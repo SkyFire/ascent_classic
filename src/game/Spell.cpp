@@ -2121,9 +2121,6 @@ void Spell::HandleAddAura(uint64 guid)
 	{
 		p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,Target, m_spellInfo);
 		p_caster->m_procCounter = 0;
-
-		if(m_spellInfo->buffType > 0)
-			p_caster->RemoveSpellTargets(m_spellInfo->buffType);
 	}
 
 	std::map<uint32,Aura*>::iterator itr=Target->tmpAura.find(m_spellInfo->Id);

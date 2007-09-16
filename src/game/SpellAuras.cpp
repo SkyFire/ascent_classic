@@ -354,7 +354,10 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 	if(caster->IsUnit())
 	{
 		if(m_spellProto->buffType > 0 && caster->IsPlayer())
+		{
+			((Player*)caster)->RemoveSpellTargets(m_spellProto->buffType);
 			((Player*)caster)->SetSpellTargetType(m_spellProto->buffType, target);
+		}
 
 		if(isAttackable((Unit*)caster,target))
 		{

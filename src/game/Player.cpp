@@ -8542,12 +8542,12 @@ void Player::RemoveSpellTargets(uint32 Type)
 	else if(Type & SPELL_TYPE_HUNTER_MARK)
 	{
 		if(m_spellTypeTargets[SPELL_TYPE_INDEX_MARK] != NULL)
-			m_spellTypeTargets[SPELL_TYPE_INDEX_MARK]->RemoveAurasByBuffType(SPELL_TYPE_CURSE, GetGUID(), 0);
+			m_spellTypeTargets[SPELL_TYPE_INDEX_MARK]->RemoveAurasByBuffType(SPELL_TYPE_HUNTER_MARK, GetGUID(), 0);
 	}
 	else if(Type & SPELL_TYPE_STING)
 	{
 		if(m_spellTypeTargets[SPELL_TYPE_INDEX_STING] != NULL)
-			m_spellTypeTargets[SPELL_TYPE_INDEX_STING]->RemoveAurasByBuffType(SPELL_TYPE_CURSE, GetGUID(), 0);
+			m_spellTypeTargets[SPELL_TYPE_INDEX_STING]->RemoveAurasByBuffType(SPELL_TYPE_STING, GetGUID(), 0);
 	}
 }
 
