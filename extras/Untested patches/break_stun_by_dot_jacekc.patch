@@ -1,0 +1,78 @@
+Index: Object.cpp
+===================================================================
+--- Object.cpp    (revision 982)
++++ Object.cpp    (working copy)
+@@ -1377,7 +1377,9 @@
+    }
+}
+
+-void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId, bool no_remove_auras)
++/* start change - Jacekc - 30-07-2007 - dots breaking all stuns fix - no_remove_aura_by_dots parameter */
++void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId, bool no_remove_auras, bool no_remove_auras_by_dots)
++/* end change - Jacekc - 30-07-2007 - dots breaking all stuns fix - no_remove_aura_by_dots parameter */
+{
+    if(!pVictim || !pVictim->isAlive())
+        return;
+@@ -1402,18 +1404,15 @@
+    if(!no_remove_auras)
+    {
+        //zack 2007 04 24 : root should not remove self (and also other unknown spells)
+-        if(spellId)
+-        {
+-            pVictim->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN,spellId);
+-            if(Rand(35.0f))
+-                pVictim->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_UNUSED2,spellId);
+-        }
+-        else
+-        {
++        /* start change - Jacekc - 30-07-2007 - dots breaking all stuns fix - breaks AURA_INTERRUPT_ON_UNUSED2 if not dot */
++        // this will also cover bug of roots being dispelled by root dmg so we can remove 'if'
++
+            pVictim->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN);
+-            if(Rand(35.0f))
++            if(!no_remove_auras_by_dots && Rand(35.0f))
+                pVictim->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_UNUSED2);
+-        }
++        
++        /* end change - Jacekc - 30-07-2007 - dots breaking all stuns fix - breaks AURA_INTERRUPT_ON_UNUSED2 if not dot */
++
+    }
+
+    if(this->IsUnit())
+Index: Object.h
+===================================================================
+--- Object.h    (revision 982)
++++ Object.h    (working copy)
+@@ -135,7 +135,9 @@
+    void BuildFieldUpdatePacket(Player* Target, uint32 Index, uint32 Value);
+    void BuildFieldUpdatePacket(ByteBuffer * buf, uint32 Index, uint32 Value);
+
+-    void DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId, bool no_remove_auras = false);
++/* start change - Jacekc - 30-07-2007 - dots breaking all stuns fix - added no_remove_aura_by_dots parameter */
++    void DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId, bool no_remove_auras = false, bool no_remove_auras_by_dots = false);
++/* end change - Jacekc - 30-07-2007 - dots breaking all stuns fix - added no_remove_aura_by_dots parameter */    
+    
+
+    virtual void DestroyForPlayer( Player *target ) const;
+Index: SpellAuras.cpp
+===================================================================
+--- SpellAuras.cpp    (revision 982)
++++ SpellAuras.cpp    (working copy)
+@@ -1071,11 +1071,14 @@
+    Unit * mtarget = m_target;
+    uint64 cguid = m_casterGuid;
+
++    /* start change - Jacekc - 30-07-2007 - dots breaking all stuns fix - last param means dmg doesnt break stuns like frost nova */
++    /* with last param as true dmg dealt by dots wont remove auras like frost nova or roots */
+    if(c)
+-        c->DealDamage(m_target, float2int32(res),  2, 0, GetSpellId ());
++        c->DealDamage(m_target, float2int32(res),  2, 0, GetSpellId (), false, true);
+    else
+-        m_target->DealDamage(m_target, float2int32(res),  2, 0,  GetSpellId ());
+-
++        m_target->DealDamage(m_target, float2int32(res),  2, 0,  GetSpellId (),false, true);
++    /* end change - Jacekc - 30-07-2007 - dots breaking all stuns fix - last param means dmg doesnt break stuns like frost nova */
++    
+    if(mtarget->GetGUID()!=cguid && c)//don't use resist when cast on self-- this is some internal stuff
+    {
+        uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION;

@@ -1,0 +1,13 @@
+////////////////////////////////////////
+// Script name : GongOfBethekk.gm
+// Submitter name : Darkened Fate
+//
+// Submitted for AscentScripts (c)
+//------------------------------------//
+
+global GongOfBethekk = function(unit, plr)
+{
+		// Spawn High Priestess Arlokk when Gong is rung
+		unit.SpawnMonster(14515, -11556.3, -1628.32, 41.299); 
+};
+.RegisterGameObjectEvent(180526, 2, GongOfBethekk); 

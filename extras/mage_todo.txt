@@ -1,0 +1,65 @@
+8) Ice lance (is not affected by ice shard on antrix and it duplicate damage when the damage would be 3x on frozen target...).without the gear (0 spell damage) the dmg on frozen target is ok..(160-187)with the gear (880+ spll dmg) i make 400-500 dmg on target without frozen effect... and 800 on frozen target( and crit 1200)... is not correct i think... i have a pg on official server and with 550 spell dmg and i hit for 800 on frozen target and crit 1600..
+9) Summon water elemental (Mage)
+
+Ice lance this spell is cheap on mana,and does little damage,but here it gains all the spell damage you have and as a result we have tonz of damage for nothing.It should not gain any spell dmg.it only does tripple damage against frozen targets like frost nova'd.
+Double shield - Ice Barrier + Mana Shield,this combo makes a mage mostly impossible to kill if you are melee,since the dmg absorb is unreal.Only one type of shield can be on you at a time.
+Arcane Missles - popular spell due it's unlimited range,if you even run away from the range,they will be still casting on you.When the target leaves the range the channeling should be canceled.
+
+Mage:
+
+Talents:
+Arcane:
+Arcane Subtlety:Working. Not sure if reduces resistance. Instead of resistance this spell reduces cost !
+Arcane Focus: Not sure if works
+Improved Arcane Missiles: Not tested yet
+Wand Specialization: Not works. And you can train it in the trainers (?))
+Magic Absorption:At least works the resistance part of it, mana restore not sure
+Arcane Concentration:Doesn't work
+Magic Attunement: Looks like working but only if you spend 2 points
+Arcane Impact:Looks like working
+Improved Blink:Doesn't work
+Presence of Mind:Partially, sometimes you lose this buff. Seens like it is lost by magic effect (like the periodic fire by fireball)
+Arcane Instability:Doesn't work
+Arcane Potency:Since there's no Clearcasting state (Arcane Concentration), Arcane pontency can't work
+Empowered Arcane Missiles:Doesn't work
+Arcane Power:Doesn't work
+Spell Power:Doesn't work
+
+Fire:
+Improved Fire Blast:Doesn't Work. It's only visual
+Improved Flamestrike:Doesn't Work
+Master of Elements:Not tested yet
+Playing with Fire:Not tested yet
+Pyromaniac:Not tested yet
+Molten Fury:Not tested yet
+- mage - Improved Fire Ward
+
+Frost:
+Frost Warding:Doesn't work
+Elemental Precision:Doesn't work
+Improved Blizzard:Doesn't work. Retest
+Frozen Core:Not tested yet
+Ice Floes:Doesn't work
+Arctic Winds:Not sure about +5% frost spell damage
+Empowered Frostbolt:Doesn't work
+Summon Water Elemental:Doesn't work
+
+Spells:
+Armors:
+Molter Armor:Partially working. Crit chance is incrised. but the rest doens't work
+
+Arcane:
+Arcane Missiles:Don't shot the last missile (or first?)
+Detect Magic:Not works
+Blink: Doesn't release you from stun, just from bonds.
+Mana Shield:Working, but only for physical damage, because in 2.0.3 or later it has been changed to absorb spell damage too.
+Invisibility:Not tested yet
+Arcane Blast:Working but the buff (stacks three times, lasts 8 sec) that increases mana cost but decreases casting time doesn't work.
+Spellsteal:Doesn't work
+
+
+Frost:
+Frost Nova:Working Side Effect: 100% chance to break it on hit
+
+Problems not related with only one spell/talent:
+- Problem with multiple mages in one group: if a mage cast fireball for example on a mob, if i cast a lower rank of fireball it says that a another more powerfull spell effect is active...this should work on buffs like Arcane Intellect not casting damage spells

@@ -1,0 +1,23 @@
+Druid:
+
+Druid's need a little tweaking they'r % dmages becouse it's pretty high.
+And some of it's ability's which were doing ur damage + ability's damage became % damage.For example,the simple Claw,it does ur dmg +123(just an example) now it does,ur damage + 123% of ur damage,kinda much you know.(At this point i could be making a mistake, if i'm wrong please correct me)
+Nerf boomkins!!!!Instant cast spells dont reciave that much spell dmg as long cast spells.Can cast moonfire with they'r back,when they shouldn't.
+
+Omen of Clarity (druid)
+
+Skills
+Tranquility - doesnt work. are you sure ?
+Nature Grasp - doesnt work. have to check to be outdors (cancast)
+Entangling Roots - may need break chance changed to be damage dependant
+Shared - does only the plus dmg not the 225% dmg from normal atack (I think this skill its eazy fixable becoz Rogue skills like this work)
+Revange - same as shared
+Mangle - same as shared (about the effect i dont know)
+Rake - Does 2x dmg over time it should do 219 over 9 sec..it does 400+ over 4 sec
+Feline Grace - Is totaly bagged its should reduse dmg from falling but instead u can jump from the highes places and no dmg....after jumping when u cancel cat form u will take like a milion dmg and die :D (if u fall with cat from high place logout while u are in cat form or ull be dead :D)
+
+Talents
+Hearth of the Wild - Only adds you 20% intelect... while in cat and bear forms its doesnt add anything
+Moonkin aura - doesnt work. 2 maybe it works now ?
+Stun and fear are 100% so all talents that reduse stun and fear effects are bugged
+11) Heart of th wild (Druid) ==> Do not add strength in cat form

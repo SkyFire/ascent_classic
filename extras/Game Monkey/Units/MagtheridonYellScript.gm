@@ -1,0 +1,21 @@
+global MagtheridonAggro=function(mob)
+{
+.PlaySoundToSet(10254);
+.SendYellMessage("Thank you for releasing me. Now... die!");
+};
+.RegisterUnitEvent(17257, 1, MagtheridonAggro);
+
+global MagtheridonKillPlayer=function(mob)
+{
+.PlaySoundToSet(10255);
+.SendYellMessage("Did you think me weak? Soft? Who is the weak one now?!");
+};
+.RegisterUnitEvent(17257, 3, MagtheridonKillPlayer);
+
+global MagtheridonDies=function(mob)
+{
+.PlaySoundToSet(10258);
+.SendYellMessage("The Legion... will consume you... all....");
+.DeregisterTimer ();
+};
+.RegisterUnitEvent(17257, 4, MagtheridonDies);

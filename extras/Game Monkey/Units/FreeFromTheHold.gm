@@ -1,0 +1,178 @@
+//////////////////////////////////////////
+// Script name : Free From the Hold Escort
+// Submitter name : Iceman
+//
+// Submitted for AscentScripts (c)
+//------------------------------------////
+
+global OnFreeFromtheHoldStart = function(mob, plr)
+{
+   // Create all the waypoints for the mob
+   mob.CreateCustomWaypointMap();
+   mob.CreateWaypoint(-1607.61, -3846.03, 14.3572, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1601.69, -3845.79, 14.4817, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1594.94, -3844.55, 14.823, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1588.44, -3843.31, 15.354, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1581.88, -3842.06, 16.2485, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1575.89, -3840.92, 17.1104, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1570.30, -3839.8, 17.9687, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1564.34, -3838.72, 18.9013, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1558.74, -3837.65, 19.0262, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1552.89, -3836.54, 18.7007, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1547.43, -3835.5, 18.6492, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1541.33, -3834.44, 18.9799, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1536.76, -3835.05, 19.4686, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1531.07, -3835.98, 20.3061, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1523.45, -3837.19, 21.3995, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1517.71, -3837.22, 22.2306, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1511.25, -3837.25, 23.0413, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1505.6, -3837.28, 23.6246, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1500.16, -3837.31, 23.8903, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1495.08, -3837.33, 23.9026, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1489.17, -3837.59, 23.8869, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1482.45, -3837.57, 23.63, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1476.31, -3837.61, 23.194, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1467.31, -3839.26, 22.3576, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1460.5, -3841.34, 21.7234, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1454.07, -3843.84, 21.0815, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1445.73, -3846.94, 20.289, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1437.76, -3847.57, 19.8442, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1429.79, -3848.21, 19.3784, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1423.26, -3848.67, 18.9816, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1415.31, -3847.78, 18.5469, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1406.03, -3845.68, 17.8986, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1399.99, -3843.36, 17.8729, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1375.81, -3840.52, 18.7323, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1372.16, -3838.88, 18.8057, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1361.21, -3832.72, 17.926, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1355.54, -3828.14, 17.5429, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1348.75, -3822.75, 17.5781, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1338.12, -3816.78, 17.5464, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1328.21, -3811.28, 17.6097, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1320.31, -3807.99, 18.1579, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1313.69, -3804.48, 19.2114, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1305.6, -3799.6, 20.4015, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1302.12, -3792.88, 20.6411, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1296.79, -3786.92, 22.0117, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1290.65, -3780.14, 24.335, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1286.06, -3777.14, 26.583, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1280.86, -3776.57, 27.7688, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1273.94, -3779.63, 26.4915, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1264.78, -3783.29, 26.6199, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1256.33, -3783.53, 26.094, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1248.37, -3784.3, 25.5332, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1240.41, -3785.08, 25.1034, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1231.61, -3784.21, 24.472, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1223.92, -3782.33, 23.623, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1216.24, -3779.79, 24.0898, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1208.55, -3777.58, 24.5246, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1197.85, -3772.64, 23.8734, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1191.31, -3770.45, 23.4831, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1184.86, -3768.21, 23.2267, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1174.51, -3761.98, 22.8914, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1167.65, -3757.85, 22.2859, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1159.04, -3752.67, 21.3435, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1152.09, -3748.49, 20.238, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1145.65, -3744.69, 18.7876, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1138.34, -3742.05, 17.6977, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1131.72, -3739.67, 17.0391, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1121.53, -3736.45, 17.7398, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1115.49, -3736.1, 17.7868, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1107.49, -3735.9, 18.1145, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1099.49, -3735.69, 18.714, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1091.5, -3735.49, 19.1923, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1083.5, -3735.28, 19.3328, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1074.13, -3734.84, 19.4273, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1065.55, -3730.66, 19.8925, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1063.96, -3727.33, 20.5922, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1060.76, -3719.66, 22.14, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1057.56, -3712.33, 24.3349, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1054.37, -3705.33, 25.9164, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1050.46, -3697.17, 26.9811, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1048.16, -3694.28, 26.3632, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1042.54, -3689.67, 24.7195, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1036.35, -3684.61, 23.4694, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1030.22, -3679.16, 23.1939, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1024.87, -3671.21, 22.8851, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1019.65, -3668.06, 22.237, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1013.34, -3666.59, 21.184, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-1003.49, -3665.46, 19.6068, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-998.347, -3661.75, 19.4684, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-991.859, -3657.07, 18.869, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-985.371, -3652.39, 18.4673, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-980.152, -3648.56, 18.5684, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-974.281, -3643.16, 18.2057, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-965.768, -3640.76, 16.6939, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-960.052, -3642.37, 15.2018, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-956.27, -3647.81, 12.6505, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-955.801, -3655.79, 10.7971, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-955.332, -3663.78, 9.82122, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-954.707, -3671.47, 9.07335, 3.098398, 0, 256, 0);
+   mob.CreateWaypoint(-951.746, -3678.91, 8.21153, 3.098398, 0, 256, 0);
+                      
+   // Set the escort target. This is needed to clean up and move him back to the spawn if the player
+   // goes out of range.
+   mob.SetEscortTarget(plr);
+                      
+   // Make sure he is on the correct movement type (move to the end of the waypoint path then stop)
+   mob.SetMovementType(11);
+                      
+   // He shouldn't attack anything.
+   mob.SetCombatCapable(0);
+                      
+   // Halt his movement for 3 seconds, so he can say his stuff.
+   mob.StopMovement(3000);
+                      
+   // Send his chat message.
+   mob.SendChatMessage("Enough talk, help me get back to Ratchet will you? Let me know when you're ready and we'll make our break!");
+
+   // Set his NPC flags to 0, so no one else can accept the quest.
+   mob.SetNPCFlags(0);
+
+   // If all goes well, he should proceed to his first waypoint.
+};
+
+global OnFreeFromtheHoldCheck = function(mob, plr)
+{
+   if(mob.HasEscortTarget() == 1)
+   {
+      //plr.SendSystemMessage("Someone else is already doing that quest.");
+      return 0;
+   }
+  
+   return 1;
+};
+
+global OnFreeFromtheHoldReachWaypoint = function(waypoint_id)
+{
+
+   if(waypoint_id == 100)
+   {
+      // Send the chat message.
+      .SendChatMessage("Finally, I am rescued");
+      
+      // Despawn him after 5 seconds, and return back to the spawn.
+      .Despawn(5000, 1000);
+
+      // Destroy the custom waypoint map we created.
+      .DestroyCustomWaypointMap();
+
+      // Last but not least, complete the quest objective for the player.
+      if(.HasEscortTarget() == 0)
+      {
+          return;
+      }
+
+      plr = .GetEscortTarget();
+
+      // We're no longer being escorted.
+      .ClearEscortTarget();
+
+      plr.MarkQuestObjectiveAsComplete(898, 0);
+   }
+};
+
+// Register the events.
+.RegisterQuestEvent(898, 2, OnFreeFromtheHoldStart);        // TheEscape - on accept
+.RegisterQuestEvent(898, 3, OnFreeFromtheHoldCheck);        
+.RegisterUnitEvent(3465, 8, OnFreeFromtheHoldReachWaypoint);        // TheEscape - on reach waypoint

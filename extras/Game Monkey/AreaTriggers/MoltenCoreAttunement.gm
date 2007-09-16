@@ -1,0 +1,27 @@
+///////////////////////
+// AscentScripts team
+// (c) 2007
+//
+// Credits to Ascent team, you can have it on their SVN, in extras/example_scripts
+// http://www.ascentemu.com/
+//
+// This is an example script too, you can have it in example scripts section
+//
+//--------------------------------------------------------------------//
+
+global MoltenCore_Attunement_Check = function(plr)
+{
+    // check for a quest
+    if(plr.HasFinishedQuest(7487) == 1)
+    {
+			plr.JoinInstance(409, 1089.6, -470.19, -106.41, 0.0); 
+            return 1;
+    }
+//plr.SendAreaTriggerMessage("You need to be in a Raid Group, be level 58 and have completed the quest : Attunement to the Core");
+    //plr.BroadcastMessage(1,"You need to be in a Raid Group, be level 58 and have completed the quest : Attunement to the Core");
+    return 0;
+};
+
+// register in script system
+this.RegisterAreaTriggerEvent(3528, MoltenCore_Attunement_Check);
+this.RegisterGameObjectEvent(180601, 2, MoltenCore_Attunement_Check);

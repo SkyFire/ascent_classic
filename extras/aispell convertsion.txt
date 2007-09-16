@@ -1,0 +1,67 @@
+	FILE * f = fopen("C:\\ai.sql", "w");
+	QueryResult * r = sDatabase.Query("SELECT * FROM spells");
+	do 
+	{
+		int entry = r->Fetch()[0].GetUInt32();
+		for(int i = 0; i < 20; ++i)
+		{
+			int spellid = r->Fetch()[1+i].GetUInt32();
+			SpellEntry * sp = spellid ? sSpellStore.LookupEntry(spellid) : 0;
+			if(sp)
+			{
+				int type = STYPE_DAMAGE;
+				int dmgtype = TTYPE_SINGLETARGET;
+
+				for(int i = 0; i < 3; ++i)
+				{
+					switch(sp->EffectImplicitTargetA[i])
+					{
+					case 28:
+					case 31:
+						dmgtype = TTYPE_DESTINATION;
+						break;
+					}
+					if(sp->Effect[i] == SPELL_EFFECT_APPLY_AURA)
+					{
+						if(sp->EffectApplyAuraName[i] == SPELL_AURA_MOD_FEAR)
+							type = STYPE_FEAR;
+						else
+                            type = STYPE_BUFF;
+						break;
+					}
+					else if(sp->Effect[i] == SPELL_EFFECT_HEAL)
+					{
+						type = STYPE_HEAL;
+						break;
+					}
+				}
+
+				int cooldown = 0;
+				if(sp->CategoryRecoveryTime > 0)
+					cooldown = sp->CategoryRecoveryTime;
+				if(sp->RecoveryTime > 0)
+					cooldown += sp->RecoveryTime;
+				if(sp->StartRecoveryTime > 0)
+					cooldown += sp->StartRecoveryTime;
+
+				if(!cooldown)
+					cooldown = 5000;
+
+				stringstream ss;
+				ss << "INSERT INTO ai_agents VALUES("
+					<< entry << ","
+					<< uint32(AGENT_SPELL) << ","
+					<< uint32(EVENT_DAMAGETAKEN) << ","
+					<< uint32(5) << ","
+					<< uint32(0) << ","
+					<< spellid << ","
+					<< type << ","
+					<< dmgtype << ","
+					<< cooldown << ","
+					<< uint32(0) << ","
+					<< uint32(0) << ");";
+				fprintf(f, "%s\n", ss.str().c_str());
+			}
+		}
+	} while(r->NextRow());
+	fclose(f);

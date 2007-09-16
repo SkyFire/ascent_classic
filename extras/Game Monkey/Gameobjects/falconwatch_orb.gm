@@ -1,0 +1,13 @@
+global falconwatch_orb_bottom = function(plr)
+{
+   plr.Teleport(530, -592.9, 4068.4, 143.2);
+   return 0;
+};
+this.RegisterAreaTriggerEvent(4439, falconwatch_orb_bottom);
+
+global falconwatch_orb_top = function(plr)
+{
+   plr.Teleport(530, -595.0, 4081.1, 93.8);
+   return 0;
+};
+this.RegisterAreaTriggerEvent(4440, falconwatch_orb_top);	

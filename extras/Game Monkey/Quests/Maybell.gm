@@ -1,0 +1,12 @@
+global MaybellComplete = function(qst_giver, plr)
+{
+   qst_giver.SendChatMessage("Here goes nothing...");
+   qst_giver.Emote(18);	// EMOTE_ONESHOT_CRY
+
+   // Despawn after 5 seconds (time for the message), and respawn after 30 secs.
+   qst_giver.Despawn(5000, 20000);
+};
+
+
+// Register the scripts
+.RegisterQuestEvent(114, 1, MaybellComplete);			// The Escape

@@ -1,0 +1,20 @@
+Index: src/game/WorldSession.cpp
+===================================================================
+--- src/game/WorldSession.cpp	(revision 973)
++++ src/game/WorldSession.cpp	(working copy)
+@@ -103,11 +103,11 @@
+ 			// Abort..
+ 			return 0;
+ 		}
+-
+-		bDeleted = true;
+-		LogoutPlayer(true);
++		SetLogoutTimer(20);
++		//bDeleted = true;
++		//LogoutPlayer(true);
+ 		// 1 - Delete session completely.
+-		return 1;
++		//return 1;
+ 	}
+ 
+ 	while ((packet = _recvQueue.Pop()))

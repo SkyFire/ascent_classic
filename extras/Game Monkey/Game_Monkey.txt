@@ -1,0 +1,191 @@
+One word: gamemonkey! *whip sound*
+
+Fun fun
+
+More: (via Psychotic AKA "Somnium")
+
+Registering Events
+
+Quest Event:
+
+.RegisterQuestEvent(Quest, Event, Function);
+Event
+1 = On Complete
+2 = On Accept
+3 = Can Accept
+Function
+global EventName = function(QuestGiver, Player)
+
+Unit Event:
+
+.RegisterUnitEvent(Unit, Event, Function);
+Event
+1 = On Enter Combat
+2 = On Leave Combat
+3 = On Killed Target
+4 = On Died
+5 = On AI Tick
+6 = On Spawn
+7 = On Gossip Talk
+8 = On Reach Waypoint
+Function
+global EventName = function(Player)
+Code:
+
+GameObject Event:
+
+.RegisterGameObjectEvent(Unit, Event, Function);
+Event
+1 = On Spawn
+2 = On Use
+Function
+global EventName = function(Player)
+Unit = GameObject "entry" via gameobject_names database table
+
+Commands:
+
+Player:
+.IsGroupLeader() : Returns 1 for true, 0 for false
+.HasFinishedQuest(QuestID) : Returns 1 for ture, 0 for false
+.GetStanding(FactionID) : im not sure exactly how this works
+.GetStandingRank(FactionID) : im not sure exactly how this works
+.BroadcastMessage(Message) : im note sure how this works
+.SendAreaTriggerMessage(Message) : Same as above.
+.GetRace() : Returns race as a number
+.GetClass() : Returns class as a number
+.GetLevel() : Returns level
+.Teleport(mapID, x, y z) : This will check if its safe before teleporting then teleports player to location
+.AddItem(ItemID, Count)
+.RemoveItem(ItemID, Count)
+.LearnSpell(SpellID)
+.UnlearnSpell(SpellID)
+.Knockback(x, y, affect1, affect2)
+.SendNotification(message)
+.SendSystemMessage(message)
+.MarkQuestObjectiveAsComplete() - explanitory
+
+
+GameObjects:
+
+.GetEntry() : Returns entry id
+.Despawn(Delay) : Despawns after so many seconds
+.SetActive() 1 (active?) 2 (closed?)
+.PlayCustomAnim(animation) - maybe via DBC? or fields in core
+.GetUnit
+.GetGameObject() gets go entry
+.GetPlayer()
+.GetGuid() gets guid (graphical universal ID? I made that up >.>)
+.RegisterEvent
+
+Unit:
+.Despawn(Delay, Respawn Time) : Im not sure if it waits for the delay then runs respawn time or the other way
+.Emote(EmoteID) : Emotes
+.SendChatMessage(Message)
+.CastSpell(SpellID) : Casts a spell, no target (maybe self?)
+.CastSpellOnTarget(SpellID, Target) : Im not sure how the target works
+.TimedEmote(EmoteID, Timer) : Delayed emote
+.RegisterTimer(Delay, Function, Repeats) : Does something every X seconds? Y times.
+.DeregisterTimer() : Im not sure how this works
+.SpawnMonster(entry, x, y, z) : Spawns a creature at X Y Z
+.SendChatMessageAltEntry
+.TimedEmote(emoteid, timer)
+.SpawnWithoutWorld(entry, x, y, z)
+.AddToWorld
+.CreateCustomWaypointMap
+.CreateWaypoint(x, y, z, orientation, waittime, flags, modelid)
+.MoveToWaypoint(wapoint #)
+.Delete()
+.SetCombatCapable() - (1)true (0)false
+.StopMovement(timer)
+.SetMovementType(movement type)
+.SetEscortTarget()
+.GetEscortTarget()
+.HasEscortTarget() - (1)True or (0)false
+.SetNPCFlags(movetype)
+.DestroyCustomWaypointMap()
+.CrearEscortTarget()
+.GetUnit
+.ChangeEntry()
+.ChangeModel(model id)
+.ChangeScale(scale #1-?, not sure if this includes floats)
+.ChangeFaction(faction id)
+.TextEmote(text)
+
+QuestFunctions:
+
+GetId
+
+AreaTriggerFunctions:
+
+GetEntry
+
+Examples:
+
+Code:
+
+global TranslocOrb = function(plr)
+{
+	// Silvermoon to Undercity
+	// map id, x, y, z (must be float!)
+	plr.Teleport(0, 1805.0, 336.0, 71.0);
+};
+// Player will transport "on use (click)"
+.RegisterGameObjectEvent(184502, 2, TranslocOrb);
+
+Code:
+
+global AttackTest = function(plr)
+{
+  //Simply use the commands without a prefix to call the Creature
+  .SendChatMessage("You take no candle");
+};
+
+Code:
+
+global MaybellComplete = function(qst_giver, plr)
+{
+  qst_giver.SendChatMessage("Here goes nothing...");
+  qst_giver.Emote(18);   // EMOTE_ONESHOT_CRY - can be found in core
+  // Despawn after 5 seconds (time for the message), and respawn after 30 secs.
+  qst_giver.Despawn(5000, 30000);
+};
+
+Code:
+
+global LillithText = function(plr)
+{
+  // We dont use a function type as its later set in RegisterUnitEvent
+  //Send that message!
+	.SendChatMessage("You have disturbed my rest. Now face my wrath!");
+	// Despawn in 3 minutes (1000 = 1 second)
+	.Despawn(180000, 0);
+};
+
+global DormentShadeC = function(unit, plr)
+{
+   unit.SpawnMonster(1946, 2478.089355, 20.496187, 25.791481);
+};
+// Quest id/on complete/function name
+.RegisterQuestEvent(410, 2, DormentShadeC);
+// unit 'entry'/on spawn/function name
+.RegisterUnitEvent(1946, 6, LillithText);
+
+//--------------------------------------------
+// Example check HP script
+//--------------------------------------------
+
+global HealthCheck = function()
+{
+	if(.GetHealthPct() <= 70)	
+	{
+		.SendYellMessage("Fools!");
+		.DeregisterTimer();
+	}
+};
+
+global OnSpawn = function(plr)
+{
+	.RegisterTimer(1000, HealthCheck, 0); // Calls HealthCheck every 1 second.	
+};
+
+.RegisterUnitEvent(yourunit, 6, OnSpawn);

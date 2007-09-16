@@ -1,0 +1,40 @@
+Index: ObjectMgr.cpp
+===================================================================
+--- ObjectMgr.cpp    (revision 908)
++++ ObjectMgr.cpp    (working copy)
+@@ -2112,10 +2112,14 @@
+
+                // Calculate next level XP
+                uint32 nextLvlXP = 0;
+-                if( Level > 0 && Level <= 30 )
++                if( Level > 0 && Level <= 29 )
+                {
+                    nextLvlXP = ((int)((((double)(8 * Level * ((Level * 5) + 45)))/100)+0.5))*100;
+                }
++                else if( Level == 30 )
++                {
++                    nextLvlXP = ((int)((((double)(((8 * Level) + 1) * ((Level * 5) + 45)))/100)+0.5))*100;
++                }
+                else if( Level == 31 )
+                {
+                    nextLvlXP = ((int)((((double)(((8 * Level) + 3) * ((Level * 5) + 45)))/100)+0.5))*100;
+@@ -2124,10 +2128,18 @@
+                {
+                    nextLvlXP = ((int)((((double)(((8 * Level) + 6) * ((Level * 5) + 45)))/100)+0.5))*100;
+                }
+-                else
++                else if( Level > 32 && Level <=60 )
+                {
+                    nextLvlXP = ((int)((((double)(((8 * Level) + ((Level - 30) * 5)) * ((Level * 5) + 45)))/100)+0.5))*100;
+                }
++                else if( Level == 60 )
++                {
++                    nextLvlXP = ((int)((((double)(155 + (235 + (5 * Level)) * (1344 - 69 - ((69 - Level) * (7 + (69 - Level) * 8 - 1) / 2))))/100)+0.5))*100;
++                }
++                else
++                {
++                    nextLvlXP = ((int)((((double)(155 + (235 + (5 * Level)) * (1344 - ((69 - Level) * (7 + (69 - Level) * 8 - 1) / 2))))/100)+0.5))*100;
++                }
+
+                lvl->XPToNextLevel = nextLvlXP;
+                lastlvl = *lvl;

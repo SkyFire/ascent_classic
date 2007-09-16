@@ -1,0 +1,29 @@
+////////////////////////////////////////
+// Script name : Onyxias_lair_attunement.gm
+// Submitter name : Darkened Fate
+//
+// Submitted for AscentScripts (c)
+//------------------------------------//
+
+
+global OnyxiasLair_Attunement_Check = function(plr)
+{
+    // check for a quest
+    if(plr.HasFinishedQuest(6602) == 1)
+    {
+            plr.JoinInstance(249, 30.0, -64.0, -5.0, 0.0);
+            return 1;
+    }
+    
+    if(plr.HasFinishedQuest(6502) == 1)
+    {
+            plr.JoinInstance(249, 30.0, -64.0, -5.0, 0.0);
+            return 1;
+    }
+    //plr.SendAreaTriggerMessage("You need to be level 58 and have completed the quest : Drakefire Amulet for Alliance, or Blood of the Black Dragon Champion for Horde.");
+    //plr.BroadcastMessage(1,"You need to be level 58 and have completed the quest : Drakefire Amulet for Alliance, or Blood of the Black Dragon Champion for Horde.");
+    return 0;
+};
+
+// register in script system
+this.RegisterAreaTriggerEvent(2848, OnyxiasLair_Attunement_Check);

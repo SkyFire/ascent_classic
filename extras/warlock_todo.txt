@@ -1,0 +1,70 @@
+Warlock:
+
+Warclock's have lot's of spells woking,but mostly they depend on pets,and since they'r pets dont like to listen to they'r masters,lock's are abit weak.
+Death Coil need's a dmg heal effect added.It just does damage,but not giving a heal equal to the damage done.
+
+Affliction
+Life Tap - last rank isn't working so you don't get any mana whit cost of health points
+Curse of Tongues - nothing happens , no +x% casting time to enemy
+Unstable Affliction - no dmg when dispelled
+Seed of Corruption - no dmg when detonates
+Curse of Weakness - last 2 ranks aren't working
+Curse of Idiocracy - nothing happens no intelect and spirit decreased
+Demonology
+Soulstone - last rank doesnt works , nothing appears in your bags
+Firestone - missing rank 2 3 4 5
+Spellstone - missing rank also
+Health Funnel - you get killed while channeling
+Eye of Kilrogg - they eye gets summoned but u still have control on you
+Enslave Demon - doesnt works
+SoulWell - nothing appears
+Destruction
+Hellfire - nothing happens , no dmg made
+Searing Pain - somethimes doesnt make dmg
+Minions:
+Each time u resummon your pet you have to drag and drop your spells in minion action bar .
+
+Imp:
+* Blood Pact - no +43 stamina received neither in party/raid/self alone
+*Phase Shift - nothing happens imp still get's attacked by enemy
+*Fire Shield - no shield protect your target
+Voidwaler ( VW) * Self Sacrifice - nothing happens
+* Consume Shadows - no hp regained
+Succubus ( succy )
+*Seduction - nothing happens
+*Shooting Kiss - no aggro made
+*Lesser Invisibility - doesn't works
+Felhunter
+*Spell lock - no spell lock for 8 seconds
+*Devour Magic - no buffs dispelled
+*Tainted Blood - no dmg reduction
+*Paranoia - doesn't destealths rogues or druids
+Felguard
+First i don't even know where i sohlud get Grimoires for his spells so i cannot tell u how its bugged .
+
+Talents:
+http://img82.imageshack.us/img82/5526/untitledlklklsg0.png
+
+Also for all caster classes i don't know why but sometimes even if i'm correctly positioned it tells me " Target must be in front of you " .
+TALENTS
+Affliction
+Improved Life Tap - increases mana awarded by 10% - nothing happens no bonus <- should be fixed already
+Improved Drain Soul - no mana regeneration after shard is made
+Amplify Curse - should increase dmg for next Curse of Doom or Curse of Agony by 50 % , works sometimes only for CoA
+Grim Reach - should increase range for affliction spells by 10 % - no increase
+Shadow Embrace - should give u 5% reduction on dmg received when you cast Corr , CoA , Siphon Life or Seed of Corr
+Nighfall - 4% chance when a target is dmged by Drain Life or Corr to make your next shadowbolt instant
+Improved Howl of Terror - should reduce your howl of terror cast by 1.6 sec - nothing happens
+Unstable Affliction - should make 1057 DoT and 1570 when dispelled - no dmg at dispell
+
+Demonology - anyway useless whitout minions fixes
+Improved Healthstone - grants 20% more hp at healthstone
+Demonic Sacrifice - nothing happens
+Master Demonologyst - idem ^^
+Soul Link - 20% or dmg received by caster is taken by minion and increases dmg done by 5%
+
+Destruction
+Cataclysm - reduces mana cost by destruction spells by 5% - no reduction
+Bane - casting time reduced by 0.5 sec for shadowbolt and 1 sec for shoul fire - no reduction for soul fire and immolate
+Intensity - 70% chance to resist intreruption when channeling destro spells ( Rain of Fire and Hellfire ) - nothing
+Blacklash - increases critical chance by 3% and has a 25% when dmged to have a Shadow bolt or Incinerate spell instant - nothing

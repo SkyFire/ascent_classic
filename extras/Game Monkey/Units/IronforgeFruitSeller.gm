@@ -1,0 +1,36 @@
+//////////////////////////////////////////////////////////////////////////////////////////
+// AscentScripts team
+// (c) 2007
+//
+// Made by: Grape
+//
+// This scripts adds the shout lines from the fruit vendor in Ironforge.
+// 
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+global IF_FRUIT_SELLER_SPAWN = function(mob, plr)
+{
+.SetMovementType(2);
+.CreateWaypoint(-4680.991699,	-970.090454,	501.658295,	2.30, 0, 256, 0);
+.CreateWaypoint(-4693.670410,	-944.227600,	501.667389,	1.88, 0, 256, 0);
+.CreateWaypoint(-4694.562012,	-918.898987,	501.660919,	1.12, 0, 256, 0);
+.CreateWaypoint(-4670.797852,	-922.369873,	501.660065,	5.76, 0, 256, 0);
+.CreateWaypoint(-4647.173828,	-939.691162,	501.658264,	5.55, 0, 256, 0);
+.CreateWaypoint(-4636.800781,	-967.015930,	501.660706,	4.51, 0, 256, 0);
+.CreateWaypoint(-4660.826660,	-988.344177,	501.659790,	1.59, 0, 256, 0);
+};
+
+global IF_FRUIT_SELLER_WAYPOINT = function(waypoint_id)
+{
+
+if(waypoint_id == 3) {.SendChatMessage("Sink your teeth into a fresh, ripe apple.");}
+if(waypoint_id == 6) {.SendChatMessage("Juicy fruits for sale!");}
+if(waypoint_id == 7) {.SendChatMessage("Stright from the lush forests of Elwynn, get your fresh fruit right here.");}
+};
+
+.RegisterUnitEvent(7978, 8,IF_FRUIT_SELLER_WAYPOINT );
+.RegisterUnitEvent(7978, 6,IF_FRUIT_SELLER_SPAWN );
+
+
+

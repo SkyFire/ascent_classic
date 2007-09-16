@@ -1,0 +1,26 @@
+////////////////////////////////////////
+// Script name : Naxxramas_attunement.gm
+// Submitter name : Darkened Fate
+//
+// Submitted for AscentScripts (c)
+//------------------------------------//
+
+
+global Naxxramas_Attunement_Check = function(plr)
+{
+    // check for a quest
+    if(plr.HasFinishedQuest(7487) == 1)
+    {
+        if(plr.GetStandingRank(529) >= 5)    // HONORED
+        {
+            plr.JoinInstance(533, 3006.06, -3436.72, 293.891, 64.8757);     
+            return 1;
+        }
+    }
+    //plr.SendAreaTriggerMessage("You need to be level 58, Honored or higher with the Argent Dawn, and have completed the quest : The Dread Citadel - Naxxramas");
+    //plr.BroadcastMessage(1,"You need to be level 58, Honored or higher with the Argent Dawn, and have completed the quest : The Dread Citadel - Naxxramas");
+    return 0;
+};
+
+// register in script system
+this.RegisterAreaTriggerEvent(4055, Naxxramas_Attunement_Check);

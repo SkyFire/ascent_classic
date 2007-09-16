@@ -1,0 +1,38 @@
+///////////////////////
+// AscentScripts team
+// (c) 2007
+//
+// Credits to Neoshinobi On EP for this script
+// http://emupedia.com/community/showthread.php?t=11451
+//
+// This is an example script too, you can have it in example scripts section
+//
+//--------------------------------------------------------------------//
+//
+//------------------------------------LillithText---------------------//
+global LillithText = function(plr)
+{
+  // We dont use a function type as its later set in RegisterUnitEvent
+  //Send that message!
+	.SendChatMessage("You have disturbed my rest. Now face my wrath!");
+	// Despawn in 3 minutes (1000 = 1 second)
+	.Despawn(180000, 0);
+};
+
+//--------------------------------------------------------------------//
+//
+//
+//------------------------------------DormentShadeC-------------------//
+global DormentShadeC = function(unit, plr)
+{
+   unit.SpawnMonster(1946, 2478.089355, 20.496187, 25.791481);
+};
+
+//--------------------------------------------------------------------//
+//
+//--------------------------------------------------------------------//
+
+// Quest id/on complete/function name
+.RegisterQuestEvent(410, 2, DormentShadeC);
+// unit 'entry'/on spawn/function name
+.RegisterUnitEvent(1946, 6, LillithText);

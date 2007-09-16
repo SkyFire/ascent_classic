@@ -1,0 +1,44 @@
+	Creature * pCreature = getSelectedCreature(m_session, false);
+	Player * pPlayer = m_session->GetPlayer();
+	QueryResult * result = sDatabase.Query("SELECT * FROM ai_agents WHERE spellType=10");
+	FILE * f1 = fopen("C:\\log1.txt", "w");
+	FILE * f2 = fopen("C:\\log2.txt", "w");
+	int total = result->GetRowCount();
+	int j = 0;
+	do 
+	{
+		Aura * pAura = new Aura(sSpellStore.LookupEntry(result->Fetch()[5].GetUInt32()), 1000, pCreature, pPlayer);
+		for(uint32 i = 0; i < 3; ++i)
+		{
+			if(pAura->GetSpellProto()->Effect[i] == SPELL_EFFECT_APPLY_AURA)
+			{
+				pAura->AddMod(pAura->GetSpellProto()->EffectApplyAuraName[i], 
+					pAura->GetSpellProto()->EffectBasePoints[i],
+					pAura->GetSpellProto()->EffectMiscValue[i],
+					i);
+			}
+		}
+		pPlayer->AddAura(pAura);
+		if(pAura->IsPositive())
+		{
+			fprintf(f1, "Spell %u `%s` is positive.\n", pAura->GetSpellId(), sSpellStore.LookupString(pAura->GetSpellProto()->Name));
+			fprintf(f2, "UPDATE ai_agents SET spellType = 10 WHERE entryId = %u AND spellId = %u;\n", result->Fetch()[0].GetUInt32(), pAura->GetSpellId());
+			printf( "Spell %u `%s` is positive.\n", pAura->GetSpellId(), sSpellStore.LookupString(pAura->GetSpellProto()->Name));
+		}
+		else
+		{
+			fprintf(f1, "Spell %u `%s` is negative.\n", pAura->GetSpellId(), sSpellStore.LookupString(pAura->GetSpellProto()->Name));
+			fprintf(f2, "UPDATE ai_agents SET spellType = 11 WHERE entryId = %u AND spellId = %u;\n", result->Fetch()[0].GetUInt32(), pAura->GetSpellId());
+			printf( "Spell %u `%s` is negative.\n", pAura->GetSpellId(), sSpellStore.LookupString(pAura->GetSpellProto()->Name));
+		}
+		fflush(f1);
+		fflush(f2);
+		pPlayer->RemoveAura(pAura->GetSpellId());
+		j++;
+		if(!(j % 100))
+			SystemMessage(m_session, "Done %u / %u, %u%%", j, total, uint32(float( float(j) / float(total) * 100.0f ) ) );
+	} while(result->NextRow());
+	fclose(f1);
+	fclose(f2);
+	delete result;
+	return true;

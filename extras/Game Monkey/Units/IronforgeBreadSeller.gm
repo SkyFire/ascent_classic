@@ -1,0 +1,32 @@
+//////////////////////////////////////////////////////////////////////////////////////////
+// AscentScripts team
+// (c) 2007
+//
+// Made by: Grape
+// Added waypoints: Mata
+//
+// This scripts adds the shout lines from the bread vendor in Ironforge.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+
+global IF_BREAD_SELLER_SPAWN = function(mob, plr)
+{
+    .SetMovementType(11);
+    .CreateWaypoint(-4931.69, -954.53,501.565, 2.30, 0, 256, 0);
+    .CreateWaypoint(-4961.89, -979.187,501.637, 1.88, 0, 256, 0);
+    .CreateWaypoint(-4981.35, -965.17,501.659, 1.12, 0, 256, 0);
+    .CreateWaypoint(-4944.42, -928.605,501.659, 5.76, 0, 256, 0);
+    .CreateWaypoint(-4899.81, -897.791,501.659, 5.55, 0, 256, 0);
+    .CreateWaypoint(-4889.72, -921.59,501.624, 4.51, 0, 256, 0);
+};
+
+global IF_BREAD_SELLER_WAYPOINT = function(waypoint_id)
+{
+    if(waypoint_id == 4) {.SendChatMessage("Fresh bread, baked this very morning.");}
+    if(waypoint_id == 1) {.SendChatMessage("Fresh bread, baked this very morning.");}
+    if(waypoint_id == 2) {.SendChatMessage("Come get yer fresh bread!");}
+    if(waypoint_id == 6) {.SendChatMessage("Fresh bread for sale!");}
+};
+
+.RegisterUnitEvent(5109, 6,IF_BREAD_SELLER_SPAWN );
+.RegisterUnitEvent(5109, 8,IF_BREAD_SELLER_WAYPOINT);

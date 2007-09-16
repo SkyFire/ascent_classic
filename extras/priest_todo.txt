@@ -1,0 +1,20 @@
+Priest:
+
+Shadow talents:
+Talents:
+
+Misery; should make shadow word: pain, mind flay, and vampiric touch increase target spell damage taken by 5%; does not work at all.
+
+Focused Mind; should reduce mana cost of mind blast, mind control, and mind flay by 15%; does not work at all (I think).
+
+Disciple:
+
+Talent : Inner Focus
+
+What it does : Instant / 3min cooldown / When activated , reduces the mana cost of your next spell by 100% and increases its critical effect chance by 25% if it is capable of a critical strike
+
+Spells:
+
+	Psychic Scream - may need the break chance fixed
+
+	Mind Control - When used on anyone besides an NPC, the mind controlled victim is unusable.

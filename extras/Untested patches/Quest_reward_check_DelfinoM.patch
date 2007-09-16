@@ -1,0 +1,117 @@
+Index: QuestMgr.cpp
+===================================================================
+--- QuestMgr.cpp    (revision 976)
++++ QuestMgr.cpp    (working copy)
+@@ -747,7 +747,6 @@
+    if(!qst->is_repeatable) CALL_QUESTSCRIPT_EVENT(qle, OnQuestComplete)(plr);
+
+    ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), plr, QUEST_EVENT_ON_COMPLETE);
+-    if(!qst->is_repeatable) qle->Finish();
+
+    if(qst_giver->GetTypeId() == TYPEID_UNIT)
+    {
+@@ -805,10 +804,19 @@
+                }
+                else
+                {  
+-                    Item *itm = objmgr.CreateItem(qst->reward_item[i], plr);
+-                    itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, uint32(qst->reward_itemcount[i]));
+-                    plr->GetItemInterface()->AddItemToFreeSlot(itm); //possible memleak and no safe check.
+-                }
++                    SlotResult result = plr->GetItemInterface()->FindFreeInventorySlot(proto);
++                    if( result.Result == true )
++                    {
++                        Item *itm = objmgr.CreateItem(qst->reward_item[i], plr);
++                        itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, uint32(qst->reward_itemcount[i]));
++                        plr->GetItemInterface()->AddItemToFreeSlot(itm); //possible memleak and no safe check.
++                    }
++                    else
++                    {
++                        sChatHandler.RedSystemMessageToPlr(plr,"Please make room in your inventory before completing the quest");
++                        return;
++                    }
++                }
+            }
+        }
+
+@@ -822,10 +830,19 @@
+            }
+            else
+            {
+-                Item *itm = objmgr.CreateItem(qst->reward_choiceitem[reward_slot], plr);
+-                itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, qst->reward_choiceitemcount[reward_slot]);
+-                plr->GetItemInterface()->AddItemToFreeSlot(itm); //possible mem leak and no item check
+-            }
++                SlotResult result = plr->GetItemInterface()->FindFreeInventorySlot(proto);
++                if( result.Result == true )
++                {
++                    Item *itm = objmgr.CreateItem(qst->reward_choiceitem[reward_slot], plr);
++                    itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, qst->reward_choiceitemcount[reward_slot]);
++                    plr->GetItemInterface()->AddItemToFreeSlot(itm); //possible mem leak and no item check
++                }
++                else
++                {
++                    sChatHandler.RedSystemMessageToPlr(plr,"Please make room in your inventory before completing the quest");
++                    return;
++                }
++            }
+        }
+
+        // Remove items
+@@ -899,10 +916,19 @@
+                }
+                else
+                {  
+-                    Item *itm = objmgr.CreateItem(qst->reward_item[i], plr);
+-                    itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, uint32(qst->reward_itemcount[i]));
+-                    plr->GetItemInterface()->AddItemToFreeSlot(itm); //possible memleak and no safe check.
+-                }
++                    SlotResult result = plr->GetItemInterface()->FindFreeInventorySlot(proto);
++                    if( result.Result == true )
++                    {
++                        Item *itm = objmgr.CreateItem(qst->reward_item[i], plr);
++                        itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, uint32(qst->reward_itemcount[i]));
++                        plr->GetItemInterface()->AddItemToFreeSlot(itm); //possible memleak and no safe check.
++                    }
++                    else
++                    {
++                        sChatHandler.RedSystemMessageToPlr(plr,"Please make room in your inventory before completing the quest");
++                        return;
++                    }
++                }
+            }
+        }
+
+@@ -916,10 +942,19 @@
+            }
+            else
+            {
+-                Item *itm = objmgr.CreateItem(qst->reward_choiceitem[reward_slot], plr);
+-                itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, qst->reward_choiceitemcount[reward_slot]);
+-                plr->GetItemInterface()->AddItemToFreeSlot(itm); //possible mem leak and no item check
+-            }
++                SlotResult result = plr->GetItemInterface()->FindFreeInventorySlot(proto);
++                if( result.Result == true )
++                {
++                    Item *itm = objmgr.CreateItem(qst->reward_choiceitem[reward_slot], plr);
++                    itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, qst->reward_choiceitemcount[reward_slot]);
++                    plr->GetItemInterface()->AddItemToFreeSlot(itm); //possible mem leak and no item check
++                }
++                else
++                {
++                    sChatHandler.RedSystemMessageToPlr(plr,"Please make room in your inventory before completing the quest");
++                    return;
++                }
++            }
+        }
+
+        // Remove items
+@@ -979,6 +1014,8 @@
+        //Add to finished quests
+        plr->AddToFinishedQuests(qst->id);
+     }
++
++    if(!qst->is_repeatable) qle->Finish();
+}
+
+/////////////////////////////////////

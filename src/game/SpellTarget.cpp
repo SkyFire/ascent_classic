@@ -1,0 +1,851 @@
+/*
+* Ascent MMORPG Server
+* Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+// Coded by Captnoord for ascent (2007), please give feedback to me if your able to.
+
+#include "StdAfx.h"
+
+/// Function pointer holder
+pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] = 
+{
+    &Spell::SpellTargetDefault,                 // 0
+    &Spell::SpellTargetSelf,                    // 1
+    &Spell::SpellTargetNULL,                    // 2
+    &Spell::SpellTargetNULL,                    // 3
+    &Spell::SpellTargetType4,                   // 4
+    &Spell::SpellTargetPet,                     // 5
+    &Spell::SpellTargetSingleTargetEnemy,       // 6
+    &Spell::SpellTargetNULL,                    // 7
+    &Spell::SpellTargetCustomAreaOfEffect,      // 8
+    &Spell::SpellTargetNULL,                    // 9
+    &Spell::SpellTargetNULL,                    // 10
+    &Spell::SpellTargetNULL,                    // 11
+    &Spell::SpellTargetNULL,                    // 12
+    &Spell::SpellTargetNULL,                    // 13
+    &Spell::SpellTargetNULL,                    // 14
+    &Spell::SpellTargetAreaOfEffect,            // 15
+    &Spell::SpellTargetAreaOfEffect,            // 16
+    &Spell::SpellTargetNULL,                    // 17
+    &Spell::SpellTargetLandUnderCaster,         // 18
+    &Spell::SpellTargetNULL,                    // 19
+    &Spell::SpellTargetAllPartyMembersRangeNR,  // 20
+    &Spell::SpellTargetSingleTargetFriend,      // 21
+    &Spell::SpellTargetAoE,                     // 22
+    &Spell::SpellTargetSingleGameobjectTarget,  // 23
+    &Spell::SpellTargetInFrontOfCaster,         // 24
+    &Spell::SpellTargetSingleFriend,            // 25
+    &Spell::SpellTargetGameobject_itemTarget,   // 26
+    &Spell::SpellTargetPetOwner,                // 27
+    &Spell::SpellTargetEnemysAreaOfEffect,      // 28 // channeled
+    &Spell::SpellTargetType29,                  // 29
+    &Spell::SpellTargetPartyBasedAreaEffect,    // 30
+    &Spell::SpellTargetScriptedEffects,         // 31
+    &Spell::SpellTargetSummon,                  // 32
+    &Spell::SpellTargetNearbyPartyMembers,      // 33
+    &Spell::SpellTargetNULL,                    // 34
+    &Spell::SpellTargetSingleTargetPartyMember, // 35
+    &Spell::SpellTargetScriptedEffects2,        // 36
+    &Spell::SpellTargetPartyMember,             // 37
+    &Spell::SpellTargetDummyTarget,             // 38
+    &Spell::SpellTargetFishing,                 // 39
+    &Spell::SpellTargetType40,                  // 40
+    &Spell::SpellTargetTotem,                   // 41
+    &Spell::SpellTargetTotem,                   // 42
+    &Spell::SpellTargetTotem,                   // 43
+    &Spell::SpellTargetTotem,                   // 44
+    &Spell::SpellTargetChainTargeting,          // 45
+    &Spell::SpellTargetType46,                  // 46
+    &Spell::SpellTargetType47,                  // 47
+    &Spell::SpellTargetNULL,                    // 48
+    &Spell::SpellTargetNULL,                    // 49
+    &Spell::SpellTargetNULL,                    // 50
+    &Spell::SpellTargetNULL,                    // 51
+    &Spell::SpellTargetType52,                  // 52
+    &Spell::SpellTargetTargetAreaSelectedUnit,  // 53
+    &Spell::SpellTargetInFrontOfCaster2,        // 54
+    &Spell::SpellTargetNULL,                    // 55
+    &Spell::SpellTargetNULL,                    // 56
+    &Spell::SpellTargetTargetPartyMember,       // 57
+    &Spell::SpellTargetNULL,                    // 58
+    &Spell::SpellTargetNULL,                    // 59
+    &Spell::SpellTargetNULL,                    // 60
+    &Spell::SpellTargetSameGroupSameClass,      // 61
+    &Spell::SpellTargetNULL,                    // 62
+    &Spell::SpellTargetNULL,                    // 63
+    &Spell::SpellTargetNULL,                    // 64
+    &Spell::SpellTargetNULL,                    // 65
+    &Spell::SpellTargetNULL,                    // 66
+    &Spell::SpellTargetNULL,                    // 67
+    &Spell::SpellTargetNULL,                    // 68
+    &Spell::SpellTargetNULL,                    // 69
+    &Spell::SpellTargetNULL,                    // 70
+    &Spell::SpellTargetNULL,                    // 71
+    &Spell::SpellTargetNULL,                    // 72
+    &Spell::SpellTargetSummon,                  // 73
+    &Spell::SpellTargetNULL,                    // 74
+    &Spell::SpellTargetNULL,                    // 75
+    &Spell::SpellTargetNULL,                    // 76
+    &Spell::SpellTargetSingleTargetEnemy,       // 77
+    &Spell::SpellTargetNULL,                    // 78
+    &Spell::SpellTargetNULL,                    // 79
+    &Spell::SpellTargetNULL,                    // 80
+    // all 81 > n spelltargettype's are from test spells
+};
+
+/* LEFTOVER RESEARCH, this contains note's comments from Captnoord
+// these are left here because of the importance's of the info.
+// comments and additional information related to this send to Captnoord
+
+// Type 4:
+// 4 is related to Diseases fun to give it a try..
+// dono related to "Wandering Plague", "Spirit Steal", "Contagion of Rot", "Retching Plague" and "Copy of Wandering Plague"
+
+// Type 7:
+// Point Blank Area of Effect
+// think its wrong, related to 2 spells, "Firegut Fear Storm" and "Mind Probe"
+// FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+
+//fear storm is nice
+//Score 5.7     Vote: [-] [+] by plle, 1.5 years ago
+//when you set that ogre head on the top of the rock and all orges see it they /yell: FLEE (and) RUN!!
+//and then all ogres get fear storm =D 
+
+//this quest
+//Score 6.9     Vote: [-] [+] by ewendim, 1.1 years ago
+//happens while doing this quest http://www.thottbot.com/?qu=3825
+
+// Type 11
+// this is related to spellID: 4, as I think is a gm spell
+
+// 11 select id,name, EffectImplicitTargetA1 from spell where EffectImplicitTargetA1 = 11;
+// +----+----------------------+------------------------+
+// | id | name                 | EffectImplicitTargetA1 |
+// +----+----------------------+------------------------+
+// |  4 | Word of Recall Other |                     11 |
+// +----+----------------------+------------------------+
+
+// type 17:
+// spells like 17278:Cannon Fire and 21117:Summon Son of Flame A
+// A single target at a xyz location or the target is a possition xyz
+
+// select id,name, EffectImplicitTargetA1 from spell where EffectImplicitTargetB1 = 9;
+// +-------+----------------------------+------------------------+
+// | id    | name                       | EffectImplicitTargetA1 |
+// +-------+----------------------------+------------------------+
+// |     1 | Word of Recall (OLD)       |                      1 |
+// |     3 | Word of Mass Recall (OLD)  |                     20 |
+// |   556 | Astral Recall              |                      1 |
+// |  8690 | Hearthstone                |                      1 |
+// | 39937 | There's No Place Like Home |                      1 |
+// +-------+----------------------------+------------------------+
+
+// type 10: is not used
+// type 12: is not used
+// type 13: is not used
+// type 14: is not used
+
+// type 19: is target zone I think
+
+// type 48: is summon wild unit
+// type 49: is summon friend unit
+// type 50: something related to the pref 2
+// type 51: is targeting objects / egg's / possible to use those while flying
+
+
+// type 55 related to blink and Netherstep... I think this one sets the xyz where you should end...
+// type 56 is related to aura holder... Player 1 give's me a aura and that aura has as target me. I wear then the aura / spell and it targeting me
+
+// type 58 proc triggeret target... 
+// Apply Aura: Proc Trigger Spell
+// Retching Plague
+// 10% chance.
+
+// type 59 related to 2 visual spells
+// type 60 1 target related. rest is unknown or not clear
+
+// type 62 targets the best player of [class]
+// type 63 targets chess player... something like that
+// type 64 something related to wharp storm... and the wharpstorm creature..
+// type 65 target enemy's weapon... Item target..... "A" target type, "B" target type is target enemy unit...
+// type 66 related to summon some unit...
+// type 67 related to summon some unit...
+// type 68 is not used
+// type 69 is totem stuff level 70 totem stuff
+// type 70 is not used
+// type 71 is not used
+// type 72 target enemy unit... (I think it does not matter if its a friendly unit)
+// type 73 is item
+// type 74 Target Random Enemy
+// type 75 Target location in front of the caster
+// type 76 target a area... of target...
+// type 77 target single enemy
+// type 78 units in front of caster ( test spell )
+// type 79 is not used
+// type 80 related to summon some unit
+// type 81 > N are not handled because they are test spells 
+
+*/
+
+/// Fill the target map with the targets
+/// the targets are specified with numbers and handled accordingly
+void Spell::FillTargetMap(uint32 i)
+{
+    uint32 cur;
+
+    // j = 0
+    cur = m_spellInfo->EffectImplicitTargetA[0];
+    if (cur < TOTAL_SPELL_TARGET)
+    {
+        (*this.*SpellTargetHandler[cur])(i,0);
+    }
+
+    // j = 1
+    cur = m_spellInfo->EffectImplicitTargetB[1];
+    if (cur < TOTAL_SPELL_TARGET)
+    {
+        (*this.*SpellTargetHandler[cur])(i,1);
+    }
+
+    // j = 2
+    cur = m_spellInfo->EffectImplicitTargetB[2];
+    if (cur < TOTAL_SPELL_TARGET)
+    {
+        (*this.*SpellTargetHandler[cur])(i,2);
+    }
+}
+
+//#define I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
+void Spell::SpellTargetNULL(uint32 i, uint32 j)
+{
+    #ifdef I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
+        TargetsList *tmpMap=&m_targetUnits[i];
+        SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+    #endif
+}
+//#undef I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
+
+/// Spell Target Handling for type 0: Default targeting
+void Spell::SpellTargetDefault(uint32 i, uint32 j)
+{
+    if(j==0 || (m_caster->IsPet() && j==1))
+    {
+        TargetsList *tmpMap=&m_targetUnits[i];
+
+        if(m_targets.m_unitTarget)
+            SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+        else if(m_targets.m_itemTarget)
+            SafeAddTarget(tmpMap,m_targets.m_itemTarget);
+        else if( (m_spellInfo->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT
+            || m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_DEMON) )
+            SafeAddTarget(tmpMap,m_caster->GetGUID());
+    }
+}
+
+/// Spell Target Handling for type 1: Self Target + in moon skin form party member in radius
+void Spell::SpellTargetSelf(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    if(p_caster)
+    {
+        if(m_spellInfo->RequiredShapeShift && (p_caster->getClass()==DRUID || p_caster->getClass()==WARRIOR))
+        {
+            if(m_spellInfo->Effect[i] != SPELL_EFFECT_LEARN_SPELL)//in talents
+            {	
+                if(!p_caster->GetShapeShift())
+                    return;
+                if(!((((uint32)1)<< (p_caster->GetShapeShift()-1)) & m_spellInfo->RequiredShapeShift))
+                    return;
+            }
+        }
+    }
+    SafeAddTarget(tmpMap,m_caster->GetGUID());
+}
+
+/// Spell Target Handling for type 4: Target is holder of the aura
+void Spell::SpellTargetType4(uint32 i, uint32 j)
+{
+    // O fuck we are contagious...
+    // this off course is not tested yet. 
+    if (p_caster)
+    {
+        TargetsList *tmpMap=&m_targetUnits[i];
+        SafeAddTarget(tmpMap,p_caster->GetGUID());
+    }
+}
+
+/// Spell Target Handling for type 5: Target: Pet
+void Spell::SpellTargetPet(uint32 i, uint32 j)
+{
+    if(p_caster)
+    {
+        TargetsList *tmpMap=&m_targetUnits[i];
+        if(p_caster->GetSummon())
+            SafeAddTarget(tmpMap,p_caster->GetSummon()->GetGUID());
+    }
+}
+
+/// Spell Target Handling for type 6 and 77: Single Target Enemy (grep thinks 77 fits in 6)
+void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    if(m_spellInfo->TargetCreatureType  && GUID_HIPART(m_targets.m_unitTarget)==HIGHGUID_UNIT)
+    {		
+        Creature *cr=m_caster->GetMapMgr()->GetCreature( m_targets.m_unitTarget);
+        if(!cr)return;
+
+        if(cr->GetCreatureName())
+            if(!(1<<(cr->GetCreatureName()->Type-1) & m_spellInfo->TargetCreatureType))
+                return;
+    }
+    if(DidHit(m_targets.m_unitTarget))
+        SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+    else
+        SafeAddMissedTarget(m_targets.m_unitTarget);
+    if(m_spellInfo->EffectChainTarget[i])
+    {
+        uint32 jumps=m_spellInfo->EffectChainTarget[i]-1;
+        float range=GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong
+        range*=range;
+        std::set<Object*>::iterator itr;
+        for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+        {
+            if((*itr)->GetGUID()==m_targets.m_unitTarget)
+                continue;
+            if( !((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
+                continue;
+
+            if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr),range))
+            {
+                if(isAttackable(u_caster,(Unit*)(*itr)))
+                {
+                    if(DidHit(m_targets.m_unitTarget))
+                        SafeAddTarget(tmpMap,((Unit*)*itr)->GetGUID());
+                    else
+                        SafeAddMissedTarget(((Unit*)*itr)->GetGUID());
+                    if(!--jumps)
+                        return;
+                }
+            }
+        }
+    }
+}
+
+/// Spell Target Handling for type 8:  related to Chess Move (DND), Firecrackers, Spotlight, aedm, Spice Mortar
+/// Seems to be some kind of custom area of effect... Scripted... or something like that
+void Spell::SpellTargetCustomAreaOfEffect(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    // This should be good enough for now
+    FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+}
+
+/// Spell Target Handling for type 15 / 16: All Enemies in Area of Effect (instant)
+void Spell::SpellTargetAreaOfEffect(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+}
+
+/// Spell Target Handling for type 18: Land under caster
+void Spell::SpellTargetLandUnderCaster(uint32 i, uint32 j) /// I don't think this is the correct name for this one
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    if(m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_DEMON || m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_OBJECT_WILD)
+        SafeAddTarget(tmpMap,m_caster->GetGUID());
+    else
+        FillAllTargetsInArea(tmpMap,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
+}
+
+/// Spell Target Handling for type 18: All Party Members around the Caster in given range NOT RAID
+void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    Player *p=p_caster;
+    if(!p)
+    {
+        if(((Creature*)u_caster)->IsTotem())
+            p=(Player*)((Creature*)u_caster)->GetTotemOwner();
+    }
+    if(!p)
+        return;
+
+    float r= GetRadius(i);
+
+    r*=r;
+    if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),p,r))
+        SafeAddTarget(tmpMap,p->GetGUID());	 
+
+    SubGroup * subgroup = p->GetGroup() ?
+        p->GetGroup()->GetSubGroup(p->GetSubGroup()) : 0;
+
+    if(subgroup)
+    {				
+        p->GetGroup()->Lock();
+        for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
+        {
+            if(!itr->player || m_caster == itr->player) 
+                continue;
+            if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),itr->player,r))
+                SafeAddTarget(tmpMap,itr->player->GetGUID());
+        }
+        p->GetGroup()->Unlock();
+    }
+}
+
+/// Spell Target Handling for type 21: Single Target Friend
+void Spell::SpellTargetSingleTargetFriend(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    Unit *Target = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
+    if(!Target)
+        //continue;
+        return;
+    float r= GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+    if(IsInrange (m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target, r*r))
+        SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+}
+
+/// Spell Target Handling for type 22: Enemy Targets around the Caster//changed party members around you
+/// place around the target / near the target //targeted Area effect
+void Spell::SpellTargetAoE(uint32 i, uint32 j) // something special
+// grep: this is *totally* broken. AoE only attacking friendly party members and self
+// is NOT correct. // not correct at all:P
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    FillAllTargetsInArea(tmpMap,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
+}
+
+/// Spell Target Handling for type 23: Gameobject Target
+void Spell::SpellTargetSingleGameobjectTarget(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+}
+
+/// Spell Target Handling for type 24: Targets in Front of the Caster
+void Spell::SpellTargetInFrontOfCaster(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    std::set<Object*>::iterator itr;
+    for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+    {
+        if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
+            continue;
+        //is Creature in range
+        if(m_caster->isInRange((Unit*)(*itr),GetRadius(i)))
+        {
+            if(m_caster->isInFront((Unit*)(*itr)))
+            {
+                if(isAttackable(u_caster, (Unit*)(*itr)))
+                {
+                    if(DidHit(m_targets.m_unitTarget))
+                        SafeAddTarget(tmpMap,((Unit*)*itr)->GetGUID());
+                    else
+                        SafeAddMissedTarget(((Unit*)*itr)->GetGUID());
+                }	
+            }
+        }
+    }
+}
+
+/// Spell Target Handling for type 25: Single Target Friend     // Used o.a. in Duel
+void Spell::SpellTargetSingleFriend(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+}
+
+/// Spell Target Handling for type 26: unit target/Item Target
+/// game object and item related... research pickpocket stuff
+void Spell::SpellTargetGameobject_itemTarget(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    if(m_targets.m_unitTarget)
+        SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+
+    if(m_targets.m_itemTarget)
+        SafeAddTarget(tmpMap,m_targets.m_itemTarget);
+}
+
+/// Spell Target Handling for type 27: target is owner of pet
+void Spell::SpellTargetPetOwner(uint32 i, uint32 j)
+{ 
+    TargetsList *tmpMap=&m_targetUnits[i];
+    if (u_caster && u_caster->IsPet())
+        SafeAddTarget(tmpMap,((Pet*)u_caster)->GetPetOwner()->GetGUID());
+}
+
+/// this is handled in DO
+/// Spell Target Handling for type 28: All Enemies in Area of Effect(Blizzard/Rain of Fire/volley) channeled
+void Spell::SpellTargetEnemysAreaOfEffect(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+}
+
+// all object around the the caster / object
+/*
+mysql> select id,name from spell where EffectImplicitTargetb1 = 29;
++-------+-----------------------------------------------+
+| 23467 | Tower Buff                                    |
+| 32087 | Putrid Cloud                                  |
+| 34378 | Thrall Calls Thunder                          |
+| 35487 | Seed of Revitalization Lightning Cloud Visual |
+| 36037 | Rina's Bough Lightning Cloud Visual           |
++-------+-----------------------------------------------+
+*/
+/// Spell Target Handling for type 29: all object around the the caster / object (so it seems)
+void Spell::SpellTargetType29(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+}
+
+/// Spell Target Handling for type 30: PBAE Party Based Area Effect
+void Spell::SpellTargetPartyBasedAreaEffect(uint32 i, uint32 j)
+{
+    /* Description
+    We take the selected party member(also known as target), then we get a list of all the party members in the area
+
+    // Used in
+    26043 -> Battle Shout
+    */
+    TargetsList *tmpMap=&m_targetUnits[i];
+}
+
+/// Spell Target Handling for type 31: related to scripted effects
+void Spell::SpellTargetScriptedEffects(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+}
+
+/// Spell Target Handling for type 32 / 73: related to summoned pet or creature
+void Spell::SpellTargetSummon(uint32 i, uint32 j)
+{// Minion Target
+    TargetsList *tmpMap=&m_targetUnits[i];
+    if(m_caster->GetUInt64Value(UNIT_FIELD_SUMMON) == 0)
+        SafeAddTarget(tmpMap,m_caster->GetGUID());
+    else
+        SafeAddTarget(tmpMap,m_caster->GetUInt64Value(UNIT_FIELD_SUMMON));
+}
+
+/// Spell Target Handling for type 33: Party members of totem, inside given range
+void Spell::SpellTargetNearbyPartyMembers(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    // this implementation is wrong.... this one is for totems
+    if(u_caster)
+    {
+        if(u_caster->GetTypeId()==TYPEID_UNIT)
+        {
+            if(((Creature*)u_caster)->IsTotem())
+            {
+                float r =GetRadius(i);
+                r*=r;
+
+                Player*p=(Player*) ((Creature*)u_caster)->GetTotemOwner();
+                if(!p)
+                    return;
+
+                if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),p,r))
+                    SafeAddTarget(tmpMap,p->GetGUID());
+
+                SubGroup * pGroup = p->GetGroup() ?
+                    p->GetGroup()->GetSubGroup(p->GetSubGroup()) : 0;
+
+                if(pGroup)
+                {
+                    p->GetGroup()->Lock();
+                    for(GroupMembersSet::iterator itr = pGroup->GetGroupMembersBegin();
+                        itr != pGroup->GetGroupMembersEnd(); ++itr)
+                    {
+                        if(!itr->player || p == itr->player) 
+                            continue;
+                        if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),itr->player,r))
+                            SafeAddTarget(tmpMap,itr->player->GetGUID());
+                    }
+                    p->GetGroup()->Unlock();
+                }
+            }
+        }
+    }
+}
+
+/// Spell Target Handling for type 35: Single Target Party Member (if not in party then the target can not be himself)
+/// this one requeres more research
+void Spell::SpellTargetSingleTargetPartyMember(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    Unit* Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+    if(!Target)
+        return;
+    float r=GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+    if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target,r*r))
+        SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+}
+
+/// Spell Target Handling for type 36: these targets are scripted :s or something.. there seems to be a system...
+void Spell::SpellTargetScriptedEffects2(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+
+}
+
+/// Spell Target Handling for type 37: all Members of the targets party
+void Spell::SpellTargetPartyMember(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    // if no group target self
+    Player * Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+    if(!Target)
+        return;
+
+    SubGroup * subgroup = Target->GetGroup() ?
+        Target->GetGroup()->GetSubGroup(Target->GetSubGroup()) : 0;
+
+    if(subgroup)
+    {
+        Target->GetGroup()->Lock();
+        for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
+        {
+            if(itr->player)
+                SafeAddTarget(tmpMap,itr->player->GetGUID());
+        }
+        Target->GetGroup()->Unlock();
+    }
+    else
+    {
+        SafeAddTarget(tmpMap,Target->GetGUID());
+    }
+}
+
+/// Spell Target Handling for type 38: Dummy Target (Server-side script effect)
+void Spell::SpellTargetDummyTarget(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    if(m_spellInfo->Id == 12938)
+    {
+        //FIXME:this ll be immortal targets
+        FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+    }
+    SafeAddTarget(tmpMap,m_caster->GetGUID());
+}
+
+/// Spell Target Handling for type 39: Fishing
+void Spell::SpellTargetFishing(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    SafeAddTarget(tmpMap,m_caster->GetGUID());
+}
+
+/// Spell Target Handling for type 40: Activate Object target(probably based on focus)
+void Spell::SpellTargetType40(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+
+}
+
+/// Spell Target Handling for type 41 / 42 / 43 / 44: Totems
+void Spell::SpellTargetTotem(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    SafeAddTarget(tmpMap,m_caster->GetGUID());
+}
+
+/// Spell Target Handling for type 45: Chain,!!only for healing!! for chain lightning =6 
+void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    //if selected target is party member, then jumps on party
+    Unit* firstTarget;
+
+    bool PartyOnly=false;
+    float range=GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong,
+    //this is cast distance, not searching distance
+    range *= range;
+
+    firstTarget = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+    if(firstTarget && p_caster)
+    {
+        if(p_caster->InGroup())
+            if(p_caster->GetSubGroup()==((Player*)firstTarget)->GetSubGroup())
+                PartyOnly=true;					
+    }
+    else
+    {
+        firstTarget = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
+        if(!firstTarget) 
+            return;
+    }
+
+    uint32 jumps=m_spellInfo->EffectChainTarget[i];
+    if(m_spellInfo->SpellGroupType && u_caster)
+    {
+        SM_FIValue(u_caster->SM_FAdditionalTargets,(int32*)&jumps,m_spellInfo->SpellGroupType);
+    }
+    SafeAddTarget(tmpMap,firstTarget->GetGUID());
+    if(!jumps)
+        return;
+    jumps--;
+    if(PartyOnly)
+    {
+        GroupMembersSet::iterator itr;
+        SubGroup * pGroup = p_caster->GetGroup() ?
+            p_caster->GetGroup()->GetSubGroup(p_caster->GetSubGroup()) : 0;
+
+        if(pGroup)
+        {
+            p_caster->GetGroup()->Lock();
+            for(itr = pGroup->GetGroupMembersBegin();
+                itr != pGroup->GetGroupMembersEnd(); ++itr)
+            {
+                if(!itr->player || itr->player==u_caster)
+                    continue;
+                if(IsInrange(u_caster->GetPositionX(),u_caster->GetPositionY(),u_caster->GetPositionZ(),itr->player, range))
+                {
+                    SafeAddTarget(tmpMap,itr->player->GetGUID());
+                    if(!--jumps)
+                        return;
+                }
+            }
+            p_caster->GetGroup()->Unlock();
+        }
+    }//find nearby friendly target
+    else
+    {
+        std::set<Object*>::iterator itr;
+        for( itr = firstTarget->GetInRangeSetBegin(); itr != firstTarget->GetInRangeSetEnd(); itr++ )
+        {
+            if( !(*itr)->IsUnit() || !((Unit*)(*itr))->isAlive())
+                continue;
+
+            if(IsInrange(firstTarget->GetPositionX(),firstTarget->GetPositionY(),firstTarget->GetPositionZ(),*itr, range))
+            {
+                if(!isAttackable(u_caster,(Unit*)(*itr)))
+                {
+                    SafeAddTarget(tmpMap,(*itr)->GetGUID());
+                    if(!--jumps)
+                        return;
+                }
+            }
+        }
+    }
+}
+
+/// Spell Target Handling for type 46: Unknown Summon Atal'ai Skeleton
+void Spell::SpellTargetType46(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    SafeAddTarget(tmpMap,m_caster->GetGUID());
+}
+
+/// Spell Target Handling for type 47: Portal (Not sure)
+void Spell::SpellTargetType47(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    //FIXME: Not sure
+    SafeAddTarget(tmpMap,m_caster->GetGUID());
+}
+
+/// Spell Target Handling for type 52: Lightwells, etc (Need more research)
+void Spell::SpellTargetType52(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    SafeAddTarget(tmpMap, m_caster->GetGUID());
+}
+
+/// Spell Target Handling for type 53: Target Area by Players CurrentSelection()
+void Spell::SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    Unit *Target = NULL;
+    if(m_caster->IsInWorld())
+    {
+        if(p_caster)
+            Target = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+        else
+            Target = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
+    }
+
+    if(!Target)
+        return;
+    FillAllTargetsInArea(tmpMap,Target->GetPositionX(),Target->GetPositionY(),Target->GetPositionZ(),GetRadius(i));
+}
+
+/// Spell Target Handling for type 54: Targets in Front of the Caster
+void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    std::set<Object*>::iterator itr;
+    for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+    {
+        if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
+            continue;
+        //is Creature in range
+        if(m_caster->isInRange((Unit*)(*itr),GetRadius(i)))
+        {
+            if(m_caster->isInFront((Unit*)(*itr)))
+            {
+                if(isAttackable(u_caster, (Unit*)(*itr)))
+                {
+                    if(DidHit(m_targets.m_unitTarget))
+                        SafeAddTarget(tmpMap,((Unit*)*itr)->GetGUID());
+                    else
+                        SafeAddMissedTarget(((Unit*)*itr)->GetGUID());
+                }	
+            }
+        }
+    }
+}
+
+/// Spell Target Handling for type 57: Targeted Party Member
+void Spell::SpellTargetTargetPartyMember(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    Unit* Target = m_caster->GetMapMgr()->GetPlayer (m_targets.m_unitTarget);
+    if(!Target)
+        return;
+
+    float r=GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+    if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target,r*r))
+        SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+}
+
+/// Spell Target Handling for type 61: targets with the same group/raid and the same class
+void Spell::SpellTargetSameGroupSameClass(uint32 i, uint32 j)
+{
+    TargetsList *tmpMap=&m_targetUnits[i];
+    Player * Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+    if(!Target)
+        return;
+
+    SubGroup * subgroup = Target->GetGroup() ?
+        Target->GetGroup()->GetSubGroup(Target->GetSubGroup()) : 0;
+
+    if(subgroup)
+    {
+        Target->GetGroup()->Lock();
+        for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
+        {
+            if(!itr->player || Target->getClass() != itr->player->getClass()) 
+                continue;
+            SafeAddTarget(tmpMap,itr->player->GetGUID());
+        }
+        Target->GetGroup()->Unlock();
+    }
+}

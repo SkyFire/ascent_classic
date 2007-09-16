@@ -1,0 +1,34 @@
+Paladin:
+
+This here is the ultimate bug machine.Everyone i saw did somth like this - First of all yell LEROOOYY JENKINSSSS and then do 21074386532 dmg and run away being really happy.
+
+Heroism
+
+=====SPELLS AND ABILITIES =====
+Blessing of Light - Doesn't work.
+Blessing of Might - Does not add the Attack Power it should.
+Blessing of Protection - Doesn't work.
+Blessing of Sanctuary - Doesn't work.
+Crusader Strike - Retribution - Does the damage, doesn't refresh Judgment.
+Divine protection - Doesn't work.
+Greater Blessing of Might - Does not add the Attack Power it should.
+Greater Blessing of Protection - Doesn't work.
+Greater Blessing of Sanctuary - Doesn't work.
+Hammer of Justice - Character Positioning is Wrong.
+Hammer of Wrath - Does not do the damage it should at Maximum rank.
+Righteous Defense - Only works for one monster, not 3.
+Seal of Blood - Doesn't work. Judgment doesnt work.
+Seal of Command - If you unlearn it, you cant learn past rank 1. Judgment doesn't work.
+Seal of Justice - Judgment doesn't work.
+Seal of Wisdom - Doesn't work. Judgment doesn't work.
+Spiritual Attunement - Doesn't add the mana.
+Summon Charger/Warhorse - Doesn't work for Blood Elf.
+
+=====TALENTS=====
+Benediction - Holy - Doesn't work
+Improved Blessing of Might - Retribution - Doesn't work.
+Improved Hammer of Justice - Protection - Looks like it changes the time for Hammer of Justice, but doesn't.
+Improved Judgment - Retribution - Doesn't work.
+Sanctity Aura - Retribution - Doesn't work
+Improved Sanctity Aura - Retribution - Won't do anything since the base ability won't.
+Toughness - Protection - Doesn't add the armor.

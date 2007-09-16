@@ -1,0 +1,22 @@
+// Script name : Blackwing_lair_attunement.gm
+// Submitter name : Darkened Fate
+//
+// Submitted for AscentScripts (c)
+//------------------------------------//
+
+
+global BlackwingLair_Attunement_Check = function(plr)
+{
+    if(plr.HasFinishedQuest(7761) == 1)
+    {
+            plr.JoinInstance(469, -7669.6, -1105.7, 397.925, 38.0332);
+            return 1;
+    }
+    //plr.SendAreaTriggerMessage("You need to be level 58 and have completed the quest : Blackhand's Command");
+    //plr.BroadcastMessage(1,"You need to be level 58 and have completed the quest : Blackhand's Command");
+    return 0;
+};
+
+// register in script system
+this.RegisterAreaTriggerEvent(3847, BlackwingLair_Attunement_Check);
+this.RegisterGameObjectEvent(179879, 2, BlackwingLair_Attunement_Check);

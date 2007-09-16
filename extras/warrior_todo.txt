@@ -1,0 +1,43 @@
+I'll talk more about prot wars here.
+Shield block - This thing should block one attack which could be increased by using a talent which allows blocking 2 attack's.But it doesnt want to block anything nor using the str stat as the amout of damage blocked by your shield.1 talent,and it means much to a prot war.
+Shiled slam - This is the ultimate prot war thing,by using the amout of shield block from items + it's own ability damage it slams you opponent right into his balls %) But the truth is that it just does the damage of the ability and not + shield block value.It should be like for example: you have somth like 100 shield block value,and this value is the amount of damage added to your shield slam,so if you hit for let's say 500 and +100 you have 600,simple.
+Slam - the damage is fine,but the skill doesnt reset the normal attack,so it goes along whith the slam,making you have infinitive rage all the time.
+Stance switch - correct me if i'm wrong,but switching removes all buffs debuffs from you.
+- endless rage
+
+- this got depracated, maybe update with new one ?
+[23:52:39] Spell::cast 5301, Unit: 283
+[23:52:39] WORLD: Spell effect id = 6, damage = 1
+[23:52:39] WORLD: target = 283 , Spell Aura id = 42, SpellId  = 5301, i = 0, apply = true
+
+//the problem is actually that spell dbc does not contain the 3rd effect as in description. It must be added manually
+berserker stance - not working
+berserker rage - does not get triggered on struck. it does not even have an onstruck spell to get triggered.
+improved berserker rage - not triggered. Should only get triggered while we have aura "berserker rage" onstruck event
+[23:54:34] Spell::cast 20500, Unit: 283
+[23:54:34] WORLD: Spell effect id = 6, damage = 0
+[23:54:34] WORLD: target = 283 , Spell Aura id = 42, SpellId  = 20500, i = 0, apply = true
+[23:54:35] WORLD: target = 283 , Spell Aura id = 42, SpellId  = 20500, i = 0, apply = false
+
+# Sunder Armor - not stackable
+# Disarm - not working in PvE - duh if it's only a visual thing
+# Execute does not show dmglog - needs some special packet or something
+# Shield Bash - not working in PvE
+# Pummel - no efect în PvE
+	# Improved Rend 
+	# Improved Charge
+	# Improved Mortal Strike
+# Sweeping Strikes - it is put on self and removed on attack,only that it does not do dmg to target.
+	# Improved Bloodrage
+# Overpower - should work
+	# Improved Disciplinses 
+	# cum Overpower nu merge nici Improved Overpower nu merge
+	# cum Demoralizing Shout nu are efect, nici Improved Demoralizing Shout nu merge
+	3. Improved Intercept
+5. Improved Berseker Rage
+	7. Improved Whirlwind
+8. Rampage - does not have any effect. Should this use up aurastateflag ? If so then remove it from caster
+
+mocking blow - not working
+taunt - should pull creatures even if they are already attacking
+shield block - should increase block chance to 75%- block does not ocure ?

@@ -1,0 +1,13 @@
+global firewing_point_orb1 = function(plr)
+{
+   plr.Teleport(530, -2260.65, 3186.5, 23.67);
+   return 0;
+};
+this.RegisterGameObjectEvent(182543, 2, firewing_point_orb1);
+
+global firewing_point_orb2 = function(plr)
+{
+   plr.Teleport(530, -2250.4, 3120.7, 27.38);
+   return 0;
+};
+this.RegisterGameObjectEvent(182548, 2, firewing_point_orb2);

@@ -1,0 +1,25 @@
+////////////////////////////////////////
+// Script name : BattleForMtHyjal_Attunement_Check.gm
+// Submitter name : Darkened Fate
+//
+// Submitted for AscentScripts (c)
+//------------------------------------//
+
+global BattleForMtHyjal_Attunement_Check = function(plr)
+{
+    // check for a quest
+    if(plr.HasFinishedQuest(10445) == 1)
+    {
+            plr.JoinInstance(534, 5070.39, -1736.84, 1328.01, 168.455);
+            return 1;
+    }
+    //plr.SendAreaTriggerMessage("You need to be level 68 and have completed the quest : The Vials of Eternity");
+    //plr.BroadcastMessage(1,"You need to be level 68 and have completed the quest : The Vials of Eternity");
+    return 0;
+};
+
+// register in script system
+this.RegisterAreaTriggerEvent(4311, BattleForMtHyjal_Attunement_Check);
+this.RegisterAreaTriggerEvent(4312, BattleForMtHyjal_Attunement_Check);
+this.RegisterAreaTriggerEvent(4313, BattleForMtHyjal_Attunement_Check);
+this.RegisterAreaTriggerEvent(4319, BattleForMtHyjal_Attunement_Check);

@@ -1,0 +1,165 @@
+Shaman:
+2. Searing totem is attacking players in Stealth mode (rogue,shadowmelded etc.)
+
+Talents
+
+dranei
+fire elemental totem = 15439 -> 32982.
+	- Just use 8985 instead that uses 575 creature type. 
+	- Should cast fireshield on self based on level of creature : select * from dbc_spell where name like "%fire sh%". Cast once only. Myabe use auras field here ?
+	- also : select * from dbc_spell where name like "%fire blast%"
+	- also : select * from dbc_spell where name like "%fire nova"
+	- maybe : fire ward (543), hellfire (2951), Fire Breath (37985)
+	- deal fire dmg
+	- imune to fire
+
+Earth Elemental Totem = 15430 -> 33663
+	- Just use 19704 instead that uses 329 creature type. 
+	- also : select * from dbc_spell where name like "%Earth Shock%"
+	- also : select * from dbc_spell where name like "%Earth Rumble"
+	- maybe : Earth Shield (32734), Earth Stun (37982)
+	- taunt
+	- imune to nature magic
+	
+
+Elemental:
+
+Enhancement:
+Guardian Totems - Not working.
+Enhancing Totems - Not working.
+Improved Weapon Totems - Not tested.
+Elemental Weapons - Not working.
+Stormstrike - removed aura effect on target since our spell system does not support it yet
+
+Restoration:
+Imp Reincarnation - Doesn't work
+Restorative Totem - Doesn't work
+Healing Way - Doesn't work
+
+Spells
+
+Elemental:
+Earthbind Totem - It works vs other faction but not vs your own (fixed?), and vs mobs when it stacks with any other cripple effect a shaman has it makes the mob warp towards you at a very high speed (Usefull to control mobs still, BTW ;) )
+Purge - Works well enough, in some cases it removes things it shouldent (Palidins bubble) and on some things it doesn't work at all (Priests Divine Spirit)
+
+Enhancement:
+Stoneclaw Totem - Doesn't work
+Flametongue Weapon - Doesn't work
+Windfury Totem (Rank 4+) - Doesn't work
+Far Sight - recheck
+Flametongue Totem - Doesn't work
+Grounding Totem - Doesn't work
+Sentry Totem - Doesn't work
+
+Restoration:
+Tremor Totem - Doesn't work
+Poison Cleansing Totem - Doesn't work
+Disease Cleansing Totem - Doesn't work
+
+make Nature's grace to use SM variables. Preferably Spell:Calceffect
+
+[08:51:59] Spell::cast 3050, Unit: 7
+[08:51:59] WORLD: Spell effect id = 49, damage = 0
+[08:51:59] Unhandled spell effect 49 in spell 3050.
+
+[08:51:59] Spell::cast 29932, Unit: 7
+[08:51:59] WORLD: Spell effect id = 39, damage = 1
+[08:51:59] Unhandled spell effect 39 in spell 29932.
+
+//maybe later the dummy spells. Probably will use scripts fr them ..
+
+[08:58:27] Spell::cast 29192, Unit: 7
+[08:58:27] WORLD: Spell effect id = 6, damage = 15
+[08:58:27] WORLD: Spell effect id = 6, damage = 6
+[08:58:27] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29192, i = 0, apply = true
+[08:58:27] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29192, i = 1, apply = true
+[08:58:30] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29192, i = 0, apply = false
+[08:58:30] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29192, i = 1, apply = false
+[08:58:30] Spell::cast 29193, Unit: 7
+[08:58:30] WORLD: Spell effect id = 6, damage = 30
+[08:58:30] WORLD: Spell effect id = 6, damage = 12
+[08:58:30] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29193, i = 0, apply = true
+[08:58:30] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29193, i = 1, apply = true
+[09:10:56] Spell::cast 30675, Unit: 7
+[09:10:56] WORLD: Spell effect id = 6, damage = 1
+[09:10:56] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30675, i = 0, apply = true
+[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30675, i = 0, apply = false
+[09:10:57] Spell::cast 30678, Unit: 7
+[09:10:57] WORLD: Spell effect id = 6, damage = 2
+[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30678, i = 0, apply = true
+[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30678, i = 0, apply = false
+[09:10:57] Spell::cast 30679, Unit: 7
+[09:10:57] WORLD: Spell effect id = 6, damage = 3
+[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30679, i = 0, apply = true
+[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30679, i = 0, apply = false
+[09:10:57] Spell::cast 30680, Unit: 7
+[09:10:57] WORLD: Spell effect id = 6, damage = 4
+[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30680, i = 0, apply = true
+[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30680, i = 0, apply = false
+[09:10:57] Spell::cast 30681, Unit: 7
+[09:10:57] WORLD: Spell effect id = 6, damage = 5
+[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30681, i = 0, apply = true
+[09:10:58] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30681, i = 0, apply = false
+
+//place a mark on target so when this spell is casted again on him it will change it's effect
+[09:11:32] Spell::cast 29206, Unit: 7
+[09:11:32] WORLD: Spell effect id = 6, damage = 33
+[09:11:32] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29206, i = 0, apply = true
+[09:11:33] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29206, i = 0, apply = false
+[09:11:33] Spell::cast 29205, Unit: 7
+[09:11:33] WORLD: Spell effect id = 6, damage = 66
+[09:11:33] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29205, i = 0, apply = true
+[09:11:33] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29205, i = 0, apply = false
+[09:11:33] Spell::cast 29202, Unit: 7
+[09:11:33] WORLD: Spell effect id = 6, damage = 100
+[09:11:33] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29202, i = 0, apply = true
+
+Spells:
+
+windfury weapon don't give attack power and doesn't work (give 3 attacks) the spell need give two extra attacks in more of the primary attack and need can be crti attack
+Stoneclaw totem doesn't work
+Frost shock don't slow ennemy when they are on mount
+Cure Disease don't work
+Magma Totem rank3 and up can't be learn at trainer
+Grounding Totem don't work
+Windfury Totem don't work
+Fire Nova Totem don't work
+Sentry Totem don't work
+Flametongue Totem rank5 don't work and magic damage stuff don't up the damage of the spell
+Disease Cleansing Totem don't work
+Mana Tide Totem don't work
+Shamanistic Rage don't work
+Flametongue Weapon don't work
+Wrath of Air Totem don't work
+Earth Elemental Totem don't work
+Bloodlust don't give the effect on friends and members but on ennemy
+Heroism don't work
+Totem of Wrath don't work
+Stormstrike have not 100% luck of damage an ennemy in pvp and don't attack in same time with two weapons (Dual Wield) and don't up damage on two seconds attacks (melee and spells)
+Purge don't work
+Poison Cleansing Totem don't work
+Water Shield don't work
+
+talents:
+
+Mental Quickness don't work
+Ancestral Healing don't work
+Healing Way don't work
+Focused Mind don't work
+Purification don't work
+Nature's Blessing don't work
+Nature's Guardian don't work
+Elemental Focus don't work
+Eye of the Storm don't work
+Elemental Devastation don't work
+Elemental Fury don't work
+Unrelenting Storm don't work
+Elemental Mastery don't have 100% luck to make a crit and don't reduce 100% of cost the mana spell
+Lightning Overload don't work
+Elemental Shields don't work
+Tidal Mastery don't work
+Improved Lightning Shield don't work
+
+
+Sorry for my bad english and if you have some probs for debug ask me
+Darkmugen @ shaman fan :]

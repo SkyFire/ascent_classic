@@ -1,0 +1,15 @@
+global silvermoon_to_undercity= function(plr)
+{
+    // Silvermoon to Undercity
+    // map id, x, y, z (must be float!)
+    plr.Teleport(0, 1805.0, 336.0, 71.0);
+};
+.RegisterGameObjectEvent(184502, 2, silvermoon_to_undercity);
+
+global undercity_to_silvermoon = function(plr)
+{
+    // Undercity to Silvermoon
+    // map id, x, y, z (must be float!)
+    plr.Teleport(530, 10021.0, -7014.0, 50.0);
+};
+.RegisterGameObjectEvent(182546, 2, undercity_to_silvermoon);

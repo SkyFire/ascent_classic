@@ -1,0 +1,101 @@
+==========================================================================
+! test first then impelement if necesary !
+SMT_TREAT_REDUCED - this is not used anywhere. Threat formulas are kinda rough estimations ...
+SMT_DUMMY - work on this
+SMT_CAST_TIME - does not depend on charges, add this ability
+SMT_RESIST - not used. There is only 1 spell what is veryrarely used
+SMT_TRIGGER - check if this is used
+SMT_EFFECT_BONUS - check if it is used 
+SMT_RESIST_DISPEL - check if it is used
+- items modify this value PLAYER_FIELD_COMBAT_RATING_08 but nowhere else is used ?
+- test if cooldown reduciotn is showed client side too. If not then force cooldown update on spells that have cooldown change (+ use cooldown cheat here - needed for tests)
+- rogue trainers train you lower level spell then the one you have ?
+- redoubt(paladin talent) description says that aura=51 shoul dhave effect of increase block chance by percent. Are we mixing this up ? We use different meaning for it
+- rogue - cold blood - need a log why does not trigger cooldown decrease
+- water shield gets removed on first trigger and does not show effect log. But why ?
+- warlock health funnel used on pet will kill you both
+- !help : Flameblade = 7806, Bonespike= 16550, Bone Shards = 17014,Blessing of Sanctuary=20911,Worgen's Spite=30564,Shadow Shield=31976,Fel Fire = 32008,Shadowguard = 32861,Thorns=34343,Energy Flare =35922,Arcane Shield=36640,Prismatic Shield=38905,Shadow Strikes=40334,
+- deadly poison trigger maybe. This is a weapon enchant ?. Also added aurastate so envenom can be casted too
+
+==========================================================================
+! Features !
+- make a proper loading for auras. Should restore caster guid, charges, procflags....
+- in world.cpp,line 788 removed stormstrike effect 0 until find a solution for : spell is casted on target and should apply 1 aura, but it also adds the other 2 effects that should be aplied only to caster.
+- a lot of spells have wrong trigger spell id. Lightning shield, Parry Mastery ...Make a tool to find them all and see what can be done for them.
+- some creatures should not enter or exit water. ex : spider - fish.
+- handleproc is getting huge, maybe we should break it into pieces
+- on server load a lot of spell.dbc data is processed. Maybe make an external tool
+- you do not gain resurection sicness after using spirit healer. WTF ? this was working before. Oh, well, next.
+- add conditioned aura removal. Ex: presence of mind should not be removed on instant cast spell (RemoveAurasByInterruptFlag)
+- players can moderate channels and they should not do so : trade ...
+- maybe rewrite procspell on spell. There are like 140 spells who use this, and to function correctly most of them would need this
+- hunter : curently you can equip only 1 Ammo Bag. This is wrong (INV_ERR_CAN_EQUIP_ONLY1_AMMOPOUCH). It should only use effects of ammo bag that is actively used.
+- make a general way of adidng threat to targets. Right now unit.cpp->addaura:AttackReaction makes this move but it is not right
+- paladin - illumination - nasty spell. Started workin on it but just delayed it for a while
+- make Fishing chair item spell work. Should spawn a chair and auto sits you in it. While your fishing.
+- not every creature have same speed, implement creature base speed at least for movement maybe for run too
+- elemental creatures do not have fizical attack but magic type, add dmg type to db load
+- some creatures need to fly (is this made already ? )
+
+==========================================================================
+! BUGS !
+- make hunter to be able to use only 1 bag
+- group quest does not share quest loot.
+- if BG is over and you are dead then you are teleported as dead.
+- there should be a cooldown for players who leave instance groups.
+- some players can't shoot with wand
+- (old one but effect counts)if you have multiple slow effects that stack you can inverse your direction keys back=forward
+- sometimes items are not created client side, making them invisible. A logout fixes it though it is not a good solution. Maybe createpackets can't be mixed ?
+- someone added special flags for transporters and this makes them invisible (only sometimes ? ) Object.cpp - 138
+- a lot of players report that 1 dmg thing(glnacing blow). Recheck it.
+- sometimes mount is removed only visually and not the aura itself. (sitting chairs...)
+- you can use instant canst/nomana spells from mounts= baaaad.
+- creatures keep yelling no content messgs
+- horde does not have PVP flag and A does
+- rogues can exit combat instantly, this is bad i think.
+- quest loot from elites should be lootable by everybody who shares the quest
+- some kill quest does not give kill revard to whole group ?
+
+==========================================================================
+Zack - test my shit :
+
+- test function RemoveThreatByPtr
+- don't let rogues stealth with dots
+- ai spell cooldown when not known
+
+==========================================================================
+Capt - test my shit :
+
+- changed the ranged weapon stuff
+
+
+==========================================================================
+
+maybe later :P
+[20:56] <Raziel> spell Translocate
+[20:57] <Raziel> SPELL_ID_TRANSLOCATE_*
+[20:57] <Raziel> its doesnt work
+[20:59] <Raziel> see
+[20:59] <Raziel> in sql queries
+[21:00] <Raziel> UPDATE gameobject_names SET Type = 22 , sound0 = 35376 WHERE entry = 184502;
+[21:00] <Raziel> INSERT INTO `teleport_coords` VALUES ('35376', 'Translocation: Undercity', '0', '1806,09', '334,559', '70,3974', '0');
+[21:00] <Raziel> and when I click on GO with entry 184502 (ne of Orbs of Translocation)
+[21:00] <Raziel> nothing to proceed
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_1 = 25143
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_2 = 25649
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_3 = 25650
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_4 = 25652
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_5 = 26566
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_6 = 26572
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_7 = 29128
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_8 = 29129
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_9 = 30141
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_10 = 32568
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_11 = 32569
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_12 = 32571
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_13 = 32572
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_14 = 34448
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_15 = 34452
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_16 = 35376
+[21:03] <Raziel> SPELL_ID_TRANSLOCATE_17 = 35727
+[21:04] <Raziel> SPELL_ID_TRANSLOCATE_18 = 35730
