@@ -1157,13 +1157,14 @@ void WorldSession::HandleCharterQuery(WorldPacket & recv_data)
 	}
 	else
 	{
-		uint32 v = c->CharterType;
+		/*uint32 v = c->CharterType;
 		if(c->CharterType == CHARTER_TYPE_ARENA_3V3)
-			v=3;
+			v=2;
 		else if(c->CharterType == CHARTER_TYPE_ARENA_5V5)
-			v=5;
+			v=4;
 
-		data << v << v;
+		data << v << v;*/
+		data << uint32(c->Slots) << uint32(c->Slots);
 	}
 
 	data << uint32(0);                                      // 4
@@ -1383,7 +1384,7 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 			return;
 		}
 
-		team = new ArenaTeam(type, 0);
+		team = new ArenaTeam(type, objmgr.GenerateArenaTeamId());
 		team->m_name = pCharter->GuildName;
 		team->m_emblemColour = iconcolor;
 		team->m_emblemStyle = icon;
@@ -1392,6 +1393,8 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 		team->m_backgroundColour = background;
 
 		team->AddMember(_player->m_playerInfo);
+		objmgr.AddArenaTeam(team);
+
 		/* Add the members */
 		for(i = 0; i < pCharter->SignatureCount; ++i)
 		{

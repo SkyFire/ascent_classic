@@ -488,6 +488,7 @@ void World::SetInitialWorldSettings()
 	MAKE_TASK(ObjectMgr, LoadExtraCreatureProtoStuff);
 	MAKE_TASK(ObjectMgr, LoadExtraItemStuff);
 	MAKE_TASK(QuestMgr, LoadExtraQuestStuff);
+	MAKE_TASK(ObjectMgr, LoadArenaTeams);
 
 #undef MAKE_TASK
 

@@ -89,8 +89,8 @@ bool ArenaTeam::AddMember(PlayerInfo * info)
 			plr->SetUInt32Value(base_field+1,0);
 		else
 			plr->SetUInt32Value(base_field+1,1);
-
-
+        
+        plr->m_arenaTeams[m_type]=this;
 	}
 	return true;
 }
@@ -107,6 +107,12 @@ bool ArenaTeam::RemoveMember(PlayerInfo * info)
 
 			--m_memberCount;
 			SaveToDB();
+
+			if(info->m_loggedInPlayer)
+			{
+				info->m_loggedInPlayer->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (m_type*5), 0);
+				info->m_loggedInPlayer->m_arenaTeams[m_type]=0;
+			}
 			return true;
 		}
 	}

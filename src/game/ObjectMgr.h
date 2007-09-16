@@ -265,13 +265,13 @@ public:
 			return 9;
 
 		case CHARTER_TYPE_ARENA_2V2:
-			return 2;
+			return 1;
 
 		case CHARTER_TYPE_ARENA_3V3:
-			return 3;
+			return 2;
 
 		case CHARTER_TYPE_ARENA_5V5:
-			return 5;
+			return 4;
 
 		default:
 			return 9;
@@ -438,6 +438,16 @@ public:
 
 	Pet * CreatePet();
 	uint32 m_hiPetGuid;
+	uint32 m_hiArenaTeamId;
+	uint32 GenerateArenaTeamId()
+	{
+		uint32 ret;
+		m_arenaTeamLock.Acquire();
+		ret = ++m_hiArenaTeamId;
+		m_arenaTeamLock.Release();
+		return ret;
+	}
+
 	Mutex m_petlock;
 
 	Player * CreatePlayer();

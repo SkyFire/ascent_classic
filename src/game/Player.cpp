@@ -2608,6 +2608,8 @@ bool Player::LoadFromDB(uint32 guid)
 	m_arenaPoints = get_next_field.GetUInt32();
 	for(uint32 z = 0; z < NUM_CHARTER_TYPES; ++z)
 		m_charters[z] = objmgr.GetCharterByGuid(GetGUID(), (CharterTypes)z);
+	for(uint32 z = 0; z < NUM_ARENA_TEAM_TYPES; ++z)
+		m_arenaTeams[z] = objmgr.GetArenaTeamByGuid(GetGUIDLow(), z);
 
 	m_StableSlotCount = get_next_field.GetUInt32();
 	m_instanceId = get_next_field.GetUInt32();

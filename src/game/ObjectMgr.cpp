@@ -37,6 +37,7 @@ ObjectMgr::ObjectMgr()
 	m_mailid = 0;
 	m_hiPlayerGuid = 0;
 	m_hiCorpseGuid = 0;
+	m_hiArenaTeamId=0;
 }
 
 
@@ -3195,6 +3196,9 @@ void ObjectMgr::LoadArenaTeams()
 		{
 			ArenaTeam * team = new ArenaTeam(result->Fetch());
 			AddArenaTeam(team);
+			if(team->m_id > m_hiArenaTeamId)
+				m_hiArenaTeamId=team->m_id;
+
 		} while(result->NextRow());
 		delete result;
 	}
