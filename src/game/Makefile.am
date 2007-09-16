@@ -9,6 +9,8 @@ libgame_a_SOURCES = \
     ../scriptengine/ScriptFunctions.cpp \
     ../scriptengine/ScriptFunctions.h \
     ../scriptengine/ScriptFunctionTable.cpp \
+    ArenaTeam.cpp \
+    ArenaTeam.h \
 	DatabaseCleaner.cpp \
 	DatabaseCleaner.h \
     ObjectStorage.cpp \
@@ -136,6 +138,7 @@ libgame_a_SOURCES = \
     SocialMgr.h \
     SpellAuras.cpp \
     SpellAuras.h \
+    SpellTarget.cpp \
     Spell.cpp \
     Spell.h \
     SpellEffects.cpp \
