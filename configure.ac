@@ -170,36 +170,25 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS( \
    limits.h sys/ioctl.h unistd.h fcntl.h float.h \
    mysql.h netdb.h netinet/in.h stddef.h sys/socket.h \
-   sys/time.h sys/timeb.h opensslv.h \
+   sys/time.h opensslv.h \
  ,[],[AC_MSG_ERROR([Missing required header])])
-
-#CPPFLAGS=$CPPFLAGS_SAVE
-
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_C_INLINE
 AC_C_VOLATILE
 AC_TYPE_SIZE_T
-AC_TYPE_OFF_T
 AC_TYPE_SIGNAL
 AC_STRUCT_TM
-AC_CHECK_TYPES([ ptrdiff_t ])
 
 # Checks for library functions.
 AC_FUNC_MEMCMP
-AC_FUNC_STRCOLL
-AC_FUNC_ALLOCA
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_SELECT_ARGTYPES
-AC_FUNC_STRFTIME
-#AC_FUNC_STRNLEN
-AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(                                               \
-   ftime strcspn strtoul atexit bzero floor gethostbyname     \
-   gettimeofday localtime_r memset rint select socket         \
-   sqrt stpcpy strchr strpbrk strrchr strstr strtol strtoul   \
+AC_CHECK_FUNCS(                                           
+   floor gethostbyname gettimeofday memset socket sqrt  \
+   stpcpy strchr strrchr strstr strtoul  \
 )
 
 AC_DEFINE_UNQUOTED([PREFIX], "${prefix}", "Prefix")

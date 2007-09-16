@@ -119,7 +119,7 @@ if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib libpq.lib mswsock.lib"
+				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib dbghelp.lib mswsock.lib"
 				OutputFile=".\..\..\bin\Debug\ascent.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
