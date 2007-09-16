@@ -4261,13 +4261,15 @@ float Unit::get_chance_to_daze(Unit *target)
 {
 //	if(GetTypeId()!=TYPEID_UNIT)
 //		return 0.0f;
-	int attack_skill=getLevel()*5;
-	int defense_skill;
+	float attack_skill=getLevel()*5;
+	float defense_skill;
 	if(target->IsPlayer())
 		defense_skill=((Player*)target)->_GetSkillLineCurrent(SKILL_DEFENSE,false);
 	else defense_skill=target->getLevel()*5;
-	float base_daze_chance=target->getLevel()*20/30;
-	float final_chance=base_daze_chance + attack_skill/(defense_skill+1);
+	float base_daze_chance=target->getLevel()*20.0f/30.0f;
+	if(!defense_skill)
+		defense_skill=1;
+	float final_chance=base_daze_chance + attack_skill/defense_skill;
 	if(final_chance>40)
 		return 40.0f;
 	else return final_chance;
