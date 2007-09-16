@@ -272,6 +272,7 @@ public:
 	void UnloadCell(uint32 x,uint32 y);
 	void EventRespawnCreature(Creature * c, MapCell * p);
 	void EventRespawnGameObject(GameObject * o, MapCell * c);
+	void SendMessageToCellPlayers(Object * obj, WorldPacket * packet, uint32 cell_radius = 2);
 
 protected:
 

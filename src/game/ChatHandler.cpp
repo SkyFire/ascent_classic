@@ -240,8 +240,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			else
 				data = sChatHandler.FillMessageData( CHAT_MSG_YELL, (CanUseCommand('c') && lang != -1) ? LANG_UNIVERSAL : lang,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 
-			SendPacket(data);
-			sWorld.SendZoneMessage(data, GetPlayer()->GetZoneId(), this);
+			//SendPacket(data);
+			//sWorld.SendZoneMessage(data, GetPlayer()->GetZoneId(), this);
+			_player->GetMapMgr()->SendMessageToCellPlayers(_player, data, 2);
 			delete data;
 			sLog.outString("[yell] %s: %s", _player->GetName(), msg.c_str());
 			pMsg=msg.c_str();
