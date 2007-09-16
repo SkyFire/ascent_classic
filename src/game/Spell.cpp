@@ -1553,9 +1553,7 @@ enum SpellGoFlags
 
 void Spell::SendSpellGo()
 {
-    // no need to send this on passive spells
-    if(!m_caster->IsInWorld() || m_spellInfo->Attributes & 64)
-        return;
+    
 
 	// Fill UniqueTargets
 	TargetsList::iterator i,j;
@@ -1563,10 +1561,10 @@ void Spell::SendSpellGo()
 	{
 		if(m_spellInfo->Effect[x])
 		{
-			//for ( i = m_targetUnits[x].begin(); i != m_targetUnits[x].end(); i++ )
-			//{
-				/*bool add=true;
-
+            bool add = true;
+			for ( i = m_targetUnits[x].begin(); i != m_targetUnits[x].end(); i++ )
+			{
+				add = true;
 				for(j = UniqueTargets.begin(); j != UniqueTargets.end(); j++ )
 				{
 					if((*j) == (*i))
@@ -1576,15 +1574,17 @@ void Spell::SendSpellGo()
 					}
 				}
 				if(add)
-					UniqueTargets.push_back((*i));*/
-                TargetsList::iterator itr = std::unique(m_targetUnits[x].begin(), m_targetUnits[x].end());
+					UniqueTargets.push_back((*i));
+                //TargetsList::iterator itr = std::unique(m_targetUnits[x].begin(), m_targetUnits[x].end());
                 //UniqueTargets.insert(UniqueTargets.begin(),));
                 //UniqueTargets.insert(UniqueTargets.begin(), itr);
-			//}
+			}
 		}
 	}
 	
-	
+    // no need to send this on passive spells
+    if(!m_caster->IsInWorld() || m_spellInfo->Attributes & 64)
+        return;
 
 	// Start Spell
 	WorldPacket data(200);
