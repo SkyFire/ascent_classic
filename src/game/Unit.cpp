@@ -2141,7 +2141,7 @@ void Unit::AddAura(Aura *aur)
 					// Check for auras with the same name and a different rank.
 					
 					if(info->buffType > 0 && m_auras[x]->GetSpellProto()->buffType & info->buffType && maxStack == 0)
-						deleteAur = HasAurasOfBuffType(info->buffType, aur->m_casterGuid);
+						deleteAur = HasAurasOfBuffType(info->buffType, aur->m_casterGuid,0);
 					else
 					{
 						acr = AuraCheck(info->NameHash, info->RankNumber, m_auras[x]);
@@ -3641,25 +3641,25 @@ void Unit::Unroot()
 	}
 }
 
-void Unit::RemoveAurasByBuffType(uint32 buff_type, uint64 guid)
+void Unit::RemoveAurasByBuffType(uint32 buff_type, uint64 guid, uint32 skip)
 {
 	uint64 sguid = buff_type >= SPELL_TYPE_BLESSING ? guid : 0;
 
 	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->buffType & buff_type)
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->buffType & buff_type && m_auras[x]->GetSpellId()!=skip)
 			if(!sguid || (sguid && m_auras[x]->m_casterGuid == sguid))
 				m_auras[x]->Remove();
 	}
 }
 
-bool Unit::HasAurasOfBuffType(uint32 buff_type, uint64 guid)
+bool Unit::HasAurasOfBuffType(uint32 buff_type, uint64 guid,uint32 skip)
 {
 	uint64 sguid = buff_type >= SPELL_TYPE_BLESSING ? guid : 0;
 
 	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->buffType & buff_type)
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->buffType & buff_type && m_auras[x]->GetSpellId()!=skip)
 			if(!sguid || (sguid && m_auras[x]->m_casterGuid == sguid))
 				return true;
 	}

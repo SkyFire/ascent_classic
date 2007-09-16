@@ -568,6 +568,9 @@ void World::SetInitialWorldSettings()
         namehash = crc32((const unsigned char*)nametext, strlen(nametext));
 
 
+		if(namehash == 0x56392512)			/* seal of light */
+			sp->procChance=45;	/* this will do */
+
 		//these mostly do not mix so we can use else 
         // look for seal, etc in name
         if(strstr(nametext, "Seal"))

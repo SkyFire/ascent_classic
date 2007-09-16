@@ -1225,9 +1225,14 @@ void Spell::cast(bool check)
 					}
 				}
 	
-				for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+				/* don't call HandleAddAura unless we actually have auras... - Burlex*/
+				if(m_spellInfo->EffectApplyAuraName[0] != 0 || m_spellInfo->EffectApplyAuraName[1] != 0 ||
+					m_spellInfo->EffectApplyAuraName[1] != 0)
 				{
-					HandleAddAura((*i));
+					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+					{
+						HandleAddAura((*i));
+					}
 				}
 			}
 			// we're much better to remove this here, because otherwise spells that change powers etc,
@@ -2110,7 +2115,7 @@ void Spell::HandleAddAura(uint64 guid)
 
 	// remove any auras with same type
 	if(m_spellInfo->buffType > 0)
-		Target->RemoveAurasByBuffType(m_spellInfo->buffType, m_caster->GetGUID());
+		Target->RemoveAurasByBuffType(m_spellInfo->buffType, m_caster->GetGUID(),0);
 	// spells that proc on spell cast, some talents
 	if(p_caster && !m_triggeredSpell)
 	{
