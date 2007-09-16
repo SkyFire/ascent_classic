@@ -402,6 +402,9 @@
 				RelativePath="..\..\src\shared\MersenneTwister.h">
 			</File>
 			<File
+				RelativePath="..\..\src\logonserver\PeriodicFunctionCall_Thread.h">
+			</File>
+			<File
 				RelativePath="..\..\src\shared\PreallocatedQueue.h">
 			</File>
 			<File

@@ -215,6 +215,12 @@
 			<File
 				RelativePath="..\..\src\logonserver\LogonCommServer.h">
 			</File>
+			<File
+				RelativePath="..\..\src\logonserver\LogonOpcodes.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\logonserver\LogonOpcodes.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Client Handlers"
@@ -251,36 +257,38 @@
 				RelativePath="..\..\src\logonserver\RealmlistThreadMgr.cpp">
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\..\src\logonserver\AccountCache.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\logonserver\AccountCache.h">
-		</File>
-		<File
-			RelativePath="..\..\src\logonserver\LogonConsole.cpp">
-			<FileConfiguration
-				Name="Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="0"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Hoard|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="0"/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\src\logonserver\LogonConsole.h">
-		</File>
-		<File
-			RelativePath="..\..\src\logonserver\LogonOpcodes.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\logonserver\LogonOpcodes.h">
-		</File>
+		<Filter
+			Name="Caching"
+			Filter="">
+			<File
+				RelativePath="..\..\src\logonserver\AccountCache.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\logonserver\AccountCache.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Console"
+			Filter="">
+			<File
+				RelativePath="..\..\src\logonserver\LogonConsole.cpp">
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Hoard|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\src\logonserver\LogonConsole.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\src\logonserver\LogonStdAfx.cpp">
 			<FileConfiguration
@@ -310,9 +318,6 @@
 		</File>
 		<File
 			RelativePath="..\..\src\logonserver\Main.h">
-		</File>
-		<File
-			RelativePath="..\..\src\logonserver\PeriodicFunctionCall_Thread.h">
 		</File>
 		<File
 			RelativePath="..\..\src\ascent\usewinhoard.cpp">

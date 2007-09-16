@@ -238,17 +238,25 @@ if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\
 	<References>
 	</References>
 	<Files>
-		<File
-			RelativePath="..\..\src\ascent\CConsole.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\ascent\CConsole.h">
-		</File>
+		<Filter
+			Name="Console"
+			Filter="">
+			<File
+				RelativePath="..\..\src\ascent\CConsole.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent\CConsole.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Server-Wide Definitions"
+			Filter="">
+			<File
+				RelativePath="..\..\src\ascent\MainServerDefines.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\src\ascent\Main.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\ascent\MainServerDefines.h">
 		</File>
 		<File
 			RelativePath="..\..\src\ascent\Master.cpp">
