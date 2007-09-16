@@ -633,6 +633,8 @@ void World::SetInitialWorldSettings()
             type |= SPELL_TYPE_ELIXIR_GUARDIAN;
         else if(strstr(desc, "Battle and Guardian elixir"))
             type |= SPELL_TYPE_ELIXIR_FLASK;
+		else if(namehash==0xFF89ABD2)		// hunter's mark
+			type |= SPELL_TYPE_HUNTER_MARK;
 
 		//stupid spell ranking problem
 		if(sp->spellLevel==0)

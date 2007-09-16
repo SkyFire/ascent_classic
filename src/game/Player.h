@@ -542,6 +542,14 @@ struct PlayerSkill
 	void Reset(uint32 Id);
 };
 
+enum SPELL_INDEX
+{
+	SPELL_TYPE_INDEX_CURSE		= 0,
+	SPELL_TYPE_INDEX_MARK		= 1,
+	SPELL_TYPE_INDEX_STING		= 2,
+	NUM_SPELL_TYPE_INDEX		= 3,
+};
+
 class ArenaTeam;
 //====================================================================
 //  Player
@@ -610,6 +618,10 @@ public:
 	~Player ( );
 	bool ok_to_remove;
 	PlayerInfo * m_playerInfo;
+	Unit * m_spellTypeTargets[NUM_SPELL_TYPE_INDEX];
+	void RemoveSpellTargets(uint32 Type);
+	void RemoveSpellIndexReferences(uint32 Type);
+	void SetSpellTargetType(uint32 Type, Unit* target);
 
 	void AddToWorld();
 	void RemoveFromWorld();

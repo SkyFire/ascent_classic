@@ -353,6 +353,9 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 
 	if(caster->IsUnit())
 	{
+		if(m_spellProto->buffType > 0 && caster->IsPlayer())
+			((Player*)caster)->SetSpellTargetType(m_spellProto->buffType, target);
+
 		if(isAttackable((Unit*)caster,target))
 		{
 			SetNegative();
@@ -435,8 +438,14 @@ void Aura::Remove()
 
 	// remove attacker
 	Unit * caster = GetUnitCaster();
-	if(caster && caster != m_target)
-		m_target->removeAttacker(caster);
+	if(caster)
+	{
+		if(caster != m_target)
+			m_target->removeAttacker(caster);
+
+		if(m_spellProto->buffType != 0 && m_target->IsPlayer())
+			((Player*)m_target)->RemoveSpellIndexReferences(m_spellProto->buffType);
+	}
 
 	/**********************Cooldown**************************
 	* this is only needed for some spells
