@@ -4266,12 +4266,11 @@ float Unit::get_chance_to_daze(Unit *target)
 	if(target->IsPlayer())
 		defense_skill=((Player*)target)->_GetSkillLineCurrent(SKILL_DEFENSE,false);
 	else defense_skill=target->getLevel()*5;
-	float base_daze_chance=target->getLevel()*20.0f/30.0f;
 	if(!defense_skill)
 		defense_skill=1;
-	float final_chance=base_daze_chance + attack_skill/defense_skill;
-	if(final_chance>40)
+	float chance_to_daze=attack_skill*20/defense_skill;//if level is equal then we get a 20% chance to daze
+	chance_to_daze = chance_to_daze*min(target->getLevel()/30.0f,1);//for targets below level 30 the chance decreses
+	if(chance_to_daze>40)
 		return 40.0f;
-	else return final_chance;
+	else return chance_to_daze;
 }
-
