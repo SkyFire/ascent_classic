@@ -927,8 +927,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 		}
 	}
 
-	HandleProcDmgShield(flag,victim);
-
 	std::map<uint32,struct SpellCharge>::iterator iter,iter2;
 	iter=m_chargeSpells.begin();
 	while(iter!= m_chargeSpells.end())
@@ -1903,6 +1901,8 @@ else
 	if(realdamage)
 	{
 		DealDamage(pVictim, realdamage, 0, targetEvent, 0);
+		//pVictim->HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,this);
+		HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,pVictim);
 
 		if (pVictim->GetCurrentSpell())
 			pVictim->GetCurrentSpell()->AddTime(0);
