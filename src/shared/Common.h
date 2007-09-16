@@ -211,6 +211,7 @@ enum MsTimeVariables
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
