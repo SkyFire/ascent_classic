@@ -353,10 +353,10 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 
 	if(caster->IsUnit())
 	{
-		if(m_spellProto->buffType > 0 && caster->IsPlayer())
+		if(m_spellProto->buffIndexType > 0 && caster->IsPlayer())
 		{
-			((Player*)caster)->RemoveSpellTargets(m_spellProto->buffType);
-			((Player*)caster)->SetSpellTargetType(m_spellProto->buffType, target);
+			((Player*)caster)->RemoveSpellTargets(m_spellProto->buffIndexType);
+			((Player*)caster)->SetSpellTargetType(m_spellProto->buffIndexType, target);
 		}
 
 		if(isAttackable((Unit*)caster,target))
@@ -446,8 +446,8 @@ void Aura::Remove()
 		if(caster != m_target)
 			m_target->removeAttacker(caster);
 
-		if(m_spellProto->buffType != 0 && m_target->IsPlayer())
-			((Player*)m_target)->RemoveSpellIndexReferences(m_spellProto->buffType);
+		if(m_spellProto->buffIndexType != 0 && m_target->IsPlayer())
+			((Player*)m_target)->RemoveSpellIndexReferences(m_spellProto->buffIndexType);
 	}
 
 	/**********************Cooldown**************************

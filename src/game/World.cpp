@@ -674,6 +674,49 @@ void World::SetInitialWorldSettings()
 
 		// find diminishing status
 		sp->DiminishStatus = GetDiminishingGroup(namehash);
+		sp->buffIndexType=0;
+		switch(sp->NameHash)
+		{
+		case 0xFF89ABD2:		// Hunter's mark
+			sp->buffIndexType = SPELL_TYPE_INDEX_MARK;
+			break;
+
+		case 0x2266F1F2:		// Polymorph
+		case 0xB15D524E:		// Polymorph: Chicken
+		case 0xA73086F1:		// Polymorph: Pig
+		case 0xBD6B76DC:		// Polymorph: Sheep
+		case 0x0128F8E9:		// Polymorph: Turtle
+			sp->buffIndexType = SPELL_TYPE_INDEX_POLYMORPH;
+			break;
+
+		case 0x328E44DC:		// Fear
+			sp->buffIndexType = SPELL_TYPE_INDEX_FEAR;
+			break;
+
+		case 0x4219BB33:		// Sap
+			sp->buffIndexType = SPELL_TYPE_INDEX_SAP;
+			break;
+
+		case 0x94675337:		// Scare Beast
+			sp->buffIndexType = SPELL_TYPE_INDEX_SCARE_BEAST;
+			break;
+
+		case 0x898B6207:		// Hibernate
+			sp->buffIndexType = SPELL_TYPE_INDEX_HIBERNATE;
+			break;
+
+		case 0x0227BA8B:		// Earth Shield
+			sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
+			break;
+
+		case 0x73812928:		// Cyclone
+			sp->buffIndexType = SPELL_TYPE_INDEX_CYCLONE;
+			break;
+
+		case 0x3D46465A:		// Banish
+			sp->buffIndexType = SPELL_TYPE_INDEX_BANISH;
+			break;
+		}
 
 		// HACK FIX: Break roots/fear on damage.. this needs to be fixed properly!
 		if(!(sp->AuraInterruptFlags & AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN))

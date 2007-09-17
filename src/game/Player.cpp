@@ -4835,12 +4835,18 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 	}
 
 	/* wehee loop unrolling */
-	if(m_spellTypeTargets[0] == pObj)
+/*	if(m_spellTypeTargets[0] == pObj)
 		m_spellTypeTargets[0] = NULL;
 	if(m_spellTypeTargets[1] == pObj)
 		m_spellTypeTargets[1] = NULL;
 	if(m_spellTypeTargets[2] == pObj)
-		m_spellTypeTargets[2] = NULL;
+		m_spellTypeTargets[2] = NULL;*/
+	if(pObj->IsUnit())
+	{
+		for(uint32 x = 0; x < NUM_SPELL_TYPE_INDEX; ++x)
+			if(m_spellTypeTargets[x] == pObj)
+				m_spellTypeTargets[x] = NULL;
+	}
 }
 
 void Player::ClearInRangeSet()
@@ -8537,53 +8543,21 @@ void Player::_ModifySkillMaximum(uint32 SkillLine, uint32 NewMax)
 
 void Player::RemoveSpellTargets(uint32 Type)
 {
-	if(Type & SPELL_TYPE_CURSE)
+	if(m_spellTypeTargets[Type] != NULL)
 	{
-		if(m_spellTypeTargets[SPELL_TYPE_INDEX_CURSE] != NULL)
-			m_spellTypeTargets[SPELL_TYPE_INDEX_CURSE]->RemoveAurasByBuffType(SPELL_TYPE_CURSE, GetGUID(), 0);
-	}
-	else if(Type & SPELL_TYPE_HUNTER_MARK)
-	{
-		if(m_spellTypeTargets[SPELL_TYPE_INDEX_MARK] != NULL)
-			m_spellTypeTargets[SPELL_TYPE_INDEX_MARK]->RemoveAurasByBuffType(SPELL_TYPE_HUNTER_MARK, GetGUID(), 0);
-	}
-	else if(Type & SPELL_TYPE_STING)
-	{
-		if(m_spellTypeTargets[SPELL_TYPE_INDEX_STING] != NULL)
-			m_spellTypeTargets[SPELL_TYPE_INDEX_STING]->RemoveAurasByBuffType(SPELL_TYPE_STING, GetGUID(), 0);
+		m_spellTypeTargets[Type]->RemoveAurasByBuffIndexType(Type, GetGUID());
+		m_spellTypeTargets[Type]=NULL;
 	}
 }
 
 void Player::RemoveSpellIndexReferences(uint32 Type)
 {
-	if(Type & SPELL_TYPE_CURSE)
-	{
-		m_spellTypeTargets[SPELL_TYPE_INDEX_CURSE] = NULL;
-	}
-	else if(Type & SPELL_TYPE_HUNTER_MARK)
-	{
-		m_spellTypeTargets[SPELL_TYPE_INDEX_MARK] = NULL;
-	}
-	else if(Type & SPELL_TYPE_STING)
-	{
-		m_spellTypeTargets[SPELL_TYPE_INDEX_STING] = NULL;
-	}
+	m_spellTypeTargets[Type]=NULL;
 }
 
 void Player::SetSpellTargetType(uint32 Type, Unit* target)
 {
-	if(Type & SPELL_TYPE_CURSE)
-	{
-		m_spellTypeTargets[SPELL_TYPE_INDEX_CURSE] = target;
-	}
-	else if(Type & SPELL_TYPE_HUNTER_MARK)
-	{
-		m_spellTypeTargets[SPELL_TYPE_INDEX_MARK] = target;
-	}
-	else if(Type & SPELL_TYPE_STING)
-	{
-		m_spellTypeTargets[SPELL_TYPE_INDEX_STING] = target;
-	}
+	m_spellTypeTargets[Type]=NULL;
 }
 
 /************************************************************************/

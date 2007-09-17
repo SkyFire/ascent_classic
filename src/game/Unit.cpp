@@ -3641,7 +3641,7 @@ void Unit::Unroot()
 	}
 }
 
-void Unit::RemoveAurasByBuffType(uint32 buff_type, uint64 guid, uint32 skip)
+void Unit::RemoveAurasByBuffType(uint32 buff_type, const uint64 &guid, uint32 skip)
 {
 	uint64 sguid = buff_type >= SPELL_TYPE_BLESSING ? guid : 0;
 
@@ -3653,7 +3653,17 @@ void Unit::RemoveAurasByBuffType(uint32 buff_type, uint64 guid, uint32 skip)
 	}
 }
 
-bool Unit::HasAurasOfBuffType(uint32 buff_type, uint64 guid,uint32 skip)
+void Unit::RemoveAurasByBuffIndexType(uint32 buff_index_type, const uint64 &guid)
+{
+	for(uint32 x=0;x<MAX_AURAS;x++)
+	{
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->buffType == buff_index_type)
+			if(!guid || (guid && m_auras[x]->m_casterGuid == guid))
+				m_auras[x]->Remove();
+	}
+}
+
+bool Unit::HasAurasOfBuffType(uint32 buff_type, const uint64 &guid,uint32 skip)
 {
 	uint64 sguid = buff_type >= SPELL_TYPE_BLESSING ? guid : 0;
 

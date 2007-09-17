@@ -104,7 +104,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 
 	m_Unit = un;
 
-	m_moveSpeed = m_Unit->m_runSpeed/1000.0f;//move distance per ms time 
+	m_moveSpeed = m_Unit->m_runSpeed*0.001f;//move distance per ms time 
 	/*if(!m_DefaultMeleeSpell)
 	{
 		m_DefaultMeleeSpell = new AI_Spell;
@@ -137,7 +137,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 	m_Unit = un;
 	m_PetOwner = owner;
 
-	m_moveSpeed = m_Unit->m_runSpeed/1000.0f;//move/ms
+	m_moveSpeed = m_Unit->m_runSpeed*0.001f;//move/ms
 	m_sourceX = un->GetPositionX();
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
@@ -1789,22 +1789,22 @@ uint32 AIInterface::getMoveFlags()
 	uint32 MoveFlags = 0;
 	if(m_moveFly == true) //Fly
 	{
-		m_moveSpeed = m_Unit->m_flySpeed/1000.0f;
+		m_moveSpeed = m_Unit->m_flySpeed*0.001f;
 		MoveFlags = 0x300;
 	}
 	else if(m_moveSprint == true) //Sprint
 	{
-		m_moveSpeed = (m_Unit->m_runSpeed+5.0f)/1000.0f;
+		m_moveSpeed = (m_Unit->m_runSpeed+5.0f)*0.001f;
 		MoveFlags = 0x100;
 	}
 	else if(m_moveRun == true) //Run
 	{
-		m_moveSpeed = m_Unit->m_runSpeed/1000.0f;
+		m_moveSpeed = m_Unit->m_runSpeed*0.001f;
 		MoveFlags = 0x100;
 	}
 	else //Walk
 	{
-		m_moveSpeed = m_Unit->m_walkSpeed/1000.0f;
+		m_moveSpeed = m_Unit->m_walkSpeed*0.001f;
 		MoveFlags = 0x000;
 	}
 	return MoveFlags;

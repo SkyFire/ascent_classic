@@ -330,7 +330,7 @@ struct SpellEntry
 	int32 FH;							   //202   related to paladin aura's 
 	float dmg_multiplier[3];				//203 - 205   if the name is correct I dono
 	uint32 FL;							  //206   only one spellid:6994 has this value = 369
-	uint32 FM;							  //207   only one spellid:6994 has this value = 4
+	//uint32 FM;							  //207   only one spellid:6994 has this value = 4
 	//uint32 FN;							  //208   only one spellid:26869  has this flag = 1
 
 	// soz guys, gotta use these 3 vars :p
@@ -346,7 +346,7 @@ struct SpellEntry
 	uint32 NameHash;						//211
 
 	uint32 DiminishStatus;				//212
-
+	uint32 buffIndexType;
 };
 
 struct ItemExtendedCostEntry
