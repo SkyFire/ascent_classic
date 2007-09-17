@@ -409,7 +409,10 @@ public:
 	float m_turnRate;
 	float m_flySpeed;
 	float m_backFlySpeed;
-	
+
+	float m_base_runSpeed;
+	float m_base_walkSpeed;
+
 	inline bool IsUnit()//creature or player
 	{
 		return ( m_objectTypeId == TYPEID_UNIT || m_objectTypeId == TYPEID_PLAYER); 

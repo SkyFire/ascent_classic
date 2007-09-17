@@ -104,7 +104,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 
 	m_Unit = un;
 
-	m_moveSpeed = m_Unit->m_runSpeed*0.001f;
+	m_moveSpeed = m_Unit->m_runSpeed/1000.0f;//move distance per ms time 
 	/*if(!m_DefaultMeleeSpell)
 	{
 		m_DefaultMeleeSpell = new AI_Spell;
@@ -137,7 +137,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 	m_Unit = un;
 	m_PetOwner = owner;
 
-	m_moveSpeed = m_Unit->m_runSpeed*0.001f;
+	m_moveSpeed = m_Unit->m_runSpeed/1000.0f;//move/ms
 	m_sourceX = un->GetPositionX();
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
@@ -248,7 +248,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 					firstLeaveCombat = true;
 					if(m_isGuard)
 					{
-						m_Unit->m_runSpeed *= 2.0f;
+						m_Unit->m_runSpeed = m_Unit->m_base_runSpeed * 2.0f;
 						m_fastMove = true;
 					}
 				}
@@ -318,7 +318,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				m_moveRun = true;
 				
 				// update speed
-				m_Unit->m_runSpeed /= 2;
+				m_Unit->m_runSpeed = m_Unit->m_base_runSpeed / 2;
 				getMoveFlags();
 
 				m_nextSpell = NULL;
@@ -328,7 +328,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_UNFEAR:
 			{
 				// update speed
-				m_Unit->m_runSpeed *= 2;
+				m_Unit->m_runSpeed = m_Unit->m_base_runSpeed;
 				getMoveFlags();
 //				m_AIState = STATE_IDLE;
 				//maybe we were not idle before fear. Like a guardian could have been doing something
@@ -356,7 +356,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				m_moveRun = true;
 				
 				// update speed
-				m_Unit->m_runSpeed /= 2;
+				m_Unit->m_runSpeed = m_Unit->m_base_runSpeed / 2;
 				getMoveFlags();
 
 				m_nextSpell = NULL;
@@ -368,7 +368,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_UNWANDER:
 			{
 				// update speed
-				m_Unit->m_runSpeed *= 2;
+				m_Unit->m_runSpeed = m_Unit->m_base_runSpeed;
 				getMoveFlags();
 				UnitToFollow = UnitToFollow_backup;
 				FollowDistance = FollowDistance_backup;
@@ -1312,7 +1312,7 @@ Unit* AIInterface::FindTarget()
 	{
 		if(m_isGuard)
 		{
-			m_Unit->m_runSpeed *= 2.0f;
+			m_Unit->m_runSpeed = m_Unit->m_base_runSpeed * 2.0f;
 			m_fastMove = true;
 		}
 
@@ -1789,22 +1789,22 @@ uint32 AIInterface::getMoveFlags()
 	uint32 MoveFlags = 0;
 	if(m_moveFly == true) //Fly
 	{
-		m_moveSpeed = m_Unit->m_flySpeed*0.001f;
+		m_moveSpeed = m_Unit->m_flySpeed/1000.0f;
 		MoveFlags = 0x300;
 	}
 	else if(m_moveSprint == true) //Sprint
 	{
-		m_moveSpeed = (m_Unit->m_runSpeed+5.0f)*0.001f;
+		m_moveSpeed = (m_Unit->m_runSpeed+5.0f)/1000.0f;
 		MoveFlags = 0x100;
 	}
 	else if(m_moveRun == true) //Run
 	{
-		m_moveSpeed = m_Unit->m_runSpeed*0.001f;
+		m_moveSpeed = m_Unit->m_runSpeed/1000.0f;
 		MoveFlags = 0x100;
 	}
 	else //Walk
 	{
-		m_moveSpeed = m_Unit->m_walkSpeed*0.001f;
+		m_moveSpeed = m_Unit->m_walkSpeed/1000.0f;
 		MoveFlags = 0x000;
 	}
 	return MoveFlags;

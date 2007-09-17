@@ -38,6 +38,8 @@ Object::Object() : m_position(0,0,0,0), m_spawnLocation(0,0,0,0)
 	//official Values
 	m_walkSpeed = 2.5f;
 	m_runSpeed = 7.0f;
+	m_base_runSpeed = m_runSpeed;
+	m_base_walkSpeed = m_walkSpeed;
 
 	m_flySpeed = 7.0f;
 	m_backFlySpeed = 4.5f;

@@ -34,10 +34,10 @@ struct LevelInfo;
 #define myabs(a) (a<0)?(-a):a
 #define MAX_PET_NO 3
 #define PLAYER_NORMAL_RUN_SPEED 7.0
-#define MONSTER_NORMAL_RUN_SPEED 8.0
 #define PLAYER_NORMAL_SWIM_SPEED 4.722222
 #define PLAYER_NORMAL_FLIGHT_SPEED 7.0
 #define PLAYER_HONORLESS_TARGET_SPELL 2479
+#define MONSTER_NORMAL_RUN_SPEED 8.0
 //====================================================================
 //  Inventory
 //  Holds the display id and item type id for objects in

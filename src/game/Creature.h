@@ -89,6 +89,8 @@ struct CreatureProto
 	uint32 money;
 	uint32 invisibility_type;
 	uint32 death_state;
+	float	walk_speed;//base movement
+	float	run_speed;//most of the time mobs use this
 
 	/* AI Stuff */
 	bool m_canRangedAttack;

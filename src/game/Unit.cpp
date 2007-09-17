@@ -3354,21 +3354,21 @@ void Unit::UpdateSpeed(bool delay /* = false */)
 	if(!HasFlag( UNIT_FIELD_FLAGS , U_FIELD_FLAG_MOUNT_SIT ))
 	{
 		if(IsPlayer())
-			m_runSpeed = PLAYER_NORMAL_RUN_SPEED*(1.0f + ((float)m_speedModifier)/100.0f);
+			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_speedModifier)/100.0f);
 		else
-			m_runSpeed = MONSTER_NORMAL_RUN_SPEED*(1.0f + ((float)m_speedModifier)/100.0f);
+			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_speedModifier)/100.0f);
 	}
 	else
 	{
 		if(IsPlayer())
 		{
-			m_runSpeed = PLAYER_NORMAL_RUN_SPEED*(1.0f + ((float)m_mountedspeedModifier)/100.0f);
-			m_runSpeed += (m_speedModifier<0) ? (PLAYER_NORMAL_RUN_SPEED*((float)m_speedModifier)/100.0f) : 0;
+			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_mountedspeedModifier)/100.0f);
+			m_runSpeed += (m_speedModifier<0) ? (m_base_runSpeed*((float)m_speedModifier)/100.0f) : 0;
 		}
 		else
 		{
-			m_runSpeed = MONSTER_NORMAL_RUN_SPEED*(1.0f + ((float)m_mountedspeedModifier)/100.0f);
-			m_runSpeed += (m_speedModifier<0) ? (PLAYER_NORMAL_RUN_SPEED*((float)m_speedModifier)/100.0f) : 0;
+			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_mountedspeedModifier)/100.0f);
+			m_runSpeed += (m_speedModifier<0) ? (m_base_runSpeed*((float)m_speedModifier)/100.0f) : 0;
 		}
 	}
 

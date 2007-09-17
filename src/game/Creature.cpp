@@ -68,7 +68,6 @@ Creature::Creature(uint32 high, uint32 low)
 		StatModPct[x]=0;
 		FlatStatMod[x]=0;
 	}
-	m_runSpeed=MONSTER_NORMAL_RUN_SPEED;
 
 	totemOwner = NULL;
 	totemSlot = -1;
@@ -94,8 +93,11 @@ Creature::Creature(uint32 high, uint32 low)
 	m_escorter = 0;
 	m_limbostate = false;
 	m_corpseEvent=false;
-	m_runSpeed=8.0f;
 	m_respawnCell=NULL;
+	m_walkSpeed = 2.5f;
+	m_runSpeed = MONSTER_NORMAL_RUN_SPEED;
+	m_base_runSpeed = m_runSpeed;
+	m_base_walkSpeed = m_walkSpeed;
 }
 
 
@@ -489,8 +491,8 @@ void Creature::EnslaveExpire()
 	SetUInt64Value(UNIT_FIELD_SUMMONEDBY, 0);
 	SetIsPet(false);
 
-	m_walkSpeed = 2.5f;
-	m_runSpeed = 6.0f;
+	m_walkSpeed = m_base_walkSpeed;
+	m_runSpeed = m_base_runSpeed;
 
 	switch(GetCreatureName()->Type)
 	{
@@ -760,6 +762,10 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		return false;
 	
 	spawnid = spawn->id;
+
+	m_walkSpeed = m_base_walkSpeed = proto->walk_speed; //set speeds
+	m_runSpeed = m_base_runSpeed = proto->run_speed; //set speeds
+
 	//Set fields
 	SetUInt32Value(OBJECT_FIELD_ENTRY,proto->Id);
 	SetFloatValue(OBJECT_FIELD_SCALE_X,proto->Scale);
@@ -959,6 +965,9 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 	creature_info = CreatureNameStorage.LookupEntry(proto->Id);
 	if(!creature_info)
 		return;
+
+	m_walkSpeed = m_base_walkSpeed = proto->walk_speed; //set speeds
+	m_runSpeed = m_base_runSpeed = proto->run_speed; //set speeds
 
 	//Set fields
 	SetUInt32Value(OBJECT_FIELD_ENTRY,proto->Id);

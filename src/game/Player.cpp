@@ -49,6 +49,7 @@ Player::Player ( uint32 high, uint32 low )
 	TrackingSpell		   = 0;
 	m_status				= 0;
 	offhand_dmg_mod		 = 0.5;
+	m_walkSpeed			= 2.5f;
 	m_runSpeed			  = PLAYER_NORMAL_RUN_SPEED;
 	m_isMoving			  = false;
 	m_ShapeShifted		  = 0;
@@ -365,6 +366,8 @@ Player::Player ( uint32 high, uint32 low )
 	m_arenaPoints = 0;
 	_delayAntiFlyUntil=0;
 	memset(&m_spellTypeTargets, 0, sizeof(Unit*)*NUM_SPELL_TYPE_INDEX);
+	m_base_runSpeed = m_runSpeed;
+	m_base_walkSpeed = m_walkSpeed;
 }
 
 
