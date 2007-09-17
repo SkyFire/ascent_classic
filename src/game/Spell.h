@@ -1491,7 +1491,6 @@ public:
     Item *          i_caster;
     Player *        p_caster;
     Object *        m_caster;
-	Item * item_to_delete;
 
     // get the diet flags for pet food
     inline uint32 GetPetFoodFlags(const char* m_string)

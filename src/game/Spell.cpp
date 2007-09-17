@@ -172,7 +172,6 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	add_damage = 0;
 	m_delayed = false;
 	pSpellId = 0;
-	item_to_delete = NULL;
 }
 
 Spell::~Spell()
@@ -182,9 +181,6 @@ Spell::~Spell()
 	
 	if(cancastresult == -1 && !failed)
 		RemoveItems();
-
-	if(item_to_delete)
-		item_to_delete->GetOwner()->GetItemInterface()->SafeFullRemoveItemByGuid(item_to_delete->GetGUID());
 }
 
 //i might forget conditions here. Feel free to add them
@@ -299,7 +295,6 @@ void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float
 					else
 						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(),2));
 				}
-					
 			}
 			else //cast from GO
 			{
@@ -1085,78 +1080,6 @@ void Spell::cast(bool check)
 			if(Target)
 				Target->RemoveBySpecialType(sp->specialtype, p_caster->GetGUID());
 		}*/
-
-		if (i_caster)
-		{			
-			ItemPrototype *proto = NULL;
-			proto = i_caster->GetProto();
-			if (proto->Class == ITEM_CLASS_CONSUMABLE || proto->Class == ITEM_CLASS_RECIPE
-				||proto->Class == ITEM_CLASS_TRADEGOODS || proto->Flags & 2)//flag&2 --conjured item
-			{
-				if (((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) <= 1)//number of charges might be -1,->remove
-				{
-					if (i_caster->GetUInt32Value(ITEM_FIELD_STACK_COUNT) <= 1)
-					{
-						if(i_caster->GetProto()->ItemId != 5507) //Ornate SpyGlass
-						{
-							/*bool result = i_caster->GetOwner()->GetItemInterface()->SafeFullRemoveItemByGuid(i_caster->GetGUID());
-							if(!result)
-							{
-								//should never get here
-								printf("Spell: Prepare, Item destruction failed");
-								this->cancel();
-								return;
-							}*/
-							item_to_delete = i_caster;
-						}
-					}
-					else
-					{
-						i_caster->SetUInt32Value(ITEM_FIELD_SPELL_CHARGES, proto->Spells[0].Charges );
-						i_caster->ModUInt32Value(ITEM_FIELD_STACK_COUNT,-1);
-						i_caster->m_isDirty = true;
-						//i_caster->Update();
-					}
-				}
-				else
-				{
-					i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES,-1);
-					i_caster->m_isDirty = true;
-				}
-			}
-			else if(proto->Class == ITEM_CLASS_QUEST )
-			{					
-				if(proto->Spells[0].Charges!=-1)
-				{
-					int32 cha=i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES);
-					//0 - remove, -1 don't remove otherwise inc count
-					if(cha)
-					{
-						i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES,-1);
-						i_caster->m_isDirty = true;
-						//i_caster->Update ();
-					}
-
-					if(!cha && proto->Class != ITEM_CLASS_QUEST)	// quest items shouldn't disappear..
-					{
-						bool result = i_caster->GetOwner()->GetItemInterface()->SafeFullRemoveItemByGuid(i_caster->GetGUID());
-						if(!result)
-						{
-							//should never get here
-							printf("Spell: Prepare, Item destruction failed");
-							this->cancel();
-							return;
-						}
-						i_caster=NULL;
-					}
-                    else if(!cha && proto->Class == ITEM_CLASS_QUEST)
-                    {
-                        this->cancel();
-                        return;
-                    }
-				}
-			}
-		}
 
 		if(!(m_spellInfo->Attributes & ATTRIBUTE_ON_NEXT_ATTACK  && !m_triggeredSpell))//on next attack
 		{
@@ -2775,6 +2698,9 @@ uint8 Spell::CanCast(bool rangetolerate)
 			if(i_caster->GetProto() && i_caster->GetProto()->InventoryType != INVTYPE_TRINKET)
 				return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;	
 		}	
+		// *** ITEM CHARGES CHECK - Partha ***
+		if( i_caster->GetProto()->Spells[0].Charges != 0 && ((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) == 0 )
+			return SPELL_FAILED_NO_CHARGES_REMAIN; // Item has no charges left
 	}
 
     /// if we happen to get here we check if the caster is a player and apply check's for items 
@@ -2896,6 +2822,33 @@ int8 Spell::CheckItems()
 
 void Spell::RemoveItems()
 {
+    /// ITEM CHARGES REMOVAL, created by Partha
+	if(i_caster)
+	{
+		if( i_caster->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > 1 )                  // STACKABLE ITEM
+		{
+			i_caster->ModUInt32Value(ITEM_FIELD_STACK_COUNT,-1);                    // remove 1 from stack
+			i_caster->m_isDirty = true;
+		}
+		else if( i_caster->GetProto()->Spells[0].Charges < 0                        // EXPENDABLE ITEM
+						|| i_caster->GetProto()->Spells[1].Category == 1153 )       // healthstones/mana gems <-- hackfix for wrong db values
+		{
+			if( ((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) < -1 ) // Has Charges Remaining
+			{
+				i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES,1);               // remove 1 charge
+				i_caster->m_isDirty = true;
+			}
+			else                                                                    // No Charges Remaining
+				i_caster->GetOwner()->GetItemInterface()->SafeFullRemoveItemByGuid(i_caster->GetGUID()); // delete item
+		}
+		else if( i_caster->GetProto()->Spells[0].Charges > 0 )                      // NON-EXPENDABLE ITEM
+		{
+			i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES,-1);                  // remove 1 charge
+			i_caster->m_isDirty = true;
+		}
+	} 
+    // END -> ITEM CHARGES REMOVAL
+
 	if (m_caster->GetTypeId() != TYPEID_PLAYER)
 		return;
 
