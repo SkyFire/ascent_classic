@@ -895,8 +895,8 @@ enum SpellTypes
     SPELL_TYPE_FINISHING_MOVE       = 0x080000, 
     SPELL_TYPE_ELIXIR_BATTLE		= 0x100000, 
     SPELL_TYPE_ELIXIR_GUARDIAN      = 0x200000, 
-    SPELL_TYPE_ELIXIR_FLASK         = 0x400000, 
-	SPELL_TYPE_HUNTER_MARK			= 0x800000,
+    SPELL_TYPE_ELIXIR_FLASK         = 0x300000, //weee, this contains both batle and guardian elixirs ;)
+	SPELL_TYPE_HUNTER_MARK			= 0x400000,
 };
 
 inline bool CanAgroHash(uint32 spellhashname)
