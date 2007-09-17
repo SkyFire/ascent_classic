@@ -369,7 +369,9 @@ struct FactionReputation
 	inline bool Positive() { return standing >= 0; }
 	FactionRating CalcRating()
 	{		
-		register long st=CalcStanding();
+		//changed by zack : nocturno patch : items bougth from Quartermasters relly on full standing value
+//		register long st=CalcStanding();
+		register long st=standing;
 		if(st>=42000)
 			return EXALTED;
 		if(st>=21000)
