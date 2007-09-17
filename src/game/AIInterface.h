@@ -354,7 +354,7 @@ public:
 	inline void SetWaypointMap(WayPointMap * m) { m_waypoints = m; }
 	bool m_hasWaypointEvents;
 	bool m_isGuard;
-	bool m_fastMove;
+//	bool m_fastMove;
 	void setGuardTimer(uint32 timer) { m_guardTimer = timer; }
 
 private:
@@ -401,7 +401,8 @@ private:
 
 
 	// Movement
-	float m_moveSpeed;
+	float m_walkSpeed;
+	float m_runSpeed;
 	float m_destinationX;
 	float m_destinationY;
 	float m_destinationZ;

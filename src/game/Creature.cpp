@@ -942,6 +942,8 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	m_aiInterface->m_hasWaypointEvents = ScriptSystem->HasEventType(GetEntry(), CREATURE_EVENT_ON_REACH_WP);
 	m_aiInterface->m_isGuard = isGuard(GetEntry());
 
+	m_aiInterface->getMoveFlags();
+
 	/* creature death state */
 	if(proto->death_state == 1)
 	{
@@ -1116,6 +1118,8 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 	has_waypoint_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_RANDOM_WAYPOINT);
 	m_aiInterface->m_hasWaypointEvents = ScriptSystem->HasEventType(GetEntry(), CREATURE_EVENT_ON_REACH_WP);
 	m_aiInterface->m_isGuard = isGuard(GetEntry());
+
+	m_aiInterface->getMoveFlags();
 
 	/* creature death state */
 	if(proto->death_state == 1)

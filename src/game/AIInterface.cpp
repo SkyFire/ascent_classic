@@ -62,7 +62,7 @@ AIInterface::AIInterface()
 	m_Unit = NULL;
 	m_PetOwner = NULL;
 	m_aiCurrentAgent = AGENT_NULL;
-	m_moveSpeed = 0.0f;
+	m_runSpeed = 0.0f;
 	UnitToFear = NULL;
 	firstLeaveCombat = true;
 	m_outOfCombatRange = 2500;
@@ -89,7 +89,7 @@ AIInterface::AIInterface()
 	m_AIState_backup = m_AIState;
 	UnitToFollow_backup = NULL;
 	m_isGuard = false;
-	m_fastMove = false;
+//	m_fastMove = false;
 }
 
 void AIInterface::Init(Unit *un, AIType at, MovementType mt)
@@ -104,7 +104,8 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 
 	m_Unit = un;
 
-	m_moveSpeed = m_Unit->m_runSpeed*0.001f;//move distance per ms time 
+	m_walkSpeed = m_Unit->m_walkSpeed*0.001f;//move distance per ms time 
+	m_runSpeed = m_Unit->m_runSpeed*0.001f;//move distance per ms time 
 	/*if(!m_DefaultMeleeSpell)
 	{
 		m_DefaultMeleeSpell = new AI_Spell;
@@ -137,7 +138,8 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 	m_Unit = un;
 	m_PetOwner = owner;
 
-	m_moveSpeed = m_Unit->m_runSpeed*0.001f;//move/ms
+	m_walkSpeed = m_Unit->m_walkSpeed*0.001f;//move distance per ms time 
+	m_runSpeed = m_Unit->m_runSpeed*0.001f;//move/ms
 	m_sourceX = un->GetPositionX();
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
@@ -239,6 +241,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 
 				firstLeaveCombat = false;
 
+				m_moveRun = true;
+
 				// Scan for a new target before moving back on waypoint path
 				Unit * Target = FindTarget();
 				if(Target != NULL)
@@ -246,11 +250,11 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				else
 				{
 					firstLeaveCombat = true;
-					if(m_isGuard)
+/*					if(m_isGuard)
 					{
 						m_Unit->m_runSpeed = m_Unit->m_base_runSpeed * 2.0f;
 						m_fastMove = true;
-					}
+					}*/
 				}
 
 				/*SpellEntry* spell = getSpellEntry(2054);
@@ -298,6 +302,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				m_hasCalledForHelp = false;
 				m_nextSpell = NULL;
 				SetNextTarget(NULL);
+				m_moveRun = true;
 			}break;
 		case EVENT_FEAR:
 			{   
@@ -315,10 +320,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				m_fleeTimer = 0;
 				m_hasFleed = false;
 				m_hasCalledForHelp = false;
-				m_moveRun = true;
+				m_moveRun = false;
 				
 				// update speed
-				m_Unit->m_runSpeed = m_Unit->m_base_runSpeed / 2;
 				getMoveFlags();
 
 				m_nextSpell = NULL;
@@ -328,7 +332,6 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_UNFEAR:
 			{
 				// update speed
-				m_Unit->m_runSpeed = m_Unit->m_base_runSpeed;
 				getMoveFlags();
 //				m_AIState = STATE_IDLE;
 				//maybe we were not idle before fear. Like a guardian could have been doing something
@@ -353,10 +356,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				m_fleeTimer = 0;
 				m_hasFleed = false;
 				m_hasCalledForHelp = false;
-				m_moveRun = true;
+				m_moveRun = false;
 				
 				// update speed
-				m_Unit->m_runSpeed = m_Unit->m_base_runSpeed / 2;
 				getMoveFlags();
 
 				m_nextSpell = NULL;
@@ -368,7 +370,6 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_UNWANDER:
 			{
 				// update speed
-				m_Unit->m_runSpeed = m_Unit->m_base_runSpeed;
 				getMoveFlags();
 				UnitToFollow = UnitToFollow_backup;
 				FollowDistance = FollowDistance_backup;
@@ -549,9 +550,9 @@ void AIInterface::Update(uint32 p_time)
 			{
 				m_AIState = STATE_IDLE;
 				m_returnX = m_returnY = m_returnZ = 0.0f;
+				m_moveRun = false;
 				if(hasWaypoints())
 				{
-					
 						if(m_moveBackward)
 						{
 							if(m_currentWaypoint != GetWayPointsCount()-1)
@@ -562,8 +563,6 @@ void AIInterface::Update(uint32 p_time)
 							if(m_currentWaypoint != 0)
 								m_currentWaypoint--;
 						}
-			
-
 				}
 				// Set health to full if they at there last location before attacking
 				if(m_AIType != AITYPE_PET)
@@ -865,7 +864,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					}
 					
 					FollowDistance = 0.0f;
-					m_moveRun = false;
+//					m_moveRun = false;
 					//FIXME: offhand shit
 					if(m_Unit->isAttackReady(false) && !m_fleeTimer)
 					{
@@ -918,7 +917,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					}
 					
 					FollowDistance = 0.0f;
-					m_moveRun = false;
+//					m_moveRun = false;
 					//FIXME: offhand shit
 					if(m_Unit->isAttackReady(false) && !m_fleeTimer)
 					{
@@ -1310,11 +1309,11 @@ Unit* AIInterface::FindTarget()
 
 	if( target )
 	{
-		if(m_isGuard)
+/*		if(m_isGuard)
 		{
 			m_Unit->m_runSpeed = m_Unit->m_base_runSpeed * 2.0f;
 			m_fastMove = true;
-		}
+		}*/
 
 		AttackReaction(target, 1, 0);
 		if(target->IsPlayer())
@@ -1789,24 +1788,25 @@ uint32 AIInterface::getMoveFlags()
 	uint32 MoveFlags = 0;
 	if(m_moveFly == true) //Fly
 	{
-		m_moveSpeed = m_Unit->m_flySpeed*0.001f;
+		m_runSpeed = m_Unit->m_flySpeed*0.001f;
 		MoveFlags = 0x300;
 	}
 	else if(m_moveSprint == true) //Sprint
 	{
-		m_moveSpeed = (m_Unit->m_runSpeed+5.0f)*0.001f;
+		m_runSpeed = (m_Unit->m_runSpeed+5.0f)*0.001f;
 		MoveFlags = 0x100;
 	}
 	else if(m_moveRun == true) //Run
 	{
-		m_moveSpeed = m_Unit->m_runSpeed*0.001f;
+		m_runSpeed = m_Unit->m_runSpeed*0.001f;
 		MoveFlags = 0x100;
 	}
-	else //Walk
+/*	else //Walk
 	{
-		m_moveSpeed = m_Unit->m_walkSpeed*0.001f;
+		m_runSpeed = m_Unit->m_walkSpeed*0.001f;
 		MoveFlags = 0x000;
-	}
+	}*/
+	m_walkSpeed = m_Unit->m_walkSpeed*0.001f;//move distance per ms time 
 	return MoveFlags;
 }
 
@@ -1833,7 +1833,11 @@ void AIInterface::UpdateMove()
 	}
 	m_nextPosX = m_nextPosY = m_nextPosZ = 0;
 
-	uint32 moveTime = (uint32) (distance / m_moveSpeed);
+	uint32 moveTime;
+	if(m_moveRun)
+		moveTime = (uint32) (distance / m_runSpeed);
+	else moveTime = (uint32) (distance / m_walkSpeed);
+
 	m_totalMoveTime = moveTime;
 
 	if(m_Unit->GetTypeId() == TYPEID_UNIT)
@@ -1905,7 +1909,7 @@ void AIInterface::SendCurrentMove(Player* plyr/*uint64 guid*/)
 	data << getMoveFlags();
 
 	//float distance = m_Unit->CalcDistance(m_destinationX, m_destinationY, m_destinationZ);
-	//uint32 moveTime = (uint32) (distance / m_moveSpeed);
+	//uint32 moveTime = (uint32) (distance / m_runSpeed);
 
 	data << moveTime;
 	data << uint32(1); //Number of Waypoints
@@ -2313,11 +2317,11 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 		{
 			if(m_timeMoved == m_timeToMove) //reached destination
 			{
-				if(m_fastMove)
+/*				if(m_fastMove)
 				{
 					m_Unit->UpdateSpeed();
 					m_fastMove = false;
-				}
+				}*/
 
 				if(m_moveType == MOVEMENTTYPE_WANTEDWP)//We reached wanted wp stop now
 					m_moveType = MOVEMENTTYPE_DONTMOVEWP;
