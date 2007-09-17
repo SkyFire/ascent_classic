@@ -1935,27 +1935,6 @@ void Aura::SpellAuraModStun(bool apply)
 	if(m_spellProto->Id == 38554)		// Eye of gilrock
 		return;
 
-	if(m_spellProto->NameHash == 1108982579) // Sap
-	{
-		Unit* m_caster = GetUnitCaster();
-		if(m_caster && m_caster->IsPlayer())
-		{
-			Unit* saptarget=static_cast<Player*>(m_caster)->GetSoloSpellTarget(m_spellProto->Id);
-
-			//remove sap from old target before we set it to new
-			if(saptarget && saptarget != m_target)
-			{
-				//sap is a negative effect with 1 stack
-				static_cast<Player*>(m_caster)->SetSoloSpellTarget(m_spellProto->Id, 0);
-				saptarget->RemoveAuraNegByNameHash(m_spellProto->NameHash);
-			}
-
-			//set new sap target if necesarry
-			if(apply)
-				static_cast<Player*>(m_caster)->SetSoloSpellTarget(m_spellProto->Id,m_target->GetGUID());
-		}
-	}
-
 	if(apply)
 	{ 
 		SetNegative();
@@ -3586,19 +3565,6 @@ void Aura::SpellAuraTransform(bool apply)
 		case 28271:	 // Polymorph: Turtle
 		case 28272:	 // Polymorph: Pig
 			{
-				//test if caster already has a polymorphed thing
-			    Unit* m_caster = GetUnitCaster();
-				if(m_caster && m_caster->IsPlayer())
-				{
-					Unit* polytarget=static_cast<Player*>(m_caster)->GetSoloSpellTarget(m_spellProto->Id);
-					//remove poly from old target before we set it to new
-					if(polytarget && polytarget!=m_target && polytarget->polySpell)
-						polytarget->RemoveSoloAura(((uint32)1));
-					//set new poly target if necesarry
-					if(apply)
-						static_cast<Player*>(m_caster)->SetSoloSpellTarget(m_spellProto->Id,m_target->GetGUID());
-					else static_cast<Player*>(m_caster)->SetSoloSpellTarget(m_spellProto->Id,(uint64)NULL);
-				}
 				if(!displayId)
 				{
 					switch(GetSpellProto()->Id)
@@ -5533,22 +5499,6 @@ void Aura::SpellAuraResistPushback(bool apply)
 	//DK:This is resist for spell casting delay
 	//Only use on players for now
 	
-	//check if we are casting earth shield and make sure we have it on only 1 target
-	Unit* m_caster = GetUnitCaster();
-	if(GetSpellProto()->NameHash==36158091 && m_caster && m_caster->IsPlayer())
-	{
-		Unit* earthshielded=static_cast<Player*>(m_caster)->GetSoloSpellTarget(m_spellProto->Id);
-
-		if(earthshielded && earthshielded!=m_target)
-		{
-			//earth shield can have max 10 charges so we remove them all
-			static_cast<Player*>(m_caster)->SetSoloSpellTarget(m_spellProto->Id, (uint64)NULL);
-			earthshielded->RemoveAllPosAuraByNameHash(GetSpellProto()->NameHash);//remove auras from target
-		}
-		if(apply)
-			static_cast<Player*>(m_caster)->SetSoloSpellTarget(m_spellProto->Id,m_target->GetGUID());
-	}
-
 	if(m_target->IsPlayer())
 	{
 		int32 val;

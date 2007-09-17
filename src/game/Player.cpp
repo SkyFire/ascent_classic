@@ -7933,32 +7933,6 @@ void Player::UpdateComboPoints()
 	m_session->OutPacket(SMSG_SET_COMBO_POINTS, c, buffer);
 }
 
-Unit *Player::GetSoloSpellTarget(uint32 spell_id)
-{
-	if(m_mapMgr == 0) return NULL;
-
-	SoloSpells::iterator iter=solospelltarget.find(spell_id);
-	if(iter!=solospelltarget.end())
-		return GetMapMgr()->GetUnit(iter->second);
-	return NULL;
-}
-
-void  Player::SetSoloSpellTarget(uint32 spellid,uint64 newtarget)
-{ 
-	if(newtarget)
-		solospelltarget.insert(make_pair( spellid, newtarget ));
-	else 
-	{
-		SoloSpells::iterator iter=solospelltarget.find(spellid);
-		if(iter!=solospelltarget.end())
-		{
-			solospelltarget.erase(iter);
-			return;
-		}
-	}
-}
-
-
 void Player::SendAreaTriggerMessage(const char * message, ...)
 {
 	va_list ap;

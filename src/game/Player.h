@@ -1471,8 +1471,6 @@ public:
 	}
 
 	inline void NullComboPoints() { if(!m_retainComboPoints) { m_comboTarget = 0; m_comboPoints = 0; m_spellcomboPoints=0; } UpdateComboPoints(); }
-	Unit *GetSoloSpellTarget(uint32 spell_id);
-	void  SetSoloSpellTarget(uint32 spellid,uint64 newtarget);
 	uint32 m_speedChangeCounter;
 
 	void SendAreaTriggerMessage(const char * message, ...);
@@ -1685,7 +1683,6 @@ protected:
 	Object *m_SummonedObject;
 
     // other system
-    SoloSpells	solospelltarget;
 	Corpse *    myCorpse;
 
 	uint32      m_cooldownTimer;
