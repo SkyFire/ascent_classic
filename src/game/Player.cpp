@@ -1927,7 +1927,7 @@ void Player::_SetVisibleBits(UpdateMask *updateMask, Player *target) const
 	updateMask->SetBit(UNIT_FIELD_FACTIONTEMPLATE);
 	updateMask->SetBit(UNIT_FIELD_BYTES_0);
 	updateMask->SetBit(UNIT_FIELD_FLAGS);
-	for(uint32 i = UNIT_FIELD_AURA; i < UNIT_FIELD_AURASTATE; i ++)
+	for(uint32 i = UNIT_FIELD_AURA; i <= UNIT_FIELD_AURASTATE; i ++)
 		updateMask->SetBit(i);
 	updateMask->SetBit(UNIT_FIELD_BASEATTACKTIME);
 	updateMask->SetBit(UNIT_FIELD_BASEATTACKTIME+1);
