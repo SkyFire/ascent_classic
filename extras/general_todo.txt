@@ -55,6 +55,10 @@ SMT_RESIST_DISPEL - check if it is used
 - rogues can exit combat instantly, this is bad i think.
 - quest loot from elites should be lootable by everybody who shares the quest
 - some kill quest does not give kill revard to whole group ?
+- megic wards( like fire ward) and shields ( like ice barrier ) doesnt absorbing dot spells
+- u aways suffer "1" dmg when u absorb a spell with ward/shield and losing casting time ..
+- when someone cast a spell (firaball,frostbolt,shadowbolt, etc.) and u cast "ice block" when the spell is still "flying" toward u, still make u dmg when she reach u
+- the target is debuffed befor the spell reach it. For example: if a mage cast fireball, right after the cast the target is immediately debuffed with the fireball dot effect
 
 ==========================================================================
 Zack - test my shit :

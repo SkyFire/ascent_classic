@@ -32,3 +32,5 @@ Improved Judgment - Retribution - Doesn't work.
 Sanctity Aura - Retribution - Doesn't work
 Improved Sanctity Aura - Retribution - Won't do anything since the base ability won't.
 Toughness - Protection - Doesn't add the armor.
+
+Hammer of Wrath (paladin) - does not trigger in pvp

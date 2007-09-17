@@ -68,3 +68,55 @@ Cataclysm - reduces mana cost by destruction spells by 5% - no reduction
 Bane - casting time reduced by 0.5 sec for shadowbolt and 1 sec for shoul fire - no reduction for soul fire and immolate
 Intensity - 70% chance to resist intreruption when channeling destro spells ( Rain of Fire and Hellfire ) - nothing
 Blacklash - increases critical chance by 3% and has a 25% when dmged to have a Shadow bolt or Incinerate spell instant - nothing
+
+
+
+
+General
+-Should receive soul shard when pet is dismissed due to out of range or getting on windrider
+-Temporary +spell damage buffs (trinkets, potions, etc) will only apply the +damage to DoT's while the effect is in place - Not when you start the spell cast. For example, say you used a trinket that gives +150 spell damage. You apply Corruption and Unstable Affliction. You gain the +150 spell damage bonus as normal - your Unstable Affliction and Corruption should gain around 25 damage a tick. Half way through the ticks, the trinket wears off. You will now LOSE that 25 damage a tick, even though the DoT was applied when you initiated the cast.
+
+Affliction Spells
+-Curse of Agony: causes the "beginning damage" throughout the whole spell cast, making it to do much less damage than it should. (Its damage should ramp up [url]http://www.wowwiki.com/Curse_of_Agony[/url])
+-Curse of Doom: works, but only gets 100% bonus from spell damage instead of 200%.
+-Life Tap: works, but it can kill you and cause durability loss.
+-Fear and fear effects sometimes does nothing as u see the enemy charge/attack u with the fear icon on. Fear also sometimes cause the enemy to stand in place for the entire duration of fear which isn't supposed to happen. If you fear a person too much, they become immune (which is supposed to happen) but it should reset in 15 seconds which doesn't happen (so they are permanently immune to fear until they choose to relog)
+[url]http://www.wowwiki.com/Diminishing_Returns_Rule[/url].
+
+Demonology Spells
+-Eye of krilrogg: summons a movable eye for scouting but this cancels at any attempt to move it.
+-Soul Shatter: Doesn't reduce threat as it should.
+-Summon Infernal: no 200 damage stun. Dismissing the infernal won't release him from his chains and send him wild, but instead just disappear. Does less damage than normal.
+
+Talents - Affliction
+-Improved howl of terror: doesn't decrease cast time by 1.5 seconds as it states.
+-Night fall: does not proc (Any damage on target should give u a chance to reduce next shadowbolt cast by 100% as stated)
+-Grim reach: does not increase the range of your affliction spells as it should
+-Contagion: has no effect (+5% affliction corruption, curse of agony, seed of corruption damage. Also reduces chance of affliction spells from being reduced by 30%)
+-Shadow Mastery: for some reason only applies to rank 1 skills. Doesn't apply to drain spells. Only uses base spell damage, not total spell damage after +damage is taken into consideration.
+-Dark pact: should recieve +shadow spell dmg bonus (currently does not), otherwise it works ok. [url]http://www.wowwiki.com/Dark_Pact[/url]
+-Fel Concentration: somewhat works, proc rate for cast time reduction seems to be less than 75% at maximum lvl
+-Empowered corruption: does not add any damage to corruption as it should (+36% at maximum lvl)
+
+Talents - Destruction
+-Ruin: gives + 100% crit damage but it doesn't work on soulfire as it is supposed to.
+-Intensity: has no noticable effect (supposed to give 70% at max lvl to reduce the chance of spell interruption).
+-Conflagerate: can't be used in pvp as it says "You cannot use this yet"
+-Backlash: gives 3% critical strike, but doesn't give the proc chance for the instant shadowbolt or incinerate.
+-Shadow and Flame: is supposed to give +20% damage to shadowbolt and incinerate but doesn't.
+-Improved shadowbolt: gets applied, but ANY damage caused - whether it be someone else's meele/spell strike, or one of your DoTs. It's only suppose to lose charges from your strikes. [url]http://www.wowwiki.com/Improved_Shadow_Bolt[/url]
+-Bane: reduces Shadow bolt cast time but not Soul Fire.
+-Emberstorm: only applies to base damage, not damage after spell casts.
+-Pyroclasm: hellfire will have the 40% chance to stun you just for the first tick. It doesn't interrupt spellcasting, just if you try to move within that 4seconds, well, you can't.
+
+Talents - Demonology
+-Demonic Aegis: does not increase the effectiveness of demonic armor and fel armor by 30% at max lvl.
+-Soul link: does not transfer 20% of damage to pet or give the +5% damage
+-Demonic Sacrifice: Working, though fire damage gained from imp and shadow damage gained from succubus and felguard are applied to base spell damage, not total spell damage after all other effects. Also, ff you use Demonic Sacrifice and log out with no pet, your character will show a Voidwalker next to them. When you log onto another character than back on to your lock, you'll have both the Demonic Sacrifice you used, and a Voidwalker out. Sacrificing this one would make 2 Sacrifices stack.
+
+Pets
+-Succubus' seduce: is somewhat bugged. It currently only works on mobs and not players.
+-If u have enough pet skills to go on the next page, u can't turn to the next page to access the skills.
+-Pets on defense/passive immediately attacks the closest enemy if it kills the current mob. It also immediately attacks the closest enemy if it is just summoned or from log in.
+
+Conflagrate (warlock) - does not trigger in pvp

@@ -21,3 +21,4 @@ Hearth of the Wild - Only adds you 20% intelect... while in cat and bear forms i
 Moonkin aura - doesnt work. 2 maybe it works now ?
 Stun and fear are 100% so all talents that reduse stun and fear effects are bugged
 11) Heart of th wild (Druid) ==> Do not add strength in cat form
+Improved Mark of the Wild

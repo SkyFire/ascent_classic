@@ -18,3 +18,5 @@ Spells:
 	Psychic Scream - may need the break chance fixed
 
 	Mind Control - When used on anyone besides an NPC, the mind controlled victim is unusable.
+
+Talent from discipline that increase your total mana, as far as I remember "Enlightenment", increase your mana not for 1-2-3 etc percents but for thousand points, and if you reset your talents it do it again until logout.
