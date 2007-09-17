@@ -868,6 +868,27 @@ enum SPELL_ENTRY
     SPELL_ENTRY_unk201_6
 };
 
+// target type flags
+enum SpellTargetTypes
+{
+    SPELL_TARGET_TYPE_NONE              = 0x01,
+    SPELL_TARGET_TYPE_PROFESSION        = 0x02,
+    SPELL_TARGET_TYPE_NONE1             = 0x04,
+    SPELL_TARGET_TYPE_NONE2             = 0x08,
+    SPELL_TARGET_TYPE_ENCHANTABLE_ITEM  = 0x10,
+    SPELL_TARGET_TYPE_UNK               = 0x20,     // seems to be scripted stuff
+    SPELL_TARGET_TYPE_UNK0              = 0x40,     // lots of spells interesting to research this one further
+    SPELL_TARGET_TYPE_UNK1              = 0x80,     // something todo with scripted and GM stuff
+    SPELL_TARGET_TYPE_UNK2              = 0x100,    // lots of spells interesting to research this one further...
+    SPELL_TARGET_TYPE_PLAYER_CORPSE     = 0x200,
+    SPELL_TARGET_TYPE_DEATHx            = 0x400,
+    SPELL_TARGET_TYPE_NONE3             = 0x800,
+    SPELL_TARGET_TYPE_NONE4             = 0x1000,
+    SPELL_TARGET_TYPE_NONE5             = 0x2000,
+    SPELL_TARGET_TYPE_GAME_OBJECTS      = 0x4000, // like chests and mining
+    SPELL_TARGET_TYPE_DEATH             = 0x8000,
+};
+
 // lets make this bitwise for more fun
 enum SpellTypes
 {
@@ -895,8 +916,8 @@ enum SpellTypes
     SPELL_TYPE_FINISHING_MOVE       = 0x080000, 
     SPELL_TYPE_ELIXIR_BATTLE		= 0x100000, 
     SPELL_TYPE_ELIXIR_GUARDIAN      = 0x200000, 
-    SPELL_TYPE_ELIXIR_FLASK         = 0x300000, //weee, this contains both batle and guardian elixirs ;)
-	SPELL_TYPE_HUNTER_MARK			= 0x400000,
+    SPELL_TYPE_ELIXIR_FLASK         = SPELL_TYPE_ELIXIR_BATTLE | SPELL_TYPE_ELIXIR_GUARDIAN, //weee, this contains both battle and guardian elixirs ;)
+    SPELL_TYPE_HUNTER_MARK			= 0x400000,
 };
 
 inline bool CanAgroHash(uint32 spellhashname)
@@ -1244,6 +1265,10 @@ public:
     Spell( Object* Caster, SpellEntry *info, bool triggered, Aura* aur);
     ~Spell();
 
+    // Fills specified targets at the area of effect
+    void FillSpecifiedTargetsInArea(float srcx,float srcy,float srcz,uint32 ind, uint32 specification);
+    // Fills specified targets at the area of effect. We suppose we already inited this spell and know the details
+    void FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range, uint32 specification);
     // Fills the targets at the area of effect
     void FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range);
     // Fills the targets at the area of effect. We suppose we already inited this spell and know the details
@@ -1422,6 +1447,7 @@ public:
     void SpellTargetNULL(uint32 i, uint32 j);
     void SpellTargetDefault(uint32 i, uint32 j);
     void SpellTargetSelf(uint32 i, uint32 j);
+    void SpellTargetInvisibleAOE(uint32 i, uint32 j);
     void SpellTargetType4(uint32 i, uint32 j);
     void SpellTargetPet(uint32 i, uint32 j);
     void SpellTargetSingleTargetEnemy(uint32 i, uint32 j);

@@ -1234,8 +1234,8 @@ void World::SetInitialWorldSettings()
 
 	sp = sSpellStore.LookupEntry(17364);
 	//remove stormstrike effect 0
-	if(sp && sp->Id==17364)
-		sp->Effect[0]=0;
+	//if(sp && sp->Id==17364)
+		//sp->Effect[0]=0;
 
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
 	sp = sSpellStore.LookupEntry(27962);

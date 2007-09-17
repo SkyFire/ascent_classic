@@ -26,17 +26,17 @@ enum AURA_FLAGS
 
 enum AUARA_STAE_FLAGS
 {
-    AURASTATE_FLAG_DODGE_BLOCK          = 1,//1
-    AURASTATE_FLAG_HEALTH20             = 2, //2
-    AURASTATE_FLAG_BERSERK              = 4, //3
-    AURASTATE_FLAG_JUDGEMENT            = 16, //5
-    AURASTATE_FLAG_PARRY                = 64, //7
-    AURASTATE_FLAG_LASTKILLWITHHONOR    = 512, //10
-    AURASTATE_FLAG_CRITICAL             = 1024, //11
-    AURASTATE_FLAG_HEALTH35             = 4096, //13
-    AURASTATE_FLAG_IMMOLATE             = 8192, //14
-    AURASTATE_FLAG_REJUVENATE           = 16384, //15 //where do i use this ?
-    AURASTATE_FLAG_POISON               = 32768, //16
+    AURASTATE_FLAG_DODGE_BLOCK          = 1,        //1
+    AURASTATE_FLAG_HEALTH20             = 2,        //2
+    AURASTATE_FLAG_BERSERK              = 4,        //3
+    AURASTATE_FLAG_JUDGEMENT            = 16,       //5
+    AURASTATE_FLAG_PARRY                = 64,       //7
+    AURASTATE_FLAG_LASTKILLWITHHONOR    = 512,      //10
+    AURASTATE_FLAG_CRITICAL             = 1024,     //11
+    AURASTATE_FLAG_HEALTH35             = 4096,     //13
+    AURASTATE_FLAG_IMMOLATE             = 8192,     //14
+    AURASTATE_FLAG_REJUVENATE           = 16384,    //15 //where do i use this ?
+    AURASTATE_FLAG_POISON               = 32768,    //16
 };
 
 enum MOD_TYPES
@@ -326,7 +326,6 @@ public:
     void Remove();
     void Expire();
     void AddMod(uint32 t, int32 a,uint32 miscValue,uint32 i);
-
 
     inline SpellEntry* GetSpellProto() const { return m_spellProto; }
     inline uint32 GetSpellId() const {return m_spellProto->Id; }

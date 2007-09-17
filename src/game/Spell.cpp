@@ -209,12 +209,71 @@ bool Spell::IsInvisibilitySpell()
 	return false;
 }
 
+void Spell::FillSpecifiedTargetsInArea(float srcx,float srcy,float srcz,uint32 ind, uint32 specification)
+{
+    FillSpecifiedTargetsInArea(&m_targetUnits[ind],srcx,srcy,srcz,GetRadius(ind), specification);
+}
+
+// for the moment we do invisible targets
+void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range, uint32 specification)
+{
+    //IsStealth()
+    float r = range * range;
+    for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+    {
+        // don't add objects that are not units and that are dead
+        if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
+            continue;
+        
+        //((Unit*)(*itr))->IsStealth()
+        if(m_spellInfo->TargetCreatureType)
+        {
+            if((*itr)->GetTypeId()!= TYPEID_UNIT)
+                continue;
+            CreatureInfo *inf = ((Creature*)(*itr))->GetCreatureName();
+            if(!inf || !(1<<(inf->Type-1) & m_spellInfo->TargetCreatureType))
+                continue;
+        }
+
+        if(IsInrange(srcx,srcy,srcz,(*itr),r))
+        {
+            if(u_caster)
+            {
+                if(isAttackable(u_caster, (Unit*)(*itr)))
+                {
+                    if(DidHit((*itr)->GetGUID()))
+                        tmpMap->push_back((*itr)->GetGUID());
+                    else
+                        ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(),2));
+                }
+
+            }
+            else //cast from GO
+            {
+                if(g_caster && g_caster->GetUInt32Value(OBJECT_FIELD_CREATED_BY) && g_caster->m_summoner)
+                {
+                    //trap, check not to attack owner and friendly
+                    if(isAttackable(g_caster->m_summoner,(Unit*)(*itr)))
+                        tmpMap->push_back((*itr)->GetGUID());
+                }
+                else
+                    tmpMap->push_back((*itr)->GetGUID());
+            }
+            if(m_spellInfo->MaxTargets)
+            {
+                if(m_spellInfo->MaxTargets >= tmpMap->size())
+                    return;
+            }
+        }
+    }
+}
+
 void Spell::FillAllTargetsInArea(float srcx,float srcy,float srcz,uint32 ind)
 {
 	FillAllTargetsInArea(&m_targetUnits[ind],srcx,srcy,srcz,GetRadius(ind));
 }
 
-void Spell::FillAllTargetsInArea(std::vector<uint64> *tmpMap,float srcx,float srcy,float srcz, float range)
+void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range)
 {
 	float r = range*range;
 	for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
@@ -224,7 +283,7 @@ void Spell::FillAllTargetsInArea(std::vector<uint64> *tmpMap,float srcx,float sr
 		if(m_spellInfo->TargetCreatureType)
 		{
 			if((*itr)->GetTypeId()!= TYPEID_UNIT)
-					continue;
+				continue;
 			CreatureInfo *inf = ((Creature*)(*itr))->GetCreatureName();
 			if(!inf || !(1<<(inf->Type-1) & m_spellInfo->TargetCreatureType))
 				continue;
@@ -3356,7 +3415,11 @@ void Spell::SafeAddMissedTarget(uint64 guid)
 {
     for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
         if((*i).TargetGuid==guid)
+        {
+            sLog.outDebug("[SPELL] Something goes wrong in spell target system");
             return;
+        }
+
     ModeratedTargets.push_back(SpellTargetMod(guid,2));
 }
 

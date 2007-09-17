@@ -25,8 +25,8 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
 {
     &Spell::SpellTargetDefault,                 // 0
     &Spell::SpellTargetSelf,                    // 1
-    &Spell::SpellTargetNULL,                    // 2
-    &Spell::SpellTargetNULL,                    // 3
+    &Spell::SpellTargetNULL,                    // 2 Not handled (Test spells)
+    &Spell::SpellTargetInvisibleAOE,            // 3
     &Spell::SpellTargetType4,                   // 4
     &Spell::SpellTargetPet,                     // 5
     &Spell::SpellTargetSingleTargetEnemy,       // 6
@@ -42,7 +42,7 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
     &Spell::SpellTargetAreaOfEffect,            // 16
     &Spell::SpellTargetNULL,                    // 17
     &Spell::SpellTargetLandUnderCaster,         // 18
-    &Spell::SpellTargetNULL,                    // 19
+    &Spell::SpellTargetNULL,                    // 19 Not handled (Test spells)
     &Spell::SpellTargetAllPartyMembersRangeNR,  // 20
     &Spell::SpellTargetSingleTargetFriend,      // 21
     &Spell::SpellTargetAoE,                     // 22
@@ -51,7 +51,7 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
     &Spell::SpellTargetSingleFriend,            // 25
     &Spell::SpellTargetGameobject_itemTarget,   // 26
     &Spell::SpellTargetPetOwner,                // 27
-    &Spell::SpellTargetEnemysAreaOfEffect,      // 28 // channeled
+    &Spell::SpellTargetEnemysAreaOfEffect,      // 28 channeled
     &Spell::SpellTargetType29,                  // 29
     &Spell::SpellTargetPartyBasedAreaEffect,    // 30
     &Spell::SpellTargetScriptedEffects,         // 31
@@ -159,7 +159,7 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
 // type 13: is not used
 // type 14: is not used
 
-// type 19: is target zone I think
+// type 19: is target zone I think (test spells)
 
 // type 48: is summon wild unit
 // type 49: is summon friend unit
@@ -206,6 +206,56 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
 void Spell::FillTargetMap(uint32 i)
 {
     uint32 cur;
+    
+    uint32 TypeA1 = m_spellInfo->EffectImplicitTargetA[0];
+    uint32 TypeA2 = m_spellInfo->EffectImplicitTargetA[1];
+    uint32 TypeA3 = m_spellInfo->EffectImplicitTargetA[2];
+
+    uint32 TypeB1 = m_spellInfo->EffectImplicitTargetB[0];
+    uint32 TypeB2 = m_spellInfo->EffectImplicitTargetB[1];
+    uint32 TypeB3 = m_spellInfo->EffectImplicitTargetB[2];
+
+    // if all secondary targets are 0 then use only primary targets
+    if (!TypeB1 && !TypeB2 && !TypeB3 )
+    {
+        if (TypeA1 < TOTAL_SPELL_TARGET)
+        {
+            (*this.*SpellTargetHandler[TypeA1])(i,0);
+        }
+
+        if (TypeA2 < TOTAL_SPELL_TARGET)
+        {
+            (*this.*SpellTargetHandler[TypeA2])(i,0);
+        }
+
+        if (TypeA3 < TOTAL_SPELL_TARGET)
+        {
+            (*this.*SpellTargetHandler[TypeA3])(i,0);
+        }
+        // exit here because we are not want to have extra targets added we don't need
+        return;
+    }
+
+    // if all primary targets are 0 then use only secondary targets
+    if (!TypeA1 && !TypeA2 && !TypeA3 )
+    {
+        if (TypeB1 < TOTAL_SPELL_TARGET)
+        {
+            (*this.*SpellTargetHandler[TypeB1])(i,0);
+        }
+
+        if (TypeB2 < TOTAL_SPELL_TARGET)
+        {
+            (*this.*SpellTargetHandler[TypeB2])(i,0);
+        }
+
+        if (TypeB3 < TOTAL_SPELL_TARGET)
+        {
+            (*this.*SpellTargetHandler[TypeB3])(i,0);
+        }
+        // exit here
+        return;
+    }
 
     // j = 0
     cur = m_spellInfo->EffectImplicitTargetA[0];
@@ -232,6 +282,18 @@ void Spell::FillTargetMap(uint32 i)
 //#define I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
 void Spell::SpellTargetNULL(uint32 i, uint32 j)
 {
+    uint32 UnhandledTargetType = 0;
+    if (j == 0)
+    {
+        UnhandledTargetType = m_spellInfo->EffectImplicitTargetA[j];
+
+    }
+    else
+    {
+        UnhandledTargetType = m_spellInfo->EffectImplicitTargetB[j];
+    }
+    sLog.outDebug("[SPELL][TARGET] Unhandled target type: %u", UnhandledTargetType);
+
     #ifdef I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
         TargetsList *tmpMap=&m_targetUnits[i];
         SafeAddTarget(tmpMap,m_targets.m_unitTarget);
@@ -274,6 +336,10 @@ void Spell::SpellTargetSelf(uint32 i, uint32 j)
         }
     }
     SafeAddTarget(tmpMap,m_caster->GetGUID());
+}
+void Spell::SpellTargetInvisibleAOE(uint32 i, uint32 j)
+{
+
 }
 
 /// Spell Target Handling for type 4: Target is holder of the aura
