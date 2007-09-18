@@ -88,10 +88,7 @@ bool ArenaTeam::AddMember(PlayerInfo * info)
 	{
 		base_field = (m_type*5) + PLAYER_FIELD_ARENA_TEAM_INFO_1_1;
 		plr->SetUInt32Value(base_field, m_id);
-		if(info->guid == m_leader)
-			plr->SetUInt32Value(base_field+1,0);
-		else
-			plr->SetUInt32Value(base_field+1,1);
+		plr->SetUInt32Value(base_field+1,m_leader);
         
         plr->m_arenaTeams[m_type]=this;
 	}

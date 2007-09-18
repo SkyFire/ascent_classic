@@ -915,7 +915,7 @@ void WorldSession::SystemMessage(const char * format, ...)
 	WorldPacket * data;
 	char buffer[1024];
 	va_list ap;
-	va_start(ap,buffer);
+	va_start(ap,format);
 	vsnprintf(buffer,1024,format,ap);
 	va_end(ap);
 
