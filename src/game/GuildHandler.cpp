@@ -1391,6 +1391,7 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 		team->m_borderColour = bordercolor;
 		team->m_borderStyle = border;
 		team->m_backgroundColour = background;
+		team->m_leader=_player->GetGUIDLow();
 
 		team->AddMember(_player->m_playerInfo);
 		objmgr.AddArenaTeam(team);

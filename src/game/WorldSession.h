@@ -726,6 +726,7 @@ public:
 	static void InitPacketHandlerTable();
 	uint32 floodLines;
 	uint32 floodTime;
+	void SystemMessage(const char * format, ...);
 };
 
 typedef std::set<WorldSession*> SessionSet;

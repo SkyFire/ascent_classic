@@ -1532,6 +1532,7 @@ public:
 	LocationVector m_sentTeleportPosition;
 
 	void RemoveFromBattlegroundQueue();
+	uint32 m_arenateaminviteguid;
 
     /************************************************************************/
     /* Spell Packet wharper Please keep this separated                      */

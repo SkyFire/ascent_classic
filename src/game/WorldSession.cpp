@@ -909,3 +909,17 @@ void WorldSession::HandlePingOpcode(WorldPacket& recvPacket)
 }
 
 #endif
+
+void WorldSession::SystemMessage(const char * format, ...)
+{
+	WorldPacket * data;
+	char buffer[1024];
+	va_list ap;
+	va_start(ap,buffer);
+	vsnprintf(buffer,1024,format,ap);
+	va_end(ap);
+
+	data = sChatHandler.FillSystemMessageData(buffer);
+	SendPacket(data);
+	delete data;
+}

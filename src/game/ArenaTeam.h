@@ -106,6 +106,7 @@ public:
 	bool AddMember(PlayerInfo * info);
 	bool RemoveMember(PlayerInfo * info);
 	bool HasMember(uint32 guid);
+	void SetLeader(PlayerInfo * info);
 
 	inline uint32 GetPlayersPerTeam()
 	{

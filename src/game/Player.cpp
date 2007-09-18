@@ -368,6 +368,7 @@ Player::Player ( uint32 high, uint32 low )
 	memset(&m_spellTypeTargets, 0, sizeof(Unit*)*NUM_SPELL_TYPE_INDEX);
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
+	m_arenateaminviteguid=0;
 }
 
 
