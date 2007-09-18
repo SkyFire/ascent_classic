@@ -91,6 +91,7 @@ bool ArenaTeam::AddMember(PlayerInfo * info)
 		plr->SetUInt32Value(base_field+1,m_leader);
         
         plr->m_arenaTeams[m_type]=this;
+		plr->GetSession()->SystemMessage("You are now a member of the arena team, '%s'.", m_name.c_str());
 	}
 	return true;
 }
@@ -223,7 +224,29 @@ bool ArenaTeam::HasMember(uint32 guid)
 
 void ArenaTeam::SetLeader(PlayerInfo * info)
 {
+	uint32 old_leader = m_leader;
+	char buffer[1024];
+	WorldPacket * data;
+	snprintf(buffer, 1024,"%s is now the captain of the arena team, '%s'.", info->name.c_str(), m_name.c_str());
+	data = sChatHandler.FillSystemMessageData(buffer);
+	m_leader=info->guid;
+    SendPacket(data);
+	delete data;
 
+	/* set the fields */
+	for(uint32 i = 0; i < m_memberCount; ++i)
+	{
+		if(m_members[i].Info == info)		/* new leader */
+		{
+			if(m_members[i].Info->m_loggedInPlayer)
+				m_members[i].Info->m_loggedInPlayer->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (m_type*5) + 1, 0);
+		}
+		else if(m_members[i].Info->guid == old_leader)
+		{
+			if(m_members[i].Info->m_loggedInPlayer)
+				m_members[i].Info->m_loggedInPlayer->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (m_type*5) + 1, 1);
+		}
+	}
 }
 
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recv_data)
@@ -312,7 +335,8 @@ void WorldSession::HandleArenaTeamAddMemberOpcode(WorldPacket & recv_data)
 	}
 
 	plr->m_arenateaminviteguid = _player->m_arenaTeams[slot]->m_id;
-	data << _player->GetNameString() << _player->m_arenaTeams[slot]->m_name;
+	data << _player->GetName();
+	data << _player->m_arenaTeams[slot]->m_name;
 	plr->GetSession()->SendPacket(&data);
 }
 
@@ -408,15 +432,14 @@ void WorldSession::HandleArenaTeamInviteAcceptOpcode(WorldPacket & recv_data)
 void WorldSession::HandleArenaTeamInviteDenyOpcode(WorldPacket & recv_data)
 {
 	ArenaTeam * team;
-	if(_player->m_arenateaminviteguid != 0)
+	if(_player->m_arenateaminviteguid == 0)
 	{
 		SystemMessage("You were not invited.");
 		return;
 	}
-	else
-		_player->m_arenateaminviteguid=0;
 
 	team = objmgr.GetArenaTeamById(_player->m_arenateaminviteguid);
+	_player->m_arenateaminviteguid=0;
 	if(team == NULL)
 		return;
 

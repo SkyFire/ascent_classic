@@ -2624,10 +2624,10 @@ bool Player::LoadFromDB(uint32 guid)
 		if(m_arenaTeams[z] != NULL)
 		{
 			SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5), m_arenaTeams[z]->m_id);
-			/*if(m_arenaTeams[z]->m_leader == GetGUIDLow())
+			if(m_arenaTeams[z]->m_leader == GetGUIDLow())
+				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5) + 1, 0);
+			else
 				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5) + 1, 1);
-			else*/
-				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5) + 1, m_arenaTeams[z]->m_leader);
 		}
 	}
 
