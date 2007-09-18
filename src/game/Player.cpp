@@ -1152,6 +1152,11 @@ void Player::_EventExploration()
                     if(m_isResting) ApplyPlayerRestState(false);
                 }
             }
+			else
+			{
+				if(m_isResting)
+					ApplyPlayerRestState(false);
+			}
         }
         else
         {

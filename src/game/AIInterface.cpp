@@ -1834,7 +1834,7 @@ void AIInterface::UpdateMove()
 		if(m_Unit->GetMapMgr())
 		{
 			float adt_Z = m_Unit->GetMapMgr()->GetLandHeight(m_destinationX, m_destinationY);
-			if(fabsf(adt_Z - m_destinationZ) < 1.5)
+			if(fabsf(adt_Z - m_destinationZ) < 3.0f)
 				m_destinationZ = adt_Z;
 		}
 	}
@@ -2646,12 +2646,6 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				if(dist > 900.0f/*30*/)
 					m_moveSprint = true;
 
-				// estimate position based on orientation
-				/*float delta_x = -(sinf(UnitToFollow->GetOrientation()) * 5);
-				float delta_y = -(cosf(UnitToFollow->GetOrientation()) * 5);
-
-				delta_x += UnitToFollow->GetPositionX();
-				delta_y += UnitToFollow->GetPositionY();*/
 				float delta_x = UnitToFollow->GetPositionX();
 				float delta_y = UnitToFollow->GetPositionY();
 				float d = 3;
@@ -2660,7 +2654,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 
 				MoveTo(delta_x+(d*(cosf(m_fallowAngle+UnitToFollow->GetOrientation()))),
 					   delta_y+(d*(sinf(m_fallowAngle+UnitToFollow->GetOrientation()))),
-					   UnitToFollow->GetPositionZ(),UnitToFollow->GetOrientation());
+					   UnitToFollow->GetPositionZ(),UnitToFollow->GetOrientation());				
 			}
 			else
 			{
