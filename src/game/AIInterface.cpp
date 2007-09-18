@@ -1269,7 +1269,7 @@ Unit* AIInterface::FindTarget()
 		}
 
 		/* is it a player? we have to check for our pvp flag. */
-		if(m_U)
+//		if(m_U)
 		crange = _CalcCombatRange(pUnit,false);
 		if(m_isGuard)
 			crange *= 4;
