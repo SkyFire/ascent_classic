@@ -58,37 +58,9 @@ public:
 		uint32 c1 = m_players[1].size() + m_pendPlayers[1].size();
 		if(m_started) return -1;
 
-		/* Grab the team with the least players. */
-		if(c0 >= m_playerCountPerTeam)
-		{
-			/* Team 0 is full, try team 1 */
-			if(c1 >= m_playerCountPerTeam)
-				return -1;
-			else
-				return 1;
-		}
-		else if(c1 >= m_playerCountPerTeam)
-		{
-			/* Team 1 is full, try team 0 */
-			if(c0 >= m_playerCountPerTeam)
-				return -1;
-			else
-				return 0;
-		}
-		else
-		{
-			/* Neither team is full. Pick the one with the least slots */
-			if(c0 > c1)
-			{
-				/* 0 has more players than 1 */
-				return 1;
-			}
-			else
-			{
-				/* 1 has more players than 0 */
-				return 0;
-			}
-		}
+		// Check if there is free room, if yes, return team with less members
+		return ((c0 + c1 >= m_playerCountPerTeam * 2) ? -1 : (c0 > c1));
+
 		/* We shouldn't reach here. */
 	}
 };

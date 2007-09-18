@@ -302,7 +302,7 @@ public:
 	void PlaySoundToAll(uint32 Sound);
 
 	/* Full? */
-	inline bool IsFull() { return (!HasFreeSlots(0) && !HasFreeSlots(1)); }
+	inline bool IsFull() { return !(HasFreeSlots(0) || HasFreeSlots(1)); }
 
 	/* Are we full? */
 	inline bool HasFreeSlots(uint32 Team) { m_mainLock.Acquire(); bool res = ((m_players[Team].size() + m_pendPlayers[Team].size()) < m_playerCountPerTeam); m_mainLock.Release(); return res; }

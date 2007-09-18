@@ -2143,6 +2143,10 @@ void Spell::HandleAddAura(uint64 guid)
 		spellid = 6788;
 	else if(m_spellInfo->Id == 11958) // Cast spell Hypothermia
 		spellid = 41425;
+	else if(m_spellInfo->Id == 30451) // Cast spell Arcane Blast
+		spellid = 36032;
+	else if(m_spellInfo->Id == 20572 || m_spellInfo->Id == 33702 || m_spellInfo->Id == 33697) // Cast spell Blood Fury
+		spellid = 23230;
 
 	if(spellid && p_caster)
 	{
@@ -2895,6 +2899,8 @@ int32 Spell::CalculateEffect(uint32 i)
 		{
 		case 0x7424D6B3: //Gift of the Naaru
 		case 0xDE1C36C8: //Blood Fury
+		case 0xEE91A232: //Mana Tap
+		case 0x6632EB62: //Arcane Torrent
 			basePoints += static_cast<Unit*>(m_caster)->getLevel()*basePointsPerLevel;
 			break;
 		}
@@ -3611,7 +3617,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		grp = 19;
 		break;
 
-	case 0x593D7EC7:        // Freezing Trap
+	case 0x1895FD50:        // Freezing Trap Effect
 		grp = 20;
 		break;
 

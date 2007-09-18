@@ -280,16 +280,16 @@ inline uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 		case 0: // normal mob
 			break;
 		case 1: // elite
-			xp *= 1.5f;
+			xp *= 2.0f;
 			break;
 		case 2: // rare elite
-			xp *= 3.0f;
+			xp *= 2.0f;
 			break;
 		case 3: // world boss
-			xp *= 10.0f;
+			xp *= 2.5f;
 			break;
 		default:	// rare or higher
-			xp *= 7.0f;
+//			xp *= 7.0f;
 			break;
 		}
 	}
@@ -747,6 +747,7 @@ inline bool isEven (int num)
 }
 
 #endif
+
 
 
 

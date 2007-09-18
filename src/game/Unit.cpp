@@ -2135,6 +2135,10 @@ void Unit::AddAura(Aura *aur)
 		{
 			if(m_auras[x])
 			{
+				// Nasty check for Blood Fury debuff (spell system based on namehashes is bs anyways)
+				if(info->NameHash == 0xDE1C36C8)
+					continue;
+
 				if(m_auras[x]->GetSpellProto()->Id != aur->GetSpellId())
 				{
 					// Check for auras by specific type.

@@ -820,6 +820,7 @@ void Pet::ApplySummonLevelAbilities()
 		break;*/
 	case 510:	// Mage's water elemental
 		stat_index = 5;
+		m_aiInterface->disable_melee = true;
 		break;
 	}
 	if(m_uint32Values[OBJECT_FIELD_ENTRY] == 89)
