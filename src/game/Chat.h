@@ -121,6 +121,7 @@ class SERVER_DECL CommandTableStorage : public Singleton<CommandTableStorage>
 	ChatCommand * _GameObjectCommandTable;
 	ChatCommand * _BattlegroundCommandTable;
 	ChatCommand * _NPCCommandTable;
+	ChatCommand * _accountCommandTable;
 	ChatCommand * _CheatCommandTable;
 	ChatCommand * _honorCommandTable;
 	ChatCommand * _petCommandTable;
@@ -316,6 +317,11 @@ protected:
 	bool HandleAttackerInfoCommand(const char* args, WorldSession *m_session);
 	bool HandleShowAttackersCommand(const char* args, WorldSession *m_session);
 	bool HandleNpcReturnCommand(const char* args, WorldSession* m_session);
+	bool HandleAccountBannedCommand(const char * args, WorldSession * m_session);
+	bool HandleAccountPasswordCommand(const char * args, WorldSession * m_session);
+	bool HandleAccountEmailCommand(const char * args, WorldSession * m_session);
+	bool HandleAccountLevelCommand(const char * args, WorldSession * m_session);
+	bool HandleAccountFlagsCommand(const char * args, WorldSession * m_session);
 	bool HandleCreateAccountCommand(const char* args, WorldSession *m_session);
 	bool HandleSetRateCommand(const char* args, WorldSession* m_session);
 	bool HandleGetRateCommand(const char* args, WorldSession* m_session);

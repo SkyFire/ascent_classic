@@ -1149,6 +1149,115 @@ bool ChatHandler::HandleResetSpellsCommand(const char* args, WorldSession *m_ses
 	return true;
 }
 
+bool ChatHandler::HandleAccountLevelCommand(const char * args, WorldSession * m_session)
+{
+    if(!*args) return false;
+
+	char account[100];
+	char gmlevel[100];
+	int argc = sscanf(args, "%s %s", account, gmlevel);
+	if(argc != 2)
+		return false;
+
+	std::stringstream my_sql;
+	my_sql << "UPDATE accounts SET gm = '" << gmlevel << "' WHERE login = '" << account << "'";
+
+	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
+
+	GreenSystemMessage(m_session, "Account '%s' level has been updated to '%s'. The change will be effective with the next reload cycle.", account, gmlevel);
+
+	return true;
+}
+
+bool ChatHandler::HandleAccountPasswordCommand(const char * args, WorldSession * m_session)
+{
+   if(!*args) return false;
+
+	char account[100];
+	char password[100];
+	int argc = sscanf(args, "%s %s", account, password);
+	if(argc != 2)
+		return false;
+
+	std::stringstream my_sql;
+	my_sql << "UPDATE accounts SET password = '" << password << "' WHERE login = '" << account << "'";
+
+	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
+
+	GreenSystemMessage(m_session, "Account '%s' password has been changed to '%s'. The change will be effective with the next reload cycle.", account, password);
+
+	return true;
+}
+
+bool ChatHandler::HandleAccountBannedCommand(const char * args, WorldSession * m_session)
+{
+    if(!*args) return false;
+
+	char account[100];
+	uint32 banned;
+	int argc = sscanf(args, "%s %u", account, (unsigned int*)&banned);
+	if(argc != 2)
+		return false;
+
+	std:stringstream my_sql;
+	my_sql << "UPDATE accounts SET banned = " << banned << " WHERE login = '" << account << "'";
+
+	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
+
+	switch(banned)
+	{
+	case 0: {
+		GreenSystemMessage(m_session, "Account '%s' has been unbanned. The change will be effective with the next reload cycle.", account);
+		}break;
+
+	case 1: {
+		GreenSystemMessage(m_session, "Account '%s' has been banned. The change will be effective with the next reload cycle.", account);
+		}break;
+	}
+
+	return true;
+}
+
+bool ChatHandler::HandleAccountFlagsCommand(const char * args, WorldSession * m_session)
+{
+    if(!*args) return false;
+
+	char account[100];
+	uint32 flags;
+	int argc = sscanf(args, "%s %u", account, (unsigned int*)&flags);
+	if(argc != 2)
+		return false;
+
+	std:stringstream my_sql;
+	my_sql << "UPDATE accounts SET flags = " << flags << " WHERE login = '" << account << "'";
+
+	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
+
+	GreenSystemMessage(m_session, "Account '%s' flags have been updated. The change will be effective with the next reload cycle.", account);
+
+	return true;
+}
+
+bool ChatHandler::HandleAccountEmailCommand(const char * args, WorldSession * m_session)
+{
+    if(!*args) return false;
+
+	char account[100];
+	char email[100];
+	int argc = sscanf(args, "%s %s", account, email);
+	if(argc != 2)
+		return false;
+
+	std:stringstream my_sql;
+	my_sql << "UPDATE accounts SET email = '" << email << "' WHERE login = '" << account << "'";
+
+	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
+
+	GreenSystemMessage(m_session, "Account '%s' email has been updated to '%s'. The change will be effective with the next reload cycle.", account, email);
+
+	return true;
+}
+
 bool ChatHandler::HandleCreateAccountCommand(const char* args, WorldSession *m_session)
 {
 	char *user = strtok((char *)args, " ");

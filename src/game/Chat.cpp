@@ -46,6 +46,8 @@ ChatCommand * CommandTableStorage::GetSubCommandTable(const char * name)
 		return _NPCCommandTable;
 	else if(!strcmp(name, "cheat"))
 		return _CheatCommandTable;
+	else if(!strcmp(name, "account"))
+		return _accountCommandTable;
 	else if(!strcmp(name, "pet"))
 		return _petCommandTable;
 	else if(!strcmp(name, "recall"))
@@ -161,6 +163,7 @@ void CommandTableStorage::Dealloc()
 	free( _BattlegroundCommandTable );
 	free( _NPCCommandTable );
 	free( _CheatCommandTable );
+	free( _accountCommandTable );
 	free( _petCommandTable );
 	free( _recallCommandTable );
 	free( _honorCommandTable );
@@ -354,6 +357,19 @@ void CommandTableStorage::Init()
 	};
 	dupe_command_table(CheatCommandTable, _CheatCommandTable);
 
+	static ChatCommand accountCommandTable[] =
+	{
+		{ "banned",	  'z', &ChatHandler::HandleAccountBannedCommand,   "Ban account. Pass it username and 0 or 1.", NULL, 0, 0, 0 },
+		{ "create",	  'z', &ChatHandler::HandleCreateAccountCommand,   "Create account. Pass it username password email.", NULL, 0, 0, 0 },
+		{ "email",	  'z', &ChatHandler::HandleAccountEmailCommand,	   "Sets email address on account. Pass it username email_address.", NULL, 0, 0, 0},
+		{ "flags",	  'z', &ChatHandler::HandleAccountFlagsCommand,	   "Sets flags on account. Pass it username and 0 for Non-TBC or 8 for TBC.", NULL, 0, 0, 0},
+		{ "level",	  'z', &ChatHandler::HandleAccountLevelCommand,    "Sets gm level on account. Pass it username and 0,1,2,3,az, etc.", NULL, 0, 0, 0 },
+		{ "password", 'z', &ChatHandler::HandleAccountPasswordCommand, "Sets password on account. Pass it username password.",	NULL, 0, 0, 0},
+		{ "reload",   'z', &ChatHandler::HandleReloadAccountsCommand,  "Reloads accounts on logon server.",	NULL, 0, 0, 0},
+		{ NULL, 0, NULL, "", NULL, 0, 0, 0},
+	};
+	dupe_command_table(accountCommandTable, _accountCommandTable);
+
 	static ChatCommand honorCommandTable[] =
 	{
 		{ "getpvprank",  'm', &ChatHandler::HandleGetRankCommand,	   "Gets PVP Rank",							   NULL, 0, 0, 0},
@@ -460,6 +476,7 @@ void CommandTableStorage::Init()
 		{ "battleground",  'e', NULL,									 "",		   BattlegroundCommandTable, 0, 0, 0},
 		{ "npc"		 ,  'n', NULL,									 "",					NPCCommandTable, 0, 0, 0},
 		{ "cheat"	   ,  'm', NULL,									 "",				  CheatCommandTable, 0, 0, 0},
+		{ "account"	   ,  'z', NULL,									 "",				  accountCommandTable, 0, 0, 0},
 		{ "honor"	   ,  'm', NULL,									 "",				  honorCommandTable, 0, 0, 0},
 		{ "pet",		   'm', NULL,									 "",					petCommandTable, 0, 0, 0},
 		{ "recall",		'q', NULL,									 "",				 recallCommandTable, 0, 0, 0},
@@ -1083,5 +1100,6 @@ bool ChatHandler::HandleGetPosCommand(const char* args, WorldSession *m_session)
 		BlueSystemMessage(m_session, "SpellIcon for %d is %d", se->Id, se->field114);
 	return true;
 }
+
 
 
