@@ -107,6 +107,7 @@ public:
 	bool RemoveMember(PlayerInfo * info);
 	bool HasMember(uint32 guid);
 	void SetLeader(PlayerInfo * info);
+	ArenaTeamMember * GetMember(PlayerInfo * info);
 
 	inline uint32 GetPlayersPerTeam()
 	{

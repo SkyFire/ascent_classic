@@ -525,6 +525,7 @@ void CommandTableStorage::Init()
 		{ "silentplayer", 't', &ChatHandler::HandleSilentPlayerCommand, "Player cannot chat for x minutes <duration> (default 5 minutes)", NULL, 0, 0, 0 },
 		{ "changepassword", 'z', &ChatHandler::HandleChangePasswordCommand, "Changes your accounts password.", NULL, 0, 0, 0 },
 		{ "rehash", 'z', &ChatHandler::HandleRehashCommand, "Reloads config file.", NULL, 0, 0, 0 },
+		{ "createarenateam", 'g', &ChatHandler::HandleCreateArenaTeamCommands, NULL, 0, 0, 0 },
 		{ NULL,		  0, NULL,										 "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(commandTable, _commandTable);

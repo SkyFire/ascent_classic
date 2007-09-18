@@ -29,6 +29,25 @@ Arena::Arena(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t, uint32 players_pe
 {
 	m_started = false;
 	m_playerCountPerTeam = players_per_side;
+	switch(t)
+	{
+	case BATTLEGROUND_ARENA_5V5:
+		m_arenateamtype=2;
+		break;
+
+	case BATTLEGROUND_ARENA_3V3:
+		m_arenateamtype=1;
+		break;
+		
+	case BATTLEGROUND_ARENA_2V2:
+		m_arenateamtype=0;
+		break;
+
+	default:
+		m_arenateamtype=0;
+		break;
+	}
+	rated_match=false;
 }
 
 Arena::~Arena()
@@ -50,6 +69,27 @@ void Arena::OnAddPlayer(Player * plr)
 	/* Set FFA PvP Flag */
 	if(!plr->HasFlag(PLAYER_FLAGS, PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		plr->SetFlag(PLAYER_FLAGS, PLAYER_FLAG_FREE_FOR_ALL_PVP);
+
+	/* update arena team stats */
+	if(rated_match && plr->m_arenaTeams[m_arenateamtype] != NULL)
+	{
+		ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
+		ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
+		if(doneteams.find(t) == doneteams.end())
+		{
+			t->m_stat_gamesplayedseason++;
+			t->m_stat_gamesplayedweek++;
+			doneteams.insert(t);
+		}
+
+		if(tp != NULL)
+		{
+			tp->Played_ThisWeek++;
+			tp->Played_ThisSeason++;
+		}
+
+		t->SaveToDB();
+	}
 }
 
 void Arena::OnRemovePlayer(Player * plr)
@@ -229,13 +269,47 @@ void Arena::UpdatePlayerCounts()
 	else
 		return;
 
+	Finish();
+}
+
+void Arena::Finish()
+{
 	m_ended = true;
 	m_nextPvPUpdateTime = 0;
 	UpdatePvPData();
 	PlaySoundToAll(m_winningteam ? SOUND_ALLIANCEWINS : SOUND_HORDEWINS);
 
-				sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_CLOSE);
-			sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
+	sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_CLOSE);
+	sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
+
+	/* update arena team stats */
+	doneteams.clear();
+	if(rated_match)
+	{
+		for(set<Player*>::iterator itr = m_players[m_winningteam].begin(); itr != m_players[m_winningteam].end(); ++itr)
+		{
+			Player * plr = *itr;
+			if(plr->m_arenaTeams[m_arenateamtype] != NULL)
+			{
+				ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
+				ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
+				if(doneteams.find(t) == doneteams.end())
+				{
+					t->m_stat_gameswonseason++;
+					t->m_stat_gameswonweek++;
+					doneteams.insert(t);
+				}
+	
+				if(tp != NULL)
+				{
+					tp->Won_ThisWeek++;
+					tp->Won_ThisSeason++;
+				}
+
+				t->SaveToDB();
+			}
+		}
+	}
 }
 
 LocationVector Arena::GetStartingCoords(uint32 Team)

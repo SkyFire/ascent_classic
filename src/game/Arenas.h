@@ -17,11 +17,16 @@
  *
  */
 
+class ArenaTeam;
+
 class Arena : public CBattleground
 {
 	set<GameObject*> m_gates;
+	set<ArenaTeam*> doneteams;
 	bool m_started;
+	uint32 m_arenateamtype;
 public:
+	bool rated_match;
 	Arena(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t, uint32 players_per_side);
 	virtual ~Arena();
 
@@ -63,4 +68,6 @@ public:
 
 		/* We shouldn't reach here. */
 	}
+
+	void Finish();
 };

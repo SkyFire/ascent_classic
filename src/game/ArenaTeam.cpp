@@ -271,6 +271,16 @@ void ArenaTeam::SetLeader(PlayerInfo * info)
 	}
 }
 
+ArenaTeamMember * ArenaTeam::GetMember(PlayerInfo * info)
+{
+	for(uint32 i = 0; i < m_memberCount; ++i)
+	{
+		if(m_members[i].Info == info)
+			return &m_members[i];
+	}
+	return NULL;
+}
+
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recv_data)
 {
 	uint8 slot;
