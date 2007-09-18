@@ -70,7 +70,29 @@ void ArenaTeam::SendPacket(WorldPacket * data)
 
 void ArenaTeam::Destroy()
 {
+	char buffer[1024];
+	WorldPacket * data;
+	vector<PlayerInfo*> tokill;
+	uint32 i;
+	tokill.reserve(m_memberCount);
+	sprintf(buffer,1024, "The arena team, '%s', disbanded.", m_name.c_str());
+	data = sChatHandler.FillSystemMessageData(buffer);
+	SendPacket(data);
+	delete data;
 
+	for(i=0; i < m_memberCount; ++i)
+	{
+		if(m_members[i].Info)
+			tokill.push_back(m_members[i].Info);
+	}
+
+	for(vector<PlayerInfo*>::iterator itr = tokill.begin(); itr != tokill.end(); ++itr)
+	{
+		RemoveMember(*itr);
+	}
+
+	objmgr.RemoveArenaTeam(this);
+	delete this;
 }
 
 bool ArenaTeam::AddMember(PlayerInfo * info)
