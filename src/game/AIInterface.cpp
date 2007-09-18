@@ -1226,6 +1226,10 @@ Unit* AIInterface::FindTarget()
 	Object *pObj;
 	Unit *pUnit;
 	float dist;
+	bool pvp=true;
+	if(m_Unit->GetTypeId()==TYPEID_UNIT&&((Creature*)m_Unit)->GetCreatureName()&&((Creature*)m_Unit)->GetCreatureName()->Civilian)
+		pvp=false;
+
 	//target is immune to all form of attacks, cant attack either.
 	if(m_Unit->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_UNIT_UNTACKABLE_NO_SELECT))
 	{
@@ -1263,6 +1267,9 @@ Unit* AIInterface::FindTarget()
 				continue;
 			}
 		}
+
+		/* is it a player? we have to check for our pvp flag. */
+		if(m_U)
 		crange = _CalcCombatRange(pUnit,false);
 		if(m_isGuard)
 			crange *= 4;

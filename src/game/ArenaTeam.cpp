@@ -33,6 +33,7 @@ ArenaTeam::ArenaTeam(Field * f)
 	m_borderColour = f[z++].GetUInt32();
 	m_backgroundColour = f[z++].GetUInt32();
 	m_stat_rating = f[z++].GetUInt32();
+	AllocateSlots(m_type);
 
 	m_stat_gamesplayedweek = 0;
 	m_stat_gamesplayedseason = 0;
@@ -48,6 +49,8 @@ ArenaTeam::ArenaTeam(Field * f)
 			&m_members[i].Played_ThisSeason, &m_members[i].Won_ThisSeason) == 5)
 		{
 			m_members[i].Info = objmgr.GetPlayerInfo(guid);
+			if(m_members[i].Info)
+				++m_memberCount;
 		}
 		else
 			m_members[i].Info = NULL;
@@ -138,10 +141,10 @@ void ArenaTeam::Query(WorldPacket & data)
 	data << m_id;
 	data << m_name;
 	data << GetPlayersPerTeam();
-	data << m_emblemStyle;
 	data << m_emblemColour;
-	data << m_borderStyle;
+	data << m_emblemStyle;
 	data << m_borderColour;
+	data << m_borderStyle;
 	data << m_backgroundColour;
 }
 

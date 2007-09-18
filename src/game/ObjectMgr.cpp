@@ -3189,7 +3189,7 @@ void ObjectMgr::LoadGroups()
 
 void ObjectMgr::LoadArenaTeams()
 {
-	QueryResult * result = CharacterDatabase.Query("SELECT * FROM arena_teams");
+	QueryResult * result = CharacterDatabase.Query("SELECT * FROM arenateams");
 	if(result != NULL)
 	{
 		do 

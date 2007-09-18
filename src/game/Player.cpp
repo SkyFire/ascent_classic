@@ -2613,7 +2613,17 @@ bool Player::LoadFromDB(uint32 guid)
 	for(uint32 z = 0; z < NUM_CHARTER_TYPES; ++z)
 		m_charters[z] = objmgr.GetCharterByGuid(GetGUID(), (CharterTypes)z);
 	for(uint32 z = 0; z < NUM_ARENA_TEAM_TYPES; ++z)
+	{
 		m_arenaTeams[z] = objmgr.GetArenaTeamByGuid(GetGUIDLow(), z);
+		if(m_arenaTeams[z] != NULL)
+		{
+			SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5), m_arenaTeams[z]->m_id);
+			if(m_arenaTeams[z]->m_leader == GetGUIDLow())
+				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5) + 1, 1);
+			else
+				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5) + 1, m_arenaTeams[z]->m_leader);
+		}
+	}
 
 	m_StableSlotCount = get_next_field.GetUInt32();
 	m_instanceId = get_next_field.GetUInt32();
