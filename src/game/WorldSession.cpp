@@ -858,6 +858,11 @@ void WorldSession::InitPacketHandlerTable()
 #ifdef CLUSTERING
 	WorldPacketHandlers[CMSG_PING].handler = &WorldSession::HandlePingOpcode;
 #endif
+
+	// cheat/gm commands?
+	WorldPacketHandlers[MSG_MOVE_TELEPORT_CHEAT].handler = &WorldSession::HandleTeleportCheatOpcode;
+	WorldPacketHandlers[CMSG_TELEPORT_TO_UNIT].handler = &WorldSession::HandleTeleportToUnitOpcode;
+	WorldPacketHandlers[CMSG_WORLD_TELEPORT].handler = &WorldSession::HandleWorldportOpcode;
 }
 
 void WorldSession::CHECK_PACKET_SIZE(WorldPacket& data, uint32 size)

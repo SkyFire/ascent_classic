@@ -680,3 +680,59 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket &recvdata)
 	data << _player->GetGUID();
 	_player->SendMessageToSet(&data, true);
 }
+
+void WorldSession::HandleWorldportOpcode(WorldPacket & recv_data)
+{
+	uint32 mapid;
+	float x,y,z,o;
+	recv_data >> mapid >> x >> y >> z >> o;
+	
+	if(!_player->IsInWorld())
+		return;
+
+	if(!HasGMPermissions())
+	{
+		SendNotification("You do not have permission to use this function.");
+		return;
+	}
+
+	LocationVector vec(x,y,z,o);
+	_player->SafeTeleport(mapid,0,vec);
+}
+
+void WorldSession::HandleTeleportToUnitOpcode(WorldPacket & recv_data)
+{
+	uint8 unk;
+	Unit * target;
+	recv_data >> unk;
+
+	if(!_player->IsInWorld())
+		return;
+
+	if(!HasGMPermissions())
+	{
+		SendNotification("You do not have permission to use this function.");
+		return;
+	}
+
+	if( (target = _player->GetMapMgr()->GetUnit(_player->GetSelection())) == NULL )
+		return;
+
+	_player->SafeTeleport(_player->GetMapId(), _player->GetInstanceID(), target->GetPosition());
+}
+
+void WorldSession::HandleTeleportCheatOpcode(WorldPacket & recv_data)
+{
+	float x,y,z,o;
+	LocationVector vec;
+
+	if(!HasGMPermissions())
+	{
+		SendNotification("You do not have permission to use this function.");
+		return;
+	}
+
+	recv_data >> x >> y >> z >> o;
+	vec.ChangeCoords(x,y,z,o);
+	_player->SafeTeleport(_player->GetMapId(),_player->GetInstanceID(),vec);
+}

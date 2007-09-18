@@ -676,6 +676,10 @@ protected:
 	void HandleArenaTeamQueryOpcode(WorldPacket & recv_data);
 	void HandleArenaTeamRosterOpcode(WorldPacket & recv_data);
 
+	void HandleTeleportCheatOpcode(WorldPacket & recv_data);
+	void HandleTeleportToUnitOpcode(WorldPacket & recv_data);
+	void HandleWorldportOpcode(WorldPacket & recv_data);
+
 public:
 
 	void SendInventoryList(Creature* pCreature);
