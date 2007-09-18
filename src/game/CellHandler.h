@@ -56,8 +56,8 @@ public:
 
 	inline bool Allocated(uint32 x, uint32 y) { return _cells[x][y] != NULL; }
 
-	uint32 GetPosX(float x); 
-	uint32 GetPosY(float y);
+	static uint32 GetPosX(float x); 
+	static uint32 GetPosY(float y);
 
 	inline Map *GetBaseMap() { return _map; }
 

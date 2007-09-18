@@ -357,6 +357,8 @@ public:
 	void EventResurrectPlayers();
 	virtual bool CanPlayerJoin(Player * plr) { return true; }
 	virtual bool CreateCorpse(Player * plr) { return true; }
+
+	void BuildPvPUpdateDataPacket(WorldPacket * data);
 };
 
 #define BattlegroundManager CBattlegroundManager::getSingleton( )

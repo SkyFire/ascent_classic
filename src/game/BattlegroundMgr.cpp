@@ -309,8 +309,8 @@ void CBattlegroundManager::EventQueueUpdate()
 								tempPlayerVec[plr->GetTeam()].push_back(plr);
 							}
 
-							if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG/* &&
-								tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG*/)
+							if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG &&
+								tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
 							{
 								Log.Debug("BattlegroundManager", "Enough players to start battleground type %u for level group %u. Creating.", i, j);
 								/* Woot! Let's create a new instance! */
@@ -544,66 +544,8 @@ void CBattleground::UpdatePvPData()
 	if(World::UNIXTIME >= m_nextPvPUpdateTime)
 	{
 		m_mainLock.Acquire();
-		WorldPacket data(MSG_PVP_LOG_DATA, 50);
-		BGScore * bs;
-		if(m_type >= BATTLEGROUND_ARENA_2V2 && m_type <= BATTLEGROUND_ARENA_5V5)
-		{
-			if(!m_ended)
-			{
-				m_mainLock.Release();
-				return;
-			}
-
-			data << uint8(1);
-			data << uint32(0x61272A5C);
-			data << uint8(0);
-			data << uint32(m_players[0].size() + m_players[1].size());
-			data << uint8(0);
-			data << uint8(1);
-			data << uint8(m_winningteam);
-
-			data << uint32(m_players[0].size() + m_players[1].size());
-			for(uint32 i = 0; i < 2; ++i)
-			{
-				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-				{
-					data << (*itr)->GetGUID();
-					bs = &(*itr)->m_bgScore;
-					data << bs->KillingBlows;
-					data << uint8((*itr)->m_bgTeam);
-					data << bs->DamageDone;
-					data << bs->HealingDone;
-					data << bs->Misc1;	/* rating change */
-					//(*itr)->Root();
-				}
-			}
-		}
-		else
-		{
-			data << uint8(0);
-			data << uint8(0);		// If the game has ended - this will be 1
-
-			data << uint32(m_players[0].size() + m_players[1].size());
-			for(uint32 i = 0; i < 2; ++i)
-			{
-				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-				{
-					data << (*itr)->GetGUID();
-					bs = &(*itr)->m_bgScore;
-
-					data << bs->KillingBlows;
-					data << bs->HonorableKills;
-					data << bs->Deaths;
-					data << bs->BonusHonor;
-					data << bs->DamageDone;
-					data << bs->HealingDone;
-					data << uint32(0x2);
-					data << bs->Misc1;
-					data << bs->Misc2;
-				}
-			}
-		}
-
+		WorldPacket data(10*(m_players[0].size()+m_players[1].size())+50);
+		BuildPvPUpdateDataPacket(&data);
 		DistributePacketToAll(&data);
 		m_mainLock.Release();
 
@@ -611,6 +553,77 @@ void CBattleground::UpdatePvPData()
 	}
 }
 
+void CBattleground::BuildPvPUpdateDataPacket(WorldPacket * data)
+{
+	data->Initialize(MSG_PVP_LOG_DATA);
+	data->reserve(10*(m_players[0].size()+m_players[1].size())+50);
+
+	BGScore * bs;
+	if(m_type >= BATTLEGROUND_ARENA_2V2 && m_type <= BATTLEGROUND_ARENA_5V5)
+	{
+		if(!m_ended)
+		{
+			m_mainLock.Release();
+			return;
+		}
+
+		*data << uint8(1);
+		*data << uint32(0x61272A5C);
+		*data << uint8(0);
+		*data << uint32(m_players[0].size() + m_players[1].size());
+		*data << uint8(0);
+		*data << uint8(1);
+		*data << uint8(m_winningteam);
+
+		*data << uint32(m_players[0].size() + m_players[1].size());
+		for(uint32 i = 0; i < 2; ++i)
+		{
+			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			{
+				*data << (*itr)->GetGUID();
+				bs = &(*itr)->m_bgScore;
+				*data << bs->KillingBlows;
+				*data << uint8((*itr)->m_bgTeam);
+				*data << bs->DamageDone;
+				*data << bs->HealingDone;
+				*data << bs->Misc1;	/* rating change */
+				//(*itr)->Root();
+			}
+		}
+	}
+	else
+	{
+		*data << uint8(0);
+		if(m_ended)
+		{
+			*data << uint8(1);
+			*data << uint8(m_winningteam);
+		}
+		else
+			*data << uint8(0);		// If the game has ended - this will be 1
+
+		*data << uint32(m_players[0].size() + m_players[1].size());
+		for(uint32 i = 0; i < 2; ++i)
+		{
+			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			{
+				*data << (*itr)->GetGUID();
+				bs = &(*itr)->m_bgScore;
+
+				*data << bs->KillingBlows;
+				*data << bs->HonorableKills;
+				*data << bs->Deaths;
+				*data << bs->BonusHonor;
+				*data << bs->DamageDone;
+				*data << bs->HealingDone;
+				*data << uint32(0x2);
+				*data << bs->Misc1;
+				*data << bs->Misc2;
+			}
+		}
+	}
+
+}
 void CBattleground::AddPlayer(Player * plr, uint32 team)
 {
 	m_mainLock.Acquire();
@@ -1000,107 +1013,18 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 void CBattleground::SendPVPData(Player * plr)
 {
 	m_mainLock.Acquire();
-	WorldPacket data(MSG_PVP_LOG_DATA, 50);
-	BGScore * bs;
 	if(m_type >= BATTLEGROUND_ARENA_2V2 && m_type <= BATTLEGROUND_ARENA_5V5)
 	{
-		/*if(!m_ended)*/
-		{
-			m_mainLock.Release();
-			return;
-		}
-
-		/*
-		18:28:55 {Server} MSG_PVP_LOG_DATA [0x02E0] 117 bytes
-		|------------------------------------------------|----------------|
-		|00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F |0123456789ABCDEF|
-		|------------------------------------------------|----------------|
-		|01 5C 2A 27 61 00 04 00 00 00 00 01 01 04 00 00 |.\*'a...........|
-		|00 A6 E0 27 00 00 00 00 00 01 00 00 00 00 A3 3A |...'...........:|
-		|00 00 00 00 00 00 00 00 00 00 A4 18 10 00 00 00 |................|
-		|00 00 00 00 00 00 01 EF 06 00 00 B7 01 00 00 00 |................|
-		|00 00 00 62 D4 27 00 00 00 00 00 00 00 00 00 00 |...b.'..........|
-		|1B 18 00 00 61 0E 00 00 00 00 00 00 EA FD 1A 00 |....a...........|
-		|00 00 00 00 02 00 00 00 01 AF 51 00 00 3D 10 00 |..........Q..=..|
-		|00 00 00 00 00                                  |.....           |
-		-------------------------------------------------------------------
-		*/
-
-
-		/*
-		01 - arena packet
-		5C 2A 27 61 - timestamp
-		00 - winning team
-		04 00 00 00 00 01 01 - constant
-		04 00 00 00  - count
-		*/
-		/* (loop each guid) */
-		/*
-		A6 E0 27 00 00 00 00 00  = guid
-		01 00 00 00 		 = KillingBlows
-		00 					 = team
-		A3 3A 00 00 		 = DamageDone
-		00 00 00 00			 = HealingDOne
-		00 00 00 00 		 = RatingChange
-		*/
-
-		data << uint8(1);
-		data << uint32(0);
-		data << uint8(m_winningteam);
-		data << uint16(0);
-		data << uint8(0);
-		data << uint32(0);
-		data << uint32(m_players[0].size() + m_players[1].size());
-		for(uint32 i = 0; i < 2; ++i)
-		{
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-			{
-				data << (*itr)->GetGUID();
-				bs = &(*itr)->m_bgScore;
-				data << bs->KillingBlows;
-				data << uint8((*itr)->m_bgTeam);
-				data << bs->DamageDone;
-				data << bs->HealingDone;
-				data << bs->Misc1;	/* rating change */
-			}
-		}
+		m_mainLock.Release();
+		return;
 	}
 	else
 	{
-		data << uint8(0);
-
-		if(m_ended)
-		{
-			data << uint8(1);
-			data << uint8(m_winningteam);
-		}
-		else
-		{
-			data << uint8(0);		// If the game has ended - this will be 1
-
-			data << uint32(m_players[0].size() + m_players[1].size());
-			for(uint32 i = 0; i < 2; ++i)
-			{
-				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-				{
-					data << (*itr)->GetGUID();
-					bs = &(*itr)->m_bgScore;
-
-					data << bs->KillingBlows;
-					data << bs->HonorableKills;
-					data << bs->Deaths;
-					data << bs->BonusHonor;
-					data << bs->DamageDone;
-					data << bs->HealingDone;
-					data << uint32(0x2);
-					data << bs->Misc1;
-					data << bs->Misc2;
-				}
-			}
-		}
+		WorldPacket data(10*(m_players[0].size()+m_players[1].size())+50);
+		BuildPvPUpdateDataPacket(&data);
+		plr->GetSession()->SendPacket(&data);
 	}
-
-	plr->GetSession()->SendPacket(&data);
+	
 	m_mainLock.Release();
 }
 
@@ -1116,7 +1040,7 @@ int32 CBattleground::event_GetInstanceID()
 
 void CBattleground::EventCountdown()
 {
-	/*if(m_countdownStage == 1)
+	if(m_countdownStage == 1)
 	{
 		m_countdownStage = 2;
 		SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, 0, "One minute until the battle for %s begins!", GetName());
@@ -1133,7 +1057,7 @@ void CBattleground::EventCountdown()
 		sEventMgr.ModifyEventTime(this, EVENT_BATTLEGROUND_COUNTDOWN, 15000);
 		sEventMgr.ModifyEventTimeLeft(this, EVENT_BATTLEGROUND_COUNTDOWN, 15000);
 	}
-	else*/
+	else
 	{
 		SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, 0, "The battle for %s has begun!", GetName());
 		sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_COUNTDOWN);

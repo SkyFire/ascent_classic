@@ -149,6 +149,7 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 			for(uint32 i = 0; i < 2; ++i) {
 				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
 					plr->CastSpell(plr, i ? h_sp : a_sp, true);
+					plr->Root();
 				}
 			}
 		}

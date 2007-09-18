@@ -306,8 +306,10 @@ void Map::LoadSpawns(bool reload)
 			cspawn->y = fields[4].GetFloat();
 			cspawn->z = fields[5].GetFloat();
 			cspawn->o = fields[6].GetFloat();
-			uint32 cellx=float2int32(((_maxX-cspawn->x)/_cellSize));
-			uint32 celly=float2int32(((_maxY-cspawn->y)/_cellSize));
+			/*uint32 cellx=float2int32(((_maxX-cspawn->x)/_cellSize));
+			uint32 celly=float2int32(((_maxY-cspawn->y)/_cellSize));*/
+			uint32 cellx=CellHandler<MapMgr>::GetPosX(cspawn->x);
+			uint32 celly=CellHandler<MapMgr>::GetPosY(cspawn->y);
 			if(spawns[cellx]==NULL)
 			{
 				spawns[cellx]=new CellSpawns*[_sizeY];
@@ -410,8 +412,10 @@ void Map::LoadSpawns(bool reload)
 			gspawn->scale = fields[14].GetFloat();
 			gspawn->stateNpcLink = fields[15].GetUInt32();
 
-			uint32 cellx=float2int32(((_maxX-gspawn->x)/_cellSize));
-			uint32 celly=float2int32(((_maxY-gspawn->y)/_cellSize));
+			//uint32 cellx=float2int32(((_maxX-gspawn->x)/_cellSize));
+			//uint32 celly=float2int32(((_maxY-gspawn->y)/_cellSize));
+			uint32 cellx=CellHandler<MapMgr>::GetPosX(gspawn->x);
+			uint32 celly=CellHandler<MapMgr>::GetPosY(gspawn->y);
 			if(spawns[cellx]==NULL)
 			{
 				spawns[cellx]=new CellSpawns*[_sizeY];

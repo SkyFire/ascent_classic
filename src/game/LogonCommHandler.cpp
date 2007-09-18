@@ -106,6 +106,8 @@ void LogonCommHandler::Connect(LogonServer * server)
 		if((uint32)time(NULL) >= tt)
 		{
 			sLog.outColor(TYELLOW, " timeout.\n");
+			conn->Disconnect();
+			logons[server]=NULL;
 			return;
 		}
 
