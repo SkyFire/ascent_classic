@@ -309,8 +309,8 @@ void CBattlegroundManager::EventQueueUpdate()
 								tempPlayerVec[plr->GetTeam()].push_back(plr);
 							}
 
-							if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG &&
-								tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
+							if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG/* &&
+								tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG*/)
 							{
 								Log.Debug("BattlegroundManager", "Enough players to start battleground type %u for level group %u. Creating.", i, j);
 								/* Woot! Let's create a new instance! */
@@ -580,6 +580,7 @@ void CBattleground::UpdatePvPData()
 		}
 		else
 		{
+			data << uint8(0);
 			data << uint8(0);		// If the game has ended - this will be 1
 
 			data << uint32(m_players[0].size() + m_players[1].size());
