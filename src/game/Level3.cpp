@@ -3122,7 +3122,6 @@ bool ChatHandler::HandleCreateArenaTeamCommands(const char * args, WorldSession 
 	uint32 arena_team_type;
 	char name[1000];
 	uint32 real_type;
-	ArenaTeam * team;
 	Player * plr = getSelectedChar(m_session, true);
 	if(sscanf(args, "%u %s", &arena_team_type, name) != 2)
 	{

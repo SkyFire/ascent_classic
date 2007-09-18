@@ -1,0 +1,20 @@
+CREATE TABLE `arenateams` (
+  `id` int(30) NOT NULL,
+  `type` int(30) NOT NULL,
+  `leader` int(30) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `emblemstyle` int(40) NOT NULL,
+  `emblemcolour` bigint(40) NOT NULL,
+  `borderstyle` int(40) NOT NULL,
+  `bordercolour` bigint(40) NOT NULL,
+  `backgroundcolour` bigint(40) NOT NULL,
+  `rating` int(30) NOT NULL,
+  `data` varchar(150) NOT NULL,
+  `ranking` int(30) NOT NULL,
+  `player_data1` varchar(60) NOT NULL,
+  `player_data2` varchar(60) NOT NULL,
+  `player_data3` varchar(60) NOT NULL,
+  `player_data4` varchar(60) NOT NULL,
+  `player_data5` varchar(60) NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
