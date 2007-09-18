@@ -75,7 +75,7 @@ void ArenaTeam::Destroy()
 	vector<PlayerInfo*> tokill;
 	uint32 i;
 	tokill.reserve(m_memberCount);
-	sprintf(buffer,1024, "The arena team, '%s', disbanded.", m_name.c_str());
+	snprintf(buffer,1024, "The arena team, '%s', disbanded.", m_name.c_str());
 	data = sChatHandler.FillSystemMessageData(buffer);
 	SendPacket(data);
 	delete data;

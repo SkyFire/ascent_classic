@@ -25,7 +25,8 @@
 class WeatherInfo;
 class WeatherMgr;
 
-void BuildWeatherPacket(WorldPacket * data, uint32 Effect, float Density);
+void   BuildWeatherPacket(WorldPacket * data, uint32 Effect, float Density );
+uint32 GetSound(uint32 Effect, float Density);
 
 class WeatherMgr :  public Singleton < WeatherMgr >
 {
@@ -47,6 +48,7 @@ public:
 	WeatherInfo();
 	~WeatherInfo();
 
+	void BuildUp();
 	void Update();	
 	void SendUpdate();
 	void SendUpdate(Player *plr);
@@ -63,7 +65,6 @@ protected:
 	float m_currentDensity;
 
 	uint32 m_currentEffect;
-	bool m_increase;
 	std::map<uint32, uint32> m_effectValues;
 };
 
