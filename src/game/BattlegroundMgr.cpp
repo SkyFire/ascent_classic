@@ -425,6 +425,86 @@ void CBattlegroundManager::EventQueueUpdate()
 			m_instanceLock.ReleaseReadLock();
 		}
 	}
+
+	/* Handle paired arena team joining */
+	Group * group1, *group2;
+	uint32 n;
+	list<uint32>::iterator itz;
+	for(i = BATTLEGROUND_ARENA_2V2; i < BATTLEGROUND_ARENA_5V5+1; ++i)
+	{
+		for(;;)
+		{
+			if(m_queuedGroups[i].size() < 2)		/* got enough to have an arena battle ;P */
+			{
+                break;				
+			}
+
+			group1 = group2 = NULL;
+			while(group1 == NULL)
+			{
+				n = sRand.randInt(m_queuedGroups[i].size()) - 1;
+				for(itz = m_queuedGroups[i].begin(); itz != m_queuedGroups[i].end() && n>0; ++itz)
+					--n;
+
+				if(itz == m_queuedGroups[i].end())
+					itz=m_queuedGroups[i].begin();
+
+				if(itz == m_queuedGroups[i].end())
+				{
+					Log.Error("BattlegroundMgr", "Internal error at %s:%u", __FILE__, __LINE__);
+					m_queueLock.Release();
+					return;
+				}
+
+				group1 = objmgr.GetGroupById(*itz);
+				m_queuedGroups[i].erase(itz);
+			}
+
+			while(group2 == NULL)
+			{
+				n = sRand.randInt(m_queuedGroups[i].size()) - 1;
+				for(itz = m_queuedGroups[i].begin(); itz != m_queuedGroups[i].end() && n>0; ++itz)
+					--n;
+
+				if(itz == m_queuedGroups[i].end())
+					itz=m_queuedGroups[i].begin();
+
+				if(itz == m_queuedGroups[i].end())
+				{
+					Log.Error("BattlegroundMgr", "Internal error at %s:%u", __FILE__, __LINE__);
+					m_queueLock.Release();
+					return;
+				}
+
+				group2 = objmgr.GetGroupById(*itz);
+				m_queuedGroups[i].erase(itz);
+			}
+
+			Arena * ar = ((Arena*)CreateInstance(i,LEVEL_GROUP_70));
+			GroupMembersSet::iterator itx;
+			int32 team;
+			ar->rated_match=true;
+
+			for(itx = group1->GetSubGroup(0)->GetGroupMembersBegin(); itx != group1->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
+			{
+				if(itx->player)
+				{
+					if( (team = ar->GetFreeTeam()) != -1 )
+                        ar->AddPlayer(itx->player, team);
+				}
+			}
+
+			for(itx = group2->GetSubGroup(0)->GetGroupMembersBegin(); itx != group2->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
+			{
+				if(itx->player)
+				{
+					if( (team = ar->GetFreeTeam()) != -1 )
+						ar->AddPlayer(itx->player, team);
+				}
+			}
+		}
+	}
+
 	m_queueLock.Release();
 }
 
