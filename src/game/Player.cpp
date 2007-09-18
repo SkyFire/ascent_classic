@@ -8541,7 +8541,7 @@ void Player::RemoveSpellIndexReferences(uint32 Type)
 
 void Player::SetSpellTargetType(uint32 Type, Unit* target)
 {
-	m_spellTypeTargets[Type]=NULL;
+	m_spellTypeTargets[Type]=target;
 }
 
 /************************************************************************/

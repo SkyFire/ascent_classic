@@ -675,7 +675,7 @@ void World::SetInitialWorldSettings()
 		// find diminishing status
 		sp->DiminishStatus = GetDiminishingGroup(namehash);
 		sp->buffIndexType=0;
-		switch(sp->NameHash)
+		switch(namehash)
 		{
 		case 0xFF89ABD2:		// Hunter's mark
 			sp->buffIndexType = SPELL_TYPE_INDEX_MARK;
