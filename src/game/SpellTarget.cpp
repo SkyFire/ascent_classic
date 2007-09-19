@@ -207,75 +207,39 @@ void Spell::FillTargetMap(uint32 i)
 {
     uint32 cur;
     
-    uint32 TypeA1 = m_spellInfo->EffectImplicitTargetA[0];
-    uint32 TypeA2 = m_spellInfo->EffectImplicitTargetA[1];
-    uint32 TypeA3 = m_spellInfo->EffectImplicitTargetA[2];
-
-    uint32 TypeB1 = m_spellInfo->EffectImplicitTargetB[0];
-    uint32 TypeB2 = m_spellInfo->EffectImplicitTargetB[1];
-    uint32 TypeB3 = m_spellInfo->EffectImplicitTargetB[2];
+    uint32 TypeA = m_spellInfo->EffectImplicitTargetA[i];
+    uint32 TypeB = m_spellInfo->EffectImplicitTargetB[i];
 
     // if all secondary targets are 0 then use only primary targets
-    if (!TypeB1 && !TypeB2 && !TypeB3 )
-    {
-        if (TypeA1 < TOTAL_SPELL_TARGET)
-        {
-            (*this.*SpellTargetHandler[TypeA1])(i,0);
-        }
+	if(!TypeB)
+	{
+		if(TypeA < TOTAL_SPELL_TARGET)
+			(this->*SpellTargetHandler[TypeA])(i, 0);		//0=A
 
-        if (TypeA2 < TOTAL_SPELL_TARGET)
-        {
-            (*this.*SpellTargetHandler[TypeA2])(i,0);
-        }
+		return;
+	}
 
-        if (TypeA3 < TOTAL_SPELL_TARGET)
-        {
-            (*this.*SpellTargetHandler[TypeA3])(i,0);
-        }
-        // exit here because we are not want to have extra targets added we don't need
-        return;
-    }
+	// if all primary targets are 0 then use only secondary targets
+	if(!TypeA)
+	{
+		if(TypeB < TOTAL_SPELL_TARGET)
+			(this->*SpellTargetHandler[TypeB])(i, 1);		//1=B
 
-    // if all primary targets are 0 then use only secondary targets
-    if (!TypeA1 && !TypeA2 && !TypeA3 )
-    {
-        if (TypeB1 < TOTAL_SPELL_TARGET)
-        {
-            (*this.*SpellTargetHandler[TypeB1])(i,0);
-        }
-
-        if (TypeB2 < TOTAL_SPELL_TARGET)
-        {
-            (*this.*SpellTargetHandler[TypeB2])(i,0);
-        }
-
-        if (TypeB3 < TOTAL_SPELL_TARGET)
-        {
-            (*this.*SpellTargetHandler[TypeB3])(i,0);
-        }
-        // exit here
-        return;
-    }
+		return;
+	}
 
     // j = 0
-    cur = m_spellInfo->EffectImplicitTargetA[0];
+    cur = m_spellInfo->EffectImplicitTargetA[i];
     if (cur < TOTAL_SPELL_TARGET)
     {
-        (*this.*SpellTargetHandler[cur])(i,0);
+        (this->*SpellTargetHandler[cur])(i,0);	//0=A
     }
 
     // j = 1
-    cur = m_spellInfo->EffectImplicitTargetB[1];
+    cur = m_spellInfo->EffectImplicitTargetB[i];
     if (cur < TOTAL_SPELL_TARGET)
     {
-        (*this.*SpellTargetHandler[cur])(i,1);
-    }
-
-    // j = 2
-    cur = m_spellInfo->EffectImplicitTargetB[2];
-    if (cur < TOTAL_SPELL_TARGET)
-    {
-        (*this.*SpellTargetHandler[cur])(i,2);
+        (this->*SpellTargetHandler[cur])(i,1);	//1=B
     }
 }
 
