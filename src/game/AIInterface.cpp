@@ -2772,9 +2772,18 @@ AI_Spell *AIInterface::getSpell()
 				if(sp->procChance >= 100 || Rand(sp->procChance))
 				{
 					//focus/mana requirement
-					if(m_Unit->GetUInt32Value(UNIT_FIELD_POWER3) < sp->spell->manaCost && m_Unit->GetUInt32Value(UNIT_FIELD_POWER1) < sp->spell->manaCost)
+					switch(sp->spell->powerType)
+					{
+					case POWER_TYPE_MANA:
+						if(m_Unit->GetUInt32Value(UNIT_FIELD_POWER1) < sp->spell->manaCost)
 							continue;
-					
+						break;
+
+					case POWER_TYPE_FOCUS:
+						if(m_Unit->GetUInt32Value(UNIT_FIELD_POWER3) < sp->spell->manaCost)
+							continue;
+						break;
+					}
 
 #ifdef _AI_DEBUG
 					sLog.outString("AI DEBUG: Returning spell %s for unit %u", sSpellStore.LookupString( sp->spell->Name ),
