@@ -1392,9 +1392,12 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 		team->m_borderStyle = border;
 		team->m_backgroundColour = background;
 		team->m_leader=_player->GetGUIDLow();
-
-		team->AddMember(_player->m_playerInfo);
+		team->m_stat_rating=1500;
+        
 		objmgr.AddArenaTeam(team);
+		objmgr.UpdateArenaTeamRankings();
+		team->AddMember(_player->m_playerInfo);
+		
 
 		/* Add the members */
 		for(i = 0; i < pCharter->SignatureCount; ++i)
