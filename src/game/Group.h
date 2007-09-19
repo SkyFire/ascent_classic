@@ -102,6 +102,7 @@ protected:
 
 };
 
+class Arena;
 class SERVER_DECL Group
 {
 public:
@@ -179,6 +180,9 @@ public:
 	inline Mutex& getLock() { return m_groupLock; }
 	inline void Lock() { m_groupLock.Acquire(); }
 	inline void Unlock() { return m_groupLock.Release(); }
+	uint32 player_cap;
+	bool isqueued;
+	Arena * arena;
 
 protected:
 	

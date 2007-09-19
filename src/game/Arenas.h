@@ -70,4 +70,5 @@ public:
 	}
 
 	void Finish();
+	uint8 Rated() { return rated_match; }
 };

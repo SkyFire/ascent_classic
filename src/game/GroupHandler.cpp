@@ -56,6 +56,12 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 	group = _player->GetGroup();
 	if ( group != NULL )
 	{
+		if(group->player_cap && group->MemberCount() >= group->player_cap)
+		{
+			SystemMessage("You cannot add any more players to this group while it is in an arena.");
+			return;
+		}
+
 		if (group->IsFull())
 		{
 			SendPartyCommandResult(_player, 0, "", ERR_PARTY_IS_FULL);
@@ -132,6 +138,12 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 
 	if(grp)
 	{
+		if(grp->player_cap && grp->MemberCount() >= grp->player_cap)
+		{
+			SystemMessage("Internal error.");
+			return;
+		}
+
 		grp->AddMember(_player->m_playerInfo, _player);
         _player->iInstanceType = grp->GetLeader()->iInstanceType;
         _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &grp->GetLeader()->iInstanceType);

@@ -74,6 +74,9 @@ Group::Group()
 	m_updateblock=false;
 	m_disbandOnNoMembers = true;
 	memset(m_targetIcons, 0, sizeof(uint64) * 8);
+	player_cap=0;
+	isqueued=false;
+	arena=NULL;
 }
 
 Group::~Group()

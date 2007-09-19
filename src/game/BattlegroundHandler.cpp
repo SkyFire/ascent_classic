@@ -48,11 +48,11 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket &recv_data)
 	/* This is done based on whether we are queued, inside, or not in a battleground.
 	 */
 	if(_player->m_pendingBattleground)		// Ready to port
-		BattlegroundManager.SendBattlefieldStatus(_player, 2, _player->m_pendingBattleground->GetType(), _player->m_pendingBattleground->GetId(), 120000, 0);
+		BattlegroundManager.SendBattlefieldStatus(_player, 2, _player->m_pendingBattleground->GetType(), _player->m_pendingBattleground->GetId(), 120000, 0, _player->m_pendingBattleground->Rated());
 	else if(_player->m_bg)					// Inside a bg
-		BattlegroundManager.SendBattlefieldStatus(_player, 3, _player->m_bg->GetType(), _player->m_bg->GetId(), World::UNIXTIME - _player->m_bg->GetStartTime(), _player->GetMapId());
+		BattlegroundManager.SendBattlefieldStatus(_player, 3, _player->m_bg->GetType(), _player->m_bg->GetId(), World::UNIXTIME - _player->m_bg->GetStartTime(), _player->GetMapId(), _player->m_bg->Rated());
 	else									// None
-		BattlegroundManager.SendBattlefieldStatus(_player, 0, 0, 0, 0, 0);	
+		BattlegroundManager.SendBattlefieldStatus(_player, 0, 0, 0, 0, 0, 0);	
 }
 
 void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recv_data)
@@ -119,6 +119,12 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket &recv_dat
 
 void WorldSession::HandleBattleMasterJoinOpcode(WorldPacket &recv_data)
 {
+	if(_player->GetGroup() && (_player->GetGroup()->arena || _player->GetGroup()->isqueued))
+	{
+		SystemMessage("You are in a group that is already queued for a battleground or inside a battleground. Leave this first.");
+		return;
+	}
+
 	/* are we already in a queue? */
 	if(_player->m_bgIsQueued)
 		BattlegroundManager.RemovePlayerFromQueues(_player);
@@ -129,14 +135,22 @@ void WorldSession::HandleBattleMasterJoinOpcode(WorldPacket &recv_data)
 
 void WorldSession::HandleArenaJoinOpcode(WorldPacket &recv_data)
 {
+	if(_player->GetGroup() && (_player->GetGroup()->arena || _player->GetGroup()->isqueued))
+	{
+		SystemMessage("You are in a group that is already queued for a battleground or inside a battleground. Leave this first.");
+		return;
+	}
+
 	/* are we already in a queue? */
-	if(_player->m_bgIsQueued)
+    if(_player->m_bgIsQueued)
 		BattlegroundManager.RemovePlayerFromQueues(_player);
 
 	uint32 bgtype=0;
 	uint64 guid;
 	uint8 arenacategory;
-    recv_data >> guid >> arenacategory;
+	uint8 as_group;
+	uint8 rated_match;
+    recv_data >> guid >> arenacategory >> as_group >> rated_match;
 	switch(arenacategory)
 	{
 	case 0:		// 2v2
@@ -153,7 +167,7 @@ void WorldSession::HandleArenaJoinOpcode(WorldPacket &recv_data)
 	}
 
 	if(bgtype != 0)
-		BattlegroundManager.HandleArenaJoin(this, bgtype);
+		BattlegroundManager.HandleArenaJoin(this, bgtype, as_group, rated_match);
 }
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket &recv_data)

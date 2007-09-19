@@ -229,7 +229,7 @@ public:
 
 	/* Packet Handlers */
 	void HandleBattlegroundListPacket(WorldSession * m_session, uint32 BattlegroundType);
-	void HandleArenaJoin(WorldSession * m_session, uint32 BattlegroundType);
+	void HandleArenaJoin(WorldSession * m_session, uint32 BattlegroundType, uint8 as_group, uint8 rated_match);
 
 	/* Player Logout Handler */
 	void OnPlayerLogout(Player * plr);
@@ -253,7 +253,7 @@ public:
 	void DeleteBattleground(CBattleground * bg);
 
 	/* Build SMSG_BATTLEFIELD_STATUS */
-	void SendBattlefieldStatus(Player * plr, uint32 Status, uint32 Type, uint32 InstanceID, uint32 Time, uint32 MapId);
+	void SendBattlefieldStatus(Player * plr, uint32 Status, uint32 Type, uint32 InstanceID, uint32 Time, uint32 MapId, uint8 RatedMatch);
 };
 
 class CBattleground : public EventableObject
@@ -412,6 +412,7 @@ public:
 	virtual bool CreateCorpse(Player * plr) { return true; }
 
 	void BuildPvPUpdateDataPacket(WorldPacket * data);
+	virtual uint8 Rated() { return 0; }
 };
 
 #define BattlegroundManager CBattlegroundManager::getSingleton( )
