@@ -1229,7 +1229,7 @@ void CBattleground::SetWorldState(uint32 Index, uint32 Value)
 		itr->second = Value;
 
 	WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
-	data << itr->first << itr->second;
+	data << Index << Value;
 	DistributePacketToAll(&data);
 }
 
