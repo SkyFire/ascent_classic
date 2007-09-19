@@ -1209,7 +1209,7 @@ void Spell::cast(bool check)
 	
 				/* don't call HandleAddAura unless we actually have auras... - Burlex*/
 				if(m_spellInfo->EffectApplyAuraName[0] != 0 || m_spellInfo->EffectApplyAuraName[1] != 0 ||
-					m_spellInfo->EffectApplyAuraName[1] != 0)
+				   m_spellInfo->EffectApplyAuraName[2] != 0)
 				{
 					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 					{
