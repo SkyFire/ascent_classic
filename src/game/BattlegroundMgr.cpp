@@ -1336,6 +1336,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 					HandleArenaJoin(itx->player->GetSession(), BattlegroundType, 0, 0);
 			}
 			pGroup->Unlock();
+			return;
 		}
 		else
 		{
@@ -1401,6 +1402,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 			m_session->GetPlayer()->m_bgIsQueued = true;
 			m_session->GetPlayer()->m_bgQueueInstanceId = 0;
 			m_session->GetPlayer()->m_bgQueueType = BattlegroundType;
+			return;
 		}
 	}
 	
