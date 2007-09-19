@@ -1,9 +1,9 @@
-// $Id: svn_revision.h 1510 2007-09-15 01:07:32Z Burlex $
+// $Id$
 
 #ifndef _SVN_REVISION_H
 #define _SVN_REVISION_H
 
-static const char * REVISION_TEXT = "$Rev: 1510 $";
+static const char * REVISION_TEXT = "$Rev$";
 
 inline int g_getRevision()
 {
