@@ -204,6 +204,9 @@ void CBattlegroundManager::EventQueueUpdate()
 							{
 								/* Add a player if we have free slots. */
 								Arena * arena = ((Arena*)bg);
+								if(arena->rated_match)
+									continue;
+
 								int32 team;
 								if( (team = arena->GetFreeTeam()) != -1 )
 								{
