@@ -1145,14 +1145,22 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	/* teleport out */
 	if(!logout)
 	{
-		LocationVector vec(plr->m_bgEntryPointX, plr->m_bgEntryPointY, plr->m_bgEntryPointZ, plr->m_bgEntryPointO);
-		plr->SafeTeleport(plr->m_bgEntryPointMap, plr->m_bgEntryPointInstance, vec);
+		if(!IS_INSTANCE(plr->m_bgEntryPointMap))
+		{
+			LocationVector vec(plr->m_bgEntryPointX, plr->m_bgEntryPointY, plr->m_bgEntryPointZ, plr->m_bgEntryPointO);
+			plr->SafeTeleport(plr->m_bgEntryPointMap, plr->m_bgEntryPointInstance, vec);
+		}
+		else
+		{
+			LocationVector vec(plr->GetBindPositionX(), plr->GetBindPositionY(), plr->GetBindPositionZ());
+			plr->SafeTeleport(plr->GetBindMapId(), 0, vec);
+		}
 
 		BattlegroundManager.SendBattlefieldStatus(plr, 0, 0, 0, 0, 0,0);
 
 		/* send some null world states */
 		data.Initialize(SMSG_INIT_WORLD_STATES);
-		data << uint32(plr->m_bgEntryPointMap) << uint32(0) << uint32(0);
+		data << uint32(plr->GetMapId()) << uint32(0) << uint32(0);
 		plr->GetSession()->SendPacket(&data);
 	}
 

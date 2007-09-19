@@ -442,15 +442,27 @@ void MapMgr::RemoveObject(Object *obj)
 	if(!obj->GetMapCell())
 	{
 		/* set the map cell correctly */
-		obj->SetMapCell(this->GetCellByCoords(obj->GetPositionX(), obj->GetPositionY()));
+		if(obj->GetPositionX() >= _maxX || obj->GetPositionX() <= _minY ||
+			obj->GetPositionY() >= _maxY || obj->GetPositionY() <= _minY)
+		{
+			// do nothing
+		}
+		else
+		{
+			obj->SetMapCell(this->GetCellByCoords(obj->GetPositionX(), obj->GetPositionY()));
+		}		
 	}
-	ASSERT(obj->GetMapCell());
 
-	// Remove object from cell
-	obj->GetMapCell()->RemoveObject(obj);
-
-	// Unset object's cell
-	obj->SetMapCell(NULL);
+	if(obj->GetMapCell())
+	{
+		ASSERT(obj->GetMapCell());
+	
+		// Remove object from cell
+		obj->GetMapCell()->RemoveObject(obj);
+	
+		// Unset object's cell
+		obj->SetMapCell(NULL);
+	}
 
 	// Clear any updates pending
 	if(obj->GetTypeId() == TYPEID_PLAYER)
@@ -477,9 +489,17 @@ void MapMgr::RemoveObject(Object *obj)
 	if(!_shutdown && obj->GetTypeId() == TYPEID_PLAYER)
 	{
 		// get x/y
-		uint32 x = GetPosX(obj->GetPositionX());
-		uint32 y = GetPosY(obj->GetPositionY());
-		UpdateCellActivity(x, y, 2);
+		if(obj->GetPositionX() >= _maxX || obj->GetPositionX() <= _minY ||
+			obj->GetPositionY() >= _maxY || obj->GetPositionY() <= _minY)
+		{
+			// do nothing
+		}
+		else
+		{
+			uint32 x = GetPosX(obj->GetPositionX());
+			uint32 y = GetPosY(obj->GetPositionY());
+			UpdateCellActivity(x, y, 2);
+		}
 		m_PlayerStorage.erase(((Player*)obj)->GetGUIDLow());
 	}
 
