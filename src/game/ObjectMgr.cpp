@@ -3262,10 +3262,14 @@ void ObjectMgr::AddArenaTeam(ArenaTeam * team)
 class ArenaSorter
 {
 public:
-	bool operator()(ArenaTeam*& a,ArenaTeam*& b)
+	bool operator()(ArenaTeam* const & a,ArenaTeam* const & b)
 	{
 		return (a->m_stat_rating > b->m_stat_rating);
 	}
+        bool operator()(ArenaTeam*& a, ArenaTeam*& b)
+        {
+                return (a->m_stat_rating > b->m_stat_rating);
+        }
 };
 
 void ObjectMgr::UpdateArenaTeamRankings()
