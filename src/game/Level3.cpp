@@ -3167,3 +3167,14 @@ bool ChatHandler::HandleCreateArenaTeamCommands(const char * args, WorldSession 
 	SystemMessage(m_session, "created arena team.");
 	return true;
 }
+
+bool ChatHandler::HandleGMCallCommand(const char * args, WorldSession * m_session)
+{
+	Player * plr = getSelectedChar(m_session);
+	if(!plr) return true;
+	if(ScriptSystem->CallGMFunction(args, plr))
+		SystemMessage(m_session, "Call succeeded.");
+	else
+		SystemMessage(m_session, "Call failed.");
+	return true;
+}

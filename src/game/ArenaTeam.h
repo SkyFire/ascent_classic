@@ -70,25 +70,7 @@ public:
 	uint32 m_stat_gameswonseason;
 	uint32 m_stat_ranking;
 
-	ArenaTeam(uint32 Type, uint32 Id)
-	{
-		m_id = Id;
-		m_type = Type;
-		AllocateSlots(Type);
-		m_leader = 0;
-		m_emblemStyle = 0;
-		m_emblemColour = 0;
-		m_borderColour = 0;
-		m_borderStyle = 0;
-		m_backgroundColour = 0;
-		m_stat_rating = 0;
-		m_stat_gamesplayedweek = 0;
-		m_stat_gamesplayedseason = 0;
-		m_stat_gameswonseason = 0;
-		m_stat_gameswonweek = 0;
-		m_stat_ranking = 0;
-	}
-
+	ArenaTeam(uint32 Type, uint32 Id);
 	ArenaTeam(Field * f);
 	~ArenaTeam()
 	{

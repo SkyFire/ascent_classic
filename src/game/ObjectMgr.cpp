@@ -3258,3 +3258,33 @@ void ObjectMgr::AddArenaTeam(ArenaTeam * team)
 	m_arenaTeamMap[team->m_type].insert(make_pair(team->m_id,team));
 	m_arenaTeamLock.Release();
 }
+
+class ArenaSorter
+{
+public:
+	bool operator()(ArenaTeam*& a,ArenaTeam*& b)
+	{
+		return (a->m_stat_rating > b->m_stat_rating);
+	}
+};
+
+void ObjectMgr::UpdateArenaTeamRankings()
+{
+	m_arenaTeamLock.Acquire();
+	for(uint32 i = 0; i < NUM_ARENA_TEAM_TYPES; ++i)
+	{
+		vector<ArenaTeam*> ranking;
+		
+		for(HM_NAMESPACE::hash_map<uint32,ArenaTeam*>::iterator itr = m_arenaTeamMap[i].begin(); itr != m_arenaTeamMap[i].end(); ++itr)
+			ranking.push_back(itr->second);
+
+		std::sort(ranking.begin(), ranking.end(), ArenaSorter());
+		uint32 rank = 1;
+		for(vector<ArenaTeam*>::iterator itr = ranking.begin(); itr != ranking.end(); ++itr)
+		{
+			(*itr)->m_stat_ranking = rank++;
+			(*itr)->SaveToDB();
+		}
+	}
+	m_arenaTeamLock.Release();
+}

@@ -451,6 +451,7 @@ protected:
 	bool HandleAddGuardCommand(const char * args, WorldSession * m_session);
 
 	bool HandleCreateArenaTeamCommands(const char * args, WorldSession * m_session);
+	bool HandleGMCallCommand(const char * args, WorldSession * m_session);
 };
 
 

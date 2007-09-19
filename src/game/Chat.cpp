@@ -526,6 +526,7 @@ void CommandTableStorage::Init()
 		{ "changepassword", 'z', &ChatHandler::HandleChangePasswordCommand, "Changes your accounts password.", NULL, 0, 0, 0 },
 		{ "rehash", 'z', &ChatHandler::HandleRehashCommand, "Reloads config file.", NULL, 0, 0, 0 },
 		{ "createarenateam", 'g', &ChatHandler::HandleCreateArenaTeamCommands, "Creates arena team", NULL, 0, 0, 0 },
+		{ "callgmfunction", 'g', &ChatHandler::HandleGMCallCommand, "Calls script function", NULL, 0, 0, 0 },
 		{ NULL,		  0, NULL,										 "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(commandTable, _commandTable);

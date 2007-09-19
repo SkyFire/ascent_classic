@@ -74,9 +74,7 @@ Group::Group()
 	m_updateblock=false;
 	m_disbandOnNoMembers = true;
 	memset(m_targetIcons, 0, sizeof(uint64) * 8);
-	player_cap=0;
-	isqueued=false;
-	arena=NULL;
+	m_isqueued=false;
 }
 
 Group::~Group()
@@ -193,6 +191,16 @@ SubGroup * Group::FindFreeSubGroup()
 bool Group::AddMember(PlayerInfo * info, Player* pPlayer, int32 subgroupid)
 {
 	m_groupLock.Acquire();
+	if(m_isqueued)
+	{
+		m_isqueued=false;
+		WorldPacket * data = sChatHandler.FillSystemMessageData("A change was made to your group. Removing the arena queue.");
+		SendPacketToAll(data);
+		delete data;
+
+		BattlegroundManager.RemoveGroupFromQueues(this);
+	}
+
 	if(!IsFull())
 	{
 		SubGroup* subgroup = (subgroupid>0) ? m_SubGroups[subgroupid] : FindFreeSubGroup();
@@ -364,6 +372,17 @@ void Group::Update(bool delayed)
 void Group::Disband()
 {
 	m_groupLock.Acquire();
+
+	if(m_isqueued)
+	{
+		m_isqueued=false;
+		WorldPacket * data = sChatHandler.FillSystemMessageData("A change was made to your group. Removing the arena queue.");
+		SendPacketToAll(data);
+		delete data;
+
+		BattlegroundManager.RemoveGroupFromQueues(this);
+	}
+
 	uint32 i = 0;
 	for(i = 0; i < m_SubGroupCount; i++)
 	{
@@ -443,6 +462,15 @@ void Group::RemovePlayer(PlayerInfo * info, Player* pPlayer, bool forced_remove)
 {
 	WorldPacket data;
 	m_groupLock.Acquire();
+	if(m_isqueued)
+	{
+		m_isqueued=false;
+		WorldPacket * data = sChatHandler.FillSystemMessageData("A change was made to your group. Removing the arena queue.");
+		SendPacketToAll(data);
+		delete data;
+
+		BattlegroundManager.RemoveGroupFromQueues(this);
+	}
 	
 	SubGroup *sg=NULL;/* = GetSubGroup(pPlayer->GetSubGroup());
 	ASSERT(sg); // something wrong here if that isn't right*/
@@ -565,6 +593,15 @@ void Group::SendPacketToAll(WorldPacket *packet)
 
 void Group::ExpandToRaid()
 {
+	if(m_isqueued)
+	{
+		m_isqueued=false;
+		WorldPacket * data = sChatHandler.FillSystemMessageData("A change was made to your group. Removing the arena queue.");
+		SendPacketToAll(data);
+		delete data;
+
+		BattlegroundManager.RemoveGroupFromQueues(this);
+	}
 	// Very simple ;)
 
 	uint32 i = 1;

@@ -263,9 +263,9 @@ void Arena::UpdatePlayerCounts()
 		return;
 
 	if(players[1] == 0)
-		m_winningteam = 1;
-	else if(players[0] == 0)
 		m_winningteam = 0;
+	else if(players[0] == 0)
+		m_winningteam = 1;
 	else
 		return;
 
@@ -297,6 +297,9 @@ void Arena::Finish()
 				{
 					t->m_stat_gameswonseason++;
 					t->m_stat_gameswonweek++;
+					t->m_stat_rating += 13; /* TODO: Formulae*/
+					objmgr.UpdateArenaTeamRankings();
+					
 					doneteams.insert(t);
 				}
 	

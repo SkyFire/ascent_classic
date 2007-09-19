@@ -242,6 +242,7 @@ public:
 
 	/* Remove Player From All Queues */
 	void RemovePlayerFromQueues(Player * plr);
+	void RemoveGroupFromQueues(Group * grp);
 
 	/* Create a battleground instance of type x */
 	CBattleground * CreateInstance(uint32 Type, uint32 LevelGroup);

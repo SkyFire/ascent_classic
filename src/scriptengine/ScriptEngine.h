@@ -222,6 +222,10 @@ public:
 	/** Has event of type?
 	 */
 	bool HasEventType(uint32 Entry, uint32 Event);
+
+	/** Calls a function
+	 */
+	bool CallGMFunction(const char * name, Object* forthis);
 };
 
 /* gonna make one global scriptengine for testing */

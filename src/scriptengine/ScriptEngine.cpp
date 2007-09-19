@@ -434,3 +434,39 @@ bool ScriptEngine::HasEventType(uint32 Entry, uint32 Event)
 
 	return true;
 }
+
+bool ScriptEngine::CallGMFunction(const char * name, Object* forthis)
+{
+	m_lock.Acquire();
+	gmStringObject * fname = m_machine->AllocStringObject(name,strlen(name));
+	ASSERT(fname);
+	gmCall call;
+	m_userObjectCounter=1;
+	m_userObjects[0]->m_user = forthis;
+	switch(forthis->GetTypeId())
+	{
+	case TYPEID_PLAYER:
+		m_userObjects[0]->m_userType = m_playerType;
+		break;
+
+	case TYPEID_UNIT:
+		m_userObjects[0]->m_userType = m_unitType;
+		break;
+
+	default:
+		m_lock.Release();
+		return false;
+	}
+
+	m_variables[0].SetUser(m_userObjects[0]);
+	if(call.BeginGlobalFunction(m_machine, fname, m_variables[0], false))
+	{
+		call.End();
+		DumpErrors();
+		m_lock.Release();
+		return true;
+	}	
+
+	m_lock.Release();
+	return false;
+}
