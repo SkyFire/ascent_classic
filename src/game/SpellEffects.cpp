@@ -3613,6 +3613,9 @@ void Spell::SpellEffectCharge(uint32 i)
 	
 	dx=unitTarget->GetPositionX()-m_caster->GetPositionX();
 	dy=unitTarget->GetPositionY()-m_caster->GetPositionY();
+	if(dx == 0.0f || dy == 0.0f)
+		return;
+
 	float d = sqrt(dx*dx+dy*dy)-unitTarget->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS)-m_caster->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
 	float alpha = atan(dy/dx);
 	if(dx<0)

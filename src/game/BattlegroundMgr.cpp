@@ -687,7 +687,7 @@ void CBattleground::BuildPvPUpdateDataPacket(WorldPacket * data)
 		else
 		{
 			/* Grab some arena teams */
-			ArenaTeam * teams[2];
+			ArenaTeam * teams[2] = {NULL,NULL};
 			for(uint32 i = 0; i < 2; ++i)
 			{
 				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
