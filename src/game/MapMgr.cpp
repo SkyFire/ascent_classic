@@ -172,7 +172,28 @@ void MapMgr::PushObject(Object *obj)
 	if(!(obj->GetPositionX() < _maxX && obj->GetPositionX() > _minX) || 
 	   !(obj->GetPositionY() < _maxY && obj->GetPositionY() > _minY))
 	{
-		obj->SetPosition(0, 0, 0, 0, false);
+		if(obj->IsPlayer())
+		{
+			Player * plr = ((Player*)obj);
+			if(plr->GetBindMapId() != GetMapId())
+			{
+				plr->SafeTeleport(plr->GetBindMapId(),0,plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
+				plr->GetSession()->SystemMessage("Teleported you to your hearthstone location as you were out of the map boundaries.");
+				return;
+			}
+			else
+			{
+				obj->GetPositionV()->ChangeCoords(plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
+				plr->GetSession()->SystemMessage("Teleported you to your hearthstone location as you were out of the map boundaries.");
+				WorldPacket * data = plr->BuildTeleportAckMsg(plr->GetPosition());
+				plr->GetSession()->SendPacket(data);
+				delete data;
+			}
+		}
+		else
+		{
+			obj->GetPositionV()->ChangeCoords(0,0,0,0);
+		}
 	}
 
 	ASSERT(obj->GetPositionY() < _maxY && obj->GetPositionY() > _minY);
@@ -187,7 +208,29 @@ void MapMgr::PushObject(Object *obj)
 
 	if(x >= _sizeX || y >= _sizeY)
 	{
-		obj->SetPosition(0,0,0,0,false);
+		if(obj->IsPlayer())
+		{
+			Player * plr = ((Player*)obj);
+			if(plr->GetBindMapId() != GetMapId())
+			{
+				plr->SafeTeleport(plr->GetBindMapId(),0,plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
+				plr->GetSession()->SystemMessage("Teleported you to your hearthstone location as you were out of the map boundaries.");
+				return;
+			}
+			else
+			{
+				obj->GetPositionV()->ChangeCoords(plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
+				plr->GetSession()->SystemMessage("Teleported you to your hearthstone location as you were out of the map boundaries.");
+				WorldPacket * data = plr->BuildTeleportAckMsg(plr->GetPosition());
+				plr->GetSession()->SendPacket(data);
+				delete data;
+			}
+		}
+		else
+		{
+			obj->GetPositionV()->ChangeCoords(0,0,0,0);
+		}
+
 		x = GetPosX(obj->GetPositionX());
 		y = GetPosY(obj->GetPositionY());
 	}
@@ -608,6 +651,33 @@ void MapMgr::ChangeObjectLocation(Object *obj)
 	{
 		/* Something removed us. */
 		return;
+	}
+
+	if(obj->GetPositionX() >= _maxX || obj->GetPositionX() <= _minX ||
+		obj->GetPositionY() >= _maxY || obj->GetPositionY() <= _minY)
+	{
+		if(obj->IsPlayer())
+		{
+			Player * plr = ((Player*)obj);
+			if(plr->GetBindMapId() != GetMapId())
+			{
+				plr->SafeTeleport(plr->GetBindMapId(),0,plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
+				plr->GetSession()->SystemMessage("Teleported you to your hearthstone location as you were out of the map boundaries.");
+				return;
+			}
+			else
+			{
+				obj->GetPositionV()->ChangeCoords(plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
+				plr->GetSession()->SystemMessage("Teleported you to your hearthstone location as you were out of the map boundaries.");
+				WorldPacket * data = plr->BuildTeleportAckMsg(plr->GetPosition());
+				plr->GetSession()->SendPacket(data);
+				delete data;
+			}
+		}
+		else
+		{
+			obj->GetPositionV()->ChangeCoords(0,0,0,0);
+		}
 	}
 
 	uint32 cellX = GetPosX(obj->GetPositionX());

@@ -167,6 +167,7 @@ public:
 	inline const float& GetSpawnO( ) const { return m_spawnLocation.o; }
 
 	inline const LocationVector & GetPosition() { return m_position; }
+	inline LocationVector * GetPositionV() { return &m_position; }
 
 	//Distance Calculation
 	float CalcDistance(Object* Ob);

@@ -3608,6 +3608,8 @@ void Spell::SpellEffectCharge(uint32 i)
 	//if(unitTarget->GetTypeId() == TYPEID_UNIT)
 	//	if(unitTarget->GetAIInterface())
 	//		unitTarget->GetAIInterface()->StopMovement(5000);
+	if(unitTarget->GetPositionX() == 0.0f || unitTarget->GetPositionY() == 0.0f)
+		return;
 	
 	dx=unitTarget->GetPositionX()-m_caster->GetPositionX();
 	dy=unitTarget->GetPositionY()-m_caster->GetPositionY();
