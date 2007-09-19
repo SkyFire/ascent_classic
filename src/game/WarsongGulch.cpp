@@ -144,12 +144,17 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 			sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
 
 			/* add the marks of honor to all players */
-            SpellEntry * a_sp = sSpellStore.LookupEntry((plr->GetTeam()) ? 24950 : 24951);
-			SpellEntry * h_sp = sSpellStore.LookupEntry((plr->GetTeam()) ? 24951 : 24950);
-			for(uint32 i = 0; i < 2; ++i) {
-				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
-					plr->CastSpell(plr, i ? h_sp : a_sp, true);
-					plr->Root();
+			SpellEntry * winner_spell = sSpellStore.LookupEntry(24951);
+			SpellEntry * loser_spell = sSpellStore.LookupEntry(24950);
+			for(uint32 i = 0; i < 2; ++i)
+			{
+				for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+				{
+					(*itr)->Root();
+					if(i == m_winningteam)
+						(*itr)->CastSpell((*itr), winner_spell, true);
+					else
+						(*itr)->CastSpell((*itr), loser_spell, true);
 				}
 			}
 		}

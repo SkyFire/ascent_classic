@@ -860,8 +860,13 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	UpdatePvPData();
 
 	/* add the player to the group */
-	if(!plr->GetGroup())
-		m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);
+	if(plr->GetGroup())
+	{
+		/* remove them from their group */
+		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
+	}
+
+	m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);
 
 	if(!m_countdownStage)
 	{
@@ -1364,7 +1369,7 @@ void CBattleground::EventResurrectPlayers()
 				plr->SendMessageToSet(&data, true);
 
 				plr->ResurrectPlayer();
-				plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_HEALTH));
+				plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 				plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 				plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
 			}

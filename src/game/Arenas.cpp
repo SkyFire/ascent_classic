@@ -58,12 +58,26 @@ Arena::~Arena()
 void Arena::OnAddPlayer(Player * plr)
 {
 	/* cast arena readyness buff */
+	if(plr->isDead())
+	{
+		plr->ResurrectPlayer();
+		plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+		plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
+	}
+	else
+	{
+		plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+		plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
+	}
+
 	plr->m_deathVision = true;
 	plr->CastSpell(plr, ARENA_PREPARATION, true);
 	UpdatePlayerCounts();
 
 	/* Add the green/gold team flag */
-	Aura * aura = new Aura(sSpellStore.LookupEntry(plr->m_bgTeam+32724), -1, plr, plr);
+	Aura * aura = new Aura(sSpellStore.LookupEntry(32725-plr->m_bgTeam), -1, plr, plr);
 	plr->AddAura(aura);
 	
 	/* Set FFA PvP Flag */
@@ -99,7 +113,7 @@ void Arena::OnRemovePlayer(Player * plr)
 	plr->RemoveAura(ARENA_PREPARATION);
 	UpdatePlayerCounts();
 	
-	plr->RemoveAura(plr->m_bgTeam+32724);
+	plr->RemoveAura(32725-plr->m_bgTeam);
 	if(plr->HasFlag(PLAYER_FLAGS, PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		plr->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAG_FREE_FOR_ALL_PVP);
 }
@@ -256,8 +270,8 @@ void Arena::UpdatePlayerCounts()
 		}
 	}
 
-	SetWorldState(ARENA_WORLD_STATE_A_PLAYER_COUNT, players[1]);
-	SetWorldState(ARENA_WORLD_STATE_H_PLAYER_COUNT, players[0]);
+	SetWorldState(ARENA_WORLD_STATE_A_PLAYER_COUNT, players[0]);
+	SetWorldState(ARENA_WORLD_STATE_H_PLAYER_COUNT, players[1]);
 
 	if(!m_started)
 		return;

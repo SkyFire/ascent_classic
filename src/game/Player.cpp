@@ -7029,7 +7029,7 @@ void Player::UpdatePvPArea()
                 }
             }
 
-            if(at->AreaFlags & AREA_PVP_ARENA && !m_bg)			/* ffa pvp arenas will come later */
+            if(at->AreaFlags & AREA_PVP_ARENA)			/* ffa pvp arenas will come later */
             {
                 if(!IsPvPFlagged()) SetPvPFlag();
 
