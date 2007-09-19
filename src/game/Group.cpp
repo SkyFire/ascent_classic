@@ -210,6 +210,7 @@ bool Group::AddMember(PlayerInfo * info, Player* pPlayer, int32 subgroupid)
 			if(pPlayer)
 				sLog.outDebug("GROUP: Tried to add member %s but FindFreeSubGroup returned NULL!", pPlayer->GetName());
 
+			m_groupLock.Release();
 			return false;
 		}
 
@@ -729,7 +730,11 @@ void Group::MovePlayer(PlayerInfo *info, uint8 subgroup)
 		}
 	}
 
-	if(!sg) return;
+	if(!sg)
+	{
+		m_groupLock.Release();
+		return;
+	}
 	
 	sg->RemovePlayer(info, NULL, true);
 
