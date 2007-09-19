@@ -41,7 +41,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/Zm150"
+				AdditionalOptions="/Zm250"
 				Optimization="0"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared;..\..\src\logonserver;..\..\dep\src\gm"
@@ -122,7 +122,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/Zm150"
+				AdditionalOptions="/Zm250"
 				Optimization="4"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="0"
@@ -205,7 +205,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/Zm150"
+				AdditionalOptions="/Zm250"
 				Optimization="4"
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="0"
