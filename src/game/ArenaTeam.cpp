@@ -384,6 +384,12 @@ void WorldSession::HandleArenaTeamAddMemberOpcode(WorldPacket & recv_data)
 		return;
 	}
 
+	if(plr->GetTeam() != _player->GetTeam() && !HasGMPermissions())
+	{
+		SystemMessage("That player is a member of a different faction.");
+		return;
+	}
+
 	plr->m_arenateaminviteguid = _player->m_arenaTeams[slot]->m_id;
 	data << _player->GetName();
 	data << _player->m_arenaTeams[slot]->m_name;

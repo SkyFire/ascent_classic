@@ -3286,8 +3286,12 @@ void ObjectMgr::UpdateArenaTeamRankings()
 		uint32 rank = 1;
 		for(vector<ArenaTeam*>::iterator itr = ranking.begin(); itr != ranking.end(); ++itr)
 		{
-			(*itr)->m_stat_ranking = rank++;
-			(*itr)->SaveToDB();
+			if((*itr)->m_stat_ranking != rank)
+			{
+				(*itr)->m_stat_ranking = rank;
+				(*itr)->SaveToDB();
+			}
+			++rank;
 		}
 	}
 	m_arenaTeamLock.Release();
