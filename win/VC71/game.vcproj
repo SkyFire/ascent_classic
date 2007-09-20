@@ -824,6 +824,12 @@
 			Name="Event System"
 			Filter="">
 			<File
+				RelativePath="..\..\src\game\DayWatcherThread.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\DayWatcherThread.h">
+			</File>
+			<File
 				RelativePath="..\..\src\game\EventableObject.cpp">
 			</File>
 			<File

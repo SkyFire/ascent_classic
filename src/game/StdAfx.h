@@ -146,6 +146,7 @@
 #include "../shared/Storage.h"
 #include "ObjectStorage.h"
 #include "DatabaseCleaner.h"
+#include "DayWatcherThread.h"
 
 #ifdef CLUSTERING
     #include "WorkerServerClient.h"

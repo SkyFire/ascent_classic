@@ -251,11 +251,12 @@ public:
 	uint32 getCurrentWaypoint() { return m_currentWaypoint; }
 	void changeWayPointID(uint32 oldwpid, uint32 newwpid);
 	bool addWayPoint(WayPoint* wp);
-	bool saveWayPoints(uint32 wpid);
-	bool showWayPoints(uint32 wpid, Player* pPlayer, bool Backwards);
-	bool hideWayPoints(uint32 wpid, Player* pPlayer);
+	bool saveWayPoints();
+	bool showWayPoints(Player* pPlayer, bool Backwards);
+	bool hideWayPoints(Player* pPlayer);
 	WayPoint* getWayPoint(uint32 wpid);
-	void deleteWayPoint(uint32 wpid, bool save = true);
+	void deleteWayPoint(uint32 wpid);
+	void deleteWaypoints();
 	inline bool hasWaypoints() { return m_waypoints!=NULL; }
 	inline void setMoveType(uint32 movetype) { m_moveType = movetype; }
 	inline uint32 getMoveType() { return m_moveType; }

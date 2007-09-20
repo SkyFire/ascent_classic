@@ -84,6 +84,12 @@ WorldSession::~WorldSession()
 int WorldSession::Update(uint32 InstanceID)
 {
 	m_currMsTime = getMSTime();
+
+#ifndef CLUSTERING
+	if(!((++_updatecount) % 2) && _socket)
+		_socket->UpdateQueuedPackets();
+#endif
+
 	WorldPacket *packet;
 	OpcodeHandler * Handler;
 
@@ -192,12 +198,6 @@ int WorldSession::Update(uint32 InstanceID)
 		// 1 - Complete deletion
 		return 1;
 	}
-
-#ifndef CLUSTERING
-	// 0 - OK!
-	if(!((++_updatecount) % 2) && _socket)
-		_socket->UpdateQueuedPackets();
-#endif
 
 	return 0;
 }

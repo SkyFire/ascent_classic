@@ -1218,6 +1218,11 @@ void World::SetInitialWorldSettings()
 		/* Decapitate */
 		if(sp->NameHash == 0xB6C3243C)
 			sp->procChance = 30;
+
+		/* hackfix for this - FIX ME LATER - Burlex */
+		if(namehash==3238263755UL)
+			sp->procFlags=0;
+
 //junk code to get me has :P 
 //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
 //	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);

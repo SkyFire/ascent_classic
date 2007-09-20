@@ -140,6 +140,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
 	uint32 mstime = getMSTime();
+	m_moveDelayTime = (mstime - movement_info.time);
 	int32 new_move_time = (MOVEMENT_PACKET_TIME_DELAY + (movement_info.time - mstime))+mstime;
 	memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
 
@@ -281,8 +282,8 @@ void WorldSession::HandleMoveStopOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleMoveTimeSkippedOpcode( WorldPacket & recv_data )
 {
-	uint64 guid;
-	recv_data >> guid >> m_moveDelayTime;
+	//uint64 guid;
+	//recv_data >> guid >> m_moveDelayTime;
 	//Log.Debug("MoveTimeSkipped", "Client %s is out of sync by %u ms", GetSocket()->GetRemoteIP().c_str(), m_moveDelayTime);
 }
 
@@ -378,6 +379,7 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
 	uint32 mstime = getMSTime();
+	m_moveDelayTime = (mstime - movement_info.time);
 	int32 new_move_time = (MOVEMENT_PACKET_TIME_DELAY + (movement_info.time - mstime))+mstime;
 	memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
 

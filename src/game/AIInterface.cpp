@@ -1953,11 +1953,9 @@ bool AIInterface::addWayPoint(WayPoint* wp)
 	if(m_waypoints->size() <= wp->id)
 		m_waypoints->resize(wp->id+1);
 
-	//if(m_waypoints->find( wp->id ) == m_waypoints->end( ))
 	if((*m_waypoints)[wp->id] == NULL)
 	{
 		(*m_waypoints)[wp->id] = wp;
-		//m_waypoints->insert(WayPointMap::value_type(wp->id, wp));
 		return true;
 	}
 	return false;
@@ -1970,6 +1968,9 @@ void AIInterface::changeWayPointID(uint32 oldwpid, uint32 newwpid)
 		return; //not valid id
 	if(newwpid > m_waypoints->size()) 
 		return; //not valid id
+	if(oldwpid > m_waypoints->size())
+		return;
+
 	if(newwpid == oldwpid) 
 		return; //same spot
 
@@ -1986,79 +1987,11 @@ void AIInterface::changeWayPointID(uint32 oldwpid, uint32 newwpid)
 	(*m_waypoints)[oldwp->id] = oldwp;
 	(*m_waypoints)[originalwp->id] = originalwp;
 
-	//we have valid wps in the positions
-	/*WayPoint* wpnext = NULL;
-	WayPoint* wp = NULL;
-	uint32 i = 0;
-	uint32 endat = 0;
-	//reorder freeing newwpid's spot
-	if((oldwpid+1 == newwpid) || (newwpid+1 == oldwpid))
-	{
-		//within 1 place of eachother just swap
-		oldwp->id = newwpid;
-		originalwp->id = oldwpid;
-		(*m_waypoints)[newwpid] = oldwp;
-		(*m_waypoints)[oldwpid] = originalwp;
-	}
-	//		4		  2
-	else if(oldwpid > newwpid) // move others up
-	{
-		//2	   4		 2
-		endat = (oldwpid-newwpid);
-
-		for(i = 0; i < endat;i++)
-		{
-			//				  2
-			wpnext = getWayPoint(newwpid+i+1); //waypoint 3
-
-			if(i == 0)
-			{
-				//First move
-				oldwp->id = newwpid;
-				(*m_waypoints)[newwpid] = oldwp; //position 2
-
-				originalwp->id = newwpid+1;
-				(*m_waypoints)[newwpid+1] = originalwp; //position 3
-			}
-			else //i > 0
-			{
-				if(wp)
-				{
-					wp->id = newwpid+1+i;
-					(*m_waypoints)[newwpid+1+i] = wp;
-				}
-			}
-			wp = wpnext;
-		}
-	}
-	//		2		  4
-	else if(oldwpid < newwpid) //move others down
-	{
-		//2	   4		 2
-		endat = (newwpid-oldwpid);
-
-		for(i = 0; i < endat;i++)
-		{
-			//				  2
-			wp = getWayPoint(oldwpid+i+1); //waypoint 3
-			if(wp)
-			{
-				wp->id = oldwpid+i;
-				(*m_waypoints)[oldwpid+i] = wp; //position 2
-			}
-			if(i == endat-1)
-			{
-				oldwp->id = newwpid;
-				(*m_waypoints)[newwpid] = oldwp; //position 4
-			}
-		}
-	}*/
-
 	//SaveAll to db
-	saveWayPoints(0);
+	saveWayPoints();
 }
 
-void AIInterface::deleteWayPoint(uint32 wpid, bool save)
+void AIInterface::deleteWayPoint(uint32 wpid)
 {
 	if(!m_waypoints)return;
 	if(wpid <= 0) 
@@ -2066,79 +1999,48 @@ void AIInterface::deleteWayPoint(uint32 wpid, bool save)
 	if(wpid > m_waypoints->size()) 
 		return; //not valid id
 
-//	uint32 startsize = m_waypoints->size();
-	
-	//Delete Waypoint
-	/*WayPointMap::iterator iter = m_waypoints->find( wpid );
-	if( iter != m_waypoints->end() )
+	WayPointMap new_waypoints;
+	uint32 newpid = 1;
+	for(WayPointMap::iterator itr = m_waypoints->begin(); itr != m_waypoints->end(); ++itr)
 	{
-		delete iter->second;
-		m_waypoints->erase( iter );
-	}*/
-	if(m_waypoints->size() > wpid)
-	{
-		delete (*m_waypoints)[wpid];
-		(*m_waypoints)[wpid] = NULL;
-	}
-	
-//	WayPoint* wp = NULL;
-	//Reorginise the rest
-	/*if(wpid <= m_waypoints->size()) //non existant wp
-	{
-		uint32 i = 0;
-		for(i = 0; i < startsize-wpid;i++)
+		if((*itr) == NULL || (*itr)->id == wpid)
 		{
-			wp = (*m_waypoints)[wpid+i+1];
-			if(wp)
-			{
-				wp->id = wpid+i;
-				(*m_waypoints)[wpid+i] = wp;
-			}
+			if((*itr) != NULL)
+				delete ((*itr));
+
+			continue;
 		}
-		//m_waypoints->erase( wpid+i );
-	}*/
-	vector<WayPoint*> new_wps;
-	for(vector<WayPoint*>::iterator itr = m_waypoints->begin(); itr != m_waypoints->end(); ++itr) {
-		if((*itr) != NULL)
-			new_wps.push_back(*itr);
+
+		new_waypoints.push_back(*itr);
 	}
 
-	if(!new_wps.size())
+	m_waypoints->clear();
+	m_waypoints->push_back(NULL);		// waypoint 0
+	for(WayPointMap::iterator itr = new_waypoints.begin(); itr != new_waypoints.end(); ++itr)
 	{
-		delete m_waypoints;
-		m_waypoints = NULL;
-		if(save)
-			saveWayPoints(0);
-		return;
+		(*itr)->id = newpid++;
+		m_waypoints->push_back(*itr);
 	}
 
-	m_waypoints->resize(new_wps.size());
-	for(uint32 i = 0; i < new_wps.size(); ++i)
-		(*m_waypoints)[i] = new_wps[i];
-
-	//SaveAll to db
-	if(save)
-		saveWayPoints(0);
+	saveWayPoints();
 }
 
-bool AIInterface::showWayPoints(uint32 wpid, Player* pPlayer, bool Backwards)
+bool AIInterface::showWayPoints(Player* pPlayer, bool Backwards)
 {
 	if(!m_waypoints)
 		return false;
 
-	if(wpid > m_waypoints->size()) 
-		return false; //not valid id
-
 	//wpid of 0 == all
 	WayPointMap::const_iterator itr;
-	if((m_WayPointsShowing == true) && (wpid == 0)) 
+	if(m_WayPointsShowing == true) 
 		return false;
+
 	m_WayPointsShowing = true;
 
 	WayPoint* wp = NULL;
 	for (itr = m_waypoints->begin(); itr != m_waypoints->end(); itr++)
 	{
-		if( (*itr) != NULL && (((*itr)->id == wpid) || (wpid == 0)) )
+		if( (*itr) != NULL )
 		{
 			wp = *itr;
 
@@ -2178,20 +2080,16 @@ bool AIInterface::showWayPoints(uint32 wpid, Player* pPlayer, bool Backwards)
 			pPlayer->GetSession()->SendPacket( &data1 );
 
 			//Cleanup
-			//delete data;
 			delete pWayPoint;
-			if(wpid != 0) return true;
 		}
 	}
 	return true;
 }
 
-bool AIInterface::hideWayPoints(uint32 wpid, Player* pPlayer)
+bool AIInterface::hideWayPoints(Player* pPlayer)
 {
 	if(!m_waypoints)
 		return false;
-
-	if(wpid > m_waypoints->size()) return false; //not valid id
 
 	//wpid of 0 == all
 	if(m_WayPointsShowing != true) return false;
@@ -2203,81 +2101,69 @@ bool AIInterface::hideWayPoints(uint32 wpid, Player* pPlayer)
 
 	for (itr = m_waypoints->begin(); itr != m_waypoints->end(); itr++)
 	{
-		if( (*itr) != NULL && (((*itr)->id == wpid) || (wpid == 0)) )
+		if( (*itr) != NULL )
 		{
 			// avoid C4293
 			guid = ((uint64)HIGHGUID_WAYPOINT << 32) | (*itr)->id;
 			WoWGuid wowguid(guid);
 			pPlayer->PushOutOfRange(wowguid);
-			if(wpid != 0) return true;
 		}
 	}
 	return true;
 }
 
-bool AIInterface::saveWayPoints(uint32 wpid)
+bool AIInterface::saveWayPoints()
 {
 	if(!m_waypoints)return false;
 
-	if(wpid > m_waypoints->size()) return false; //not valid id
 	if(!GetUnit()) return false;
 	if(GetUnit()->GetTypeId() != TYPEID_UNIT) return false;
 
-	//wpid of 0 == all
-	std::stringstream ss;
-	if(wpid == 0)
-	{
-		//Delete
-		ss << "DELETE FROM creature_waypoints WHERE creatureid = " << ((Creature*)GetUnit())->GetSQL_id() << "\0";
-		WorldDatabase.Query( ss.str().c_str() );
-	}
-
+	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE creatureid = %u", ((Creature*)GetUnit())->GetSQL_id());
 	WayPointMap::const_iterator itr;
-
 	WayPoint* wp = NULL;
+	std::stringstream ss;
+
 	for (itr = m_waypoints->begin(); itr != m_waypoints->end(); itr++)
 	{
-		if(itr == m_waypoints->end()) 
-			break;
-		if(!(*itr)) 
+		if((*itr) == NULL) 
 			continue;
 
-		if( ((*itr)->id == wpid) || (wpid == 0) )
-		{
-			wp = (*itr);
+		wp = (*itr);
 
-			if(wpid != 0)
-			{
-				//Delete
-				ss.str("");
-				ss << "DELETE FROM creature_waypoints WHERE creatureid = " << ((Creature*)GetUnit())->GetSQL_id() << " and waypointid = " << wp->id << "\0";
-				WorldDatabase.Query( ss.str().c_str() );
-			}
-
-			//Save
-			ss.str("");
-			ss << "INSERT INTO creature_waypoints ";
-			ss << "(creatureid,waypointid,x,y,z,waittime,flags,forwardemoteoneshot,forwardemoteid,backwardemoteoneshot,backwardemoteid,forwardskinid,backwardskinid) VALUES (";
-			ss << ((Creature*)GetUnit())->GetSQL_id() << ", ";
-			ss << wp->id << ", ";
-			ss << wp->x << ", ";
-			ss << wp->y << ", ";
-			ss << wp->z << ", ";
-			ss << wp->waittime << ", ";
-			ss << wp->flags << ", ";
-			ss << wp->forwardemoteoneshot << ", ";
-			ss << wp->forwardemoteid << ", ";
-			ss << wp->backwardemoteoneshot << ", ";
-			ss << wp->backwardemoteid << ", ";
-			ss << wp->forwardskinid << ", ";
-			ss << wp->backwardskinid << ")\0";
-			WorldDatabase.Query( ss.str().c_str() );
-
-			if(wpid != 0) 
-				return true;
-		}
+		//Save
+		ss.str("");
+		ss << "INSERT INTO creature_waypoints ";
+		ss << "(creatureid,waypointid,x,y,z,waittime,flags,forwardemoteoneshot,forwardemoteid,backwardemoteoneshot,backwardemoteid,forwardskinid,backwardskinid) VALUES (";
+		ss << ((Creature*)GetUnit())->GetSQL_id() << ", ";
+		ss << wp->id << ", ";
+		ss << wp->x << ", ";
+		ss << wp->y << ", ";
+		ss << wp->z << ", ";
+		ss << wp->waittime << ", ";
+		ss << wp->flags << ", ";
+		ss << wp->forwardemoteoneshot << ", ";
+		ss << wp->forwardemoteid << ", ";
+		ss << wp->backwardemoteoneshot << ", ";
+		ss << wp->backwardemoteid << ", ";
+		ss << wp->forwardskinid << ", ";
+		ss << wp->backwardskinid << ")\0";
+		WorldDatabase.Query( ss.str().c_str() );
 	}
-	return false;
+	return true;
+}
+
+void AIInterface::deleteWaypoints()
+{
+	if(!m_waypoints)
+		return;
+
+	for(WayPointMap::iterator itr = m_waypoints->begin(); itr != m_waypoints->end(); ++itr)
+	{
+		if((*itr) != NULL)
+			delete (*itr);
+	}
+	m_waypoints->clear();
 }
 
 WayPoint* AIInterface::getWayPoint(uint32 wpid)

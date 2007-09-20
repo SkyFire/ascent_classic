@@ -80,6 +80,7 @@ bool ChatHandler::HandleWPAddCommand(const char* args, WorldSession *m_session)
 	uint32 BackwardEmoteOneShot = (pBackwardEmoteOneShot)? atoi(pBackwardEmoteOneShot) : 1;
 
 	WayPoint* wp = new WayPoint;
+	bool showing = ai->m_WayPointsShowing;
 	wp->id = ai->GetWayPointsCount()+1;
 	wp->x = p->GetPositionX();
 	wp->y = p->GetPositionY();
@@ -92,12 +93,15 @@ bool ChatHandler::HandleWPAddCommand(const char* args, WorldSession *m_session)
 	wp->backwardemoteid = BackwardEmoteId;
 	wp->forwardskinid = ForwardSkinId;
 	wp->backwardskinid = BackwardSkinId;
+
+	if(showing)
+		ai->hideWayPoints(p);
+
 	ai->addWayPoint(wp);
-	ai->saveWayPoints(wp->id);
-	if(ai->m_WayPointsShowing == true)
-	{
-		ai->showWayPoints(wp->id,p,ai->m_WayPointsShowBackwards);
-	}
+	ai->saveWayPoints();
+
+	if(showing)
+		ai->showWayPoints(p,ai->m_WayPointsShowBackwards);
 
 	SystemMessage(m_session, "Waypoint %u added.", wp->id);
 	return true;
@@ -175,14 +179,15 @@ bool ChatHandler::HandleWPShowCommand(const char* args, WorldSession *m_session)
 		{
 			SystemMessage(m_session, "Some one else is also Viewing this Creatures WayPoints.");
 			SystemMessage(m_session, "Viewing WayPoints at the same time as some one else can cause undesireble results.");
+			return true;
 		}
 
 		if(pPlayer->waypointunit != NULL)
 		{
-			pPlayer->waypointunit->hideWayPoints(0,pPlayer);
+			pPlayer->waypointunit->hideWayPoints(pPlayer);
 		}
 		pPlayer->waypointunit = ai;
-		ai->showWayPoints(0,pPlayer,Backwards);
+		ai->showWayPoints(pPlayer,Backwards);
 		ai->m_WayPointsShowBackwards = Backwards;
 	}
 	else
@@ -222,21 +227,19 @@ bool ChatHandler::HandleWPDeleteCommand(const char* args, WorldSession *m_sessio
 	std::stringstream ss;
 
 	uint32 wpid = GUID_LOPART(guid);
-	if((wpid > 0) && (wpid <= ai->GetWayPointsCount()))
+	if(wpid)
 	{
 		//Refresh client
 		//Hide all
 		bool show = ai->m_WayPointsShowing;
 		if(show == true)
-		{
-			ai->hideWayPoints(0,pPlayer);
-		}
-		ai->deleteWayPoint(wpid, true);
+			ai->hideWayPoints(pPlayer);
+
+		ai->deleteWayPoint(wpid);
 		//Show All again after delete
 		if(show == true)
-		{
-			ai->showWayPoints(0,pPlayer,ai->m_WayPointsShowBackwards);
-		}
+			ai->showWayPoints(pPlayer,ai->m_WayPointsShowBackwards);
+
 		SystemMessage(m_session, "Waypoint %u deleted.", wpid);
 	}
 	else
@@ -277,25 +280,21 @@ bool ChatHandler::HandleWPChangeNoCommand(const char* args, WorldSession *m_sess
 
 	uint32 wpid = GUID_LOPART(guid);
 	if(NewID == wpid) return false;
-	if((wpid > 0) && (wpid <= ai->GetWayPointsCount()) && (NewID > 0) && (NewID <= ai->GetWayPointsCount()))
+	if(wpid)
 	{
 		//Refresh client
 		//Hide all
 
 		bool show = ai->m_WayPointsShowing;
 		if(show == true)
-		{
-			ai->hideWayPoints(0,pPlayer);
-		}
+			ai->hideWayPoints(pPlayer);
 
 		//update to new id
 		ai->changeWayPointID(wpid,NewID);
 
 		//Show All again after update
 		if(show == true)
-		{
-			ai->showWayPoints(0,pPlayer,ai->m_WayPointsShowBackwards);
-		}
+			ai->showWayPoints(pPlayer,ai->m_WayPointsShowBackwards);
 
 		ss << "Waypoint " << wpid << " changed to Waypoint " << NewID << ".";
 		SystemMessage(m_session, ss.str().c_str());
@@ -333,7 +332,7 @@ bool ChatHandler::HandleWPFlagsCommand(const char* args, WorldSession *m_session
 	std::stringstream ss;
 
 	uint32 wpid = GUID_LOPART(guid);
-	if((wpid > 0) && (wpid <= ai->GetWayPointsCount()))
+	if(wpid)
 	{
 		WayPoint* wp = ai->getWayPoint(wpid);
 		uint32 flags = wp->flags;
@@ -344,7 +343,7 @@ bool ChatHandler::HandleWPFlagsCommand(const char* args, WorldSession *m_session
 		wp->flags = NewFlags;
 
 		//save wp
-		ai->saveWayPoints(wpid);
+		ai->saveWayPoints();
 
 		ss << "Waypoint " << wpid << " flags changed from " << flags << " to " << NewFlags;
 		SystemMessage(m_session, ss.str().c_str());
@@ -382,7 +381,7 @@ bool ChatHandler::HandleWPMoveHereCommand(const char* args, WorldSession *m_sess
 	std::stringstream ss;
 
 	uint32 wpid = GUID_LOPART(guid);
-	if((wpid > 0) && (wpid <= ai->GetWayPointsCount()))
+	if(wpid)
 	{
 		WayPoint* wp = ai->getWayPoint(wpid);
 		if(wp)
@@ -392,13 +391,13 @@ bool ChatHandler::HandleWPMoveHereCommand(const char* args, WorldSession *m_sess
 			wp->z = pPlayer->GetPositionZ();
 
 			//save wp
-			ai->saveWayPoints(wpid);
+			ai->saveWayPoints();
 		}
 		//Refresh client
 		if(ai->m_WayPointsShowing == true)
 		{
-			ai->hideWayPoints(wpid,pPlayer);
-			ai->showWayPoints(wpid,pPlayer,ai->m_WayPointsShowBackwards);
+			ai->hideWayPoints(pPlayer);
+			ai->showWayPoints(pPlayer,ai->m_WayPointsShowBackwards);
 		}
 
 		ss << "Waypoint " << wpid << " has been moved.";
@@ -439,7 +438,7 @@ bool ChatHandler::HandleWPWaitCommand(const char* args, WorldSession *m_session)
 	std::stringstream ss;
 
 	uint32 wpid = GUID_LOPART(guid);
-	if((wpid > 0) && (wpid <= ai->GetWayPointsCount()))
+	if(wpid)
 	{
 		WayPoint* wp = ai->getWayPoint(wpid);
 		if(wp)
@@ -454,7 +453,7 @@ bool ChatHandler::HandleWPWaitCommand(const char* args, WorldSession *m_session)
 			wp->waittime = Wait;
 
 			//save wp
-			ai->saveWayPoints(wpid);
+			ai->saveWayPoints();
 		}
 
 		ss << "Wait Time for Waypoint " << wpid << " is now " << Wait << "ms.";
@@ -495,7 +494,7 @@ bool ChatHandler::HandleWPEmoteCommand(const char* args, WorldSession *m_session
 	std::stringstream ss;
 
 	uint32 wpid = GUID_LOPART(guid);
-	if((wpid > 0) && (wpid <= ai->GetWayPointsCount()))
+	if(wpid)
 	{
 		WayPoint* wp = ai->getWayPoint(wpid);
 		if(wp)
@@ -518,7 +517,7 @@ bool ChatHandler::HandleWPEmoteCommand(const char* args, WorldSession *m_session
 			}
 
 			//save wp
-			ai->saveWayPoints(wpid);
+			ai->saveWayPoints();
 		}
 
 		ss << "EmoteID for Waypoint " << wpid << " is now " << EmoteId << " and oneshot is " << ((OneShot == true)? "Enabled." : "Disabled.");
@@ -558,7 +557,7 @@ bool ChatHandler::HandleWPSkinCommand(const char* args, WorldSession *m_session)
 	std::stringstream ss;
 
 	uint32 wpid = GUID_LOPART(guid);
-	if((wpid > 0) && (wpid <= ai->GetWayPointsCount()))
+	if(wpid)
 	{
 		WayPoint* wp = ai->getWayPoint(wpid);
 		if(wp)
@@ -577,7 +576,7 @@ bool ChatHandler::HandleWPSkinCommand(const char* args, WorldSession *m_session)
 			}
 
 			//save wp
-			ai->saveWayPoints(wpid);
+			ai->saveWayPoints();
 		}
 
 		ss << "SkinID for Waypoint " << wpid << " is now " << SkinId;
@@ -673,7 +672,7 @@ bool ChatHandler::HandleWPHideCommand(const char* args, WorldSession *m_session)
 	{
 		if(ai->m_WayPointsShowing == true)
 		{
-			pPlayer->waypointunit->hideWayPoints(0,pPlayer);
+			pPlayer->waypointunit->hideWayPoints(pPlayer);
 			pPlayer->waypointunit = NULL;
 		}
 	}
@@ -704,6 +703,12 @@ bool ChatHandler::HandleGenerateWaypoints(const char* args, WorldSession * m_ses
 		SystemMessage(m_session, "The creature already has waypoints");
 		return false;
 	}
+	if(m_session->GetPlayer()->waypointunit != NULL)
+	{
+		SystemMessage(m_session, "You are already showing waypoints, hide them first.");
+		return true;
+	}
+
 	if(!cr->GetSQL_id())
 		return false;
 	char* pR = strtok((char*)args, " ");
@@ -749,8 +754,10 @@ bool ChatHandler::HandleGenerateWaypoints(const char* args, WorldSession * m_ses
 		wp->backwardskinid = 0;
 		
 		cr->GetAIInterface()->addWayPoint(wp);
-		cr->GetAIInterface()->showWayPoints(wp->id,m_session->GetPlayer(),cr->GetAIInterface()->m_WayPointsShowBackwards);
 	}
+
+	m_session->GetPlayer()->waypointunit = cr->GetAIInterface();
+	cr->GetAIInterface()->showWayPoints(m_session->GetPlayer(),cr->GetAIInterface()->m_WayPointsShowBackwards);
 	
 	return true;
 }
@@ -789,13 +796,15 @@ bool ChatHandler::HandleDeleteWaypoints(const char* args, WorldSession * m_sessi
 	if(!cr)return false;
 	if(!cr->GetSQL_id())
 		return false;
+
+	if(cr->GetAIInterface()->m_WayPointsShowing)
+	{
+		SystemMessage(m_session, "Waypoints are showing, hide them first.");
+		return true;
+	}
 	
 	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE creatureid=%u",cr->GetSQL_id());
 
-	
-	while(cr->GetAIInterface()->GetWayPointsCount())
-	{
-		cr->GetAIInterface()->deleteWayPoint(1,false);
-	}
+	cr->GetAIInterface()->deleteWaypoints();
 	return true;
 }

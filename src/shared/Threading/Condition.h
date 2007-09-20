@@ -229,6 +229,73 @@ public:
 		m_externalMutex->Release();
 	}
 
+	DWORD Wait(time_t timeout)
+	{
+		DWORD dwMillisecondsTimeout = timeout * 1000;
+		BOOL bAlertable = FALSE;
+		ASSERT(LockHeldByCallingThread());
+
+		// Enter a new event handle into the wait set.
+		HANDLE hWaitEvent = Push();
+		if( NULL == hWaitEvent )
+			return WAIT_FAILED;
+
+		// Store the current lock count for re-acquisition.
+		int nThisThreadsLockCount = m_nLockCount;
+		m_nLockCount = 0;
+
+		// Release the synchronization lock the appropriate number of times.
+		// Win32 allows no error checking here.
+		for( int i=0; i<nThisThreadsLockCount; ++i)
+		{
+			//::LeaveCriticalSection(&m_critsecSynchronized);
+			m_externalMutex->Release();
+		}
+
+		// NOTE: Conceptually, releasing the lock and entering the wait
+		// state is done in one atomic step. Technically, that is not
+		// true here, because we first leave the critical section and
+		// then, in a separate line of code, call WaitForSingleObjectEx.
+		// The reason why this code is correct is that our thread is placed
+		// in the wait set *before* the lock is released. Therefore, if
+		// we get preempted right here and another thread notifies us, then
+		// that notification will *not* be missed: the wait operation below
+		// will find the event signalled.
+
+		// Wait for the event to become signalled.
+		DWORD dwWaitResult = ::WaitForSingleObjectEx(
+			hWaitEvent,
+			dwMillisecondsTimeout,
+			bAlertable
+			);
+
+		// If the wait failed, store the last error because it will get
+		// overwritten when acquiring the lock.
+		DWORD dwLastError = 0;
+		if( WAIT_FAILED == dwWaitResult )
+			dwLastError = ::GetLastError();
+
+		// Acquire the synchronization lock the appropriate number of times.
+		// Win32 allows no error checking here.
+		for( int j=0; j<nThisThreadsLockCount; ++j)
+		{
+			//::EnterCriticalSection(&m_critsecSynchronized);
+			m_externalMutex->Acquire();
+		}
+
+		// Restore lock count.
+		m_nLockCount = nThisThreadsLockCount;
+
+		// Close event handle
+		if( ! CloseHandle(hWaitEvent) )
+			return WAIT_FAILED;
+
+		if( WAIT_FAILED == dwWaitResult )
+			::SetLastError(dwLastError);
+
+		return dwWaitResult;
+	}
+
 	DWORD Wait()
 	{
 		DWORD dwMillisecondsTimeout = INFINITE;
@@ -430,6 +497,16 @@ public:
 	inline void Wait()
 	{
 		pthread_cond_wait(&cond,&mut->mutex);
+	}
+	inline bool Wait(time_t seconds)
+	{
+		timespec tv;
+		tv.tv_usec = 0;
+		tv.tv_sec = seconds;
+		if(pthread_cond_timedwait(&cond, &mut->mutex, &tv) == 0)
+			return true;
+		else
+			return false;
 	}
 	inline void BeginSynchronized()
 	{
