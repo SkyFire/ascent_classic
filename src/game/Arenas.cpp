@@ -121,14 +121,6 @@ void Arena::OnRemovePlayer(Player * plr)
 void Arena::HookOnPlayerKill(Player * plr, Unit * pVictim)
 {
 	plr->m_bgScore.KillingBlows++;
-
-	int32 honorpoints = HonorHandler::CalculateHonorPointsForKill(plr, pVictim);
-	if(honorpoints>0)
-	{
-		/* add these points to his team */
-		for(set<Player*>::iterator itr = m_players[plr->m_bgTeam].begin(); itr != m_players[plr->m_bgTeam].end(); ++itr)
-			HonorHandler::AddArenaPointsToPlayer((*itr), honorpoints);
-	}
 	UpdatePlayerCounts();
 }
 
