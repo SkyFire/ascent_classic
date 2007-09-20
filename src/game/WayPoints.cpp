@@ -196,6 +196,8 @@ bool ChatHandler::HandleWPShowCommand(const char* args, WorldSession *m_session)
 		{
 			SystemMessage(m_session, "Waypoints Already Showing.");
 		}
+		else
+			ai->showWayPoints(m_session->GetPlayer(),Backwards);
 	}
 
 	SystemMessage(m_session, "Showing waypoints for creature %u", pCreature->GetSQL_id());
@@ -671,10 +673,9 @@ bool ChatHandler::HandleWPHideCommand(const char* args, WorldSession *m_session)
 	if(pPlayer->waypointunit == ai)
 	{
 		if(ai->m_WayPointsShowing == true)
-		{
 			pPlayer->waypointunit->hideWayPoints(pPlayer);
-			pPlayer->waypointunit = NULL;
-		}
+			
+		pPlayer->waypointunit = NULL;
 	}
 	else
 	{
@@ -683,7 +684,7 @@ bool ChatHandler::HandleWPHideCommand(const char* args, WorldSession *m_session)
 	}
 
 	std::stringstream ss;
-	ss << "Hiding Waypoints for " << pCreature->GetGUIDLow();
+	ss << "Hiding Waypoints for " << pCreature->GetSQL_id();
 	SystemMessage(m_session, ss.str().c_str());
 
 	return true;
@@ -744,7 +745,7 @@ bool ChatHandler::HandleGenerateWaypoints(const char* args, WorldSession * m_ses
 		wp->x = x;
 		wp->y = y;
 		wp->z = z;
-		wp->waittime = 2000;
+		wp->waittime = 5000;
 		wp->flags = 0;
 		wp->forwardemoteoneshot = 0;
 		wp->forwardemoteid = 0;
@@ -756,6 +757,12 @@ bool ChatHandler::HandleGenerateWaypoints(const char* args, WorldSession * m_ses
 		cr->GetAIInterface()->addWayPoint(wp);
 	}
 
+	if(cr->m_spawn && cr->m_spawn->movetype != 1)		/* move random */
+	{
+		cr->m_spawn->movetype = 1;
+		cr->GetAIInterface()->m_moveType = 1;
+		WorldDatabase.Execute("UPDATE creature_spawns SET movetype = 1 WHERE id = %u", cr->GetSQL_id());
+	}
 	m_session->GetPlayer()->waypointunit = cr->GetAIInterface();
 	cr->GetAIInterface()->showWayPoints(m_session->GetPlayer(),cr->GetAIInterface()->m_WayPointsShowBackwards);
 	
@@ -770,21 +777,7 @@ bool ChatHandler::HandleSaveWaypoints(const char* args, WorldSession * m_session
 	if(!cr->GetSQL_id())
 		return false;
 	
-	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE creatureid=%u",cr->GetSQL_id());
-
-	
-	for(uint32 x=1;x<=cr->GetAIInterface()->GetWayPointsCount();x++)
-	{
-		 WayPoint  *w =cr->GetAIInterface()->getWayPoint(x);
-		 if(!w)continue;
-		 WorldDatabase.Execute(
-			 "INSERT INTO creature_waypoints VALUES(%u,%u,%f,%f,%f,%u,%u,%u,%u,%u,%u,%u,%u)",
-				
-				cr->GetSQL_id(),w->id,w->x,w->y,w->z,w->waittime,w->flags,w->forwardemoteoneshot,
-				w->forwardemoteid,w->backwardemoteoneshot,w->backwardemoteid,
-				w->forwardskinid,w->backwardskinid);
-
-	}
+	cr->GetAIInterface()->saveWayPoints();
 	return true;
 }
 
@@ -806,5 +799,6 @@ bool ChatHandler::HandleDeleteWaypoints(const char* args, WorldSession * m_sessi
 	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE creatureid=%u",cr->GetSQL_id());
 
 	cr->GetAIInterface()->deleteWaypoints();
+	SystemMessage(m_session, "Deleted waypoints for %u", cr->GetSQL_id());
 	return true;
 }

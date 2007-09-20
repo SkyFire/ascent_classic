@@ -291,8 +291,8 @@ public:
 	CreatureState m_creatureState;
 	uint32 GetWayPointsCount()
 	{
-		if(m_waypoints)
-			return m_waypoints->size();
+		if(m_waypoints && !m_waypoints->empty())
+			return m_waypoints->size()-1;	/* ignore 0 */
 		else
 			return 0;
 	}

@@ -159,7 +159,9 @@ ObjectMgr::~ObjectMgr()
 	for(HM_NAMESPACE::hash_map<uint32, WayPointMap*>::iterator i = m_waypoints.begin(); i != m_waypoints.end(); ++i)
 	{
 		for(WayPointMap::iterator i2 = i->second->begin(); i2 != i->second->end(); ++i2)
-			delete (*i2);
+			if((*i2))
+				delete (*i2);
+
 		delete i->second;
 	}
 
