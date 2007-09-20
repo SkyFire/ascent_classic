@@ -83,12 +83,12 @@ static void * thread_func(void * args)
 // Use pthread_create to start the thread
 inline void launch_thread(ThreadBase * thread)
 {
-	pthread_create(&THREAD_HANDLE, 0, thread_func, (void*)thread);
+	pthread_create(&thread->THREAD_HANDLE, 0, thread_func, (void*)thread);
 }
 
 inline void ThreadBase::join()
 {
-	pthread_join(THREAD_HANDLE);
+	pthread_join(this->THREAD_HANDLE, NULL);
 }
 
 #endif

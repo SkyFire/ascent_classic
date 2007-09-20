@@ -501,7 +501,7 @@ public:
 	inline bool Wait(time_t seconds)
 	{
 		timespec tv;
-		tv.tv_usec = 0;
+		tv.tv_nsec = 0;
 		tv.tv_sec = seconds;
 		if(pthread_cond_timedwait(&cond, &mut->mutex, &tv) == 0)
 			return true;
