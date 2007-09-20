@@ -74,7 +74,7 @@ void CBattlegroundManager::HandleBattlegroundListPacket(WorldSession * m_session
 	data << uint32(0);		// Count
 
 	/* Append the battlegrounds */
-	m_instanceLock.AcquireReadLock();
+	m_instanceLock.Acquire();
 	for(map<uint32, CBattleground*>::iterator itr = m_instances[BattlegroundType].begin(); itr != m_instances[BattlegroundType].end(); ++itr)
 	{
         if(itr->second->GetLevelGroup() == LevelGroup)
@@ -83,7 +83,7 @@ void CBattlegroundManager::HandleBattlegroundListPacket(WorldSession * m_session
 			++Count;
 		}
 	}
-	m_instanceLock.ReleaseReadLock();
+	m_instanceLock.Release();
 #ifdef USING_BIG_ENDIAN
 	*(uint32*)&data.contents()[13] = swap32(Count);
 #else
@@ -108,17 +108,17 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, Worl
 	if(instance)
 	{
 		/* We haven't picked the first instance. This means we've specified an instance to join. */
-		m_instanceLock.AcquireReadLock();
+		m_instanceLock.Acquire();
 		map<uint32, CBattleground*>::iterator itr = m_instances[bgtype].find(instance);
 
 		if(itr == m_instances[bgtype].end())
 		{
 			sChatHandler.SystemMessage(m_session, "You have tried to join an invalid instance id.");
-			m_instanceLock.ReleaseReadLock();
+			m_instanceLock.Release();
 			return;
 		}
 
-		m_instanceLock.ReleaseReadLock();
+		m_instanceLock.Release();
 	}
     
 	/* Queue him! */
@@ -157,6 +157,7 @@ void CBattlegroundManager::EventQueueUpdate()
 	list<uint32>::iterator it3, it4;
 	vector<Player*>::iterator it6;
 	m_queueLock.Acquire();
+	m_instanceLock.Acquire();
 	for(i = 0; i < BATTLEGROUND_NUM_TYPES; ++i)
 	{
 		for(j = 0; j < MAX_LEVEL_GROUP; ++j)
@@ -171,7 +172,6 @@ void CBattlegroundManager::EventQueueUpdate()
 
 				/* Try and find a free instance. */
 				bg=0;
-				m_instanceLock.AcquireReadLock();
 				for(itr = m_instances[i].begin(); itr != m_instances[i].end(); ++itr)
 				{
 					if(itr->second->GetLevelGroup() != j)
@@ -250,8 +250,6 @@ void CBattlegroundManager::EventQueueUpdate()
 						Log.Debug("BattlegroundMgr", "Instance is full.");
 					}*/
 				}
-
-				m_instanceLock.ReleaseReadLock();
 
 				/* Do we still have players left over? */
 				if(it2->second.size())
@@ -358,8 +356,6 @@ void CBattlegroundManager::EventQueueUpdate()
 			}
 
 			// Now process the players bound to a specific instance id.
-			m_instanceLock.AcquireReadLock();
-
 			for(it5 = m_queuedPlayers[i][j].begin(); it5 != m_queuedPlayers[i][j].end();)
 			{
 				it2 = it5;
@@ -424,8 +420,6 @@ void CBattlegroundManager::EventQueueUpdate()
 					}
 				}
 			}
-
-			m_instanceLock.ReleaseReadLock();
 		}
 	}
 
@@ -456,6 +450,7 @@ void CBattlegroundManager::EventQueueUpdate()
 				{
 					Log.Error("BattlegroundMgr", "Internal error at %s:%u", __FILE__, __LINE__);
 					m_queueLock.Release();
+					m_instanceLock.Release();
 					return;
 				}
 
@@ -476,6 +471,7 @@ void CBattlegroundManager::EventQueueUpdate()
 				{
 					Log.Error("BattlegroundMgr", "Internal error at %s:%u", __FILE__, __LINE__);
 					m_queueLock.Release();
+					m_instanceLock.Release();
 					return;
 				}
 
@@ -509,6 +505,7 @@ void CBattlegroundManager::EventQueueUpdate()
 	}
 
 	m_queueLock.Release();
+	m_instanceLock.Release();
 }
 
 void CBattlegroundManager::RemovePlayerFromQueues(Player * plr)
@@ -925,9 +922,9 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 		mgr->m_battleground = bg;
 		Log.Success("BattlegroundManager", "Created arena battleground type %u for level group %u on map %u.", Type, LevelGroup, mapid);
 		sEventMgr.AddEvent(bg, &CBattleground::EventCreate, EVENT_BATTLEGROUND_QUEUE_UPDATE, 1, 1,0);
-		m_instanceLock.AcquireWriteLock();
+		m_instanceLock.Acquire();
 		m_instances[Type].insert( make_pair(iid, bg) );
-		m_instanceLock.ReleaseWriteLock();
+		m_instanceLock.Release();
 		return bg;
 	}
 
@@ -952,9 +949,9 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 	sEventMgr.AddEvent(bg, &CBattleground::EventCreate, EVENT_BATTLEGROUND_QUEUE_UPDATE, 1, 1,0);
 	Log.Success("BattlegroundManager", "Created battleground type %u for level group %u.", Type, LevelGroup);
 
-	m_instanceLock.AcquireWriteLock();
+	m_instanceLock.Acquire();
 	m_instances[Type].insert( make_pair(iid, bg) );
-	m_instanceLock.ReleaseWriteLock();
+	m_instanceLock.Release();
 
 	return bg;
 }
@@ -965,7 +962,7 @@ void CBattlegroundManager::DeleteBattleground(CBattleground * bg)
 	uint32 j = bg->GetLevelGroup();
 	Player * plr;
 
-	m_instanceLock.AcquireWriteLock();
+	m_instanceLock.Acquire();
 	m_queueLock.Acquire();
 	m_instances[i].erase(bg->GetId());
 	
@@ -989,7 +986,7 @@ void CBattlegroundManager::DeleteBattleground(CBattleground * bg)
 	}
 
 	m_queueLock.Release();
-	m_instanceLock.ReleaseWriteLock();
+	m_instanceLock.Release();
 
 }
 

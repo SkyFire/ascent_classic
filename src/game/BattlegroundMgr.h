@@ -209,7 +209,7 @@ class CBattlegroundManager : public Singleton<CBattlegroundManager>, public Even
 {
 	/* Battleground Instance Map */
 	map<uint32, CBattleground*> m_instances[BATTLEGROUND_NUM_TYPES];
-	RWLock m_instanceLock;
+	Mutex m_instanceLock;
 
 	/* Max Id */
 	uint32 m_maxBattlegroundId;
