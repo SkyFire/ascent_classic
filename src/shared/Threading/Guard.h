@@ -27,8 +27,6 @@
 /************************************************************************/
 // crossplatform :)
 
-#ifdef _ALLOW_GUARD_CLASS_USE
-
 class SERVER_DECL Guard
 {
 public:
@@ -45,8 +43,6 @@ public:
 protected:
 	Mutex& target;
 };
-
-#endif
 
 #endif
 

@@ -750,7 +750,10 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
                 {
                     SafeAddTarget(tmpMap,itr->player->GetGUID());
                     if(!--jumps)
+					{
+						p_caster->GetGroup()->Unlock();
                         return;
+					}
                 }
             }
             p_caster->GetGroup()->Unlock();
