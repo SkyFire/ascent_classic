@@ -626,7 +626,7 @@ public:
 	~Player ( );
 	bool ok_to_remove;
 	PlayerInfo * m_playerInfo;
-	Unit * m_spellTypeTargets[NUM_SPELL_TYPE_INDEX];
+	uint64 m_spellIndexTypeTargets[NUM_SPELL_TYPE_INDEX];
 	void RemoveSpellTargets(uint32 Type);
 	void RemoveSpellIndexReferences(uint32 Type);
 	void SetSpellTargetType(uint32 Type, Unit* target);

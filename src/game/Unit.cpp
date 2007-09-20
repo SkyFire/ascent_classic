@@ -3474,7 +3474,7 @@ void Unit::setAttackTarget(Unit* pUnit)
 
 	if(m_attackTarget != 0)
 	{
-		Unit *pTarget = GetMapMgr()->GetUnit(m_attackTarget);
+		Unit *pTarget = m_mapMgr ? m_mapMgr->GetUnit(m_attackTarget) : NULL;
 		if(pTarget)
 			pTarget->removeAttacker(this);
 	}

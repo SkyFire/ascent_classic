@@ -365,7 +365,7 @@ Player::Player ( uint32 high, uint32 low )
 	memset(&m_bgScore,0,sizeof(BGScore));
 	m_arenaPoints = 0;
 	_delayAntiFlyUntil=0;
-	memset(&m_spellTypeTargets, 0, sizeof(Unit*)*NUM_SPELL_TYPE_INDEX);
+	memset(&m_spellIndexTypeTargets, 0, sizeof(uint64)*NUM_SPELL_TYPE_INDEX);
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
 	m_arenateaminviteguid=0;
@@ -4860,8 +4860,8 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 	if(pObj->IsUnit())
 	{
 		for(uint32 x = 0; x < NUM_SPELL_TYPE_INDEX; ++x)
-			if(m_spellTypeTargets[x] == pObj)
-				m_spellTypeTargets[x] = NULL;
+			if(m_spellIndexTypeTargets[x] == pObj->GetGUID())
+				m_spellIndexTypeTargets[x] = 0;
 	}
 }
 
@@ -8576,21 +8576,24 @@ void Player::_ModifySkillMaximum(uint32 SkillLine, uint32 NewMax)
 
 void Player::RemoveSpellTargets(uint32 Type)
 {
-	if(m_spellTypeTargets[Type] != NULL)
+	if(m_spellIndexTypeTargets[Type] != 0)
 	{
-		m_spellTypeTargets[Type]->RemoveAurasByBuffIndexType(Type, GetGUID());
-		m_spellTypeTargets[Type]=NULL;
+		Unit * pUnit = m_mapMgr ? m_mapMgr->GetUnit(m_spellIndexTypeTargets[Type]) : NULL;
+		if(pUnit)
+            pUnit->RemoveAurasByBuffIndexType(Type, GetGUID());
+
+		m_spellIndexTypeTargets[Type] = 0;
 	}
 }
 
 void Player::RemoveSpellIndexReferences(uint32 Type)
 {
-	m_spellTypeTargets[Type]=NULL;
+	m_spellIndexTypeTargets[Type] = 0;
 }
 
 void Player::SetSpellTargetType(uint32 Type, Unit* target)
 {
-	m_spellTypeTargets[Type]=target;
+	m_spellIndexTypeTargets[Type] = target->GetGUID();
 }
 
 /************************************************************************/
