@@ -2203,7 +2203,7 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	}
 
 	ss << "', ";
-	ss << m_lastHonorResetTime << ", ";
+	ss << m_honorPointsToAdd << ", ";
 	ss << m_killsToday << ", " << m_killsYesterday << ", " << m_killsLifetime << ", ";
 	ss << m_honorToday << ", " << m_honorYesterday << ", ";
 	ss << m_honorPoints << ", ";
@@ -2798,7 +2798,7 @@ bool Player::LoadFromDB(uint32 guid)
 	}
 	
 
-	uint32 last_update = get_next_field.GetUInt32();
+	m_honorPointsToAdd = get_next_field.GetUInt32();
 	m_killsToday = get_next_field.GetUInt32();
 	m_killsYesterday = get_next_field.GetUInt32();
 	m_killsLifetime = get_next_field.GetUInt32();
@@ -2808,13 +2808,7 @@ bool Player::LoadFromDB(uint32 guid)
 	m_honorPoints = get_next_field.GetUInt32();
     iInstanceType = get_next_field.GetUInt32();
 
-	uint32 next_update = HonorHandler::GetNextUpdateTime();
-	
-	if(last_update <= next_update)
-		HonorHandler::DailyFieldMove(this);
-	else
-		HonorHandler::RecalculateHonorFields(this);
-
+	HonorHandler::RecalculateHonorFields(this);
 	delete result;
   
 	
@@ -8594,6 +8588,11 @@ void Player::RemoveSpellIndexReferences(uint32 Type)
 void Player::SetSpellTargetType(uint32 Type, Unit* target)
 {
 	m_spellIndexTypeTargets[Type] = target->GetGUID();
+}
+
+void Player::RecalculateHonor()
+{
+	HonorHandler::RecalculateHonorFields(this);
 }
 
 /************************************************************************/

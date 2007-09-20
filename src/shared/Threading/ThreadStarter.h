@@ -26,7 +26,13 @@ public:
 	ThreadBase() : delete_after_use(true) {}
 	virtual ~ThreadBase() {}
 	virtual void run() = 0;
+	void join();
 	bool delete_after_use;
+#ifdef WIN32
+	HANDLE THREAD_HANDLE;
+#else
+	pthread_t THREAD_HANDLE;
+#endif
 };
 
 #ifdef WIN32
@@ -49,7 +55,14 @@ static unsigned int __stdcall thread_func(void * args)
 // Use _beginthreadex to start the thread (MT runtime lib needed)
 inline void launch_thread(ThreadBase * thread)
 {
-	_beginthreadex(0, 0, &thread_func, (void*)thread, 0, 0);
+	uintptr_t ptr = _beginthreadex(0, 0, &thread_func, (void*)thread, 0, 0);
+	if(ptr != -1L)
+		thread->THREAD_HANDLE = (HANDLE)ptr;
+}
+
+inline void ThreadBase::join()
+{
+	WaitForSingleObject(THREAD_HANDLE,INFINITE);
 }
 
 #else
@@ -70,8 +83,12 @@ static void * thread_func(void * args)
 // Use pthread_create to start the thread
 inline void launch_thread(ThreadBase * thread)
 {
-	pthread_t t;
-	pthread_create(&t, 0, thread_func, (void*)thread);
+	pthread_create(&THREAD_HANDLE, 0, thread_func, (void*)thread);
+}
+
+inline void ThreadBase::join()
+{
+	pthread_join(THREAD_HANDLE);
 }
 
 #endif

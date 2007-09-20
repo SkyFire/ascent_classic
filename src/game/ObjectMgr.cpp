@@ -3204,6 +3204,9 @@ void ObjectMgr::LoadArenaTeams()
 		} while(result->NextRow());
 		delete result;
 	}
+
+	/* update the ranking */
+	UpdateArenaTeamRankings();
 }
 
 ArenaTeam * ObjectMgr::GetArenaTeamByGuid(uint32 guid, uint32 Type)

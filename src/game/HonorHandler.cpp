@@ -32,43 +32,13 @@ void WorldSession::HandleSetVisibleRankOpcode(WorldPacket& recv_data)
 
 void HonorHandler::AddHonorPointsToPlayer(Player *pPlayer, uint32 uAmount)
 {
-	pPlayer->m_honorPoints += uAmount;
+	pPlayer->m_honorPointsToAdd += uAmount;
 	pPlayer->m_honorToday += uAmount;
 	
 	pPlayer->HandleProc(PROC_ON_GAIN_EXPIERIENCE, pPlayer, NULL);
 	pPlayer->m_procCounter = 0;
 
 	RecalculateHonorFields(pPlayer);
-}
-
-void HonorHandler::AddArenaPointsToPlayer(Player *pPlayer, uint32 uAmount)
-{
-	pPlayer->m_arenaPoints += uAmount;
-
-	pPlayer->HandleProc(PROC_ON_GAIN_EXPIERIENCE, pPlayer, NULL);
-	pPlayer->m_procCounter = 0;
-
-	RecalculateHonorFields(pPlayer);
-}
-
-time_t HonorHandler::GetNextUpdateTime()
-{
-	time_t ct = time(NULL);
-	struct tm * tp = localtime(&ct);
-	tm now_time = *tp;
-	now_time.tm_hour = now_time.tm_min = now_time.tm_sec = 0;
-
-	return mktime(&now_time);
-}
-
-void HonorHandler::PerformStartupTasks()
-{
-	Log.Notice("HonorHandler", "Starting Honor System...");
-	Log.Notice("HonorHandler", "Checking for out of date players and moving their kill values...");
-	uint32 next_update = GetNextUpdateTime();
-	uint32 now_update = time(NULL);
-
-	CharacterDatabase.WaitExecute("UPDATE characters SET lastDailyReset = %u, killsYesterday = killsToday, honorYesterday = honorToday, killsToday = 0, honorToday = 0 WHERE lastDailyReset < %u", now_update, next_update);
 }
 
 int32 HonorHandler::CalculateHonorPointsForKill(Player *pPlayer, Unit* pVictim)
@@ -198,25 +168,8 @@ void HonorHandler::RecalculateHonorFields(Player *pPlayer)
 	pPlayer->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, pPlayer->m_honorToday);
 	pPlayer->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, pPlayer->m_killsYesterday | ( (pPlayer->m_honorYesterday * 10) << 16));
 	pPlayer->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, pPlayer->m_killsLifetime);
-//	if(pPlayer->m_honorPoints < 0)
-  //	  return;
 	pPlayer->SetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, pPlayer->m_honorPoints);
 	pPlayer->SetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, pPlayer->m_arenaPoints);
-}
-
-void HonorHandler::DailyFieldMove(Player *pPlayer)
-{
-	// Move fields
-	pPlayer->m_honorYesterday = pPlayer->m_honorToday;
-	pPlayer->m_killsYesterday = pPlayer->m_killsToday;
-	
-	pPlayer->m_killsToday = 0;
-	pPlayer->m_honorToday = 0;
-
-	// update fields
-	RecalculateHonorFields(pPlayer);
-	pPlayer->LastHonorResetTime(time(NULL));
-	pPlayer->SaveHonorFields();
 }
 
 bool ChatHandler::HandleAddKillCommand(const char* args, WorldSession* m_session)
@@ -281,13 +234,5 @@ bool ChatHandler::HandleGlobalHonorDailyMaintenanceCommand(const char* args, Wor
 
 bool ChatHandler::HandleNextDayCommand(const char* args, WorldSession* m_session)
 {
-	Player * plr = getSelectedChar(m_session);
-	if(plr == 0)
-		return true;
-
-	BlueSystemMessage(m_session, "Moving honor fields to tomorrow for player %s.", plr->GetName());
-	GreenSystemMessage(m_session, "%s moved your honor fields to tomorrow.", m_session->GetPlayer()->GetName());
-
-	HonorHandler::DailyFieldMove(plr);
-	return true;
+	return false;
 }

@@ -618,6 +618,9 @@ public:
 	void _AdvanceAllSkills(uint32 count);
 	void _ModifySkillMaximum(uint32 SkillLine, uint32 NewMax);
 
+
+	void RecalculateHonor();
+
 protected:
 	void _UpdateSkillFields();
     
@@ -1352,6 +1355,7 @@ public:
 	uint32 m_honorYesterday;
 	
 	uint32 m_honorPoints;
+	uint32 m_honorPointsToAdd;
 	uint32 m_killsToday;
 	uint32 m_killsYesterday;
 	uint32 m_killsLifetime;

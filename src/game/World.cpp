@@ -22,6 +22,7 @@
 initialiseSingleton( World );
 time_t World::UNIXTIME = time(NULL);
 time_t World::MSTIME = getMSTime();
+static DayWatcherThread * dw = NULL;
 
 World::World()
 {
@@ -55,6 +56,10 @@ World::World()
 
 World::~World()
 {
+	Log.Notice("DayWatcherThread", "Joining...");
+	dw->terminate();
+	dw = NULL;
+
 	sLog.outString("  Saving players to DB...");
 	for(SessionMap::iterator i=m_sessions.begin();i!=m_sessions.end();i++)
 	{
@@ -1737,9 +1742,6 @@ void World::SetInitialWorldSettings()
 	new AuctionMgr;
 	sAuctionMgr.LoadAuctionHouses();
 
-
-	HonorHandler::PerformStartupTasks();
-
 	m_queueUpdateTimer = mQueueUpdateInterval;
 	if(Config.MainConfig.GetBoolDefault("Startup", "Preloading", false))
 	{
@@ -1767,6 +1769,9 @@ void World::SetInitialWorldSettings()
 
 	Log.Notice("BattlegroundManager", "Starting...");
 	new CBattlegroundManager;
+
+	dw = new DayWatcherThread();
+	launch_thread(dw);
 }
 
 
@@ -2333,6 +2338,9 @@ void World::Rehash(bool load)
 	setRate(RATE_SKILLRATE, Config.MainConfig.GetFloatDefault("Rates", "SkillRate", 1.0f));
 	setIntRate(INTRATE_COMPRESSION, Config.MainConfig.GetIntDefault("Rates", "Compression", 1));
 	setIntRate(INTRATE_PVPTIMER, Config.MainConfig.GetIntDefault("Rates", "PvPTimer", 300000));
+	setRate(RATE_ARENAPOINTMULTIPLIER2X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier2x", 1.0f));
+	setRate(RATE_ARENAPOINTMULTIPLIER3X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier3x", 1.0f));
+	setRate(RATE_ARENAPOINTMULTIPLIER5X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier5x", 1.0f));
 	SetPlayerLimit(Config.MainConfig.GetIntDefault("Server", "PlayerLimit", 1000));
 	SetMotd(Config.MainConfig.GetStringDefault("Server", "Motd", "Ascent Default MOTD").c_str());
 	SetUpdateDistance( Config.MainConfig.GetFloatDefault("Server", "PlrUpdateDistance", 79.1f) );

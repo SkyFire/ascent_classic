@@ -17,11 +17,20 @@
  *
  */
 
+/* Arena and Honor Point Calculation System
+ *    Copyright (c) 2007 Burlex
+ */
+
 #include "StdAfx.h"
 
 DayWatcherThread::DayWatcherThread() : m_cond(&m_mutex)
 {
 	m_running = true;
+}
+
+DayWatcherThread::~DayWatcherThread()
+{
+
 }
 
 void DayWatcherThread::terminate()
@@ -31,6 +40,7 @@ void DayWatcherThread::terminate()
 	if(!m_busy)
 		m_cond.Broadcast();
 	m_cond.EndSynchronized();
+	join();
 }
 
 void DayWatcherThread::dupe_tm_pointer(tm * returnvalue, tm * mypointer)
@@ -52,7 +62,7 @@ void DayWatcherThread::load_settings()
 	honor_period = get_timeout_from_string(honor_timeout.c_str(), DAILY);
 	arena_period = get_timeout_from_string(arena_timeout.c_str(), WEEKLY);
 
-	QueryResult * result = CharacterDatabase.Query("SELECT * FROM server_settings WHERE setting_id = \"last_honor_update_time\"");
+	QueryResult * result = CharacterDatabase.Query("SELECT setting_value FROM server_settings WHERE setting_id = \"last_honor_update_time\"");
 	if(result)
 	{
 		last_honor_time = result->Fetch()[0].GetUInt32();
@@ -61,7 +71,7 @@ void DayWatcherThread::load_settings()
 	else
 		last_honor_time = 0;
 
-	result = CharacterDatabase.Query("SELECT * FROM server_settings WHERE setting_id = \"last_arena_update_time\"");
+	result = CharacterDatabase.Query("SELECT setting_value FROM server_settings WHERE setting_id = \"last_arena_update_time\"");
 	if(result)
 	{
 		last_arena_time = result->Fetch()[0].GetUInt32();
@@ -122,11 +132,13 @@ void DayWatcherThread::run()
 	dupe_tm_pointer(localtime(&currenttime), &local_currenttime);
 	load_settings();
 	set_tm_pointers();
+	m_busy = false;
 	
 	while(ThreadState != THREADSTATE_TERMINATE)
 	{
 		m_cond.BeginSynchronized();
 
+		m_busy=true;
 		currenttime = UNIXTIME;
 		dupe_tm_pointer(localtime(&currenttime), &local_currenttime);
 		if(has_timeout_expired(&local_currenttime, &local_last_honor_time, honor_period))
@@ -138,7 +150,11 @@ void DayWatcherThread::run()
 		if(m_dirty)
 			update_settings();
 
-		m_cond.Wait(timeout);
+		m_busy=false;
+		if(ThreadState == THREADSTATE_TERMINATE)
+			break;
+
+		m_cond.Wait(timeout*2);
 		if(!m_running)
 		{
 			m_cond.EndSynchronized();
@@ -151,9 +167,106 @@ void DayWatcherThread::run()
 
 void DayWatcherThread::update_arena()
 {
-	QueryResult * result = CharacterDatabase.Query("SELECT ");
+	Log.Notice("DayWatcherThread", "Running Weekly Arena Point Maintenance...");
+	QueryResult * result = CharacterDatabase.Query("SELECT guid, arenaPoints FROM characters");		/* this one is a little more intensive. */
+	Player * plr;
+	uint32 guid, arenapoints, orig_arenapoints;
+	ArenaTeam * team;
+	long double X, Y;
+	if(result)
+	{
+		do
+		{
+			Field * f = result->Fetch();
+			guid = f[0].GetUInt32();
+			arenapoints = f[1].GetUInt32();
+			orig_arenapoints = arenapoints;
 
-    //===========================================================================
+			/* are we in any arena teams? */
+			for(uint32 i = 0; i < 3; ++i)			// 3 arena team types
+			{
+				team = objmgr.GetArenaTeamByGuid(guid, i);
+				if(team)
+				{
+					/* TODO: In the future we might want to do a check that says is the player active in this arena team.
+					 * Private servers are kinda smaller so this probably isn't such a good idea.
+					 * - Burlex */
+
+					/* we're in an arena team of this type! */
+					/* Source: http://www.wowwiki.com/Arena_point */
+					X = (long double)team->m_stat_rating;
+					if(X <= 510.0)	// "if X<=510"
+						continue;		// no change
+					else if(X > 510.0 && X <= 1500.0)		// "if 510 < X <= 1500"
+					{
+						Y = (0.38 * X) - 194.0;
+					}
+					else			// "if X > 1500"
+					{
+						// how nice of wowwiki. they prevent a divide by zero for us.
+						//              1426.79
+						//   ---------------------------
+						//                 -0.00386405X
+						//         1+918.836
+
+						/*long double power = ((-0.00386405) * X);
+						if(power < 1.0)
+							power = 1.0;
+
+						long double divisor = pow(long double(918.836), power);						
+						divisor += 1.0;
+						if(divisor < 1.0)
+							divisor = 1.0;
+
+						Y = 1426.79 / divisor;*/
+
+						// Burlex - The above formula is giving really odd results... gonna use this one instead. */
+						Y = (0.45 * X) - 150.0;
+					}
+
+					// 2v2 teams only earn 70% (Was 60% until 13th March 07) of the arena points, 3v3 teams get 80%, while 5v5 teams get 100% of the arena points.
+					if(team->m_type == ARENA_TEAM_TYPE_2V2)
+					{
+						Y *= 0.70;
+						Y *= sWorld.getRate(RATE_ARENAPOINTMULTIPLIER2X);
+					}
+					else if(team->m_type == ARENA_TEAM_TYPE_3V3)
+					{
+						Y *= 0.80;
+						Y *= sWorld.getRate(RATE_ARENAPOINTMULTIPLIER3X);
+					}
+					else
+					{
+						Y *= sWorld.getRate(RATE_ARENAPOINTMULTIPLIER5X);
+					}
+					
+					if(Y > 1.0)
+						arenapoints += long2int32(double(ceil(Y)));
+				}
+			}
+
+			if(orig_arenapoints != arenapoints)
+			{
+				plr = objmgr.GetPlayer(guid);
+				if(plr)
+				{
+					plr->m_arenaPoints = arenapoints;
+					
+					/* update visible fields (must be done through an event because of no uint lock */
+					sEventMgr.AddEvent(plr, &Player::RecalculateHonor, EVENT_PLAYER_UPDATE, 100, 1, 0);
+	
+					/* send a little message :> */
+					sChatHandler.SystemMessage(plr->GetSession(), "Your arena points have been updated! Check your PvP tab!");
+				}
+
+				/* update in sql */
+				CharacterDatabase.Execute("UPDATE characters SET arenaPoints = %u WHERE guid = %u", arenapoints, guid);
+			}
+		}while(result->NextRow());
+		delete result;
+	}
+
+	//===========================================================================
 	last_arena_time = UNIXTIME;
 	dupe_tm_pointer(localtime(&last_arena_time), &local_last_arena_time);
 	m_dirty = true;
@@ -161,24 +274,62 @@ void DayWatcherThread::update_arena()
 
 void DayWatcherThread::update_honor()
 {
-	uint32 guid, killstoday, killsyesterday, killslifetime, honortoday, honoryesterday, honorpoints, points_to_add;
-	QueryResult * result = CharacterDatabase.Query("SELECT guid, killsToday, killsYesterday, killsLifeTime, honorToday, honorYesterday, honorPoints, honorPointsToAdd");
+	Log.Notice("DayWatcherThread", "Running Daily Honor Maintenance...");
+	uint32 guid, killstoday, killsyesterday, honortoday, honoryesterday, honorpoints, points_to_add;
+	Player * plr;
+	QueryResult * result = CharacterDatabase.Query("SELECT guid, killsToday, killsYesterday, honorToday, honorYesterday, honorPoints, honorPointsToAdd FROM characters");
+	
 	if(result)
 	{
-		Field * f = result->Fetch();
-		guid = f[0].GetUInt32();
-		killstoday = f[1].GetUInt32();
-		killsyesterday = f[2].GetUInt32();
-		killslifetime = f[3].GetUInt32();
-		honortoday = f[4].GetUInt32();
-		honoryesterday = f[5].GetUInt32();
-		honorpoints = f[6].GetUInt32();
-		points_to_add = f[7].GetUInt32();
+		do 
+		{
+			Field * f = result->Fetch();
+			guid = f[0].GetUInt32();
+			killstoday = f[1].GetUInt32();
+			killsyesterday = f[2].GetUInt32();
+			honortoday = f[3].GetUInt32();
+			honoryesterday = f[4].GetUInt32();
+			honorpoints = f[5].GetUInt32();
+			points_to_add = f[6].GetUInt32();
+
+			/* add his "honor points to be added" */
+			honorpoints += points_to_add;
+			points_to_add = 0;
+
+			/* update the yesterday fields */
+			killsyesterday = killstoday;
+			honoryesterday = honortoday;
+			honortoday = killstoday = 0;
+
+			/* are we online? */
+			plr = objmgr.GetPlayer(guid);
+			if(plr)
+			{
+				/* we're online, update our fields here too */
+				plr->m_honorPoints = honorpoints;
+				plr->m_honorPointsToAdd = points_to_add;
+				plr->m_honorToday = honortoday;
+				plr->m_honorYesterday = honoryesterday;
+				plr->m_killsToday = killstoday;
+				plr->m_killsYesterday = killsyesterday;
+
+				/* update visible fields (must be done through an event because of no uint lock */
+				sEventMgr.AddEvent(plr, &Player::RecalculateHonor, EVENT_PLAYER_UPDATE, 100, 1, 0);
+
+				/* send a little message :> */
+				sChatHandler.SystemMessage(plr->GetSession(), "Your honor points have been updated! Check your PvP tab!");
+			}
+
+			/* update in database */
+			CharacterDatabase.Execute("UPDATE characters SET killsToday = %u, killsYesterday = %u, honorToday = %u, honorYesterday = %u, honorPoints = %u, honorPointsToAdd = %u WHERE guid = %u",
+				killstoday, killsyesterday, honortoday, honoryesterday, honorpoints, points_to_add);
+		} while(result->NextRow());
+		delete result;
 	}
 
 	//===========================================================================
 	last_honor_time = UNIXTIME;
-	dupe_tm_pointer(localtime(&last_honor_time), &local_last_arena_time);
+	dupe_tm_pointer(localtime(&last_honor_time), &local_last_honor_time);
 	m_dirty = true;
 }
 

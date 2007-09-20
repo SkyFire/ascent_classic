@@ -9,6 +9,8 @@ libgame_a_SOURCES = \
     ../scriptengine/ScriptFunctions.cpp \
     ../scriptengine/ScriptFunctions.h \
     ../scriptengine/ScriptFunctionTable.cpp \
+    DailyWatcherThread.cpp \
+    DailyWatcherThread.h \
     ArenaTeam.cpp \
     ArenaTeam.h \
 	DatabaseCleaner.cpp \
