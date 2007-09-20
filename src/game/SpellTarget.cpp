@@ -332,6 +332,9 @@ void Spell::SpellTargetPet(uint32 i, uint32 j)
 /// Spell Target Handling for type 6 and 77: Single Target Enemy (grep thinks 77 fits in 6)
 void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 {
+	if(!m_caster->IsInWorld())
+		return;
+
     TargetsList *tmpMap=&m_targetUnits[i];
     if(m_spellInfo->TargetCreatureType  && GUID_HIPART(m_targets.m_unitTarget)==HIGHGUID_UNIT)
     {		
@@ -441,10 +444,14 @@ void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 void Spell::SpellTargetSingleTargetFriend(uint32 i, uint32 j)
 {
     TargetsList *tmpMap=&m_targetUnits[i];
-    Unit *Target = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
+	Unit *Target;
+	if(m_targets.m_unitTarget == m_caster->GetGUID())
+		Target = u_caster;
+	else
+		Target = m_caster->GetMapMgr() ? m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget) : NULL;
     if(!Target)
-        //continue;
         return;
+
     float r= GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
     if(IsInrange (m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target, r*r))
         SafeAddTarget(tmpMap,m_targets.m_unitTarget);
@@ -621,6 +628,9 @@ void Spell::SpellTargetNearbyPartyMembers(uint32 i, uint32 j)
 void Spell::SpellTargetSingleTargetPartyMember(uint32 i, uint32 j)
 {
     TargetsList *tmpMap=&m_targetUnits[i];
+	if(!m_caster->IsInWorld())
+		return;
+
     Unit* Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
     if(!Target)
         return;
@@ -639,6 +649,9 @@ void Spell::SpellTargetScriptedEffects2(uint32 i, uint32 j)
 /// Spell Target Handling for type 37: all Members of the targets party
 void Spell::SpellTargetPartyMember(uint32 i, uint32 j)
 {
+	if(!m_caster->IsInWorld())
+		return;
+
     TargetsList *tmpMap=&m_targetUnits[i];
     // if no group target self
     Player * Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
@@ -700,6 +713,9 @@ void Spell::SpellTargetTotem(uint32 i, uint32 j)
 /// Spell Target Handling for type 45: Chain,!!only for healing!! for chain lightning =6 
 void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 {
+	if(!m_caster->IsInWorld())
+		return;
+
     TargetsList *tmpMap=&m_targetUnits[i];
     //if selected target is party member, then jumps on party
     Unit* firstTarget;
@@ -849,6 +865,9 @@ void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
 /// Spell Target Handling for type 57: Targeted Party Member
 void Spell::SpellTargetTargetPartyMember(uint32 i, uint32 j)
 {
+	if(!m_caster->IsInWorld())
+		return;
+
     TargetsList *tmpMap=&m_targetUnits[i];
     Unit* Target = m_caster->GetMapMgr()->GetPlayer (m_targets.m_unitTarget);
     if(!Target)
@@ -863,6 +882,9 @@ void Spell::SpellTargetTargetPartyMember(uint32 i, uint32 j)
 void Spell::SpellTargetSameGroupSameClass(uint32 i, uint32 j)
 {
     TargetsList *tmpMap=&m_targetUnits[i];
+	if(!m_caster->IsInWorld())
+		return;
+
     Player * Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
     if(!Target)
         return;
