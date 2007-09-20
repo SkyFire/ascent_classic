@@ -596,16 +596,16 @@ bool Player::Create(WorldPacket& data )
 	memset(m_taximask,0,sizeof(m_taximask));
 	switch(race)
 	{
-	case RACE_TAUREN:		m_taximask[0]= 1 << (22-1); break;
-	case RACE_HUMAN:		 m_taximask[0]= 1 << ( 2-1); break;
-	case RACE_DWARF:		 m_taximask[0]= 1 << ( 6-1); break;
-	case RACE_GNOME:		 m_taximask[0]= 1 << ( 6-1); break;
-	case RACE_ORC:		   m_taximask[0]= 1 << (23-1); break;
-	case RACE_TROLL:		 m_taximask[0]= 1 << (23-1); break;
-	case RACE_UNDEAD:		m_taximask[0]= 1 << (11-1); break;
-	case RACE_NIGHTELF:	  m_taximask[0]= 1 << (27-1); break;
-	case RACE_BLOODELF:		 m_taximask[2]= 1 << (18-1); break;
-	case RACE_DRAENEI:		 m_taximask[2]= 1 << (30-1); break;
+	case RACE_TAUREN:       m_taximask[0]= 1 << (22-1); break;
+	case RACE_HUMAN:        m_taximask[0]= 1 << ( 2-1); break;
+	case RACE_DWARF:        m_taximask[0]= 1 << ( 6-1); break;
+	case RACE_GNOME:        m_taximask[0]= 1 << ( 6-1); break;
+	case RACE_ORC:          m_taximask[0]= 1 << (23-1); break;
+	case RACE_TROLL:        m_taximask[0]= 1 << (23-1); break;
+	case RACE_UNDEAD:       m_taximask[0]= 1 << (11-1); break;
+	case RACE_NIGHTELF:     m_taximask[0]= 1 << (27-1); break;
+	case RACE_BLOODELF:     m_taximask[2]= 1 << (18-1); break;
+	case RACE_DRAENEI:      m_taximask[2]= 1 << (30-1); break;
 	}
 
 	// Set Starting stats for char
@@ -5385,11 +5385,54 @@ void Player::SendInitialLogonPackets()
 	//Factions
 	smsg_InitialFactions();
 
+
+    /* Some minor documentation about the time field
+    // MOVE THIS DOCUMENATION TO THE WIKI
+    
+    minute's = 0x0000003F                  00000000000000000000000000111111
+    hour's   = 0x000007C0                  00000000000000000000011111000000
+    weekdays = 0x00003800                  00000000000000000011100000000000
+    days     = 0x000FC000                  00000000000011111100000000000000
+    months   = 0x00F00000                  00000000111100000000000000000000
+    years    = 0x1F000000                  00011111000000000000000000000000
+    unk	     = 0xE0000000                  11100000000000000000000000000000
+    */
+
 	data.Initialize(SMSG_LOGIN_SETTIMESPEED);
 	time_t minutes = sWorld.GetGameTime( ) / 60;
 	time_t hours = minutes / 60; minutes %= 60;
-	time_t gameTime = minutes + ( hours << 6 );
-	data << (uint32)gameTime;
+    time_t gameTime = 0;
+    
+    // TODO: Add stuff to handle these variable's
+    uint32 DayOfTheWeek     = -1;    //(0b111 = (any) day, 0 = Monday ect)
+    uint32 DayOfTheMonth    = 20-1;   // Day - 1 (0 is actual 1) its now the 20e here. TODO: replace this one with the proper date
+    uint32 CurrentMonth     = 9-1;    // Month - 1 (0 is actual 1) same as above. TODO: replace it with the proper code
+    uint32 CurrentYear      = 7;    // 2000 + this number results in a correct value for this crap. TODO: replace this with the propper code
+
+    #define MINUTE_BITMASK      0x0000003F
+    #define HOUR_BITMASK        0x000007C0
+    #define WEEKDAY_BITMASK     0x00003800
+    #define DAY_BITMASK         0x000FC000
+    #define MONTH_BITMASK       0x00F00000
+    #define YEAR_BITMASK        0x1F000000
+    #define UNK_BITMASK         0xE0000000
+
+    #define MINUTE_SHIFTMASK    0
+    #define HOUR_SHIFTMASK      6
+    #define WEEKDAY_SHIFTMASK   11
+    #define DAY_SHIFTMASK       14
+    #define MONTH_SHIFTMASK     20
+    #define YEAR_SHIFTMASK      24
+    #define UNK_SHIFTMASK       29
+
+    gameTime = ((minutes << MINUTE_SHIFTMASK) & MINUTE_BITMASK);
+    gameTime|= ((hours << HOUR_SHIFTMASK) & HOUR_BITMASK);
+    gameTime|= ((DayOfTheWeek << WEEKDAY_SHIFTMASK) & WEEKDAY_BITMASK);
+    gameTime|= ((DayOfTheMonth << DAY_SHIFTMASK) & DAY_BITMASK);
+    gameTime|= ((CurrentMonth << MONTH_SHIFTMASK) & MONTH_BITMASK);
+    gameTime|= ((CurrentYear << YEAR_SHIFTMASK) & YEAR_BITMASK);
+
+    data << (uint32)gameTime;
 	data << (float)0.0166666669777748f;  // Normal Game Speed
 	GetSession()->SendPacket( &data );
 

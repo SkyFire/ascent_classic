@@ -242,6 +242,8 @@ void CommandTableStorage::Init()
 		{ "aispelltestskip", 'd', &ChatHandler::HandleAIAgentDebugSkip, "", NULL, 0, 0, 0 },
 		{ "dumpcoords", 'd', &ChatHandler::HandleDebugDumpCoordsCommmand, "", NULL, 0, 0, 0 },
 		{ "speedchange", 'd', &ChatHandler::HandleSendRunSpeedChange, "", NULL, 0, 0, 0 },
+        { "sendpacket", 'd', &ChatHandler::HandleSendpacket, "<opcode ID>, <data>", NULL, 0, 0, 0 },
+
 		{ NULL,		   0, NULL,									  "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(debugCommandTable, _debugCommandTable);

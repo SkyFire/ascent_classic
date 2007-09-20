@@ -1461,6 +1461,27 @@ void Spell::SendCastResult(int16 result)
 	//}
 }
 
+// uint16 0xFFFF
+enum SpellStartFlags
+{
+    //0x01
+    SPELL_START_FLAG_DEFAULT = 0x02, // atm set as defailt flag
+    //0x04
+    //0x08
+    //0x10
+    SPELL_START_FLAG_RANGED = 0x20,
+    //0x40
+    //0x80
+    //0x100
+    //0x200
+    //0x400
+    //0x800
+    //0x1000
+    //0x2000
+    //0x4000
+    //0x8000
+};
+
 void Spell::SendSpellStart()
 {
 	// no need to send this on passive spells
@@ -1473,6 +1494,11 @@ void Spell::SendSpellStart()
 
 	if(GetType() == SPELL_TYPE_RANGED)
 		cast_flags |= 0x20;
+
+    // hacky yeaaaa
+    if (m_spellInfo->Id == 8326) // death
+        cast_flags = 0x0F;
+
 
 	data.SetOpcode(SMSG_SPELL_START);
 	if(i_caster)
@@ -1533,9 +1559,22 @@ void Spell::SendSpellStart()
 /************************************************************************/
 enum SpellGoFlags
 {
+    //0x01
+    //0x02
+    //0x04
+    //0x08
+    //0x10
     SPELL_GO_FLAGS_RANGED           = 0x20,
+    //0x40
+    //0x80
     SPELL_GO_FLAGS_ITEM_CASTER      = 0x100,
+    //0x200
     SPELL_GO_FLAGS_EXTRA_MESSAGE    = 0x400, //TARGET MISSES AND OTHER MESSAGES LIKE "Resist"
+    //0x800
+    //0x1000
+    //0x2000
+    //0x4000
+    //0x8000
 };
 
 void Spell::SendSpellGo()
@@ -1582,10 +1621,15 @@ void Spell::SendSpellGo()
 		flags |= 0x20;				    // 0x20 RANGED
 
 	if(i_caster)
-		flags |= 0x100;				    // 0x100 ITEM CASTER
+		flags |= SPELL_GO_FLAGS_ITEM_CASTER; // 0x100 ITEM CASTER
 
 	if(ModeratedTargets.size() > 0)
 		flags |= 0x400;				    // 0x400 TARGET MISSES AND OTHER MESSAGES LIKE "Resist"
+
+    // hacky..
+    if (m_spellInfo->Id == 8326)      // death
+        flags = SPELL_GO_FLAGS_ITEM_CASTER | 0x0D;
+    
 
 	if(i_caster && u_caster)			// this is needed for correct cooldown on items
 	{
