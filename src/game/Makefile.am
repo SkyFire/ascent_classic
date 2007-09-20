@@ -9,12 +9,12 @@ libgame_a_SOURCES = \
     ../scriptengine/ScriptFunctions.cpp \
     ../scriptengine/ScriptFunctions.h \
     ../scriptengine/ScriptFunctionTable.cpp \
-    DailyWatcherThread.cpp \
-    DailyWatcherThread.h \
+    DayWatcherThread.cpp \
+    DayWatcherThread.h \
     ArenaTeam.cpp \
     ArenaTeam.h \
-	DatabaseCleaner.cpp \
-	DatabaseCleaner.h \
+    DatabaseCleaner.cpp \
+    DatabaseCleaner.h \
     ObjectStorage.cpp \
     ObjectStorage.h \
     AddonMgr.cpp \
