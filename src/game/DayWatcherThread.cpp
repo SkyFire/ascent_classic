@@ -39,7 +39,9 @@ DayWatcherThread::~DayWatcherThread()
 void DayWatcherThread::terminate()
 {
 	m_running = false;
+#ifdef WIN32
 	SetEvent(m_abortEvent);
+#endif
 }
 
 void DayWatcherThread::dupe_tm_pointer(tm * returnvalue, tm * mypointer)
