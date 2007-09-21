@@ -20,8 +20,8 @@ improved berserker rage - not triggered. Should only get triggered while we have
 [23:54:35] WORLD: target = 283 , Spell Aura id = 42, SpellId  = 20500, i = 0, apply = false
 
 # Sunder Armor - not stackable
-# Disarm - not working in PvE - duh if it's only a visual thing
-# Execute does not show dmglog - needs some special packet or something
+	# Disarm - not working in PvE - duh if it's only a visual thing
+	# Execute does not show dmglog - needs some special packet or something
 # Shield Bash - not working in PvE
 # Pummel - no efect în PvE
 	# Improved Rend 
@@ -39,5 +39,4 @@ improved berserker rage - not triggered. Should only get triggered while we have
 8. Rampage - does not have any effect. Should this use up aurastateflag ? If so then remove it from caster
 
 mocking blow - not working
-taunt - should pull creatures even if they are already attacking
 shield block - should increase block chance to 75%- block does not ocure ?
