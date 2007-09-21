@@ -63,6 +63,7 @@ AIInterface::AIInterface()
 	m_PetOwner = NULL;
 	m_aiCurrentAgent = AGENT_NULL;
 	m_runSpeed = 0.0f;
+	m_flySpeed = 0.0f;
 	UnitToFear = NULL;
 	firstLeaveCombat = true;
 	m_outOfCombatRange = 2500;
@@ -106,6 +107,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 
 	m_walkSpeed = m_Unit->m_walkSpeed*0.001f;//move distance per ms time 
 	m_runSpeed = m_Unit->m_runSpeed*0.001f;//move distance per ms time 
+	m_flySpeed = m_Unit->m_flySpeed * 0.001f;
 	/*if(!m_DefaultMeleeSpell)
 	{
 		m_DefaultMeleeSpell = new AI_Spell;
@@ -140,6 +142,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 
 	m_walkSpeed = m_Unit->m_walkSpeed*0.001f;//move distance per ms time 
 	m_runSpeed = m_Unit->m_runSpeed*0.001f;//move/ms
+	m_flySpeed = m_Unit->m_flySpeed*0.001f;
 	m_sourceX = un->GetPositionX();
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
@@ -1795,7 +1798,7 @@ uint32 AIInterface::getMoveFlags()
 	uint32 MoveFlags = 0;
 	if(m_moveFly == true) //Fly
 	{
-		m_runSpeed = m_Unit->m_flySpeed*0.001f;
+		m_flySpeed = m_Unit->m_flySpeed*0.001f;
 		MoveFlags = 0x300;
 	}
 	else if(m_moveSprint == true) //Sprint
@@ -1841,7 +1844,9 @@ void AIInterface::UpdateMove()
 	m_nextPosX = m_nextPosY = m_nextPosZ = 0;
 
 	uint32 moveTime;
-	if(m_moveRun)
+	if(m_moveFly)
+		moveTime = (uint32) (distance / m_flySpeed);
+	else if(m_moveRun)
 		moveTime = (uint32) (distance / m_runSpeed);
 	else moveTime = (uint32) (distance / m_walkSpeed);
 

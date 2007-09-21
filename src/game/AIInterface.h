@@ -404,6 +404,7 @@ private:
 	// Movement
 	float m_walkSpeed;
 	float m_runSpeed;
+	float m_flySpeed;
 	float m_destinationX;
 	float m_destinationY;
 	float m_destinationZ;
