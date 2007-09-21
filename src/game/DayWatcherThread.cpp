@@ -22,6 +22,9 @@
  */
 
 #include "StdAfx.h"
+#ifdef WIN32
+static HANDLE m_abortEvent = INVALID_HANDLE_VALUE;
+#endif
 
 DayWatcherThread::DayWatcherThread() : m_cond(&m_mutex)
 {
@@ -36,11 +39,7 @@ DayWatcherThread::~DayWatcherThread()
 void DayWatcherThread::terminate()
 {
 	m_running = false;
-	m_cond.BeginSynchronized();
-	if(!m_busy)
-		m_cond.Broadcast();
-	m_cond.EndSynchronized();
-	join();
+	SetEvent(m_abortEvent);
 }
 
 void DayWatcherThread::dupe_tm_pointer(tm * returnvalue, tm * mypointer)
@@ -133,11 +132,13 @@ void DayWatcherThread::run()
 	load_settings();
 	set_tm_pointers();
 	m_busy = false;
+	sThreadMgr.RemoveThread(this);
+#ifdef WIN32
+	m_abortEvent = CreateEvent(NULL, NULL, FALSE, NULL);
+#endif
 	
 	while(ThreadState != THREADSTATE_TERMINATE)
 	{
-		m_cond.BeginSynchronized();
-
 		m_busy=true;
 		currenttime = UNIXTIME;
 		dupe_tm_pointer(localtime(&currenttime), &local_currenttime);
@@ -154,15 +155,17 @@ void DayWatcherThread::run()
 		if(ThreadState == THREADSTATE_TERMINATE)
 			break;
 
-		m_cond.Wait(timeout*2);
+#ifdef WIN32
+		WaitForSingleObject(m_abortEvent, 120000);
+#else
+		Sleep(120000);
+#endif
 		if(!m_running)
-		{
-			m_cond.EndSynchronized();
 			break;
-		}
-
-		m_cond.EndSynchronized();
 	}
+#ifdef WIN32
+	CloseHandle(m_abortEvent);
+#endif
 }
 
 void DayWatcherThread::update_arena()
