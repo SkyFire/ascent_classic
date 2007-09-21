@@ -35,7 +35,8 @@ SMT_RESIST_DISPEL - check if it is used
 - make Fishing chair item spell work. Should spawn a chair and auto sits you in it. While your fishing.
 - not every creature have same speed, implement creature base speed at least for movement maybe for run too
 - elemental creatures do not have fizical attack but magic type, add dmg type to db load
-- some creatures need to fly (is this made already ? )
+- some creatures need to fly (is this made already ? ) on spawn
+- add new column to quests to be able to make required_quest_alternative
 
 ==========================================================================
 ! BUGS !
@@ -59,6 +60,7 @@ SMT_RESIST_DISPEL - check if it is used
 - u aways suffer "1" dmg when u absorb a spell with ward/shield and losing casting time ..
 - when someone cast a spell (firaball,frostbolt,shadowbolt, etc.) and u cast "ice block" when the spell is still "flying" toward u, still make u dmg when she reach u
 - the target is debuffed befor the spell reach it. For example: if a mage cast fireball, right after the cast the target is immediately debuffed with the fireball dot effect
+- some teleportation spells have target_type 17 and they will not generate a target to be teleported. Right now there is a special if for this in spell.cpp (ugly)
 
 ==========================================================================
 Zack - test my shit :
@@ -66,6 +68,8 @@ Zack - test my shit :
 - test function RemoveThreatByPtr
 - don't let rogues stealth with dots
 - ai spell cooldown when not known
+- getrandomplayer,getmosthated not woking ?
+- windfurry gets plain dmg instead of attackpower based dmg (this was fixed once)
 
 ==========================================================================
 Capt - test my shit :

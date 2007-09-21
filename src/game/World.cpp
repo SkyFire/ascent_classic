@@ -1113,7 +1113,7 @@ void World::SetInitialWorldSettings()
 			if(startofid)
 			{
 				startofid += strlen("an additional ");
-				sp->EffectBasePoints[0]=atoi(startofid); //get new chance. This is actually level*8 ;)
+				sp->EffectBasePoints[0]=atoi(startofid); //get new value. This is actually level*8 ;)
 			}
 			sp->Effect[0] = 6; //aura
 			sp->EffectApplyAuraName[0] = 42; //force him to use procspell effect

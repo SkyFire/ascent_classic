@@ -1,5 +1,5 @@
 Shaman:
-2. Searing totem is attacking players in Stealth mode (rogue,shadowmelded etc.)
+windfurry gives direct dmg instead of attack power based dmg
 
 Talents
 

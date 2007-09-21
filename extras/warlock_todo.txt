@@ -3,6 +3,15 @@ Warlock:
 Warclock's have lot's of spells woking,but mostly they depend on pets,and since they'r pets dont like to listen to they'r masters,lock's are abit weak.
 Death Coil need's a dmg heal effect added.It just does damage,but not giving a heal equal to the damage done.
 
+1. All talent pts wich improving drain spells are useless because all channeled spells are not working well, or not working at all (geting interrupted with no reason). That's are soul siphon, improved drain soul, fel concentration, and shadow mastery. Also Siphon Life are not drains any hp.
+2. Improved Howl of Terror - are not working. It's supposed to reduce cast time of that spell by 1.5sec, so make it instant, which does not happens.
+
+Demonology:
+
+1. Demonic Aegis - does not increases efectiveness of armor spells at any rank.
+2. Demonic Knowledge - does not increases spell dmg at all.
+3. Soul Link - deamon does not take any dmg instead of caster. 
+
 Affliction
 Life Tap - last rank isn't working so you don't get any mana whit cost of health points
 Curse of Tongues - nothing happens , no +x% casting time to enemy

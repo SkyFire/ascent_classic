@@ -5,6 +5,8 @@ Ice lance this spell is cheap on mana,and does little damage,but here it gains a
 Double shield - Ice Barrier + Mana Shield,this combo makes a mage mostly impossible to kill if you are melee,since the dmg absorb is unreal.Only one type of shield can be on you at a time.
 Arcane Missles - popular spell due it's unlimited range,if you even run away from the range,they will be still casting on you.When the target leaves the range the channeling should be canceled.
 
+scorch
+
 Mage:
 
 Talents:
