@@ -77,7 +77,7 @@ void CBattlegroundManager::HandleBattlegroundListPacket(WorldSession * m_session
 	m_instanceLock.Acquire();
 	for(map<uint32, CBattleground*>::iterator itr = m_instances[BattlegroundType].begin(); itr != m_instances[BattlegroundType].end(); ++itr)
 	{
-        if(itr->second->GetLevelGroup() == LevelGroup)
+        if(itr->second->GetLevelGroup() == LevelGroup && itr->second->CanPlayerJoin(m_session->GetPlayer()))
 		{
 			data << itr->first;
 			++Count;

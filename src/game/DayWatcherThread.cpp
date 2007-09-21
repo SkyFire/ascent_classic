@@ -26,7 +26,7 @@
 static HANDLE m_abortEvent = INVALID_HANDLE_VALUE;
 #endif
 
-DayWatcherThread::DayWatcherThread() : m_cond(&m_mutex)
+DayWatcherThread::DayWatcherThread()
 {
 	m_running = true;
 }

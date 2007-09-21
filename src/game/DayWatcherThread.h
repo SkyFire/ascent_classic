@@ -35,8 +35,6 @@ class DayWatcherThread : public CThread
 	bool m_running;
 	bool m_busy;
 	bool m_dirty;
-	Condition m_cond;
-	Mutex m_mutex;
 
 	static const time_t timeout = 120;		/* check every 2 minutes */
 	time_t currenttime;
