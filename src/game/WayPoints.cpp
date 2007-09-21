@@ -802,3 +802,112 @@ bool ChatHandler::HandleDeleteWaypoints(const char* args, WorldSession * m_sessi
 	SystemMessage(m_session, "Deleted waypoints for %u", cr->GetSQL_id());
 	return true;
 }
+
+bool ChatHandler::HandleWaypointAddFlyCommand(const char * args, WorldSession * m_session)
+{
+	uint64 guid = m_session->GetPlayer()->GetSelection();
+	if (guid == 0)
+	{
+		SystemMessage(m_session, "No Selection");
+		return true;
+	}
+	AIInterface* ai = NULL;
+	Creature * pCreature = NULL;
+	Player* p = m_session->GetPlayer();
+	if(p->waypointunit != NULL)
+	{
+		SystemMessage(m_session, "Using Previous Unit.");
+		ai = p->waypointunit;
+		if(!ai)
+		{
+			SystemMessage(m_session, "Invalid Creature, please select another one.");
+			return true;
+		}
+
+		pCreature = (Creature*)ai->GetUnit();
+		if(!pCreature)
+		{
+			SystemMessage(m_session, "Invalid Creature, please select another one.");
+			return true;
+		}
+	}
+	else
+	{
+		pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+		if(!pCreature)
+		{
+			SystemMessage(m_session, "You should select a creature.");
+			return true;
+		}
+		ai = pCreature->GetAIInterface();
+	}
+
+	char* pWaitTime = strtok((char*)args, " ");
+	uint32 WaitTime = (pWaitTime)? atoi(pWaitTime) : 10000;
+	char* pForwardEmoteId = strtok(NULL, " ");
+	uint32 ForwardEmoteId = (pForwardEmoteId)? atoi(pForwardEmoteId) : 0;
+	char* pBackwardEmoteId = strtok(NULL, " ");
+	uint32 BackwardEmoteId = (pBackwardEmoteId)? atoi(pBackwardEmoteId) : 0;
+	char* pForwardSkinId = strtok(NULL, " ");
+	uint32 ForwardSkinId = (pForwardSkinId)? atoi(pForwardSkinId) : pCreature->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID);
+	char* pBackwardSkinId = strtok(NULL, " ");
+	uint32 BackwardSkinId = (pBackwardSkinId)? atoi(pBackwardSkinId) : pCreature->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID);
+	char* pForwardEmoteOneShot = strtok(NULL, " ");
+	uint32 ForwardEmoteOneShot = (pForwardEmoteOneShot)? atoi(pForwardEmoteOneShot) : 1;
+	char* pBackwardEmoteOneShot = strtok(NULL, " ");
+	uint32 BackwardEmoteOneShot = (pBackwardEmoteOneShot)? atoi(pBackwardEmoteOneShot) : 1;
+
+	WayPoint* wp = new WayPoint;
+	bool showing = ai->m_WayPointsShowing;
+	wp->id = ai->GetWayPointsCount()+1;
+	wp->x = p->GetPositionX();
+	wp->y = p->GetPositionY();
+	wp->z = p->GetPositionZ();
+	wp->waittime = WaitTime;
+	wp->flags = 768;
+	wp->forwardemoteoneshot = ForwardEmoteOneShot;
+	wp->forwardemoteid = ForwardEmoteId;
+	wp->backwardemoteoneshot = BackwardEmoteOneShot;
+	wp->backwardemoteid = BackwardEmoteId;
+	wp->forwardskinid = ForwardSkinId;
+	wp->backwardskinid = BackwardSkinId;
+
+	if(showing)
+		ai->hideWayPoints(p);
+
+	ai->addWayPoint(wp);
+	ai->saveWayPoints();
+
+	if(showing)
+		ai->showWayPoints(p,ai->m_WayPointsShowBackwards);
+
+	SystemMessage(m_session, "Waypoint %u added.", wp->id);
+	return true;
+}
+
+bool ChatHandler::HandleNpcSelectCommand(const char * args, WorldSession * m_session)
+{
+	Creature * un = NULL;
+	float dist = 999999.0f;
+	float dist2;
+	Player * plr = m_session->GetPlayer();
+	set<Object*>::iterator itr;
+	for(itr = plr->GetInRangeSetBegin(); itr != plr->GetInRangeSetEnd(); ++itr)
+	{
+		if( (dist2 = plr->GetDistance2dSq(*itr)) < dist && (*itr)->GetTypeId() == TYPEID_UNIT )
+		{
+			un = ((Creature*)*itr);
+			dist = dist2;
+		}
+	}
+
+	if(!un)
+	{
+		SystemMessage(m_session, "No inrange creatures found.");
+		return true;
+	}
+
+	plr->SetSelection(un->GetGUID());
+	SystemMessage(m_session, "Set selection to "I64FMT" (%s)", un->GetGUID(), un->GetCreatureName() ? un->GetCreatureName()->Name : "Unknown");
+	return true;
+}

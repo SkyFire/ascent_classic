@@ -33,7 +33,7 @@ struct CreatureItem
 	int amount;
 };
 
-bool Rand(float chance);
+SERVER_DECL bool Rand(float chance);
 
 struct CreatureInfo
 {

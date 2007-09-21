@@ -2067,6 +2067,7 @@ bool AIInterface::showWayPoints(Player* pPlayer, bool Backwards)
 			pWayPoint->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE , pPlayer->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 			pWayPoint->SetUInt32Value(UNIT_FIELD_HEALTH, 1);
 			pWayPoint->SetUInt32Value(UNIT_FIELD_MAXHEALTH, 1);
+			pWayPoint->SetUInt32Value(UNIT_FIELD_PADDING, wp->flags);
 
 			//Create on client
 			ByteBuffer buf(2500);

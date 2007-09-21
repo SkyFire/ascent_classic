@@ -265,6 +265,7 @@ void CommandTableStorage::Init()
 		{ "generate",	'w', &ChatHandler::HandleGenerateWaypoints,	"Randomly generate wps",		  NULL, 0, 0, 0},
 		{ "save",		 'w', &ChatHandler::HandleSaveWaypoints,		"Save all waypoints",			  NULL, 0, 0, 0},
 		{ "deleteall",	 'w', &ChatHandler::HandleDeleteWaypoints,	  "Delete all waypoints",			  NULL, 0, 0, 0},
+		{ "addfly", 'w', &ChatHandler::HandleWaypointAddFlyCommand, "Adds a flying waypoint", NULL, 0, 0, 0 },
 		{ NULL,			0, NULL,									 "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(waypointCommandTable, _waypointCommandTable);
@@ -338,6 +339,7 @@ void CommandTableStorage::Init()
 		{ "spawnlink", 'n', &ChatHandler::HandleNpcSpawnLinkCommand, ".spawnlink sqlentry", NULL, 0, 0, 0 },
 		{ "possess", 'n', &ChatHandler::HandleNpcPossessCommand, ".npc possess - Possess an npc (mind control)", NULL, 0, 0, 0 },
 		{ "unpossess", 'n', &ChatHandler::HandleNpcUnPossessCommand, ".npc unpossess - Unposses any currently possessed npc.", NULL, 0, 0, 0 },
+		{ "select", 'n', &ChatHandler::HandleNpcSelectCommand, ".npc select - selects npc closest", NULL, 0, 0, 0 },
 		{ NULL,		  2, NULL,						   "",										   NULL, 0, 0  }
 	};
 	dupe_command_table(NPCCommandTable, _NPCCommandTable);

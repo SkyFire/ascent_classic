@@ -352,6 +352,13 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 		
 			if(static_cast<Unit*>(this)->GetAIInterface()->IsFlying())
 				flags2 |= 0x800;
+			if(static_cast<Creature*>(this)->proto && static_cast<Creature*>(this)->proto->extra_a9_flags)
+				flags2 |= static_cast<Creature*>(this)->proto->extra_a9_flags;
+			if(GetGUIDHigh() == HIGHGUID_WAYPOINT)
+			{
+				if(GetUInt32Value(UNIT_FIELD_PADDING) == 768)		// flying waypoint
+					flags2 |= 0x800;
+			}
 		}
 
 		*data << (uint32)flags2;
