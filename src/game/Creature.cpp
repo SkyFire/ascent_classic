@@ -788,8 +788,9 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID,spawn->displayid);
 	SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,proto->MountedDisplayID);
 
+	// Whee, thank you blizz, I love patch 2.2! Later on, we can randomize male/female mobs! xD
 	// Determine gender (for voices)
-	if(spawn->displayid != creature_info->DisplayID)
+	if(spawn->displayid != creature_info->Male_DisplayID)
 		setGender(1);   // Female
 	
     //SetUInt32Value(UNIT_FIELD_LEVEL, (mode ? proto->Level + (info ? info->lvl_mod_a : 0) : proto->Level));
@@ -988,8 +989,12 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 	SetUInt32Value(UNIT_FIELD_MAXPOWER1,proto->Mana);
 	SetUInt32Value(UNIT_FIELD_BASE_MANA,proto->Mana);
 
-	SetUInt32Value(UNIT_FIELD_DISPLAYID,creature_info->DisplayID);
-	SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID,creature_info->DisplayID);
+	uint32 model;
+	uint32 gender = creature_info->GenerateModelId(&model);
+	setGender(gender);
+
+	SetUInt32Value(UNIT_FIELD_DISPLAYID,model);
+	SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID,model);
 	SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,proto->MountedDisplayID);
 
 	//SetUInt32Value(UNIT_FIELD_LEVEL, (mode ? proto->Level + (info ? info->lvl_mod_a : 0) : proto->Level));
@@ -1261,8 +1266,8 @@ void Creature::SetGuardWaypoints()
 		wp->backwardemoteoneshot = 0;
 		wp->forwardemoteid = 0;
 		wp->forwardemoteoneshot = 0;
-		wp->backwardskinid = GetCreatureName()->DisplayID;
-		wp->forwardskinid = GetCreatureName()->DisplayID;
+		wp->backwardskinid = m_uint32Values[UNIT_FIELD_NATIVEDISPLAYID];
+		wp->forwardskinid = m_uint32Values[UNIT_FIELD_NATIVEDISPLAYID];
 		GetAIInterface()->addWayPoint(wp);
 	}
 }

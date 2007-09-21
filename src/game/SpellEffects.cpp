@@ -685,8 +685,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				NewSummon->SetInstanceID(m_caster->GetInstanceID());
 				// Fields
 				NewSummon->SetUInt32Value(UNIT_FIELD_LEVEL,m_caster->GetUInt32Value(UNIT_FIELD_LEVEL));
-				NewSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->DisplayID);
-				NewSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->DisplayID);
+				NewSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->Male_DisplayID);
+				NewSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->Male_DisplayID);
 				NewSummon->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID());
 				NewSummon->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
 				NewSummon->SetUInt32Value(UNIT_NPC_FLAGS , 0);
@@ -2902,8 +2902,8 @@ void Spell::SpellEffectAddFarsight(uint32 i) // Add Farsight
 		InvisibleSummon->SetUInt32Value(UNIT_FIELD_LEVEL, 1);
 //		InvisibleSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  14495);
 //		InvisibleSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, 14495);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->DisplayID);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->DisplayID);
+		InvisibleSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->Male_DisplayID);
+		InvisibleSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->Male_DisplayID);
 		InvisibleSummon->SetUInt32Value(UNIT_FIELD_HEALTH , 100);
 		InvisibleSummon->SetUInt32Value(UNIT_FIELD_MAXHEALTH , 100);
 		InvisibleSummon->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, m_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
@@ -2963,8 +2963,8 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 
 		// Fields
 		NewSummon->SetUInt32Value(UNIT_FIELD_LEVEL,m_caster->GetUInt32Value(UNIT_FIELD_LEVEL));
-		NewSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->DisplayID);
-		NewSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->DisplayID);
+		NewSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->Male_DisplayID);
+		NewSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->Male_DisplayID);
 		NewSummon->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID());
 		NewSummon->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
 		NewSummon->SetUInt32Value(UNIT_FIELD_HEALTH , 100);
@@ -3449,8 +3449,8 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	pTotem->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, 2000);
 	pTotem->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.0f);
 	pTotem->SetFloatValue(UNIT_FIELD_COMBATREACH, 1.0f);
-	pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, ci->DisplayID);
-	pTotem->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->DisplayID);
+	pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, ci->Male_DisplayID);
+	pTotem->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->Male_DisplayID);
 	pTotem->SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 	pTotem->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 	pTotem->SetUInt32Value(UNIT_FIELD_BYTES_2, 1 | (0x28 << 8));

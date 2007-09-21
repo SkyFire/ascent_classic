@@ -1788,7 +1788,7 @@ bool ChatHandler::HandleCreatePetCommand(const char* args, WorldSession* m_sessi
 	sp->id = 1;
 	sp->bytes = 0;
 	sp->bytes2 = 0;
-	sp->displayid = pCreatureInfo->DisplayID;
+	sp->displayid = pCreatureInfo->Male_DisplayID;
 	sp->emote_state = 0;
 	sp->entry = pCreatureInfo->Id;
 	sp->factionid = pTemplate->Faction;
@@ -2521,7 +2521,8 @@ bool ChatHandler::HandleCreatureSpawnCommand(const char *args, WorldSession *m_s
 	}
 
 	CreatureSpawn * sp = new CreatureSpawn;
-	sp->displayid = info->DisplayID;
+	//sp->displayid = info->DisplayID;
+	info->GenerateModelId(&sp->displayid);
 	sp->entry = entry;
 	sp->form = 0;
 	sp->id = objmgr.GenerateCreatureSpawnID();

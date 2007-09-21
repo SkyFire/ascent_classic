@@ -369,6 +369,8 @@ Player::Player ( uint32 high, uint32 low )
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
 	m_arenateaminviteguid=0;
+	m_arenaPoints=0;
+	m_honorPointsToAdd=0;
 }
 
 
@@ -1252,7 +1254,7 @@ void Player::BuildEnumData( WorldPacket * p_data )
 		}
 	}
 	if(info)  //PET INFO uint32 displayid,	uint32 level,		 uint32 familyid
-		*p_data << uint32(info->DisplayID) << uint32(getLevel()) << uint32(info->Family);
+		*p_data << uint32(info->Male_DisplayID) << uint32(getLevel()) << uint32(info->Family);
 	else
 		*p_data << uint32(0) << uint32(0) << uint32(0);
 

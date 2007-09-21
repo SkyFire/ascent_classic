@@ -3537,7 +3537,7 @@ void Aura::SpellAuraTransform(bool apply)
 	uint32 displayId = 0;
 	CreatureInfo* ci = CreatureNameStorage.LookupEntry(mod->m_miscValue);
 	if(ci)
-		displayId = ci->DisplayID;
+		displayId = ci->Male_DisplayID;
 	if(m_target->IsPlayer() &&  static_cast<Player*>(m_target)->m_MountSpellId)
 		m_target->RemoveAura(static_cast<Player*>(m_target)->m_MountSpellId);
 	
@@ -4125,7 +4125,7 @@ void Aura::SpellAuraMounted(bool apply)
 		CreatureInfo* ci = CreatureNameStorage.LookupEntry(mod->m_miscValue);
 		if(!ci)
 			return;
-		uint32 displayId = ci->DisplayID;
+		uint32 displayId = ci->Male_DisplayID;
 		if(displayId != 0)
 		{
 			m_target->SetFlag( UNIT_FIELD_FLAGS , U_FIELD_FLAG_MOUNT_SIT );

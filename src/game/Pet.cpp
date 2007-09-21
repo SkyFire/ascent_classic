@@ -47,8 +47,8 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	else
 		SetUInt32Value(UNIT_FIELD_LEVEL,owner->GetUInt32Value(UNIT_FIELD_LEVEL));
 
-	SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->DisplayID);
-	SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->DisplayID);
+	SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->Male_DisplayID);
+	SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->Male_DisplayID);
 	SetUInt64Value(UNIT_FIELD_SUMMONEDBY, owner->GetGUID());
 	SetUInt64Value(UNIT_FIELD_CREATEDBY, owner->GetGUID());
 	

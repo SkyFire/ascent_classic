@@ -33,6 +33,8 @@ struct CreatureItem
 	int amount;
 };
 
+bool Rand(float chance);
+
 struct CreatureInfo
 {
 	uint32 Id;
@@ -44,13 +46,51 @@ struct CreatureInfo
 	uint32 Rank;
 	uint32 Unknown1;
 	uint32 SpellDataID;
-	uint32 DisplayID;
-	float unk2;
-	float unk3;
+	uint32 Male_DisplayID;
+	uint32 Female_DisplayID;
+	uint32 unkint1;
+	uint32 unkint2;
+	float unkfloat1;
+	float unkfloat2;
 	uint8  Civilian;
 	uint8  Leader;
 
 	std::string lowercase_name;
+	uint32 GenerateModelId(uint32 * dest)
+	{
+		/* only M */
+        if(Male_DisplayID == Female_DisplayID)
+		{
+			*dest = Male_DisplayID;
+			return 0;
+		}
+
+		/* only M */
+		if(Male_DisplayID && !Female_DisplayID)
+		{
+            *dest = Male_DisplayID;
+			return 0;
+		}
+
+		/* only F */
+		if(!Male_DisplayID && Female_DisplayID)
+		{
+			*dest = Female_DisplayID;
+			return 1;
+		}
+
+		/* make a random one */
+		if(Rand(50.0f))
+		{
+			*dest = Female_DisplayID;
+			return 1;
+		}
+		else
+		{
+			*dest = Male_DisplayID;
+			return 0;
+		}
+	}
 };
 
 struct CreatureProto
@@ -91,6 +131,8 @@ struct CreatureProto
 	uint32 death_state;
 	float	walk_speed;//base movement
 	float	run_speed;//most of the time mobs use this
+	float fly_speed;
+	uint32 extra_a9_flags;
 
 	/* AI Stuff */
 	bool m_canRangedAttack;
