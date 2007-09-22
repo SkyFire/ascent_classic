@@ -1354,10 +1354,16 @@ void Unit::Strike(Unit *pVictim, uint32 damage_type, SpellEntry *ability, int32 
 		{
 			uint8 form = static_cast<Player*>(this)->GetShapeShift();
 			if (form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
-				SubClassSkill = SKILL_UNARMED;
+			{
+//				SubClassSkill = SKILL_UNARMED;
+				SubClassSkill = SKILL_FERAL_COMBAT;
+
+				// Adjust skill for Level * 5 for Feral Combat
+				self_skill += pr->getLevel() * 5;
+			}
 		}
 
-		self_skill += pr->_GetSkillLineCurrent(SubClassSkill);	
+		self_skill += pr->_GetSkillLineCurrent(SubClassSkill);
 		crit = GetFloatValue(PLAYER_CRIT_PERCENTAGE);
 	}
 	else
