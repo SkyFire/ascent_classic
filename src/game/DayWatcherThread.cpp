@@ -214,19 +214,16 @@ void DayWatcherThread::update_arena()
 						//                 -0.00386405X
 						//         1+918.836
 
-						/*long double power = ((-0.00386405) * X);
-						if(power < 1.0)
-							power = 1.0;
+						long double power = ((-0.00386405) * X);
+						//if(power < 1.0)
+						//	power = 1.0;
 
 						long double divisor = pow(long double(918.836), power);						
 						divisor += 1.0;
-						if(divisor < 1.0)
-							divisor = 1.0;
+						//if(divisor < 1.0)
+						//	divisor = 1.0;
 
-						Y = 1426.79 / divisor;*/
-
-						// Burlex - The above formula is giving really odd results... gonna use this one instead. */
-						Y = (0.45 * X) - 150.0;
+						Y = 1426.79 / divisor;
 					}
 
 					// 2v2 teams only earn 70% (Was 60% until 13th March 07) of the arena points, 3v3 teams get 80%, while 5v5 teams get 100% of the arena points.
