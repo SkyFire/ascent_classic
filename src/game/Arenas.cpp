@@ -292,30 +292,85 @@ void Arena::Finish()
 	doneteams.clear();
 	if(rated_match)
 	{
-		for(set<Player*>::iterator itr = m_players[m_winningteam].begin(); itr != m_players[m_winningteam].end(); ++itr)
-		{
-			Player * plr = *itr;
-			if(plr->m_arenaTeams[m_arenateamtype] != NULL)
+		uint32 averageRating[2] = {0,0};
+		for(uint32 i = 0; i < 2; ++i) {
+			uint32 teamCount = 0;
+			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
-				ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
-				ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
-				if(doneteams.find(t) == doneteams.end())
+				Player * plr = *itr;
+				if(plr->m_arenaTeams[m_arenateamtype] != NULL)
 				{
-					t->m_stat_gameswonseason++;
-					t->m_stat_gameswonweek++;
-					t->m_stat_rating += 13; /* TODO: Formulae*/
-					objmgr.UpdateArenaTeamRankings();
-					
-					doneteams.insert(t);
+					ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
+					if(doneteams.find(t) == doneteams.end())
+					{
+						averageRating[i] += t->m_stat_rating;
+						teamCount++;
+						doneteams.insert(t);
+					}
 				}
-	
-				if(tp != NULL)
-				{
-					tp->Won_ThisWeek++;
-					tp->Won_ThisSeason++;
-				}
+			}
+			averageRating[i] /= teamCount;
+		}
+		doneteams.clear();
+		for (uint32 i = 0; i < 2; ++i) {
+			uint32 j = i ? 0 : 1; // opposing side
+			bool outcome;
 
-				t->SaveToDB();
+			outcome = (i == m_winningteam);
+
+			// ---- Elo Rating System ----
+			// Expected Chance to Win for Team A vs Team B
+			//                     1
+			// -------------------------------------------
+			//                   (PB - PA)/400
+			//              1 + 10
+
+			long double power = ( averageRating[j] - averageRating[i] ) / 400.0;
+
+			long double divisor = pow(long double(10.0), power);
+			divisor += 1.0;
+
+			long double winChance = 1.0 / divisor;
+
+			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			{
+				Player * plr = *itr;
+				if(plr->m_arenaTeams[m_arenateamtype] != NULL)
+				{
+					ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
+					ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
+					if(doneteams.find(t) == doneteams.end())
+					{
+						if (outcome)
+						{
+							t->m_stat_gameswonseason++;
+							t->m_stat_gameswonweek++;
+						}
+						// New Rating Calculation via Elo
+						// New Rating = Old Rating + K * (outcome - Expected Win Chance)
+						// outcome = 1 for a win and 0 for a loss (0.5 for a draw ... but we cant have that)
+						// K is the maximum possible change
+						// Through investigation, K was estimated to be 30
+						// When used in chess, Elo uses K = 32 ... maybe this would be better? :/
+						long double multiplier = (outcome ? 1.0 : 0.0) - winChance;
+						int32 deltaRating = int32(30.0 * multiplier);
+						if ( deltaRating < 0 && (-1 * deltaRating) > t->m_stat_rating )
+							t->m_stat_rating = 0;
+						else
+							t->m_stat_rating += deltaRating;
+						objmgr.UpdateArenaTeamRankings();
+
+						doneteams.insert(t);
+					}
+
+					if(tp != NULL && outcome)
+					{
+						tp->Won_ThisWeek++;
+						tp->Won_ThisSeason++;
+					}
+
+					t->SaveToDB();
+				}
 			}
 		}
 	}
