@@ -443,6 +443,9 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		{//converts base+1 points of health into mana
 		uint32 damage = m_spellInfo->EffectBasePoints[i]+1;
 		uint32 man = (damage *(100+playerTarget->m_lifetapbonus))/100;
+		if(!p_caster || !playerTarget)
+			return;
+
 		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
 		playerTarget->ModUInt32Value(UNIT_FIELD_POWER1,man);
 		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1) > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))

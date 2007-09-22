@@ -327,7 +327,7 @@ void DayWatcherThread::update_honor()
 
 			/* update in database */
 			CharacterDatabase.Execute("UPDATE characters SET killsToday = %u, killsYesterday = %u, honorToday = %u, honorYesterday = %u, honorPoints = %u, honorPointsToAdd = %u WHERE guid = %u",
-				killstoday, killsyesterday, honortoday, honoryesterday, honorpoints, points_to_add);
+				killstoday, killsyesterday, honortoday, honoryesterday, honorpoints, points_to_add, guid);
 		} while(result->NextRow());
 		delete result;
 	}
