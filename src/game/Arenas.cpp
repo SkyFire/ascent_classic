@@ -353,11 +353,11 @@ void Arena::Finish()
 						// Through investigation, K was estimated to be 30
 						// When used in chess, Elo uses K = 32 ... maybe this would be better? :/
 						long double multiplier = (outcome ? 1.0 : 0.0) - winChance;
-						int32 deltaRating = int32(30.0 * multiplier);
-						if ( deltaRating < 0 && (-1 * deltaRating) > t->m_stat_rating )
+						long double deltaRating = 30.0 * multiplier;
+						if ( deltaRating < 0 && (-1.0 * deltaRating) > t->m_stat_rating )
 							t->m_stat_rating = 0;
 						else
-							t->m_stat_rating += deltaRating;
+							t->m_stat_rating += long2int32(deltaRating);
 						objmgr.UpdateArenaTeamRankings();
 
 						doneteams.insert(t);
