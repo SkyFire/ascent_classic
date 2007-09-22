@@ -327,7 +327,7 @@ void Arena::Finish()
 
 			long double power = ( averageRating[j] - averageRating[i] ) / 400.0;
 
-			long double divisor = pow(long double(10.0), power);
+			long double divisor = pow(((long double)(10.0)), power);
 			divisor += 1.0;
 
 			long double winChance = 1.0 / divisor;
