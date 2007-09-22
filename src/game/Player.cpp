@@ -7282,16 +7282,6 @@ void Player::ResetPvPTimer()
 	 m_pvpTimer = sWorld.getIntRate(INTRATE_PVPTIMER);
 }
 
-void Player::SaveHonorFields()
-{
-	// Save honor fields only :P
-	//Zehamster: we can do this with a single single query instead of 7 ;)
-	CharacterDatabase.Execute("UPDATE characters SET lastDailyReset=%u,killsToday=%u,killsYesterday=%u,killsLifeTime=%u,"
-		"honorToday=%u,honorYesterday=%u,honorPoints=%u WHERE guid=%u",
-		m_lastHonorResetTime, m_killsToday, m_killsYesterday, m_killsLifetime, m_honorToday, m_honorYesterday,
-		m_honorPoints, GetGUIDLow());
-}
-
 void Player::CalculateBaseStats()
 {
 	if(!lvlinfo) return;

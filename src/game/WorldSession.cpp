@@ -323,7 +323,7 @@ void WorldSession::LogoutPlayer(bool Save)
 			GetPlayer( )->RemoveFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER );
 
 		// Save Honor Points
-		_player->SaveHonorFields();
+		//_player->SaveHonorFields();
 
 		// Update any dirty account_data fields.
 		/*bool dirty=false;
