@@ -117,16 +117,10 @@ struct ModelHeader {
 class model
 {
 	ModelHeader header;
-	Vector boundaries[4];
-	// after calculation of boundingbox
-	float sizex;
-	float sizey;
 	char * file2;
 public:
 	~model();
-	bool Load(const char * filename);
-	inline float GetSizeX() { return sizex; }
-	inline float GetSizeY() { return sizey; }
+	bool Convert(const char * filename);
 };
 typedef struct {
 	float x;
@@ -205,5 +199,8 @@ typedef struct
 class MPQFile;
 void LoadMapChunk(MPQFile &,chunk*);
 bool LoadWMO(char* filename);
+
+unsigned long crc32(const unsigned char *s, unsigned int len);
+
 #endif
 

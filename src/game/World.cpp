@@ -506,6 +506,11 @@ void World::SetInitialWorldSettings()
 	Log.Notice("World", "Database loaded in %ums.", getMSTime() - start_time);
 	sLog.outString("");
 
+#ifdef COLLISION
+	Log.Notice("Collision", "Initializing...");
+	Collision::InitTileManagers();
+#endif
+
 	// calling this puts all maps into our task list.
 	new WorldCreator(&tl);
 

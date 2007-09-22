@@ -36,6 +36,10 @@ void MapCell::Init(uint32 x, uint32 y, uint32 mapid, MapMgr *mapmgr)
 	_x=x;
 	_y=y;
 	_unloadpending=false;
+
+#ifdef COLLISION
+	m_collisionTile = NULL;
+#endif
 }
 
 void MapCell::AddObject(Object *obj)
@@ -68,6 +72,10 @@ void MapCell::SetActivity(bool state)
 		if(_unloadpending)
 			CancelPendingUnload();
 
+#ifdef COLLISION
+		m_collisionTile = Collision::GetTileManager(_mapmgr->GetMapId())->GetTile(Collision::GetXFromCellX(_y), Collision::GetYFromCellY(_x));
+#endif
+
 	} else if(_active && !state)
 	{
 		// Move all objects from active set.
@@ -79,6 +87,14 @@ void MapCell::SetActivity(bool state)
 
 		if(sWorld.map_unload_time && !_unloadpending)
 			QueueUnloadPending();
+
+#ifdef COLLISION
+		if(m_collisionTile != NULL)
+		{
+			m_collisionTile->DecRef();
+			m_collisionTile = NULL;
+		}
+#endif
 	}
 
 	_active = state; 

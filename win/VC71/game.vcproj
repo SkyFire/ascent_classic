@@ -861,6 +861,37 @@
 				RelativePath="..\..\src\game\UpdateMask.h">
 			</File>
 		</Filter>
+		<Filter
+			Name="Collision System"
+			Filter="">
+			<File
+				RelativePath="..\..\src\game\collision\Collision.h">
+			</File>
+			<File
+				RelativePath="..\..\src\game\collision\Model.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\collision\Model.h">
+			</File>
+			<File
+				RelativePath="..\..\src\game\collision\ModelManager.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\collision\ModelManager.h">
+			</File>
+			<File
+				RelativePath="..\..\src\game\collision\Tile.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\collision\Tile.h">
+			</File>
+			<File
+				RelativePath="..\..\src\game\collision\TileManager.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\collision\TileManager.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\src\game\StdAfx.cpp">
 			<FileConfiguration

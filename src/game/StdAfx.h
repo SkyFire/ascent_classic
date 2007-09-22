@@ -22,6 +22,7 @@
 
 #define _GAME
 //#define CLUSTERING
+//#define COLLISION
 
 #include <list>
 #include <vector>
@@ -151,6 +152,10 @@
 #ifdef CLUSTERING
     #include "WorkerServerClient.h"
     #include "ClusterInterface.h"
+#endif
+
+#ifdef COLLISION
+#include "collision/Collision.h"
 #endif
 
 #endif

@@ -2346,7 +2346,6 @@ bool Object::CanActivate()
 
 void Object::Activate(MapMgr * mgr)
 {
-	assert(!Active);
 	switch(m_objectTypeId)
 	{
 	case TYPEID_UNIT:
@@ -2363,7 +2362,6 @@ void Object::Activate(MapMgr * mgr)
 
 void Object::Deactivate(MapMgr * mgr)
 {
-	assert(Active);
 	switch(m_objectTypeId)
 	{
 	case TYPEID_UNIT:
