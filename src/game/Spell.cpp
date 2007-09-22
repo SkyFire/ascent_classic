@@ -1263,6 +1263,11 @@ void Spell::AddTime(uint32 type)
 {
 	if(u_caster && u_caster->IsPlayer())
 	{
+		if(m_spellInfo->InterruptFlags & CAST_INTERRUPT_ON_DAMAGE_TAKEN)
+		{
+			cancel();
+			return;
+		}
 		if(m_spellInfo->SpellGroupType && u_caster)
 		{
 			float ch=0;
