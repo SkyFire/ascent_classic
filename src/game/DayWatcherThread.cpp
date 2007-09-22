@@ -218,7 +218,7 @@ void DayWatcherThread::update_arena()
 						//if(power < 1.0)
 						//	power = 1.0;
 
-						long double divisor = pow(long double(918.836), power);						
+						long double divisor = pow(((long double)(918.836)), power);						
 						divisor += 1.0;
 						//if(divisor < 1.0)
 						//	divisor = 1.0;
