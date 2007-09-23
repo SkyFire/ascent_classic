@@ -272,9 +272,9 @@ void CommandTableStorage::Init()
 
 	static ChatCommand GMTicketCommandTable[] =
 	{
-		{ "get",		 'g', &ChatHandler::HandleGMTicketGetAllCommand,  "Gets GM Ticket",			   NULL, 0, 0, 0},
-		{ "getId",	   'g', &ChatHandler::HandleGMTicketGetByIdCommand, "Gets GM Ticket by ID",		 NULL, 0, 0, 0},
-		{ "delId",	   'g', &ChatHandler::HandleGMTicketDelByIdCommand, "Deletes GM Ticket by ID",	  NULL, 0, 0, 0},
+		{ "get",		 'c', &ChatHandler::HandleGMTicketGetAllCommand,  "Gets GM Ticket",			   NULL, 0, 0, 0},
+		{ "getId",	   'c', &ChatHandler::HandleGMTicketGetByIdCommand, "Gets GM Ticket by ID",		 NULL, 0, 0, 0},
+		{ "delId",	   'c', &ChatHandler::HandleGMTicketDelByIdCommand, "Deletes GM Ticket by ID",	  NULL, 0, 0, 0},
 		{ NULL,			2, NULL,									   "",							 NULL, 0, 0  }
 	};
 	dupe_command_table(GMTicketCommandTable, _GMTicketCommandTable);
@@ -475,7 +475,7 @@ void CommandTableStorage::Init()
 		{ "modify",		'm', NULL,									 "",				 modifyCommandTable, 0, 0, 0},
 		{ "waypoint",	  'w', NULL,									 "",			   waypointCommandTable, 0, 0, 0},
 		{ "debug",		 'd', NULL,									 "",				  debugCommandTable, 0, 0, 0},
-		{ "gmTicket",	  'g', NULL,									 "",			   GMTicketCommandTable, 0, 0, 0},
+		{ "gmTicket",	  'c', NULL,									 "",			   GMTicketCommandTable, 0, 0, 0},
 		{ "gobject",	   'o', NULL,									 "",			 GameObjectCommandTable, 0, 0, 0},
 		{ "battleground",  'e', NULL,									 "",		   BattlegroundCommandTable, 0, 0, 0},
 		{ "npc"		 ,  'n', NULL,									 "",					NPCCommandTable, 0, 0, 0},
