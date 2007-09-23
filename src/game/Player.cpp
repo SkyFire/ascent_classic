@@ -721,6 +721,7 @@ bool Player::Create(WorldPacket& data )
 	load_health = m_uint32Values[UNIT_FIELD_HEALTH];
 	load_mana = m_uint32Values[UNIT_FIELD_POWER1];
 
+    
 	return true;
 }
 
@@ -1831,11 +1832,6 @@ void Player::addSpell(uint32 spell_id)
 	if(sk && !_HasSkillLine(sk->skilline))
 	{
 		skilllineentry * skill = sSkillLineStore.LookupEntry(sk->skilline);
-		if(!skill)
-		{
-			_AddSkillLine(sk->skilline, 1, 1);
-			return;
-		}
 		uint32 max = 5 * getLevel();
 
 		switch(skill->type)
@@ -1845,18 +1841,8 @@ void Player::addSpell(uint32 spell_id)
 		case SKILL_TYPE_LANGUAGE:
 		case SKILL_TYPE_PROFESSION:
 			return;
-			break;
-
-		default:
-			{
-				if(skill->id != SKILL_POISONS && skill->id != SKILL_LOCKPICKING)
-					max = 1;
-			}break;
 		}
 
-		if(skill->type==SKILL_TYPE_PROFESSION)
-			ModUInt32Value(PLAYER_CHARACTER_POINTS2,-1);
-		
 		_AddSkillLine(sk->skilline, 1, max);
 	}
 }
@@ -3177,9 +3163,6 @@ void Player::OnPushToWorld()
 	
 	/* send weather */
 	sWeatherMgr.SendWeather(this);
-
-	if(m_mapMgr && m_mapMgr->m_battleground)
-		m_mapMgr->m_battleground->PortPlayer(this, true);
 
 	SetUInt32Value(UNIT_FIELD_HEALTH, load_health);
 	SetUInt32Value(UNIT_FIELD_POWER1, load_mana);

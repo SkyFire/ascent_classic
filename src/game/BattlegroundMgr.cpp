@@ -123,16 +123,7 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, Worl
     
 	/* Queue him! */
 	m_queueLock.Acquire();
-	map<uint32, list<uint32> >::iterator itr = m_queuedPlayers[bgtype][lgroup].find(instance);
-	if(itr != m_queuedPlayers[bgtype][lgroup].end())
-		itr->second.push_back(pguid);
-	else
-	{
-		Log.Debug("BattlegroundManager", "Created queue for battleground type %u in levelgroup %u", bgtype, lgroup);
-		list<uint32> tmp;
-		tmp.push_back(pguid);
-		m_queuedPlayers[bgtype][lgroup].insert( make_pair( instance, tmp ) );
-	}
+	m_queuedPlayers[bgtype][lgroup].push_back(pguid);
 	Log.Success("BattlegroundManager", "Player %u is now in battleground queue for instance %u", m_session->GetPlayer()->GetGUIDLow(), instance );
 
 	/* send the battleground status packet */
@@ -146,18 +137,22 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, Worl
 	/* We will get updated next few seconds =) */
 }
 
+#define IS_ARENA(x) ( (x) >= BATTLEGROUND_ARENA_2V2 && (x) <= BATTLEGROUND_ARENA_5V5 )
+
 void CBattlegroundManager::EventQueueUpdate()
 {
-	vector<Player*> tempPlayerVec[2];
+	deque<Player*> tempPlayerVec[2];
 	uint32 i,j,k;
 	Player * plr;
 	CBattleground * bg;
-	map<uint32, CBattleground*>::iterator itr;
-	map<uint32, list<uint32> >::iterator it2, it5;
 	list<uint32>::iterator it3, it4;
 	vector<Player*>::iterator it6;
+	map<uint32, CBattleground*>::iterator iitr;
+	Arena * arena;
+	int32 team;
 	m_queueLock.Acquire();
 	m_instanceLock.Acquire();
+
 	for(i = 0; i < BATTLEGROUND_NUM_TYPES; ++i)
 	{
 		for(j = 0; j < MAX_LEVEL_GROUP; ++j)
@@ -165,256 +160,115 @@ void CBattlegroundManager::EventQueueUpdate()
 			if(!m_queuedPlayers[i][j].size())
 				continue;
 
-			/* Process instance id 0 first. */
-			if( (it2 = m_queuedPlayers[i][j].find( 0 )) != m_queuedPlayers[i][j].end() )
+			tempPlayerVec[0].clear();
+			tempPlayerVec[1].clear();
+
+			for(it3 = m_queuedPlayers[i][j].begin(); it3 != m_queuedPlayers[i][j].end();)
 			{
-				/* These players have chosen to join the "first available" instance. */
-
-				/* Try and find a free instance. */
-				bg=0;
-				for(itr = m_instances[i].begin(); itr != m_instances[i].end(); ++itr)
+				it4 = it3++;
+                plr = objmgr.GetPlayer(*it4);
+				
+				if(plr || GetLevelGrouping(plr->getLevel()) != j)
 				{
-					if(itr->second->GetLevelGroup() != j)
-					{
-						//Log.Debug("BgMgr", "Bad level group");
-						continue;
-					}
-
-					//Log.Debug("BattlegroundMgr", "Trying instance %u", itr->second->GetId());
-					if(!itr->second->IsFull())
-					{
-						bg = itr->second;
-
-						/* Add as many players as possible to this battleground. */
-						for(it4 = it2->second.begin(); it4 != it2->second.end();)
-						{
-							it3 = it4;
-							++it4;
-
-							plr = objmgr.GetPlayer(*it3);
-							if(!plr)
-							{
-								it2->second.erase(it3);
-								continue;
-							}
-
-							//Log.Debug("BattlegroundMgr", "Trying player %u", plr->GetGUIDLow());
-							/* Arenas are FFA battlegrounds, you can kill people of your same faction. */
-							if(i >= BATTLEGROUND_ARENA_2V2 && i <= BATTLEGROUND_ARENA_5V5)
-							{
-								/* Add a player if we have free slots. */
-								Arena * arena = ((Arena*)bg);
-								if(arena->rated_match)
-									continue;
-
-								int32 team;
-								if( (team = arena->GetFreeTeam()) != -1 )
-								{
-									/* Free slots, w00t */
-									plr->m_bgIsQueued = false;
-									if(GetLevelGrouping(plr->getLevel()) == j)
-									{
-										plr->m_bgTeam=team;
-										bg->AddPlayer(plr, (uint32)team);
-									}
-
-									it2->second.erase(it3);
-									//Log.Debug("BattlegroundMgr", "Added!");
-								}
-								/*else
-                                    Log.Debug("BattlegroundMgr", "Fail.");*/
-							}
-							else
-							{
-								/* PvP Battlegrounds are Faction (Team) Based. */
-								if(bg->HasFreeSlots(plr->GetTeam()) && bg->CanPlayerJoin(plr))
-								{
-									plr->m_bgIsQueued = false;
-									if(GetLevelGrouping(plr->getLevel()) == j)
-										bg->AddPlayer(plr, plr->GetTeam());
-
-									it2->second.erase(it3);
-									//Log.Debug("BattlegroundMgr", "Added!");
-								}
-								/*else
-									Log.Debug("BattlegroundMgr", "Fail.");*/
-							}
-						}
-
-						/* No players left? */
-						if(!it2->second.size())
-							break;
-					}
-					/*else
-					{
-						Log.Debug("BattlegroundMgr", "Instance is full.");
-					}*/
-				}
-
-				/* Do we still have players left over? */
-				if(it2->second.size())
-				{
-					if(CanCreateInstance(i, j))
-					{
-						/* Arenas are FFA battlegrounds, you can kill people of your same faction. */
-						if(i >= BATTLEGROUND_ARENA_2V2 && i <= BATTLEGROUND_ARENA_5V5)
-						{
-							if(it2->second.size() >= 2)
-							{
-								int32 team;
-								/* 2 players to start bg */
-								Log.Debug("BattlegroundManager", "Enough players to start battleground type %u for level group %u. Creating.", i, j);
-								/* Woot! Let's create a new instance! */
-								Arena * arena;
-								bg = CreateInstance(i, j);
-								arena = ((Arena*)bg);
-
-								for(it4 = it2->second.begin(); it4 != it2->second.end();)
-								{
-									it3 = it4;
-									++it4;
-
-									plr = objmgr.GetPlayer(*it3);
-									if(!plr || GetLevelGrouping(plr->getLevel()) != j)
-									{
-										it2->second.erase(it3);
-										continue;
-									}
-
-									if( (team = arena->GetFreeTeam()) != -1 )
-									{
-										plr->m_bgTeam=team;
-										bg->AddPlayer(plr,team);
-										it2->second.erase(it3);
-									}
-								}
-							}
-						}
-						else
-						{
-							/* PvP Battlegrounds are Faction (Team) Based. */
-							// No free instances.
-							// Do we have enough players to create a new instance?
-							for(it4 = it2->second.begin(); it4 != it2->second.end();)
-							{
-								it3 = it4;
-								++it4;
-
-								plr = objmgr.GetPlayer(*it3);
-								if(!plr || GetLevelGrouping(plr->getLevel()) != j)
-								{
-									it2->second.erase(it3);
-									continue;
-								}
-
-								tempPlayerVec[plr->GetTeam()].push_back(plr);
-							}
-
-							if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG &&
-								tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
-							{
-								Log.Debug("BattlegroundManager", "Enough players to start battleground type %u for level group %u. Creating.", i, j);
-								/* Woot! Let's create a new instance! */
-								bg = CreateInstance(i, j);
-
-								/* Dump all the players into the bg */
-								for(k=0;k<2;++k)
-								{
-									for(it6=tempPlayerVec[k].begin(); it6 != tempPlayerVec[k].end(); ++it6)
-									{
-										Log.Debug("BattlegroundManager", "Trying to add player %u to bg", (*it6)->GetGUIDLow());
-										if(!bg->HasFreeSlots(k) || !bg->CanPlayerJoin(*it6))
-										{
-											/*Log.Debug("BattlegroundManager", "FAIL!", (*it6)->GetGUIDLow());*/
-											break;
-										}
-
-										bg->AddPlayer(*it6, (*it6)->GetTeam());
-
-										/* This is gonna be costly. :P */
-										for(it4 = it2->second.begin(); it4 != it2->second.end(); ++it4)
-										{
-											if((*it4) == (*it6)->GetGUIDLow())
-											{
-												it2->second.erase(it4);
-												break;
-											}
-										}
-									}
-								}
-							}
-
-							tempPlayerVec[0].clear();
-							tempPlayerVec[1].clear();
-						}						
-					}
-				}
-
-				/* If there is no players queued on instance id 0 anymore, kill the iterator (Saves memory) */
-				if(!it2->second.size())
-					m_queuedPlayers[i][j].erase(it2);
-			}
-
-			// Now process the players bound to a specific instance id.
-			for(it5 = m_queuedPlayers[i][j].begin(); it5 != m_queuedPlayers[i][j].end();)
-			{
-				it2 = it5;
-				++it5;
-
-				/* Skip the '0' instance id (handled differently) */
-				if(it2->first == 0)
-					continue;
-
-				if(!it2->second.size())		// No queued players on this instance any more
-				{
-					/* Kill the iterator */
-					m_queuedPlayers[i][j].erase(it2);
+                    m_queuedPlayers[i][j].erase(it4);
 					continue;
 				}
 
-				/* Find the instance that these players are queued on. */
-				itr = m_instances[i].find(it2->first);
-				if(itr == m_instances[i].end())
+				// queued to a specific instance id?
+				if(plr->m_bgQueueInstanceId != 0)
 				{
-					/* Whoops! That instance is no longer valid. */
-					/* Kill all the players on it. */
-					for(it3 = it2->second.begin(); it3 != it2->second.end(); ++it3)
+					iitr = m_instances[i].find(plr->m_bgQueueInstanceId);
+					if(iitr == m_instances[i].end())
 					{
-						plr = objmgr.GetPlayer(*it3);
-						if(plr)
-						{
-							sChatHandler.SystemMessageToPlr(plr, "Your queue on battleground instance %u is no longer valid, the instance no longer exists.", it2->first);
-							SendBattlefieldStatus(plr, 0, 0, 0, 0, 0,0);
-							plr->m_bgIsQueued = false;
-						}
+						// queue no longer valid
+						plr->GetSession()->SystemMessage("Your queue on battleground instance id %u is no longer valid. Reason: Instance Deleted.", plr->m_bgQueueInstanceId);
+						plr->m_bgIsQueued = false;
+						plr->m_bgQueueType = 0;
+						plr->m_bgQueueInstanceId = 0;
+						m_queuedPlayers[i][j].erase(it4);
 					}
-					m_queuedPlayers[i][j].erase(it2);
-					continue;
+
+					// can we join?
+					bg = iitr->second;
+					if(bg->CanPlayerJoin(plr))
+						bg->AddPlayer(plr, plr->GetTeam());
 				}
 				else
 				{
-					/* Do we have free slots? */
-					if(!itr->second->IsFull())
-					{
-						/* Add as many players as possible. */
-						for(it4 = it2->second.begin(); it4 != it2->second.end();)
-						{
-							it3 = it4;
-							++it4;
+					if(IS_ARENA(i))
+						tempPlayerVec[0].push_back(plr);
+					else
+						tempPlayerVec[plr->GetTeam()].push_back(plr);
+				}
+			}
 
-							plr = objmgr.GetPlayer(*it3);
-							if(!plr)
-								it2->second.erase(it3);
-							else
+			// try to join existing instances
+			for(iitr = m_instances[i].begin(); iitr != m_instances[i].end(); ++iitr)
+			{
+				if(IS_ARENA(i))
+				{
+                    arena = ((Arena*)iitr->second);
+					team = arena->GetFreeTeam();
+					while(team > 0 && tempPlayerVec[0].size())
+					{
+						plr = *tempPlayerVec[0].begin();
+						tempPlayerVec[0].pop_front();
+						arena->AddPlayer(plr, team);
+					}
+				}
+				else
+				{
+					bg = iitr->second;
+					for(k = 0; k < 2; ++k)
+					{
+						while(tempPlayerVec[k].size() && bg->HasFreeSlots(k))
+						{
+							plr = *tempPlayerVec[0].begin();
+							tempPlayerVec[0].pop_front();
+							bg->AddPlayer(plr, plr->GetTeam());
+						}
+					}
+				}
+			}
+
+			if(IS_ARENA(i))
+			{
+				// enough players to start a round?
+				if(tempPlayerVec[0].size() < 2)
+					continue;
+
+				if(CanCreateInstance(i,j))
+				{
+					arena = ((Arena*)CreateInstance(i, j));
+					team = arena->GetFreeTeam();
+					while(!arena->IsFull() && tempPlayerVec[0].size() && team > 0)
+					{
+						plr = *tempPlayerVec[0].begin();
+						tempPlayerVec[0].pop_front();
+
+						arena->AddPlayer(plr, team);
+						team = arena->GetFreeTeam();
+					}
+				}
+			}
+			else
+			{
+				if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG &&
+					tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
+				{
+					if(CanCreateInstance(i,j))
+					{
+						bg = CreateInstance(i,j);
+						ASSERT(bg);
+						
+						// push as many as possible in
+						for(k = 0; k < 2; ++k)
+						{
+							while(tempPlayerVec[k].size() && bg->HasFreeSlots(k))
 							{
-								if(itr->second->HasFreeSlots(plr->GetTeam()))
-								{
-									plr->m_bgIsQueued = false;
-									if(GetLevelGrouping(plr->getLevel()) == j)
-									{
-										itr->second->AddPlayer(plr, plr->GetTeam());
-									}
-								}
+								plr = *tempPlayerVec[0].begin();
+								tempPlayerVec[k].pop_front();
+								bg->AddPlayer(plr, k);
 							}
 						}
 					}
@@ -510,22 +364,24 @@ void CBattlegroundManager::EventQueueUpdate()
 
 void CBattlegroundManager::RemovePlayerFromQueues(Player * plr)
 {
-	uint32 lgroup = GetLevelGrouping(plr->getLevel());
 	m_queueLock.Acquire();
+
 	ASSERT(plr->m_bgQueueType < BATTLEGROUND_NUM_TYPES);
-	map<uint32, list<uint32> >::iterator itr = m_queuedPlayers[plr->m_bgQueueType][lgroup].find(plr->m_bgQueueInstanceId);
-	list<uint32>::iterator it2;
-	if(itr != m_queuedPlayers[plr->m_bgQueueType][lgroup].end())
+	uint32 lgroup = GetLevelGrouping(plr->getLevel());
+	list<uint32>::iterator itr = m_queuedPlayers[plr->m_bgQueueType][lgroup].begin();
+	
+	while(itr != m_queuedPlayers[plr->m_bgQueueType][lgroup].end())
 	{
-		for(it2 = itr->second.begin(); it2 != itr->second.end(); ++it2) {
-			if((*it2) == plr->GetGUIDLow())
-			{
-				Log.Debug("BattlegroundManager", "Removing player %u from queue in instance %u type %u group %u", plr->GetGUIDLow(), plr->m_bgQueueInstanceId, plr->m_bgQueueType, lgroup);
-				itr->second.erase(it2);
-				break;
-			}
+		if((*itr) == plr->GetGUIDLow())
+		{
+			Log.Debug("BattlegroundManager", "Removing player %u from queue instance %u type %u", plr->GetGUIDLow(), plr->m_bgQueueInstanceId, plr->m_bgQueueType);
+			m_queuedPlayers[plr->m_bgQueueType][lgroup].erase(itr);
+			break;
 		}
+
+		++itr;
 	}
+
 	plr->m_bgIsQueued = false;
 	plr->m_bgTeam=plr->GetTeam();
 	plr->m_pendingBattleground=0;
@@ -967,22 +823,25 @@ void CBattlegroundManager::DeleteBattleground(CBattleground * bg)
 	m_instances[i].erase(bg->GetId());
 	
 	/* erase any queued players */
-	map<uint32, list<uint32> >::iterator itr = m_queuedPlayers[i][j].find(bg->GetId());
+	list<uint32>::iterator itr = m_queuedPlayers[i][j].begin();
 	list<uint32>::iterator it2;
-	if(itr != m_queuedPlayers[i][j].end())
+	for(; itr != m_queuedPlayers[i][j].end();)
 	{
-		/* kill him! */
-		for(it2 = itr->second.begin(); it2 != itr->second.end(); ++it2)
+		it2 = itr++;
+		plr = objmgr.GetPlayer(*it2);
+		if(!plr)
 		{
-			plr = objmgr.GetPlayer(*it2);
-			if(plr)
-			{
-				sChatHandler.SystemMessageToPlr(plr, "Your queue on battleground instance %u is no longer valid, the instance no longer exists.", bg->GetId());
-				SendBattlefieldStatus(plr, 0, 0, 0, 0, 0,0);
-				plr->m_bgIsQueued = false;
-			}
+			m_queuedPlayers[i][j].erase(it2);
+			continue;
 		}
-		m_queuedPlayers[i][j].erase(itr);
+
+		if(plr && plr->m_bgQueueInstanceId == bg->GetId())
+		{
+			sChatHandler.SystemMessageToPlr(plr, "Your queue on battleground instance %u is no longer valid, the instance no longer exists.", bg->GetId());
+			SendBattlefieldStatus(plr, 0, 0, 0, 0, 0,0);
+			plr->m_bgIsQueued = false;
+			m_queuedPlayers[i][j].erase(it2);
+		}
 	}
 
 	m_queueLock.Release();
@@ -1504,16 +1363,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 
 	/* Queue him! */
 	m_queueLock.Acquire();
-	map<uint32, list<uint32> >::iterator itr = m_queuedPlayers[BattlegroundType][lgroup].find(0);
-	if(itr != m_queuedPlayers[BattlegroundType][lgroup].end())
-		itr->second.push_back(pguid);
-	else
-	{
-		Log.Debug("BattlegroundManger", "Created queue for battleground type %u in levelgroup %u", BattlegroundType, lgroup);
-		list<uint32> tmp;
-		tmp.push_back(pguid);
-		m_queuedPlayers[BattlegroundType][lgroup].insert( make_pair( (uint32)0, tmp ) );
-	}
+	m_queuedPlayers[BattlegroundType][lgroup].push_back(pguid);
 	Log.Success("BattlegroundMgr", "Player %u is now in battleground queue for {Arena %u}", m_session->GetPlayer()->GetGUIDLow(), BattlegroundType );
 
 	/* send the battleground status packet */

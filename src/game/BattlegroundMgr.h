@@ -215,8 +215,8 @@ class CBattlegroundManager : public Singleton<CBattlegroundManager>, public Even
 	uint32 m_maxBattlegroundId;
 	
 	/* Queue System */
-	// Instance Id -> list<Player guid> [ BattlegroundType ] [ Level Group ] (instance 0 - first available)
-	map<uint32, list<uint32> > m_queuedPlayers[BATTLEGROUND_NUM_TYPES][MAX_LEVEL_GROUP];
+	// Instance Id -> list<Player guid> [ BattlegroundType ] (instance 0 - first available)
+	list<uint32> m_queuedPlayers[BATTLEGROUND_NUM_TYPES][MAX_LEVEL_GROUP];
 
 	// Instance Id -> list<Group id> [BattlegroundType][LevelGroup]
 	list<uint32> m_queuedGroups[BATTLEGROUND_NUM_TYPES];
