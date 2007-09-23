@@ -46,7 +46,7 @@ public:
 		if(m_started)
 			return false;
 		else
-			return true;
+			return CBattleground::CanPlayerJoin(plr);
 	}
 
 	bool CreateCorpse(Player * plr) { return false; }

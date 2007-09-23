@@ -1523,3 +1523,8 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 	m_session->GetPlayer()->m_bgQueueType = BattlegroundType;
 	m_queueLock.Release();
 }
+
+bool CBattleground::CanPlayerJoin(Player * plr)
+{
+	return HasFreeSlots(plr->m_bgTeam);
+}

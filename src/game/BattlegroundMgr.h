@@ -409,7 +409,7 @@ public:
 	inline uint32 GetLastResurrect() { return m_lastResurrect; }
 	void QueuePlayerForResurrect(Player * plr);
 	void EventResurrectPlayers();
-	virtual bool CanPlayerJoin(Player * plr) { return true; }
+	virtual bool CanPlayerJoin(Player * plr);
 	virtual bool CreateCorpse(Player * plr) { return true; }
 
 	void BuildPvPUpdateDataPacket(WorldPacket * data);
