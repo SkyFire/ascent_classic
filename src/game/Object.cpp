@@ -2035,6 +2035,9 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	SpellEntry *spellInfo = sSpellStore.LookupEntry( spellID );
 	if(!spellInfo)
         return;
+
+	if (this->IsPlayer() && !static_cast<Player*>(this)->canCast(spellInfo))
+		return;
 //==========================================================================================
 //==============================Variables Initialization====================================
 //========================================================================================== 

@@ -968,8 +968,10 @@ void World::SetInitialWorldSettings()
 						//we should find that specific spell (or group) on what we will trigger
 						else pr|=PROC_ON_CAST_SPECIFIC_SPELL;
 					}
-					if(strstr(desc, "chance to add an additional combo"))
-							pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc, "chance to add an additional combo") && strstr(desc, "critical") )
+						pr|=PROC_ON_SPELL_CRIT_HIT;
+					else if(strstr(desc, "chance to add an additional combo"))
+						pr|=PROC_ON_CAST_SPELL;
 					if(strstr(desc, "victim of a melee or ranged critical strike"))
 						pr|=PROC_ON_CRIT_HIT_VICTIM;
 					if(strstr(desc, "getting a critical effect from"))

@@ -279,9 +279,22 @@ void Unit::Update( uint32 p_time )
 	}
 	else
 	{
-		SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-		if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
-		
+		if (m_attackTarget==0)
+		{
+			RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+			if(hasStateFlag(UF_ATTACKING)) clearStateFlag(UF_ATTACKING);
+
+			for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
+			{
+				Unit* pUnit = GetMapMgr()->GetUnit(*itr);
+				if(pUnit && pUnit->isAlive())
+				{
+					SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+					if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
+					break;
+				}
+			}
+		}
 	}
 
 	if(!isDead())
@@ -681,6 +694,19 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							if(!CastingSpell)
 								continue;
 							if(CastingSpell->School!=SCHOOL_FIRE)
+								continue;
+						}break;
+						//druid - Primal Fury
+						case 37116:
+						case 37117:
+						{
+							if (!this->IsPlayer())
+								continue;
+							Player* mPlayer = (Player*)this;
+							if (!mPlayer->IsInFeralForm() || 
+								mPlayer->GetShapeShift() != FORM_CAT ||
+								mPlayer->GetShapeShift() != FORM_BEAR ||
+								mPlayer->GetShapeShift() != FORM_DIREBEAR)
 								continue;
 						}break;
 						//rogue - blade twisting
@@ -1355,9 +1381,7 @@ void Unit::Strike(Unit *pVictim, uint32 damage_type, SpellEntry *ability, int32 
 			uint8 form = static_cast<Player*>(this)->GetShapeShift();
 			if (form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
 			{
-//				SubClassSkill = SKILL_UNARMED;
 				SubClassSkill = SKILL_FERAL_COMBAT;
-
 				// Adjust skill for Level * 5 for Feral Combat
 				self_skill += pr->getLevel() * 5;
 			}
@@ -1768,20 +1792,6 @@ else
 //==========================================================================================
 //==============================Post Roll Special Cases Processing==========================
 //==========================================================================================
-//--------------------------dirty fixes-----------------------------------------------------
-	//vstate=1-wound,2-dodge,3-parry,4-interrupt,5-block,6-evade,7-immune,8-deflect	
-	// hack fix for stormstirke loop here.
-	if(damage_type != DUALWIELD && !disable_proc)
-    {
-		if( !(ability && ability->NameHash == 0x2535ed19) )
-		{
-			this->HandleProc(aproc,pVictim, ability,realdamage);
-			m_procCounter = 0;
-		}
-
-		pVictim->HandleProc(vproc,this, ability,realdamage);
-		m_procCounter = 0;
-	}
 //--------------------------special states processing---------------------------------------
 	if(pVictim->GetTypeId() == TYPEID_UNIT)
 	{
@@ -1796,6 +1806,34 @@ else
 	if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pVictim)->GodModeCheat == true)
 	{
 		dmg.resisted_damage = dmg.full_damage; //godmode
+	}
+
+	if (this->IsPlayer() && static_cast<Player*>(this)->IsInFeralForm()) 
+	{ //Players in feral forms can't proc anything on hit
+		switch (static_cast<Player*>(this)->GetShapeShift())
+		{
+		case FORM_CAT:	
+		case FORM_BEAR: 
+		case FORM_DIREBEAR:
+			disable_proc = true;
+			break;
+		default:
+			break;
+		}
+	}
+//--------------------------dirty fixes-----------------------------------------------------
+	//vstate=1-wound,2-dodge,3-parry,4-interrupt,5-block,6-evade,7-immune,8-deflect	
+	// hack fix for stormstirke loop here.
+	if(damage_type != DUALWIELD && !disable_proc)
+    {
+		if( !(ability && ability->NameHash == 0x2535ed19) )
+		{
+			this->HandleProc(aproc,pVictim, ability,realdamage);
+			m_procCounter = 0;
+		}
+
+		pVictim->HandleProc(vproc,this, ability,realdamage);
+		m_procCounter = 0;
 	}
 //--------------------------spells triggering-----------------------------------------------
 	if(realdamage > 0 && ability == 0)

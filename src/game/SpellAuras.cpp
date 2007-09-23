@@ -1617,6 +1617,11 @@ void Aura::SpellAuraDummy(bool apply)
 					}
 				}
 			}break;
+		case 17007: //Druid:Leader of the Pack
+			{
+				this->mod->m_amount = 5;
+				this->SpellAuraModCritPerc(apply);
+			}break;
 	}
 }
 
@@ -2724,6 +2729,12 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 	else
 		m_target->m_speedModifier -= mod->m_amount;
 	m_target->UpdateSpeed();
+	if (this->GetSpellId() == 17002 || //dirty fix for Druid:Feral Swiftness
+		this->GetSpellId() == 24866)
+	{
+		this->mod->m_amount=4;
+		this->SpellAuraModDodgePerc(apply);
+	}
 }
 
 void Aura::SpellAuraModIncreaseMountedSpeed(bool apply)
@@ -2984,7 +2995,6 @@ void Aura::SpellAuraModShapeshift(bool apply)
 		} break;
 	case FORM_GHOSTWOLF:
 		{
-//			modelId = 1236;
 			modelId = 4613;
 		} break;  
 	case FORM_DEFENSIVESTANCE:
