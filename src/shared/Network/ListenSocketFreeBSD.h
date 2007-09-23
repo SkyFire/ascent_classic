@@ -14,11 +14,18 @@
 #include "SocketDefines.h"
 #include <errno.h>
 
-template<class T>
-class ListenSocket
+class ListenSocketBase
 {
 public:
-    ListenSocket(const char * ListenAddress, uint32 Port)
+	virtual void OnAccept() = 0;
+	virtual int GetFd() = 0;
+};
+
+template<class T>
+class ListenSocket : public ListenSocketBase
+{
+public:
+	ListenSocket(const char * ListenAddress, uint32 Port) : ListenSocketBase()
     {
         m_socket = socket(AF_INET, SOCK_STREAM, 0);
         SocketOps::ReuseAddr(m_socket);
@@ -60,7 +67,7 @@ public:
             Close();
     }
 
-    void Update()
+    /*void Update()
     {
         aSocket = accept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len);
         if(aSocket == -1)
@@ -68,7 +75,17 @@ public:
 
         dsocket = new T(aSocket);
         dsocket->Accept(&m_tempAddress);
-    }
+    }*/
+
+	void OnAccept()
+	{
+		aSocket = accept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len);
+		if(aSocket == -1)
+			return;
+
+		dsocket = new T(aSocket);
+		dsocket->Accept(&m_tempAddress);
+	}
     
     void Close()
     {
@@ -78,6 +95,7 @@ public:
     } 
 
     inline bool IsOpen() { return m_opened; }
+	int GetFd() { return m_socket; }	
 
 private:
     SOCKET m_socket;

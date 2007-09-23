@@ -306,8 +306,8 @@ void LogonServer::Run(int argc, char ** argv)
 	{
 		if(!(++loop_counter % 400))	 // 20 seconds
 			CheckForDeadSockets();
-		cl->Update();
-		sl->Update();
+		//cl->Update();
+		//sl->Update();
 		sInfoCore.TimeoutSockets();
 		sSocketGarbageCollector.Update();
 		CheckForDeadSockets();			  // Flood Protection

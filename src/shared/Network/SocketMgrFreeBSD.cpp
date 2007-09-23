@@ -28,6 +28,21 @@ void SocketMgr::AddSocket(Socket * s)
     }
 }
 
+void SocketMgr::AddListenSocket(ListenSocketBase * s)
+{
+	assert(listenfds[s->GetFd()] == 0);
+	listenfds[s->GetFd()] = s;
+
+	struct kevent ev;
+	EV_SET(&ev, s->GetFd(), EVFILT_READ, EV_ADD, 0, 0, NULL);
+
+	if(kevent(kq, &ev, 1, 0, 0, NULL) < 0)
+	{
+		Log.Error("kqueue", "Could not add initial kevent for fd %u!", s->GetFd());
+		return;
+	}
+}
+
 void SocketMgr::RemoveSocket(Socket * s)
 {
     if(fds[s->GetFd()] != s)
@@ -90,13 +105,20 @@ void SocketWorkerThread::run()
 
             if(ptr == NULL)
             {
-                Log.Warning("kqueue", "Returned invalid fd (no pointer) of FD %u", events[i].ident);
+				if( (ptr = ((Socket*)mgr->listenfds[events[i].ident])) != NULL )
+				{
+					((ListenSocketBase*)ptr)->OnAccept();
+				}
+				else
+				{
+					Log.Warning("kqueue", "Returned invalid fd (no pointer) of FD %u", events[i].ident);
 
-				/* make sure it removes so we don't go chasing it again */
-				EV_SET(&ev, events[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-				EV_SET(&ev2, events[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-				kevent(kq, &ev, 1, 0, 0, NULL);
-				kevent(kq, &ev2, 1, 0, 0, NULL);
+					/* make sure it removes so we don't go chasing it again */
+					EV_SET(&ev, events[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+					EV_SET(&ev2, events[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+					kevent(kq, &ev, 1, 0, 0, NULL);
+					kevent(kq, &ev2, 1, 0, 0, NULL);
+				}
                 continue;
             }
 

@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
 	for(;;)
 	{
         sLogonCommHandler.UpdateSockets();
-		wsl->Update();
-		isl->Update();
+		//wsl->Update();
+		//isl->Update();
 		sClientMgr.Update();
 		sClusterMgr.Update();
 		Sleep(50);

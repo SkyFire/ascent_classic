@@ -58,11 +58,13 @@ public:
 void SERVER_DECL HandleReadComplete(Socket * s, uint32 len);
 void SERVER_DECL HandleWriteComplete(Socket * s, uint32 len);
 void SERVER_DECL HandleShutdown(Socket * s, uint32 len);
+void SERVER_DECL HandleAccept(Socket * s, uint32 len);
 
 static OperationHandler ophandlers[NUM_SOCKET_IO_EVENTS] = {
 	&HandleReadComplete,
 	&HandleWriteComplete,
-	&HandleShutdown };
+	&HandleShutdown,
+	&HandleAccept };
 
 #endif
 #endif

@@ -50,18 +50,26 @@ void SocketWorkerThread::run()
 
 		ov = CONTAINING_RECORD(ol_ptr, OverlappedStruct, m_overlap);
 
-		if(ov->m_event == SOCKET_IO_THREAD_SHUTDOWN)
+		switch(ov->m_event)
 		{
-			delete ov;
-			return;
+		case SOCKET_IO_THREAD_SHUTDOWN:
+			{
+				delete ov;
+				return;
+			}break;
+
+		case SOCKET_IO_EVENT_ACCEPT:
+			{
+				ophandlers[ov->m_event](s, len);
+			}break;
+
+		default:
+			{
+				if(!s->IsDeleted())
+					ophandlers[ov->m_event](s, len);
+			}break;
 		}
-
-		if(s->IsDeleted())
-			continue;
-
-		if(ov->m_event < NUM_SOCKET_IO_EVENTS)
-			ophandlers[ov->m_event](s, len);
-
+		
 		delete ov;
 	}
 }
@@ -98,6 +106,13 @@ void HandleWriteComplete(Socket * s, uint32 len)
 void HandleShutdown(Socket * s, uint32 len)
 {
 	
+}
+
+void HandleAccept(Socket * s, uint32 len)
+{
+	/* warning: has to be a listensocket */
+	ListenSocketBase * b = ((ListenSocketBase*)s);
+	b->OnAccept();
 }
 
 void SocketMgr::CloseAll()

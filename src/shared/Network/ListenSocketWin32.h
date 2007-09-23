@@ -12,11 +12,21 @@
 
 #ifdef CONFIG_USE_IOCP
 
-template<class T>
-class SERVER_DECL ListenSocket
+#include <mswsock.h>
+
+class SERVER_DECL ListenSocketBase
 {
 public:
-	ListenSocket(const char * ListenAddress, uint32 Port)
+	uint32 m_new_fd;
+	char m_accept_buffer[1024];
+	virtual void OnAccept() = 0;
+};
+
+template<class T>
+class SERVER_DECL ListenSocket : public ListenSocketBase
+{
+public:
+	ListenSocket(const char * ListenAddress, uint32 Port) : ListenSocketBase()
 	{
 		m_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 		SocketOps::ReuseAddr(m_socket);
@@ -52,6 +62,14 @@ public:
 		m_opened = true;
 		len = sizeof(sockaddr_in);
 		m_cp = sSocketMgr.GetCompletionPort();
+
+		// assign socket to completion port
+		if(CreateIoCompletionPort( ((HANDLE)m_socket), m_cp, (ULONG_PTR)this, 0 ) == INVALID_HANDLE_VALUE)
+		{
+			printf("CreateIoCompletionPort: %u\n", GetLastError());
+		}
+		
+		CreateEvent();
 	}
 
 	~ListenSocket()
@@ -59,7 +77,7 @@ public:
 		Close();	
 	}
 
-	void Update()
+	/*void Update()
 	{
 		aSocket = WSAAccept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len, NULL, NULL);
 		if(aSocket == INVALID_SOCKET)
@@ -68,6 +86,31 @@ public:
 		socket = new T(aSocket);
 		socket->SetCompletionPort(m_cp);
 		socket->Accept(&m_tempAddress);
+	}*/
+
+	void OnAccept()
+	{
+		sockaddr_in * addr = (sockaddr_in*)&((char*)m_accept_buffer)[42];
+		socket = new T(m_new_fd);
+		socket->SetCompletionPort(m_cp);
+		socket->Accept(addr);
+
+		// post another event for the next socket
+		CreateEvent();
+	}
+
+	void CreateEvent()
+	{
+		DWORD bytes;
+		OverlappedStruct * ov = new OverlappedStruct(SOCKET_IO_EVENT_ACCEPT);
+		int len = sizeof(sockaddr_in) + 16;
+		m_new_fd = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+        if(!AcceptEx(m_socket, m_new_fd, ((char*)m_accept_buffer) + sizeof(int), 0, len, len, &bytes, &ov->m_overlap))
+		{
+			DWORD err = WSAGetLastError();
+			if(err != WSA_IO_PENDING)
+				printf("AcceptEx: %u\n", err);
+		}
 	}
 
 	void Close()
