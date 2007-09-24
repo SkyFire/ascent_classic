@@ -109,37 +109,6 @@ struct Addr
         static const char * default_realm_config_file = CONFDIR "/realms.conf";
 #endif
 
-const char banner[] = ""
-"                                   I33ctueuJ7     \n"
-"                                   ICLL5seOue37   \n"
-"                                    7zLeYuvYee27  \n"
-"                                     7uOCaYaaYs7  \n"
-"                               71v22C5s0nC5JJJSJ  \n"
-"                               7z2zvvCtolljjljC57 \n"
-"                                lzesCIoooonCoaCe7 \n"
-"                                 7Oz3JlooI8xtgu57 \n"
-"                                 tOj3sloootvlolu3 \n"
-"                                 55jjuejlollojI357\n"
-"                             7ves5tlojeYejjllsa4Yr\n"
-"  12n2n5eOLnnnnnnCuunuunnn5enCC5Clloooj3LuCoI304sr\n"
-"  i2uCotzueolljljjljjllllloojjljjooooltzoJfhaa09Yr\n"
-"    7esjljjlllllllllllllllllooooooooovCn3JunYhTal7\n"
-"    Jevlooooooooooooooooooooooooooolo3oljz5ir777  \n"
-"   cuvloooooooooooooooooooooooooooot2JlolC3       \n"
-"  7nCjooooooooooooooooooooooooooool3JlojCn7       \n"
-"  7LJlooooooooooooooooooooooooooooollljzu7        \n"
-"  7LvloooooooololoooooooooooooooooojoJee1         \n"
-"  7OCjoooooool3o2tooooooooolloooolozT0C7           \"We love our goats\"\n"
-"   JLlooooolvnlJ5jlllljjjjjtvoooltes0r            \n"
-"   7eejoooolv3OatllotvJ222CY8loojuCzL7            \n"
-"    7L3loolt2sULunnCuCCzJtIeLjoolzOInv            \n"
-"   7JYolol3Otun7          7unIlllJOrzC            \n"
-"   7JLzlll3OoIuu7          rsuJtv3a6h3            \n"
-"     7n5ool3OC1CC7         7spXk9pFhei            \n"
-"      7LOicilSxxO7          7oneoeJ7              \n"
-"       1OUU9fPfYj7                                \n"
-"       7vVGf277 \n"
-"\n";
 
 bool Master::Run(int argc, char ** argv)
 {
@@ -199,7 +168,6 @@ bool Master::Run(int argc, char ** argv)
 		sLog.m_screenLogLevel = 3;
 	}
 
-	puts(banner);
 	printf(BANNER, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
 	printf("\nCopyright (C) 2005-2007 Ascent Team. http://www.ascentemu.com/\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY, and is FREE SOFTWARE.\n");
