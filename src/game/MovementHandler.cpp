@@ -19,7 +19,27 @@
 
 #include "StdAfx.h"
 #define SWIMMING_TOLERANCE_LEVEL -0.08f
-#define MOVEMENT_PACKET_TIME_DELAY 50
+#define MOVEMENT_PACKET_TIME_DELAY 500
+
+#ifdef WIN32
+
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
+inline uint32 TimeStamp()
+{
+	return timeGetTime();
+}
+
+#else
+
+inline uint32 TimeStamp()
+{
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	return (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
+}
+
+#endif
 
 void WorldSession::HandleMoveWorldportAckOpcode( WorldPacket & recv_data )
 {
@@ -139,17 +159,20 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	}
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
-	uint32 mstime = getMSTime();
-	m_moveDelayTime = (mstime - movement_info.time);
-	int32 new_move_time = (MOVEMENT_PACKET_TIME_DELAY + (movement_info.time - mstime))+mstime;
+	uint32 mstime = TimeStamp();
+	int32 move_time;
+	if(m_clientTimeDelay == 0)
+		m_clientTimeDelay = mstime - movement_info.time;
+
+	move_time = (movement_info.time - (mstime - m_clientTimeDelay)) + MOVEMENT_PACKET_TIME_DELAY + mstime;
 	memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
 
 	for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
 	{
 #ifdef USING_BIG_ENDIAN
-		*(uint32*)&movement_packet[pos+4] = swap32(new_move_time+(*itr)->GetSession()->m_moveDelayTime);
+		*(uint32*)&movement_packet[pos+4] = swap32(move_time + (*itr)->GetSession()->m_moveDelayTime);
 #else
-		*(uint32*)&movement_packet[pos+4] = new_move_time+(*itr)->GetSession()->m_moveDelayTime;
+		*(uint32*)&movement_packet[pos+4] = uint32(move_time + (*itr)->GetSession()->m_moveDelayTime);
 #endif
 		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), recv_data.size() + pos, movement_packet);
 	}
@@ -378,17 +401,20 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 	}
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
-	uint32 mstime = getMSTime();
-	m_moveDelayTime = (mstime - movement_info.time);
-	int32 new_move_time = (MOVEMENT_PACKET_TIME_DELAY + (movement_info.time - mstime))+mstime;
+	uint32 mstime = TimeStamp();
+	int32 move_time;
+	if(m_clientTimeDelay == 0)
+		m_clientTimeDelay = mstime - movement_info.time;
+
+	move_time = (movement_info.time - (mstime - m_clientTimeDelay)) + MOVEMENT_PACKET_TIME_DELAY + mstime;
 	memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
 
 	for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
 	{
 #ifdef USING_BIG_ENDIAN
-		*(uint32*)&movement_packet[pos+4] = swap32(new_move_time+(*itr)->GetSession()->m_moveDelayTime);
+		*(uint32*)&movement_packet[pos+4] = swap32(move_time + (*itr)->GetSession()->m_moveDelayTime);
 #else
-		*(uint32*)&movement_packet[pos+4] = new_move_time+(*itr)->GetSession()->m_moveDelayTime;
+		*(uint32*)&movement_packet[pos+4] = uint32(move_time + (*itr)->GetSession()->m_moveDelayTime);
 #endif
 		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), recv_data.size() + pos, movement_packet);
 	}

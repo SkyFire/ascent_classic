@@ -38,6 +38,7 @@ _logoutTime(0), permissions(NULL), permissioncount(0), _loggingOut(false), insta
 	floodTime = UNIXTIME;
 	_updatecount = 0;
 	m_moveDelayTime=0;
+	m_clientTimeDelay =0;
 
 	for(uint32 x=0;x<8;x++)
 		sAccountData[x].data=NULL;	

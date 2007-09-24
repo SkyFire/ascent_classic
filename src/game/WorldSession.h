@@ -324,6 +324,7 @@ public:
 	Mutex deleteMutex;
 	void _HandleAreaTriggerOpcode(uint32 id);//real handle
 	int32 m_moveDelayTime;
+	int32 m_clientTimeDelay;
 
 
 protected:
