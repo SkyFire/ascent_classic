@@ -13,7 +13,7 @@
 #include "SocketDefines.h"
 #ifdef CONFIG_USE_EPOLL
 
-#define SOCKET_HOLDER_SIZE 65536    // You don't want this number to be too big, otherwise you're gonna be eating
+#define SOCKET_HOLDER_SIZE 1024    // You don't want this number to be too big, otherwise you're gonna be eating
                                     // memory. 65536 = 256KB, so thats no big issue for now, and I really can't
                                     // see anyone wanting to have more than 65536 concurrent connections.
 
@@ -22,6 +22,8 @@
 
 class Socket;
 class SocketWorkerThread;
+class ListenSocketBase;
+
 class SocketMgr : public Singleton<SocketMgr>
 {
     /// /dev/epoll instance handle
@@ -29,6 +31,7 @@ class SocketMgr : public Singleton<SocketMgr>
 
     // fd -> pointer binding.
     Socket * fds[SOCKET_HOLDER_SIZE];
+	ListenSocketBase * listenfds[SOCKET_HOLDER_SIZE];
 
     /// socket counter
     int socket_count;
@@ -50,6 +53,7 @@ public:
 
         // null out the pointer array
         memset(fds, 0, sizeof(void*) * SOCKET_HOLDER_SIZE);
+		memset(listenfds, 0, sizeof(void*) * SOCKET_HOLDER_SIZE);
     }
 
     /// destructor > destroy epoll handle
@@ -61,6 +65,7 @@ public:
 
     /// add a new socket to the epoll set and to the fd mapping
     void AddSocket(Socket * s);
+	void AddListenSocket(ListenSocketBase * s);
 
     /// remove a socket from epoll set/fd mapping
     void RemoveSocket(Socket * s);

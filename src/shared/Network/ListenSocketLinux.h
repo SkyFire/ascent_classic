@@ -14,6 +14,13 @@
 #include "SocketDefines.h"
 #include <errno.h>
 
+class ListenSocketBase
+{
+public:
+	virtual void OnAccept() = 0;
+	virtual int GetFd() = 0;
+};
+
 template<class T>
 class ListenSocket
 {
@@ -52,6 +59,7 @@ public:
         }
         len = sizeof(sockaddr_in);
         m_opened = true;
+		sSocketMgr.AddListenSocket(this);
     }
 
     ~ListenSocket()
@@ -67,7 +75,7 @@ public:
         m_opened = false;
     }
 
-    void Update()
+    /*void Update()
     {
         aSocket = accept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len);
         if(aSocket == -1)
@@ -75,9 +83,20 @@ public:
 
         dsocket = new T(aSocket);
         dsocket->Accept(&m_tempAddress);
-    }
+    }*/
+
+	void OnAccept()
+	{
+		aSocket = accept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len);
+		if(aSocket == -1)
+			return;
+
+		dsocket = new T(aSocket);
+		dsocket->Accept(&m_tempAddress);
+	}
 
     inline bool IsOpen() { return m_opened; }
+	int GetFd() { return m_socket; }	
 
 private:
     SOCKET m_socket;

@@ -26,6 +26,22 @@ void SocketMgr::AddSocket(Socket * s)
 		Log.Warning("epoll", "Could not add event to epoll set on fd %u", ev.data.fd);
 }
 
+void SocketMgr::AddListenSocket(ListenSocketBase * s)
+{
+	assert(listenfds[s->GetFd()] == 0);
+	listenfds[s->GetFd()] = s;
+
+	// Add epoll event based on socket activity.
+	struct epoll_event ev;
+	memset(&ev, 0, sizeof(epoll_event));
+	ev.events = EPOLLIN;
+	ev.events |= EPOLLET;			/* use edge-triggered instead of level-triggered because we're using nonblocking sockets */
+	ev.data.fd = s->GetFd();
+
+	if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, ev.data.fd, &ev))
+		Log.Warning("epoll", "Could not add event to epoll set on fd %u", ev.data.fd);
+}
+
 void SocketMgr::RemoveSocket(Socket * s)
 {
     if(fds[s->GetFd()] != s)
@@ -82,7 +98,11 @@ void SocketWorkerThread::run()
 
             if(ptr == NULL)
             {
-               Log.Warning("epoll", "Returned invalid fd (no pointer) of FD %u", events[i].data.fd);
+				if( (ptr = ((Socket*)mgr->listenfds[events[i].data.fd])) != NULL )
+					((ListenSocketBase*)ptr)->OnAccept();
+				else
+					Log.Warning("epoll", "Returned invalid fd (no pointer) of FD %u", events[i].data.fd);
+
                 continue;
             }
 
