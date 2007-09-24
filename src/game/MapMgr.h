@@ -292,6 +292,7 @@ private:
 	float m_UpdateDistance;
 
 	/* Update System */
+	FastMutex m_updateMutex;		// use a user-mode mutex for extra speed
 	UpdateQueue _updates;
 	PUpdateQueue _processQueue;
 

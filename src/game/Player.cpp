@@ -721,7 +721,6 @@ bool Player::Create(WorldPacket& data )
 	load_health = m_uint32Values[UNIT_FIELD_HEALTH];
 	load_mana = m_uint32Values[UNIT_FIELD_POWER1];
 
-    
 	return true;
 }
 
@@ -8592,4 +8591,3 @@ void Player::SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra)
 /************************************************************************/
 /* End of SpellPacket Wharper                                           */
 /************************************************************************/
-

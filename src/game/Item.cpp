@@ -297,11 +297,6 @@ void Item::DeleteFromDB()
 		{
 			if(((Container*)this)->GetItem(i) != NULL)
 			{
-#ifdef WIN32
-				OutputCrashLogLine("Delting bag with inventority items still!!!! ItemId %u containerslots %u", m_itemProto->ItemId, m_itemProto->ContainerSlots);
-				CStackWalker ws;
-				ws.ShowCallstack();
-#endif
 				/* abort the delete */
 				return;
 			}

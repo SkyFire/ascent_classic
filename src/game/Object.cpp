@@ -727,7 +727,9 @@ bool Object::SetPosition( float newX, float newY, float newZ, float newOrientati
 {
 	bool updateMap = false, result = true;
 
-	if (m_position.x != newX || m_position.y != newY)
+	//if (m_position.x != newX || m_position.y != newY)
+		//updateMap = true;
+	if(m_position.Distance2DSq(newX, newY) > 4.0f)		/* 2.0f */
 		updateMap = true;
 
 	m_position.ChangeCoords(newX, newY, newZ, newOrientation);

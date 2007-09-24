@@ -1026,6 +1026,7 @@ void MapMgr::_UpdateObjects()
 	ByteBuffer update(2500);
 	uint32 count = 0;
 	
+	m_updateMutex.Acquire();
 	UpdateQueue::iterator iter = _updates.begin();
 	PUpdateQueue::iterator it, eit;
 
@@ -1087,6 +1088,7 @@ void MapMgr::_UpdateObjects()
 		pObj->ClearUpdateMask();
 	}
 	_updates.clear();
+	m_updateMutex.Release();
 	
 	// generate pending a9packets and send to clients.
 	Player *plyr;
@@ -1203,17 +1205,12 @@ bool MapMgr::_CellActive(uint32 x, uint32 y)
 
 void MapMgr::ObjectUpdated(Object *obj)
 {
-#ifdef WIN32
-	if(GetCurrentThreadId() != threadid && !_shutdown)
-	{
-		OutputCrashLogLine("ObjectUpdated accessed from external thread!!!");
-		sLog.outString("ObjectUpdated accessed from external thread!!!");
-		CStackWalker sw;
-		sw.ShowCallstack();
-	}
-#endif
 	// set our fields to dirty
+	// stupid fucked up code in places.. i hate doing this but i've got to :<
+	// - burlex
+	m_updateMutex.Acquire();
 	_updates.insert(obj);
+	m_updateMutex.Release();
 }
 
 void MapMgr::PushToProcessed(Player* plr)
