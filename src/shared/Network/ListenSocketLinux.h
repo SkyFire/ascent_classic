@@ -22,10 +22,10 @@ public:
 };
 
 template<class T>
-class ListenSocket
+class ListenSocket : public ListenSocketBase
 {
 public:
-    ListenSocket(const char * ListenAddress, uint32 Port)
+	ListenSocket(const char * ListenAddress, uint32 Port) : ListenSocketBase()
     {
         m_socket = socket(AF_INET, SOCK_STREAM, 0);
         SocketOps::ReuseAddr(m_socket);
