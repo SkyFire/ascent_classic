@@ -223,6 +223,9 @@ void CBattlegroundManager::EventQueueUpdate()
 				if(IS_ARENA(i))
 				{
                     arena = ((Arena*)iitr->second);
+					if(arena->Rated())
+						continue;
+
 					team = arena->GetFreeTeam();
 					while(team >= 0 && tempPlayerVec[0].size())
 					{
