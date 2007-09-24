@@ -34,9 +34,10 @@
 #endif
 
 uint8 loglevel = DEFAULT_LOG_LEVEL;
-int main(int argc, char ** argv)
-{
+
 #ifndef WIN32
+int unix_main(int argc, char ** argv)
+{
 	rlimit rl;
 	if (getrlimit(RLIMIT_CORE, &rl) == -1)
 		printf("getrlimit failed. This could be problem.\n");
@@ -46,28 +47,38 @@ int main(int argc, char ** argv)
 		if (setrlimit(RLIMIT_CORE, &rl) == -1)
 			printf("setrlimit failed. Server may not save core.dump files.\n");
 	}
-#endif
 
-	//VLDEnable();
+	if(!sMaster.Run(argc, argv))
+		exit(-1);
+	else
+		exit(0);
+
+	return 0;// shouldn't be reached
+}
+
+#else
+
+int win32_main(int argc, char ** argv)
+{
 	SetThreadName("Main Thread");
-
-#ifdef WIN32
-	// Activate Crash Handler
 	StartCrashHandler();
 
 	THREAD_TRY_EXECUTION
 	{
-#endif
-		if(!sMaster.Run(argc, argv))
-		{
-			sLog.outString("\nStartup failed for some reason. Please review the error messages above.");
-		} else {
-			sLog.outString("Server exited without failure.");
-		}
-#ifdef WIN32
+		sMaster.Run(argc, argv);
 	}
 	THREAD_HANDLE_CRASH;
+	exit(0);
+	return 0;
+}
+
 #endif
 
-	exit(0);
+int main(int argc, char ** argv)
+{
+#ifdef WIN32
+	win32_main(argc, argv);
+#else
+	unix_main(argc, argv);
+#endif
 }
