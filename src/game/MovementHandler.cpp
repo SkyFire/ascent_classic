@@ -136,9 +136,12 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	if(sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 2500.0f
 		&& _player->m_runSpeed < 50.0f && !(movement_info.flags & MOVEFLAG_TAXI))	/*50*50*/
 	{
-		sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
-		Disconnect();
-		return;
+		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		{
+			sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
+			Disconnect();
+			return;
+		}
 	}
 
 	if(sWorld.antihack_flight && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->FlyCheat &&
@@ -146,16 +149,22 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		!(movement_info.flags & MOVEFLAG_FALLING) && !(movement_info.flags & MOVEFLAG_TAXI) &&
 		_player->_delayAntiFlyUntil < UNIXTIME)
 	{
-		sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
-		Disconnect();
-		return;
+		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		{
+			sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
+			Disconnect();
+			return;
+		}
 	}
 
 	if(movement_info.flags & MOVEFLAG_FALLING_FAR && !movement_info.FallTime && sWorld.antihack_falldmg && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->bSafeFall && !_player->GodModeCheat)
 	{
-		sCheatLog.writefromsession(this, "Used fall damage hack, falltime is 0 and flags are %u", movement_info.flags);
-		Disconnect();
-		return;
+		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		{
+			sCheatLog.writefromsession(this, "Used fall damage hack, falltime is 0 and flags are %u", movement_info.flags);
+			Disconnect();
+			return;
+		}
 	}
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
@@ -378,9 +387,12 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 	if(sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 2500.0f
 		&& _player->m_runSpeed < 50.0f && !(movement_info.flags & MOVEFLAG_TAXI))	/*50*50*/
 	{
-		sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
-		Disconnect();
-		return;
+		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		{
+			sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
+			Disconnect();
+			return;
+		}
 	}
 
 	if(sWorld.antihack_flight && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->FlyCheat &&
@@ -388,16 +400,22 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 		!(movement_info.flags & MOVEFLAG_FALLING) && !(movement_info.flags & MOVEFLAG_TAXI) &&
 		_player->_delayAntiFlyUntil < UNIXTIME)
 	{
-		sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
-		Disconnect();
-		return;
+		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		{
+			sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
+			Disconnect();
+			return;
+		}
 	}
 
 	if(movement_info.flags & MOVEFLAG_FALLING_FAR && !movement_info.FallTime && sWorld.antihack_falldmg && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->bSafeFall && !_player->GodModeCheat)
 	{
-		sCheatLog.writefromsession(this, "Used fall damage hack, falltime is 0 and flags are %u", movement_info.flags);
-		Disconnect();
-		return;
+		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		{
+			sCheatLog.writefromsession(this, "Used fall damage hack, falltime is 0 and flags are %u", movement_info.flags);
+			Disconnect();
+			return;
+		}
 	}
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
@@ -638,6 +656,8 @@ void WorldSession::_HandleBreathing(WorldPacket &recv_data, MovementInfo &mi)
 void WorldSession::_SpeedCheck(MovementInfo &mi)
 {
 	// beat!
+	if(_player->m_uint32Values[UNIT_FIELD_CHARM] != 0)
+		return;
 
 	// calculate distance between last heartbeat and this
 	if(_player->_lastHeartbeatTime && _player->_heartBeatDisabledUntil < UNIXTIME)

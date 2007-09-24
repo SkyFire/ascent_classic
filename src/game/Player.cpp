@@ -8094,6 +8094,7 @@ void Player::Possess(Unit * pTarget)
 	m_noInterrupt++;
 	SetUInt64Value(UNIT_FIELD_CHARM, pTarget->GetGUID());
 	SetUInt64Value(PLAYER_FARSIGHT, pTarget->GetGUID());
+	ResetHeartbeatCoords();
 
 	pTarget->SetUInt64Value(UNIT_FIELD_CHARMEDBY, GetGUID());
 	pTarget->SetCharmTempVal(pTarget->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
@@ -8163,6 +8164,8 @@ void Player::UnPossess()
 		pTarget->setAItoUse(true);
 		pTarget->m_redirectSpellPackets = 0;
 	}
+
+	ResetHeartbeatCoords();
 
 	m_noInterrupt--;
 	SetUInt64Value(PLAYER_FARSIGHT, 0);
