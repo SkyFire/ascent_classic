@@ -7672,9 +7672,7 @@ void Player::SetShapeShift(uint8 ss)
 {
 	SetByte(UNIT_FIELD_BYTES_1,2,ss);
 	//remove auras that we should not have
-	//Shady: commented cause a lot of auras like HoTs, buffs  etc removed by this, but it shouldn't.
-	//Need to be reworked.
-	/*for(uint32 x =0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+	for(uint32 x =0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 		if(m_auras[x])
 		{
 			if(m_auras[x]->GetSpellProto()->RequiredShapeShift)
@@ -7684,7 +7682,7 @@ void Player::SetShapeShift(uint8 ss)
 					m_auras[x]->Remove();
 				}
 			}
-		} */
+		} 
 
 	if(m_SSSPecificSpells.size())
 	{//recalc modifiers
