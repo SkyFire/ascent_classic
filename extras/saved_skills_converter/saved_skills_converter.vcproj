@@ -160,6 +160,9 @@
 				RelativePath=".\Database\QueryResult.h">
 			</File>
 			<File
+				RelativePath=".\Skill.h">
+			</File>
+			<File
 				RelativePath=".\stdafx.h">
 			</File>
 		</Filter>
