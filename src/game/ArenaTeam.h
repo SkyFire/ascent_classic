@@ -35,11 +35,11 @@ class ArenaTeam
 	{
 		uint32 Slots = 0;
 		if(Type == ARENA_TEAM_TYPE_2V2)
-			Slots=2;
+			Slots=4;
 		else if(Type == ARENA_TEAM_TYPE_3V3)
-			Slots=3;
+			Slots=6;
 		else if(Type == ARENA_TEAM_TYPE_5V5)
-			Slots=5;
+			Slots=10;
 		ASSERT(Slots);
 		m_members = new ArenaTeamMember[Slots];
 		memset(m_members,0,sizeof(ArenaTeamMember)*Slots);
