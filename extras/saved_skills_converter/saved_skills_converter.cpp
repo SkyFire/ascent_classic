@@ -75,7 +75,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				*end = '\0';
 				uint32 val = atoi(start);
 				start = end + 1;
-				ss << val << ";";
+				ss << val << " ";
 				++i;
 				if(!(i % 2))
 					ss << "0 ";
