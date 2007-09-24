@@ -311,7 +311,8 @@ void Arena::Finish()
 					}
 				}
 			}
-			averageRating[i] /= teamCount;
+			if(teamCount)
+				averageRating[i] /= teamCount;
 		}
 		doneteams.clear();
 		for (uint32 i = 0; i < 2; ++i) {
