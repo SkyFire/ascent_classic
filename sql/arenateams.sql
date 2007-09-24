@@ -16,5 +16,10 @@ CREATE TABLE `arenateams` (
   `player_data3` varchar(60) NOT NULL,
   `player_data4` varchar(60) NOT NULL,
   `player_data5` varchar(60) NOT NULL,
+  `player_data6` varchar(60) NOT NULL,
+  `player_data7` varchar(60) NOT NULL,
+  `player_data8` varchar(60) NOT NULL,
+  `player_data9` varchar(60) NOT NULL,
+  `player_data10` varchar(60) NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
