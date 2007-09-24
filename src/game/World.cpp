@@ -509,6 +509,8 @@ void World::SetInitialWorldSettings()
 	tl.wait();
 
 	CommandTableStorage::getSingleton().Load();
+	new WordFilter;
+	sWordFilter.Load();
 
 	sLog.outString("");
 	Log.Notice("World", "Database loaded in %ums.", getMSTime() - start_time);

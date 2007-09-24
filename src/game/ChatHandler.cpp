@@ -22,6 +22,7 @@
 extern std::string LogFileName;
 extern bool bLogChat;
 
+
 void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 {
 	CHECK_PACKET_SIZE(recv_data, 9);
@@ -114,6 +115,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
 
+			if(sWordFilter.UsesBannedKeyword(msg, this))
+				return;
+
 			if(GetPlayer()->m_modlanguage >=0)
 				data = sChatHandler.FillMessageData( CHAT_MSG_SAY, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 			else 
@@ -136,6 +140,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
 			
+			if(sWordFilter.UsesBannedKeyword(msg, this))
+				return;
+
 			Group *pGroup = _player->GetGroup();
 			if(pGroup == NULL) break;
 			
@@ -178,6 +185,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 					break;
 				}
 
+				if(sWordFilter.UsesBannedKeyword(msg, this))
+					return;
+
 			if (GetPlayer()->IsInGuild())
 			{
 				Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
@@ -206,6 +216,8 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			if(sWorld.getReqGmClient() == false)
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
+			if(sWordFilter.UsesBannedKeyword(msg, this))
+				return;
 
 			if (GetPlayer()->IsInGuild())
 			{
@@ -234,6 +246,8 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			if(sWorld.getReqGmClient() == false)
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
+			if(sWordFilter.UsesBannedKeyword(msg, this))
+				return;
 
 			if(GetPlayer()->m_modlanguage >=0)
 				data = sChatHandler.FillMessageData( CHAT_MSG_YELL, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
@@ -252,6 +266,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 		{
 			std::string to = "",tmp;
 			recv_data >> to >> msg;
+
+			if(sWordFilter.UsesBannedKeyword(msg, this))
+				return;
 		 
 			Player *player = objmgr.GetPlayer(to.c_str(), false);
 			if(!player)
@@ -321,10 +338,12 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			recv_data >> channel;
 			recv_data >> msg;
 		 
-
 			if(strcmp(channel.c_str(), sWorld.getGmClientChannel().c_str()) == 0)
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
+
+			if(sWordFilter.UsesBannedKeyword(msg, this))
+				return;
 
 			Channel *chn = channelmgr.GetChannel(channel.c_str(),GetPlayer()); 
 			if(chn) 
@@ -340,6 +359,10 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			std::string reason;
 			recv_data >> reason;
 			GetPlayer()->SetAFKReason(reason);
+
+			if(sWordFilter.UsesBannedKeyword(reason, this))
+				return;
+
 			/* WorldPacket *data, WorldSession* session, uint32 type, uint32 language, const char *channelName, const char *message*/
 			if(GetPlayer()->HasFlag(PLAYER_FLAGS, 0x02))
 			{
@@ -359,6 +382,10 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			std::string reason;
 			recv_data >> reason;
 			GetPlayer()->SetAFKReason(reason);
+
+			if(sWordFilter.UsesBannedKeyword(reason, this))
+				return;
+
 			if(GetPlayer()->HasFlag(PLAYER_FLAGS, 0x04))
 				GetPlayer()->RemoveFlag(PLAYER_FLAGS, 0x04);
 			else
