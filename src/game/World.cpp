@@ -20,8 +20,6 @@
 #include "StdAfx.h"
 
 initialiseSingleton( World );
-time_t World::UNIXTIME = time(NULL);
-time_t World::MSTIME = getMSTime();
 static DayWatcherThread * dw = NULL;
 
 World::World()
@@ -1789,8 +1787,7 @@ void World::Update(time_t diff)
 	_UpdateGameTime();
 
 	/* since time() is an expensive system call, we only update it once per server loop */
-	World::UNIXTIME = time(NULL);
-	World::MSTIME = getMSTime();
+	UNIXTIME = time(NULL);
 }
 
 

@@ -465,8 +465,8 @@ CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 
 	m_countdownStage = 0;
 	m_ended = false;
 	m_winningteam = 0;
-	m_startTime = World::UNIXTIME;
-	m_lastResurrect = World::UNIXTIME;
+	m_startTime = UNIXTIME;
+	m_lastResurrect = UNIXTIME;
 	sEventMgr.AddEvent(this, &CBattleground::EventResurrectPlayers, EVENT_BATTLEGROUND_QUEUE_UPDATE, 30000, 0,0);
 
 	/* create raid groups */
@@ -507,7 +507,7 @@ void CBattleground::UpdatePvPData()
 		}
 	}
 
-	if(World::UNIXTIME >= m_nextPvPUpdateTime)
+	if(UNIXTIME >= m_nextPvPUpdateTime)
 	{
 		m_mainLock.Acquire();
 		WorldPacket data(10*(m_players[0].size()+m_players[1].size())+50);
@@ -515,7 +515,7 @@ void CBattleground::UpdatePvPData()
 		DistributePacketToAll(&data);
 		m_mainLock.Release();
 
-		m_nextPvPUpdateTime = World::UNIXTIME + 2;
+		m_nextPvPUpdateTime = UNIXTIME + 2;
 	}
 }
 
@@ -697,7 +697,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		plr->m_bgEntryPointInstance = plr->GetInstanceID();
 	
 		plr->SafeTeleport(m_mapMgr->GetMapId(), m_mapMgr->GetInstanceID(), GetStartingCoords(plr->m_bgTeam));
-		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, World::UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
+		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
 	}
 
 	plr->m_pendingBattleground = 0;
@@ -1243,7 +1243,7 @@ void CBattleground::EventResurrectPlayers()
 		}
 		m_resurrectQueue[i].clear();
 	}
-	m_lastResurrect = World::UNIXTIME;
+	m_lastResurrect = UNIXTIME;
 }
 
 void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 BattlegroundType, uint8 as_group, uint8 rated_match)

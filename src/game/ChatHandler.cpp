@@ -46,16 +46,16 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 	if(lang != -1 && !GetPermissionCount() && sWorld.flood_lines)
 	{
 		/* flood detection, wheeee! */
-		if(World::UNIXTIME >= floodTime)
+		if(UNIXTIME >= floodTime)
 		{
 			floodLines = 0;
-			floodTime = World::UNIXTIME + sWorld.flood_seconds;
+			floodTime = UNIXTIME + sWorld.flood_seconds;
 		}
 
 		if((++floodLines) > sWorld.flood_lines)
 		{
 			if(sWorld.flood_message)
-				_player->BroadcastMessage("Your message has triggered serverside flood protection. You can speak again in %u seconds.", floodTime - World::UNIXTIME);
+				_player->BroadcastMessage("Your message has triggered serverside flood protection. You can speak again in %u seconds.", floodTime - UNIXTIME);
 
 			return;
 		}

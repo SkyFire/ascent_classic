@@ -2625,10 +2625,10 @@ SpellCastTargets AIInterface::setSpellTargets(SpellEntry *spellInfo, Unit* targe
 AI_Spell *AIInterface::getSpell()
 {
 	/* limit spell query time to once every second */
-	if((time_t)next_spell_time >= World::UNIXTIME)
+	if((time_t)next_spell_time >= UNIXTIME)
 		return 0;
 
-	next_spell_time = World::UNIXTIME + 1;
+	next_spell_time = UNIXTIME + 1;
 
 	// look at our spells
 	AI_Spell *  sp = NULL;
@@ -2700,7 +2700,7 @@ AI_Spell *AIInterface::getSpell()
 		cast_time = GetCastTime(sCastTime.LookupEntry( sp->spell->CastingTimeIndex ) );
 		cast_time /= 1000;
 		if(cast_time)
-			next_spell_time = World::UNIXTIME + cast_time;
+			next_spell_time = UNIXTIME + cast_time;
 
 /*		// add the cooldown - added at actual cast
 		AddSpellCooldown(sp->spell->Id);*/

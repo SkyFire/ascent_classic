@@ -35,7 +35,7 @@ _logoutTime(0), permissions(NULL), permissioncount(0), _loggingOut(false), insta
 	bDeleted = false;
 	m_bIsWLevelSet = false;
 	floodLines = 0;
-	floodTime = World::UNIXTIME;
+	floodTime = UNIXTIME;
 	_updatecount = 0;
 	m_moveDelayTime=0;
 

@@ -402,9 +402,6 @@ bool Master::Run(int argc, char ** argv)
 	while(!m_stopEvent)
 #endif
 	{
-		/* Update global UnixTime variable */
-		UNIXTIME = time(NULL);
-
 		start = now();
 		diff = start - last_time;
 

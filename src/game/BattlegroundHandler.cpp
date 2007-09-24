@@ -50,7 +50,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket &recv_data)
 	if(_player->m_pendingBattleground)		// Ready to port
 		BattlegroundManager.SendBattlefieldStatus(_player, 2, _player->m_pendingBattleground->GetType(), _player->m_pendingBattleground->GetId(), 120000, 0, _player->m_pendingBattleground->Rated());
 	else if(_player->m_bg)					// Inside a bg
-		BattlegroundManager.SendBattlefieldStatus(_player, 3, _player->m_bg->GetType(), _player->m_bg->GetId(), World::UNIXTIME - _player->m_bg->GetStartTime(), _player->GetMapId(), _player->m_bg->Rated());
+		BattlegroundManager.SendBattlefieldStatus(_player, 3, _player->m_bg->GetType(), _player->m_bg->GetId(), UNIXTIME - _player->m_bg->GetStartTime(), _player->GetMapId(), _player->m_bg->Rated());
 	else									// None
 		BattlegroundManager.SendBattlefieldStatus(_player, 0, 0, 0, 0, 0, 0);	
 }
@@ -96,7 +96,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket &recv_data)
 	uint64 guid;
 	recv_data >> guid;
 	
-	uint32 restime = (_player->m_bg->GetLastResurrect() + 30) - World::UNIXTIME;
+	uint32 restime = (_player->m_bg->GetLastResurrect() + 30) - UNIXTIME;
 	WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
 	data << guid << restime;
 	SendPacket(&data);

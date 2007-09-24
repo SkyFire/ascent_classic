@@ -517,11 +517,6 @@ private:
 	typedef HM_NAMESPACE::hash_map<uint32, AreaTrigger*> AreaTriggerMap;
 	AreaTriggerMap m_AreaTrigger;
 
-public:
-
-	static time_t UNIXTIME;
-	static time_t MSTIME;
-
 protected:
 	Mutex SessionsMutex;//FOR GLOBAL !
 	SessionSet Sessions;
