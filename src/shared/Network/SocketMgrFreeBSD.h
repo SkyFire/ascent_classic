@@ -22,6 +22,8 @@
 
 class Socket;
 class SocketWorkerThread;
+class ListenSocketBase;
+
 class SocketMgr : public Singleton<SocketMgr>
 {
     // kqueue handle

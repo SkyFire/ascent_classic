@@ -59,6 +59,7 @@ public:
         }
         len = sizeof(sockaddr_in);
         m_opened = true;
+	sSocketMgr.AddListenSocket(this);
     }
 
     ~ListenSocket()
