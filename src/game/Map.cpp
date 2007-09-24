@@ -214,12 +214,6 @@ void Map::DestroyMapMgrInstance(uint32 instanceId)
 	sLog.outError("Deleting instance %u of map %u", instanceId, _mapId);
 	if(it->second->thread_is_alive)
 	{
-		/*sLog.outString("Adding delete pending to mapmgr");
-		Crash_Log->AddLine("Adding delete pending to mapmgr. Callstack:");
-#ifdef WIN32
-		CStackWalker ws;
-		ws.ShowCallstack();
-#endif*/
 		it->second->delete_pending = true;
 		it->second->SetThreadState(THREADSTATE_TERMINATE);
 		listmutex.Release();

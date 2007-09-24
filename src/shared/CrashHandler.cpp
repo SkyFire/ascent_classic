@@ -39,6 +39,9 @@ void OutputCrashLogLine(const char * format, ...)
 
 #ifdef WIN32
 
+#include "CircularQueue.h"
+extern CircularQueue<uint32, 30> last_spells;
+
 /* *
    @file CrashHandler.h
    Handles crashes/exceptions on a win32 based platform, writes a dump file,
@@ -169,12 +172,17 @@ static const TCHAR *GetExceptionDescription(DWORD ExceptionCode)
 
 void echo(const char * format, ...)
 {
-	std::string s = FormatOutputString("logs", "CrashLog", false);
-	FILE * m_file = fopen(s.c_str(), "a");
-	if(!m_file) return;
-
 	va_list ap;
 	va_start(ap, format);
+	vprintf(format, ap);
+	std::string s = FormatOutputString("logs", "CrashLog", false);
+	FILE * m_file = fopen(s.c_str(), "a");
+	if(!m_file)
+	{
+		va_end(ap);
+		return;
+	}
+
 	vfprintf(m_file, format, ap);
 	fclose(m_file);
 	va_end(ap);
@@ -186,6 +194,7 @@ void PrintCrashInformation(PEXCEPTION_POINTERS except)
 	GetSystemInfo(&si);
 	TCHAR username[200];
 	DWORD usize = 198;
+	uint32 i,j;
 	if(!GetUserName(username, &usize))
 		strcpy(username, "Unknown");
 	TCHAR winver[200];
@@ -220,6 +229,17 @@ void PrintCrashInformation(PEXCEPTION_POINTERS except)
 	echo("System Information:\n");
 	echo("   Running as: %s on %s Build %u\n", username, winver, ver.dwBuildNumber);
 	echo("   Running on %u processors (type %u)\n", si.dwNumberOfProcessors, si.dwProcessorType);
+	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+	echo("Last 30 used spells were: \n");
+	for(i = 0; i < 3; ++i)
+	{
+		echo("   ");
+		for(j = 0; j < 10; ++j)
+		{
+			echo("%u ", last_spells.get()[j*i]);
+		}
+		echo("\n");
+	}
 	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
 	echo("Call Stack: \n");
 	CStackWalker sw;
@@ -294,7 +314,7 @@ void CStackWalker::OnOutput(LPCSTR szText)
 	if(!m_file) return;
 
 	printf("   %s", szText);
-	fprintf(m_file, "   %s\n", szText);
+	fprintf(m_file, "   %s", szText);
 	fclose(m_file);
 }
 

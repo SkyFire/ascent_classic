@@ -79,15 +79,6 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 
 MapMgr::~MapMgr()
 {
-	if(thread_is_alive && !_shutdown)
-	{
-		sLog.outString("possible crash! instance deletion while thread is alive! oh noes!");
-		OutputCrashLogLine("possible crash! instance deletion while thread is alive! oh noes!");
-#ifdef WIN32
-		CStackWalker ws;
-		ws.ShowCallstack();
-#endif
-	}
 	_shutdown=true;
 	sEventMgr.RemoveEvents(this);
 	delete ScriptInterface;
@@ -141,15 +132,6 @@ MapMgr::~MapMgr()
 
 void MapMgr::PushObject(Object *obj)
 {
-#ifdef WIN32
-	if(GetCurrentThreadId()!=threadid && !_shutdown)
-	{
-		printf("Push object of mapmgr is accessed from external thread!!!\n");
-		OutputCrashLogLine("Push object of mapmgr is accessed from external thread!!!");
-		CStackWalker sw;
-		sw.ShowCallstack();
-	}
-#endif
 	/////////////
 	// Assertions
 	/////////////
@@ -376,16 +358,6 @@ void MapMgr::PushStaticObject(Object *obj)
 
 void MapMgr::RemoveObject(Object *obj)
 {
-#ifdef WIN32
-	if(GetCurrentThreadId()!=threadid && !_shutdown)
-	{
-		printf("Remove object of mapmgr is accessed from external thread!!!\n");
-		OutputCrashLogLine("Remove object of mapmgr is accessed from external thread!!!");
-		CStackWalker sw;
-		sw.ShowCallstack();
-		sLog.outString("");
-	}
-#endif
 	/////////////
 	// Assertions
 	/////////////
@@ -527,16 +499,6 @@ void MapMgr::RemoveObject(Object *obj)
 
 void MapMgr::ChangeObjectLocation(Object *obj)
 {
-#ifdef WIN32
-	if(GetCurrentThreadId()!=threadid)
-	{
-		sLog.outString("Change object location of mapmgr is accessed from external thread!!!");
-		OutputCrashLogLine("Change object location of mapmgr is accessed from external thread!!!");
-		CStackWalker sw;
-		sw.ShowCallstack();
-		sLog.outString("");
-	}
-#endif
 	// Items and containers are of no interest for us
 	if(obj->GetTypeId() == TYPEID_ITEM || obj->GetTypeId() == TYPEID_CONTAINER || obj->GetMapMgr() != this)
 	{

@@ -70,11 +70,6 @@ Object::~Object( )
 
 	if (this->IsInWorld() && m_objectTypeId != TYPEID_ITEM && m_objectTypeId != TYPEID_CONTAINER)
 	{
-#ifdef WIN32
-		CStackWalker ws;
-		OutputCrashLogLine("Object deleted while in world.");
-		ws.ShowCallstack();
-#endif
 		this->RemoveFromWorld();
 	}
 

@@ -40,6 +40,7 @@ initialiseSingleton(LogonServer);
 bool mrunning = true;
 Mutex _authSocketLock;
 set<AuthSocket*> _authSockets;
+CircularQueue<uint32,30> last_spells;
 
 /*** Signal Handler ***/
 void _OnSignal(int s)

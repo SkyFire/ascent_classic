@@ -23,6 +23,7 @@
 
 MySQLDatabase * Database_Character;
 MySQLDatabase * Database_World;
+CircularQueue<uint32,30> last_spells;
 
 int main(int argc, char *argv[])
 {

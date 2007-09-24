@@ -57,6 +57,7 @@
 #include "../shared/Auth/WowCrypt.h"
 #include "../shared/CrashHandler.h"
 #include "../shared/FastQueue.h"
+#include "../shared/CircularQueue.h"
 
 #include "UpdateFields.h"
 #include "UpdateMask.h"

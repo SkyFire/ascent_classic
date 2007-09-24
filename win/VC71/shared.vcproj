@@ -378,6 +378,9 @@
 				RelativePath="..\..\src\shared\CallBack.h">
 			</File>
 			<File
+				RelativePath="..\..\src\shared\CircularQueue.h">
+			</File>
+			<File
 				RelativePath="..\..\src\shared\CrashHandler.cpp">
 			</File>
 			<File

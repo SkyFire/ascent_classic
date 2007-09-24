@@ -21,6 +21,16 @@
 
 initialiseSingleton( World );
 static DayWatcherThread * dw = NULL;
+CircularQueue<uint32, 30> last_spells;
+FastMutex last_spell_lock;
+void pushLastSpell(uint32 spellid)
+{
+#ifdef WIN32
+	last_spell_lock.Acquire();
+	last_spells.push(spellid);
+	last_spell_lock.Release();
+#endif
+}
 
 World::World()
 {

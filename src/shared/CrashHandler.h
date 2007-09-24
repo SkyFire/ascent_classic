@@ -34,6 +34,9 @@ void OutputCrashLogLine(const char* format, ...);
 #include <Windows.h>
 #include <DbgHelp.h>
 #include "StackWalker.h"
+#include "CircularQueue.h"
+
+extern CircularQueue<uint32, 30> last_spells;
 
 class CStackWalker : public StackWalker
 {
