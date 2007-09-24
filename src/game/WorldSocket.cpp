@@ -368,18 +368,17 @@ void WorldSocket::_HandlePing(WorldPacket* recvPacket)
 	}
 
 	*recvPacket >> ping;
+	*recvPacket >> _latency;
+
 	if(mSession)
+	{
+		mSession->_latency = _latency;
 		mSession->m_lastPing = time(NULL);
 
-	if(recvPacket->size() >= 8 && mSession)
-	{
-		*recvPacket >> _latency;
-		if(!_latency)
-			_latency = mSession->_latency;
-		else
-			mSession->_latency = _latency;
-		//sLog.outDetail("Got ping packet with latency of %u and seq of %u", mSession->_latency, ping);
+		// reset the move time diff calculator, don't worry it will be re-calculated next movement packet.
+		mSession->m_clientTimeDelay = 0;
 	}
+
 	OutPacket(SMSG_PONG, 4, &ping);
 
 #ifdef WIN32
