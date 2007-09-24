@@ -1535,6 +1535,7 @@ public:
 	LocationVector m_sentTeleportPosition;
 
 	void RemoveFromBattlegroundQueue();
+	void FullHPMP();
 	uint32 m_arenateaminviteguid;
 
     /************************************************************************/

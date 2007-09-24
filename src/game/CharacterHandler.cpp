@@ -887,7 +887,7 @@ bool WorldSession::PlayerLogin(uint32 playerGuid, uint32 forced_map_id, uint32 f
 		
 		if(mapMgr && mapMgr->m_battleground)
 		{
-			CBattleground * bg = plr->GetMapMgr()->m_battleground;
+			CBattleground * bg = mapMgr->m_battleground;
 			int32 team;
 			if(bg->GetType() <= BATTLEGROUND_ARENA_5V5 && bg->GetType() >= BATTLEGROUND_ARENA_2V2)
 			{
@@ -898,8 +898,9 @@ bool WorldSession::PlayerLogin(uint32 playerGuid, uint32 forced_map_id, uint32 f
 				team = plr->GetTeam();
 			}
 
-			if(team > 0 && bg->CanPlayerJoin(plr))
+			if(team >= 0 && bg->CanPlayerJoin(plr))
 			{
+				plr->m_bgTeam = team;
 				bg->PortPlayer(plr, false);
 			}
 			else

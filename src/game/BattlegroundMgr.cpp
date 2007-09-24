@@ -139,6 +139,18 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, Worl
 
 #define IS_ARENA(x) ( (x) >= BATTLEGROUND_ARENA_2V2 && (x) <= BATTLEGROUND_ARENA_5V5 )
 
+void ErasePlayerFromList(uint32 guid, list<uint32>* l)
+{
+	for(list<uint32>::iterator itr = l->begin(); itr != l->end(); ++itr)
+	{
+		if((*itr) == guid)
+		{
+			l->erase(itr);
+			return;
+		}
+	}
+}
+
 void CBattlegroundManager::EventQueueUpdate()
 {
 	deque<Player*> tempPlayerVec[2];
@@ -168,7 +180,7 @@ void CBattlegroundManager::EventQueueUpdate()
 				it4 = it3++;
                 plr = objmgr.GetPlayer(*it4);
 				
-				if(plr || GetLevelGrouping(plr->getLevel()) != j)
+				if(!plr || GetLevelGrouping(plr->getLevel()) != j)
 				{
                     m_queuedPlayers[i][j].erase(it4);
 					continue;
@@ -191,7 +203,10 @@ void CBattlegroundManager::EventQueueUpdate()
 					// can we join?
 					bg = iitr->second;
 					if(bg->CanPlayerJoin(plr))
+					{
 						bg->AddPlayer(plr, plr->GetTeam());
+						m_queuedPlayers[i][j].erase(it4);
+					}
 				}
 				else
 				{
@@ -209,11 +224,12 @@ void CBattlegroundManager::EventQueueUpdate()
 				{
                     arena = ((Arena*)iitr->second);
 					team = arena->GetFreeTeam();
-					while(team > 0 && tempPlayerVec[0].size())
+					while(team >= 0 && tempPlayerVec[0].size())
 					{
 						plr = *tempPlayerVec[0].begin();
 						tempPlayerVec[0].pop_front();
 						arena->AddPlayer(plr, team);
+						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 					}
 				}
 				else
@@ -223,9 +239,10 @@ void CBattlegroundManager::EventQueueUpdate()
 					{
 						while(tempPlayerVec[k].size() && bg->HasFreeSlots(k))
 						{
-							plr = *tempPlayerVec[0].begin();
-							tempPlayerVec[0].pop_front();
+							plr = *tempPlayerVec[k].begin();
+							tempPlayerVec[k].pop_front();
 							bg->AddPlayer(plr, plr->GetTeam());
+							ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 						}
 					}
 				}
@@ -241,13 +258,16 @@ void CBattlegroundManager::EventQueueUpdate()
 				{
 					arena = ((Arena*)CreateInstance(i, j));
 					team = arena->GetFreeTeam();
-					while(!arena->IsFull() && tempPlayerVec[0].size() && team > 0)
+					while(!arena->IsFull() && tempPlayerVec[0].size() && team >= 0)
 					{
 						plr = *tempPlayerVec[0].begin();
 						tempPlayerVec[0].pop_front();
 
 						arena->AddPlayer(plr, team);
 						team = arena->GetFreeTeam();
+
+						// remove from the main queue (painful!)
+						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 					}
 				}
 			}
@@ -266,9 +286,10 @@ void CBattlegroundManager::EventQueueUpdate()
 						{
 							while(tempPlayerVec[k].size() && bg->HasFreeSlots(k))
 							{
-								plr = *tempPlayerVec[0].begin();
+								plr = *tempPlayerVec[k].begin();
 								tempPlayerVec[k].pop_front();
 								bg->AddPlayer(plr, k);
+								ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 							}
 						}
 					}

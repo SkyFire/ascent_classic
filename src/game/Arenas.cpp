@@ -64,12 +64,14 @@ void Arena::OnAddPlayer(Player * plr)
 		plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 		plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 		plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
+		sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
 	}
 	else
 	{
 		plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 		plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 		plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
+		sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
 	}
 
 	plr->m_deathVision = true;
@@ -473,4 +475,11 @@ bool Arena::HookHandleRepop(Player * plr)
 void Arena::HookOnAreaTrigger(Player * plr, uint32 id)
 {
 
+}
+
+void Player::FullHPMP()
+{
+	SetUInt32Value(UNIT_FIELD_HEALTH, m_uint32Values[UNIT_FIELD_MAXHEALTH]);
+	SetUInt32Value(UNIT_FIELD_POWER1, m_uint32Values[UNIT_FIELD_MAXPOWER1]);
+	SetUInt32Value(UNIT_FIELD_POWER4, m_uint32Values[UNIT_FIELD_MAXPOWER4]);
 }

@@ -108,6 +108,12 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 
 	if(((id == 3646 && plr->GetTeam() == 0) || (id == 3647 && plr->GetTeam() == 1)) && (plr->m_bgHasFlag && m_flagHolders[plr->GetTeam()] == plr->GetGUIDLow()))
 	{
+		if(m_flagHolders[plr->GetTeam() ? 0 : 1] != 0 || m_dropFlags[plr->GetTeam() ? 0 : 1]->IsInWorld())
+		{
+			/* can't cap while flag dropped */
+			return;
+		}
+
 		/* remove the bool from the player so the flag doesn't drop */
 		m_flagHolders[plr->GetTeam()] = 0;
 		plr->m_bgHasFlag = 0;
