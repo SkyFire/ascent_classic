@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="game"
+	Name="main"
 	ProjectGUID="{622DAAB0-B843-4B19-AEFC-693456DF95D8}"
 	RootNamespace="game"
 	SccProjectName=""

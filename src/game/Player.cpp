@@ -7833,7 +7833,9 @@ void Player::CalcDamage()
 
 			if(it->GetProto()->SubClass != 19)//wands do not have bonuses from RAP & ammo
 			{
-				ap_bonus = (GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER)+(int32)GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS))/14000.0;
+//				ap_bonus = (GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER)+(int32)GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS))/14000.0;
+				//modified by Zack : please try to use premade functions if possible to avoid forgetting stuff
+				ap_bonus = GetRAP()/14000.0;
 				bonus = ap_bonus*it->GetProto()->Delay;
 				
 				if(GetUInt32Value(PLAYER_AMMO_ID))

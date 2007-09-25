@@ -1,3 +1,9 @@
+*Warlock pets will attack someone who uses bandages on them.
+*if warlock imp cast "fire shield" on someone who stay near the NPC, NPC will attack them. (imp must be near the NPC)
+*Un`Goro Crater/the slithering Scar. No one of warlock pets cann`t attack mobs onda this location, but warlock can.
+*summon imp, aura "blood pact" activ. dismiss imp, aura will stay(while you logout)
+*2nd page of summon spellbook don`t open
+
 Warlock:
 
 Warclock's have lot's of spells woking,but mostly they depend on pets,and since they'r pets dont like to listen to they'r masters,lock's are abit weak.
