@@ -1654,7 +1654,11 @@ int8 ItemInterface::CanReceiveItem(ItemPrototype * item, uint32 amount)
 
 void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount)
 {
-	m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32(GetBuyPriceForItem(item, amount, amount))));
+	if(item->BuyPrice)
+	{
+		int32 itemprice = GetBuyPriceForItem(item, amount, amount);
+		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice));
+	}
 	ItemExtendedCostEntry *ex = ItemExtendedCostStore::getSingleton().LookupEntry(item->ItemExtendedCost);
 	if(ex)
 	{
