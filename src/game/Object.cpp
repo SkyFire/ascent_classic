@@ -969,6 +969,20 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 		Group * pGroup = ((Player*)this)->GetGroup();
 		if(pGroup)
 			pGroup->HandleUpdateFieldChange(index, ((Player*)this));
+
+#ifdef OPTIMIZED_PLAYER_SAVING
+		switch(index)
+		{
+		case UNIT_FIELD_LEVEL:
+		case PLAYER_XP:
+			((Player*)this)->save_LevelXP();
+			break;
+
+		case PLAYER_FIELD_COINAGE:
+			((Player*)this)->save_Gold();
+			break;
+		}
+#endif
 	}
 }
 /*
@@ -1017,6 +1031,23 @@ void Object::ModUInt32Value(uint32 index, int32 value )
 			m_mapMgr->ObjectUpdated(this);
 			m_objectUpdated = true;
 		}
+	}
+
+	if(m_objectTypeId == TYPEID_PLAYER)
+	{
+#ifdef OPTIMIZED_PLAYER_SAVING
+		switch(index)
+		{
+		case UNIT_FIELD_LEVEL:
+		case PLAYER_XP:
+			((Player*)this)->save_LevelXP();
+			break;
+
+		case PLAYER_FIELD_COINAGE:
+			((Player*)this)->save_Gold();
+			break;
+		}
+#endif
 	}
 }
 

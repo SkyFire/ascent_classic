@@ -1092,6 +1092,10 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
 			GetPlayer()->setAction(button,action,type,misc);
 		} 
 	}
+
+#ifdef OPTIMIZED_PLAYER_SAVING
+	_player->save_Actions();
+#endif
 }
 
 void WorldSession::HandleSetWatchedFactionIndexOpcode(WorldPacket &recvPacket)
@@ -1099,6 +1103,10 @@ void WorldSession::HandleSetWatchedFactionIndexOpcode(WorldPacket &recvPacket)
 	uint32 factionid;
 	recvPacket >> factionid;
 	GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, factionid);
+
+#ifdef OPTIMIZED_PLAYER_SAVING
+	_player->save_Misc();
+#endif
 }
 
 void WorldSession::HandleTogglePVPOpcode(WorldPacket& recv_data)
@@ -1124,6 +1132,10 @@ void WorldSession::HandleAmmoSetOpcode(WorldPacket & recv_data)
 
 	_player->SetUInt32Value(PLAYER_AMMO_ID, ammoId);
 	_player->CalcDamage();
+
+#ifdef OPTIMIZED_PLAYER_SAVING
+	_player->save_Misc();
+#endif
 }
 
 #define OPEN_CHEST 11437 
@@ -1845,6 +1857,10 @@ void WorldSession::HandleDungeonDifficultyOpcode(WorldPacket& recv_data)
         _player->iInstanceType = data;
         sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
     }
+
+#ifdef OPTIMIZED_PLAYER_SAVING
+	_player->save_InstanceType();
+#endif
 }
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket & recv_data)

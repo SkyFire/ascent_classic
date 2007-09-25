@@ -580,6 +580,8 @@ typedef std::map<uint32, OnHitSpell >               StrikeSpellDmgMap;
 typedef std::map<uint32, PlayerSkill>				SkillMap;
 typedef std::set<Player**>							ReferenceSet;
 
+//#define OPTIMIZED_PLAYER_SAVING
+
 class SERVER_DECL Player : public Unit
 {
 	friend class WorldSession;
@@ -1524,6 +1526,27 @@ public:
 	int32 m_rap_mod_pct;
 	void SummonRequest(uint32 Requestor, uint32 ZoneID, uint32 MapID, uint32 InstanceID, const LocationVector & Position);
 	uint8 m_lastMoveType;
+#ifdef OPTIMIZED_PLAYER_SAVING
+	void save_LevelXP();
+	void save_Skills();
+	void save_ExploreData();
+	void save_Gold();
+	void save_Misc();
+	void save_PositionHP();
+	void save_BindPosition();
+	void save_GuildData();
+	void save_Honor();
+	void save_EntryPoint();
+	void save_Taxi();
+	void save_Transporter();
+	void save_Spells();
+	void save_Actions();
+	void save_Reputation();
+	void save_Auras();
+	void save_InstanceType();
+	void save_Zone();
+	void save_PVP();
+#endif
 
 #ifdef CLUSTERING
 	void EventRemoveAndDelete();
