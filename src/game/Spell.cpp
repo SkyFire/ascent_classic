@@ -1217,6 +1217,20 @@ void Spell::cast(bool check)
 						HandleAddAura((*i));
 					}
 				}
+				// spells that proc on spell cast, some talents
+				if(p_caster && p_caster->IsInWorld() && !m_triggeredSpell)
+				{
+					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+					{
+						Unit * Target = p_caster->GetMapMgr()->GetUnit((*i));
+
+						if(!Target)
+							continue; //we already made this check, so why make it again ?
+
+						p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,Target, m_spellInfo);
+						p_caster->m_procCounter = 0; //this is required for to be able to count the depth of procs (though i have no idea where/why we use proc on proc)
+					}
+				}
 			}
 			// we're much better to remove this here, because otherwise spells that change powers etc,
 			// don't get applied.
@@ -2148,12 +2162,6 @@ void Spell::HandleAddAura(uint64 guid)
 	// remove any auras with same type
 	if(m_spellInfo->buffType > 0)
 		Target->RemoveAurasByBuffType(m_spellInfo->buffType, m_caster->GetGUID(),0);
-	// spells that proc on spell cast, some talents
-	if(p_caster && !m_triggeredSpell)
-	{
-		p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,Target, m_spellInfo);
-		p_caster->m_procCounter = 0;
-	}
 
 	std::map<uint32,Aura*>::iterator itr=Target->tmpAura.find(m_spellInfo->Id);
 	if(itr!=Target->tmpAura.end())

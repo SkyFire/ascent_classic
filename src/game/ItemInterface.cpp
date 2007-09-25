@@ -1657,7 +1657,7 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount)
 	if(item->BuyPrice)
 	{
 		int32 itemprice = GetBuyPriceForItem(item, amount, amount);
-		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice));
+		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice);
 	}
 	ItemExtendedCostEntry *ex = ItemExtendedCostStore::getSingleton().LookupEntry(item->ItemExtendedCost);
 	if(ex)

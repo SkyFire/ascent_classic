@@ -9,7 +9,6 @@ Warlock:
 Warclock's have lot's of spells woking,but mostly they depend on pets,and since they'r pets dont like to listen to they'r masters,lock's are abit weak.
 Death Coil need's a dmg heal effect added.It just does damage,but not giving a heal equal to the damage done.
 
-1. All talent pts wich improving drain spells are useless because all channeled spells are not working well, or not working at all (geting interrupted with no reason). That's are soul siphon, improved drain soul, fel concentration, and shadow mastery. Also Siphon Life are not drains any hp.
 2. Improved Howl of Terror - are not working. It's supposed to reduce cast time of that spell by 1.5sec, so make it instant, which does not happens.
 
 Demonology:
@@ -29,7 +28,6 @@ Demonology
 Soulstone - last rank doesnt works , nothing appears in your bags
 Firestone - missing rank 2 3 4 5
 Spellstone - missing rank also
-Health Funnel - you get killed while channeling
 Eye of Kilrogg - they eye gets summoned but u still have control on you
 Enslave Demon - doesnt works
 SoulWell - nothing appears
