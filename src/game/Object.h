@@ -352,7 +352,7 @@ public:
 		m_oppFactsInRange.clear();
 	}
 
-	inline uint32 GetInRangeCount() { return m_objectsInRange.size(); }
+	inline size_t GetInRangeCount() { return m_objectsInRange.size(); }
 	inline InRangeSet::iterator GetInRangeSetBegin() { return m_objectsInRange.begin(); }
 	inline InRangeSet::iterator GetInRangeSetEnd() { return m_objectsInRange.end(); }
 	inline InRangeSet::iterator FindInRangeSet(Object * obj) { return m_objectsInRange.find(obj); }
@@ -456,7 +456,7 @@ public:
 	}
 
 	void GMScriptEvent(void * function, uint32 argc, uint32 * argv, uint32 * argt);
-	inline uint32 GetInRangeOppFactCount() { return m_oppFactsInRange.size(); }
+	inline size_t GetInRangeOppFactCount() { return m_oppFactsInRange.size(); }
 
 
 protected:

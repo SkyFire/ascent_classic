@@ -58,7 +58,7 @@ void WorldSocket::OnDisconnect()
 	}
 }
 
-void WorldSocket::OutPacket(uint16 opcode, uint16 len, const void* data)
+void WorldSocket::OutPacket(uint16 opcode, size_t len, const void* data)
 {
 	bool rv;
 	if(opcode == 0 || !IsConnected())
@@ -70,7 +70,7 @@ void WorldSocket::OutPacket(uint16 opcode, uint16 len, const void* data)
 	// First, create the header.
 	ServerPktHeader Header;
 	Header.cmd = opcode;
-	Header.size = ntohs(len + 2);
+	Header.size = uint16(ntohs((u_short)len + 2));
 	_crypt.EncryptSend((uint8*)&Header, 4);
 
 	// Pass the header to our send buffer
@@ -79,7 +79,7 @@ void WorldSocket::OutPacket(uint16 opcode, uint16 len, const void* data)
 	// Pass the rest of the packet to our send buffer (if there is any)
 	if(len > 0 && rv)
 	{
-		rv = BurstSend((const uint8*)data, len);
+		rv = BurstSend((const uint8*)data, (uint32)len);
 	}
 
 	if(rv) BurstPush();

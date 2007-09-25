@@ -63,7 +63,7 @@ void ThreadMgr::RemoveThread(CThread *thread)
 
 void ThreadMgr::Shutdown()
 {
-	uint32 threadcount;
+	size_t threadcount;
 	uint32 timer = getMSTime() + 500;
 	uint32 start = getMSTime();
 	SETTHREADCOUNT;
@@ -96,7 +96,7 @@ std::string ThreadMgr::ShowStatus()
 {
 	std::stringstream s;
 	s << endl;
-	s << "*** ThreadMgr: " << mThreads.size() << " threads active." << endl;
+	s << "*** ThreadMgr: " << (unsigned int)(mThreads.size()) << " threads active." << endl;
 	s <<	"=============================================================================" << endl;
 	s <<	"|  ID  |	  Type		|	 State	  |			Start Time		  |" << endl;
 	s <<	"=============================================================================" << endl;
@@ -124,7 +124,7 @@ void ThreadMgr::AppendThreadStatus(CThread* thread, std::stringstream &stream)
 		LookupName(thread->GetThreadState(), g_threadStates),
 		tmp);
 
-	stream.write(line, strlen(line));	
+	stream.write(line, (std::streamsize)strlen(line));	
 }
 
 int ThreadMgr::GenerateThreadId()

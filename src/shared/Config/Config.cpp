@@ -82,7 +82,7 @@ void apply_setting(string & str, ConfigSetting & setting)
 	setting.AsString = str;
 	setting.AsInt = atoi(str.c_str());
 	setting.AsBool = (setting.AsInt > 0);
-	setting.AsFloat = atof(str.c_str());
+	setting.AsFloat = (float)atof(str.c_str());
 
 	/* check for verbal yes/no answers */
 	if(str.length() > 1)
@@ -103,9 +103,9 @@ void apply_setting(string & str, ConfigSetting & setting)
 
 uint32 ahash(const char * str)
 {
-	register int len = strlen(str);
+	register size_t len = strlen(str);
 	register uint32 ret = 0;
-	register int i = 0;
+	register size_t i = 0;
 	for(; i < len; ++i)
 		ret += 5 * ret + (tolower(str[i]));
 
@@ -517,7 +517,7 @@ std::string ConfigFile::GetStringVA(const char * block, const char* def, const c
 bool ConfigFile::GetString(const char * block, char * buffer, const char * name, const char * def, uint32 len)
 {
 	string val = GetStringDefault(block, name, def);
-	uint32 blen = val.length();
+	size_t blen = val.length();
 	if(blen > len)
 		blen = len;
 

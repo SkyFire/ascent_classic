@@ -119,7 +119,7 @@ public:
 			ReallocateOnHeap();
 
 		memcpy(&m_bufferPointer[m_writePos], data, size);
-		m_writePos += size;
+		m_writePos += uint32(size);
 	}
 
 	/** Ensures the buffer is big enough to fit the specified number of bytes.

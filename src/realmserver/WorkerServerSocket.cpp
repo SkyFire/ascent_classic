@@ -144,7 +144,7 @@ void WSSocket::HandleRegisterWorker(WorldPacket & pck)
 void WSSocket::SendPacket(WorldPacket * pck)
 {
 	bool rv;
-	uint32 size = pck->size();
+	size_t size = pck->size();
 	uint16 opcode = pck->GetOpcode();
 	if(!IsConnected())
 		return;
@@ -157,7 +157,7 @@ void WSSocket::SendPacket(WorldPacket * pck)
 
 	// Pass the rest of the packet to our send buffer (if there is any)
 	if(size > 0 && rv)
-		rv = BurstSend((const uint8*)pck->contents(), size);
+		rv = BurstSend((const uint8*)pck->contents(), uint32(size));
 
 	if(rv) BurstPush();
 	BurstEnd();
@@ -166,9 +166,9 @@ void WSSocket::SendPacket(WorldPacket * pck)
 void WSSocket::SendWoWPacket(Session * from, WorldPacket * pck)
 {
 	bool rv;
-	uint32 size1 = pck->size();
+	size_t size1 = pck->size();
 	uint16 opcode1 = pck->GetOpcode();
-	uint32 size2 = size1 + 10;
+	size_t size2 = size1 + 10;
 	uint32 opcode2 = ISMSG_WOW_PACKET;
 	uint32 id = from->GetSessionId();
 	if(!IsConnected())
@@ -185,7 +185,7 @@ void WSSocket::SendWoWPacket(Session * from, WorldPacket * pck)
 
 	// Pass the rest of the packet to our send buffer (if there is any)
 	if(size1 > 0 && rv)
-		rv = BurstSend(pck->contents(), size1);
+		rv = BurstSend(pck->contents(), uint32(size1));
 
 	if(rv) BurstPush();
 	BurstEnd();

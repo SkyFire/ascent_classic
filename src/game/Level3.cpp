@@ -255,7 +255,7 @@ bool ChatHandler::HandleAddSpiritCommand(const char* args, WorldSession *m_sessi
 		float x = g->x + 2;
 		float y = g->y - 2;		// move it a little..
 				
-		pCreature->Create(CreatureNameStorage.LookupEntry(SPIRITHEALER_NAMEID)->Name, g->mapid, x, y, g->z, 3.14);
+		pCreature->Create(CreatureNameStorage.LookupEntry(SPIRITHEALER_NAMEID)->Name, g->mapid, x, y, g->z, 3.14f);
 		pCreature->SetUInt32Value( OBJECT_FIELD_ENTRY, SPIRITHEALER_NAMEID );
 		pCreature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
 		pCreature->SetUInt32Value(UNIT_FIELD_DISPLAYID, 5233);
@@ -3087,7 +3087,7 @@ bool ChatHandler::HandleAddGuardCommand(const char * args, WorldSession * m_sess
 		return true;
 	}
 	uint32 zoneId = at->ZoneId;
-	string fieldName = ((bool)factionId) ? "hordeEntry" : "allianceEntry";
+	string fieldName = (factionId>0) ? "hordeEntry" : "allianceEntry";
 	uint32 startTime = getMSTime();
 	if(!ZoneGuardStorage.LookupEntry(zoneId))
 		WorldDatabase.WaitExecute("INSERT INTO zoneguards (zoneId, %s) VALUES (%u, %u)", fieldName.c_str(), zoneId, guardId);

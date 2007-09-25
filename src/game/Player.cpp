@@ -1745,12 +1745,12 @@ void Player::_LoadPet()
 		pet->entry   = fields[3].GetUInt32();
 		pet->fields  = fields[4].GetString();
 		pet->xp	  = fields[5].GetUInt32();
-		pet->active  = fields[6].GetUInt32();
+		pet->active  = (fields[6].GetUInt32()>0 ? true : false);
 		pet->level   = fields[7].GetUInt32();
 		pet->happiness = fields[8].GetUInt32();
 		pet->actionbar = fields[9].GetString();
 		pet->happinessupdate = fields[10].GetUInt32();
-		pet->summon = fields[11].GetUInt32();
+		pet->summon = (fields[11].GetUInt32()>0 ? true : false);
 		pet->autocastspell = fields[12].GetUInt32();
 		pet->loyaltypts = fields[13].GetUInt32();
 		pet->loyaltyupdate = fields[14].GetUInt32();
@@ -4183,9 +4183,9 @@ void Player::UpdateChances()
 {
 	uint32 pClass = (uint32)this->getClass();
 	uint32 pLevel = (this->getLevel()>70) ? 70 : this->getLevel();
-	const float baseDodge[12] = { 0, 0, 0.75, 0.64, 0, 3, 0, 1.75, 3.25, 2, 0, 0.75 };
-	const float dodgeRatio[12] = { 0, 30, 30, 40, 21, 30, 0, 30, 30, 30, 0, 30 };
-	const float baseSpellCrit[12] = { 0, 0, 3.3355, 3.6020, 0, 1.2375, 0, 2.2010, 0.9075, 1.700, 0, 1.8515 };
+	const float baseDodge[12] = { 0.0f, 0.0f, 0.75f, 0.64f, 0.0f, 3.0f, 0.0f, 1.75f, 3.25f, 2.0f, 0.0f, 0.75f };
+	const float dodgeRatio[12] = { 0.0f, 30.0f, 30.0f, 40.0f, 21.0f, 30.0f, 0, 30.0f, 30.0f, 30.0f, 0, 30.0f };
+	const float baseSpellCrit[12] = { 0.0f, 0.0f, 3.3355f, 3.6020f, 0.0f, 1.2375f, 0.0f, 2.2010f, 0.9075f, 1.700f, 0.0f, 1.8515f };
  
 	float tmp = baseDodge[pClass] + (GetUInt32Value( UNIT_FIELD_STAT1) / dodgeRatio[pClass]) + this->GetDodgeFromSpell();
 	tmp+=CalcRating(2);//dodge rating
@@ -5835,9 +5835,9 @@ void Player::CalcStat(uint32 type)
 void Player::RegenerateMana(float RegenPct)
 {
 	const static float ClassMultiplier[12]={
-		0,0,0.2,0.25,0,0.25,0,0.2,0.25,0.2,0,0.2};
+		0.0f,0.0f,0.2f,0.25f,0.0f,0.25f,0.0f,0.2f,0.25f,0.2f,0.0f,0.2f};
 		const static float ClassFlatMod[12]={
-			0,0,15,15,0,12.5,0,17,12.5,15,0,15};
+			0.0f,0.0f,15.0f,15.0f,0.0f,12.5f,0.0f,17.0f,12.5f,15.0f,0.0f,15.0f};
 			float amt;
 			if (m_interruptRegen)
 				return;
@@ -5870,10 +5870,10 @@ void Player::RegenerateMana(float RegenPct)
 void Player::RegenerateHealth(bool inCombat)
 {
 	const static float ClassMultiplier[12]={
-		0,0.8,0.25,0.25,0.5,0.1,0,0.11,0.1,0.11,0,0.09};
+		0.0f,0.8f,0.25f,0.25f,0.5f,0.1f,0.0f,0.11f,0.1f,0.11f,0.0f,0.09f};
 
 	const static float ClassFlatMod[12]={
-			0,6,6,6,2,4,0,6,4,6,0,6.5};
+			0.0f,6.0f,6.0f,6.0f,2.0f,4.0f,0.0f,6.0f,4.0f,6.0f,0.0f,6.5f};
 
 	float amt;
 	uint32 cur = GetUInt32Value(UNIT_FIELD_HEALTH);
@@ -8037,45 +8037,45 @@ void Player::SetNoseLevel()
 	{
 		case RACE_HUMAN:
 		// female
-			if (getGender()) m_noseLevel = 1.72;
+			if (getGender()) m_noseLevel = 1.72f;
 			// male
-			else m_noseLevel = 1.78;
+			else m_noseLevel = 1.78f;
 		break;
 		case RACE_ORC:
-			if (getGender()) m_noseLevel = 1.82;
-			else m_noseLevel = 1.98;
+			if (getGender()) m_noseLevel = 1.82f;
+			else m_noseLevel = 1.98f;
 		break;
 		case RACE_DWARF:
-		if (getGender()) m_noseLevel = 1.27;
-			else m_noseLevel = 1.4;
+		if (getGender()) m_noseLevel = 1.27f;
+			else m_noseLevel = 1.4f;
 		break;
 		case RACE_NIGHTELF:
-			if (getGender()) m_noseLevel = 1.84;
-			else m_noseLevel = 2.13;
+			if (getGender()) m_noseLevel = 1.84f;
+			else m_noseLevel = 2.13f;
 		break;
 		case RACE_UNDEAD:
-			if (getGender()) m_noseLevel = 1.61;
-			else m_noseLevel = 1.8;
+			if (getGender()) m_noseLevel = 1.61f;
+			else m_noseLevel = 1.8f;
 		break;
 		case RACE_TAUREN:
-			if (getGender()) m_noseLevel = 2.48;
-			else m_noseLevel = 2.01;
+			if (getGender()) m_noseLevel = 2.48f;
+			else m_noseLevel = 2.01f;
 		break;
 		case RACE_GNOME:
-			if (getGender()) m_noseLevel = 1.06;
-			else m_noseLevel = 1.04;
+			if (getGender()) m_noseLevel = 1.06f;
+			else m_noseLevel = 1.04f;
 		break;
 		case RACE_TROLL:
-			if (getGender()) m_noseLevel = 2.02;
-			else m_noseLevel = 1.93;
+			if (getGender()) m_noseLevel = 2.02f;
+			else m_noseLevel = 1.93f;
 		break;
 		case RACE_BLOODELF:
-			if (getGender()) m_noseLevel = 1.83;
-			else m_noseLevel = 1.93;
+			if (getGender()) m_noseLevel = 1.83f;
+			else m_noseLevel = 1.93f;
 		break;
 		case RACE_DRAENEI:
-			if (getGender()) m_noseLevel = 2.09;
-			else m_noseLevel = 2.36;
+			if (getGender()) m_noseLevel = 2.09f;
+			else m_noseLevel = 2.36f;
 		break;
 	}
 }

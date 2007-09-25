@@ -35,7 +35,7 @@ public:
 	WServer(uint32 id, WSSocket * s);
 	~WServer();
 
-	inline uint32 GetInstanceCount() { return m_instances.size(); }
+	inline size_t GetInstanceCount() { return m_instances.size(); }
 	inline void SendPacket(WorldPacket * data) { if(m_socket) m_socket->SendPacket(data); }
 	inline void SendWoWPacket(Session * from, WorldPacket * data) { if(m_socket) m_socket->SendWoWPacket(from, data); }
 	inline void AddInstance(Instance * pInstance) { m_instances.push_back(pInstance); }

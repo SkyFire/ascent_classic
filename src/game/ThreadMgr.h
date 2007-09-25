@@ -60,7 +60,7 @@ public:
 	void PauseAllThreads();
 	void ResumeAllThreads();
 
-	inline uint32 GetThreadCount() { return mThreads.size(); }
+	inline size_t GetThreadCount() { return mThreads.size(); }
 
 private:
 	ThreadSet mThreads;

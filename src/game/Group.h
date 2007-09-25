@@ -84,7 +84,7 @@ public:
 	
 
 	inline bool IsFull(void)				{ return m_GroupMembers.size() >= MAX_GROUP_SIZE_PARTY; }
-	inline uint32 GetMemberCount(void)		{ return m_GroupMembers.size(); }
+	inline size_t GetMemberCount(void)		{ return m_GroupMembers.size(); }
 	
 	inline uint32 GetID(void)			   { return m_Id; }
 	inline void SetID(uint32 newid)		 { m_Id = newid; }
@@ -149,7 +149,7 @@ public:
 	inline uint32 GetSubGroupCount(void) { return m_SubGroupCount; }
 
 	inline uint8 GetMethod(void) { return m_LootMethod; }
-	inline uint8 GetThreshold(void) { return m_LootThreshold; }
+	inline uint16 GetThreshold(void) { return m_LootThreshold; }
 	inline Player* GetLeader(void) { return m_Leader; }
 	inline Player* GetLooter(void) { return m_Looter; }
 

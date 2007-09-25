@@ -2024,7 +2024,7 @@ void ObjectMgr::LoadTrainers()
 		//now load the spells
 		result2 = WorldDatabase.Query("SELECT * FROM trainer_spells where entry='%d'",entry);
 		uint32 badspellcount=0;
-		for(int i=0;i<tr->SpellCount;i++)
+		for(uint32 i=0;i<tr->SpellCount;i++)
 		{
 			fields2 = result2->Fetch();
 			if(!fields2)
@@ -2893,7 +2893,7 @@ Charter * ObjectMgr::GetCharterByGuid(uint64 playerguid, CharterTypes type)
 				return itr->second;
 			}
 
-			for(int j = 0; j < itr->second->SignatureCount; ++j)
+			for(uint32 j = 0; j < itr->second->SignatureCount; ++j)
 			{
 				if(itr->second->Signatures[j] == playerguid)
 				{

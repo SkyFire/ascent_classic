@@ -730,7 +730,7 @@ private:
 public:
 	static void InitPacketHandlerTable();
 	uint32 floodLines;
-	uint32 floodTime;
+	time_t floodTime;
 	void SystemMessage(const char * format, ...);
 };
 

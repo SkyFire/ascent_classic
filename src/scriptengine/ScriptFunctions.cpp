@@ -1121,18 +1121,18 @@ int Player_SetLevel(gmThread * a_thread)
 
 	Player * p = GetThisPointer<Player>(a_thread);
 
-	uint32 curLevel = p->getLevel();
+	int32 curLevel = p->getLevel();
 	if ( curLevel >= level )	// player has already reached or exceeded the requested level
 		return GM_OK;
 
 	// deny the setting of level above server limits
 	if ( p->GetSession()->HasFlag(ACCOUNT_FLAG_XPACK_01) )
 	{
-		if ( level > sWorld.Expansion1LevelCap )
-			level = sWorld.Expansion1LevelCap;
+		if ( level > (int32)sWorld.Expansion1LevelCap )
+			level = (int32)sWorld.Expansion1LevelCap;
 	} else {
-		if ( level > sWorld.LevelCap )
-			level = sWorld.LevelCap;
+		if ( level > (int32)sWorld.LevelCap )
+			level = (int32)sWorld.LevelCap;
 	}
 
 	for( ; curLevel < level ; curLevel++ )

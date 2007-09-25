@@ -73,8 +73,8 @@ inline void UnsetFlagVisible(uint8 & flag)
 	flag &= ~FACTION_FLAG_VISIBLE;
 }
 
-inline bool AtWar(uint8 flag) { return flag & FACTION_FLAG_AT_WAR; }
-inline bool Visible(uint8 flag) { return flag & FACTION_FLAG_VISIBLE; }
+inline bool AtWar(uint8 flag) { return (flag & FACTION_FLAG_AT_WAR) ? true : false; }
+inline bool Visible(uint8 flag) { return (flag & FACTION_FLAG_VISIBLE) ? true : false; }
 
 inline bool RankChanged(int32 Standing, int32 Change)
 {

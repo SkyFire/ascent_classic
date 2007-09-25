@@ -94,7 +94,7 @@ public:
 		return 0;
 	}
 
-	inline uint32 GetEnchantmentApplytime(uint32 slot)
+	inline time_t GetEnchantmentApplytime(uint32 slot)
 	{
 		EnchantmentMap::iterator itr = Enchantments.find(slot);
 		if(itr == Enchantments.end()) return 0;

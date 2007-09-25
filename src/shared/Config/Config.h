@@ -22,7 +22,7 @@
 #include "Common.h"
 
 using namespace std;
-struct ConfigSetting
+struct SERVER_DECL ConfigSetting
 {
 	string AsString;
 	bool AsBool;

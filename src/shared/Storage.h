@@ -534,7 +534,7 @@ public:
 				break;
 
 			case 's':	// Null-terminated string
-				*(uint32*)structpointer = (uint32)strdup(f->GetString());
+				*(char**)structpointer = strdup(f->GetString());
 				structpointer += sizeof(char*);
 				break;
 

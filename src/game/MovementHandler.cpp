@@ -86,7 +86,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 		_player->ResetHeartbeatCoords();
 
 		if(GetPlayer()->GetSummon() != NULL)		// move pet too
-			GetPlayer()->GetSummon()->SetPosition((GetPlayer()->GetPositionX() + 2), (GetPlayer()->GetPositionY() + 2), GetPlayer()->GetPositionZ(), M_PI);
+			GetPlayer()->GetSummon()->SetPosition((GetPlayer()->GetPositionX() + 2), (GetPlayer()->GetPositionY() + 2), GetPlayer()->GetPositionZ(), float(M_PI));
 		_player->m_sentTeleportPosition.ChangeCoords(999999.0f,999999.0f,999999.0f);
 	}
 
@@ -147,7 +147,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	if(sWorld.antihack_flight && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->FlyCheat &&
 		(movement_info.flags & MOVEFLAG_FLYING || movement_info.flags & MOVEFLAG_AIR_SWIMMING) &&
 		!(movement_info.flags & MOVEFLAG_FALLING) && !(movement_info.flags & MOVEFLAG_TAXI) &&
-		_player->_delayAntiFlyUntil < UNIXTIME)
+		time_t(_player->_delayAntiFlyUntil) < UNIXTIME)
 	{
 		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
 		{
@@ -679,7 +679,7 @@ void WorldSession::_SpeedCheck(MovementInfo &mi)
 			break;
 		}
 
-		uint32 move_time = (uint32)((float)distance_travelled / (float)(speed*0.001f));
+		int32 move_time = (int32)((float)distance_travelled / (float)(speed*0.001f));
 
 		// check if we're in the correct bounds
 		if(move_time > time_diff)

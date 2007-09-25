@@ -296,7 +296,7 @@ public:
 
 	inline std::vector<CreatureItem>::iterator GetSellItemBegin() { return m_SellItems->begin(); }
 	inline std::vector<CreatureItem>::iterator GetSellItemEnd()   { return m_SellItems->end(); }
-	inline uint32 GetSellItemCount() { return m_SellItems->size(); }
+	inline size_t GetSellItemCount() { return m_SellItems->size(); }
 	
 	void RemoveVendorItem(uint32 itemid)
 	{

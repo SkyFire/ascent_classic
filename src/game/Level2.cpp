@@ -727,7 +727,7 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 	bool Save = false;
 	char* pSave = strtok(NULL, " ");
 	if (pSave)
-		Save = atoi(pSave);
+		Save = (atoi(pSave)>0?true:false);
 
 	GameObjectInfo* goi = GameObjectNameStorage.LookupEntry(EntryID);
 	if(!goi)

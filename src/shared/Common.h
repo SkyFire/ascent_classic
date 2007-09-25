@@ -20,8 +20,12 @@
 #ifndef WOWSERVER_COMMON_H
 #define WOWSERVER_COMMON_H
 
-#ifdef WIN32
+/*#ifdef WIN32
 #pragma warning(disable:4996)
+#endif*/
+
+#ifdef WIN32
+#pragma warning(disable:4251)		// dll-interface bullshit
 #endif
 
 enum TimeVariables
@@ -127,13 +131,13 @@ enum MsTimeVariables
 #define ARCH "X86"
 #endif
 
-#if COMPILER == COMPILER_MICROSOFT
+/*#if COMPILER == COMPILER_MICROSOFT
 #  pragma warning( disable : 4267 ) // conversion from 'size_t' to 'int', possible loss of data
 #  pragma warning( disable : 4311 ) // 'type cast': pointer truncation from HMODULE to uint32
 #  pragma warning( disable : 4786 ) // identifier was truncated to '255' characters in the debug information
 #  pragma warning( disable : 4146 )
 #  pragma warning( disable : 4800 )
-#endif
+#endif*/
 
 #if PLATFORM == PLATFORM_WIN32
 #define STRCASECMP stricmp
@@ -537,7 +541,7 @@ inline uint32 now()
 #define Sleep(ms) usleep(1000*ms)
 #endif
 
-#ifdef WIN32
+/*#ifdef WIN32
 #ifndef __SHOW_STUPID_WARNINGS__
 #pragma warning(disable:4018)
 #pragma warning(disable:4244)
@@ -554,7 +558,7 @@ inline uint32 now()
 #pragma warning(disable:279)
 #pragma warning(disable:1744)
 #pragma warning(disable:1740)
-#endif
+#endif*/
 
 #include "Util.h"
 struct WayPoint

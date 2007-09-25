@@ -49,10 +49,10 @@ public:
 		return t;
 	}
 
-	inline uint32 size()
+	inline size_t size()
 	{
 		mutex.Acquire();
-		uint32 c = queue.size();
+		size_t c = queue.size();
 		mutex.Release();
 		return c;
 	}

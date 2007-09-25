@@ -691,7 +691,7 @@ public:
 	inline int32 GetStealthDetect() { return 5 * getLevel() + m_stealthDetectBonus; }
 	inline uint32 GetStealthDetectBonus() { return m_stealthDetectBonus; }
 	inline void SetStealth(uint32 id) { m_stealth = id; }
-	inline bool IsStealth() { return (bool)m_stealth; }
+	inline bool IsStealth() { return (m_stealth!=0 ? true : false); }
 	bool HasAura(uint32 visualid);//not spell id!!!
 	bool HasActiveAura(uint32 spelllid);
 	bool HasActiveAura(uint32 spelllid,uint64);
@@ -890,7 +890,7 @@ public:
 	
 	inline AttackerSet::iterator GetAttackersetBegin() { return m_attackers.begin(); }
 	inline AttackerSet::iterator GetAttackersetEnd() { return m_attackers.end(); }
-	inline int GetAttackersetSize() { return m_attackers.size(); }
+	inline size_t GetAttackersetSize() { return m_attackers.size(); }
 	inline uint64 getAttackTarget() { return m_attackTarget; }
 	inline bool IsBeingAttackedBy(Unit *pUnit) { return m_attackers.count(pUnit->GetGUID()) > 0; }
 

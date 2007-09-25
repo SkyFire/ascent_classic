@@ -36,7 +36,7 @@ public:
 		i_nodes.resize( sz );
 	}
 
-	inline unsigned int Size(void) const { return i_nodes.size(); }
+	inline size_t Size(void) const { return i_nodes.size(); }
 	inline void Resize(unsigned int sz) { i_nodes.resize(sz); }
 	inline void Clear(void) { i_nodes.clear(); }
 	inline PathNode* GetNodes(void) { return static_cast<PathNode *>(&i_nodes[0]); }

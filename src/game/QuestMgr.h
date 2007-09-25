@@ -83,7 +83,7 @@ public:
 	   QuestRelationList* GetGOQuestList(uint32 entryid);
 	uint32 GetGameObjectLootQuest(uint32 GO_Entry);
 	void SetGameObjectLootQuest(uint32 GO_Entry, uint32 Item_Entry);
-	inline bool IsQuestRepeatable(Quest *qst) { return qst->is_repeatable; }
+	inline bool IsQuestRepeatable(Quest *qst) { return (qst->is_repeatable!=0 ? true : false); }
 
 	bool CanStoreReward(Player *plyr, Quest *qst, uint32 reward_slot);
 

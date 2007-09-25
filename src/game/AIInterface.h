@@ -218,7 +218,7 @@ public:
 	bool taunt(Unit* caster, bool apply = true);
 	Unit* getTauntedBy();
 	bool GetIsTaunted();
-	inline uint32 getAITargetsCount() { return m_aiTargets.size(); }
+	inline size_t getAITargetsCount() { return m_aiTargets.size(); }
 	inline uint32 getOutOfCombatRange() { return m_outOfCombatRange; }
 	void setOutOfCombatRange(uint32 val) { m_outOfCombatRange = val; }
 
@@ -289,7 +289,7 @@ public:
 	bool m_moveFly;
 	bool m_moveSprint;
 	CreatureState m_creatureState;
-	uint32 GetWayPointsCount()
+	size_t GetWayPointsCount()
 	{
 		if(m_waypoints && !m_waypoints->empty())
 			return m_waypoints->size()-1;	/* ignore 0 */

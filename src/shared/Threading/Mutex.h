@@ -64,7 +64,7 @@ public:
 #ifndef WIN32
 		return (pthread_mutex_trylock(&mutex) == 0);
 #else
-		return TryEnterCriticalSection(&cs);
+		return (TryEnterCriticalSection(&cs) == TRUE ? true : false);
 #endif
 	}
 

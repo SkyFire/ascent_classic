@@ -31,7 +31,7 @@ void SocketMgr::SpawnWorkerThreads()
 	threadcount = si.dwNumberOfProcessors;
 
 	printf("IOCP: Spawning %u worker threads.\n", threadcount);
-	for(uint32 x = 0; x < threadcount; ++x)
+	for(long x = 0; x < threadcount; ++x)
 		launch_thread(new SocketWorkerThread());
 }
 
@@ -127,7 +127,7 @@ void SocketMgr::CloseAll()
 	for(list<Socket*>::iterator itr = tokill.begin(); itr != tokill.end(); ++itr)
 		(*itr)->Delete();
 
-	uint32 size;
+	size_t size;
 	do
 	{
 		socketLock.Acquire();

@@ -247,8 +247,8 @@ inline uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 		g = 5;
 
 	float xp = 0.0f;
-	float fVictim = VictimLvl;
-	float fAttacker = AttackerLvl;
+	float fVictim = float(VictimLvl);
+	float fAttacker = float(AttackerLvl);
 
 	if(VictimLvl == AttackerLvl)
 		xp = float( ((fVictim * 5.0f) + 45.0f) );
@@ -669,7 +669,7 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
                 if(apb)
 				    ap += apall*((float)apb/100);
                 else
-                    ap = apall;
+                    ap = float(apall);
 			}
 		}
 		else
@@ -730,7 +730,7 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 
 	float result = min_damage;
 	if(diff >= 1)
-		result += sRand.rand(diff);;
+		result += float(sRand.rand(diff));
 
 	if(result >= 0)
 		return FL2UINT(result);

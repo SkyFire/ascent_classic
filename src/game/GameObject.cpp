@@ -694,6 +694,6 @@ bool GameObject::HasLoot()
     for(vector<__LootItem>::iterator itr = loot.items.begin(); itr != loot.items.end(); ++itr)
 		count += (itr)->iItemsCount;
 
-    return count;
+    return (count>0);
 
 }

@@ -28,7 +28,7 @@ AIInterface::AIInterface()
 	m_nextPosX = m_nextPosY = m_nextPosZ = 0;
 	UnitToFollow = NULL;
 	FollowDistance = 0.0f;
-	m_fallowAngle = M_PI/2;
+	m_fallowAngle = float(M_PI/2);
 	m_timeToMove = 0;
 	m_timeMoved = 0;
 	m_moveTimer = 0;
@@ -1482,7 +1482,7 @@ bool AIInterface::FindFriends(float dist)
 		CreatureProto * cp = CreatureProtoStorage.LookupEntry(guardid);
 		if(!cp) return result;
 
-		for(int i = 1; i <= m_Unit->GetInRangeOppFactCount(); i++)
+		for(size_t i = 1; i <= m_Unit->GetInRangeOppFactCount(); i++)
 		{
 			if(i >= 3)
 				break;
@@ -3057,7 +3057,7 @@ void AIInterface::AddSpellCooldown(SpellEntry * pSpell, AI_Spell * sp)
 //we only cast once a spell and we will set his health and resistances. Note that this can be made with db too !
 void AIInterface::Event_Summon_EE_totem(uint32 summon_duration)
 {
-	Unit *ourslave=m_Unit->create_guardian(329,summon_duration,-M_PI*2);
+	Unit *ourslave=m_Unit->create_guardian(329,summon_duration,float(-M_PI*2));
 	if(ourslave)
 	{
 		static_cast<Creature*>(ourslave)->ResistanceModPct[NATURE_DAMAGE]=100;//we should be imune to nature dmg. This can be also set in db
@@ -3074,7 +3074,7 @@ void AIInterface::Event_Summon_FE_totem(uint32 summon_duration)
 	//timer should not reach this value thus not cast this spell again
 	m_totemspelltimer = 0xEFFFFFFF;
 	//creatures do not support PETs and the spell uses that effect so we force a summon guardian thing
-	Unit *ourslave=m_Unit->create_guardian(575,summon_duration,-M_PI*2);
+	Unit *ourslave=m_Unit->create_guardian(575,summon_duration,float(-M_PI*2));
 	if(ourslave)
 	{
 		static_cast<Creature*>(ourslave)->ResistanceModPct[FIRE_DAMAGE]=100;//we should be imune to fire dmg. This can be also set in db

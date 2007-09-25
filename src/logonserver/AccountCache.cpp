@@ -372,11 +372,11 @@ void InformationCore::SendRealms(AuthSocket * Socket)
 #ifdef USING_BIG_ENDIAN
 	*(uint16*)&data.contents()[1] = swap16(uint16(data.size() - 3));
 #else
-	*(uint16*)&data.contents()[1] = data.size() - 3;
+	*(uint16*)&data.contents()[1] = uint16(data.size() - 3);
 #endif
 
 	// Send to the socket.
-	Socket->Send((const uint8*)data.contents(), data.size());
+	Socket->Send((const uint8*)data.contents(), uint32(data.size()));
 }
 
 BigNumber * InformationCore::GetSessionKey(uint32 account_id)
@@ -420,7 +420,7 @@ void InformationCore::TimeoutSockets()
 	/* burlex: this is vulnerable to race conditions, adding a mutex to it. */
 	serverSocketLock.Acquire();
 
-	uint32 t = time(NULL);
+	uint32 t = uint32(time(NULL));
 	// check the ping time
 	set<LogonCommServerSocket*>::iterator itr, it2;
 	LogonCommServerSocket * s;

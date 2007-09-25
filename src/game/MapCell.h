@@ -54,7 +54,7 @@ public:
 	void RemoveObject(Object *obj);
 	bool HasObject(Object *obj) { return (_objects.find(obj) != _objects.end()); }
 	bool HasPlayers() { return ((_playerCount > 0) ? true : false); }
-	inline uint32 GetObjectCount() { return _objects.size(); }
+	inline size_t GetObjectCount() { return _objects.size(); }
 	void RemoveObjects();
 	inline ObjectSet::iterator Begin() { return _objects.begin(); }
 	inline ObjectSet::iterator End() { return _objects.end(); }

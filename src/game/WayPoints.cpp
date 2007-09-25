@@ -87,9 +87,9 @@ bool ChatHandler::HandleWPAddCommand(const char* args, WorldSession *m_session)
 	wp->z = p->GetPositionZ();
 	wp->waittime = WaitTime;
 	wp->flags = Flags;
-	wp->forwardemoteoneshot = ForwardEmoteOneShot;
+	wp->forwardemoteoneshot = (ForwardEmoteOneShot>0)?true:false;
 	wp->forwardemoteid = ForwardEmoteId;
-	wp->backwardemoteoneshot = BackwardEmoteOneShot;
+	wp->backwardemoteoneshot = (BackwardEmoteOneShot>0)?true:false;
 	wp->backwardemoteid = BackwardEmoteId;
 	wp->forwardskinid = ForwardSkinId;
 	wp->backwardskinid = BackwardSkinId;
@@ -167,7 +167,7 @@ bool ChatHandler::HandleWPShowCommand(const char* args, WorldSession *m_session)
 	}
 
 	char* pBackwards = strtok((char*)args, " ");
-	bool Backwards = (pBackwards)? atoi(pBackwards) : false;
+	bool Backwards = (pBackwards)? ((atoi(pBackwards)>0)?true:false) : false;
 
 	AIInterface* ai = pCreature->GetAIInterface();
 	Player* pPlayer = m_session->GetPlayer();
@@ -506,7 +506,7 @@ bool ChatHandler::HandleWPEmoteCommand(const char* args, WorldSession *m_session
 			char* pEmoteId = strtok(NULL, " ");
 			EmoteId = (pEmoteId)? atoi(pEmoteId) : 0;
 			char* pOneShot = strtok(NULL, " ");
-			OneShot = (pOneShot)? atoi(pOneShot) : 1;
+			OneShot = (pOneShot)? ((atoi(pOneShot)>0)?true:false) : 1;
 			if(Backwards)
 			{
 				wp->backwardemoteid = EmoteId;
@@ -865,9 +865,9 @@ bool ChatHandler::HandleWaypointAddFlyCommand(const char * args, WorldSession * 
 	wp->z = p->GetPositionZ();
 	wp->waittime = WaitTime;
 	wp->flags = 768;
-	wp->forwardemoteoneshot = ForwardEmoteOneShot;
+	wp->forwardemoteoneshot = (ForwardEmoteOneShot>0)?true:false;
 	wp->forwardemoteid = ForwardEmoteId;
-	wp->backwardemoteoneshot = BackwardEmoteOneShot;
+	wp->backwardemoteoneshot = (BackwardEmoteOneShot>0)?true:false;
 	wp->backwardemoteid = BackwardEmoteId;
 	wp->forwardskinid = ForwardSkinId;
 	wp->backwardskinid = BackwardSkinId;

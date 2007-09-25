@@ -200,7 +200,7 @@ void SessionLogWriter::write(const char* format, ...)
 	time_t t = time(NULL);
 	tm* aTm = localtime(&t);
 	sprintf(out, "[%-4d-%02d-%02d %02d:%02d:%02d] ",aTm->tm_year+1900,aTm->tm_mon+1,aTm->tm_mday,aTm->tm_hour,aTm->tm_min,aTm->tm_sec);
-	int l = strlen(out);
+	size_t l = strlen(out);
 	vsnprintf(&out[l], 32768 - l, format, ap);
 
 	fprintf(m_file, "%s\n", out);

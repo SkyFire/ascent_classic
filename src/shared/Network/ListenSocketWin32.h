@@ -17,7 +17,7 @@
 class SERVER_DECL ListenSocketBase
 {
 public:
-	uint32 m_new_fd;
+	SOCKET m_new_fd;
 	char m_accept_buffer[1024];
 	virtual void OnAccept() = 0;
 };

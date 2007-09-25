@@ -226,10 +226,10 @@ void AddonMgr::LoadFromDB()
 
 		ent->name = field[1].GetString();
 		ent->crc = field[2].GetUInt64();
-		ent->banned = field[3].GetUInt32();
+		ent->banned = (field[3].GetUInt32()>0? true:false);
 		ent->isNew = false;
 		if(result->GetFieldCount() == 5)				// To avoid crashes for stilly nubs who don't update table :P
-			ent->showinlist = field[4].GetUInt32();
+			ent->showinlist = (field[4].GetUInt32()>0 ? true : false);
 
 		KnownAddons[ent->name] = ent;
 	} while(result->NextRow());

@@ -85,7 +85,7 @@ void LogonCommHandler::Startup()
 void LogonCommHandler::Connect(LogonServer * server)
 {
 	sLog.outColor(TNORMAL, "	>> connecting to `%s` on `%s:%u`...", server->Name.c_str(), server->Address.c_str(), server->Port);
-	server->RetryTime = time(NULL) + 10;
+	server->RetryTime = uint32(time(NULL) + 10);
 	server->Registered = false;
 	LogonCommClientSocket * conn = ConnectToLogon(server->Address, server->Port);
 	logons[server] = conn;
@@ -98,7 +98,7 @@ void LogonCommHandler::Connect(LogonServer * server)
 	sLog.outColor(TGREEN, " ok!\n");
 	sLog.outColor(TNORMAL, "        >> authenticating...\n");
 	sLog.outColor(TNORMAL, "        >> ");
-	uint32 tt = time(NULL) + 10;
+	uint32 tt = uint32(time(NULL) + 10);
 	conn->SendChallenge();
 	sLog.outColor(TNORMAL, "        >> result:");
 	while(!conn->authenticated)
@@ -130,7 +130,7 @@ void LogonCommHandler::Connect(LogonServer * server)
 
 	RequestAddition(conn);
 
-	uint32 st = time(NULL) + 10;
+	uint32 st = uint32(time(NULL) + 10);
 
 	// Wait for register ACK
 	while(server->Registered == false)
@@ -177,7 +177,7 @@ void LogonCommHandler::UpdateSockets()
 
 	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
 	LogonCommClientSocket * cs;
-	uint32 t = time(NULL);
+	uint32 t = uint32(time(NULL));
 	for(; itr != logons.end(); ++itr)
 	{
 		cs = itr->second;

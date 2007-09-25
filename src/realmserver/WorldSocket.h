@@ -37,7 +37,7 @@ public:
 	inline void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
 	inline void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
 
-	void __fastcall OutPacket(uint16 opcode, uint16 len, const void* data);
+	void __fastcall OutPacket(uint16 opcode, size_t len, const void* data);
    
 	inline uint32 GetLatency() { return _latency; }
 

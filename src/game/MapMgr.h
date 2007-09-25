@@ -243,7 +243,7 @@ public:
 	virtual int32 event_GetInstanceID() { return m_instanceID; }
 
 	void LoadAllCells();
-	inline uint32 GetPlayerCount() { return m_PlayerStorage.size(); }
+	inline size_t GetPlayerCount() { return m_PlayerStorage.size(); }
 
 	time_t CreationTime;
 	time_t ExpiryTime;

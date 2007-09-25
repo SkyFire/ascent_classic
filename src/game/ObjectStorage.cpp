@@ -205,7 +205,7 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 		{
 			cn->m_canFlee = true;
 			if(sp->floatMisc1)
-				cn->m_canFlee = sp->floatMisc1;
+				cn->m_canFlee = (sp->floatMisc1>0.0f ? true : false);
 			else
 				cn->m_fleeHealth = 0.2f;
 

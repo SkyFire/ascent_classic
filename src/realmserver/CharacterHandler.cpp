@@ -187,7 +187,7 @@ void Session::HandlePlayerLogin(WorldPacket & pck)
 	{
 		data << uint8(CHAR_LOGIN_NO_CHARACTER);
 		SendPacket(&data);
-		sClientMgr.DestroyRPlayerInfo(guid);
+		sClientMgr.DestroyRPlayerInfo((uint32)guid);
 		m_currentPlayer = NULL;
 		return;
 	}
@@ -226,7 +226,7 @@ void Session::HandlePlayerLogin(WorldPacket & pck)
 		/* world server is down */
 		data << uint8(CHAR_LOGIN_NO_WORLD);
 		SendPacket(&data);
-		sClientMgr.DestroyRPlayerInfo(guid);
+		sClientMgr.DestroyRPlayerInfo((uint32)guid);
 		m_currentPlayer = NULL;
 		return;
 	}

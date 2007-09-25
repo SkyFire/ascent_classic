@@ -330,9 +330,9 @@ public:
 	void RemoveGlobalSession(WorldSession *session);
 	void DeleteSession(WorldSession *session);
 
-	inline uint32 GetSessionCount() const { return m_sessions.size(); }
+	inline size_t GetSessionCount() const { return m_sessions.size(); }
 	uint32 GetNonGmSessionCount();
-	inline uint32 GetQueueCount() { return mQueuedSessions.size(); }
+	inline size_t GetQueueCount() { return mQueuedSessions.size(); }
 	void GetStats(uint32 * GMCount, float * AverageLatency);
 
 	inline uint32 GetPlayerLimit() const { return m_playerLimit; }

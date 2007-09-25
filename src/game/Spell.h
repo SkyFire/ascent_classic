@@ -1556,7 +1556,7 @@ public:
                 if((int32)sd->Duration1 < 0 && sd->Duration2 && u_caster)
                 {
                     c_dur = ((int32)sd->Duration1 + (sd->Duration2 * u_caster->getLevel()));
-                    if(c_dur > 0 && sd->Duration3 > 0 && c_dur > sd->Duration3)
+                    if(c_dur > 0 && sd->Duration3 > 0 && c_dur > (int32)sd->Duration3)
                     {
                         c_dur = sd->Duration3;
                     }

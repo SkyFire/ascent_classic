@@ -1214,7 +1214,7 @@ float Object::calcAngle( float Position1X, float Position1Y, float Position2X, f
 {
 	float dx = Position2X-Position1X;
 	float dy = Position2Y-Position1Y;
-	float angle=0.0f;
+	double angle=0.0f;
 
 	// Calculate angle
 	if (dx == 0.0)
@@ -1252,9 +1252,9 @@ float Object::calcAngle( float Position1X, float Position1Y, float Position2X, f
 
 float Object::calcRadAngle( float Position1X, float Position1Y, float Position2X, float Position2Y )
 {
-	float dx = Position2X-Position1X;
-	float dy = Position2Y-Position1Y;
-	float angle=0.0f;
+	double dx = double(Position2X-Position1X);
+	double dy = double(Position2Y-Position1Y);
+	double angle=0.0;
 
 	// Calculate angle
 	if (dx == 0.0)
@@ -1276,15 +1276,15 @@ float Object::calcRadAngle( float Position1X, float Position1Y, float Position2X
 	else
 	{
 		if (dx < 0.0)
-			angle = atanf(dy/dx) + M_PI;
+			angle = atan(dy/dx) + M_PI;
 		else if (dy < 0.0)
-			angle = atanf(dy/dx) + (2*M_PI);
+			angle = atan(dy/dx) + (2*M_PI);
 		else
-			angle = atanf(dy/dx);
+			angle = atan(dy/dx);
 	}
 
 	// Return
-	return angle;
+	return float(angle);
 }
 
 float Object::getEasyAngle( float angle )
@@ -1316,9 +1316,9 @@ bool Object::inArc(float Position1X, float Position1Y, float FOV, float Orientat
 
 bool Object::isInFront(Object* target)
 {
-	float dx=target->GetPositionX()-GetPositionX();
-	float dy=target->GetPositionY()-GetPositionY();
-	float d = m_position.o;
+	double dx=double(target->GetPositionX()-GetPositionX());
+	double dy=double(target->GetPositionY()-GetPositionY());
+	double d = double(m_position.o);
 
 	while(d < 0) d+=2*M_PI;
 	while(d > 2*M_PI) d-=2*M_PI;
@@ -1344,9 +1344,9 @@ bool Object::isInFront(Object* target)
 
 bool Object::isInBack(Object* target)
 {
-	float dx=target->GetPositionX()-GetPositionX();
-	float dy=target->GetPositionY()-GetPositionY();
-	float d=target->GetOrientation();
+	double dx=double(target->GetPositionX()-GetPositionX());
+	double dy=double(target->GetPositionY()-GetPositionY());
+	double d=double(target->GetOrientation());
 
 	while(d < 0) d+=2*M_PI;
 	while(d > 2*M_PI) d-=2*M_PI;

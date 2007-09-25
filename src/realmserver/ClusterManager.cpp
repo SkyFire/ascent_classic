@@ -119,17 +119,17 @@ Instance * ClusterMgr::CreateInstance(uint32 MapId, WServer * server)
 WServer * ClusterMgr::GetWorkerServerForNewInstance()
 {
     WServer * lowest = 0;
-	uint32 lowest_load = -1;
+	int32 lowest_load = -1;
 
 	/* for now we'll just work with the instance count. in the future we might want to change this to
 	   use cpu load instead. */
 
 	for(uint32 i = 0; i < MAX_WORKER_SERVERS; ++i) {
 		if(WorkerServers[i] != 0) {
-			if(WorkerServers[i]->GetInstanceCount() < lowest_load)
+			if((int32)WorkerServers[i]->GetInstanceCount() < lowest_load)
 			{
 				lowest = WorkerServers[i];
-				lowest_load = WorkerServers[i]->GetInstanceCount();
+				lowest_load = int32(WorkerServers[i]->GetInstanceCount());
 			}
 		}
 	}

@@ -168,7 +168,7 @@ string MySQLDatabase::EscapeString(string Escape)
 
 	MysqlCon * con = GetFreeConnection();
 	const char * ret;
-	if(mysql_real_escape_string(con->con, a2, Escape.c_str(), Escape.length()) == 0)
+	if(mysql_real_escape_string(con->con, a2, Escape.c_str(), (unsigned long)Escape.length()) == 0)
 		ret = Escape.c_str();
 	else
 		ret = a2;
@@ -242,7 +242,7 @@ QueryResult * MySQLDatabase::Query(const char* QueryString, ...)
 		MYSQL_RES * Result = mysql_store_result(con->con);
 
 		// Don't think we're gonna have more than 4 billion rows......
-		uint32 RowCount = mysql_affected_rows(con->con);
+		uint32 RowCount = (uint32)mysql_affected_rows(con->con);
 		uint32 FieldCount = mysql_field_count(con->con);
 
 		// Check if we have no rows.
@@ -271,7 +271,7 @@ bool MySQLDatabase::Execute(const char* QueryString, ...)
 	if(!ThreadRunning)
 		return WaitExecute(query);
 
-	int len = strlen(query);
+	size_t len = strlen(query);
 	char * pBuffer = new char[len+1];
 	memcpy(pBuffer, query, len + 1);
 

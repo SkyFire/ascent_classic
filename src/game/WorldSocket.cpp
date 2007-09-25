@@ -79,7 +79,7 @@ void WorldSocket::OnDisconnect()
 		sWorld.RemoveQueuedSocket(this);	// Remove from queued sockets.
 }
 
-void WorldSocket::OutPacket(uint16 opcode, uint16 len, const void* data)
+void WorldSocket::OutPacket(uint16 opcode, size_t len, const void* data)
 {
 	OUTPACKET_RESULT res = _OutPacket(opcode, len, data);
 	if(res == OUTPACKET_RESULT_SUCCESS)
@@ -137,7 +137,7 @@ void WorldSocket::UpdateQueuedPackets()
 	queueLock.Release();
 }
 
-OUTPACKET_RESULT WorldSocket::_OutPacket(uint16 opcode, uint16 len, const void* data)
+OUTPACKET_RESULT WorldSocket::_OutPacket(uint16 opcode, size_t len, const void* data)
 {
 	bool rv;
 	if(!IsConnected())

@@ -33,11 +33,11 @@ class Charter;
 struct LevelInfo;
 #define myabs(a) (a<0)?(-a):a
 #define MAX_PET_NO 3
-#define PLAYER_NORMAL_RUN_SPEED 7.0
-#define PLAYER_NORMAL_SWIM_SPEED 4.722222
-#define PLAYER_NORMAL_FLIGHT_SPEED 7.0
+#define PLAYER_NORMAL_RUN_SPEED 7.0f
+#define PLAYER_NORMAL_SWIM_SPEED 4.722222f
+#define PLAYER_NORMAL_FLIGHT_SPEED 7.0f
 #define PLAYER_HONORLESS_TARGET_SPELL 2479
-#define MONSTER_NORMAL_RUN_SPEED 8.0
+#define MONSTER_NORMAL_RUN_SPEED 8.0f
 //====================================================================
 //  Inventory
 //  Holds the display id and item type id for objects in
@@ -260,7 +260,7 @@ struct LoginAura
     uint32 dur;
 };
 
-const float SpellCritFromInt[74][12] = { //[level][class]
+const double SpellCritFromInt[74][12] = { //[level][class]
 	// War Paladin Hunter Rog Priest  -  Shaman  Mage    Warlock -  Druid
 	   {0, 0, 0     , 0     , 0, 0     , 0, 0     , 0     , 0     , 0, 0      }, //level 0
        {0, 0, 0.0832, 0.0699, 0, 0.1710, 0, 0.1333, 0.1637, 0.1500, 0, 0.1431 },
@@ -869,7 +869,7 @@ public:
     /************************************************************************/
     /* Guilds                                                               */
     /************************************************************************/
-	inline  bool        IsInGuild() {return (bool)GetUInt32Value(PLAYER_GUILDID);}
+	inline  bool        IsInGuild() {return (m_uint32Values[PLAYER_GUILDID] != 0) ? true : false;}
 	inline uint32       GetGuildId() { return m_uint32Values[PLAYER_GUILDID]; }
 	void                SetGuildId(uint32 guildId);
 	inline uint32       GetGuildRank() { return m_uint32Values[PLAYER_GUILDRANK]; }
@@ -1287,7 +1287,7 @@ public:
 	uint32 m_ShapeShifted;
 	uint32 m_MountSpellId;
     
-    inline bool IsMounted() {return m_MountSpellId; }
+	inline bool IsMounted() {return (m_MountSpellId!=0 ? true : false); }
 	
     bool bHasBindDialogOpen;
 	bool bGMTagOn;
@@ -1325,8 +1325,8 @@ public:
 	void ResetHeartbeatCoords();
 	float _lastHeartbeatX;
 	float _lastHeartbeatY;
-	uint32 _heartBeatDisabledUntil;
-	uint32 _delayAntiFlyUntil;
+	time_t _heartBeatDisabledUntil;
+	time_t _delayAntiFlyUntil;
 	uint32 _lastHeartbeatTime;
 	void AddSplinePacket(uint64 guid, ByteBuffer* packet);
 	ByteBuffer* GetAndRemoveSplinePacket(uint64 guid);
@@ -1489,7 +1489,7 @@ public:
 	inline Player * GetTradeTarget()
 	{
 		if(!IsInWorld()) return 0;
-		return m_mapMgr->GetPlayer(mTradeTarget);
+		return m_mapMgr->GetPlayer((uint32)mTradeTarget);
 	}
 
 	Item *getTradeItem(uint32 slot) {return mTradeItems[slot];};

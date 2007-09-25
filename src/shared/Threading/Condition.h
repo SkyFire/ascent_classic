@@ -231,7 +231,7 @@ public:
 
 	DWORD Wait(time_t timeout)
 	{
-		DWORD dwMillisecondsTimeout = timeout * 1000;
+		DWORD dwMillisecondsTimeout = (DWORD)timeout * 1000;
 		BOOL bAlertable = FALSE;
 		ASSERT(LockHeldByCallingThread());
 

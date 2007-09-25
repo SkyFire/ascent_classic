@@ -244,7 +244,7 @@ public:
 
 	PlayerInfo* GetGuildMember(uint64 guid);
 	PlayerInfo* GetGuildMember(std::string name);
-	uint32 GetGuildMembersCount() { return m_guildMembers.size();}
+	size_t GetGuildMembersCount() { return m_guildMembers.size();}
 
 	void FillGuildRosterData(WorldPacket *data);
 	void FillQueryData(WorldPacket *data);
@@ -288,7 +288,7 @@ public:
 	void DelRank(){ m_rankList.pop_back(); }
 	std::string GetRankName(uint32 rankId);
 	uint32 GetRankRights(uint32 rankId);
-	uint32 GetNrRanks(){ return m_rankList.size(); }
+	size_t GetNrRanks(){ return m_rankList.size(); }
 
 	void SetRankName(uint32 rankId, std::string name);
 	void SetRankRights(uint32 rankId, uint32 rights);

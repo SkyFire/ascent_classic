@@ -93,7 +93,7 @@ public:
 	void ReloadAccounts(bool silent);
 	void ReloadAccountsCallback();
 
-	inline uint32 GetCount() { return AccountDatabase.size(); }
+	inline size_t GetCount() { return AccountDatabase.size(); }
 
 private:
 	inline Account* __GetAccount(string Name)

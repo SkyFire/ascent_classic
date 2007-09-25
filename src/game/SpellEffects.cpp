@@ -718,7 +718,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				
 				NewSummon->GetAIInterface()->Init(NewSummon,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
 				NewSummon->GetAIInterface()->SetUnitToFollow(u_caster);
-				NewSummon->GetAIInterface()->SetUnitToFollowAngle(-(M_PI/2));
+				NewSummon->GetAIInterface()->SetUnitToFollowAngle(float(-(M_PI/2)));
 				NewSummon->GetAIInterface()->SetFollowDistance(3.0f);
 				
 				u_caster->summonPet = NewSummon;
@@ -1664,7 +1664,7 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 	       pCreature->_setFaction();
 	       pCreature->GetAIInterface()->Init(pCreature,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
 	       pCreature->GetAIInterface()->SetUnitToFollow(u_caster);
-	       pCreature->GetAIInterface()->SetUnitToFollowAngle(-(M_PI/2));
+	       pCreature->GetAIInterface()->SetUnitToFollowAngle(float(-(M_PI/2)));
 	       pCreature->GetAIInterface()->SetFollowDistance(3.0f);
 	       pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
 	       pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, p_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
@@ -3620,7 +3620,7 @@ void Spell::SpellEffectCharge(uint32 i)
 		return;
 
 	float d = sqrt(dx*dx+dy*dy)-unitTarget->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS)-m_caster->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
-	float alpha = atan(dy/dx);
+	double alpha = atan(dy/dx);
 	if(dx<0)
 		alpha += M_PI;
 
@@ -3681,7 +3681,7 @@ void Spell::SpellEffectSummonCritter(uint32 i)
 	pCreature->_setFaction();
 	pCreature->GetAIInterface()->Init(pCreature,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
 	pCreature->GetAIInterface()->SetUnitToFollow(u_caster);
-	pCreature->GetAIInterface()->SetUnitToFollowAngle(-(M_PI/2));
+	pCreature->GetAIInterface()->SetUnitToFollowAngle(float(-(M_PI/2)));
 	pCreature->GetAIInterface()->SetFollowDistance(3.0f);
 	pCreature->GetAIInterface()->disable_melee = true;
 	pCreature->bInvincible = true;

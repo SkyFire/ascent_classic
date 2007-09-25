@@ -355,7 +355,7 @@ public:
     inline uint32 GetTimeLeft()//in sec
     {
         if(m_duration==-1)return (uint32)-1;
-        int32 n=(time(NULL)-timeleft)*1000;
+        int32 n=int32((UNIXTIME-time_t(timeleft))*1000);
         if(n>=m_duration) return 0;
         else 
         return (m_duration-n);

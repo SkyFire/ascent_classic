@@ -212,7 +212,7 @@ public:
 	string GetPassword() { return password; }
 	void SetPassword(string npassword) { password = npassword; }
 	void SetAnnounce(bool nannounce) { announce = nannounce; }
-	uint32 GetNumPlayers() { return players.size(); }
+	size_t GetNumPlayers() { return players.size(); }
 
 	bool Join(Player *p, const char *pass);
 	void Leave(Player *p, bool send = true);

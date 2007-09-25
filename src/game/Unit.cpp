@@ -456,9 +456,9 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 			if(active_player_count==3)
 				xp_mod=1.1666f;
 			else if(active_player_count==4)
-				xp_mod=1.3;
+				xp_mod=1.3f;
 			else if(active_player_count==5)
-				xp_mod=1.4;
+				xp_mod=1.4f;
 			else xp_mod=1;//in case we have only 2 members ;)
 		}
 		else if(pGroup->GetGroupType() == GROUP_TYPE_RAID)
@@ -1406,13 +1406,13 @@ void Unit::Strike(Unit *pVictim, uint32 damage_type, SpellEntry *ability, int32 
 //==========================================================================================
 //<THE SHIT> to avoid Linux bug. 
 float diffVcapped = (float)self_skill;
-if (pVictim->getLevel()*5>victim_skill)
+if (int32(pVictim->getLevel()*5)>victim_skill)
 	diffVcapped -=(float)victim_skill;
 else
 	diffVcapped -=(float)(pVictim->getLevel()*5);
 
 float diffAcapped = (float)victim_skill;
-if (this->getLevel()*5>self_skill)
+if (int32(this->getLevel()*5)>self_skill)
 	diffAcapped -=(float)self_skill;
 else
 	diffAcapped -=(float)(this->getLevel()*5);
@@ -1645,7 +1645,7 @@ else
 					float low_dmg_mod = 1.5 - (0.05 * diffAcapped);
 					if (this->getClass() == MAGE || this->getClass() == PRIEST || this->getClass() == WARLOCK) //casters = additional penalty.
 					{
-						low_dmg_mod -= 0.7;
+						low_dmg_mod -= 0.7f;
 					}
 					if (low_dmg_mod<0.01)
 						low_dmg_mod = 0.01f;
@@ -1654,7 +1654,7 @@ else
 					float high_dmg_mod = 1.2 - (0.03 * diffAcapped);
 					if (this->getClass() == MAGE || this->getClass() == PRIEST || this->getClass() == WARLOCK) //casters = additional penalty.
 					{
-						high_dmg_mod -= 0.3;
+						high_dmg_mod -= 0.3f;
 					}
 					if (high_dmg_mod>0.99)
 						high_dmg_mod = 0.99f;
@@ -1928,7 +1928,7 @@ else
 	{
 		if(realdamage)//FIXME: add log for miss,block etc for ability and ranged
 		{
-			SendSpellNonMeleeDamageLog(this,pVictim,ability->Id,realdamage,0,dmg.resisted_damage,0,false,blocked_damage,(hit_status & HITSTATUS_CRICTICAL),true);
+			SendSpellNonMeleeDamageLog(this,pVictim,ability->Id,realdamage,0,dmg.resisted_damage,0,false,blocked_damage,((hit_status & HITSTATUS_CRICTICAL) ? true : false),true);
 		}
 		//FIXME: add log for miss,block etc for ability and ranged
 		//example how it works

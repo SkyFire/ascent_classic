@@ -200,7 +200,7 @@ bool ChatHandler::HandleAIMoveCommand(const char* args, WorldSession *m_session)
 	float y = m_session->GetPlayer()->GetPositionY();
 	float z = m_session->GetPlayer()->GetPositionZ();
 	float o = m_session->GetPlayer()->GetOrientation();
-	((Creature *)obj)->GetAIInterface()->setMoveRunFlag(Run);
+	((Creature *)obj)->GetAIInterface()->setMoveRunFlag((Run>0?true:false));
 	float distance = ((Creature *)obj)->CalcDistance(x,y,z);
 	if(Move == 1)
 	{

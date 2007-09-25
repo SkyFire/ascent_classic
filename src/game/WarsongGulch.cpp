@@ -29,13 +29,13 @@ WarsongGulch::WarsongGulch(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : C
 
 	/* take note: these are swapped around for performance bonus */
 	// warsong flag - horde base
-	m_homeFlags[0] = SpawnGameObject(179831, 489, 915.367, 1433.78, 346.089, 3.17301, 0, 210, 2.5f);
+	m_homeFlags[0] = SpawnGameObject(179831, 489, 915.367f, 1433.78f, 346.089f, 3.17301f, 0, 210, 2.5f);
 	m_homeFlags[0]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 	m_homeFlags[0]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 24);
 	m_homeFlags[0]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 
 	// silverwing flag - alliance base
-	m_homeFlags[1] = SpawnGameObject(179830, 489, 1540.29, 1481.34, 352.64, 3.17301, 0,1314, 2.5f);
+	m_homeFlags[1] = SpawnGameObject(179830, 489, 1540.29f, 1481.34f, 352.64f, 3.17301f, 0,1314, 2.5f);
 	m_homeFlags[1]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 	m_homeFlags[1]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 24);
 	m_homeFlags[1]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
@@ -287,7 +287,7 @@ void WarsongGulch::OnRemovePlayer(Player * plr)
 LocationVector WarsongGulch::GetStartingCoords(uint32 Team)
 {
 	if(Team)		// Horde
-		return LocationVector(933.989685f, 1430.735840f, 345.537140f, 3.141593);
+		return LocationVector(933.989685f, 1430.735840f, 345.537140f, 3.141593f);
 	else			// Alliance
 		return LocationVector(1519.530273f, 1481.868408f, 352.023743f, 3.141593f);
 }
@@ -326,49 +326,49 @@ void WarsongGulch::SpawnBuff(uint32 x)
     switch(x)
 	{
 	case 0:
-		m_buffs[x] = SpawnGameObject(179871, 489, 1449.9296875, 1470.70971679688, 342.634552001953, -1.64060950279236, 0, 114, 1);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.73135370016098);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.681998312473297);
+		m_buffs[x] = SpawnGameObject(179871, 489, 1449.9296875f, 1470.70971679688f, 342.634552001953f, -1.64060950279236f, 0, 114, 1);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.73135370016098f);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.681998312473297f);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 		break;
 	case 1:
-		m_buffs[x] = SpawnGameObject(179899, 489, 1005.17071533203, 1447.94567871094, 335.903228759766, 1.64060950279236, 0, 114, 1);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.73135370016098);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,0.681998372077942);
+		m_buffs[x] = SpawnGameObject(179899, 489, 1005.17071533203f, 1447.94567871094f, 335.903228759766f, 1.64060950279236f, 0, 114, 1);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.73135370016098f);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,0.681998372077942f);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 		break;
 	case 2:
-		m_buffs[x] = SpawnGameObject(179904, 489, 1317.50573730469, 1550.85070800781, 313.234375, -0.26179963350296, 0, 114, 1);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.130526319146156);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.991444826126099);
+		m_buffs[x] = SpawnGameObject(179904, 489, 1317.50573730469f, 1550.85070800781f, 313.234375f, -0.26179963350296f, 0, 114, 1);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.130526319146156f);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.991444826126099f);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 		break;
 	case 3:
-		m_buffs[x] = SpawnGameObject(179906, 489, 1110.45129394531, 1353.65563964844, 316.518096923828, -0.68067866563797, 0, 114, 1);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.333806991577148);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.94264143705368);
+		m_buffs[x] = SpawnGameObject(179906, 489, 1110.45129394531f, 1353.65563964844f, 316.518096923828f, -0.68067866563797f, 0, 114, 1);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.333806991577148f);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.94264143705368f);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 		break;
 	case 4:
-		m_buffs[x] = SpawnGameObject(179905, 489, 1320.09375, 1378.78967285156, 314.753234863281, 1.18682384490967, 0, 114, 1);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.559192895889282);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,0.829037606716156);
+		m_buffs[x] = SpawnGameObject(179905, 489, 1320.09375f, 1378.78967285156f, 314.753234863281f, 1.18682384490967f, 0, 114, 1);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.559192895889282f);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,0.829037606716156f);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 		break;
 	case 5:
-		m_buffs[x] = SpawnGameObject(179907, 489, 1139.68774414063, 1560.28771972656, 306.843170166016, -2.4434609413147, 0, 114, 1);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.939692616462708);
-		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.342020124197006);
+		m_buffs[x] = SpawnGameObject(179907, 489, 1139.68774414063f, 1560.28771972656f, 306.843170166016f, -2.4434609413147f, 0, 114, 1);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02,0.939692616462708f);
+		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.342020124197006f);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
 		m_buffs[x]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
@@ -383,32 +383,32 @@ void WarsongGulch::OnCreate()
 		m_buffs[i]->PushToWorld(m_mapMgr);
 
 	// Alliance Gates
-	GameObject *gate = SpawnGameObject(179921, 489, 1471.554688, 1458.778076, 362.633240, 0, 33, 114, 2.33271);
+	GameObject *gate = SpawnGameObject(179921, 489, 1471.554688f, 1458.778076f, 362.633240f, 0, 33, 114, 2.33271f);
 	gate->PushToWorld(m_mapMgr);
 	m_gates.push_back(gate);
 
-	gate = SpawnGameObject(179919, 489, 1492.477783, 1457.912354, 342.968933, 0, 33, 114, 2.68149);
+	gate = SpawnGameObject(179919, 489, 1492.477783f, 1457.912354f, 342.968933f, 0, 33, 114, 2.68149f);
 	gate->PushToWorld(m_mapMgr);
 	m_gates.push_back(gate);
 
-	gate = SpawnGameObject(179918, 489, 1503.335327, 1493.465820, 352.188843, 0, 33, 114, 2.26);
+	gate = SpawnGameObject(179918, 489, 1503.335327f, 1493.465820f, 352.188843f, 0, 33, 114, 2.26f);
 	gate->PushToWorld(m_mapMgr);
 	m_gates.push_back(gate);
 
 	// Horde Gates
-	gate = SpawnGameObject(179916, 489, 949.1663208, 1423.7717285, 345.6241455, -0.5756807, 32, 114, 0.900901);
-	gate->SetFloatValue(GAMEOBJECT_ROTATION,-0.0167336);
-	gate->SetFloatValue(GAMEOBJECT_ROTATION_01,-0.004956);
-	gate->SetFloatValue(GAMEOBJECT_ROTATION_02,-0.283972);
-	gate->SetFloatValue(GAMEOBJECT_ROTATION_03,0.9586736);
+	gate = SpawnGameObject(179916, 489, 949.1663208f, 1423.7717285f, 345.6241455f, -0.5756807f, 32, 114, 0.900901f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION,-0.0167336f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_01,-0.004956f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_02,-0.283972f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_03,0.9586736f);
 	gate->PushToWorld(m_mapMgr);
 	m_gates.push_back(gate);
 
-	gate = SpawnGameObject(179917, 489, 953.0507202, 1459.8424072, 340.6525573, -1.9966197, 32, 114, 0.854700);   
-	gate->SetFloatValue(GAMEOBJECT_ROTATION,-0.1971825);
-	gate->SetFloatValue(GAMEOBJECT_ROTATION_01,0.1575096);
-	gate->SetFloatValue(GAMEOBJECT_ROTATION_02,-0.8239487);
-	gate->SetFloatValue(GAMEOBJECT_ROTATION_03,0.5073640);
+	gate = SpawnGameObject(179917, 489, 953.0507202f, 1459.8424072f, 340.6525573f, -1.9966197f, 32, 114, 0.854700f);   
+	gate->SetFloatValue(GAMEOBJECT_ROTATION,-0.1971825f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_01,0.1575096f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_02,-0.8239487f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_03,0.5073640f);
 	gate->PushToWorld(m_mapMgr);
 	m_gates.push_back(gate);
 

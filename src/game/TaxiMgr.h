@@ -63,7 +63,7 @@ public:
 	inline uint32 GetID() { return id; }
 	void SendMoveForTime(Player *riding, Player *to, uint32 time);
 	void AddPathNode(uint32 index, TaxiPathNode* pn) { m_pathNodes[index] = pn; }
-	inline uint32 GetNodeCount() { return m_pathNodes.size(); }
+	inline size_t GetNodeCount() { return m_pathNodes.size(); }
 	TaxiPathNode* GetPathNode(uint32 i);
 	inline uint32 GetPrice() { return price; }
 

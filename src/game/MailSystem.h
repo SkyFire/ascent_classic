@@ -102,7 +102,7 @@ public:
 
 	WorldPacket * BuildMailboxListingPacket();
 	void CleanupExpiredMessages();
-	inline uint32 MessageCount() { return Messages.size(); }
+	inline size_t MessageCount() { return Messages.size(); }
 	bool HasUnreadMessages();
 	inline uint64 GetOwner() { return owner; }
 };
