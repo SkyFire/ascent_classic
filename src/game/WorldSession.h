@@ -554,6 +554,8 @@ protected:
 	void HandleChannelUnban(WorldPacket& recvPacket);
 	void HandleChannelAnnounce(WorldPacket& recvPacket);
 	void HandleChannelModerate(WorldPacket& recvPacket);
+	void HandleChannelNumMembersQuery(WorldPacket & recvPacket);
+	void HandleChannelRosterQuery(WorldPacket & recvPacket);
 
 	// Duel
 	void HandleDuelAccepted(WorldPacket & recv_data);

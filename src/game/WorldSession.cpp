@@ -618,6 +618,8 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_CHANNEL_UNBAN].handler							 = &WorldSession::HandleChannelUnban;
 	WorldPacketHandlers[CMSG_CHANNEL_ANNOUNCEMENTS].handler					 = &WorldSession::HandleChannelAnnounce;
 	WorldPacketHandlers[CMSG_CHANNEL_MODERATE].handler						  = &WorldSession::HandleChannelModerate;
+	WorldPacketHandlers[CMSG_CHANNEL_NUM_MEMBERS_QUERY].handler					= &WorldSession::HandleChannelNumMembersQuery;
+	WorldPacketHandlers[CMSG_CHANNEL_GET_ROSTER_INFO].handler					= &WorldSession::HandleChannelRosterQuery;
 	
 	// Groups / Raids
 	WorldPacketHandlers[CMSG_GROUP_INVITE].handler							  = &WorldSession::HandleGroupInviteOpcode;

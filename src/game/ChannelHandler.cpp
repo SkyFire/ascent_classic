@@ -26,16 +26,17 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 	CHECK_PACKET_SIZE(recvPacket, 1);
 	string channelname,pass;
 	uint32 code = 0;
-	uint8 crap;
+	uint16 crap;		// crap = some sort of channel type?
 
 	recvPacket >> code >> crap;
 	recvPacket >> channelname;
 	recvPacket >> pass;
 	if(channelmgr.GetJoinChannel(channelname.c_str(),GetPlayer())->Join(GetPlayer(),pass.c_str()))
 	{
-		WorldPacket data(SMSG_CHANNEL_NOTIFY, 1 + 8 + channelname.size());
+		WorldPacket data(SMSG_CHANNEL_NOTIFY, 10 + channelname.size());
 		data << uint8(2) << channelname;
-		data << uint64(code);
+		data << uint8(1);
+		data << uint64(0);
 		SendPacket(&data);
 	}
 }
@@ -186,4 +187,23 @@ void WorldSession::HandleChannelModerate(WorldPacket& recvPacket)
 	string channelname;
 	recvPacket >> channelname;
 	Channel *chn = channelmgr.GetChannel(channelname.c_str(),GetPlayer()); if(chn) chn->Moderate(GetPlayer());
+}
+
+void WorldSession::HandleChannelRosterQuery(WorldPacket & recvPacket)
+{
+
+}
+
+void WorldSession::HandleChannelNumMembersQuery(WorldPacket & recvPacket)
+{
+	string channel_name;
+	WorldPacket data(SMSG_CHANNEL_NUM_MEMBERS_QUERY_RESPONSE, recvPacket.size() + 4);
+	Channel *chn;
+	recvPacket >> channel_name;
+	chn = channelmgr.GetChannel(channel_name.c_str(), _player);
+	if(chn)
+	{
+		data << uint32(chn->GetNumPlayers());
+		SendPacket(&data);
+	}
 }
