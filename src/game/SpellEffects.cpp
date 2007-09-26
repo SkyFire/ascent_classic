@@ -351,7 +351,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			{
                 dmg = u_caster->GetAP()*(m_spellInfo->EffectBasePoints[0]+1) / 100;
 			}
-		case 0x00:	// Shield Slam - damage is increased by block value
+		case 2189817683:	// Shield Slam - damage is increased by block value
 			{
 				if(p_caster)
 				{

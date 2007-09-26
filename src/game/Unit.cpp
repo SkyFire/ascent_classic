@@ -911,13 +911,10 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									continue;
 							}break;
 						//warrior - improved berserker rage 
-						case 20500:
-						case 20501:
+						case 23690:
+						case 23691:
 							{
 								if(!HasActiveAura(18499))
-									continue;
-								//we need a finishing move for this 
-								if(CastingSpell->buffType!=SPELL_TYPE_FINISHING_MOVE || victim==this)
 									continue;
 							}break;
 /*						//paladin - illumination

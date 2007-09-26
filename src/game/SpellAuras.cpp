@@ -498,8 +498,8 @@ void Aura::ApplyModifiers(bool apply)
 	for (uint32 x=0;x<m_modcount; x++)
 	{
 		mod = &m_modList[x];
-		sLog.outDebug( "WORLD: target = %u , Spell Aura id = %u, SpellId  = %u, i = %u, apply = %s, duration = %u",
-			m_target->GetGUIDLow(),mod->m_type, m_spellProto->Id, mod->i, apply ? "true" : "false",GetDuration()); 
+		sLog.outDebug( "WORLD: target = %u , Spell Aura id = %u, SpellId  = %u, i = %u, apply = %s, duration = %u, damage = %u",
+			m_target->GetGUIDLow(),mod->m_type, m_spellProto->Id, mod->i, apply ? "true" : "false",GetDuration(),mod->m_amount); 
 
 		/*if(m_target->SchoolImmunityList[m_spellProto->School] &&
 			m_target->GetGUID() != m_casterGuid)	// make sure that we dont block self spells

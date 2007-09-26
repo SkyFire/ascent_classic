@@ -59,19 +59,12 @@ Zack - test my shit :
 - test function RemoveThreatByPtr
 - don't let rogues stealth with dots
 - ai spell cooldown when not known
-- Priest - Misery - add hashnames : 589,7378,34914
-- warrior - shield slam - add namehash : 23922
-- warrior berserker rage - make sure it regenerates extra rage when taking dmg (30 rage) - lol, is this required at all ?
-- warrior improved berserker rage - make sure it regenerates extra rage when taking dmg ((50+30)-(100+30) rage) only when using berserker rage
-- shield bash should silance and cancel cast
-- pummel should silance and cancel cast - test if interrupts mob cast too...
-- warrior - Sweeping Strikes strike aditional enemy
+- warrior - Sweeping Strikes strike aditional enemy - well it seems there is no support yet for this
 - warlock(affliction talent) - Curse of Idiocy - check if in time stuff gets decresed
-- warrior - Rampage - should stack on with mele attacks attack power
-- warlock - soulstone resurection - last rank
 - warlock(demonology) - firestone - added trigger (is this spell 27252), procchance set to 50%(good/bad?)
 - warlock(demonology) - Spellstone - recheck
 - warlock(demonology) - Enslave Demon - recheck
+- warlock - soulstone resurection - last rank
 
 ==========================================================================
 Capt - test my shit :

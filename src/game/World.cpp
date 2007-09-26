@@ -1335,13 +1335,6 @@ void World::SetInitialWorldSettings()
 		sp->Effect[1] = 64; //aura
 		sp->EffectTriggerSpell[1] = 30339; //evil , but this is good for us :D
 	}
-	//Warrior:Improved Berserker
-	sp = sSpellStore.LookupEntry(20500);
-	if(sp)
-	   sp->procFlags=PROC_ON_CAST_SPELL;
-	sp = sSpellStore.LookupEntry(20501);
-	if(sp)
-	   sp->procFlags=PROC_ON_CAST_SPELL;
 	//Druid:Intensity
 	sp = sSpellStore.LookupEntry(17106);
 	if(sp)
@@ -1676,35 +1669,35 @@ void World::SetInitialWorldSettings()
 	sp = sSpellStore.LookupEntry(18499);
 	if(sp)
 	{
-		sp->Effect[3] = 6;
-		sp->EffectApplyAuraName[3] = 42;
-		sp->EffectTriggerSpell[3] = 9174; //not sure if this is the one
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->Effect[2] = 6;
+		sp->EffectApplyAuraName[2] = 42;
+		sp->EffectTriggerSpell[2] = 9174; //not sure if this is the one. In my time this adds 30 rage
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
 	}
-	//warrior - improved berserker rage is missing 1 effect = regenerate rage
+	//warrior - improved berserker rage
 	sp = sSpellStore.LookupEntry(20500);
 	if(sp)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
 	sp = sSpellStore.LookupEntry(20501);
 	if(sp)
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
 	//warrior - Rampage
 	sp = sSpellStore.LookupEntry(29801);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	sp = sSpellStore.LookupEntry(30030);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	sp = sSpellStore.LookupEntry(30033);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	//winfury weapon changes. Start to hate these day by day
@@ -1769,7 +1762,7 @@ void World::SetInitialWorldSettings()
 		}
 	}
 	//for test only
-	sp = sSpellStore.LookupEntry(16498);
+	sp = sSpellStore.LookupEntry(23922);
 	if(sp)
 	{
 //		printf("!!!!!!hash %u \n",sp->NameHash);
