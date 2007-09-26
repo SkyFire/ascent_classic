@@ -1,5 +1,4 @@
 # Sunder Armor - not stackable
-# Sweeping Strikes - it is put on self and removed on attack,only that it does not do dmg to target.
 # Overpower - should work
 5. Improved Berseker Rage
 8. Rampage - does not have any effect. Should this use up aurastateflag ? If so then remove it from caster
