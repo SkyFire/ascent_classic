@@ -2109,6 +2109,17 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			castaff = 500;
 
 		float dmgdoneaffectperc = castaff / 3500;
+//------------------------------by downranking----------------------------------------------
+		if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
+		{
+		   float downrank1 = 1.0f;
+		   if (spellInfo->baseLevel < 20)
+		      downrank1 = 1.0f - (20.0f - float (spellInfo->baseLevel) ) * 0.0375f;
+		   float downrank2 = ( float(spellInfo->maxLevel + 5.0f) / float(static_cast<Player*>(this)->getLevel()) );
+		   if (downrank2 >= 1 || downrank2 < 0)
+		         downrank2 = 1.0f;
+			dmgdoneaffectperc *= downrank1 * downrank2;
+		}
 //==========================================================================================
 //==============================Bonus Adding To Main Damage=================================
 //==========================================================================================
@@ -2230,6 +2241,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	if(this->IsUnit() && allowProc && spellInfo->Id != 25501)
 	{
 		static_cast<Unit*>(this)->HandleProc(aproc,pVictim,spellInfo, float2int32(res));
+		static_cast<Unit*>(this)->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,static_cast<Player*>(this), spellInfo);
 		static_cast<Unit*>(this)->m_procCounter = 0;
 		pVictim->HandleProc(vproc,(Unit*)this,spellInfo, float2int32(res));
 		pVictim->m_procCounter = 0;

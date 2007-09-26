@@ -419,22 +419,16 @@ bool Spell::DidHit(uint64 target)
 			break;
 	}
 
-	float resistPvP[4]={96.0f,95.0f,94.0f,83.0f};
-	float resistPvE[4]={96.0f,95.0f,94.0f,87.0f};
-
+	float baseresist[3]={96.0f,95.0f,94.0f};
 	int32 lvldiff;
 	float resistchance ;
-	bool pvp ;
 	if(!u_victim && !p_victim)
 		return false;
 	if(!p_caster)
 		return true;		// Mob spells hit!
 
-	if(p_caster && p_victim) //PvP
-	{
-		pvp = true;
-	}else
-		pvp = false;
+
+	bool pvp =(p_caster && p_victim);
 
 	if(p_victim)
 		lvldiff = p_victim->getLevel() - p_caster->getLevel();
@@ -446,17 +440,14 @@ bool Spell::DidHit(uint64 target)
 
 	if(lvldiff < 3)
 	{ 
-		if(pvp)
-			resistchance = resistPvP[lvldiff];
-		else
-			resistchance = resistPvE[lvldiff];
+			resistchance = baseresist[lvldiff];
 	}
 	else
 	{
 		if(pvp)
-			resistchance = resistPvP[3] - ((lvldiff-3)*7);
+			resistchance = baseresist[2] + ((lvldiff-2)*7);
 		else
-			resistchance = resistPvE[3] - ((lvldiff-3)*11);
+			resistchance = baseresist[2] + ((lvldiff-2)*11);
 	}
 	//check mechanical resistance
 	//i have no idea what is the best pace for this code
@@ -464,24 +455,25 @@ bool Spell::DidHit(uint64 target)
 	{
 		if(p_victim)
 			resistchance += p_victim->MechanicsResistancesPCT[m_spellInfo->MechanicsType];
-		else resistchance += u_victim->MechanicsResistancesPCT[m_spellInfo->MechanicsType];
+		else 
+			resistchance += u_victim->MechanicsResistancesPCT[m_spellInfo->MechanicsType];
 	}
- 
-	resistchance = 100.0-resistchance;
 	//rating bonus
 	if(p_caster)
 	{
-		resistchance-=p_caster->CalcRating(7);
+		resistchance -= p_caster->CalcRating(7);
+		resistchance -= p_caster->GetHitFromSpell();
 	}
+
 
 	if(resistchance >= 100.0)
 		return false;
 	else
 	{
 		if(resistchance<=1.0)//resist chance >=1
-			return !Rand(1.0);
+			return Rand(1.0);
 		else
-			return !Rand(resistchance);
+			return Rand(resistchance);
 	}
  
 }
@@ -1199,10 +1191,11 @@ void Spell::cast(bool check)
 							}
 							else*/
 							if (m_targetUnits[x].size()>0)
+							{
 								for(i= m_targetUnits[x].begin();i != m_targetUnits[x].end();i++)
 									HandleEffects((*i),x);
-							else
-								if(m_spellInfo->Effect[x] == SPELL_EFFECT_TELEPORT_UNITS)
+							}
+							else if(m_spellInfo->Effect[x] == SPELL_EFFECT_TELEPORT_UNITS)
 									HandleEffects(m_caster->GetGUID(),x);
 						}
 					}
@@ -3266,7 +3259,19 @@ void Spell::Heal(int32 amount)
 		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
 		amount += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
 		amount += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
-		
+
+        //Downranking
+        if(m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0)
+        {
+            float downrank1 = 1.0f;
+            if (m_spellInfo->baseLevel < 20)
+                downrank1 = 1.0f - (20.0f - float (m_spellInfo->baseLevel) ) * 0.0375f;
+           float downrank2 = ( float(m_spellInfo->maxLevel + 5.0f) / float(p_caster->getLevel()) );
+           if (downrank2 >= 1 || downrank2 < 0)
+                downrank2 = 1.0f;
+            healdoneaffectperc *= downrank1 * downrank2;
+        }
+
 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
 		if(critical = Rand(spellCrit))
 		{
@@ -3305,6 +3310,9 @@ void Spell::Heal(int32 amount)
 		unitTarget->SetUInt32Value(UNIT_FIELD_HEALTH, maxHealth);
 	else
 		unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH, amount);
+
+	if(p_caster)
+		p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,p_caster, m_spellInfo);
 	
 	int doneTarget = 0;
 

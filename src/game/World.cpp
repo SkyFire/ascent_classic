@@ -1208,7 +1208,7 @@ void World::SetInitialWorldSettings()
 		}
 		else if(strstr(nametext, "Firestone Passive"))
 		{
-			Enchants the main hand weapon with fire, granting each attack a chance to deal $17809s1 additional fire damage.
+			//Enchants the main hand weapon with fire, granting each attack a chance to deal $17809s1 additional fire damage.
 			//check if we can find in the desription
 			char *startofid=strstr(desc, "to deal $");
 			if(startofid)

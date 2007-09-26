@@ -704,9 +704,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								continue;
 							Player* mPlayer = (Player*)this;
 							if (!mPlayer->IsInFeralForm() || 
-								mPlayer->GetShapeShift() != FORM_CAT ||
-								mPlayer->GetShapeShift() != FORM_BEAR ||
-								mPlayer->GetShapeShift() != FORM_DIREBEAR)
+								(mPlayer->GetShapeShift() != FORM_CAT &&
+								mPlayer->GetShapeShift() != FORM_BEAR &&
+								mPlayer->GetShapeShift() != FORM_DIREBEAR))
 								continue;
 						}break;
 						//rogue - blade twisting
@@ -910,23 +910,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(CastingSpell->School!=SCHOOL_SHADOW && !IsDamagingSpell(CastingSpell))
 									continue;
 							}break;
-						//Priest - Misery
-						case 33196:
-						case 33197:
-						case 33198:
-						case 33199:
-						case 33200:
-							{
-								continue;
-								if(!CastingSpell)
-									continue;//this should not ocur unless we made a fuckup somewhere
-								if (CastingSpell->NameHash!=1 && //Shadow Word: Pain
-									CastingSpell->NameHash!=1 && //Mind Flay
-									CastingSpell->NameHash!=1)  //Vampiric Touch 
-									continue;
-							}break;
 						//warrior - improved berserker rage 
-						case 14157:
+						case 20500:
+						case 20501:
 							{
 								if(!HasActiveAura(18499))
 									continue;
@@ -1003,6 +989,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							if(sd->CastTime==0)
 								continue;
 						}break;
+					case 17116: //Shaman - Nature's Swiftness
 					case 16188:
 						{
 //							if(CastingSpell->School!=SCHOOL_NATURE||(!sd->CastTime||sd->CastTime>10000)) continue;
@@ -1197,19 +1184,7 @@ void Unit::RegeneratePower(bool isinterrupted)
 
 void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 {
-	//	   lvl diff:  0+   1+   2+
-	float resist[3]={4.0f,5.0f,6.0f};
-
-	int32 lvldiff = 0;
-	float resistchance = 1.0f;
-	float miscchance = 0.0f;
 	float AverageResistance = 0.0f;
-//	bool pvp = false;
-	
-	if(GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER) //PvP
-		miscchance = 7.0f;
-	else
-		miscchance = 11.0f;
 
 	if((*dmg).damage_type == 0)//physical
 	{		
@@ -1226,47 +1201,14 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 	}
 	else
 	{
-		// applying resistance to other type of damage
-		lvldiff = pVictim->getLevel() - getLevel();
-	
-		if(lvldiff >= 0)
-		{
-			if(lvldiff < 3) 
-				resistchance = resist[lvldiff];
-			else
-				resistchance = resist[2] + miscchance*(lvldiff-2);
-			if(IsPlayer())
-			{
-				float spellHitMod = static_cast<Player*>(this)->GetHitFromSpell();
-				resistchance -= spellHitMod;
-			}
-		}
-
-		if(m_objectTypeId == TYPEID_UNIT) 
-		{ 
-			Creature * c = (Creature*)(this);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
-				resistchance = 1.0f; //can't resist boss spells even if lvl70 -vs- lvl63 boss.
-		} 
-
-		if (pVictim->IsPlayer())
-			resistchance-=static_cast<Player*>(pVictim)->m_resist_hit[2];
-		if (resistchance<1)
-			resistchance=1.0f;
-		if(Rand(resistchance))
-		{
-			(*dmg).resisted_damage = (*dmg).full_damage;
-		}
-		else
-		{
-			AverageResistance = ((float)pVictim->GetResistance( (*dmg).damage_type)- PowerCostPctMod[(*dmg).damage_type]) / (float)(getLevel() * 5) * 0.75f;
-			  if(AverageResistance > 0.75f)
-				AverageResistance = 0.75f;
-			if(AverageResistance>0)
- 				(*dmg).resisted_damage = (uint32)(((*dmg).full_damage)*AverageResistance);
-			else 
-				(*dmg).resisted_damage=0; 
-		 }
+		// applying resistance to other type of damage 
+		AverageResistance = ((float)pVictim->GetResistance( (*dmg).damage_type)- PowerCostPctMod[(*dmg).damage_type]) / (float)(getLevel() * 5) * 0.75f;
+		  if(AverageResistance > 0.75f)
+			AverageResistance = 0.75f;
+		if(AverageResistance>0)
+			(*dmg).resisted_damage = (uint32)(((*dmg).full_damage)*AverageResistance);
+		else 
+			(*dmg).resisted_damage=0; 
 	}
 	// Checks for random bugs on spells
 	if ( (*dmg).full_damage > 10000 && GetTypeId() == TYPEID_PLAYER && ((Player*)this)->GetSession()->GetPermissionCount() == 0) // hits higher then 5.5k must be bugged

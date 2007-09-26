@@ -1627,8 +1627,7 @@ void Aura::SpellAuraDummy(bool apply)
 			}break;
 		case 17007: //Druid:Leader of the Pack
 			{
-				this->mod->m_amount = 5;
-				this->SpellAuraModCritPerc(apply);
+				//TODO
 			}break;
 	}
 }
@@ -1807,16 +1806,15 @@ void Aura::EventPeriodicHeal(uint32 amount)
 
 	int bonus = 0;
 
-	if(c)
-		if(c->IsPlayer())
-		{
-			bonus += float2int32(((Player*)c)->SpellHealDoneByInt[m_spellProto->School] * ((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT3));
-			bonus += float2int32(((Player*)c)->SpellHealDoneBySpr[m_spellProto->School] * ((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT4));
-			bonus += c->HealDoneMod[GetSpellProto()->School];
-			//Druid Tree of Life form. it should work not like this, but it's better then nothing. 
-			if (static_cast<Player*>(c)->IsInFeralForm() && static_cast<Player*>(c)->GetShapeShift() == FORM_TREE)
-				bonus += float2int32(0.25f*((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT4));
-		}
+	if(c && c->IsPlayer())
+	{
+		bonus += float2int32(((Player*)c)->SpellHealDoneByInt[m_spellProto->School] * ((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT3));
+		bonus += float2int32(((Player*)c)->SpellHealDoneBySpr[m_spellProto->School] * ((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT4));
+		bonus += c->HealDoneMod[GetSpellProto()->School];
+		//Druid Tree of Life form. it should work not like this, but it's better then nothing. 
+		if (static_cast<Player*>(c)->IsInFeralForm() && static_cast<Player*>(c)->GetShapeShift() == FORM_TREE)
+			bonus += float2int32(0.25f*((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT4));
+	}
 	bonus += m_target->HealTakenMod[GetSpellProto()->School];
 
 	int amp = m_spellProto->EffectAmplitude[mod->i];
@@ -1829,6 +1827,23 @@ void Aura::EventPeriodicHeal(uint32 amount)
 		bonus= (ticks) ? bonus/ticks : 0;
 	}
 	else bonus = 0;
+
+    //Downranking
+    if(c &&c->IsPlayer())
+    {
+       if(m_spellProto->baseLevel > 0 && m_spellProto->maxLevel > 0)
+        {
+            float downrank1 = 1.0f;
+            if (m_spellProto->baseLevel < 20)
+                downrank1 = 1.0f - (20.0f - float (m_spellProto->baseLevel) ) * 0.0375f;
+            float downrank2 = ( float(m_spellProto->maxLevel + 5.0f) / float(c->getLevel()) );
+            if (downrank2 >= 1 || downrank2 < 0)
+                downrank2 = 1.0f;
+
+            bonus = float2int32(float(bonus)*downrank1*downrank2);
+        }
+    }
+
 
 	int add = (bonus+amount>0) ? bonus+amount : 0;
 	if (c)
@@ -2737,12 +2752,6 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 	else
 		m_target->m_speedModifier -= mod->m_amount;
 	m_target->UpdateSpeed();
-	if (this->GetSpellId() == 17002 || //dirty fix for Druid:Feral Swiftness
-		this->GetSpellId() == 24866)
-	{
-		this->mod->m_amount=4;
-		this->SpellAuraModDodgePerc(apply);
-	}
 }
 
 void Aura::SpellAuraModIncreaseMountedSpeed(bool apply)

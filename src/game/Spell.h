@@ -1570,7 +1570,7 @@ public:
                     }
 
                 }
-                if(sd->Duration1 > 0 && !c_dur)
+                if(sd->Duration1 >= 0 && !c_dur)
                 {
                     Dur = sd->Duration1;
                 }
