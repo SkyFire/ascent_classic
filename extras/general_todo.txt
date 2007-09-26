@@ -51,6 +51,7 @@ SMT_RESIST_DISPEL - check if it is used
 - kidney shot stuns target until death
 - fear, slowes you down forever
 - getrandomplayer,getmosthated not woking ?
+- aura=68 = stalked should silance only some specific school and not all
 
 ==========================================================================
 Zack - test my shit :
@@ -62,6 +63,8 @@ Zack - test my shit :
 - warrior - shield slam - add namehash : 23922
 - warrior berserker rage - make sure it regenerates extra rage when taking dmg (30 rage) - lol, is this required at all ?
 - warrior improved berserker rage - make sure it regenerates extra rage when taking dmg ((50+30)-(100+30) rage) only when using berserker rage
+- shield bash should silance and cancel cast
+- pummel should silance and cancel cast - test if interrupts mob cast too...
 
 ==========================================================================
 Capt - test my shit :

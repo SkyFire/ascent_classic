@@ -3906,9 +3906,17 @@ void Aura::SpellAuraModStalked(bool apply)
 	{
 		//SetNegative();
 		m_target->stalkedby = m_casterGuid;
+		//cancel spell casting
+		if(m_target->isCasting())
+			m_target->GetCurrentSpell()->cancel();
+		//hmmm, some spells silance you only on specific spelltypes ?
+		m_target->m_silenced++;
 	}
 	else 
+	{
 		m_target->stalkedby = 0;
+		m_target->m_silenced--;
+	}
 }
 
 void Aura::SpellAuraSchoolAbsorb(bool apply)

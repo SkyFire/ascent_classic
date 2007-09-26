@@ -1,6 +1,4 @@
 # Sunder Armor - not stackable
-# Shield Bash - not working in PvE
-# Pummel - no efect în PvE
 # Sweeping Strikes - it is put on self and removed on attack,only that it does not do dmg to target.
 # Overpower - should work
 5. Improved Berseker Rage
