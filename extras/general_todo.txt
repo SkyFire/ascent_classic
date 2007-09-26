@@ -60,6 +60,7 @@ Zack - test my shit :
 - ai spell cooldown when not known
 - Priest - Misery - add hashnames : 589,7378,34914
 - warrior - shield slam - add namehash : 23922
+- warrior berserker rage - make sure it regenerates extra rage when taking dmg
 
 ==========================================================================
 Capt - test my shit :

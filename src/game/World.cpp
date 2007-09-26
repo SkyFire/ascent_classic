@@ -1658,6 +1658,15 @@ void World::SetInitialWorldSettings()
 		sp->procChance = 30;//some say it is triggered every now and then
 		sp->procFlags = PROC_ON_RANGED_ATTACK;
 	}
+	//warrior - berserker rage is missing 1 effect = regenerate rage
+	sp = sSpellStore.LookupEntry(18499);
+	if(sp)
+	{
+		sp->Effect[3] = 6;
+		sp->EffectApplyAuraName[3] = 42;
+		sp->EffectTriggerSpell[3] = 23690; 
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+	}
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(283);
 	if(Enchantment)
