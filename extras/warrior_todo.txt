@@ -1,11 +1,3 @@
-//the problem is actually that spell dbc does not contain the 3rd effect as in description. It must be added manually
-berserker rage - does not get triggered on struck. it does not even have an onstruck spell to get triggered.
-improved berserker rage - not triggered. Should only get triggered while we have aura "berserker rage" onstruck event
-[23:54:34] Spell::cast 20500, Unit: 283
-[23:54:34] WORLD: Spell effect id = 6, damage = 0
-[23:54:34] WORLD: target = 283 , Spell Aura id = 42, SpellId  = 20500, i = 0, apply = true
-[23:54:35] WORLD: target = 283 , Spell Aura id = 42, SpellId  = 20500, i = 0, apply = false
-
 # Sunder Armor - not stackable
 # Shield Bash - not working in PvE
 # Pummel - no efect în PvE

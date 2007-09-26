@@ -1664,9 +1664,16 @@ void World::SetInitialWorldSettings()
 	{
 		sp->Effect[3] = 6;
 		sp->EffectApplyAuraName[3] = 42;
-		sp->EffectTriggerSpell[3] = 23690; 
+		sp->EffectTriggerSpell[3] = 9174; //not sure if this is the one
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
 	}
+	//warrior - improved berserker rage is missing 1 effect = regenerate rage
+	sp = sSpellStore.LookupEntry(20500);
+	if(sp)
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+	sp = sSpellStore.LookupEntry(20501);
+	if(sp)
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(283);
 	if(Enchantment)
