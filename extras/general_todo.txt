@@ -59,6 +59,7 @@ Zack - test my shit :
 - don't let rogues stealth with dots
 - ai spell cooldown when not known
 - Priest - Misery - add hashnames : 589,7378,34914
+- warrior - shield slam - add namehash : 23922
 
 ==========================================================================
 Capt - test my shit :

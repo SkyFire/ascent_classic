@@ -351,6 +351,17 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			{
                 dmg = u_caster->GetAP()*(m_spellInfo->EffectBasePoints[0]+1) / 100;
 			}
+		case 0x00:	// Shield Slam - damage is increased by block value
+			{
+				if(p_caster)
+				{
+					Item *it = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+					if(it && it->GetProto()->InventoryType == INVTYPE_SHIELD)
+					{
+						dmg += it->GetProto()->Block;
+					}
+				}
+			}
 		}
 	}
 

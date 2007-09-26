@@ -28,25 +28,6 @@ Earth shield - gives only two charges and no 30% chance on ignore spell interrup
 
 Talents
 
-dranei
-fire elemental totem = 15439 -> 32982.
-	- Just use 8985 instead that uses 575 creature type. 
-	- Should cast fireshield on self based on level of creature : select * from dbc_spell where name like "%fire sh%". Cast once only. Myabe use auras field here ?
-	- also : select * from dbc_spell where name like "%fire blast%"
-	- also : select * from dbc_spell where name like "%fire nova"
-	- maybe : fire ward (543), hellfire (2951), Fire Breath (37985)
-	- deal fire dmg
-	- imune to fire
-
-Earth Elemental Totem = 15430 -> 33663
-	- Just use 19704 instead that uses 329 creature type. 
-	- also : select * from dbc_spell where name like "%Earth Shock%"
-	- also : select * from dbc_spell where name like "%Earth Rumble"
-	- maybe : Earth Shield (32734), Earth Stun (37982)
-	- taunt
-	- imune to nature magic
-	
-
 Elemental:
 
 Enhancement:
@@ -139,26 +120,15 @@ make Nature's grace to use SM variables. Preferably Spell:Calceffect
 
 Spells:
 
-windfury weapon don't give attack power and doesn't work (give 3 attacks) the spell need give two extra attacks in more of the primary attack and need can be crti attack
 Stoneclaw totem doesn't work
-Frost shock don't slow ennemy when they are on mount
 Cure Disease don't work
-Magma Totem rank3 and up can't be learn at trainer
 Grounding Totem don't work
 Windfury Totem don't work
-Fire Nova Totem don't work
-Sentry Totem don't work
-Flametongue Totem rank5 don't work and magic damage stuff don't up the damage of the spell
 Disease Cleansing Totem don't work
-Mana Tide Totem don't work
-Shamanistic Rage don't work
-Flametongue Weapon don't work
 Wrath of Air Totem don't work
-Earth Elemental Totem don't work
 Bloodlust don't give the effect on friends and members but on ennemy
 Heroism don't work
 Totem of Wrath don't work
-Stormstrike have not 100% luck of damage an ennemy in pvp and don't attack in same time with two weapons (Dual Wield) and don't up damage on two seconds attacks (melee and spells)
 Purge don't work
 Poison Cleansing Totem don't work
 Water Shield don't work
@@ -182,7 +152,3 @@ Lightning Overload don't work
 Elemental Shields don't work
 Tidal Mastery don't work
 Improved Lightning Shield don't work
-
-
-Sorry for my bad english and if you have some probs for debug ask me
-Darkmugen @ shaman fan :]
