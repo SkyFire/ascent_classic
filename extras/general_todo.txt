@@ -29,6 +29,7 @@ SMT_RESIST_DISPEL - check if it is used
 - elemental creatures do not have fizical attack but magic type, add dmg type to db load
 - some creatures need to fly (is this made already ? ) on spawn
 - add new column to quests to be able to make required_quest_alternative
+- make cooldown cheat update client cooldown too
 
 ==========================================================================
 ! BUGS !
@@ -52,6 +53,9 @@ SMT_RESIST_DISPEL - check if it is used
 - fear, slowes you down forever
 - getrandomplayer,getmosthated not woking ?
 - aura=68 = stalked should silance only some specific school and not all
+- channeled spells are not working ?
+- charmed creature is attacking me
+- why do we need enslavecount ?
 
 ==========================================================================
 Zack - test my shit :
@@ -60,11 +64,10 @@ Zack - test my shit :
 - don't let rogues stealth with dots
 - ai spell cooldown when not known
 - warrior - Sweeping Strikes strike aditional enemy - well it seems there is no support yet for this
-- warlock(affliction talent) - Curse of Idiocy - check if in time stuff gets decresed
-- warlock(demonology) - firestone - added trigger (is this spell 27252), procchance set to 50%(good/bad?)
-- warlock(demonology) - Spellstone - recheck
-- warlock(demonology) - Enslave Demon - recheck
-- warlock - soulstone resurection - last rank
+- warlock(affliction talent) - Curse of Idiocy - rewrite this spell :
+	1 ) do not make him loop self it will be casted by cater for eternity ;)
+	2 ) there is no visual sighn that spell had effect (the negative values are missing ex : 23+1-6)
+- warlock(demonology) - Enslave Demon - works buit will rush you and set aura as negative
 
 ==========================================================================
 Capt - test my shit :

@@ -498,7 +498,7 @@ void Aura::ApplyModifiers(bool apply)
 	for (uint32 x=0;x<m_modcount; x++)
 	{
 		mod = &m_modList[x];
-		sLog.outDebug( "WORLD: target = %u , Spell Aura id = %u, SpellId  = %u, i = %u, apply = %s, duration = %u, damage = %u",
+		sLog.outDebug( "WORLD: target = %u , Spell Aura id = %u, SpellId  = %u, i = %u, apply = %s, duration = %u, damage = %d",
 			m_target->GetGUIDLow(),mod->m_type, m_spellProto->Id, mod->i, apply ? "true" : "false",GetDuration(),mod->m_amount); 
 
 		/*if(m_target->SchoolImmunityList[m_spellProto->School] &&
@@ -1681,6 +1681,8 @@ void Aura::SpellAuraModCharm(bool apply)
 	Player * caster = ((Player*)ucaster);
 	Creature * target = ((Creature*)m_target);
   
+	SetPositive();
+
 	if(!ucaster || ucaster->GetTypeId() != TYPEID_PLAYER || (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() || m_target->GetTypeId() != TYPEID_UNIT)
 		return;
 
@@ -1697,12 +1699,14 @@ void Aura::SpellAuraModCharm(bool apply)
 		m_target->SetCharmTempVal(caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 		m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 		m_target->_setFaction();
-		m_target->GetAIInterface()->WipeHateList();
-		m_target->GetAIInterface()->WipeTargetList();
 		m_target->UpdateOppFactionSet();
 		m_target->GetAIInterface()->Init(m_target, AITYPE_PET, MOVEMENTTYPE_NONE, caster);
 		m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, caster->GetGUID());
 		caster->SetUInt64Value(UNIT_FIELD_CHARM, target->GetGUID());
+		//damn it, the other effects of enslaive demon will agro him on us anyway :S
+		m_target->GetAIInterface()->WipeHateList();
+		m_target->GetAIInterface()->WipeTargetList();
+		m_target->GetAIInterface()->SetNextTarget(NULL);
 
 		target->SetEnslaveCount(target->GetEnslaveCount() + 1);
 
