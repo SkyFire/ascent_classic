@@ -463,6 +463,7 @@ bool Spell::DidHit(uint64 target)
 	{
 		resistchance -= p_caster->CalcRating(7);
 		resistchance -= p_caster->GetHitFromSpell();
+		resistchance += p_victim->m_resist_hit[2];
 	}
 
 
@@ -2346,8 +2347,14 @@ uint8 Spell::CanCast(bool rangetolerate)
 			
 			if(m_spellInfo->EffectApplyAuraName[0]==2)//mind control
 			if(m_spellInfo->EffectBasePoints[0])//got level req;
-				if((int32)target->getLevel() > m_spellInfo->EffectBasePoints[0])
+				if((int32)target->getLevel() > m_spellInfo->EffectBasePoints[0]+1 + (p_caster->getLevel() - m_spellInfo->spellLevel))
 					return SPELL_FAILED_HIGHLEVEL;
+				else if(target->GetTypeId() == TYPEID_UNIT) 
+					{ 
+						Creature * c = (Creature*)(target);
+						if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
+							return SPELL_FAILED_HIGHLEVEL;
+					} 
 
 			// scripted spell stuff
 			switch (m_spellInfo->Id)
