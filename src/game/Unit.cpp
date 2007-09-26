@@ -910,6 +910,21 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(CastingSpell->School!=SCHOOL_SHADOW && !IsDamagingSpell(CastingSpell))
 									continue;
 							}break;
+						//Priest - Misery
+						case 33196:
+						case 33197:
+						case 33198:
+						case 33199:
+						case 33200:
+							{
+								continue;
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
+								if (CastingSpell->NameHash!=1 && //Shadow Word: Pain
+									CastingSpell->NameHash!=1 && //Mind Flay
+									CastingSpell->NameHash!=1)  //Vampiric Touch 
+									continue;
+							}break;
 /*						//paladin - illumination
 						case 18350:
 							{

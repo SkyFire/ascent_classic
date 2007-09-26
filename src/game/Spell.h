@@ -247,7 +247,7 @@ enum procFlags
     PROC_ON_ANY_DAMAGE_VICTIM       = 0x100000,
     PROC_ON_TRAP_TRIGGERED          = 0x200000,
     PROC_ON_AUTO_SHOT_HIT           = 0x400000,
-    PROC_UNUSED2                    = 0x800000,
+    PROC_ON_ABSORB                  = 0x800000,
     PROC_ON_RESIST_VICTIM           = 0x1000000,//added it as custom, maybe already exists in another form ?
     PROC_ON_DODGE_VICTIM            = 0x2000000,//added it as custom, maybe already exists in another form ?
     PROC_ON_DIE                     = 0x4000000,//added it as custom, maybe already exists in another form ?

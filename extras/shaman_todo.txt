@@ -16,8 +16,6 @@ Shield Specialization - only 1 talent point works - gives a max of +1% increased
 Improved Lightning shield - no effect - supposed to give a max of +15% dmg to lighting shield.
 Weapon Mastery - no effect - supposed to give a max of +10% dmg to melee attacks
 
-Unleashed rage and shamanistic rage not yet tested by me.
-
 Restoration Tree
 Tidal focus - no effect - supposed to give a max -5% mana reduction on healing spells
 Totemic focus - no effect - supposed to give a max of -25% mana reduction on totems
@@ -27,11 +25,6 @@ Focused Mind - no effect - supposed to give a -15% reduction time on stuns and s
 nature's guardian - no effect - supposed to give you a 50% chance on a 10% heal off your total health when dropping below 30% health
 Nature's blessing - no effect - supposed to increase healing and spell dmg equally to 30% of your total intellect
 Earth shield - gives only two charges and no 30% chance on ignore spell interruption - supposed to give 10 charges and 30% chance of ignoring spell interruption.
-
-This is really important because every other class has received many updates , and shaman has not received any since the start. This made them not worthwhile playing and too weak considered other classes. Please Shady, Captnoord, Sinistry or Zack take a look at this and consider it.... this is even only the important talents...
-
-Shaman:
-windfurry gives direct dmg instead of attack power based dmg
 
 Talents
 
@@ -57,14 +50,12 @@ Earth Elemental Totem = 15430 -> 33663
 Elemental:
 
 Enhancement:
-Guardian Totems - Not working.
 Enhancing Totems - Not working.
 Improved Weapon Totems - Not tested.
 Elemental Weapons - Not working.
 Stormstrike - removed aura effect on target since our spell system does not support it yet
 
 Restoration:
-Imp Reincarnation - Doesn't work
 Restorative Totem - Doesn't work
 Healing Way - Doesn't work
 

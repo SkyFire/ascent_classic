@@ -1038,6 +1038,8 @@ void World::SetInitialWorldSettings()
 					}
 					if(strstr(desc,"fully resisting"))
 						pr|=PROC_ON_RESIST_VICTIM;
+					if(strstr(desc,"Your Shadow Word: Pain, Mind Flay and Vampiric Touch spells also cause the target"))
+						pr|=PROC_ON_CAST_SPELL;
 //					if(strstr(desc,"chill effect to your Blizzard"))
 //						pr|=PROC_ON_CAST_SPELL;	
 					//////////////////////////////////////////////////
