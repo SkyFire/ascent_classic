@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="gamemonkey"
 	ProjectGUID="{59918FF8-A77F-4AAB-BD9A-3ABC446C23F8}"
+	RootNamespace="gamemonkey"
 	>
 	<Platforms>
 		<Platform
