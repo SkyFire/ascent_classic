@@ -66,6 +66,12 @@ Zack - test my shit :
 - shield bash should silance and cancel cast
 - pummel should silance and cancel cast - test if interrupts mob cast too...
 - warrior - Sweeping Strikes strike aditional enemy
+- warlock(affliction talent) - Curse of Idiocy - check if in time stuff gets decresed
+- warrior - Rampage - should stack on with mele attacks attack power
+- warlock - soulstone resurection - last rank
+- warlock(demonology) - firestone - added trigger (is this spell 27252), procchance set to 50%(good/bad?)
+- warlock(demonology) - Spellstone - recheck
+- warlock(demonology) - Enslave Demon - recheck
 
 ==========================================================================
 Capt - test my shit :

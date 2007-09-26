@@ -1206,6 +1206,20 @@ void World::SetInitialWorldSettings()
 				sp->procFlags = uint32(PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF);
 			}
 		}
+		else if(strstr(nametext, "Firestone Passive"))
+		{
+			Enchants the main hand weapon with fire, granting each attack a chance to deal $17809s1 additional fire damage.
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "to deal $");
+			if(startofid)
+			{
+				startofid += strlen("to deal $");
+				sp->EffectTriggerSpell[0]=atoi(startofid);
+				sp->EffectApplyAuraName[0]=42;
+				sp->procFlags = PROC_ON_MELEE_ATTACK;
+				sp->procChance = 50;
+			}
+		}
 		//some procs trigger at intervals
 		else if(strstr(nametext, "Water Shield"))
 		{
@@ -1674,6 +1688,25 @@ void World::SetInitialWorldSettings()
 	sp = sSpellStore.LookupEntry(20501);
 	if(sp)
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+	//warrior - Rampage
+	sp = sSpellStore.LookupEntry(29801);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
+	}
+	sp = sSpellStore.LookupEntry(30030);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
+	}
+	sp = sSpellStore.LookupEntry(30033);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
+	}
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(283);
 	if(Enchantment)

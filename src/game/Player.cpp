@@ -8019,6 +8019,10 @@ void Player::removeSoulStone()
 		{
 			sSoulStone = 20765;
 		}break;
+	case 27240:
+		{
+			sSoulStone = 27239;
+		}break;
 	}
 	this->RemoveAura(sSoulStone);
 	this->SoulStone = this->SoulStoneReciever = 0; //just incase

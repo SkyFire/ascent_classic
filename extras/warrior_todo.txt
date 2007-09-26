@@ -1,4 +1,2 @@
 # Sunder Armor - not stackable
 # Overpower - should work
-5. Improved Berseker Rage
-8. Rampage - does not have any effect. Should this use up aurastateflag ? If so then remove it from caster
