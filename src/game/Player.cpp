@@ -4031,9 +4031,13 @@ void Player::LeftChannel(Channel *c)
 void Player::CleanupChannels()
 {
 	list<Channel *>::iterator i;
-	for(i = m_channels.begin(); i != m_channels.end(); i++)
+	Channel * c;
+	for(i = m_channels.begin(); i != m_channels.end();)
 	{
-		(*i)->Part(this);
+		c = *i;
+		++i;
+		
+		c->Part(this);
 	}
 }
 
