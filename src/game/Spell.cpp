@@ -3270,7 +3270,7 @@ void Spell::Heal(int32 amount)
 		amount += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
 
         //Downranking
-        if(m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0)
+        if(m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
         {
             float downrank1 = 1.0f;
             if (m_spellInfo->baseLevel < 20)

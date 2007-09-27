@@ -241,10 +241,10 @@ void PrintCrashInformation(PEXCEPTION_POINTERS except)
 		echo("\n");
 	}
 	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-	echo("Call Stack: \n");
+	/*echo("Call Stack: \n");
 	CStackWalker sw;
 	sw.ShowCallstack();
-	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
+	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");*/
 }
 
 void CStackWalker::OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUserName)
