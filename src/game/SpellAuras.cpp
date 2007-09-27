@@ -5441,6 +5441,17 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 		ASSERT(mod->m_miscValue < 5);
 		if(m_target->IsPlayer())
 		{
+			//druid hearth of the wild should add more features based on form
+			if(m_spellProto->NameHash==0x00 && static_cast<Player*>(m_target)->m_ShapeShifted)
+			{
+				//increase stamina if :
+				if(static_cast<Player*>(m_target)->GetShapeShift()==FORM_BEAR || static_cast<Player*>(m_target)->GetShapeShift()==FORM_DIREBEAR)
+					static_cast<Player*>(m_target)->TotalStatModPctPos[STAT_STAMINA] += val; 
+				//increase stamina if :
+				else if(static_cast<Player*>(m_target)->GetShapeShift()==FORM_CAT)
+					static_cast<Player*>(m_target)->TotalStatModPctPos[STAT_STRENGTH] += val; 
+			}
+
 			if(mod->m_amount>0)
 				static_cast<Player*>(m_target)->TotalStatModPctPos[mod->m_miscValue] += val; 
 			else  
