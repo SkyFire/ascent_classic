@@ -58,6 +58,7 @@ SMT_RESIST_DISPEL - check if it is used
 - why do we need enslavecount ?
 - hunter scattershot then rogue blind will make creature block (again)
 - there are spells that can go through iceblock. Just make the damn check in cancast and see if target is imune to spell type.
+- Pets - You can attack players from your faction with pets
 
 ==========================================================================
 Zack - test my shit :
@@ -70,6 +71,7 @@ Zack - test my shit :
 	1 ) do not make him loop self it will be casted by cater for eternity ;)
 	2 ) there is no visual sighn that spell had effect (the negative values are missing ex : 23+1-6)
 - warlock(demonology) - Enslave Demon - works buit will rush you and set aura as negative
+- druid - omen of clarity - 16864
 
 ==========================================================================
 Capt - test my shit :

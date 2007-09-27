@@ -2403,7 +2403,8 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 	if(IsPassive() && m_spellProto->dummy != 2010  && m_spellProto->dummy != 2020 && m_spellProto->dummy != 2255) //this spells are passive and are not done on the attack...
 	{
 		Unit * target = (m_target != 0) ? m_target : GetUnitCaster();
-		if(target == 0 || !target->IsPlayer()) return;
+		if(target == 0 || !target->IsPlayer())
+			return; //what about creatures ?
 
 		SpellEntry *proto = sSpellStore.LookupEntry( m_spellProto->EffectTriggerSpell[mod->i] );
 
@@ -2722,7 +2723,7 @@ void Aura::SpellAuraModStat(bool apply)
 
 	if(apply)
 	{
-	val = mod->m_amount;
+		val = mod->m_amount;
 		if (val<0)
 			SetNegative();
 		else
@@ -2739,7 +2740,7 @@ void Aura::SpellAuraModStat(bool apply)
 		{
 			for(uint32 x=0;x<5;x++)
 			{
-				if(mod->m_amount>0)
+				if(val>0)
 					static_cast<Player*>(m_target)->FlatStatModPos[x] += val; 
 				else
 					static_cast<Player*>(m_target)->FlatStatModNeg[x] -= val;

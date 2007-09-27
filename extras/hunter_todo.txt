@@ -1,3 +1,5 @@
+Feign Death - Feign death which may trick enemies into ignoring you... this is not working :S, after using this spell hunter gets immun to all attacks, that is little imbalanced
+
 Same as warlock,depend's on pet's help.But hey are somehow allowed to shoot they gun bow crossbow from mounts which give's them some unfair advantage.
 
 4) Trueshot aura (Hunter) - are you sure ?. this should work

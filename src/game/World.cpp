@@ -963,6 +963,8 @@ void World::SetInitialWorldSettings()
 						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc, "chance to get an extra attack"))
 						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc, "melee attacks has"))
+						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc, "gives your"))
 					{
 						if(strstr(desc, "melee"))

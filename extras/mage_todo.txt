@@ -1,3 +1,7 @@
+Polymorph - after this is dispelled from target target is switching from run to walk and he needs to turn on running "/" (same problem wit hunters Freezing Trap)
+Improved Counterspell (talent) - its not silencing target for 4 sec
+Improved Scorch (talent) - not stacking on target
+
 8) Ice lance (is not affected by ice shard on antrix and it duplicate damage when the damage would be 3x on frozen target...).without the gear (0 spell damage) the dmg on frozen target is ok..(160-187)with the gear (880+ spll dmg) i make 400-500 dmg on target without frozen effect... and 800 on frozen target( and crit 1200)... is not correct i think... i have a pg on official server and with 550 spell dmg and i hit for 800 on frozen target and crit 1600..
 9) Summon water elemental (Mage)
 
