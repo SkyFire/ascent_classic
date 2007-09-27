@@ -988,7 +988,27 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						m_nextSpell->procCount--;*/
 
 					SpellCastTargets targets = setSpellTargets(spellInfo, m_nextTarget);
-					CastSpell(m_Unit, spellInfo, targets);
+					uint32 targettype = m_nextSpell->spelltargetType;
+					switch(targettype)
+					{
+					case TTYPE_CASTER:
+					case TTYPE_SINGLETARGET:
+						{
+							CastSpell(m_Unit, spellInfo, targets);
+							break;
+						}
+					case TTYPE_SOURCE:
+						{
+							m_Unit->CastSpellAoF(targets.m_srcX,targets.m_srcY,targets.m_srcZ, spellInfo, true);
+							break;
+						}
+					case TTYPE_DESTINATION:
+						{
+							m_Unit->CastSpellAoF(targets.m_destX,targets.m_destY,targets.m_destZ, spellInfo, true);
+							break;
+						}
+					}
+					// CastSpell(m_Unit, spellInfo, targets);
                     AddSpellCooldown(spellInfo, m_nextSpell);
 					//add pet spell after use to pet owner with some chance
 					if(m_Unit->GetGUIDHigh() == HIGHGUID_PET && m_PetOwner->IsPlayer())
