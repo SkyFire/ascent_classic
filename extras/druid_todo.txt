@@ -10,7 +10,6 @@ Skills
 Tranquility - doesnt work. are you sure ?
 Nature Grasp - doesnt work. have to check to be outdors (cancast)
 Entangling Roots - may need break chance changed to be damage dependant
-Revange - same as shared
 Mangle - same as shared (about the effect i dont know)
 Rake - Does 2x dmg over time it should do 219 over 9 sec..it does 400+ over 4 sec
 Feline Grace - Is totaly bagged its should reduse dmg from falling but instead u can jump from the highes places and no dmg....after jumping when u cancel cat form u will take like a milion dmg and die :D (if u fall with cat from high place logout while u are in cat form or ull be dead :D)

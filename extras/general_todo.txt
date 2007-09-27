@@ -73,6 +73,7 @@ Zack - test my shit :
 - warlock(demonology) - Enslave Demon - works buit will rush you and set aura as negative
 - druid - omen of clarity - 16864
 - druid - shred - add the base (405) dmg to attack - 27002
+- druid - ravage - add the base (514) dmg to attack - 27005
 
 ==========================================================================
 Capt - test my shit :
