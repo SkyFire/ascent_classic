@@ -6,31 +6,10 @@ Talents:
 Arcane:
 Arcane Potency:Since there's no Clearcasting state (Arcane Concentration), Arcane pontency can't work
 
-Frost:
-Elemental Precision:Doesn't work
-Improved Blizzard:Doesn't work. Retest
-Frozen Core:Not tested yet
-Ice Floes:Doesn't work
-Arctic Winds:Not sure about +5% frost spell damage
-Empowered Frostbolt:Doesn't work
-Summon Water Elemental:Doesn't work
-
-Spells:
-Armors:
-Molter Armor:Partially working. Crit chance is incrised. but the rest doens't work
-
 Arcane:
 Arcane Missiles:Don't shot the last missile (or first?)
-Detect Magic:Not works
 Blink: Doesn't release you from stun, just from bonds.
-Mana Shield:Working, but only for physical damage, because in 2.0.3 or later it has been changed to absorb spell damage too.
-Invisibility:Not tested yet
-Arcane Blast:Working but the buff (stacks three times, lasts 8 sec) that increases mana cost but decreases casting time doesn't work.
 Spellsteal:Doesn't work
-
-
-Frost:
-Frost Nova:Working Side Effect: 100% chance to break it on hit
 
 Problems not related with only one spell/talent:
 - Problem with multiple mages in one group: if a mage cast fireball for example on a mob, if i cast a lower rank of fireball it says that a another more powerfull spell effect is active...this should work on buffs like Arcane Intellect not casting damage spells

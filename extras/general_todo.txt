@@ -80,6 +80,8 @@ Zack - test my shit :
 - mage - Magic Absorption - restore mana on resist
 - mage - Arcane Concentration - 11213
 - mage - Frost Warding - 28332 - rss->require_aura_hash = "Frost Ward"
+- mage - molten armor - 35915
+- mage - Detect Magic - 2855
 
 ==========================================================================
 Capt - test my shit :
