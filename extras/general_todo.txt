@@ -74,6 +74,7 @@ Zack - test my shit :
 - druid - omen of clarity - 16864
 - druid - shred - add the base (405) dmg to attack - 27002
 - druid - ravage - add the base (514) dmg to attack - 27005
+- druid - Mangle - add base dmg (dinamic) - 33878
 
 ==========================================================================
 Capt - test my shit :

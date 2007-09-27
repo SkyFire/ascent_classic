@@ -1199,6 +1199,13 @@ void World::SetInitialWorldSettings()
 				sp->EffectBasePoints[1]=atoi(startofid);
 			}
 		}
+		else if(strstr(nametext, "Mangle"))
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "damage plus ");
+			if(startofid)
+				sp->EffectBasePoints[1]=(sp->EffectBasePoints[0]+1)*(sp->EffectBasePoints[2]+1)/100;//kinda rough estimation no ? :P
+		}
 		else if(strstr(nametext, "Holy Shock"))
 		{
 			//check if we can find in the desription
