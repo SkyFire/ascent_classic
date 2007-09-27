@@ -2756,18 +2756,46 @@ uint8 Spell::CanCast(bool rangetolerate)
         }
     }
 
-    // if the caster is a item
-	if(i_caster)
+	if(i_caster) // if the caster is an item
 	{
-		uint32 ss = p_caster->GetShapeShift();
-		if(ss && (ss < FORM_BATTLESTANCE || ss > FORM_STEALTH))//druid shapeshift
-		{
-			if(i_caster->GetProto() && i_caster->GetProto()->InventoryType != INVTYPE_TRINKET)
-				return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;	
-		}	
 		// *** ITEM CHARGES CHECK - Partha ***
 		if( i_caster->GetProto()->Spells[0].Charges != 0 && ((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) == 0 )
 			return SPELL_FAILED_NO_CHARGES_REMAIN; // Item has no charges left
+
+		// *** SHAPESHIFT CHECK - Partha ***
+		uint8 ss = p_caster->GetShapeShift();
+
+		switch(ss)
+		{
+			case 0: // normal form
+			case FORM_TREE:
+			case FORM_BATTLESTANCE:
+			case FORM_DEFENSIVESTANCE:
+			case FORM_BERSERKERSTANCE:
+			case FORM_SHADOW:
+			case FORM_STEALTH:
+			case FORM_MOONKIN:
+				break;
+
+			case FORM_SWIFT:
+			case FORM_FLIGHT:
+				return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+
+			//case FORM_CAT: 
+			//case FORM_TRAVEL:
+			//case FORM_AQUA:
+			//case FORM_BEAR:
+			//case FORM_AMBIENT:
+			//case FORM_GHOUL:
+			//case FORM_DIREBEAR:
+			//case FORM_CREATUREBEAR:
+			//case FORM_GHOSTWOLF:
+			//case FORM_SPIRITOFREDEMPTION:
+
+			default:  // only equipped items allowed in other forms
+				if( i_caster->GetProto()->InventoryType == INVTYPE_NON_EQUIP )
+					return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+		}
 	}
 
     /// if we happen to get here we check if the caster is a player and apply check's for items 
@@ -2787,12 +2815,18 @@ int8 Spell::CheckItems()
     /// typecast Master to Player
 	Player* p_caster = (Player*)m_caster;
 
-    ItemInterface * t_PlayerItemInterface = p_caster->GetItemInterface();
+	ItemInterface * t_PlayerItemInterface = p_caster->GetItemInterface();
+
 	for(uint32 i=0;i<8;i++)
 	{
 		if((m_spellInfo->Reagent[i] == 0) || (m_spellInfo->ReagentCount[i] == 0))
 			continue;
-		if (t_PlayerItemInterface->GetItemCount(m_spellInfo->Reagent[i]) < m_spellInfo->ReagentCount[i])
+
+		if(i_caster && i_caster->GetProto()->ItemId == m_spellInfo->Reagent[i])
+			usedItem = 1; // make sure the item being used doesn't get counted as an available reagent 
+		else usedItem = 0;
+
+		if (t_PlayerItemInterface->GetItemCount(m_spellInfo->Reagent[i]) - usedItem < m_spellInfo->ReagentCount[i])
 			return int8(SPELL_FAILED_ITEM_GONE);
 	}
 
@@ -2837,14 +2871,13 @@ int8 Spell::CheckItems()
 			ItemPrototype *proto=it->GetProto();
 			ASSERT(proto);
 
-			if(m_spellInfo->Id==13262) //check for disenchant, only green and better items could be disenchanted
+			if(m_spellInfo->Id==13262) // check for disenchantable item and high enough skill
 			{
-				if(proto->Quality < 2 
-					|| proto->InventoryType == INVTYPE_NON_EQUIP
-                    || proto->InventoryType == INVTYPE_AMMO
-                  )
+				if( proto->DisenchantReqSkill < 1 )
 					return SPELL_FAILED_CANT_BE_DISENCHANTED;
-				//disenchant armor,weapon,ring,trinket, and neck				
+
+				if( p_caster->_GetSkillLineCurrent(SKILL_ENCHANTING) < proto->DisenchantReqSkill )
+					return SPELL_FAILED_CANT_BE_DISENCHANTED_SKILL;
 			}
 			else
 			{

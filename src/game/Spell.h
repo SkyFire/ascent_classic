@@ -1662,6 +1662,8 @@ public:
 protected:
     bool m_usesMana;
     bool failed;//for 5sr
+    bool hadEffect;
+    uint8 usedItem;
 
     uint32 m_spellState;
     int32 m_castTime;

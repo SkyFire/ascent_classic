@@ -512,7 +512,7 @@ struct ItemPrototype
 	uint32 SocketBonus;
 	uint32 GemProperties;
 	uint32 ItemExtendedCost;
-	uint32 DisenchantReqSkill;
+	int32 DisenchantReqSkill;
 	uint32 ArmorDamageModifier;
 
 	// used in auctions
