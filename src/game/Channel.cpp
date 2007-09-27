@@ -220,12 +220,12 @@ void Channel::SetOwner(Player * oldpl, Player * plr)
 
 	data.clear();
 	data << uint8(CHANNEL_NOTIFY_FLAG_CHGOWNER) << m_name << pOwner->GetGUID();
-	plr->GetSession()->SendPacket(&data);
+	SendToAll(&data);
 
 	// send the mode changes
 	data.clear();
 	data << uint8(CHANNEL_NOTIFY_FLAG_MODE_CHG) << m_name << pOwner->GetGUID() << uint8(oldflags) << uint8(oldflags | CHANNEL_FLAG_OWNER);
-	plr->GetSession()->SendPacket(&data);
+	SendToAll(&data);
 }
 
 void Channel::Invite(Player * plr, Player * new_player)
