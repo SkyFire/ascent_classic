@@ -103,16 +103,19 @@ void Channel::Part(Player * plr)
 	data << uint8(CHANNEL_NOTIFY_FLAG_YOULEFT) << m_name << m_id << uint32(0) << uint8(0);
 	plr->GetSession()->SendPacket(&data);
 
-	if(!m_announce)
-		return;
+	if(m_announce)
+	{
+		data.clear();
+		data << uint8(CHANNEL_NOTIFY_FLAG_LEFT) << m_name << plr->GetGUID();
+		SendToAll(&data);
+	
+		data.Initialize(SMSG_PLAYER_LEFT_CHANNEL);
+		data << plr->GetGUID() << m_flags << m_id << m_name;
+		SendToAll(&data);
+	}
 
-	data.clear();
-	data << uint8(CHANNEL_NOTIFY_FLAG_LEFT) << m_name << plr->GetGUID();
-	SendToAll(&data);
-
-	data.Initialize(SMSG_PLAYER_LEFT_CHANNEL);
-	data << plr->GetGUID() << m_flags << m_id << m_name;
-	SendToAll(&data);
+	if(m_members.size() == 0)
+		channelmgr.RemoveChannel(this);
 }
 
 void Channel::SetOwner(Player * oldpl, Player * plr)
@@ -703,7 +706,17 @@ ChannelMgr::~ChannelMgr()
 	}
 }
 
+Channel::~Channel()
+{
 
+}
+
+void Channel::SendToAll(WorldPacket * data)
+{
+	Guard guard(m_lock);
+	for(MemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+		itr->first->GetSession()->SendPacket(data);
+}
 uint32 chash(const char * str)
 {
 	register size_t len = strlen(str);
