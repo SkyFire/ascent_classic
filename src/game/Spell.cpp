@@ -1615,7 +1615,7 @@ void Spell::SendSpellGo()
 						break;
 					}
 				}
-				if(add)
+				if(add && (*i) != 0)
 					UniqueTargets.push_back((*i));
                 //TargetsList::iterator itr = std::unique(m_targetUnits[x].begin(), m_targetUnits[x].end());
                 //UniqueTargets.insert(UniqueTargets.begin(),));
@@ -2139,6 +2139,9 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 void Spell::HandleAddAura(uint64 guid)
 {
 	Unit * Target = 0;
+	if(guid == 0)
+		return;
+
 	if(u_caster && u_caster->GetGUID() == guid)
 		Target = u_caster;
 	else if(m_caster->IsInWorld())
@@ -3439,9 +3442,13 @@ void Spell::DetermineSkillUp(uint32 skillid)
 
 void Spell::SafeAddTarget(TargetsList* tgt,uint64 guid)
 {
+	if(guid == 0)
+		return;
+
 	for(TargetsList::iterator i=tgt->begin();i!=tgt->end();i++)
 		if((*i)==guid)
 			return;
+	
 	tgt->push_back(guid);
 }
 

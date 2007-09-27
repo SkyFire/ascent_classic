@@ -427,7 +427,14 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 
 	if(flags & 0x2)
 	{
-		*data << getMSTime();
+		if(target)
+		{
+			int32 m_time = getMSTime() - target->GetSession()->m_clientTimeDelay;
+			m_time += target->GetSession()->m_moveDelayTime;
+			*data << m_time;
+		}
+		else
+            *data << getMSTime();
 	}
 }
 
