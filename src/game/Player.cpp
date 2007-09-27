@@ -7709,6 +7709,9 @@ void Player::SetShapeShift(uint8 ss)
 					}
 					break;
 				}
+
+				if(m_auras[x] == NULL)
+					break;
 			}
 		} 
 	}
