@@ -652,11 +652,11 @@ public:
 	//// Combat
    // void DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId = 0);   // to stop from falling, etc
 	//void AttackerStateUpdate(Unit *pVictim,uint32 damage_type);//0-melee,1-offhand(dual wield),2-ranged
-	void Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add_damage,int32 pct_dmg_mod,uint32,bool);
+	void Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add_damage,int32 pct_dmg_mod,uint32 exclusive_damage,bool disable_proc);
 //	void PeriodicAuraLog(Unit *pVictim, SpellEntry* spellID, uint32 damage, uint32 damageType);
 	//void SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
 	uint32 m_procCounter;
-	void HandleProc(uint32 flag, Unit* Victim, SpellEntry* CastingSpell,uint32 dmg=-1);
+	void HandleProc(uint32 flag, Unit* Victim, SpellEntry* CastingSpell,uint32 dmg=-1,uint32 abs=0);
 	void HandleProcDmgShield(uint32 flag, Unit* Victim);//almost the same as handleproc :P
 //	void HandleProcSpellOnSpell(Unit* Victim,uint32 damage,bool critical);//nasty, some spells proc other spells
 
@@ -1032,7 +1032,7 @@ public:
 	void RemoveAurasByBuffIndexType(uint32 buff_index_type, const uint64 &guid);
 	void RemoveAurasByBuffType(uint32 buff_type, const uint64 &guid,uint32 skip);
 	bool HasAurasOfBuffType(uint32 buff_type, const uint64 &guid,uint32 skip);
-	bool HasAurasWithNameHash(uint32 name_hash);
+	int	 HasAurasWithNameHash(uint32 name_hash);
 	bool HasNegativeAuraWithNameHash(uint32 name_hash); //just to reduce search range in some cases
 	bool HasNegativeAura(uint32 spell_id); //just to reduce search range in some cases
 

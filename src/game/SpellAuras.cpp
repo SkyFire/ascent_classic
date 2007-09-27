@@ -3206,6 +3206,7 @@ void Aura::SpellAuraModShapeshift(bool apply)
 			   }
 			}
 		}
+		((Player*)m_target)->EventTalentHearthOfWildChange(true);
 	}
 	else 
 	{
@@ -3218,6 +3219,7 @@ void Aura::SpellAuraModShapeshift(bool apply)
 		static_cast<Player*>(m_target)->m_ShapeShifted=0;
 
 		((Player*)m_target)->SetShapeShift(0);
+		((Player*)m_target)->EventTalentHearthOfWildChange(false);
 
 	}
 	static_cast<Player*>(m_target)->UpdateStats();
@@ -5443,14 +5445,14 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 		if(m_target->IsPlayer())
 		{
 			//druid hearth of the wild should add more features based on form
-			if(m_spellProto->NameHash==0x00 && static_cast<Player*>(m_target)->m_ShapeShifted)
+			if(m_spellProto->NameHash==1814208707)
 			{
-				//increase stamina if :
-				if(static_cast<Player*>(m_target)->GetShapeShift()==FORM_BEAR || static_cast<Player*>(m_target)->GetShapeShift()==FORM_DIREBEAR)
-					static_cast<Player*>(m_target)->TotalStatModPctPos[STAT_STAMINA] += val; 
-				//increase stamina if :
-				else if(static_cast<Player*>(m_target)->GetShapeShift()==FORM_CAT)
-					static_cast<Player*>(m_target)->TotalStatModPctPos[STAT_STRENGTH] += val; 
+				//we should remove effect first
+				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange(false);
+				//set new value
+				static_cast<Player*>(m_target)->SetTalentHearthOfWildPCT(val);
+				//reapply
+				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange(true);
 			}
 
 			if(mod->m_amount>0)

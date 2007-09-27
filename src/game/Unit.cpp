@@ -509,7 +509,7 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 	}*/
 }
 
-void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32 dmg)
+void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32 dmg,uint32 abs)
 {
 	++m_procCounter;
 	bool can_delete = !bProcInUse;
@@ -929,15 +929,14 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//priest - Reflective Shield 
 						case 33619:
 							{
-								continue;
 								//requires Power Word: Shield active
-								if(!HasAurasWithNameHash(0))
+								int power_word_id = HasAurasWithNameHash(3248591006);
+								if(!power_word_id)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//make a direct strike then exit rest of handler
-								int dmg=dmg*(ospinfo->EffectBasePoints[0]+1)/100;
-								if(CastingSpell)
-									Strike(victim,CastingSpell->School,ospinfo,1,0,1,true);
-								else Strike(victim,0,ospinfo,1,0,1,true);
+								int tdmg=abs*(ospinfo->EffectBasePoints[0]+1)/100;
+								//somehow we should make this not caused any threat (tobedone)
+								SpellNonMeleeDamageLog(victim,power_word_id, tdmg, false, false);
 								continue;
 							}break;
 /*						//paladin - illumination
@@ -1817,11 +1816,11 @@ else
     {
 		if( !(ability && ability->NameHash == 0x2535ed19) )
 		{
-			this->HandleProc(aproc,pVictim, ability,realdamage);
+			this->HandleProc(aproc,pVictim, ability,realdamage,abs); //maybe using dmg.resisted_damage is better sometimes but then if using godmode dmg is resisted instead of absorbed....bad
 			m_procCounter = 0;
 		}
 
-		pVictim->HandleProc(vproc,this, ability,realdamage);
+		pVictim->HandleProc(vproc,this, ability,realdamage,abs);
 		m_procCounter = 0;
 	}
 //--------------------------spells triggering-----------------------------------------------
@@ -3856,15 +3855,15 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 	}
 }
 
-bool Unit::HasAurasWithNameHash(uint32 name_hash)
+int Unit::HasAurasWithNameHash(uint32 name_hash)
 {
 	for(uint32 x = 0; x < MAX_AURAS; ++x)
 	{
 		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash)
-			return true;
+			return m_auras[x]->m_spellProto->Id;
 	}
 
-	return false;
+	return 0;
 }
 
 bool Unit::HasNegativeAuraWithNameHash(uint32 name_hash)

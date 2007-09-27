@@ -1862,10 +1862,10 @@ void World::SetInitialWorldSettings()
 		}
 	}
 	//for test only
-	sp = sSpellStore.LookupEntry(23922);
+	sp = sSpellStore.LookupEntry(25218);
 	if(sp)
 	{
-//		printf("!!!!!!hash %u \n",sp->NameHash);
+		printf("!!!!!!hash %u \n",sp->NameHash);
 //		sp->procChance=100;
 //		SpellDuration *sd=sSpellDuration.LookupEntry(sp->DurationIndex);
 //printf("iterruptflag %u, duration %u",sp->AuraInterruptFlags,GetDuration(sd));

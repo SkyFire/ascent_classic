@@ -971,6 +971,8 @@ public:
 	// These functions build a specific type of A9 packet
 	uint32 __fastcall BuildCreateUpdateBlockForPlayer( ByteBuffer *data, Player *target );
 	void DestroyForPlayer( Player *target ) const;
+	void SetTalentHearthOfWildPCT(int value){hearth_of_wild_pct=value;}
+	void EventTalentHearthOfWildChange(bool apply);
 	
 	std::list<LoginAura> loginauras;
 
@@ -1719,6 +1721,7 @@ protected:
     uint32	    chat_disabled_until;    //force player to be silent. Yeah i'm pissed of on noobs
 	uint32	    trigger_on_stun;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
 	uint32	    trigger_on_stun_chance; //also using this for mage "Frostbite" talent
+	int			hearth_of_wild_pct;		//druid hearth of wild talent used on shapeshifting. We eighter know what is last talent level or memo on learn
 
 	uint32 m_team;
 	float       m_lastRunSpeed;

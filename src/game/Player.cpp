@@ -371,6 +371,7 @@ Player::Player ( uint32 high, uint32 low )
 	m_arenateaminviteguid=0;
 	m_arenaPoints=0;
 	m_honorPointsToAdd=0;
+	hearth_of_wild_pct = 0;
 }
 
 
@@ -7685,6 +7686,9 @@ void Player::SaveAuras(stringstream &ss)
 			//we are going to cast passive spells anyway on login so no need to save auras for them
             if(aur->IsPassive() && !(aur->GetSpellProto()->AttributesEx & 1024))
 				skip = true;
+			//shapeshift
+//			if(m_ShapeShifted==aur->m_spellProto->Id)
+//				skip=true;
 
 			if(skip)continue;
 			uint32 d=aur->GetTimeLeft();
@@ -8626,6 +8630,33 @@ void Player::SetSpellTargetType(uint32 Type, Unit* target)
 void Player::RecalculateHonor()
 {
 	HonorHandler::RecalculateHonorFields(this);
+}
+
+//wooot, crapy code rulez.....NOT
+void Player::EventTalentHearthOfWildChange(bool apply)
+{
+	if(!hearth_of_wild_pct)
+		return;
+	//druid hearth of the wild should add more features based on form
+	int tval;
+	if(apply)
+		tval = hearth_of_wild_pct;
+	else tval = -hearth_of_wild_pct;
+
+	//increase stamina if :
+	if(GetShapeShift()==FORM_BEAR || GetShapeShift()==FORM_DIREBEAR)
+	{
+		TotalStatModPctPos[STAT_STAMINA] += tval; 
+		CalcStat(STAT_STAMINA);	
+	}
+	//increase stamina if :
+	else if(GetShapeShift()==FORM_CAT)
+	{
+		TotalStatModPctPos[STAT_STRENGTH] += tval; 
+		CalcStat(STAT_STRENGTH);	
+	}
+	UpdateStats();
+	UpdateChances();
 }
 
 /************************************************************************/
