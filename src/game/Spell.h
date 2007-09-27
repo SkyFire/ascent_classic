@@ -1659,6 +1659,11 @@ public:
 
     bool duelSpell;
 
+	inline void safe_cancel()
+	{
+		m_cancelled = true;
+	}
+
 protected:
     bool m_usesMana;
     bool failed;//for 5sr
@@ -1684,6 +1689,7 @@ protected:
     bool bDurSet;
     float Rad[3];
     bool bRadSet[3];
+	bool m_cancelled;
     //void _DamageRangeUpdate();
 
 private:

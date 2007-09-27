@@ -173,6 +173,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	add_damage = 0;
 	m_delayed = false;
 	pSpellId = 0;
+	m_cancelled = false;
 }
 
 Spell::~Spell()
@@ -1350,6 +1351,12 @@ void Spell::update(uint32 difftime)
 				return;
 			}
 		}
+	}
+
+	if(m_cancelled)
+	{
+		cancel();
+		return;
 	}
 
 	switch(m_spellState)

@@ -3981,8 +3981,8 @@ void Aura::SpellAuraModStalked(bool apply)
 		//SetNegative();
 		m_target->stalkedby = m_casterGuid;
 		//cancel spell casting
-		if(m_target->isCasting())
-			m_target->GetCurrentSpell()->cancel();
+		if(m_target->isCasting() && m_target->GetCurrentSpell() && m_target->GetCurrentSpell()->m_spellInfo != m_spellProto)			// hackfix for stupid spells.. we should really cancel on the next loop!
+			m_target->GetCurrentSpell()->safe_cancel();
 		//hmmm, some spells silance you only on specific spelltypes ?
 		m_target->m_silenced++;
 	}
