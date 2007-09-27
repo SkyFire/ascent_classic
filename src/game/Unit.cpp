@@ -917,6 +917,15 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!HasActiveAura(18499))
 									continue;
 							}break;
+						//mage - Arcane Concentration 
+						case 12536:
+							{
+								//requires damageing spell
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
+								if(!IsDamagingSpell(CastingSpell))
+									continue;
+							}break;
 /*						//paladin - illumination
 						case 18350:
 							{

@@ -965,6 +965,8 @@ void World::SetInitialWorldSettings()
 						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc, "melee attacks has"))
 						pr|=PROC_ON_MELEE_ATTACK;
+					if(strstr(desc, "any damage spell hits a target"))
+						pr|=PROC_ON_CAST_SPELL;
 					if(strstr(desc, "gives your"))
 					{
 						if(strstr(desc, "melee"))

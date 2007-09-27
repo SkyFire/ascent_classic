@@ -5,7 +5,6 @@ Mage:
 Talents:
 Arcane:
 Arcane Subtlety:Working. Not sure if reduces resistance. Instead of resistance this spell reduces cost !
-Arcane Concentration:Doesn't work
 Magic Attunement: Looks like working but only if you spend 2 points
 Arcane Impact:Looks like working
 Improved Blink:Doesn't work

@@ -78,6 +78,7 @@ Zack - test my shit :
 - druid - heath of wiild - add namehash here : m_spellProto->NameHash==0x00 && static_cast<Player*>(m_target)->m_ShapeShifted
 - mage - Improved Counterspell - its not silencing target for 4 sec : 29443 - 12598
 - mage - Magic Absorption - restore mana on resist
+- mage - Arcane Concentration - 11213
 
 ==========================================================================
 Capt - test my shit :
