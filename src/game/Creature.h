@@ -350,24 +350,45 @@ public:
 	void RegenerateHealth();
 	void RegenerateMana();
 
-	inline bool CanSee(Unit* obj)
+	inline bool CanSee(Unit* obj) // * Invisibility & Stealth Detection - Partha *
 	{
 		if(!obj)
 			return false;
 
-		if(!obj->m_stealth)
-			return true;
-
-		float steathlevel = (float)obj->GetStealthLevel();
-		if(steathlevel == 0.0f) steathlevel = 1.0f;
-
-		float visibility =  (float)GetStealthDetect()/steathlevel;
-
-		float invisRange =  visibility * 3 + GetFloatValue (UNIT_FIELD_BOUNDINGRADIUS) +obj->GetFloatValue (UNIT_FIELD_BOUNDINGRADIUS);
-		if (GetDistance2dSq (obj) <= invisRange * invisRange) 
-			return true;
-		else
+		if(obj->getDeathState() == CORPSE) // can't see ghosts
 			return false;
+
+		if(obj->m_invisible) // Invisibility Detection
+		{
+			if( true ) // TODO: replace this line with correct invisibility detection formula
+				return false;
+		}
+
+		if(obj->IsStealth()) // Stealth Detection (  I Hate Rogues :P  )
+		{
+			if(isInFront(obj)) // stealthed player is in front of creature
+			{
+				// Detection Range = 5yds + (Detection Skill - Stealth Skill)/5
+				if(getLevel() < 60)
+					detectRange = 5.0f + getLevel() + 0.2f * (float)(GetStealthDetectBonus() - obj->GetStealthLevel());
+				else
+					detectRange = 65.0f + 0.2f * (float)(GetStealthDetectBonus() - obj->GetStealthLevel());
+
+				if(detectRange < 1.0f) detectRange = 1.0f; // Minimum Detection Range = 1yd
+			}
+			else // stealthed player is behind creature
+			{
+				if(GetStealthDetectBonus() > 1000) return true; // immune to stealth
+				else detectRange = 0.0f;
+			}	
+
+			detectRange += GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of creature
+			detectRange += obj->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of stealthed player
+
+			if(GetDistance2dSq(obj) > detectRange * detectRange)
+				return false;
+		}
+		return true;
 	}
 
 	//Make this unit face another unit

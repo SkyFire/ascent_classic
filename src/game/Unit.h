@@ -687,11 +687,12 @@ public:
 	float get_chance_to_daze(Unit *target);
 
 	// Stealth  
-	inline uint32 GetStealthLevel() { return m_stealthLevel+ 5* m_uint32Values[UNIT_FIELD_LEVEL]; }
-	inline int32 GetStealthDetect() { return 5 * getLevel() + m_stealthDetectBonus; }
-	inline uint32 GetStealthDetectBonus() { return m_stealthDetectBonus; }
+	inline int32 GetStealthLevel() { return m_stealthLevel; }
+	inline int32 GetStealthDetectBonus() { return m_stealthDetectBonus; }
 	inline void SetStealth(uint32 id) { m_stealth = id; }
 	inline bool IsStealth() { return (m_stealth!=0 ? true : false); }
+	float detectRange;
+
 	bool HasAura(uint32 visualid);//not spell id!!!
 	bool HasActiveAura(uint32 spelllid);
 	bool HasActiveAura(uint32 spelllid,uint64);
