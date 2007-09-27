@@ -4,28 +4,9 @@ Mage:
 
 Talents:
 Arcane:
-Arcane Subtlety:Working. Not sure if reduces resistance. Instead of resistance this spell reduces cost !
-Magic Attunement: Looks like working but only if you spend 2 points
-Arcane Impact:Looks like working
-Improved Blink:Doesn't work
-Presence of Mind:Partially, sometimes you lose this buff. Seens like it is lost by magic effect (like the periodic fire by fireball)
-Arcane Instability:Doesn't work
 Arcane Potency:Since there's no Clearcasting state (Arcane Concentration), Arcane pontency can't work
-Empowered Arcane Missiles:Doesn't work
-Arcane Power:Doesn't work
-Spell Power:Doesn't work
-
-Fire:
-Improved Fire Blast:Doesn't Work. It's only visual
-Improved Flamestrike:Doesn't Work
-Master of Elements:Not tested yet
-Playing with Fire:Not tested yet
-Pyromaniac:Not tested yet
-Molten Fury:Not tested yet
-- mage - Improved Fire Ward
 
 Frost:
-Frost Warding:Doesn't work
 Elemental Precision:Doesn't work
 Improved Blizzard:Doesn't work. Retest
 Frozen Core:Not tested yet

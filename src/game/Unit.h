@@ -57,6 +57,7 @@ struct ReflectSpellSchool
 	uint32 spellId;
 	int32 school;
 	int32 chance;
+	int32 require_aura_hash;
 };
 
 typedef struct

@@ -79,6 +79,7 @@ Zack - test my shit :
 - mage - Improved Counterspell - its not silencing target for 4 sec : 29443 - 12598
 - mage - Magic Absorption - restore mana on resist
 - mage - Arcane Concentration - 11213
+- mage - Frost Warding - 28332 - rss->require_aura_hash = "Frost Ward"
 
 ==========================================================================
 Capt - test my shit :

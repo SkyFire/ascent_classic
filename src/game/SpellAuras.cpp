@@ -4109,6 +4109,7 @@ void Aura::SpellAuraReflectSpellsSchool(bool apply)
 
 		rss->chance = mod->m_amount;
 		rss->spellId = GetSpellId();
+		rss->require_aura_hash = 0;
 		if(m_spellProto->Attributes == 0x400D0 && m_spellProto->AttributesEx == 0)
 		{
 			rss->school = (int)(log10((float)mod->m_miscValue) / log10((float)2));

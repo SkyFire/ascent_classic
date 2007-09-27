@@ -423,6 +423,23 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		return;
 	switch(spellId)
 	{
+	case 11189: //mage - frost warding
+	case 28332:
+		{
+			if(!unitTarget)
+				break;
+			for(std::list<struct ReflectSpellSchool*>::iterator i = unitTarget->m_reflectSpellSchool.begin();i != unitTarget->m_reflectSpellSchool.end();i++)
+				if(m_spellInfo->Id == (*i)->spellId)
+					unitTarget->m_reflectSpellSchool.erase(i);
+
+			ReflectSpellSchool *rss = new ReflectSpellSchool;
+			rss->chance = m_spellInfo->procChance;
+			rss->spellId = m_spellInfo->Id;
+			rss->require_aura_hash = 0; 
+			rss->school = m_spellInfo->School;		
+
+			unitTarget->m_reflectSpellSchool.push_back(rss);
+		}break;
 	case 18350:		/* paladin talent: illumination - gain mana equal to 60% cost of spell. */
 		{
 			if(!p_caster) return;

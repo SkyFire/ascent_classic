@@ -3529,7 +3529,12 @@ bool Spell::reflect(Unit *refunit)
 		if((*i)->school == -1 || (*i)->school == (int32)m_spellInfo->School)
 		{
 			if(Rand((float)(*i)->chance))
+			{
+				//the god blessed special case : mage - Frost Warding = is an augmentation to frost warding
+				if((*i)->require_aura_hash && u_caster && !u_caster->HasAurasWithNameHash((*i)->require_aura_hash))
+					continue;
 				refspell = m_spellInfo;
+			}
 		}
 	}
 
