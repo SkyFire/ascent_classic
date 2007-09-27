@@ -168,7 +168,7 @@ void Guild::FillGuildRosterData(WorldPacket *data)
 	std::list<RankInfo*>::iterator ritr;
 
 	data->Initialize(SMSG_GUILD_ROSTER);
-	*data << GetGuildMembersCount();
+	*data << uint32(GetGuildMembersCount());
 	*data << m_motd;
 	*data << m_guildInfo;
 	*data << (uint32)m_rankList.size();
