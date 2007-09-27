@@ -26,7 +26,7 @@ vector<string> m_generalChannels;
 void Channel::LoadConfSettings()
 {
 	string BannedChannels = Config.MainConfig.GetStringDefault("Channels", "BannedChannels", "");
-	string GeneralChannels = Config.MainConfig.GetStringDefault("Channels", "GeneralChannels", "General -;Trade -;LookingForGroup;GuildRecruitment;");
+	string GeneralChannels = Config.MainConfig.GetStringDefault("Channels", "GeneralChannels", "General -;Trade -;LookingForGroup;GuildRecruitment;LocalDefense;WorldDefense");
 	m_confSettingLock.Acquire();
 	m_bannedChannels = StrSplit(BannedChannels, ";");
 	m_generalChannels = StrSplit(GeneralChannels, ";");
@@ -280,7 +280,7 @@ void Channel::Say(Player * plr, const char * message)
 {
 	Guard mGuard(m_lock);
 	MemberMap::iterator itr = m_members.find(plr);
-	WorldPacket data(SMSG_CHANNEL_NOTIFY, 200);
+	WorldPacket data(SMSG_CHANNEL_NOTIFY, strlen(message)+100);
 	if(m_members.end() == itr)
 	{
 		data << uint8(CHANNEL_NOTIFY_FLAG_NOTON) << m_name;
@@ -309,7 +309,7 @@ void Channel::Say(Player * plr, const char * message)
 	data << uint32(0);		// rank?
 	data << m_name;			// channel name
 	data << plr->GetGUID();	// guid again?
-	data << uint32(strlen(message));
+	data << uint32(strlen(message)+1);
 	data << message;
 	data << (uint8)(plr->bGMTagOn ? 4 : 0);
 	SendToAll(&data);
@@ -662,7 +662,7 @@ void Channel::Password(Player * plr, const char * pass)
 void Channel::List(Player * plr)
 {
 	Guard mGuard(m_lock);
-	WorldPacket data(SMSG_CHANNEL_LIST, 500);
+	WorldPacket data(SMSG_CHANNEL_LIST, 50 + (m_members.size()*9));
 	MemberMap::iterator itr = m_members.find(plr);
 	if(itr == m_members.end())
 	{
