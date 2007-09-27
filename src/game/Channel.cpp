@@ -19,6 +19,20 @@
 
 #include "StdAfx.h"
 
+Mutex m_confSettingLock;
+vector<string> m_bannedChannels;
+vector<string> m_generalChannels;
+
+void Channel::LoadConfSettings()
+{
+	string BannedChannels = Config.MainConfig.GetStringDefault("Channels", "BannedChannels", "");
+	string GeneralChannels = Config.MainConfig.GetStringDefault("Channels", "GeneralChannels", "General -;Trade -;LookingForGroup;GuildRecruitment;");
+	m_confSettingLock.Acquire();
+	m_bannedChannels = StrSplit(BannedChannels, ";");
+	m_generalChannels = StrSplit(GeneralChannels, ";");
+	m_confSettingLock.Release();
+}
+
 Channel::Channel(const char * name, uint32 team)
 {
 	// flags (0x01 = custom?, 0x04 = trade?, 0x20 = city?, 0x40 = lfg?, , 0x80 = voice?,
@@ -26,9 +40,20 @@ Channel::Channel(const char * name, uint32 team)
 	m_announce = true;
 	m_muted = false;
 	m_general = false;
-	m_hash = chash(name);
 	m_name = string(name);
 	m_team = team;
+
+	m_confSettingLock.Acquire();
+	for(vector<string>::iterator itr = m_generalChannels.begin(); itr != m_generalChannels.end(); ++itr)
+	{
+		if(!strnicmp(m_name.c_str(), (*itr).c_str(), (*itr).size()))
+		{
+			m_general = true;
+			m_announce = false;
+			break;
+		}
+	}
+	m_confSettingLock.Release();
 }
 
 void Channel::AttemptJoin(Player * plr, const char * password)
@@ -57,7 +82,7 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 		return;
 	}
 
-	if(m_members.empty())
+	if(m_members.empty() && !m_general)
 		flags |= CHANNEL_FLAG_OWNER;
 
 	plr->JoinedChannel(this);
@@ -93,6 +118,7 @@ void Channel::Part(Player * plr)
     
 	flags = itr->second;
 	m_members.erase(itr);
+	plr->LeftChannel(this);
 
 	if(flags & CHANNEL_FLAG_OWNER)
 	{
@@ -648,6 +674,7 @@ void Channel::List(Player * plr)
 
 	uint8 flags;
 	data << uint8(1) << m_name;
+	data << uint8(m_flags);
 	data << uint32(m_members.size());
 	for(MemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
 	{
@@ -717,14 +744,86 @@ void Channel::SendToAll(WorldPacket * data)
 	for(MemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
 		itr->first->GetSession()->SendPacket(data);
 }
-uint32 chash(const char * str)
-{
-	register size_t len = strlen(str);
-	register uint32 ret = 0;
-	register size_t i = 0;
-	for(; i < len; ++i)
-		ret += 5 * ret + (tolower(str[i]));
 
-	/*printf("%s : %u\n", str, ret);*/
-	return ret;
+Channel * ChannelMgr::GetCreateChannel(const char *name, Player * p)
+{
+	ChannelList::iterator itr;
+	ChannelList * cl = &Channels[0];
+	Channel * chn;
+	if(seperatechannels)
+		cl = &Channels[p->GetTeam()];
+
+	lock.Acquire();
+	for(itr = cl->begin(); itr != cl->end(); ++itr)
+	{
+		if(!stricmp(name, itr->first.c_str()))
+		{
+			lock.Release();
+			return itr->second;
+		}
+	}
+
+	// make sure the name isn't banned
+	m_confSettingLock.Acquire();
+	for(vector<string>::iterator itr = m_bannedChannels.begin(); itr != m_bannedChannels.end(); ++itr)
+	{
+		if(!strnicmp( name, itr->c_str(), itr->size() ) )
+		{
+			lock.Release();
+			return NULL;
+		}
+	}
+	m_confSettingLock.Release();
+
+	chn = new Channel(name, seperatechannels ? p->GetTeam() : 0);
+	cl->insert(make_pair(chn->m_name, chn));
+	lock.Release();
+	return chn;
+}
+
+Channel * ChannelMgr::GetChannel(const char *name, Player * p)
+{
+	ChannelList::iterator itr;
+	ChannelList * cl = &Channels[0];
+	if(seperatechannels)
+		cl = &Channels[p->GetTeam()];
+
+	lock.Acquire();
+	for(itr = cl->begin(); itr != cl->end(); ++itr)
+	{
+		if(!stricmp(name, itr->first.c_str()))
+		{
+			lock.Release();
+			return itr->second;
+		}
+	}
+
+	lock.Release();
+	return NULL;
+}
+
+void ChannelMgr::RemoveChannel(Channel * chn)
+{
+	ChannelList::iterator itr;
+	ChannelList * cl = &Channels[0];
+	if(seperatechannels)
+		cl = &Channels[chn->m_team];
+
+	lock.Acquire();
+	for(itr = cl->begin(); itr != cl->end(); ++itr)
+	{
+		if(itr->second == chn)
+		{
+			cl->erase(itr);
+			lock.Release();
+			return;
+		}
+	}
+
+	lock.Release();
+}
+
+ChannelMgr::ChannelMgr()
+{
+
 }

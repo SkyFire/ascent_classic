@@ -17,80 +17,23 @@
  *
  */
 
-uint32 chash(const char * str);
-
 class ChannelMgr :  public Singleton < ChannelMgr >
 {
  
 public:
-	ChannelMgr()
-	{
-		
-	}
-
+	ChannelMgr();
 	~ChannelMgr();
 
-	Channel *GetCreateChannel(const char *name, Player * p)
-	{ 
-		uint32 team = 0;
-		ChannelList* cl=&Channels[team];
-		if(seperatechannels)
-		{
-			cl = &Channels[p->GetTeam()];
-			team = p->GetTeam();
-		}
-
-		uint32 h = chash(name);
-		lock.Acquire();
-		ChannelList::iterator i=cl->find(h);
-		lock.Release();
-		if(i!=cl->end())
-			return i->second;
-		else 
-		{
-			Channel *nchan = new Channel(name, team);
-			cl->insert(make_pair(nchan->m_hash, nchan));
-			return nchan;
-		}
-
-	}
-	Channel *GetChannel(const char *name, Player * p)
-	{ 
-		ChannelList* cl = &Channels[0];
-		lock.Acquire();
-		if(seperatechannels)
-			cl = &Channels[p->GetTeam()];
-
-		uint32 h = chash(name);
-		ChannelList::iterator i=cl->find(h);
-		lock.Release();
-
-		if(i!=cl->end())
-			return i->second;
-		else 
-			return NULL;
-	}
-
-	void RemoveChannel(Channel * chn)
-	{
-		lock.Acquire();
-		ChannelList * cl = &Channels[chn->m_team];
-		ChannelList::iterator i = cl->find(chn->m_hash);
-		if(i != cl->end())
-		{
-			cl->erase(i);
-		}
-		lock.Release();
-		delete chn;
-	}
-
+	Channel *GetCreateChannel(const char *name, Player * p);
+	Channel *GetChannel(const char *name, Player * p);
+	void RemoveChannel(Channel * chn);
 	bool seperatechannels;
+
 private:
 	//team 0: aliance, team 1 horde
-	typedef map<uint32,Channel *> ChannelList;
+	typedef map<string,Channel *> ChannelList;
 	ChannelList Channels[2];
 	Mutex lock;
-
 };
 
 #define channelmgr ChannelMgr::getSingleton()

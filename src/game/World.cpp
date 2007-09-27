@@ -2489,4 +2489,5 @@ void World::Rehash(bool load)
 	antihack_flight = Config.MainConfig.GetBoolDefault("AntiHack", "Flight", true);
 	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", false);
 	SpeedhackProtection = antihack_speed;
+	Channel::LoadConfSettings();
 }

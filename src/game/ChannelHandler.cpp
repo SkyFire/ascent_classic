@@ -42,6 +42,7 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 	}
 
 	chn->AttemptJoin(_player, pass.c_str());
+	Log.Debug("ChannelJoin", "%s", channelname.c_str());
 }
 
 void WorldSession::HandleChannelLeave(WorldPacket& recvPacket)

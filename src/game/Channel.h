@@ -80,9 +80,9 @@ class Channel
 	MemberMap m_members;
 	set<uint32> m_bannedMembers;
 public:
+	static void LoadConfSettings();
 	string m_name;
 	string m_password;
-	uint32 m_hash;
 	uint32 m_id;
 	uint8 m_flags;
 	bool m_general;
