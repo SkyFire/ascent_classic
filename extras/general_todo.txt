@@ -72,6 +72,7 @@ Zack - test my shit :
 	2 ) there is no visual sighn that spell had effect (the negative values are missing ex : 23+1-6)
 - warlock(demonology) - Enslave Demon - works buit will rush you and set aura as negative
 - druid - omen of clarity - 16864
+- druid - shred - add the base (405) dmg to attack - 27002
 
 ==========================================================================
 Capt - test my shit :
