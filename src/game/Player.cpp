@@ -4032,7 +4032,9 @@ void Player::CleanupChannels()
 {
 	list<Channel *>::iterator i;
 	for(i = m_channels.begin(); i != m_channels.end(); i++)
-		(*i)->Leave(this,false);
+	{
+		(*i)->Part(this);
+	}
 }
 
 void Player::SendInitialActions()

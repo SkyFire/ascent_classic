@@ -17,6 +17,8 @@
  *
  */
 
+uint32 chash(const char * str);
+
 class ChannelMgr :  public Singleton < ChannelMgr >
 {
  
@@ -28,68 +30,66 @@ public:
 
 	~ChannelMgr();
 
-	Channel *GetJoinChannel(const char *name, Player *p)
+	Channel *GetCreateChannel(const char *name, Player * p)
 	{ 
-		ChannelList* cl=&Channels[0];
+		uint32 team = 0;
+		ChannelList* cl=&Channels[team];
 		if(seperatechannels)
+		{
 			cl = &Channels[p->GetTeam()];
+			team = p->GetTeam();
+		}
 
-		ChannelList::iterator i=cl->find(string(name));
+		uint32 h = chash(name);
+		lock.Acquire();
+		ChannelList::iterator i=cl->find(h);
+		lock.Release();
 		if(i!=cl->end())
 			return i->second;
 		else 
 		{
-			Channel *nchan = new Channel(name,p);
-			(*cl)[name]=nchan;
+			Channel *nchan = new Channel(name, team);
+			cl->insert(make_pair(nchan->m_hash, nchan));
 			return nchan;
 		}
 
 	}
-	Channel *GetChannel(const char *name, Player *p)
+	Channel *GetChannel(const char *name, Player * p)
 	{ 
-		ChannelList* cl=&Channels[0];
+		ChannelList* cl = &Channels[0];
+		lock.Acquire();
 		if(seperatechannels)
 			cl = &Channels[p->GetTeam()];
 
-		ChannelList::iterator i=cl->find(string(name));
+		uint32 h = chash(name);
+		ChannelList::iterator i=cl->find(h);
+		lock.Release();
+
 		if(i!=cl->end())
 			return i->second;
 		else 
-		{
-            string n_name = name;
-			WorldPacket data(1 + 1 + n_name.size());
-			data.SetOpcode (SMSG_CHANNEL_NOTIFY);
-			data << (uint8)0x05 << n_name;
-			p->GetSession()->SendPacket(&data);
 			return NULL;
-		}
 	}
-	bool LeftChannel(const char *name,Player*p)
-	{ 
-		ChannelList* cl=&Channels[0];
-		if(seperatechannels)
-			cl = &Channels[p->GetTeam()];
 
-		ChannelList::iterator i=cl->find(string(name));
-		if(i!=cl->end())
+	void RemoveChannel(Channel * chn)
+	{
+		lock.Acquire();
+		ChannelList * cl = &Channels[chn->m_team];
+		ChannelList::iterator i = cl->find(chn->m_hash);
+		if(i != cl->end())
 		{
-			Channel *ch=i->second;
-
-			ch->Leave(p);
-			if(!ch->IsConstant()  && ch->GetNumPlayers() == 0 )
-			{
-				cl->erase(i);
-				delete ch;
-			}
-			return true;
+			cl->erase(i);
 		}
-		return false;
+		lock.Release();
+		delete chn;
 	}
+
 	bool seperatechannels;
 private:
 	//team 0: aliance, team 1 horde
-	typedef map<string,Channel *> ChannelList;
+	typedef map<uint32,Channel *> ChannelList;
 	ChannelList Channels[2];
+	Mutex lock;
 
 };
 

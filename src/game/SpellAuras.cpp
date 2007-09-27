@@ -2489,57 +2489,56 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo, uint64 target)
 	switch (spellInfo->NameHash)
 	{
 	case 0x884B70A4: //Druid: Frenzied Regeneration
-		if (!pTarget->IsPlayer())
-			break;
-
-		Player* player = (Player*)(pTarget);
-		if (!player->IsInFeralForm() || (player->GetShapeShift!=FORM_BEAR && player->GetShapeShift()!= FORM_DIREBEAR))
-			break;
-		if(player->GetPowerType() == POWER_TYPE_RAGE)
 		{
-			uint32 val = player->GetUInt32Value(UNIT_FIELD_POWER2);
-			if (val>100) val = 100;
-			if (val)
+			if (!pTarget->IsPlayer())
+				break;
+
+			Player* player = (Player*)(pTarget);
+			if (!player->IsInFeralForm() || (player->GetShapeShift()!=FORM_BEAR && player->GetShapeShift()!= FORM_DIREBEAR))
+				break;
+			if(player->GetPowerType() == POWER_TYPE_RAGE)
 			{
-				player->SetUInt32Value(UNIT_FIELD_POWER2, player->GetUInt32Value(UNIT_FIELD_POWER2)-val);
-				switch (this->pSpellId)
+				uint32 val = player->GetUInt32Value(UNIT_FIELD_POWER2);
+				if (val>100) val = 100;
+				if (val)
 				{
-					case 22842:
-						val *= 10;break;
-					case 22895:
-						val *= 15;break;
-					case 22896:
-						val *= 20;break;
-					case 26999:
-						val *=25;break;
-					default:
-						break;
+					player->SetUInt32Value(UNIT_FIELD_POWER2, player->GetUInt32Value(UNIT_FIELD_POWER2)-val);
+					switch (this->pSpellId)
+					{
+						case 22842:
+							val *= 10;break;
+						case 22895:
+							val *= 15;break;
+						case 22896:
+							val *= 20;break;
+						case 26999:
+							val *=25;break;
+						default:
+							break;
+					}
+					uint32 chealth = player->GetUInt32Value(UNIT_FIELD_HEALTH);
+					chealth+=val/10;
+					if (chealth>player->GetUInt32Value(UNIT_FIELD_MAXHEALTH))
+						chealth=player->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+					player->SetUInt32Value(UNIT_FIELD_HEALTH,chealth);
+					WorldPacket datamr(SMSG_HEALSPELL_ON_PLAYER, 30);
+					datamr << player->GetNewGUID();
+					datamr << player->GetNewGUID();
+					datamr << uint32(22845);
+					datamr << uint32(0);
+					datamr << uint32(chealth);
+					player->GetSession()->SendPacket(&datamr);
 				}
-				uint32 chealth = player->GetUInt32Value(UNIT_FIELD_HEALTH);
-				chealth+=val/10;
-				if (chealth>player->GetUInt32Value(UNIT_FIELD_MAXHEALTH))
-					chealth=player->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-				player->SetUInt32Value(UNIT_FIELD_HEALTH,chealth);
-				WorldPacket datamr(SMSG_HEALSPELL_ON_PLAYER, 30);
-				datamr << player->GetNewGUID();
-				datamr << player->GetNewGUID();
-				datamr << uint32(22845);
-				datamr << uint32(0);
-				datamr << uint32(chealth);
-				player->GetSession()->SendPacket(&datamr);
-			}
+			}break;
 		}
-
-
-		break;
 	default:
-		Spell *spell = new Spell(m_caster, spellInfo, true, this);
-		SpellCastTargets targets;
-		targets.m_unitTarget = pTarget->GetGUID();
-		targets.m_targetMask = TARGET_FLAG_UNIT;
-		spell->prepare(&targets);
-		break;
-
+		{
+			Spell *spell = new Spell(m_caster, spellInfo, true, this);
+			SpellCastTargets targets;
+			targets.m_unitTarget = pTarget->GetGUID();
+			targets.m_targetMask = TARGET_FLAG_UNIT;
+			spell->prepare(&targets);
+		}break;
 	}
 }
 

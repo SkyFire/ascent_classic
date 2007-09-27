@@ -709,7 +709,7 @@ bool ChatHandler::HandleGMTicketGetAllCommand(const char* args, WorldSession *m_
 	if(!chn)
 		return false;
 
-	chn->Say(m_session->GetPlayer(), "GmTicket 2", m_session->GetPlayer());
+	chn->Say(m_session->GetPlayer(), "GmTicket 2");
 	for(GmTicketList::iterator itr = objmgr.GM_TicketList.begin(); itr != objmgr.GM_TicketList.end(); itr++)
 	{
 		uint32 cont = 0;
@@ -727,7 +727,7 @@ bool ChatHandler::HandleGMTicketGetAllCommand(const char* args, WorldSession *m_
 			str << (*itr)->name.c_str() << ","  << (*itr)->level << ","  << (*itr)->type << ",";
 			str << zone;
 
-			chn->Say(m_session->GetPlayer(),str.str().c_str(), m_session->GetPlayer());
+			chn->Say(m_session->GetPlayer(),str.str().c_str());
 	}
 
 	return true;
@@ -751,7 +751,7 @@ bool ChatHandler::HandleGMTicketGetByIdCommand(const char* args, WorldSession *m
 			std::stringstream str;
 			str << "GmTicket 3,";
 			str << (*i)->name.c_str() << "," << (*i)->message;
-			chn->Say(m_session->GetPlayer(),str.str().c_str(), m_session->GetPlayer());
+			chn->Say(m_session->GetPlayer(),str.str().c_str());
 		}
 	}
 	return true;
@@ -783,7 +783,7 @@ bool ChatHandler::HandleGMTicketDelByIdCommand(const char* args, WorldSession *m
 		if(!chn)
 			return false;
 
-		chn->Say(m_session->GetPlayer(), str.str().c_str(), m_session->GetPlayer());
+		chn->Say(m_session->GetPlayer(), str.str().c_str());
 
 
 		Player* plr = objmgr.GetPlayer(guid);

@@ -22,26 +22,15 @@
 
 using namespace std;
 
-inline uint32 ahash(const char * str)
-{
-	register size_t len = strlen(str);
-	register uint32 ret = 0;
-	register size_t i = 0;
-	for(; i < len; ++i)
-		ret += 5 * ret + (tolower(str[i]));
-
-	/*printf("%s : %u\n", str, ret);*/
-	return ret;
-}
-
 enum CHANNEL_FLAGS
 {
-	CHANNEL_FLAG_NONE				= 0,
-	CHANNEL_FLAG_MODERATOR			= 1,
-	CHANNEL_FLAG_MUTED				= 2,
-	CHANNEL_FLAG_OWNER				= 4,
-	CHANNEL_FLAG_VOICED				= 8,
-    CHANNEL_FLAG_MICROPHONE_MUTE	= 16,
+	CHANNEL_FLAG_NONE				= 0x00,
+	CHANNEL_FLAG_OWNER				= 0x01,
+	CHANNEL_FLAG_MODERATOR			= 0x02,
+	CHANNEL_FLAG_VOICED				= 0x04,
+	CHANNEL_FLAG_MUTED				= 0x08,
+	CHANNEL_FLAG_CUSTOM				= 0x10,
+    CHANNEL_FLAG_MICROPHONE_MUTE	= 0x20,
 };
 
 enum CHANNEL_NOTIFY_FLAGS
@@ -90,6 +79,7 @@ class Channel
 	typedef map<Player*, uint32> MemberMap;
 	MemberMap m_members;
 	set<uint32> m_bannedMembers;
+public:
 	string m_name;
 	string m_password;
 	uint32 m_hash;
@@ -98,9 +88,11 @@ class Channel
 	bool m_general;
 	bool m_muted;
 	bool m_announce;
+	uint32 m_team;
+	inline size_t GetNumMembers() { return m_members.size(); }
 
 public:
-	Channel(const char * name);
+	Channel(const char * name, uint32 team);
 	~Channel();
 
 	void AttemptJoin(Player * plr, const char * password);
@@ -119,8 +111,9 @@ public:
 	void Announce(Player * plr);
 	void Password(Player * plr, const char * pass);
 	void List(Player * plr);
+	void GetOwner(Player * plr);
 
-	void SetOwner(Player * plr);
+	void SetOwner(Player * oldpl, Player * plr);
 
 	// Packet Forging
 	void SendAlreadyOn(Player * plr, Player * plr2);
@@ -128,6 +121,7 @@ public:
 	void SendNotOn(Player * plr);
 	void SendNotOwner(Player * plr);
 	void SendYouCantSpeak(Player * plr);
+	void SendModeChange(Player * plr, uint8 old_flags, uint8 new_flags);
 
 	void SendToAll(WorldPacket * data);
 };
