@@ -24,7 +24,7 @@ bool GnomishTransporter(uint32 i, Spell * pSpell)
     if(plr == 0) return true;
 
     plr->EventAttackStop();
-    plr->SafeTeleport(1, 0, LocationVector(-7169.41f, -3838.63, 8.72f));
+    plr->SafeTeleport(1, 0, LocationVector(-7169.41f, -3838.63f, 8.72f));
     return true;
 }
 

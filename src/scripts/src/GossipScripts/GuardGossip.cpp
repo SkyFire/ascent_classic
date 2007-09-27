@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
+#pragma warning(disable:4305)		// warning C4305: 'argument' : truncation from 'double' to 'float'
+
 /************************************************************************/
 /* GENERAL GUARD SCRIPT                                                 */
 /************************************************************************/
