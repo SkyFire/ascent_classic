@@ -463,8 +463,10 @@ bool Spell::DidHit(uint64 target)
 	{
 		resistchance -= p_caster->CalcRating(7);
 		resistchance -= p_caster->GetHitFromSpell();
-		resistchance += p_victim->m_resist_hit[2];
 	}
+
+	if(p_victim)
+		resistchance += p_victim->m_resist_hit[2];
 
 
 	if(resistchance >= 100.0)
