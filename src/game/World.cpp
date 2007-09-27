@@ -1729,6 +1729,38 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
+	// mage - Magic Absorption
+	sp = sSpellStore.LookupEntry(29441);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
+		sp->EffectTriggerSpell[0] = 29442;
+	}
+	sp = sSpellStore.LookupEntry(29444);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
+		sp->EffectTriggerSpell[0] = 29442;
+	}
+	sp = sSpellStore.LookupEntry(29445);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
+		sp->EffectTriggerSpell[0] = 29442;
+	}
+	sp = sSpellStore.LookupEntry(29446);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
+		sp->EffectTriggerSpell[0] = 29442;
+	}
+	sp = sSpellStore.LookupEntry(29447);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
+		sp->EffectTriggerSpell[0] = 29442;
+	}
+	
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(283);
 	if(Enchantment)

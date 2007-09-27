@@ -4,16 +4,11 @@ Druid's need a little tweaking they'r % dmages becouse it's pretty high.
 And some of it's ability's which were doing ur damage + ability's damage became % damage.For example,the simple Claw,it does ur dmg +123(just an example) now it does,ur damage + 123% of ur damage,kinda much you know.(At this point i could be making a mistake, if i'm wrong please correct me)
 Nerf boomkins!!!!Instant cast spells dont reciave that much spell dmg as long cast spells.Can cast moonfire with they'r back,when they shouldn't.
 
-moonkin form should change you into humanoid type and not beast ?
-
 Skills
 Tranquility - doesnt work. are you sure ?
 Nature Grasp - doesnt work. have to check to be outdors (cancast)
 Entangling Roots - may need break chance changed to be damage dependant
 
 Talents
-Increases your Intellect by $s1%.  In addition, while in Bear or Dire Bear Form your Stamina is increased by $s1% and while in Cat Form your Strength is increased by $s1%.
-Moonkin aura - doesnt work. 2 maybe it works now ?
-Stun and fear are 100% so all talents that reduse stun and fear effects are bugged
-11) Heart of th wild (Druid) ==> Do not add strength in cat form
-Improved Mark of the Wild
+Moonkin aura - change you into humanoid type and not beast ?
+Improved Mark of the Wild (probably spell group relation problem)

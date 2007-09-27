@@ -1,25 +1,10 @@
-Polymorph - after this is dispelled from target target is switching from run to walk and he needs to turn on running "/" (same problem wit hunters Freezing Trap)
-Improved Counterspell (talent) - its not silencing target for 4 sec
 Improved Scorch (talent) - not stacking on target
-
-8) Ice lance (is not affected by ice shard on antrix and it duplicate damage when the damage would be 3x on frozen target...).without the gear (0 spell damage) the dmg on frozen target is ok..(160-187)with the gear (880+ spll dmg) i make 400-500 dmg on target without frozen effect... and 800 on frozen target( and crit 1200)... is not correct i think... i have a pg on official server and with 550 spell dmg and i hit for 800 on frozen target and crit 1600..
-9) Summon water elemental (Mage)
-
-Ice lance this spell is cheap on mana,and does little damage,but here it gains all the spell damage you have and as a result we have tonz of damage for nothing.It should not gain any spell dmg.it only does tripple damage against frozen targets like frost nova'd.
-Double shield - Ice Barrier + Mana Shield,this combo makes a mage mostly impossible to kill if you are melee,since the dmg absorb is unreal.Only one type of shield can be on you at a time.
-Arcane Missles - popular spell due it's unlimited range,if you even run away from the range,they will be still casting on you.When the target leaves the range the channeling should be canceled.
-
-scorch
 
 Mage:
 
 Talents:
 Arcane:
 Arcane Subtlety:Working. Not sure if reduces resistance. Instead of resistance this spell reduces cost !
-Arcane Focus: Not sure if works
-Improved Arcane Missiles: Not tested yet
-Wand Specialization: Not works. And you can train it in the trainers (?))
-Magic Absorption:At least works the resistance part of it, mana restore not sure
 Arcane Concentration:Doesn't work
 Magic Attunement: Looks like working but only if you spend 2 points
 Arcane Impact:Looks like working
