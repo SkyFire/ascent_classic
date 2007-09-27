@@ -1764,7 +1764,42 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = 29442;
 	}
-	
+	// priest - Reflective Shield
+	sp = sSpellStore.LookupEntry(33201);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_ABSORB;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
+	}
+	sp = sSpellStore.LookupEntry(33202);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_ABSORB;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
+	}
+	sp = sSpellStore.LookupEntry(33203);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_ABSORB;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
+	}
+	sp = sSpellStore.LookupEntry(33204);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_ABSORB;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
+	}
+	sp = sSpellStore.LookupEntry(33205);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_ABSORB;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
+	}
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(283);
 	if(Enchantment)

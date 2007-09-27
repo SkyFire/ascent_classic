@@ -82,6 +82,7 @@ Zack - test my shit :
 - mage - Frost Warding - 28332 - rss->require_aura_hash = "Frost Ward"
 - mage - molten armor - 35915
 - mage - Detect Magic - 2855
+- priest - Reflective Shield - 33201 - add power word namehash
 
 ==========================================================================
 Capt - test my shit :

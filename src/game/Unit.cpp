@@ -926,6 +926,20 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!IsDamagingSpell(CastingSpell))
 									continue;
 							}break;
+						//priest - Reflective Shield 
+						case 33619:
+							{
+								continue;
+								//requires Power Word: Shield active
+								if(!HasAurasWithNameHash(0))
+									continue;//this should not ocur unless we made a fuckup somewhere
+								//make a direct strike then exit rest of handler
+								int dmg=dmg*(ospinfo->EffectBasePoints[0]+1)/100;
+								if(CastingSpell)
+									Strike(victim,CastingSpell->School,ospinfo,1,0,1,true);
+								else Strike(victim,0,ospinfo,1,0,1,true);
+								continue;
+							}break;
 /*						//paladin - illumination
 						case 18350:
 							{
@@ -1733,6 +1747,9 @@ else
 //--------------------------absorption------------------------------------------------------
 			uint32 dm = dmg.full_damage;
 			abs = pVictim->AbsorbDamage(0,(uint32*)&dm);
+
+			if(abs)
+				vproc |= PROC_ON_ABSORB;
 		
 			if(dmg.full_damage > (int32)blocked_damage)
 			{

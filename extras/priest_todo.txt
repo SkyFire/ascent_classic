@@ -1,22 +1,4 @@
-Spell Bugs.
-
-Dispel Magic - Does not work at all, none of it's ranks do. When you target an enemy player and try to dispel them it says there is nothing to dispel. (When there's obviously a lot to dispel). Tested.
-
-Shadow Form - Once you leave Shadowform all of your buffs disappear, making it's viability in PvP horrible. I believe druid's shapeshifting and warriors changing stances have this effect too (Not sure about that).
-
-Mind Control - Does not scale with your level. At level 70 you should be able to MC target's up to level 74.
-
-Psychic Scream - It's much like warrior's fear. It has a chance to break on damage and it seem's that was sorta fixed.. Fear breaks from SW Pain ticks sometimes, and from nothing other times. A spell-caster under the effect of fear, if hit with any damage will be able to cast spells normally although still under the effect. Another problem with it, it doesn't do its job very well (Psychic scream causes nearby enemies to run away in fear. ). Most times the opponent stands still in front of you or behind you with the fear icon over there heads and yet still able to melee dps you. Other times the opponent would run off in a direction on your screen but in reality be standing in the same spot you feared at (Then you have to turn until you find the right blank spot where your opponent WILL be after the fear ends to actually hit him).
-
-And btw.. are Mages supposed to be critting 7027 non-trinketed Pyroblasts?
-
-
-Talents
-
-Reflective Shield - Doesn't work at all.
-
 Spells:
-
 	Psychic Scream - may need the break chance fixed
 
 	Mind Control - When used on anyone besides an NPC, the mind controlled victim is unusable.

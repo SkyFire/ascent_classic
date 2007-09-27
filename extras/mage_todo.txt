@@ -1,15 +1,11 @@
 Improved Scorch (talent) - not stacking on target
 
-Mage:
-
 Talents:
-Arcane:
 Arcane Potency:Since there's no Clearcasting state (Arcane Concentration), Arcane pontency can't work
 
 Arcane:
 Arcane Missiles:Don't shot the last missile (or first?)
 Blink: Doesn't release you from stun, just from bonds.
-Spellsteal:Doesn't work
 
 Problems not related with only one spell/talent:
 - Problem with multiple mages in one group: if a mage cast fireball for example on a mob, if i cast a lower rank of fireball it says that a another more powerfull spell effect is active...this should work on buffs like Arcane Intellect not casting damage spells
