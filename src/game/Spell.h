@@ -1560,7 +1560,7 @@ public:
                     {
                         c_dur = sd->Duration3;
                     }
-                    if(c_dur > 0)
+					else if(c_dur > 0)
                     {
                         Dur = c_dur;
                     }
