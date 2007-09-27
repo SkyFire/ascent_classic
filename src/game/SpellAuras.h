@@ -337,9 +337,9 @@ public:
     inline uint8 GetAuraSlot() const { return m_auraSlot; }
     void SetAuraSlot(uint8 slot) { m_auraSlot = slot; }
 
-    inline bool IsPositive() { return m_positive; }
-    void SetNegative() { m_positive = false; }
-    void SetPositive() { m_positive = true; }
+    inline bool IsPositive() { return m_positive>=0; }
+    void SetNegative(signed char value=1) { m_positive -= value; }
+    void SetPositive(signed char value=1) { m_positive += value; }
 
     Object* GetCaster();
     Unit* GetUnitCaster();
@@ -644,7 +644,8 @@ private:
     Player * p_target;
     uint32 timeleft;
     int32 m_duration; // in msecs
-    bool m_positive;
+//    bool m_positive;
+	signed char m_positive;
 
     uint32 m_modcount;
     Modifier m_modList[3];

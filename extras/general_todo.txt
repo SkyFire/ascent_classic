@@ -56,6 +56,8 @@ SMT_RESIST_DISPEL - check if it is used
 - channeled spells are not working ?
 - charmed creature is attacking me
 - why do we need enslavecount ?
+- hunter scattershot then rogue blind will make creature block (again)
+- there are spells that can go through iceblock. Just make the damn check in cancast and see if target is imune to spell type.
 
 ==========================================================================
 Zack - test my shit :

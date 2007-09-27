@@ -328,6 +328,7 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 	m_castInDuel = false;
 	m_spellProto = proto;
 	m_duration   = duration;
+	m_positive	= 0; //we suppose spell will have positive impact on target
 
 	m_casterGuid = caster->GetGUID();
 	m_target = target;
@@ -573,7 +574,7 @@ void Aura::AddAuraVisual()
 	uint8 slot, i;
 	slot = 0xFF;
 
-	if (m_positive)
+	if (IsPositive())
 	{
 		for (i = 0; i < MAX_POSITIVE_AURAS; i++)
 		{
@@ -1684,7 +1685,7 @@ void Aura::SpellAuraModCharm(bool apply)
 	Player * caster = ((Player*)ucaster);
 	Creature * target = ((Creature*)m_target);
   
-	SetPositive();
+	SetPositive(3); //we ignore the other 2 effect of this spell and force it to be a positive spell
 
 	if(!ucaster || ucaster->GetTypeId() != TYPEID_PLAYER || (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() || m_target->GetTypeId() != TYPEID_UNIT)
 		return;
