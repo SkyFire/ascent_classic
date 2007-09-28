@@ -219,6 +219,7 @@ Unit::Unit()
 	m_procCounter = 0;
 	m_invisibityFlag = 0;
 	m_extrastriketargets = 0;
+	m_damgeShieldsInUse = false;
 //	fearSpell = 0;
 }
 
@@ -961,7 +962,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								int healthtoloose=ospinfo->EffectBasePoints[1]*GetUInt32Value(UNIT_FIELD_BASE_HEALTH)/100;
 								if(healthtoloose>GetUInt32Value(UNIT_FIELD_HEALTH))
 									SetUInt32Value(UNIT_FIELD_HEALTH,1);
-								else ModUInt32Value(UNIT_FIELD_HEALTH,-healthtoloose);
+								else ModUInt32Value(UNIT_FIELD_HEALTH,-(int32)healthtoloose);
 							}break;
 						//paladin - Spiritual Attunement
 						case 31785:
@@ -1092,6 +1093,9 @@ void Unit::HandleProcDmgShield(uint32 flag, Unit* victim)
 	//make sure we do not loop dmg procs
 	if(this==victim || !victim)
 		return;
+	if(victim->m_damgeShieldsInUse)
+		return;
+	victim->m_damgeShieldsInUse = true;
 	//charges are already removed in handleproc
 	WorldPacket data(24);
 	std::list<DamageProc>::iterator i;
@@ -1119,6 +1123,7 @@ void Unit::HandleProcDmgShield(uint32 flag, Unit* victim)
 			}
 		}
 	}
+	victim->m_damgeShieldsInUse = false;
 }
 
 /*

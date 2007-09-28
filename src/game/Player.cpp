@@ -8950,3 +8950,20 @@ void Player::save_Auras()
 }
 
 #endif
+
+#ifdef CLUSTERING
+
+void Player::PackPlayerData(ByteBuffer & data)
+{
+	data << uint32(GetGUIDLow());
+	for(uint32 x = 0; x < MAX_AURAS; ++x)
+	{
+		if(m_auras[x])
+		{
+			data << x;
+			m_auras[x]->Pack(data);
+		}
+	}
+}
+
+#endif

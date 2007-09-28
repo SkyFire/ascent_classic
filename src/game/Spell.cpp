@@ -2883,7 +2883,7 @@ int8 Spell::CheckItems()
 				if( proto->DisenchantReqSkill < 1 )
 					return SPELL_FAILED_CANT_BE_DISENCHANTED;
 
-				if( p_caster->_GetSkillLineCurrent(SKILL_ENCHANTING) < proto->DisenchantReqSkill )
+				if( (int32)p_caster->_GetSkillLineCurrent(SKILL_ENCHANTING) < proto->DisenchantReqSkill )
 					return SPELL_FAILED_CANT_BE_DISENCHANTED_SKILL;
 			}
 			else

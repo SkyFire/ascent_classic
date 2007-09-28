@@ -757,6 +757,7 @@ public:
 	
 	// Spell Effect Variables
 	uint16 m_silenced;
+	bool m_damgeShieldsInUse;
 	std::list<struct DamageProc> m_damageShields;
 	std::list<struct ReflectSpellSchool*> m_reflectSpellSchool;
  

@@ -1552,6 +1552,7 @@ public:
 
 #ifdef CLUSTERING
 	void EventRemoveAndDelete();
+	void PackPlayerData(ByteBuffer & data);
 #endif
 
 	Creature * m_tempSummon;
