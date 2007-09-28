@@ -7706,34 +7706,34 @@ void Player::SetShapeShift(uint8 ss)
 	//remove auras that we should not have
 	for(uint32 x =0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 	{
-		if(m_auras[x] && !m_auras[x]->IsPositive())
+		if(m_auras[x])
 		{
-			for(uint32 y = 0; y < 3; ++y)
+			if(m_auras[x]->GetSpellProto()->RequiredShapeShift)
 			{
-				switch (m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
+				//Shady:commented cause a lot of spells has wrong RequiredShapeShift
+				//if(!ss || !(((uint32)1 << (ss-1))&m_auras[x]->GetSpellProto()->RequiredShapeShift))
+				if(!ss)
 				{
-				case 26: //Root
-				case 31: //Movement speed
-				case 5:  //Confuse (polymorph)
-					if (this->getClass()==DRUID)
-						m_auras[x]->Remove();
-					break;
-				default:
-					if(m_auras[x]->GetSpellProto()->RequiredShapeShift)
-					{
-						//Shady:commented cause a lot of spells has wrong RequiredShapeShift
-						//if(!ss || !(((uint32)1 << (ss-1))&m_auras[x]->GetSpellProto()->RequiredShapeShift))
-						if(!ss)
-						{
-							m_auras[x]->Remove();
-						}
-					}
-					break;
+					m_auras[x]->Remove();
 				}
-
-				if(m_auras[x] == NULL)
-					break;
 			}
+			if(m_auras[x] == NULL)
+				break;
+
+			if (this->getClass()==DRUID)
+				for(uint32 y = 0; y < 3; ++y)
+				{
+					switch (m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
+					{
+					case 26: //Root
+					case 31: //Movement speed
+					case 5:  //Confuse (polymorph)
+							m_auras[x]->Remove();
+						break;
+					default:
+						break;
+					}
+				}
 		} 
 	}
 

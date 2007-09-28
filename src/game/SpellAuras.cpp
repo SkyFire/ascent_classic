@@ -1629,7 +1629,7 @@ void Aura::SpellAuraDummy(bool apply)
 		case 17007: //Druid:Leader of the Pack
 			{
 				//Shady: commented till NT on localhost
-			/*	SpellEntry* se = sSpellStore.LookupEntry(24932);
+				/*SpellEntry* se = sSpellStore.LookupEntry(24932);
 				Aura* aur = new Aura(se,0,(Object*)m_target,m_target);
 				static_cast<Player*>(m_target)->AddAura(aur);*/
 			}break;

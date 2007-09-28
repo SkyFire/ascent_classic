@@ -431,7 +431,7 @@ bool Spell::DidHit(uint64 target)
 
 	bool pvp =(p_caster && p_victim);
 
-	if(p_victim)
+	if(pvp)
 		lvldiff = p_victim->getLevel() - p_caster->getLevel();
 	else
 		lvldiff = u_victim->getLevel() - p_caster->getLevel();
@@ -446,9 +446,9 @@ bool Spell::DidHit(uint64 target)
 	else
 	{
 		if(pvp)
-			resistchance = baseresist[2] + ((lvldiff-2)*7);
+			resistchance = baseresist[2] + ((lvldiff-2)*7.0f);
 		else
-			resistchance = baseresist[2] + ((lvldiff-2)*11);
+			resistchance = baseresist[2] + ((lvldiff-2)*11.0f);
 	}
 	//check mechanical resistance
 	//i have no idea what is the best pace for this code
