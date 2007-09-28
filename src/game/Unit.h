@@ -841,8 +841,8 @@ public:
 	int32 * SM_PEffectBonus;//pct
 	int32 * SM_FDamageBonus;//flat
 	int32 * SM_PDamageBonus;//pct
-	int32 * SM_PDummy;//pct
-	int32 * SM_FDummy;//flat
+	int32 * SM_PSPELL_VALUE;//pct
+	int32 * SM_FSPELL_VALUE;//flat
 	int32 * SM_FResist;//flat
 	int32 * SM_PAPBonus;//pct
 	int32 * SM_PCost;

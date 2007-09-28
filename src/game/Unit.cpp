@@ -77,8 +77,8 @@ Unit::Unit()
 	SM_PEffectBonus=0;
 	SM_FDamageBonus=0;
 	SM_PDamageBonus=0;
-	SM_PDummy=0;
-	SM_FDummy=0;
+	SM_PSPELL_VALUE=0;
+	SM_FSPELL_VALUE=0;
 	SM_FResist=0;
 	SM_PRange=0;//pct
 	SM_PRadius=0;
@@ -241,8 +241,8 @@ Unit::~Unit()
     if(SM_FEffectBonus != 0) delete [] SM_FEffectBonus ;
 	if(SM_FDamageBonus != 0) delete [] SM_FDamageBonus ;
 	if(SM_PDamageBonus != 0) delete [] SM_PDamageBonus ;
-	if(SM_PDummy != 0) delete [] SM_PDummy ;
-	if(SM_FDummy != 0) delete [] SM_FDummy ;
+	if(SM_PSPELL_VALUE != 0) delete [] SM_PSPELL_VALUE ;
+	if(SM_FSPELL_VALUE != 0) delete [] SM_FSPELL_VALUE ;
 	if(SM_FResist != 0) delete [] SM_FResist ;
 	if(SM_PRange != 0) delete [] SM_PRange ;//pct
 	if(SM_PRadius != 0) delete [] SM_PRadius ;
@@ -960,7 +960,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							{
 								//we loose health depending on father of trigger spell when trigering this effect
 								int healthtoloose=ospinfo->EffectBasePoints[1]*GetUInt32Value(UNIT_FIELD_BASE_HEALTH)/100;
-								if(healthtoloose>GetUInt32Value(UNIT_FIELD_HEALTH))
+								if(healthtoloose>(int)GetUInt32Value(UNIT_FIELD_HEALTH))
 									SetUInt32Value(UNIT_FIELD_HEALTH,1);
 								else ModUInt32Value(UNIT_FIELD_HEALTH,-(int32)healthtoloose);
 							}break;
@@ -3151,7 +3151,7 @@ void Unit::VampiricEmbrace(uint32 dmg,Unit* tgt)
 	if(!IsPlayer())
 		return;//just in case
 	int32 perc = 20;
-	SM_FIValue(SM_FDummy,&perc,4);
+	SM_FIValue(SM_FSPELL_VALUE,&perc,4);
 	uint32 heal = (dmg*perc) / 100;
 
 	WorldPacket data(25);
@@ -3218,7 +3218,7 @@ void Unit::VampiricTouch(uint32 dmg,Unit* tgt)
                 return;//just in case
         
         int32 perc = 5;
-        SM_FIValue(SM_FDummy,&perc,4); // need fixing if required
+        SM_FIValue(SM_FSPELL_VALUE,&perc,4); // need fixing if required
         uint32 man = (dmg*perc) / 100;
         
         uint32 cm=this->GetUInt32Value(UNIT_FIELD_POWER1);

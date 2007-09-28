@@ -1,3 +1,22 @@
 Spells:
-	Psychic Scream - may need the break chance fixed
 	Mind Control - When used on anyone besides an NPC, the mind controlled victim is unusable.
+
+Improved Power Word: Fortitude - is only visual.
+
+Absolution - Does not work at all.
+
+Mental Agility - Does not work at all.
+
+Force of Will - Does not work either.
+
+Focused Power - Does not work.
+
+Surge of Light - Does not work.
+
+Shadow Reach - Only visual. Says your out of range either way.
+
+Psychic Scream - On the Todo list I saw something alone the lines of "fix the chance of it breaking". Imo, I think it'd be best to make fear actually make the enemy run, because its glitched up pretty bad :/, especially in indoor environments.
+
+QUOTE(D@rk @ Sep 28 2007, 02:42 AM) *
+Vampiric Touch, doesn't give any mana.
+The only reason I didnt mention VT was cause I completely forgot it.. It's working to my favor in 1700, 98% of the time I get mana = to the persons health (o.O). I've had 12980/9785 mana before after a VT.

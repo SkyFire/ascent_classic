@@ -3024,8 +3024,7 @@ int32 Spell::CalculateEffect(uint32 i)
 		value += float2int32(m_spellInfo->EffectRealPointsPerLevel[i]*(u_caster->getLevel()-m_spellInfo->baseLevel));
 	}
 	//scripted shit
-	else
-	if(m_spellInfo->Id == 34120)
+	else if(m_spellInfo->Id == 34120)
 	{	//A steady shot that causes ${$RAP*0.3+$m1} damage. 
 		if(i==0)
 			value += (uint32)(u_caster->GetRAP()*0.3);
@@ -3092,6 +3091,14 @@ int32 Spell::CalculateEffect(uint32 i)
 			}
 		}
 	 }
+
+	int32 spell_flat_modifers=0;
+	int32 spell_pct_modifers=0;
+	SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+	SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+
+	value = value + value*spell_pct_modifers/100 + spell_flat_modifers;
+
 	return value;
 }
 

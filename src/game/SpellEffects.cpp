@@ -468,7 +468,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ReflectSpellSchool *rss = new ReflectSpellSchool;
 			rss->chance = m_spellInfo->procChance;
 			rss->spellId = m_spellInfo->Id;
-			rss->require_aura_hash = 0; 
+			rss->require_aura_hash = 2161224959; 
 			rss->school = m_spellInfo->School;		
 
 			unitTarget->m_reflectSpellSchool.push_back(rss);
@@ -1795,46 +1795,49 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 		return;
 
 	uint32 POWER_TYPE=UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
-	SendHealManaSpellOnPlayer(u_caster, unitTarget, damage, m_spellInfo->EffectMiscValue[i]);
 
 	uint32 curEnergy = (uint32)unitTarget->GetUInt32Value(POWER_TYPE);
 	uint32 maxEnergy = (uint32)unitTarget->GetUInt32Value(POWER_TYPE+6);
-	uint32 totalEnergy = 0;
+	uint32 modEnergy;
 	//yess there is always someone special : shamanistic rage - talent
 	if(m_spellInfo->Id==30824)
-		totalEnergy = curEnergy+damage*GetUnitTarget()->GetAP()/100;
+		modEnergy = damage*GetUnitTarget()->GetAP()/100;
 	//paladin illumination
 	else if(m_spellInfo->Id==20272 && ProcedOnSpell)
 	{
 		SpellEntry *motherspell=sSpellStore.LookupEntry(pSpellId);
 		if(motherspell)
-			totalEnergy = curEnergy + (motherspell->EffectBasePoints[0]+1)*ProcedOnSpell->manaCost/100;
+			modEnergy = (motherspell->EffectBasePoints[0]+1)*ProcedOnSpell->manaCost/100;
 	}
+	//paladin - Spiritual Attunement 
 	else if(m_spellInfo->Id==31786 && ProcedOnSpell)
 	{
 		SpellEntry *motherspell=sSpellStore.LookupEntry(pSpellId);
 		if(motherspell)
-			totalEnergy = curEnergy + (motherspell->EffectBasePoints[0]+1)*damage/100;
+			modEnergy = (motherspell->EffectBasePoints[0]+1)*damage/100;
 	}
 	else if (m_spellInfo->Id==2687){
-		totalEnergy = curEnergy+damage;
+		modEnergy = damage;
 		if(p_caster)
 		{
 			for(set<uint32>::iterator itr = p_caster->mSpells.begin(); itr != p_caster->mSpells.end(); ++itr)
 			{
 				if(*itr == 12818)
-					totalEnergy += 60;
+					modEnergy += 60;
 				else if(*itr == 12301)
-					totalEnergy += 30;
+					modEnergy += 30;
 			}
 		}
 	}
 	else  
-        totalEnergy = curEnergy+damage;
-	if(totalEnergy > maxEnergy)
+        modEnergy = damage;
+
+	SendHealManaSpellOnPlayer(u_caster, unitTarget, modEnergy, m_spellInfo->EffectMiscValue[i]);
+
+	if(modEnergy + curEnergy > maxEnergy)
 		unitTarget->SetUInt32Value(POWER_TYPE,maxEnergy);
 	else
-		unitTarget->SetUInt32Value(POWER_TYPE,totalEnergy);
+		unitTarget->SetUInt32Value(POWER_TYPE,modEnergy + curEnergy);
 }
 
 void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage

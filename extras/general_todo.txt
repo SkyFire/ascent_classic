@@ -35,6 +35,8 @@ SMT_RESIST_DISPEL - check if it is used
 - add a combat exit timer so warrior and rogue cannot charge.stealth any time
 - add on_change_map event for scripts. Required for some instance scripts
 - make spells to run on startup Isdamaging and ishealing hunctions
+- summon guardians not working : 49,
+- clearcasting
 
 ==========================================================================
 ! BUGS !
@@ -65,6 +67,7 @@ SMT_RESIST_DISPEL - check if it is used
 - there are spells that can go through iceblock. Just make the damn check in cancast and see if target is imune to spell type.
 - Pets - You can attack players from your faction with pets
 - starfire stuns the caster instead of target.
+- i can request and accept at the same time a duel ? request on second login char the duel then simply accept it :S
 
 ==========================================================================
 Zack - test my shit :
@@ -76,12 +79,7 @@ Zack - test my shit :
 - warlock(affliction talent) - Curse of Idiocy - rewrite this spell :
 	1 ) do not make him loop self it will be casted by cater for eternity ;)
 	2 ) there is no visual sighn that spell had effect (the negative values are missing ex : 23+1-6)
-- mage - Improved Counterspell - its not silencing target for 4 sec : 29443 - 12598
-- mage - Magic Absorption - restore mana on resist
-- mage - Arcane Concentration - 11213
-- mage - Frost Warding - 28332 - rss->require_aura_hash = "Frost Ward"
-- mage - molten armor - 35915
-- mage - Detect Magic - 2855
+- mage - Frost Warding - 28332 - does not reflect
 - rogue - combat potency - require weapon and apply only for succesfull attack. Dual wield : 674, 35553
 - paladin - Blessing of Light - 27144,635,19750
 - paladin - Righteous Defense - 31789
@@ -91,6 +89,7 @@ Zack - test my shit :
 
 ==========================================================================
 Capt - test my shit :
+
 
 - changed the ranged weapon stuff
 

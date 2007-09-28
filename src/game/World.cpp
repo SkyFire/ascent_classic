@@ -966,10 +966,10 @@ void World::SetInitialWorldSettings()
 					if(strstr(desc, "melee attacks has"))
 						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc, "any damage spell hits a target"))
-						pr|=PROC_ON_CAST_SPELL;
+						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
 					if(strstr(desc, "giving each melee attack a chance"))
 						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc, "Fire damage when hit"))
+					if(strstr(desc, "damage when hit"))
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM; //myabe melee damage ?
 					if(strstr(desc, "gives your"))
 					{
@@ -1819,37 +1819,6 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
-	// mage - Magic Absorption
-	sp = sSpellStore.LookupEntry(29441);
-	if(sp)
-	{
-		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
-		sp->EffectTriggerSpell[0] = 29442;
-	}
-	sp = sSpellStore.LookupEntry(29444);
-	if(sp)
-	{
-		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
-		sp->EffectTriggerSpell[0] = 29442;
-	}
-	sp = sSpellStore.LookupEntry(29445);
-	if(sp)
-	{
-		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
-		sp->EffectTriggerSpell[0] = 29442;
-	}
-	sp = sSpellStore.LookupEntry(29446);
-	if(sp)
-	{
-		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
-		sp->EffectTriggerSpell[0] = 29442;
-	}
-	sp = sSpellStore.LookupEntry(29447);
-	if(sp)
-	{
-		sp->procFlags = PROC_ON_RESIST_VICTIM | PROC_TAGRGET_SELF;
-		sp->EffectTriggerSpell[0] = 29442;
-	}
 	// priest - Reflective Shield
 	sp = sSpellStore.LookupEntry(33201);
 	if(sp)
@@ -1885,6 +1854,28 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
+	}
+	// mage - Frost Warding
+	sp = sSpellStore.LookupEntry(11189);
+	if(sp)
+	{
+		SpellEntry * tsp = sSpellStore.LookupEntry(168); //frost armor
+		if(tsp)
+			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
+		tsp = sSpellStore.LookupEntry(7302); //ice armor
+		if(tsp)
+			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
+	}
+	sp = sSpellStore.LookupEntry(28332);
+	if(sp)
+	{
+		SpellEntry * tsp = sSpellStore.LookupEntry(168); //frost armor
+		if(tsp)
+			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
+		tsp = sSpellStore.LookupEntry(7302); //ice armor
+		if(tsp)
+			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
+//		sp->procChance = 100;
 	}
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(283);
@@ -1948,10 +1939,10 @@ void World::SetInitialWorldSettings()
 		}
 	}
 	//for test only
-	sp = sSpellStore.LookupEntry(25218);
+	sp = sSpellStore.LookupEntry(32796);
 	if(sp)
 	{
-		printf("!!!!!!hash %u \n",sp->NameHash);
+//		printf("!!!!!!hash %u \n",sp->NameHash);
 //		sp->procChance=100;
 //		SpellDuration *sd=sSpellDuration.LookupEntry(sp->DurationIndex);
 //printf("iterruptflag %u, duration %u",sp->AuraInterruptFlags,GetDuration(sd));
