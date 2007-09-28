@@ -4,9 +4,6 @@ Blessing of Sanctuary - Doesn't work.
 Divine protection - Doesn't work.
 Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
-Seal of Command - If you unlearn it, you cant learn past rank 1. Judgment doesn't work.
-Seal of Justice - Judgment doesn't work.
-Seal of Wisdom - Doesn't work. Judgment doesn't work.
 Spiritual Attunement - Doesn't add the mana.
 Summon Charger/Warhorse - Doesn't work for Blood Elf.
 

@@ -967,6 +967,8 @@ void World::SetInitialWorldSettings()
 						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc, "any damage spell hits a target"))
 						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc, "giving each melee attack a chance"))
+						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc, "Fire damage when hit"))
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM; //myabe melee damage ?
 					if(strstr(desc, "gives your"))
@@ -1369,6 +1371,13 @@ void World::SetInitialWorldSettings()
 
 	//paladin - seal of blood
 	sp = sSpellStore.LookupEntry(31892);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 31893;
+	}
+	sp = sSpellStore.LookupEntry(38008);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK;

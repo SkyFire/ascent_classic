@@ -85,6 +85,7 @@ Zack - test my shit :
 - paladin - Blessing of Light - 27144,635,19750
 - paladin - Righteous Defense - 31789
 - paladin - Seal of Blood - 31892 
+- paladin - Seal of Wisdom - 20166
 
 ==========================================================================
 Capt - test my shit :
