@@ -1,16 +1,10 @@
 =====SPELLS AND ABILITIES =====
-Blessing of Light - Doesn't work.
-Blessing of Might - Does not add the Attack Power it should.
 Blessing of Protection - Doesn't work.
 Blessing of Sanctuary - Doesn't work.
-Crusader Strike - Retribution - Does the damage, doesn't refresh Judgment.
 Divine protection - Doesn't work.
-Greater Blessing of Might - Does not add the Attack Power it should.
 Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
-Hammer of Justice - Character Positioning is Wrong.
-Hammer of Wrath - Does not do the damage it should at Maximum rank.
-Righteous Defense - Only works for one monster, not 3.
+Righteous Defense - does not work at all ?
 Seal of Blood - Doesn't work. Judgment doesnt work.
 Seal of Command - If you unlearn it, you cant learn past rank 1. Judgment doesn't work.
 Seal of Justice - Judgment doesn't work.

@@ -423,6 +423,39 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		return;
 	switch(spellId)
 	{
+	case 31789: //paladin - Righteous Defense
+		{
+			break; //disabled until tested
+			//we will try to lure 3 enemies from our target
+			if(!unitTarget || !u_caster)
+				break;
+			Unit *targets[3];
+			int targets_got=0;
+			for(std::set<Object*>::iterator itr = unitTarget->GetInRangeSetBegin(); itr != unitTarget->GetInRangeSetEnd(); itr++ )
+			{
+				// don't add objects that are not units and that are dead
+				if((*itr)->GetTypeId()!= TYPEID_UNIT || !((Unit*)(*itr))->isAlive())
+					continue;
+		        
+				Creature *cr=((Creature*)(*itr));
+				if(cr->GetAIInterface()->GetNextTarget()==unitTarget)
+					targets[targets_got++]=cr;
+
+				if(targets_got==3)
+					break;
+			}
+			for(int i=0;i<targets_got;i++)
+			{
+				//set threat to this target so we are the msot hated
+				uint32 threat_to_him = targets[i]->GetAIInterface()->getThreatByPtr(unitTarget);
+				uint32 threat_to_us = targets[i]->GetAIInterface()->getThreatByPtr(u_caster);
+				int threat_dif = threat_to_him - threat_to_us;
+				if(threat_dif>0)//should nto happen
+					targets[i]->GetAIInterface()->modThreatByPtr(u_caster,threat_dif);
+				targets[i]->GetAIInterface()->AttackReaction(u_caster,1,0);
+				targets[i]->GetAIInterface()->SetNextTarget(u_caster);
+			}
+		}break;
 	case 11189: //mage - frost warding
 	case 28332:
 		{
