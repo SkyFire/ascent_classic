@@ -939,6 +939,21 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								SpellNonMeleeDamageLog(victim,power_word_id, tdmg, false, false);
 								continue;
 							}break;
+						//rogue - combat potency
+						case 35542:
+						case 35545:
+						case 35546:
+						case 35547:
+						case 35548:
+							{
+								//this needs offhand weapon
+								continue;
+								if(!IsPlayer() || !dmg)
+									continue;
+								Item *it = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+								if(!it || it->GetProto()->InventoryType!=INVTYPE_WEAPON )
+									continue;
+							}break;
 /*						//paladin - illumination
 						case 18350:
 							{

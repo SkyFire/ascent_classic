@@ -81,6 +81,7 @@ Zack - test my shit :
 - mage - Frost Warding - 28332 - rss->require_aura_hash = "Frost Ward"
 - mage - molten armor - 35915
 - mage - Detect Magic - 2855
+- rogue - combat potency - require weapon and apply only for succesfull attack. Dual wield : 674, 35553
 
 ==========================================================================
 Capt - test my shit :
