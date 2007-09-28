@@ -8637,26 +8637,31 @@ void Player::EventTalentHearthOfWildChange(bool apply)
 {
 	if(!hearth_of_wild_pct)
 		return;
+
 	//druid hearth of the wild should add more features based on form
 	int tval;
 	if(apply)
 		tval = hearth_of_wild_pct;
 	else tval = -hearth_of_wild_pct;
 
+	uint32 SS=GetShapeShift();
+
 	//increase stamina if :
-	if(GetShapeShift()==FORM_BEAR || GetShapeShift()==FORM_DIREBEAR)
+	if(SS==FORM_BEAR || SS==FORM_DIREBEAR)
 	{
 		TotalStatModPctPos[STAT_STAMINA] += tval; 
 		CalcStat(STAT_STAMINA);	
+		UpdateStats();
+		UpdateChances();
 	}
 	//increase stamina if :
-	else if(GetShapeShift()==FORM_CAT)
+	else if(SS==FORM_CAT)
 	{
 		TotalStatModPctPos[STAT_STRENGTH] += tval; 
 		CalcStat(STAT_STRENGTH);	
+		UpdateStats();
+		UpdateChances();
 	}
-	UpdateStats();
-	UpdateChances();
 }
 
 /************************************************************************/

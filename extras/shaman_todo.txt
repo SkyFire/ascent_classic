@@ -127,7 +127,6 @@ Windfury Totem don't work
 Disease Cleansing Totem don't work
 Wrath of Air Totem don't work
 Bloodlust don't give the effect on friends and members but on ennemy
-Heroism don't work
 Totem of Wrath don't work
 Purge don't work
 Poison Cleansing Totem don't work

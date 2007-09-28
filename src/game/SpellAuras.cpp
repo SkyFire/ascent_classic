@@ -3206,10 +3206,13 @@ void Aura::SpellAuraModShapeshift(bool apply)
 			   }
 			}
 		}
+		//execute after we changed shape
 		((Player*)m_target)->EventTalentHearthOfWildChange(true);
 	}
 	else 
 	{
+		//execute before changing shape back
+		((Player*)m_target)->EventTalentHearthOfWildChange(false);
 		m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));				
 		if(spellId != GetSpellId())
 		{
@@ -3219,7 +3222,6 @@ void Aura::SpellAuraModShapeshift(bool apply)
 		static_cast<Player*>(m_target)->m_ShapeShifted=0;
 
 		((Player*)m_target)->SetShapeShift(0);
-		((Player*)m_target)->EventTalentHearthOfWildChange(false);
 
 	}
 	static_cast<Player*>(m_target)->UpdateStats();

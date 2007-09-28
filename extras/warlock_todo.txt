@@ -1,3 +1,8 @@
+Vampiric Touch, doesn't give any mana.
+HealthStone rank 2
+Nether Protection procs of shadow and fire dmg DoT's ticks
+pet is not controlable
+
 *Warlock pets will attack someone who uses bandages on them.
 *if warlock imp cast "fire shield" on someone who stay near the NPC, NPC will attack them. (imp must be near the NPC)
 *summon imp, aura "blood pact" activ. dismiss imp, aura will stay(while you logout)

@@ -1,5 +1,4 @@
 Intimidating Shout - Ok this one is working, but when i attack feared target i get feared too :S
-Rage - i dont get any rage when i take damage from spells
 
 The Warrior talent "Shield Mastery" seems to increase block rating instead of the hidden block value usually added by this talent.
 # Sunder Armor - not stackable
