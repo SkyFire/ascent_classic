@@ -30,6 +30,9 @@ SMT_RESIST_DISPEL - check if it is used
 - some creatures need to fly (is this made already ? ) on spawn
 - add new column to quests to be able to make required_quest_alternative
 - make cooldown cheat update client cooldown too
+- procs of enchants like Crusader,Demonslaying,Battlemaster,Mongoose is 100 %
+- make DOTs do not require infront check
+- add a combat exit timer so warrior and rogue cannot charge.stealth any time
 
 ==========================================================================
 ! BUGS !
