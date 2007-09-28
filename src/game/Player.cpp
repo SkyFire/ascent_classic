@@ -1843,6 +1843,9 @@ void Player::addSpell(uint32 spell_id)
 			return;
 		}
 
+		if(skill->type==SKILL_TYPE_PROFESSION)
+			ModUInt32Value(PLAYER_CHARACTER_POINTS2,-1);
+
 		_AddSkillLine(sk->skilline, 1, max);
 	}
 }

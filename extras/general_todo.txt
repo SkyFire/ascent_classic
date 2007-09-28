@@ -33,6 +33,7 @@ SMT_RESIST_DISPEL - check if it is used
 - procs of enchants like Crusader,Demonslaying,Battlemaster,Mongoose is 100 %
 - make DOTs do not require infront check
 - add a combat exit timer so warrior and rogue cannot charge.stealth any time
+- add on_change_map event for scripts. Required for some instance scripts
 
 ==========================================================================
 ! BUGS !
