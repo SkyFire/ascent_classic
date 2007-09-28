@@ -1808,7 +1808,13 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 	{
 		SpellEntry *motherspell=sSpellStore.LookupEntry(pSpellId);
 		if(motherspell)
-			totalEnergy = (motherspell->EffectBasePoints[0]+1)*ProcedOnSpell->manaCost/100;
+			totalEnergy = curEnergy + (motherspell->EffectBasePoints[0]+1)*ProcedOnSpell->manaCost/100;
+	}
+	else if(m_spellInfo->Id==31786 && ProcedOnSpell)
+	{
+		SpellEntry *motherspell=sSpellStore.LookupEntry(pSpellId);
+		if(motherspell)
+			totalEnergy = curEnergy + (motherspell->EffectBasePoints[0]+1)*damage/100;
 	}
 	else if (m_spellInfo->Id==2687){
 		totalEnergy = curEnergy+damage;

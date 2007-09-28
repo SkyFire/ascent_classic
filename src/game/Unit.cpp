@@ -958,10 +958,19 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 31893:
 							{
 								//we loose health depending on father of trigger spell when trigering this effect
-								uint32 healthtoloose=ospinfo->EffectBasePoints[1]*GetUInt32Value(UNIT_FIELD_BASE_HEALTH)/100;
+								int healthtoloose=ospinfo->EffectBasePoints[1]*GetUInt32Value(UNIT_FIELD_BASE_HEALTH)/100;
 								if(healthtoloose>GetUInt32Value(UNIT_FIELD_HEALTH))
 									SetUInt32Value(UNIT_FIELD_HEALTH,1);
 								else ModUInt32Value(UNIT_FIELD_HEALTH,-healthtoloose);
+							}break;
+						//paladin - Spiritual Attunement
+						case 31785:
+							{
+								//trigger only on heal spell
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
+								if(!IsHealingSpell(CastingSpell))
+									continue;
 							}break;
 /*						//paladin - illumination
 						case 18350:

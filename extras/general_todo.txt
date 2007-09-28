@@ -34,6 +34,7 @@ SMT_RESIST_DISPEL - check if it is used
 - make DOTs do not require infront check
 - add a combat exit timer so warrior and rogue cannot charge.stealth any time
 - add on_change_map event for scripts. Required for some instance scripts
+- make spells to run on startup Isdamaging and ishealing hunctions
 
 ==========================================================================
 ! BUGS !
@@ -86,6 +87,7 @@ Zack - test my shit :
 - paladin - Righteous Defense - 31789
 - paladin - Seal of Blood - 31892 
 - paladin - Seal of Wisdom - 20166
+- paladin - Spiritual Attunement - 33776
 
 ==========================================================================
 Capt - test my shit :

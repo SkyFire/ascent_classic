@@ -1008,6 +1008,69 @@ inline bool IsDamagingSpell(SpellEntry *sp)
     return false;
 }
 
+//will rewrite this to constant flags later
+inline bool IsHealingSpell(SpellEntry *sp)
+{
+    switch (sp->Effect[0])
+    {
+        case SPELL_EFFECT_HEALTH_LEECH:
+        case SPELL_EFFECT_HEAL:
+        case SPELL_EFFECT_HEALTH_FUNNEL:
+        case SPELL_EFFECT_HEAL_MAX_HEALTH:
+            return true;
+    }
+    switch (sp->Effect[1])
+    {
+        case SPELL_EFFECT_HEALTH_LEECH:
+        case SPELL_EFFECT_HEAL:
+        case SPELL_EFFECT_HEALTH_FUNNEL:
+        case SPELL_EFFECT_HEAL_MAX_HEALTH:
+            return true;
+    }
+    switch (sp->Effect[2])
+    {
+        case SPELL_EFFECT_HEALTH_LEECH:
+        case SPELL_EFFECT_HEAL:
+        case SPELL_EFFECT_HEALTH_FUNNEL:
+        case SPELL_EFFECT_HEAL_MAX_HEALTH:
+            return true;
+    }
+    if( sp->Effect[0]==SPELL_EFFECT_APPLY_AURA ||
+       sp->Effect[0]==SPELL_EFFECT_APPLY_AREA_AURA)
+    {
+        switch (sp->EffectApplyAuraName[0])
+        {
+            case 8://SPELL_AURA_PERIODIC_HEAL:
+            case 34://SPELL_AURA_MOD_INCREASE_HEALTH:
+            case 62://SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+                return true;
+        }
+    }
+    if( sp->Effect[1]==SPELL_EFFECT_APPLY_AURA ||
+        sp->Effect[1]==SPELL_EFFECT_APPLY_AREA_AURA)
+    {
+        switch (sp->EffectApplyAuraName[1])
+        {
+            case 8://SPELL_AURA_PERIODIC_HEAL:
+            case 34://SPELL_AURA_MOD_INCREASE_HEALTH:
+            case 62://SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+                return true;
+        }
+    }
+    if( sp->Effect[2]==SPELL_EFFECT_APPLY_AURA ||
+        sp->Effect[2]==SPELL_EFFECT_APPLY_AREA_AURA)
+    {
+        switch (sp->EffectApplyAuraName[2])
+        {
+            case 8://SPELL_AURA_PERIODIC_HEAL:
+            case 34://SPELL_AURA_MOD_INCREASE_HEALTH:
+            case 62://SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+                return true;
+        }
+    }
+    return false;
+}
+
 inline bool IsInrange(LocationVector & location, Object * o, float square_r)
 {
     float r = o->GetDistanceSq(location);

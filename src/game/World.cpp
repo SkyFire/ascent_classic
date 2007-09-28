@@ -1384,6 +1384,21 @@ void World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31893;
 	}
+	//paladin - Spiritual Attunement 
+	sp = sSpellStore.LookupEntry(31785);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 31786;
+	}
+	sp = sSpellStore.LookupEntry(33776);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 31786;
+	}
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
 	sp = sSpellStore.LookupEntry(27962);
 	if(sp)

@@ -4,8 +4,6 @@ Blessing of Sanctuary - Doesn't work.
 Divine protection - Doesn't work.
 Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
-Spiritual Attunement - Doesn't add the mana.
-Summon Charger/Warhorse - Doesn't work for Blood Elf.
 
 =====TALENTS=====
 Benediction - Holy - Doesn't work
