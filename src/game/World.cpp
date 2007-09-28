@@ -1367,6 +1367,14 @@ void World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
 
+	//paladin - seal of blood
+	sp = sSpellStore.LookupEntry(31892);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 31893;
+	}
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
 	sp = sSpellStore.LookupEntry(27962);
 	if(sp)

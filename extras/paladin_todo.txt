@@ -4,8 +4,6 @@ Blessing of Sanctuary - Doesn't work.
 Divine protection - Doesn't work.
 Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
-Righteous Defense - does not work at all ?
-Seal of Blood - Doesn't work. Judgment doesnt work.
 Seal of Command - If you unlearn it, you cant learn past rank 1. Judgment doesn't work.
 Seal of Justice - Judgment doesn't work.
 Seal of Wisdom - Doesn't work. Judgment doesn't work.

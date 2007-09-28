@@ -84,6 +84,7 @@ Zack - test my shit :
 - rogue - combat potency - require weapon and apply only for succesfull attack. Dual wield : 674, 35553
 - paladin - Blessing of Light - 27144,635,19750
 - paladin - Righteous Defense - 31789
+- paladin - Seal of Blood - 31892 
 
 ==========================================================================
 Capt - test my shit :
