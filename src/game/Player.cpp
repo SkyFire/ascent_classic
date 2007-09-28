@@ -4683,7 +4683,7 @@ bool Player::CanSee(Object* obj)
 
 					if(pObj->m_invisible) // Invisibility Detection
 					{
-						if(pObj->GetGroup() == GetGroup() // can see invisible group members except when dueling them
+						if(GetGroup() && pObj->GetGroup() == GetGroup() // can see invisible group members except when dueling them
 								&& DuelingWith != pObj)
 							return true;
 
@@ -4699,7 +4699,7 @@ bool Player::CanSee(Object* obj)
 
 					if(pObj->IsStealth()) // Stealth Detection (  I Hate Rogues :P  )
 					{
-						if(pObj->GetGroup() == GetGroup() // can see stealthed group members except when dueling them
+						if(GetGroup() && pObj->GetGroup() == GetGroup() // can see stealthed group members except when dueling them
 								&& DuelingWith != pObj)
 							return true;
 
