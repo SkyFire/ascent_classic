@@ -34,6 +34,9 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 	recvPacket >> pass;
 
 	chn = channelmgr.GetCreateChannel(channelname.c_str(), _player);
+	if(chn == NULL)
+		return;
+
 	if(chn->GetNumMembers() == 0)
 	{
 		// just created
