@@ -1313,6 +1313,60 @@ void World::SetInitialWorldSettings()
 	//if(sp && sp->Id==17364)
 		//sp->Effect[0]=0;
 
+	//paladin - Blessing of Light
+		//first let us get the 2 spellgrouprelations
+	sp = sSpellStore.LookupEntry(635);//holy light
+	uint32 HL_grouprelation;
+	if(sp)
+		HL_grouprelation = sp->EffectSpellGroupRelation[0];
+	else HL_grouprelation=0;
+	sp = sSpellStore.LookupEntry(19750);//Flash of light
+	uint32 FL_grouprelation;
+	if(sp)
+		FL_grouprelation = sp->EffectSpellGroupRelation[0];
+	else FL_grouprelation=0;
+
+	sp = sSpellStore.LookupEntry(19977);
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0] = 107;
+		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
+		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+	}
+	sp = sSpellStore.LookupEntry(19978);
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0] = 107;
+		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
+		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+	}
+	sp = sSpellStore.LookupEntry(19979);
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0] = 107;
+		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
+		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+	}
+	sp = sSpellStore.LookupEntry(27144);
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0] = 107;
+		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
+		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+	}
+	sp = sSpellStore.LookupEntry(32770);
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0] = 107;
+		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
+		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+	}
+
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
 	sp = sSpellStore.LookupEntry(27962);
 	if(sp)

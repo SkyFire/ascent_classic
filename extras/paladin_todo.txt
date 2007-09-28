@@ -1,11 +1,3 @@
-Paladin:
-
-This here is the ultimate bug machine.Everyone i saw did somth like this - First of all yell LEROOOYY JENKINSSSS and then do 21074386532 dmg and run away being really happy.
-
-seal of righteousness is not proccing anymore ?
-
-Heroism
-
 =====SPELLS AND ABILITIES =====
 Blessing of Light - Doesn't work.
 Blessing of Might - Does not add the Attack Power it should.

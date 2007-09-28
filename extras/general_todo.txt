@@ -82,6 +82,7 @@ Zack - test my shit :
 - mage - molten armor - 35915
 - mage - Detect Magic - 2855
 - rogue - combat potency - require weapon and apply only for succesfull attack. Dual wield : 674, 35553
+- paladin - Blessing of Light - 27144,635,19750
 
 ==========================================================================
 Capt - test my shit :
