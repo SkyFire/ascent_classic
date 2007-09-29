@@ -2502,19 +2502,23 @@ void Task::execute()
 void TaskExecutor::run()
 {
 	Task * t;
-	while(starter->running)
+	THREAD_TRY_EXECUTION
 	{
-		t = starter->GetTask();
-		if(t)
+		while(starter->running)
 		{
-			t->execute();
-			t->completed = true;
-			starter->RemoveTask(t);
-			delete t;
+			t = starter->GetTask();
+			if(t)
+			{
+				t->execute();
+				t->completed = true;
+				starter->RemoveTask(t);
+				delete t;
+			}
+			else
+				Sleep(20);
 		}
-		else
-			Sleep(20);
 	}
+	THREAD_HANDLE_CRASH
 }
 
 void TaskList::waitForThreadsToExit()

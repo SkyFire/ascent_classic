@@ -121,6 +121,7 @@ Creature* MapScriptInterface::SpawnCreature(uint32 Entry, float cX, float cY, fl
 	sp->bytes=0;
 	sp->bytes2=0;
 	sp->respawnNpcLink = 0;
+	sp->channel_spell=sp->channel_target_creature=sp->channel_target_go=0;
 
 	Creature * p = this->mapMgr.CreateCreature();
 	ASSERT(p);
