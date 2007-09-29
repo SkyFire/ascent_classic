@@ -4750,8 +4750,12 @@ bool Player::CanSee(Object* obj)
 					{
 						if (val < INVISIBILTY_FLAG_TOTAL)
 						{
-							float r = GetInvisibiltyDetection(static_cast<INVISIBILTY_FLAG>(val))/GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
+							/*float r = GetInvisibiltyDetection(static_cast<INVISIBILTY_FLAG>(val))/GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
 							if (GetDistance2dSq (obj) < r * r) 
+								return true;
+							else
+								return false;*/
+							if(InvisibilityDetectBonus[val] > 0)
 								return true;
 							else
 								return false;
