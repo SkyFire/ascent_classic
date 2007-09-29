@@ -351,6 +351,9 @@ void Map::LoadSpawns(bool reload)
 			cspawn->bytes2 = fields[12].GetUInt32();
 			cspawn->emote_state = fields[13].GetUInt32();
 			cspawn->respawnNpcLink = fields[14].GetUInt32();
+			cspawn->channel_spell=0;
+			cspawn->channel_target_creature=0;
+			cspawn->channel_target_go=0;
 			staticSpawns.CreatureSpawns.insert(cspawn);
 			++CreatureSpawnCount;
 		}while(result->NextRow());

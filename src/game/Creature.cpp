@@ -860,6 +860,12 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	if(m_faction)
 	{
 		m_factionDBC = sFactionStore.LookupEntry(m_faction->Faction);
+		// not a neutral creature
+		if(!(m_factionDBC->RepListId == -1 && m_faction->HostileMask == 0 && m_faction->FriendlyMask == 0))
+		{
+			GetAIInterface()->m_canCallForHelp = true;
+		}
+		
 	}
 //SETUP NPC FLAGS
 	SetUInt32Value(UNIT_NPC_FLAGS,proto->NPCFLags);
@@ -909,8 +915,8 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	{
 		m_aiInterface->addSpellToList(*itr);
 	}
-	m_aiInterface->m_canCallForHelp = proto->m_canCallForHelp;
-	m_aiInterface->m_CallForHelpHealth = proto->m_callForHelpHealth;
+	//m_aiInterface->m_canCallForHelp = proto->m_canCallForHelp;
+	//m_aiInterface->m_CallForHelpHealth = proto->m_callForHelpHealth;
 	m_aiInterface->m_canFlee = proto->m_canFlee;
 	m_aiInterface->m_FleeHealth = proto->m_fleeHealth;
 	m_aiInterface->m_FleeDuration = proto->m_fleeDuration;
@@ -1058,6 +1064,11 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 	if(m_faction)
 	{
 		m_factionDBC = sFactionStore.LookupEntry(m_faction->Faction);
+		// not a neutral creature
+		if(!(m_factionDBC->RepListId == -1 && m_faction->HostileMask == 0 && m_faction->FriendlyMask == 0))
+		{
+			GetAIInterface()->m_canCallForHelp = true;
+		}
 	}
 	//SETUP NPC FLAGS
 	SetUInt32Value(UNIT_NPC_FLAGS,proto->NPCFLags);

@@ -782,7 +782,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				agent = AGENT_FLEE;
 			else if(m_canCallForHelp 
 				&& !m_hasCalledForHelp 
-				&& (m_CallForHelpHealth > (m_Unit->GetUInt32Value(UNIT_FIELD_HEALTH) / (m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH) > 0 ? m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH) : 1))))
+				/*&& (m_CallForHelpHealth > (m_Unit->GetUInt32Value(UNIT_FIELD_HEALTH) / (m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH) > 0 ? m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH) : 1)))*/)
 				agent = AGENT_CALLFORHELP;
 			else if(m_nextSpell)
 			{
@@ -1075,7 +1075,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 			}break;
 		case AGENT_CALLFORHELP:
 			{
-				FindFriends(400.0f/*20.0f*/);
+				FindFriends(50.0f/*7.0f*/);
 				m_hasCalledForHelp = true; // We only want to call for Help once in a Fight.
 				if(m_Unit->GetTypeId() == TYPEID_UNIT)
 						objmgr.HandleMonsterSayEvent(((Creature*)m_Unit), MONSTER_SAY_EVENT_CALL_HELP);
