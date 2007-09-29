@@ -388,6 +388,14 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 	pSpellId=0;
 
 //	fixed_amount = 0;//used only por percent values to be able to recover value correctly.No need to init this if we are not using it
+	m_expired = false;
+	periodic_target=0;
+}
+
+void Aura::ExpireRemove()
+{
+	m_expired = true;
+	Remove();
 }
 
 void Aura::Remove()
@@ -1028,6 +1036,10 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 		{
 			m_target->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_POISON);
 		}
+
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicDamage(GetSpellProto()->EffectAmplitude[mod->i]);
 	}
 }
 
@@ -1804,6 +1816,12 @@ void Aura::SpellAuraPeriodicHeal(bool apply)
 			sEventMgr.AddEvent(this, &Aura::EventPeriodicHeal,(uint32)mod->m_amount,
 				EVENT_AURA_PERIODIC_HEAL,	GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicHeal(m_spellProto->EffectAmplitude[mod->i]);
+	}
 }
 
 void Aura::EventPeriodicHeal(uint32 amount)
@@ -2294,6 +2312,12 @@ void Aura::SpellAuraModTotalHealthRegenPct(bool apply)
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicHealPct,(float)mod->m_amount,
 			EVENT_AURA_PERIODIC_HEALPERC,	GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicHealPct(m_spellProto->EffectAmplitude[mod->i]);
+	}
 }
 
 void Aura::EventPeriodicHealPct(float RegenPct)
@@ -2325,6 +2349,12 @@ void Aura::SpellAuraModTotalManaRegenPct(bool apply)
 		SetPositive();
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicManaPct,(float)mod->m_amount,
 			EVENT_AURA_PERIOCIC_MANA,	GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicManaPct(m_spellProto->EffectAmplitude[mod->i]);
 	}
 }
 
@@ -2432,15 +2462,27 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 			return;
 
 		if(m_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT))
-			sEventMgr.AddEvent(this, &Aura::EventPeriodicTriggerSpell, spe, m_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT),
+		{
+			sEventMgr.AddEvent(this, &Aura::EventPeriodicTriggerSpell, spe,
 			EVENT_AURA_PERIODIC_TRIGGERSPELL,GetSpellProto()->EffectAmplitude[mod->i], 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+
+            periodic_target = m_caster->GetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT);
+		}
 		else if(m_target)
-			sEventMgr.AddEvent(this, &Aura::EventPeriodicTriggerSpell, spe, m_target->GetGUID(),
+		{
+			sEventMgr.AddEvent(this, &Aura::EventPeriodicTriggerSpell, spe, 
 				EVENT_AURA_PERIODIC_TRIGGERSPELL,GetSpellProto()->EffectAmplitude[mod->i], 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+			periodic_target = m_target->GetGUID();
+		}
+	}
+	else
+	{
+		if(periodic_target)
+			EventPeriodicTriggerSpell(sSpellStore.LookupEntry(m_spellProto->EffectTriggerSpell[mod->i]));
 	}
 }
 
-void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo, uint64 target)
+void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 {
 	// Trigger Spell
 	// check for spell id
@@ -2449,7 +2491,7 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo, uint64 target)
 	if(!m_caster || !m_caster->IsInWorld())
 		return;
 
-	Unit *pTarget = m_target->GetMapMgr()->GetUnit(target);
+	Unit *pTarget = m_target->GetMapMgr()->GetUnit(periodic_target);
 	int8 fail = -1;
 	if(!pTarget)
 		return;
@@ -2551,6 +2593,12 @@ void Aura::SpellAuraPeriodicEnergize(bool apply)
 		SetPositive();
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicEnergize,(uint32)mod->m_amount,(uint32)mod->m_miscValue,
 			EVENT_AURA_PERIODIC_ENERGIZE,GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicEnergize(mod->m_amount, mod->m_miscValue);
 	}
 }
 
@@ -3546,6 +3594,12 @@ void Aura::SpellAuraPeriodicLeech(bool apply)
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicLeech,amt,
 			EVENT_AURA_PERIODIC_LEECH,	GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicLeech(m_spellProto->EffectAmplitude[mod->i]);
+	}
 }
 
 void Aura::EventPeriodicLeech(uint32 amount)
@@ -3863,6 +3917,12 @@ void Aura::SpellAuraPeriodicHealthFunnel(bool apply)
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicHealthFunnel, amt,
 			EVENT_AURA_PERIODIC_HEALTH_FUNNEL, GetSpellProto()->EffectAmplitude[mod->i], 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicHealthFunnel(m_spellProto->EffectAmplitude[mod->i]);
+	}
 }
 
 void Aura::EventPeriodicHealthFunnel(uint32 amount)
@@ -3902,6 +3962,12 @@ void Aura::SpellAuraPeriodicManaLeech(bool apply)
 		}*/
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicManaLeech,amt,
 			EVENT_AURA_PERIODIC_LEECH,	 GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicManaLeech(m_spellProto->EffectAmplitude[mod->i]);
 	}
 }
 
@@ -4406,6 +4472,12 @@ void Aura::SpellAuraModRegen(bool apply)
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicHeal1,(uint32)((this->GetSpellProto()->EffectBasePoints[mod->i]+1)/5)*3,
 			EVENT_AURA_PERIODIC_REGEN,3000,0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicHeal1((uint32)((this->GetSpellProto()->EffectBasePoints[mod->i]+1)/5)*3);
+	}
 }
 
 void Aura::EventPeriodicHeal1(uint32 amount)
@@ -4436,6 +4508,12 @@ void Aura::SpellAuraModPowerRegen(bool apply)
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicEnergize,(uint32)mod->m_amount,(uint32)mod->m_miscValue,
 			EVENT_AURA_PERIODIC_ENERGIZE,5000,0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}	
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicEnergize(mod->m_amount, mod->m_miscValue);
+	}
 }
 
 void Aura::SpellAuraChannelDeathItem(bool apply)
@@ -4555,7 +4633,21 @@ void Aura::SpellAuraPeriodicDamagePercent(bool apply)
 	}
 	else
 	{
-		sEventMgr.RemoveEvents(m_target, EVENT_AURA_PERIODIC_DAMAGE_PERCENT);
+		//sEventMgr.RemoveEvents(m_target, EVENT_AURA_PERIODIC_DAMAGE_PERCENT);		// not needed - burlex
+		// expired? do the last tick
+		if(m_expired)
+		{
+			if(m_spellProto->Id == 28347) //Dimensional Siphon
+			{
+				uint32 dmg = (m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*5)/100;
+				EventPeriodicDamagePercent(dmg);
+			}
+			else
+			{
+				uint32 dmg = mod->m_amount;
+				EventPeriodicDamagePercent(dmg);
+			}
+		}
 	}
 }
 
@@ -5770,6 +5862,12 @@ void Aura::SpellAuraModHealthRegInCombat(bool apply)
 	{
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicHeal1, uint32(mod->m_amount), EVENT_AURA_PERIODIC_HEALINCOMB, 5000, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicHeal1(mod->m_amount);
+	}
 }
 
 void Aura::EventPeriodicBurn(uint32 amount, uint32 misc)
@@ -5799,6 +5897,12 @@ void Aura::SpellAuraPowerBurn(bool apply)
 	//0 mana,1 rage, 3 energy
 	if(apply)
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicBurn, uint32(mod->m_amount), (uint32)mod->m_miscValue, EVENT_AURA_PERIODIC_BURN, GetSpellProto()->EffectAmplitude[mod->i], 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicBurn(mod->m_amount, mod->m_miscValue);
+	}
 }
 
 void Aura::SpellAuraModCritDmgPhysical(bool apply)
@@ -6562,6 +6666,12 @@ void Aura::SpellAuraRegenManaStatPCT(bool apply)
 	{
 		SetPositive();
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicRegenManaStatPct,(uint32)mod->m_amount,(uint32)mod->m_miscValue,  EVENT_AURA_REGEN_MANA_STAT_PCT, 5000, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	}
+	else
+	{
+		// expired? do the last tick
+		if(m_expired)
+			EventPeriodicRegenManaStatPct(mod->m_amount, mod->m_miscValue);
 	}
 }
 void Aura::SpellAuraSpellHealingStatPCT(bool apply)

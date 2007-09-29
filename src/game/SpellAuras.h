@@ -321,8 +321,11 @@ typedef set<uint64> AreaAuraList;
 
 class SERVER_DECL Aura : public EventableObject
 {
+	bool m_expired;
+	uint64 periodic_target;
 public:
     Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target);
+	void ExpireRemove();
     void Remove();
     void Expire();
     void AddMod(uint32 t, int32 a,uint32 miscValue,uint32 i);
@@ -553,7 +556,7 @@ public:
     void EventPeriodicDamage(uint32);
     void EventPeriodicDamagePercent(uint32);
     void EventPeriodicHeal(uint32);
-    void EventPeriodicTriggerSpell(SpellEntry* spellInfo, uint64 target);
+    void EventPeriodicTriggerSpell(SpellEntry* spellInfo);
     void EventPeriodicEnergize(uint32,uint32);
     void EventPeriodicHeal1(uint32);
     void EventPeriodicLeech(uint32);
