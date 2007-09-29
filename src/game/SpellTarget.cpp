@@ -553,8 +553,7 @@ void Spell::SpellTargetTypeTAOE(uint32 i, uint32 j)
     if(!Target)
         return;
 
-    TargetsList *tmpMap=&m_targetUnits[i];
-    FillAllTargetsInArea(tmpMap, Target->GetPosition(), GetRadius(i);
+    FillAllTargetsInArea((LocationVector&)Target->GetPosition(), i);
 }
 
 /// Spell Target Handling for type 30: PBAE Party Based Area Effect
@@ -818,12 +817,12 @@ void Spell::SpellTargetSimpleTargetAdd(uint32 i, uint32 j)
     SafeAddTarget(&m_targetUnits[i],m_caster->GetGUID());
 }
 
-
+/*
 void Spell::SpellTargetType52(uint32 i, uint32 j)
 {
     TargetsList *tmpMap=&m_targetUnits[i];
     SafeAddTarget(tmpMap, m_caster->GetGUID());
-}
+}*/
 
 /// Spell Target Handling for type 53: Target Area by Players CurrentSelection()
 void Spell::SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j)
@@ -840,7 +839,8 @@ void Spell::SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j)
 
     if(!Target)
         return;
-    FillAllTargetsInArea(tmpMap, Target->GetPosition(), GetRadius(i);
+
+    FillAllTargetsInArea((LocationVector&)Target->GetPosition(), i);
 }
 
 /// Spell Target Handling for type 54: Targets in Front of the Caster
@@ -870,7 +870,7 @@ void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
 }
 
 /// Spell Target Handling for type 56: Target should be infected (Aura holder) caster...
-void Spell::SpellTarget56(uint32 o, uint32 j)
+void Spell::SpellTarget56(uint32 i, uint32 j)
 {
     if(!m_caster->IsInWorld())
         return;
