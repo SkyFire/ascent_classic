@@ -685,6 +685,7 @@ void Creature::ChannelLinkUpGO(uint32 SqlId)
 	{
 		event_RemoveEvents(EVENT_CREATURE_CHANNEL_LINKUP);
 		SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, go->GetGUID());
+		SetUInt32Value(UNIT_CHANNEL_SPELL, m_spawn->channel_spell);
 	}
 }
 
@@ -698,6 +699,7 @@ void Creature::ChannelLinkUpCreature(uint32 SqlId)
 	{
 		event_RemoveEvents(EVENT_CREATURE_CHANNEL_LINKUP);
 		SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, go->GetGUID());
+		SetUInt32Value(UNIT_CHANNEL_SPELL, m_spawn->channel_spell);
 	}
 }
 
@@ -773,6 +775,7 @@ WayPoint * Creature::CreateWaypointStruct()
 {
 	return new WayPoint();
 }
+//#define SAFE_FACTIONS
 
 bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 {
@@ -857,6 +860,9 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 
 	m_faction = sFactionTmpStore.LookupEntry(spawn->factionid);
 	
+#ifndef SAFE_FACTIONS
+	m_faction = sFactionTmpStore.LookupEntry(proto->Faction);
+
 	if(m_faction)
 	{
 		m_factionDBC = sFactionStore.LookupEntry(m_faction->Faction);
@@ -865,8 +871,23 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		{
 			GetAIInterface()->m_canCallForHelp = true;
 		}
-		
 	}
+#else
+
+	m_faction = sFactionTmpStore.LookupEntryForced(proto->Faction);
+	if(m_faction)
+	{
+		m_factionDBC = sFactionStore.LookupEntryForced(m_faction->Faction);
+		// not a neutral creature
+		if(!(m_factionDBC->RepListId == -1 && m_faction->HostileMask == 0 && m_faction->FriendlyMask == 0))
+		{
+			GetAIInterface()->m_canCallForHelp = true;
+		}
+	}
+	if(!m_faction || !m_factionDBC)
+		return false;
+#endif
+
 //SETUP NPC FLAGS
 	SetUInt32Value(UNIT_NPC_FLAGS,proto->NPCFLags);
 
@@ -983,9 +1004,6 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
 	}
 	m_invisibityFlag = proto->invisibility_type;
-	if(spawn->channel_spell)
-		SetUInt32Value(UNIT_CHANNEL_SPELL, spawn->channel_spell);
-
 	return true;
 }
 
@@ -1059,6 +1077,7 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 	m_position.ChangeCoords( x, y, z, 0 );
 	m_spawnLocation.ChangeCoords(x, y, z, 0);
 
+#ifndef SAFE_FACTIONS
 	m_faction = sFactionTmpStore.LookupEntry(proto->Faction);
 
 	if(m_faction)
@@ -1070,6 +1089,22 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 			GetAIInterface()->m_canCallForHelp = true;
 		}
 	}
+#else
+
+	m_faction = sFactionTmpStore.LookupEntryForced(proto->Faction);
+	if(m_faction)
+	{
+		m_factionDBC = sFactionStore.LookupEntryForced(m_faction->Faction);
+		// not a neutral creature
+		if(!(m_factionDBC->RepListId == -1 && m_faction->HostileMask == 0 && m_faction->FriendlyMask == 0))
+		{
+			GetAIInterface()->m_canCallForHelp = true;
+		}
+	}
+	if(!m_faction || !m_factionDBC)
+		return;
+#endif
+
 	//SETUP NPC FLAGS
 	SetUInt32Value(UNIT_NPC_FLAGS,proto->NPCFLags);
 

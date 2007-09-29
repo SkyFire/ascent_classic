@@ -167,6 +167,12 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 
 					CALL_SCRIPT_EVENT(m_Unit, OnCombatStart)(pUnit);
 					ScriptSystem->OnCreatureEvent(((Creature*)m_Unit), pUnit, CREATURE_EVENT_ON_ENTER_COMBAT);
+
+					if(static_cast<Creature*>(m_Unit)->m_spawn && (static_cast<Creature*>(m_Unit)->m_spawn->channel_target_go || static_cast<Creature*>(m_Unit)->m_spawn->channel_target_creature))
+					{
+						m_Unit->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+						m_Unit->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+					}
 				}
 				
 				// Stop the emote
@@ -209,6 +215,15 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 						m_Unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, static_cast<Creature*>(m_Unit)->original_emotestate);
 					
 					ScriptSystem->OnCreatureEvent(((Creature*)m_Unit), pUnit, CREATURE_EVENT_ON_LEAVE_COMBAT);
+
+					if(static_cast<Creature*>(m_Unit)->m_spawn && (static_cast<Creature*>(m_Unit)->m_spawn->channel_target_go || static_cast<Creature*>(m_Unit)->m_spawn->channel_target_creature))
+					{
+						if(static_cast<Creature*>(m_Unit)->m_spawn->channel_target_go)
+							sEventMgr.AddEvent(((Creature*)m_Unit), &Creature::ChannelLinkUpGO, static_cast<Creature*>(m_Unit)->m_spawn->channel_target_go, EVENT_CREATURE_CHANNEL_LINKUP, 1000, 5, 0);
+
+						if(static_cast<Creature*>(m_Unit)->m_spawn->channel_target_creature)
+							sEventMgr.AddEvent(((Creature*)m_Unit), &Creature::ChannelLinkUpCreature, static_cast<Creature*>(m_Unit)->m_spawn->channel_target_creature, EVENT_CREATURE_CHANNEL_LINKUP, 1000, 5, 0);
+					}
 				}
 
 				//reset ProcCount
