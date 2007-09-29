@@ -27,20 +27,20 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
     &Spell::SpellTargetSelf,                    // 1
     &Spell::SpellTargetNULL,                    // 2 Not handled (Test spells)
     &Spell::SpellTargetInvisibleAOE,            // 3
-    &Spell::SpellTargetType4,                   // 4
+    &Spell::SpellTargetFriendly,                // 4
     &Spell::SpellTargetPet,                     // 5
     &Spell::SpellTargetSingleTargetEnemy,       // 6
     &Spell::SpellTargetNULL,                    // 7
     &Spell::SpellTargetCustomAreaOfEffect,      // 8
-    &Spell::SpellTargetNULL,                    // 9
-    &Spell::SpellTargetNULL,                    // 10
-    &Spell::SpellTargetNULL,                    // 11
-    &Spell::SpellTargetNULL,                    // 12
-    &Spell::SpellTargetNULL,                    // 13
-    &Spell::SpellTargetNULL,                    // 14
+    &Spell::SpellTargetNULL,                    // 9 Not handled (no spells)
+    &Spell::SpellTargetNULL,                    // 10 Not handled (no spells)
+    &Spell::SpellTargetNULL,                    // 11 Not handled (Test spells)
+    &Spell::SpellTargetNULL,                    // 12 Not handled (no spells)
+    &Spell::SpellTargetNULL,                    // 13 Not handled (no spells)
+    &Spell::SpellTargetNULL,                    // 14 Not handled (no spells)
     &Spell::SpellTargetAreaOfEffect,            // 15
     &Spell::SpellTargetAreaOfEffect,            // 16
-    &Spell::SpellTargetNULL,                    // 17
+    &Spell::SpellTargetNULL,                    // 17 Target is a location
     &Spell::SpellTargetLandUnderCaster,         // 18
     &Spell::SpellTargetNULL,                    // 19 Not handled (Test spells)
     &Spell::SpellTargetAllPartyMembersRangeNR,  // 20
@@ -52,12 +52,12 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
     &Spell::SpellTargetGameobject_itemTarget,   // 26
     &Spell::SpellTargetPetOwner,                // 27
     &Spell::SpellTargetEnemysAreaOfEffect,      // 28 channeled
-    &Spell::SpellTargetType29,                  // 29
+    &Spell::SpellTargetTypeTAOE,                // 29
     &Spell::SpellTargetPartyBasedAreaEffect,    // 30
     &Spell::SpellTargetScriptedEffects,         // 31
     &Spell::SpellTargetSummon,                  // 32
     &Spell::SpellTargetNearbyPartyMembers,      // 33
-    &Spell::SpellTargetNULL,                    // 34
+    &Spell::SpellTargetNULL,                    // 34 Not handled (No spells)
     &Spell::SpellTargetSingleTargetPartyMember, // 35
     &Spell::SpellTargetScriptedEffects2,        // 36
     &Spell::SpellTargetPartyMember,             // 37
@@ -69,33 +69,33 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
     &Spell::SpellTargetTotem,                   // 43
     &Spell::SpellTargetTotem,                   // 44
     &Spell::SpellTargetChainTargeting,          // 45
-    &Spell::SpellTargetType46,                  // 46
-    &Spell::SpellTargetType47,                  // 47
-    &Spell::SpellTargetNULL,                    // 48
-    &Spell::SpellTargetNULL,                    // 49
-    &Spell::SpellTargetNULL,                    // 50
+    &Spell::SpellTargetSimpleTargetAdd,         // 46
+    &Spell::SpellTargetSimpleTargetAdd,         // 47
+    &Spell::SpellTargetSimpleTargetAdd,         // 48
+    &Spell::SpellTargetSimpleTargetAdd,         // 49
+    &Spell::SpellTargetSimpleTargetAdd,         // 50
     &Spell::SpellTargetNULL,                    // 51
-    &Spell::SpellTargetType52,                  // 52
+    &Spell::SpellTargetSimpleTargetAdd,         // 52
     &Spell::SpellTargetTargetAreaSelectedUnit,  // 53
     &Spell::SpellTargetInFrontOfCaster2,        // 54
-    &Spell::SpellTargetNULL,                    // 55
-    &Spell::SpellTargetNULL,                    // 56
+    &Spell::SpellTargetNULL,                    // 55 Not handled (Not realy handled by the current spell system)
+    &Spell::SpellTarget56,                      // 56
     &Spell::SpellTargetTargetPartyMember,       // 57
     &Spell::SpellTargetNULL,                    // 58
     &Spell::SpellTargetNULL,                    // 59
-    &Spell::SpellTargetNULL,                    // 60
+    &Spell::SpellTargetNULL,                    // 60 // scripted target fill..
     &Spell::SpellTargetSameGroupSameClass,      // 61
-    &Spell::SpellTargetNULL,                    // 62
-    &Spell::SpellTargetNULL,                    // 63
-    &Spell::SpellTargetNULL,                    // 64
-    &Spell::SpellTargetNULL,                    // 65
-    &Spell::SpellTargetNULL,                    // 66
-    &Spell::SpellTargetNULL,                    // 67
-    &Spell::SpellTargetNULL,                    // 68
-    &Spell::SpellTargetNULL,                    // 69
-    &Spell::SpellTargetNULL,                    // 70
-    &Spell::SpellTargetNULL,                    // 71
-    &Spell::SpellTargetNULL,                    // 72
+    &Spell::SpellTargetNULL,                    // 62 // targets the priest champion, big range..
+    &Spell::SpellTargetSimpleTargetAdd,         // 63 // summon [] creature
+    &Spell::SpellTargetSimpleTargetAdd,         // 64 // summon [] creature
+    &Spell::SpellTargetSimpleTargetAdd,         // 65 // summon [] creature
+    &Spell::SpellTargetSimpleTargetAdd,         // 66 // summon [] creature
+    &Spell::SpellTargetSimpleTargetAdd,         // 67 // summon [] creature
+    &Spell::SpellTargetNULL,                    // 68 Not handled (No spells)
+    &Spell::SpellTargetTotem,                   // 69 // Spitfire totem
+    &Spell::SpellTargetNULL,                    // 70 Not handled (No spells)
+    &Spell::SpellTargetNULL,                    // 71 Not handled (No spells)
+    &Spell::SpellTargetSimpleTargetAdd,         // 72 // summon [] creature + trow items
     &Spell::SpellTargetSummon,                  // 73
     &Spell::SpellTargetNULL,                    // 74
     &Spell::SpellTargetNULL,                    // 75
@@ -189,7 +189,7 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
 // type 70 is not used
 // type 71 is not used
 // type 72 target enemy unit... (I think it does not matter if its a friendly unit)
-// type 73 is item
+// type 73 is serverside scripted.... Mostly summons
 // type 74 Target Random Enemy
 // type 75 Target location in front of the caster
 // type 76 target a area... of target...
@@ -307,7 +307,7 @@ void Spell::SpellTargetInvisibleAOE(uint32 i, uint32 j)
 }
 
 /// Spell Target Handling for type 4: Target is holder of the aura
-void Spell::SpellTargetType4(uint32 i, uint32 j)
+void Spell::SpellTargetFriendly(uint32 i, uint32 j)
 {
     // O fuck we are contagious...
     // this off course is not tested yet. 
@@ -547,9 +547,14 @@ mysql> select id,name from spell where EffectImplicitTargetb1 = 29;
 +-------+-----------------------------------------------+
 */
 /// Spell Target Handling for type 29: all object around the the caster / object (so it seems)
-void Spell::SpellTargetType29(uint32 i, uint32 j)
+void Spell::SpellTargetTypeTAOE(uint32 i, uint32 j)
 {
+    Unit* Target = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
+    if(!Target)
+        return;
+
     TargetsList *tmpMap=&m_targetUnits[i];
+    FillAllTargetsInArea(tmpMap, Target->GetPosition(), GetRadius(i);
 }
 
 /// Spell Target Handling for type 30: PBAE Party Based Area Effect
@@ -697,6 +702,7 @@ void Spell::SpellTargetFishing(uint32 i, uint32 j)
 }
 
 /// Spell Target Handling for type 40: Activate Object target(probably based on focus)
+/// movement proc, like traps.
 void Spell::SpellTargetType40(uint32 i, uint32 j)
 {
     TargetsList *tmpMap=&m_targetUnits[i];
@@ -796,22 +802,23 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
     }
 }
 
+/// Spell target handling for commonly used simple target add's
+/// mostly used in scripted and kinda unknown target
+
+/// This handler is used in
 /// Spell Target Handling for type 46: Unknown Summon Atal'ai Skeleton
-void Spell::SpellTargetType46(uint32 i, uint32 j)
-{
-    TargetsList *tmpMap=&m_targetUnits[i];
-    SafeAddTarget(tmpMap,m_caster->GetGUID());
-}
-
-/// Spell Target Handling for type 47: Portal (Not sure)
-void Spell::SpellTargetType47(uint32 i, uint32 j)
-{
-    TargetsList *tmpMap=&m_targetUnits[i];
-    //FIXME: Not sure
-    SafeAddTarget(tmpMap,m_caster->GetGUID());
-}
-
+/// Spell Target Handling for type 47: Portal (Not sure, fix me.)
+/// Spell Target Handling for type 48: fix me
+/// Spell Target Handling for type 49: fix me
+/// Spell Target Handling for type 50: fix me
 /// Spell Target Handling for type 52: Lightwells, etc (Need more research)
+
+void Spell::SpellTargetSimpleTargetAdd(uint32 i, uint32 j)
+{
+    SafeAddTarget(&m_targetUnits[i],m_caster->GetGUID());
+}
+
+
 void Spell::SpellTargetType52(uint32 i, uint32 j)
 {
     TargetsList *tmpMap=&m_targetUnits[i];
@@ -833,7 +840,7 @@ void Spell::SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j)
 
     if(!Target)
         return;
-    FillAllTargetsInArea(tmpMap,Target->GetPositionX(),Target->GetPositionY(),Target->GetPositionZ(),GetRadius(i));
+    FillAllTargetsInArea(tmpMap, Target->GetPosition(), GetRadius(i);
 }
 
 /// Spell Target Handling for type 54: Targets in Front of the Caster
@@ -860,6 +867,16 @@ void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
             }
         }
     }
+}
+
+/// Spell Target Handling for type 56: Target should be infected (Aura holder) caster...
+void Spell::SpellTarget56(uint32 o, uint32 j)
+{
+    if(!m_caster->IsInWorld())
+        return;
+
+    TargetsList *tmpMap=&m_targetUnits[i];
+    SafeAddTarget(tmpMap,m_caster->GetGUID());
 }
 
 /// Spell Target Handling for type 57: Targeted Party Member

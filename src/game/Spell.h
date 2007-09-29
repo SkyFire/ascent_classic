@@ -1336,6 +1336,8 @@ public:
     void FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range);
     // Fills the targets at the area of effect. We suppose we already inited this spell and know the details
     void FillAllTargetsInArea(float srcx,float srcy,float srcz,uint32 ind);
+    // Fills the targets at the area of effect. We suppose we already inited this spell and know the details
+    void FillAllTargetsInArea(LocationVector & location,uint32 ind);
     //get single Enemy as target
     uint64 GetSinglePossibleEnemy(float prange=0);
     //get single Enemy as target
@@ -1511,7 +1513,7 @@ public:
     void SpellTargetDefault(uint32 i, uint32 j);
     void SpellTargetSelf(uint32 i, uint32 j);
     void SpellTargetInvisibleAOE(uint32 i, uint32 j);
-    void SpellTargetType4(uint32 i, uint32 j);
+    void SpellTargetFriendly(uint32 i, uint32 j);
     void SpellTargetPet(uint32 i, uint32 j);
     void SpellTargetSingleTargetEnemy(uint32 i, uint32 j);
     void SpellTargetCustomAreaOfEffect(uint32 i, uint32 j);
@@ -1526,7 +1528,7 @@ public:
     void SpellTargetGameobject_itemTarget(uint32 i, uint32 j);
     void SpellTargetPetOwner(uint32 i, uint32 j);
     void SpellTargetEnemysAreaOfEffect(uint32 i, uint32 j);
-    void SpellTargetType29(uint32 i, uint32 j);
+    void SpellTargetTypeTAOE(uint32 i, uint32 j);
     void SpellTargetPartyBasedAreaEffect(uint32 i, uint32 j);
     void SpellTargetScriptedEffects(uint32 i, uint32 j);
     void SpellTargetSummon(uint32 i, uint32 j);
@@ -1539,9 +1541,8 @@ public:
     void SpellTargetType40(uint32 i, uint32 j);
     void SpellTargetTotem(uint32 i, uint32 j);
     void SpellTargetChainTargeting(uint32 i, uint32 j);
-    void SpellTargetType46(uint32 i, uint32 j);
-    void SpellTargetType47(uint32 i, uint32 j);
-    void SpellTargetType52(uint32 i, uint32 j);
+    void SpellTargetSimpleTargetAdd(uint32 i, uint32 j);
+    void SpellTarget56(uint32 o, uint32 j);
     void SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j);
     void SpellTargetInFrontOfCaster2(uint32 i, uint32 j);
     void SpellTargetTargetPartyMember(uint32 i, uint32 j);

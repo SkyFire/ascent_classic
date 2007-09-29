@@ -265,6 +265,10 @@ void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy
         }
     }
 }
+void Spell::FillAllTargetsInArea(LocationVector & location,uint32 ind)
+{
+    FillAllTargetsInArea(&m_targetUnits[ind],location.x,location.y,location.z,GetRadius(ind));
+}
 
 void Spell::FillAllTargetsInArea(float srcx,float srcy,float srcz,uint32 ind)
 {
