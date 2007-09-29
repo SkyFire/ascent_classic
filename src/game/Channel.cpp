@@ -276,30 +276,33 @@ void Channel::Moderate(Player * plr)
 	SendToAll(&data);
 }
 
-void Channel::Say(Player * plr, const char * message)
+void Channel::Say(Player * plr, const char * message, Player * for_gm_client, bool forced)
 {
 	Guard mGuard(m_lock);
 	MemberMap::iterator itr = m_members.find(plr);
 	WorldPacket data(SMSG_CHANNEL_NOTIFY, strlen(message)+100);
-	if(m_members.end() == itr)
+	if(!forced)
 	{
-		data << uint8(CHANNEL_NOTIFY_FLAG_NOTON) << m_name;
-		plr->GetSession()->SendPacket(&data);
-		return;
-	}
+		if(m_members.end() == itr)
+		{
+			data << uint8(CHANNEL_NOTIFY_FLAG_NOTON) << m_name;
+			plr->GetSession()->SendPacket(&data);
+			return;
+		}
 
-	if(itr->second & CHANNEL_FLAG_MUTED)
-	{
-		data << uint8(CHANNEL_NOTIFY_FLAG_YOUCANTSPEAK) << m_name;
-		plr->GetSession()->SendPacket(&data);
-		return;
-	}
+		if(itr->second & CHANNEL_FLAG_MUTED)
+		{
+			data << uint8(CHANNEL_NOTIFY_FLAG_YOUCANTSPEAK) << m_name;
+			plr->GetSession()->SendPacket(&data);
+			return;
+		}
 
-	if(m_muted && !(itr->second & CHANNEL_FLAG_VOICED) && !(itr->second & CHANNEL_FLAG_MODERATOR) && !(itr->second & CHANNEL_FLAG_OWNER))
-	{
-		data << uint8(CHANNEL_NOTIFY_FLAG_YOUCANTSPEAK) << m_name;
-		plr->GetSession()->SendPacket(&data);
-		return;	
+		if(m_muted && !(itr->second & CHANNEL_FLAG_VOICED) && !(itr->second & CHANNEL_FLAG_MODERATOR) && !(itr->second & CHANNEL_FLAG_OWNER))
+		{
+			data << uint8(CHANNEL_NOTIFY_FLAG_YOUCANTSPEAK) << m_name;
+			plr->GetSession()->SendPacket(&data);
+			return;	
+		}
 	}
 
 	data.SetOpcode(SMSG_MESSAGECHAT);
@@ -312,7 +315,10 @@ void Channel::Say(Player * plr, const char * message)
 	data << uint32(strlen(message)+1);
 	data << message;
 	data << (uint8)(plr->bGMTagOn ? 4 : 0);
-	SendToAll(&data);
+	if(for_gm_client != NULL)
+		for_gm_client->GetSession()->SendPacket(&data);
+	else
+		SendToAll(&data);
 }
 
 void Channel::SendNotOn(Player * plr)

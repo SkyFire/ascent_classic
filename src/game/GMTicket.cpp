@@ -66,7 +66,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 	{
 		char msg[100];
 		snprintf(msg, 100, "GmTicket 5,%s", GetPlayer()->GetName());
-		chn->Say(_player, msg);
+		chn->Say(_player, msg, NULL, true);
 	}
 }
 
@@ -163,5 +163,8 @@ void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleGMTicketToggleSystemStatusOpcode(WorldPacket & recv_data)
 {
+	if(!HasGMPermissions())
+		return;
+
 	sWorld.toggleGMTicketStatus();
 }

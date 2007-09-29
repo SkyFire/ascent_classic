@@ -104,7 +104,7 @@ public:
 	void Voice(Player * plr, Player * v_player);
 	void Unmute(Player * plr, Player * die_player);
 	void Devoice(Player * plr, Player * v_player);
-	void Say(Player * plr, const char * message);
+	void Say(Player * plr, const char * message, Player * for_gm_client, bool forced);
 	void Unban(Player * plr, PlayerInfo * bplr);
 	void GiveModerator(Player * plr, Player * new_player);
 	void TakeModerator(Player * plr, Player * new_player);
