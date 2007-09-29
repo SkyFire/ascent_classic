@@ -338,7 +338,7 @@ public:
     inline uint8 GetAuraSlot() const { return m_auraSlot; }
     void SetAuraSlot(uint8 slot) { m_auraSlot = slot; }
 
-    inline bool IsPositive() { return m_positive>=0; }
+    inline bool IsPositive() { return m_positive>0; }
     void SetNegative(signed char value=1) { m_positive -= value; }
     void SetPositive(signed char value=1) { m_positive += value; }
 
