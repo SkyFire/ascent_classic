@@ -78,15 +78,16 @@ struct keyFrame {
 };
 
 struct TWayPoint {
-	TWayPoint() : mapid(0), x(0), y(0), z(0), teleport(0) {}
+	TWayPoint() : mapid(0), x(0), y(0), z(0), teleport(0), delayed(false) {}
 	TWayPoint(uint32 _mapid, float _x, float _y, float _z, bool _teleport) : 
-	mapid(_mapid), x(_x), y(_y), z(_z), teleport(_teleport) {}
+	mapid(_mapid), x(_x), y(_y), z(_z), teleport(_teleport), delayed(false) {}
 	uint32 mapid;
 	float x;
 	float y;
 	float z;
 	float o;
 	bool teleport;
+	bool delayed;
 };
 
 typedef std::map<uint32, TWayPoint> WaypointMap;

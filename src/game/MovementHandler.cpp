@@ -25,14 +25,26 @@
 
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
-inline uint32 TimeStamp()
+uint32 TimeStamp()
+{
+	return timeGetTime();
+}
+
+inline uint32 mTimeStamp()
 {
 	return timeGetTime();
 }
 
 #else
 
-inline uint32 TimeStamp()
+uint32 TimeStamp()
+{
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	return (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
+}
+
+inline uint32 mTimeStamp()
 {
 	struct timeval tp;
 	gettimeofday(&tp, NULL);
@@ -168,7 +180,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	}
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
-	uint32 mstime = TimeStamp();
+	uint32 mstime = mTimeStamp();
 	int32 move_time;
 	if(m_clientTimeDelay == 0)
 		m_clientTimeDelay = mstime - movement_info.time;
@@ -244,6 +256,9 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			{
 				_player->m_CurrentTransporter->AddPlayer(_player);
 			}
+
+			if(_player->IsMounted())
+				_player->RemoveAura(_player->m_MountSpellId);
 		}
 
 		GetPlayer()->m_TransporterX = movement_info.transX;
@@ -253,11 +268,11 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		GetPlayer()->m_TransporterUnk = movement_info.transUnk;
 		GetPlayer()->m_TransporterGUID = movement_info.transGuid;
 		
-		//float x = movement_info.x - movement_info.transX;
-		//float y = movement_info.y - movement_info.transY;
-		//float z = movement_info.z - movement_info.transZ;
-		/*Transporter* trans = _player->m_CurrentTransporter;
-		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));*/
+		float x = movement_info.x - movement_info.transX;
+		float y = movement_info.y - movement_info.transY;
+		float z = movement_info.z - movement_info.transZ;
+		Transporter* trans = _player->m_CurrentTransporter;
+		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));
 	}
 	else
 	{
@@ -419,7 +434,7 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 	}
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
-	uint32 mstime = TimeStamp();
+	uint32 mstime = mTimeStamp();
 	int32 move_time;
 	if(m_clientTimeDelay == 0)
 		m_clientTimeDelay = mstime - movement_info.time;
@@ -445,6 +460,9 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 			_player->m_CurrentTransporter = objmgr.GetTransporter(movement_info.transGuid);
 			if(_player->m_CurrentTransporter)
 			{
+				if(_player->IsMounted())
+					_player->RemoveAura(_player->m_MountSpellId);
+
 				_player->m_CurrentTransporter->AddPlayer(_player);
 			}
 		}
@@ -456,11 +474,11 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 		GetPlayer()->m_TransporterUnk = movement_info.transUnk;
 		GetPlayer()->m_TransporterGUID = movement_info.transGuid;
 
-//		float x = movement_info.x - movement_info.transX;
- //	   float y = movement_info.y - movement_info.transY;
-  //	  float z = movement_info.z - movement_info.transZ;
-		/*Transporter* trans = _player->m_CurrentTransporter;
-		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));*/
+		float x = movement_info.x - movement_info.transX;
+ 	   float y = movement_info.y - movement_info.transY;
+  	  float z = movement_info.z - movement_info.transZ;
+		Transporter* trans = _player->m_CurrentTransporter;
+		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));
 	}
 	else
 	{

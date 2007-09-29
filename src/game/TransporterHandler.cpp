@@ -100,6 +100,7 @@ bool Transporter::GenerateWaypoints()
 	}
 
 	int lastStop = -1;
+	int firstStop = -1;
 
 	// first cell is arrived at by teleportation :S
 	keyFrames[0].distFromPrev = 0;
@@ -111,7 +112,7 @@ bool Transporter::GenerateWaypoints()
 	// find the rest of the distances between key points
 	for (size_t i = 1; i < keyFrames.size(); i++)
 	{
-		if ((keyFrames[i].actionflag == 1) || (keyFrames[i].mapid != keyFrames[i-1].mapid))
+		if ((keyFrames[i-1].actionflag == 1) || (keyFrames[i].mapid != keyFrames[i-1].mapid))
 		{
 			keyFrames[i].distFromPrev = 0;
 		}
@@ -122,8 +123,12 @@ bool Transporter::GenerateWaypoints()
 				pow(keyFrames[i].y - keyFrames[i - 1].y, 2) +
 				pow(keyFrames[i].z - keyFrames[i - 1].z, 2));
 		}
-		if (keyFrames[i].actionflag == 2)
+		if (keyFrames[i].actionflag == 2) {
+            if(firstStop<0)
+				firstStop=i;
+
 			lastStop = i;
+		}
 	}
 
 	float tmpDist = 0;
@@ -139,7 +144,7 @@ bool Transporter::GenerateWaypoints()
 
 	for (int i = int(keyFrames.size()) - 1; i >= 0; i--)
 	{
-		int j = (i + (keyFrames.size() - lastStop)) % keyFrames.size();
+		int j = (i + (firstStop+1)) % keyFrames.size();
 		tmpDist += keyFrames[(j + 1) % keyFrames.size()].distFromPrev;
 		keyFrames[j].distUntilStop = tmpDist;
 		if (keyFrames[j].actionflag == 2)
@@ -259,6 +264,9 @@ bool Transporter::GenerateWaypoints()
 
 		//if (teleport)
 		//m_WayPoints[t] = pos;
+		if(keyFrames[i+1].delay > 5)
+			pos.delayed = true;
+
 		m_WayPoints.insert(WaypointMap::value_type(t, pos));
 
 		t += keyFrames[i + 1].delay * 1000;
@@ -268,7 +276,7 @@ bool Transporter::GenerateWaypoints()
 	uint32 timer = t;
 
 	mCurrentWaypoint = m_WayPoints.begin();
-	mCurrentWaypoint = GetNextWaypoint();
+	//mCurrentWaypoint = GetNextWaypoint();
 	mNextWaypoint = GetNextWaypoint();
 	m_pathTime = timer;
 	m_timer = 0;
@@ -284,16 +292,17 @@ WaypointIterator Transporter::GetNextWaypoint()
 	return iter;
 }
 
+uint32 TimeStamp();
 void Transporter::UpdatePosition()
 {
 	if (m_WayPoints.size() <= 1)
 		return;
 
-	m_timer = getMSTime() % m_period;
+	m_timer = GetTickCount() % m_period;
 
 	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) > ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
 	{
-		mCurrentWaypoint = GetNextWaypoint();
+		mCurrentWaypoint = mNextWaypoint;
 		mNextWaypoint = GetNextWaypoint();
 
 		if (mCurrentWaypoint->second.teleport == true) {
@@ -304,6 +313,11 @@ void Transporter::UpdatePosition()
 		} else {
 			SetPosition(mCurrentWaypoint->second.x, mCurrentWaypoint->second.y,
 				mCurrentWaypoint->second.z, m_position.o, false);
+		}
+
+		if(mCurrentWaypoint->second.delayed)
+		{
+			PlaySoundToSet(5495);		// BoatDockedWarning.wav
 		}
 	}
 }

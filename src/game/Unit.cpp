@@ -3664,13 +3664,6 @@ void Unit::CastSpellAoF(float x,float y,float z,SpellEntry* Sp, bool triggered)
 	newSpell->prepare(&targets);
 }
 
-void Unit::PlaySoundToSet(uint32 sound_entry)
-{
-	WorldPacket data(SMSG_PLAY_SOUND, 4);
-	data << sound_entry;
-	SendMessageToSet(&data, true);
-}
-
 void Unit::PlaySpellVisual(uint64 target, uint32 spellVisual)
 {
 	WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 12);

@@ -986,7 +986,6 @@ public:
 	void PauseEscortQuest();
 	void EndEscortQuest();*/
 	void MoveToWaypoint(uint32 wp_id);	
-	void PlaySoundToSet(uint32 sound_entry);
 	void PlaySpellVisual(uint64 target, uint32 spellVisual);
 	bool m_isPet;
 	uint32 m_stealth;

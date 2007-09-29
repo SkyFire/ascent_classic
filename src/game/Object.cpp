@@ -299,6 +299,8 @@ void Object::DestroyForPlayer(Player *target) const
 /// Build the Movement Data portion of the update packet
 /// Fills the data with this object's movement/speed info
 /// TODO: rewrite this stuff, document unknown fields and flags
+uint32 TimeStamp();
+
 void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2, Player* target )
 {
 	ByteBuffer *splinebuf = (m_objectTypeId == TYPEID_UNIT) ? target->GetAndRemoveSplinePacket(GetGUID()) : 0;
@@ -429,9 +431,10 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 	{
 		if(target)
 		{
-			int32 m_time = getMSTime() - target->GetSession()->m_clientTimeDelay;
+			/*int32 m_time = TimeStamp() - target->GetSession()->m_clientTimeDelay;
 			m_time += target->GetSession()->m_moveDelayTime;
-			*data << m_time;
+			*data << m_time;*/
+			*data << TimeStamp();
 		}
 		else
             *data << getMSTime();
@@ -2453,4 +2456,11 @@ void Object::SetZoneId(uint32 newZone)
 	m_zoneId = newZone;
 	if(m_objectTypeId == TYPEID_PLAYER && ((Player*)this)->GetGroup())
 		((Player*)this)->GetGroup()->HandlePartialChange(PARTY_UPDATE_FLAG_ZONEID, ((Player*)this));
+}
+
+void Object::PlaySoundToSet(uint32 sound_entry)
+{
+	WorldPacket data(SMSG_PLAY_SOUND, 4);
+	data << sound_entry;
+	SendMessageToSet(&data, true);
 }

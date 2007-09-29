@@ -457,7 +457,7 @@ public:
 
 	void GMScriptEvent(void * function, uint32 argc, uint32 * argv, uint32 * argt);
 	inline size_t GetInRangeOppFactCount() { return m_oppFactsInRange.size(); }
-
+	void PlaySoundToSet(uint32 sound_entry);
 
 protected:
 	Object (  );
