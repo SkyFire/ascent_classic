@@ -3004,7 +3004,7 @@ int32 Spell::CalculateEffect(uint32 i)
 	I think it's imbalanced so committed and replaced with dirty fix.
 	if (m_caster->IsUnit())
 		basePoints += static_cast<Unit*>(m_caster)->getLevel()*basePointsPerLevel; */
-	if (m_caster->IsUnit())
+	if (u_caster)
 	{
 		switch (m_spellInfo->NameHash)
 		{
@@ -3012,7 +3012,7 @@ int32 Spell::CalculateEffect(uint32 i)
 		case 0xDE1C36C8: //Blood Fury
 		case 0xEE91A232: //Mana Tap
 		case 0x6632EB62: //Arcane Torrent
-			basePoints += static_cast<Unit*>(m_caster)->getLevel()*basePointsPerLevel;
+			basePoints += u_caster->getLevel()*basePointsPerLevel;
 			break;
 		}
 	}
@@ -3029,37 +3029,41 @@ int32 Spell::CalculateEffect(uint32 i)
     // druid passive forms
 	if(m_spellInfo->Id ==3025 ||m_spellInfo->Id==9635 || m_spellInfo->Id == 1178 || m_spellInfo->Id == 24905)
 	{
-		value += float2int32(m_spellInfo->EffectRealPointsPerLevel[i]*(u_caster->getLevel()-m_spellInfo->baseLevel));
+		if(u_caster)
+			value += float2int32(m_spellInfo->EffectRealPointsPerLevel[i]*(u_caster->getLevel()-m_spellInfo->baseLevel));
 	}
 	//scripted shit
 	else if(m_spellInfo->Id == 34120)
 	{	//A steady shot that causes ${$RAP*0.3+$m1} damage. 
-		if(i==0)
+		if(i==0 && u_caster)
 			value += (uint32)(u_caster->GetRAP()*0.3);
 	}
     // HACK FIX
     else if(m_spellInfo->Id == 34428 || m_spellInfo->Id ==23881 ||m_spellInfo->Id == 23892 || m_spellInfo->Id==23893 ||m_spellInfo->Id == 23894||
 		    m_spellInfo->Id == 25251 || m_spellInfo->Id == 30335)
 	{//causing ${$AP*$m1/100} damage
-		if(i==0)
-		value = (value*u_caster->GetAP())/100;
+		if(i==0 && u_caster)
+			value = (value*u_caster->GetAP())/100;
 	}
 	else if(m_spellInfo->NameHash==0xF4D5F002)
 	{
 		//causes ${$RAP*0.2+$m1} Arcane damage." 
-		if(i==0)
+		if(i==0 && u_caster)
 			value +=u_caster->GetRAP()*0.15f;
 	}else if(m_spellInfo->NameHash == 0x93C04185)//rake
 	{
-		if(i==0)
-			value+=u_caster->GetAP()/100;
-		else if(i==1)
-		{
-			value = (uint32)(value*3+ u_caster->GetAP()*0.06);
+		if(u_caster) {
+			if(i==0)
+				value+=u_caster->GetAP()/100;
+			else if(i==1)
+			{
+				value = (uint32)(value*3+ u_caster->GetAP()*0.06);
+			}
 		}
 	}else if(m_spellInfo->NameHash == 0x5F076E9E)//Mongoose Bite
 	{// ${$AP*0.2+$m1} damage.
-		value+=u_caster->GetAP()/5;
+		if(u_caster)
+			value+=u_caster->GetAP()/5;
 	}
 	
 	if(p_caster)
@@ -3100,12 +3104,15 @@ int32 Spell::CalculateEffect(uint32 i)
 		}
 	 }
 
-	int32 spell_flat_modifers=0;
-	int32 spell_pct_modifers=0;
-	SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-	SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-
-	value = value + value*spell_pct_modifers/100 + spell_flat_modifers;
+	if(u_caster)
+	{
+		int32 spell_flat_modifers=0;
+		int32 spell_pct_modifers=0;
+		SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+	
+		value = value + value*spell_pct_modifers/100 + spell_flat_modifers;
+	}
 
 	return value;
 }
