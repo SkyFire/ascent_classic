@@ -1245,6 +1245,15 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 
 	if((*dmg).damage_type == 0)//physical
 	{		
+		//patch from emsy : wands do not get reduction
+        if (IsPlayer())
+        {
+            Item * it = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
+            if(it && it->GetProto()->SubClass == 19)
+            {
+                return;
+            }
+        }
 //		double Reduction = double(pVictim->GetResistance(0)) / double(pVictim->GetResistance(0)+400+(85*getLevel()));
 		//dmg reduction formula from xinef
 		double Reduction = 0;
