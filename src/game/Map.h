@@ -51,6 +51,9 @@ typedef struct
 	uint32 bytes2;
 	uint32 emote_state;
 	uint32 respawnNpcLink;
+	uint32 channel_spell;
+	uint32 channel_target_go;
+	uint32 channel_target_creature;
 }CreatureSpawn;
 
 typedef struct

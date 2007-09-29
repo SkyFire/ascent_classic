@@ -473,6 +473,8 @@ public:
 	inline bool IsTotem() { return totemOwner != 0 && totemSlot != -1; }
 	void TotemExpire();
 	void FormationLinkUp(uint32 SqlId);
+	void ChannelLinkUpGO(uint32 SqlId);
+	void ChannelLinkUpCreature(uint32 SqlId);
 	bool haslinkupevent;
 	WayPoint * CreateWaypointStruct();
 	uint32 spawnid;

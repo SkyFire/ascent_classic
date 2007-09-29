@@ -453,9 +453,6 @@ void Creature::RemoveFromWorld(bool addev)
 		return;
 	}
 
-	if(!IS_INSTANCE(m_mapId))
-		objmgr.SetCreatureBySqlId(GetSQL_id(), 0);
-
 	if(IsInWorld())
 	{
 		RemoveAllAuras();
@@ -666,15 +663,41 @@ void Creature::TotemExpire()
 
 void Creature::FormationLinkUp(uint32 SqlId)
 {
-	if(IS_INSTANCE(m_mapId))
+	if(!m_mapMgr)		// shouldnt happen
 		return;
 
-	Creature * creature = objmgr.GetCreatureBySqlId(SqlId);
+	Creature * creature = m_mapMgr->GetSqlIdCreature(SqlId);
 	if(creature != 0)
 	{
 		m_aiInterface->m_formationLinkTarget = creature;
 		haslinkupevent = false;
 		event_RemoveEvents(EVENT_CREATURE_FORMATION_LINKUP);
+	}
+}
+
+void Creature::ChannelLinkUpGO(uint32 SqlId)
+{
+	if(!m_mapMgr)		// shouldnt happen
+		return;
+
+	GameObject * go = m_mapMgr->GetSqlIdGameObject(SqlId);
+	if(go != 0)
+	{
+		event_RemoveEvents(EVENT_CREATURE_CHANNEL_LINKUP);
+		SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, go->GetGUID());
+	}
+}
+
+void Creature::ChannelLinkUpCreature(uint32 SqlId)
+{
+	if(!m_mapMgr)		// shouldnt happen
+		return;
+
+	Creature * go = m_mapMgr->GetSqlIdCreature(SqlId);
+	if(go != 0)
+	{
+		event_RemoveEvents(EVENT_CREATURE_CHANNEL_LINKUP);
+		SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, go->GetGUID());
 	}
 }
 
@@ -902,10 +925,6 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		m_aiInterface->m_formationLinkSqlId = spawn->form->fol;
 		m_aiInterface->m_formationFollowDistance = spawn->form->dist;
 		m_aiInterface->m_formationFollowAngle = spawn->form->ang;
-		// add event
-		sEventMgr.AddEvent(this, &Creature::FormationLinkUp, m_aiInterface->m_formationLinkSqlId,
-			EVENT_CREATURE_FORMATION_LINKUP, 1000, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-		haslinkupevent = true;
 	}
 	else
 	{
@@ -958,6 +977,9 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
 	}
 	m_invisibityFlag = proto->invisibility_type;
+	if(spawn->channel_spell)
+		SetUInt32Value(UNIT_CHANNEL_SPELL, spawn->channel_spell);
+
 	return true;
 }
 
@@ -1164,10 +1186,26 @@ void Creature::OnPushToWorld()
 	if(_myScriptClass)
 		_myScriptClass->OnLoad();
 
-	if(IS_INSTANCE(m_mapMgr->GetMapId()))
-		m_aiInterface->setOutOfCombatRange(0);		
-	else
-		objmgr.SetCreatureBySqlId(GetSQL_id(), this);
+	if(m_spawn)
+	{
+		if(m_aiInterface->m_formationLinkSqlId)
+		{
+			// add event
+			sEventMgr.AddEvent(this, &Creature::FormationLinkUp, m_aiInterface->m_formationLinkSqlId,
+				EVENT_CREATURE_FORMATION_LINKUP, 1000, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+			haslinkupevent = true;
+		}
+
+		if(m_spawn->channel_target_creature)
+		{
+			sEventMgr.AddEvent(this, &Creature::ChannelLinkUpCreature, m_spawn->channel_target_creature, EVENT_CREATURE_CHANNEL_LINKUP, 1000, 5, 0);	// only 5 attempts
+		}
+		
+		if(m_spawn->channel_target_go)
+		{
+			sEventMgr.AddEvent(this, &Creature::ChannelLinkUpGO, m_spawn->channel_target_go, EVENT_CREATURE_CHANNEL_LINKUP, 1000, 5, 0);	// only 5 attempts
+		}
+	}
 }
 
 // this is used for guardians. They are non respawnable creatures linked to a player

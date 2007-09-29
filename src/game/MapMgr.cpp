@@ -281,6 +281,10 @@ void MapMgr::PushObject(Object *obj)
 		case HIGHGUID_UNIT:
 			///ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
 			m_CreatureStorage[obj->GetGUIDLow()] = (Creature*)obj;
+			if(((Creature*)obj)->m_spawn != NULL)
+			{
+				_sqlids_creatures.insert(make_pair( ((Creature*)obj)->m_spawn->id, ((Creature*)obj) ) );
+			}
 			break;
 
 		case HIGHGUID_PET:
@@ -293,6 +297,10 @@ void MapMgr::PushObject(Object *obj)
 
 		case HIGHGUID_GAMEOBJECT:
 			m_GOStorage[obj->GetGUIDLow()] = (GameObject*)obj;
+			if(((GameObject*)obj)->m_spawn != NULL)
+			{
+				_sqlids_gameobjects.insert(make_pair( ((GameObject*)obj)->m_spawn->id, ((GameObject*)obj) ) );
+			}
 			break;
 	}
 
@@ -384,6 +392,10 @@ void MapMgr::RemoveObject(Object *obj)
 		case HIGHGUID_UNIT:
 			ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
 			m_CreatureStorage[obj->GetGUIDLow()] = 0;
+			if(((Creature*)obj)->m_spawn != NULL)
+			{
+				_sqlids_creatures.erase(((Creature*)obj)->m_spawn->id);
+			}
 			  break;
 
 		case HIGHGUID_PET:
@@ -397,6 +409,10 @@ void MapMgr::RemoveObject(Object *obj)
 		case HIGHGUID_GAMEOBJECT:
 			ASSERT(obj->GetGUIDLow() <= m_GOHighGuid);
 			m_GOStorage[obj->GetGUIDLow()] = 0;
+			if(((GameObject*)obj)->m_spawn != NULL)
+			{
+				_sqlids_creatures.erase(((GameObject*)obj)->m_spawn->id);
+			}
 			break;
 	}
 
@@ -1766,4 +1782,16 @@ void MapMgr::SendMessageToCellPlayers(Object * obj, WorldPacket * packet, uint32
 			}
 		}
 	}
+}
+
+Creature * MapMgr::GetSqlIdCreature(uint32 sqlid)
+{
+	CreatureSqlIdMap::iterator itr = _sqlids_creatures.find(sqlid);
+	return (itr == _sqlids_creatures.end()) ? NULL : itr->second;
+}
+
+GameObject * MapMgr::GetSqlIdGameObject(uint32 sqlid)
+{
+	GameObjectSqlIdMap::iterator itr = _sqlids_gameobjects.find(sqlid);
+	return (itr == _sqlids_gameobjects.end()) ? NULL : itr->second;
 }

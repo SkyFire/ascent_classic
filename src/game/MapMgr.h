@@ -63,6 +63,8 @@ typedef HM_NAMESPACE::hash_map<uint32, Object*> StorageMap;
 typedef HM_NAMESPACE::hash_map<uint64, uint64> CombatProgressMap;
 typedef set<Creature*> CreatureSet;
 typedef set<GameObject*> GameObjectSet;
+typedef HM_NAMESPACE::hash_map<uint32, Creature*> CreatureSqlIdMap;
+typedef HM_NAMESPACE::hash_map<uint32, GameObject*> GameObjectSqlIdMap;
 
 #define MAX_TRANSPORTERS_PER_MAP 25
 
@@ -319,6 +321,11 @@ public:
 	EventableObjectHolder eventHolder;
 	CBattleground * m_battleground;
 	set<Corpse*> m_corpses;
+	CreatureSqlIdMap _sqlids_creatures;
+	GameObjectSqlIdMap _sqlids_gameobjects;
+
+	Creature * GetSqlIdCreature(uint32 sqlid);
+	GameObject * GetSqlIdGameObject(uint32 sqlid);
 };
 
 #endif

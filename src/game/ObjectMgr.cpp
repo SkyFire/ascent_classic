@@ -2542,30 +2542,6 @@ void ObjectMgr::SetVendorList(uint32 Entry, std::vector<CreatureItem>* list_)
 	mVendors[Entry] = list_;
 }
 
-Creature * ObjectMgr::GetCreatureBySqlId(uint32 Sql_Id)
-{
-	CreatureSqlIdMapMutex.Acquire();
-	Creature * c;
-	CreatureSqlIdMap::iterator itr = mCreatureSqlIds.find(Sql_Id);
-	c = (itr == mCreatureSqlIds.end()) ? 0 : itr->second;
-	CreatureSqlIdMapMutex.Release();
-	return c;
-}
-
-void ObjectMgr::SetCreatureBySqlId(uint32 Sql_Id, Creature * pCreature)
-{
-	CreatureSqlIdMapMutex.Acquire();
-
-	if(pCreature != 0)
-		mCreatureSqlIds[Sql_Id] = pCreature;
-	else
-	{
-		CreatureSqlIdMap::iterator itr = mCreatureSqlIds.find(Sql_Id);
-		if(itr != mCreatureSqlIds.end())
-			mCreatureSqlIds.erase(itr);
-	}
-	CreatureSqlIdMapMutex.Release();
-}
 
 void ObjectMgr::LoadCreatureWaypoints()
 {

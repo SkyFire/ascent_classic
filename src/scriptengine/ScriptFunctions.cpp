@@ -1085,7 +1085,8 @@ int GM_GetUnitBySqlId(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
 	GM_CHECK_INT_PARAM(id, 0);
-	Creature * pc = objmgr.GetCreatureBySqlId(id);
+	Object * o = GetThisPointer<Object>(a_thread);
+	Creature * pc = o->IsInWorld() ? o->GetMapMgr()->GetSqlIdCreature(id) : NULL;
 	if(!pc)
 	{
 		GM_EXCEPTION_MSG("could not find entrysqlid");
@@ -1361,7 +1362,7 @@ int Unit_GetClosestPlayer(gmThread * a_thread)
 	Player * closest = NULL;
 	for(set<Player*>::iterator itr = pThis->GetInRangePlayerSetBegin(); itr != pThis->GetInRangePlayerSetEnd(); ++itr)
 	{
-		if(closest == NULL || closest->GetDistance2dSq(pThis) > (*itr)->GetDistance2dSq(pThis) && pThis != (*itr))
+		if((closest == NULL || closest->GetDistance2dSq(pThis) > (*itr)->GetDistance2dSq(pThis)) && pThis != (*itr))
 			closest = (*itr);
 	}
 

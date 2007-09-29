@@ -320,6 +320,9 @@ void Map::LoadSpawns(bool reload)
 			cspawn->bytes2 = fields[12].GetUInt32();
 			cspawn->emote_state = fields[13].GetUInt32();
 			cspawn->respawnNpcLink = fields[14].GetUInt32();
+			cspawn->channel_spell = fields[15].GetUInt32();
+			cspawn->channel_target_go = fields[16].GetUInt32();
+			cspawn->channel_target_creature = fields[17].GetUInt32();
 			spawns[cellx][celly]->CreatureSpawns.insert(cspawn);
 			++CreatureSpawnCount;
 		}while(result->NextRow());

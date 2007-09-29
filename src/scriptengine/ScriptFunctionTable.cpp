@@ -149,6 +149,7 @@ void ScriptEngine::SetUnitFunctionTable()
 		{ "GetMostHated",						Unit_GetMostHated					},
 		{ "ForgetHate",							Unit_ForgetHate						},
 		{ "IsInMeleeRange",						Unit_IsInMeleRange					},
+		{ "GetUnitBySqlId",						GM_GetUnitBySqlId					},
 	};
 
 	m_machine->RegisterTypeLibrary(m_unitType, table, sizeof(table) / sizeof(table[0]));
@@ -183,6 +184,7 @@ void ScriptEngine::SetGameObjectFunctionTable()
 		{ "GetPositionY",						Unit_GetPositionY					},
 		{ "GetPositionZ",						Unit_GetPositionZ					},
 		{ "GetFacing",							Unit_GetFacing						},
+		{ "GetUnitBySqlId",						GM_GetUnitBySqlId					},
 	};
 
 	m_machine->RegisterTypeLibrary(m_gameObjectType, table, sizeof(table) / sizeof(table[0]));
@@ -229,7 +231,6 @@ void ScriptEngine::SetScriptEngineFunctionTable()
 
 	// Register Normal Functions
 	m_machine->RegisterLibraryFunction("Rand", GM_RAND, 0, 0);
-	m_machine->RegisterLibraryFunction("GetUnitBySqlId", GM_GetUnitBySqlId, 0, 0);
 	m_machine->RegisterLibraryFunction("sprintf", GM_RAND, 0, 0);
 	m_machine->RegisterLibraryFunction("GetDistance", GM_GetDistance, 0, 0);
 	

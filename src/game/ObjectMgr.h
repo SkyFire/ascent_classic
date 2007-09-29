@@ -338,7 +338,6 @@ public:
 	typedef HM_NAMESPACE::hash_map<uint32, Guild*>                      GuildMap;
 	typedef HM_NAMESPACE::hash_map<uint32, skilllinespell*>             SLMap;
 	typedef HM_NAMESPACE::hash_map<uint32, std::vector<CreatureItem>*>  VendorMap;
-	typedef HM_NAMESPACE::hash_map<uint32, Creature*>                   CreatureSqlIdMap;
     typedef HM_NAMESPACE::hash_map<uint64, Transporter*>                TransportMap;
 	typedef HM_NAMESPACE::hash_map<uint32, Trainer*>                    TrainerMap;
 	typedef HM_NAMESPACE::hash_map<uint32, std::vector<TrainerSpell*> > TrainerSpellMap;
@@ -432,9 +431,6 @@ public:
 	int32 GetAIThreatToSpellId(uint32 spellId);
 
 	std::list<ItemPrototype*>* GetListForItemSet(uint32 setid);
-
-  	Creature * GetCreatureBySqlId(uint32 Sql_Id);
-	void SetCreatureBySqlId(uint32 Sql_Id, Creature * pCreature);
 
 	Pet * CreatePet();
 	uint32 m_hiPetGuid;
@@ -645,8 +641,6 @@ protected:
 	LevelInfoMap mLevelInfo;
 	PetDefaultSpellMap mDefaultPetSpells;
 	PetSpellCooldownMap mPetSpellCooldowns;
-	CreatureSqlIdMap mCreatureSqlIds;
-	Mutex CreatureSqlIdMapMutex;
 };
 
 
