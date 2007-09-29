@@ -817,13 +817,6 @@ void Spell::SpellTargetSimpleTargetAdd(uint32 i, uint32 j)
     SafeAddTarget(&m_targetUnits[i],m_caster->GetGUID());
 }
 
-/*
-void Spell::SpellTargetType52(uint32 i, uint32 j)
-{
-    TargetsList *tmpMap=&m_targetUnits[i];
-    SafeAddTarget(tmpMap, m_caster->GetGUID());
-}*/
-
 /// Spell Target Handling for type 53: Target Area by Players CurrentSelection()
 void Spell::SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j)
 {
