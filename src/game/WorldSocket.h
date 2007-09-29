@@ -244,6 +244,7 @@ public:
 	inline void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
 	inline void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
 	void __fastcall OutPacket(uint16 opcode, uint16 len, const void* data);
+	inline uint32 GetSessionId() { return m_sessionId; }
 
 protected:
 	uint32 m_sessionId;

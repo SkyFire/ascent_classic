@@ -1282,7 +1282,11 @@ public:
 	// GameObject commands
 	GameObject *m_GM_SelectedGO;
 	
+#ifndef CLUSTERING
 	void _Relocate(uint32 mapid,const LocationVector & v, bool sendpending, bool force_new_world);
+#else
+	void RelocateCallback(uint32 instance_were_going_to);
+#endif
 	void AddItemsToWorld();
 	void RemoveItemsFromWorld();
 	
@@ -1553,6 +1557,7 @@ public:
 #ifdef CLUSTERING
 	void EventRemoveAndDelete();
 	void PackPlayerData(ByteBuffer & data);
+	bool UnpackPlayerData(ByteBuffer & data);
 #endif
 
 	Creature * m_tempSummon;

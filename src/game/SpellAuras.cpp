@@ -6688,27 +6688,3 @@ void Aura::SpellAuraModBlockValue(bool apply)
 		}
 	}
 }
-
-void Aura::Pack(ByteBuffer & data)
-{
-	uint32 x, y;
-	if(!IsPassive())
-		data << uint32(UNIXTIME - timeleft);
-	else
-		data << uint32(-1);
-
-	data << m_modcount;
-	for(x = 0; x < m_modcount; ++x)
-	{
-		for(y = 0; y < 7; ++y)
-			data << m_modList[y].fixed_amount[y];
-
-		data << m_modList[x].i;
-		data << m_modList[x].m_amount;
-		data << m_modList[x].m_miscValue;
-		data << m_modList[x].m_type;
-		data << m_modList[x].realamount;
-	}
-
-	data << m_auraSlot;
-}

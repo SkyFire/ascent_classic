@@ -322,7 +322,6 @@ typedef set<uint64> AreaAuraList;
 class SERVER_DECL Aura : public EventableObject
 {
 public:
-	void Pack(ByteBuffer & data);
     Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target);
     void Remove();
     void Expire();

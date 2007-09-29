@@ -311,5 +311,11 @@ void ClusterInterface::HandlePlayerChangedServers(WorldPacket & pck)
 	/* dereference the session */
 }
 
+void ClusterInterface::RequestTransfer(Player * plr, uint32 MapId, uint32 InstanceId, LocationVector & vec)
+{
+	WorldPacket data(ICMSG_TELEPORT_REQUEST, 32);
+	data << plr->GetSession()->GetSocket()->GetSessionId() << MapId << InstanceId << vec << vec.o;
+	SendPacket(&data);
+}
 
 #endif

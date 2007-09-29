@@ -92,11 +92,10 @@ void WServer::HandleTeleportRequest(WorldPacket & pck)
 	RPlayerInfo * pi;
 	Session * s;
 	Instance * dest;
-	uint32 mapid, sessionid;
+	uint32 mapid, sessionid, instanceid;
 
 	/* this packet is only used upon changing main maps! */
-	pck >> sessionid >> mapid;
-	ASSERT(IS_MAIN_MAP(mapid));
+	pck >> sessionid >> mapid >> instanceid;	
 
 	s = sClientMgr.GetSession(sessionid);
 	if(s)
@@ -105,14 +104,14 @@ void WServer::HandleTeleportRequest(WorldPacket & pck)
 		ASSERT(pi);
 
 		/* find the destination server */
-		dest = sClusterMgr.GetInstanceByMapId(mapid);
+		if(instanceid == 0)
+			dest = sClusterMgr.GetInstanceByMapId(mapid);
+		else
+			dest = sClusterMgr.GetInstanceByInstanceId(instanceid);
 
 		/* server up? */
 		if(!dest)
 		{
-			data << sessionid << uint8(0);
-			SendPacket(&data);
-
 			data.Initialize(SMSG_TRANSFER_ABORTED);
 			data << uint32(0x02);	// INSTANCE_ABORT_NOT_FOUND
 			s->SendPacket(&data);
@@ -120,29 +119,34 @@ void WServer::HandleTeleportRequest(WorldPacket & pck)
 		else
 		{
 			/* server found! */
-			data << uint8(1);
-			SendPacket(&data);
+			LocationVector vec;
+			pck >> vec >> vec.o;
+
 			pi->MapId = mapid;
 			pi->InstanceId = dest->InstanceId;
+			pi->PositionX = vec.x;
+			pi->PositionY = vec.y;
 
 			if(dest->Server == s->GetServer())
 			{
 				/* we're not changing servers, the new instance is on the same server */
-				data.Initialize(ISMSG_PLAYER_INFO);
-				pi->Pack(data);
-				sClusterMgr.DistributePacketToAll(&data, this);
-
-				data.Initialize(ISMSG_PLAYER_CHANGE_INSTANCES);
-				data << sessionid << pi->MapId << pi->InstanceId;
+				data << sessionid << uint8(1) << mapid << instanceid << vec << vec.o;
 				SendPacket(&data);
 			}
 			else
 			{
 				/* notify the old server to pack the player info together to send to the new server, and delete the player */
-				data.Initialize(ISMSG_PLAYER_CHANGED_SERVERS);
-				data << sessionid << dest->Server->GetID();
+				data << sessionid << uint8(0) << mapid << instanceid << vec << vec.o;
 				SendPacket(&data);
 			}
+
+			data.Initialize(ISMSG_PLAYER_INFO);
+			pi->Pack(data);
+			sClusterMgr.DistributePacketToAll(&data, this);
+
+			data.Initialize(SMSG_NEW_WORLD);
+			data << mapid << vec << vec.o;
+			s->SendPacket(&data);
 		}
 	}
 }

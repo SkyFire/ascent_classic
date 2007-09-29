@@ -29,6 +29,7 @@ typedef void(ClusterInterface::*ClusterInterfaceHandler)(WorldPacket&);
 
 class ClusterInterface : public Singleton<ClusterInterface>
 {
+	Mutex m_onlinePlayerMapMutex;
 	OnlinePlayerStorageMap _onlinePlayers;
 	WSClient * _clientSocket;
 	FastQueue<WorldPacket*, Mutex> _pckQueue;
@@ -37,6 +38,7 @@ class ClusterInterface : public Singleton<ClusterInterface>
 	bool m_connected;
 	uint8 key[20];
 	uint32 m_latency;
+	Mutex m_mapMutex;
 
 public:
 
@@ -53,8 +55,11 @@ public:
 	
 	RPlayerInfo * GetPlayer(uint32 guid)
 	{
-		// this should use a mutex - burlex
-		OnlinePlayerStorageMap::iterator itr = _onlinePlayers.find(guid);
+		RPlayerInfo * inf;
+		OnlinePlayerStorageMap::iterator itr;
+		m_onlinePlayerMapMutex.Acquire();
+		itr = _onlinePlayers.find(guid);
+		m_onlinePlayerMapMutex.Release();
 		return (itr == _onlinePlayers.end()) ? 0 : itr->second;
 	}
 
@@ -77,6 +82,8 @@ public:
 
 	inline void SendPacket(WorldPacket * data) { if(_clientSocket) _clientSocket->SendPacket(data); }
 	inline void SetSocket(WSClient * s) { _clientSocket = s; }
+
+	void RequestTransfer(Player * plr, uint32 MapId, uint32 InstanceId, LocationVector & vec);
 };
 
 #define sClusterInterface ClusterInterface::getSingleton()

@@ -5997,7 +5997,7 @@ void Player::RemovePlayerPet(uint32 pet_number)
 		m_Pets.erase(itr);
 	}
 }
-
+#ifndef CLUSTERING
 void Player::_Relocate(uint32 mapid, const LocationVector & v, bool sendpending, bool force_new_world)
 {
 	//this func must only be called when switching between maps!
@@ -6036,6 +6036,7 @@ void Player::_Relocate(uint32 mapid, const LocationVector & v, bool sendpending,
 	SetPosition(v);
 	ResetHeartbeatCoords();
 }
+#endif
 
 // Player::AddItemsToWorld
 // Adds all items to world, applies any modifiers for them.
@@ -6956,7 +6957,60 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, float X, float Y, flo
 
 bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector & vec)
 {
+#ifdef CLUSTERING
+	/* Clustering Version */
+	MapInfo * mi = WorldMapInfoStorage.LookupEntry(MapID);
+
+	// Lookup map info
+	if(mi && mi->flags & WMI_INSTANCE_XPACK_01 && !m_session->HasFlag(ACCOUNT_FLAG_XPACK_01))
+	{
+		WorldPacket msg(SMSG_BROADCAST_MSG, 50);
+		msg << uint32(3) << "You must have The Burning Crusade Expansion to access this content." << uint8(0);
+		m_session->SendPacket(&msg);
+		return false;
+	}
+
+	uint32 instance_id;
+	bool map_change = false;
+	if(mi && mi->type == 0)
+	{
+		// single instance map
+		if(MapID != m_mapId)
+		{
+			map_change = true;
+			instance_id = 0;
+		}
+	}
+	else
+	{
+		// instanced map
+		if(InstanceID != GetInstanceID())
+			map_change = true;
+
+		instance_id = InstanceID;
+	}
+
+	if(map_change)
+	{
+		WorldPacket data(SMSG_TRANSFER_PENDING, 4);
+		data << uint32(MapID);
+		GetSession()->SendPacket(&data);
+		sClusterInterface.RequestTransfer(this, MapID, instance_id, vec);
+		return;
+	}
+
+	m_sentTeleportPosition = vec;
+	SetPosition(vec);
+	ResetHeartbeatCoords();
+
+	WorldPacket * data = BuildTeleportAckMsg(vec);
+	m_session->SendPacket(data);
+	delete data;
+#else
+	/* Normal Version */
 	bool instance = false;
+	MapInfo * mi = WorldMapInfoStorage.LookupEntry(MapID);
+
 	if(InstanceID && (uint32)m_instanceId != InstanceID)
 	{
 		instance = true;
@@ -6971,14 +7025,13 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 	if (m_UnderwaterState & UNDERWATERSTATE_UNDERWATER)
 		m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
 
-	if(flying_aura && m_mapId != 530)
+	if(flying_aura && MapID != 530)
 	{
 		RemoveAura(flying_aura);
 		flying_aura = 0;
 	}
 
 	// Lookup map info
-	MapInfo * mi = WorldMapInfoStorage.LookupEntry(MapID);
 	if(mi && mi->flags & WMI_INSTANCE_XPACK_01 && !m_session->HasFlag(ACCOUNT_FLAG_XPACK_01))
 	{
 		WorldPacket msg(SMSG_BROADCAST_MSG, 50);
@@ -6989,6 +7042,7 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 
 	_Relocate(MapID, vec, true, instance);
 	return true;
+#endif
 }
 
 void Player::SetGuildId(uint32 guildId)
@@ -8953,17 +9007,5 @@ void Player::save_Auras()
 
 #ifdef CLUSTERING
 
-void Player::PackPlayerData(ByteBuffer & data)
-{
-	data << uint32(GetGUIDLow());
-	for(uint32 x = 0; x < MAX_AURAS; ++x)
-	{
-		if(m_auras[x])
-		{
-			data << x;
-			m_auras[x]->Pack(data);
-		}
-	}
-}
 
 #endif
