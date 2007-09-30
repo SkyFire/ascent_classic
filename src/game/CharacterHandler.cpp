@@ -728,6 +728,13 @@ bool WorldSession::PlayerLogin(uint32 playerGuid, uint32 forced_map_id, uint32 f
 		Transporter * pTrans = objmgr.GetTransporter(plr->m_TransporterGUID);
 		if(pTrans)
 		{
+			if(plr->isDead())
+			{
+				plr->ResurrectPlayer();
+				plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+				plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+			}
+
 			float c_tposx = pTrans->GetPositionX() + plr->m_TransporterX;
 			float c_tposy = pTrans->GetPositionY() + plr->m_TransporterY;
 			float c_tposz = pTrans->GetPositionZ() + plr->m_TransporterZ;

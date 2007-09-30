@@ -75,7 +75,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 	recv_data >> guid;
 	if(guid == _player->GetGUID())
 	{
-		if(sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->GetPlayerStatus() != TRANSFER_PENDING)
+		if(_player->_heartBeatDisabledUntil < UNIXTIME && sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->GetPlayerStatus() != TRANSFER_PENDING)
 		{
 			/* we're obviously cheating */
 			sCheatLog.writefromsession(this, "Used teleport hack, disconnecting.");
@@ -83,7 +83,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 			return;
 		}
 
-		if(sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->m_position.Distance2DSq(_player->m_sentTeleportPosition) > 625.0f)	/* 25.0f*25.0f */
+		if(_player->_heartBeatDisabledUntil < UNIXTIME && sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->m_position.Distance2DSq(_player->m_sentTeleportPosition) > 625.0f)	/* 25.0f*25.0f */
 		{
 			/* cheating.... :( */
 			sCheatLog.writefromsession(this, "Used teleport hack {2}, disconnecting.");
@@ -268,11 +268,11 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		GetPlayer()->m_TransporterUnk = movement_info.transUnk;
 		GetPlayer()->m_TransporterGUID = movement_info.transGuid;
 		
-		float x = movement_info.x - movement_info.transX;
+		/*float x = movement_info.x - movement_info.transX;
 		float y = movement_info.y - movement_info.transY;
 		float z = movement_info.z - movement_info.transZ;
 		Transporter* trans = _player->m_CurrentTransporter;
-		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));
+		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));*/
 	}
 	else
 	{
@@ -474,11 +474,11 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 		GetPlayer()->m_TransporterUnk = movement_info.transUnk;
 		GetPlayer()->m_TransporterGUID = movement_info.transGuid;
 
-		float x = movement_info.x - movement_info.transX;
+		/*float x = movement_info.x - movement_info.transX;
  	   float y = movement_info.y - movement_info.transY;
   	  float z = movement_info.z - movement_info.transZ;
 		Transporter* trans = _player->m_CurrentTransporter;
-		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));
+		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));*/
 	}
 	else
 	{
