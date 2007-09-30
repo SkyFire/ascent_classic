@@ -4735,8 +4735,12 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 					if(GetGUID() == owner) // the owner of an object can always see it
 						return true;
 
-					if(GetGroup() && GetGroup()->HasMember(owner)) // the owner's group members can also see it
-						return true;
+					if(GetGroup())
+					{
+						PlayerInfo * inf = objmgr.GetPlayerInfo((uint32)owner);
+						if(inf && GetGroup()->HasMember(inf))
+							return true;
+					}
 
 					if(m_invisDetect[gObj->invisibilityFlag] < 1) // can't see invisible without proper detection
 						return m_session->HasPermissions(); // GM can see invisible objects
