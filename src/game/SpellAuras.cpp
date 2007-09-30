@@ -2479,7 +2479,7 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 			sEventMgr.AddEvent(this, &Aura::EventPeriodicTriggerSpell, spe,
 			EVENT_AURA_PERIODIC_TRIGGERSPELL,GetSpellProto()->EffectAmplitude[mod->i], 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
-            periodic_target = m_caster->GetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT);
+            periodic_target = m_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT);
 		}
 		else if(m_target)
 		{
@@ -2490,8 +2490,9 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 	}
 	else
 	{
-		if(periodic_target)
-			EventPeriodicTriggerSpell(dbcSpell.LookupEntry(m_spellProto->EffectTriggerSpell[mod->i]));
+		SpellEntry * inf = dbcSpell.LookupEntry(m_spellProto->EffectTriggerSpell[mod->i]);
+		if(periodic_target && inf->Effect[0] != SPELL_EFFECT_TAMECREATURE)
+			EventPeriodicTriggerSpell(inf);
 	}
 }
 
