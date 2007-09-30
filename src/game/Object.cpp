@@ -2120,6 +2120,11 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 
 		float dmgdoneaffectperc = castaff / 3500;
 //------------------------------by downranking----------------------------------------------
+		//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
+		float td = GetDuration(sSpellDuration.LookupEntry(spellInfo->DurationIndex));
+		if (spellInfo->NameHash == 0x695C4940 || spellInfo->NameHash == 0x3DD5C872 || spellInfo->NameHash == 0xddaf1ac7 || spellInfo->NameHash == 0xCB75E5D1)
+			dmgdoneaffectperc *= float (1.0f - (( td / 15000.0f ) / (( td / 15000.0f ) + dmgdoneaffectperc)));
+
 		if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
 		{
 		   float downrank1 = 1.0f;
