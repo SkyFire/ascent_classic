@@ -3905,7 +3905,7 @@ void Spell::SpellEffectSummonObjectSlot(uint32 i)
 	if(GoSummon->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRAP)
 	{
 		GoSummon->invisible = true;
-		GoSummon->invisibilityFlag = INVISIBILTY_FLAG_TRAP;
+		GoSummon->invisibilityFlag = INVIS_FLAG_TRAP;
 		GoSummon->charges = 1;
 		GoSummon->checkrate = 1;
 		sEventMgr.AddEvent(GoSummon, &GameObject::TrapSearchTarget, EVENT_GAMEOBJECT_TRAP_SEARCH_TARGET, 100, 0,0);

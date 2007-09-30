@@ -355,12 +355,12 @@ public:
 		if(!obj)
 			return false;
 
-		if(obj->getDeathState() == CORPSE) // can't see ghosts
-			return false;
-
-		if(obj->m_invisible) // Invisibility Detection
+		if(obj->m_invisible) // Invisibility - Detection of Players and Units
 		{
-			if( true ) // TODO: replace this line with correct invisibility detection formula
+			if(obj->getDeathState() == CORPSE) // can't see dead players' spirits
+				return false;
+
+			if(m_invisDetect[obj->m_invisFlag] < 1) // can't see invisible without proper detection
 				return false;
 		}
 
@@ -388,6 +388,7 @@ public:
 			if(GetDistance2dSq(obj) > detectRange * detectRange)
 				return false;
 		}
+
 		return true;
 	}
 

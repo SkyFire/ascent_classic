@@ -4624,176 +4624,130 @@ void Player::AddGlobalCooldown(uint32 tm)
 
 #define CORPSE_VIEW_DISTANCE 900 // 30*30
 
-bool Player::CanSee(Object* obj)
+bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha *
 {
 	if (obj == this)
 	   return true;
 
 	uint32 object_type = obj->GetTypeId();
 
-	if (!isAlive())
+	if(getDeathState() == CORPSE) // we are dead and we have released our spirit
 	{
-		if(myCorpse && myCorpse->GetDistance2dSq(this) < sWorld.m_UpdateDistance)  // We're close enough to our corpse
+		if(myCorpse && myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
+			return true; // we can see everything within range of our corpse
+
+		if(m_deathVision) // if we have special death-vision (from arenas) then we can see everything 
+			return true;
+
+		if(object_type == TYPEID_PLAYER)
 		{
-			if(myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
+			if(((Player*)obj)->getDeathState() == CORPSE) // we can only see dead players' spirits
+				return true;
+			else return false;
+		}
+
+		if(object_type == TYPEID_UNIT
+				&& ((Unit*)obj)->IsSpiritHealer()) // we can't see any NPCs except spirit-healers
+			return true;
+
+		return false;
+	}
+	//------------------------------------------------------------------
+
+	switch(object_type) // we are alive or we haven't released our spirit yet
+	{			
+		case TYPEID_PLAYER:
 			{
-				// We can see any object within a certain distance from our corpse. ;)
+				Player *pObj = static_cast<Player *>(obj);
+
+				if(pObj->m_invisible) // Invisibility - Detection of Players
+				{
+					if(pObj->getDeathState() == CORPSE)
+						return m_session->HasPermissions(); // only GM can see dead players' spirits
+
+					if(GetGroup() && pObj->GetGroup() == GetGroup() // can see invisible group members except when dueling them
+							&& DuelingWith != pObj)
+						return true;
+
+					if(pObj->stalkedby == GetGUID()) // Hunter's Mark / MindVision is visible to the caster
+						return true;
+
+					if(m_invisDetect[INVIS_FLAG_NORMAL] < 1 // can't see invisible without proper detection
+							|| pObj->m_isGmInvisible) // only GM can see invisible GM
+						return m_session->HasPermissions(); // GM can see invisible players
+				}
+
+				if(pObj->IsStealth()) // Stealth Detection (  I Hate Rogues :P  )
+				{
+					if(GetGroup() && pObj->GetGroup() == GetGroup() // can see stealthed group members except when dueling them
+							&& DuelingWith != pObj)
+						return true;
+
+					if(pObj->stalkedby == GetGUID()) // Hunter's Mark / MindVision is visible to the caster
+						return true;
+
+					if(isInFront(pObj)) // stealthed player is in front of us
+					{
+						// Detection Range = 5yds + (Detection Skill - Stealth Skill)/5
+						if(getLevel() < 60)
+							detectRange = 5.0f + getLevel() + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
+						else
+							detectRange = 65.0f + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
+
+						if(detectRange < 1.0f) detectRange = 1.0f; // Minimum Detection Range = 1yd
+					}
+					else detectRange = 0.0f; // stealthed player is behind us
+
+					detectRange += GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of player
+					detectRange += pObj->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of stealthed player
+
+					if(GetDistance2dSq(pObj) > detectRange * detectRange)
+						return m_session->HasPermissions(); // GM can see stealthed players
+				}
+
 				return true;
 			}
-		}
+		//------------------------------------------------------------------
 
-		// If we got here, we're further away from our corpse than we can see.
-		switch(object_type)
-		{
-			case TYPEID_DYNAMICOBJECT:
-					return false;
-			//------------------------------------------------------------------
-			case TYPEID_UNIT:
-				{
-					if ( ((Unit*)obj)->IsSpiritHealer() )
-						return true;
-					else
-						return false;
-				}
-			//------------------------------------------------------------------
-			case TYPEID_PLAYER:
-				{
-					// if we're in corpse state, we can't see anything but other dead players.
-					// otherwise, we can still see everything
-					if(getDeathState() != CORPSE || m_deathVision)
-						return true;
-					else
-						return false;
-				}
-			//------------------------------------------------------------------
-			default: 
-				return true;
-		}
-	}
-	else//alive
-	{
-		switch(object_type)
-		{			
-			case TYPEID_PLAYER: // * Invisibility & Stealth Detection - Partha *
-				{
-					Player *pObj = static_cast<Player *>(obj);
-
-					if(pObj->getDeathState() == CORPSE) // only GM can see ghosts
-						return m_session->HasPermissions();
-
-					if(pObj->m_isGmInvisible) // only GM can see invisible GM
-						return m_session->HasPermissions();
-
-					if(pObj->m_invisible) // Invisibility Detection
-					{
-						if(GetGroup() && pObj->GetGroup() == GetGroup() // can see invisible group members except when dueling them
-								&& DuelingWith != pObj)
-							return true;
-
-						if(pObj->stalkedby == GetGUID()) // Hunter's Mark / MindVision is visible to the caster
-							return true;
-
-						if(m_session->HasPermissions()) // GM can always see invisible
-							return true;
-
-						if( true ) // TODO: replace this line with correct invisibility detection formula
-							return false;
-					}
-
-					if(pObj->IsStealth()) // Stealth Detection (  I Hate Rogues :P  )
-					{
-						if(GetGroup() && pObj->GetGroup() == GetGroup() // can see stealthed group members except when dueling them
-								&& DuelingWith != pObj)
-							return true;
-
-						if(pObj->stalkedby == GetGUID()) // Hunter's Mark / MindVision is visible to the caster
-							return true;
-
-						if(m_session->HasPermissions()) // GM can always see stealth
-							return true;
-
-						if(isInFront(pObj)) // stealthed player is in front of us
-						{
-							// Detection Range = 5yds + (Detection Skill - Stealth Skill)/5
-							if(getLevel() < 60)
-								detectRange = 5.0f + getLevel() + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
-							else
-								detectRange = 65.0f + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
-
-							if(detectRange < 1.0f) detectRange = 1.0f; // Minimum Detection Range = 1yd
-						}
-						else // stealthed player is behind us
-						{
-							if(GetStealthDetectBonus() > 1000) return true; // immune to stealth
-							else detectRange = 0.0f;
-						}	
-
-						detectRange += GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of player
-						detectRange += pObj->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of stealthed player
-
-						if(GetDistance2dSq(pObj) > detectRange * detectRange)
-							return false;
-					}
-					return true;
-				}
-			//------------------------------------------------------------------
-
-			case TYPEID_UNIT:
-				{	
-					if(static_cast<Unit*>(obj)->m_invisible)
-						return false;
+		case TYPEID_UNIT:
+			{	
+				Unit *uObj = static_cast<Unit *>(obj);
 					
-					if ( ((Unit*)obj)->IsSpiritHealer() )
-						return false;
-					uint32 val = ((Unit*)obj)->m_invisibityFlag;
-					if(val > INVISIBILTY_FLAG_NONE)
-					{
-						if (val < INVISIBILTY_FLAG_TOTAL)
-						{
-							/*float r = GetInvisibiltyDetection(static_cast<INVISIBILTY_FLAG>(val))/GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
-							if (GetDistance2dSq (obj) < r * r) 
-								return true;
-							else
-								return false;*/
-							if(InvisibilityDetectBonus[val] > 0)
-								return true;
-							else
-								return false;
-						}
-					}
-					else
-						return true;
-				}
-			//------------------------------------------------------------------
-			case TYPEID_GAMEOBJECT://some go's are stealthed
+				if(uObj->IsSpiritHealer()) // can't see spirit-healers when alive
+					return false;
+
+				if(uObj->m_invisible // Invisibility - Detection of Units
+						&& m_invisDetect[uObj->m_invisFlag] < 1) // can't see invisible without proper detection
+					return m_session->HasPermissions(); // GM can see invisible units
+
+				return true;
+			}
+		//------------------------------------------------------------------
+
+		case TYPEID_GAMEOBJECT:
+			{
+				GameObject *gObj = static_cast<GameObject *>(obj);
+
+				if(gObj->invisible) // Invisibility - Detection of GameObjects
 				{
-					if(static_cast<GameObject*>(obj)->invisible)
-					{
-						uint64 owner = obj->GetUInt64Value(OBJECT_FIELD_CREATED_BY);
-						if(this->GetGUID() == owner)
-							return true;
+					uint64 owner = gObj->GetUInt64Value(OBJECT_FIELD_CREATED_BY);
 
-						SubGroup * pGroup = GetGroup() ?
-							GetGroup()->GetSubGroup(GetSubGroup()) : 0;
-
-						if(pGroup)
-							return pGroup->HasMember(owner);
-						else
-						{
-							float r = GetInvisibiltyDetection(static_cast<GameObject*>(obj)->invisibilityFlag)/sWorld.Expansion1LevelCap;
-							if (GetDistance2dSq (obj) < r * r) 
-								return true;
-							else
-								return false;
-						}						
-					}
-					else 
+					if(GetGUID() == owner) // the owner of an object can always see it
 						return true;
-				}					
-			//------------------------------------------------------------------
-			default:
-					return true;
-		}
+
+					if(GetGroup() && GetGroup()->HasMember(owner)) // the owner's group members can also see it
+						return true;
+
+					if(m_invisDetect[gObj->invisibilityFlag] < 1) // can't see invisible without proper detection
+						return m_session->HasPermissions(); // GM can see invisible objects
+				}
+
+				return true;
+			}					
+		//------------------------------------------------------------------
+
+		default:
+			return true;
 	}
 }
 

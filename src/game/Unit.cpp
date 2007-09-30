@@ -103,7 +103,6 @@ Unit::Unit()
 	APvModifier=0;
 	stalkedby=0;
 
-	m_invisible = false;
 	m_extraattacks = 0;
 	m_stunned = 0;
 	m_manashieldamt=0;
@@ -129,6 +128,14 @@ Unit::Unit()
 	CreatureRangedAttackPowerMod[UNIT_TYPE_MISC] = 0;
 	CreatureAttackPowerMod[11] = 0;
 	CreatureRangedAttackPowerMod[11] = 0;
+
+	m_invisible = false;
+	m_invisFlag = INVIS_FLAG_NORMAL;
+
+	for(int i = 0; i < INVIS_FLAG_TOTAL; i++)
+	{
+		m_invisDetect[i] = 0;
+	}
 
 	m_stealthLevel = 0;
 	m_stealthDetectBonus = 0;
@@ -186,11 +193,7 @@ Unit::Unit()
 	{
 		m_detectRangeGUID[i] = 0;
 		m_detectRangeMOD[i] = 0;
-		InvisibilityDetectBonus[i] = 0;
 	}
-	//REMIND:Update these if you make any changes
-	InvisibilityDetectBonus[INVISIBILTY_FLAG_TRAP] = 180;//MaxLevel*3
-	InvisibilityDetectBonus[INVISIBILTY_FLAG_GHOSTS] = 0;
 
 	trackStealth = false;
 	modAttackTimeIncreasePCT = 0;
@@ -217,7 +220,6 @@ Unit::Unit()
 	polySpell = 0;
 	RangedDamageTaken = 0;
 	m_procCounter = 0;
-	m_invisibityFlag = 0;
 	m_extrastriketargets = 0;
 	m_damgeShieldsInUse = false;
 //	fearSpell = 0;

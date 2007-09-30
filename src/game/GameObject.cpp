@@ -39,7 +39,7 @@ GameObject::GameObject(uint32 high, uint32 low)
 
 	m_summonedGo = false;
 	invisible = false;
-	invisibilityFlag = INVISIBILTY_FLAG_NONE;
+	invisibilityFlag = INVIS_FLAG_NORMAL;
 	spell = 0;
 	m_summoner = NULL;
 	charges = -1;

@@ -2291,6 +2291,11 @@ void Aura::SpellAuraModInvisibility(bool apply)
 	if(m_spellProto->Effect[mod->i] == 128)
 		return;
 
+	if(apply)
+		m_target->m_invisFlag = mod->m_miscValue;
+	else
+		m_target->m_invisFlag = INVIS_FLAG_NORMAL;
+
 	m_target->m_invisible = apply;
 	m_target->UpdateVisibility();
 }
@@ -2299,14 +2304,14 @@ void Aura::SpellAuraModInvisibilityDetection(bool apply)
 {
 	//Always Positive
 
-	assert(mod->m_miscValue < INVISIBILTY_FLAG_TOTAL);
+	assert(mod->m_miscValue < INVIS_FLAG_TOTAL);
 	if(apply)
 	{
-		m_target->InvisibilityDetectBonus[mod->m_miscValue] += mod->m_amount;
+		m_target->m_invisDetect[mod->m_miscValue] += mod->m_amount;
 		SetPositive ();
 	}
 	else 
-		m_target->InvisibilityDetectBonus[mod->m_miscValue] -= mod->m_amount;
+		m_target->m_invisDetect[mod->m_miscValue] -= mod->m_amount;
 
 	if(m_target->IsPlayer())
 		static_cast<Player*>(m_target)->UpdateVisibility();
@@ -4733,6 +4738,8 @@ void Aura::SpellAuraGhost(bool apply)
 {
 	if(m_target->GetTypeId() == TYPEID_PLAYER)
 	{
+		m_target->m_invisible = apply;
+
 		if(apply)
 		{
 			SetNegative();

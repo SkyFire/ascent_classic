@@ -61,11 +61,13 @@ bool ChatHandler::HandleInvisibleCommand(const char *args, WorldSession *m_sessi
 	if(pChar->m_isGmInvisible)
 	{
 		pChar->m_isGmInvisible = false;
+		pChar->m_invisible = false;
 		pChar->bInvincible = false;
 		sSocialMgr.LoggedOut(pChar);
 		snprintf(msg, 256, "%s OFF.", msg);
 	} else {
 		pChar->m_isGmInvisible = true;
+		pChar->m_invisible = true;
 		pChar->bInvincible = true;
 		sSocialMgr.LoggedIn(pChar);
 		snprintf(msg, 256, "%s ON.", msg);

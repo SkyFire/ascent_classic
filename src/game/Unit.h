@@ -544,30 +544,24 @@ enum HitStatus
 	HITSTATUS_SWINGNOHITSOUND = 0x80000 // as in miss?
 };
 
-enum INVISIBILTY_FLAG
+enum INVIS_FLAG
 {
-	INVISIBILTY_FLAG_NONE,
-	INVISIBILTY_FLAG_UNIT_SPIRIT,
-	INVISIBILTY_FLAG_UNK_SPIRIT,
-	INVISIBILTY_FLAG_TRAP,
-	INVISIBILTY_FLAG_QUEST_INVISIBILITY,
-	INVISIBILTY_FLAG_GHOSTS,
-	INVISIBILTY_FLAG_UNK1,
-	INVISIBILTY_FLAG_UNK2,
-	INVISIBILTY_FLAG_SHADOWMOON_GHOSTWORLD,
-	INVISIBILTY_FLAG_NETHERSTORM_UNK,
-	INVISIBILTY_FLAG_TOTAL
+	INVIS_FLAG_NORMAL, // players and units with no special invisibility flags
+	INVIS_FLAG_SPIRIT1,
+	INVIS_FLAG_SPIRIT2,
+	INVIS_FLAG_TRAP,
+	INVIS_FLAG_QUEST,
+	INVIS_FLAG_GHOST,
+	INVIS_FLAG_UNKNOWN6,
+	INVIS_FLAG_UNKNOWN7,
+	INVIS_FLAG_SHADOWMOON,
+	INVIS_FLAG_NETHERSTORM,
+	INVIS_FLAG_TOTAL
 };
 
 enum FIELD_PADDING//Since this field isnt used you can expand it for you needs
 {
-	PADDING_NONE,
-	PADDING_INVISIBILTY_UNIT_SPIRIT,
-	PADDING_INVISIBILTY_UNK_SPIRIT,
-	PADDING_INVISIBILTY_TRAP,
-	PADDING_INVISIBILTY_QUEST_INVISIBILITY,
-	PADDING_INVISIBILTY_GHOSTS,
-	PADDING_INVISIBILTY_TOTAL
+	PADDING_NONE
 };
 
 struct AuraCheckResponse
@@ -694,13 +688,15 @@ public:
 	inline bool IsStealth() { return (m_stealth!=0 ? true : false); }
 	float detectRange;
 
+	// Invisibility
+	bool m_invisible;
+	uint8 m_invisFlag;
+	int32 m_invisDetect[INVIS_FLAG_TOTAL];
+
 	bool HasAura(uint32 visualid);//not spell id!!!
 	bool HasActiveAura(uint32 spelllid);
 	bool HasActiveAura(uint32 spelllid,uint64);
 	
-	uint16 InvisibilityDetectBonus[INVISIBILTY_FLAG_TOTAL];
-	inline uint32 GetInvisibiltyDetection(INVISIBILTY_FLAG flag) { return getLevel() + InvisibilityDetectBonus[flag] - 1; }
-
 	void GiveGroupXP(Unit *pVictim, Player *PlayerInGroup);
 
 	/// Combat / Death Status
@@ -947,7 +943,6 @@ public:
 	int32 m_resistChance;
 	int32 m_powerRegenPCT;
 	int32 m_stunned;
-	bool m_invisible;
 	int32 m_extraattacks;   
 	int32 m_extrastriketargets;
 	//std::set<SpellEntry*> m_onStrikeSpells;
@@ -1070,7 +1065,6 @@ public:
 
 	//solo target auras
 	uint32 polySpell;
-	uint16 m_invisibityFlag;
 	uint32 m_special_state; //flags for special states (stunned,rooted etc)
 	
 //	uint32 fearSpell;

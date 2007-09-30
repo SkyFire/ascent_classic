@@ -1003,7 +1003,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		bInvincible = true;
 		SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
 	}
-	m_invisibityFlag = proto->invisibility_type;
+	m_invisFlag = proto->invisibility_type;
 	return true;
 }
 
@@ -1206,7 +1206,7 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 		bInvincible = true;
 		SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
 	}
-	m_invisibityFlag = proto->invisibility_type;
+	m_invisFlag = proto->invisibility_type;
 }
 
 void Creature::OnPushToWorld()

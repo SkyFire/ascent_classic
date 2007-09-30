@@ -193,7 +193,7 @@ public:
 	uint32 counter;
 	int32 charges;//used for type==22,to limit number of usages.
 	bool invisible;//invisible
-	INVISIBILTY_FLAG invisibilityFlag;
+	uint8 invisibilityFlag;
 	Unit* m_summoner;
 	GameObject *pcbannerAura;
 	int32 bannerslot;
@@ -229,5 +229,4 @@ protected:
 };
 
 #endif
-
 
