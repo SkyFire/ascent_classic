@@ -856,7 +856,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							{
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->School!=SCHOOL_SHADOW || !IsDamagingSpell(CastingSpell)) //we need damaging spells for this, so we suppose all shadow spells casted on target are dmging spells = Wrong
+								if(CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->buffType & SPELL_TYPE_DAMAGING)) //we need damaging spells for this, so we suppose all shadow spells casted on target are dmging spells = Wrong
 									continue;
 							}break;
 						//shaman - windfurry weapon
@@ -911,7 +911,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							{
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->School!=SCHOOL_SHADOW && !IsDamagingSpell(CastingSpell))
+								if(CastingSpell->School!=SCHOOL_SHADOW && !(CastingSpell->buffType & SPELL_TYPE_DAMAGING))
 									continue;
 							}break;
 						//warrior - improved berserker rage 
@@ -927,7 +927,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								//requires damageing spell
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(!IsDamagingSpell(CastingSpell))
+								if(!(CastingSpell->buffType & SPELL_TYPE_DAMAGING))
 									continue;
 							}break;
 						//priest - Reflective Shield 
@@ -973,7 +973,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								//trigger only on heal spell
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(!IsHealingSpell(CastingSpell))
+								if(!(CastingSpell->buffType & SPELL_TYPE_HEALING))
 									continue;
 							}break;
 /*						//paladin - illumination

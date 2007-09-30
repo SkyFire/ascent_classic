@@ -892,32 +892,34 @@ enum SpellTargetTypes
 // lets make this bitwise for more fun
 enum SpellTypes
 {
-    SPELL_TYPE_NONE                 = 0x000000,
-    SPELL_TYPE_SEAL                 = 0x000001,
-    SPELL_TYPE_ASPECT               = 0x000002,
-    SPELL_TYPE_BLESSING             = 0x000004,
-    SPELL_TYPE_CURSE                = 0x000008,
-    SPELL_TYPE_STING                = 0x000010,
-    SPELL_TYPE_ARMOR                = 0x000020,
-    SPELL_TYPE_AURA                 = 0x000040,
+    SPELL_TYPE_NONE                 = 0x00000000,
+    SPELL_TYPE_SEAL                 = 0x00000001,
+    SPELL_TYPE_ASPECT               = 0x00000002,
+    SPELL_TYPE_BLESSING             = 0x00000004,
+    SPELL_TYPE_CURSE                = 0x00000008,
+    SPELL_TYPE_STING                = 0x00000010,
+    SPELL_TYPE_ARMOR                = 0x00000020,
+    SPELL_TYPE_AURA                 = 0x00000040,
     //hmm these could be named simply incompatible spells. One active at a time
-    SPELL_TYPE_MARK_GIFT            = 0x000080,
-    SPELL_TYPE_TRACK                = 0x000100,
-    SPELL_TYPE_HUNTER_TRAP          = 0x000200,
-    SPELL_TYPE_MAGE_INTEL           = 0x000400,
-    SPELL_TYPE_MAGE_MAGI            = 0x000800,
-    SPELL_TYPE_MAGE_WARDS           = 0x001000,
-    SPELL_TYPE_PRIEST_SH_PPROT      = 0x002000,
-    SPELL_TYPE_SHIELD               = 0x004000,
-    SPELL_TYPE_FORTITUDE            = 0x008000,
-    SPELL_TYPE_SPIRIT               = 0x010000,
-    SPELL_TYPE_MAGE_AMPL_DUMP       = 0x020000,
-    SPELL_TYPE_WARLOCK_IMMOLATE     = 0x040000, //maybe there is a better way to trigger the aura state for immolate spell
-    SPELL_TYPE_FINISHING_MOVE       = 0x080000, 
-    SPELL_TYPE_ELIXIR_BATTLE		= 0x100000, 
-    SPELL_TYPE_ELIXIR_GUARDIAN      = 0x200000, 
+    SPELL_TYPE_MARK_GIFT            = 0x00000080,
+    SPELL_TYPE_TRACK                = 0x00000100,
+    SPELL_TYPE_HUNTER_TRAP          = 0x00000200,
+    SPELL_TYPE_MAGE_INTEL           = 0x00000400,
+    SPELL_TYPE_MAGE_MAGI            = 0x00000800,
+    SPELL_TYPE_MAGE_WARDS           = 0x00001000,
+    SPELL_TYPE_PRIEST_SH_PPROT      = 0x00002000,
+    SPELL_TYPE_SHIELD               = 0x00004000,
+    SPELL_TYPE_FORTITUDE            = 0x00008000,
+    SPELL_TYPE_SPIRIT               = 0x00010000,
+    SPELL_TYPE_MAGE_AMPL_DUMP       = 0x00020000,
+    SPELL_TYPE_WARLOCK_IMMOLATE     = 0x00040000, //maybe there is a better way to trigger the aura state for immolate spell
+    SPELL_TYPE_FINISHING_MOVE       = 0x00080000, 
+    SPELL_TYPE_ELIXIR_BATTLE		= 0x00100000, 
+    SPELL_TYPE_ELIXIR_GUARDIAN      = 0x00200000, 
     SPELL_TYPE_ELIXIR_FLASK         = SPELL_TYPE_ELIXIR_BATTLE | SPELL_TYPE_ELIXIR_GUARDIAN, //weee, this contains both battle and guardian elixirs ;)
-    SPELL_TYPE_HUNTER_MARK			= 0x400000,
+    SPELL_TYPE_HUNTER_MARK			= 0x00400000,
+    SPELL_TYPE_DAMAGING				= 0x00800000,
+    SPELL_TYPE_HEALING				= 0x01000000,
 };
 
 inline bool CanAgroHash(uint32 spellhashname)
