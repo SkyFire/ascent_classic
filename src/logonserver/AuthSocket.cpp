@@ -18,6 +18,7 @@
  */
 
 #include "LogonStdAfx.h"
+#include <openssl/md5.h>
 
 enum _errors
 {
@@ -54,9 +55,6 @@ AuthSocket::~AuthSocket()
 
 void AuthSocket::OnDisconnect()
 {
-	if(m_authenticated && m_account)
-		sInfoCore.DeleteSessionKey(m_account->AccountId);
-
 	if(!removedFromSet)
 	{
 		_authSocketLock.Acquire();
@@ -259,7 +257,7 @@ void AuthSocket::HandleProof()
 	t3.SetBinary(hash, 20);
 
 	sha.Initialize();
-	sha.UpdateData(m_account->Username);
+	sha.UpdateData((const uint8*)m_account->UsernamePtr->c_str(), (int)m_account->UsernamePtr->size());
 	sha.Finalize();
 
 	BigNumber t4;
@@ -283,8 +281,7 @@ void AuthSocket::HandleProof()
 	}
 
 	// Store sessionkey
-	BigNumber * bs = new BigNumber(m_sessionkey);
-	sInfoCore.SetSessionKey(m_account->AccountId, bs);
+	m_account->SetSessionKey(m_sessionkey.AsByteArray());
 
 	// let the client know
 	sha.Initialize();
@@ -352,6 +349,16 @@ void AuthSocket::OnRead()
 		HandleProof();
 		break;
 
+	case 2:	// AUTH_RECHALLENGE
+		last_recv = time(NULL);
+		HandleReconnectChallenge();
+		break;
+
+	case 3:	// AUTH_RECHALLENGE_PROOF
+		last_recv = time(NULL);
+		HandleReconnectProof();
+		break;			
+
 	case 0x10:  // REALM_LIST
 		last_recv = time(NULL);
 		HandleRealmlist();
@@ -364,3 +371,133 @@ void AuthSocket::HandleRealmlist()
 	sInfoCore.SendRealms(this);
 }
 
+void AuthSocket::HandleReconnectChallenge()
+{
+	// No header
+	if(GetReadBufferSize() < 4)
+		return;	
+
+	// Check the rest of the packet is complete.
+	uint8 * ReceiveBuffer = GetReadBuffer(0);
+	uint16 full_size = *(uint16*)&ReceiveBuffer[2];
+	sLog.outDetail("[AuthChallenge] got header, body is 0x%02X bytes", full_size);
+
+	if(GetReadBufferSize() < (uint32)full_size+4)
+		return;
+
+	// Copy the data into our cached challenge structure
+	if(full_size > sizeof(sAuthLogonChallenge_C))
+	{
+		Disconnect();
+		return;
+	}
+
+	sLog.outDebug("[AuthChallenge] got full packet.");
+
+	memcpy(&m_challenge, ReceiveBuffer, full_size + 4);
+	RemoveReadBufferBytes(full_size + 4, false);
+
+	// Check client build.
+	if(m_challenge.build > LogonServer::getSingleton().max_build ||
+		m_challenge.build < LogonServer::getSingleton().min_build)
+	{
+		SendChallengeError(CE_WRONG_BUILD_NUMBER);
+		return;
+	}
+
+	// Check for a possible IP ban on this client.
+	BAN_STATUS ipb = IPBanner::getSingleton().CalculateBanStatus(GetRemoteAddress());
+
+	switch(ipb)
+	{
+	case BAN_STATUS_PERMANENT_BAN:
+		SendChallengeError(CE_ACCOUNT_CLOSED);
+		return;
+
+	case BAN_STATUS_TIME_LEFT_ON_BAN:
+		SendChallengeError(CE_ACCOUNT_FREEZED);
+		return;
+	}
+
+	// Null-terminate the account string
+	m_challenge.I[m_challenge.I_len] = 0;
+
+	// Look up the account information
+	string AccountName = (char*)&m_challenge.I;
+	sLog.outDebug("[AuthChallenge] Account Name: \"%s\"", AccountName.c_str());
+
+	m_account = AccountMgr::getSingleton().GetAccount(AccountName);
+	if(m_account == 0)
+	{
+		sLog.outDebug("[AuthChallenge] Invalid account.");
+
+		// Non-existant account
+		SendChallengeError(CE_NO_ACCOUNT);
+		return;
+	}
+
+	sLog.outDebug("[AuthChallenge] Account banned state = %u", m_account->Banned);
+
+	// Check that the account isn't banned.
+	if(m_account->Banned == 1)
+	{
+		SendChallengeError(CE_ACCOUNT_CLOSED);
+		return;
+	}
+	else if(m_account->Banned > 0)
+	{
+		SendChallengeError(CE_ACCOUNT_FREEZED);
+		return;
+	}
+
+	if(!m_account->SessionKey)
+	{
+		SendChallengeError(CE_SERVER_FULL);
+		return;
+	}
+
+	/** burlex: this is pure speculation, I really have no idea what this does :p
+	 * just guessed the md5 because it was 16 byte blocks.
+	 */
+
+	MD5_CTX ctx;
+	MD5_Init(&ctx);
+	MD5_Update(&ctx, m_account->SessionKey, 40);
+	uint8 buffer[20];
+	MD5_Final(buffer, &ctx);
+	ByteBuffer buf;
+	buf << uint16(2);
+	buf.append(buffer, 20);
+	buf << uint64(0);
+	buf << uint64(0);
+	Send(buf.contents(), 34);
+}
+
+void AuthSocket::HandleReconnectProof()
+{
+	/*
+	printf("Len: %u\n", this->GetReadBufferSize());
+	ByteBuffer buf(58);
+	buf.resize(58);
+	Read(58, const_cast<uint8*>(buf.contents()));
+	buf.hexlike();*/
+
+	// Don't update when IP banned, but update anyway if it's an account ban
+	sLogonSQL->Execute("UPDATE accounts SET lastlogin=NOW(), lastip='%s' WHERE acct=%u;", GetRemoteIP().c_str(), m_account->AccountId);
+	RemoveReadBufferBytes(GetReadBufferSize(), true);
+
+	if(!m_account->SessionKey)
+	{
+		uint8 buffer[4];
+		buffer[0] = 3;
+		buffer[1] = 0;
+		buffer[2] = 1;
+		buffer[3] = 0;
+		Send(buffer, 4);
+	}
+	else
+	{
+		uint32 x = 3;
+		Send((const uint8*)&x, 4);
+	}
+}

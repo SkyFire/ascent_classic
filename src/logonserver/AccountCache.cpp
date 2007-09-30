@@ -67,11 +67,11 @@ void AccountMgr::ReloadAccounts(bool silent)
 
 	// check for any purged/deleted accounts
 #ifdef WIN32
-	HM_NAMESPACE::hash_map<string, Account>::iterator itr = AccountDatabase.begin();
-	HM_NAMESPACE::hash_map<string, Account>::iterator it2;
+	HM_NAMESPACE::hash_map<string, Account*>::iterator itr = AccountDatabase.begin();
+	HM_NAMESPACE::hash_map<string, Account*>::iterator it2;
 #else
-	std::map<string, Account>::iterator itr = AccountDatabase.begin();
-	std::map<string, Account>::iterator it2;
+	std::map<string, Account*>::iterator itr = AccountDatabase.begin();
+	std::map<string, Account*>::iterator it2;
 #endif
 
 	for(; itr != AccountDatabase.end();)
@@ -80,7 +80,14 @@ void AccountMgr::ReloadAccounts(bool silent)
 		++itr;
 
 		if(account_list.find(it2->first) == account_list.end())
+		{
+			delete it2->second;
 			AccountDatabase.erase(it2);
+		}
+		else
+		{
+			it2->second->UsernamePtr = (std::string*)&it2->first;
+		}
 	}
 
 	if(!silent) sLog.outString("[AccountMgr] Found %u accounts.", AccountDatabase.size());
@@ -91,51 +98,57 @@ void AccountMgr::ReloadAccounts(bool silent)
 
 void AccountMgr::AddAccount(Field* field)
 {
-	Account acct;
+	Account * acct = new Account;
 	Sha1Hash hash;
-	acct.AccountId	  = field[0].GetUInt32();
-	acct.Username	   = field[1].GetString();
-	acct.Password	   = field[2].GetString();
-	acct.GMFlags		= field[3].GetString();
-	acct.AccountFlags   = field[4].GetUInt32();
-	acct.Banned			= field[5].GetUInt32();
+	string Username     = field[1].GetString();
+	string Password	    = field[2].GetString();
+	string GMFlags		= field[3].GetString();
+
+	acct->AccountId				= field[0].GetUInt32();
+	acct->AccountFlags			= field[4].GetUInt8();
+	acct->Banned				= field[5].GetUInt32();
+	acct->SetGMFlags(GMFlags.c_str());
 
 	// Convert username/password to uppercase. this is needed ;)
-	transform(acct.Username.begin(), acct.Username.end(), acct.Username.begin(), towupper);
-	transform(acct.Password.begin(), acct.Password.end(), acct.Password.begin(), towupper);
-
+	transform(Username.begin(), Username.end(), Username.begin(), towupper);
+	transform(Password.begin(), Password.end(), Password.begin(), towupper);
+	
 	// Prehash the I value.
-	hash.UpdateData((acct.Username + ":" + acct.Password));
+	hash.UpdateData((Username + ":" + Password));
 	hash.Finalize();
-	memcpy(acct.SrpHash, hash.GetDigest(), 20);
+	memcpy(acct->SrpHash, hash.GetDigest(), 20);
 
-	AccountDatabase[acct.Username] = acct;
+	AccountDatabase[Username] = acct;
 }
 
 void AccountMgr::UpdateAccount(Account * acct, Field * field)
 {
 	uint32 id = field[0].GetUInt32();
+	Sha1Hash hash;
+	string Username     = field[1].GetString();
+	string Password	    = field[2].GetString();
+	string GMFlags		= field[3].GetString();
+
 	if(id != acct->AccountId)
 	{
 		//printf("Account %u `%s` is a duplicate.\n", id, acct->Username.c_str());
-		sLog.outColor(TYELLOW, " >> deleting duplicate account %u [%s]...", id, acct->Username.c_str());
+		sLog.outColor(TYELLOW, " >> deleting duplicate account %u [%s]...", id, Username.c_str());
 		sLog.outColor(TNORMAL, "\n");
 		sLogonSQL->Execute("DELETE FROM accounts WHERE acct=%u", id);
 		return;
 	}
-	acct->AccountId	  = field[0].GetUInt32();
-	acct->Username	   = field[1].GetString();
-	acct->Password	   = field[2].GetString();
-	acct->GMFlags		= field[3].GetString();
-	acct->AccountFlags   = field[4].GetUInt32();
-	acct->Banned		 = field[5].GetUInt32();
+
+	acct->AccountId				= field[0].GetUInt32();
+	acct->AccountFlags			= field[4].GetUInt8();
+	acct->Banned				= field[5].GetUInt32();
+	acct->SetGMFlags(GMFlags.c_str());
 
 	// Convert username/password to uppercase. this is needed ;)
-	transform(acct->Username.begin(), acct->Username.end(), acct->Username.begin(), towupper);
-	transform(acct->Password.begin(), acct->Password.end(), acct->Password.begin(), towupper);
+	transform(Username.begin(), Username.end(), Username.begin(), towupper);
+	transform(Password.begin(), Password.end(), Password.begin(), towupper);
 
-	Sha1Hash hash;
-	hash.UpdateData((acct->Username + ":" + acct->Password));
+	// Prehash the I value.
+	hash.UpdateData((Username + ":" + Password));
 	hash.Finalize();
 	memcpy(acct->SrpHash, hash.GetDigest(), 20);
 }
@@ -377,39 +390,6 @@ void InformationCore::SendRealms(AuthSocket * Socket)
 
 	// Send to the socket.
 	Socket->Send((const uint8*)data.contents(), uint32(data.size()));
-}
-
-BigNumber * InformationCore::GetSessionKey(uint32 account_id)
-{
-	m_sessionKeyLock.Acquire();
-	BigNumber * bn = 0;
-	map<uint32, BigNumber*>::iterator itr = m_sessionkeys.find(account_id);
-	if(itr != m_sessionkeys.end())
-	{
-		bn = itr->second;
-	}
-
-	m_sessionKeyLock.Release();
-	return bn;
-}
-
-void InformationCore::DeleteSessionKey(uint32 account_id)
-{
-	m_sessionKeyLock.Acquire();
-	map<uint32, BigNumber*>::iterator itr = m_sessionkeys.find(account_id);
-	if(itr != m_sessionkeys.end())
-	{
-		delete itr->second;
-		m_sessionkeys.erase(itr);
-	}
-	m_sessionKeyLock.Release();
-}
-
-void InformationCore::SetSessionKey(uint32 account_id, BigNumber * key)
-{
-	m_sessionKeyLock.Acquire();
-	m_sessionkeys[account_id] = key;
-	m_sessionKeyLock.Release();
 }
 
 void InformationCore::TimeoutSockets()

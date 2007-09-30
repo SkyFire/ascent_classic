@@ -28,7 +28,7 @@ typedef struct
 LogonCommServerSocket::LogonCommServerSocket(SOCKET fd) : Socket(fd, 65536, 524288)
 {
 	// do nothing
-	last_ping = time(NULL);
+	last_ping = (uint32)time(NULL);
 	remaining = opcode = 0;
 	sInfoCore.AddServerSocket(this);
 	removed = false;
@@ -130,6 +130,7 @@ void LogonCommServerSocket::HandlePacket(WorldPacket & recvData)
 		NULL,												// RSMSG_REQUEST_ACCOUNT_CHARACTER_MAPPING
 		&LogonCommServerSocket::HandleMappingReply,			// RCMSG_ACCOUNT_CHARACTER_MAPPING_REPLY
 		&LogonCommServerSocket::HandleUpdateMapping,		// RCMSG_UPDATE_CHARACTER_MAPPING_COUNT
+		NULL,
 	};
 
 	if(recvData.GetOpcode() >= RMSG_COUNT || Handlers[recvData.GetOpcode()] == 0)
@@ -178,9 +179,7 @@ void LogonCommServerSocket::HandleSessionRequest(WorldPacket & recvData)
 	// get sessionkey!
 	uint32 error = 0;
 	Account * acct = sAccountMgr.GetAccount(account_name);
-	BigNumber * sessionkey = acct ? sInfoCore.GetSessionKey(acct->AccountId) : 0;
-	
-	if(sessionkey == 0 || acct == 0)
+	if(acct->SessionKey == NULL || acct == 0)
 		error = 1;		  // Unauthorized user.
 
 	// build response packet
@@ -191,10 +190,14 @@ void LogonCommServerSocket::HandleSessionRequest(WorldPacket & recvData)
 	{
 		// Append account information.
 		data << acct->AccountId;
-		data << acct->Username;
-		data << acct->GMFlags;
+		data << acct->UsernamePtr->c_str();
+		if(!acct->GMFlags)
+			data << uint8(0);
+		else
+			data << acct->GMFlags;
+
 		data << acct->AccountFlags;
-		data.append(sessionkey->AsByteArray(), 40);
+		data.append(acct->SessionKey, 40);
 	}
 	
 	SendPacket(&data);
@@ -204,7 +207,7 @@ void LogonCommServerSocket::HandlePing(WorldPacket & recvData)
 {
 	WorldPacket data(RSMSG_PONG, 4);
 	SendPacket(&data);
-	last_ping = time(NULL);
+	last_ping = (uint32)time(NULL);
 }
 
 void LogonCommServerSocket::SendPacket(WorldPacket * data)
@@ -215,7 +218,7 @@ void LogonCommServerSocket::SendPacket(WorldPacket * data)
 	logonpacket header;
 #ifndef USING_BIG_ENDIAN
 	header.opcode = data->GetOpcode();
-	header.size   = ntohl(data->size());
+	header.size   = ntohl((u_long)data->size());
 #else
 	header.opcode = swap16(uint16(data->GetOpcode()));
 	header.size   = data->size();
@@ -229,9 +232,9 @@ void LogonCommServerSocket::SendPacket(WorldPacket * data)
 	if(data->size() > 0 && rv)
 	{
 		if(use_crypto)
-			sendCrypto.Process((unsigned char*)data->contents(), (unsigned char*)data->contents(), data->size());
+			sendCrypto.Process((unsigned char*)data->contents(), (unsigned char*)data->contents(), (uint32)data->size());
 
-		rv=BurstSend(data->contents(), data->size());
+		rv=BurstSend(data->contents(), (uint32)data->size());
 	}
 
 	if(rv) BurstPush();
@@ -292,7 +295,7 @@ void LogonCommServerSocket::HandleMappingReply(WorldPacket & recvData)
 	ByteBuffer buf(real_size);
 	buf.resize(real_size);
 
-	if(uncompress((uint8*)buf.contents(), &rsize, recvData.contents() + 4, recvData.size() - 4) != Z_OK)
+	if(uncompress((uint8*)buf.contents(), &rsize, recvData.contents() + 4, (u_long)recvData.size() - 4) != Z_OK)
 	{
 		printf("Uncompress of mapping failed.\n");
 		return;

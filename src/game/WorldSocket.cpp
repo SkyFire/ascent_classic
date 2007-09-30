@@ -237,7 +237,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	string AccountName;
 	uint32 AccountID;
 	string GMFlags;
-	uint32 AccountFlags;
+	uint8 AccountFlags;
 	
 	recvData >> AccountID >> AccountName >> GMFlags >> AccountFlags;
 	sLog.outDebug( " >> got information packet from logon: `%s` ID %u (request %u)", AccountName.c_str(), AccountID, mRequestID);

@@ -23,16 +23,56 @@
 #include "../shared/Common.h"
 #include "../shared/Database/DatabaseEnv.h"
 
-typedef struct
+struct Account
 {
 	uint32 AccountId;
-	string Username;
-	string Password;
-	string GMFlags;
-	uint32 AccountFlags;
+	char * GMFlags;
+	uint8 AccountFlags;
 	uint32 Banned;
 	uint8 SrpHash[20];
-} Account;
+	uint8 * SessionKey;
+	string * UsernamePtr;
+
+	Account()
+	{
+		GMFlags = NULL;
+		SessionKey = NULL;
+	}
+
+	~Account()
+	{
+		if(GMFlags)
+			delete [] GMFlags;
+		if(SessionKey)
+			delete [] SessionKey;
+	}
+
+	void SetGMFlags(const char * flags)
+	{
+		if(GMFlags)
+			delete [] GMFlags;
+
+		size_t len = strlen(flags);
+		if(len == 0 || (len == 1 && flags[0] == '0'))
+		{
+			// no flags
+			GMFlags = NULL;
+			return;
+		}
+		
+		GMFlags = new char[len+1];
+		memcpy(GMFlags, flags, len);
+		GMFlags[len] = 0;
+	}
+
+	void SetSessionKey(const uint8 *key)
+	{
+		if(SessionKey == NULL)
+			SessionKey = new uint8[40];
+		memcpy(SessionKey, key, 40);
+	}
+
+};
 
 typedef struct 
 {
@@ -68,6 +108,19 @@ protected:
 class AccountMgr : public Singleton < AccountMgr >
 {
 public:
+	~AccountMgr()
+	{
+
+#ifdef WIN32
+		for(HM_NAMESPACE::hash_map<string,Account*>::iterator itr = AccountDatabase.begin(); itr != AccountDatabase.end(); ++itr)
+#else
+		for(map<string,Account*>::iterator itr = AccountDatabase.begin(); itr != AccountDatabase.end(); ++itr)
+#endif
+		{
+			delete itr->second;
+		}
+	}
+
 	void AddAccount(Field* field);
 
 	inline Account* GetAccount(string Name)
@@ -76,13 +129,13 @@ public:
 		Account * pAccount = NULL;
 		// this should already be uppercase!
 #ifdef WIN32
-		HM_NAMESPACE::hash_map<string, Account>::iterator itr = AccountDatabase.find(Name);
+		HM_NAMESPACE::hash_map<string, Account*>::iterator itr = AccountDatabase.find(Name);
 #else
-		map<string, Account>::iterator itr = AccountDatabase.find(Name);
+		map<string, Account*>::iterator itr = AccountDatabase.find(Name);
 #endif
 
 		if(itr == AccountDatabase.end())	pAccount = NULL;
-		else								pAccount = &(itr->second);
+		else								pAccount = itr->second;
 
 		setBusy.Release();
 		return pAccount;
@@ -100,19 +153,19 @@ private:
 	{
 		// this should already be uppercase!
 #ifdef WIN32
-		HM_NAMESPACE::hash_map<string, Account>::iterator itr = AccountDatabase.find(Name);
+		HM_NAMESPACE::hash_map<string, Account*>::iterator itr = AccountDatabase.find(Name);
 #else
-		map<string, Account>::iterator itr = AccountDatabase.find(Name);
+		map<string, Account*>::iterator itr = AccountDatabase.find(Name);
 #endif
 
 		if(itr == AccountDatabase.end())	return NULL;
-		else								return &(itr->second);
+		else								return itr->second;
 	}
 
 #ifdef WIN32
-	HM_NAMESPACE::hash_map<string, Account> AccountDatabase;
+	HM_NAMESPACE::hash_map<string, Account*> AccountDatabase;
 #else
-	std::map<string, Account> AccountDatabase;
+	std::map<string, Account*> AccountDatabase;
 #endif
 
 protected:
@@ -135,8 +188,6 @@ class LogonCommServerSocket;
 
 class InformationCore : public Singleton<InformationCore>
 {
-	Mutex m_sessionKeyLock;
-	map<uint32, BigNumber*>	 m_sessionkeys;
 	map<uint32, Realm*>		  m_realms;
 	set<LogonCommServerSocket*> m_serverSockets;
 	Mutex serverSocketLock;
@@ -158,11 +209,6 @@ public:
 	// Packets
 	void		  SendRealms(AuthSocket * Socket);
 	
-	// Sessionkey Management
-	BigNumber*	GetSessionKey(uint32 account_id);
-	void		  DeleteSessionKey(uint32 account_id);
-	void		  SetSessionKey(uint32 account_id, BigNumber * key);
-
 	// Realm management
 	inline uint32 GenerateRealmID()
 	{

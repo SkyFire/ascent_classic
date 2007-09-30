@@ -108,6 +108,7 @@ void LogonCommClientSocket::HandlePacket(WorldPacket & recvData)
 		&LogonCommClientSocket::HandleRequestAccountMapping,// RSMSG_REQUEST_ACCOUNT_CHARACTER_MAPPING
 		NULL,												// RCMSG_ACCOUNT_CHARACTER_MAPPING_REPLY
 		NULL,												// RCMSG_UPDATE_CHARACTER_MAPPING_COUNT
+		&LogonCommClientSocket::HandleDisconnectAccount,
 	};
 
 	if(recvData.GetOpcode() >= RMSG_COUNT || Handlers[recvData.GetOpcode()] == 0)
@@ -390,6 +391,17 @@ void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 	data.resize(stream.total_out + 4);
 	SendPacket(&data);
 }
+
+void LogonCommClientSocket::HandleDisconnectAccount(WorldPacket & recvData)
+{
+	uint32 id;
+	recvData >> id;
+
+	WorldSession * sess = sWorld.FindSession(id);
+	if(sess != NULL)
+		sess->Disconnect();
+}
+
 #else
 void LogonCommHandler::LogonDatabaseReloadAccounts()
 {

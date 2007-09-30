@@ -45,6 +45,8 @@ public:
 	void HandleChallenge();
 	void HandleProof();
 	void HandleRealmlist();
+	void HandleReconnectChallenge();
+	void HandleReconnectProof();
 
 	///////////////////////////////////////////////////
 	// Server Packet Builders

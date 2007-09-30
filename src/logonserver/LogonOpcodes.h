@@ -48,9 +48,10 @@ enum RealmListOpcodes
 
 	// Update Character->Account Mapping
 	RCMSG_UPDATE_CHARACTER_MAPPING_COUNT		= 13,
+	RSMSG_DISCONNECT_ACCOUNT					= 14,
 
 	// count
-	RMSG_COUNT									= 14,
+	RMSG_COUNT									= 15,
 };
 
 #endif
