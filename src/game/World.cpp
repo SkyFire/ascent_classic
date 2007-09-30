@@ -428,6 +428,7 @@ bool World::SetInitialWorldSettings()
 	MAKE_TASK(ObjectMgr, LoadMonsterSay);
 	MAKE_TASK(WeatherMgr, LoadFromDB);
 	MAKE_TASK(ObjectMgr,LoadGroups);
+	MAKE_TASK(ObjectMgr, LoadCreatureFamilyNames);
 
 	MAKE_TASK(ObjectMgr, LoadExtraCreatureProtoStuff);
 	MAKE_TASK(ObjectMgr, LoadExtraItemStuff);
@@ -462,6 +463,7 @@ bool World::SetInitialWorldSettings()
 	tl.kill();
 	tl.waitForThreadsToExit();
 	sLog.outString("");
+	LoadNameGenData();
 
 	new InstanceSavingManagement;
 	sInstanceSavingManager.LoadSavedInstances();
@@ -1961,6 +1963,7 @@ bool World::SetInitialWorldSettings()
 
 	dw = new DayWatcherThread();
 	launch_thread(dw);
+	return true;
 }
 
 
@@ -2089,19 +2092,11 @@ void World::UpdateSessions(uint32 diff)
 
 std::string World::GenerateName(uint32 type)
 {
-/*	uint32 maxval = NameGenStore::getSingleton().GetNumRows();
-	uint32 entry = rand()%(maxval+1); // we don't want 1..
-	NameGenEntry* ne = NameGenStore::getSingleton().LookupEntry(entry);
-	if(!ne)
-	{
-		sLog.outError("ERROR: Couldn't find NameGenStore Entry!");
+	if(_namegendata[type].size() == 0)
 		return "ERR";
-	}
-	const char *name = NameGenStore::getSingleton().LookupString((const uint32)ne->offsetindex);
-	if(name)
-		return name;
-	else*/
-		return "ERR";
+
+	uint32 ent = sRand.randInt(_namegendata[type].size());
+	return _namegendata[type].at(ent).name;
 }
 
 void World::DeleteSession(WorldSession *session)
@@ -2622,4 +2617,17 @@ void World::Rehash(bool load)
 	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", false);
 	SpeedhackProtection = antihack_speed;
 	Channel::LoadConfSettings();
+}
+
+void World::LoadNameGenData()
+{
+	DBCFile dbc;
+	dbc.open("DBC/NameGen.dbc");
+	for(uint32 i = 0; i < dbc.getRecordCount(); ++i)
+	{
+		NameGenData d;
+		d.name = string(dbc.getRecord(i).getString(1));
+		d.type = dbc.getRecord(i).getUInt(3);
+		_namegendata[d.type].push_back(d);
+	}
 }

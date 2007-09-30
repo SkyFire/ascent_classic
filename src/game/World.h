@@ -431,6 +431,13 @@ public:
 
 	inline uint32 GetTimeOut(){return TimeOut;}
 
+	struct NameGenData
+	{
+		string name;
+		uint32 type;
+	};
+	vector<NameGenData> _namegendata[3];
+	void LoadNameGenData();
 	std::string GenerateName(uint32 type = 0);
 
 	void SetUpdateDistance(float dist) { m_UpdateDistance = (float)pow(dist, 2); }

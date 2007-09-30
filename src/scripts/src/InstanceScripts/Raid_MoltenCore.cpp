@@ -19,8 +19,8 @@ public:
     {
 		m_meltarmor = m_inciteflame = true;
 
-        infomeltarmor = sSpellStore.LookupEntry(MELT_ARMOR);
-		infoinciteflame = sSpellStore.LookupEntry(INCITE_FLAME);
+        infomeltarmor = dbcSpell.LookupEntry(MELT_ARMOR);
+		infoinciteflame = dbcSpell.LookupEntry(INCITE_FLAME);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -100,9 +100,9 @@ public:
     {
 		m_flamethrower = m_fireshield = m_flames =true;
 
-        infoflamethrower = sSpellStore.LookupEntry(FLAMETHROWER);
-		infofireshield = sSpellStore.LookupEntry(FIRE_SHIELD);
-		infoflames = sSpellStore.LookupEntry(FLAMES);
+        infoflamethrower = dbcSpell.LookupEntry(FLAMETHROWER);
+		infofireshield = dbcSpell.LookupEntry(FIRE_SHIELD);
+		infoflames = dbcSpell.LookupEntry(FLAMES);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -186,8 +186,8 @@ public:
     {
 		m_strike = m_pyroclast = true;
 
-        infostrike = sSpellStore.LookupEntry(STRIKE);
-		infopyroclast = sSpellStore.LookupEntry(PYROCLAST_BARRAGE);
+        infostrike = dbcSpell.LookupEntry(STRIKE);
+		infopyroclast = dbcSpell.LookupEntry(PYROCLAST_BARRAGE);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -264,7 +264,7 @@ public:
     {
 		m_cleave =true;
 
-        infocleave = sSpellStore.LookupEntry(CLEAVE);
+        infocleave = dbcSpell.LookupEntry(CLEAVE);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -329,7 +329,7 @@ public:
     {
 		m_firenova =true;
 
-        infofirenova = sSpellStore.LookupEntry(FIRENOVA);
+        infofirenova = dbcSpell.LookupEntry(FIRENOVA);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -394,7 +394,7 @@ public:
     {
 		m_surge =true;
 
-        infosurge = sSpellStore.LookupEntry(SURGE);
+        infosurge = dbcSpell.LookupEntry(SURGE);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -460,8 +460,8 @@ public:
     {
 		m_lavaspawn = m_soulburn = true;
 
-        infolavaspawn = sSpellStore.LookupEntry(SUMMON_LAVA_SPAWN);
-		infosoulburn = sSpellStore.LookupEntry(SOUL_BURN);
+        infolavaspawn = dbcSpell.LookupEntry(SUMMON_LAVA_SPAWN);
+		infosoulburn = dbcSpell.LookupEntry(SOUL_BURN);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -538,7 +538,7 @@ public:
     {
 		m_knockdown = true;
 
-        infoknockdown = sSpellStore.LookupEntry(KNOCKDOWN);
+        infoknockdown = dbcSpell.LookupEntry(KNOCKDOWN);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -604,8 +604,8 @@ public:
     {
 		m_stomp = m_knockback = true;
 
-        infostomp = sSpellStore.LookupEntry(STOMP);
-		infoknockback = sSpellStore.LookupEntry(KNOCKBACK);
+        infostomp = dbcSpell.LookupEntry(STOMP);
+		infoknockback = dbcSpell.LookupEntry(KNOCKBACK);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -685,9 +685,9 @@ public:
     {
 		m_impedingdoom = m_lucifroncurse = m_shadowshock = true;
 
-        infoimpedingdoom = sSpellStore.LookupEntry(IMPEDING_DOOM);
-		infolucifroncurse = sSpellStore.LookupEntry(LUCIFRON_CURSE);
-		infoshadowshock =  sSpellStore.LookupEntry(SHADOW_SHOCK);
+        infoimpedingdoom = dbcSpell.LookupEntry(IMPEDING_DOOM);
+		infolucifroncurse = dbcSpell.LookupEntry(LUCIFRON_CURSE);
+		infoshadowshock =  dbcSpell.LookupEntry(SHADOW_SHOCK);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -777,9 +777,9 @@ public:
     {
 		m_magmaspit = m_lavabreath = m_panic = true;
 
-        infomagmaspit = sSpellStore.LookupEntry(MAGMASPIT);
-		infolavabreath = sSpellStore.LookupEntry(LAVABREATH);
-		infopanic =  sSpellStore.LookupEntry(PANIC);
+        infomagmaspit = dbcSpell.LookupEntry(MAGMASPIT);
+		infolavabreath = dbcSpell.LookupEntry(LAVABREATH);
+		infopanic =  dbcSpell.LookupEntry(PANIC);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -870,9 +870,9 @@ public:
     {
 		m_shadowbolt = m_gehennascurse = m_rainoffire = true;
 
-        infoshadowbolt = sSpellStore.LookupEntry(SHADOW_BOLT);
-		infogehennascurse = sSpellStore.LookupEntry(GEHENNAS_CURSE);
-		inforainoffire =  sSpellStore.LookupEntry(RAIN_OF_FIRE);
+        infoshadowbolt = dbcSpell.LookupEntry(SHADOW_BOLT);
+		infogehennascurse = dbcSpell.LookupEntry(GEHENNAS_CURSE);
+		inforainoffire =  dbcSpell.LookupEntry(RAIN_OF_FIRE);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -964,9 +964,9 @@ public:
     {
 		m_sunderarmor = m_fistofragnaros = m_strike = true;
 
-        infosunderarmor = sSpellStore.LookupEntry(SUNDERARMOR);
-		infofistofragnaros = sSpellStore.LookupEntry(FISTOFRAGNAROS);
-		infostrike =  sSpellStore.LookupEntry(FSTRIKE);
+        infosunderarmor = dbcSpell.LookupEntry(SUNDERARMOR);
+		infofistofragnaros = dbcSpell.LookupEntry(FISTOFRAGNAROS);
+		infostrike =  dbcSpell.LookupEntry(FSTRIKE);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1057,8 +1057,8 @@ public:
     {
 		m_antimagic = m_magmashackes = true;
 
-        infoantimagic = sSpellStore.LookupEntry(ANTIMAGIC_PULSE);
-		infomagmashackes = sSpellStore.LookupEntry(MAGMA_SHACKES);
+        infoantimagic = dbcSpell.LookupEntry(ANTIMAGIC_PULSE);
+		infomagmashackes = dbcSpell.LookupEntry(MAGMA_SHACKES);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1137,8 +1137,8 @@ public:
     {
 		m_immolate = m_eruption = true;
 
-        infoimmolate = sSpellStore.LookupEntry(IMMOLATE);
-		infoeruption = sSpellStore.LookupEntry(ERUPTION);
+        infoimmolate = dbcSpell.LookupEntry(IMMOLATE);
+		infoeruption = dbcSpell.LookupEntry(ERUPTION);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1218,9 +1218,9 @@ public:
     {
 		m_inferno = m_ignitemana = m_livingbomb = true;
 
-        infoinferno = sSpellStore.LookupEntry(INFERNO);
-		infoignitemana = sSpellStore.LookupEntry(IGNITE_MANA);
-		infolivingbomb = sSpellStore.LookupEntry(LIVING_BOMB);
+        infoinferno = dbcSpell.LookupEntry(INFERNO);
+		infoignitemana = dbcSpell.LookupEntry(IGNITE_MANA);
+		infolivingbomb = dbcSpell.LookupEntry(LIVING_BOMB);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1312,11 +1312,11 @@ public:
     {
 		m_arcaneexplosion = m_shazzrahcurse = m_deadenmagic = m_counterspell = m_blink = true;
 
-        info_arcaneexplosion = sSpellStore.LookupEntry(ARCANE_EXPLOSION);
-		info_shazzrahcurse = sSpellStore.LookupEntry(SHAZZRAH_CURSE);
-		info_deadenmagic = sSpellStore.LookupEntry(DEADEN_MAGIC);
-		info_counterspell = sSpellStore.LookupEntry(COUNTERSPELL);
-		info_blink = sSpellStore.LookupEntry(BLINK);
+        info_arcaneexplosion = dbcSpell.LookupEntry(ARCANE_EXPLOSION);
+		info_shazzrahcurse = dbcSpell.LookupEntry(SHAZZRAH_CURSE);
+		info_deadenmagic = dbcSpell.LookupEntry(DEADEN_MAGIC);
+		info_counterspell = dbcSpell.LookupEntry(COUNTERSPELL);
+		info_blink = dbcSpell.LookupEntry(BLINK);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1433,8 +1433,8 @@ public:
     {
 		m_golemaggtrust = m_magmasplash = true;
 
-        info_golemaggtrust = sSpellStore.LookupEntry(GOLEMAGG_TRUST);
-		info_magmasplash = sSpellStore.LookupEntry(MAGMA_SPLASH);
+        info_golemaggtrust = dbcSpell.LookupEntry(GOLEMAGG_TRUST);
+		info_magmasplash = dbcSpell.LookupEntry(MAGMA_SPLASH);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1501,7 +1501,7 @@ public:
     {
 		m_mangle = true;
 
-        info_mangle = sSpellStore.LookupEntry(MANGLE);
+        info_mangle = dbcSpell.LookupEntry(MANGLE);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1569,9 +1569,9 @@ public:
     {
 		m_demoralizingshout = m_inspire = m_flamespear = true;
 
-        info_demoralizingshout = sSpellStore.LookupEntry(DEMORALIZING_SHOUT);
-		info_inspire = sSpellStore.LookupEntry(INSPIRE);
-		info_flamespear = sSpellStore.LookupEntry(FLAME_SPEAR);
+        info_demoralizingshout = dbcSpell.LookupEntry(DEMORALIZING_SHOUT);
+		info_inspire = dbcSpell.LookupEntry(INSPIRE);
+		info_flamespear = dbcSpell.LookupEntry(FLAME_SPEAR);
     }
     
     void OnCombatStart(Unit* mTarget)
@@ -1687,11 +1687,11 @@ public:
     {
 		m_elementalfire = m_wrath = m_hammer = m_meltweapon = m_summonsons = true;
 
-        info_elementalfire = sSpellStore.LookupEntry(ELEMENTAL_FIRE);
-		info_wrath = sSpellStore.LookupEntry(WRATH_OF_RAGNAROS);
-		info_hammer = sSpellStore.LookupEntry(HAMMER_OF_RAGNAROS);
-		info_meltweapon = sSpellStore.LookupEntry(MELT_WEAPON);
-		info_summonsons = sSpellStore.LookupEntry(SUMMON_SONS_OF_FLAMES);
+        info_elementalfire = dbcSpell.LookupEntry(ELEMENTAL_FIRE);
+		info_wrath = dbcSpell.LookupEntry(WRATH_OF_RAGNAROS);
+		info_hammer = dbcSpell.LookupEntry(HAMMER_OF_RAGNAROS);
+		info_meltweapon = dbcSpell.LookupEntry(MELT_WEAPON);
+		info_summonsons = dbcSpell.LookupEntry(SUMMON_SONS_OF_FLAMES);
     }
     
     void OnCombatStart(Unit* mTarget)

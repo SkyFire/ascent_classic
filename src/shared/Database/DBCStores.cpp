@@ -21,33 +21,33 @@
 #include "DataStore.h"
 #include "NGLog.h"
 
-DBCStorage<GemPropertyEntry> dbcGemProperty;
-DBCStorage<ItemSetEntry> dbcItemSet;
-DBCStorage<Lock> dbcLock;
-DBCStorage<SpellEntry> dbcSpell;
-DBCStorage<SpellDuration> dbcSpellDuration;
-DBCStorage<SpellRange> dbcSpellRange;
-DBCStorage<emoteentry> dbcEmoteEntry;
-DBCStorage<SpellRadius> dbcSpellRadius;
-DBCStorage<SpellCastTime> dbcSpellCastTime;
-DBCStorage<AreaTable> dbcArea;
-DBCStorage<FactionTemplateDBC> dbcFactionTemplate;
-DBCStorage<FactionDBC> dbcFaction;
-DBCStorage<EnchantEntry> dbcEnchant;
-DBCStorage<RandomProps> dbcRandomProps;
-DBCStorage<skilllinespell> dbcSkillLineSpell;
-DBCStorage<skilllineentry> dbcSkillLine;
-DBCStorage<DBCTaxiNode> dbcTaxiNode;
-DBCStorage<DBCTaxiPath> dbcTaxiPath;
-DBCStorage<DBCTaxiPathNode> dbcTaxiPathNode;
-DBCStorage<AuctionHouseDBC> dbcAuctionHouse;
-DBCStorage<TalentEntry> dbcTalent;
-DBCStorage<CreatureSpellDataEntry> dbcCreatureSpellData;
-DBCStorage<CreatureFamilyEntry> dbcCreatureFamily;
-DBCStorage<CharClassEntry> dbcCharClass;
-DBCStorage<CharRaceEntry> dbcCharRace;
-DBCStorage<MapEntry> dbcMap;
-DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
+SERVER_DECL DBCStorage<GemPropertyEntry> dbcGemProperty;
+SERVER_DECL DBCStorage<ItemSetEntry> dbcItemSet;
+SERVER_DECL DBCStorage<Lock> dbcLock;
+SERVER_DECL DBCStorage<SpellEntry> dbcSpell;
+SERVER_DECL DBCStorage<SpellDuration> dbcSpellDuration;
+SERVER_DECL DBCStorage<SpellRange> dbcSpellRange;
+SERVER_DECL DBCStorage<emoteentry> dbcEmoteEntry;
+SERVER_DECL DBCStorage<SpellRadius> dbcSpellRadius;
+SERVER_DECL DBCStorage<SpellCastTime> dbcSpellCastTime;
+SERVER_DECL DBCStorage<AreaTable> dbcArea;
+SERVER_DECL DBCStorage<FactionTemplateDBC> dbcFactionTemplate;
+SERVER_DECL DBCStorage<FactionDBC> dbcFaction;
+SERVER_DECL DBCStorage<EnchantEntry> dbcEnchant;
+SERVER_DECL DBCStorage<RandomProps> dbcRandomProps;
+SERVER_DECL DBCStorage<skilllinespell> dbcSkillLineSpell;
+SERVER_DECL DBCStorage<skilllineentry> dbcSkillLine;
+SERVER_DECL DBCStorage<DBCTaxiNode> dbcTaxiNode;
+SERVER_DECL DBCStorage<DBCTaxiPath> dbcTaxiPath;
+SERVER_DECL DBCStorage<DBCTaxiPathNode> dbcTaxiPathNode;
+SERVER_DECL DBCStorage<AuctionHouseDBC> dbcAuctionHouse;
+SERVER_DECL DBCStorage<TalentEntry> dbcTalent;
+SERVER_DECL DBCStorage<CreatureSpellDataEntry> dbcCreatureSpellData;
+SERVER_DECL DBCStorage<CreatureFamilyEntry> dbcCreatureFamily;
+SERVER_DECL DBCStorage<CharClassEntry> dbcCharClass;
+SERVER_DECL DBCStorage<CharRaceEntry> dbcCharRace;
+SERVER_DECL DBCStorage<MapEntry> dbcMap;
+SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 
 const char * ItemSetFormat = "uuxxxxxxxxxxxxxxxuuuuuuuuuxxxxxxxxxuuuuuuuuuuuuuuuuuu";
 const char * LockFormat = "uuuuuuxxxuuuuuxxxuuuuuxxxxxxxxxxx";
@@ -114,6 +114,7 @@ bool LoadDBCs()
 	LOAD_DBC("DBC/ChrRaces.dbc", charraceFormat, true, dbcCharRace);
 	LOAD_DBC("DBC/ChrClasses.dbc", charclassFormat, true, dbcCharClass);
 	LOAD_DBC("DBC/Map.dbc", mapentryFormat, true, dbcMap);
+	LOAD_DBC("DBC/AuctionHouse.dbc", auctionhousedbcFormat, true, dbcAuctionHouse);
 	return true;
 }
 

@@ -846,7 +846,7 @@ inline uint32 GetDuration(SpellDuration *dur)
 #define SAFE_DBC_CODE_RETURNS			/* undefine this to make out of range/nulls return null. */
 
 template<class T>
-class DBCStorage
+class SERVER_DECL DBCStorage
 {
 	T * m_heapBlock;
 	T * m_firstEntry;
@@ -1057,33 +1057,34 @@ public:
 #endif
 };
 
-extern DBCStorage<GemPropertyEntry> dbcGemProperty;
-extern DBCStorage<ItemSetEntry> dbcItemSet;
-extern DBCStorage<Lock> dbcLock;
-extern DBCStorage<SpellEntry> dbcSpell;
-extern DBCStorage<SpellDuration> dbcSpellDuration;
-extern DBCStorage<SpellRange> dbcSpellRange;
-extern DBCStorage<emoteentry> dbcEmoteEntry;
-extern DBCStorage<SpellRadius> dbcSpellRadius;
-extern DBCStorage<SpellCastTime> dbcSpellCastTime;
-extern DBCStorage<AreaTable> dbcArea;
-extern DBCStorage<FactionTemplateDBC> dbcFactionTemplate;
-extern DBCStorage<FactionDBC> dbcFaction;
-extern DBCStorage<EnchantEntry> dbcEnchant;
-extern DBCStorage<RandomProps> dbcRandomProps;
-extern DBCStorage<skilllinespell> dbcSkillLineSpell;
-extern DBCStorage<skilllineentry> dbcSkillLine;
-extern DBCStorage<DBCTaxiNode> dbcTaxiNode;
-extern DBCStorage<DBCTaxiPath> dbcTaxiPath;
-extern DBCStorage<DBCTaxiPathNode> dbcTaxiPathNode;
-extern DBCStorage<AuctionHouseDBC> dbcAuctionHouse;
-extern DBCStorage<TalentEntry> dbcTalent;
-extern DBCStorage<CreatureSpellDataEntry> dbcCreatureSpellData;
-extern DBCStorage<CreatureFamilyEntry> dbcCreatureFamily;
-extern DBCStorage<CharClassEntry> dbcCharClass;
-extern DBCStorage<CharRaceEntry> dbcCharRace;
-extern DBCStorage<MapEntry> dbcMap;
-extern DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
+extern SERVER_DECL DBCStorage<GemPropertyEntry> dbcGemProperty;
+extern SERVER_DECL DBCStorage<ItemSetEntry> dbcItemSet;
+extern SERVER_DECL DBCStorage<Lock> dbcLock;
+extern SERVER_DECL DBCStorage<SpellEntry> dbcSpell;
+extern SERVER_DECL DBCStorage<SpellDuration> dbcSpellDuration;
+extern SERVER_DECL DBCStorage<SpellRange> dbcSpellRange;
+extern SERVER_DECL DBCStorage<emoteentry> dbcEmoteEntry;
+extern SERVER_DECL DBCStorage<SpellRadius> dbcSpellRadius;
+extern SERVER_DECL DBCStorage<SpellCastTime> dbcSpellCastTime;
+extern SERVER_DECL DBCStorage<AreaTable> dbcArea;
+extern SERVER_DECL DBCStorage<FactionTemplateDBC> dbcFactionTemplate;
+extern SERVER_DECL DBCStorage<FactionDBC> dbcFaction;
+extern SERVER_DECL DBCStorage<EnchantEntry> dbcEnchant;
+extern SERVER_DECL DBCStorage<RandomProps> dbcRandomProps;
+extern SERVER_DECL DBCStorage<skilllinespell> dbcSkillLineSpell;
+extern SERVER_DECL DBCStorage<skilllineentry> dbcSkillLine;
+extern SERVER_DECL DBCStorage<DBCTaxiNode> dbcTaxiNode;
+extern SERVER_DECL DBCStorage<DBCTaxiPath> dbcTaxiPath;
+extern SERVER_DECL DBCStorage<DBCTaxiPathNode> dbcTaxiPathNode;
+extern SERVER_DECL DBCStorage<AuctionHouseDBC> dbcAuctionHouse;
+extern SERVER_DECL DBCStorage<TalentEntry> dbcTalent;
+extern SERVER_DECL DBCStorage<CreatureSpellDataEntry> dbcCreatureSpellData;
+extern SERVER_DECL DBCStorage<CreatureFamilyEntry> dbcCreatureFamily;
+extern SERVER_DECL DBCStorage<CharClassEntry> dbcCharClass;
+extern SERVER_DECL DBCStorage<CharRaceEntry> dbcCharRace;
+extern SERVER_DECL DBCStorage<MapEntry> dbcMap;
+extern SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
+
 bool LoadDBCs();
 
 #endif

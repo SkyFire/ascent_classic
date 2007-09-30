@@ -1359,6 +1359,25 @@ uint32 ObjectMgr::GetGossipTextForNpc(uint32 ID)
 	return mNpcToGossipText[ID];
 }
 
+map<uint32, pair<string,string> > SpellNameRanks;
+const char * GetSpellName(uint32 id)
+{
+	map<uint32,pair<string,string> >::iterator itr = SpellNameRanks.find(id);
+	if(itr == SpellNameRanks.end())
+		return NULL;
+
+	return itr->second.first.c_str();
+}
+
+const char * GetSpellRank(uint32 id)
+{
+	map<uint32,pair<string,string> >::iterator itr = SpellNameRanks.find(id);
+	if(itr == SpellNameRanks.end())
+		return NULL;
+
+	return itr->second.second.c_str();
+}
+
 void ObjectMgr::GenerateTrainerSpells()
 {
 	std::map<uint32, TrainerSpellOverride> OMap;
@@ -1455,7 +1474,6 @@ void ObjectMgr::GenerateTrainerSpells()
 	map<string, map<uint32, uint32>* >::iterator it1;
 	map<uint32, uint32>::iterator it2;
 	map<uint32, uint32> TeachingSpellMap;
-	map<uint32, pair<string,string> > SpellNameRanks;
 
 	uint32 mx = dbcSpell.GetNumRows();
 	DBCFile f;
@@ -1637,42 +1655,42 @@ void ObjectMgr::GenerateTrainerSpells()
 			TS->RequiredClass = -1;
 
 			// Find out our spell rank.
-			map<uint32,pair<string,string> >::iterator itr = SpellNameRanks.find(spell->Id);
-			ASSERT(itr != SpellNameRanks.end());
+			const char* SpellName = GetSpellName(spell->Id);
+			const char* RankName = GetSpellRank(spell->Id);
 
-			const char* SpellName = itr->second.first.c_str();
-			const char* RankName = itr->second.second.c_str();
-
-			string Sp_Name = SpellName;
-			it1 = SpellRankMap.find(Sp_Name);
-			if(it1 != SpellRankMap.end())
+			if(SpellName)
 			{
-				// We're a ranked spell.
-				uint32 SpellRank = SpellRanks[SpellID];
-				// Grab any ranks lower than ours
-				if(SpellRank > 1)
+				string Sp_Name = SpellName;
+				it1 = SpellRankMap.find(Sp_Name);
+				if(it1 != SpellRankMap.end())
 				{
-					vector<uint32> lowerspells;
-					lowerspells.reserve(15);
-
-					// Assign required spells
-					uint32 crank = SpellRank - 1;
-					if(crank > 0)
+					// We're a ranked spell.
+					uint32 SpellRank = SpellRanks[SpellID];
+					// Grab any ranks lower than ours
+					if(SpellRank > 1)
 					{
-						it2 = it1->second->find(crank);
-						if((it2 != it1->second->end()))
+						vector<uint32> lowerspells;
+						lowerspells.reserve(15);
+
+						// Assign required spells
+						uint32 crank = SpellRank - 1;
+						if(crank > 0)
 						{
-							uint32 rspell = it2->second;					
-							if(TeachingSpellId2)
-								rspell = 0;
-							else
-								ASSERT(rspell);
+							it2 = it1->second->find(crank);
+							if((it2 != it1->second->end()))
+							{
+								uint32 rspell = it2->second;					
+								if(TeachingSpellId2)
+									rspell = 0;
+								else
+									ASSERT(rspell);
 
-							TS->RequiredSpell = rspell;
+								TS->RequiredSpell = rspell;
 
-							uint32 flags = spell->SpellFamilyName;
-							if(flags == 0x4 || flags == 0x10 || flags == 0x8 || flags == 0xA)
-								TS->DeleteSpell = TeachingSpellId2 ? 0 : rspell; //do not delete lower ranks of pet spells
+								uint32 flags = spell->SpellFamilyName;
+								if(flags == 0x4 || flags == 0x10 || flags == 0x8 || flags == 0xA)
+									TS->DeleteSpell = TeachingSpellId2 ? 0 : rspell; //do not delete lower ranks of pet spells
+							}
 						}
 					}
 				}
@@ -2093,6 +2111,7 @@ void ObjectMgr::LoadTrainers()
 	} while(result->NextRow());
 	delete result;
 	Log.Notice("ObjectMgr", "%u trainers loaded.", mTrainers.size());
+	SpellNameRanks.clear();
 }
 
 bool ObjectMgr::AddTrainerSpell(uint32 entry, SpellEntry *pSpell)
@@ -2100,7 +2119,10 @@ bool ObjectMgr::AddTrainerSpell(uint32 entry, SpellEntry *pSpell)
 	CreatureInfo *ci = CreatureNameStorage.LookupEntry(entry);
 	if(ci)
 	{
-/*		const char* RankName = dbcSpell.LookupString(pSpell->Rank);
+		const char* RankName = GetSpellRank(pSpell->Id);
+		if(!RankName)
+			return true;
+
 		if(strstr(ci->SubName,"Journeyman"))
 		{
 			if(!stricmp(RankName, "Journeyman"))
@@ -2140,7 +2162,7 @@ bool ObjectMgr::AddTrainerSpell(uint32 entry, SpellEntry *pSpell)
 			else
 				return true;
 		}
-		else*/
+		else
 			return true;
 	}
 	else
@@ -3290,4 +3312,25 @@ void ObjectMgr::UpdateArenaTeamRankings()
 		}
 	}
 	m_arenaTeamLock.Release();
+}
+
+const string& ObjectMgr::GetCreatureFamilyName(uint32 id)
+{
+	map<uint32,string>::iterator itr = _creaturefamilynames.find(id);
+	if(itr == _creaturefamilynames.end())
+		return _creaturefamilynames.begin()->second;
+	else
+		return itr->second;
+}
+
+void ObjectMgr::LoadCreatureFamilyNames()
+{
+	DBCFile dbc;
+	dbc.open("DBC/CreatureFamily.dbc");
+	for(uint32 i = 0; i < dbc.getRecordCount(); ++i)
+	{
+		uint32 id = dbc.getRecord(i).getUInt(0);
+		string str = string(dbc.getRecord(i).getString(7));
+		_creaturefamilynames[id] = str;
+	}
 }

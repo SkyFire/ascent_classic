@@ -34,15 +34,15 @@ bool NoggenFoggerElixr(uint32 i, Spell * pSpell)
     switch(chance)
     {
     case 0:
-        pSpell->u_caster->CastSpell(pSpell->u_caster, sSpellStore.LookupEntry(16591), true);
+        pSpell->u_caster->CastSpell(pSpell->u_caster, dbcSpell.LookupEntry(16591), true);
         break;
 
     case 1:
-        pSpell->u_caster->CastSpell(pSpell->u_caster, sSpellStore.LookupEntry(16593), true);
+        pSpell->u_caster->CastSpell(pSpell->u_caster, dbcSpell.LookupEntry(16593), true);
         break;
 
     case 2:
-        pSpell->u_caster->CastSpell(pSpell->u_caster, sSpellStore.LookupEntry(16595), true);
+        pSpell->u_caster->CastSpell(pSpell->u_caster, dbcSpell.LookupEntry(16595), true);
         break;
     }
     return true;
@@ -122,7 +122,7 @@ bool HolyShock(uint32 i, Spell *pSpell)
             spellid = 33073;
             break;
         }
-        spInfo = sSpellStore.LookupEntry(spellid); // if its a enemy
+        spInfo = dbcSpell.LookupEntry(spellid); // if its a enemy
     } else {
         uint32 spellid = 0;
         switch(pSpell->m_spellInfo->Id)
@@ -143,7 +143,7 @@ bool HolyShock(uint32 i, Spell *pSpell)
             spellid = 33074;
             break;
         }
-        spInfo = sSpellStore.LookupEntry(spellid); // if its a ally
+        spInfo = dbcSpell.LookupEntry(spellid); // if its a ally
     }
 
     if(!spInfo)
@@ -162,7 +162,7 @@ bool HallowsEndCandy(uint32 i, Spell * pSpell)
     int chance = sRand.randInt(4);
     int spellId = 24924;
     
-    SpellEntry *spInfo = sSpellStore.LookupEntry(spellId+chance);
+    SpellEntry *spInfo = dbcSpell.LookupEntry(spellId+chance);
     if(!spInfo) return true;
 
     pSpell->p_caster->CastSpell(pSpell->p_caster, spInfo, true);
@@ -220,7 +220,7 @@ bool CookiedDeviateFish(uint32 i, Spell * pSpell)
 
     if(spellId)
     {
-        SpellEntry *spInfo = sSpellStore.LookupEntry(spellId);
+        SpellEntry *spInfo = dbcSpell.LookupEntry(spellId);
         if(!spInfo)
             return true;
 
@@ -264,7 +264,7 @@ bool NetOMatic(uint32 i, Spell * pSpell)
         t2 = playerTarget->GetGUID();
     }
 
-    SpellEntry *spInfo = sSpellStore.LookupEntry(13099);
+    SpellEntry *spInfo = dbcSpell.LookupEntry(13099);
     if(!spInfo)
         return true;
 
@@ -306,7 +306,7 @@ bool DeviateFish(uint32 i, Spell * pSpell)
 {
     int spell = sRand.randInt(5) + 1;
 
-    SpellEntry *spInfo = sSpellStore.LookupEntry((pSpell->m_spellInfo->Id+spell));
+    SpellEntry *spInfo = dbcSpell.LookupEntry((pSpell->m_spellInfo->Id+spell));
     if(!spInfo)
         return true;
 

@@ -33,9 +33,8 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	m_Owner = static_cast<Player*>(owner);
 	m_OwnerGuid = m_Owner->GetGUID();
 	creature_info = ci;
-	/*myFamily = .LookupEntry(creature_info->Family);
-	m_name = sCreatureFamilyStore.LookupString(myFamily->name);*/
-	// BURLEX FIX ME!
+	myFamily = dbcCreatureFamily.LookupEntry(creature_info->Family);
+	m_name = objmgr.GetCreatureFamilyName(myFamily->ID);
 
 	// Create ourself	
 	Create(m_name.c_str(), owner->GetMapId(), owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());

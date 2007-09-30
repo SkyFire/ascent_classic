@@ -60,7 +60,7 @@ bool RockbiterWeapon(uint32 i, Spell* pSpell)
         return true;
 
     Item * item = pSpell->p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-    EnchantEntry * enchant = sEnchantStore.LookupEntry(enchantment_entry);
+    EnchantEntry * enchant = dbcEnchant.LookupEntry(enchantment_entry);
     if(!item || !enchant)
         return true;
 

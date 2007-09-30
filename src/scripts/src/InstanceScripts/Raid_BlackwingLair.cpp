@@ -33,13 +33,13 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(MARK_OF_FLAMES);
+        spells[0].info = dbcSpell.LookupEntry(MARK_OF_FLAMES);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 15.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
 
-		spells[1].info = sSpellStore.LookupEntry(MARK_OF_DETONATION);
+		spells[1].info = dbcSpell.LookupEntry(MARK_OF_DETONATION);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
 		spells[1].perctrigger = 4.0f;
@@ -149,7 +149,7 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(FLAME_SHOCK);
+        spells[0].info = dbcSpell.LookupEntry(FLAME_SHOCK);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 100.0f;
@@ -267,7 +267,7 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(FIREBALL_VOLLEY);
+        spells[0].info = dbcSpell.LookupEntry(FIREBALL_VOLLEY);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 40.0f;
@@ -379,7 +379,7 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(GRANADE);
+        spells[0].info = dbcSpell.LookupEntry(GRANADE);
 		spells[0].targettype = TARGET_ATTACKING;
 		spells[0].instant = false;
 		spells[0].perctrigger = 25.0f;
@@ -481,13 +481,13 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(RAIN_OF_FIRE);
+        spells[0].info = dbcSpell.LookupEntry(RAIN_OF_FIRE);
 		spells[0].targettype = TARGET_DESTINATION;
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 6000; // 1sec
 
-		spells[1].info = sSpellStore.LookupEntry(SHADOW_BOLT);
+		spells[1].info = dbcSpell.LookupEntry(SHADOW_BOLT);
 		spells[1].targettype = TARGET_DESTINATION;
 		spells[1].instant = true;
 		spells[1].perctrigger = 15.0f;
@@ -623,7 +623,7 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(FIRE_NOVA_LASH);
+        spells[0].info = dbcSpell.LookupEntry(FIRE_NOVA_LASH);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 15.0f;
@@ -726,13 +726,13 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(WING_BUFFET);
+        spells[0].info = dbcSpell.LookupEntry(WING_BUFFET);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
 
-		spells[1].info = sSpellStore.LookupEntry(FLAME_BUFFET);
+		spells[1].info = dbcSpell.LookupEntry(FLAME_BUFFET);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = false;
 		spells[1].perctrigger = 15.0f;
@@ -831,13 +831,13 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(WING_BUFFET);
+        spells[0].info = dbcSpell.LookupEntry(WING_BUFFET);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
 
-		spells[1].info = sSpellStore.LookupEntry(SHADOW_OF_EBONROC);
+		spells[1].info = dbcSpell.LookupEntry(SHADOW_OF_EBONROC);
 		spells[1].targettype = TARGET_ATTACKING;
 		spells[1].instant = false;
 		spells[1].perctrigger = 15.0f;
@@ -936,13 +936,13 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(WING_BUFFET);
+        spells[0].info = dbcSpell.LookupEntry(WING_BUFFET);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 10.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
 
-		spells[1].info = sSpellStore.LookupEntry(FIRE_NOVA);
+		spells[1].info = dbcSpell.LookupEntry(FIRE_NOVA);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = true;
 		spells[1].perctrigger = 20.0f;
@@ -1066,20 +1066,20 @@ public:
 		// ----------------------
 		
 		// Create basic info for spells here, and play with it later , fill always the info, targettype and if is instant or not! 
-        spells[0].info = sSpellStore.LookupEntry(ESSENCE_OF_THE_RED);
+        spells[0].info = dbcSpell.LookupEntry(ESSENCE_OF_THE_RED);
 		spells[0].targettype = TARGET_VARIOUS;
 		spells[0].instant = false;
 		spells[0].perctrigger = 0.0f;
 		spells[0].attackstoptimer = 1000; // 1sec
 		m_spellcheck[0] = true;
 
-		spells[1].info = sSpellStore.LookupEntry(FLAME_BREATH);
+		spells[1].info = dbcSpell.LookupEntry(FLAME_BREATH);
 		spells[1].targettype = TARGET_VARIOUS;
 		spells[1].instant = false;
 		spells[1].perctrigger = 15.0f;
 		spells[1].attackstoptimer = 3000; // 1sec
 
-		spells[2].info = sSpellStore.LookupEntry(BURNING_ADRENALINE);
+		spells[2].info = dbcSpell.LookupEntry(BURNING_ADRENALINE);
 		spells[2].targettype = TARGET_ATTACKING;
 		spells[2].instant = false;
 		spells[2].perctrigger = 3.0f;

@@ -93,13 +93,13 @@ public:
         _unit->GetAIInterface()->addWayPoint(CreateWaypoint(7, 0, FLY));
         _unit->GetAIInterface()->addWayPoint(CreateWaypoint(8, 0, FLY));
 
-        infoFear = sSpellStore.LookupEntry(AOE_FEAR);
-        infoCleave = sSpellStore.LookupEntry(CLEAVE);
-        infoFBreath = sSpellStore.LookupEntry(FLAME_BREATH);
-        infoKAway = sSpellStore.LookupEntry(KNOCK_AWAY);
-        infoSFireball = sSpellStore.LookupEntry(SCRIPTABLE_FIREBALL);
-        infoWBuffet = sSpellStore.LookupEntry(WING_BUFFET);
-        infoDeepBreath = sSpellStore.LookupEntry(DEEP_BREATH);
+        infoFear = dbcSpell.LookupEntry(AOE_FEAR);
+        infoCleave = dbcSpell.LookupEntry(CLEAVE);
+        infoFBreath = dbcSpell.LookupEntry(FLAME_BREATH);
+        infoKAway = dbcSpell.LookupEntry(KNOCK_AWAY);
+        infoSFireball = dbcSpell.LookupEntry(SCRIPTABLE_FIREBALL);
+        infoWBuffet = dbcSpell.LookupEntry(WING_BUFFET);
+        infoDeepBreath = dbcSpell.LookupEntry(DEEP_BREATH);
 
         if(!infoFear || !infoCleave || !infoFBreath
             || !infoKAway || !infoSFireball || !infoWBuffet || !infoDeepBreath)
