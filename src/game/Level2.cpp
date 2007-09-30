@@ -452,7 +452,7 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 		Spell * sp = new Spell(m_session->GetPlayer(), se, true, 0);
 		sp->prepare(&targets);
 */
-		SpellEntry * se = sSpellStore.LookupEntry(20479);
+		SpellEntry * se = dbcSpell.LookupEntry(20479);
 		if(se == 0) return false;
 		
 		SpellCastTargets targets(target->GetGUID());
@@ -476,7 +476,7 @@ bool ChatHandler::HandleCastSpellCommand(const char* args, WorldSession *m_sessi
 	}
 
 	uint32 spellid = atol(args);
-	SpellEntry *spellentry = sSpellStore.LookupEntry(spellid);
+	SpellEntry *spellentry = dbcSpell.LookupEntry(spellid);
 	if(!spellentry)
 	{
 		RedSystemMessage(m_session, "Invalid spell id!");
@@ -513,7 +513,7 @@ bool ChatHandler::HandleCastSpellNECommand(const char* args, WorldSession *m_ses
 	}
 
 	uint32 spellId = atol(args);
-	SpellEntry *spellentry = sSpellStore.LookupEntry(spellId);
+	SpellEntry *spellentry = dbcSpell.LookupEntry(spellId);
 	if(!spellentry)
 	{
 		RedSystemMessage(m_session, "Invalid spell id!");
@@ -1061,14 +1061,14 @@ bool ChatHandler::HandleAddAIAgentCommand(const char* args, WorldSession *m_sess
 	sp->agent = atoi(agent);
 	sp->procChance = atoi(procChance);
 /*	sp->procCount = atoi(procCount);*/
-	sp->spell = sSpellStore.LookupEntry(atoi(spellId));
+	sp->spell = dbcSpell.LookupEntry(atoi(spellId));
 	sp->spellType = atoi(spellType);
 	sp->spelltargetType = atoi(spelltargetType);
 	sp->floatMisc1 = atof(floatMisc1);
 	sp->Misc2 = (uint32)atof(Misc2);
 	sp->cooldown = atof(spellCooldown);
-	sp->minrange = GetMinRange(sSpellRange.LookupEntry(sSpellStore.LookupEntry(atoi(spellId))->rangeIndex));
-	sp->maxrange = GetMaxRange(sSpellRange.LookupEntry(sSpellStore.LookupEntry(atoi(spellId))->rangeIndex));
+	sp->minrange = GetMinRange(dbcSpellRange.LookupEntry(dbcSpell.LookupEntry(atoi(spellId))->rangeIndex));
+	sp->maxrange = GetMaxRange(dbcSpellRange.LookupEntry(dbcSpell.LookupEntry(atoi(spellId))->rangeIndex));
 	if(sp->agent == AGENT_CALLFORHELP)
 		target->GetAIInterface()->m_canCallForHelp = true;
 	else if(sp->agent == AGENT_FLEE)

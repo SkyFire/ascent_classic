@@ -33,8 +33,9 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	m_Owner = static_cast<Player*>(owner);
 	m_OwnerGuid = m_Owner->GetGUID();
 	creature_info = ci;
-	myFamily = sCreatureFamilyStore.LookupEntry(creature_info->Family);
-	m_name = sCreatureFamilyStore.LookupString(myFamily->name);
+	/*myFamily = .LookupEntry(creature_info->Family);
+	m_name = sCreatureFamilyStore.LookupString(myFamily->name);*/
+	// BURLEX FIX ME!
 
 	// Create ourself	
 	Create(m_name.c_str(), owner->GetMapId(), owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
@@ -313,8 +314,8 @@ void Pet::CreateAISpell(SpellEntry * info)
 	sp->agent = AGENT_SPELL;
 	sp->entryId = GetEntry();
 	sp->floatMisc1 = 0;
-	sp->maxrange = GetMaxRange(sSpellRange.LookupEntry(info->rangeIndex));
-	sp->minrange = GetMinRange(sSpellRange.LookupEntry(info->rangeIndex));
+	sp->maxrange = GetMaxRange(dbcSpellRange.LookupEntry(info->rangeIndex));
+	sp->minrange = GetMinRange(dbcSpellRange.LookupEntry(info->rangeIndex));
 	sp->Misc2 = 0;
 	sp->procChance = 0;
 	sp->spell = info;
@@ -326,7 +327,7 @@ void Pet::CreateAISpell(SpellEntry * info)
 
 	if(info->EffectImplicitTargetA[0] == 24)
 	{
-		float radius = ::GetRadius(sSpellRadius.LookupEntry(info->EffectRadiusIndex[0]));
+		float radius = ::GetRadius(dbcSpellRadius.LookupEntry(info->EffectRadiusIndex[0]));
 		sp->maxrange = radius;
 		sp->spelltargetType = TTYPE_SOURCE;
 	}
@@ -408,7 +409,7 @@ void Pet::InitializeMe(bool first)
 	m_Owner->SetUInt64Value(UNIT_FIELD_SUMMON, this->GetGUID());
 	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetGUIDLow());
 	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, (uint32)time(NULL));
-	myFamily = sCreatureFamilyStore.LookupEntry(creature_info->Family);
+	myFamily = dbcCreatureFamily.LookupEntry(creature_info->Family);
 	bHasLoyalty = m_Owner->getClass() == HUNTER ? true : false;
 	SetPetDiet();
 	_setFaction();
@@ -443,7 +444,7 @@ void Pet::InitializeMe(bool first)
 			do 
 			{
 				Field * f = query->Fetch();
-				SpellEntry* spell = sSpellStore.LookupEntry(f[2].GetUInt32());
+				SpellEntry* spell = dbcSpell.LookupEntry(f[2].GetUInt32());
 				uint16 flags = f[3].GetUInt16();
 				mSpells.insert ( make_pair( spell, flags ) );
 			} while(query->NextRow());
@@ -647,7 +648,7 @@ void Pet::SetDefaultSpells()
 		uint32 Line = GetCreatureName()->SpellDataID;
 		if(Line)
 		{
-			CreatureSpellDataEntry * SpellData = CreatureSpellDataStore::getSingleton().LookupEntry(Line);
+			CreatureSpellDataEntry * SpellData = dbcCreatureSpellData.LookupEntry(Line);
 			if(SpellData)
 				for(uint32 i = 0; i < 3; ++i)
 					if(SpellData->Spells[i] != 0)
@@ -1305,7 +1306,7 @@ void Pet::AddPetSpellToOwner(uint32 spellId)
 uint32 Pet::GetHighestRankSpell(uint32 spellId)
 {	
 	//get the highest rank of spell from known spells
-	SpellEntry *sp = sSpellStore.LookupEntry(spellId);
+	SpellEntry *sp = dbcSpell.LookupEntry(spellId);
 	SpellEntry *tmp = 0;
 	if(sp && mSpells.size() > 0)
 	{

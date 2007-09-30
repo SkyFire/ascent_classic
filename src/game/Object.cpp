@@ -1402,12 +1402,12 @@ void Object::_setFaction()
 
 	if(GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER)
 	{
-		factT = sFactionTmpStore.LookupEntry(GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
+		factT = dbcFactionTemplate.LookupEntry(GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 	}
 	else
 	if(GetTypeId() == TYPEID_GAMEOBJECT)
 	{
-		factT = sFactionTmpStore.LookupEntry(GetUInt32Value(GAMEOBJECT_FACTION));
+		factT = dbcFactionTemplate.LookupEntry(GetUInt32Value(GAMEOBJECT_FACTION));
 	}
 
 	if(!factT)
@@ -1415,7 +1415,7 @@ void Object::_setFaction()
 		return;
 	}
 	m_faction = factT;
-	m_factionDBC = sFactionStore.LookupEntry(factT->Faction);
+	m_factionDBC = dbcFaction.LookupEntry(factT->Faction);
 }
 
 void Object::UpdateOppFactionSet()
@@ -1758,7 +1758,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
 			if(!self_res_spell && ((Player*)pVictim)->bReincarnation)
 			{
-				SpellEntry *m_reincarnSpellInfo = sSpellStore.LookupEntry(20608);
+				SpellEntry *m_reincarnSpellInfo = dbcSpell.LookupEntry(20608);
 				if(((Player*)pVictim)->CanCastDueToCooldown(m_reincarnSpellInfo))
 				{
 					uint32 ankh_count = ((Player*)pVictim)->GetItemInterface()->GetItemCount(17030);
@@ -1805,7 +1805,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		{
 			if(((Player*)pVictim)->HasSpell(20711)) //check for spirit of Redemption
 			{
-				SpellEntry * sorInfo = sSpellStore.LookupEntry(27827);
+				SpellEntry * sorInfo = dbcSpell.LookupEntry(27827);
 				if(sorInfo)
 				{
 					Spell *sor = new Spell(pVictim, sorInfo, true, NULL);
@@ -2070,7 +2070,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	if(!pVictim || !pVictim->isAlive())
 		return;
 
-	SpellEntry *spellInfo = sSpellStore.LookupEntry( spellID );
+	SpellEntry *spellInfo = dbcSpell.LookupEntry( spellID );
 	if(!spellInfo)
         return;
 
@@ -2109,7 +2109,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==============================+Spell Damage Bonus Modifications===========================
 //==========================================================================================
 //------------------------------by cast duration--------------------------------------------
-		SpellCastTime *sd = sCastTime.LookupEntry(spellInfo->CastingTimeIndex);
+		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
 		float castaff = GetCastTime(sd);
 		if(castaff < 1500) castaff = 1500;
 		else
@@ -2121,7 +2121,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		float dmgdoneaffectperc = castaff / 3500;
 //------------------------------by downranking----------------------------------------------
 		//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
-		float td = GetDuration(sSpellDuration.LookupEntry(spellInfo->DurationIndex));
+		float td = GetDuration(dbcSpellDuration.LookupEntry(spellInfo->DurationIndex));
 		if (spellInfo->NameHash == 0x695C4940 || spellInfo->NameHash == 0x3DD5C872 || spellInfo->NameHash == 0xddaf1ac7 || spellInfo->NameHash == 0xCB75E5D1)
 			dmgdoneaffectperc *= float (1.0f - (( td / 15000.0f ) / (( td / 15000.0f ) + dmgdoneaffectperc)));
 

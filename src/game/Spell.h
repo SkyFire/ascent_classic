@@ -1612,7 +1612,7 @@ public:
 
         if(m_spellInfo->DurationIndex)
         {
-            SpellDuration *sd=sSpellDuration.LookupEntry(m_spellInfo->DurationIndex);
+            SpellDuration *sd=dbcSpellDuration.LookupEntry(m_spellInfo->DurationIndex);
             if(sd)
             {
                 //check for negative and 0 durations.
@@ -1676,7 +1676,7 @@ public:
     {
         if(bRadSet[i])return Rad[i];
         bRadSet[i]=true;
-        Rad[i]=::GetRadius(sSpellRadius.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
+        Rad[i]=::GetRadius(dbcSpellRadius.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
         if(m_spellInfo->SpellGroupType && u_caster)
         {
             SM_FFValue(u_caster->SM_FRadius,&Rad[i],m_spellInfo->SpellGroupType);

@@ -281,7 +281,7 @@ void Spell::SpellEffectInstantKill(uint32 i)
 		//now caster gains this buff
 		if (spellid1 && spellid1 != 0)
 		{
-			u_caster->CastSpell(u_caster, sSpellStore.LookupEntry(spellid1), true);
+			u_caster->CastSpell(u_caster, dbcSpell.LookupEntry(spellid1), true);
 		}
 	}
 
@@ -534,7 +534,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 32594:
 		{
 			if(!pSpellId) return;
-			SpellEntry *spellInfo = sSpellStore.LookupEntry(pSpellId);
+			SpellEntry *spellInfo = dbcSpell.LookupEntry(pSpellId);
 			if(!spellInfo) return;
 			uint32 heal32 = CalculateEffect(i);
 			unitTarget=u_caster; // Should heal caster :p
@@ -671,7 +671,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 27172: //Judgement of Command
 		{
 			uint32 SpellID = m_spellInfo->EffectBasePoints[i]+1;
-			Spell * spell=new Spell(m_caster,sSpellStore.LookupEntry(SpellID),true,NULL);
+			Spell * spell=new Spell(m_caster,dbcSpell.LookupEntry(SpellID),true,NULL);
 			SpellCastTargets targets;
 			targets.m_unitTarget = unitTarget->GetGUID();
 			spell->prepare(&targets);
@@ -798,7 +798,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 			SpellCastTargets tgt;
 			tgt.m_unitTarget = playerTarget->GetGUID();
-			SpellEntry * inf =sSpellStore.LookupEntry(23782);
+			SpellEntry * inf =dbcSpell.LookupEntry(23782);
 			Spell * spe = new Spell(u_caster,inf,true,NULL);
 			spe->prepare(&tgt);
 
@@ -809,7 +809,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				break;
 			SpellCastTargets tgt;
 			tgt.m_unitTarget = playerTarget->GetGUID();
-			SpellEntry * inf =sSpellStore.LookupEntry(12976);
+			SpellEntry * inf =dbcSpell.LookupEntry(12976);
 			Spell * spe = new Spell(u_caster,inf,true,NULL);
 			spe->prepare(&tgt);
 
@@ -1047,7 +1047,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				break;//something went wrong, we are missing the triger spell
 			SpellCastTargets tgt;
 			tgt.m_unitTarget = unitTarget->GetGUID();
-			SpellEntry  * inf =sSpellStore.LookupEntry(sp);
+			SpellEntry  * inf =dbcSpell.LookupEntry(sp);
 			if(!inf)
 				break;//something wrong again, triggering unexistant spell
 			Spell * spe = new Spell(u_caster,inf,true,NULL);
@@ -1320,7 +1320,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 			if(unitTarget && unitTarget->IsPlayer() && pSpellId && unitTarget->GetHealthPct()<30)
 			{
 				//check for that 10 second cooldown
-				SpellEntry *spellInfo = sSpellStore.LookupEntry(pSpellId );
+				SpellEntry *spellInfo = dbcSpell.LookupEntry(pSpellId );
 				if(spellInfo)
 				{
 					//heal value is receivad by the level of current active talent :s
@@ -1711,10 +1711,8 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 		summon->SetInstanceID(m_caster->GetInstanceID());
 		summon->CreateAsSummon(m_spellInfo->EffectMiscValue[i], ci, NULL, p_caster, m_spellInfo, 1, 45000);
 		summon->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
-		if (sSpellStore.LookupEntry(31707))
-			summon->AddSpell(sSpellStore.LookupEntry(31707), true);
-		if (sSpellStore.LookupEntry(33395))
-			summon->AddSpell(sSpellStore.LookupEntry(33395), true);
+		summon->AddSpell(dbcSpell.LookupEntry(31707), true);
+		summon->AddSpell(dbcSpell.LookupEntry(33395), true);
        summon->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, p_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
        summon->_setFaction();
 	}
@@ -1805,14 +1803,14 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 	//paladin illumination
 	else if(m_spellInfo->Id==20272 && ProcedOnSpell)
 	{
-		SpellEntry *motherspell=sSpellStore.LookupEntry(pSpellId);
+		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
 		if(motherspell)
 			modEnergy = (motherspell->EffectBasePoints[0]+1)*ProcedOnSpell->manaCost/100;
 	}
 	//paladin - Spiritual Attunement 
 	else if(m_spellInfo->Id==31786 && ProcedOnSpell)
 	{
-		SpellEntry *motherspell=sSpellStore.LookupEntry(pSpellId);
+		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
 		if(motherspell)
 			modEnergy = (motherspell->EffectBasePoints[0]+1)*damage/100;
 	}
@@ -1859,7 +1857,7 @@ void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
 	if(spellid == 0)
 		return;
 
-	SpellEntry *spInfo = sSpellStore.LookupEntry(spellid);
+	SpellEntry *spInfo = dbcSpell.LookupEntry(spellid);
 	if(!spInfo)
 		return;
 
@@ -1911,7 +1909,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 				if(!itemTarget->locked)
 				return;
 						
-				Lock *lock = sLockStore.LookupEntry( itemTarget->GetProto()->LockId );
+				Lock *lock = dbcLock.LookupEntry( itemTarget->GetProto()->LockId );
 				if(!lock) return;
 				for(int i=0;i<5;i++)
 					if(lock->locktype[i] == 2 && lock->minlockskill[i] && lockskill >= lock->minlockskill[i])
@@ -1927,7 +1925,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			{
 				GameObjectInfo *info = GameObjectNameStorage.LookupEntry(gameObjTarget->GetEntry());
 				if(!info || gameObjTarget->GetUInt32Value(GAMEOBJECT_STATE) == 1) return;
-				Lock *lock = sLockStore.LookupEntry( info->SpellFocus );
+				Lock *lock = dbcLock.LookupEntry( info->SpellFocus );
 				if(!lock) return;
 				for(int i=0;i<5;i++)
 					if(lock->locktype[i] == 2 && lock->minlockskill[i] && lockskill >= lock->minlockskill[i])
@@ -2016,7 +2014,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		{
 			if(!gameObjTarget ) return;
 			uint32 spellid = !gameObjTarget->GetInfo()->Unknown1 ? 23932 : gameObjTarget->GetInfo()->Unknown1;
-			SpellEntry*en=sSpellStore.LookupEntry(spellid);
+			SpellEntry*en=dbcSpell.LookupEntry(spellid);
 			Spell *sp=new Spell(p_caster,en,true,NULL);
 			SpellCastTargets tgt;
 			tgt.m_unitTarget=gameObjTarget->GetGUID();
@@ -2074,7 +2072,7 @@ void Spell::SpellEffectProficiency(uint32 i)
 	skilllinespell* skillability = objmgr.GetSpellSkill(m_spellInfo->Id);
 	if (skillability)
 		skill = skillability->skilline;
-	skilllineentry* sk = sSkillLineStore.LookupEntry(skill);
+	skilllineentry* sk = dbcSkillLine.LookupEntry(skill);
 	if(skill)
 	{
 		if(playerTarget)
@@ -2161,7 +2159,7 @@ void Spell::SpellEffectLearnSpell(uint32 i) // Learn Spell
 		uint32 spellToLearn = m_spellInfo->EffectTriggerSpell[i];
 		playerTarget->addSpell(spellToLearn);
 		//smth is wrong here, first we add this spell to player then we may cast it on player...
-		SpellEntry *spellinfo = sSpellStore.LookupEntry(spellToLearn);
+		SpellEntry *spellinfo = dbcSpell.LookupEntry(spellToLearn);
 		for(uint32 i=0;i<3;i++)
 			if(spellinfo->Effect[i] == SPELL_EFFECT_WEAPON ||
 			   spellinfo->Effect[i] == SPELL_EFFECT_PROFICIENCY ||
@@ -2318,9 +2316,9 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
         p->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
         p->SetZoneId(m_caster->GetZoneId());
 		p->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,u_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
-		p->m_faction = sFactionTmpStore.LookupEntry(proto->Faction);
+		p->m_faction = dbcFactionTemplate.LookupEntry(proto->Faction);
 		if(p->m_faction)
-			p->m_factionDBC = sFactionStore.LookupEntry(p->m_faction->Faction);
+			p->m_factionDBC = dbcFaction.LookupEntry(p->m_faction->Faction);
 		p->PushToWorld(u_caster->GetMapMgr());
 		//make sure they will be desumonized (roxor)
 		sEventMgr.AddEvent(p, &Creature::SummonExpire, EVENT_SUMMON_EXPIRE, GetDuration(), 1,0);
@@ -2390,7 +2388,7 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 	
 	uint32 skill=m_spellInfo->EffectMiscValue[i];
 	if(skill == 242) skill = SKILL_LOCKPICKING; // somehow for lockpicking misc is different than the skill :s
-	skilllineentry *sk=sSkillLineStore.LookupEntry(skill);
+	skilllineentry *sk=dbcSkillLine.LookupEntry(skill);
 	if(!sk)
 		return;
 	uint32 max = 1;
@@ -2539,7 +2537,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		//FIX me: this should be loaded/cached
 		uint32 zone;
 			if(!p_caster)
-				zone=sAreaStore.LookupEntry(map->GetAreaID(posx,posy))->ZoneId;
+				zone=dbcArea.LookupEntry(map->GetAreaID(posx,posy))->ZoneId;
 			else
 				zone=p_caster->GetZoneId();
 
@@ -2639,7 +2637,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 void Spell::SpellEffectEnchantItem(uint32 i) // Enchant Item Permanent
 {
 	if(!itemTarget || !p_caster) return;
-	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(m_spellInfo->EffectMiscValue[i]);
+	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(m_spellInfo->EffectMiscValue[i]);
 	if(!Enchantment) return;
 
 	if(p_caster->GetSession()->GetPermissionCount() > 0)
@@ -2659,7 +2657,7 @@ void Spell::SpellEffectEnchantItemTemporary(uint32 i)  // Enchant Item Temporary
 	if(!itemTarget || !p_caster) return;
 	uint32 Duration = damage > 1 ? damage : 1800;
 
-	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(m_spellInfo->EffectMiscValue[i]);
+	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(m_spellInfo->EffectMiscValue[i]);
 	if(!Enchantment) return;
 
 	itemTarget->RemoveEnchantment(1);
@@ -2695,7 +2693,7 @@ void Spell::SpellEffectTameCreature(uint32 i)
 	else if(p_caster->GetSummon())
 		result = SPELL_FAILED_ALREADY_HAVE_SUMMON;
 	{
-		CreatureFamilyEntry *cf = sCreatureFamilyStore.LookupEntry(tame->GetCreatureName()->Family);
+		CreatureFamilyEntry *cf = dbcCreatureFamily.LookupEntry(tame->GetCreatureName()->Family);
 		if(cf && !cf->tameable)
 				result = SPELL_FAILED_BAD_TARGETS;
 	}
@@ -2821,7 +2819,7 @@ void Spell::SpellEffectTriggerSpell(uint32 i) // Trigger Spell
 	if(!unitTarget)
 		return;
 
-	Spell*sp=new Spell(m_caster,sSpellStore.LookupEntry(m_spellInfo->EffectTriggerSpell[i]),true,NULL);
+	Spell*sp=new Spell(m_caster,dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]),true,NULL);
 	SpellCastTargets tgt(unitTarget->GetGUID());
 	sp->prepare(&tgt);
 
@@ -3267,7 +3265,7 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 		{
 			if(!unitTarget || !p_caster) return;
 
-			SpellEntry*en=sSpellStore.LookupEntry(p_caster->judgespell);
+			SpellEntry*en=dbcSpell.LookupEntry(p_caster->judgespell);
 			Spell *sp=new Spell(p_caster,en,true,NULL);
 			SpellCastTargets tgt;
 			tgt.m_unitTarget=unitTarget->GetGUID();
@@ -3965,7 +3963,7 @@ void Spell::SpellEffectDestroyAllTotems(uint32 i)
 		if(p_caster->m_TotemSlots[x])
 		{
 			uint32 SpellID = p_caster->m_TotemSlots[x]->GetUInt32Value(UNIT_CREATED_BY_SPELL);
-			SpellEntry * sp = sSpellStore.LookupEntry(SpellID);
+			SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
 			if (!sp)
 				continue;
 
@@ -4016,7 +4014,7 @@ void Spell::SpellEffectSummonDemon(uint32 i)
 	//Create Enslave Aura if its inferno spell
 	if(m_spellInfo->Id == 1122)
 	{
-		SpellEntry *spellInfo = sSpellStore.LookupEntry(11726);
+		SpellEntry *spellInfo = dbcSpell.LookupEntry(11726);
 		
 		Spell *sp=new Spell((Object *)pPet,spellInfo,true,NULL);
 		SpellCastTargets tgt;
@@ -4376,7 +4374,7 @@ void Spell::SpellEffectEnchantHeldItem(uint32 i)
 	if(!item) return;
 
 	uint32 Duration = 1800; // Needs to be found in dbc.. I guess?
-	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(m_spellInfo->EffectMiscValue[i]);
+	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(m_spellInfo->EffectMiscValue[i]);
 	if(!Enchantment) return;
 
 	item->RemoveEnchantment(1);

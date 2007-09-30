@@ -283,7 +283,7 @@ int Unit_CastSpell(gmThread * a_thread)
 	GM_CHECK_INT_PARAM(spellid, 0);
 
 	Unit * pUnit = GetThisPointer<Unit>(a_thread);
-	pUnit->CastSpell(pUnit, sSpellStore.LookupEntry(spellid), true);
+	pUnit->CastSpell(pUnit, dbcSpell.LookupEntry(spellid), true);
 	return GM_OK;
 }
 int Unit_SetStandState(gmThread * a_thread)
@@ -408,7 +408,7 @@ int Unit_CastSpellOnTarget(gmThread * a_thread)
 	if(!pTarget)
 		return GM_OK;
 
-	SpellEntry * pSpellEntry = sSpellStore.LookupEntry(spellid);
+	SpellEntry * pSpellEntry = dbcSpell.LookupEntry(spellid);
 
 	pThis->CastSpell(pTarget, pSpellEntry, true);
 	return GM_OK;

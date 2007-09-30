@@ -866,7 +866,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						float his_facing=m_nextTarget->GetOrientation();
 						if(fabs(our_facing-his_facing)<CREATURE_DAZE_TRIGGER_ANGLE && !m_nextTarget->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
 						{
-							SpellEntry *info = sSpellStore.LookupEntry(CREATURE_SPELL_TO_DAZE);
+							SpellEntry *info = dbcSpell.LookupEntry(CREATURE_SPELL_TO_DAZE);
 							Spell *sp = new Spell(m_Unit, info, false, NULL);
 							SpellCastTargets targets;
 							targets.m_unitTarget = m_nextTarget->GetGUID();
@@ -955,7 +955,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						if(infront)
 						{
 							m_Unit->setAttackTimer(0, false);
-							SpellEntry *info = sSpellStore.LookupEntry(SPELL_RANGED_GENERAL);
+							SpellEntry *info = dbcSpell.LookupEntry(SPELL_RANGED_GENERAL);
 							if(info)
 							{
 								Spell *sp = new Spell(m_Unit, info, false, NULL);
@@ -991,7 +991,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				//this the way justly suggested
 //				if(m_nextSpell->spell->CastingTimeIndex != 1)
 				//do not stop for instant spells
-				SpellCastTime *sd = sCastTime.LookupEntry(m_nextSpell->spell->CastingTimeIndex);
+				SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_nextSpell->spell->CastingTimeIndex);
 				if(GetCastTime(sd) != 0)
 					StopMovement(0);
 
@@ -1486,7 +1486,7 @@ bool AIInterface::FindFriends(float dist)
 	if(family == HUMANOID && civilian && getMSTime() > m_guardTimer && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_NULL)
 	{
 		uint16 AreaId = m_Unit->GetMapMgr()->GetAreaID(m_Unit->GetPositionX(),m_Unit->GetPositionY());
-		AreaTable * at = sAreaStore.LookupEntry(AreaId);
+		AreaTable * at = dbcArea.LookupEntry(AreaId);
 		if(!at)
 			return result;
 
@@ -2606,7 +2606,7 @@ void AIInterface::CastSpell(Unit* caster, SpellEntry *spellInfo, SpellCastTarget
 
 SpellEntry *AIInterface::getSpellEntry(uint32 spellId)
 {
-	SpellEntry *spellInfo = sSpellStore.LookupEntry(spellId );
+	SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
 
 	if(!spellInfo)
 	{
@@ -2732,7 +2732,7 @@ AI_Spell *AIInterface::getSpell()
 			return 0;
 		}
 
-		cast_time = GetCastTime(sCastTime.LookupEntry( sp->spell->CastingTimeIndex ) );
+		cast_time = GetCastTime(dbcSpellCastTime.LookupEntry( sp->spell->CastingTimeIndex ) );
 		cast_time /= 1000;
 		if(cast_time)
 			next_spell_time = UNIXTIME + cast_time;

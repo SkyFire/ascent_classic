@@ -40,7 +40,7 @@ void Auction::UpdateInDB()
 
 AuctionHouse::AuctionHouse(uint32 ID)
 {
-	dbc = sAuctionHouseStore.LookupEntry(ID);
+	dbc = dbcAuctionHouse.LookupEntry(ID);
 	assert(dbc);
 
 	cut_percent = float( float(dbc->fee) / 100.0f );

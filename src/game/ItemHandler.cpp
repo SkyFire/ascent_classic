@@ -1659,7 +1659,7 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 			if(!ip)
 				gp = 0;
 			else
-				gp = sGemPropertiesStore.LookupEntry(ip->GemProperties);
+				gp = dbcGemProperty.LookupEntry(ip->GemProperties);
 	
 			if(gp)
 			if(!(gp->SocketMask & TargetItem->GetProto()->Sockets[i].SocketColor))
@@ -1672,7 +1672,7 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 			if(!it)
 				continue;
 
-			gp = sGemPropertiesStore.LookupEntry(it->GetProto()->GemProperties);
+			gp = dbcGemProperty.LookupEntry(it->GetProto()->GemProperties);
 			delete it;
 		
 			if(!gp)
@@ -1688,7 +1688,7 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 			else//add gem
 				FilledSlots++;
 
-			Enchantment = sEnchantStore.LookupEntry(gp->EnchantmentID);
+			Enchantment = dbcEnchant.LookupEntry(gp->EnchantmentID);
 			if(Enchantment)
 				TargetItem->AddEnchantment(Enchantment, 0, true,apply,false,2+i);
 		}
@@ -1703,7 +1703,7 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 			if(TargetItem->HasEnchantment(TargetItem->GetProto()->SocketBonus))
 				return;
 
-			Enchantment = sEnchantStore.LookupEntry(TargetItem->GetProto()->SocketBonus);
+			Enchantment = dbcEnchant.LookupEntry(TargetItem->GetProto()->SocketBonus);
 			if(Enchantment)
 			{
 				uint32 Slot = TargetItem->FindFreeEnchantSlot(Enchantment);

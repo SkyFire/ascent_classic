@@ -140,7 +140,7 @@ void Item::LoadFromDB(	Field *fields, Player * plr, bool light)
 	{
 		if(sscanf((*itr).c_str(), "%u,%u,%u", (unsigned int*)&enchant_id, (unsigned int*)&time_left, (unsigned int*)&enchslot) == 3)
 		{
-			entry = sEnchantStore.LookupEntry(enchant_id);
+			entry = dbcEnchant.LookupEntry(enchant_id);
 			if(entry && entry->Id == enchant_id)
 				AddEnchantment(entry, time_left,
 				(time_left==0),false,false,enchslot);
@@ -205,14 +205,14 @@ void Item::ApplyRandomProperties()
 	// apply random properties
 	if(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID] != 0)
 	{
-		RandomProps *rp= sRandomPropStore.LookupEntry(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID]);
+		RandomProps *rp= dbcRandomProps.LookupEntry(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID]);
 		if(rp)
 		{
 			for (int k=0;k<3;k++)
 			{
 				if (rp->spells[k] != 0)
 				{
-					EnchantEntry * ee = sEnchantStore.LookupEntry(rp->spells[k]);
+					EnchantEntry * ee = dbcEnchant.LookupEntry(rp->spells[k]);
 					if(HasEnchantment(ee->Id) < 0) 
 					{
 						uint32 Slot = FindFreeEnchantSlot(ee);
@@ -688,7 +688,7 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 					
 					if(Entry->spell[c] != 0)
 					{
-						sp = sSpellStore.LookupEntry(Entry->spell[c]);
+						sp = dbcSpell.LookupEntry(Entry->spell[c]);
 						if(!sp) continue;
 
 						spell = new Spell(m_owner, sp, true, 0);

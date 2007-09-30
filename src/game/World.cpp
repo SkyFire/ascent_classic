@@ -124,44 +124,6 @@ World::~World()
 
 	//eventholder = 0;
 	delete eventholder;
-	sLog.outString("\n  Unloading DBC files...");
-	// Indexed stores, need to call correct destructor.
-	delete ((FastIndexedDataStore<emoteentry>*)EmoteStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<SpellEntry>*)SpellStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<Lock>*)LockStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<SpellRange>*)RangeStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<SpellCastTime>*)CastTimeStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<SpellDuration>*)DurationStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<SpellRadius>*)RadiusStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<FactionTemplateDBC>*)FactionTmpStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<FactionDBC>*)FactionStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<EnchantEntry>*)EnchantStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<WorldMapArea>*)WorldMapAreaStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<AreaTable>*)AreaStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<skilllineentry>*)SkillLineStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<RandomProps>*)RandomPropStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<ItemSetEntry>*)ItemSetStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<TransportAnimation>*)TransportAnimationStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<AuctionHouseDBC>*)AuctionHouseStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<CreatureSpellDataEntry>*)CreatureSpellDataStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<ItemExtendedCostEntry>*)ItemExtendedCostStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<CreatureFamilyEntry>*)CreatureFamilyStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<CharClassEntry>*)CharClassStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<CharRaceEntry>*)CharRaceStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<MapEntry>*)MapStore::getSingletonPtr());
-	delete ((FastIndexedDataStore<GemPropertyEntry>*)GemPropertiesStore::getSingletonPtr());
-
-	// Non-Indexed stores
-	delete WorldMapOverlayStore::getSingletonPtr();
-	delete SkillStore::getSingletonPtr();
-	delete TaxiPathStore::getSingletonPtr();
-	delete TaxiNodeStore::getSingletonPtr();
-	delete TaxiPathNodeStore::getSingletonPtr();
-	delete WorldSafeLocsStore::getSingletonPtr();
-	delete NameGenStore::getSingletonPtr();
-	delete TalentStore::getSingletonPtr();
-	
-	sLog.outString("  DBC files unloaded.\n");
 
 	Storage_Cleanup();
 	for(list<SpellEntry*>::iterator itr = dummyspells.begin(); itr != dummyspells.end(); ++itr)
@@ -281,15 +243,14 @@ void CreateDummySpell(uint32 id)
 	sp->EquippedItemClass=uint32(-1);
 	sp->Effect[0]=3;
 	sp->EffectImplicitTargetA[0]=25;
-	sp->buffdescflags=4128828;
 	sp->NameHash=crc32((const unsigned char*)name, strlen(name));
 	sp->dmg_multiplier[0]=1.0f;
 	sp->FH=-1;
-	static_cast<FastIndexedDataStore<SpellEntry>*>(SpellStore::getSingletonPtr())->SetRow(id,sp);
+	dbcSpell.SetRow(id,sp);
 	sWorld.dummyspells.push_back(sp);
 }
 
-void World::SetInitialWorldSettings()
+bool World::SetInitialWorldSettings()
 {
 	CharacterDatabase.Execute("UPDATE characters SET online = 0 WHERE online = 1");
    
@@ -345,38 +306,8 @@ void World::SetInitialWorldSettings()
 	uint32 start_time = getMSTime();
 
 	Log.Notice("World", "Loading DBC files...");
-	new GemPropertiesStore("DBC/GemProperties.dbc");
-	new SpellStore("DBC/Spell.dbc");
-	new LockStore("DBC/Lock.dbc");
-	new SkillStore("DBC/SkillLineAbility.dbc");
-	new EmoteStore("DBC/EmotesText.dbc");
-	new RangeStore("DBC/SpellRange.dbc");
-	new CastTimeStore("DBC/SpellCastTimes.dbc");
-	new DurationStore("DBC/SpellDuration.dbc");
-	new RadiusStore("DBC/SpellRadius.dbc");
-	new FactionTmpStore("DBC/FactionTemplate.dbc");
-	new FactionStore("DBC/Faction.dbc");
-	new EnchantStore("DBC/SpellItemEnchantment.dbc");
-	new WorldMapAreaStore("DBC/WorldMapArea.dbc");
-	new WorldMapOverlayStore("DBC/WorldMapOverlay.dbc");
-	new AreaStore("DBC/AreaTable.dbc");
-	new SkillLineStore("DBC/SkillLine.dbc");
-	new RandomPropStore("DBC/ItemRandomProperties.dbc");
-	new TaxiPathStore("DBC/TaxiPath.dbc");
-	new TaxiNodeStore("DBC/TaxiNodes.dbc");
-	new TaxiPathNodeStore("DBC/TaxiPathNode.dbc");
-	new ItemSetStore("DBC/ItemSet.dbc");
-	new WorldSafeLocsStore("DBC/WorldSafeLocs.dbc");
-	new TransportAnimationStore("DBC/TransportAnimation.dbc");
-	new AuctionHouseStore("DBC/AuctionHouse.dbc");
-	new NameGenStore("DBC/NameGen.dbc");
-	new TalentStore("DBC/Talent.dbc");
-	new CreatureSpellDataStore("DBC/CreatureSpellData.dbc");
-	new CreatureFamilyStore("DBC/CreatureFamily.dbc");
-	new CharClassStore("DBC/ChrClasses.dbc");
-	new CharRaceStore("DBC/ChrRaces.dbc");
-	new MapStore("DBC/Map.dbc");
-	new ItemExtendedCostStore("DBC/ItemExtendedCost.dbc");
+	if(!LoadDBCs())
+		return false;
 
 	/*{
 		DBCFile moo;
@@ -432,7 +363,7 @@ void World::SetInitialWorldSettings()
 		flag_ = area.getRecord(i).getUInt(3);
 		zone_ = area.getRecord(i).getUInt(2);
 
-		mAreaIDToTable[flag_] = sAreaStore.LookupEntry(area_);
+		mAreaIDToTable[flag_] = dbcArea.LookupEntry(area_);
 		if(mZoneIDToTable.find(zone_) != mZoneIDToTable.end())
 		{
 			if(mZoneIDToTable[zone_]->AreaFlags != 312 &&
@@ -578,12 +509,10 @@ void World::SetInitialWorldSettings()
 		uint32 namehash = 0;
 
 		// get spellentry
-		SpellEntry * sp = sSpellStore.LookupEntry(spellid);
+		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
 		for(uint32 b=0;b<3;++b)
 		{
-			if(sp->EffectTriggerSpell[b] != 0 &&
-				static_cast<FastIndexedDataStore<SpellEntry>*>(SpellStore::getSingletonPtr())->LookupEntryForced(
-				sp->EffectTriggerSpell[b]) == NULL)
+			if(sp->EffectTriggerSpell[b] != 0 && dbcSpell.LookupEntryForced(sp->EffectTriggerSpell[b]) == NULL)
 			{
 				/* proc spell referencing non-existant spell. create a dummy spell for use w/ it. */
 				CreateDummySpell(sp->EffectTriggerSpell[b]);
@@ -694,7 +623,7 @@ void World::SetInitialWorldSettings()
 					teachspell = sp->EffectTriggerSpell[2];
 				if(teachspell)
 				{
-					SpellEntry *spellInfo = sSpellStore.LookupEntry(teachspell );
+					SpellEntry *spellInfo = dbcSpell.LookupEntry(teachspell );
 					spellInfo->spellLevel = new_level;
 					sp->spellLevel = new_level;
 				}
@@ -1323,34 +1252,34 @@ void World::SetInitialWorldSettings()
 //	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);
 	}
 	//this is so lame : shamanistic rage triggers a new spell which borrows it's stats from parent spell :S
-	SpellEntry * parentsp = sSpellStore.LookupEntry(30823);
-	SpellEntry * triggersp = sSpellStore.LookupEntry(30824);
+	SpellEntry * parentsp = dbcSpell.LookupEntry(30823);
+	SpellEntry * triggersp = dbcSpell.LookupEntry(30824);
 	if(parentsp && triggersp) 
 		triggersp->EffectBasePoints[0] = parentsp->EffectBasePoints[0];
 
-	SpellEntry * sp = sSpellStore.LookupEntry(16164);
+	SpellEntry * sp = dbcSpell.LookupEntry(16164);
 	if(sp && sp->Id==16164)
 		sp->procFlags=PROC_ON_SPELL_CRIT_HIT_VICTIM;
 
-	sp = sSpellStore.LookupEntry(17364);
+	sp = dbcSpell.LookupEntry(17364);
 	//remove stormstrike effect 0
 	//if(sp && sp->Id==17364)
 		//sp->Effect[0]=0;
 
 	//paladin - Blessing of Light
 		//first let us get the 2 spellgrouprelations
-	sp = sSpellStore.LookupEntry(635);//holy light
+	sp = dbcSpell.LookupEntry(635);//holy light
 	uint32 HL_grouprelation;
 	if(sp)
 		HL_grouprelation = sp->EffectSpellGroupRelation[0];
 	else HL_grouprelation=0;
-	sp = sSpellStore.LookupEntry(19750);//Flash of light
+	sp = dbcSpell.LookupEntry(19750);//Flash of light
 	uint32 FL_grouprelation;
 	if(sp)
 		FL_grouprelation = sp->EffectSpellGroupRelation[0];
 	else FL_grouprelation=0;
 
-	sp = sSpellStore.LookupEntry(19977);
+	sp = dbcSpell.LookupEntry(19977);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 107;
@@ -1358,7 +1287,7 @@ void World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
-	sp = sSpellStore.LookupEntry(19978);
+	sp = dbcSpell.LookupEntry(19978);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 107;
@@ -1366,7 +1295,7 @@ void World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
-	sp = sSpellStore.LookupEntry(19979);
+	sp = dbcSpell.LookupEntry(19979);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 107;
@@ -1374,7 +1303,7 @@ void World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
-	sp = sSpellStore.LookupEntry(27144);
+	sp = dbcSpell.LookupEntry(27144);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 107;
@@ -1382,7 +1311,7 @@ void World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
-	sp = sSpellStore.LookupEntry(32770);
+	sp = dbcSpell.LookupEntry(32770);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 107;
@@ -1392,14 +1321,14 @@ void World::SetInitialWorldSettings()
 	}
 
 	//paladin - seal of blood
-	sp = sSpellStore.LookupEntry(31892);
+	sp = dbcSpell.LookupEntry(31892);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31893;
 	}
-	sp = sSpellStore.LookupEntry(38008);
+	sp = dbcSpell.LookupEntry(38008);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
@@ -1407,14 +1336,14 @@ void World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 31893;
 	}
 	//paladin - Spiritual Attunement 
-	sp = sSpellStore.LookupEntry(31785);
+	sp = dbcSpell.LookupEntry(31785);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
-	sp = sSpellStore.LookupEntry(33776);
+	sp = dbcSpell.LookupEntry(33776);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
@@ -1422,15 +1351,15 @@ void World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 31786;
 	}
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
-	sp = sSpellStore.LookupEntry(27962);
+	sp = dbcSpell.LookupEntry(27962);
 	if(sp)
 		sp->EffectMiscValue[0] = 2998;
-	sp = sSpellStore.LookupEntry(36285);
+	sp = dbcSpell.LookupEntry(36285);
 	if(sp)
 		sp->EffectMiscValue[0] = 2998;
 
 	//muhaha, rewriting Retaliation spell as old one :D
-	sp = sSpellStore.LookupEntry(20230);
+	sp = dbcSpell.LookupEntry(20230);
 	if(sp)
 	{
 		sp->Effect[0] = 6; //aura
@@ -1440,70 +1369,70 @@ void World::SetInitialWorldSettings()
 	}
 
 	//"bloodthirst" new version is ok but old version is wrong from now on :(
-	sp = sSpellStore.LookupEntry(23881);
+	sp = dbcSpell.LookupEntry(23881);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //cast on us, it is good
 		sp->EffectTriggerSpell[1] = 23885; //evil , but this is good for us :D
 	}
-	sp = sSpellStore.LookupEntry(23892);
+	sp = dbcSpell.LookupEntry(23892);
 	if(sp)
 	{
 		sp->Effect[1] = 64;
 		sp->EffectTriggerSpell[1] = 23886; //evil , but this is good for us :D
 	}
-	sp = sSpellStore.LookupEntry(23893);
+	sp = dbcSpell.LookupEntry(23893);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //
 		sp->EffectTriggerSpell[1] = 23887; //evil , but this is good for us :D
 	}
-	sp = sSpellStore.LookupEntry(23894);
+	sp = dbcSpell.LookupEntry(23894);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //
 		sp->EffectTriggerSpell[1] = 23888; //evil , but this is good for us :D
 	}
-	sp = sSpellStore.LookupEntry(25251);
+	sp = dbcSpell.LookupEntry(25251);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //aura
 		sp->EffectTriggerSpell[1] = 25252; //evil , but this is good for us :D
 	}
-	sp = sSpellStore.LookupEntry(30335);
+	sp = dbcSpell.LookupEntry(30335);
 	if(sp)
 	{
 		sp->Effect[1] = 64; //aura
 		sp->EffectTriggerSpell[1] = 30339; //evil , but this is good for us :D
 	}
 	//Druid:Intensity
-	sp = sSpellStore.LookupEntry(17106);
+	sp = dbcSpell.LookupEntry(17106);
 	if(sp)
 	{
 	   sp->EffectApplyAuraName[1] = 42;
 	   sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = sSpellStore.LookupEntry(17107);
+	sp = dbcSpell.LookupEntry(17107);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[1] = 42;
 		 sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = sSpellStore.LookupEntry(17108);
+	sp = dbcSpell.LookupEntry(17108);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[1] = 42;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
     //Improved Sprint
-	sp = sSpellStore.LookupEntry(13743);
+	sp = dbcSpell.LookupEntry(13743);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 		sp->procChance = 50;
 	}
-	sp = sSpellStore.LookupEntry(13875);
+	sp = dbcSpell.LookupEntry(13875);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
@@ -1512,7 +1441,7 @@ void World::SetInitialWorldSettings()
 	//warlock: Shadow Mastery
 	for (uint32 i=0;i<5;i++)
 	{
-		sp  = sSpellStore.LookupEntry(18271+i);
+		sp  = dbcSpell.LookupEntry(18271+i);
 		if (sp)
 		{
 			sp->EffectSpellGroupRelation[0]=33562624;
@@ -1520,38 +1449,38 @@ void World::SetInitialWorldSettings()
 		}
 	}
 	//mage: Arcane Power
-	sp  = sSpellStore.LookupEntry(12042);
+	sp  = dbcSpell.LookupEntry(12042);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=5775504;
 		sp->EffectSpellGroupRelation[1]=10518528;
 	}
 	//mage: Fire Power
-	sp  = sSpellStore.LookupEntry(11124);
+	sp  = dbcSpell.LookupEntry(11124);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=868;
 		sp->EffectSpellGroupRelation[1]=868;
 	}
-	sp  = sSpellStore.LookupEntry(12398);
+	sp  = dbcSpell.LookupEntry(12398);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=868;
 		sp->EffectSpellGroupRelation[1]=868;
 	}
-	sp  = sSpellStore.LookupEntry(12399);
+	sp  = dbcSpell.LookupEntry(12399);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=868;
 		sp->EffectSpellGroupRelation[1]=868;
 	}
-	sp  = sSpellStore.LookupEntry(12400);
+	sp  = dbcSpell.LookupEntry(12400);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=868;
 		sp->EffectSpellGroupRelation[1]=868;
 	}
-	sp  = sSpellStore.LookupEntry(12378);
+	sp  = dbcSpell.LookupEntry(12378);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=868;
@@ -1569,24 +1498,24 @@ void World::SetInitialWorldSettings()
 	//	sp->EffectSpellGroupRelation[0]=5775504;
 	//}
 	//mage: Blazing Speed
-	sp = sSpellStore.LookupEntry(31641); 
+	sp = dbcSpell.LookupEntry(31641); 
 	if(sp)	sp->EffectTriggerSpell[0]=31643;
-	sp = sSpellStore.LookupEntry(31642);
+	sp = dbcSpell.LookupEntry(31642);
 	if(sp)	sp->EffectTriggerSpell[0]=31643;
 
 	//mage talent "frostbyte". we make it to be dummy
-	sp = sSpellStore.LookupEntry(11071);
+	sp = dbcSpell.LookupEntry(11071);
 	if(sp)	sp->EffectApplyAuraName[0]=4;
-	sp = sSpellStore.LookupEntry(12496);
+	sp = dbcSpell.LookupEntry(12496);
 	if(sp)	sp->EffectApplyAuraName[0]=4;
-	sp = sSpellStore.LookupEntry(12497);
+	sp = dbcSpell.LookupEntry(12497);
 	if(sp)	sp->EffectApplyAuraName[0]=4;
 	//rogue-shiv -> add 1 combo point
-	sp = sSpellStore.LookupEntry(5938);
+	sp = dbcSpell.LookupEntry(5938);
 	if(sp)	sp->Effect[1]=80;
 
 	//warlock - soul leech
-	sp = sSpellStore.LookupEntry(30293);
+	sp = dbcSpell.LookupEntry(30293);
 	if(sp)
 	{
 		sp->Effect[0] = 6; //aura
@@ -1594,7 +1523,7 @@ void World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 30294;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
-	sp = sSpellStore.LookupEntry(30295);
+	sp = dbcSpell.LookupEntry(30295);
 	if(sp)
 	{
 		sp->Effect[0] = 6; //aura
@@ -1602,7 +1531,7 @@ void World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 30294;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
-	sp = sSpellStore.LookupEntry(30296);
+	sp = dbcSpell.LookupEntry(30296);
 	if(sp)
 	{
 		sp->Effect[0] = 6; //aura
@@ -1612,7 +1541,7 @@ void World::SetInitialWorldSettings()
 	}
 
 	//warlock - Pyroclasm
-	sp = sSpellStore.LookupEntry(18073);
+	sp = dbcSpell.LookupEntry(18073);
 	if(sp)
 	{
 		sp->Effect[0] = 0; //delete this owerride effect :P
@@ -1620,7 +1549,7 @@ void World::SetInitialWorldSettings()
 		sp->procFlags=PROC_ON_CAST_SPELL;
 		sp->procChance = 13; //god, save us from fixed values !
 	}
-	sp = sSpellStore.LookupEntry(18096);
+	sp = dbcSpell.LookupEntry(18096);
 	if(sp)
 	{
 		sp->Effect[0] = 0; //delete this owerride effect :P
@@ -1630,19 +1559,19 @@ void World::SetInitialWorldSettings()
 	}
 
 	//improved scorch
-	sp = sSpellStore.LookupEntry(11095);
+	sp = dbcSpell.LookupEntry(11095);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42; 
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = sSpellStore.LookupEntry(12872);
+	sp = dbcSpell.LookupEntry(12872);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42; 
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
-	sp = sSpellStore.LookupEntry(12873);
+	sp = dbcSpell.LookupEntry(12873);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42; 
@@ -1650,7 +1579,7 @@ void World::SetInitialWorldSettings()
 	}
 
 	//Nature's Grasp
-	sp = sSpellStore.LookupEntry(16689);
+	sp = dbcSpell.LookupEntry(16689);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -1660,7 +1589,7 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = sSpellStore.LookupEntry(16810);
+	sp = dbcSpell.LookupEntry(16810);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -1670,7 +1599,7 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = sSpellStore.LookupEntry(16811);
+	sp = dbcSpell.LookupEntry(16811);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -1680,7 +1609,7 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = sSpellStore.LookupEntry(16812);
+	sp = dbcSpell.LookupEntry(16812);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -1690,7 +1619,7 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = sSpellStore.LookupEntry(16813);
+	sp = dbcSpell.LookupEntry(16813);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -1700,7 +1629,7 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = sSpellStore.LookupEntry(17329);
+	sp = dbcSpell.LookupEntry(17329);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -1710,7 +1639,7 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
-	sp = sSpellStore.LookupEntry(27009);
+	sp = dbcSpell.LookupEntry(27009);
 	if(sp)
 	{
 		sp->Effect[0] = 6; 
@@ -1721,7 +1650,7 @@ void World::SetInitialWorldSettings()
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
 	//wrath of air totem targets sorounding creatures instead of us
-	sp = sSpellStore.LookupEntry(2895);
+	sp = dbcSpell.LookupEntry(2895);
 	if(sp)
 	{
 		sp->EffectImplicitTargetA[0]=1;
@@ -1732,7 +1661,7 @@ void World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 	//Relentless Strikes
-	sp = sSpellStore.LookupEntry(14179);
+	sp = dbcSpell.LookupEntry(14179);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0]=42;//proc spell
@@ -1740,13 +1669,13 @@ void World::SetInitialWorldSettings()
 		sp->EffectBasePoints[1] = 20; //client showes 20% chance but whe do not have it ? :O
 	}
 	//priest - surge of light
-	sp = sSpellStore.LookupEntry(33150);
+	sp = dbcSpell.LookupEntry(33150);
 	if(sp)
 		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_TAGRGET_SELF);
-	sp = sSpellStore.LookupEntry(33154);
+	sp = dbcSpell.LookupEntry(33154);
 	if(sp)
 		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_TAGRGET_SELF);
-	sp = sSpellStore.LookupEntry(33151);
+	sp = dbcSpell.LookupEntry(33151);
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=128;
@@ -1755,59 +1684,59 @@ void World::SetInitialWorldSettings()
 		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
 	}
 	//Seal of Justice -lowered proc chance (experimental values !)
-	sp = sSpellStore.LookupEntry(20164);
+	sp = dbcSpell.LookupEntry(20164);
 	if(sp)
 		sp->procChance = 20;
-	sp = sSpellStore.LookupEntry(31895);
+	sp = dbcSpell.LookupEntry(31895);
 	if(sp)
 		sp->procChance = 20;
 	//make Berserking a simple spell 
-	sp = sSpellStore.LookupEntry(20554);
+	sp = dbcSpell.LookupEntry(20554);
 	if(sp)
 	{
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 26635;
 	}
-	sp = sSpellStore.LookupEntry(26296);
+	sp = dbcSpell.LookupEntry(26296);
 	if(sp)
 	{
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 26635;
 	}
-	sp = sSpellStore.LookupEntry(26297);
+	sp = dbcSpell.LookupEntry(26297);
 	if(sp)
 	{
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 26635;
 	}
 	//rogue - intiative
-	sp = sSpellStore.LookupEntry(13976);
+	sp = dbcSpell.LookupEntry(13976);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
-	sp = sSpellStore.LookupEntry(13979);
+	sp = dbcSpell.LookupEntry(13979);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
-	sp = sSpellStore.LookupEntry(13980);
+	sp = dbcSpell.LookupEntry(13980);
 	if(sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
 	}
 	//this an on equip item spell(2824) :  ice arrow(29501)
-	sp = sSpellStore.LookupEntry(29501);
+	sp = dbcSpell.LookupEntry(29501);
 	if(sp)
 	{
 		sp->procChance = 30;//some say it is triggered every now and then
 		sp->procFlags = PROC_ON_RANGED_ATTACK;
 	}
 	//warrior - berserker rage is missing 1 effect = regenerate rage
-	sp = sSpellStore.LookupEntry(18499);
+	sp = dbcSpell.LookupEntry(18499);
 	if(sp)
 	{
 		sp->Effect[2] = 6;
@@ -1816,61 +1745,61 @@ void World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
 	}
 	//warrior - improved berserker rage
-	sp = sSpellStore.LookupEntry(20500);
+	sp = dbcSpell.LookupEntry(20500);
 	if(sp)
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
-	sp = sSpellStore.LookupEntry(20501);
+	sp = dbcSpell.LookupEntry(20501);
 	if(sp)
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
 	//warrior - Rampage
-	sp = sSpellStore.LookupEntry(29801);
+	sp = dbcSpell.LookupEntry(29801);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
-	sp = sSpellStore.LookupEntry(30030);
+	sp = dbcSpell.LookupEntry(30030);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
-	sp = sSpellStore.LookupEntry(30033);
+	sp = dbcSpell.LookupEntry(30033);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	// priest - Reflective Shield
-	sp = sSpellStore.LookupEntry(33201);
+	sp = dbcSpell.LookupEntry(33201);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
-	sp = sSpellStore.LookupEntry(33202);
+	sp = dbcSpell.LookupEntry(33202);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
-	sp = sSpellStore.LookupEntry(33203);
+	sp = dbcSpell.LookupEntry(33203);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
-	sp = sSpellStore.LookupEntry(33204);
+	sp = dbcSpell.LookupEntry(33204);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
-	sp = sSpellStore.LookupEntry(33205);
+	sp = dbcSpell.LookupEntry(33205);
 	if(sp)
 	{
 		sp->procFlags = PROC_ON_ABSORB;
@@ -1878,33 +1807,33 @@ void World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
 	// mage - Frost Warding
-	sp = sSpellStore.LookupEntry(11189);
+	sp = dbcSpell.LookupEntry(11189);
 	if(sp)
 	{
-		SpellEntry * tsp = sSpellStore.LookupEntry(168); //frost armor
+		SpellEntry * tsp = dbcSpell.LookupEntry(168); //frost armor
 		if(tsp)
 			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
-		tsp = sSpellStore.LookupEntry(7302); //ice armor
+		tsp = dbcSpell.LookupEntry(7302); //ice armor
 		if(tsp)
 			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
 	}
-	sp = sSpellStore.LookupEntry(28332);
+	sp = dbcSpell.LookupEntry(28332);
 	if(sp)
 	{
-		SpellEntry * tsp = sSpellStore.LookupEntry(168); //frost armor
+		SpellEntry * tsp = dbcSpell.LookupEntry(168); //frost armor
 		if(tsp)
 			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
-		tsp = sSpellStore.LookupEntry(7302); //ice armor
+		tsp = dbcSpell.LookupEntry(7302); //ice armor
 		if(tsp)
 			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
 //		sp->procChance = 100;
 	}
 	//winfury weapon changes. Start to hate these day by day
-	EnchantEntry * Enchantment = sEnchantStore.LookupEntry(283);
+	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33757; //this is actually good
-		sp = sSpellStore.LookupEntry(33757);
+		sp = dbcSpell.LookupEntry(33757);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -1912,11 +1841,11 @@ void World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 8232; //for the logs and rest
 		}
 	}
-	Enchantment = sEnchantStore.LookupEntry(284);
+	Enchantment = dbcEnchant.LookupEntry(284);
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33756; 
-		sp = sSpellStore.LookupEntry(33756);
+		sp = dbcSpell.LookupEntry(33756);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -1924,11 +1853,11 @@ void World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 8235; //for the logs and rest
 		}
 	}
-	Enchantment = sEnchantStore.LookupEntry(525);
+	Enchantment = dbcEnchant.LookupEntry(525);
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33755; 
-		sp = sSpellStore.LookupEntry(33755);
+		sp = dbcSpell.LookupEntry(33755);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -1936,11 +1865,11 @@ void World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 10486; //for the logs and rest
 		}
 	}
-	Enchantment = sEnchantStore.LookupEntry(1669);
+	Enchantment = dbcEnchant.LookupEntry(1669);
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33754; 
-		sp = sSpellStore.LookupEntry(33754);
+		sp = dbcSpell.LookupEntry(33754);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -1948,11 +1877,11 @@ void World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 16362; //for the logs and rest
 		}
 	}
-	Enchantment = sEnchantStore.LookupEntry(2636);
+	Enchantment = dbcEnchant.LookupEntry(2636);
 	if(Enchantment)
 	{
 		Enchantment->spell[0] = 33727; 
-		sp = sSpellStore.LookupEntry(33727);
+		sp = dbcSpell.LookupEntry(33727);
 		if(sp)
 		{
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
@@ -1961,7 +1890,7 @@ void World::SetInitialWorldSettings()
 		}
 	}
 	//for test only
-	sp = sSpellStore.LookupEntry(32796);
+	sp = dbcSpell.LookupEntry(32796);
 	if(sp)
 	{
 //		printf("!!!!!!hash %u \n",sp->NameHash);
@@ -1980,17 +1909,17 @@ void World::SetInitialWorldSettings()
 
 	//fix for Predatory Strikes
 	uint32 mm=(1<<(FORM_BEAR-1))|(1<<(FORM_DIREBEAR-1))|(1<<(FORM_MOONKIN-1))|(1<<(FORM_CAT-1));
-	sSpellStore.LookupEntry(16972)->RequiredShapeShift = mm;
-	sSpellStore.LookupEntry(16974)->RequiredShapeShift = mm;
-	sSpellStore.LookupEntry(16975)->RequiredShapeShift = mm;
-	sSpellStore.LookupEntry(20134)->procChance = 50;
+	dbcSpell.LookupEntry(16972)->RequiredShapeShift = mm;
+	dbcSpell.LookupEntry(16974)->RequiredShapeShift = mm;
+	dbcSpell.LookupEntry(16975)->RequiredShapeShift = mm;
+	dbcSpell.LookupEntry(20134)->procChance = 50;
 
 	/* aspect of the pack - change to AA */
-	sSpellStore.LookupEntry(13159)->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
-	sSpellStore.LookupEntry(13159)->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
+	dbcSpell.LookupEntry(13159)->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
+	dbcSpell.LookupEntry(13159)->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
 	
 	/* shadowstep - change proc flags */
-	sSpellStore.LookupEntry(36563)->procFlags = 0;
+	dbcSpell.LookupEntry(36563)->procFlags = 0;
 
 	Log.Notice("World","Starting Transport System...");
 	objmgr.LoadTransporters();
@@ -2160,7 +2089,7 @@ void World::UpdateSessions(uint32 diff)
 
 std::string World::GenerateName(uint32 type)
 {
-	uint32 maxval = NameGenStore::getSingleton().GetNumRows();
+/*	uint32 maxval = NameGenStore::getSingleton().GetNumRows();
 	uint32 entry = rand()%(maxval+1); // we don't want 1..
 	NameGenEntry* ne = NameGenStore::getSingleton().LookupEntry(entry);
 	if(!ne)
@@ -2171,7 +2100,7 @@ std::string World::GenerateName(uint32 type)
 	const char *name = NameGenStore::getSingleton().LookupString((const uint32)ne->offsetindex);
 	if(name)
 		return name;
-	else
+	else*/
 		return "ERR";
 }
 

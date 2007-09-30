@@ -70,7 +70,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	if(!spellId)
 		return;
 	// check for spell id
-	SpellEntry *spellInfo = sSpellStore.LookupEntry( spellId );
+	SpellEntry *spellInfo = dbcSpell.LookupEntryForced( spellId );
 
 	if(!spellInfo)
 	{
@@ -150,7 +150,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 	if (GetPlayer()->GetOnMeleeSpell() != spellId)
 	{
 		// check for spell id
-		SpellEntry *spellInfo = sSpellStore.LookupEntry(spellId );
+		SpellEntry *spellInfo = dbcSpell.LookupEntryForced(spellId );
 
 		if(!spellInfo || !sHookInterface.OnCastSpell(_player, spellInfo))
 		{
@@ -200,7 +200,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 				SpellCastTargets targets(recvPacket,GetPlayer()->GetGUID());
 				if(!targets.m_unitTarget)
 					return;
-				SpellEntry *sp = sSpellStore.LookupEntry(spellid);
+				SpellEntry *sp = dbcSpell.LookupEntry(spellid);
 			
 				_player->m_AutoShotSpell = sp;
 				_player->m_AutoShotDuration = duration;
@@ -217,7 +217,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 			sChatHandler.SystemMessageToPlr(_player, "%sSpell Cast:%s %s %s[Group %u, family %u]", MSG_COLOR_LIGHTBLUE,
 			MSG_COLOR_SUBWHITE, name, MSG_COLOR_YELLOW, spellInfo->SpellGroupType, spellInfo->SpellFamilyName);*/
 
-        if(GetPlayer()->m_currentSpell && GetCastTime(sCastTime.LookupEntry(spellInfo->CastingTimeIndex)))
+        if(GetPlayer()->m_currentSpell && GetCastTime(dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex)))
         {
             _player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, 0);
             return;
@@ -280,7 +280,7 @@ void WorldSession::HandleAddDynamicTargetOpcode(WorldPacket & recvPacket)
 	uint8 flags;
 	recvPacket >> guid >> spellid >> flags;
 	
-	SpellEntry * sp = sSpellStore.LookupEntry(spellid);
+	SpellEntry * sp = dbcSpell.LookupEntry(spellid);
 	// Summoned Elemental's Freeze
     if (spellid == 33395)
     {

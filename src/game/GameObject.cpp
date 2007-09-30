@@ -377,7 +377,7 @@ void GameObject::InitAI()
 	}
     else if(pInfo->Type == GAMEOBJECT_TYPE_CHEST)
     {
-        Lock *pLock = sLockStore.LookupEntry(GetInfo()->SpellFocus);
+        Lock *pLock = dbcLock.LookupEntry(GetInfo()->SpellFocus);
         if(pLock)
         {
             for(uint32 i=0; i < 5; i++)
@@ -404,7 +404,7 @@ void GameObject::InitAI()
 	if(!spellid || spellid == 22247)
 		return;
 
-	SpellEntry *sp= sSpellStore.LookupEntry(spellid);
+	SpellEntry *sp= dbcSpell.LookupEntry(spellid);
 	if(!sp)
 	{
 		spell = NULL;
@@ -423,14 +423,14 @@ void GameObject::InitAI()
 	{
 		if(sp->Effect[i])
 		{
-			float t = GetRadius(sSpellRadius.LookupEntry(sp->EffectRadiusIndex[i]));
+			float t = GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[i]));
 			if(t > r)
 				r = t;
 		}
 	}
 
 	if(r < 0.1)//no range
-		r = GetMaxRange(sSpellRange.LookupEntry(sp->rangeIndex));
+		r = GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex));
 
 	range = r*r;//square to make code faster
 	checkrate = 20;//once in 2 seconds
@@ -454,9 +454,9 @@ bool GameObject::Load(GOSpawn *spawn)
 	if(spawn->faction)
 	{
 		SetUInt32Value(GAMEOBJECT_FACTION,spawn->faction);
-		m_faction = sFactionTmpStore.LookupEntry(spawn->faction);
+		m_faction = dbcFactionTemplate.LookupEntry(spawn->faction);
 		if(m_faction)
-			m_factionDBC = sFactionStore.LookupEntry(m_faction->Faction);
+			m_factionDBC = dbcFaction.LookupEntry(m_faction->Faction);
 	}
 	SetFloatValue(OBJECT_FIELD_SCALE_X,spawn->scale);
 	_LoadQuests();

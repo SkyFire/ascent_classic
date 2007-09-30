@@ -1101,7 +1101,7 @@ bool ChatHandler::HandleGetPosCommand(const char* args, WorldSession *m_session)
 	return true;*/
 
 	uint32 spell = atol(args);
-	SpellEntry *se = sSpellStore.LookupEntry(spell);
+	SpellEntry *se = dbcSpell.LookupEntry(spell);
 	if(se)
 		BlueSystemMessage(m_session, "SpellIcon for %d is %d", se->Id, se->field114);
 	return true;

@@ -33,7 +33,7 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 	if (requested_rank > 4)
 		return;
 
-	unsigned int numRows = sTalentStore.GetNumRows();
+/*	unsigned int numRows = sTalentStore.GetNumRows();
 	TalentEntry *talentInfo=NULL ;
 	for (unsigned int i = 0; i < numRows; i++)		  // Loop through all talents.
 	{
@@ -43,7 +43,8 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 			talentInfo=t;
 			break;
 		}
-	}
+	}*/
+	TalentEntry * talentInfo = dbcTalent.LookupEntryForced(talent_id);
 	if(!talentInfo)return;
   
 	Player * player = GetPlayer();
@@ -52,7 +53,7 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 	if (talentInfo->DependsOn > 0)
 	{
 		TalentEntry *depTalentInfo = NULL;
-		for (unsigned int i = 0; i < numRows; i++)		  // Loop through all talents.
+		/*for (unsigned int i = 0; i < numRows; i++)		  // Loop through all talents.
 		{
 			TalentEntry *t= sTalentStore.LookupEntry( i );
 			if(t->TalentID==talentInfo->DependsOn)
@@ -60,7 +61,8 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 				depTalentInfo=t;
 				break;
 			}
-		}
+		}*/
+		depTalentInfo = dbcTalent.LookupEntryForced(talentInfo->DependsOn);
 		bool hasEnoughRank = false;
 		for (int i = talentInfo->DependsOnRank; i < 5; i++)
 		{
@@ -83,10 +85,10 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 	uint32 tTree = talentInfo->TalentTree;
 	if (talentInfo->Row > 0)
 	{
-		for (unsigned int i = 0; i < numRows; i++)		  // Loop through all talents.
+		for (unsigned int i = 0; i < dbcTalent.GetNumRows(); i++)		  // Loop through all talents.
 		{
 			// Someday, someone needs to revamp
-			TalentEntry *tmpTalent = sTalentStore.LookupEntry(i);
+			TalentEntry *tmpTalent = dbcTalent.LookupRow(i);
 			if (tmpTalent)								  // the way talents are tracked
 			{
 				if (tmpTalent->TalentTree == tTree)
@@ -125,7 +127,7 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 		{
 			GetPlayer( )->addSpell(spellid);			
 	
-			SpellEntry *spellInfo = sSpellStore.LookupEntry( spellid );	 
+			SpellEntry *spellInfo = dbcSpell.LookupEntry( spellid );	 
 			
 			if(requested_rank > 0 )
 			{
@@ -212,7 +214,7 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recv_data)
 	if(points_remaining==_player->GetUInt32Value(PLAYER_CHARACTER_POINTS2))
 	{
 		//we unlearned a kill so we enable a new one to be learned
-		skilllineentry *sk=sSkillLineStore.LookupEntry(skill_line);
+		skilllineentry *sk=dbcSkillLine.LookupEntry(skill_line);
 		if(!sk)
 			return;
 		if(sk->type==SKILL_TYPE_PROFESSION && points_remaining<2)

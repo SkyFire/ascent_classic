@@ -242,48 +242,6 @@ bool ChatHandler::HandleAddSpiritCommand(const char* args, WorldSession *m_sessi
 	m_session->SendPacket( &data );
 
 	return true;*/
-#define SPIRITHEALER_NAMEID 6491
-	// Loop through all graveyard locations
-	uint32 entries=sWorldSafeLocsStore.GetNumRows();
-	GraveyardEntry*g;
-	BlueSystemMessage(m_session, "Spawning spirit healers. This may take some time.");
-	for(uint32 c=0;c<entries;c++)
-	{
-		g=sWorldSafeLocsStore.LookupEntry(c);
-		// Let's create a creature
-		Creature *pCreature = m_session->GetPlayer()->GetMapMgr()->CreateCreature();
-		float x = g->x + 2;
-		float y = g->y - 2;		// move it a little..
-				
-		pCreature->Create(CreatureNameStorage.LookupEntry(SPIRITHEALER_NAMEID)->Name, g->mapid, x, y, g->z, 3.14f);
-		pCreature->SetUInt32Value( OBJECT_FIELD_ENTRY, SPIRITHEALER_NAMEID );
-		pCreature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
-		pCreature->SetUInt32Value(UNIT_FIELD_DISPLAYID, 5233);
-		pCreature->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, 5233);
-		pCreature->SetUInt32Value(UNIT_NPC_FLAGS, 35);//33
-		pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE , 35);
-		pCreature->SetUInt32Value(UNIT_FIELD_HEALTH, 100);
-		pCreature->SetUInt32Value(UNIT_FIELD_MAXHEALTH, 100);
-		pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, 60);
-		pCreature->SetUInt32Value(UNIT_FIELD_FLAGS, 768);
-		pCreature->SetUInt32Value(UNIT_FIELD_AURA, 10848);
-		pCreature->SetUInt32Value(UNIT_FIELD_AURALEVELS+0, 0x0000003C);
-		pCreature->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS+0, 0x000000FF);
-		pCreature->SetUInt32Value(UNIT_FIELD_AURAFLAGS+0, 0x00000009);
-		pCreature->SetFloatValue(UNIT_FIELD_COMBATREACH , 1.5f);
-		pCreature->SetFloatValue(UNIT_FIELD_MAXDAMAGE ,  5.0f);
-		pCreature->SetFloatValue(UNIT_FIELD_MINDAMAGE , 8.0f);
-		pCreature->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 1900);
-		pCreature->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME+1, 2000);
-		pCreature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 2.0f);
-		pCreature->SetUInt32Value(UNIT_FIELD_BYTES_0, 0x01010100);
-		pCreature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0x01000000);
-		pCreature->SetUInt32Value(UNIT_FIELD_BYTES_2, 0x00001001);
-
-		pCreature->_setFaction();
-		pCreature->SaveToDB();
-	}
-	GreenSystemMessage(m_session, "%d spirit healers spawned.", entries);
 	return true;
 }
 
@@ -350,7 +308,7 @@ bool ChatHandler::HandleLearnCommand(const char* args, WorldSession *m_session)
 		{
 			if(skilllines[plr->getClass()][i] != 0)
 			{
-				skilllineentry * se = sSkillLineStore.LookupEntry(skilllines[plr->getClass()][i]);
+				skilllineentry * se = dbcSkillLine.LookupEntry(skilllines[plr->getClass()][i]);
 				if(se && se->type == SKILL_TYPE_CLASS)
 				{
 					/* grab all training spells for that skill line */
@@ -372,7 +330,7 @@ bool ChatHandler::HandleLearnCommand(const char* args, WorldSession *m_session)
 								}
 							}
 						}
-						BlueSystemMessage(m_session, "Taught all spells in line %u (%s).", se->id, sSkillLineStore.LookupString(se->Name));
+						BlueSystemMessage(m_session, "Taught all spells in line %u", se->id);
 					}
 				}
 			}
@@ -383,7 +341,7 @@ bool ChatHandler::HandleLearnCommand(const char* args, WorldSession *m_session)
 		{
 			if((uint16)plr->GetUInt32Value(i) != 0)
 			{
-				skilllineentry * se = sSkillLineStore.LookupEntry((uint16)plr->GetUInt32Value(i));
+				skilllineentry * se = dbcSkillLine.LookupEntry((uint16)plr->GetUInt32Value(i));
 				if(se && se->type == SKILL_TYPE_CLASS)
 				{
 					/* grab all training spells for that skill line */
@@ -405,7 +363,7 @@ bool ChatHandler::HandleLearnCommand(const char* args, WorldSession *m_session)
 								}
 							}
 						}
-						BlueSystemMessage(m_session, "Taught all spells in line %u (%s).", se->id, sSkillLineStore.LookupString(se->Name));
+						BlueSystemMessage(m_session, "Taught all spells in line %u", se->id);
 					}
 				}
 			}
@@ -1385,17 +1343,17 @@ bool ChatHandler::HandleAddItemSetCommand(const char* args, WorldSession* m_sess
 	return true;
 	}
 
-	ItemSetEntry *entry = sItemSetStore.LookupEntry(setid);
+	ItemSetEntry *entry = dbcItemSet.LookupEntry(setid);
 	std::list<ItemPrototype*>* l = objmgr.GetListForItemSet(setid);
 	if(!entry || !l)
 	{
 		RedSystemMessage(m_session, "Invalid item set.");
 		return true;
 	}
-	const char* setname = sItemSetStore.LookupString(entry->name);
-	BlueSystemMessage(m_session, "Searching item set %u (%s)...", setid, setname ? setname : "UNKNOWN");
+	//const char* setname = sItemSetStore.LookupString(entry->name);
+	BlueSystemMessage(m_session, "Searching item set %u...", setid);
 	uint32 start = getMSTime();
-	sGMLog.writefromsession(m_session, "used add item set command, set %u [%s], target %s", setid, setname, chr->GetName());
+	sGMLog.writefromsession(m_session, "used add item set command, set %u, target %s", setid, chr->GetName());
 	for(std::list<ItemPrototype*>::iterator itr = l->begin(); itr != l->end(); ++itr)
 	{
 		Item *itm = objmgr.CreateItem((*itr)->ItemId, m_session->GetPlayer());
@@ -1832,7 +1790,7 @@ bool ChatHandler::HandleAddPetSpellCommand(const char* args, WorldSession* m_ses
 	}
 
 	uint32 SpellId = atol(args);
-	SpellEntry * spell = sSpellStore.LookupEntry(SpellId);
+	SpellEntry * spell = dbcSpell.LookupEntry(SpellId);
 	if(!SpellId || !spell)
 	{
 		RedSystemMessage(m_session, "Invalid spell id requested.");
@@ -1855,7 +1813,7 @@ bool ChatHandler::HandleRemovePetSpellCommand(const char* args, WorldSession* m_
 	}
 
 	uint32 SpellId = atol(args);
-	SpellEntry * spell = sSpellStore.LookupEntry(SpellId);
+	SpellEntry * spell = dbcSpell.LookupEntry(SpellId);
 	if(!SpellId || !spell)
 	{
 		RedSystemMessage(m_session, "Invalid spell id requested.");
@@ -2071,7 +2029,7 @@ bool ChatHandler::HandleCastAllCommand(const char* args, WorldSession* m_session
 	}
 	Player * plr;
 	uint32 spellid = atol(args);
-	SpellEntry * info = sSpellStore.LookupEntry(spellid);
+	SpellEntry * info = dbcSpell.LookupEntry(spellid);
 	if(!info)
 	{
 		RedSystemMessage(m_session, "Invalid spell specified.");
@@ -2295,7 +2253,7 @@ bool ChatHandler::HandleResetSkillsCommand(const char* args, WorldSession * m_se
 
 	for(std::list<CreateInfo_SkillStruct>::iterator ss = info->skills.begin(); ss!=info->skills.end(); ss++)
 	{
-		se = sSkillLineStore.LookupEntry(ss->skillid);
+		se = dbcSkillLine.LookupEntry(ss->skillid);
 		if(se->type != SKILL_TYPE_LANGUAGE && ss->skillid && ss->currentval && ss->maxval)
 			plr->_AddSkillLine(ss->skillid, ss->currentval, ss->maxval);		
 	}
@@ -2940,7 +2898,7 @@ bool ChatHandler::HandleAIAgentDebugBegin(const char * args, WorldSession * m_se
 
 	do 
 	{
-		SpellEntry * se = ((FastIndexedDataStore<SpellEntry>*)SpellStore::getSingletonPtr())->LookupEntryForced(result->Fetch()[0].GetUInt32());
+		SpellEntry * se = dbcSpell.LookupEntryForced(result->Fetch()[0].GetUInt32());
 		if(se)
 			aiagent_spells.push_back(se);
 	} while(result->NextRow());
@@ -3013,7 +2971,7 @@ bool ChatHandler::HandleAIAgentDebugContinue(const char * args, WorldSession * m
 
 		SpellEntry * sp = *aiagent_spells.begin();
 		aiagent_spells.erase(aiagent_spells.begin());
-		BlueSystemMessage(m_session, "Casting %u "MSG_COLOR_WHITE"(%s), "MSG_COLOR_SUBWHITE"%u remaining.", sp->Id, sSpellStore.LookupString(sp->Name), aiagent_spells.size());
+		BlueSystemMessage(m_session, "Casting %u, "MSG_COLOR_SUBWHITE"%u remaining.", sp->Id, aiagent_spells.size());
 
 		map<uint32, spell_thingo>::iterator it = aiagent_extra.find(sp->Id);
 		ASSERT(it != aiagent_extra.end());
@@ -3082,7 +3040,7 @@ bool ChatHandler::HandleAddGuardCommand(const char * args, WorldSession * m_sess
 		return true;
 	}
 
-	AreaTable * at = sAreaStore.LookupEntry(m_session->GetPlayer()->GetMapMgr()->GetAreaID(m_session->GetPlayer()->GetPositionX(), m_session->GetPlayer()->GetPositionY()));
+	AreaTable * at = dbcArea.LookupEntry(m_session->GetPlayer()->GetMapMgr()->GetAreaID(m_session->GetPlayer()->GetPositionX(), m_session->GetPlayer()->GetPositionY()));
 	if(!at || !at->ZoneId)
 	{
 		RedSystemMessage(m_session, "TerrainMgr was unable to locate an AreaID. This is a core bug.");

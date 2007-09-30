@@ -173,7 +173,7 @@ public:
 
 	inline void AddSpell(uint32 SpellID)
 	{
-		SpellEntry * sp = sSpellStore.LookupEntry(SpellID);
+		SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
 		if(sp) 
 		{
 			AddSpell(sp);
@@ -182,12 +182,12 @@ public:
 	}
 	inline void RemoveSpell(uint32 SpellID)
 	{
-		SpellEntry * sp = sSpellStore.LookupEntry(SpellID);
+		SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
 		if(sp) RemoveSpell(sp);
 	}
 	inline void SetSpellState(uint32 SpellID, uint16 State)
 	{
-		SpellEntry * sp = sSpellStore.LookupEntry(SpellID);
+		SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
 		if(sp) SetSpellState(sp, State);
 	}
 	inline uint16 GetSpellState(uint32 SpellID)
@@ -195,7 +195,7 @@ public:
 		if(SpellID == 0)
 			return DEFAULT_SPELL_STATE;
 
-		SpellEntry * sp = sSpellStore.LookupEntry(SpellID);
+		SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
 		if(sp)
 			return GetSpellState(sp);
 		return DEFAULT_SPELL_STATE;

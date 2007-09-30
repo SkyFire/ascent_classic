@@ -19,39 +19,101 @@
 
 #include "DBCStores.h"
 #include "DataStore.h"
+#include "NGLog.h"
 
-// You need a line like this for every DBC store. If you use createDBCStore (no Indexed), the lines will be ordered the way they are in the file
-// SpellEntry is the file struct entry (for Spell.dbc here).
-implementIndexedDBCStore(ItemSetStore,ItemSetEntry)
-implementIndexedDBCStore(LockStore,Lock)
-implementIndexedDBCStore(SpellStore,SpellEntry)
-implementIndexedDBCStore(DurationStore,SpellDuration)
-implementIndexedDBCStore(RangeStore,SpellRange)
-implementIndexedDBCStore(EmoteStore,emoteentry)
-implementIndexedDBCStore(RadiusStore,SpellRadius)
-implementIndexedDBCStore(CastTimeStore,SpellCastTime)
-implementIndexedDBCStore(AreaStore,AreaTable)
-implementIndexedDBCStore(FactionTmpStore,FactionTemplateDBC)
-implementIndexedDBCStore(RandomPropStore,RandomProps)
-implementIndexedDBCStore(FactionStore,FactionDBC)
-implementIndexedDBCStore(EnchantStore,EnchantEntry)
-implementIndexedDBCStore(WorldMapAreaStore,WorldMapArea)
-implementDBCStore(WorldMapOverlayStore,WorldMapOverlay)
-implementDBCStore(SkillStore,skilllinespell)
-implementIndexedDBCStore(SkillLineStore,skilllineentry)
-implementDBCStore(TaxiPathStore,DBCTaxiPath)
-implementDBCStore(TaxiNodeStore,DBCTaxiNode)
-implementDBCStore(TaxiPathNodeStore,DBCTaxiPathNode)
-implementDBCStore(WorldSafeLocsStore,GraveyardEntry)
-implementIndexedDBCStore(TransportAnimationStore,TransportAnimation);
-implementDBCStore(NameGenStore, NameGenEntry);
-implementIndexedDBCStore(AuctionHouseStore,AuctionHouseDBC);
-implementDBCStore(TalentStore, TalentEntry);
-implementIndexedDBCStore(CreatureSpellDataStore, CreatureSpellDataEntry);
-implementIndexedDBCStore(CreatureFamilyStore, CreatureFamilyEntry);
-implementIndexedDBCStore(CharClassStore, CharClassEntry);
-implementIndexedDBCStore(CharRaceStore, CharRaceEntry);
-implementIndexedDBCStore(MapStore, MapEntry);
-implementIndexedDBCStore(ItemExtendedCostStore,ItemExtendedCostEntry);
-implementIndexedDBCStore(GemPropertiesStore,GemPropertyEntry);
+DBCStorage<GemPropertyEntry> dbcGemProperty;
+DBCStorage<ItemSetEntry> dbcItemSet;
+DBCStorage<Lock> dbcLock;
+DBCStorage<SpellEntry> dbcSpell;
+DBCStorage<SpellDuration> dbcSpellDuration;
+DBCStorage<SpellRange> dbcSpellRange;
+DBCStorage<emoteentry> dbcEmoteEntry;
+DBCStorage<SpellRadius> dbcSpellRadius;
+DBCStorage<SpellCastTime> dbcSpellCastTime;
+DBCStorage<AreaTable> dbcArea;
+DBCStorage<FactionTemplateDBC> dbcFactionTemplate;
+DBCStorage<FactionDBC> dbcFaction;
+DBCStorage<EnchantEntry> dbcEnchant;
+DBCStorage<RandomProps> dbcRandomProps;
+DBCStorage<skilllinespell> dbcSkillLineSpell;
+DBCStorage<skilllineentry> dbcSkillLine;
+DBCStorage<DBCTaxiNode> dbcTaxiNode;
+DBCStorage<DBCTaxiPath> dbcTaxiPath;
+DBCStorage<DBCTaxiPathNode> dbcTaxiPathNode;
+DBCStorage<AuctionHouseDBC> dbcAuctionHouse;
+DBCStorage<TalentEntry> dbcTalent;
+DBCStorage<CreatureSpellDataEntry> dbcCreatureSpellData;
+DBCStorage<CreatureFamilyEntry> dbcCreatureFamily;
+DBCStorage<CharClassEntry> dbcCharClass;
+DBCStorage<CharRaceEntry> dbcCharRace;
+DBCStorage<MapEntry> dbcMap;
+DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
+
+const char * ItemSetFormat = "uuxxxxxxxxxxxxxxxuuuuuuuuuxxxxxxxxxuuuuuuuuuuuuuuuuuu";
+const char * LockFormat = "uuuuuuxxxuuuuuxxxuuuuuxxxxxxxxxxx";
+const char * EmoteEntryFormat = "uxuuuuxuxuxxxxxxxxx";
+const char * skilllinespellFormat = "uuuxxxxxuuuuxxu";
+const char * EnchantEntrYFormat = "uuuuuuuuuuuuuxxxxxxxxxxxxxxxxxuuuu";
+const char * GemPropertyEntryFormat = "uuuuu";
+const char * skilllineentrYFormat = "uuuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char * spellentrYFormat = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuiuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffffffiiiiiiuuuuuuuuuuuuuuufffuuuuuuuuuuuufffuuuuuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxuuuuuuuuuuifffuuuuuu";
+const char * itemextendedcostFormat = "uuuuuuuuuuuuu";
+const char * talententryFormat = "uuuuuuuuuxxxxuxxuxxxx";
+const char * spellcasttimeFormat = "uuxx";
+const char * spellradiusFormat = "ufxf";
+const char * spellrangeFormat = "uffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char * spelldurationFormat = "uuuu";
+const char * randompropsFormat = "uxuuuxxxxxxxxxxxxxxxxxxx";
+const char * areatableFormat = "uuuuuxxxuxuxxxxxxxxxxxxxxxxxuxxxxxx";
+const char * factiontemplatedbcFormat = "uuuuuuuuuuuuuu";
+const char * auctionhousedbcFormat = "uuuuxxxxxxxxxxxxxxxxx";
+const char * factiondbcFormat = "uiuuuuxxxxiiiixxxxuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char * dbctaxinodeFormat = "uufffxxxxxxxxxxxxxxxxxuu";
+const char * dbctaxipathFormat = "uuuu";
+const char * dbctaxipathnodeFormat = "uuuufffuuxx";
+const char * creaturespelldataFormat = "uuuuuuuuu";
+const char * charraceFormat = "uxuxxxxxuxxxxuxxxxxxxxxxxxxxxxxxxxx";
+const char * charclassFormat = "uxuxxxxxxxxxxxxxxxxxxxxx";
+const char * creaturefamilyFormat = "ufufuuuuxxxxxxxxxxxxxxxxxx";
+const char * mapentryFormat = "uxuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+template<class T>
+bool loader_stub(const char * filename, const char * format, bool ind, T& l)
+{
+	Log.Notice("DBC", "Loading %s.", filename);
+	return l.Load(filename, format, ind);
+}
+
+#define LOAD_DBC(filename, format, ind, stor) if(!loader_stub(filename, format, ind, stor)) { return false; } 
+
+bool LoadDBCs()
+{
+	LOAD_DBC("DBC/ItemSet.dbc", ItemSetFormat, true, dbcItemSet);
+	LOAD_DBC("DBC/Lock.dbc", LockFormat, true, dbcLock);
+	LOAD_DBC("DBC/EmotesText.dbc", EmoteEntryFormat, true, dbcEmoteEntry);
+	LOAD_DBC("DBC/SkillLineAbility.dbc", skilllinespellFormat, false, dbcSkillLineSpell);
+	LOAD_DBC("DBC/SpellItemEnchantment.dbc", EnchantEntrYFormat, true, dbcEnchant);
+	LOAD_DBC("DBC/GemProperties.dbc", GemPropertyEntryFormat, true, dbcGemProperty);
+	LOAD_DBC("DBC/SkillLine.dbc", skilllineentrYFormat, true, dbcSkillLine);
+	LOAD_DBC("DBC/Spell.dbc", spellentrYFormat, true, dbcSpell);
+	LOAD_DBC("DBC/ItemExtendedCost.dbc", itemextendedcostFormat, true, dbcItemExtendedCost);
+	LOAD_DBC("DBC/Talent.dbc", talententryFormat, true, dbcTalent);
+	LOAD_DBC("DBC/SpellCastTimes.dbc", spellcasttimeFormat, true, dbcSpellCastTime);
+	LOAD_DBC("DBC/SpellRadius.dbc", spellradiusFormat, true, dbcSpellRadius);
+	LOAD_DBC("DBC/SpellRange.dbc", spellrangeFormat, true, dbcSpellRange);
+	LOAD_DBC("DBC/SpellDuration.dbc", spelldurationFormat, true, dbcSpellDuration);
+	LOAD_DBC("DBC/ItemRandomProperties.dbc", randompropsFormat, true, dbcRandomProps);
+	LOAD_DBC("DBC/AreaTable.dbc", areatableFormat, true, dbcArea);
+	LOAD_DBC("DBC/FactionTemplate.dbc", factiontemplatedbcFormat, true, dbcFactionTemplate);
+	LOAD_DBC("DBC/Faction.dbc", factiondbcFormat, true, dbcFaction);
+	LOAD_DBC("DBC/TaxiNodes.dbc", dbctaxinodeFormat, false, dbcTaxiNode);
+	LOAD_DBC("DBC/TaxiPath.dbc", dbctaxipathFormat, false, dbcTaxiPath);
+	LOAD_DBC("DBC/TaxiPathNode.dbc", dbctaxipathnodeFormat, false, dbcTaxiPathNode);
+	LOAD_DBC("DBC/CreatureSpellData.dbc", creaturespelldataFormat, true, dbcCreatureSpellData);
+	LOAD_DBC("DBC/CreatureFamily.dbc", creaturefamilyFormat, true, dbcCreatureFamily);
+	LOAD_DBC("DBC/ChrRaces.dbc", charraceFormat, true, dbcCharRace);
+	LOAD_DBC("DBC/ChrClasses.dbc", charclassFormat, true, dbcCharClass);
+	LOAD_DBC("DBC/Map.dbc", mapentryFormat, true, dbcMap);
+	return true;
+}
 

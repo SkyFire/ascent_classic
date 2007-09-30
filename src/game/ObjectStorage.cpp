@@ -129,7 +129,7 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 		sp->agent = fields[1].GetUInt16();
 		sp->procChance = fields[3].GetUInt32();
 		//sp->procCountDB = fields[4].GetUInt32();
-		sp->spell = ((FastIndexedDataStore<SpellEntry>*)SpellStore::getSingletonPtr())->LookupEntryForced(fields[5].GetUInt32());
+		sp->spell = dbcSpell.LookupEntryForced(fields[5].GetUInt32());
 		sp->spellType = fields[6].GetUInt32();
 		sp->spelltargetType = fields[7].GetUInt32();
 		sp->cooldown = fields[8].GetFloat();
@@ -155,21 +155,21 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 				continue;
 			}
 
-			sp->minrange = GetMinRange(sSpellRange.LookupEntry(sp->spell->rangeIndex));
-			sp->maxrange = GetMaxRange(sSpellRange.LookupEntry(sp->spell->rangeIndex));
+			sp->minrange = GetMinRange(dbcSpellRange.LookupEntry(sp->spell->rangeIndex));
+			sp->maxrange = GetMaxRange(dbcSpellRange.LookupEntry(sp->spell->rangeIndex));
 
 			//omg the poor darling has no clue about making ai_agents
 			if(sp->cooldown==-1)
 			{
 				//now this will not be exact cooldown but maybe a bigger one to not make him spam spells to often
 				int cooldown;
-				SpellDuration *sd=sSpellDuration.LookupEntry(sp->spell->DurationIndex);
+				SpellDuration *sd=dbcSpellDuration.LookupEntry(sp->spell->DurationIndex);
 				int Dur=0;
 				int Casttime=0;//most of the time 0
 				int RecoveryTime=sp->spell->RecoveryTime;
 	            if(sp->spell->DurationIndex)
 		            Dur =::GetDuration(sd);
-				Casttime=GetCastTime(sCastTime.LookupEntry(sp->spell->CastingTimeIndex));
+				Casttime=GetCastTime(dbcSpellCastTime.LookupEntry(sp->spell->CastingTimeIndex));
 				cooldown=Dur+Casttime+RecoveryTime;
 				if(cooldown<0)
 					sp->cooldown=0x00FFFFFF;//huge value that should not loop while adding some timestamp to it

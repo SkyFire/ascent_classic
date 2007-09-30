@@ -858,35 +858,17 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	m_aiInterface->setMoveType(spawn->movetype);	
 	m_aiInterface->m_waypoints = objmgr.GetWayPointMap(spawn->id);
 
-	m_faction = sFactionTmpStore.LookupEntry(spawn->factionid);
-	
-#ifndef SAFE_FACTIONS
-	m_faction = sFactionTmpStore.LookupEntry(proto->Faction);
-
+	m_faction = dbcFactionTemplate.LookupEntry(spawn->factionid);
 	if(m_faction)
 	{
-		m_factionDBC = sFactionStore.LookupEntry(m_faction->Faction);
+		m_factionDBC = dbcFaction.LookupEntry(m_faction->Faction);
 		// not a neutral creature
 		if(!(m_factionDBC->RepListId == -1 && m_faction->HostileMask == 0 && m_faction->FriendlyMask == 0))
 		{
 			GetAIInterface()->m_canCallForHelp = true;
 		}
 	}
-#else
 
-	m_faction = sFactionTmpStore.LookupEntryForced(proto->Faction);
-	if(m_faction)
-	{
-		m_factionDBC = sFactionStore.LookupEntryForced(m_faction->Faction);
-		// not a neutral creature
-		if(!(m_factionDBC->RepListId == -1 && m_faction->HostileMask == 0 && m_faction->FriendlyMask == 0))
-		{
-			GetAIInterface()->m_canCallForHelp = true;
-		}
-	}
-	if(!m_faction || !m_factionDBC)
-		return false;
-#endif
 
 //SETUP NPC FLAGS
 	SetUInt32Value(UNIT_NPC_FLAGS,proto->NPCFLags);
@@ -962,7 +944,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 
 //////////////AI
 
-	myFamily = sCreatureFamilyStore.LookupEntry(creature_info->Family);
+	myFamily = dbcCreatureFamily.LookupEntry(creature_info->Family);
 
 	
 // PLACE FOR DIRTY FIX BASTARDS
@@ -1076,34 +1058,17 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 
 	m_position.ChangeCoords( x, y, z, 0 );
 	m_spawnLocation.ChangeCoords(x, y, z, 0);
-
-#ifndef SAFE_FACTIONS
-	m_faction = sFactionTmpStore.LookupEntry(proto->Faction);
+	m_faction = dbcFactionTemplate.LookupEntry(proto->Faction);
 
 	if(m_faction)
 	{
-		m_factionDBC = sFactionStore.LookupEntry(m_faction->Faction);
+		m_factionDBC = dbcFaction.LookupEntry(m_faction->Faction);
 		// not a neutral creature
 		if(!(m_factionDBC->RepListId == -1 && m_faction->HostileMask == 0 && m_faction->FriendlyMask == 0))
 		{
 			GetAIInterface()->m_canCallForHelp = true;
 		}
 	}
-#else
-
-	m_faction = sFactionTmpStore.LookupEntryForced(proto->Faction);
-	if(m_faction)
-	{
-		m_factionDBC = sFactionStore.LookupEntryForced(m_faction->Faction);
-		// not a neutral creature
-		if(!(m_factionDBC->RepListId == -1 && m_faction->HostileMask == 0 && m_faction->FriendlyMask == 0))
-		{
-			GetAIInterface()->m_canCallForHelp = true;
-		}
-	}
-	if(!m_faction || !m_factionDBC)
-		return;
-#endif
 
 	//SETUP NPC FLAGS
 	SetUInt32Value(UNIT_NPC_FLAGS,proto->NPCFLags);
@@ -1165,7 +1130,7 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 
 	//////////////AI
 
-	myFamily = sCreatureFamilyStore.LookupEntry(creature_info->Family);
+	myFamily = dbcCreatureFamily.LookupEntry(creature_info->Family);
 
 
 	// PLACE FOR DIRTY FIX BASTARDS
@@ -1217,7 +1182,7 @@ void Creature::OnPushToWorld()
 		SpellEntry * sp;
 		for(; itr != proto->start_auras.end(); ++itr)
 		{
-			sp = sSpellStore.LookupEntry((*itr));
+			sp = dbcSpell.LookupEntry((*itr));
 			if(sp == 0) continue;
 
 			CastSpell(this, sp, 0);

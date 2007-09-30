@@ -48,12 +48,12 @@ bool Transporter::CreateAsTransporter(uint32 EntryID, const char* Name, uint32 T
 
 bool FillPathVector(uint32 PathID, TransportPath & Path)
 {
-	Path.Resize(sTaxiPathNodeStore.GetNumRows());
+	Path.Resize(dbcTaxiPathNode.GetNumRows());
 	uint32 i = 0;
 
-	for(uint32 j = 0; j < sTaxiPathNodeStore.GetNumRows(); j++)
+	for(uint32 j = 0; j < dbcTaxiPathNode.GetNumRows(); j++)
 	{
-		DBCTaxiPathNode *pathnode = sTaxiPathNodeStore.LookupEntry(j);
+		DBCTaxiPathNode *pathnode = dbcTaxiPathNode.LookupRow(j);
 		if(pathnode->path == PathID)
 		{
 			Path[i].mapid	   = pathnode->mapid;

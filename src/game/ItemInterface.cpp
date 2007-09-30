@@ -1659,7 +1659,7 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount)
 		int32 itemprice = GetBuyPriceForItem(item, amount, amount);
 		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice);
 	}
-	ItemExtendedCostEntry *ex = ItemExtendedCostStore::getSingleton().LookupEntry(item->ItemExtendedCost);
+	ItemExtendedCostEntry *ex = dbcItemExtendedCost.LookupEntry(item->ItemExtendedCost);
 	if(ex)
 	{
 		for(int i = 0;i<5;i++)
@@ -1686,7 +1686,7 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount)
 {
 	if(item->ItemExtendedCost)
 	{
-		ItemExtendedCostEntry *ex = ItemExtendedCostStore::getSingleton().LookupEntry(item->ItemExtendedCost);
+		ItemExtendedCostEntry *ex = dbcItemExtendedCost.LookupEntry(item->ItemExtendedCost);
 		if(ex)
 		{
 			for(int i = 0;i<5;i++)
@@ -1714,7 +1714,7 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount)
 	}
 	if(item->RequiredFaction)
 	{
-		FactionDBC *factdbc = sFactionStore.LookupEntry(item->RequiredFaction);
+		FactionDBC *factdbc = dbcFaction.LookupEntry(item->RequiredFaction);
 		if(!factdbc || factdbc->RepListId < 0)
 			return (int8)NULL;
 		

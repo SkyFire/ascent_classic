@@ -324,7 +324,7 @@ uint64 Spell::GetSinglePossibleEnemy(float prange)
 {
 	float range;
 	if(!prange)
-		range = GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+		range = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 	else range = prange;
 	float r = range*range;
 	float srcx=m_caster->GetPositionX(),srcy=m_caster->GetPositionY(),srcz=m_caster->GetPositionZ();
@@ -365,7 +365,7 @@ uint64 Spell::GetSinglePossibleFriend(float prange)
 {
 	float range;
 	if(!prange)
-		range = GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+		range = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 	else range = prange;
 	float r = range*range;
 	float srcx=m_caster->GetPositionX(),srcy=m_caster->GetPositionY(),srcz=m_caster->GetPositionZ();
@@ -490,7 +490,7 @@ bool Spell::DidHit(uint64 target)
 //!!!disabled parts that were not tested !!
 void Spell::GenerateTargets(SpellCastTargets *store_buff)
 {
-	float range = GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+	float range = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 	if(range==0)
 	{
 		float tr1=GetRadius(0);
@@ -750,7 +750,7 @@ void Spell::prepare(SpellCastTargets * targets)
 		m_castTime = 0;
 	else
 	{
-		m_castTime = GetCastTime(sCastTime.LookupEntry(m_spellInfo->CastingTimeIndex));
+		m_castTime = GetCastTime(dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex));
 
 		if (m_spellInfo->SpellGroupType && u_caster)
 		{
@@ -1053,7 +1053,7 @@ void Spell::cast(bool check)
 			if(p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_REMAIN_STEALTHED))
 			{
 				/* talents procing - don't remove stealth either */
-				if(m_spellInfo->Attributes & 64 || (pSpellId && sSpellStore.LookupEntry(pSpellId)->Attributes & 64))
+				if(m_spellInfo->Attributes & 64 || (pSpellId && dbcSpell.LookupEntry(pSpellId)->Attributes & 64))
 				{
 
 				}
@@ -2218,7 +2218,7 @@ void Spell::HandleAddAura(uint64 guid)
 
 	if(spellid && p_caster)
 	{
-		SpellEntry *spellInfo = sSpellStore.LookupEntry( spellid );
+		SpellEntry *spellInfo = dbcSpell.LookupEntry( spellid );
 		if(!spellInfo) return;
 		Spell *spell = new Spell(p_caster, spellInfo ,true, NULL);
 		SpellCastTargets targets(Target->GetGUID());
@@ -2351,8 +2351,8 @@ uint8 Spell::CanCast(bool rangetolerate)
                     // allow attacks in duels
                     if (p_caster->DuelingWith != target && !isFriendly(p_caster, target))
                     {
-                        AreaTable * atCaster = sAreaStore.LookupEntry(p_caster->GetAreaID());
-                        AreaTable * atTarget = sAreaStore.LookupEntry(((Player*)target)->GetAreaID());
+                        AreaTable * atCaster = dbcArea.LookupEntry(p_caster->GetAreaID());
+                        AreaTable * atTarget = dbcArea.LookupEntry(((Player*)target)->GetAreaID());
                         if(atCaster->AreaFlags & 0x800 || atTarget->AreaFlags & 0x800)
                             return SPELL_FAILED_NOT_HERE;
                     }
@@ -2529,7 +2529,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 				}
 			}
 			
-			maxr = GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+			maxr = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 			
 			if(m_spellInfo->SpellGroupType && u_caster)
 			{
@@ -2611,7 +2611,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 	}	
 	if(m_targets.m_targetMask==TARGET_FLAG_DEST_LOCATION)
 	{
-		maxr = GetMaxRange (sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+		maxr = GetMaxRange (dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 		if(!IsInrange(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,m_caster, (maxr*maxr+2)))
 			return SPELL_FAILED_OUT_OF_RANGE;
 	}
@@ -3322,7 +3322,7 @@ void Spell::Heal(int32 amount)
 	bool critical=false;
 	if(u_caster)
 	{
-		SpellCastTime *sd = sCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
+		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
 
 		// affect the plus damage by duration
 		float castaff = GetCastTime(sd);

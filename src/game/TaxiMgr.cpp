@@ -192,9 +192,9 @@ void TaxiMgr::_LoadTaxiNodes()
 {
 	uint32 i;
 
-	for(i = 0; i < sTaxiNodeStore.GetNumRows(); i++)
+	for(i = 0; i < dbcTaxiNode.GetNumRows(); i++)
 	{
-		DBCTaxiNode *node = sTaxiNodeStore.LookupEntry(i);
+		DBCTaxiNode *node = dbcTaxiNode.LookupRow(i);
 		if (node)
 		{
 			TaxiNode *n = new TaxiNode;
@@ -217,9 +217,9 @@ void TaxiMgr::_LoadTaxiPaths()
 {
 	uint32 i, j;
 
-	for(i = 0; i < sTaxiPathStore.GetNumRows(); i++)
+	for(i = 0; i < dbcTaxiPath.GetNumRows(); i++)
 	{
-		DBCTaxiPath *path = sTaxiPathStore.LookupEntry(i);
+		DBCTaxiPath *path = dbcTaxiPath.LookupRow(i);
 
 		if (path)
 		{
@@ -230,9 +230,9 @@ void TaxiMgr::_LoadTaxiPaths()
 			p->price = path->price;
 
 			//Load Nodes
-			for(j = 0; j < sTaxiPathNodeStore.GetNumRows(); j++)
+			for(j = 0; j < dbcTaxiPathNode.GetNumRows(); j++)
 			{
-				DBCTaxiPathNode *pathnode = sTaxiPathNodeStore.LookupEntry(j);
+				DBCTaxiPathNode *pathnode = dbcTaxiPathNode.LookupRow(j);
 
 				if (pathnode)
 				{

@@ -355,7 +355,7 @@ public:
 
 	inline time_t GetGameTime() const { return m_gameTime; }
 
-	void SetInitialWorldSettings();
+	bool SetInitialWorldSettings();
 
 	void SendWorldText(const char *text, WorldSession *self = 0);
 	void SendWorldWideScreenText(const char *text, WorldSession *self = 0);

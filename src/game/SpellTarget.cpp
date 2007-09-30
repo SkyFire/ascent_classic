@@ -352,7 +352,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
     if(m_spellInfo->EffectChainTarget[i])
     {
         uint32 jumps=m_spellInfo->EffectChainTarget[i]-1;
-        float range=GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong
+        float range=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong
         range*=range;
         std::set<Object*>::iterator itr;
         for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
@@ -452,7 +452,7 @@ void Spell::SpellTargetSingleTargetFriend(uint32 i, uint32 j)
     if(!Target)
         return;
 
-    float r= GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+    float r= GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
     if(IsInrange (m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target, r*r))
         SafeAddTarget(tmpMap,m_targets.m_unitTarget);
 }
@@ -638,7 +638,7 @@ void Spell::SpellTargetSingleTargetPartyMember(uint32 i, uint32 j)
     Unit* Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
     if(!Target)
         return;
-    float r=GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+    float r=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
     if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target,r*r))
         SafeAddTarget(tmpMap,m_targets.m_unitTarget);
 }
@@ -726,7 +726,7 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
     Unit* firstTarget;
 
     bool PartyOnly=false;
-    float range=GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong,
+    float range=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong,
     //this is cast distance, not searching distance
     range *= range;
 
@@ -883,7 +883,7 @@ void Spell::SpellTargetTargetPartyMember(uint32 i, uint32 j)
     if(!Target)
         return;
 
-    float r=GetMaxRange(sSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+    float r=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
     if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target,r*r))
         SafeAddTarget(tmpMap,m_targets.m_unitTarget);
 }

@@ -61,8 +61,7 @@ int main(int argc, char *argv[])
 	}
 
 	Log.Line();
-	new CharClassStore("DBC/ChrClasses.dbc");
-	new CharRaceStore("DBC/ChrRaces.dbc");
+
 	Log.Success("Storage", "DBC Files Loaded...");
 	Storage_Load();
 

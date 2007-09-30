@@ -29,7 +29,7 @@ uint32 GetGOReqSkill(GameObject * gameObjTarget)
 		return 0;
 	}
 
-	Lock *lock = sLockStore.LookupEntry( gi->SpellFocus );
+	Lock *lock = dbcLock.LookupEntry( gi->SpellFocus );
 	if(!lock) return 0;
 	for(uint32 i=0;i<5;i++)
 		if(lock->locktype[i] == 2 && lock->minlockskill[i])

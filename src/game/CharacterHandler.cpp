@@ -760,8 +760,7 @@ bool WorldSession::PlayerLogin(uint32 playerGuid, uint32 forced_map_id, uint32 f
 	}
 #endif
 
-	sLog.outString("Player %s (%s %s %s), logged in.", plr->GetName(), plr->getGender() ? "Female" : "Male", 
-		sCharRaceStore.LookupString(plr->myRace->name2), sCharClassStore.LookupString(plr->myClass->name));
+	sLog.outString("Player %s logged in.", plr->GetName());
 
 #ifndef CLUSTERING
 	// send extended message

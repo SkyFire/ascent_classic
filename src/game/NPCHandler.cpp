@@ -512,7 +512,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode( WorldPacket & recv_data )
 	}
 	else // else add him one, that fucker, he think he will get away!?
 	{
-		SpellEntry *spellInfo = sSpellStore.LookupEntry( 15007 );//resurrection sickness
+		SpellEntry *spellInfo = dbcSpell.LookupEntry( 15007 );//resurrection sickness
 		SpellCastTargets targets;
 		targets.m_unitTarget = GetPlayer()->GetGUID();
 		Spell*sp=new Spell(_player,spellInfo,true,NULL);

@@ -575,8 +575,8 @@ bool Player::Create(WorldPacket& data )
 	memset(m_taximask, 0, sizeof(uint32)*8);
 	
 	// set race dbc
-	myRace = sCharRaceStore.LookupEntry(race);
-	myClass = sCharClassStore.LookupEntry(class_);
+	myRace = dbcCharRace.LookupEntry(race);
+	myClass = dbcCharClass.LookupEntry(class_);
 	if(!myRace || !myClass)
 	{
 		// information not found
@@ -589,9 +589,6 @@ bool Player::Create(WorldPacket& data )
 		m_team = 0;
 	else
 		m_team = 1;
-
-	sLog.outString("Account %s creating a %s %s %s", m_session->GetAccountName().c_str(), gender ? "Female" : "Male", 
-		sCharRaceStore.LookupString(myRace->name2), sCharClassStore.LookupString(myClass->name));
 
 	uint8 powertype = myClass->power_type;
 
@@ -687,7 +684,7 @@ bool Player::Create(WorldPacket& data )
 	skilllineentry * se;
 	for(std::list<CreateInfo_SkillStruct>::iterator ss = info->skills.begin(); ss!=info->skills.end(); ss++)
 	{
-		se = sSkillLineStore.LookupEntry(ss->skillid);
+		se = dbcSkillLine.LookupEntry(ss->skillid);
 		if(se->type != SKILL_TYPE_LANGUAGE)
 			_AddSkillLine(se->id, ss->currentval, ss->maxval);
 	}
@@ -961,7 +958,7 @@ void Player::_EventAttack(bool offhand)
 		} 
 		else 
 		{ 
-			SpellEntry *spellInfo = sSpellStore.LookupEntry(GetOnMeleeSpell());
+			SpellEntry *spellInfo = dbcSpell.LookupEntry(GetOnMeleeSpell());
 			SetOnMeleeSpell(0);
 			Spell *spell = new Spell(this,spellInfo,true,NULL);
 			SpellCastTargets targets;
@@ -1037,7 +1034,7 @@ void Player::_EventCharmAttack()
 			} 
 			else 
 			{ 
-				SpellEntry *spellInfo = sSpellStore.LookupEntry(m_CurrentCharm->GetOnMeleeSpell());
+				SpellEntry *spellInfo = dbcSpell.LookupEntry(m_CurrentCharm->GetOnMeleeSpell());
 				m_CurrentCharm->SetOnMeleeSpell(0);
 				Spell *spell = new Spell(m_CurrentCharm,spellInfo,true,NULL);
 				SpellCastTargets targets;
@@ -1088,7 +1085,7 @@ void Player::_EventExploration()
 	
 	if(!AreaId || AreaId == 0xFFFF)
 		return;
-	AreaTable * at = sAreaStore.LookupEntry(AreaId);
+	AreaTable * at = dbcArea.LookupEntry(AreaId);
 	if(at == 0)
 		return;
 
@@ -1140,7 +1137,7 @@ void Player::_EventExploration()
         //second AT check for subzones.
         if(at->ZoneId)
         {
-            AreaTable * at2 = sAreaStore.LookupEntry(at->ZoneId);
+            AreaTable * at2 = dbcArea.LookupEntry(at->ZoneId);
             if(at2 && at2->AreaFlags & AREA_CITY_AREA || at2 && at2->AreaFlags & AREA_CITY)
             {
                 if((at2->category == AREAC_ALLIANCE_TERRITORY && GetTeam() == 0) || (at2->category == AREAC_HORDE_TERRITORY && GetTeam() == 1) )
@@ -1708,7 +1705,7 @@ void Player::_LoadSpellCoolDownSecurity()
 			uint32 SpellID			  = fields[1].GetUInt32();
 			uint32 Timestamp			= fields[2].GetUInt32();
 			uint32 DiffTimestamp		= Timestamp - now();
-			SpellEntry		*spellInfo = sSpellStore.LookupEntry( SpellID );
+			SpellEntry		*spellInfo = dbcSpell.LookupEntry( SpellID );
 			
 			if (now() + spellInfo->RecoveryTime > Timestamp && // cooldown did not expired somehow (not taking into care cooldown modifiers!)
 				now() < Timestamp + spellInfo->RecoveryTime )  // cooldown does not starts in future (not taking into care cooldown modifiers!)
@@ -1831,7 +1828,7 @@ void Player::addSpell(uint32 spell_id)
 	skilllinespell * sk = objmgr.GetSpellSkill(spell_id);
 	if(sk && !_HasSkillLine(sk->skilline))
 	{
-		skilllineentry * skill = sSkillLineStore.LookupEntry(sk->skilline);
+		skilllineentry * skill = dbcSkillLine.LookupEntry(sk->skilline);
 		uint32 max = 5 * getLevel();
 
 		switch(skill->type)
@@ -2323,8 +2320,8 @@ bool Player::LoadFromDB(uint32 guid)
 	setGender(get_next_field.GetUInt8());
 	
 	// set race dbc
-	myRace = sCharRaceStore.LookupEntry(getRace());
-	myClass = sCharClassStore.LookupEntry(getClass());
+	myRace = dbcCharRace.LookupEntryForced(getRace());
+	myClass = dbcCharClass.LookupEntryForced(getClass());
 	if(!myClass || !myRace)
 	{
 		// bad character
@@ -2719,7 +2716,7 @@ bool Player::LoadFromDB(uint32 guid)
 		start = end +1;
 
 		// listid stuff
-		factdbc = sFactionStore.LookupEntry(id);
+		factdbc = dbcFaction.LookupEntryForced(id);
 		if(!factdbc) continue;
 
 		rep = new FactionReputation;
@@ -2881,12 +2878,9 @@ void Player::LoadFromDB_Light(Field *fields, uint32 guid)
 
 	_LoadInventoryLight();
 	// set race dbc
-	myRace = sCharRaceStore.LookupEntry(getRace());
-	myClass = sCharClassStore.LookupEntry(getClass());
+	myRace = dbcCharRace.LookupEntryForced(getRace());
+	myClass = dbcCharClass.LookupEntryForced(getClass());
 
-    // set race dbc
-	myRace = sCharRaceStore.LookupEntry(getRace());
-	myClass = sCharClassStore.LookupEntry(getClass());
 	if(!myClass || !myRace)
 	{
 		// bad character
@@ -2962,7 +2956,7 @@ bool Player::HasSpell(uint32 spell)
 
 int Player::GetMaxLearnedSpellLevel(uint32 spell)
 {
-	SpellEntry *spinfo=sSpellStore.LookupEntry(spell);
+	SpellEntry *spinfo=dbcSpell.LookupEntry(spell);
 	if(!spinfo)
 		return 0;
 	int max_level=-1; //now it can't get worse then this :D
@@ -2970,7 +2964,7 @@ int Player::GetMaxLearnedSpellLevel(uint32 spell)
 	for(iter= mSpells.begin();iter != mSpells.end();iter++)
 	{
 		//get hash name for this spell
-		SpellEntry *spinfo2 = sSpellStore.LookupEntry(*iter);
+		SpellEntry *spinfo2 = dbcSpell.LookupEntry(*iter);
 		if(!spinfo2)
 			return -1; //nasty error here. Very impossible to happen (memory corruption or something)
 		if(spinfo2->NameHash == spinfo->NameHash)
@@ -3279,7 +3273,7 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 	uint32 rndprop=item->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID);
 	if(rndprop)
 	{
-		RandomProps *rp= sRandomPropStore.LookupEntry(rndprop);
+		RandomProps *rp= dbcRandomProps.LookupEntry(rndprop);
 		if(rp)
 		for (int k=0;k<3;k++)
 		{
@@ -3287,7 +3281,7 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 			{
 				if(apply)
 				{
-					EnchantEntry * ee = sEnchantStore.LookupEntry(rp->spells[k]);
+					EnchantEntry * ee = dbcEnchant.LookupEntry(rp->spells[k]);
 					int32 Slot = item->HasEnchantment(ee->Id);
 					if(Slot < 0)
 					{
@@ -3298,7 +3292,7 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 						item->ApplyEnchantmentBonus(Slot, true);
 				}else
 				{
-					EnchantEntry * ee = sEnchantStore.LookupEntry(rp->spells[k]);
+					EnchantEntry * ee = dbcEnchant.LookupEntry(rp->spells[k]);
 					int32 Slot = item->HasEnchantment(ee->Id);
 					if(Slot >= 0)
 					{
@@ -3315,7 +3309,7 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 	
 	if(setid)
 	{
-		ItemSetEntry *set=sItemSetStore.LookupEntry(setid);
+		ItemSetEntry *set=dbcItemSet.LookupEntry(setid);
 		ASSERT(set);
 		ItemSet* Set=NULL;
 		std::list<ItemSet>::iterator i;
@@ -3345,7 +3339,7 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 				{
 					if(Set->itemscount==set->itemscount[x])
 					{//cast new spell
-						SpellEntry *info= sSpellStore.LookupEntry(set->SpellID[x]);
+						SpellEntry *info= dbcSpell.LookupEntry(set->SpellID[x]);
 						Spell * spell=new Spell(this,info,true,NULL);
 						SpellCastTargets targets;
 						targets.m_unitTarget = this->GetGUID();
@@ -3468,7 +3462,7 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 		{
 			if (item->GetProto()->Spells[k].Trigger == 1)
 			{
-				SpellEntry* spells = sSpellStore.LookupEntry(item->GetProto()->Spells[k].Id);
+				SpellEntry* spells = dbcSpell.LookupEntry(item->GetProto()->Spells[k].Id);
 				Spell *spell = new Spell(this, spells ,true,NULL);
 				SpellCastTargets targets;
 				targets.m_unitTarget = this->GetGUID();
@@ -3639,17 +3633,17 @@ void Player::BuildPlayerRepop()
    
 	if(getRace()==RACE_NIGHTELF)
 	{
-		SpellEntry *inf=sSpellStore.LookupEntry(20584);
+		SpellEntry *inf=dbcSpell.LookupEntry(20584);
 		Spell*sp=new Spell(this,inf,true,NULL);
 		sp->prepare(&tgt);
-		inf=sSpellStore.LookupEntry(9036);
+		inf=dbcSpell.LookupEntry(9036);
 		sp=new Spell(this,inf,true,NULL);
 		sp->prepare(&tgt);
 	}
 	else
 	{
 	
-		SpellEntry *inf=sSpellStore.LookupEntry(8326);
+		SpellEntry *inf=dbcSpell.LookupEntry(8326);
 		Spell*sp=new Spell(this,inf,true,NULL);
 		sp->prepare(&tgt);
 	}
@@ -3958,7 +3952,7 @@ void Player::RepopAtGraveyard(float ox, float oy, float oz, uint32 mapid)
 	else
 	{
 		uint32 areaid = sWorldCreator.GetMap(mapid)->GetAreaID(ox,oy);
-		AreaTable * at = sAreaStore.LookupEntry(areaid);
+		AreaTable * at = dbcArea.LookupEntry(areaid);
 		if(!at) return;
 
 		uint32 mzone = ( at->ZoneId ? at->ZoneId : at->AreaId);
@@ -5138,7 +5132,7 @@ void Player::SendTalentResetConfirm()
 
 bool Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 {
-	SpellEntry *spellinfo = sSpellStore.LookupEntry(spellid);
+	SpellEntry *spellinfo = dbcSpell.LookupEntry(spellid);
 	if(!spellinfo)
 		return false;
 	
@@ -5171,7 +5165,7 @@ bool Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 	if(!target || target->isDead())
 		return false;	
 
-	SpellRange * range = sSpellRange.LookupEntry(spellinfo->rangeIndex);
+	SpellRange * range = dbcSpellRange.LookupEntry(spellinfo->rangeIndex);
 	float minrange = GetMinRange(range);
 	float dist = CalcDistance(this, target);
 	float maxr = GetMaxRange(range);
@@ -5246,7 +5240,7 @@ void Player::removeSpellByHashName(uint32 hash)
 	{
 		it = iter++;
 		uint32 SpellID = *it;
-		SpellEntry *e = sSpellStore.LookupEntry(SpellID);
+		SpellEntry *e = dbcSpell.LookupEntry(SpellID);
 		if(e->NameHash == hash)
 		{
 			RemoveAura(SpellID,GetGUID());
@@ -5435,10 +5429,10 @@ void Player::Reset_Spells()
 
 void Player::Reset_Talents()
 {
-	unsigned int numRows = sTalentStore.GetNumRows();
+	unsigned int numRows = dbcTalent.GetNumRows();
 	for (unsigned int i = 0; i < numRows; i++)		  // Loop through all talents.
 	{
-		TalentEntry *tmpTalent = sTalentStore.LookupEntry(i);
+		TalentEntry *tmpTalent = dbcTalent.LookupRow(i);
 		if(!tmpTalent)
 			continue; //should not ocur
 		//this is a normal talent (i hope )
@@ -5448,7 +5442,7 @@ void Player::Reset_Talents()
 			{
 				m_SSSPecificSpells.erase(tmpTalent->RankID[j]);
 				SpellEntry *spellInfo;
-				spellInfo = sSpellStore.LookupEntry( tmpTalent->RankID[j] );
+				spellInfo = dbcSpell.LookupEntry( tmpTalent->RankID[j] );
 				if(spellInfo)
 				{
 					for(int k=0;k<3;k++)
@@ -5457,7 +5451,7 @@ void Player::Reset_Talents()
 							removeSpell(spellInfo->EffectTriggerSpell[k], false, 0, 0);
 							//remove higher ranks of this spell too (like earth shield lvl 1 is talent and the rest is thought from trainer) 
 							SpellEntry *spellInfo2;
-							spellInfo2 = sSpellStore.LookupEntry( spellInfo->EffectTriggerSpell[k] );
+							spellInfo2 = dbcSpell.LookupEntry( spellInfo->EffectTriggerSpell[k] );
 							if(spellInfo2)
 								removeSpellByHashName(spellInfo2->NameHash);
 						}
@@ -5789,10 +5783,10 @@ void Player::JumpToEndTaxiNode(TaxiPath * path)
 
 void Player::RemoveSpellsFromLine(uint32 skill_line)
 {
-	uint32 cnt = sSkillStore.GetNumRows();
+	uint32 cnt = dbcSkillLineSpell.GetNumRows();
 	for(uint32 i=0; i < cnt; i++)
 	{
-		skilllinespell * sp = sSkillStore.LookupEntry(i);
+		skilllinespell * sp = dbcSkillLineSpell.LookupRow(i);
 		if(sp)
 		{
 			if(sp->skilline == skill_line)
@@ -6117,7 +6111,7 @@ void Player::ClearCooldownForSpell(uint32 spell_id)
 	GetSession()->SendPacket(&data);
 
 	// remove cooldown data from Server side lists
-	SpellEntry * spe = sSpellStore.LookupEntry(spell_id);
+	SpellEntry * spe = dbcSpell.LookupEntry(spell_id);
 	if(!spe) return;
 
 	map<uint32,uint32>::iterator itr;
@@ -6509,7 +6503,7 @@ void Player::ZoneUpdate(uint32 ZoneId)
 	m_zoneId = ZoneId;
 	sHookInterface.OnZone(this, ZoneId);
 
-	AreaTable * at = sAreaStore.LookupEntry(GetAreaID());
+	AreaTable * at = dbcArea.LookupEntry(GetAreaID());
 	if(at->category == AREAC_SANCTUARY || at->AreaFlags & AREA_SANCTUARY)
 	{
 		Unit * pUnit = (GetSelection() == 0) ? 0 : (m_mapMgr ? m_mapMgr->GetUnit(GetSelection()) : 0);
@@ -7015,7 +7009,7 @@ void Player::SetGuildId(uint32 guildId)
 
 void Player::UpdatePvPArea()
 {
-	AreaTable * at = sAreaStore.LookupEntry(m_AreaID);
+	AreaTable * at = dbcArea.LookupEntry(m_AreaID);
 	if(at == 0)
         return;
 
@@ -7045,7 +7039,7 @@ void Player::UpdatePvPArea()
         //fix for zone areas.
         if(at->ZoneId)
         {
-            AreaTable * at2 = sAreaStore.LookupEntry(at->ZoneId);
+            AreaTable * at2 = dbcArea.LookupEntry(at->ZoneId);
             if(at2 && (at2->category == AREAC_ALLIANCE_TERRITORY && GetTeam() == 0) || at2 && (at2->category == AREAC_HORDE_TERRITORY && GetTeam() == 1))
             {
                 if(!HasFlag(PLAYER_FLAGS, PLAYER_FLAG_PVP_TOGGLE) && !m_pvpTimer)
@@ -7161,7 +7155,7 @@ void Player::PvPToggle()
 	    {
 		    if(IsPvPFlagged())
 		    {
-                AreaTable * at = sAreaStore.LookupEntry(m_AreaID);
+                AreaTable * at = dbcArea.LookupEntry(m_AreaID);
                 if(at && at->AreaFlags & AREA_CITY_AREA || at && at->AreaFlags & AREA_CITY)
                 {
                     if(at && (at->category == AREAC_ALLIANCE_TERRITORY && GetTeam() == 1) || at && (at->category == AREAC_HORDE_TERRITORY && GetTeam() == 0))
@@ -7192,7 +7186,7 @@ void Player::PvPToggle()
     }
     else if(sWorld.GetRealmType() == REALM_PVP)
     {
-        AreaTable * at = sAreaStore.LookupEntry(m_AreaID);
+        AreaTable * at = dbcArea.LookupEntry(m_AreaID);
 	    if(at == 0)
             return;
 
@@ -7231,7 +7225,7 @@ void Player::PvPToggle()
         {
             if(at->ZoneId)
             {
-                AreaTable * at2 = sAreaStore.LookupEntry(at->ZoneId);
+                AreaTable * at2 = dbcArea.LookupEntry(at->ZoneId);
                 if(at2 && (at2->category == AREAC_ALLIANCE_TERRITORY && GetTeam() == 0) || at2 && (at2->category == AREAC_HORDE_TERRITORY && GetTeam() == 1))
                 {
                     if(m_pvpTimer > 0)
@@ -7340,7 +7334,7 @@ void Player::CompleteLoading()
 
 	for (itr = mSpells.begin(); itr != mSpells.end(); ++itr)
 	{
-		info = sSpellStore.LookupEntry(*itr);
+		info = dbcSpell.LookupEntry(*itr);
 
 		if(info && (info->Attributes & ATTRIBUTES_PASSIVE)  ) // passive
 		{
@@ -7369,7 +7363,7 @@ void Player::CompleteLoading()
 				count_appearence++;
 			}
 */
-		SpellEntry * sp = sSpellStore.LookupEntry((*i).id);
+		SpellEntry * sp = dbcSpell.LookupEntry((*i).id);
 		Aura * a = new Aura(sp,(*i).dur,this,this);
 		
 		for(uint32 x =0;x<3;x++)
@@ -7425,7 +7419,7 @@ void Player::CompleteLoading()
 	}
 
 	// useless logon spell
-	Spell *logonspell = new Spell(this, sSpellStore.LookupEntry(836), false, NULL);
+	Spell *logonspell = new Spell(this, dbcSpell.LookupEntry(836), false, NULL);
 	logonspell->prepare(&targets);
 
 	// Banned
@@ -7764,7 +7758,7 @@ void Player::SetShapeShift(uint8 ss)
 			uint32 SpellId = *i;
 			if(this->FindAura(SpellId))
 				continue;
-			SpellEntry* spells = sSpellStore.LookupEntry(SpellId);
+			SpellEntry* spells = dbcSpell.LookupEntry(SpellId);
 			Spell *spell = new Spell(this, spells ,true,NULL);
 			SpellCastTargets targets;
 			targets.m_unitTarget = this->GetGUID();
@@ -8271,7 +8265,7 @@ void Player::EventStunOrImmobilize(Unit *proc_target)
 	{
 		if(trigger_on_stun_chance<100 && !Rand(trigger_on_stun_chance))
 			return;
-		SpellEntry *spellInfo = sSpellStore.LookupEntry(trigger_on_stun);
+		SpellEntry *spellInfo = dbcSpell.LookupEntry(trigger_on_stun);
 		if(!spellInfo)
 			return;
 		Spell *spell = new Spell(this, spellInfo ,true, NULL);
@@ -8337,7 +8331,7 @@ void Player::_AddSkillLine(uint32 SkillLine, uint32 Current, uint32 Max)
 	else
 	{
 		PlayerSkill inf;
-		inf.Skill = sSkillLineStore.LookupEntry(SkillLine);
+		inf.Skill = dbcSkillLine.LookupEntry(SkillLine);
 		inf.CurrentValue = Current;
 		inf.MaximumValue = Max;
 		inf.BonusValue = 0;
@@ -8526,7 +8520,7 @@ void PlayerSkill::Reset(uint32 Id)
 	MaximumValue = 0;
 	CurrentValue = 0;
 	BonusValue = 0;
-	Skill = (Id == 0) ? NULL : sSkillLineStore.LookupEntry(Id);
+	Skill = (Id == 0) ? NULL : dbcSkillLine.LookupEntry(Id);
 }
 
 void Player::_AddLanguages(bool All)
@@ -8560,7 +8554,7 @@ void Player::_AddLanguages(bool All)
 	{
 		for(list<CreateInfo_SkillStruct>::iterator itr = info->skills.begin(); itr != info->skills.end(); ++itr)
 		{
-			en = sSkillLineStore.LookupEntry(itr->skillid);
+			en = dbcSkillLine.LookupEntry(itr->skillid);
 			if(en->type == SKILL_TYPE_LANGUAGE)
 			{
 				sk.Reset(itr->skillid);

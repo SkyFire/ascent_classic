@@ -888,7 +888,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
         // cast Effect Spell
 	    if(qst->effect_on_player)
 	    {
-		    SpellEntry  * inf =sSpellStore.LookupEntry(qst->effect_on_player);
+		    SpellEntry  * inf =dbcSpell.LookupEntry(qst->effect_on_player);
 		    if(inf)
 		    {
 			    Spell * spe = new Spell(qst_giver,inf,true,NULL);
@@ -1021,7 +1021,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 	    // cast Effect Spell
 	    if(qst->effect_on_player)
 	    {
-		    SpellEntry  * inf =sSpellStore.LookupEntry(qst->effect_on_player);
+		    SpellEntry  * inf =dbcSpell.LookupEntry(qst->effect_on_player);
 		    if(inf)
 		    {
 			    Spell * spe = new Spell(qst_giver,inf,true,NULL);

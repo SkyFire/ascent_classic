@@ -253,16 +253,16 @@ inline bool isAttackable(Object* objA, Object* objB)// A can attack B?
 	AreaTable *atA;
 	AreaTable *atB;
 	if(objA->IsPet() && ((Pet*)objA)->GetPetOwner())
-		atA = sAreaStore.LookupEntry(static_cast<Pet *>(objA)->GetPetOwner()->GetAreaID());
+		atA = dbcArea.LookupEntry(static_cast<Pet *>(objA)->GetPetOwner()->GetAreaID());
 	else if (objA->IsPlayer())
-		atA = sAreaStore.LookupEntry(static_cast<Player *>(objA)->GetAreaID());
+		atA = dbcArea.LookupEntry(static_cast<Player *>(objA)->GetAreaID());
 	else
 		atA = NULL;
 
 	if(objB->IsPet() && ((Pet*)objB)->GetPetOwner())
-		atB = sAreaStore.LookupEntry(static_cast<Pet *>(objB)->GetPetOwner()->GetAreaID());
+		atB = dbcArea.LookupEntry(static_cast<Pet *>(objB)->GetPetOwner()->GetAreaID());
 	else if (objB->IsPlayer())
-		atB = sAreaStore.LookupEntry(static_cast<Player *>(objB)->GetAreaID());
+		atB = dbcArea.LookupEntry(static_cast<Player *>(objB)->GetAreaID());
 	else
 		atB = NULL;
 
@@ -348,8 +348,8 @@ inline bool isCombatSupport(Object* objA, Object* objB)// B combat supports A?
 
 inline bool isAlliance(Object* objA)// A is alliance?
 {
-	FactionTemplateDBC * m_sw_faction = sFactionTmpStore.LookupEntry(11);
-	FactionDBC * m_sw_factionDBC = sFactionStore.LookupEntry(72);
+	FactionTemplateDBC * m_sw_faction = dbcFactionTemplate.LookupEntry(11);
+	FactionDBC * m_sw_factionDBC = dbcFaction.LookupEntry(72);
 	if(!objA || objA->m_factionDBC == NULL || objA->m_faction == NULL)
 		return true;
 

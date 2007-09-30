@@ -55,15 +55,8 @@ Map::Map(uint32 mapid)
 		CreateMapMgrInstance();
 
 	// get our name
-	me = sMapStore.LookupEntry(_mapId);
-	if(me)
-	{
-		name = sMapStore.LookupString(me->real_name);
-	}
-	else
-	{
-		name = "Unknown";
-	}
+	me = dbcMap.LookupEntry(_mapId);
+	name = _mapInfo->name;
 }
 
 Map::~Map()

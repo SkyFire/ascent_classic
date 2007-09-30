@@ -122,9 +122,9 @@ void Player::_InitialReputation()
 	int32 BaseRep = 0;
 	uint32 j;
 	uint32 RaceMask = getRaceMask();
-	for(uint32 i = 0; i < sFactionStore.GetNumRows(); ++i)
+	for(uint32 i = 0; i < dbcFaction.GetNumRows(); ++i)
 	{
-		f = static_cast<FastIndexedDataStore<FactionDBC>*>(FactionStore::getSingletonPtr())->LookupRow(i);
+		f = dbcFaction.LookupRow(i);
 		if(f == 0) continue;
 
 		// Get Base Reputation
@@ -183,7 +183,7 @@ int32 Player::GetBaseStanding(uint32 Faction)
 void Player::SetStanding(uint32 Faction, int32 Value)
 {
 	ReputationMap::iterator itr = m_reputation.find(Faction);
-	FactionDBC * dbc = sFactionStore.LookupEntry(Faction);
+	FactionDBC * dbc = dbcFaction.LookupEntry(Faction);
 	if(dbc == 0) return;
 
 	if(itr == m_reputation.end())
@@ -265,7 +265,7 @@ bool Player::IsHostileBasedOnReputation(FactionDBC * dbc)
 void Player::ModStanding(uint32 Faction, int32 Value)
 {
 	ReputationMap::iterator itr = m_reputation.find(Faction);
-	FactionDBC * dbc = sFactionStore.LookupEntry(Faction);
+	FactionDBC * dbc = dbcFaction.LookupEntry(Faction);
 	if(dbc == 0) return;
 
 	if(itr == m_reputation.end())

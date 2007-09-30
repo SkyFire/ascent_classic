@@ -295,9 +295,9 @@ void ObjectMgr::LoadSpellSkills()
 	uint32 i;
 //	int total = sSkillStore.GetNumRows();
 
-	for(i = 0; i < sSkillStore.GetNumRows(); i++)
+	for(i = 0; i < dbcSkillLineSpell.GetNumRows(); i++)
 	{
-		skilllinespell *sp = sSkillStore.LookupEntry(i);
+		skilllinespell *sp = dbcSkillLineSpell.LookupRow(i);
 		if (sp)
 		{
 			mSpellSkills[sp->spell] = sp;
@@ -1109,7 +1109,7 @@ void ObjectMgr::LoadTotemSpells()
 	{
 		Field *fields = result->Fetch();
 		spellid = fields[1].GetUInt32();
-		sp = sSpellStore.LookupEntry(spellid);
+		sp = dbcSpell.LookupEntry(spellid);
 		if(!spellid || !sp) continue;
 
 		m_totemSpells.insert( TotemSpellMap::value_type( fields[0].GetUInt32(), sp ));
@@ -1395,7 +1395,7 @@ void ObjectMgr::GenerateTrainerSpells()
 			uint32 s1,s2,s3,s4,s5;
 			if((s1 = f[0].GetUInt32()) != 0)
 			{
-				SpellEntry *sp = sSpellStore.LookupEntry(s1);
+				SpellEntry *sp = dbcSpell.LookupEntry(s1);
 				for(int i = 0; i < 3; i++)
 				{
 					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
@@ -1405,7 +1405,7 @@ void ObjectMgr::GenerateTrainerSpells()
 			}
 			if((s2 = f[1].GetUInt32()) != 0)
 			{
-				SpellEntry *sp = sSpellStore.LookupEntry(s2);
+				SpellEntry *sp = dbcSpell.LookupEntry(s2);
 				for(int i = 0; i < 3; i++)
 				{
 					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
@@ -1415,7 +1415,7 @@ void ObjectMgr::GenerateTrainerSpells()
 			}
 			if((s3 = f[2].GetUInt32()) != 0)
 			{
-				SpellEntry *sp = sSpellStore.LookupEntry(s3);
+				SpellEntry *sp = dbcSpell.LookupEntry(s3);
 				for(int i = 0; i < 3; i++)
 				{
 					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
@@ -1425,7 +1425,7 @@ void ObjectMgr::GenerateTrainerSpells()
 			}
 			if((s4 = f[3].GetUInt32()) != 0)
 			{
-				SpellEntry *sp = sSpellStore.LookupEntry(s4);
+				SpellEntry *sp = dbcSpell.LookupEntry(s4);
 				for(int i = 0; i < 3; i++)
 				{
 					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
@@ -1435,7 +1435,7 @@ void ObjectMgr::GenerateTrainerSpells()
 			}
 			if((s5 = f[4].GetUInt32()) != 0)
 			{
-				SpellEntry *sp = sSpellStore.LookupEntry(s5);
+				SpellEntry *sp = dbcSpell.LookupEntry(s5);
 				for(int i = 0; i < 3; i++)
 				{
 					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
@@ -1455,12 +1455,17 @@ void ObjectMgr::GenerateTrainerSpells()
 	map<string, map<uint32, uint32>* >::iterator it1;
 	map<uint32, uint32>::iterator it2;
 	map<uint32, uint32> TeachingSpellMap;
+	map<uint32, pair<string,string> > SpellNameRanks;
 
-	uint32 mx = sSpellStore.GetNumRows();
-	for(uint32 i = 0; i < mx; ++i)
+	uint32 mx = dbcSpell.GetNumRows();
+	DBCFile f;
+	f.open("DBC/Spell.dbc");
+
+	for(uint32 i = 0; i < f.getRecordCount(); ++i)
 	{
 		// Get Spell
-		SpellEntry *Sp = static_cast<FastIndexedDataStore<SpellEntry>*>(SpellStore::getSingletonPtr())->LookupRow(i);
+		SpellEntry *Sp = dbcSpell.LookupEntryForced(f.getRecord(i).getUInt(0));
+		ASSERT(Sp);
 		if(Sp != NULL)
 		{
 			// Skip learning spells ;)
@@ -1507,12 +1512,17 @@ void ObjectMgr::GenerateTrainerSpells()
 			if(j != 3)
 				continue;
 
+			const char* SpellName = f.getRecord(i).getString(140);
+			const char* RankName = f.getRecord(i).getString(123);
+			
 			// Get our row name
-			if(!Sp->Rank)
+			if(!SpellName || !RankName)
 				continue;
 
-			const char* SpellName = sSpellStore.LookupString(Sp->Name);
-			const char* RankName = sSpellStore.LookupString(Sp->Rank);
+			pair<string,string> p;
+			p.first = string(SpellName);
+			p.second = string(RankName);
+			SpellNameRanks.insert(make_pair(Sp->Id, p));
 
 			// Skip old spells
 			if(SpellName[0] == 'z' && SpellName[1] == 'z' &&
@@ -1551,14 +1561,14 @@ void ObjectMgr::GenerateTrainerSpells()
 			{
 
 				uint32 o = mapPtr->find(RankNumber)->second;
-				SpellEntry *p = sSpellStore.LookupEntry(o);
+				SpellEntry *p = dbcSpell.LookupEntryForced(o);
 //				const char* SpellName2 = sSpellStore.LookupString(p->Name);
 //				const char* RankName2 = sSpellStore.LookupString(p->Rank);
 
 				// For enchants, override the aura spell with casting spell.
-				if(Sp->Effect[0] == 54 ||
+				if(Sp && (Sp->Effect[0] == 54 ||
 					Sp->Effect[1] == 54 ||
-					Sp->Effect[2] == 54)
+					Sp->Effect[2] == 54))
 				{
 					if(p->Effect[0] != 54 && p->Effect[1] != 54 && p->Effect[2] != 54)
 						mapPtr->find(RankNumber)->second = Sp->Id;
@@ -1573,16 +1583,17 @@ void ObjectMgr::GenerateTrainerSpells()
 	SpellEntry * spell;
 	TrainerSpellMap * destmap;
 
-	mx = sSkillStore.GetNumRows();
+	mx = dbcSkillLineSpell.GetNumRows();
 
 	for(uint32 i = 0; i < mx; ++i)
 	{
-		sp = sSkillStore.LookupEntry(i);
+		sp = dbcSkillLineSpell.LookupEntry(i);
 
 		// Check if we're a learning spell :)
-		spell = sSpellStore.LookupEntry(sp->spell);
+		spell = dbcSpell.LookupEntryForced(sp->spell);
+        if(!spell) continue;
 		
-		skilllineentry *skill = sSkillLineStore.LookupEntry(sp->skilline);
+		skilllineentry *skill = dbcSkillLine.LookupEntry(sp->skilline);
 		ASSERT(skill);
 
 		for(uint32 j = 0; j < 3; j++)
@@ -1593,7 +1604,7 @@ void ObjectMgr::GenerateTrainerSpells()
 			if(!TeachingSpellId)
 				continue;
 
-			SpellEntry * TeachingSpell = sSpellStore.LookupEntry(TeachingSpellId);
+			SpellEntry * TeachingSpell = dbcSpell.LookupEntry(TeachingSpellId);
 
 			SpellEntry * TeachingSpell2 = NULL;//2nd level teaching spell used by Pet trainers to teach hunter a teaching spell
 			uint32 TeachingSpellId2 = 0;//init 0, later used to distinguish if 2nd lvl teach.sp. is present
@@ -1603,7 +1614,7 @@ void ObjectMgr::GenerateTrainerSpells()
                 destmap = &mPetSpells;
 				TeachingSpellId2 = TeachingSpellMap[TeachingSpellId];
                 if(TeachingSpellId2)
-                    TeachingSpell2 = sSpellStore.LookupEntry(TeachingSpellId2);
+                    TeachingSpell2 = dbcSpell.LookupEntry(TeachingSpellId2);
 			}
             else if(TeachingSpell->Effect[j] == SPELL_EFFECT_LEARN_SPELL)
                 destmap = &mNormalSpells;
@@ -1626,8 +1637,11 @@ void ObjectMgr::GenerateTrainerSpells()
 			TS->RequiredClass = -1;
 
 			// Find out our spell rank.
-			const char* SpellName = sSpellStore.LookupString(spell->Name);
-			const char* RankName = sSpellStore.LookupString(spell->Rank);
+			map<uint32,pair<string,string> >::iterator itr = SpellNameRanks.find(spell->Id);
+			ASSERT(itr != SpellNameRanks.end());
+
+			const char* SpellName = itr->second.first.c_str();
+			const char* RankName = itr->second.second.c_str();
 
 			string Sp_Name = SpellName;
 			it1 = SpellRankMap.find(Sp_Name);
@@ -1839,9 +1853,9 @@ void ObjectMgr::GenerateTrainerSpells()
 	tsp->SpellID = 1515;
 	tsp->Cost = 300;
 	tsp->DeleteSpell=0;
-	tsp->pSpell = sSpellStore.LookupEntry(1515);
+	tsp->pSpell = dbcSpell.LookupEntry(1515);
 	tsp->IsProfession=0;
-	tsp->pTrainingSpell = sSpellStore.LookupEntry(1579);
+	tsp->pTrainingSpell = dbcSpell.LookupEntry(1579);
 	tsp->RequiredLevel=10;
 	tsp->RequiredSkillLine=0;
 	tsp->RequiredSpell=0;
@@ -1882,7 +1896,7 @@ void ObjectMgr::LoadTrainers()
 		for(uint32 i = 0; i < 20; ++i)
 		{
 			skilllines[i] = fields[1+i].GetUInt32();
-			skill = sSkillLineStore.LookupEntry(skilllines[i]);
+			skill = dbcSkillLine.LookupEntryForced(skilllines[i]);
 			if(!skill)
 			{
 				skilllines[i] = 0;
@@ -1917,7 +1931,7 @@ void ObjectMgr::LoadTrainers()
 				{
 					if((*it)->pSpell->spellLevel <= maxlevel || maxlevel == 60)	// 60 trainers have all?
 					{
-						skill = sSkillLineStore.LookupEntry(skilllines[i]);
+						skill = dbcSkillLine.LookupEntry(skilllines[i]);
 						if(skill->type == SKILL_TYPE_PROFESSION || skill->type == SKILL_TYPE_SECONDARY)
 						{
 							if(skill->type == SKILL_TYPE_SECONDARY)
@@ -2030,7 +2044,7 @@ void ObjectMgr::LoadTrainers()
 			if(!fields2)
 				break;//wow, this is bad, a few seconds ago we had all entrys
 			uint32 CastSpellID=fields2[1].GetUInt32();
-			SpellEntry *spellInfo = sSpellStore.LookupEntry(CastSpellID );
+			SpellEntry *spellInfo = dbcSpell.LookupEntry(CastSpellID );
 			if(!spellInfo)
 			{
 				badspellcount++;
@@ -2055,7 +2069,7 @@ void ObjectMgr::LoadTrainers()
 				{
 					tr->SpellList[i]->TeachSpellID = spellInfo->EffectTriggerSpell[k];
 
-					SpellEntry *spellInfo2 = sSpellStore.LookupEntry(spellInfo->EffectTriggerSpell[k] );
+					SpellEntry *spellInfo2 = dbcSpell.LookupEntry(spellInfo->EffectTriggerSpell[k] );
 					tr->SpellList[i]->pSpell = spellInfo2;
 				}
 			result2->NextRow();
@@ -2086,7 +2100,7 @@ bool ObjectMgr::AddTrainerSpell(uint32 entry, SpellEntry *pSpell)
 	CreatureInfo *ci = CreatureNameStorage.LookupEntry(entry);
 	if(ci)
 	{
-		const char* RankName = sSpellStore.LookupString(pSpell->Rank);
+/*		const char* RankName = dbcSpell.LookupString(pSpell->Rank);
 		if(strstr(ci->SubName,"Journeyman"))
 		{
 			if(!stricmp(RankName, "Journeyman"))
@@ -2126,7 +2140,7 @@ bool ObjectMgr::AddTrainerSpell(uint32 entry, SpellEntry *pSpell)
 			else
 				return true;
 		}
-		else
+		else*/
 			return true;
 	}
 	else
@@ -2378,7 +2392,7 @@ void ObjectMgr::LoadDefaultPetSpells()
 			Field * f = result->Fetch();
 			uint32 Entry = f[0].GetUInt32();
 			uint32 spell = f[1].GetUInt32();
-			SpellEntry * sp = sSpellStore.LookupEntry(spell);
+			SpellEntry * sp = dbcSpell.LookupEntry(spell);
 
 			if(spell && Entry && sp)
 			{
@@ -2459,7 +2473,7 @@ void ObjectMgr::LoadSpellFixes()
 	{
 		Field * fields = result->Fetch();
 		uint32 entry = fields[0].GetUInt32();
-		SpellEntry * sp = sSpellStore.LookupEntry(entry);
+		SpellEntry * sp = dbcSpell.LookupEntry(entry);
 		if(sp == 0) continue;
 
 		// FIX SPELL GROUP RELATIONS
@@ -2521,7 +2535,7 @@ void ObjectMgr::LoadSpellOverride()
 			{
 				Field *fieldsIn = resultIn->Fetch();
 				spellid = fieldsIn[0].GetUInt32();
-				sp = sSpellStore.LookupEntry(spellid);
+				sp = dbcSpell.LookupEntry(spellid);
 				if(!spellid || !sp) 
 					continue;
 				list->push_back(sp);
