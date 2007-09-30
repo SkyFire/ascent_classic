@@ -243,7 +243,7 @@ void ArenaTeam::SaveToDB()
 		}
 	}
 
-	for(; i < 5; ++i)
+	for(; i < 10; ++i)
 	{
 		ss << ",'0 0 0 0 0'";
 	}
