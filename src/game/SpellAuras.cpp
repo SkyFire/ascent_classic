@@ -4016,39 +4016,35 @@ void Aura::SpellAuraModCastingSpeed(bool apply)
 
 void Aura::SpellAuraFeighDeath(bool apply)
 {
-	//Not sure
-	//apply ? m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_DEAD) : m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_DEAD);
-            
-        if(m_target->IsPlayer()) 
-        {
-                if (apply)
-                {
-                        m_target->setDeathState(JUST_DIED);    
-                        static_cast<Player*>(m_target)->EventDeath();
-                        
-                        m_target->SetFlag(UNIT_FIELD_FLAGS, 0x08);
-                        m_target->SetFlag(UNIT_FIELD_FLAGS_2, 0x00000001);
-                        m_target->SetFlag(UNIT_DYNAMIC_FLAGS, 0x00);
-                        
-                        m_target->clearAttackers(true);
-                        m_target->addStateFlag(UF_TARGET_DIED);
-                }
-                else
-                {
-                        m_target->setDeathState(ALIVE);
-                    
-                        m_target->RemoveFlag(UNIT_FIELD_FLAGS, 0x08);
-                        m_target->RemoveFlag(UNIT_FIELD_FLAGS_2, 0x00000001);
-                        m_target->clearStateFlag(UF_TARGET_DIED);
-                    
-                        WorldPacket data(12);
-                        data.SetOpcode(SMSG_COOLDOWN_EVENT);
-                        data << (uint32)GetSpellProto()->Id << m_target->GetGUID();
-                        static_cast<Player*>(m_target)->GetSession()->SendPacket(&data);
-						//hopefully will disable bug of teleporting target to graveyard
-						sEventMgr.RemoveEvents(m_target,EVENT_PLAYER_FORECED_RESURECT);
-                }
-        }
+	if(m_target->IsPlayer())
+	{
+		Player * pTarget = ((Player*)m_target);
+		WorldPacket data(50);
+		if(apply)
+		{
+			pTarget->EventDeath();
+			pTarget->SetFlag(UNIT_FIELD_FLAGS_2, 1);
+			pTarget->SetFlag(UNIT_FIELD_FLAGS, 0x20000000);
+			pTarget->clearAttackers(false);
+			
+			data.SetOpcode(SMSG_START_MIRROR_TIMER);
+			data << uint32(2);		// type
+			data << uint32(GetDuration());
+			data << uint32(GetDuration());
+			data << uint32(0xFFFFFFFF);
+			data << uint8(0);
+			data << uint32(m_spellProto->Id);		// ???
+			pTarget->GetSession()->SendPacket(&data);
+		}
+		else
+		{
+			pTarget->RemoveFlag(UNIT_FIELD_FLAGS_2, 1);
+			pTarget->RemoveFlag(UNIT_FIELD_FLAGS, 0x20000000);
+			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
+			data << uint32(2);
+			pTarget->GetSession()->SendPacket(&data);
+		}
+	}
 }
 
 void Aura::SpellAuraModDisarm(bool apply)
