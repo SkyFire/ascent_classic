@@ -1619,24 +1619,19 @@ public:
                 //duration affected by level
                 if((int32)sd->Duration1 < 0 && sd->Duration2 && u_caster)
                 {
-                    c_dur = ((int32)sd->Duration1 + (sd->Duration2 * u_caster->getLevel()));
-                    if(c_dur > 0 && sd->Duration3 > 0 && c_dur > (int32)sd->Duration3)
+                    this->Dur = uint32(((int32)sd->Duration1 + (sd->Duration2 * u_caster->getLevel())));
+                    if((int32)this->Dur > 0 && sd->Duration3 > 0 && (int32)this->Dur > (int32)sd->Duration3)
                     {
-                        c_dur = sd->Duration3;
-                    }
-					else if(c_dur > 0)
-                    {
-                        Dur = c_dur;
-                    }
-                    if(c_dur < 0)
-                    {
-                        Dur = 0;
+                        this->Dur = sd->Duration3;
                     }
 
+                    if((int32)this->Dur < 0)
+						this->Dur = 0;
+					c_dur = this->Dur;
                 }
                 if(sd->Duration1 >= 0 && !c_dur)
                 {
-                    Dur = sd->Duration1;
+                    this->Dur = sd->Duration1;
                 }
                 //combo point lolerCopter? ;P
                 if(p_caster)  
@@ -1647,7 +1642,7 @@ public:
                         uint32 bonus=(cp*(sd->Duration3-sd->Duration1))/5;
                         if(bonus)
                         {
-                            Dur+=bonus;
+                            this->Dur+=bonus;
                             m_requiresCP=true;
                         }
                     }
@@ -1655,21 +1650,21 @@ public:
 
                 if(m_spellInfo->SpellGroupType && u_caster)
                 {
-                    SM_FIValue(u_caster->SM_FDur,(int32*)&Dur,m_spellInfo->SpellGroupType);
-                    SM_PIValue(u_caster->SM_PDur,(int32*)&Dur,m_spellInfo->SpellGroupType);
+                    SM_FIValue(u_caster->SM_FDur,(int32*)&this->Dur,m_spellInfo->SpellGroupType);
+                    SM_PIValue(u_caster->SM_PDur,(int32*)&this->Dur,m_spellInfo->SpellGroupType);
                 }
             }
             else
             {
-                Dur = (uint32)-1;
+                this->Dur = (uint32)-1;
             }
         }
         else
         {
-             Dur = (uint32)-1;
+             this->Dur = (uint32)-1;
         }
 
-        return Dur;
+        return this->Dur;
     }
 
     inline float GetRadius(uint32 i)

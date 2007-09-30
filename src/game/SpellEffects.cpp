@@ -1220,7 +1220,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	std::map<uint32,Aura*>::iterator itr=unitTarget->tmpAura.find(m_spellInfo->Id);
 	if(itr==unitTarget->tmpAura.end())
 	{
-		uint32 Duration=GetDuration();
+		uint32 Duration=this->GetDuration();
 		
 		// Handle diminishing returns, if it should be resisted, it'll make duration 0 here.
 		if(!(m_spellInfo->Attributes & 64)) // Passive
