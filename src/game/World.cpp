@@ -541,6 +541,19 @@ void World::SetInitialWorldSettings()
 
 	dbc.open("DBC/Spell.dbc");
 	Log.Notice("World", "Processing %u spells...", dbc.getRecordCount());
+
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_proc_data");
+	map<uint32, pair<uint32, int32> > procMap;
+	if(result)
+	{
+		do 
+		{
+			pair<uint32,int32> p;
+			p.first = result->Fetch()[1].GetUInt32();
+			p.second = result->Fetch()[2].GetInt32();
+			procMap.insert(make_pair(result->Fetch()[0].GetUInt32(), p));
+		} while(result->NextRow());
+	}
 	uint32 cnt = dbc.getRecordCount();
 	uint32 effect;
 
@@ -1295,6 +1308,15 @@ void World::SetInitialWorldSettings()
 		/* hackfix for this - FIX ME LATER - Burlex */
 		if(namehash==3238263755UL)
 			sp->procFlags=0;
+
+		map<uint32,pair<uint32,int32> >::iterator itr = procMap.find(namehash);
+		if(itr != procMap.end())
+		{
+			if(itr->second.second > 0)
+				sp->procFlags = (uint32)itr->second.second;
+			if(itr->first != 0)
+				sp->procChance = itr->first;
+		}
 
 //junk code to get me has :P 
 //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
