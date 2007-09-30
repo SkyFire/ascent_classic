@@ -321,7 +321,6 @@ typedef set<uint64> AreaAuraList;
 
 class SERVER_DECL Aura : public EventableObject
 {
-	bool m_expired;
 	uint64 periodic_target;
 public:
     Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target);

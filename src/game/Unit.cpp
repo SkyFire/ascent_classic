@@ -2347,8 +2347,10 @@ void Unit::AddAura(Aura *aur)
 		}
 	}
 
+	// We add 500ms here to allow for the last tick in DoT spells. This is a dirty hack, but at least it doesn't crash like my other method.
+	// - Burlex
 	if(aur->GetDuration() > 0)
-		sEventMgr.AddEvent(aur, &Aura::ExpireRemove, EVENT_AURA_REMOVE, aur->GetDuration(), 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+		sEventMgr.AddEvent(aur, &Aura::Remove, EVENT_AURA_REMOVE, aur->GetDuration() + 500, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
 	aur->RelocateEvents();
 
