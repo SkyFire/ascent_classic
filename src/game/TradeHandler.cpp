@@ -31,7 +31,11 @@ void WorldSession::HandleInitiateTrade(WorldPacket & recv_data)
 
 	if(pTarget == 0)
 	{
+#ifdef USING_BIG_ENDIAN
+		TradeStatus = swap32(uint32(TRADE_STATUS_PLAYER_NOT_FOUND));
+#else
 		TradeStatus = TRADE_STATUS_PLAYER_NOT_FOUND;
+#endif
 		OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 		return;
 	}
@@ -73,13 +77,23 @@ void WorldSession::HandleBeginTrade(WorldPacket & recv_data)
 	Player * plr = _player->GetTradeTarget();
 	if(_player->mTradeTarget == 0 || plr == 0)
 	{
+#ifdef USING_BIG_ENDIAN
+		TradeStatus = swap32(uint32(TRADE_STATUS_PLAYER_NOT_FOUND));
+#else
 		TradeStatus = TRADE_STATUS_PLAYER_NOT_FOUND;
-		OutPacket(TRADE_STATUS_PLAYER_NOT_FOUND, 4, &TradeStatus);
+#endif
+		OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 		return;
 	}
-
+#ifdef USING_BIG_ENDIAN
+	swap32(&TradeStatus);
 	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	swap32(&TradeStatus);
+#else
+	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+#endif
 
 	plr->mTradeStatus = TradeStatus;
 	_player->mTradeStatus = TradeStatus;
@@ -93,13 +107,24 @@ void WorldSession::HandleBusyTrade(WorldPacket & recv_data)
 	Player * plr = _player->GetTradeTarget();
 	if(_player->mTradeTarget == 0 || plr == 0)
 	{
+#ifdef USING_BIG_ENDIAN
+		TradeStatus = swap32(uint32(TRADE_STATUS_PLAYER_NOT_FOUND));
+#else
 		TradeStatus = TRADE_STATUS_PLAYER_NOT_FOUND;
+#endif
 		OutPacket(TRADE_STATUS_PLAYER_NOT_FOUND, 4, &TradeStatus);
 		return;
 	}
 
+#ifdef USING_BIG_ENDIAN
+	swap32(&TradeStatus);
 	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	swap32(&TradeStatus);
+#else
+	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+#endif
 
 	plr->mTradeStatus = TradeStatus;
 	_player->mTradeStatus = TradeStatus;
@@ -116,13 +141,24 @@ void WorldSession::HandleIgnoreTrade(WorldPacket & recv_data)
 	Player * plr = _player->GetTradeTarget();
 	if(_player->mTradeTarget == 0 || plr == 0)
 	{
+#ifdef USING_BIG_ENDIAN
+		TradeStatus = swap32(uint32(TRADE_STATUS_PLAYER_NOT_FOUND));
+#else
 		TradeStatus = TRADE_STATUS_PLAYER_NOT_FOUND;
+#endif
 		OutPacket(TRADE_STATUS_PLAYER_NOT_FOUND, 4, &TradeStatus);
 		return;
 	}
 
+#ifdef USING_BIG_ENDIAN
+	swap32(&TradeStatus);
 	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	swap32(&TradeStatus);
+#else
+	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+#endif
 
 	plr->mTradeStatus = TradeStatus;
 	_player->mTradeStatus = TradeStatus;
@@ -137,7 +173,12 @@ void WorldSession::HandleCancelTrade(WorldPacket & recv_data)
 	if(_player->mTradeTarget == 0 || _player->mTradeStatus == TRADE_STATUS_COMPLETE)
 		return;
 
+#ifdef USING_BIG_ENDIAN
+	uint32 TradeStatus = swap32(uint32(TRADE_STATUS_CANCELLED));
+#else
     uint32 TradeStatus = TRADE_STATUS_CANCELLED;
+#endif
+
     OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 
 	Player * plr = _player->GetTradeTarget();
@@ -160,7 +201,12 @@ void WorldSession::HandleUnacceptTrade(WorldPacket & recv_data)
 	if(_player->mTradeTarget == 0 || plr == 0)
 		return;
 
+#ifdef USING_BIG_ENDIAN
+	uint32 TradeStatus = swap32(uint32(TRADE_STATUS_UNACCEPTED));
+#else
 	uint32 TradeStatus = TRADE_STATUS_UNACCEPTED;
+#endif
+
 	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 
@@ -225,8 +271,15 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 	uint32 TradeStatus = TRADE_STATUS_ACCEPTED;
 	
 	// Tell the other player we're green.
+#ifdef USING_BIG_ENDIAN
+	swap32(&TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	_player->mTradeStatus = TradeStatus;
+	swap32(&TradeStatus);
+#else
+	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	_player->mTradeStatus = TradeStatus;
+#endif
 
 	if(plr->mTradeStatus == TRADE_STATUS_ACCEPTED)
 	{
@@ -305,8 +358,15 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 
 			// Close Window
 			TradeStatus = TRADE_STATUS_COMPLETE;
+#ifdef USING_BIG_ENDIAN
+            swap32(&TradeStatus);
 			OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 			plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+			swap32(&TradeStatus);
+#else
+			OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+			plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+#endif
 
 			_player->mTradeStatus = TRADE_STATUS_COMPLETE;
 			plr->mTradeStatus = TRADE_STATUS_COMPLETE;

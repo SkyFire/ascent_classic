@@ -1187,8 +1187,12 @@ void QuestMgr::SendQuestInvalid(INVALID_REASON reason, Player *plyr)
 {
 	if(!plyr)
 		return;
-
+#ifdef USING_BIG_ENDIAN
+	uint32 swapped = swap32((uint32)reason);
 	plyr->GetSession()->OutPacket(SMSG_QUESTGIVER_QUEST_INVALID, 4, &reason);
+#else
+	plyr->GetSession()->OutPacket(SMSG_QUESTGIVER_QUEST_INVALID, 4, &reason);
+#endif	
 	sLog.outDebug("WORLD:Sent SMSG_QUESTGIVER_QUEST_INVALID");
 }
 

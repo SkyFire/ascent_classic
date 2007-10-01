@@ -134,7 +134,12 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 	{
 		grp->AddMember(_player->m_playerInfo, _player);
         _player->iInstanceType = grp->GetLeader()->iInstanceType;
+#ifdef USING_BIG_ENDIAN
+		uint32 swapped = swap32(grp->GetLeader()->iInstanceType);
+		_player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &swapped);
+#else
         _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &grp->GetLeader()->iInstanceType);
+#endif
         sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
 		return;
 	}
@@ -144,7 +149,12 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 	grp->AddMember(player->m_playerInfo, player);		// add the inviter first, therefore he is the leader
 	grp->AddMember(_player->m_playerInfo, _player);	   // add us.
     _player->iInstanceType = player->iInstanceType;
+#ifdef USING_BIG_ENDIAN
+	uint32 swapped2 = swap32(player->iInstanceType);
+	_player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &swapped2);
+#else
     _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &player->iInstanceType);
+#endif
     sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
 
 	// Currentgroup and all that shit are set by addmember.

@@ -215,7 +215,14 @@ void Player::SetStanding(uint32 Faction, int32 Value)
 		{
 			SetFlagVisible(itr->second->flag);
 			if(IsInWorld())
+			{
+#ifdef USING_BIG_ENDIAN
+				uint32 swapped = swap32(dbc->RepListId);
+				m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &swapped);
+#else
 				m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &dbc->RepListId);
+#endif
+			}
 		}
 
 		// Set at war if we're beyond hostile.
@@ -304,7 +311,14 @@ void Player::ModStanding(uint32 Faction, int32 Value)
 		{
 			SetFlagVisible(itr->second->flag);
 			if(IsInWorld())
+			{
+#ifdef USING_BIG_ENDIAN
+				uint32 swapped = swap32(dbc->RepListId);
+				m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &swapped);
+#else
 				m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &dbc->RepListId);
+#endif
+			}
 		}
 
 		// Set at war if we're beyond hostile.
@@ -472,7 +486,14 @@ void Player::Reputation_OnTalk(FactionDBC * dbc)
 	{
 		SetFlagVisible(rep->flag);
 		if(IsInWorld())
+		{
+#ifdef USING_BIG_ENDIAN
+			uint32 swapped = swap32(dbc->RepListId);
+			m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &swapped);
+#else
 			m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &dbc->RepListId);
+#endif
+		}
 
 #ifdef OPTIMIZED_PLAYER_SAVING
 		save_Reputation();

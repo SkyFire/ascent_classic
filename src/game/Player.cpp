@@ -1813,7 +1813,14 @@ void Player::addSpell(uint32 spell_id)
 		
 	mSpells.insert(spell_id);
 	if(IsInWorld())
+	{
+#ifdef USING_BIG_ENDIAN
+		uint32 swapped = swap32(spell_id);
+		m_session->OutPacket(SMSG_LEARNED_SPELL, 4, &swapped);
+#else
 		m_session->OutPacket(SMSG_LEARNED_SPELL, 4, &spell_id);
+#endif
+	}
 
 	// Check if we're a deleted spell
 	iter = mDeletedSpells.find(spell_id);
@@ -5244,7 +5251,12 @@ void Player::removeSpellByHashName(uint32 hash)
 		if(e->NameHash == hash)
 		{
 			RemoveAura(SpellID,GetGUID());
+#ifdef USING_BIG_ENDIAN
+			uint32 swapped = swap32(SpellID);
+			m_session->OutPacket(SMSG_REMOVED_SPELL, 4, &swapped);
+#else
 			m_session->OutPacket(SMSG_REMOVED_SPELL, 4, &SpellID);		
+#endif
 			mSpells.erase(it);
 		}
 	}
@@ -5277,7 +5289,12 @@ bool Player::removeSpell(uint32 SpellID, bool MoveToDeleted, bool SupercededSpel
 	}
 	else
 	{
+#ifdef USING_BIG_ENDIAN
+		uint32 swapped = swap32(SpellID);
+		m_session->OutPacket(SMSG_REMOVED_SPELL, 4, &swapped);
+#else
 		m_session->OutPacket(SMSG_REMOVED_SPELL, 4, &SpellID);		
+#endif
 	}
 
 	return true;
@@ -5305,7 +5322,14 @@ void Player::EventTimedQuestExpire(Quest *qst, QuestLogEntry *qle, uint32 log_sl
 void Player::SendInitialLogonPackets()
 {
 	// Initial Packets... they seem to be re-sent on port.
+#ifdef USING_BIG_ENDIAN
+	swap32(&m_timeLogoff);
 	m_session->OutPacket(SMSG_SET_REST_START, 4, &m_timeLogoff);
+	swap32(&m_timeLogoff);
+#else
+	m_session->OutPacket(SMSG_SET_REST_START, 4, &m_timeLogoff);
+#endif
+
 #ifndef USING_BIG_ENDIAN
 	StackWorldPacket<32> data(SMSG_BINDPOINTUPDATE);
 #else
@@ -6687,7 +6711,12 @@ void Player::DuelBoundaryTest()
 			m_duelCountdownTimer = 10000;
 			
 			// let us know
+#ifdef USING_BIG_ENDIAN
+			uint32 swapped = swap32(&m_duelCountdownTimer);
+			m_session->OutPacket(SMSG_DUEL_OUTOFBOUNDS, 4, &swapped);
+#else
 			m_session->OutPacket(SMSG_DUEL_OUTOFBOUNDS, 4, &m_duelCountdownTimer);
+#endif
 			m_duelStatus = DUEL_STATUS_OUTOFBOUNDS;
 		}
 	}
@@ -6803,7 +6832,12 @@ void Player::EndDuel(uint8 WinCondition)
 
 void Player::StopMirrorTimer(uint32 Type)
 {
+#ifdef USING_BIG_ENDIAN
+	uint32 swapped = swap32(Type);
+	m_session->OutPacket(SMSG_STOP_MIRROR_TIMER, 4, &swapped);
+#else
 	m_session->OutPacket(SMSG_STOP_MIRROR_TIMER, 4, &Type);
+#endif
 }
 
 void Player::EventTeleport(uint32 mapid, float x, float y, float z)

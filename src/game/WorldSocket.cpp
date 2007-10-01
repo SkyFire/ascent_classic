@@ -182,8 +182,14 @@ OUTPACKET_RESULT WorldSocket::_OutPacket(uint16 opcode, size_t len, const void* 
 void WorldSocket::OnConnect()
 {
 	sWorld.mAcceptedConnections++;
-	OutPacket(SMSG_AUTH_CHALLENGE, 4, &mSeed);
 	_latency = getMSTime();
+
+#ifdef USING_BIG_ENDIAN
+	uint32 swapped = swap32(mSeed);
+	OutPacket(SMSG_AUTH_CHALLENGE, 4, &swapped);
+#else
+	OutPacket(SMSG_AUTH_CHALLENGE, 4, &mSeed);
+#endif
 }
 
 void WorldSocket::_HandleAuthSession(WorldPacket* recvPacket)
@@ -276,14 +282,13 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	sha.UpdateData((uint8 *)&mSeed, 4);
 	sha.UpdateBigNumbers(&BNK, NULL);
 	sha.Finalize();
-#ifndef USING_BIG_ENDIAN
+
 	if (memcmp(sha.GetDigest(), digest, 20))
 	{
 		// AUTH_UNKNOWN_ACCOUNT = 21
 		OutPacket(SMSG_AUTH_RESPONSE, 1, "\x15");
 		return;
 	}
-#endif
 
 	// Allocate session
 	mSession = new WorldSession(AccountID, AccountName, this);
@@ -378,6 +383,10 @@ void WorldSocket::_HandlePing(WorldPacket* recvPacket)
 		// reset the move time diff calculator, don't worry it will be re-calculated next movement packet.
 		mSession->m_clientTimeDelay = 0;
 	}
+
+#ifdef USING_BIG_ENDIAN
+	swap32(&ping);
+#endif
 
 	OutPacket(SMSG_PONG, 4, &ping);
 

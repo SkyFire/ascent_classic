@@ -802,6 +802,9 @@ bool WorldSession::PlayerLogin(uint32 playerGuid, uint32 forced_map_id, uint32 f
 	if(plr->m_FirstLogin && !HasGMPermissions())
 	{
 		uint32 racecinematic = plr->myRace->cinematic_id;
+#ifdef USING_BIG_ENDIAN
+		swap32(&racecinematic);
+#endif
 		OutPacket(SMSG_TRIGGER_CINEMATIC, 4, &racecinematic);
 	}
 
