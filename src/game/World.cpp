@@ -2099,7 +2099,7 @@ std::string World::GenerateName(uint32 type)
 	if(_namegendata[type].size() == 0)
 		return "ERR";
 
-	uint32 ent = sRand.randInt(_namegendata[type].size());
+	uint32 ent = sRand.randInt(_namegendata[type].size()-1);
 	return _namegendata[type].at(ent).name;
 }
 

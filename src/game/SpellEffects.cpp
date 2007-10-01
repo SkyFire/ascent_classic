@@ -461,9 +461,14 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		{
 			if(!unitTarget)
 				break;
-			for(std::list<struct ReflectSpellSchool*>::iterator i = unitTarget->m_reflectSpellSchool.begin();i != unitTarget->m_reflectSpellSchool.end();i++)
+			for(std::list<struct ReflectSpellSchool*>::iterator i = unitTarget->m_reflectSpellSchool.begin(), i2;i != unitTarget->m_reflectSpellSchool.end();)
 				if(m_spellInfo->Id == (*i)->spellId)
-					unitTarget->m_reflectSpellSchool.erase(i);
+				{
+					i2 = i++;
+					unitTarget->m_reflectSpellSchool.erase(i2);
+				}
+				else
+					++i;
 
 			ReflectSpellSchool *rss = new ReflectSpellSchool;
 			rss->chance = m_spellInfo->procChance;
