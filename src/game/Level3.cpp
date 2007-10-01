@@ -1157,7 +1157,7 @@ bool ChatHandler::HandleAccountBannedCommand(const char * args, WorldSession * m
 	if(argc != 2)
 		return false;
 
-	std:stringstream my_sql;
+	stringstream my_sql;
 	my_sql << "UPDATE accounts SET banned = " << banned << " WHERE login = '" << account << "'";
 
 	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
@@ -1186,7 +1186,7 @@ bool ChatHandler::HandleAccountFlagsCommand(const char * args, WorldSession * m_
 	if(argc != 2)
 		return false;
 
-	std:stringstream my_sql;
+	stringstream my_sql;
 	my_sql << "UPDATE accounts SET flags = " << flags << " WHERE login = '" << account << "'";
 
 	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
@@ -1206,7 +1206,7 @@ bool ChatHandler::HandleAccountEmailCommand(const char * args, WorldSession * m_
 	if(argc != 2)
 		return false;
 
-	std:stringstream my_sql;
+	stringstream my_sql;
 	my_sql << "UPDATE accounts SET email = '" << email << "' WHERE login = '" << account << "'";
 
 	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
