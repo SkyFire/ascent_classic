@@ -2896,7 +2896,7 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 		{
 			Unit *caster=GetUnitCaster();
 			//yes we are freezing the bastard, so can we proc anything on this ?
-			if(caster->IsPlayer() && m_target)
+			if(caster && caster->IsPlayer() && m_target)
 				static_cast<Player*>(caster)->EventStunOrImmobilize(m_target);
 		}
 		m_target->speedReductionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
