@@ -6712,7 +6712,7 @@ void Player::DuelBoundaryTest()
 			
 			// let us know
 #ifdef USING_BIG_ENDIAN
-			uint32 swapped = swap32(&m_duelCountdownTimer);
+			uint32 swapped = swap32(m_duelCountdownTimer);
 			m_session->OutPacket(SMSG_DUEL_OUTOFBOUNDS, 4, &swapped);
 #else
 			m_session->OutPacket(SMSG_DUEL_OUTOFBOUNDS, 4, &m_duelCountdownTimer);
