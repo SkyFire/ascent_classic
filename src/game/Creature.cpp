@@ -282,7 +282,12 @@ void Creature::SaveToDB()
 		<< m_uint32Values[UNIT_FIELD_BYTES_0] << ","
 		<< m_uint32Values[UNIT_FIELD_BYTES_2] << ","
 		<< m_uint32Values[UNIT_NPC_EMOTESTATE] << ","
-		<< ((this->m_spawn ? m_spawn->respawnNpcLink : uint32(0))) << ")";
+		<< ((this->m_spawn ? m_spawn->respawnNpcLink : uint32(0))) << ",";
+
+	if(m_spawn)
+		ss << m_spawn->channel_spell << "," << m_spawn->channel_target_go << "," << m_spawn->channel_target_creature << ")";
+	else
+		ss << "0,0,0)";
 
 	WorldDatabase.Execute(ss.str().c_str());
 }
