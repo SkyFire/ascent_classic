@@ -1,5 +1,5 @@
 Intimidating Shout - Ok this one is working, but when i attack feared target i get feared too :S
-
 The Warrior talent "Shield Mastery" seems to increase block rating instead of the hidden block value usually added by this talent.
 # Sunder Armor - not stackable
 # Overpower - should work
+focused rage: should decrease the rage of all damage-dealing abilities and of all debuffs. And it should be stackable with Improved Sunder Armor and Improved Heroic Strike talents

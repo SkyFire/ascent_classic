@@ -72,6 +72,7 @@ SMT_RESIST_DISPEL - check if it is used
 ==========================================================================
 Zack - test my shit :
 
+- aura stalked silances more then it should (ex:hunters mark)
 - test function RemoveThreatByPtr
 - don't let rogues stealth with dots
 - ai spell cooldown when not known

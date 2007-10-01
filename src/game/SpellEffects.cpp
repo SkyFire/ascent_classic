@@ -3189,7 +3189,7 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 			CreateItem(19006);
 			break;
 		}
-		CreateItem(551);
+		CreateItem(5511);
 		break;
 	case 5699:		// Healthstone
 		if (p_caster->HasSpell(18693))	// Improved Healthstone (2)
