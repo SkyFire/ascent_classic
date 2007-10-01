@@ -375,7 +375,9 @@ bool Master::Run(int argc, char ** argv)
 
 #ifndef CLUSTERING
 		sLogonCommHandler.UpdateSockets();
-		//ls->Update();
+#ifdef WIN32
+		ls->Update();
+#endif
 #else
 		sClusterInterface.Update();
 #endif
