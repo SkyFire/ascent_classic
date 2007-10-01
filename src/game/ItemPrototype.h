@@ -259,7 +259,6 @@ enum ITEM_STAT_TYPE
 	HASTE_RATING					 = 36,
 };
 
-
 enum ITEM_DAMAGE_TYPE
 {
 	NORMAL_DAMAGE  = 0,
@@ -286,7 +285,7 @@ enum ITEM_BONDING_TYPE
 	ITEM_BIND_ON_EQUIP  =   2,
 	ITEM_BIND_ON_USE	=   3,
 	ITEM_BIND_QUEST	    =   4,
-    ITEM_BIND_QUEST2    =   5,
+	ITEM_BIND_QUEST2    =   5,
 };
 
 enum INVENTORY_TYPES
@@ -402,6 +401,45 @@ enum Item_Subclass
    ITEM_SUBCLASS_MISC_JUNK            = 0,
 };
 
+enum ITEM_QUALITY
+{
+	ITEM_QUALITY_POOR_GREY             = 0,
+	ITEM_QUALITY_NORMAL_WHITE          = 1,
+	ITEM_QUALITY_UNCOMMON_GREEN        = 2,
+	ITEM_QUALITY_RARE_BLUE             = 3,
+	ITEM_QUALITY_EPIC_PURPLE           = 4,
+	ITEM_QUALITY_LEGENDARY_ORANGE      = 5,
+	ITEM_QUALITY_ARTIFACT_LIGHT_YELLOW = 6,
+};
+
+enum ITEM_FLAG
+{
+	ITEM_FLAG_SOULBOUND    = 0x1,      // not used in proto
+	ITEM_FLAG_CONJURED     = 0x2,
+	ITEM_FLAG_LOOTABLE     = 0x4,
+	ITEM_FLAG_UNKNOWN_04   = 0x8,      // not used in proto
+	ITEM_FLAG_UNKNOWN_05   = 0x10,     // many equipable items and bags
+	ITEM_FLAG_UNKNOWN_06   = 0x20,     // totems
+	ITEM_FLAG_UNKNOWN_07   = 0x40,     // many consumables
+	ITEM_FLAG_UNKNOWN_08   = 0x80,     // only 1 wand uses this
+	ITEM_FLAG_UNKNOWN_09   = 0x100,    // some wands & relics
+	ITEM_FLAG_WRAP_GIFT    = 0x200,
+	ITEM_FLAG_CREATE_ITEM  = 0x400,
+	ITEM_FLAG_QUEST        = 0x800,
+	ITEM_FLAG_UNKNOWN_13   = 0x1000,   // not used in proto
+	ITEM_FLAG_SIGNABLE     = 0x2000,
+	ITEM_FLAG_READABLE     = 0x4000,
+	ITEM_FLAG_UNKNOWN_16   = 0x8000,
+	ITEM_FLAG_EVENT_REQ    = 0x10000,
+	ITEM_FLAG_UNKNOWN_18   = 0x20000,
+	ITEM_FLAG_PROSPECTABLE = 0x40000,
+	ITEM_FLAG_UNIQUE_EQUIP = 0x80000,
+	ITEM_FLAG_UNKNOWN_21   = 0x100000, // not used in proto
+	ITEM_FLAG_UNKNOWN_22   = 0x200000, // player created health/mana/poisons
+	ITEM_FLAG_THROWN       = 0x400000,
+	ITEM_FLAG_FLIGHT_USE   = 0x800000,
+};
+
 enum SPECIAL_ITEM_TYPE
 {
 	ITEM_TYPE_KEYRING	 = 9,
@@ -419,6 +457,7 @@ enum SOCKET_GEM_COLOR
 	YELLOW_SOCKET = 4,
 	BLUE_SOCKET = 8
 };
+
 struct SocketInfo {
 	uint32 SocketColor;
 	uint32 Unk;

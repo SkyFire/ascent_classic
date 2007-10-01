@@ -22,17 +22,6 @@
 
 #include "Skill.h"
 
-enum Item_quality_names
-{
-	ITEM_QUALITY_POOR_GREY				= 0, 
-	ITEM_QUALITY_NORMAL_WHITE			= 1,
-	ITEM_QUALITY_UNCOMMON_GREEN			= 2, 
-	ITEM_QUALITY_RARE_BLUE				= 3,
-	ITEM_QUALITY_EPIC_PURPLE			= 4, 
-	ITEM_QUALITY_LEGENDARY_ORANGE		= 5, 
-	ITEM_QUALITY_ARTIFACT_LIGHT_YELLOW	= 6,
-};
-
 struct EnchantmentInstance
 {
 	EnchantEntry * Enchantment;
@@ -41,12 +30,6 @@ struct EnchantmentInstance
 	time_t ApplyTime;
 	uint32 Duration;
 	bool RemoveAtLogout;
-};
-
-enum ITEM_FLAGS
-{
-    ITEM_SOULBOUND = 0x01,
-    ITEM_QUESTITEM = 0x800,
 };
 
 typedef map<uint32, EnchantmentInstance> EnchantmentMap;
