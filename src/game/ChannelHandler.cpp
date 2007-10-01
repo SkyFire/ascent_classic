@@ -103,7 +103,7 @@ void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
 	
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayer(newp.c_str(), false);
-	if(chn)
+	if(chn && plr)
 		chn->SetOwner(_player, plr);
 }
 
@@ -131,7 +131,7 @@ void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
 
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayer(newp.c_str(), false);
-	if(chn)
+	if(chn && plr)
 		chn->GiveModerator(_player, plr);
 }
 
@@ -147,7 +147,7 @@ void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
 
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayer(newp.c_str(), false);
-	if(chn)
+	if(chn && plr)
 		chn->TakeModerator(_player, plr);
 }
 
@@ -163,7 +163,7 @@ void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
 
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayer(newp.c_str(), false);
-	if(chn)
+	if(chn && plr)
 		chn->Mute(_player, plr);
 }
 
@@ -179,7 +179,7 @@ void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
 
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayer(newp.c_str(), false);
-	if(chn)
+	if(chn && plr)
 		chn->Unmute(_player, plr);
 }
 
@@ -195,7 +195,7 @@ void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
 
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayer(newp.c_str(), false);
-	if(chn)
+	if(chn && plr)
 		chn->Invite(_player, plr);
 }
 void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
@@ -210,7 +210,7 @@ void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
 
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayer(newp.c_str(), false);
-	if(chn)
+	if(chn && plr)
 		chn->Kick(_player, plr, false);
 }
 
@@ -226,7 +226,7 @@ void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
 
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayer(newp.c_str(), false);
-	if(chn)
+	if(chn && plr)
 		chn->Kick(_player, plr, true);
 }
 
@@ -242,7 +242,7 @@ void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
 
 	chn = channelmgr.GetChannel(channelname.c_str(), _player);
 	plr = objmgr.GetPlayerInfoByName(newp);
-	if(chn)
+	if(chn && plr)
 		chn->Unban(_player, plr);
 }
 
