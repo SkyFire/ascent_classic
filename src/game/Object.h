@@ -232,7 +232,7 @@ public:
 	{
 		ASSERT( i < m_valuesCount);
 		ASSERT(i1 < 4);
-		return ((uint8*)m_uint32Values)[i*4+i1];
+		return ((uint8*)m_uint32Values)[i*4+(3-i1)];
 	}
 	
 	inline void SetNewGuid(uint32 Guid)

@@ -2437,7 +2437,11 @@ void Object::SetByte(uint32 index, uint32 index1,uint8 value)
 {
 	ASSERT( index < m_valuesCount );
 	// save updating when val isn't changing.
+	#ifndef USING_BIG_ENDIAN
 	uint8 * v =&((uint8*)m_uint32Values)[index*4+index1];
+	#else
+	uint8 * v = &((uint8*)m_uint32Values)[index*4+(3-index1)];
+	#endif
 	if(*v == value)
 		return;
 

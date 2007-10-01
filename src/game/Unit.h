@@ -633,7 +633,7 @@ public:
 
 	/// Stats
 	inline uint32 getLevel() { return m_uint32Values[ UNIT_FIELD_LEVEL ]; };
-	inline uint8 getRace() { return ((uint8)m_uint32Values[ UNIT_FIELD_BYTES_0]); }
+	inline uint8 getRace() { return GetByte(UNIT_FIELD_BYTES_0,0); }
 	inline uint8 getClass() { return GetByte(UNIT_FIELD_BYTES_0,1); }
 	inline void setRace(uint8 race) { SetByte(UNIT_FIELD_BYTES_0,0,race); }
 	inline void setClass(uint8 class_) { SetByte(UNIT_FIELD_BYTES_0,1, class_ ); }
