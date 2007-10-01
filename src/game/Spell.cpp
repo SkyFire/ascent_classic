@@ -155,6 +155,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	
 	m_usesMana = false;
 	failed = false;
+	hadEffect = false;
 	bDurSet=false;
 	bRadSet[0]=false;
 	bRadSet[1]=false;
@@ -181,7 +182,7 @@ Spell::~Spell()
 	if(u_caster && u_caster->GetCurrentSpell() == this)
 		u_caster->SetCurrentSpell(NULL); 
 	
-	if(cancastresult == -1 && !failed)
+	if((cancastresult == -1 && !failed) || hadEffect)
 		RemoveItems();
 }
 
@@ -1213,6 +1214,8 @@ void Spell::cast(bool check)
 				if(m_spellInfo->EffectApplyAuraName[0] != 0 || m_spellInfo->EffectApplyAuraName[1] != 0 ||
 				   m_spellInfo->EffectApplyAuraName[2] != 0)
 				{
+					hadEffect = true; // spell has had an effect (for item removal & possibly other things)
+
 					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 					{
 						HandleAddAura((*i));
@@ -2846,7 +2849,7 @@ int8 Spell::CheckItems()
 		else usedItem = 0;
 
 		if (t_PlayerItemInterface->GetItemCount(m_spellInfo->Reagent[i]) - usedItem < m_spellInfo->ReagentCount[i])
-			return int8(SPELL_FAILED_ITEM_GONE);
+			return int8(SPELL_FAILED_ITEM_NOT_FOUND);
 	}
 
     if(m_spellInfo->Totem[0] != 0)
