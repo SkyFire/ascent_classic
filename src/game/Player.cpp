@@ -7728,10 +7728,9 @@ void Player::SetShapeShift(uint8 ss)
 				if(!ss)
 				{
 					m_auras[x]->Remove();
+					continue;
 				}
 			}
-			if(m_auras[x] == NULL)
-				break;
 
 			if (this->getClass()==DRUID)
 				for(uint32 y = 0; y < 3; ++y)
@@ -7746,6 +7745,9 @@ void Player::SetShapeShift(uint8 ss)
 					default:
 						break;
 					}
+
+					if(m_auras[x] == NULL)
+						break;
 				}
 		} 
 	}
