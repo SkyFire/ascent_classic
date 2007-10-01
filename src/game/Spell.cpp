@@ -175,6 +175,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	m_delayed = false;
 	pSpellId = 0;
 	m_cancelled = false;
+	ProcedOnSpell = 0;
 }
 
 Spell::~Spell()

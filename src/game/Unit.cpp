@@ -968,13 +968,13 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								else ModUInt32Value(UNIT_FIELD_HEALTH,-(int32)healthtoloose);
 							}break;
 						//paladin - Spiritual Attunement
-						case 31785:
+						case 31786:
 							{
-								//trigger only on heal spell
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(!(CastingSpell->buffType & SPELL_TYPE_HEALING))
-									continue;
+								//trigger only on heal spell cast by NOT us
+								if(!(CastingSpell->buffType & SPELL_TYPE_HEALING) && victim!=this)
+									continue; 
 							}break;
 /*						//paladin - illumination
 						case 18350:
@@ -998,12 +998,12 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					continue;
 				}
 				Spell *spell = new Spell(this, spellInfo ,true, NULL);
+				spell->ProcedOnSpell = CastingSpell;
 				//Spell *spell = new Spell(this,spellInfo,false,0,true,false);
 				if(spellId==974||spellId==32593||spellId==32594) // Earth Shield handler
 				{
 					spell->pSpellId=itr2->spellId;
 					spell->SpellEffectDummy(0);
-					spell->ProcedOnSpell = CastingSpell;
 					delete spell;
 					continue;
 				}

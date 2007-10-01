@@ -37,6 +37,7 @@ SMT_RESIST_DISPEL - check if it is used
 - make spells to run on startup Isdamaging and ishealing hunctions
 - summon guardians not working : 49,
 - clearcasting
+ - there should a trigger type named : proc on effect - so we can know the effect value at which we proc
 
 ==========================================================================
 ! BUGS !
@@ -82,11 +83,6 @@ Zack - test my shit :
 	2 ) there is no visual sighn that spell had effect (the negative values are missing ex : 23+1-6)
 - mage - Frost Warding - 28332 - does not reflect
 - rogue - combat potency - require weapon and apply only for succesfull attack. Dual wield : 674, 35553
-- paladin - Blessing of Light - 27144,635,19750
-- paladin - Righteous Defense - 31789
-- paladin - Seal of Blood - 31892 
-- paladin - Seal of Wisdom - 20166
-- paladin - Spiritual Attunement - 33776
 
 ==========================================================================
 Capt - test my shit :

@@ -490,12 +490,6 @@ bool World::SetInitialWorldSettings()
 	uint32 cnt = dbc.getRecordCount();
 	uint32 effect;
 
-/*	char nametext[500];
-	uint32 namehash;
-	strcpy(nametext,"Backstab");
-    namehash = crc32((const unsigned char*)nametext, strlen(nametext));
-	printf("spellname %s, namehash %u\n",nametext,namehash);
-*/
 	for(uint32 x=0; x < cnt; x++)
 	{
 		uint32 result = 0;
@@ -512,6 +506,12 @@ bool World::SetInitialWorldSettings()
 
 		// get spellentry
 		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
+
+		// hash the name
+		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
+        namehash = crc32((const unsigned char*)nametext, strlen(nametext));
+		sp->NameHash   = namehash; //need these set before we start processing spells
+
 		for(uint32 b=0;b<3;++b)
 		{
 			if(sp->EffectTriggerSpell[b] != 0 && dbcSpell.LookupEntryForced(sp->EffectTriggerSpell[b]) == NULL)
@@ -526,11 +526,6 @@ bool World::SetInitialWorldSettings()
 		// parse rank text
 		if(!sscanf(ranktext, "Rank %d", (unsigned int*)&rank))
 			rank = 0;
-
-        // hash the name
-		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
-        namehash = crc32((const unsigned char*)nametext, strlen(nametext));
-
 
 		if(namehash == 0x56392512)			/* seal of light */
 			sp->procChance=45;	/* this will do */
@@ -701,7 +696,6 @@ bool World::SetInitialWorldSettings()
 
 		// set extra properties
 		sp->buffType   = type;
-		sp->NameHash   = namehash;
 		sp->RankNumber = rank;
 
 		uint32 pr=sp->procFlags;
@@ -1277,12 +1271,12 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(635);//holy light
 	uint32 HL_grouprelation;
 	if(sp)
-		HL_grouprelation = sp->EffectSpellGroupRelation[0];
+		HL_grouprelation = sp->SpellGroupType;
 	else HL_grouprelation=0;
 	sp = dbcSpell.LookupEntry(19750);//Flash of light
 	uint32 FL_grouprelation;
 	if(sp)
-		FL_grouprelation = sp->EffectSpellGroupRelation[0];
+		FL_grouprelation = sp->SpellGroupType;
 	else FL_grouprelation=0;
 
 	sp = dbcSpell.LookupEntry(19977);
@@ -1290,6 +1284,8 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = 107;
 		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
@@ -1298,6 +1294,8 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = 107;
 		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
@@ -1306,6 +1304,8 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = 107;
 		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
@@ -1314,6 +1314,8 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = 107;
 		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
@@ -1322,6 +1324,8 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = 107;
 		sp->EffectApplyAuraName[1] = 107;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}
@@ -1345,14 +1349,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(31785);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TAGRGET_SELF;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
 	sp = dbcSpell.LookupEntry(33776);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TAGRGET_SELF;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}

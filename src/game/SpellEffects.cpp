@@ -425,22 +425,21 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	{
 	case 31789: //paladin - Righteous Defense
 		{
-			break; //disabled until tested
 			//we will try to lure 3 enemies from our target
 			if(!unitTarget || !u_caster)
 				break;
 			Unit *targets[3];
 			int targets_got=0;
-			for(std::set<Object*>::iterator itr = unitTarget->GetInRangeSetBegin(); itr != unitTarget->GetInRangeSetEnd(); itr++ )
+			for(std::set<Object*>::iterator itr = unitTarget->GetInRangeSetBegin(), i2; itr != unitTarget->GetInRangeSetEnd(); itr++ )
 			{
+				i2 = itr++;
 				// don't add objects that are not units and that are dead
-				if((*itr)->GetTypeId()!= TYPEID_UNIT || !((Unit*)(*itr))->isAlive())
+				if((*i2)->GetTypeId()!= TYPEID_UNIT || !((Unit*)(*i2))->isAlive())
 					continue;
 		        
-				Creature *cr=((Creature*)(*itr));
+				Creature *cr=((Creature*)(*i2));
 				if(cr->GetAIInterface()->GetNextTarget()==unitTarget)
 					targets[targets_got++]=cr;
-
 				if(targets_got==3)
 					break;
 			}
@@ -1817,7 +1816,17 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 	{
 		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
 		if(motherspell)
-			modEnergy = (motherspell->EffectBasePoints[0]+1)*damage/100;
+		{
+			//heal amount from procspell (we only proced on a heal spell)
+			uint32 healamt=0;
+			if(ProcedOnSpell->Effect[0]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[0]==SPELL_EFFECT_SCRIPT_EFFECT)
+				healamt=ProcedOnSpell->EffectBasePoints[0]+1;
+			else if(ProcedOnSpell->Effect[1]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT)
+				healamt=ProcedOnSpell->EffectBasePoints[1]+1;
+			else if(ProcedOnSpell->Effect[2]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[2]==SPELL_EFFECT_SCRIPT_EFFECT)
+				healamt=ProcedOnSpell->EffectBasePoints[2]+1;
+			modEnergy = (motherspell->EffectBasePoints[0]+1)*(healamt)/100;
+		}
 	}
 	else if (m_spellInfo->Id==2687){
 		modEnergy = damage;

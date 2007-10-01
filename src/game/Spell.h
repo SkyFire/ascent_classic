@@ -1070,6 +1070,13 @@ inline bool IsHealingSpell(SpellEntry *sp)
                 return true;
         }
     }
+	//holy light uses scripted effect which is not neceserally heal spell
+	if(sp->NameHash==0x9B56A8F5)
+		return true;
+	//flash of light uses scripted effect which is not neceserally heal spell
+	if(sp->NameHash==0x333C4740)
+		return true;
+	
     return false;
 }
 
