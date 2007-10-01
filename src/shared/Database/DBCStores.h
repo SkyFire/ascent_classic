@@ -900,7 +900,6 @@ public:
 #ifdef USING_BIG_ENDIAN
 		swap32(&rows); swap32(&cols); swap32(&useless_shit); swap32(&string_length);
 #endif
-
 		m_heapBlock = (T*)malloc(rows * sizeof(T));
 		ASSERT(m_heapBlock);
 
@@ -964,7 +963,9 @@ public:
 				++t;
 				continue;		// skip!
 			}
-
+#ifdef USING_BIG_ENDIAN
+			swap32(&val);
+#endif
 			dest_ptr[v++] = val;
 			++t;
 		}
