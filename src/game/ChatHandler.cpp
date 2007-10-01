@@ -119,11 +119,37 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				return;
 
 			if(GetPlayer()->m_modlanguage >=0)
+			{
 				data = sChatHandler.FillMessageData( CHAT_MSG_SAY, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
-			else 
-				data = sChatHandler.FillMessageData( CHAT_MSG_SAY, (CanUseCommand('c') && lang != -1) ? LANG_UNIVERSAL : lang,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
+				GetPlayer()->SendMessageToSet( data, true );
+			}
+			else
+			{
+				data = sChatHandler.FillMessageData( CHAT_MSG_SAY, lang, msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
+				_player->GetSession()->SendPacket(data);
+				for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
+				{
+					if((*itr)->GetSession()->CanUseCommand('c') || _player->GetSession()->CanUseCommand('c'))
+					{
+#ifdef USING_BIG_ENDIAN
+						*(uint32*)&data->contents()[1] = swap32((lang == -1) ? -1 : LANG_UNIVERSAL);
+#else
+						*(uint32*)&data->contents()[1] = (lang == -1) ? -1 : LANG_UNIVERSAL;						
+#endif
+					}
+					else
+					{
+#ifdef USING_BIG_ENDIAN
+						*(uint32*)&data->contents()[1] = swap32(lang);
+#else
+						*(uint32*)&data->contents()[1] = lang;
+#endif
+					}
+					(*itr)->GetSession()->SendPacket(data);
+				}
+			}
 
-			GetPlayer()->SendMessageToSet( data, true );
+			
 			sLog.outString("[say] %s: %s", _player->GetName(), msg.c_str());
 			delete data;
 			pMsg=msg.c_str();
@@ -303,7 +329,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			if(GetPlayer()->m_modlanguage >=0)
 				data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 			else
-				data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, (CanUseCommand('c') && lang != -1) ? LANG_UNIVERSAL : lang,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
+				data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, ((CanUseCommand('c') || player->GetSession()->CanUseCommand('c')) && lang != -1) ? LANG_UNIVERSAL : lang,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 
 			player->GetSession()->SendPacket(data);
 			delete data;
