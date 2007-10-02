@@ -4635,14 +4635,14 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 	if(getDeathState() == CORPSE) // we are dead and we have released our spirit
 	{
 		if(myCorpse && myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
-			return true; // we can see everything within range of our corpse
+			return !pObj->m_isGmInvisible; // we can see everything within range of our corpse except invisible GMs
 
-		if(m_deathVision) // if we have special death-vision (from arenas) then we can see everything 
-			return true;
+		if(m_deathVision) // if we have special death-vision (from arenas) we can see everything except invisible GMs
+			return !pObj->m_isGmInvisible;
 
 		if(object_type == TYPEID_PLAYER)
 		{
-			if(((Player*)obj)->getDeathState() == CORPSE) // we can only see dead players' spirits
+			if(((Player*)obj)->getDeathState() == CORPSE) // we can only see players that are spirits
 				return true;
 			else return false;
 		}
@@ -4664,7 +4664,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 				if(pObj->m_invisible) // Invisibility - Detection of Players
 				{
 					if(pObj->getDeathState() == CORPSE)
-						return m_session->HasPermissions(); // only GM can see dead players' spirits
+						return bGMTagOn; // only GM can see players that are spirits
 
 					if(GetGroup() && pObj->GetGroup() == GetGroup() // can see invisible group members except when dueling them
 							&& DuelingWith != pObj)
@@ -4674,8 +4674,8 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 						return true;
 
 					if(m_invisDetect[INVIS_FLAG_NORMAL] < 1 // can't see invisible without proper detection
-							|| pObj->m_isGmInvisible) // only GM can see invisible GM
-						return m_session->HasPermissions(); // GM can see invisible players
+							|| pObj->m_isGmInvisible) // can't see invisible GM
+						return bGMTagOn; // GM can see invisible players
 				}
 
 				if(pObj->IsStealth()) // Stealth Detection (  I Hate Rogues :P  )
@@ -4697,13 +4697,17 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 						if(detectRange < 1.0f) detectRange = 1.0f; // Minimum Detection Range = 1yd
 					}
-					else detectRange = 0.0f; // stealthed player is behind us
+					else // stealthed player is behind us
+					{
+						if(GetStealthDetectBonus() > 1000) return true; // immune to stealth
+						else detectRange = 0.0f;
+					}
 
 					detectRange += GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of player
 					detectRange += pObj->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of stealthed player
 
 					if(GetDistance2dSq(pObj) > detectRange * detectRange)
-						return m_session->HasPermissions(); // GM can see stealthed players
+						return bGMTagOn; // GM can see stealthed players
 				}
 
 				return true;
