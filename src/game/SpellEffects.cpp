@@ -1043,6 +1043,9 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 33072:
 		{/*Blasts the target with Holy energy, causing $25912s1 Holy damage to an enemy, or $25914s1 healing to an ally." */
 			uint32 sp;
+			if(!unitTarget)
+				return;
+
 			if(isAttackable(unitTarget,u_caster))
 				sp=m_spellInfo->EffectTriggerSpell[0];
 			else
