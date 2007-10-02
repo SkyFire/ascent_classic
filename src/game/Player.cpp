@@ -7687,7 +7687,8 @@ void Player::SaveAuras(stringstream &ss)
 {
    
 	// Add player auras
-	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+//	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
 		if(m_auras[x])
 		{

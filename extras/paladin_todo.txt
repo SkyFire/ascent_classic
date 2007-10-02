@@ -4,6 +4,7 @@ Blessing of Sanctuary - Doesn't work.
 Divine protection - Doesn't work.
 Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
+blessing of freedom
 
 =====TALENTS=====
 Benediction - Holy - Doesn't work
