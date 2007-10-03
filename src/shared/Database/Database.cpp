@@ -295,6 +295,32 @@ QueryResult * Database::QueryNA(const char* QueryString)
 	return qResult;
 }
 
+QueryResult * Database::FQuery(const char * QueryString, MysqlCon * con)
+{	
+	// Send the query
+	QueryResult * qResult = NULL;
+	if(SendQuery(con, QueryString, false))
+	{
+		// We got a valid query. :)
+		MYSQL_RES * Result = mysql_store_result(con->con);
+
+		// Don't think we're gonna have more than 4 billion rows......
+		uint32 RowCount = (uint32)mysql_affected_rows(con->con);
+		uint32 FieldCount = mysql_field_count(con->con);
+
+		// Check if we have no rows.
+		if(!RowCount || !FieldCount) 
+		{
+			mysql_free_result(Result);
+		} else 
+		{
+			qResult = new QueryResult( Result, FieldCount, RowCount );
+			qResult->NextRow();
+		}
+	}
+	return qResult;
+}
+
 
 bool Database::Execute(const char* QueryString, ...)
 {
@@ -409,8 +435,9 @@ bool QueryResult::NextRow()
 	return true;
 }
 
-void AsyncQuery::SetQuery(const char * format, ...)
+void AsyncQuery::AddQuery(const char * format, ...)
 {
+	AsyncQueryResult res;
 	va_list ap;
 	char buffer[10000];
 	size_t len;
@@ -419,16 +446,21 @@ void AsyncQuery::SetQuery(const char * format, ...)
 	va_end(ap);
 	len = strlen(buffer);
 	ASSERT(len);
-	this->query = new char[len+1];
-	this->query[len] = 0;
-	memcpy(this->query, buffer, len);
+	res.query = new char[len+1];
+	res.query[len] = 0;
+	memcpy(res.query, buffer, len);
+	res.result = NULL;
+	queries.push_back(res);
 }
 
-void AsyncQuery::Callback(QueryResult * result)
+void AsyncQuery::Perform()
 {
-	func->run(result);
-	if(result)
-		delete result;
+	MysqlCon * conn = db->GetFreeConnection();
+	for(vector<AsyncQueryResult>::iterator itr = queries.begin(); itr != queries.end(); ++itr)
+		itr->result = db->FQuery(itr->query, conn);
+
+	conn->busy = false;
+	func->run(queries);
 
 	delete this;
 }
@@ -436,7 +468,13 @@ void AsyncQuery::Callback(QueryResult * result)
 AsyncQuery::~AsyncQuery()
 {
 	delete func;
-	delete [] query;
+	for(vector<AsyncQueryResult>::iterator itr = queries.begin(); itr != queries.end(); ++itr)
+	{
+		if(itr->result)
+			delete itr->result;
+
+		delete itr->query;
+	}
 }
 
 void Database::EndThreads()
@@ -471,13 +509,11 @@ QueryThread::~QueryThread()
 void Database::thread_proc_query()
 {
 	AsyncQuery * q;
-	QueryResult * res;
 
 	q = qqueries_queue.pop();
 	while(q)
 	{
-		res = QueryNA(q->query);
-		q->Callback(res);
+		q->Perform();
 
 		if(ThreadState == THREADSTATE_TERMINATE)
 			break;
@@ -496,9 +532,10 @@ void Database::thread_proc_query()
 
 void Database::QueueAsyncQuery(AsyncQuery * query)
 {
+	query->db = this;
 	if(qt == NULL)
 	{
-		query->Callback(NULL);
+		query->Perform();
 		return;
 	}
 

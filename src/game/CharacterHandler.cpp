@@ -166,7 +166,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 {	
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::CharacterEnumProc, GetAccountId()) );
-	q->SetQuery("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
+	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
     CharacterDatabase.QueueAsyncQuery(q);
 }
 
@@ -563,37 +563,26 @@ void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 	sLog.outDebug( "WORLD: Recvd Player Logon Message" );
 
 	recv_data >> playerGuid; // this is the GUID selected by the player
-	PlayerLogin((uint32)playerGuid, 0, 0);
-}
-
-bool WorldSession::PlayerLogin(uint32 playerGuid, uint32 forced_map_id, uint32 forced_instance_id)
-{
-	if(objmgr.GetPlayer(playerGuid) != NULL)
+	if(objmgr.GetPlayer(playerGuid) != NULL || m_loggingInPlayer || _player)
 	{
 		// A character with that name already exists 0x3E
 		uint8 respons = CHAR_LOGIN_DUPLICATE_CHARACTER;
 		OutPacket(SMSG_CHARACTER_LOGIN_FAILED, 1, &respons);
-		return false;
+		return;
 	}
 
 	Player* plr = new Player(HIGHGUID_PLAYER,playerGuid);
 	ASSERT(plr);
 	plr->SetSession(this);
 	m_bIsWLevelSet = false;
+	
+	Log.Debug("WorldSession", "Async loading player %u", (uint32)playerGuid);
+	plr->LoadFromDB((uint32)playerGuid);
+}
 
-	if(!plr->LoadFromDB(playerGuid))
-	{
-		// kick em.
-		//sCheatLog.writefromsession(this, "Tried to log in with invalid player guid %u.", playerGuid);
-		//Disconnect();
-		plr->ok_to_remove = true;
-		delete plr;
-                uint8 respons = CHAR_LOGIN_NO_CHARACTER;
-                OutPacket(SMSG_CHARACTER_LOGIN_FAILED, 1, &respons);
-
-		return false;
-	}
-
+void WorldSession::FullLogin(Player * plr)
+{
+	Log.Debug("WorldSession", "Fully loading player %u", plr->GetGUIDLow());
 	SetPlayer(plr); 
 	m_MoverWoWGuid.Init(plr->GetGUID());
 
@@ -620,8 +609,6 @@ bool WorldSession::PlayerLogin(uint32 playerGuid, uint32 forced_map_id, uint32 f
 		<< plr->GetOrientation();
 
 	SendPacket(&datab);
-
-	plr->LoadPropertiesFromDB();
 	plr->UpdateAttackSpeed();
 
 	// Make sure our name exists (for premade system)
@@ -892,7 +879,6 @@ bool WorldSession::PlayerLogin(uint32 playerGuid, uint32 forced_map_id, uint32 f
 
 	sInstanceSavingManager.BuildSavedInstancesForPlayer(plr);
 	objmgr.AddPlayer(_player);
-	return true;
 }
 
 bool ChatHandler::HandleRenameCommand(const char * args, WorldSession * m_session)

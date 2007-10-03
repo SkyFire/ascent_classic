@@ -985,8 +985,8 @@ public:
 	void SaveToDB(bool bNewCharacter);
 	void SaveAuras(stringstream&);
 	bool LoadFromDB(uint32 guid);
-	void LoadFromDB_Light(Field *fields, uint32 guid);
-	void LoadPropertiesFromDB();
+	void LoadFromDBProc(QueryResultVector & results);
+
 	void LoadNamesFromDB(uint32 guid);
 	void DeleteFromDB();
 	bool m_FirstLogin;
@@ -1596,24 +1596,22 @@ protected:
 	ByteBuffer mOutOfRangeIds;
 	SplineMap _splineMap;
 /* End update system */
-	void _LoadTutorials();
+	void _LoadTutorials(QueryResult * result);
 	void _SaveTutorials();
 	void _SaveInventory(bool firstsave);
-	void _LoadBagInventory(uint32 playerguid, uint8 bagslot);
 	void _SaveQuestLogEntry();
-	void _LoadQuestLogEntry();
-	void _LoadInventoryLight();
+	void _LoadQuestLogEntry(QueryResult * result);
 	// DK
 	void _LoadGuild();
-	void _LoadPet();
+	void _LoadPet(QueryResult * result);
 	void _LoadPetNo();
-	void _LoadPetSpells();
+	void _LoadPetSpells(QueryResult * result);
 	void _SavePet();
 	void _SavePetSpells();
 	void _SaveItemCooldown();
-	void _LoadItemCooldown();
+	void _LoadItemCooldown(QueryResult * result);
 	void _SaveSpellCoolDownSecurity();
-	void _LoadSpellCoolDownSecurity();
+	void _LoadSpellCoolDownSecurity(QueryResult * result);
 	void _ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown=false);
    
 	void _EventAttack(bool offhand);
@@ -1735,6 +1733,9 @@ protected:
 	float       m_lastSwimSpeed;
 	float       m_lastBackSwimSpeed;
 	float       m_lastFlySpeed;
+
+
+	void RemovePendingPlayer();
 };
 
 #endif

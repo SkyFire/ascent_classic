@@ -33,21 +33,29 @@ typedef struct{
 	volatile	bool	busy;
 }MysqlCon;
 
+struct AsyncQueryResult
+{
+	QueryResult * result;
+	char * query;
+};
+
 class AsyncQuery
 {
 	friend class Database;
 	SQLCallbackBase * func;
-	char * query;
+	vector<AsyncQueryResult> queries;
+	Database * db;
 public:
-	AsyncQuery(SQLCallbackBase * f) : func(f), query(NULL) {}
+	AsyncQuery(SQLCallbackBase * f) : func(f) {}
 	~AsyncQuery();
-	void SetQuery(const char * format, ...);
-	void Callback(QueryResult * result);
+	void AddQuery(const char * format, ...);
+	void Perform();
 };
 
 class Database : public CThread
 {
 	friend class QueryThread;
+	friend class AsyncQuery;
 public:
 	Database();
 	~Database();
@@ -60,6 +68,7 @@ public:
 
 	QueryResult* Query(const char* QueryString, ...);
 	QueryResult* QueryNA(const char* QueryString);
+	QueryResult * FQuery(const char * QueryString, MysqlCon * con);
 	bool WaitExecute(const char* QueryString, ...);//Wait For Request Completion
 	bool WaitExecuteNA(const char* QueryString);//Wait For Request Completion
 	bool Execute(const char* QueryString, ...);

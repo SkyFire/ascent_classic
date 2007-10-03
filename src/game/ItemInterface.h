@@ -56,7 +56,7 @@ public:
 	uint32 m_CreateForPlayer(ByteBuffer *data);
 	void m_DestroyForPlayer();
 
-	void mLoadItemsFromDatabase();
+	void mLoadItemsFromDatabase(QueryResult * result);
 	void mSaveItemsToDatabase(bool first);
 
 	Item *GetInventoryItem(int8 slot);

@@ -207,6 +207,7 @@ public:
 	WorldSession(uint32 id, string Name, WorldSocket *sock);
 	~WorldSession();
 
+	Player * m_loggingInPlayer;
 	inline void SendPacket(WorldPacket* packet)
 	{
 		if(_socket && _socket->IsConnected())
@@ -330,7 +331,6 @@ public:
 
 	void CharacterEnumProc(QueryResult * result);
 	void LoadAccountDataProc(QueryResult * result);
-
 
 protected:
 
@@ -700,7 +700,7 @@ public:
 	void SendTabardHelp(Creature* pCreature);
 	void SendAuctionList(Creature* pCreature);
 	void SendSpiritHealerRequest(Creature* pCreature);
-	bool PlayerLogin(uint32 guid, uint32 forced_map_id, uint32 forced_instance_id);
+	void FullLogin(Player * plr);
 
 private:
 	friend class Player;

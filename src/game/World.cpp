@@ -2707,20 +2707,20 @@ void World::LoadNameGenData()
 	}
 }
 
-void World::CharacterEnumProc(QueryResult * result, uint32 AccountId)
+void World::CharacterEnumProc(QueryResultVector& results, uint32 AccountId)
 {
 	WorldSession * s = FindSession(AccountId);
 	if(s == NULL)
 		return;
 
-	s->CharacterEnumProc(result);
+	s->CharacterEnumProc(results[0].result);
 }
 
-void World::LoadAccountDataProc(QueryResult * result, uint32 AccountId)
+void World::LoadAccountDataProc(QueryResultVector& results, uint32 AccountId)
 {
 	WorldSession * s = FindSession(AccountId);
 	if(s == NULL)
 		return;
 
-	s->LoadAccountDataProc(result);
+	s->LoadAccountDataProc(results[0].result);
 }

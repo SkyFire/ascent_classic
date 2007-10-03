@@ -1515,7 +1515,7 @@ void Player::_SaveItemCooldown()
 	}
 	//only execute if we have entrys to insert
 	if(entrys_to_insert)
-		CharacterDatabase.Execute( query.str().c_str() );
+		CharacterDatabase.ExecuteNA( query.str().c_str() );
 }
 
 void Player::_SaveSpellCoolDownSecurity()
@@ -1557,7 +1557,7 @@ void Player::_SaveSpellCoolDownSecurity()
 		hascooldowns++;
 	}
 	if(hascooldowns)
-		CharacterDatabase.Execute( query.str().c_str( ) );
+		CharacterDatabase.ExecuteNA( query.str().c_str( ) );
 }
 
 void Player::_SavePet()
@@ -1605,7 +1605,7 @@ void Player::_SavePet()
 			<< itr->second->loyaltypts << "','"
 			<< itr->second->loyaltyupdate << "')";
 			
-		CharacterDatabase.Execute(ss.str().c_str());
+		CharacterDatabase.ExecuteNA(ss.str().c_str());
 	}
 }
 
@@ -1654,9 +1654,8 @@ set<uint32>* Player::GetSummonSpells(uint32 Entry)
 
 /* Loads ItemCooldowns
 checks for invalid items and deletes them from the db */
-void Player::_LoadItemCooldown()
+void Player::_LoadItemCooldown(QueryResult * result)
 {
-	QueryResult *result = CharacterDatabase.Query("SELECT * FROM playercooldownitems WHERE OwnerGuid=%u",GetGUIDLow());
 	if(result)
 	{
 		// TODO is there a better way to do this?
@@ -1688,14 +1687,11 @@ void Player::_LoadItemCooldown()
 			}
 		}
 		while( result->NextRow() );
-
-		delete result;
 	}
 }
 
-void Player::_LoadSpellCoolDownSecurity()
+void Player::_LoadSpellCoolDownSecurity(QueryResult * result)
 {
-	QueryResult *result = CharacterDatabase.Query("SELECT * FROM playercooldownsecurity WHERE OwnerGuid=%u",GetGUIDLow());
 	if(result)
 	{
 		do
@@ -1716,22 +1712,19 @@ void Player::_LoadSpellCoolDownSecurity()
 			else // only add spells to list that still have cooldown
 			{
 				//if timestamp overflow or diff time is larger than 7 days
-				CharacterDatabase.WaitExecute( "DELETE FROM playercooldownsecurity WHERE OwnerGuid = %u AND SpellID = %u", GetGUIDLow(), SpellID );
+				CharacterDatabase.Execute( "DELETE FROM playercooldownsecurity WHERE OwnerGuid = %u AND SpellID = %u", GetGUIDLow(), SpellID );
 			}
 		}
 		while( result->NextRow() );
-
-		delete result;
 	}
 }
 
-void Player::_LoadPet()
+void Player::_LoadPet(QueryResult * result)
 {
-	QueryResult *result = CharacterDatabase.Query( 
-		 "SELECT * FROM playerpets WHERE ownerguid=%u ORDER BY petnumber",GetGUIDLow());
-	if(!result)return;
-
 	m_PetNumberMax=0;
+	if(!result)
+		return;
+
 	do
 	{
 		Field *fields = result->Fetch();
@@ -1765,8 +1758,6 @@ void Player::_LoadPet()
 		if(pet->number > m_PetNumberMax)
 			m_PetNumberMax =  pet->number;
 	}while(result->NextRow());
-
-	delete result;
 }
 
 void Player::SpawnPet(uint32 pet_number)
@@ -1782,15 +1773,13 @@ void Player::SpawnPet(uint32 pet_number)
 	pPet->LoadFromDB(this, itr->second);
 }
 
-void Player::_LoadPetSpells()
+void Player::_LoadPetSpells(QueryResult * result)
 {
 	std::stringstream query;
 	std::map<uint32, std::list<uint32>* >::iterator itr;
 	uint32 entry = 0;
 	uint32 spell = 0;
 
-	query << "SELECT * FROM playersummonspells where ownerguid='" << GetGUIDLow() << "' ORDER BY entryid";
-	QueryResult *result = CharacterDatabase.Query( query.str().c_str() );
 	if(result)
 	{
 		do
@@ -1801,7 +1790,6 @@ void Player::_LoadPetSpells()
 			AddSummonSpell(entry, spell);
 		}
 		while( result->NextRow() ); 
-		delete result;
 	}
 }
 
@@ -2211,9 +2199,9 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
     ss << iInstanceType << ")";
 	
 	if(bNewCharacter)
-		CharacterDatabase.WaitExecute(ss.str().c_str());
+		CharacterDatabase.WaitExecuteNA(ss.str().c_str());
 	else
-		CharacterDatabase.Execute( ss.str().c_str() );
+		CharacterDatabase.ExecuteNA( ss.str().c_str() );
 
 	//Save Other related player stuff
 
@@ -2300,16 +2288,54 @@ bool Player::canCast(SpellEntry *m_spellInfo)
 	return true;
 }
 
+void Player::RemovePendingPlayer()
+{
+	if(m_session)
+	{
+		uint8 respons = 0x42;		// CHAR_LOGIN_NO_CHARACTER
+		m_session->OutPacket(SMSG_CHARACTER_LOGIN_FAILED, 1, &respons);
+		m_session->m_loggingInPlayer = NULL;
+	}
+
+	ok_to_remove = true;
+	delete this;
+}
+
 bool Player::LoadFromDB(uint32 guid)
+{
+	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP0<Player>(this, &Player::LoadFromDBProc) );
+	q->AddQuery("SELECT * FROM characters WHERE guid=%u AND banned=0 AND forced_rename_pending = 0",guid);
+	q->AddQuery("SELECT * FROM tutorials WHERE playerId=%u",guid);
+	q->AddQuery("SELECT * FROM playercooldownitems WHERE OwnerGuid=%u", guid);
+	q->AddQuery("SELECT * FROM questlog WHERE player_guid=%u",guid);
+	q->AddQuery("SELECT * FROM playercooldownsecurity WHERE OwnerGuid=%u",guid);
+	q->AddQuery("SELECT * FROM playeritems WHERE ownerguid=%u ORDER BY containerslot ASC", guid);
+	q->AddQuery("SELECT * FROM playerpets WHERE ownerguid=%u ORDER BY petnumber", guid);
+	q->AddQuery("SELECT * FROM playersummonspells where ownerguid=%u ORDER BY entryid", guid);
+
+	// queue it!
+	m_uint32Values[OBJECT_FIELD_GUID] = guid;
+	CharacterDatabase.QueueAsyncQuery(q);
+	return true;
+}
+
+void Player::LoadFromDBProc(QueryResultVector & results)
 {
 	uint32 field_index = 2;
 #define get_next_field fields[field_index++]
 
-	QueryResult *result = CharacterDatabase.Query("SELECT * FROM characters WHERE guid=%u AND banned=0 AND forced_rename_pending = 0",guid);
+	if(GetSession() == NULL || results.size() < 8)		// should have 8 queryresults for aplayer load.
+	{
+		RemovePendingPlayer();
+		return;
+	}
+
+	QueryResult *result = results[0].result;
 	if(!result)
 	{
-		printf("Player login query failed., guid %u\n", (unsigned int)guid);
-		return false;
+		printf("Player login query failed., guid %u\n", GetGUIDLow());
+		RemovePendingPlayer();
+		return;
 	}
 
 	Field *fields = result->Fetch();
@@ -2318,14 +2344,12 @@ bool Player::LoadFromDB(uint32 guid)
 	{
 		sCheatLog.writefromsession(m_session, "player tried to load character not belonging to them (guid %u, on account %u)",
 			fields[0].GetUInt32(), fields[1].GetUInt32());
-		delete result;
-		return false;
+		RemovePendingPlayer();
+		return;
 	}
-
 
 	// Load name
 	m_name = get_next_field.GetString();
-
    
 	// Load race/class from fields
 	setRace(get_next_field.GetUInt8());
@@ -2339,8 +2363,9 @@ bool Player::LoadFromDB(uint32 guid)
 	if(!myClass || !myRace)
 	{
 		// bad character
-		printf("guid %u failed to login, no race or class dbc found. (race %u class %u)\n", (unsigned int)guid, (unsigned int)getRace(), (unsigned int)getClass());
-		return false;
+		printf("guid %u failed to login, no race or class dbc found. (race %u class %u)\n", (unsigned int)GetGUIDLow(), (unsigned int)getRace(), (unsigned int)getClass());
+		RemovePendingPlayer();
+		return;
 	}
 
 	if(myRace->team_id == 7)
@@ -2371,8 +2396,9 @@ bool Player::LoadFromDB(uint32 guid)
 	
 	if(!lvlinfo)
 	{
-		printf("guid %u level %u class %u race %u levelinfo not found!\n", (unsigned int)guid, (unsigned int)getLevel(), (unsigned int)getClass(), (unsigned int)getRace());
-		return false;
+		printf("guid %u level %u class %u race %u levelinfo not found!\n", (unsigned int)GetGUIDLow(), (unsigned int)getLevel(), (unsigned int)getClass(), (unsigned int)getRace());
+		RemovePendingPlayer();
+		return;
 	}
 	
 	CalculateBaseStats();
@@ -2830,8 +2856,6 @@ bool Player::LoadFromDB(uint32 guid)
     iInstanceType = get_next_field.GetUInt32();
 
 	HonorHandler::RecalculateHonorFields(this);
-	delete result;
-  
 	
 	for(uint32 x=0;x<5;x++)
 		BaseStats[x]=GetUInt32Value(UNIT_FIELD_STAT0+x);
@@ -2852,8 +2876,8 @@ bool Player::LoadFromDB(uint32 guid)
 		break;
 	case WARLOCK:
 	case HUNTER:
-		_LoadPetSpells();
-		_LoadPet();
+        _LoadPetSpells(results[6].result);
+		_LoadPet(results[7].result);
 	break;
 	}
 
@@ -2866,120 +2890,16 @@ bool Player::LoadFromDB(uint32 guid)
 	if(GetGuildId())
 		SetUInt32Value(PLAYER_GUILD_TIMESTAMP, time(NULL));
 
-	return true;
 #undef get_next_field
-   
-}
 
-void Player::LoadFromDB_Light(Field *fields, uint32 guid)
-{
-	uint32 field_index = 1;
-#define get_next_field fields[field_index++]
-	
-	// set level
-	m_uint32Values[UNIT_FIELD_LEVEL] = get_next_field.GetUInt32();
-
-	// Set guid fields
-  //  m_uint32Values[OBJECT_FIELD_GUID] = guid;
-	//m_uint32Values[OBJECT_FIELD_GUID+1] = 0;
-
-	// Load race/class from fields
-	setRace(get_next_field.GetUInt8());
-	setClass(get_next_field.GetUInt8());
-	setGender(get_next_field.GetUInt8());
-
-	SetUInt32Value(PLAYER_BYTES, get_next_field.GetUInt32());
-	SetUInt32Value(PLAYER_BYTES_2, get_next_field.GetUInt32());
-	SetUInt32Value(PLAYER_GUILDID, get_next_field.GetUInt32());
-
-	SetNoseLevel();
-	
-	// Load name
-	m_name = get_next_field.GetString();
-
-	float x = get_next_field.GetFloat();
-	float y = get_next_field.GetFloat();
-	float z = get_next_field.GetFloat();
-
-	m_position.ChangeCoords(x, y, z);
-	m_mapId = get_next_field.GetUInt32();
-	m_zoneId = get_next_field.GetUInt32();
-
-	m_banned = get_next_field.GetUInt32();
-	m_restState = get_next_field.GetUInt8();
-	m_deathState = (DeathState)get_next_field.GetUInt32();
-
-	_LoadInventoryLight();
-	// set race dbc
-	myRace = dbcCharRace.LookupEntryForced(getRace());
-	myClass = dbcCharClass.LookupEntryForced(getClass());
-
-	if(!myClass || !myRace)
-	{
-		// bad character
-		printf("guid %u failed to login, no race or class dbc found. (race %u class %u)\n", (unsigned int)guid, (unsigned int)getRace(), (unsigned int)getClass());
-		return;
-	}
-
-	if(myRace->team_id == 7)
-		m_team = 0;
-	else
-		m_team = 1;
-
-	rename_pending = get_next_field.GetBool();
-#undef get_next_field
-}
-
-void Player::LoadPropertiesFromDB()
-{
-	_LoadTutorials();
-	GetItemInterface()->mLoadItemsFromDatabase();
-	_LoadQuestLogEntry();
-
-	//
-	_LoadItemCooldown();
-	_LoadSpellCoolDownSecurity();
-
-	// init Faction
-	_setFaction();
-}
-
-void Player::_LoadInventoryLight()
-{
-	// Inventory
-	std::stringstream invq;
-	invq << "SELECT * FROM playeritems WHERE ownerguid=" << GetGUIDLow();
-	invq << " and containerslot=-1 and slot < 19";//EQUIPMENT_SLOT_END
-
-	QueryResult *result = CharacterDatabase.Query( invq.str().c_str() );
-	if(result)
-	{
-		do
-		{
-			Field *fields = result->Fetch();
-			Item* item;
-            uint32 entry = fields[2].GetUInt32();
-	
-            ItemPrototype * proto = ItemPrototypeStorage.LookupEntry(entry);
-            if(proto)
-            {
-			    item=new Item(HIGHGUID_ITEM,fields[1].GetUInt64());
-			    item->LoadFromDB(fields, 0, true);
-
-			    int8 slot=fields[11].GetInt8();
-    		
-			    GetItemInterface()->SafeAddItem(item, INVENTORY_SLOT_NOT_SET, slot);
-            }
-            /*else
-            {
-                sDatabase.Execute("DELETE FROM playeritems WHERE guid ="I64FMTD, fields[1].GetUInt64());
-            }*/
-			
-		}
-		while( result->NextRow() );
-
-		delete result;
-	}
+	// load properties
+	_LoadTutorials(results[1].result);
+	_LoadItemCooldown(results[2].result);
+	_LoadQuestLogEntry(results[3].result);
+	_LoadSpellCoolDownSecurity(results[4].result);
+	m_ItemInterface->mLoadItemsFromDatabase(results[5].result);
+	m_session->FullLogin(this);
+	m_session->m_loggingInPlayer=NULL;
 }
 
 bool Player::HasSpell(uint32 spell)
@@ -3008,9 +2928,8 @@ int Player::GetMaxLearnedSpellLevel(uint32 spell)
 }
 
 
-void Player::_LoadQuestLogEntry()
+void Player::_LoadQuestLogEntry(QueryResult * result)
 {
-	QueryResult *result = CharacterDatabase.Query("SELECT * FROM questlog WHERE player_guid=%u", GetGUIDLow());
 	QuestLogEntry *entry;
 	Quest *quest;
 	Field *fields;
@@ -3053,7 +2972,6 @@ void Player::_LoadQuestLogEntry()
 			entry->UpdatePlayerFields();
 
 		} while(result->NextRow());
-		delete result;
 	}
 }
 
@@ -4130,17 +4048,13 @@ bool Player::HasFinishedQuest(uint32 quest_id)
 }
 
 //From Mangos Project
-void Player::_LoadTutorials()
+void Player::_LoadTutorials(QueryResult * result)
 {	
-	QueryResult *result = CharacterDatabase.Query("SELECT * FROM tutorials WHERE playerId=%u",GetGUIDLow());
-
 	if(result)
 	{
 		 Field *fields = result->Fetch();
 		 for (int iI=0; iI<8; iI++) 
 			 m_Tutorials[iI] = fields[iI + 1].GetUInt32();
-
-		delete result;
 	}
 	tutorialsDirty = false;
 }

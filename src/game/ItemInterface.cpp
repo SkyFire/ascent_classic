@@ -2271,15 +2271,11 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 //-------------------------------------------------------------------//
 //Description: Item Loading
 //-------------------------------------------------------------------//
-void ItemInterface::mLoadItemsFromDatabase()
+void ItemInterface::mLoadItemsFromDatabase(QueryResult * result)
 {
 	int8 containerslot, slot;
 	Item* item;
 	ItemPrototype *proto;
-
-	std::stringstream invq;
-	invq << "SELECT * FROM playeritems WHERE ownerguid=" << m_pOwner->GetGUIDLow() << " ORDER BY containerslot ASC";
-	QueryResult *result = CharacterDatabase.Query( invq.str().c_str() );
 	if(result)
 	{
 		do
@@ -2310,8 +2306,6 @@ void ItemInterface::mLoadItemsFromDatabase()
 		}
 		while( result->NextRow() );
 	}
-
-	delete result;
 }
 
 //-------------------------------------------------------------------//

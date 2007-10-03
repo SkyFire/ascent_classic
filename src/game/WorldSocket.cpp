@@ -306,7 +306,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 
 	// queue the account loading
 	AsyncQuery * aq = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::LoadAccountDataProc, AccountID) );
-	aq->SetQuery("SELECT * FROM account_data WHERE acct = %u", AccountID);
+	aq->AddQuery("SELECT * FROM account_data WHERE acct = %u", AccountID);
 	CharacterDatabase.QueueAsyncQuery(aq);
 
 	sLog.outString("> %s authenticated from %s:%u [%ums]", AccountName.c_str(), GetRemoteIP().c_str(), GetRemotePort(), _latency);

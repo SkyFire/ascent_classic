@@ -39,6 +39,7 @@ _logoutTime(0), permissions(NULL), permissioncount(0), _loggingOut(false), insta
 	_updatecount = 0;
 	m_moveDelayTime=0;
 	m_clientTimeDelay =0;
+	m_loggingInPlayer=NULL;
 
 	for(uint32 x=0;x<8;x++)
 		sAccountData[x].data=NULL;	
@@ -78,6 +79,9 @@ WorldSession::~WorldSession()
 	if(_socket)
 		_socket->SetSession(0);
 #endif
+
+	if(m_loggingInPlayer)
+		m_loggingInPlayer->SetSession(NULL);
 
 	deleteMutex.Release();
 }

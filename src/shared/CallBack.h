@@ -152,42 +152,45 @@ private:
 };
 
 class QueryResult;
+struct AsyncQueryResult;
+typedef std::vector<AsyncQueryResult> QueryResultVector;
+
 class SQLCallbackBase
 {
 public:
 	virtual ~SQLCallbackBase();
-	virtual void run(QueryResult * result) = 0;
+	virtual void run(QueryResultVector & result) = 0;
 };
 
 template<class T>
 class SQLClassCallbackP0 : public SQLCallbackBase
 {
-	typedef void (T::*SCMethod)(QueryResult * p);
+	typedef void (T::*SCMethod)(QueryResultVector & p);
 	T * base;
 	SCMethod method;
 public:
 	SQLClassCallbackP0(T* instance, SCMethod imethod) : base(instance), method(imethod), SQLCallbackBase() {}
 	~SQLClassCallbackP0() {}
-	void run(QueryResult * data) { (base->*method)(data); }
+	void run(QueryResultVector & data) { (base->*method)(data); }
 };
 
 template<class T, typename P1>
 class SQLClassCallbackP1 : public SQLCallbackBase
 {
-	typedef void (T::*SCMethod)(QueryResult * p, P1 p1);
+	typedef void (T::*SCMethod)(QueryResultVector & p, P1 p1);
 	T * base;
 	SCMethod method;
 	P1 par1;
 public:
 	SQLClassCallbackP1(T* instance, SCMethod imethod, P1 p1) : base(instance), method(imethod), par1(p1), SQLCallbackBase() {}
 	~SQLClassCallbackP1() {}
-	void run(QueryResult * data) { (base->*method)(data, par1); }
+	void run(QueryResultVector & data) { (base->*method)(data, par1); }
 };
 
 template<class T, typename P1, typename P2>
 class SQLClassCallbackP2 : public SQLCallbackBase
 {
-	typedef void (T::*SCMethod)(QueryResult * p, P1 p1, P2 p2);
+	typedef void (T::*SCMethod)(QueryResultVector & p, P1 p1, P2 p2);
 	T * base;
 	SCMethod method;
 	P1 par1;
@@ -195,13 +198,13 @@ class SQLClassCallbackP2 : public SQLCallbackBase
 public:
 	SQLClassCallbackP2(T* instance, SCMethod imethod, P1 p1, P2 p2) : base(instance), method(imethod), par1(p1), par2(p2), SQLCallbackBase() {}
 	~SQLClassCallbackP2() {}
-	void run(QueryResult * data) { (base->*method)(data, par1, par2); }
+	void run(QueryResultVector & data) { (base->*method)(data, par1, par2); }
 };
 
 template<class T, typename P1, typename P2, typename P3>
 class SQLClassCallbackP3 : public SQLCallbackBase
 {
-	typedef void (T::*SCMethod)(QueryResult * p, P1 p1, P2 p2, P3 p3);
+	typedef void (T::*SCMethod)(QueryResultVector & p, P1 p1, P2 p2, P3 p3);
 	T * base;
 	SCMethod method;
 	P1 par1;
@@ -210,13 +213,13 @@ class SQLClassCallbackP3 : public SQLCallbackBase
 public:
 	SQLClassCallbackP3(T* instance, SCMethod imethod, P1 p1, P2 p2, P3 p3) : base(instance), method(imethod), par1(p1), par2(p2), par3(p3), SQLCallbackBase() {}
 	~SQLClassCallbackP3();
-	void run(QueryResult * data) { (base->*method)(data, par1, par2, par3); }
+	void run(QueryResultVector & data) { (base->*method)(data, par1, par2, par3); }
 };
 
 template<class T, typename P1, typename P2, typename P3, typename P4>
 class SQLClassCallbackP4 : public SQLCallbackBase
 {
-	typedef void (T::*SCMethod)(QueryResult * p, P1 p1, P2 p2, P3 p3, P4 p4);
+	typedef void (T::*SCMethod)(QueryResultVector & p, P1 p1, P2 p2, P3 p3, P4 p4);
 	T * base;
 	SCMethod method;
 	P1 par1;
@@ -226,7 +229,7 @@ class SQLClassCallbackP4 : public SQLCallbackBase
 public:
 	SQLClassCallbackP4(T* instance, SCMethod imethod, P1 p1, P2 p2, P3 p3, P4 p4) : base(instance), method(imethod), par1(p1), par2(p2), par3(p3), par4(p4), SQLCallbackBase() {}
 	~SQLClassCallbackP4() {}
-	void run(QueryResult * data) { (base->*method)(data, par1, par2, par3, par4); }
+	void run(QueryResultVector & data) { (base->*method)(data, par1, par2, par3, par4); }
 };
 
 class SQLFunctionCallbackP0 : public SQLCallbackBase
