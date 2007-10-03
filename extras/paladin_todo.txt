@@ -7,7 +7,6 @@ Greater Blessing of Sanctuary - Doesn't work.
 blessing of freedom
 
 =====TALENTS=====
-Benediction - Holy - Doesn't work
 Improved Blessing of Might - Retribution - Doesn't work.
 Improved Hammer of Justice - Protection - Looks like it changes the time for Hammer of Justice, but doesn't.
 Improved Judgment - Retribution - Doesn't work.

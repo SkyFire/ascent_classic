@@ -4,7 +4,6 @@ Talents:
 Arcane Potency:Since there's no Clearcasting state (Arcane Concentration), Arcane pontency can't work
 
 Arcane:
-Arcane Missiles:Don't shot the last missile (or first?)
 Blink: Doesn't release you from stun, just from bonds.
 
 Problems not related with only one spell/talent:

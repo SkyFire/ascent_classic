@@ -489,6 +489,7 @@ bool World::SetInitialWorldSettings()
 	}
 	uint32 cnt = dbc.getRecordCount();
 	uint32 effect;
+	uint32 All_Seal_Groups_Combined=0;
 
 	for(uint32 x=0; x < cnt; x++)
 	{
@@ -533,7 +534,10 @@ bool World::SetInitialWorldSettings()
 		//these mostly do not mix so we can use else 
         // look for seal, etc in name
         if(strstr(nametext, "Seal"))
+		{
             type |= SPELL_TYPE_SEAL;
+			All_Seal_Groups_Combined |= sp->SpellGroupType;
+		}
         else if(strstr(nametext, "Blessing"))
             type |= SPELL_TYPE_BLESSING;
         else if(strstr(nametext, "Curse"))
@@ -1845,6 +1849,27 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[0] = 6;
 		sp->EffectApplyAuraName[0] = 56;
 	}
+	// paladin - benediction
+	uint32 judgement_group=0;
+	SpellEntry * tsp = dbcSpell.LookupEntry(20271); //judgement
+	if(tsp)
+		judgement_group = tsp->SpellGroupType;
+	sp = dbcSpell.LookupEntry(20101);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
+	sp = dbcSpell.LookupEntry(20102);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
+	sp = dbcSpell.LookupEntry(20103);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
+	sp = dbcSpell.LookupEntry(20104);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
+	sp = dbcSpell.LookupEntry(20105);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
+	
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);
 	if(Enchantment)
