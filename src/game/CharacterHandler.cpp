@@ -46,65 +46,8 @@ void CapitalizeString(string& arg)
 		arg[x] = tolower(arg[x]);
 }
 
-void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
-{	
-	/*uint32 start_time = getMSTime();
-
-	// loading characters
-	QueryResult* result = CharacterDatabase.Query("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
-	uint8 num = 0;
-	
-	// should be more than enough.. 200 bytes per char..
-	WorldPacket data((result ? result->GetRowCount() * 200 : 1));	
-
-	// parse m_characters and build a mighty packet of
-	// characters to send to the client.
-	data.SetOpcode(SMSG_CHAR_ENUM);
-
-	data << num;
-	SetSide(0);
-	if( result )
-	{
-		Player *plr;
-		uint64 guid;
-		Field *fields;
-		do
-		{
-			fields = result->Fetch();
-			guid = fields[0].GetUInt32();
-			
-			plr = objmgr.GetPlayer(guid);
-			if(plr)
-			{
-				// we already have that player in world... for some strange reason...
-				continue;
-			}
-
-			plr = new Player(HIGHGUID_PLAYER, guid);
-			ASSERT(plr);
-			plr->SetSession(this);
-
-			// added to catch an assertion failure at Player::LoadFromDB function.
-			plr->LoadFromDB_Light( fields, guid );
-			sLog.outDebug("Loaded char guid "I64FMTD" [%s] from account %d for enum build.",guid,plr->GetName(), GetAccountId());
-			//printf("Guid: "I64FMT"\n", plr->GetGUID());
-			plr->BuildEnumData( &data );
-			_side|=(plr->GetTeam()+1);
-
-			plr->ok_to_remove = true;
-			delete plr;
-
-			num++;
-		}
-		while( result->NextRow() );
-
-		delete result;
-	}
-
-	data.put<uint8>(0, num);
-
-	sLog.outDetail("[Character Enum] Built in %u ms.", getMSTime() - start_time);
-	SendPacket( &data );*/
+void WorldSession::CharacterEnumProc(QueryResult * result)
+{
 	struct player_item
 	{
 		uint32 displayid;
@@ -115,22 +58,15 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 	uint32 slot;
 	uint32 i;
 	ItemPrototype * proto;
-
-	//uint32 start_time = getMSTime();
-
-	// loading characters
-	QueryResult* result = CharacterDatabase.Query("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
 	QueryResult * res;
 	CreatureInfo *info = NULL;
 	uint8 num = 0;
 
 	// should be more than enough.. 200 bytes per char..
-	WorldPacket data((result ? result->GetRowCount() * 200 : 1));	
+	WorldPacket data(SMSG_CHAR_ENUM, (result ? result->GetRowCount() * 200 : 1));	
 
 	// parse m_characters and build a mighty packet of
 	// characters to send to the client.
-	data.SetOpcode(SMSG_CHAR_ENUM);
-
 	data << num;
 	if( result )
 	{
@@ -219,8 +155,6 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 			num++;
 		}
 		while( result->NextRow() );
-
-		delete result;
 	}
 
 	data.put<uint8>(0, num);
@@ -229,6 +163,34 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 	SendPacket( &data );
 }
 
+void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
+{	
+	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::CharacterEnumProc, GetAccountId()) );
+	q->SetQuery("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
+    CharacterDatabase.QueueAsyncQuery(q);
+}
+
+void WorldSession::LoadAccountDataProc(QueryResult * result)
+{
+	size_t len;
+	const char * data;
+	char * d;
+
+	if(!result)
+		return;
+
+	for(uint32 i = 0; i < 7; ++i)
+	{
+		data = result->Fetch()[1+i].GetString();
+		len = data ? strlen(data) : 0;
+		if(len > 1)
+		{
+			d = new char[len+1];
+			memcpy(d, data, len+1);
+			SetAccountData(i, d, true, len);
+		}
+	}
+}
 
 void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 {

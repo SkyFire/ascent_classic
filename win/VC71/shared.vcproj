@@ -236,22 +236,6 @@
 					RelativePath="..\..\src\shared\Database\DBCStores.h">
 				</File>
 			</Filter>
-			<Filter
-				Name="Database Impl"
-				Filter="">
-				<File
-					RelativePath="..\..\src\shared\Database\impl\MySQLDatabase.cpp">
-				</File>
-				<File
-					RelativePath="..\..\src\shared\Database\impl\MySQLDatabase.h">
-				</File>
-				<File
-					RelativePath="..\..\src\shared\Database\impl\PostgreDatabase.cpp">
-				</File>
-				<File
-					RelativePath="..\..\src\shared\Database\impl\PostgreDatabase.h">
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Config"

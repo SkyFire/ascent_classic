@@ -21,8 +21,8 @@
 #include "../game/ThreadMgr.h"
 #include "../shared/svn_revision.h"
 
-MySQLDatabase * Database_Character;
-MySQLDatabase * Database_World;
+Database * Database_Character;
+Database * Database_World;
 CircularQueue<uint32,30> last_spells;
 
 int main(int argc, char *argv[])
@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
 	Log.Notice("Server", "==============================================================");
 	Log.Line();
 
-	Database_Character = new MySQLDatabase();
-	Database_World = new MySQLDatabase();
+	Database_Character = new Database();
+	Database_World = new Database();
 	Log.Success("Database", "Interface Created.");
 
 	new ClusterMgr;

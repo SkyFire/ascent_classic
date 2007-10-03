@@ -63,6 +63,40 @@ public:
 		cond.EndSynchronized();
 	}
 
+	T pop_nowait()
+	{
+		//lock.Acquire();
+		cond.BeginSynchronized();
+		if(size==0)
+		{
+			cond.EndSynchronized();
+			return NULL;
+		}
+
+		h*tmp=first;
+		if(tmp == NULL)
+		{
+			cond.EndSynchronized();
+			return NULL;
+		}
+
+		if(--size)//more than 1 item
+		{
+			first=(h*)first->pNext;
+		}
+		else//last item
+		{
+			first=last=NULL;
+		}
+		//lock.Release();
+		cond.EndSynchronized();
+
+		T returnVal = tmp->value;
+		delete tmp;
+
+		return returnVal;
+	}
+
 	T pop()
 	{
 		//lock.Acquire();
@@ -71,6 +105,11 @@ public:
 		cond.Wait();
 
 		h*tmp=first;
+		if(tmp == NULL)
+		{
+			cond.EndSynchronized();
+			return NULL;
+		}
 
 		if(--size)//more than 1 item
 		{
@@ -88,6 +127,8 @@ public:
 		
 		return returnVal;
 	}	
+
+	inline Condition& GetCond() { return cond; }
 	
 private:
 	struct h

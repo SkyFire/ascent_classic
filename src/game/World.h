@@ -504,6 +504,9 @@ public:
 	bool antihack_flight;
 	bool no_antihack_on_gm;
 
+	void CharacterEnumProc(QueryResult * result, uint32 AccountId);
+	void LoadAccountDataProc(QueryResult * result, uint32 AccountId);
+
 protected:
 	// update Stuff, FIXME: use diff
 	time_t _UpdateGameTime()

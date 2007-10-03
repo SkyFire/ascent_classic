@@ -21,68 +21,123 @@
 #define _DATABASE_H
 
 #include <string>
+#include "../Threading/Queue.h"
+#include "../CallBack.h"
 
 using namespace std;
 class QueryResult;
-class DatabaseThread;
+class QueryThread;
 
-enum DatabaseType
+typedef struct{
+	MYSQL*	con;
+	volatile	bool	busy;
+}MysqlCon;
+
+class AsyncQuery
 {
-	DATABASE_TYPE_NONE	  = 0,
-	DATABASE_TYPE_MYSQL	 = 1,
-	DATABASE_TYPE_PGSQL	 = 2,
-	DATABASE_TYPE_ORACLE10  = 3,
-	DATABASE_TYPE_TOTAL	 = 4,
+	friend class Database;
+	SQLCallbackBase * func;
+	char * query;
+public:
+	AsyncQuery(SQLCallbackBase * f) : func(f), query(NULL) {}
+	~AsyncQuery();
+	void SetQuery(const char * format, ...);
+	void Callback(QueryResult * result);
 };
 
-class Database
+class Database : public CThread
 {
-	friend class DatabaseThread;
+	friend class QueryThread;
 public:
-	Database(DatabaseType type) : mType(type) {}
-	virtual ~Database() {}
+	Database();
+	~Database();
 
-	virtual bool Initialize(const char* Hostname, unsigned int port,
+	bool Initialize(const char* Hostname, unsigned int port,
 		const char* Username, const char* Password, const char* DatabaseName,
-		uint32 ConnectionCount, uint32 BufferSize) = 0;
+		uint32 ConnectionCount, uint32 BufferSize);
+	void run();
+	void Shutdown();
 
-	virtual void Shutdown() = 0;
+	QueryResult* Query(const char* QueryString, ...);
+	QueryResult* QueryNA(const char* QueryString);
+	bool WaitExecute(const char* QueryString, ...);//Wait For Request Completion
+	bool WaitExecuteNA(const char* QueryString);//Wait For Request Completion
+	bool Execute(const char* QueryString, ...);
+	bool ExecuteNA(const char* QueryString);
 
-	virtual QueryResult* Query(const char* QueryString, ...) = 0;
-	virtual bool WaitExecute(const char* QueryString, ...) = 0;
-	virtual bool Execute(const char* QueryString, ...) = 0;
-	virtual string EscapeString(string Escape) = 0;
+	void CheckConnections();
+	bool ThreadRunning;
 
-	virtual void CheckConnections() = 0;
+	inline string GetHostName() { return mHostname; }
+	inline string GetDatabaseName() { return mDatabaseName; }
+	inline uint32 GetQueueSize() { return queries_queue.get_size(); }
 
-	inline DatabaseType GetType() { return mType; }
+	string EscapeString(string Escape);
+	void QueueAsyncQuery(AsyncQuery * query);
+	void EndThreads();
+	void thread_proc_query();
 
 protected:
-	DatabaseType mType;
+
+	bool Connect(MysqlCon * con);
+	bool Disconnect(MysqlCon * con);
+
+	bool HandleError(MysqlCon*, uint32 ErrorNumber);
+
+	bool SendQuery(MysqlCon *con, const char* Sql, bool Self = false);
+
+	////////////////////////////////
+	FQueue<AsyncQuery*> qqueries_queue;
+
+	////////////////////////////////
+	FQueue<char*> queries_queue;
+	Mutex	lock;
+	MysqlCon * Connections;
+	MysqlCon * GetFreeConnection();
+	uint32 _counter;
+	///////////////////////////////
+
+	int32 mConnectionCount;
+
+	// For reconnecting a broken connection
+	string mHostname;
+	string mUsername;
+	string mPassword;
+	string mDatabaseName;
+	uint32 mPort;
+
+	//uint32 mNextPing;
+	QueryThread * qt;
 };
 
 class QueryResult
 {
 public:
-	QueryResult(uint32 FieldCount, uint32 RowCount, uint32 Type);
-	virtual ~QueryResult();
+	QueryResult(MYSQL_RES* res, uint32 FieldCount, uint32 RowCount);
+	~QueryResult();
 
-	virtual bool NextRow() = 0;
+	bool NextRow();
 
 	inline Field* Fetch() { return mCurrentRow; }
 	inline uint32 GetFieldCount() const { return mFieldCount; }
 	inline uint32 GetRowCount() const { return mRowCount; }
 
 protected:
-
+	MYSQL_RES* mResult;
 	Field *mCurrentRow;
 	uint32 mFieldCount;
 	uint32 mRowCount;
 	uint32 mType;
-
 };
 
-Database* CreateDatabaseInterface(DatabaseType type);
-void DestroyDatabaseInterface(Database * ptr);
+class QueryThread : public CThread
+{
+	friend class Database;
+	Database * db;
+public:
+	QueryThread(Database * d) : db(d), CThread() {}
+	~QueryThread();
+	void run();
+};
 
 #endif

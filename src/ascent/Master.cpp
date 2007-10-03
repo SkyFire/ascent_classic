@@ -463,19 +463,11 @@ bool Master::Run(int argc, char ** argv)
 	// send a query to wake it up if its inactive
 	sLog.outString("Executing pending database queries and closing database thread...");
 	// kill the database thread first so we don't lose any queries/data
-	((MySQLDatabase*)Database_Character)->SetThreadState(THREADSTATE_TERMINATE);
-	((MySQLDatabase*)Database_World)->SetThreadState(THREADSTATE_TERMINATE);
+	CharacterDatabase.EndThreads();
+	WorldDatabase.EndThreads();
 
-	CharacterDatabase.Execute("UPDATE characters SET online = 0");
-	WorldDatabase.Execute("UPDATE characters SET online = 0");
-
-	// wait for it to finish its work
-	while(((MySQLDatabase*)Database_Character)->ThreadRunning || ((MySQLDatabase*)Database_World)->ThreadRunning)
-	{
-		Sleep(100);
-	}
-	sThreadMgr.RemoveThread(((MySQLDatabase*)Database_Character));
-	sThreadMgr.RemoveThread(((MySQLDatabase*)Database_World));
+	sThreadMgr.RemoveThread(Database_Character);
+	sThreadMgr.RemoveThread(Database_World);
 
 	sLog.outString("All pending database operations cleared.\n");
 
@@ -541,7 +533,7 @@ bool Master::_StartDB()
 	result = !result ? result : Config.MainConfig.GetString("WorldDatabase", "Name", &database);
 	result = !result ? result : Config.MainConfig.GetInt("WorldDatabase", "Port", &port);
 	result = !result ? result : Config.MainConfig.GetInt("WorldDatabase", "Type", &type);
-	Database_World = CreateDatabaseInterface((DatabaseType)type);
+	Database_World = new Database();
 
 	if(result == false)
 	{
@@ -565,7 +557,7 @@ bool Master::_StartDB()
 	result = !result ? result : Config.MainConfig.GetString("CharacterDatabase", "Name", &database);
 	result = !result ? result : Config.MainConfig.GetInt("CharacterDatabase", "Port", &port);
 	result = !result ? result : Config.MainConfig.GetInt("CharacterDatabase", "Type", &type);
-	Database_Character = CreateDatabaseInterface((DatabaseType)type);
+	Database_Character = new Database();
 
 	if(result == false)
 	{
@@ -589,8 +581,8 @@ void Master::_StopDB()
 {
 	CharacterDatabase.Shutdown();
 	WorldDatabase.Shutdown();
-	DestroyDatabaseInterface(Database_World);
-	DestroyDatabaseInterface(Database_Character);
+	delete Database_World;
+	delete Database_Character;
 }
 
 void Master::_HookSignals()
@@ -634,35 +626,8 @@ void OnCrash(bool Terminate)
 		if(World::getSingletonPtr() != 0 && ThreadMgr::getSingletonPtr() != 0)
 		{
 			sLog.outString("Waiting for all database queries to finish...");
-			MySQLDatabase* dbThread = (MySQLDatabase*)sThreadMgr.GetThreadByType(THREADTYPE_DATABASE);
-			if(dbThread != 0)
-			{
-				// end it
-				MySQLDatabase * dbThread2 = (MySQLDatabase*)Database_World;
-				dbThread = (MySQLDatabase*)Database_Character;
-				dbThread->SetThreadState(THREADSTATE_TERMINATE);
-				dbThread2->SetThreadState(THREADSTATE_TERMINATE);
-				const char * query = "UPDATE characters SET online = 0 WHERE guid = 0";
-				uint32 next_query_time = getMSTime() + 10000;
-				// wait for it to finish its work
-				CharacterDatabase.Execute(query);
-				WorldDatabase.Execute(query);
-
-				while(dbThread->ThreadRunning || dbThread2->ThreadRunning)
-				{
-					if(getMSTime() >= next_query_time)
-					{
-						next_query_time = getMSTime() + 10000;
-						/* send some bullshit queries */
-                        if(dbThread->ThreadRunning)
-							CharacterDatabase.Execute(query);
-						
-						if(dbThread2->ThreadRunning)
-							WorldDatabase.Execute(query);
-					}
-					Sleep(100);
-				}
-			}
+			WorldDatabase.EndThreads();
+			CharacterDatabase.EndThreads();
 			sLog.outString("All pending database operations cleared.\n");
 			sWorld.SaveAllPlayers();
 			sLog.outString("Data saved.");

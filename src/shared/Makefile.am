@@ -58,11 +58,7 @@ libdatabase_a_SOURCES = \
     Database/Field.h \
     Database/DataStore.h \
     Database/dbcfile.cpp \
-    Database/dbcfile.h \
-    Database/impl/MySQLDatabase.h \
-    Database/impl/MySQLDatabase.cpp \
-    Database/impl/PostgreDatabase.h \
-    Database/impl/PostgreDatabase.cpp
+    Database/dbcfile.h
 
 libnetwork_a_SOURCES = \
     Network/ListenSocketPoll.h \

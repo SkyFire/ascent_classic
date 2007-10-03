@@ -328,6 +328,9 @@ public:
 	int32 m_moveDelayTime;
 	int32 m_clientTimeDelay;
 
+	void CharacterEnumProc(QueryResult * result);
+	void LoadAccountDataProc(QueryResult * result);
+
 
 protected:
 

@@ -2646,3 +2646,21 @@ void World::LoadNameGenData()
 		_namegendata[d.type].push_back(d);
 	}
 }
+
+void World::CharacterEnumProc(QueryResult * result, uint32 AccountId)
+{
+	WorldSession * s = FindSession(AccountId);
+	if(s == NULL)
+		return;
+
+	s->CharacterEnumProc(result);
+}
+
+void World::LoadAccountDataProc(QueryResult * result, uint32 AccountId)
+{
+	WorldSession * s = FindSession(AccountId);
+	if(s == NULL)
+		return;
+
+	s->LoadAccountDataProc(result);
+}

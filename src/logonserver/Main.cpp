@@ -114,7 +114,7 @@ bool startdb()
 	}
 
 	sLog.SetScreenLoggingLevel(Config.MainConfig.GetIntDefault("LogLevel", "Screen", 0));
-	sLogonSQL = CreateDatabaseInterface((DatabaseType)ltype);
+	sLogonSQL = new Database();
 
 	// Initialize it
 	if(!sLogonSQL->Initialize(lhostname.c_str(), (unsigned int)lport, lusername.c_str(),
@@ -335,16 +335,11 @@ void LogonServer::Run(int argc, char ** argv)
 	delete LogonConsole::getSingletonPtr();
 
 	// kill db
-	sThreadMgr.RemoveThread((MySQLDatabase*)sLogonSQL);
-	((MySQLDatabase*)sLogonSQL)->SetThreadState(THREADSTATE_TERMINATE);
-
-	// send a query to wake up condition
-	((MySQLDatabase*)sLogonSQL)->Execute("SELECT count(acct) from accounts");
 	sLog.outString("Waiting for database to close..");
-	while(((MySQLDatabase*)sLogonSQL)->ThreadRunning)
-		Sleep(100);
-
-	DestroyDatabaseInterface(sLogonSQL);
+	sThreadMgr.RemoveThread(sLogonSQL);
+	sLogonSQL->EndThreads();
+	sLogonSQL->Shutdown();
+	delete sLogonSQL;
 
 	sThreadMgr.Shutdown();
 
