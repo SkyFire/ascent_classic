@@ -419,7 +419,7 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 		ASSERT(plr);
 		plr->SetSession(this);
 
-		if(!plr->LoadFromDB( GUID_LOPART(guid)))
+		if(!plr->LoadFromDBBlocking( GUID_LOPART(guid)))
 		{
 			// Disconnect us
 			sCheatLog.writefromsession(this, "Tried to delete non-existant player %u\n", guid);

@@ -25,6 +25,7 @@ libshared_a_SOURCES = \
     crc32.h \
     FastQueue.h \
     Threading/Mutex.cpp \
+    Threading/ThreadPool.cpp \
     Storage.h \
     ascent_getopt.h \
     ascent_getopt.cpp \

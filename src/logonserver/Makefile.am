@@ -20,8 +20,7 @@ logonserver_SOURCES = \
 	Main.cpp \
 	Main.h \
 	PeriodicFunctionCall_Thread.h \
-	RealmlistThreadMgr.cpp \
-        ../game/CThreads.cpp
+    ../game/CThreads.cpp
 
 logonserver_LDADD = -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork
 

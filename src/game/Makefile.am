@@ -153,8 +153,6 @@ libgame_a_SOURCES = \
     TaxiMgr.h \
     TerrainMgr.cpp \
     TerrainMgr.h \
-    ThreadMgr.cpp \
-    ThreadMgr.h \
     TradeHandler.cpp \
     TransporterHandler.cpp \
     TransporterHandler.h \

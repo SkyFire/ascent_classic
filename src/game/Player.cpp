@@ -2319,6 +2319,23 @@ bool Player::LoadFromDB(uint32 guid)
 	return true;
 }
 
+void Player::LoadFromDBBlocking(uint32 guid)
+{
+	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP0<Player>(this, &Player::LoadFromDBProc) );
+	q->AddQuery("SELECT * FROM characters WHERE guid=%u AND banned=0 AND forced_rename_pending = 0",guid);
+	q->AddQuery("SELECT * FROM tutorials WHERE playerId=%u",guid);
+	q->AddQuery("SELECT * FROM playercooldownitems WHERE OwnerGuid=%u", guid);
+	q->AddQuery("SELECT * FROM questlog WHERE player_guid=%u",guid);
+	q->AddQuery("SELECT * FROM playercooldownsecurity WHERE OwnerGuid=%u",guid);
+	q->AddQuery("SELECT * FROM playeritems WHERE ownerguid=%u ORDER BY containerslot ASC", guid);
+	q->AddQuery("SELECT * FROM playerpets WHERE ownerguid=%u ORDER BY petnumber", guid);
+	q->AddQuery("SELECT * FROM playersummonspells where ownerguid=%u ORDER BY entryid", guid);
+
+	m_uint32Values[OBJECT_FIELD_GUID] = guid;
+	q->Perform();
+}
+
+
 void Player::LoadFromDBProc(QueryResultVector & results)
 {
 	uint32 field_index = 2;
