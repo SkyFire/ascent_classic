@@ -950,10 +950,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 35547:
 						case 35548:
 							{
-								//this needs offhand weapon
-								continue;
 								if(!IsPlayer() || !dmg)
 									continue;
+								//this needs offhand weapon
 								Item *it = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
 								if(!it || it->GetProto()->InventoryType!=INVTYPE_WEAPON )
 									continue;

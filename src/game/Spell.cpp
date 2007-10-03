@@ -2059,6 +2059,14 @@ bool Spell::TakePower()
 		  SM_PIValue(u_caster->SM_PCost,&cost,m_spellInfo->SpellGroupType);
 	}
 		 
+/*
+int spell_flat_modifers=0;
+int spell_pct_modifers=0;
+SM_FIValue(u_caster->SM_FCost,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+SM_FIValue(u_caster->SM_PCost,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+printf("!!!!!spell cost mod flat %d , spell value mod pct %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cost,m_spellInfo->SpellGroupType);
+*/
+
 	if (cost <=0)
 		return true;
 
@@ -3119,10 +3127,15 @@ int32 Spell::CalculateEffect(uint32 i)
 	{
 		int32 spell_flat_modifers=0;
 		int32 spell_pct_modifers=0;
+		int32 spell_pct_modifers2=0;//separated from the other for debugging purpuses
 		SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
 		SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		//it seems there is no Flat value only pct values for this mod. Maybe later ? Right now it is intended for testing
+		SM_FIValue(u_caster->SM_PDOT,&spell_pct_modifers2,m_spellInfo->SpellGroupType);
 	
-		value = value + value*spell_pct_modifers/100 + spell_flat_modifers;
+//printf("!!!!spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
+	
+		value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
 	}
 
 	return value;

@@ -4912,7 +4912,7 @@ void Aura::SpellAuraAddPctMod(bool apply)
 		SendModifierLog(&m_target->SM_PCriticalDamage,val,AffectedGroups,mod->m_miscValue,true); 
 		break;
 
-	case SMT_DAMAGE_DONE_PERIODIC:
+	case SMT_SPELL_VALUE_PCT:
 		SendModifierLog(&m_target->SM_PDOT,val,AffectedGroups,mod->m_miscValue,true);
 		break;
 
@@ -6055,7 +6055,7 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 		SendModifierLog(&m_target->SM_FCost,val,AffectedGroups,mod->m_miscValue); 
 		break;
 
-	case SMT_DAMAGE_DONE_PERIODIC:
+	case SMT_SPELL_VALUE_PCT:
 		SendModifierLog(&m_target->SM_FDOT,val,AffectedGroups,mod->m_miscValue); 
 		break;
 

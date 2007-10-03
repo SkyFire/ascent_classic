@@ -82,17 +82,8 @@ Zack - test my shit :
 	1 ) do not make him loop self it will be casted by cater for eternity ;)
 	2 ) there is no visual sighn that spell had effect (the negative values are missing ex : 23+1-6)
 - mage - Frost Warding - 28332 - does not reflect
-- rogue - combat potency - require weapon and apply only for succesfull attack. Dual wield : 674, 35553
-- Gnomish Poultryizer trinket - Poultryizer - 30507 
-- paladin - Benediction - 20105
-- paladin - Improved Blessing of Might - 20048
-- paladin - Improved Hammer of Justice - 24188
-- paladin - Improved Judgement - 25957
-- paladin - Sanctity Aura - 20218 
-- paladin - Improved Sanctity Aura - 31870
-- paladin - Toughness - 12764
-- priest - Improved Power Word: Fortitude - 14767
-- priest - Force of Will - 18550
+- Gnomish Poultryizer trinket - Poultryizer - need aura duration to set to 15 sec
+- priest - Force of Will - 18550 - what is the group type to increase here ?, all spells ?
 
 ==========================================================================
 Capt - test my shit :
