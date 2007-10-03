@@ -648,7 +648,7 @@ void AIInterface::_UpdateTargets()
 		return;
 
 	AssistTargetSet::iterator i, i2;
-	TargetMap::iterator itr, itr2;
+	TargetMap::iterator itr;
 
 	// Find new Assist Targets and remove old ones
 	if(m_AIState == STATE_FLEEING)
@@ -678,20 +678,20 @@ void AIInterface::_UpdateTargets()
 	if(m_updateTargets)
 	{
 		m_updateTargets = false;
+		deque<Unit*> tokill;
+
 		//modified for vs2005 compatibility
-		for(itr = m_aiTargets.begin(); itr != m_aiTargets.end();)
+		for(itr = m_aiTargets.begin(); itr != m_aiTargets.end();++itr)
 		{
-			itr2 = itr;
-			++itr;
-
-			//if(!itr->target)		// we shouldnt get to here, i'm guessing.
-				//continue;
-
-			if(!itr2->first->isAlive() || m_Unit->GetDistanceSq(itr2->first) >= 6400.0f/*80.0f*/)
+			if(!itr->first->isAlive() || m_Unit->GetDistanceSq(itr->first) >= 6400.0f/*80.0f*/)
 			{
-				m_aiTargets.erase(itr2);
+				tokill.push_back(itr->first);
 			}
 		}
+		for(deque<Unit*>::iterator itr = tokill.begin(); itr != tokill.end(); ++itr)
+			m_aiTargets.erase((*itr));
+		tokill.clear();
+		
 		if(m_aiTargets.size() == 0 
 			&& m_AIState != STATE_IDLE && m_AIState != STATE_FOLLOWING 
 			&& m_AIState != STATE_EVADE && m_AIState != STATE_FEAR 
