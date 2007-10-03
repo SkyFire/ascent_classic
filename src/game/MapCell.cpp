@@ -133,7 +133,7 @@ void MapCell::RemoveObjects()
 
 		itr++;
 
-		if(_unloadpending && UINT32_LOPART(obj->GetGUIDHigh())==HIGHGUID_TRANSPORTER)
+		if(!obj || _unloadpending && UINT32_LOPART(obj->GetGUIDHigh())==HIGHGUID_TRANSPORTER)
 			continue;
 
 		if(_unloadpending && obj->GetTypeId()==TYPEID_CORPSE)

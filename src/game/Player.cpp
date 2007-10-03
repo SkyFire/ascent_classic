@@ -4634,24 +4634,26 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 	if(getDeathState() == CORPSE) // we are dead and we have released our spirit
 	{
-		if(myCorpse && myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
-			return !pObj->m_isGmInvisible; // we can see everything within range of our corpse except invisible GMs
-
-		if(m_deathVision) // if we have special death-vision (from arenas) we can see everything except invisible GMs
-			return !pObj->m_isGmInvisible;
-
 		if(object_type == TYPEID_PLAYER)
 		{
+			if(myCorpse && myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
+				return !static_cast<Player*>(obj)->m_isGmInvisible; // we can see everything within range of our corpse except invisible GMs
+
+			if(m_deathVision) // if we have special death-vision (from arenas) we can see everything except invisible GMs
+				return !static_cast<Player*>(obj)->m_isGmInvisible;
+
 			if(((Player*)obj)->getDeathState() == CORPSE) // we can only see players that are spirits
 				return true;
-			else return false;
+			
+			return false;
 		}
+		else if(object_type == TYPEID_UNIT)
+		{
+			if(((Unit*)obj)->IsSpiritHealer()) // we can't see any NPCs except spirit-healers
+				return true;
 
-		if(object_type == TYPEID_UNIT
-				&& ((Unit*)obj)->IsSpiritHealer()) // we can't see any NPCs except spirit-healers
-			return true;
-
-		return false;
+			return false;
+		}
 	}
 	//------------------------------------------------------------------
 
