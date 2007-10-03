@@ -85,6 +85,8 @@ Zack - test my shit :
 - rogue - combat potency - require weapon and apply only for succesfull attack. Dual wield : 674, 35553
 - Gnomish Poultryizer trinket - Poultryizer - 30507 
 - paladin - Benediction - 20105
+- paladin - Improved Blessing of Might - 20048
+- paladin - Improved Hammer of Justice - 24188
 
 ==========================================================================
 Capt - test my shit :

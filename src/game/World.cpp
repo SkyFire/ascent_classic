@@ -1869,6 +1869,23 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(20105);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
+	// paladin - Improved Hammer of Justice
+	uint32 Hammer_of_Justice_group=0;
+	tsp = dbcSpell.LookupEntry(853); //Hammer of Justice
+	if(tsp)
+		Hammer_of_Justice_group = tsp->SpellGroupType;
+	sp = dbcSpell.LookupEntry(20487);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
+	sp = dbcSpell.LookupEntry(20488);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
+	sp = dbcSpell.LookupEntry(20489);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
+	sp = dbcSpell.LookupEntry(24188);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
 	
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);
