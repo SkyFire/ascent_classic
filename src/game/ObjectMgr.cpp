@@ -2024,6 +2024,7 @@ void ObjectMgr::LoadTrainers()
 		tr->RequiredClass = fields[3].GetUInt32();
 		tr->Req_lvl = fields[4].GetUInt32();
 		tr->TrainerType = fields[5].GetUInt32(); //0 or 2 ?
+		tr->TalkMessage=NULL;
 
 		const char * temp = fields[6].GetString();
 		int len=strlen(temp);
@@ -2062,7 +2063,7 @@ void ObjectMgr::LoadTrainers()
 			if(!fields2)
 				break;//wow, this is bad, a few seconds ago we had all entrys
 			uint32 CastSpellID=fields2[1].GetUInt32();
-			SpellEntry *spellInfo = dbcSpell.LookupEntry(CastSpellID );
+			SpellEntry *spellInfo = dbcSpell.LookupEntryForced(CastSpellID );
 			if(!spellInfo)
 			{
 				badspellcount++;

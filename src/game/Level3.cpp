@@ -2496,7 +2496,7 @@ bool ChatHandler::HandleCreatureSpawnCommand(const char *args, WorldSession *m_s
 	sp->bytes=0;
 	sp->bytes2=0;
 	sp->respawnNpcLink = 0;
-	sp->channel_spell=sp->channel_target_creature=sp->channel_target_go;
+	sp->channel_spell=sp->channel_target_creature=sp->channel_target_go=0;
 
 
 	Creature * p = m_session->GetPlayer()->GetMapMgr()->CreateCreature();
