@@ -72,3 +72,4 @@ void CThread::OnShutdown()
 {
 	SetThreadState(THREADSTATE_TERMINATE);
 }
+

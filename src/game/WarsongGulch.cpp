@@ -454,3 +454,4 @@ void WarsongGulch::OnStart()
 	/* correct? - burlex */
 	PlaySoundToAll(SOUND_BATTLEGROUND_BEGIN);
 }
+

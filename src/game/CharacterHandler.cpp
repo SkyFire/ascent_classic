@@ -24,8 +24,8 @@
 
 bool VerifyName(const char * name, size_t nlen)
 {
-	static char * bannedCharacters = "\t\v\b\f\a\n\r\\\"\'\? <>[](){}_=+-|/!@#$%^&*~`.,0123456789\0";
-	char * p;
+	static const char * bannedCharacters = "\t\v\b\f\a\n\r\\\"\'\? <>[](){}_=+-|/!@#$%^&*~`.,0123456789\0";
+	const char * p;
 	for(size_t i = 0; i < nlen; ++i)
 	{
         p = bannedCharacters;
@@ -419,16 +419,7 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 		ASSERT(plr);
 		plr->SetSession(this);
 
-		if(!plr->LoadFromDBBlocking( GUID_LOPART(guid)))
-		{
-			// Disconnect us
-			sCheatLog.writefromsession(this, "Tried to delete non-existant player %u\n", guid);
-			Disconnect();
-			plr->ok_to_remove = true;
-			delete plr;
-			//sObjHolder.Delete<Player>(plr);
-			return;
-		}
+		plr->LoadFromDBBlocking( GUID_LOPART(guid));
 		plr->m_playerInfo = objmgr.GetPlayerInfo(guid);
 		plr->DeleteFromDB();
 		//if charter leader

@@ -2558,7 +2558,13 @@ void World::DeleteObject(Object * obj)
 void World::Rehash(bool load)
 {
 	if(load)
+	{
+		#ifdef WIN32
 		Config.MainConfig.SetSource("ascent.conf", true);
+		#else
+		Config.MainConfig.SetSource((char*)CONFDIR "/ascent.conf", true);
+		#endif
+	}
 
 	if(!ChannelMgr::getSingletonPtr())
 		new ChannelMgr;

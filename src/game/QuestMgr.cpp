@@ -1109,8 +1109,8 @@ template <class T> void QuestMgr::_AddQuest(uint32 entryid, Quest *qst, uint8 ty
 
 void QuestMgr::_CleanLine(std::string *str) 
 {
-	_RemoveChar("\r", str);
-	_RemoveChar("\n", str);
+	_RemoveChar((char*)"\r", str);
+	_RemoveChar((char*)"\n", str);
 
 	while (str->c_str()[0] == 32) 
 	{

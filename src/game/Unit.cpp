@@ -901,9 +901,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 13977:
 							{
 								//we need a Ambush, Garrote, or Cheap Shot
-								if (CastingSpell->NameHash!=3345919181 && //Cheap Shot
-									CastingSpell->NameHash!=566770777 && //Ambush
-									CastingSpell->NameHash!=891349384)  //Garrote
+								if (CastingSpell->NameHash!=3345919181UL && //Cheap Shot
+									CastingSpell->NameHash!=566770777UL && //Ambush
+									CastingSpell->NameHash!=891349384UL)  //Garrote
 									continue;
 							}break;
 						//Blackout
@@ -934,7 +934,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 33619:
 							{
 								//requires Power Word: Shield active
-								int power_word_id = HasAurasWithNameHash(3248591006);
+								int power_word_id = HasAurasWithNameHash(3248591006UL);
 								if(!power_word_id)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//make a direct strike then exit rest of handler
@@ -3886,11 +3886,11 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 					case 33151:
 						{
 							//our luck. it got trigered on smite..we do not remove it just yet
-							if(m_currentSpell && m_currentSpell->m_spellInfo->NameHash==2272412495)
+							if(m_currentSpell && m_currentSpell->m_spellInfo->NameHash==2272412495UL)
 								continue;
 							//this spell gets removed only when caasting smite
 						    SpellEntry *spi = dbcSpell.LookupEntry(skip);
-							if(spi && spi->NameHash!=2272412495)
+							if(spi && spi->NameHash!=2272412495UL)
 								continue;
 						}
 				}

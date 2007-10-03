@@ -3024,7 +3024,7 @@ bool ChatHandler::HandleSendRunSpeedChange(const char * args, WorldSession * m_s
 bool ChatHandler::HandleAddGuardCommand(const char * args, WorldSession * m_session)
 {
 	uint32 guardId;
-	uint8 factionId;
+	int32 factionId;
 	if(sscanf(args, "%u %u", &guardId, &factionId) != 2)
 		return false;
 
@@ -3117,10 +3117,10 @@ bool ChatHandler::HandleCreateArenaTeamCommands(const char * args, WorldSession 
 
 	ArenaTeam * t = new ArenaTeam(real_type,objmgr.GenerateArenaTeamId());
 	t->m_emblemStyle=22;
-	t->m_emblemColour=4292133532;
-	t->m_borderColour=4294931722;
+	t->m_emblemColour=4292133532UL;
+	t->m_borderColour=4294931722UL;
 	t->m_borderStyle=1;
-	t->m_backgroundColour=4284906803;
+	t->m_backgroundColour=4284906803UL;
 	t->m_leader=plr->GetGUIDLow();
 	t->m_name = string(name);
 	t->AddMember(plr->m_playerInfo);

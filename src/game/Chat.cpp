@@ -1167,3 +1167,4 @@ void WordFilter::LogMessage(string& message, string& blockedKeyword, Player * pl
 	fflush(m_file);
 	fclose(m_file);
 }
+

@@ -136,7 +136,7 @@ void LogonServer::Run(int argc, char ** argv)
 #ifdef WIN32
 	char * config_file = "logonserver.conf";
 #else
-	char * config_file = CONFDIR "/logonserver.conf";
+	char * config_file = (char*)CONFDIR "/logonserver.conf";
 #endif
 	int file_log_level = DEF_VALUE_NOT_SET;
 	int screen_log_level = DEF_VALUE_NOT_SET;

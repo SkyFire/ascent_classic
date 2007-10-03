@@ -351,7 +351,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			{
                 dmg = u_caster->GetAP()*(m_spellInfo->EffectBasePoints[0]+1) / 100;
 			}
-		case 2189817683:	// Shield Slam - damage is increased by block value
+		case 2189817683UL:	// Shield Slam - damage is increased by block value
 			{
 				if(p_caster)
 				{
@@ -472,7 +472,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ReflectSpellSchool *rss = new ReflectSpellSchool;
 			rss->chance = m_spellInfo->procChance;
 			rss->spellId = m_spellInfo->Id;
-			rss->require_aura_hash = 2161224959; 
+			rss->require_aura_hash = 2161224959UL; 
 			rss->school = m_spellInfo->School;		
 
 			unitTarget->m_reflectSpellSchool.push_back(rss);

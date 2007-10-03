@@ -72,7 +72,7 @@ void SocketMgr::SpawnWorkerThreads()
 {
     uint32 count = 1;
     for(uint32 i = 0; i < count; ++i)
-        launch_thread(new SocketWorkerThread());
+        ThreadPool.ExecuteTask(new SocketWorkerThread());
 }
 
 void SocketWorkerThread::run()

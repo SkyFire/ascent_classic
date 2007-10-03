@@ -27,6 +27,7 @@
 using namespace std;
 class QueryResult;
 class QueryThread;
+class Database;
 
 typedef struct{
 	MYSQL*	con;

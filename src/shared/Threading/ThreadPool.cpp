@@ -27,6 +27,13 @@
 #define THREAD_RESERVE 5
 
 CThreadPool ThreadPool;
+#ifndef WIN32
+volatile int threadid_count = 0;
+int GenerateThreadId()
+{
+	return ++threadid_count;
+}
+#endif
 
 CThreadPool::CThreadPool()
 {
@@ -272,8 +279,7 @@ Thread * CThreadPool::StartThread(ThreadBase * ExecutionTarget)
 static void * thread_proc(void * param)
 {
 	Thread * t = (Thread*)param;
-	t->ControlInterface.Setup();
-	Log.Debug("Thread %u started.", t->ControlInterface.GetId());
+	Log.Debug("ThreadPool", "Thread %u started.", t->ControlInterface.GetId());
 
 	for(;;)
 	{
@@ -283,7 +289,7 @@ static void * thread_proc(void * param)
 			if(t->ExecutionTarget->delete_after_use)
 				delete t->ExecutionTarget;
 
-			t->ExecutionTarget = NULL
+			t->ExecutionTarget = NULL;
 		}
 
 		if(!ThreadPool.ThreadExit(t))

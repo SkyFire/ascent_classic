@@ -71,16 +71,20 @@ public:
 };
 
 #else
+#include <semaphore.h>
+int GenerateThreadId();
 
 class ThreadController
 {
 	sem_t sem;
 	pthread_t handle;
+	int thread_id;
 public:
-	void Setup(pthread_t h);
+	void Setup(pthread_t h)
 	{
 		handle = h;
-		sem_init(&sem);
+		sem_init(&sem, PTHREAD_PROCESS_PRIVATE, 5);
+		thread_id = GenerateThreadId();
 	}
 	~ThreadController()
 	{
@@ -102,10 +106,10 @@ public:
 	void Join()
 	{
 		// waits until the thread finishes then returns
-		pthread_join(&handle);
+		pthread_join(handle, NULL);
 	}
 
-	inline uint32 GetId() { return (uint32)handle; }
+	inline uint32 GetId() { return (uint32)thread_id; }
 };
 
 #endif
