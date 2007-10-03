@@ -430,7 +430,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				break;
 			Unit *targets[3];
 			int targets_got=0;
-			for(std::set<Object*>::iterator itr = unitTarget->GetInRangeSetBegin(), i2; itr != unitTarget->GetInRangeSetEnd(); itr++ )
+			for(std::set<Object*>::iterator itr = unitTarget->GetInRangeSetBegin(), i2; itr != unitTarget->GetInRangeSetEnd(); )
 			{
 				i2 = itr++;
 				// don't add objects that are not units and that are dead
