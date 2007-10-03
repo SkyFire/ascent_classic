@@ -1838,6 +1838,13 @@ bool World::SetInitialWorldSettings()
 			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
 //		sp->procChance = 100;
 	}
+	//Gnomish Poultryizer trinket - Poultryizer
+	sp = dbcSpell.LookupEntry(30507);
+	if(sp)
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = 56;
+	}
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);
 	if(Enchantment)
