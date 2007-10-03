@@ -2517,7 +2517,7 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 				break;
 
 			Player* player = (Player*)(pTarget);
-			if (!player->IsInFeralForm() || (player->GetShapeShift()!=FORM_BEAR && player->GetShapeShift()!= FORM_DIREBEAR))
+			if (!player->IsInFeralForm())
 				break;
 			if(player->GetPowerType() == POWER_TYPE_RAGE)
 			{
@@ -2526,7 +2526,7 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 				if (val)
 				{
 					player->SetUInt32Value(UNIT_FIELD_POWER2, player->GetUInt32Value(UNIT_FIELD_POWER2)-val);
-					switch (this->pSpellId)
+					switch (this->GetSpellId())
 					{
 						case 22842:
 							val *= 10;break;
@@ -2549,7 +2549,7 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 					datamr << player->GetNewGUID();
 					datamr << uint32(22845);
 					datamr << uint32(0);
-					datamr << uint32(chealth);
+					datamr << uint32(val);
 					player->GetSession()->SendPacket(&datamr);
 				}
 			}break;
@@ -3999,18 +3999,12 @@ void Aura::SpellAuraModStalked(bool apply)
 {
 	if(apply)
 	{
-		//SetNegative();
 		m_target->stalkedby = m_casterGuid;
-		//cancel spell casting
-		if(m_target->isCasting() && m_target->GetCurrentSpell() && m_target->GetCurrentSpell()->m_spellInfo != m_spellProto)			// hackfix for stupid spells.. we should really cancel on the next loop!
-			m_target->GetCurrentSpell()->safe_cancel();
-		//hmmm, some spells silance you only on specific spelltypes ?
-		m_target->m_silenced++;
+		SetNegative();
 	}
 	else 
 	{
 		m_target->stalkedby = 0;
-		m_target->m_silenced--;
 	}
 }
 
@@ -5424,9 +5418,6 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 	if(apply)
 	{
 	   val= mod->m_amount;
-//	   if(val>0)SetPositive();
-  //	 else
-	//	   SetNegative();
 	}
 	else 
 	   val= -mod->m_amount;

@@ -426,7 +426,7 @@ bool Spell::DidHit(uint64 target)
 			break;
 	}
 
-	float baseresist[3]={96.0f,95.0f,94.0f};
+	float baseresist[3]={4.0f,5.0f,6.0f};
 	int32 lvldiff;
 	float resistchance ;
 	if(!u_victim && !p_victim)
@@ -441,20 +441,23 @@ bool Spell::DidHit(uint64 target)
 		lvldiff = p_victim->getLevel() - p_caster->getLevel();
 	else
 		lvldiff = u_victim->getLevel() - p_caster->getLevel();
-
-	if(lvldiff < 0)
-		lvldiff = 0;
-
-	if(lvldiff < 3)
-	{ 
-			resistchance = baseresist[lvldiff];
+	if (lvldiff < 0)
+	{
+		resistchance = baseresist[0] +lvldiff;
 	}
 	else
 	{
-		if(pvp)
-			resistchance = baseresist[2] + ((lvldiff-2)*7.0f);
+		if(lvldiff < 3)
+		{ 
+				resistchance = baseresist[lvldiff];
+		}
 		else
-			resistchance = baseresist[2] + ((lvldiff-2)*11.0f);
+		{
+			if(pvp)
+				resistchance = baseresist[2] + ((lvldiff-2)*7.0f);
+			else
+				resistchance = baseresist[2] + ((lvldiff-2)*11.0f);
+		}
 	}
 	//check mechanical resistance
 	//i have no idea what is the best pace for this code
@@ -481,9 +484,9 @@ bool Spell::DidHit(uint64 target)
 	else
 	{
 		if(resistchance<=1.0)//resist chance >=1
-			return Rand(1.0);
+			return !Rand(1.0);
 		else
-			return Rand(resistchance);
+			return !Rand(resistchance);
 	}
  
 }
