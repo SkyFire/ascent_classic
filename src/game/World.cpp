@@ -1893,6 +1893,17 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(25957);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = judgement_group;
+	// paladin - Improved Sanctity Aura
+	uint32 Sanctity_group=0;
+	tsp = dbcSpell.LookupEntry(20218); //Hammer of Justice
+	if(tsp)
+		Sanctity_group = tsp->SpellGroupType;
+	sp = dbcSpell.LookupEntry(31869);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = Sanctity_group;
+	sp = dbcSpell.LookupEntry(31870);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = Sanctity_group;
 	
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);

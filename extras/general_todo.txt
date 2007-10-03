@@ -88,6 +88,7 @@ Zack - test my shit :
 - paladin - Improved Blessing of Might - 20048
 - paladin - Improved Hammer of Justice - 24188
 - paladin - Improved Judgement - 25957
+- paladin - Improved Sanctity Aura - 31870 (this will require sancity aura to be workin)
 
 ==========================================================================
 Capt - test my shit :
