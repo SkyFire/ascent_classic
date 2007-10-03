@@ -593,7 +593,7 @@ public:
 
 	virtual void Update( uint32 time );
 	virtual void AddToWorld();
-	virtual void RemoveFromWorld();
+	virtual void RemoveFromWorld(bool free_guid);
 	virtual void OnPushToWorld();
 
 	inline void setAttackTimer(int32 time, bool offhand)

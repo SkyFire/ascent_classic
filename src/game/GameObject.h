@@ -210,7 +210,7 @@ public:
 	GOSpawn * m_spawn;
 	void OnPushToWorld();
 	void OnRemoveInRangeObject(Object* pObj);
-	void RemoveFromWorld();
+	void RemoveFromWorld(bool free_guid);
 
 	inline bool CanMine(){return mines_remaining != 1 && mines_remaining > 0;}
 	inline void UseMine(){ if(mines_remaining) mines_remaining--;}

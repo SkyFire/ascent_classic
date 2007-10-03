@@ -463,7 +463,7 @@ void Item::RemoveFromWorld()
 	if(!IsInWorld()) return;
 
 	mSemaphoreTeleport = true;
-	m_mapMgr->RemoveObject(this);
+	m_mapMgr->RemoveObject(this, false);
 	m_mapMgr = NULL;
   
 	// update our event holder

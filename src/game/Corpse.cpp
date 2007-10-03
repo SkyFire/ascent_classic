@@ -101,7 +101,7 @@ void Corpse::Despawn()
 {
 	if(this->IsInWorld())
 	{
-		RemoveFromWorld();
+		RemoveFromWorld(false);
 	}
 }
 

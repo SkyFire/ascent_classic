@@ -129,7 +129,7 @@ void Creature::Update( uint32 p_time )
 	Unit::Update( p_time );
 	if(IsTotem() && isDead())
 	{
-		RemoveFromWorld(false);
+		RemoveFromWorld(false, true);
 		delete this;
 		return;
 	}
@@ -152,7 +152,7 @@ void Creature::SafeDelete()
 void Creature::DeleteMe()
 {
 	if(IsInWorld())
-		RemoveFromWorld(false);
+		RemoveFromWorld(false, true);
 
 	delete this;
 }
@@ -167,14 +167,14 @@ void Creature::OnRemoveCorpse()
 	   
 			if(GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID && this->proto && this->proto->boss)
 			{
-				RemoveFromWorld(false);
+				RemoveFromWorld(false, true);
 			}
 			else
 			{
 				if(proto && proto->RespawnTime)
-					RemoveFromWorld(true);
+					RemoveFromWorld(true, false);
 				else
-					RemoveFromWorld(false);
+					RemoveFromWorld(false, true);
 			}
 		
 	   
@@ -447,12 +447,12 @@ bool Creature::CanAddToWorld()
 	return true;
 }
 
-void Creature::RemoveFromWorld(bool addev)
+void Creature::RemoveFromWorld(bool addrespawnevent, bool free_guid)
 {
 	if(GetGUIDHigh() != HIGHGUID_UNIT)		/* is a pet */
 	{
 		if(IsInWorld())
-			Unit::RemoveFromWorld();
+			Unit::RemoveFromWorld(true);
 
 		SafeDelete();
 		return;
@@ -463,7 +463,7 @@ void Creature::RemoveFromWorld(bool addev)
 		RemoveAllAuras();
 		sEventMgr.RemoveEvents(this);
 
-		if(addev)
+		if(addrespawnevent)
 		{
 			if(proto && proto->RespawnTime > 0)
 				Despawn(0, proto->RespawnTime);
@@ -662,7 +662,7 @@ void Creature::TotemExpire()
 	totemSlot = -1;
 	totemOwner = 0;
 
-	RemoveFromWorld(false);
+	RemoveFromWorld(false, true);
 	SafeDelete();
 }
 
@@ -1227,7 +1227,7 @@ void Creature::OnPushToWorld()
 // this is used for guardians. They are non respawnable creatures linked to a player
 void Creature::SummonExpire()
 {
-	RemoveFromWorld(false);
+	RemoveFromWorld(false, true);
 	SafeDelete();//delete creature totaly.
 }
 
@@ -1253,13 +1253,13 @@ void Creature::Despawn(uint32 delay, uint32 respawntime)
 		pCell->_respawnObjects.insert(((Object*)this));
 		sEventMgr.RemoveEvents(this);
 		sEventMgr.AddEvent(m_mapMgr, &MapMgr::EventRespawnCreature, this, pCell, EVENT_CREATURE_RESPAWN, respawntime, 1, 0);
-		Unit::RemoveFromWorld();
+		Unit::RemoveFromWorld(false);
 		m_position = m_spawnLocation;
 		m_respawnCell=pCell;
 	}
 	else
 	{
-		Unit::RemoveFromWorld();
+		Unit::RemoveFromWorld(true);
 		SafeDelete();
 	}
 }

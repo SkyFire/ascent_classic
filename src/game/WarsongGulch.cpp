@@ -202,7 +202,7 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 			(obj->GetEntry() == 179786 && plr->GetTeam() == 1) )
 		{
 			uint32 x = plr->GetTeam() ? 0 : 1;
-			m_dropFlags[x]->RemoveFromWorld();
+			m_dropFlags[x]->RemoveFromWorld(false);
 			if(m_homeFlags[x]->IsInWorld() == false)
 				m_homeFlags[x]->PushToWorld(m_mapMgr);
 
@@ -216,7 +216,7 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 		return;
 	}
 
-	m_dropFlags[plr->GetTeam()]->RemoveFromWorld();
+	m_dropFlags[plr->GetTeam()]->RemoveFromWorld(false);
 	m_flagHolders[plr->GetTeam()] = plr->GetGUIDLow();
 	plr->m_bgHasFlag = true;
 
@@ -249,7 +249,7 @@ void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
 
 	/* set the flag holder */
 	m_flagHolders[plr->GetTeam()] = plr->GetGUIDLow();
-	m_homeFlags[plr->GetTeam()]->RemoveFromWorld();
+	m_homeFlags[plr->GetTeam()]->RemoveFromWorld(false);
 	plr->m_bgHasFlag = true;
 
 	SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, 0, "The %s flag was picked up by %s!", plr->GetTeam() ? "Alliance" : "Horde", plr->GetName());

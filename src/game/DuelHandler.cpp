@@ -55,7 +55,7 @@ void WorldSession::HandleDuelCancelled(WorldPacket & recv_data)
 	GameObject *arbiter = _player->GetMapMgr() ? _player->GetMapMgr()->GetGameObject(_player->GetUInt32Value(PLAYER_DUEL_ARBITER)) : 0;
 	if(arbiter)
 	{
-			arbiter->RemoveFromWorld();
+			arbiter->RemoveFromWorld(true);
 			delete arbiter;
  		}
 	_player->SetUInt64Value(PLAYER_DUEL_ARBITER, 0);

@@ -393,7 +393,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 		        pGO->loot.looters.erase(_player->GetGUID());
                 if(pGO->IsInWorld())
 			    {
-				    pGO->RemoveFromWorld();
+				    pGO->RemoveFromWorld(true);
 			    }
 			    delete pGO;
             }break;

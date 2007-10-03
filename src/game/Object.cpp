@@ -70,7 +70,7 @@ Object::~Object( )
 
 	if (this->IsInWorld() && m_objectTypeId != TYPEID_ITEM && m_objectTypeId != TYPEID_CONTAINER)
 	{
-		this->RemoveFromWorld();
+		this->RemoveFromWorld(false);
 	}
 
 	// for linux
@@ -934,7 +934,7 @@ void Object::PushToWorld(MapMgr*mgr)
 	OnPushToWorld();
 }
 
-void Object::RemoveFromWorld()
+void Object::RemoveFromWorld(bool free_guid)
 {
 	ASSERT(m_mapMgr);
 	MapMgr * m = m_mapMgr;
@@ -942,7 +942,7 @@ void Object::RemoveFromWorld()
 
 	mSemaphoreTeleport = true;
 
-	m->RemoveObject(this);
+	m->RemoveObject(this, free_guid);
 	
 	// update our event holder
 	event_Relocate();
@@ -1730,8 +1730,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 						WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
 						data << dObj->GetGUID();
 						dObj->SendMessageToSet(&data, false);
-						
-						dObj->RemoveFromWorld();
+						dObj->RemoveFromWorld(true);
 						delete dObj;
 					}
 				}

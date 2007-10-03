@@ -241,12 +241,12 @@ void GameObject::Despawn(uint32 time)
 		pCell->_respawnObjects.insert( ((Object*)this) );
 		sEventMgr.RemoveEvents(this);
 		sEventMgr.AddEvent(m_mapMgr, &MapMgr::EventRespawnGameObject, this, pCell, EVENT_GAMEOBJECT_ITEM_SPAWN, time, 1, 0);
-		Object::RemoveFromWorld();
+		Object::RemoveFromWorld(false);
 		m_respawnCell=pCell;
 	}
 	else
 	{
-		Object::RemoveFromWorld();
+		Object::RemoveFromWorld(true);
 		ExpireAndDelete();
 	}
 }
@@ -632,7 +632,7 @@ void GameObject::_Expire()
 {
 	sEventMgr.RemoveEvents(this);
 	if(IsInWorld())
-		RemoveFromWorld();
+		RemoveFromWorld(true);
 
 	//sEventMgr.AddEvent(World::getSingletonPtr(), &World::DeleteObject, ((Object*)this), EVENT_DELETE_TIMER, 1000, 1);
 	delete this;
@@ -682,10 +682,10 @@ void GameObject::OnRemoveInRangeObject(Object* pObj)
 	}
 }
 
-void GameObject::RemoveFromWorld()
+void GameObject::RemoveFromWorld(bool free_guid)
 {
 	sEventMgr.RemoveEvents(this, EVENT_GAMEOBJECT_TRAP_SEARCH_TARGET);
-	Object::RemoveFromWorld();
+	Object::RemoveFromWorld(free_guid);
 }
 
 bool GameObject::HasLoot()

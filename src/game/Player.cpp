@@ -3189,7 +3189,7 @@ void Player::RemoveFromWorld()
 
 	if(m_tempSummon)
 	{
-		m_tempSummon->RemoveFromWorld(false);
+		m_tempSummon->RemoveFromWorld(false, true);
 		if(m_tempSummon)
 			m_tempSummon->SafeDelete();
 
@@ -3244,7 +3244,7 @@ void Player::RemoveFromWorld()
 			{
 				if(m_SummonedObject->IsInWorld())
 				{
-					m_SummonedObject->RemoveFromWorld();
+					m_SummonedObject->RemoveFromWorld(true);
 				}
 				delete m_SummonedObject;
 			}
@@ -3256,7 +3256,7 @@ void Player::RemoveFromWorld()
 	{
 		clearAttackers(true);
 		RemoveItemsFromWorld();
-		Unit::RemoveFromWorld();
+		Unit::RemoveFromWorld(false);
 	}
 
 	sWorld.mInWorldPlayerCount--;
@@ -4794,7 +4794,7 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 	//}
 	if(m_tempSummon == pObj)
 	{
-		m_tempSummon->RemoveFromWorld(false);
+		m_tempSummon->RemoveFromWorld(false, true);
 		if(m_tempSummon)
 			m_tempSummon->SafeDelete();
 
@@ -6800,7 +6800,7 @@ void Player::EndDuel(uint8 WinCondition)
 		//original code....for some reason we set timer to respawn arbiter
 		// this is wrong i guess...reenable if i'm wrong
 
-		arbiter->RemoveFromWorld();
+		arbiter->RemoveFromWorld(true);
 		delete arbiter;
 	}
 

@@ -109,14 +109,16 @@ void MapCell::RemoveObjects()
 	/* delete objects in pending respawn state */
 	for(itr = _respawnObjects.begin(); itr != _respawnObjects.end(); ++itr)
 	{
-		switch((*itr)->GetTypeId())
+		switch((*itr)->GetGUIDHigh())
 		{
-		case TYPEID_UNIT: {
+		case HIGHGUID_UNIT: {
+			_mapmgr->_reusable_guids_creature.push_back((*itr)->GetGUIDLow());
 			((Creature*)*itr)->m_respawnCell=NULL;
 			delete ((Creature*)*itr);
 			}break;
 
-		case TYPEID_GAMEOBJECT: {
+		case HIGHGUID_GAMEOBJECT: {
+			_mapmgr->_reusable_guids_gameobject.push_back((*itr)->GetGUIDLow());
 			((GameObject*)*itr)->m_respawnCell=NULL;
 			delete ((GameObject*)*itr);
 			}break;
@@ -143,7 +145,7 @@ void MapCell::RemoveObjects()
 			obj->Deactivate(_mapmgr);
 
 		if (obj->IsInWorld())
-			obj->RemoveFromWorld();
+			obj->RemoveFromWorld(true);
 
 		if (obj->GetTypeId() == TYPEID_UNIT)
 		{

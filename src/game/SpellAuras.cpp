@@ -1274,7 +1274,7 @@ void Aura::SpellAuraDummy(bool apply)
 
 				if(summon)
 				{
-					summon->RemoveFromWorld(false);
+					summon->RemoveFromWorld(false,true);
 					delete summon;
 				}
 				m_target->m_noInterrupt--;
@@ -1316,7 +1316,7 @@ void Aura::SpellAuraDummy(bool apply)
 				Creature *summon = m_target->GetMapMgr()->GetCreature(m_target->GetUInt32Value(UNIT_FIELD_SUMMON));
 				if(summon)
 				{
-					summon->RemoveFromWorld(false);
+					summon->RemoveFromWorld(false,true);
 					delete summon;
 				}
 				m_target->SetUInt64Value(PLAYER_FARSIGHT,0);
@@ -1533,7 +1533,7 @@ void Aura::SpellAuraDummy(bool apply)
 				plr->SetUInt64Value(PLAYER_FARSIGHT, 0);
 				if(farsight)
 				{
-					farsight->RemoveFromWorld(false);
+					farsight->RemoveFromWorld(false,true);
 					delete farsight;
 				}
 			}

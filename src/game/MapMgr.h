@@ -93,6 +93,13 @@ public:
 	GameObject ** m_GOStorage;
 	__inline GameObject * CreateGameObject()
 	{
+		if(_reusable_guids_gameobject.size())
+		{
+			uint32 guid = _reusable_guids_gameobject.front();
+			_reusable_guids_gameobject.pop_front();
+			return new GameObject(HIGHGUID_GAMEOBJECT, guid);
+		}
+
 		if(++m_GOHighGuid  >= m_GOArraySize)
 		{
 			// Reallocate array with larger size.
@@ -123,6 +130,13 @@ public:
 	Creature ** m_CreatureStorage;
 	__inline Creature * CreateCreature()
 	{
+		if(_reusable_guids_creature.size())
+		{
+			uint32 guid = _reusable_guids_creature.front();
+			_reusable_guids_creature.pop_front();
+			return new Creature(HIGHGUID_UNIT, guid);
+		}
+
 		if(++m_CreatureHighGuid  >= m_CreatureArraySize)
 		{
 			// Reallocate array with larger size.
@@ -210,7 +224,7 @@ public:
 
 	void PushObject(Object *obj);
 	void PushStaticObject(Object * obj);
-	void RemoveObject(Object *obj);
+	void RemoveObject(Object *obj, bool free_guid);
 	void ChangeObjectLocation(Object *obj); // update inrange lists
 	void ChangeFarsightLocation(Player *plr, Creature *farsight);
 
@@ -326,6 +340,8 @@ public:
 
 	Creature * GetSqlIdCreature(uint32 sqlid);
 	GameObject * GetSqlIdGameObject(uint32 sqlid);
+	deque<uint32> _reusable_guids_gameobject;
+	deque<uint32> _reusable_guids_creature;
 };
 
 #endif

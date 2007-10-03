@@ -216,7 +216,7 @@ void DynamicObject::UpdateTargets()
 void DynamicObject::Remove()
 {
 	if(IsInWorld())
-		RemoveFromWorld();
+		RemoveFromWorld(true);
 	delete this;
 }
 

@@ -210,7 +210,7 @@ bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 			unit->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly)->CreatureSpawns.erase(unit->m_spawn);
 		}
 		
-		unit->RemoveFromWorld(false);
+		unit->RemoveFromWorld(false,true);
 	}
 	unit->DeleteFromDB();
 

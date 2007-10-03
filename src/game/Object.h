@@ -113,7 +113,7 @@ public:
 	virtual void AddToWorld();
 	void PushToWorld(MapMgr*);
 	virtual void OnPushToWorld() { }
-	virtual void RemoveFromWorld();
+	virtual void RemoveFromWorld(bool free_guid);
 
 	// guid always comes first
 #ifndef USING_BIG_ENDIAN
@@ -455,7 +455,7 @@ public:
 	void Delete()
 	{
 		if(IsInWorld())
-			RemoveFromWorld();
+			RemoveFromWorld(true);
 		delete this;
 	}
 

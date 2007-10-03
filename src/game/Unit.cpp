@@ -3630,7 +3630,7 @@ void Unit::EventSummonPetExpire()
 		}
 		else
 		{
-			summonPet->RemoveFromWorld(false);
+			summonPet->RemoveFromWorld(false, true);
 			delete summonPet;
 			summonPet = NULL;
 		}
@@ -3830,11 +3830,11 @@ void Unit::OnPushToWorld()
 	}
 }
 
-void Unit::RemoveFromWorld()
+void Unit::RemoveFromWorld(bool free_guid)
 {
 	if(critterPet != 0)
 	{
-		critterPet->RemoveFromWorld(false);
+		critterPet->RemoveFromWorld(false, true);
 		delete critterPet;
 		critterPet = 0;
 	}
@@ -3854,7 +3854,7 @@ void Unit::RemoveFromWorld()
 		}
 	}
 
-	Object::RemoveFromWorld();
+	Object::RemoveFromWorld(free_guid);
 
 
 	for(uint32 x = 0; x < MAX_AURAS+MAX_PASSIVE_AURAS; ++x)

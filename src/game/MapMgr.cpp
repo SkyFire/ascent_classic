@@ -106,7 +106,7 @@ MapMgr::~MapMgr()
 	for(set<Object*>::iterator itr = _mapWideStaticObjects.begin(); itr != _mapWideStaticObjects.end(); ++itr)
 	{
 		if((*itr)->IsInWorld())
-			(*itr)->RemoveFromWorld();
+			(*itr)->RemoveFromWorld(false);
 		delete (*itr);
 	}
 
@@ -123,7 +123,7 @@ MapMgr::~MapMgr()
 		++itr;
 
 		if(pCorpse->IsInWorld())
-			pCorpse->RemoveFromWorld();
+			pCorpse->RemoveFromWorld(false);
 
 		delete pCorpse;
 	}
@@ -279,7 +279,7 @@ void MapMgr::PushObject(Object *obj)
 	switch(UINT32_LOPART(obj->GetGUIDHigh()))
 	{
 		case HIGHGUID_UNIT:
-			///ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
+			ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
 			m_CreatureStorage[obj->GetGUIDLow()] = (Creature*)obj;
 			if(((Creature*)obj)->m_spawn != NULL)
 			{
@@ -364,7 +364,7 @@ void MapMgr::PushStaticObject(Object *obj)
 
 #define OPTIONAL_IN_RANGE_SETS
 
-void MapMgr::RemoveObject(Object *obj)
+void MapMgr::RemoveObject(Object *obj, bool free_guid)
 {
 	/////////////
 	// Assertions
@@ -396,6 +396,10 @@ void MapMgr::RemoveObject(Object *obj)
 			{
 				_sqlids_creatures.erase(((Creature*)obj)->m_spawn->id);
 			}
+
+			if(free_guid)
+				_reusable_guids_creature.push_back(obj->GetGUIDLow());
+
 			  break;
 
 		case HIGHGUID_PET:
@@ -411,8 +415,12 @@ void MapMgr::RemoveObject(Object *obj)
 			m_GOStorage[obj->GetGUIDLow()] = 0;
 			if(((GameObject*)obj)->m_spawn != NULL)
 			{
-				_sqlids_creatures.erase(((GameObject*)obj)->m_spawn->id);
+				_sqlids_gameobjects.erase(((GameObject*)obj)->m_spawn->id);
 			}
+
+			if(free_guid)
+				_reusable_guids_gameobject.push_back(obj->GetGUIDLow());
+
 			break;
 	}
 
@@ -1646,7 +1654,7 @@ void MapMgr::RespawnMapMgr()
 	for(uint32 x=1;x<m_CreatureArraySize;x++)
 	if(m_CreatureStorage[x])//have creature
 	{
-		m_CreatureStorage[x]->RemoveFromWorld(false);
+		m_CreatureStorage[x]->RemoveFromWorld(false,true);
 		delete m_CreatureStorage[x];
 		m_CreatureStorage[x] = NULL;
 	}
@@ -1658,7 +1666,7 @@ void MapMgr::RespawnMapMgr()
 	for(uint32 x=1;x<m_GOArraySize;x++)
 	if(m_GOStorage[x])//have creature
 	{
-		m_GOStorage[x]->RemoveFromWorld();
+		m_GOStorage[x]->RemoveFromWorld(true);
 		delete m_GOStorage[x];
 		m_GOStorage[x] = NULL;
 	}

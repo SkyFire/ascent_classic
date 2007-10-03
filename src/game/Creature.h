@@ -236,7 +236,7 @@ public:
 	void Load(CreatureProto * proto_, float x, float y, float z);
 
 	void AddToWorld();
-	void RemoveFromWorld(bool addrespawnevent);
+	void RemoveFromWorld(bool addrespawnevent, bool free_guid);
 
 	/// Creation
 	void Create ( const char* creature_name, uint32 mapid, float x, float y, float z, float ang);	

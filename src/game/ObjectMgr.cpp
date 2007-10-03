@@ -1274,7 +1274,7 @@ void ObjectMgr::CorpseCollectorUnload()
 		Corpse * c =itr->second;
 		++itr;
 		if(c->IsInWorld())
-			c->RemoveFromWorld();
+			c->RemoveFromWorld(false);
 		delete c;
 	}
 	m_corpses.clear();

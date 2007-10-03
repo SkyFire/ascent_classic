@@ -892,7 +892,7 @@ void Spell::cancel()
 					DynamicObject* dynObj=m_caster->GetMapMgr()->GetDynamicObject(m_caster->GetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT));
 					if(dynObj)
 					{
-						dynObj->RemoveFromWorld();
+						dynObj->RemoveFromWorld(true);
 						delete dynObj;
 					}
 				}
@@ -900,7 +900,7 @@ void Spell::cancel()
 				if(p_caster->GetSummonedObject())
 				{
 					if(p_caster->GetSummonedObject()->IsInWorld())
-						p_caster->GetSummonedObject()->RemoveFromWorld();
+						p_caster->GetSummonedObject()->RemoveFromWorld(true);
 					// for now..
 					ASSERT(p_caster->GetSummonedObject()->GetTypeId() == TYPEID_GAMEOBJECT);
 					delete ((GameObject*)(p_caster->GetSummonedObject()));
@@ -1819,7 +1819,7 @@ void Spell::SendChannelUpdate(uint32 time)
 			DynamicObject* dynObj=u_caster->GetMapMgr()->GetDynamicObject(u_caster->GetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT));
 			if(dynObj)
 			{
-				dynObj->RemoveFromWorld();
+				dynObj->RemoveFromWorld(true);
 				delete dynObj;
 			}
 			u_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT,0);

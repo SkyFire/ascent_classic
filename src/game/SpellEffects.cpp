@@ -218,7 +218,7 @@ void Spell::SpellEffectInstantKill(uint32 i)
 			if(m_caster->GetTypeId() != TYPEID_UNIT)
 				break;
 			Unit *caster = m_caster->GetMapMgr()->GetPlayer(m_caster->GetUInt64Value(UNIT_FIELD_SUMMONEDBY));
-			caster->summonPet->RemoveFromWorld(false);
+			caster->summonPet->RemoveFromWorld(false,true);
 			delete caster->summonPet;
 			caster->summonPet = NULL;
 		}break;
@@ -737,7 +737,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			//For 1 min
 			if(u_caster->summonPet)
 			{
-				u_caster->summonPet->RemoveFromWorld(false);
+				u_caster->summonPet->RemoveFromWorld(false,true);
 				delete u_caster->summonPet;
 				u_caster->summonPet = NULL;
 			}			
@@ -1697,7 +1697,7 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 
 	if(p_caster->m_tempSummon)
 	{
-		p_caster->m_tempSummon->RemoveFromWorld(false);
+		p_caster->m_tempSummon->RemoveFromWorld(false,true);
 		if(p_caster->m_tempSummon)
 			p_caster->m_tempSummon->SafeDelete();
 
@@ -3336,7 +3336,7 @@ void Spell::SpellEffectSanctuary(uint32 i) // Stop all attacks made to you
 							//WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
 							//data << un->GetGUID();
 							//un->SendMessageToSet(&data,true);
-							dObj->RemoveFromWorld();
+							dObj->RemoveFromWorld(true);
 							delete dObj;
 						}
 					}
@@ -3747,7 +3747,7 @@ void Spell::SpellEffectSummonCritter(uint32 i)
 
 	if(u_caster->critterPet)
 	{
-		u_caster->critterPet->RemoveFromWorld(false);
+		u_caster->critterPet->RemoveFromWorld(false,true);
 		delete u_caster->critterPet;
 		u_caster->critterPet = NULL;
 		return;
@@ -3898,7 +3898,7 @@ void Spell::SpellEffectSummonObjectSlot(uint32 i)
 		else
 		{
 			if( GoSummon->IsInWorld() )
-				GoSummon->RemoveFromWorld();
+				GoSummon->RemoveFromWorld(true);
 			delete GoSummon;
 		}
 	}
