@@ -1818,7 +1818,7 @@ void MapMgr::SendChatMessageToCellPlayers(Object * obj, WorldPacket * packet, ui
 					if((*iter)->IsPlayer())
 					{
 						//static_cast<Player*>(*iter)->GetSession()->SendPacket(packet);
-						static_cast<Player*>(*iter)->GetSession()->SendChatPacket(packet, langpos, 1, originator);
+						static_cast<Player*>(*iter)->GetSession()->SendChatPacket(packet, langpos, lang, originator);
 					}
 				}
 			}
