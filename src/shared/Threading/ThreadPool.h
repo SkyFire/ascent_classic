@@ -153,6 +153,9 @@ public:
 
 	// kills x free threads
 	void KillFreeThreads(uint32 count);
+
+	// resets the gobble counter
+	inline void Gobble() { _threadsEaten=0; }
 };
 
 extern CThreadPool ThreadPool;

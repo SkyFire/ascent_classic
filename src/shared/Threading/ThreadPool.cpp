@@ -133,6 +133,7 @@ void CThreadPool::IntegrityCheck()
 			StartThread(NULL);
 
 		_threadsEaten = new_threads;
+		Log.Debug("ThreadPool", "IntegrityCheck: (gobbled < 0) Spawning %u threads.", new_threads);
 	}
 	else if(gobbled <= THREAD_RESERVE)
 	{
@@ -143,6 +144,7 @@ void CThreadPool::IntegrityCheck()
 			StartThread(NULL);
 
 		_threadsEaten = new_threads;
+		Log.Debug("ThreadPool", "IntegrityCheck: (gobbled <= 5) Spawning %u threads.", new_threads);
 	}
 	else if(gobbled > THREAD_RESERVE)
 	{
@@ -151,10 +153,12 @@ void CThreadPool::IntegrityCheck()
 		uint32 kill_count = (gobbled - THREAD_RESERVE);
 		KillFreeThreads(kill_count);
 		_threadsEaten -= kill_count;
+		Log.Debug("ThreadPool", "IntegrityCheck: (gobbled > 5) Killing %u threads.", kill_count);
 	}
 	else
 	{
 		// perfect! we have the ideal number of free threads.
+		Log.Debug("ThreadPool", "IntegrityCheck: Perfect!");
 	}
 
 	_threadsExitedSinceLastCheck = 0;
@@ -193,7 +197,7 @@ void CThreadPool::Shutdown()
 	size_t tcount = m_activeThreads.size() + m_freeThreads.size();		// exit all
 	Log.Debug("ThreadPool", "Shutting down %u threads.", tcount);
 	KillFreeThreads((uint32)m_freeThreads.size());
-	_threadsToExit += m_activeThreads.size();
+	_threadsToExit += (uint32)m_activeThreads.size();
 
 	for(ThreadSet::iterator itr = m_activeThreads.begin(); itr != m_activeThreads.end(); ++itr)
 	{

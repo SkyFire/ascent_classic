@@ -350,6 +350,9 @@ bool Master::Run(int argc, char ** argv)
 	HANDLE hThread = GetCurrentThread();
 #endif
 
+	uint32 loopcounter=0;
+	ThreadPool.Gobble();
+
 #ifndef CLUSTERING
 	/* Connect to realmlist servers / logon servers */
 	new LogonCommHandler();
@@ -367,6 +370,11 @@ bool Master::Run(int argc, char ** argv)
 	{
 		start = now();
 		diff = start - last_time;
+		if(! ((++loopcounter) % 3600) )		// 3mins
+		{
+			ThreadPool.ShowStats();
+			ThreadPool.IntegrityCheck();
+		}
 
 #ifndef CLUSTERING
 		sLogonCommHandler.UpdateSockets();
