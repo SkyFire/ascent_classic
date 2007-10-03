@@ -1,13 +1,9 @@
 Spells:
 	Mind Control - When used on anyone besides an NPC, the mind controlled victim is unusable.
 
-Improved Power Word: Fortitude - is only visual.
-
 Absolution - Does not work at all.
 
 Mental Agility - Does not work at all.
-
-Force of Will - Does not work either.
 
 Focused Power - Does not work.
 

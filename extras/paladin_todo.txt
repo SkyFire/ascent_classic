@@ -5,9 +5,3 @@ Divine protection - Doesn't work.
 Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
 blessing of freedom
-
-=====TALENTS=====
-Sanctity Aura - Retribution - Doesn't work
-Toughness - Protection - Doesn't add the armor.
-
-Hammer of Wrath (paladin) - does not trigger in pvp
