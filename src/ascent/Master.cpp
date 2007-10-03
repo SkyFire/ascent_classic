@@ -55,6 +55,7 @@ SERVER_DECL Database* Database_World;
 SessionLogWriter * GMCommand_Log;
 SessionLogWriter * Anticheat_Log;
 SessionLogWriter * Player_Log;
+extern DayWatcherThread * dw;
 
 void Master::_OnSignal(int s)
 {
@@ -209,8 +210,7 @@ bool Master::Run(int argc, char ** argv)
 	srand(seed);
 	Log.Success("MTRand", "Initialized Random Number Generators.");
 
-	new ThreadMgr;
-	Log.Success("ThreadMgr", "Started.");
+	ThreadPool.Startup();
 	uint32 LoadingTime = getMSTime();
 
 	Log.Notice("Config", "Loading Config Files...\n");
@@ -309,14 +309,11 @@ bool Master::Run(int argc, char ** argv)
 	
 	_HookSignals();
 
-	launch_thread(new CConsoleThread);
+	ThreadPool.ExecuteTask(new CConsoleThread);
 
 	uint32 realCurrTime, realPrevTime;
 	realCurrTime = realPrevTime = getMSTime();
 
-	// initialize thread system
-	sThreadMgr.Initialize();
-	
 	// Socket loop!
 	uint32 start;
 	uint32 diff;
@@ -332,8 +329,6 @@ bool Master::Run(int argc, char ** argv)
 
 	sScriptMgr.LoadScripts();
 
-
-	sLog.outString("Threading system initialized, currently %u threads are active.", sThreadMgr.GetThreadCount());	
 
 	LoadingTime = getMSTime() - LoadingTime;
 	sLog.outString ("\nServer is ready for connections. Startup time: %ums\n", LoadingTime );
@@ -443,6 +438,7 @@ bool Master::Run(int argc, char ** argv)
 	}
 	_UnhookSignals();
 
+	ThreadPool.ShowStats();
 	/* Shut down console system */
 	sCConsole.Kill();
 
@@ -466,10 +462,12 @@ bool Master::Run(int argc, char ** argv)
 	CharacterDatabase.EndThreads();
 	WorldDatabase.EndThreads();
 
-	sThreadMgr.RemoveThread(Database_Character);
-	sThreadMgr.RemoveThread(Database_World);
-
 	sLog.outString("All pending database operations cleared.\n");
+	Log.Notice("DayWatcherThread", "Exiting...");
+	dw->terminate();
+	dw = NULL;
+
+	ThreadPool.Shutdown();
 
 	sWorld.SaveAllPlayers();
 	sLog.outString("");
@@ -623,7 +621,7 @@ void OnCrash(bool Terminate)
 
 	try
 	{
-		if(World::getSingletonPtr() != 0 && ThreadMgr::getSingletonPtr() != 0)
+		if(World::getSingletonPtr() != 0 )
 		{
 			sLog.outString("Waiting for all database queries to finish...");
 			WorldDatabase.EndThreads();

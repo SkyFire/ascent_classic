@@ -26,6 +26,7 @@ public:
 	ThreadBase() : delete_after_use(true) {}
 	virtual ~ThreadBase() {}
 	virtual void run() = 0;
+	virtual void OnShutdown() {}
 	void join();
 	bool delete_after_use;
 #ifdef WIN32
@@ -34,64 +35,6 @@ public:
 	pthread_t THREAD_HANDLE;
 #endif
 };
-
-#ifdef WIN32
-
-#include <process.h>
-
-static unsigned int __stdcall thread_func(void * args)
-{
-	ThreadBase * ptr = (ThreadBase*)args;
-	bool delete_it = ptr->delete_after_use;
-	ptr->run();
-
-	// delete the thread to call the destructor, our threads remove themselves here.
-	if(delete_it)
-		delete ptr;
-
-	return 0;
-}
-
-// Use _beginthreadex to start the thread (MT runtime lib needed)
-inline void launch_thread(ThreadBase * thread)
-{
-	uintptr_t ptr = _beginthreadex(0, 0, &thread_func, (void*)thread, 0, 0);
-	if(ptr != -1L)
-		thread->THREAD_HANDLE = (HANDLE)ptr;
-}
-
-inline void ThreadBase::join()
-{
-	WaitForSingleObject(THREAD_HANDLE,INFINITE);
-}
-
-#else
-
-static void * thread_func(void * args)
-{
-	ThreadBase * ptr = (ThreadBase*)args;
-	bool delete_it = ptr->delete_after_use;
-	ptr->run();
-
-	// delete the thread to call the destructor, our threads remove themselves here.
-	if(delete_it)
-		delete ptr;
-	
-	return 0;
-}
-
-// Use pthread_create to start the thread
-inline void launch_thread(ThreadBase * thread)
-{
-	pthread_create(&thread->THREAD_HANDLE, 0, thread_func, (void*)thread);
-}
-
-inline void ThreadBase::join()
-{
-	pthread_join(this->THREAD_HANDLE, NULL);
-}
-
-#endif
 
 #endif
 

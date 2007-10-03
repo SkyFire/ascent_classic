@@ -23,7 +23,6 @@
 #include "Common.h"
 #include "NameTables.h"
 #include "CThreads.h"
-#include "ThreadMgr.h"
 
 /* Name tables */
 NameTableEntry g_threadStates[] = {
@@ -57,24 +56,19 @@ CThread::CThread() : ThreadBase()
 {
 	ThreadState = THREADSTATE_AWAITING;
 	ThreadType  = THREADTYPE_UNASSIGNED;
-	ThreadId	= sThreadMgr.GenerateThreadId();
 	start_time  = time(NULL);
-	sThreadMgr.AddThread(this);
 }
 
 CThread::~CThread()
 {
-	if(ThreadType == THREADTYPE_CONSOLEINTERFACE || !delete_after_use)
-		return; // we're deleted manually
-	sThreadMgr.RemoveThread(this);
+	
 }
 
 void CThread::run()
 {
 
 }
-
-void CThread::manual_start()
+void CThread::OnShutdown()
 {
-	launch_thread(this);
+	SetThreadState(THREADSTATE_TERMINATE);
 }

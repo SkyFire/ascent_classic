@@ -130,7 +130,6 @@
 #include "ObjectMgr.h"
 
 #include "CThreads.h"
-#include "ThreadMgr.h"
 #include "ScriptMgr.h"
 
 #include "Channel.h"

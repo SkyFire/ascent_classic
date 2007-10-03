@@ -196,7 +196,7 @@ MapMgr * Map::CreateMapMgrInstance(uint32 instanceid)
 	ASSERT(_instances.find(instanceId) == _instances.end());
 	_instances[instanceId]=mapMgr;
 	listmutex.Release();
-	launch_thread(mapMgr);
+	ThreadPool.ExecuteTask(mapMgr);
 
 	return mapMgr;
 }

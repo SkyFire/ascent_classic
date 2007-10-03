@@ -426,10 +426,6 @@
 						/>
 					</FileConfiguration>
 				</File>
-				<File
-					RelativePath="..\..\src\realmserver\RealmlistThreadMgr.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter

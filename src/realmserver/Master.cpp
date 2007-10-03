@@ -18,7 +18,6 @@
  */
 
 #include "RStdAfx.h"
-#include "../game/ThreadMgr.h"
 #include "../shared/svn_revision.h"
 
 Database * Database_Character;
@@ -27,8 +26,6 @@ CircularQueue<uint32,30> last_spells;
 
 int main(int argc, char *argv[])
 {
-	new ThreadMgr;
-
 	sLog.Init(-1, -1);
 	sLog.outString("TexT");
 	/* Initialize global timestamp */
@@ -47,6 +44,7 @@ int main(int argc, char *argv[])
 
 	new ClusterMgr;
 	new ClientMgr;
+	ThreadPool.Startup();
 	Log.Line();
 	Log.Notice("Database", "Connecting to database...");
 	if(Database_Character->Initialize("localhost", 3306, "moocow", "moo", "antrix-character", 1, 1000) &&

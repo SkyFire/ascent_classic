@@ -134,7 +134,6 @@ void DayWatcherThread::run()
 	load_settings();
 	set_tm_pointers();
 	m_busy = false;
-	sThreadMgr.RemoveThread(this);
 #ifdef WIN32
 	m_abortEvent = CreateEvent(NULL, NULL, FALSE, NULL);
 #endif

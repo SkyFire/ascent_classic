@@ -32,7 +32,7 @@ void SocketMgr::SpawnWorkerThreads()
 
 	printf("IOCP: Spawning %u worker threads.\n", threadcount);
 	for(long x = 0; x < threadcount; ++x)
-		launch_thread(new SocketWorkerThread());
+		ThreadPool.ExecuteTask(new SocketWorkerThread());
 }
 
 void SocketWorkerThread::run()

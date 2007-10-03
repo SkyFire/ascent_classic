@@ -64,10 +64,11 @@ bool Database::Initialize(const char* Hostname, unsigned int Port, const char* U
 	}
    
 	// Spawn Database thread
-	launch_thread(this);
+	ThreadPool.ExecuteTask(this);
 
 	// launch the query thread
-	launch_thread(new QueryThread(this));
+	qt = new QueryThread(this);
+	ThreadPool.ExecuteTask(qt);
 	
 	return true;
 }
@@ -480,7 +481,7 @@ AsyncQuery::~AsyncQuery()
 void Database::EndThreads()
 {
 	SetThreadState(THREADSTATE_TERMINATE);
-	while(ThreadRunning)
+	while(ThreadRunning || qt)
 	{
 		if(qqueries_queue.get_size() == 0)
 			qqueries_queue.GetCond().Broadcast();

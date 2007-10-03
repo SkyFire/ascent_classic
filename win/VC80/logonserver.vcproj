@@ -353,10 +353,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath="..\..\src\logonserver\RealmlistThreadMgr.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Caching"

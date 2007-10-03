@@ -1451,8 +1451,6 @@ void MapMgr::Do()
 		}
 	}
 
-	sThreadMgr.RemoveThread(this);
-
 	if(m_battleground)
 		BattlegroundManager.DeleteBattleground(m_battleground);
 

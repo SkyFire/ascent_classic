@@ -20,7 +20,7 @@
 #include "StdAfx.h"
 
 initialiseSingleton( World );
-static DayWatcherThread * dw = NULL;
+DayWatcherThread * dw = NULL;
 CircularQueue<uint32, 30> last_spells;
 FastMutex last_spell_lock;
 void pushLastSpell(uint32 spellid)
@@ -64,10 +64,6 @@ World::World()
 
 World::~World()
 {
-	Log.Notice("DayWatcherThread", "Joining...");
-	dw->terminate();
-	dw = NULL;
-
 	sLog.outString("  Saving players to DB...");
 	for(SessionMap::iterator i=m_sessions.begin();i!=m_sessions.end();i++)
 	{
@@ -108,8 +104,8 @@ World::~World()
 	sLog.outString("Removing all objects and deleting WorldCreator...\n");
 	delete WorldCreator::getSingletonPtr();
 
-	sLog.outString("Deleting Thread Manager..");
-	delete ThreadMgr::getSingletonPtr();
+	//sLog.outString("Deleting Thread Manager..");
+	//delete ThreadMgr::getSingletonPtr();
 
 	sLog.outString("Deleting Instance Saving Management...");
 	delete InstanceSavingManagement::getSingletonPtr();
@@ -226,6 +222,12 @@ void BasicTaskExecutor::run()
 
 	// Execute the task in our new context.
 	cb->execute();
+#ifdef WIN32
+	::SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
+#else
+	param.sched_priority = 5;
+	pthread_setschedparam(pthread_self(), SCHED_OTHER, &param);
+#endif
 }
 
 void CreateDummySpell(uint32 id)
@@ -2018,13 +2020,13 @@ bool World::SetInitialWorldSettings()
 		sWorldCreator.GetInstance(530, uint32(0))->LoadAllCells();
 	}
 
-	launch_thread(new WorldRunnable);
+	ThreadPool.ExecuteTask(new WorldRunnable);
 	if(Config.MainConfig.GetBoolDefault("Startup", "BackgroundLootLoading", true))
 	{
 		Log.Notice("World", "Backgrounding loot loading...");
 
 		// loot background loading in a lower priority thread.
-		launch_thread(new BasicTaskExecutor(new CallbackP0<LootMgr>(LootMgr::getSingletonPtr(), &LootMgr::LoadLoot), 
+		ThreadPool.ExecuteTask(new BasicTaskExecutor(new CallbackP0<LootMgr>(LootMgr::getSingletonPtr(), &LootMgr::LoadLoot), 
 			BTE_PRIORITY_LOW));
 	}
 	else
@@ -2037,7 +2039,7 @@ bool World::SetInitialWorldSettings()
 	new CBattlegroundManager;
 
 	dw = new DayWatcherThread();
-	launch_thread(dw);
+	ThreadPool.ExecuteTask(dw);
 	return true;
 }
 
@@ -2383,8 +2385,6 @@ void World::BroadcastExtendedMessage(WorldSession * self, const char* str, ...)
 
 void World::ShutdownClasses()
 {
-	sThreadMgr.Shutdown();
-
 	sLog.outString("Deleting Addon Manager...");
 	sAddonMgr.SaveToDB();
 	delete AddonMgr::getSingletonPtr();
@@ -2487,7 +2487,7 @@ void TaskList::spawn()
 	Log.Line();
 
 	for(uint32 x = 0; x < threadcount; ++x)
-		launch_thread(new TaskExecutor(this));
+		ThreadPool.ExecuteTask(new TaskExecutor(this));
 }
 
 void TaskList::wait()

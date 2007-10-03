@@ -48,7 +48,6 @@
 #include "LogonOpcodes.h"
 #include "../logonserver/Main.h"
 #include "../game/NameTables.h"
-#include "../game/ThreadMgr.h"
 #include "AccountCache.h"
 #include "PeriodicFunctionCall_Thread.h"
 #include "../logonserver/AuthSocket.h"

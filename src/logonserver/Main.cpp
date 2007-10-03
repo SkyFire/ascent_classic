@@ -221,14 +221,11 @@ void LogonServer::Run(int argc, char ** argv)
 		return;
 	}
 	Log.Notice("ThreadMgr", "Starting...");
-	new ThreadMgr;
-	ThreadMgr::getSingleton( ).Initialize();
+	ThreadPool.Startup();
    
 	if(!startdb())
 		return;
 
-
-	
 	Log.Notice("AccountMgr", "Starting...");
 	new AccountMgr;
 	new IPBanner;
@@ -248,7 +245,7 @@ void LogonServer::Run(int argc, char ** argv)
 	//SpawnPeriodicCallThread(AccountMgr, AccountMgr::getSingletonPtr(), &AccountMgr::ReloadAccountsCallback, time);
 	PeriodicFunctionCaller<AccountMgr> * pfc = new PeriodicFunctionCaller<AccountMgr>(AccountMgr::getSingletonPtr(),
 		&AccountMgr::ReloadAccountsCallback, time);
-	launch_thread(pfc);
+	ThreadPool.ExecuteTask(pfc);
 
 	// Load conf settings..
 	uint32 cport = Config.MainConfig.GetIntDefault("Listen", "RealmListPort", 3724);
@@ -265,7 +262,7 @@ void LogonServer::Run(int argc, char ** argv)
 	hash.Finalize();
 	memcpy(sql_hash, hash.GetDigest(), 20);
 	
-	launch_thread(new LogonConsoleThread);
+	ThreadPool.ExecuteTask(new LogonConsoleThread);
 
 	new SocketMgr;
 	new SocketGarbageCollector;
@@ -320,6 +317,7 @@ void LogonServer::Run(int argc, char ** argv)
 	}
 
 	sLog.outString("Shutting down...");
+	ThreadPool.ShowStats();
 	pfc->kill();
 	delete pfc;
 
@@ -336,19 +334,17 @@ void LogonServer::Run(int argc, char ** argv)
 
 	// kill db
 	sLog.outString("Waiting for database to close..");
-	sThreadMgr.RemoveThread(sLogonSQL);
 	sLogonSQL->EndThreads();
 	sLogonSQL->Shutdown();
 	delete sLogonSQL;
 
-	sThreadMgr.Shutdown();
+	ThreadPool.Shutdown();
 
 	// delete pid file
 	remove("logonserver.pid");
 
 	delete AccountMgr::getSingletonPtr();
 	delete InformationCore::getSingletonPtr();
-	delete ThreadMgr::getSingletonPtr();
 	delete IPBanner::getSingletonPtr();
 	delete SocketMgr::getSingletonPtr();
 	delete SocketGarbageCollector::getSingletonPtr();

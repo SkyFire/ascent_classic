@@ -220,8 +220,7 @@ CConsoleThread::CConsoleThread()
 
 void CConsole::TranslateThreads(char* str)
 {
-	std::string threads = sThreadMgr.ShowStatus();
-	printf(threads.c_str());
+	ThreadPool.ShowStats();
 }
 
 CConsoleThread::~CConsoleThread()

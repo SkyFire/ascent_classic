@@ -389,12 +389,6 @@
 				RelativePath="..\..\src\game\CThreads.h">
 			</File>
 			<File
-				RelativePath="..\..\src\game\ThreadMgr.cpp">
-			</File>
-			<File
-				RelativePath="..\..\src\game\ThreadMgr.h">
-			</File>
-			<File
 				RelativePath="..\..\src\game\WorldRunnable.cpp">
 			</File>
 			<File

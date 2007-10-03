@@ -287,7 +287,7 @@ bool ChatHandler::HandleInfoCommand(const char* args, WorldSession *m_session)
 		g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
 	GreenSystemMessage(m_session, "Server Uptime: |r%s", sWorld.GetUptimeString().c_str());
 	GreenSystemMessage(m_session, "Current Players: |r%d (%d GMs, %d queued)", clientsNum, gm,  0);
-	GreenSystemMessage(m_session, "Thread Count: |r%u", sThreadMgr.GetThreadCount());
+	//GreenSystemMessage(m_session, "Thread Count: |r%u", ThreadPool.GetThreadCount());
 	GreenSystemMessage(m_session, "Average Latency: |r%.3fms", (float)((float)avg / (float)count));
 	GreenSystemMessage(m_session, "SQL Query Cache Size (World): |r%u queries delayed", WorldDatabase.GetQueueSize());
 	GreenSystemMessage(m_session, "SQL Query Cache Size (Character): |r%u queries delayed", CharacterDatabase.GetQueueSize());

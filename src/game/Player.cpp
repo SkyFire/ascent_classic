@@ -2888,7 +2888,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 
 	OnlineTime	= time(NULL);
 	if(GetGuildId())
-		SetUInt32Value(PLAYER_GUILD_TIMESTAMP, time(NULL));
+		SetUInt32Value(PLAYER_GUILD_TIMESTAMP, UNIXTIME);
 
 #undef get_next_field
 
@@ -2918,8 +2918,6 @@ int Player::GetMaxLearnedSpellLevel(uint32 spell)
 	{
 		//get hash name for this spell
 		SpellEntry *spinfo2 = dbcSpell.LookupEntry(*iter);
-		if(!spinfo2)
-			return -1; //nasty error here. Very impossible to happen (memory corruption or something)
 		if(spinfo2->NameHash == spinfo->NameHash)
 			if(max_level< (int) spinfo2->spellLevel)
 				max_level = spinfo2->spellLevel;
@@ -3178,11 +3176,7 @@ void Player::RemoveFromWorld()
 		{
 			if(m_SummonedObject->GetTypeId() == TYPEID_PLAYER)
 			{
-				OutputCrashLogLine("SummonedObject = Player!");
-#ifdef WIN32
-				CStackWalker ws;
-				ws.ShowCallstack();
-#endif
+
 			}
 			else
 			{

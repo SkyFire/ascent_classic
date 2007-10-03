@@ -321,9 +321,6 @@ copy ..\..\dep\lib\*.dll ..\..\bin\release
 							UsePrecompiledHeader="0"/>
 					</FileConfiguration>
 				</File>
-				<File
-					RelativePath="..\..\src\realmserver\RealmlistThreadMgr.cpp">
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
