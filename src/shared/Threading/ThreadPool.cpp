@@ -227,6 +227,7 @@ void CThreadPool::Shutdown()
 static unsigned int __stdcall thread_proc(void* param)
 {
 	Thread * t = (Thread*)param;
+	t->ControlInterface.Setup2();
 	Log.Debug("ThreadPool", "Thread %u started.", t->ControlInterface.GetId());
 
 	for(;;)

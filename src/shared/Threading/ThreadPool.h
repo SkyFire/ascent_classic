@@ -35,7 +35,13 @@ public:
 	void Setup(HANDLE h)
 	{
 		hThread = h;
-		thread_id = (uint32)GetThreadId(h);
+		// whoops! GetThreadId is for windows 2003 and up only! :<		 - Burlex
+		//thread_id = (uint32)GetThreadId(h);
+	}
+
+	void Setup2()
+	{
+		thread_id = GetCurrentThreadId();
 	}
 
 	void Suspend()
