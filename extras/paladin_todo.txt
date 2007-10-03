@@ -7,7 +7,6 @@ Greater Blessing of Sanctuary - Doesn't work.
 blessing of freedom
 
 =====TALENTS=====
-Improved Judgment - Retribution - Doesn't work.
 Sanctity Aura - Retribution - Doesn't work
 Improved Sanctity Aura - Retribution - Won't do anything since the base ability won't.
 Toughness - Protection - Doesn't add the armor.

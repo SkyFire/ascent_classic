@@ -1886,6 +1886,13 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(24188);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
+	// paladin - Improved Judgement
+	sp = dbcSpell.LookupEntry(25956);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = judgement_group;
+	sp = dbcSpell.LookupEntry(25957);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = judgement_group;
 	
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);

@@ -87,6 +87,7 @@ Zack - test my shit :
 - paladin - Benediction - 20105
 - paladin - Improved Blessing of Might - 20048
 - paladin - Improved Hammer of Justice - 24188
+- paladin - Improved Judgement - 25957
 
 ==========================================================================
 Capt - test my shit :
