@@ -388,12 +388,13 @@ void Database::run()
 
 QueryResult::QueryResult(MYSQL_RES* res, uint32 FieldCount, uint32 RowCount) : mFieldCount(FieldCount), mRowCount(RowCount), mResult(res)
 {
-
+	mCurrentRow = new Field[FieldCount];
 }
 
 QueryResult::~QueryResult()
 {
 	mysql_free_result(mResult);
+	delete [] mCurrentRow;
 }
 
 bool QueryResult::NextRow()
@@ -449,6 +450,10 @@ void Database::EndThreads()
 		if(queries_queue.get_size() == 0)
 			queries_queue.GetCond().Broadcast();
 
+		Sleep(100);
+		if(!ThreadRunning)
+			break;
+			
 		Sleep(1000);
 	}
 }
