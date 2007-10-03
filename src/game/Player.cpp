@@ -1999,8 +1999,14 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	<< "'" << m_name << "', "
 	<< uint32(getRace()) << ","
 	<< uint32(getClass()) << ","
-	<< uint32(getGender()) << ","
-	<< uint32(getLevel()) << ","
+	<< uint32(getGender()) << ",";
+
+	if(m_uint32Values[UNIT_FIELD_FACTIONTEMPLATE] != info->factiontemplate)
+		ss << m_uint32Values[UNIT_FIELD_FACTIONTEMPLATE] << ",";
+	else
+		ss << "0,";
+
+	ss << uint32(getLevel()) << ","
 	<< m_uint32Values[PLAYER_XP] << ","
 	
 	// dump exploration data
@@ -2325,6 +2331,7 @@ bool Player::LoadFromDB(uint32 guid)
 	setRace(get_next_field.GetUInt8());
 	setClass(get_next_field.GetUInt8());
 	setGender(get_next_field.GetUInt8());
+	uint32 cfaction = get_next_field.GetUInt32();
 	
 	// set race dbc
 	myRace = dbcCharRace.LookupEntryForced(getRace());
@@ -2576,6 +2583,25 @@ bool Player::LoadFromDB(uint32 guid)
 	SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, (GetSession()->HasFlag(ACCOUNT_FLAG_XPACK_01)?sWorld.Expansion1LevelCap:sWorld.LevelCap));
 	SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, info->factiontemplate);
+	if(cfaction)
+	{
+		SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, info->factiontemplate);
+		// re-calculate team
+		switch(cfaction)
+		{
+		case 1:	// human
+		case 3:	// dwarf
+		case 4: // ne
+		case 8:	// gnome
+		case 927:	// dreinei
+			m_team = m_bgTeam = 0;
+			break;
+
+		default:
+			m_team = m_bgTeam = 1;
+			break;
+		}
+	}
  
 	LoadTaxiMask( get_next_field.GetString() );
 
