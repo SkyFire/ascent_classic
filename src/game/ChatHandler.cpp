@@ -279,7 +279,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 
 			//SendPacket(data);
 			//sWorld.SendZoneMessage(data, GetPlayer()->GetZoneId(), this);
-			_player->GetMapMgr()->SendMessageToCellPlayers(_player, data, 2);
+			_player->GetMapMgr()->SendChatMessageToCellPlayers(_player, data, 2, 1, lang, this);
 			delete data;
 			sLog.outString("[yell] %s: %s", _player->GetName(), msg.c_str());
 			pMsg=msg.c_str();
