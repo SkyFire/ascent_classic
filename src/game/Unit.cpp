@@ -2752,7 +2752,7 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 				}
 			}
 		}break;
-	case CHAT_MSG_MONSTER_EMOTE:
+	case CHAT_MSG_CHANNEL:
 		{
 			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
 			{
@@ -2840,7 +2840,7 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 				}
 			}
 		}break;
-	case CHAT_MSG_MONSTER_EMOTE:
+	case CHAT_MSG_CHANNEL:
 		{
 			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
 			{

@@ -1072,7 +1072,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 
 				WorldPacket data(SMSG_MESSAGECHAT, 100);
 				string msg = "%s attempts to run away in fear!";
-				data << (uint8)CHAT_MSG_MONSTER_EMOTE;
+				data << (uint8)CHAT_MSG_CHANNEL;
 				data << (uint32)LANG_UNIVERSAL;
 				data << (uint32)(strlen(((Creature*)m_Unit)->GetCreatureName()->Name) + 1);
 				data << ((Creature*)m_Unit)->GetCreatureName()->Name;
