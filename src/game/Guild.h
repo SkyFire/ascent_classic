@@ -310,6 +310,9 @@ public:
 	void LoadGuildCreationDate();
 	void RenameGuild(std::string guildName);
 
+	inline list<PlayerInfo*>::iterator Begin() { return m_guildMembers.begin(); }
+	inline list<PlayerInfo*>::iterator End() { return m_guildMembers.end(); }
+
 protected:
 	std::list<PlayerInfo*> m_guildMembers;
 	std::list<RankInfo*> m_rankList;

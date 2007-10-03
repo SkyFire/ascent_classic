@@ -225,6 +225,8 @@ public:
 			_socket->OutPacket(opcode, 0, NULL);
 	}
 
+	void SendChatPacket(WorldPacket * data, uint32 langpos, int32 lang, WorldSession * originator);
+
 	uint32 m_currMsTime;
 	uint32 m_lastPing;
 

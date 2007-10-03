@@ -931,3 +931,30 @@ void WorldSession::SystemMessage(const char * format, ...)
 	SendPacket(data);
 	delete data;
 }
+
+void WorldSession::SendChatPacket(WorldPacket * data, uint32 langpos, int32 lang, WorldSession * originator)
+{
+#ifndef USING_BIG_ENDIAN
+	if(lang == -1)
+		*(uint32*)&data->contents()[langpos] = lang;
+	else
+	{
+		if(CanUseCommand('c') || (originator && originator->CanUseCommand('c')))
+			*(uint32*)&data->contents()[langpos] = LANG_UNIVERSAL;
+		else
+			*(uint32*)&data->contents()[langpos] = lang;
+	}
+#else
+	if(lang == -1)
+		*(uint32*)&data->contents()[langpos] = swap32(lang);
+	else
+	{
+		if(CanUseCommand('c') || (originator && originator->CanUseCommand('c')))
+			*(uint32*)&data->contents()[langpos] = swap32(uint32(LANG_UNIVERSAL));
+		else
+			*(uint32*)&data->contents()[langpos] = swap32(lang);
+	}
+#endif
+
+	SendPacket(data);
+}

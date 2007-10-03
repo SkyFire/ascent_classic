@@ -126,26 +126,10 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			else
 			{
 				data = sChatHandler.FillMessageData( CHAT_MSG_SAY, lang, msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
-				_player->GetSession()->SendPacket(data);
+				SendChatPacket(data, 1, lang, this);
 				for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
 				{
-					if((*itr)->GetSession()->CanUseCommand('c') || _player->GetSession()->CanUseCommand('c'))
-					{
-#ifdef USING_BIG_ENDIAN
-						*(uint32*)&data->contents()[1] = swap32((lang == -1) ? -1 : LANG_UNIVERSAL);
-#else
-						*(uint32*)&data->contents()[1] = (lang == -1) ? -1 : LANG_UNIVERSAL;						
-#endif
-					}
-					else
-					{
-#ifdef USING_BIG_ENDIAN
-						*(uint32*)&data->contents()[1] = swap32(lang);
-#else
-						*(uint32*)&data->contents()[1] = lang;
-#endif
-					}
-					(*itr)->GetSession()->SendPacket(data);
+					(*itr)->GetSession()->SendChatPacket(data, 1, lang, this);
 				}
 			}
 
@@ -188,14 +172,25 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 					for(GroupMembersSet::iterator itr = sgr->GetGroupMembersBegin(); itr != sgr->GetGroupMembersEnd(); ++itr)
 					{
 						if(itr->player)
-							itr->player->GetSession()->SendPacket(data);
+							itr->player->GetSession()->SendChatPacket(data, 1, lang, this);
 					}
 					_player->GetGroup()->Unlock();
 				}
 			}
 			else
 			{
-				pGroup->SendPacketToAll(data);
+				SubGroup * sgr;
+				for(uint32 i = 0; i < _player->GetGroup()->GetSubGroupCount(); ++i)
+				{
+					sgr = _player->GetGroup()->GetSubGroup(i);
+					_player->GetGroup()->Lock();
+					for(GroupMembersSet::iterator itr = sgr->GetGroupMembersBegin(); itr != sgr->GetGroupMembersEnd(); ++itr)
+					{
+						if(itr->player)
+							itr->player->GetSession()->SendChatPacket(data, 1, lang, this);
+					}
+					_player->GetGroup()->Unlock();
+				}
 			}
 			//sLog.outString("[party] %s: %s", _player->GetName(), msg.c_str());
 			delete data;
@@ -220,7 +215,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				if(pGuild)
 				{
 					if(pGuild->HasRankRight(GetPlayer()->GetGuildRank(), GR_RIGHT_GCHATSPEAK))
+					{
 						pGuild->BroadCastToGuild(this, msg);
+					}
 					else
 					{
                         
