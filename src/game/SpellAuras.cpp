@@ -1186,6 +1186,8 @@ void Aura::SpellAuraDummy(bool apply)
 		}
 	}
 
+    Player * _ptarget = (Player*)m_target;
+
 	switch(GetSpellId())
 	{
 		//warrior - sweeping strikes
@@ -1289,9 +1291,9 @@ void Aura::SpellAuraDummy(bool apply)
 	case 17061:
 		{
 			if(apply)
-				((Player*)m_target)->m_furorChance += mod->m_amount;
+				_ptarget->m_furorChance += mod->m_amount;
 			else
-				((Player*)m_target)->m_furorChance -= mod->m_amount;
+				_ptarget->m_furorChance -= mod->m_amount;
 		}break;
 	case 12295:
 	case 12676:
@@ -1299,9 +1301,9 @@ void Aura::SpellAuraDummy(bool apply)
 	case 12678:
 		{
 			if(apply)
-				((Player*)m_target)->m_retainedrage += mod->m_amount*10; //don't really know if value is all value or needs to be multiplyed with 10
+				_ptarget->m_retainedrage += mod->m_amount*10; //don't really know if value is all value or needs to be multiplyed with 10
 			else
-				((Player*)m_target)->m_retainedrage -= mod->m_amount*10;
+				_ptarget->m_retainedrage -= mod->m_amount*10;
 		}break;
 	case 2096://MindVision
 		{
@@ -1361,71 +1363,73 @@ void Aura::SpellAuraDummy(bool apply)
 	case 18183:
 		{//improved life tap give amt% bonus for convers
 			if(apply)
-				((Player*)m_target)->m_lifetapbonus=mod->m_amount;
+				_ptarget->m_lifetapbonus=mod->m_amount;
 			else
-				((Player*)m_target)->m_lifetapbonus=0;
+				_ptarget->m_lifetapbonus=0;
 		}break;
 	case 20608://Reincarnation
 		{
-				if(apply)
-					((Player*)m_target)->bReincarnation = true;
-				else
-					((Player*)m_target)->bReincarnation = false;
+			if(apply)
+				_ptarget->bReincarnation = true;
+			else
+				_ptarget->bReincarnation = false;
 		}break;
 	case 20707://Soulstone Resurrecton
 		if(apply)
 		{
-			((Player*)m_target)->SoulStone = 3026;
-			((Player*)m_target)->SoulStoneReciever = GetUnitCaster()->GetGUID();
+            _ptarget->SetSoulStone(3026);
+			_ptarget->SetSoulStoneReceiver(GetUnitCaster()->GetGUID());
 		}
 		else if(m_target->isAlive())
-			((Player*)m_target)->SoulStone = ((Player*)m_target)->SoulStoneReciever = 0;
-		break;
+        {
+            _ptarget->SetSoulStone(0);
+            _ptarget->SetSoulStoneReceiver(0);
+        }break;
 	case 20762:
 		if(apply)
 		{
-			((Player*)m_target)->SoulStone = 20758;
-			((Player*)m_target)->SoulStoneReciever = GetUnitCaster()->GetGUID();
+			_ptarget->SoulStone = 20758;
+			_ptarget->SoulStoneReceiver = GetUnitCaster()->GetGUID();
 		}
 		else if(m_target->isAlive())
-			((Player*)m_target)->SoulStone = ((Player*)m_target)->SoulStoneReciever = 0;
+			_ptarget->SoulStone = _ptarget->SoulStoneReceiver = 0;
 		break;
 	case 20763:
 		if(apply)
 		{
-			((Player*)m_target)->SoulStone = 20759;
-			((Player*)m_target)->SoulStoneReciever = GetUnitCaster()->GetGUID();
+			_ptarget->SoulStone = 20759;
+			_ptarget->SoulStoneReceiver = GetUnitCaster()->GetGUID();
 		}
 		else if(m_target->isAlive())
-			((Player*)m_target)->SoulStone = ((Player*)m_target)->SoulStoneReciever = 0;
+			_ptarget->SoulStone = _ptarget->SoulStoneReceiver = 0;
 		break;
 	case 20764:
 		if(apply)
 		{
-			((Player*)m_target)->SoulStone = 20760;
-			((Player*)m_target)->SoulStoneReciever = GetUnitCaster()->GetGUID();
+			_ptarget->SoulStone = 20760;
+			_ptarget->SoulStoneReceiver = GetUnitCaster()->GetGUID();
 		}
 		else if(m_target->isAlive())
-			((Player*)m_target)->SoulStone = ((Player*)m_target)->SoulStoneReciever = 0;
+			_ptarget->SoulStone = _ptarget->SoulStoneReceiver = 0;
 		break;
 	case 20765:
 		if(apply)
 		{
-			((Player*)m_target)->SoulStone = 20761;
-			((Player*)m_target)->SoulStoneReciever = GetUnitCaster()->GetGUID();
+			_ptarget->SoulStone = 20761;
+			_ptarget->SoulStoneReceiver = GetUnitCaster()->GetGUID();
 		}
 		else if(m_target->isAlive())
-			((Player*)m_target)->SoulStone = ((Player*)m_target)->SoulStoneReciever = 0;
+			_ptarget->SoulStone = _ptarget->SoulStoneReceiver = 0;
 		break;
 	case 27239:
 		{
 			if(apply)
 			{
-				((Player*)m_target)->SoulStone = 27240;
-				((Player*)m_target)->SoulStoneReciever = GetUnitCaster()->GetGUID();
+				_ptarget->SoulStone = 27240;
+				_ptarget->SoulStoneReceiver = GetUnitCaster()->GetGUID();
 			}
 			else if(m_target->isAlive())
-				((Player*)m_target)->SoulStone = ((Player*)m_target)->SoulStoneReciever = 0;
+				_ptarget->SoulStone = _ptarget->SoulStoneReceiver = 0;
 		}break;
 	//case 20154://Soulstone Resurrecton
 	//case 20287:
