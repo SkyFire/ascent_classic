@@ -131,6 +131,7 @@ private:
 	unsigned int stringSize;
 	unsigned char *data;
 	unsigned char *stringTable;
+	char header[4];
 };
 
 #endif

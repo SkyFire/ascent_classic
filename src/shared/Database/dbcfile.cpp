@@ -19,7 +19,7 @@
 
 #include "dbcfile.h"
 #include <stdio.h>
-#include "../Common.h"
+//#include "../Common.h"
 DBCFile::DBCFile()
 {
 	
@@ -29,7 +29,6 @@ bool DBCFile::open(const char*fn)
 {
 	FILE*pf=fopen(fn,"rb");
 	if(!pf)return false;
-	char header[4];
 
 	fread(header,4,1,pf); // Number of records
 	assert(header[0]=='W' && header[1]=='D' && header[2]=='B' && header[3] == 'C');
