@@ -4640,7 +4640,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 					if(pObj->stalkedby == GetGUID()) // Hunter's Mark / MindVision is visible to the caster
 						return true;
 
-					if(pObj->isInFront(this)) // stealthed player is in front of us
+					if(isInFront(pObj)) // stealthed player is in front of us
 					{
 						// Detection Range = 5yds + (Detection Skill - Stealth Skill)/5
 						if(getLevel() < 60)

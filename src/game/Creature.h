@@ -366,7 +366,7 @@ public:
 
 		if(obj->IsStealth()) // Stealth Detection (  I Hate Rogues :P  )
 		{
-			if(obj->isInFront(this)) // stealthed player is in front of creature
+			if(isInFront(obj)) // stealthed player is in front of creature
 			{
 				// Detection Range = 5yds + (Detection Skill - Stealth Skill)/5
 				if(getLevel() < 60)
