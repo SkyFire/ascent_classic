@@ -122,7 +122,7 @@ struct SERVER_DECL Thread
 
 typedef std::set<Thread*> ThreadSet;
 
-class CThreadPool
+class SERVER_DECL CThreadPool
 {
 	int GetNumCpus();
 
@@ -166,8 +166,14 @@ public:
 
 	// resets the gobble counter
 	inline void Gobble() { _threadsEaten=0; }
+
+	// gets active thread count
+	inline uint32 GetActiveThreadCount() { return (uint32)m_activeThreads.size(); }
+
+	// gets free thread count
+	inline uint32 GetFreeThreadCount() { return (uint32)m_freeThreads.size(); }
 };
 
-extern CThreadPool ThreadPool;
+extern SERVER_DECL CThreadPool ThreadPool;
 
 #endif

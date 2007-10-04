@@ -21,19 +21,21 @@
 #include "../NGLog.h"
 
 #ifdef WIN32
-#include <process.h>
+
+	#include <process.h>
+
+#else
+	
+	volatile int threadid_count = 0;
+	int GenerateThreadId()
+	{
+		return ++threadid_count;
+	}
+
 #endif
 
 #define THREAD_RESERVE 5
-
-CThreadPool ThreadPool;
-#ifndef WIN32
-volatile int threadid_count = 0;
-int GenerateThreadId()
-{
-	return ++threadid_count;
-}
-#endif
+SERVER_DECL CThreadPool ThreadPool;
 
 CThreadPool::CThreadPool()
 {

@@ -148,7 +148,7 @@ void AStatDumper::DumpStats()
 	/* Post to the server */
 	if(!trunning)
 	{
-		launch_thread(new AStatThread);
+		ThreadPool.ExecuteTask(new AStatThread);
 		trunning=true;
 	}
 }

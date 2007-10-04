@@ -259,7 +259,8 @@ void StatDumper::DumpStats()
         fprintf(f, "    <qplayers>%u</qplayers>\n", (unsigned int)sWorld.GetQueueCount());
         fprintf(f, "    <ram>%.3f</ram>\n", GetRAMUsage());
         fprintf(f, "    <avglat>%.3f</avglat>\n", AvgLat);
-        fprintf(f, "    <threads>%u</threads>\n", (unsigned int)sThreadMgr.GetThreadCount());
+		fprintf(f, "    <threads>%u</threads>\n", (unsigned int)ThreadPool.GetActiveThreadCount());
+		fprintf(f, "    <fthreads>%u</fthreads>\n", (unsigned int)ThreadPool.GetFreeThreadCount());
         time_t t = time(NULL);
         fprintf(f, "    <gmcount>%u</gmcount>\n", (unsigned int)GMCount);
         fprintf(f, "    <lastupdate>%s</lastupdate>\n", asctime(localtime(&t)));
@@ -267,8 +268,8 @@ void StatDumper::DumpStats()
         fprintf(f, "    <horde>%u</horde>\n", (unsigned int)sWorld.HordePlayers);
         fprintf(f, "    <acceptedconns>%u</acceptedconns>\n", (unsigned int)sWorld.mAcceptedConnections);
         fprintf(f, "    <peakcount>%u</peakcount>\n", (unsigned int)sWorld.PeakSessionCount);
-		fprintf(f, "    <wdbquerysize>%u</wdbquerysize>\n", (unsigned int)(((MySQLDatabase*)Database_World)->GetQueueSize()));
-		fprintf(f, "    <cdbquerysize>%u</cdbquerysize>\n", (unsigned int)(((MySQLDatabase*)Database_Character)->GetQueueSize()));
+		fprintf(f, "    <wdbquerysize>%u</wdbquerysize>\n", WorldDatabase.GetQueueSize());
+		fprintf(f, "    <cdbquerysize>%u</cdbquerysize>\n", CharacterDatabase.GetQueueSize());
     }
     fprintf(f, "  </status>\n");
     Player * plr;
