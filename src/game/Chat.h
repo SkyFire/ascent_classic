@@ -350,7 +350,9 @@ protected:
 	bool HandleNullFollowCommand(const char* args, WorldSession * m_session);
 	bool HandleFormationClearCommand(const char* args, WorldSession * m_session);
 	bool HandleResetSkillsCommand(const char* args, WorldSession * m_session);
-	bool HandlePlayerInfo(const char* args, WorldSession * m_session);
+	bool HandleGetSkillInfoCommand(const char* args, WorldSession * m_session);
+    bool HandlePlayerInfo(const char* args, WorldSession * m_session);
+    
 
 	//Ban
 	bool HandleBanCharacterCommand(const char* args, WorldSession *m_session);

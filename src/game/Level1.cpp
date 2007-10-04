@@ -518,6 +518,45 @@ bool ChatHandler::HandleModifySkillCommand(const char *args, WorldSession *m_ses
 	return true;
 }
 
+/// DGM: Get skill info command for getting information about a skill
+bool ChatHandler::HandleGetSkillInfoCommand(const char *args, WorldSession *m_session)
+{
+	uint32 skill = 0;
+	char *pSkill = strtok((char*)args, " ");
+	if(!pSkill)
+		return false;
+	else 
+		skill = atol(pSkill);
+
+	Player *plr = getSelectedChar(m_session, true);
+	if(!plr) return false;
+
+    char * SkillName = SkillNames[skill];
+    if (!SkillName)
+    {
+        BlueSystemMessage(m_session, "Skill: %u does not exists", skill);
+        return false;
+    }
+
+    // hacky and possible crashy... but as the info was hand filled I know that there are
+    // no name's smaller than 6 characters
+    SkillName+=6;
+    
+    if (!plr->_HasSkillLine(skill))
+    {
+        BlueSystemMessage(m_session, "Player does not have %s skill.", SkillName);
+        return false;
+    }
+
+	uint32 nobonus = plr->_GetSkillLineCurrent(skill,false);
+	uint32 bonus = nobonus - plr->_GetSkillLineCurrent(skill,true);
+    uint32 max = plr->_GetSkillLineMax(skill);
+
+    BlueSystemMessage(m_session, "Player's %s skill has level: %u maxlevel: %u. (+ %u bonus)", SkillName,max,nobonus, bonus);
+	return true;
+}
+
+
 bool ChatHandler::HandleRemoveSkillCommand(const char *args, WorldSession *m_session)
 {
 	uint32 skill = 0;
@@ -702,5 +741,7 @@ bool ChatHandler::HandleSilentPlayerCommand(const char* args, WorldSession *m_se
 
 	return true;
 }
+
+
 
 

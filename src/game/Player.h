@@ -1267,9 +1267,15 @@ public:
 	void RegenerateHealth(bool inCombat);
 	void RegenerateEnergy(float RegenPct);
 	void LooseRage();
-	uint32 SoulStone;
-	uint32 SoulStoneReciever;
+	
+    uint32 SoulStone;
+	uint32 SoulStoneReceiver;
 	void removeSoulStone();
+
+    inline uint32 GetSoulStoneReceiver(){return SoulStoneReceiver;}
+    inline void SetSoulStoneReceiver(uint32 StoneGUID){SoulStoneReceiver = StoneGUID;}
+    inline uint32 GetSoulStone(){return SoulStone;}
+    inline void SetSoulStone(uint32 StoneID){SoulStone = StoneID;}
 
 	bool bReincarnation;
 

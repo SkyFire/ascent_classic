@@ -300,7 +300,7 @@ void Group::Update(bool delayed)
 			/*          SoulStone effect removed if           */
 			/* the giver and reciever are not in party / raid */
 			bool removeSoulStone = true;
-			uint32 SoulStoneGiver = itr1->player->SoulStoneReciever;
+			uint32 SoulStoneGiver = itr1->player->SoulStoneReceiver;
 			if(!SoulStoneGiver || itr1->player->GetGUID() == SoulStoneGiver) removeSoulStone = false;
 
 			data.Initialize(SMSG_GROUP_LIST);
@@ -421,7 +421,7 @@ void SubGroup::Disband(bool bRemoveGroup)
 			}
 
 			/* remove SoulStones if caster and reciever are not the same player */
-			if(itr->player->SoulStoneReciever && itr->player->SoulStoneReciever!=itr->player->GetGUID())
+			if(itr->player->SoulStoneReceiver && itr->player->SoulStoneReceiver!=itr->player->GetGUID())
 				itr->player->removeSoulStone();
 
 			itr->player->RemoveReference(&itr->player);

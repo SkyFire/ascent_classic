@@ -40,7 +40,7 @@ Player::Player ( uint32 high, uint32 low )
 	info					= NULL;				 // Playercreate info
 	bSafeFall			   = false;
 	SoulStone			   = 0;
-	SoulStoneReciever		= 0;
+	SoulStoneReceiver		= 0;
 	bReincarnation			= false;
 	m_furorChance			= 0;
 	Seal					= 0;
@@ -4545,8 +4545,8 @@ void Player::AddRecoverCooldown(SpellEntry * spellInfo)
 		ItemCooldown * item = new ItemCooldown;
 		int32 cooltime;
 
-		item->ItemEntry = 0;						// SpellCoolDowns have no itemid
-		item->SpellID = spellInfo->Id;			  // spellId
+		item->ItemEntry = 0;                        // SpellCoolDowns have no itemid
+		item->SpellID = spellInfo->Id;              // spellId
 		item->SpellCategory = spellInfo->Category;  // category
 
 		// if we have a standard cooldown time
@@ -8080,7 +8080,7 @@ void Player::removeSoulStone()
 		}break;
 	}
 	this->RemoveAura(sSoulStone);
-	this->SoulStone = this->SoulStoneReciever = 0; //just incase
+	this->SoulStone = this->SoulStoneReceiver = 0; //just incase
 }
 
 void Player::SoftDisconnect()

@@ -68,7 +68,6 @@ extern NameTableEntry g_threadTypes[];
 
 class SERVER_DECL CThread : public ThreadBase
 {
-	friend class ThreadMgr;
 public:
 	CThread();
 	~CThread();
