@@ -86,7 +86,7 @@ public:
 				//"\033[22;37m",
 				"\033[0m",
 				"\033[01;37m",
-				"\033[22;34m",
+				"\033[1;34m",
 		};
 		fputs(colorstrings[color], stdout);
 #else

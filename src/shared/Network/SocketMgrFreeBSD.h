@@ -87,9 +87,13 @@ class SocketWorkerThread : public ThreadBase
 {
     /// epoll event struct
     struct kevent events[THREAD_EVENT_SIZE];
-
+    bool running;
 public:
     void run();
+    void OnShutdown()
+    {
+        running=false;
+    }
 };
 
 #define sSocketMgr SocketMgr::getSingleton()

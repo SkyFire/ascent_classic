@@ -79,6 +79,7 @@ void SocketWorkerThread::run()
 {
     //printf("Worker thread started.\n");
     int fd_count;
+    running=true;
     Socket * ptr;
     int i;
     struct kevent ev;
@@ -90,7 +91,7 @@ void SocketWorkerThread::run()
     SocketMgr * mgr = SocketMgr::getSingletonPtr();
     int kq = mgr->GetKq();
 
-    while(true)
+    while(running)
     {
         fd_count = kevent(kq, NULL, 0, &events[0], THREAD_EVENT_SIZE, &ts);
         for(i = 0; i < fd_count; ++i)
