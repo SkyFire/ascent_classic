@@ -329,41 +329,45 @@ void AuthSocket::SendProofError(uint8 Error, uint8 * M2)
 	Send(buffer, 28);
 }
 
+#define AUTH_CHALLENGE 0
+#define AUTH_PROOF 1
+#define AUTH_RECHALLENGE 2
+#define AUTH_REPROOF 3
+#define REALM_LIST 16
+#define MAX_AUTH_CMD 17
+
+typedef void (AuthSocket::*AuthHandler)();
+static AuthHandler Handlers[MAX_AUTH_CMD] = {
+		&AuthSocket::HandleChallenge,			// 0
+		&AuthSocket::HandleProof,				// 1
+		&AuthSocket::HandleReconnectChallenge,	// 2
+		&AuthSocket::HandleReconnectProof,		// 3
+		NULL,									// 4
+		NULL,									// 5
+		NULL,									// 6
+		NULL,									// 7
+		NULL,									// 8
+		NULL,									// 9
+		NULL,									// 10
+		NULL,									// 11
+		NULL,									// 12
+		NULL,									// 13
+		NULL,									// 14
+		NULL,									// 15
+		&AuthSocket::HandleRealmlist,			// 16
+};
+
 void AuthSocket::OnRead()
 {
 	if(GetReadBufferSize() < 1)
 		return;
 
 	uint8 Command = GetReadBuffer(0)[0];
-
-	// Handle depending on command
-	switch(Command)
-	{
-	case 0:	 // AUTH_CHALLENGE
-		last_recv = time(NULL);
-		HandleChallenge();
-		break;
-
-	case 1:	 // AUTH_PROOF
-		last_recv = time(NULL);
-		HandleProof();
-		break;
-
-	case 2:	// AUTH_RECHALLENGE
-		last_recv = time(NULL);
-		HandleReconnectChallenge();
-		break;
-
-	case 3:	// AUTH_RECHALLENGE_PROOF
-		last_recv = time(NULL);
-		HandleReconnectProof();
-		break;			
-
-	case 0x10:  // REALM_LIST
-		last_recv = time(NULL);
-		HandleRealmlist();
-		break;
-	}
+	last_recv = UNIXTIME;
+	if(Command < MAX_AUTH_CMD)
+		(this->*Handlers[Command])();
+	else
+		Log.Notice("AuthSocket", "Unknown cmd %u", Command);
 }
 
 void AuthSocket::HandleRealmlist()

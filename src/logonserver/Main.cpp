@@ -240,11 +240,11 @@ void LogonServer::Run(int argc, char ** argv)
 
 
 	// Spawn periodic function caller thread for account reload every 10mins
-	int time = Config.MainConfig.GetIntDefault("Rates", "AccountRefresh",600);
-	time *= 1000;
+	int atime = Config.MainConfig.GetIntDefault("Rates", "AccountRefresh",600);
+	atime *= 1000;
 	//SpawnPeriodicCallThread(AccountMgr, AccountMgr::getSingletonPtr(), &AccountMgr::ReloadAccountsCallback, time);
 	PeriodicFunctionCaller<AccountMgr> * pfc = new PeriodicFunctionCaller<AccountMgr>(AccountMgr::getSingletonPtr(),
-		&AccountMgr::ReloadAccountsCallback, time);
+		&AccountMgr::ReloadAccountsCallback, atime);
 	ThreadPool.ExecuteTask(pfc);
 
 	// Load conf settings..
@@ -319,6 +319,7 @@ void LogonServer::Run(int argc, char ** argv)
 		sSocketGarbageCollector.Update();
 		CheckForDeadSockets();			  // Flood Protection
 		Sleep(50);
+		UNIXTIME = time(NULL);
 	}
 
 	sLog.outString("Shutting down...");
