@@ -223,6 +223,7 @@ Unit::Unit()
 	m_extrastriketargets = 0;
 	m_damgeShieldsInUse = false;
 //	fearSpell = 0;
+	m_extraAttackCounter = false;
 }
 
 Unit::~Unit()
@@ -2047,10 +2048,19 @@ else
 		
 	RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
 //--------------------------extra strikes processing----------------------------------------
-	while(m_extraattacks > 0)
+	if(!m_extraAttackCounter)
 	{
-		m_extraattacks--;
-		Strike(pVictim,damage_type,ability,add_damage,pct_dmg_mod,exclusive_damage, false);
+		int32 extra_attacks = m_extraattacks;
+		m_extraAttackCounter = true;
+		m_extraattacks = 0;
+
+		while(extra_attacks > 0)
+		{
+			extra_attacks--;
+			Strike(pVictim,damage_type,ability,add_damage,pct_dmg_mod,exclusive_damage, false);
+		}
+
+		m_extraAttackCounter = false;
 	}
 
 	if(m_extrastriketargets)

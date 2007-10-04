@@ -1117,6 +1117,7 @@ protected:
 
 	AttackerSet m_attackers;
 	uint64 m_attackTarget;
+	bool m_extraAttackCounter;
 };
 
 
