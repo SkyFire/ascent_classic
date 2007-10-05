@@ -600,6 +600,21 @@ void WorldSession::FullLogin(Player * plr)
 		<< plr->GetOrientation();
 
 	SendPacket(&datab);
+
+	// send voicechat state - active/inactive
+	/*
+	{SERVER} Packet: (0x03C7) UNKNOWN PacketSize = 2
+	|------------------------------------------------|----------------|
+	|00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F |0123456789ABCDEF|
+	|------------------------------------------------|----------------|
+	|02 01                                           |..              |
+	-------------------------------------------------------------------
+	*/
+
+	datab.Initialize(0x03C7);
+	datab << uint8(2) << uint8(1);
+	SendPacket(&datab);
+
 	plr->UpdateAttackSpeed();
 
 	// Make sure our name exists (for premade system)

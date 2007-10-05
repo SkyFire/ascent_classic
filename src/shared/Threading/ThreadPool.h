@@ -28,20 +28,15 @@
 
 class SERVER_DECL ThreadController
 {
+public:
 	HANDLE hThread;
 	uint32 thread_id;
-public:
 
 	void Setup(HANDLE h)
 	{
 		hThread = h;
 		// whoops! GetThreadId is for windows 2003 and up only! :<		 - Burlex
 		//thread_id = (uint32)GetThreadId(h);
-	}
-
-	void Setup2()
-	{
-		thread_id = GetCurrentThreadId();
 	}
 
 	void Suspend()

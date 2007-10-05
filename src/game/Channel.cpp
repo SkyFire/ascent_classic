@@ -22,6 +22,7 @@
 Mutex m_confSettingLock;
 vector<string> m_bannedChannels;
 vector<string> m_generalChannels;
+uint64 voicechannelhigh = 0;
 
 void Channel::LoadConfSettings()
 {
@@ -42,6 +43,7 @@ Channel::Channel(const char * name, uint32 team)
 	m_general = false;
 	m_name = string(name);
 	m_team = team;
+	voice_enabled = true;
 
 	m_confSettingLock.Acquire();
 	for(vector<string>::iterator itr = m_generalChannels.begin(); itr != m_generalChannels.end(); ++itr)
@@ -50,10 +52,12 @@ Channel::Channel(const char * name, uint32 team)
 		{
 			m_general = true;
 			m_announce = false;
+			voice_enabled = false;
 			break;
 		}
 	}
 	m_confSettingLock.Release();
+	voice_channel_id = voicechannelhigh++;
 }
 
 void Channel::AttemptJoin(Player * plr, const char * password)
@@ -91,16 +95,23 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 	data << uint8(CHANNEL_NOTIFY_FLAG_YOUJOINED) << m_name << m_id << uint32(0) << uint8(0);
 	plr->GetSession()->SendPacket(&data);
 
-	if(!m_announce)
-		return;
+	if(m_announce)
+	{
+		data.clear();
+		data << uint8(CHANNEL_NOTIFY_FLAG_JOINED) << m_name << plr->GetGUID();
+		SendToAll(&data);
 
-	data.clear();
-	data << uint8(CHANNEL_NOTIFY_FLAG_JOINED) << m_name << plr->GetGUID();
-	SendToAll(&data);
+		data.Initialize(SMSG_PLAYER_JOINED_CHANNEL);
+		data << plr->GetGUID() << uint8(0x14) << m_flags << m_id << m_name;
+		SendToAll(&data);
+	}
 
-	data.Initialize(SMSG_PLAYER_JOINED_CHANNEL);
-	data << plr->GetGUID() << uint8(0x14) << m_flags << m_id << m_name;
-	SendToAll(&data);
+	if(voice_enabled)
+	{
+		data.Initialize(SMSG_CHANNEL_NOTIFY);
+		data << uint8(CHANNEL_NOTIFY_FLAG_VOICE_ON) << m_name << plr->GetGUID();
+		plr->GetSession()->SendPacket(&data);
+	}
 }
 
 void Channel::Part(Player * plr)

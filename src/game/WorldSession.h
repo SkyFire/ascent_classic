@@ -687,6 +687,12 @@ protected:
 	void HandleTeleportCheatOpcode(WorldPacket & recv_data);
 	void HandleTeleportToUnitOpcode(WorldPacket & recv_data);
 	void HandleWorldportOpcode(WorldPacket & recv_data);
+	
+	
+	
+	// VOICECHAT
+	void HandleEnableMicrophoneOpcode(WorldPacket & recv_data);
+	void HandleVoiceChatQueryOpcode(WorldPacket & recv_data);
 
 public:
 

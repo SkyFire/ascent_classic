@@ -130,13 +130,13 @@ int WorldSession::Update(uint32 InstanceID)
 		ASSERT(packet);
 
 		if(packet->GetOpcode() >= NUM_MSG_TYPES)
-			sLog.outDebug("[Session] Received out of range packet with opcode 0x%.4X", packet->GetOpcode());
+			sLog.outError("[Session] Received out of range packet with opcode 0x%.4X", packet->GetOpcode());
 		else
 		{
 			Handler = &WorldPacketHandlers[packet->GetOpcode()];
 			if(Handler->status == STATUS_LOGGEDIN && !_player && Handler->handler != 0)
 			{
-				sLog.outDebug("[Session] Received unexpected/wrong state packet with opcode %s (0x%.4X)",
+				sLog.outError("[Session] Received unexpected/wrong state packet with opcode %s (0x%.4X)",
 					LookupName(packet->GetOpcode(), g_worldOpcodeNames), packet->GetOpcode());
 			}
 			else
@@ -144,7 +144,7 @@ int WorldSession::Update(uint32 InstanceID)
 				// Valid Packet :>
 				if(Handler->handler == 0)
 				{
-					sLog.outDebug("[Session] Received unhandled packet with opcode %s (0x%.4X)",
+					sLog.outError("[Session] Received unhandled packet with opcode %s (0x%.4X)",
 						LookupName(packet->GetOpcode(), g_worldOpcodeNames), packet->GetOpcode());
 				}
 				else
@@ -870,6 +870,10 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[MSG_MOVE_TELEPORT_CHEAT].handler = &WorldSession::HandleTeleportCheatOpcode;
 	WorldPacketHandlers[CMSG_TELEPORT_TO_UNIT].handler = &WorldSession::HandleTeleportToUnitOpcode;
 	WorldPacketHandlers[CMSG_WORLD_TELEPORT].handler = &WorldSession::HandleWorldportOpcode;
+
+	// voicechat
+	WorldPacketHandlers[CMSG_ENABLE_MICROPHONE].handler = &WorldSession::HandleEnableMicrophoneOpcode;
+	WorldPacketHandlers[CMSG_CHANNEL_VOICE_CHAT_QUERY].handler = &WorldSession::HandleVoiceChatQueryOpcode;
 }
 
 void WorldSession::CHECK_PACKET_SIZE(WorldPacket& data, uint32 size)

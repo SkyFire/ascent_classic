@@ -233,10 +233,10 @@ void CThreadPool::Shutdown()
 /* this is the only platform-specific code. neat, huh! */
 #ifdef WIN32
 
-static unsigned int __stdcall thread_proc(void* param)
+static unsigned long WINAPI thread_proc(void* param)
 {
 	Thread * t = (Thread*)param;
-	t->ControlInterface.Setup2();
+	uint32 tid = t->ControlInterface.GetId();
 	Log.Debug("ThreadPool", "Thread %u started.", t->ControlInterface.GetId());
 
 	for(;;)
@@ -262,6 +262,9 @@ static unsigned int __stdcall thread_proc(void* param)
 
 	// at this point the t pointer has already been freed, so we can just cleanly exit.
 	ExitThread(0);
+
+	// not reached
+	return 0;
 }
 
 Thread * CThreadPool::StartThread(ThreadBase * ExecutionTarget)
@@ -270,7 +273,8 @@ Thread * CThreadPool::StartThread(ThreadBase * ExecutionTarget)
 	Thread * t = new Thread;
 	
 	t->ExecutionTarget = ExecutionTarget;
-	h = (HANDLE)_beginthreadex(NULL, 0, &thread_proc, (void*)t, 0, NULL);
+	//h = (HANDLE)_beginthreadex(NULL, 0, &thread_proc, (void*)t, 0, NULL);
+	h = CreateThread(NULL, 0, &thread_proc, (LPVOID)t, 0, (LPDWORD)&t->ControlInterface.thread_id);
 	t->ControlInterface.Setup(h);
 
 	return t;

@@ -90,6 +90,8 @@ public:
 	bool m_announce;
 	uint32 m_team;
 	inline size_t GetNumMembers() { return m_members.size(); }
+	bool voice_enabled;
+	uint64 voice_channel_id;
 
 public:
 	Channel(const char * name, uint32 team);
