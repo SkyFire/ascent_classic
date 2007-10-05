@@ -4676,7 +4676,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 				if(uObj->m_invisible // Invisibility - Detection of Units
 						&& m_invisDetect[uObj->m_invisFlag] < 1) // can't see invisible without proper detection
-					return m_session->HasPermissions(); // GM can see invisible units
+					return bGMTagOn; // GM can see invisible units
 
 				return true;
 			}
@@ -4701,7 +4701,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 					}
 
 					if(m_invisDetect[gObj->invisibilityFlag] < 1) // can't see invisible without proper detection
-						return m_session->HasPermissions(); // GM can see invisible objects
+						return bGMTagOn; // GM can see invisible objects
 				}
 
 				return true;
