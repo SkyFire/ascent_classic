@@ -2228,7 +2228,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 
 	res=(float)ress;
 	dealdamage dmg;
-	dmg.damage_type = school;
+	dmg.school_type = school;
 	dmg.full_damage = ress;
 	dmg.resisted_damage = 0;
 	if(res <= 0)

@@ -1094,7 +1094,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 //		uint32 abs_dmg = m_target->AbsorbDamage(school, &ress);
 		res=(float)ress;
 		dealdamage dmg;
-		dmg.damage_type = school;
+		dmg.school_type = school;
 		// again.......
 		//dmg.full_damage = res;
 		dmg.full_damage = ress;

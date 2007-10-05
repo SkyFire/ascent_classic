@@ -47,7 +47,7 @@ struct FactionDBC;
 
 typedef struct
 { 
-	uint32 damage_type;
+	uint32 school_type;
 	int32 full_damage;
 	uint32 resisted_damage;
 }dealdamage;

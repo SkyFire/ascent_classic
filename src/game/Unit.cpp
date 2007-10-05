@@ -1246,7 +1246,7 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 {
 	float AverageResistance = 0.0f;
 
-	if((*dmg).damage_type == 0)//physical
+	if((*dmg).school_type == 0)//physical
 	{		
 		//patch from emsy : wands do not get reduction
         if (IsPlayer())
@@ -1271,7 +1271,7 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 	else
 	{
 		// applying resistance to other type of damage 
-		AverageResistance = ((float)pVictim->GetResistance( (*dmg).damage_type)- PowerCostPctMod[(*dmg).damage_type]) / (float)(getLevel() * 5) * 0.75f;
+		AverageResistance = ((float)pVictim->GetResistance( (*dmg).school_type)- PowerCostPctMod[(*dmg).school_type]) / (float)(getLevel() * 5) * 0.75f;
 		  if(AverageResistance > 0.75f)
 			AverageResistance = 0.75f;
 		if(AverageResistance>0)
@@ -1654,7 +1654,7 @@ else
 			}
 
 			dmg.full_damage += pVictim->DamageTakenMod[0]+add_damage;
-			if (dmg.damage_type==RANGED)
+			if (damage_type==RANGED)
 			{
 				dmg.full_damage+=pVictim->RangedDamageTaken;
 			}
@@ -1662,7 +1662,7 @@ else
 			float summaryPCTmod = pVictim->DamageTakenPctMod[0]+this->DamageDoneModPCT[0];
 			if (pct_dmg_mod)
 				summaryPCTmod += pct_dmg_mod/100.0f - 1;
-			if (dmg.damage_type == RANGED)
+			if (damage_type == RANGED)
 			{
 				summaryPCTmod+=pVictim->RangedDamageTakenPct/100;	
 			}
