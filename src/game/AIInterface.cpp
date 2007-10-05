@@ -856,24 +856,6 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 //					distance >= combatReach[0] && 
 					distance <= combatReach[1]) // Target is in Range -> Attack
 				{
-#ifdef ENABLE_CREATURE_DAZE
-					//now if the target is facing his back to us then we could just cast dazed on him :P
-					//as far as i know dazed is casted by most of the creatures but feel free to remove this code if you think otherwise
-					if(!(m_Unit->m_factionDBC->RepListId == -1 && m_Unit->m_faction->FriendlyMask==0 && m_Unit->m_faction->HostileMask==0) /* neutral creature */
-						&& m_nextTarget->IsPlayer() && !m_Unit->IsPet() && Rand(m_Unit->get_chance_to_daze(m_nextTarget)))
-					{
-						float our_facing=m_Unit->calcRadAngle(m_Unit->GetPositionX(),m_Unit->GetPositionY(),m_nextTarget->GetPositionX(),m_nextTarget->GetPositionY());
-						float his_facing=m_nextTarget->GetOrientation();
-						if(fabs(our_facing-his_facing)<CREATURE_DAZE_TRIGGER_ANGLE && !m_nextTarget->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
-						{
-							SpellEntry *info = dbcSpell.LookupEntry(CREATURE_SPELL_TO_DAZE);
-							Spell *sp = new Spell(m_Unit, info, false, NULL);
-							SpellCastTargets targets;
-							targets.m_unitTarget = m_nextTarget->GetGUID();
-							sp->prepare(&targets);
-						}
-					}
-#endif
 					if(UnitToFollow != NULL)
 					{
 						UnitToFollow = NULL; //we shouldn't be following any one
@@ -901,7 +883,30 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						if(infront)
 						{
 							m_Unit->setAttackTimer(0, false);
+#ifdef ENABLE_CREATURE_DAZE
+							//we require to know if strike was succesfull. If there was no dmg then target cannot be dazed by it
+							uint32 health_before_strike=m_nextTarget->GetUInt32Value(UNIT_FIELD_HEALTH);
+#endif
 							m_Unit->Strike(m_nextTarget, (agent==AGENT_MELEE)?0:2,NULL,0,0,0, false);
+#ifdef ENABLE_CREATURE_DAZE
+							//now if the target is facing his back to us then we could just cast dazed on him :P
+							//as far as i know dazed is casted by most of the creatures but feel free to remove this code if you think otherwise
+							if(!(m_Unit->m_factionDBC->RepListId == -1 && m_Unit->m_faction->FriendlyMask==0 && m_Unit->m_faction->HostileMask==0) /* neutral creature */
+								&& m_nextTarget->IsPlayer() && !m_Unit->IsPet() && health_before_strike>m_nextTarget->GetUInt32Value(UNIT_FIELD_HEALTH)
+								&& Rand(m_Unit->get_chance_to_daze(m_nextTarget)))
+							{
+								float our_facing=m_Unit->calcRadAngle(m_Unit->GetPositionX(),m_Unit->GetPositionY(),m_nextTarget->GetPositionX(),m_nextTarget->GetPositionY());
+								float his_facing=m_nextTarget->GetOrientation();
+								if(fabs(our_facing-his_facing)<CREATURE_DAZE_TRIGGER_ANGLE && !m_nextTarget->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
+								{
+									SpellEntry *info = dbcSpell.LookupEntry(CREATURE_SPELL_TO_DAZE);
+									Spell *sp = new Spell(m_Unit, info, false, NULL);
+									SpellCastTargets targets;
+									targets.m_unitTarget = m_nextTarget->GetGUID();
+									sp->prepare(&targets);
+								}
+							}
+#endif
 						}
 					}
 				}
