@@ -7759,6 +7759,32 @@ void Player::SetShapeShift(uint8 ss)
 			spell->prepare(&targets);		   
 		}
 	}
+
+	//Add some specific forms auras
+	if (m_ssAuras.size())
+	{
+		std::set<SSAura*>::iterator i;
+		for(i=m_ssAuras.begin();i!=m_ssAuras.end();i++)
+		{
+			SSAura* aura = *i;
+			if(ss)
+			{
+				if (!(ss &= aura->forms )) // Not in required form
+				{
+					if(this->FindAura(aura->spellid))
+						this->FindAura(aura->spellid)->Remove();
+				}
+				else //in required form
+				{
+					SpellEntry* spe = dbcSpell.LookupEntry(aura->spellid);
+					if (!spe)
+					return;
+					Aura* aur = new Aura(spe,0,this,this);
+					this->AddAura(aur);
+				}
+			}
+		}
+	}
 }
 
 void Player::CalcDamage()

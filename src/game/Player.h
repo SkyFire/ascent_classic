@@ -544,6 +544,12 @@ struct PlayerSkill
 	void Reset(uint32 Id);
 };
 
+struct SSAura
+{
+	uint32 spellid;
+	uint32 forms;
+};
+
 enum SPELL_INDEX
 {
 	SPELL_TYPE_INDEX_MARK			= 1,
@@ -795,6 +801,8 @@ public:
     SpellSet            m_SSSPecificSpells;
     SpellSet            mSpells;
     SpellSet            mDeletedSpells;
+	std::set<SSAura*>    m_ssAuras;
+
 
     /************************************************************************/
     /* Actionbar                                                            */

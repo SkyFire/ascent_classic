@@ -1640,10 +1640,13 @@ void Aura::SpellAuraDummy(bool apply)
 			}break;
 		case 17007: //Druid:Leader of the Pack
 			{
-				//Shady: commented till NT on localhost
-				/*SpellEntry* se = sSpellStore.LookupEntry(24932);
-				Aura* aur = new Aura(se,0,(Object*)m_target,m_target);
-				static_cast<Player*>(m_target)->AddAura(aur);*/
+				if (!m_target->IsPlayer())
+					return;
+				Player* pTarget = (Player*)m_target;
+				SSAura* aura = new SSAura();
+				aura->spellid = 24932;
+				aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
+				pTarget->m_ssAuras.insert(aura);
 			}break;
 	}
 }
@@ -5457,7 +5460,7 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 		if(m_target->IsPlayer())
 		{
 			//druid hearth of the wild should add more features based on form
-			if(m_spellProto->NameHash==1814208707)
+			if(m_spellProto->NameHash==0x6C22A0C3)
 			{
 				//we should remove effect first
 				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange(false);
