@@ -32,6 +32,8 @@
 	#include <winsock2.h>
 #endif
 
+#include "VoiceChatOpcodes.h"
+
 typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
@@ -58,10 +60,12 @@ struct WoWServer * CreateServer(int fd, struct sockaddr_in* address);
 struct WoWServer * GetServer(int fd);
 void CloseChannelsOnServer(struct WoWServer * srv);
 void CloseServerConnection(struct WoWServer * srv);
+struct VoiceChatChannel * CreateChannel(uint16 channel_id, uint8 channel_type);
+int GenerateChannelId();
 
 struct WoWServer
 {
-	struct VoiceChatChannel * channels[1000];
+	struct VoiceChatChannel channels[1000];
 	struct sockaddr_in address;
 	int fd;
 	struct WoWServer * next;

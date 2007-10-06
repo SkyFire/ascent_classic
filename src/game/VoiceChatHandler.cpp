@@ -37,6 +37,28 @@ void WorldSession::HandleEnableMicrophoneOpcode(WorldPacket & recv_data)
 	}
 }
 
+void WorldSession::HandleChannelVoiceQueryOpcode(WorldPacket & recv_data)
+{
+	string name;
+	recv_data >> name;
+
+	// custom channel
+	Channel * chn = channelmgr.GetChannel(name.c_str(), _player);
+	uint8 key[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	if(chn == NULL)
+		return;
+
+	if(chn->m_general || !chn->voice_enabled)
+		return;
+
+	WorldPacket data(SMSG_CHANNEL_NOTIFY_AVAILABLE_VOICE_SESSION, 17+chn->m_name.size());
+	data << chn->voice_channel_id;
+	data << uint8(0);		// 00=custom,03=party,04=raid
+	data << chn->m_name;
+	data << _player->GetGUID();
+	SendPacket(&data);
+}
+
 void WorldSession::HandleVoiceChatQueryOpcode(WorldPacket & recv_data)
 {
 	uint32 type;
@@ -46,17 +68,27 @@ void WorldSession::HandleVoiceChatQueryOpcode(WorldPacket & recv_data)
 	{
 		// custom channel
 		Channel * chn = channelmgr.GetChannel(name.c_str(), _player);
+		uint8 key[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 		if(chn == NULL)
 			return;
 
 		if(chn->m_general || !chn->voice_enabled)
 			return;
 
-		WorldPacket data(SMSG_CHANNEL_NOTIFY_AVAILABLE_VOICE_SESSION, 17+chn->m_name.size());
+		WorldPacket data(SMSG_VOICE_SESSION, 100);
+		data.Initialize(0x039E);
 		data << chn->voice_channel_id;
-		data << uint8(type);		// 00=custom,03=party,04=raid
+		data << uint16(0x0001);
+		data << uint8(type);
 		data << chn->m_name;
+		data.append(key, 16);
+		data << uint32(htonl(inet_addr("0.0.0.0")));
+		data << uint16(htons(3725));
+		data << uint8(1);
 		data << _player->GetGUID();
+		data << uint8(1);
+		data << uint8(40);
+		data << uint8(6);
 		SendPacket(&data);
 	}
 }

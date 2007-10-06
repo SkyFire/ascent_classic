@@ -693,6 +693,7 @@ protected:
 	// VOICECHAT
 	void HandleEnableMicrophoneOpcode(WorldPacket & recv_data);
 	void HandleVoiceChatQueryOpcode(WorldPacket & recv_data);
+	void HandleChannelVoiceQueryOpcode(WorldPacket & recv_data);
 
 public:
 

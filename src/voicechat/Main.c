@@ -23,20 +23,57 @@
 int m_boundFdUDP;
 int m_listenFdTCP;
 
+int udp_listen_port;
+int tcp_listen_port;
+char udp_listen_address[100];
+char tcp_listen_address[100];
+struct sockaddr_in m_udplisten;
+struct sockaddr_in m_tcplisten;
 
-int Bind(struct sockaddr_in * address)
+int LoadConfigs(int * udp_port, char * udp_address, int * tcp_port, char * tcp_address);
+
+int Bind()
 {
 	m_boundFdUDP = (int)socket(AF_INET, SOCK_DGRAM, 0);
 	if(m_boundFdUDP < 0)
 		return -1;
 
-	if(bind(m_boundFdUDP, (const struct sockaddr*)address, sizeof(struct sockaddr_in)) < 0)
+	if(bind(m_boundFdUDP, (const struct sockaddr*)&m_udplisten, sizeof(struct sockaddr_in)) < 0)
 	{
 		closesocket(m_boundFdUDP);
 		return -2;
 	}
 
 	return 0;
+}
+
+int Listen()
+{
+	m_listenFdTCP = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if(m_listenFdTCP < 0)
+		return -1;
+
+	if(bind(m_listenFdTCP, (const struct sockaddr*)&m_tcplisten, sizeof(struct sockaddr_in)) < 0)
+	{
+		closesocket(m_boundFdUDP);
+		return -2;
+	}
+
+	if(listen(m_listenFdTCP, 5) < 0)
+	{
+		closesocket(m_listenFdTCP);
+		return -3;
+	}
+
+	return 0;
+}
+
+void dumphex(char * buf, int len)
+{
+	int i;
+	for(i = 0; i < len; ++i)
+		printf("%.2X ", buf[i]);
+	printf("\n");
 }
 
 void OnUdpRead()
@@ -59,6 +96,9 @@ void OnUdpRead()
 		printf("recvfrom() returned <0!\n");
 		return;
 	}
+
+	printf("from: %s:%u (%u bytes)\n", inet_ntoa(from.sin_addr), ntohs(from.sin_port), recv_len);
+	dumphex(buffer, recv_len);
 
     // TODO: Decrypt the header.
 
@@ -108,6 +148,7 @@ void OnListenTcpRead()
 		return;
 	}
 
+	printf("new tcp connection from: %s:%u\n", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));
 	ws = CreateServer(new_fd, &addr);
 }
 
@@ -135,23 +176,48 @@ void HandleTcpRead(int fd)
 	char buffer[1000];
 	int len;
 	int cmd;
-	struct WoWServer * ws;
+	struct WoWServer * ws = GetServer(fd);
 
 	len = recv(fd, buffer, 1000, 0);
-	if(len <= 0)
+	if(ws == NULL)
 	{
-		ws = GetServer(fd);
-		if(ws)
-		{
-			CloseServerConnection(ws);
-			return;
-		}
+		printf("tcpfrom: %u bytes from fd %u with unknown sockaddr\n", len, fd);
+		return;
 	}
 
+	printf("tcpfrom: %s:%u (%u bytes)\n", inet_ntoa(ws->address.sin_addr), ntohs(ws->address.sin_port), len);
+
+	if(len <= 0)
+	{
+		CloseServerConnection(ws);
+		return;
+	}
+
+	dumphex(buffer, len);
 	cmd = *(int*)&buffer[0];
+	switch(cmd)
+	{
+	case VOICECHAT_CMSG_CREATE_CHANNEL:
+		{
+			int t = *(int*)&buffer[4];
+			int request_id = *(int*)&buffer[8];
+			struct VoiceChatChannel * chn;
+			uint8 out_buffer[12];
+            
+			chn = CreateChannel(GenerateChannelId(), t);
+			*(int*)&out_buffer[0] = VOICECHAT_SMSG_CHANNEL_CREATED;
+			*(int*)&out_buffer[4] = request_id;
+			*(int*)&out_buffer[8] = chn->channel_id;
+			if(send(fd, out_buffer, 12, 0) != 12)
+			{
+				printf("send() error (create channel)\n");
+				return;
+			}
+		}break;
+	}
 }
 
-void MessageLoop()
+int MessageLoop()
 {
 	FD_SET read_fds;
 	u_int i;
@@ -166,7 +232,10 @@ void MessageLoop()
 		fd_count = SetFds(&read_fds);
 		result = select(fd_count, &read_fds, NULL, NULL, &tv);
 		if(result < 0)
+		{
 			printf("select() returned < 0\n");
+			return -1;
+		}
 		else
 		{
 			if(FD_ISSET(m_boundFdUDP, &read_fds))
@@ -190,7 +259,69 @@ void MessageLoop()
 	}
 }
 
+void GenerateSockAddr(struct sockaddr_in * ptr, char * addr, int port)
+{
+	struct hostent * h;
+
+	memset(ptr, 0, sizeof(struct sockaddr_in));
+	ptr->sin_family = AF_INET;
+	ptr->sin_port = htons((short)port);
+	if(!strcmp(addr, "0.0.0.0"))
+		ptr->sin_addr.s_addr = htonl(INADDR_ANY);
+	else
+	{
+		h = gethostbyname(addr);
+		if(h == 0)
+			ptr->sin_addr.s_addr = htonl(INADDR_ANY);
+		else
+			memcpy(&ptr->sin_addr.s_addr, h->h_addr_list[0], sizeof(struct in_addr));
+	}
+}
 int main(int argc, char * argv[])
 {
-	return 0;
+#ifdef WIN32
+	WSADATA d;
+	WSAStartup(MAKEWORD(2,0), &d);
+#endif
+
+	printf("Ascent VoiceChat Server\n");
+	printf("Copyright (C) 2007 Burlex\n");
+	printf("This is free software, covered by the GNU General Public License, and you are\n"
+		   "welcome to change it and/or distribute copies of it under certain conditions.\n\n");
+
+	if(LoadConfigs(&udp_listen_port, udp_listen_address, &tcp_listen_port, tcp_listen_address) < 0)
+	{
+		printf("Could not parse config. Exiting.\n");
+		return -1;
+	}
+
+	GenerateSockAddr(&m_udplisten, udp_listen_address, udp_listen_port);
+	GenerateSockAddr(&m_tcplisten, tcp_listen_address, tcp_listen_port);
+
+	printf("Binding...");
+	if(Bind() < 0)
+	{
+		printf("Could not bind UDP listener!\n");
+		return -2;
+	}
+	printf(" ok!\nListening...");
+
+	if(Listen() < 0)
+	{
+		printf("Could not listen on TCP port!\n");
+		return -3;
+	}
+	printf(" ok!\n");
+
+	printf("\nServer is now running.\n");
+	if(MessageLoop() < 0)
+	{
+		printf("Message loop exited with errors!\n");
+		return -1;
+	}
+	else
+	{
+		printf("Message loop exited without errors.");
+		return 0;
+	}
 }

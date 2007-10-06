@@ -25,6 +25,7 @@ struct VoiceChatChannel * m_channelBegin;
 struct VoiceChatChannel * m_channelEnd;
 struct WoWServer * m_serverBegin;
 struct WoWServer * m_serverEnd;
+int m_channelIdHigh = 1;
 
 struct VoiceChatChannel * GetChannel(uint16 channel_id)
 {
@@ -116,6 +117,7 @@ struct WoWServer * CreateServer(int fd, struct sockaddr_in* address)
 	struct WoWServer * current;
 
 	ws = (struct WoWServer*)malloc(sizeof(struct WoWServer));
+	memset(ws, 0, sizeof(struct WoWServer));
 	assert(ws);
 
 	prev = NULL;
@@ -138,7 +140,7 @@ struct WoWServer * CreateServer(int fd, struct sockaddr_in* address)
 		ws->next = NULL;
 	}
 
-	memcpy(&ws->address, &address, sizeof(struct sockaddr_in));
+	memcpy(&ws->address, address, sizeof(struct sockaddr_in));
 	ws->fd = fd;
 
 	m_serverEnd = ws;
@@ -147,12 +149,48 @@ struct WoWServer * CreateServer(int fd, struct sockaddr_in* address)
 
 void CloseServerConnection(struct WoWServer * srv)
 {
-	
+	printf("server connection: %s:%u is now closed.\n", inet_ntoa(srv->address.sin_addr), ntohs(srv->address.sin_port));
+	CloseChannelsOnServer(srv);
+
+	if(srv->prev == NULL)
+		m_serverBegin = srv->next;
+	else
+		srv->prev->next = srv->next;
+
+	if(srv->next != NULL)
+		srv->next->prev = srv->prev;
+
+	if(m_serverEnd == srv)
+		m_serverEnd = srv->prev;
+
+	free(srv);
+}
+
+void CloseChannel(struct VoiceChatChannel* chn)
+{
+	if(chn->prev == NULL)
+		m_channelBegin = chn->next;
+	else
+		chn->prev->next = chn->next;
+
+	if(chn->next != NULL)
+		chn->next->prev = chn->prev;
+
+	if(m_channelEnd == chn)
+		m_channelEnd = chn->prev;
+
+	free(chn->members);
+	free(chn);
 }
 
 void CloseChannelsOnServer(struct WoWServer * srv)
 {
-
+	int i;
+	for(i = 0; i < 1000; ++i)
+	{
+		if(srv->channels[i].channel_id != 0)
+			CloseChannel(&srv->channels[i]);
+	}
 }
 
 struct WoWServer * GetServer(int fd)
@@ -167,4 +205,9 @@ struct WoWServer * GetServer(int fd)
 	}
 
 	return NULL;
+}
+
+int GenerateChannelId()
+{
+	return m_channelIdHigh++;
 }

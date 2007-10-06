@@ -873,7 +873,8 @@ void WorldSession::InitPacketHandlerTable()
 
 	// voicechat
 	WorldPacketHandlers[CMSG_ENABLE_MICROPHONE].handler = &WorldSession::HandleEnableMicrophoneOpcode;
-	WorldPacketHandlers[CMSG_CHANNEL_VOICE_CHAT_QUERY].handler = &WorldSession::HandleVoiceChatQueryOpcode;
+	WorldPacketHandlers[CMSG_VOICE_CHAT_QUERY].handler = &WorldSession::HandleVoiceChatQueryOpcode;
+	WorldPacketHandlers[CMSG_CHANNEL_VOICE_QUERY].handler = &WorldSession::HandleChannelVoiceQueryOpcode;
 }
 
 void WorldSession::CHECK_PACKET_SIZE(WorldPacket& data, uint32 size)
