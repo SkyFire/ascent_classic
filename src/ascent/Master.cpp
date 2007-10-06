@@ -113,9 +113,6 @@ struct Addr
 
 bool Master::Run(int argc, char ** argv)
 {
-    // remove this to develop
-    char I_Should_Not_Use_The_Trunk_But_The_Stable_Branch = *((char*)NULL);
-
 	char * config_file = (char*)default_config_file;
 	char * realm_config_file = (char*)default_realm_config_file;
 
