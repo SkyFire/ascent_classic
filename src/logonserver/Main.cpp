@@ -301,14 +301,14 @@ void LogonServer::Run(int argc, char ** argv)
 		fclose(fPid);
 	}
 	uint32 loop_counter = 0;
-	ThreadPool.Gobble();
+	//ThreadPool.Gobble();
 
 	while(mrunning && authsockcreated && intersockcreated)
 	{
 		if(!(++loop_counter % 400))	 // 20 seconds
 			CheckForDeadSockets();
 
-		if(!(loop_counter%3600))	// 3mins
+		if(!(loop_counter%250))	// 5mins
 			ThreadPool.IntegrityCheck();
 
 #ifdef WIN32

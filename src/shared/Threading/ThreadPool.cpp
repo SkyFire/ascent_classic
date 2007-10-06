@@ -65,7 +65,14 @@ bool CThreadPool::ThreadExit(Thread * t)
 
 	// enter the "suspended" pool
 	++_threadsExitedSinceLastCheck;
+	++_threadsEaten;
+	std::set<Thread*>::iterator itr = m_freeThreads.find(t);
+	if(itr != m_freeThreads.end())
+	{
+		printf("Thread %u duplicated with thread %u\n", (*itr)->ControlInterface.GetId(), t->ControlInterface.GetId());
+	}
 	m_freeThreads.insert(t);
+	
 	_mutex.Release();
 	Log.Debug("ThreadPool", "Thread %u entered the free pool.", t->ControlInterface.GetId());
 	return true;
@@ -113,6 +120,7 @@ void CThreadPool::Startup()
 		StartThread(NULL);
 
 	Log.Debug("ThreadPool", "Startup, launched %u threads.", tcount);
+	Sleep(500);
 	IntegrityCheck();
 }
 
@@ -122,7 +130,7 @@ void CThreadPool::ShowStats()
 	Log.Debug("ThreadPool", "============ ThreadPool Status =============");
 	Log.Debug("ThreadPool", "Active Threads: %u", m_activeThreads.size());
 	Log.Debug("ThreadPool", "Suspended Threads: %u", m_freeThreads.size());
-	Log.Debug("ThreadPool", "Requested-To-Freed Ratio: %.3f%% (%u/%u)", float( float(_threadsRequestedSinceLastCheck) / float(_threadsExitedSinceLastCheck) * 100.0f ), _threadsRequestedSinceLastCheck, _threadsExitedSinceLastCheck);
+	Log.Debug("ThreadPool", "Requested-To-Freed Ratio: %.3f%% (%u/%u)", float( float(_threadsRequestedSinceLastCheck+1) / float(_threadsExitedSinceLastCheck+1) * 100.0f ), _threadsRequestedSinceLastCheck, _threadsExitedSinceLastCheck);
 	Log.Debug("ThreadPool", "Eaten Count: %d (negative is bad!)", _threadsEaten);
 	Log.Debug("TrheadPool", "============================================");
 	_mutex.Release();
@@ -138,13 +146,14 @@ void CThreadPool::IntegrityCheck()
 		// this means we requested more threads than we had in the pool last time.
         // spawn "gobbled" + THREAD_RESERVE extra threads.
 		uint32 new_threads = abs(gobbled) + THREAD_RESERVE;
+		_threadsEaten=0;
+
 		for(uint32 i = 0; i < new_threads; ++i)
 			StartThread(NULL);
 
-		_threadsEaten = new_threads;
 		Log.Debug("ThreadPool", "IntegrityCheck: (gobbled < 0) Spawning %u threads.", new_threads);
 	}
-	else if(gobbled <= THREAD_RESERVE)
+	else if(gobbled < THREAD_RESERVE)
 	{
         // this means while we didn't run out of threads, we were getting damn low.
 		// spawn enough threads to keep the reserve amount up.
@@ -152,7 +161,6 @@ void CThreadPool::IntegrityCheck()
 		for(uint32 i = 0; i < new_threads; ++i)
 			StartThread(NULL);
 
-		_threadsEaten = new_threads;
 		Log.Debug("ThreadPool", "IntegrityCheck: (gobbled <= 5) Spawning %u threads.", new_threads);
 	}
 	else if(gobbled > THREAD_RESERVE)
@@ -169,6 +177,13 @@ void CThreadPool::IntegrityCheck()
 		// perfect! we have the ideal number of free threads.
 		Log.Debug("ThreadPool", "IntegrityCheck: Perfect!");
 	}
+	/*if(m_freeThreads.size() < 5)
+	{
+		uint32 j = 5 - m_freeThreads.size();
+		Log.Debug("ThreadPool", "Spawning %u threads.", j);
+		for(uint32 i = 0; i < j; ++i)
+			StartThread(NULL);
+	}*/
 
 	_threadsExitedSinceLastCheck = 0;
 	_threadsRequestedSinceLastCheck = 0;
@@ -237,7 +252,8 @@ static unsigned long WINAPI thread_proc(void* param)
 {
 	Thread * t = (Thread*)param;
 	uint32 tid = t->ControlInterface.GetId();
-	Log.Debug("ThreadPool", "Thread %u started.", t->ControlInterface.GetId());
+	bool ht = (t->ExecutionTarget != NULL);
+	//Log.Debug("ThreadPool", "Thread %u started.", t->ControlInterface.GetId());
 
 	for(;;)
 	{
@@ -251,9 +267,14 @@ static unsigned long WINAPI thread_proc(void* param)
 		}
 
 		if(!ThreadPool.ThreadExit(t))
+		{
+			Log.Debug("ThreadPool", "Thread %u exiting.", tid);
 			break;
+		}
 		else
 		{
+			if(ht)
+				Log.Debug("ThreadPool", "Thread %u waiting for a new task.", tid);
 			// enter "suspended" state. when we return, the threadpool will either tell us to fuk off, or to execute a new task.
 			t->ControlInterface.Suspend();
 			// after resuming, this is where we will end up. start the loop again, check for tasks, then go back to the threadpool.

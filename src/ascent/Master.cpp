@@ -351,7 +351,7 @@ bool Master::Run(int argc, char ** argv)
 #endif
 
 	uint32 loopcounter=0;
-	ThreadPool.Gobble();
+	//ThreadPool.Gobble();
 
 #ifndef CLUSTERING
 	/* Connect to realmlist servers / logon servers */
@@ -374,7 +374,7 @@ bool Master::Run(int argc, char ** argv)
 	{
 		start = now();
 		diff = start - last_time;
-		if(! ((++loopcounter) % 3600) )		// 3mins
+		if(! ((++loopcounter) % 250) )		// 5mins
 		{
 			ThreadPool.ShowStats();
 			ThreadPool.IntegrityCheck();

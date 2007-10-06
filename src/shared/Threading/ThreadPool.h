@@ -160,7 +160,7 @@ public:
 	void KillFreeThreads(uint32 count);
 
 	// resets the gobble counter
-	inline void Gobble() { _threadsEaten=0; }
+	inline void Gobble() { _threadsEaten=(int32)m_freeThreads.size(); }
 
 	// gets active thread count
 	inline uint32 GetActiveThreadCount() { return (uint32)m_activeThreads.size(); }

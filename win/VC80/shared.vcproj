@@ -451,6 +451,18 @@
 				RelativePath="..\..\src\shared\Threading\ThreadStarter.h"
 				>
 			</File>
+			<Filter
+				Name="ThreadPool"
+				>
+				<File
+					RelativePath="..\..\src\shared\Threading\ThreadPool.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\shared\Threading\ThreadPool.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Util"
