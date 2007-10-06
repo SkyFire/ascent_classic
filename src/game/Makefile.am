@@ -9,6 +9,10 @@ libgame_a_SOURCES = \
     ../scriptengine/ScriptFunctions.cpp \
     ../scriptengine/ScriptFunctions.h \
     ../scriptengine/ScriptFunctionTable.cpp \
+    VoiceChatClientSocket.cpp \
+    VoiceChatClientSocket.h \
+    VoiceChatHandler.cpp \
+    VoiceChatHandler.h \
     DayWatcherThread.cpp \
     DayWatcherThread.h \
     ArenaTeam.cpp \
