@@ -481,50 +481,49 @@ void SocialMgr::LoggedOut(Player* plr)
 	}
 }
 
-void SocialMgr::RemovePlayer(Player* plr)
+void SocialMgr::RemovePlayer(uint64 plr)
 {
 	if(!plr)
 		return;
 
-	uint64 plrguid = plr->GetGUID();
 	std::map<uint64, std::set<uint64>*>::iterator Itr;
 	std::map<uint64, std::set<uint64>*>::iterator mItr;
 	std::set<uint64>::iterator sItr;
 
-	Itr = m_isInFriendList.find( plrguid );
+	Itr = m_isInFriendList.find( plr );
 	if( Itr != m_isInFriendList.end() )
 	{
 		for(sItr = Itr->second->begin(); sItr != Itr->second->end(); sItr++)
 		{
 			mItr = m_hasInFriendList.find( *sItr );
 			if( mItr != m_hasInFriendList.end() )
-				mItr->second->erase( plrguid );
+				mItr->second->erase( plr );
 		}
 		delete Itr->second;
 		m_isInFriendList.erase(Itr);
 	}
 
-	Itr = m_isInIgnoreList.find( plrguid );
+	Itr = m_isInIgnoreList.find( plr );
 	if( Itr != m_isInIgnoreList.end() )
 	{
 		for(sItr = Itr->second->begin(); sItr != Itr->second->end(); sItr++)
 		{
 			mItr = m_hasInIgnoreList.find( *sItr );
 			if( mItr != m_hasInIgnoreList.end() )
-				mItr->second->erase( plrguid );
+				mItr->second->erase( plr );
 		}
 		delete Itr->second;
 		m_isInIgnoreList.erase(Itr);
 	}
 
-	Itr = m_needsBlockNotice.find(plrguid);
+	Itr = m_needsBlockNotice.find(plr);
 	if( Itr != m_needsBlockNotice.end() )
 	{
 		delete Itr->second;
 		m_needsBlockNotice.erase(Itr);
 	}
 
-	CharacterDatabase.Execute("DELETE FROM social WHERE guid=%d OR socialguid=%d", plr->GetGUIDLow(), plr->GetGUIDLow());
+	CharacterDatabase.Execute("DELETE FROM social WHERE guid=%d OR socialguid=%d", uint32(plr), uint32(plr));
 }
 
 void SocialMgr::LoadFromDB()

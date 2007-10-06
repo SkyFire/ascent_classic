@@ -51,6 +51,7 @@ public:
 	~AsyncQuery();
 	void AddQuery(const char * format, ...);
 	void Perform();
+	inline void SetDB(Database * dbb) { db = dbb; }
 };
 
 class Database : public CThread

@@ -55,7 +55,7 @@ public:
 
 	void LoggedIn(Player* plr); // To send a friend status update 'online' to people having him in their list
 	void LoggedOut(Player* plr); // To send a friend status update 'offline' to people having him in their list
-	void RemovePlayer(Player* plr); // When deleting a character from the server
+	void RemovePlayer(uint64 plr); // When deleting a character from the server
 
 	void LoadFromDB();
 	

@@ -993,11 +993,9 @@ public:
 	void SaveToDB(bool bNewCharacter);
 	void SaveAuras(stringstream&);
 	bool LoadFromDB(uint32 guid);
-	void LoadFromDBBlocking(uint32 guid);
 	void LoadFromDBProc(QueryResultVector & results);
 
 	void LoadNamesFromDB(uint32 guid);
-	void DeleteFromDB();
 	bool m_FirstLogin;
 
     /************************************************************************/

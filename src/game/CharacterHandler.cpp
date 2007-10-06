@@ -415,60 +415,64 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 		fail = 0x3B;
 	} else {
 
-		Player* plr = new Player( HIGHGUID_PLAYER, GUID_LOPART(guid));
-		ASSERT(plr);
-		plr->SetSession(this);
+		QueryResult * result = CharacterDatabase.Query("SELECT guildid, name FROM characters WHERE guid = %u", (uint32)guid);
+		PlayerInfo * inf = objmgr.GetPlayerInfo((uint32)guid);
+		if(!result || !inf)
+			return;
 
-		plr->LoadFromDBBlocking( GUID_LOPART(guid));
-		plr->m_playerInfo = objmgr.GetPlayerInfo(guid);
-		plr->DeleteFromDB();
-		//if charter leader
-		/*if(plr->m_charter)
-		{
-			plr->m_charter->RemoveSignature(plr->GetGUID());
-			if(plr->m_charter->GetLeader() == plr->GetGUIDLow())
-			{
-				plr->m_charter->Destroy();
-			}
-		}*/
-		for(int i = 0; i < NUM_ARENA_TEAM_TYPES; ++i)
-		{
-			if(plr->m_arenaTeams[i] != NULL)
-			{
-				if(plr->m_arenaTeams[i]->m_leader == plr->GetGUIDLow())
-					plr->m_arenaTeams[i]->Destroy();
-				else
-					plr->m_arenaTeams[i]->RemoveMember(plr->m_playerInfo);
-			}
-		}
+		uint32 guildid = result->Fetch()[0].GetUInt32();
+		string name = result->Fetch()[1].GetString();
+		delete result;
 
 		for(int i = 0; i < NUM_CHARTER_TYPES; ++i)
 		{
-			if(plr->m_charters[i])
-			{
-				if(plr->m_charters[i]->LeaderGuid == plr->GetGUIDLow())
-					plr->m_charters[i]->Destroy();
-				else
-					plr->m_charters[i]->RemoveSignature(plr->GetGUIDLow());
-			}
+			Charter * c = objmgr.GetCharterByGuid(guid, (CharterTypes)i);
+			if(c != NULL)
+				c->RemoveSignature((uint32)guid);
+		}
+
+
+		for(int i = 0; i < NUM_ARENA_TEAM_TYPES; ++i)
+		{
+			ArenaTeam * t = objmgr.GetArenaTeamByGuid((uint32)guid, i);
+			if(t != NULL)
+				t->RemoveMember(inf);
 		}
 		
-		Guild *pGuild = objmgr.GetGuild(plr->GetGuildId());
-		if(pGuild)
+		if(guildid)
 		{
-			if(pGuild->GetGuildLeaderGuid() == plr->GetGUID())
+			Guild *pGuild = objmgr.GetGuild(guildid);
+			if(pGuild)
 			{
-				pGuild->DeleteGuildMembers();
-				pGuild->RemoveFromDb();
+				if(pGuild->GetGuildLeaderGuid() == guid)
+				{
+					pGuild->DeleteGuildMembers();
+					pGuild->RemoveFromDb();
+				}
+				else
+					pGuild->DeleteGuildMember(guid);
 			}
-			else
-				pGuild->DeleteGuildMember(plr->GetGUID());
 		}
 
-		sPlrLog.write("Account: %s | IP: %s >> Deleted player %s", GetAccountName().c_str(), GetSocket()->GetRemoteIP().c_str(), plr->GetName());
+		sPlrLog.write("Account: %s | IP: %s >> Deleted player %s", GetAccountName().c_str(), GetSocket()->GetRemoteIP().c_str(), name.c_str());
 
-		plr->ok_to_remove = true;
-		delete plr;
+		sSocialMgr.RemovePlayer(guid);
+
+		CharacterDatabase.WaitExecute("DELETE FROM characters WHERE guid = %u", (uint32)guid);
+
+		Corpse * c=objmgr.GetCorpseByOwner((uint32)guid);
+		if(c)
+			CharacterDatabase.Execute("DELETE FROM corpses WHERE guid = %u", c->GetGUIDLow());
+
+		CharacterDatabase.Execute("DELETE FROM playeritems WHERE ownerguid=%u",(uint32)guid);
+		CharacterDatabase.Execute("DELETE FROM gm_tickets WHERE guid = %u", (uint32)guid);
+		CharacterDatabase.Execute("DELETE FROM playerpets WHERE ownerguid = %u", (uint32)guid);
+		CharacterDatabase.Execute("DELETE FROM playerpetspells WHERE ownerguid = %u", (uint32)guid);
+		CharacterDatabase.Execute("DELETE FROM playersummonspells WHERE ownerguid = %u", (uint32)guid);
+		CharacterDatabase.Execute("DELETE FROM tutorials WHERE playerId = %u", (uint32)guid);
+		CharacterDatabase.Execute("DELETE FROM questlog WHERE player_guid = %u", (uint32)guid);
+		CharacterDatabase.Execute("DELETE FROM playercooldownitems WHERE OwnerGuid = %u", (uint32)guid);
+		CharacterDatabase.Execute("DELETE FROM mailbox WHERE player_guid = %u", (uint32)guid);
 
 		/* remove player info */
 		objmgr.DeletePlayerInfo(guid);
