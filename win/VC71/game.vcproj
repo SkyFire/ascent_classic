@@ -236,7 +236,16 @@
 			Name="Sockets"
 			Filter="">
 			<File
+				RelativePath="..\..\src\game\VoiceChatClientSocket.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\VoiceChatClientSocket.h">
+			</File>
+			<File
 				RelativePath="..\..\src\game\VoiceChatHandler.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\VoiceChatHandler.h">
 			</File>
 			<File
 				RelativePath="..\..\src\game\WorkdSocketCluster.cpp">

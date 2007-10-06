@@ -57,7 +57,7 @@ Channel::Channel(const char * name, uint32 team)
 		}
 	}
 	m_confSettingLock.Release();
-	voice_channel_id = voicechannelhigh++;
+	i_voice_channel_id = -1;
 }
 
 void Channel::AttemptJoin(Player * plr, const char * password)
@@ -129,6 +129,14 @@ void Channel::Part(Player * plr)
     
 	flags = itr->second;
 	m_members.erase(itr);
+	itr = m_VoiceMembers.find(plr);
+	if(itr != m_VoiceMembers.end())
+	{
+		m_VoiceMembers.erase(itr);
+		if(i_voice_channel_id != (uint16)-1)
+			SendVoiceUpdate();
+	}
+
 	plr->LeftChannel(this);
 
 	if(flags & CHANNEL_FLAG_OWNER)
@@ -387,6 +395,14 @@ void Channel::Kick(Player * plr, Player * die_player, bool ban)
 	}
 
 	m_members.erase(itr);
+	itr = m_VoiceMembers.find(plr);
+	if(itr != m_VoiceMembers.end())
+	{
+		m_VoiceMembers.erase(itr);
+		if(i_voice_channel_id != (uint16)-1)
+			SendVoiceUpdate();
+	}
+
 	if(flags & CHANNEL_FLAG_OWNER)
 		SetOwner(NULL, NULL);
 
@@ -819,6 +835,27 @@ Channel * ChannelMgr::GetChannel(const char *name, Player * p)
 	return NULL;
 }
 
+Channel * ChannelMgr::GetChannel(const char *name, uint32 team)
+{
+	ChannelList::iterator itr;
+	ChannelList * cl = &Channels[0];
+	if(seperatechannels)
+		cl = &Channels[team];
+
+	lock.Acquire();
+	for(itr = cl->begin(); itr != cl->end(); ++itr)
+	{
+		if(!stricmp(name, itr->first.c_str()))
+		{
+			lock.Release();
+			return itr->second;
+		}
+	}
+
+	lock.Release();
+	return NULL;
+}
+
 void ChannelMgr::RemoveChannel(Channel * chn)
 {
 	ChannelList::iterator itr;
@@ -843,4 +880,109 @@ void ChannelMgr::RemoveChannel(Channel * chn)
 ChannelMgr::ChannelMgr()
 {
 
+}
+
+void Channel::VoiceChannelCreated(uint16 id)
+{
+	i_voice_channel_id = id;
+	SendVoiceUpdate();
+}
+
+void Channel::JoinVoiceChannel(Player * plr)
+{
+	m_lock.Acquire();
+	if(m_VoiceMembers.find(plr) == m_VoiceMembers.end())
+	{
+		m_VoiceMembers.insert(make_pair(plr, 0x40));
+		if(m_VoiceMembers.size() == 1)		// create channel
+			sVoiceChatHandler.CreateVoiceChannel(this);
+
+		if(i_voice_channel_id != (uint16)-1)
+			SendVoiceUpdate();
+	}
+	m_lock.Release();
+}
+
+void Channel::PartVoiceChannel(Player * plr)
+{
+	m_lock.Acquire();
+	MemberMap::iterator itr = m_VoiceMembers.find(plr);
+	if(itr != m_VoiceMembers.end())
+	{
+		m_VoiceMembers.erase(itr);
+		if(m_VoiceMembers.size() == 0)
+			sVoiceChatHandler.DestroyVoiceChannel(this);
+
+		if(i_voice_channel_id != (uint16)-1)
+			SendVoiceUpdate();
+	}
+	m_lock.Release();
+}
+
+void Channel::SendVoiceUpdate()
+{
+	/*
+	0x039E - SMSG_VOICE_SESSION
+	uint64 channel_id
+	uint16 voice_channel_id
+	uint8 channel_type (0=channel,2=party)
+	string name
+	16 bytes - unk, some sort of encryption key?
+	uint32 ip
+	uint16 port
+	uint8 player_count
+	<for each player>
+		uint64 guid
+		uint8 user_id
+		uint8 flags
+	uint8 unk
+	*/
+
+	WorldPacket data(SMSG_VOICE_SESSION, 300);
+	uint8 m_encryptionKey[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	uint8 counter=1;
+	m_lock.Acquire();
+	MemberMap::iterator itr;
+
+	data << m_id << uint32(0);
+	data << i_voice_channel_id;
+	data << uint8(0);
+	data << m_name;
+	data.append(m_encryptionKey, 16);
+	data << uint32(htonl(sVoiceChatHandler.GetVoiceServerIP()));
+	data << uint16(htons(sVoiceChatHandler.GetVoiceServerPort()));
+	data << uint8(m_VoiceMembers.size());
+    
+	for(itr = m_VoiceMembers.begin(); itr != m_VoiceMembers.end(); ++itr)
+	{
+		data << itr->first->GetGUID();
+		data << counter;
+		data << uint8(itr->second);
+	}
+
+	data << uint8(6);
+
+	for(itr = m_VoiceMembers.begin(); itr != m_VoiceMembers.end(); ++itr)
+		itr->first->GetSession()->SendPacket(&data);
+
+	m_lock.Release();
+}
+
+void Channel::VoiceDied()
+{
+	m_lock.Acquire();
+	m_VoiceMembers.clear();
+	i_voice_channel_id = (uint16)-1;
+	m_lock.Release();
+}
+
+void ChannelMgr::VoiceDied()
+{
+	lock.Acquire();
+	for(uint32 i = 0; i < 2; ++i)
+	{
+		for(ChannelList::iterator itr = Channels[i].begin(); itr != Channels[i].end(); ++itr)
+			itr->second->VoiceDied();
+	}
+	lock.Release();
 }

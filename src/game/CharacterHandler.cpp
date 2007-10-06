@@ -611,8 +611,8 @@ void WorldSession::FullLogin(Player * plr)
 	-------------------------------------------------------------------
 	*/
 
-	datab.Initialize(0x03C7);
-	datab << uint8(2) << uint8(1);
+	datab.Initialize(SMSG_VOICE_SYSTEM_STATUS);
+	datab << uint8(2) << uint8(sVoiceChatHandler.CanUseVoiceChat() ? 1 : 0);
 	SendPacket(&datab);
 
 	plr->UpdateAttackSpeed();

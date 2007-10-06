@@ -91,7 +91,8 @@ public:
 	uint32 m_team;
 	inline size_t GetNumMembers() { return m_members.size(); }
 	bool voice_enabled;
-	uint64 voice_channel_id;
+	uint16 i_voice_channel_id;
+	MemberMap m_VoiceMembers;
 
 public:
 	Channel(const char * name, uint32 team);
@@ -126,6 +127,11 @@ public:
 	void SendModeChange(Player * plr, uint8 old_flags, uint8 new_flags);
 
 	void SendToAll(WorldPacket * data);
+	void VoiceChannelCreated(uint16 id);
+	void JoinVoiceChannel(Player * plr);
+	void PartVoiceChannel(Player * plr);
+	void SendVoiceUpdate();
+	void VoiceDied();
 };
 
 #endif

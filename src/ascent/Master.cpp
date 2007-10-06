@@ -361,6 +361,10 @@ bool Master::Run(int argc, char ** argv)
 	new LogonCommHandler();
 	sLogonCommHandler.Startup();
 
+	/* voicechat */
+	new VoiceChatHandler();
+	sVoiceChatHandler.Startup();
+
 	// Create listener
 	ListenSocket<WorldSocket> * ls = new ListenSocket<WorldSocket>(host.c_str(), wsport);
     bool listnersockcreate = ls->IsOpen();
@@ -381,6 +385,7 @@ bool Master::Run(int argc, char ** argv)
 
 #ifndef CLUSTERING
 		sLogonCommHandler.UpdateSockets();
+		sVoiceChatHandler.Update();
 #ifdef WIN32
 		ls->Update();
 #endif

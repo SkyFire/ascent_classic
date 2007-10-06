@@ -148,6 +148,7 @@
 #include "ObjectStorage.h"
 #include "DatabaseCleaner.h"
 #include "DayWatcherThread.h"
+#include "VoiceChatHandler.h"
 
 #ifdef CLUSTERING
     #include "WorkerServerClient.h"
