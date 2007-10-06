@@ -58,7 +58,6 @@ bool Database::Initialize(const char* Hostname, unsigned int Port, const char* U
 	
 	for(int i = 0; i < mConnectionCount; ++i)
 	{
-		Connections[i].busy = false;
 		if(!Connect(&Connections[i]))
 			return false;
 	}
@@ -157,17 +156,16 @@ void Database::CheckConnections()
 
 MysqlCon * Database::GetFreeConnection()
 {
-	lock.Acquire();
-	while(true)
+	uint32 i = 0;
+	for(;;)
 	{
-		MysqlCon *con=&Connections[(++_counter)%mConnectionCount];
-		if(!con->busy)
-		{
-			con->busy=true;
-			lock.Release();
+		MysqlCon * con = &Connections[ ((i++) % mConnectionCount) ];
+		if(con->busy.AttemptAcquire())
 			return con;
-		}
-	}	
+	}
+
+	// shouldn't be reached
+	return NULL;
 }
 
 string Database::EscapeString(string Escape)
@@ -180,7 +178,7 @@ string Database::EscapeString(string Escape)
 		ret = Escape.c_str();
 	else
 		ret = a2;
-	con->busy = false;
+	con->busy.Release();
 	return string(ret);
 }
 
@@ -263,7 +261,7 @@ QueryResult * Database::Query(const char* QueryString, ...)
 			qResult->NextRow();
 		}
 	}
-	con->busy=false;
+	con->busy.Release();
 	return qResult;
 }
 
@@ -292,7 +290,7 @@ QueryResult * Database::QueryNA(const char* QueryString)
 			qResult->NextRow();
 		}
 	}
-	con->busy=false;
+	con->busy.Release();
 	return qResult;
 }
 
@@ -367,7 +365,7 @@ bool Database::WaitExecute(const char* QueryString, ...)
 
 	MysqlCon*con=GetFreeConnection();
 	bool Result = SendQuery(con, sql, false);
-	con->busy=false;
+	con->busy.Release();
 	return Result;
 }
 
@@ -375,7 +373,7 @@ bool Database::WaitExecuteNA(const char* QueryString)
 {
 	MysqlCon*con=GetFreeConnection();
 	bool Result = SendQuery(con, QueryString, false);
-	con->busy=false;
+	con->busy.Release();
 	return Result;
 }
 
@@ -388,7 +386,7 @@ void Database::run()
 	{
 		MysqlCon * con=GetFreeConnection();
 		SendQuery(con,query);
-		con->busy=false;
+		con->busy.Release();
 		delete [] query;
 		if(ThreadState == THREADSTATE_TERMINATE)
 			break;
@@ -404,7 +402,7 @@ void Database::run()
 		{
 			MysqlCon * con=GetFreeConnection();
 			SendQuery(con,query);
-			con->busy=false;
+			con->busy.Release();
 			delete [] query;
 		}
 	}
@@ -460,7 +458,7 @@ void AsyncQuery::Perform()
 	for(vector<AsyncQueryResult>::iterator itr = queries.begin(); itr != queries.end(); ++itr)
 		itr->result = db->FQuery(itr->query, conn);
 
-	conn->busy = false;
+	conn->busy.Release();
 	func->run(queries);
 
 	delete this;

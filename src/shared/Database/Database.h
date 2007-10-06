@@ -31,7 +31,7 @@ class Database;
 
 typedef struct{
 	MYSQL*	con;
-	volatile	bool	busy;
+	FastMutex busy;
 }MysqlCon;
 
 struct AsyncQueryResult
@@ -101,7 +101,6 @@ protected:
 
 	////////////////////////////////
 	FQueue<char*> queries_queue;
-	Mutex	lock;
 	MysqlCon * Connections;
 	MysqlCon * GetFreeConnection();
 	uint32 _counter;
