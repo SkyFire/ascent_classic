@@ -1534,7 +1534,13 @@ bool AIInterface::FindFriends(float dist)
 			guard->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PVP); /* shitty DBs */
 		
 			if(guard->CanAddToWorld())
-				sEventMgr.AddEvent(guard, &Creature::AddToWorld, EVENT_UNK, sRand.randInt(8)*1000, 1,0); /* staggered, not all at once :) */
+			{
+				uint32 t = sRand.randInt(8)*1000;
+				if(t==0)
+					guard->PushToWorld(m_Unit->GetMapMgr());
+				else
+					sEventMgr.AddEvent(((Object*)guard), &Object::PushToWorld, m_Unit->GetMapMgr(), EVENT_UNK, t, 1, 0);
+			}
 			else
 			{
 				guard->SafeDelete();
