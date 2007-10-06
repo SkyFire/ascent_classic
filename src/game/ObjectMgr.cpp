@@ -1335,45 +1335,6 @@ uint32 ObjectMgr::GetGossipTextForNpc(uint32 ID)
 
 const char * NormalTalkMessage = "What can I teach you, $N?";
 
-bool ynprompt()
-{
-#ifdef WIN32
-	for(;;)
-	{
-		if(GetAsyncKeyState('y') || GetAsyncKeyState('Y'))
-			return true;
-		else if(GetAsyncKeyState('n') || GetAsyncKeyState('N'))
-			return false;
-
-		Sleep(10);
-	}
-#else
-	char buffer[10];
-	for(;;)
-	{
-		struct termios initial_settings, new_settings;
-		tcgetattr(0,&initial_settings);
-		tcgetattr(0,&new_settings);
-		new_settings.c_lflag &= ~ICANON;
-		new_settings.c_lflag &= ~ECHO;
-		new_settings.c_lflag &= ~ISIG;
-		tcsetattr(0,TCSANOW,&new_settings);
-
-		int br = read(fileno(stdin), buffer, 10);
-		tcsetattr(0,TCSANOW,&initial_settings);
-		if(br>0)
-		{
-			if(buffer[0] == 'Y' || buffer[0] == 'y')
-				return true;
-			else if(buffer[1] == 'N' || buffer == 'n')
-				return false;
-		}		
-	}
-#endif
-	// not reached
-	return false;
-}
-
 void ObjectMgr::LoadTrainers()
 {
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM trainer_defs");
@@ -1413,9 +1374,7 @@ void ObjectMgr::LoadTrainers()
 		result2 = WorldDatabase.Query("SELECT * FROM trainer_spells where entry='%u'",entry);
 		if(!result2)
 		{
-			Log.Error("LoadTrainers", "Trainer with no spells, entry %u. Delete? (y/n) ", entry);
-			if(ynprompt())
-				WorldDatabase.WaitExecute("DELETE FROM trainer_defs WHERE entry = %u", entry);
+			Log.Error("LoadTrainers", "Trainer with no spells, entry %u.", entry);
 		}
 		else
 		{
@@ -1427,10 +1386,7 @@ void ObjectMgr::LoadTrainers()
 				SpellEntry *spellInfo = dbcSpell.LookupEntryForced(CastSpellID );
 				if(!spellInfo)
 				{
-					Log.Error("LoadTrainers", "Trainer %u with non-existant spell %u. Delete? (y/n) ", entry, CastSpellID);
-					if(ynprompt())
-						WorldDatabase.WaitExecute("DELETE FROM trainer_spells WHERE entry=%u AND cast_spell=%u", entry, CastSpellID);
-
+					Log.Error("LoadTrainers", "Trainer %u with non-existant spell %u.", entry, CastSpellID);
 					result2->NextRow();
 					continue; //omg a bad spell !
 				}
@@ -1457,9 +1413,7 @@ void ObjectMgr::LoadTrainers()
 
 				if(ts.pRealSpell == NULL)
 				{
-					Log.Error("LoadTrainers", "Trainer %u contains spell %u which doesn't teach. Delete? (y/n)", entry, CastSpellID);
-					if(ynprompt())
-						WorldDatabase.WaitExecute("DELETE FROM trainer_spells WHERE entry=%u AND cast_spell=%u", entry, CastSpellID);
+					Log.Error("LoadTrainers", "Trainer %u contains spell %u which doesn't teach.", entry, CastSpellID);
 				}
 				else
 				{
