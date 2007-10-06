@@ -86,35 +86,9 @@ ObjectMgr::~ObjectMgr()
 
 	for( TrainerMap::iterator i = mTrainers.begin( ); i != mTrainers.end( ); ++ i) {
 		Trainer * t = i->second;
-		if(t->TrainMsg)
-			delete [] t->TrainMsg;
-		if(t->NoTrainMsg)
-			delete [] t->NoTrainMsg;
-		if(t->SpellList)
-			delete [] t->SpellList;
-		if(t->TalkMessage)
-			delete [] t->TalkMessage;
+		if(t->UIMessage)
+			delete [] t->UIMessage;
 		delete t;
-	}
-
-	for(TrainerSpellMap::iterator i = mNormalSpells.begin(); i != mNormalSpells.end(); ++i)
-	{
-		vector<TrainerSpell*>::iterator itr = i->second.begin();
-		for(; itr != i->second.end(); ++itr)
-		{
-			delete (*itr);
-		}
-		i->second.clear();
-	}
-
-	for(TrainerSpellMap::iterator i = mPetSpells.begin(); i != mPetSpells.end(); ++i)
-	{
-		vector<TrainerSpell*>::iterator itr = i->second.begin();
-		for(; itr != i->second.end(); ++itr)
-		{
-			delete (*itr);
-		}
-		i->second.clear();
 	}
 
 	for( LevelInfoMap::iterator i = mLevelInfo.begin(); i != mLevelInfo.end(); ++i)
@@ -1359,815 +1333,159 @@ uint32 ObjectMgr::GetGossipTextForNpc(uint32 ID)
 	return mNpcToGossipText[ID];
 }
 
-map<uint32, pair<string,string> > SpellNameRanks;
-const char * GetSpellName(uint32 id)
+const char * NormalTalkMessage = "What can I teach you, $N?";
+
+bool ynprompt()
 {
-	map<uint32,pair<string,string> >::iterator itr = SpellNameRanks.find(id);
-	if(itr == SpellNameRanks.end())
-		return NULL;
-
-	return itr->second.first.c_str();
-}
-
-const char * GetSpellRank(uint32 id)
-{
-	map<uint32,pair<string,string> >::iterator itr = SpellNameRanks.find(id);
-	if(itr == SpellNameRanks.end())
-		return NULL;
-
-	return itr->second.second.c_str();
-}
-
-void ObjectMgr::GenerateTrainerSpells()
-{
-	std::map<uint32, TrainerSpellOverride> OMap;
-	
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM trainerspelloverride");
-	if(result != 0)
+#ifdef WIN32
+	for(;;)
 	{
-//		uint32 mx = result->GetRowCount(), c = 0;
-		do 
+		if(GetAsyncKeyState('y') || GetAsyncKeyState('Y'))
+			return true;
+		else if(GetAsyncKeyState('n') || GetAsyncKeyState('N'))
+			return false;
+
+		Sleep(10);
+	}
+#else
+	char buffer[10];
+	for(;;)
+	{
+		struct termios initial_settings, new_settings;
+		tcgetattr(0,&initial_settings);
+		tcgetattr(0,&new_settings);
+		new_settings.c_lflag &= ~ICANON;
+		new_settings.c_lflag &= ~ECHO;
+		new_settings.c_lflag &= ~ISIG;
+		tcsetattr(0,TCSANOW,&new_settings);
+
+		int br = read(fileno(stdin), buffer, 10);
+		tcsetattr(0,TCSANOW,&initial_settings);
+		if(br>0)
 		{
-			Field * f = result->Fetch();
-			TrainerSpellOverride ov;
-			ov.Cost = f[1].GetUInt32();
-			ov.RequiredSpell = f[2].GetUInt32();
-			ov.DeleteSpell = f[3].GetUInt32();
-			ov.RequiredSkill = f[4].GetUInt32();
-			ov.RequiredSkillValue = f[5].GetUInt32();
-			ov.RequiredLevel = f[6].GetUInt32();
-			ov.RequiredClass = f[7].GetUInt32();
-
-			OMap[f[0].GetUInt32()] = ov;
-		} while(result->NextRow());
-		delete result;
+			if(buffer[0] == 'Y' || buffer[0] == 'y')
+				return true;
+			else if(buffer[1] == 'N' || buffer == 'n')
+				return false;
+		}		
 	}
-	std::vector<uint32> itemSpell;
-
-	// Lets take item spell learn list so we can remove recipe from trainers
-	result = WorldDatabase.Query("SELECT spellid_1,spellid_2,spellid_3,spellid_4,spellid_5 FROM items");
-	if(result != 0)
-	{
-		do 
-		{
-			Field * f = result->Fetch();
-			uint32 s1,s2,s3,s4,s5;
-			if((s1 = f[0].GetUInt32()) != 0)
-			{
-				SpellEntry *sp = dbcSpell.LookupEntry(s1);
-				for(int i = 0; i < 3; i++)
-				{
-					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
-						|| sp->Effect[i] == SPELL_EFFECT_LEARN_PET_SPELL)
-						itemSpell.push_back(sp->EffectTriggerSpell[i]);
-				}
-			}
-			if((s2 = f[1].GetUInt32()) != 0)
-			{
-				SpellEntry *sp = dbcSpell.LookupEntry(s2);
-				for(int i = 0; i < 3; i++)
-				{
-					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
-						|| sp->Effect[i] == SPELL_EFFECT_LEARN_PET_SPELL)
-						itemSpell.push_back(sp->EffectTriggerSpell[i]);
-				}
-			}
-			if((s3 = f[2].GetUInt32()) != 0)
-			{
-				SpellEntry *sp = dbcSpell.LookupEntry(s3);
-				for(int i = 0; i < 3; i++)
-				{
-					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
-						|| sp->Effect[i] == SPELL_EFFECT_LEARN_PET_SPELL)
-						itemSpell.push_back(sp->EffectTriggerSpell[i]);
-				}
-			}
-			if((s4 = f[3].GetUInt32()) != 0)
-			{
-				SpellEntry *sp = dbcSpell.LookupEntry(s4);
-				for(int i = 0; i < 3; i++)
-				{
-					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
-						|| sp->Effect[i] == SPELL_EFFECT_LEARN_PET_SPELL)
-						itemSpell.push_back(sp->EffectTriggerSpell[i]);
-				}
-			}
-			if((s5 = f[4].GetUInt32()) != 0)
-			{
-				SpellEntry *sp = dbcSpell.LookupEntry(s5);
-				for(int i = 0; i < 3; i++)
-				{
-					if(sp->Effect[i] == SPELL_EFFECT_LEARN_SPELL
-						|| sp->Effect[i] == SPELL_EFFECT_LEARN_PET_SPELL)
-						itemSpell.push_back(sp->EffectTriggerSpell[i]);
-				}
-			}
-		} while(result->NextRow());
-		delete result;
-	}
-
-	// Convert ranks into our temp map.
-
-	// i _hate_ string indexes :p
-	map<string, map<uint32, uint32>* > SpellRankMap;
-	map<uint32, uint32> SpellRanks;
-	map<string, map<uint32, uint32>* >::iterator it1;
-	map<uint32, uint32>::iterator it2;
-	map<uint32, uint32> TeachingSpellMap;
-
-	uint32 mx = dbcSpell.GetNumRows();
-	DBCFile f;
-	f.open("DBC/Spell.dbc");
-
-	for(uint32 i = 0; i < f.getRecordCount(); ++i)
-	{
-		// Get Spell
-		SpellEntry *Sp = dbcSpell.LookupEntryForced(f.getRecord(i).getUInt(0));
-		ASSERT(Sp);
-		if(Sp != NULL)
-		{
-			// Skip learning spells ;)
-			// Skip any spells that are obselete
-			if(Sp->SpellVisual == 222)
-				continue;
-
-			uint32 j;
-			bool check = false;
-			for(j = 0; j < 3; j++)
-			{
-				if(check)
-					break;
-				check = false;
-				if(Sp->Effect[j] == SPELL_EFFECT_LEARN_SPELL ||
-					Sp->Effect[j] == SPELL_EFFECT_LEARN_PET_SPELL)
-				{
-					// BANNED SPELLS CUZ THEY'RE FUCKED.. GG BLIZZARD
-					if(Sp->Id == 21085 || Sp->Id == 1872)
-						continue;
-
-//					const char* SpellName = sSpellStore.LookupString(Sp->Name);
-//					const char* RankName = sSpellStore.LookupString(Sp->Rank);
-					if(!(TeachingSpellMap.find(Sp->EffectTriggerSpell[j]) == TeachingSpellMap.end()))
-					{
-						//printf("Duplicate training spell %s %s\n", SpellName, RankName);
-					} else {
-						for(std::vector<uint32>::iterator itr = itemSpell.begin(); itr != itemSpell.end(); ++itr)
-						{
-							if((*itr) == Sp->Id)
-							{
-								check = true;
-								break;
-							}
-						}
-						if(check)
-							continue;
-						TeachingSpellMap.insert( map<uint32, uint32>::value_type( Sp->EffectTriggerSpell[j], Sp->Id ) );
-					}
-					break;
-				}
-			}
-
-			if(j != 3)
-				continue;
-
-			const char* SpellName = f.getRecord(i).getString(140);
-			const char* RankName = f.getRecord(i).getString(123);
-			
-			// Get our row name
-			if(!SpellName || !RankName)
-				continue;
-
-			pair<string,string> p;
-			p.first = string(SpellName);
-			p.second = string(RankName);
-			SpellNameRanks.insert(make_pair(Sp->Id, p));
-
-			// Skip old spells
-			if(SpellName[0] == 'z' && SpellName[1] == 'z' &&
-				SpellName[2] == 'O' && SpellName[3] == 'L' &&
-				SpellName[4] == 'D')
-			{
-				continue;
-			}
-
-			if(m_disabled_trainer_spells.find(Sp->Id) != m_disabled_trainer_spells.end())
-				continue;
-
-			// Convert rank name into a number
-			int32 RankNumber = -1;
-
-			if(sscanf(RankName, "Rank %d", (int*)&RankNumber) != 1)  // Not a ranked spell
-				continue;
-
-			SpellRanks[Sp->Id] = RankNumber;
-
-			// Insert into our map if we don't have one
-			string Sp_Name = SpellName;
-			it1 = SpellRankMap.find(Sp_Name);
-			map<uint32, uint32> *mapPtr;
-			if(it1 == SpellRankMap.end())
-			{
-				mapPtr = new map<uint32, uint32>;
-				SpellRankMap.insert( map<string, map<uint32, uint32>* >::value_type( Sp_Name, mapPtr ) );
-				it1 = SpellRankMap.find(Sp_Name);
-				ASSERT(it1 != SpellRankMap.end());
-			} else {
-				mapPtr = it1->second;
-			}
-
-			if(!(mapPtr->find(RankNumber) == mapPtr->end()))
-			{
-
-				uint32 o = mapPtr->find(RankNumber)->second;
-				SpellEntry *p = dbcSpell.LookupEntryForced(o);
-//				const char* SpellName2 = sSpellStore.LookupString(p->Name);
-//				const char* RankName2 = sSpellStore.LookupString(p->Rank);
-
-				// For enchants, override the aura spell with casting spell.
-				if(Sp && (Sp->Effect[0] == 54 ||
-					Sp->Effect[1] == 54 ||
-					Sp->Effect[2] == 54))
-				{
-					if(p->Effect[0] != 54 && p->Effect[1] != 54 && p->Effect[2] != 54)
-						mapPtr->find(RankNumber)->second = Sp->Id;
-				}
-			} else {
-				mapPtr->insert( map<uint32, uint32>::value_type( (uint32)RankNumber, Sp->Id ) );
-			}
-		}
-	}
-
-	skilllinespell *sp;
-	SpellEntry * spell;
-	TrainerSpellMap * destmap;
-
-	mx = dbcSkillLineSpell.GetNumRows();
-
-	for(uint32 i = 0; i < mx; ++i)
-	{
-		sp = dbcSkillLineSpell.LookupEntry(i);
-
-		// Check if we're a learning spell :)
-		spell = dbcSpell.LookupEntryForced(sp->spell);
-        if(!spell) continue;
-		
-		skilllineentry *skill = dbcSkillLine.LookupEntry(sp->skilline);
-		ASSERT(skill);
-
-		for(uint32 j = 0; j < 3; j++)
-		{
-			destmap = NULL;
-			uint32 TeachingSpellId = TeachingSpellMap[sp->spell];
-
-			if(!TeachingSpellId)
-				continue;
-
-			SpellEntry * TeachingSpell = dbcSpell.LookupEntry(TeachingSpellId);
-
-			SpellEntry * TeachingSpell2 = NULL;//2nd level teaching spell used by Pet trainers to teach hunter a teaching spell
-			uint32 TeachingSpellId2 = 0;//init 0, later used to distinguish if 2nd lvl teach.sp. is present
-		
-			if((TeachingSpell->Effect[j] == SPELL_EFFECT_LEARN_SPELL && TeachingSpell->EffectImplicitTargetA[j]==5) || TeachingSpell->Effect[j] == SPELL_EFFECT_LEARN_PET_SPELL )
-            {
-                destmap = &mPetSpells;
-				TeachingSpellId2 = TeachingSpellMap[TeachingSpellId];
-                if(TeachingSpellId2)
-                    TeachingSpell2 = dbcSpell.LookupEntry(TeachingSpellId2);
-			}
-            else if(TeachingSpell->Effect[j] == SPELL_EFFECT_LEARN_SPELL)
-                destmap = &mNormalSpells;
-
-			if(destmap == NULL)
-				continue;
-
-			// TODO: Check for quest reward spells, and shit like that.
-			uint32 SpellID = TeachingSpell->EffectTriggerSpell[j];
-
-			TrainerSpell * TS = new TrainerSpell;
-			TS->pSpell = spell;
-			TS->pTrainingSpell = TeachingSpellId2 ? TeachingSpell2 : TeachingSpell;
-			TS->SpellID = TeachingSpellId2 ? TeachingSpell2->EffectTriggerSpell[0] : SpellID;
-			TS->TeachingSpellID = TeachingSpellId2 ? TeachingSpellId2 : TeachingSpellId;
-			TS->DeleteSpell = 0;
-			TS->RequiredSpell = 0;
-			TS->TeachingLine = 0;
-			TS->IsProfession = 0;
-			TS->RequiredClass = -1;
-
-			// Find out our spell rank.
-			const char* SpellName = GetSpellName(spell->Id);
-			const char* RankName = GetSpellRank(spell->Id);
-
-			if(SpellName)
-			{
-				string Sp_Name = SpellName;
-				it1 = SpellRankMap.find(Sp_Name);
-				if(it1 != SpellRankMap.end())
-				{
-					// We're a ranked spell.
-					uint32 SpellRank = SpellRanks[SpellID];
-					// Grab any ranks lower than ours
-					if(SpellRank > 1)
-					{
-						vector<uint32> lowerspells;
-						lowerspells.reserve(15);
-
-						// Assign required spells
-						uint32 crank = SpellRank - 1;
-						if(crank > 0)
-						{
-							it2 = it1->second->find(crank);
-							if((it2 != it1->second->end()))
-							{
-								uint32 rspell = it2->second;					
-								if(TeachingSpellId2)
-									rspell = 0;
-								else
-									ASSERT(rspell);
-
-								TS->RequiredSpell = rspell;
-
-								uint32 flags = spell->SpellFamilyName;
-								if(flags == 0x4 || flags == 0x10 || flags == 0x8 || flags == 0xA)
-									TS->DeleteSpell = TeachingSpellId2 ? 0 : rspell; //do not delete lower ranks of pet spells
-							}
-						}
-					}
-				}
-			}
-
-			// Profession checks.. la di da...
-			TS->RequiredSkillLine = 0;
-			TS->RequiredSkillLineValue = 0;
-			
-			TS->RequiredLevel = spell->spellLevel;
-			TS->Cost = sWorld.mPrices[spell->spellLevel];
-
-			if(skill->type == SKILL_TYPE_PROFESSION)
-			{
-				// Check if we're a profession learner. If we are, we need to have the previous
-				// rank. If we're a profession spell, we need to have an amount
-
-				uint32 l;
-				for(l = 0; l < 3; ++l)
-				{
-					if(TeachingSpell->Effect[l] == SPELL_EFFECT_SKILL_STEP)		// Rank
-					{
-						break;
-					}
-				}
-				if(l == 3)
-				{
-					//TS->RequiredSkillLineValue = 1;
-					//TS->RequiredSkillLineValue = sp->minrank ? sp->minrank : 1;
-					if(sp->green)
-						TS->RequiredSkillLineValue = (sp->green >= 30) ? (sp->green - 30) : sp->green;
-					else
-						TS->RequiredSkillLineValue = 1;
-					TS->RequiredSkillLine = skill->id;
-				}
-				else
-				{
-					//Here handles general profession learns
-					TS->TeachingLine = skill->id;
-					uint32 rval = 0;
-					// hack hack hack!
-					if(!stricmp(RankName, "Journeyman"))
-						rval = 75;
-					else if(!stricmp(RankName, "Expert"))
-						rval = 150;
-					else if(!stricmp(RankName, "Artisan"))
-						rval = 225;
-					else if(!stricmp(RankName, "Master"))
-						rval = 300;
-					else
-						TS->IsProfession = 1;
-
-					if(rval != 0)
-					{
-						TS->RequiredSkillLine = skill->id;
-						TS->RequiredSkillLineValue = rval;
-					}
-				}
-			}
-			if(skill->type == SKILL_TYPE_SECONDARY)
-			{
-				uint32 rval = 0;
-				//Riding skills again
-				if(strstr(SpellName, "Riding") || strstr(SpellName, "Piloting")
-					|| strstr(SpellName, "Horsemanship"))
-				{					
-					if(!stricmp(RankName, "Apprentice"))
-					{
-						TS->Cost = 900000;
-						TS->RequiredLevel = 40;
-					}
-					else if(!stricmp(RankName, "Journeyman"))
-					{
-						rval = 75;
-						TS->Cost = 6000000;
-						TS->RequiredLevel = 60;
-					}
-					else if(!stricmp(RankName, "Expert"))
-					{
-						rval = 150;
-						TS->Cost = 8000000;
-						TS->RequiredLevel = 70;
-					}
-					else if(!stricmp(RankName, "Artisan"))
-					{
-						rval = 225;
-						TS->Cost = 50000000;
-						TS->RequiredLevel = 70;
-					}
-					//No Master for now but if we have later
-					else if(!stricmp(RankName, "Master"))
-					{
-						rval = 300;
-						TS->RequiredLevel = 70;
-						TS->Cost = 90000000;
-					}
-					else//No old shit
-					{
-						delete TS;
-						break;
-					}
-				}
-
-				if(rval != 0)
-				{
-					TS->RequiredSkillLine = skill->id;
-					TS->RequiredSkillLineValue = rval;
-				}
-			}
-			std::map<uint32, TrainerSpellOverride>::iterator oitr = OMap.find(TS->TeachingSpellID);
-			if(oitr == OMap.end()) oitr = OMap.find(TS->SpellID);
-			if(oitr != OMap.end())
-			{
-				TrainerSpellOverride * ov = &oitr->second;
-				TS->Cost = ov->Cost ? ov->Cost : TS->Cost;
-				TS->RequiredClass = ov->RequiredClass ? ov->RequiredClass : TS->RequiredClass;
-				TS->RequiredSpell = ov->RequiredSpell ? ov->RequiredSpell : TS->RequiredSpell;
-				TS->RequiredSkillLine = ov->RequiredSkill ? ov->RequiredSkill : TS->RequiredSkillLine;
-				TS->RequiredSkillLineValue = ov->RequiredSkillValue ? ov->RequiredSkillValue : TS->RequiredSkillLineValue;
-				TS->DeleteSpell = ov->DeleteSpell ? ov->DeleteSpell : TS->DeleteSpell;
-				TS->RequiredLevel = ov->RequiredLevel ? ov->RequiredLevel : TS->RequiredLevel;
-				TS->RequiredClass = ov->RequiredClass ? ov->RequiredClass : TS->RequiredClass;
-			} 
-
-			if(skill->type == SKILL_TYPE_PROFESSION || skill->type == SKILL_TYPE_SECONDARY)
-			{
-				if(skill->type == SKILL_TYPE_SECONDARY)
-				{
-					if(skill->id == 185 || skill->id == 129 || skill->id == 356)
-					{
-						if(sp->next == 0 && TS->RequiredSkillLineValue <= 1)
-						{
-							delete TS;
-							continue;
-						}
-					}
-				}
-				else
-				{
-					if(TS->IsProfession != 1 && TS->RequiredSkillLineValue <= 1)
-					{
-						delete TS;
-						continue;
-					}
-				}
-			}
-
-			if(m_disabled_trainer_spells.find( TS->pSpell->Id ) != m_disabled_trainer_spells.end() ||
-				m_disabled_trainer_spells.find( TS->pTrainingSpell->Id ) != m_disabled_trainer_spells.end())
-			{
-				delete TS;
-				continue;
-			}
-
-			TrainerSpellMap::iterator iter = destmap->find(sp->skilline);
-			if(iter == destmap->end())
-			{
-				vector<TrainerSpell*> v;
-				v.push_back(TS);
-				destmap->insert( TrainerSpellMap::value_type( sp->skilline, v ) );
-				//const char* skillname = sSkillLineStore.LookupString(skill->Name);
-				/*printf("Skill line: %s created for %s.\n", skillname,
-					( destmap == &mNormalSpells ? "NORMAL" : "PET"));*/
-			} else {
-				iter->second.push_back(TS);
-			}
-		}
-	}
-	// Cleanup
-	for(it1 = SpellRankMap.begin(); it1 != SpellRankMap.end(); ++it1)
-	{
-		it1->second->clear();
-		delete it1->second;
-	}
-
-	TrainerSpell * tsp = new TrainerSpell;
-	tsp->TeachingSpellID = 1579;
-	tsp->SpellID = 1515;
-	tsp->Cost = 300;
-	tsp->DeleteSpell=0;
-	tsp->pSpell = dbcSpell.LookupEntry(1515);
-	tsp->IsProfession=0;
-	tsp->pTrainingSpell = dbcSpell.LookupEntry(1579);
-	tsp->RequiredLevel=10;
-	tsp->RequiredSkillLine=0;
-	tsp->RequiredSpell=0;
-	tsp->SpellRank=0;
-	tsp->TeachingLine=0;
-	tsp->SpellType=0;
-	tsp->RequiredClass=-1;
-
-	//1579 - tame beast
-	mNormalSpells.find(50)->second.push_back(tsp);
-	SpellRankMap.clear();
+#endif
+	// not reached
+	return false;
 }
 
 void ObjectMgr::LoadTrainers()
 {
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM trainer_defs");
+	QueryResult * result2;
+	Field * fields2;
+	const char * temp;
+	int len;
+
 	LoadDisabledSpells();
-	GenerateTrainerSpells();
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM trainers");
-	if(!result) return;
 
-//	uint32 mx = result->GetRowCount();
-//	uint32 c = 0;
-	uint32 entry, maxlevel, class_;
-	uint32 skilllines[20];
-	skilllineentry *skill;
-	do 
-	{
-		Field * fields = result->Fetch();
-		entry = fields[0].GetUInt32();
-		
-		Trainer * tr = new Trainer;
-		tr->IsSimpleTrainer = false;
-		tr->TrainerType = 0;
-        tr->TrainMsg = 0;
-        tr->NoTrainMsg = 0;
-        tr->TalkMessage = 0;
-		
-		for(uint32 i = 0; i < 20; ++i)
-		{
-			skilllines[i] = fields[1+i].GetUInt32();
-			skill = dbcSkillLine.LookupEntryForced(skilllines[i]);
-			if(!skill)
-			{
-				skilllines[i] = 0;
-				continue;
-			}
-			if(skill->type == SKILL_TYPE_PROFESSION ||
-				skill->type == SKILL_TYPE_SECONDARY)
-			{
-				tr->TrainerType = 2;
-			}
-		}
-		maxlevel = fields[21].GetUInt32();
-		class_ = fields[22].GetUInt32();
+	if(!result)
+		return;
 
-		vector<TrainerSpell*> tmp;
-		tmp.reserve(400);
-		for(uint32 i = 0; i < 20; ++i)
-		{
-			if(skilllines[i] != 0)
-			{
-				//TODO: Check for pet trainer!
-				TrainerSpellMap::iterator iter = mNormalSpells.find(skilllines[i]);
-				if(iter == mNormalSpells.end())
-				{
-					iter = mPetSpells.find(skilllines[i]);
-					if(iter == mPetSpells.end()) // Not found.
-						continue;
-				}
-
-				for(vector<TrainerSpell*>::iterator it = iter->second.begin();
-					it != iter->second.end(); ++it)
-				{
-					if((*it)->pSpell->spellLevel <= maxlevel || maxlevel == 60)	// 60 trainers have all?
-					{
-						skill = dbcSkillLine.LookupEntry(skilllines[i]);
-						if(skill->type == SKILL_TYPE_PROFESSION || skill->type == SKILL_TYPE_SECONDARY)
-						{
-							if(skill->type == SKILL_TYPE_SECONDARY)
-							{
-								if(skill->id == 185 || skill->id == 129 || skill->id == 356)
-								{
-									bool add = AddTrainerSpell(entry, (*it)->pSpell);
-									if(add)
-										tmp.push_back((*it));
-								}
-								else
-								{
-									tmp.push_back((*it));
-								}
-							}
-							else
-							{
-								bool add = AddTrainerSpell(entry, (*it)->pSpell);
-								if(add)
-									tmp.push_back((*it));
-							}
-						}
-						else
-							tmp.push_back((*it));
-					}						
-				}
-			}
-		}
-		tr->SpellCount = tmp.size();
-		tr->SpellList = new TrainerSpell*[tmp.size()];
-
-		uint32 j = 0;
-		for(vector<TrainerSpell*>::iterator it = tmp.begin();
-			it != tmp.end(); ++it, j++)
-		{
-			tr->SpellList[j] = (*it);
-		}
-		
-		const char * temp = fields[23].GetString();
-		tr->TalkMessage = new char[strlen(temp)+1];
-		strcpy(tr->TalkMessage, temp);
-		tr->TalkMessage[strlen(temp)] = 0;
-
-		tr->RequiredClass = class_;
-		//assert(mTrainers.find(entry) == mTrainers.end());
-		if(mTrainers.find(entry) != mTrainers.end())
-		{
-			delete [] tr->TalkMessage;
-			delete [] tr->SpellList;
-			delete tr;
-			continue;
-		}
-		mTrainers.insert( TrainerMap::value_type( entry, tr ) );
-		
-	} while(result->NextRow());
-	delete result;
-	//simple trainer generation
-	result = WorldDatabase.Query("SELECT * FROM trainer_defs");
-	if(!result) return;
 	do 
 	{
 		Field * fields = result->Fetch();
 		uint32 entry = fields[0].GetUInt32();
-		if(mTrainers.find(entry) != mTrainers.end())
-		{
-			continue;
-		}
 		Trainer * tr = new Trainer;
-		tr->IsSimpleTrainer = 1;
-		tr->Req_rep = fields[1].GetUInt32();
-		tr->Req_rep_value = fields[2].GetUInt32();
+		tr->RequiredSkill = fields[1].GetUInt32();
+		tr->RequiredSkillLine = fields[2].GetUInt32();
 		tr->RequiredClass = fields[3].GetUInt32();
-		tr->Req_lvl = fields[4].GetUInt32();
-		tr->TrainerType = fields[5].GetUInt32(); //0 or 2 ?
-		tr->TalkMessage=NULL;
+		tr->TrainerType = fields[4].GetUInt32();
+		tr->Can_Train_Gossip_TextId = fields[6].GetUInt32();
+		tr->Cannot_Train_GossipTextId = fields[7].GetUInt32();
+		tr->UIMessage = (char*)NormalTalkMessage;
 
-		const char * temp = fields[6].GetString();
-		int len=strlen(temp);
-		if(len)
-		{
-			tr->TrainMsg = new char[len+1];
-			strcpy(tr->TrainMsg, temp);
-			tr->TrainMsg[len] = 0;
-		}
-		else tr->TrainMsg=NULL;
-
-		temp = fields[7].GetString();
+		temp = fields[5].GetString();
 		len=strlen(temp);
 		if(len)
 		{
-			tr->NoTrainMsg = new char[len+1];
-			strcpy(tr->NoTrainMsg, temp);
-			tr->NoTrainMsg[len] = 0;
+			tr->UIMessage = new char[len+1];
+			strcpy(tr->UIMessage, temp);
+			tr->UIMessage[len] = 0;
 		}
-		else tr->NoTrainMsg=NULL;
-
-		//get spell list count
-		QueryResult * result2 = WorldDatabase.Query("SELECT count(entry) FROM trainer_spells where entry='%d'",entry);
-		Field *fields2 = result2->Fetch();
-
-		tr->SpellCount = fields2[0].GetUInt32();
-		tr->SpellList = new TrainerSpell*[tr->SpellCount];
-		delete result2;
 
 		//now load the spells
-		result2 = WorldDatabase.Query("SELECT * FROM trainer_spells where entry='%d'",entry);
-		uint32 badspellcount=0;
-		for(uint32 i=0;i<tr->SpellCount;i++)
+		result2 = WorldDatabase.Query("SELECT * FROM trainer_spells where entry='%u'",entry);
+		if(!result2)
 		{
-			fields2 = result2->Fetch();
-			if(!fields2)
-				break;//wow, this is bad, a few seconds ago we had all entrys
-			uint32 CastSpellID=fields2[1].GetUInt32();
-			SpellEntry *spellInfo = dbcSpell.LookupEntryForced(CastSpellID );
-			if(!spellInfo)
+			Log.Error("LoadTrainers", "Trainer with no spells, entry %u. Delete? (y/n) ", entry);
+			if(ynprompt())
+				WorldDatabase.WaitExecute("DELETE FROM trainer_defs WHERE entry = %u", entry);
+		}
+		else
+		{
+			do
 			{
-				badspellcount++;
-				result2->NextRow();
-				continue; //omg a bad spell !
-			}
-			tr->SpellList[i] = new TrainerSpell;
-			tr->SpellList[i]->TeachingSpellID = CastSpellID;
-			tr->SpellList[i]->Cost = fields2[2].GetUInt32();
-			tr->SpellList[i]->RequiredSpell = fields2[3].GetUInt32();
-			tr->SpellList[i]->RequiredSkillLine = fields2[4].GetUInt32();
-			tr->SpellList[i]->RequiredSkillLineValue = fields2[5].GetUInt32();
-			tr->SpellList[i]->RequiredLevel = fields2[6].GetUInt32();
-			tr->SpellList[i]->DeleteSpell = fields2[7].GetUInt32();
-			tr->SpellList[i]->IsProfession = fields2[8].GetUInt32();
+				fields2 = result2->Fetch();
+				uint32 CastSpellID=fields2[1].GetUInt32();
 
-			tr->SpellList[i]->pTrainingSpell = spellInfo;
-			tr->SpellList[i]->pSpell = NULL; //make sure we are 
-			//some spells might teach us more then 1 spell. Just have no idea how we should handle those. Maybe later it will get clear to us
-			for(int k=0;k<3;k++)
-				if(spellInfo->Effect[k]==SPELL_EFFECT_LEARN_SPELL)
+				SpellEntry *spellInfo = dbcSpell.LookupEntryForced(CastSpellID );
+				if(!spellInfo)
 				{
-					tr->SpellList[i]->TeachSpellID = spellInfo->EffectTriggerSpell[k];
+					Log.Error("LoadTrainers", "Trainer %u with non-existant spell %u. Delete? (y/n) ", entry, CastSpellID);
+					if(ynprompt())
+						WorldDatabase.WaitExecute("DELETE FROM trainer_spells WHERE entry=%u AND cast_spell=%u", entry, CastSpellID);
 
-					SpellEntry *spellInfo2 = dbcSpell.LookupEntry(spellInfo->EffectTriggerSpell[k] );
-					tr->SpellList[i]->pSpell = spellInfo2;
+					result2->NextRow();
+					continue; //omg a bad spell !
 				}
-			result2->NextRow();
-		}
-		delete result2;
 
-		//in case we encountered another noob who can't assemble a train list
-		tr->SpellCount -= badspellcount;
+				TrainerSpell ts;
+				ts.pCastSpell = spellInfo;
+				ts.Cost = fields2[2].GetUInt32();
+				ts.RequiredSpell = fields2[3].GetUInt32();
+				ts.RequiredSkillLine = fields2[4].GetUInt32();
+				ts.RequiredSkillLineValue = fields2[5].GetUInt32();
+				ts.RequiredLevel = fields2[6].GetUInt32();
+				ts.DeleteSpell = fields2[7].GetUInt32();
+				ts.IsProfession = (fields2[8].GetUInt32() != 0) ? true : false;
+				ts.pRealSpell=NULL;
 
-		//and now we insert it to our lookup table
-		if(!tr->SpellCount)
-		{
-			delete [] tr->TrainMsg;
-			delete [] tr->NoTrainMsg;
-			delete [] tr->SpellList;
-			delete tr;
-			continue;
+				for(int k=0;k<3;k++)
+				{
+					if(spellInfo->Effect[k]==SPELL_EFFECT_LEARN_SPELL)
+					{
+						ts.pRealSpell = dbcSpell.LookupEntry(spellInfo->EffectTriggerSpell[k]);
+						break;
+					}
+				}
+
+				if(ts.pRealSpell == NULL)
+				{
+					Log.Error("LoadTrainers", "Trainer %u contains spell %u which doesn't teach. Delete? (y/n)", entry, CastSpellID);
+					if(ynprompt())
+						WorldDatabase.WaitExecute("DELETE FROM trainer_spells WHERE entry=%u AND cast_spell=%u", entry, CastSpellID);
+				}
+				else
+				{
+					tr->Spells.push_back(ts);
+				}
+				result2->NextRow();
+			}
+			while(result2->NextRow());
+			delete result2;
+
+			tr->SpellCount = (uint32)tr->Spells.size();
+
+			//and now we insert it to our lookup table
+			if(!tr->SpellCount)
+			{
+				delete [] tr->UIMessage;
+				delete tr;
+				continue;
+			}
+
+			mTrainers.insert( TrainerMap::value_type( entry, tr ) );
 		}
-		mTrainers.insert( TrainerMap::value_type( entry, tr ) );
 		
 	} while(result->NextRow());
 	delete result;
 	Log.Notice("ObjectMgr", "%u trainers loaded.", mTrainers.size());
-	SpellNameRanks.clear();
-}
-
-bool ObjectMgr::AddTrainerSpell(uint32 entry, SpellEntry *pSpell)
-{
-	CreatureInfo *ci = CreatureNameStorage.LookupEntry(entry);
-	if(ci)
-	{
-		const char* RankName = GetSpellRank(pSpell->Id);
-		if(!RankName)
-			return true;
-
-		if(strstr(ci->SubName,"Journeyman"))
-		{
-			if(!stricmp(RankName, "Journeyman"))
-				return true;
-			else if(!stricmp(RankName, "Expert"))
-				return false;
-			else if(!stricmp(RankName, "Artisan"))
-				return false;
-			else if(!stricmp(RankName, "Master"))
-				return false;
-			else
-				return true;
-		}
-		else if(strstr(ci->SubName,"Expert"))
-		{
-			if(!stricmp(RankName, "Journeyman"))
-				return true;
-			else if(!stricmp(RankName, "Expert"))
-				return true;
-			else if(!stricmp(RankName, "Artisan"))
-				return false;
-			else if(!stricmp(RankName, "Master"))
-				return false;
-			else
-				return true;
-		}
-		else if(strstr(ci->SubName,"Artisan"))
-		{
-			if(!stricmp(RankName, "Journeyman"))
-				return true;
-			else if(!stricmp(RankName, "Expert"))
-				return true;
-			else if(!stricmp(RankName, "Artisan"))
-				return true;
-			else if(!stricmp(RankName, "Master"))
-				return false;
-			else
-				return true;
-		}
-		else
-			return true;
-	}
-	else
-		return false;
 }
 
 Trainer* ObjectMgr::GetTrainer(uint32 Entry)
@@ -3172,18 +2490,7 @@ void ObjectMgr::LoadDisabledSpells()
 		delete result;
 	}
 
-	result = WorldDatabase.Query("SELECT * FROM spell_disable_trainers");
-	if(result)
-	{
-		do 
-		{
-			m_disabled_trainer_spells.insert( result->Fetch()[0].GetUInt32() );
-		} while(result->NextRow());
-		delete result;
-	}
-
 	Log.Notice("ObjectMgr", "%u disabled spells.", m_disabled_spells.size());
-	Log.Notice("ObjectMgr", "%u disabled trainer spells.", m_disabled_trainer_spells.size());
 }
 
 void ObjectMgr::LoadGroups()

@@ -1285,7 +1285,7 @@ void Pet::AddPetSpellToOwner(uint32 spellId)
 	if(!m_Owner || !m_Owner->HasSpell(5149) || !line)
 		return;
 	//find appropriate teaching spell...
-	vector<TrainerSpell*>* lst = objmgr.GetTrainerPetSpellsForLine(line);
+/*	vector<TrainerSpell*>* lst = objmgr.GetTrainerPetSpellsForLine(line);
 	TrainerSpell * sp;
 	if(lst)
 		for(vector<TrainerSpell*>::iterator itr = lst->begin(); itr != lst->end(); ++itr)
@@ -1300,7 +1300,7 @@ void Pet::AddPetSpellToOwner(uint32 spellId)
 					m_Owner->addSpell(sp->TeachingSpellID);
 					return;
 				}
-		}
+		}*/
 }
 uint32 Pet::GetHighestRankSpell(uint32 spellId)
 {	

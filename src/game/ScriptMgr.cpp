@@ -313,6 +313,7 @@ void GossipScript::GossipEnd(Creature* pCreature, Player* Plr)
 	Plr->CleanupGossipMenu();
 }
 
+bool CanTrainAt(Player * plr, Trainer * trn);
 void GossipScript::GossipHello(Creature* pCreature, Player* Plr, bool AutoSend)
 {
 	GossipMenu *Menu;
@@ -340,18 +341,14 @@ void GossipScript::GossipHello(Creature* pCreature, Player* Plr, bool AutoSend)
 		if(pos != string::npos)
 			name = name.substr(0, pos);
 
+		if(CanTrainAt(Plr, pTrainer))
+			Menu->SetTextID(pTrainer->Can_Train_Gossip_TextId);
+		else
+			Menu->SetTextID(pTrainer->Cannot_Train_GossipTextId);
+        
 		string msg = "I seek ";
-
-		if(pTrainer->RequiredClass && pTrainer->RequiredClass != Plr->getClass())
+		if(pTrainer->RequiredClass)
 		{
-			//							   WARRIOR   PALADIN HUNTER  ROGUE   PRIEST  -   SHAMAN  MAGE   WARLOCK  - DRUID
-			uint32 notclass[13] =   {0	  ,5721	 ,3976   ,5839   ,4797   ,4435   ,0  ,5006   ,539	,5836   ,0,4774};
-			Menu->SetTextID(notclass[pTrainer->RequiredClass]);
-		} else if(pTrainer->RequiredClass) {
-			//							   WARRIOR   PALADIN HUNTER  ROGUE   PRIEST  -   SHAMAN  MAGE   WARLOCK  - DRUID
-			uint32 isclass[13] =	{0	  ,1040	 ,3974   ,4864   ,4835   ,4436   ,0  ,5005   ,538	,5835   ,0,4775};
-			Menu->SetTextID(isclass[pTrainer->RequiredClass]);
-
 			switch(Plr->getClass())
 			{
 			case MAGE:

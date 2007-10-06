@@ -102,41 +102,28 @@ struct GossipMenuItem
 struct SpellEntry;
 struct TrainerSpell
 {
-
-	uint32 SpellID;
-	SpellEntry* pSpell;
-	uint32 TeachingLine;
-	uint32 SpellType;
-	SpellEntry* pTrainingSpell;
-	int32 RequiredClass;
-	//these values are required only for new trainer system
-	uint32	TeachingSpellID; //this is actually castspell
+	SpellEntry * pCastSpell;
+	SpellEntry * pRealSpell;
 	uint32	DeleteSpell;
 	uint32	RequiredSpell;
 	uint32	RequiredSkillLine;
 	uint32	RequiredSkillLineValue;
-	uint32	IsProfession;
+	bool	IsProfession;
 	uint32	Cost;
 	uint32	RequiredLevel;
-	uint32	SpellRank;
-	bool	CheckProfCount;
-	uint32	TeachSpellID; //well yes, just too keep the compatibility with old system we capt the misleading name...
 };
 
 struct Trainer
 {
 	uint32 SpellCount;
-	TrainerSpell** SpellList;
-	char*	TalkMessage;
-	//these values are required only for new trainer system
-	bool	IsSimpleTrainer; //simple trainers are the ones that use traners_defs and trainer_spells lists
-	char*	TrainMsg;
-	char*	NoTrainMsg;
-	uint32	RequiredClass;
-	uint32	Req_rep;
-	int32	Req_rep_value;
-	uint32	Req_lvl;
-	uint32	TrainerType;
+	vector<TrainerSpell> Spells;
+	char*	UIMessage;
+    uint32 RequiredSkill;
+	uint32 RequiredSkillLine;
+	uint32 RequiredClass;
+	uint32 TrainerType;
+	uint32 Can_Train_Gossip_TextId;
+	uint32 Cannot_Train_GossipTextId;
 };
 
 struct TrainerSpellOverride
@@ -484,8 +471,6 @@ public:
 	void ProcessGameobjectQuests();
     void AddTransport(Transporter * pTransporter);
    
-	void GenerateTrainerSpells();
-	bool AddTrainerSpell(uint32 entry, SpellEntry *pSpell);
 	void LoadTrainers();
 	Trainer* GetTrainer(uint32 Entry);
 
@@ -559,17 +544,6 @@ public:
 	}
 
 	void LoadDisabledSpells();
-	vector<TrainerSpell*> * GetTrainerSpellsForLine(uint32 line)
-	{
-		TrainerSpellMap::iterator itr = mNormalSpells.find(line);
-		return (itr == mNormalSpells.end()) ? 0 : &itr->second;
-	}
-	vector<TrainerSpell*> * GetTrainerPetSpellsForLine(uint32 line)
-	{
-			TrainerSpellMap::iterator itr = mPetSpells.find(line);
-			return (itr == mPetSpells.end()) ? 0 : &itr->second;
-	}
-
 	inline GuildMap::iterator GetGuildsBegin() { return mGuild.begin(); }
 	inline GuildMap::iterator GetGuildsEnd() { return mGuild.end(); }
 
@@ -598,7 +572,6 @@ protected:
 	HM_NAMESPACE::hash_map<uint32, Charter*> m_charters[NUM_CHARTER_TYPES];
 	
 	set<uint32> m_disabled_spells;
-	set<uint32> m_disabled_trainer_spells;
 
 	uint64 TransportersCount;
 	HM_NAMESPACE::hash_map<uint32,PlayerInfo*> m_playersinfo;
@@ -637,9 +610,6 @@ protected:
     TransportMap mTransports;
 
 	ItemSetContentMap mItemSets;
-
-	TrainerSpellMap mNormalSpells;
-	TrainerSpellMap mPetSpells;
 
 	TrainerMap mTrainers;
 	LevelInfoMap mLevelInfo;
