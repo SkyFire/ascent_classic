@@ -308,7 +308,7 @@ void LogonServer::Run(int argc, char ** argv)
 		if(!(++loop_counter % 400))	 // 20 seconds
 			CheckForDeadSockets();
 
-		if(!(loop_counter%250))	// 5mins
+		if(!(loop_counter%10000))	// 5mins
 			ThreadPool.IntegrityCheck();
 
 #ifdef WIN32

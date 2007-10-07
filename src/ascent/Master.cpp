@@ -176,6 +176,7 @@ bool Master::Run(int argc, char ** argv)
 	printf("Public License, either version 3 or any later version. For a copy of\n");
 	printf("this license, see the COPYING file provided with this distribution.\n");
 	Log.Line();
+	Log.log_level = 1;
 
 	if(do_version)
 		return true;
@@ -379,7 +380,7 @@ bool Master::Run(int argc, char ** argv)
 	{
 		start = now();
 		diff = start - last_time;
-		if(! ((++loopcounter) % 250) )		// 5mins
+		if(! ((++loopcounter) % 10000) )		// 5mins
 		{
 			ThreadPool.ShowStats();
 			ThreadPool.IntegrityCheck();
