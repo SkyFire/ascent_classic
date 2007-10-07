@@ -105,25 +105,17 @@ public:
 	inline size_t MessageCount() { return Messages.size(); }
 	bool HasUnreadMessages();
 	inline uint64 GetOwner() { return owner; }
+	void Load(QueryResult * result);
 };
 
-typedef map<uint64, Mailbox*> MailboxMap;
 
 class MailSystem : public Singleton<MailSystem>, public EventableObject
 {
 public:
 
 	void StartMailSystem();
-
-	Mailbox * GetPlayersMailbox(uint64 player_guid, bool create);
 	MailError DeliverMessage(uint64 recipent, MailMessage* message);
-	void RemoveMessageIfDeleted(uint32 message_id, uint64 player_guid);
-
-	void PeriodicMailRefresh();
-	uint32 GenerateMessageID();
-	void LoadMessages();
-
-	void ShutdownMailSystem();
+	void RemoveMessageIfDeleted(uint32 message_id, Player * plr);
 	void SaveMessageToSQL(MailMessage * message);
 	void SendAutomatedMessage(uint32 type, uint64 sender, uint64 receiver, string subject, string body, uint32 money,
 		uint32 cod, uint64 item_guid, uint32 stationary);
@@ -134,11 +126,7 @@ public:
 	}
 	uint32 config_flags;
 
-protected:
-	MailboxMap Mailboxes;
-	Mailbox * CreateMailbox(uint64 ownerguid);
-	uint32 message_high;
-	Mutex MUTEX;
+	uint32 Generate_Message_Id();
 };
 
 #define sMailSystem MailSystem::getSingleton()

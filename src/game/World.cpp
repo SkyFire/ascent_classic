@@ -2399,7 +2399,6 @@ void World::ShutdownClasses()
 	sLog.outString("Deleting Loot Manager...");
 	delete LootMgr::getSingletonPtr();
 
-	sMailSystem.ShutdownMailSystem();
 	delete MailSystem::getSingletonPtr();
 	delete WorldCreator::getSingletonPtr();
 }

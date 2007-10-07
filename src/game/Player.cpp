@@ -19,7 +19,7 @@
 
 #include "StdAfx.h"
 
-Player::Player ( uint32 high, uint32 low )
+Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 {
 	m_objectTypeId = TYPEID_PLAYER;
 	m_valuesCount = PLAYER_END;
@@ -2312,6 +2312,7 @@ bool Player::LoadFromDB(uint32 guid)
 	q->AddQuery("SELECT * FROM playeritems WHERE ownerguid=%u ORDER BY containerslot ASC", guid);
 	q->AddQuery("SELECT * FROM playerpets WHERE ownerguid=%u ORDER BY petnumber", guid);
 	q->AddQuery("SELECT * FROM playersummonspells where ownerguid=%u ORDER BY entryid", guid);
+	q->AddQuery("SELECT * FROM mailbox WHERE player_guid = %u", guid);
 
 	// queue it!
 	m_uint32Values[OBJECT_FIELD_GUID] = guid;
@@ -2898,6 +2899,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	_LoadQuestLogEntry(results[3].result);
 	_LoadSpellCoolDownSecurity(results[4].result);
 	m_ItemInterface->mLoadItemsFromDatabase(results[5].result);
+	m_mailBox.Load(results[8].result);
 	m_session->FullLogin(this);
 	m_session->m_loggingInPlayer=NULL;
 }

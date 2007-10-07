@@ -1590,6 +1590,8 @@ public:
     /* End of SpellPacket Wharper                                           */
     /************************************************************************/
 
+	Mailbox m_mailBox;
+
 protected:
 	LocationVector m_summonPos;
 	uint32 m_summonInstanceId;

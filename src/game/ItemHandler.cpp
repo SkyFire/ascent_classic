@@ -509,7 +509,7 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 
 		uint32 mail_id = it->GetUInt32Value(ITEM_FIELD_ITEM_TEXT_ID);
 		if(mail_id)
-			sMailSystem.RemoveMessageIfDeleted(mail_id, _player->GetGUID());
+			sMailSystem.RemoveMessageIfDeleted(mail_id, _player);
 		
 
 
