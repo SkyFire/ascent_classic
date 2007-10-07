@@ -423,7 +423,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode( WorldPacket & recv_data )
 	GetPlayer( )->DeathDurabilityLoss(0.25);
 	GetPlayer( )->ResurrectPlayer();
 
-	if(_player->getLevel() <= 10)
+	if(_player->getLevel() > 10)
 	{
 		Aura *aur = GetPlayer()->FindAura(15007);
 		
