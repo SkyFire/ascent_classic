@@ -549,7 +549,7 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 		bValid = quest_giver->isQuestGiver();
 		if(bValid)
 		{
-			qst = quest_giver->FindQuest(quest_id, QUESTGIVER_QUEST_START);
+			qst = quest_giver->FindQuest(quest_id, QUESTGIVER_QUEST_END);
 			/*if(!qst) 
 				sQuestMgr.FindQuest(quest_id);*/
 			if(!qst)

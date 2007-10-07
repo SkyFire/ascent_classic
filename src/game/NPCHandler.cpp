@@ -352,8 +352,22 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 					ql.insert((*it)->qst->id);
 					count++;
 					data << (*it)->qst->id;
-					data << status;//sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), *it);
-					data << uint32(0);
+					/*data << status;//sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), *it);
+					data << uint32(0);*/
+					switch(status)
+					{
+					case QMGR_QUEST_NOT_FINISHED:
+						data << uint32(4) << uint32(0);
+						break;
+
+					case QMGR_QUEST_FINISHED:
+						data << uint32(4) << uint32(1);
+						break;
+
+					default:
+						data << status << uint32(0);
+					}
+
 					data << (*it)->qst->title;
 				}
 			}

@@ -21,20 +21,7 @@
 
 uint32 QuestMgr::CalcQuestStatus(Object* quest_giver, Player* plr, QuestRelation* qst)
 {
-	uint32 status = CalcQuestStatus(quest_giver, plr, qst->qst, qst->type, false);
-	if(status == QMGR_QUEST_FINISHED)
-	{
-		if(quest_giver->GetTypeId() == TYPEID_UNIT)
-		{
-			// Bleh, POI is the wrong icon.
-			// Turns out, dynamic_flags should be 0x02 :P
-			uint32 flags = quest_giver->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
-			flags |= 0x02;	// MINIMAP_TRACK
-
-			quest_giver->BuildFieldUpdatePacket(plr, UNIT_DYNAMIC_FLAGS, flags);
-		}
-	}
-	return status;
+	return CalcQuestStatus(quest_giver, plr, qst->qst, qst->type, false);
 }
 
 bool QuestMgr::isRepeatableQuestFinished(Player *plr, Quest *qst)

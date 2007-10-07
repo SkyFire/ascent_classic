@@ -30,7 +30,7 @@ enum QUEST_STATUS
 	QMGR_QUEST_NOT_FINISHED			 = 0x03,	// Quest isnt finished yet.						| "Gray Question ? Mark"
 	QMGR_QUEST_REPEATABLE			   = 0x04,	// Quest repeatable								| "Blue Question ? Mark" 
 	QMGR_QUEST_AVAILABLE				= 0x05,	// Quest avaiable, and your level is enough		| "Yellow Quotation ! Mark" 
-	QMGR_QUEST_FINISHED				 = 0x06,	// Quest has been finished.						| "Yellow Question  ? Mark"
+	QMGR_QUEST_FINISHED				 = 0x07,	// Quest has been finished.						| "Yellow Question  ? Mark"
 	//QUEST_ITEM_UPDATE				 = 0x06	 // Yellow Question "?" Mark. //Unknown
 };
 
