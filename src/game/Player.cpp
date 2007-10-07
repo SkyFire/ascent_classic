@@ -1601,7 +1601,6 @@ void Player::_SavePet()
 			<< itr->second->actionbar << "','"
 			<< itr->second->happinessupdate << "','"
 			<< itr->second->summon << "','"
-			<< itr->second->autocastspell << "','"
 			<< itr->second->loyaltypts << "','"
 			<< itr->second->loyaltyupdate << "')";
 			
@@ -1628,7 +1627,21 @@ void Player::_SavePetSpells()
 
 void Player::AddSummonSpell(uint32 Entry, uint32 SpellID)
 {
-	SummonSpells[Entry].insert(SpellID);
+	SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
+	map<uint32, set<uint32> >::iterator itr = SummonSpells.find(Entry);
+	if(itr == SummonSpells.end())
+		SummonSpells[Entry].insert(SpellID);
+	else
+	{
+		set<uint32>::iterator it3;
+		for(set<uint32>::iterator it2 = itr->second.begin(); it2 != itr->second.end();)
+		{
+			it3 = it2++;
+			if(dbcSpell.LookupEntry(*it3)->NameHash == sp->NameHash)
+				itr->second.erase(it3);
+		}
+		itr->second.insert(SpellID);
+	}
 }
 
 void Player::RemoveSummonSpell(uint32 Entry, uint32 SpellID)
@@ -1742,9 +1755,8 @@ void Player::_LoadPet(QueryResult * result)
 		pet->actionbar = fields[9].GetString();
 		pet->happinessupdate = fields[10].GetUInt32();
 		pet->summon = (fields[11].GetUInt32()>0 ? true : false);
-		pet->autocastspell = fields[12].GetUInt32();
-		pet->loyaltypts = fields[13].GetUInt32();
-		pet->loyaltyupdate = fields[14].GetUInt32();
+		pet->loyaltypts = fields[12].GetUInt32();
+		pet->loyaltyupdate = fields[13].GetUInt32();
 
 		m_Pets[pet->number] = pet;
 		if(pet->active)

@@ -97,9 +97,20 @@ enum LoyaltyLevel
 	BEST_FRIEND	=6
 };
 
+enum AutoCastEvents
+{
+	AUTOCAST_EVENT_NONE					= 0,
+	AUTOCAST_EVENT_ATTACK				= 1,
+	AUTOCAST_EVENT_ON_SPAWN				= 2,
+	AUTOCAST_EVENT_OWNER_ATTACKED		= 3,
+	AUTOCAST_EVENT_LEAVE_COMBAT			= 4,
+	AUTOCAST_EVENT_COUNT				= 5,
+};
+
 #define PET_DELAYED_REMOVAL_TIME 60000  // 1 min
 
 #define DEFAULT_SPELL_STATE 0x8100
+#define AUTOCAST_SPELL_STATE 0xC100
 
 typedef map<SpellEntry*, uint16> PetSpellMap;
 struct PlayerPet;
@@ -166,20 +177,10 @@ public:
 	void SetDefaultActionbar();
 
 	void LoadSpells();
-	void AddSpell(SpellEntry * sp, bool putInBar = false);
+	void AddSpell(SpellEntry * sp, bool learning);
 	void RemoveSpell(SpellEntry * sp);
 	void SetSpellState(SpellEntry * sp, uint16 State);
 	uint16 GetSpellState(SpellEntry * sp);
-
-	inline void AddSpell(uint32 SpellID)
-	{
-		SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
-		if(sp) 
-		{
-			AddSpell(sp);
-			UpdateTP();
-		}
-	}
 	inline void RemoveSpell(uint32 SpellID)
 	{
 		SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
@@ -201,7 +202,7 @@ public:
 		return DEFAULT_SPELL_STATE;
 	}
 	
-	void CreateAISpell(SpellEntry * info);
+	AI_Spell * CreateAISpell(SpellEntry * info);
 	inline PetSpellMap* GetSpells() { return &mSpells; }
 	inline bool IsSummon() { return Summon; }
 
@@ -213,6 +214,11 @@ public:
 	uint16 GetUsedTP();
 	void UpdateTP();
 	bool CanLearnSpellTP(uint32 spellId);
+
+	void HandleAutoCastEvent(uint32 Type);
+	AI_Spell * HandleAutoCastEvent();
+	void SetPetSpellState(uint32 spell, uint16 state);
+	void SetAutoCast(AI_Spell * sp, bool on);
 
 protected:
 	bool bHasLoyalty;
@@ -246,6 +252,8 @@ protected:
 	uint32 GetHighestRankSpell(uint32 spellId);
 	void UpdateLoyalty(char pts);
 	void SetLoyaltyLvl(LoyaltyLevel lvl);
+
+	list<AI_Spell*> m_autoCastSpells[AUTOCAST_EVENT_COUNT];
 };
 
 #define PET_LOYALTY_UPDATE_TIMER 120000

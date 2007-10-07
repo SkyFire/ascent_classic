@@ -171,12 +171,22 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 						}
 					}
 
-					// Clear the threat
-					pPet->GetAIInterface()->WipeTargetList();
-					pPet->GetAIInterface()->WipeHateList();
+					if(sp->autocast_type != AUTOCAST_EVENT_ATTACK)
+					{
+						if(sp->autocast_type == AUTOCAST_EVENT_OWNER_ATTACKED)
+							pPet->CastSpell(_player, sp->spell, false);
+						else
+							pPet->CastSpell(pPet, sp->spell, false);
+					}
+					else
+					{
+						// Clear the threat
+						pPet->GetAIInterface()->WipeTargetList();
+						pPet->GetAIInterface()->WipeHateList();
 
-					pPet->GetAIInterface()->AttackReaction(pTarget, 1, 0);
-					pPet->GetAIInterface()->SetNextSpell(sp);
+						pPet->GetAIInterface()->AttackReaction(pTarget, 1, 0);
+						pPet->GetAIInterface()->SetNextSpell(sp);
+					}
 				}
 			}
 
@@ -350,19 +360,6 @@ void WorldSession::HandlePetSetActionOpcode(WorldPacket& recv_data)
 	Pet * pet = _player->GetSummon();
 	pet->ActionBar[slot] = spell;
 	pet->SetSpellState(spell, state);
-
-	AI_Spell * sp = pet->GetAISpellForSpellId(spell);
-	if(!sp) return;
-
-	if(state == 0x8100) //autocast OFF
-		sp->procChance = 0;
-	else if(state == 0xC100) //autocast ON
-	{
-		if(sp->spell->NameHash == 2858464432UL)		/* Firebolt */
-			sp->procChance=100;
-		else
-			sp->procChance = PET_SPELL_AUTOCAST_CHANCE;
-	}
 }
 
 void WorldSession::HandlePetRename(WorldPacket & recv_data)

@@ -23,6 +23,44 @@
 #define GROWL_RANK_2 14916
 #define WATER_ELEMENTAL 510
 
+uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
+{
+	switch(ent->NameHash)
+	{
+		/************************************************************************/
+		/* Warlock Spells                                                       */
+		/************************************************************************/
+
+	case 0xAA60B4B0:		// Firebolt
+	case 0x593F01B3:		// Lash of Pain
+	case 0x866C169D:		// Torment
+		return AUTOCAST_EVENT_ATTACK;
+		break;
+
+	case 0x9D296A8A:		// Blood Pact
+		return AUTOCAST_EVENT_ON_SPAWN;
+		break;
+
+	case 0x3211F67B:		// Fire Shield
+		return AUTOCAST_EVENT_OWNER_ATTACKED;
+		break;
+        
+	case 0xAF831F1C:		// Phase Shift
+		return AUTOCAST_EVENT_LEAVE_COMBAT;
+		break;
+
+		/************************************************************************/
+		/* HunterPet Spells                                                     */
+		/************************************************************************/
+
+	case 0x7AEB7BEE:		// Claw
+		return AUTOCAST_EVENT_ATTACK;
+		break;
+	}
+
+	return AUTOCAST_EVENT_NONE;
+}
+
 void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_creature, Unit *owner, SpellEntry* created_by_spell, uint32 type, uint32 expiretime)
 {
 	SetIsPet(true);
@@ -296,19 +334,21 @@ void Pet::InitializeSpells()
 			continue;
 		}
 
-		CreateAISpell(info);
-		if(itr->second == 0xC100)//if autocast ON...
-		{
-			AI_Spell * sp = GetAISpellForSpellId(info->Id);
-			if(sp) 
-				sp->procChance = PET_SPELL_AUTOCAST_CHANCE;//...set chance for it
-		}
+		AI_Spell * sp = CreateAISpell(info);
+		if(itr->second == AUTOCAST_SPELL_STATE)
+			SetAutoCast(sp, true);
+		else
+			SetAutoCast(sp,false);
 	}
 }
 
-void Pet::CreateAISpell(SpellEntry * info)
+AI_Spell * Pet::CreateAISpell(SpellEntry * info)
 {
 	// Create an AI_Spell
+	map<uint32,AI_Spell*>::iterator itr = m_AISpellStore.find(info->Id);
+	if(itr != m_AISpellStore.end())
+		return itr->second;
+
 	AI_Spell *sp = new AI_Spell;
 	sp->agent = AGENT_SPELL;
 	sp->entryId = GetEntry();
@@ -331,8 +371,9 @@ void Pet::CreateAISpell(SpellEntry * info)
 		sp->spelltargetType = TTYPE_SOURCE;
 	}
 
+	sp->autocast_type = GetAutoCastTypeForSpell(info);
 	m_AISpellStore[info->Id] = sp;
-	m_aiInterface->addSpellToList(sp);
+	return sp;
 }
 
 void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
@@ -355,33 +396,41 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 	m_LoyaltyTimer = mPi->loyaltyupdate;
 	LoyaltyPts = mPi->loyaltypts;
 
-	// Setup actionbar
-	uint32 pos = 0;
-	string::size_type sp = mPi->actionbar.find(",");
-	string::size_type lp = 0;
-	while(sp != string::npos)
-	{
-		uint32 spell = atol(mPi->actionbar.substr(lp, sp).c_str());
-		ActionBar[pos] = spell;
-		++pos;
-
-		lp = sp+1;
-		sp = mPi->actionbar.find(",", lp);
-	}
-
 	SetIsPet(true);
-	InitializeMe(false);
 	bExpires = false;   
-	if(pi->autocastspell && Summon)//hunter pet autocast flag are set in InitializeSpells
+
+	// Setup actionbar
+	if(mPi->actionbar.size() > 2)
 	{
-		AI_Spell * sp = GetAISpellForSpellId(pi->autocastspell);
-		if(sp)
+		char * ab = strdup(mPi->actionbar.c_str());
+		char * p = strchr(ab, ',');
+		char * q = ab;
+		uint32 spellid;
+		uint16 spstate;
+		uint32 i = 0;
+
+		while(p && i<10)
 		{
-			sp->procChance = PET_SPELL_AUTOCAST_CHANCE;
-			//m_aiInterface->disable_melee = true;
+			*p = 0;
+
+			if(sscanf(q, "%u %u", &spellid, &spstate) != 2)
+				break;
+
+			ActionBar[i] = spellid;
+			//SetSpellState(dbcSpell.LookupEntry(spellid), spstate);
+			if(!(ActionBar[i] & 0x4000000) && spellid)
+                mSpells[dbcSpell.LookupEntry(spellid)] = spstate;
+
+			i++;
+
+			q = p+1;
+			p = strchr(q, ',');
 		}
+
+		free(ab);
 	}
-	
+	InitializeMe(false);
+
 	if(m_Owner && getLevel() > m_Owner->getLevel())
 	{
 		SetUInt32Value(UNIT_FIELD_LEVEL, m_Owner->getLevel());
@@ -414,12 +463,8 @@ void Pet::InitializeMe(bool first)
 	_setFaction();
 	m_State = 1;		// dont set agro on spawn
 
-
 	if(GetEntry() == 416)
 		m_aiInterface->disable_melee = true;
-
-	PushToWorld(m_Owner->GetMapMgr());
-	//InitializeSpells(); 
 
 	// Load our spells
 	if(Summon)
@@ -445,25 +490,31 @@ void Pet::InitializeMe(bool first)
 				Field * f = query->Fetch();
 				SpellEntry* spell = dbcSpell.LookupEntry(f[2].GetUInt32());
 				uint16 flags = f[3].GetUInt16();
-				mSpells.insert ( make_pair( spell, flags ) );
+				if(mSpells.find(spell) == mSpells.end())
+					mSpells.insert ( make_pair( spell, flags ) );
+
 			} while(query->NextRow());
 		}
 		delete query;
 	}
+
 	InitializeSpells();
+	PushToWorld(m_Owner->GetMapMgr());
+
 	if(first)
 	{
 		// Set up default actionbar
 		SetDefaultActionbar();
 	}
+
 	SendSpellsToOwner();
-
-
-	sEventMgr.AddEvent(this, &Pet::Update, (uint32)100, EVENT_PET_UPDATE, 100, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
 	// set to active
 	if(!bExpires)
 		UpdatePetInfo(false);
+
+	sEventMgr.AddEvent(this, &Pet::HandleAutoCastEvent, uint32(AUTOCAST_EVENT_ON_SPAWN), EVENT_UNK, 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	sEventMgr.AddEvent(this, &Pet::HandleAutoCastEvent, uint32(AUTOCAST_EVENT_LEAVE_COMBAT), EVENT_UNK, 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
 
 void Pet::UpdatePetInfo(bool bSetToOffline)
@@ -476,7 +527,12 @@ void Pet::UpdatePetInfo(bool bSetToOffline)
 	pi->entry = GetEntry();
 	std::stringstream ss;
 	for( uint32 index = 0; index < UNIT_END; index ++ )
-		ss << GetUInt32Value(index) << " ";
+	{
+		if(index >= UNIT_FIELD_AURA_01 && index <= UNIT_FIELD_AURA_55)
+			ss << "0 ";
+		else
+			ss << GetUInt32Value(index) << " ";
+	}
 	pi->fields = ss.str();
 	pi->name = GetName();
 	pi->number = m_PetNumber;
@@ -492,21 +548,18 @@ void Pet::UpdatePetInfo(bool bSetToOffline)
 	ss.rdbuf()->str("");
 	for(uint32 i = 0; i < 10; ++i)
 	{
-		ss << ActionBar[i] << ",";
+		if(ActionBar[i] & 0x4000000)
+			ss << ActionBar[i] << " 0";
+		else if(ActionBar[i])
+			ss << ActionBar[i] << " " << uint32(GetSpellState(ActionBar[i]));
+		else
+			ss << "0 0";
+
+		ss << ",";
 	}
 
 	pi->actionbar = ss.str();
 	pi->summon = Summon;
-	/*AI_Spell * sp = m_aiInterface->GetDefaultSpell();
-	if(sp)
-	{
-		if(sp->agent == AGENT_SPELL)
-			pi->autocastspell = sp->spell->Id;
-		else
-			pi->autocastspell = 0;
-	}*/
-	//FIXME
-	pi->autocastspell=0;
 }
 
 void Pet::Dismiss(bool bSafeDelete)//Abandon pet
@@ -637,7 +690,7 @@ void Pet::SetDefaultSpells()
 			it2 = it1->second.begin();
 			for(; it2 != it1->second.end(); ++it2)
 			{
-				AddSpell((*it2));
+				AddSpell(dbcSpell.LookupEntry(*it2), false);
 			}
 		}
 	}
@@ -651,12 +704,12 @@ void Pet::SetDefaultSpells()
 			if(SpellData)
 				for(uint32 i = 0; i < 3; ++i)
 					if(SpellData->Spells[i] != 0)
-						AddSpell(SpellData->Spells[i]); //add spell to pet
+						AddSpell(dbcSpell.LookupEntry(SpellData->Spells[i]), false); //add spell to pet
 		}
 	}
 }
 
-void Pet::AddSpell(SpellEntry * sp, bool putInBar)
+void Pet::AddSpell(SpellEntry * sp, bool learning)
 {
 	// Cast on self if we're a passive spell
 	if(sp->Attributes & 64)
@@ -672,38 +725,85 @@ void Pet::AddSpell(SpellEntry * sp, bool putInBar)
 	else
 	{
        // Active spell add to the actionbar.
+		bool has=false;
 		for(int i = 0; i < 10; ++i)
 		{
-			if(ActionBar[i] == 0)
+			if(ActionBar[i] == sp->Id)
 			{
-				ActionBar[i] = sp->Id;
+				has=true;
 				break;
 			}
 		}
-		mSpells[sp] = DEFAULT_SPELL_STATE;
-		// Create the AI_Spell
-		CreateAISpell(sp);
+
+		if(!has)
+		{
+			for(int i = 0; i < 10; ++i)
+			{
+				if(ActionBar[i] == 0)
+				{
+					ActionBar[i] = sp->Id;
+					break;
+				}
+			}
+		}
+
+		bool done=false;
+		if(learning)
+		{
+			for(PetSpellMap::iterator itr = mSpells.begin(); itr != mSpells.end(); ++itr)
+			{
+				if(sp->NameHash == itr->first->NameHash)
+				{
+					// replace the action bar
+					for(int i = 0; i < 10; ++i)
+					{
+						if(ActionBar[i] == itr->first->Id)
+						{
+							ActionBar[i] = sp->Id;
+							break;
+						}
+					}
+
+					// Create the AI_Spell
+					AI_Spell * asp = CreateAISpell(sp);
+
+					// apply the spell state
+					uint16 ss = GetSpellState(itr->first);
+					mSpells[sp] = ss;
+					if(ss==AUTOCAST_SPELL_STATE)
+						SetAutoCast(asp, true);
+
+					if(asp->autocast_type==AUTOCAST_EVENT_ON_SPAWN)
+						CastSpell(this, sp, false);
+
+					RemoveSpell(itr->first);
+					done=true;
+					break;
+				}
+			}
+		}
+
+		if(done==false)
+		{
+			if(mSpells.find(sp) != mSpells.end())
+				return;
+
+			if(learning)
+			{
+				AI_Spell * asp = CreateAISpell(sp);
+				uint16 ss = (asp->autocast_type > 0) ? AUTOCAST_SPELL_STATE : DEFAULT_SPELL_STATE;
+				mSpells[sp] = ss;
+				if(ss==AUTOCAST_SPELL_STATE)
+					SetAutoCast(asp,true);
+
+				if(asp->autocast_type==AUTOCAST_EVENT_ON_SPAWN)
+					CastSpell(this, sp, false);
+			}
+			else
+				mSpells[sp] = DEFAULT_SPELL_STATE;
+		}
 	}
 	
-	if(IsInWorld() && sp->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA)
-	{
-		// Autocast by default
-		SetSpellState(sp, PET_ACTION_SPELL);
-		// Cast it.
-		CastSpell(this, sp, true);
-	}
-	else if(putInBar)
-	{
-		// Add to the actionbar.
-		for(int i = 0; i < 10; ++i)
-		{
-			if(ActionBar[i] == 0)
-			{
-				ActionBar[i] = sp->Id;
-				break;
-			}
-		}
-	}
 	if(IsInWorld())
 		SendSpellsToOwner();
 }
@@ -714,7 +814,20 @@ void Pet::SetSpellState(SpellEntry* sp, uint16 State)
 	if(itr == mSpells.end())
 		return;
 
+	uint16 oldstate = itr->second;
 	itr->second = State;
+
+	if(State == AUTOCAST_SPELL_STATE || oldstate == AUTOCAST_SPELL_STATE)
+	{
+		AI_Spell * sp2 = GetAISpellForSpellId(sp->Id);
+		if(sp2)
+		{
+			if(State == AUTOCAST_SPELL_STATE)
+				SetAutoCast(sp2, true);
+			else
+				SetAutoCast(sp2,false);
+		}
+	}		
 }
 
 uint16 Pet::GetSpellState(SpellEntry* sp)
@@ -758,6 +871,9 @@ void Pet::RemoveSpell(SpellEntry * sp)
 		{
 			if((*it) == itr->second)
 			{
+				if((*it)->autocast_type > 0)
+					m_autoCastSpells[(*it)->autocast_type].remove((*it));
+
 				m_aiInterface->m_spells.erase(it);
 				m_aiInterface->CheckNextSpell(itr->second);
 				break;
@@ -1226,6 +1342,7 @@ void Pet::ApplyStatsForLevel()
 	SetUInt32Value(UNIT_FIELD_POWER1, m_uint32Values[UNIT_FIELD_BASE_MANA]);
 	SetUInt32Value(UNIT_FIELD_MAXPOWER1, m_uint32Values[UNIT_FIELD_BASE_MANA]);
 }
+
 uint16 Pet::SpellTP(uint32 spellId)
 {
 	//returns required training points for spell
@@ -1333,5 +1450,81 @@ void Pet::UpdateLoyalty(char pts)
 	{
 		SetUInt32Value(UNIT_FIELD_BYTES_1, 0 | (newLvl << 8));
 		UpdateTP();
+	}
+}
+
+AI_Spell * Pet::HandleAutoCastEvent()
+{
+	if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
+	{
+		// more than one autocast spell. pick a random one.
+		uint32 c = sRand.randInt(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
+		uint32 j = 0;
+		list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+
+		for(; itr != m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end(), j < c; ++j, ++itr);
+		if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
+			return *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+		else
+			return *itr;
+	}
+	else if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size())
+		return *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+	
+	return NULL;
+}
+
+void Pet::HandleAutoCastEvent(uint32 Type)
+{
+	if(!m_Owner)
+		return;
+
+	if(Type == AUTOCAST_EVENT_ATTACK)
+	{
+		if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
+		{
+			// more than one autocast spell. pick a random one.
+			uint32 c = sRand.randInt(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
+			uint32 j = 0;
+			list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+
+			for(; itr != m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end(), j < c; ++j, ++itr);
+            if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
+				m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
+			else
+				m_aiInterface->SetNextSpell(*itr);
+		}
+		else if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size())
+			m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
+
+		return;
+	}
+
+	for(list<AI_Spell*>::iterator itr = m_autoCastSpells[Type].begin(); itr != m_autoCastSpells[Type].end(); ++itr)
+	{
+		if((*itr)->spelltargetType == TTYPE_OWNER)
+			CastSpell(m_Owner, (*itr)->spell, false);
+		else
+			CastSpell(this, (*itr)->spell, false);
+	}
+}
+
+void Pet::SetAutoCast(AI_Spell * sp, bool on)
+{
+	if(sp->autocast_type > 0)
+	{
+		if(!on)
+			m_autoCastSpells[sp->autocast_type].remove(sp);
+		else
+		{
+			for(list<AI_Spell*>::iterator itr = m_autoCastSpells[sp->autocast_type].begin();
+				itr != m_autoCastSpells[sp->autocast_type].end(); ++itr)
+			{
+				if((*itr) == sp)
+					return;
+			}
+
+			m_autoCastSpells[sp->autocast_type].push_back(sp);
+		}
 	}
 }

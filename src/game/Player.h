@@ -424,7 +424,6 @@ struct PlayerPet
 	uint32 happinessupdate;
 	string actionbar;
 	bool summon;
-	uint32 autocastspell;
 	uint32 loyaltypts;
 	uint32 loyaltyupdate;
 	char loyaltylvl;

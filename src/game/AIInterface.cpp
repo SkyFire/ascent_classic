@@ -236,7 +236,10 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 					FollowDistance = 3.0f;
 					m_lastFollowX = m_lastFollowY = 0;
 					if(m_Unit->GetGUIDHigh() == HIGHGUID_PET)
+					{
 						((Pet*)m_Unit)->SetPetAction(PET_ACTION_FOLLOW);
+						((Pet*)m_Unit)->HandleAutoCastEvent(AUTOCAST_EVENT_LEAVE_COMBAT);
+					}
 					HandleEvent(EVENT_FOLLOWOWNER, 0, 0);
 				}
 				else
@@ -2679,55 +2682,54 @@ AI_Spell *AIInterface::getSpell()
 	// look at our spells
 	AI_Spell *  sp = NULL;
 	AI_Spell *  def_spell = NULL;
-    uint32      cast_time;
-	for(list<AI_Spell*>::iterator itr = m_spells.begin(); itr != m_spells.end();)
+	uint32      cast_time;
+
+	if(m_Unit->GetGUIDHigh() == HIGHGUID_PET)
 	{
-        sp = *itr;
-		++itr;
-		if(/*sp->procCount && */sp->agent == AGENT_SPELL)
+		sp = def_spell = ((Pet*)m_Unit)->HandleAutoCastEvent();
+	}
+	else
+	{
+		for(list<AI_Spell*>::iterator itr = m_spells.begin(); itr != m_spells.end();)
 		{
-			if (sp->spellType == STYPE_BUFF)
+			sp = *itr;
+			++itr;
+			if(/*sp->procCount && */sp->agent == AGENT_SPELL)
 			{
-				// cast the buff at requested percent only if we don't have it already
-				if(sp->procChance >= 100 || Rand(sp->procChance))
+				if (sp->spellType == STYPE_BUFF)
 				{
-					if(!m_Unit->HasActiveAura(sp->spell->Id))
+					// cast the buff at requested percent only if we don't have it already
+					if(sp->procChance >= 100 || Rand(sp->procChance))
 					{
-#ifdef _AI_DEBUG
-						sLog.outString("AI DEBUG: Returning aura %s for unit %u", sSpellStore.LookupString( sp->spell->Name ),
-							sp->entryId);
-#endif
-						return sp;
+						if(!m_Unit->HasActiveAura(sp->spell->Id))
+						{
+							return sp;
+						}
 					}
 				}
-			}
-            else
-			{
-				if(def_spell!=0)
-					continue;
-
-				// cast the spell at requested percent.
-				if(sp->procChance >= 100 || Rand(sp->procChance))
+				else
 				{
-					//focus/mana requirement
-					switch(sp->spell->powerType)
+					if(def_spell!=0)
+						continue;
+
+					// cast the spell at requested percent.
+					if(sp->procChance >= 100 || Rand(sp->procChance))
 					{
-					case POWER_TYPE_MANA:
-						if(m_Unit->GetUInt32Value(UNIT_FIELD_POWER1) < sp->spell->manaCost)
-							continue;
-						break;
+						//focus/mana requirement
+						switch(sp->spell->powerType)
+						{
+						case POWER_TYPE_MANA:
+							if(m_Unit->GetUInt32Value(UNIT_FIELD_POWER1) < sp->spell->manaCost)
+								continue;
+							break;
 
-					case POWER_TYPE_FOCUS:
-						if(m_Unit->GetUInt32Value(UNIT_FIELD_POWER3) < sp->spell->manaCost)
-							continue;
-						break;
+						case POWER_TYPE_FOCUS:
+							if(m_Unit->GetUInt32Value(UNIT_FIELD_POWER3) < sp->spell->manaCost)
+								continue;
+							break;
+						}
+						def_spell = sp;
 					}
-
-#ifdef _AI_DEBUG
-					sLog.outString("AI DEBUG: Returning spell %s for unit %u", sSpellStore.LookupString( sp->spell->Name ),
-						sp->entryId);
-#endif
-					def_spell = sp;
 				}
 			}
 		}

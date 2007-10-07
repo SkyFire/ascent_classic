@@ -1545,21 +1545,35 @@ void MapMgr::_PerformObjectDuties()
 {
 	++mLoopCounter;
 	uint32 mstime = getMSTime();
+	uint32 difftime = mstime - lastUnitUpdate;
+	if(difftime > 500)
+		difftime = 500;
 
 	// Update creatures.
 	{
 		CreatureSet::iterator itr = activeCreatures.begin();
+		PetStorageMap::iterator it2 = m_PetStorage.begin();
 		Creature * ptr;
+		Pet * ptr2;
+
 		for(; itr != activeCreatures.end();)
 		{
 			ptr = *itr;
 			++itr;
-			ptr->Update(mstime - lastUnitUpdate);
+			ptr->Update(difftime);
 		}
+
+		for(; it2 != m_PetStorage.end();)
+		{
+			ptr2 = it2->second;
+			++it2;
+
+			ptr2->Update(difftime);
+		}		
 	}
 
 	// Update any events.
-	eventHolder.Update(mstime - lastUnitUpdate);
+	eventHolder.Update(difftime);
 
 	// Update players.
 	{
@@ -1569,7 +1583,7 @@ void MapMgr::_PerformObjectDuties()
 		{
 			ptr = ((Player*)(itr->second));
 			++itr;
-			ptr->Update(mstime - lastUnitUpdate);
+			ptr->Update(difftime);
 		}
 
 		lastUnitUpdate = mstime;
@@ -1578,13 +1592,15 @@ void MapMgr::_PerformObjectDuties()
 	// Update gameobjects (not on every loop, however)
 	if(mLoopCounter % 2)
 	{
+		difftime = mstime - lastGameobjectUpdate;
+
 		GameObjectSet::iterator itr = activeGameObjects.begin();
 		GameObject * ptr;
 		for(; itr != activeGameObjects.end();)
 		{
 			ptr = *itr;
 			++itr;
-			ptr->Update(mstime - lastGameobjectUpdate);
+			ptr->Update(difftime);
 		}
 
 		lastGameobjectUpdate = mstime;

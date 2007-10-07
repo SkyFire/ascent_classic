@@ -1705,7 +1705,7 @@ bool ChatHandler::HandleAddPetSpellCommand(const char* args, WorldSession* m_ses
 		return true;
 	}
 
-	pPet->AddSpell(spell);
+	pPet->AddSpell(spell, true);
 	GreenSystemMessage(m_session, "Added spell %u to your pet.", SpellId);
 	return true;
 }

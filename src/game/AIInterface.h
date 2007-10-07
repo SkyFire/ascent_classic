@@ -107,6 +107,7 @@ enum AI_SpellTargetType
 	TTYPE_DESTINATION,
 	TTYPE_SOURCE,
 	TTYPE_CASTER,
+	TTYPE_OWNER,
 };
 
 enum AI_State
@@ -171,6 +172,7 @@ struct AI_Spell
 	uint32 Misc2;
 	float minrange;
 	float maxrange;
+	uint32 autocast_type;
 };
 
 bool isGuard(uint32 id);

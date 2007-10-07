@@ -2217,12 +2217,12 @@ void Spell::SpellEffectLearnPetSpell(uint32 i)
 		if(pPet->IsSummon())
 		{
 			p_caster->AddSummonSpell(unitTarget->GetEntry(), m_spellInfo->EffectTriggerSpell[i]);
-			pPet->AddSpell(m_spellInfo->EffectTriggerSpell[i]);
+			pPet->AddSpell(dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]), true);
 		}
 		else
 		{
 			if(pPet->CanLearnSpellTP(m_spellInfo->EffectTriggerSpell[i]))
-				pPet->AddSpell(m_spellInfo->EffectTriggerSpell[i]);
+				pPet->AddSpell(dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]), true);
 			else
 			{
 				SendCastResult(SPELL_FAILED_TRAINING_POINTS);
