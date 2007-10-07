@@ -304,7 +304,12 @@ bool Master::Run(int argc, char ** argv)
 
 	new ScriptMgr;
 
-	sWorld.SetInitialWorldSettings();
+	if(!sWorld.SetInitialWorldSettings())
+	{
+		Log.Error("Server", "SetInitialWorldSettings() failed. Something went wrong? Exiting.");
+		return false;
+	}
+
 	sWorld.SetStartTime((uint32)time(NULL));
 	
 	_HookSignals();
