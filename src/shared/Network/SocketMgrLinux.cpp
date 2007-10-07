@@ -75,7 +75,7 @@ void SocketMgr::SpawnWorkerThreads()
         ThreadPool.ExecuteTask(new SocketWorkerThread());
 }
 
-void SocketWorkerThread::run()
+bool SocketWorkerThread::run()
 {
     int fd_count;
     Socket * ptr;
@@ -137,6 +137,7 @@ void SocketWorkerThread::run()
             }
         }       
     }
+    return true;
 }
 
 #endif

@@ -89,7 +89,7 @@ class SocketWorkerThread : public ThreadBase
     struct epoll_event events[THREAD_EVENT_SIZE];
 
 public:
-    void run();
+    bool run();
 };
 
 #define sSocketMgr SocketMgr::getSingleton()
