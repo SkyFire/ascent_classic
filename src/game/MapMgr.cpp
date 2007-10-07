@@ -63,8 +63,6 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 	memset(m_GOStorage,0,sizeof(GameObject*)*m_GOArraySize);
 	m_GOHighGuid = m_CreatureHighGuid = 0;
 	m_DynamicObjectHighGuid=0; 
-	// dont allow it to delete us when the thread exits :)
-	delete_after_use = false;
 	lastUnitUpdate = getMSTime();
 	lastGameobjectUpdate = getMSTime();
 	m_battleground = 0;
@@ -1317,14 +1315,16 @@ void MapMgr::LoadAllCells()
 /* new stuff
 */
 
-void MapMgr::run()
+bool MapMgr::run()
 {
+	bool rv;
 	THREAD_TRY_EXECUTION2
-		Do();
+		rv = Do();
 	THREAD_HANDLE_CRASH2
+	return rv;
 }
 
-void MapMgr::Do()
+bool MapMgr::Do()
 {
 #ifdef WIN32
 	threadid=GetCurrentThreadId();
@@ -1458,7 +1458,7 @@ void MapMgr::Do()
 	{
 		thread_is_alive = false;
 		GetBaseMap()->DestroyMapMgrInstance(GetInstanceID());
-		return;
+		return false;
 	}
 
 	///////////////////////////////
@@ -1483,6 +1483,7 @@ void MapMgr::Do()
 		}
 
 	}
+	return false;
 }
 
 void MapMgr::AddObject(Object *obj)

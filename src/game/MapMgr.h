@@ -215,8 +215,8 @@ public:
 	Unit * GetUnit(const uint64 & guid);
 	Object * _GetObject(const uint64 & guid);
 
-	void run();
-	void Do();
+	bool run();
+	bool Do();
 
 	MapMgr(Map *map, uint32 mapid, uint32 instanceid);
 	~MapMgr();

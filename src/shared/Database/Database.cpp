@@ -34,7 +34,6 @@ Database::Database() : CThread()
 	Connections = NULL;
 	mConnectionCount = -1;   // Not connected.
 //	mNextPing = getMSTime();
-	delete_after_use = false;
 	ThreadRunning = true;
 }
 
@@ -377,7 +376,7 @@ bool Database::WaitExecuteNA(const char* QueryString)
 	return Result;
 }
 
-void Database::run()
+bool Database::run()
 {
 	SetThreadName("MySQL Database Execute Thread");
 	SetThreadState(THREADSTATE_BUSY);
@@ -408,6 +407,7 @@ void Database::run()
 	}
 
 	ThreadRunning = false;
+	return false;
 }
 
 
@@ -495,9 +495,10 @@ void Database::EndThreads()
 	}
 }
 
-void QueryThread::run()
+bool QueryThread::run()
 {
 	db->thread_proc_query();
+	return true;
 }
 
 QueryThread::~QueryThread()

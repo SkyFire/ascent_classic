@@ -65,7 +65,7 @@ public:
 	bool Initialize(const char* Hostname, unsigned int port,
 		const char* Username, const char* Password, const char* DatabaseName,
 		uint32 ConnectionCount, uint32 BufferSize);
-	void run();
+	bool run();
 	void Shutdown();
 
 	QueryResult* Query(const char* QueryString, ...);
@@ -147,7 +147,7 @@ class QueryThread : public CThread
 public:
 	QueryThread(Database * d) : db(d), CThread() {}
 	~QueryThread();
-	void run();
+	bool run();
 };
 
 #endif

@@ -29,7 +29,7 @@ public:
 	bool kill;
 	CConsoleThread();
 	~CConsoleThread();
-	void run();
+	bool run();
 };
 
 class CConsole :  public Singleton < CConsole >

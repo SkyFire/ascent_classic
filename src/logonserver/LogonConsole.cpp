@@ -53,7 +53,8 @@ void LogonConsole::Kill()
 	printf("Console shut down.\n");
 #endif
 }
-void LogonConsoleThread::run()
+
+bool LogonConsoleThread::run()
 {
 	new LogonConsole;
 
@@ -61,7 +62,6 @@ void LogonConsoleThread::run()
 	sLogonConsole._thread = this;
 	int i = 0;
 	char cmd[96];
-	
 
 	while (!kill)
 	{
@@ -87,6 +87,7 @@ void LogonConsoleThread::run()
 	}
 
 	sLogonConsole._thread=NULL;
+	return true;
 }
 
 //------------------------------------------------------------------------------

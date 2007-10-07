@@ -51,7 +51,7 @@ public:
 	DayWatcherThread();
 	~DayWatcherThread();
 
-	void run();
+	bool run();
 	void terminate();
 	void maintenence();
 	void dupe_tm_pointer(tm * returnvalue, tm * mypointer);

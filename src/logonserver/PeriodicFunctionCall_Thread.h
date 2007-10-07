@@ -29,7 +29,6 @@ public:
 		cb = new CallbackP0<T>(callback, method);
 		interval = Interval;
 		running = true;
-		delete_after_use=false;
 	}
 
 	~PeriodicFunctionCaller()
@@ -37,7 +36,7 @@ public:
 		delete cb;
 	}
 
-	void run()
+	bool run()
 	{
 #ifndef WIN32
 		uint32 start = getMSTime();
@@ -74,7 +73,7 @@ public:
 		}
 		thread_active=false;
 #endif
-
+		return false;
 	}
 
 	void kill()

@@ -1129,11 +1129,11 @@ int Player_SetLevel(gmThread * a_thread)
 	// deny the setting of level above server limits
 	if ( p->GetSession()->HasFlag(ACCOUNT_FLAG_XPACK_01) )
 	{
-		if ( level > (int32)sWorld.Expansion1LevelCap )
-			level = (int32)sWorld.Expansion1LevelCap;
+		if ( level > (int32)70 )
+			level = (int32)70;
 	} else {
-		if ( level > (int32)sWorld.LevelCap )
-			level = (int32)sWorld.LevelCap;
+		if ( level > (int32)60 )
+			level = (int32)60;
 	}
 
 	for( ; curLevel < level ; curLevel++ )
@@ -1164,11 +1164,11 @@ int Player_LevelUp(gmThread * a_thread)
 
 	if ( p->GetSession()->HasFlag(ACCOUNT_FLAG_XPACK_01) )
 	{
-		if ( endLevel > sWorld.Expansion1LevelCap )
-			endLevel = sWorld.Expansion1LevelCap;
+		if ( endLevel > 70 )
+			endLevel = 70;
 	} else {
-		if ( endLevel > sWorld.LevelCap )
-			endLevel = sWorld.LevelCap;
+		if ( endLevel > 60 )
+			endLevel = 60;
 	};
 
 	for( ; curLevel < endLevel; curLevel++ )

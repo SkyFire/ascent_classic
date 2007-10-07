@@ -59,7 +59,7 @@ void CConsole::Kill()
 	printf("Console shut down.\n");
 #endif
 }
-void CConsoleThread::run()
+bool CConsoleThread::run()
 {
 	SetThreadName("Console Interpreter");
 	sCConsole._thread = this;
@@ -88,6 +88,7 @@ void CConsoleThread::run()
 		}
 	}
 	sCConsole._thread=NULL;
+	return true;
 }
 
 //------------------------------------------------------------------------------

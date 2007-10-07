@@ -64,10 +64,11 @@ CThread::~CThread()
 	
 }
 
-void CThread::run()
+bool CThread::run()
 {
-
+	return false;
 }
+
 void CThread::OnShutdown()
 {
 	SetThreadState(THREADSTATE_TERMINATE);

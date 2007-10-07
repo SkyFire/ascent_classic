@@ -233,7 +233,7 @@ class BasicTaskExecutor : public ThreadBase
 public:
 	BasicTaskExecutor(CallbackBase * Callback, uint32 Priority) : cb(Callback), priority(Priority) {}
 	~BasicTaskExecutor() { delete cb; }
-	void run();
+	bool run();
 };
 
 class Task
@@ -299,7 +299,7 @@ public:
 	TaskExecutor(TaskList * l) : starter(l) { l->incrementThreadCount(); }
 	~TaskExecutor() { starter->decrementThreadCount(); }
 
-	void run();
+	bool run();
 };
 
 class WorldSocket;
@@ -458,8 +458,7 @@ public:
 	bool sendRevisionOnJoin;
 
 	void SaveAllPlayers();
-	uint32 LevelCap;
-	uint32 Expansion1LevelCap;
+
 	string MapPath;
 	bool UnloadMapFiles;
 	bool BreathingEnabled;

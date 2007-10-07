@@ -29,7 +29,7 @@ public:
 	bool kill;
 	LogonConsoleThread();
 	~LogonConsoleThread();
-	void run();
+	bool run();
 };
 
 class LogonConsole :  public Singleton < LogonConsole >

@@ -259,8 +259,7 @@ static unsigned long WINAPI thread_proc(void* param)
 	{
 		if(t->ExecutionTarget != NULL)
 		{
-			t->ExecutionTarget->run();
-			if(t->ExecutionTarget->delete_after_use)
+			if(t->ExecutionTarget->run())
 				delete t->ExecutionTarget;
 
 			t->ExecutionTarget = NULL;

@@ -61,7 +61,7 @@ void LogonCommServerSocket::OnRead()
 	{
 		if(!remaining)
 		{
-			if(GetReadBufferSize() < 4)
+			if(GetReadBufferSize() < 6)
 				return;	 // no header
 
 			// read header

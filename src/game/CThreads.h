@@ -77,7 +77,7 @@ public:
 	inline CThreadType GetThreadType() { return ThreadType; }
 	int GetThreadId() { return ThreadId; }
 	time_t GetStartTime() { return start_time; }
-	virtual void run();
+	virtual bool run();
 	void OnShutdown();
 
 protected:

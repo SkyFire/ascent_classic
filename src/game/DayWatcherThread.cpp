@@ -126,7 +126,7 @@ bool DayWatcherThread::has_timeout_expired(tm * now_time, tm * last_time, uint32
 	return false;
 }
 
-void DayWatcherThread::run()
+bool DayWatcherThread::run()
 {
 	Log.Notice("DayWatcherThread", "Started.");
 	currenttime = time(NULL);
@@ -167,6 +167,7 @@ void DayWatcherThread::run()
 #ifdef WIN32
 	CloseHandle(m_abortEvent);
 #endif
+	return true;
 }
 
 void DayWatcherThread::update_arena()

@@ -30,7 +30,7 @@ class WorldRunnable : public CThread
 {
 public:
 	WorldRunnable();
-	void run();
+	bool run();
 };
 
 #endif

@@ -29,7 +29,7 @@ WorldRunnable::WorldRunnable() : CThread()
 	ThreadType = THREADTYPE_WORLDRUNNABLE;
 }
 
-void WorldRunnable::run()
+bool WorldRunnable::run()
 {
 	SetThreadName("WorldRunnable (non-instance/logon)");
 	uint32 LastWorldUpdate=getMSTime();
@@ -96,5 +96,5 @@ void WorldRunnable::run()
 	}
 
 	THREAD_HANDLE_CRASH2
-
+	return true;
 }

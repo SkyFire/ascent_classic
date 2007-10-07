@@ -35,7 +35,7 @@ void SocketMgr::SpawnWorkerThreads()
 		ThreadPool.ExecuteTask(new SocketWorkerThread());
 }
 
-void SocketWorkerThread::run()
+bool SocketWorkerThread::run()
 {
 	HANDLE cp = sSocketMgr.GetCompletionPort();
 	DWORD len;
@@ -53,7 +53,7 @@ void SocketWorkerThread::run()
 		if(ov->m_event == SOCKET_IO_THREAD_SHUTDOWN)
 		{
 			delete ov;
-			return;
+			return true;
 		}
 
 		if(s->IsDeleted())
@@ -64,6 +64,8 @@ void SocketWorkerThread::run()
 
 		delete ov;
 	}
+
+	return true;
 }
 
 void HandleReadComplete(Socket * s, uint32 len)

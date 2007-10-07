@@ -52,7 +52,7 @@ typedef void(*OperationHandler)(Socket * s, uint32 len);
 class SocketWorkerThread : public ThreadBase
 {
 public:
-	void run();
+	bool run();
 };
 
 void SERVER_DECL HandleReadComplete(Socket * s, uint32 len);

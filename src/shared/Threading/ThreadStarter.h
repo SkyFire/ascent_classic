@@ -23,12 +23,10 @@
 class SERVER_DECL ThreadBase
 {
 public:
-	ThreadBase() : delete_after_use(true) {}
+	ThreadBase() {}
 	virtual ~ThreadBase() {}
-	virtual void run() = 0;
+	virtual bool run() = 0;
 	virtual void OnShutdown() {}
-	void join();
-	bool delete_after_use;
 #ifdef WIN32
 	HANDLE THREAD_HANDLE;
 #else

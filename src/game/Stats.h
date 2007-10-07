@@ -144,7 +144,7 @@ inline uint32 getConColor(uint16 AttackerLvl, uint16 VictimLvl)
 			}
 			else 
 			{
-				if(AttackerLvl > sWorld.Expansion1LevelCap)
+				if(AttackerLvl > PLAYER_LEVEL_CAP)
 					return 1;//gm
 				if(AttackerLvl<PLAYER_LEVEL_CAP && VictimLvl <= grayLevel[AttackerLvl])
 					return 0;
@@ -174,7 +174,7 @@ inline uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 	if ((int32)pVictim->getLevel()-(int32)pAttacker->getLevel()>10)
 		return 0;
 
-	uint32 max_level = sWorld.Expansion1LevelCap;
+	uint32 max_level = 70;
 	if(pAttacker->IsPlayer())
 		max_level = pAttacker->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
 	else if(pAttacker->IsPet())

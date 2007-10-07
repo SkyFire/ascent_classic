@@ -183,7 +183,7 @@ void World::RemoveGlobalSession(WorldSession *session)
 	SessionsMutex.Release();
 }
 
-void BasicTaskExecutor::run()
+bool BasicTaskExecutor::run()
 {
 	/* Set thread priority, this is a bitch for multiplatform :P */
 #ifdef WIN32
@@ -228,6 +228,8 @@ void BasicTaskExecutor::run()
 	param.sched_priority = 5;
 	pthread_setschedparam(pthread_self(), SCHED_OTHER, &param);
 #endif
+
+	return true;
 }
 
 void CreateDummySpell(uint32 id)
@@ -2524,7 +2526,7 @@ void Task::execute()
 	_cb->execute();
 }
 
-void TaskExecutor::run()
+bool TaskExecutor::run()
 {
 	Task * t;
 	THREAD_TRY_EXECUTION
@@ -2544,6 +2546,7 @@ void TaskExecutor::run()
 		}
 	}
 	THREAD_HANDLE_CRASH
+	return true;
 }
 
 void TaskList::waitForThreadsToExit()
@@ -2583,8 +2586,6 @@ void World::Rehash(bool load)
 	BreathingEnabled = Config.MainConfig.GetBoolDefault("Server", "EnableBreathing", true);
 	SendStatsOnJoin = Config.MainConfig.GetBoolDefault("Server", "SendStatsOnJoin", true);
 	compression_threshold = Config.MainConfig.GetIntDefault("Server", "CompressionThreshold", 1000);
-	LevelCap = Config.MainConfig.GetIntDefault("Server", "LevelCap", 60);
-	Expansion1LevelCap = Config.MainConfig.GetIntDefault("Server", "Expansion1LevelCap", 70);
 
 	// load regeneration rates.
 	setRate(RATE_HEALTH,Config.MainConfig.GetFloatDefault("Rates", "Health",1));
