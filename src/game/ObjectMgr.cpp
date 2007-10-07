@@ -1360,6 +1360,10 @@ void ObjectMgr::LoadTrainers()
 		tr->Can_Train_Gossip_TextId = fields[6].GetUInt32();
 		tr->Cannot_Train_GossipTextId = fields[7].GetUInt32();
 		tr->UIMessage = (char*)NormalTalkMessage;
+		if(!tr->Can_Train_Gossip_TextId)
+			tr->Can_Train_Gossip_TextId=1;
+		if(!tr->Cannot_Train_GossipTextId)
+			tr->Cannot_Train_GossipTextId=1;
 
 		temp = fields[5].GetString();
 		len=strlen(temp);
