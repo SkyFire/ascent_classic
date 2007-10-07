@@ -1374,7 +1374,7 @@ void Spell::update(uint32 difftime)
 	{
 	case SPELL_STATE_PREPARING:
 		{
-			printf("spell::update m_timer %u, difftime %d, newtime %d\n", m_timer, difftime, m_timer-difftime);
+			//printf("spell::update m_timer %u, difftime %d, newtime %d\n", m_timer, difftime, m_timer-difftime);
 			if((int32)difftime >= m_timer)
 				cast(true);
 			else 
