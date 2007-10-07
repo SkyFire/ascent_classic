@@ -123,6 +123,7 @@ void VoiceChatHandler::OnRead(const uint8 * bytes, uint32 len)
 		{
 			uint32 request_id = *(uint32*)&bytes[4];
 			uint32 channel_id = *(uint32*)&bytes[8];
+			Log.Debug("VoiceChatHandler", "Request ID %u, channel id %u", request_id, channel_id);
 
 			for(vector<VoiceChatChannelRequest>::iterator itr = m_requests.begin(); itr != m_requests.end(); ++itr)
 			{
@@ -171,11 +172,14 @@ void VoiceChatHandler::CreateVoiceChannel(Channel * chn)
 	m_lock.Acquire();
 
 	req.id = request_high++;
+	req.channel_name = chn->m_name;
+	req.team = chn->m_team;
 	m_requests.push_back(req);
 
 	buf << uint32(VOICECHAT_CMSG_CREATE_CHANNEL);
+	buf << uint32(0);
 	buf << req.id;
-	m_client->Send(buf.contents(), 8);
+	m_client->Send(buf.contents(), 12);
 	m_lock.Release();
 }
 

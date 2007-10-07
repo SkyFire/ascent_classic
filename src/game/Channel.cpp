@@ -884,6 +884,7 @@ ChannelMgr::ChannelMgr()
 
 void Channel::VoiceChannelCreated(uint16 id)
 {
+	Log.Debug("VoiceChannelCreated", "id %u", id);
 	i_voice_channel_id = id;
 	SendVoiceUpdate();
 }
@@ -944,7 +945,7 @@ void Channel::SendVoiceUpdate()
 	m_lock.Acquire();
 	MemberMap::iterator itr;
 
-	data << m_id << uint32(0);
+	data << uint32(i_voice_channel_id) << uint32(0);
 	data << i_voice_channel_id;
 	data << uint8(0);
 	data << m_name;
