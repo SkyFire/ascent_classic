@@ -195,6 +195,7 @@ void HandleTcpRead(int fd)
 
 	dumphex(buffer, len);
 	cmd = *(int*)&buffer[0];
+	printf("tcpfrom: got cmd %u\n", cmd);
 	switch(cmd)
 	{
 	case VOICECHAT_CMSG_CREATE_CHANNEL:
@@ -205,6 +206,7 @@ void HandleTcpRead(int fd)
 			uint8 out_buffer[12];
             
 			chn = CreateChannel(GenerateChannelId(), t);
+			printf("tcp: creating channel request id %u type %u new id %u\n", t, request_id, chn->channel_id);
 			*(int*)&out_buffer[0] = VOICECHAT_SMSG_CHANNEL_CREATED;
 			*(int*)&out_buffer[4] = request_id;
 			*(int*)&out_buffer[8] = chn->channel_id;
