@@ -287,6 +287,7 @@ void Unit::Update( uint32 p_time )
 		{
 			RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
 			if(hasStateFlag(UF_ATTACKING)) clearStateFlag(UF_ATTACKING);
+			
 
 			for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
 			{
@@ -298,6 +299,9 @@ void Unit::Update( uint32 p_time )
 					break;
 				}
 			}
+			//all attackers is dead.
+			if (!hasStateFlag(UF_ATTACKING))
+				m_attackers.clear();
 		}
 	}
 
