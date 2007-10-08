@@ -1662,10 +1662,12 @@ else
 			float summaryPCTmod = pVictim->DamageTakenPctMod[0]+this->DamageDoneModPCT[0];
 			if (pct_dmg_mod)
 				summaryPCTmod += pct_dmg_mod/100.0f - 1;
+
+			/* RangedDamageTakenPct is not used
 			if (damage_type == RANGED)
 			{
 				summaryPCTmod+=pVictim->RangedDamageTakenPct/100;	
-			}
+			}*/
 
 			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
 

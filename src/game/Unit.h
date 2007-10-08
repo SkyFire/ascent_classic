@@ -818,7 +818,7 @@ public:
 	uint32 MechanicsDispels[27];
 	float MechanicsResistancesPCT[27]; 
 	int32 modAttackTimeIncreasePCT;
-	int32 RangedDamageTakenPct; 
+	//int32 RangedDamageTakenPct; 
 
 	//SM
 	int32 * SM_CriticalChance;//flat

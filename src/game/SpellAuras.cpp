@@ -6679,13 +6679,14 @@ void Aura::SpellAuraIncreaseRangedAPStatPCT(bool apply)
 	}
 }
 
+/* not used
 void Aura::SpellAuraModRangedDamageTakenPCT(bool apply)
 {
 	if(apply)
 		m_target->RangedDamageTakenPct += mod->m_amount;
 	else
 		m_target->RangedDamageTakenPct -= mod->m_amount;  
-}
+}*/
 
 void Aura::SpellAuraModBlockValue(bool apply)
 {
