@@ -37,7 +37,8 @@ SMT_RESIST_DISPEL - check if it is used
 - make spells to run on startup Isdamaging and ishealing hunctions
 - summon guardians not working : 49,
 - clearcasting
- - there should a trigger type named : proc on effect - so we can know the effect value at which we proc
+- there should a trigger type named : proc on effect - so we can know the effect value at which we proc
+- make a spellgroup generator for featured spells
 
 ==========================================================================
 ! BUGS !
@@ -69,6 +70,8 @@ SMT_RESIST_DISPEL - check if it is used
 - Pets - You can attack players from your faction with pets
 - starfire stuns the caster instead of target.
 - i can request and accept at the same time a duel ? request on second login char the duel then simply accept it :S
+- unlearning talents does not remove buffes from you. (it does for me :P )
+- check is_flags place in spellentry structure.Maybe we should place it elsewhere ?(193)
 
 ==========================================================================
 Zack - test my shit :
@@ -84,6 +87,7 @@ Zack - test my shit :
 - mage - Frost Warding - 28332 - does not reflect
 - Gnomish Poultryizer trinket - Poultryizer - need aura duration to set to 15 sec
 - priest - Force of Will - 18550 - what is the group type to increase here ?, all spells ?
+- isdamageing ishealing should not be put to bufftype. It makes spells remove each other
 
 ==========================================================================
 Capt - test my shit :

@@ -918,8 +918,13 @@ enum SpellTypes
     SPELL_TYPE_ELIXIR_GUARDIAN      = 0x00200000, 
     SPELL_TYPE_ELIXIR_FLASK         = SPELL_TYPE_ELIXIR_BATTLE | SPELL_TYPE_ELIXIR_GUARDIAN, //weee, this contains both battle and guardian elixirs ;)
     SPELL_TYPE_HUNTER_MARK			= 0x00400000,
-    SPELL_TYPE_DAMAGING				= 0x00800000,
-    SPELL_TYPE_HEALING				= 0x01000000,
+};
+
+//custom stuff generated for spells that will not change in time
+enum SpellIsFlags
+{
+    SPELL_FLAG_IS_DAMAGING				= 0x00800000,
+    SPELL_FLAG_IS_HEALING				= 0x01000000,
 };
 
 inline bool CanAgroHash(uint32 spellhashname)

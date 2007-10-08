@@ -317,7 +317,8 @@ struct SpellEntry
 //    uint32 BuffDescriptionAlt15;          //190
     //uint32 buffdescflags;                   //191
     uint32 ManaCostPercentage;              //192
-    uint32 unkflags;                        //193 
+//    uint32 unkflags;                        //193 
+	uint32 c_is_flags;						//193 store spell checks in a static way : isdamageind,ishealing
     uint32 StartRecoveryTime;               //194
     uint32 StartRecoveryCategory;           //195
     uint32 SpellFamilyName;                 //196
@@ -347,6 +348,7 @@ struct SpellEntry
     uint32 DiminishStatus;                  //212
     uint32 buffIndexType;
 	uint32 proc_interval;                   //190 - !!! Using it instead of BuffDescriptionAlt15 !!!
+
 };
 
 struct ItemExtendedCostEntry

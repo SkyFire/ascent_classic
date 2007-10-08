@@ -527,6 +527,7 @@ bool World::SetInitialWorldSettings()
 		}
 
 		sp->proc_interval = 0;//trigger at each event
+		sp->c_is_flags = 0;
 
 		// parse rank text
 		if(!sscanf(ranktext, "Rank %d", (unsigned int*)&rank))
@@ -603,9 +604,9 @@ bool World::SetInitialWorldSettings()
 		else if(namehash==0xFF89ABD2)		// hunter's mark
 			type |= SPELL_TYPE_HUNTER_MARK;
 		if(IsDamagingSpell(sp))
-			type |= SPELL_TYPE_DAMAGING;
+			sp->c_is_flags |= SPELL_FLAG_IS_DAMAGING;
 		if(IsHealingSpell(sp))
-			type |= SPELL_TYPE_HEALING;
+			sp->c_is_flags |= SPELL_FLAG_IS_HEALING;
 
 		//stupid spell ranking problem
 		if(sp->spellLevel==0)

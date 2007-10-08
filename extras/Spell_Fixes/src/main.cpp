@@ -121,5 +121,10 @@ void dump_as_sql(TCHAR *inf)
 	}
 	else printf("Opened DBC with %u fields and %u rows\n",(int)dbc.getFieldCount(),(int)dbc.getRecordCount());
 
+	FILE *fsql=fopen("dbc_spell.sql","w");
+
+	printf("CREATE TABLE dbc_spell2 (id INT (11) UNSIGNED NOT NULL, School INT (11) UNSIGNED DEFAULT '0' NOT NULL, PRIMARY KEY(id), UNIQUE(id), INDEX(id)) 
+
+
 	uint32 cnt = (uint32)dbc.getRecordCount();
 }

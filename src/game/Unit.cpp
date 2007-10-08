@@ -857,7 +857,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							{
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->buffType & SPELL_TYPE_DAMAGING)) //we need damaging spells for this, so we suppose all shadow spells casted on target are dmging spells = Wrong
+								if(CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //we need damaging spells for this, so we suppose all shadow spells casted on target are dmging spells = Wrong
 									continue;
 							}break;
 						//shaman - windfurry weapon
@@ -912,7 +912,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							{
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->School!=SCHOOL_SHADOW && !(CastingSpell->buffType & SPELL_TYPE_DAMAGING))
+								if(CastingSpell->School!=SCHOOL_SHADOW && !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						//warrior - improved berserker rage 
@@ -928,7 +928,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								//requires damageing spell
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(!(CastingSpell->buffType & SPELL_TYPE_DAMAGING))
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						//priest - Reflective Shield 
@@ -973,7 +973,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//trigger only on heal spell cast by NOT us
-								if(!(CastingSpell->buffType & SPELL_TYPE_HEALING) && victim!=this)
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) && victim!=this)
 									continue; 
 							}break;
 /*						//paladin - illumination
