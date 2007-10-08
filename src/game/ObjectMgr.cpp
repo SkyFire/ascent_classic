@@ -2596,7 +2596,7 @@ void ObjectMgr::LoadCreatureFamilyNames()
 	for(uint32 i = 0; i < dbc.getRecordCount(); ++i)
 	{
 		uint32 id = dbc.getRecord(i).getUInt(0);
-		string str = string(dbc.getRecord(i).getString(7));
+		string str = string(dbc.getRecord(i).getString(8));
 		_creaturefamilynames[id] = str;
 	}
 }
