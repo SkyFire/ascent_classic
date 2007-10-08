@@ -88,13 +88,13 @@ public:
 
 	void Suspend()
 	{
-		ASSERT(pthread_self() == handle);
+		ASSERT(pthread_equal(pthread_self(), handle));
 		sem_wait(&sem);
 	}
 
 	void Resume()
 	{
-		ASSERT(pthread_self() != handle);
+		ASSERT(!pthread_equal(pthread_self(), handle));
 		sem_post(&sem);
 	}
 
