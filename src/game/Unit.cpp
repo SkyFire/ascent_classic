@@ -305,6 +305,43 @@ void Unit::Update( uint32 p_time )
 		}
 	}
 
+	//If 1 player in Raid in combat => all raid in combat.
+	if (this->IsPlayer())
+	{
+		Player* p = (Player*)(this);
+		if (p->InGroup())
+		{
+			Group *pGroup = p->GetGroup();
+			GroupMembersSet::iterator itr;
+			Player* pGroupGuy;
+			AttackerSet raidattackers;
+			bool RaidInCombat=false;
+			pGroup->Lock();
+			for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) 
+			{
+				for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
+				{
+					pGroupGuy = itr->player;
+					if( pGroupGuy && pGroupGuy->isAlive() && pGroupGuy->isInCombat())
+					{
+						RaidInCombat=true;
+						raidattackers = pGroupGuy->m_attackers;
+						break;
+					}
+				}
+				if (RaidInCombat)
+					break;
+			}
+			pGroup->Unlock();
+			if (RaidInCombat)
+			{   
+				SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+				if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
+				this->m_attackers = raidattackers;
+			}
+		}
+	}
+
 	if(!isDead())
 	{
         if(p_time >= m_H_regenTimer)

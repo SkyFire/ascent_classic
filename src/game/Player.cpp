@@ -7752,11 +7752,15 @@ void Player::SetShapeShift(uint8 ss)
 					SpellEntry* spe = dbcSpell.LookupEntry(aura->spellid);
 					if (!spe)
 					return;
-					Aura* aur = new Aura(spe,0,this,this);
-					this->AddAura(aur);
+					Spell *spell = new Spell(this, spe ,true,NULL);
+					SpellCastTargets targets;
+					targets.m_unitTarget = this->GetGUID();
+					spell->prepare(&targets);	
 				}
 			}
 		}
+		UpdateStats();
+		UpdateChances();
 	}
 }
 

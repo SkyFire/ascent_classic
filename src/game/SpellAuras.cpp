@@ -2830,13 +2830,36 @@ void Aura::SpellAuraModSkill(bool apply)
 void Aura::SpellAuraModIncreaseSpeed(bool apply)
 {
 	if(apply)
-	{
-		//if(m_target->isAlive() ) SetPositive(); 
 		m_target->m_speedModifier += mod->m_amount;
-	}
 	else
 		m_target->m_speedModifier -= mod->m_amount;
+
 	m_target->UpdateSpeed();
+
+	switch (this->GetSpellId())
+	{
+	case 24866: //Feral Swiftness
+		if (!m_target->IsPlayer())
+			break;
+		{
+			SSAura* aura = new SSAura();
+			aura->forms = FORM_BEAR | FORM_CAT | FORM_DIREBEAR;
+			aura->spellid = 24864;
+			static_cast<Player*>(m_target)->m_ssAuras.insert(aura);
+		}
+		break;
+	case 17002: //Feral Swiftness
+		if (!m_target->IsPlayer())
+			break;
+		{
+			SSAura* aura = new SSAura();
+			aura->forms = FORM_BEAR | FORM_CAT | FORM_DIREBEAR;
+			aura->spellid = 24867;
+			static_cast<Player*>(m_target)->m_ssAuras.insert(aura);
+		}
+		break;
+
+	}
 }
 
 void Aura::SpellAuraModIncreaseMountedSpeed(bool apply)
