@@ -292,12 +292,18 @@ struct SpellEntry
     //uint32 DescriptionAlt7;                 //165
     //uint32 DescriptionAlt8;                 //166
     //uint32 DescriptionAlt9;                 //167
-    //uint32 DescriptionAlt10;                //168
-    //uint32 DescriptionAlt11;                //169
-    //uint32 DescriptionAlt12;                //170
-    //uint32 DescriptionAlt13;                //171
-    //uint32 DescriptionAlt14;                //172
-    //uint32 DescriptionAlt15;                //173
+//    //uint32 DescriptionAlt10;                //168
+	uint32 proc_interval;					  //168 - !!! CUSTOM, Using it instead of DescriptionAlt10 !!!
+//    //uint32 DescriptionAlt11;                //169
+    uint32 buffIndexType;					  //169 - !!! CUSTOM, Using it instead of DescriptionAlt11 !!!
+//    //uint32 DescriptionAlt12;                //170
+	uint32 c_is_flags;						  //170 store spell checks in a static way : isdamageind,ishealing - !!! CUSTOM, Using it instead of DescriptionAlt12 !!!
+//    //uint32 DescriptionAlt13;                //171
+//    //uint32 DescriptionAlt14;                //172
+//    //uint32 DescriptionAlt15;                //173
+    uint32 buffType;                        //171 - !!! CUSTOM, Using it instead of DescriptionAlt13 !!!// these are related to creating a item through a spell
+    uint32 RankNumber;                      //172 // this protects players from having >1 rank of a spell - !!! CUSTOM, Using it instead of DescriptionAlt14 !!!
+    uint32 NameHash;                        //173 - !!! CUSTOM, Using it instead of DescriptionAlt15 !!!// related to custom spells, summon spell quest related spells
     //uint32 DescriptionFlags;                //174
     //uint32 BuffDescription;                 //175
     //uint32 BuffDescriptionAlt1;             //176
@@ -314,11 +320,10 @@ struct SpellEntry
     //uint32 BuffDescriptionAlt12;            //187
     //uint32 BuffDescriptionAlt13;            //188
     //uint32 BuffDescriptionAlt14;            //189
-//    uint32 BuffDescriptionAlt15;          //190
+	//uint32 BuffDescriptionAlt15;            //190
     //uint32 buffdescflags;                   //191
     uint32 ManaCostPercentage;              //192
-//    uint32 unkflags;                        //193 
-	uint32 c_is_flags;						//193 store spell checks in a static way : isdamageind,ishealing
+    uint32 unkflags;                        //193 
     uint32 StartRecoveryTime;               //194
     uint32 StartRecoveryCategory;           //195
     uint32 SpellFamilyName;                 //196
@@ -331,24 +336,11 @@ struct SpellEntry
     float dmg_multiplier[3];                //203 - 205   if the name is correct I dono
     uint32 FL;                              //206   only one spellid:6994 has this value = 369
     uint32 FM;                              //207   only one spellid:6994 has this value = 4
-    uint32 FN;                              //208   only one spellid:26869  has this flag = 1
-
-    // soz guys, gotta use these 3 vars :p
-    uint32 unk201_4; // these are related to creating a item through a spell
-    uint32 unk201_5;
-    uint32 unk201_6; // related to custom spells, summon spell quest related spells
-    
-    // custom shit
-    uint32 buffType;                        //209
-
-    // this protects players from having >1 rank of a spell
-    uint32 RankNumber;                      //210
-    uint32 NameHash;                        //211
-
+    uint32 FN;                              //208   only one spellid:26869  has this flag = 1   
+    uint32 unk201_4;						//209 
+    uint32 unk201_5;						//210 
+    uint32 unk201_6;						//211 
     uint32 DiminishStatus;                  //212
-    uint32 buffIndexType;
-	uint32 proc_interval;                   //190 - !!! Using it instead of BuffDescriptionAlt15 !!!
-
 };
 
 struct ItemExtendedCostEntry

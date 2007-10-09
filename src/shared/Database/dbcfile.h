@@ -31,6 +31,9 @@ public:
 	// Open database. It must be openened before it can be used.
 	bool open(const char*);
 
+	// Dump the 
+	bool DumpBufferToFile(const char*fn);
+
 	// Database exceptions
 	class Exception
 	{
@@ -75,6 +78,33 @@ public:
 			size_t stringOffset = getUInt(field);
 			assert(stringOffset < file.stringSize);
 			return reinterpret_cast<char*>(file.stringTable + stringOffset);
+		}
+		//used by external tool
+		const void *getRowStart() const
+		{
+			return reinterpret_cast<void*>(offset);
+		}
+		void SetFloat(size_t field,float value) const
+		{
+			assert(field < file.fieldCount);
+			*reinterpret_cast<float*>(offset+field*4) = value;
+		}
+		void SetUInt(size_t field,unsigned int value) const
+		{
+			assert(field < file.fieldCount);
+			*reinterpret_cast<unsigned int*>(offset+field*4) = value;
+		}
+		void SetInt(size_t field,signed int value) const
+		{
+			assert(field < file.fieldCount);
+			*reinterpret_cast<int*>(offset+field*4) =  value;
+		}
+		void SetString(size_t field,const char *value) const
+		{
+			assert(field < file.fieldCount);
+			size_t stringOffset = getUInt(field);
+			assert(stringOffset < file.stringSize);
+			strcpy(reinterpret_cast<char*>(file.stringTable + stringOffset),value);
 		}
 	private:
 		Record(DBCFile &file, unsigned char *offset): file(file), offset(offset) {}

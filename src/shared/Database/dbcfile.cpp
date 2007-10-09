@@ -81,3 +81,24 @@ DBCFile::Iterator DBCFile::end()
 	return Iterator(*this, stringTable);
 }
 
+bool DBCFile::DumpBufferToFile(const char*fn)
+{
+  FILE * pFile;
+  pFile = fopen ( fn , "wb" );
+  if(!pFile)
+	  return false;
+
+  //write header stuff
+  fwrite ((const void *)&header , 4 , 1 , pFile );
+  fwrite ((const void *)&recordCount , 4 , 1 , pFile );
+  fwrite ((const void *)&fieldCount , 4 , 1 , pFile );
+  fwrite ((const void *)&recordSize , 4 , 1 , pFile );
+  fwrite ((const void *)&stringSize , 4 , 1 , pFile );
+
+  //now the main part is the data
+  fwrite (data , recordSize*recordCount+stringSize , 1 , pFile );
+
+  //and pull out
+  fclose (pFile);
+  return true;
+}
