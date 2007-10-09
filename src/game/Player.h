@@ -645,6 +645,7 @@ public:
 	void RemoveFromWorld();
 	bool Create ( WorldPacket &data );
 	
+	void addAttacker(Unit *pUnit);
 	void Update( uint32 time );
 	void BuildEnumData( WorldPacket * p_data );
     void BuildFlagUpdateForNonGroupSet(uint32 index, uint32 flag);

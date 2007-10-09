@@ -889,6 +889,29 @@ void Player::EventDismount(uint32 money, float x, float y, float z)
 	}
 }
 
+
+void Player::addAttacker(Unit *pUnit)
+{
+	Unit::addAttacker(pUnit);
+	if (this->InGroup())
+	{
+		Group *pGroup = this->GetGroup();
+		GroupMembersSet::iterator itr;
+		Player* pGroupGuy;
+		pGroup->Lock();
+		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) 
+		{
+			for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
+			{
+				pGroupGuy = itr->player;
+				if( pGroupGuy && !pGroupGuy->m_attackers.count(pUnit->GetGUID()))
+					pUnit->m_attackers.insert(pUnit->GetGUID());
+			}
+		}
+		pGroup->Unlock();
+	}
+}
+
 void Player::_EventAttack(bool offhand)
 {
 	if (m_currentSpell)

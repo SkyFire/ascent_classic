@@ -276,81 +276,30 @@ void Unit::Update( uint32 p_time )
 {
 	_UpdateSpells( p_time );
 
-	if(m_attackers.size() == 0 && m_attackTarget == 0)
+	if (m_attackTarget == 0)
 	{
 		RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
 		if(hasStateFlag(UF_ATTACKING)) clearStateFlag(UF_ATTACKING);
+		for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
+		{
+			Unit* pUnit = GetMapMgr()->GetUnit(*itr);
+			if(pUnit && pUnit->isAlive())
+			{
+				SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+				if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
+				break;
+			}
+		}
+		//all attackers are dead.
+		if (!hasStateFlag(UF_ATTACKING))
+			m_attackers.clear();
 	}
 	else
 	{
-		if (m_attackTarget==0)
-		{
-			RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-			if(hasStateFlag(UF_ATTACKING)) clearStateFlag(UF_ATTACKING);
-			
-
-			for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-			{
-				Unit* pUnit = GetMapMgr()->GetUnit(*itr);
-				if(pUnit && pUnit->isAlive())
-				{
-					SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-					if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
-					break;
-				}
-			}
-			//all attackers is dead.
-			if (!hasStateFlag(UF_ATTACKING))
-				m_attackers.clear();
-		}
+		SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+		if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
 	}
 
-	//If 1 player in Raid in combat => all raid in combat.
-	//Shady: mb should be rewritten cause a lot of fors
-	if (this->IsPlayer())
-	{
-		Player* p = (Player*)(this);
-		if (p->InGroup())
-		{
-			Group *pGroup = p->GetGroup();
-			GroupMembersSet::iterator itr;
-			Player* pGroupGuy;
-			AttackerSet raidattackers;
-			bool RaidInCombat=false;
-			pGroup->Lock();
-			for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) 
-			{
-				for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
-				{
-					pGroupGuy = itr->player;
-					if( pGroupGuy && pGroupGuy->isAlive() && pGroupGuy->isInCombat())
-					{
-						for(AttackerSet::iterator itr = pGroupGuy->m_attackers.begin(); itr != pGroupGuy->m_attackers.end(); ++itr)
-						{
-							Unit* pUnit = GetMapMgr()->GetUnit(*itr);
-							if(pUnit && pUnit->isAlive())
-							{
-								RaidInCombat=true;
-								raidattackers = pGroupGuy->m_attackers;
-								break;
-							}
-						}
-						if (RaidInCombat)
-							break;
-					}
-				}
-				if (RaidInCombat)
-					break;
-			}
-			pGroup->Unlock();
-			if (RaidInCombat)
-			{   
-				SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-				if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
-				this->m_attackers = raidattackers;
-			}
-		}
-	}
 
 	if(!isDead())
 	{

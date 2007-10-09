@@ -906,7 +906,7 @@ public:
 	uint32 m_CombatUpdateTimer;
 
 	// Attacker stuff
-	void addAttacker(Unit *pUnit);
+	virtual void addAttacker(Unit *pUnit);
 	void removeAttacker(Unit *pUnit);
 	void setAttackTarget(Unit* pUnit);
 	void clearAttackers(bool bFromOther);
