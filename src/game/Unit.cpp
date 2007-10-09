@@ -306,6 +306,7 @@ void Unit::Update( uint32 p_time )
 	}
 
 	//If 1 player in Raid in combat => all raid in combat.
+	//Shady: mb should be rewritten cause a lot of fors
 	if (this->IsPlayer())
 	{
 		Player* p = (Player*)(this);
@@ -324,9 +325,18 @@ void Unit::Update( uint32 p_time )
 					pGroupGuy = itr->player;
 					if( pGroupGuy && pGroupGuy->isAlive() && pGroupGuy->isInCombat())
 					{
-						RaidInCombat=true;
-						raidattackers = pGroupGuy->m_attackers;
-						break;
+						for(AttackerSet::iterator itr = pGroupGuy->m_attackers.begin(); itr != pGroupGuy->m_attackers.end(); ++itr)
+						{
+							Unit* pUnit = GetMapMgr()->GetUnit(*itr);
+							if(pUnit && pUnit->isAlive())
+							{
+								RaidInCombat=true;
+								raidattackers = pGroupGuy->m_attackers;
+								break;
+							}
+						}
+						if (RaidInCombat)
+							break;
 					}
 				}
 				if (RaidInCombat)
