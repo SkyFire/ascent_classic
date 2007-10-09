@@ -1315,6 +1315,13 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 		AverageResistance = ((float)pVictim->GetResistance( (*dmg).school_type)- PowerCostPctMod[(*dmg).school_type]) / (float)(getLevel() * 5) * 0.75f;
 		  if(AverageResistance > 0.75f)
 			AverageResistance = 0.75f;
+
+		  // NOT WOWWIKILIKE but i think it's actual to add some fullresist chance frome resistances
+		  float Resistchance=(float)pVictim->GetResistance( (*dmg).school_type)/(float)pVictim->getLevel();
+		  Resistchance*=Resistchance*2;
+		  if (Rand(Resistchance))
+			  AverageResistance=1.0f;
+
 		if(AverageResistance>0)
 			(*dmg).resisted_damage = (uint32)(((*dmg).full_damage)*AverageResistance);
 		else 
