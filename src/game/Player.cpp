@@ -905,7 +905,7 @@ void Player::addAttacker(Unit *pUnit)
 			{
 				pGroupGuy = itr->player;
 				if( pGroupGuy && !pGroupGuy->m_attackers.count(pUnit->GetGUID()))
-					pUnit->m_attackers.insert(pUnit->GetGUID());
+					pGroupGuy->m_attackers.insert(pUnit->GetGUID());
 			}
 		}
 		pGroup->Unlock();
