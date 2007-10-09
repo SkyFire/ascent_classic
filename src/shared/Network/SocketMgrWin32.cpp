@@ -56,9 +56,6 @@ bool SocketWorkerThread::run()
 			return true;
 		}
 
-		if(s->IsDeleted())
-			continue;
-
 		if(ov->m_event < NUM_SOCKET_IO_EVENTS)
 			ophandlers[ov->m_event](s, len);
 
@@ -70,6 +67,7 @@ bool SocketWorkerThread::run()
 
 void HandleReadComplete(Socket * s, uint32 len)
 {
+	s->m_readEvent=NULL;
 	if(!s->IsDeleted())
 	{
 		if(len)
@@ -85,6 +83,7 @@ void HandleReadComplete(Socket * s, uint32 len)
 
 void HandleWriteComplete(Socket * s, uint32 len)
 {
+	s->m_writeEvent=NULL;
 	if(!s->IsDeleted())
 	{
 		s->BurstBegin();					// Lock

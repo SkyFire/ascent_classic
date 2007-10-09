@@ -28,6 +28,8 @@ initialiseSingleton( ObjectMgr );
 #endif
 #define ToUpper(yourstring) transform (yourstring.begin(),yourstring.end(), yourstring.begin(), towupper);
 
+const char * NormalTalkMessage = "What can I teach you, $N?";
+
 ObjectMgr::ObjectMgr()
 {
 	m_hiPetGuid = 0;
@@ -86,7 +88,7 @@ ObjectMgr::~ObjectMgr()
 
 	for( TrainerMap::iterator i = mTrainers.begin( ); i != mTrainers.end( ); ++ i) {
 		Trainer * t = i->second;
-		if(t->UIMessage)
+		if(t->UIMessage && t->UIMessage != (char*)NormalTalkMessage)
 			delete [] t->UIMessage;
 		delete t;
 	}
@@ -139,9 +141,6 @@ ObjectMgr::~ObjectMgr()
 		delete i->second;
 	}
 
-	for(HM_NAMESPACE::hash_map<uint32, PlayerInfo*>::iterator itr = m_playersinfo.begin(); itr != m_playersinfo.end(); ++itr)
-		delete itr->second;
-
 	sLog.outString("Deleting npc_monstersay...");
 	for(uint32 i = 0 ; i < NUM_MONSTER_SAY_EVENTS ; ++i)
 	{
@@ -188,6 +187,23 @@ ObjectMgr::~ObjectMgr()
 		mod->mods.clear();
 		delete mod;
 	}
+
+	sLog.outString("Deleting groups...");
+	for(GroupSet::iterator itr = mGroupSet.begin(); itr != mGroupSet.end();)
+	{
+		Group * pGroup = *itr;
+		++itr;
+
+		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); ++i)
+		{
+			SubGroup * p = pGroup->GetSubGroup(i);
+			p->Disband(true);
+		}
+		delete pGroup;
+	}
+
+	for(HM_NAMESPACE::hash_map<uint32, PlayerInfo*>::iterator itr = m_playersinfo.begin(); itr != m_playersinfo.end(); ++itr)
+		delete itr->second;
 }
 
 //
@@ -1333,8 +1349,6 @@ uint32 ObjectMgr::GetGossipTextForNpc(uint32 ID)
 	return mNpcToGossipText[ID];
 }
 
-const char * NormalTalkMessage = "What can I teach you, $N?";
-
 void ObjectMgr::LoadTrainers()
 {
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM trainer_defs");
@@ -1379,6 +1393,9 @@ void ObjectMgr::LoadTrainers()
 		if(!result2)
 		{
 			Log.Error("LoadTrainers", "Trainer with no spells, entry %u.", entry);
+			delete [] tr->UIMessage;
+			delete tr;
+			continue;
 		}
 		else
 		{
@@ -2295,7 +2312,7 @@ void ObjectMgr::LoadMonsterSay()
 		ms->Chance = fields[2].GetFloat();
 		ms->Language = fields[3].GetUInt32();
 		ms->Type = fields[4].GetUInt32();
-		ms->MonsterName = fields[5].GetString() ? strdup(fields[5].GetString()) : "None";
+		ms->MonsterName = fields[5].GetString() ? strdup(fields[5].GetString()) : strdup("None");
 
 		char * texts[5];
 		char * text;
@@ -2315,6 +2332,7 @@ void ObjectMgr::LoadMonsterSay()
 
 		if(!textcount)
 		{
+			delete ms->MonsterName;
 			delete ms;
 			continue;
 		}

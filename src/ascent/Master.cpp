@@ -508,6 +508,7 @@ bool Master::Run(int argc, char ** argv)
 	sLog.outString("Deleting Network Subsystem...");
 	delete SocketMgr::getSingletonPtr();
 	delete SocketGarbageCollector::getSingletonPtr();
+	delete VoiceChatHandler::getSingletonPtr();
 
 	sLog.outString("Deleting Script Engine...");
 	delete ScriptSystem;

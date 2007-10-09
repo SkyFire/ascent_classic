@@ -106,6 +106,7 @@ World::~World()
 
 	//sLog.outString("Deleting Thread Manager..");
 	//delete ThreadMgr::getSingletonPtr();
+	delete WordFilter::getSingletonPtr();
 
 	sLog.outString("Deleting Instance Saving Management...");
 	delete InstanceSavingManagement::getSingletonPtr();

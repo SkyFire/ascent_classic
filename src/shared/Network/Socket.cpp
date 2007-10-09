@@ -22,6 +22,8 @@ Socket::Socket(SOCKET fd, uint32 sendbuffersize, uint32 recvbuffersize) : m_read
 #ifdef CONFIG_USE_IOCP
 	m_writeLock = 0;
 	m_completionPort = 0;
+	m_readEvent = NULL;
+	m_writeEvent=NULL;
 #else
 	m_writeLock = 0;
 #endif
@@ -36,6 +38,13 @@ Socket::~Socket()
 	// Deallocate buffers
 	free(m_readBuffer);
 	free(m_writeBuffer);
+
+#ifdef CONFIG_USE_IOCP
+	if(m_readEvent != NULL)
+		delete m_readEvent;
+	if(m_writeEvent != NULL)
+		delete m_writeEvent;
+#endif
 }
 
 bool Socket::Connect(const char * Address, uint32 Port)

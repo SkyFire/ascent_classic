@@ -38,11 +38,12 @@ void Socket::WriteCallback()
 				Disconnect();
 			}
 		}
+		m_writeEvent = ov;
 	}
 	else
 	{
 		// Write operation is completed.
-		PostSocketMessage(SOCKET_IO_EVENT_WRITE_END);
+		m_writeEvent = PostSocketMessage(SOCKET_IO_EVENT_WRITE_END);
 	}
 	m_writeMutex.Release();
 }
@@ -67,6 +68,7 @@ void Socket::SetupReadEvent()
 		if(WSAGetLastError() != WSA_IO_PENDING)
 			Disconnect();
 	}
+	m_readEvent = ov;
 	m_readMutex.Release();
 }
 
@@ -83,11 +85,11 @@ void Socket::AssignToCompletionPort()
 	//__asm int 3;
 }
 
-void Socket::PostSocketMessage(SocketIOEvent type)
+OverlappedStruct * Socket::PostSocketMessage(SocketIOEvent type)
 {
 	// don't post any more events
 	if(m_deleted)
-		return;
+		return NULL;
 
 	// create struct
 	OverlappedStruct * ov = new OverlappedStruct(type);
@@ -97,7 +99,9 @@ void Socket::PostSocketMessage(SocketIOEvent type)
 	{
 		// This shouldn't really happen.. :/
 		delete ov;
+		return NULL;
 	}
+	return ov;
 }
 
 void Socket::BurstPush()

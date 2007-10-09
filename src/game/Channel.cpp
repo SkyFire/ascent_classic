@@ -869,6 +869,7 @@ void ChannelMgr::RemoveChannel(Channel * chn)
 		if(itr->second == chn)
 		{
 			cl->erase(itr);
+			delete chn;
 			lock.Release();
 			return;
 		}
