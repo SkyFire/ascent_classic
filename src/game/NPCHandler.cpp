@@ -197,11 +197,12 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvPacket)
 
 uint8 WorldSession::TrainerGetSpellStatus(TrainerSpell* pSpell)
 {
-	/*if(pSpell->pSpell && _player->GetMaxLearnedSpellLevel(pSpell->TeachSpellID) >= (int)pSpell->pSpell->spellLevel)
-		return TRAINER_STATUS_ALREADY_HAVE;*/  // wtf? - burlex
-
-	if(_player->HasSpell(pSpell->pRealSpell->Id))
+	//for burlex : In case we know level 3 of some rogue spell and trainer teaches us all kinda levels of it then we need to not teach all lower levels again
+	if(pSpell->pRealSpell && _player->GetMaxLearnedSpellLevel(pSpell->pRealSpell->Id) >= (int)pSpell->pRealSpell->spellLevel)
 		return TRAINER_STATUS_ALREADY_HAVE;
+
+/*	if(_player->HasSpell(pSpell->pRealSpell->Id))
+		return TRAINER_STATUS_ALREADY_HAVE; */
 
 	if(	(pSpell->RequiredLevel && _player->getLevel()<pSpell->RequiredLevel)
 		|| (pSpell->RequiredSpell && !_player->HasSpell(pSpell->RequiredSpell))
