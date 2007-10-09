@@ -90,7 +90,7 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 	bool bFailedPre = false;
 	std::string failed_reason;
 
-	if(pAreaTrigger->required_level)
+	if(pAreaTrigger->required_level && !GetPlayer()->triggerpass_cheat)
 	{
 		if(GetPlayer()->getLevel() < pAreaTrigger->required_level)
 		{
@@ -130,7 +130,7 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 				MapInfo *pMapinfo = NULL;
 
 				pMapinfo = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
-				if(pMapinfo && !pMapinfo->HasFlag(WMI_INSTANCE_ENABLED))
+				if(pMapinfo && !pMapinfo->HasFlag(WMI_INSTANCE_ENABLED) && !GetPlayer()->triggerpass_cheat)
 				{
 					WorldPacket msg(47);
 					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
@@ -157,7 +157,7 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 					return;
 				}
 
-				if(pMapinfo && pMapinfo->type == INSTANCE_RAID && GetPlayer()->InGroup() && GetPlayer()->GetGroup()->GetGroupType() != GROUP_TYPE_RAID)
+				if(pMapinfo && pMapinfo->type == INSTANCE_RAID && !GetPlayer()->InGroup() && !GetPlayer()->triggerpass_cheat)
 				{
 					WorldPacket msg(72);
 					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
@@ -166,7 +166,7 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 					return;
 				}
 
-				if(pMapinfo && pMapinfo->type == INSTANCE_RAID && !GetPlayer()->InGroup())
+				if(pMapinfo && pMapinfo->type == INSTANCE_RAID && GetPlayer()->InGroup() && GetPlayer()->GetGroup()->GetGroupType() != GROUP_TYPE_RAID && !GetPlayer()->triggerpass_cheat)
 				{
 					WorldPacket msg(72);
 					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
@@ -175,7 +175,7 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 					return;
 				}
 
-				if(pMapinfo && pMapinfo->required_quest && !_player->HasFinishedQuest(pMapinfo->required_quest))
+				if(pMapinfo && pMapinfo->required_quest && !_player->HasFinishedQuest(pMapinfo->required_quest) && !GetPlayer()->triggerpass_cheat)
 				{
 					WorldPacket msg( 68 );
 					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
@@ -184,7 +184,7 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 					return;
 				}
 
-				if(pMapinfo && pMapinfo->required_item && !_player->GetItemInterface()->GetItemCount(pMapinfo->required_item, true))
+				if(pMapinfo && pMapinfo->required_item && !_player->GetItemInterface()->GetItemCount(pMapinfo->required_item, true) && !GetPlayer()->triggerpass_cheat)
 				{
 					WorldPacket msg(68);
 					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);

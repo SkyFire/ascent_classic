@@ -2147,6 +2147,20 @@ bool ChatHandler::HandleStackCheatCommand(const char* args, WorldSession * m_ses
 	return true;
 }
 
+bool ChatHandler::HandleTriggerpassCheatCommand(const char* args, WorldSession * m_session)
+{
+	Player * plr = getSelectedChar(m_session, true);
+	if (!plr)
+		return true;
+
+	bool val = plr->triggerpass_cheat;
+	BlueSystemMessage(m_session, "%s areatrigger prerequisites immunity cheat on %s.", val ? "Deactivated" : "Activated", plr->GetName());
+	GreenSystemMessageToPlr(plr, "%s %s areatrigger prerequisites immunity cheat on you.", m_session->GetPlayer()->GetName(), val ? "deactivated" : "activated");
+
+	plr->triggerpass_cheat = !val;
+	return true;
+}
+
 bool ChatHandler::HandleResetSkillsCommand(const char* args, WorldSession * m_session)
 {
 	skilllineentry * se;

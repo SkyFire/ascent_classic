@@ -308,6 +308,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_explorationTimer	  = getMSTime();
 	linkTarget			  = 0;
 	stack_cheat			 = false;
+	triggerpass_cheat = false;
 	myGuild				 = 0;
 	m_pvpTimer			  = 0;
 	m_cooldownTimer		 = getMSTime() + 10000;

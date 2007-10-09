@@ -395,6 +395,7 @@ protected:
 	bool HandleShowCheatsCommand(const char* args, WorldSession* m_session);
 	bool HandleFlySpeedCheatCommand(const char* args, WorldSession* m_session);
 	bool HandleStackCheatCommand(const char* args, WorldSession * m_session);
+	bool HandleTriggerpassCheatCommand(const char* args, WorldSession * m_session);
 	bool HandleFlyCommand(const char* args, WorldSession* m_session);
 	bool HandleLandCommand(const char* args, WorldSession* m_session);
 
