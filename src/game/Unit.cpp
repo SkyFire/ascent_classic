@@ -2939,7 +2939,8 @@ void Unit::OnRemoveInRangeObject(Object* pObj)
 		/* === ATTACKER CHECKS === */
 
 		// if we're being attacked by him, remove from our set.
-		removeAttacker(pUnit);
+		if (!this->IsPlayer() || !static_cast<Player*>(this)->InGroup())
+			removeAttacker(pUnit);
 
 		// check that our target is not him (shouldn't happen!)
 		if(m_attackTarget == pUnit->GetGUID())
