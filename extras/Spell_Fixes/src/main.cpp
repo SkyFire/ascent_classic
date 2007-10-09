@@ -11,9 +11,9 @@ project status : not finished yet..not tested
 #include "defines.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <conio.h>
 
-//#include "../../../src/shared/Database/dbcfile.h"
-#include "dbcfile.h"
+#include "../../../src/shared/Database/dbcfile.h"
 
 //make this after the main
 void do_fixes(TCHAR *inf);
@@ -57,6 +57,7 @@ void main(int argc, TCHAR* argv[])
 		case 2:		dump_as_sql(file_name);	break;
 		default:							break;
 	}
+	getch();
 }
 
 __int64 getfilesize(TCHAR *infname)
@@ -120,11 +121,82 @@ void dump_as_sql(TCHAR *inf)
 		exit(1);
 	}
 	else printf("Opened DBC with %u fields and %u rows\n",(int)dbc.getFieldCount(),(int)dbc.getRecordCount());
+	printf("will start dumping data into sql file (we will drop not required fields!)\n");
 
 	FILE *fsql=fopen("dbc_spell.sql","w");
 
-	printf("CREATE TABLE dbc_spell2 (id INT (11) UNSIGNED NOT NULL, School INT (11) UNSIGNED DEFAULT '0' NOT NULL, PRIMARY KEY(id), UNIQUE(id), INDEX(id)) 
+	//drop table if already exist
+	fprintf(fsql,"%s","DROP TABLE IF EXISTS `dbc_spell`;\n");
 
+	//create the table
+	fprintf(fsql,"%s","CREATE TABLE dbc_spell (\n");
 
-	uint32 cnt = (uint32)dbc.getRecordCount();
+	for(int i=0;i<SPELL_COLUMN_COUNT;i++)
+		if(sql_translation_table[i][0][0]=='u')
+			fprintf(fsql,"\t `%s` INT (11) UNSIGNED DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
+		else if(sql_translation_table[i][0][0]=='i')
+			fprintf(fsql,"\t `%s` INT (11) DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
+		else if(sql_translation_table[i][0][0]=='f')
+			fprintf(fsql,"\t `%s` FLOAT DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
+		else if(sql_translation_table[i][0][0]=='s')
+			fprintf(fsql,"\t `%s` VARCHAR(60),\n",sql_translation_table[i][1]);
+
+	fprintf(fsql,"%s","PRIMARY KEY(id), UNIQUE(id), INDEX(id));\n");
+
+	fprintf(fsql,"\n\n");
+	//start dumping the data from the DBC
+
+	char tstr[2000];
+	for(unsigned int j=0;j<dbc.getRecordCount();j++)
+	{
+		//we start a new insert block
+		if((j % SQL_INSERTS_PER_QUERY) == 0)
+		{
+			fprintf(fsql,"%s","INSERT INTO dbc_spell (");
+			for(int i=0;i<SPELL_COLUMN_COUNT-1;i++)
+					fprintf(fsql,"`%s`,",sql_translation_table[i][1]);
+			fprintf(fsql,"`%s`) values \n",sql_translation_table[SPELL_COLUMN_COUNT-1][1]);
+			fprintf(fsql," (");
+		}
+		else
+			fprintf(fsql,",(");
+		for(int i=0;i<SPELL_COLUMN_COUNT;i++)
+		{
+			if(i!=0)
+				fprintf(fsql,",");
+			if(sql_translation_table[i][0][0]=='u')
+				fprintf(fsql,"%u",dbc.getRecord(j).getUInt(i));
+			else if(sql_translation_table[i][0][0]=='i')
+				fprintf(fsql,"%d",dbc.getRecord(j).getInt(i));
+			else if(sql_translation_table[i][0][0]=='f')
+				fprintf(fsql,"%f",dbc.getRecord(j).getFloat(i));
+			else if(sql_translation_table[i][0][0]=='s')
+			{
+				const char *dstr=dbc.getRecord(j).getString(i);
+				int otherindex=0;
+				for(unsigned int k=0;k<=strlen(dstr);k++)
+					if(dstr[k]=='\'' || dstr[k]=='"')
+					{
+						tstr[otherindex++] = '\\';
+						tstr[otherindex++] = dstr[k];
+					}
+					else
+						tstr[otherindex++] = dstr[k];
+				fprintf(fsql,"\"%s\"",tstr);
+			}
+		}
+		//we need to end an insert block
+		if(((j+1) % SQL_INSERTS_PER_QUERY)==0)
+			fprintf(fsql,");\n");
+		else fprintf(fsql,")\n");
+	}
+	fprintf(fsql,";");
+
+	fprintf(fsql,"\n\n");
+	//drop stuff that we do not need visually
+	for(int i=0;i<SPELL_COLUMN_COUNT;i++)
+		if(sql_translation_table[i][2][0]=='1')
+			fprintf(fsql,"ALTER TABLE dbc_spell DROP `%s`;\n",sql_translation_table[i][1]);
+
+	fclose(fsql);
 }
