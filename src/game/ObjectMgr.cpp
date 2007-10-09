@@ -1391,7 +1391,6 @@ void ObjectMgr::LoadTrainers()
 				if(!spellInfo)
 				{
 					Log.Error("LoadTrainers", "Trainer %u with non-existant spell %u.", entry, CastSpellID);
-					result2->NextRow();
 					continue; //omg a bad spell !
 				}
 
@@ -1423,7 +1422,6 @@ void ObjectMgr::LoadTrainers()
 				{
 					tr->Spells.push_back(ts);
 				}
-				result2->NextRow();
 			}
 			while(result2->NextRow());
 			delete result2;
