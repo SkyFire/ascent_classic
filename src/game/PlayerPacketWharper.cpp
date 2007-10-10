@@ -21,6 +21,48 @@
 
 /// collection of client packets in a warper to keep the player.cpp clean
 
+#pragma pack(push,1) 
+struct Levelup_Info_Packet
+{
+    uint32 level;
+    uint32 Hp;
+    uint32 Mana;
+    uint32 unk0;
+    uint32 unk1;
+    uint32 unk2;
+    uint32 unk3;
+    uint32 Stat0;
+    uint32 Stat1;
+    uint32 Stat2;
+    uint32 Stat3;
+    uint32 Stat4;
+};
+
+#pragma pack(pop)
+
+    
+void Player::SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4)
+{
+    Levelup_Info_Packet packet;
+    packet.level = level;
+    packet.Hp = Hp;
+    packet.Mana = Mana;
+
+    // grep: these are probably the other powers :)
+    packet.unk0 = 0;
+    packet.unk1 = 0;
+    packet.unk2 = 0;
+    packet.unk3 = 0;
+
+    // Append stat differences
+    packet.Stat0 = Stat0;
+    packet.Stat1 = Stat1;
+    packet.Stat2 = Stat2;
+    packet.Stat3 = Stat3;
+    packet.Stat4 = Stat4;
+    GetSession()->OutPacket(SMSG_LEVELUP_INFO, sizeof(Levelup_Info_Packet),(const char*)&packet);
+}
+
 void Player::SendSpellCoolDown(uint32 SpellID, uint16 Time)
 {
     if (!IsInWorld())

@@ -1394,27 +1394,16 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 		lvlinfo = objmgr.GetLevelInfo(getRace(), getClass(), level);
 		CalculateBaseStats();
 
-		// Generate Level Info Packet
-		data.Initialize(SMSG_LEVELUP_INFO);
-		data << level;
-		data << uint32(lvlinfo->HP - oldlevel->HP);
-		data << uint32(lvlinfo->Mana - oldlevel->Mana);
-
-		// grep: these are probably the other powers :)
-		data << uint32(0); 
-		data << uint32(0);
-		data << uint32(0);
-		data << uint32(0);
-
-		// Append stat differences
-		data << uint32(lvlinfo->Stat[0] - oldlevel->Stat[0]);
-		data << uint32(lvlinfo->Stat[1] - oldlevel->Stat[1]);
-		data << uint32(lvlinfo->Stat[2] - oldlevel->Stat[2]);
-		data << uint32(lvlinfo->Stat[3] - oldlevel->Stat[3]);
-		data << uint32(lvlinfo->Stat[4] - oldlevel->Stat[4]);
-
-		// Send to client
-		GetSession()->SendPacket(&data);
+		// Generate Level Info Packet and Send to client
+        SendLevelupInfo(
+            level,
+            lvlinfo->HP - oldlevel->HP,
+            lvlinfo->Mana - oldlevel->Mana,
+            lvlinfo->Stat[0] - oldlevel->Stat[0],
+            lvlinfo->Stat[1] - oldlevel->Stat[1],
+            lvlinfo->Stat[2] - oldlevel->Stat[2],
+            lvlinfo->Stat[3] - oldlevel->Stat[3],
+            lvlinfo->Stat[4] - oldlevel->Stat[4]);
 	
 		_UpdateMaxSkillCounts();
 		UpdateStats();
