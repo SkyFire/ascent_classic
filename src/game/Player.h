@@ -1589,6 +1589,7 @@ public:
     inline void SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra);
     inline void SendSpellCoolDown(uint32 SpellID, uint16 Time);
     inline void SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4);
+    inline void SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, uint8 type);
     /************************************************************************/
     /* End of SpellPacket Wharper                                           */
     /************************************************************************/

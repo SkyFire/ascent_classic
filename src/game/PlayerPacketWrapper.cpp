@@ -38,6 +38,22 @@ struct Levelup_Info_Packet
     uint32 Stat4;
 };
 
+struct LogXPGainPacket
+{
+    uint64 guid;                                    // Player guid
+    uint32 xp;                                      // Normal XP
+    uint8  type;                                    // 0 for xp gained from killing creature's and 1 for xp gained from quests
+    uint32 restxp;                                  // "Rest XP", is equal to XP for no rest xp message
+    float  unk2; //1.0f                             // static data.. Seems to always be 1.0f
+};
+
+struct LogQuestXPGainPacket
+{
+    uint64 guid;                                    // Always 0
+    uint32 xp;                                      // Normal XP
+    uint8  type;                                    // Unknown.. seems to always be 0		
+};
+
 #pragma pack(pop)
 
     
@@ -87,4 +103,26 @@ void Player::SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra)
     if (Extra)
         data << Extra;
     GetSession()->SendPacket(&data);
+}
+
+void Player::SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, uint8 type)
+{
+    if (!type)
+    {
+        LogXPGainPacket packet;
+        packet.guid     = guid;
+        packet.xp       = NormalXP;
+        packet.type     = type;
+        packet.restxp   = RestedXP;
+        packet.unk2     = 1.0f;
+        GetSession()->OutPacket(SMSG_LOG_XPGAIN, sizeof(LogXPGainPacket),(const char*)&packet);
+    }
+    else if (type == 1)
+    {
+        LogQuestXPGainPacket packet;
+        packet.guid = 0; // does not need to be set for quest xp
+        packet.xp = NormalXP;
+        packet.type = type;
+        GetSession()->OutPacket(SMSG_LOG_XPGAIN, sizeof(LogQuestXPGainPacket),(const char*)&packet);
+    }
 }

@@ -1303,7 +1303,6 @@ void Player::BuildEnumData( WorldPacket * p_data )
 ///  It assumes you will send out an UpdateObject packet at a later time.
 void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 {
-	WorldPacket data(SMSG_LOG_XPGAIN, 21);
 	uint32 restxp = xp;
 	if ( xp < 1 )
 		return;
@@ -1317,20 +1316,8 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 		xp += restxp;
 	}
 	UpdateRestState();
-		
-	if (guid == 0)
-	{
-		data << uint64(0);
-	}
-	else
-	{
-		data << guid;
-	}
-    data << uint32(xp);                                 // Normal XP
-    data << uint8(0);                                   // Unknown.. seems to always be 0		
-    data << uint32(restxp);                             // "Rest XP", is equal to XP for no rest xp message
-    data << float(1.0f);                                // static data.. Seems to always be 1.0f
-	GetSession()->SendPacket(&data);
+	
+    SendLogXPGain(guid,xp,restxp,guid == 0 ? true : false);
 
 	/*uint32 curXP = GetUInt32Value(PLAYER_XP);
 	uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
