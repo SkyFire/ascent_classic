@@ -1587,6 +1587,7 @@ public:
     /* Spell Packet wharper Please keep this separated                      */
     /************************************************************************/
     void SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra);
+    void SendSpellCoolDown(uint32 SpellID, uint16 Time);
     /************************************************************************/
     /* End of SpellPacket Wharper                                           */
     /************************************************************************/

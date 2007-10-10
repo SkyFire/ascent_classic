@@ -401,66 +401,76 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}break;
 		}
 	}
+
 	if(event != EVENT_UNITDIED)
-		m_Unit->setAttackTarget(m_nextTarget);
+    {
+        uint64 currenttarget = m_Unit->getAttackTarget();
+        if (!m_nextTarget && currenttarget)
+        {
+            m_Unit->setAttackTarget(m_nextTarget);
+        }
+        else if (m_nextTarget && currenttarget != m_nextTarget->GetGUID())
+        {
+            m_Unit->setAttackTarget(m_nextTarget);
+        }
+    }
+   
+    //Should be able to do this stuff even when evading
+    else // would mean event == EVENT_UNITDIED
+    {
 
-	//Should be able to do this stuff even when evading
-	switch(event)
-	{
-		case EVENT_UNITDIED:
-		{
-			CALL_SCRIPT_EVENT(m_Unit, OnDied)(pUnit);
-			ScriptSystem->OnCreatureEvent(((Creature*)m_Unit), pUnit, CREATURE_EVENT_ON_DIED);
-			m_AIState = STATE_IDLE;
+        //EVENT_UNITDIED
+        CALL_SCRIPT_EVENT(m_Unit, OnDied)(pUnit);
+        ScriptSystem->OnCreatureEvent(((Creature*)m_Unit), pUnit, CREATURE_EVENT_ON_DIED);
+        m_AIState = STATE_IDLE;
 
-			StopMovement(0);
-			m_aiTargets.clear();
-			UnitToFollow = NULL;
-			m_lastFollowX = m_lastFollowY = 0;
-			UnitToFear = NULL;
-			FollowDistance = 0.0f;
-			m_fleeTimer = 0;
-			m_hasFleed = false;
-			m_hasCalledForHelp = false;
-			m_nextSpell = NULL;
+        StopMovement(0);
+        m_aiTargets.clear();
+        UnitToFollow = NULL;
+        m_lastFollowX = m_lastFollowY = 0;
+        UnitToFear = NULL;
+        FollowDistance = 0.0f;
+        m_fleeTimer = 0;
+        m_hasFleed = false;
+        m_hasCalledForHelp = false;
+        m_nextSpell = NULL;
 
-			SetNextTarget(NULL);
-            //reset ProcCount
-            //ResetProcCounts();
-		
-			//reset waypoint to 0
-			m_currentWaypoint = 0;
-			
-			// There isn't any need to do any attacker checks here, as
-			// they should all be taken care of in DealDamage
+        SetNextTarget(NULL);
+        //reset ProcCount
+        //ResetProcCounts();
 
-			//removed by Zack : why do we need to go to our master if we just died ? On next spawn we will be spawned near him after all
-/*			if(m_AIType == AITYPE_PET)
-			{
-				SetUnitToFollow(m_PetOwner);
-				SetFollowDistance(3.0f);
-				HandleEvent(EVENT_FOLLOWOWNER, m_Unit, 0);
-			}*/
+        //reset waypoint to 0
+        m_currentWaypoint = 0;
 
-			if(m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID || m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_MULTIMODE)
+        // There isn't any need to do any attacker checks here, as
+        // they should all be taken care of in DealDamage
+
+        //removed by Zack : why do we need to go to our master if we just died ? On next spawn we will be spawned near him after all
+        /*			if(m_AIType == AITYPE_PET)
+        {
+        SetUnitToFollow(m_PetOwner);
+        SetFollowDistance(3.0f);
+        HandleEvent(EVENT_FOLLOWOWNER, m_Unit, 0);
+        }*/
+
+        if(m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID || m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_MULTIMODE)
+        {
+            if(m_Unit->GetTypeId() == TYPEID_UNIT && !m_Unit->IsPet())
             {
-                if(m_Unit->GetTypeId() == TYPEID_UNIT && !m_Unit->IsPet())
+                if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
                 {
-                    if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
-                    {
-                        m_Unit->GetMapMgr()->RemoveCombatInProgress(m_Unit->GetGUID());
-                        sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
-                        m_Unit->GetMapMgr()->SavePlayersToInstance();
-                    }
-                    else if(static_cast<Creature*>(m_Unit)->proto && static_cast<Creature*>(m_Unit)->proto->boss && m_Unit->GetMapMgr()->iInstanceMode == MODE_HEROIC)
-                    {
-                        sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
-                        m_Unit->GetMapMgr()->SavePlayersToInstance();
-                    }
+                    m_Unit->GetMapMgr()->RemoveCombatInProgress(m_Unit->GetGUID());
+                    sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
+                    m_Unit->GetMapMgr()->SavePlayersToInstance();
+                }
+                else if(static_cast<Creature*>(m_Unit)->proto && static_cast<Creature*>(m_Unit)->proto->boss && m_Unit->GetMapMgr()->iInstanceMode == MODE_HEROIC)
+                {
+                    sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
+                    m_Unit->GetMapMgr()->SavePlayersToInstance();
                 }
             }
-		}break;
-	}
+        }
+    }
 }
 
 void AIInterface::Update(uint32 p_time)

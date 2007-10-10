@@ -21,7 +21,6 @@
 
 Unit::Unit()
 {
-
 	m_attackTimer = 0;
 	m_attackTimer_1 = 0;
 	m_duelWield = false;
@@ -276,35 +275,16 @@ void Unit::Update( uint32 p_time )
 {
 	_UpdateSpells( p_time );
 
-	if (m_attackTarget == 0)
+	if(m_attackers.size() == 0 && m_attackTarget == 0)
 	{
 		RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
 		if(hasStateFlag(UF_ATTACKING)) clearStateFlag(UF_ATTACKING);
-		for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-		{
-			Unit* pUnit = GetMapMgr()->GetUnit(*itr);
-			if(pUnit && pUnit->isAlive())
-			{
-				SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-				if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
-				break;
-			}
-		}
-		//all attackers are dead.
-		if (!hasStateFlag(UF_ATTACKING))
-			m_attackers.clear();
 	}
-	else
-	{
-		SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-		if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
-	}
-
 
 	if(!isDead())
 	{
         if(p_time >= m_H_regenTimer)
-		    RegenerateHealth();	
+		    RegenerateHealth();
 	    else
 		    m_H_regenTimer -= p_time;
 	    //most of the times the 2 timers will be the same (except on spell casts)
@@ -3535,9 +3515,6 @@ void Unit::removeAttacker(Unit *pUnit)
 	// this should't happen
 	ASSERT(pUnit != NULL);
 
-	// crashfix at shutdown
-//	if(m_attackers.size() == 0) return;
-
 	// no longer being attacked by unit
 	m_attackers.erase(pUnit->GetGUID());
 }
@@ -3560,7 +3537,8 @@ void Unit::setAttackTarget(Unit* pUnit)
 
 		// now, clear ourselves and abort
 		m_attackTarget = 0;
-		return;		
+        OnClearAttackTarget();
+		return;
 	}
 
 	// can't attack self
@@ -3628,7 +3606,7 @@ void Unit::clearAttackers(bool bFromOther)
 		}
 	}
 
-	// wipe our attacker set (we shouldnt have any unknowns)
+	// wipe our attacker set (we shouldn't have any unknowns)
 	m_attackers.clear();
 }
 
@@ -4386,3 +4364,30 @@ float Unit::get_chance_to_daze(Unit *target)
 		return 40.0f;
 	else return chance_to_daze;
 }
+
+/************************************************************************/
+/* OnClearAttackTarget: Clear us from attackers                         */
+/* when the current target gets cleared there are some actions to be    */
+/* done. Like you know executing code 1x is hell of a lot better than   */
+/* execturing it 20x                                                    */
+/************************************************************************/
+void Unit::OnClearAttackTarget()
+{
+    RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+    if(hasStateFlag(UF_ATTACKING)) clearStateFlag(UF_ATTACKING);
+
+    for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
+    {
+        Unit* pUnit = GetMapMgr()->GetUnit(*itr);
+        if(pUnit && pUnit->isAlive())
+        {
+            SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+            if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
+            break;
+        }
+    }
+    //all attackers is dead.
+    if (!hasStateFlag(UF_ATTACKING))
+        m_attackers.clear();
+}
+

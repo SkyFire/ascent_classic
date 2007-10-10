@@ -596,7 +596,7 @@ public:
 	virtual void RemoveFromWorld(bool free_guid);
 	virtual void OnPushToWorld();
 
-	inline void setAttackTimer(int32 time, bool offhand)
+    inline void setAttackTimer(int32 time, bool offhand)
 	{
 		if(!time)
 			time = offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
@@ -1118,6 +1118,10 @@ protected:
 	AttackerSet m_attackers;
 	uint64 m_attackTarget;
 	bool m_extraAttackCounter;
+
+// these functions should never be called external
+private:
+    inline void OnClearAttackTarget();
 };
 
 

@@ -1321,19 +1321,15 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 	if (guid == 0)
 	{
 		data << uint64(0);
-		data << uint32(xp);
-		data << uint8(0);
-		data << uint32(restxp);
-		data << float(1.0f); // static data.. Seems to always be 1.0f
 	}
 	else
 	{
 		data << guid;
-		data << uint32(xp);									 // Normal XP
-		data << uint8(0);									   // Unknown.. seems to always be 0		
-		data << uint32(restxp);								 // "Rest XP", is equal to XP for no rest xp message
-		data << float(1.0f);									// static data.. Seems to always be 1.0f
 	}
+    data << uint32(xp);                                 // Normal XP
+    data << uint8(0);                                   // Unknown.. seems to always be 0		
+    data << uint32(restxp);                             // "Rest XP", is equal to XP for no rest xp message
+    data << float(1.0f);                                // static data.. Seems to always be 1.0f
 	GetSession()->SendPacket(&data);
 
 	/*uint32 curXP = GetUInt32Value(PLAYER_XP);
@@ -8699,26 +8695,6 @@ void Player::EventTalentHearthOfWildChange(bool apply)
 }
 
 /************************************************************************/
-/* Spell Packet wharper Please keep this separated                      */
-/************************************************************************/
-void Player::SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra)
-{
-#ifndef USING_BIG_ENDIAN
-    StackWorldPacket<9> data(SMSG_CAST_RESULT);
-#else
-    WorldPacket data(SMSG_CAST_RESULT, 9);
-#endif
-    data << SpellId;
-    data << ErrorMessage;
-    if (Extra)
-        data << Extra;
-    GetSession()->SendPacket(&data);
-}
-/************************************************************************/
-/* End of SpellPacket Wharper                                           */
-/************************************************************************/
-
-/************************************************************************/
 /* New Save System                                                      */
 /************************************************************************/
 #ifdef OPTIMIZED_PLAYER_SAVING
@@ -8782,7 +8758,7 @@ void Player::save_Skills()
 	for(SkillMap::iterator itr = m_skills.begin(); itr != m_skills.end(); ++itr)
 	{
 		if(itr->first && itr->second.Skill->type != SKILL_TYPE_LANGUAGE)
-			p += sprintf(&buffer[p], "%u;%u;%u", itr->first, itr->second.CurrentValue, itr->second.MaximumValue);
+			p += sprintf(&buffer[p], "%u;%u;%u;", itr->first, itr->second.CurrentValue, itr->second.MaximumValue);
 	}
 
 	ASSERT(p < 6000);
