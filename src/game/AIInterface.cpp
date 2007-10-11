@@ -660,7 +660,7 @@ void AIInterface::_UpdateTargets()
 	if(((Creature*)m_Unit)->GetCreatureName() && ((Creature*)m_Unit)->GetCreatureName()->Type == CRITTER)
 		return;
 
-	AssistTargetSet::iterator i, i2;
+	AssistTargetSet::iterator i;
 	TargetMap::iterator itr;
 
 	// Find new Assist Targets and remove old ones
@@ -676,16 +676,19 @@ void AIInterface::_UpdateTargets()
 	if(m_updateAssist)
 	{
 		m_updateAssist = false;
+		deque<Unit*> tokill;
+
 		//modified for vs2005 compatibility
-		for(i = m_assistTargets.begin(); i != m_assistTargets.end();)
+		for(i = m_assistTargets.begin(); i != m_assistTargets.end(); ++i)
 		{
-			i2 = i;
-			++i;
-			if(m_Unit->GetDistanceSq((*i2)) > 2500.0f/*50.0f*/ || !(*i2)->isAlive() || !(*i2)->isInCombat())
+			if(m_Unit->GetDistanceSq((*i)) > 2500.0f/*50.0f*/ || !(*i)->isAlive() || !(*i)->isInCombat())
 			{
-				m_assistTargets.erase(i2);
+				tokill.push_back(*i);
 			}
 		}
+
+		for(deque<Unit*>::iterator i2 = tokill.begin(); i2 != tokill.end(); ++i2)
+			m_assistTargets.erase(*i2);
 	}
 
 	if(m_updateTargets)
