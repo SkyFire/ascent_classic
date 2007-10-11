@@ -1,6 +1,8 @@
 /*
 
 Purpuse : make modifications in dbc file for ascent project to set values that are missing for spells in able to work
+Warning : Output result is changed in order to obtain ascent specific data. Do not try to use or interpret data for anything else
+Warning : SpellEntry + sql_translation_table + SPELL_ENTRY must have the same structure !!!
 
 project status : not finished yet..not tested
 
@@ -8,20 +10,23 @@ project status : not finished yet..not tested
 
 #include <stdio.h>
 #include <tchar.h>
-#include "defines.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <conio.h>
+#include <windows.h>
 
 #include "../../../src/shared/Database/dbcfile.h"
 #include "../../../src/shared/crc32.cpp"
-//#include "../../../src/game/spell.h"
+#include "../../../dep/include/mysql/mysql.h"
+
+#include "defines.h"
 
 DBCFile dbc;
 
 //make this after the main
 void do_fixes(TCHAR *inf);
 void dump_as_sql(TCHAR *inf);
+void import_from_sql();
 
 void print_usage()
 {
@@ -29,9 +34,12 @@ void print_usage()
 	printf("parameters: -h output this help message\n");
 	printf("parameters: -dofix start making custom fixes\n");
 	printf("parameters: -conv dump DBC as sql\n");
+	printf("parameters: -imp import data from an sql table(experimental)\n");
 	printf("parameters: inf= specify the input filename(no spaces)\n");
 }
 
+//-dofix inf=spell.dbc
+//-conv inf=spell.dbc
 void main(int argc, TCHAR* argv[])
 {
 	int dotask=0;
@@ -52,6 +60,7 @@ void main(int argc, TCHAR* argv[])
 		if (strnicmp(argv[i],"-h",2)==0) print_usage();
 		if (strnicmp(argv[i],"-dofix",6)==0) dotask=1;
 		if (strnicmp(argv[i],"-conv",5)==0) dotask=2;
+		if (strnicmp(argv[i],"-imp",4)==0) dotask=3;
 		if (strnicmp(argv[i],"inf=",4)==0) strcpy(file_name,argv[i]+4);
 		
 	}
@@ -66,11 +75,19 @@ void main(int argc, TCHAR* argv[])
 
 	dbc.open(file_name);
 
+	if(!dbc.getFieldCount())
+	{
+		printf("error, could not open dbc file\n");
+		exit(1);
+	}
+	else printf("Opened DBC with %u fields and %u rows\n",(int)dbc.getFieldCount(),(int)dbc.getRecordCount());
+
 	switch(dotask)
 	{
-		case 1:		do_fixes(file_name);	break;
-		case 2:		dump_as_sql(file_name);	break;
-		default:							break;
+		case 1:		do_fixes(file_name);		break;
+		case 2:		dump_as_sql(file_name);		break;
+		case 3:		import_from_sql();			break;
+		default:								break;
 	}
 	getch();
 }
@@ -94,11 +111,12 @@ unsigned int get_spell_row(uint32 id)
 {
 	//replace this later with at least a binary search
 	for(unsigned int j=0;j<dbc.getRecordCount();j++)
-		if(dbc.getRecord(j).getUInt(0)==id)
+		if(dbc.getRecord(j).getUInt(SPELL_ENTRY_Id)==id)
 			return j;
 	return 0;
 }
 
+/*
 void change_spell_value(int spell_id,unsigned int field, unsigned int value)
 {
 	uint32 row=get_spell_row(spell_id);
@@ -118,7 +136,7 @@ void change_spell_value(int spell_id,unsigned int field, float value)
 	uint32 row=get_spell_row(spell_id);
 	if(!row)return;
 	dbc.getRecord(row).SetFloat(field,value);
-}
+}*/
 
 void assign_row_to_SpellEntry(SpellEntry **spe,uint32 row)
 {
@@ -143,11 +161,6 @@ void do_fixes(TCHAR *inf)
 	else printf("Opened DBC with %u fields and %u rows\n",(int)dbc.getFieldCount(),(int)dbc.getRecordCount());
 
 	uint32 cnt = (uint32)dbc.getRecordCount();
-/*	for(unsigned int j=0;j<dbc.getRecordCount();j++)
-	{
-		int school=dbc.getRecord(j).getUInt(1);
-		dbc.getRecord(j).SetUInt(1,school+1);
-	}*/
 
 	uint32 effect;
 	uint32 All_Seal_Groups_Combined=0;
@@ -157,16 +170,16 @@ void do_fixes(TCHAR *inf)
 		// SpellID
 		uint32 spellid = dbc.getRecord(x).getUInt(SPELL_ENTRY_Id);
 		// Description field
-		char* desc = (char*)dbc.getRecord(x).getString(157); 
-		const char* ranktext = dbc.getRecord(x).getString(140);
-		const char* nametext = dbc.getRecord(x).getString(123);
+		char* desc = (char*)dbc.getRecord(x).getString(SPELL_ENTRY_Description); 
+		const char* ranktext = dbc.getRecord(x).getString(SPELL_ENTRY_Rank);
+		const char* nametext = dbc.getRecord(x).getString(SPELL_ENTRY_Name);
 
 		uint32 rank = 0;
 		uint32 type = 0;
 		uint32 namehash = 0;
 
 		// get spellentry
-		SpellEntry * sp;
+		SpellEntry *sp, *sp1;
 		assign_row_to_SpellEntry(&sp,x);
 
 		// hash the name
@@ -290,7 +303,8 @@ void do_fixes(TCHAR *inf)
 					teachspell = sp->EffectTriggerSpell[2];
 				if(teachspell)
 				{
-					change_spell_value(teachspell,SPELL_ENTRY_spellLevel,new_level);
+					assign_Spell_to_SpellEntry(&sp1,teachspell);
+					sp1->spellLevel = new_level;
 					sp->spellLevel = new_level;
 				}
 			}
@@ -1597,10 +1611,18 @@ void do_fixes(TCHAR *inf)
 
 	//fix for Predatory Strikes
 	uint32 mm=(1<<(FORM_BEAR-1))|(1<<(FORM_DIREBEAR-1))|(1<<(FORM_MOONKIN-1))|(1<<(FORM_CAT-1));
-	assign_Spell_to_SpellEntry(&sp,16972);	sp->RequiredShapeShift = mm;
-	assign_Spell_to_SpellEntry(&sp,16974);	sp->RequiredShapeShift = mm;
-	assign_Spell_to_SpellEntry(&sp,16975);	sp->RequiredShapeShift = mm;
-	assign_Spell_to_SpellEntry(&sp,20134);	sp->procChance = mm;
+	assign_Spell_to_SpellEntry(&sp,16972);
+	if(sp)
+		sp->RequiredShapeShift = mm;
+	assign_Spell_to_SpellEntry(&sp,16974);
+	if(sp)
+		sp->RequiredShapeShift = mm;
+	assign_Spell_to_SpellEntry(&sp,16975);
+	if(sp)
+		sp->RequiredShapeShift = mm;
+	assign_Spell_to_SpellEntry(&sp,20134);
+	if(sp)
+		sp->procChance = mm;
 
 	/* aspect of the pack - change to AA */
 	assign_Spell_to_SpellEntry(&sp,13159);
@@ -1616,16 +1638,6 @@ void do_fixes(TCHAR *inf)
 
 void dump_as_sql(TCHAR *inf)
 {
-	DBCFile dbc;
-	dbc.open(inf);
-
-	if(!dbc.getFieldCount())
-	{
-		printf("error, could not open dbc file\n");
-		exit(1);
-	}
-	else printf("Opened DBC with %u fields and %u rows\n",(int)dbc.getFieldCount(),(int)dbc.getRecordCount());
-
 	if(SPELL_COLUMN_COUNT!=dbc.getFieldCount())
 	{
 		printf("error,column counts do not match update code for latest dbc format\n");
@@ -1643,14 +1655,17 @@ void dump_as_sql(TCHAR *inf)
 	fprintf(fsql,"%s","CREATE TABLE dbc_spell (\n");
 
 	for(int i=0;i<SPELL_COLUMN_COUNT;i++)
-		if(sql_translation_table[i][0][0]=='u')
-			fprintf(fsql,"\t `%s` INT (11) UNSIGNED DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
-		else if(sql_translation_table[i][0][0]=='i')
-			fprintf(fsql,"\t `%s` INT (11) DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
-		else if(sql_translation_table[i][0][0]=='f')
-			fprintf(fsql,"\t `%s` FLOAT DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
-		else if(sql_translation_table[i][0][0]=='s')
-			fprintf(fsql,"\t `%s` VARCHAR(60),\n",sql_translation_table[i][1]);
+		if(sql_translation_table[i][2][0]=='0')
+		{
+			if(sql_translation_table[i][0][0]=='u')
+				fprintf(fsql,"\t `%s` INT (11) UNSIGNED DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
+			else if(sql_translation_table[i][0][0]=='i')
+				fprintf(fsql,"\t `%s` INT (11) DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
+			else if(sql_translation_table[i][0][0]=='f')
+				fprintf(fsql,"\t `%s` FLOAT DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
+			else if(sql_translation_table[i][0][0]=='s')
+				fprintf(fsql,"\t `%s` VARCHAR(60),\n",sql_translation_table[i][1]);
+		}
 
 	fprintf(fsql,"%s","PRIMARY KEY(id), UNIQUE(id), INDEX(id));\n");
 
@@ -1665,6 +1680,7 @@ void dump_as_sql(TCHAR *inf)
 		{
 			fprintf(fsql,"%s","INSERT INTO dbc_spell (");
 			for(int i=0;i<SPELL_COLUMN_COUNT-1;i++)
+				if(sql_translation_table[i][2][0]=='0')
 					fprintf(fsql,"`%s`,",sql_translation_table[i][1]);
 			fprintf(fsql,"`%s`) values \n",sql_translation_table[SPELL_COLUMN_COUNT-1][1]);
 			fprintf(fsql," (");
@@ -1672,30 +1688,31 @@ void dump_as_sql(TCHAR *inf)
 		else
 			fprintf(fsql,",(");
 		for(int i=0;i<SPELL_COLUMN_COUNT;i++)
-		{
-			if(i!=0)
-				fprintf(fsql,",");
-			if(sql_translation_table[i][0][0]=='u')
-				fprintf(fsql,"%u",dbc.getRecord(j).getUInt(i));
-			else if(sql_translation_table[i][0][0]=='i')
-				fprintf(fsql,"%d",dbc.getRecord(j).getInt(i));
-			else if(sql_translation_table[i][0][0]=='f')
-				fprintf(fsql,"%f",dbc.getRecord(j).getFloat(i));
-			else if(sql_translation_table[i][0][0]=='s')
+			if(sql_translation_table[i][2][0]=='0')
 			{
-				const char *dstr=dbc.getRecord(j).getString(i);
-				int otherindex=0;
-				for(unsigned int k=0;k<=strlen(dstr);k++)
-					if(dstr[k]=='\'' || dstr[k]=='"')
-					{
-						tstr[otherindex++] = '\\';
-						tstr[otherindex++] = dstr[k];
-					}
-					else
-						tstr[otherindex++] = dstr[k];
-				fprintf(fsql,"\"%s\"",tstr);
+				if(i!=0)
+					fprintf(fsql,",");
+				if(sql_translation_table[i][0][0]=='u')
+					fprintf(fsql,"%u",dbc.getRecord(j).getUInt(i));
+				else if(sql_translation_table[i][0][0]=='i')
+					fprintf(fsql,"%d",dbc.getRecord(j).getInt(i));
+				else if(sql_translation_table[i][0][0]=='f')
+					fprintf(fsql,"%f",dbc.getRecord(j).getFloat(i));
+				else if(sql_translation_table[i][0][0]=='s')
+				{
+					const char *dstr=dbc.getRecord(j).getString(i);
+					int otherindex=0;
+					for(unsigned int k=0;k<=strlen(dstr);k++)
+						if(dstr[k]=='\'' || dstr[k]=='"')
+						{
+							tstr[otherindex++] = '\\';
+							tstr[otherindex++] = dstr[k];
+						}
+						else
+							tstr[otherindex++] = dstr[k];
+					fprintf(fsql,"\"%s\"",tstr);
+				}
 			}
-		}
 		//we need to end an insert block
 		if(((j+1) % SQL_INSERTS_PER_QUERY)==0)
 			fprintf(fsql,");\n");
@@ -1704,10 +1721,86 @@ void dump_as_sql(TCHAR *inf)
 	fprintf(fsql,";");
 
 	fprintf(fsql,"\n\n");
-	//drop stuff that we do not need visually
-	for(int i=0;i<SPELL_COLUMN_COUNT;i++)
-		if(sql_translation_table[i][2][0]=='1')
-			fprintf(fsql,"ALTER TABLE dbc_spell DROP `%s`;\n",sql_translation_table[i][1]);
 
 	fclose(fsql);
+}
+
+void import_from_sql()
+{
+	TCHAR mHostname[50];strcpy(mHostname,"");
+	TCHAR mUsername[50];strcpy(mUsername,"");
+	TCHAR mPassword[50];strcpy(mPassword,"");
+	TCHAR mDatabaseName[50];strcpy(mDatabaseName,"");
+	TCHAR mTableName[50];strcpy(mTableName,"");
+	uint32 mPort=3306;
+	TCHAR strbuffer[500];
+	//read sql connection data
+	FILE *inif=fopen("mysql_con.ini","r");
+	if(!inif)
+	{
+		printf("error,Could not open mysql ini file\n");
+		exit(1);
+	}
+	while (!feof(inif))
+	{
+		fgets (strbuffer , 100 , inif);
+		if (strnicmp(strbuffer,"Hostname=",strlen("Hostname="))==0) strcpy(mHostname,strbuffer+strlen("Hostname="));
+		else if (strnicmp(strbuffer,"Username=",strlen("Username="))==0) strcpy(mUsername,strbuffer+strlen("Username="));
+		else if (strnicmp(strbuffer,"Password=",strlen("Password="))==0) strcpy(mPassword,strbuffer+strlen("Password="));
+		else if (strnicmp(strbuffer,"DatabaseName=",strlen("DatabaseName="))==0) strcpy(mDatabaseName,strbuffer+strlen("DatabaseName="));
+		else if (strnicmp(strbuffer,"TableName=",strlen("TableName="))==0) strcpy(mTableName,strbuffer+strlen("TableName="));
+		else if (strnicmp(strbuffer,"Port=",strlen("Port="))==0) mPort=atoi(strbuffer+strlen("Port="));
+	}
+	fclose(inif);
+
+	//establish mysql connection
+	MYSQL* Descriptor = mysql_init(NULL);
+	if(mysql_options(Descriptor, MYSQL_SET_CHARSET_NAME, "utf8"))
+		printf("sql: Could not set utf8 character set [!!]");
+	MYSQL *con = mysql_real_connect(Descriptor, mHostname,
+		mUsername, mPassword, "", mPort, NULL, 0);
+	if(con == NULL)
+	{
+		printf("sql: Connection failed. Reason was `%s`", mysql_error(Descriptor));
+		return;
+	}
+	
+	if(mysql_select_db(con, mDatabaseName))
+	{
+		printf("sql: Select of Database %s failed due to `%s`", mDatabaseName,mysql_error(con));
+		return;
+	}
+
+	//start to get the lines we have in our dbc from the mysql table
+	for(unsigned int j=0;j<dbc.getRecordCount();j++)
+	{
+		uint32 spell_id=dbc.getRecord(j).getUInt(SPELL_ENTRY_Id);
+
+		//get the eqivalent of this dbc spell from mysql
+		sprintf(strbuffer,"SELECT * FROM `%s` where id='%d'",mTableName,spell_id);
+		int result = mysql_query(con, strbuffer);
+		if(result > 0)
+		{
+			printf("Sql query failed due to [%s]", mysql_error(con));
+			exit(1);
+		}
+        MYSQL_RES * Result = mysql_store_result(con);
+        uint32 RowCount = (uint32)mysql_affected_rows(con);
+        uint32 FieldCount = mysql_field_count(con);
+        if(!RowCount || !FieldCount)
+		{
+			//empty result means we did not have this spell in sql
+            mysql_free_result(Result); 
+			continue;
+		}
+	    MYSQL_ROW row = mysql_fetch_row(Result);
+		//now to set the values
+		int *dbc_row; //dbc row does contain diferent data types but we don;t interpret values just simply set data
+		int col_shifter=0;
+		dbc_row=(int *)dbc.getRecord(j).getRowStart();
+		for(int i=0;i<SPELL_COLUMN_COUNT;i++)
+			if(sql_translation_table[i][2][0]=='0' && sql_translation_table[i][0][0]!='s')
+				dbc_row[i] = (int)atoi(row[col_shifter++]); 
+		mysql_free_result(Result); 
+	}
 }

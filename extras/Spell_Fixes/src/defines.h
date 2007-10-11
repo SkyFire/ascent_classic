@@ -7,7 +7,9 @@
 	typedef int int32;
 #endif
 
-#define ASSERT assert
+#ifndef ASSERT
+	#define ASSERT assert
+#endif
 
 #define SERVER_DECL __declspec(dllexport)
 
@@ -161,7 +163,8 @@ struct SpellEntry
     uint32 DescriptionAlt6;                 //164
     uint32 DescriptionAlt7;                 //165
     uint32 DescriptionAlt8;                 //166
-    uint32 DescriptionAlt9;                 //167
+//    uint32 DescriptionAlt9;                 //167
+    uint32 buffType;                        //167 - !!! CUSTOM, Using it instead of DescriptionAlt9 !!!
 //    //uint32 DescriptionAlt10;                //168
 	uint32 proc_interval;					  //168 - !!! CUSTOM, Using it instead of DescriptionAlt10 !!!
 //    //uint32 DescriptionAlt11;                //169
@@ -169,12 +172,11 @@ struct SpellEntry
 //    //uint32 DescriptionAlt12;                //170
 	uint32 c_is_flags;						  //170 store spell checks in a static way : isdamageind,ishealing - !!! CUSTOM, Using it instead of DescriptionAlt12 !!!
 //    //uint32 DescriptionAlt13;                //171
-//    //uint32 DescriptionAlt14;                //172
+    uint32 RankNumber;						  //171 - !!! CUSTOM, Using it instead of DescriptionAlt13 !!!// these are related to creating a item through a spell
 //    //uint32 DescriptionAlt15;                //173
-    // soz guys, gotta use these 3 vars :p
-    uint32 unk201_4;						  //171 - !!! CUSTOM, Using it instead of DescriptionAlt13 !!!// these are related to creating a item through a spell
-    uint32 unk201_5;						  //172 - !!! CUSTOM, Using it instead of DescriptionAlt14 !!!
-    uint32 unk201_6;						  //173 - !!! CUSTOM, Using it instead of DescriptionAlt15 !!!// related to custom spells, summon spell quest related spells
+    uint32 NameHash;						  //172 - !!! CUSTOM, Using it instead of DescriptionAlt14 !!!
+//    //uint32 DescriptionAlt14;               //172
+    uint32 DiminishStatus;					  //173 - !!! CUSTOM, Using it instead of DescriptionAlt15 !!!// related to custom spells, summon spell quest related spells
     uint32 DescriptionFlags;                //174
     uint32 BuffDescription;                 //175
     uint32 BuffDescriptionAlt1;             //176
@@ -208,14 +210,12 @@ struct SpellEntry
     uint32 FL;                              //206   only one spellid:6994 has this value = 369
     uint32 FM;                              //207   only one spellid:6994 has this value = 4
     uint32 FN;                              //208   only one spellid:26869  has this flag = 1   
-    // custom shit
-    uint32 buffType;                        //209
-    // this protects players from having >1 rank of a spell
-    uint32 RankNumber;                      //210
-    uint32 NameHash;                        //211
-    uint32 DiminishStatus;                  //212
+    uint32 unk201_4;						//209
+    uint32 unk201_5;                        //210
+    uint32 unk201_6;						//211
 };
 
+//last column is "skip_this_for_sql"
 const char sql_translation_table[220][3][300] = 
 {
     {"uint32" ,"Id","0"},                              //1
@@ -358,7 +358,7 @@ const char sql_translation_table[220][3][300] =
     {"uint32" ,"NameAlt14","1"},                       //138
     {"uint32" ,"NameAlt15","1"},                       //139
     {"uint32" ,"NameFlags","0"},                       //140
-    {"uint32" ,"Rank","0"},                            //141
+    {"str"	  ,"Rank","0"},                            //141
     {"uint32" ,"RankAlt1","1"},                        //142
     {"uint32" ,"RankAlt2","1"},                        //143
     {"uint32" ,"RankAlt3","1"},                        //144
@@ -384,59 +384,58 @@ const char sql_translation_table[220][3][300] =
     {"uint32" ,"DescriptionAlt6","1"},                 //164
     {"uint32" ,"DescriptionAlt7","1"},                 //165
     {"uint32" ,"DescriptionAlt8","1"},                 //166
-    {"uint32" ,"DescriptionAlt9","1"},                 //167
-//    //{"uint32" ," DescriptionAlt10","1"},                //168
-	{"uint32" ," proc_interval","0"},					  //168 - !!! CUSTOM, Using it instead of DescriptionAlt10 !!!
-//    //{"uint32" ," DescriptionAlt11","1"},                //169
-    {"uint32" ," buffIndexType","0"},					  //169 - !!! CUSTOM, Using it instead of DescriptionAlt11 !!!
-//    //{"uint32" ," DescriptionAlt12","1"},                //170
-	{"uint32" ," c_is_flags","0"},						  //170 store spell checks in a static way : isdamageind,ishealing - !!! CUSTOM, Using it instead of DescriptionAlt12 !!!
-//    //{"uint32" ," DescriptionAlt13","1"},                //171
-//    //{"uint32" ," DescriptionAlt14","1"},                //172
-//    //{"uint32" ," DescriptionAlt15","1"},                //173
-    // soz guys, gotta use these 3 vars :p
-    {"uint32" ," buffType","0"},						  //171 - !!! CUSTOM, Using it instead of DescriptionAlt13 !!!// these are related to creating a item through a spell
-    {"uint32" ," RankNumber","0"},						  //172 - !!! CUSTOM, Using it instead of DescriptionAlt14 !!!
-    {"uint32" ," NameHash","0"},						  //173 - !!! CUSTOM, Using it instead of DescriptionAlt15 !!!// related to custom spells, summon spell quest related spells
-    {"uint32" ," DescriptionFlags","0"},                //174
-    {"uint32" ," BuffDescription","0"},                 //175
-    {"uint32" ," BuffDescriptionAlt1","1"},             //176
-    {"uint32" ," BuffDescriptionAlt2","1"},             //177
-    {"uint32" ," BuffDescriptionAlt3","1"},             //178
-    {"uint32" ," BuffDescriptionAlt4","1"},             //179
-    {"uint32" ," BuffDescriptionAlt5","1"},             //180
-    {"uint32" ," BuffDescriptionAlt6","1"},             //181
-    {"uint32" ," BuffDescriptionAlt7","1"},             //182
-    {"uint32" ," BuffDescriptionAlt8","1"},             //183
-    {"uint32" ," BuffDescriptionAlt9","1"},             //184
-    {"uint32" ," BuffDescriptionAlt10","1"},            //185
-    {"uint32" ," BuffDescriptionAlt11","1"},            //186
-    {"uint32" ," BuffDescriptionAlt12","1"},            //187
-    {"uint32" ," BuffDescriptionAlt13","1"},            //188
-    {"uint32" ," BuffDescriptionAlt14","1"},            //189
-	{"uint32" ," BuffDescriptionAlt15","1"},            //190
-    {"uint32" ," buffdescflags","0"},                   //191
-    {"uint32" ," ManaCostPercentage","0"},              //192
-    {"uint32" ," unkflags","0"},                        //193 
-    {"uint32" ," StartRecoveryTime","0"},               //194
-    {"uint32" ," StartRecoveryCategory","0"},           //195
-    {"uint32" ," SpellFamilyName","0"},                 //196
-    {"uint32" ," SpellGroupType","0"},                  //197   flags 
-    {"uint32" ," unkne","0"},                           //198   flags hackwow=shit 
-    {"uint32" ," MaxTargets","0"},                      //199 
-    {"uint32" ," Spell_Dmg_Type","0"},                  //200   dmg_class Integer      0=None, 1=Magic, 2=Melee, 3=Ranged
-    {"uint32" ," FG","0"},                              //201   0,1,2 related to Spell_Dmg_Type I think
-    {"int32" ," FH","0"},                               //202   related to paladin aura's 
-    {"float" ," dmg_multiplier_1","0"},                //203 - 205   if the name is correct I dono
-    {"float" ," dmg_multiplier_2","0"},                //203 - 205   if the name is correct I dono
-    {"float" ," dmg_multiplier_3","0"},                //203 - 205   if the name is correct I dono
-    {"uint32" ," FL","0"},                              //206   only one spellid:6994 has this value = 369
-    {"uint32" ," FM","0"},                              //207   only one spellid:6994 has this value = 4
-    {"uint32" ," FN","0"},                              //208   only one spellid:26869  has this flag = 1   
-    {"uint32" ," unk201_4","0"},                        //209
-    {"uint32" ," unk201_5","0"},                        //210
-    {"uint32" ," unk201_6","0"},                        //211
-    {"uint32" ," DiminishStatus","0"},                  //212
+//    {"uint32" ,"DescriptionAlt9","1"},                 //167
+    {"uint32" ,"buffType","1"},							//167
+//    //{"uint32" ,"DescriptionAlt10","1"},                //168
+	{"uint32"  ,"proc_interval","0"},					  //168 - !!! CUSTOM, Using it instead of DescriptionAlt10 !!!
+//    //{"uint32" ,"DescriptionAlt11","1"},                //169
+    {"uint32" ,"buffIndexType","0"},					  //169 - !!! CUSTOM, Using it instead of DescriptionAlt11 !!!
+//    //{"uint32" ,"DescriptionAlt12","1"},                //170
+	{"uint32" ,"c_is_flags","0"},						  //170  - !!! CUSTOM, Using it instead of DescriptionAlt12 !!! store spell checks in a static way : isdamageind,ishealing
+//    //{"uint32"  ,"DescriptionAlt13","1"},                //171
+    {"uint32"  ,"RankNumber","0"},						  //171 - !!! CUSTOM, Using it instead of DescriptionAlt13 !!!// these are related to creating a item through a spell
+//    //{"uint32"  ,"DescriptionAlt14","1"},                //172
+    {"uint32"  ,"NameHash","0"},						  //172 - !!! CUSTOM, Using it instead of DescriptionAlt14 !!!
+//    //{"uint32"  ,"DescriptionAlt15","1"},                //173
+    {"uint32"  ,"DiminishStatus","0"},					  //173 - !!! CUSTOM, Using it instead of DescriptionAlt15 !!!// related to custom spells, summon spell quest related spells
+    {"uint32"  ,"DescriptionFlags","0"},                //174
+    {"str"	   ,"BuffDescription","0"},                 //175
+    {"uint32"  ,"BuffDescriptionAlt1","1"},             //176
+    {"uint32"  ,"BuffDescriptionAlt2","1"},             //177
+    {"uint32"  ,"BuffDescriptionAlt3","1"},             //178
+    {"uint32"  ,"BuffDescriptionAlt4","1"},             //179
+    {"uint32"  ,"BuffDescriptionAlt5","1"},             //180
+    {"uint32"  ,"BuffDescriptionAlt6","1"},             //181
+    {"uint32"  ,"BuffDescriptionAlt7","1"},             //182
+    {"uint32"  ,"BuffDescriptionAlt8","1"},             //183
+    {"uint32"  ,"BuffDescriptionAlt9","1"},             //184
+    {"uint32"  ,"BuffDescriptionAlt10","1"},            //185
+    {"uint32"  ,"BuffDescriptionAlt11","1"},            //186
+    {"uint32"  ,"BuffDescriptionAlt12","1"},            //187
+    {"uint32"  ,"BuffDescriptionAlt13","1"},            //188
+    {"uint32"  ,"BuffDescriptionAlt14","1"},            //189
+	{"uint32"  ,"BuffDescriptionAlt15","1"},            //190
+    {"uint32"  ,"buffdescflags","0"},                   //191
+    {"uint32"  ,"ManaCostPercentage","0"},              //192
+    {"uint32"  ,"unkflags","0"},                        //193 
+    {"uint32"  ,"StartRecoveryTime","0"},               //194
+    {"uint32"  ,"StartRecoveryCategory","0"},           //195
+    {"uint32"  ,"SpellFamilyName","0"},                 //196
+    {"uint32"  ,"SpellGroupType","0"},                  //197   flags 
+    {"uint32"  ,"unkne","0"},                           //198   flags hackwow=shit 
+    {"uint32"  ,"MaxTargets","0"},                      //199 
+    {"uint32"  ,"Spell_Dmg_Type","0"},                  //200   dmg_class Integer      0=None, 1=Magic, 2=Melee, 3=Ranged
+    {"uint32"  ,"FG","0"},                              //201   0,1,2 related to Spell_Dmg_Type I think
+    {"int32"   ,"FH","0"},                               //202   related to paladin aura's 
+    {"float"   ,"dmg_multiplier_1","0"},                //203 - 205   if the name is correct I dono
+    {"float"   ,"dmg_multiplier_2","0"},                //203 - 205   if the name is correct I dono
+    {"float"   ,"dmg_multiplier_3","0"},                //203 - 205   if the name is correct I dono
+    {"uint32"  ,"FL","0"},                              //206   only one spellid:6994 has this value = 369
+    {"uint32"  ,"FM","0"},                              //207   only one spellid:6994 has this value = 4
+    {"uint32"  ,"FN","0"},                              //208   only one spellid:26869  has this flag = 1   
+    {"uint32"  ,"unk201_4","0"},						//209
+    {"uint32"  ,"unk201_5","0"},                        //210
+    {"uint32"  ,"unk201_6","0"},						//211
 };
 
 // lets make this bitwise for more fun
