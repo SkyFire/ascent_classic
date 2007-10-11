@@ -545,7 +545,11 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 				case 54:// Targets in Front of the Caster
 					{
 						if(p_caster)
-							store_buff->m_unitTarget = p_caster->GetSelection();
+						{
+							Unit *selected = p_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+							if(isAttackable(p_caster,selected))
+								store_buff->m_unitTarget = p_caster->GetSelection();
+						}
 						else if(u_caster)
 						{
 							if(isAttackable(u_caster,u_caster->GetAIInterface()->GetNextTarget()))

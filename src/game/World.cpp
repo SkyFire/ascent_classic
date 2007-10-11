@@ -1916,6 +1916,31 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = Sanctity_group;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 	}
+
+///////////////////////////////
+	// druid - Improved Mark of the Wild
+	uint32 imarkofthv_group=0;
+	tsp = dbcSpell.LookupEntry(1126); //Mark of the wild
+	if(tsp)
+		imarkofthv_group = tsp->SpellGroupType;
+	tsp = dbcSpell.LookupEntry(21849); //Gift of the Wild
+	if(tsp)
+		imarkofthv_group |= tsp->SpellGroupType;
+	sp = dbcSpell.LookupEntry(17050);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	sp = dbcSpell.LookupEntry(17051);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	sp = dbcSpell.LookupEntry(17053);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	sp = dbcSpell.LookupEntry(17054);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	sp = dbcSpell.LookupEntry(17055);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);
 	if(Enchantment)
