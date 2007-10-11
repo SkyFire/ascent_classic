@@ -23,7 +23,6 @@ Socket::Socket(SOCKET fd, uint32 sendbuffersize, uint32 recvbuffersize) : m_read
 	m_writeLock = 0;
 	m_completionPort = 0;
 	m_readEvent = NULL;
-	m_writeEvent=NULL;
 #else
 	m_writeLock = 0;
 #endif
@@ -42,8 +41,6 @@ Socket::~Socket()
 #ifdef CONFIG_USE_IOCP
 	if(m_readEvent != NULL)
 		delete m_readEvent;
-	if(m_writeEvent != NULL)
-		delete m_writeEvent;
 #endif
 }
 

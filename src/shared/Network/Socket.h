@@ -152,7 +152,6 @@ public:
 		}
 	}
 	OverlappedStruct * m_readEvent;
-	OverlappedStruct * m_writeEvent;
 
 private:
 	// Completion port socket is assigned to

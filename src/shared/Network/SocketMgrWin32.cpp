@@ -83,7 +83,6 @@ void HandleReadComplete(Socket * s, uint32 len)
 
 void HandleWriteComplete(Socket * s, uint32 len)
 {
-	s->m_writeEvent=NULL;
 	if(!s->IsDeleted())
 	{
 		s->BurstBegin();					// Lock

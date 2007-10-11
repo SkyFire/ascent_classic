@@ -38,12 +38,11 @@ void Socket::WriteCallback()
 				Disconnect();
 			}
 		}
-		m_writeEvent = ov;
 	}
 	else
 	{
 		// Write operation is completed.
-		m_writeEvent = PostSocketMessage(SOCKET_IO_EVENT_WRITE_END);
+		PostSocketMessage(SOCKET_IO_EVENT_WRITE_END);
 	}
 	m_writeMutex.Release();
 }

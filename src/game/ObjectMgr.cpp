@@ -2332,7 +2332,7 @@ void ObjectMgr::LoadMonsterSay()
 
 		if(!textcount)
 		{
-			delete ms->MonsterName;
+			free(((char*)ms->MonsterName));
 			delete ms;
 			continue;
 		}

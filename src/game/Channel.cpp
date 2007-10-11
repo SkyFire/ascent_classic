@@ -116,7 +116,7 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 
 void Channel::Part(Player * plr)
 {
-	Guard mGuard(m_lock);
+	m_lock.Acquire();
 	WorldPacket data(SMSG_CHANNEL_NOTIFY, 100);
 	uint32 flags;
 	MemberMap::iterator itr = m_members.find(plr);
@@ -124,6 +124,7 @@ void Channel::Part(Player * plr)
 	{
 		data << uint8(CHANNEL_NOTIFY_FLAG_NOTON) << m_name;
 		plr->GetSession()->SendPacket(&data);
+		m_lock.Release();
 		return;
 	}
     
@@ -159,6 +160,7 @@ void Channel::Part(Player * plr)
 		SendToAll(&data);
 	}
 
+	m_lock.Release();
 	if(m_members.size() == 0)
 		channelmgr.RemoveChannel(this);
 }
