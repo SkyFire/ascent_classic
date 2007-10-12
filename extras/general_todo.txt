@@ -72,6 +72,7 @@ SMT_RESIST_DISPEL - check if it is used
 - i can request and accept at the same time a duel ? request on second login char the duel then simply accept it :S
 - unlearning talents does not remove buffes from you. (it does for me :P )
 - check is_flags place in spellentry structure.Maybe we should place it elsewhere ?(193)
+- make aurastates get checked on spellcast and remove them on a sucessfull cast
 
 ==========================================================================
 Zack - test my shit :
