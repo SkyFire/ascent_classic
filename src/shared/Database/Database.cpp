@@ -65,8 +65,9 @@ bool Database::Initialize(const char* Hostname, unsigned int Port, const char* U
 	ThreadPool.ExecuteTask(this);
 
 	// launch the query thread
-	qt = new QueryThread(this);
-	ThreadPool.ExecuteTask(qt);
+	//qt = new QueryThread(this);
+	//ThreadPool.ExecuteTask(qt);
+	qt=NULL;
 	
 	return true;
 }
@@ -533,11 +534,12 @@ void Database::thread_proc_query()
 void Database::QueueAsyncQuery(AsyncQuery * query)
 {
 	query->db = this;
-	if(qt == NULL)
+	/*if(qt == NULL)
 	{
 		query->Perform();
 		return;
 	}
 
-	qqueries_queue.push(query);
+	qqueries_queue.push(query);*/
+	query->Perform();
 }

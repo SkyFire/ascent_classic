@@ -285,7 +285,7 @@ void Channel::Moderate(Player * plr)
 		return;
 	}
 
-	if(!(itr->second & CHANNEL_FLAG_OWNER || itr->second & CHANNEL_FLAG_MODERATOR))
+	if(!(itr->second & CHANNEL_FLAG_OWNER || itr->second & CHANNEL_FLAG_MODERATOR) && !plr->GetSession()->CanUseCommand('c'))
 	{
 		data << uint8(CHANNEL_NOTIFY_FLAG_NOTMOD) << m_name;
 		plr->GetSession()->SendPacket(&data);

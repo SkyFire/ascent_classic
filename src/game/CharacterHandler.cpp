@@ -572,6 +572,7 @@ void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 	m_bIsWLevelSet = false;
 	
 	Log.Debug("WorldSession", "Async loading player %u", (uint32)playerGuid);
+	m_loggingInPlayer = plr;
 	plr->LoadFromDB((uint32)playerGuid);
 }
 
