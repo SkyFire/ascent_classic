@@ -133,6 +133,14 @@ void HonorHandler::OnPlayerKilledUnit(Player *pPlayer, Unit* pVictim)
 			                data << pvppoints << pVictim->GetGUID() << uint32(static_cast<Player*>(pVictim)->GetPVPRank());
 			                gPlayer->GetSession()->SendPacket(&data);
 		                }
+						//patch by emsy
+                        // If we are in Halaa
+                        if(pPlayer->GetZoneId() == 3518)
+                        {
+                            // Add Halaa Battle Token
+                            SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 33004 : 33005);
+                            gPlayer->CastSpell(gPlayer, halaa_spell, true);
+                        }
                     }
 
                 }
@@ -157,6 +165,14 @@ void HonorHandler::OnPlayerKilledUnit(Player *pPlayer, Unit* pVictim)
 			    data << pvppoints << pVictim->GetGUID() << uint32(static_cast<Player*>(pVictim)->GetPVPRank());
 			    pPlayer->GetSession()->SendPacket(&data);
 		    }
+			//patch by emsy
+            // If we are in Halaa
+            if(pPlayer->GetZoneId() == 3518)
+            {
+                // Add Halaa Battle Token
+                SpellEntry * halaa_spell = dbcSpell.LookupEntry(pPlayer->GetTeam()? 33004 : 33005);
+                pPlayer->CastSpell(pPlayer, halaa_spell, true);
+            }
         }
 	}
 }
