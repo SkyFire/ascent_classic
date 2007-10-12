@@ -1941,6 +1941,17 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(17055);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	//rogue - initiative
+	sp = dbcSpell.LookupEntry(13976);
+	if(sp)
+		sp->procChance = 25;
+	sp = dbcSpell.LookupEntry(13979);
+	if(sp)
+		sp->procChance = 50;
+	sp = dbcSpell.LookupEntry(13980);
+	if(sp)
+		sp->procChance = 75;
+
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);
 	if(Enchantment)
