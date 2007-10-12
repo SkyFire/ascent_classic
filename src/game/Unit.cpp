@@ -694,6 +694,37 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								mPlayer->GetShapeShift() != FORM_DIREBEAR))
 								continue;
 						}break;
+						//Druid:Improved Leader of the Pack
+						case 34299:
+						{
+							if (!this->IsPlayer() || !this->isAlive())
+								continue;
+							Player* mPlayer = (Player*)this;
+							if (!mPlayer->IsInFeralForm() || 
+								(mPlayer->GetShapeShift() != FORM_CAT &&
+								mPlayer->GetShapeShift() != FORM_BEAR &&
+								mPlayer->GetShapeShift() != FORM_DIREBEAR))
+								continue;
+
+							float multi = 0.04;
+							uint32 curhp = mPlayer->GetUInt32Value(UNIT_FIELD_HEALTH);
+							uint32 maxhp = mPlayer->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+							uint32 val = uint32(float( float(maxhp)*multi));
+							if (curhp+val>maxhp)
+								val = maxhp-curhp;
+
+							mPlayer->SetUInt32Value(UNIT_FIELD_HEALTH,curhp+val);
+
+							WorldPacket datamr(SMSG_HEALSPELL_ON_PLAYER, 30);
+							datamr << mPlayer->GetNewGUID();
+							datamr << mPlayer->GetNewGUID();
+							datamr << uint32(34299);
+							datamr << uint32(val);
+							datamr << uint32(0);
+							mPlayer->GetSession()->SendPacket(&datamr);
+							continue;
+						}
+						break;
 						//rogue - blade twisting
 						case 31125:
 							{
@@ -921,7 +952,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								//make a direct strike then exit rest of handler
 								int tdmg=abs*(ospinfo->EffectBasePoints[0]+1)/100;
 								//somehow we should make this not caused any threat (tobedone)
-								SpellNonMeleeDamageLog(victim,power_word_id, tdmg, false, false);
+								SpellNonMeleeDamageLog(victim,power_word_id, tdmg, false, true);
 								continue;
 							}break;
 						//rogue - combat potency
@@ -1117,6 +1148,13 @@ void Unit::HandleProcSpellOnSpell(Unit* Victim,uint32 damage,bool critical)
 bool Unit::isCasting()
 {
 	return (m_currentSpell != NULL);
+}
+
+bool Unit::IsInInstance()
+{
+	MapInfo *pMapinfo = WorldMapInfoStorage.LookupEntry(this->GetMapId());
+	if (pMapinfo)
+		return (pMapinfo->type != INSTANCE_NULL);
 }
 
 void Unit::RegenerateHealth()
@@ -1731,7 +1769,7 @@ else
 					dmg.full_damage += dmgbonus;
 					if(IsPlayer())
 					{
-						if(damage_type != RANGED && !ability)
+						if(damage_type != RANGED)
 						{
 							float critextra=static_cast<Player*>(this)->m_modphyscritdmgPCT;
 							dmg.full_damage += int32((dmg.full_damage*critextra/100.0f));
@@ -2919,7 +2957,7 @@ void Unit::OnRemoveInRangeObject(Object* pObj)
 		/* === ATTACKER CHECKS === */
 
 		// if we're being attacked by him, remove from our set.
-		if (!this->IsPlayer() || !static_cast<Player*>(this)->InGroup())
+		if(this->IsInInstance())
 			removeAttacker(pUnit);
 
 		// check that our target is not him (shouldn't happen!)

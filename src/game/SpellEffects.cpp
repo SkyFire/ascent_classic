@@ -1136,6 +1136,21 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			turns the arena spectators from red to yellow*/
 		}break;
 		/* Quest Related */
+	case 34297:
+	case 34300: //Druid:Improved Leader of the Pack
+		{
+			if (!u_caster->IsPlayer())
+				return;
+			ProcTriggerSpell ILotP;
+			ILotP.origId = 34299;
+			ILotP.spellId = 34299;
+			ILotP.procChance = (spellId==34300) ? 100 : 50;
+			ILotP.procFlags = PROC_ON_CRIT_HIT_VICTIM;
+			ILotP.deleted = false;
+			ILotP.caster = u_caster->GetGUID();
+			ILotP.LastTrigger = 0;
+			u_caster->m_procSpells.push_back(ILotP);
+		}
 	}										 
 }
 
@@ -2818,7 +2833,7 @@ void Spell::SpellEffectPowerBurn(uint32 i) // power burn
 	int32 mana=min((int32)unitTarget->GetUInt32Value(UNIT_FIELD_POWER1),damage);
 	unitTarget->ModUInt32Value(UNIT_FIELD_POWER1,-mana);
 	
-	m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, (uint32)(mana * m_spellInfo->Effectunknown[i]), true);   
+	m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, (uint32)(mana * m_spellInfo->Effectunknown[i]), true,true);   
 }
 
 void Spell::SpellEffectThreat(uint32 i) // Threat

@@ -423,7 +423,7 @@ public:
 		return ( m_objectTypeId == TYPEID_UNIT || m_objectTypeId == TYPEID_PLAYER); 
 	}
 	void EventSpellDamage(uint64 Victim, uint32 SpellID, uint32 Damage);
-	void SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage, bool allowProc, bool no_remove_auras = false);
+	void SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage, bool allowProc, bool static_damage = false, bool no_remove_auras = false);
 	
 	//*****************************************************************************************
 	//* SpellLog packets just to keep the code cleaner and better to read

@@ -2061,7 +2061,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	}
 }
 
-void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage, bool allowProc,bool no_remove_auras)
+void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage, bool allowProc, bool static_damage, bool no_remove_auras)
 {
 //==========================================================================================
 //==============================Unacceptable Cases Processing===============================
@@ -2087,7 +2087,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==============================+Spell Damage Bonus Calculations============================
 //==========================================================================================
 //------------------------------by stats----------------------------------------------------
-	if(this->IsUnit())
+	if(this->IsUnit() && !static_damage)
 	{
 		Unit* caster = (Unit*)(this);
 		caster->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);

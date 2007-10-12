@@ -1085,6 +1085,13 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			else
 			{
 				float summaryPCTmod = c->GetDamageDonePctMod(school)+ c->DamageDoneModPCT[school] + m_target->DamageTakenPctMod[school]-1;
+				if (m_target->IsPlayer()) //Resilience
+				{
+					float dmg_reduction_pct=static_cast<Player*>(m_target)->CalcRating(14)/100;
+					if(dmg_reduction_pct>1.0f)
+						dmg_reduction_pct = 1.0f;
+					summaryPCTmod -=dmg_reduction_pct;
+				}
 				res *= summaryPCTmod;
 				if(res < 0) res = 0;
 			}
@@ -1190,33 +1197,33 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
-		//warrior - sweeping strikes
-		case 35429:
-		case 18765:
-		case 12292:
-			{
-		      if(apply)
-				 m_target->m_extrastriketargets++;
-			}break;
-		//taming rod spells
-		case 19548:	triggerSpId=19597;
-		case 19674:	triggerSpId=19677;
-		case 19687:	triggerSpId=19676;
-		case 19688:	triggerSpId=19678;
-		case 19689:	triggerSpId=19679;
-		case 19692:	triggerSpId=19680;
-		case 19693:	triggerSpId=19684;
-		case 19694:	triggerSpId=19681;
-		case 19696:	triggerSpId=19682;
-		case 19697:	triggerSpId=19683;
-		case 19699:	triggerSpId=19685;
-		case 19700:	triggerSpId=19686;
-		case 30099:	triggerSpId=30100;
-		case 30105:	triggerSpId=30104;
+	//warrior - sweeping strikes
+	case 35429:
+	case 18765:
+	case 12292:
 		{
-			Player*p_caster =(Player*)GetUnitCaster();
-			p_caster->CastSpell(m_target, triggerSpId, true);
+	      if(apply)
+			 m_target->m_extrastriketargets++;
 		}break;
+	//taming rod spells
+	case 19548:	triggerSpId=19597;
+	case 19674:	triggerSpId=19677;
+	case 19687:	triggerSpId=19676;
+	case 19688:	triggerSpId=19678;
+	case 19689:	triggerSpId=19679;
+	case 19692:	triggerSpId=19680;
+	case 19693:	triggerSpId=19684;
+	case 19694:	triggerSpId=19681;
+	case 19696:	triggerSpId=19682;
+	case 19697:	triggerSpId=19683;
+	case 19699:	triggerSpId=19685;
+	case 19700:	triggerSpId=19686;
+	case 30099:	triggerSpId=30100;
+	case 30105:	triggerSpId=30104;
+	{
+		Player*p_caster =(Player*)GetUnitCaster();
+		p_caster->CastSpell(m_target, triggerSpId, true);
+	}break;
 	case 16972://Predatory Strikes
 	case 16974:
 	case 16975:
@@ -1566,88 +1573,88 @@ void Aura::SpellAuraDummy(bool apply)
 			//reduce casters armor by 100%
 			static_cast<Player*>(m_target)->BaseResistanceModPctPos[0]+= apply ? -100 : 100;
 		}break;
-		//Second Wind - triggers only on stun and Immobilize
-		case 29834:
+	//Second Wind - triggers only on stun and Immobilize
+	case 29834:
+		{
+			Unit *caster = GetUnitCaster();
+			if(caster && caster->IsPlayer())
+				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(29841,100);//fixed 100% chance
+		}break;
+	case 29838:
+		{
+			Unit *caster = GetUnitCaster();
+			if(caster && caster->IsPlayer())
+				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(29842,100);//fixed 100% chance
+		}break;
+	//mage Frostbite talent
+	case 11071:
+	case 12496:
+	case 12497:
+		{
+			Unit *caster = GetUnitCaster();
+			if(caster && caster->IsPlayer())
+				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(12494,mod->m_amount);
+		}break;
+	//mage Magic Absorption
+	case 29441:
+	case 29444:
+	case 29445:
+	case 29446:
+	case 29447:
+		{
+			if (m_target->IsPlayer())
 			{
-				Unit *caster = GetUnitCaster();
-				if(caster && caster->IsPlayer())
-					static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(29841,100);//fixed 100% chance
-			}break;
-		case 29838:
+				static_cast<Player*>(m_target)->m_RegenManaOnSpellResist += ((apply) ? 1:-1)*(float)mod->m_amount/100;
+			}
+		}break;
+	//warlock - seed of corruption
+	case 27243:
+	case 32863:
+	case 36123:
+	case 38252:
+	case 39367:
+		{
+			//register a cast on death of the player
+			if(apply)
 			{
-				Unit *caster = GetUnitCaster();
-				if(caster && caster->IsPlayer())
-					static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(29842,100);//fixed 100% chance
-			}break;
-		//mage Frostbite talent
-		case 11071:
-		case 12496:
-		case 12497:
-			{
-				Unit *caster = GetUnitCaster();
-				if(caster && caster->IsPlayer())
-					static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(12494,mod->m_amount);
-			}break;
-		//mage Magic Absorption
-		case 29441:
-		case 29444:
-		case 29445:
-		case 29446:
-		case 29447:
-			{
-				if (m_target->IsPlayer())
-				{
-					static_cast<Player*>(m_target)->m_RegenManaOnSpellResist += ((apply) ? 1:-1)*(float)mod->m_amount/100;
-				}
-			}break;
-		//warlock - seed of corruption
-		case 27243:
-		case 32863:
-		case 36123:
-		case 38252:
-		case 39367:
-			{
-				//register a cast on death of the player
-				if(apply)
-				{
-					ProcTriggerSpell pts;
-					pts.origId = GetSpellProto()->Id;
-					pts.caster = m_casterGuid;
+				ProcTriggerSpell pts;
+				pts.origId = GetSpellProto()->Id;
+				pts.caster = m_casterGuid;
 //					pts.spellId=GetSpellProto()->Id;
-					pts.spellId=32865;
-					if(!pts.spellId)
-						return;
-					pts.procChance = GetSpellProto()->procChance;
+				pts.spellId=32865;
+				if(!pts.spellId)
+					return;
+				pts.procChance = GetSpellProto()->procChance;
 //					pts.procFlags = GetSpellProto()->procFlags;
-					pts.procFlags = PROC_ON_DIE;
-					pts.procCharges = GetSpellProto()->procCharges;
-					pts.LastTrigger = 0;
-					pts.deleted = false;
-					m_target->m_procSpells.push_front(pts);
-				}
-				else
+				pts.procFlags = PROC_ON_DIE;
+				pts.procCharges = GetSpellProto()->procCharges;
+				pts.LastTrigger = 0;
+				pts.deleted = false;
+				m_target->m_procSpells.push_front(pts);
+			}
+			else
+			{
+				for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
 				{
-					for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
+					if(itr->origId == GetSpellId() && itr->caster == m_casterGuid)
 					{
-						if(itr->origId == GetSpellId() && itr->caster == m_casterGuid)
-						{
-							//m_target->m_procSpells.erase(itr);
-							itr->deleted = true;
-							break;
-						}
+						//m_target->m_procSpells.erase(itr);
+						itr->deleted = true;
+						break;
 					}
 				}
-			}break;
-		case 17007: //Druid:Leader of the Pack
-			{
-				if (!m_target->IsPlayer())
-					return;
-				Player* pTarget = (Player*)m_target;
-				SSAura* aura = new SSAura();
-				aura->spellid = 24932;
-				aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
-				pTarget->m_ssAuras.insert(aura);
-			}break;
+			}
+		}break;
+	case 17007: //Druid:Leader of the Pack
+		{
+			if (!m_target->IsPlayer())
+				return;
+			Player* pTarget = (Player*)m_target;
+			SSAura* aura = new SSAura();
+			aura->spellid = 24932;
+			aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
+			pTarget->m_ssAuras.insert(aura);
+		}break;
 	}
 }
 
@@ -2516,60 +2523,11 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 		if(m_casterGuid == pTarget->GetGUID())
 			return;
 
-	switch (spellInfo->NameHash)
-	{
-	case 0x884B70A4: //Druid: Frenzied Regeneration
-		{
-			if (!pTarget->IsPlayer())
-				break;
-
-			Player* player = (Player*)(pTarget);
-			if (!player->IsInFeralForm())
-				break;
-			if(player->GetPowerType() == POWER_TYPE_RAGE)
-			{
-				uint32 val = player->GetUInt32Value(UNIT_FIELD_POWER2);
-				if (val>100) val = 100;
-				if (val)
-				{
-					player->SetUInt32Value(UNIT_FIELD_POWER2, player->GetUInt32Value(UNIT_FIELD_POWER2)-val);
-					switch (this->GetSpellId())
-					{
-						case 22842:
-							val *= 10;break;
-						case 22895:
-							val *= 15;break;
-						case 22896:
-							val *= 20;break;
-						case 26999:
-							val *=25;break;
-						default:
-							break;
-					}
-					uint32 chealth = player->GetUInt32Value(UNIT_FIELD_HEALTH);
-					chealth+=val/10;
-					if (chealth>player->GetUInt32Value(UNIT_FIELD_MAXHEALTH))
-						chealth=player->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-					player->SetUInt32Value(UNIT_FIELD_HEALTH,chealth);
-					WorldPacket datamr(SMSG_HEALSPELL_ON_PLAYER, 30);
-					datamr << player->GetNewGUID();
-					datamr << player->GetNewGUID();
-					datamr << uint32(22845);
-					datamr << uint32(0);
-					datamr << uint32(val);
-					player->GetSession()->SendPacket(&datamr);
-				}
-			}break;
-		}
-	default:
-		{
-			Spell *spell = new Spell(m_caster, spellInfo, true, this);
-			SpellCastTargets targets;
-			targets.m_unitTarget = pTarget->GetGUID();
-			targets.m_targetMask = TARGET_FLAG_UNIT;
-			spell->prepare(&targets);
-		}break;
-	}
+	Spell *spell = new Spell(m_caster, spellInfo, true, this);
+	SpellCastTargets targets;
+	targets.m_unitTarget = pTarget->GetGUID();
+	targets.m_targetMask = TARGET_FLAG_UNIT;
+	spell->prepare(&targets);
 }
 
 void Aura::SpellAuraPeriodicEnergize(bool apply)

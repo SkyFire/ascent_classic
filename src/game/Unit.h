@@ -665,6 +665,7 @@ public:
 	void EventCastSpell(Unit * Target, SpellEntry * Sp);
 
 	bool isCasting();
+	bool IsInInstance();
     void CalculateResistanceReduction(Unit *pVictim,dealdamage *dmg) ;
 	void RegenerateHealth();
 	void RegeneratePower(bool isinterrupted);
