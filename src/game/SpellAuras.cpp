@@ -1780,10 +1780,15 @@ void Aura::SpellAuraModFear(bool apply)
 			m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_NO_ROTATE);
 			m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
 			m_target->setAItoUse(true);
+			// Partha: I can't see what the point of this was, but...
+			// I believe it's preventing feared players from running away
+			// and allowing them to attack with melee and ranged weapon
+			/*
 			WorldPacket data1(9);
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
 			data1 << m_target->GetNewGUID() << uint8(0x00); //block player movement ?
 			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
+			*/
 		}
 		m_target->m_special_state |= UNIT_STATE_FEAR;
 		m_target->GetAIInterface()->SetUnitToFear(GetUnitCaster());
@@ -1797,10 +1802,12 @@ void Aura::SpellAuraModFear(bool apply)
  			m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
 			m_target->GetAIInterface()->StopMovement(1);
 			m_target->setAItoUse(false);
+			/*
 			WorldPacket data1(9);
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
 			data1 << m_target->GetNewGUID() << uint8(0x01); //enable player movement ?
 			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
+			*/
 		}
 		m_target->m_special_state &= ~UNIT_STATE_FEAR;
 		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, m_target, 0);
