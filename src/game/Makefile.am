@@ -125,6 +125,7 @@ libgame_a_SOURCES = \
     PetHandler.cpp \
     Player.cpp \
     Player.h \
+    PlayerPacketWrapper.cpp \
     Professions.cpp \
     Professions.h \
     QueryHandler.cpp \
@@ -133,6 +134,7 @@ libgame_a_SOURCES = \
     QuestHandler.cpp \
     QuestMgr.cpp \
     QuestMgr.h \
+    QuestCommands.cpp \
     RaidHandler.cpp \
     RecallCommands.cpp \
     ReputationHandler.cpp \

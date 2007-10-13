@@ -805,6 +805,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\PlayerPacketWrapper.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\Professions.cpp"
 				>
 			</File>
