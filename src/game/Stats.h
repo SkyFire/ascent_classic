@@ -43,14 +43,14 @@ ZD = 12, when Char Level = 30 - 39
 ZD = 13, when Char Level = 40 - 44
 ZD = 14, when Char Level = 45 - 49
 ZD = 15, when Char Level = 50 - 53 (50-54?)
-ZD = 16, when Char Level = 55 - 59 (guessed) 
+ZD = 16, when Char Level = 55 - 59 (guessed)
 ZD = 17, when Char Level = 60 (guessed) */
 
 /////////////////////////////////////////////////////////////////////////		  30
 //  CalculateXpToGive
 //
 //  Calculates XP given out by pVictim upon death.
-//  XP=(MOB_LEVEL*5+45)*(1+0.05*(MOB_LEVEL-PLAYER_LEVEL)) 
+//  XP=(MOB_LEVEL*5+45)*(1+0.05*(MOB_LEVEL-PLAYER_LEVEL))
 //  from http://wowwow.game-host.org/viewtopic.php?t=857&sid=07e3a117e26e43358dd23cf260c0c7ad
 //
 //
@@ -73,7 +73,7 @@ uint16 VictimLvl = pVictim->GetUInt32Value(UNIT_FIELD_LEVEL);
 uint16 AttackerLvl = pAttacker->GetUInt32Value(UNIT_FIELD_LEVEL);
 int xp = 0;
 int greylvl = 0;
-int ZD[61] = {1,5,5,5,5,5,5,5,6,6,7,7,8,8,8,9,9,9,9,9,11,11,11,11,11,11,11,11,11,11,12,12,12,12,12,12,12,12,12,12,13,13,13,13,13,14,14,14,14,14,15,15,15,15,15,16,16,16,16,16,17};	
+int ZD[61] = {1,5,5,5,5,5,5,5,6,6,7,7,8,8,8,9,9,9,9,9,11,11,11,11,11,11,11,11,11,11,12,12,12,12,12,12,12,12,12,12,13,13,13,13,13,14,14,14,14,14,15,15,15,15,15,16,16,16,16,16,17};
 if( VictimLvl > AttackerLvl )
 xp = (AttackerLvl*5+45)*(1+0.05*(VictimLvl-AttackerLvl));
 else if( VictimLvl == AttackerLvl )
@@ -113,15 +113,15 @@ inline uint32 getConColor(uint16 AttackerLvl, uint16 VictimLvl)
 //	const uint32 grayLevel[sWorld.LevelCap+1] = {0,0,0,0,0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,13,14,15,16,17,18,19,20,21,22,22,23,24,25,26,27,28,29,30,31,31,32,33,34,35,35,36,37,38,39,39,40,41,42,43,43,44,45,46,47,47,48,49,50,51,51,52,53,54,55,55};
 #define PLAYER_LEVEL_CAP 70
 	const uint32 grayLevel[PLAYER_LEVEL_CAP+1] = {0,0,0,0,0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,13,14,15,16,17,18,19,20,21,22,22,23,24,25,26,27,28,29,30,31,31,32,33,34,35,35,36,37,38,39,39,40,41,42,43,43,44,45,46,47,47,48,49,50,51,51,52,53,54,55,55};
-	if(AttackerLvl + 5 <= VictimLvl) 
+	if(AttackerLvl + 5 <= VictimLvl)
 	{
-		if(AttackerLvl + 10 <= VictimLvl) 
+		if(AttackerLvl + 10 <= VictimLvl)
 		{
 			return 5;
 		}
 		return 4;
 	}
-	else 
+	else
 	{
 		switch(VictimLvl - AttackerLvl)
 		{
@@ -138,11 +138,11 @@ inline uint32 getConColor(uint16 AttackerLvl, uint16 VictimLvl)
 			break;
 		default:
 			// More adv formula for grey/green lvls:
-			if(AttackerLvl <= 6) 
+			if(AttackerLvl <= 6)
 			{
 				return 1; //All others are green.
 			}
-			else 
+			else
 			{
 				if(AttackerLvl > PLAYER_LEVEL_CAP)
 					return 1;//gm
@@ -160,13 +160,13 @@ inline uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 {
 	if(pVictim->IsPlayer())
 		return 0;
-  
+
 	if(((Creature*)pVictim)->IsTotem())
 		return 0;
 
 	CreatureInfo *victimI;
 	  victimI = ((Creature*)pVictim)->GetCreatureName();
-	
+
 	if(victimI)
 		if(victimI->Type == CRITTER)
 			return 0;
@@ -179,7 +179,7 @@ inline uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 		max_level = pAttacker->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
 	else if(pAttacker->IsPet())
 		max_level = ((Pet*)pAttacker)->GetPetOwner()->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
-	
+
 	if(pAttacker->getLevel() >= max_level)
 		return 0;
 	uint32 VictimLvl = pVictim->GetUInt32Value(UNIT_FIELD_LEVEL);
@@ -299,7 +299,7 @@ inline uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 	float tempcap = 0;
 	float xp = 0;
 
-	if(VictimLvl >= AttackerLvl) 
+	if(VictimLvl >= AttackerLvl)
 	{
 		temp = ((AttackerLvl * 5) + 45) * (1 + 0.05 * (VictimLvl - AttackerLvl));
 		tempcap = ((AttackerLvl * 5) + 45) * 1.2;
@@ -312,23 +312,23 @@ inline uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 
 			xp = tempcap;
 		}
-		else 
+		else
 		{
 			if( temp < 0 )
 				temp = 0;
 			else
-				temp *= sWorld.getRate(RATE_XP); 
+				temp *= sWorld.getRate(RATE_XP);
 
 			xp = temp;
 		}
 	}
-	else 
+	else
 	{
-		if(getConColor(AttackerLvl, VictimLvl) == 0) 
+		if(getConColor(AttackerLvl, VictimLvl) == 0)
 		{
 			return (uint32)0;
 		}
-		else 
+		else
 		{
 			if(AttackerLvl < PLAYER_LEVEL_CAP)
 				temp = (((AttackerLvl * 5) + 45) * (1 - (AttackerLvl - VictimLvl)/ZD[AttackerLvl]));
@@ -518,18 +518,20 @@ inline uint32 GainStat(uint16 level, uint8 playerclass,uint8 Stat)
 	return gain;
 }
 
-//TODO: Some awesome formula to determine how much damage to deal
-//consider this is melee damage
-//damage type =0 --melee, 1--dual wield, 2 - ranged
 inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type, uint32 spellgroup, SpellEntry *ability)//spellid is used only for 2-3 spells, that have AP bonus
 {
-	// Attack Power increases your base damage-per-second (DPS) by 1 for every 14 attack power. 
+	//TODO: Some awesome formula to determine how much damage to deal
+	//consider this is melee damage
+	//damage type =0 --melee, 1--dual wield, 2 - ranged
+
+	// Attack Power increases your base damage-per-second (DPS) by 1 for every 14 attack power.
 	// (c) wowwiki
 
 	//type of this UNIT_FIELD_ATTACK_POWER_MODS is unknown, not even uint32 disabled for now.
 
 	uint32 offset;
 	Item *it = NULL;
+
 	if(pAttacker->disarmed && pAttacker->IsPlayer())
 	{
 		offset=UNIT_FIELD_MINDAMAGE;
@@ -541,7 +543,6 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 		offset=UNIT_FIELD_MINOFFHANDDAMAGE;
 	else
 		offset=UNIT_FIELD_MINRANGEDDAMAGE;
-
 
 	float min_damage = pAttacker->GetFloatValue(offset);
 	float max_damage = pAttacker->GetFloatValue(offset+1);
@@ -558,27 +559,22 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 
 	if(offset == UNIT_FIELD_MINRANGEDDAMAGE)
 	{
-//		//starting from base attack power then we apply mods on it
+		//starting from base attack power then we apply mods on it
 		//ap += pAttacker->GetRAP();
 		ap += pVictim->RAPvModifier;
 
-		if(!pVictim->IsPlayer())
-		if(((Creature*)pVictim)->GetCreatureName())
+		if(!pVictim->IsPlayer() && ((Creature*)pVictim)->GetCreatureName())
 		{
-//			ap += (float)pAttacker->CreatureRangedAttackPowerMod[((Creature*)pVictim)->GetCreatureName()->Type];
-
 			uint32 creatType = ((Creature*)pVictim)->GetCreatureName()->Type;
 			ap += (float)pAttacker->CreatureRangedAttackPowerMod[creatType];
 
 			if(pAttacker->IsPlayer())
 			{
-//				min_damage += min_damage*static_cast<Player*>(pAttacker)->IncreaseDamageByTypePCT[((Creature*)pVictim)->GetCreatureName()->Type];
-//				max_damage += max_damage*static_cast<Player*>(pAttacker)->IncreaseDamageByTypePCT[((Creature*)pVictim)->GetCreatureName()->Type];
 				min_damage = (min_damage + static_cast<Player*>(pAttacker)->IncreaseDamageByType[creatType]) * (1 + static_cast<Player*>(pAttacker)->IncreaseDamageByTypePCT[creatType]);
 				max_damage = (max_damage + static_cast<Player*>(pAttacker)->IncreaseDamageByType[creatType]) * (1 + static_cast<Player*>(pAttacker)->IncreaseDamageByTypePCT[creatType]);
 			}
 		}
-	 
+
 		if(pAttacker->IsPlayer())
 		{
 			if(!pAttacker->disarmed)
@@ -591,70 +587,67 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 			}
 			else
 				wspeed = (float)pAttacker->GetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME);
-
 		}
 		else
 		{
 			wspeed = (float)pAttacker->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME);
 		}
 
-        //ranged weapon normalization.
-        if(pAttacker->IsPlayer() && ability)
-        {
-            if(ability->Effect[0] == SPELL_EFFECT_DUMMYMELEE || ability->Effect[1] == SPELL_EFFECT_DUMMYMELEE || ability->Effect[2] == SPELL_EFFECT_DUMMYMELEE)
-            { 
-                wspeed = 2800;
-            }
-        }
+		//ranged weapon normalization.
+		if(pAttacker->IsPlayer() && ability)
+		{
+			if(ability->Effect[0] == SPELL_EFFECT_DUMMYMELEE || ability->Effect[1] == SPELL_EFFECT_DUMMYMELEE || ability->Effect[2] == SPELL_EFFECT_DUMMYMELEE)
+			{
+				wspeed = 2800;
+			}
+		}
+
 		//Weapon speed constant in feral forms
 		if(pAttacker->IsPlayer())
 		{
 			if(static_cast<Player*>(pAttacker)->IsInFeralForm())
 			{
 				uint8 ss = static_cast<Player*>(pAttacker)->GetShapeShift();
-					if (ss == FORM_CAT)
-						wspeed = 1000.0;
-					else if(ss == FORM_DIREBEAR || ss == FORM_BEAR)
-						 wspeed = 2500.0;
+
+				if(ss == FORM_CAT)
+					wspeed = 1000.0;
+				else if(ss == FORM_DIREBEAR || ss == FORM_BEAR)
+					wspeed = 2500.0;
 			}
 		}
 
 		bonus = (wspeed*ap)/14000.0f;
-
 		min_damage += bonus;
 		max_damage += bonus;
 	}
 	else
 	{
 		//MinD = AP(28AS-(WS/7))-MaxD
-//		//starting from base attack power then we apply mods on it
-//		ap += pAttacker->GetAP();
+		//starting from base attack power then we apply mods on it
+		//ap += pAttacker->GetAP();
 		ap += pVictim->APvModifier;
 
-		if(!pVictim->IsPlayer())
-		if(((Creature*)pVictim)->GetCreatureName())
+		if(!pVictim->IsPlayer() && ((Creature*)pVictim)->GetCreatureName())
 		{
-//			ap += (float)pAttacker->CreatureAttackPowerMod[((Creature*)pVictim)->GetCreatureName()->Type];
-
 			uint32 creatType = ((Creature*)pVictim)->GetCreatureName()->Type;
 			ap += (float)pAttacker->CreatureAttackPowerMod[creatType];
 
 			if(pAttacker->IsPlayer())
 			{
-//				min_damage += min_damage*static_cast<Player*>(pAttacker)->IncreaseDamageByTypePCT[((Creature*)pVictim)->GetCreatureName()->Type];
-//				max_damage += max_damage*static_cast<Player*>(pAttacker)->IncreaseDamageByTypePCT[((Creature*)pVictim)->GetCreatureName()->Type];
 				min_damage = (min_damage + static_cast<Player*>(pAttacker)->IncreaseDamageByType[creatType]) * (1 + static_cast<Player*>(pAttacker)->IncreaseDamageByTypePCT[creatType]);
 				max_damage = (max_damage + static_cast<Player*>(pAttacker)->IncreaseDamageByType[creatType]) * (1 + static_cast<Player*>(pAttacker)->IncreaseDamageByTypePCT[creatType]);
 			}
 		}
+
 		if(pAttacker->IsPlayer())
 		{
 			if(!pAttacker->disarmed)
 			{
 				Item *it = static_cast<Player*>(pAttacker)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+
 				if(it)
 					wspeed = (float)it->GetProto()->Delay;
-				else 
+				else
 					wspeed = 2000;
 			}
 			else
@@ -663,13 +656,13 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 			if(spellgroup)
 			{
 				int32 apall = pAttacker->GetAP();
-
 				int32 apb=0;
 				SM_FIValue(pAttacker->SM_PAPBonus,&apb,spellgroup);
-                if(apb)
-				    ap += apall*((float)apb/100);
-                else
-                    ap = float(apall);
+
+				if(apb)
+					ap += apall*((float)apb/100);
+				else
+					ap = float(apall);
 			}
 		}
 		else
@@ -677,39 +670,40 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 			wspeed = (float)pAttacker->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME);
 		}
 
-        //Normalized weapon damage checks.
-        if(pAttacker->IsPlayer() && ability)
-        {
-            if(ability->Effect[0] == SPELL_EFFECT_DUMMYMELEE || ability->Effect[1] == SPELL_EFFECT_DUMMYMELEE || ability->Effect[2] == SPELL_EFFECT_DUMMYMELEE)
-            {
-                it = static_cast<Player*>(pAttacker)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-                if(it)
-                {
-                    if(it->GetProto()->Class == 2) //weapon
-                    {
-                        if(it->GetProto()->InventoryType == INVTYPE_2HWEAPON) wspeed = 3300;
-                        else if(it->GetProto()->SubClass == 15) wspeed = 1700;
-                        else wspeed = 2400;
-                    }
-                }
-            }
-        }
+		//Normalized weapon damage checks.
+		if(pAttacker->IsPlayer() && ability)
+		{
+			if(ability->Effect[0] == SPELL_EFFECT_DUMMYMELEE || ability->Effect[1] == SPELL_EFFECT_DUMMYMELEE || ability->Effect[2] == SPELL_EFFECT_DUMMYMELEE)
+			{
+				it = static_cast<Player*>(pAttacker)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+
+				if(it)
+				{
+					if(it->GetProto()->Class == 2) //weapon
+					{
+						if(it->GetProto()->InventoryType == INVTYPE_2HWEAPON) wspeed = 3300;
+						else if(it->GetProto()->SubClass == 15) wspeed = 1700;
+						else wspeed = 2400;
+					}
+				}
+			}
+		}
 
 		//Weapon speed constant in feral forms
-	    if(pAttacker->IsPlayer())
-	    {
-	        if(static_cast<Player*>(pAttacker)->IsInFeralForm())
-	        {
-	            uint8 ss = static_cast<Player*>(pAttacker)->GetShapeShift();
-	            if(ss == FORM_CAT)
-	                wspeed = 1000.0;
-	            else if(ss == FORM_DIREBEAR || ss == FORM_BEAR)
-	                wspeed = 2500.0;
-	        }
-	    }
+		if(pAttacker->IsPlayer())
+		{
+			if(static_cast<Player*>(pAttacker)->IsInFeralForm())
+			{
+				uint8 ss = static_cast<Player*>(pAttacker)->GetShapeShift();
+
+				if(ss == FORM_CAT)
+					wspeed = 1000.0;
+				else if(ss == FORM_DIREBEAR || ss == FORM_BEAR)
+					wspeed = 2500.0;
+			}
+		}
 
 		bonus = (wspeed*ap)/14000.0f;
-
 		min_damage += bonus;
 		max_damage += bonus;
 	}
@@ -721,33 +715,33 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 	max_damage = min_damage;
 	min_damage = temp;
 	}*/
+
 	// Fix creatures that have no base attack damage.
 	//this is shit, critter should not have attack damage!
 	//if db is wrong we should fix db
 	//if(max_damage==0)
 	//  max_damage=5;
-	float diff = fabs(max_damage - min_damage);
 
+	float diff = fabs(max_damage - min_damage);
 	float result = min_damage;
+
 	if(diff >= 1)
 		result += float(sRand.rand(diff));
 
 	if(result >= 0)
 		return FL2UINT(result);
+
 	return 0;
 }
 
 inline bool isEven (int num)
 {
-	if ((num%2)==0) 
+	if ((num%2)==0)
 	{
 		return true;
 	}
+
 	return false;
 }
 
 #endif
-
-
-
-
