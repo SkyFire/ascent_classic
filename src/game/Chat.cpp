@@ -54,6 +54,8 @@ ChatCommand * CommandTableStorage::GetSubCommandTable(const char * name)
 		return _recallCommandTable;
 	else if(!strcmp(name, "honor"))
 		return _honorCommandTable;
+	else if(!strcmp(name, "guild"))
+		return _GuildCommandTable;
 	else if(!strcmp(name, "quest"))
 		return _questCommandTable;
 	return 0;
@@ -169,6 +171,7 @@ void CommandTableStorage::Dealloc()
 	free( _petCommandTable );
 	free( _recallCommandTable );
 	free( _honorCommandTable );
+	free( _GuildCommandTable);
 	free( _questCommandTable );
 	free( _commandTable );
 }
@@ -246,7 +249,7 @@ void CommandTableStorage::Init()
 		{ "dumpcoords", 'd', &ChatHandler::HandleDebugDumpCoordsCommmand, "", NULL, 0, 0, 0 },
 		{ "speedchange", 'd', &ChatHandler::HandleSendRunSpeedChange, "", NULL, 0, 0, 0 },
         { "sendpacket", 'd', &ChatHandler::HandleSendpacket, "<opcode ID>, <data>", NULL, 0, 0, 0 },
-
+		{ "sqlquery", 'd', &ChatHandler::HandleSQLQueryCommand, "<sql query>", NULL, 0, 0, 0 },
 		{ NULL,		   0, NULL,									  "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(debugCommandTable, _debugCommandTable);
@@ -281,6 +284,17 @@ void CommandTableStorage::Init()
 		{ NULL,			2, NULL,									   "",							 NULL, 0, 0  }
 	};
 	dupe_command_table(GMTicketCommandTable, _GMTicketCommandTable);
+
+	static ChatCommand GuildCommandTable[] =
+	{
+		{ "create",		 'm', &ChatHandler::CreateGuildCommand,  "Creates a guild.",			   NULL, 0, 0, 0},
+		{ "rename",	   'm', &ChatHandler::HandleRenameGuildCommand, "Renames a guild.",		 NULL, 0, 0, 0},
+		{ "members",	   'm', &ChatHandler::HandleGuildMembersCommand, "Lists guildmembers and their ranks.",	  NULL, 0, 0, 0},
+		{ "removeplayer",	   'm', &ChatHandler::HandleGuildRemovePlayerCommand, "Removes a player from a guild.",		 NULL, 0, 0, 0},
+		{ "disband",	   'm', &ChatHandler::HandleGuildDisbandCommand, "Disbands the guild of your target.",		 NULL, 0, 0, 0},
+		{ NULL,			2, NULL,									   "",							 NULL, 0, 0  }
+	};
+	dupe_command_table(GuildCommandTable, _GuildCommandTable);
 
 	static ChatCommand GameObjectCommandTable[] =
 	{
@@ -438,7 +452,7 @@ void CommandTableStorage::Init()
 	dupe_command_table(questCommandTable, _questCommandTable);
 
 	static ChatCommand commandTable[] = {
-		{ "renameguild", 'a', &ChatHandler::HandleRenameGuildCommand, "Renames a guild.", NULL, 0, 0, 0 },
+		//{ "renameguild", 'a', &ChatHandler::HandleRenameGuildCommand, "Renames a guild.", NULL, 0, 0, 0 },
 		{ "addguard",   'a', &ChatHandler::HandleAddGuardCommand, "Adds a guardentry to the zonetables DB and reloads.", NULL, 0, 0, 0},
 		{ "masssummon", 'z', &ChatHandler::HandleMassSummonCommand, ".masssummon - Summons all players.", NULL, 0, 0, 0},
 		{ "commands",	1, &ChatHandler::HandleCommandsCommand,		"Shows Commands",				 NULL, 0, 0, 0},
@@ -479,7 +493,7 @@ void CommandTableStorage::Init()
 		{ "levelup",	 'm', &ChatHandler::HandleLevelUpCommand,	   "",							   NULL, 0, 0, 0},
 		{ "additem",	 'm', &ChatHandler::HandleAddInvItemCommand,	"",							   NULL, 0, 0, 0},
 		{ "removeitem",  'm', &ChatHandler::HandleRemoveItemCommand,	"Removes item %u count %u.", NULL, 0, 0, 0 },
-		{ "createguild", 'l', &ChatHandler::CreateGuildCommand,		 "",							   NULL, 0, 0, 0},
+		//{ "createguild", 'l', &ChatHandler::CreateGuildCommand,		 "",							   NULL, 0, 0, 0},
 
 		{ "invincible",  'j', &ChatHandler::HandleInvincibleCommand,	".invincible - Toggles INVINCIBILITY (mobs won't attack you)", NULL, 0, 0, 0},
 		{ "invisible",   'i', &ChatHandler::HandleInvisibleCommand,	 ".invisible - Toggles INVINCIBILITY and INVISIBILITY (mobs won't attack you and nobody can see you, but they can see your chat messages)", NULL, 0, 0, 0},
@@ -517,6 +531,7 @@ void CommandTableStorage::Init()
 		{ "quest",		'q', NULL,									 "",				 questCommandTable, 0, 0, 0},
 		{ "pet",		   'm', NULL,									 "",					petCommandTable, 0, 0, 0},
 		{ "recall",		'q', NULL,									 "",				 recallCommandTable, 0, 0, 0},
+		{ "guild",		'm', NULL,									 "",				 GuildCommandTable, 0, 0, 0},
 		{ "getpos"	  ,  'd', &ChatHandler::HandleGetPosCommand,		"",							   NULL, 0, 0, 0},
 		{ "removeauras",   'm', &ChatHandler::HandleRemoveAurasCommand,   "Removes all auras from target",  NULL, 0, 0, 0},
 		{ "paralyze",	  'b', &ChatHandler::HandleParalyzeCommand,	  "Roots/Paralyzes the target.",	NULL, 0, 0, 0 },
@@ -593,6 +608,16 @@ ChatHandler::ChatHandler()
 ChatHandler::~ChatHandler()
 {
 	CommandTableStorage::getSingleton().Dealloc();
+	//Get rid of the precached skillinfo stuff -DGM
+	if(SkillNames!=0)
+	{
+		for(uint32 i = 0;i<=maxskill;i++)
+		{
+			if(SkillNames[i] != 0)
+				free(SkillNames[i]);
+		}
+		free(SkillNames);
+	}
 	delete CommandTableStorage::getSingletonPtr();
 }
 

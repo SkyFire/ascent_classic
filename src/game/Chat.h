@@ -143,6 +143,7 @@ class SERVER_DECL CommandTableStorage : public Singleton<CommandTableStorage>
 	ChatCommand * _petCommandTable;
 	ChatCommand * _recallCommandTable;
 	ChatCommand * _commandTable;
+	ChatCommand * _GuildCommandTable;
 
 	ChatCommand * GetSubCommandTable(const char * name);
 public:
@@ -235,6 +236,7 @@ protected:
 	bool HandleDebugDumpCoordsCommmand(const char * args, WorldSession * m_session);
 	bool HandleSendRunSpeedChange(const char * args, WorldSession * m_session);
     bool HandleSendpacket(const char * args, WorldSession * m_session);
+	bool HandleSQLQueryCommand(const char* args, WorldSession *m_session);
 
 	//WayPoint Commands
 	bool HandleWPAddCommand(const char* args, WorldSession *m_session);
@@ -253,6 +255,13 @@ protected:
 	bool HandleGenerateWaypoints(const char* args, WorldSession * m_session);
 	bool HandleDeleteWaypoints(const char* args, WorldSession * m_session);
 
+	// Guild commands
+	bool HandleGuildMembersCommand(const char* args, WorldSession *m_session);
+	bool CreateGuildCommand(const char* args, WorldSession *m_session);
+	bool HandleRenameGuildCommand(const char* args, WorldSession *m_session);
+	bool HandleGuildRemovePlayerCommand(const char* args, WorldSession *m_session);
+	bool HandleGuildDisbandCommand(const char* args, WorldSession *m_session);
+
 	// Level 2 commands
 	bool HandleGUIDCommand(const char* args, WorldSession *m_session);
 	bool HandleNameCommand(const char* args, WorldSession *m_session);
@@ -265,7 +274,6 @@ protected:
 	bool HandleNPCFlagCommand(const char* args, WorldSession *m_session);
 	bool HandleSaveAllCommand(const char* args, WorldSession *m_session);
 	bool HandleRegenerateGossipCommand(const char* args, WorldSession *m_session);
-	bool CreateGuildCommand(const char* args, WorldSession *m_session);
 	bool HandleStartBGCommand(const char* args, WorldSession *m_session);
 	bool HandlePauseBGCommand(const char* args, WorldSession *m_session);
 	bool HandleResetScoreCommand(const char* args, WorldSession *m_session);
@@ -289,7 +297,6 @@ protected:
 	bool HandleListAIAgentCommand(const char* args, WorldSession *m_session);
 
 	// Level 3 commands
-	bool HandleRenameGuildCommand(const char* args, WorldSession *m_session);
 	bool HandleMassSummonCommand(const char* args, WorldSession *m_session);
 	bool HandleSecurityCommand(const char* args, WorldSession *m_session);
 	bool HandleWorldPortCommand(const char* args, WorldSession *m_session);

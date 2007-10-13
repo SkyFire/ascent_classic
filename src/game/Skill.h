@@ -159,6 +159,11 @@
 #define SKILL_TYPE_PROFESSION           11
 #define SKILL_TYPE_NA                   12
 
+static char **SkillNames=0;
+static uint32 maxskill=0;
+
+//Sorry capt, i prefer it to load from the dbc's rather then hardcoded -DGM
+/*
 static char * SkillNames[] = 
 {
     0,//0
@@ -932,7 +937,7 @@ static char * SkillNames[] =
     "SKILL_PET_SERPENT",            //768
     "SKILL_INTERNAL",               //769
 };
-
+*/
 
 typedef struct{
     uint8   itemclass;

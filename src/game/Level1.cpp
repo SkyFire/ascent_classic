@@ -23,6 +23,39 @@
 
 #include "StdAfx.h"
 
+//Pre-loads skill names to a lookup table.
+//Used by the getskillinfo functions.
+//I need to place it somewhere, and i don't want to create a new file just for this...
+//...isn't this preloaded somewhere already?
+void PreLoadSkillNames()
+{
+	//If the skill names haven't been loaded yet.. "cache" load them up to the lookup table. ONCE!
+	//Once they have been loaded, it will get them straight out of the lookup table next time :)
+	if(SkillNames==0)
+	{
+		//RedSystemMessage(m_session, "Precaching Skill names...");
+		//These should actually be loaded out of the DBCStores.cpp stuff.. This will do for now.
+		DBCFile SkillDBC;
+		SkillDBC.open("./DBC/SkillLine.dbc");
+
+		//This will become the size of the skill name lookup table
+		maxskill = SkillDBC.getRecord(SkillDBC.getRecordCount()-1).getUInt(0);
+
+		SkillNames = (char **) malloc(maxskill * sizeof(char *));
+		memset(SkillNames,0,maxskill * sizeof(char *));
+
+		for(uint32 i = 0; i < SkillDBC.getRecordCount(); ++i)
+		{
+			unsigned int SkillID = SkillDBC.getRecord(i).getUInt(0);
+			const char *SkillName = SkillDBC.getRecord(i).getString(3);
+			//Allocate it..
+			SkillNames[SkillID] = (char *) malloc(strlen(SkillName)+1);
+			//When the DBCFile gets cleaned up, so is the record data, so make a copy of it..
+			memcpy(SkillNames[SkillID],SkillName,strlen(SkillName)+1);
+		}
+	}
+}
+
 bool ChatHandler::HandleAnnounceCommand(const char* args, WorldSession *m_session)
 {
 	if(!*args)
@@ -531,16 +564,21 @@ bool ChatHandler::HandleGetSkillLevelCommand(const char *args, WorldSession *m_s
 	Player *plr = getSelectedChar(m_session, true);
 	if(!plr) return false;
 
+	PreLoadSkillNames();
+
+	if(skill > maxskill)
+	{
+		BlueSystemMessage(m_session, "Skill: %u does not exists", skill);
+		return false;
+	}
+
     char * SkillName = SkillNames[skill];
-    if (!SkillName)
+
+    if (SkillName==0)
     {
         BlueSystemMessage(m_session, "Skill: %u does not exists", skill);
         return false;
     }
-
-    // hacky and possible crashy... but as the info was hand filled I know that there are
-    // no name's smaller than 6 characters
-    SkillName+=6;
     
     if (!plr->_HasSkillLine(skill))
     {
@@ -565,9 +603,11 @@ bool ChatHandler::HandleGetSkillsInfoCommand(const char *args, WorldSession *m_s
     int32  bonus = 0;
     uint32 max = 0;
 
+	PreLoadSkillNames();
+
     BlueSystemMessage(m_session, "Player: %s has skills", plr->GetName() );
 
-    for (uint32 SkillId = 0; SkillId <= SKILL_INTERNAL; SkillId++)
+    for (uint32 SkillId = 0; SkillId <= maxskill; SkillId++)
     {
         if (plr->_HasSkillLine(SkillId))
         {
@@ -581,8 +621,6 @@ bool ChatHandler::HandleGetSkillsInfoCommand(const char *args, WorldSession *m_s
             nobonus = plr->_GetSkillLineCurrent(SkillId,false);
             bonus = plr->_GetSkillLineCurrent(SkillId,true) - nobonus;
             max = plr->_GetSkillLineMax(SkillId);
-            
-            SkillName+=6; // hacky trick to get nice skill text
 
             BlueSystemMessage(m_session, "  %s: Value: %u, MaxValue: %u. (+ %d bonus)", SkillName, nobonus,max, bonus);
         }
@@ -645,9 +683,9 @@ bool ChatHandler::HandleModifyGoldCommand(const char* args, WorldSession *m_sess
 		newgold = 0;
 	} else {
 		if(newgold > currentgold)
-			GreenSystemMessageToPlr(chr, "%s added %d gold from your backpack.", m_session->GetPlayer()->GetName(), myabs(gold));
+			GreenSystemMessageToPlr(chr, "%s added %d gold to your backpack.", m_session->GetPlayer()->GetName(), myabs(gold));
 		else
-			GreenSystemMessageToPlr(chr, "%s took %d gold to your backpack.", m_session->GetPlayer()->GetName(), myabs(gold));
+			GreenSystemMessageToPlr(chr, "%s took %d gold from your backpack.", m_session->GetPlayer()->GetName(), myabs(gold));
 	}
 
 	chr->SetUInt32Value(PLAYER_FIELD_COINAGE, newgold);
@@ -728,7 +766,7 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 	{
 		snprintf(sql, 512, "UPDATE creature_spawns SET respawnlink = '%u' WHERE id = '%u'", (unsigned int)id, (unsigned int)target->GetSQL_id());
 		WorldDatabase.Execute( sql );
-		BlueSystemMessage(m_session, "Spawn linking for this npc has been updated: %u", id);
+		BlueSystemMessage(m_session, "Spawn linking for this NPC has been updated: %u", id);
 	}
 	else
 	{

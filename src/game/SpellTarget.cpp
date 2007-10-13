@@ -246,17 +246,7 @@ void Spell::FillTargetMap(uint32 i)
 //#define I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
 void Spell::SpellTargetNULL(uint32 i, uint32 j)
 {
-    uint32 UnhandledTargetType = 0;
-    if (j == 0)
-    {
-        UnhandledTargetType = m_spellInfo->EffectImplicitTargetA[j];
-
-    }
-    else
-    {
-        UnhandledTargetType = m_spellInfo->EffectImplicitTargetB[j];
-    }
-    sLog.outDebug("[SPELL][TARGET] Unhandled target type: %u", UnhandledTargetType);
+    sLog.outDebug("[SPELL][TARGET] Unhandled target typeA: %u typeB: %u", m_spellInfo->EffectImplicitTargetA[j], m_spellInfo->EffectImplicitTargetB[j]);
 
     #ifdef I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
         TargetsList *tmpMap=&m_targetUnits[i];

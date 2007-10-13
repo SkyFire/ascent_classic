@@ -253,28 +253,36 @@ void QuestMgr::BuildOfferReward(WorldPacket *data, Quest* qst, Object* qst_giver
 	*data << uint32(1);										 // emote type
 
 	*data << qst->count_reward_choiceitem;
-	for(uint32 i = 0; i < 6; ++i)
-	{
-		if(qst->reward_choiceitem[i])
-		{
-			*data << qst->reward_choiceitem[i];
-			*data << qst->reward_choiceitemcount[i];
-			it = ItemPrototypeStorage.LookupEntry(qst->reward_choiceitem[i]);
-			*data << (it ? it->DisplayInfoID : uint32(0));
-		}
-	}
+	if (qst->count_reward_choiceitem)
+    {
+        for(uint32 i = 0; i < 6; ++i)
+        {
+            if(qst->reward_choiceitem[i])
+            {
+                *data << qst->reward_choiceitem[i];
+                *data << qst->reward_choiceitemcount[i];
+                it = ItemPrototypeStorage.LookupEntry(qst->reward_choiceitem[i]);
+                *data << (it ? it->DisplayInfoID : uint32(0));
+            }
+        }
+    }
+    
 
 	*data << qst->count_reward_item;
-	for(uint32 i = 0; i < 6; ++i)
-	{
-		if(qst->reward_item[i])
-		{
-			*data << qst->reward_item[i];
-			*data << qst->reward_itemcount[i];
-			it = ItemPrototypeStorage.LookupEntry(qst->reward_item[i]);
-			*data << (it ? it->DisplayInfoID : uint32(0));
-		}
-	}
+    if (qst->count_reward_item)
+    {
+        for(uint32 i = 0; i < 6; ++i)
+        {
+            if(qst->reward_item[i])
+            {
+                *data << qst->reward_item[i];
+                *data << qst->reward_itemcount[i];
+                it = ItemPrototypeStorage.LookupEntry(qst->reward_item[i]);
+                *data << (it ? it->DisplayInfoID : uint32(0));
+            }
+        }
+    }
+	
 
 	*data << qst->reward_money;
 	*data << qst->reward_spell;

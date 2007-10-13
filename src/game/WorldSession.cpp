@@ -375,8 +375,8 @@ void WorldSession::BuildItemPushResult(WorldPacket *data, uint64 guid, uint32 ty
     *data << itemid;
 	//not sure if random property. 
 	//For quest items also sent at loot list but it's changing in time.
-	//in SMSG_ITEM_PUSH_RESULT packet it's used as sent in first occurance of lootlist packet
-    *data << randomprop; 
+	//in SMSG_ITEM_PUSH_RESULT packet it's used as sent in first ccurance of lootlist packet
+    *data << randomprop;
     *data << proto->Quality;
     *data << count;
     *data << count_have;

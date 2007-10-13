@@ -154,7 +154,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	castedItemId = 0;
 	
 	m_usesMana = false;
-	failed = false;
+	SetSpellFailed();
 	hadEffect = false;
 	bDurSet=false;
 	bRadSet[0]=false;
@@ -172,7 +172,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	corpseTarget = NULL;
 	judgement = false;
 	add_damage = 0;
-	m_delayed = false;
+	m_Delayed = false;
 	pSpellId = 0;
 	m_cancelled = false;
 	ProcedOnSpell = 0;
@@ -183,7 +183,7 @@ Spell::~Spell()
 	if(u_caster && u_caster->GetCurrentSpell() == this)
 		u_caster->SetCurrentSpell(NULL); 
 	
-	if((cancastresult == -1 && !failed) || hadEffect)
+	if((cancastresult == -1 && !GetSpellFailed()) || hadEffect)
 		RemoveItems();
 }
 
@@ -881,7 +881,7 @@ void Spell::cancel()
 		if(u_caster)
 			u_caster->RemoveAura(m_spellInfo->Id);
 	
-		if(m_timer > 0 || m_delayed)
+		if(m_timer > 0 || m_Delayed)
 		{
 			if(p_caster && p_caster->IsInWorld())
 			{
@@ -1048,8 +1048,10 @@ void Spell::cast(bool check)
 			AddCooldown();
 		
 		for(uint32 i=0;i<3;i++)
-			if(m_spellInfo->Effect[i] && m_spellInfo->Effect[i]!=27)
+        {
+			if(m_spellInfo->Effect[i] && m_spellInfo->Effect[i] != SPELL_EFFECT_PERSISTENT_AREA_AURA)
 				 FillTargetMap(i);
+        }
 
 		if(p_caster)
 		{
@@ -1075,14 +1077,6 @@ void Spell::cast(bool check)
 			}
 		}
 
-		/*if (m_spellInfo->RecoveryTime && m_caster->IsPlayer() && m_caster->IsInWorld())
-		{
-			WorldPacket data(SMSG_SPELL_COOLDOWN, 15);
-			data << (uint32)m_spellInfo->Id << m_caster->GetNewGUID();
-			data << (uint16)m_spellInfo->RecoveryTime; // from dbc
-			((Player*)m_caster)->GetSession()->SendPacket (&data);
-		}*/
-
 		/*SpellExtraInfo* sp = objmgr.GetSpellExtraData(m_spellInfo->Id);
 		if(sp)
 		{
@@ -1100,17 +1094,9 @@ void Spell::cast(bool check)
 
 			if (m_spellInfo->Flags4 & 0x8000 && m_caster->IsPlayer() && m_caster->IsInWorld())
 			{
-				WorldPacket data(SMSG_SPELL_COOLDOWN, 15);
-				data << (uint32)m_spellInfo->Id << m_caster->GetNewGUID();
-				if (m_spellInfo->RecoveryTime)
-					data << (uint16)m_spellInfo->RecoveryTime;
-				else
-					data << (uint16)(2300); // hack fix for shoot spells, should be some other resource for it
-
-				((Player*)m_caster)->GetSession()->SendPacket (&data);
-				
-				// Hack fix for the channel error on wands
-				// this needs to be properly fixed!!!!
+                /// Part of this function contains a hack fix
+                /// hack fix for shoot spells, should be some other resource for it
+                p_caster->SendSpellCoolDown(m_spellInfo->Id, m_spellInfo->RecoveryTime ? m_spellInfo->RecoveryTime : 2300);
 			}
 			else
 			{			
@@ -1153,7 +1139,7 @@ void Spell::cast(bool check)
 			std::vector<uint64>::iterator i;
 			
 			// this is here to avoid double search in the unique list
-			bool canreflect = false, reflected = false;
+			//bool canreflect = false, reflected = false;
 			for(int j=0;j<3;j++)
 			{
 				switch(m_spellInfo->EffectImplicitTargetA[j])
@@ -1162,59 +1148,56 @@ void Spell::cast(bool check)
 					case 22:
 					case 24:
 					case 25:
-						canreflect = true;
+						SetCanReflect();
 						break;
 				}
-				if(canreflect)
+				if(GetCanReflect())
 					continue;
 				else
 					break;
 			}
 
-			if(canreflect && m_caster->IsInWorld())
+			if(GetCanReflect() && m_caster->IsInWorld())
 			{
 				for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 				{
 					Unit *Target = m_caster->GetMapMgr()->GetUnit(*i);
 					if(Target)
-					   reflected = reflect(Target);
+                    {
+                       SetReflected(Reflect(Target));
+                    }
 					
-					if(reflected)
+                    // if the spell is reflected
+					if(IsReflected())
 						break;
 				}
 			}
 			bool isDuelEffect = false;
-			if(!reflected)
+
+            // if the spell is not reflected
+			if(!IsReflected())
 			{
 				for(uint32 x=0;x<3;x++)
 				{
+                    // check if we actualy have a effect
 					if(m_spellInfo->Effect[x])
 					{
 						isDuelEffect = isDuelEffect ||  m_spellInfo->Effect[x] == SPELL_EFFECT_DUEL;
 						if(m_spellInfo->Effect[x] == SPELL_EFFECT_PERSISTENT_AREA_AURA)
+                        {
 							HandleEffects(m_caster->GetGUID(),x);
-						else  
+                        }
+						else if (m_targetUnits[x].size()>0)
 						{
-	/*						if(m_spellInfo->TargetAuraState)
-							{
-								for(i= m_targetUnits[x].begin();i != m_targetUnits[x].end();i++)
-								{
-									HandleEffects((*i),x);
-									//do not swap orders or unittarget will not be valid
-									Unit *ut=GetUnitTarget();
-									if(ut)
-										ut->RemoveFlag(UNIT_FIELD_AURASTATE,m_spellInfo->TargetAuraState);
-								}
-							}
-							else*/
-							if (m_targetUnits[x].size()>0)
-							{
-								for(i= m_targetUnits[x].begin();i != m_targetUnits[x].end();i++)
-									HandleEffects((*i),x);
-							}
-							else if(m_spellInfo->Effect[x] == SPELL_EFFECT_TELEPORT_UNITS)
-									HandleEffects(m_caster->GetGUID(),x);
+							for(i= m_targetUnits[x].begin();i != m_targetUnits[x].end();i++)
+                            {
+								HandleEffects((*i),x);
+                            }
 						}
+						else if(m_spellInfo->Effect[x] == SPELL_EFFECT_TELEPORT_UNITS)
+                        {
+							HandleEffects(m_caster->GetGUID(),x);
+                        }
 					}
 				}
 	
@@ -1337,7 +1320,7 @@ void Spell::AddTime(uint32 type)
 			int32 delay = GetDuration()/3;
 			m_timer-=delay;
 			p_caster->delayAttackTimer(-delay);
-			m_delayed = true;
+			m_Delayed = true;
 			if(m_timer>0)
 				SendChannelUpdate(m_timer);
 
@@ -1418,7 +1401,7 @@ void Spell::finish()
 	{
 		u_caster->m_canMove = true;
  
-		if(m_usesMana && !failed && u_caster->GetPowerType()==POWER_TYPE_MANA) 
+		if(m_usesMana && !GetSpellFailed() && u_caster->GetPowerType()==POWER_TYPE_MANA) 
 		{
 			u_caster->setPRegenTimer(5000); /* 5 Seconds */
 			u_caster->setPIRegenTimer(2000);
@@ -1434,7 +1417,7 @@ void Spell::finish()
 	//enable pvp when attacking another player with spells
 	if(p_caster)
 	{
-		if(m_requiresCP && !failed)
+		if(m_requiresCP && !GetSpellFailed())
 		{
 			if(p_caster->m_spellcomboPoints)
 			{
@@ -1444,7 +1427,7 @@ void Spell::finish()
 			else
 				p_caster->NullComboPoints();
 		}
-		if(m_delayed)
+		if(m_Delayed)
 		{
 			Unit *pTarget = p_caster->GetMapMgr()->GetUnit(m_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT));
 			if(!pTarget)
@@ -1479,7 +1462,7 @@ void Spell::finish()
 void Spell::SendCastResult(int16 result)
 {
 	if(result != -1)
-		failed = true;
+		SetSpellFailed();
 
 	if(!m_caster->IsInWorld())
 		return;
@@ -1791,7 +1774,7 @@ void Spell::SendLogExecute(uint32 damage, uint64 & targetGuid)
 void Spell::SendInterrupted(uint8 result)
 {
 	if(result != (uint8)-1)
-		failed = true;
+		SetSpellFailed();
 	if(!m_caster->IsInWorld())
 		return;
 
@@ -3335,7 +3318,7 @@ void Spell::Heal(int32 amount)
 	if(p_caster)
 		p_caster->last_heal_spell=m_spellInfo;
 
-    //self healing shouldnt flag himself
+    //self healing shouldn't flag himself
 	if(p_caster && playerTarget && p_caster != playerTarget)
 	{
 		// Healing a flagged target will flag you.
@@ -3542,14 +3525,16 @@ void Spell::SafeAddModeratedTarget(uint64 guid, uint16 type)
 	ModeratedTargets.push_back(SpellTargetMod(guid, type));
 }
 
-bool Spell::reflect(Unit *refunit)
+bool Spell::Reflect(Unit *refunit)
 {
-	SpellEntry *refspell = NULL;
+	SpellEntry * refspell = NULL;
 
 	// if the spell to reflect is a reflect spell, do nothing.
 	for(int i=0; i<3; i++)
+    {
 		if(m_spellInfo->Effect[i] == 6 && (m_spellInfo->EffectApplyAuraName[i] == 74 || m_spellInfo->EffectApplyAuraName[i] == 28))
 			return false;
+    }
 	for(std::list<struct ReflectSpellSchool*>::iterator i = refunit->m_reflectSpellSchool.begin();i != refunit->m_reflectSpellSchool.end();i++)
 	{
 		if((*i)->school == -1 || (*i)->school == (int32)m_spellInfo->School)
@@ -3558,7 +3543,9 @@ bool Spell::reflect(Unit *refunit)
 			{
 				//the god blessed special case : mage - Frost Warding = is an augmentation to frost warding
 				if((*i)->require_aura_hash && u_caster && !u_caster->HasAurasWithNameHash((*i)->require_aura_hash))
+                {
 					continue;
+                }
 				refspell = m_spellInfo;
 			}
 		}

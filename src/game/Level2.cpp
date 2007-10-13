@@ -100,11 +100,8 @@ bool ChatHandler::CreateGuildCommand(const char* args, WorldSession *m_session)
 	if(!*args)
 		return false;
 
-	Player * ptarget = m_session->GetPlayer()->GetMapMgr()->GetPlayer(m_session->GetPlayer()->GetSelection());
-	if(ptarget == 0)
-	{
-		ptarget = m_session->GetPlayer();
-	}
+	Player * ptarget = getSelectedChar(m_session);
+	if(!ptarget) return false;
 
 	if(strlen((char*)args)>75)
 	{

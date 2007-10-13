@@ -1428,7 +1428,9 @@ public:
     void AddTime(uint32 type);
     void AddCooldown();
     void AddStartCooldown();
-    bool reflect(Unit *refunit);
+
+
+    bool Reflect(Unit * refunit);
 
     inline uint32 getState() { return m_spellState; }
     inline void SetUnitTarget(Unit *punit){unitTarget=punit;}
@@ -1769,32 +1771,55 @@ public:
 		m_cancelled = true;
 	}
 
+    /// Spell state's
+    /// Spell failed
+    inline bool GetSpellFailed(){return m_Spell_Failed;}
+    inline void SetSpellFailed(bool failed = true){m_Spell_Failed = failed;}
+
+    inline bool IsReflected() {return m_IsReflected;}
+    inline void SetReflected(bool reflected = true) {m_IsReflected = reflected;}
+    
+    /// Spell possibility's
+    inline bool GetCanReflect() {return m_CanRelect;}
+    inline void SetCanReflect(bool reflect = true) {m_CanRelect = reflect;}
+
+
 protected:
-    bool m_usesMana;
-    bool failed;//for 5sr
+
+    /// Spell state's
+    bool    m_usesMana;
+    bool    m_Spell_Failed;        //for 5sr
+    bool    m_IsReflected;
+    bool    m_Delayed;
+    
+    
+    // Spell possibility's
+    bool m_CanRelect;
+
+
     bool hadEffect;
     uint8 usedItem;
 
-    uint32 m_spellState;
-    int32 m_castTime;
-    int32 m_timer;
-    bool m_delayed;
+    uint32  m_spellState;
+    int32   m_castTime;
+    int32   m_timer;
+    
     
 
     // Current Targets to be used in effect handler
-    Unit* unitTarget;
-    Item* itemTarget;
+    Unit*       unitTarget;
+    Item*       itemTarget;
     GameObject* gameObjTarget;
-    Player* playerTarget;
-    Corpse* corpseTarget;
-    uint32 add_damage;
+    Player*     playerTarget;
+    Corpse*     corpseTarget;
+    uint32      add_damage;
 
-    int8 cancastresult;
-    uint32 Dur;
-    bool bDurSet;
-    float Rad[3];
-    bool bRadSet[3];
-	bool m_cancelled;
+    int8        cancastresult;
+    uint32      Dur;
+    bool        bDurSet;
+    float       Rad[3];
+    bool        bRadSet[3];
+	bool        m_cancelled;
     //void _DamageRangeUpdate();
 
 private:

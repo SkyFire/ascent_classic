@@ -1290,7 +1290,7 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 	
     SendLogXPGain(guid,xp,restxp,guid == 0 ? true : false);
 
-	/*uint32 curXP = GetUInt32Value(PLAYER_XP);
+    /*uint32 curXP = GetUInt32Value(PLAYER_XP);
 	uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
 	uint32 newXP = curXP + xp;
 	uint32 level = GetUInt32Value(UNIT_FIELD_LEVEL);
@@ -5227,30 +5227,20 @@ void Player::SendInitialLogonPackets()
 #endif
 
 #ifndef USING_BIG_ENDIAN
-	StackWorldPacket<32> data(SMSG_BINDPOINTUPDATE);
+    StackWorldPacket<32> data(SMSG_BINDPOINTUPDATE);
+    data << m_bind_pos_x;
+    data << m_bind_pos_y;
+    data << m_bind_pos_z;
+    data << m_bind_mapid;
+    data << m_bind_zoneid;
+    GetSession()->SendPacket( &data );
 #else
-	WorldPacket data(SMSG_BINDPOINTUPDATE, 32);
+    SendBindPointUpdate(m_bind_pos_x,m_bind_pos_y,m_bind_pos_z,m_bind_mapid,m_bind_zoneid);
 #endif
-	data << m_bind_pos_x;
-	data << m_bind_pos_y;
-	data << m_bind_pos_z;
-	data << m_bind_mapid;
-	data << m_bind_zoneid;
-	GetSession()->SendPacket( &data );
 
-	//Proficiences
-	data.Initialize(SMSG_SET_PROFICIENCY);   
-	data << (uint8)4;
-	data << armor_proficiency ; 
-	GetSession()->SendPacket(&data);
-#ifndef USING_BIG_ENDIAN
-	data.Clear();
-#else
-	data.clear();
-#endif
-	data << (uint8)2;
-	data << weapon_proficiency; 
-	GetSession()->SendPacket(&data);
+	//Proficiencies
+    SendSetProficiency(4,armor_proficiency);
+    SendSetProficiency(2,weapon_proficiency);
   
 	//Tutorial Flags
 	data.Initialize( SMSG_TUTORIAL_FLAGS );
@@ -8296,22 +8286,19 @@ void Player::_AddSkillLine(uint32 SkillLine, uint32 Current, uint32 Max)
 		m_skills.insert( make_pair( SkillLine, inf ) );
 		_UpdateSkillFields();
 
-		//Add to proficeincy
+		//Add to proficiency
 		if((prof=(ItemProf *)GetProficiencyBySkill(SkillLine)))
 		{
-			WorldPacket data(SMSG_SET_PROFICIENCY, 8);
-			data << prof->itemclass;
-			if(prof->itemclass==4)
-			{
-				armor_proficiency|=prof->subclass;
-				data << armor_proficiency;
-			}else
-			{
-				weapon_proficiency|=prof->subclass;
-				data << weapon_proficiency;
-			}
-			GetSession()->SendPacket(&data);
-		}
+            if(prof->itemclass==4)
+            {
+                armor_proficiency|=prof->subclass;
+                SendSetProficiency(prof->itemclass,armor_proficiency);
+            }else
+            {
+                weapon_proficiency|=prof->subclass;
+                SendSetProficiency(prof->itemclass,weapon_proficiency);
+            }
+    	}
 	}
 }
 

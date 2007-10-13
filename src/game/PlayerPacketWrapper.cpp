@@ -54,9 +54,53 @@ struct LogQuestXPGainPacket
     uint8  type;                                    // Unknown.. seems to always be 0		
 };
 
+struct CastResultPacketWExtra
+{
+    uint32 SpellId;
+    uint8 ErrorMessage;
+    uint32 Extra;
+};
+
+struct CastResultPacket
+{
+    uint32 SpellId;
+    uint8 ErrorMessage;
+};
+
+struct BindPointUpdatePacket
+{
+    float pos_x;
+    float pos_y;
+    float pos_z;
+    uint32 mapid;
+    uint32 zoneid;
+};
+
+struct SetProfinciencyPacket
+{
+    uint8 ItemClass;
+    uint32 Profinciency;
+};
+
+struct EnvironmentalDamageLogPacket
+{
+    uint64 Guid;
+    uint8  Type;
+    uint32 Damage;
+};
+
+struct LoginVerifyWorldPacket
+{
+    uint32 MapId;
+    float  X;
+    float  Y;
+    float  Z;
+    float  O;
+};
+
 #pragma pack(pop)
 
-    
+  
 void Player::SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4)
 {
     Levelup_Info_Packet packet;
@@ -93,36 +137,93 @@ void Player::SendSpellCoolDown(uint32 SpellID, uint16 Time)
 
 void Player::SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra)
 {
-#ifndef USING_BIG_ENDIAN
-    StackWorldPacket<9> data(SMSG_CAST_RESULT);
-#else
-    WorldPacket data(SMSG_CAST_RESULT, 9);
-#endif
-    data << SpellId;
-    data << ErrorMessage;
-    if (Extra)
-        data << Extra;
-    GetSession()->SendPacket(&data);
+    if (!Extra)
+    {
+        CastResultPacket packet;
+        packet.SpellId = SpellId;
+        packet.ErrorMessage = ErrorMessage;
+        GetSession()->OutPacket(SMSG_CAST_RESULT, sizeof(CastResultPacket),(const char*)&packet);
+    }
+    else
+    {
+        CastResultPacketWExtra packet;
+        packet.SpellId = SpellId;
+        packet.ErrorMessage = ErrorMessage;
+        packet.Extra = Extra;
+        GetSession()->OutPacket(SMSG_CAST_RESULT, sizeof(CastResultPacketWExtra),(const char*)&packet);
+    }
 }
 
-void Player::SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, uint8 type)
+void Player::SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, bool type)
 {
-    if (!type)
+    if (type == false)
     {
         LogXPGainPacket packet;
         packet.guid     = guid;
         packet.xp       = NormalXP;
-        packet.type     = type;
+        packet.type     = (uint8)type;
         packet.restxp   = RestedXP;
         packet.unk2     = 1.0f;
         GetSession()->OutPacket(SMSG_LOG_XPGAIN, sizeof(LogXPGainPacket),(const char*)&packet);
     }
-    else if (type == 1)
+    else if (type == true)
     {
         LogQuestXPGainPacket packet;
         packet.guid = 0; // does not need to be set for quest xp
         packet.xp = NormalXP;
-        packet.type = type;
+        packet.type = (uint8)type;
         GetSession()->OutPacket(SMSG_LOG_XPGAIN, sizeof(LogQuestXPGainPacket),(const char*)&packet);
     }
 }
+
+
+void Player::SendBindPointUpdate(float x,float y,float z,uint32 mapid,uint32 zoneid)
+{
+    BindPointUpdatePacket packet;
+    packet.pos_x = x;
+    packet.pos_y = y;
+    packet.pos_z = z;
+    packet.mapid = mapid;
+    packet.zoneid = zoneid;
+    GetSession()->OutPacket(SMSG_BINDPOINTUPDATE, sizeof(BindPointUpdatePacket),(const char*)&packet);
+}
+
+void Player::SendSetProficiency(uint8 ItemClass, uint32 Proficiency)
+{
+    SetProfinciencyPacket packet;
+    packet.ItemClass = ItemClass;
+    packet.Profinciency = Proficiency;
+    GetSession()->OutPacket(SMSG_SET_PROFICIENCY, sizeof(SetProfinciencyPacket),(const char*)&packet);
+}
+
+// this one needs to be send inrange...
+void Player::SendEnvironmentalDamageLog(uint64 & guid, uint8 type, uint32 damage)
+{
+    EnvironmentalDamageLogPacket packet;
+    packet.Guid = guid;
+    packet.Damage = damage;
+    packet.Type = type;
+    GetSession()->OutPacket(SMSG_ENVIRONMENTALDAMAGELOG, sizeof(EnvironmentalDamageLogPacket),(const char*)&packet);
+}
+
+void Player::SendLoginVerifyWorld(uint32 MapId, float x, float y, float z, float o)
+{
+    LoginVerifyWorldPacket packet;
+    packet.MapId = MapId;
+    packet.X = x;
+    packet.Y = y;
+    packet.Z = z;
+    packet.O = o;
+    GetSession()->OutPacket(SMSG_LOGIN_VERIFY_WORLD, sizeof(LoginVerifyWorldPacket),(const char*)&packet);
+};
+
+void Player::SendLoginVerifyWorld()
+{
+    LoginVerifyWorldPacket packet;
+    packet.MapId = GetMapId();
+    packet.X = GetPositionX();
+    packet.Y = GetPositionY();
+    packet.Z = GetPositionZ();
+    packet.O = GetOrientation();
+    GetSession()->OutPacket(SMSG_LOGIN_VERIFY_WORLD, sizeof(LoginVerifyWorldPacket),(const char*)&packet);
+};

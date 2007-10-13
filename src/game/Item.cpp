@@ -285,9 +285,6 @@ void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
 	m_isDirty = false;
 }
 
-
-
-
 void Item::DeleteFromDB()
 {
 	if(m_itemProto->ContainerSlots>0)
@@ -318,8 +315,8 @@ uint32 GetSkillByProto(uint32 Class, uint32 SubClass)
 	{
 		return arm_skills[SubClass];
 
-	} else 
-	if(Class == 2)
+	} 
+    else if(Class == 2)
 	{
 		if(SubClass < 20)//no skill for fishing
 		{

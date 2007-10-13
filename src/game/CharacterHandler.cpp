@@ -597,14 +597,7 @@ void WorldSession::FullLogin(Player * plr)
 	SendPacket(&datab);
 
 	/* world preload */
-	datab.Initialize(SMSG_LOGIN_VERIFY_WORLD);
-	datab << plr->GetMapId();
-	datab << plr->GetPositionX()
-		<< plr->GetPositionY()  
-		<< plr->GetPositionZ()
-		<< plr->GetOrientation();
-
-	SendPacket(&datab);
+    plr->SendLoginVerifyWorld();
 
 	// send voicechat state - active/inactive
 	/*

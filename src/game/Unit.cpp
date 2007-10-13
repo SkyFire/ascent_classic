@@ -139,6 +139,7 @@ Unit::Unit()
 	m_stealthLevel = 0;
 	m_stealthDetectBonus = 0;
 	m_stealth = 0;
+	m_can_stealth = true;
 	m_sleep = 0;
 	
 	for(uint32 x=0;x<5;x++)
@@ -1816,6 +1817,10 @@ else
 //==========================================================================================
 //==============================Post Roll Damage Processing=================================
 //==========================================================================================
+			/* Debugcode
+		if (ability)
+			printf("PCTDMGMOD %d ED %d AD %d DFD %d\n",pct_dmg_mod,exclusive_damage,add_damage_dmg.full_damage);
+			*/
 //--------------------------absorption------------------------------------------------------
 			uint32 dm = dmg.full_damage;
 			abs = pVictim->AbsorbDamage(0,(uint32*)&dm);
@@ -1884,7 +1889,7 @@ else
 	}
 //--------------------------dirty fixes-----------------------------------------------------
 	//vstate=1-wound,2-dodge,3-parry,4-interrupt,5-block,6-evade,7-immune,8-deflect	
-	// hack fix for stormstirke loop here.
+	// hack fix for stormstike loop here.
 	if(damage_type != DUALWIELD && !disable_proc)
     {
 		if( !(ability && ability->NameHash == 0x2535ed19) )

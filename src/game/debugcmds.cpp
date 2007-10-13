@@ -932,6 +932,29 @@ bool ChatHandler::HandleDebugDumpCoordsCommmand(const char * args, WorldSession 
 	return true;
 }
 
+//As requested by WaRxHeAd for database development.
+//This should really only be available in special cases and NEVER on real servers... -DGM
+bool ChatHandler::HandleSQLQueryCommand(const char* args, WorldSession *m_session)
+{
+	#ifdef _ONLY_FOOLS_TRY_THIS_
+	if(!*args)
+	{
+		RedSystemMessage(m_session, "No query given.");
+		return false;
+	}
+	
+	bool isok = WorldDatabase.Execute(args);
+
+	if(isok)
+		GreenSystemMessage(m_session, "Query was executed successfully.");
+	else
+		RedSystemMessage(m_session, "Query failed to execute.");
+
+	#endif
+
+	return true;
+}
+
 //#define _ONLY_FOOLS_TRY_THIS_
 
 bool ChatHandler::HandleSendpacket(const char * args, WorldSession * m_session)

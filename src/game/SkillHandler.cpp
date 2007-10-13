@@ -220,5 +220,4 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recv_data)
 		if(sk->type==SKILL_TYPE_PROFESSION && points_remaining<2)
 			_player->SetUInt32Value(PLAYER_CHARACTER_POINTS2,points_remaining+1);
 	}
-
 }
