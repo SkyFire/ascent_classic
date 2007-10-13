@@ -4427,8 +4427,7 @@ void Unit::OnClearAttackTarget()
 	{
 
 		AttackerSet::iterator itr = m_attackers.begin();
-		++itr;
-		while (itr !=m_attackers.end())
+		while (m_attackers.size()>0 && itr !=m_attackers.end())
 		{
 			Unit* pUnit = GetMapMgr()->GetUnit(*itr);
 			if (!pUnit)
@@ -4444,8 +4443,8 @@ void Unit::OnClearAttackTarget()
 			}
 			else
 			{
-				++itr;
 				this->removeAttacker(pUnit);
+				++itr;
 			}
 		}
 		//all attackers is dead.
