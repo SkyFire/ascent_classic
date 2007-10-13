@@ -4327,7 +4327,7 @@ void CombatStatusHandler::UpdateFlag()
 		m_lastStatus = n_status;
 		if(n_status)
 		{
-			printf(I64FMT" is now in combat.\n", m_Unit->GetGUID());
+			//printf(I64FMT" is now in combat.\n", m_Unit->GetGUID());
 			m_Unit->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
 			if(!m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->addStateFlag(UF_ATTACKING);
 
@@ -4336,7 +4336,7 @@ void CombatStatusHandler::UpdateFlag()
 		}
 		else
 		{
-			printf(I64FMT" is no longer in combat.\n", m_Unit->GetGUID());
+			//printf(I64FMT" is no longer in combat.\n", m_Unit->GetGUID());
 			m_Unit->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
 			if(m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->clearStateFlag(UF_ATTACKING);
 		}
@@ -4360,7 +4360,7 @@ bool CombatStatusHandler::InternalIsInCombat()
 void CombatStatusHandler::AddAttackTarget(const uint64& guid)
 {
 	m_attackTargets.insert(guid);
-	printf("Adding attack target "I64FMT" to "I64FMT"\n", guid, m_Unit->GetGUID());
+	//printf("Adding attack target "I64FMT" to "I64FMT"\n", guid, m_Unit->GetGUID());
 	if(m_Unit->GetTypeId() == TYPEID_PLAYER &&
 		m_primaryAttackTarget != guid)			// players can only have one attack target.
 	{
@@ -4375,7 +4375,7 @@ void CombatStatusHandler::AddAttackTarget(const uint64& guid)
 
 void CombatStatusHandler::ClearPrimaryAttackTarget()
 {
-	printf("ClearPrimaryAttackTarget for "I64FMT"\n", m_Unit->GetGUID());
+	//printf("ClearPrimaryAttackTarget for "I64FMT"\n", m_Unit->GetGUID());
 	if(m_primaryAttackTarget != 0)
 	{
 		Unit * pt = m_Unit->GetMapMgr()->GetUnit(m_primaryAttackTarget);
@@ -4425,15 +4425,15 @@ void CombatStatusHandler::RemoveAttackTarget(Unit * pTarget)
 
 	if(!IsAttacking(pTarget))
 	{
-		printf("Removing attack target "I64FMT" on "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
+		//printf("Removing attack target "I64FMT" on "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
 		m_attackTargets.erase(itr);
 		if(m_primaryAttackTarget == pTarget->GetGUID())
 			m_primaryAttackTarget = 0;
 
 		UpdateFlag();
 	}
-	else
-		printf("Cannot remove attack target "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
+	/*else
+		printf("Cannot remove attack target "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());*/
 }
 
 void CombatStatusHandler::RemoveAttacker(Unit * pAttacker, const uint64& guid)
@@ -4444,20 +4444,20 @@ void CombatStatusHandler::RemoveAttacker(Unit * pAttacker, const uint64& guid)
 
 	if( (!pAttacker) || (!pAttacker->CombatStatus.IsAttacking(m_Unit)) )
 	{
-		printf("Removing attacker "I64FMT" from "I64FMT"\n", guid, m_Unit->GetGUID());
+		//printf("Removing attacker "I64FMT" from "I64FMT"\n", guid, m_Unit->GetGUID());
 		m_attackers.erase(itr);
 		UpdateFlag();
 	}
-	else
+	/*else
 	{
 		printf("Cannot remove attacker "I64FMT" from "I64FMT"\n", guid, m_Unit->GetGUID());
-	}
+	}*/
 }
 
 void CombatStatusHandler::OnDamageDealt(Unit * pTarget)
 {
 	// we added an aura, or dealt some damage to a target. they need to have us as an attacker, and they need to be our attack target if not.
-	printf("OnDamageDealt to "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
+	//printf("OnDamageDealt to "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
 	AttackerMap::iterator itr = m_attackTargets.find(pTarget->GetGUID());
 	if(itr == m_attackTargets.end())
 		AddAttackTarget(pTarget->GetGUID());
