@@ -139,6 +139,7 @@ Unit::Unit()
 	m_stealthLevel = 0;
 	m_stealthDetectBonus = 0;
 	m_stealth = 0;
+	m_can_stealth = true;
 	m_sleep = 0;
 	
 	for(uint32 x=0;x<5;x++)
@@ -1154,7 +1155,9 @@ bool Unit::IsInInstance()
 {
 	MapInfo *pMapinfo = WorldMapInfoStorage.LookupEntry(this->GetMapId());
 	if (pMapinfo)
-		return (pMapinfo->type != INSTANCE_NULL);
+		return (pMapinfo->type == INSTANCE_RAID ||
+				pMapinfo->type == INSTANCE_NONRAID ||
+				pMapinfo->type == INSTANCE_MULTIMODE);
 
 	return false;
 }
@@ -1822,6 +1825,10 @@ else
 //==========================================================================================
 //==============================Post Roll Damage Processing=================================
 //==========================================================================================
+			/* Debugcode
+		if (ability)
+			printf("PCTDMGMOD %d ED %d AD %d DFD %d\n",pct_dmg_mod,exclusive_damage,add_damage_dmg.full_damage);
+			*/
 //--------------------------absorption------------------------------------------------------
 			uint32 dm = dmg.full_damage;
 			abs = pVictim->AbsorbDamage(0,(uint32*)&dm);
@@ -2959,7 +2966,7 @@ void Unit::OnRemoveInRangeObject(Object* pObj)
 		/* === ATTACKER CHECKS === */
 
 		// if we're being attacked by him, remove from our set.
-		if(this->IsInInstance())
+		if(!this->IsInInstance()) 
 			removeAttacker(pUnit);
 
 		// check that our target is not him (shouldn't happen!)
@@ -4418,20 +4425,32 @@ void Unit::OnClearAttackTarget()
 
 	if(IsInWorld())
 	{
-		for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
+
+		AttackerSet::iterator itr = m_attackers.begin();
+		++itr;
+		while (itr !=m_attackers.end())
 		{
 			Unit* pUnit = GetMapMgr()->GetUnit(*itr);
-			if(pUnit && pUnit->isAlive())
+			if (!pUnit)
+			{
+				++itr;
+				continue;
+			}
+			if(pUnit->isAlive())
 			{
 				SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
 				if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
 				break;
 			}
+			else
+			{
+				++itr;
+				this->removeAttacker(pUnit);
+			}
 		}
+		//all attackers is dead.
+		if (!hasStateFlag(UF_ATTACKING))
+			this->clearAttackers(false);
 	}
-
-    //all attackers is dead.
-    if (!hasStateFlag(UF_ATTACKING))
-        m_attackers.clear();
 }
 

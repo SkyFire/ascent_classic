@@ -985,6 +985,7 @@ public:
 	void PlaySpellVisual(uint64 target, uint32 spellVisual);
 	bool m_isPet;
 	uint32 m_stealth;
+	bool m_can_stealth;
 
 	Aura* m_auras[MAX_AURAS+MAX_PASSIVE_AURAS];   
 

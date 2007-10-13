@@ -2402,6 +2402,10 @@ void Aura::SpellAuraModResistance(bool apply)
 	}
 	else 
 		amt = -mod->m_amount;  
+
+	if (this->GetSpellProto() && //druid: faerie fire
+		(this->GetSpellProto()->NameHash == 0xA6272FD2 || this->GetSpellProto()->NameHash == 0x162D168A))
+		m_target->m_can_stealth = !apply;
 	
 	if(m_target->GetTypeId() == TYPEID_PLAYER)
 	{
@@ -3114,6 +3118,8 @@ void Aura::SpellAuraModShapeshift(bool apply)
 		}break;
 	case FORM_STEALTH:
 		{// rogue		
+			if (!m_target->m_can_stealth)
+				return;
 			//m_target->UpdateVisibility();
 		} break;
 	case FORM_MOONKIN:

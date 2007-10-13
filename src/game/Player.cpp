@@ -6768,7 +6768,8 @@ void Player::StopMirrorTimer(uint32 Type)
 
 void Player::EventTeleport(uint32 mapid, float x, float y, float z)
 {
-	SafeTeleport(mapid, 0, LocationVector(x, y, z));
+	if (SafeTeleport(mapid, 0, LocationVector(x, y, z)))
+		this->clearAttackers(true);
 }
 
 void Player::ApplyLevelInfo(LevelInfo* Info, uint32 Level)
