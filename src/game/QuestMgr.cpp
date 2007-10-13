@@ -442,6 +442,7 @@ void QuestMgr::BuildQuestComplete(Player*plr, Quest* qst)
 
 void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr)
 {
+	uint32 status;
 	list<QuestRelation *>::iterator it;
 	list<QuestRelation *>::iterator st;
 	list<QuestRelation *>::iterator ed;
@@ -491,8 +492,22 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr)
 				tmp_map.insert(std::map<uint32,uint8>::value_type((*it)->qst->id, 1));
 
 				*data << (*it)->qst->id;
-				*data << sQuestMgr.CalcQuestStatus(qst_giver, plr, *it);
-				*data << uint32(0);
+				/**data << sQuestMgr.CalcQuestStatus(qst_giver, plr, *it);
+				*data << uint32(0);*/
+				status = sQuestMgr.CalcQuestStatus(qst_giver, plr, *it);
+				switch(status)
+				{
+				case QMGR_QUEST_NOT_FINISHED:
+					*data << uint32(4) << uint32(0);
+					break;
+
+				case QMGR_QUEST_FINISHED:
+					*data << uint32(4) << uint32(1);
+					break;
+
+				default:
+					*data << status << uint32(0);
+				}
 				*data << (*it)->qst->title;
 			}
 		}

@@ -149,6 +149,8 @@ void ScriptEngine::SetUnitFunctionTable()
 		{ "GetMostHated",						Unit_GetMostHated					},
 		{ "ForgetHate",							Unit_ForgetHate						},
 		{ "IsInMeleeRange",						Unit_IsInMeleRange					},
+		{ "SpawnMonsterWithFaction",			Unit_SpawnMonsterWithFaction		},
+		{ "FullCastSpell",						Unit_FullCastSpell					},
 		{ "GetUnitBySqlId",						GM_GetUnitBySqlId					},
 	};
 

@@ -139,6 +139,7 @@ class SERVER_DECL CommandTableStorage : public Singleton<CommandTableStorage>
 	ChatCommand * _accountCommandTable;
 	ChatCommand * _CheatCommandTable;
 	ChatCommand * _honorCommandTable;
+	ChatCommand * _questCommandTable;
 	ChatCommand * _petCommandTable;
 	ChatCommand * _recallCommandTable;
 	ChatCommand * _commandTable;
@@ -464,6 +465,26 @@ protected:
 	bool HandleNpcUnPossessCommand(const char * args, WorldSession * m_session);
 	bool HandleChangePasswordCommand(const char * args, WorldSession * m_session);
 	bool HandleRehashCommand(const char * args, WorldSession * m_session);
+
+	/* QUEST COMMANDS */
+	bool HandleQuestAddBothCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestAddFinishCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestAddStartCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestDelBothCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestDelFinishCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestFinisherCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestDelStartCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestFinishCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestGiverCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestItemCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestListCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestLoadCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestLookupCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestRemoveCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestRewardCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestSpawnCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestStartCommand(const char * args, WorldSession * m_session);
+	bool HandleQuestStatusCommand(const char * args, WorldSession * m_session);
 
 	/** AI AGENT DEBUG COMMANDS */
 	bool HandleAIAgentDebugBegin(const char * args, WorldSession * m_session);

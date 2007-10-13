@@ -106,6 +106,8 @@ T * GetThisPointer(gmThread * a_thread)
 	int GM_CDECL Unit_GetMostHated(gmThread * a_thread);
 	int GM_CDECL Unit_AddThreat(gmThread * a_thread);
 	int GM_CDECL Unit_IsInMeleRange(gmThread * a_thread);
+	int GM_CDECL Unit_SpawnMonsterWithFaction(gmThread * a_thread);
+	int GM_CDECL Unit_FullCastSpell(gmThread * a_thread);
 	
 	// Escort Quest System
 		int GM_CDECL Unit_SpawnWithoutWorld(gmThread * a_thread);

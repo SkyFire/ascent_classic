@@ -54,6 +54,8 @@ ChatCommand * CommandTableStorage::GetSubCommandTable(const char * name)
 		return _recallCommandTable;
 	else if(!strcmp(name, "honor"))
 		return _honorCommandTable;
+	else if(!strcmp(name, "quest"))
+		return _questCommandTable;
 	return 0;
 }
 
@@ -167,6 +169,7 @@ void CommandTableStorage::Dealloc()
 	free( _petCommandTable );
 	free( _recallCommandTable );
 	free( _honorCommandTable );
+	free( _questCommandTable );
 	free( _commandTable );
 }
 
@@ -410,6 +413,30 @@ void CommandTableStorage::Init()
 	};
 	dupe_command_table(recallCommandTable, _recallCommandTable);
 
+	static ChatCommand questCommandTable[] =
+	{
+		{ "addboth",   '2', &ChatHandler::HandleQuestAddBothCommand,	"Add quest <id> to the targeted NPC as start & finish",	NULL, 0, 0, 0},
+		{ "addfinish", '2', &ChatHandler::HandleQuestAddFinishCommand,	"Add quest <id> to the targeted NPC as finisher",		NULL, 0, 0, 0},
+		{ "addstart",  '2', &ChatHandler::HandleQuestAddStartCommand,	"Add quest <id> to the targeted NPC as starter",		NULL, 0, 0, 0},
+		{ "delboth",   '2', &ChatHandler::HandleQuestDelBothCommand,	"Delete quest <id> from the targeted NPC as start & finish",	NULL, 0, 0, 0},
+		{ "delfinish", '2', &ChatHandler::HandleQuestDelFinishCommand,	"Delete quest <id> from the targeted NPC as finisher",	NULL, 0, 0, 0},
+		{ "delstart",  '2', &ChatHandler::HandleQuestDelStartCommand,	"Delete quest <id> from the targeted NPC as starter",	NULL, 0, 0, 0},
+		{ "complete",  '2', &ChatHandler::HandleQuestFinishCommand,	    "Complete/Finish quest <id>",							NULL, 0, 0, 0},
+		{ "finisher",  '2', &ChatHandler::HandleQuestFinisherCommand,	"Lookup quest finisher for quest <id>",					NULL, 0, 0, 0},
+		{ "item",	   '2', &ChatHandler::HandleQuestItemCommand,		"Lookup itemid necessary for quest <id>",				NULL, 0, 0, 0},
+		{ "list",	   '2', &ChatHandler::HandleQuestListCommand,		"Lists the quests for the npc <id>",					NULL, 0, 0, 0},
+		{ "load",	   '2', &ChatHandler::HandleQuestLoadCommand,		"Loads quests from database",							NULL, 0, 0, 0},
+		{ "lookup",	   '2', &ChatHandler::HandleQuestLookupCommand,		"Looks up quest string x",								NULL, 0, 0, 0},
+		{ "giver",	   '2', &ChatHandler::HandleQuestGiverCommand,		"Lookup quest giver for quest <id>",					NULL, 0, 0, 0},
+		{ "remove",	   '2', &ChatHandler::HandleQuestRemoveCommand,		"Removes the quest <id> from the targeted player",		NULL, 0, 0, 0},
+		{ "reward",	   '2', &ChatHandler::HandleQuestRewardCommand,		"Shows reward for quest <id>",							NULL, 0, 0, 0},
+		{ "status",	   '2', &ChatHandler::HandleQuestStatusCommand,		"Lists the status of quest <id>",						NULL, 0, 0, 0},
+		{ "spawn",	   '2', &ChatHandler::HandleQuestSpawnCommand,		"Port to spawn location for quest <id>",				NULL, 0, 0, 0},
+		{ "start",	   '2', &ChatHandler::HandleQuestStartCommand,		"Starts quest <id>",									NULL, 0, 0, 0},
+		{ NULL,		    0,  NULL,										"",														NULL, 0, 0, 0},
+	};
+	dupe_command_table(questCommandTable, _questCommandTable);
+
 	static ChatCommand commandTable[] = {
 		{ "renameguild", 'a', &ChatHandler::HandleRenameGuildCommand, "Renames a guild.", NULL, 0, 0, 0 },
 		{ "addguard",   'a', &ChatHandler::HandleAddGuardCommand, "Adds a guardentry to the zonetables DB and reloads.", NULL, 0, 0, 0},
@@ -487,6 +514,7 @@ void CommandTableStorage::Init()
 		{ "cheat"	   ,  'm', NULL,									 "",				  CheatCommandTable, 0, 0, 0},
 		{ "account"	   ,  'z', NULL,									 "",				  accountCommandTable, 0, 0, 0},
 		{ "honor"	   ,  'm', NULL,									 "",				  honorCommandTable, 0, 0, 0},
+		{ "quest",		'q', NULL,									 "",				 questCommandTable, 0, 0, 0},
 		{ "pet",		   'm', NULL,									 "",					petCommandTable, 0, 0, 0},
 		{ "recall",		'q', NULL,									 "",				 recallCommandTable, 0, 0, 0},
 		{ "getpos"	  ,  'd', &ChatHandler::HandleGetPosCommand,		"",							   NULL, 0, 0, 0},
@@ -529,6 +557,7 @@ void CommandTableStorage::Init()
 
 		{ "reloadaccounts", 'z', &ChatHandler::HandleReloadAccountsCommand, "Reloads accounts on logon server.", NULL, 0, 0, 0 },
 		{ "lookupitem", 'l', &ChatHandler::HandleLookupItemCommand, "Looks up item string x.", NULL, 0, 0, 0 },
+		{ "lookupquest", 'l', &ChatHandler::HandleQuestLookupCommand, "Looks up quest string x.", NULL, 0, 0, 0 },
 		{ "lookupcreature", 'l', &ChatHandler::HandleLookupCreatureCommand, "Looks up item string x.", NULL, 0, 0, 0 },
 		{ "reloadscripts", 'w', &ChatHandler::HandleReloadScriptsCommand, "Reloads GM Scripts", NULL, 0, 0, 0 },
 		{ "silentplayer", 't', &ChatHandler::HandleSilentPlayerCommand, "Player cannot chat for x minutes <duration> (default 5 minutes)", NULL, 0, 0, 0 },
@@ -1131,7 +1160,6 @@ void WordFilter::Load()
 		transform(n.begin(), n.end(), n.begin(), towlower);
 		blockedPhrases.push_back(n);
 	}
-	
 }
 
 initialiseSingleton(WordFilter);
@@ -1172,5 +1200,6 @@ void WordFilter::LogMessage(string& message, string& blockedKeyword, Player * pl
 	fflush(m_file);
 	fclose(m_file);
 }
+
 
 

@@ -373,6 +373,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\QuestCommands.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\RecallCommands.cpp"
 				>
 			</File>

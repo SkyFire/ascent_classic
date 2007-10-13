@@ -286,6 +286,17 @@ int Unit_CastSpell(gmThread * a_thread)
 	pUnit->CastSpell(pUnit, dbcSpell.LookupEntry(spellid), true);
 	return GM_OK;
 }
+
+int Unit_FullCastSpell(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(1);
+	GM_CHECK_INT_PARAM(spellid, 0);
+
+	Unit * pUnit = GetThisPointer<Unit>(a_thread);
+	pUnit->CastSpell(pUnit, dbcSpell.LookupEntry(spellid), false);
+	return GM_OK;
+}
+
 int Unit_SetStandState(gmThread * a_thread)
 {
 	GM_CHECK_NUM_PARAMS(1);
@@ -476,6 +487,37 @@ int Unit_SpawnMonster(gmThread * a_thread)
 	pCreature->SetMapId(pThis->GetMapId());
 	pCreature->SetInstanceID(pThis->GetInstanceID());
 	pCreature->PushToWorld(pThis->GetMapMgr());
+
+	return GM_OK;
+}
+
+int Unit_SpawnMonsterWithFaction(gmThread * a_thread)
+{
+	GM_CHECK_NUM_PARAMS(7);
+	GM_CHECK_INT_PARAM(entry, 0);
+	GM_CHECK_FLOAT_PARAM(posX, 1);
+	GM_CHECK_FLOAT_PARAM(posY, 2);
+	GM_CHECK_FLOAT_PARAM(posZ, 3);
+	GM_CHECK_FLOAT_PARAM(posO, 4);
+	GM_CHECK_INT_PARAM(faction, 5);
+	GM_CHECK_INT_PARAM(duration, 6);
+
+	Unit * pThis = GetThisPointer<Unit>(a_thread);
+	CreatureProto * p = CreatureProtoStorage.LookupEntry(entry);
+	if(!p)
+		return GM_EXCEPTION;
+
+	Creature * pCreature = pThis->GetMapMgr()->CreateCreature();
+	pCreature->spawnid = 0;
+	pCreature->m_spawn = 0;
+	pCreature->Load(p, posX, posY, posZ);
+	pCreature->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction);
+	pCreature->_setFaction();
+	pCreature->SetOrientation(posO);
+	pCreature->SetMapId(pThis->GetMapId());
+	pCreature->SetInstanceID(pThis->GetInstanceID());
+	pCreature->PushToWorld(pThis->GetMapMgr());
+	pCreature->Despawn(duration, 0);
 
 	return GM_OK;
 }
