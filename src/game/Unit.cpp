@@ -4306,7 +4306,7 @@ void CombatStatusHandler::ClearMyHealers()
 
 void CombatStatusHandler::WeHealed(Unit * pHealTarget)
 {
-	if(pHealTarget->GetTypeId() != TYPEID_PLAYER || m_Unit->GetTypeId() != TYPEID_PLAYER)
+	if(pHealTarget->GetTypeId() != TYPEID_PLAYER || m_Unit->GetTypeId() != TYPEID_PLAYER || pHealTarget == m_Unit)
 		return;
 
 	if(pHealTarget->CombatStatus.IsInCombat())
@@ -4364,6 +4364,9 @@ bool CombatStatusHandler::InternalIsInCombat()
 
 void CombatStatusHandler::AddAttackTarget(const uint64& guid)
 {
+	if(guid == m_Unit->GetGUID())
+		return;
+
 	m_attackTargets.insert(guid);
 	//printf("Adding attack target "I64FMT" to "I64FMT"\n", guid, m_Unit->GetGUID());
 	if(m_Unit->GetTypeId() == TYPEID_PLAYER &&
@@ -4463,6 +4466,9 @@ void CombatStatusHandler::OnDamageDealt(Unit * pTarget)
 {
 	// we added an aura, or dealt some damage to a target. they need to have us as an attacker, and they need to be our attack target if not.
 	//printf("OnDamageDealt to "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
+	if(pTarget == m_Unit)
+		return;
+
 	AttackerMap::iterator itr = m_attackTargets.find(pTarget->GetGUID());
 	if(itr == m_attackTargets.end())
 		AddAttackTarget(pTarget->GetGUID());
