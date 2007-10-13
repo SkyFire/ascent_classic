@@ -645,7 +645,6 @@ public:
 	void RemoveFromWorld();
 	bool Create ( WorldPacket &data );
 	
-	void addAttacker(Unit *pUnit);
 	void Update( uint32 time );
 	void BuildEnumData( WorldPacket * p_data );
     void BuildFlagUpdateForNonGroupSet(uint32 index, uint32 flag);
@@ -1086,10 +1085,6 @@ public:
 			m_attackTimer_1 = getMSTime() + time;
 		else
 			m_attackTimer = getMSTime() + time;
-		//do not exit combat just because we are trying to delay attack (for whatever reason, like spellcasting)
-		if(!sEventMgr.HasEvent(this,EVENT_ATTACK_TIMEOUT)) //do not add excesive attack events 
-			sEventMgr.AddEvent(this,&Player::EventAttackStop,EVENT_ATTACK_TIMEOUT,time+PLAYER_ATTACK_TIMEOUT_INTERVAL,1,0); //attack timeout on no attack after 5 seconds
-		else sEventMgr.ModifyEventTimeLeft(this,EVENT_ATTACK_TIMEOUT,time+PLAYER_ATTACK_TIMEOUT_INTERVAL,true);
 	}
 	
 	inline void delayAttackTimer(int32 delay)
@@ -1099,14 +1094,6 @@ public:
 
 		m_attackTimer += delay;
 		m_attackTimer_1 += delay;
-
-		if (delay > 0)
-		{
-			if(sEventMgr.HasEvent(this,EVENT_ATTACK_TIMEOUT))
-			{
-				sEventMgr.ModifyEventTimeLeft(this,EVENT_ATTACK_TIMEOUT,delay+PLAYER_ATTACK_TIMEOUT_INTERVAL,true);
-			}
-		}
 	}
 	
 	void SetShapeShift(uint8 ss);

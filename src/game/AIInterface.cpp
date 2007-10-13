@@ -246,7 +246,6 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				{
 					CALL_SCRIPT_EVENT(m_Unit, OnCombatStop)(UnitToFollow);
 					m_AIState = STATE_EVADE;
-					m_Unit->setAttackTarget(NULL);
 
 					UnitToFollow = NULL;
 					FollowDistance = 0.0f;
@@ -259,6 +258,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				m_hasCalledForHelp = false;
 				m_nextSpell = NULL;
 				SetNextTarget(NULL);
+				m_Unit->CombatStatus.Vanished();
 
 				firstLeaveCombat = false;
 
@@ -307,6 +307,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				{
 					m_aiTargets.insert(TargetMap::value_type(pUnit, misc1));
 				}
+				m_Unit->CombatStatus.OnDamageDealt(pUnit);
 			}break;
 		case EVENT_FOLLOWOWNER:
 			{
@@ -402,7 +403,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		}
 	}
 
-	if(event != EVENT_UNITDIED)
+	/*if(event != EVENT_UNITDIED)
     {
         uint64 currenttarget = m_Unit->getAttackTarget();
         if (!m_nextTarget && currenttarget)
@@ -413,7 +414,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
         {
             m_Unit->setAttackTarget(m_nextTarget);
         }
-    }
+    }*/
    
     //Should be able to do this stuff even when evading
     else // would mean event == EVENT_UNITDIED
@@ -681,7 +682,7 @@ void AIInterface::_UpdateTargets()
 		//modified for vs2005 compatibility
 		for(i = m_assistTargets.begin(); i != m_assistTargets.end(); ++i)
 		{
-			if(m_Unit->GetDistanceSq((*i)) > 2500.0f/*50.0f*/ || !(*i)->isAlive() || !(*i)->isInCombat())
+			if(m_Unit->GetDistanceSq((*i)) > 2500.0f/*50.0f*/ || !(*i)->isAlive() || !(*i)->CombatStatus.IsInCombat())
 			{
 				tokill.push_back(*i);
 			}
@@ -876,7 +877,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					{
 						UnitToFollow = NULL; //we shouldn't be following any one
 						m_lastFollowX = m_lastFollowY = 0;
-						m_Unit->setAttackTarget(NULL);  // remove ourselves from any target that might have been followed
+						//m_Unit->setAttackTarget(NULL);  // remove ourselves from any target that might have been followed
 					}
 					
 					FollowDistance = 0.0f;
@@ -953,7 +954,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					{
 						UnitToFollow = NULL; //we shouldn't be following any one
 						m_lastFollowX = m_lastFollowY = 0;
-						m_Unit->setAttackTarget(NULL);  // remove ourselves from any target that might have been followed
+						//m_Unit->setAttackTarget(NULL);  // remove ourselves from any target that might have been followed
 					}
 					
 					FollowDistance = 0.0f;
@@ -1089,8 +1090,6 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 //				m_nextTarget = m_Unit;
 //				m_Unit->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 				SetNextTarget(NULL);
-				m_Unit->setAttackTarget(0);
-				m_Unit->clearAttackers(true);
 
 				WorldPacket data(SMSG_MESSAGECHAT, 100);
 				string msg = "%s attempts to run away in fear!";
@@ -2946,6 +2945,7 @@ void AIInterface::WipeTargetList()
 	m_nextSpell = NULL;
 	m_currentHighestThreat = 0;
 	m_aiTargets.clear();
+	m_Unit->CombatStatus.Vanished();
 }
 
 bool AIInterface::taunt(Unit* caster, bool apply)

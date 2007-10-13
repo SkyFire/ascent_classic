@@ -625,6 +625,23 @@ public:
     uint8 m_visualSlot;
     uint32 pSpellId; //this represents the triggering spell id
 
+	// this stuff can be cached in spellproto.
+	inline bool IsCombatStateAffecting()
+	{
+		for(uint32 x = 0; x < 3; ++x) {
+			if(m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_DAMAGE || 
+				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
+				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_TRIGGER_SPELL ||
+				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_LEECH ||
+				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_MANA_LEECH)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 private:
     uint32 GetCasterFaction() { return m_casterfaction; }
     void SetCasterFaction(uint32 faction){ m_casterfaction = faction; }

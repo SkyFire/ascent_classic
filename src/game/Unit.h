@@ -577,8 +577,63 @@ enum AURA_CHECK_RESULT
 	AURA_CHECK_RESULT_LOWER_BUFF_PRESENT	= 3,
 };
 
-typedef std::set<uint64> AttackerSet;
 typedef std::list<struct ProcTriggerSpellOnSpell> ProcTriggerSpellOnSpellList;
+
+/************************************************************************/
+/* "In-Combat" Handler                                                  */
+/************************************************************************/
+
+class Unit;
+class CombatStatusHandler
+{
+	typedef set<uint64> AttackerMap;
+	typedef set<uint32> HealedSet;		// Must Be Players!
+	AttackerMap m_attackers;
+	HealedSet m_healers;
+	HealedSet m_healed;
+	Unit* m_Unit;
+	bool m_lastStatus;
+	AttackerMap m_attackTargets;
+	uint64 m_primaryAttackTarget;
+
+public:
+	CombatStatusHandler() : m_lastStatus(false), m_primaryAttackTarget(0) {}
+
+	void AddAttackTarget(const uint64& guid);						// this means we clicked attack, not actually striked yet, so they shouldnt be in combat.
+	void ClearPrimaryAttackTarget();								// means we deselected the unit, stopped attacking it.
+
+	void OnDamageDealt(Unit * pTarget);								// this is what puts the other person in combat.
+	void WeHealed(Unit * pHealTarget);								// called when a player heals another player, regardless of combat state.
+
+	void RemoveAttacker(Unit * pAttacker, const uint64& guid);		// this means we stopped attacking them totally. could be because of deagro, etc.
+	void RemoveAttackTarget(Unit * pTarget);						// means our DoT expired.
+
+	void UpdateFlag();												// detects if we have changed combat state (in/out), and applies the flag.
+
+	inline bool IsInCombat() { return m_lastStatus; }				// checks if we are in combat or not.
+
+	void OnRemoveFromWorld();										// called when we are removed from world, kills all references to us.
+	
+	inline void Vanished()
+	{
+		ClearAttackers();
+		ClearHealers();
+	}
+
+	inline const uint64& GetPrimaryAttackTarget() { return m_primaryAttackTarget; }
+	inline void SetUnit(Unit * p) { m_Unit = p; }
+	void TryToClearAttackTargets();									// for pvp timeout
+
+protected:
+	bool InternalIsInCombat();										// called by UpdateFlag, do not call from anything else!
+	bool IsAttacking(Unit * pTarget);								// internal function used to determine if we are still attacking target x.
+	void AddAttacker(const uint64& guid);							// internal function to add an attacker
+	void RemoveHealed(Unit * pHealTarget);							// usually called only by updateflag
+	void ClearHealers();											// this is called on instance change.
+	void ClearAttackers();											// means we vanished, or died.
+	void ClearMyHealers();
+};
+
 //====================================================================
 //  Unit
 //  Base object for Players and Creatures
@@ -586,6 +641,10 @@ typedef std::list<struct ProcTriggerSpellOnSpell> ProcTriggerSpellOnSpellList;
 class SERVER_DECL Unit : public Object
 {
 public:
+
+	void CombatStatusHandler_UpdatePvPTimeout();
+	void CombatStatusHandler_ResetPvPTimeout();
+
 	virtual ~Unit ( );
 
 	friend class AIInterface;
@@ -888,14 +947,6 @@ public:
 	//Pet
 	inline void SetIsPet(bool chck) { m_isPet = chck; }
 	
-	inline AttackerSet::iterator GetAttackersetBegin() { return m_attackers.begin(); }
-	inline AttackerSet::iterator GetAttackersetEnd() { return m_attackers.end(); }
-	inline size_t GetAttackersetSize() { return m_attackers.size(); }
-	inline uint64 getAttackTarget() { return m_attackTarget; }
-	inline bool IsBeingAttackedBy(Unit *pUnit) { return m_attackers.count(pUnit->GetGUID()) > 0; }
-
-	virtual bool isInCombat() { return (m_attackers.size() > 0 || m_attackTarget != 0); }
-
 	//In-Range
 	virtual void AddInRangeObject(Object* pObj);
 	virtual void OnRemoveInRangeObject(Object* pObj);
@@ -906,11 +957,6 @@ public:
 
 	uint32 m_CombatUpdateTimer;
 
-	// Attacker stuff
-	virtual void addAttacker(Unit *pUnit);
-	void removeAttacker(Unit *pUnit);
-	void setAttackTarget(Unit* pUnit);
-	void clearAttackers(bool bFromOther);
 	inline void setcanperry(bool newstatus){can_parry=newstatus;}
 		
 	std::map<uint32,Aura*> tmpAura;
@@ -1070,6 +1116,7 @@ public:
 	uint32 m_special_state; //flags for special states (stunned,rooted etc)
 	
 //	uint32 fearSpell;
+	CombatStatusHandler CombatStatus;
 	
 protected:
 	Unit ();
@@ -1117,15 +1164,9 @@ protected:
 
 	uint32 m_charmtemp;
 
-	AttackerSet m_attackers;
-	uint64 m_attackTarget;
 	bool m_extraAttackCounter;
 
-// these functions should never be called external
-private:
-    inline void OnClearAttackTarget();
 };
-
 
 
 #endif

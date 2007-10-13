@@ -166,7 +166,6 @@ Unit::Unit()
 	BaseOffhandDamage[1]=0;
 	BaseRangedDamage[1]=0;
 
-	m_attackTarget = 0;
 	m_CombatUpdateTimer = 0;
 	for(uint32 x=0;x<7;x++)
 	{
@@ -223,6 +222,7 @@ Unit::Unit()
 	m_damgeShieldsInUse = false;
 //	fearSpell = 0;
 	m_extraAttackCounter = false;
+	CombatStatus.SetUnit(this);
 }
 
 Unit::~Unit()
@@ -274,12 +274,6 @@ Unit::~Unit()
 void Unit::Update( uint32 p_time )
 {
 	_UpdateSpells( p_time );
-
-	if(m_attackers.size() == 0 && m_attackTarget == 0)
-	{
-		RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-		if(hasStateFlag(UF_ATTACKING)) clearStateFlag(UF_ATTACKING);
-	}
 
 	if(!isDead())
 	{
@@ -1170,7 +1164,7 @@ void Unit::RegenerateHealth()
 	if(this->IsPlayer())
 	{
 		// These only NOT in combat
-		if(!static_cast<Player*>(this)->isInCombat())
+		if(!CombatStatus.IsInCombat())
 		{
 			static_cast<Player*>(this)->RegenerateHealth(false);
 		}
@@ -1180,7 +1174,7 @@ void Unit::RegenerateHealth()
 	else
 	{
 		// Only regen health out of combat
-		if(!isInCombat())
+		if(!CombatStatus.IsInCombat())
 			static_cast<Creature*>(this)->RegenerateHealth();
 	}
 }
@@ -1236,7 +1230,7 @@ void Unit::RegeneratePower(bool isinterrupted)
 			static_cast<Player*>(this)->RegenerateMana(RegenPct);
 
 		// These only NOT in combat
-		if(!static_cast<Player*>(this)->isInCombat())
+		if(!CombatStatus.IsInCombat())
 		{
 	        // Rage timer is 3 seconds not 2
 	        if(powertype == POWER_TYPE_RAGE)
@@ -2022,7 +2016,7 @@ else
 	{		
 		// have to set attack target here otherwise it wont be set
 		// because dealdamage is not called.
-		setAttackTarget(pVictim);
+		//setAttackTarget(pVictim);
 	}
 //==========================================================================================
 //==============================Post Damage Dealing Processing==============================
@@ -2067,7 +2061,7 @@ else
 		  // It only regens rage if in combat, don't know why but this is making
 		  // the player to regen 1 rage every 3 secs.....
 		  // and the formula is wrong also ... TODO
-		  if(isInCombat()) {
+		  if(!CombatStatus.IsInCombat()) {
 			val = GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/getLevel();
 			val += (static_cast<Player *>(this)->rageFromDamageDealt*val)/100;
 			SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
@@ -2118,9 +2112,6 @@ void Unit::smsg_AttackStop(Unit* pVictim)
 	if(!pVictim)
 		return;
 
-	if(m_attackTarget == pVictim->GetGUID())
-		setAttackTarget(NULL);
-
 	WorldPacket data(SMSG_ATTACKSTOP, 24);
 	data << GetNewGUID();
 	data << pVictim->GetNewGUID();
@@ -2135,6 +2126,9 @@ void Unit::smsg_AttackStop(Unit* pVictim)
 		data << GetNewGUID() << uint8(0) << uint32(0);
 		SendMessageToSet(&data, IsPlayer());
 	}
+
+	pVictim->CombatStatus.RemoveAttacker(this, GetGUID());
+	CombatStatus.RemoveAttackTarget(pVictim);
 }
 
 void Unit::smsg_AttackStop(uint64 victimGuid)
@@ -2393,9 +2387,17 @@ void Unit::AddAura(Aura *aur)
 	aur->RelocateEvents();
 
 	// Reaction from enemy AI
-	if(GetTypeId() == TYPEID_UNIT && !aur->IsPositive())	  // Creature
+	if(!aur->IsPositive() && aur->IsCombatStateAffecting())	  // Creature
 	{
-		if(isAlive() && CanAgroHash(aur->m_spellProto->NameHash)) //no threat for hunter's mark
+		Unit * pCaster = aur->GetUnitCaster();
+		if(pCaster && isAlive())
+		{
+			pCaster->CombatStatus.OnDamageDealt(this);
+
+			if(m_objectTypeId == TYPEID_UNIT)
+				m_aiInterface->AttackReaction(pCaster, 1, aur->GetSpellId());
+		}
+		/*if(isAlive() && CanAgroHash(aur->m_spellProto->NameHash)) //no threat for hunter's mark
 		{
 			Unit * pCaster = aur->GetUnitCaster();
 			if(!pCaster) return;
@@ -2403,7 +2405,7 @@ void Unit::AddAura(Aura *aur)
 			addAttacker(pCaster);
 
 			GetAIInterface()->AttackReaction(pCaster, 1, aur->GetSpellId());
-		}
+		}*/
 	}
 }
 
@@ -2956,17 +2958,6 @@ void Unit::OnRemoveInRangeObject(Object* pObj)
 
 		Unit *pUnit = static_cast<Unit*>(pObj);
 		GetAIInterface()->CheckTarget(pUnit);
-
-		/* === ATTACKER CHECKS === */
-
-		// if we're being attacked by him, remove from our set.
-		removeAttacker(pUnit);
-
-		// check that our target is not him (shouldn't happen!)
-		if(m_attackTarget == pUnit->GetGUID())
-			setAttackTarget(NULL);
-
-		/* === END ATTACKER CHECKS === */
 
 		if(GetUInt64Value(UNIT_FIELD_CHARM) == pObj->GetGUID())
 			if(m_currentSpell)
@@ -3537,119 +3528,6 @@ bool Unit::HasActiveAura(uint32 spellid,uint64 guid)
 	return false;
 }
 
-void Unit::addAttacker(Unit *pUnit)
-{
-	if(!pUnit->isAlive() || !isAlive())
-		return;
-
-	// this shouldn't happen
-	ASSERT(pUnit != NULL);
-
-	// being attacked by this unit
-	if(m_attackers.count(pUnit->GetGUID()) == 0)
-		m_attackers.insert(pUnit->GetGUID());
-}
-
-void Unit::removeAttacker(Unit *pUnit)
-{
-	// this should't happen
-	ASSERT(pUnit != NULL);
-
-	// no longer being attacked by unit
-	m_attackers.erase(pUnit->GetGUID());
-}
-
-void Unit::setAttackTarget(Unit* pUnit)
-{
-	if(!isAlive())
-		pUnit = 0;
-
-	if(pUnit == NULL)
-	{
-		// check if we have a current target
-		// if so, remove from their attacker set
-		if(m_attackTarget)
-		{
-			Unit *pTarget = m_mapMgr ? m_mapMgr->GetUnit(m_attackTarget) : NULL;
-			if(pTarget)
-				pTarget->removeAttacker(this);
-		}
-
-		// now, clear ourselves and abort
-		m_attackTarget = 0;
-        OnClearAttackTarget();
-		return;
-	}
-
-	// can't attack self
-	if(pUnit == this)
-		return;
-
-	// already done -> skip
-	if(m_attackTarget == pUnit->GetGUID())
-		return;
-
-	// remove from our old target, if we have one
-	// this will stop attackers getting "lost" and people
-	// "stuck" in combat.
-
-	if(m_attackTarget != 0)
-	{
-		Unit *pTarget = m_mapMgr ? m_mapMgr->GetUnit(m_attackTarget) : NULL;
-		if(pTarget)
-			pTarget->removeAttacker(this);
-	}
-
-	// add to victim's attacker set
-	pUnit->addAttacker(this);
-
-	// set our value
-	m_attackTarget = pUnit->GetGUID();
-}
-
-void Unit::clearAttackers(bool bFromOther)
-{
-	// this will _usually_ be called on death.
-	// so, we will remove ourselves from our target's set,
-	// and clear our target set
-
-	// clear our target
-	if(bFromOther)
-		setAttackTarget(NULL);
-
-	// skip this shit if we don't have any attackers
-	if(m_attackers.size() == 0)
-		return;
-	
-	if(bFromOther && IsInWorld())
-	{
-		// push our existing attackers into a temp vector
-		// because they will erase from our attacker set when they have their target
-		// reset, we need to have another place to store them
-		std::vector<Unit*> tmp_vec;
-		tmp_vec.reserve(m_attackers.size());
-		Unit *pUnit;
-
-		for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-		{
-			pUnit = GetMapMgr()->GetUnit(*itr);
-			if(pUnit)
-				tmp_vec.push_back(pUnit);
-		}
-
-		// clear any attackers from us
-		for(std::vector<Unit*>::iterator itr = tmp_vec.begin(); itr != tmp_vec.end(); ++itr)
-		{
-			pUnit = (*itr);
-			if(pUnit->getAttackTarget() == GetGUID())
-				pUnit->setAttackTarget(NULL);
-		}
-	}
-
-	// wipe our attacker set (we shouldn't have any unknowns)
-	m_attackers.clear();
-}
-
 void Unit::EventSummonPetExpire()
 {
 	if(summonPet)
@@ -3869,6 +3747,7 @@ void Unit::OnPushToWorld()
 
 void Unit::RemoveFromWorld(bool free_guid)
 {
+	CombatStatus.OnRemoveFromWorld();
 	if(critterPet != 0)
 	{
 		critterPet->RemoveFromWorld(false, true);
@@ -4405,33 +4284,296 @@ float Unit::get_chance_to_daze(Unit *target)
 	else return chance_to_daze;
 }
 
-/************************************************************************/
-/* OnClearAttackTarget: Clear us from attackers                         */
-/* when the current target gets cleared there are some actions to be    */
-/* done. Like you know executing code 1x is hell of a lot better than   */
-/* execturing it 20x                                                    */
-/************************************************************************/
-void Unit::OnClearAttackTarget()
+void CombatStatusHandler::ClearMyHealers()
 {
-    RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-    if(hasStateFlag(UF_ATTACKING)) clearStateFlag(UF_ATTACKING);
-
-	if(IsInWorld())
+	// this is where we check all our healers
+	HealedSet::iterator i;
+	Player * pt;
+	for(i = m_healers.begin(); i != m_healers.end(); ++i)
 	{
-		for(AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
+		pt = m_Unit->GetMapMgr()->GetPlayer(*i);
+		if(pt != NULL)
+			pt->CombatStatus.RemoveHealed(m_Unit);
+	}
+
+	m_healers.clear();
+}
+
+void CombatStatusHandler::WeHealed(Unit * pHealTarget)
+{
+	if(pHealTarget->GetTypeId() != TYPEID_PLAYER || m_Unit->GetTypeId() != TYPEID_PLAYER)
+		return;
+
+	if(pHealTarget->CombatStatus.IsInCombat())
+	{
+		m_healed.insert(pHealTarget->GetGUIDLow());
+		pHealTarget->CombatStatus.m_healers.insert(m_Unit->GetGUIDLow());
+	}
+
+	UpdateFlag();
+}
+
+void CombatStatusHandler::RemoveHealed(Unit * pHealTarget)
+{
+	m_healed.erase(pHealTarget->GetGUIDLow());
+	UpdateFlag();
+}
+
+void CombatStatusHandler::UpdateFlag()
+{
+	bool n_status = InternalIsInCombat();
+	if(n_status != m_lastStatus)
+	{
+		m_lastStatus = n_status;
+		if(n_status)
 		{
-			Unit* pUnit = GetMapMgr()->GetUnit(*itr);
-			if(pUnit && pUnit->isAlive())
+			printf(I64FMT" is now in combat.\n", m_Unit->GetGUID());
+			m_Unit->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+			if(!m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->addStateFlag(UF_ATTACKING);
+
+			// remove any of our healers from combat too, if they are able to be.
+			ClearMyHealers();			
+		}
+		else
+		{
+			printf(I64FMT" is no longer in combat.\n", m_Unit->GetGUID());
+			m_Unit->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+			if(m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->clearStateFlag(UF_ATTACKING);
+		}
+	}
+}
+
+bool CombatStatusHandler::InternalIsInCombat()
+{
+	if(m_healed.size() > 0)
+		return true;
+
+	if(m_attackTargets.size() > 0)
+		return true;
+
+	if(m_attackers.size() > 0)
+		return true;
+
+	return false;
+}
+
+void CombatStatusHandler::AddAttackTarget(const uint64& guid)
+{
+	m_attackTargets.insert(guid);
+	printf("Adding attack target "I64FMT" to "I64FMT"\n", guid, m_Unit->GetGUID());
+	if(m_Unit->GetTypeId() == TYPEID_PLAYER &&
+		m_primaryAttackTarget != guid)			// players can only have one attack target.
+	{
+		if(m_primaryAttackTarget)
+			ClearPrimaryAttackTarget();
+
+		m_primaryAttackTarget = guid;
+	}
+
+	UpdateFlag();
+}
+
+void CombatStatusHandler::ClearPrimaryAttackTarget()
+{
+	printf("ClearPrimaryAttackTarget for "I64FMT"\n", m_Unit->GetGUID());
+	if(m_primaryAttackTarget != 0)
+	{
+		Unit * pt = m_Unit->GetMapMgr()->GetUnit(m_primaryAttackTarget);
+		if(pt != NULL)
+		{
+			// remove from their attacker set. (if we have no longer got any DoT's, etc)
+			if(!IsAttacking(pt))
 			{
-				SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
-				if(!hasStateFlag(UF_ATTACKING)) addStateFlag(UF_ATTACKING);
-				break;
+				pt->CombatStatus.RemoveAttacker(m_Unit, m_Unit->GetGUID());
+				m_attackTargets.erase(m_primaryAttackTarget);
 			}
+			
+			m_primaryAttackTarget = 0;
+		}
+		else
+		{
+			m_attackTargets.erase(m_primaryAttackTarget);
+			m_primaryAttackTarget = 0;
 		}
 	}
 
-    //all attackers is dead.
-    if (!hasStateFlag(UF_ATTACKING))
-        m_attackers.clear();
+	UpdateFlag();
 }
 
+bool CombatStatusHandler::IsAttacking(Unit * pTarget)
+{
+	// check the target for any of our DoT's.
+	for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
+	{
+		if(pTarget->m_auras[i] != NULL)
+		{
+			if(m_Unit->GetGUID() == pTarget->m_auras[i]->m_casterGuid && pTarget->m_auras[i]->IsCombatStateAffecting())
+				return true;
+		}
+	}
+
+	// place any additional checks here
+	return false;
+}
+
+void CombatStatusHandler::RemoveAttackTarget(Unit * pTarget)
+{
+	// called on aura remove, etc.
+	AttackerMap::iterator itr = m_attackTargets.find(pTarget->GetGUID());
+	if(itr == m_attackTargets.end())
+		return;
+
+	if(!IsAttacking(pTarget))
+	{
+		printf("Removing attack target "I64FMT" on "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
+		m_attackTargets.erase(itr);
+		if(m_primaryAttackTarget == pTarget->GetGUID())
+			m_primaryAttackTarget = 0;
+
+		UpdateFlag();
+	}
+	else
+		printf("Cannot remove attack target "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
+}
+
+void CombatStatusHandler::RemoveAttacker(Unit * pAttacker, const uint64& guid)
+{
+	AttackerMap::iterator itr = m_attackers.find(guid);
+	if(itr == m_attackers.end())
+		return;
+
+	if( (!pAttacker) || (!pAttacker->CombatStatus.IsAttacking(m_Unit)) )
+	{
+		printf("Removing attacker "I64FMT" from "I64FMT"\n", guid, m_Unit->GetGUID());
+		m_attackers.erase(itr);
+		UpdateFlag();
+	}
+	else
+	{
+		printf("Cannot remove attacker "I64FMT" from "I64FMT"\n", guid, m_Unit->GetGUID());
+	}
+}
+
+void CombatStatusHandler::OnDamageDealt(Unit * pTarget)
+{
+	// we added an aura, or dealt some damage to a target. they need to have us as an attacker, and they need to be our attack target if not.
+	printf("OnDamageDealt to "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
+	AttackerMap::iterator itr = m_attackTargets.find(pTarget->GetGUID());
+	if(itr == m_attackTargets.end())
+		AddAttackTarget(pTarget->GetGUID());
+
+	itr = pTarget->CombatStatus.m_attackers.find(m_Unit->GetGUID());
+	if(itr == pTarget->CombatStatus.m_attackers.end())
+		pTarget->CombatStatus.AddAttacker(m_Unit->GetGUID());
+
+	// update the timeout
+	m_Unit->CombatStatusHandler_ResetPvPTimeout();
+}
+
+void CombatStatusHandler::AddAttacker(const uint64& guid)
+{
+	m_attackers.insert(guid);
+	UpdateFlag();
+}
+
+void CombatStatusHandler::ClearAttackers()
+{
+	// this is a FORCED function, only use when the reference will be destroyed.
+	AttackerMap::iterator itr = m_attackTargets.begin();
+	Unit * pt;
+	for(; itr != m_attackTargets.end(); ++itr)
+	{
+		pt = m_Unit->GetMapMgr()->GetUnit(*itr);
+		if(pt)
+		{
+			pt->CombatStatus.m_attackers.erase(m_Unit->GetGUID());
+			pt->CombatStatus.UpdateFlag();
+		}
+	}
+
+	for(itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
+	{
+		pt = m_Unit->GetMapMgr()->GetUnit(*itr);
+		if(pt)
+		{
+			pt->CombatStatus.m_attackTargets.erase(m_Unit->GetGUID());
+			pt->CombatStatus.UpdateFlag();
+		}
+	}
+
+	m_attackers.clear();
+	m_attackTargets.clear();
+	m_primaryAttackTarget = 0;
+	UpdateFlag();
+}
+
+void CombatStatusHandler::ClearHealers()
+{
+	HealedSet::iterator itr = m_healed.begin();
+	Player * pt;
+	for(; itr != m_healed.end(); ++itr)
+	{
+		pt = m_Unit->GetMapMgr()->GetPlayer(*itr);
+		if(pt)
+		{
+			pt->CombatStatus.m_healers.erase(m_Unit->GetGUIDLow());
+			pt->CombatStatus.UpdateFlag();
+		}
+	}
+
+	for(itr = m_healers.begin(); itr != m_healers.end(); ++itr)
+	{
+		pt = m_Unit->GetMapMgr()->GetPlayer(*itr);
+		if(pt)
+		{
+			pt->CombatStatus.m_healed.erase(m_Unit->GetGUIDLow());
+			pt->CombatStatus.UpdateFlag();
+		}
+	}
+
+	m_healed.clear();
+	m_healers.clear();
+	UpdateFlag();
+}
+
+void CombatStatusHandler::OnRemoveFromWorld()
+{
+	ClearAttackers();
+	ClearHealers();
+}
+
+void Unit::CombatStatusHandler_ResetPvPTimeout()
+{
+	if(!IsPlayer())
+		return;
+
+	EventMap::iterator itr = m_events.find(EVENT_ATTACK_TIMEOUT);
+	if(itr == m_events.end())
+		sEventMgr.AddEvent(this, &Unit::CombatStatusHandler_UpdatePvPTimeout, EVENT_ATTACK_TIMEOUT, 5000, 1, 0);
+	else
+		itr->second->currTime = itr->second->msTime;
+}
+
+void Unit::CombatStatusHandler_UpdatePvPTimeout()
+{
+	CombatStatus.TryToClearAttackTargets();	
+}
+
+void CombatStatusHandler::TryToClearAttackTargets()
+{
+	AttackerMap::iterator i, i2;
+	Unit * pt;
+
+	for(i = m_attackTargets.begin(); i != m_attackTargets.end();)
+	{
+		i2 = i++;
+		pt = m_Unit->GetMapMgr()->GetUnit(*i2);
+		if(pt == NULL)
+		{
+			m_attackTargets.erase(i2);
+			continue;
+		}
+
+		RemoveAttackTarget(pt);
+	}
+}

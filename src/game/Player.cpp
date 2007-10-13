@@ -889,29 +889,6 @@ void Player::EventDismount(uint32 money, float x, float y, float z)
 	}
 }
 
-
-void Player::addAttacker(Unit *pUnit)
-{
-	Unit::addAttacker(pUnit);
-	if (this->InGroup())
-	{
-		Group *pGroup = this->GetGroup();
-		GroupMembersSet::iterator itr;
-		Player* pGroupGuy;
-		pGroup->Lock();
-		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) 
-		{
-			for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
-			{
-				pGroupGuy = itr->player;
-				if( pGroupGuy && !pGroupGuy->m_attackers.count(pUnit->GetGUID()))
-					pGroupGuy->m_attackers.insert(pUnit->GetGUID());
-			}
-		}
-		pGroup->Unlock();
-	}
-}
-
 void Player::_EventAttack(bool offhand)
 {
 	if (m_currentSpell)
@@ -1073,9 +1050,6 @@ void Player::_EventCharmAttack()
 void Player::EventAttackStart()
 {
 	m_attacking = true;
-	if(!sEventMgr.HasEvent(this,EVENT_ATTACK_TIMEOUT)) //do not add excesive attack events 
-		sEventMgr.AddEvent(this,&Player::EventAttackStop,EVENT_ATTACK_TIMEOUT,PLAYER_ATTACK_TIMEOUT_INTERVAL,1,0); //attack timeout on no attack after 5 seconds
-		
 	if(m_MountSpellId)
         RemoveAura(m_MountSpellId);
 }
@@ -1085,9 +1059,6 @@ void Player::EventAttackStop()
 	if(m_CurrentCharm != NULL)
 		sEventMgr.RemoveEvents(this, EVENT_PLAYER_CHARM_ATTACK);
 
-	sEventMgr.RemoveEvents(this,EVENT_ATTACK_TIMEOUT); //have no idea why we need an attack timeout event
-
-	setAttackTarget(NULL);  // nice and simple!
 	m_attacking = false;
 }
 
@@ -3178,7 +3149,6 @@ void Player::RemoveFromWorld()
 
 	if(IsInWorld())
 	{
-		clearAttackers(true);
 		RemoveItemsFromWorld();
 		Unit::RemoveFromWorld(false);
 	}
@@ -6730,9 +6700,10 @@ void Player::EndDuel(uint8 WinCondition)
 	// Call off pet
 	if(this->GetSummon())
 	{
-		this->GetSummon()->setAttackTarget(NULL);
+		this->GetSummon()->CombatStatus.Vanished();
 		this->GetSummon()->GetAIInterface()->SetUnitToFollow(this);
 		this->GetSummon()->GetAIInterface()->HandleEvent(EVENT_FOLLOWOWNER, this->GetSummon(), 0);
+		this->GetSummon()->GetAIInterface()->WipeTargetList();
 	}
 
 	// removing auras that kills players after if low HP
@@ -6742,12 +6713,6 @@ void Player::EndDuel(uint8 WinCondition)
 	//Stop Players attacking so they don't kill the other player
 	m_session->OutPacket(SMSG_CANCEL_COMBAT);
 	DuelingWith->m_session->OutPacket(SMSG_CANCEL_COMBAT);
-	
-	if(getAttackTarget() == DuelingWith->GetGUID())
-		setAttackTarget(NULL);
-
-	if(DuelingWith->getAttackTarget() == GetGUID())
-		DuelingWith->setAttackTarget(NULL);
 
 	smsg_AttackStop(DuelingWith);
 	DuelingWith->smsg_AttackStop(this);
@@ -6768,8 +6733,7 @@ void Player::StopMirrorTimer(uint32 Type)
 
 void Player::EventTeleport(uint32 mapid, float x, float y, float z)
 {
-	if (SafeTeleport(mapid, 0, LocationVector(x, y, z)))
-		this->clearAttackers(true);
+	SafeTeleport(mapid, 0, LocationVector(x, y, z));
 }
 
 void Player::ApplyLevelInfo(LevelInfo* Info, uint32 Level)

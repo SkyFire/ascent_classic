@@ -701,7 +701,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
 			return;
 		}
 
-		if(pPlayer->DuelingWith != NULL || pPlayer->isInCombat())
+		if(pPlayer->DuelingWith != NULL || pPlayer->CombatStatus.IsInCombat())
 		{
 			//can't quit still dueling or attacking
 			data << uint32(0x1); //Filler
@@ -794,8 +794,8 @@ void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
 		GetPlayer( )->SetTarget(guid);
 	}
 
-	if(guid == 0 && _player->getAttackTarget())
-		_player->setAttackTarget(0);
+	if(guid == 0)
+		_player->CombatStatus.ClearPrimaryAttackTarget();
 }
 
 void WorldSession::HandleSetSelectionOpcode( WorldPacket & recv_data )
@@ -808,8 +808,8 @@ void WorldSession::HandleSetSelectionOpcode( WorldPacket & recv_data )
 		_player->UpdateComboPoints();
 
 	_player->SetUInt64Value(UNIT_FIELD_TARGET, guid);
-	if(guid == 0 && _player->getAttackTarget())
-		_player->setAttackTarget(0);
+	if(guid == 0)
+		_player->CombatStatus.ClearPrimaryAttackTarget();
 }
 
 void WorldSession::HandleStandStateChangeOpcode( WorldPacket & recv_data )
@@ -1871,7 +1871,7 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if(_player->isInCombat())
+	if(_player->CombatStatus.IsInCombat())
 		return;
 
 	_player->SafeTeleport(_player->m_summonMapId, _player->m_summonInstanceId, 

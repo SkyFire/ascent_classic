@@ -3435,10 +3435,7 @@ void Spell::Heal(int32 amount)
 				if((*itr)->GetTypeId() != TYPEID_UNIT)
 					continue;
 				unit = static_cast<Unit*>((*itr));
-				if(unitTarget->IsBeingAttackedBy(unit) ||
-					unitTarget->getAttackTarget() == unit->GetGUID() ||
-					u_caster->IsBeingAttackedBy(unit) ||
-					u_caster->getAttackTarget() == unit->GetGUID())
+				if(unit->GetAIInterface()->GetNextTarget() == unitTarget)
 				{
 					target_threat.push_back(unit);
 					++count;
@@ -3459,35 +3456,13 @@ void Spell::Heal(int32 amount)
 				// for now we'll just use heal amount as threat.. we'll prolly need a formula though
 				((Unit*)(*itr))->GetAIInterface()->HealReaction(u_caster, unitTarget, threat);
 
-				if((*itr)->GetGUID() == u_caster->getAttackTarget())
+				if((*itr)->GetGUID() == u_caster->CombatStatus.GetPrimaryAttackTarget())
 					doneTarget = 1;
 			}
 		}
 
-		if(!u_caster->isInCombat() && unitTarget->isInCombat() && unitTarget->IsInWorld())
-		{
-			// "get" the caster in combat.
-			Unit * add = 0;
-
-			if(unitTarget->getAttackTarget())
-				add = unitTarget->GetMapMgr()->GetUnit(unitTarget->getAttackTarget());
-
-			if(!add)
-			{
-				// try and grab one from the list
-				if(target_threat.size())
-					add = *target_threat.begin();
-			}
-
-			if(add && !add->IsPlayer())
-				u_caster->addAttacker(add);
-		}
-		if(!doneTarget && u_caster->getAttackTarget())
-		{
-			// this shouldn't happen..
-			//printf("wtf in heal()");
-			//u_caster->m_AttackTarget->GetAIInterface()->HealReaction(u_caster, unitTarget, threat);
-		}
+		if(unitTarget->IsInWorld() && u_caster->IsInWorld())
+			u_caster->CombatStatus.WeHealed(unitTarget);
 	}   
 }
 

@@ -1754,12 +1754,12 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 	       p_caster->m_tempSummon = pCreature;
 	       pCreature->PushToWorld(p_caster->GetMapMgr());
 
-	       if(p_caster->isInCombat())
+	       /*if(p_caster->isInCombat())
 	       {
 		       Unit * target = p_caster->GetMapMgr()->GetUnit(p_caster->getAttackTarget());
 		       if(target)
 			       pCreature->GetAIInterface()->AttackReaction(target, 1, 0);
-	       }
+	       }*/
 	       
 	       /* not sure on this */
 	       sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE, /*GetDuration()*/45000, 1, 0);
@@ -3311,77 +3311,7 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 
 void Spell::SpellEffectSanctuary(uint32 i) // Stop all attacks made to you
 {
-	if(!u_caster)
-		return;
-	if(u_caster->GetAttackersetBegin() == u_caster->GetAttackersetEnd())
-		return;
-
-	uint64 *arr = new uint64[u_caster->GetAttackersetSize()];
-	int count = 0;
-
-	for(AttackerSet::iterator itr = u_caster->GetAttackersetBegin(); itr != u_caster->GetAttackersetEnd(); ++itr)
-	{
-		arr[count] = (*itr);
-		count++;
-	}
-	for(int i = 0; i < count; i++)
-	{
-		Unit *un = m_caster->GetMapMgr()->GetUnit(arr[i]);
-		if(un && un != m_caster)
-		{
-			if(un->IsPlayer())
-			{
-				static_cast<Player *>(un)->EventAttackStop();
-				static_cast<Player *>(un)->SetSelection(0);
-			} 
-			if(un->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT) == u_caster->GetGUID())
-			{
-				if(un->GetCurrentSpell())
-				{
-					Spell *spl = un->GetCurrentSpell();
-					if(spl == this) continue;
-					for(int i = 0; i < 3; i++)
-					{
-						if(spl->m_spellInfo->Effect[i] == SPELL_EFFECT_PERSISTENT_AREA_AURA)
-						{
-							DynamicObject *dObj = m_caster->GetMapMgr()->GetDynamicObject(un->GetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT));
-							if(!dObj)
-								return;//return ? seems to be wrong rather continue
-							//this code is wrong.. 
-							//WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-							//data << un->GetGUID();
-							//un->SendMessageToSet(&data,true);
-							dObj->RemoveFromWorld(true);
-							delete dObj;
-						}
-					}
-					spl->cancel();
-				}
-			}
-			un->smsg_AttackStop(u_caster);
-			un->setAttackTarget(NULL);
-			un->SetUInt32Value(UNIT_FIELD_TARGET, 0);
-			if(un->GetTypeId() == TYPEID_UNIT)
-			{
-				un->GetAIInterface()->HandleEvent(EVENT_LEAVECOMBAT, u_caster, 0);
-			}
-		}
-	}
-	if(u_caster->IsPlayer())
-	{
-		static_cast<Player *>(u_caster)->EventAttackStop();
-		uint64 guid = static_cast<Player *>(u_caster)->GetSelection();
-		if(guid != 0)
-		{
-			Unit *casterTarget = u_caster->GetMapMgr()->GetUnit(guid);
-			if(casterTarget)
-				u_caster->smsg_AttackStop(casterTarget);
-		}
-	}
-	u_caster->setAttackTarget(NULL);
-	u_caster->SetUInt32Value(UNIT_FIELD_TARGET, 0);
-
-	delete [] arr;
+	/* Note to burlex: RE-WRITE ME! */
 }
 
 void Spell::SpellEffectAddComboPoints(uint32 i) // Add Combo Points

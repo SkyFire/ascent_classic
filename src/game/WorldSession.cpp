@@ -268,9 +268,6 @@ void WorldSession::LogoutPlayer(bool Save)
 		if(_player->DuelingWith != NULL)
 			_player->EndDuel(DUEL_WINNER_RETREAT);
 
-		// wipe our attacker list and target list
-		_player->clearAttackers(true);
-
 		//Issue a message telling all guild members that this player signed off
 		if(_player->IsInGuild())
 		{

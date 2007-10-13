@@ -63,7 +63,6 @@ void WorldSession::HandleMoveWorldportAckOpcode( WorldPacket & recv_data )
 	sLog.outDebug( "WORLD: got MSG_MOVE_WORLDPORT_ACK." );
 	
 	GetPlayer()->SendInitialLogonPackets();
-	GetPlayer()->clearAttackers(true);
 	GetPlayer()->m_TeleportState = 2;
 	GetPlayer()->AddToWorld();
 	GetPlayer()->SetPlayerStatus(NONE);
@@ -93,7 +92,6 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 
 		sLog.outDebug( "WORLD: got MSG_MOVE_TELEPORT_ACK." );
 		GetPlayer()->SetPlayerStatus(NONE);
-		GetPlayer()->clearAttackers(true);
 		GetPlayer()->SetMovement(MOVE_UNROOT,5);
 		_player->ResetHeartbeatCoords();
 

@@ -235,7 +235,7 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 		}
 	}
 
-	if(GetPlayer()->isInCombat())
+	if(GetPlayer()->CombatStatus.IsInCombat())
 	{
 		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(SrcItem, NULL, INV_ERR_CANT_DO_IN_COMBAT);
 		return;
@@ -359,7 +359,7 @@ void WorldSession::HandleSwapInvItemOpcode( WorldPacket & recv_data )
 	bool skip_combat = false;
 	if( srcslot < EQUIPMENT_SLOT_END || dstslot < EQUIPMENT_SLOT_END )	  // We're doing an equip swap.
 	{
-		if(_player->isInCombat())
+		if(_player->CombatStatus.IsInCombat())
 		{
 			if( srcslot < EQUIPMENT_SLOT_MAINHAND || dstslot < EQUIPMENT_SLOT_MAINHAND )	// These can't be swapped
 			{

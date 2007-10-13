@@ -446,11 +446,16 @@ void Aura::Remove()
 	if(caster)
 	{
 		if(caster != m_target)
-			m_target->removeAttacker(caster);
+		{
+			caster->CombatStatus.RemoveAttackTarget(m_target);
+			m_target->CombatStatus.RemoveAttacker(caster, caster->GetGUID());
+		}
 
 		if(m_spellProto->buffIndexType != 0 && m_target->IsPlayer())
 			((Player*)m_target)->RemoveSpellIndexReferences(m_spellProto->buffIndexType);
 	}
+	else
+		m_target->CombatStatus.RemoveAttacker(NULL, m_casterGuid);
 
 	/**********************Cooldown**************************
 	* this is only needed for some spells
@@ -3967,7 +3972,6 @@ void Aura::SpellAuraFeighDeath(bool apply)
 			pTarget->EventDeath();
 			pTarget->SetFlag(UNIT_FIELD_FLAGS_2, 1);
 			pTarget->SetFlag(UNIT_FIELD_FLAGS, 0x20000000);
-			pTarget->clearAttackers(false);
 			
 			data.SetOpcode(SMSG_START_MIRROR_TIMER);
 			data << uint32(2);		// type

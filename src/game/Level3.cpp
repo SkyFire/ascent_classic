@@ -874,7 +874,7 @@ bool ChatHandler::HandleAddRestXPCommand(const char* args, WorldSession *m_sessi
 
 bool ChatHandler::HandleShowAttackersCommand(const char* args, WorldSession *m_session)
 {
-	Player *plr = this->getSelectedChar(m_session, false);
+	/*Player *plr = this->getSelectedChar(m_session, false);
 	std::string name;
 	Unit *target;
 	if(!plr)
@@ -907,13 +907,13 @@ bool ChatHandler::HandleShowAttackersCommand(const char* args, WorldSession *m_s
 		unit->BuildFieldUpdatePacket(m_session->GetPlayer(), UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_UNIT_TRACKABLE);
 		++count;
 	}
-	SystemMessage(m_session, "Total of %d attacking units.", count);
+	SystemMessage(m_session, "Total of %d attacking units.", count);*/
 	return true;
 }
 
 bool ChatHandler::HandleAttackerInfoCommand(const char* args, WorldSession *m_session)
 {
-	Player *plr = this->getSelectedChar(m_session, false);
+	/*Player *plr = this->getSelectedChar(m_session, false);
 	std::string name;
 	Unit *target;
 	if(!plr)
@@ -971,7 +971,7 @@ bool ChatHandler::HandleAttackerInfoCommand(const char* args, WorldSession *m_se
 	} else {
 		add += "None";
 	}
-	SystemMessage(m_session, add.c_str());
+	SystemMessage(m_session, add.c_str());*/
 	return true;
 }
 

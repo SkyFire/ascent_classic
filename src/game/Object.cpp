@@ -1486,11 +1486,11 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
 	if(this->IsUnit())
 	{
-		if(!pVictim->isInCombat() && pVictim->IsPlayer())
+/*		if(!pVictim->isInCombat() && pVictim->IsPlayer())
 			sHookInterface.OnEnterCombat((Player*)pVictim, ((Unit*)this));
 
 		if(IsPlayer() && !((Player*)this)->isInCombat())
-			sHookInterface.OnEnterCombat(((Player*)this), ((Player*)this));
+			sHookInterface.OnEnterCombat(((Player*)this), ((Player*)this));*/
 
 		plr = 0;
 		if(IsPet())
@@ -1555,7 +1555,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if(pVictim->IsUnit())
 		{
 			// Set our attack target to the victim.
-			static_cast<Unit*>(this)->setAttackTarget(pVictim);
+			((Unit*)this)->CombatStatus.OnDamageDealt(pVictim);
 		}
 	}
 
@@ -1576,7 +1576,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
         if(pVictim->GetPowerType() == POWER_TYPE_RAGE && !spellId && pVictim != this)
 	  {
-	    if(pVictim->IsPlayer() && pVictim->isInCombat()) {
+	    if(pVictim->IsPlayer()) {				// WTF? - Burlex
 	      val = pVictim->GetUInt32Value(UNIT_FIELD_POWER2)+(damage*20)/(pVictim->getLevel()*3);
 	      pVictim->SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
 	    }
@@ -1672,7 +1672,10 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if(pVictim->IsPlayer())
 			((Player*)pVictim)->KillPlayer();
 		else
+		{
 			pVictim->setDeathState(JUST_DIED);
+			pVictim->GetAIInterface()->HandleEvent(EVENT_LEAVECOMBAT, ((Unit*)this), 0);
+		}
 
 		if(pVictim->IsPlayer() && (!IsPlayer() || pVictim == this))
 		{
@@ -1772,7 +1775,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		}
 
 		// Wipe our attacker set on death
-		pVictim->clearAttackers(true);
+		pVictim->CombatStatus.Vanished();
 
 		//		 sent to set. don't send it to the party, becuase if they're out of
 		//		 range they won't know this guid exists -> possible 132.
@@ -1796,7 +1799,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			((Unit*)this)->addStateFlag(UF_TARGET_DIED);
 
 			// We will no longer be attacking this target, as it's dead.
-			static_cast<Unit*>(this)->setAttackTarget(NULL);
+			//static_cast<Unit*>(this)->setAttackTarget(NULL);
 		}
 		//so now we are completely dead
 		//lets see if we have spirit of redemption
