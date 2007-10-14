@@ -353,10 +353,12 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}break;
 		case EVENT_UNFEAR:
 			{
+				m_moveRun = true;
 				// update speed
 				getMoveFlags();
-//				m_AIState = STATE_IDLE;
+
 				//maybe we were not idle before fear. Like a guardian could have been doing something
+				//m_AIState = STATE_IDLE;
 				m_AIState = m_AIState_backup;
 				UnitToFollow = UnitToFollow_backup;
 				FollowDistance = FollowDistance_backup;
@@ -374,7 +376,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				FollowDistance = 0.0f;
 
 				//comented by Zack : why do we need to forget our old targets ?. Maybe this was put here with a reason
-//				m_aiTargets.clear();
+				//m_aiTargets.clear();
 				m_fleeTimer = 0;
 				m_hasFleed = false;
 				m_hasCalledForHelp = false;
@@ -391,8 +393,10 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}break;
 		case EVENT_UNWANDER:
 			{
+				m_moveRun = true;
 				// update speed
 				getMoveFlags();
+
 				UnitToFollow = UnitToFollow_backup;
 				FollowDistance = FollowDistance_backup;
 				m_AIState = m_AIState_backup;
