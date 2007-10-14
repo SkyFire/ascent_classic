@@ -1274,23 +1274,25 @@ void Player::BuildEnumData( WorldPacket * p_data )
 ///  It assumes you will send out an UpdateObject packet at a later time.
 void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 {
-	uint32 restxp = xp;
 	if ( xp < 1 )
 		return;
-	if(!GetSession()->CanUseCommand('p'))
-		if(getLevel() >= GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))
-			return;
+
+	if(getLevel() >= GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))
+		return;
+
+	uint32 restxp = xp;
 
 	if(m_restState == RESTSTATE_RESTED && allowbonus)
 	{
 		restxp = SubtractRestXP(xp);
 		xp += restxp;
 	}
-	UpdateRestState();
-	
-    SendLogXPGain(guid,xp,restxp,guid == 0 ? true : false);
 
-    /*uint32 curXP = GetUInt32Value(PLAYER_XP);
+	UpdateRestState();
+	SendLogXPGain(guid,xp,restxp,guid == 0 ? true : false);
+
+	/*
+	uint32 curXP = GetUInt32Value(PLAYER_XP);
 	uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
 	uint32 newXP = curXP + xp;
 	uint32 level = GetUInt32Value(UNIT_FIELD_LEVEL);
@@ -1314,7 +1316,8 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 			uint32 curTalentPoints = GetUInt32Value(PLAYER_CHARACTER_POINTS1);
 			SetUInt32Value(PLAYER_CHARACTER_POINTS1,curTalentPoints+1);
 		}
-	}*/
+	}
+	*/
 
 	if(m_Summon != NULL && m_Summon->GetUInt32Value(UNIT_CREATED_BY_SPELL) == 0)
 		m_Summon->GiveXP(xp);
