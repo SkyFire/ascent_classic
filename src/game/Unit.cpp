@@ -182,7 +182,7 @@ Unit::Unit()
 		DamageTakenPctMod[x] = 1;
 		SpellCritChanceSchool[x] = 0;
 		PowerCostMod[x] = 0;
-		PowerCostPctMod[x] = 0;
+		PowerCostPctMod[x] = 0; // armor penetration & spell penetration
 		AttackerSpellCritChanceMod[x]=0;
 	}
 	DamageTakenPctModOnHP = 1;

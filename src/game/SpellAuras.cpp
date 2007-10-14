@@ -143,7 +143,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//SPELL_AURA_UNTRACKABLE = 120,
 		&Aura::SpellAuraEmphaty,//SPELL_AURA_EMPATHY = 121,
 		&Aura::SpellAuraModOffhandDamagePCT,//SPELL_AURA_MOD_OFFHAND_DAMAGE_PCT = 122,
-		&Aura::SpellAuraModPowerCostPCT,//SPELL_AURA_MOD_POWER_COST_PCT = 123, /* VICTIM RESISTANCE REDUCION AURA!!!! NOT POWER COST */
+		&Aura::SpellAuraModPowerCostPCT,//SPELL_AURA_MOD_POWER_COST_PCT = 123, --> armor penetration & spell penetration, NOT POWER COST!
 		&Aura::SpellAuraModRangedAttackPower,//SPELL_AURA_MOD_RANGED_ATTACK_POWER = 124,
 		&Aura::SpellAuraModMeleeDamageTaken,//SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN = 125,
 		&Aura::SpellAuraModMeleeDamageTakenPct,//SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT = 126,
@@ -6200,24 +6200,24 @@ void Aura::SpellAuraModOffhandDamagePCT(bool apply)
 	}
 }
 
-void Aura::SpellAuraModPowerCostPCT(bool apply)
+void Aura::SpellAuraModPowerCostPCT(bool apply) // armor penetration & spell penetration
 {
-	//DK:This is basicly resistance reduce but i really dont 
+	//DK:This is basicly resistance reduce but i really dont
 	//know why blizz named this function like this
 	if(apply)
 	{
 		if(mod->m_amount < 0)
-			SetNegative();
-		else
 			SetPositive();
+		else
+			SetNegative();
 
 		for(uint32 x=0;x<7;x++)
 		{
 			if (mod->m_miscValue & (((uint32)1)<<x))
-				m_target->PowerCostPctMod[x] += mod->m_amount;
+				m_target->PowerCostPctMod[x] -= mod->m_amount;
 		}
-		
-		if(mod->m_miscValue == 126 && m_target->IsPlayer())
+
+		if(mod->m_miscValue & 124 && m_target->IsPlayer())
 			m_target->ModUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -mod->m_amount);
 	}
 	else
@@ -6225,9 +6225,9 @@ void Aura::SpellAuraModPowerCostPCT(bool apply)
 		for(uint32 x=0;x<7;x++)
 		{
 			if (mod->m_miscValue & (((uint32)1)<<x))
-				m_target->PowerCostPctMod[x] -= mod->m_amount;
+				m_target->PowerCostPctMod[x] += mod->m_amount;
 		}
-		if(mod->m_miscValue == 126 && m_target->IsPlayer())
+		if(mod->m_miscValue & 124 && m_target->IsPlayer())
 			m_target->ModUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE,  mod->m_amount);
 	}
 }

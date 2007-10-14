@@ -164,7 +164,7 @@ enum MOD_TYPES
     SPELL_AURA_UNTRACKABLE = 120,                       // Untrackable
     SPELL_AURA_EMPATHY = 121,                           // Empathy (Lore, whatever)
     SPELL_AURA_MOD_OFFHAND_DAMAGE_PCT = 122,            // Mod Offhand Dmg %
-    SPELL_AURA_MOD_POWER_COST_PCT = 123,                // Mod Power Cost %
+    SPELL_AURA_MOD_POWER_COST_PCT = 123,                // Mod Power Cost % --> armor penetration & spell penetration
     SPELL_AURA_MOD_RANGED_ATTACK_POWER = 124,           // Mod Ranged Attack Power
     SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN = 125,            // Mod Melee Dmg Taken
     SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT = 126,        // Mod Melee % Dmg Taken

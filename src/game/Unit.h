@@ -970,7 +970,7 @@ public:
 	uint32 SchoolImmunityList[7];
 	float SpellCritChanceSchool[7];
 	int32 PowerCostMod[7];
-	float PowerCostPctMod[7];
+	float PowerCostPctMod[7]; // armor penetration & spell penetration
 	int32 AttackerSpellCritChanceMod[7];
 	uint32 SpellDelayResist[7];
 	int32 CreatureAttackPowerMod[12];
