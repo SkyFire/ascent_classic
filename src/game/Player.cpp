@@ -4963,8 +4963,24 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		data << uint32(itemProto->ItemId);
 		data << uint32(iter->iItemsCount);//nr of items of this type
 		data << uint32(iter->item.displayid); 
-		data << uint32(0) ;
-		data << uint32(iter->iRandomProperty);
+		//data << uint32(iter->iRandomSuffix ? iter->iRandomSuffix->id : 0);
+		//data << uint32(iter->iRandomProperty ? iter->iRandomProperty->ID : 0);
+		if(iter->iRandomSuffix)
+		{
+			data << Item::GenerateRandomSuffixFactor(itemProto);
+			data << uint32(-int32(iter->iRandomSuffix->id));
+		}
+		else if(iter->iRandomProperty)
+		{
+			data << uint32(0);
+			data << uint32(iter->iRandomProperty->ID);
+		}
+		else
+		{
+			data << uint32(0);
+			data << uint32(0);
+		}
+
 		data << slottype;   // "still being rolled for" flag
 		
 		if(slottype == 1)
@@ -4972,12 +4988,16 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 			if(iter->roll == NULL && !iter->passed)
 			{
 				int32 ipid = 0;
+				uint32 factor=0;
 				if(iter->iRandomProperty)
 					ipid=iter->iRandomProperty->ID;
 				else if(iter->iRandomSuffix)
+				{
 					ipid = -int32(iter->iRandomSuffix->id);
+					factor=Item::GenerateRandomSuffixFactor(iter->item.itemproto);
+				}
 
-				iter->roll = new LootRoll(60000, (m_Group != NULL ? m_Group->MemberCount() : 1),  guid, x, iter->item.itemproto->ItemId, 0, uint32(ipid), GetMapMgr());
+				iter->roll = new LootRoll(60000, (m_Group != NULL ? m_Group->MemberCount() : 1),  guid, x, iter->item.itemproto->ItemId, factor, uint32(ipid), GetMapMgr());
 				data2.Initialize(SMSG_LOOT_START_ROLL);
 				data2 << guid;
 				data2 << x;

@@ -162,10 +162,11 @@ void Channel::Part(Player * plr)
 
     if(m_members.size() == 0)
     {
-        channelmgr.RemoveChannel(this);
         m_lock.Release();
+		channelmgr.RemoveChannel(this);
     }
-    m_lock.Release();
+	else
+		m_lock.Release();
 }
 
 void Channel::SetOwner(Player * oldpl, Player * plr)

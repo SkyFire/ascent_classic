@@ -46,7 +46,6 @@ Item::Item(uint32 high,uint32 low)
 	locked = false;
 	m_isDirty = true;
 	random_prop=random_suffix=0;
-	random_suffixfactor=0.0f;
 }
 
 Item::~Item()
@@ -943,7 +942,7 @@ uint32 Item::GetSocketsCount()
 	return c;
 }
 
-void Item::GenerateRandomSuffixFactor()
+uint32 Item::GenerateRandomSuffixFactor(ItemPrototype * m_itemProto)
 {
 	const static double SuffixMods[NUM_INVENTORY_TYPES] = {
 		0.0,
@@ -984,6 +983,5 @@ void Item::GenerateRandomSuffixFactor()
 		value = SuffixMods[m_itemProto->InventoryType];
 
 	value = (value * double(m_itemProto->ItemLevel)) + 0.5;
-	SetUInt32Value(ITEM_FIELD_PROPERTY_SEED, long2int32(value));
-	random_suffixfactor = float(value);
+	return long2int32(value);
 }

@@ -145,8 +145,8 @@ public:
 	EnchantmentInstance * GetEnchantment(uint32 slot);
 	bool IsGemRelated(EnchantEntry * Enchantment);
 
-	inline float GetItemRandomSuffixFactor() { return random_suffixfactor; }
-	void GenerateRandomSuffixFactor();
+	inline uint32 GetItemRandomSuffixFactor() { return m_uint32Values[ITEM_FIELD_PROPERTY_SEED]; }
+	static uint32 GenerateRandomSuffixFactor(ItemPrototype * m_itemProto);
 
 	inline void SetRandomProperty(uint32 id)
 	{
@@ -157,9 +157,10 @@ public:
 	inline void SetRandomSuffix(uint32 id)
 	{
 		int32 r_id = -(int32(id));
+		uint32 v = Item::GenerateRandomSuffixFactor(m_itemProto);
 		SetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, (uint32)r_id);
+		SetUInt32Value(ITEM_FIELD_PROPERTY_SEED, v);
 		random_suffix = id;
-		GenerateRandomSuffixFactor();
 	}
 
 protected:
@@ -171,7 +172,6 @@ protected:
 	Player *m_owner; // let's not bother the manager with unneeded requests
 	uint32 random_prop;
 	uint32 random_suffix;
-	float random_suffixfactor;
 };
 
 uint32 GetSkillByProto(uint32,uint32);
