@@ -167,11 +167,11 @@ void AddItemFromProspecting(uint32 loot_id,Player*owner)
 
 	for(uint32 x =0,pass=0; x<list->count; x++,pass++)
 	{
-		if(list->items[x].item.itemid)// this check is needed until loot DB is fixed
+		if(list->items[x].item.itemproto)// this check is needed until loot DB is fixed
 		{
 			if(Rand(list->items[x].chance)) 
 		    {
-				ItemPrototype *itemproto = ItemPrototypeStorage.LookupEntry(list->items[x].item.itemid);
+				ItemPrototype *itemproto = list->items[x].item.itemproto;
 				if(!itemproto)
 					return;
 				uint32 count = 1;
@@ -180,12 +180,12 @@ void AddItemFromProspecting(uint32 loot_id,Player*owner)
 					for(uint32 z = (x + 1); z < list->count; z++)
 						if(itemproto->MaxCount && (count == itemproto->MaxCount))
 							break;
-						else if(list->items[x].item.itemid == list->items[z].item.itemid && Rand(list->items[x].chance))
+						else if(list->items[x].item.itemproto == list->items[z].item.itemproto && Rand(list->items[x].chance))
 							count++;
 				}
 				Item *add;
 				SlotResult slotresult;
-				add = owner->GetItemInterface()->FindItemLessMax(list->items[x].item.itemid, count, false);
+				add = owner->GetItemInterface()->FindItemLessMax(list->items[x].item.itemproto->ItemId, count, false);
 				if (!add)
 				{
 					slotresult = owner->GetItemInterface()->FindFreeInventorySlot(itemproto);
@@ -194,7 +194,7 @@ void AddItemFromProspecting(uint32 loot_id,Player*owner)
 						owner->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_INVENTORY_FULL);
 						return;
 					}
-					Item * it=objmgr.CreateItem(list->items[x].item.itemid,owner);  
+					Item * it=objmgr.CreateItem(list->items[x].item.itemproto->ItemId,owner);  
 					it->SetUInt32Value( ITEM_FIELD_STACK_COUNT, count);
 					owner->GetItemInterface()->SafeAddItem(it,slotresult.ContainerSlot, slotresult.Slot);
 				}

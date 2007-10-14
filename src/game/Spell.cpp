@@ -3007,6 +3007,41 @@ int32 Spell::CalculateEffect(uint32 i)
 	float randomPointsPerLevel  = m_spellInfo->EffectDicePerLevel[i];
 	int32 basePoints            = m_spellInfo->EffectBasePoints[i] + 1;
 
+	/* Random suffix value calculation */
+	if(i_caster && (int32(i_caster->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID)) < 0))
+	{
+        ItemRandomSuffixEntry * si = dbcItemRandomSuffix.LookupEntry(abs(int(i_caster->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID))));
+		EnchantEntry * ent;
+		uint32 i,j;
+		float v;
+
+		for(i = 0; i < 3; ++j)
+		{
+			if(si->enchantments[i] != 0)
+			{
+				ent = dbcEnchant.LookupEntry(si->enchantments[i]);
+				for(j = 0; j < 3; ++j)
+				{
+					if(ent->spell[j] == m_spellInfo->Id)
+					{
+						if(si->prefixes[i] == 0)
+							goto exit;
+						
+						v = i_caster->GetItemRandomSuffixFactor() * float(si->prefixes[i]);
+						v /= 10000.0f;
+                        value = float2int32(v);
+						
+						if(value == 0)
+							goto exit;
+
+						return value;
+					}
+				}
+			}
+		}
+	}
+exit:
+
 	/* Shady: it's so strange cause almost all spells has BPPL!=0 so at lvl70 Fireball takes +280 damage.
 	I think it's imbalanced so committed and replaced with dirty fix.
 	if (m_caster->IsUnit())

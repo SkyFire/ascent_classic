@@ -79,8 +79,8 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
 		return;
 	} 
-	itemid = pLoot->items.at(lootSlot).item.itemid;
-	ItemPrototype* it = ItemPrototypeStorage.LookupEntry(itemid);
+	itemid = pLoot->items.at(lootSlot).item.itemproto->ItemId;
+	ItemPrototype* it = pLoot->items.at(lootSlot).item.itemproto;
 
 	if((error = _player->GetItemInterface()->CanReceiveItem(it, 1)))
 	{
@@ -108,10 +108,16 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		Item *item = objmgr.CreateItem( itemid, GetPlayer());
 	   
 		item->SetUInt32Value(ITEM_FIELD_STACK_COUNT,amt);
-		uint32 rndprop=pLoot->items.at(lootSlot).iRandomProperty;
-		if(rndprop)
-			item->SetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID,rndprop);
-		item->ApplyRandomProperties();
+		if(pLoot->items.at(lootSlot).iRandomProperty!=NULL)
+		{
+			item->SetRandomProperty(pLoot->items.at(lootSlot).iRandomProperty->ID);
+			item->ApplyRandomProperties();
+		}
+		else if(pLoot->items.at(lootSlot).iRandomSuffix != NULL)
+		{
+			item->SetRandomSuffix(pLoot->items.at(lootSlot).iRandomSuffix->id);
+			item->ApplyRandomProperties();
+		}
 
 		GetPlayer()->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
 		
@@ -141,9 +147,9 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
     if(it->Class == ITEM_CLASS_QUEST)
     {
         uint32 pcount = _player->GetItemInterface()->GetItemCount(it->ItemId, true);
-		BuildItemPushResult(&idata, _player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(lootSlot).iRandomProperty,0xFF,0,0xFFFFFFFF,pcount);
+		BuildItemPushResult(&idata, _player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(lootSlot).iRandomProperty ? pLoot->items.at(lootSlot).iRandomProperty->ID : 0,0xFF,0,0xFFFFFFFF,pcount);
     }
-    else BuildItemPushResult(&idata, _player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(lootSlot).iRandomProperty);
+	else BuildItemPushResult(&idata, _player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(lootSlot).iRandomProperty ? pLoot->items.at(lootSlot).iRandomProperty->ID : 0);
 
 	if(_player->InGroup())
 		_player->GetGroup()->SendPacketToAll(&idata);
@@ -363,10 +369,10 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 			for(std::vector<__LootItem>::iterator i=pCreature->loot.items.begin();i!=pCreature->loot.items.end();i++)
 			if(i->iItemsCount)
 			{
-				ItemPrototype *proto=ItemPrototypeStorage.LookupEntry(i->item.itemid);
+				ItemPrototype *proto=i->item.itemproto;
 				if(proto->Class != 12)
 				return;
-				if(_player->HasQuestForItem(i->item.itemid))
+				if(_player->HasQuestForItem(i->item.itemproto->ItemId))
 				return;
 			}
 			pCreature->BuildFieldUpdatePacket(_player, UNIT_DYNAMIC_FLAGS, 0);
@@ -1601,8 +1607,8 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
 		return;
 	} 
-	itemid = pLoot->items.at(slotid).item.itemid;
-	ItemPrototype* it = ItemPrototypeStorage.LookupEntry(itemid);
+	itemid = pLoot->items.at(slotid).item.itemproto->ItemId;
+	ItemPrototype* it = pLoot->items.at(slotid).item.itemproto;
 
 	if((error = player->GetItemInterface()->CanReceiveItem(it, 1)))
 	{
@@ -1624,10 +1630,16 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	Item *item = objmgr.CreateItem( itemid, player);
 	
 	item->SetUInt32Value(ITEM_FIELD_STACK_COUNT,amt);
-	uint32 rndprop=pLoot->items.at(slotid).iRandomProperty;
-	if(rndprop)
-		item->SetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID,rndprop);
-	item->ApplyRandomProperties();
+	if(pLoot->items.at(slotid).iRandomProperty!=NULL)
+	{
+		item->SetRandomProperty(pLoot->items.at(slotid).iRandomProperty->ID);
+		item->ApplyRandomProperties();
+	}
+	else if(pLoot->items.at(slotid).iRandomSuffix != NULL)
+	{
+		item->SetRandomSuffix(pLoot->items.at(slotid).iRandomSuffix->id);
+		item->ApplyRandomProperties();
+	}
 
 	player->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
 	
@@ -1650,11 +1662,11 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
     if(it->Class == ITEM_CLASS_QUEST)
     {
         uint32 pcount = player->GetItemInterface()->GetItemCount(it->ItemId, true);
-		BuildItemPushResult(&idata, GetPlayer()->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(slotid).iRandomProperty,0xFF,0,0xFFFFFFFF,pcount);
+		BuildItemPushResult(&idata, GetPlayer()->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(slotid).iRandomProperty ? pLoot->items.at(slotid).iRandomProperty->ID : 0,0xFF,0,0xFFFFFFFF,pcount);
     }
     else
     {
-        BuildItemPushResult(&idata, player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(slotid).iRandomProperty);
+		BuildItemPushResult(&idata, player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(slotid).iRandomProperty ? pLoot->items.at(slotid).iRandomProperty->ID : 0);
     }
 
 	if(_player->InGroup())

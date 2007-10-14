@@ -20,6 +20,7 @@
 #ifndef _LOOTMGR_H
 #define _LOOTMGR_H
 
+struct ItemPrototype;
 class MapMgr;
 class LootRoll : public EventableObject
 {
@@ -45,22 +46,12 @@ private:
 	MapMgr * _mgr;
 };
 
-typedef struct
-{
-	uint32	prop;
-	float	chance;
-}LootProp;
+typedef vector<pair<RandomProps*, float> > RandomPropertyVector;
+typedef vector<pair<ItemRandomSuffixEntry*, float> > RandomSuffixVector;
 
 typedef struct
 {
-	LootProp * pProps;
-	uint32	iPropsCount;
-}LootPropTable;
-
-
-typedef struct
-{
-	uint32 itemid;
+	ItemPrototype * itemproto;
 	uint32 displayid;
 }_LootItem;
 
@@ -68,7 +59,8 @@ typedef struct
 {
 	_LootItem item;
 	uint32 iItemsCount;
-	uint32 iRandomProperty;
+	RandomProps * iRandomProperty;
+	ItemRandomSuffixEntry * iRandomSuffix;
 	LootRoll *roll;
 	bool passed;
 }__LootItem;
@@ -81,7 +73,6 @@ typedef struct
 	float chance2;
 	uint32 mincount;
 	uint32 maxcount;
-	LootPropTable *prop;
 }StoreLootItem;
 
 
@@ -114,7 +105,6 @@ struct tempy
 
 
 typedef HM_NAMESPACE::hash_map<uint32, StoreLootList > LootStore;  
-typedef HM_NAMESPACE::hash_map<uint32,  LootPropTable*> PropStore; 
 
 #define PARTY_LOOT_FFA	  0
 #define PARTY_LOOT_MASTER   2
@@ -130,9 +120,6 @@ public:
 	LootMgr();
 	~LootMgr();
 
-	typedef HM_NAMESPACE::hash_map<uint32, StoreLootList > LootStore;  
-	typedef HM_NAMESPACE::hash_map<uint32,  LootPropTable*> PropStore; 
-	
 	void FillProfessionLoot(LootStore * store,Loot * loot,uint32 loot_id);
 	void FillCreatureLoot(Loot * loot,uint32 loot_id, bool heroic);
 	void FillGOLoot(Loot * loot,uint32 loot_id, bool heroic);
@@ -145,7 +132,7 @@ public:
 	bool IsFishable(uint32 zoneid);
 
 	void LoadLoot();
-	void LoadLootProp(uint32);
+	void LoadLootProp();
 	
 	LootStore	CreatureLoot;
 	
@@ -156,12 +143,16 @@ public:
 	LootStore	ProspectingLoot;
 	LootStore PickpocketingLoot;
 	std::map<uint32, std::set<uint32> > quest_loot_go;
+
+	RandomProps * GetRandomProperties(ItemPrototype * proto);
+	ItemRandomSuffixEntry * GetRandomSuffix(ItemPrototype * proto);
  
 private:
 	void LoadLootTables(const char * szTableName,LootStore * LootTable);
 	void PushLoot(StoreLootList *list,Loot * loot, bool heroic);
-	PropStore	LootProperties;
-   // uint32 _propCount;
+	
+	map<uint32, RandomPropertyVector> _randomprops;
+	map<uint32, RandomSuffixVector> _randomsuffix;
 };
 
 #define lootmgr LootMgr::getSingleton()

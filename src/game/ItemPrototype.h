@@ -539,7 +539,7 @@ struct ItemPrototype
 	uint32 LockMaterial;
 	uint32 Field108;
 	uint32 RandomPropId;
-	uint32 RandomPropId_2;
+	uint32 RandomSuffixId;
 	uint32 Block;
 	uint32 ItemSet;
 	uint32 MaxDurability;

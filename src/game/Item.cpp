@@ -45,6 +45,8 @@ Item::Item(uint32 high,uint32 low)
 	loot = NULL;
 	locked = false;
 	m_isDirty = true;
+	random_prop=random_suffix=0;
+	random_suffixfactor=0.0f;
 }
 
 Item::~Item()
@@ -98,6 +100,7 @@ void Item::Create( uint32 itemid, Player *owner )
 void Item::LoadFromDB(	Field *fields, Player * plr, bool light)
 {
 	uint32 itemid=fields[2].GetUInt32();
+	uint32 random_prop, random_suffix;
 	m_itemProto = ItemPrototypeStorage.LookupEntry( itemid );
 	ASSERT(m_itemProto);
 	
@@ -120,16 +123,22 @@ void Item::LoadFromDB(	Field *fields, Player * plr, bool light)
 	}
 	
 	SetUInt32Value( ITEM_FIELD_FLAGS, fields[6].GetUInt32());
-	SetUInt32Value( ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetUInt32());
+	random_prop = fields[7].GetUInt32();
+	random_suffix = fields[8].GetUInt32();
 
-	SetUInt32Value( ITEM_FIELD_ITEM_TEXT_ID, fields[8].GetUInt32());
+	if(random_prop)
+		SetRandomProperty(random_prop);
+	else if(random_suffix)
+		SetRandomSuffix(random_suffix);
+
+	SetUInt32Value( ITEM_FIELD_ITEM_TEXT_ID, fields[9].GetUInt32());
 
 	SetUInt32Value( ITEM_FIELD_MAXDURABILITY, m_itemProto->MaxDurability);
-	SetUInt32Value( ITEM_FIELD_DURABILITY, fields[9].GetUInt32());
+	SetUInt32Value( ITEM_FIELD_DURABILITY, fields[10].GetUInt32());
 
 	if(light) return;
 
-	string enchant_field = fields[12].GetString();
+	string enchant_field = fields[13].GetString();
 	vector<string> enchants = StrSplit(enchant_field, ";");
 	uint32 enchant_id;
 	EnchantEntry * entry;
@@ -241,7 +250,7 @@ void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
 	ss << GetUInt32Value(ITEM_FIELD_STACK_COUNT) << ",";
 	ss << GetChargesLeft() << ",";
 	ss << GetUInt32Value(ITEM_FIELD_FLAGS) << ",";
-	ss << GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) << ",";
+	ss << random_prop << ", " << random_suffix << ", ";
 	ss << GetUInt32Value(ITEM_FIELD_ITEM_TEXT_ID) << ",";
 	ss << GetUInt32Value(ITEM_FIELD_DURABILITY) << ",";
 	ss << static_cast<int>(containerslot) << ",";
@@ -689,6 +698,7 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 						if(!sp) continue;
 
 						spell = new Spell(m_owner, sp, true, 0);
+						spell->i_caster = this;
 						spell->prepare(&targets);
 					}
 				}
@@ -931,4 +941,49 @@ uint32 Item::GetSocketsCount()
 	if(GetProto()->Sockets[x].SocketColor)
 		c++;
 	return c;
+}
+
+void Item::GenerateRandomSuffixFactor()
+{
+	const static double SuffixMods[NUM_INVENTORY_TYPES] = {
+		0.0,
+		0.46,		// HEAD
+		0.26,		// NECK
+		0.35,		// SHOULDERS
+		0.46,		// BODY
+		0.46,		// CHEST
+		0.35,		// WAIST
+		0.46,		// LEGS
+		0.34,		// FEET
+		0.26,		// WRISTS
+		0.35,		// HANDS
+		0.26,		// FINGER
+		0.0,		// TRINKET
+		0.19,		// WEAPON
+		0.25,		// SHEILD
+		0.14,		// RANGED
+		0.26,		// CLOAK
+		0.46,		// 2H-WEAPON
+		0.0,		// BAG
+		0.0,		// TABARD
+		0.46,		// ROBE
+		0.19,		// MAIN-HAND WEAPON
+		0.19,		// OFF-HAND WEAPON
+		0.26,		// HOLDABLE
+		0.0,		// AMMO
+		0.26,		// THROWN
+		0.14,		// RANGED
+		0.0,		// QUIVER
+		0.26,		// RELIC
+	};
+
+	double value;
+	if(m_itemProto->Class == ITEM_CLASS_ARMOR && m_itemProto->Quality > ITEM_QUALITY_NORMAL_WHITE)
+		value = SuffixMods[m_itemProto->InventoryType] * 1.24;
+	else
+		value = SuffixMods[m_itemProto->InventoryType];
+
+	value = (value * double(m_itemProto->ItemLevel)) + 0.5;
+	SetUInt32Value(ITEM_FIELD_PROPERTY_SEED, long2int32(value));
+	random_suffixfactor = float(value);
 }

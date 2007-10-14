@@ -145,6 +145,23 @@ public:
 	EnchantmentInstance * GetEnchantment(uint32 slot);
 	bool IsGemRelated(EnchantEntry * Enchantment);
 
+	inline float GetItemRandomSuffixFactor() { return random_suffixfactor; }
+	void GenerateRandomSuffixFactor();
+
+	inline void SetRandomProperty(uint32 id)
+	{
+		SetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, id);
+		random_prop = id;
+	}
+
+	inline void SetRandomSuffix(uint32 id)
+	{
+		int32 r_id = -(int32(id));
+		SetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, (uint32)r_id);
+		random_suffix = id;
+		GenerateRandomSuffixFactor();
+	}
+
 protected:
 
 	ItemPrototype *m_itemProto;
@@ -152,6 +169,9 @@ protected:
 	uint32 _fields[ITEM_END];//this mem is wasted in case of container... but this will be fixed in future
 
 	Player *m_owner; // let's not bother the manager with unneeded requests
+	uint32 random_prop;
+	uint32 random_suffix;
+	float random_suffixfactor;
 };
 
 uint32 GetSkillByProto(uint32,uint32);

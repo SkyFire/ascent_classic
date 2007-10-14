@@ -50,13 +50,37 @@ const T& RandomChoice( const T* variant, int count )
   return variant[count-1];
 }
 
+template <class T>  // works for anything that has the field 'chance' and is stored in plain array
+T* RandomChoiceVector( vector<pair<T*, float> > & variant )
+{
+	float totalChance = 0;
+	float val;
+	vector<pair<T*,float> >::iterator itr;
+
+	if(variant.size() == 0)
+		return NULL;
+
+	for(itr = variant.begin(); itr != variant.end(); ++itr)
+		totalChance += itr->second;
+
+	val = sRand.rand(totalChance);
+	
+	for(itr = variant.begin(); itr != variant.end(); ++itr)
+	{
+		val -= itr->second;
+		if (val <= 0) return itr->first;
+	}
+	// should not come here, buf if it does, we should return something reasonable
+	return variant.begin()->first;
+}
+
 LootMgr::LootMgr()
 {}
 
 void LootMgr::LoadLoot()
 {
 	//THIS MUST BE CALLED AFTER LOADING OF ITEMS
-	LoadLootProp(0);
+	LoadLootProp();
 	LoadLootTables("creatureloot",&CreatureLoot);
 	LoadLootTables("objectloot",&GOLoot);
 	LoadLootTables("skinningloot",&SkinningLoot);
@@ -66,40 +90,105 @@ void LootMgr::LoadLoot()
 	LoadLootTables("pickpocketingloot", &PickpocketingLoot);
 }
 
-void LootMgr::LoadLootProp(uint32 id)
+RandomProps * LootMgr::GetRandomProperties(ItemPrototype * proto)
+{
+	map<uint32,RandomPropertyVector>::iterator itr;
+
+	if(proto->RandomPropId==0)
+		return NULL;
+
+    itr = _randomprops.find(proto->RandomPropId);
+	if(itr==_randomprops.end())
+		return NULL;
+
+	return RandomChoiceVector<RandomProps>(itr->second);
+}
+
+ItemRandomSuffixEntry * LootMgr::GetRandomSuffix(ItemPrototype * proto)
+{
+	map<uint32,RandomSuffixVector>::iterator itr;
+
+	if(proto->RandomSuffixId==0)
+		return NULL;
+
+	itr = _randomsuffix.find(proto->RandomSuffixId);
+	if(itr==_randomsuffix.end())
+		return NULL;
+
+	return RandomChoiceVector<ItemRandomSuffixEntry>(itr->second);
+}
+
+
+void LootMgr::LoadLootProp()
 {	
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM lootrandomprop ORDER BY entryid");
-	if(!result)return;
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM item_randomprop_groups");
+	uint32 id, eid;
+	RandomProps * rp;
+	ItemRandomSuffixEntry * rs;
+	float ch;
 
-	Field *fields = result->Fetch();
-	map<uint32, vector< pair< uint32, float > > > propcache;
-	map<uint32, vector< pair< uint32, float > > >::iterator itr;
-	uint32 i = 0;
-	uint32 m = result->GetRowCount();
-	do 
+	if(result)
 	{
-		propcache[fields[0].GetUInt32()].push_back( make_pair( fields[1].GetUInt32(), fields[2].GetFloat() ) );
-	} while(result->NextRow());
-	delete result;
-
-	i = 0;
-	m = propcache.size();
-
-	for(itr = propcache.begin(); itr != propcache.end(); ++itr)
-	{
-		LootPropTable * prop = new LootPropTable;
-		prop->iPropsCount = itr->second.size();
-		prop->pProps = new LootProp[prop->iPropsCount];
-		vector< pair<uint32, float> >::iterator it2 = itr->second.begin();
-		uint32 j = 0;
-		for(; it2 != itr->second.end(); ++it2, ++j)
+		map<uint32, RandomPropertyVector>::iterator itr;
+		do 
 		{
-			prop->pProps[j].chance = it2->second;
-			prop->pProps[j].prop = it2->first;
-		}
-		LootProperties[itr->first] = prop;
+			id = result->Fetch()[0].GetUInt32();
+			eid = result->Fetch()[1].GetUInt32();
+			ch = result->Fetch()[2].GetFloat();
+
+			rp = dbcRandomProps.LookupEntryForced(eid);
+			if(rp == NULL)
+			{
+				Log.Error("LoadLootProp", "RandomProp group %u references non-existant randomprop %u.", id, eid);
+				continue;
+			}
+
+            itr = _randomprops.find(id);
+			if(itr == _randomprops.end())
+			{
+				RandomPropertyVector v;
+				v.push_back(make_pair(rp, ch));
+				_randomprops.insert(make_pair(id, v));
+			}
+			else
+			{
+				itr->second.push_back(make_pair(rp,ch));
+			}
+		} while(result->NextRow());
+		delete result;
 	}
-   
+
+	result = WorldDatabase.Query("SELECT * FROM item_randomsuffix_groups");
+	if(result)
+	{
+		map<uint32, RandomSuffixVector>::iterator itr;
+		do 
+		{
+			id = result->Fetch()[0].GetUInt32();
+			eid = result->Fetch()[1].GetUInt32();
+			ch = result->Fetch()[2].GetFloat();
+
+			rs = dbcItemRandomSuffix.LookupEntryForced(eid);
+			if(rs == NULL)
+			{
+				Log.Error("LoadLootProp", "RandomSuffix group %u references non-existant randomsuffix %u.", id, eid);
+				continue;
+			}
+
+			itr = _randomsuffix.find(id);
+			if(itr == _randomsuffix.end())
+			{
+				RandomSuffixVector v;
+				v.push_back(make_pair(rs, ch));
+				_randomsuffix.insert(make_pair(id, v));
+			}
+			else
+			{
+				itr->second.push_back(make_pair(rs,ch));
+			}
+		} while(result->NextRow());
+		delete result;
+	}   
 }
 
 LootMgr::~LootMgr()
@@ -125,12 +214,6 @@ LootMgr::~LootMgr()
 
  for(LootStore::iterator iter=PickpocketingLoot.begin(); iter != PickpocketingLoot.end(); ++iter)
  delete [] iter->second.items;
- 
-  for(PropStore::iterator iter = LootProperties.begin(); iter != LootProperties.end(); ++iter)
-  {
-	  delete iter->second->pProps;
-	  delete iter->second;
-  }
 }
 
 void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
@@ -235,25 +318,18 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 				proto=ItemPrototypeStorage.LookupEntry(itemid);
 				if(!proto)
 				{
-					list.items[ind].item.itemid=0;
+					list.items[ind].item.itemproto=NULL;
 					sLog.outDetail("WARNING: Loot %u contains item that does not exist in the DB.",entry_id);
 				}
 				else
 				{
-					list.items[ind].item.itemid=itemid;
+					list.items[ind].item.itemproto=proto;
 					list.items[ind].item.displayid=proto->DisplayInfoID;
 					//list.items[ind].chance=(*itr2).chance;
 					list.items[ind].chance= itr2->chance;
 					list.items[ind].chance2 = itr2->chance_2;
 					list.items[ind].mincount = itr2->mincount;
 					list.items[ind].maxcount = itr2->maxcount;
-
-					PropStore::iterator ptab =LootProperties.find(itemid);
-				
-					if( LootProperties.end()==ptab)
-						list.items[ind].prop=NULL;
-					else
-						list.items[ind].prop=ptab->second;
 
 					if(LootTable == &GOLoot)
 					{
@@ -281,12 +357,12 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 	uint32 i;
 	uint32 count;
 	for(uint32 x =0; x<list->count;x++)
-	if(list->items[x].item.itemid)// this check is needed until loot DB is fixed
+	if(list->items[x].item.itemproto)// this check is needed until loot DB is fixed
 	{
 		float chance = heroic ? list->items[x].chance2 : list->items[x].chance;
 		if(chance == 0.0f) continue;
 
-		ItemPrototype *itemproto = ItemPrototypeStorage.LookupEntry(list->items[x].item.itemid);
+		ItemPrototype *itemproto = list->items[x].item.itemproto;
 		if(Rand(chance * sWorld.getRate(RATE_DROP0 + itemproto->Quality)) )//|| itemproto->Class == ITEM_CLASS_QUEST)
 		{
 			if(list->items[x].mincount == list->items[x].maxcount)
@@ -297,7 +373,7 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 			for(i = 0; i < loot->items.size(); ++i)
 			{
 				//itemid rand match a already placed item, if item is stackable and unique(stack), increment it, otherwise skips
-				if((loot->items[i].item.itemid == list->items[x].item.itemid) && itemproto->MaxCount && ((loot->items[i].iItemsCount + count) < itemproto->MaxCount))
+				if((loot->items[i].item.itemproto == list->items[x].item.itemproto) && itemproto->MaxCount && ((loot->items[i].iItemsCount + count) < itemproto->MaxCount))
 				{
 					if(itemproto->Unique && ((loot->items[i].iItemsCount+count) < itemproto->Unique))
 					{
@@ -317,12 +393,20 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 			__LootItem itm;
 			itm.item =list->items[x].item;
 			itm.iItemsCount = count;
-			itm.iRandomProperty=0;
 			itm.roll = NULL;
 			itm.passed = false;
 			
-			if (list->items[x].prop && itemproto->Quality > 1)
-        itm.iRandomProperty = RandomChoice<LootProp>(list->items[x].prop->pProps, list->items[x].prop->iPropsCount).prop;
+			if (itemproto->Quality > 1)
+			{
+				itm.iRandomProperty=GetRandomProperties(itemproto);
+				itm.iRandomSuffix=GetRandomSuffix(itemproto);
+			}
+			else
+			{
+				// save some calls :P
+				itm.iRandomProperty=NULL;
+				itm.iRandomSuffix=NULL;
+			}
 
 			loot->items.push_back(itm);
 		}	
@@ -375,7 +459,7 @@ void LootMgr::FillProfessionLoot(LootStore * store,Loot * loot,uint32 loot_id)
 	while(true)
 	for(uint32 x =0,pass=0; x<list->count; x++,pass++)
 	{
-		if(list->items[x].item.itemid)// this check is needed until loot DB is fixed
+		if(list->items[x].item.itemproto)// this check is needed until loot DB is fixed
 		{
 //			ItemPrototype *itemproto = ItemPrototypeStorage.LookupEntry(list->items[x].item.itemid);
 			if(Rand(list->items[x].chance))// || itemproto->Class == ITEM_CLASS_QUEST)
@@ -415,7 +499,7 @@ bool LootMgr::CanGODrop(uint32 LootId,uint32 itemid)
 	return false;
 	StoreLootList *list=&(tab->second);
 	for(uint32 x=0;x<list->count;x++)
-		if(list->items[x].item.itemid==itemid)
+		if(list->items[x].item.itemproto->ItemId==itemid)
 			return true;
 	return false;
 }
@@ -556,7 +640,7 @@ void LootRoll::Finalize()
 
 	pLoot->items.at(_slotid).roll = NULL;
 
-	uint32 itemid = pLoot->items.at(_slotid).item.itemid;
+	uint32 itemid = pLoot->items.at(_slotid).item.itemproto->ItemId;
 	uint32 amt = pLoot->items.at(_slotid).iItemsCount;
 	if(!amt)
 	{
@@ -618,10 +702,17 @@ void LootRoll::Finalize()
 		Item *item = objmgr.CreateItem( itemid, _player);
 
 		item->SetUInt32Value(ITEM_FIELD_STACK_COUNT,amt);
-		uint32 rndprop=pLoot->items.at(_slotid).iRandomProperty;
-		if(rndprop)
-			item->SetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID,rndprop);
-		item->ApplyRandomProperties();
+		if(pLoot->items.at(_slotid).iRandomProperty!=NULL)
+		{
+			item->SetRandomProperty(pLoot->items.at(_slotid).iRandomProperty->ID);
+			item->ApplyRandomProperties();
+		}
+		else if(pLoot->items.at(_slotid).iRandomSuffix != NULL)
+		{
+			item->SetRandomSuffix(pLoot->items.at(_slotid).iRandomSuffix->id);
+			item->ApplyRandomProperties();
+		}
+
 
 		_player->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
 
@@ -646,7 +737,7 @@ void LootRoll::Finalize()
 	}
 
 	WorldPacket idata(45);
-	_player->GetSession()->BuildItemPushResult(&idata, _player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(_slotid).iRandomProperty);
+	_player->GetSession()->BuildItemPushResult(&idata, _player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(_slotid).iRandomProperty ? pLoot->items.at(_slotid).iRandomProperty->ID : 0);
 
 	if(_player->InGroup())
 		_player->GetGroup()->SendPacketToAll(&idata);

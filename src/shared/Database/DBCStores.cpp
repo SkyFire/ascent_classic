@@ -48,6 +48,7 @@ SERVER_DECL DBCStorage<CharClassEntry> dbcCharClass;
 SERVER_DECL DBCStorage<CharRaceEntry> dbcCharRace;
 SERVER_DECL DBCStorage<MapEntry> dbcMap;
 SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
+SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 
 const char * ItemSetFormat = "uuxxxxxxxxxxxxxxxuuuuuuuuuxxxxxxxxxuuuuuuuuuuuuuuuuuu";
 const char * LockFormat = "uuuuuuxxxuuuuuxxxuuuuuxxxxxxxxxxx";
@@ -76,6 +77,7 @@ const char * charraceFormat = "uxuxxxxxuxxxxuxxxxxxxxxxxxxxxxxxxxx";
 const char * charclassFormat = "uxuxxxxxxxxxxxxxxxxxxxxx";
 const char * creaturefamilyFormat = "ufufuuuuxxxxxxxxxxxxxxxxxx";
 const char * mapentryFormat = "uxuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char * itemrandomsuffixformat = "uxxxxxxxxxxxxxxxxxxuuuuuu";
 
 template<class T>
 bool loader_stub(const char * filename, const char * format, bool ind, T& l)
@@ -115,6 +117,7 @@ bool LoadDBCs()
 	LOAD_DBC("DBC/ChrClasses.dbc", charclassFormat, true, dbcCharClass);
 	LOAD_DBC("DBC/Map.dbc", mapentryFormat, true, dbcMap);
 	LOAD_DBC("DBC/AuctionHouse.dbc", auctionhousedbcFormat, true, dbcAuctionHouse);
+	LOAD_DBC("DBC/ItemRandomSuffix.dbc", itemrandomsuffixformat, true, dbcItemRandomSuffix);
 	return true;
 }
 

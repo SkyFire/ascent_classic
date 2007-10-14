@@ -195,7 +195,7 @@ void Session::HandleItemQuerySingleOpcode(WorldPacket & pck)
 	data << itemProto->LockMaterial;
 	data << itemProto->Field108;
 	data << itemProto->RandomPropId;
-	data << itemProto->RandomPropId_2;
+	data << itemProto->RandomSuffixId;
 	data << itemProto->Block;
 	data << itemProto->ItemSet;
 	data << itemProto->MaxDurability;

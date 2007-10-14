@@ -4885,14 +4885,14 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		if (iter->iItemsCount == 0)
 			continue;
 
-		ItemPrototype* itemProto =ItemPrototypeStorage.LookupEntry(iter->item.itemid);
+		ItemPrototype* itemProto =iter->item.itemproto;
 		if (!itemProto)		   
 			continue;
         //quest items check. type 4/5
         //quest items that dont start quests.
-        if((itemProto->Bonding == ITEM_BIND_QUEST) && !(itemProto->QuestId) && !HasQuestForItem(iter->item.itemid))
+        if((itemProto->Bonding == ITEM_BIND_QUEST) && !(itemProto->QuestId) && !HasQuestForItem(iter->item.itemproto->ItemId))
             continue;
-        if((itemProto->Bonding == ITEM_BIND_QUEST2) && !(itemProto->QuestId) && !HasQuestForItem(iter->item.itemid))
+        if((itemProto->Bonding == ITEM_BIND_QUEST2) && !(itemProto->QuestId) && !HasQuestForItem(iter->item.itemproto->ItemId))
             continue;
 
         //quest items that start quests need special check to avoid drops all the time.
@@ -4960,7 +4960,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		}
 
 		data << uint8(x); 
-		data << uint32(iter->item.itemid);
+		data << uint32(itemProto->ItemId);
 		data << uint32(iter->iItemsCount);//nr of items of this type
 		data << uint32(iter->item.displayid); 
 		data << uint32(0) ;
@@ -4971,11 +4971,17 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		{
 			if(iter->roll == NULL && !iter->passed)
 			{
-				iter->roll = new LootRoll(60000, (m_Group != NULL ? m_Group->MemberCount() : 1),  guid, x, iter->item.itemid, 0, iter->iRandomProperty, GetMapMgr());
+				int32 ipid = 0;
+				if(iter->iRandomProperty)
+					ipid=iter->iRandomProperty->ID;
+				else if(iter->iRandomSuffix)
+					ipid = -int32(iter->iRandomSuffix->id);
+
+				iter->roll = new LootRoll(60000, (m_Group != NULL ? m_Group->MemberCount() : 1),  guid, x, iter->item.itemproto->ItemId, 0, uint32(ipid), GetMapMgr());
 				data2.Initialize(SMSG_LOOT_START_ROLL);
 				data2 << guid;
 				data2 << x;
-				data2 << uint32(iter->item.itemid);
+				data2 << uint32(iter->item.itemproto->ItemId);
 				data2 << uint32(0);
 				data2 << uint32(iter->iRandomProperty);
 				data2 << uint32(60000); // countdown

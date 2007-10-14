@@ -816,6 +816,13 @@ struct MapEntry
     //uint32 bunk24;
 };
 
+struct ItemRandomSuffixEntry
+{
+	uint32 id;
+	uint32 enchantments[3];
+	uint32 prefixes[3];
+};
+
 inline float GetRadius(SpellRadius *radius)
 {
     return radius->Radius;
@@ -1079,6 +1086,7 @@ extern SERVER_DECL DBCStorage<CharClassEntry> dbcCharClass;
 extern SERVER_DECL DBCStorage<CharRaceEntry> dbcCharRace;
 extern SERVER_DECL DBCStorage<MapEntry> dbcMap;
 extern SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
+extern SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 
 bool LoadDBCs();
 
