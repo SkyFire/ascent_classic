@@ -37,6 +37,11 @@ public:
 
 	void DecryptRecv(uint8 *, size_t);
 	void EncryptSend(uint8 *, size_t);
+    
+    // encrypt 4 bytes
+    void EncryptFourSend(uint8 * data);
+    // decrypt 6 bytes
+    void DecryptSixRecv(uint8 *data);
 
 	bool IsInitialized() { return _initialized; }
 

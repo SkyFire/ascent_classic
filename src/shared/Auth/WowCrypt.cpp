@@ -47,18 +47,88 @@ void WowCrypt::DecryptRecv(uint8 *data, size_t len)
 	}
 }
 
+void WowCrypt::DecryptSixRecv(uint8 *data)
+{
+    if (!_initialized) return;
+    
+    uint8 x, KeySize = (uint8)_key.size();;
+
+    // 0
+    _recv_i %= KeySize;
+    x = (data[0] - _recv_j) ^ _key[_recv_i];
+    ++_recv_i;
+    _recv_j = data[0];
+    data[0] = x;
+
+    // 1
+    _recv_i %= KeySize;
+    x = (data[1] - _recv_j) ^ _key[_recv_i];
+    ++_recv_i;
+    _recv_j = data[1];
+    data[1] = x;
+
+    // 2
+    _recv_i %= KeySize;
+    x = (data[2] - _recv_j) ^ _key[_recv_i];
+    ++_recv_i;
+    _recv_j = data[2];
+    data[2] = x;
+
+    // 3
+    _recv_i %= KeySize;
+    x = (data[3] - _recv_j) ^ _key[_recv_i];
+    ++_recv_i;
+    _recv_j = data[3];
+    data[3] = x;
+
+    // 4
+    _recv_i %= KeySize;
+    x = (data[4] - _recv_j) ^ _key[_recv_i];
+    ++_recv_i;
+    _recv_j = data[4];
+    data[4] = x;
+
+    // 5
+    _recv_i %= KeySize;
+    x = (data[5] - _recv_j) ^ _key[_recv_i];
+    ++_recv_i;
+    _recv_j = data[5];
+    data[5] = x;
+}
+
 void WowCrypt::EncryptSend(uint8 *data, size_t len)
 {
 	if (!_initialized) return;
 	if (len < CRYPTED_SEND_LEN) return;
-	uint8 x;
 
 	for (size_t t = 0; t < CRYPTED_SEND_LEN; t++) {
 		_send_i %= _key.size();
-		x = (data[t] ^ _key[_send_i]) + _send_j;
-		++_send_i;
-		data[t] = _send_j = x;
+		data[t] = _send_j = (data[t] ^ _key[_send_i]) + _send_j;
+        ++_send_i;
 	}
+}
+
+void WowCrypt::EncryptFourSend(uint8 * data)
+{
+    if (!_initialized) return;
+
+    uint8 KeySize = (uint8)_key.size();
+
+    _send_i %= KeySize;
+    data[0] = _send_j = (data[0] ^ _key[_send_i]) + _send_j;
+    ++_send_i;
+
+    _send_i %= KeySize;
+    data[1] = _send_j = (data[1] ^ _key[_send_i]) + _send_j;
+    ++_send_i;
+
+    _send_i %= KeySize;
+    data[2] = _send_j = (data[2] ^ _key[_send_i]) + _send_j;
+    ++_send_i;
+
+    _send_i %= KeySize;
+    data[3] = _send_j = (data[3] ^ _key[_send_i]) + _send_j;
+    ++_send_i;
 }
 
 void WowCrypt::SetKey(uint8 *key, size_t len)

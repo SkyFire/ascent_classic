@@ -163,7 +163,7 @@ OUTPACKET_RESULT WorldSocket::_OutPacket(uint16 opcode, size_t len, const void* 
 	Header.cmd = opcode;
 	Header.size = ntohs(len + 2);
 #endif
-	_crypt.EncryptSend((uint8*)&Header, 4);
+    _crypt.EncryptFourSend((uint8*)&Header);
 
 	// Pass the header to our send buffer
 	rv = BurstSend((const uint8*)&Header, 4);
@@ -436,7 +436,7 @@ void WorldSocket::OnRead()
 			Read(6, (uint8*)&Header);
 
 			// Decrypt the header
-			_crypt.DecryptRecv((uint8*)&Header, 6);
+            _crypt.DecryptSixRecv((uint8*)&Header);
 #ifdef USING_BIG_ENDIAN
 			mRemaining = mSize = Header.size - 4;
 			mOpcode = swap32(Header.cmd);

@@ -71,7 +71,7 @@ void WorldSocket::OutPacket(uint16 opcode, size_t len, const void* data)
 	ServerPktHeader Header;
 	Header.cmd = opcode;
 	Header.size = uint16(ntohs((u_short)len + 2));
-	_crypt.EncryptSend((uint8*)&Header, 4);
+    _crypt.EncryptFourSend((uint8*)&Header);
 
 	// Pass the header to our send buffer
 	rv = BurstSend((const uint8*)&Header, 4);
@@ -247,7 +247,7 @@ void WorldSocket::OnRead()
 			Read(6, (uint8*)&Header);
 
 			// Decrypt the header
-			_crypt.DecryptRecv((uint8*)&Header, 6);
+            _crypt.DecryptSixRecv((uint8*)&Header);
 
 			mRemaining = mSize = ntohs(Header.size) - 4;
 			mOpcode = Header.cmd;
