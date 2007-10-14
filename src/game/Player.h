@@ -1573,15 +1573,15 @@ public:
     /************************************************************************/
     /* Spell Packet wrapper Please keep this separated                      */
     /************************************************************************/
-    inline void SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra);
-    inline void SendSpellCoolDown(uint32 SpellID, uint16 Time);
-    inline void SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4);
-    inline void SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, bool type);
-    inline void SendBindPointUpdate(float x,float y,float z,uint32 mapid,uint32 zoneid);
-    inline void SendSetProficiency(uint8 ItemClass, uint32 Proficiency);
-    inline void SendEnvironmentalDamageLog(uint64 & guid, uint8 type, uint32 damage);
-    inline void SendLoginVerifyWorld(uint32 MapId, float x, float y, float z, float o);
-    inline void SendLoginVerifyWorld();
+    void SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra);
+    void SendSpellCoolDown(uint32 SpellID, uint16 Time);
+    void SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4);
+    void SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, bool type);
+    void SendBindPointUpdate(float x,float y,float z,uint32 mapid,uint32 zoneid);
+    void SendSetProficiency(uint8 ItemClass, uint32 Proficiency);
+    void SendEnvironmentalDamageLog(uint64 & guid, uint8 type, uint32 damage);
+    void SendLoginVerifyWorld(uint32 MapId, float x, float y, float z, float o);
+    void SendLoginVerifyWorld();
     /************************************************************************/
     /* End of SpellPacket wrapper                                           */
     /************************************************************************/
