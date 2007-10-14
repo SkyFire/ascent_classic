@@ -26,7 +26,6 @@ CREATE TABLE `item_randomprop_groups` (
   `entry_id` int(30) NOT NULL,
   `randomprops_entryid` int(30) NOT NULL,
   `chance` float NOT NULL,
-  PRIMARY KEY (`entry_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
