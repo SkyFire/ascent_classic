@@ -4484,7 +4484,7 @@ void Player::AddGlobalCooldown(uint32 tm)
 	GlobalCooldown = getMSTime() + tm;
 }
 
-#define CORPSE_VIEW_DISTANCE 900 // 30*30
+#define CORPSE_VIEW_DISTANCE 1600 // 40*40
 
 bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha *
 {
@@ -4497,24 +4497,31 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 	{
 		if(object_type == TYPEID_PLAYER)
 		{
+			Player *pObj = static_cast<Player *>(obj);
+
 			if(myCorpse && myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
-				return !static_cast<Player*>(obj)->m_isGmInvisible; // we can see everything within range of our corpse except invisible GMs
+				return !pObj->m_isGmInvisible; // we can see all players within range of our corpse except invisible GMs
 
-			if(m_deathVision) // if we have special death-vision (from arenas) we can see everything except invisible GMs
-				return !static_cast<Player*>(obj)->m_isGmInvisible;
+			if(m_deathVision) // if we have arena death-vision we can see all players except invisible GMs
+				return !pObj->m_isGmInvisible;
 
-			if(((Player*)obj)->getDeathState() == CORPSE) // we can only see players that are spirits
-				return true;
-			
-			return false;
+			return (pObj->getDeathState() == CORPSE); // we can only see players that are spirits
 		}
-		else if(object_type == TYPEID_UNIT)
+
+		if(myCorpse && myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
+			return true; // we can see everything within range of our corpse
+
+		if(m_deathVision) // if we have arena death-vision we can see everything
+			return true;
+
+		if(object_type == TYPEID_UNIT)
 		{
-			if(((Unit*)obj)->IsSpiritHealer()) // we can't see any NPCs except spirit-healers
-				return true;
+			Unit *uObj = static_cast<Unit *>(obj);
 
-			return false;
+			return uObj->IsSpiritHealer(); // we can't see any NPCs except spirit-healers
 		}
+
+		return false;
 	}
 	//------------------------------------------------------------------
 
