@@ -213,15 +213,31 @@ void Item::ApplyRandomProperties()
 	// apply random properties
 	if(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID] != 0)
 	{
-		RandomProps *rp= dbcRandomProps.LookupEntry(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID]);
-		if(rp)
+		if(int32(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID]) > 0)		// Random Property
 		{
+			RandomProps *rp= dbcRandomProps.LookupEntry(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID]);
 			for (int k=0;k<3;k++)
 			{
 				if (rp->spells[k] != 0)
-				{
+				{	
 					EnchantEntry * ee = dbcEnchant.LookupEntry(rp->spells[k]);
 					if(HasEnchantment(ee->Id) < 0) 
+					{
+						uint32 Slot = FindFreeEnchantSlot(ee);
+						AddEnchantment(ee, 0, false, false, true, Slot);
+					}
+				}
+			}
+		}
+		else
+		{
+			ItemRandomSuffixEntry * rs = dbcItemRandomSuffix.LookupEntry(abs(int(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID])));
+			for(uint32 k = 0; k < 3; ++k)
+			{
+				if(rs->enchantments[k] != 0)
+				{
+					EnchantEntry * ee = dbcEnchant.LookupEntry(rs->enchantments[k]);
+					if(HasEnchantment(ee->Id) < 0)
 					{
 						uint32 Slot = FindFreeEnchantSlot(ee);
 						AddEnchantment(ee, 0, false, false, true, Slot);
