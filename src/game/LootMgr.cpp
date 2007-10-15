@@ -55,7 +55,7 @@ T* RandomChoiceVector( vector<pair<T*, float> > & variant )
 {
 	float totalChance = 0;
 	float val;
-	vector<pair<T*,float> >::iterator itr;
+	typename vector<pair<T*,float> >::iterator itr;
 
 	if(variant.size() == 0)
 		return NULL;
