@@ -205,6 +205,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 						}
 					}
 				}
+#ifdef ENABLE_GRACEFULL_HIT
+				have_graceful_hit=false;
+#endif
 			}break;
 		case EVENT_LEAVECOMBAT:
 			{
@@ -875,7 +878,11 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 
 				if(	
 //					distance >= combatReach[0] && 
-					distance <= combatReach[1]) // Target is in Range -> Attack
+					distance <= combatReach[1]
+#ifdef ENABLE_GRACEFULL_HIT
+					|| have_graceful_hit
+#endif
+					) // Target is in Range -> Attack
 				{
 					if(UnitToFollow != NULL)
 					{
@@ -889,53 +896,56 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					//FIXME: offhand shit
 					if(m_Unit->isAttackReady(false) && !m_fleeTimer)
 					{
+#ifdef ENABLE_GRACEFULL_HIT
+						have_graceful_hit = false;
+#endif
 						m_creatureState = ATTACKING;
-						bool infront = m_Unit->isInFront(m_nextTarget);
 
-						if(!infront) // set InFront
+						if(!m_Unit->isInFront(m_nextTarget)) // set InFront
 						{
 							//prevent mob from rotating while stunned
 							if(!m_Unit->IsStunned ())
 							{
 								setInFront(m_nextTarget);
-								infront = true;
 							}							
 						}
-						if(infront)
+						m_Unit->setAttackTimer(0, false);
+#ifdef ENABLE_CREATURE_DAZE
+						//we require to know if strike was succesfull. If there was no dmg then target cannot be dazed by it
+						uint32 health_before_strike=m_nextTarget->GetUInt32Value(UNIT_FIELD_HEALTH);
+#endif
+						m_Unit->Strike(m_nextTarget, (agent==AGENT_MELEE)?0:2,NULL,0,0,0, false);
+#ifdef ENABLE_CREATURE_DAZE
+						//now if the target is facing his back to us then we could just cast dazed on him :P
+						//as far as i know dazed is casted by most of the creatures but feel free to remove this code if you think otherwise
+						if(m_nextTarget &&
+							!(m_Unit->m_factionDBC->RepListId == -1 && m_Unit->m_faction->FriendlyMask==0 && m_Unit->m_faction->HostileMask==0) /* neutral creature */
+							&& m_nextTarget->IsPlayer() && !m_Unit->IsPet() && health_before_strike>m_nextTarget->GetUInt32Value(UNIT_FIELD_HEALTH)
+							&& Rand(m_Unit->get_chance_to_daze(m_nextTarget)))
 						{
-							m_Unit->setAttackTimer(0, false);
-#ifdef ENABLE_CREATURE_DAZE
-							//we require to know if strike was succesfull. If there was no dmg then target cannot be dazed by it
-							uint32 health_before_strike=m_nextTarget->GetUInt32Value(UNIT_FIELD_HEALTH);
-#endif
-							m_Unit->Strike(m_nextTarget, (agent==AGENT_MELEE)?0:2,NULL,0,0,0, false);
-#ifdef ENABLE_CREATURE_DAZE
-							//now if the target is facing his back to us then we could just cast dazed on him :P
-							//as far as i know dazed is casted by most of the creatures but feel free to remove this code if you think otherwise
-							if(m_nextTarget &&
-								!(m_Unit->m_factionDBC->RepListId == -1 && m_Unit->m_faction->FriendlyMask==0 && m_Unit->m_faction->HostileMask==0) /* neutral creature */
-								&& m_nextTarget->IsPlayer() && !m_Unit->IsPet() && health_before_strike>m_nextTarget->GetUInt32Value(UNIT_FIELD_HEALTH)
-								&& Rand(m_Unit->get_chance_to_daze(m_nextTarget)))
+							float our_facing=m_Unit->calcRadAngle(m_Unit->GetPositionX(),m_Unit->GetPositionY(),m_nextTarget->GetPositionX(),m_nextTarget->GetPositionY());
+							float his_facing=m_nextTarget->GetOrientation();
+							if(fabs(our_facing-his_facing)<CREATURE_DAZE_TRIGGER_ANGLE && !m_nextTarget->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
 							{
-								float our_facing=m_Unit->calcRadAngle(m_Unit->GetPositionX(),m_Unit->GetPositionY(),m_nextTarget->GetPositionX(),m_nextTarget->GetPositionY());
-								float his_facing=m_nextTarget->GetOrientation();
-								if(fabs(our_facing-his_facing)<CREATURE_DAZE_TRIGGER_ANGLE && !m_nextTarget->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
-								{
-									SpellEntry *info = dbcSpell.LookupEntry(CREATURE_SPELL_TO_DAZE);
-									Spell *sp = new Spell(m_Unit, info, false, NULL);
-									SpellCastTargets targets;
-									targets.m_unitTarget = m_nextTarget->GetGUID();
-									sp->prepare(&targets);
-								}
+								SpellEntry *info = dbcSpell.LookupEntry(CREATURE_SPELL_TO_DAZE);
+								Spell *sp = new Spell(m_Unit, info, false, NULL);
+								SpellCastTargets targets;
+								targets.m_unitTarget = m_nextTarget->GetGUID();
+								sp->prepare(&targets);
 							}
-#endif
 						}
+#endif
 					}
 				}
-				else // Target out of Range -> Run to it
+				if(distance > combatReach[1]) // Target out of Range -> Run to it
 				{
+#ifdef ENABLE_GRACEFULL_HIT
+					have_graceful_hit = true;
+#endif
 					//calculate next move
-					float dist = combatReach[1]-PLAYER_SIZE;
+					float targetradius = m_nextTarget->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
+					float targetscale = m_nextTarget->GetFloatValue(OBJECT_FIELD_SCALE_X);
+					float dist = combatReach[1]-(PLAYER_SIZE + targetradius*targetscale);
 
 					if(dist < PLAYER_SIZE)
 						dist = PLAYER_SIZE; //unbelievable how this could happen
@@ -1700,7 +1710,9 @@ float AIInterface::_CalcCombatRange(Unit* target, bool ranged)
 	float targetscale = target->GetFloatValue(OBJECT_FIELD_SCALE_X);
 	float selfscale = m_Unit->GetFloatValue(OBJECT_FIELD_SCALE_X);
 
-	range = (((powf(targetradius,2)*targetscale) + selfreach) + ((selfradius*selfscale) + rang));
+	//removbed by zack : why do we need targetradius*targetradius ?
+//	range = (((powf(targetradius,2)*targetscale) + selfreach) + ((selfradius*selfscale) + rang));
+	range = (((targetradius*targetscale) + selfreach) + ((selfradius*selfscale) + rang));
 	if(range > 28.29f) range = 28.29f;
 	if(range < PLAYER_SIZE) range = PLAYER_SIZE; //unbeleavable to get here :)
 	return range;

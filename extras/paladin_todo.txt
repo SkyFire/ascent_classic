@@ -5,3 +5,6 @@ Divine protection - Doesn't work.
 Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
 blessing of freedom
+
+resurrection sickness can be canceled by divine shield
+blessing of light will change healing amount only on self
