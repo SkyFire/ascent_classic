@@ -334,7 +334,7 @@ void InformationCore::RemoveRealm(uint32 realm_id)
 	map<uint32, Realm*>::iterator itr = m_realms.find(realm_id);
 	if(itr != m_realms.end())
 	{
-		sLog.outString("Removing realm `%s` (%u) due to socket close.", itr->second->Name.c_str(), realm_id);
+		//sLog.outString("Removing realm `%s` (%u) due to socket close.", itr->second->Name.c_str(), realm_id);
 		delete itr->second;
 		m_realms.erase(itr);
 	}
