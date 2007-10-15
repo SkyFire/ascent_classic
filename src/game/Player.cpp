@@ -3174,39 +3174,7 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 	}
 
 	//check for rnd prop
-	uint32 rndprop=item->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID);
-	if(rndprop)
-	{
-		RandomProps *rp= dbcRandomProps.LookupEntry(rndprop);
-		if(rp)
-		for (int k=0;k<3;k++)
-		{
-			if (rp->spells[k] != 0)
-			{
-				if(apply)
-				{
-					EnchantEntry * ee = dbcEnchant.LookupEntry(rp->spells[k]);
-					int32 Slot = item->HasEnchantment(ee->Id);
-					if(Slot < 0)
-					{
-						Slot = item->FindFreeEnchantSlot(ee);
-						item->AddEnchantment(ee, 0, true, false, true, Slot);
-					}
-					else
-						item->ApplyEnchantmentBonus(Slot, true);
-				}else
-				{
-					EnchantEntry * ee = dbcEnchant.LookupEntry(rp->spells[k]);
-					int32 Slot = item->HasEnchantment(ee->Id);
-					if(Slot >= 0)
-					{
-						//item->RemoveEnchantment(Slot);
-						item->ApplyEnchantmentBonus(Slot, false);
-					}
-				}
-			}
-		}
-	}
+	item->ApplyRandomProperties(true);
 
 	//Items Set check
 	uint32 setid=proto->ItemSet;

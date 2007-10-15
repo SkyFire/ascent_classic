@@ -705,12 +705,12 @@ void LootRoll::Finalize()
 		if(pLoot->items.at(_slotid).iRandomProperty!=NULL)
 		{
 			item->SetRandomProperty(pLoot->items.at(_slotid).iRandomProperty->ID);
-			item->ApplyRandomProperties();
+			item->ApplyRandomProperties(false);
 		}
 		else if(pLoot->items.at(_slotid).iRandomSuffix != NULL)
 		{
 			item->SetRandomSuffix(pLoot->items.at(_slotid).iRandomSuffix->id);
-			item->ApplyRandomProperties();
+			item->ApplyRandomProperties(false);
 		}
 
 

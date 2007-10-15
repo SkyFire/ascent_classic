@@ -168,7 +168,7 @@ void Item::LoadFromDB(	Field *fields, Player * plr, bool light)
 		}
 	}	
 
-	ApplyRandomProperties();
+	ApplyRandomProperties(false);
 
 	// Charter stuff
 	if(m_uint32Values[OBJECT_FIELD_ENTRY] == ITEM_ENTRY_GUILD_CHARTER)
@@ -208,7 +208,7 @@ void Item::LoadFromDB(	Field *fields, Player * plr, bool light)
 	}
 }
 
-void Item::ApplyRandomProperties()
+void Item::ApplyRandomProperties(bool apply)
 {
 	// apply random properties
 	if(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID] != 0)
@@ -216,32 +216,42 @@ void Item::ApplyRandomProperties()
 		if(int32(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID]) > 0)		// Random Property
 		{
 			RandomProps *rp= dbcRandomProps.LookupEntry(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID]);
+			int32 Slot;
 			for (int k=0;k<3;k++)
 			{
 				if (rp->spells[k] != 0)
 				{	
 					EnchantEntry * ee = dbcEnchant.LookupEntry(rp->spells[k]);
-					if(HasEnchantment(ee->Id) < 0) 
+					Slot = HasEnchantment(ee->Id);
+					if(Slot < 0) 
 					{
-						uint32 Slot = FindFreeEnchantSlot(ee);
-						AddEnchantment(ee, 0, false, false, true, Slot);
+						Slot = FindFreeEnchantSlot(ee, 1);
+						AddEnchantment(ee, 0, false, apply, true, Slot);
 					}
+					else
+						if(apply)
+							ApplyEnchantmentBonus(Slot, true);
 				}
 			}
 		}
 		else
 		{
 			ItemRandomSuffixEntry * rs = dbcItemRandomSuffix.LookupEntry(abs(int(m_uint32Values[ITEM_FIELD_RANDOM_PROPERTIES_ID])));
+			int32 Slot;
 			for(uint32 k = 0; k < 3; ++k)
 			{
 				if(rs->enchantments[k] != 0)
 				{
 					EnchantEntry * ee = dbcEnchant.LookupEntry(rs->enchantments[k]);
-					if(HasEnchantment(ee->Id) < 0)
+					Slot = HasEnchantment(ee->Id);
+					if(Slot < 0) 
 					{
-						uint32 Slot = FindFreeEnchantSlot(ee);
-						AddEnchantment(ee, 0, false, false, true, Slot);
+						Slot = FindFreeEnchantSlot(ee, 2);
+						AddEnchantment(ee, 0, false, apply, true, Slot, rs->prefixes[k]);
 					}
+					else
+						if(apply)
+							ApplyEnchantmentBonus(Slot, true);
 				}
 			}
 		}
@@ -501,7 +511,7 @@ void Item::SetOwner(Player *owner)
 }
 
 
-int32 Item::AddEnchantment(EnchantEntry * Enchantment, uint32 Duration, bool Perm /* = false */, bool apply /* = true */, bool RemoveAtLogout /* = false */,uint32 Slot_)
+int32 Item::AddEnchantment(EnchantEntry * Enchantment, uint32 Duration, bool Perm /* = false */, bool apply /* = true */, bool RemoveAtLogout /* = false */,uint32 Slot_,uint32 RandomSuffix)
 {
 	int32 Slot = Slot_;
 	m_isDirty = true;
@@ -552,6 +562,7 @@ int32 Item::AddEnchantment(EnchantEntry * Enchantment, uint32 Duration, bool Per
 	Instance.Enchantment = Enchantment;
 	Instance.Duration = Duration;
 	Instance.RemoveAtLogout = RemoveAtLogout;
+	Instance.RandomSuffix = RandomSuffix;
 
 	// Set the enchantment in the item fields.
 	uint32 EnchantBase = Slot * 3 + ITEM_FIELD_ENCHANTMENT;
@@ -631,6 +642,7 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 		return;
 
 	EnchantEntry * Entry = itr->second.Enchantment;
+	uint32 RandomSuffixAmount = itr->second.RandomSuffix;
 
 	if(itr->second.BonusApplied == Apply)
 		return;
@@ -693,9 +705,13 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 
 		case 2:		 // Mod damage done.
 			{
+				int32 val = Entry->min[c];
+				if(RandomSuffixAmount)
+					val = RANDOM_SUFFIX_MAGIC_CALCULATION(RandomSuffixAmount, GetItemRandomSuffixFactor());
+
 				if(Apply)
-					m_owner->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, Entry->min[c]);
-				else m_owner->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, -Entry->min[c]);
+					m_owner->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, val);
+				else m_owner->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, -val);
 				m_owner->CalcDamage();
 			}break;
 
@@ -727,13 +743,17 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 
 		case 4:		 // Modify physical resistance
 			{
+				int32 val = Entry->min[c];
+				if(RandomSuffixAmount)
+					val = RANDOM_SUFFIX_MAGIC_CALCULATION(RandomSuffixAmount, GetItemRandomSuffixFactor());
+
 				if(Apply)
 				{
-					m_owner->FlatResistanceModifierPos[0] += Entry->min[c];
+					m_owner->FlatResistanceModifierPos[0] += val;
 				}
 				else
 				{
-					m_owner->FlatResistanceModifierPos[0] -= Entry->min[c];
+					m_owner->FlatResistanceModifierPos[0] -= val;
 				}
 				m_owner->CalcResistance(0);
 			}break;
@@ -742,8 +762,12 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 			{
 				//spellid is enum ITEM_STAT_TYPE
 				//min=max is amount
+				int32 val = Entry->min[c];
+				if(RandomSuffixAmount)
+					val = RANDOM_SUFFIX_MAGIC_CALCULATION(RandomSuffixAmount, GetItemRandomSuffixFactor());
+
 				m_owner->ModifyBonuses(Entry->spell[c],
-					Apply ? Entry->min[c] : -Entry->min[c]);
+					Apply ? val : -val);
 				m_owner->UpdateStats();
 			}break;
 
@@ -753,12 +777,20 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 				{
 	//				m_owner->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, Entry->min[c]);
 					//if i'm not wrong then we should apply DMPS formula for this. This will have somewhat a larger value 28->34
-					int32 value=GetProto()->Delay*Entry->min[c]/1000;
+					int32 val = Entry->min[c];
+					if(RandomSuffixAmount)
+						val = RANDOM_SUFFIX_MAGIC_CALCULATION(RandomSuffixAmount, GetItemRandomSuffixFactor());
+
+					int32 value=GetProto()->Delay*val/1000;
 					m_owner->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, value);
 				}
 				else
 				{
-					int32 value=-(int32)(GetProto()->Delay*Entry->min[c]/1000);
+					int32 val = Entry->min[c];
+					if(RandomSuffixAmount)
+						val = RANDOM_SUFFIX_MAGIC_CALCULATION(RandomSuffixAmount, GetItemRandomSuffixFactor());
+
+					int32 value=-(int32)(GetProto()->Delay*val/1000);
 					m_owner->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, value);
 				}
 				m_owner->CalcDamage();
@@ -796,7 +828,7 @@ void Item::EventRemoveEnchantment(uint32 Slot)
 	RemoveEnchantment(Slot);
 }
 
-int32 Item::FindFreeEnchantSlot(EnchantEntry * Enchantment)
+int32 Item::FindFreeEnchantSlot(EnchantEntry * Enchantment, uint32 random_type)
 {	
 	//if(!Enchantment) return -1;
 
@@ -810,6 +842,19 @@ int32 Item::FindFreeEnchantSlot(EnchantEntry * Enchantment)
 	uint32 GemSlotsReserve=GetSocketsCount();
 	if(GetProto()->SocketBonus)
 		GemSlotsReserve++;
+
+	if(random_type==1)		// random prop
+	{
+		for(uint32 Slot = 8; Slot < 11; ++Slot)
+			if(m_uint32Values[ITEM_FIELD_ENCHANTMENT+Slot*3] == 0)
+				return Slot;
+	}
+	else if(random_type==2)	// random suffix
+	{
+		for(uint32 Slot=6;Slot<11;++Slot)
+			if(m_uint32Values[ITEM_FIELD_ENCHANTMENT+Slot*3]==0)
+				return Slot;
+	}
 	
 	for(uint32 Slot = GemSlotsReserve+2;Slot<11; Slot++)
 	{

@@ -30,12 +30,15 @@ struct EnchantmentInstance
 	time_t ApplyTime;
 	uint32 Duration;
 	bool RemoveAtLogout;
+	uint32 RandomSuffix;
 };
 
 typedef map<uint32, EnchantmentInstance> EnchantmentMap;
 
 #define APPLY true
 #define REMOVE false
+
+#define RANDOM_SUFFIX_MAGIC_CALCULATION(__suffix, __scale) int32(float((float((__suffix)) * float((__scale)))) / 13340.0f);
 
 class SERVER_DECL Item : public Object
 {
@@ -86,7 +89,7 @@ public:
 
 	//! Adds an enchantment to the item.
 	int32 AddEnchantment(EnchantEntry * Enchantment, uint32 Duration, bool Perm = false,
-		bool apply = true, bool RemoveAtLogout = false,uint32 Slot_ = 0);
+		bool apply = true, bool RemoveAtLogout = false,uint32 Slot_ = 0, uint32 RandomSuffix=0);
 	uint32 GetSocketsCount();
 
 
@@ -115,7 +118,7 @@ public:
 	void ModifyEnchantmentTime(uint32 Slot, uint32 Duration);
 
 	//! Find free enchantment slot.
-	int32 FindFreeEnchantSlot(EnchantEntry * Enchantment);
+	int32 FindFreeEnchantSlot(EnchantEntry * Enchantment, uint32 random_type);
 
 	//! Removes all enchantments.
 	void RemoveAllEnchantments(bool OnlyTemporary);
@@ -124,7 +127,7 @@ public:
 	void SendEnchantTimeUpdate(uint32 Slot, uint32 Duration);
 
 	//! Applies any random properties the item has.
-	void ApplyRandomProperties();
+	void ApplyRandomProperties(bool apply);
 
 	void RemoveProfessionEnchant();
 	void RemoveSocketBonusEnchant();

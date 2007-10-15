@@ -3012,24 +3012,21 @@ int32 Spell::CalculateEffect(uint32 i)
 	{
         ItemRandomSuffixEntry * si = dbcItemRandomSuffix.LookupEntry(abs(int(i_caster->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID))));
 		EnchantEntry * ent;
-		uint32 i,j;
-		float v;
+		uint32 j,k;
 
-		for(i = 0; i < 3; ++j)
+		for(j = 0; j < 3; ++j)
 		{
-			if(si->enchantments[i] != 0)
+			if(si->enchantments[j] != 0)
 			{
-				ent = dbcEnchant.LookupEntry(si->enchantments[i]);
-				for(j = 0; j < 3; ++j)
+				ent = dbcEnchant.LookupEntry(si->enchantments[j]);
+				for(k = 0; k < 3; ++k)
 				{
-					if(ent->spell[j] == m_spellInfo->Id)
+					if(ent->spell[k] == m_spellInfo->Id)
 					{
-						if(si->prefixes[i] == 0)
+						if(si->prefixes[k] == 0)
 							goto exit;
 						
-						v = i_caster->GetItemRandomSuffixFactor() * float(si->prefixes[i]);
-						v /= 10000.0f;
-                        value = float2int32(v);
+						value = RANDOM_SUFFIX_MAGIC_CALCULATION(si->prefixes[j], i_caster->GetItemRandomSuffixFactor());
 						
 						if(value == 0)
 							goto exit;

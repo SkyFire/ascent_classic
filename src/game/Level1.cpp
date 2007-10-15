@@ -277,7 +277,7 @@ bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_sess
 		if ( it->MaxCount == 1 && cCount )
 		{ // let's think of count as a randomprop
 			item->SetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, count);
-			item->ApplyRandomProperties();
+			item->ApplyRandomProperties(false);
 		}
 	  
 		if(!chr->GetItemInterface()->AddItemToFreeSlot(item))

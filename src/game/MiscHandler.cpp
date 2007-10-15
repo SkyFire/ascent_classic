@@ -111,12 +111,12 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		if(pLoot->items.at(lootSlot).iRandomProperty!=NULL)
 		{
 			item->SetRandomProperty(pLoot->items.at(lootSlot).iRandomProperty->ID);
-			item->ApplyRandomProperties();
+			item->ApplyRandomProperties(false);
 		}
 		else if(pLoot->items.at(lootSlot).iRandomSuffix != NULL)
 		{
 			item->SetRandomSuffix(pLoot->items.at(lootSlot).iRandomSuffix->id);
-			item->ApplyRandomProperties();
+			item->ApplyRandomProperties(false);
 		}
 
 		GetPlayer()->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
@@ -1633,12 +1633,12 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	if(pLoot->items.at(slotid).iRandomProperty!=NULL)
 	{
 		item->SetRandomProperty(pLoot->items.at(slotid).iRandomProperty->ID);
-		item->ApplyRandomProperties();
+		item->ApplyRandomProperties(false);
 	}
 	else if(pLoot->items.at(slotid).iRandomSuffix != NULL)
 	{
 		item->SetRandomSuffix(pLoot->items.at(slotid).iRandomSuffix->id);
-		item->ApplyRandomProperties();
+		item->ApplyRandomProperties(false);
 	}
 
 	player->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);

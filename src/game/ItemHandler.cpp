@@ -1706,7 +1706,7 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 			Enchantment = dbcEnchant.LookupEntry(TargetItem->GetProto()->SocketBonus);
 			if(Enchantment)
 			{
-				uint32 Slot = TargetItem->FindFreeEnchantSlot(Enchantment);
+				uint32 Slot = TargetItem->FindFreeEnchantSlot(Enchantment,0);
 				TargetItem->AddEnchantment(Enchantment, 0, true,apply,false, Slot);
 			}
 		}else //remove
