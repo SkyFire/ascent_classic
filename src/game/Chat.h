@@ -20,6 +20,8 @@
 #ifndef WOWSERVER_CHAT_H
 #define WOWSERVER_CHAT_H
 
+#include "SkillNameMgr.h"
+
 class ChatHandler;
 class WorldSession;
 class Player;
@@ -504,6 +506,9 @@ protected:
 	bool HandleGMCallCommand(const char * args, WorldSession * m_session);
 	bool HandleNpcSelectCommand(const char * args, WorldSession * m_session);
 	bool HandleWaypointAddFlyCommand(const char * args, WorldSession * m_session);
+
+	/* For skill related GM commands */
+	SkillNameMgr *SkillNameManager;
 };
 
 

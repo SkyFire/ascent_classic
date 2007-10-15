@@ -114,6 +114,7 @@
 #include "faction.h"
 #include "Professions.h"
 #include "Skill.h"
+#include "SkillNameMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"

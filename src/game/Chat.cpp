@@ -603,22 +603,14 @@ ChatHandler::ChatHandler()
 {
 	new CommandTableStorage;
 	CommandTableStorage::getSingleton().Init();
+	SkillNameManager = new SkillNameMgr;
 }
 
 ChatHandler::~ChatHandler()
 {
 	CommandTableStorage::getSingleton().Dealloc();
-	//Get rid of the precached skillinfo stuff -DGM
-	if(SkillNames!=0)
-	{
-		for(uint32 i = 0;i<=maxskill;i++)
-		{
-			if(SkillNames[i] != 0)
-				free(SkillNames[i]);
-		}
-		free(SkillNames);
-	}
 	delete CommandTableStorage::getSingletonPtr();
+	delete SkillNameManager;
 }
 
 bool ChatHandler::hasStringAbbr(const char* s1, const char* s2)
