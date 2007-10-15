@@ -749,13 +749,13 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 
 				if(Apply)
 				{
-					m_owner->FlatResistanceModifierPos[0] += val;
+					m_owner->FlatResistanceModifierPos[Entry->spell[c]] += val;
 				}
 				else
 				{
-					m_owner->FlatResistanceModifierPos[0] -= val;
+					m_owner->FlatResistanceModifierPos[Entry->spell[c]] -= val;
 				}
-				m_owner->CalcResistance(0);
+				m_owner->CalcResistance(Entry->spell[c]);
 			}break;
 
 		case 5:	 //Modify rating ...order is PLAYER_FIELD_COMBAT_RATING_1 and above

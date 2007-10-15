@@ -253,16 +253,16 @@ bool ChatHandler::HandleGetRankCommand(const char *args, WorldSession *m_session
 
 bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_session)
 {
+	uint32 itemid, count=1;
+	int32 randomprop=0;
+
 	if(strlen(args) < 1)
 	{
 		return false;
 	}
 
-	int itemid = atoi(strtok((char*)args, " "));
-	uint32 count = 1;
-	char *cCount = strtok(NULL, "\n");  
-	if(cCount) count = atoi(cCount);
-	if(!count) count = 1;
+	if(sscanf(args, "%u %u %d", &itemid, &count, &randomprop) < 1)
+		return false;
 
 	Player *chr = getSelectedChar(m_session);
 	if (chr == NULL) return true;
@@ -274,9 +274,13 @@ bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_sess
 		Item *item;
 		item = objmgr.CreateItem( itemid, chr);
 		item->SetUInt32Value(ITEM_FIELD_STACK_COUNT, ((count > it->MaxCount) ? it->MaxCount : count));
-		if ( it->MaxCount == 1 && cCount )
-		{ // let's think of count as a randomprop
-			item->SetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, count);
+		if(randomprop!=0)
+		{
+			if(randomprop<0)
+				item->SetRandomSuffix(abs(int(randomprop)));
+			else
+				item->SetRandomProperty(randomprop);
+
 			item->ApplyRandomProperties(false);
 		}
 	  
