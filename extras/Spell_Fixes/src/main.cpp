@@ -30,7 +30,7 @@ void import_from_sql();
 
 void print_usage()
 {
-	printf("Usage: -doall spell_fix.exe inf=input_spell.dbc\n");
+	printf("Usage: -dofix spell_fix.exe inf=input_spell.dbc\n");
 	printf("parameters: -h output this help message\n");
 	printf("parameters: -dofix start making custom fixes\n");
 	printf("parameters: -conv dump DBC as sql\n");
@@ -68,7 +68,7 @@ void main(int argc, TCHAR* argv[])
 	//we will work with this anyway. This whole tool is about this var :P
 	if(strlen(file_name)<2)
 	{
-		printf("This tool is designed for sopme special purpuse and it needs an imput file \n");
+		printf("This tool is designed for some special purpuse and it needs an imput file \n");
 		print_usage();
 		exit(1);
 	}
@@ -89,7 +89,7 @@ void main(int argc, TCHAR* argv[])
 		case 3:		import_from_sql();			break;
 		default:								break;
 	}
-	getch();
+//	getch();
 }
 
 __int64 getfilesize(TCHAR *infname)
@@ -113,7 +113,7 @@ unsigned int get_spell_row(uint32 id)
 	for(unsigned int j=0;j<dbc.getRecordCount();j++)
 		if(dbc.getRecord(j).getUInt(SPELL_ENTRY_Id)==id)
 			return j;
-	return 0;
+	return 0xFFFFFFFF;
 }
 
 /*
@@ -146,7 +146,7 @@ void assign_row_to_SpellEntry(SpellEntry **spe,uint32 row)
 void assign_Spell_to_SpellEntry(SpellEntry **spe,uint32 spell_id)
 {
 	uint32 row=get_spell_row(spell_id);
-	if(!row)
+	if(row==0xFFFFFFFF)
 		*spe = NULL;
 	else assign_row_to_SpellEntry(spe,row);
 }
@@ -161,14 +161,18 @@ void do_fixes(TCHAR *inf)
 	else printf("Opened DBC with %u fields and %u rows\n",(int)dbc.getFieldCount(),(int)dbc.getRecordCount());
 
 	uint32 cnt = (uint32)dbc.getRecordCount();
-
 	uint32 effect;
 	uint32 All_Seal_Groups_Combined=0;
+	SpellEntry * sp;
+
 	for(uint32 x=0; x < cnt; x++)
 	{
 		uint32 result = 0;
 		// SpellID
-		uint32 spellid = dbc.getRecord(x).getUInt(SPELL_ENTRY_Id);
+//		uint32 spellid = dbc.getRecord(x).getUInt(SPELL_ENTRY_Id);
+		// get spellentry
+//		assign_Spell_to_SpellEntry(&sp,spellid);
+		assign_row_to_SpellEntry(&sp,x);
 		// Description field
 		char* desc = (char*)dbc.getRecord(x).getString(SPELL_ENTRY_Description); 
 		const char* ranktext = dbc.getRecord(x).getString(SPELL_ENTRY_Rank);
@@ -178,23 +182,10 @@ void do_fixes(TCHAR *inf)
 		uint32 type = 0;
 		uint32 namehash = 0;
 
-		// get spellentry
-		SpellEntry *sp, *sp1;
-		assign_row_to_SpellEntry(&sp,x);
-
 		// hash the name
 		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
-        namehash = crc32((const unsigned char*)nametext, (unsigned int)strlen(nametext));
+        namehash = (uint32) crc32((const unsigned char*)nametext, (uint32)strlen(nametext));
 		sp->NameHash   = namehash; //need these set before we start processing spells
-
-/*		for(uint32 b=0;b<3;++b)
-		{
-			if(sp->EffectTriggerSpell[b] != 0 && check_spell_exist(sp->EffectTriggerSpell[b]) == NULL)
-			{
-				// proc spell referencing non-existant spell. create a dummy spell for use w/ it. 
-				CreateDummySpell(sp->EffectTriggerSpell[b]);
-			}
-		}*/
 
 		sp->proc_interval = 0;//trigger at each event
 		sp->c_is_flags = 0;
@@ -303,8 +294,9 @@ void do_fixes(TCHAR *inf)
 					teachspell = sp->EffectTriggerSpell[2];
 				if(teachspell)
 				{
-					assign_Spell_to_SpellEntry(&sp1,teachspell);
-					sp1->spellLevel = new_level;
+					SpellEntry *spellInfo;
+					assign_Spell_to_SpellEntry(&spellInfo,teachspell);
+					spellInfo->spellLevel = new_level;
 					sp->spellLevel = new_level;
 				}
 			}
@@ -917,26 +909,14 @@ void do_fixes(TCHAR *inf)
 		if(namehash==3238263755UL)
 			sp->procFlags=0;
 
-/*		map<uint32,pair<uint32,int32> >::iterator itr = procMap.find(namehash);
-		if(itr != procMap.end())
-		{
-			if(itr->second.second > 0)
-				sp->procFlags = (uint32)itr->second.second;
-			if(itr->first != 0)
-				sp->procChance = itr->first;
-		}
-		*/
-
 //junk code to get me has :P 
 //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
 //	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);
 	}
 	//this is so lame : shamanistic rage triggers a new spell which borrows it's stats from parent spell :S
+	SpellEntry * tsp;
 	SpellEntry * parentsp;
 	SpellEntry * triggersp;
-	SpellEntry * sp;
-	SpellEntry * tsp;
-
 	assign_Spell_to_SpellEntry(&parentsp,30823);
 	assign_Spell_to_SpellEntry(&triggersp,30824);
 	if(parentsp && triggersp) 
@@ -1591,8 +1571,43 @@ void do_fixes(TCHAR *inf)
 		sp->EffectSpellGroupRelation[0] = Sanctity_group;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 	}
+
+	// druid - Improved Mark of the Wild
+	uint32 imarkofthv_group=0;
+	assign_Spell_to_SpellEntry(&tsp,1126); //Mark of the wild
+	if(tsp)
+		imarkofthv_group = tsp->SpellGroupType;
+	assign_Spell_to_SpellEntry(&tsp,21849); //Gift of the Wild
+	if(tsp)
+		imarkofthv_group |= tsp->SpellGroupType;
+	assign_Spell_to_SpellEntry(&sp,17050);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	assign_Spell_to_SpellEntry(&sp,17051);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	assign_Spell_to_SpellEntry(&sp,17053);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	assign_Spell_to_SpellEntry(&sp,17054);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	assign_Spell_to_SpellEntry(&sp,17055);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
+	//rogue - initiative
+	assign_Spell_to_SpellEntry(&sp,13976);
+	if(sp)
+		sp->procChance = 25;
+	assign_Spell_to_SpellEntry(&sp,13979);
+	if(sp)
+		sp->procChance = 50;
+	assign_Spell_to_SpellEntry(&sp,13980);
+	if(sp)
+		sp->procChance = 75;
+
 	//for test only
-	assign_Spell_to_SpellEntry(&sp,32796);
+/*	sp = dbcSpell.LookupEntry(32796);
 	if(sp)
 	{
 //		printf("!!!!!!hash %u \n",sp->NameHash);
@@ -1600,6 +1615,7 @@ void do_fixes(TCHAR *inf)
 //		SpellDuration *sd=sSpellDuration.LookupEntry(sp->DurationIndex);
 //printf("iterruptflag %u, duration %u",sp->AuraInterruptFlags,GetDuration(sd));
 	}
+	*/
 	//improoved berserker stance should be triggered on berserker stance use
 //	sp = sSpellStore.LookupEntry(12704);
 //	if(sp)	sp->procFlags=PROC_ON_CAST_SPECIFIC_SPELL;
@@ -1617,21 +1633,28 @@ void do_fixes(TCHAR *inf)
 	assign_Spell_to_SpellEntry(&sp,16974);
 	if(sp)
 		sp->RequiredShapeShift = mm;
+	assign_Spell_to_SpellEntry(&sp,16972);
+	if(sp)
+		sp->RequiredShapeShift = mm;
 	assign_Spell_to_SpellEntry(&sp,16975);
 	if(sp)
 		sp->RequiredShapeShift = mm;
 	assign_Spell_to_SpellEntry(&sp,20134);
 	if(sp)
-		sp->procChance = mm;
+		sp->procChance = 50;
 
 	/* aspect of the pack - change to AA */
 	assign_Spell_to_SpellEntry(&sp,13159);
-	sp->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
-	sp->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
+	if(sp)
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
+	assign_Spell_to_SpellEntry(&sp,13159);
+	if(sp)
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
 	
 	/* shadowstep - change proc flags */
 	assign_Spell_to_SpellEntry(&sp,36563);
-	sp->procFlags = 0;
+	if(sp)
+		sp->procChance = 50;
 
 	dbc.DumpBufferToFile(inf);
 }
