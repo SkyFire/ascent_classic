@@ -6218,7 +6218,7 @@ void Aura::SpellAuraModPowerCostPCT(bool apply) // armor penetration & spell pen
 		}
 
 		if(mod->m_miscValue & 124 && m_target->IsPlayer())
-			m_target->ModUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -mod->m_amount);
+			m_target->ModUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, mod->m_amount);
 	}
 	else
 	{
@@ -6228,7 +6228,7 @@ void Aura::SpellAuraModPowerCostPCT(bool apply) // armor penetration & spell pen
 				m_target->PowerCostPctMod[x] += mod->m_amount;
 		}
 		if(mod->m_miscValue & 124 && m_target->IsPlayer())
-			m_target->ModUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE,  mod->m_amount);
+			m_target->ModUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -mod->m_amount);
 	}
 }
 
