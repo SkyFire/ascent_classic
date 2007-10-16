@@ -248,51 +248,50 @@ struct SpellEntry
     uint32 dummy;                           //121
     uint32 CoSpell;                         //122   activeIconID;
     uint32 spellPriority;                   //123
-//    uint32 Name;                            //124
-//    uint32 NameAlt1;                        //125
-//    uint32 NameAlt2;                        //126
-//    uint32 NameAlt3;                        //127
-//    uint32 NameAlt4;                        //128
-//    uint32 NameAlt5;                        //129
-//    uint32 NameAlt6;                        //130
-//    uint32 NameAlt7;                        //131
-//    uint32 NameAlt8;                        //132
-//    uint32 NameAlt9;                        //133
-//    uint32 NameAlt10;                       //134
-//    uint32 NameAlt11;                       //135
-//    uint32 NameAlt12;                       //136
-//    uint32 NameAlt13;                       //137
-//    uint32 NameAlt14;                       //138
-//    uint32 NameAlt15;                       //139
-//    uint32 NameFlags;                       //140
-//    uint32 Rank;                            //141
-//    uint32 RankAlt1;                        //142
-//    uint32 RankAlt2;                        //143
-//    uint32 RankAlt3;                        //144
-//    uint32 RankAlt4;                        //145
-//    uint32 RankAlt5;                        //146
-//    uint32 RankAlt6;                        //147
-//    uint32 RankAlt7;                        //148
-//    uint32 RankAlt8;                        //149
-//    uint32 RankAlt9;                        //150
-//    uint32 RankAlt10;                       //151
-//    uint32 RankAlt11;                       //152
-//    uint32 RankAlt12;                       //153
-//    uint32 RankAlt13;                       //154
-//    uint32 RankAlt14;                       //155
-//    uint32 RankAlt15;                       //156
-//    uint32 RankFlags;                       //157
-//    uint32 Description;                     //158
-//    uint32 DescriptionAlt1;                 //159
-//    uint32 DescriptionAlt2;                 //160
-//    uint32 DescriptionAlt3;                 //161
-//    uint32 DescriptionAlt4;                 //162
-//    uint32 DescriptionAlt5;                 //163
-//    uint32 DescriptionAlt6;                 //164
-//    uint32 DescriptionAlt7;                 //165
-//    uint32 DescriptionAlt8;                 //166
-//    uint32 DescriptionAlt9;                 //167
-    uint32 buffType;                        //167 - !!! CUSTOM, Using it instead of DescriptionAlt9 !!!
+    //uint32 Name;                            //124
+    //uint32 NameAlt1;                        //125
+    //uint32 NameAlt2;                        //126
+    //uint32 NameAlt3;                        //127
+    //uint32 NameAlt4;                        //128
+    //uint32 NameAlt5;                        //129
+    //uint32 NameAlt6;                        //130
+    //uint32 NameAlt7;                        //131
+    //uint32 NameAlt8;                        //132
+    //uint32 NameAlt9;                        //133
+    //uint32 NameAlt10;                       //134
+    //uint32 NameAlt11;                       //135
+    //uint32 NameAlt12;                       //136
+    //uint32 NameAlt13;                       //137
+    //uint32 NameAlt14;                       //138
+    //uint32 NameAlt15;                       //139
+    //uint32 NameFlags;                       //140
+    //uint32 Rank;                            //141
+    //uint32 RankAlt1;                        //142
+    //uint32 RankAlt2;                        //143
+    //uint32 RankAlt3;                        //144
+    //uint32 RankAlt4;                        //145
+    //uint32 RankAlt5;                        //146
+    //uint32 RankAlt6;                        //147
+    //uint32 RankAlt7;                        //148
+    //uint32 RankAlt8;                        //149
+    //uint32 RankAlt9;                        //150
+    //uint32 RankAlt10;                       //151
+    //uint32 RankAlt11;                       //152
+    //uint32 RankAlt12;                       //153
+    //uint32 RankAlt13;                       //154
+    //uint32 RankAlt14;                       //155
+    //uint32 RankAlt15;                       //156
+    //uint32 RankFlags;                       //157
+    //uint32 Description;                     //158
+    //uint32 DescriptionAlt1;                 //159
+    //uint32 DescriptionAlt2;                 //160
+    //uint32 DescriptionAlt3;                 //161
+    //uint32 DescriptionAlt4;                 //162
+    //uint32 DescriptionAlt5;                 //163
+    //uint32 DescriptionAlt6;                 //164
+    //uint32 DescriptionAlt7;                 //165
+    //uint32 DescriptionAlt8;                 //166
+    //uint32 DescriptionAlt9;                 //167
 //    //uint32 DescriptionAlt10;                //168
 	uint32 proc_interval;					  //168 - !!! CUSTOM, Using it instead of DescriptionAlt10 !!!
 //    //uint32 DescriptionAlt11;                //169
@@ -300,29 +299,29 @@ struct SpellEntry
 //    //uint32 DescriptionAlt12;                //170
 	uint32 c_is_flags;						  //170 store spell checks in a static way : isdamageind,ishealing - !!! CUSTOM, Using it instead of DescriptionAlt12 !!!
 //    //uint32 DescriptionAlt13;                //171
-    uint32 RankNumber;						  //171 - !!! CUSTOM, Using it instead of DescriptionAlt13 !!!// these are related to creating a item through a spell
+//    //uint32 DescriptionAlt14;                //172
 //    //uint32 DescriptionAlt15;                //173
-    uint32 NameHash;						  //172 - !!! CUSTOM, Using it instead of DescriptionAlt14 !!!
-//    //uint32 DescriptionAlt14;               //172
-    uint32 DiminishStatus;					  //173 - !!! CUSTOM, Using it instead of DescriptionAlt15 !!!// related to custom spells, summon spell quest related spells
-//    uint32 DescriptionFlags;                //174
-//    uint32 BuffDescription;                 //175
-//    uint32 BuffDescriptionAlt1;             //176
-//    uint32 BuffDescriptionAlt2;             //177
-//    uint32 BuffDescriptionAlt3;             //178
-//    uint32 BuffDescriptionAlt4;             //179
-//    uint32 BuffDescriptionAlt5;             //180
-//    uint32 BuffDescriptionAlt6;             //181
-//    uint32 BuffDescriptionAlt7;             //182
-//    uint32 BuffDescriptionAlt8;             //183
-//    uint32 BuffDescriptionAlt9;             //184
-//    uint32 BuffDescriptionAlt10;            //185
-//    uint32 BuffDescriptionAlt11;            //186
-//    uint32 BuffDescriptionAlt12;            //187
-//    uint32 BuffDescriptionAlt13;            //188
-//    uint32 BuffDescriptionAlt14;            //189
-//	  uint32 BuffDescriptionAlt15;            //190
-//    uint32 buffdescflags;                   //191
+    uint32 buffType;                        //171 - !!! CUSTOM, Using it instead of DescriptionAlt13 !!!// these are related to creating a item through a spell
+    uint32 RankNumber;                      //172 // this protects players from having >1 rank of a spell - !!! CUSTOM, Using it instead of DescriptionAlt14 !!!
+    uint32 NameHash;                        //173 - !!! CUSTOM, Using it instead of DescriptionAlt15 !!!// related to custom spells, summon spell quest related spells
+    //uint32 DescriptionFlags;                //174
+    //uint32 BuffDescription;                 //175
+    //uint32 BuffDescriptionAlt1;             //176
+    //uint32 BuffDescriptionAlt2;             //177
+    //uint32 BuffDescriptionAlt3;             //178
+    //uint32 BuffDescriptionAlt4;             //179
+    //uint32 BuffDescriptionAlt5;             //180
+    //uint32 BuffDescriptionAlt6;             //181
+    //uint32 BuffDescriptionAlt7;             //182
+    //uint32 BuffDescriptionAlt8;             //183
+    //uint32 BuffDescriptionAlt9;             //184
+    //uint32 BuffDescriptionAlt10;            //185
+    //uint32 BuffDescriptionAlt11;            //186
+    //uint32 BuffDescriptionAlt12;            //187
+    //uint32 BuffDescriptionAlt13;            //188
+    //uint32 BuffDescriptionAlt14;            //189
+	//uint32 BuffDescriptionAlt15;            //190
+    //uint32 buffdescflags;                   //191
     uint32 ManaCostPercentage;              //192
     uint32 unkflags;                        //193 
     uint32 StartRecoveryTime;               //194
@@ -338,9 +337,10 @@ struct SpellEntry
     uint32 FL;                              //206   only one spellid:6994 has this value = 369
     uint32 FM;                              //207   only one spellid:6994 has this value = 4
     uint32 FN;                              //208   only one spellid:26869  has this flag = 1   
-    uint32 unk201_4;						//209
-    uint32 unk201_5;                        //210
-    uint32 unk201_6;						//211
+    uint32 unk201_4;						//209 
+    uint32 unk201_5;						//210 
+    uint32 unk201_6;						//211 
+    uint32 DiminishStatus;                  //212
 };
 
 struct ItemExtendedCostEntry
