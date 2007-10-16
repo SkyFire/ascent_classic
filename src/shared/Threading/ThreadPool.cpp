@@ -254,6 +254,7 @@ static unsigned long WINAPI thread_proc(void* param)
 	t->SetupMutex.Acquire();
 	uint32 tid = t->ControlInterface.GetId();
 	bool ht = (t->ExecutionTarget != NULL);
+	t->SetupMutex.Release();
 	//Log.Debug("ThreadPool", "Thread %u started.", t->ControlInterface.GetId());
 
 	for(;;)
@@ -281,7 +282,6 @@ static unsigned long WINAPI thread_proc(void* param)
 		}
 	}
 
-	t->SetupMutex.Release();
 	// at this point the t pointer has already been freed, so we can just cleanly exit.
 	ExitThread(0);
 
@@ -311,6 +311,7 @@ static void * thread_proc(void * param)
 	Thread * t = (Thread*)param;
 	t->SetupMutex.Acquire();
 	Log.Debug("ThreadPool", "Thread %u started.", t->ControlInterface.GetId());
+	t->SetupMutex.Release();
 
 	for(;;)
 	{
@@ -332,7 +333,6 @@ static void * thread_proc(void * param)
 		}
 	}
 
-	t->SetupMutex.Release();
 	pthread_exit(0);
 }
 
