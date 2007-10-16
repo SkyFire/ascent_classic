@@ -37,9 +37,11 @@
 	#define CREATURE_DAZE_TRIGGER_ANGLE M_PI/2 //for the beginners this means 45 degrees 
 #endif
 
+#define DISTANCE_TO_SMALL_TO_MOVE 1.0f
+
 //people keep reporting that creatures can be soloed without getting even 1 hit
 //personally i was never able to reproduce this bug but if the whole world tells me that i'm wrong then i must be wrong :)
-#define ENABLE_GRACEFULL_HIT
+//#define ENABLE_GRACEFULL_HIT
 
 class Object;
 class Creature;

@@ -268,7 +268,15 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				m_moveRun = true;
 
 				// Scan for a new target before moving back on waypoint path
-				Unit * Target = FindTarget();
+				//check if target is out of our melee range
+				Unit * Target;
+				if(m_outOfCombatRange && m_Unit->GetDistanceSq(m_returnX,m_returnY,m_returnZ) < m_outOfCombatRange)
+					Target = FindTarget();
+				else 
+				{
+					Target = NULL;
+				}
+
 				if(Target != NULL)
 					AttackReaction(Target, 1, 0);
 				else
@@ -874,16 +882,22 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				float distance = m_Unit->CalcDistance(m_nextTarget);
 
 				combatReach[0] = 0.0f;
-				combatReach[1] = _CalcCombatRange(m_nextTarget, false);
+				combatReach[1] = _CalcCombatRange(m_nextTarget, false)+DISTANCE_TO_SMALL_TO_MOVE;//ther are cases when creature blocks. Range is too small to move and he cannot attack because out of range
 
 				if(	
 //					distance >= combatReach[0] && 
 					distance <= combatReach[1]
 #ifdef ENABLE_GRACEFULL_HIT
-					|| have_graceful_hit
+					//gracefull hit when player walks backward and mob will never be able to get to him and attack
+					//make sure we do not make hits on chars that are really running away from us
+					|| (have_graceful_hit && m_creatureState!=MOVING && distance <= (combatReach[1] + 2*PLAYER_SIZE)) 
 #endif
 					) // Target is in Range -> Attack
 				{
+#ifdef ENABLE_GRACEFULL_HIT
+if(have_graceful_hit)
+	printf("we just made a gracefull hit \n");
+#endif
 					if(UnitToFollow != NULL)
 					{
 						UnitToFollow = NULL; //we shouldn't be following any one
@@ -896,9 +910,6 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					//FIXME: offhand shit
 					if(m_Unit->isAttackReady(false) && !m_fleeTimer)
 					{
-#ifdef ENABLE_GRACEFULL_HIT
-						have_graceful_hit = false;
-#endif
 						m_creatureState = ATTACKING;
 
 						if(!m_Unit->isInFront(m_nextTarget)) // set InFront
@@ -937,6 +948,10 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 #endif
 					}
 				}
+#ifdef ENABLE_GRACEFULL_HIT
+				//we should loose gracefull hit here eighter we made thehiot or not
+				have_graceful_hit = false;
+#endif
 				if(distance > combatReach[1] && m_nextTarget) // Target out of Range -> Run to it
 				{
 #ifdef ENABLE_GRACEFULL_HIT
@@ -1374,7 +1389,7 @@ Unit* AIInterface::FindTarget()
 
 		if(dist > distance)	 // we want to find the CLOSEST target
 			continue;
-		
+
 		if(dist <= _CalcAggroRange(pUnit) )
 		{
 			distance = dist;
@@ -1904,7 +1919,8 @@ void AIInterface::UpdateMove()
 	//use MoveTo()
 	float distance = m_Unit->CalcDistance(m_nextPosX,m_nextPosY,m_nextPosZ);
 	
-	if(distance < 1.0f) return; //we don't want little movements here and there
+	if(distance < DISTANCE_TO_SMALL_TO_MOVE) 
+		return; //we don't want little movements here and there
 
 	m_destinationX = m_nextPosX;
 	m_destinationY = m_nextPosY;
