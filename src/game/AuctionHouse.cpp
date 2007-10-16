@@ -34,8 +34,8 @@ void Auction::SaveToDB(uint32 AuctionHouseId)
 
 void Auction::UpdateInDB()
 {
-	CharacterDatabase.Execute("UPDATE auctions SET bidder = %u WHERE auctionId = %u", HighestBidder, Owner);
-	CharacterDatabase.Execute("UPDATE auctions SET bid = %u WHERE auctionId = %u", HighestBid, Owner);
+	CharacterDatabase.Execute("UPDATE auctions SET bidder = %u WHERE auctionId = %u", HighestBidder, Id);
+	CharacterDatabase.Execute("UPDATE auctions SET bid = %u WHERE auctionId = %u", HighestBid, Id);
 }
 
 AuctionHouse::AuctionHouse(uint32 ID)
