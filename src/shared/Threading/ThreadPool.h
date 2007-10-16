@@ -78,7 +78,7 @@ public:
 	void Setup(pthread_t h)
 	{
 		handle = h;
-		sem_init(&sem, PTHREAD_PROCESS_PRIVATE, 5);
+		sem_init(&sem, PTHREAD_PROCESS_PRIVATE, 0);
 		thread_id = GenerateThreadId();
 	}
 	~ThreadController()

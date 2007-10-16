@@ -29,7 +29,9 @@
 	volatile int threadid_count = 0;
 	int GenerateThreadId()
 	{
-		return ++threadid_count;
+		int i = ++threadid_count;
+		printf("threadid generated: %u\n", i);
+		return i;
 	}
 
 #endif
@@ -67,14 +69,15 @@ bool CThreadPool::ThreadExit(Thread * t)
 	++_threadsExitedSinceLastCheck;
 	++_threadsEaten;
 	std::set<Thread*>::iterator itr = m_freeThreads.find(t);
+
 	if(itr != m_freeThreads.end())
 	{
 		printf("Thread %u duplicated with thread %u\n", (*itr)->ControlInterface.GetId(), t->ControlInterface.GetId());
 	}
 	m_freeThreads.insert(t);
 	
-	_mutex.Release();
 	Log.Debug("ThreadPool", "Thread %u entered the free pool.", t->ControlInterface.GetId());
+	_mutex.Release();
 	return true;
 }
 

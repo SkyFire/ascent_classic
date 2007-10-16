@@ -176,7 +176,7 @@ bool Master::Run(int argc, char ** argv)
 	printf("Public License, either version 3 or any later version. For a copy of\n");
 	printf("this license, see the COPYING file provided with this distribution.\n");
 	Log.Line();
-	Log.log_level = 1;
+	Log.log_level = 3;
 
 	if(do_version)
 		return true;
