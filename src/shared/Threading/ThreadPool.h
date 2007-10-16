@@ -67,7 +67,6 @@ public:
 
 #else
 #include <semaphore.h>
-#include <pthread.h>
 int GenerateThreadId();
 
 class ThreadController
@@ -106,22 +105,18 @@ public:
 	}
 
 	inline uint32 GetId() { return (uint32)thread_id; }
-	inline pthread_t GetPthreadId() { return handle; }
 };
 
 #endif
 
 struct SERVER_DECL Thread
 {
-#ifndef WIN32
-	pthread_mutex_t setup_mutex;
-#endif
 	ThreadBase * ExecutionTarget;
 	ThreadController ControlInterface;
+	Mutex SetupMutex;
 };
 
 typedef std::set<Thread*> ThreadSet;
-typedef std::queue<Thread*> ThreadQueue;
 
 class SERVER_DECL CThreadPool
 {
@@ -135,12 +130,10 @@ class SERVER_DECL CThreadPool
 	Mutex _mutex;
 
     ThreadSet m_activeThreads;
-	ThreadQueue m_freeThreads;
+	ThreadSet m_freeThreads;
 
 public:
 	CThreadPool();
-
-	void EnterSuspendPool(Thread * t);
 
 	// call every 2 minutes or so.
 	void IntegrityCheck();
