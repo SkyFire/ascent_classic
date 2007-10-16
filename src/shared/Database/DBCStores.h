@@ -321,7 +321,7 @@ struct SpellEntry
     //uint32 BuffDescriptionAlt13;            //188
     //uint32 BuffDescriptionAlt14;            //189
 	//uint32 BuffDescriptionAlt15;            //190
-    //uint32 buffdescflags;                   //191
+    uint32 buffdescflags;                   //191
     uint32 ManaCostPercentage;              //192
     uint32 unkflags;                        //193 
     uint32 StartRecoveryTime;               //194
