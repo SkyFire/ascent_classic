@@ -937,7 +937,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 #endif
 					}
 				}
-				if(distance > combatReach[1]) // Target out of Range -> Run to it
+				if(distance > combatReach[1] && m_nextTarget) // Target out of Range -> Run to it
 				{
 #ifdef ENABLE_GRACEFULL_HIT
 					have_graceful_hit = true;
