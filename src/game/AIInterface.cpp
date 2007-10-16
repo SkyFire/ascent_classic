@@ -3033,6 +3033,7 @@ void AIInterface::CheckTarget(Unit* target)
 	{
 		UnitToFollow = NULL;
 		m_lastFollowX = m_lastFollowY = 0;
+		FollowDistance=0;
 	}
 
 	if(target == UnitToFollow_backup)
@@ -3041,6 +3042,12 @@ void AIInterface::CheckTarget(Unit* target)
 	}
 
 	TargetMap::iterator it2 = m_aiTargets.find(target);
+	if(it2 != m_aiTargets.end() || target==m_nextTarget)
+	{
+		target->CombatStatus.RemoveAttacker(m_Unit, m_Unit->GetGUID());
+		m_Unit->CombatStatus.RemoveAttackTarget(target);
+	}
+
 	if(it2 != m_aiTargets.end())
 	{
 		m_aiTargets.erase(it2);
