@@ -975,6 +975,13 @@ void Player::_EventCharmAttack()
 		return;
 
 	Unit *pVictim = NULL;
+	if(!IsInWorld())
+	{
+		m_CurrentCharm=NULL;
+		sEventMgr.RemoveEvents(this,EVENT_PLAYER_CHARM_ATTACK);
+		return;
+	}
+
 	if(m_curSelection == 0)
 	{
 		sEventMgr.RemoveEvents(this, EVENT_PLAYER_CHARM_ATTACK);
@@ -4667,6 +4674,7 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 		this->UnPossess();
 		if(m_currentSpell)
 			m_currentSpell->cancel();	   // cancel the spell
+		m_CurrentCharm=NULL;
 	}
  
 	if(pObj == m_Summon)

@@ -2317,7 +2317,7 @@ void ItemInterface::mSaveItemsToDatabase(bool first)
 
 	for(x = EQUIPMENT_SLOT_START; x < INVENTORY_KEYRING_END; ++x)
 	{
-		if(GetInventoryItem(x) != NULL)
+		if(GetInventoryItem(x) != NULL&&GetInventoryItem(x)->GetProto())
 		{
 			if(!( (GetInventoryItem(x)->GetProto()->Flags)&2 )) // skip conjured item on save
 			{
