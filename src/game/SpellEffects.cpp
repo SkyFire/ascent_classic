@@ -414,15 +414,16 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 
 void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 {
-	//curse of agony(18230) = periodic damage increased in 
-	//flag 2031678
 	uint32 spellId = m_spellInfo->Id;
 	
-	// INTERNAL HANDLERS
 	if(sScriptMgr.CallScriptedDummySpell(spellId, i, this))
 		return;
+
+	// INTERNAL HANDLERS
 	switch(spellId)
 	{
+	//curse of agony(18230) = periodic damage increased in 
+	//flag 2031678
 	case 31789: //paladin - Righteous Defense
 		{
 			//we will try to lure 3 enemies from our target
@@ -856,40 +857,6 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		{
 			//FIXME:Dont know what this dummy does
 		}break;
-		/*Normal Spells*/
-
-		/* Quest Related */
-	case 11536:
-		{
-			WorldPacket data(12);
-			data.SetOpcode(SMSG_PLAY_OBJECT_SOUND);
-			data << uint32(6197) << unitTarget->GetGUID();
-			p_caster->SendMessageToSet(&data, true);
-
-			sQuestMgr.OnPlayerKill(p_caster, ((Creature*)unitTarget));  // this should increment in quest log
-		}break;
-	case 19938:
-		{
-            if(((Creature*)unitTarget)->GetEntry() == 10556)
-            {
-			    WorldPacket data(12);
-			    data.SetOpcode(SMSG_PLAY_OBJECT_SOUND);
-			    data << uint32(6197) << unitTarget->GetGUID();
-			    p_caster->SendMessageToSet(&data, true);
-
-			    sQuestMgr.OnPlayerKill(p_caster, ((Creature*)unitTarget));  // this should increment in quest log
-
-			    // Send chat message
-			    char msg[100];
-			    snprintf(msg, 100, "Ow! Ok, I'll get back to work, %s", p_caster->GetName());
-			    unitTarget->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);
-            }
-            else
-            {
-                SendCastResult(SPELL_FAILED_BAD_TARGETS);
-                return;
-            }
-		}break;
 	case 7669:// Bethor's Potion
 		{
 			// related to Hex of Ravenclaw,
@@ -900,10 +867,6 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		{
 			//FIXME:Quest Blueleaf Tubers
 			//For use on a Snufflenose Gopher
-		}break;
-	case 8593:// Symbol of Life
-		{
-			//Quest The Tome of Divinity 
 		}break;
 	case 8913:// Sacred Cleansing
 		{
@@ -1025,40 +988,10 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 19250:// Placing Smokey's Explosives
 		{
 			//This is something related to quest i think
-			if(i == 0)
-			{
-			}
-			else
-			{
-			}
 		}break;
 	case 19512:// Apply Salve
 		{
 			//FIXME:Cure a sickly animal afflicted by the taint of poisoning
-		}break;
-	case 20473://holy shock r1 
-	case 20929://holy shock rank2
-	case 20930:
-	case 27174:
-	case 33072:
-		{/*Blasts the target with Holy energy, causing $25912s1 Holy damage to an enemy, or $25914s1 healing to an ally." */
-			uint32 sp;
-			if(!unitTarget)
-				return;
-
-			if(isAttackable(unitTarget,u_caster))
-				sp=m_spellInfo->EffectTriggerSpell[0];
-			else
-				sp=m_spellInfo->EffectTriggerSpell[1];
-			if(!sp)
-				break;//something went wrong, we are missing the triger spell
-			SpellCastTargets tgt;
-			tgt.m_unitTarget = unitTarget->GetGUID();
-			SpellEntry  * inf =dbcSpell.LookupEntry(sp);
-			if(!inf)
-				break;//something wrong again, triggering unexistant spell
-			Spell * spe = new Spell(u_caster,inf,true,NULL);
-			spe->prepare(&tgt);
 		}break;
 	case 20804:// Triage 
 		{
