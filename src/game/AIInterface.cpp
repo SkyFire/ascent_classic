@@ -975,7 +975,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					StopMovement(0);
 
 				float distance = m_Unit->GetDistanceSq(m_nextTarget);
-				if((distance <= powf(m_nextSpell->maxrange,2)  && distance >= powf(m_nextSpell->minrange,2)) || m_nextSpell->maxrange == 0) // Target is in Range -> Attack
+				if((distance <= (m_nextSpell->maxrange*m_nextSpell->maxrange)  && distance >= (m_nextSpell->minrange*m_nextSpell->minrange)) || m_nextSpell->maxrange == 0) // Target is in Range -> Attack
 				{
 					SpellEntry* spellInfo = m_nextSpell->spell;
 /*					if(m_nextSpell->procCount)
@@ -1586,7 +1586,7 @@ float AIInterface::_CalcAggroRange(Unit* target)
 		AggroRange = 40.0f;
 	}
 
-	return powf(AggroRange, 2);
+	return (AggroRange*AggroRange);
 }
 
 void AIInterface::_CalcDestinationAndMove(Unit *target, float dist)
@@ -1652,7 +1652,7 @@ float AIInterface::_CalcCombatRange(Unit* target, bool ranged)
 	float targetscale = target->GetFloatValue(OBJECT_FIELD_SCALE_X);
 	float selfscale = m_Unit->GetFloatValue(OBJECT_FIELD_SCALE_X);
 
-	range = (((powf(targetradius,2)*targetscale) + selfreach) + ((selfradius*selfscale) + rang));
+	range = ((((targetradius*targetradius)*targetscale) + selfreach) + ((selfradius*selfscale) + rang));
 	if(range > 28.29f) range = 28.29f;
 	if(range < PLAYER_SIZE) range = PLAYER_SIZE; //unbeleavable to get here :)
 	return range;
@@ -2542,7 +2542,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			m_lastFollowY = UnitToFollow->GetPositionY();
 		}
 
-		if (dist > powf(FollowDistance,2)) //if out of range
+		if (dist > (FollowDistance*FollowDistance)) //if out of range
 		{
 			m_AIState = STATE_FOLLOWING;
 			

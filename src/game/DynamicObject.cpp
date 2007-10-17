@@ -137,7 +137,7 @@ void DynamicObject::UpdateTargets()
 		FactionRangeList::iterator iend = m_inRangeOppFactions.end();
 		Unit * target;
 		Aura * pAura;
-		float radius = powf(m_floatValues[DYNAMICOBJECT_RADIUS], 2);
+		float radius = m_floatValues[DYNAMICOBJECT_RADIUS]*m_floatValues[DYNAMICOBJECT_RADIUS];
 
 		while(itr != iend)
 		{

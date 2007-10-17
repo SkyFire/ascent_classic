@@ -40,7 +40,7 @@ public:
 		float delta_y = comp.y - y;
 		float delta_z = comp.z - z;
 		
-		return (powf(delta_x, 2) + powf(delta_y, 2) + powf(delta_z, 2));
+		return (delta_x*delta_x + delta_y*delta_y + delta_z*delta_z);
 	}
 
 	float DistanceSq(const float &X, const float &Y, const float &Z)
@@ -49,7 +49,7 @@ public:
 		float delta_y = Y - y;
 		float delta_z = Z - z;
 
-		return (powf(delta_x, 2) + powf(delta_y, 2) + powf(delta_z, 2));
+		return (delta_x*delta_x + delta_y*delta_y + delta_z*delta_z);
 	}
 
 	// sqrt(dx * dx + dy * dy + dz * dz)
@@ -59,7 +59,7 @@ public:
 		float delta_y = comp.y - y;
 		float delta_z = comp.z - z;
 
-		return sqrtf(powf(delta_x, 2) + powf(delta_y, 2) + powf(delta_z, 2));
+		return sqrtf(delta_x*delta_x + delta_y*delta_y + delta_z*delta_z);
 	}
 
 	float Distance(const float &X, const float &Y, const float &Z)
@@ -68,35 +68,35 @@ public:
 		float delta_y = Y - y;
 		float delta_z = Z - z;
 
-		return sqrtf(powf(delta_x, 2) + powf(delta_y, 2) + powf(delta_z, 2));
+		return sqrtf(delta_x*delta_x + delta_y*delta_y + delta_z*delta_z);
 	}
 
 	float Distance2DSq(const LocationVector & comp)
 	{
 		float delta_x = comp.x - x;
 		float delta_y = comp.y - y;
-		return (powf(delta_x, 2) + powf(delta_y, 2));
+		return (delta_x*delta_x + delta_y*delta_y);
 	}
 
 	float Distance2DSq(const float & X, const float & Y)
 	{
 		float delta_x = X - x;
 		float delta_y = Y - y;
-		return (powf(delta_x, 2) + powf(delta_y, 2));
+		return (delta_x*delta_x + delta_y*delta_y);
 	}
 
 	float Distance2D(LocationVector & comp)
 	{
 		float delta_x = comp.x - x;
 		float delta_y = comp.y - y;
-		return sqrtf(powf(delta_x, 2) + powf(delta_y, 2));
+		return sqrtf(delta_x*delta_x + delta_y*delta_y);
 	}
 
 	float Distance2D(const float & X, const float & Y)
 	{
 		float delta_x = X - x;
 		float delta_y = Y - y;
-		return sqrtf(powf(delta_x, 2) + powf(delta_y, 2));
+		return sqrtf(delta_x*delta_x + delta_y*delta_y);
 	}
 
 	// atan2(dx / dy)
