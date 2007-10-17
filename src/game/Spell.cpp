@@ -770,7 +770,7 @@ void Spell::prepare(SpellCastTargets * targets)
 		// handle MOD_CAST_TIME
 		if(u_caster && m_castTime)
 		{
-			m_castTime *= float2int32(u_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+			m_castTime = float2int32(m_castTime*u_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
 		}
 	}
 
