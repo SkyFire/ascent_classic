@@ -222,7 +222,7 @@ void Spell::SpellEffectInstantKill(uint32 i)
 			delete caster->summonPet;
 			caster->summonPet = NULL;
 		}break;
-	/*case 7814:
+	case 7814:
 	case 7815:
 	case 7816:
 	case 7876:
@@ -250,7 +250,7 @@ void Spell::SpellEffectInstantKill(uint32 i)
 	case 19442:
 	case 19443:
 		{
-		}break;*/
+		}break;
 	case 18788: //Demonic Sacrifice (508745)
 		uint32 spellid1 = 0;
 		switch(unitTarget->GetEntry())
