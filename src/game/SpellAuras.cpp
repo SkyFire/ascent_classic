@@ -2721,6 +2721,7 @@ void Aura::SpellAuraReflectSpells(bool apply)
 
 void Aura::SpellAuraModStat(bool apply)
 {
+	int32 stat = (int32)mod->m_miscValue;
 	int32 val;
 
 	if(apply)
@@ -2736,7 +2737,7 @@ void Aura::SpellAuraModStat(bool apply)
 		val = -mod->m_amount;
 	}
 
-	if (mod->m_miscValue == -1)//all stats
+	if (stat == -1)//all stats
 	{
 		if(m_target->IsPlayer())
 		{
@@ -2762,7 +2763,7 @@ void Aura::SpellAuraModStat(bool apply)
 			}
 		}
 	} 
-	else
+	else if(stat >= 0)
 	{
 		ASSERT(mod->m_miscValue < 5);
 		if(m_target->IsPlayer())
