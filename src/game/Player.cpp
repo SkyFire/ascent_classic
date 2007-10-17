@@ -4055,9 +4055,12 @@ void Player::UpdateChances()
 {
 	uint32 pClass = (uint32)this->getClass();
 	uint32 pLevel = (this->getLevel()>70) ? 70 : this->getLevel();
-	const float baseDodge[12] = { 0.0f, 0.0f, 0.75f, 0.64f, 0.0f, 3.0f, 0.0f, 1.75f, 3.25f, 2.0f, 0.0f, 0.75f };
-	const float dodgeRatio[12] = { 0.0f, 30.0f, 30.0f, 40.0f, 21.0f, 30.0f, 0, 30.0f, 30.0f, 30.0f, 0, 30.0f };
-	const float baseSpellCrit[12] = { 0.0f, 0.0f, 3.3355f, 3.6020f, 0.0f, 1.2375f, 0.0f, 2.2010f, 0.9075f, 1.700f, 0.0f, 1.8515f };
+				// - War Paladin Hunter Rogue Priest - Shaman Mage Warlock - Druid
+	const float baseDodge[12] = { 0.0f, 0.7580f, 0.6520f, -5.4500f, -0.5900f, 3.1830f, 0.0f, 1.6750f, 3.4575f, 2.0350f, 0.0f, -1.8720f };
+	// TODO: get proper ratios for all levels, these values are valid for lvl 70 only
+	const float dodgeRatio[12] = { 0.0f, 30.0f, 25.0f, 25.0f, 20.0f, 25.0f, 0.0f, 25.0f, 25.0f, 25.0f, 0.0f, 14.7059f };
+ 	const float baseSpellCrit[12] = { 0.0f, 0.0f, 3.3355f, 3.6020f, 0.0f, 1.2375f, 0.0f, 2.2010f, 0.9075f, 1.700f, 0.0f, 1.8515f };
+	const float baseCritChance[12] = { 0.0f, 1.144f, 0.652f, -1.532f, -0.295f, 3.183f, 0.0f, 1.675f, 3.4575f, 2.0f, 0.0f, 0.961f };
  
 	float tmp = baseDodge[pClass] + (GetUInt32Value( UNIT_FIELD_STAT1) / dodgeRatio[pClass]) + this->GetDodgeFromSpell();
 	tmp+=CalcRating(2);//dodge rating
@@ -4094,21 +4097,7 @@ The crit constant is class and level dependent and for a level 70 character as f
 	* Warrior [33] 
 */
 
-	switch(pClass)
-	{
-	case ROGUE: 
-		tmp = 5.0f + (GetUInt32Value(UNIT_FIELD_STAT1) / 40.00);
-		break;
-	case HUNTER: 
-		tmp = 5.0f + (GetUInt32Value(UNIT_FIELD_STAT1) / 40.00);
-		break;
-	case WARRIOR: 
-		tmp = 5.0f + (GetUInt32Value(UNIT_FIELD_STAT1) / 33.00);
-		break;
-	default: 
-		tmp = 5.0f + (GetUInt32Value(UNIT_FIELD_STAT1) / 25.00);
-		break;
-	}
+	tmp = baseCritChance[pClass] + GetUInt32Value(UNIT_FIELD_STAT1)*CritFromAgi[pLevel][pClass];
 	//std::list<WeaponModifier>::iterator i = tocritchance.begin();
 	map<uint32, WeaponModifier>::iterator i = tocritchance.begin();
 	Item * tItem = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
