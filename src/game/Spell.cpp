@@ -154,7 +154,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	castedItemId = 0;
 	
 	m_usesMana = false;
-	SetSpellFailed();
+	SetSpellFailed(false);
 	hadEffect = false;
 	bDurSet=false;
 	bRadSet[0]=false;
@@ -761,14 +761,14 @@ void Spell::prepare(SpellCastTargets * targets)
 	{
 		m_castTime = GetCastTime(dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex));
 
-		if (m_spellInfo->SpellGroupType && u_caster)
+		if (m_castTime && m_spellInfo->SpellGroupType && u_caster)
 		{
 			SM_FIValue(u_caster->SM_FCastTime,(int32*)&m_castTime,m_spellInfo->SpellGroupType);
 			SM_PIValue(u_caster->SM_PCastTime,(int32*)&m_castTime,m_spellInfo->SpellGroupType);
 		}
 
 		// handle MOD_CAST_TIME
-		if(u_caster)
+		if(u_caster && m_castTime)
 		{
 			m_castTime *= float2int32(u_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
 		}
@@ -2007,7 +2007,7 @@ bool Spell::TakePower()
 	//UNIT_FIELD_POWER_COST_MULTIPLIER
 	if(u_caster)
 	{
-		if( m_spellInfo->AttributesEx & 2 ) // Uses %100 mana
+		if( m_spellInfo->AttributesEx & ATTRIBUTEEX_DRAIN_WHOLE_MANA ) // Uses %100 mana
 		{
 			m_caster->SetUInt32Value(powerField, 0);
 			return true;
@@ -3123,7 +3123,7 @@ exit:
 
 			value += (comboDamage * p_caster->m_comboPoints);
 			m_requiresCP=true;
-			//this is ugly so i willexplain the case maybe someone ha a better idea :
+			//this is ugly so i will explain the case maybe someone ha a better idea :
 			// while casting a spell talent will trigger uppon the spell prepare faze
 			// the effect of the talent is to add 1 combo point but when triggering spell finishes it will clear the extra combo point
 			if(p_caster)
@@ -3171,6 +3171,7 @@ void Spell::HandleTeleport(uint32 id, Unit* Target)
 	float x,y,z;
 	uint32 mapid;
 	
+    // predefined behavior 
 	if (m_spellInfo->Id == 8690 ||m_spellInfo->Id == 556)//556- Astral Recall
 	{
 		x = pTarget->GetBindPositionX();
@@ -3178,20 +3179,8 @@ void Spell::HandleTeleport(uint32 id, Unit* Target)
 		z = pTarget->GetBindPositionZ();
 		mapid = pTarget->GetBindMapId();
 	}
-	else
+	else // normal behavior
 	{
-		/*std::stringstream query;
-		query << "SELECT * FROM recall where guid = " << m_spellInfo->Id;
-		QueryResult *result = sDatabase.Query( query.str( ).c_str( ) );
-		
-		if( !result )
-			return;
-
-		Field *fields = result->Fetch();
-		mapid = fields[3].GetUInt32();
-		x = fields[4].GetUInt32();
-		y = fields[5].GetUInt32();
-		z = fields[6].GetUInt32();*/
 		TeleportCoords* TC = TeleportCoordStorage.LookupEntry(id);
 		if(!TC)
 			return;
@@ -3200,17 +3189,14 @@ void Spell::HandleTeleport(uint32 id, Unit* Target)
 		y=TC->y;
 		z=TC->z;
 		mapid=TC->mapId;
-	}   
+	}
 
 	pTarget->EventAttackStop();
-	pTarget->SetSelection(0);   
+	pTarget->SetSelection(0);
 	  
-	//pTarget->Relocate(mapid, x, y, z, pTarget->GetOrientation(), true, false);
-
-	// We have to use a teleport event on this one. Reason being because of UpdateCellActivity,
+	// We use a teleport event on this one. Reason being because of UpdateCellActivity,
 	// the game object set of the updater thread WILL Get messed up if we teleport from a gameobject
 	// caster.
-
 	if(!sEventMgr.HasEvent(pTarget, EVENT_PLAYER_TELEPORT))
 		sEventMgr.AddEvent(pTarget, &Player::EventTeleport, mapid, x, y, z, EVENT_PLAYER_TELEPORT, 1, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
