@@ -67,7 +67,7 @@ bool SocketWorkerThread::run()
 
 void HandleReadComplete(Socket * s, uint32 len)
 {
-	s->m_readEvent=NULL;
+	//s->m_readEvent=NULL;
 	if(!s->IsDeleted())
 	{
 		if(len)

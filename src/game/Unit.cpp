@@ -2066,7 +2066,7 @@ else
 		  // It only regens rage if in combat, don't know why but this is making
 		  // the player to regen 1 rage every 3 secs.....
 		  // and the formula is wrong also ... TODO
-		  if(!CombatStatus.IsInCombat()) {
+		  if(CombatStatus.IsInCombat()) {
 			val = GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/getLevel();
 			val += (static_cast<Player *>(this)->rageFromDamageDealt*val)/100;
 			SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);

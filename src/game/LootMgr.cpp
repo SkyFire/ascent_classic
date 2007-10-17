@@ -477,7 +477,8 @@ void LootMgr::FillProfessionLoot(LootStore * store,Loot * loot,uint32 loot_id)
 				
 				}*/
 				
-				itm.iRandomProperty=0;
+				itm.iRandomProperty=NULL;
+				itm.iRandomSuffix=NULL;
 			  
 				loot->items.push_back(itm);
 				return;

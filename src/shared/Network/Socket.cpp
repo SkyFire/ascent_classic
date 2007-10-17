@@ -39,8 +39,8 @@ Socket::~Socket()
 	free(m_writeBuffer);
 
 #ifdef CONFIG_USE_IOCP
-	if(m_readEvent != NULL)
-		delete m_readEvent;
+	/*if(m_readEvent != NULL)
+		delete m_readEvent;*/
 #endif
 }
 

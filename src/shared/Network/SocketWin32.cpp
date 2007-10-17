@@ -67,7 +67,7 @@ void Socket::SetupReadEvent()
 		if(WSAGetLastError() != WSA_IO_PENDING)
 			Disconnect();
 	}
-	m_readEvent = ov;
+	//m_readEvent = ov;
 	m_readMutex.Release();
 }
 
