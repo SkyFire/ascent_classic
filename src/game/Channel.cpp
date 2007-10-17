@@ -43,7 +43,7 @@ Channel::Channel(const char * name, uint32 team)
 	m_general = false;
 	m_name = string(name);
 	m_team = team;
-	voice_enabled = true;
+	voice_enabled = sVoiceChatHandler.CanUseVoiceChat();
 
 	m_confSettingLock.Acquire();
 	for(vector<string>::iterator itr = m_generalChannels.begin(); itr != m_generalChannels.end(); ++itr)
