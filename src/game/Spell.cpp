@@ -431,9 +431,9 @@ bool Spell::DidHit(uint64 target)
 	float resistchance ;
 	if(!u_victim && !p_victim)
 		return false;
-	if(!p_caster)
-		return true;		// Mob spells hit!
-
+	
+	if(u_caster && u_caster->GetTypeId()==TYPEID_UNIT && ((Creature*)u_caster)->GetCreatureName() && ((Creature*)u_caster)->GetCreatureName()->Rank >= 3)
+		return true;
 
 	bool pvp =(p_caster && p_victim);
 
