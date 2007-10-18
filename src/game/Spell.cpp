@@ -411,7 +411,7 @@ bool Spell::DidHit(uint64 target)
 	if(m_spellInfo->School == 0)
 		return true;
 	//note resistchance is vise versa, is full hit chance
-	Creature *u_victim = NULL;
+	Unit *u_victim = NULL;
 	Player *p_victim = NULL;
 	switch(UINT32_LOPART(GUID_HIPART(target)))
 	{
@@ -420,6 +420,7 @@ bool Spell::DidHit(uint64 target)
 			break;
 		case HIGHGUID_PLAYER:
 			p_victim = m_caster->GetMapMgr()->GetPlayer(target);
+			u_victim = p_victim;
 			break;
 		case HIGHGUID_PET:
 			u_victim = m_caster->GetMapMgr()->GetPet(target);
@@ -435,12 +436,15 @@ bool Spell::DidHit(uint64 target)
 	if(u_caster && u_caster->GetTypeId()==TYPEID_UNIT && ((Creature*)u_caster)->GetCreatureName() && ((Creature*)u_caster)->GetCreatureName()->Rank >= 3)
 		return true;
 
+	if(!u_caster)
+		return true;
+
 	bool pvp =(p_caster && p_victim);
 
 	if(pvp)
 		lvldiff = p_victim->getLevel() - p_caster->getLevel();
 	else
-		lvldiff = u_victim->getLevel() - p_caster->getLevel();
+		lvldiff = u_victim->getLevel() - u_caster->getLevel();
 	if (lvldiff < 0)
 	{
 		resistchance = baseresist[0] +lvldiff;
