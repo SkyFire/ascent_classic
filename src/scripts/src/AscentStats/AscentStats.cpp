@@ -33,19 +33,21 @@ public:
 
 AStatDumper dumper;
 
+
 class AStatThread : public ThreadBase
 {
 public:
 	AStatThread()
 	{
-		delete_after_use=false;
+		//removed by zack : it was making compile issues as not declared, maybe forgot to delete ?
+//		delete_after_use=false;
 	}
 
 	~AStatThread()
 	{
 		dumper.trunning=false;
 	}
-	void run();
+	bool run();
 };
 
 
@@ -153,7 +155,7 @@ void AStatDumper::DumpStats()
 	}
 }
 
-void AStatThread::run()
+bool AStatThread::run()
 {
 	SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	
@@ -174,7 +176,7 @@ void AStatThread::run()
 		printf("AscentStats: Could not connect to www.ascentemu.com!\n");
 		closesocket(s);
 		delete this;
-		return;
+		return false;
 	}
 
 	/* Formulate our HTTP request */
@@ -192,7 +194,7 @@ void AStatThread::run()
 		printf("AscentStats: Could not send HTTP request to server.\n");
 		closesocket(s);
 		delete this;
-		return;
+		return false;
 	}
 
 	/*if(send(s, post_data, p_len, 0) != p_len)
@@ -211,7 +213,7 @@ void AStatThread::run()
 			printf("AscentStats: Error in recv()\n");
 			closesocket(s);
 			delete this;
-			return;
+			return false;
 		}
 
 		if(strchr(reply, '\n'))
