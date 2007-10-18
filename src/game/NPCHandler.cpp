@@ -185,31 +185,31 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvPacket)
 	if(TrainerGetSpellStatus(pSpell) > 0) return;
 	
 	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)pSpell->Cost);
-	if(pSpell->DeleteSpell)
-	{
-		// Remove old spell.
-		_player->removeSpell(pSpell->DeleteSpell, true, true, pSpell->DeleteSpell);
-	}
 
 	// Cast teaching spell on player
 	pCreature->CastSpell(_player, pSpell->pCastSpell, true);
+
+	if(pSpell->DeleteSpell)
+	{
+		// Remove old spell.
+		_player->removeSpell(pSpell->DeleteSpell, true, true, pSpell->pRealSpell->Id);
+	}
+
 }
 
 uint8 WorldSession::TrainerGetSpellStatus(TrainerSpell* pSpell)
 {
-	// wtf tudi? :P this shit is whack.. we can just check for deleted spells instead.
-	//for burlex : In case we know level 3 of some rogue spell and trainer teaches us all kinda levels of it then we need to not teach all lower levels again
-	/*if(pSpell->pRealSpell && _player->GetMaxLearnedSpellLevel(pSpell->pRealSpell->Id) >= (int)pSpell->pRealSpell->spellLevel)
-		return TRAINER_STATUS_ALREADY_HAVE;*/
+	if(!pSpell->pRealSpell)
+		return TRAINER_STATUS_NOT_LEARNABLE;
 
-	if(pSpell->pRealSpell && _player->HasSpell(pSpell->pRealSpell->Id))
+	if(_player->HasSpell(pSpell->pRealSpell->Id))
 		return TRAINER_STATUS_ALREADY_HAVE;
 
-	if(pSpell->DeleteSpell && (_player->HasSpell(pSpell->DeleteSpell) || _player->HasDeletedSpell(pSpell->DeleteSpell)))
+	if(_player->HasDeletedSpell(pSpell->pRealSpell->Id))
 		return TRAINER_STATUS_ALREADY_HAVE;
 
-/*	if(_player->HasSpell(pSpell->pRealSpell->Id))
-		return TRAINER_STATUS_ALREADY_HAVE; */
+	if(pSpell->DeleteSpell && _player->HasDeletedSpell(pSpell->DeleteSpell))
+		return TRAINER_STATUS_ALREADY_HAVE;
 
 	if(	(pSpell->RequiredLevel && _player->getLevel()<pSpell->RequiredLevel)
 		|| (pSpell->RequiredSpell && !_player->HasSpell(pSpell->RequiredSpell))

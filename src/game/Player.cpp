@@ -2898,25 +2898,6 @@ bool Player::HasSpell(uint32 spell)
 	return mSpells.find(spell) != mSpells.end();
 }
 
-int Player::GetMaxLearnedSpellLevel(uint32 spell)
-{
-	SpellEntry *spinfo=dbcSpell.LookupEntry(spell);
-	if(!spinfo)
-		return 0;
-	int max_level=-1; //now it can't get worse then this :D
-	SpellSet::iterator iter;
-	for(iter= mSpells.begin();iter != mSpells.end();iter++)
-	{
-		//get hash name for this spell
-		SpellEntry *spinfo2 = dbcSpell.LookupEntry(*iter);
-		if(spinfo2->NameHash == spinfo->NameHash)
-			if(max_level< (int) spinfo2->spellLevel)
-				max_level = spinfo2->spellLevel;
-	}
-	return max_level;
-}
-
-
 void Player::_LoadQuestLogEntry(QueryResult * result)
 {
 	QuestLogEntry *entry;
@@ -5181,7 +5162,7 @@ bool Player::removeSpell(uint32 SpellID, bool MoveToDeleted, bool SupercededSpel
 	if(SupercededSpell)
 	{
 		WorldPacket data(SMSG_SUPERCEDED_SPELL, 8);
-		data << SupercededSpellID << SpellID;
+		data << SpellID << SupercededSpellID;
 		m_session->SendPacket(&data);
 	}
 	else
