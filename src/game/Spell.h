@@ -955,8 +955,9 @@ enum SpellTypes
 //custom stuff generated for spells that will not change in time
 enum SpellIsFlags
 {
-    SPELL_FLAG_IS_DAMAGING				= 0x00800000,
-    SPELL_FLAG_IS_HEALING				= 0x01000000,
+    SPELL_FLAG_IS_DAMAGING				= 0x00000001,
+    SPELL_FLAG_IS_HEALING				= 0x00000002,
+    SPELL_FLAG_IS_TARGETINGSTEALTHED	= 0x00000004,
 };
 
 inline bool CanAgroHash(uint32 spellhashname)
@@ -1047,7 +1048,6 @@ inline bool IsDamagingSpell(SpellEntry *sp)
     return false;
 }
 
-//will rewrite this to constant flags later
 inline bool IsHealingSpell(SpellEntry *sp)
 {
     switch (sp->Effect[0])
@@ -1115,6 +1115,25 @@ inline bool IsHealingSpell(SpellEntry *sp)
 		return true;
 	
     return false;
+}
+
+inline bool IsTargetingStealthed(SpellEntry *sp)
+{
+	if(
+		sp->EffectImplicitTargetA[0]==3 ||
+		sp->EffectImplicitTargetA[1]==3 ||
+		sp->EffectImplicitTargetA[2]==3 ||
+		sp->EffectImplicitTargetB[0]==3 ||
+		sp->EffectImplicitTargetB[1]==3 ||
+		sp->EffectImplicitTargetB[2]==3 ||
+		sp->EffectImplicitTargetA[0]==22 ||
+		sp->EffectImplicitTargetA[1]==22 ||
+		sp->EffectImplicitTargetA[2]==22 ||
+		sp->EffectImplicitTargetB[0]==22 ||
+		sp->EffectImplicitTargetB[1]==22 ||
+		sp->EffectImplicitTargetB[2]==22 )
+		return 1;
+	return 0;
 }
 
 inline bool IsInrange(LocationVector & location, Object * o, float square_r)

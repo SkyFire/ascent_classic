@@ -77,7 +77,6 @@ SMT_RESIST_DISPEL - check if it is used
 ==========================================================================
 Zack - test my shit :
 
-- aura stalked silances more then it should (ex:hunters mark)
 - test function RemoveThreatByPtr
 - don't let rogues stealth with dots
 - ai spell cooldown when not known
@@ -88,7 +87,7 @@ Zack - test my shit :
 - mage - Frost Warding - 28332 - does not reflect
 - Gnomish Poultryizer trinket - Poultryizer - need aura duration to set to 15 sec
 - priest - Force of Will - 18550 - what is the group type to increase here ?, all spells ?
-- isdamageing ishealing should not be put to bufftype. It makes spells remove each other
+- searing totem hunts you to the end of the world. probably range related problem in generatetargets
 
 ==========================================================================
 Capt - test my shit :

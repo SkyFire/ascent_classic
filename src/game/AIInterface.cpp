@@ -471,14 +471,34 @@ void AIInterface::Update(uint32 p_time)
 		if(p_time >= m_totemspelltimer)
 		{
 			Spell * pSpell = new Spell(m_Unit, totemspell, true, 0);
+
+/*
+			float range = GetMaxRange(dbcSpellRange.LookupEntry(pSpell->m_spellInfo->rangeIndex));
+			float radius=max(pSpell->GetRadius(0),pSpell->GetRadius(1));
+			radius=max(pSpell->GetRadius(2),radius);
+			radius=max(range,radius);
+printf("!!!totem will try to target steathed %u \n",(pSpell->m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)!=0);
+if(m_nextTarget)
+{
+	printf("!!!target exists and is stealthed %u \n",m_nextTarget->IsStealth());
+	printf("!!!in map %u \n",m_Unit->GetMapMgr()->GetUnit(m_nextTarget->GetGUID())!=0);
+	printf("!!!is in range %u , range %f\n",IsInrange(m_Unit,m_nextTarget,pSpell->m_spellInfo->base_range_or_radius_sqr),pSpell->m_spellInfo->base_range_or_radius_sqr);
+	printf("!!!is attackable %u \n",isAttackable(m_Unit, m_nextTarget,!(pSpell->m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)));
+}
+else printf("!!!target is none \n");*/
+
 			SpellCastTargets targets(0);
 			if(!m_nextTarget ||
 				(m_nextTarget && 
 					(!m_Unit->GetMapMgr()->GetUnit(m_nextTarget->GetGUID()) || 
 					!m_nextTarget->isAlive() ||
-					!IsInrange(m_Unit,m_nextTarget,pSpell->GetRadius(0)) ||
-					!isAttackable(m_Unit, m_nextTarget))))
+					!IsInrange(m_Unit,m_nextTarget,pSpell->m_spellInfo->base_range_or_radius_sqr) ||
+					!isAttackable(m_Unit, m_nextTarget,!(pSpell->m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED))
+					)
+				)
+				)
 			{
+//printf("!!!generating new targets\n");
 				//something happend to our target, pick another one
 				pSpell->GenerateTargets(&targets);
 				if(targets.m_targetMask & TARGET_FLAG_UNIT)

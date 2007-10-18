@@ -518,6 +518,11 @@ bool World::SetInitialWorldSettings()
         namehash = crc32((const unsigned char*)nametext, strlen(nametext));
 		sp->NameHash   = namehash; //need these set before we start processing spells
 
+		float radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[1])));
+		radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[2])),radius);
+		radius=max(GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex)),radius);
+		sp->base_range_or_radius_sqr = radius*radius;
+
 		for(uint32 b=0;b<3;++b)
 		{
 			if(sp->EffectTriggerSpell[b] != 0 && dbcSpell.LookupEntryForced(sp->EffectTriggerSpell[b]) == NULL)
@@ -608,6 +613,8 @@ bool World::SetInitialWorldSettings()
 			sp->c_is_flags |= SPELL_FLAG_IS_DAMAGING;
 		if(IsHealingSpell(sp))
 			sp->c_is_flags |= SPELL_FLAG_IS_HEALING;
+		if(IsTargetingStealthed(sp))
+			sp->c_is_flags |= SPELL_FLAG_IS_TARGETINGSTEALTHED;
 
 		//stupid spell ranking problem
 		if(sp->spellLevel==0)
