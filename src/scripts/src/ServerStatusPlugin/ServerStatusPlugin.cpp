@@ -222,7 +222,7 @@ void StatDumper::DumpStats()
     std::deque<Player*> gms;
     {
         // Dump server information.
-		fprintf(f, "    <platform>Ascent r%u/%s-%s-%s</platform>\n", g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
+		fprintf(f, "    <platform>Ascent %s r%u/%s-%s-%s</platform>\n", BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
 
         char uptime[80];
         GenerateUptimeString(uptime);
