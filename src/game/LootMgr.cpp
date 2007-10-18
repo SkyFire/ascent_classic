@@ -396,7 +396,7 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 			itm.roll = NULL;
 			itm.passed = false;
 			
-			if (itemproto->Quality > 1)
+			if (itemproto->Quality > 1 && itemproto->ContainerSlots==0)
 			{
 				itm.iRandomProperty=GetRandomProperties(itemproto);
 				itm.iRandomSuffix=GetRandomSuffix(itemproto);

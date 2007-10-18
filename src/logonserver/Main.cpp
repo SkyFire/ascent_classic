@@ -25,7 +25,7 @@
 #endif
 #include "../shared/ascent_getopt.h"
 
-#define BANNER "Ascent r%u/%s-%s (%s) :: Logon Server"
+#define BANNER "Ascent %s r%u/%s-%s (%s) :: Logon Server"
 
 #ifndef WIN32
 #include <sched.h>
@@ -184,7 +184,7 @@ void LogonServer::Run(int argc, char ** argv)
 		sLog.m_screenLogLevel = 3;
 	}
 	
-	sLog.outString(BANNER, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
+	sLog.outString(BANNER, BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
 	sLog.outString("==============================================================================");
 	sLog.outString("");
 	if(do_version)
@@ -325,7 +325,6 @@ void LogonServer::Run(int argc, char ** argv)
 	sLog.outString("Shutting down...");
 	ThreadPool.ShowStats();
 	pfc->kill();
-	delete pfc;
 
 	cl->Close();
 	sl->Close();

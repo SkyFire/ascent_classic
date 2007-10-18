@@ -798,8 +798,13 @@ void WorldSession::FullLogin(Player * plr)
 	if(sWorld.sendRevisionOnJoin)
 	{
 		uint32 rev = g_getRevision();
-		_player->BroadcastMessage("%sAscent %s r%u/%s-%s-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG
-			rev, CONFIG, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
+#ifdef WIN32
+		_player->BroadcastMessage("Server: %sAscent %s r%u/%s-Win32 %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
+			rev, CONFIG, MSG_COLOR_LIGHTBLUE);		
+#else
+		_player->BroadcastMessage("Server: %sAscent %s r%u/%s-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
+			rev, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
+#endif
 	}
 
 	if(sWorld.SendStatsOnJoin)

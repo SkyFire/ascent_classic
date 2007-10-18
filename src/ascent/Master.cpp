@@ -23,11 +23,7 @@
 #include "../game/StdAfx.h"
 #include "../shared/ascent_getopt.h"
 
-#ifdef HOARD
-#define BANNER "Ascent r%u/%s-%s-%s-Hoard :: World Server"
-#else
-#define BANNER "Ascent r%u/%s-%s-%s :: World Server"
-#endif
+#define BANNER "Ascent %s r%u/%s-%s-%s :: World Server"
 
 #ifndef WIN32
 #include <sched.h>
@@ -169,7 +165,7 @@ bool Master::Run(int argc, char ** argv)
 		sLog.m_screenLogLevel = 3;
 	}
 
-	printf(BANNER, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
+	printf(BANNER, BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
 	printf("\nCopyright (C) 2005-2007 Ascent Team. http://www.ascentemu.com/\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY, and is FREE SOFTWARE.\n");
 	printf("You are welcome to redistribute it under the terms of the GNU General\n");
