@@ -1273,8 +1273,8 @@ bool World::SetInitialWorldSettings()
 
 	sp = dbcSpell.LookupEntry(17364);
 	//remove stormstrike effect 0
-	//if(sp && sp->Id==17364)
-		//sp->Effect[0]=0;
+	if(sp && sp->Id==17364)
+		sp->Effect[0]=0;
 
 	//paladin - Blessing of Light
 		//first let us get the 2 spellgrouprelations
@@ -1875,7 +1875,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(20105);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | judgement_group;
-	// paladin - Improved Hammer of Justice
+/*	// paladin - Improved Hammer of Justice
 	uint32 Hammer_of_Justice_group=0;
 	tsp = dbcSpell.LookupEntry(853); //Hammer of Justice
 	if(tsp)
@@ -1891,14 +1891,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
 	sp = dbcSpell.LookupEntry(24188);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group;
+		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group; 
 	// paladin - Improved Judgement
 	sp = dbcSpell.LookupEntry(25956);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = judgement_group;
 	sp = dbcSpell.LookupEntry(25957);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = judgement_group;
+		sp->EffectSpellGroupRelation[0] = judgement_group; */
 	// paladin - Improved Sanctity Aura
 	uint32 Sanctity_group=0;
 	tsp = dbcSpell.LookupEntry(20218); //Sanctity Aura
@@ -1918,7 +1918,7 @@ bool World::SetInitialWorldSettings()
 	}
 
 ///////////////////////////////
-	// druid - Improved Mark of the Wild
+/*	// druid - Improved Mark of the Wild
 	uint32 imarkofthv_group=0;
 	tsp = dbcSpell.LookupEntry(1126); //Mark of the wild
 	if(tsp)
@@ -1950,7 +1950,7 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 50;
 	sp = dbcSpell.LookupEntry(13980);
 	if(sp)
-		sp->procChance = 75;
+		sp->procChance = 75;*/
 
 	//winfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);

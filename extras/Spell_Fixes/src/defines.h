@@ -385,7 +385,7 @@ const char sql_translation_table[220][3][300] =
     {"uint32" ,"DescriptionAlt7","1"},                 //165
     {"uint32" ,"DescriptionAlt8","1"},                 //166
 //    {"uint32" ,"DescriptionAlt9","1"},                 //167
-    {"uint32" ,"buffType","1"},							//167
+    {"uint32" ,"buffType","1"},							//167 - !!! CUSTOM, Using it instead of DescriptionAlt9 !!!
 //    //{"uint32" ,"DescriptionAlt10","1"},                //168
 	{"uint32"  ,"proc_interval","0"},					  //168 - !!! CUSTOM, Using it instead of DescriptionAlt10 !!!
 //    //{"uint32" ,"DescriptionAlt11","1"},                //169

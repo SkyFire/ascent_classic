@@ -1687,7 +1687,7 @@ void dump_as_sql(TCHAR *inf)
 			else if(sql_translation_table[i][0][0]=='f')
 				fprintf(fsql,"\t `%s` FLOAT DEFAULT '0' NOT NULL,\n",sql_translation_table[i][1]);
 			else if(sql_translation_table[i][0][0]=='s')
-				fprintf(fsql,"\t `%s` VARCHAR(500),\n",sql_translation_table[i][1]);
+				fprintf(fsql,"\t `%s` VARCHAR(2000),\n",sql_translation_table[i][1]);
 		}
 
 	fprintf(fsql,"%s","PRIMARY KEY(id), UNIQUE(id), INDEX(id));\n");
@@ -1748,6 +1748,8 @@ void dump_as_sql(TCHAR *inf)
 	fclose(fsql);
 }
 
+
+//this is not tested yet !!!
 void import_from_sql()
 {
 	TCHAR mHostname[50];strcpy(mHostname,"");
