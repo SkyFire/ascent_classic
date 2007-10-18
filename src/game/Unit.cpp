@@ -1262,9 +1262,6 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 	float AverageResistance = 0.0f;
 	float ArmorReduce;
 
-	if(this->IsPlayer())
-		ArmorReduce = PowerCostPctMod[0];
-
 	if((*dmg).school_type == 0)//physical
 	{		
 		//patch from emsy : wands do not get reduction
@@ -1276,6 +1273,15 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
                 return;
             }
         }
+
+		if(this->IsPlayer())
+			ArmorReduce = PowerCostPctMod[0];
+		else
+			ArmorReduce = 0.0f;
+
+		if(ArmorReduce >= pVictim->GetResistance(0))		// fully penetrated :O
+			return;
+
 //		double Reduction = double(pVictim->GetResistance(0)) / double(pVictim->GetResistance(0)+400+(85*getLevel()));
 		//dmg reduction formula from xinef
 		double Reduction = 0;
