@@ -4141,14 +4141,14 @@ void Player::UpdateAttackSpeed()
 			speed=weap->GetProto()->Delay;
 	}
 		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 
-			       (uint32)(speed*(100.0 - ((float)m_meleeattackspeedmod) - CalcRating(17))/100.0));
+			       (uint32)((speed*((100.0 - (float)m_meleeattackspeedmod) / 100.0))*((100.0 - CalcRating(17)) / 100.0)));
 	
 	weap=GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
 	if(weap && weap->GetProto()->Class==2)//weapon
 	{
 		speed=weap->GetProto()->Delay;
 		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, 
-			       (uint32)(speed*(100.0 - ((float)m_meleeattackspeedmod) - CalcRating(17))/100.0));
+			       (uint32)((speed*((100.0 - (float)m_meleeattackspeedmod) / 100.0))*((100.0 - CalcRating(17)) / 100.0)));
 	}
 	  
 	weap=GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
@@ -4156,7 +4156,7 @@ void Player::UpdateAttackSpeed()
 	{
 		speed=weap->GetProto()->Delay;
 		SetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,
-			       (uint32)(speed*(100.0 - ((float)m_rangedattackspeedmod) - CalcRating(18))/100.0));
+			       (uint32)((speed*((100.0 - (float)m_rangedattackspeedmod) / 100.0))*((100.0 - CalcRating(18)) / 100.0)));
 	}
 }
 

@@ -177,7 +177,7 @@ bool HolidayCheer(uint32 i, Spell * pSpell)
 
 bool NetOMatic(uint32 i, Spell * pSpell)
 {
-	Player *target = pSpell->GetPlayerTarget();
+	Unit *target = pSpell->GetUnitTarget();
 	if(!pSpell->p_caster || !target) return true;
 
 	SpellEntry *spInfo = dbcSpell.LookupEntry(13099);
