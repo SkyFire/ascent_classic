@@ -1783,43 +1783,44 @@ void Aura::SpellAuraModFear(bool apply)
 		if(m_target->GetTypeId() == TYPEID_PLAYER)
 		{
 			m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_NO_ROTATE);
-			m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+			m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER); // this isn't working in cities 
 			m_target->setAItoUse(true);
-			// Partha: I can't see what the point of this was, but...
-			// I believe it's preventing feared players from running away
-			// and allowing them to attack with melee and ranged weapon
-			/*
+
+			// this is a hackfix to stop player from moving
+			// I guess we have to continue to use it until the above problem can be found
 			WorldPacket data1(9);
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
 			data1 << m_target->GetNewGUID() << uint8(0x00); //block player movement ?
 			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
-			*/
 		}
+		m_target->m_pacified++; // another hackfix to account for players not running away while feared
 		m_target->m_special_state |= UNIT_STATE_FEAR;
 		m_target->GetAIInterface()->SetUnitToFear(GetUnitCaster());
 		m_target->GetAIInterface()->HandleEvent(EVENT_FEAR, m_target, 0); 
 	}
 	else
 	{
+		m_target->m_pacified--;
+		m_target->m_special_state &= ~UNIT_STATE_FEAR;
+		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, m_target, 0);
+		m_target->GetAIInterface()->SetUnitToFear(NULL);
+
 		if(m_target->GetTypeId() == TYPEID_PLAYER)
 		{
-			m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_NO_ROTATE);
- 			m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
 			m_target->GetAIInterface()->StopMovement(1);
 			m_target->setAItoUse(false);
-			/*
+			m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_NO_ROTATE);
+ 			m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+
 			WorldPacket data1(9);
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
 			data1 << m_target->GetNewGUID() << uint8(0x01); //enable player movement ?
 			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
-			*/
 		}
-		m_target->m_special_state &= ~UNIT_STATE_FEAR;
-		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, m_target, 0);
-		m_target->GetAIInterface()->SetUnitToFear(NULL);
+
 		Unit*m_caster = GetUnitCaster();
-		if(!m_caster)
-			return;
+		if(!m_caster) return;
+
 		if(m_caster->isAlive() && m_target->GetTypeId() != TYPEID_PLAYER)
 		{
 			m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, 0);
