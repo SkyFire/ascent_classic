@@ -866,7 +866,6 @@ void Pet::RemoveSpell(SpellEntry * sp)
 	map<uint32, AI_Spell*>::iterator itr = m_AISpellStore.find(sp->Id);
 	if(itr != m_AISpellStore.end())
 	{
-		delete itr->second;
 		for(list<AI_Spell*>::iterator it = m_aiInterface->m_spells.begin(); it != m_aiInterface->m_spells.end(); ++it)
 		{
 			if((*it) == itr->second)
@@ -880,7 +879,22 @@ void Pet::RemoveSpell(SpellEntry * sp)
 			}
 		}
 
+		delete itr->second;
 		m_AISpellStore.erase(itr);
+	}
+	else
+	{
+		for(list<AI_Spell*>::iterator it = m_aiInterface->m_spells.begin(); it != m_aiInterface->m_spells.end(); ++it)
+		{
+			if((*it)->spell == sp)
+			{
+				// woot?
+				AI_Spell * spe = *it;
+				m_aiInterface->m_spells.erase(it);
+				delete spe;
+				break;
+			}
+		}
 	}
 }
 
