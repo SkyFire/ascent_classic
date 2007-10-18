@@ -1507,6 +1507,7 @@ bool AIInterface::FindFriends(float dist)
 			guard->SetInstanceID(m_Unit->GetInstanceID());
 			guard->SetZoneId(m_Unit->GetZoneId());
 			guard->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PVP); /* shitty DBs */
+			guard->m_noRespawn=true;
 		
 			if(guard->CanAddToWorld())
 			{

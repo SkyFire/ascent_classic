@@ -98,6 +98,7 @@ Creature::Creature(uint32 high, uint32 low)
 	m_runSpeed = MONSTER_NORMAL_RUN_SPEED;
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
+	m_noRespawn=false;
 }
 
 
@@ -165,7 +166,7 @@ void Creature::OnRemoveCorpse()
 
 		sLog.outDetail("Removing corpse of "I64FMT"...", GetGUID());
 	   
-			if(GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID && this->proto && this->proto->boss)
+			if((GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID && this->proto && this->proto->boss) || m_noRespawn)
 			{
 				RemoveFromWorld(false, true);
 			}

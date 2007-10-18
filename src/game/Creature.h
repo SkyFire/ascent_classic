@@ -502,6 +502,7 @@ public:
 	void SetGuardWaypoints();
 	bool m_corpseEvent;
 	MapCell * m_respawnCell;
+	bool m_noRespawn;
 protected:
 	CreatureAIScript *_myScriptClass;
 	bool m_limbostate;
