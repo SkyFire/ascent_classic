@@ -37,6 +37,8 @@
 	#define CREATURE_DAZE_TRIGGER_ANGLE M_PI/2 //for the beginners this means 45 degrees 
 #endif
 
+#define DISTANCE_TO_SMALL_TO_WALK 1.0f
+
 class Object;
 class Creature;
 class Unit;

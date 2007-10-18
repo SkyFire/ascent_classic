@@ -830,7 +830,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 
 				if(	
 //					distance >= combatReach[0] && 
-					distance <= combatReach[1]) // Target is in Range -> Attack
+					distance <= combatReach[1] + DISTANCE_TO_SMALL_TO_WALK) // Target is in Range -> Attack
 				{
 					if(UnitToFollow != NULL)
 					{
@@ -953,7 +953,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				else // Target out of Range -> Run to it
 				{
 					//calculate next move
-					float dist = 1.0f;
+					float dist;
 
 					if(distance < combatReach[0])// Target is too near
 						dist = 9.0f;
@@ -1848,7 +1848,7 @@ void AIInterface::UpdateMove()
 	//use MoveTo()
 	float distance = m_Unit->CalcDistance(m_nextPosX,m_nextPosY,m_nextPosZ);
 	
-	if(distance < 1.0f) return; //we don't want little movements here and there
+	if(distance < DISTANCE_TO_SMALL_TO_WALK) return; //we don't want little movements here and there
 
 	m_destinationX = m_nextPosX;
 	m_destinationY = m_nextPosY;
