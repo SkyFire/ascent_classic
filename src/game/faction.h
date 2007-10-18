@@ -105,7 +105,7 @@ inline bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 
 /// Where we check if we object A can attack object B. This is used in many feature's
 /// Including the spell class and the player class.
-inline bool isAttackable(Object* objA, Object* objB, bool CheckStealth = false)// A can attack B?
+inline bool isAttackable(Object* objA, Object* objB, bool CheckStealth = true)// A can attack B?
 {
 	if(!objA || !objB || objB->m_factionDBC == NULL || objA->m_factionDBC == NULL)
 		return false;
@@ -157,7 +157,7 @@ inline bool isAttackable(Object* objA, Object* objB, bool CheckStealth = false)/
         /// we cannot attack sheathed units. Maybe checked in other places too ?
 		/// !! warning, this presumes that objA is attacking ObjB
         /// Capt: Added the possibility to disregard this (regarding the spell class)
-		if(static_cast<Unit *>(objB)->IsStealth() && !CheckStealth)
+		if(static_cast<Unit *>(objB)->IsStealth() && CheckStealth)
 			return false;
 	}
 
