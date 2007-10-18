@@ -798,13 +798,8 @@ void WorldSession::FullLogin(Player * plr)
 	if(sWorld.sendRevisionOnJoin)
 	{
 		uint32 rev = g_getRevision();
-#ifdef HOARD
-		_player->BroadcastMessage("You are playing on %sAscent r%u/%s-%s-%s-Hoard", MSG_COLOR_WHITE,
-			rev, CONFIG, PLATFORM_TEXT, ARCH);
-#else
-		_player->BroadcastMessage("You are playing on %sAscent r%u/%s-%s-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE,
+		_player->BroadcastMessage("%sAscent %s r%u/%s-%s-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG
 			rev, CONFIG, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
-#endif
 	}
 
 	if(sWorld.SendStatsOnJoin)
