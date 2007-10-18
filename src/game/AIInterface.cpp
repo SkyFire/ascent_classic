@@ -259,21 +259,24 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 					FollowDistance = 0.0f;
 					m_lastFollowX = m_lastFollowY = 0;
 
-					if(m_returnX != 0.0f && m_returnY != 0.0f && m_returnZ != 0.0f)
-						MoveTo(m_returnX,m_returnY,m_returnZ,m_Unit->GetOrientation());
-					else
+					if(m_Unit->isAlive())
 					{
-						MoveTo(m_Unit->GetSpawnX(),m_Unit->GetSpawnY(),m_Unit->GetSpawnZ(),m_Unit->GetSpawnO());
-						m_returnX=m_Unit->GetSpawnX();
-						m_returnY=m_Unit->GetSpawnY();
-						m_returnZ=m_Unit->GetSpawnZ();
-					}
+						if(m_returnX != 0.0f && m_returnY != 0.0f && m_returnZ != 0.0f)
+							MoveTo(m_returnX,m_returnY,m_returnZ,m_Unit->GetOrientation());
+						else
+						{
+							MoveTo(m_Unit->GetSpawnX(),m_Unit->GetSpawnY(),m_Unit->GetSpawnZ(),m_Unit->GetSpawnO());
+							m_returnX=m_Unit->GetSpawnX();
+							m_returnY=m_Unit->GetSpawnY();
+							m_returnZ=m_Unit->GetSpawnZ();
+						}
 
-					Creature *aiowner = static_cast<Creature*>(m_Unit);
-					//clear tagger.
-					aiowner->Tagged = false;
-					aiowner->TaggerGuid = 0;
-					aiowner->SetUInt32Value(UNIT_DYNAMIC_FLAGS,aiowner->GetUInt32Value(UNIT_DYNAMIC_FLAGS) & ~(U_DYN_FLAG_TAGGED_BY_OTHER |U_DYN_FLAG_LOOTABLE));
+						Creature *aiowner = static_cast<Creature*>(m_Unit);
+						//clear tagger.
+						aiowner->Tagged = false;
+						aiowner->TaggerGuid = 0;
+						aiowner->SetUInt32Value(UNIT_DYNAMIC_FLAGS,aiowner->GetUInt32Value(UNIT_DYNAMIC_FLAGS) & ~(U_DYN_FLAG_TAGGED_BY_OTHER |U_DYN_FLAG_LOOTABLE));
+					}
 				}
 
 				if(m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
