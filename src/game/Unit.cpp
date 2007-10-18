@@ -1260,6 +1260,10 @@ void Unit::RegeneratePower(bool isinterrupted)
 void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 {
 	float AverageResistance = 0.0f;
+	float ArmorReduce;
+
+	if(this->IsPlayer())
+		ArmorReduce = PowerCostPctMod[0];
 
 	if((*dmg).school_type == 0)//physical
 	{		
@@ -1275,10 +1279,10 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 //		double Reduction = double(pVictim->GetResistance(0)) / double(pVictim->GetResistance(0)+400+(85*getLevel()));
 		//dmg reduction formula from xinef
 		double Reduction = 0;
-		if (getLevel() < 60) Reduction = double(pVictim->GetResistance(0)) / double(pVictim->GetResistance(0)+400+(85*getLevel()));
-		else if (getLevel() > 59 && getLevel() < 70) Reduction = double(pVictim->GetResistance(0)) / double(pVictim->GetResistance(0)-22167.5+(467.5*getLevel()));
+		if (getLevel() < 60) Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)+400+(85*getLevel()));
+		else if (getLevel() > 59 && getLevel() < 70) Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)-22167.5+(467.5*getLevel()));
 		//
-		else Reduction = double(pVictim->GetResistance(0)) / double(pVictim->GetResistance(0)+10557.5);
+		else Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)+10557.5);
 		if(Reduction > 0.75f) Reduction = 0.75f;
 		else if(Reduction < 0) Reduction = 0;
 		if(Reduction) dmg[0].resisted_damage = (uint32)(dmg[0].full_damage*Reduction);	  // no multiply by 0
