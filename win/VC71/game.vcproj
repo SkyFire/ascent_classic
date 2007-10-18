@@ -284,7 +284,7 @@
 			<File
 				RelativePath="..\..\src\game\Level3.cpp">
 			</File>
-			<File
+ 			<File
 				RelativePath="..\..\src\game\QuestCommands.cpp">
 			</File>
 			<File
@@ -544,9 +544,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\ChatHandler.cpp">
-			</File>
-			<File
-				RelativePath="..\..\src\game\SkillNameMgr.h">
 			</File>
 		</Filter>
 		<Filter
