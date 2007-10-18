@@ -879,6 +879,7 @@ enum Opcodes {
 	SMSG_TARGET_CAST_RESULT                      = 934,	//(0x03A6)
 	MSG_MOVE_FLY_DOWN_UNK						 = 935, //(0x03A7)
 	CMSG_ENABLE_MICROPHONE						 = 943,	//(0x03AF)
+    SMSG_DISABLE_MICROPHONE                      = 944, //(0x03B0) // manual added its a result for CMSG_ENABLE_MICROPHONE
 	CMSG_REPORT_SPAM                             = 953,	//(0x03B9)
 	SMSG_REPORT_SPAM_RESPONSE                    = 954,	//(0x03BA)
 	SMSG_ACTIVATE_SPAM_REPORTING                 = 955,	//(0x03BB)

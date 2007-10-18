@@ -293,7 +293,8 @@ void Spell::SpellTargetSelf(uint32 i, uint32 j)
 }
 void Spell::SpellTargetInvisibleAOE(uint32 i, uint32 j)
 {
-
+    TargetsList *tmpMap=&m_targetUnits[i];
+    FillSpecifiedTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i),1); //TARGET_SPEC_INVISIBLE);
 }
 
 /// Spell Target Handling for type 4: Target is holder of the aura
@@ -695,7 +696,6 @@ void Spell::SpellTargetFishing(uint32 i, uint32 j)
 void Spell::SpellTargetType40(uint32 i, uint32 j)
 {
     TargetsList *tmpMap=&m_targetUnits[i];
-
 }
 
 /// Spell Target Handling for type 41 / 42 / 43 / 44: Totems

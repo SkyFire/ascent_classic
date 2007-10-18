@@ -325,9 +325,9 @@ enum Attributes
     ATTRIBUTES_UNK2           = 0x1,
     ATTRIBUTES_UNK3           = 0x2, // related to ranged??
     ATTRIBUTE_ON_NEXT_ATTACK  = 0x4,
-    ATTRIBUTES_UNK5           = 0x8,
+    ATTRIBUTES_UNK5           = 0x8, // not used.
     ATTRIBUTES_UNK6           = 0x10,
-    ATTRIBUTES_UNK7           = 0x20, // Reagents??
+    ATTRIBUTES_UNK7           = 0x20, // Reagents
     ATTRIBUTES_PASSIVE        = 0x40,
     ATTRIBUTES_NO_VISUAL_AURA = 0x80,
     ATTRIBUTES_UNK10          = 0x100,//seems to be afflicts pet
@@ -1795,6 +1795,8 @@ protected:
     
     // Spell possibility's
     bool m_CanRelect;
+    
+    bool m_IsCastedOnSelf;
 
 
     bool hadEffect;

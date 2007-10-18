@@ -214,6 +214,15 @@ void Spell::FillSpecifiedTargetsInArea(float srcx,float srcy,float srcz,uint32 i
     FillSpecifiedTargetsInArea(&m_targetUnits[ind],srcx,srcy,srcz,GetRadius(ind), specification);
 }
 
+
+enum SpellTargetSpecification
+{
+    TARGET_SPECT_NONE       = 0,
+    TARGET_SPEC_INVISIBLE   = 1,
+    TARGET_SPEC_DEAD        = 2,
+};
+
+
 // for the moment we do invisible targets
 void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range, uint32 specification)
 {
@@ -277,6 +286,7 @@ void Spell::FillAllTargetsInArea(float srcx,float srcy,float srcz,uint32 ind)
 	FillAllTargetsInArea(&m_targetUnits[ind],srcx,srcy,srcz,GetRadius(ind));
 }
 
+/// We fill all the targets in the area, including the stealth ed one's
 void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range)
 {
 	float r = range*range;
@@ -296,7 +306,7 @@ void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float
 		{
 			if(u_caster)
 			{
-				if(isAttackable(u_caster, (Unit*)(*itr)))
+				if(isAttackable(u_caster, (Unit*)(*itr)),true)
 				{
 					if(DidHit((*itr)->GetGUID()))
 						tmpMap->push_back((*itr)->GetGUID());

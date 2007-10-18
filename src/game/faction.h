@@ -103,7 +103,9 @@ inline bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 	return hostile;
 }
 
-inline bool isAttackable(Object* objA, Object* objB)// A can attack B?
+/// Where we check if we object A can attack object B. This is used in many feature's
+/// Including the spell class and the player class.
+inline bool isAttackable(Object* objA, Object* objB, bool CheckStealth = false)// A can attack B?
 {
 	if(!objA || !objB || objB->m_factionDBC == NULL || objA->m_factionDBC == NULL)
 		return false;
@@ -112,7 +114,7 @@ inline bool isAttackable(Object* objA, Object* objB)// A can attack B?
 		return true;
 
 	if(objA == objB)
-		return false;   // can't attack self.. this causes problems with buffs if we dont have it :p
+		return false;   // can't attack self.. this causes problems with buffs if we don't have it :p
 
 	if(objA->GetTypeId() == TYPEID_CORPSE)
 		return false;
@@ -120,7 +122,7 @@ inline bool isAttackable(Object* objA, Object* objB)// A can attack B?
 	if(objB->GetTypeId() == TYPEID_CORPSE)
 		return false;
 	
-	// Players in fiegn death flags can't be attacked
+	// Players in feign death flags can't be attacked
 	if(objA->IsPlayer())
 		if(objA->HasFlag(UNIT_FIELD_FLAGS_2, 0x00000001))
 			return false;
@@ -150,9 +152,12 @@ inline bool isAttackable(Object* objA, Object* objB)// A can attack B?
 			return false;
 		if(objB->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_MAKE_CHAR_UNTOUCHABLE))
 			return false;
-		//added by Zack : we cannot attack steathed units. Maybe checked in other palces too ?
-		//!! warning, this presumes that objA is attacking ObjB
-		if(static_cast<Unit *>(objB)->IsStealth())
+
+		/// added by Zack : 
+        /// we cannot attack sheathed units. Maybe checked in other places too ?
+		/// !! warning, this presumes that objA is attacking ObjB
+        /// Capt: Added the possibility to disregard this (regarding the spell class)
+		if(static_cast<Unit *>(objB)->IsStealth() && !CheckStealth)
 			return false;
 	}
 
@@ -162,7 +167,7 @@ inline bool isAttackable(Object* objA, Object* objB)// A can attack B?
 			static_cast<Player *>(objA)->DuelingWith == static_cast<Player *>(objB) && 
 			static_cast<Player *>(objA)->GetDuelState() == DUEL_STATE_STARTED
 			)
-		return true;					
+		return true;
 
 		if(objA->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP) && objB->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		{
