@@ -248,7 +248,7 @@ void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy
         {
             if(u_caster)
             {
-                if(isAttackable(u_caster, (Unit*)(*itr)),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED))
+                if(isAttackable(u_caster, (Unit*)(*itr),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)))
                 {
                     if(DidHit((*itr)->GetGUID()))
                         tmpMap->push_back((*itr)->GetGUID());

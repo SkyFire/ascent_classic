@@ -39,6 +39,7 @@ SMT_RESIST_DISPEL - check if it is used
 - clearcasting
 - there should a trigger type named : proc on effect - so we can know the effect value at which we proc
 - make a spellgroup generator for featured spells
+- channeled spells have a big chance to get interrupted
 
 ==========================================================================
 ! BUGS !
@@ -88,6 +89,7 @@ Zack - test my shit :
 - Gnomish Poultryizer trinket - Poultryizer - need aura duration to set to 15 sec
 - priest - Force of Will - 18550 - what is the group type to increase here ?, all spells ?
 - searing totem hunts you to the end of the world. probably range related problem in generatetargets
+- blessing of light applies it's effect on holy shock ? and value gets wrong
 
 ==========================================================================
 Capt - test my shit :

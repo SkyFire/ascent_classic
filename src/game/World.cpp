@@ -1283,6 +1283,8 @@ bool World::SetInitialWorldSettings()
 	if(sp && sp->Id==17364)
 		sp->Effect[0]=0;
 
+/*
+	//disabled by Zack : BL will influence holy nova too if using flash of light spellgroup
 	//paladin - Blessing of Light
 		//first let us get the 2 spellgrouprelations
 	sp = dbcSpell.LookupEntry(635);//holy light
@@ -1345,7 +1347,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
-	}
+	}*/
 
 	//paladin - seal of blood
 	sp = dbcSpell.LookupEntry(31892);
