@@ -302,6 +302,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 	}
    
 	uint32 dmg;
+	bool static_damage=false;
 
 	if(m_spellInfo->EffectChainTarget[i])//chain
 	{
@@ -346,11 +347,11 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					p_caster->EventAttackStop();
 					p_caster->smsg_AttackStop(unitTarget);
 				}break;
-			}
+			}break;
 		case 0xCBC738B8:	// Bloodthirst
 			{
                 dmg = u_caster->GetAP()*(m_spellInfo->EffectBasePoints[0]+1) / 100;
-			}
+			}break;
 		case 2189817683UL:	// Shield Slam - damage is increased by block value
 			{
 				if(p_caster)
@@ -361,7 +362,11 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 						dmg += it->GetProto()->Block;
 					}
 				}
-			}
+			}break;
+
+		case 0xf79e1873:		// fire armor, is static damage
+			static_damage=true;
+			break;
 		}
 	}
 
@@ -402,7 +407,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 		uint32 dmg_type = GetType();
 		if(dmg_type == SPELL_TYPE_MAGIC)		
 		{
-			m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, dmg, pSpellId==0);
+			m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, dmg, pSpellId==0,static_damage);
 		}
 		else 
 		{
