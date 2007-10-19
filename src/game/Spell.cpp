@@ -306,7 +306,7 @@ void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float
 		{
 			if(u_caster)
 			{
-				if(isAttackable(u_caster, (Unit*)(*itr)),false)
+				if(isAttackable(u_caster, (Unit*)(*itr),false))
 				{
 					if(DidHit((*itr)->GetGUID()))
 						tmpMap->push_back((*itr)->GetGUID());

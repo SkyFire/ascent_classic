@@ -2501,9 +2501,25 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 	if(!m_caster || !m_caster->IsInWorld())
 		return;
 
-	Unit *pTarget = m_target->GetMapMgr()->GetUnit(periodic_target);
+	Object * oTarget = m_target->GetMapMgr()->_GetObject(periodic_target);
+	if(oTarget==NULL)
+		return;
+
+	if(oTarget->GetTypeId()==TYPEID_DYNAMICOBJECT)
+	{
+		Spell *spell = new Spell(m_caster, spellInfo, true, this);
+		SpellCastTargets targets;
+		targets.m_targetMask = TARGET_FLAG_DEST_LOCATION;
+		targets.m_destX = oTarget->GetPositionX();
+		targets.m_destY = oTarget->GetPositionY();
+		targets.m_destZ = oTarget->GetPositionZ();
+		spell->prepare(&targets);
+		return;
+	}
+
+	Unit *pTarget = ((Unit*)oTarget);
 	int8 fail = -1;
-	if(!pTarget)
+	if(!oTarget->IsUnit())
 		return;
 	
 	if(!pTarget || pTarget->isDead())
@@ -2517,21 +2533,8 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 	}
 	if(fail > 0)
 	{
-		WorldPacket data(14);
-		if(m_caster->GetTypeId() == TYPEID_PLAYER)
-		{
-			data.SetOpcode(SMSG_SPELL_FAILURE);
-			data << m_caster->GetNewGUID() << GetSpellProto()->Id << fail;
-			static_cast<Player*>(m_caster)->GetSession()->SendPacket(&data);
-
-			data.Initialize(MSG_CHANNEL_UPDATE);
-			data << uint32(0);
-			static_cast<Player*>(m_caster)->GetSession()->SendPacket(&data);
-		}
-		data.Initialize(SMSG_SPELL_FAILED_OTHER);
-		data << m_caster->GetNewGUID() << GetSpellProto()->Id << fail;
-		m_caster->SendMessageToSet(&data, false);
-
+		SendInterrupted(fail, m_caster);
+		SendChannelUpdate(0, m_caster);
 		this->Remove();
 		return;
 	}
@@ -6701,4 +6704,33 @@ void Aura::SpellAuraModBlockValue(bool apply)
 			p_target->m_modblockvalue -= (uint32)mod->m_amount;
 		}
 	}
+}
+
+void Aura::SendInterrupted(uint8 result, Object * m_caster)
+{
+	if(!m_caster->IsInWorld())
+		return;
+
+	WorldPacket data(SMSG_SPELL_FAILURE, 20);
+	if(m_caster->IsPlayer())
+	{
+		data << m_caster->GetNewGUID();
+		data << m_spellProto->Id;
+		data << uint8(result);
+		((Player*)m_caster)->GetSession()->SendPacket(&data);
+	}
+
+	data.Initialize(SMSG_SPELL_FAILED_OTHER);
+	data << m_caster->GetNewGUID();
+	data << m_spellProto->Id;
+	m_caster->SendMessageToSet(&data, false);
+}
+
+void Aura::SendChannelUpdate(uint32 time, Object * m_caster)
+{
+	WorldPacket data(MSG_CHANNEL_UPDATE, 18);
+	data << m_caster->GetNewGUID();
+	data << time;
+
+	m_caster->SendMessageToSet(&data, true);	
 }

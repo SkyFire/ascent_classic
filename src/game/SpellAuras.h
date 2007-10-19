@@ -674,6 +674,9 @@ private:
 
 protected:
     uint32 m_casterfaction;
+
+	void SendInterrupted(uint8 result, Object * m_caster);
+	void SendChannelUpdate(uint32 time, Object * m_caster);
 };
 
 typedef void(Aura::*pSpellAura)(bool apply);
