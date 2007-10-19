@@ -2257,11 +2257,14 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	
 	if(this->IsUnit() && allowProc && spellInfo->Id != 25501)
 	{
-		static_cast<Unit*>(this)->HandleProc(aproc,pVictim,spellInfo, float2int32(res));
-		static_cast<Unit*>(this)->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,static_cast<Player*>(this), spellInfo);
-		static_cast<Unit*>(this)->m_procCounter = 0;
 		pVictim->HandleProc(vproc,(Unit*)this,spellInfo, float2int32(res));
 		pVictim->m_procCounter = 0;
+
+		static_cast<Unit*>(this)->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,static_cast<Player*>(this), spellInfo);
+		static_cast<Unit*>(this)->m_procCounter = 0;
+
+		static_cast<Unit*>(this)->HandleProc(aproc,pVictim,spellInfo, float2int32(res));
+		static_cast<Unit*>(this)->m_procCounter = 0;
 	}
 	
 	DealDamage(pVictim, float2int32(res),  2, 0, spellID);

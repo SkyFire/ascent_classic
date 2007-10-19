@@ -1264,6 +1264,15 @@ bool World::SetInitialWorldSettings()
 				sp->procChance = itr->first;
 		}
 
+		if(namehash==0x8D4A2E9F)		// warlock - intensity
+		{
+			sp->EffectSpellGroupRelation[0] |= 1;		// shadow bolt
+			sp->EffectSpellGroupRelation[0] |= 4;		// immolatate
+		}
+
+		if(namehash==0x2bc0ae00)		// warlock - incinerate
+			sp->SpellGroupType=1;
+
 //junk code to get me has :P 
 //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
 //	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);
