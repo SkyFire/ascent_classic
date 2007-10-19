@@ -1,3 +1,6 @@
+/**
+ * The author of this file is unknown, it is not public domain.
+ */
 using System;
 using System.Runtime.InteropServices;
 
