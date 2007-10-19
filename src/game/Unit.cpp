@@ -224,6 +224,7 @@ Unit::Unit()
 //	fearSpell = 0;
 	m_extraAttackCounter = false;
 	CombatStatus.SetUnit(this);
+	m_temp_summon=false;
 }
 
 Unit::~Unit()

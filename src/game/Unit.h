@@ -1118,6 +1118,7 @@ public:
 	
 //	uint32 fearSpell;
 	CombatStatusHandler CombatStatus;
+	bool m_temp_summon;
 	
 protected:
 	Unit ();

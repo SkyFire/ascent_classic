@@ -4652,10 +4652,15 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 
 	if( pObj == m_CurrentCharm )
 	{
+		Unit * p = m_CurrentCharm;
+
 		this->UnPossess();
 		if(m_currentSpell)
 			m_currentSpell->cancel();	   // cancel the spell
 		m_CurrentCharm=NULL;
+
+		if(p->m_temp_summon&&p->GetTypeId()==TYPEID_UNIT)
+			((Creature*)p)->SafeDelete();
 	}
  
 	if(pObj == m_Summon)
@@ -8121,6 +8126,9 @@ void Player::Possess(Unit * pTarget)
 	list<uint32>::iterator itr = avail_spells.begin();
 
 	/* build + send pet_spells packet */
+	if(pTarget->m_temp_summon)
+		return;
+	
 	WorldPacket data(SMSG_PET_SPELLS, pTarget->GetAIInterface()->m_spells.size() * 4 + 20);
 	data << pTarget->GetGUID();
 	data << uint32(0x00000000);//unk1
@@ -8182,6 +8190,9 @@ void Player::UnPossess()
 	WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
 	data << GetNewGUID() << uint8(1);
 	m_session->SendPacket(&data);
+
+	if(pTarget->m_temp_summon)
+		return;
 
 	data.Initialize(SMSG_PET_SPELLS);
 	data << uint64(0);

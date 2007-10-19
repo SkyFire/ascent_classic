@@ -3016,6 +3016,7 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 
 		//Setting faction
 		NewSummon->_setFaction();
+		NewSummon->m_temp_summon=true;
 
 		// Add To World
 		NewSummon->PushToWorld(m_caster->GetMapMgr());
@@ -3023,9 +3024,10 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 		// Force an update on the player to create this guid.
 		p_caster->ProcessPendingUpdates();
 
-		p_caster->SetUInt64Value(UNIT_FIELD_SUMMON, NewSummon->GetGUID());
-		p_caster->SetUInt64Value(PLAYER_FARSIGHT, NewSummon->GetGUID());
-		p_caster->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+		//p_caster->SetUInt64Value(UNIT_FIELD_SUMMON, NewSummon->GetGUID());
+		//p_caster->SetUInt64Value(PLAYER_FARSIGHT, NewSummon->GetGUID());
+		//p_caster->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+		p_caster->Possess(NewSummon);
 		
 //		WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
 //		data << NewSummon->GetNewGUID() << uint8(1);
