@@ -115,7 +115,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 		    i_caster=NULL;
 		    p_caster=NULL;
 		    u_caster=(Unit*)Caster;
-		    if(u_caster->IsPet() && ((Pet*)u_caster)->GetPetOwner()->DuelingWith)
+		    if(u_caster->IsPet() && ((Pet*)u_caster)->GetPetOwner() && ((Pet*)u_caster)->GetPetOwner()->DuelingWith)
 			    duelSpell = true;
         }break;
 

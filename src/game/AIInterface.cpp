@@ -1483,7 +1483,7 @@ bool AIInterface::FindFriends(float dist)
 	// check if we're a civillan, in which case summon guards on a despawn timer
 	uint8 civilian = (((Creature*)m_Unit)->GetCreatureName()) ? (((Creature*)m_Unit)->GetCreatureName()->Civilian) : 0;
 	uint32 family = (((Creature*)m_Unit)->GetCreatureName()) ? (((Creature*)m_Unit)->GetCreatureName()->Type) : 0;
-	if(family == HUMANOID && civilian && getMSTime() > m_guardTimer && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_NULL)
+	if(family == HUMANOID && civilian && getMSTime() > m_guardTimer && !IS_INSTANCE(m_Unit->GetMapId()))
 	{
 		uint16 AreaId = m_Unit->GetMapMgr()->GetAreaID(m_Unit->GetPositionX(),m_Unit->GetPositionY());
 		AreaTable * at = dbcArea.LookupEntry(AreaId);
