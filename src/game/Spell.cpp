@@ -463,6 +463,9 @@ bool Spell::DidHit(uint64 target)
 	if(!u_caster)
 		return true;
 
+	if(u_caster == u_victim)
+		return true;
+
 	bool pvp =(p_caster && p_victim);
 
 	if(pvp)
