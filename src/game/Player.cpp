@@ -24,6 +24,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_objectTypeId = TYPEID_PLAYER;
 	m_valuesCount = PLAYER_END;
 	m_uint32Values = _fields;
+	m_Group=NULL;
 	memset(m_uint32Values, 0,(PLAYER_END)*sizeof(uint32));
 	m_updateMask.SetCount(PLAYER_END);
 	SetUInt32Value( OBJECT_FIELD_TYPE,TYPE_PLAYER|TYPE_UNIT|TYPE_OBJECT);

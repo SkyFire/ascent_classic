@@ -976,9 +976,12 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 	// Group update handling
 	if(m_objectTypeId == TYPEID_PLAYER)
 	{
-		Group * pGroup = ((Player*)this)->GetGroup();
-		if(pGroup)
-			pGroup->HandleUpdateFieldChange(index, ((Player*)this));
+		if(IsInWorld())
+		{
+			Group * pGroup = ((Player*)this)->GetGroup();
+			if(pGroup)
+				pGroup->HandleUpdateFieldChange(index, ((Player*)this));
+		}
 
 #ifdef OPTIMIZED_PLAYER_SAVING
 		switch(index)
