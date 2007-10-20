@@ -229,7 +229,8 @@ bool Group::AddMember(PlayerInfo * info, Player* pPlayer, int32 subgroupid)
 				/* process any pending updates beforehand */
 				pPlayer->ProcessPendingUpdates();
 
-				UpdateAllOutOfRangePlayersFor(pPlayer);
+				//UpdateAllOutOfRangePlayersFor(pPlayer);
+				sEventMgr.AddEvent(pPlayer,&Player::EventGroupFullUpdate,EVENT_PLAYER_UPDATE,1500,1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 			}
 
 			Update();	// Send group update

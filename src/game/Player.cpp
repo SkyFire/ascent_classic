@@ -8883,3 +8883,10 @@ void Player::save_Auras()
 
 
 #endif
+
+
+void Player::EventGroupFullUpdate()
+{
+	if(m_Group)
+		m_Group->UpdateAllOutOfRangePlayersFor(this);
+}
