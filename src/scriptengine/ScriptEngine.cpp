@@ -176,12 +176,13 @@ void ScriptEngine::ExecuteScriptFile(const char * filename)
 	int threadid;
 	printf("  %s: ", strstr(filename, "/")+1);
 	int no_errors = m_machine->ExecuteString(data, &threadid, true, filename, &m_variables[0]);
-	printf("%u errors.\n", no_errors);
-	if(no_errors)
+	bool first=true;
+	if(no_errors || m_machine->GetLog().GetEntry(first))
 	{
 		printf("Errors occured while compiling %s.\n", filename);
 		DumpErrors();
 	}
+	else printf("%u errors.\n", no_errors);
 
 	delete [] data;
 }
@@ -192,13 +193,14 @@ void ScriptEngine::DumpErrors()
 	
 	bool first = true;
 	const char * message = m_machine->GetLog().GetEntry(first);
+	first = false;
 	while(message)
 	{
 		printf("GM_Debug:  %s", message);
-		first = false;
 		message = m_machine->GetLog().GetEntry(first);
 	}
 	// sLog.outString("End of error dump.");
+	m_machine->GetLog().Reset();  //if not reset, will repeat last error over and over again
 }
 
 void ScriptEngine::DoGMCall(gmFunctionObject * obj, uint32 ArgumentCount, int * return_value)
