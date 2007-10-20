@@ -966,6 +966,9 @@ void Group::UpdateAllOutOfRangePlayersFor(Player * pPlayer)
 	WorldPacket data(150);
 	WorldPacket data2(150);
 
+	if(m_SubGroupCount>8)
+		return;
+
 	/* tell the other players about us */
 	UpdateOutOfRangePlayer(pPlayer, GROUP_UPDATE_TYPE_FULL_CREATE, true, &data2);
 
@@ -1037,6 +1040,7 @@ void Group::UpdateAllOutOfRangePlayersFor(Player * pPlayer)
 void Group::HandleUpdateFieldChange(uint32 Index, Player * pPlayer)
 {
 	uint32 Flags = 0;
+	m_groupLock.Acquire();
 	switch(Index)
 	{
 	case UNIT_FIELD_HEALTH:
@@ -1068,11 +1072,15 @@ void Group::HandleUpdateFieldChange(uint32 Index, Player * pPlayer)
 
 	if(Flags)
 		UpdateOutOfRangePlayer(pPlayer, Flags, true, 0);
+
+	m_groupLock.Release();
 }
 
 void Group::HandlePartialChange(uint32 Type, Player * pPlayer)
 {
 	uint32 Flags = 0;
+	m_groupLock.Acquire();
+
 	switch(Type)
 	{
 	case PARTY_UPDATE_FLAG_POSITION:
@@ -1086,6 +1094,8 @@ void Group::HandlePartialChange(uint32 Type, Player * pPlayer)
 
 	if(Flags)
 		UpdateOutOfRangePlayer(pPlayer, Flags, true, 0);
+
+	m_groupLock.Release();
 }
 
 void WorldSession::HandlePartyMemberStatsOpcode(WorldPacket & recv_data)
