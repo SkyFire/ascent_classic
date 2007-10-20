@@ -93,10 +93,11 @@ public:
 	 */
 	void Resetup(uint32 Max)
 	{
-		if(Max <= _max)
+		if(Max < _max)
 			return;		// no need to realloc
 
         T ** a = new T*[Max];
+		memset(a,0,sizeof(T*)*Max);
 		memcpy(a, _array, sizeof(T*) * _max);
 		delete [] _array;
 		_array = a;
@@ -634,7 +635,7 @@ public:
 		if(!Max)
 			return;
 
-		Storage<T, StorageType>::_storage.Resetup(Max);
+		Storage<T, StorageType>::_storage.Resetup(Max+1);
 
 		size_t cols = strlen(Storage<T, StorageType>::_formatString);
 		result = WorldDatabase.Query("SELECT * FROM %s", Storage<T, StorageType>::_indexName);
