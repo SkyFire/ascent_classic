@@ -85,7 +85,7 @@ void LogonCommHandler::Startup()
 void LogonCommHandler::Connect(LogonServer * server)
 {
 	sLog.outColor(TNORMAL, "	>> connecting to `%s` on `%s:%u`...", server->Name.c_str(), server->Address.c_str(), server->Port);
-	server->RetryTime = time(NULL) + 10;
+	server->RetryTime = UNIXTIME + 10;
 	server->Registered = false;
 	LogonCommClientSocket * conn = ConnectToLogon(server->Address, server->Port);
 	logons[server] = conn;
@@ -98,12 +98,12 @@ void LogonCommHandler::Connect(LogonServer * server)
 	sLog.outColor(TGREEN, " ok!\n");
 	sLog.outColor(TNORMAL, "        >> authenticating...\n");
 	sLog.outColor(TNORMAL, "        >> ");
-	uint32 tt = time(NULL) + 10;
+	uint32 tt = UNIXTIME + 10;
 	conn->SendChallenge();
 	sLog.outColor(TNORMAL, "        >> result:");
 	while(!conn->authenticated)
 	{
-		if((uint32)time(NULL) >= tt)
+		if((uint32)UNIXTIME >= tt)
 		{
 			sLog.outColor(TYELLOW, " timeout.\n");
 			conn->Disconnect();
@@ -132,13 +132,13 @@ void LogonCommHandler::Connect(LogonServer * server)
 
 	RequestAddition(conn);
 
-	uint32 st = time(NULL) + 10;
+	uint32 st = UNIXTIME + 10;
 
 	// Wait for register ACK
 	while(server->Registered == false)
 	{
 		// Don't wait more than.. like 10 seconds for a registration
-		if((uint32)time(NULL) >= st)
+		if((uint32)UNIXTIME >= st)
 		{
 			sLog.outColor(TYELLOW, "timeout.");
 			logons[server] = 0;
@@ -179,7 +179,7 @@ void LogonCommHandler::UpdateSockets()
 
 	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
 	LogonCommClientSocket * cs;
-	uint32 t = time(NULL);
+	uint32 t = UNIXTIME;
 	for(; itr != logons.end(); ++itr)
 	{
 		cs = itr->second;

@@ -299,7 +299,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	mSession->SetClientBuild(mClientBuild);
 	mSession->LoadSecurity(GMFlags);
 	mSession->SetAccountFlags(AccountFlags);
-	mSession->m_lastPing = time(NULL);
+	mSession->m_lastPing = UNIXTIME;
 
 	for(uint32 i = 0; i < 8; ++i)
 		mSession->SetAccountData(i, NULL, true, 0);
@@ -383,7 +383,7 @@ void WorldSocket::_HandlePing(WorldPacket* recvPacket)
 	if(mSession)
 	{
 		mSession->_latency = _latency;
-		mSession->m_lastPing = time(NULL);
+		mSession->m_lastPing = UNIXTIME;
 
 		// reset the move time diff calculator, don't worry it will be re-calculated next movement packet.
 		mSession->m_clientTimeDelay = 0;

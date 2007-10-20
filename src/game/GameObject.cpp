@@ -98,7 +98,7 @@ bool GameObject::CreateFromProto(uint32 entry,uint32 mapid, float x, float y, fl
 	SetFloatValue( GAMEOBJECT_POS_Z, z );
 	SetFloatValue( GAMEOBJECT_FACING, ang );
 	 
-	//SetUInt32Value( GAMEOBJECT_TIMESTAMP, (uint32)time(NULL));
+	//SetUInt32Value( GAMEOBJECT_TIMESTAMP, (uint32)UNIXTIME);
  //   SetUInt32Value( GAMEOBJECT_ARTKIT, 0 );		   //these must be from wdb somewhere i guess
    // SetUInt32Value( GAMEOBJECT_ANIMPROGRESS, 0 );
 	SetUInt32Value( GAMEOBJECT_STATE, 1 );

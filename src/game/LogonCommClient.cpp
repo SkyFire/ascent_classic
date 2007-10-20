@@ -31,7 +31,7 @@ typedef struct
 LogonCommClientSocket::LogonCommClientSocket(SOCKET fd) : Socket(fd, 524288, 65536)
 {
 	// do nothing
-	last_ping = last_pong = time(NULL);
+	last_ping = last_pong = UNIXTIME;
 	remaining = opcode = 0;
 	_id=0;
 	latency = 0;
@@ -162,7 +162,7 @@ void LogonCommClientSocket::HandlePong(WorldPacket & recvData)
 	if(latency)
 		sLog.outDebug(">> logonserver latency: %ums", getMSTime() - pingtime);
 	latency = getMSTime() - pingtime;
-	last_pong = time(NULL);
+	last_pong = UNIXTIME;
 }
 
 void LogonCommClientSocket::SendPing()
@@ -171,7 +171,7 @@ void LogonCommClientSocket::SendPing()
 	WorldPacket data(RCMSG_PING, 4);
 	SendPacket(&data);
 
-	last_ping = time(NULL);
+	last_ping = UNIXTIME;
 }
 
 void LogonCommClientSocket::SendPacket(WorldPacket * data)

@@ -1203,7 +1203,7 @@ void WordFilter::LogMessage(string& message, string& blockedKeyword, Player * pl
 {
 	FILE * m_file = fopen("logs\\contentfilter.txt", "a");
 	char datestring[200];
-	time_t t = time(NULL);
+	time_t t = UNIXTIME;
 	tm* aTm = localtime(&t);
 
 	if(m_file == NULL)

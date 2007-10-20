@@ -202,7 +202,7 @@ bool Master::Run(int argc, char ** argv)
 	printf("The key combination <Ctrl-C> will safely shut down the server at any time.\n");
 	Log.Line();
     
-	uint32 seed = time(NULL);
+	uint32 seed = UNIXTIME;
 	new MTRand(seed);
 	srand(seed);
 	Log.Success("MTRand", "Initialized Random Number Generators.");
@@ -307,7 +307,7 @@ bool Master::Run(int argc, char ** argv)
 		return false;
 	}
 
-	sWorld.SetStartTime((uint32)time(NULL));
+	sWorld.SetStartTime((uint32)UNIXTIME);
 	
 	_HookSignals();
 
@@ -468,7 +468,7 @@ bool Master::Run(int argc, char ** argv)
 	sSocketMgr.CloseAll();
 
 	// begin server shutdown
-	time_t st = time(NULL);
+	time_t st = UNIXTIME;
 	sLog.outString("Server shutdown initiated at %s", ctime(&st));
 
 	// send a query to wake it up if its inactive

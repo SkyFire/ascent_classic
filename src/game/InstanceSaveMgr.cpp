@@ -285,7 +285,7 @@ void InstanceSavingManagement::LoadSavedInstances()
 		Field *fields = result->Fetch();
 		
 		// check for instance expiry
-		if((uint32)time(NULL) >= fields[5].GetUInt32())
+		if((uint32)UNIXTIME >= fields[5].GetUInt32())
 		{
 			CharacterDatabase.Execute("DELETE FROM instances WHERE instanceid = %u", fields[0].GetUInt32());
 			continue;
@@ -452,7 +452,7 @@ void InstanceSavingManagement::BuildRaidSavedInstancesForPlayer(Player *pPlayer)
 			{
 				data << uint32(0x00);
 				data << (p->GetMapInfo() ? p->GetMapInfo()->mapid : 0);
-				data << (uint32)(pi->GetRaidExpireTime() - time(NULL));
+				data << (uint32)(pi->GetRaidExpireTime() - UNIXTIME);
 				data << pi->GetInstanceID();
 
 				counter++;

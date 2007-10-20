@@ -37,7 +37,7 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 
 	// Create script interface
 	ScriptInterface = new MapScriptInterface(*this);
-	CreationTime = time(NULL);
+	CreationTime = UNIXTIME;
 	ExpiryTime = 0;
 	RaidExpireTime = 0;
 	if(pMapInfo && pMapInfo->type == INSTANCE_RAID || pMapInfo && pMapInfo->type == INSTANCE_MULTIMODE)
@@ -516,7 +516,7 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	}
 
 	if(!HasPlayers() && !InactiveMoveTime && RaidExpireTime)
-		InactiveMoveTime = time(NULL) + (10 * 60);	   // 10 mins -> move to inactive
+		InactiveMoveTime = UNIXTIME + (10 * 60);	   // 10 mins -> move to inactive
 }
 
 void MapMgr::ChangeObjectLocation(Object *obj)
@@ -995,7 +995,7 @@ void MapMgr::_UpdateObjects()
 		else if(!HasPlayers() && !reset_pending)
 		{
 			reset_pending = true;
-			ExpiryTime = time(NULL) + 600;
+			ExpiryTime = UNIXTIME + 600;
 		}
 	}
 
@@ -1367,7 +1367,7 @@ bool MapMgr::Do()
 #endif
 	while((ThreadState != THREADSTATE_TERMINATE) && !_shutdown)
 	{
-		t = time(NULL);
+		t = UNIXTIME;
 		exec_start=getMSTime();
 		//first push to world new objects
 		m_objectinsertlock.Acquire();//<<<<<<<<<<<<<<<<

@@ -364,11 +364,11 @@ public:
 	void SendFactionMessage(WorldPacket *packet, uint8 teamId);
 
 	inline void SetStartTime(uint32 val) { m_StartTime = val; }
-	inline uint32 GetUptime(void) { return (uint32)time(NULL) - m_StartTime; }
+	inline uint32 GetUptime(void) { return (uint32)UNIXTIME - m_StartTime; }
 	inline uint32 GetStartTime(void) { return m_StartTime; }
 	inline std::string GetUptimeString()
 	{
-		int seconds = (uint32)time(NULL) - m_StartTime;
+		int seconds = (uint32)UNIXTIME - m_StartTime;
 		int mins=0;
 		int hours=0;
 		int days=0;
@@ -511,7 +511,7 @@ protected:
 	time_t _UpdateGameTime()
 	{
 		// Update Server time
-		time_t thisTime = time(NULL);
+		time_t thisTime = UNIXTIME;
 		m_gameTime += thisTime - m_lastTick;
 		m_lastTick = thisTime;
 

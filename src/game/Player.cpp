@@ -159,7 +159,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_afk_reason			= "";
 	m_playedtime[0]		 = 0;
 	m_playedtime[1]		 = 0;
-	m_playedtime[2]		 = (uint32)time(NULL);
+	m_playedtime[2]		 = (uint32)UNIXTIME;
 
 	m_AllowAreaTriggerPort  = true;
 
@@ -1962,7 +1962,7 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	uint32 start_time = getMSTime();
  
 	//Calc played times
-	uint32 playedt = (uint32)time(NULL) - m_playedtime[2];
+	uint32 playedt = (uint32)UNIXTIME - m_playedtime[2];
 	m_playedtime[0] += playedt;
 	m_playedtime[1] += playedt;
 	m_playedtime[2] += playedt;
@@ -2065,7 +2065,7 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	
 	<< m_banned << ", '"
 	<< CharacterDatabase.EscapeString(m_banreason) << "', "
-	<< (uint32)time(NULL) << ",";
+	<< (uint32)UNIXTIME << ",";
 	
 	//online state
 	if(GetSession()->_loggingOut)
@@ -2877,7 +2877,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	else
 		_AddLanguages(false);
 
-	OnlineTime	= time(NULL);
+	OnlineTime	= UNIXTIME;
 	if(GetGuildId())
 		SetUInt32Value(PLAYER_GUILD_TIMESTAMP, UNIXTIME);
 
@@ -4325,8 +4325,8 @@ void Player::EventPlayerRest()
 		return;
 	}
 	// Rest timer
-	float diff = difftime(time(NULL),m_lastRestUpdate);
-	m_lastRestUpdate = (uint32)time(NULL);
+	float diff = difftime(UNIXTIME,m_lastRestUpdate);
+	m_lastRestUpdate = (uint32)UNIXTIME;
 	uint32 RestXP = CalculateRestXP((uint32)diff);
 	sLog.outDebug("REST: Adding %d rest XP for %.0f seconds of rest time", RestXP, diff);
 	AddRestXP(RestXP);
@@ -4353,7 +4353,7 @@ void Player::ApplyPlayerRestState(bool apply)
 		SetFlag(PLAYER_FLAGS, PLAYER_FLAG_RESTING);	//put zzz icon
 
 		UpdateRestState();
-		m_lastRestUpdate = (uint32)time(NULL);
+		m_lastRestUpdate = (uint32)UNIXTIME;
 
 		if(GetUInt32Value(UNIT_FIELD_LEVEL) >= GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))		// Save CPU, don't waste time on this if you're >= 70
 			return;

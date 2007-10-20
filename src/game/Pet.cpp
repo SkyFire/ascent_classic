@@ -456,7 +456,7 @@ void Pet::InitializeMe(bool first)
 	m_Owner->SetSummon(this);
 	m_Owner->SetUInt64Value(UNIT_FIELD_SUMMON, this->GetGUID());
 	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetGUIDLow());
-	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, (uint32)time(NULL));
+	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, (uint32)UNIXTIME);
 	myFamily = dbcCreatureFamily.LookupEntry(creature_info->Family);
 	bHasLoyalty = m_Owner->getClass() == HUNTER ? true : false;
 	SetPetDiet();
@@ -905,7 +905,7 @@ void Pet::Rename(string NewName)
 	UpdatePetInfo(false);
 
 	// update timestamp to force a re-query
-	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
+	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, UNIXTIME);
 }
 
 void Pet::ApplySummonLevelAbilities()

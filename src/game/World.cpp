@@ -259,7 +259,7 @@ bool World::SetInitialWorldSettings()
 {
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");
    
-	m_lastTick = time(NULL);
+	m_lastTick = UNIXTIME;
 
 	// TODO: clean this
 	time_t tiempo;
@@ -267,7 +267,7 @@ bool World::SetInitialWorldSettings()
 	char minute[3];
 	char second[3];
 	struct tm *tmPtr;
-	tiempo = time(NULL);
+	tiempo = UNIXTIME;
 	tmPtr = localtime(&tiempo);
 	strftime( hour, 3, "%H", tmPtr );
 	strftime( minute, 3, "%M", tmPtr );

@@ -1425,7 +1425,7 @@ void WorldSession::HandleSetSheathedOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandlePlayedTimeOpcode( WorldPacket & recv_data )
 {
-	uint32 playedt = (uint32)time(NULL) - _player->m_playedtime[2];
+	uint32 playedt = (uint32)UNIXTIME - _player->m_playedtime[2];
 	if(playedt)
 	{
 		_player->m_playedtime[0] += playedt;

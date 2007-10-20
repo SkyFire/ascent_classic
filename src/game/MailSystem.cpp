@@ -62,7 +62,7 @@ WorldPacket * Mailbox::BuildMailboxListingPacket()
 	WorldPacket * data = new WorldPacket(SMSG_MAIL_LIST_RESULT, 500);
 	MessageMap::iterator itr;
 	uint32 count = 0;
-	uint32 t = time(NULL);
+	uint32 t = UNIXTIME;
 	*data << uint8(0);	 // size placeholder
 
 	for(itr = Messages.begin(); itr != Messages.end(); ++itr)
@@ -297,7 +297,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	
 	// 30 day expiry time for unread mail mail
 	if(!sMailSystem.MailOption(MAIL_FLAG_NO_EXPIRY))
-		msg.expire_time = time(NULL) + (TIME_DAY * 30);
+		msg.expire_time = UNIXTIME + (TIME_DAY * 30);
 	else
 		msg.expire_time = 0;
 
@@ -659,7 +659,7 @@ void MailSystem::SendAutomatedMessage(uint32 type, uint64 sender, uint64 receive
 	msg.cod = cod;
 	msg.attached_item_guid = item_guid;
 	msg.stationary = stationary;
-	msg.delivery_time = time(NULL);
+	msg.delivery_time = UNIXTIME;
 	msg.expire_time = 0;
 	msg.read_flag = false;
 	msg.copy_made = false;

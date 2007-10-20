@@ -47,7 +47,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 	ticket->posY = y;
 	ticket->posZ = z;
 	ticket->message = message;
-	ticket->timestamp = (uint32)time(NULL);
+	ticket->timestamp = (uint32)UNIXTIME;
 	ticket->name = GetPlayer()->GetName();
 	ticket->level = GetPlayer()->getLevel();
 
@@ -92,7 +92,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
 		return;
 	}
 	ticket->message = message;
-	ticket->timestamp = (uint32)time(NULL);
+	ticket->timestamp = (uint32)UNIXTIME;
 
 	objmgr.remGMTicket(GetPlayer()->GetGUID());
 	objmgr.AddGMTicket(ticket,false);

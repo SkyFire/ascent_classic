@@ -67,7 +67,7 @@ void Guild::GuildMemberLogoff(Player *pMember)
 			(*i)->lastLevel = pMember->getLevel();
 			(*i)->lastZone = pMember->GetZoneId();
 			(*i)->Rank = pMember->GetGuildRank();
-			(*i)->lastOnline = time(NULL);
+			(*i)->lastOnline = UNIXTIME;
 			return;
 		}
 	}
@@ -81,7 +81,7 @@ void Guild::AddNewGuildMember(Player *plyr)
 	gMember->lastZone =plyr->GetZoneId();
 	gMember->publicNote = "";
 	gMember->officerNote = "";
-	gMember->lastOnline = time(NULL);
+	gMember->lastOnline = UNIXTIME;
 
 	AddGuildMember(gMember);
 	sHookInterface.OnGuildJoin(plyr, this);
@@ -199,7 +199,7 @@ void Guild::FillGuildRosterData(WorldPacket *data)
 			*data << (uint8)((*i)->lastLevel);
 			*data << (uint8)((*i)->cl);
 			*data << (*i)->lastZone;
-			*data << float((time(NULL)-(*i)->lastOnline)/86400.0);
+			*data << float((UNIXTIME-(*i)->lastOnline)/86400.0);
 			*data << (*i)->publicNote;
 			*data << (*i)->officerNote;
 		}
@@ -572,7 +572,7 @@ void Guild::RenameGuild(std::string guildName)
 {
 	SetGuildName(guildName);
 	CharacterDatabase.Execute("UPDATE guilds SET guildName = '%s' WHERE guildId = %u", CharacterDatabase.EscapeString(guildName).c_str(), GetGuildId());
-	uint32 ttime = time(NULL);
+	uint32 ttime = UNIXTIME;
 
 	std::list<PlayerInfo*>::iterator itr = m_guildMembers.begin();
 	for (; itr != m_guildMembers.end(); itr++)

@@ -110,7 +110,7 @@ MapMgr* WorldCreator::GetInstance(uint32 mapid, Object* obj)
 			MapInfo *pMapInfo = WorldMapInfoStorage.LookupEntry(ia->MapId);
 			if(pMapInfo)
 			{
-				if((uint32)time(NULL) > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
+				if((uint32)UNIXTIME > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
 				{
 					sInstanceSavingManager.RemoveSavedInstance(ia->MapId,ia->InstanceId,true);
 					sInstanceSavingManager.RemoveSavedInstance(ia->InstanceId);
@@ -152,7 +152,7 @@ MapMgr* WorldCreator::GetInstance(uint32 mapid, uint32 instanceId)
 			MapInfo *pMapInfo = WorldMapInfoStorage.LookupEntry(ia->MapId);
 			if(pMapInfo)
 			{
-				if((uint32)time(NULL) > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
+				if((uint32)UNIXTIME > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
 				{
 					sInstanceSavingManager.RemoveSavedInstance(ia->MapId,ia->InstanceId,true);
 					sInstanceSavingManager.RemoveSavedInstance(ia->InstanceId);
@@ -192,7 +192,7 @@ MapMgr* WorldCreator::GetInstance(uint32 instanceId)
 			MapInfo *pMapInfo = WorldMapInfoStorage.LookupEntry(ia->MapId);
 			if(pMapInfo)
 			{
-				if((uint32)time(NULL) > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
+				if((uint32)UNIXTIME > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
 				{
 					sInstanceSavingManager.RemoveSavedInstance(ia->MapId,ia->InstanceId,true);
 					sInstanceSavingManager.RemoveSavedInstance(ia->InstanceId);
@@ -431,7 +431,7 @@ MapMgr *WorldCreator::GetInstanceByGroup(Group *pGroup, Player *pPlayer, MapInfo
 					MapInfo *pMapInfo = WorldMapInfoStorage.LookupEntry(ia->MapId);
 					if(pMapInfo)
 					{
-						if((uint32)time(NULL) > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
+						if((uint32)UNIXTIME > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
 						{
 							sInstanceSavingManager.RemoveSavedInstance(ia->MapId,ia->InstanceId,true);
 							sInstanceSavingManager.RemoveSavedInstance(ia->InstanceId);
@@ -484,7 +484,7 @@ MapMgr *WorldCreator::GetInstanceByCreator(Player *pCreator, MapInfo *pMapInfo)
 					MapInfo *pMapInfo = WorldMapInfoStorage.LookupEntry(ia->MapId);
 					if(pMapInfo)
 					{
-						if((uint32)time(NULL) > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
+						if((uint32)UNIXTIME > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
 						{
 							sInstanceSavingManager.RemoveSavedInstance(ia->MapId,ia->InstanceId,true);
 							sInstanceSavingManager.RemoveSavedInstance(ia->InstanceId);
@@ -572,7 +572,7 @@ MapMgr * WorldCreator::ISMGetInstanceBeforeRemoval(uint32 InstanceID, uint32 map
 			MapInfo *pMapInfo = WorldMapInfoStorage.LookupEntry(ia->MapId);
 			if(pMapInfo)
 			{
-				if((uint32)time(NULL) > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
+				if((uint32)UNIXTIME > (ia->Creation) + (pMapInfo->cooldown ? pMapInfo->cooldown : 604800))
 				{
 					sInstanceSavingManager.RemoveSavedInstance(ia->InstanceId);
 				}

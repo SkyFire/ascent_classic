@@ -88,7 +88,7 @@ void AuctionHouse::UpdateAuctions()
 	auctionLock.AcquireReadLock();
 	removalLock.Acquire();
 
-	uint32 t = time(NULL);
+	uint32 t = UNIXTIME;
 	HM_NAMESPACE::hash_map<uint32, Auction*>::iterator itr = auctions.begin();
 	Auction * auct;
 	for(; itr != auctions.end();)
@@ -274,7 +274,7 @@ void Auction::AddToPacket(WorldPacket & data)
 	// hehe I know its evil, this creates a nice trough put of money
 	data << uint32(50);				 // Next bid value modifier, like current bid + this value
 	data << BuyoutPrice;				// Buyout
-	data << uint32((ExpiryTime - time(NULL)) * 1000); // Time left
+	data << uint32((ExpiryTime - UNIXTIME) * 1000); // Time left
 	data << uint64(HighestBidder);	  // Last bidder
 	data << HighestBid;				 // The bid of the last bidder
 }
@@ -477,7 +477,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 	// Create auction structure.
 	Auction * auct = new Auction;
 	auct->BuyoutPrice = buyout;
-	auct->ExpiryTime = time(NULL) + (etime * 60);
+	auct->ExpiryTime = UNIXTIME + (etime * 60);
 	auct->HighestBid = bid;
 	auct->HighestBidder = 0;
 	auct->Id = sAuctionMgr.GenerateAuctionId();

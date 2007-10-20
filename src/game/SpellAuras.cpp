@@ -380,7 +380,7 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 
 	if(!IsPassive())
 	{
-		timeleft=time(NULL);
+		timeleft=UNIXTIME;
 	}
 
 	m_castedItemId = 0;

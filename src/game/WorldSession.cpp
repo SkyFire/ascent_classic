@@ -185,7 +185,7 @@ int WorldSession::Update(uint32 InstanceID)
 		LogoutPlayer(true);
 	}
 
-	if(m_lastPing + WORLDSOCKET_TIMEOUT < (uint32)time(NULL))
+	if(m_lastPing + WORLDSOCKET_TIMEOUT < (uint32)UNIXTIME)
 	{
 		// Check if the player is in the process of being moved. We can't delete him
 		// if we are.
@@ -895,7 +895,7 @@ void SessionLogWriter::writefromsession(WorldSession* session, const char* forma
 	va_start(ap, format);
 	char out[32768];
 
-	time_t t = time(NULL);
+	time_t t = UNIXTIME;
 	tm* aTm = localtime(&t);
 	snprintf(out, 32768, "[%-4d-%02d-%02d %02d:%02d:%02d] ",aTm->tm_year+1900,aTm->tm_mon+1,aTm->tm_mday,aTm->tm_hour,aTm->tm_min,aTm->tm_sec);
 	int l = strlen(out);

@@ -288,7 +288,7 @@ void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
 		 if(itr->second.RemoveAtLogout)
 			   continue;
 
-		uint32 elapsed_duration = time(NULL) - itr->second.ApplyTime;
+		uint32 elapsed_duration = UNIXTIME - itr->second.ApplyTime;
 		int32 remaining_duration = itr->second.Duration - elapsed_duration;
 		if(remaining_duration < 0) remaining_duration = 0;
 	  /*  if(!itr->second.RemoveAtLogout && 
@@ -556,7 +556,7 @@ int32 Item::AddEnchantment(EnchantEntry * Enchantment, uint32 Duration, bool Per
 
 	// Create the enchantment struct.
 	EnchantmentInstance Instance;
-	Instance.ApplyTime = time(NULL);
+	Instance.ApplyTime = UNIXTIME;
 	Instance.BonusApplied = false;
 	Instance.Slot = Slot;
 	Instance.Enchantment = Enchantment;
@@ -883,7 +883,7 @@ void Item::ModifyEnchantmentTime(uint32 Slot, uint32 Duration)
 		return;
 
 	// Reset the apply time.
-	itr->second.ApplyTime = time(NULL);
+	itr->second.ApplyTime = UNIXTIME;
 	itr->second.Duration = Duration;
 
 	// Change the event timer.

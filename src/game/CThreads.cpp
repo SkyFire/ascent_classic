@@ -56,7 +56,7 @@ CThread::CThread() : ThreadBase()
 {
 	ThreadState = THREADSTATE_AWAITING;
 	ThreadType  = THREADTYPE_UNASSIGNED;
-	start_time  = time(NULL);
+	start_time  = 0;
 }
 
 CThread::~CThread()

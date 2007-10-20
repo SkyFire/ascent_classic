@@ -625,7 +625,7 @@ void WorldSession::FullLogin(Player * plr)
 		info->guid = plr->GetGUID();
 		info->name = plr->GetName();
 		info->lastLevel = plr->getLevel();
-		info->lastOnline = time(NULL);
+		info->lastOnline = UNIXTIME;
 		info->lastZone = plr->GetZoneId();
 		info->officerNote = "";
 		info->publicNote = "";
@@ -764,7 +764,7 @@ void WorldSession::FullLogin(Player * plr)
 	sLog.outDetail( "WORLD: Created new player for existing players (%s)", plr->GetName() );
 
 	// Login time, will be used for played time calc
-	plr->m_playedtime[2] = (uint32)time(NULL);
+	plr->m_playedtime[2] = (uint32)UNIXTIME;
 
 	//Issue a message telling all guild members that this player has signed on
 	if(plr->IsInGuild())
@@ -814,7 +814,7 @@ void WorldSession::FullLogin(Player * plr)
 	}
 
 	// Calculate rested experience if there is time between lastlogoff and now
-	uint32 currenttime = (uint32)time(NULL);
+	uint32 currenttime = (uint32)UNIXTIME;
 	float timediff = currenttime - plr->m_timeLogoff;
 
 	if(plr->m_timeLogoff > 0 && plr->GetUInt32Value(UNIT_FIELD_LEVEL) < plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))	// if timelogoff = 0 then it's the first login
