@@ -1,4 +1,4 @@
-/*
+*/
  * Ascent MMORPG Server
  * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
@@ -3524,6 +3524,17 @@ void Player::RepopRequestedPlayer()
 	if(myCorpse)
 	{
 		GetSession()->SendNotification(NOTIFICATION_MESSAGE_NO_PERMISSION);
+		return;
+	}
+
+	if(m_CurrentTransporter != NULL)
+	{
+		m_CurrentTransporter->RemovePlayer(this);
+		m_CurrentTransporter = NULL;
+		m_TransporterGUID = 0;
+
+		ResurrectPlayer();
+		RepopAtGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId());
 		return;
 	}
 
@@ -7266,9 +7277,11 @@ void Player::CompleteLoading()
 				count_appearence++;
 			}
 */
+
+		// this stuff REALLY needs to be fixed - Burlex
 		SpellEntry * sp = dbcSpell.LookupEntry((*i).id);
 		Aura * a = new Aura(sp,(*i).dur,this,this);
-		
+
 		for(uint32 x =0;x<3;x++)
         {
 		    if(sp->Effect[x]==SPELL_EFFECT_APPLY_AURA)
@@ -7276,6 +7289,10 @@ void Player::CompleteLoading()
 			    a->AddMod(sp->EffectApplyAuraName[x],sp->EffectBasePoints[x]+1,sp->EffectMiscValue[x],x);
 		    }
         }
+
+		if(a->GetSpellId() == 8326 || a->GetSpellId() == 9036 || a->GetSpellId() == 20584 || a->GetSpellId() == 150007)		// death auras
+			a->SetNegative();
+
 		this->AddAura(a);		//FIXME: must save amt,pos/neg
 		//Somehow we should restore number of appearence. Right now i have no idea how :(
 //		if(count_appearence>1)
