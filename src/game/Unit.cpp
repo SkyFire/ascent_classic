@@ -4346,15 +4346,15 @@ void CombatStatusHandler::UpdateFlag()
 			//printf(I64FMT" is now in combat.\n", m_Unit->GetGUID());
 			m_Unit->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
 			if(!m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->addStateFlag(UF_ATTACKING);
-
-			// remove any of our healers from combat too, if they are able to be.
-			ClearMyHealers();			
 		}
 		else
 		{
 			//printf(I64FMT" is no longer in combat.\n", m_Unit->GetGUID());
 			m_Unit->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
 			if(m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->clearStateFlag(UF_ATTACKING);
+
+			// remove any of our healers from combat too, if they are able to be.
+			ClearMyHealers();
 		}
 	}
 }
@@ -4478,6 +4478,9 @@ void CombatStatusHandler::OnDamageDealt(Unit * pTarget)
 	// we added an aura, or dealt some damage to a target. they need to have us as an attacker, and they need to be our attack target if not.
 	//printf("OnDamageDealt to "I64FMT" from "I64FMT"\n", pTarget->GetGUID(), m_Unit->GetGUID());
 	if(pTarget == m_Unit)
+		return;
+
+	if(!pTarget->isAlive())
 		return;
 
 	AttackerMap::iterator itr = m_attackTargets.find(pTarget->GetGUID());

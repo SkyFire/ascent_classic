@@ -49,6 +49,9 @@ void WorldSession::HandleAttackSwingOpcode( WorldPacket & recv_data )
 		return;
 	}
 
+	if(pEnemy->isDead())
+		return;
+
 	GetPlayer()->smsg_AttackStart(pEnemy);
 	GetPlayer()->EventAttackStart();
 
