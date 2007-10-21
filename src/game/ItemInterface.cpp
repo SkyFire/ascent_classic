@@ -1226,6 +1226,10 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 {
 	uint32 type=proto->InventoryType;
 	
+	if(slot >= INVENTORY_SLOT_BAG_START && slot < INVENTORY_SLOT_BAG_END)
+		if(proto->ContainerSlots == 0)
+			return INV_ERR_ITEMS_CANT_BE_SWAPPED;
+
 	if((slot < INVENTORY_SLOT_BAG_END && DstInvSlot == INVENTORY_SLOT_NOT_SET) || (slot >= BANK_SLOT_BAG_START && slot < BANK_SLOT_BAG_END && DstInvSlot == INVENTORY_SLOT_NOT_SET))
 	{
 		if (!ignore_combat && m_pOwner->CombatStatus.IsInCombat())

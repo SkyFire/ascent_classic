@@ -35,6 +35,7 @@ Container::Container(uint32 high,uint32 low) : Item()
 
 
 	m_Slot = NULL;
+	random_suffix=random_prop=0;
 }
 
 Container::~Container( )
