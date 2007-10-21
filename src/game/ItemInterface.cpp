@@ -1226,7 +1226,7 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 {
 	uint32 type=proto->InventoryType;
 	
-	if(slot >= INVENTORY_SLOT_BAG_START && slot < INVENTORY_SLOT_BAG_END)
+	if(slot >= INVENTORY_SLOT_BAG_START && slot < INVENTORY_SLOT_BAG_END && DstInvSlot == -1)
 		if(proto->ContainerSlots == 0)
 			return INV_ERR_ITEMS_CANT_BE_SWAPPED;
 

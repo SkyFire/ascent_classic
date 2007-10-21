@@ -153,7 +153,9 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	castedItemId = 0;
 	
 	m_usesMana = false;
-	SetSpellFailed(false);
+	m_Spell_Failed = false;
+	m_CanRelect = false;
+	m_IsReflected = false;
 	hadEffect = false;
 	bDurSet=false;
 	bRadSet[0]=false;
