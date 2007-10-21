@@ -1,4 +1,4 @@
-*/
+/*
  * Ascent MMORPG Server
  * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
