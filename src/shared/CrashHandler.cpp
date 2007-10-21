@@ -40,7 +40,6 @@ void OutputCrashLogLine(const char * format, ...)
 #ifdef WIN32
 
 #include "CircularQueue.h"
-extern CircularQueue<uint32, 30> last_spells;
 
 /* *
    @file CrashHandler.h
@@ -190,56 +189,10 @@ void echo(const char * format, ...)
 
 void PrintCrashInformation(PEXCEPTION_POINTERS except)
 {
-	SYSTEM_INFO si;
-	GetSystemInfo(&si);
-	TCHAR username[200];
-	DWORD usize = 198;
-	uint32 i,j;
-	if(!GetUserName(username, &usize))
-		strcpy(username, "Unknown");
-	TCHAR winver[200];
-	OSVERSIONINFO ver;
-	ver.dwOSVersionInfoSize = sizeof(ver);
-	if(GetVersionEx(&ver) == 0)
-	{
-		ver.dwBuildNumber = 0;
-		ver.dwMajorVersion = 5;
-		ver.dwMinorVersion = 1;
-	}
-	MEMORYSTATUS mi;
-	mi.dwLength = sizeof(mi);
-	GlobalMemoryStatus(&mi);
-
-	if(ver.dwMajorVersion == 5 && ver.dwMinorVersion == 0)
-		strcpy(winver, "Windows 2000");
-	else if(ver.dwMajorVersion == 5 && ver.dwMinorVersion == 1)
-		strcpy(winver, "Windows XP");
-	else if(ver.dwMajorVersion == 5 && ver.dwMajorVersion >= 2)
-		strcpy(winver, "Windows 2003");
-	else if(ver.dwMajorVersion >= 5)
-		strcpy(winver, "Windows Vista");
-	else
-		strcpy(winver, "Unknown Windows");
-
 	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
 	echo("Server has crashed. Reason was:\n");
 	echo("   %s at 0x%08X\n", GetExceptionDescription(except->ExceptionRecord->ExceptionCode),
 		(unsigned long)except->ExceptionRecord->ExceptionAddress);
-	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-	echo("System Information:\n");
-	echo("   Running as: %s on %s Build %u\n", username, winver, ver.dwBuildNumber);
-	echo("   Running on %u processors (type %u)\n", si.dwNumberOfProcessors, si.dwProcessorType);
-	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
-	echo("Last 30 used spells were: \n");
-	for(i = 0; i < 3; ++i)
-	{
-		echo("   ");
-		for(j = 0; j < 10; ++j)
-		{
-			echo("%u ", last_spells.get()[j*i]);
-		}
-		echo("\n");
-	}
 	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
 	/*echo("Call Stack: \n");
 	CStackWalker sw;
