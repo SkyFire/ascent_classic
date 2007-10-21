@@ -578,7 +578,9 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 						}
 						else if(u_caster)
 						{
-							if(isAttackable(u_caster,u_caster->GetAIInterface()->GetNextTarget(),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)))
+							if(	u_caster->GetAIInterface()->GetNextTarget() &&
+								isAttackable(u_caster,u_caster->GetAIInterface()->GetNextTarget(),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)) &&
+								u_caster->GetDistanceSq(u_caster->GetAIInterface()->GetNextTarget()) <= r)
 							{
 								store_buff->m_unitTarget = u_caster->GetAIInterface()->GetNextTarget()->GetGUID();
 							}

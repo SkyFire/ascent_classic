@@ -88,8 +88,8 @@ Zack - test my shit :
 - mage - Frost Warding - 28332 - does not reflect
 - Gnomish Poultryizer trinket - Poultryizer - need aura duration to set to 15 sec
 - priest - Force of Will - 18550 - what is the group type to increase here ?, all spells ?
-- searing totem hunts you to the end of the world. probably range related problem in generatetargets
 - blessing of light applies it's effect on holy shock ? and value gets wrong
+- palading spiritual atunement procs 2 times.And it should proc if others cast heal spell on paladin
 
 ==========================================================================
 Capt - test my shit :
