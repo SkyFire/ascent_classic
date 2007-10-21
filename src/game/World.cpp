@@ -248,6 +248,7 @@ void CreateDummySpell(uint32 id)
 bool World::SetInitialWorldSettings()
 {
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");
+	CharacterDatabase.WaitExecute("UPDATE characters SET level = 70 WHERE level > 70");
    
 	m_lastTick = UNIXTIME;
 

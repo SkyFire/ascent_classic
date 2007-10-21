@@ -28,7 +28,7 @@ bool VerifyName(const char * name, size_t nlen)
 	const char * p;
 	for(size_t i = 0; i < nlen; ++i)
 	{
-        p = bannedCharacters;
+		p = bannedCharacters;
 		while(*p != 0 && name[i] != *p && name[i] != 0)
 			++p;
 
@@ -167,7 +167,7 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 {	
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::CharacterEnumProc, GetAccountId()) );
 	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
-    CharacterDatabase.QueueAsyncQuery(q);
+	CharacterDatabase.QueueAsyncQuery(q);
 }
 
 void WorldSession::LoadAccountDataProc(QueryResult * result)
@@ -597,7 +597,7 @@ void WorldSession::FullLogin(Player * plr)
 	SendPacket(&datab);
 
 	/* world preload */
-    plr->SendLoginVerifyWorld();
+	plr->SendLoginVerifyWorld();
 
 	// send voicechat state - active/inactive
 	/*
@@ -605,7 +605,7 @@ void WorldSession::FullLogin(Player * plr)
 	|------------------------------------------------|----------------|
 	|00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F |0123456789ABCDEF|
 	|------------------------------------------------|----------------|
-	|02 01                                           |..              |
+	|02 01							               |..              |
 	-------------------------------------------------------------------
 	*/
 
@@ -614,6 +614,8 @@ void WorldSession::FullLogin(Player * plr)
 	SendPacket(&datab);
 
 	plr->UpdateAttackSpeed();
+	if(plr->getLevel()>70)
+		plr->SetUInt32Value(UNIT_FIELD_LEVEL,70);
 
 	// Make sure our name exists (for premade system)
 	PlayerInfo * info = objmgr.GetPlayerInfo(plr->GetGUID());

@@ -64,7 +64,7 @@
 #include "Opcodes.h"
 
 #ifdef CLUSTERING
-    #include "../realmserver/WorkerOpcodes.h"
+	#include "../realmserver/WorkerOpcodes.h"
 #endif
 
 #include "../shared/CallBack.h"
@@ -152,8 +152,8 @@
 #include "VoiceChatHandler.h"
 
 #ifdef CLUSTERING
-    #include "WorkerServerClient.h"
-    #include "ClusterInterface.h"
+	#include "WorkerServerClient.h"
+	#include "ClusterInterface.h"
 #endif
 
 #ifdef COLLISION

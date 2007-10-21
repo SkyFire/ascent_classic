@@ -2379,8 +2379,8 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 
 	// set level
 	m_uint32Values[UNIT_FIELD_LEVEL] = get_next_field.GetUInt32();
-	/*if(m_uint32Values[UNIT_FIELD_LEVEL] > sWorld.LevelCap)
-		m_uint32Values[UNIT_FIELD_LEVEL] = sWorld.LevelCap;*/
+	if(m_uint32Values[UNIT_FIELD_LEVEL] > 70)
+		m_uint32Values[UNIT_FIELD_LEVEL] = 70;
 
 	// obtain level/stats information
 	lvlinfo = objmgr.GetLevelInfo(getRace(), getClass(), getLevel());

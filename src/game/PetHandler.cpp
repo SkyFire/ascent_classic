@@ -286,7 +286,7 @@ void WorldSession::HandleUnstablePet(WorldPacket & recv_data)
 	// much easier? :P
 	_player->SpawnPet(petnumber);
 
-    WorldPacket data(1);
+	WorldPacket data(1);
 	data.SetOpcode(SMSG_STABLE_RESULT);
 	data << uint8(0x9); // success?
 	SendPacket(&data);

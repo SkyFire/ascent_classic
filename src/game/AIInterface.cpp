@@ -58,7 +58,7 @@ AIInterface::AIInterface()
 
 	m_nextSpell = NULL;
 	m_nextTarget = NULL;
-    totemspell = NULL;
+	totemspell = NULL;
 	m_Unit = NULL;
 	m_PetOwner = NULL;
 	m_aiCurrentAgent = AGENT_NULL;
@@ -425,8 +425,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			m_nextSpell = NULL;
 
 			SetNextTarget(NULL);
-            //reset ProcCount
-            //ResetProcCounts();
+			//reset ProcCount
+			//ResetProcCounts();
 		
 			//reset waypoint to 0
 			m_currentWaypoint = 0;
@@ -443,22 +443,22 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}*/
 
 			if(m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID || m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_MULTIMODE)
-            {
-                if(m_Unit->GetTypeId() == TYPEID_UNIT && !m_Unit->IsPet())
-                {
-                    if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
-                    {
-                        m_Unit->GetMapMgr()->RemoveCombatInProgress(m_Unit->GetGUID());
-                        sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
-                        m_Unit->GetMapMgr()->SavePlayersToInstance();
-                    }
-                    else if(static_cast<Creature*>(m_Unit)->proto && static_cast<Creature*>(m_Unit)->proto->boss && m_Unit->GetMapMgr()->iInstanceMode == MODE_HEROIC)
-                    {
-                        sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
-                        m_Unit->GetMapMgr()->SavePlayersToInstance();
-                    }
-                }
-            }
+			{
+				if(m_Unit->GetTypeId() == TYPEID_UNIT && !m_Unit->IsPet())
+				{
+					if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
+					{
+						m_Unit->GetMapMgr()->RemoveCombatInProgress(m_Unit->GetGUID());
+						sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
+						m_Unit->GetMapMgr()->SavePlayersToInstance();
+					}
+					else if(static_cast<Creature*>(m_Unit)->proto && static_cast<Creature*>(m_Unit)->proto->boss && m_Unit->GetMapMgr()->iInstanceMode == MODE_HEROIC)
+					{
+						sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
+						m_Unit->GetMapMgr()->SavePlayersToInstance();
+					}
+				}
+			}
 		}break;
 	}
 }
@@ -1026,7 +1026,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						}
 					}
 					// CastSpell(m_Unit, spellInfo, targets);
-                    AddSpellCooldown(spellInfo, m_nextSpell);
+					AddSpellCooldown(spellInfo, m_nextSpell);
 					//add pet spell after use to pet owner with some chance
 					if(m_Unit->GetGUIDHigh() == HIGHGUID_PET && m_PetOwner->IsPlayer())
 					{	
@@ -2675,7 +2675,7 @@ AI_Spell *AIInterface::getSpell()
 	// look at our spells
 	AI_Spell *  sp = NULL;
 	AI_Spell *  def_spell = NULL;
-	uint32      cast_time;
+	uint32	  cast_time;
 
 	if(m_Unit->GetGUIDHigh() == HIGHGUID_PET)
 	{
@@ -2804,7 +2804,7 @@ Unit *AIInterface::GetMostHated()
 	for(; it2 != m_aiTargets.end();)
 	{
 		itr = it2;
-        ++it2;
+		++it2;
 
 		/* check the target is valid */
 		if(itr->first->GetInstanceID() != m_Unit->GetInstanceID() || !itr->first->isAlive() || !isAttackable(m_Unit, itr->first))
@@ -3091,16 +3091,16 @@ uint32 AIInterface::GetSpellCooldown(uint32 SpellId)
 
 void AIInterface::AddSpellCooldown(SpellEntry * pSpell, AI_Spell * sp)
 {
-    uint32 Cooldown;
-    if (sp && sp->cooldown)
-    {
+	uint32 Cooldown;
+	if (sp && sp->cooldown)
+	{
 		Cooldown = sp->cooldown;
 	}
-    else
-    {
+	else
+	{
 		Cooldown = pSpell->CategoryRecoveryTime > pSpell->RecoveryTime ? pSpell->CategoryRecoveryTime : pSpell->RecoveryTime;
 	}
-    m_spellCooldown[pSpell->Id] = getMSTime() + Cooldown;
+	m_spellCooldown[pSpell->Id] = getMSTime() + Cooldown;
 }
 
 //we only cast once a spell and we will set his health and resistances. Note that this can be made with db too !

@@ -28,7 +28,7 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 	switch(ent->NameHash)
 	{
 		/************************************************************************/
-		/* Warlock Spells                                                       */
+		/* Warlock Spells													   */
 		/************************************************************************/
 
 	case 0xAA60B4B0:		// Firebolt
@@ -44,13 +44,13 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 	case 0x3211F67B:		// Fire Shield
 		return AUTOCAST_EVENT_OWNER_ATTACKED;
 		break;
-        
+		
 	case 0xAF831F1C:		// Phase Shift
 		return AUTOCAST_EVENT_LEAVE_COMBAT;
 		break;
 
 		/************************************************************************/
-		/* HunterPet Spells                                                     */
+		/* HunterPet Spells													 */
 		/************************************************************************/
 
 	case 0x7AEB7BEE:		// Claw
@@ -58,7 +58,7 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 		break;
 
 		/************************************************************************/
-		/* Water Elemental                                                      */
+		/* Water Elemental													  */
 		/************************************************************************/
 	case 0x85FA77FF:		// Waterbolt
 		return AUTOCAST_EVENT_ATTACK;
@@ -240,7 +240,7 @@ void Pet::Update(uint32 time)
 			else
 				val -= burn;
 			SetUInt32Value(UNIT_FIELD_POWER5, val);// Set the value
-            m_HappinessTimer = PET_HAPPINESS_UPDATE_TIMER;// reset timer
+			m_HappinessTimer = PET_HAPPINESS_UPDATE_TIMER;// reset timer
 		} 
 	else 
 		{
@@ -426,7 +426,7 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 			ActionBar[i] = spellid;
 			//SetSpellState(dbcSpell.LookupEntry(spellid), spstate);
 			if(!(ActionBar[i] & 0x4000000) && spellid)
-                mSpells[dbcSpell.LookupEntry(spellid)] = spstate;
+				mSpells[dbcSpell.LookupEntry(spellid)] = spstate;
 
 			i++;
 
@@ -731,7 +731,7 @@ void Pet::AddSpell(SpellEntry * sp, bool learning)
 	}
 	else
 	{
-       // Active spell add to the actionbar.
+	   // Active spell add to the actionbar.
 		bool has=false;
 		for(int i = 0; i < 10; ++i)
 		{
@@ -1510,7 +1510,7 @@ AI_Spell * Pet::HandleAutoCastEvent()
 		else
 		{
 			if( (*itr)->autocast_type == AUTOCAST_EVENT_ATTACK )
-                return *itr;
+				return *itr;
 			else
 			{
 				m_autoCastSpells[AUTOCAST_EVENT_ATTACK].erase(itr);
@@ -1548,7 +1548,7 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 			list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 
 			for(; itr != m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end(), j < c; ++j, ++itr);
-            if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
+			if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
 				m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
 			else
 				m_aiInterface->SetNextSpell(*itr);

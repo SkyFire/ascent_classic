@@ -31,7 +31,7 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 	m_instanceID = instanceid;
 	m_UpdateDistance = sWorld.GetUpdateDistance();
 	pMapInfo = WorldMapInfoStorage.LookupEntry(mapId);
-    iInstanceMode = 0;
+	iInstanceMode = 0;
 	reset_pending = false;
 	DeletionPending = false;
 
@@ -557,9 +557,9 @@ void MapMgr::ChangeObjectLocation(Object *obj)
 			fRange = 0.0f;		\
 		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER)) \
 			fRange = 0.0f;		\
-        else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT)) \
+		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT)) \
 			fRange = 0.0f;		\
-        else \
+		else \
 			fRange = m_UpdateDistance;	\
 		if (curObj->GetDistance2dSq(obj) > fRange && fRange > 0) \
 
@@ -773,9 +773,9 @@ void MapMgr::UpdateInRangeSet(Object *obj, Player *plObj, MapCell* cell, ByteBuf
 			fRange = 0.0f;			 // unlimited distance for people on same boat
 		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER))
 			fRange = 0.0f;			  // unlimited distance for transporters (only up to 2 cells +/- anyway.)
-        else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT))
+		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT))
 			fRange = 0.0f;			  // unlimited distance for transporters (only up to 2 cells +/- anyway.)
-        else
+		else
 			fRange = m_UpdateDistance;	  // normal distance
 
 		if ( curObj != obj &&
@@ -867,9 +867,9 @@ void MapMgr::UpdateInRangeSet(Object *obj, Player *plObj, MapCell* cell, ByteBuf
 			fRange = 0.0f; \
 		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER)) \
 			fRange = 0.0f; \
-        else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT)) \
+		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT)) \
 			fRange = 0.0f; \
-        else \
+		else \
 			fRange = m_UpdateDistance; \
 		if ( curObj != obj && (fRange == 0.0f || curObj->GetDistance2dSq(obj) < fRange ) ) \
 		{ \
@@ -1411,7 +1411,7 @@ bool MapMgr::Do()
 		///////////
 		if(ExpiryTime && t >= ExpiryTime)
 		{
-            if(GetMapInfo() && GetMapInfo()->type == INSTANCE_RAID || GetMapInfo() && GetMapInfo()->type == INSTANCE_MULTIMODE && iInstanceMode == MODE_HEROIC)
+			if(GetMapInfo() && GetMapInfo()->type == INSTANCE_RAID || GetMapInfo() && GetMapInfo()->type == INSTANCE_MULTIMODE && iInstanceMode == MODE_HEROIC)
 			{
 				if(HasPlayers())
 				{
@@ -1749,7 +1749,7 @@ void MapMgr::UnloadCell(uint32 x,uint32 y)
 	sLog.outDetail("Unloading Cell [%d][%d] on map %d (instance %d)...", 
 		x,y,_mapId,m_instanceID);
 
-    c->Unload();
+	c->Unload();
 }
 
 void MapMgr::EventRespawnCreature(Creature * c, MapCell * p)

@@ -127,7 +127,7 @@ ObjectMgr::~ObjectMgr()
 		delete p;
 	}*/
 
-    /*for(HM_NAMESPACE::hash_map<uint64, Transporter*>::iterator i = mTransports.begin(); i != mTransports.end(); ++i)
+	/*for(HM_NAMESPACE::hash_map<uint64, Transporter*>::iterator i = mTransports.begin(); i != mTransports.end(); ++i)
 	{
 		delete i->second;
 	}*/
@@ -2010,14 +2010,14 @@ Transporter * ObjectMgr::GetTransporter(uint64 guid)
 
 void ObjectMgr::AddTransport(Transporter *pTransporter)
 {
-    _TransportLock.Acquire();
-    mTransports[pTransporter->GetGUID()]=pTransporter;
+	_TransportLock.Acquire();
+	mTransports[pTransporter->GetGUID()]=pTransporter;
  	_TransportLock.Release();
 }
 
 Transporter * ObjectMgr::GetTransporterByEntry(uint32 entry)
 {
-    Transporter * rv = 0;
+	Transporter * rv = 0;
 	_TransportLock.Acquire();
 	HM_NAMESPACE::hash_map<uint64, Transporter*>::iterator itr = mTransports.begin();
 	for(; itr != mTransports.end(); ++itr)
@@ -2028,7 +2028,7 @@ Transporter * ObjectMgr::GetTransporterByEntry(uint32 entry)
 			break;
 		}
 	}
-    _TransportLock.Release();
+	_TransportLock.Release();
 	return rv;
 }
 
@@ -2160,7 +2160,7 @@ void Charter::SaveToDB()
 	for(; i < 9; ++i)
 		ss << ",0";
 
-    ss << ")";
+	ss << ")";
 	CharacterDatabase.Execute(ss.str().c_str());
 }
 
@@ -2522,7 +2522,7 @@ ArenaTeam * ObjectMgr::GetArenaTeamById(uint32 id)
 {
 	HM_NAMESPACE::hash_map<uint32, ArenaTeam*>::iterator itr;
 	m_arenaTeamLock.Acquire();
-    itr = m_arenaTeams.find(id);
+	itr = m_arenaTeams.find(id);
 	m_arenaTeamLock.Release();
 	return (itr == m_arenaTeams.end()) ? NULL : itr->second;
 }
@@ -2565,10 +2565,10 @@ public:
 	{
 		return (a->m_stat_rating > b->m_stat_rating);
 	}
-        bool operator()(ArenaTeam*& a, ArenaTeam*& b)
-        {
-                return (a->m_stat_rating > b->m_stat_rating);
-        }
+		bool operator()(ArenaTeam*& a, ArenaTeam*& b)
+		{
+				return (a->m_stat_rating > b->m_stat_rating);
+		}
 };
 
 void ObjectMgr::UpdateArenaTeamRankings()
