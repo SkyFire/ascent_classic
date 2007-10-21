@@ -56,6 +56,13 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 	case 0x7AEB7BEE:		// Claw
 		return AUTOCAST_EVENT_ATTACK;
 		break;
+
+		/************************************************************************/
+		/* Water Elemental                                                      */
+		/************************************************************************/
+	case 0x85FA77FF:		// Waterbolt
+		return AUTOCAST_EVENT_ATTACK;
+		break;
 	}
 
 	return AUTOCAST_EVENT_NONE;
