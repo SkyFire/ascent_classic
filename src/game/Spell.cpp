@@ -1572,7 +1572,11 @@ void Spell::SendSpellStart()
 	
 					// burlex - added a check here anyway (wpe suckers :P)
 					if(itm->GetDurability() > 0)
+					{
 	                    itm->SetDurability( itm->GetDurability() - 1 );
+						if(itm->GetDurability() == 0)
+							p_caster->ApplyItemMods(itm, EQUIPMENT_SLOT_RANGED, false, true);
+					}
 				}
 				else
 				{
