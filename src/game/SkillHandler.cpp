@@ -123,6 +123,17 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 			return;
 		}
 
+		if(requested_rank > 0)
+		{
+			if(talentInfo->RankID[requested_rank-1] && !_player->HasSpell(talentInfo->RankID[requested_rank-1]))
+			{
+				// cheater
+				sCheatLog.writefromsession(this, "tried to learn talent with requested rank %u talent %u without prerequsites", talent_id, requested_rank);
+				Disconnect();
+				return;
+			}
+		}
+
 		if(!(GetPlayer( )->HasSpell(spellid)))
 		{
 			GetPlayer( )->addSpell(spellid);			
