@@ -19,11 +19,69 @@
 
 #include "StdAfx.h"
 
+/************************************************************************/
+/* Talent Anti-Cheat                                                    */
+/************************************************************************/
+
+/*
+	mage - arcane - 81			
+	mage - fire - 41
+	mage - frost - 61
+
+	rogue - assassination - 182
+	rogue - combat - 181
+	rogue - subelty - 183
+
+	warlock - afflication - 302
+	warlock - demonology - 303
+	warlock - destruction - 301
+
+	warrior - arms - 161
+	warrior - fury - 163
+	warrior - protection - 164
+
+	shaman - elemental - 261
+	shaman - enchantment - 263
+	shaman - restoration - 262
+
+	paladin - holy - 382
+	paladin - protection - 383
+	paladin - retribution - 381
+
+	priest - dicipline - 201
+	priest - holy - 202
+	priest - shadow - 203
+
+	hunter - beast - 361
+	hunter - marksmanship - 363
+	hunter - survival - 362
+
+	druid - balance - 283
+	druid - feral combat - 281
+	druid - restoration - 282
+*/
+
+static const uint32 TalentTreesPerClass[DRUID+1][3] =  {
+	{ 0, 0, 0 },		// NONE
+	{ 161, 163, 164 },	// WARRIOR
+	{ 382, 383, 381 },	// PALADIN
+	{ 361, 363, 362 },	// HUNTER
+	{ 182, 181, 183 },	// ROGUE
+	{ 201, 202, 203 },	// PRIEST
+	{ 0, 0, 0 },		// NONE
+	{ 261, 263, 262 },	// SHAMAN
+	{ 81, 41, 61 },		// MAGE
+	{ 302, 303, 301 },	// WARLOCK
+	{ 0, 0, 0 },		// NONE
+	{ 283, 281, 282 },	// DRUID
+};
+
 void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 {
 	if(!_player->IsInWorld()) return;
  	 
 	uint32 talent_id, requested_rank;
+	unsigned int i;
 	recv_data >> talent_id >> requested_rank;
 
 	uint32 CurTalentPoints =  GetPlayer()->GetUInt32Value(PLAYER_CHARACTER_POINTS1);
@@ -83,9 +141,22 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 	uint32 spentPoints = 0;
 
 	uint32 tTree = talentInfo->TalentTree;
+	uint32 cl = _player->getClass();
+
+	for(i = 0; i < 3; ++i)
+		if(tTree == TalentTreesPerClass[cl][i])
+			break;
+
+	if(i == 3)
+	{
+		// cheater!
+		Disconnect();
+		return;
+	}
+
 	if (talentInfo->Row > 0)
 	{
-		for (unsigned int i = 0; i < dbcTalent.GetNumRows(); i++)		  // Loop through all talents.
+		for (i = 0; i < dbcTalent.GetNumRows(); i++)		  // Loop through all talents.
 		{
 			// Someday, someone needs to revamp
 			TalentEntry *tmpTalent = dbcTalent.LookupRow(i);
@@ -146,6 +217,7 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 				if(respellid)
 				{
 					_player->removeSpell(respellid, false, false, 0);
+					_player->RemoveAura(respellid);
 					if(_player->m_SSSPecificSpells.size())
 						_player->m_SSSPecificSpells.erase(respellid);
 
