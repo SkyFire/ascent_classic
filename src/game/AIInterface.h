@@ -161,6 +161,7 @@ struct SpellEntry;
 
 struct AI_Spell
 {
+	~AI_Spell() { autocast_type=(uint32)-1; }
 	uint32 entryId;
 	uint16 agent;
 	uint32 procChance;

@@ -134,6 +134,7 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 		sp->spelltargetType = fields[7].GetUInt32();
 		sp->cooldown = fields[8].GetFloat();
 		sp->floatMisc1 = fields[9].GetFloat();
+		sp->autocast_type=(uint32)-1;
 /*		if (!sp->procCountDB) 
 			sp->procCount = uint32(-1);
 		else sp->procCount = sp->procCountDB;*/

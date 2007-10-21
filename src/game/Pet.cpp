@@ -870,8 +870,20 @@ void Pet::RemoveSpell(SpellEntry * sp)
 		{
 			if((*it) == itr->second)
 			{
+				/*if((*it)->autocast_type > 0)
+					m_autoCastSpells[(*it)->autocast_type].remove((*it));*/
 				if((*it)->autocast_type > 0)
-					m_autoCastSpells[(*it)->autocast_type].remove((*it));
+				{
+					for(list<AI_Spell*>::iterator i3 = m_autoCastSpells[(*it)->autocast_type].begin();
+						i3 != m_autoCastSpells[(*it)->autocast_type].end(); ++i3)
+					{
+						if( (*i3) == itr->second )
+						{
+							m_autoCastSpells[(*it)->autocast_type].erase(i3);
+							break;
+						}
+					}
+				}
 
 				m_aiInterface->m_spells.erase(it);
 				m_aiInterface->CheckNextSpell(itr->second);
@@ -1478,12 +1490,38 @@ AI_Spell * Pet::HandleAutoCastEvent()
 
 		for(; itr != m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end(), j < c; ++j, ++itr);
 		if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
-			return *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+		{
+			if( (*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin())->autocast_type == AUTOCAST_EVENT_ATTACK )
+				return *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+			else
+			{
+				// bad pointers somehow end up here :S
+				m_autoCastSpells[AUTOCAST_EVENT_ATTACK].erase(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
+				return HandleAutoCastEvent();
+			}
+		}
 		else
-			return *itr;
+		{
+			if( (*itr)->autocast_type == AUTOCAST_EVENT_ATTACK )
+                return *itr;
+			else
+			{
+				m_autoCastSpells[AUTOCAST_EVENT_ATTACK].erase(itr);
+				return HandleAutoCastEvent();
+			}
+		}
 	}
 	else if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size())
-		return *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+	{
+		if( (*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin())->autocast_type == AUTOCAST_EVENT_ATTACK )
+			return *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+		else
+		{
+			// bad pointers somehow end up here :S
+			m_autoCastSpells[AUTOCAST_EVENT_ATTACK].erase(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
+			return NULL;
+		}
+	}
 	
 	return NULL;
 }
@@ -1528,7 +1566,17 @@ void Pet::SetAutoCast(AI_Spell * sp, bool on)
 	if(sp->autocast_type > 0)
 	{
 		if(!on)
-			m_autoCastSpells[sp->autocast_type].remove(sp);
+		{
+			for(list<AI_Spell*>::iterator itr = m_autoCastSpells[sp->autocast_type].begin();
+				itr != m_autoCastSpells[sp->autocast_type].end(); ++itr)
+			{
+				if( (*itr) == sp )
+				{
+					m_autoCastSpells[sp->autocast_type].erase(itr);
+					break;
+				}
+			}
+		}
 		else
 		{
 			for(list<AI_Spell*>::iterator itr = m_autoCastSpells[sp->autocast_type].begin();
