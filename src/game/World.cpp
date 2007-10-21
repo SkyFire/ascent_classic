@@ -2072,7 +2072,7 @@ bool World::SetInitialWorldSettings()
 	dbcSpell.LookupEntry(36563)->procFlags = 0;
 
 	/* thrown - add a 1.6 second cooldown */
-	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL,SPELL_RANGED_THROW,SPELL_RANGED_WAND, 0};
+	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL,SPELL_RANGED_THROW,SPELL_RANGED_WAND, 26679, 27084, 29436, 37074, 41182, 41346, 0};
 	for(i = 0; thrown_spells[i] != 0; ++i)
 	{
 		sp = dbcSpell.LookupEntry(thrown_spells[i]);
