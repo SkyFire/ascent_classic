@@ -836,6 +836,12 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
 		return; //our player doesn't have this item
 	}
 
+	if(item->IsContainer() && ((Container*)item)->HasItems())
+	{
+		SendNotification("You cannot sell this bag with items in it.");
+		return;
+	}
+
 	// Check if item can be sold
 	if (it->SellPrice == 0)
 	{
