@@ -1311,7 +1311,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 					break;
 				uint32 max = mPlayer->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
 				uint32 val = mPlayer->GetUInt32Value(UNIT_FIELD_HEALTH);
-				val += float2int32(((mPlayer->HasAura(34300)) ? 0.04f : 0.02f)*max);
+				val += float2int32(((mPlayer->FindAura(34300)) ? 0.04f : 0.02f)*max);
 				if (val>max)
 					val=max;
 				val -= mPlayer->GetUInt32Value(UNIT_FIELD_HEALTH);

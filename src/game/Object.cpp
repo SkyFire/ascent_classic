@@ -1349,7 +1349,7 @@ bool Object::isInFront(Object* target)
 		d-=3*M_PI/2 - atan(dx/dy);
 	}
 
-	if(d < -M_PI/2 || d > M_PI/2)
+	if(d < -M_PI*2/3 || d > M_PI*2/3)
 		return false;
 	return true;
 }

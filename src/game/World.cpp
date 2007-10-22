@@ -2147,7 +2147,7 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->procChance = 75;*/
 //---------ITEMS-----------------
-	sp = dbcSpell.LookupEntry(33746);
+	sp = dbcSpell.LookupEntry(33758);
 	if(sp)
 		sp->RecoveryTime = 10000; //10 seconds.
 	sp = dbcSpell.LookupEntry(33759);
