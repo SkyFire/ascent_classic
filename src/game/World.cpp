@@ -1153,7 +1153,7 @@ bool World::SetInitialWorldSettings()
 				sp->EffectTriggerSpell[0]=atoi(startofid);
 			}
 		}
-		else if(strstr(nametext, "Shred"))
+		/*else if(strstr(nametext, "Shred"))
 		{
 			//check if we can find in the desription
 			char *startofid=strstr(desc, "damage plus ");
@@ -1179,7 +1179,7 @@ bool World::SetInitialWorldSettings()
 			char *startofid=strstr(desc, "damage plus ");
 			if(startofid)
 				sp->EffectBasePoints[1]=(sp->EffectBasePoints[0]+1)*(sp->EffectBasePoints[2]+1)/100;//kinda rough estimation no ? :P
-		}
+		}*/
 		else if(strstr(nametext, "Holy Shock"))
 		{
 			//check if we can find in the desription
@@ -1366,6 +1366,35 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}*/
+	//Druid: Frenzied Regeneration
+	sp = dbcSpell.LookupEntry(22842);
+	if(sp)
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = 23;
+		sp->EffectTriggerSpell[0] = 22845;
+	}
+	sp = dbcSpell.LookupEntry(22895);
+	if(sp)
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = 23;
+		sp->EffectTriggerSpell[0] = 22845;
+	}
+	sp = dbcSpell.LookupEntry(22896);
+	if(sp)
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = 23;
+		sp->EffectTriggerSpell[0] = 22845;
+	}
+	sp = dbcSpell.LookupEntry(26999);
+	if(sp)
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = 23;
+		sp->EffectTriggerSpell[0] = 22845;
+	}
 
 	//paladin - seal of blood
 	sp = dbcSpell.LookupEntry(31892);
@@ -1386,16 +1415,28 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(31785);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM ;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
 	sp = dbcSpell.LookupEntry(33776);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM ;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
+	}
+	//Druid: Leader of the Pack
+	sp = dbcSpell.LookupEntry(24932);
+	if (sp)
+	{
+		sp->Effect[1] = 0;
+		sp->Effect[2] = 0; //removing strange effects.
+	}
+	sp = dbcSpell.LookupEntry(34299);
+	if (sp)
+	{
+		sp->RecoveryTime = 6000; //6 secs
 	}
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
 	sp = dbcSpell.LookupEntry(27962);
@@ -1451,6 +1492,64 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->Effect[1] = 64; //aura
 		sp->EffectTriggerSpell[1] = 30339; //evil , but this is good for us :D
+	}
+	//Rogue: Seal Fate
+	sp = dbcSpell.LookupEntry(14186);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 20;
+	}
+	sp = dbcSpell.LookupEntry(14190);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 40;
+	}
+	sp = dbcSpell.LookupEntry(14193);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 60;
+	}
+	sp = dbcSpell.LookupEntry(14194);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 80;
+	}
+	sp = dbcSpell.LookupEntry(14195);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 100;
+	}
+	//Druid: Primal Fury (2 parts)
+	//Blood Frenzy
+	sp = dbcSpell.LookupEntry(16954);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 100;
+	}
+	sp = dbcSpell.LookupEntry(16952);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 50;
+	}
+	//Primal Fury
+	sp = dbcSpell.LookupEntry(16961);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 100;
+	}
+	sp = dbcSpell.LookupEntry(16958);
+	if(sp) 
+	{
+		sp->procFlags = PROC_ON_CRIT_ATTACK;
+		sp->procChance = 50;
 	}
 	//Druid:Intensity
 	sp = dbcSpell.LookupEntry(17106);
@@ -1706,6 +1805,77 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[0]=0;
 		sp->EffectImplicitTargetB[1]=0;
 		sp->EffectImplicitTargetB[2]=0;
+	}
+//-----BLEED effects----- (setting mech to BLEED)
+	//garrot
+	sp = dbcSpell.LookupEntry(14179);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(8631);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(8632);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(8633);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(11289);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(11290);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(26839);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(26884);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	//pounce
+	sp = dbcSpell.LookupEntry(9007);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(9824);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(9826);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(27007);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(14179);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	//rend
+	sp = dbcSpell.LookupEntry(772);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(6546);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(6547);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(6548);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(11572);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(11573);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(11574);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(25208);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	//rip
+	sp = dbcSpell.LookupEntry(1079);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(9492);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(9493);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(9752);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(9894);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(9896);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(27008);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	//rupture
+	sp = dbcSpell.LookupEntry(1943);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(8639);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(8640);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(11273);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(11274);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(11275);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(26867);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	//rake
+	sp = dbcSpell.LookupEntry(1822);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(1823);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(1824);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(9904);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntry(27003);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+	//lacerate
+	sp = dbcSpell.LookupEntry(33745);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
+//-----------------------
+	//Priest: Shadow Power
+	sp = dbcSpell.LookupEntry(15310);
+	if(sp)
+	{
+		uint32 group = sp->EffectSpellGroupRelation[0];
+		sp = dbcSpell.LookupEntry(33221);
+		if(sp)
+			sp->EffectSpellGroupRelation[0]=group;
+		sp = dbcSpell.LookupEntry(33222);
+		if(sp)
+			sp->EffectSpellGroupRelation[0]=group;
+		sp = dbcSpell.LookupEntry(33223);
+		if(sp)
+			sp->EffectSpellGroupRelation[0]=group;
+		sp = dbcSpell.LookupEntry(33224);
+		if(sp)
+			sp->EffectSpellGroupRelation[0]=group;
+		sp = dbcSpell.LookupEntry(33225);
+		if(sp)
+			sp->EffectSpellGroupRelation[0]=group;
 	}
 	//Relentless Strikes
 	sp = dbcSpell.LookupEntry(14179);
@@ -1978,8 +2148,15 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(13980);
 	if(sp)
 		sp->procChance = 75;*/
+//---------ITEMS-----------------
+	sp = dbcSpell.LookupEntry(33746);
+	if(sp)
+		sp->RecoveryTime = 10000; //10 seconds.
+	sp = dbcSpell.LookupEntry(33759);
+	if(sp)
+		sp->RecoveryTime = 10000; //10 seconds.
 
-	//winfury weapon changes. Start to hate these day by day
+	//windfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);
 	if(Enchantment)
 	{

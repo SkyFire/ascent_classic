@@ -59,6 +59,7 @@ Unit::Unit()
 	{
 		MechanicsDispels[x]=0;
 		MechanicsResistancesPCT[x]=0;
+		ModDamageTakenByMechPCT[x]=0;
 	}
 
 	//SM
@@ -506,7 +507,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 			if(can_delete) m_procSpells.erase(itr2);
 			continue;
 		}
-
 		uint32 origId = itr2->origId;
 		if(CastingSpell)
 		{
@@ -549,6 +549,11 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 			SM_FIValue(SM_FChanceOfSuccess, (int32*)&proc_Chance, ospinfo->SpellGroupType);
 			if(spellId && Rand(proc_Chance))
 			{
+				SpellCastTargets targets;
+				if(itr2->procFlags & PROC_TAGRGET_SELF)
+					targets.m_unitTarget = GetGUID();
+				else 
+					targets.m_unitTarget = victim->GetGUID();
 				/* hmm whats a reasonable value here */
 				if(m_procCounter > 40)
 				{
@@ -589,6 +594,32 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					}
 					switch(spellId)
 					{
+						case 14189: //Seal Fate
+						{
+							if (!this->IsPlayer() || !CastingSpell)
+								continue;
+							if (CastingSpell->Effect[0]!=80 &&
+								CastingSpell->Effect[1]!=80 &&
+								CastingSpell->Effect[2]!=80)
+								continue;
+						}break;
+						case 16953: //Blood Frenzy & Primal Fury
+						case 16959:
+						{
+							printf("triggered\n");
+							if (!this->IsPlayer() || !CastingSpell)
+								continue;
+							if (!static_cast<Player*>(this)->IsInFeralForm() ||
+								(static_cast<Player*>(this)->GetShapeShift() != FORM_CAT &&
+								static_cast<Player*>(this)->GetShapeShift() != FORM_BEAR &&
+								static_cast<Player*>(this)->GetShapeShift() != FORM_DIREBEAR))
+								continue;
+						}break;
+						case 17106: //druid intencity
+						{
+							if (CastingSpell->Id != 5229)//enrage
+								continue;
+						}break;
 						case 31616:
 						{
 							//yep, another special case: Nature's grace
@@ -690,37 +721,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								mPlayer->GetShapeShift() != FORM_DIREBEAR))
 								continue;
 						}break;
-						//Druid:Improved Leader of the Pack
-						case 34299:
-						{
-							if (!this->IsPlayer() || !this->isAlive())
-								continue;
-							Player* mPlayer = (Player*)this;
-							if (!mPlayer->IsInFeralForm() || 
-								(mPlayer->GetShapeShift() != FORM_CAT &&
-								mPlayer->GetShapeShift() != FORM_BEAR &&
-								mPlayer->GetShapeShift() != FORM_DIREBEAR))
-								continue;
-
-							float multi = 0.04f;
-							uint32 curhp = mPlayer->GetUInt32Value(UNIT_FIELD_HEALTH);
-							uint32 maxhp = mPlayer->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-							uint32 val = uint32(float( float(maxhp)*multi));
-							if (curhp+val>maxhp)
-								val = maxhp-curhp;
-
-							mPlayer->SetUInt32Value(UNIT_FIELD_HEALTH,curhp+val);
-
-							WorldPacket datamr(SMSG_HEALSPELL_ON_PLAYER, 30);
-							datamr << mPlayer->GetNewGUID();
-							datamr << mPlayer->GetNewGUID();
-							datamr << uint32(34299);
-							datamr << uint32(val);
-							datamr << uint32(0);
-							mPlayer->GetSession()->SendPacket(&datamr);
-							continue;
-						}
-						break;
 						//rogue - blade twisting
 						case 31125:
 							{
@@ -980,7 +980,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//trigger only on heal spell cast by NOT us
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) && victim!=this)
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) || this != victim)
 									continue; 
 							}break;
 /*						//paladin - illumination
@@ -1014,12 +1014,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					delete spell;
 					continue;
 				}
-				SpellCastTargets targets;
-				if(itr2->procFlags & PROC_TAGRGET_SELF)
-					targets.m_unitTarget = GetGUID();
-				else 
-					targets.m_unitTarget = victim->GetGUID();
-	
 				spell->pSpellId=origId;
 				spell->prepare(&targets);
 			}//not always we have a spell to cast
@@ -1292,7 +1286,7 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 		else Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)+10557.5);
 		if(Reduction > 0.75f) Reduction = 0.75f;
 		else if(Reduction < 0) Reduction = 0;
-		if(Reduction) dmg[0].resisted_damage = (uint32)(dmg[0].full_damage*Reduction);	  // no multiply by 0
+		if(Reduction) dmg[0].full_damage = (uint32)(dmg[0].full_damage*(1-Reduction));	  // no multiply by 0
 	}
 	else
 	{
@@ -1685,7 +1679,6 @@ else
 				SM_FIValue(((Unit*)this)->SM_FDamageBonus,&dmg.full_damage,ability->SpellGroupType);
 				SM_PIValue(((Unit*)this)->SM_PDamageBonus,&dmg.full_damage,ability->SpellGroupType);
 			}
-
 			dmg.full_damage += pVictim->DamageTakenMod[0]+add_damage;
 			if (damage_type==RANGED)
 			{
@@ -1695,6 +1688,10 @@ else
 			float summaryPCTmod = pVictim->DamageTakenPctMod[0]+this->DamageDoneModPCT[0];
 			if (pct_dmg_mod)
 				summaryPCTmod += pct_dmg_mod/100.0f - 1;
+
+			//a bit dirty fix
+			if (ability && ability->NameHash == 0x8401EC6A)
+				summaryPCTmod += pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
 
 			/* RangedDamageTakenPct is not used
 			if (damage_type == RANGED)
@@ -1828,10 +1825,6 @@ else
 //==========================================================================================
 //==============================Post Roll Damage Processing=================================
 //==========================================================================================
-			/* Debugcode
-		if (ability)
-			printf("PCTDMGMOD %d ED %d AD %d DFD %d\n",pct_dmg_mod,exclusive_damage,add_damage_dmg.full_damage);
-			*/
 //--------------------------absorption------------------------------------------------------
 			uint32 dm = dmg.full_damage;
 			abs = pVictim->AbsorbDamage(0,(uint32*)&dm);
@@ -1883,20 +1876,6 @@ else
 	if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pVictim)->GodModeCheat == true)
 	{
 		dmg.resisted_damage = dmg.full_damage; //godmode
-	}
-
-	if (this->IsPlayer() && static_cast<Player*>(this)->IsInFeralForm()) 
-	{ //Players in feral forms can't proc anything on hit
-		switch (static_cast<Player*>(this)->GetShapeShift())
-		{
-		case FORM_CAT:	
-		case FORM_BEAR: 
-		case FORM_DIREBEAR:
-			disable_proc = true;
-			break;
-		default:
-			break;
-		}
 	}
 //--------------------------dirty fixes-----------------------------------------------------
 	//vstate=1-wound,2-dodge,3-parry,4-interrupt,5-block,6-evade,7-immune,8-deflect	

@@ -486,9 +486,9 @@ bool Spell::DidHit(uint64 target)
 		else
 		{
 			if(pvp)
-				resistchance = baseresist[2] + ((lvldiff-2)*7.0f);
+				resistchance = baseresist[2] + (((float)lvldiff-2.0f)*7.0f);
 			else
-				resistchance = baseresist[2] + ((lvldiff-2)*11.0f);
+				resistchance = baseresist[2] + (((float)lvldiff-2.0f)*11.0f);
 		}
 	}
 	//check mechanical resistance
@@ -511,7 +511,7 @@ bool Spell::DidHit(uint64 target)
 		resistchance += p_victim->m_resist_hit[2];
 
 
-	if(resistchance >= 100.0)
+	if(resistchance >= 100.0f)
 		return false;
 	else
 	{
@@ -1448,7 +1448,9 @@ void Spell::finish()
 				p_caster->UpdateComboPoints(); //this will make sure we do not use any wrong values here
 			}
 			else
+			{
 				p_caster->NullComboPoints();
+			}
 		}
 		if(m_Delayed)
 		{
@@ -1948,10 +1950,11 @@ bool Spell::HasPower()
 	int32 cost;
 	if(m_spellInfo->ManaCostPercentage)//Percentage spells cost % of !!!BASE!!! mana
 	{
+		// Shady:It's too overflowed. Something wrong with BaseMana calculation. So let's div it by 2
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/100;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/200;
 		else
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/100;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/200;
 	}
 	else 
 	{
@@ -2046,10 +2049,11 @@ bool Spell::TakePower()
 	int32 cost;
 	if(m_spellInfo->ManaCostPercentage)//Percentage spells cost % of !!!BASE!!! mana
 	{
+		// Shady:It's too overflowed. Something wrong with BaseMana calculation. So let's div it by 2
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/100;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/200;
 		else
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/100;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/200;
 	}
 	else 
 	{
@@ -2406,13 +2410,17 @@ uint8 Spell::CanCast(bool rangetolerate)
 				else if(target->GetTypeId() == TYPEID_UNIT) 
 					{ 
 						Creature * c = (Creature*)(target);
-						if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
+						if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank >1) //boss or rare or elite
 							return SPELL_FAILED_HIGHLEVEL;
 					} 
 
 			// scripted spell stuff
 			switch (m_spellInfo->Id)
-			{			
+			{
+			case 13907:
+				if (!target || target->IsPlayer() || target->getClass()!=TARGET_TYPE_DEMON )
+					return SPELL_FAILED_SPELL_UNAVAILABLE;
+				break;
             // disable spell
             case 25997: // Eye for an Eye
 			case 38554: //Absorb Eye of Grillok
@@ -3120,11 +3128,9 @@ exit:
 	{
 		if(u_caster) {
 			if(i==0)
-				value+=u_caster->GetAP()/100;
+				value+=(uint32)(u_caster->GetAP()*0.01);
 			else if(i==1)
-			{
-				value = (uint32)(value*3+ u_caster->GetAP()*0.06);
-			}
+				value+=(uint32)(u_caster->GetAP()*0.02);
 		}
 	}else if(m_spellInfo->NameHash == 0x5F076E9E)//Mongoose Bite
 	{// ${$AP*0.2+$m1} damage.

@@ -1090,10 +1090,10 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				res = 0;
 			else
 			{
-				float summaryPCTmod = c->GetDamageDonePctMod(school)+ c->DamageDoneModPCT[school] + m_target->DamageTakenPctMod[school]-1;
+				float summaryPCTmod = c->GetDamageDonePctMod(school)+ c->DamageDoneModPCT[school] + m_target->DamageTakenPctMod[school] + m_target->ModDamageTakenByMechPCT[m_spellProto->MechanicsType]-1;
 				if (m_target->IsPlayer()) //Resilience
 				{
-					float dmg_reduction_pct=static_cast<Player*>(m_target)->CalcRating(14)/100;
+					float dmg_reduction_pct=static_cast<Player*>(m_target)->CalcRating(14)/150;
 					if(dmg_reduction_pct>1.0f)
 						dmg_reduction_pct = 1.0f;
 					summaryPCTmod -=dmg_reduction_pct;
@@ -1113,7 +1113,8 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		dmg.full_damage = ress;
 		dmg.resisted_damage = 0;
 
-		if(c)
+		
+		if(c && m_spellProto->MechanicsType != MECHANIC_BLEEDING)
 		{
 			c->CalculateResistanceReduction(m_target,&dmg);
 			res = dmg.full_damage - dmg.resisted_damage;
@@ -1203,6 +1204,18 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
+	//druid - mangle
+	case 33876:
+	case 33982:
+	case 33983:
+	case 33878:
+	case 33986:
+		{
+			if (GetUnitCaster() && GetUnitCaster()->IsPlayer())
+				static_cast<Player*>(GetUnitCaster())->AddComboPoints(m_target->GetGUID(),1);
+			int32 val = (apply) ? 30 : -30;
+			m_target->ModDamageTakenByMechPCT[MECHANIC_BLEEDING] += val/100.0f;
+		}break;
 	//warrior - sweeping strikes
 	case 35429:
 	case 18765:
@@ -3984,6 +3997,11 @@ void Aura::SpellAuraFeighDeath(bool apply)
 
 void Aura::SpellAuraModDisarm(bool apply)
 {
+	if (m_target->IsPlayer() && static_cast<Player*>(m_target)->IsInFeralForm() &&
+		(static_cast<Player*>(m_target)->GetShapeShift() == FORM_CAT ||
+		static_cast<Player*>(m_target)->GetShapeShift() == FORM_BEAR ||
+		static_cast<Player*>(m_target)->GetShapeShift() == FORM_DIREBEAR))
+		return;
 	//U_FIELD_FLAG_WEAPON_OFF
 	apply ? m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_WEAPON_OFF) : m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_WEAPON_OFF);
 	m_target->disarmed = apply;
@@ -6271,9 +6289,9 @@ void Aura::SpellAuraReduceAttackerSHitChance(bool apply)
 	if (!m_target->IsPlayer())
 		return;
 	if(apply)
-		static_cast<Player*>(m_target)->m_resist_hit[2]+=mod->m_amount;
-	else
 		static_cast<Player*>(m_target)->m_resist_hit[2]-=mod->m_amount;
+	else
+		static_cast<Player*>(m_target)->m_resist_hit[2]+=mod->m_amount;
 }
 
 

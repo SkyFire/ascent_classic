@@ -1082,8 +1082,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ProcTriggerSpell ILotP;
 			ILotP.origId = 34299;
 			ILotP.spellId = 34299;
-			ILotP.procChance = (spellId==34300) ? 100 : 50;
-			ILotP.procFlags = PROC_ON_CRIT_HIT_VICTIM;
+			ILotP.procChance = 100;
+			ILotP.procFlags = PROC_ON_CRIT_ATTACK | PROC_TAGRGET_SELF;
 			ILotP.deleted = false;
 			ILotP.caster = u_caster->GetGUID();
 			ILotP.LastTrigger = 0;
@@ -1275,29 +1275,69 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 	{
 		//yep, the usual special case. This one is shaman talen : Nature's guardian
 		//health is below 30%, we have a mother spell to get value from
-		if(m_spellInfo->Id==31616) 
+		switch (m_spellInfo->Id)
 		{
-			if(unitTarget && unitTarget->IsPlayer() && pSpellId && unitTarget->GetHealthPct()<30)
+		case 31616:
 			{
-				//check for that 10 second cooldown
-				SpellEntry *spellInfo = dbcSpell.LookupEntry(pSpellId );
-				if(spellInfo)
+				if(unitTarget && unitTarget->IsPlayer() && pSpellId && unitTarget->GetHealthPct()<30)
 				{
-					//heal value is receivad by the level of current active talent :s
-					//maybe we should use CalculateEffect(uint32 i) to gain SM benefits
-					int32 value = 0;
-					int32 basePoints = spellInfo->EffectBasePoints[i]+1;//+(m_caster->getLevel()*basePointsPerLevel);
-					int32 randomPoints = spellInfo->EffectDieSides[i];
-					if(randomPoints <= 1)
-						value = basePoints;
-					else
-						value = basePoints + rand() % randomPoints;
-					//the value is in percent. Until now it's a fixed 10%
-					Heal(unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*value/100);
+					//check for that 10 second cooldown
+					SpellEntry *spellInfo = dbcSpell.LookupEntry(pSpellId );
+					if(spellInfo)
+					{
+						//heal value is receivad by the level of current active talent :s
+						//maybe we should use CalculateEffect(uint32 i) to gain SM benefits
+						int32 value = 0;
+						int32 basePoints = spellInfo->EffectBasePoints[i]+1;//+(m_caster->getLevel()*basePointsPerLevel);
+						int32 randomPoints = spellInfo->EffectDieSides[i];
+						if(randomPoints <= 1)
+							value = basePoints;
+						else
+							value = basePoints + rand() % randomPoints;
+						//the value is in percent. Until now it's a fixed 10%
+						Heal(unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*value/100);
+					}
 				}
-			}
+			}break;
+		case 34299: //Druid: Improved Leader of the PAck
+			{
+				if (!unitTarget->IsPlayer() || !unitTarget->isAlive())
+					break;
+				Player* mPlayer = (Player*)unitTarget;
+				if (!mPlayer->IsInFeralForm() || 
+					(mPlayer->GetShapeShift() != FORM_CAT &&
+					mPlayer->GetShapeShift() != FORM_BEAR &&
+					mPlayer->GetShapeShift() != FORM_DIREBEAR))
+					break;
+				uint32 max = mPlayer->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+				uint32 val = mPlayer->GetUInt32Value(UNIT_FIELD_HEALTH);
+				val += float2int32(((mPlayer->HasAura(34300)) ? 0.04f : 0.02f)*max);
+				if (val>max)
+					val=max;
+				val -= mPlayer->GetUInt32Value(UNIT_FIELD_HEALTH);
+				if (val)
+					Heal((int32)(val));
+			}break;
+		case 22845: // Druid: Frenzied Regeneration
+			{
+				if (!unitTarget->IsPlayer() || !unitTarget->isAlive())
+					break;
+				Player* mPlayer = (Player*)unitTarget;
+				if (!mPlayer->IsInFeralForm() || 
+					(mPlayer->GetShapeShift() != FORM_BEAR &&
+					mPlayer->GetShapeShift() != FORM_DIREBEAR))
+					break;
+				uint32 val = mPlayer->GetUInt32Value(UNIT_FIELD_POWER2);
+				if (val>100)
+					val = 100;
+				mPlayer->SetUInt32Value(UNIT_FIELD_POWER2,mPlayer->GetUInt32Value(UNIT_FIELD_POWER2)-val);
+				if (val)
+					Heal((int32)(val*2.5));
+			}break;
+		default:
+			Heal((int32)damage);
+			break;
 		}
-		else Heal((int32)damage);
 	}
 }
 

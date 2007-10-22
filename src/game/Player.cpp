@@ -7690,18 +7690,17 @@ void Player::SetShapeShift(uint8 ss)
 	}
 
 	//Add some specific forms auras
-	if (m_ssAuras.size())
+	if (m_ssAuras.size() && ss)
 	{
 		std::set<SSAura*>::iterator i;
 		for(i=m_ssAuras.begin();i!=m_ssAuras.end();i++)
 		{
 			SSAura* aura = *i;
-			if(ss)
+			if(aura)
 			{
 				if (!(ss &= aura->forms )) // Not in required form
 				{
-					if(this->FindAura(aura->spellid))
-						this->FindAura(aura->spellid)->Remove();
+					this->RemoveAura(aura->spellid);
 				}
 				else //in required form
 				{

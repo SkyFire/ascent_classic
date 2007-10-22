@@ -551,7 +551,6 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 
 	float min_damage = pAttacker->GetFloatValue(offset);
 	float max_damage = pAttacker->GetFloatValue(offset+1);
-
 	if(it)
 	{
 		min_damage -= it->GetProto()->Damage[0].Min;
@@ -621,7 +620,7 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 			}
 		}
 
-		bonus = (wspeed*ap)/14000.0f;
+		bonus = (wspeed-pAttacker->GetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME))/14000.0f*ap;
 		min_damage += bonus;
 		max_damage += bonus;
 	}
@@ -708,25 +707,13 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 			}
 		}
 
-		bonus = (wspeed*ap)/14000.0f;
+		if (offset == UNIT_FIELD_MINDAMAGE)
+			bonus = (wspeed-pAttacker->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME))/14000.0f*ap;
+		else
+			bonus = (wspeed-pAttacker->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01))/14000.0f*ap;
 		min_damage += bonus;
 		max_damage += bonus;
 	}
-
-	// Ehh, sometimes min is bigger than max!?!?
-	/*if (min_damage > max_damage)
-	{
-	float temp = max_damage;
-	max_damage = min_damage;
-	min_damage = temp;
-	}*/
-
-	// Fix creatures that have no base attack damage.
-	//this is shit, critter should not have attack damage!
-	//if db is wrong we should fix db
-	//if(max_damage==0)
-	//  max_damage=5;
-
 	float diff = fabs(max_damage - min_damage);
 	float result = min_damage;
 
