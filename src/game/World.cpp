@@ -1433,11 +1433,9 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[1] = 0;
 		sp->Effect[2] = 0; //removing strange effects.
 	}
-	sp = dbcSpell.LookupEntry(34299);
-	if (sp)
-	{
-		sp->RecoveryTime = 6000; //6 secs
-	}
+	//Druid: Improved Leader of the Pack
+	sp = dbcSpell.LookupEntry(34299); if (sp) sp->proc_interval = 6000;//6 secs
+
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
 	sp = dbcSpell.LookupEntry(27962);
 	if(sp)

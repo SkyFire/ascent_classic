@@ -1950,11 +1950,10 @@ bool Spell::HasPower()
 	int32 cost;
 	if(m_spellInfo->ManaCostPercentage)//Percentage spells cost % of !!!BASE!!! mana
 	{
-		// Shady:It's too overflowed. Something wrong with BaseMana calculation. So let's div it by 2
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/200;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/100;
 		else
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/200;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/100;
 	}
 	else 
 	{
@@ -2049,11 +2048,10 @@ bool Spell::TakePower()
 	int32 cost;
 	if(m_spellInfo->ManaCostPercentage)//Percentage spells cost % of !!!BASE!!! mana
 	{
-		// Shady:It's too overflowed. Something wrong with BaseMana calculation. So let's div it by 2
 		if(m_spellInfo->powerType==POWER_TYPE_MANA)
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/200;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_MANA)*m_spellInfo->ManaCostPercentage)/100;
 		else
-			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/200;
+			cost = (m_caster->GetUInt32Value(UNIT_FIELD_BASE_HEALTH)*m_spellInfo->ManaCostPercentage)/100;
 	}
 	else 
 	{

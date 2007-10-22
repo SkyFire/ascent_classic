@@ -606,7 +606,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 16953: //Blood Frenzy & Primal Fury
 						case 16959:
 						{
-							printf("triggered\n");
 							if (!this->IsPlayer() || !CastingSpell)
 								continue;
 							if (!static_cast<Player*>(this)->IsInFeralForm() ||

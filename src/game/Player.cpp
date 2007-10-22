@@ -7227,12 +7227,12 @@ void Player::CalculateBaseStats()
 
 	memcpy(BaseStats, lvlinfo->Stat, sizeof(uint32) * 5);
 	SetUInt32Value(UNIT_FIELD_MAXHEALTH, lvlinfo->HP);
-	SetUInt32Value(UNIT_FIELD_BASE_HEALTH, lvlinfo->HP);
+	SetUInt32Value(UNIT_FIELD_BASE_HEALTH, (uint32)(lvlinfo->HP/2));
 	SetUInt32Value(PLAYER_NEXT_LEVEL_XP, lvlinfo->XPToNextLevel);
 	
 	if(GetPowerType() == POWER_TYPE_MANA)
 	{
-		SetUInt32Value(UNIT_FIELD_BASE_MANA, lvlinfo->Mana);
+		SetUInt32Value(UNIT_FIELD_BASE_MANA, (uint32)(lvlinfo->Mana/2));
 		SetUInt32Value(UNIT_FIELD_MAXPOWER1, lvlinfo->Mana);
 	}
 }
