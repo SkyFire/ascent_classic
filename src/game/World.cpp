@@ -2149,10 +2149,10 @@ bool World::SetInitialWorldSettings()
 //---------ITEMS-----------------
 	sp = dbcSpell.LookupEntry(33758);
 	if(sp)
-		sp->RecoveryTime = 10000; //10 seconds.
+		sp->proc_interval = 10000; //10 seconds.
 	sp = dbcSpell.LookupEntry(33759);
 	if(sp)
-		sp->RecoveryTime = 10000; //10 seconds.
+		sp->proc_interval = 10000; //10 seconds.
 
 	//windfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);
