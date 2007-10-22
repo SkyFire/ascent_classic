@@ -332,10 +332,11 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 
 	m_casterGuid = caster->GetGUID();
 	m_target = target;
+
 	if(m_target->GetTypeId() == TYPEID_PLAYER)
 		p_target = ((Player*)m_target);
 	else
-		p_target = 0;
+		p_target = NULL;
 
 	if(caster->GetTypeId() == TYPEID_PLAYER && target->GetTypeId() == TYPEID_PLAYER)
 	{
@@ -1665,44 +1666,36 @@ void Aura::SpellAuraDummy(bool apply)
 
 void Aura::SpellAuraModConfuse(bool apply)
 {   
+	Unit* u_caster = GetUnitCaster();
+	if(!u_caster) return;
+
 	if(apply)
 	{
 		SetNegative();
 		
-		if(m_target->GetTypeId() == TYPEID_PLAYER)
+		if(p_target)
 		{
-			//m_target->SetFlag(UNIT_FIELD_FLAGS, 0x00040000);
-			m_target->SetFlag(UNIT_FIELD_FLAGS, 0x04);
 			m_target->setAItoUse(true);
 		}
 		m_target->m_pacified++;
 		m_target->m_special_state |= UNIT_STATE_CONFUSE;
-		m_target->GetAIInterface()->HandleEvent(EVENT_WANDER, m_target, 0); 
+		m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_CONFUSED);
+		m_target->GetAIInterface()->HandleEvent(EVENT_WANDER, u_caster, 0);
 	}
 	else
 	{
-		if(m_target->GetTypeId() == TYPEID_PLAYER)
-		{
-			//m_target->RemoveFlag(UNIT_FIELD_FLAGS, 0x00040000);
-			m_target->RemoveFlag(UNIT_FIELD_FLAGS, 0x04);
-			m_target->GetAIInterface()->StopMovement(1);
-			m_target->setAItoUse(false);
-		}
+		m_target->GetAIInterface()->HandleEvent(EVENT_UNWANDER, u_caster, 0);
+		m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_CONFUSED);
+		m_target->m_special_state &= ~UNIT_STATE_CONFUSE;
 		m_target->m_pacified--;
-		if (!m_target->m_pacified)
-			m_target->m_special_state &= ~UNIT_STATE_CONFUSE;
-		m_target->GetAIInterface()->HandleEvent(EVENT_UNWANDER, m_target, 0);
-		//somebody made us dizzy. It's paybacktime
-		Unit *m_caster = GetUnitCaster();
-		if(!m_caster)
-			return;
-		if(m_caster->isAlive())
+
+		if(p_target)
 		{
-			m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, 0);
-			//m_target->GetAIInterface()->HandleEvent(EVENT_ENTERCOMBAT, GetUnitCaster(), 0);
+			m_target->setAItoUse(false);
+			sHookInterface.OnEnterCombat(p_target, u_caster);
 		}
-		if(m_target->IsPlayer())
-			sHookInterface.OnEnterCombat(((Player*)m_target), m_caster);
+		else
+			m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
 	}
 }
 
@@ -1776,58 +1769,36 @@ void Aura::SpellAuraModCharm(bool apply)
 
 void Aura::SpellAuraModFear(bool apply)
 {
+	Unit* u_caster = GetUnitCaster();
+	if(!u_caster) return;
+
 	if(apply)
 	{
 		SetNegative();
 
-		if(m_target->GetTypeId() == TYPEID_PLAYER)
+		if(p_target)
 		{
-			m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_NO_ROTATE);
-			m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER); // this isn't working in cities 
 			m_target->setAItoUse(true);
-
-			// this is a hackfix to stop player from moving
-			// I guess we have to continue to use it until the above problem can be found
-			WorldPacket data1(9);
-			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
-			data1 << m_target->GetNewGUID() << uint8(0x00); //block player movement ?
-			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
 		}
-		m_target->m_pacified++; // another hackfix to account for players not running away while feared
+		m_target->m_pacified++;
 		m_target->m_special_state |= UNIT_STATE_FEAR;
-		m_target->GetAIInterface()->SetUnitToFear(GetUnitCaster());
-		m_target->GetAIInterface()->HandleEvent(EVENT_FEAR, m_target, 0); 
+		m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_FEARED);
+		m_target->GetAIInterface()->HandleEvent(EVENT_FEAR, u_caster, 0);
 	}
 	else
 	{
-		m_target->m_pacified--;
+		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, u_caster, 0);
+		m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_FEARED);
 		m_target->m_special_state &= ~UNIT_STATE_FEAR;
-		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, m_target, 0);
-		m_target->GetAIInterface()->SetUnitToFear(NULL);
+		m_target->m_pacified--;
 
-		if(m_target->GetTypeId() == TYPEID_PLAYER)
+		if(p_target)
 		{
-			m_target->GetAIInterface()->StopMovement(1);
 			m_target->setAItoUse(false);
-			m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_NO_ROTATE);
- 			m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
-
-			WorldPacket data1(9);
-			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
-			data1 << m_target->GetNewGUID() << uint8(0x01); //enable player movement ?
-			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
+			sHookInterface.OnEnterCombat(p_target, u_caster);
 		}
-
-		Unit*m_caster = GetUnitCaster();
-		if(!m_caster) return;
-
-		if(m_caster->isAlive() && m_target->GetTypeId() != TYPEID_PLAYER)
-		{
-			m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, 0);
-			m_target->GetAIInterface()->HandleEvent(EVENT_ENTERCOMBAT, GetUnitCaster(), 0);
-		}
-		if(m_target->IsPlayer())
-			sHookInterface.OnEnterCombat(((Player*)m_target), m_caster);
+		else
+			m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
 	}
 }
 

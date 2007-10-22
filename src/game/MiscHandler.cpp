@@ -354,7 +354,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 	SendPacket( &data );
 
 	_player->SetLootGUID(0);
-	_player->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_ANIMATION_LOOTING);
+	_player->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ANIMATION_LOOTING);
 	_player->m_currentLoot = 0;
 
 	if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_UNIT)
@@ -1905,5 +1905,3 @@ void WorldSession::HandleDismountOpcode(WorldPacket& recv_data)
 	if( _player->m_MountSpellId )
 		_player->RemoveAura( _player->m_MountSpellId );
 }
-
-

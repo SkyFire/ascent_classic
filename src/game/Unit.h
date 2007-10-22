@@ -459,35 +459,38 @@ enum UnitFieldBytes2
 };
 
 enum UnitFieldFlags
-{										  //  = 0x01
-										  //   = 0x02,
-	U_FIELD_FLAG_LOCK_PLAYER				   = 0x04,
-	U_FIELD_FLAG_PLAYER_CONTROLLED			 = 0x08,
-								//			 = 0x10
-										//	 = 0x20
-	U_FIELD_FLAG_PLUS_MOB					  = 0x40,
-	//										 = 0x80
-	U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT		= 0x100,
-	//										 = 0x200,
-	U_FIELD_ANIMATION_LOOTING				  = 0x400,
-	U_FIELD_SELF_RES						   = 0x800,
-	U_FIELD_FLAG_PVP						   = 0x1000,
-	U_FIELD_FLAG_MOUNT_SIT					 = 0x2000,
-	U_FIELD_FLAG_DEAD						  = 0x4000,
-										//	 = 0x8000
-	U_FIELD_FLAG_ALIVE						 = 0x10000,
-	//										 = 0x20000,
-	U_FIELD_FLAG_NO_ROTATE					 = 0x40000,
-	U_FIELD_FLAG_ATTACK_ANIMATION			  = 0x80000,
-	U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT_2	  = 0x100000, //AI, UNIT can attack non players.
-	//										 = 0x200000,
-	//										 = 0x400000,
-	//										 = 0x800000,
-	U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE	= 0x1000000,
-	U_FIELD_FLAG_UNIT_UNTACKABLE_NO_SELECT	 = 0x2000000, //AI, UNIT cant attack any unit, no name is displayed
-	U_FIELD_FLAG_SKINNABLE					 = 0x4000000,
-	U_FIELD_FLAG_MAKE_CHAR_UNTOUCHABLE		 = 0x8000000,
-	U_FIELD_FLAG_WEAPON_OFF					= 0x40000000,
+{
+	U_FIELD_FLAG_UNKNOWN1                   = 0x01,
+	U_FIELD_FLAG_UNKNOWN2                   = 0x02,
+	U_FIELD_FLAG_LOCK_PLAYER                = 0x04,       // doesn't seem to work 
+	U_FIELD_FLAG_PLAYER_CONTROLLED          = 0x08,
+	U_FIELD_FLAG_UNKNOWN5                   = 0x10,
+	U_FIELD_FLAG_UNKNOWN6                   = 0x20,
+	U_FIELD_FLAG_PLUS_MOB                   = 0x40,
+	U_FIELD_FLAG_UNKNOWN8                   = 0x80,
+	U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT     = 0x100,
+	U_FIELD_FLAG_UNKNOWN10                  = 0x200,
+	U_FIELD_FLAG_ANIMATION_LOOTING          = 0x400,
+	U_FIELD_FLAG_SELF_RES                   = 0x800,
+	U_FIELD_FLAG_PVP                        = 0x1000,
+	U_FIELD_FLAG_MOUNT_SIT                  = 0x2000,
+	U_FIELD_FLAG_DEAD                       = 0x4000,
+	U_FIELD_FLAG_UNKNOWN16                  = 0x8000,
+	U_FIELD_FLAG_ALIVE                      = 0x10000,
+	U_FIELD_FLAG_UNKNOWN18                  = 0x20000,
+	U_FIELD_FLAG_NO_ROTATE                  = 0x40000,
+	U_FIELD_FLAG_ATTACK_ANIMATION           = 0x80000,
+	U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT_2   = 0x100000,   // AI, UNIT can attack non players.
+	U_FIELD_FLAG_UNKNOWN22                  = 0x200000,
+	U_FIELD_FLAG_CONFUSED                   = 0x400000,
+	U_FIELD_FLAG_FEARED                     = 0x800000,
+	U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE = 0x1000000,
+	U_FIELD_FLAG_UNIT_UNTACKABLE_NO_SELECT  = 0x2000000,  // AI, UNIT cant attack any unit, no name is displayed
+	U_FIELD_FLAG_SKINNABLE                  = 0x4000000,
+	U_FIELD_FLAG_MAKE_CHAR_UNTOUCHABLE      = 0x8000000,
+	U_FIELD_FLAG_UNKNOWN29                  = 0x10000000,
+	U_FIELD_FLAG_UNKNOWN30                  = 0x20000000,
+	U_FIELD_FLAG_WEAPON_OFF                 = 0x40000000,
 };
 
 enum UnitDynamicFlags

@@ -5003,7 +5003,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 	data << (uint8)count;
 
 	GetSession ()->SendPacket(&data);
-	SetFlag(UNIT_FIELD_FLAGS,U_FIELD_ANIMATION_LOOTING);
+	SetFlag(UNIT_FIELD_FLAGS,U_FIELD_FLAG_ANIMATION_LOOTING);
 }
 
 void Player::EventAllowTiggerPort(bool enable)

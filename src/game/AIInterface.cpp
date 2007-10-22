@@ -325,6 +325,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}break;
 		case EVENT_FEAR:
 			{   
+				SetUnitToFear(pUnit);
 				CALL_SCRIPT_EVENT(m_Unit, OnFear)(pUnit, 0);
 				m_AIState_backup = m_AIState;
 				m_AIState = STATE_FEAR;
@@ -359,6 +360,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				m_AIState = m_AIState_backup;
 				UnitToFollow = UnitToFollow_backup;
 				FollowDistance = FollowDistance_backup;
+
+				SetUnitToFear(NULL);
+				StopMovement(1);
 			}break;
 		case EVENT_WANDER:
 			{   
@@ -397,6 +401,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				UnitToFollow = UnitToFollow_backup;
 				FollowDistance = FollowDistance_backup;
 				m_AIState = m_AIState_backup;
+
+				StopMovement(1);
 			}break;	   
 		default:
 			{
@@ -1128,7 +1134,7 @@ void AIInterface::DismissPet()
 
 void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellId)
 {
-	if(m_AIState == STATE_EVADE || m_fleeTimer != 0 || !pUnit 
+	if(m_AIState == STATE_EVADE || m_fleeTimer != 0 || !pUnit || !pUnit->isAlive()
 		|| m_Unit->IsPacified() || m_Unit->IsStunned() || !m_Unit->isAlive())
 	{
 		return;
