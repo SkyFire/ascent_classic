@@ -471,21 +471,19 @@ bool ChatHandler::HandleLevelUpCommand(const char* args, WorldSession *m_session
 	if(!plr) plr = m_session->GetPlayer();
 	if(!plr) return false;
 	sGMLog.writefromsession(m_session, "used level up command on %s, with %u levels", plr->GetName(), levels);
+	levels += plr->getLevel();
+	if(levels>70)
+		levels=70;
 
-	uint32 startlvl = plr->GetUInt32Value(UNIT_FIELD_LEVEL);
-	for(uint32 i = startlvl; i < (startlvl+levels);i++)
-	{
-		uint32 curXP = plr->GetUInt32Value(PLAYER_XP);
-		uint32 nextLvlXP = plr->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
-		uint32 givexp = nextLvlXP - curXP;
+	LevelInfo * inf = objmgr.GetLevelInfo(plr->getRace(),plr->getClass(),levels);
+	if(!inf)
+		return false;
 
-		plr->GiveXP(givexp,plr->GetGUID(), true);
-		if(plr->getLevel() >= 255) break;
-	}
+	plr->ApplyLevelInfo(inf,levels);
 
 	WorldPacket data;
 	std::stringstream sstext;
-	sstext << "You have been leveled up to Level " << startlvl+levels << '\0';
+	sstext << "You have been leveled up to Level " << levels << '\0';
 	SystemMessage(plr->GetSession(), sstext.str().c_str());
 
 	sSocialMgr.SendUpdateToFriends( plr );
@@ -1607,7 +1605,7 @@ bool ChatHandler::HandleModifyLevelCommand(const char* args, WorldSession* m_ses
 	if(plr == 0) return true;
 
 	uint32 Level = args ? atol(args) : 0;
-	if(Level == 0)
+	if(Level == 0 || Level > 70)
 	{
 		RedSystemMessage(m_session, "A level (numeric) is required to be specified after this command.");
 		return true;
