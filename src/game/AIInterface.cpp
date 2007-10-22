@@ -208,6 +208,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}break;
 		case EVENT_LEAVECOMBAT:
 			{
+				//cancel spells that we are casting. Should remove bug where creatures cast a spell after they died
+//				CancelSpellCast();
 				// restart emote
 				if(m_Unit->GetTypeId() == TYPEID_UNIT)
 				{
@@ -476,7 +478,7 @@ void AIInterface::Update(uint32 p_time)
 		assert(totemspell != 0);
 		if(p_time >= m_totemspelltimer)
 		{
-			Spell * pSpell = new Spell(m_Unit, totemspell, true, 0);
+			Spell *pSpell = new Spell(m_Unit, totemspell, true, 0);
 
 			SpellCastTargets targets(0);
 			if(!m_nextTarget ||
@@ -2598,8 +2600,9 @@ void AIInterface::CastSpell(Unit* caster, SpellEntry *spellInfo, SpellCastTarget
 		sSpellStore.LookupString(spellInfo->Name), targets.m_unitTarget);
 #endif
 
-	Spell *spell = new Spell(caster, spellInfo, false, NULL);
-	spell->prepare(&targets);
+	//i wonder if this will lead to a memory leak :S
+	castingspell = new Spell(caster, spellInfo, false, NULL);
+	castingspell->prepare(&targets);
 }
 
 SpellEntry *AIInterface::getSpellEntry(uint32 spellId)
@@ -3124,6 +3127,17 @@ void AIInterface::Event_Summon_FE_totem(uint32 summon_duration)
 		*/
 	}
 }
+
+void AIInterface::CancelSpellCast()
+{
+	//i can see this crashing already :P.
+	if(m_AIState==STATE_CASTING && m_nextSpell && castingspell)
+		castingspell->safe_cancel();
+	//hmm unit spell casting is not the same as Ai spell casting ? Have to test this
+	if(m_Unit->isCasting())
+		m_Unit->m_currentSpell->safe_cancel();
+}
+
 
 bool isGuard(uint32 id)
 {

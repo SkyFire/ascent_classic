@@ -228,11 +228,14 @@ public:
 	void setOutOfCombatRange(uint32 val) { m_outOfCombatRange = val; }
 
 	// Spell
+	Spell *castingspell;
 	void CastSpell(Unit* caster, SpellEntry *spellInfo, SpellCastTargets targets);
 	SpellEntry *getSpellEntry(uint32 spellId);
 	SpellCastTargets setSpellTargets(SpellEntry *spellInfo, Unit* target);
 	AI_Spell *getSpell();
 	void addSpellToList(AI_Spell *sp);
+	//don't use this until i finish it !!
+	void CancelSpellCast();
 
 	// Event Handler
 	void HandleEvent(uint32 event, Unit* pUnit, uint32 misc1);

@@ -74,6 +74,7 @@ SMT_RESIST_DISPEL - check if it is used
 - unlearning talents does not remove buffes from you. (it does for me :P )
 - check is_flags place in spellentry structure.Maybe we should place it elsewhere ?(193)
 - make aurastates get checked on spellcast and remove them on a sucessfull cast
+blind + scatter shot = blocheaza mobii
 
 ==========================================================================
 Zack - test my shit :
@@ -90,6 +91,7 @@ Zack - test my shit :
 - priest - Force of Will - 18550 - what is the group type to increase here ?, all spells ?
 - blessing of light applies it's effect on holy shock ? and value gets wrong
 - palading spiritual atunement procs 2 times.And it should proc if others cast heal spell on paladin
+- mobs continue casting after they die. Test spell CancelSpellCast.Specially test this : CastSpellAoF
 
 ==========================================================================
 Capt - test my shit :
