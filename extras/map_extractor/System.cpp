@@ -85,13 +85,12 @@ void ExtractMapsFromMpq()
     char output_filename[50];
     map_id * map;
 	char mpq_filename[128];
-    printf("\nConverting Maps...\n\n");
+	printf("\nProcessing %u maps...\n\n", MapCount);
 
     for(uint32 i = 0; i < MapCount; ++i)
     {	
         map = &map_ids[i];
         printf("Converting maps for mapid %u [%s]...\n", map->id, map->name);
-        
         // Create the container file
         sprintf(output_filename, "maps\\Map_%u.bin", map->id);
         printf("  Creating output file %s.\n", output_filename);
@@ -198,17 +197,82 @@ void ExtractMapsFromMpq()
 
 int main(int argc, char * arg[])
 {
-    printf("antrix map extractor for versions 2.1.0 and above.. maybe :p\n");
+    printf("Ascent map extractor for versions 2.1.0 and above.. maybe :p\n");
     printf("============================================================\n\n");
-    
-//	const char* archiveNames[] = {"common.mpq", "enUS/locale-enUS.MPQ",0 };
-	const char* archiveNames[] = {"common.mpq", "enUS/locale-enUS.MPQ", "expansion.mpq", "enUS/expansion-locale-enUS.MPQ", "patch.MPQ", "enUS/patch-enUS.MPQ",0 };
-	for (size_t i=0; archiveNames[i] != 0; i++)
+
+	FILE * tf;
+	const char* localeNames[] = { "enUS", "enGB", "deDE", "frFR", "koKR", "zhCN", "zhTW", "esES", 0 };
+	int maxPatches = 3;
+	int locale = -1;
+	char tmp[100];
+
+	tf = fopen("Data/common.MPQ", "r");
+	if (!tf)
 	{
-        char tmp[100];
-		sprintf(tmp,"Data/%s",archiveNames[i]);
+		printf("Could not find Data/common.MPQ\n");
+		return 1;
+	}
+	fclose(tf);
+	new MPQArchive("Data/common.MPQ");
+
+	for( size_t i = 0; localeNames[i] != 0; i++ )
+	{
+		sprintf(tmp, "Data/%s/locale-%s.MPQ", localeNames[i], localeNames[i]);
+		tf = fopen(tmp, "r");
+		if (!tf)
+			continue;
+		fclose(tf);
+		locale = i;
 		new MPQArchive(tmp);
-    }
+	}
+
+	tf = fopen("Data/expansion.MPQ", "r");
+	if (tf)
+	{
+		fclose(tf);
+		new MPQArchive("Data/expansion.MPQ");
+		if ( -1 != locale )
+		{
+			sprintf(tmp, "Data/%s/expansion-locale-%s.MPQ", localeNames[locale], localeNames[locale]);
+			new MPQArchive(tmp);
+		}
+	}
+
+	tf = fopen("Data/patch.MPQ", "r");
+	if (tf)
+	{
+		fclose(tf);
+		new MPQArchive("Data/patch.MPQ");
+		for(int i = 2; i <= maxPatches; i++)
+		{
+			sprintf(tmp, "Data/patch-%d.MPQ", i);
+			tf = fopen(tmp, "r");
+			if (!tf)
+				continue;
+			fclose(tf);
+			new MPQArchive(tmp);
+		}
+		if ( -1 != locale )
+		{
+			sprintf(tmp, "Data/%s/patch-%s.MPQ", localeNames[locale], localeNames[locale]);
+			tf = fopen(tmp, "r");
+			if (tf)
+			{
+				fclose(tf);
+				new MPQArchive(tmp);
+				for(int i = 2; i <= maxPatches; i++)
+				{
+					sprintf(tmp, "Data/%s/patch-%s-%d.MPQ", localeNames[locale], localeNames[locale], i);
+					tf = fopen(tmp, "r");
+					if (!tf)
+						continue;
+					fclose(tf);
+					new MPQArchive(tmp);
+				}
+			}
+		}
+	}
+
 	//map.dbc
 	DBCFile * dbc= new DBCFile("DBFilesClient\\Map.dbc");
 	dbc->open();
@@ -222,6 +286,7 @@ int main(int argc, char * arg[])
 	}
 	delete dbc;
 
+	CreateDirectory("maps", NULL);
 	ExtractMapsFromMpq();
 	delete [] map_ids;
 

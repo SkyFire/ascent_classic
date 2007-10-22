@@ -46,7 +46,7 @@ MPQFile::MPQFile(const char* filename):
 	pointer(0),
 	size(0)
 {
-	for(ArchiveSet::iterator i=gOpenArchives.begin(); i!=gOpenArchives.end();++i)
+	for(ArchiveSet::reverse_iterator i=gOpenArchives.rbegin(); i!=gOpenArchives.rend();++i)
 	{
 		mpq_archive &mpq_a = (*i)->mpq_a;
 		
