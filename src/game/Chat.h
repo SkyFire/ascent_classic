@@ -336,6 +336,7 @@ protected:
 	bool HandleMonsterSayCommand(const char* args, WorldSession *m_session);
 	bool HandleMonsterYellCommand(const char* args, WorldSession* m_session);
 	bool HandleNpcComeCommand(const char* args, WorldSession* m_session);
+	bool HandleClearCooldownsCommand(const char* args, WorldSession *m_session);
 	bool HandleBattlegroundCommand(const char* args, WorldSession *m_session);
 	bool HandleSetWorldStateCommand(const char* args, WorldSession *m_session);
 	bool HandlePlaySoundCommand(const char* args, WorldSession *m_session);
