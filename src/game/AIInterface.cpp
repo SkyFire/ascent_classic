@@ -90,7 +90,7 @@ AIInterface::AIInterface()
 	m_AIState_backup = m_AIState;
 	UnitToFollow_backup = NULL;
 	m_isGuard = false;
-//	m_fastMove = false;
+	castingspell = NULL;
 }
 
 void AIInterface::Init(Unit *un, AIType at, MovementType mt)
