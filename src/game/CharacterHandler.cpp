@@ -73,6 +73,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 		uint64 guid;
 		uint8 Class;
 		uint32 bytes2;
+		uint32 flags;
 		Field *fields;
 		do
 		{
@@ -80,6 +81,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			guid = fields[0].GetUInt32();
 			bytes2 = fields[6].GetUInt32();
 			Class = fields[3].GetUInt8();			
+			flags = fields[18].GetUInt32();
 
 			/* build character enum, w0000t :p */
 			data << fields[0].GetUInt64();		// guid
@@ -141,9 +143,12 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 					proto = ItemPrototypeStorage.LookupEntry(res->Fetch()[1].GetUInt32());
 					if(proto)
 					{
+						// slot0 = head, slot14 = cloak
 						slot = res->Fetch()[0].GetUInt32();
-						items[slot].displayid = proto->DisplayInfoID;
-						items[slot].invtype = proto->InventoryType;
+						if(!(slot == 0 && (flags & (uint32)PLAYER_FLAG_NOHELM) != 0) && !(slot == 14 && (flags & (uint32)PLAYER_FLAG_NOCLOAK) != 0)) {
+							items[slot].displayid = proto->DisplayInfoID;
+							items[slot].invtype = proto->InventoryType;
+						}
 					}
 				} while(res->NextRow());
 				delete res;
@@ -166,7 +171,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 {	
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::CharacterEnumProc, GetAccountId()) );
-	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
+	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
 	CharacterDatabase.QueueAsyncQuery(q);
 }
 
