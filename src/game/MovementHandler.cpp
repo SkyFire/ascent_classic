@@ -97,8 +97,11 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 
 		if(GetPlayer()->GetSummon() != NULL)		// move pet too
 			GetPlayer()->GetSummon()->SetPosition((GetPlayer()->GetPositionX() + 2), (GetPlayer()->GetPositionY() + 2), GetPlayer()->GetPositionZ(), float(M_PI));
-		_player->m_position = _player->m_sentTeleportPosition;
-		_player->m_sentTeleportPosition.ChangeCoords(999999.0f,999999.0f,999999.0f);
+		if(_player->m_sentTeleportPosition.x != 999999.0f)
+		{
+			_player->m_position = _player->m_sentTeleportPosition;
+			_player->m_sentTeleportPosition.ChangeCoords(999999.0f,999999.0f,999999.0f);
+		}
 	}
 
 }
