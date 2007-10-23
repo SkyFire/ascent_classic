@@ -204,37 +204,39 @@ void DayWatcherThread::update_arena()
 						continue;		// no change
 					else if(X > 510.0 && X <= 1500.0)		// "if 510 < X <= 1500"
 					{
-						Y = (0.38 * X) - 194.0;
+						Y = (0.22 * X) + 14.0;
 					}
 					else			// "if X > 1500"
 					{
-						// how nice of wowwiki. they prevent a divide by zero for us.
-						//              1426.79
+						// http://eu.wowarmory.com/arena-calculator.xml
+						//              1511.26
 						//   ---------------------------
-						//                 -0.00386405X
-						//         1+918.836
+						//                   -0.00412*X
+						//    1+1639.28*2.71828
 
-						long double power = ((-0.00386405) * X);
+						long double power = ((-0.00412) * X);
 						//if(power < 1.0)
 						//	power = 1.0;
 
-						long double divisor = pow(((long double)(918.836)), power);						
+						long double divisor = pow(((long double)(2.71828)), power);						
+						divisor *= 1639.28;
 						divisor += 1.0;
 						//if(divisor < 1.0)
 						//	divisor = 1.0;
 
-						Y = 1426.79 / divisor;
+						Y = 1511.26 / divisor;
 					}
 
 					// 2v2 teams only earn 70% (Was 60% until 13th March 07) of the arena points, 3v3 teams get 80%, while 5v5 teams get 100% of the arena points.
+					// 2v2 - 76%, 3v3 - 88% as of patch 2.2
 					if(team->m_type == ARENA_TEAM_TYPE_2V2)
 					{
-						Y *= 0.70;
+						Y *= 0.76;
 						Y *= sWorld.getRate(RATE_ARENAPOINTMULTIPLIER2X);
 					}
 					else if(team->m_type == ARENA_TEAM_TYPE_3V3)
 					{
-						Y *= 0.80;
+						Y *= 0.88;
 						Y *= sWorld.getRate(RATE_ARENAPOINTMULTIPLIER3X);
 					}
 					else
@@ -334,4 +336,5 @@ void DayWatcherThread::update_honor()
 	dupe_tm_pointer(localtime(&last_honor_time), &local_last_honor_time);
 	m_dirty = true;
 }
+
 
