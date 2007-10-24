@@ -119,8 +119,8 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 
 	} else {
 		SetUInt32Value(UNIT_FIELD_BYTES_0, 2048 | (0 << 24));
-		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, created_from_creature->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
-		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, created_from_creature->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01));
+		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 2000);
+		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, 2000); // Supalosa: 2.00 normalised attack speed
 		SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, created_from_creature->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS));
 		SetFloatValue(UNIT_FIELD_COMBATREACH, created_from_creature->GetFloatValue(UNIT_FIELD_COMBATREACH));
 
@@ -1324,7 +1324,8 @@ void Pet::ApplyPetLevelAbilities()
 	// Calculate HP
 	double pet_hp	= ( ( ( 0.6 * dlevel * dlevel + 10.6 * dlevel + 33 ) + ( pet_sta_bonus * 10 ) ) * pet_mod_sta);
 	double pet_armor = ( ( -75 + 50 * dlevel ) * pet_mod_arm + pet_arm_bonus );
-	double pet_attack_power = ( ( ( 20 * dlevel) - 60 ) + pet_ap_bonus ) * pet_mod_dps;
+//	double pet_attack_power = ( ( ( 20 * dlevel) - 60 ) + pet_ap_bonus ) * pet_mod_dps;
+	double pet_attack_power = ( ( 7.9 * ( ( dlevel * dlevel ) / ( dlevel * 3 ) ) ) + ( pet_ap_bonus ) ) * pet_mod_dps;
 
 	if(pet_attack_power <= 0.0f) pet_attack_power = 1;
 	if(pet_armor <= 0.0f) pet_armor = 1;
