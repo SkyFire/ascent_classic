@@ -417,7 +417,7 @@ void CConsole::SaveallPlayers(char *str)
 
 void CConsole::ReloadGMScripts(char * str)
 {
-	ScriptSystem->Reload();
+	//ScriptSystem->Reload();
 }
 
 static char ConsoleBuffer[65536];

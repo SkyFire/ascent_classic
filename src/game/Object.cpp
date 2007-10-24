@@ -1794,7 +1794,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if(this->IsUnit())
 		{
 			CALL_SCRIPT_EVENT(this, OnTargetDied)(pVictim);
-			ScriptSystem->OnCreatureEvent(((Creature*)this), pVictim, CREATURE_EVENT_ON_KILLED_TARGET);
+			//ScriptSystem->OnCreatureEvent(((Creature*)this), pVictim, CREATURE_EVENT_ON_KILLED_TARGET);
 
 			((Unit*)this)->smsg_AttackStop(pVictim);
 		

@@ -284,7 +284,7 @@
 			<File
 				RelativePath="..\..\src\game\Level3.cpp">
 			</File>
- 			<File
+			<File
 				RelativePath="..\..\src\game\QuestCommands.cpp">
 			</File>
 			<File
@@ -302,21 +302,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\MapScriptInterface.h">
-			</File>
-			<File
-				RelativePath="..\..\src\scriptengine\ScriptEngine.cpp">
-			</File>
-			<File
-				RelativePath="..\..\src\scriptengine\ScriptEngine.h">
-			</File>
-			<File
-				RelativePath="..\..\src\scriptengine\ScriptFunctions.cpp">
-			</File>
-			<File
-				RelativePath="..\..\src\scriptengine\ScriptFunctions.h">
-			</File>
-			<File
-				RelativePath="..\..\src\scriptengine\ScriptFunctionTable.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\game\ScriptMgr.cpp">

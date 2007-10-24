@@ -320,8 +320,8 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 		}
 	}	
 	
-	if(qst_giver->GetTypeId() == TYPEID_UNIT && !ScriptSystem->OnQuestRequireEvent(qst, ((Creature*)qst_giver), _player, QUEST_EVENT_CAN_ACCEPT))
-		return;
+/*	if(qst_giver->GetTypeId() == TYPEID_UNIT && !ScriptSystem->OnQuestRequireEvent(qst, ((Creature*)qst_giver), _player, QUEST_EVENT_CAN_ACCEPT))
+		return;*/
 
 	QuestLogEntry *qle = new QuestLogEntry();
 	qle->Init(qst, _player, log_slot);
@@ -365,7 +365,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	if(qst->count_required_item || qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)	// gameobject quests deactivate
 		GetPlayer()->UpdateNearbyGameObjects();
 
-	ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), _player, QUEST_EVENT_ON_ACCEPT);
+	//ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), _player, QUEST_EVENT_ON_ACCEPT);
 	
 	sLog.outDebug("WORLD: Added new QLE.");
 	sHookInterface.OnQuestAccept(_player, qst);

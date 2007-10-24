@@ -63,13 +63,13 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 		AreaTrigger tmpTrigger;
 		tmpTrigger.AreaTriggerID = id;
 
-		ScriptSystem->OnActivateAreaTrigger(&tmpTrigger, _player);
+		//ScriptSystem->OnActivateAreaTrigger(&tmpTrigger, _player);
 		return;
 	}
 
 	/* script prerequsites */
-	if(ScriptSystem->OnActivateAreaTrigger(pAreaTrigger, _player) == false)
-		return;
+/*	if(ScriptSystem->OnActivateAreaTrigger(pAreaTrigger, _player) == false)
+		return;*/
 
 	if(pAreaTrigger->Type == ATTYPE_BATTLEGROUND)
 	{

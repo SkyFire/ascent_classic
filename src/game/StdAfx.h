@@ -142,9 +142,6 @@
 #include "../ascent/MainServerDefines.h"
 #include "WorldRunnable.h"
 
-#include "../scriptengine/ScriptEngine.h"
-#include "../scriptengine/ScriptFunctions.h"
-
 #include "../shared/Storage.h"
 #include "ObjectStorage.h"
 #include "DatabaseCleaner.h"

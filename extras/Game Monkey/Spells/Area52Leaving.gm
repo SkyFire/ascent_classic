@@ -1,9 +1,0 @@
-global Area52Neuralizer = function(plr)
-{
-	plr.CastSpell(34400);	// A52 Neuralizer
-};
-
-this.RegisterAreaTriggerEvent(4422, Area52Neuralizer);
-this.RegisterAreaTriggerEvent(4466, Area52Neuralizer);
-this.RegisterAreaTriggerEvent(4471, Area52Neuralizer);
-this.RegisterAreaTriggerEvent(4472, Area52Neuralizer);

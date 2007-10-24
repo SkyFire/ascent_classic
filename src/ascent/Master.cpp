@@ -259,8 +259,8 @@ bool Master::Run(int argc, char ** argv)
 	Log.Line();
 	sLog.outString("");
 
-	ScriptSystem = new ScriptEngine;
-	ScriptSystem->Reload();
+	//ScriptSystem = new ScriptEngine;
+	//ScriptSystem->Reload();
 
 	new EventMgr;
 	new World;
@@ -497,7 +497,7 @@ bool Master::Run(int argc, char ** argv)
 	delete VoiceChatHandler::getSingletonPtr();
 
 	sLog.outString("Deleting Script Engine...");
-	delete ScriptSystem;
+	//delete ScriptSystem;
 
 	delete GMCommand_Log;
 	delete Anticheat_Log;

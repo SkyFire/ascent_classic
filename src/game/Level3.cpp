@@ -2745,7 +2745,7 @@ bool ChatHandler::HandleReloadAccountsCommand(const char * args, WorldSession * 
 bool ChatHandler::HandleReloadScriptsCommand(const char * args, WorldSession * m_session)
 {
 	BlueSystemMessage(m_session, "Reloading scripts...");
-	ScriptSystem->Reload();
+	//ScriptSystem->Reload();
 	return true;
 }
 
@@ -3230,11 +3230,11 @@ bool ChatHandler::HandleCreateArenaTeamCommands(const char * args, WorldSession 
 
 bool ChatHandler::HandleGMCallCommand(const char * args, WorldSession * m_session)
 {
-	Player * plr = getSelectedChar(m_session);
+	/*Player * plr = getSelectedChar(m_session);
 	if(!plr) return true;
 	if(ScriptSystem->CallGMFunction(args, plr))
 		SystemMessage(m_session, "Call succeeded.");
 	else
-		SystemMessage(m_session, "Call failed.");
+		SystemMessage(m_session, "Call failed.");*/
 	return true;
 }

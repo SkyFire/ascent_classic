@@ -794,7 +794,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
     BuildQuestComplete(plr, qst);
     if(!qst->is_repeatable) CALL_QUESTSCRIPT_EVENT(qle, OnQuestComplete)(plr);
 
-	ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), plr, QUEST_EVENT_ON_COMPLETE);
+	//ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), plr, QUEST_EVENT_ON_COMPLETE);
 	if(!qst->is_repeatable) qle->Finish();
 	
 	if(qst_giver->GetTypeId() == TYPEID_UNIT)
