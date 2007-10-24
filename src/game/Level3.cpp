@@ -2590,7 +2590,7 @@ bool ChatHandler::HandleForceRenameCommand(const char * args, WorldSession * m_s
 		BlueSystemMessageToPlr(plr, "%s forced your character to be renamed next logon.", m_session->GetPlayer()->GetName());
 	}
 
-	WorldDatabase.Execute("INSERT INTO banned_names ('%s')", pi->name.c_str());
+	WorldDatabase.Execute("INSERT INTO banned_names ('%s')", pi->name);
 
 	GreenSystemMessage(m_session, "Forcing %s to rename his character next logon.", args);
 	return true;
@@ -3171,7 +3171,7 @@ bool ChatHandler::HandleGuildMembersCommand(const char* args, WorldSession *m_se
 	for (i = pGuild->Begin(); i != pGuild->End();++i) 
 	{
 		Counter++;
-		GreenSystemMessage(m_session, "%u: %s (Rank: %u,%s)",Counter, (*i)->name.c_str(),(*i)->Rank,pGuild->GetRankName((*i)->Rank).c_str());
+		GreenSystemMessage(m_session, "%u: %s (Rank: %u,%s)",Counter, (*i)->name,(*i)->Rank,pGuild->GetRankName((*i)->Rank).c_str());
 	}
 
 	return true;

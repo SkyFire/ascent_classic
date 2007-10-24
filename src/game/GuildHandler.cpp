@@ -584,7 +584,7 @@ void WorldSession::HandleGuildLeader(WorldPacket & recv_data)
 	data << (uint8)GUILD_EVENT_LEADER_CHANGED;
 	data << (uint8)2;
 	data << pLeader->GetName();
-	data << pGuildMember->name.c_str();
+	data << pGuildMember->name;
 	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
 
 	/*
@@ -995,7 +995,7 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 		{
 			// Create the item and charter
 			Item * i = objmgr.CreateItem(item_ids[arena_type], _player);
-			Charter * c = objmgr.CreateCharter(_player->GetGUID(), (CharterTypes)arena_index);
+			Charter * c = objmgr.CreateCharter(_player->GetGUIDLow(), (CharterTypes)arena_index);
 			c->GuildName = name;
 			c->ItemGuid = i->GetGUID();
 
@@ -1054,7 +1054,7 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 
 			// Create the item and charter
 			Item * i = objmgr.CreateItem(ITEM_ENTRY_GUILD_CHARTER, _player);
-			c = objmgr.CreateCharter(_player->GetGUID(), CHARTER_TYPE_GUILD);
+			c = objmgr.CreateCharter(_player->GetGUIDLow(), CHARTER_TYPE_GUILD);
 			c->GuildName = name;
 			c->ItemGuid = i->GetGUID();
 
@@ -1237,7 +1237,7 @@ void WorldSession::HandleCharterSign( WorldPacket & recv_data )
 	if(c->IsFull())
 		return;
 
-	c->AddSignature(_player->GetGUID());
+	c->AddSignature(_player->GetGUIDLow());
 	c->SaveToDB();
 	_player->m_charters[c->CharterType] = c;
 	_player->SaveToDB(false);

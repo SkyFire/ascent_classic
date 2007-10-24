@@ -30,12 +30,12 @@ void WorldSession::HandleNameQueryOpcode( WorldPacket & recv_data )
 
 	recv_data >> guid;
 
-	PlayerInfo *pn = objmgr.GetPlayerInfo( guid );
+	PlayerInfo *pn = objmgr.GetPlayerInfo( (uint32)guid );
 
 	if(!pn)
 		return;
 
-	sLog.outDebug( "Received CMSG_NAME_QUERY for: %s", pn->name.c_str() );
+	sLog.outDebug( "Received CMSG_NAME_QUERY for: %s", pn->name );
 
 	data.Initialize( SMSG_NAME_QUERY_RESPONSE );
 

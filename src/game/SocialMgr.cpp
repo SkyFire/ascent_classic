@@ -149,7 +149,7 @@ void SocialMgr::AddFriend(Player* plr, std::string friendName)
 
 	WorldPacket data( SMSG_FRIEND_STATUS, 22 );
 
-	PlayerInfo* playerInfo = objmgr.GetPlayerInfo(plr->GetGUID());
+	PlayerInfo* playerInfo = objmgr.GetPlayerInfo(plr->GetGUIDLow());
 	PlayerInfo* friendInfo = objmgr.GetPlayerInfoByName(friendName);
 
 	if(playerInfo == NULL)
@@ -192,7 +192,7 @@ void SocialMgr::AddFriend(Player* plr, std::string friendName)
 		return;
 	}
 
-	sLog.outDebug("SocialMgr: %s added %s to his friendlist", playerInfo->name.c_str(), friendInfo->name.c_str());
+	sLog.outDebug("SocialMgr: %s added %s to his friendlist", playerInfo->name, friendInfo->name);
 
 	if ( pFriend )
 	{
@@ -222,7 +222,7 @@ void SocialMgr::AddIgnore(Player* plr, std::string ignoreName)
 
 	WorldPacket data( SMSG_FRIEND_STATUS, 10 );
 
-	PlayerInfo* playerInfo = objmgr.GetPlayerInfo(plr->GetGUID());
+	PlayerInfo* playerInfo = objmgr.GetPlayerInfo(plr->GetGUIDLow());
 	PlayerInfo* ignoreInfo = objmgr.GetPlayerInfoByName(ignoreName);
 	if (!ignoreInfo)
 	{
@@ -257,7 +257,7 @@ void SocialMgr::AddIgnore(Player* plr, std::string ignoreName)
 		return;
 	}
 
-	sLog.outDebug("SocialMgr: %s added %s to his ignorelist", plr->GetName(), ignoreInfo->name.c_str());
+	sLog.outDebug("SocialMgr: %s added %s to his ignorelist", plr->GetName(), ignoreInfo->name);
 
 	data << (uint8)FRIEND_IGNORE_ADDED << (uint64)iGuid;
 

@@ -151,7 +151,7 @@ OUTPACKET_RESULT WorldSocket::_OutPacket(uint16 opcode, size_t len, const void* 
 	}
 
 	// Packet logger :)
-	sWorldLog.LogPacket(len, opcode, (const uint8*)data, 1);
+	sWorldLog.LogPacket((uint32)len, opcode, (const uint8*)data, 1);
 
 	// Encrypt the packet
 	// First, create the header.
@@ -161,7 +161,7 @@ OUTPACKET_RESULT WorldSocket::_OutPacket(uint16 opcode, size_t len, const void* 
 	Header.cmd = swap16(opcode);
 #else
 	Header.cmd = opcode;
-	Header.size = ntohs(len + 2);
+	Header.size = ntohs((uint16)len + 2);
 #endif
     _crypt.EncryptFourSend((uint8*)&Header);
 
@@ -171,7 +171,7 @@ OUTPACKET_RESULT WorldSocket::_OutPacket(uint16 opcode, size_t len, const void* 
 	// Pass the rest of the packet to our send buffer (if there is any)
 	if(len > 0 && rv)
 	{
-		rv = BurstSend((const uint8*)data, len);
+		rv = BurstSend((const uint8*)data, (uint32)len);
 	}
 
 	if(rv) BurstPush();
@@ -299,7 +299,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	mSession->SetClientBuild(mClientBuild);
 	mSession->LoadSecurity(GMFlags);
 	mSession->SetAccountFlags(AccountFlags);
-	mSession->m_lastPing = UNIXTIME;
+	mSession->m_lastPing = (uint32)UNIXTIME;
 
 	for(uint32 i = 0; i < 8; ++i)
 		mSession->SetAccountData(i, NULL, true, 0);
@@ -338,7 +338,7 @@ void WorldSocket::Authenticate()
 	else
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x00");
 
-	sAddonMgr.SendAddonInfoPacket(pAuthenticationPacket, pAuthenticationPacket->rpos(), mSession);
+	sAddonMgr.SendAddonInfoPacket(pAuthenticationPacket, (uint32)pAuthenticationPacket->rpos(), mSession);
 	mSession->_latency = _latency;
 
 	delete pAuthenticationPacket;
@@ -383,7 +383,7 @@ void WorldSocket::_HandlePing(WorldPacket* recvPacket)
 	if(mSession)
 	{
 		mSession->_latency = _latency;
-		mSession->m_lastPing = UNIXTIME;
+		mSession->m_lastPing = (uint32)UNIXTIME;
 
 		// reset the move time diff calculator, don't worry it will be re-calculated next movement packet.
 		mSession->m_clientTimeDelay = 0;

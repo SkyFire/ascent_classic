@@ -203,7 +203,14 @@ ObjectMgr::~ObjectMgr()
 	}
 
 	for(HM_NAMESPACE::hash_map<uint32, PlayerInfo*>::iterator itr = m_playersinfo.begin(); itr != m_playersinfo.end(); ++itr)
+	{
+		if(itr->second->publicNote)
+			free(itr->second->publicNote);
+		if(itr->second->officerNote)
+			free(itr->second->officerNote);
+		free(itr->second->name);
 		delete itr->second;
+	}
 }
 
 //
@@ -253,6 +260,12 @@ void ObjectMgr::DeletePlayerInfo( uint32 guid )
 		if(pl->m_Group)
 			pl->m_Group->RemovePlayer(pl,NULL,true);
 
+		if(pl->officerNote)
+			free(pl->officerNote);
+		if(pl->publicNote)
+			free(pl->publicNote);
+
+		free(pl->name);
 		delete i->second;
 		m_playersinfo.erase(i);
 	}
@@ -311,16 +324,22 @@ void ObjectMgr::LoadPlayersInfo()
 		{
 			Field *fields = result->Fetch();
 			pn=new PlayerInfo;
-			pn->guid = fields[0].GetUInt64();
-			pn->name = fields[1].GetString();
+			pn->guid = fields[0].GetUInt32();
+			pn->name = strdup(fields[1].GetString());
 			pn->race = fields[2].GetUInt8();
 			pn->cl = fields[3].GetUInt8();
 			pn->lastLevel = fields[4].GetUInt32();
 			pn->gender = fields[5].GetUInt8();
 			pn->lastZone=fields[6].GetUInt32();
 			pn->lastOnline=fields[7].GetUInt32();
-			pn->publicNote=fields[8].GetString();
-			pn->officerNote= fields[9].GetString();
+			//pn->publicNote=fields[8].GetString();
+			//pn->officerNote= fields[9].GetString();
+			pn->publicNote=pn->officerNote=NULL;
+			if(strlen(fields[8].GetString()) > 1)
+				pn->publicNote = strdup(fields[8].GetString());
+			if(strlen(fields[9].GetString()) > 1)
+				pn->officerNote = strdup(fields[9].GetString());
+
 			pn->Rank=fields[10].GetUInt32();
 			pn->acct = fields[11].GetUInt32();
 			pn->m_Group=0;
@@ -349,7 +368,7 @@ PlayerInfo* ObjectMgr::GetPlayerInfoByName(std::string &name)
 	PlayerInfo * rv = 0;
 	playernamelock.AcquireReadLock();
 	for(i=m_playersinfo.begin();i!=m_playersinfo.end();i++)
-		if(!stricmp(i->second->name.c_str(),name.c_str()))
+		if(!stricmp(i->second->name,name.c_str()))
 		{
 			rv = i->second;
 			break;
@@ -509,7 +528,7 @@ void ObjectMgr::LoadGuilds()
 		{
 			do
 			{
-				PlayerInfo *pi=objmgr.GetPlayerInfo(result2->Fetch()->GetUInt64());
+				PlayerInfo *pi=objmgr.GetPlayerInfo(result2->Fetch()->GetUInt32());
 				if(pi)
 				pGuild->AddGuildMember( pi );
 			}while( result2->NextRow() );
@@ -1186,13 +1205,13 @@ Item * ObjectMgr::LoadItem(uint64 guid)
 
 		if(pProto->InventoryType == INVTYPE_BAG)
 		{
-			Container * pContainer = new Container(HIGHGUID_CONTAINER,guid);
+			Container * pContainer = new Container(HIGHGUID_CONTAINER,(uint32)guid);
 			pContainer->LoadFromDB(result->Fetch());
 			pReturn = pContainer;
 		}
 		else
 		{
-			Item * pItem = new Item(HIGHGUID_ITEM,guid);
+			Item * pItem = new Item(HIGHGUID_ITEM,(uint32)guid);
 			pItem->LoadFromDB(result->Fetch(), 0, false);
 			pReturn = pItem;
 		}
@@ -1247,7 +1266,7 @@ void ObjectMgr::CorpseAddEventDespawn(Corpse *pCorpse)
 
 void ObjectMgr::DespawnCorpse(uint64 Guid)
 {
-	Corpse * pCorpse = objmgr.GetCorpse(Guid);
+	Corpse * pCorpse = objmgr.GetCorpse((uint32)Guid);
 	if(pCorpse == 0)	// Already Deleted
 		return;
 	

@@ -469,9 +469,9 @@ struct FactionReputation
 };
 struct PlayerInfo
 {
-	uint64 guid;
+	uint32 guid;
 	uint32 acct;
-	std::string name;
+	char * name;
 	uint32 race;
 	uint32 gender;
 	uint32 cl;
@@ -479,8 +479,8 @@ struct PlayerInfo
 	
 	//guild stuff
 	uint32 Rank;//guild rank
-	std::string publicNote;
-	std::string officerNote;
+	char * publicNote;
+	char * officerNote;
 	time_t lastOnline;
 	uint32 lastZone;
 	uint32 lastLevel;

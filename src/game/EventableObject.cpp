@@ -376,7 +376,7 @@ uint32 EventableObject::event_GetEventPeriod(uint32 EventType)
 	m_lock.Acquire();
 	EventMap::iterator itr = m_events.find(EventType);
 	if(itr != m_events.end())
-		ret = itr->second->msTime;
+		ret = (uint32)itr->second->msTime;
 	
 	m_lock.Release();
 	return ret;

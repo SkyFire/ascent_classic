@@ -75,12 +75,12 @@ void Guild::GuildMemberLogoff(Player *pMember)
 
 void Guild::AddNewGuildMember(Player *plyr)
 {
-	PlayerInfo *gMember=objmgr.GetPlayerInfo(plyr->GetGUID());
+	PlayerInfo *gMember=objmgr.GetPlayerInfo(plyr->GetGUIDLow());
 	gMember->Rank = plyr->GetGuildRank();
 	gMember->lastLevel =plyr->getLevel();
 	gMember->lastZone =plyr->GetZoneId();
-	gMember->publicNote = "";
-	gMember->officerNote = "";
+	gMember->publicNote = NULL;
+	gMember->officerNote = NULL;
 	gMember->lastOnline = UNIXTIME;
 
 	AddGuildMember(gMember);
@@ -108,7 +108,7 @@ bool Guild::DeleteGuildMember(string name)
 	std::list<PlayerInfo*>::iterator i;
 	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
 	{
-		if (!strcmp((*i)->name.c_str(), name.c_str()))
+		if (!strcmp((*i)->name, name.c_str()))
 		{
 			m_guildMembers.erase(i);
 			CharacterDatabase.Execute("UPDATE characters SET guildid=0,guildRank=0 WHERE name='%s' AND guildid=%u",CharacterDatabase.EscapeString(name).c_str(), m_guildId);
@@ -256,7 +256,10 @@ void Guild::SetPublicNote(uint64 guid, std::string publicNote)
 	{
 		if ((*i)->guid == guid)
 		{
-			(*i)->publicNote = publicNote;
+			if((*i)->publicNote)
+				free((*i)->publicNote);
+
+			(*i)->publicNote = strdup(publicNote.c_str());
 			break;
 		}
 	}
@@ -269,7 +272,10 @@ void Guild::SetOfficerNote(uint64 guid, std::string officerNote)
 	{
 		if ((*i)->guid == guid)
 		{
-			(*i)->officerNote = officerNote;
+			if((*i)->officerNote)
+				free((*i)->officerNote);
+
+			(*i)->officerNote = strdup(officerNote.c_str());
 			break;
 		}
 	}

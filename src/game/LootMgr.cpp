@@ -293,7 +293,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 	if(last_entry != 0 && ttab.size())
 		db_cache.push_back( make_pair( last_entry, ttab) );
 	pos = 0;
-	total = db_cache.size();
+	total = (uint32)db_cache.size();
 	ItemPrototype* proto;
 	uint32 itemid;
 

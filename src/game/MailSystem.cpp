@@ -230,7 +230,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	}
 
 	// Instant delivery time by default.
-	msg.delivery_time = UNIXTIME;
+	msg.delivery_time = (uint32)UNIXTIME;
 
 	// Set up the cost
 	int32 cost = 0;
@@ -273,7 +273,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 		if(GetPermissionCount() > 0)
 		{
 			/* log the message */
-			sGMLog.writefromsession(this, "sent mail with item entry %u to %s, with gold %u.", attached_item->GetEntry(), player->name.c_str(), msg.money);
+			sGMLog.writefromsession(this, "sent mail with item entry %u to %s, with gold %u.", attached_item->GetEntry(), player->name, msg.money);
 		}
 
 		// Delete from memory now, its not needed anymore.
@@ -297,7 +297,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	
 	// 30 day expiry time for unread mail mail
 	if(!sMailSystem.MailOption(MAIL_FLAG_NO_EXPIRY))
-		msg.expire_time = UNIXTIME + (TIME_DAY * 30);
+		msg.expire_time = (uint32)UNIXTIME + (TIME_DAY * 30);
 	else
 		msg.expire_time = 0;
 
@@ -327,7 +327,7 @@ void WorldSession::HandleMarkAsRead(WorldPacket & recv_data )
 
 	// mail now has a 3 day expiry time
 	if(!sMailSystem.MailOption(MAIL_FLAG_NO_EXPIRY))
-		message->expire_time = UNIXTIME + (TIME_DAY * 3);
+		message->expire_time = (uint32)UNIXTIME + (TIME_DAY * 3);
 
 	// update it in sql
 	CharacterDatabase.Execute("UPDATE mailbox SET read_flag = 1, expiry_time = %u WHERE message_id = %u", message->message_id, message->expire_time);
@@ -529,7 +529,7 @@ void WorldSession::HandleReturnToSender(WorldPacket & recv_data )
 	message.cod = 0;
 
 	// assign new delivery time
-	message.delivery_time = message.attached_item_guid ? UNIXTIME + 3600 : UNIXTIME;
+	message.delivery_time = message.attached_item_guid ? (uint32)UNIXTIME + 3600 : (uint32)UNIXTIME;
 
 	// add to the senders mailbox
 	sMailSystem.DeliverMessage(message.player_guid, &message);
@@ -659,7 +659,7 @@ void MailSystem::SendAutomatedMessage(uint32 type, uint64 sender, uint64 receive
 	msg.cod = cod;
 	msg.attached_item_guid = item_guid;
 	msg.stationary = stationary;
-	msg.delivery_time = UNIXTIME;
+	msg.delivery_time = (uint32)UNIXTIME;
 	msg.expire_time = 0;
 	msg.read_flag = false;
 	msg.copy_made = false;

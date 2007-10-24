@@ -267,7 +267,7 @@ void ArenaTeam::SetLeader(PlayerInfo * info)
 	uint32 old_leader = m_leader;
 	char buffer[1024];
 	WorldPacket * data;
-	snprintf(buffer, 1024,"%s is now the captain of the arena team, '%s'.", info->name.c_str(), m_name.c_str());
+	snprintf(buffer, 1024,"%s is now the captain of the arena team, '%s'.", info->name, m_name.c_str());
 	data = sChatHandler.FillSystemMessageData(buffer);
 	m_leader=info->guid;
     SendPacket(data);
@@ -432,11 +432,11 @@ void WorldSession::HandleArenaTeamRemoveMemberOpcode(WorldPacket & recv_data)
 	{
 		char buffer[1024];
 		WorldPacket * data;
-		snprintf(buffer,1024,"%s was removed from the arena team, '%s'.", inf->name.c_str(), team->m_name.c_str());
+		snprintf(buffer,1024,"%s was removed from the arena team, '%s'.", inf->name, team->m_name.c_str());
 		data = sChatHandler.FillSystemMessageData(buffer);
 		team->SendPacket(data);
 		delete data;
-		SystemMessage("Removed %s from the arena team, '%s'.", inf->name.c_str(), team->m_name.c_str());
+		SystemMessage("Removed %s from the arena team, '%s'.", inf->name, team->m_name.c_str());
 	}
 }
 

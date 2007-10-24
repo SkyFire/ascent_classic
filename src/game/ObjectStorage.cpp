@@ -174,7 +174,7 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 				cooldown=Dur+Casttime+RecoveryTime;
 				if(cooldown<0)
 					sp->cooldown=0x00FFFFFF;//huge value that should not loop while adding some timestamp to it
-				else sp->cooldown=cooldown;
+				else sp->cooldown=float(cooldown);
 			}
 
 			/*

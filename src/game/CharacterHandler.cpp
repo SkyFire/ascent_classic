@@ -296,13 +296,13 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	pNewChar->SaveToDB(true);	
 
 	PlayerInfo *pn=new PlayerInfo ;
-	pn->guid = pNewChar->GetGUID();
-	pn->name = pNewChar->GetName();
+	pn->guid = pNewChar->GetGUIDLow();
+	pn->name = strdup(pNewChar->GetName());
 	pn->cl = pNewChar->getClass();
 	pn->race = pNewChar->getRace();
 	pn->gender = pNewChar->getGender();
-	pn->publicNote="";
-	pn->officerNote="";
+	pn->publicNote=NULL;
+	pn->officerNote=NULL;
 	pn->m_Group=0;
 	pn->subGroup=0;
 	pn->m_loggedInPlayer=NULL;
@@ -546,7 +546,8 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket & recv_data)
 	CapitalizeString(name);
 
 	// If we're here, the name is okay.
-	pi->name = name;
+	free(pi->name);
+	pi->name = strdup(name.c_str());
 	CharacterDatabase.WaitExecute("UPDATE characters SET name = '%s' WHERE guid = %u", name.c_str(), (uint32)guid);
 	CharacterDatabase.WaitExecute("UPDATE characters SET forced_rename_pending = 0 WHERE guid = %u", (uint32)guid);
 	
@@ -623,19 +624,19 @@ void WorldSession::FullLogin(Player * plr)
 		plr->SetUInt32Value(UNIT_FIELD_LEVEL,70);
 
 	// Make sure our name exists (for premade system)
-	PlayerInfo * info = objmgr.GetPlayerInfo(plr->GetGUID());
+	PlayerInfo * info = objmgr.GetPlayerInfo(plr->GetGUIDLow());
 	if(info == 0)
 	{
 		info = new PlayerInfo;
 		info->cl = plr->getClass();
 		info->gender = plr->getGender();
-		info->guid = plr->GetGUID();
-		info->name = plr->GetName();
+		info->guid = plr->GetGUIDLow();
+		info->name = strdup(plr->GetName());
 		info->lastLevel = plr->getLevel();
 		info->lastOnline = UNIXTIME;
 		info->lastZone = plr->GetZoneId();
-		info->officerNote = "";
-		info->publicNote = "";
+		info->officerNote = NULL;
+		info->publicNote = NULL;
 		info->race = plr->getRace();
 		info->Rank = plr->GetPVPRank();
 		info->team = plr->GetTeam();
@@ -919,7 +920,8 @@ bool ChatHandler::HandleRenameCommand(const char * args, WorldSession * m_sessio
 		return true;
 	}
 
-	pi->name = new_name;
+	free(pi->name);
+	pi->name = strdup(new_name.c_str());
 
 	// look in world for him
 	Player * plr = objmgr.GetPlayer(pi->guid);

@@ -405,7 +405,7 @@ void WorldSession::LoadSecurity(std::string securitystring)
 	for(uint32 i = 0; i < securitystring.length(); ++i)
 	{
 		char c = securitystring.at(i);
-		c = towlower(c);
+		c = tolower(c);
 		if(c == '4' || c == '3')
 			c = 'a';	// for the lazy people
 
@@ -425,7 +425,7 @@ void WorldSession::LoadSecurity(std::string securitystring)
 
 	permissions = new char[tmp.size()+1];
 	memset(permissions, 0, tmp.size()+1);
-	permissioncount = tmp.size();
+	permissioncount = (uint32)tmp.size();
 	int k = 0;
 	for(std::list<char>::iterator itr = tmp.begin(); itr != tmp.end(); ++itr)
 		permissions[k++] = (*itr);
@@ -898,7 +898,7 @@ void SessionLogWriter::writefromsession(WorldSession* session, const char* forma
 	time_t t = UNIXTIME;
 	tm* aTm = localtime(&t);
 	snprintf(out, 32768, "[%-4d-%02d-%02d %02d:%02d:%02d] ",aTm->tm_year+1900,aTm->tm_mon+1,aTm->tm_mday,aTm->tm_hour,aTm->tm_min,aTm->tm_sec);
-	int l = strlen(out);
+	size_t l = strlen(out);
 
 	snprintf(&out[l], 32768 - l, "Account %u [%s], IP %s, Player %s :: ", (unsigned int)session->GetAccountId(), session->GetAccountName().c_str(),
 		session->GetSocket() ? session->GetSocket()->GetRemoteIP().c_str() : "NOIP", 

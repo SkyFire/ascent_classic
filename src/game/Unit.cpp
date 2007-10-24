@@ -344,7 +344,7 @@ bool Unit::canReachWithAttack(Unit *pVictim)
 		return false;
 	float distance = sqrt(GetDistanceSq(pVictim));
 
-	float attackreach = (((targetradius*targetscale) + selfreach) + ((pow(selfradius,2)*selfscale)+1.50));
+	float attackreach = (((targetradius*targetscale) + selfreach) + (((selfradius*selfradius)*selfscale)+1.50f));
 	//formula adjustment for player side.
 	if(this->IsPlayer())
 	{
@@ -879,7 +879,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								//we have to recalc the value of this spell
 								SpellEntry *spellInfo = dbcSpell.LookupEntry(origId);
 								uint32 AP_owerride=GetAP() + spellInfo->EffectBasePoints[0]+1;
-								float dmg = static_cast<Player*>(this)->GetMainMeleeDamage(AP_owerride);
+								uint32 dmg = static_cast<Player*>(this)->GetMainMeleeDamage(AP_owerride);
 								SpellEntry *sp_for_the_logs = dbcSpell.LookupEntry(spellId);
 								Strike(victim,MELEE,sp_for_the_logs,dmg,0,0,true);
 								Strike(victim,MELEE,sp_for_the_logs,dmg,0,0,true);
