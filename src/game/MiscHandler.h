@@ -2,7 +2,7 @@
 #ifndef __MISCHANDLER_H
 #define __MISCHANDLER_H
 
-
+#pragma pack(push,1)
 struct GraveyardTeleport
 {
     uint32 ID;
@@ -15,6 +15,7 @@ struct GraveyardTeleport
 	uint32 MapId;
     uint32 FactionID;
 };
+#pragma pack(pop)
 
 #endif
 

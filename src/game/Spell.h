@@ -495,6 +495,7 @@ enum SpellTargetType
 #define SPELL_RANGED_THROW      2764
 #define SPELL_RANGED_WAND       5019
 
+#pragma pack(push,1)
 struct TeleportCoords
 {
     uint32 id;
@@ -503,6 +504,7 @@ struct TeleportCoords
     float y;
     float z;
 };
+#pragma pack(pop)
 
 struct TotemSpells
 {

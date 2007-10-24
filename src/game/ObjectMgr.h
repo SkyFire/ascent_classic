@@ -36,6 +36,7 @@ enum SpellSpecialType
 	STING   =5,
 };
 
+#pragma pack(push,1)
 struct SpellExtraInfo
 {
 	uint32 Id;
@@ -43,6 +44,8 @@ struct SpellExtraInfo
 	uint32 enchantableslots;
 	uint32 ExtraFlags;
 };
+
+#pragma pack(pop)
 
 struct GM_Ticket
 {
@@ -63,6 +66,7 @@ struct ThreatToSpellId
 	int32 mod;
 };
 
+#pragma pack(push,1)
 struct FishingZoneEntry
 {
 	uint32 ZoneID;
@@ -83,6 +87,7 @@ struct ItemPage
 	char * text;
 	uint32 next_page;
 };
+#pragma pack(pop)
 
 struct SpellReplacement
 {

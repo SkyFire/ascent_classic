@@ -36,7 +36,7 @@ struct CreatureItem
 SERVER_DECL bool Rand(float chance);
 SERVER_DECL bool Rand(uint32 chance);
 SERVER_DECL bool Rand(int32 chance);
-
+#pragma pack(push,1)
 struct CreatureInfo
 {
 	uint32 Id;
@@ -147,6 +147,7 @@ struct CreatureProto
 	set<uint32> start_auras;
 	list<AI_Spell*> spells;
 };
+#pragma pack(pop)
 
 struct Formation{
 	uint32 fol;

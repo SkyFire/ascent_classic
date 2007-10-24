@@ -62,10 +62,10 @@ void StartCrashHandler()
 	// handling crashes internally if we have a debugger attached, that would 
 	// just piss us off. :P
 
-	DWORD code;
-
 	// Check for a debugger.
 #ifndef X64
+	DWORD code;
+
 	__asm
 	{
 		MOV EAX, FS:[0x18]
@@ -85,7 +85,7 @@ void StartCrashHandler()
 		ON_CRASH_BREAK_DEBUGGER = false;
 	}
 #else
-	ON_CRASH_BREAK_DEBUGGER = IsDebuggerPresent();
+	ON_CRASH_BREAK_DEBUGGER = (IsDebuggerPresent() == TRUE) ? true : false;
 #endif
 }
 

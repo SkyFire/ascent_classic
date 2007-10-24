@@ -45,6 +45,7 @@ enum GAMEOBJECT_FLAG_BIT
 typedef HM_NAMESPACE::hash_map<Quest*, std::map<uint32, uint32> > GameObjectItemMap;
 typedef HM_NAMESPACE::hash_map<Quest*, uint32 > GameObjectGOMap;
 
+#pragma pack(push,1)
 struct GameObjectInfo
 {
 	uint32 ID;
@@ -79,6 +80,7 @@ struct GameObjectInfo
 	GameObjectGOMap goMap;
 	GameObjectItemMap itemMap;
 };
+#pragma pack(pop)
 
 enum GAMEOBJECT_TYPES
 {

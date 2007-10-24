@@ -484,7 +484,7 @@ public:
 			switch(*p)
 			{
 			case 's':		// string is the only one we have to actually do anything for here
-				free((void*)(*(uint32*)structpointer));
+				free((*(char**)structpointer));
 				structpointer += sizeof(char*);
 				break;
 
@@ -519,42 +519,43 @@ public:
 	{
 		char * p = Storage<T, StorageType>::_formatString;
 		char * structpointer = (char*)Allocated;
+		uint32 offset = 0;
 		Field * f = fields;
 		for(; *p != 0; ++p, ++f)
 		{
             switch(*p)
 			{
 			case 'u':	// Unsigned integer
-				*(uint32*)structpointer = f->GetUInt32();
-				structpointer += sizeof(uint32);
+				*(uint32*)&structpointer[offset] = f->GetUInt32();
+				offset += sizeof(uint32);
 				break;
 
 			case 'i':	// Signed integer
-				*(int32*)structpointer = f->GetInt32();
-				structpointer += sizeof(uint64);
+				*(int32*)&structpointer[offset] = f->GetInt32();
+				offset += sizeof(uint64);
 				break;
 
 			case 's':	// Null-terminated string
-				*(char**)structpointer = strdup(f->GetString());
-				structpointer += sizeof(char*);
+				*(char**)&structpointer[offset] = strdup(f->GetString());
+				offset += sizeof(char*);
 				break;
 
 			case 'x':	// Skip
 				break;
 
 			case 'f':	// Float
-				*(float*)structpointer = f->GetFloat();
-				structpointer += sizeof(float);
+				*(float*)&structpointer[offset] = f->GetFloat();
+				offset += sizeof(float);
 				break;
 
 			case 'c':	// Char
-				*(uint8*)structpointer = f->GetUInt8();
-				structpointer += sizeof(uint8);
+				*(uint8*)&structpointer[offset] = f->GetUInt8();
+				offset += sizeof(uint8);
 				break;
 
 			case 'h':	// Short
-				*(uint16*)structpointer = f->GetUInt16();
-				structpointer += sizeof(uint16);
+				*(uint16*)&structpointer[offset] = f->GetUInt16();
+				offset += sizeof(uint16);
 				break;
 
 			default:	// unknown

@@ -458,6 +458,7 @@ enum SOCKET_GEM_COLOR
 	BLUE_SOCKET = 8
 };
 
+#pragma pack(push,1)
 struct SocketInfo {
 	uint32 SocketColor;
 	uint32 Unk;
@@ -563,5 +564,6 @@ typedef struct {
 	uint32 itemscount;
   //  Spell* spell[8];
 }ItemSet;
+#pragma pack(pop)
 
 #endif

@@ -669,9 +669,9 @@ void WorldSession::FullLogin(Player * plr)
 		md5hash.Finalize();
 
 #ifndef USING_BIG_ENDIAN
-		data.Write(md5hash.GetDigest(), MD5_DIGESTSIZE);
+		data.Write(md5hash.GetDigest(), MD5_DIGEST_LENGTH);
 #else
-		data.append(md5hash.GetDigest(), MD5_DIGESTSIZE);
+		data.append(md5hash.GetDigest(), MD5_DIGEST_LENGTH);
 #endif
 	}
 	SendPacket(&data);

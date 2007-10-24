@@ -62,13 +62,16 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 		while(!itr->AtEnd())
 		{
 			cn = itr->Get();
-			string auras = itr->Get()->aura_string;
-			vector<string> aurs = StrSplit(auras, " ");
-			for(vector<string>::iterator it = aurs.begin(); it != aurs.end(); ++it)
+			if(itr->Get()->aura_string)
 			{
-				uint32 id = atol((*it).c_str());
-				if(id)
-					itr->Get()->start_auras.insert( id );
+				string auras = string(itr->Get()->aura_string);
+				vector<string> aurs = StrSplit(auras, " ");
+				for(vector<string>::iterator it = aurs.begin(); it != aurs.end(); ++it)
+				{
+					uint32 id = atol((*it).c_str());
+					if(id)
+						itr->Get()->start_auras.insert( id );
+				}
 			}
 
 			if(!itr->Get()->MinHealth)

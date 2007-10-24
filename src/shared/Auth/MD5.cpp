@@ -21,7 +21,7 @@
 
 MD5Hash::MD5Hash()
 {
-	md5_init(&mC);
+	MD5_Init(&mC);
 }
 
 MD5Hash::~MD5Hash()
@@ -36,16 +36,16 @@ void MD5Hash::UpdateData(const std::string &str)
 
 void MD5Hash::UpdateData(const uint8 *dta, int len)
 {
-	md5_append(&mC, dta, len);
+	MD5_Update(&mC, dta, len);
 }
 
 void MD5Hash::Finalize()
 {
-	md5_finish(&mC, mDigest);
+	MD5_Final(mDigest, &mC);
 }
 
 void MD5Hash::Initialize()
 {
-	md5_init(&mC);
+	MD5_Init(&mC);
 }
 

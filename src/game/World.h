@@ -195,6 +195,7 @@ enum AccountFlags
 	ACCOUNT_FLAG_XPACK_01	= 0x8,
 };
 
+#pragma pack(push,1)
 struct MapInfo
 {
 	uint32 mapid;
@@ -218,6 +219,7 @@ struct MapInfo
 		return (flags & flag) != 0;
 	}
 };
+#pragma pack(pop)
 
 enum REALM_TYPE
 {

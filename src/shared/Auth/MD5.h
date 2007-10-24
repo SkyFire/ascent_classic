@@ -20,7 +20,7 @@
 #ifndef _MD5_H
 #define _MD5_H
 
-#include "md5_impl.h"
+#include <openssl/md5.h>
 #include "Common.h"
 
 class MD5Hash
@@ -36,11 +36,11 @@ public:
 	void Finalize();
 
 	uint8 *GetDigest(void) { return mDigest; };
-	int GetLength(void) { return MD5_DIGESTSIZE; };
+	int GetLength(void) { return MD5_DIGEST_LENGTH; };
 
 private:
-	md5_state_s mC;
-	uint8 mDigest[MD5_DIGESTSIZE];
+	MD5_CTX mC;
+	uint8 mDigest[MD5_DIGEST_LENGTH];
 };
 
 #endif

@@ -24,6 +24,8 @@
 #include "DataStore.h"
 #include "Timer.h"
 
+#pragma pack(push,1)
+
 struct ItemSetEntry
 {
     uint32 id;                  //1
@@ -826,6 +828,8 @@ struct ItemRandomSuffixEntry
 	uint32 enchantments[3];
 	uint32 prefixes[3];
 };
+
+#pragma pack(pop)
 
 inline float GetRadius(SpellRadius *radius)
 {

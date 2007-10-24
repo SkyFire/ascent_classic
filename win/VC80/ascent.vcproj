@@ -374,12 +374,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib libpq.lib mswsock.lib"
-				OutputFile=".\..\..\bin\Debug\ascent.exe"
+				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib mswsock.lib"
+				OutputFile=".\..\..\bin\Debug_x64\ascent.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\dep\lib\debug"
+				AdditionalLibraryDirectories="..\..\dep\lib64"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\..\bin\Debug_x64\ascent.pdb"
@@ -411,7 +410,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib\debug\*.dll ..\..\bin\debug&#x0D;&#x0A;copy ..\..\dep\lib\*.dll ..\..\bin\debug&#x0D;&#x0A;if not exist ..\..\bin\debug\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\debug&#x0D;&#x0A;if not exist ..\..\bin\debug\realms.conf copy ..\..\src\realms.conf ..\..\bin\debug&#x0D;&#x0A;"
+				CommandLine="copy ..\..\dep\lib64\*.dll ..\..\bin\debug&#x0D;&#x0A;if not exist ..\..\bin\debug\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\debug&#x0D;&#x0A;if not exist ..\..\bin\debug\realms.conf copy ..\..\src\realms.conf ..\..\bin\debug&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration

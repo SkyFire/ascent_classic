@@ -57,6 +57,7 @@ enum TrainerType
 };
 #define NUM_TRAINER_TYPES				0x4
 
+#pragma pack(push,1)
 struct GossipText_Text
 {
 	float Prob;
@@ -70,6 +71,7 @@ struct GossipText
 	uint32 ID;
 	GossipText_Text Texts[8];
 };
+#pragma pack(pop)
 
 struct GossipOptions
 {

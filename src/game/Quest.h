@@ -95,6 +95,7 @@ enum QUEST_SHARE
 	QUEST_SHARE_MSG_FINISH_QUEST	= 8,
 };
 
+#pragma pack(push,1)
 struct Quest
 {
 	uint32 id;
@@ -171,6 +172,7 @@ struct Quest
 	uint32 count_reward_item;
 	uint32 reward_xp_as_money;
 };
+#pragma pack(pop)
 
 enum QUEST_MOB_TYPES
 {
