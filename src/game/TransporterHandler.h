@@ -92,8 +92,8 @@ struct TWayPoint {
 
 typedef std::map<uint32, TWayPoint> WaypointMap;
 typedef std::map<uint32, TWayPoint>::iterator WaypointIterator;
-typedef std::map<uint64, Player*> PassengerMap;
-typedef std::map<uint64, Player*>::iterator PassengerIterator;
+typedef std::map<uint32, Player*> PassengerMap;
+typedef std::map<uint32, Player*>::iterator PassengerIterator;
 
 bool FillTransporterPathVector(uint32 PathID, TransportPath & Path);
 
@@ -109,9 +109,9 @@ public:
 
 	bool GenerateWaypoints();
 
-	inline void AddPlayer(Player *pPlayer) { mPassengers[pPlayer->GetGUID()] = pPlayer; }
-	inline void RemovePlayer(Player *pPlayer) {mPassengers.erase(pPlayer->GetGUID()); }
-	inline bool HasPlayer(Player* pPlayer) { return mPassengers.find(pPlayer->GetGUID()) != mPassengers.end(); }
+	inline void AddPlayer(Player *pPlayer) { mPassengers[pPlayer->GetGUIDLow()] = pPlayer; }
+	inline void RemovePlayer(Player *pPlayer) {mPassengers.erase(pPlayer->GetGUIDLow()); }
+	inline bool HasPlayer(Player* pPlayer) { return mPassengers.find(pPlayer->GetGUIDLow()) != mPassengers.end(); }
 	inline void SetPeriod(uint32 val) { m_period = val; }
 
 	uint32 m_pathTime;

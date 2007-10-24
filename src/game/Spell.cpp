@@ -516,7 +516,7 @@ bool Spell::DidHit(uint64 target)
 	else
 	{
 		if(resistchance<=1.0)//resist chance >=1
-			return !Rand(1.0);
+			return !Rand(1.0f);
 		else
 			return !Rand(resistchance);
 	}

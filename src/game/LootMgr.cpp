@@ -30,7 +30,21 @@ struct loot_tb
 bool Rand(float chance)
 {
 	int32 val = sRand.randInt(10000);
+	int32 p = int32(chance * 100.0f);
+	return p >= val;
+}
+
+bool Rand(uint32 chance)
+{
+	int32 val = sRand.randInt(10000);
 	int32 p = int32(chance * 100);
+	return p >= val;
+}
+
+bool Rand(int32 chance)
+{
+	int32 val = sRand.randInt(10000);
+	int32 p = chance * 100;
 	return p >= val;
 }
 

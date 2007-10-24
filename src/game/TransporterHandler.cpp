@@ -79,7 +79,7 @@ bool Transporter::GenerateWaypoints()
 
 	vector<keyFrame> keyFrames;
 	int mapChange = 0;
-	for (size_t i = 1; i < path.Size() - 1; i++)
+	for (int i = 1; i < (int)path.Size() - 1; i++)
 	{
 		if (mapChange == 0)
 		{
@@ -125,16 +125,16 @@ bool Transporter::GenerateWaypoints()
 		}
 		if (keyFrames[i].actionflag == 2) {
             if(firstStop<0)
-				firstStop=i;
+				firstStop=(int)i;
 
-			lastStop = i;
+			lastStop = (int)i;
 		}
 	}
 
 	float tmpDist = 0;
-	for (size_t i = 0; i < keyFrames.size(); i++)
+	for (int i = 0; i < (int)keyFrames.size(); i++)
 	{
-		int j = (i + lastStop) % keyFrames.size();
+		int j = (i + lastStop) % (int)keyFrames.size();
 		if (keyFrames[j].actionflag == 2)
 			tmpDist = 0;
 		else
@@ -144,7 +144,7 @@ bool Transporter::GenerateWaypoints()
 
 	for (int i = int(keyFrames.size()) - 1; i >= 0; i--)
 	{
-		int j = (i + (firstStop+1)) % keyFrames.size();
+		int j = (i + (firstStop+1)) % (int)keyFrames.size();
 		tmpDist += keyFrames[(j + 1) % keyFrames.size()].distFromPrev;
 		keyFrames[j].distUntilStop = tmpDist;
 		if (keyFrames[j].actionflag == 2)
@@ -156,12 +156,12 @@ bool Transporter::GenerateWaypoints()
 		if (keyFrames[i].distSinceStop < (30 * 30 * 0.5))
 			keyFrames[i].tFrom = sqrt(2 * keyFrames[i].distSinceStop);
 		else
-			keyFrames[i].tFrom = ((keyFrames[i].distSinceStop - (30 * 30 * 0.5)) / 30) + 30;
+			keyFrames[i].tFrom = ((keyFrames[i].distSinceStop - (30 * 30 * 0.5f)) / 30) + 30;
 
 		if (keyFrames[i].distUntilStop < (30 * 30 * 0.5))
 			keyFrames[i].tTo = sqrt(2 * keyFrames[i].distUntilStop);
 		else
-			keyFrames[i].tTo = ((keyFrames[i].distUntilStop - (30 * 30 * 0.5)) / 30) + 30;
+			keyFrames[i].tTo = ((keyFrames[i].distUntilStop - (30 * 30 * 0.5f)) / 30) + 30;
 
 		keyFrames[i].tFrom *= 1000;
 		keyFrames[i].tTo *= 1000;
@@ -221,11 +221,11 @@ bool Transporter::GenerateWaypoints()
 				{
 					if (tFrom <= 30000)
 					{
-						d = 0.5 * (tFrom / 1000) * (tFrom / 1000);
+						d = 0.5f * (tFrom / 1000) * (tFrom / 1000);
 					}
 					else
 					{
-						d = 0.5 * 30 * 30 + 30 * ((tFrom - 30000) / 1000);
+						d = 0.5f * 30 * 30 + 30 * ((tFrom - 30000) / 1000);
 					}
 					d = d - keyFrames[i].distSinceStop;
 				}
@@ -233,11 +233,11 @@ bool Transporter::GenerateWaypoints()
 				{
 					if (tTo <= 30000)
 					{
-						d = 0.5 * (tTo / 1000) * (tTo / 1000);
+						d = 0.5f * (tTo / 1000) * (tTo / 1000);
 					}
 					else
 					{
-						d = 0.5 * 30 * 30 + 30 * ((tTo - 30000) / 1000);
+						d = 0.5f * 30 * 30 + 30 * ((tTo - 30000) / 1000);
 					}
 					d = keyFrames[i].distUntilStop - d;
 				}

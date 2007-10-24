@@ -34,6 +34,8 @@ struct CreatureItem
 };
 
 SERVER_DECL bool Rand(float chance);
+SERVER_DECL bool Rand(uint32 chance);
+SERVER_DECL bool Rand(int32 chance);
 
 struct CreatureInfo
 {
