@@ -63,8 +63,7 @@
 				TypeLibraryName=".\..\..\bin\Release/ascent.tlb"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib\release\*.dll ..\..\bin\release
-copy ..\..\dep\lib\*.dll ..\..\bin\release
+				CommandLine="copy ..\..\dep\lib32\*.dll ..\..\bin\release
 if not exist ..\..\bin\release\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\release
 if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\release
 "/>
@@ -135,8 +134,7 @@ if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\
 				TypeLibraryName=".\..\..\bin\Debug/ascent.tlb"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib\debug\*.dll ..\..\bin\debug
-copy ..\..\dep\lib\*.dll ..\..\bin\debug
+				CommandLine="copy ..\..\dep\lib32\*.dll ..\..\bin\debug
 if not exist ..\..\bin\debug\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\debug
 if not exist ..\..\bin\debug\realms.conf copy ..\..\src\realms.conf ..\..\bin\debug
 "/>
