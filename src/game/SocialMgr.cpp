@@ -32,7 +32,7 @@ SocialMgr::SocialMgr()
 
 SocialMgr::~SocialMgr()
 {
-	std::map<uint64, std::set<uint64>*>::iterator iter;
+	SocialMap::iterator iter;
 	for(iter = m_isInFriendList.begin(); iter != m_isInFriendList.end(); ++iter) {
 		delete iter->second;
 	}
@@ -61,9 +61,9 @@ void SocialMgr::SendFriendList(Player* plr)
 		return;
 
 	WorldPacket data( SMSG_FRIEND_LIST , 512 );
-	uint64 plrguid = plr->GetGUID();
+	uint32 plrguid = plr->GetGUIDLow();
 
-	std::map<uint64, std::set<uint64>*>::iterator fItr = m_hasInFriendList.find(plrguid);
+	SocialMap::iterator fItr = m_hasInFriendList.find(plrguid);
 	if( fItr == m_hasInFriendList.end() )
 	{
 		data << (uint8)0;
@@ -72,8 +72,8 @@ void SocialMgr::SendFriendList(Player* plr)
 		return;
 	}
 
-	std::set<uint64>* fList = fItr->second;
-	std::set<uint64>::iterator itr;
+	SocialSet* fList = fItr->second;
+	SocialSet::iterator itr;
 	Player* pFriend = NULL;
 	bool isGm = (plr->GetSession()->GetPermissionCount() > 0);
 
@@ -97,9 +97,9 @@ void SocialMgr::SendIgnoreList(Player* plr)
 		return;
 
 	WorldPacket data( SMSG_IGNORE_LIST, 512 );
-	uint64 plrguid = plr->GetGUID();
+	uint32 plrguid = plr->GetGUIDLow();
 
-	std::map<uint64, std::set<uint64>*>::iterator iItr;
+	SocialMap::iterator iItr;
 	iItr = m_hasInIgnoreList.find(plrguid);
 	if( iItr == m_hasInIgnoreList.end() )
 	{
@@ -109,8 +109,8 @@ void SocialMgr::SendIgnoreList(Player* plr)
 		return;
 	}
 
-	std::set<uint64>* iList = iItr->second;
-	std::set<uint64>::iterator itr;
+	SocialSet* iList = iItr->second;
+	SocialSet::iterator itr;
 
 	data << (uint8)iList->size();
 	for(itr = iList->begin(); itr != iList->end(); itr++)
@@ -126,12 +126,12 @@ void SocialMgr::SendUpdateToFriends(Player* plr)
 	if(!plr)
 		return;
 
-	std::map<uint64, std::set<uint64>*>::iterator Itr = m_isInFriendList.find(plr->GetGUID());
+	SocialMap::iterator Itr = m_isInFriendList.find(plr->GetGUIDLow());
 	if(Itr == m_isInFriendList.end())
 		return;
 
-	std::set<uint64>* iList = Itr->second;
-	std::set<uint64>::iterator itr;
+	SocialSet* iList = Itr->second;
+	SocialSet::iterator itr;
 	Player* cPlayer = NULL;
 
 	for(itr = iList->begin(); itr != iList->end(); itr++)
@@ -173,8 +173,8 @@ void SocialMgr::AddFriend(Player* plr, std::string friendName)
 		return;
 	}
 
-	uint64 pGuid = playerInfo->guid;
-	uint64 fGuid = friendInfo->guid;
+	uint32 pGuid = playerInfo->guid;
+	uint32 fGuid = friendInfo->guid;
 	Player *pFriend = objmgr.GetPlayer(fGuid);
 
 	if ( pGuid == fGuid )
@@ -203,10 +203,10 @@ void SocialMgr::AddFriend(Player* plr, std::string friendName)
 		data << (uint8)FRIEND_ADDED_OFFLINE << (uint64)friendInfo->guid;
 
 	if( m_isInFriendList.find(fGuid) == m_isInFriendList.end() )
-		m_isInFriendList[fGuid] = new std::set<uint64>;
+		m_isInFriendList[fGuid] = new SocialSet;
 
 	if( m_hasInFriendList.find(pGuid) == m_hasInFriendList.end() )
-		m_hasInFriendList[pGuid] = new std::set<uint64>;
+		m_hasInFriendList[pGuid] = new SocialSet;
 
 	m_hasInFriendList[pGuid]->insert(fGuid);
 	m_isInFriendList[fGuid]->insert(pGuid);
@@ -239,8 +239,8 @@ void SocialMgr::AddIgnore(Player* plr, std::string ignoreName)
 		return;
 	}
 
-	uint64 pGuid = playerInfo->guid;
-	uint64 iGuid = ignoreInfo->guid;
+	uint32 pGuid = playerInfo->guid;
+	uint32 iGuid = ignoreInfo->guid;
 
 	if( pGuid == iGuid )
 	{
@@ -262,13 +262,13 @@ void SocialMgr::AddIgnore(Player* plr, std::string ignoreName)
 	data << (uint8)FRIEND_IGNORE_ADDED << (uint64)iGuid;
 
 	if( m_isInIgnoreList.find(iGuid) == m_isInIgnoreList.end() )
-		m_isInIgnoreList[iGuid] = new std::set<uint64>;
+		m_isInIgnoreList[iGuid] = new SocialSet;
 
 	if( m_hasInIgnoreList.find(pGuid) == m_hasInIgnoreList.end() )
-		m_hasInIgnoreList[pGuid] = new std::set<uint64>;
+		m_hasInIgnoreList[pGuid] = new SocialSet;
 
 	if( m_needsBlockNotice.find(iGuid) == m_needsBlockNotice.end() )
-		m_needsBlockNotice[iGuid] = new std::set<uint64>;
+		m_needsBlockNotice[iGuid] = new SocialSet;
 
 	m_isInIgnoreList[iGuid]->insert(pGuid);
 	m_hasInIgnoreList[pGuid]->insert(iGuid);
@@ -278,17 +278,17 @@ void SocialMgr::AddIgnore(Player* plr, std::string ignoreName)
 	CharacterDatabase.Execute("INSERT INTO social(guid,socialguid,flags,noticed) VALUES (%I64u,%I64u,'IGNORE',0)",pGuid,iGuid);
 }
 
-void SocialMgr::DelFriend(Player* plr, uint64 friendguid)
+void SocialMgr::DelFriend(Player* plr, uint32 friendguid)
 {
 	if(!plr)
 		return;
 
 	WorldPacket data(9);
-	uint64 plrguid = plr->GetGUID();
+	uint32 plrguid = plr->GetGUIDLow();
 
 	sLog.outDebug("SocialMgr: %s is deleting friendguid %d from his friendlist", plr->GetName(), friendguid);
 
-	std::map<uint64, std::set<uint64>*>::iterator Itr;
+	SocialMap::iterator Itr;
 	Itr = m_hasInFriendList.find(plrguid);
 	if( Itr != m_hasInFriendList.end() )
 		Itr->second->erase( friendguid );
@@ -304,17 +304,17 @@ void SocialMgr::DelFriend(Player* plr, uint64 friendguid)
 	CharacterDatabase.Execute("DELETE FROM social WHERE guid=%I64u AND socialguid=%I64u AND flags='FRIEND'",plrguid,friendguid);
 }
 
-void SocialMgr::DelIgnore(Player* plr, uint64 ignoreguid)
+void SocialMgr::DelIgnore(Player* plr, uint32 ignoreguid)
 {
 	if(!plr)
 		return;
 
 	WorldPacket data(9);
-	uint64 plrguid = plr->GetGUID();
+	uint32 plrguid = plr->GetGUIDLow();
 
 	sLog.outDebug("SocialMgr: %s is deleting guid %d from his ignorelist", plr->GetName(), ignoreguid);
 	
-	std::map<uint64, std::set<uint64>*>::iterator iItr;
+	SocialMap::iterator iItr;
 	iItr = m_hasInIgnoreList.find(plrguid);
 	if( iItr != m_hasInIgnoreList.end() )
 		iItr->second->erase(ignoreguid);
@@ -330,49 +330,49 @@ void SocialMgr::DelIgnore(Player* plr, uint64 ignoreguid)
 	CharacterDatabase.Execute("DELETE FROM social WHERE guid=%I64u AND socialguid=%I64u AND flags='IGNORE'",plrguid,ignoreguid);
 }
 
-bool SocialMgr::IsFriend(uint64 plrguid, uint64 target)
+bool SocialMgr::IsFriend(uint32 plrguid, uint32 target)
 {
-	std::map<uint64, std::set<uint64>*>::iterator Itr = m_isInFriendList.find( target );
+	SocialMap::iterator Itr = m_isInFriendList.find( target );
 	if( Itr == m_isInFriendList.end() )
 		return false;
 
-	std::set<uint64>::iterator sItr = Itr->second->find( plrguid );
+	SocialSet::iterator sItr = Itr->second->find( plrguid );
 	if( sItr != Itr->second->end() )
 		return true;
 	return false;
 }
 
-inline bool SocialMgr::HasFriend(uint64 plrguid, uint64 mfriend)
+bool SocialMgr::HasFriend(uint32 plrguid, uint32 mfriend)
 {
-	std::map<uint64, std::set<uint64>*>::iterator Itr = m_hasInFriendList.find( plrguid );
+	SocialMap::iterator Itr = m_hasInFriendList.find( plrguid );
 	if( Itr == m_hasInFriendList.end() )
 		return false;
 
-	std::set<uint64>::iterator sItr = Itr->second->find( mfriend );
+	SocialSet::iterator sItr = Itr->second->find( mfriend );
 	if( sItr != Itr->second->end() )
 		return true;
 	return false;
 }
 
-bool SocialMgr::IsIgnore(uint64 plrguid, uint64 target)
+bool SocialMgr::IsIgnore(uint32 plrguid, uint32 target)
 {
-	std::map<uint64, std::set<uint64>*>::iterator Itr = m_isInIgnoreList.find(target);
+	SocialMap::iterator Itr = m_isInIgnoreList.find(target);
 	if( Itr == m_isInIgnoreList.end() )
 		return false;
 
-	std::set<uint64>::iterator sItr = Itr->second->find( plrguid );
+	SocialSet::iterator sItr = Itr->second->find( plrguid );
 	if( sItr != Itr->second->end() )
 		return true;
 	return false;
 }
 
-inline bool SocialMgr::HasIgnore(uint64 plrguid, uint64 mignore)
+bool SocialMgr::HasIgnore(uint32 plrguid, uint32 mignore)
 {
-	std::map<uint64, std::set<uint64>*>::iterator Itr = m_hasInIgnoreList.find(plrguid);
+	SocialMap::iterator Itr = m_hasInIgnoreList.find(plrguid);
 	if( Itr == m_hasInIgnoreList.end() )
 		return false;
 
-	std::set<uint64>::iterator sItr = Itr->second->find( mignore );
+	SocialSet::iterator sItr = Itr->second->find( mignore );
 	if( sItr != Itr->second->end() )
 		return true;
 	return false;
@@ -380,13 +380,13 @@ inline bool SocialMgr::HasIgnore(uint64 plrguid, uint64 mignore)
 
 bool SocialMgr::HasIgnore(Player* plr, Player* mignore)
 {
-	std::map<uint64, std::set<uint64>*>::iterator Itr;
-	uint64 plrguid = plr->GetGUID();
-	uint64 ignguid = mignore->GetGUID();
+	SocialMap::iterator Itr;
+	uint32 plrguid = plr->GetGUIDLow();
+	uint32 ignguid = mignore->GetGUIDLow();
 
 	if( HasIgnore(plrguid, ignguid) )
 	{
-		std::set<uint64>::iterator iter;
+		SocialSet::iterator iter;
 		Itr = m_needsBlockNotice.find(ignguid);
 		if( Itr != m_needsBlockNotice.end() )
 		{
@@ -420,7 +420,7 @@ inline void SocialMgr::SendOnlinePkt(Player* plr, SocialStr* pNfo)
 	plr->GetSession()->SendPacket( &data );
 }
 
-inline void SocialMgr::SendOfflinePkt(Player* plr, uint64 fGuid)
+inline void SocialMgr::SendOfflinePkt(Player* plr, uint32 fGuid)
 {
 	if(!plr || !plr->GetSession())
 		return;
@@ -437,8 +437,8 @@ void SocialMgr::LoggedIn(Player* plr)
 		return;
 
 	SocialStr* pNfo = new SocialStr;
-	pNfo->pGuid = plr->GetGUID();
-	std::map<uint64, std::set<uint64>*>::iterator Itr = m_isInFriendList.find(pNfo->pGuid);
+	pNfo->pGuid = plr->GetGUIDLow();
+	SocialMap::iterator Itr = m_isInFriendList.find(pNfo->pGuid);
 	if( Itr == m_isInFriendList.end() )
 	{
 		delete pNfo;
@@ -449,7 +449,7 @@ void SocialMgr::LoggedIn(Player* plr)
 	pNfo->Class = plr->getClass();
 	pNfo->Area = plr->GetZoneId();
 
-	std::set<uint64>::iterator sItr = Itr->second->begin();
+	SocialSet::iterator sItr = Itr->second->begin();
 	Player* fPlr = NULL;
 	for( ; sItr != Itr->second->end(); sItr++ )
 	{
@@ -466,12 +466,12 @@ void SocialMgr::LoggedOut(Player* plr)
 	if(!plr)
 		return;
 
-	uint64 plrguid = plr->GetGUID();
-	std::map<uint64, std::set<uint64>*>::iterator Itr = m_isInFriendList.find(plrguid);
+	uint32 plrguid = plr->GetGUIDLow();
+	SocialMap::iterator Itr = m_isInFriendList.find(plrguid);
 	if( Itr == m_isInFriendList.end() )
 		return;
 
-	std::set<uint64>::iterator sItr = Itr->second->begin();
+	SocialSet::iterator sItr = Itr->second->begin();
 	Player* fPlr = NULL;
 	for( ; sItr != Itr->second->end(); sItr++ )
 	{
@@ -481,14 +481,14 @@ void SocialMgr::LoggedOut(Player* plr)
 	}
 }
 
-void SocialMgr::RemovePlayer(uint64 plr)
+void SocialMgr::RemovePlayer(uint32 plr)
 {
 	if(!plr)
 		return;
 
-	std::map<uint64, std::set<uint64>*>::iterator Itr;
-	std::map<uint64, std::set<uint64>*>::iterator mItr;
-	std::set<uint64>::iterator sItr;
+	SocialMap::iterator Itr;
+	SocialMap::iterator mItr;
+	SocialSet::iterator sItr;
 
 	Itr = m_isInFriendList.find( plr );
 	if( Itr != m_isInFriendList.end() )
@@ -528,10 +528,10 @@ void SocialMgr::RemovePlayer(uint64 plr)
 
 void SocialMgr::LoadFromDB()
 {
-	std::map<uint64, std::set<uint64>*>::iterator Itr;
-	uint64 plrguid = 0;
-	uint64 friendguid = 0;
-	uint64 ignoreguid = 0;
+	SocialMap::iterator Itr;
+	uint32 plrguid = 0;
+	uint32 friendguid = 0;
+	uint32 ignoreguid = 0;
 	bool noticed = false;
 
 	QueryResult *result = CharacterDatabase.Query("SELECT guid,socialguid FROM social WHERE flags='FRIEND'");
@@ -541,14 +541,14 @@ void SocialMgr::LoadFromDB()
 		do 
 		{
 			Field *field = result->Fetch();
-			plrguid = field[0].GetUInt64();
-			friendguid = field[1].GetUInt64();
+			plrguid = field[0].GetUInt32();
+			friendguid = field[1].GetUInt32();
 
 			if( m_isInFriendList.find(friendguid) == m_isInFriendList.end() )
-				m_isInFriendList[friendguid] = new std::set<uint64>;
+				m_isInFriendList[friendguid] = new SocialSet;
 
 			if( m_hasInFriendList.find(plrguid) == m_hasInFriendList.end() )
-				m_hasInFriendList[plrguid] = new std::set<uint64>;
+				m_hasInFriendList[plrguid] = new SocialSet;
 
 			m_isInFriendList[friendguid]->insert(plrguid);
 			m_hasInFriendList[plrguid]->insert(friendguid);
@@ -563,20 +563,20 @@ void SocialMgr::LoadFromDB()
 		do 
 		{
 			Field *field = result->Fetch();
-			plrguid = field[0].GetUInt64();
-			ignoreguid = field[1].GetUInt64();
+			plrguid = field[0].GetUInt32();
+			ignoreguid = field[1].GetUInt32();
 			noticed = field[2].GetBool();
 
 			if( m_isInIgnoreList.find(ignoreguid) == m_isInIgnoreList.end() )
-				m_isInIgnoreList[ignoreguid] = new std::set<uint64>;
+				m_isInIgnoreList[ignoreguid] = new SocialSet;
 
 			if( m_hasInIgnoreList.find(plrguid) == m_hasInIgnoreList.end() )
-				m_hasInIgnoreList[plrguid] = new std::set<uint64>;
+				m_hasInIgnoreList[plrguid] = new SocialSet;
 
 			if( !noticed )
 			{
 				if( m_needsBlockNotice.find(ignoreguid) == m_needsBlockNotice.end() )
-					m_needsBlockNotice[ignoreguid] = new std::set<uint64>;
+					m_needsBlockNotice[ignoreguid] = new SocialSet;
 				m_needsBlockNotice[ignoreguid]->insert(plrguid);
 			}
 

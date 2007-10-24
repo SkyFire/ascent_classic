@@ -192,7 +192,7 @@ void WorldSession::LoadAccountDataProc(QueryResult * result)
 		{
 			d = new char[len+1];
 			memcpy(d, data, len+1);
-			SetAccountData(i, d, true, len);
+			SetAccountData(i, d, true, (uint32)len);
 		}
 	}
 }
@@ -414,7 +414,7 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	if(objmgr.GetPlayer(guid) != NULL)
+	if(objmgr.GetPlayer((uint32)guid) != NULL)
 	{
 		// "Char deletion failed"
 		fail = 0x3B;
@@ -461,7 +461,7 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 
 		sPlrLog.write("Account: %s | IP: %s >> Deleted player %s", GetAccountName().c_str(), GetSocket()->GetRemoteIP().c_str(), name.c_str());
 
-		sSocialMgr.RemovePlayer(guid);
+		sSocialMgr.RemovePlayer((uint32)guid);
 
 		CharacterDatabase.WaitExecute("DELETE FROM characters WHERE guid = %u", (uint32)guid);
 
@@ -480,7 +480,7 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 		CharacterDatabase.Execute("DELETE FROM mailbox WHERE player_guid = %u", (uint32)guid);
 
 		/* remove player info */
-		objmgr.DeletePlayerInfo(guid);
+		objmgr.DeletePlayerInfo((uint32)guid);
 	}
 
 	OutPacket(SMSG_CHAR_DELETE, 1, &fail);
@@ -494,7 +494,7 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket & recv_data)
 	string name;
 	recv_data >> guid >> name;
 
-	PlayerInfo * pi = objmgr.GetPlayerInfo(guid);
+	PlayerInfo * pi = objmgr.GetPlayerInfo((uint32)guid);
 	if(pi == 0) return;
 
 	QueryResult * result = CharacterDatabase.Query("SELECT forced_rename_pending FROM characters WHERE guid = %u AND acct = %u", 
@@ -564,7 +564,7 @@ void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 	sLog.outDebug( "WORLD: Recvd Player Logon Message" );
 
 	recv_data >> playerGuid; // this is the GUID selected by the player
-	if(objmgr.GetPlayer(playerGuid) != NULL || m_loggingInPlayer || _player)
+	if(objmgr.GetPlayer((uint32)playerGuid) != NULL || m_loggingInPlayer || _player)
 	{
 		// A character with that name already exists 0x3E
 		uint8 respons = CHAR_LOGIN_DUPLICATE_CHARACTER;
@@ -572,7 +572,7 @@ void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	Player* plr = new Player(HIGHGUID_PLAYER,playerGuid);
+	Player* plr = new Player(HIGHGUID_PLAYER,(uint32)playerGuid);
 	ASSERT(plr);
 	plr->SetSession(this);
 	m_bIsWLevelSet = false;
@@ -823,7 +823,7 @@ void WorldSession::FullLogin(Player * plr)
 
 	// Calculate rested experience if there is time between lastlogoff and now
 	uint32 currenttime = (uint32)UNIXTIME;
-	float timediff = currenttime - plr->m_timeLogoff;
+	uint32 timediff = currenttime - plr->m_timeLogoff;
 
 	if(plr->m_timeLogoff > 0 && plr->GetUInt32Value(UNIT_FIELD_LEVEL) < plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))	// if timelogoff = 0 then it's the first login
 	{

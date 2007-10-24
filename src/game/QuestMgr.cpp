@@ -777,7 +777,7 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 			if(plr->GetStanding(fact) >= (int32)qst->reward_replimit)
 				continue;
 	  
-		amt *= sWorld.getRate(RATE_QUESTREPUTATION); // reputation rewards 
+		amt = float2int32(float(amt)*sWorld.getRate(RATE_QUESTREPUTATION)); // reputation rewards 
 		plr->ModStanding(fact, amt);
 	}
 }

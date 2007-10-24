@@ -348,7 +348,7 @@ void Guild::CreateRank(std::string name,uint32 rights)
 	RankInfo *newrank;
 
 	newrank = new RankInfo;
-	newrank->rankid = m_rankList.size();
+	newrank->rankid = (uint32)m_rankList.size();
 	newrank->name = name;
 	newrank->rights = rights;
 	m_rankList.push_back(newrank);
@@ -418,7 +418,7 @@ void Guild::FillQueryData(WorldPacket *data)
 	std::list<RankInfo*>::iterator itr;
 	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
 		*data << (*itr)->name;
-	for (uint32 r = m_rankList.size(); r < MAX_GUILD_RANKS;++r)
+	for (uint32 r = (uint32)m_rankList.size(); r < MAX_GUILD_RANKS;++r)
 		*data << uint8(0);
 	*data << GetGuildEmblemStyle();
 	*data << GetGuildEmblemColor();
@@ -578,7 +578,7 @@ void Guild::RenameGuild(std::string guildName)
 {
 	SetGuildName(guildName);
 	CharacterDatabase.Execute("UPDATE guilds SET guildName = '%s' WHERE guildId = %u", CharacterDatabase.EscapeString(guildName).c_str(), GetGuildId());
-	uint32 ttime = UNIXTIME;
+	uint32 ttime = (uint32)UNIXTIME;
 
 	std::list<PlayerInfo*>::iterator itr = m_guildMembers.begin();
 	for (; itr != m_guildMembers.end(); itr++)

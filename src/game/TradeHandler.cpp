@@ -25,7 +25,7 @@ void WorldSession::HandleInitiateTrade(WorldPacket & recv_data)
 	CHECK_PACKET_SIZE(recv_data, 8);
 	uint64 guid;
 	recv_data >> guid;
-	Player * pTarget = _player->GetMapMgr()->GetPlayer(guid);
+	Player * pTarget = _player->GetMapMgr()->GetPlayer((uint32)guid);
 	uint32 TradeStatus = TRADE_STATUS_PROPOSED;
 	WorldPacket data(SMSG_TRADE_STATUS, 12);
 
@@ -57,8 +57,8 @@ void WorldSession::HandleInitiateTrade(WorldPacket & recv_data)
 		_player->ResetTradeVariables();
 		pTarget->ResetTradeVariables();
 
-		pTarget->mTradeTarget = _player->GetGUID();
-		_player->mTradeTarget = pTarget->GetGUID();
+		pTarget->mTradeTarget = _player->GetGUIDLow();
+		_player->mTradeTarget = pTarget->GetGUIDLow();
 
 		pTarget->mTradeStatus = TradeStatus;
 		_player->mTradeStatus = TradeStatus;

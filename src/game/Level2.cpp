@@ -185,7 +185,7 @@ bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 		return true;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!unit)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -236,7 +236,7 @@ bool ChatHandler::HandleItemCommand(const char* args, WorldSession *m_session)
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -286,7 +286,7 @@ bool ChatHandler::HandleItemRemoveCommand(const char* args, WorldSession *m_sess
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -347,7 +347,7 @@ bool ChatHandler::HandleRunCommand(const char* args, WorldSession *m_session)
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -382,7 +382,7 @@ bool ChatHandler::HandleNPCFlagCommand(const char* args, WorldSession *m_session
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -930,7 +930,7 @@ bool ChatHandler::HandleGOScale(const char* args, WorldSession* m_session)
 		RedSystemMessage(m_session, "Invalid syntax. Should be .gobject scale 1.0");
 		return false;
 	}
-	float scale = atof(args);
+	float scale = (float)atof(args);
 	if(!scale) scale = 1;
 	go->SetFloatValue(OBJECT_FIELD_SCALE_X, scale);
 	BlueSystemMessage(m_session, "Set scale to %.3f", scale);
@@ -1043,7 +1043,7 @@ bool ChatHandler::HandleAddAIAgentCommand(const char* args, WorldSession *m_sess
 	if(!Misc2)
 		return false;
 
-	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature(m_session->GetPlayer()->GetSelection());
+	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
 	if(!target)
 	{
 		RedSystemMessage(m_session, "You have to select a Creature!");
@@ -1061,9 +1061,9 @@ bool ChatHandler::HandleAddAIAgentCommand(const char* args, WorldSession *m_sess
 	sp->spell = dbcSpell.LookupEntry(atoi(spellId));
 	sp->spellType = atoi(spellType);
 	sp->spelltargetType = atoi(spelltargetType);
-	sp->floatMisc1 = atof(floatMisc1);
+	sp->floatMisc1 = (float)atof(floatMisc1);
 	sp->Misc2 = (uint32)atof(Misc2);
-	sp->cooldown = atof(spellCooldown);
+	sp->cooldown = (float)atof(spellCooldown);
 	sp->minrange = GetMinRange(dbcSpellRange.LookupEntry(dbcSpell.LookupEntry(atoi(spellId))->rangeIndex));
 	sp->maxrange = GetMaxRange(dbcSpellRange.LookupEntry(dbcSpell.LookupEntry(atoi(spellId))->rangeIndex));
 	if(sp->agent == AGENT_CALLFORHELP)
@@ -1102,7 +1102,7 @@ bool ChatHandler::HandleDelAIAgentCommand(const char* args, WorldSession *m_sess
 
 bool ChatHandler::HandleListAIAgentCommand(const char* args, WorldSession *m_session)
 {
-	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature(m_session->GetPlayer()->GetSelection());
+	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
 	if(!target)
 	{
 		RedSystemMessage(m_session, "You have to select a Creature!");
@@ -1170,7 +1170,7 @@ bool ChatHandler::HandleGOExport(const char * args, WorldSession * m_session)
 
 bool ChatHandler::HandleNpcExport(const char * args, WorldSession * m_session)
 {
-	Creature* target = m_session->GetPlayer()->GetMapMgr()->GetCreature(m_session->GetPlayer()->GetSelection());
+	Creature* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
 	if (!target)
 		return false;
 	

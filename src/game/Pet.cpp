@@ -284,7 +284,7 @@ void Pet::Update(uint32 time)
 
 void Pet::SendSpellsToOwner()
 {
-	int packetsize = (m_uint32Values[OBJECT_FIELD_ENTRY] != WATER_ELEMENTAL) ? (mSpells.size() * 4 + 20) : 64;
+	int packetsize = (m_uint32Values[OBJECT_FIELD_ENTRY] != WATER_ELEMENTAL) ? ((int)mSpells.size() * 4 + 20) : 64;
 	WorldPacket * data = new WorldPacket(SMSG_PET_SPELLS, packetsize);
 	*data << GetGUID();
 	*data << uint32(0x00000000);//unk1
@@ -367,7 +367,7 @@ AI_Spell * Pet::CreateAISpell(SpellEntry * info)
 	sp->spell = info;
 	sp->spellType = STYPE_DAMAGE;
 	sp->spelltargetType = TTYPE_SINGLETARGET;
-	sp->cooldown = objmgr.GetPetSpellCooldown(info->Id);
+	sp->cooldown = float(objmgr.GetPetSpellCooldown(info->Id));
 	if(info->Effect[0] == SPELL_EFFECT_APPLY_AURA || info->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA)
 		sp->spellType = STYPE_BUFF;
 
@@ -627,7 +627,7 @@ void Pet::PetSafeDelete()
 
 void Pet::DelayedRemove(bool bTime, bool bDeath)
 {
-	m_Owner = objmgr.GetPlayer(m_OwnerGuid);
+	m_Owner = objmgr.GetPlayer((uint32)m_OwnerGuid);
 	if(bTime)
 	{
 		if(GetUInt32Value(UNIT_CREATED_BY_SPELL) > 0 || bDeath)
@@ -924,7 +924,7 @@ void Pet::Rename(string NewName)
 	UpdatePetInfo(false);
 
 	// update timestamp to force a re-query
-	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, UNIXTIME);
+	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, (uint32)UNIXTIME);
 }
 
 void Pet::ApplySummonLevelAbilities()
@@ -1238,8 +1238,8 @@ void Pet::ApplySummonLevelAbilities()
 
 	double pet_min_dmg = base_min_dmg + pet_level * mod_min_dmg;
 	double pet_max_dmg = base_max_dmg + pet_level * mod_max_dmg;
-	BaseDamage[0] = FL2UINT(pet_min_dmg);
-	BaseDamage[1] = FL2UINT(pet_max_dmg);
+	BaseDamage[0] = float(pet_min_dmg);
+	BaseDamage[1] = float(pet_max_dmg);
 
 	for(uint32 x = 0; x < 5; ++x)
 		CalcStat(x);
@@ -1360,11 +1360,11 @@ void Pet::ApplyStatsForLevel()
 		ApplyPetLevelAbilities();
 
 	// Apply common stuff
-	float pet_level = m_uint32Values[UNIT_FIELD_LEVEL];
+	float pet_level = float(m_uint32Values[UNIT_FIELD_LEVEL]);
 
 	// Apply scale for this family.
-	float level_diff = myFamily->maxlevel - myFamily->minlevel;
-	float scale_diff = myFamily->maxsize - myFamily->minsize;
+	float level_diff = float(myFamily->maxlevel - myFamily->minlevel);
+	float scale_diff = float(myFamily->maxsize - myFamily->minsize);
 	float factor = scale_diff / level_diff;
 	float scale = factor * pet_level + myFamily->minsize;
 	SetFloatValue(OBJECT_FIELD_SCALE_X, scale);
@@ -1491,7 +1491,7 @@ AI_Spell * Pet::HandleAutoCastEvent()
 	if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
 	{
 		// more than one autocast spell. pick a random one.
-		uint32 c = sRand.randInt(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
+		uint32 c = sRand.randInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
 		uint32 j = 0;
 		list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 
@@ -1543,7 +1543,7 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 		if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
 		{
 			// more than one autocast spell. pick a random one.
-			uint32 c = sRand.randInt(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
+			uint32 c = sRand.randInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
 			uint32 j = 0;
 			list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 

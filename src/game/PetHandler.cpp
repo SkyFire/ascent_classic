@@ -36,7 +36,7 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 
 	if(UINT32_LOPART(GUID_HIPART(petGuid)) == HIGHGUID_UNIT)
 	{
-		Creature *pCharm = GetPlayer()->GetMapMgr()->GetCreature(petGuid);
+		Creature *pCharm = GetPlayer()->GetMapMgr()->GetCreature((uint32)petGuid);
 		if(!pCharm) 
 			return;
 
@@ -61,7 +61,7 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 		}
 		return;
 	}
-	Pet *pPet = _player->GetMapMgr()->GetPet(petGuid);
+	Pet *pPet = _player->GetMapMgr()->GetPet((uint32)petGuid);
 	if(!pPet)
 		return;
 
@@ -242,7 +242,7 @@ void WorldSession::HandlePetNameQuery(WorldPacket & recv_data)
 	uint64 petGuid = 0;
 
 	recv_data >> petNumber >> petGuid;
-	Pet *pPet = _player->GetMapMgr()->GetPet(petGuid);
+	Pet *pPet = _player->GetMapMgr()->GetPet((uint32)petGuid);
 	if(!pPet) return;
 
 	WorldPacket data(8 + pPet->GetName().size());

@@ -88,7 +88,7 @@ void AuctionHouse::UpdateAuctions()
 	auctionLock.AcquireReadLock();
 	removalLock.Acquire();
 
-	uint32 t = UNIXTIME;
+	uint32 t = (uint32)UNIXTIME;
 	HM_NAMESPACE::hash_map<uint32, Auction*>::iterator itr = auctions.begin();
 	Auction * auct;
 	for(; itr != auctions.end();)
@@ -230,7 +230,7 @@ void WorldSession::HandleAuctionListBidderItems( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -364,7 +364,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 	uint32 auction_id, price;
 	recv_data >> auction_id >> price;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -392,7 +392,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 
 	if(auct->BuyoutPrice == price)
 	{
-		auct->HighestBidder = _player->GetGUID();
+		auct->HighestBidder = _player->GetGUIDLow();
 		auct->HighestBid = price;
 
 		// we used buyout on the item.
@@ -406,7 +406,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 	else
 	{
 		// update most recent bid
-		auct->HighestBidder = _player->GetGUID();
+		auct->HighestBidder = _player->GetGUIDLow();
 		auct->HighestBid = price;
 		auct->UpdateInDB();
 
@@ -428,7 +428,7 @@ void WorldSession::HandleCancelAuction( WorldPacket & recv_data)
 	uint32 auction_id;
 	recv_data >> auction_id;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -459,7 +459,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 	recv_data >> item;
 	recv_data >> bid >> buyout >> etime;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -477,11 +477,11 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 	// Create auction structure.
 	Auction * auct = new Auction;
 	auct->BuyoutPrice = buyout;
-	auct->ExpiryTime = UNIXTIME + (etime * 60);
+	auct->ExpiryTime = (uint32)UNIXTIME + (etime * 60);
 	auct->HighestBid = bid;
 	auct->HighestBidder = 0;
 	auct->Id = sAuctionMgr.GenerateAuctionId();
-	auct->Owner = _player->GetGUID();
+	auct->Owner = _player->GetGUIDLow();
 	auct->pItem = pItem;
 	auct->Deleted = false;
 	auct->DeletedReason = 0;
@@ -510,7 +510,7 @@ void WorldSession::HandleAuctionListOwnerItems( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -626,7 +626,7 @@ void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 

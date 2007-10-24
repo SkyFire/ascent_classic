@@ -318,7 +318,7 @@ struct SpellCharge
     bool FromProc;
 };
 
-typedef set<uint64> AreaAuraList;
+typedef set<uint32> AreaAuraList;
 
 class SERVER_DECL Aura : public EventableObject
 {

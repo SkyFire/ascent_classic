@@ -100,8 +100,8 @@ void CommandTableStorage::Override(const char * command, const char * level)
 		subcommand_name = sp + 1;
 	}
 
-	int len1 = strlen(command_name);
-	int len2 = subcommand_name ? strlen(subcommand_name) : 0;
+	size_t len1 = strlen(command_name);
+	size_t len2 = subcommand_name ? strlen(subcommand_name) : 0;
 
 	// look for the command.
 	ChatCommand * p = &_commandTable[0];
@@ -762,7 +762,7 @@ WorldPacket * ChatHandler::FillMessageData( uint32 type, uint32 language, const 
 	//uint8	    afk_state;
 	ASSERT(type != CHAT_MSG_CHANNEL);
 	   //channels are handled in channel handler and so on
-	uint32 messageLength = strlen((char*)message) + 1;
+	uint32 messageLength = (uint32)strlen((char*)message) + 1;
 
 	WorldPacket *data = new WorldPacket(SMSG_MESSAGECHAT, messageLength + 30);
 	data->Initialize(SMSG_MESSAGECHAT);
@@ -783,7 +783,7 @@ WorldPacket * ChatHandler::FillMessageData( uint32 type, uint32 language, const 
 
 WorldPacket* ChatHandler::FillSystemMessageData(const char *message) const
 {
-	uint32 messageLength = strlen((char*)message) + 1;
+	uint32 messageLength = (uint32)strlen((char*)message) + 1;
 
 	WorldPacket * data = new WorldPacket(SMSG_MESSAGECHAT, 30 + messageLength);
 	*data << (uint8)CHAT_MSG_SYSTEM;
@@ -815,7 +815,7 @@ Player * ChatHandler::getSelectedChar(WorldSession *m_session, bool showerror)
 		chr = m_session->GetPlayer(); // autoselect
 	}
 	else
-		chr = m_session->GetPlayer()->GetMapMgr()->GetPlayer(guid);
+		chr = m_session->GetPlayer()->GetMapMgr()->GetPlayer((uint32)guid);
 	
 	if(chr == NULL)
 	{
@@ -834,7 +834,7 @@ Creature * ChatHandler::getSelectedCreature(WorldSession *m_session, bool shower
 
 	guid = m_session->GetPlayer()->GetSelection();
 	
-	creature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	creature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	
 	if(creature != NULL)
 		return creature;

@@ -619,7 +619,7 @@ bool Instance_Map_Info_Holder::RemovePlayer(uint64 guid)
 			// dont reset an instnace with players inside.. dunno how they got in there anyway :P
 			if(mapMgr->HasPlayers())
 			{
-				Player * pPlayer = objmgr.GetPlayer(guid);
+				Player * pPlayer = objmgr.GetPlayer((uint32)guid);
 				if(pPlayer) 
 					sChatHandler.SystemMessageToPlr(pPlayer,"You are trying to reset a instance when there are still players inside");
 				instanceIdListMutex.Release();
@@ -896,8 +896,8 @@ void Instance_Map_InstanceId_Holder::SaveInstanceToDB()
 	}
     playerListMutex.Release();
 	ss << "', ";
-	ss << CreationTime << ", ";
-	ss << ExpireTime << ", ";
+	ss << (uint32)CreationTime << ", ";
+	ss << (uint32)ExpireTime << ", ";
     ss << difficulty << ");";
 	CharacterDatabase.Execute( ss.str().c_str() );
 }
@@ -929,10 +929,10 @@ void InstanceSavingManagement::CreateInactiveInstance(MapMgr * mgr)
 	// called on mapmgr expire..
 
 	InactiveInstance * ia = new InactiveInstance;
-	ia->Creation = mgr->CreationTime;
+	ia->Creation = (uint32)mgr->CreationTime;
 	ia->InstanceId = mgr->GetInstanceID();
 	ia->MapId = mgr->GetMapId();
-	ia->Creator = mgr->GetCreator();
+	ia->Creator = (uint32)mgr->GetCreator();
 	ia->GroupSignature = mgr->GetGroupSignature();
     ia->difficulty = mgr->iInstanceMode;
 

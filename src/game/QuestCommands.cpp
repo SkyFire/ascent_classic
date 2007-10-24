@@ -560,7 +560,7 @@ bool ChatHandler::HandleQuestListCommand(const char * args, WorldSession * m_ses
 			return true;
 		}
 
-		Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+		Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 		if(unit)
 		{
 			if (!unit->isQuestGiver())
@@ -697,7 +697,7 @@ bool ChatHandler::HandleQuestAddStartCommand(const char * args, WorldSession * m
 		return false;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!unit)
 	{
 		SystemMessage(m_session, "You must target an npc.");
@@ -753,7 +753,7 @@ bool ChatHandler::HandleQuestAddStartCommand(const char * args, WorldSession * m
 	QuestRelation *qstrel = new QuestRelation;
 	qstrel->qst = qst;
 	qstrel->type = QUESTGIVER_QUEST_START;
-	uint16 qstrelid = unit->GetQuestRelation(quest_id);
+	uint8 qstrelid = (uint8)unit->GetQuestRelation(quest_id);
 	unit->FindQuest(quest_id, qstrelid);
 	unit->AddQuest(qstrel);
 	unit->_LoadQuests();
@@ -781,7 +781,7 @@ bool ChatHandler::HandleQuestAddFinishCommand(const char * args, WorldSession * 
 		return false;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!unit)
 	{
 		SystemMessage(m_session, "You must target an npc.");
@@ -826,7 +826,7 @@ bool ChatHandler::HandleQuestAddFinishCommand(const char * args, WorldSession * 
 		delete selectResult2;
 	else
 	{
-		std:string my_insert2 = "INSERT INTO gameobject_quest_finisher (id, quest) VALUES (" + quest_giver + "," + string(args) + ")";
+		string my_insert2 = "INSERT INTO gameobject_quest_finisher (id, quest) VALUES (" + quest_giver + "," + string(args) + ")";
 		QueryResult *insertResult2 = WorldDatabase.Query(my_insert2.c_str());
 		if (insertResult2)
 			delete insertResult2;
@@ -837,7 +837,7 @@ bool ChatHandler::HandleQuestAddFinishCommand(const char * args, WorldSession * 
 	QuestRelation *qstrel = new QuestRelation;
 	qstrel->qst = qst;
 	qstrel->type = QUESTGIVER_QUEST_END;
-	uint16 qstrelid = unit->GetQuestRelation(quest_id);
+	uint8 qstrelid = (uint8)unit->GetQuestRelation(quest_id);
 	unit->FindQuest(quest_id, qstrelid);
 	unit->AddQuest(qstrel);
 	unit->_LoadQuests();
@@ -878,7 +878,7 @@ bool ChatHandler::HandleQuestDelStartCommand(const char * args, WorldSession * m
 		return false;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!unit)
 	{
 		SystemMessage(m_session, "You must target an npc.");
@@ -934,7 +934,7 @@ bool ChatHandler::HandleQuestDelStartCommand(const char * args, WorldSession * m
 	QuestRelation *qstrel = new QuestRelation;
 	qstrel->qst = qst;
 	qstrel->type = QUESTGIVER_QUEST_START;
-	uint16 qstrelid = unit->GetQuestRelation(quest_id);
+	uint8 qstrelid = (uint8)unit->GetQuestRelation(quest_id);
 	unit->FindQuest(quest_id, qstrelid);
 	unit->DeleteQuest(qstrel);
 	unit->_LoadQuests();
@@ -962,7 +962,7 @@ bool ChatHandler::HandleQuestDelFinishCommand(const char * args, WorldSession * 
 		return false;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!unit)
 	{
 		SystemMessage(m_session, "You must target an npc.");
@@ -1018,7 +1018,7 @@ bool ChatHandler::HandleQuestDelFinishCommand(const char * args, WorldSession * 
 	QuestRelation *qstrel = new QuestRelation;
 	qstrel->qst = qst;
 	qstrel->type = QUESTGIVER_QUEST_END;
-	uint16 qstrelid = unit->GetQuestRelation(quest_id);
+	uint8 qstrelid = (uint8)unit->GetQuestRelation(quest_id);
 	unit->FindQuest(quest_id, qstrelid);
 	unit->DeleteQuest(qstrel);
 	unit->_LoadQuests();
@@ -1247,7 +1247,7 @@ bool ChatHandler::HandleQuestLoadCommand(const char * args, WorldSession * m_ses
 	if (guid == 0)
 		return true;
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!unit)
 		return true;
 
@@ -1271,7 +1271,7 @@ bool ChatHandler::HandleQuestRemoveCommand(const char * args, WorldSession * m_s
 		SystemMessage(m_session, "Auto-targeting self.");
 	}
 
-	std:string recout = "";
+	string recout = "";
 	uint32 quest_id = atol(args);
 	Quest * qst = QuestStorage.LookupEntry(quest_id);
 
@@ -1289,7 +1289,7 @@ bool ChatHandler::HandleQuestRewardCommand(const char * args, WorldSession * m_s
 {
 	if(!*args) return false;
 
-	std:string recout = "";
+	string recout = "";
 
 	recout += "\n\n";
 

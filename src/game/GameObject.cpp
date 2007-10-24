@@ -65,7 +65,7 @@ GameObject::~GameObject()
 	if(m_ritualmembers)
 	delete[] m_ritualmembers;
 
-	uint64 guid = GetUInt64Value(OBJECT_FIELD_CREATED_BY);
+	uint32 guid = GetUInt32Value(OBJECT_FIELD_CREATED_BY);
 	if(guid)
 	{
 		Player *plr = objmgr.GetPlayer(guid);
@@ -616,7 +616,7 @@ uint16 GameObject::GetQuestRelation(uint32 quest_id)
 
 uint32 GameObject::NumOfQuests()
 {
-	return m_quests->size();
+	return (uint32)m_quests->size();
 }
 
 void GameObject::_LoadQuests()

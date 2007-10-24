@@ -181,7 +181,7 @@ void WeatherInfo::_GenerateWeather()
 	m_currentTime = 0;
 	m_currentEffect = 0;
 	m_currentDensity = 0.20f;//Starting Offset (don't go below, it's annoying fog)
-	m_maxDensity = max(1,sRand.rand(2)); //1 - 2
+	m_maxDensity = max(1,(float)sRand.rand(2)); //1 - 2
 	m_totalTime = (sRand.randInt(11) + 5)*1000*120;//update approx. every 1-2 minutes
 
 	uint32 rv = sRand.randInt(100);

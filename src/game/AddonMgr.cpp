@@ -120,7 +120,7 @@ void AddonMgr::SendAddonInfoPacket(WorldPacket *source, uint32 pos, WorldSession
 		return;
 	}	
 	rsize = realsize;
-	uint32 position = source->rpos();
+	size_t position = source->rpos();
 
 	ByteBuffer unpacked;
 	unpacked.resize(realsize);
@@ -132,7 +132,7 @@ void AddonMgr::SendAddonInfoPacket(WorldPacket *source, uint32 pos, WorldSession
 		return;
 	}
 	int32 result;
-	result = uncompress((uint8*)unpacked.contents(), &rsize, (uint8*)(*source).contents() + position, (*source).size() - position);
+	result = uncompress((uint8*)unpacked.contents(), &rsize, (uint8*)(*source).contents() + position, (uLong)((*source).size() - position));
 
 	if(result != Z_OK)
 	{
@@ -148,7 +148,7 @@ void AddonMgr::SendAddonInfoPacket(WorldPacket *source, uint32 pos, WorldSession
 	uint32 unknown;
 	
 	std::string name;
-	uint32 p = unpacked.rpos();
+	size_t p = unpacked.rpos();
 	while(p != unpacked.size())	// make sure theres always room, otherwise *BAM* crash.
 	{
 		unpacked >> name;

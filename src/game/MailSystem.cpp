@@ -30,7 +30,7 @@ MailError MailSystem::DeliverMessage(uint64 recipent, MailMessage* message)
 	// assign a new id
 	message->message_id = Generate_Message_Id();
 
-	Player * plr = objmgr.GetPlayer(recipent);
+	Player * plr = objmgr.GetPlayer((uint32)recipent);
 	if(plr != NULL)
 	{
 		plr->m_mailBox.AddMessage(message);
@@ -62,7 +62,7 @@ WorldPacket * Mailbox::BuildMailboxListingPacket()
 	WorldPacket * data = new WorldPacket(SMSG_MAIL_LIST_RESULT, 500);
 	MessageMap::iterator itr;
 	uint32 count = 0;
-	uint32 t = UNIXTIME;
+	uint32 t = (uint32)UNIXTIME;
 	*data << uint8(0);	 // size placeholder
 
 	for(itr = Messages.begin(); itr != Messages.end(); ++itr)

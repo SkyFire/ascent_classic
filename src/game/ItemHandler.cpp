@@ -814,7 +814,7 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	Creature *unit = _player->GetMapMgr()->GetCreature(vendorguid);
+	Creature *unit = _player->GetMapMgr()->GetCreature((uint32)vendorguid);
 	// Check if Vendor exists
 	if (unit == NULL)
 	{
@@ -913,7 +913,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 	if(_player->isCasting())
 		_player->InterruptSpell();
 
-	Creature *unit = _player->GetMapMgr()->GetCreature(srcguid);
+	Creature *unit = _player->GetMapMgr()->GetCreature((uint32)srcguid);
 	if (unit == NULL || !unit->HasItems())
 		return;
 	Container*c=NULL;
@@ -1111,7 +1111,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	recv_data >> amount >> slot;
 
 
-	Creature *unit = _player->GetMapMgr()->GetCreature(srcguid);
+	Creature *unit = _player->GetMapMgr()->GetCreature((uint32)srcguid);
 	if (unit == NULL || !unit->HasItems())
 		return;
 
@@ -1213,7 +1213,7 @@ void WorldSession::HandleListInventoryOpcode( WorldPacket & recv_data )
 
 	recv_data >> guid;
 
-	Creature *unit = _player->GetMapMgr()->GetCreature(guid);
+	Creature *unit = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if (unit == NULL)
 		return;
 

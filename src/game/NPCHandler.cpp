@@ -59,7 +59,7 @@ void WorldSession::HandleTabardVendorActivateOpcode( WorldPacket & recv_data )
 	if(!_player->IsInWorld()) return;
 	uint64 guid;
 	recv_data >> guid;
-	Creature *pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature) return;
 
 	SendTabardHelp(pCreature);
@@ -84,7 +84,7 @@ void WorldSession::HandleBankerActivateOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature *pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature) return;
 
 	SendBankerList(pCreature);
@@ -110,7 +110,7 @@ void WorldSession::HandleTrainerListOpcode( WorldPacket & recv_data )
 	// Inits, grab creature, check.
 	uint64 guid;
 	recv_data >> guid;
-	Creature *train = GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature *train = GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!train) return;
 
 	SendTrainerList(train);
@@ -167,7 +167,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvPacket)
 	uint32 TeachingSpellID;
 
 	recvPacket >> Guid >> TeachingSpellID;
-	Creature *pCreature = _player->GetMapMgr()->GetCreature(Guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)Guid);
 	if(pCreature == 0) return;
 
 	Trainer *pTrainer = pCreature->GetTrainer();
@@ -230,7 +230,7 @@ void WorldSession::HandleCharterShowListOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature *pCreature = _player->GetMapMgr()->GetCreature(guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature) return;
 
 	SendCharterRequest(pCreature);
@@ -284,7 +284,7 @@ void WorldSession::HandleAuctionHelloOpcode( WorldPacket & recv_data )
 	if(!_player->IsInWorld()) return;
 	uint64 guid;
 	recv_data >> guid;
-	Creature* auctioneer = _player->GetMapMgr()->GetCreature(guid);
+	Creature* auctioneer = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!auctioneer)
 		return;
 
@@ -318,7 +318,7 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 	std::set<uint32> ql;
 
 	recv_data >> guid;
-	Creature *qst_giver = _player->GetMapMgr()->GetCreature(guid);
+	Creature *qst_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!qst_giver) 
 		return;
 
@@ -348,7 +348,7 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 
 		_player->CurrentGossipMenu->BuildPacket(data);
 		uint32 count=0;//sQuestMgr.ActiveQuestsCount(qst_giver, GetPlayer());
-		uint32 pos=data.wpos();
+		size_t pos=data.wpos();
 		data << uint32(count);
 		for (it = qst_giver->QuestsBegin(); it != qst_giver->QuestsEnd(); ++it)
 		{
@@ -404,7 +404,7 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
 	recv_data >> guid >> option;
 
 	sLog.outDetail("WORLD: CMSG_GOSSIP_SELECT_OPTION Option %i Guid %.8X", option, guid );
-	Creature *qst_giver = _player->GetMapMgr()->GetCreature(guid);
+	Creature *qst_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!qst_giver)
 		return;
 
@@ -525,7 +525,7 @@ void WorldSession::HandleBinderActivateOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature *pC = _player->GetMapMgr()->GetCreature(guid);
+	Creature *pC = _player->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pC) return;
 
 	SendInnkeeperBind(pC);

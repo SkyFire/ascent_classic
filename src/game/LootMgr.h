@@ -82,7 +82,7 @@ typedef struct
 	StoreLootItem*items;
 }StoreLootList;
 
-typedef std::set<uint64> LooterSet;
+typedef std::set<uint32> LooterSet;
 
 typedef struct
 {

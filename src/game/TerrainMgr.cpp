@@ -113,7 +113,7 @@ bool TerrainMgr::LoadTerrainHeader()
 
 	// Read in the header.
 	fseek(FileDescriptor,0,SEEK_SET);
-	int dread = fread(CellOffsets, 1, TERRAIN_HEADER_SIZE, FileDescriptor);
+	size_t dread = fread(CellOffsets, 1, TERRAIN_HEADER_SIZE, FileDescriptor);
 	if(dread != TERRAIN_HEADER_SIZE)
 	{
 		fclose(FileDescriptor);

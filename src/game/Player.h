@@ -784,9 +784,9 @@ public:
 	int32                GetOpenQuestSlot();
 	QuestLogEntry*       GetQuestLogForEntry(uint32 quest);
 	inline QuestLogEntry*GetQuestLogInSlot(uint32 slot)  { return m_questlog[slot]; }
-    inline uint64        GetQuestSharer()                { return m_questSharer; }
+    inline uint32        GetQuestSharer()                { return m_questSharer; }
     
-    inline void         SetQuestSharer(uint64 guid)     { m_questSharer = guid; }
+    inline void         SetQuestSharer(uint32 guid)     { m_questSharer = guid; }
     void                SetQuestLogSlot(QuestLogEntry *entry, uint32 slot);
     
     inline void         PushToRemovedQuests(uint32 questid)	{ m_removequests.insert(questid);}
@@ -804,7 +804,7 @@ public:
     std::set<uint32>    m_QuestGOInProgress;
     std::set<uint32>    m_removequests;
     std::set<uint32>    m_finishedQuests;
-    uint64              m_questSharer;
+    uint32              m_questSharer;
     uint32              timed_quest_slot;
 
     /************************************************************************/
@@ -927,8 +927,8 @@ public:
     /************************************************************************/
     /* Groups                                                               */
     /************************************************************************/
-	void                SetInviter(uint64 pInviter) { m_GroupInviter = pInviter; }
-	uint64              GetInviter() { return m_GroupInviter; }
+	void                SetInviter(uint32 pInviter) { m_GroupInviter = pInviter; }
+	inline uint32       GetInviter() { return m_GroupInviter; }
 	inline bool         InGroup() { return (m_Group != NULL && !m_GroupInviter); }
 	bool                IsGroupLeader()
 	{
@@ -959,8 +959,8 @@ public:
 	void                SetGuildId(uint32 guildId);
 	inline uint32       GetGuildRank() { return m_uint32Values[PLAYER_GUILDRANK]; }
 	void                SetGuildRank(uint32 guildRank) { SetUInt32Value(PLAYER_GUILDRANK, guildRank); }
-	uint64              GetGuildInvitersGuid() { return m_invitersGuid; }
-	void                SetGuildInvitersGuid( uint64 guid ) { m_invitersGuid = guid; }
+	uint32              GetGuildInvitersGuid() { return m_invitersGuid; }
+	void                SetGuildInvitersGuid( uint32 guid ) { m_invitersGuid = guid; }
 	void                UnSetGuildInvitersGuid() { m_invitersGuid = 0; }
   
     /************************************************************************/
@@ -1465,7 +1465,7 @@ public:
 	inline Corpse * getMyCorpse() { return myCorpse; }
 	bool bCorpseCreateable;
 	uint32 m_resurrectHealth, m_resurrectMana;
-	uint64 resurrector;
+	uint32 resurrector;
 	bool blinked;
 	uint16 m_speedhackChances;
 	uint32 m_explorationTimer;
@@ -1718,7 +1718,7 @@ protected:
 	/************************************************************************/
 	Item* mTradeItems[8];
 	uint32 mTradeGold;
-	uint64 mTradeTarget;
+	uint32 mTradeTarget;
 	uint32 mTradeStatus;
 
     /************************************************************************/
@@ -1738,7 +1738,7 @@ protected:
 	uint32      m_PetNumberMax;
 	std::map<uint32, PlayerPet*> m_Pets;
 	
-    uint64      m_invitersGuid; // It is guild inviters guid ,0 when its not used
+    uint32      m_invitersGuid; // It is guild inviters guid ,0 when its not used
     
 
     // bind
@@ -1799,7 +1799,7 @@ protected:
 	// Groups/Raids
 	Group* m_Group;
 	uint32 m_SubGroup;
-	uint64 m_GroupInviter;
+	uint32 m_GroupInviter;
 	uint8 m_StableSlotCount;
 
     // Fishing related

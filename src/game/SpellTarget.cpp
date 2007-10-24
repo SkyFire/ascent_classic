@@ -329,7 +329,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 	TargetsList *tmpMap=&m_targetUnits[i];
 	if(m_spellInfo->TargetCreatureType  && GUID_HIPART(m_targets.m_unitTarget)==HIGHGUID_UNIT)
 	{		
-		Creature *cr=m_caster->GetMapMgr()->GetCreature( m_targets.m_unitTarget);
+		Creature *cr=m_caster->GetMapMgr()->GetCreature((uint32) m_targets.m_unitTarget);
 		if(!cr)return;
 
 		if(cr->GetCreatureName())
@@ -626,7 +626,7 @@ void Spell::SpellTargetSingleTargetPartyMember(uint32 i, uint32 j)
 	if(!m_caster->IsInWorld())
 		return;
 
-	Unit* Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+	Unit* Target = m_caster->GetMapMgr()->GetPlayer((uint32)m_targets.m_unitTarget);
 	if(!Target)
 		return;
 	float r=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
@@ -649,7 +649,7 @@ void Spell::SpellTargetPartyMember(uint32 i, uint32 j)
 
 	TargetsList *tmpMap=&m_targetUnits[i];
 	// if no group target self
-	Player * Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+	Player * Target = m_caster->GetMapMgr()->GetPlayer((uint32)m_targets.m_unitTarget);
 	if(!Target)
 		return;
 
@@ -720,7 +720,7 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 	//this is cast distance, not searching distance
 	range *= range;
 
-	firstTarget = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+	firstTarget = m_caster->GetMapMgr()->GetPlayer((uint32)m_targets.m_unitTarget);
 	if(firstTarget && p_caster)
 	{
 		if(p_caster->InGroup())
@@ -869,7 +869,7 @@ void Spell::SpellTargetTargetPartyMember(uint32 i, uint32 j)
 		return;
 
 	TargetsList *tmpMap=&m_targetUnits[i];
-	Unit* Target = m_caster->GetMapMgr()->GetPlayer (m_targets.m_unitTarget);
+	Unit* Target = m_caster->GetMapMgr()->GetPlayer ((uint32)m_targets.m_unitTarget);
 	if(!Target)
 		return;
 
@@ -885,7 +885,7 @@ void Spell::SpellTargetSameGroupSameClass(uint32 i, uint32 j)
 	if(!m_caster->IsInWorld())
 		return;
 
-	Player * Target = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+	Player * Target = m_caster->GetMapMgr()->GetPlayer((uint32)m_targets.m_unitTarget);
 	if(!Target)
 		return;
 

@@ -1403,8 +1403,8 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 
 void Player::smsg_InitialSpells()
 {
-	uint16 spellCount = mSpells.size();
-	uint16 itemCount = m_itemcooldown.size();
+	uint16 spellCount = (uint16)mSpells.size();
+	uint16 itemCount = (uint16)m_itemcooldown.size();
 
 	WorldPacket data(SMSG_INITIAL_SPELLS, 5 + (spellCount * 4) + (itemCount * 4) );
 	data << uint8(0);
@@ -2702,7 +2702,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	m_TransporterGUID = get_next_field.GetUInt32();
 	if(m_TransporterGUID)
 	{
-		Transporter * t = objmgr.GetTransporterByEntry(m_TransporterGUID);
+		Transporter * t = objmgr.GetTransporterByEntry((uint32)m_TransporterGUID);
 		m_TransporterGUID = t ? t->GetGUID() : 0;
 	}
 
@@ -2738,7 +2738,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	uint32 id;
 	int32 basestanding;
 	int32 standing;
-	uint8 fflag;
+	uint32 fflag;
 	while(true) 
 	{
 		end = strchr(start,',');
@@ -2791,17 +2791,17 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		end = strchr(start,',');
 		if(!end)break;
 		*end=0;
-		mActions[Counter].Action = atol(start);
+		mActions[Counter].Action = (uint16)atol(start);
 		start = end +1;
 		end = strchr(start,',');
 		if(!end)break;
 		*end=0;
-		mActions[Counter].Misc = atol(start);
+		mActions[Counter].Misc = (uint8)atol(start);
 		start = end +1;
 		end = strchr(start,',');
 		if(!end)break;
 		*end=0;
-		mActions[Counter++].Type = atol(start);
+		mActions[Counter++].Type = (uint8)atol(start);
 		start = end +1;
 	}
 	
@@ -2877,9 +2877,9 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	else
 		_AddLanguages(false);
 
-	OnlineTime	= UNIXTIME;
+	OnlineTime	= (uint32)UNIXTIME;
 	if(GetGuildId())
-		SetUInt32Value(PLAYER_GUILD_TIMESTAMP, UNIXTIME);
+		SetUInt32Value(PLAYER_GUILD_TIMESTAMP, (uint32)UNIXTIME);
 
 #undef get_next_field
 
@@ -4064,22 +4064,22 @@ void Player::UpdateChances()
  
 	float tmp = baseDodge[pClass] + (GetUInt32Value( UNIT_FIELD_STAT1) / dodgeRatio[pClass]) + this->GetDodgeFromSpell();
 	tmp+=CalcRating(2);//dodge rating
-	SetFloatValue(PLAYER_DODGE_PERCENTAGE,min(tmp,95.0));
+	SetFloatValue(PLAYER_DODGE_PERCENTAGE,min(tmp,95.0f));
 
 	//block = 0 if no shield
 	Item* it = this->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
 	if(it && it->GetProto()->InventoryType==INVTYPE_SHIELD)
 	{
-		tmp = 5.0f + GetUInt32Value(UNIT_FIELD_STAT0) / 22.0 + this->GetBlockFromSpell();
+		tmp = 5.0f + GetUInt32Value(UNIT_FIELD_STAT0) / 22.0f + this->GetBlockFromSpell();
 		tmp+=CalcRating(4);//block rating
 	}
 	else
 		tmp = 0.0f;
-	SetFloatValue(PLAYER_BLOCK_PERCENTAGE,min(tmp,95.0));
+	SetFloatValue(PLAYER_BLOCK_PERCENTAGE,min(tmp,95.0f));
 
 	tmp = 5.0f + this->GetParryFromSpell();
 	tmp+=CalcRating(3);
-	SetFloatValue(PLAYER_PARRY_PERCENTAGE,max(0,min(tmp,95.0))); //let us not use negative parry. Some spells decrease it
+	SetFloatValue(PLAYER_PARRY_PERCENTAGE,max(0,min(tmp,95.0f))); //let us not use negative parry. Some spells decrease it
 /* The formula is generated as follows:
 
 [agility] / [crit constant*] + [skill modifier] + [bonuses]
@@ -4097,7 +4097,7 @@ The crit constant is class and level dependent and for a level 70 character as f
 	* Warrior [33] 
 */
 
-	tmp = baseCritChance[pClass] + GetUInt32Value(UNIT_FIELD_STAT1)*CritFromAgi[pLevel][pClass];
+	tmp = baseCritChance[pClass] + GetUInt32Value(UNIT_FIELD_STAT1)*float(CritFromAgi[pLevel][pClass]);
 	//std::list<WeaponModifier>::iterator i = tocritchance.begin();
 	map<uint32, WeaponModifier>::iterator i = tocritchance.begin();
 	Item * tItem = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
@@ -4112,14 +4112,14 @@ The crit constant is class and level dependent and for a level 70 character as f
 		}
 	}
 	float cr=tmp+CalcRating(8)+b;
-	SetFloatValue(PLAYER_CRIT_PERCENTAGE,min(cr,95.0));
+	SetFloatValue(PLAYER_CRIT_PERCENTAGE,min(cr,95.0f));
 
 
 	float rcr=tmp+CalcRating(9);
-	SetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE,min(rcr,95.0));
+	SetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE,min(rcr,95.0f));
 
 	spellcritperc = baseSpellCrit[pClass] +
-					GetUInt32Value(UNIT_FIELD_STAT3)*SpellCritFromInt[pLevel][pClass] +
+					GetUInt32Value(UNIT_FIELD_STAT3)*float(SpellCritFromInt[pLevel][pClass]) +
 					this->GetSpellCritFromSpell() +
 					this->CalcRating(10);
 	UpdateChanceFields();
@@ -4252,7 +4252,7 @@ void Player::UpdateStats()
 		SetUInt32Value(UNIT_FIELD_HEALTH,res);
     else if ( (cl==DRUID) && (GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR) )
     {
-        res=(int32) (float)GetUInt32Value(UNIT_FIELD_MAXHEALTH)*(float)GetUInt32Value(UNIT_FIELD_HEALTH)/oldmaxhp;
+        res= float2int32((float)GetUInt32Value(UNIT_FIELD_MAXHEALTH)*(float)GetUInt32Value(UNIT_FIELD_HEALTH)/float(oldmaxhp));
         SetUInt32Value(UNIT_FIELD_HEALTH,res);
     }
 	
@@ -4273,7 +4273,7 @@ void Player::UpdateStats()
 	float newb=CalcRating(19);
 	if(newb!=SpellHasteRatingBonus)
 	{
-		ModFloatValue(UNIT_MOD_CAST_SPEED,(SpellHasteRatingBonus-newb)/100.0);
+		ModFloatValue(UNIT_MOD_CAST_SPEED,(SpellHasteRatingBonus-newb)/100.0f);
 		SpellHasteRatingBonus=newb;
 	}
 ////////////////////RATINGS STUFF//////////////////////
@@ -4336,7 +4336,7 @@ void Player::EventPlayerRest()
 		return;
 	}
 	// Rest timer
-	float diff = difftime(UNIXTIME,m_lastRestUpdate);
+	uint32 diff = (uint32)UNIXTIME - m_lastRestUpdate;
 	m_lastRestUpdate = (uint32)UNIXTIME;
 	uint32 RestXP = CalculateRestXP((uint32)diff);
 	sLog.outDebug("REST: Adding %d rest XP for %.0f seconds of rest time", RestXP, diff);
@@ -4789,13 +4789,13 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 	
 	if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_UNIT)
 	{
-		Creature* pCreature = GetMapMgr()->GetCreature(guid);
+		Creature* pCreature = GetMapMgr()->GetCreature((uint32)guid);
 		if(!pCreature)return;
 		pLoot=&pCreature->loot;
 		m_currentLoot = pCreature->GetGUID();
 	}else if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_GAMEOBJECT)
 	{
-		GameObject* pGO = GetMapMgr()->GetGameObject(guid);
+		GameObject* pGO = GetMapMgr()->GetGameObject((uint32)guid);
 		if(!pGO)return;
 		pGO->SetUInt32Value(GAMEOBJECT_STATE,0);
 		pLoot=&pGO->loot;
@@ -4803,14 +4803,14 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 	}
 	else if((UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_PLAYER) )
 	{
-		Player *p=GetMapMgr()->GetPlayer(guid);
+		Player *p=GetMapMgr()->GetPlayer((uint32)guid);
 		if(!p)return;
 		pLoot=&p->loot;
 		m_currentLoot = p->GetGUID();
 	}
 	else if( (UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_CORPSE))
 	{
-		Corpse *pCorpse = objmgr.GetCorpse(guid);
+		Corpse *pCorpse = objmgr.GetCorpse((uint32)guid);
 		if(!pCorpse)return;
 		pLoot=&pCorpse->loot;
 		m_currentLoot = pCorpse->GetGUID();
@@ -4831,7 +4831,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 	}
 
 	// add to looter set
-	pLoot->looters.insert(GetGUID());
+	pLoot->looters.insert(GetGUIDLow());
 		
 	WorldPacket data, data2(28);
 	data.SetOpcode (SMSG_LOOT_RESPONSE);
@@ -4973,7 +4973,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 				data2 << x;
 				data2 << uint32(iter->item.itemproto->ItemId);
 				data2 << uint32(0);
-				data2 << uint32(iter->iRandomProperty);
+				data2 << uint32(iter->iRandomProperty->ID);
 				data2 << uint32(60000); // countdown
 
 				if(m_Group)
@@ -5663,7 +5663,7 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 	sEventMgr.AddEvent(this, &Player::EventTaxiInterpolate, 
 		EVENT_PLAYER_TAXI_INTERPOLATE, 900, 0,0);
 
-	TaxiPathNode *pn = path->GetPathNode(path->GetNodeCount() - 1);
+	TaxiPathNode *pn = path->GetPathNode((uint32)path->GetNodeCount() - 1);
 
 	sEventMgr.AddEvent(this, &Player::EventDismount, path->GetPrice(), 
 		pn->x, pn->y, pn->z, EVENT_PLAYER_TAXI_DISMOUNT, traveltime, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT); 
@@ -5672,7 +5672,7 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 void Player::JumpToEndTaxiNode(TaxiPath * path)
 {
 	// this should *always* be safe in case it cant build your position on the path!
-	TaxiPathNode * pathnode = path->GetPathNode(path->GetNodeCount()-1);
+	TaxiPathNode * pathnode = path->GetPathNode((uint32)path->GetNodeCount()-1);
 	if(!pathnode) return;
 
 	SetTaxiState(false);
@@ -5837,7 +5837,7 @@ void Player::RegenerateEnergy(float RegenPct)
 	uint32 mh = GetUInt32Value(UNIT_FIELD_MAXPOWER4);
 	if(cur >= mh)
 		return;
-	float amt = 20.0 * PctPowerRegenModifier[POWER_TYPE_ENERGY];
+	float amt = 20.0f * PctPowerRegenModifier[POWER_TYPE_ENERGY];
 
 	cur += float2int32(amt);
 	SetUInt32Value(UNIT_FIELD_POWER4,(cur>=mh) ? mh : cur);
@@ -6139,9 +6139,9 @@ void Player::ProcessPendingUpdates()
 		return;
 	}
 
-	uint32 bBuffer_size =  (bCreationBuffer.size() > bUpdateBuffer.size() ? bCreationBuffer.size() : bUpdateBuffer.size()) + 10 + (mOutOfRangeIds.size() * 9);
+	size_t bBuffer_size =  (bCreationBuffer.size() > bUpdateBuffer.size() ? bCreationBuffer.size() : bUpdateBuffer.size()) + 10 + (mOutOfRangeIds.size() * 9);
     uint8 * update_buffer = new uint8[bBuffer_size];
-	uint32 c = 0;
+	size_t c = 0;
 
     //build out of range updates if creation updates are queued
     if(bCreationBuffer.size() || mOutOfRangeIdCount)
@@ -6176,10 +6176,10 @@ void Player::ProcessPendingUpdates()
 
         // compress update packet
 	    // while we said 350 before, i'm gonna make it 500 :D
-	    if(c < sWorld.compression_threshold || !CompressAndSendUpdateBuffer(c, update_buffer))
+	    if(c < (size_t)sWorld.compression_threshold || !CompressAndSendUpdateBuffer((uint32)c, update_buffer))
 	    {
 		    // send uncompressed packet -> because we failed
-		    m_session->OutPacket(SMSG_UPDATE_OBJECT, c, update_buffer);
+		    m_session->OutPacket(SMSG_UPDATE_OBJECT, (uint16)c, update_buffer);
 	    }
     }
 
@@ -6201,10 +6201,10 @@ void Player::ProcessPendingUpdates()
 
 		// compress update packet
 		// while we said 350 before, i'm gonna make it 500 :D
-		if(c < sWorld.compression_threshold || !CompressAndSendUpdateBuffer(c, update_buffer))
+		if(c < (size_t)sWorld.compression_threshold || !CompressAndSendUpdateBuffer((uint32)c, update_buffer))
 		{
 			// send uncompressed packet -> because we failed
-			m_session->OutPacket(SMSG_UPDATE_OBJECT, c, update_buffer);
+			m_session->OutPacket(SMSG_UPDATE_OBJECT, (uint16)c, update_buffer);
 		}
 	}
 	
@@ -6290,7 +6290,7 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 #endif
 
 	// send it
-	m_session->OutPacket(SMSG_COMPRESSED_UPDATE_OBJECT, stream.total_out + 4, buffer);
+	m_session->OutPacket(SMSG_COMPRESSED_UPDATE_OBJECT, (uint16)stream.total_out + 4, buffer);
 
 	// cleanup memory
 	delete [] buffer;
@@ -6509,8 +6509,8 @@ void Player::RequestDuel(Player *pTarget)
 	//Get Flags position
 	float dist = CalcDistance(pTarget);
 	dist = dist/2; //half way
-	float x = (GetPositionX() + pTarget->GetPositionX()*dist)/(1+dist) + cos(GetOrientation()+(M_PI/2))*2;
-	float y = (GetPositionY() + pTarget->GetPositionY()*dist)/(1+dist) + sin(GetOrientation()+(M_PI/2))*2;
+	float x = (GetPositionX() + pTarget->GetPositionX()*dist)/(1+dist) + cos(GetOrientation()+(float(M_PI)/2))*2;
+	float y = (GetPositionY() + pTarget->GetPositionY()*dist)/(1+dist) + sin(GetOrientation()+(float(M_PI)/2))*2;
 	float z = (GetPositionZ() + pTarget->GetPositionZ()*dist)/(1+dist);
 
 	//Create flag/arbiter
@@ -6812,10 +6812,10 @@ float Player::CalcRating(uint32 index)
 		if(l<10)l=10;//this is not dirty fix-> that's from wowwiki
 		double cost;
 		if(l < 60)
-			cost=(l-8)/52.0;
+			cost=(l-8)/52.0f;
 		else
-			cost=82.0/(262-3*l);
-		return rating /(BaseRating[index] * cost);
+			cost=82.0f/(262-3*l);
+		return rating /float(BaseRating[index] * cost);
 	}else return 0;
 
 }
@@ -7725,8 +7725,8 @@ void Player::CalcDamage()
 	float r;
 	int ss = GetShapeShift();
 /////////////////MAIN HAND
-		float ap_bonus = GetAP()/14000.0;
-		delta = GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS)-GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG);
+		float ap_bonus = GetAP()/14000.0f;
+		delta = float(GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS)-GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG));
 		if(IsInFeralForm())
 		{
 			uint32 lev = getLevel();
@@ -7736,15 +7736,15 @@ void Player::CalcDamage()
 				r = delta + ap_bonus * 2500.0;*/
 
 			if(ss == FORM_CAT)
-				r = lev + delta + ap_bonus * 1000.0;
+				r = lev + delta + ap_bonus * 1000.0f;
 			else
-				r = lev + delta + ap_bonus * 2500.0;
+				r = lev + delta + ap_bonus * 2500.0f;
 			
 			//SetFloatValue(UNIT_FIELD_MINDAMAGE,r);
 			//SetFloatValue(UNIT_FIELD_MAXDAMAGE,r);
 
-			SetFloatValue(UNIT_FIELD_MINDAMAGE,r * 0.9);
-			SetFloatValue(UNIT_FIELD_MAXDAMAGE,r * 1.1);
+			SetFloatValue(UNIT_FIELD_MINDAMAGE,r * 0.9f);
+			SetFloatValue(UNIT_FIELD_MAXDAMAGE,r * 1.1f);
 
 			return;
 		}
@@ -7766,7 +7766,7 @@ void Player::CalcDamage()
 			if((i->second.wclass == (uint32)-1) || //any weapon
 				(it && ((1 << it->GetProto()->SubClass) & i->second.subclass) )
 				)
-					tmp+=i->second.value/100.0;
+					tmp+=i->second.value/100.0f;
 		}
 		
 		r = BaseDamage[0]+delta+bonus;
@@ -7808,7 +7808,7 @@ void Player::CalcDamage()
 				if((i->second.wclass==(uint32)-1) || //any weapon
 					(( (1 << it->GetProto()->SubClass) & i->second.subclass)  )
 					)
-					tmp+=i->second.value/100.0;
+					tmp+=i->second.value/100.0f;
 			}
 
 			r = (BaseOffhandDamage[0]+delta+bonus)*offhand_dmg_mod;
@@ -7840,7 +7840,7 @@ void Player::CalcDamage()
 					( ((1 << it->GetProto()->SubClass) & i->second.subclass)  )
 					)
 				{
-					tmp+=i->second.value/100.0;
+					tmp+=i->second.value/100.0f;
 				}
 			}
 
@@ -7848,7 +7848,7 @@ void Player::CalcDamage()
 			{
 //				ap_bonus = (GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER)+(int32)GetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS))/14000.0;
 				//modified by Zack : please try to use premade functions if possible to avoid forgetting stuff
-				ap_bonus = GetRAP()/14000.0;
+				ap_bonus = GetRAP()/14000.0f;
 				bonus = ap_bonus*it->GetProto()->Delay;
 				
 				if(GetUInt32Value(PLAYER_AMMO_ID))
@@ -7856,7 +7856,7 @@ void Player::CalcDamage()
 					ItemPrototype * xproto=ItemPrototypeStorage.LookupEntry(GetUInt32Value(PLAYER_AMMO_ID));
 					if(xproto)
 					{
-						bonus+=((xproto->Damage[0].Min+xproto->Damage[0].Max)*it->GetProto()->Delay)/2000.0;
+						bonus+=((xproto->Damage[0].Min+xproto->Damage[0].Max)*it->GetProto()->Delay)/2000.0f;
 					}
 				}
 			}else bonus =0;
@@ -7884,7 +7884,7 @@ void Player::CalcDamage()
 		tmp = 1;
 		for(i = damagedone.begin();i != damagedone.end();i++)
 		if(i->second.wclass==(uint32)-1)  //any weapon
-			tmp += i->second.value/100.0;
+			tmp += i->second.value/100.0f;
 		
 		//display only modifiers for any weapon
 		SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT ,tmp);
@@ -7900,20 +7900,20 @@ uint32 Player::GetMainMeleeDamage(uint32 AP_owerride)
 /////////////////MAIN HAND
 	float ap_bonus;
 	if(AP_owerride) 
-		ap_bonus = AP_owerride/14000.0;
+		ap_bonus = AP_owerride/14000.0f;
 	else 
-		ap_bonus = GetAP()/14000.0;
-	delta = GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS)-GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG);
+		ap_bonus = GetAP()/14000.0f;
+	delta = float(GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS)-GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG));
 	if(IsInFeralForm())
 	{
 		uint32 lev = getLevel();
 		if(ss == FORM_CAT)
-			r = lev + delta + ap_bonus * 1000.0;
+			r = lev + delta + ap_bonus * 1000.0f;
 		else
-			r = lev + delta + ap_bonus * 2500.0;
-		min_dmg = r * 0.9;
-		max_dmg = r * 1.1;
-		return max((min_dmg + max_dmg)/2,0);
+			r = lev + delta + ap_bonus * 2500.0f;
+		min_dmg = r * 0.9f;
+		max_dmg = r * 1.1f;
+		return float2int32(max((min_dmg + max_dmg)/2,0));
 	}
 //////no druid ss	
 	uint32 speed=2000;
@@ -7931,17 +7931,17 @@ uint32 Player::GetMainMeleeDamage(uint32 AP_owerride)
 		if((i->second.wclass == (uint32)-1) || //any weapon
 			(it && ((1 << it->GetProto()->SubClass) & i->second.subclass) )
 			)
-				tmp+=i->second.value/100.0;
+				tmp+=i->second.value/100.0f;
 	}
 	
 	r = BaseDamage[0]+delta+bonus;
 	r *= tmp;
-	min_dmg = r * 0.9;
+	min_dmg = r * 0.9f;
 	r = BaseDamage[1]+delta+bonus;
 	r *= tmp;
-	max_dmg = r * 1.1;
+	max_dmg = r * 1.1f;
 
-	return max((min_dmg + max_dmg)/2,0);
+	return float2int32(max((min_dmg + max_dmg)/2,0));
 }
 
 void Player::EventPortToGM(Player *p)
@@ -8452,7 +8452,7 @@ void Player::_ModifySkillBonusByType(uint32 SkillType, int32 Delta)
 
 float PlayerSkill::GetSkillUpChance()
 {
-	float diff = MaximumValue - CurrentValue;
+	float diff = float(MaximumValue - CurrentValue);
 	return (diff * 100.0f / float(MaximumValue)) / 3.0f;
 }
 

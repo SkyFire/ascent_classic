@@ -301,7 +301,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}break;
 		case EVENT_DAMAGETAKEN:
 			{
-				CALL_SCRIPT_EVENT(m_Unit, OnDamageTaken)(pUnit, misc1);
+				CALL_SCRIPT_EVENT(m_Unit, OnDamageTaken)(pUnit, float(misc1));
 				if(!modThreatByPtr(pUnit, misc1))
 				{
 					m_aiTargets.insert(TargetMap::value_type(pUnit, misc1));
@@ -1576,7 +1576,7 @@ float AIInterface::_CalcAggroRange(Unit* target)
 
 	// Multiply by elite value
 	if(((Creature*)m_Unit)->GetCreatureName() && ((Creature*)m_Unit)->GetCreatureName()->Rank > 0)
-		AggroRange *= (((Creature*)m_Unit)->GetCreatureName()->Rank) * 1.50;
+		AggroRange *= (((Creature*)m_Unit)->GetCreatureName()->Rank) * 1.50f;
 
 	if(AggroRange > 40.0f) // cap at 40.0f
 	{
@@ -1616,7 +1616,7 @@ void AIInterface::_CalcDestinationAndMove(Unit *target, float dist)
 	
 	if(target->GetTypeId() == TYPEID_UNIT || target->GetTypeId() == TYPEID_PLAYER)
 	{
-		float angle = m_Unit->calcAngle(m_Unit->GetPositionX(), m_Unit->GetPositionY(), target->GetPositionX(), target->GetPositionY()) * M_PI / 180.0f;
+		float angle = m_Unit->calcAngle(m_Unit->GetPositionX(), m_Unit->GetPositionY(), target->GetPositionX(), target->GetPositionY()) * float(M_PI) / 180.0f;
 		float x = dist * cosf(angle);
 		float y = dist * sinf(angle);
 		if(target->GetTypeId() == TYPEID_PLAYER && ((Player*)target)->m_isMoving)
@@ -2420,7 +2420,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				if(m_moveType == MOVEMENTTYPE_RANDOMWP) //is random move on if so move to a random waypoint
 				{
 					if(GetWayPointsCount() > 1)
-						destpoint = sRand.randInt(GetWayPointsCount());
+						destpoint = sRand.randInt((uint32)GetWayPointsCount());
 				}
 				else if (m_moveType == MOVEMENTTYPE_CIRCLEWP) //random move is not on lets follow the path in circles
 				{
@@ -2521,7 +2521,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 	
 	if(m_AIState == STATE_WANDER && m_creatureState == STOPPED)
 	{
-		float wanderO = sRand.randInt(6);
+		float wanderO = (float)sRand.rand(6);
 		float wanderX = m_Unit->GetPositionX() + cosf(wanderO);																											 
 		float wanderY = m_Unit->GetPositionY() + sinf(wanderO);																											  
 		float wanderZ;
@@ -2664,7 +2664,7 @@ AI_Spell *AIInterface::getSpell()
 	if((time_t)next_spell_time >= UNIXTIME)
 		return 0;
 
-	next_spell_time = UNIXTIME + 1;
+	next_spell_time = (uint32)UNIXTIME + 1;
 
 	// look at our spells
 	AI_Spell *  sp = NULL;
@@ -2735,7 +2735,7 @@ AI_Spell *AIInterface::getSpell()
 		cast_time = GetCastTime(dbcSpellCastTime.LookupEntry( sp->spell->CastingTimeIndex ) );
 		cast_time /= 1000;
 		if(cast_time)
-			next_spell_time = UNIXTIME + cast_time;
+			next_spell_time = (uint32)UNIXTIME + cast_time;
 
 /*		// add the cooldown - added at actual cast
 		AddSpellCooldown(sp->spell->Id);*/
@@ -3088,7 +3088,7 @@ void AIInterface::AddSpellCooldown(SpellEntry * pSpell, AI_Spell * sp)
 	uint32 Cooldown;
 	if (sp && sp->cooldown)
 	{
-		Cooldown = sp->cooldown;
+		Cooldown = (uint32)sp->cooldown;
 	}
 	else
 	{

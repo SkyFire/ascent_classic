@@ -83,7 +83,7 @@ int32 HonorHandler::CalculateHonorPointsForKill(Player *pPlayer, Unit* pVictim)
 		if(diff_honor < 0) diff_honor = 0.0;
 
 		float honor_points = diff_level * (150 + diff_honor*60);
-		honor_points *= ((float)k_level) / 70.0;
+		honor_points *= ((float)k_level) / 70.0f;
 		honor_points *= World::getSingleton().getRate(RATE_HONOR);
 
 		return float2int32(honor_points);

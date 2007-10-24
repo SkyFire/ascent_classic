@@ -724,7 +724,7 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 {
 	uint32 id;
 	char sql[512];
-	Creature* target = m_session->GetPlayer()->GetMapMgr()->GetCreature(m_session->GetPlayer()->GetSelection());
+	Creature* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
 	if (!target)
 		return false;
 

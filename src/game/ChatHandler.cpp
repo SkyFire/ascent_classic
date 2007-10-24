@@ -447,7 +447,7 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 		if(pUnit->IsPlayer())
 		{
 			name = static_cast<Player*>(pUnit)->GetName();
-			namelen = strlen(name) + 1;
+			namelen = (uint32)strlen(name) + 1;
 		}
 		else if(pUnit->GetTypeId() == TYPEID_UNIT)
 		{
@@ -455,7 +455,7 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 			if(p->GetCreatureName())
 			{
 				name = p->GetCreatureName()->Name;
-				namelen = strlen(name) + 1;
+				namelen = (uint32)strlen(name) + 1;
 			}
 			else
 			{
@@ -513,7 +513,7 @@ void WorldSession::HandleReportSpamOpcode(WorldPacket & recvPacket)
 	std::string message;
 	recvPacket >> unk1 >> reportedGuid >> unk2 >> messagetype >> unk3 >> unk4 >> message;
 
-	Player * rPlayer = objmgr.GetPlayer(reportedGuid);
+	Player * rPlayer = objmgr.GetPlayer((uint32)reportedGuid);
 	if(!rPlayer)
 		return;
 

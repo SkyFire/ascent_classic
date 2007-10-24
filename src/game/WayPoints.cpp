@@ -53,7 +53,7 @@ bool ChatHandler::HandleWPAddCommand(const char* args, WorldSession *m_session)
 	}
 	else
 	{
-		pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+		pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 		if(!pCreature)
 		{
 			SystemMessage(m_session, "You should select a creature.");
@@ -81,7 +81,7 @@ bool ChatHandler::HandleWPAddCommand(const char* args, WorldSession *m_session)
 
 	WayPoint* wp = new WayPoint;
 	bool showing = ai->m_WayPointsShowing;
-	wp->id = ai->GetWayPointsCount()+1;
+	wp->id = (uint32)ai->GetWayPointsCount()+1;
 	wp->x = p->GetPositionX();
 	wp->y = p->GetPositionY();
 	wp->z = p->GetPositionZ();
@@ -132,7 +132,7 @@ bool ChatHandler::HandleWPMoveTypeCommand(const char* args, WorldSession *m_sess
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -159,7 +159,7 @@ bool ChatHandler::HandleWPShowCommand(const char* args, WorldSession *m_session)
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a Creature.");
@@ -659,7 +659,7 @@ bool ChatHandler::HandleWPHideCommand(const char* args, WorldSession *m_session)
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a Creature.");
@@ -693,7 +693,7 @@ bool ChatHandler::HandleWPHideCommand(const char* args, WorldSession *m_session)
 bool ChatHandler::HandleGenerateWaypoints(const char* args, WorldSession * m_session)
 {
 	Creature * cr = 
-		m_session->GetPlayer()->GetMapMgr()->GetCreature(m_session->GetPlayer()->GetSelection());
+		m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
 	if(!cr)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -729,11 +729,11 @@ bool ChatHandler::HandleGenerateWaypoints(const char* args, WorldSession * m_ses
 
 	for(int i=0;i<n;i++)
 	{
-		float ang = rand()/100.0;
-		float ran = (rand()%(r*10))/10.0;
+		float ang = rand()/100.0f;
+		float ran = (rand()%(r*10))/10.0f;
 		while(ran<1)
 		{
-			ran = (rand()%(r*10))/10.0;
+			ran = (rand()%(r*10))/10.0f;
 		}
 
 		float x = cr->GetPositionX()+ran*sin(ang);
@@ -741,7 +741,7 @@ bool ChatHandler::HandleGenerateWaypoints(const char* args, WorldSession * m_ses
 		float z = cr->GetMapMgr()->GetBaseMap()->GetLandHeight(x,y);
 		 
 		WayPoint* wp = new WayPoint;
-		wp->id = cr->GetAIInterface()->GetWayPointsCount()+1;
+		wp->id = (uint32)cr->GetAIInterface()->GetWayPointsCount()+1;
 		wp->x = x;
 		wp->y = y;
 		wp->z = z;
@@ -772,7 +772,7 @@ bool ChatHandler::HandleGenerateWaypoints(const char* args, WorldSession * m_ses
 bool ChatHandler::HandleSaveWaypoints(const char* args, WorldSession * m_session)
 {
 	Creature * cr = 
-		m_session->GetPlayer()->GetMapMgr()->GetCreature(m_session->GetPlayer()->GetSelection());
+		m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
 	if(!cr)return false;
 	if(!cr->GetSQL_id())
 		return false;
@@ -785,7 +785,7 @@ bool ChatHandler::HandleSaveWaypoints(const char* args, WorldSession * m_session
 bool ChatHandler::HandleDeleteWaypoints(const char* args, WorldSession * m_session)
 {
 	Creature * cr = 
-		m_session->GetPlayer()->GetMapMgr()->GetCreature(m_session->GetPlayer()->GetSelection());
+		m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
 	if(!cr)return false;
 	if(!cr->GetSQL_id())
 		return false;
@@ -833,7 +833,7 @@ bool ChatHandler::HandleWaypointAddFlyCommand(const char * args, WorldSession * 
 	}
 	else
 	{
-		pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+		pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 		if(!pCreature)
 		{
 			SystemMessage(m_session, "You should select a creature.");
@@ -859,7 +859,7 @@ bool ChatHandler::HandleWaypointAddFlyCommand(const char * args, WorldSession * 
 
 	WayPoint* wp = new WayPoint;
 	bool showing = ai->m_WayPointsShowing;
-	wp->id = ai->GetWayPointsCount()+1;
+	wp->id = (uint32)ai->GetWayPointsCount()+1;
 	wp->x = p->GetPositionX();
 	wp->y = p->GetPositionY();
 	wp->z = p->GetPositionZ();

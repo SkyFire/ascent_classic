@@ -971,7 +971,7 @@ void ObjectMgr::AddGuild(Guild *pGuild)
 
 uint32 ObjectMgr::GetTotalGuildCount()
 {
-	return mGuild.size();
+	return (uint32)mGuild.size();
 }
 
 bool ObjectMgr::RemoveGuild(uint32 guildId)
@@ -1300,7 +1300,7 @@ void GossipMenu::AddItem(uint16 Icon, const char* Text, int32 Id)
 	GossipMenuItem Item;
 	Item.Icon = Icon;
 	Item.Text = Text;
-	Item.Id = Menu.size();
+	Item.Id = (uint32)Menu.size();
 	if(Id > 0)
 		Item.IntId = Id;
 	else
@@ -1374,7 +1374,7 @@ void ObjectMgr::LoadTrainers()
 	QueryResult * result2;
 	Field * fields2;
 	const char * temp;
-	int len;
+	size_t len;
 
 	LoadDisabledSpells();
 

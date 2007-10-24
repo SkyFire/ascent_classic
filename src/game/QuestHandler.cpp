@@ -34,7 +34,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
 
     if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_UNIT)
     {
-        Creature *quest_giver = _player->GetMapMgr()->GetCreature(guid);
+        Creature *quest_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
         if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -56,7 +56,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
 	}
     else if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_GAMEOBJECT)
 	{
-		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject(guid);
+		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -85,7 +85,7 @@ void WorldSession::HandleQuestgiverHelloOpcode( WorldPacket & recv_data )
 
 	recv_data >> guid;
 
-	Creature *qst_giver = _player->GetMapMgr()->GetCreature(guid);
+	Creature *qst_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
 
 	if (!qst_giver)
 	{
@@ -133,25 +133,25 @@ void WorldSession::HandleQuestGiverQueryQuestOpcode( WorldPacket & recv_data )
 
 	if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_UNIT)
 	{
-		Creature *quest_giver = _player->GetMapMgr()->GetCreature(guid);
+		Creature *quest_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
 			return;
 		bValid = quest_giver->isQuestGiver();
 		if(bValid)
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, quest_giver->GetQuestRelation(qst->id), false);
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id), false);
 	} 
 	else if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_GAMEOBJECT)
 	{
-		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject(guid);
+		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
 			return;
 		bValid = quest_giver->isQuestGiver();
 		if(bValid)
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, quest_giver->GetQuestRelation(qst->id), false);
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id), false);
 	} 
 	else if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_ITEM)
 	{
@@ -224,7 +224,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 
 	if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_UNIT)
 	{
-		Creature *quest_giver = _player->GetMapMgr()->GetCreature(guid);
+		Creature *quest_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -236,7 +236,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	} 
 	else if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_GAMEOBJECT)
 	{
-		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject(guid);
+		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -259,7 +259,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	}
 	else if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_PLAYER)
 	{
-		Player *quest_giver = _player->GetMapMgr()->GetPlayer(guid);
+		Player *quest_giver = _player->GetMapMgr()->GetPlayer((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -456,7 +456,7 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data 
 
 	if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_UNIT)
 	{
-		Creature *quest_giver = _player->GetMapMgr()->GetCreature(guid);
+		Creature *quest_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -475,12 +475,12 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data 
 				sLog.outError("WARNING: Cannot complete quest, as it doesnt exist.");
 				return;
 			}
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, quest_giver->GetQuestRelation(qst->id),false);
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id),false);
 		}
 	} 
 	else if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_GAMEOBJECT)
 	{
-		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject(guid);
+		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -495,7 +495,7 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data 
 				sLog.outError("WARNING: Cannot complete quest, as it doesnt exist.");
 				return;
 			}
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, quest_giver->GetQuestRelation(qst->id),false);
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id),false);
 		}
 	}
 
@@ -541,7 +541,7 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 
 	if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_UNIT)
 	{
-		Creature *quest_giver = _player->GetMapMgr()->GetCreature(guid);
+		Creature *quest_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -557,12 +557,12 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 				sLog.outError("WARNING: Cannot complete quest, as it doesnt exist.");
 				return;
 			}
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, quest_giver->GetQuestRelation(qst->id),false);
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id),false);
 		}
 	} 
 	else if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_GAMEOBJECT)
 	{
-		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject(guid);
+		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -577,7 +577,7 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 				sLog.outError("WARNING: Cannot complete quest, as it doesnt exist.");
 				return;
 			}
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, quest_giver->GetQuestRelation(qst->id),false);
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id),false);
 		}
 	}
 
@@ -630,7 +630,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvPacket)
 
 	if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_UNIT)
 	{
-		Creature *quest_giver = _player->GetMapMgr()->GetCreature(guid);
+		Creature *quest_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -641,7 +641,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvPacket)
 	} 
 	else if(UINT32_LOPART(GUID_HIPART(guid))==HIGHGUID_GAMEOBJECT)
 	{
-		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject(guid);
+		GameObject *quest_giver = _player->GetMapMgr()->GetGameObject((uint32)guid);
 		if(quest_giver)
 			qst_giver = (Object*)quest_giver;
 		else
@@ -726,7 +726,7 @@ void WorldSession::HandlePushQuestToPartyOpcode(WorldPacket &recv_data)
 		Group *pGroup = _player->GetGroup();
 		if(pGroup)
 		{
-			uint32 pguid = _player->GetGUID();
+			uint32 pguid = _player->GetGUIDLow();
 			SubGroup * sgr = _player->GetGroup() ?
 				_player->GetGroup()->GetSubGroup(_player->GetSubGroup()) : 0;
 

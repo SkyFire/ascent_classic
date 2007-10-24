@@ -786,7 +786,7 @@ void Group::LoadFromDB(Field *fields)
 	{
 		for(int j = 0; j < 5; ++j)
 		{
-			uint64 guid = fields[5 + (i*5) + j].GetUInt64();
+			uint32 guid = fields[5 + (i*5) + j].GetUInt32();
 			PlayerInfo * inf = objmgr.GetPlayerInfo(guid);
 			if(inf == NULL) continue;
 			AddMember(inf, NULL, i);
@@ -827,7 +827,7 @@ void Group::SaveToDB()
 	for(uint32 i = 0; i < fillers; ++i)
 		ss << "0,0,0,0,0,";
 
-	ss << UNIXTIME << ")";
+	ss << (uint32)UNIXTIME << ")";
 	/*printf("==%s==\n", ss.str().c_str());*/
 	CharacterDatabase.Execute(ss.str().c_str());
 }
@@ -1106,7 +1106,7 @@ void WorldSession::HandlePartyMemberStatsOpcode(WorldPacket & recv_data)
 	uint64 guid;
 	recv_data >> guid;
 
-	Player * plr = _player->GetMapMgr()->GetPlayer(guid);
+	Player * plr = _player->GetMapMgr()->GetPlayer((uint32)guid);
 
 	if(!_player->GetGroup() || !plr)
 		return;

@@ -181,7 +181,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		}
 	}
 
-	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
+	size_t pos = (size_t)m_MoverWoWGuid.GetNewGuidLen() + 1;
 	uint32 mstime = mTimeStamp();
 	int32 move_time;
 	if(m_clientTimeDelay == 0)
@@ -197,7 +197,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 #else
 		*(uint32*)&movement_packet[pos+4] = uint32(move_time + (*itr)->GetSession()->m_moveDelayTime);
 #endif
-		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), recv_data.size() + pos, movement_packet);
+		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), uint16(recv_data.size() + pos), movement_packet);
 	}
 
 	//Falling Handler
@@ -451,7 +451,7 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 #else
 		*(uint32*)&movement_packet[pos+4] = uint32(move_time + (*itr)->GetSession()->m_moveDelayTime);
 #endif
-		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), recv_data.size() + pos, movement_packet);
+		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), uint16(recv_data.size() + pos), movement_packet);
 	}
 
 	//Setup Transporter Positioning
@@ -558,7 +558,7 @@ void WorldSession::_HandleBreathing(WorldPacket &recv_data, MovementInfo &mi)
 		if (!m_bIsWLevelSet)
 		{
 			// water level is somewhere below the nose of the character when entering water
-			m_wLevel = movement_info.z + _player->m_noseLevel*0.95;
+			m_wLevel = movement_info.z + _player->m_noseLevel*0.95f;
 			m_bIsWLevelSet = true;
 		}
 		if(!(_player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING))

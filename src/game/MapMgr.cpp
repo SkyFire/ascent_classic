@@ -1652,7 +1652,7 @@ void MapMgr::_PerformObjectDuties()
 
 void MapMgr::EventCorpseDespawn(uint64 guid)
 {
-	Corpse * pCorpse = objmgr.GetCorpse(guid);
+	Corpse * pCorpse = objmgr.GetCorpse((uint32)guid);
 	if(pCorpse == 0)	// Already Deleted
 		return;
 

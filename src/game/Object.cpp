@@ -1260,7 +1260,7 @@ float Object::calcAngle( float Position1X, float Position1Y, float Position2X, f
 	angle = angle * float(180 / M_PI);
 
 	// Return
-	return angle;
+	return float(angle);
 }
 
 float Object::calcRadAngle( float Position1X, float Position1Y, float Position2X, float Position2Y )
@@ -1314,8 +1314,8 @@ float Object::getEasyAngle( float angle )
 bool Object::inArc(float Position1X, float Position1Y, float FOV, float Orientation, float Position2X, float Position2Y )
 {
 	float angle = calcAngle( Position1X, Position1Y, Position2X, Position2Y );
-	float lborder = getEasyAngle( ( Orientation - (FOV*0.5/*/2*/) ) );
-	float rborder = getEasyAngle( ( Orientation + (FOV*0.5/*/2*/) ) );
+	float lborder = getEasyAngle( ( Orientation - (FOV*0.5f/*/2*/) ) );
+	float rborder = getEasyAngle( ( Orientation + (FOV*0.5f/*/2*/) ) );
 	//sLog.outDebug("Orientation: %f Angle: %f LeftBorder: %f RightBorder %f",Orientation,angle,lborder,rborder);
 	if(((angle >= lborder) && (angle <= rborder)) || ((lborder > rborder) && ((angle < rborder) || (angle > lborder))))
 	{
@@ -1335,7 +1335,7 @@ bool Object::isInFront(Object* target)
 
 	while(d < 0) d+=2*M_PI;
 	while(d > 2*M_PI) d-=2*M_PI;
-	m_position.o = d;
+	m_position.o = float(d);
 
 	if(dy>=0.0)
 	{
@@ -1884,7 +1884,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
 				Player *owner = 0;
 				if(victim->TaggerGuid)
-					owner = GetMapMgr()->GetPlayer(victim->TaggerGuid);
+					owner = GetMapMgr()->GetPlayer((uint32)victim->TaggerGuid);
 
 				if(owner == 0)  // no owner
 				{
@@ -2101,8 +2101,8 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		
 		if(caster->IsPlayer())
 		{
-			plus_damage += static_cast<Player*>(caster)->SpellDmgDoneByInt[school] * caster->GetUInt32Value(UNIT_FIELD_STAT3);
-			plus_damage += static_cast<Player*>(caster)->SpellDmgDoneBySpr[school] * caster->GetUInt32Value(UNIT_FIELD_STAT4);
+			plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneByInt[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT3)));
+			plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneBySpr[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT4)));
 		}
 //------------------------------by school---------------------------------------------------
 		plus_damage += caster->GetDamageDoneMod(school);
@@ -2115,7 +2115,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 //------------------------------by cast duration--------------------------------------------
 		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
-		float castaff = GetCastTime(sd);
+		float castaff = float(GetCastTime(sd));
 		if(castaff < 1500) castaff = 1500;
 		else
 			if(castaff > 7000) castaff = 7000;
@@ -2126,7 +2126,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		float dmgdoneaffectperc = castaff / 3500;
 //------------------------------by downranking----------------------------------------------
 		//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
-		float td = GetDuration(dbcSpellDuration.LookupEntry(spellInfo->DurationIndex));
+		float td = float(GetDuration(dbcSpellDuration.LookupEntry(spellInfo->DurationIndex)));
 		if (spellInfo->NameHash == 0x695C4940 || spellInfo->NameHash == 0x3DD5C872 || spellInfo->NameHash == 0xddaf1ac7 || spellInfo->NameHash == 0xCB75E5D1)
 			dmgdoneaffectperc *= float (1.0f - (( td / 15000.0f ) / (( td / 15000.0f ) + dmgdoneaffectperc)));
 
@@ -2205,7 +2205,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 					float dmg_reduction_pct=2*static_cast<Player*>(pVictim)->CalcRating(14)/100;
 					if(dmg_reduction_pct>1.0f)
 						dmg_reduction_pct = 1.0f; //we cannot resist more then he is criticalling us, there is no point of the critical then :P
-					res=float2int32(res - res*dmg_reduction_pct);
+					res= res - res*dmg_reduction_pct;
 				}
 
 				pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
@@ -2243,12 +2243,12 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	if(this->IsUnit())
 	{
 		static_cast<Unit*>(this)->CalculateResistanceReduction(pVictim,&dmg);
-		res = dmg.full_damage - dmg.resisted_damage;
+		res = float(dmg.full_damage - dmg.resisted_damage);
 	}
 //------------------------------special states----------------------------------------------
 	if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pVictim)->GodModeCheat == true)
 	{
-		res = dmg.full_damage;
+		res = float(dmg.full_damage);
 		dmg.resisted_damage = dmg.full_damage;
 	}
 	//DK:FIXME->SplitDamage

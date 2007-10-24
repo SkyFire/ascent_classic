@@ -155,7 +155,7 @@ void World::AddSession(WorldSession* s)
 	m_sessions[s->GetAccountId()] = s;
 
 	if(m_sessions.size() >  PeakSessionCount)
-		PeakSessionCount = m_sessions.size();
+		PeakSessionCount = (uint32)m_sessions.size();
 
 	m_sessionlock.ReleaseWriteLock();
 }
@@ -238,7 +238,7 @@ void CreateDummySpell(uint32 id)
 	sp->EquippedItemClass=uint32(-1);
 	sp->Effect[0]=3;
 	sp->EffectImplicitTargetA[0]=25;
-	sp->NameHash=crc32((const unsigned char*)name, strlen(name));
+	sp->NameHash=crc32((const unsigned char*)name, (unsigned int)strlen(name));
 	sp->dmg_multiplier[0]=1.0f;
 	sp->FH=-1;
 	dbcSpell.SetRow(id,sp);
@@ -483,7 +483,7 @@ bool World::SetInitialWorldSettings()
 			procMap.insert(make_pair(result->Fetch()[0].GetUInt32(), p));
 		} while(result->NextRow());
 	}
-	uint32 cnt = dbc.getRecordCount();
+	uint32 cnt = (uint32)dbc.getRecordCount();
 	uint32 effect;
 	uint32 All_Seal_Groups_Combined=0;
 
@@ -518,7 +518,7 @@ bool World::SetInitialWorldSettings()
 
 		// hash the name
 		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
-        namehash = crc32((const unsigned char*)nametext, strlen(nametext));
+        namehash = crc32((const unsigned char*)nametext, (unsigned int)strlen(nametext));
 		sp->NameHash   = namehash; //need these set before we start processing spells
 
 		float radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[1])));
@@ -819,8 +819,8 @@ bool World::SetInitialWorldSettings()
 					}
 					pr=0;
 
-					int len = strlen(desc);
-					for(int i = 0; i < len; ++i)
+					uint32 len = (uint32)strlen(desc);
+					for(i = 0; i < len; ++i)
 						desc[i] = tolower(desc[i]);
 					//dirty code for procs, if any1 got any better idea-> u are welcome
 					//139944 --- some magic number, it will trigger on all hits etc
@@ -2302,7 +2302,7 @@ bool World::SetInitialWorldSettings()
 
 void World::Update(time_t diff)
 {
-	eventholder->Update(diff);
+	eventholder->Update((uint32)diff);
 	sAuctionMgr.Update();
 	_UpdateGameTime();
 
@@ -2366,7 +2366,7 @@ void World::SendZoneMessage(WorldPacket *packet, uint32 zoneid, WorldSession *se
 
 void World::SendWorldText(const char* text, WorldSession *self)
 {
-    uint32 textLen = strlen((char*)text) + 1;
+    uint32 textLen = (uint32)strlen((char*)text) + 1;
 
     WorldPacket data(textLen + 40);
 
@@ -2428,7 +2428,7 @@ std::string World::GenerateName(uint32 type)
 	if(_namegendata[type].size() == 0)
 		return "ERR";
 
-	uint32 ent = sRand.randInt(_namegendata[type].size()-1);
+	uint32 ent = sRand.randInt((uint32)_namegendata[type].size()-1);
 	return _namegendata[type].at(ent).name;
 }
 
@@ -2448,7 +2448,7 @@ uint32 World::GetNonGmSessionCount()
 {
 	m_sessionlock.AcquireReadLock();
 
-	uint32 total = m_sessions.size();
+	uint32 total = (uint32)m_sessions.size();
 
 	SessionMap::const_iterator itr = m_sessions.begin();
 	for( ; itr != m_sessions.end(); itr++ )
@@ -2472,7 +2472,7 @@ uint32 World::AddQueuedSocket(WorldSocket* Socket)
 	mQueuedSessions.push_back(Socket);
 	queueMutex.Release();
 	// Return queue position
-	return mQueuedSessions.size();
+	return (uint32)mQueuedSessions.size();
 }
 
 void World::RemoveQueuedSocket(WorldSocket* Socket)

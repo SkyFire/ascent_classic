@@ -183,14 +183,14 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 
 	if(UINT32_LOPART(GUID_HIPART(lootguid)) == HIGHGUID_UNIT)
 	{
-		Creature* pCreature = _player->GetMapMgr()->GetCreature(lootguid);
+		Creature* pCreature = _player->GetMapMgr()->GetCreature((uint32)lootguid);
 		if(!pCreature)return;
 		pLoot=&pCreature->loot;
 		pt = pCreature;
 	}
 	else if(UINT32_LOPART(GUID_HIPART(lootguid)) == HIGHGUID_GAMEOBJECT)
 	{
-		GameObject* pGO = _player->GetMapMgr()->GetGameObject(lootguid);
+		GameObject* pGO = _player->GetMapMgr()->GetGameObject((uint32)lootguid);
 		if(!pGO)return;
 		pLoot=&pGO->loot;
 	}
@@ -202,7 +202,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 	}
 	else if(UINT32_LOPART(GUID_HIPART(lootguid)) == HIGHGUID_PLAYER)
 	{
-		Player * pPlayer = _player->GetMapMgr()->GetPlayer(lootguid);
+		Player * pPlayer = _player->GetMapMgr()->GetPlayer((uint32)lootguid);
 		if(!pPlayer) return;
 		pLoot = &pPlayer->loot;
 		pPlayer->bShouldHaveLootableOnCorpse = false;
@@ -359,11 +359,11 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 
 	if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_UNIT)
 	{
-		Creature* pCreature = _player->GetMapMgr()->GetCreature(guid);
+		Creature* pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
 		if(!pCreature)
 			return;
 		// remove from looter set
-		pCreature->loot.looters.erase(_player->GetGUID());
+		pCreature->loot.looters.erase(_player->GetGUIDLow());
 		if(!pCreature->loot.gold)
 		{			
 			for(std::vector<__LootItem>::iterator i=pCreature->loot.items.begin();i!=pCreature->loot.items.end();i++)
@@ -388,7 +388,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 	}
 	else if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_GAMEOBJECT)
 	{	   
-		GameObject* pGO = _player->GetMapMgr()->GetGameObject(guid);
+		GameObject* pGO = _player->GetMapMgr()->GetGameObject((uint32)guid);
 		if(!pGO)
 			return;
 
@@ -396,7 +396,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
         {
         case GAMEOBJECT_TYPE_FISHINGNODE:
             {
-		        pGO->loot.looters.erase(_player->GetGUID());
+		        pGO->loot.looters.erase(_player->GetGUIDLow());
                 if(pGO->IsInWorld())
 			    {
 				    pGO->RemoveFromWorld(true);
@@ -405,7 +405,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
             }break;
         case GAMEOBJECT_TYPE_CHEST:
             {
-                pGO->loot.looters.erase(_player->GetGUID());
+                pGO->loot.looters.erase(_player->GetGUIDLow());
                 //check for locktypes
                 
                 Lock *pLock = dbcLock.LookupEntry(pGO->GetInfo()->SpellFocus);
@@ -495,13 +495,13 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 	}
 	else if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_CORPSE)
 	{
-		Corpse *pCorpse = objmgr.GetCorpse(guid);
+		Corpse *pCorpse = objmgr.GetCorpse((uint32)guid);
 		if(pCorpse) 
 			pCorpse->SetUInt32Value(CORPSE_FIELD_DYNAMIC_FLAGS, 0);
 	}
 	else if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_PLAYER)
 	{
-		Player *plr = objmgr.GetPlayer(guid);
+		Player *plr = objmgr.GetPlayer((uint32)guid);
 		if(plr)
 		{
 			plr->bShouldHaveLootableOnCorpse = false;
@@ -851,7 +851,7 @@ void WorldSession::HandleDelFriendOpcode( WorldPacket & recv_data )
 	uint64 FriendGuid;
 	recv_data >> FriendGuid;
 
-	sSocialMgr.DelFriend( GetPlayer(), FriendGuid );
+	sSocialMgr.DelFriend( GetPlayer(), (uint32)FriendGuid );
 }
 
 void WorldSession::HandleAddIgnoreOpcode( WorldPacket & recv_data )
@@ -871,7 +871,7 @@ void WorldSession::HandleDelIgnoreOpcode( WorldPacket & recv_data )
 	uint64 IgnoreGuid;
 	recv_data >> IgnoreGuid;
 
-	sSocialMgr.DelIgnore( GetPlayer(), IgnoreGuid );
+	sSocialMgr.DelIgnore( GetPlayer(), (uint32)IgnoreGuid );
 }
 
 void WorldSession::HandleBugOpcode( WorldPacket & recv_data )
@@ -902,11 +902,11 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 	uint64 guid;
 	recv_data >> guid;
 	// Check that we're reviving from a corpse, and that corpse is associated with us.
-	Corpse * pCorpse = objmgr.GetCorpse(guid);
+	Corpse * pCorpse = objmgr.GetCorpse((uint32)guid);
 	if(pCorpse == 0) return;
 
 	if(pCorpse == 0 ||
-		pCorpse->GetUInt64Value(CORPSE_FIELD_OWNER) != _player->GetGUID() &&
+		pCorpse->GetUInt32Value(CORPSE_FIELD_OWNER) != _player->GetGUIDLow() &&
 		pCorpse->GetUInt32Value(CORPSE_FIELD_FLAGS) == 5)
 	{
 		WorldPacket data(SMSG_RESURRECT_FAILED, 4);
@@ -935,9 +935,9 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 	recv_data >> status;
 
 	// need to check guid
-	Player * pl = _player->GetMapMgr()->GetPlayer(guid);
+	Player * pl = _player->GetMapMgr()->GetPlayer((uint32)guid);
 	if(!pl)
-		pl = objmgr.GetPlayer(guid);
+		pl = objmgr.GetPlayer((uint32)guid);
 		
 	
 	if(pl == 0 || status != 1)
@@ -979,7 +979,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 	if(uiDecompressedSize>100000)
 		return;
 
-	uint32 ReceivedPackedSize = recv_data.size() - 8;
+	size_t ReceivedPackedSize = recv_data.size() - 8;
 	char* data = new char[uiDecompressedSize+1];
 	memset(data,0,uiDecompressedSize+1);	/* fix umr here */
 
@@ -987,7 +987,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 	{
 		int32 ZlibResult;
 
-		ZlibResult = uncompress((uint8*)data, &uid, recv_data.contents() + 8, ReceivedPackedSize);
+		ZlibResult = uncompress((uint8*)data, &uid, recv_data.contents() + 8, (uLong)ReceivedPackedSize);
 		
 		switch (ZlibResult)
 		{
@@ -1158,7 +1158,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	SpellEntry *spellInfo = NULL;;
 	sLog.outDebug("WORLD: CMSG_GAMEOBJ_USE: [GUID %d]", guid);   
 
-	GameObject *obj = _player->GetMapMgr()->GetGameObject(guid);
+	GameObject *obj = _player->GetMapMgr()->GetGameObject((uint32)guid);
 	if (!obj) return;
 	GameObjectInfo *goinfo= obj->GetInfo();
 	if (!goinfo) return;
@@ -1362,7 +1362,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	case GAMEOBJECT_TYPE_MEETINGSTONE:	// Meeting Stone
 		{
 			/* Use selection */
-            Player * pPlayer = objmgr.GetPlayer(_player->GetSelection());
+            Player * pPlayer = objmgr.GetPlayer((uint32)_player->GetSelection());
 			if(!pPlayer || _player->m_Group != pPlayer->m_Group || !_player->m_Group)
 				return;
 
@@ -1578,7 +1578,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	uint8 slotid;
 	recv_data >> creatureguid >> slotid >> target_playerguid;
 
-	Player *player = _player->GetMapMgr()->GetPlayer(target_playerguid);
+	Player *player = _player->GetMapMgr()->GetPlayer((uint32)target_playerguid);
 	if(!player)
 		return;
 
@@ -1589,7 +1589,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	//now its time to give the loot to the target player
 	if(UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_UNIT)
 	{
-		pCreature = _player->GetMapMgr()->GetCreature((creatureguid));
+		pCreature = _player->GetMapMgr()->GetCreature((uint32)creatureguid);
 		if (!pCreature)return;
 		pLoot=&pCreature->loot;	
 	}
@@ -1700,7 +1700,7 @@ void WorldSession::HandleLootRollOpcode(WorldPacket& recv_data)
 	uint8 choice;
 	recv_data >> creatureguid >> slotid >> choice;
 
-	Creature *pCreature = _player->GetMapMgr()->GetCreature(creatureguid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)creatureguid);
 	if(!pCreature)
 	{
 		return;

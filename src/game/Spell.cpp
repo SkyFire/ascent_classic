@@ -441,14 +441,14 @@ bool Spell::DidHit(uint64 target)
 	switch(UINT32_LOPART(GUID_HIPART(target)))
 	{
 		case HIGHGUID_UNIT:
-			u_victim = m_caster->GetMapMgr()->GetCreature(target);
+			u_victim = m_caster->GetMapMgr()->GetCreature((uint32)target);
 			break;
 		case HIGHGUID_PLAYER:
-			p_victim = m_caster->GetMapMgr()->GetPlayer(target);
+			p_victim = m_caster->GetMapMgr()->GetPlayer((uint32)target);
 			u_victim = p_victim;
 			break;
 		case HIGHGUID_PET:
-			u_victim = m_caster->GetMapMgr()->GetPet(target);
+			u_victim = m_caster->GetMapMgr()->GetPet((uint32)target);
 			break;
 	}
 
@@ -1499,7 +1499,7 @@ void Spell::SendCastResult(int16 result)
             plr = u_caster->m_redirectSpellPackets;
         if (plr)
         {
-            plr->SendCastResult(m_spellInfo->Id, result,(result == SPELL_FAILED_REQUIRES_SPELL_FOCUS) ? m_spellInfo->RequiresSpellFocus : 0);
+            plr->SendCastResult(m_spellInfo->Id,(uint8)result,(result == SPELL_FAILED_REQUIRES_SPELL_FOCUS) ? m_spellInfo->RequiresSpellFocus : 0);
         }
 	}
 	//else
@@ -2130,7 +2130,7 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 			{
 				Player * plr = p_caster->GetTradeTarget();
 				if(plr)
-					itemTarget = plr->getTradeItem(guid);
+					itemTarget = plr->getTradeItem((uint32)guid);
 			}
 		}
 		else
@@ -2139,14 +2139,14 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 			switch(UINT32_LOPART(GUID_HIPART(guid)))
 			{
 			case HIGHGUID_UNIT:
-				unitTarget = m_caster->GetMapMgr()->GetCreature(guid);
+				unitTarget = m_caster->GetMapMgr()->GetCreature((uint32)guid);
 				break;
 			case HIGHGUID_PET:
-				unitTarget = m_caster->GetMapMgr()->GetPet(guid);
+				unitTarget = m_caster->GetMapMgr()->GetPet((uint32)guid);
 				break;
 			case HIGHGUID_PLAYER:
 				{
-					unitTarget =  m_caster->GetMapMgr()->GetPlayer(guid);
+					unitTarget =  m_caster->GetMapMgr()->GetPlayer((uint32)guid);
 					playerTarget = static_cast<Player*>(unitTarget);
 				}break;
 			case HIGHGUID_ITEM:
@@ -2155,10 +2155,10 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 
 				break;
 			case HIGHGUID_GAMEOBJECT:
-				gameObjTarget = m_caster->GetMapMgr()->GetGameObject(guid);
+				gameObjTarget = m_caster->GetMapMgr()->GetGameObject((uint32)guid);
 				break;
 			case HIGHGUID_CORPSE:
-				corpseTarget = objmgr.GetCorpse(guid);
+				corpseTarget = objmgr.GetCorpse((uint32)guid);
 				break;
 			}
 		}
@@ -2911,7 +2911,7 @@ int8 Spell::CheckItems()
 					{
 						Player * plr = p_caster->GetTradeTarget();
                         if(plr)
-							it = plr->getTradeItem(m_targets.m_itemTarget);
+							it = plr->getTradeItem((uint32)m_targets.m_itemTarget);
 					}
 				}break;
 			default:
@@ -3084,7 +3084,7 @@ exit:
 		case 0xDE1C36C8: //Blood Fury
 		case 0xEE91A232: //Mana Tap
 		case 0x6632EB62: //Arcane Torrent
-			basePoints += u_caster->getLevel()*basePointsPerLevel;
+			basePoints += float2int32(u_caster->getLevel()*basePointsPerLevel);
 			break;
 		}
 	}
@@ -3121,7 +3121,7 @@ exit:
 	{
 		//causes ${$RAP*0.2+$m1} Arcane damage." 
 		if(i==0 && u_caster)
-			value +=u_caster->GetRAP()*0.15f;
+			value +=float2int32(u_caster->GetRAP()*0.15f);
 	}else if(m_spellInfo->NameHash == 0x93C04185)//rake
 	{
 		if(u_caster) {
@@ -3382,7 +3382,7 @@ void Spell::Heal(int32 amount)
 		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
 
 		// affect the plus damage by duration
-		float castaff = GetCastTime(sd);
+		float castaff = float(GetCastTime(sd));
 		if(castaff > 3500) 
             castaff = 3500;
 		else if(castaff < 1500) 
@@ -3571,7 +3571,7 @@ void Spell::SafeAddModeratedTarget(uint64 guid, uint16 type)
 			return;
         }
 
-	ModeratedTargets.push_back(SpellTargetMod(guid, type));
+	ModeratedTargets.push_back(SpellTargetMod(guid, (uint8)type));
 }
 
 bool Spell::Reflect(Unit *refunit)
@@ -3623,7 +3623,7 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 		return;
 
 	// TODO: check for spells that should do this
-	float Dur = *Duration;
+	float Dur = float(*Duration);
 
 	switch(Target->m_diminishCount[Grp])
 	{

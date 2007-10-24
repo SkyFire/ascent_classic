@@ -217,7 +217,7 @@ void Spell::SpellEffectInstantKill(uint32 i)
 		{
 			if(m_caster->GetTypeId() != TYPEID_UNIT)
 				break;
-			Unit *caster = m_caster->GetMapMgr()->GetPlayer(m_caster->GetUInt64Value(UNIT_FIELD_SUMMONEDBY));
+			Unit *caster = m_caster->GetMapMgr()->GetPlayer(m_caster->GetUInt32Value(UNIT_FIELD_SUMMONEDBY));
 			caster->summonPet->RemoveFromWorld(false,true);
 			delete caster->summonPet;
 			caster->summonPet = NULL;
@@ -390,7 +390,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 		//It now only checks the first distance and hits the player after time expires.
 		//sEventMgr.AddEvent(this, &Spell::_DamageRangeUpdate, (uint32)100, EVENT_SPELL_DAMAGE_HIT, 100, 0);
 		float dist = m_caster->CalcDistance(unitTarget);
-		float time = ((dist*1000.0)/m_spellInfo->speed);
+		float time = ((dist*1000.0f)/m_spellInfo->speed);
 		if(time <= 100)
 			m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, dmg, pSpellId==0);
 		else
@@ -754,7 +754,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				Creature* NewSummon = m_caster->GetMapMgr()->CreateCreature();
 				// Create
 				NewSummon->Create( ci->Name, m_caster->GetMapId(), 
-					m_caster->GetPositionX()+(3*(cos(-(M_PI/2)+m_caster->GetOrientation()))), m_caster->GetPositionY()+(3*(cos(-(M_PI/2)+m_caster->GetOrientation()))), m_caster->GetPositionZ(), m_caster->GetOrientation());
+					m_caster->GetPositionX()+(3*(cos(-(float(M_PI)/2)+m_caster->GetOrientation()))), m_caster->GetPositionY()+(3*(cos(-(float(M_PI)/2)+m_caster->GetOrientation()))), m_caster->GetPositionZ(), m_caster->GetOrientation());
 
 				NewSummon->SetInstanceID(m_caster->GetInstanceID());
 				// Fields
@@ -1114,7 +1114,7 @@ void Spell::SpellEffectTeleportUnits(uint32 i)  // Teleport Units
 				ang = m_caster->calcAngle(m_caster->GetPositionX(), m_caster->GetPositionY(), unitTarget->GetPositionX(), unitTarget->GetPositionY());
 
 				/* convert degree angle to radians */
-				ang = ang * M_PI / 180.0f;
+				ang = ang * float(M_PI) / 180.0f;
 			}
 			else
 			{
@@ -2159,7 +2159,7 @@ void Spell::SpellEffectLearnSpell(uint32 i) // Learn Spell
 	if(playerTarget == 0 && unitTarget && UINT32_LOPART(unitTarget->GetGUIDHigh()) == HIGHGUID_UNIT)
 	{
 		// bug in target map fill?
-		playerTarget = m_caster->GetMapMgr()->GetPlayer(m_targets.m_unitTarget);
+		playerTarget = m_caster->GetMapMgr()->GetPlayer((uint32)m_targets.m_unitTarget);
 	}
 	if(playerTarget)
 	{
@@ -2315,7 +2315,7 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 	}
 	for(int i=0;i<damage;i++)
 	{
-		float m_fallowAngle=-(M_PI/2*i);
+		float m_fallowAngle=-(float(M_PI)/2*i);
 		float x = u_caster->GetPositionX()+(3*(cosf(m_fallowAngle+u_caster->GetOrientation())));
 		float y = u_caster->GetPositionY()+(3*(sinf(m_fallowAngle+u_caster->GetOrientation())));
 		float z = u_caster->GetPositionZ();
@@ -2348,7 +2348,7 @@ void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 		sLog.outDetail("Warning : Missing summon creature template %u used by spell %u!",cr_entry,m_spellInfo->Id);
 		return;
 	}
-	float angle_for_each_spawn=-M_PI*2/damage;
+	float angle_for_each_spawn=-float(M_PI)*2/damage;
 	for(int i=0;i<damage;i++)
 	{
 		float m_fallowAngle=angle_for_each_spawn*i;
@@ -2384,7 +2384,7 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 		// Check targets
 		if(m_targets.m_unitTarget)
 		{
-			target = objmgr.GetPlayer(m_targets.m_unitTarget);
+			target = objmgr.GetPlayer((uint32)m_targets.m_unitTarget);
 			if(!target) 
 				return;
 		}
@@ -2627,7 +2627,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		}
 		else if(entry == 36727 || entry == 177193) // Portal of Summoning and portal of doom
 		{
-			Player * pTarget = p_caster->GetMapMgr()->GetPlayer(p_caster->GetSelection());
+			Player * pTarget = p_caster->GetMapMgr()->GetPlayer((uint32)p_caster->GetSelection());
 			if(!pTarget)
 				return;
 
@@ -3040,7 +3040,7 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 		// Create
 		NewSummon->SetInstanceID(m_caster->GetInstanceID());
 		NewSummon->Create( ci->Name, m_caster->GetMapId(), 
-			m_caster->GetPositionX()+(3*(cos((M_PI/2)+m_caster->GetOrientation()))), m_caster->GetPositionY()+(3*(cos((M_PI/2)+m_caster->GetOrientation()))), m_caster->GetPositionZ(), m_caster->GetOrientation());
+			m_caster->GetPositionX()+(3*(cos((float(M_PI)/2)+m_caster->GetOrientation()))), m_caster->GetPositionY()+(3*(cos((float(M_PI)/2)+m_caster->GetOrientation()))), m_caster->GetPositionZ(), m_caster->GetOrientation());
 
 		// Fields
 		NewSummon->SetUInt32Value(UNIT_FIELD_LEVEL,m_caster->GetUInt32Value(UNIT_FIELD_LEVEL));
@@ -3630,12 +3630,12 @@ void Spell::SpellEffectCharge(uint32 i)
 		return;
 
 	float d = sqrt(dx*dx+dy*dy)-unitTarget->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS)-m_caster->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
-	double alpha = atan(dy/dx);
+	float alpha = atanf(dy/dx);
 	if(dx<0)
-		alpha += M_PI;
+		alpha += float(M_PI);
 
-	x = d*cos(alpha)+m_caster->GetPositionX();
-	y = d*sin(alpha)+m_caster->GetPositionY();
+	x = d*cosf(alpha)+m_caster->GetPositionX();
+	y = d*sinf(alpha)+m_caster->GetPositionY();
 	z = unitTarget->GetPositionZ();
 
 	uint32 time = uint32( (m_caster->CalcDistance(unitTarget) / ((m_caster->m_runSpeed * 3.5) * 0.001f)) + 0.5);
@@ -3927,7 +3927,7 @@ void Spell::SpellEffectDestroyAllTotems(uint32 i)
 	}
 
 	// get the current mana, get the max mana. Calc if we overflow
-	SendHealManaSpellOnPlayer(m_caster, unitTarget, RetreivedMana, 0);
+	SendHealManaSpellOnPlayer(m_caster, unitTarget, (uint32)RetreivedMana, 0);
 	RetreivedMana += float(unitTarget->GetUInt32Value(UNIT_FIELD_POWER1));
 	uint32 max = unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
 	if((uint32)RetreivedMana > max)
@@ -3970,7 +3970,7 @@ void Spell::SpellEffectResurrect(uint32 i) // Resurrect (Flat)
 	if(!playerTarget)
 	{
 		if(!corpseTarget) return;
-		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt64Value(CORPSE_FIELD_OWNER));
+		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt32Value(CORPSE_FIELD_OWNER));
 		if(!playerTarget) return;
 	}
 
@@ -4003,7 +4003,7 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
 	if(!playerTarget)
 	{
 		// means we're "skinning" a corpse
-		corpse = objmgr.GetCorpse(m_targets.m_unitTarget);  // hacky
+		corpse = objmgr.GetCorpse((uint32)m_targets.m_unitTarget);  // hacky
 	}
 	else if(playerTarget->getDeathState() == CORPSE)	// repopped while we were casting 
 	{
@@ -4055,7 +4055,7 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
 		p_caster->SendLoot(corpse->GetGUID(), 2);
 
 		// find the corpses' owner
-		Player * owner = objmgr.GetPlayer(corpse->GetUInt64Value(CORPSE_FIELD_OWNER));
+		Player * owner = objmgr.GetPlayer(corpse->GetUInt32Value(CORPSE_FIELD_OWNER));
 		if(owner)
 		{
 			owner->GetSession()->OutPacket(SMSG_PLAYER_SKINNED, 1, "\x00");
@@ -4224,14 +4224,14 @@ void Spell::SpellEffectResurrectNew(uint32 i)
 	if(!playerTarget)
 	{
 		if(!corpseTarget) return;
-		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt64Value(CORPSE_FIELD_OWNER));
+		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt32Value(CORPSE_FIELD_OWNER));
 		if(!playerTarget) return;
 	}
 
 	if(playerTarget->isAlive() || !playerTarget->IsInWorld())
 		return;
    //resurr
-	playerTarget->resurrector = p_caster->GetGUID();
+	playerTarget->resurrector = p_caster->GetGUIDLow();
 	playerTarget->m_resurrectHealth = damage;
 	playerTarget->m_resurrectMana = m_spellInfo->EffectMiscValue[i];
 

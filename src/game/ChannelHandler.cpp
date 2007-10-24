@@ -40,7 +40,7 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 	if(chn->GetNumMembers() == 0)
 	{
 		// just created
-		chn->m_flags = crap;
+		chn->m_flags = (uint8)crap;
 		chn->m_id = code;
 	}
 

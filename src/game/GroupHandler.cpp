@@ -88,7 +88,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 	}
 
 	// 16/08/06 - change to guid to prevent very unlikely event of a crash in deny, etc
-	_player->SetInviter(_player->GetGUID());//bugfix if player invtied 2 people-> he can be in 2 parties
+	_player->SetInviter(_player->GetGUIDLow());//bugfix if player invtied 2 people-> he can be in 2 parties
 
 	data.SetOpcode(SMSG_GROUP_INVITE);
 	data << GetPlayer()->GetName();
@@ -102,7 +102,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 	SendPartyCommandResult(_player, gtype, membername, ERR_PARTY_NO_ERROR);
 
 	// 16/08/06 - change to guid to prevent very unlikely event of a crash in deny, etc
-	player->SetInviter(_player->GetGUID());
+	player->SetInviter(_player->GetGUIDLow());
 }
 
 ///////////////////////////////////////////////////////////////
@@ -243,7 +243,7 @@ void WorldSession::HandleGroupSetLeaderOpcode( WorldPacket & recv_data )
 
 	recv_data >> MemberGuid;
 	
-	player = objmgr.GetPlayer(MemberGuid);
+	player = objmgr.GetPlayer((uint32)MemberGuid);
 
 	if ( player == NULL )
 	{
@@ -301,7 +301,7 @@ void WorldSession::HandleLootMethodOpcode( WorldPacket & recv_data )
 		return;
 	}
 	
-	Player *plyr = objmgr.GetPlayer(lootMaster);
+	Player *plyr = objmgr.GetPlayer((uint32)lootMaster);
 	//if(!plyr)return;
 	Group *pGroup = _player->GetGroup();
 	if(pGroup)

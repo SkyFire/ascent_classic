@@ -317,7 +317,7 @@ void CBattlegroundManager::EventQueueUpdate()
 			group1 = group2 = NULL;
 			while(group1 == NULL)
 			{
-				n = sRand.randInt(m_queuedGroups[i].size()) - 1;
+				n = sRand.randInt((uint32)m_queuedGroups[i].size()) - 1;
 				for(itz = m_queuedGroups[i].begin(); itz != m_queuedGroups[i].end() && n>0; ++itz)
 					--n;
 
@@ -338,7 +338,7 @@ void CBattlegroundManager::EventQueueUpdate()
 
 			while(group2 == NULL)
 			{
-				n = sRand.randInt(m_queuedGroups[i].size()) - 1;
+				n = sRand.randInt((uint32)m_queuedGroups[i].size()) - 1;
 				for(itz = m_queuedGroups[i].begin(); itz != m_queuedGroups[i].end() && n>0; ++itz)
 					--n;
 
@@ -489,8 +489,8 @@ CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 
 	m_countdownStage = 0;
 	m_ended = false;
 	m_winningteam = 0;
-	m_startTime = UNIXTIME;
-	m_lastResurrect = UNIXTIME;
+	m_startTime = (uint32)UNIXTIME;
+	m_lastResurrect = (uint32)UNIXTIME;
 	sEventMgr.AddEvent(this, &CBattleground::EventResurrectPlayers, EVENT_BATTLEGROUND_QUEUE_UPDATE, 30000, 0,0);
 
 	/* create raid groups */
@@ -721,7 +721,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		plr->m_bgEntryPointInstance = plr->GetInstanceID();
 	
 		plr->SafeTeleport(m_mapMgr->GetMapId(), m_mapMgr->GetInstanceID(), GetStartingCoords(plr->m_bgTeam));
-		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
+		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, (uint32)UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
 	}
 
 	plr->m_pendingBattleground = 0;
@@ -1267,7 +1267,7 @@ void CBattleground::EventResurrectPlayers()
 		}
 		m_resurrectQueue[i].clear();
 	}
-	m_lastResurrect = UNIXTIME;
+	m_lastResurrect = (uint32)UNIXTIME;
 }
 
 void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 BattlegroundType, uint8 as_group, uint8 rated_match)

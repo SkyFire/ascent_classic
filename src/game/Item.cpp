@@ -288,7 +288,7 @@ void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
 		 if(itr->second.RemoveAtLogout)
 			   continue;
 
-		uint32 elapsed_duration = UNIXTIME - itr->second.ApplyTime;
+		uint32 elapsed_duration = uint32(UNIXTIME - itr->second.ApplyTime);
 		int32 remaining_duration = itr->second.Duration - elapsed_duration;
 		if(remaining_duration < 0) remaining_duration = 0;
 	  /*  if(!itr->second.RemoveAtLogout && 
@@ -567,7 +567,7 @@ int32 Item::AddEnchantment(EnchantEntry * Enchantment, uint32 Duration, bool Per
 	// Set the enchantment in the item fields.
 	uint32 EnchantBase = Slot * 3 + ITEM_FIELD_ENCHANTMENT;
 	SetUInt32Value(EnchantBase	, Enchantment->Id);
-	SetUInt32Value(EnchantBase + 1, Instance.ApplyTime);
+	SetUInt32Value(EnchantBase + 1, (uint32)Instance.ApplyTime);
 	SetUInt32Value(EnchantBase + 2, 0); // charges
 
 	// Add it to our map.

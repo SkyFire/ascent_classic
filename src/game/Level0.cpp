@@ -265,7 +265,7 @@ bool ChatHandler::HandleInfoCommand(const char* args, WorldSession *m_session)
 	WorldPacket data;
 
 	
-	uint32 clientsNum = sWorld.GetSessionCount();
+	uint32 clientsNum = (uint32)sWorld.GetSessionCount();
 
 	int gm = 0;
 	int count = 0;

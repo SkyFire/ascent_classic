@@ -56,7 +56,7 @@ void LfgMgr::SetPlayerInLFGqueue(Player *pl,uint32 LfgDungeonId)
 
 uint32 LfgMgr::GetLfgQueueSize(uint32 LfgDungeonId)
 {
-	return m_LFGqueueMembers[LfgDungeonId].size();	
+	return (uint32)m_LFGqueueMembers[LfgDungeonId].size();	
 }
 
 std::set<Player*>::iterator LfgMgr::GetLfgQueueBegin(uint32 LfgDungeonId)

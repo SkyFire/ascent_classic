@@ -644,7 +644,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							//let's recalc chance to cast since we have a full 100 all time on this one
 							//how lame to get talentpointlevel for this spell :(
 //							float chance=it->GetProto()->Delay*100*talentlevel/60000;
-							float chance=it->GetProto()->Delay*talentlevel/600;
+							float chance=float(it->GetProto()->Delay)*float(talentlevel)/600.0f;
 							if(!Rand(chance))
 								continue;
 						}break;
@@ -695,7 +695,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							}
 							else continue; //no weapon no joy
 //							float chance=it->GetProto()->Delay*100*talentlevel/60000;
-							float chance=it->GetProto()->Delay*talentlevel/600;
+							float chance=float(it->GetProto()->Delay)*float(talentlevel)/600.0f;
 							if(!Rand(chance))
 								continue;
 						}break;
@@ -1406,7 +1406,7 @@ void Unit::Strike(Unit *pVictim, uint32 damage_type, SpellEntry *ability, int32 
 	{	  
 		self_skill=0;
 		Player *pr = ((Player*)this);
-		hitmodifier = (uint32)pr->GetHitFromMeleeSpell();  
+		hitmodifier = pr->GetHitFromMeleeSpell();  
 		
 		switch(damage_type)
 		{
@@ -1543,24 +1543,24 @@ else
 		}
 //--------------------------------by skill difference---------------------------------------
 	float vsk = (float)self_skill-(float)victim_skill;
-	dodge = max(0.0,dodge-vsk*0.04);
+	dodge = max(0.0f,dodge-vsk*0.04f);
 	if (parry)
-		parry = max(0.0,parry-vsk*0.04);
+		parry = max(0.0f,parry-vsk*0.04f);
 	if (block)
-		block = max(0.0,block-vsk*0.04);
+		block = max(0.0f,block-vsk*0.04f);
 
-	crit += pVictim->IsPlayer() ? vsk*0.04 : min(vsk*0.2,0.0) ; 
+	crit += pVictim->IsPlayer() ? vsk*0.04f : min(vsk*0.2f,0.0f) ; 
 	crit -= pVictim->IsPlayer() ? static_cast<Player*>(pVictim)->CalcRating(14) : 0.0f;
 	if (crit<0) crit=0.0f;
 
 	if (vsk>0)
-			hitchance = max(hitchance,95.0f+vsk*0.02+hitmodifier);
+			hitchance = max(hitchance,95.0f+vsk*0.02f+hitmodifier);
 	else
 	{
 		if (pVictim->IsPlayer())
-			hitchance = max(hitchance,95.0f+vsk*0.1+hitmodifier); //wowwiki multiplier - 0.04 but i think 0.1 more balanced
+			hitchance = max(hitchance,95.0f+vsk*0.1f+hitmodifier); //wowwiki multiplier - 0.04 but i think 0.1 more balanced
 		else
-			hitchance = max(hitchance,100.0f+vsk*0.6+hitmodifier); //not wowwiki but more balanced
+			hitchance = max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
 	}
 
 	if(ability && ability->SpellGroupType)
@@ -1708,7 +1708,7 @@ else
 //--------------------------------glancing blow---------------------------------------------
 			case 3:
 				{
-					float low_dmg_mod = 1.5 - (0.05 * diffAcapped);
+					float low_dmg_mod = 1.5f - (0.05f * diffAcapped);
 					if (this->getClass() == MAGE || this->getClass() == PRIEST || this->getClass() == WARLOCK) //casters = additional penalty.
 					{
 						low_dmg_mod -= 0.7f;
@@ -1717,7 +1717,7 @@ else
 						low_dmg_mod = 0.01f;
 					if (low_dmg_mod>0.91)
 						low_dmg_mod = 0.91f;
-					float high_dmg_mod = 1.2 - (0.03 * diffAcapped);
+					float high_dmg_mod = 1.2f - (0.03f * diffAcapped);
 					if (this->getClass() == MAGE || this->getClass() == PRIEST || this->getClass() == WARLOCK) //casters = additional penalty.
 					{
 						high_dmg_mod -= 0.3f;
@@ -1730,7 +1730,7 @@ else
 					float damage_reduction = (high_dmg_mod + low_dmg_mod) / 2;
 					if(damage_reduction > 0)
 					{
-							dmg.full_damage = (damage_reduction * dmg.full_damage);
+							dmg.full_damage = float2int32(damage_reduction * float(dmg.full_damage));
 					}
 					hit_status |= HITSTATUS_GLANCING;
 				}
@@ -1775,8 +1775,8 @@ else
 					{
 						if(damage_type != RANGED)
 						{
-							float critextra=static_cast<Player*>(this)->m_modphyscritdmgPCT;
-							dmg.full_damage += int32((dmg.full_damage*critextra/100.0f));
+							float critextra=float(static_cast<Player*>(this)->m_modphyscritdmgPCT);
+							dmg.full_damage += int32((float(dmg.full_damage)*critextra/100.0f));
 						}
 						if(!pVictim->IsPlayer())
 							dmg.full_damage += float2int32(dmg.full_damage*static_cast<Player*>(this)->IncreaseCricticalByTypePCT[((Creature*)pVictim)->GetCreatureName() ? ((Creature*)pVictim)->GetCreatureName()->Type : 0]);
@@ -1808,8 +1808,8 @@ else
 						else sEventMgr.ModifyEventTimeLeft(this,EVENT_CRIT_FLAG_EXPIRE,5000);
 					}
 
-					CALL_SCRIPT_EVENT(pVictim, OnTargetCritHit)(this, dmg.full_damage);
-					CALL_SCRIPT_EVENT(this, OnCritHit)(pVictim, dmg.full_damage);
+					CALL_SCRIPT_EVENT(pVictim, OnTargetCritHit)(this, float(dmg.full_damage));
+					CALL_SCRIPT_EVENT(this, OnCritHit)(pVictim, float(dmg.full_damage));
 				}
 				break;
 //--------------------------------crushing blow---------------------------------------------
@@ -2726,7 +2726,7 @@ void Unit::Emote (EmoteType emote)
 
 void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg)
 {
-	uint32 UnitNameLength = 0, MessageLength = 0;
+	size_t UnitNameLength = 0, MessageLength = 0;
 	const char *UnitName = "";
 	CreatureInfo *ci;
 
@@ -2751,10 +2751,10 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 					data << lang;
 					data << GetGUID();
 					data << uint32(0);			// new in 2.1.0
-					data << UnitNameLength;
+					data << uint32(UnitNameLength);
 					data << UnitName;
 					data << ((Player*)(*i))->GetGUID();
-					data << MessageLength;
+					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
@@ -2774,10 +2774,10 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 					data << lang;
 					data << GetGUID();
 					data << uint32(0);			// new in 2.1.0
-					data << UnitNameLength;
+					data << uint32(UnitNameLength);
 					data << UnitName;
 					data << ((Player*)(*i))->GetGUID();
-					data << MessageLength;
+					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
@@ -2797,10 +2797,10 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 					data << lang;
 					data << GetGUID();
 					data << uint32(0);			// new in 2.1.0
-					data << UnitNameLength;
+					data << uint32(UnitNameLength);
 					data << UnitName;
 					data << ((Player*)(*i))->GetGUID();
-					data << MessageLength;
+					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
@@ -2814,7 +2814,7 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 
 void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 {
-	uint32 UnitNameLength = 0, MessageLength = 0;
+	size_t UnitNameLength = 0, MessageLength = 0;
 	const char *UnitName = "";
 	CreatureInfo *ci;
 
@@ -2839,10 +2839,10 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 					data << lang;
 					data << GetGUID();
 					data << uint32(0);			// new in 2.1.0
-					data << UnitNameLength;
+					data << uint32(UnitNameLength);
 					data << UnitName;
 					data << ((Player*)(*i))->GetGUID();
-					data << MessageLength;
+					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
@@ -2862,10 +2862,10 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 					data << lang;
 					data << GetGUID();
 					data << uint32(0);			// new in 2.1.0
-					data << UnitNameLength;
+					data << uint32(UnitNameLength);
 					data << UnitName;
 					data << ((Player*)(*i))->GetGUID();
-					data << MessageLength;
+					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
@@ -2885,10 +2885,10 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 					data << lang;
 					data << GetGUID();
 					data << uint32(0);			// new in 2.1.0
-					data << UnitNameLength;
+					data << uint32(UnitNameLength);
 					data << UnitName;
 					data << ((Player*)(*i))->GetGUID();
-					data << MessageLength;
+					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
@@ -2924,7 +2924,7 @@ void Unit::AddInRangeObject(Object* pObj)
 				{
 					if (((Creature*)pObj)->Tagged)
 					{
-						if(((Player*)this)->GetGroup()->HasMember(pObj->GetMapMgr()->GetPlayer(((Creature*)pObj)->TaggerGuid)))
+						if(((Player*)this)->GetGroup()->HasMember(pObj->GetMapMgr()->GetPlayer((uint32)((Creature*)pObj)->TaggerGuid)))
 						{
 							uint32 Flags;
 							Flags = ((Creature*)pObj)->m_uint32Values[UNIT_DYNAMIC_FLAGS];
@@ -3141,12 +3141,12 @@ void Unit::CalcDamage()
 	float delta;
 	float mult;
 	
-	float ap_bonus = GetAP()/14000.0;
+	float ap_bonus = float(GetAP())/14000.0f;
 
 		float bonus = ap_bonus*GetUInt32Value(UNIT_FIELD_BASEATTACKTIME);
 	
-		delta = ((Creature*)this)->ModDamageDone[0];
-		mult = ((Creature*)this)->ModDamageDonePct[0];
+		delta = float(((Creature*)this)->ModDamageDone[0]);
+		mult = float(((Creature*)this)->ModDamageDonePct[0]);
 		r = BaseDamage[0]*mult+delta+bonus;
 		SetFloatValue(UNIT_FIELD_MINDAMAGE,r>0?r:0);
 		r = BaseDamage[1]*mult+delta+bonus;
@@ -4264,11 +4264,11 @@ float Unit::get_chance_to_daze(Unit *target)
 {
 //	if(GetTypeId()!=TYPEID_UNIT)
 //		return 0.0f;
-	float attack_skill=getLevel()*5;
+	float attack_skill=float(getLevel())*5.0f;
 	float defense_skill;
 	if(target->IsPlayer())
-		defense_skill=((Player*)target)->_GetSkillLineCurrent(SKILL_DEFENSE,false);
-	else defense_skill=target->getLevel()*5;
+		defense_skill=float(((Player*)target)->_GetSkillLineCurrent(SKILL_DEFENSE,false));
+	else defense_skill=float(target->getLevel()*5);
 	if(!defense_skill)
 		defense_skill=1;
 	float chance_to_daze=attack_skill*20/defense_skill;//if level is equal then we get a 20% chance to daze

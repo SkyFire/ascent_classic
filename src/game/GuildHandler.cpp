@@ -145,7 +145,7 @@ void WorldSession::HandleInviteToGuild(WorldPacket & recv_data)
 	data << inviter->GetName();
 	data << pGuild->GetGuildName();
 	plyr->GetSession()->SendPacket(&data);
-	plyr->SetGuildInvitersGuid( inviter->GetGUID() );	
+	plyr->SetGuildInvitersGuid( inviter->GetGUIDLow() );	
 }
 
 void WorldSession::HandleGuildAccept(WorldPacket & recv_data)
@@ -193,7 +193,7 @@ void WorldSession::HandleGuildDecline(WorldPacket & recv_data)
 	if(!plyr)
 		return;
 
-	Player *inviter = objmgr.GetPlayer( (uint64)(plyr->GetGuildInvitersGuid()) );
+	Player *inviter = objmgr.GetPlayer( plyr->GetGuildInvitersGuid() );
 	plyr->UnSetGuildInvitersGuid(); 
 
 	if(!inviter)
@@ -410,7 +410,7 @@ void WorldSession::HandleGuildDemote(WorldPacket & recv_data)
 
 	pTargetRank++;
 	if(pTargetRank > pGuild->GetNrRanks()-1)
-		pTargetRank = pGuild->GetNrRanks()-1;
+		pTargetRank = (uint32)pGuild->GetNrRanks()-1;
 
 	pGuildMember->Rank = pTargetRank;
 
@@ -936,7 +936,7 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 	recv_data >> crap3 >> crap4 >> crap5 >> crap6 >> crap7 >> crap8 >> crap9 >> crap10 >> crap11
 		>> crap12 >> crap13 >> crap14 >> arena_index >> crap15;
 
-	Creature * crt = _player->GetMapMgr()->GetCreature(creature_guid);
+	Creature * crt = _player->GetMapMgr()->GetCreature((uint32)creature_guid);
 	if(!crt)
 	{
 		Disconnect();
@@ -1198,7 +1198,7 @@ void WorldSession::HandleCharterOffer( WorldPacket & recv_data )
 	recv_data >> shit >> item_guid >> target_guid;
 	
 	if(!_player->IsInWorld()) return;
-	Player * pTarget = _player->GetMapMgr()->GetPlayer(target_guid);
+	Player * pTarget = _player->GetMapMgr()->GetPlayer((uint32)target_guid);
 	pCharter = objmgr.GetCharterByItemGuid(item_guid);
 
 	if(pTarget == 0 || pTarget->GetTeam() != _player->GetTeam() || pTarget == _player)

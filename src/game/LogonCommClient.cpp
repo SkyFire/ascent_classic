@@ -31,7 +31,7 @@ typedef struct
 LogonCommClientSocket::LogonCommClientSocket(SOCKET fd) : Socket(fd, 524288, 65536)
 {
 	// do nothing
-	last_ping = last_pong = UNIXTIME;
+	last_ping = last_pong = (uint32)UNIXTIME;
 	remaining = opcode = 0;
 	_id=0;
 	latency = 0;
@@ -162,7 +162,7 @@ void LogonCommClientSocket::HandlePong(WorldPacket & recvData)
 	if(latency)
 		sLog.outDebug(">> logonserver latency: %ums", getMSTime() - pingtime);
 	latency = getMSTime() - pingtime;
-	last_pong = UNIXTIME;
+	last_pong = (uint32)UNIXTIME;
 }
 
 void LogonCommClientSocket::SendPing()
@@ -171,7 +171,7 @@ void LogonCommClientSocket::SendPing()
 	WorldPacket data(RCMSG_PING, 4);
 	SendPacket(&data);
 
-	last_ping = UNIXTIME;
+	last_ping = (uint32)UNIXTIME;
 }
 
 void LogonCommClientSocket::SendPacket(WorldPacket * data)
@@ -183,7 +183,7 @@ void LogonCommClientSocket::SendPacket(WorldPacket * data)
 
 #ifndef USING_BIG_ENDIAN
 	header.opcode = data->GetOpcode();
-	header.size   = ntohl(data->size());
+	header.size   = ntohl((u_long)data->size());
 #else
 	header.opcode = swap16(uint16(data->GetOpcode()));
 	header.size   = data->size();
@@ -197,9 +197,9 @@ void LogonCommClientSocket::SendPacket(WorldPacket * data)
 	if(data->size() > 0 && rv)
 	{
 		if(use_crypto)
-			_sendCrypto.Process((unsigned char*)data->contents(), (unsigned char*)data->contents(), data->size());
+			_sendCrypto.Process((unsigned char*)data->contents(), (unsigned char*)data->contents(), (unsigned int)data->size());
 
-		rv = BurstSend((const uint8*)data->contents(), data->size());
+		rv = BurstSend((const uint8*)data->contents(), (uint32)data->size());
 	}
 
 	if(rv) BurstPush();
@@ -307,7 +307,7 @@ void LogonCommClientSocket::HandleRequestAccountMapping(WorldPacket & recvData)
 
 	ByteBuffer uncompressed(40000 * 5 + 8);
 	//uint32 Count = 0;
-	uint32 Remaining = mapping_to_send.size();
+	uint32 Remaining = (uint32)mapping_to_send.size();
 	itr = mapping_to_send.begin();
 	for(;;)
 	{
@@ -338,7 +338,7 @@ void LogonCommClientSocket::HandleRequestAccountMapping(WorldPacket & recvData)
 void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 {
 	// I still got no idea where this came from :p
-	uint32 destsize = uncompressed.size() + uncompressed.size()/10 + 16;
+	size_t destsize = uncompressed.size() + uncompressed.size()/10 + 16;
 
 	// w000t w000t kat000t for gzipped packets
 	WorldPacket data(RCMSG_ACCOUNT_CHARACTER_MAPPING_REPLY, destsize + 4);
@@ -357,9 +357,9 @@ void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 
 	// set up stream pointers
 	stream.next_out  = (Bytef*)((uint8*)data.contents())+4;
-	stream.avail_out = destsize;
+	stream.avail_out = (uInt)destsize;
 	stream.next_in   = (Bytef*)uncompressed.contents();
-	stream.avail_in  = uncompressed.size();
+	stream.avail_in  = (uInt)uncompressed.size();
 
 	// call the actual process
 	if(deflate(&stream, Z_NO_FLUSH) != Z_OK ||
@@ -386,7 +386,7 @@ void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 #ifdef USING_BIG_ENDIAN
 	*(uint32*)data.contents() = swap32(uint32(uncompressed.size()));
 #else
-	*(uint32*)data.contents() = uncompressed.size();
+	*(uint32*)data.contents() = (uint32)uncompressed.size();
 #endif
 	data.resize(stream.total_out + 4);
 	SendPacket(&data);

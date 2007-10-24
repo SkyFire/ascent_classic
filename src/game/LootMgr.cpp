@@ -63,7 +63,7 @@ T* RandomChoiceVector( vector<pair<T*, float> > & variant )
 	for(itr = variant.begin(); itr != variant.end(); ++itr)
 		totalChance += itr->second;
 
-	val = sRand.rand(totalChance);
+	val = float(sRand.rand((double)totalChance));
 	
 	for(itr = variant.begin(); itr != variant.end(); ++itr)
 	{
@@ -305,7 +305,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 		{
 			StoreLootList list;
 			//list.count = itr->second.size();			
-			list.count = (*itr).second.size();
+			list.count = (uint32)(*itr).second.size();
 			list.items=new StoreLootItem[list.count];
 		
 			uint32 ind=0;
@@ -618,12 +618,12 @@ void LootRoll::Finalize()
 	Loot * pLoot = 0;
 	if(GUID_HIPART(_guid) == HIGHGUID_UNIT)
 	{
-		Creature * pc = _mgr->GetCreature(_guid);
+		Creature * pc = _mgr->GetCreature((uint32)_guid);
 		if(pc) pLoot = &pc->loot;
 	}
 	else if(GUID_HIPART(_guid) == HIGHGUID_GAMEOBJECT)
 	{
-		GameObject * go = _mgr->GetGameObject(_guid);
+		GameObject * go = _mgr->GetGameObject((uint32)_guid);
 		if(go) pLoot = &go->loot;
 	}
 
@@ -649,10 +649,10 @@ void LootRoll::Finalize()
 		return;
 	}
 
-	Player * _player = (player) ? _mgr->GetPlayer(player) : 0;
+	Player * _player = (player) ? _mgr->GetPlayer((uint32)player) : 0;
 	if(!player || !_player)
 	{
-		_player = _mgr->GetPlayer(_passedGuid);
+		_player = _mgr->GetPlayer((uint32)_passedGuid);
 		if(_player)
 		{
 			/* all passed */
