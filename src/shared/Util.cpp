@@ -56,7 +56,11 @@ void SetThreadName(const char* format, ...)
 
 	__try
 	{
+#ifdef _WIN64
+		RaiseException(0x406D1388, 0, sizeof(info)/sizeof(DWORD), (ULONG_PTR*)&info);
+#else
 		RaiseException(0x406D1388, 0, sizeof(info)/sizeof(DWORD), (DWORD*)&info);
+#endif
 	}
 	__except(EXCEPTION_CONTINUE_EXECUTION)
 	{

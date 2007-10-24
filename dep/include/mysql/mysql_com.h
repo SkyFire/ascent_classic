@@ -20,9 +20,13 @@
 #ifndef _mysql_com_h
 #define _mysql_com_h
 
-#define NAME_LEN	64		/* Field/table name length */
 #define HOSTNAME_LENGTH 60
-#define USERNAME_LENGTH 16
+#define SYSTEM_CHARSET_MBMAXLEN 3
+#define NAME_CHAR_LEN	64              /* Field/table name length */
+#define USERNAME_CHAR_LENGTH 16
+#define NAME_LEN                (NAME_CHAR_LEN*SYSTEM_CHARSET_MBMAXLEN)
+#define USERNAME_LENGTH         (USERNAME_CHAR_LENGTH*SYSTEM_CHARSET_MBMAXLEN)
+
 #define SERVER_VERSION_LENGTH 60
 #define SQLSTATE_LENGTH 5
 
@@ -56,7 +60,7 @@ enum enum_server_command
   COM_TIME, COM_DELAYED_INSERT, COM_CHANGE_USER, COM_BINLOG_DUMP,
   COM_TABLE_DUMP, COM_CONNECT_OUT, COM_REGISTER_SLAVE,
   COM_STMT_PREPARE, COM_STMT_EXECUTE, COM_STMT_SEND_LONG_DATA, COM_STMT_CLOSE,
-  COM_STMT_RESET, COM_SET_OPTION, COM_STMT_FETCH,
+  COM_STMT_RESET, COM_SET_OPTION, COM_STMT_FETCH, COM_DAEMON,
   /* don't forget to update const char *command_name[] in sql_parse.cc */
 
   /* Must be last */
@@ -95,6 +99,10 @@ enum enum_server_command
 #define GROUP_FLAG	32768		/* Intern: Group field */
 #define UNIQUE_FLAG	65536		/* Intern: Used by sql_yacc */
 #define BINCMP_FLAG	131072		/* Intern: Used by sql_yacc */
+#define GET_FIXED_FIELDS_FLAG (1 << 18) /* Used to get fields in item tree */
+#define FIELD_IN_PART_FUNC_FLAG (1 << 19)/* Field part of partition func */
+#define FIELD_IN_ADD_INDEX (1<< 20)	/* Intern: Field used in ADD INDEX */
+#define FIELD_IS_RENAMED (1<< 21)       /* Intern: Field is being renamed */
 
 #define REFRESH_GRANT		1	/* Refresh grant tables */
 #define REFRESH_LOG		2	/* Start on new log file */
@@ -174,29 +182,29 @@ typedef struct st_vio Vio;
 #define MAX_INT_WIDTH           10      /* Max width for a LONG w.o. sign */
 #define MAX_BIGINT_WIDTH        20      /* Max width for a LONGLONG */
 #define MAX_CHAR_WIDTH		255	/* Max length for a CHAR colum */
-#define MAX_BLOB_WIDTH		8192	/* Default width for blob */
+#define MAX_BLOB_WIDTH		16777216	/* Default width for blob */
 
 typedef struct st_net {
 #if !defined(CHECK_EMBEDDED_DIFFERENCES) || !defined(EMBEDDED_LIBRARY)
-  Vio* vio;
+  Vio *vio;
   unsigned char *buff,*buff_end,*write_pos,*read_pos;
   my_socket fd;					/* For Perl DBI/dbd */
-  unsigned long max_packet,max_packet_size;
-  unsigned int pkt_nr,compress_pkt_nr;
-  unsigned int write_timeout, read_timeout, retry_count;
-  int fcntl;
-  my_bool compress;
   /*
     The following variable is set if we are doing several queries in one
     command ( as in LOAD TABLE ... FROM MASTER ),
     and do not want to confuse the client with OK at the wrong time
   */
   unsigned long remain_in_buf,length, buf_length, where_b;
+  unsigned long max_packet,max_packet_size;
+  unsigned int pkt_nr,compress_pkt_nr;
+  unsigned int write_timeout, read_timeout, retry_count;
+  int fcntl;
   unsigned int *return_status;
   unsigned char reading_or_writing;
   char save_char;
   my_bool no_send_ok;  /* For SPs and other things that do multiple stmts */
   my_bool no_send_eof; /* For SPs' first version read-only cursors */
+  my_bool compress;
   /*
     Set if OK packet is already sent, and we do not need to send error
     messages
@@ -207,19 +215,19 @@ typedef struct st_net {
     queries in cache that have not stored its results yet
   */
 #endif
-  char last_error[MYSQL_ERRMSG_SIZE], sqlstate[SQLSTATE_LENGTH+1];
-  unsigned int last_errno;
-  unsigned char error;
-
   /*
     'query_cache_query' should be accessed only via query cache
     functions and methods to maintain proper locking.
   */
-  gptr query_cache_query;
-
+  unsigned char *query_cache_query;
+  unsigned int last_errno;
+  unsigned char error;
   my_bool report_error; /* We should report error (we have unreported error) */
   my_bool return_errno;
+  char last_error[MYSQL_ERRMSG_SIZE], sqlstate[SQLSTATE_LENGTH+1];
+  void *extension;
 } NET;
+
 
 #define packet_error (~(unsigned long) 0)
 
@@ -335,15 +343,20 @@ extern "C" {
 my_bool	my_net_init(NET *net, Vio* vio);
 void	my_net_local_init(NET *net);
 void	net_end(NET *net);
-void	net_clear(NET *net);
-my_bool net_realloc(NET *net, unsigned long length);
+  void	net_clear(NET *net, my_bool clear_buffer);
+my_bool net_realloc(NET *net, size_t length);
 my_bool	net_flush(NET *net);
-my_bool	my_net_write(NET *net,const char *packet,unsigned long len);
+my_bool	my_net_write(NET *net,const unsigned char *packet, size_t len);
 my_bool	net_write_command(NET *net,unsigned char command,
-			  const char *header, unsigned long head_len,
-			  const char *packet, unsigned long len);
-int	net_real_write(NET *net,const char *packet,unsigned long len);
+			  const unsigned char *header, size_t head_len,
+			  const unsigned char *packet, size_t len);
+int	net_real_write(NET *net,const unsigned char *packet, size_t len);
 unsigned long my_net_read(NET *net);
+
+#ifdef _global_h
+void my_net_set_write_timeout(NET *net, uint timeout);
+void my_net_set_read_timeout(NET *net, uint timeout);
+#endif
 
 /*
   The following function is not meant for normal usage
@@ -376,6 +389,7 @@ typedef struct st_udf_args
   char *maybe_null;			/* Set to 1 for all maybe_null args */
   char **attributes;                    /* Pointer to attribute name */
   unsigned long *attribute_lengths;     /* Length of attribute arguments */
+  void *extension;
 } UDF_ARGS;
 
   /* This holds information about the result */
@@ -386,7 +400,9 @@ typedef struct st_udf_init
   unsigned int decimals;		/* for real functions */
   unsigned long max_length;		/* For string functions */
   char	  *ptr;				/* free pointer for function data */
-  my_bool const_item;			/* 0 if result is independent of arguments */
+  /* 0 if result is independent of arguments */
+  my_bool const_item;
+  void *extension;
 } UDF_INIT;
 
   /* Constants when using compression */
@@ -427,24 +443,18 @@ char *octet2hex(char *to, const char *str, unsigned int len);
 
 /* end of password.c */
 
-char *get_tty_password(char *opt_message);
+char *get_tty_password(const char *opt_message);
 const char *mysql_errno_to_sqlstate(unsigned int mysql_errno);
 
 /* Some other useful functions */
 
-my_bool my_init(void);
-extern int modify_defaults_file(const char *file_location, const char *option,
-                                const char *option_value,
-                                const char *section_name, int remove_option);
-int load_defaults(const char *conf_file, const char **groups,
-		  int *argc, char ***argv);
 my_bool my_thread_init(void);
 void my_thread_end(void);
 
 #ifdef _global_h
 ulong STDCALL net_field_length(uchar **packet);
 my_ulonglong net_field_length_ll(uchar **packet);
-char *net_store_length(char *pkg, ulonglong length);
+uchar *net_store_length(uchar *pkg, ulonglong length);
 #endif
 
 #ifdef __cplusplus

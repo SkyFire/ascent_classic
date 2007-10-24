@@ -27,7 +27,7 @@ functions */
 #endif
 
 #include <sys/locking.h>
-#include <windows.h>
+#include <winsock2.h>
 #include <math.h>			/* Because of rint() */
 #include <fcntl.h>
 #include <io.h>
@@ -94,7 +94,7 @@ functions */
 #define O_SHORT_LIVED	0
 #define SH_DENYNO	_SH_DENYNO
 #else
-#define O_BINARY	_O_BINARY	/* compability with MSDOS */
+#define O_BINARY	_O_BINARY	/* compability with older style names */
 #define FILE_BINARY	_O_BINARY	/* my_fopen in binary mode */
 #define O_TEMPORARY	_O_TEMPORARY
 #define O_SHORT_LIVED	_O_SHORT_LIVED
@@ -121,12 +121,12 @@ functions */
 
 /* Type information */
 
-#if defined(__EMX__) || !defined(HAVE_UINT)
+#if !defined(HAVE_UINT)
 #undef HAVE_UINT
 #define HAVE_UINT
 typedef unsigned short	ushort;
 typedef unsigned int	uint;
-#endif /* defined(__EMX__) || !defined(HAVE_UINT) */
+#endif /* !defined(HAVE_UINT) */
 
 typedef unsigned __int64 ulonglong;	/* Microsofts 64 bit types */
 typedef __int64 longlong;
@@ -172,6 +172,7 @@ typedef uint rf_SetTimer;
 #endif
 #define VOID_SIGHANDLER
 #define SIZEOF_CHAR		1
+#define SIZEOF_INT		4
 #define SIZEOF_LONG		4
 #define SIZEOF_LONG_LONG	8
 #define SIZEOF_OFF_T		8
@@ -204,9 +205,6 @@ typedef uint rf_SetTimer;
 
 /* If LOAD DATA LOCAL INFILE should be enabled by default */
 #define ENABLED_LOCAL_INFILE 1
-
-/* If query profiling should be enabled by default */
-#define ENABLED_PROFILING 1
 
 /* Convert some simple functions to Posix */
 
@@ -281,6 +279,12 @@ inline double ulonglong2double(ulonglong value)
 				    (((uint32) ((uchar) (A)[2])) << 16) +\
 				    (((uint32) ((uchar) (A)[3])) << 24)) +\
 				    (((ulonglong) ((uchar) (A)[4])) << 32))
+#define uint6korr(A)	((ulonglong)(((uint32)    ((uchar) (A)[0]))          + \
+                                     (((uint32)    ((uchar) (A)[1])) << 8)   + \
+                                     (((uint32)    ((uchar) (A)[2])) << 16)  + \
+                                     (((uint32)    ((uchar) (A)[3])) << 24)) + \
+                         (((ulonglong) ((uchar) (A)[4])) << 32) +       \
+                         (((ulonglong) ((uchar) (A)[5])) << 40))
 #define uint8korr(A)	(*((ulonglong *) (A)))
 #define sint8korr(A)	(*((longlong *) (A)))
 #define int2store(T,A)	*((uint16*) (T))= (uint16) (A)
@@ -293,6 +297,12 @@ inline double ulonglong2double(ulonglong value)
 			  *((T)+2)=(uchar) (((A) >> 16));\
 			  *((T)+3)=(uchar) (((A) >> 24)); \
 			  *((T)+4)=(uchar) (((A) >> 32)); }
+#define int6store(T,A)	{ *(T)    =(uchar)((A));          \
+			  *((T)+1)=(uchar) (((A) >> 8));  \
+			  *((T)+2)=(uchar) (((A) >> 16)); \
+			  *((T)+3)=(uchar) (((A) >> 24)); \
+			  *((T)+4)=(uchar) (((A) >> 32)); \
+			  *((T)+5)=(uchar) (((A) >> 40)); }
 #define int8store(T,A)	*((ulonglong *) (T))= (ulonglong) (A)
 
 #define doubleget(V,M)	do { *((long *) &V) = *((long*) M); \
@@ -300,10 +310,10 @@ inline double ulonglong2double(ulonglong value)
 #define doublestore(T,V) do { *((long *) T) = *((long*) &V); \
 			      *(((long *) T)+1) = *(((long*) &V)+1); } while(0)
 #define float4get(V,M) { *((long *) &(V)) = *((long*) (M)); }
-#define floatstore(T,V) memcpy((byte*)(T), (byte*)(&V), sizeof(float))
-#define floatget(V,M)   memcpy((byte*)(&V), (byte*)(M), sizeof(float))
+#define floatstore(T,V) memcpy((uchar*)(T), (uchar*)(&V), sizeof(float))
+#define floatget(V,M)   memcpy((uchar*)(&V), (uchar*)(M), sizeof(float))
 #define float8get(V,M) doubleget((V),(M))
-#define float4store(V,M) memcpy((byte*) V,(byte*) (&M),sizeof(float))
+#define float4store(V,M) memcpy((uchar*) V,(uchar*) (&M),sizeof(float))
 #define float8store(V,M) doublestore((V),(M))
 #endif /* _WIN64 */
 
@@ -340,7 +350,14 @@ inline double ulonglong2double(ulonglong value)
 #define SPRINTF_RETURNS_INT
 #define HAVE_SETFILEPOINTER
 #define HAVE_VIO_READ_BUFF
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+/* strnlen() appeared in Studio 2005 */
 #define HAVE_STRNLEN
+#endif
+#define HAVE_WINSOCK2
+
+#define strcasecmp stricmp
+#define strncasecmp strnicmp
 
 #ifndef __NT__
 #undef FILE_SHARE_DELETE
@@ -397,28 +414,13 @@ inline double ulonglong2double(ulonglong value)
 #ifdef __NT__  /* This should also work on Win98 but .. */
 #define thread_safe_add(V,C,L) InterlockedExchangeAdd((long*) &(V),(C))
 #define thread_safe_sub(V,C,L) InterlockedExchangeAdd((long*) &(V),-(long) (C))
-#define statistic_add(V,C,L) thread_safe_add((V),(C),(L))
-#else
-#define thread_safe_add(V,C,L) \
-	pthread_mutex_lock((L)); (V)+=(C); pthread_mutex_unlock((L));
-#define thread_safe_sub(V,C,L) \
-	pthread_mutex_lock((L)); (V)-=(C); pthread_mutex_unlock((L));
-#define statistic_add(V,C,L)	 (V)+=(C)
 #endif
-#define statistic_increment(V,L) thread_safe_increment((V),(L))
-#define statistic_decrement(V,L) thread_safe_decrement((V),(L))
 
 #define shared_memory_buffer_length 16000
 #define default_shared_memory_base_name "MYSQL"
 
-#ifdef CYBOZU
-#define MYSQL_DEFAULT_CHARSET_NAME "utf8"
-#define MYSQL_DEFAULT_COLLATION_NAME "utf8_general_cs"
-#define HAVE_UTF8_GENERAL_CS 1
-#else
 #define MYSQL_DEFAULT_CHARSET_NAME "latin1"
 #define MYSQL_DEFAULT_COLLATION_NAME "latin1_swedish_ci"
-#endif
 
 #define HAVE_SPATIAL 1
 #define HAVE_RTREE_KEYS 1
@@ -429,10 +431,8 @@ inline double ulonglong2double(ulonglong value)
 /* Define charsets you want */
 /* #undef HAVE_CHARSET_armscii8 */
 /* #undef HAVE_CHARSET_ascii */
-#ifndef CYBOZU
 #define HAVE_CHARSET_big5 1
 #define HAVE_CHARSET_cp1250 1
-#endif
 /* #undef HAVE_CHARSET_cp1251 */
 /* #undef HAVE_CHARSET_cp1256 */
 /* #undef HAVE_CHARSET_cp1257 */
@@ -441,33 +441,27 @@ inline double ulonglong2double(ulonglong value)
 /* #undef HAVE_CHARSET_cp866 */
 #define HAVE_CHARSET_cp932 1
 /* #undef HAVE_CHARSET_dec8 */
-#ifndef CYBOZU
 #define HAVE_CHARSET_eucjpms 1
 #define HAVE_CHARSET_euckr 1
 #define HAVE_CHARSET_gb2312 1
 #define HAVE_CHARSET_gbk 1
-#endif
 /* #undef HAVE_CHARSET_greek */
 /* #undef HAVE_CHARSET_hebrew */
 /* #undef HAVE_CHARSET_hp8 */
 /* #undef HAVE_CHARSET_keybcs2 */
 /* #undef HAVE_CHARSET_koi8r */
 /* #undef HAVE_CHARSET_koi8u */
-#ifndef CYBOZU
 #define HAVE_CHARSET_latin1 1
 #define HAVE_CHARSET_latin2 1
-#endif
 /* #undef HAVE_CHARSET_latin5 */
 /* #undef HAVE_CHARSET_latin7 */
 /* #undef HAVE_CHARSET_macce */
 /* #undef HAVE_CHARSET_macroman */
 #define HAVE_CHARSET_sjis 1
 /* #undef HAVE_CHARSET_swe7 */
-#ifndef CYBOZU
 #define HAVE_CHARSET_tis620 1
 #define HAVE_CHARSET_ucs2 1
 #define HAVE_CHARSET_ujis 1
-#endif
 #define HAVE_CHARSET_utf8 1
 #define HAVE_UCA_COLLATIONS 1
 

@@ -65,6 +65,7 @@ void StartCrashHandler()
 	DWORD code;
 
 	// Check for a debugger.
+#ifndef X64
 	__asm
 	{
 		MOV EAX, FS:[0x18]
@@ -83,7 +84,9 @@ void StartCrashHandler()
 		// No debugger. On crash, we'll call OnCrash to save etc.
 		ON_CRASH_BREAK_DEBUGGER = false;
 	}
-	//ON_CRASH_BREAK_DEBUGGER = IsDebuggerPresent();
+#else
+	ON_CRASH_BREAK_DEBUGGER = IsDebuggerPresent();
+#endif
 }
 
 

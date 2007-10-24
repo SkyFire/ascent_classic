@@ -128,7 +128,11 @@ enum MsTimeVariables
 #ifdef USING_BIG_ENDIAN
 #define ARCH "PPC"
 #else
+#ifdef X64
+#define ARCH "X64"
+#else
 #define ARCH "X86"
+#endif
 #endif
 
 /*#if COMPILER == COMPILER_MICROSOFT

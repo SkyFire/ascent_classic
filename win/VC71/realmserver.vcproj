@@ -53,7 +53,7 @@
 				OutputFile=".\..\..\bin\Release/realmserver.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\dep\lib\release"
+				AdditionalLibraryDirectories="..\..\dep\lib32"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\..\..\bin\Release/realmserver.pdb"
 				SubSystem="1"/>
@@ -122,7 +122,7 @@ copy ..\..\dep\lib\*.dll ..\..\bin\release
 				OutputFile=".\..\..\bin\Debug\realmserver.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\dep\lib\debug"
+				AdditionalLibraryDirectories="..\..\dep\lib32"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\..\..\bin\Debug\realmserver.pdb"

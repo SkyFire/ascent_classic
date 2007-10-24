@@ -380,9 +380,9 @@ public:
 	inline uint32 GetFreeSlots(uint32 t)
 	{
 		m_mainLock.Acquire();
-		uint32 s = m_playerCountPerTeam - m_players[t].size() - m_pendPlayers[t].size();
+		size_t s = m_playerCountPerTeam - m_players[t].size() - m_pendPlayers[t].size();
 		m_mainLock.Release();
-		return s;
+		return (uint32)s;
 	}
 
 	GameObject * SpawnGameObject(uint32 entry,uint32 MapId , float x, float y, float z, float o, uint32 flags, uint32 faction, float scale);
