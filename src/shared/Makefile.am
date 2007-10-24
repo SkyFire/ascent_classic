@@ -35,8 +35,8 @@ libshared_a_SOURCES = \
 libauth_a_SOURCES = \
     Auth/BigNumber.cpp \
     Auth/BigNumber.h \
-    Auth/md5.c \
-    Auth/md5.h \
+    Auth/MD5.cpp \
+    Auth/MD5.h \
     Auth/Sha1.cpp \
     Auth/Sha1.h \
     Auth/WowCrypt.cpp \

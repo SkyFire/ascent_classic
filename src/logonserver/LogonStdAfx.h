@@ -39,7 +39,6 @@
 #include "../shared/Database/DBCStores.h"
 #include "../shared/Database/dbcfile.h"
 
-#include "../shared/Auth/md5.h"
 #include "../shared/Auth/BigNumber.h"
 #include "../shared/Auth/Sha1.h"
 #include "../shared/Auth/WowCrypt.h"
