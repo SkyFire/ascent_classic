@@ -48,3 +48,4 @@ void MD5Hash::Initialize()
 {
 	md5_init(&mC);
 }
+

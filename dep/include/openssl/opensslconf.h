@@ -63,8 +63,8 @@
 
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
-#define ENGINESDIR "c:/openssl/lib/engines"
-#define OPENSSLDIR "c:/openssl/ssl"
+#define ENGINESDIR "D:\MyOpenProjects\openssl-0.9.8e\Build\Win32/lib/engines"
+#define OPENSSLDIR "D:\MyOpenProjects\openssl-0.9.8e\Build\Win32/ssl"
 #endif
 #endif
 
