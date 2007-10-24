@@ -97,9 +97,9 @@ else
 fi
 
 # THIS IS UGLY!
-CPPFLAGS=""
-CFLAGS=""
-CXXFLAGS=""
+CPPFLAGS="-pipe"
+CFLAGS="-pipe"
+CXXFLAGS="-pipe"
 
 AC_ARG_ENABLE(gcov,
      AC_HELP_STRING([--enable-gcov],[enable codecovering])],
