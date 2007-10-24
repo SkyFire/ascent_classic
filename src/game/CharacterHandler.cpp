@@ -18,7 +18,6 @@
  */
 
 #include "StdAfx.h"
-#include <openssl/md5.h>
 #include "../shared/AuthCodes.h"
 #include "../shared/svn_revision.h"
 
@@ -654,6 +653,8 @@ void WorldSession::FullLogin(Player * plr)
 	WorldPacket data(SMSG_ACCOUNT_DATA_MD5, 128);
 #endif
 
+	MD5Hash md5hash;
+
 	for (int i = 0; i < 8; i++)
 	{
 		AccountDataEntry* acct_data = GetAccountData(i);
@@ -663,16 +664,14 @@ void WorldSession::FullLogin(Player * plr)
 			data << uint64(0) << uint64(0);				// Nothing.
 			continue;
 		}
-		MD5_CTX ctx;
-		MD5_Init(&ctx);
+		md5hash.Initialize();
+		md5hash.UpdateData((const uint8*)acct_data->data, acct_data->sz);
+		md5hash.Finalize();
 
-		MD5_Update(&ctx, acct_data->data, acct_data->sz);
-		uint8 md5hash[MD5_DIGEST_LENGTH];
-		MD5_Final(md5hash, &ctx);
 #ifndef USING_BIG_ENDIAN
-		data.Write(md5hash, MD5_DIGEST_LENGTH);
+		data.Write(md5hash.GetDigest(), MD5_DIGESTSIZE);
 #else
-		data.append(md5hash, MD5_DIGEST_LENGTH);
+		data.append(md5hash.GetDigest(), MD5_DIGESTSIZE);
 #endif
 	}
 	SendPacket(&data);

@@ -51,7 +51,7 @@
 
 #include <Network/Network.h>
 
-#include "../shared/Auth/md5.h"
+#include "../shared/Auth/MD5.h"
 #include "../shared/Auth/BigNumber.h"
 #include "../shared/Auth/Sha1.h"
 #include "../shared/Auth/WowCrypt.h"
