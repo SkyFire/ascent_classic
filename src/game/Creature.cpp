@@ -396,7 +396,7 @@ uint16 Creature::GetQuestRelation(uint32 quest_id)
 
 uint32 Creature::NumOfQuests()
 {
-	return m_quests->size();
+	return (uint32)m_quests->size();
 }
 
 void Creature::_LoadQuests()
@@ -480,7 +480,7 @@ void Creature::EnslaveExpire()
 {
 	
 	m_enslaveCount++;
-	Player *caster = objmgr.GetPlayer(GetUInt64Value(UNIT_FIELD_CHARMEDBY));
+	Player *caster = objmgr.GetPlayer(GetUInt32Value(UNIT_FIELD_CHARMEDBY));
 	if(caster)
 	{
 		caster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
@@ -584,18 +584,19 @@ void Creature::RegenerateHealth()
 	
 	//though creatures have their stats we use some wierd formula for amt
 	float amt = 0.0f;
+	float lvl = float(getLevel());
 
 	if(PctRegenModifier == 0.0f)
-		amt = getLevel()*2;
+		amt = lvl*2.0f;
 	else if(PctRegenModifier > 0)
-		amt = (getLevel()*2)*(1+PctRegenModifier);
+		amt = (lvl*2.0f)*(1.0f+PctRegenModifier);
 	else
-		amt = (getLevel()*2)*(-1+PctRegenModifier);
+		amt = (lvl*2.0f)*(-1.0f+PctRegenModifier);
 		
 	//Apply shit from conf file
 	amt*=sWorld.getRate(RATE_HEALTH);
 	
-	if(amt<=1.0)//this fixes regen like 0.98
+	if(amt<=1.0f)//this fixes regen like 0.98
 		cur++;
 	else
 		cur+=(uint32)amt;
@@ -630,7 +631,7 @@ void Creature::RegenerateFocus()
 	uint32 cur=GetUInt32Value(UNIT_FIELD_POWER3);
 	uint32 mm=GetUInt32Value(UNIT_FIELD_MAXPOWER3);
 	if(cur>=mm)return;
-	float amt = 10.0 * PctPowerRegenModifier[POWER_TYPE_FOCUS];
+	float amt = 10.0f * PctPowerRegenModifier[POWER_TYPE_FOCUS];
 	cur+=(uint32)amt;
 	SetUInt32Value(UNIT_FIELD_POWER3,(cur>=mm)?mm:cur);
 }
@@ -835,8 +836,8 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		SetUInt32Value(UNIT_FIELD_RESISTANCES+i,proto->Resistances[i]);
 
 	SetUInt32Value(UNIT_FIELD_BASEATTACKTIME,proto->AttackTime);
-	SetFloatValue(UNIT_FIELD_MINDAMAGE, (mode ? proto->MinDamage * 1.5  : proto->MinDamage));
-	SetFloatValue(UNIT_FIELD_MAXDAMAGE, (mode ? proto->MaxDamage * 1.5  : proto->MaxDamage));
+	SetFloatValue(UNIT_FIELD_MINDAMAGE, (mode ? proto->MinDamage * 1.5f  : proto->MinDamage));
+	SetFloatValue(UNIT_FIELD_MAXDAMAGE, (mode ? proto->MaxDamage * 1.5f  : proto->MaxDamage));
 
 	SetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,proto->RangedAttackTime);
 	SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE,proto->RangedMinDamage);
@@ -1305,10 +1306,10 @@ void Creature::SetGuardWaypoints()
 	GetAIInterface()->setMoveType(1);
 	for(int i = 1; i <= 4; i++)
 	{
-		float ang = rand()/100.0;
-		float ran = (rand()%(100))/10.0;
+		float ang = rand()/100.0f;
+		float ran = (rand()%(100))/10.0f;
 		while(ran < 1)
-			ran = (rand()%(100))/10.0;
+			ran = (rand()%(100))/10.0f;
 
 		WayPoint * wp = new WayPoint;
 		wp->id = i;

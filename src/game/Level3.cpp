@@ -38,7 +38,7 @@ bool ChatHandler::HandleWeatherCommand(const char* args, WorldSession *m_session
 		return false;
 
 	uint32 type = atol(ptype);
-	float intensity = atof(pintensity);
+	float intensity = (float)atof(pintensity);
 
 	BuildWeatherPacket(&data,type,intensity);
 	m_session->GetPlayer()->SendMessageToSet(&data,true);
@@ -259,7 +259,7 @@ bool ChatHandler::HandleNPCFactionCommand(const char* args, WorldSession *m_sess
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -276,7 +276,7 @@ bool ChatHandler::HandleNPCFactionCommand(const char* args, WorldSession *m_sess
 
 bool ChatHandler::HandleClearCooldownsCommand(const char *args, WorldSession *m_session)
 {
-	uint64 guid = m_session->GetPlayer()->GetSelection();
+	uint32 guid = (uint32)m_session->GetPlayer()->GetSelection();
 	Player *plr = getSelectedChar(m_session, true);
 	
 	if(!plr)
@@ -403,7 +403,7 @@ bool ChatHandler::HandleAddWeaponCommand(const char* args, WorldSession *m_sessi
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -665,7 +665,7 @@ bool ChatHandler::HandleGMTicketGetAllCommand(const char* args, WorldSession *m_
 	{
 		uint32 cont = 0;
 		uint32 zone = 0;
-		Player* plr = objmgr.GetPlayer((*itr)->guid);
+		Player* plr = objmgr.GetPlayer((uint32)(*itr)->guid);
 		if(plr)
 			if(plr->IsInWorld())
 			{
@@ -714,12 +714,12 @@ bool ChatHandler::HandleGMTicketDelByIdCommand(const char* args, WorldSession *m
 		return false;
 
 	GmTicketList::iterator i;
-	int32 guid = -1;
+	int64 guid = -1;
 	for(i = objmgr.GM_TicketList.begin(); i != objmgr.GM_TicketList.end(); i++)
 	{
 		if(strcmp((*i)->name.c_str(), args) == 0)
 		{
-			guid = (*i)->guid;
+			guid = (int64)(*i)->guid;
 			break;
 		}
 	}
@@ -737,7 +737,7 @@ bool ChatHandler::HandleGMTicketDelByIdCommand(const char* args, WorldSession *m
 		chn->Say(m_session->GetPlayer(), str.str().c_str(), NULL, true);
 
 
-		Player* plr = objmgr.GetPlayer(guid);
+		Player* plr = objmgr.GetPlayer((uint32)guid);
 		if(!plr)
 			return true;
 		if(!plr->IsInWorld())
@@ -755,7 +755,7 @@ bool ChatHandler::HandleGMTicketDelByIdCommand(const char* args, WorldSession *m
 bool ChatHandler::HandleAddSkillCommand(const char* args, WorldSession *m_session)
 {
 	char buf[256];
-	Player* target = objmgr.GetPlayer(m_session->GetPlayer()->GetSelection());
+	Player* target = objmgr.GetPlayer((uint32)m_session->GetPlayer()->GetSelection());
 
 	if(!target) {
 		SystemMessage(m_session, "Select A Player first.");
@@ -1592,7 +1592,7 @@ bool ChatHandler::HandleResetHPCommand(const char* args, WorldSession* m_session
 
 bool ChatHandler::HandleFlySpeedCheatCommand(const char* args, WorldSession* m_session)
 {
-	float Speed = atof(args);
+	float Speed = (float)atof(args);
 	if(Speed == 0)
 		Speed = 20;
 
@@ -2578,7 +2578,7 @@ bool ChatHandler::HandleForceRenameCommand(const char * args, WorldSession * m_s
 		return true;
 	}
 
-	Player * plr = objmgr.GetPlayer(pi->guid);
+	Player * plr = objmgr.GetPlayer((uint32)pi->guid);
 	if(plr == 0)
 	{
 		CharacterDatabase.Execute("UPDATE characters SET forced_rename_pending = 1 WHERE guid = %u", (uint32)pi->guid);
@@ -2758,12 +2758,12 @@ bool ChatHandler::HandleGORotate(const char * args, WorldSession * m_session)
 		return true;
 	}
 
-	float deg = atof(args);
+	float deg = (float)atof(args);
 	if(deg == 0.0f)
 		return false;
 
 	// Convert the argument to radians
-	float rad = deg * (M_PI / 180.0f);
+	float rad = deg * (float(M_PI) / 180.0f);
 
 	// let's try rotation_0
 	go->ModFloatValue(GAMEOBJECT_ROTATION, rad);
@@ -3017,7 +3017,7 @@ bool ChatHandler::HandleAIAgentDebugSkip(const char * args, WorldSession * m_ses
 
 bool ChatHandler::HandleSendRunSpeedChange(const char * args, WorldSession * m_session)
 {
-	float s = atof(args);
+	float s = (float)atof(args);
 
 	WorldPacket data(SMSG_FORCE_RUN_SPEED_CHANGE, 20);
 	data << m_session->GetPlayer()->GetNewGUID();

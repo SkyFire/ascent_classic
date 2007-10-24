@@ -152,7 +152,7 @@ void CConsole::CancelShutdown(char *str)
 
 void CConsole::GetUptime(char *str)
 {
-	uint32 count = objmgr._players.size();
+	uint32 count = (uint32)objmgr._players.size();
 
 	sLog.outString("Console: Server has been running for %s There are currently %d online players.",
 		sWorld.GetUptimeString().c_str(), count);
