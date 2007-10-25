@@ -197,11 +197,31 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvPacket)
 
 }
 
+//since burlex will remove this code sooner or later, i did not bother adding this to a class
+int GetMaxLearnedSpellLevel(Player *p,uint32 spell)
+{
+	SpellEntry *spinfo=dbcSpell.LookupEntry(spell);
+	if(!spinfo)
+		return 0;
+	int max_level=-1; //now it can't get worse then this :D
+	SpellSet::iterator iter;
+	for(iter= p->mSpells.begin();iter != p->mSpells.end();iter++)
+	{
+		//get hash name for this spell
+		SpellEntry *spinfo2 = dbcSpell.LookupEntry(*iter);
+		if(spinfo2->NameHash == spinfo->NameHash)
+			if(max_level< (int) spinfo2->spellLevel)
+				max_level = spinfo2->spellLevel;
+	}
+	return max_level;
+}
+
 uint8 WorldSession::TrainerGetSpellStatus(TrainerSpell* pSpell)
 {
 	if(!pSpell->pRealSpell)
 		return TRAINER_STATUS_NOT_LEARNABLE;
 
+/* disabled by zack :D
 	if(_player->HasSpell(pSpell->pRealSpell->Id))
 		return TRAINER_STATUS_ALREADY_HAVE;
 
@@ -209,6 +229,18 @@ uint8 WorldSession::TrainerGetSpellStatus(TrainerSpell* pSpell)
 		return TRAINER_STATUS_ALREADY_HAVE;
 
 	if(pSpell->DeleteSpell && _player->HasDeletedSpell(pSpell->DeleteSpell))
+		return TRAINER_STATUS_ALREADY_HAVE;
+*/
+/*	
+	this code is getting history :D.
+	first remove : - it had a loop bug. Spank me baby
+	second remove : - it was just not sexy
+	third remove : - replaced with simple HasSpell function. On rewriting new trainer code
+	forth remove : - replaced with HasDeletedSpell. Wrong when you have more then 1 rank of the same spell
+	futured fifth remove : To be completed.Wrong when you reset talents and you have first rank as talent and rest from trainer :D 
+	Why do you hate this function so much ? It is just as checking has_spell but instead of id it checks for namehash.
+	*/
+	if(pSpell->pRealSpell && GetMaxLearnedSpellLevel(_player,pSpell->pRealSpell->Id)>=(int)pSpell->pRealSpell->spellLevel)
 		return TRAINER_STATUS_ALREADY_HAVE;
 
 	if(	(pSpell->RequiredLevel && _player->getLevel()<pSpell->RequiredLevel)
