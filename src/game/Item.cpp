@@ -681,8 +681,8 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 					 * Secondly, need to assign some static chance for instant attacks (ss,
 					 * gouge, etc.) */
 					if (!Entry->min[c] && GetProto()->Class == 2) {
-						uint32 speed = GetProto()->Delay;
-						TS.procChance = (uint32)((1.0*(float)speed)/600.0);
+						float speed = (float)GetProto()->Delay;
+						TS.procChance = (uint32)(speed/600.0f);
 					} else
 						TS.procChance = Entry->min[c];
 					Log.Debug("Enchant","Setting procChance to %u%%.", TS.procChance);

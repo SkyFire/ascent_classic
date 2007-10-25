@@ -664,7 +664,7 @@ public:
 		if(!time)
 			time = offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
 
-		time += (time*modAttackTimeIncreasePCT)/100;
+		time = max(0,float2int32(time*GetFloatValue(UNIT_MOD_CAST_SPEED)));
 
 		if(offhand)
 			m_attackTimer_1 = getMSTime() + time;
@@ -882,7 +882,7 @@ public:
 	uint32 MechanicsDispels[27];
 	float MechanicsResistancesPCT[27]; 
 	float ModDamageTakenByMechPCT[27];
-	int32 modAttackTimeIncreasePCT;
+//	int32 modAttackTimeIncreasePCT;
 	//int32 RangedDamageTakenPct; 
 
 	//SM

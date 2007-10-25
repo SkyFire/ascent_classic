@@ -196,7 +196,7 @@ Unit::Unit()
 	}
 
 	trackStealth = false;
-	modAttackTimeIncreasePCT = 0;
+//	modAttackTimeIncreasePCT = 0;
 
 	m_threatModifyer = 0;
 	m_generatedThreatModifyer = 0;

@@ -1,3 +1,7 @@
 # Sunder Armor - not stackable
 # Overpower - should work
 focused rage: should decrease the rage of all damage-dealing abilities and of all debuffs. And it should be stackable with Improved Sunder Armor and Improved Heroic Strike talents
+Piercing howl should detect stealth
+Berserker rage should give you temporary stun ress
+Iron will, stun ress is not working
+charge/intercept should brake slowing effects
