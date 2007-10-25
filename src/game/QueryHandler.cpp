@@ -25,9 +25,7 @@
 void WorldSession::HandleNameQueryOpcode( WorldPacket & recv_data )
 {
 	CHECK_PACKET_SIZE(recv_data, 8);
-	WorldPacket data;
 	uint64 guid;
-
 	recv_data >> guid;
 
 	PlayerInfo *pn = objmgr.GetPlayerInfo( (uint32)guid );
@@ -37,15 +35,11 @@ void WorldSession::HandleNameQueryOpcode( WorldPacket & recv_data )
 
 	sLog.outDebug( "Received CMSG_NAME_QUERY for: %s", pn->name );
 
-	data.Initialize( SMSG_NAME_QUERY_RESPONSE );
-
-	data << pn->guid;
+	WorldPacket data(SMSG_NAME_QUERY_RESPONSE, strlen(pn->name) + 35);
+	data << pn->guid << uint32(0);	//highguid
 	data << pn->name;
-	
 	data << uint8(0);	   // this probably is "different realm" or something flag.
-	
 	data << pn->race << pn->gender << pn->cl;
-
 	SendPacket( &data );
 }
 

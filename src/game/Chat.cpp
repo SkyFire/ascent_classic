@@ -765,7 +765,7 @@ WorldPacket * ChatHandler::FillMessageData( uint32 type, uint32 language, const 
 	uint32 messageLength = (uint32)strlen((char*)message) + 1;
 
 	WorldPacket *data = new WorldPacket(SMSG_MESSAGECHAT, messageLength + 30);
-	data->Initialize(SMSG_MESSAGECHAT);
+
 	*data << (uint8)type;
 	*data << language;
 

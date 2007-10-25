@@ -283,22 +283,6 @@
 			<File
 				RelativePath="..\..\src\shared\Auth\WowCrypt.h">
 			</File>
-			<Filter
-				Name="impl"
-				Filter="">
-				<File
-					RelativePath="..\..\src\shared\Auth\md5_impl.c">
-				</File>
-				<File
-					RelativePath="..\..\src\shared\Auth\md5_impl.h">
-				</File>
-				<File
-					RelativePath="..\..\src\shared\Auth\sha1_impl.c">
-				</File>
-				<File
-					RelativePath="..\..\src\shared\Auth\sha1_impl.h">
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Network"
