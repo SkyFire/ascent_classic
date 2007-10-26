@@ -882,7 +882,6 @@ public:
 	uint32 MechanicsDispels[27];
 	float MechanicsResistancesPCT[27]; 
 	float ModDamageTakenByMechPCT[27];
-//	int32 modAttackTimeIncreasePCT;
 	//int32 RangedDamageTakenPct; 
 
 	//SM

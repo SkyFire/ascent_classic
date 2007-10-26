@@ -1064,27 +1064,6 @@ void Object::ModUInt32Value(uint32 index, int32 value )
 	}
 }
 
-void Object::ModPFloatValue(const uint32 index, const float value, bool apply)
-{
-	ASSERT( index < m_valuesCount );
-	float basevalue = m_floatValues[ index ];
-	if(apply)
-		m_floatValues[ index ] += ((basevalue*value)/100);
-	else
-		m_floatValues[ index ] = (basevalue*100)/(100+value);
-
-	if(IsInWorld())
-	{
-		m_updateMask.SetBit( index );
-
-		if(!m_objectUpdated )
-		{
-			m_mapMgr->ObjectUpdated(this);
-			m_objectUpdated = true;
-		}
-	}
-}
-
 void Object::ModFloatValue(const uint32 index, const float value )
 {
 	ASSERT( index < m_valuesCount );

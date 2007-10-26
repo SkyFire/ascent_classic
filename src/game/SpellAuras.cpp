@@ -6331,9 +6331,6 @@ void Aura::SpellAuraReduceEnemyRCritChance(bool apply)
 void Aura::SpellAuraIncreaseTimeBetweenAttacksPCT(bool apply)
 {
 	int32 val =  (apply) ? mod->m_amount : -mod->m_amount;
-//	m_target->modAttackTimeIncreasePCT -= val;
-	//Zack : not sure this does it correctly. It is only a visual thing
-//	m_target->ModPFloatValue(UNIT_MOD_CAST_SPEED, (float)-val, false);
 	float pct_value = -val/100.0f;
 	m_target->ModFloatValue(UNIT_MOD_CAST_SPEED,pct_value);
 }

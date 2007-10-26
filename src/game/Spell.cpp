@@ -2435,6 +2435,12 @@ uint8 Spell::CanCast(bool rangetolerate)
 					if(target->GetEntry()!=20132) //nasty fixed numbers :(
 						return SPELL_FAILED_BAD_TARGETS;
 				}
+            case 982: //Revive Pet
+                {
+                    Pet *pPet = p_caster->GetSummon();
+                    if(pPet && !pPet->isDead())
+                        return SPELL_FAILED_TARGET_NOT_DEAD;
+                }
 			}
 
             // if the target is not the unit caster and not the masters pet
