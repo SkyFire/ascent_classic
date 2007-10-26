@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `arenateams`;
 CREATE TABLE IF NOT EXISTS `arenateams` (
 	`id` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Unique ID',
 	`type` int UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Type: 0-2v2 1-3v3 2-5v5',
@@ -26,7 +25,6 @@ CREATE TABLE IF NOT EXISTS `arenateams` (
 ) COMMENT 'Arena Teams';
 
 
-DROP TABLE IF EXISTS `auctions`;
 CREATE TABLE IF NOT EXISTS `auctions` (
 	`auctionId` int UNSIGNED NOT NULL auto_increment,
 	`auctionHouse` int UNSIGNED NOT NULL,
@@ -42,7 +40,6 @@ CREATE TABLE IF NOT EXISTS `auctions` (
 ) COMMENT 'Auctioned items';
 
 
-DROP TABLE IF EXISTS `characters`;
 CREATE TABLE IF NOT EXISTS `characters` (
 	`guid` int UNSIGNED NOT NULL,
 	`acct` int UNSIGNED NOT NULL,
@@ -133,7 +130,6 @@ CREATE TABLE IF NOT EXISTS `characters` (
 ) COMMENT 'Characters';
 
 
-DROP TABLE IF EXISTS `charters`;
 CREATE TABLE IF NOT EXISTS `charters` (
 	`charterId` int UNSIGNED NOT NULL,
 	`charterType` int UNSIGNED NOT NULL DEFAULT 0,
@@ -154,7 +150,6 @@ CREATE TABLE IF NOT EXISTS `charters` (
 );
 
 
-DROP TABLE IF EXISTS `corpses`;
 CREATE TABLE IF NOT EXISTS `corpses` (
 	`guid` int UNSIGNED NOT NULL DEFAULT 0,
 	`positionX` float NOT NULL DEFAULT 0,
@@ -169,7 +164,6 @@ CREATE TABLE IF NOT EXISTS `corpses` (
 );
 
 
-DROP TABLE IF EXISTS `gm_tickets`;
 CREATE TABLE IF NOT EXISTS `gm_tickets` (
 	`guid` int UNSIGNED NOT NULL DEFAULT 0,
 	`name` varchar(200) NOT NULL,
@@ -183,7 +177,6 @@ CREATE TABLE IF NOT EXISTS `gm_tickets` (
 	PRIMARY KEY (`guid`)
 );
 
-DROP TABLE IF EXISTS `groups`;
 CREATE TABLE IF NOT EXISTS `groups` (
 	`group_id` int UNSIGNED NOT NULL,
 	`group_type` tinyint UNSIGNED NOT NULL,
@@ -235,7 +228,6 @@ CREATE TABLE IF NOT EXISTS `groups` (
 );
 
 
-DROP TABLE IF EXISTS `guilds`;
 CREATE TABLE IF NOT EXISTS `guilds` (
 	`guildId` int UNSIGNED NOT NULL auto_increment,
 	`guildName` varchar(32) NOT NULL,
@@ -254,7 +246,6 @@ CREATE TABLE IF NOT EXISTS `guilds` (
 ) COMMENT 'Guilds';
 
 
-DROP TABLE IF EXISTS `guild_ranks`;
 CREATE TABLE IF NOT EXISTS `guild_ranks` (
 	`guildId` int UNSIGNED NOT NULL,
 	`rankId` int UNSIGNED NOT NULL DEFAULT 0,
@@ -263,7 +254,6 @@ CREATE TABLE IF NOT EXISTS `guild_ranks` (
 ) COMMENT 'Guild Ranks';
 
 
-DROP TABLE IF EXISTS `instances`;
 CREATE TABLE IF NOT EXISTS `instances` (
 	`instanceid` int UNSIGNED NOT NULL DEFAULT 0,
 	`mapid` int UNSIGNED NOT NULL DEFAULT 0,
@@ -276,7 +266,6 @@ CREATE TABLE IF NOT EXISTS `instances` (
 );
 
 
-DROP TABLE IF EXISTS `mailbox`;
 CREATE TABLE IF NOT EXISTS `mailbox` (
 	`message_id` int UNSIGNED NOT NULL DEFAULT 0,
 	`message_type` int UNSIGNED NOT NULL DEFAULT 0,
@@ -297,7 +286,6 @@ CREATE TABLE IF NOT EXISTS `mailbox` (
 );
 
 
-DROP TABLE IF EXISTS `playercooldownitems`;
 CREATE TABLE IF NOT EXISTS `playercooldownitems` (
 	`OwnerGuid` int UNSIGNED NOT NULL DEFAULT 0,
 	`ItemEntry` int UNSIGNED NOT NULL DEFAULT 0,
@@ -308,7 +296,6 @@ CREATE TABLE IF NOT EXISTS `playercooldownitems` (
 );
 
 
-DROP TABLE IF EXISTS `playercooldownsecurity`;
 CREATE TABLE IF NOT EXISTS `playercooldownsecurity` (
 	`OwnerGuid` int UNSIGNED NOT NULL DEFAULT 0,
 	`SpellID` int UNSIGNED NOT NULL DEFAULT 0,
@@ -316,7 +303,6 @@ CREATE TABLE IF NOT EXISTS `playercooldownsecurity` (
 );
 
 
-DROP TABLE IF EXISTS `playeritems`;
 CREATE TABLE IF NOT EXISTS `playeritems` (
 	`ownerguid` int UNSIGNED NOT NULL DEFAULT 0,
 	`guid` bigint UNSIGNED NOT NULL DEFAULT 0,
@@ -337,7 +323,6 @@ CREATE TABLE IF NOT EXISTS `playeritems` (
 );
 
 
-DROP TABLE IF EXISTS `playerpets`;
 CREATE TABLE IF NOT EXISTS `playerpets` (
 	`ownerguid` int UNSIGNED NOT NULL DEFAULT 0,
 	`petnumber` int NOT NULL DEFAULT 0,	-- unsigned?
@@ -358,7 +343,6 @@ CREATE TABLE IF NOT EXISTS `playerpets` (
 );
 
 
-DROP TABLE IF EXISTS `playerpetspells`;
 CREATE TABLE IF NOT EXISTS `playerpetspells` (
 	`ownerguid` int UNSIGNED NOT NULL DEFAULT 0,
 	`petnumber` int UNSIGNED NOT NULL DEFAULT 0,
@@ -367,14 +351,13 @@ CREATE TABLE IF NOT EXISTS `playerpetspells` (
 );
 
 
-DROP TABLE IF EXISTS `playersummonspells`;
 CREATE TABLE IF NOT EXISTS `playersummonspells` (
 	`ownerguid` int UNSIGNED NOT NULL DEFAULT 0,
 	`entryid` int UNSIGNED NOT NULL DEFAULT 0,
 	`spellid` int UNSIGNED NOT NULL DEFAULT 0
 );
 
-DROP TABLE IF EXISTS `questlog`;
+
 CREATE TABLE IF NOT EXISTS `questlog` (
 	`index` bigint UNSIGNED NOT NULL auto_increment,
 	`player_guid` int UNSIGNED NOT NULL DEFAULT 0,
@@ -393,7 +376,6 @@ CREATE TABLE IF NOT EXISTS `questlog` (
 );
 
 
-DROP TABLE IF EXISTS `server_settings`;
 CREATE TABLE IF NOT EXISTS `server_settings` (
 	`setting_id` varchar(200) NOT NULL,
 	`setting_value` int NOT NULL,
@@ -401,7 +383,6 @@ CREATE TABLE IF NOT EXISTS `server_settings` (
 );
 
 
-DROP TABLE IF EXISTS `social`;
 CREATE TABLE IF NOT EXISTS `social` (
 	`guid` int UNSIGNED NOT NULL DEFAULT 0,
 	`socialguid` int UNSIGNED NOT NULL DEFAULT 0,
@@ -411,7 +392,6 @@ CREATE TABLE IF NOT EXISTS `social` (
 );
 
 
-DROP TABLE IF EXISTS `tutorials`;
 CREATE TABLE IF NOT EXISTS `tutorials` (
 	`playerId` int UNSIGNED NOT NULL DEFAULT 0,
 	`tut0` int UNSIGNED NOT NULL DEFAULT 0,

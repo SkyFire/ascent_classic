@@ -2742,12 +2742,14 @@ bool ChatHandler::HandleReloadAccountsCommand(const char * args, WorldSession * 
 	return true;
 }
 
+/*
 bool ChatHandler::HandleReloadScriptsCommand(const char * args, WorldSession * m_session)
 {
 	BlueSystemMessage(m_session, "Reloading scripts...");
 	//ScriptSystem->Reload();
 	return true;
 }
+*/
 
 bool ChatHandler::HandleGORotate(const char * args, WorldSession * m_session)
 {

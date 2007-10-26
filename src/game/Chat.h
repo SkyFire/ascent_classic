@@ -470,7 +470,7 @@ protected:
 	bool HandleLookupObjectCommand(const char * args, WorldSession * m_session);
 	bool HandleLookupSpellCommand(const char * args, WorldSession * m_session);
 
-	bool HandleReloadScriptsCommand(const char * args, WorldSession * m_session);
+//	bool HandleReloadScriptsCommand(const char * args, WorldSession * m_session);
 	bool HandleNpcPossessCommand(const char * args, WorldSession * m_session);
 	bool HandleNpcUnPossessCommand(const char * args, WorldSession * m_session);
 	bool HandleChangePasswordCommand(const char * args, WorldSession * m_session);

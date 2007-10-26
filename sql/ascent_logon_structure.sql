@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE IF NOT EXISTS `accounts` (
 	`acct` int unsigned NOT NULL auto_increment COMMENT 'Unique ID',
 	`login` varchar(32) NOT NULL COMMENT 'Login username',
@@ -15,7 +14,6 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 ) COMMENT='Account Information';
 
 
-DROP TABLE IF EXISTS `ipbans`;
 CREATE TABLE IF NOT EXISTS `ipbans` (
 	`ip` varchar(16) NOT NULL DEFAULT '' COMMENT 'Remote host',
 	`expire` timestamp NOT NULL DEFAULT 0 COMMENT 'Expiry time (s)',
