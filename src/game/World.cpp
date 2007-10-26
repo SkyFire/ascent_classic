@@ -1239,6 +1239,8 @@ bool World::SetInitialWorldSettings()
 			sp->proc_interval = 10000; //10 seconds
 		else if(strstr(nametext, "Aviana's Purpose"))
 			sp->proc_interval = 10000; //10 seconds
+		else if(strstr(nametext, "Seal of Command"))
+			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
 //		else if(strstr(nametext, "Illumination"))
 //			sp->EffectTriggerSpell[0]=20272;
 		//sp->dummy=result;
