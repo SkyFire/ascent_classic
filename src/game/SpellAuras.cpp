@@ -465,7 +465,7 @@ void Aura::Remove()
 	* m_spellProto->Attributes == 0x2040100
 	* are handled. Its possible there are more spells like this
 	*************************************************************/
-	if ( caster && caster->IsPlayer() && caster->IsInWorld() && (m_spellProto->Attributes&ATTRIBUTES_UNK27) && (!m_spellProto->AttributesEx || m_spellProto->AttributesEx&0x20000))
+	if ( caster && caster->IsPlayer() && caster->IsInWorld() && m_spellProto->c_is_flags & SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE)
 	{
 		WorldPacket data(12);
 		data.SetOpcode(SMSG_COOLDOWN_EVENT);

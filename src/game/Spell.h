@@ -321,39 +321,39 @@ enum ChannelInterruptFlags
 
 enum Attributes
 {
-    ATTRIBUTES_NULL           = 0x0,
-    ATTRIBUTES_UNK2           = 0x1,
-    ATTRIBUTES_UNK3           = 0x2, // related to ranged??
-    ATTRIBUTE_ON_NEXT_ATTACK  = 0x4,
-    ATTRIBUTES_UNK5           = 0x8, // not used.
-    ATTRIBUTES_UNK6           = 0x10,
-    ATTRIBUTES_UNK7           = 0x20, // Reagents
-    ATTRIBUTES_PASSIVE        = 0x40,
-    ATTRIBUTES_NO_VISUAL_AURA = 0x80,
-    ATTRIBUTES_UNK10          = 0x100,//seems to be afflicts pet
-    ATTRIBUTES_UNK11          = 0x200, // only appears in shaman imbue weapon spells
-    ATTRIBUTES_UNK12          = 0x400,
-    ATTRIBUTES_UNK13          = 0x800,
-    ATTRIBUTES_UNUSED1        = 0x1000,
-    ATTRIBUTES_UNUSED2        = 0x2000,
-    ATTRIBUTES_UNUSED3        = 0x4000,
-    ATTRIBUTES_ONLY_OUTDOORS  = 0x8000,
-    ATTRIBUTES_UNK            = 0x10000,
-    ATTRIBUTES_REQ_STEALTH    = 0x20000,
-    ATTRIBUTES_MUSTBEBEHIND   = 0x40000,//may be wrong
-    ATTRIBUTES_UNK21          = 0x80000,
-    ATTRIBUTES_MUSTFACECASTER = 0x100000,//may be wrong
-    ATTRIBUTES_UNK23          = 0x200000,
-    ATTRIBUTES_UNK24          = 0x400000,
-    ATTRIBUTES_UNK25          = 0x800000,
-    ATTRIBUTES_UNK26          = 0x1000000,
-    ATTRIBUTES_UNK27          = 0x2000000,
-    ATTRIBUTES_UNK28          = 0x4000000,
-    ATTRIBUTES_UNK29          = 0x8000000,
-    ATTRIBUTES_REQ_OOC        = 0x10000000, //     ATTRIBUTES_REQ_OUT_OF_COMBAT
-    ATTRIBUTES_UNK31          = 0x20000000,
-    ATTRIBUTES_UNK32          = 0x40000000,
-    ATTRIBUTES_UNUSED9        = 0x80000000,
+    ATTRIBUTES_NULL								= 0x0,
+    ATTRIBUTES_UNK2								= 0x1,
+    ATTRIBUTES_UNK3								= 0x2, // related to ranged??
+    ATTRIBUTE_ON_NEXT_ATTACK					= 0x4,
+    ATTRIBUTES_UNK5								= 0x8, // not used.
+    ATTRIBUTES_UNK6								= 0x10,
+    ATTRIBUTES_UNK7								= 0x20, // Reagents
+    ATTRIBUTES_PASSIVE							= 0x40,
+    ATTRIBUTES_NO_VISUAL_AURA					= 0x80,
+    ATTRIBUTES_UNK10							= 0x100,//seems to be afflicts pet
+    ATTRIBUTES_UNK11							= 0x200, // only appears in shaman imbue weapon spells
+    ATTRIBUTES_UNK12							= 0x400,
+    ATTRIBUTES_UNK13							= 0x800,
+    ATTRIBUTES_UNUSED1							= 0x1000,
+    ATTRIBUTES_UNUSED2							= 0x2000,
+    ATTRIBUTES_UNUSED3							= 0x4000,
+    ATTRIBUTES_ONLY_OUTDOORS					= 0x8000,
+    ATTRIBUTES_UNK								= 0x10000,
+    ATTRIBUTES_REQ_STEALTH						= 0x20000,
+    ATTRIBUTES_UNK20							= 0x40000,//it's not : must be behind
+    ATTRIBUTES_UNK21							= 0x80000,
+    ATTRIBUTES_MUSTFACECASTER					= 0x100000,//may be wrong
+    ATTRIBUTES_UNK23							= 0x200000,
+    ATTRIBUTES_UNK24							= 0x400000,
+    ATTRIBUTES_UNK25							= 0x800000,
+    ATTRIBUTES_UNK26							= 0x1000000,
+    ATTRIBUTES_TRIGGER_COOLDOWN			        = 0x2000000, //also requires atributes ex = 32 ?
+    ATTRIBUTES_UNK28							= 0x4000000,
+    ATTRIBUTES_UNK29							= 0x8000000,
+    ATTRIBUTES_REQ_OOC							= 0x10000000, //     ATTRIBUTES_REQ_OUT_OF_COMBAT
+    ATTRIBUTES_UNK31							= 0x20000000,
+    ATTRIBUTES_UNK32							= 0x40000000,
+    ATTRIBUTES_UNUSED9							= 0x80000000,
 };
 
 enum AttributesEx
@@ -364,7 +364,7 @@ enum AttributesEx
     ATTRIBUTESEX_UNK4                         = 0x4,
     ATTRIBUTESEX_UNK5                         = 0x8,
     ATTRIBUTESEX_UNK6                         = 0x10,
-    ATTRIBUTESEX_REMAIN_STEALTHED             = 0x20,
+    ATTRIBUTESEX_DELAY_SOME_TRIGGERS          = 0x20,
     ATTRIBUTESEX_UNK8                         = 0x40,
     ATTRIBUTESEX_UNK9                         = 0x80,
     ATTRIBUTESEX_UNK10                        = 0x100,
@@ -960,6 +960,7 @@ enum SpellIsFlags
     SPELL_FLAG_IS_DAMAGING				= 0x00000001,
     SPELL_FLAG_IS_HEALING				= 0x00000002,
     SPELL_FLAG_IS_TARGETINGSTEALTHED	= 0x00000004,
+    SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE	= 0x00000008, //it started with rogue cold blood but i'm sure others will come
 };
 
 inline bool CanAgroHash(uint32 spellhashname)

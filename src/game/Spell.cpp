@@ -1084,7 +1084,7 @@ void Spell::cast(bool check)
 				p_caster->setAttackTimer(0, true);
 				p_caster->setAttackTimer(0, false);
 			}
-			if(p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_REMAIN_STEALTHED))
+			if(p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_DELAY_SOME_TRIGGERS))
 			{
 				/* talents procing - don't remove stealth either */
 				if(m_spellInfo->Attributes & 64 || (pSpellId && dbcSpell.LookupEntry(pSpellId)->Attributes & 64))

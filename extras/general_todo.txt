@@ -74,7 +74,8 @@ SMT_RESIST_DISPEL - check if it is used
 - unlearning talents does not remove buffes from you. (it does for me :P )
 - check is_flags place in spellentry structure.Maybe we should place it elsewhere ?(193)
 - make aurastates get checked on spellcast and remove them on a sucessfull cast
-blind + scatter shot = blocheaza mobii
+- blind + scatter shot = blocheaza mobii
+- on creature evade, make them imune to all spells, test with war stomp
 
 ==========================================================================
 Zack - test my shit :
@@ -94,6 +95,7 @@ Zack - test my shit :
 - mobs continue casting after they die. Test spell CancelSpellCast.Specially test this : CastSpellAoF
 - test aura 193, it might make a big BUBU
 - paladin Seal of Command (41469) - should make holy dmg
+- see if cold blood(14177) and Revealed Flaw(28815) get's it's cooldown enabled after use
 
 ==========================================================================
 Capt - test my shit :

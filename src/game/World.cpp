@@ -1282,9 +1282,15 @@ bool World::SetInitialWorldSettings()
 			sp->EffectSpellGroupRelation[0] |= 1;		// shadow bolt
 			sp->EffectSpellGroupRelation[0] |= 4;		// immolatate
 		}
-
-		if(namehash==0x2bc0ae00)		// warlock - incinerate
+		else if(namehash==0x2bc0ae00)		// warlock - incinerate
 			sp->SpellGroupType=1;
+		else if(
+			((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (sp->AttributesEx & ATTRIBUTESEX_DELAY_SOME_TRIGGERS)) //rogue cold blood
+			|| ((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (!sp->AttributesEx || sp->AttributesEx & ATTRIBUTESEX_REMAIN_OOC))
+			)
+		{
+			sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
+		}
 
 //junk code to get me has :P 
 //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
