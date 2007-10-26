@@ -235,11 +235,11 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 		}
 	}
 
-	if(GetPlayer()->CombatStatus.IsInCombat())
+	/*if(GetPlayer()->CombatStatus.IsInCombat())
 	{
 		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(SrcItem, NULL, INV_ERR_CANT_DO_IN_COMBAT);
 		return;
-	}
+	}*/
 
 	if(SrcInvSlot==DstInvSlot)//in 1 bag
 	{
