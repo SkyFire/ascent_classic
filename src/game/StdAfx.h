@@ -20,6 +20,12 @@
 #ifndef __STDAFX_H
 #define __STDAFX_H
 
+extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C function names.
+#include <lua/lua.h>
+#include <lua/lauxlib.h>
+#include <lua/lualib.h>
+};
+
 #define _GAME
 //#define CLUSTERING
 //#define COLLISION
@@ -147,6 +153,7 @@
 #include "DatabaseCleaner.h"
 #include "DayWatcherThread.h"
 #include "VoiceChatHandler.h"
+#include "LUAEngine.h"
 
 #ifdef CLUSTERING
 	#include "WorkerServerClient.h"

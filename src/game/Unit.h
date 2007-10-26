@@ -642,9 +642,20 @@ protected:
 //  Unit
 //  Base object for Players and Creatures
 //====================================================================
+
 class SERVER_DECL Unit : public Object
 {
 public:
+	/************************************************************************/
+	/* LUA Stuff                                                            */
+	/************************************************************************/
+	typedef struct { const char *name; int(*mfunc)(lua_State*,Unit*); } RegType;
+	static const char className[];
+	static RegType methods[];
+	
+	// a lua script cannot create a unit.
+	Unit(lua_State * L) { ASSERT(false); }
+
 
 	void CombatStatusHandler_UpdatePvPTimeout();
 	void CombatStatusHandler_ResetPvPTimeout();

@@ -98,7 +98,7 @@ if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\logonserver;..\..\dep\src\gm"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\logonserver;..\..\dep\src"
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE;INTEL_COMPILER"
 				IgnoreStandardIncludePath="FALSE"
 				MinimalRebuild="TRUE"

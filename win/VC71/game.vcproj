@@ -25,7 +25,7 @@
 				AdditionalOptions="/Zm150"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared;..\..\src\logonserver;..\..\dep\src\gm"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared;..\..\src\logonserver;..\..\dep\src"
 				PreprocessorDefinitions="WIN32,_DEBUG,_LIB;INTEL_COMPILER"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -229,6 +229,16 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\collision\TileManager.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="LUA Script Engine"
+			Filter="">
+			<File
+				RelativePath="..\..\src\game\LUAEngine.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\LUAEngine.h">
 			</File>
 		</Filter>
 		<File

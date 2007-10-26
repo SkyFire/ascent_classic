@@ -2,6 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 8.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "VC71\game.vcproj", "{1DC6C4DA-A028-41F3-877D-D5400C594F88}"
 	ProjectSection(ProjectDependencies) = postProject
 		{90297C34-F231-4DF4-848E-A74BCC0E40ED} = {90297C34-F231-4DF4-848E-A74BCC0E40ED}
+		{10083E8F-1732-4870-BB74-10AB310B0FE3} = {10083E8F-1732-4870-BB74-10AB310B0FE3}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shared", "VC71\shared.vcproj", "{90297C34-F231-4DF4-848E-A74BCC0E40ED}"
@@ -33,6 +34,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "realmserver", "VC71\realmse
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "voicechat", "VC71\voicechat.vcproj", "{C36E06CE-9CBF-4B13-AA03-DA3F886F6B59}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua", "VC71\lua.vcproj", "{10083E8F-1732-4870-BB74-10AB310B0FE3}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -87,6 +92,12 @@ Global
 		{C36E06CE-9CBF-4B13-AA03-DA3F886F6B59}.Hoard.Build.0 = Release|Win32
 		{C36E06CE-9CBF-4B13-AA03-DA3F886F6B59}.Release.ActiveCfg = Release|Win32
 		{C36E06CE-9CBF-4B13-AA03-DA3F886F6B59}.Release.Build.0 = Release|Win32
+		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Debug.ActiveCfg = Debug|Win32
+		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Debug.Build.0 = Debug|Win32
+		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Hoard.ActiveCfg = Release|Win32
+		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Hoard.Build.0 = Release|Win32
+		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Release.ActiveCfg = Release|Win32
+		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
