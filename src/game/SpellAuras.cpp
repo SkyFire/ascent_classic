@@ -4526,7 +4526,7 @@ void Aura::SpellAuraModDamagePercTaken(bool apply)
 		val= -mod->m_amount/100.0f;
 	}
 	
-	if(m_spellProto->dummy == 2135) // Ardent Defender it only applys on 20% hp :/
+	if(m_spellProto->NameHash == 0xB0CBB1C3) // Ardent Defender it only applys on 20% hp :/
 	{
 		m_target->DamageTakenPctModOnHP +=val;
 		return;
@@ -4603,9 +4603,9 @@ void Aura::EventPeriodicDamagePercent(uint32 amount)
 	else
 		m_target->DealDamage(m_target, damage, 0, 0, GetSpellProto()->Id);*/
 	if(c)
-		c->SpellNonMeleeDamageLog(m_target, GetSpellProto()->Id, damage, true, true);
+		c->SpellNonMeleeDamageLog(m_target, GetSpellProto()->Id, damage, pSpellId==0, true);
 	else
-		m_target->SpellNonMeleeDamageLog(m_target, GetSpellProto()->Id, damage, true, true);
+		m_target->SpellNonMeleeDamageLog(m_target, GetSpellProto()->Id, damage, pSpellId==0, true);
 }
 
 void Aura::SpellAuraModResistChance(bool apply)

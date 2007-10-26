@@ -3452,9 +3452,6 @@ void Spell::Heal(int32 amount)
 	else
 		unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH, amount);
 
-	if(p_caster)
-		p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,p_caster, m_spellInfo);
-	
 	int doneTarget = 0;
 
 	// add threat

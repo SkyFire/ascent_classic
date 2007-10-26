@@ -1034,6 +1034,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 
 					SpellCastTime *sd = dbcSpellCastTime.LookupEntry(CastingSpell->CastingTimeIndex);
 					if(!sd) continue; // this shouldnt happen though :P
+					//if we did not proc these then we should not remove them
+					if(CastingSpell->Id == iter2->second.spellId)
+						continue;
 					switch(iter2->second.spellId)
 					{
 					case 12043:

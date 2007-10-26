@@ -500,7 +500,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		if(unitTarget)
 		if(unitTarget->IsDazed())
 		{
-			u_caster->SpellNonMeleeDamageLog(unitTarget,spellId,damage,false);
+//			u_caster->SpellNonMeleeDamageLog(unitTarget,spellId,damage,false);
+			u_caster->SpellNonMeleeDamageLog(unitTarget,spellId,damage,pSpellId==0);
 		}
 		
 		}break;
@@ -2811,7 +2812,7 @@ void Spell::SpellEffectPowerBurn(uint32 i) // power burn
 	int32 mana=min((int32)unitTarget->GetUInt32Value(UNIT_FIELD_POWER1),damage);
 	unitTarget->ModUInt32Value(UNIT_FIELD_POWER1,-mana);
 	
-	m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, (uint32)(mana * m_spellInfo->Effectunknown[i]), true,true);   
+	m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, (uint32)(mana * m_spellInfo->Effectunknown[i]), pSpellId==0,true);   
 }
 
 void Spell::SpellEffectThreat(uint32 i) // Threat
@@ -4287,7 +4288,7 @@ void Spell::SpellEffectEnvironmentalDamage(uint32 i)
 		return;
 	}
 	//this is GO, not unit	
-	m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id,damage, true);
+	m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id,damage, pSpellId==0);
   
 	WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, 13);
 	data << unitTarget->GetGUID();
