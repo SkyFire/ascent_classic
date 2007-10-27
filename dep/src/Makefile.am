@@ -1,1 +1,1 @@
-SUBDIRS = zlib
+SUBDIRS = lua zlib

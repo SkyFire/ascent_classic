@@ -87,8 +87,12 @@ libgame_a_SOURCES = \
     LfgHandler.cpp \
     LfgMgr.cpp \
     LfgMgr.h \
+    LUAEngine.cpp \
+    LUAEngine.h \
     LootMgr.cpp \
     LootMgr.h \
+    LocalizationMgr.cpp \
+    LocalizationMgr.h \
     LogonCommClient.cpp \
     LogonCommHandler.h \
     LogonCommClient.h \

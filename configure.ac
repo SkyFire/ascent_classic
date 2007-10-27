@@ -210,6 +210,7 @@ AC_CONFIG_FILES([
    src/scripts/src/SpellHandlers/Makefile
    dep/Makefile
    dep/src/Makefile
+   dep/src/lua/Makefile
    dep/src/zlib/Makefile
 ])
 

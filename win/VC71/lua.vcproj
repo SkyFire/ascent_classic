@@ -53,8 +53,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory=".\lua___Win32_Release"
+			IntermediateDirectory=".\lua___Win32_Release"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -69,7 +69,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/win.lib"/>
+				OutputFile=".\lua___Win32_Release\lua.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
