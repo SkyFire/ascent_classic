@@ -1,6 +1,6 @@
 INCLUDES += -I$(srcdir) -I$(srcdir)/../../../../dep/include -I$(srcdir)/../../../shared
 INCLUDES += -I$(srcdir)/../../../script -I$(srcdir)/../../../../src -I$(srcdir)/../../../game
-INCLUDES += -I$(srcdir)/../../../logonserver -I$(srcdir)/../../../../dep/src/gm
+INCLUDES += -I$(srcdir)/../../../logonserver -I$(srcdir)/../../../../dep/src
 
 AM_CXXFLAGS = -DSCRIPTLIB
 
