@@ -27,7 +27,7 @@
 				WholeProgramOptimization="FALSE"
 				OptimizeForProcessor="0"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\redirect;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src\gm"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent"
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE;INTEL_COMPILER"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -62,8 +62,7 @@
 				TypeLibraryName=".\..\..\bin\Release/realmserver.tlb"/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib\release\*.dll ..\..\bin\release
-copy ..\..\dep\lib\*.dll ..\..\bin\release
+				CommandLine="copy ..\..\dep\lib32\*.dll ..\..\bin\release
 "/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
@@ -96,7 +95,7 @@ copy ..\..\dep\lib\*.dll ..\..\bin\release
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared;..\..\dep\src\gm"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared"
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE;INTEL_COMPILER"
 				IgnoreStandardIncludePath="FALSE"
 				MinimalRebuild="TRUE"

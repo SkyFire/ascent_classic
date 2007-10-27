@@ -27,7 +27,7 @@
 				WholeProgramOptimization="FALSE"
 				OptimizeForProcessor="0"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\redirect;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src\gm"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\dep\src"
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE;INTEL_COMPILER"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
