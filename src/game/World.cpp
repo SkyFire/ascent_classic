@@ -437,6 +437,7 @@ bool World::SetInitialWorldSettings()
 
 	// wait for all loading to complete.
 	tl.wait();
+	sLocalizationMgr.Reload(false);
 
 	CommandTableStorage::getSingleton().Load();
 	new WordFilter;

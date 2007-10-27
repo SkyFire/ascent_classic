@@ -503,6 +503,12 @@
 			RelativePath="..\..\src\game\LfgMgr.h">
 		</File>
 		<File
+			RelativePath="..\..\src\game\LocalizationMgr.cpp">
+		</File>
+		<File
+			RelativePath="..\..\src\game\LocalizationMgr.h">
+		</File>
+		<File
 			RelativePath="..\..\src\game\LogonCommClient.cpp">
 		</File>
 		<File

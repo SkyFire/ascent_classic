@@ -1,0 +1,285 @@
+/*
+ * Ascent MMORPG Server
+ * String Localization Manager
+ * Copyright (C) 2007 Burlex <burlex@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "StdAfx.h"
+
+LocalizationMgr sLocalizationMgr;
+
+void LocalizationMgr::Lower(string& conv)
+{
+	for(size_t i = 0; i < conv.length(); ++i)
+		conv[i] = tolower(conv[i]);
+}
+
+void GetDistinctLanguages(set<string>& dest, const char * table)
+{
+	QueryResult * result = WorldDatabase.Query("SELECT DISTINCT language_code FROM %s", table);
+	if(result == NULL)
+		return;
+
+	string lc;
+	do 
+	{
+		lc = result->Fetch()[0].GetString();
+		sLocalizationMgr.Lower(lc);
+        if(dest.find(lc)==dest.end())
+			dest.insert(lc);
+
+	} while(result->NextRow());
+	delete result;
+}
+
+uint32 LocalizationMgr::GetLanguageId(uint32 full)
+{
+	if(m_disabled)
+		return 0;
+
+	for(vector<pair<uint32,uint32> >::iterator itr = m_languages.begin(); itr != m_languages.end(); ++itr)
+		if(itr->first == full)
+			return itr->second;
+
+	return 0;
+}
+
+void LocalizationMgr::Reload(bool first)
+{
+	if(first)
+		return;
+
+	QueryResult * result;
+	set<string> languages;
+	GetDistinctLanguages(languages, "creature_names_localized");
+	GetDistinctLanguages(languages, "gameobject_names_localized");
+	GetDistinctLanguages(languages, "items_localized");
+	GetDistinctLanguages(languages, "quests_localized");
+	GetDistinctLanguages(languages, "npc_text_localized");
+
+	/************************************************************************/
+	/* Generate Language IDs                                                */
+	/************************************************************************/
+
+	uint32 langid=1;
+	pair<uint32,uint32> dpr;
+	for(set<string>::iterator sitr = languages.begin(); sitr != languages.end(); ++sitr)
+	{
+		if((*sitr)=="enus")		// Default
+		{
+			dpr.first = *(uint32*)sitr->c_str();
+			dpr.second = 0;
+		}
+		else
+		{
+			dpr.first = *(uint32*)sitr->c_str();
+			dpr.second = langid++;
+		}
+
+		m_languages.push_back(dpr);
+	}
+
+	if(m_languages.size() == 0)
+	{
+		m_disabled = true;
+		return;		// No localizations
+	}
+	else
+		m_disabled = false;
+
+	m_CreatureNames = new HM_NAMESPACE::hash_map<uint32, LocalizedCreatureName>[langid];
+	m_GameObjectNames = new HM_NAMESPACE::hash_map<uint32, LocalizedGameObjectName>[langid];
+	m_Quests = new HM_NAMESPACE::hash_map<uint32, LocalizedQuest>[langid];
+	m_NpcTexts = new HM_NAMESPACE::hash_map<uint32, LocalizedNpcText>[langid];
+	m_Items = new HM_NAMESPACE::hash_map<uint32, LocalizedItem>[langid];
+
+	/************************************************************************/
+	/* Creature Names                                                       */
+	/************************************************************************/
+	{
+		LocalizedCreatureName cn;
+		string str;
+		uint32 entry;
+		Field * f;
+		uint32 lid;
+
+		result = WorldDatabase.Query("SELECT * FROM creature_names_localized");
+		if(result)
+		{
+			do 
+			{
+				f = result->Fetch();
+				str = string(f[1].GetString());
+				entry = f[0].GetUInt32();
+
+				lid = GetLanguageId(str);
+				if(lid == 0)
+					continue;		// no loading enus stuff.. lawl
+
+				cn.Name = strdup(f[2].GetString());
+				cn.SubName = strdup(f[3].GetString());
+				m_CreatureNames[lid].insert(make_pair(entry, cn));
+			} while(result->NextRow());
+			delete result;
+		}
+	}
+
+	/************************************************************************/
+	/* GameObject Names                                                     */
+	/************************************************************************/
+	{
+		LocalizedGameObjectName gn;
+		string str;
+		uint32 entry;
+		Field * f;
+		uint32 lid;
+
+		result = WorldDatabase.Query("SELECT * FROM gameobject_names_localized");
+		if(result)
+		{
+			do 
+			{
+				f = result->Fetch();
+				str = string(f[1].GetString());
+				entry = f[0].GetUInt32();
+
+				lid = GetLanguageId(str);
+				if(lid == 0)
+					continue;		// no loading enus stuff.. lawl
+
+				gn.Name = strdup(f[2].GetString());
+				m_GameObjectNames[lid].insert(make_pair(entry, gn));
+			} while(result->NextRow());
+			delete result;
+		}
+	}
+
+	/************************************************************************/
+	/* Items                                                                */
+	/************************************************************************/
+	{
+		LocalizedItem it;
+		string str;
+		uint32 entry;
+		Field * f;
+		uint32 lid;
+
+		result = WorldDatabase.Query("SELECT * FROM items_localized");
+		if(result)
+		{
+			do 
+			{
+				f = result->Fetch();
+				str = string(f[1].GetString());
+				entry = f[0].GetUInt32();
+
+				lid = GetLanguageId(str);
+				if(lid == 0)
+					continue;		// no loading enus stuff.. lawl
+
+				it.Name = strdup(f[2].GetString());
+				it.Description = strdup(f[3].GetString());
+				m_Items[lid].insert(make_pair(entry, it));
+			} while(result->NextRow());
+			delete result;
+		}
+	}
+
+	/************************************************************************/
+	/* Quests                                                               */
+	/************************************************************************/
+	{
+		LocalizedQuest q;
+		string str;
+		uint32 entry;
+		Field * f;
+		uint32 lid;
+
+		result = WorldDatabase.Query("SELECT * FROM quests_localized");
+		if(result)
+		{
+			do 
+			{
+				f = result->Fetch();
+				str = string(f[1].GetString());
+				entry = f[0].GetUInt32();
+
+				lid = GetLanguageId(str);
+				if(lid == 0)
+					continue;		// no loading enus stuff.. lawl
+
+				q.Title = strdup(f[2].GetString());
+				q.Details = strdup(f[3].GetString());
+				q.Objectives = strdup(f[4].GetString());
+				q.CompletionText = strdup(f[5].GetString());
+				q.IncompleteText = strdup(f[6].GetString());
+				q.EndText = strdup(f[7].GetString());
+				q.ObjectiveText[0] = strdup(f[8].GetString());
+				q.ObjectiveText[1] = strdup(f[9].GetString());
+				q.ObjectiveText[2] = strdup(f[10].GetString());
+				q.ObjectiveText[3] = strdup(f[11].GetString());
+				
+				m_Quests[lid].insert(make_pair(entry, q));
+			} while(result->NextRow());
+			delete result;
+		}
+	}
+
+	/************************************************************************/
+	/* NPC Texts                                                            */
+	/************************************************************************/
+	{
+		LocalizedNpcText nt;
+		string str;
+		uint32 entry;
+		Field * f;
+		uint32 lid;
+
+		result = WorldDatabase.Query("SELECT * FROM npc_text_localized");
+		if(result)
+		{
+			do 
+			{
+				f = result->Fetch();
+				str = string(f[1].GetString());
+				entry = f[0].GetUInt32();
+
+				lid = GetLanguageId(str);
+				if(lid == 0)
+					continue;		// no loading enus stuff.. lawl
+
+				for(uint32 i = 0; i < 8; ++i)
+					nt.Texts[i] = strdup(f[2+i].GetString());
+
+				m_NpcTexts[lid].insert(make_pair(entry, nt));
+			} while(result->NextRow());
+			delete result;
+		}
+	}
+}
+
+#define MAKE_LOOKUP_FUNCTION(t, hm, fn) t * LocalizationMgr::fn(uint32 id, uint32 language) { \
+	if(m_disabled) { return NULL; } \
+	HM_NAMESPACE::hash_map<uint32, t>::iterator itr = hm[language].find(id); \
+	return (itr == hm[language].end()) ? NULL : &itr->second; }
+
+MAKE_LOOKUP_FUNCTION(LocalizedCreatureName, m_CreatureNames, GetLocalizedCreatureName);
+MAKE_LOOKUP_FUNCTION(LocalizedGameObjectName, m_GameObjectNames, GetLocalizedGameObjectName);
+MAKE_LOOKUP_FUNCTION(LocalizedQuest, m_Quests, GetLocalizedQuest);
+MAKE_LOOKUP_FUNCTION(LocalizedItem, m_Items, GetLocalizedItem);
+MAKE_LOOKUP_FUNCTION(LocalizedNpcText, m_NpcTexts, GetLocalizedNpcText);
+

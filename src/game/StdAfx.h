@@ -154,6 +154,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "DayWatcherThread.h"
 #include "VoiceChatHandler.h"
 #include "LUAEngine.h"
+#include "LocalizationMgr.h"
 
 #ifdef CLUSTERING
 	#include "WorkerServerClient.h"
