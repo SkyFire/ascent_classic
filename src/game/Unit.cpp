@@ -3947,11 +3947,11 @@ uint32 Unit::ModAuraStackCount(uint32 slot, int32 count)
 	return m_auraStackCount[slot];
 }
 
-void Unit::RemoveAurasOfSchool(uint32 School, bool Positive)
+void Unit::RemoveAurasOfSchool(uint32 School, bool Positive, bool Immune)
 {
 	for(uint32 x = 0; x < MAX_AURAS; ++x)
 	{
-		if(m_auras[x]  && m_auras[x]->GetSpellProto()->School == School && (!m_auras[x]->IsPositive() || Positive))
+		if(m_auras[x]  && m_auras[x]->GetSpellProto()->School == School && (!m_auras[x]->IsPositive() || Positive) && (!Immune && m_auras[x]->GetSpellProto()->removable_by_immunity)
 			m_auras[x]->Remove();
 	}
 }

@@ -2205,6 +2205,30 @@ void Spell::HandleAddAura(uint64 guid)
 	if(m_spellInfo->buffType > 0)
 		Target->RemoveAurasByBuffType(m_spellInfo->buffType, m_caster->GetGUID(),0);
 
+	uint32 spellid = 0;
+
+	if((m_spellInfo->MechanicsType == 25 || m_spellInfo->MechanicsType == 29) && m_spellInfo->Id != 25771) // Cast spell Forbearance
+		spellid = 25771;
+	else if(m_spellInfo->MechanicsType == 16 && m_spellInfo->Id != 11196) // Cast spell Recently Bandaged
+		spellid = 11196;
+	else if(m_spellInfo->MechanicsType == 19 && m_spellInfo->Id != 6788) // Cast spell Weakened Soul
+		spellid = 6788;
+	else if(m_spellInfo->Id == 11958) // Cast spell Hypothermia
+		spellid = 41425;
+	else if(m_spellInfo->Id == 30451) // Cast spell Arcane Blast
+		spellid = 36032;
+	else if(m_spellInfo->Id == 20572 || m_spellInfo->Id == 33702 || m_spellInfo->Id == 33697) // Cast spell Blood Fury
+		spellid = 23230;
+
+	if(spellid && p_caster)
+	{
+		SpellEntry *spellInfo = dbcSpell.LookupEntry( spellid );
+		if(!spellInfo) return;
+		Spell *spell = new Spell(p_caster, spellInfo ,true, NULL);
+		SpellCastTargets targets(Target->GetGUID());
+		spell->prepare(&targets);	
+	}
+
 	std::map<uint32,Aura*>::iterator itr=Target->tmpAura.find(m_spellInfo->Id);
 	if(itr!=Target->tmpAura.end())
 	{
@@ -2232,29 +2256,6 @@ void Spell::HandleAddAura(uint64 guid)
 			Target->AddAura(itr->second); // the real spell is added last so the modifier is removed last
 			Target->tmpAura.erase(itr);
 		}
-	}
-	uint32 spellid = 0;
-
-	if(m_spellInfo->MechanicsType == 25 && m_spellInfo->Id != 25771) // Cast spell Forbearance
-		spellid = 25771;
-	else if(m_spellInfo->MechanicsType == 16 && m_spellInfo->Id != 11196) // Cast spell Recently Bandaged
-		spellid = 11196;
-	else if(m_spellInfo->MechanicsType == 19 && m_spellInfo->Id != 6788) // Cast spell Weakened Soul
-		spellid = 6788;
-	else if(m_spellInfo->Id == 11958) // Cast spell Hypothermia
-		spellid = 41425;
-	else if(m_spellInfo->Id == 30451) // Cast spell Arcane Blast
-		spellid = 36032;
-	else if(m_spellInfo->Id == 20572 || m_spellInfo->Id == 33702 || m_spellInfo->Id == 33697) // Cast spell Blood Fury
-		spellid = 23230;
-
-	if(spellid && p_caster)
-	{
-		SpellEntry *spellInfo = dbcSpell.LookupEntry( spellid );
-		if(!spellInfo) return;
-		Spell *spell = new Spell(p_caster, spellInfo ,true, NULL);
-		SpellCastTargets targets(Target->GetGUID());
-		spell->prepare(&targets);	
 	}
 }
 

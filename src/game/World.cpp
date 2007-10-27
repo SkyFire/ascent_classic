@@ -1264,6 +1264,9 @@ bool World::SetInitialWorldSettings()
 		if(sp->NameHash == 0xB6C3243C)
 			sp->procChance = 30;
 
+		if(sp->Id==25771 || sp->Id == 11196 || sp->Id == 6788)
+			sp->removable_by_immunity = false;
+
 		/* Backlash */
 		if(sp->NameHash == 0x5965939A)
 		{

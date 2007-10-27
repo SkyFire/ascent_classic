@@ -3287,7 +3287,7 @@ void Aura::SpellAuraModSchoolImmunity(bool apply)
 			if(mod->m_miscValue & (1<<i))
 			{
 				m_target->SchoolImmunityList[i] ++;
-				m_target->RemoveAurasOfSchool(i, false);
+				m_target->RemoveAurasOfSchool(i, false, true);
 			}
 		}
 	}

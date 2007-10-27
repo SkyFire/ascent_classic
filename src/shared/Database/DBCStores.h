@@ -347,6 +347,7 @@ struct SpellEntry
     uint32 NameHash;                        //!!! CUSTOM, related to custom spells, summon spell quest related spells
     float base_range_or_radius_sqr;         //!!! CUSTOM, needed for aoe spells most of the time
 	uint32 talent_tree;
+	bool removable_by_immunity;
 };
 
 struct ItemExtendedCostEntry

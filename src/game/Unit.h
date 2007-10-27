@@ -1119,7 +1119,7 @@ public:
 	uint32 ModAuraStackCount(uint32 slot, int32 count);
 	uint8 m_auraStackCount[MAX_AURAS];
 
-	void RemoveAurasOfSchool(uint32 School, bool Positive);
+	void RemoveAurasOfSchool(uint32 School, bool Positive, bool Immune);
 	SpellEntry * pLastSpell;
 	bool bProcInUse;
 	bool bInvincible;
