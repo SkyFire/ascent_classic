@@ -1264,6 +1264,14 @@ bool World::SetInitialWorldSettings()
 		if(sp->NameHash == 0xB6C3243C)
 			sp->procChance = 30;
 
+		/* Backlash */
+		if(sp->NameHash == 0x5965939A)
+		{
+			sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM;
+			sp->EffectSpellGroupRelation[0] = 1;
+			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
+		}
+
 		/* hackfix for this - FIX ME LATER - Burlex */
 		if(namehash==3238263755UL)
 			sp->procFlags=0;

@@ -833,8 +833,10 @@ Creature * ChatHandler::getSelectedCreature(WorldSession *m_session, bool shower
 	Creature *creature;
 
 	guid = m_session->GetPlayer()->GetSelection();
-	
-	creature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	if(GUID_HIPART(guid)==HIGHGUID_PET)
+		creature = m_session->GetPlayer()->GetMapMgr()->GetPet((uint32)guid);
+	else
+		creature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	
 	if(creature != NULL)
 		return creature;
