@@ -184,7 +184,7 @@ void WorldSession::HandleQuestGiverQueryQuestOpcode( WorldPacket & recv_data )
 	
 	if ((status == QMGR_QUEST_AVAILABLE) || (status == QMGR_QUEST_REPEATABLE))
 	{
-		sQuestMgr.BuildQuestDetails(&data, qst,qst_giver,1);	 // 0 because we want goodbye to function
+		sQuestMgr.BuildQuestDetails(&data, qst,qst_giver,1, language);	 // 0 because we want goodbye to function
 		SendPacket(&data);
 		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS." );
 	}
@@ -196,7 +196,7 @@ void WorldSession::HandleQuestGiverQueryQuestOpcode( WorldPacket & recv_data )
 	}*/
 	else if (status == QMGR_QUEST_NOT_FINISHED || status == QMGR_QUEST_FINISHED)
 	{
-		sQuestMgr.BuildRequestItems(&data, qst, qst_giver, status);
+		sQuestMgr.BuildRequestItems(&data, qst, qst_giver, status, language);
 		SendPacket(&data);
 		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS." );
 	}
@@ -514,7 +514,7 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data 
 	if (status == QMGR_QUEST_FINISHED)
 	{
         WorldPacket data;
-		sQuestMgr.BuildOfferReward(&data, qst, qst_giver, 1);
+		sQuestMgr.BuildOfferReward(&data, qst, qst_giver, 1, language);
 		SendPacket(&data);
 		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS." );
 	}
@@ -596,7 +596,7 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 	if (status == QMGR_QUEST_NOT_FINISHED || status == QMGR_QUEST_REPEATABLE)
 	{
         WorldPacket data;
-		sQuestMgr.BuildRequestItems(&data, qst, qst_giver, status);
+		sQuestMgr.BuildRequestItems(&data, qst, qst_giver, status, language);
 		SendPacket(&data);
 		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS." );
 	}
@@ -604,7 +604,7 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 	if (status == QMGR_QUEST_FINISHED)
 	{
 		WorldPacket data;
-		sQuestMgr.BuildOfferReward(&data, qst, qst_giver, 1);
+		sQuestMgr.BuildOfferReward(&data, qst, qst_giver, 1, language);
 		SendPacket(&data);
 		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS." );
 	}
@@ -782,7 +782,7 @@ void WorldSession::HandlePushQuestToPartyOpcode(WorldPacket &recv_data)
 							sQuestMgr.SendPushToPartyResponse(_player, pPlayer, response);
 
 						data.clear();
-						sQuestMgr.BuildQuestDetails(&data, pQuest, pPlayer, 1);
+						sQuestMgr.BuildQuestDetails(&data, pQuest, pPlayer, 1, pPlayer->GetSession()->language);
 						pPlayer->GetSession()->SendPacket(&data);
 						pPlayer->SetQuestSharer(pguid);
 					}

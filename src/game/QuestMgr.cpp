@@ -235,14 +235,24 @@ uint32 QuestMgr::ActiveQuestsCount(Object* quest_giver, Player* plr)
 	return questCount;
 }
 
-void QuestMgr::BuildOfferReward(WorldPacket *data, Quest* qst, Object* qst_giver, uint32 menutype)
+void QuestMgr::BuildOfferReward(WorldPacket *data, Quest* qst, Object* qst_giver, uint32 menutype, uint32 language)
 {
+	LocalizedQuest * lq = (language>0) ? sLocalizationMgr.GetLocalizedQuest(qst->id,language):NULL;
 	ItemPrototype * it;
 	data->SetOpcode(SMSG_QUESTGIVER_OFFER_REWARD);
 	*data << qst_giver->GetGUID();
 	*data << qst->id;
-	*data << qst->title;
-	*data << qst->completiontext;
+
+	if(lq)
+	{
+		*data << lq->Title;
+		*data << lq->CompletionText;
+	}
+	else
+	{
+		*data << qst->title;
+		*data << qst->completiontext;
+	}
 	
 	//uint32 a = 0, b = 0, c = 1, d = 0, e = 1;
 
@@ -291,17 +301,28 @@ void QuestMgr::BuildOfferReward(WorldPacket *data, Quest* qst, Object* qst_giver
 	*data << uint32(0);
 }
 
-void QuestMgr::BuildQuestDetails(WorldPacket *data, Quest* qst, Object* qst_giver, uint32 menutype)
+void QuestMgr::BuildQuestDetails(WorldPacket *data, Quest* qst, Object* qst_giver, uint32 menutype, uint32 language)
 {
+	LocalizedQuest * lq = (language>0) ? sLocalizationMgr.GetLocalizedQuest(qst->id,language):NULL;
 	std::map<uint32, uint8>::const_iterator itr;
 
 	data->SetOpcode( SMSG_QUESTGIVER_QUEST_DETAILS );
 
 	*data <<  qst_giver->GetGUID();
 	*data <<  qst->id;
-	*data <<  qst->title;
-	*data <<  qst->details;
-	*data <<  qst->objectives;
+	if(lq)
+	{
+		*data << lq->Title;
+		*data << lq->Details;
+		*data << lq->Objectives;
+	}
+	else
+	{
+		*data <<  qst->title;
+		*data <<  qst->details;
+		*data <<  qst->objectives;
+	}
+
 	*data <<  uint32(1);
 	*data << uint32(0);		 // "Suggested players"
 
@@ -353,21 +374,25 @@ void QuestMgr::BuildQuestDetails(WorldPacket *data, Quest* qst, Object* qst_give
 	*data << uint32(0);
 }
 
-void QuestMgr::BuildRequestItems(WorldPacket *data, Quest* qst, Object* qst_giver, uint32 status)
+void QuestMgr::BuildRequestItems(WorldPacket *data, Quest* qst, Object* qst_giver, uint32 status, uint32 language)
 {
+	LocalizedQuest * lq = (language>0) ? sLocalizationMgr.GetLocalizedQuest(qst->id,language):NULL;
 	ItemPrototype * it;
 	data->SetOpcode( SMSG_QUESTGIVER_REQUEST_ITEMS );
 
 	*data << qst_giver->GetGUID();
 	*data << qst->id;
-	*data << qst->title;
 
-	/*if(qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)
-		type = ((GameObject*)qst_giver)->GetQuestRelation(qst->id);
-	else if(qst_giver->GetTypeId() == TYPEID_UNIT)
-		type = ((Creature*)qst_giver)->GetQuestRelation(qst->id);*/
-	
-	*data << (qst->incompletetext[0] ? qst->incompletetext : qst->details);
+	if(lq)
+	{
+		*data << lq->Title;
+		*data << ((lq->IncompleteText[0]) ? lq->IncompleteText : lq->Details);
+	}
+	else
+	{
+		*data << qst->title;
+		*data << (qst->incompletetext[0] ? qst->incompletetext : qst->details);
+	}
 	
 	*data << uint32(0);
 	*data << uint32(1);				 // Emote count
@@ -448,7 +473,7 @@ void QuestMgr::BuildQuestComplete(Player*plr, Quest* qst)
 	plr->GetSession()->SendPacket(&data);
 }
 
-void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr)
+void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr, uint32 language)
 {
 	uint32 status;
 	list<QuestRelation *>::iterator it;
@@ -498,6 +523,7 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr)
 			if (tmp_map.find((*it)->qst->id) == tmp_map.end())
 			{
 				tmp_map.insert(std::map<uint32,uint8>::value_type((*it)->qst->id, 1));
+				LocalizedQuest * lq = (language>0) ? sLocalizationMgr.GetLocalizedQuest((*it)->qst->id,language):NULL;
 
 				*data << (*it)->qst->id;
 				/**data << sQuestMgr.CalcQuestStatus(qst_giver, plr, *it);
@@ -516,7 +542,10 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr)
 				default:
 					*data << status << uint32(0);
 				}
-				*data << (*it)->qst->title;
+				if(lq)
+					*data << lq->Title;
+				else
+					*data << (*it)->qst->title;
 			}
 		}
 	}
@@ -1351,27 +1380,27 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 
 		if ((status == QMGR_QUEST_AVAILABLE) || (status == QMGR_QUEST_REPEATABLE))
 		{
-			sQuestMgr.BuildQuestDetails(&data, (*itr)->qst, qst_giver, 1);		// 1 because we have 1 quest, and we want goodbye to function
+			sQuestMgr.BuildQuestDetails(&data, (*itr)->qst, qst_giver, 1, plr->GetSession()->language);		// 1 because we have 1 quest, and we want goodbye to function
 			plr->GetSession()->SendPacket(&data);
 			sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS." );
 		}
 		else if (status == QMGR_QUEST_FINISHED)
 		{
-			sQuestMgr.BuildOfferReward(&data, (*itr)->qst, qst_giver, 1);
+			sQuestMgr.BuildOfferReward(&data, (*itr)->qst, qst_giver, 1, plr->GetSession()->language);
 			plr->GetSession()->SendPacket(&data);
 			//ss
 			sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_OFFER_REWARD." );
 		}
 		else if (status == QMGR_QUEST_NOT_FINISHED)
 		{
-			sQuestMgr.BuildRequestItems(&data, (*itr)->qst, qst_giver, status);
+			sQuestMgr.BuildRequestItems(&data, (*itr)->qst, qst_giver, status, plr->GetSession()->language);
 			plr->GetSession()->SendPacket(&data);
 			sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS." );
 		}
 	}
 	else 
 	{
-		sQuestMgr.BuildQuestList(&data, qst_giver ,plr);
+		sQuestMgr.BuildQuestList(&data, qst_giver ,plr, plr->GetSession()->language);
 		plr->GetSession()->SendPacket(&data);
 		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST." );
 	}

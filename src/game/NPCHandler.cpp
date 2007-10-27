@@ -408,7 +408,11 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 						data << status << uint32(0);
 					}
 
-					data << (*it)->qst->title;
+					LocalizedQuest * lq = (language>0) ? sLocalizationMgr.GetLocalizedQuest((*it)->qst->id,language):NULL;
+					if(lq)
+						data << lq->Title;
+					else
+						data << (*it)->qst->title;
 				}
 			}
 		}

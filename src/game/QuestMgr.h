@@ -46,11 +46,11 @@ public:
 	uint32 ActiveQuestsCount(Object* quest_giver, Player* plr);
 
 	//Packet Forging...
-	void BuildOfferReward(WorldPacket* data,Quest* qst, Object* qst_giver, uint32 menutype);
-	void BuildQuestDetails(WorldPacket* data, Quest* qst, Object* qst_giver, uint32 menutype);	
-	void BuildRequestItems(WorldPacket* data, Quest* qst, Object* qst_giver, uint32 status);
+	void BuildOfferReward(WorldPacket* data,Quest* qst, Object* qst_giver, uint32 menutype, uint32 language);
+	void BuildQuestDetails(WorldPacket* data, Quest* qst, Object* qst_giver, uint32 menutype, uint32 language);	
+	void BuildRequestItems(WorldPacket* data, Quest* qst, Object* qst_giver, uint32 status, uint32 language);
 	void BuildQuestComplete(Player*, Quest* qst);
-	void BuildQuestList(WorldPacket* data, Object* qst_giver, Player* plr);
+	void BuildQuestList(WorldPacket* data, Object* qst_giver, Player* plr, uint32 language);
 	bool OnActivateQuestGiver(Object *qst_giver, Player *plr);
     bool isRepeatableQuestFinished(Player *plr, Quest *qst);
 
