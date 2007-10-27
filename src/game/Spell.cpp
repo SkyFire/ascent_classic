@@ -2207,7 +2207,7 @@ void Spell::HandleAddAura(uint64 guid)
 
 	uint32 spellid = 0;
 
-	if((m_spellInfo->MechanicsType == 25 || m_spellInfo->MechanicsType == 29) && m_spellInfo->Id != 25771) // Cast spell Forbearance
+	if(m_spellInfo->MechanicsType == 25 && m_spellInfo->Id != 25771) // Cast spell Forbearance
 		spellid = 25771;
 	else if(m_spellInfo->MechanicsType == 16 && m_spellInfo->Id != 11196) // Cast spell Recently Bandaged
 		spellid = 11196;
@@ -2607,10 +2607,10 @@ uint8 Spell::CanCast(bool rangetolerate)
 				}
 
 				if(target->dispels[m_spellInfo->DispelType])
-					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC;
+					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1;			// hackfix - burlex
 				
 				if(target->MechanicsDispels[m_spellInfo->MechanicsType])
-					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC;
+					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1;
 			}
 
 			// if we're replacing a higher rank, deny it

@@ -1267,6 +1267,9 @@ bool World::SetInitialWorldSettings()
 		if(sp->Id==25771 || sp->Id == 11196 || sp->Id == 6788)
 			sp->removable_by_immunity = false;
 
+		if(sp->NameHash==0x9840A1A6 || sp->NameHash == 0x1513B967 || sp->NameHash==0x204D568D)
+			sp->MechanicsType=25;
+
 		/* Backlash */
 		if(sp->NameHash == 0x5965939A)
 		{
