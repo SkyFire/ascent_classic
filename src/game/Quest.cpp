@@ -22,12 +22,13 @@
 //Pakcet Building
 /////////////////
 
-WorldPacket* BuildQuestQueryResponse(Quest *qst)
+WorldPacket* WorldSession::BuildQuestQueryResponse(Quest *qst)
 {
 	// 2048 bytes should be more than enough. The fields cost ~200 bytes.
 	// better to allocate more at startup than have to realloc the buffer later on.
 
 	WorldPacket *data = new WorldPacket(SMSG_QUEST_QUERY_RESPONSE, 2048);
+	LocalizedQuest * lci = (language>0) ? sLocalizationMgr.GetLocalizedQuest(qst->id, language) : NULL;
    
 	*data << uint32(qst->id);					   // Quest ID
 	*data << uint32(2);							 // Unknown, always seems to be 2
@@ -72,10 +73,20 @@ WorldPacket* BuildQuestQueryResponse(Quest *qst)
 	*data << qst->point_y;						  // Unknown
 	*data << qst->point_opt;						// Unknown
 	
-	*data << qst->title;							// Title / name of quest
-	*data << qst->objectives;					   // Objectives / description
-	*data << qst->details;						  // Details
-	*data << qst->endtext;						  // Subdescription
+	if(lci)
+	{
+		*data << lci->Title;
+		*data << lci->Objectives;
+		*data << lci->Details;
+		*data << lci->EndText;
+	}
+	else
+	{
+		*data << qst->title;							// Title / name of quest
+		*data << qst->objectives;					   // Objectives / description
+		*data << qst->details;						  // Details
+		*data << qst->endtext;						  // Subdescription
+	}
 
 	// (loop 4 times)
 	for(uint32 i = 0; i < 4; ++i)
@@ -87,10 +98,20 @@ WorldPacket* BuildQuestQueryResponse(Quest *qst)
 		*data << qst->required_itemcount[i];		// Collect item count [i]
 	}
 
-	*data << qst->objectivetexts[0];				// Objective 1 - Used as text if mob not set
-	*data << qst->objectivetexts[1];				// Objective 2 - Used as text if mob not set
-	*data << qst->objectivetexts[2];				// Objective 3 - Used as text if mob not set
-	*data << qst->objectivetexts[3];				// Objective 4 - Used as text if mob not set
+	if(lci)
+	{
+		*data << lci->ObjectiveText[0];
+		*data << lci->ObjectiveText[1];
+		*data << lci->ObjectiveText[2];
+		*data << lci->ObjectiveText[3];
+	}
+	else
+	{
+		*data << qst->objectivetexts[0];				// Objective 1 - Used as text if mob not set
+		*data << qst->objectivetexts[1];				// Objective 2 - Used as text if mob not set
+		*data << qst->objectivetexts[2];				// Objective 3 - Used as text if mob not set
+		*data << qst->objectivetexts[3];				// Objective 4 - Used as text if mob not set
+	}
 
 	return data;
 }

@@ -747,6 +747,7 @@ public:
 	time_t floodTime;
 	void SystemMessage(const char * format, ...);
 	uint32 language;
+	WorldPacket* BuildQuestQueryResponse(Quest *qst);
 };
 
 typedef std::set<WorldSession*> SessionSet;

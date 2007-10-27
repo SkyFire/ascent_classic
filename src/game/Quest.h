@@ -238,6 +238,4 @@ private:
 	int32 m_slot;
 };
 
-WorldPacket* BuildQuestQueryResponse(Quest *qst);
-
 #endif

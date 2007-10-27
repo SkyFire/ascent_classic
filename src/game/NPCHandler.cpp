@@ -501,6 +501,7 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 	GetPlayer()->SetUInt64Value(UNIT_FIELD_TARGET, targetGuid);
 
 	pGossip = NpcTextStorage.LookupEntry(textID);
+	LocalizedNpcText * lnc = (language>0) ? sLocalizationMgr.GetLocalizedNpcText(textID,language) : NULL;
 
 	data.Initialize( SMSG_NPC_TEXT_UPDATE );
 	data << textID;
@@ -510,14 +511,17 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 		data << float(1.0f);		// Unknown
 		for(uint32 i=0;i<8;i++)
 		{
-			if(pGossip->Texts[i].Text[0][0])
-				data << pGossip->Texts[i].Text[1];
+			if(lnc)
+			{
+				data << lnc->Texts[i][0];
+				data << lnc->Texts[i][1];
+			}
 			else
+			{
 				data << pGossip->Texts[i].Text[0];
-			if(pGossip->Texts[i].Text[1][0])
-				data << pGossip->Texts[i].Text[0];
-			else
 				data << pGossip->Texts[i].Text[1];
+			}
+
 			data << pGossip->Texts[i].Lang;
 			data << uint32(0x00);		// Was prob.. but if you set it to 0 emotes work ;)
 			for(uint32 e=0;e<6;e++)
