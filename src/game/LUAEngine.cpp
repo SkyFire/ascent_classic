@@ -215,6 +215,7 @@ void LuaEngine::LoadScripts()
 	set<string> luaFiles;
 	set<string> luaBytecodeFiles;
 
+#ifdef WIN32
 	WIN32_FIND_DATA fd;
 	HANDLE h;
 
@@ -234,6 +235,7 @@ void LuaEngine::LoadScripts()
 			luaBytecodeFiles.insert(string(fn));
 	} while(FindNextFile(h, &fd));
 	FindClose(h);
+#endif
 
 	// we prefer precompiled code.
 	for(set<string>::iterator itr = luaBytecodeFiles.begin(); itr != luaBytecodeFiles.end(); ++itr)
