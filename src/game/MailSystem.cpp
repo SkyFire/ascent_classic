@@ -421,7 +421,17 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 	if(message->attached_item_guid)
 		item = objmgr.LoadItem(message->attached_item_guid);
 	else if(message->external_attached_item_guid)
+	{
 		item = objmgr.LoadExternalItem(message->external_attached_item_guid);
+		if(item)
+		{
+			// reassign its guid
+			if(item->GetProto()->ContainerSlots)
+				item->SetNewGuid(objmgr.GenerateLowGuid(HIGHGUID_CONTAINER));
+			else
+				item->SetNewGuid(objmgr.GenerateLowGuid(HIGHGUID_ITEM));
+		}
+	}
 
 	if(item == 0)
 	{
