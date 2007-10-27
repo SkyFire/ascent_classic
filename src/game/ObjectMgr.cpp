@@ -1221,6 +1221,35 @@ Item * ObjectMgr::LoadItem(uint64 guid)
 	return pReturn;
 }
 
+Item * ObjectMgr::LoadExternalItem(uint64 guid)
+{
+	QueryResult * result = CharacterDatabase.Query("SELECT * FROM playeritems_external WHERE guid = %u", GUID_LOPART(guid));
+	Item * pReturn = 0;
+
+	if(result)
+	{
+		ItemPrototype * pProto = ItemPrototypeStorage.LookupEntry(result->Fetch()[2].GetUInt32());
+		if(!pProto)
+			return NULL;
+
+		if(pProto->InventoryType == INVTYPE_BAG)
+		{
+			Container * pContainer = new Container(HIGHGUID_CONTAINER,(uint32)guid);
+			pContainer->LoadFromDB(result->Fetch());
+			pReturn = pContainer;
+		}
+		else
+		{
+			Item * pItem = new Item(HIGHGUID_ITEM,(uint32)guid);
+			pItem->LoadFromDB(result->Fetch(), 0, false);
+			pReturn = pItem;
+		}
+		delete result;
+	}
+
+	return pReturn;
+}
+
 void ObjectMgr::LoadCorpses(MapMgr * mgr)
 {
 	Corpse *pCorpse = NULL;

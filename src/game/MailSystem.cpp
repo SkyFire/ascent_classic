@@ -123,11 +123,23 @@ bool MailMessage::AddMessageDataToPacket(WorldPacket& data)
 
 	if(attached_item_guid)
 	{
-		stringstream ss;
-		ss << "SELECT `entry`, `count`, `charges`, `durability` FROM playeritems WHERE guid='"
-			<< GUID_LOPART(attached_item_guid) << "'";
-		
-		QueryResult * result = CharacterDatabase.Query(ss.str().c_str());
+		QueryResult * result = CharacterDatabase.Query("SELECT `entry`, `count`, `charges`, `durability` FROM playeritems WHERE guid='%u'", GUID_LOPART(attached_item_guid));
+		if(result)
+		{
+			itementry = result->Fetch()[0].GetUInt32();
+			itemcount = result->Fetch()[1].GetUInt32();
+			charges = result->Fetch()[2].GetUInt32();
+			durability = result->Fetch()[3].GetUInt32();
+			ItemPrototype * it = ItemPrototypeStorage.LookupEntry(itementry);
+			maxdurability = it ? it->MaxDurability : durability;
+
+			delete result;
+		}
+	}
+
+	if(external_attached_item_guid)
+	{
+		QueryResult * result = CharacterDatabase.Query("SELECT `entry`, `count`, `charges`, `durability` FROM playeritems_external WHERE guid='%u'", GUID_LOPART(external_attached_item_guid));
 		if(result)
 		{
 			itementry = result->Fetch()[0].GetUInt32();
@@ -177,7 +189,8 @@ void MailSystem::SaveMessageToSQL(MailMessage * message)
 		<< CharacterDatabase.EscapeString(message->subject) << "\",\""
 		<< CharacterDatabase.EscapeString(message->body) << "\","
 		<< message->money << ",'"
-		<< message->attached_item_guid << "',"
+		<< message->attached_item_guid << "','"
+		<< message->external_attached_item_guid << "',"
 		<< message->cod << ","
 		<< message->stationary << ","
 		<< message->expire_time << ","
@@ -281,6 +294,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
 		// no need to update guid, it shouldn't change..
 	}
+	msg.external_attached_item_guid=0;
 
 	if(msg.money != 0 || msg.cod != 0 || msg.attached_item_guid != 0 && player->acct != _player->GetSession()->GetAccountId())
 	{
@@ -382,7 +396,7 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 	data << message_id << uint32(MAIL_RES_ITEM_TAKEN);
 	
 	MailMessage * message = _player->m_mailBox.GetMessage(message_id);
-	if(message == 0 || !message->attached_item_guid)
+	if(message == 0 || (!message->attached_item_guid && !message->external_attached_item_guid))
 	{
 		data << uint32(MAIL_ERR_INTERNAL_ERROR);
 		SendPacket(&data);
@@ -402,13 +416,12 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 	}
 
 	// grab the item
-	Item * item = 0;
+	Item * item = NULL;
 
-	// try cached auctionhouse items first,
-	// this will stop crashes later on :p
-
-	if(item == 0)
+	if(message->attached_item_guid)
 		item = objmgr.LoadItem(message->attached_item_guid);
+	else if(message->external_attached_item_guid)
+		item = objmgr.LoadExternalItem(message->external_attached_item_guid);
 
 	if(item == 0)
 	{
@@ -439,10 +452,16 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 	_player->GetItemInterface()->AddItemToFreeSlot(item);
 
 	// message no longer has an item association
-	message->attached_item_guid = 0;
+	if(message->external_attached_item_guid)
+	{
+		CharacterDatabase.Execute("DELETE FROM playeritems_external WHERE guid = "I64FMTD, message->external_attached_item_guid);
+		message->external_attached_item_guid = 0;
+	}
+	else
+		message->attached_item_guid = 0;
 	
 	// update in sql!
-	CharacterDatabase.Execute("UPDATE mailbox SET attached_item_guid = 0, cod = 0 WHERE message_id = %u", message->message_id);
+	CharacterDatabase.Execute("UPDATE mailbox SET attached_item_guid = 0, external_attached_item_guid = 0, cod = 0 WHERE message_id = %u", message->message_id);
 
 	// send complete packet
 	data << uint32(MAIL_OK);
@@ -658,6 +677,7 @@ void MailSystem::SendAutomatedMessage(uint32 type, uint64 sender, uint64 receive
 	msg.money = money;
 	msg.cod = cod;
 	msg.attached_item_guid = item_guid;
+	msg.external_attached_item_guid = 0;
 	msg.stationary = stationary;
 	msg.delivery_time = (uint32)UNIXTIME;
 	msg.expire_time = 0;
@@ -709,6 +729,7 @@ void Mailbox::Load(QueryResult * result)
 		msg.body = fields[i++].GetString();
 		msg.money = fields[i++].GetUInt32();
 		msg.attached_item_guid = fields[i++].GetUInt64();
+		msg.external_attached_item_guid = fields[i++].GetUInt64();
 		msg.cod = fields[i++].GetUInt32();
 		msg.stationary = fields[i++].GetUInt32();
 		msg.expire_time = fields[i++].GetUInt32();
