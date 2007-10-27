@@ -157,7 +157,16 @@ void AuthSocket::HandleChallenge()
 	}
 
 	// update cached locale
-	*(uint32*)&m_account->Locale[0] = *(uint32*)&m_challenge.country;
+	if(!m_account->forcedLocale)
+	{
+		char temp[4];
+		temp[0] = m_challenge.country[3];
+		temp[1] = m_challenge.country[2];
+		temp[2] = m_challenge.country[1];
+		temp[3] = m_challenge.country[0];
+
+		*(uint32*)&m_account->Locale[0] = *(uint32*)temp;
+	}
 
 	Sha1Hash sha;
 	//uint32 tc = s.GetNumBytes();

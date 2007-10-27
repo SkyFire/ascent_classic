@@ -244,6 +244,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	uint32 AccountID;
 	string GMFlags;
 	uint8 AccountFlags;
+	string lang = "enUS";
 	
 	recvData >> AccountID >> AccountName >> GMFlags >> AccountFlags;
 	sLog.outDebug( " >> got information packet from logon: `%s` ID %u (request %u)", AccountName.c_str(), AccountID, mRequestID);
@@ -263,6 +264,8 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 
 	//checking if player is already connected
     //disconnect corrent player and login this one(blizzlike)
+
+	recvData.read((uint8*)lang.data(), 4);
 	WorldSession *session = sWorld.FindSession( AccountID );
 	if( session)
 	{
@@ -300,6 +303,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	mSession->LoadSecurity(GMFlags);
 	mSession->SetAccountFlags(AccountFlags);
 	mSession->m_lastPing = (uint32)UNIXTIME;
+	mSession->language = sLocalizationMgr.GetLanguageId(lang);
 
 	for(uint32 i = 0; i < 8; ++i)
 		mSession->SetAccountData(i, NULL, true, 0);

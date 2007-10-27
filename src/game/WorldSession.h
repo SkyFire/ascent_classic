@@ -746,6 +746,7 @@ public:
 	uint32 floodLines;
 	time_t floodTime;
 	void SystemMessage(const char * format, ...);
+	uint32 language;
 };
 
 typedef std::set<WorldSession*> SessionSet;

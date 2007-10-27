@@ -86,12 +86,27 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 		ci = CreatureNameStorage.LookupEntry(entry);
 		if(ci == NULL)
 			return;
-		sLog.outDetail("WORLD: CMSG_CREATURE_QUERY '%s'", ci->Name);
 
-		data << (uint32)entry;
-		data << ci->Name;
-		data << uint8(0) << uint8(0) << uint8(0);
-		data << ci->SubName;
+		LocalizedCreatureName * lcn = NULL;
+		if(language > 0)
+			lcn = sLocalizationMgr.GetLocalizedCreatureName(entry, language);
+
+		if(lcn == NULL)
+		{
+			sLog.outDetail("WORLD: CMSG_CREATURE_QUERY '%s'", ci->Name);
+			data << (uint32)entry;
+			data << ci->Name;
+			data << uint8(0) << uint8(0) << uint8(0);
+			data << ci->SubName;
+		}
+		else
+		{
+			sLog.outDetail("WORLD: CMSG_CREATURE_QUERY '%s' (localized to %s)", ci->Name, lcn->Name);
+			data << (uint32)entry;
+			data << lcn->Name;
+			data << uint8(0) << uint8(0) << uint8(0);
+			data << lcn->SubName;
+		}
 		data << ci->Flags1;  
 		data << ci->Type;
 		data << ci->Family;
@@ -105,8 +120,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 		data << ci->unkfloat1;
 		data << ci->unkfloat2;
 		data << ci->Civilian;
-		data << ci->Leader;
-		
+		data << ci->Leader;		
 	}
 
 	SendPacket( &data );
@@ -123,6 +137,7 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 	uint32 entryID;
 	uint64 guid;
 	GameObjectInfo *goinfo;
+	LocalizedGameObjectName * lgn = NULL;
 
 	recv_data >> entryID;
 	recv_data >> guid;
@@ -130,13 +145,20 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 	sLog.outDetail("WORLD: CMSG_GAMEOBJECT_QUERY '%u'", entryID);
 
 	goinfo = GameObjectNameStorage.LookupEntry(entryID);
-	if(goinfo == 0)
+	if(goinfo == NULL)
 		return;
 
+	if(language>0)
+		lgn = sLocalizationMgr.GetLocalizedGameObjectName(entryID, language);
+    
 	data << entryID;
 	data << goinfo->Type;
 	data << goinfo->DisplayID;
-	data << goinfo->Name;
+	if(lgn)
+		data << lgn->Name;
+	else
+		data << goinfo->Name;
+
 	data << uint8(0) << uint8(0) << uint8(0) << uint8(0) << uint8(0) << uint8(0);   // new string in 1.12
 	data << goinfo->SpellFocus;
 	data << goinfo->sound1;
@@ -261,6 +283,12 @@ void WorldSession::HandleItemNameQueryOpcode( WorldPacket & recv_data )
 	if(!proto)
 		reply << "Unknown Item";
 	else
-		reply << proto->Name1;
+	{
+		LocalizedItem * li = (language>0) ? sLocalizationMgr.GetLocalizedItem(itemid, language) : NULL;
+		if(li)
+			reply << li->Name;
+		else
+			reply << proto->Name1;
+	}
 	SendPacket(&reply);	
 }

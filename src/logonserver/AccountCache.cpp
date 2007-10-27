@@ -28,7 +28,7 @@ void AccountMgr::ReloadAccounts(bool silent)
 	if(!silent) sLog.outString("[AccountMgr] Reloading Accounts...");
 
 	// Load *all* accounts.
-	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned FROM accounts");
+	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned, forceLanguage FROM accounts");
 	Field * field;
 	string AccountName;
 	set<string> account_list;
@@ -112,6 +112,14 @@ void AccountMgr::AddAccount(Field* field)
 	acct->Locale[1] = 'n';
 	acct->Locale[2] = 'U';
 	acct->Locale[3] = 'S';
+	if(strcmp(field[6].GetString(), "enUS"))
+	{
+		// non-standard language forced
+		memcpy(acct->Locale, field[6].GetString(), 4);
+		acct->forcedLocale = true;
+	}
+	else
+		acct->forcedLocale = false;
 
 	// Convert username/password to uppercase. this is needed ;)
 	transform(Username.begin(), Username.end(), Username.begin(), towupper);
@@ -146,6 +154,14 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 	acct->AccountFlags			= field[4].GetUInt8();
 	acct->Banned				= field[5].GetUInt32();
 	acct->SetGMFlags(GMFlags.c_str());
+	if(strcmp(field[6].GetString(), "enUS"))
+	{
+		// non-standard language forced
+		memcpy(acct->Locale, field[6].GetString(), 4);
+		acct->forcedLocale = true;
+	}
+	else
+		acct->forcedLocale = false;
 
 	// Convert username/password to uppercase. this is needed ;)
 	transform(Username.begin(), Username.end(), Username.begin(), towupper);
@@ -159,7 +175,7 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 
 bool AccountMgr::LoadAccount(string Name)
 {
-	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned FROM account_database WHERE login='%s'", Name.c_str());
+	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned, forceLanguage FROM account_database WHERE login='%s'", Name.c_str());
 	if(result == 0)
 		return false;
 

@@ -73,6 +73,7 @@ struct Account
 	}
 
 	char Locale[4];
+	bool forcedLocale;
 
 };
 

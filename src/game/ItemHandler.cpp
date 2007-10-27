@@ -607,12 +607,24 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
 	} 
 
 	//WorldPacket * data = new WorldPacket(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 600 + itemProto->Name1.length() + itemProto->Description.length() );
-	WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 600 + strlen(itemProto->Name1) + strlen(itemProto->Description) );
+	size_t namelens;
+	
+	LocalizedItem * li = (language>0) ? sLocalizationMgr.GetLocalizedItem(itemid, language) : NULL;
+	if(li)
+		namelens = strlen(li->Name) + strlen(li->Description) + 602;
+	else
+		namelens = strlen(itemProto->Name1) + strlen(itemProto->Description) + 602;
+
+	WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, namelens );
 	data << itemProto->ItemId;
 	data << itemProto->Class;
 	data << itemProto->SubClass;
 	data << itemProto->unknown_bc;
-	data << itemProto->Name1;
+	if(li)
+		data << li->Name;
+	else
+		data << itemProto->Name1;
+
 	/*data << itemProto->Name2;
 	data << itemProto->Name3;
 	data << itemProto->Name4;*/
@@ -667,7 +679,11 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
 		data << itemProto->Spells[i].CategoryCooldown;
 	}
 	data << itemProto->Bonding;
-	data << itemProto->Description;
+	if(li)
+		data << li->Description;
+	else
+		data << itemProto->Description;
+
 	data << itemProto->PageId;
 	data << itemProto->PageLanguage;
 	data << itemProto->PageMaterial;
