@@ -1,5 +1,5 @@
 
-INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../shared -I$(srcdir)/../../dep/src/gm
+INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../shared -I$(srcdir)/../../dep/src
 INCLUDES += -I$(srcdir)/../game
 
 bin_PROGRAMS = ascent
@@ -11,11 +11,12 @@ ascent_SOURCES = \
     CConsole.cpp \
     CConsole.h
 
-ascent_LDADD = -lgame -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork
+ascent_LDADD = -lgame -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork -llua
 
 ascent_LDFLAGS = -L$(srcdir)/../shared \
                -L$(srcdir)/../game \
                -L$(srcdir)/../../dep/src/zlib \
-               -L$(srcdir)/../../dep/src/gm \
+               -L$(srcdir)/../../dep/src/lua \
+               -L$(srcdir)/../../dep/src \
                -Wl,-export-dynamic
 #               @DLL_EXPORT@

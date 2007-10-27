@@ -1,5 +1,5 @@
 INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../shared
-INCLUDES += -I$(srcdir)/../logonserver
+INCLUDES += -I$(srcdir)/../logonserver -I$(srcdir)/../../dep/src
 
 noinst_LIBRARIES = libgame.a
 
