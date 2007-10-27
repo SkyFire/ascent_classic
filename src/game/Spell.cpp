@@ -2524,13 +2524,13 @@ uint8 Spell::CanCast(bool rangetolerate)
 			}
 
 			// pet's owner stuff
-			if (m_spellInfo->EffectImplicitTargetA[0] == 27 || 
+			/*if (m_spellInfo->EffectImplicitTargetA[0] == 27 || 
 				m_spellInfo->EffectImplicitTargetA[1] == 27 || 
 				m_spellInfo->EffectImplicitTargetA[2] == 27)
 			{
 				if (!target->IsPlayer())
 					return SPELL_FAILED_TARGET_NOT_PLAYER; //if you are there something is very wrong
-			}
+			}*/
 
 			// target 39 is fishing, all fishing spells are handled
 			if (m_spellInfo->EffectImplicitTargetA[0] == 39 )//|| 

@@ -33,7 +33,6 @@ Imp:
 * Blood Pact - no +43 stamina received neither in party/raid/self alone
 *Phase Shift - nothing happens imp still get's attacked by enemy
 *Fire Shield - no shield protect your target
-Voidwaler ( VW) * Self Sacrifice - nothing happens
 * Consume Shadows - no hp regained
 Succubus ( succy )
 *Seduction - nothing happens

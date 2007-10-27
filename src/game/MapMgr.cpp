@@ -23,6 +23,7 @@
 
 #include "StdAfx.h"
 #define MAP_MGR_UPDATE_PERIOD 100
+#define MAPMGR_INACTIVE_MOVE_TIME 5
 
 MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>(map), _mapId(mapId), eventHolder(instanceid)
 {
@@ -370,8 +371,8 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 
 	ASSERT(obj);
 	ASSERT(obj->GetMapId() == _mapId);
-	ASSERT(obj->GetPositionX() > _minX && obj->GetPositionX() < _maxX);
-	ASSERT(obj->GetPositionY() > _minY && obj->GetPositionY() < _maxY);
+	//ASSERT(obj->GetPositionX() > _minX && obj->GetPositionX() < _maxX);
+	//ASSERT(obj->GetPositionY() > _minY && obj->GetPositionY() < _maxY);
 	ASSERT(_cells);
 
 	if(obj->Active)
@@ -516,7 +517,7 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	}
 
 	if(!HasPlayers() && !InactiveMoveTime && RaidExpireTime)
-		InactiveMoveTime = UNIXTIME + (10 * 60);	   // 10 mins -> move to inactive
+		InactiveMoveTime = UNIXTIME + (MAPMGR_INACTIVE_MOVE_TIME * 60);	   // 5 mins -> move to inactive
 }
 
 void MapMgr::ChangeObjectLocation(Object *obj)

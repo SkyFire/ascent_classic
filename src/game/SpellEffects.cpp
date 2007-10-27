@@ -202,13 +202,6 @@ void Spell::SpellEffectInstantKill(uint32 i)
 	Felhunter: Restores $18792s1% of total Mana every $18792t1 sec.
 
 	*/
-
-	if(m_spellInfo->NameHash==0x154BC7DB)
-	{
-		/* sacrifice */
-		return;
-	}
-
 	uint32 spellId = m_spellInfo->Id;
 
 	switch(spellId)
@@ -240,15 +233,6 @@ void Spell::SpellEffectInstantKill(uint32 i)
 	case 20400:
 	case 20401:
 	case 20402:
-		{
-		}break;
-	//sacrifise works
-	case 7812:
-	case 19438:
-	case 19440:
-	case 19441:
-	case 19442:
-	case 19443:
 		{
 		}break;
 	case 18788: //Demonic Sacrifice (508745)
