@@ -3951,7 +3951,7 @@ void Unit::RemoveAurasOfSchool(uint32 School, bool Positive, bool Immune)
 {
 	for(uint32 x = 0; x < MAX_AURAS; ++x)
 	{
-		if(m_auras[x]  && m_auras[x]->GetSpellProto()->School == School && (!m_auras[x]->IsPositive() || Positive) && (!Immune && m_auras[x]->GetSpellProto()->removable_by_immunity)
+		if(m_auras[x]  && m_auras[x]->GetSpellProto()->School == School && (!m_auras[x]->IsPositive() || Positive) && (!Immune && m_auras[x]->GetSpellProto()->removable_by_immunity))
 			m_auras[x]->Remove();
 	}
 }
