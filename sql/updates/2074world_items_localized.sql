@@ -27,6 +27,7 @@ CREATE TABLE `items_localized` (
   `language_code` varchar(5) NOT NULL,
   `name` varchar(100) NOT NULL,
   `description` varchar(100) NOT NULL,
+  PRIMARY KEY (`entry`,`language_code`),
   KEY `lol` (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
@@ -35,6 +36,10 @@ SET character_set_client = @saved_cs_client;
 -- Dumping data for table `items_localized`
 --
 
+LOCK TABLES `items_localized` WRITE;
+/*!40000 ALTER TABLE `items_localized` DISABLE KEYS */;
+/*!40000 ALTER TABLE `items_localized` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -45,4 +50,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2007-10-27 12:31:58
+-- Dump completed on 2007-10-27 13:03:34

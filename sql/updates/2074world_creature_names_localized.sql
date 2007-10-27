@@ -27,6 +27,7 @@ CREATE TABLE `creature_names_localized` (
   `language_code` varchar(5) NOT NULL,
   `name` varchar(100) NOT NULL,
   `subname` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`,`language_code`),
   KEY `lol` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
@@ -49,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2007-10-27 11:33:54
+-- Dump completed on 2007-10-27 13:04:13

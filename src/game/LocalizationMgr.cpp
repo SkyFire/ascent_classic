@@ -70,6 +70,7 @@ void LocalizationMgr::Reload(bool first)
 	GetDistinctLanguages(languages, "items_localized");
 	GetDistinctLanguages(languages, "quests_localized");
 	GetDistinctLanguages(languages, "npc_text_localized");
+	GetDistinctLanguages(languages, "itempages_localized");
 
 	/************************************************************************/
 	/* Generate Language IDs                                                */
@@ -106,6 +107,7 @@ void LocalizationMgr::Reload(bool first)
 	m_Quests = new HM_NAMESPACE::hash_map<uint32, LocalizedQuest>[langid];
 	m_NpcTexts = new HM_NAMESPACE::hash_map<uint32, LocalizedNpcText>[langid];
 	m_Items = new HM_NAMESPACE::hash_map<uint32, LocalizedItem>[langid];
+	m_ItemPages = new HM_NAMESPACE::hash_map<uint32, LocalizedItemPage>[langid];
 
 	/************************************************************************/
 	/* Creature Names                                                       */
@@ -248,6 +250,7 @@ void LocalizationMgr::Reload(bool first)
 		uint32 entry;
 		Field * f;
 		uint32 lid;
+		uint32 counter=2;
 
 		result = WorldDatabase.Query("SELECT * FROM npc_text_localized");
 		if(result)
@@ -263,9 +266,41 @@ void LocalizationMgr::Reload(bool first)
 					continue;		// no loading enus stuff.. lawl
 
 				for(uint32 i = 0; i < 8; ++i)
-					nt.Texts[i] = strdup(f[2+i].GetString());
+				{
+					nt.Texts[i][0] = strdup(f[counter++].GetString());
+					nt.Texts[i][1] = strdup(f[counter++].GetString());
+				}
 
 				m_NpcTexts[lid].insert(make_pair(entry, nt));
+			} while(result->NextRow());
+			delete result;
+		}
+	}
+	/************************************************************************/
+	/* Item Pages                                                           */
+	/************************************************************************/
+	{
+		LocalizedItemPage nt;
+		string str;
+		uint32 entry;
+		Field * f;
+		uint32 lid;
+
+		result = WorldDatabase.Query("SELECT * FROM itempages_localized");
+		if(result)
+		{
+			do 
+			{
+				f = result->Fetch();
+				str = string(f[1].GetString());
+				entry = f[0].GetUInt32();
+
+				lid = GetLanguageId(str);
+				if(lid == 0)
+					continue;		// no loading enus stuff.. lawl
+
+				nt.Text = strdup(f[2].GetString());
+				m_ItemPages[lid].insert(make_pair(entry, nt));
 			} while(result->NextRow());
 			delete result;
 		}
@@ -282,4 +317,6 @@ MAKE_LOOKUP_FUNCTION(LocalizedGameObjectName, m_GameObjectNames, GetLocalizedGam
 MAKE_LOOKUP_FUNCTION(LocalizedQuest, m_Quests, GetLocalizedQuest);
 MAKE_LOOKUP_FUNCTION(LocalizedItem, m_Items, GetLocalizedItem);
 MAKE_LOOKUP_FUNCTION(LocalizedNpcText, m_NpcTexts, GetLocalizedNpcText);
+MAKE_LOOKUP_FUNCTION(LocalizedItemPage, m_ItemPages, GetLocalizedItemPage);
+
 

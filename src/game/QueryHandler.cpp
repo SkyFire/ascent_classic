@@ -87,9 +87,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 		if(ci == NULL)
 			return;
 
-		LocalizedCreatureName * lcn = NULL;
-		if(language > 0)
-			lcn = sLocalizationMgr.GetLocalizedCreatureName(entry, language);
+		LocalizedCreatureName * lcn = (language>0) ? sLocalizationMgr.GetLocalizedCreatureName(entry, language) : NULL;
 
 		if(lcn == NULL)
 		{
@@ -137,7 +135,7 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 	uint32 entryID;
 	uint64 guid;
 	GameObjectInfo *goinfo;
-	LocalizedGameObjectName * lgn = NULL;
+	
 
 	recv_data >> entryID;
 	recv_data >> guid;
@@ -148,8 +146,7 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 	if(goinfo == NULL)
 		return;
 
-	if(language>0)
-		lgn = sLocalizationMgr.GetLocalizedGameObjectName(entryID, language);
+	LocalizedGameObjectName * lgn = (language>0) ? sLocalizationMgr.GetLocalizedGameObjectName(entryID, language) : NULL;
     
 	data << entryID;
 	data << goinfo->Type;
@@ -251,23 +248,17 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 	if(!page)
 		return;
 
+	LocalizedItemPage * lpi = (language>0) ? sLocalizationMgr.GetLocalizedItemPage(pageid,language):NULL;
+
 	WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 1000);
 	data << pageid;
-	data << page->text;
+	if(lpi)
+		data << lpi->Text;
+	else
+		data << page->text;
+
 	data << page->next_page;
 	SendPacket(&data);
-	/*ItemPage* page = NULL;
-	while(pageid)
-	{
-		page = ItemPageStorage.LookupEntry(pageid);
-		if(page == NULL) 
-			break;
-		data << pageid;
-		data << page->text;
-		data << page->next_page;
-		pageid = page->next_page;
-		SendPacket(&data);
-	}*/
 }
 //////////////////////////////////////////////////////////////
 /// This function handles CMSG_ITEM_NAME_QUERY:

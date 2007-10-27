@@ -16,28 +16,28 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `gameobject_names_localized`
+-- Table structure for table `itempages_localized`
 --
 
-DROP TABLE IF EXISTS `gameobject_names_localized`;
+DROP TABLE IF EXISTS `itempages_localized`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-CREATE TABLE `gameobject_names_localized` (
+CREATE TABLE `itempages_localized` (
   `entry` int(30) NOT NULL,
   `language_code` varchar(5) NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `text` text NOT NULL,
   PRIMARY KEY (`entry`,`language_code`),
-  KEY `lol` (`entry`)
+  KEY `a` (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
--- Dumping data for table `gameobject_names_localized`
+-- Dumping data for table `itempages_localized`
 --
 
-LOCK TABLES `gameobject_names_localized` WRITE;
-/*!40000 ALTER TABLE `gameobject_names_localized` DISABLE KEYS */;
-/*!40000 ALTER TABLE `gameobject_names_localized` ENABLE KEYS */;
+LOCK TABLES `itempages_localized` WRITE;
+/*!40000 ALTER TABLE `itempages_localized` DISABLE KEYS */;
+/*!40000 ALTER TABLE `itempages_localized` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -49,4 +49,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2007-10-27 13:04:27
+-- Dump completed on 2007-10-27 13:03:40

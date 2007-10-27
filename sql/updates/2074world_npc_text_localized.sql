@@ -26,13 +26,22 @@ CREATE TABLE `npc_text_localized` (
   `entry` int(30) NOT NULL,
   `language_code` varchar(5) NOT NULL,
   `text0` varchar(200) NOT NULL,
+  `text0_1` varchar(200) NOT NULL,
   `text1` varchar(200) NOT NULL,
+  `text1_1` varchar(200) NOT NULL,
   `text2` varchar(200) NOT NULL,
+  `text2_1` varchar(200) NOT NULL,
   `text3` varchar(200) NOT NULL,
+  `text3_1` varchar(200) NOT NULL,
   `text4` varchar(200) NOT NULL,
+  `text4_1` varchar(200) NOT NULL,
   `text5` varchar(200) NOT NULL,
+  `text5_1` varchar(200) NOT NULL,
   `text6` varchar(200) NOT NULL,
+  `text6_1` varchar(200) NOT NULL,
   `text7` varchar(200) NOT NULL,
+  `text7_1` varchar(200) NOT NULL,
+  PRIMARY KEY (`entry`,`language_code`),
   KEY `lol` (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
@@ -43,6 +52,7 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `npc_text_localized` WRITE;
 /*!40000 ALTER TABLE `npc_text_localized` DISABLE KEYS */;
+INSERT INTO `npc_text_localized` VALUES (1,'enGB','1','2','3','4','5','6','8','98','98','98','98','98','998','98','98','8888');
 /*!40000 ALTER TABLE `npc_text_localized` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +65,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2007-10-27 11:34:15
+-- Dump completed on 2007-10-27 13:03:59

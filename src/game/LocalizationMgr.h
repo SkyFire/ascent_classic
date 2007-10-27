@@ -34,7 +34,12 @@ struct LocalizedGameObjectName
 
 struct LocalizedNpcText
 {
-	char * Texts[8];
+	char * Texts[8][2];
+};
+
+struct LocalizedItemPage
+{
+	char * Text;
 };
 
 struct LocalizedItem
@@ -74,6 +79,7 @@ public:
 	LocalizedNpcText *			GetLocalizedNpcText(uint32 id, uint32 language);
 	LocalizedCreatureName *		GetLocalizedCreatureName(uint32 id, uint32 language);
 	LocalizedGameObjectName *	GetLocalizedGameObjectName(uint32 id, uint32 language);
+	LocalizedItemPage *			GetLocalizedItemPage(uint32 id, uint32 language);
 
 private:
 	HM_NAMESPACE::hash_map<uint32, LocalizedQuest>				* m_Quests;
@@ -81,6 +87,7 @@ private:
 	HM_NAMESPACE::hash_map<uint32, LocalizedNpcText>			* m_NpcTexts;
 	HM_NAMESPACE::hash_map<uint32, LocalizedCreatureName>		* m_CreatureNames;
 	HM_NAMESPACE::hash_map<uint32, LocalizedGameObjectName>		* m_GameObjectNames;
+	HM_NAMESPACE::hash_map<uint32, LocalizedItemPage>			* m_ItemPages;
 	vector<pair<uint32,uint32> >								  m_languages;
 	bool														  m_disabled;
 };
