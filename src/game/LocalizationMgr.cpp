@@ -65,12 +65,42 @@ void LocalizationMgr::Reload(bool first)
 
 	QueryResult * result;
 	set<string> languages;
+	map<string, string> bound_languages;
 	GetDistinctLanguages(languages, "creature_names_localized");
 	GetDistinctLanguages(languages, "gameobject_names_localized");
 	GetDistinctLanguages(languages, "items_localized");
 	GetDistinctLanguages(languages, "quests_localized");
 	GetDistinctLanguages(languages, "npc_text_localized");
 	GetDistinctLanguages(languages, "itempages_localized");
+
+	/************************************************************************/
+	/* Read Language Bindings From Config                                   */
+	/************************************************************************/
+	string ls = Config.MainConfig.GetStringDefault("Localization", "LocaleBindings", "");
+	vector<string> tbindings = StrSplit(ls, " ");
+	for(vector<string>::iterator ztr = tbindings.begin(); ztr != tbindings.end(); ++ztr)
+	{
+		char lb[200];
+		string ll1,ll2;
+		strcpy(lb,(*ztr).c_str());
+
+		char * lbp = strchr(lb,'=');
+		if(lbp==NULL)
+			continue;
+		*lbp=0;
+		lbp++;
+
+		ll1 = string(lb);
+		ll2 = string(lbp);
+		Lower(ll1);
+		Lower(ll2);
+
+		if(languages.find(ll1) == languages.end())
+		{
+			bound_languages[ll1] = ll2;
+			languages.insert(ll1);
+		}
+	}
 
 	/************************************************************************/
 	/* Generate Language IDs                                                */
@@ -305,6 +335,24 @@ void LocalizationMgr::Reload(bool first)
 			delete result;
 		}
 	}
+
+	/************************************************************************/
+	/* Apply all the language bindings.                                     */
+	/************************************************************************/
+	for(map<string,string>::iterator itr = bound_languages.begin(); itr != bound_languages.end(); ++itr)
+	{
+		uint32 source_language_id = GetLanguageId(itr->second);
+		uint32 dest_language_id = GetLanguageId(itr->first);
+		ASSERT(source_language_id>0&&dest_language_id>0);
+
+		/* duplicate the hashmaps (we can save the pointers here) */
+		CopyHashMap<LocalizedItem>(&m_Items[source_language_id], &m_Items[dest_language_id]);
+		CopyHashMap<LocalizedCreatureName>(&m_CreatureNames[source_language_id], &m_CreatureNames[dest_language_id]);
+		CopyHashMap<LocalizedGameObjectName>(&m_GameObjectNames[source_language_id], &m_GameObjectNames[dest_language_id]);
+		CopyHashMap<LocalizedItemPage>(&m_ItemPages[source_language_id], &m_ItemPages[dest_language_id]);
+		CopyHashMap<LocalizedQuest>(&m_Quests[source_language_id], &m_Quests[dest_language_id]);
+		CopyHashMap<LocalizedNpcText>(&m_NpcTexts[source_language_id], &m_NpcTexts[dest_language_id]);
+	}
 }
 
 #define MAKE_LOOKUP_FUNCTION(t, hm, fn) t * LocalizationMgr::fn(uint32 id, uint32 language) { \
@@ -318,5 +366,4 @@ MAKE_LOOKUP_FUNCTION(LocalizedQuest, m_Quests, GetLocalizedQuest);
 MAKE_LOOKUP_FUNCTION(LocalizedItem, m_Items, GetLocalizedItem);
 MAKE_LOOKUP_FUNCTION(LocalizedNpcText, m_NpcTexts, GetLocalizedNpcText);
 MAKE_LOOKUP_FUNCTION(LocalizedItemPage, m_ItemPages, GetLocalizedItemPage);
-
 

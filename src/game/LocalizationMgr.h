@@ -81,6 +81,13 @@ public:
 	LocalizedGameObjectName *	GetLocalizedGameObjectName(uint32 id, uint32 language);
 	LocalizedItemPage *			GetLocalizedItemPage(uint32 id, uint32 language);
 
+	template<typename T>
+		void CopyHashMap(HM_NAMESPACE::hash_map<uint32,T> * src, HM_NAMESPACE::hash_map<uint32,T> * dest)
+	{
+		for(HM_NAMESPACE::hash_map<uint32,T>::iterator itr = src->begin(); itr != src->end(); ++itr)
+			dest->insert(make_pair(itr->first,itr->second));
+	}
+
 private:
 	HM_NAMESPACE::hash_map<uint32, LocalizedQuest>				* m_Quests;
 	HM_NAMESPACE::hash_map<uint32, LocalizedItem>				* m_Items;
