@@ -2,7 +2,7 @@
 
 echo Building Precompiled Header...
 cd src/game
-g++ -DHAVE_CONFIG_H -I. -I../.. -I/usr/include/mysql -I/usr/local/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I. -I./../../dep/include -I./../shared -I./../../dep/src-I./../logonserver  -I/usr/include/mysql -I/usr/local/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -c -o StdAfx.h.gch StdAfx.h
+g++ -DHAVE_CONFIG_H -I. -I../.. -I/usr/include/mysql -I/usr/local/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I. -I./../../dep/include -I./../shared -I./../../dep/src -I./../logonserver  -I/usr/include/mysql -I/usr/local/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -c -o StdAfx.h.gch StdAfx.h
 
 
 echo Symlinking script gch files.
@@ -19,10 +19,6 @@ rm -f StdAfx.h.gch
 ln -s ../../../game/StdAfx.h.gch ./StdAfx.h.gch
 
 cd ../ServerStatusPlugin
-rm -f StdAfx.h.gch
-ln -s ../../../game/StdAfx.h.gch ./StdAfx.h.gch
-
-cd ../IRCPlugin
 rm -f StdAfx.h.gch
 ln -s ../../../game/StdAfx.h.gch ./StdAfx.h.gch
 
