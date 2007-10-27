@@ -72,6 +72,8 @@ struct Account
 		memcpy(SessionKey, key, 40);
 	}
 
+	char Locale[4];
+
 };
 
 typedef struct 

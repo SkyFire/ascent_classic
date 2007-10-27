@@ -198,6 +198,7 @@ void LogonCommServerSocket::HandleSessionRequest(WorldPacket & recvData)
 
 		data << acct->AccountFlags;
 		data.append(acct->SessionKey, 40);
+		data.append(acct->Locale, 4);
 	}
 	
 	SendPacket(&data);

@@ -108,6 +108,10 @@ void AccountMgr::AddAccount(Field* field)
 	acct->AccountFlags			= field[4].GetUInt8();
 	acct->Banned				= field[5].GetUInt32();
 	acct->SetGMFlags(GMFlags.c_str());
+	acct->Locale[0] = 'e';
+	acct->Locale[1] = 'n';
+	acct->Locale[2] = 'U';
+	acct->Locale[3] = 'S';
 
 	// Convert username/password to uppercase. this is needed ;)
 	transform(Username.begin(), Username.end(), Username.begin(), towupper);
