@@ -2970,6 +2970,9 @@ void World::LoadNameGenData()
 	for(uint32 i = 0; i < dbc.getRecordCount(); ++i)
 	{
 		NameGenData d;
+		if(dbc.getRecord(i).getString(1)==NULL)
+			continue;
+
 		d.name = string(dbc.getRecord(i).getString(1));
 		d.type = dbc.getRecord(i).getUInt(3);
 		_namegendata[d.type].push_back(d);
