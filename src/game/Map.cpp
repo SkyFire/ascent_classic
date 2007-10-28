@@ -319,7 +319,7 @@ void Map::LoadSpawns(bool reload)
 			cspawn->channel_spell = fields[15].GetUInt32();
 			cspawn->channel_target_go = fields[16].GetUInt32();
 			cspawn->channel_target_creature = fields[17].GetUInt32();
-			spawns[cellx][celly]->CreatureSpawns.insert(cspawn);
+			spawns[cellx][celly]->CreatureSpawns.push_back(cspawn);
 			++CreatureSpawnCount;
 		}while(result->NextRow());
 
@@ -350,7 +350,7 @@ void Map::LoadSpawns(bool reload)
 			cspawn->channel_spell=0;
 			cspawn->channel_target_creature=0;
 			cspawn->channel_target_go=0;
-			staticSpawns.CreatureSpawns.insert(cspawn);
+			staticSpawns.CreatureSpawns.push_back(cspawn);
 			++CreatureSpawnCount;
 		}while(result->NextRow());
 
@@ -379,7 +379,7 @@ void Map::LoadSpawns(bool reload)
 			gspawn->faction=fields[13].GetUInt32();
 			gspawn->scale = fields[14].GetFloat();
 			gspawn->stateNpcLink = fields[15].GetUInt32();
-			staticSpawns.GOSpawns.insert(gspawn);
+			staticSpawns.GOSpawns.push_back(gspawn);
 			++GameObjectSpawnCount;
 		}while(result->NextRow());
 
@@ -421,7 +421,7 @@ void Map::LoadSpawns(bool reload)
 			if(!spawns[cellx][celly])
 				spawns[cellx][celly]=new CellSpawns;
 
-			spawns[cellx][celly]->GOSpawns.insert(gspawn);
+			spawns[cellx][celly]->GOSpawns.push_back(gspawn);
 			++GameObjectSpawnCount;
 		}while(result->NextRow());
 

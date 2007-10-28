@@ -76,8 +76,8 @@ typedef struct
 	uint32 stateNpcLink;
 } GOSpawn;
 
-typedef std::set<CreatureSpawn*> CreatureSpawnList;
-typedef std::set<GOSpawn*> GOSpawnList;
+typedef std::vector<CreatureSpawn*> CreatureSpawnList;
+typedef std::vector<GOSpawn*> GOSpawnList;
 
 typedef struct
 {

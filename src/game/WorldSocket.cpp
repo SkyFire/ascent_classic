@@ -265,7 +265,9 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	//checking if player is already connected
     //disconnect corrent player and login this one(blizzlike)
 
-	recvData.read((uint8*)lang.data(), 4);
+	if(recvData.rpos() != recvData.wpos())
+		recvData.read((uint8*)lang.data(), 4);
+
 	WorldSession *session = sWorld.FindSession( AccountID );
 	if( session)
 	{

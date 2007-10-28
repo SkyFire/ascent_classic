@@ -2517,7 +2517,7 @@ bool ChatHandler::HandleCreatureSpawnCommand(const char *args, WorldSession *m_s
 	// Add spawn to map
 	m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(
 		x,
-		y)->CreatureSpawns.insert(sp);
+		y)->CreatureSpawns.push_back(sp);
 
 	BlueSystemMessage(m_session, "Spawned a creature `%s` with entry %u at %f %f %f on map %u", info->Name, 
 		entry, sp->x, sp->y, sp->z, m_session->GetPlayer()->GetMapId());

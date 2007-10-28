@@ -204,9 +204,15 @@ bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 		{
 			uint32 cellx=float2int32(((_maxX-unit->m_spawn->x)/_cellSize));
 			uint32 celly=float2int32(((_maxY-unit->m_spawn->y)/_cellSize));
-			unit->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly)->CreatureSpawns.erase(unit->m_spawn);
+			CellSpawns * c = unit->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly);
+			for(CreatureSpawnList::iterator itr = c->CreatureSpawns.begin(); itr != c->CreatureSpawns.end(); ++itr)
+				if((*itr) == unit->m_spawn)
+				{
+					c->CreatureSpawns.erase(itr);
+					break;
+				}
+			delete unit->m_spawn;
 		}
-		
 		unit->RemoveFromWorld(false,true);
 	}
 	unit->DeleteFromDB();
@@ -683,7 +689,14 @@ bool ChatHandler::HandleGODelete(const char *args, WorldSession *m_session)
 	{
 		uint32 cellx=float2int32(((_maxX-GObj->m_spawn->x)/_cellSize));
 		uint32 celly=float2int32(((_maxY-GObj->m_spawn->y)/_cellSize));
-		m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx,celly)->GOSpawns.erase(GObj->m_spawn);
+		//m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx,celly)->GOSpawns.erase(GObj->m_spawn);
+		CellSpawns * c = GObj->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly);
+		for(GOSpawnList::iterator itr = c->GOSpawns.begin(); itr != c->GOSpawns.end(); ++itr)
+			if((*itr) == GObj->m_spawn)
+			{
+				c->GOSpawns.erase(itr);
+				break;
+			}
 		delete GObj->m_spawn;
 	}
 	GObj->DeleteFromDB();
@@ -778,7 +791,7 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 	uint32 cx = m_session->GetPlayer()->GetMapMgr()->GetPosX(m_session->GetPlayer()->GetPositionX());
 	uint32 cy = m_session->GetPlayer()->GetMapMgr()->GetPosY(m_session->GetPlayer()->GetPositionY());
 
-	m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cx,cy)->GOSpawns.insert(gs);
+	m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cx,cy)->GOSpawns.push_back(gs);
 	go->m_spawn = gs;
 	go->spawnid = gs->id;
 
