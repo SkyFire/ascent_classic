@@ -299,6 +299,9 @@ bool Master::Run(int argc, char ** argv)
 
 	sWorld.SetStartTime((uint32)UNIXTIME);
 	
+	WorldRunnable * wr = new WorldRunnable();
+	ThreadPool.ExecuteTask(wr);
+
 	_HookSignals();
 
 	ThreadPool.ExecuteTask(new CConsoleThread);
@@ -443,6 +446,7 @@ bool Master::Run(int argc, char ** argv)
 	}
 	_UnhookSignals();
 
+    wr->SetThreadState(THREADSTATE_TERMINATE);
 	ThreadPool.ShowStats();
 	/* Shut down console system */
 	sCConsole.Kill();
@@ -474,8 +478,6 @@ bool Master::Run(int argc, char ** argv)
 #endif
 	sSocketMgr.CloseAll();
 
-	ThreadPool.Shutdown();
-
 	sLog.outString("");
 
 	delete LogonCommHandler::getSingletonPtr();
@@ -483,6 +485,9 @@ bool Master::Run(int argc, char ** argv)
 	sWorld.ShutdownClasses();
 	sLog.outString("\nDeleting World...");
 	delete World::getSingletonPtr();
+
+	ThreadPool.Shutdown();
+
 	sScriptMgr.UnloadScripts();
 	delete ScriptMgr::getSingletonPtr();
 

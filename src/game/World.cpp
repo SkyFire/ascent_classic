@@ -2287,7 +2287,6 @@ bool World::SetInitialWorldSettings()
 	sAuctionMgr.LoadAuctionHouses();
 
 	m_queueUpdateTimer = mQueueUpdateInterval;
-	ThreadPool.ExecuteTask(new WorldRunnable);
 	if(Config.MainConfig.GetBoolDefault("Startup", "BackgroundLootLoading", true))
 	{
 		Log.Notice("World", "Backgrounding loot loading...");
