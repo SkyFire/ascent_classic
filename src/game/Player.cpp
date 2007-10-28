@@ -3075,6 +3075,9 @@ void Player::ResetHeartbeatCoords()
 
 void Player::RemoveFromWorld()
 {
+	if(raidgrouponlysent)
+		event_RemoveEvents(EVENT_PLAYER_EJECT_FROM_INSTANCE);
+
 	load_health = m_uint32Values[UNIT_FIELD_HEALTH];
 	load_mana = m_uint32Values[UNIT_FIELD_POWER1];
 

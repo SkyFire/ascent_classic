@@ -1377,7 +1377,10 @@ void MapMgr::BeginInstanceExpireCountdown()
 	// send our sexy packet
     data << uint32(60000) << uint32(1);
 	for(itr = m_PlayerStorage.begin(); itr != m_PlayerStorage.end(); ++itr)
-		itr->second->GetSession()->SendPacket(&data);
+	{
+		if(!itr->second->raidgrouponlysent)
+			itr->second->GetSession()->SendPacket(&data);
+	}
 
 	// set our expire time to 60 seconds.
 	InactiveMoveTime = UNIXTIME + 60;

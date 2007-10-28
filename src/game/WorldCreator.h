@@ -129,6 +129,9 @@ public:
 	// deletes all instances owned by this group
 	void OnGroupDestruction(Group * pGroup);
 
+	// player left a group, boot him out of any instances he's not supposed to be in.
+	void PlayerLeftGroup(Group * pGroup, Player * pPlayer);
+
 	// has an instance expired?
 	// can a player join?
     inline bool PlayerOwnsInstance(Instance * pInstance, Player * pPlayer)

@@ -394,6 +394,7 @@ void Group::Disband()
 
 	m_groupLock.Release();
 	CharacterDatabase.Execute("DELETE FROM groups WHERE group_id = %u", m_Id);
+	sInstanceMgr.OnGroupDestruction(this);
 	delete this;	// destroy ourselves, the destructor removes from eventmgr and objectmgr.
 }
 
@@ -523,6 +524,7 @@ void Group::RemovePlayer(PlayerInfo * info, Player* pPlayer, bool forced_remove)
 
 	if(pPlayer)
 	{
+		sInstanceMgr.PlayerLeftGroup(this, pPlayer);
 		pPlayer->SetGroup(NULL);
 		if(pPlayer->GetSession() != NULL)
 		{

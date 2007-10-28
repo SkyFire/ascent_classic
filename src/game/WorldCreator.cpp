@@ -707,6 +707,47 @@ void Instance::SaveToDB()
 	CharacterDatabase.Execute(ss.str().c_str());
 }
 
+void InstanceMgr::PlayerLeftGroup(Group * pGroup, Player * pPlayer)
+{
+	// does this group own any instances? we have to kick the player out of those instances.
+	Instance * in;
+	InstanceMap::iterator itr;
+	InstanceMap * instancemap;
+	WorldPacket data(SMSG_RAID_GROUP_ONLY, 8);
+	uint32 i;
+
+	m_mapLock.Acquire();
+	for(i = 0; i < NUM_MAPS; ++i)
+	{
+		instancemap = m_instances[i];
+		if(instancemap)
+		{
+			for(itr = instancemap->begin(); itr != instancemap->end();)
+			{
+				in = itr->second;
+				++itr;
+
+				if(in->m_creatorGroup && in->m_creatorGroup == pGroup->GetID())
+				{
+					// better make sure we're actually in that instance.. :P
+					if(!pPlayer->raidgrouponlysent && pPlayer->GetInstanceID() == in->m_instanceId)
+					{
+						data << uint32(60000) << uint32(1);
+						pPlayer->GetSession()->SendPacket(&data);
+						pPlayer->raidgrouponlysent=true;
+	
+						sEventMgr.AddEvent(pPlayer, &Player::EjectFromInstance, EVENT_PLAYER_EJECT_FROM_INSTANCE, 60000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+
+						m_mapLock.Release();
+						return;
+					}
+				}
+			}
+		}
+	}
+	m_mapLock.Release();
+}
+
 FormationMgr::FormationMgr()
 {
 	QueryResult * res = WorldDatabase.Query("SELECT * FROM creature_formations");
