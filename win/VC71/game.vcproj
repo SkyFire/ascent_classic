@@ -389,12 +389,6 @@
 				Name="Instances"
 				Filter="">
 				<File
-					RelativePath="..\..\src\game\InstanceSaveMgr.cpp">
-				</File>
-				<File
-					RelativePath="..\..\src\game\InstanceSaveMgr.h">
-				</File>
-				<File
 					RelativePath="..\..\src\game\WorldCreator.cpp">
 				</File>
 				<File

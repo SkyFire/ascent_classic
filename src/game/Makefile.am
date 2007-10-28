@@ -72,8 +72,6 @@ libgame_a_SOURCES = \
     GuildHandler.cpp \
     HonorHandler.cpp \
     HonorHandler.h \
-    InstanceSaveMgr.cpp \
-    InstanceSaveMgr.h \
     Item.cpp \
     Item.h \
     ItemHandler.cpp \
