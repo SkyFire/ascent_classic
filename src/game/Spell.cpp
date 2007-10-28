@@ -2582,7 +2582,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 
 			if(rangetolerate)
 				maxr *= 1.33f;		
-			if(!IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),target, (maxr*maxr+2)))
+			if(!IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),target, (maxr*maxr+9)))
 				return SPELL_FAILED_OUT_OF_RANGE;
 		
 			if(p_caster)
@@ -3114,8 +3114,11 @@ exit:
 	//scripted shit
 	else if(m_spellInfo->Id == 34120)
 	{	//A steady shot that causes ${$RAP*0.3+$m1} damage. 
+		//	Actual Equation (http://www.wowwiki.com/Steady_Shot)
+		//		* The tooltip is proven to be wrong and the following is the best player worked out formula so far with data taken from [1]
+		//		* Formula: DamagePercentageBonus*RangedWeaponSpecialization*(150 + WeaponDamage/WeaponSpeed*2.8 + 0.2*RAP + [Dazed: 175]) 
 		if(i==0 && u_caster)
-			value += (uint32)(u_caster->GetRAP()*0.3);
+			value += (uint32)(u_caster->GetRAP()*0.2);
 	}
     // HACK FIX
     else if(m_spellInfo->Id == 34428 || m_spellInfo->Id ==23881 ||m_spellInfo->Id == 23892 || m_spellInfo->Id==23893 ||m_spellInfo->Id == 23894||
