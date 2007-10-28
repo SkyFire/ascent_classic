@@ -455,8 +455,8 @@ void CommandTableStorage::Init()
 		//{ "renameguild", 'a', &ChatHandler::HandleRenameGuildCommand, "Renames a guild.", NULL, 0, 0, 0 },
 		{ "addguard",   'a', &ChatHandler::HandleAddGuardCommand, "Adds a guardentry to the zonetables DB and reloads.", NULL, 0, 0, 0},
 		{ "masssummon", 'z', &ChatHandler::HandleMassSummonCommand, ".masssummon - Summons all players.", NULL, 0, 0, 0},
-		{ "commands",	1, &ChatHandler::HandleCommandsCommand,		"Shows Commands",				 NULL, 0, 0, 0},
-		{ "help",		1, &ChatHandler::HandleHelpCommand,			"Shows help for command",		 NULL, 0, 0, 0},
+		{ "commands",	'h', &ChatHandler::HandleCommandsCommand,		"Shows Commands",				 NULL, 0, 0, 0},
+		{ "help",		'h', &ChatHandler::HandleHelpCommand,			"Shows help for command",		 NULL, 0, 0, 0},
 
 		{ "announce",	'u', &ChatHandler::HandleAnnounceCommand,	  "Sends Msg To All",			   NULL, 0, 0, 0},
 		{ "wannounce",   'u', &ChatHandler::HandleWAnnounceCommand,	 "Sends Widescreen Msg To All",	NULL, 0, 0, 0},
@@ -474,7 +474,7 @@ void CommandTableStorage::Init()
 		{ "morph",	   'm', &ChatHandler::HandleMorphCommand,		 "Morphs into model id x.",		NULL, 0, 0, 0},
 		{ "demorph",	 'm', &ChatHandler::HandleDeMorphCommand,	   "Demorphs from morphed model.",   NULL, 0, 0, 0},
 		{ "mount",	   'm', &ChatHandler::HandleMountCommand,		 "Mounts into modelid x.",		 NULL, 0, 0, 0},
-		{ "dismount",	  1, &ChatHandler::HandleDismountCommand,	  "Dismounts.",					 NULL, 0, 0, 0},
+		{ "dismount",	  'h', &ChatHandler::HandleDismountCommand,	  "Dismounts.",					 NULL, 0, 0, 0},
 
 		{ "gm",		  'p', &ChatHandler::HandleGMListCommand,		"Shows active GM's",			  NULL, 0, 0, 0},
 		{ "gmoff",	   't', &ChatHandler::HandleGMOffCommand,		 "Sets GM tag off",				NULL, 0, 0, 0},
@@ -516,7 +516,7 @@ void CommandTableStorage::Init()
 		{ "createaccount",'z',&ChatHandler::HandleCreateAccountCommand, ".createaccount - Creates account. Format should be .createaccount username password email", NULL, 0, 0, 0 },
 		{ "playerinfo",  'm', &ChatHandler::HandlePlayerInfo,		   ".playerinfo - Displays informations about the selected character (account...)", NULL, 0, 0, 0 },
 
-		{ "uptime",		1, &ChatHandler::HandleUptimeCommand,		"Shows server uptime",			NULL, 0, 0, 0},
+		{ "uptime",		'h', &ChatHandler::HandleUptimeCommand,		"Shows server uptime",			NULL, 0, 0, 0},
 
 		{ "modify",		'm', NULL,									 "",				 modifyCommandTable, 0, 0, 0},
 		{ "waypoint",	  'w', NULL,									 "",			   waypointCommandTable, 0, 0, 0},
