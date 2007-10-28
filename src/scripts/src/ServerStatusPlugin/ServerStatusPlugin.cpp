@@ -283,7 +283,7 @@ void StatDumper::DumpStats()
         memset(buf, 0, 500000);
 
         // Dump Instance Information
-        sWorldCreator.BuildXMLStats(buf);
+        //sWorldCreator.BuildXMLStats(buf);
         fprintf(f, buf);
         fprintf(f, "  </instances>\n");
     }
