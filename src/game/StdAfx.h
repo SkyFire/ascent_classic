@@ -132,7 +132,6 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "ItemInterface.h"
 #include "Stats.h"
 #include "WorldCreator.h"
-#include "InstanceSaveMgr.h"
 
 #include "ObjectMgr.h"
 

@@ -27,6 +27,57 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
 	_HandleAreaTriggerOpcode(id);
 }
 
+enum AreaTriggerFailures
+{
+	AREA_TRIGGER_FAILURE_OK				= 0,
+	AREA_TRIGGER_FAILURE_UNAVAILABLE	= 1,
+	AREA_TRIGGER_FAILURE_NO_BC			= 2,
+	AREA_TRIGGER_FAILURE_NO_HEROIC		= 3,
+	AREA_TRIGGER_FAILURE_NO_RAID		= 4,
+	AREA_TRIGGER_FAILURE_NO_ATTUNE		= 5,
+	AREA_TRIGGER_FAILURE_LEVEL			= 6,
+};
+
+const char * AreaTriggerFailureMessages[] = {
+	"-",
+	"This instance is unavailable",
+	"You must have The Burning Crusade Expansion to access this content.",
+	"Heroic mode unavailable for this instance.",
+	"You must be in a raid group to pass through here.",
+	"You do not have the required attunement to pass through here.",
+	"You must be at least level %u to pass through here.",
+};
+
+inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSession, Player * pPlayer, MapInfo * pMapInfo)
+{
+	if(pAreaTrigger->required_level && pPlayer->getLevel() < pAreaTrigger->required_level)
+		return AREA_TRIGGER_FAILURE_LEVEL;
+
+	if(!pMapInfo || !pMapInfo->HasFlag(WMI_INSTANCE_ENABLED))
+		return AREA_TRIGGER_FAILURE_UNAVAILABLE;
+
+	if(!pSession->HasFlag(ACCOUNT_FLAG_XPACK_01) && pMapInfo->HasFlag(WMI_INSTANCE_XPACK_01))
+		return AREA_TRIGGER_FAILURE_NO_BC;
+
+	// These can be overridden by cheats/GM
+	if(pPlayer->triggerpass_cheat)
+		return AREA_TRIGGER_FAILURE_OK;
+
+	if(pPlayer->iInstanceType == MODE_HEROIC && pMapInfo->type != INSTANCE_MULTIMODE)
+		return AREA_TRIGGER_FAILURE_NO_HEROIC;
+
+	if((pMapInfo->type == INSTANCE_MULTIMODE || pMapInfo->type == INSTANCE_RAID) && (!pPlayer->GetGroup() || (pPlayer->GetGroup() && pPlayer->GetGroup()->GetGroupType() != GROUP_TYPE_RAID)))
+		return AREA_TRIGGER_FAILURE_NO_RAID;
+
+	if(pMapInfo && pMapInfo->required_quest && !pPlayer->HasFinishedQuest(pMapInfo->required_quest))
+		return AREA_TRIGGER_FAILURE_NO_ATTUNE;
+
+	if(pMapInfo && pMapInfo->required_item && !pPlayer->GetItemInterface()->GetItemCount(pMapInfo->required_item, true))
+		return AREA_TRIGGER_FAILURE_NO_ATTUNE;
+
+	return AREA_TRIGGER_FAILURE_OK;
+}
+
 void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 {		
 	sLog.outDebug("AreaTrigger: %u", id);
@@ -51,200 +102,33 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 		return;
 	}
 
-	if(GetPermissionCount())
-	{
-		sChatHandler.BlueSystemMessage(this, "[%sSystem%s] |rEntered areatrigger: %s%u.", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, 
-			MSG_COLOR_SUBWHITE, id);
-	}
-
-	/* if we don't have an areatrigger, create one on the stack to use for gm scripts :p */
-	if(!pAreaTrigger)
-	{
-		AreaTrigger tmpTrigger;
-		tmpTrigger.AreaTriggerID = id;
-
-		//ScriptSystem->OnActivateAreaTrigger(&tmpTrigger, _player);
-		return;
-	}
-
-	/* script prerequsites */
-/*	if(ScriptSystem->OnActivateAreaTrigger(pAreaTrigger, _player) == false)
-		return;*/
-
-	if(pAreaTrigger->Type == ATTYPE_BATTLEGROUND)
-	{
-		if(pAreaTrigger->Mapid == 489)		// hack fix
-			pAreaTrigger->Mapid = 2;
-		else if(pAreaTrigger->Mapid == 529)
-			pAreaTrigger->Mapid = 3;
-		else if(pAreaTrigger->Mapid == 30)
-			pAreaTrigger->Mapid = 1;
-			
-		/*WorldPacket *pkt = sBattlegroundMgr.BuildBattlegroundListPacket(GetPlayer()->GetGUID(), _player,
-			pAreaTrigger->Mapid);
-		SendPacket(pkt);
-		delete pkt;
-		return;*/
-	}
-
-	bool bFailedPre = false;
-	std::string failed_reason;
-
-	if(pAreaTrigger->required_level && !GetPlayer()->triggerpass_cheat)
-	{
-		if(GetPlayer()->getLevel() < pAreaTrigger->required_level)
-		{
-			bFailedPre = true;
-			if(failed_reason.size() > 0)
-				failed_reason += ", and ";
-			else
-				failed_reason = "You must be ";
-
-			// mm hacky
-			char lvltext[30];
-			snprintf(lvltext, 30, "at least level %d", (int)pAreaTrigger->required_level);
-			failed_reason += lvltext;
-		}
-	}
-	if(bFailedPre)
-	{
-		failed_reason += " before you're allowed through here.";
-		WorldPacket msg(4 + 1 + 1 + failed_reason.size());
-		msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
-		msg << uint32(0) << failed_reason << uint8(0);
-		SendPacket(&msg);
-		sLog.outDebug("Player %s failed area trigger prereq - %s", GetPlayer()->GetName(), failed_reason.c_str());
-		return;
-	}
 	switch(pAreaTrigger->Type)
 	{
 	case ATTYPE_INSTANCE:
 		{
 			if(GetPlayer()->GetPlayerStatus() != TRANSFER_PENDING) //only ports if player is out of pendings
 			{
-				GetPlayer()->SaveEntryPoint(pAreaTrigger->Mapid);
-
-				//death system check.
-				Corpse *pCorpse = NULL;
-//					CorpseData *pCorpseData = NULL;
-				MapInfo *pMapinfo = NULL;
-
-				pMapinfo = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
-				if(pMapinfo && !pMapinfo->HasFlag(WMI_INSTANCE_ENABLED) && !GetPlayer()->triggerpass_cheat)
+				uint32 reason = CheckTriggerPrerequsites(pAreaTrigger, this, _player, WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid));
+				if(reason != AREA_TRIGGER_FAILURE_OK)
 				{
-					WorldPacket msg(47);
-					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
-					msg << uint32(0) << "This instance is currently unavailable." << uint8(0) << uint8(0);
-					SendPacket(&msg);
-					return;
-				}
-
-				if(pMapinfo && pMapinfo->HasFlag(WMI_INSTANCE_XPACK_01) && !HasFlag(ACCOUNT_FLAG_XPACK_01))
-				{
-					WorldPacket msg(72);
-					msg.Initialize(SMSG_BROADCAST_MSG);
-					msg << uint32(3) << "You must have The Burning Crusade Expansion to access this content." << uint8(0);
-					SendPacket(&msg);
-					return;
-				}
-
-                if(pMapinfo && pMapinfo->type != INSTANCE_MULTIMODE && GetPlayer()->iInstanceType == MODE_HEROIC && pMapinfo->type != INSTANCE_NULL)
-                {
-					WorldPacket msg(54);
-					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
-					msg << uint32(0) << "Heroic mode is not available for this instance." << uint8(0) << uint8(0);
-					SendPacket(&msg);
-					return;
-				}
-
-				if(pMapinfo && pMapinfo->type == INSTANCE_RAID && !GetPlayer()->InGroup() && !GetPlayer()->triggerpass_cheat)
-				{
-					WorldPacket msg(72);
-					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
-					msg << uint32(0) << "You need to be in a raid group to be able to enter this instance." << uint8(0) << uint8(0);
-					SendPacket(&msg);
-					return;
-				}
-
-				if(pMapinfo && pMapinfo->type == INSTANCE_RAID && GetPlayer()->InGroup() && GetPlayer()->GetGroup()->GetGroupType() != GROUP_TYPE_RAID && !GetPlayer()->triggerpass_cheat)
-				{
-					WorldPacket msg(72);
-					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
-					msg << uint32(0) << "You need to be in a raid group to be able to enter this instance." << uint8(0) << uint8(0);
-					SendPacket(&msg);
-					return;
-				}
-
-				if(pMapinfo && pMapinfo->required_quest && !_player->HasFinishedQuest(pMapinfo->required_quest) && !GetPlayer()->triggerpass_cheat)
-				{
-					WorldPacket msg( 68 );
-					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
-					msg << uint32(0) << "You do not have the required attunement to enter this instance.";
-					SendPacket(&msg);
-					return;
-				}
-
-				if(pMapinfo && pMapinfo->required_item && !_player->GetItemInterface()->GetItemCount(pMapinfo->required_item, true) && !GetPlayer()->triggerpass_cheat)
-				{
-					WorldPacket msg(68);
-					msg.Initialize(SMSG_AREA_TRIGGER_MESSAGE);
-					msg << uint32(0) << "You do not have the required attunement to enter this instance.";
-					SendPacket(&msg);
-					return;
-				}
-
-				/*if(!GetPlayer()->isAlive())
-				{
-					pCorpse = objmgr.GetCorpseByOwner(GetPlayer()->GetGUIDLow());
-					if(pCorpse)
+					const char * pReason = AreaTriggerFailureMessages[reason];
+					WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 50);
+					data << uint32(0);
+                    
+					if(reason == AREA_TRIGGER_FAILURE_LEVEL)
 					{
-						pMapinfo = WorldMapInfoStorage.LookupEntry(pCorpse->GetMapId());
-						if(pMapinfo)
-						{
-                            if(GetPlayer()->InGroup())
-							{
-								MapMgr * groupinstance = sWorldCreator.GetInstanceByGroup(GetPlayer()->GetGroup(), GetPlayer(), pMapinfo);
-								if (groupinstance)
-								{
-									if(groupinstance->GetPlayerCount() >= pMapinfo->playerlimit)
-                                    {
-                                        WorldPacket data(4);
-                                        data.Initialize(SMSG_TRANSFER_ABORTED);
-								        data << uint32(INSTANCE_ABORT_FULL);
-								        _player->GetSession()->SendPacket(&data);
-                                        GetPlayer()->RepopAtGraveyard(GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
-                                        GetPlayer()->ResurrectPlayer();
-								        return;
-                                    }
-                                }
-							}
-
-                            //if its a raid instance and corpse is inside and player is not in a group, ressurect
-							if(pMapinfo->type != INSTANCE_NULL && pMapinfo->type != INSTANCE_PVP  && pMapinfo->type != INSTANCE_NONRAID && pMapinfo->type != INSTANCE_MULTIMODE && GetPlayer()->GetMapId() != pCorpse->GetMapId() && pCorpse->GetMapId() == pAreaTrigger->Mapid  && !GetPlayer()->InGroup())
-							{
-								GetPlayer()->ResurrectPlayer();
-								return;
-							}
-                            //if its a instance and player is trying to enter when corpse is on a diferent instance, repop back
-                            else if(pMapinfo->type != INSTANCE_NULL && pMapinfo->type != INSTANCE_PVP &&  pCorpse->GetMapId() != pAreaTrigger->Mapid)
-							{
-								GetPlayer()->RepopAtGraveyard(GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
-								return;
-							}
-						}
+						// special case
+						char msg[50];
+						snprintf(msg,50,pReason,pAreaTrigger->required_level);
+						data << msg;
 					}
 					else
-					{
-						GetPlayer()->RepopAtGraveyard(GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(),GetPlayer()->GetMapId());
-						return;
-					}
+						data << pReason;
+
+					data << uint8(0);
+					SendPacket(&data);
+					return;
 				}
-				bool result = sWorldCreator.CheckInstanceForObject(static_cast<Object*>(GetPlayer()), pMapinfo);
-				if(result)
-				{
-					GetPlayer()->SaveEntryPoint(pAreaTrigger->Mapid);
-					GetPlayer()->SafeTeleport(pAreaTrigger->Mapid, 0, LocationVector(pAreaTrigger->x, pAreaTrigger->y, pAreaTrigger->z, pAreaTrigger->o));
-				}*/
 
 				GetPlayer()->SaveEntryPoint(pAreaTrigger->Mapid);
 				GetPlayer()->SafeTeleport(pAreaTrigger->Mapid, 0, LocationVector(pAreaTrigger->x, pAreaTrigger->y, pAreaTrigger->z, pAreaTrigger->o));
@@ -267,19 +151,6 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 				GetPlayer()->SafeTeleport(pAreaTrigger->Mapid, 0, LocationVector(pAreaTrigger->x, pAreaTrigger->y, pAreaTrigger->z, pAreaTrigger->o));
 			}
 		}break;
-	case ATTYPE_NULL:
-		{
-			MapInfo *pMapinfo = NULL;
-			pMapinfo = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
-			if(pMapinfo && pMapinfo->HasFlag(WMI_INSTANCE_XPACK_01) && !HasFlag(ACCOUNT_FLAG_XPACK_01))
-			{
-				WorldPacket msg(73);
-				msg.Initialize(SMSG_BROADCAST_MSG);
-				msg << uint32(3) << "You must have The Burning Crusade Expansion to access this content." << uint8(0);
-				SendPacket(&msg);
-				return;
-			}
-		}
 	default:break;
 	}
 }
