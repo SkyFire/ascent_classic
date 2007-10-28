@@ -211,6 +211,9 @@ ObjectMgr::~ObjectMgr()
 		free(itr->second->name);
 		delete itr->second;
 	}
+
+	for(GmTicketList::iterator itr = GM_TicketList.begin(); itr != GM_TicketList.end(); ++itr)
+		delete (*itr);
 }
 
 //

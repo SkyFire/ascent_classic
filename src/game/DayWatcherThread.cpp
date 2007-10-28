@@ -29,6 +29,7 @@ static HANDLE m_abortEvent = INVALID_HANDLE_VALUE;
 DayWatcherThread::DayWatcherThread()
 {
 	m_running = true;
+	m_dirty = false;
 }
 
 DayWatcherThread::~DayWatcherThread()
