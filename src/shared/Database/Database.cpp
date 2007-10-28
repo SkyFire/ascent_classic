@@ -543,3 +543,8 @@ void Database::QueueAsyncQuery(AsyncQuery * query)
 	qqueries_queue.push(query);*/
 	query->Perform();
 }
+
+void Database::FreeQueryResult(QueryResult * p)
+{
+	delete p;
+}

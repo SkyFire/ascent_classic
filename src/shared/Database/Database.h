@@ -34,13 +34,13 @@ typedef struct{
 	FastMutex busy;
 }MysqlCon;
 
-struct AsyncQueryResult
+struct SERVER_DECL AsyncQueryResult
 {
 	QueryResult * result;
 	char * query;
 };
 
-class AsyncQuery
+class SERVER_DECL AsyncQuery
 {
 	friend class Database;
 	SQLCallbackBase * func;
@@ -54,7 +54,7 @@ public:
 	inline void SetDB(Database * dbb) { db = dbb; }
 };
 
-class Database : public CThread
+class SERVER_DECL Database : public CThread
 {
 	friend class QueryThread;
 	friend class AsyncQuery;
@@ -87,6 +87,7 @@ public:
 	void QueueAsyncQuery(AsyncQuery * query);
 	void EndThreads();
 	void thread_proc_query();
+	void FreeQueryResult(QueryResult * p);
 
 protected:
 
@@ -120,7 +121,7 @@ protected:
 	QueryThread * qt;
 };
 
-class QueryResult
+class SERVER_DECL QueryResult
 {
 public:
 	QueryResult(MYSQL_RES* res, uint32 FieldCount, uint32 RowCount);
@@ -140,7 +141,7 @@ protected:
 	uint32 mType;
 };
 
-class QueryThread : public CThread
+class SERVER_DECL QueryThread : public CThread
 {
 	friend class Database;
 	Database * db;

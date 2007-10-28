@@ -2370,12 +2370,16 @@ void ObjectMgr::LoadMonsterSay()
 		{
 			text = (char*)fields[6+i].GetString();
 			if(!text) continue;
+			if(strlen(fields[6+i].GetString()) < 5)
+				continue;
 
-			texts[textcount++] = strdup(fields[6+i].GetString());
+			texts[textcount] = strdup(fields[6+i].GetString());
 
 			// check for ;
-			if(texts[textcount-1][strlen(texts[textcount-1])-1] == ';')
-				texts[textcount-1][strlen(texts[textcount-1])-1] = 0;
+			if(texts[textcount][strlen(texts[textcount])-1] == ';')
+				texts[textcount][strlen(texts[textcount])-1] = 0;
+
+			++textcount;
 		}
 
 		if(!textcount)
