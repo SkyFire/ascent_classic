@@ -72,7 +72,7 @@ MapMgr::~MapMgr()
 	delete ScriptInterface;
 	
 	// Remove objects
-	sLog.outString("	Emptying all cells of objects...");
+	Log.Notice("MapMgr","Instance %u shutdown: emptying all cells of objects...", GetInstanceID());
 	if(_cells)
 	{
 		for (uint32 i = 0; i < _sizeX; i++)
@@ -98,8 +98,6 @@ MapMgr::~MapMgr()
 		delete (*itr);
 	}
 
-	sLog.outString("	Instance %d deleted (MapId: %u)" , m_instanceID, _mapId);
-	sLog.outString("	Instance closed successfully.");
 
 	free(m_GOStorage);
 	free(m_CreatureStorage);
@@ -115,6 +113,8 @@ MapMgr::~MapMgr()
 
 		delete pCorpse;
 	}
+
+	Log.Notice("MapMgr", "Instance %u shutdown: Instance Closed Successfully. (MapId: %u)" , m_instanceID, _mapId);
 }
 
 
@@ -1347,7 +1347,9 @@ bool MapMgr::Do()
 			// just null out the pointer
 			pInstance->m_mapMgr=NULL;
 		}
-	}		
+	}
+	else if(GetMapInfo()->type == INSTANCE_NULL)
+		sInstanceMgr.m_singleMaps[GetMapId()] = NULL;
 
 	if(m_battleground)
 		BattlegroundManager.DeleteBattleground(m_battleground);
