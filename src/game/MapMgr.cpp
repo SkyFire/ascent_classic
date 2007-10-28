@@ -23,7 +23,7 @@
 
 #include "StdAfx.h"
 #define MAP_MGR_UPDATE_PERIOD 100
-#define MAPMGR_INACTIVE_MOVE_TIME 5
+#define MAPMGR_INACTIVE_MOVE_TIME 10
 
 MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>(map), _mapId(mapId), eventHolder(instanceid)
 {
@@ -33,23 +33,9 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 	m_UpdateDistance = sWorld.GetUpdateDistance();
 	pMapInfo = WorldMapInfoStorage.LookupEntry(mapId);
 	iInstanceMode = 0;
-	reset_pending = false;
-	DeletionPending = false;
 
 	// Create script interface
 	ScriptInterface = new MapScriptInterface(*this);
-	CreationTime = UNIXTIME;
-	ExpiryTime = 0;
-	RaidExpireTime = 0;
-	if(pMapInfo && pMapInfo->type == INSTANCE_RAID || pMapInfo && pMapInfo->type == INSTANCE_MULTIMODE)
-	{
-		if(!pMapInfo->cooldown)
-			pMapInfo->cooldown = 604800;
-
-		RaidExpireTime = (CreationTime + (pMapInfo ? pMapInfo->cooldown : 604800));
-	}
-	m_iCreator = 0;
-	m_GroupSignatureId = 0;
 
 	// Set up storage arrays
 	m_CreatureArraySize = map->CreatureSpawnCount;
@@ -70,10 +56,12 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 
 	m_holder = &eventHolder;
 	m_event_Instanceid = eventHolder.GetInstanceID();
-	thread_is_alive = true;
-	delete_pending = false;
+	forced_expire = false;
 	InactiveMoveTime = 0;
 	mLoopCounter=0;
+	pInstance = NULL;
+	thread_kill_only = false;
+	thread_running = false;
 }
 
 
@@ -333,7 +321,7 @@ void MapMgr::PushObject(Object *obj)
 	if(buf)
 		delete buf;
 
-	if(plObj && InactiveMoveTime)
+	if(plObj && InactiveMoveTime && !forced_expire)
 		InactiveMoveTime = 0;
 }
 
@@ -517,7 +505,7 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 			sWorld.AddGlobalSession(plObj->GetSession());
 	}
 
-	if(!HasPlayers() && !InactiveMoveTime && RaidExpireTime)
+	if(!HasPlayers() && !InactiveMoveTime && !forced_expire)
 		InactiveMoveTime = UNIXTIME + (MAPMGR_INACTIVE_MOVE_TIME * 60);	   // 5 mins -> move to inactive
 }
 
@@ -987,20 +975,6 @@ void MapMgr::UpdateInRangeSet(Object *obj, Player *plObj, MapCell* cell, ByteBuf
 
 void MapMgr::_UpdateObjects()
 {
-	if(this->pMapInfo && pMapInfo->type != INSTANCE_NULL)
-	{
-		if(HasPlayers() && reset_pending)
-		{
-			reset_pending = false;
-			ExpiryTime = 0;
-		}
-		else if(!HasPlayers() && !reset_pending)
-		{
-			reset_pending = true;
-			ExpiryTime = UNIXTIME + 600;
-		}
-	}
-
 	if(!_updates.size() && !_processQueue.size())
 		return;
 
@@ -1091,7 +1065,6 @@ void MapMgr::_UpdateObjects()
 
 void MapMgr::UpdateCellActivity(uint32 x, uint32 y, int radius)
 {
-	Instance_Map_InstanceId_Holder * pInstance =  sInstanceSavingManager.GetInstance(GetMapId(), GetInstanceID());
 	CellSpawns * sp;
 	uint32 endX = (x + radius) <= _sizeX ? x + radius : (_sizeX-1);
 	uint32 endY = (y + radius) <= _sizeY ? y + radius : (_sizeY-1);
@@ -1125,7 +1098,7 @@ void MapMgr::UpdateCellActivity(uint32 x, uint32 y, int radius)
 						posX, posY, this->_mapId, m_instanceID);
 
 					sp = _map->GetSpawnsList(posX, posY);
-					if(sp) objCell->LoadObjects(sp, pInstance);
+					if(sp) objCell->LoadObjects(sp);
 				}
 			}
 			else
@@ -1143,7 +1116,7 @@ void MapMgr::UpdateCellActivity(uint32 x, uint32 y, int radius)
 						sLog.outDetail("Loading objects for Cell [%d][%d] on map %d (instance %d)...", 
 							posX, posY, this->_mapId, m_instanceID);
 						sp = _map->GetSpawnsList(posX, posY);
-						if(sp) objCell->LoadObjects(sp, pInstance);
+						if(sp) objCell->LoadObjects(sp);
 					}
 				}
 				//Cell is no longer active
@@ -1261,59 +1234,6 @@ void MapMgr::ChangeFarsightLocation(Player *plr, Creature *farsight)
 	}
 }
 
-void MapMgr::LoadAllCells()
-{
-#ifdef WIN32
-	HANDLE hThread = OpenThread(THREAD_SUSPEND_RESUME, FALSE, threadid);
-	SuspendThread(hThread);
-	DWORD tid = threadid;
-	threadid = GetCurrentThreadId();
-#endif
-
-	MapCell * pCell;
-	char msg[50];
-	snprintf(msg,50, "Preload: Map%u", (unsigned int)_mapId);
-	//uint32 count = _sizeX * _sizeY;
-	//uint32 c = 0;
-	CellSpawns * sp;
-
-	for(uint32 x = 0; x < _sizeX; ++x)
-	{
-		for(uint32 y = 0; y < _sizeY; ++y)
-		{
-			pCell = _cells[x][y];
-			sp = _map->GetSpawnsList(x, y);
-			if(sp)
-			{
-				if(!pCell)
-				{
-					pCell = Create(x, y);
-					pCell->Init(x, y, _mapId, this);
-				}
-				pCell->LoadObjects(sp, 0);
-			}
-			/*if(pCell == 0)
-			{
-				pCell = Create(x, y);
-				pCell->Init(x, y, _mapId, this);
-				sp = _map->GetSpawnsList(x, y);
-				if(sp) pCell->LoadObjects(sp, 0);
-			}
-			else if(pCell->IsLoaded() == false)
-			{
-				sp = _map->GetSpawnsList(x, y);
-				if(sp) pCell->LoadObjects(sp, 0);
-			}*/
-		}
-	}
-#ifdef WIN32
-	threadid = tid;
-	ResumeThread(hThread);
-	CloseHandle(hThread);
-#endif
-}
-
-
 /* new stuff
 */
 
@@ -1331,6 +1251,7 @@ bool MapMgr::Do()
 #ifdef WIN32
 	threadid=GetCurrentThreadId();
 #endif
+	thread_running = true;
 	ThreadState =THREADSTATE_BUSY;
 	SetThreadName("Map mgr - M%u|I%u",this->_mapId ,this->m_instanceID);
 	ObjectSet::iterator i;
@@ -1355,21 +1276,18 @@ bool MapMgr::Do()
 	for(set<Object*>::iterator itr = _mapWideStaticObjects.begin(); itr != _mapWideStaticObjects.end(); ++itr)
 		PushStaticObject(*itr);
 
-	/* load corpses on instances */
-	if(IS_INSTANCE(GetMapId()))
-		objmgr.LoadCorpses(this);
+	/* load corpses */
+	objmgr.LoadCorpses(this);
 
 	// always declare local variables outside of the loop!
 	// otherwise theres a lot of sub esp; going on.
 
 	uint32 exec_time, exec_start;
-	time_t t = 0;
 #ifdef WIN32
 	HANDLE hThread = GetCurrentThread();
 #endif
 	while((ThreadState != THREADSTATE_TERMINATE) && !_shutdown)
 	{
-		t = UNIXTIME;
 		exec_start=getMSTime();
 		//first push to world new objects
 		m_objectinsertlock.Acquire();//<<<<<<<<<<<<<<<<
@@ -1408,84 +1326,61 @@ bool MapMgr::Do()
 #endif
 		}
 
-		////////////////////////////////////
-		// Instance Soft Reset Handler
-		///////////
-		if(ExpiryTime && t >= ExpiryTime)
-		{
-			if(GetMapInfo() && GetMapInfo()->type == INSTANCE_RAID || GetMapInfo() && GetMapInfo()->type == INSTANCE_MULTIMODE && iInstanceMode == MODE_HEROIC)
-			{
-				if(HasPlayers())
-				{
-					ExpiryTime = 0;
-					DeletionPending = false;
-					reset_pending = false;
-				}
-				else
-				{
-					DeletionPending = true;
-					sInstanceSavingManager.CreateInactiveInstance(this);
-					break;
-				}
-
-			}
-			else
-			{
-				DeletionPending = true;
-				if(HasPlayers())
-				{
-					ExpiryTime = 0;
-					DeletionPending = false;
-					reset_pending = false;
-				}
-				else
-					break;
-			}
-		}
-		if(RaidExpireTime && t >= RaidExpireTime)
-		{
-			 DeletionPending = true;
-			 if(HasPlayers())
-			 {
-				 TeleportPlayers();
-			 }
-			 break;
-		}
+		//////////////////////////////////////////////////////////////////////////
+		// Check if we have to die :P
+		//////////////////////////////////////////////////////////////////////////
+		if(InactiveMoveTime && UNIXTIME >= InactiveMoveTime)
+			break;
 	}
+
+	// Clear the instance's reference to us.
+	if(pInstance)
+	{
+		// check for a non-raid instance, these expire after 10 minutes.
+		if(GetMapInfo()->type == INSTANCE_NONRAID)
+		{
+			pInstance->m_mapMgr = NULL;
+			sInstanceMgr._DeleteInstance(pInstance, true);
+		}
+		else
+		{
+			// just null out the pointer
+			pInstance->m_mapMgr=NULL;
+		}
+	}		
 
 	if(m_battleground)
 		BattlegroundManager.DeleteBattleground(m_battleground);
 
-	if(delete_pending)
-	{
-		thread_is_alive = false;
-		GetBaseMap()->DestroyMapMgrInstance(GetInstanceID());
+	// Teleport any left-over players out.
+	TeleportPlayers();	
+
+	thread_running = false;
+	if(thread_kill_only)
 		return false;
-	}
 
-	///////////////////////////////
-	// Instance Soft Reset
-	/////////////
-	// make sure this executes in the correct context. otherwise,
-	// with per-thread heap management we're gonna have issues.
+	// delete ourselves
+	delete this;
 
-	// variable 't' never been initialized
-	if(RaidExpireTime && t >= RaidExpireTime)
-	{
-		sInstanceSavingManager.RemoveSavedInstance(GetMapId(),GetInstanceID(),true);
-		thread_is_alive = false;
-		sWorldCreator.InstanceHardReset(this);
-	}
-	else
-	{
-		if(ExpiryTime && t >= ExpiryTime)
-		{
-			thread_is_alive = false;
-			sWorldCreator.InstanceSoftReset(this);
-		}
-
-	}
+	// already deleted, so the threadpool doesn't have to.
 	return false;
+}
+
+void MapMgr::BeginInstanceExpireCountdown()
+{
+	WorldPacket data(SMSG_RAID_GROUP_ONLY, 8);
+	PlayerStorageMap::iterator itr;
+
+	// so players getting removed don't overwrite us
+	forced_expire = true;
+
+	// send our sexy packet
+    data << uint32(60000) << uint32(1);
+	for(itr = m_PlayerStorage.begin(); itr != m_PlayerStorage.end(); ++itr)
+		itr->second->GetSession()->SendPacket(&data);
+
+	// set our expire time to 60 seconds.
+	InactiveMoveTime = UNIXTIME + 60;
 }
 
 void MapMgr::AddObject(Object *obj)
@@ -1665,50 +1560,6 @@ void MapMgr::EventCorpseDespawn(uint64 guid)
 	delete pCorpse;
 }
 
-void MapMgr::RespawnMapMgr()
-{
-	//Despawn Creatures
-	for(uint32 x=1;x<m_CreatureArraySize;x++)
-	if(m_CreatureStorage[x])//have creature
-	{
-		m_CreatureStorage[x]->RemoveFromWorld(false,true);
-		delete m_CreatureStorage[x];
-		m_CreatureStorage[x] = NULL;
-	}
-	//reset guid 
-	m_CreatureHighGuid = 0;
-
-
-	//Despawn GOs
-	for(uint32 x=1;x<m_GOArraySize;x++)
-	if(m_GOStorage[x])//have creature
-	{
-		m_GOStorage[x]->RemoveFromWorld(true);
-		delete m_GOStorage[x];
-		m_GOStorage[x] = NULL;
-	}
-	//reset guid 
-	m_GOHighGuid = 0;
-	
-	//Loop through cells to load objects
-	CellSpawns * sp;
-	Instance_Map_InstanceId_Holder * pInstance = sInstanceSavingManager.GetInstance(_mapId, GetInstanceID());
-
-	for (uint32 i = 0; i < _sizeX; i++)
-	{
-		if(_cells[i]==NULL) continue;
-		for (uint32 j = 0; j < _sizeY; j++)
-		{	 
-			if(_cells[i][j] != 0)
-			{
-				sp = _map->GetSpawnsList(i, j);
-				if(sp)
-					_cells[i][j]->LoadObjects(sp, pInstance);
-			}
-		}
-	}
-}
-
 void MapMgr::TeleportPlayers()
 {
 	PlayerStorageMap::iterator itr =  m_PlayerStorage.begin();
@@ -1716,31 +1567,8 @@ void MapMgr::TeleportPlayers()
 	{
 		Object *p = itr->second;
 		++itr;
-		static_cast<Player*>(p)->SafeTeleport(static_cast<Player*>(p)->GetBindMapId(), 0, static_cast<Player*>(p)->GetBindPositionX(), static_cast<Player*>(p)->GetBindPositionY(), static_cast<Player*>(p)->GetBindPositionZ(), 3.14f);
+		static_cast<Player*>(p)->EjectFromInstance();
 	}
-}
-
-void MapMgr::SavePlayersToInstance()
-{
-	PlayerStorageMap::iterator itr =  m_PlayerStorage.begin();
-	for(; itr !=  m_PlayerStorage.end();)
-	{
-		Object *p = itr->second;
-		++itr;
-		sInstanceSavingManager.SavePlayerToInstance(((Player*)p), _mapId);
-	}
-	sInstanceSavingManager.SaveInstanceIdToDB(m_instanceID, _mapId);
-}
-
-void MapMgr::SetNewExpireTime(time_t creation)
-{
-	CreationTime = creation;
-	RaidExpireTime = creation + (pMapInfo ? pMapInfo->cooldown : 604800);
-}
-
-void MapMgr::SetCreator(Player *pPlayer)
-{
-	m_iCreator = pPlayer->GetGUID();
 }
 
 void MapMgr::UnloadCell(uint32 x,uint32 y)

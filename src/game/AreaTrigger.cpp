@@ -193,7 +193,7 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 					return;
 				}
 
-				if(!GetPlayer()->isAlive())
+				/*if(!GetPlayer()->isAlive())
 				{
 					pCorpse = objmgr.GetCorpseByOwner(GetPlayer()->GetGUIDLow());
 					if(pCorpse)
@@ -244,7 +244,10 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 				{
 					GetPlayer()->SaveEntryPoint(pAreaTrigger->Mapid);
 					GetPlayer()->SafeTeleport(pAreaTrigger->Mapid, 0, LocationVector(pAreaTrigger->x, pAreaTrigger->y, pAreaTrigger->z, pAreaTrigger->o));
-				}
+				}*/
+
+				GetPlayer()->SaveEntryPoint(pAreaTrigger->Mapid);
+				GetPlayer()->SafeTeleport(pAreaTrigger->Mapid, 0, LocationVector(pAreaTrigger->x, pAreaTrigger->y, pAreaTrigger->z, pAreaTrigger->o));
 			}
 		}break;
 	case ATTYPE_QUESTTRIGGER:

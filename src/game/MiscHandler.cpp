@@ -1782,7 +1782,7 @@ void WorldSession::HandleCompleteCinematic(WorldPacket &recv_data)
 
 void WorldSession::HandleResetInstanceOpcode(WorldPacket& recv_data)
 {
-	sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
+	sInstanceMgr.ResetSavedInstances(_player);
 }
 
 void EncodeHex(const char* source, char* dest, uint32 size)
@@ -1849,7 +1849,7 @@ void WorldSession::HandleDungeonDifficultyOpcode(WorldPacket& recv_data)
         pData << data;
 
         _player->iInstanceType = data;
-        sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
+        sInstanceMgr.ResetSavedInstances(_player);
 
         Group * m_Group = _player->GetGroup();
 
@@ -1870,7 +1870,7 @@ void WorldSession::HandleDungeonDifficultyOpcode(WorldPacket& recv_data)
     else if(!_player->GetGroup())
     {
         _player->iInstanceType = data;
-        sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
+        sInstanceMgr.ResetSavedInstances(_player);
     }
 
 #ifdef OPTIMIZED_PLAYER_SAVING

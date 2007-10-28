@@ -852,7 +852,7 @@ void WorldSession::FullLogin(Player * plr)
 
 	if(enter_world)
 	{
-		MapMgr * mapMgr = sWorldCreator.GetInstance(plr->GetMapId(), plr);
+/*		MapMgr * mapMgr = sWorldCreator.GetInstance(plr->GetMapId(), plr);
 		
 		if(mapMgr && mapMgr->m_battleground)
 		{
@@ -878,9 +878,9 @@ void WorldSession::FullLogin(Player * plr)
 				plr->SetMapId(plr->m_bgEntryPointMap);
 				plr->SetInstanceID(plr->m_bgEntryPointInstance);
 			}
-		}
+		}*/
 
-		plr->SendInitialLogonPackets();
+		//plr->SendInitialLogonPackets();
 		plr->AddToWorld();
 	}
 
@@ -888,7 +888,6 @@ void WorldSession::FullLogin(Player * plr)
 	_player->_delayAntiFlyUntil = UNIXTIME + 10;
 	_player->_heartBeatDisabledUntil = UNIXTIME + 10;
 
-	sInstanceSavingManager.BuildSavedInstancesForPlayer(plr);
 	objmgr.AddPlayer(_player);
 }
 

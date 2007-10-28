@@ -140,7 +140,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 #else
         _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &grp->GetLeader()->iInstanceType);
 #endif
-        sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
+        //sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
 		return;
 	}
 	
@@ -155,7 +155,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 #else
     _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &player->iInstanceType);
 #endif
-    sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
+    //sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
 
 	// Currentgroup and all that shit are set by addmember.
 }

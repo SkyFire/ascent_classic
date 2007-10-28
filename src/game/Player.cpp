@@ -374,6 +374,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_arenaPoints=0;
 	m_honorPointsToAdd=0;
 	hearth_of_wild_pct = 0;
+	raidgrouponlysent=false;
 }
 
 
@@ -3016,6 +3017,8 @@ void Player::AddToWorld()
 
 void Player::OnPushToWorld()
 {
+	SendInitialLogonPackets();
+
 	if(m_TeleportState == 2)   // Worldport Ack
 		OnWorldPortAck();
 
@@ -3823,7 +3826,7 @@ void Player::RepopAtGraveyard(float ox, float oy, float oz, uint32 mapid)
 	}
 	else
 	{
-		uint32 areaid = sWorldCreator.GetMap(mapid)->GetAreaID(ox,oy);
+		uint32 areaid = sInstanceMgr.GetMap(mapid)->GetAreaID(ox,oy);
 		AreaTable * at = dbcArea.LookupEntry(areaid);
 		if(!at) return;
 
@@ -5874,6 +5877,15 @@ void Player::_Relocate(uint32 mapid, const LocationVector & v, bool sendpending,
 		GetSession()->SendPacket(&data);
 	}
 
+	uint32 status = sInstanceMgr.PreTeleport(mapid, this);
+	if(status != INSTANCE_OK)
+	{
+		data.Initialize(SMSG_TRANSFER_ABORTED);
+		data << mapid << status;
+		GetSession()->SendPacket(&data);
+		return;
+	}
+
 	SetPlayerStatus(TRANSFER_PENDING);
 	
 	if(m_mapId != mapid || force_new_world)
@@ -7360,6 +7372,16 @@ void Player::CompleteLoading()
             iInstanceType = this->GetGroup()->GetLeader()->iInstanceType;
         }
 	}
+
+	if(raidgrouponlysent)
+	{
+		WorldPacket data2(SMSG_RAID_GROUP_ONLY, 8);
+		data2 << uint32(0xFFFFFFFF) << uint32(0);
+		GetSession()->SendPacket(&data2);
+		raidgrouponlysent=false;
+	}
+
+	sInstanceMgr.BuildSavedInstancesForPlayer(this);
 }
 
 void Player::OnWorldPortAck()
@@ -7383,26 +7405,13 @@ void Player::OnWorldPortAck()
 			std::string welcome_msg;
 			welcome_msg = "Welcome to ";
 			welcome_msg += pMapinfo->name;
-			welcome_msg += ".";
-            if(pMapinfo->type == INSTANCE_RAID || pMapinfo->type == INSTANCE_MULTIMODE && iInstanceType == MODE_HEROIC)
+			welcome_msg += ". ";
+            if(pMapinfo->type != INSTANCE_NONRAID && m_mapMgr->pInstance)
 			{
 				welcome_msg += "This instance is scheduled to reset on ";
-				welcome_msg += asctime(localtime(&GetMapMgr()->RaidExpireTime));
+				welcome_msg += asctime(localtime(&m_mapMgr->pInstance->m_expiration));
 			}
 			sChatHandler.SystemMessage(m_session, welcome_msg.c_str());
-		}
-		if(pMapinfo->type == INSTANCE_NONRAID || pMapinfo->type == INSTANCE_MULTIMODE && iInstanceType == MODE_NORMAL)
-		{
-			data.SetOpcode(SMSG_INSTANCE_RESET_ACTIVATE);
-			data << uint32(0x00);
-			GetSession()->SendPacket(&data);
-
-			sInstanceSavingManager.SavePlayerToInstance(this, pMapinfo->mapid);
-		} else if(pMapinfo->type == INSTANCE_NULL)
-		{
-			data.SetOpcode(SMSG_INSTANCE_RESET_ACTIVATE);
-			data << uint32(0x01);
-			GetSession()->SendPacket(&data);
 		}
 	}
 
@@ -8906,4 +8915,15 @@ void Player::EventGroupFullUpdate()
 {
 	if(m_Group)
 		m_Group->UpdateAllOutOfRangePlayersFor(this);
+}
+
+void Player::EjectFromInstance()
+{
+	if(m_bgEntryPointX && m_bgEntryPointY && m_bgEntryPointZ)
+	{
+		if(SafeTeleport(m_bgEntryPointMap, m_bgEntryPointInstance, m_bgEntryPointX, m_bgEntryPointY, m_bgEntryPointZ, m_bgEntryPointO))
+			return;
+	}
+
+	SafeTeleport(m_bind_mapid, 0, m_bind_pos_x, m_bind_pos_y, m_bind_pos_z, 0);
 }

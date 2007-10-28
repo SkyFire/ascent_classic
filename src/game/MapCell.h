@@ -25,7 +25,6 @@
 #define __MAP_CELL_H
 
 class Map;
-struct Instance_Map_InstanceId_Holder;
 
 #define MAKE_CELL_EVENT(x,y) ( ((x) * 1000) + 200 + y )
 #define DECODE_CELL_EVENT(dest_x, dest_y, ev) (dest_x) = ((ev-200)/1000); (dest_y) = ((ev-200)%1000);
@@ -66,7 +65,7 @@ public:
 	inline bool IsLoaded() { return _loaded; }
 
 	//Object Loading Managing
-	void LoadObjects(CellSpawns * sp, Instance_Map_InstanceId_Holder * pInstance);
+	void LoadObjects(CellSpawns * sp);
 	inline uint32 GetPlayerCount() { return _playerCount; }
 
 	inline bool IsUnloadPending() { return _unloadpending; }

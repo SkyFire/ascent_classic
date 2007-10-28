@@ -1477,6 +1477,8 @@ public:
 	bool triggerpass_cheat;
 	bool SafeTeleport(uint32 MapID, uint32 InstanceID, float X, float Y, float Z, float O);
 	bool SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector & vec);
+	void EjectFromInstance();
+	bool raidgrouponlysent;
 	
 	void EventSafeTeleport(uint32 MapID, uint32 InstanceID, LocationVector vec)
 	{

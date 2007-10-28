@@ -897,7 +897,7 @@ void Object::_SetCreateBits(UpdateMask *updateMask, Player *target) const
 
 void Object::AddToWorld()
 {
-	MapMgr *mapMgr = sWorldCreator.GetInstance(m_mapId, this);
+	MapMgr *mapMgr = sInstanceMgr.GetInstance(this);
 	if(!mapMgr)
 		return; //instance add failed
 

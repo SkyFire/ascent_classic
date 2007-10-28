@@ -1395,7 +1395,7 @@ bool ChatHandler::HandleGoInstanceCommand(const char* args, WorldSession* m_sess
 		data2 << mapid << x << y << z << (float)3.14;
 		plr->GetSession()->SendPacket(&data2);
 	} else {
-		MapMgr *instance = sWorldCreator.GetInstance(instanceid);
+/*		MapMgr *instance = sWorldCreator.GetInstance(instanceid);
 		if(!instance)
 		{
 			BlueSystemMessage(m_session, "Invalid instance specified.");
@@ -1413,7 +1413,7 @@ bool ChatHandler::HandleGoInstanceCommand(const char* args, WorldSession* m_sess
 		plr->GetSession()->SendPacket(&data);
 		WorldPacket data2(SMSG_NEW_WORLD, 20);
 		data2 << mapid << x << y << z << (float)3.14;
-		plr->GetSession()->SendPacket(&data2);
+		plr->GetSession()->SendPacket(&data2);*/
 	}
 	GreenSystemMessage(m_session, "Ported to instance %u on map %u", instanceid, mapid);
 	return true;
@@ -1427,10 +1427,10 @@ bool ChatHandler::HandleCreateInstanceCommand(const char* args, WorldSession* m_
 		RedSystemMessage(m_session, "Needs to be in format .createinstance <mapid>");
 		return true;
 	}
-	Map *pMap = sWorldCreator.GetMap(mapid);
+	/*Map *pMap = sWorldCreator.GetMap(mapid);
 	MapMgr *pMapMgr = pMap->CreateMapMgrInstance();
 
-	GreenSystemMessage(m_session, "Instance %u on map %u created.", pMapMgr->GetInstanceID(), pMapMgr->GetMapId());
+	GreenSystemMessage(m_session, "Instance %u on map %u created.", pMapMgr->GetInstanceID(), pMapMgr->GetMapId());*/
 	return true;
 }
 

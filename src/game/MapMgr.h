@@ -36,6 +36,7 @@ class Pet;
 class Transporter;
 class Corpse;
 class CBattleground;
+class Instance;
 
 
 enum MapMgrTimers
@@ -60,7 +61,7 @@ typedef std::set<Object*> UpdateQueue;
 typedef std::set<Player*> PUpdateQueue;
 typedef std::set<Player*> PlayerSet;
 typedef HM_NAMESPACE::hash_map<uint32, Object*> StorageMap;
-typedef HM_NAMESPACE::hash_map<uint64, uint64> CombatProgressMap;
+typedef set<uint64> CombatProgressMap;
 typedef set<Creature*> CreatureSet;
 typedef set<GameObject*> GameObjectSet;
 typedef HM_NAMESPACE::hash_map<uint32, Creature*> CreatureSqlIdMap;
@@ -202,7 +203,7 @@ public:
 	CombatProgressMap _combatProgress;
 	void AddCombatInProgress(uint64 guid)
 	{
-		_combatProgress[guid] = guid;
+		_combatProgress.insert(guid);
 	}
 	void RemoveCombatInProgress(uint64 guid)
 	{
@@ -221,13 +222,11 @@ public:
 	MapMgr(Map *map, uint32 mapid, uint32 instanceid);
 	~MapMgr();
 
-
 	void PushObject(Object *obj);
 	void PushStaticObject(Object * obj);
 	void RemoveObject(Object *obj, bool free_guid);
 	void ChangeObjectLocation(Object *obj); // update inrange lists
 	void ChangeFarsightLocation(Player *plr, Creature *farsight);
-
 
 	//! Mark object as updated
 	void ObjectUpdated(Object *obj);
@@ -248,8 +247,6 @@ public:
 	inline bool IsCombatInProgress() { return (_combatProgress.size() > 0); }
 	void TeleportPlayers();
 
-	inline void SetResetPending(bool val) { reset_pending = val; }
-
 	inline uint32 GetInstanceID() { return m_instanceID; }
 	inline MapInfo *GetMapInfo() { return pMapInfo; }
 
@@ -261,35 +258,42 @@ public:
 	void LoadAllCells();
 	inline size_t GetPlayerCount() { return m_PlayerStorage.size(); }
 
-	time_t CreationTime;
-	time_t ExpiryTime;
 	void _PerformObjectDuties();
 	uint32 mLoopCounter;
 	uint32 lastGameobjectUpdate;
 	uint32 lastUnitUpdate;
 	void EventCorpseDespawn(uint64 guid);
-	void RespawnMapMgr();
 
-	//Map Mgr Instance functions
-	time_t RaidExpireTime;
-	void SetCreator(Player *pPlayer);
-	uint64 GetCreator() { return m_iCreator; }
-	uint32 GetGroupSignature() { return m_GroupSignatureId; }
-	void SetGroupSignature(uint32 iGroupSignature) { m_GroupSignatureId = iGroupSignature; }
-	bool IsDeletionPending() { return (DeletionPending == true); }
-	void SavePlayersToInstance();
-	void SetNewExpireTime(time_t creation);
-	bool bEncounterInProgress;
 	time_t InactiveMoveTime;
     uint32 iInstanceMode;
-	bool thread_is_alive;
-	bool delete_pending;
 
 	void UnloadCell(uint32 x,uint32 y);
 	void EventRespawnCreature(Creature * c, MapCell * p);
 	void EventRespawnGameObject(GameObject * o, MapCell * c);
 	void SendMessageToCellPlayers(Object * obj, WorldPacket * packet, uint32 cell_radius = 2);
 	void SendChatMessageToCellPlayers(Object * obj, WorldPacket * packet, uint32 cell_radius, uint32 langpos, int32 lang, WorldSession * originator);
+
+	Instance * pInstance;
+	void BeginInstanceExpireCountdown();
+	
+	// better hope to clear any references to us when calling this :P
+	void InstanceShutdown()
+	{
+		pInstance = NULL;
+		SetThreadState(THREADSTATE_TERMINATE);
+	}
+
+	// kill the worker thread only
+	void KillThread()
+	{
+		pInstance=NULL;
+		thread_kill_only = true;
+		SetThreadState(THREADSTATE_TERMINATE);
+		while(thread_running)
+		{
+			Sleep(100);
+		}
+	}
 
 protected:
 
@@ -322,15 +326,12 @@ private:
 	uint32 m_instanceID;
 
 	MapScriptInterface * ScriptInterface;
-	bool reset_pending;
-	bool DeletionPending;
-	uint64 m_iCreator;
-	uint32 m_GroupSignatureId;
 
 public:
 #ifdef WIN32
 	DWORD threadid;
 #endif
+
 	GameObjectSet activeGameObjects;
 	CreatureSet activeCreatures;
 	EventableObjectHolder eventHolder;
@@ -343,6 +344,10 @@ public:
 	GameObject * GetSqlIdGameObject(uint32 sqlid);
 	deque<uint32> _reusable_guids_gameobject;
 	deque<uint32> _reusable_guids_creature;
+
+	bool forced_expire;
+	bool thread_kill_only;
+	bool thread_running;
 };
 
 #endif

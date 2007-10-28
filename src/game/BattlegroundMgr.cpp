@@ -773,11 +773,11 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 		static const uint32 arena_map_ids[3] = { 559, 562, 572 };
 		uint32 mapid = /*arena_map_ids[sRand.randInt(3)]*/562;
 		uint32 players_per_side;
-        if(sWorldCreator.CreateInstance(mapid, 0, &mgr) == false || !mgr)
+/*        if(sWorldCreator.CreateInstance(mapid, 0, &mgr) == false || !mgr)
 		{
 			Log.Error("BattlegroundManager", "Arena CreateInstance() call failed for map %u, type %u, level group %u", mapid, Type, LevelGroup);
 			return NULL;		// Shouldn't happen
-		}
+		}*/
 
 		switch(Type)
 		{
@@ -816,11 +816,11 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 	}
 
 	/* Create Map Manager */
-	if(sWorldCreator.CreateInstance(BGMapIds[Type], 0, &mgr) == false || !mgr)
+/*	if(sWorldCreator.CreateInstance(BGMapIds[Type], 0, &mgr) == false || !mgr)
 	{
 		Log.Error("BattlegroundManager", "CreateInstance() call failed for map %u, type %u, level group %u", BGMapIds[Type], Type, LevelGroup);
 		return NULL;		// Shouldn't happen
-	}
+	}*/
 
 	/* Call the create function */
 	iid = ++m_maxBattlegroundId;
@@ -1164,8 +1164,7 @@ void CBattleground::Close()
 	OnClose();
 
 	/* shut down the map thread. this will delete the battleground from the corrent context. */
-	m_mapMgr->SetThreadState(THREADSTATE_TERMINATE);
-	m_mapMgr->delete_pending = true;
+	m_mapMgr->InstanceShutdown();
 
 	m_mainLock.Release();
 }

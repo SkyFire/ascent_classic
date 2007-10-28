@@ -42,14 +42,19 @@ enum INSTANCE_MODE
 
 enum INSTANCE_ABORT_ERROR
 {
-	INSTANCE_ABORT_ERROR	 = 0x00,
+	INSTANCE_ABORT_ERROR_ERROR	 = 0x00,
 	INSTANCE_ABORT_FULL	  = 0x01,
 	INSTANCE_ABORT_NOT_FOUND = 0x02,
 	INSTANCE_ABORT_TOO_MANY  = 0x03,
 	INSTANCE_ABORT_ENCOUNTER = 0x04,
+	INSTANCE_ABORT_NON_CLIENT_TYPE = 0x05,
+	INSTANCE_ABORT_HEROIC_MODE_NOT_AVAILABLE = 0x06,
+	INSTANCE_ABORT_NOT_IN_RAID_GROUP = 0x07,
+
+	INSTANCE_OK = 0x10,
 };
 
-#define INSTANCE_OK  INSTANCE_ABORT_TOO_MANY + 0x01
+extern const char * InstanceAbortMessages[];
 
 class Map;
 class MapMgr;
@@ -59,10 +64,6 @@ class Group;
 class Player;
 class MapUpdaterThread;
 class Battleground;
-
-// first = mapid
-// first = instance id
-typedef std::map<uint32, std::map<uint32, std::pair<Map*, Battleground*> > > BattlegroundInstanceMap;
 
 class SERVER_DECL FormationMgr : public Singleton < FormationMgr >
 {
@@ -78,45 +79,109 @@ public:
 		return (itr == m_formations.end()) ? 0 : itr->second;
 	}
 };
-class SERVER_DECL WorldCreator :  public Singleton < WorldCreator >
+
+class Instance
 {
 public:
-	WorldCreator(TaskList * tl);	
-	~WorldCreator();
+	uint32 m_instanceId;
+	uint32 m_mapId;
+	MapMgr * m_mapMgr;
+	uint32 m_creatorGuid;
+	uint32 m_creatorGroup;
+	uint32 m_difficulty;
+    set<uint32> m_killedNpcs;
+	time_t m_creation;
+	time_t m_expiration;
+	MapInfo * m_mapInfo;
 
-	Map* GetMap(uint32 mapid);
-	MapMgr * GetInstance(uint32 mapid, Object* obj);
-	MapMgr * GetInstance(uint32 mapid, uint32 instanceId);
-	MapMgr * GetInstance(uint32 instanceId);
-	MapMgr * ISMGetInstanceBeforeRemoval(uint32 InstanceID, uint32 mapid, bool Lock);
-	MapMgr * GetInstanceByGroup(Group *pGroup, Player *pPlayer, MapInfo *pMapInfo);
-	MapMgr * GetInstanceByCreator(Player *pCreator, MapInfo *pMapInfo);
+	void LoadFromDB(Field * fields);
+	void SaveToDB();
+	void DeleteFromDB();
+};
 
-	//Normal instance management
-	uint32 CreateInstance(Group *pGroup, Player *pPlayer, uint32 mapid, uint32 instanceid = 0, uint32 creation = 0, MapMgr ** destptr = 0, uint32 difficulty = 0);
-	uint32 CreateInstance(uint32 mapid, uint32 instanceid, MapMgr ** destptr);
+#define NUM_MAPS 600
+typedef HM_NAMESPACE::hash_map<uint32, Instance*> InstanceMap; 
 
-    void DeleteInstance(uint32 instanceid, uint32 mapid);
-	bool CheckInstanceForObject(Object *obj, MapInfo *pMapinfo);
+class SERVER_DECL InstanceMgr
+{
+	friend class MapMgr;
+public:
+	InstanceMgr();	
+	~InstanceMgr();
 
+	inline Map* GetMap(uint32 mapid)
+	{
+		if(mapid>NUM_MAPS)
+			return NULL;
+		else
+			return m_maps[mapid];
+	}
+
+	uint32 PreTeleport(uint32 mapid, Player * plr);
+	MapMgr * GetInstance(Object* obj);
 	uint32 GenerateInstanceID();
-	void InstanceSoftReset(MapMgr *mMapMgr);
-	void InstanceHardReset(MapMgr *mMapMgr);
-
 	void BuildXMLStats(char * m_file);
-	void CreateMap(uint32 mapid) { _CreateMap(mapid); }
+	void Load(TaskList * l);
+
+	// deletes all instances owned by this player.
+	void ResetSavedInstances(Player * plr);
+
+	// deletes all instances owned by this group
+	void OnGroupDestruction(Group * pGroup);
+
+	// has an instance expired?
+	// can a player join?
+    inline bool PlayerOwnsInstance(Instance * pInstance, Player * pPlayer)
+	{
+		// expired?
+		if( pInstance->m_expiration && (UNIXTIME+20) >= pInstance->m_expiration)
+		{
+			// delete the instance
+			_DeleteInstance(pInstance, true);
+			return false;
+		}
+
+		if( (pPlayer->GetGroup() && pInstance->m_creatorGroup == pPlayer->GetGroup()->GetID()) || pPlayer->GetGUIDLow() == pInstance->m_creatorGuid )
+			return true;
+
+		return false;
+	}
+
+	// has an instance expired?
+	inline bool HasInstanceExpired(Instance * pInstance)
+	{
+		// expired?
+		if( pInstance->m_expiration && (UNIXTIME+20) >= pInstance->m_expiration)
+			return true;
+
+		return false;
+	}
+
+	// check for expired instances
+	void CheckForExpiredInstances();
+
+	// delete all instances
+	void Shutdown();
+
+	// packets, w000t! we all love packets!
+	void BuildRaidSavedInstancesForPlayer(Player * plr);
+	void BuildSavedInstancesForPlayer(Player * plr);
 
 private:
-	Map* _CreateMap(uint32 mapid);
-	std::map<uint32, Map*> _maps;
+	void _LoadInstances();
+	void _CreateMap(uint32 mapid);
+	MapMgr* _CreateInstance(Instance * in);
+	MapMgr* _CreateInstance(uint32 mapid, uint32 instanceid);		// only used on main maps!
+	bool _DeleteInstance(Instance * in, bool ForcePlayersOut);
 
 	uint32 m_InstanceHigh;
 
-	//thread locks
-	Mutex _busy;
+	Mutex m_mapLock;
+	Map * m_maps[NUM_MAPS];
+	InstanceMap* m_instances[NUM_MAPS];
+	MapMgr * m_singleMaps[NUM_MAPS];
 };
 
-#define sWorldCreator WorldCreator::getSingleton()
-#define sInstanceSavingManager InstanceSavingManagement::getSingleton()
+extern InstanceMgr sInstanceMgr;
 
 #endif

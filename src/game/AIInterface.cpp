@@ -450,20 +450,14 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				HandleEvent(EVENT_FOLLOWOWNER, m_Unit, 0);
 			}*/
 
-			if(m_Unit->GetMapMgr() && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID || m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_MULTIMODE)
+			if(m_Unit->GetMapMgr())
 			{
 				if(m_Unit->GetTypeId() == TYPEID_UNIT && !m_Unit->IsPet())
 				{
-					if(static_cast<Creature*>(m_Unit)->GetCreatureName() && static_cast<Creature*>(m_Unit)->GetCreatureName()->Rank == 3)
+					if(m_Unit->GetMapMgr()->pInstance && m_Unit->GetMapMgr()->GetMapInfo()->type != INSTANCE_NONRAID)
 					{
-						m_Unit->GetMapMgr()->RemoveCombatInProgress(m_Unit->GetGUID());
-						sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
-						m_Unit->GetMapMgr()->SavePlayersToInstance();
-					}
-					else if(static_cast<Creature*>(m_Unit)->proto && static_cast<Creature*>(m_Unit)->proto->boss && m_Unit->GetMapMgr()->iInstanceMode == MODE_HEROIC)
-					{
-						sInstanceSavingManager.SaveObjectStateToInstance(m_Unit);
-						m_Unit->GetMapMgr()->SavePlayersToInstance();
+						m_Unit->GetMapMgr()->pInstance->m_killedNpcs.insert(((Creature*)m_Unit)->GetSQL_id());
+						m_Unit->GetMapMgr()->pInstance->SaveToDB();
 					}
 				}
 			}

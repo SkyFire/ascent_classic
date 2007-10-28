@@ -175,18 +175,24 @@ void MapCell::RemoveObjects()
 }
 
 
-void MapCell::LoadObjects(CellSpawns * sp, Instance_Map_InstanceId_Holder * pInstance)
+void MapCell::LoadObjects(CellSpawns * sp)
 {
 	_loaded = true;
+	Instance * pInstance = _mapmgr->pInstance;
 
 	if(sp->CreatureSpawns.size())//got creatures
 	{
 		for(CreatureSpawnList::iterator i=sp->CreatureSpawns.begin();i!=sp->CreatureSpawns.end();i++)
 		{
-			if(pInstance && pInstance->FindObject((*i)->id) || pInstance && pInstance->FindObject((*i)->respawnNpcLink))
+			if(pInstance)
 			{
-				continue;
+				if(pInstance->m_killedNpcs.find((*i)->id) != pInstance->m_killedNpcs.end())
+					continue;
+
+				if((*i)->respawnNpcLink && pInstance->m_killedNpcs.find((*i)->respawnNpcLink) != pInstance->m_killedNpcs.end())
+					continue;
 			}
+
 			Creature * c=_mapmgr->CreateCreature();
 
 			c->SetMapId(_mapmgr->GetMapId());
@@ -212,11 +218,13 @@ void MapCell::LoadObjects(CellSpawns * sp, Instance_Map_InstanceId_Holder * pIns
 			if(go->Load(*i))
 			{
 				uint32 state = go->GetUInt32Value(GAMEOBJECT_STATE);
+
+				// FIXME - burlex
+				/*
 				if(pInstance && pInstance->FindObject((*i)->stateNpcLink))
 				{
 					go->SetUInt32Value(GAMEOBJECT_STATE, (state ? 0 : 1));
-				}
-			   
+				}*/			   
 
 				go->PushToWorld(_mapmgr);
 			}

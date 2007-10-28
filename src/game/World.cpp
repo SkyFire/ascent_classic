@@ -92,14 +92,11 @@ World::~World()
 	delete CBattlegroundManager::getSingletonPtr();
 
 	sLog.outString("Removing all objects and deleting WorldCreator...\n");
-	delete WorldCreator::getSingletonPtr();
+	sInstanceMgr.Shutdown();
 
 	//sLog.outString("Deleting Thread Manager..");
 	//delete ThreadMgr::getSingletonPtr();
 	delete WordFilter::getSingletonPtr();
-
-	sLog.outString("Deleting Instance Saving Management...");
-	delete InstanceSavingManagement::getSingletonPtr();
 
 	sLog.outString("Deleting Random Number Generator...");
 	delete MTRand::getSingletonPtr();
@@ -453,7 +450,7 @@ bool World::SetInitialWorldSettings()
 #endif
 
 	// calling this puts all maps into our task list.
-	new WorldCreator(&tl);
+	sInstanceMgr.Load(&tl);
 
 	// wait for the events to complete.
 	tl.wait();
@@ -464,9 +461,7 @@ bool World::SetInitialWorldSettings()
 	sLog.outString("");
 	LoadNameGenData();
 
-	new InstanceSavingManagement;
-	sInstanceSavingManager.LoadSavedInstances();
-	
+
 	//Updating spell.dbc--this is slow like hell due to we cant read string fields
 	//dbc method will be changed in future
 	DBCFile dbc;
@@ -2292,15 +2287,6 @@ bool World::SetInitialWorldSettings()
 	sAuctionMgr.LoadAuctionHouses();
 
 	m_queueUpdateTimer = mQueueUpdateInterval;
-	if(Config.MainConfig.GetBoolDefault("Startup", "Preloading", false))
-	{
-		// Load all data on each map.
-
-		sWorldCreator.GetInstance(0, uint32(0))->LoadAllCells();
-		sWorldCreator.GetInstance(1, uint32(0))->LoadAllCells();
-		sWorldCreator.GetInstance(530, uint32(0))->LoadAllCells();
-	}
-
 	ThreadPool.ExecuteTask(new WorldRunnable);
 	if(Config.MainConfig.GetBoolDefault("Startup", "BackgroundLootLoading", true))
 	{
@@ -2603,7 +2589,7 @@ void World::UpdateQueuedSessions(uint32 diff)
 
 void World::SaveAllPlayers()
 {
-	if(!(ObjectMgr::getSingletonPtr() && WorldCreator::getSingletonPtr()))
+	if(!(ObjectMgr::getSingletonPtr()))
 		return;
 
 	sLog.outString("Saving all players to database...");
@@ -2676,7 +2662,6 @@ void World::ShutdownClasses()
 	delete LootMgr::getSingletonPtr();
 
 	delete MailSystem::getSingletonPtr();
-	delete WorldCreator::getSingletonPtr();
 }
 
 void World::EventDeleteBattleground(Battleground * BG)

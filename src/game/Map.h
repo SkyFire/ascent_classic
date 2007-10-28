@@ -27,7 +27,6 @@
 class MapMgr;
 class TemplateMgr;
 struct MapInfo;
-typedef std::map<uint32, MapMgr*> InstanceMap;
 class TerrainMgr;
 
 #include "TerrainMgr.h"
@@ -88,27 +87,14 @@ typedef struct
 class SERVER_DECL Map
 {
 public:
-	Map(uint32 mapid);
+	Map(uint32 mapid, MapInfo * inf);
 	~Map();
 
-	inline InstanceMap::iterator GetInstancesBegin() { return _instances.begin(); }
-	inline InstanceMap::iterator GetInstancesEnd() { return _instances.end(); }
-
-	MapMgr * CreateMapMgrInstance(uint32 instanceid = 0);
-	void DestroyMapMgrInstance(uint32 instanceId);
-	MapMgr * GetFirstInstance();	// for main continents
-
-	MapMgr * GetInstance(Object* obj);
-	MapMgr * GetInstance(uint32 instanceId);
-	MapMgr * GetRawInstance(uint32 instanceid); //this function bypass pending stattes
-	MapMgr * GetInstanceByGroup(Group *pGroup, Player *pCaller);
-	MapMgr * GetInstanceByCreator(Player *pCreator);
-	MapMgr * GetInstanceByGroupInstanceId(uint32 InstanceID, bool Lock);
-	MapMgr * InstanceExists(uint32 instanceId);
 	inline string GetNameString() { return name; }
 	inline const char* GetName() { return name.c_str(); }
 	inline MapEntry* GetDBCEntry() { return me; }
 	void BuildXMLStats(char * m_file);
+
 	inline CellSpawns *GetSpawnsList(uint32 cellx,uint32 celly)
 	{
 		ASSERT(cellx < _sizeX);
@@ -213,14 +199,11 @@ public:
 	}
 
 private:
-	InstanceMap	 _instances;	
 	MapInfo *	   _mapInfo;
 	TerrainMgr*	 _terrain;
 	uint32 _mapId;
 	string name;
 	MapEntry * me;
-	Mutex listmutex;
-	
 
 	//new stuff
 	CellSpawns **spawns[_sizeX];

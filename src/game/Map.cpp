@@ -23,36 +23,23 @@
 
 #include "StdAfx.h"
 
-Map::Map(uint32 mapid)
+Map::Map(uint32 mapid, MapInfo * inf)
 {
 	memset(spawns,0,sizeof(CellSpawns*) * _sizeX);
 
-	_mapInfo = WorldMapInfoStorage.LookupEntry(mapid);
+	_mapInfo = inf;
 	_mapId = mapid;
-
-	bool instance;
-	if(_mapInfo)
-	{
-		// for non-instances, create our one instance.
-		instance= _mapInfo->type != INSTANCE_NULL;
-	 } else 
-	{
-		instance = IS_INSTANCE(_mapId);
-	}
 
 	//new stuff Load Spawns
 	LoadSpawns(false);
 
 	// Setup terrain
-	_terrain = new TerrainMgr(sWorld.MapPath, _mapId, instance);
+	_terrain = new TerrainMgr(sWorld.MapPath, _mapId, !(inf->type==INSTANCE_NULL));
 	if(!_terrain->LoadTerrainHeader())
 	{
 		delete _terrain;
 		_terrain = NULL;
 	}
-
-	if(!instance)
-		CreateMapMgrInstance();
 
 	// get our name
 	me = dbcMap.LookupEntry(_mapId);
@@ -64,13 +51,7 @@ Map::Map(uint32 mapid)
 
 Map::~Map()
 {
-	sLog.outString("  Deleting all instances of map %u", _mapId);
-	for(std::map<uint32, MapMgr*>::iterator it = _instances.begin();
-		it != _instances.end(); ++it)
-	{
-		it->second->_shutdown = true;
-		delete it->second;
-	}
+	Log.Notice("Map", "~Map %u", this->_mapId);
 	delete _terrain;
 
 	for(uint32 x=0;x<_sizeX;x++)
@@ -101,148 +82,10 @@ Map::~Map()
 		delete *i;
 }
 
-MapMgr * Map::GetInstance(uint32 instanceId)
-{
-	if(_mapInfo && _mapInfo->type == INSTANCE_NULL)
-		return GetFirstInstance();
-	else if(!IS_INSTANCE(_mapId ))
-		return GetFirstInstance();
-	return InstanceExists(instanceId);
-}
-
-MapMgr * Map::GetRawInstance(uint32 instanceid)
-{
-	listmutex.Acquire();
-	InstanceMap::iterator itr = _instances.find(instanceid);
-	if(itr == _instances.end())
-	{
-		listmutex.Release();
-		return NULL;
-	}
-	MapMgr*rv = itr->second;
-	listmutex.Release();
-	return rv;
-}
-
-MapMgr * Map::InstanceExists(uint32 instanceId)
-{
-	listmutex.Acquire();
-	// we called the wrong number? :P
-	InstanceMap::iterator itr = _instances.find(instanceId);
-	if(itr == _instances.end())
-	{
-		listmutex.Release();
-		return NULL;
-	}
-
-	MapMgr*rv = itr->second;
-	if(rv && rv->IsDeletionPending())
-	{
-		listmutex.Release();
-		return NULL;
-	}
-	listmutex.Release();
-	return rv;
-}
-
-MapMgr * Map::GetInstance(Object* obj)
-{
-	// lazy
-	MapMgr * mapMgr = GetInstance(obj->GetInstanceID());
-	if(!mapMgr)
-	{
-		// Oops, we're trying to join an invalid instance
-		if(obj->GetTypeId() == TYPEID_PLAYER)
-		{
-			Player *plr = static_cast<Player*>(obj);
-			sChatHandler.RedSystemMessage(plr->GetSession(), "You tried to join an invalid instance (%u on map %u). Repopping at %s.", obj->GetInstanceID(), _mapId, (plr->m_bgEntryPointX != 0.0f ? "entry point" : "exit battleground"));
-			if(plr->m_bgEntryPointX != 0.0f)
-			{
-				plr->SetPosition(plr->m_bgEntryPointX, plr->m_bgEntryPointY, plr->m_bgEntryPointZ,
-					plr->m_bgEntryPointO, true);
-				plr->SetMapId(plr->m_bgEntryPointMap);
-				plr->SetInstanceID(plr->m_bgEntryPointInstance);
-			} else if(_mapInfo != NULL) {
-				plr->SetMapId(_mapInfo->repopmapid);
-				plr->SetPosition(_mapInfo->repopx, _mapInfo->repopy, _mapInfo->repopz, 3.14f);
-				plr->SetInstanceID(0);
-			} else {
-				PlayerCreateInfo *Info = objmgr.GetPlayerCreateInfo(plr->getRace(), plr->getClass());
-				plr->SetMapId(Info->mapId);
-				plr->SetInstanceID(Info->mapId+1);
-				plr->SetPosition(Info->positionX, Info->positionY, Info->positionZ, 0, true);
-			}
-			plr->_Relocate(plr->GetMapId(), plr->GetPosition(), true, true);
-			return NULL;
-		} else {
-			// this will destroy the creature :p
-			return 0;
-		}
-	}
-	if(mapMgr && mapMgr->IsDeletionPending()) { return NULL; }
-	return mapMgr;
-}
-
-MapMgr * Map::CreateMapMgrInstance(uint32 instanceid)
-{
-	uint32 instanceId;
-	if(instanceid)
-		instanceId = instanceid;
-	else
-		instanceId = sWorldCreator.GenerateInstanceID();
-
-	MapMgr *mapMgr = new MapMgr(this, _mapId, instanceId);
-	listmutex.Acquire(); 
-	ASSERT(_instances.find(instanceId) == _instances.end());
-	_instances[instanceId]=mapMgr;
-	listmutex.Release();
-	ThreadPool.ExecuteTask(mapMgr);
-
-	return mapMgr;
-}
-
-void Map::DestroyMapMgrInstance(uint32 instanceId)
-{
-	listmutex.Acquire();
-	InstanceMap::iterator it = _instances.find(instanceId);
-	ASSERT(it != _instances.end());
-
-	sLog.outError("Deleting instance %u of map %u", instanceId, _mapId);
-	if(it->second->thread_is_alive)
-	{
-		it->second->delete_pending = true;
-		it->second->SetThreadState(THREADSTATE_TERMINATE);
-		listmutex.Release();
-		return;
-	}
-
-	if(it->second->m_battleground)
-		it->second->TeleportPlayers();
-
-	delete it->second;
-	_instances.erase(it);
-	listmutex.Release();
-}
-
-MapMgr * Map::GetFirstInstance()
-{
-	MapMgr *rv;
-	listmutex.Acquire();
-	InstanceMap::iterator it = _instances.begin();
-	ASSERT(it != _instances.end());
-	rv=it->second;
-	if(rv && rv->IsDeletionPending())
-	{
-		listmutex.Release();
-		return NULL;
-	}
-	listmutex.Release();
-	return rv;
-}
 
 void Map::BuildXMLStats(char * m_file)
 {
-	char tmp[200];
+	/*char tmp[200];
 	strcpy(tmp, "");
 #define pushline strcat(m_file, tmp)
 
@@ -261,7 +104,7 @@ void Map::BuildXMLStats(char * m_file)
 		snprintf(tmp, 200, "	  <expirytime>%s</expirytime>\n", mgr->ExpiryTime ? asctime(localtime(&mgr->ExpiryTime)) : "Never");			  pushline;
 		snprintf(tmp, 200, "	</instance>\n");																	  pushline;
 	}
-#undef pushline
+#undef pushline*/
 }
 
 void Map::LoadSpawns(bool reload)
@@ -429,142 +272,4 @@ void Map::LoadSpawns(bool reload)
 	}
 
 	Log.Notice("Map", "%u creatures / %u gameobjects on map %u cached.", CreatureSpawnCount, GameObjectSpawnCount, _mapId);
-}
-
-MapMgr * Map::GetInstanceByGroup(Group *pGroup, Player * pCaller)
-{
-	MapMgr * pInstance = NULL;
-	listmutex.Acquire();
-	InstanceMap::iterator itr = _instances.begin();
-
-	for(; itr != _instances.end(); ++itr)
-	{
-		pInstance = itr->second;
-		//instances on hardreset cant be accessed again, ignore them to avoid problems
-		//and ofc allow new instances to be created since save manager was already reseted.
-		if(pInstance->IsDeletionPending()) { continue; }
-        //skip any heroic mode instance if player is not set to heroic difficulty.
-        if(pInstance->GetMapInfo() && pInstance->GetMapInfo()->type == INSTANCE_MULTIMODE && pInstance->iInstanceMode != pGroup->GetLeader()->iInstanceType) {  continue; }
-        if(pInstance->GetMapInfo() && pInstance->GetMapInfo()->type == INSTANCE_RAID || pInstance->GetMapInfo() && pInstance->GetMapInfo()->type == INSTANCE_MULTIMODE && pInstance->iInstanceMode == MODE_HEROIC && pGroup->GetLeader()->iInstanceType == MODE_HEROIC)
-		{
-			//Detects if the player requesting the instance is already saved to one.
-			if(sInstanceSavingManager.IsPlayerSavedToInstanceId(pInstance->GetMapId(), pInstance->GetInstanceID(), pCaller))
-			{
-				listmutex.Release();
-				return pInstance;
-			}
-			else
-			{
-				if(sInstanceSavingManager.IsPlayerSavedToInstanceId(pInstance->GetMapId(), pInstance->GetInstanceID(), pGroup->GetLeader()))
-				{
-					listmutex.Release();
-					return pInstance;
-				}
-				else
-				{
-					if(pInstance->GetGroupSignature() == pGroup->GetID()) // > 1
-					{
-						listmutex.Release();
-						return pInstance;
-					}
-					else //instance was not made with a group, prolly leader made a group, attach group to this instance and return it
-					{
-						//check if the instance creator leader matchs the new group created.
-						if(pGroup->GetLeader()->GetGUID() == pInstance->GetCreator())
-						{
-							pInstance->SetGroupSignature(pGroup->GetID());
-							listmutex.Release();
-							return pInstance;
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			if(pInstance->GetGroupSignature() == pGroup->GetID()) // > 1
-			{
-				listmutex.Release();
-				return pInstance;
-			}
-			else //instance was not made with a group, prolly leader made a group, attach group to this instance and return it
-			{
-				//check if the instance creator leader matchs the new group created.
-				if(pGroup->GetLeader()->GetGUID() == pInstance->GetCreator())
-				{
-					pInstance->SetGroupSignature(pGroup->GetID());
-					listmutex.Release();
-					return pInstance;
-				}
-			}
-		}
-	}
-
-	listmutex.Release();
-	return NULL;
-}
-
-MapMgr * Map::GetInstanceByCreator(Player *pCreator)
-{
-	MapMgr * pInstance = NULL;
-	listmutex.Acquire();
-	InstanceMap::iterator itr = _instances.begin();
-
-	for(; itr != _instances.end(); ++itr)
-	{
-		pInstance = itr->second;
-		if(pInstance->IsDeletionPending()) { listmutex.Release(); return NULL; }
-        if(pInstance->GetMapInfo() && pInstance->GetMapInfo()->type == INSTANCE_MULTIMODE && pInstance->iInstanceMode != pCreator->iInstanceType) {  continue; }
-        if(pInstance->GetMapInfo() && pInstance->GetMapInfo()->type == INSTANCE_RAID || pInstance->GetMapInfo() && pInstance->GetMapInfo()->type == INSTANCE_MULTIMODE && pInstance->iInstanceMode == MODE_HEROIC && pCreator->iInstanceType == MODE_HEROIC)
-		{
-			if(sInstanceSavingManager.IsPlayerSavedToInstanceId(pInstance->GetMapId(), pInstance->GetInstanceID(), pCreator))
-			{
-				listmutex.Release();
-				return pInstance;
-			}
-		}
-		else
-		{
-			//check if creator exists, to avoid problems we dont compare pointer address to detect if they are true,
-			//better use guid cause player can logout etc and login back to the instance with a diference address.
-			if(pInstance->GetCreator() && pCreator && !pInstance->GetGroupSignature())
-			{
-				if(pInstance->GetCreator() == pCreator->GetGUID())
-				{
-					listmutex.Release();
-					return pInstance;
-				}
-			}
-		}
-	}
-
-	listmutex.Release();
-	return NULL;
-}
-
-MapMgr * Map::GetInstanceByGroupInstanceId(uint32 InstanceID, bool Lock)
-{
-	MapMgr * pInstance = NULL;
-
-	if(Lock)
-		listmutex.Acquire();
-
-	InstanceMap::iterator itr = _instances.find(InstanceID);
-
-	if(itr != _instances.end())
-	{
-		pInstance = itr->second;
-		if(Lock)
-			listmutex.Release();
-
-		return pInstance;
-	}
-	else
-	{
-		if(Lock)
-			listmutex.Release();
-
-		return NULL;
-	}
-	return NULL;
 }

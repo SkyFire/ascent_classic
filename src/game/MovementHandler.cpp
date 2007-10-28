@@ -62,7 +62,7 @@ void WorldSession::HandleMoveWorldportAckOpcode( WorldPacket & recv_data )
 	}
 	sLog.outDebug( "WORLD: got MSG_MOVE_WORLDPORT_ACK." );
 	
-	GetPlayer()->SendInitialLogonPackets();
+	//GetPlayer()->SendInitialLogonPackets();
 	GetPlayer()->m_TeleportState = 2;
 	GetPlayer()->AddToWorld();
 	GetPlayer()->SetPlayerStatus(NONE);
