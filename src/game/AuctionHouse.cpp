@@ -43,8 +43,8 @@ AuctionHouse::AuctionHouse(uint32 ID)
 	dbc = dbcAuctionHouse.LookupEntry(ID);
 	assert(dbc);
 
-	cut_percent = float( float(dbc->fee) / 100.0f );
-	deposit_percent = float( float(dbc->tax ) / 100.0f );
+	cut_percent = float( float(dbc->tax) / 100.0f );
+	deposit_percent = float( float(dbc->fee ) / 100.0f );
 }
 
 AuctionHouse::~AuctionHouse()
@@ -449,56 +449,83 @@ void WorldSession::HandleCancelAuction( WorldPacket & recv_data)
 
 void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 {
-	if(!_player->IsInWorld())
+	if (!_player->IsInWorld())
 		return;
 
-	uint64 guid;
-	uint64 item;
-	uint32 bid,buyout,etime;
-	recv_data >> guid;
-	recv_data >> item;
+	uint64 guid,item;
+	uint32 bid,buyout,etime;	// etime is in minutes
+
+	recv_data >> guid >> item;
 	recv_data >> bid >> buyout >> etime;
 
 	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
-	if(!pCreature || !pCreature->auctionHouse)
-		return;
+	if (!pCreature || !pCreature->auctionHouse)
+		return;		// NPC doesnt exist or isnt an auctioneer
 
-	// Find Item
+	// Get item
+	Item * pItem = _player->GetItemInterface()->GetItemByGUID(item);
+	if (!pItem){
+		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 8);
+		data << uint32(0);
+		data << uint32(AUCTION_CREATE);
+		data << uint32(AUCTION_ERROR_ITEM);
+		SendPacket(&data);
+		return;
+	};
+
 	AuctionHouse * ah = pCreature->auctionHouse;
-	Item * pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(item, false);
-	if(!pItem)
-		return;
 
-	// Re-save item without its owner.
+	uint32 item_worth = pItem->GetProto()->SellPrice * pItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
+	uint32 item_deposit = (uint32)(item_worth * ah->deposit_percent) * (uint32)(etime / 120.0f);
+
+	if (_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < item_deposit)	// player cannot afford deposit
+	{
+		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 8);
+		data << uint32(0);
+		data << uint32(AUCTION_CREATE);
+		data << uint32(AUCTION_ERROR_MONEY);
+		SendPacket(&data);
+		return;
+	}
+
+	pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(item, false);
+	if (!pItem){
+		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 8);
+		data << uint32(0);
+		data << uint32(AUCTION_CREATE);
+		data << uint32(AUCTION_ERROR_ITEM);
+		SendPacket(&data);
+		return;
+	};
+
 	pItem->RemoveFromWorld();
 	pItem->SetOwner(0);
-	pItem->SaveToDB(INVENTORY_SLOT_NOT_SET, 0,true);
+	pItem->SaveToDB(INVENTORY_SLOT_NOT_SET, 0, true);
 
-	// Create auction structure.
+	// Create auction
 	Auction * auct = new Auction;
 	auct->BuyoutPrice = buyout;
 	auct->ExpiryTime = (uint32)UNIXTIME + (etime * 60);
 	auct->HighestBid = bid;
-	auct->HighestBidder = 0;
+	auct->HighestBidder = 0;	// hm
 	auct->Id = sAuctionMgr.GenerateAuctionId();
 	auct->Owner = _player->GetGUIDLow();
 	auct->pItem = pItem;
 	auct->Deleted = false;
 	auct->DeletedReason = 0;
-	
-	// calculate deposit
-	uint32 item_worth = pItem->GetProto()->SellPrice * pItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
-	auct->DepositAmount = FL2UINT(float(float(float(item_worth) * ah->deposit_percent) * float(float(etime) / 120.0f)));
 
-	// Add to the auction house.
+	// remove deposit
+	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)item_deposit);
+
+	// Add and save auction to DB
 	ah->AddAuction(auct);
 	auct->SaveToDB(ah->GetID());
 
-	// Send result packet.
+	// Send result packet
 	WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 8);
 	data << auct->Id;
 	data << uint32(AUCTION_CREATE);
-	data << uint32(0);
+	data << uint32(AUCTION_ERROR_NONE);
 	SendPacket(&data);
 }
 
