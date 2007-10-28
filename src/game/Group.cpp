@@ -321,7 +321,7 @@ void Group::Update(bool delayed)
 						/*check the reciever id against all group members*/
 						if(itr2->player_info->guid == SoulStoneGiver) removeSoulStone = false;
 
-						data << itr2->player_info->name << itr2->player_info->guid;
+						data << itr2->player_info->name << itr2->player_info->guid << uint32(0);		// highguid
 						if(itr2->player)
 							data << uint8(1);
 						else
