@@ -38,7 +38,7 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 
 	// Create script interface
 	ScriptInterface = new MapScriptInterface(*this);
-	CreationTime = UNITIME;
+	CreationTime = UNIXTIME;
 	ExpiryTime = 0;
 	RaidExpireTime = 0;
 	if(pMapInfo && pMapInfo->type == INSTANCE_RAID || pMapInfo && pMapInfo->type == INSTANCE_MULTIMODE)
