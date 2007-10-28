@@ -447,16 +447,6 @@ bool Master::Run(int argc, char ** argv)
 	/* Shut down console system */
 	sCConsole.Kill();
 
-	sLog.outString("Killing all sockets and network subsystem.");
-#ifndef CLUSTERING
-	ls->Close();
-	delete ls;
-#endif
-#ifdef WIN32
-	sSocketMgr.ShutdownThreads();
-#endif
-	sSocketMgr.CloseAll();
-
 	// begin server shutdown
 	time_t st = UNIXTIME;
 	sLog.outString("Server shutdown initiated at %s", ctime(&st));
@@ -472,9 +462,20 @@ bool Master::Run(int argc, char ** argv)
 	dw->terminate();
 	dw = NULL;
 
+	sWorld.SaveAllPlayers();
+
+	sLog.outString("Killing all sockets and network subsystem.");
+#ifndef CLUSTERING
+	ls->Close();
+	delete ls;
+#endif
+#ifdef WIN32
+	sSocketMgr.ShutdownThreads();
+#endif
+	sSocketMgr.CloseAll();
+
 	ThreadPool.Shutdown();
 
-	sWorld.SaveAllPlayers();
 	sLog.outString("");
 
 	delete LogonCommHandler::getSingletonPtr();

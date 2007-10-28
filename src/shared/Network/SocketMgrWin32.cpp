@@ -114,7 +114,7 @@ void SocketMgr::CloseAll()
 	socketLock.Release();
 	
 	for(list<Socket*>::iterator itr = tokill.begin(); itr != tokill.end(); ++itr)
-		(*itr)->Delete();
+		(*itr)->Disconnect();
 
 	size_t size;
 	do
