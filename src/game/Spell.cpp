@@ -2610,7 +2610,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1;			// hackfix - burlex
 				
 				if(target->MechanicsDispels[m_spellInfo->MechanicsType])
-					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1;
+					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1; // Why not just use 	SPELL_FAILED_DAMAGE_IMMUNE                                   = 144,
 			}
 
 			// if we're replacing a higher rank, deny it
@@ -2744,6 +2744,13 @@ uint8 Spell::CanCast(bool rangetolerate)
 						if (u_caster->m_special_state & UNIT_STATE_FEAR)
 							break;
 					}break;
+				// {Insignia|Medallion} of the {Horde|Alliance}
+				case 0xC7C45478: //Immune Movement Impairment and Loss of Control
+					{
+						if( u_caster->m_special_state & ( UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP | UNIT_STATE_ROOT | UNIT_STATE_STUN | UNIT_STATE_CONFUSE | UNIT_STATE_SNARE ) )
+							break;
+					}
+				
 				default:
 					return SPELL_FAILED_SILENCED;
 				}
