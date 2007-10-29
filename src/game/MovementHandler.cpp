@@ -124,6 +124,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 	movement_info.init(recv_data);
 	GetPlayer()->m_isMoving = true;
+	//printf("Movement flags: 0x%.8X\n", movement_info.flags);
 
 	// check for bad coords
 	if( !((movement_info.y >= _minY) && (movement_info.y <= _maxY)) ||
@@ -179,6 +180,12 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			Disconnect();
 			return;
 		}
+	}
+
+	if(movement_info.flags & MOVEFLAG_FREE_FALLING && movement_info.flags & MOVEFLAG_FALLING)
+	{
+		Disconnect();
+		return;
 	}
 
 	size_t pos = (size_t)m_MoverWoWGuid.GetNewGuidLen() + 1;
@@ -384,6 +391,7 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 		return;
 
     movement_info.init(recv_data);
+	//printf("Movement flags: 0x%.8X\n", movement_info.flags);
 	// check for bad coords
 	if( !((movement_info.y >= _minY) && (movement_info.y <= _maxY)) ||
 		!((movement_info.x >= _minX) && (movement_info.x <= _maxX)) )
@@ -433,6 +441,12 @@ void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
 			Disconnect();
 			return;
 		}
+	}
+
+	if(movement_info.flags & MOVEFLAG_FREE_FALLING && movement_info.flags & MOVEFLAG_FALLING)
+	{
+		Disconnect();
+		return;
 	}
 
 	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
@@ -683,7 +697,10 @@ void WorldSession::_SpeedCheck(MovementInfo &mi)
 	if(_player->_lastHeartbeatTime && _player->_heartBeatDisabledUntil < UNIXTIME)
 	{
 		int32 time_diff = movement_info.time - _player->_lastHeartbeatTime;
-		float distance_travelled = _player->m_position.Distance2D(_player->_lastHeartbeatX, _player->_lastHeartbeatY);
+		//float distance_travelled = _player->m_position.Distance2D(_player->_lastHeartbeatX, _player->_lastHeartbeatY);
+		float delta_x = mi.x - _player->_lastHeartbeatX;
+		float delta_y = mi.y - _player->_lastHeartbeatY;
+		float distance_travelled = sqrtf(delta_x*delta_x + delta_y*delta_y);
 
 		// do our check calculation
 		float speed = _player->m_runSpeed;
@@ -734,7 +751,7 @@ void WorldSession::_SpeedCheck(MovementInfo &mi)
 			}
 
 			//printf("Move shit: %ums\n", abs(difference));
-			sChatHandler.SystemMessage(this, "Move time : %d / %d, diff: %d", move_time, time_diff, difference);
+			//sChatHandler.SystemMessage(this, "Move time : %d / %d, diff: %d", move_time, time_diff, difference);
 		}
 	}
 	_player->_lastHeartbeatTime = movement_info.time;
