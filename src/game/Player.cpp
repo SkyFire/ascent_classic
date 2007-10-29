@@ -5630,7 +5630,11 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 		add_time = uint32( dist * TAXI_TRAVEL_SPEED );
 		lastx = lasty = lastz = 0;
 	}
-	for(uint32 i = start_node; i < path->GetNodeCount(); ++i)
+	size_t endn = path->GetNodeCount();
+	if(m_taxiPaths.size())
+		endn-= 2;
+
+	for(uint32 i = start_node; i < endn; ++i)
 	{
 		TaxiPathNode *pn = path->GetPathNode(i);
 		if(!pn)
@@ -5656,7 +5660,7 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 
 	uint32 traveltime = uint32(traveldist * TAXI_TRAVEL_SPEED);
 
-	WorldPacket data(SMSG_MONSTER_MOVE, 38 + ( (path->GetNodeCount() - start_node) * 12 ) );
+	WorldPacket data(SMSG_MONSTER_MOVE, 38 + ( (endn - start_node) * 12 ) );
 	data << GetNewGUID();
 	data << firstNode->x << firstNode->y << firstNode->z;
 	data << m_taxi_ride_time;
@@ -5666,11 +5670,11 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 
 	m_taxi_ride_time -= add_time;
 	
-	data << uint32( path->GetNodeCount() - start_node );
+	data << uint32( endn - start_node );
 //	uint32 timer = 0, nodecount = 0;
 //	TaxiPathNode *lastnode = NULL;
 
-	for(uint32 i = start_node; i < path->GetNodeCount(); i++)
+	for(uint32 i = start_node; i < endn; i++)
 	{
 		TaxiPathNode *pn = path->GetPathNode(i);
 		if(!pn)

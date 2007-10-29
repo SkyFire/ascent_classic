@@ -4128,11 +4128,12 @@ void Aura::SpellAuraReflectSpellsSchool(bool apply)
 {
 	if(apply)
 	{
-		for(std::list<struct ReflectSpellSchool*>::iterator i = m_target->m_reflectSpellSchool.begin();i != m_target->m_reflectSpellSchool.end();i++)
+		for(std::list<struct ReflectSpellSchool*>::iterator i = m_target->m_reflectSpellSchool.begin();i != m_target->m_reflectSpellSchool.end();)
 		{
 			if(GetSpellId() == (*i)->spellId)
 			{
-				m_target->m_reflectSpellSchool.erase(i);
+				delete (*i);
+				i = m_target->m_reflectSpellSchool.erase(i);
 			}
 		}
 		ReflectSpellSchool *rss = new ReflectSpellSchool;
@@ -4151,12 +4152,12 @@ void Aura::SpellAuraReflectSpellsSchool(bool apply)
 	}
 	else
 	{
-		for(std::list<struct ReflectSpellSchool*>::iterator i = m_target->m_reflectSpellSchool.begin();i != m_target->m_reflectSpellSchool.end();i++)
+		for(std::list<struct ReflectSpellSchool*>::iterator i = m_target->m_reflectSpellSchool.begin();i != m_target->m_reflectSpellSchool.end();)
 		{
 			if(GetSpellId() == (*i)->spellId)
 			{
 				delete *i;
-				m_target->m_reflectSpellSchool.erase(i);
+				i = m_target->m_reflectSpellSchool.erase(i);
 				break;
 			}
 		}
