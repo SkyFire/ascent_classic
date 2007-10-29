@@ -2105,9 +2105,15 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 
 	if(GetGuildId() && (pGuild = objmgr.GetGuild(GetGuildId())) && (pMember = pGuild->GetGuildMember( GetGUID() )))
 	{
-	
-		ss << ",'" << CharacterDatabase.EscapeString(pMember->publicNote) << "','";
-		ss << CharacterDatabase.EscapeString(pMember->officerNote) << "'," << GetGuildId() << "," << GetGuildRank();
+		if(pMember->publicNote)
+			ss << ",'" << CharacterDatabase.EscapeString(pMember->publicNote) << "','";
+		else
+			ss << ",'','";
+
+		if(pMember->officerNote)
+			ss << "'," << GetGuildId() << "," << GetGuildRank();
+		else
+            ss << CharacterDatabase.EscapeString(pMember->officerNote) << "'," << GetGuildId() << "," << GetGuildRank();
 
 	   }else
 	{
@@ -8693,8 +8699,8 @@ void Player::save_GuildData()
 {
 	if(myGuild)
 	{
-		string escaped_note = CharacterDatabase.EscapeString(m_playerInfo->publicNote);
-		string escaped_note2 = CharacterDatabase.EscapeString(m_playerInfo->officerNote);
+		string escaped_note = m_playerInfo->publicNote ? CharacterDatabase.EscapeString(m_playerInfo->publicNote) : "";
+		string escaped_note2 = m_playerInfo->officerNote ?  CharacterDatabase.EscapeString(m_playerInfo->officerNote) : "";
 		CharacterDatabase.Execute("UPDATE characters SET guildid=%u, guildRank=%u, publicNote='%s', officerNote='%s' WHERE guid = %u",
 			GetGuildId(), GetGuildRank(), escaped_note.c_str(), escaped_note2.c_str(), m_uint32Values[OBJECT_FIELD_GUID]);
 	}

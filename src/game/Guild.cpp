@@ -187,8 +187,15 @@ void Guild::FillGuildRosterData(WorldPacket *data)
 			*data << (uint8)pMember->getLevel();
 			*data << pMember->getClass();
 			*data << pMember->GetZoneId();
-			*data << (*i)->publicNote;
-			*data << (*i)->officerNote;
+			if((*i)->publicNote)
+                *data << (*i)->publicNote;
+			else
+				*data << uint8(0);
+
+			if((*i)->officerNote)
+                *data << (*i)->officerNote;
+			else
+				*data << uint8(0);
 		}
 		else
 		{
@@ -200,8 +207,15 @@ void Guild::FillGuildRosterData(WorldPacket *data)
 			*data << (uint8)((*i)->cl);
 			*data << (*i)->lastZone;
 			*data << float((UNIXTIME-(*i)->lastOnline)/86400.0);
-			*data << (*i)->publicNote;
-			*data << (*i)->officerNote;
+			if((*i)->publicNote)
+                *data << (*i)->publicNote;
+			else
+				*data << uint8(0);
+
+			if((*i)->officerNote)
+				*data << (*i)->officerNote;
+			else
+				*data << uint8(0);
 		}
 	}
 }
@@ -513,7 +527,9 @@ void Guild::UpdateGuildMembersDB(PlayerInfo *Member)
 {
   CharacterDatabase.Execute(
 		"UPDATE characters SET publicNote='%s',officerNote='%s',guildid=%u,guildRank=%u WHERE guid=%u",
-		CharacterDatabase.EscapeString(Member->publicNote).c_str(),CharacterDatabase.EscapeString(Member->officerNote).c_str(),m_guildId,Member->Rank, (uint32)Member->guid );
+		Member->publicNote ? CharacterDatabase.EscapeString(Member->publicNote).c_str() : "",
+		Member->officerNote ? CharacterDatabase.EscapeString(Member->officerNote).c_str() : "",
+		m_guildId,Member->Rank, (uint32)Member->guid );
 }
 
 void Guild::SaveAllGuildMembersToDb()
@@ -523,7 +539,9 @@ void Guild::SaveAllGuildMembersToDb()
 	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
 		CharacterDatabase.Execute(
 		"UPDATE characters SET publicNote='%s',officerNote='%s',guildid=%u,guildRank=%u WHERE guid=%u",
-		CharacterDatabase.EscapeString((*i)->publicNote).c_str(),CharacterDatabase.EscapeString((*i)->officerNote).c_str(),m_guildId,(*i)->Rank,(uint32)( (*i)->guid) );
+		(*i)->publicNote ? CharacterDatabase.EscapeString((*i)->publicNote).c_str() : "",
+		(*i)->officerNote ? CharacterDatabase.EscapeString((*i)->officerNote).c_str() : "",
+		m_guildId,(*i)->Rank,(uint32)( (*i)->guid) );
 	  
 }
 

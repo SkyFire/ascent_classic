@@ -198,7 +198,7 @@ bool Database::SendQuery(MysqlCon *con, const char* Sql, bool Self)
 	int result = mysql_query(con->con, Sql);
 	if(result > 0)
 	{
-		sLog.outDetail("Sql query failed due to [%s], Query: [%s]", mysql_error(con->con ), Sql);
+		printf("Sql query failed due to [%s], Query: [%s]\n", mysql_error(con->con ), Sql);
 		if( Self == false && HandleError(con, mysql_errno(con->con) ) )
 		{
 			// Re-send the query, the connection was successful.
