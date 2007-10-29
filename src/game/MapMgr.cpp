@@ -505,7 +505,7 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 			sWorld.AddGlobalSession(plObj->GetSession());
 	}
 
-	if(!HasPlayers() && !InactiveMoveTime && !forced_expire)
+	if(!HasPlayers() && !InactiveMoveTime && !forced_expire && GetMapInfo()->type != INSTANCE_NULL && GetMapInfo()->type != INSTANCE_PVP)
 		InactiveMoveTime = UNIXTIME + (MAPMGR_INACTIVE_MOVE_TIME * 60);	   // 5 mins -> move to inactive
 }
 
