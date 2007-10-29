@@ -3065,7 +3065,7 @@ void Player::OnPushToWorld()
 
 	SetUInt32Value(UNIT_FIELD_HEALTH, load_health);
 	SetUInt32Value(UNIT_FIELD_POWER1, load_mana);
-	if( GetMapId() != 0 && GetMapId() != 1 && GetMapId() != 530 ) // Afaik there aren't any items that are restricted to Kalimdor 1, Eastern Kingdoms 0 or Outlands 530.
+	if( !GetSession()->HasGMPermissions() && GetMapId() != 0 && GetMapId() != 1 && GetMapId() != 530 ) // Afaik there aren't any items that are restricted to Kalimdor 1, Eastern Kingdoms 0 or Outlands 530.
 	GetItemInterface()->CheckAreaItems(); // Removes items like Devastation when you leave their Field114 (MapID)
 }
 
