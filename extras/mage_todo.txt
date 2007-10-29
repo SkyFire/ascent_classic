@@ -8,3 +8,5 @@ Blink: Doesn't release you from stun, just from bonds.
 
 Problems not related with only one spell/talent:
 - Problem with multiple mages in one group: if a mage cast fireball for example on a mob, if i cast a lower rank of fireball it says that a another more powerfull spell effect is active...this should work on buffs like Arcane Intellect not casting damage spells
+
+Burning Soul should give you 70% chance to avoid interruption while you get damage

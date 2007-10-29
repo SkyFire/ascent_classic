@@ -40,6 +40,8 @@ SMT_RESIST_DISPEL - check if it is used
 - there should a trigger type named : proc on effect - so we can know the effect value at which we proc
 - make a spellgroup generator for featured spells
 - channeled spells have a big chance to get interrupted
+- sucubus seduces self
+- crusader strike and seal of blood do not gain extra dmg from stacked effect
 
 ==========================================================================
 ! BUGS !
@@ -76,6 +78,8 @@ SMT_RESIST_DISPEL - check if it is used
 - make aurastates get checked on spellcast and remove them on a sucessfull cast
 - blind + scatter shot = blocheaza mobii
 - on creature evade, make them imune to all spells, test with war stomp
+"if I have a mob or player dotted when I use fear on them, it causes me to become feared when the dot ticks. This one really pwns warlocks, priests and even warriors."
+"you can have 2 water elementals"
 
 ==========================================================================
 Zack - test my shit :
@@ -96,6 +100,7 @@ Zack - test my shit :
 - test aura 193, it might make a big BUBU
 - paladin Seal of Command (41469) - should make holy dmg
 - see if cold blood(14177) and Revealed Flaw(28815) get's it's cooldown enabled after use
+"yes, the thing is that if you have "Heart of the Wild" talent and you reset talents, if you shift you have like 500mil hp & insane dmg. You need to relog in order that things should work fine. Same thing for other talents ... leader of pack, imp leader of pack...they need to relog to lose them."
 
 ==========================================================================
 Capt - test my shit :
