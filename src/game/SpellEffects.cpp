@@ -4000,7 +4000,7 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
  
 	if(playerTarget && !corpse)
 	{
-		if(!playerTarget->m_bg)
+		if(!playerTarget->m_bg || !playerTarget->isDead())
 			return;
 
 		// Set all the lootable stuff on the player. If he repops before we've looted, we'll set the flags

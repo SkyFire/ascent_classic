@@ -376,6 +376,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_honorPointsToAdd=0;
 	hearth_of_wild_pct = 0;
 	raidgrouponlysent=false;
+	loot.gold=0;
 }
 
 
