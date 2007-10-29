@@ -401,6 +401,7 @@ public:
 
 	// update the world server every frame
 	void Update(time_t diff);
+	void CheckForExpiredInstances();
 
    
 	void UpdateSessions(uint32 diff);

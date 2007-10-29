@@ -353,7 +353,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			return;
 		}
 
-		printf("Flags: 0x%.8X FallTime %u, Opcode: %u %s\n", movement_info.flags, movement_info.FallTime, recv_data.GetOpcode(), LookupName(recv_data.GetOpcode(), g_worldOpcodeNames));
+		//printf("Flags: 0x%.8X FallTime %u, Opcode: %u %s\n", movement_info.flags, movement_info.FallTime, recv_data.GetOpcode(), LookupName(recv_data.GetOpcode(), g_worldOpcodeNames));
 	}
 
 	/************************************************************************/

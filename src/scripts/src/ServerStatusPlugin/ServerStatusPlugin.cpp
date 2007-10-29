@@ -284,6 +284,7 @@ void StatDumper::DumpStats()
 
         // Dump Instance Information
         //sWorldCreator.BuildXMLStats(buf);
+		sInstanceMgr.BuildXMLStats(buf);
         fprintf(f, buf);
         fprintf(f, "  </instances>\n");
     }

@@ -180,7 +180,7 @@ DWORD64
 #define USED_CONTEXT_FLAGS CONTEXT_FULL
 
 
-class StackWalkerInternal
+class __declspec(dllexport) StackWalkerInternal
 {
 public:
   StackWalkerInternal(StackWalker *parent, HANDLE hProcess)

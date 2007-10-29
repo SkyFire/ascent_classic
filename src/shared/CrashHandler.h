@@ -38,7 +38,7 @@ void OutputCrashLogLine(const char* format, ...);
 
 extern CircularQueue<uint32, 30> last_spells;
 
-class CStackWalker : public StackWalker
+class SERVER_DECL CStackWalker : public StackWalker
 {
 public:
 	void OnOutput(LPCSTR szText);

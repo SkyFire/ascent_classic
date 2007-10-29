@@ -45,11 +45,13 @@ public:
 	mSingleton = 0;
   }
 
-  /// Retrieve the singleton object, if you hit this assert this singleton object doesn't exist yet
-  static type & getSingleton( ) { WPAssert( mSingleton ); return *mSingleton; }
-
-  /// Retrieve a pointer to the singleton object
-  static type * getSingletonPtr( ) { return mSingleton; }
+#ifdef WIN32
+	__forceinline static type & getSingleton( ) { WPAssert( mSingleton ); return *mSingleton; }
+	__forceinline static type * getSingletonPtr( ) { return mSingleton; }
+#else
+	inline static type & getSingleton( ) { WPAssert( mSingleton ); return *mSingleton; }
+	inline static type * getSingletonPtr( ) { return mSingleton; }
+#endif
 
 protected:
 

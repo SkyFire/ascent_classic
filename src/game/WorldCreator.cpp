@@ -23,7 +23,7 @@
 
 #include "StdAfx.h"
 
-InstanceMgr sInstanceMgr;
+SERVER_DECL InstanceMgr sInstanceMgr;
 initialiseSingleton( FormationMgr );
 
 InstanceMgr::InstanceMgr()
@@ -373,9 +373,55 @@ uint32 InstanceMgr::GenerateInstanceID()
 	return iid;
 }
 
+void BuildStats(MapMgr * mgr, char * m_file, Instance * inst, MapInfo * inf)
+{
+	char tmp[200];
+	strcpy(tmp, "");
+#define pushline strcat(m_file, tmp)
+
+	snprintf(tmp, 200, "	<instance>\n");																												pushline;
+	snprintf(tmp, 200, "	  <map>%u</map>\n", mgr->GetMapId());																						pushline;
+	snprintf(tmp, 200, "	  <maptype>%u</maptype>\n", inf->type);																						pushline;
+	snprintf(tmp, 200, "	  <players>%u</players>\n", mgr->GetPlayerCount());																			pushline;
+	snprintf(tmp, 200, "	  <maxplayers>%u</maxplayers>\n", inf->playerlimit);																		pushline;
+	snprintf(tmp, 200, "      <idletime>%s</idletime>\n", mgr->InactiveMoveTime ? asctime(localtime(&mgr->InactiveMoveTime)) : "N/A");					pushline;
+	snprintf(tmp, 200, "	  <creationtime>%s</creationtime>\n", inst ? asctime(localtime(&inst->m_creation)) : "N/A");								pushline;   
+	snprintf(tmp, 200, "	  <expirytime>%s</expirytime>\n", inst ? (inst->m_expiration ? asctime(localtime(&inst->m_expiration)) : "N/A") : "N/A");	pushline;
+	snprintf(tmp, 200, "	</instance>\n");																											pushline;
+#undef pushline
+}
+
 void InstanceMgr::BuildXMLStats(char * m_file)
 {
-	// disabled at the moment.
+	uint32 i;
+	InstanceMap::iterator itr;
+	InstanceMap * instancemap;
+	Instance * in;
+	
+	m_mapLock.Acquire();
+	for(i = 0; i < NUM_MAPS; ++i)
+	{
+		if(m_singleMaps[i] != NULL)
+			BuildStats(m_singleMaps[i], m_file, NULL, m_singleMaps[i]->GetMapInfo());
+		else
+		{
+			instancemap = m_instances[i];
+			if(instancemap != NULL)
+			{
+				for(itr = instancemap->begin(); itr != instancemap->end();)
+				{
+					in = itr->second;
+					++itr;
+
+					if(in->m_mapMgr==NULL)
+						continue;
+
+					BuildStats(in->m_mapMgr, m_file, in, in->m_mapInfo);
+				}
+			}
+		}
+	}
+	m_mapLock.Release();
 }
 
 void InstanceMgr::_LoadInstances()

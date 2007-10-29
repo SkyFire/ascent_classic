@@ -185,6 +185,6 @@ private:
 	MapMgr * m_singleMaps[NUM_MAPS];
 };
 
-extern InstanceMgr sInstanceMgr;
+extern SERVER_DECL InstanceMgr sInstanceMgr;
 
 #endif
