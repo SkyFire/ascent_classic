@@ -377,6 +377,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	hearth_of_wild_pct = 0;
 	raidgrouponlysent=false;
 	loot.gold=0;
+	m_waterwalk=false;
 }
 
 
@@ -3412,12 +3413,14 @@ void Player::SetMovement(uint8 pType, uint32 flag)
 		}break;
 	case MOVE_WATER_WALK:
 		{
+			m_waterwalk=true;
 			data.SetOpcode(SMSG_MOVE_WATER_WALK);
 			data << GetNewGUID();
 			data << flag;
 		}break;
 	case MOVE_LAND_WALK:
 		{
+			m_waterwalk=false;
 			data.SetOpcode(SMSG_MOVE_LAND_WALK);
 			data << GetNewGUID();
 			data << flag;

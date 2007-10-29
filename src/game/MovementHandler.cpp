@@ -333,7 +333,27 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			return;
 		}
 
-		//printf("Flags: 0x%.8X FallTime %u\n", movement_info.flags, movement_info.FallTime);
+		/************************************************************************/
+		/* Anti-"Classic" Fly                                                   */
+		/************************************************************************/
+		if(recv_data.GetOpcode() == MSG_MOVE_STOP_SWIM && (!(movement_info.flags & MOVEFLAG_SWIMMING) || (movement_info.x == _player->GetPositionX() && movement_info.y == _player->GetPositionY())))
+		{
+			sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
+			Disconnect();
+			return;
+		}
+
+		/************************************************************************/
+		/* Anti-Water Walk                                                      */
+		/************************************************************************/
+		if(movement_info.flags & MOVEFLAG_WATER_WALK && !_player->m_waterwalk)
+		{
+			sCheatLog.writefromsession(this, "Used waterwalk hack {1}, movement flags: %u", movement_info.flags);
+			Disconnect();
+			return;
+		}
+
+		printf("Flags: 0x%.8X FallTime %u, Opcode: %u %s\n", movement_info.flags, movement_info.FallTime, recv_data.GetOpcode(), LookupName(recv_data.GetOpcode(), g_worldOpcodeNames));
 	}
 
 	/************************************************************************/
