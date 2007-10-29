@@ -2627,30 +2627,28 @@ bool ItemInterface::IsEquipped(uint32 itemid)
 void ItemInterface::CheckAreaItems()
 {
 	// Check equipment and backpack first (not inventory)
-	for( uint32 i = EQUIPMENT_SLOT_START ; i < EQUIPMENT_SLOT_END ; i++ )
+	/*for( uint32 i = EQUIPMENT_SLOT_START ; i < EQUIPMENT_SLOT_END ; i++ )
 	{
 		Item *item = GetInventoryItem( i );
 		if( item )
 		{
 			// Field114 = MapID
 			if( item->GetProto()->Field114 != 0 && item->GetProto()->Field114 != GetOwner()->GetMapId() )
-			item->RemoveFromWorld();
-			// Or is it DestroyForPlayer?
-			// Anyway, RemoveFromWorld calls DestroyForPlayer() anyway, nvm.
+				SafeFullRemoveItemByGuid(item->GetGUID());
 		}
 	}
 	// Check inventory
 	for( uint32 j = INVENTORY_SLOT_BAG_START ; j < INVENTORY_SLOT_BAG_END ; j++ )
 	{
-		Item *item = GetInventoryItem( j ); // This will be a container.
-		if( item )
+		Container *item = ((Container*)GetInventoryItem( j )); // This will be a container.
+		if( item && item->GetTypeId() == TYPEID_CONTAINER )
 		{
 			for( uint32 h = 0 ; h < item->GetProto()->ContainerSlots ; h++ )
 			{
-				Item *innerItem = GetInventoryItem( h );
-				if( innerItem->GetProto()->Field114 != 0 && innerItem->GetProto()->Field114 != GetOwner()->GetMapId() )
-				item->RemoveFromWorld();
+				Item *innerItem = item->GetItem(h);
+				if( innerItem && innerItem->GetProto()->Field114 != 0 && innerItem->GetProto()->Field114 != GetOwner()->GetMapId() )
+					SafeFullRemoveItemByGuid(item->GetGUID());
 			}
 		}
-	}
+	}*/
 }
