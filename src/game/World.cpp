@@ -1321,6 +1321,39 @@ bool World::SetInitialWorldSettings()
 	if(sp && sp->Id==17364)
 		sp->Effect[0]=0;
 
+    //Bloodlust targets sorounding creatures instead of us
+    sp = dbcSpell.LookupEntry(2825);
+    if(sp)
+    {
+        sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
+        sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
+        sp->EffectImplicitTargetA[2]=0;
+        sp->EffectImplicitTargetB[0]=0;
+        sp->EffectImplicitTargetB[1]=0;
+        sp->EffectImplicitTargetB[2]=0;
+    }
+    //Heroism targets sorounding creatures instead of us
+    sp = dbcSpell.LookupEntry(32182);
+    if(sp)
+    {
+        sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
+        sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
+        sp->EffectImplicitTargetA[2]=0;
+        sp->EffectImplicitTargetB[0]=0;
+        sp->EffectImplicitTargetB[1]=0;
+        sp->EffectImplicitTargetB[2]=0;
+    }
+    // Drums of war targets sorounding creatures instead of us
+    sp = dbcSpell.LookupEntry(35475);
+    if(sp)
+    {
+        sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
+        sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
+        sp->EffectImplicitTargetA[2]=0;
+        sp->EffectImplicitTargetB[0]=0;
+        sp->EffectImplicitTargetB[1]=0;
+        sp->EffectImplicitTargetB[2]=0;
+    }
 /*
 	//disabled by Zack : BL will influence holy nova too if using flash of light spellgroup
 	//paladin - Blessing of Light
