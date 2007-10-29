@@ -7226,7 +7226,7 @@ bool Player::CanCastDueToCooldown(SpellEntry * spellid)
 	
 	// no point checking single spells unless they have
 	// a cooldown
-	if(spellid->RecoveryTime)
+	if(spellid->RecoveryTime || spellid->StartRecoveryTime)
 	{
 		itr = SpellCooldownMap.find(spellid->Id);
 		if(itr != SpellCooldownMap.end())
