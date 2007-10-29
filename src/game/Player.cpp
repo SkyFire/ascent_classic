@@ -350,6 +350,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_modphyscritdmgPCT = 0;
 	m_RootedCritChanceBonus = 0;
 	m_ModInterrMRegenPCT = 0;
+	m_ModInterrMRegen =0;
 	m_RegenManaOnSpellResist=0;
 	m_rap_mod_pct = 0;
 	m_modblockvalue = 0;
@@ -4246,10 +4247,17 @@ void Player::UpdateStats()
 	if(AP < 0) AP=0;
 	SetUInt32Value(UNIT_FIELD_ATTACK_POWER, AP);
 	SetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER, RAP); 
+
+	LevelInfo * lvlinfo = objmgr.GetLevelInfo(this->getRace(),this->getClass(),lev);
+	int32 hpdelta = lvlinfo->Stat[2]*10;
+	int32 manadelta = lvlinfo->Stat[3]*15;
+	lvlinfo = objmgr.GetLevelInfo(this->getRace(),this->getClass(),1);
+	hpdelta -= lvlinfo->Stat[2]*10;
+	manadelta -= lvlinfo->Stat[3]*15;
 	
 	int32 hp=GetUInt32Value(UNIT_FIELD_BASE_HEALTH);
 	int32 bonus=(GetUInt32Value(UNIT_FIELD_POSSTAT2)-GetUInt32Value(UNIT_FIELD_NEGSTAT2))*10+m_healthfromspell+m_healthfromitems;
-	int32 res=hp+bonus;
+	int32 res=hp+bonus+hpdelta;
     int32 oldmaxhp=GetUInt32Value(UNIT_FIELD_MAXHEALTH);
 	if(res<hp)res=hp;
 	SetUInt32Value(UNIT_FIELD_MAXHEALTH, res  );
@@ -4268,12 +4276,20 @@ void Player::UpdateStats()
 	// MP
 		int32 mana = GetUInt32Value(UNIT_FIELD_BASE_MANA);
 		bonus=(GetUInt32Value(UNIT_FIELD_POSSTAT3)-GetUInt32Value(UNIT_FIELD_NEGSTAT3))*15+m_manafromspell +m_manafromitems ;
-		res=mana+bonus;
+		res=mana+bonus+manadelta;
 		if(res<mana)res=mana;	
 		SetUInt32Value(UNIT_FIELD_MAXPOWER1, res);
 
 		if((int32)GetUInt32Value(UNIT_FIELD_POWER1)>res)
 			SetUInt32Value(UNIT_FIELD_POWER1,res);
+
+	//Manaregen
+		const static float ClassMultiplier[12]={0.0f,0.0f,0.2f,0.2f,0.0f,0.25f,0.0f,0.2f,0.25f,0.2f,0.0f,0.225f};
+		const static float ClassFlatMod[12]={0.0f,0.0f,15.0f,15.0f,0.0f,12.5f,0.0f,15.0f,12.5f,15.0f,0.0f,15.0f};
+		uint32 Spirit = GetUInt32Value(UNIT_FIELD_STAT4);
+		float amt = (Spirit*ClassMultiplier[cl]+ClassFlatMod[cl])*PctPowerRegenModifier[POWER_TYPE_MANA]*0.5f;
+		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN,amt+m_ModInterrMRegen/5.0f);
+		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT,amt*m_ModInterrMRegenPCT/100.0f+m_ModInterrMRegen/5.0f);
 	}
 /////////////////////RATINGS STUFF/////////////////
 	float newb=CalcRating(19);
@@ -5730,39 +5746,26 @@ void Player::CalcStat(uint32 type)
 	   CalcResistance(0);
 }
 
-void Player::RegenerateMana(float RegenPct)
+void Player::RegenerateMana(bool is_interrupted)
 {
-	const static float ClassMultiplier[12]={
-		0.0f,0.0f,0.2f,0.25f,0.0f,0.25f,0.0f,0.2f,0.25f,0.2f,0.0f,0.2f};
-		const static float ClassFlatMod[12]={
-			0.0f,0.0f,15.0f,15.0f,0.0f,12.5f,0.0f,17.0f,12.5f,15.0f,0.0f,15.0f};
-			float amt;
-			if (m_interruptRegen)
-				return;
+	//if (m_interruptRegen)
+	//	return;
 
-			uint32 cur = GetUInt32Value(UNIT_FIELD_POWER1);
-			uint32 mm = GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-			if(cur >= mm)return;
-			uint32 cl = getClass();
-			uint32 Spirit = GetUInt32Value(UNIT_FIELD_STAT4);
-			amt = (Spirit*ClassMultiplier[cl]+ClassFlatMod[cl])*PctPowerRegenModifier[POWER_TYPE_MANA];
+	uint32 cur = GetUInt32Value(UNIT_FIELD_POWER1);
+	uint32 mm = GetUInt32Value(UNIT_FIELD_MAXPOWER1);
+	if(cur >= mm)return;
+	float amt = (is_interrupted) ? GetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT) : GetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN);
+	amt *= 2;
 
-			//Apply shit from conf file
-			amt *= sWorld.getRate(RATE_POWER1)*RegenPct;
+	//Apply shit from conf file
+	amt *= sWorld.getRate(RATE_POWER1);
 
-			//Near values from official
-			// wowwiki says no faster mp while resting, anyways this is wrong it reduces instead of increasing.
-			/*if(m_isResting)
-				amt = amt * 0.7f;
-			else
-				amt = amt * 0.3f;*/
+	if(amt<=1.0)//this fixes regen like 0.98
+		cur++;
+	else
+		cur += float2int32(amt);	
 
-			if(amt<=1.0)//this fixes regen like 0.98
-				cur++;
-			else
-				cur += float2int32(amt);	
-
-			SetUInt32Value(UNIT_FIELD_POWER1,(cur >= mm) ? mm : cur);
+	SetUInt32Value(UNIT_FIELD_POWER1,(cur >= mm) ? mm : cur);
 }
 
 void Player::RegenerateHealth(bool inCombat)
@@ -5837,7 +5840,7 @@ void Player::LooseRage()
 	}
 }
 
-void Player::RegenerateEnergy(float RegenPct)
+void Player::RegenerateEnergy()
 {
 	uint32 cur = GetUInt32Value(UNIT_FIELD_POWER4);
 	uint32 mh = GetUInt32Value(UNIT_FIELD_MAXPOWER4);
@@ -6900,6 +6903,12 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 	{
 		instance = true;
 		this->SetInstanceID(InstanceID);
+		//Dismount on instance entering
+		//Commented till NTY
+		/*SpellEntry* spe = dbcSpell.LookupEntry(39998);
+		SpellCastTargets targets;
+		Spell * dismount=new Spell(this,spe,true,NULL); 
+		dismount->prepare(&targets);*/
 	}
 	else if(m_mapId != MapID)
 	{
@@ -7241,13 +7250,16 @@ void Player::CalculateBaseStats()
 	if(!lvlinfo) return;
 
 	memcpy(BaseStats, lvlinfo->Stat, sizeof(uint32) * 5);
+
+	LevelInfo * levelone = objmgr.GetLevelInfo(this->getRace(),this->getClass(),1);
 	SetUInt32Value(UNIT_FIELD_MAXHEALTH, lvlinfo->HP);
-	SetUInt32Value(UNIT_FIELD_BASE_HEALTH, lvlinfo->HP);
+	SetUInt32Value(UNIT_FIELD_BASE_HEALTH, lvlinfo->HP - (lvlinfo->Stat[2]-levelone->Stat[2])*10);
 	SetUInt32Value(PLAYER_NEXT_LEVEL_XP, lvlinfo->XPToNextLevel);
+	
 	
 	if(GetPowerType() == POWER_TYPE_MANA)
 	{
-		SetUInt32Value(UNIT_FIELD_BASE_MANA, lvlinfo->Mana);
+		SetUInt32Value(UNIT_FIELD_BASE_MANA, lvlinfo->Mana - (lvlinfo->Stat[3]-levelone->Stat[3])*15);
 		SetUInt32Value(UNIT_FIELD_MAXPOWER1, lvlinfo->Mana);
 	}
 }
@@ -7654,7 +7666,7 @@ void Player::SetShapeShift(uint8 ss)
 	{
 		if(m_auras[x])
 		{
-			if(m_auras[x]->GetSpellProto()->RequiredShapeShift)
+			if(m_auras[x]->GetSpellProto()->RequiredShapeShift && m_auras[x]->IsPositive())
 			{
 				//Shady:commented cause a lot of spells has wrong RequiredShapeShift
 				//if(!ss || !(((uint32)1 << (ss-1))&m_auras[x]->GetSpellProto()->RequiredShapeShift))

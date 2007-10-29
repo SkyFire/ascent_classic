@@ -1310,6 +1310,7 @@ public:
 	uint32 m_modphyscritdmgPCT;
 	uint32 m_RootedCritChanceBonus;
 	uint32 m_ModInterrMRegenPCT;
+	int32 m_ModInterrMRegen;
 	float m_RegenManaOnSpellResist;
 	
 	uint32 FlatStatModPos[5];
@@ -1334,9 +1335,9 @@ public:
 	void CalcStat(uint32 t);
 	float CalcRating(uint32 t);
 	void RecalcAllRatings();
-	void RegenerateMana(float RegenPct);
+	void RegenerateMana(bool is_interrupted);
 	void RegenerateHealth(bool inCombat);
-	void RegenerateEnergy(float RegenPct);
+	void RegenerateEnergy();
 	void LooseRage();
 	
     uint32 SoulStone;

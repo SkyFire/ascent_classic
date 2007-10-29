@@ -1216,7 +1216,7 @@ void Aura::SpellAuraDummy(bool apply)
 			if (GetUnitCaster() && GetUnitCaster()->IsPlayer())
 				static_cast<Player*>(GetUnitCaster())->AddComboPoints(m_target->GetGUID(),1);
 			int32 val = (apply) ? 30 : -30;
-			m_target->ModDamageTakenByMechPCT[MECHANIC_BLEEDING] += val/100.0f;
+			m_target->ModDamageTakenByMechPCT[MECHANIC_BLEEDING] += float(val)/100.0f;
 		}break;
 	//warrior - sweeping strikes
 	case 35429:
@@ -1574,12 +1574,13 @@ void Aura::SpellAuraDummy(bool apply)
 		 {
 			 if(!apply)
 			 {
-				 uint32 newHealth = m_target->GetUInt32Value(UNIT_FIELD_HEALTH) + (uint32)mod->m_amount;
-
-				if(newHealth <= m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH))
-					m_target->SetUInt32Value(UNIT_FIELD_HEALTH, newHealth);
-				else
-					m_target->SetUInt32Value(UNIT_FIELD_HEALTH, m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+				 SpellEntry* spe = dbcSpell.LookupEntry(33763);
+				 if (spe)
+				 {
+					 Spell* spell = new Spell(m_target,spe,false,NULL);
+					 spell->SetUnitTarget(m_target);
+					 spell->Heal((uint32)mod->m_amount);
+				 }
 			 }
 		 }break;
 
@@ -1886,8 +1887,8 @@ void Aura::EventPeriodicHeal(uint32 amount)
 		m_target->SetUInt32Value(UNIT_FIELD_HEALTH, m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 
 	SendPeriodicHealAuraLog(add);
-	///
-	//SendPeriodicAuraLog(m_casterGuid, m_target, m_spellProto->Id, m_spellProto->School, add, FLAG_PERIODIC_HEAL);
+
+	//TODO: Add threat.
 
 	if(GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP)
 	{
@@ -4458,9 +4459,14 @@ void Aura::SpellAuraModPowerRegen(bool apply)
 	if(apply)
 	{
 		SetPositive();
-		sEventMgr.AddEvent(this, &Aura::EventPeriodicEnergize,(uint32)mod->m_amount,(uint32)mod->m_miscValue,
-			EVENT_AURA_PERIODIC_ENERGIZE,5000,0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	//	sEventMgr.AddEvent(this, &Aura::EventPeriodicEnergize,(uint32)mod->m_amount,(uint32)mod->m_miscValue,
+	//		EVENT_AURA_PERIODIC_ENERGIZE,5000,0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}	
+	if (m_target->IsPlayer())
+	{
+		int32 val = (apply) ? mod->m_amount: -mod->m_amount;
+		static_cast<Player*>(m_target)->m_ModInterrMRegen +=val;
+	}
 }
 
 void Aura::SpellAuraChannelDeathItem(bool apply)

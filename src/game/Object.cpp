@@ -2099,9 +2099,6 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		else
 			if(castaff > 7000) castaff = 7000;
 
-		if (spellInfo->NameHash == 0xddaf1ac7) //Mage: Ice Lance should take only 1/7 +spell damage bonus
-			castaff = 500;
-
 		float dmgdoneaffectperc = castaff / 3500;
 //------------------------------by downranking----------------------------------------------
 		//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)

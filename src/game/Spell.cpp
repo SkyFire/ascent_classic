@@ -2376,7 +2376,6 @@ uint8 Spell::CanCast(bool rangetolerate)
 					if(!itm || itm->GetDurability() == 0)
 						return (uint8)SPELL_FAILED_NO_AMMO;
 				}
-
                 // if the target should be a player
                 if (target->IsPlayer())
                 {
@@ -2400,6 +2399,11 @@ uint8 Spell::CanCast(bool rangetolerate)
                             }break;
                     }
                 }
+				else
+				{
+					if (target->GetAIInterface()->getAIState() == STATE_EVADE)
+						return SPELL_FAILED_BAD_TARGETS;
+				}
             }
 			
 			if(m_spellInfo->EffectApplyAuraName[0]==2)//mind control
@@ -2409,7 +2413,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 				else if(target->GetTypeId() == TYPEID_UNIT) 
 					{ 
 						Creature * c = (Creature*)(target);
-						if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank >1) //boss or rare or elite
+						if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank >0) //boss or rare or elite
 							return SPELL_FAILED_HIGHLEVEL;
 					} 
 
@@ -3744,7 +3748,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 			pve = true;
 		}break;
 
-	case 0xCC6D4182:		// Seal of Justice
+	case 0x7202A12C:		// Stuns (all of them)
 		grp = 6;
 		break;
 

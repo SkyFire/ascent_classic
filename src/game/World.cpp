@@ -1419,6 +1419,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}*/
+	//Paladin: Seal of Wisdom
+	uint32 procchance = 0;
+	sp = dbcSpell.LookupEntry(27116);
+	if (sp) procchance = sp->procChance;
+	sp = dbcSpell.LookupEntry(20166);if (sp) sp->procChance = procchance;
+	sp = dbcSpell.LookupEntry(20356);if (sp) sp->procChance = procchance;
+	sp = dbcSpell.LookupEntry(20357);if (sp) sp->procChance = procchance;
+	sp = dbcSpell.LookupEntry(27166);if (sp) sp->procChance = procchance;
 	//Druid: Frenzied Regeneration
 	sp = dbcSpell.LookupEntry(22842);
 	if(sp)
@@ -1646,12 +1654,12 @@ bool World::SetInitialWorldSettings()
 		}
 	}
 	//mage: Arcane Power
-	sp  = dbcSpell.LookupEntry(12042);
+	/*sp  = dbcSpell.LookupEntry(12042);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=5775504;
 		sp->EffectSpellGroupRelation[1]=10518528;
-	}
+	}*/
 	//mage: Fire Power
 	sp  = dbcSpell.LookupEntry(11124);
 	if (sp)

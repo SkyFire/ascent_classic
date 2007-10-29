@@ -594,23 +594,19 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					switch(spellId)
 					{
 						case 14189: //Seal Fate
-						{
-							if (!this->IsPlayer() || !CastingSpell)
-								continue;
-							if (CastingSpell->Effect[0]!=80 &&
-								CastingSpell->Effect[1]!=80 &&
-								CastingSpell->Effect[2]!=80)
-								continue;
-						}break;
 						case 16953: //Blood Frenzy & Primal Fury
 						case 16959:
 						{
-							if (!this->IsPlayer() || !CastingSpell)
+							if (!this->IsPlayer() || 
+								!CastingSpell || 
+								CastingSpell->Id == 14189 ||
+								CastingSpell->Id == 16953 ||
+								CastingSpell->Id == 16959)
 								continue;
-							if (!static_cast<Player*>(this)->IsInFeralForm() ||
-								(static_cast<Player*>(this)->GetShapeShift() != FORM_CAT &&
-								static_cast<Player*>(this)->GetShapeShift() != FORM_BEAR &&
-								static_cast<Player*>(this)->GetShapeShift() != FORM_DIREBEAR))
+							if (CastingSpell->Effect[0]!=80 &&
+								CastingSpell->Effect[1]!=80 &&
+								CastingSpell->Effect[2]!=80 &&
+								CastingSpell->NameHash != 0x7565ABA6)
 								continue;
 						}break;
 						case 17106: //druid intencity
@@ -704,19 +700,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							if(!CastingSpell)
 								continue;
 							if(CastingSpell->School!=SCHOOL_FIRE)
-								continue;
-						}break;
-						//druid - Primal Fury
-						case 37116:
-						case 37117:
-						{
-							if (!this->IsPlayer())
-								continue;
-							Player* mPlayer = (Player*)this;
-							if (!mPlayer->IsInFeralForm() || 
-								(mPlayer->GetShapeShift() != FORM_CAT &&
-								mPlayer->GetShapeShift() != FORM_BEAR &&
-								mPlayer->GetShapeShift() != FORM_DIREBEAR))
 								continue;
 						}break;
 						//rogue - blade twisting
@@ -1189,18 +1172,13 @@ void Unit::RegeneratePower(bool isinterrupted)
 	if(this->IsPlayer())
 	{
 		uint32 powertype = GetPowerType();
-		float RegenPct = 1.0f;
 		switch(powertype)
 		{
 		case POWER_TYPE_MANA:
-			if (isinterrupted)
-				RegenPct = static_cast<Player*>(this)->m_ModInterrMRegenPCT/100.0f;
-			static_cast<Player*>(this)->RegenerateMana(RegenPct);
+			static_cast<Player*>(this)->RegenerateMana(isinterrupted);
 			break;
 		case POWER_TYPE_ENERGY:
-			if (isinterrupted)
-				RegenPct = 0.0f;
-			static_cast<Player*>(this)->RegenerateEnergy(RegenPct);
+			static_cast<Player*>(this)->RegenerateEnergy();
 			break;
 		}
 		
@@ -1224,7 +1202,7 @@ void Unit::RegeneratePower(bool isinterrupted)
 
 		// druids regen mana when shapeshifted
 		if(getClass() == DRUID && powertype != POWER_TYPE_MANA)
-			static_cast<Player*>(this)->RegenerateMana(RegenPct);
+			static_cast<Player*>(this)->RegenerateMana(isinterrupted);
 
 		// These only NOT in combat
 		if(!CombatStatus.IsInCombat())
