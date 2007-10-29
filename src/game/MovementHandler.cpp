@@ -336,7 +336,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Anti-"Classic" Fly                                                   */
 		/************************************************************************/
-		if(recv_data.GetOpcode() == MSG_MOVE_STOP_SWIM && (!(movement_info.flags & MOVEFLAG_SWIMMING) || (movement_info.x == _player->GetPositionX() && movement_info.y == _player->GetPositionY())))
+		if(recv_data.GetOpcode() == MSG_MOVE_STOP_SWIM && ((!(movement_info.flags & MOVEFLAG_SWIMMING) && !(movement_info.flags & MOVEFLAG_FALLING)) || (movement_info.x == _player->GetPositionX() && movement_info.y == _player->GetPositionY())))
 		{
 			sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
 			Disconnect();
