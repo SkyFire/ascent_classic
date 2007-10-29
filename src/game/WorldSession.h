@@ -398,16 +398,12 @@ protected:
 	void HandlePageTextQueryOpcode( WorldPacket & recv_data );
 
 	/// Opcodes implemented in MovementHandler.cpp
-	void HandleMoveHeartbeatOpcode( WorldPacket& recvPacket );
 	void HandleMoveWorldportAckOpcode( WorldPacket& recvPacket );
-	void HandleMoveStopOpcode( WorldPacket& recvPacket );
 	void HandleMovementOpcodes( WorldPacket& recvPacket );
-	void HandleFallOpcode( WorldPacket & recv_data );
 	void HandleMoveTimeSkippedOpcode( WorldPacket & recv_data );
 	void HandleMoveNotActiveMoverOpcode( WorldPacket & recv_data );
 	void HandleSetActiveMoverOpcode( WorldPacket & recv_data );
 	void HandleMoveTeleportAckOpcode( WorldPacket & recv_data );
-	void HandleBasicMovementOpcodes( WorldPacket& recvPacket );
 
 	/// Opcodes implemented in GroupHandler.cpp:
 	void HandleGroupInviteOpcode(WorldPacket& recvPacket);
@@ -659,9 +655,6 @@ protected:
 	void HandleSetVisibleRankOpcode(WorldPacket& recv_data);
 	void HandlePetSetActionOpcode(WorldPacket& recv_data);
 
-	void _HandleBreathing(WorldPacket &recv_data, MovementInfo &mi);
-	void _SpeedCheck(MovementInfo &mi);
-
 	//instances
 	void HandleResetInstanceOpcode(WorldPacket& recv_data);
     void HandleDungeonDifficultyOpcode(WorldPacket& recv_data);
@@ -709,6 +702,9 @@ public:
 	void SendSpiritHealerRequest(Creature* pCreature);
 	void FullLogin(Player * plr);
 
+	float m_wLevel; // Level of water the player is currently in
+	bool m_bIsWLevelSet; // Does the m_wLevel variable contain up-to-date information about water level?
+
 private:
 	friend class Player;
 	Player *_player;
@@ -717,9 +713,6 @@ private:
 	/* Preallocated buffers for movement handlers */
 	MovementInfo movement_info;
 	uint8 movement_packet[90];
-
-	float m_wLevel; // Level of water the player is currently in
-	bool m_bIsWLevelSet; // Does the m_wLevel variable contain up-to-date information about water level?
 	
 	uint32 _accountId;
 	uint32 _accountFlags;

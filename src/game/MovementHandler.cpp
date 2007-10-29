@@ -106,97 +106,254 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 
 }
 
-void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+inline void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSession * pSession)
 {
-	if(_player == 0)
+	//player swiming.
+
+	if(movement_info.flags & 0x200000)
+	{
+		if(_player->m_MountSpellId)
+			_player->RemoveAura(_player->m_MountSpellId);
+
+		if(_player->FlyCheat)
+		{
+			if(_player->m_lastMoveType != 2)
+			{
+				_player->m_lastMoveType = 2;		// flying
+				_player->ResetHeartbeatCoords();
+			}
+		}
+		else
+		{
+			if(_player->m_lastMoveType != 1)
+			{
+				_player->m_lastMoveType = 1;		// swimming
+				_player->ResetHeartbeatCoords();
+			}
+		}
+
+		// get water level only if it was not set before
+		if (!pSession->m_bIsWLevelSet)
+		{
+			// water level is somewhere below the nose of the character when entering water
+			pSession->m_wLevel = movement_info.z + _player->m_noseLevel*0.95f;
+			pSession->m_bIsWLevelSet = true;
+		}
+		if(!(_player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING))
+			_player->m_UnderwaterState |= UNDERWATERSTATE_SWIMMING;
+	}
+	else
+	{
+		if(movement_info.flags & MOVEFLAG_AIR_SWIMMING)
+		{
+			if(_player->FlyCheat)
+			{
+				if(_player->m_lastMoveType != 2)
+				{
+					_player->m_lastMoveType = 2;		// flying
+					_player->ResetHeartbeatCoords();
+				}
+			}
+		}
+		else
+		{
+			if(_player->m_lastMoveType)
+			{
+				_player->m_lastMoveType=0;
+				_player->ResetHeartbeatCoords();
+			}
+		}
+	}
+
+	if(movement_info.flags & 0x2000 && _player->m_UnderwaterState)
+	{
+		//player jumped inside water but still underwater.
+		if(pSession->m_bIsWLevelSet && (movement_info.z + _player->m_noseLevel) < pSession->m_wLevel)
+		{
+			return;
+		}
+		else
+		{
+			if(!sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat)
+			{
+			}
+			else
+			{
+				//only swiming and can breath, stop bar
+				if(_player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER)
+				{
+					WorldPacket data(SMSG_START_MIRROR_TIMER, 20);
+					data << uint32(1) << _player->m_UnderwaterTime << _player->m_UnderwaterMaxTime << uint32(10) << uint32(0);
+					pSession->SendPacket(&data);
+
+					_player->m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
+				}
+			}
+		}
+		return;
+	}
+	//player not swiming
+	if(!(movement_info.flags & 0x200000) && _player->m_UnderwaterState)
+	{
+		if(_player->m_lastMoveType)
+		{
+			_player->m_lastMoveType = 0;
+			_player->ResetHeartbeatCoords();
+		}
+
+		if(_player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING)
+		{
+			_player->m_UnderwaterState &= ~UNDERWATERSTATE_SWIMMING;
+			if(_player->getClass()==DRUID)
+				_player->RemoveAura(1066);//remove aquatic form on land
+
+			pSession->m_bIsWLevelSet = false;
+		}
+
+		if(_player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER)
+			_player->m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
+
 		return;
 
-	if(GetPlayer()->GetPlayerStatus() == TRANSFER_PENDING) //dont update coords
-		return;
-	if(!_player->IsInWorld() || _player->m_uint32Values[UNIT_FIELD_CHARMEDBY])
+	}
+	if(pSession->m_bIsWLevelSet && (movement_info.z + _player->m_noseLevel) < pSession->m_wLevel)
+	{
+		if(!(_player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER))
+		{
+			// we only just entered the water
+			_player->m_UnderwaterState |= UNDERWATERSTATE_UNDERWATER;
+
+			if(!sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat)
+			{
+			}
+			else
+			{
+				// send packet
+				WorldPacket data(SMSG_START_MIRROR_TIMER, 20);
+				data << uint32(1) << _player->m_UnderwaterTime << _player->m_UnderwaterMaxTime << int32(-1) << uint32(0);
+				pSession->SendPacket(&data);
+			}
+		}
+	}
+	else
+	{
+		if(_player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER)
+		{
+			if(!sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat)
+			{
+			}
+			else
+			{
+				WorldPacket data(SMSG_START_MIRROR_TIMER, 20);
+				data << uint32(1) << _player->m_UnderwaterTime << _player->m_UnderwaterMaxTime << uint32(10) << uint32(0);
+				pSession->SendPacket(&data);
+			}
+			_player->m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
+		}
+	}
+}
+
+void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+{
+	if(!_player->IsInWorld() || _player->m_uint32Values[UNIT_FIELD_CHARMEDBY] || _player->GetPlayerStatus() == TRANSFER_PENDING)
 		return;
 
 	// spell cancel on movement, for now only fishing is added
-	Object * t_go = GetPlayer()->m_SummonedObject;
+	Object * t_go = _player->m_SummonedObject;
 	if (t_go)
+	{
 		if (t_go->GetEntry() == GO_FISHING_BOBBER)
 			((GameObject*)t_go)->EndFishing(GetPlayer(),true);
+	}
 
+	/************************************************************************/
+	/* Make sure the packet is the correct size range.                      */
+	/************************************************************************/
+	if(recv_data.size() > 80) { Disconnect(); return; }
+
+	/************************************************************************/
+	/* Read Movement Data Packet                                            */
+	/************************************************************************/
 	movement_info.init(recv_data);
-	GetPlayer()->m_isMoving = true;
-	//printf("Movement flags: 0x%.8X\n", movement_info.flags);
 
-	// check for bad coords
-	if( !((movement_info.y >= _minY) && (movement_info.y <= _maxY)) ||
-		!((movement_info.x >= _minX) && (movement_info.x <= _maxX)) )
-	{
-		sLog.outError("%s might be cheating, bad coords specified in movement packet.", _player->GetName());
-		return;
-	}
+	/************************************************************************/
+	/* Update player movement state                                         */
+	/************************************************************************/
+	if(recv_data.GetOpcode() == MSG_MOVE_STOP)
+		_player->m_isMoving = false;
+	else
+		_player->m_isMoving = true;
 
-	if(GetPlayer()->cannibalize)
-	{
-		sEventMgr.RemoveEvents(GetPlayer(), EVENT_CANNIBALIZE);
-		GetPlayer()->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-		GetPlayer()->cannibalize = false;
-	}
-
-	//Send packet to other players
-	if(recv_data.size() > 80)
+	/************************************************************************/
+	/* Make sure the co-ordinates are valid.                                */
+	/************************************************************************/
+	if( !((movement_info.y >= _minY) && (movement_info.y <= _maxY)) || !((movement_info.x >= _minX) && (movement_info.x <= _maxX)) )
 	{
 		Disconnect();
 		return;
 	}
 
-	if(sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 2500.0f
-		&& _player->m_runSpeed < 50.0f && !(movement_info.flags & MOVEFLAG_TAXI))	/*50*50*/
+	/************************************************************************/
+	/* Anti-Hack Checks                                                     */
+	/************************************************************************/
+	if( !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->m_uint32Values[UNIT_FIELD_CHARM])
 	{
-		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		/************************************************************************/
+		/* Anti-Teleport                                                        */
+		/************************************************************************/
+		if(sWorld.antihack_teleport && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 2500.0f
+			&& _player->m_runSpeed < 50.0f && !(movement_info.flags & MOVEFLAG_TAXI))
 		{
 			sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
 			Disconnect();
 			return;
 		}
-	}
 
-	if(sWorld.antihack_flight && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->FlyCheat &&
-		(movement_info.flags & MOVEFLAG_FLYING || movement_info.flags & MOVEFLAG_AIR_SWIMMING) &&
-		!(movement_info.flags & MOVEFLAG_FALLING) && !(movement_info.flags & MOVEFLAG_TAXI) &&
-		time_t(_player->_delayAntiFlyUntil) < UNIXTIME)
-	{
-		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		/************************************************************************/
+		/* Anti-Fly                                                             */
+		/************************************************************************/
+		if(sWorld.antihack_flight && !_player->FlyCheat && (movement_info.flags & MOVEFLAG_FLYING ||
+			movement_info.flags & MOVEFLAG_AIR_SWIMMING) &&
+			!(movement_info.flags & MOVEFLAG_FALLING) && !(movement_info.flags & MOVEFLAG_TAXI) &&
+			time_t(_player->_delayAntiFlyUntil) < UNIXTIME)
 		{
 			sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
 			Disconnect();
 			return;
 		}
-	}
 
-	if(movement_info.flags & MOVEFLAG_FALLING_FAR && !movement_info.FallTime && sWorld.antihack_falldmg && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->bSafeFall && !_player->GodModeCheat)
-	{
-		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
+		/************************************************************************/
+		/* Anti-Fall Damage                                                     */
+		/************************************************************************/
+		if(movement_info.flags & MOVEFLAG_FALLING_FAR && (!movement_info.FallTime || movement_info.FallTime==848) && sWorld.antihack_falldmg &&
+			!_player->bSafeFall && !_player->GodModeCheat)
 		{
 			sCheatLog.writefromsession(this, "Used fall damage hack, falltime is 0 and flags are %u", movement_info.flags);
 			Disconnect();
 			return;
 		}
+
+		//printf("Flags: 0x%.8X FallTime %u\n", movement_info.flags, movement_info.FallTime);
 	}
 
-	if(movement_info.flags & MOVEFLAG_FREE_FALLING && movement_info.flags & MOVEFLAG_FALLING)
-	{
-		Disconnect();
-		return;
-	}
-
+	/************************************************************************/
+	/* Calculate the timestamp of the packet we have to send out            */
+	/************************************************************************/
 	size_t pos = (size_t)m_MoverWoWGuid.GetNewGuidLen() + 1;
 	uint32 mstime = mTimeStamp();
 	int32 move_time;
 	if(m_clientTimeDelay == 0)
 		m_clientTimeDelay = mstime - movement_info.time;
 
+	/************************************************************************/
+	/* Copy into the output buffer.                                         */
+	/************************************************************************/
 	move_time = (movement_info.time - (mstime - m_clientTimeDelay)) + MOVEMENT_PACKET_TIME_DELAY + mstime;
 	memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
 
+	/************************************************************************/
+	/* Distribute to all inrange players.                                   */
+	/************************************************************************/
 	for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
 	{
 #ifdef USING_BIG_ENDIAN
@@ -207,154 +364,205 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), uint16(recv_data.size() + pos), movement_packet);
 	}
 
-	//Falling Handler
+	/************************************************************************/
+	/* Falling damage checks                                                */
+	/************************************************************************/
+
 	if (movement_info.flags & 0x2000) // Falling
 	{
-		if( GetPlayer()->m_fallTime < movement_info.FallTime)
-			GetPlayer()->m_fallTime = movement_info.FallTime;
+		if( _player->m_fallTime < movement_info.FallTime)
+			_player->m_fallTime = movement_info.FallTime;
+
 		_player->ResetHeartbeatCoords();
 	}
 	else //once we done falling lets do some damage
 	{
-		if(GetPlayer()->m_fallTime > 1000 && GetPlayer()->isAlive() && !_player->GodModeCheat)
+		if(_player->m_fallTime > 1000 && _player->isAlive() && !_player->GodModeCheat)
 		{
 			//Check if we aren't falling in water
 			if(!_player->bSafeFall)
 			{
 				if( !(movement_info.flags & 0x200000) && !_player->blinked)
 				{
-					uint8 type = DAMAGE_FALL;
 					//10% dmg per sec after first 3 seconds
 					//it rL a*t*t
 					double coeff = 0.000000075*(_player->m_fallTime*_player->m_fallTime - _player->m_fallTime);
 					if (coeff<0)
 						coeff=0;
 					uint32 damage = (uint32)(_player->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*coeff);
-					if(damage > GetPlayer()->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) // Can only deal 100% damage.
-						damage = GetPlayer()->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+					if(damage > _player->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) // Can only deal 100% damage.
+						damage = _player->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
 
-					WorldPacket data(13);
-					data.SetOpcode(SMSG_ENVIRONMENTALDAMAGELOG);
-					data << GetPlayer()->GetGUID();
-					data << type;
-					data << damage;
-					SendPacket(&data);
-					_player->DealDamage(GetPlayer(), damage, 0, 0, 0);
+					_player->SendEnvironmentalDamageLog((uint64&)_player->GetGUID(), DAMAGE_FALL, damage);
+					_player->DealDamage(_player, damage, 0, 0, 0);
 				}
 			}
-			GetPlayer()->m_fallTime = 0;
+
+			_player->m_fallTime = 0;
 			_player->blinked = false;
 			_player->ResetHeartbeatCoords();
 		}
 		else
 		{
 			//player is dead, no need to keep increasing falltime
-			GetPlayer()->m_fallTime = 0;
-			/*_player->ResetHeartbeatCoords();*/
+			_player->m_fallTime = 0;
 			_player->blinked = false;
 		}
 	}
 
-	//Setup Transporter Positioning
-	if(movement_info.transGuid != 0 && !_player->m_lockTransportVariables)
+	/************************************************************************/
+	/* Transporter Setup                                                    */
+	/************************************************************************/
+	if(!_player->m_lockTransportVariables)
 	{
-		if(!_player->m_TransporterGUID)
+		if(_player->m_TransporterGUID && !movement_info.transGuid)
 		{
-			_player->m_CurrentTransporter = objmgr.GetTransporter(movement_info.transGuid);
+			/* we left the transporter we were on */
 			if(_player->m_CurrentTransporter)
 			{
-				_player->m_CurrentTransporter->AddPlayer(_player);
+				_player->m_CurrentTransporter->RemovePlayer(_player);
+				_player->m_CurrentTransporter = NULL;
 			}
 
-			if(_player->IsMounted())
-				_player->RemoveAura(_player->m_MountSpellId);
+			_player->m_TransporterGUID = 0;
 		}
-
-		GetPlayer()->m_TransporterX = movement_info.transX;
-		GetPlayer()->m_TransporterY = movement_info.transY;
-		GetPlayer()->m_TransporterZ = movement_info.transZ;
-		GetPlayer()->m_TransporterO = movement_info.transO;
-		GetPlayer()->m_TransporterUnk = movement_info.transUnk;
-		GetPlayer()->m_TransporterGUID = movement_info.transGuid;
-		
-		/*float x = movement_info.x - movement_info.transX;
-		float y = movement_info.y - movement_info.transY;
-		float z = movement_info.z - movement_info.transZ;
-		Transporter* trans = _player->m_CurrentTransporter;
-		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));*/
-	}
-	else
-	{
-		if(_player->m_TransporterGUID && !_player->m_lockTransportVariables)
+		else if(movement_info.transGuid)
 		{
-			// remove us from the porter
-			GetPlayer()->m_TransporterGUID = 0;
-			GetPlayer()->m_TransporterX = 0.0f;
-			GetPlayer()->m_TransporterY = 0.0f;
-			GetPlayer()->m_TransporterZ = 0.0f;
-			GetPlayer()->m_TransporterO = 0.0f;
+			if(!_player->m_TransporterGUID)
+			{
+				/* just walked into a transport */
+				if(_player->IsMounted())
+					_player->RemoveAura(_player->m_MountSpellId);
 
-			if(_player->m_CurrentTransporter)
-				_player->m_CurrentTransporter->RemovePlayer(_player);
+				_player->m_CurrentTransporter = objmgr.GetTransporter(movement_info.transGuid);
+				if(_player->m_CurrentTransporter)
+					_player->m_CurrentTransporter->AddPlayer(_player);
 
-			GetPlayer()->m_CurrentTransporter = NULL;
-			_player->ResetHeartbeatCoords();
+				/* set variables */
+				_player->m_TransporterGUID = movement_info.transGuid;
+				_player->m_TransporterUnk = movement_info.transUnk;
+				_player->m_TransporterX = movement_info.transX;
+				_player->m_TransporterY = movement_info.transY;
+				_player->m_TransporterZ = movement_info.transZ;
+			}
+			else
+			{
+				/* no changes */
+				_player->m_TransporterUnk = movement_info.transUnk;
+				_player->m_TransporterX = movement_info.transX;
+				_player->m_TransporterY = movement_info.transY;
+				_player->m_TransporterZ = movement_info.transZ;
+			}
+		}
+	}
+
+	/************************************************************************/
+	/* Anti-Speed Hack Checks                                               */
+	/************************************************************************/
+	if(!_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM])
+	{
+		// calculate distance between last heartbeat and this
+		if(_player->_lastHeartbeatTime && _player->_heartBeatDisabledUntil < UNIXTIME)
+		{
+			int32 time_diff = movement_info.time - _player->_lastHeartbeatTime;
+			//float distance_travelled = _player->m_position.Distance2D(_player->_lastHeartbeatX, _player->_lastHeartbeatY);
+			float delta_x = movement_info.x - _player->_lastHeartbeatX;
+			float delta_y = movement_info.y - _player->_lastHeartbeatY;
+			float distance_travelled = sqrtf(delta_x*delta_x + delta_y*delta_y);
+
+			// do our check calculation
+			float speed = _player->m_runSpeed;
+
+			// underwater or flying
+			switch(_player->m_lastMoveType)
+			{
+			case 1:		// swimming
+				speed = _player->m_swimSpeed;
+				break;
+			case 2:		// flying
+				speed = _player->m_flySpeed;
+				break;
+			}
+
+			int32 move_time = (int32)((float)distance_travelled / (float)(speed*0.001f));
+
+			// check if we're in the correct bounds
+			if(move_time > time_diff)
+			{
+				int32 difference = move_time - time_diff;
+				if(difference > 350)	// say this for now
+				{
+					if(_player->m_speedhackChances)
+					{
+						sChatHandler.SystemMessage(this, "Speedhack detected. This has been logged for later processing by the server admins. If you are caught again, you will be kicked from the server. You will be unrooted in 5 seconds.");
+						_player->SetMovement(MOVE_ROOT, 1);
+						sEventMgr.AddEvent(_player, &Player::SetMovement, uint8(MOVE_UNROOT), uint32(1), EVENT_DELETE_TIMER, 5000, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+						_player->ResetHeartbeatCoords();
+						_player->m_speedhackChances--;
+						sCheatLog.writefromsession(this, "Speedhack warning, time diff of %u", difference);
+					}
+					else if(_player->m_speedhackChances == 0)
+					{
+						sChatHandler.SystemMessage(this, "You will now be removed from the server for speed hacking. Your account has been flagged for further investigation by the admins.");
+						sCheatLog.writefromsession(this, "Kicked for speedhack, time diff of %u", difference);
+						_player->m_KickDelay = 0;
+						sEventMgr.AddEvent(_player, &Player::_Kick, EVENT_PLAYER_KICK, 10000, 1,0);
+
+						// Root movement :p heheheh evil
+						_player->SetMovement(MOVE_ROOT, 1);
+					}
+				}
+				//printf("Move shit: %ums\n", abs(difference));
+				//sChatHandler.SystemMessage(this, "Move time : %d / %d, diff: %d", move_time, time_diff, difference);
+			}
 		}
 
-		//// speedhack protection
-		if(sWorld.SpeedhackProtection && !_player->blinked)
-			_SpeedCheck(movement_info);
+		_player->_lastHeartbeatTime = movement_info.time;
+		_player->_lastHeartbeatX = movement_info.x;
+		_player->_lastHeartbeatY = movement_info.y;
 	}
-	_HandleBreathing(recv_data, movement_info);
+
+	/************************************************************************/
+	/* Breathing System                                                     */
+	/************************************************************************/
+	_HandleBreathing(movement_info, _player, this);
+
+	/************************************************************************/
+	/* Remove Spells                                                        */
+	/************************************************************************/
 	_player->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_MOVEMENT);
 
+	/************************************************************************/
+	/* Update our position in the server.                                   */
+	/************************************************************************/
 	if( _player->m_CurrentCharm )
-	{
 		_player->m_CurrentCharm->SetPosition(movement_info.x, movement_info.y, movement_info.z, movement_info.orientation);
-	}
 	else
 	{
 		if(!_player->m_CurrentTransporter) 
 		{
 			if( !_player->SetPosition(movement_info.x, movement_info.y, movement_info.z, movement_info.orientation) )
 			{
-				GetPlayer()->SetUInt32Value(UNIT_FIELD_HEALTH, 0);
-				GetPlayer()->KillPlayer();
+				_player->SetUInt32Value(UNIT_FIELD_HEALTH, 0);
+				_player->KillPlayer();
 			}
 		}
 		else
 		{
-			_player->SetPosition(_player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), 
+			_player->SetPosition(movement_info.x, movement_info.y, movement_info.z, 
 				movement_info.orientation + movement_info.transO, false);
 		}
 	}	
 }
 
-void WorldSession::HandleMoveStopOpcode( WorldPacket & recv_data )
-{	
-	HandleMovementOpcodes( recv_data );
-	_player->m_isMoving = false;
-}
-
 void WorldSession::HandleMoveTimeSkippedOpcode( WorldPacket & recv_data )
 {
-	//uint64 guid;
-	//recv_data >> guid >> m_moveDelayTime;
-	//Log.Debug("MoveTimeSkipped", "Client %s is out of sync by %u ms", GetSocket()->GetRemoteIP().c_str(), m_moveDelayTime);
+	
 }
 
 void WorldSession::HandleMoveNotActiveMoverOpcode( WorldPacket & recv_data )
 {
-/*	uint64 guid;
-	recv_data >> guid;
 
-	MovementInfo mi(recv_data);
-	WorldPacket data;
-	data.SetOpcode(MSG_MOVE_TELEPORT);	  // meh..
-	FastGUIDPack(data, guid);			   // faaast.
-
-	mi >> data;
-	_player->SendMessageToSet(&data, false);*/
 }
 
 
@@ -381,382 +589,6 @@ void WorldSession::HandleSetActiveMoverOpcode( WorldPacket & recv_data )
 void WorldSession::HandleMoveSplineCompleteOpcode(WorldPacket &recvPacket)
 {
 
-}
-
-void WorldSession::HandleBasicMovementOpcodes( WorldPacket & recv_data )
-{
-	if(GetPlayer()->GetPlayerStatus() == TRANSFER_PENDING) //don't update coords
-		return;
-	if(!_player->IsInWorld() || _player->m_uint32Values[UNIT_FIELD_CHARMEDBY])
-		return;
-
-    movement_info.init(recv_data);
-	//printf("Movement flags: 0x%.8X\n", movement_info.flags);
-	// check for bad coords
-	if( !((movement_info.y >= _minY) && (movement_info.y <= _maxY)) ||
-		!((movement_info.x >= _minX) && (movement_info.x <= _maxX)) )
-	{
-		sLog.outError("%s might be cheating, bad coords specified in movement packet.", _player->GetName());
-		return;
-	}
-
-	GetPlayer()->m_isMoving = true;
-
-	//Send packet to other players
-	if(recv_data.size() > 80)
-	{
-		Disconnect();
-		return;
-	}
-
-	if(sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 2500.0f
-		&& _player->m_runSpeed < 50.0f && !(movement_info.flags & MOVEFLAG_TAXI))	/*50*50*/
-	{
-		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
-		{
-			sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
-			Disconnect();
-			return;
-		}
-	}
-
-	if(sWorld.antihack_flight && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->FlyCheat &&
-		(movement_info.flags & MOVEFLAG_FLYING || movement_info.flags & MOVEFLAG_AIR_SWIMMING) &&
-		!(movement_info.flags & MOVEFLAG_FALLING) && !(movement_info.flags & MOVEFLAG_TAXI) &&
-		_player->_delayAntiFlyUntil < UNIXTIME)
-	{
-		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
-		{
-			sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
-			Disconnect();
-			return;
-		}
-	}
-
-	if(movement_info.flags & MOVEFLAG_FALLING_FAR && !movement_info.FallTime && sWorld.antihack_falldmg && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->bSafeFall && !_player->GodModeCheat)
-	{
-		if(!_player->m_uint32Values[UNIT_FIELD_CHARM])		// mind controlled?
-		{
-			sCheatLog.writefromsession(this, "Used fall damage hack, falltime is 0 and flags are %u", movement_info.flags);
-			Disconnect();
-			return;
-		}
-	}
-
-	if(movement_info.flags & MOVEFLAG_FREE_FALLING && movement_info.flags & MOVEFLAG_FALLING)
-	{
-		Disconnect();
-		return;
-	}
-
-	uint32 pos = m_MoverWoWGuid.GetNewGuidLen() + 1;
-	uint32 mstime = mTimeStamp();
-	int32 move_time;
-	if(m_clientTimeDelay == 0)
-		m_clientTimeDelay = mstime - movement_info.time;
-
-	move_time = (movement_info.time - (mstime - m_clientTimeDelay)) + MOVEMENT_PACKET_TIME_DELAY + mstime;
-	memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
-
-	for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
-	{
-#ifdef USING_BIG_ENDIAN
-		*(uint32*)&movement_packet[pos+4] = swap32(move_time + (*itr)->GetSession()->m_moveDelayTime);
-#else
-		*(uint32*)&movement_packet[pos+4] = uint32(move_time + (*itr)->GetSession()->m_moveDelayTime);
-#endif
-		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), uint16(recv_data.size() + pos), movement_packet);
-	}
-
-	//Setup Transporter Positioning
-	if(movement_info.transGuid != 0 && !_player->m_lockTransportVariables)
-	{
-		if(!_player->m_TransporterGUID)
-		{
-			_player->m_CurrentTransporter = objmgr.GetTransporter(movement_info.transGuid);
-			if(_player->m_CurrentTransporter)
-			{
-				if(_player->IsMounted())
-					_player->RemoveAura(_player->m_MountSpellId);
-
-				_player->m_CurrentTransporter->AddPlayer(_player);
-			}
-		}
-
-		GetPlayer()->m_TransporterX = movement_info.transX;
-		GetPlayer()->m_TransporterY = movement_info.transY;
-		GetPlayer()->m_TransporterZ = movement_info.transZ;
-		GetPlayer()->m_TransporterO = movement_info.transO;
-		GetPlayer()->m_TransporterUnk = movement_info.transUnk;
-		GetPlayer()->m_TransporterGUID = movement_info.transGuid;
-
-		/*float x = movement_info.x - movement_info.transX;
- 	   float y = movement_info.y - movement_info.transY;
-  	  float z = movement_info.z - movement_info.transZ;
-		Transporter* trans = _player->m_CurrentTransporter;
-		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));*/
-	}
-	else
-	{
-		if(_player->m_TransporterGUID && !_player->m_lockTransportVariables)
-		{
-			// remove us from the porter
-			GetPlayer()->m_TransporterGUID = 0;
-			GetPlayer()->m_TransporterX = 0.0f;
-			GetPlayer()->m_TransporterY = 0.0f;
-			GetPlayer()->m_TransporterZ = 0.0f;
-			GetPlayer()->m_TransporterO = 0.0f;
-
-			if(_player->m_CurrentTransporter)
-				_player->m_CurrentTransporter->RemovePlayer(_player);
-			
-			GetPlayer()->m_CurrentTransporter = NULL;
-			_player->ResetHeartbeatCoords();
-		}
-
-		// speedhack protection
-		if(sWorld.SpeedhackProtection && !_player->blinked)
-			_SpeedCheck(movement_info);
-	}
-	_HandleBreathing(recv_data, movement_info);
-
-	if( _player->m_CurrentCharm )
-	{
-		_player->m_CurrentCharm->SetPosition(movement_info.x, movement_info.y, movement_info.z, movement_info.orientation);
-	}
-	else
-	{
-		if( !_player->m_CurrentTransporter)
-		{
-			if(!GetPlayer( )->SetPosition(movement_info.x, movement_info.y, movement_info.z, movement_info.orientation) )
-			{
-				GetPlayer()->SetUInt32Value(UNIT_FIELD_HEALTH, 0);
-				GetPlayer()->KillPlayer();
-			}
-		}
-		else
-		{
-			_player->SetPosition(_player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), 
-				movement_info.orientation + movement_info.transO, false);
-		}
-	}
-}
-
-void WorldSession::_HandleBreathing(WorldPacket &recv_data, MovementInfo &mi)
-{
-    //player swiming.
-
-    if(movement_info.flags & 0x200000)
-    {
-		if(_player->m_MountSpellId)
-			_player->RemoveAura(_player->m_MountSpellId);
-
-		if(_player->FlyCheat)
-		{
-			if(_player->m_lastMoveType != 2)
-			{
-				_player->m_lastMoveType = 2;		// flying
-				_player->ResetHeartbeatCoords();
-			}
-		}
-		else
-		{
-			if(_player->m_lastMoveType != 1)
-			{
-				_player->m_lastMoveType = 1;		// swimming
-				_player->ResetHeartbeatCoords();
-			}
-		}
-
-        // get water level only if it was not set before
-		if (!m_bIsWLevelSet)
-		{
-			// water level is somewhere below the nose of the character when entering water
-			m_wLevel = movement_info.z + _player->m_noseLevel*0.95f;
-			m_bIsWLevelSet = true;
-		}
-		if(!(_player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING))
-			_player->m_UnderwaterState |= UNDERWATERSTATE_SWIMMING;
-    }
-	else
-	{
-		if(movement_info.flags & MOVEFLAG_AIR_SWIMMING)
-		{
-			if(_player->FlyCheat)
-			{
-				if(_player->m_lastMoveType != 2)
-				{
-					_player->m_lastMoveType = 2;		// flying
-					_player->ResetHeartbeatCoords();
-				}
-			}
-		}
-		else
-		{
-			if(_player->m_lastMoveType)
-			{
-				_player->m_lastMoveType=0;
-				_player->ResetHeartbeatCoords();
-			}
-		}
-	}
-
-    if(movement_info.flags & 0x2000 && _player->m_UnderwaterState)
-    {
-        //player jumped inside water but still underwater.
-        if(m_bIsWLevelSet && (movement_info.z + _player->m_noseLevel) < m_wLevel)
-        {
-            return;
-        }
-        else
-        {
-            if(!sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat)
-            {
-            }
-            else
-            {
-                //only swiming and can breath, stop bar
-                if(_player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER)
-		        {
-			        WorldPacket data(SMSG_START_MIRROR_TIMER, 20);
-			        data << uint32(1) << _player->m_UnderwaterTime << _player->m_UnderwaterMaxTime << uint32(10) << uint32(0);
-			        SendPacket(&data);
-
-			        _player->m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
-		        }
-            }
-        }
-        return;
-    }
-    //player not swiming
-    if(!(movement_info.flags & 0x200000) && _player->m_UnderwaterState)
-    {
-        if(_player->m_lastMoveType)
-		{
-			_player->m_lastMoveType = 0;
-			_player->ResetHeartbeatCoords();
-		}
-
-		if(_player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING)
-		{
-			_player->m_UnderwaterState &= ~UNDERWATERSTATE_SWIMMING;
-			_player->RemoveAura(1066);//remove aquatic form on land
-			m_bIsWLevelSet = false;
-		}
-
-		if(_player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER)
-			_player->m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
-
-		return;
-
-    }
-    if(m_bIsWLevelSet && (movement_info.z + _player->m_noseLevel) < m_wLevel)
-	{
-		if(!(_player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER))
-		{
-			// we only just entered the water
-			_player->m_UnderwaterState |= UNDERWATERSTATE_UNDERWATER;
-
-            if(!sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat)
-            {
-            }
-            else
-            {
-			    // send packet
-			    WorldPacket data(SMSG_START_MIRROR_TIMER, 20);
-			    data << uint32(1) << _player->m_UnderwaterTime << _player->m_UnderwaterMaxTime << int32(-1) << uint32(0);
-			    SendPacket(&data);
-            }
-		}
-	}
-    else
-    {
-        if(_player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER)
-		{
-            if(!sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat)
-            {
-            }
-            else
-            {
-			    WorldPacket data(SMSG_START_MIRROR_TIMER, 20);
-			    data << uint32(1) << _player->m_UnderwaterTime << _player->m_UnderwaterMaxTime << uint32(10) << uint32(0);
-			    SendPacket(&data);
-            }
-			_player->m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
-		}
-    }
-}
-
-void WorldSession::_SpeedCheck(MovementInfo &mi)
-{
-	// beat!
-	if(_player->m_uint32Values[UNIT_FIELD_CHARM] != 0)
-		return;
-
-	// calculate distance between last heartbeat and this
-	if(_player->_lastHeartbeatTime && _player->_heartBeatDisabledUntil < UNIXTIME)
-	{
-		int32 time_diff = movement_info.time - _player->_lastHeartbeatTime;
-		//float distance_travelled = _player->m_position.Distance2D(_player->_lastHeartbeatX, _player->_lastHeartbeatY);
-		float delta_x = mi.x - _player->_lastHeartbeatX;
-		float delta_y = mi.y - _player->_lastHeartbeatY;
-		float distance_travelled = sqrtf(delta_x*delta_x + delta_y*delta_y);
-
-		// do our check calculation
-		float speed = _player->m_runSpeed;
-
-		// underwater or flying
-		switch(_player->m_lastMoveType)
-		{
-		case 1:		// swimming
-			speed = _player->m_swimSpeed;
-			break;
-		case 2:		// flying
-			speed = _player->m_flySpeed;
-			break;
-		}
-
-		int32 move_time = (int32)((float)distance_travelled / (float)(speed*0.001f));
-
-		// check if we're in the correct bounds
-		if(move_time > time_diff)
-		{
-			int32 difference = move_time - time_diff;
-			if(difference > 350)	// say this for now
-			{
-				if(_player->m_speedhackChances)
-				{
-					sChatHandler.SystemMessage(this, "Speedhack detected. This has been logged for later processing by the server admins. If you are caught again, you will be kicked from the server. You will be unrooted in 5 seconds.");
-					_player->SetMovement(MOVE_ROOT, 1);
-					sEventMgr.AddEvent(_player, &Player::SetMovement, uint8(MOVE_UNROOT), uint32(1), EVENT_DELETE_TIMER, 5000, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-					_player->ResetHeartbeatCoords();
-					_player->m_speedhackChances--;
-					
-					// TODO: replace with server plugin system later on
-					sCheatLog.writefromsession(this, "Speedhack warning, time diff of %u", difference);
-				}
-				else if(_player->m_speedhackChances == 0)
-				{
-					sChatHandler.SystemMessage(this, "You will now be removed from the server for speed hacking. Your account has been flagged for further investigation by the admins.");
-
-					// TODO: replace with server plugin system later on
-					sCheatLog.writefromsession(this, "Kicked for speedhack, time diff of %u", difference);
-
-					_player->m_KickDelay = 0;
-					sEventMgr.AddEvent(_player, &Player::_Kick, EVENT_PLAYER_KICK, 10000, 1,0);
-
-					// Root movement :p heheheh evil
-					_player->SetMovement(MOVE_ROOT, 1);
-				}
-			}
-
-			//printf("Move shit: %ums\n", abs(difference));
-			//sChatHandler.SystemMessage(this, "Move time : %d / %d, diff: %d", move_time, time_diff, difference);
-		}
-	}
-	_player->_lastHeartbeatTime = movement_info.time;
-	_player->_lastHeartbeatX = movement_info.x;
-	_player->_lastHeartbeatY = movement_info.y;
 }
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket &recvdata)

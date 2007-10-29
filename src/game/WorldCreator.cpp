@@ -56,21 +56,28 @@ void InstanceMgr::Load(TaskList * l)
 			if(WorldMapInfoStorage.LookupEntry(result->Fetch()[0].GetUInt32()) == NULL)
 				continue;
 
-			_CreateMap(result->Fetch()[0].GetUInt32());
+			//_CreateMap(result->Fetch()[0].GetUInt32());
+			l->AddTask(new Task(new CallbackP1<InstanceMgr,uint32>(this, &InstanceMgr::_CreateMap, result->Fetch()[0].GetUInt32())));
 		} while(result->NextRow());
 		delete result;
 	}
+
+	l->wait();
 
 	// create maps for any we don't have yet.
 	StorageContainerIterator<MapInfo> * itr = WorldMapInfoStorage.MakeIterator();
 	while(!itr->AtEnd())
 	{
 		if(m_maps[itr->Get()->mapid] == NULL)
-			_CreateMap(itr->Get()->mapid);
+		{
+			l->AddTask(new Task(new CallbackP1<InstanceMgr,uint32>(this, &InstanceMgr::_CreateMap, itr->Get()->mapid)));
+		}
+		//_CreateMap(itr->Get()->mapid);
 
 		itr->Inc();
 	}
 	itr->Destruct();
+	l->wait();
 
 	// load saved instances
 	_LoadInstances();
@@ -136,7 +143,7 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr)
 	}
 
 	// players without groups cannot enter raid instances (no soloing them:P)
-	if(plr->GetGroup() == NULL && (inf->type == INSTANCE_RAID || inf->type == INSTANCE_MULTIMODE))
+	if(plr->GetGroup() == NULL && (inf->type == INSTANCE_RAID || inf->type == INSTANCE_MULTIMODE) && !plr->triggerpass_cheat)
 		return INSTANCE_ABORT_NOT_IN_RAID_GROUP;
 
 	// check that heroic mode is available if the player has requested it.
@@ -344,8 +351,10 @@ void InstanceMgr::_CreateMap(uint32 mapid)
 	MapInfo * inf;
 
 	inf = WorldMapInfoStorage.LookupEntry(mapid);
-	ASSERT(mapid<NUM_MAPS && m_maps[mapid] == NULL);
+	ASSERT(mapid<NUM_MAPS);
 	ASSERT(inf);
+	if(m_maps[mapid]!=NULL)
+		return;
 
 	m_maps[mapid] = new Map(mapid, inf);
 	if(inf->type == INSTANCE_NULL)
@@ -427,6 +436,7 @@ void Instance::LoadFromDB(Field * fields)
 	m_difficulty = fields[5].GetUInt32();
 	m_creatorGroup = fields[6].GetUInt32();
 	m_creatorGuid = fields[7].GetUInt32();
+	m_mapMgr=NULL;
 
 	// process saved npc's
 	q = m_npcstring;
@@ -662,7 +672,6 @@ void InstanceMgr::BuildRaidSavedInstancesForPlayer(Player * plr)
 
 				if( in->m_mapInfo->type != INSTANCE_NONRAID && PlayerOwnsInstance(in, plr) )
 				{
-					data << uint32(0);
 					data << in->m_mapId;
 					data << uint32(in->m_expiration - UNIXTIME);
 					data << in->m_instanceId;

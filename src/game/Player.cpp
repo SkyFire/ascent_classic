@@ -3008,7 +3008,9 @@ void Player::AddToWorld()
 	// Add failed.
 	if(m_mapMgr == NULL)
 	{
+		// eject from instance
 		m_beingPushed = false;
+		EjectFromInstance();
 		return;
 	}
 
