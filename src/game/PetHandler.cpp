@@ -148,7 +148,7 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 			if(sp)
 			{
 				// Check the cooldown
-				if(pPet->GetAIInterface()->GetSpellCooldown(sp->spell->Id) > 0)
+				if(sp->cooldowntime && getMSTime() < sp->cooldowntime)
 				{
 					//SendNotification("That spell is still cooling down.");
 					WorldPacket data(SMSG_SPELL_FAILURE, 20);

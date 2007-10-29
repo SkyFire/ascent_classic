@@ -123,7 +123,9 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 
 AIInterface::~AIInterface()
 {
-
+	for(list<AI_Spell*>::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
+		if((*itr)->custom_pointer)
+			delete (*itr);
 }
 
 void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
@@ -1012,7 +1014,9 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						}
 					}
 					// CastSpell(m_Unit, spellInfo, targets);
-					AddSpellCooldown(spellInfo, m_nextSpell);
+					if(m_nextSpell->cooldown)
+						m_nextSpell->cooldowntime = getMSTime() + m_nextSpell->cooldown;
+
 					//add pet spell after use to pet owner with some chance
 					if(m_Unit->GetGUIDHigh() == HIGHGUID_PET && m_PetOwner->IsPlayer())
 					{	
@@ -2658,11 +2662,13 @@ AI_Spell *AIInterface::getSpell()
 		return 0;
 
 	next_spell_time = (uint32)UNIXTIME + 1;
+	waiting_for_cooldown = false;
 
 	// look at our spells
 	AI_Spell *  sp = NULL;
 	AI_Spell *  def_spell = NULL;
 	uint32	  cast_time;
+	uint32 nowtime = getMSTime();
 
 	if(m_Unit->GetGUIDHigh() == HIGHGUID_PET)
 	{
@@ -2674,7 +2680,16 @@ AI_Spell *AIInterface::getSpell()
 		{
 			sp = *itr;
 			++itr;
-			if(/*sp->procCount && */sp->agent == AGENT_SPELL)
+			if(sp->cooldowntime && nowtime < sp->cooldowntime)
+			{
+				waiting_for_cooldown = true;
+				continue;
+			}
+
+			if(sp->procCount && sp->procCounter >= sp->procCount)
+				continue;
+
+			if(sp->agent == AGENT_SPELL)
 			{
 				if (sp->spellType == STYPE_BUFF)
 				{
@@ -2717,25 +2732,18 @@ AI_Spell *AIInterface::getSpell()
 
 	if(def_spell)
 	{
-		// Check for cooldowns
-		if(GetSpellCooldown(sp->spell->Id) > 0)
-		{
-			/* we're waiting for a spell to cool down. set this flag so we don't go running until it happens. */
-			waiting_for_cooldown = true;
-			return 0;
-		}
+		// set cooldown
+		if(def_spell->procCount)
+			def_spell->procCounter++;
 
 		cast_time = GetCastTime(dbcSpellCastTime.LookupEntry( sp->spell->CastingTimeIndex ) );
 		cast_time /= 1000;
 		if(cast_time)
 			next_spell_time = (uint32)UNIXTIME + cast_time;
 
-/*		// add the cooldown - added at actual cast
-		AddSpellCooldown(sp->spell->Id);*/
+		waiting_for_cooldown = false;
 		return def_spell;
 	}
-	else
-		waiting_for_cooldown = false;	/* we're not waiting for any spells to cool down */
 
 #ifdef _AI_DEBUG
 	sLog.outString("AI DEBUG: Returning no spell for unit %u", m_Unit->GetEntry());
@@ -2748,7 +2756,18 @@ void AIInterface::addSpellToList(AI_Spell *sp)
 	if(!sp->spell)
 		return;
 
-	m_spells.push_back(sp);
+	if(sp->procCount || sp->cooldown)
+	{
+		AI_Spell * sp2 = new AI_Spell;
+		memcpy(sp2, sp, sizeof(AI_Spell));
+		sp2->procCounter=0;
+		sp2->cooldowntime=0;
+		sp2->custom_pointer = true;
+		m_spells.push_back(sp);
+	}
+	else
+		m_spells.push_back(sp);
+
 	m_Unit->m_SpellList.insert(sp->spell->Id); // add to list
 }
 
@@ -3057,37 +3076,11 @@ void AIInterface::WipeReferences()
 	tauntedBy = 0;
 }
 
-uint32 AIInterface::GetSpellCooldown(uint32 SpellId)
+void AIInterface::ResetProcCounts()
 {
-	map<uint32, uint32>::iterator itr = m_spellCooldown.find(SpellId);
-	if(itr != m_spellCooldown.end())
-	{
-		uint32 mstime = getMSTime();
-		uint32 cotime = itr->second;
-		if(mstime > cotime)
-		{
-			// empty cooldown -> erase it
-			m_spellCooldown.erase(itr);
-			return 0;
-		}
-		else
-			return cotime - mstime;
-	}
-	return 0;
-}
-
-void AIInterface::AddSpellCooldown(SpellEntry * pSpell, AI_Spell * sp)
-{
-	uint32 Cooldown;
-	if (sp && sp->cooldown)
-	{
-		Cooldown = (uint32)sp->cooldown;
-	}
-	else
-	{
-		Cooldown = pSpell->CategoryRecoveryTime > pSpell->RecoveryTime ? pSpell->CategoryRecoveryTime : pSpell->RecoveryTime;
-	}
-	m_spellCooldown[pSpell->Id] = getMSTime() + Cooldown;
+	for(list<AI_Spell*>::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
+		if((*itr)->procCount)
+			(*itr)->procCounter=0;
 }
 
 //we only cast once a spell and we will set his health and resistances. Note that this can be made with db too !

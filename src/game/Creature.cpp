@@ -417,6 +417,9 @@ void Creature::setDeathState(DeathState s)
 		if(m_enslaveSpell)
 			RemoveEnslave();
 
+		if(m_currentSpell)
+			m_currentSpell->cancel();
+
 	}else m_deathState = s;
 }
 

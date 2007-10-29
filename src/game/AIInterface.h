@@ -170,12 +170,16 @@ struct AI_Spell
 	SpellEntry * spell;
 	uint8 spellType;
 	uint8 spelltargetType;
-	float cooldown;
+	uint32 cooldown;
+	uint32 cooldowntime;
+	uint32 procCount;
+	uint32 procCounter;
 	float floatMisc1;
 	uint32 Misc2;
 	float minrange;
 	float maxrange;
 	uint32 autocast_type;
+	bool custom_pointer;
 };
 
 bool isGuard(uint32 id);
@@ -350,10 +354,7 @@ public:
 	WayPointMap *m_waypoints;
 	inline void SetPetOwner(Unit * owner) { m_PetOwner = owner; }
  
-	map<uint32, uint32> m_spellCooldown;
 	list<AI_Spell*> m_spells;
-	uint32 __fastcall GetSpellCooldown(uint32 SpellId);
-	void __fastcall AddSpellCooldown(SpellEntry * pSpell, AI_Spell * sp);
 	bool disable_melee;
 	bool waiting_for_cooldown;
 	uint32 next_spell_time;
@@ -363,6 +364,8 @@ public:
 		if(m_nextSpell == sp)
 			m_nextSpell = 0;
 	}
+
+	void ResetProcCounts();
 
 	inline void SetWaypointMap(WayPointMap * m) { m_waypoints = m; }
 	bool m_hasWaypointEvents;

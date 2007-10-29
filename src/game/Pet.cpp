@@ -367,7 +367,7 @@ AI_Spell * Pet::CreateAISpell(SpellEntry * info)
 	sp->spell = info;
 	sp->spellType = STYPE_DAMAGE;
 	sp->spelltargetType = TTYPE_SINGLETARGET;
-	sp->cooldown = float(objmgr.GetPetSpellCooldown(info->Id));
+	sp->cooldown = objmgr.GetPetSpellCooldown(info->Id);
 	if(info->Effect[0] == SPELL_EFFECT_APPLY_AURA || info->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA)
 		sp->spellType = STYPE_BUFF;
 
@@ -379,6 +379,8 @@ AI_Spell * Pet::CreateAISpell(SpellEntry * info)
 	}
 
 	sp->autocast_type = GetAutoCastTypeForSpell(info);
+	sp->custom_pointer = false;
+	sp->procCount=0;
 	m_AISpellStore[info->Id] = sp;
 	return sp;
 }
@@ -1544,15 +1546,28 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 		if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
 		{
 			// more than one autocast spell. pick a random one.
-			uint32 c = sRand.randInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
-			uint32 j = 0;
-			list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+			uint32 i;
+			uint32 ms = getMSTime();
+			for(i=0;i<m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size();++i)
+			{
+				uint32 c = sRand.randInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
+				uint32 j = 0;
+				list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 
-			for(; itr != m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end(), j < c; ++j, ++itr);
-			if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
-				m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
-			else
-				m_aiInterface->SetNextSpell(*itr);
+				for(; itr != m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end(), j < c; ++j, ++itr);
+				if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
+				{
+					m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
+					break;
+				}
+				else
+				{
+					if((*itr)->cooldowntime && (*itr)->cooldowntime > ms)
+						continue;
+
+					m_aiInterface->SetNextSpell(*itr);
+				}
+			}
 		}
 		else if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size())
 			m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());

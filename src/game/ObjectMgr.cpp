@@ -1821,7 +1821,9 @@ uint32 ObjectMgr::GetPetSpellCooldown(uint32 SpellId)
 	PetSpellCooldownMap::iterator itr = mPetSpellCooldowns.find(SpellId);
 	if(itr != mPetSpellCooldowns.end())
 		return itr->second;
-	return 0;
+
+	SpellEntry * sp = dbcSpell.LookupEntry(SpellId);
+	return sp->RecoveryTime + sp->StartRecoveryTime;
 }
 
 void ObjectMgr::LoadSpellFixes()
