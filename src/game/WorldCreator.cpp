@@ -638,6 +638,7 @@ void InstanceMgr::CheckForExpiredInstances()
 			for(itr = instancemap->begin(); itr != instancemap->end();)
 			{
 				in = itr->second;
+				++itr;
 
 				// use a "soft" delete here.
 				if(in->m_mapInfo->type != INSTANCE_NONRAID && HasInstanceExpired(in))
