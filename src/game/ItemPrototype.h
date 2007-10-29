@@ -545,7 +545,7 @@ struct ItemPrototype
 	uint32 ItemSet;
 	uint32 MaxDurability;
 	uint32 ZoneNameID;
-	uint32 Field114;
+	uint32 Field114; // ... MapID says I
 	uint32 BagFamily;
 	uint32 ToolCategory;
 	SocketInfo Sockets[3];

@@ -118,6 +118,8 @@ public:
 	void RemoveBuyBackItem(uint32 index);
 	void EmptyBuyBack();
 	bool IsEquipped(uint32 itemid);
+
+	void CheckAreaItems();
 };
 
 #endif
