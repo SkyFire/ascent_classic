@@ -25,7 +25,7 @@
 
 <xsl:template match="status">
 	<table width="100%" border="0" cellspacing="1" cellpadding="3">
-		<tr class="head"><th colspan="4">Ascent-Based Server Status</th></tr>
+		<tr class="head"><th colspan="4">Ascent Server Status (<b>www.ascentemu.com</b>)</th></tr>
 		<tr>
 			<th>Platform: </th><td><xsl:value-of select="platform"/></td>
 			<th>Uptime: </th><td><xsl:value-of select="uptime"/></td>
@@ -56,6 +56,14 @@
                         <th>Horde Online: </th><td><xsl:value-of select="horde"/></td>
 			<th>Connection Peak: </th><td><xsl:value-of select="peakcount"/></td>
                 </tr>
+                <tr>
+                        <th>Character DB Query Count: </th><td><xsl:value-of select="cdbquerysize"/></td>
+                        <th>World DB Query Count: </th><td><xsl:value-of select="cdbquerysize"/></td>
+                </tr>
+                <tr>
+                        <th>Free Thread Count: </th><td><xsl:value-of select="fthreads"/></td>
+                        <th></th><td></td>
+                </tr>
 	<xsl:apply-templates/>
 
 	</table>
@@ -78,6 +86,8 @@
 </xsl:template>
 <xsl:template match="threads">
 </xsl:template>
+<xsl:template match="fthreads">
+</xsl:template>
 <xsl:template match="gmcount">
 </xsl:template>
 <xsl:template match="lastupdate">
@@ -89,6 +99,10 @@
 <xsl:template match="acceptedconns">
 </xsl:template>
 <xsl:template match="peakcount">
+</xsl:template>
+<xsl:template match="wdbquerysize">
+</xsl:template>
+<xsl:template match="cdbquerysize">
 </xsl:template>
 
 <xsl:template match="instances">
@@ -102,10 +116,9 @@
 			<th>Type</th>
 			<th>Players</th>
 			<th>Player Limit</th>
-			<th>State</th>
-
 			<th>Creation Time</th>
 			<th>Expiry Time</th>
+			<th>Gone-Idle Time</th>
 		</tr>
 		<xsl:for-each select="instance">
 		<xsl:sort select="players" data-type="number" order="descending"/>
@@ -197,12 +210,20 @@
             </xsl:choose>
 
 			(<xsl:value-of select="map" />)</td>
-			<td><xsl:value-of select="maptype" /></td>
+			<td>
+			<xsl:choose>
+				<xsl:when test="maptype = 0">Continent</xsl:when>
+				<xsl:when test="maptype = 1">Raid</xsl:when>
+				<xsl:when test="maptype = 2">Non-Raid</xsl:when>
+				<xsl:when test="maptype = 3">PvP</xsl:when>
+				<xsl:when test="maptype = 4">Multi-Mode</xsl:when>
+			</xsl:choose>
+			</td>
 			<td><xsl:value-of select="players" /></td>
 			<td><xsl:value-of select="maxplayers" /></td>
-			<td><xsl:value-of select="state" /></td>
 			<td><xsl:value-of select="creationtime" /></td>
 			<td><xsl:value-of select="expirytime" /></td>
+			<td><xsl:value-of select="idletime" /></td>
 
 		</tr>
 		</xsl:for-each>
