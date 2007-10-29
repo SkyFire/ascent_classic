@@ -4000,6 +4000,9 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
  
 	if(playerTarget && !corpse)
 	{
+		if(!playerTarget->m_bg)
+			return;
+
 		// Set all the lootable stuff on the player. If he repops before we've looted, we'll set the flags
 		// on corpse then :p
 
@@ -4024,6 +4027,17 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
 
 	}else if(corpse)
 	{
+		// find the corpses' owner
+		Player * owner = objmgr.GetPlayer(corpse->GetUInt32Value(CORPSE_FIELD_OWNER));
+		if(owner)
+		{
+			if(owner->m_bg == NULL)
+				return;
+
+			owner->GetSession()->OutPacket(SMSG_PLAYER_SKINNED, 1, "\x00");
+			owner->GetSession()->OutPacket(MSG_CORPSE_QUERY, 1, "\x00");
+		}
+
 		if(corpse->GetUInt32Value(CORPSE_FIELD_DYNAMIC_FLAGS) != 1)
 			corpse->SetUInt32Value(CORPSE_FIELD_DYNAMIC_FLAGS, 1); // sets it so you can loot the plyr
 		
@@ -4038,14 +4052,6 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
 
 		// send loot
 		p_caster->SendLoot(corpse->GetGUID(), 2);
-
-		// find the corpses' owner
-		Player * owner = objmgr.GetPlayer(corpse->GetUInt32Value(CORPSE_FIELD_OWNER));
-		if(owner)
-		{
-			owner->GetSession()->OutPacket(SMSG_PLAYER_SKINNED, 1, "\x00");
-			owner->GetSession()->OutPacket(MSG_CORPSE_QUERY, 1, "\x00");
-		}
 	}
 }
 
