@@ -2111,9 +2111,9 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 			ss << ",'','";
 
 		if(pMember->officerNote)
-			ss << "'," << GetGuildId() << "," << GetGuildRank();
-		else
             ss << CharacterDatabase.EscapeString(pMember->officerNote) << "'," << GetGuildId() << "," << GetGuildRank();
+		else
+			ss << "'," << GetGuildId() << "," << GetGuildRank();
 
 	   }else
 	{
