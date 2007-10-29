@@ -2754,7 +2754,13 @@ uint8 Spell::CanCast(bool rangetolerate)
 						if( u_caster->m_special_state & ( UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP | UNIT_STATE_ROOT | UNIT_STATE_STUN | UNIT_STATE_CONFUSE | UNIT_STATE_SNARE ) )
 							break;
 					}
-				
+					break;
+				case 0xCD4CDF55: // Barksin
+					{ // This spell is usable while stunned, frozen, incapacitated, feared or asleep.  Lasts 12 sec.
+						if( u_caster->m_special_state & ( UNIT_STATE_STUN | UNIT_STATE_FEAR | UNIT_STATE_SLEEP ) ) // Uh, what unit_state is Frozen? (freezing trap...)
+							break;
+					}
+
 				default:
 					return SPELL_FAILED_SILENCED;
 				}
