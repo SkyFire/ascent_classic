@@ -3529,8 +3529,17 @@ void Unit::EventSummonPetExpire()
 
 void Unit::CastSpell(Unit* Target, SpellEntry* Sp, bool triggered)
 {
-	SpellCastTargets targets(Target->GetGUID());
 	Spell *newSpell = new Spell(this, Sp, triggered, 0);
+	SpellCastTargets targets(0);
+	if(Target)
+	{
+		targets.m_unitTarget |= TARGET_FLAG_UNIT;
+		targets.m_unitTarget = Target->GetGUID();
+	}
+	else
+	{
+		newSpell->GenerateTargets(&targets);
+	}
 	newSpell->prepare(&targets);
 }
 

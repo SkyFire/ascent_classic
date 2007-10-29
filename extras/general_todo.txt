@@ -97,10 +97,8 @@ Zack - test my shit :
 - blessing of light applies it's effect on holy shock ? and value gets wrong
 - palading spiritual atunement procs 2 times.And it should proc if others cast heal spell on paladin
 - mobs continue casting after they die. Test spell CancelSpellCast.Specially test this : CastSpellAoF
-- test aura 193, it might make a big BUBU
-- paladin Seal of Command (41469) - should make holy dmg
-- see if cold blood(14177) and Revealed Flaw(28815) get's it's cooldown enabled after use
 "yes, the thing is that if you have "Heart of the Wild" talent and you reset talents, if you shift you have like 500mil hp & insane dmg. You need to relog in order that things should work fine. Same thing for other talents ... leader of pack, imp leader of pack...they need to relog to lose them."
+- test pet spell targeting
 
 ==========================================================================
 Capt - test my shit :

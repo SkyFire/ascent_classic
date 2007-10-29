@@ -1565,7 +1565,10 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 		if((*itr)->spelltargetType == TTYPE_OWNER)
 			CastSpell(m_Owner, (*itr)->spell, false);
 		else
-			CastSpell(this, (*itr)->spell, false);
+		{
+			//modified by Zack: Spell targetting will be generated in the castspell function now.You cannot force to target self all the time
+			CastSpell((Unit*)NULL, (*itr)->spell, false);
+		}
 	}
 }
 
