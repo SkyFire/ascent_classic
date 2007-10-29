@@ -104,7 +104,9 @@ void InstanceMgr::Shutdown()
 		{
 			for(itr = m_instances[i]->begin(); itr != m_instances[i]->end(); ++itr)
 			{
-				itr->second->m_mapMgr->KillThread();
+				if(itr->second->m_mapMgr)
+					itr->second->m_mapMgr->KillThread();
+
 				delete itr->second;
 			}
 
