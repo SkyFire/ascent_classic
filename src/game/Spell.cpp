@@ -887,8 +887,8 @@ void Spell::prepare(SpellCastTargets * targets)
 
 		//remove Aurastates required for this spell from caster and target
 		//not sure if this is the right spot for this
-//		if(m_spellInfo->CasterAuraState)
-//			u_caster->RemoveFlag(UNIT_FIELD_AURASTATE,m_spellInfo->CasterAuraState);
+		if(m_spellInfo->CasterAuraState)
+			u_caster->RemoveFlag(UNIT_FIELD_AURASTATE,m_spellInfo->CasterAuraState);
 	}
 	else
 		cast(false);
@@ -1247,6 +1247,21 @@ void Spell::cast(bool check)
 
 						p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,Target, m_spellInfo);
 						p_caster->m_procCounter = 0; //this is required for to be able to count the depth of procs (though i have no idea where/why we use proc on proc)
+
+					}
+				}
+
+				//should merge all these iterations. wonder how it is faster. Make 1 if and iteration or iteration and more ifs
+				if(m_spellInfo->TargetAuraState)
+				{
+					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
+					{
+						Unit * Target = p_caster->GetMapMgr()->GetUnit((*i));
+
+						if(!Target)
+							continue; //we already made this check, so why make it again ?
+
+						Target->RemoveFlag(UNIT_FIELD_AURASTATE,m_spellInfo->TargetAuraState);
 					}
 				}
 			}

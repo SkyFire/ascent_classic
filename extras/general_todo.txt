@@ -20,8 +20,6 @@ SMT_RESIST_DISPEL - check if it is used
 - a lot of spells have wrong trigger spell id. Lightning shield, Parry Mastery ...Make a tool to find them all and see what can be done for them.
 - some creatures should not enter or exit water. ex : spider - fish.
 - handleproc is getting huge, maybe we should break it into pieces
-- on server load a lot of spell.dbc data is processed. Maybe make an external tool
-- add conditioned aura removal. Ex: presence of mind should not be removed on instant cast spell (RemoveAurasByInterruptFlag)
 - maybe rewrite procspell on spell. There are like 140 spells who use this, and to function correctly most of them would need this
 - hunter : curently you can equip only 1 Ammo Bag. This is wrong (INV_ERR_CAN_EQUIP_ONLY1_AMMOPOUCH). It should only use effects of ammo bag that is actively used.
 - paladin - illumination - nasty spell. Started workin on it but just delayed it for a while
@@ -30,17 +28,13 @@ SMT_RESIST_DISPEL - check if it is used
 - some creatures need to fly (is this made already ? ) on spawn
 - add new column to quests to be able to make required_quest_alternative
 - make cooldown cheat update client cooldown too
-- procs of enchants like Crusader,Demonslaying,Battlemaster,Mongoose is 100 %
 - make DOTs do not require infront check
 - add a combat exit timer so warrior and rogue cannot charge.stealth any time
-- add on_change_map event for scripts. Required for some instance scripts
-- make spells to run on startup Isdamaging and ishealing hunctions
 - summon guardians not working : 49,
 - clearcasting
 - there should a trigger type named : proc on effect - so we can know the effect value at which we proc
 - make a spellgroup generator for featured spells
 - channeled spells have a big chance to get interrupted
-- sucubus seduces self
 - crusader strike and seal of blood do not gain extra dmg from stacked effect
 
 ==========================================================================
@@ -99,6 +93,7 @@ Zack - test my shit :
 - mobs continue casting after they die. Test spell CancelSpellCast.Specially test this : CastSpellAoF
 "yes, the thing is that if you have "Heart of the Wild" talent and you reset talents, if you shift you have like 500mil hp & insane dmg. You need to relog in order that things should work fine. Same thing for other talents ... leader of pack, imp leader of pack...they need to relog to lose them."
 - test pet spell targeting
+- aurastate gets consumed after using it
 
 ==========================================================================
 Capt - test my shit :

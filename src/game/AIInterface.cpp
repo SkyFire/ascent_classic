@@ -90,7 +90,6 @@ AIInterface::AIInterface()
 	m_AIState_backup = m_AIState;
 	UnitToFollow_backup = NULL;
 	m_isGuard = false;
-	castingspell = NULL;
 }
 
 void AIInterface::Init(Unit *un, AIType at, MovementType mt)
@@ -2595,8 +2594,8 @@ void AIInterface::CastSpell(Unit* caster, SpellEntry *spellInfo, SpellCastTarget
 #endif
 
 	//i wonder if this will lead to a memory leak :S
-	castingspell = new Spell(caster, spellInfo, false, NULL);
-	castingspell->prepare(&targets);
+	Spell *nspell = new Spell(caster, spellInfo, false, NULL);
+	nspell->prepare(&targets);
 }
 
 SpellEntry *AIInterface::getSpellEntry(uint32 spellId)
@@ -3121,17 +3120,16 @@ void AIInterface::Event_Summon_FE_totem(uint32 summon_duration)
 		*/
 	}
 }
-
+/*
 void AIInterface::CancelSpellCast()
 {
-	//i can see this crashing already :P.
-	if(m_AIState==STATE_CASTING && m_nextSpell && castingspell)
-		castingspell->safe_cancel();
 	//hmm unit spell casting is not the same as Ai spell casting ? Have to test this
 	if(m_Unit->isCasting())
 		m_Unit->m_currentSpell->safe_cancel();
+	//i can see this crashing already :P.
+	m_AIState = STATE_IDLE;
 }
-
+*/
 
 bool isGuard(uint32 id)
 {
