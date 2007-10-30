@@ -145,7 +145,6 @@ public:
 	}
 
 	void UpdateAccount(Account * acct, Field * field);
-	bool LoadAccount(string Name);	
 	void ReloadAccounts(bool silent);
 	void ReloadAccountsCallback();
 

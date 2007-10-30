@@ -173,18 +173,6 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 	memcpy(acct->SrpHash, hash.GetDigest(), 20);
 }
 
-bool AccountMgr::LoadAccount(string Name)
-{
-	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned, forceLanguage FROM account_database WHERE login='%s'", Name.c_str());
-	if(result == 0)
-		return false;
-
-	AddAccount(result->Fetch());
-	delete result;
-
-	return true;
-}
-
 void AccountMgr::ReloadAccountsCallback()
 {
 	ReloadAccounts(true);

@@ -110,19 +110,6 @@ struct Trainer
 	uint32 Cannot_Train_GossipTextId;
 };
 
-struct TrainerSpellOverride
-{
-	uint32 SpellID;
-	uint32 Cost;
-	uint32 RequiredSpell;
-	uint32 DeleteSpell;
-	uint32 RequiredSkill;
-	uint32 RequiredSkillValue;
-	uint8 RequiredLevel;
-	int32 RequiredClass;
-};
-
-
 struct LevelInfo
 {
 	uint32 HP;
