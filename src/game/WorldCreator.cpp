@@ -814,7 +814,7 @@ MapMgr * InstanceMgr::CreateBattlegroundInstance(uint32 mapid)
 	{
 		_CreateMap(mapid);
 		if(!m_maps[mapid])
-			return;
+			return NULL;
 	}
 	m_mapLock.Acquire();
 	Instance * in = new Instance;

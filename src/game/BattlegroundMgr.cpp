@@ -773,11 +773,12 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 		static const uint32 arena_map_ids[3] = { 559, 562, 572 };
 		uint32 mapid = /*arena_map_ids[sRand.randInt(3)]*/562;
 		uint32 players_per_side;
-/*        if(sWorldCreator.CreateInstance(mapid, 0, &mgr) == false || !mgr)
+		mgr = sInstanceMgr.CreateBattlegroundInstance(mapid);
+		if(mgr == NULL)
 		{
 			Log.Error("BattlegroundManager", "Arena CreateInstance() call failed for map %u, type %u, level group %u", mapid, Type, LevelGroup);
 			return NULL;		// Shouldn't happen
-		}*/
+		}
 
 		switch(Type)
 		{
@@ -816,11 +817,12 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 	}
 
 	/* Create Map Manager */
-/*	if(sWorldCreator.CreateInstance(BGMapIds[Type], 0, &mgr) == false || !mgr)
+	mgr = sInstanceMgr.CreateBattlegroundInstance(BGMapIds[Type]);
+	if(mgr == NULL)
 	{
 		Log.Error("BattlegroundManager", "CreateInstance() call failed for map %u, type %u, level group %u", BGMapIds[Type], Type, LevelGroup);
 		return NULL;		// Shouldn't happen
-	}*/
+	}
 
 	/* Call the create function */
 	iid = ++m_maxBattlegroundId;
