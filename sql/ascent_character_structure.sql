@@ -276,15 +276,15 @@ SET character_set_client = @saved_cs_client;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 CREATE TABLE `instances` (
-  `instanceid` int(10) unsigned NOT NULL DEFAULT '0',
-  `mapid` int(10) unsigned NOT NULL DEFAULT '0',
-  `npc_data` longtext COLLATE utf8_unicode_ci NOT NULL,
-  `player_data` longtext COLLATE utf8_unicode_ci NOT NULL,
-  `creation` int(10) unsigned NOT NULL DEFAULT '0',
-  `expire` int(10) unsigned NOT NULL DEFAULT '0',
-  `difficulty` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`instanceid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `id` int(10) unsigned NOT NULL,
+  `mapid` int(10) unsigned NOT NULL,
+  `creation` int(10) unsigned NOT NULL,
+  `expiration` int(10) unsigned NOT NULL,
+  `killed_npc_guids` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `difficulty` int(10) unsigned NOT NULL,
+  `creator_group` int(10) unsigned NOT NULL,
+  `creator_guid` int(10) unsigned NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
