@@ -1321,6 +1321,7 @@ bool World::SetInitialWorldSettings()
 		triggersp->EffectBasePoints[0] = parentsp->EffectBasePoints[0];
 
 	SpellEntry * sp = dbcSpell.LookupEntry(16164);
+	SpellEntry * sp2;
 	if(sp && sp->Id==16164)
 		sp->procFlags=PROC_ON_SPELL_CRIT_HIT_VICTIM;
 
@@ -1500,6 +1501,29 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(14066); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Elusiveness_grouprelation;
+
+	//rogue - Dirty Tricks 
+	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
+	uint32 DT_grouprelation;
+	if(sp)
+		DT_grouprelation = sp->SpellGroupType;
+	else DT_grouprelation=0;
+	sp = dbcSpell.LookupEntry(2070);//rogue - sap 
+	if(sp)
+	{
+		DT_grouprelation |= sp->SpellGroupType;
+		sp2 = dbcSpell.LookupEntry(30980);//rogue - sap - this one is missing the value :S
+		if(sp2)
+			sp2->SpellGroupType = sp->SpellGroupType;
+	}
+	//rogue - Dirty Tricks  r1
+	sp = dbcSpell.LookupEntry(14076); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=DT_grouprelation;
+	sp = dbcSpell.LookupEntry(14094); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=DT_grouprelation;
+
 
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;

@@ -1,0 +1,54 @@
+Rogues Hemo is not working correctly...
+restealthing removes Shadow word:Paing and Devouring plague
+Gouge can be done from any position.Should be only facing the target,thus in front of it.
+
+Surprise attacks Id: 32601
+
+Your finishing moves can no longer be dodged, and the damage dealt by your Sinister Strike, Backstab, Shiv and Gouge abilities is increased by 10%.
+
+merge bine numai ca "Your finishing moves can no longer be dodged" nu merge 
+
+finishing moves:
+
+-Eviscerate 
+-Slice and Dice
+-Expose Armor
+-Rupture
+-Kidney Shot
+-Envenom
+-Deadly Throw
+
+How to test: Make a rogue learn talent "Surprise attacks" from "Combat" talent tree then duel sombodey and use eney of the finishing moves listet meney times to make shure the dont get dodged
+
+* Vanish - doesn't remove effects such as Frost Nova.
+* Cloak of shadows - grants immunity, but doesn't remove magic effects (worked long time ago, but no immunity)
+* Shiv - no effect, should apply off hand poison
+* Rupture - doesn't scale with attack power
+* Relentless Strikes - has a 20% chance per combo point to restore 25 energy, thus guarantees that 5 point combos restore 25 energy (or cost 25 energy less), however it doesn't work for all finishers, including Eviscerate and Expose Armor. It does work for Kidney Shot and Slice and Dice, from what I've seen.
+* Lethality
+
+Ruthlesness ads 2 combo points (again)
+
+Dirty Deeds Rank 2
+Reduces the Energy cost of your Cheap Shot and Garrote abilities by 20.
+
+-----------------------------------------------------------
+Master of Subtlety Rank 3
+Attacks made while stealthed and for 6 seconds after breaking stealth cause an additional 10% damage.
+
+It gives no additional damage 6sec after breaking stealth, bugged.
+-----------------------------------------------------------
+Shadowstep
+10 Energy_____20 yd range
+Instant_____15 sec cooldown
+Attempts to step through the shadows and reappear behind your enemy. The damage of your next Ambush, Backstab or Garrote ability is increased by 20%. Lasts 10 sec.
+
+Teleport is working, but no increased damage.
+-----------------------------------------------------------
+Lethality Rank 5
+Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Ghostly Strike, Mutilate, Shiv, and Hemorrhage abilities by 30%.
+
+No increased damage from critical strikes, bugged completely.
+-----------------------------------------------------------
+
+This is bugged from talents I have. Camouflage and Master of Deception are also bugged I think, but it's less important.
