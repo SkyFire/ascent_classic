@@ -54,7 +54,7 @@ void Mailbox::DeleteMessage(uint32 MessageId, bool sql)
 {
 	Messages.erase(MessageId);
 	if(sql)
-		CharacterDatabase.Execute("DELETE FROM mailbox WHERE message_id = %u", MessageId);
+		CharacterDatabase.WaitExecute("DELETE FROM mailbox WHERE message_id = %u", MessageId);
 }
 
 WorldPacket * Mailbox::BuildMailboxListingPacket()
@@ -198,7 +198,7 @@ void MailSystem::SaveMessageToSQL(MailMessage * message)
 		<< message->copy_made << ","
 		<< message->read_flag << ","
 		<< message->deleted_flag << ")";
-	CharacterDatabase.Execute(ss.str().c_str());
+	CharacterDatabase.WaitExecute(ss.str().c_str());
 }
 
 void WorldSession::HandleSendMail(WorldPacket & recv_data )
@@ -344,7 +344,7 @@ void WorldSession::HandleMarkAsRead(WorldPacket & recv_data )
 		message->expire_time = (uint32)UNIXTIME + (TIME_DAY * 3);
 
 	// update it in sql
-	CharacterDatabase.Execute("UPDATE mailbox SET read_flag = 1, expiry_time = %u WHERE message_id = %u", message->message_id, message->expire_time);
+	CharacterDatabase.WaitExecute("UPDATE mailbox SET read_flag = 1, expiry_time = %u WHERE message_id = %u", message->message_id, message->expire_time);
 }
 
 void WorldSession::HandleMailDelete(WorldPacket & recv_data )
@@ -374,7 +374,7 @@ void WorldSession::HandleMailDelete(WorldPacket & recv_data )
 		message->deleted_flag = 1;
 
 		// update in sql
-		CharacterDatabase.Execute("UPDATE mailbox SET deleted_flag = 1 WHERE message_id = %u", message_id);
+		CharacterDatabase.WaitExecute("UPDATE mailbox SET deleted_flag = 1 WHERE message_id = %u", message_id);
 	}
 	else
 	{
@@ -471,7 +471,7 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 		message->attached_item_guid = 0;
 	
 	// update in sql!
-	CharacterDatabase.Execute("UPDATE mailbox SET attached_item_guid = 0, external_attached_item_guid = 0, cod = 0 WHERE message_id = %u", message->message_id);
+	CharacterDatabase.WaitExecute("UPDATE mailbox SET attached_item_guid = 0, external_attached_item_guid = 0, cod = 0 WHERE message_id = %u", message->message_id);
 
 	// send complete packet
 	data << uint32(MAIL_OK);
@@ -513,7 +513,7 @@ void WorldSession::HandleTakeMoney(WorldPacket & recv_data )
 	message->money = 0;
 
 	// update in sql!
-	CharacterDatabase.Execute("UPDATE mailbox SET money = 0 WHERE message_id = %u", message->message_id);
+	CharacterDatabase.WaitExecute("UPDATE mailbox SET money = 0 WHERE message_id = %u", message->message_id);
 
 	// send result
 	data << uint32(MAIL_OK);
@@ -604,7 +604,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
 	message->copy_made = true;
 
 	// update in sql
-	CharacterDatabase.Execute("UPDATE mailbox SET copy_made = 1 WHERE message_id = %u", message_id);
+	CharacterDatabase.WaitExecute("UPDATE mailbox SET copy_made = 1 WHERE message_id = %u", message_id);
 
 	data << uint32(MAIL_OK);
 	SendPacket(&data);
