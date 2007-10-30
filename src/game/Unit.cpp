@@ -2154,34 +2154,6 @@ void Unit::smsg_AttackStart(Unit* pVictim)
 	}
 }
 
-void Unit::RemoveBySpecialType(uint32 id, uint64 caster)
-{
-	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
-	{
-		if(m_auras[x])
-		{
-			SpellExtraInfo* aur = SpellExtraStorage.LookupEntry(m_auras[x]->GetSpellId());
-			if(aur)
-			{
-				uint32 type = aur->specialtype;
-				if(type == id)
-				{
-					if(((type == STING) || (type == BLESSING) || (type == CURSE)) && (m_auras[x]->m_casterGuid==caster))
-					{
-						if (RemoveAura(m_auras[x]->GetSpellId(),caster))
-							return;
-					}
-					else
-					{
-						if (RemoveAura(m_auras[x]))
-							return;
-					}
-				}
-			}
-		}
-	}
-}
-
 void Unit::AddAura(Aura *aur)
 {
 	if(m_mapId != 530)

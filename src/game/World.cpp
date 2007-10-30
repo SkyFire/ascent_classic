@@ -1304,6 +1304,12 @@ bool World::SetInitialWorldSettings()
 			sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
 		}
 
+		if(namehash==0x8401EC6A)
+		{
+			// shred
+			sp->in_front_status = 2;
+		}
+
 //junk code to get me has :P 
 //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
 //	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);

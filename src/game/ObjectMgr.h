@@ -26,27 +26,6 @@ inline bool FindXinYString(std::string& x, std::string& y)
 	return y.find(x) != std::string::npos;
 }
 
-enum SpellSpecialType
-{
-	NOTHING =0,
-	SEAL    =1,
-	BLESSING=2,
-	CURSE   =3,
-	ASPECT  =4,
-	STING   =5,
-};
-
-#pragma pack(push,1)
-struct SpellExtraInfo
-{
-	uint32 Id;
-	uint32 specialtype;
-	uint32 enchantableslots;
-	uint32 ExtraFlags;
-};
-
-#pragma pack(pop)
-
 struct GM_Ticket
 {
 	uint64 guid;

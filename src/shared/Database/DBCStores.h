@@ -348,6 +348,7 @@ struct SpellEntry
     float base_range_or_radius_sqr;         //!!! CUSTOM, needed for aoe spells most of the time
 	uint32 talent_tree;
 	bool removable_by_immunity;
+	uint32 in_front_status;
 };
 
 struct ItemExtendedCostEntry

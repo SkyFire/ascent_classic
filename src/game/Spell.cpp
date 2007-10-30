@@ -2508,20 +2508,17 @@ uint8 Spell::CanCast(bool rangetolerate)
 					}
 					else
 					{   // our spell is not a ranged spell
-
-						// get spell extra data
-						SpellExtraInfo* SpellExtra = SpellExtraStorage.LookupEntry(m_spellInfo->Id);
-
-						if(SpellExtra)
+						if(GetType() == SPELL_TYPE_MAGIC && m_spellInfo->in_front_status == 1)
 						{
-							// Spell extra infront check
-							if (GetType() == SPELL_TYPE_MAGIC && SpellExtra->ExtraFlags & SPELL_EXTRA_INFRONT) // only do spells
-								if (!u_caster->isInFront(target))
-									return (uint8)SPELL_FAILED_UNIT_NOT_INFRONT;
-							// Spell extra Behind check
-							if(SpellExtra->ExtraFlags & SPELL_EXTRA_BEHIND)
-								if(target->isInFront(u_caster))
-									return SPELL_FAILED_NOT_BEHIND;
+							// must be in front
+							if (!u_caster->isInFront(target))
+								return (uint8)SPELL_FAILED_UNIT_NOT_INFRONT;
+						}
+						else if(m_spellInfo->in_front_status == 2)
+						{
+							// behind
+							if(target->isInFront(u_caster))
+								return (uint8)SPELL_FAILED_NOT_BEHIND;
 						}
 					}
 				}

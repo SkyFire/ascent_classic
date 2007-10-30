@@ -864,8 +864,6 @@ public:
 	void unsetDetectRangeMod(uint64 guid);
 	int32 getDetectRangeMod(uint64 guid);
 
-	void RemoveBySpecialType(uint32 id,uint64 guid);
-   
 	Loot loot;
 	uint32 SchoolCastPrevent[7];
 	int32 GetDamageDoneMod(uint32 school);

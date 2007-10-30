@@ -47,7 +47,6 @@ SERVER_DECL SQLStorage<AreaTrigger, HashMapStorageContainer<AreaTrigger> >					A
 SERVER_DECL SQLStorage<ItemPage, HashMapStorageContainer<ItemPage> >						ItemPageStorage;
 SERVER_DECL SQLStorage<Quest, HashMapStorageContainer<Quest> >								QuestStorage;
 SERVER_DECL SQLStorage<GossipText, HashMapStorageContainer<GossipText> >					NpcTextStorage;
-SERVER_DECL SQLStorage<SpellExtraInfo, HashMapStorageContainer<SpellExtraInfo> >			SpellExtraStorage;
 SERVER_DECL SQLStorage<GraveyardTeleport, HashMapStorageContainer<GraveyardTeleport> >		GraveyardStorage;
 SERVER_DECL SQLStorage<TeleportCoords, HashMapStorageContainer<TeleportCoords> >			TeleportCoordStorage;
 SERVER_DECL SQLStorage<FishingZoneEntry, HashMapStorageContainer<FishingZoneEntry> >		FishingZoneStorage;
@@ -235,6 +234,25 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 	} while( result->NextRow() );
 
 	delete result;
+	result = WorldDatabase.Query("SELECT Id,ExtraFlags FROM spellextra");
+	if(result)
+	{
+		do 
+		{
+			Field * fields = result->Fetch();
+			uint32 id = fields[0].GetUInt32();
+			uint32 flags = fields[1].GetUInt32();
+			SpellEntry * sp = dbcSpell.LookupEntryForced(id);
+			if(!sp)
+				continue;
+
+			if(flags & SPELL_EXTRA_INFRONT)
+				sp->in_front_status = 1;
+			else if(flags & SPELL_EXTRA_BEHIND)
+				sp->in_front_status = 2;				
+		} while(result->NextRow());
+		delete result;
+	}
 }
 
 void ObjectMgr::LoadExtraItemStuff()
@@ -284,7 +302,6 @@ void Storage_FillTaskList(TaskList & tl)
 	make_task(AreaTriggerStorage, AreaTrigger, HashMapStorageContainer, "areatriggers", gAreaTriggerFormat);
 	make_task(ItemPageStorage, ItemPage, HashMapStorageContainer, "itempages", gItemPageFormat);
 	make_task(QuestStorage, Quest, HashMapStorageContainer, "quests", gQuestFormat);
-	make_task(SpellExtraStorage, SpellExtraInfo, HashMapStorageContainer, "spellextra", gSpellExtraFormat);
 	make_task(GraveyardStorage, GraveyardTeleport, HashMapStorageContainer, "graveyards", gGraveyardFormat);
 	make_task(TeleportCoordStorage, TeleportCoords, HashMapStorageContainer, "teleport_coords", gTeleportCoordFormat);
 	make_task(FishingZoneStorage, FishingZoneEntry, HashMapStorageContainer, "fishing", gFishingFormat);
@@ -317,7 +334,6 @@ void Storage_Cleanup()
 	AreaTriggerStorage.Cleanup();
 	ItemPageStorage.Cleanup();
 	QuestStorage.Cleanup();
-	SpellExtraStorage.Cleanup();
 	GraveyardStorage.Cleanup();
 	TeleportCoordStorage.Cleanup();
 	FishingZoneStorage.Cleanup();
@@ -341,8 +357,6 @@ bool Storage_ReloadTable(const char * TableName)
 		AreaTriggerStorage.Reload();
 	else if(!stricmp(TableName, "itempages"))			// Item Pages
 		ItemPageStorage.Reload();
-	else if(!stricmp(TableName, "spellextra"))			// Spell Extra Info
-		SpellExtraStorage.Reload();
 	else if(!stricmp(TableName, "quests"))				// Quests
 		QuestStorage.Reload();
 	else if(!stricmp(TableName, "npc_text"))			// NPC Text Storage
