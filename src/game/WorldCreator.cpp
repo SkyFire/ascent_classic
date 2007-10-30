@@ -509,7 +509,7 @@ void InstanceMgr::ResetSavedInstances(Player * plr)
 	InstanceMap * instancemap;
 	uint32 i;
 
-	if(plr->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL)
+	if(!plr->IsInWorld() || plr->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL)
 		return;
 
 	m_mapLock.Acquire();
@@ -661,7 +661,7 @@ void InstanceMgr::BuildSavedInstancesForPlayer(Player * plr)
 	InstanceMap * instancemap;
 	uint32 i;
 
-	if(plr->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL)
+	if(!plr->IsInWorld() || plr->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL)
 	{
 		m_mapLock.Acquire();
 		for(i = 0; i < NUM_MAPS; ++i)
