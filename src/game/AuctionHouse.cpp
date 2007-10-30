@@ -513,6 +513,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 	auct->pItem = pItem;
 	auct->Deleted = false;
 	auct->DeletedReason = 0;
+	auct->DepositAmount = item_deposit;
 
 	// remove deposit
 	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)item_deposit);
@@ -669,14 +670,14 @@ void AuctionHouse::LoadAuctions()
 
 	Auction * auct;
 	Field * fields;
+
 	do
 	{
 		fields = result->Fetch();
 		auct = new Auction;
-		auct->Id = fields++->GetUInt32();
-		fields++;
+		auct->Id = fields[0].GetUInt32();
 		
-		Item * pItem = objmgr.LoadItem(fields++->GetUInt64());
+		Item * pItem = objmgr.LoadItem(fields[2].GetUInt64());
 		if(!pItem)
 		{
 			CharacterDatabase.Execute("DELETE FROM auctions WHERE auctionId=%u",auct->Id);
@@ -684,12 +685,12 @@ void AuctionHouse::LoadAuctions()
 			continue;
 		}
 		auct->pItem = pItem;
-		auct->Owner = fields++->GetUInt32();
-		auct->BuyoutPrice = fields++->GetUInt32();
-		auct->ExpiryTime = fields++->GetUInt32();
-		auct->HighestBidder = fields++->GetUInt32();
-		auct->HighestBid = fields++->GetUInt32();
-		auct->DepositAmount = fields++->GetUInt32();
+		auct->Owner = fields[3].GetUInt32();
+		auct->BuyoutPrice = fields[4].GetUInt32();
+		auct->ExpiryTime = fields[5].GetUInt32();
+		auct->HighestBidder = fields[6].GetUInt32();
+		auct->HighestBid = fields[7].GetUInt32();
+		auct->DepositAmount = fields[8].GetUInt32();
 		auct->DeletedReason = 0;
 		auct->Deleted = false;
 
