@@ -1164,7 +1164,7 @@ void CBattleground::Close()
 	OnClose();
 
 	/* shut down the map thread. this will delete the battleground from the corrent context. */
-	m_mapMgr->InstanceShutdown();
+	m_mapMgr->SetThreadState(THREADSTATE_TERMINATE);
 
 	m_mainLock.Release();
 }

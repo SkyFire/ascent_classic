@@ -506,7 +506,12 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	}
 
 	if(!HasPlayers() && !InactiveMoveTime && !forced_expire && GetMapInfo()->type != INSTANCE_NULL && GetMapInfo()->type != INSTANCE_PVP)
+	{
+		if(pInstance && pInstance->m_isBattleground)
+			return;
+
 		InactiveMoveTime = UNIXTIME + (MAPMGR_INACTIVE_MOVE_TIME * 60);	   // 5 mins -> move to inactive
+	}
 }
 
 void MapMgr::ChangeObjectLocation(Object *obj)
@@ -1337,7 +1342,7 @@ bool MapMgr::Do()
 	if(pInstance)
 	{
 		// check for a non-raid instance, these expire after 10 minutes.
-		if(GetMapInfo()->type == INSTANCE_NONRAID)
+		if(GetMapInfo()->type == INSTANCE_NONRAID || pInstance->m_isBattleground)
 		{
 			pInstance->m_mapMgr = NULL;
 			sInstanceMgr._DeleteInstance(pInstance, true);

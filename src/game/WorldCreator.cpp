@@ -214,6 +214,7 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr)
 	in->m_mapId = mapid;
 	in->m_mapMgr = NULL;		// always start off without a map manager, it is created in GetInstance()
 	in->m_mapInfo = inf;
+	in->m_isBattleground=false;
 	plr->SetInstanceID(in->m_instanceId);
 	Log.Notice("InstanceMgr", "Creating instance for player %u and group %u on map %u. (%u)", in->m_creatorGuid, in->m_creatorGroup, in->m_mapId, in->m_instanceId);
 	
@@ -742,7 +743,7 @@ void InstanceMgr::BuildRaidSavedInstancesForPlayer(Player * plr)
 void Instance::SaveToDB()
 {
 	// don't save non-raid instances.
-	if(m_mapInfo->type == INSTANCE_NONRAID)
+	if(m_mapInfo->type == INSTANCE_NONRAID || m_isBattleground)
 		return;
 
 	std::stringstream ss;
@@ -806,13 +807,32 @@ void InstanceMgr::PlayerLeftGroup(Group * pGroup, Player * pPlayer)
 	m_mapLock.Release();
 }
 
-void InstanceMgr::CreateBattlegroundInstance(uint32 mapid)
+MapMgr * InstanceMgr::CreateBattlegroundInstance(uint32 mapid)
 {
+	// shouldn't happen
+	if(!m_maps[mapid])
+	{
+		_CreateMap(mapid);
+		if(!m_maps[mapid])
+			return;
+	}
 	m_mapLock.Acquire();
 	Instance * in = new Instance;
 	in->m_creation = UNIXTIME;
 	in->m_expiration = 0;
+	in->m_creatorGroup = 0;
+	in->m_creatorGuid = 0;
+	in->m_difficulty = 0;
+	in->m_instanceId = GenerateInstanceID();
+	in->m_mapId = mapid;
+	in->m_mapInfo = WorldMapInfoStorage.LookupEntry(mapid);
+	in->m_mapMgr = new MapMgr(m_maps[mapid], mapid, in->m_instanceId);
+	in->m_isBattleground = true;
+	if(m_instances[mapid]==NULL)
+		m_instances[mapid]=new InstanceMap;
+	m_instances[mapid]->insert(InstanceMap::value_type(in->m_instanceId,in));
 	m_mapLock.Release();
+	return in->m_mapMgr;
 }
 
 FormationMgr::FormationMgr()

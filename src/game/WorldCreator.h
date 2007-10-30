@@ -93,6 +93,7 @@ public:
 	time_t m_creation;
 	time_t m_expiration;
 	MapInfo * m_mapInfo;
+	bool m_isBattleground;
 
 	void LoadFromDB(Field * fields);
 	void SaveToDB();
