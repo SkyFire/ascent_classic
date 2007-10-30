@@ -5479,7 +5479,10 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 				//we should remove effect first
 				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange(false);
 				//set new value
-				static_cast<Player*>(m_target)->SetTalentHearthOfWildPCT(val);
+				if(apply)
+					static_cast<Player*>(m_target)->SetTalentHearthOfWildPCT(val);
+				else
+					static_cast<Player*>(m_target)->SetTalentHearthOfWildPCT(0); //this happens on a talent reset
 				//reapply
 				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange(true);
 			}
