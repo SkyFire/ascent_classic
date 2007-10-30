@@ -166,7 +166,7 @@ bool Master::Run(int argc, char ** argv)
 	else
 	{
 		sLog.m_fileLogLevel = -1;
-		sLog.m_screenLogLevel = 3;
+		sLog.m_screenLogLevel = 1;
 	}
 
 	printf(BANNER, BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
