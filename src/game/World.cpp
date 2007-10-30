@@ -1519,11 +1519,33 @@ bool World::SetInitialWorldSettings()
 	//rogue - Dirty Tricks  r1
 	sp = dbcSpell.LookupEntry(14076); 
 	if(sp)
+	{
 		sp->EffectSpellGroupRelation[0]=DT_grouprelation;
+		sp->EffectSpellGroupRelation[1]=DT_grouprelation;
+	}
 	sp = dbcSpell.LookupEntry(14094); 
 	if(sp)
+	{
 		sp->EffectSpellGroupRelation[0]=DT_grouprelation;
+		sp->EffectSpellGroupRelation[1]=DT_grouprelation;
+	}
 
+	//rogue - Dirty Deeds
+	sp = dbcSpell.LookupEntry(1833);//rogue - Cheap Shot 
+	uint32 DD_grouprelation;
+	if(sp)
+		DD_grouprelation = sp->SpellGroupType;
+	else DD_grouprelation=0;
+	sp = dbcSpell.LookupEntry(703);//rogue - Garrote 
+	if(sp)
+		DD_grouprelation |= sp->SpellGroupType;
+	//rogue - Dirty Deeds r1
+	sp = dbcSpell.LookupEntry(14082); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=DD_grouprelation;
+	sp = dbcSpell.LookupEntry(14083); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=DD_grouprelation;
 
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;

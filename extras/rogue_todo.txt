@@ -29,14 +29,6 @@ How to test: Make a rogue learn talent "Surprise attacks" from "Combat" talent t
 
 Ruthlesness ads 2 combo points (again)
 
-Dirty Deeds Rank 2
-Reduces the Energy cost of your Cheap Shot and Garrote abilities by 20.
-
------------------------------------------------------------
-Master of Subtlety Rank 3
-Attacks made while stealthed and for 6 seconds after breaking stealth cause an additional 10% damage.
-
-It gives no additional damage 6sec after breaking stealth, bugged.
 -----------------------------------------------------------
 Shadowstep
 10 Energy_____20 yd range

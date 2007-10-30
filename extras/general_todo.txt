@@ -72,8 +72,8 @@ SMT_RESIST_DISPEL - check if it is used
 - make aurastates get checked on spellcast and remove them on a sucessfull cast
 - blind + scatter shot = blocheaza mobii
 - on creature evade, make them imune to all spells, test with war stomp
-"if I have a mob or player dotted when I use fear on them, it causes me to become feared when the dot ticks. This one really pwns warlocks, priests and even warriors."
-"you can have 2 water elementals"
+- "if I have a mob or player dotted when I use fear on them, it causes me to become feared when the dot ticks. This one really pwns warlocks, priests and even warriors."
+- "you can have 2 water elementals"
 
 ==========================================================================
 Zack - test my shit :
@@ -97,7 +97,7 @@ Zack - test my shit :
 - if you have hearth of the wild and reset talents...you will get negative dmg
 - rogue - Elusiveness (14066) reduces blind 2094 and vanish 1856 cooldown
 - rogue - Dirty Tricks 14094 reduces blind 2094 and sap 1856 range
-
+- rogue - Dirty Deeds 14083 reduces energy cost of cheap shot 1833 and garote 703
 ==========================================================================
 Capt - test my shit :
 
