@@ -95,6 +95,7 @@ Zack - test my shit :
 - test pet spell targeting
 - aurastate gets consumed after using it
 - if you have hearth of the wild and reset talents...you will get negative dmg
+- Elusiveness (14066) reduces blind 2094 and vanish 1856 cooldown
 
 ==========================================================================
 Capt - test my shit :

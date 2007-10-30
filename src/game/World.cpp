@@ -1483,6 +1483,24 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}*/
+
+	//rogue - Elusiveness
+	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
+	uint32 Elusiveness_grouprelation;
+	if(sp)
+		Elusiveness_grouprelation = sp->SpellGroupType;
+	else Elusiveness_grouprelation=0;
+	sp = dbcSpell.LookupEntry(1856);//rogue - vanish 
+	if(sp)
+		Elusiveness_grouprelation |= sp->SpellGroupType;
+	//rogue - Elusiveness r1
+	sp = dbcSpell.LookupEntry(13981); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=Elusiveness_grouprelation;
+	sp = dbcSpell.LookupEntry(14066); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=Elusiveness_grouprelation;
+
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry(27116);
@@ -1922,8 +1940,8 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(2895);
 	if(sp)
 	{
-		sp->EffectImplicitTargetA[0]=1;
-		sp->EffectImplicitTargetA[1]=1;
+		sp->EffectImplicitTargetA[0]=EFF_TARGET_SELF;
+		sp->EffectImplicitTargetA[1]=EFF_TARGET_SELF;
 		sp->EffectImplicitTargetA[2]=0;
 		sp->EffectImplicitTargetB[0]=0;
 		sp->EffectImplicitTargetB[1]=0;
