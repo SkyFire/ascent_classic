@@ -5003,14 +5003,27 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 					factor=Item::GenerateRandomSuffixFactor(iter->item.itemproto);
 				}
 
-				iter->roll = new LootRoll(60000, (m_Group != NULL ? m_Group->MemberCount() : 1),  guid, x, iter->item.itemproto->ItemId, factor, uint32(ipid), GetMapMgr());
-				data2.Initialize(SMSG_LOOT_START_ROLL);
-				data2 << guid;
-				data2 << x;
-				data2 << uint32(iter->item.itemproto->ItemId);
-				data2 << uint32(0);
-				data2 << uint32(iter->iRandomProperty->ID);
-				data2 << uint32(60000); // countdown
+				if(iter->item.itemproto)
+				{
+					iter->roll = new LootRoll(60000, (m_Group != NULL ? m_Group->MemberCount() : 1),  guid, x, iter->item.itemproto->ItemId, factor, uint32(ipid), GetMapMgr());
+					
+					data2.Initialize(SMSG_LOOT_START_ROLL);
+					data2 << guid;
+					data2 << x;
+					data2 << uint32(iter->item.itemproto->ItemId);
+					data2 << uint32(0);
+					if(!iter->iRandomProperty)
+					{
+						if(iter->iRandomSuffix)
+							data << uint32(-int32(iter->iRandomSuffix->id));
+						else
+							data2 << uint32(0);
+					}
+					else
+						data2 << uint32(iter->iRandomProperty->ID);
+
+					data2 << uint32(60000); // countdown
+				}
 
 				if(m_Group)
 				{
