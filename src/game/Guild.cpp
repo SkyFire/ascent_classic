@@ -200,6 +200,7 @@ void Guild::FillGuildRosterData(WorldPacket *data)
 		else
 		{
 			*data << (*i)->guid;
+			*data << uint32(0);		// highguid
 			*data << (uint8)0; 
 			*data << (*i)->name;
 			*data << (*i)->Rank;

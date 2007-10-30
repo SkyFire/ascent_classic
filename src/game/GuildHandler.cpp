@@ -300,7 +300,7 @@ void WorldSession::HandleGuildPromote(WorldPacket & recv_data)
 		return;
 	}
 
-	if( plyr->GetGUID() == pGuildMember->guid )
+	if( plyr->GetGUIDLow() == pGuildMember->guid )
 	{
 		sChatHandler.SystemMessage(this, "You cant promote yourself!");
 		return;
@@ -390,7 +390,7 @@ void WorldSession::HandleGuildDemote(WorldPacket & recv_data)
 		return;
 	}
 
-	if( plyr->GetGUID() == pGuildMember->guid )
+	if( plyr->GetGUIDLow() == pGuildMember->guid )
 	{
 		sChatHandler.SystemMessage(this, "You cant demote yourself!");
 		return;
@@ -550,7 +550,7 @@ void WorldSession::HandleGuildLeader(WorldPacket & recv_data)
 	if(!pGuildMember)
 		return;
 
-	if(pLeader->GetGUID() == pGuildMember->guid)
+	if(pLeader->GetGUIDLow() == pGuildMember->guid)
 		return;
 
 	if(pLeader->GetGUID() != pGuild->GetGuildLeaderGuid())
