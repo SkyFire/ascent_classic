@@ -1238,16 +1238,6 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 
 	if((*dmg).school_type == 0)//physical
 	{		
-		//patch from emsy : wands do not get reduction
-        if (IsPlayer())
-        {
-            Item * it = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
-            if(it && it->GetProto()->SubClass == 19)
-            {
-                return;
-            }
-        }
-
 		if(this->IsPlayer())
 			ArmorReduce = PowerCostPctMod[0];
 		else
@@ -1340,6 +1330,7 @@ void Unit::Strike(Unit *pVictim, uint32 damage_type, SpellEntry *ability, int32 
 
 	bool backAttack			 = isInBack( pVictim );
 	uint32 vskill            = 0;
+	bool disable_dR			 = false;
 	
 //==========================================================================================
 //==============================Victim Skill Base Calculation===============================
@@ -1405,6 +1396,7 @@ void Unit::Strike(Unit *pVictim, uint32 damage_type, SpellEntry *ability, int32 
 			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 			hitmodifier+=pr->CalcRating(6);
 			self_skill = float2int32(pr->CalcRating(0));
+			disable_dR = true;
 			break;
 		}
 
@@ -1818,12 +1810,12 @@ else
 				if(sh)
 				{
 					dmg.full_damage -= sh;
-					if(dmg.full_damage)
+					if(dmg.full_damage && !disable_dR)
 						CalculateResistanceReduction(pVictim,&dmg);
 					dmg.full_damage += sh;
 					dmg.resisted_damage += sh;
 				}
-				else
+				else if(!disable_dR)
 					CalculateResistanceReduction(pVictim,&dmg);
 			}
 			dmg.resisted_damage += abs;
