@@ -169,6 +169,7 @@ public:
 	// packets, w000t! we all love packets!
 	void BuildRaidSavedInstancesForPlayer(Player * plr);
 	void BuildSavedInstancesForPlayer(Player * plr);
+	MapMgr * CreateBattlegroundInstance(uint32 mapid);
 
 private:
 	void _LoadInstances();

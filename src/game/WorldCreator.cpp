@@ -806,6 +806,15 @@ void InstanceMgr::PlayerLeftGroup(Group * pGroup, Player * pPlayer)
 	m_mapLock.Release();
 }
 
+void InstanceMgr::CreateBattlegroundInstance(uint32 mapid)
+{
+	m_mapLock.Acquire();
+	Instance * in = new Instance;
+	in->m_creation = UNIXTIME;
+	in->m_expiration = 0;
+	m_mapLock.Release();
+}
+
 FormationMgr::FormationMgr()
 {
 	QueryResult * res = WorldDatabase.Query("SELECT * FROM creature_formations");

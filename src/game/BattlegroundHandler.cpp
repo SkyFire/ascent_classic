@@ -129,8 +129,8 @@ void WorldSession::HandleBattleMasterJoinOpcode(WorldPacket &recv_data)
 	if(_player->m_bgIsQueued)
 		BattlegroundManager.RemovePlayerFromQueues(_player);
 
-	if(_player->IsInWorld())
-		BattlegroundManager.HandleBattlegroundJoin(this, recv_data);
+	/*if(_player->IsInWorld())
+		BattlegroundManager.HandleBattlegroundJoin(this, recv_data);*/
 }
 
 void WorldSession::HandleArenaJoinOpcode(WorldPacket &recv_data)
@@ -166,8 +166,8 @@ void WorldSession::HandleArenaJoinOpcode(WorldPacket &recv_data)
 		break;
 	}
 
-	if(bgtype != 0)
-		BattlegroundManager.HandleArenaJoin(this, bgtype, as_group, rated_match);
+	/*if(bgtype != 0)
+		BattlegroundManager.HandleArenaJoin(this, bgtype, as_group, rated_match);*/
 }
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket &recv_data)
