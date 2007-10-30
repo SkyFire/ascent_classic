@@ -360,6 +360,9 @@ bool Master::Run(int argc, char ** argv)
 	// Create listener
 	ListenSocket<WorldSocket> * ls = new ListenSocket<WorldSocket>(host.c_str(), wsport);
     bool listnersockcreate = ls->IsOpen();
+	if(listnersockcreate)
+		ThreadPool.ExecuteTask(ls);
+
 	while(!m_stopEvent && listnersockcreate)
 #else
 	new ClusterInterface;
@@ -378,9 +381,6 @@ bool Master::Run(int argc, char ** argv)
 #ifndef CLUSTERING
 		sLogonCommHandler.UpdateSockets();
 		sVoiceChatHandler.Update();
-#ifdef WIN32
-		ls->Update();
-#endif
 #else
 		sClusterInterface.Update();
 #endif
@@ -471,7 +471,6 @@ bool Master::Run(int argc, char ** argv)
 	sLog.outString("Killing all sockets and network subsystem.");
 #ifndef CLUSTERING
 	ls->Close();
-	delete ls;
 #endif
 #ifdef WIN32
 	sSocketMgr.ShutdownThreads();

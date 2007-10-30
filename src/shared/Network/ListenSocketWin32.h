@@ -12,15 +12,17 @@
 
 #ifdef CONFIG_USE_IOCP
 
+#include "../Threading/ThreadPool.h"
+
 template<class T>
-class SERVER_DECL ListenSocket
+class SERVER_DECL ListenSocket : public ThreadBase
 {
 public:
 	ListenSocket(const char * ListenAddress, uint32 Port)
 	{
 		m_socket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 		SocketOps::ReuseAddr(m_socket);
-		SocketOps::Nonblocking(m_socket);
+		SocketOps::Blocking(m_socket);
 
 		m_address.sin_family = AF_INET;
 		m_address.sin_port = ntohs((u_short)Port);
@@ -59,22 +61,36 @@ public:
 		Close();	
 	}
 
-	void Update()
+	bool run()
 	{
-		aSocket = WSAAccept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len, NULL, NULL);
+		while(m_opened)
+		{
+			aSocket = accept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len);
+			if(aSocket == INVALID_SOCKET)
+				continue;		// shouldn't happen, we are blocking.
+
+			socket = new T(aSocket);
+			socket->SetCompletionPort(m_cp);
+			socket->Accept(&m_tempAddress);
+		}
+		return true;
+		/*aSocket = WSAAccept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len, NULL, NULL);
 		if(aSocket == INVALID_SOCKET)
 			return;
 
 		socket = new T(aSocket);
 		socket->SetCompletionPort(m_cp);
-		socket->Accept(&m_tempAddress);
+		socket->Accept(&m_tempAddress);*/
 	}
 
 	void Close()
 	{
-		if(m_opened)
-			SocketOps::CloseSocket(m_socket);
+		// prevent a race condition here.
+		bool mo = m_opened;
 		m_opened = false;
+
+		if(mo)
+			SocketOps::CloseSocket(m_socket);
 	}
 
 	inline bool IsOpen() { return m_opened; }

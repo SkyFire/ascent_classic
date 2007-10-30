@@ -276,6 +276,11 @@ void LogonServer::Run(int argc, char ** argv)
 	bool authsockcreated = cl->IsOpen();
 	bool intersockcreated = sl->IsOpen();
 
+	if(authsockcreated)
+		ThreadPool.ExecuteTask(cl);
+	if(intersockcreated)
+		ThreadPool.ExecuteTask(sl);
+
 	// hook signals
 	sLog.outString("Hooking signals...");
 	signal(SIGINT, _OnSignal);
@@ -311,10 +316,6 @@ void LogonServer::Run(int argc, char ** argv)
 		if(!(loop_counter%10000))	// 5mins
 			ThreadPool.IntegrityCheck();
 
-#ifdef WIN32
-		cl->Update();
-		sl->Update();
-#endif
 		sInfoCore.TimeoutSockets();
 		sSocketGarbageCollector.Update();
 		CheckForDeadSockets();			  // Flood Protection
@@ -328,8 +329,6 @@ void LogonServer::Run(int argc, char ** argv)
 
 	cl->Close();
 	sl->Close();
-	delete sl;
-	delete cl;
 	sSocketMgr.CloseAll();
 #ifdef WIN32
 	sSocketMgr.ShutdownThreads();
