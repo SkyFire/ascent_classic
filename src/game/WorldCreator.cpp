@@ -184,20 +184,13 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr)
 				if(in->m_mapMgr)
 				{
 					if(in->m_mapMgr->IsCombatInProgress())
-					{
-						m_mapLock.Release();
 						return INSTANCE_ABORT_ENCOUNTER;
-					}
 
 					if(in->m_mapMgr->GetPlayerCount() >= inf->playerlimit)
-					{
-						m_mapLock.Release();
 						return INSTANCE_ABORT_FULL;
-					}
 				}
 
 				// found our instance, allow him in.
-				m_mapLock.Release();
 				return INSTANCE_OK;
 			}
 		}
@@ -311,6 +304,7 @@ MapMgr * InstanceMgr::GetInstance(Object* obj)
 		}
 
 		// instance is non-existant (shouldn't really happen for units...)
+		m_mapLock.Release();
 		return NULL;
 	}
 }
