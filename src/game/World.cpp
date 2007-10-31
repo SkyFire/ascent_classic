@@ -2940,11 +2940,15 @@ void TaskList::spawn()
 		// get processor count
 #ifndef WIN32
 #if UNIX_FLAVOUR == UNIX_FLAVOUR_LINUX
+#ifdef X64
+		threadcount = 2;
+#else
 		long affmask;
 		sched_getaffinity(0, 4, (cpu_set_t*)&affmask);
 		threadcount = (BitCount8(affmask)) * 2;
 		if(threadcount > 8) threadcount = 8;
 		else if(threadcount <= 0) threadcount = 1;
+#endif
 #else
 		threadcount = 2;
 #endif

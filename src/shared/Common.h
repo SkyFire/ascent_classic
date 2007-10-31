@@ -187,6 +187,9 @@ enum MsTimeVariables
 #else
 #  include <string.h>
 #  define MAX_PATH 1024
+#endif
+
+#ifndef X64
 #  if defined (__GNUC__)
 #	if GCC_VERSION >= 30400
 #         ifdef HAVE_DARWIN
@@ -200,6 +203,8 @@ enum MsTimeVariables
 #  else
 #	define __fastcall __attribute__((__fastcall__))
 #  endif
+#else
+#define __fastcall  
 #endif
 
 #if COMPILER == COMPILER_GNU && __GNUC__ >= 3
