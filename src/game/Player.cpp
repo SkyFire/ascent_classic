@@ -353,7 +353,8 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_ModInterrMRegen =0;
 	m_RegenManaOnSpellResist=0;
 	m_rap_mod_pct = 0;
-	m_modblockvalue = 0;
+	m_modblockabsorbvalue = 0;
+	m_modblockvaluefromspells = 0;
 	m_summoner = m_summonInstanceId = m_summonMapId = 0;
 	m_lastMoveType = 0;
 	m_tempSummon = 0;

@@ -1253,7 +1253,7 @@ bool World::SetInitialWorldSettings()
 		{
 			sp->procChance = 25;
 			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
-			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC;
+			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
 		}
 		
 		/* Seal of Jusice - Proc Chance */

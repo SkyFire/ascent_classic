@@ -1256,7 +1256,8 @@ public:
 	void EventAllowTiggerPort(bool enable);
 	int32 m_rangedattackspeedmod;
 	int32 m_meleeattackspeedmod;
-	uint32 m_modblockvalue;
+	uint32 m_modblockabsorbvalue;
+	uint32 m_modblockvaluefromspells;
 	void SendInitialLogonPackets();
 	void Reset_Spells();
 	void Reset_Talents();

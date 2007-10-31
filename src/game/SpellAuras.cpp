@@ -170,7 +170,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//SPELL_AURA_ADD_CREATURE_IMMUNITY = 147,//http://wow.allakhazam.com/db/spell.html?wspell=36798
 		&Aura::SpellAuraRetainComboPoints,//SPELL_AURA_RETAIN_COMBO_POINTS = 148,
 		&Aura::SpellAuraResistPushback,//SPELL_AURA_RESIST_PUSHBACK = 149,//	Resist Pushback //Simply resist spell casting delay
-		&Aura::SpellAuraModShieldBlockPCT,//SPELL_AURA_MOD_SHIELD_BLOCK_PCT = 150,//	Mod Shield Block %
+		&Aura::SpellAuraModShieldBlockPCT,//SPELL_AURA_MOD_SHIELD_BLOCK_PCT = 150,//	Mod Shield Absorbed dmg %
 		&Aura::SpellAuraTrackStealthed,//SPELL_AURA_TRACK_STEALTHED = 151,//	Track Stealthed
 		&Aura::SpellAuraModDetectedRange,//SPELL_AURA_MOD_DETECTED_RANGE = 152,//	Mod Detected Range
 		&Aura::SpellAuraSplitDamageFlat,//SPELL_AURA_SPLIT_DAMAGE_FLAT= 153,//	Split Damage Flat
@@ -3530,7 +3530,6 @@ void Aura::SpellAuraModBlockPerc(bool apply)
 		else 
 			amt = -mod->m_amount;
 
-		//static_cast<Player*>(m_target)->SetBlockFromSpellPCT(static_cast<Player*>(m_target)->GetBlockFromSpellPCT() + amt );
 		static_cast<Player*>(m_target)->SetBlockFromSpell(static_cast<Player*>(m_target)->GetBlockFromSpell() + amt);
 		static_cast<Player*>(m_target)->UpdateChances();
 	}
@@ -5667,25 +5666,16 @@ void Aura::SpellAuraResistPushback(bool apply)
 
 void Aura::SpellAuraModShieldBlockPCT(bool apply)
 {
-	//old = this is wrong since we will overwrite it at first state recalc
-//	m_target->ModFloatValue(PLAYER_BLOCK_PERCENTAGE, apply ? mod->m_amount : -mod->m_amount);
-	//new
-	if (m_target->GetTypeId() == TYPEID_PLAYER)
+	if(p_target)
 	{
-		int32 amt;
 		if(apply)
 		{
-			amt = mod->m_amount;
-			if(amt<0)
-				SetNegative();
-			else 
-				SetPositive();
+			p_target->m_modblockabsorbvalue += (uint32)mod->m_amount;
 		}
-		else 
-			amt = -mod->m_amount;
-
-		static_cast<Player*>(m_target)->SetBlockFromSpell(static_cast<Player*>(m_target)->GetBlockFromSpell() + amt );
-		static_cast<Player*>(m_target)->UpdateChances();
+		else
+		{
+			p_target->m_modblockabsorbvalue -= (uint32)mod->m_amount;
+		}
 	}
 }
 
@@ -6714,16 +6704,21 @@ void Aura::SpellAuraModRangedDamageTakenPCT(bool apply)
 
 void Aura::SpellAuraModBlockValue(bool apply)
 {
-	if(p_target)
-	{
-		if(apply)
-		{
-			p_target->m_modblockvalue += (uint32)mod->m_amount;
-		}
-		else
-		{
-			p_target->m_modblockvalue -= (uint32)mod->m_amount;
-		}
+	if (p_target)
+ 	{
+		int32 amt;
+ 		if(apply)
+ 		{
+			amt = mod->m_amount;
+			if(amt<0)
+				SetNegative();
+			else 
+				SetPositive();
+ 		}
+		else 
+			amt = -mod->m_amount;
+
+		p_target->m_modblockvaluefromspells += amt;
 	}
 }
 
