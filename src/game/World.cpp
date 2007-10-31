@@ -1555,9 +1555,6 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(703);//rogue - Garrote 
 	if(sp)
 		ss_grouprelation |= sp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(703);//rogue - Garrote 
-	if(sp)
-		ss_grouprelation |= sp->SpellGroupType;
 	//rogue - Shadowstep
 	sp = dbcSpell.LookupEntry(36563); 
 	if(sp)
@@ -1565,6 +1562,30 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = ss_grouprelation;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 	}
+
+	//rogue - Lethality
+	uint32 L_grouprelation = 0;
+	L_grouprelation |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 4;//rogue - backstab (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 8;//rogue - Gouge (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 33554432;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 536870912;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 1073741824;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
+	sp = dbcSpell.LookupEntry(14128); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+	sp = dbcSpell.LookupEntry(14132); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+	sp = dbcSpell.LookupEntry(14135); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+	sp = dbcSpell.LookupEntry(14136); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+	sp = dbcSpell.LookupEntry(14137); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
 
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;

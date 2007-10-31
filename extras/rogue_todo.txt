@@ -28,12 +28,3 @@ How to test: Make a rogue learn talent "Surprise attacks" from "Combat" talent t
 * Lethality
 
 Ruthlesness ads 2 combo points (again)
-
------------------------------------------------------------
-Lethality Rank 5
-Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Ghostly Strike, Mutilate, Shiv, and Hemorrhage abilities by 30%.
-
-No increased damage from critical strikes, bugged completely.
------------------------------------------------------------
-
-This is bugged from talents I have. Camouflage and Master of Deception are also bugged I think, but it's less important.
