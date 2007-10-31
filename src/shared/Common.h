@@ -189,6 +189,7 @@ enum MsTimeVariables
 #  define MAX_PATH 1024
 #endif
 
+#ifndef WIN32
 #ifndef X64
 #  if defined (__GNUC__)
 #	if GCC_VERSION >= 30400
@@ -205,6 +206,7 @@ enum MsTimeVariables
 #  endif
 #else
 #define __fastcall  
+#endif
 #endif
 
 #if COMPILER == COMPILER_GNU && __GNUC__ >= 3

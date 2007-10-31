@@ -1677,6 +1677,23 @@ void Aura::SpellAuraDummy(bool apply)
 			aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
 			pTarget->m_ssAuras.insert(aura);
 		}break;
+	case 740:
+	case 8918:
+	case 9862:
+	case 9863:
+	case 21791:
+	case 25817:
+	case 26983:
+	case 34550:		// Tranquility
+		{
+			//uint32 duration = GetDuration();
+			//printf("moo\n");
+			if(apply)
+				sEventMgr.AddEvent(this, &Aura::EventPeriodicHeal1, (uint32)mod->m_amount, EVENT_AURA_PERIODIC_HEAL, 2000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+			else
+				sEventMgr.RemoveEvents(this, EVENT_AURA_PERIODIC_HEAL);
+            		
+		}break;
 	}
 }
 
@@ -4459,6 +4476,8 @@ void Aura::EventPeriodicHeal1(uint32 amount)
 	{
 		m_target->Emote(EMOTE_ONESHOT_EAT);
 	}
+	else
+		SendPeriodicHealAuraLog(amount);
 }
 
 void Aura::SpellAuraModPowerRegen(bool apply)

@@ -544,7 +544,11 @@ void Spell::SpellTargetTypeTAOE(uint32 i, uint32 j)
 	if(!Target)
 		return;
 
-	FillAllTargetsInArea((LocationVector&)Target->GetPosition(), i);
+	// tranquility
+	if(u_caster && m_spellInfo->NameHash==0x650C43C2)
+		m_targetUnits[i].push_back(u_caster->GetGUID());
+	else
+		FillAllTargetsInArea((LocationVector&)Target->GetPosition(), i);
 }
 
 /// Spell Target Handling for type 30: PBAE Party Based Area Effect
