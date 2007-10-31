@@ -192,7 +192,7 @@ bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 		return true;
 	}
 	sGMLog.writefromsession(m_session, "used npc delete, sqlid %u, creature %s, pos %f %f %f",
-		unit->GetSQL_id(), unit->GetCreatureName()->Name, unit->GetPositionX(), unit->GetPositionY(),
+		unit->GetSQL_id(), unit->GetCreatureName() ? unit->GetCreatureName()->Name : "wtfbbqhax", unit->GetPositionX(), unit->GetPositionY(),
 		unit->GetPositionZ());
 	if(unit->m_spawn == 0)
 		return false;
