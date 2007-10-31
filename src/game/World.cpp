@@ -1239,8 +1239,6 @@ bool World::SetInitialWorldSettings()
 			sp->proc_interval = 10000; //10 seconds
 		else if(strstr(nametext, "Aviana's Purpose"))
 			sp->proc_interval = 10000; //10 seconds
-		else if(strstr(nametext, "Seal of Command"))
-			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
 //		else if(strstr(nametext, "Illumination"))
 //			sp->EffectTriggerSpell[0]=20272;
 		//sp->dummy=result;
@@ -1252,7 +1250,11 @@ bool World::SetInitialWorldSettings()
 
 		/* Seal of Command - Proc Chance */
 		if(sp->NameHash == 0xC5C30B39)
+		{
 			sp->procChance = 25;
+			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
+			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC;
+		}
 		
 		/* Seal of Jusice - Proc Chance */
 		if(sp->NameHash == 0xCC6D4182)

@@ -95,9 +95,8 @@ Zack - test my shit :
 - test pet spell targeting
 - aurastate gets consumed after using it
 - if you have hearth of the wild and reset talents...you will get negative dmg
-- rogue - Elusiveness (14066) reduces blind 2094 and vanish 1856 cooldown
-- rogue - Dirty Tricks 14094 reduces blind 2094 and sap 1856 range
-- rogue - Dirty Deeds 14083 reduces energy cost of cheap shot 1833 and garote 703
+- check seal of command (again) to see if it gets armor reduction or resistance reduction
+
 ==========================================================================
 Capt - test my shit :
 
