@@ -1239,8 +1239,6 @@ bool World::SetInitialWorldSettings()
 			sp->proc_interval = 10000; //10 seconds
 		else if(strstr(nametext, "Aviana's Purpose"))
 			sp->proc_interval = 10000; //10 seconds
-		else if(strstr(nametext, "Seal of Command"))
-			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
 //		else if(strstr(nametext, "Illumination"))
 //			sp->EffectTriggerSpell[0]=20272;
 		//sp->dummy=result;
@@ -1252,7 +1250,11 @@ bool World::SetInitialWorldSettings()
 
 		/* Seal of Command - Proc Chance */
 		if(sp->NameHash == 0xC5C30B39)
+		{
 			sp->procChance = 25;
+			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
+			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
+		}
 		
 		/* Seal of Jusice - Proc Chance */
 		if(sp->NameHash == 0xCC6D4182)
@@ -1547,6 +1549,44 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=DD_grouprelation;
 
+	//rogue - Shadowstep
+	uint32 ss_grouprelation = 512;//rogue - ambush (only a part of the whole group since it would affect other spells too)
+	ss_grouprelation |= 4;//rogue - Backstab (only a part of the whole group since it would affect other spells too)
+	sp = dbcSpell.LookupEntry(703);//rogue - Garrote 
+	if(sp)
+		ss_grouprelation |= sp->SpellGroupType;
+	//rogue - Shadowstep
+	sp = dbcSpell.LookupEntry(36563); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = ss_grouprelation;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+	}
+
+	//rogue - Lethality
+	uint32 L_grouprelation = 0;
+	L_grouprelation |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 4;//rogue - backstab (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 8;//rogue - Gouge (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 33554432;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 536870912;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 1073741824;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
+	sp = dbcSpell.LookupEntry(14128); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+	sp = dbcSpell.LookupEntry(14132); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+	sp = dbcSpell.LookupEntry(14135); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+	sp = dbcSpell.LookupEntry(14136); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+	sp = dbcSpell.LookupEntry(14137); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=L_grouprelation;
+
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry(27116);
@@ -1604,14 +1644,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(31785);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM ;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TAGRGET_SELF ;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
 	sp = dbcSpell.LookupEntry(33776);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM ;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TAGRGET_SELF;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
@@ -2900,11 +2940,15 @@ void TaskList::spawn()
 		// get processor count
 #ifndef WIN32
 #if UNIX_FLAVOUR == UNIX_FLAVOUR_LINUX
+#ifdef X64
+		threadcount = 2;
+#else
 		long affmask;
 		sched_getaffinity(0, 4, (cpu_set_t*)&affmask);
 		threadcount = (BitCount8(affmask)) * 2;
 		if(threadcount > 8) threadcount = 8;
 		else if(threadcount <= 0) threadcount = 1;
+#endif
 #else
 		threadcount = 2;
 #endif
