@@ -466,6 +466,9 @@ Player::~Player ( )
 
 	if(m_playerInfo)
 		m_playerInfo->m_loggedInPlayer=NULL;
+
+	for(set<SSAura*>::iterator itr = m_ssAuras.begin(); itr != m_ssAuras.end(); ++itr)
+		delete (*itr);
 }
 
 inline uint32 GetSpellForLanguage(uint32 SkillID)
