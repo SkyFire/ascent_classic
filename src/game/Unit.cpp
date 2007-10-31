@@ -848,6 +848,15 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //we need damaging spells for this, so we suppose all shadow spells casted on target are dmging spells = Wrong
 									continue;
 							}break;
+						//priest - Inspiration
+						case 15363:
+						case 14893:
+						case 15357:
+							{
+								if (!CastingSpell || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
+									continue;
+							}
+							break;
 						//shaman - windfurry weapon
 						case 8232:
 						case 8235:
@@ -895,12 +904,12 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									CastingSpell->NameHash!=891349384UL)  //Garrote
 									continue;
 							}break;
-						//Blackout
+						//Priest - blackout
 						case 15269:
 							{
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->School!=SCHOOL_SHADOW && !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if(CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						//warrior - improved berserker rage 
@@ -961,7 +970,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//trigger only on heal spell cast by NOT us
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) || this != victim)
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) || this == victim)
 									continue; 
 							}break;
 /*						//paladin - illumination

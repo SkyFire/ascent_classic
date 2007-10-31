@@ -4465,14 +4465,16 @@ void Aura::SpellAuraModPowerRegen(bool apply)
 {
 	if(apply)
 	{
-		SetPositive();
-	//	sEventMgr.AddEvent(this, &Aura::EventPeriodicEnergize,(uint32)mod->m_amount,(uint32)mod->m_miscValue,
-	//		EVENT_AURA_PERIODIC_ENERGIZE,5000,0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+		if (mod->m_amount>0)
+			SetPositive();
+		else
+			SetNegative();
 	}	
 	if (m_target->IsPlayer())
 	{
 		int32 val = (apply) ? mod->m_amount: -mod->m_amount;
 		static_cast<Player*>(m_target)->m_ModInterrMRegen +=val;
+		static_cast<Player*>(m_target)->UpdateStats();
 	}
 }
 
@@ -5119,6 +5121,8 @@ void Aura::SpellAuraModPowerRegPerc(bool apply)
 		m_target->PctPowerRegenModifier[mod->m_miscValue] += ((float)(mod->m_amount))/100.0f;
 	else
 		m_target->PctPowerRegenModifier[mod->m_miscValue] -= ((float)(mod->m_amount))/100.0f;
+	if (m_target->IsPlayer())
+		static_cast<Player*>(m_target)->UpdateStats();
 }
 
 void Aura::SpellAuraOverrideClassScripts(bool apply)
@@ -5436,6 +5440,7 @@ void Aura::SpellAuraModManaRegInterrupt(bool apply)
 			static_cast<Player*>(m_target)->m_ModInterrMRegenPCT += mod->m_amount;
 		else
 			static_cast<Player*>(m_target)->m_ModInterrMRegenPCT -= mod->m_amount;
+		static_cast<Player*>(m_target)->UpdateStats();
 	}
 }
 

@@ -1644,14 +1644,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(31785);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM ;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TAGRGET_SELF ;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
 	sp = dbcSpell.LookupEntry(33776);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM ;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TAGRGET_SELF;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
