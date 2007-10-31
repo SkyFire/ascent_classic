@@ -1549,6 +1549,23 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=DD_grouprelation;
 
+	//rogue - Shadowstep
+	uint32 ss_grouprelation = 512;//rogue - ambush (only a part of the whole group since it would affect other spells too)
+	ss_grouprelation |= 4;//rogue - Backstab (only a part of the whole group since it would affect other spells too)
+	sp = dbcSpell.LookupEntry(703);//rogue - Garrote 
+	if(sp)
+		ss_grouprelation |= sp->SpellGroupType;
+	sp = dbcSpell.LookupEntry(703);//rogue - Garrote 
+	if(sp)
+		ss_grouprelation |= sp->SpellGroupType;
+	//rogue - Shadowstep
+	sp = dbcSpell.LookupEntry(36563); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = ss_grouprelation;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+	}
+
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry(27116);

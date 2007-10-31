@@ -96,6 +96,7 @@ Zack - test my shit :
 - aurastate gets consumed after using it
 - if you have hearth of the wild and reset talents...you will get negative dmg
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
+- rogue - shadowsteep(36563)
 
 ==========================================================================
 Capt - test my shit :

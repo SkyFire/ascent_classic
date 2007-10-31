@@ -30,13 +30,6 @@ How to test: Make a rogue learn talent "Surprise attacks" from "Combat" talent t
 Ruthlesness ads 2 combo points (again)
 
 -----------------------------------------------------------
-Shadowstep
-10 Energy_____20 yd range
-Instant_____15 sec cooldown
-Attempts to step through the shadows and reappear behind your enemy. The damage of your next Ambush, Backstab or Garrote ability is increased by 20%. Lasts 10 sec.
-
-Teleport is working, but no increased damage.
------------------------------------------------------------
 Lethality Rank 5
 Increases the critical strike damage bonus of your Sinister Strike, Gouge, Backstab, Ghostly Strike, Mutilate, Shiv, and Hemorrhage abilities by 30%.
 
