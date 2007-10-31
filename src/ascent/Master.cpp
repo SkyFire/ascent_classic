@@ -360,9 +360,10 @@ bool Master::Run(int argc, char ** argv)
 	// Create listener
 	ListenSocket<WorldSocket> * ls = new ListenSocket<WorldSocket>(host.c_str(), wsport);
     bool listnersockcreate = ls->IsOpen();
+#ifdef WIN32
 	if(listnersockcreate)
 		ThreadPool.ExecuteTask(ls);
-
+#endif
 	while(!m_stopEvent && listnersockcreate)
 #else
 	new ClusterInterface;

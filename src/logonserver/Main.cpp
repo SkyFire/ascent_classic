@@ -275,12 +275,12 @@ void LogonServer::Run(int argc, char ** argv)
 	// Spawn interserver listener
 	bool authsockcreated = cl->IsOpen();
 	bool intersockcreated = sl->IsOpen();
-
+#ifdef WIN32
 	if(authsockcreated)
 		ThreadPool.ExecuteTask(cl);
 	if(intersockcreated)
 		ThreadPool.ExecuteTask(sl);
-
+#endif
 	// hook signals
 	sLog.outString("Hooking signals...");
 	signal(SIGINT, _OnSignal);
