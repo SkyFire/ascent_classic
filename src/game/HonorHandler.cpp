@@ -93,6 +93,9 @@ int32 HonorHandler::CalculateHonorPointsForKill(Player *pPlayer, Unit* pVictim)
 
 void HonorHandler::OnPlayerKilledUnit(Player *pPlayer, Unit* pVictim)
 {
+	if(pPlayer->GetTypeId() != TYPEID_PLAYER || !pVictim->IsUnit())
+		return;
+
 	if(pVictim && (!pVictim->IsPlayer() || static_cast<Player*>(pVictim)->m_honorless))
 		return;
     if(pVictim && pVictim->IsPlayer() && static_cast<Player*>(pVictim)->m_bgTeam == pPlayer->m_bgTeam)

@@ -517,7 +517,7 @@ void InstanceMgr::ResetSavedInstances(Player * plr)
 				in = itr->second;
 				++itr;
 
-				if( (plr->GetGroup() && plr->GetGroup()->GetID() == in->m_creatorGroup) || plr->GetGUIDLow() == in->m_creatorGuid )
+				if( in->m_mapInfo->type == INSTANCE_NONRAID && (plr->GetGroup() && plr->GetGroup()->GetID() == in->m_creatorGroup) || plr->GetGUIDLow() == in->m_creatorGuid )
 				{
 					if(in->m_mapMgr && in->m_mapMgr->HasPlayers())
 					{
@@ -668,7 +668,7 @@ void InstanceMgr::BuildSavedInstancesForPlayer(Player * plr)
 					in = itr->second;
 					++itr;
 
-					if( PlayerOwnsInstance(in, plr) )
+					if( PlayerOwnsInstance(in, plr) && in->m_mapInfo->type == INSTANCE_NONRAID )
 					{
 						m_mapLock.Release();
 
