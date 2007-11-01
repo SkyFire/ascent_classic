@@ -1604,6 +1604,29 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=ED_grouprelation;
 
+	//priest - Focused Mind 
+	sp = dbcSpell.LookupEntry(8092);//priest - Mind Blast 
+	uint32 MF_grouprelation;
+	if(sp)
+		MF_grouprelation = sp->SpellGroupType;
+	else MF_grouprelation=0;
+	sp = dbcSpell.LookupEntry(605);//priest - Mind Control 
+	if(sp)
+		MF_grouprelation |= sp->SpellGroupType;
+	sp = dbcSpell.LookupEntry(16568);//priest - Mind Flay 
+	if(sp)
+		MF_grouprelation |= sp->SpellGroupType;
+	//priest - Focused Mind  r1
+	sp = dbcSpell.LookupEntry(33213); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=MF_grouprelation;
+	sp = dbcSpell.LookupEntry(33214); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=MF_grouprelation;
+	sp = dbcSpell.LookupEntry(33215); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=MF_grouprelation;
+
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry(27116);
