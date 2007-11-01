@@ -16,3 +16,8 @@ Psychic Scream - On the Todo list I saw something alone the lines of "fix the ch
 QUOTE(D@rk @ Sep 28 2007, 02:42 AM) *
 Vampiric Touch, doesn't give any mana.
 The only reason I didnt mention VT was cause I completely forgot it.. It's working to my favor in 1700, 98% of the time I get mana = to the persons health (o.O). I've had 12980/9785 mana before after a VT.
+
+Prayer of Mending is not working.
+Same for Blessed Recovery/Resilience.
+Focused Mind not reduces the mana cost of your Mind Blast, Mind Control and Mind Flay spells by 5%.
+http://www.wowhead.com/?spell=33213

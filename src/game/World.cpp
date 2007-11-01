@@ -1587,6 +1587,23 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=L_grouprelation;
 
+	//rogue - Endurance 
+	sp = dbcSpell.LookupEntry(2983);//rogue - Sprint 
+	uint32 ED_grouprelation;
+	if(sp)
+		ED_grouprelation = sp->SpellGroupType;
+	else ED_grouprelation=0;
+	sp = dbcSpell.LookupEntry(5277);//rogue - Evasion 
+	if(sp)
+		ED_grouprelation |= sp->SpellGroupType;
+	//rogue - Endurance  r1
+	sp = dbcSpell.LookupEntry(13742); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=ED_grouprelation;
+	sp = dbcSpell.LookupEntry(13872); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=ED_grouprelation;
+
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry(27116);

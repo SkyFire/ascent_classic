@@ -98,6 +98,7 @@ Zack - test my shit :
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
 - rogue - shadowsteep (36563)
 - rogue - Lethality (14137)
+- rogue - Endurance (13872)
 
 ==========================================================================
 Capt - test my shit :

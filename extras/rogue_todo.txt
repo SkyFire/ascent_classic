@@ -28,3 +28,6 @@ How to test: Make a rogue learn talent "Surprise attacks" from "Combat" talent t
 * Lethality
 
 Ruthlesness ads 2 combo points (again)
+
+Rogue - Relentless Strikes - procs 2 times ?
+
