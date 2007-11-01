@@ -36,6 +36,7 @@ enum AreaTriggerFailures
 	AREA_TRIGGER_FAILURE_NO_RAID		= 4,
 	AREA_TRIGGER_FAILURE_NO_ATTUNE		= 5,
 	AREA_TRIGGER_FAILURE_LEVEL			= 6,
+	AREA_TRIGGER_FAILURE_NO_GROUP		= 7,
 };
 
 const char * AreaTriggerFailureMessages[] = {
@@ -46,6 +47,7 @@ const char * AreaTriggerFailureMessages[] = {
 	"You must be in a raid group to pass through here.",
 	"You do not have the required attunement to pass through here.",
 	"You must be at least level %u to pass through here.",
+	"You must be in a party to pass through here.",
 };
 
 inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSession, Player * pPlayer, MapInfo * pMapInfo)
@@ -66,8 +68,11 @@ inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession 
 	if(pPlayer->iInstanceType == MODE_HEROIC && pMapInfo->type != INSTANCE_MULTIMODE && pMapInfo->type != INSTANCE_NULL)
 		return AREA_TRIGGER_FAILURE_NO_HEROIC;
 
-	if((pMapInfo->type == INSTANCE_MULTIMODE || pMapInfo->type == INSTANCE_RAID) && (!pPlayer->GetGroup() || (pPlayer->GetGroup() && pPlayer->GetGroup()->GetGroupType() != GROUP_TYPE_RAID)))
+	if(pMapInfo->type == INSTANCE_RAID && (!pPlayer->GetGroup() || (pPlayer->GetGroup() && pPlayer->GetGroup()->GetGroupType() != GROUP_TYPE_RAID)))
 		return AREA_TRIGGER_FAILURE_NO_RAID;
+
+	if(pMapInfo->type == INSTANCE_MULTIMODE && !pPlayer->GetGroup())
+		return AREA_TRIGGER_FAILURE_NO_GROUP;
 
 	if(pMapInfo && pMapInfo->required_quest && !pPlayer->HasFinishedQuest(pMapInfo->required_quest))
 		return AREA_TRIGGER_FAILURE_NO_ATTUNE;
