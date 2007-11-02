@@ -2262,19 +2262,9 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			if (static_cast<Player*>(pVictim)->m_RegenManaOnSpellResist)
 			{
 				Player* pl = (Player*)pVictim;
-				uint32 curmana = pl->GetUInt32Value(UNIT_FIELD_POWER1);
 				uint32 maxmana = pl->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-				curmana+=uint32(float( float(maxmana)*pl->m_RegenManaOnSpellResist));
-				
-				static_cast<Player*>(pVictim)->SetUInt32Value(UNIT_FIELD_POWER1,(curmana >= maxmana) ? maxmana : curmana);
-
-				WorldPacket datamr(SMSG_HEALMANASPELL_ON_PLAYER, 30);
-				datamr << pVictim->GetNewGUID();
-				datamr << pVictim->GetNewGUID();
-				datamr << uint32(29442);
-				datamr << uint32(0);
-				datamr << uint32(float( float(maxmana)*pl->m_RegenManaOnSpellResist));
-				((Player*)pVictim)->GetSession()->SendPacket(&datamr);
+				uint32 amount = uint32(float( float(maxmana)*pl->m_RegenManaOnSpellResist));
+				pVictim->Energize(pVictim,29442,amount,POWER_TYPE_MANA);
 			}
 		}
 	}
@@ -2296,7 +2286,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		{    //Shadow Word:Death
 			if (spellID==32379||spellID==32996) 
 			{
-				uint32 damage = (uint32)res;
+				uint32 damage = (uint32)(res+abs_dmg);
 				uint32 absorbed = static_cast<Unit*>(this)->AbsorbDamage(school,&damage);
 				DealDamage((Unit*)this,damage,2,0,spellID);
 				SendSpellNonMeleeDamageLog(this,this,spellID,damage,school,absorbed,0,false,0,false,this->IsPlayer());

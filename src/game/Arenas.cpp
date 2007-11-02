@@ -59,22 +59,78 @@ void Arena::OnAddPlayer(Player * plr)
 {
 	/* cast arena readyness buff */
 	if(plr->isDead())
-	{
 		plr->ResurrectPlayer();
-		plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-		plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
-		plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
-		sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
-	}
-	else
-	{
-		plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-		plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
-		plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
-		sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
-	}
+
+	plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+	plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+	plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
+	sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
+
+	 uint64 guid = plr->GetSelection();
+
+	 switch(plr->getClass())
+	 {
+	 case WARRIOR:
+	 {
+		 plr->ClearCooldownsOnLine(26, guid);
+		 plr->ClearCooldownsOnLine(256, guid);
+		 plr->ClearCooldownsOnLine(257 , guid);
+	 } break;
+	 case PALADIN:
+	 {
+		 plr->ClearCooldownsOnLine(594, guid);
+		 plr->ClearCooldownsOnLine(267, guid);
+		 plr->ClearCooldownsOnLine(184, guid);
+	} break;
+	 case HUNTER:
+	 {
+		 plr->ClearCooldownsOnLine(50, guid);
+		 plr->ClearCooldownsOnLine(51, guid);
+		 plr->ClearCooldownsOnLine(163, guid);
+	 } break;
+	 case ROGUE:
+	 {
+		 plr->ClearCooldownsOnLine(253, guid);
+		 plr->ClearCooldownsOnLine(38, guid);
+		 plr->ClearCooldownsOnLine(39, guid);
+	 } break;
+	 case PRIEST:
+	 {
+		plr->ClearCooldownsOnLine(56, guid);
+		 plr->ClearCooldownsOnLine(78, guid);
+		 plr->ClearCooldownsOnLine(613, guid);
+	 } break;
+	 case SHAMAN:
+	 {
+		 plr->ClearCooldownsOnLine(373, guid);
+		 plr->ClearCooldownsOnLine(374, guid);
+		 plr->ClearCooldownsOnLine(375, guid);
+	 } break;
+	 case MAGE:
+	 {
+		 plr->ClearCooldownsOnLine(6, guid);
+		 plr->ClearCooldownsOnLine(8, guid);
+		 plr->ClearCooldownsOnLine(237, guid);
+	 } break;
+	 case WARLOCK:
+	 {
+		 plr->ClearCooldownsOnLine(355, guid);
+		 plr->ClearCooldownsOnLine(354, guid);
+		 plr->ClearCooldownsOnLine(593, guid);
+	 } break;
+	 case DRUID:
+	 {
+		 plr->ClearCooldownsOnLine(573, guid);
+		 plr->ClearCooldownsOnLine(574, guid);
+		 plr->ClearCooldownsOnLine(134, guid);
+	 } break;
+
+	 default: break;
+	 }
+
 
 	plr->m_deathVision = true;
+	plr->DropAurasOnDeath();
 	plr->CastSpell(plr, ARENA_PREPARATION, true);
 	UpdatePlayerCounts();
 
@@ -480,7 +536,7 @@ void Arena::HookOnAreaTrigger(Player * plr, uint32 id)
 
 void Player::FullHPMP()
 {
-	SetUInt32Value(UNIT_FIELD_HEALTH, m_uint32Values[UNIT_FIELD_MAXHEALTH]);
-	SetUInt32Value(UNIT_FIELD_POWER1, m_uint32Values[UNIT_FIELD_MAXPOWER1]);
-	SetUInt32Value(UNIT_FIELD_POWER4, m_uint32Values[UNIT_FIELD_MAXPOWER4]);
+    SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+    SetUInt32Value(UNIT_FIELD_POWER1, GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+    SetUInt32Value(UNIT_FIELD_POWER4, GetUInt32Value(UNIT_FIELD_MAXPOWER4));
 }

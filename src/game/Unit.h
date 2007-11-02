@@ -863,6 +863,8 @@ public:
 	bool setDetectRangeMod(uint64 guid, int32 amount);
 	void unsetDetectRangeMod(uint64 guid);
 	int32 getDetectRangeMod(uint64 guid);
+	void Heal(Unit* target,uint32 SpellId, uint32 amount);
+	void Energize(Unit* target,uint32 SpellId, uint32 amount, uint32 type);
 
 	Loot loot;
 	uint32 SchoolCastPrevent[7];

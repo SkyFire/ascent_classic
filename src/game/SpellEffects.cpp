@@ -1288,6 +1288,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 			{
 				if (!unitTarget->IsPlayer() || !unitTarget->isAlive())
 					break;
+
 				Player* mPlayer = (Player*)unitTarget;
 				if (!mPlayer->IsInFeralForm() || 
 					(mPlayer->GetShapeShift() != FORM_CAT &&
@@ -1295,13 +1296,9 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 					mPlayer->GetShapeShift() != FORM_DIREBEAR))
 					break;
 				uint32 max = mPlayer->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-				uint32 val = mPlayer->GetUInt32Value(UNIT_FIELD_HEALTH);
-				val += float2int32(((mPlayer->FindAura(34300)) ? 0.04f : 0.02f)*max);
-				if (val>max)
-					val=max;
-				val -= mPlayer->GetUInt32Value(UNIT_FIELD_HEALTH);
+				uint32 val = float2int32(((mPlayer->FindAura(34300)) ? 0.04f : 0.02f)*max);
 				if (val)
-					Heal((int32)(val));
+					mPlayer->Heal((int32)(val));
 			}break;
 		case 22845: // Druid: Frenzied Regeneration
 			{
@@ -1317,7 +1314,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 					val = 100;
 				mPlayer->SetUInt32Value(UNIT_FIELD_POWER2,mPlayer->GetUInt32Value(UNIT_FIELD_POWER2)-val);
 				if (val)
-					Heal((int32)(val*2.5));
+					mPlayer->Heal(mPlayer,22845,uint32(val*2.5f));
 			}break;
 		default:
 			Heal((int32)damage);

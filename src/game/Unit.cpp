@@ -3144,27 +3144,7 @@ void Unit::VampiricEmbrace(uint32 dmg,Unit* tgt)
 	int32 perc = 20;
 	SM_FIValue(SM_FSPELL_VALUE,&perc,4);
 	uint32 heal = (dmg*perc) / 100;
-
-	WorldPacket data(25);
-	data.SetOpcode(SMSG_HEALSPELL_ON_PLAYER);
-	
-	data << this->GetNewGUID();
-	data << this->GetNewGUID();
-	data << uint32(15286);  //Vampiric embrace
-	data << uint32(heal);   // amt healed
-	data << uint8(0);	   //this is crical message
-	uint32 ch=this->GetUInt32Value(UNIT_FIELD_HEALTH);
-	uint32 mh=this->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-	if(mh!=ch)
-	{
-		ch += heal;
-		if(ch > mh)
-			this->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
-		else 
-			this->SetUInt32Value(UNIT_FIELD_HEALTH, ch);
-	
-	}
-	this->SendMessageToSet(&data, true);
+	this->Heal(this,15286,heal);
 
 	SubGroup * pGroup = ((Player*)this)->GetGroup() ?
 		((Player*)this)->GetGroup()->GetSubGroup(((Player*)this)->GetSubGroup()) : 0;
@@ -3178,24 +3158,7 @@ void Unit::VampiricEmbrace(uint32 dmg,Unit* tgt)
 			Player *p = itr->player;
 			if(!p || p==this || !p->isAlive())
 				continue;
-			data.clear();
-			data << p->GetNewGUID();
-			data << this->GetNewGUID();
-			data << uint32(15286);//Vampiric embrace
-			data << uint32(heal);	// amt healed
-			data << uint8(0);	 //this is crical message
-			
-			ch = p->GetUInt32Value(UNIT_FIELD_HEALTH);
-			mh = p->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-			if(mh != ch)
-			{
-				ch += heal;
-				if(ch > mh)
-					p->SetUInt32Value(UNIT_FIELD_HEALTH,mh);
-				else 
-					p->SetUInt32Value(UNIT_FIELD_HEALTH,ch);			
-			}
-			this->SendMessageToSet(&data, true);
+			this->Heal(p,15286,heal);
 		}
 		((Player*)this)->GetGroup()->Unlock();
 	}
@@ -3210,19 +3173,10 @@ void Unit::VampiricTouch(uint32 dmg,Unit* tgt)
         
         int32 perc = 5;
         SM_FIValue(SM_FSPELL_VALUE,&perc,4); // need fixing if required
+		if (perc*dmg<0)
+			return;
         uint32 man = (dmg*perc) / 100;
-        
-        uint32 cm=this->GetUInt32Value(UNIT_FIELD_POWER1);
-        uint32 mm=this->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-        
-        if(mm!=cm)
-        {
-                cm += man;
-                if(cm > mm)
-                        this->SetUInt32Value(UNIT_FIELD_POWER1, mm);
-                else 
-                        this->SetUInt32Value(UNIT_FIELD_POWER1, cm);
-        }
+		this->Energize(this,34919,man,POWER_TYPE_MANA);
     
 		SubGroup * pGroup = ((Player*)this)->GetGroup() ?
 			((Player*)this)->GetGroup()->GetSubGroup(((Player*)this)->GetSubGroup()) : 0;
@@ -3236,20 +3190,9 @@ void Unit::VampiricTouch(uint32 dmg,Unit* tgt)
                         if(!itr->player || itr->player == this)
                                 continue;
                         Player *p = itr->player;
-                        if(!p->isAlive() || this->getClass()==WARRIOR || this->getClass() == ROGUE)
+                        if(!p->isAlive() || p->getClass()==WARRIOR || p->getClass() == ROGUE || p==this)
                                 continue;
-                        
-                        uint32 cm=p->GetUInt32Value(UNIT_FIELD_POWER1);
-                        uint32 mm=p->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-            
-                        if(mm!=cm)
-                        {
-                                cm += man;
-                                if(cm > mm)
-                                        this->SetUInt32Value(UNIT_FIELD_POWER1, mm);
-                                else 
-                                        this->SetUInt32Value(UNIT_FIELD_POWER1, cm);
-                        }
+						this->Energize(p,34919,man,POWER_TYPE_MANA);
                 }
 				((Player*)this)->GetGroup()->Unlock();
         }
@@ -4523,6 +4466,62 @@ void Unit::CombatStatusHandler_UpdatePvPTimeout()
 {
 	CombatStatus.TryToClearAttackTargets();	
 }
+
+void Unit::Heal(Unit *target, uint32 SpellId, uint32 amount)
+{//Static heal
+	if (!target || !SpellId || !amount)
+		return;
+
+	uint32 ch=this->GetUInt32Value(UNIT_FIELD_HEALTH);
+	uint32 mh=this->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+	if(mh!=ch)
+	{
+		ch += amount;
+		if(ch > mh)
+		{
+			this->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
+			amount += mm-cm;
+		}
+		else 
+			this->SetUInt32Value(UNIT_FIELD_HEALTH, ch);
+
+		WorldPacket data(SMSG_HEALSPELL_ON_PLAYER,25);
+		data << target->GetNewGUID();
+		data << this->GetNewGUID();
+		data << uint32(SpellId);  
+		data << uint32(amount);   
+		data << uint8(0);
+		this->SendMessageToSet(&data,true);
+	}
+}
+void Unit::Energize(Unit* target,uint32 SpellId, uint32 amount,uint32 type)
+{//Static energize
+	if (!target || !SpellId || !amount)
+		return;
+
+	uint32 cm=this->GetUInt32Value(UNIT_FIELD_POWER1+type);
+	uint32 mm=this->GetUInt32Value(UNIT_FIELD_MAXPOWER1+type);
+	if(mm!=cm)
+	{
+		cm += amount;
+		if(cm > mm)
+		{
+			this->SetUInt32Value(UNIT_FIELD_POWER1+type, mm);
+			amount += mm-cm;
+		}
+		else 
+			this->SetUInt32Value(UNIT_FIELD_POWER1+type, cm);
+
+		WorldPacket datamr(SMSG_HEALMANASPELL_ON_PLAYER, 30);
+		datamr << target->GetNewGUID();
+		datamr << this->GetNewGUID();
+		datamr << uint32(SpellId);
+		datamr << uint32(0);
+		datamr << uint32(amount);
+		this->SendMessageToSet(&datamr,true);
+	}
+}
+
 
 void CombatStatusHandler::TryToClearAttackTargets()
 {

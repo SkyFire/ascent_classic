@@ -833,6 +833,14 @@ bool World::SetInitialWorldSettings()
 						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
 					if(strstr(desc,"target casts a spell"))
 						pr|=PROC_ON_CAST_SPELL;
+                    if(strstr(desc,"your harmful spells land"))
+                        pr|=PROC_ON_CAST_SPELL;
+                    if(strstr(desc,"on spell critical hit"))
+                        pr|=PROC_ON_SPELL_CRIT_HIT;
+                    if(strstr(desc,"spell critical strikes"))
+                        pr|=PROC_ON_SPELL_CRIT_HIT;
+                    if(strstr(desc,"being able to resurrect"))
+                        pr|=PROC_ON_DIE;
 					if(strstr(desc,"any damage caused"))
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
 					if(strstr(desc,"the next melee attack against the caster"))
@@ -2380,6 +2388,18 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = Sanctity_group;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 	}
+    sp = dbcSpell.LookupEntry(20608); //Reincarnation
+    if(sp)
+    {
+        for(uint32 i=0;i<8;i++)
+        {
+            if(sp->Reagent[i])
+            {
+                sp->Reagent[i] = 0;
+                sp->ReagentCount[i] = 0;
+            }
+        }
+    }
 
 ///////////////////////////////
 /*	// druid - Improved Mark of the Wild

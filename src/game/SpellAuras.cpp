@@ -1106,12 +1106,9 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		}
 
 		uint32 ress=(uint32)res;
-//		uint32 abs_dmg = m_target->AbsorbDamage(school, &ress);
-		res=(float)ress;
+		uint32 abs_dmg = m_target->AbsorbDamage(school, &ress);
 		dealdamage dmg;
 		dmg.school_type = school;
-		// again.......
-		//dmg.full_damage = res;
 		dmg.full_damage = ress;
 		dmg.resisted_damage = 0;
 
@@ -1372,7 +1369,7 @@ void Aura::SpellAuraDummy(bool apply)
 			}
 		}break;
 	case 34914://Vampiric Touch
-	case 34918:
+	case 34916:
 	case 34917:
 		{
 			if(apply)
@@ -1813,7 +1810,7 @@ void Aura::SpellAuraModFear(bool apply)
 		{
 			m_target->setAItoUse(true);
 		}
-		m_target->m_pacified++;
+		//m_target->m_pacified++;
 		m_target->m_special_state |= UNIT_STATE_FEAR;
 		m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_FEARED);
 		m_target->GetAIInterface()->HandleEvent(EVENT_FEAR, u_caster, 0);
@@ -1823,7 +1820,7 @@ void Aura::SpellAuraModFear(bool apply)
 		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, u_caster, 0);
 		m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_FEARED);
 		m_target->m_special_state &= ~UNIT_STATE_FEAR;
-		m_target->m_pacified--;
+		//m_target->m_pacified--;
 
 		if(p_target)
 		{
@@ -1905,12 +1902,56 @@ void Aura::EventPeriodicHeal(uint32 amount)
 
 	SendPeriodicHealAuraLog(add);
 
-	//TODO: Add threat.
-
 	if(GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP)
 	{
 		m_target->Emote(EMOTE_ONESHOT_EAT);
 	}
+
+		// add threat
+	SpellEntry* spe = this->GetSpellProto();
+	Unit* u_caster=this->GetUnitCaster();
+	Spell* spell = new Spell(this,spe,false,NULL);
+	if(u_caster)
+	{
+		uint32 base_threat=spell->GetBaseThreat(add);
+		int count = 0;
+		Unit *unit;
+		std::vector<Unit*> target_threat;
+		if(base_threat)
+		{
+			target_threat.reserve(u_caster->GetInRangeCount()); // this helps speed
+
+			for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
+			{
+				if((*itr)->GetTypeId() != TYPEID_UNIT)
+					continue;
+				unit = static_cast<Unit*>((*itr));
+				if(unit->GetAIInterface()->GetNextTarget() == m_target)
+				{
+					target_threat.push_back(unit);
+					++count;
+				}
+			}
+			if(count == 0)
+				count = 1;  // division against 0 protection
+			/* 
+			When a tank hold multiple mobs, the threat of a heal on the tank will be split between all the mobs.
+			The exact formula is not yet known, but it is more than the Threat/number of mobs.
+			So if a tank holds 5 mobs and receives a heal, the threat on each mob will be less than Threat(heal)/5.
+			Current speculation is Threat(heal)/(num of mobs *2)
+			*/
+			uint32 threat = base_threat / (count * 2);
+
+			for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
+			{
+				// for now we'll just use heal amount as threat.. we'll prolly need a formula though
+				((Unit*)(*itr))->GetAIInterface()->HealReaction(u_caster, m_target, threat);
+			}
+		}
+
+		if(m_target->IsInWorld() && u_caster->IsInWorld())
+			u_caster->CombatStatus.WeHealed(m_target);
+	}   
 }
 
 void Aura::SpellAuraModAttackSpeed(bool apply)
