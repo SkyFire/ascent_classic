@@ -19,3 +19,21 @@ The only reason I didnt mention VT was cause I completely forgot it.. It's worki
 
 Prayer of Mending is not working.
 Same for Blessed Recovery/Resilience.
+
+Shadow Resilience http://www.wowhead.com/?spell=14910
+Shadow Focus http://www.wowhead.com/?spell=15260
+Improved Power Word: Fortitude http://www.wowhead.com/?spell=14749
+Improved Power Word: Shield http://www.wowhead.com/?spell=14748
+Improved Divine Spirit http://www.wowhead.com/?spell=33174
+Absolution http://www.wowhead.com/?spell=33167
+Reflective Shield http://www.wowhead.com/?spell=33201
+Unbreakable Will http://www.wowhead.com/?spell=14522
+Blessed Recovery http://www.wowhead.com/?spell=27811
+Blessed Resilience http://www.wowhead.com/?spell=33142
+Spell Warding http://www.wowhead.com/?spell=27900
+
+Mind Control http://www.wowhead.com/?spell=605 Controled player can't attack and can't cast any skill/spell, controled mob can attack only in meele, can't use their skills, you loose crontrol of player/mob if you walk away from your own character.
+
+Psychic Scream http://www.wowhead.com/?spell=8124 Using Psychic Scream makes player/mob walk from you, not run.
+
+Mind Vision http://www.wowhead.com/?spell=2096 

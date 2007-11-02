@@ -31,3 +31,184 @@ Ruthlesness ads 2 combo points (again)
 
 Rogue - Relentless Strikes - procs 2 times ?
 
+Mace Specialization gives Rogues a passive chance on hit to stun an enemy for 3 seconds while wielding a mace. It also increases Weapon Skill with maces by 2 per rank taken.
+Prerequisites: Combat 20 (Minumum Level: 29)
+Rank Effect
+Rank 1/5 +1% Chance and 2 mace skill
+Rank 2/5 +2% Chance and 4 mace skill
+Rank 3/5 +3% Chance and 6 mace skill
+Rank 4/5 +4% Chance and 8 mace skill
+Rank 5/5 +6% Chance and 10 mace skill
+http://www.wowwiki.com/Mace_Specialization
+
+1.Murder
+Rank Effect
+1 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 1%.
+2 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 2%.
+
+2.Improved Expose Armor
+Rank Effect
+1 Increases the armor reduced by your Expose Armor ability by an additional 25%.
+2 Increases the armor reduced by your Expose Armor ability by an additional 50%.
+
+3.Vile Poisons
+Rank Effect
+1 Increases the damage dealt by your Poisons and Envenom ability by 4% and gives your poisons an additional 8% chance to resist Dispel effects.
+2 Increases the damage dealt by your poisons and Envenom ability by 8% and gives your poisons an additional 16% chance to resist dispel effects.
+3 Increases the damage dealt by your poisons and Envenom ability by 12% and gives your poisons an additional 24% chance to resist dispel effects.
+4 Increases the damage dealt by your poisons and Envenom ability by 16% and gives your poisons an additional 32% chance to resist dispel effects.
+5 Increases the damage dealt by your poisons and Envenom ability by 20% and gives your poisons an additional 40% chance to resist dispel effects.
+
+4.Improved Poisons ( some people think this talent works, but if he works -> he should change visual the % to cast poison on enemy when you move your mouse to icon of some poison -> but thats not happen, so not working )
+Rank Effect
+1 Increases the chance to apply Poisons to your target by 2%.
+2 Increases the chance to apply poisons to your target by 4%.
+3 Increases the chance to apply poisons to your target by 6%.
+4 Increases the chance to apply poisons to your target by 8%.
+5 Increases the chance to apply poisons to your target by 10%.
+
+5.Improved Kidney Shot
+Rank Effect
+1 While affected by your Kidney Shot ability, target receives an additional 3% damage from all sources.
+2 While affected by your Kidney Shot ability, target receives an additional 6% damage from all sources.
+3 While affected by your Kidney Shot ability, target receives an additional 9% damage from all sources
+
+6.Master Poisoner
+Rank Effect
+1 Reduces the chance your Poisons will be resisted by 5% and increases your chance to resist Poison effects by an additional 15%.
+2 Reduces the chance your poisons will be resisted by 10% and increases your chance to resist poison effects by an additional 30%.
+
+7.Find Weakness ( you get buff for 10 sec )
+Rank Effect
+1 Your Finishing moves increase the damage of all offensive abilities by 2% for 10 seconds.
+2 Your Finishing moves increase the damage of all offensive abilities by 4% for 10 seconds.
+3 Your Finishing moves increase the damage of all offensive abilities by 6% for 10 seconds.
+4 Your Finishing moves increase the damage of all offensive abilities by 8% for 10 seconds.
+5 Your Finishing moves increase the damage of all offensive abilities by 10% for 10 seconds.
+
+8.Mutilate ( the problem here is -> No increasing damage from poisons, no increasing dmg from opportunity and no increasing critical strike dmg from lethality )
+Instantly attacks with both weapons for an additional X damage with each weapon. Damage is increased by 50% against Poisoned targets. Must be behind the target. Awards 2 combo points.
+
+9.Deadened Nerves ( this probably not working, should be seen from ascent )
+Rank Effect
+1 Decreases all physical damage taken by 1%.
+2 Decreases all physical damage taken by 2%.
+3 Decreases all physical damage taken by 3%.
+4 Decreases all physical damage taken by 4%.
+5 Decreases all physical damage taken by 5%
+
+Combat
+
+1.Improved Sprint
+Rank Effect
+1 Gives a 50% chance to remove all movement impairing effects when you activate your Sprint ability.
+2 Gives a 100% chance to remove all movement impairing effects when you activate your Sprint ability
+
+2.Mace Specialization ( GOD, THIS IS THE BEST COMBAT SPEC...Mace rogue...i hope someone will fix it )
+Rank Effect
+Rank 1/5 +1% Chance and 2 mace skill
+Rank 2/5 +2% Chance and 4 mace skill
+Rank 3/5 +3% Chance and 6 mace skill
+Rank 4/5 +4% Chance and 8 mace skill
+Rank 5/5 +6% Chance and 10 mace skill
+
+3. Sword Specialization ( this was fixed and was working correctly since update to 2.2.2...something happened and stop working.
+Gives you a 1/2/3/4/5% chance to get an extra attack on the same target after dealing damage with your Sword.
+
+4. Nerves of Steel ( this talent not working probably cuz there is no Stub/Fear resist system.
+Increases your chance to resist Stun and Fear effects by an additional 5/10%.
+
+5.Surprise Attacks ( This talent is rly needful )
+Your finishing moves can no longer be dodged, and the damage dealt by your Sinister Strike, Backstab, Shiv, and Gouge abilities is increased by 10%.
+
+Subtlety
+
+1.Sleight of Hand
+Reduces the chance you are critically hit by melee and ranged attacks by 1/2% and increases the threat reduced by your Feint ability by 10/20%.
+
+2.Camouflage
+ncreases your speed while stealthed by 3/6/9/12/15% and reduces the cooldown of your Stealth ability by 1/2/3/4/5 seconds.
+
+3.Serrated Blades ( probably one of the best subtlety passive talents )
+Causes your attacks to ignore 1.67/3.34/5 armor/level of your target's Armor and increases the damage dealt by your Rupture ability by 10/20/30%. The amount of Armor reduced increases with your level.
+
+4.Master of Subtlety
+Attacks made while stealthed and for 6 seconds after breaking stealth cause an additional 4/7/10% damage.
+
+5.Enveloping Shadows ( avoid arcane explosion, blizzard, rain of fire etc. )
+Increases your chance to avoid area of effect attacks by an additional 5/10/15%.
+
+6.Cheat Death ( goood this is the great talent...gg warrior no execute.Blizzard -> if someone will going to kill you when your are on 1 hit -> you will get messege -> Absorb )
+You have a 10/20/30% chance to completely avoid any damaging attack that would otherwise kill you.
+
+Spells :
+1.Envenom :
+Envenom is a Rogue Assassination ability learned at level 62. Used as a finishing move it consumes your Deadly Poison doses on the target and deals instant poison damage. One dose is consumed for each combo point.
+
+Rank Damage Level Cost
+1 168 - 838 damage 62 5 31
+2 204 - 1018 damage 69 10 80
+
+Damage Calculation Formula
+Rank 1
+1 dose: (144+AP*0.03) damage
+2 doses: (288+AP*0.06) damage
+3 doses: (432+AP*0.09) damage
+4 doses: (576+AP*0.12) damage
+5 doses: (720+AP*0.15) damage
+Rank 2
+1 dose: (180+AP*0.03) damage
+2 doses: (360+AP*0.06) damage
+3 doses: (540+AP*0.09) damage
+4 doses: (720+AP*0.12) damage
+5 doses: (900+AP*0.15) damage
+
+2.Rupture
+Finishing move that inflicts a bleeding wound on the target, working as a DoT. ( can you read -> bleeding wound -> no reduce from armor ffs its like WOUND of warrior ! )
+
+Damage Calculation Formula
+The rough formula for rupture(rank 7) damage is:
+
+1pt = Attack Power * 0.04 + 324
+2pt = Attack Power * 0.10 + 460
+3pt = Attack Power * 0.18 + 618
+4pt = Attack Power * 0.21 + 798
+5pt = Attack Power * 0.24 + 1000
+an interesting side effect is the damage per tick
+
+1pt x 4 ticks at = Attack Power * 0.01 + 81
+2pt x 5 ticks at = Attack Power * 0.02 + 92
+3pt x 6 ticks at = Attack Power * 0.03 + 103
+4pt x 7 ticks at = Attack Power * 0.03 + 114
+5pt x 8 ticks at = Attack Power * 0.03 + 125
+
+This has been reported since...MONTHS -> the damage from rupture CANNOT BE REDUCED BY ARMOR !! ( like now )
+And should take bonus from Attack Power ( like now on ascent 2000+ do not takes ap bonus )
+
+3.Garrote -> same as rupture.
+
+Damage Calculation Formula
+The basic Garrote damage formula:
+
+Multiplier = 1 + (0.04 * Opportunity Rank) + (0.2 if Shadowstep+(.01 + .03 * Master of Subtlety)
+Modifier = Attack Power * 0.18
+
+Total Garrote Damage = (Garrote Rank + Modifer) * Multiplier
+Damage Per Tick = Total Garrote Damage / 6
+The following assumes that the character is a level 19 Rogue with 278 attack power, 5/5 Opportunity and Garrote Rank 1.
+
+Example:
+
+Multiplier = 1 + (.2) = 1.2
+Modifier = 278 * 0.18 = 50.04 = 50
+
+Total Garrote Damage = (144 + 50) * 1.2 = 232.8
+Damage Per Tick = 232.8 / 6 = 38.8 Damage every 3 seconds
+
+4.Shiv
+Performs an instant off-hand weapon attack that automatically applies the poison from your off-hand weapon to the target. Slower weapons require more Energy. Awards 1 combo point. from ( Shiv attacks do proc Combat Potency. Spamming Shiv with a high-dps offhand with a speed less than 1.5 (costing 35 energy) can be very effective (given 1x 20 energy tick and a combat potency proc for another 15 energy). The high special-attack rate this skill and talent synergy has other benefits- more hits means more chance on hit procs from gear, more mace spec procs, and any other goodies you have. )
+
+5. Cloak of Shadows
+Instantly removes all existing harmful spell effects and increases your chance to resist all spells by 90% for 5 sec
+Last time was working only -> 90% chance to resist for 5 sec.
+Also should remove Impairing/Slow effects and remove all DOT's ( Cannot remove Bleeding effects )

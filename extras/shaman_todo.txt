@@ -1,8 +1,6 @@
 As tested on fully updated and latest rev.
 
 Elemental Tree
-COnvection - no effect - supposed to reduce mana cost shocks,lighting and chain lighting with 2% per point.
-Elemental Focus - no effect - supposed to give a clearcasting state after a critical hit, cleacasting supposed to give a 60% reduction on next dmg spell
 Call of Thunder - no effect - supposed to give 6% to crit on lighting and chain lightning
 Elemental Fury - no effect - supposed to give a +200% crit damage on nature spells and fire totems
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent

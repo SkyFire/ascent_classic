@@ -1269,8 +1269,12 @@ bool World::SetInitialWorldSettings()
 			sp->procChance = 25;
 
 		/* Decapitate */
-		if(sp->NameHash == 0xB6C3243C)
+		else if(sp->NameHash == 0xB6C3243C)
 			sp->procChance = 30;
+
+		//shaman - shock, has no spellgroup.very dangerous move !
+		else if(sp->NameHash == 0x561A665E)
+			sp->SpellGroupType = 4;
 
 		if(sp->Id==25771 || sp->Id == 11196 || sp->Id == 6788)
 			sp->removable_by_immunity = false;
@@ -1494,6 +1498,35 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}*/
+
+	//shaman - COnvection
+	sp = dbcSpell.LookupEntry(28159);//shaman - shock. !!! we manually set this before. Might create conflicts later 
+	uint32 convection_grouprelation;
+	if(sp)
+		convection_grouprelation = sp->SpellGroupType;
+	else convection_grouprelation=0;
+	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt 
+	if(sp)
+		convection_grouprelation |= sp->SpellGroupType;
+	sp = dbcSpell.LookupEntry(421);//shaman - Chain Lightning 
+	if(sp)
+		convection_grouprelation |= sp->SpellGroupType;
+	//shaman - COnvection r1
+	sp = dbcSpell.LookupEntry(16039); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+	sp = dbcSpell.LookupEntry(16109); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+	sp = dbcSpell.LookupEntry(16110); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+	sp = dbcSpell.LookupEntry(16111); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+	sp = dbcSpell.LookupEntry(16112); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
 
 	//rogue - Elusiveness
 	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
