@@ -103,6 +103,7 @@ Zack - test my shit :
 - priest - Focused Mind (33215)
 - shaman - COnvection 16112
 - shaman - Call of Thunder 16120
+- shaman - Elemental mastery 16166
 
 ==========================================================================
 Capt - test my shit :

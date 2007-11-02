@@ -1499,6 +1499,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}*/
 
+	//shaman - Elemental mastery 
+	sp = dbcSpell.LookupEntry(16166); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=0xFFFFFFFF;//nature+fire+frost is all that shaman can do
+		sp->EffectSpellGroupRelation[1]=0xFFFFFFFF;//nature+fire+frost is all that shaman can do
+	}
+
 	//shaman - Call of Thunder 
 	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt.
 	uint32 Cthunder_grouprelation;
