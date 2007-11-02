@@ -1,7 +1,6 @@
 As tested on fully updated and latest rev.
 
 Elemental Tree
-Call of Thunder - no effect - supposed to give 6% to crit on lighting and chain lightning
 Elemental Fury - no effect - supposed to give a +200% crit damage on nature spells and fire totems
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent
 Elemental mastery - no effect - supposed to give a 100% crit chance without mana cost

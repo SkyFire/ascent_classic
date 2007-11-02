@@ -1499,6 +1499,32 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}*/
 
+	//shaman - Call of Thunder 
+	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt.
+	uint32 Cthunder_grouprelation;
+	if(sp)
+		Cthunder_grouprelation = sp->SpellGroupType;
+	else Cthunder_grouprelation=0;
+	sp = dbcSpell.LookupEntry(421);//shaman - Chain Lightning 
+	if(sp)
+		Cthunder_grouprelation |= sp->SpellGroupType;
+	//shaman - Call of Thunder r1
+	sp = dbcSpell.LookupEntry(16041); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
+	sp = dbcSpell.LookupEntry(16117); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
+	sp = dbcSpell.LookupEntry(16118); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
+	sp = dbcSpell.LookupEntry(16119); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
+	sp = dbcSpell.LookupEntry(16120); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
+
 	//shaman - COnvection
 	sp = dbcSpell.LookupEntry(28159);//shaman - shock. !!! we manually set this before. Might create conflicts later 
 	uint32 convection_grouprelation;

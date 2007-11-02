@@ -102,6 +102,7 @@ Zack - test my shit :
 - rogue - Endurance (13872)
 - priest - Focused Mind (33215)
 - shaman - COnvection 16112
+- shaman - Call of Thunder 16120
 
 ==========================================================================
 Capt - test my shit :
