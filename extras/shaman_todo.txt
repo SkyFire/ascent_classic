@@ -3,7 +3,6 @@ As tested on fully updated and latest rev.
 Elemental Tree
 Elemental Fury - no effect - supposed to give a +200% crit damage on nature spells and fire totems
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent
-Lightning overload - no effect - supposed to give a total of 5% chance of casting another identical spell at the same target without mana cost.
 
 I think Elemental shields and storm reach both also not work but have no evidence of that yet. More testing needed.
 

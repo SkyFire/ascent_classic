@@ -1499,6 +1499,43 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
 	}*/
 
+	//shaman - Lightning Overload 
+	sp = dbcSpell.LookupEntry(30675); 
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	}
+	sp = dbcSpell.LookupEntry(30678); 
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	}
+	sp = dbcSpell.LookupEntry(30679); 
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	}
+	sp = dbcSpell.LookupEntry(30680); 
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	}
+	sp = dbcSpell.LookupEntry(30681); 
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	}
+
 	//shaman - Elemental mastery 
 	sp = dbcSpell.LookupEntry(16166); 
 	if(sp)

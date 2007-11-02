@@ -973,6 +973,19 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) || this == victim)
 									continue; 
 							}break;
+						//shaman - Lightning Overload
+						case 39805:
+							{
+/*								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
+								//trigger on lightning and chain lightning. Spell should be identical , well maybe next time :P
+								if(	CastingSpell->NameHash==0x135F2AAF //lighning bolt
+									|| CastingSpell->NameHash==0xAAD25B2A //chain lightning
+									)
+									spellId = CastingSpell->Id; */
+								//this might crash your server so disabled until tested
+								continue;
+							}break;
 /*						//paladin - illumination
 						case 18350:
 							{

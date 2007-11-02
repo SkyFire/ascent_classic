@@ -104,6 +104,7 @@ Zack - test my shit :
 - shaman - COnvection 16112
 - shaman - Call of Thunder 16120
 - shaman - Elemental mastery 16166
+- shaman - Lightning Overload  30681
 
 ==========================================================================
 Capt - test my shit :
