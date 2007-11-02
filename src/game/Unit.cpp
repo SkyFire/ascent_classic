@@ -4480,7 +4480,7 @@ void Unit::Heal(Unit *target, uint32 SpellId, uint32 amount)
 		if(ch > mh)
 		{
 			this->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
-			amount += mm-cm;
+			amount += mh-ch;
 		}
 		else 
 			this->SetUInt32Value(UNIT_FIELD_HEALTH, ch);

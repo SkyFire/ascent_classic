@@ -1910,9 +1910,10 @@ void Aura::EventPeriodicHeal(uint32 amount)
 		// add threat
 	SpellEntry* spe = this->GetSpellProto();
 	Unit* u_caster=this->GetUnitCaster();
-	Spell* spell = new Spell(this,spe,false,NULL);
 	if(u_caster)
 	{
+		Spell* spell = new Spell(u_caster,spe,false,NULL);
+
 		uint32 base_threat=spell->GetBaseThreat(add);
 		int count = 0;
 		Unit *unit;
