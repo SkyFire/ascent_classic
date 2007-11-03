@@ -75,6 +75,7 @@ SMT_RESIST_DISPEL - check if it is used
 - on creature evade, make them imune to all spells, test with war stomp
 - "if I have a mob or player dotted when I use fear on them, it causes me to become feared when the dot ticks. This one really pwns warlocks, priests and even warriors."
 - "you can have 2 water elementals"
+- you gain combo point even on spell failed (backstab)
 
 ==========================================================================
 Zack - test my shit :
@@ -97,9 +98,6 @@ Zack - test my shit :
 - aurastate gets consumed after using it
 - if you have hearth of the wild and reset talents...you will get negative dmg
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
-- rogue - shadowsteep (36563)
-- rogue - Lethality (14137)
-- rogue - Endurance (13872)
 - priest - Focused Mind (33215)
 - shaman - COnvection 16112
 - shaman - Call of Thunder 16120

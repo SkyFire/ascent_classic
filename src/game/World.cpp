@@ -1671,8 +1671,8 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(36563); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0] = ss_grouprelation;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectSpellGroupRelation[1] = ss_grouprelation;
+		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 	}
 
 	//rogue - Lethality

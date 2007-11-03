@@ -4971,6 +4971,7 @@ void Aura::SpellAuraAddPctMod(bool apply)
 	//	);
 	//	fclose(f);
 	//}
+//printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 
 	switch (mod->m_miscValue)//let's generate warnings for unknown types of modifiers
 	{
@@ -6115,6 +6116,8 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 	//	);
 	//	fclose(f);
 	//}
+
+//printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 
 	switch (mod->m_miscValue)//let's generate warnings for unknown types of modifiers
 	{

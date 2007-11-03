@@ -6,3 +6,4 @@ Berserker rage should give you temporary stun ress
 Iron will, stun ress is not working
 charge/intercept should brake slowing effects
 unbridled wrath, should add a 8% per rank up to 40% chance to generate one rage point per hit of a melee weapon
+concussion 193276132132976 dmg from bugged heroic
