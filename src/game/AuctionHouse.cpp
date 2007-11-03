@@ -250,7 +250,7 @@ void Auction::AddToPacket(WorldPacket & data)
 	}
 
 	data << pItem->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID);		 // -ItemRandomSuffix / random property	 : If the value is negative its ItemRandomSuffix if its possitive its RandomItemProperty
-	data << uint32(0);													  // when ItemRandomSuffix is used this is the modifier
+	data << pItem->GetUInt32Value(ITEM_FIELD_PROPERTY_SEED);			  // when ItemRandomSuffix is used this is the modifier
 
 	/******************** ItemRandomSuffix***************************
 	* For what I have seen ItemRandomSuffix is like RandomItemProperty

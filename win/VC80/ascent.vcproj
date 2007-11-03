@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="ascent"
 	ProjectGUID="{A3A04E47-43A2-4C08-90B3-029CEF558594}"
+	RootNamespace="ascent"
 	>
 	<Platforms>
 		<Platform
@@ -47,7 +48,7 @@
 				Optimization="4"
 				InlineFunctionExpansion="2"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\redirect;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src\gm"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\redirect;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src"
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS"
 				StringPooling="true"
 				MinimalRebuild="false"
@@ -246,8 +247,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\logonserver;..\..\dep\src\gm"
-				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\logonserver;..\..\dep\src"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				IgnoreStandardIncludePath="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -346,7 +347,7 @@
 				Optimization="0"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\logonserver;..\..\dep\src\gm"
-				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;X64"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;X64"
 				IgnoreStandardIncludePath="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
