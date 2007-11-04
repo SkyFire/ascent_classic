@@ -1810,13 +1810,17 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 		modEnergy = damage;
 		if(p_caster)
 		{
-			for(set<uint32>::iterator itr = p_caster->mSpells.begin(); itr != p_caster->mSpells.end(); ++itr)
+			/*for(set<uint32>::iterator itr = p_caster->mSpells.begin(); itr != p_caster->mSpells.end(); ++itr)
 			{
 				if(*itr == 12818)
 					modEnergy += 60;
 				else if(*itr == 12301)
 					modEnergy += 30;
-			}
+			}*/
+			if(p_caster->mSpells.find(12818) != p_caster->mSpells.end())
+				modEnergy += 60;
+			if(p_caster->mSpells.find(12301) != p_caster->mSpells.end())
+				modEnergy += 30;
 		}
 	}
 	else  

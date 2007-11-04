@@ -445,7 +445,7 @@ void ObjectMgr::LoadPlayerCreateInfo()
 		{
 			do 
 			{
-				pPlayerCreateInfo->spell_list.push_back(sp_sql->Fetch()[1].GetUInt16());
+				pPlayerCreateInfo->spell_list.insert(sp_sql->Fetch()[1].GetUInt32());
 			} while(sp_sql->NextRow());
 			delete sp_sql;
 		}

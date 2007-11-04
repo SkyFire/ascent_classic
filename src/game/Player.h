@@ -237,7 +237,7 @@ struct PlayerCreateInfo{
 	std::list<CreateInfo_ItemStruct> items;
 	std::list<CreateInfo_SkillStruct> skills;
 	std::list<CreateInfo_ActionBarStruct> actionbars;
-	std::list<uint16> spell_list;
+	std::set<uint32> spell_list;
 	//uint32 item[10];
 	//uint8 item_slot[10];
 	//uint16 spell[10];
@@ -648,7 +648,7 @@ class ArenaTeam;
 //
 //  TODO:  Attach characters to user accounts
 //====================================================================
-typedef std::set<uint32>                            SpellSet;
+typedef std::set<uint32>	                        SpellSet;
 typedef std::set<ItemCooldown*>                     ItemCooldownSet;
 typedef std::list<classScriptOverride*>             ScriptOverrideList;
 typedef std::set<uint32>                            SaveSet;

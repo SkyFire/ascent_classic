@@ -684,7 +684,7 @@ bool Player::Create(WorldPacket& data )
 	m_StableSlotCount = 0;
 	Item *item;
 
-	for(std::list<uint16>::iterator sp = info->spell_list.begin();sp!=info->spell_list.end();sp++)
+	for(std::set<uint32>::iterator sp = info->spell_list.begin();sp!=info->spell_list.end();sp++)
 	{
 		mSpells.insert((*sp));
 	}
@@ -2726,12 +2726,16 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	
 	// Load Spells from CSV data.
 	start = (char*)get_next_field.GetString();//buff;
+	SpellEntry * spProto;
 	while(true) 
 	{
 		end = strchr(start,',');
 		if(!end)break;
 		*end=0;
-		mSpells.insert(atol(start));
+		//mSpells.insert(atol(start));
+		spProto = dbcSpell.LookupEntryForced(atol(start));
+		if(spProto)
+			mSpells.insert(spProto->Id);
 		start = end +1;
 	}
 
@@ -2741,7 +2745,9 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		end = strchr(start,',');
 		if(!end)break;
 		*end=0;
-		mDeletedSpells.insert(atol(start));
+		spProto = dbcSpell.LookupEntryForced(atol(start));
+		if(spProto)
+			mDeletedSpells.insert(spProto->Id);
 		start = end +1;
 	}
 
@@ -5200,6 +5206,30 @@ void Player::removeSpellByHashName(uint32 hash)
 		SpellEntry *e = dbcSpell.LookupEntry(SpellID);
 		if(e->NameHash == hash)
 		{
+			if(info->spell_list.find(e->Id) != info->spell_list.end())
+				continue;
+
+			RemoveAura(SpellID,GetGUID());
+#ifdef USING_BIG_ENDIAN
+			uint32 swapped = swap32(SpellID);
+			m_session->OutPacket(SMSG_REMOVED_SPELL, 4, &swapped);
+#else
+			m_session->OutPacket(SMSG_REMOVED_SPELL, 4, &SpellID);		
+#endif
+			mSpells.erase(it);
+		}
+	}
+
+	for(iter= mDeletedSpells.begin();iter != mDeletedSpells.end();)
+	{
+		it = iter++;
+		uint32 SpellID = *it;
+		SpellEntry *e = dbcSpell.LookupEntry(SpellID);
+		if(e->NameHash == hash)
+		{
+			if(info->spell_list.find(e->Id) != info->spell_list.end())
+				continue;
+
 			RemoveAura(SpellID,GetGUID());
 #ifdef USING_BIG_ENDIAN
 			uint32 swapped = swap32(SpellID);
@@ -5382,7 +5412,7 @@ void Player::Reset_Spells()
 		removeSpell((*itr), false, false, 0);
 	}
 
-	for(std::list<uint16>::iterator sp = info->spell_list.begin();sp!=info->spell_list.end();sp++)
+	for(std::set<uint32>::iterator sp = info->spell_list.begin();sp!=info->spell_list.end();sp++)
 	{
 		if(*sp)
 		{
@@ -5412,7 +5442,7 @@ void Player::Reset_Talents()
 					for(int k=0;k<3;k++)
 						if(spellInfo->Effect[k] == SPELL_EFFECT_LEARN_SPELL)
 						{
-							removeSpell(spellInfo->EffectTriggerSpell[k], false, 0, 0);
+							//removeSpell(spellInfo->EffectTriggerSpell[k], false, 0, 0);
 							//remove higher ranks of this spell too (like earth shield lvl 1 is talent and the rest is thought from trainer) 
 							SpellEntry *spellInfo2;
 							spellInfo2 = dbcSpell.LookupEntry( spellInfo->EffectTriggerSpell[k] );

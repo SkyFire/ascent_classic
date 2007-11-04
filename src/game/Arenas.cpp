@@ -66,7 +66,7 @@ void Arena::OnAddPlayer(Player * plr)
 	plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
 	sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
 
-	 uint64 guid = plr->GetSelection();
+	 uint32 guid = plr->GetGUIDLow();
 
 	 switch(plr->getClass())
 	 {
