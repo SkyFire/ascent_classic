@@ -28,6 +28,8 @@ typedef struct
 
 #ifndef CLUSTERING
 
+inline static void swap32(uint32* p) { *p = ((*p >> 24 & 0xff)) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
+
 LogonCommClientSocket::LogonCommClientSocket(SOCKET fd) : Socket(fd, 524288, 65536)
 {
 	// do nothing
@@ -63,7 +65,7 @@ void LogonCommClientSocket::OnRead()
 			opcode = swap16(opcode);
 #else
 			// convert network byte order
-			remaining = ntohl(remaining);
+			swap32(&remaining);
 #endif
 		}
 
@@ -169,12 +171,12 @@ void LogonCommClientSocket::SendPing()
 {
 	pingtime = getMSTime();
 	WorldPacket data(RCMSG_PING, 4);
-	SendPacket(&data);
+	SendPacket(&data,false);
 
 	last_ping = (uint32)UNIXTIME;
 }
 
-void LogonCommClientSocket::SendPacket(WorldPacket * data)
+void LogonCommClientSocket::SendPacket(WorldPacket * data, bool no_crypto)
 {
 	logonpacket header;
 	bool rv;
@@ -183,20 +185,22 @@ void LogonCommClientSocket::SendPacket(WorldPacket * data)
 
 #ifndef USING_BIG_ENDIAN
 	header.opcode = data->GetOpcode();
-	header.size   = ntohl((u_long)data->size());
+	//header.size   = ntohl((u_long)data->size());
+	header.size = (uint32)data->size();
+	swap32(&header.size);
 #else
 	header.opcode = swap16(uint16(data->GetOpcode()));
 	header.size   = data->size();
 #endif
 
-	if(use_crypto)
+	if(use_crypto && !no_crypto)
 		_sendCrypto.Process((unsigned char*)&header, (unsigned char*)&header, 6);
 
 	rv = BurstSend((const uint8*)&header, 6);
 
 	if(data->size() > 0 && rv)
 	{
-		if(use_crypto)
+		if(use_crypto && !no_crypto)
 			_sendCrypto.Process((unsigned char*)data->contents(), (unsigned char*)data->contents(), (unsigned int)data->size());
 
 		rv = BurstSend((const uint8*)data->contents(), (uint32)data->size());
@@ -224,10 +228,6 @@ void LogonCommClientSocket::SendChallenge()
 {
 	uint8 * key = sLogonCommHandler.sql_passhash;
 
-	WorldPacket data(RCMSG_AUTH_CHALLENGE, 20);
-	data.append(key, 20);
-	SendPacket(&data);
-
 	/* initialize rc4 keys */
 
 	printf("Key:");
@@ -241,6 +241,10 @@ void LogonCommClientSocket::SendChallenge()
 
 	/* packets are encrypted from now on */
 	use_crypto = true;
+
+	WorldPacket data(RCMSG_AUTH_CHALLENGE, 20);
+	data.append(key, 20);
+	SendPacket(&data, true);
 }
 
 void LogonCommClientSocket::HandleAuthResponse(WorldPacket & recvData)
@@ -266,7 +270,7 @@ void LogonCommClientSocket::UpdateAccountCount(uint32 account_id, uint8 add)
 	{
 		data.clear();
 		data << (*itr) << account_id << add;
-		SendPacket(&data);
+		SendPacket(&data,false);
 	}
 }
 
@@ -389,7 +393,7 @@ void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 	*(uint32*)data.contents() = (uint32)uncompressed.size();
 #endif
 	data.resize(stream.total_out + 4);
-	SendPacket(&data);
+	SendPacket(&data,false);
 }
 
 void LogonCommClientSocket::HandleDisconnectAccount(WorldPacket & recvData)

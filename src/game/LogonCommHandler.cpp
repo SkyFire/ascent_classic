@@ -65,7 +65,7 @@ void LogonCommHandler::RequestAddition(LogonCommClientSocket * Socket)
 		data << realm->Icon;
 		data << realm->TimeZone;
 		data << realm->Population;
-		Socket->SendPacket(&data);
+		Socket->SendPacket(&data,false);
 	}
 }
 
@@ -257,7 +257,7 @@ uint32 LogonCommHandler::ClientConnected(string AccountName, WorldSocket * Socke
 	WorldPacket data(RCMSG_REQUEST_SESSION, 100);
 	data << request_id;
 	data << AccountName;
-	itr->second->SendPacket(&data);
+	itr->second->SendPacket(&data,false);
 
 	pending_logons[request_id] = Socket;
 	pendingLock.Release();
@@ -296,7 +296,7 @@ void LogonCommHandler::LogonDatabaseSQLExecute(const char* str, ...)
 		// No valid logonserver is connected.
 		return;
 	}
-	itr->second->SendPacket(&data);
+	itr->second->SendPacket(&data,false);
 }
 
 void LogonCommHandler::LogonDatabaseReloadAccounts()
@@ -308,7 +308,7 @@ void LogonCommHandler::LogonDatabaseReloadAccounts()
 		// No valid logonserver is connected.
 		return;
 	}
-	itr->second->SendPacket(&data);
+	itr->second->SendPacket(&data,false);
 }
 
 void LogonCommHandler::LoadRealmConfiguration()

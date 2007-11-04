@@ -129,7 +129,7 @@
 				AdditionalOptions="/Zm250"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared;..\..\src\logonserver;..\..\dep\src\gm"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared;..\..\src\logonserver;..\..\dep\src"
 				PreprocessorDefinitions="WIN32,_DEBUG,_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;X64"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

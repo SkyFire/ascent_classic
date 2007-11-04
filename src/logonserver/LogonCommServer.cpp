@@ -25,6 +25,9 @@ typedef struct
 	uint32 size;
 }logonpacket;
 #pragma pack(pop)
+
+inline static void swap32(uint32* p) { *p = ((*p >> 24 & 0xff)) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
+
 LogonCommServerSocket::LogonCommServerSocket(SOCKET fd) : Socket(fd, 65536, 524288)
 {
 	// do nothing
@@ -79,7 +82,7 @@ void LogonCommServerSocket::OnRead()
 			opcode = swap16(opcode);
 #else
 			/* reverse byte order */
-			remaining = ntohl(remaining);
+			swap32(&remaining);
 #endif
 		}
 
@@ -219,7 +222,9 @@ void LogonCommServerSocket::SendPacket(WorldPacket * data)
 	logonpacket header;
 #ifndef USING_BIG_ENDIAN
 	header.opcode = data->GetOpcode();
-	header.size   = ntohl((u_long)data->size());
+	//header.size   = ntohl((u_long)data->size());
+	header.size = (uint32)data->size();
+	swap32(&header.size);
 #else
 	header.opcode = swap16(uint16(data->GetOpcode()));
 	header.size   = data->size();

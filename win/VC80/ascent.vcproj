@@ -346,7 +346,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\logonserver;..\..\dep\src\gm"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\logonserver;..\..\dep\src"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;X64"
 				IgnoreStandardIncludePath="false"
 				MinimalRebuild="true"
@@ -411,7 +411,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib64\*.dll ..\..\bin\debug&#x0D;&#x0A;if not exist ..\..\bin\debug\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\debug&#x0D;&#x0A;if not exist ..\..\bin\debug\realms.conf copy ..\..\src\realms.conf ..\..\bin\debug&#x0D;&#x0A;"
+				CommandLine="copy ..\..\dep\lib64\*.dll ..\..\bin\debug_x64&#x0D;&#x0A;if not exist ..\..\bin\debug\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\debug&#x0D;&#x0A;if not exist ..\..\bin\debug\realms.conf copy ..\..\src\realms.conf ..\..\bin\debug&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration

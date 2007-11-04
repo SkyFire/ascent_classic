@@ -57,7 +57,7 @@ void ScriptMgr::LoadScripts()
 		{
 			string full_path = start_path + data.cFileName;
 			HMODULE mod = LoadLibrary(full_path.c_str());
-			printf("  %s : 0x%.08X : ", data.cFileName, ((uint32)mod));
+			printf("  %s : 0x%p : ", data.cFileName, reinterpret_cast<uint32*>(mod));
 			if(mod == 0)
 				printf("error!\n");
 			else

@@ -806,8 +806,8 @@ void WorldSession::FullLogin(Player * plr)
 	{
 		uint32 rev = g_getRevision();
 #ifdef WIN32
-		_player->BroadcastMessage("Server: %sAscent %s r%u/%s-Win32 %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
-			rev, CONFIG, MSG_COLOR_LIGHTBLUE);		
+		_player->BroadcastMessage("Server: %sAscent %s r%u/%s-Win-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
+			rev, CONFIG, ARCH, MSG_COLOR_LIGHTBLUE);		
 #else
 		_player->BroadcastMessage("Server: %sAscent %s r%u/%s-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
 			rev, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);

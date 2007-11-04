@@ -270,7 +270,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 			if(!targets.size())
 				return;
 
-			uint32 share = money / targets.size();
+			uint32 share = money / uint32(targets.size());
 
 			pkt.SetOpcode(SMSG_LOOT_MONEY_NOTIFY);
 			pkt << share;
