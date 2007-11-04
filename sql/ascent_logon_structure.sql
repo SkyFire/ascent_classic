@@ -58,7 +58,7 @@ SET FOREIGN_KEY_CHECKS=0;
 -- Table structure for account_data
 -- ----------------------------
 CREATE TABLE `account_data` (
-  `account_id` int(30) NOT NULL,
+  `acct` int(30) NOT NULL,
   `uiconfig0` longtext,
   `uiconfig1` longtext,
   `uiconfig2` longtext,
