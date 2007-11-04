@@ -213,6 +213,8 @@ struct MapInfo
     uint32 lvl_mod_a;
 	uint32 required_quest;
 	uint32 required_item;
+	uint32 heroic_key_1;
+	uint32 heroic_key_2;
 
 	bool HasFlag(uint32 flag)
 	{

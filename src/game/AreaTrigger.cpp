@@ -37,6 +37,7 @@ enum AreaTriggerFailures
 	AREA_TRIGGER_FAILURE_NO_ATTUNE		= 5,
 	AREA_TRIGGER_FAILURE_LEVEL			= 6,
 	AREA_TRIGGER_FAILURE_NO_GROUP		= 7,
+	AREA_TRIGGER_FAILURE_NO_KEY         = 8,
 };
 
 const char * AreaTriggerFailureMessages[] = {
@@ -45,9 +46,10 @@ const char * AreaTriggerFailureMessages[] = {
 	"You must have The Burning Crusade Expansion to access this content.",
 	"Heroic mode unavailable for this instance.",
 	"You must be in a raid group to pass through here.",
-	"You do not have the required attunement to pass through here.",
+	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
 	"You must be at least level %u to pass through here.",
 	"You must be in a party to pass through here.",
+	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
 };
 
 inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSession, Player * pPlayer, MapInfo * pMapInfo)
@@ -79,6 +81,12 @@ inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession 
 
 	if(pMapInfo && pMapInfo->required_item && !pPlayer->GetItemInterface()->GetItemCount(pMapInfo->required_item, true))
 		return AREA_TRIGGER_FAILURE_NO_ATTUNE;
+
+	if (pPlayer->iInstanceType == MODE_HEROIC && 
+		pMapInfo->type == INSTANCE_MULTIMODE && 
+		!pPlayer->GetItemInterface()->GetItemCount(pMapInfo->heroic_key_1, false) && 
+		!pPlayer->GetItemInterface()->GetItemCount(pMapInfo->heroic_key_2, false))
+		return AREA_TRIGGER_FAILURE_NO_KEY;
 
 	return AREA_TRIGGER_FAILURE_OK;
 }
@@ -120,15 +128,17 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 					WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 50);
 					data << uint32(0);
                     
-					if(reason == AREA_TRIGGER_FAILURE_LEVEL)
+					switch (reason)
 					{
-						// special case
+					case AREA_TRIGGER_FAILURE_LEVEL:
 						char msg[50];
 						snprintf(msg,50,pReason,pAreaTrigger->required_level);
 						data << msg;
-					}
-					else
+						break;
+					default:
 						data << pReason;
+						break;
+					}
 
 					data << uint8(0);
 					SendPacket(&data);
