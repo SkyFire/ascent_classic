@@ -252,7 +252,6 @@ void QuestLogEntry::SetMobCount(uint32 i, uint32 count)
 	m_mobcount[i] = count;
 	mDirty = true;
 }
-
 void QuestLogEntry::SetTrigger(uint32 i)
 {
 	ASSERT(i<4);
