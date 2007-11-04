@@ -619,7 +619,7 @@ bool QuestMgr::OnGameObjectActivate(Player *plr, GameObject *go)
 	return false;
 }
 
-void QuestMgr::OnPlayerKill(Player* plr, Unit* victim)
+void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 {
 	if(!plr)
 		return;
@@ -651,42 +651,7 @@ void QuestMgr::OnPlayerKill(Player* plr, Unit* victim)
 			}
 		}
 	}
-}
 
-void QuestMgr::OnPlayerCast(Player* plr, Unit* victim, uint32 SpellId)
-{
-	if(!plr || !victim)
-		return;
-
-	uint32 i, j;
-	uint32 entry = victim->GetEntry();
-	QuestLogEntry *qle;
-	for(i = 0; i < 25; ++i)
-	{
-		if((qle = plr->GetQuestLogInSlot(i)))
-		{
-			// dont waste time on quests without mobs
-			if(qle->GetQuest()->count_required_mob == 0)
-				continue;
-
-			for(j = 0; j < 4; ++j)
-			{
-				if(qle->GetQuest()->required_mob[j] == entry &&
-					qle->GetQuest()->required_spell[j] == SpellId &&
-					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
-				{
-					sLog.outString( "part 2");
-					// add another kill.
-					// (auto-dirtys it)
-					qle->SetMobCount(j, qle->m_mobcount[j] + 1);
-					qle->SendUpdateAddKill(j);
-					qle->UpdatePlayerFields();
-					break;
-					//Fixme: 10 casts on the same mob = 10 increments. ;(
-				}
-			}
-		}
-	}
 
 	// Shared kills
 	Player *gplr = NULL;
@@ -740,6 +705,42 @@ void QuestMgr::OnPlayerCast(Player* plr, Unit* victim, uint32 SpellId)
 				}
 			}
 			pGroup->Unlock();
+		}
+	}
+}
+
+void QuestMgr::OnPlayerCast(Player* plr, Unit* victim, uint32 SpellId)
+{
+	if(!plr || !victim)
+		return;
+
+	uint32 i, j;
+	uint32 entry = victim->GetEntry();
+	QuestLogEntry *qle;
+	for(i = 0; i < 25; ++i)
+	{
+		if((qle = plr->GetQuestLogInSlot(i)))
+		{
+			// dont waste time on quests without mobs
+			if(qle->GetQuest()->count_required_mob == 0)
+				continue;
+
+			for(j = 0; j < 4; ++j)
+			{
+				if(qle->GetQuest()->required_mob[j] == entry &&
+					qle->GetQuest()->required_spell[j] == SpellId &&
+					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
+				{
+					sLog.outString( "part 2");
+					// add another kill.
+					// (auto-dirtys it)
+					qle->SetMobCount(j, qle->m_mobcount[j] + 1);
+					qle->SendUpdateAddKill(j);
+					qle->UpdatePlayerFields();
+					break;
+					//Fixme: 10 casts on the same mob = 10 increments. ;(
+				}
+			}
 		}
 	}
 }
