@@ -44,3 +44,33 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+/*
+MySQL Data Transfer
+Source Host: localhost
+Source Database: logon
+Target Host: localhost
+Target Database: logon
+Date: 10/30/2007 9:21:50 PM
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+-- ----------------------------
+-- Table structure for account_data
+-- ----------------------------
+CREATE TABLE `account_data` (
+  `account_id` int(30) NOT NULL,
+  `uiconfig0` longtext,
+  `uiconfig1` longtext,
+  `uiconfig2` longtext,
+  `uiconfig3` longtext,
+  `uiconfig4` longtext,
+  `uiconfig5` longtext,
+  `uiconfig6` longtext,
+  `uiconfig7` longtext,
+  `uiconfig8` longtext,
+  PRIMARY KEY  (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- ----------------------------
+-- Records 
+-- ----------------------------
