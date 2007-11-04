@@ -379,3 +379,30 @@ bool ChatHandler::HandleGMListCommand(const char* args, WorldSession *m_session)
 
 	return true;
 }
+
+bool ChatHandler::HandleRangeCheckCommand( const char *args , WorldSession *m_session )
+{
+	WorldPacket data;
+	uint64 guid = m_session->GetPlayer()->GetSelection();
+	m_session->SystemMessage( "=== RANGE CHECK ===" );
+	if (guid == 0)
+	{
+		m_session->SystemMessage("No selection imo.");
+		return true;
+	}
+
+	Unit *unit = m_session->GetPlayer()->GetMapMgr()->GetUnit( guid );
+	if(!unit)
+	{
+		m_session->SystemMessage("Invalid selection imo.");
+		return true;
+	}
+	float DistSq = unit->GetDistanceSq( static_cast<Object*>(m_session->GetPlayer()) );
+	m_session->SystemMessage( "GetDistanceSq  :   %u" , FL2UINT( DistSq ) );
+	LocationVector locvec( m_session->GetPlayer()->GetPositionX() , m_session->GetPlayer()->GetPositionY() , m_session->GetPlayer()->GetPositionZ() );
+	float DistReal = unit->CalcDistance( locvec );
+	m_session->SystemMessage( "CalcDistance   :   %u" , FL2UINT( DistReal ) );
+	float Dist2DSq = unit->GetDistance2dSq( static_cast<Object*>(m_session->GetPlayer()) );
+	m_session->SystemMessage( "GetDistance2dSq:   %u" , FL2UINT( Dist2DSq ) );
+	return true;
+}

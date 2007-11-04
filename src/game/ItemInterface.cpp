@@ -2626,15 +2626,22 @@ bool ItemInterface::IsEquipped(uint32 itemid)
 
 void ItemInterface::CheckAreaItems()
 {
+	/* Being debugged by Supalosa - at the moment it doesn't seem to actually seem to 'find' the items...
+	sLog.outString( "Checking player %s for zone-specific items:" , GetOwner()->GetNameString());
 	// Check equipment and backpack first (not inventory)
-	/*for( uint32 i = EQUIPMENT_SLOT_START ; i < EQUIPMENT_SLOT_END ; i++ )
+	for( uint32 i = EQUIPMENT_SLOT_START ; i < EQUIPMENT_SLOT_END ; i++ )
 	{
 		Item *item = GetInventoryItem( i );
 		if( item )
 		{
 			// Field114 = MapID
 			if( item->GetProto()->Field114 != 0 && item->GetProto()->Field114 != GetOwner()->GetMapId() )
+			{
+				sLog.outString( "    Found %s in slot %u, removing." , item->GetProto()->Name1 , i );
 				SafeFullRemoveItemByGuid(item->GetGUID());
+				
+			}
+
 		}
 	}
 	// Check inventory
@@ -2647,8 +2654,12 @@ void ItemInterface::CheckAreaItems()
 			{
 				Item *innerItem = item->GetItem(h);
 				if( innerItem && innerItem->GetProto()->Field114 != 0 && innerItem->GetProto()->Field114 != GetOwner()->GetMapId() )
+				{
+					sLog.outString( "    Found %s in bag %u, slot %u, removing." , item->GetProto()->Name1 , j , h );
 					SafeFullRemoveItemByGuid(item->GetGUID());
+				}
 			}
 		}
-	}*/
+	}
+	*/
 }

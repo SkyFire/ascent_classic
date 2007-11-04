@@ -239,6 +239,7 @@ protected:
 	bool HandleSendRunSpeedChange(const char * args, WorldSession * m_session);
     bool HandleSendpacket(const char * args, WorldSession * m_session);
 	bool HandleSQLQueryCommand(const char* args, WorldSession *m_session);
+	bool HandleRangeCheckCommand( const char * args , WorldSession * m_session );
 
 	//WayPoint Commands
 	bool HandleWPAddCommand(const char* args, WorldSession *m_session);
