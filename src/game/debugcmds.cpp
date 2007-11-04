@@ -874,7 +874,7 @@ bool ChatHandler::HandleModifyValueCommand(const char* args,  WorldSession* m_se
 	uint64 guid = m_session->GetPlayer()->GetSelection();
 	if (guid != 0)
 	{
-		if(!(obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid)))
+		if(!(obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetUnit(guid)))
 		{
 			SystemMessage(m_session, "You should select a character or a creature.");
 			return true;
