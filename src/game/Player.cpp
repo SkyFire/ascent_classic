@@ -8381,6 +8381,9 @@ void Player::_AddSkillLine(uint32 SkillLine, uint32 Current, uint32 Max)
 		{
 			itr->second.CurrentValue = Current;
 			itr->second.MaximumValue = Max;
+
+			if(itr->second.CurrentValue>itr->second.MaximumValue)
+				itr->second.CurrentValue=itr->second.MaximumValue;
 			_UpdateSkillFields();
 		}
 	}
@@ -8407,6 +8410,10 @@ void Player::_AddSkillLine(uint32 SkillLine, uint32 Current, uint32 Max)
                 SendSetProficiency(prof->itemclass,weapon_proficiency);
             }
     	}
+
+		// hackfix for poisons
+		if(SkillLine==SKILL_POISONS && !HasSpell(2842))
+			addSpell(2842);
 	}
 }
 
