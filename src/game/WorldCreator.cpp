@@ -94,12 +94,6 @@ void InstanceMgr::Shutdown()
 	InstanceMap::iterator itr;
 	for(i = 0; i < NUM_MAPS; ++i)
 	{
-		if(m_maps[i] != NULL)
-		{
-			delete m_maps[i];
-			m_maps[i]=NULL;
-		}
-
 		if(m_instances[i] != NULL)
 		{
 			for(itr = m_instances[i]->begin(); itr != m_instances[i]->end(); ++itr)
@@ -120,6 +114,12 @@ void InstanceMgr::Shutdown()
 			ptr->KillThread();
 			delete ptr;
 			m_singleMaps[i]=NULL;
+		}
+
+		if(m_maps[i] != NULL)
+		{
+			delete m_maps[i];
+			m_maps[i]=NULL;
 		}
 	}
 

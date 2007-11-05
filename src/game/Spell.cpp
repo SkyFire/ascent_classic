@@ -3315,18 +3315,20 @@ void Spell::CreateItem(uint32 itemId)
 		newItem->SetUInt64Value(ITEM_FIELD_CREATOR,m_caster->GetGUID());
 		newItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, damage);
 
-		WorldPacket data(45);
+		/*WorldPacket data(45);
 		p_caster->GetSession()->BuildItemPushResult(&data, p_caster->GetGUID(), 1, 1, itemId ,0,0xFF,1,0xFFFFFFFF);
-		p_caster->SendMessageToSet(&data, true);
+		p_caster->SendMessageToSet(&data, true);*/
+		p_caster->GetSession()->SendItemPushResult(newItem,true,false,true,true,slotresult.ContainerSlot,slotresult.Slot,1);
 		newItem->m_isDirty = true;
 
 	} 
 	else 
 	{
 		add->SetUInt32Value(ITEM_FIELD_STACK_COUNT,add->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + damage);
-		WorldPacket data(45);
+		/*WorldPacket data(45);
 		p_caster->GetSession()->BuildItemPushResult(&data, p_caster->GetGUID(), 1, 1, itemId ,0,0xFF,1,0xFFFFFFFF);
-		p_caster->SendMessageToSet(&data, true);
+		p_caster->SendMessageToSet(&data, true);*/
+		p_caster->GetSession()->SendItemPushResult(add,true,false,true,false,p_caster->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()),0xFFFFFFFF,1);
 		add->m_isDirty = true;
 	}
 }

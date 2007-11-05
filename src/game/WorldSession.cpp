@@ -365,27 +365,6 @@ void WorldSession::LogoutPlayer(bool Save)
 	SetLogoutTimer(0);
 }
 
-void WorldSession::BuildItemPushResult(WorldPacket *data, uint64 guid, uint32 type, uint32 count, uint32 itemid, uint32 randomprop, uint8 unk, uint32 unk2, uint32 unk3, uint32 count_have)
-{
-    ItemPrototype *proto = ItemPrototypeStorage.LookupEntry(itemid);
-    if(!proto) return;
-
-    data->Initialize(SMSG_ITEM_PUSH_RESULT);
-    *data << guid;
-    *data << type << unk2;
-    *data << uint32(1);      // show msg
-    *data << unk;
-    *data << unk3;
-    *data << itemid;
-	//not sure if random property. 
-	//For quest items also sent at loot list but it's changing in time.
-	//in SMSG_ITEM_PUSH_RESULT packet it's used as sent in first ccurance of lootlist packet
-    *data << randomprop;
-    *data << proto->Quality;
-    *data << count;
-    *data << count_have;
-}
-
 void WorldSession::SendBuyFailed(uint64 guid, uint32 itemid, uint8 error)
 {
 	WorldPacket data(13);
@@ -967,4 +946,34 @@ void WorldSession::SendChatPacket(WorldPacket * data, uint32 langpos, int32 lang
 #endif
 
 	SendPacket(data);
+}
+
+void WorldSession::SendItemPushResult(Item * pItem, bool Created, bool Received, bool SendToSet, bool NewItem, uint8 DestBagSlot, uint32 DestSlot, uint32 AddCount)
+{
+	WorldPacket data(SMSG_ITEM_PUSH_RESULT, 60);
+	data << _player->GetGUID();
+	data << uint32(Received);
+	data << uint32(Created);
+	data << uint32(1);
+	data << uint8(DestBagSlot);
+	data << uint32(NewItem ? DestSlot : 0xFFFFFFFF);
+	data << pItem->GetEntry();
+	data << pItem->GetItemRandomSuffixFactor();
+	data << pItem->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID);
+	data << AddCount;
+	data << uint32(0);
+	if(SendToSet)
+	{
+		if(Created)
+			_player->SendMessageToSet(&data, true);
+		else
+		{
+			if(_player->GetGroup())
+				_player->GetGroup()->SendPacketToAll(&data);
+			else
+				SendPacket(&data);
+		}
+	}
+	else
+		SendPacket(&data);
 }

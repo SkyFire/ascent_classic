@@ -1052,11 +1052,13 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 				else
 				{
 					c->AddItem( newslot, item );
+					SendItemPushResult(item, false, true, false, true, _player->GetItemInterface()->GetBagSlotByGuid(c->GetGUID()), newslot, 1);
 				}
 			}
 			else
 			{
 				c->AddItem( slot, item );
+				SendItemPushResult(item, false, true, false, true, _player->GetItemInterface()->GetBagSlotByGuid(c->GetGUID()), newslot, 1);
 			}
 		}
 		else
@@ -1076,6 +1078,8 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 					{
 						printf("HandleBuyItemInSlot: Error while adding item to newslot");
 					}
+					else
+						SendItemPushResult(item, false, true, false, true, INVENTORY_SLOT_NOT_SET, newslot, 1);
 				}
 			}
 			else
@@ -1085,11 +1089,13 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 				{
 					printf("HandleBuyItemInSlot: Error while adding item to slot");
 				}
+				else
+					SendItemPushResult(item, false, true, false, true, INVENTORY_SLOT_NOT_SET, slot, 1);
 			}
 		}
-		WorldPacket data(45);
+		/*WorldPacket data(45);
 		BuildItemPushResult(&data, _player->GetGUID(), ITEM_PUSH_TYPE_RECEIVE, itemd.amount, itemid, 0);
-		SendPacket(&data);
+		SendPacket(&data);*/
 	}
 
 	_player->GetItemInterface()->BuyItem(it,amount*itemd.amount);
@@ -1192,12 +1198,15 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 			{
 				printf("HandleBuyItem: Error while adding item to playerslot");
 			}
+			else
+				SendItemPushResult(itm, false, true, false, true, INVENTORY_SLOT_NOT_SET, slotresult.Result, 1);
 		}
 		else 
 		{
 			if(Item *bag = _player->GetItemInterface()->GetInventoryItem(slotresult.ContainerSlot))
 			{
 				((Container*)bag)->AddItem(slotresult.Slot, itm);
+				SendItemPushResult(itm, false, true, false, true, slotresult.ContainerSlot, slotresult.Result, 1);
 			}
 		}
 	}
@@ -1205,9 +1214,10 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	{
 		add->ModUInt32Value(ITEM_FIELD_STACK_COUNT, amount);
 		add->m_isDirty = true;
+		SendItemPushResult(add, false, true, false, false, _player->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()), 1, 1);
 	}
 
-	 BuildItemPushResult(&data, _player->GetGUID(), ITEM_PUSH_TYPE_RECEIVE, amount, itemid, 0);
+	 //BuildItemPushResult(&data, _player->GetGUID(), ITEM_PUSH_TYPE_RECEIVE, amount, itemid, 0);
 	 SendPacket(&data);
 
 	 data.Initialize( SMSG_BUY_ITEM );

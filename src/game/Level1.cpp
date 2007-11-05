@@ -264,6 +264,9 @@ bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_sess
 		snprintf(messagetext, 128, "%s added item %d (%s) to your inventory.", m_session->GetPlayer()->GetName(), (unsigned int)itemid, it->Name1);
 		SystemMessageToPlr(chr,  messagetext);
 
+		SlotResult *lr = chr->GetItemInterface()->LastSearchResult();
+		chr->GetSession()->SendItemPushResult(item,false,true,false,true,lr->ContainerSlot,lr->Slot,count);
+
 		return true;
 	} else {
 		RedSystemMessage(m_session, "Item %d is not a valid item!",itemid);

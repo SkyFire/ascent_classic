@@ -1022,6 +1022,47 @@ int8 ItemInterface::GetInventorySlotByGuid(uint64 guid)
 	return ITEM_NO_SLOT_AVAILABLE; //was changed from 0 cuz 0 is the slot for head
 }
 
+int8 ItemInterface::GetBagSlotByGuid(uint64 guid)
+{
+	for(uint32 i=EQUIPMENT_SLOT_START ;i<INVENTORY_SLOT_ITEM_END;i++)
+	{
+		if(m_pItems[i])
+		{
+			if(m_pItems[i]->GetGUID() == guid)
+			{
+				return i;
+			}
+		}
+	}
+
+	for(uint32 i=INVENTORY_KEYRING_START; i<INVENTORY_KEYRING_END; i++)
+	{
+		if(m_pItems[i])
+		{
+			if(m_pItems[i]->GetGUID() == guid)
+			{
+				return i;
+			}
+		}
+	}
+
+	for(uint32 i=INVENTORY_SLOT_BAG_START; i<INVENTORY_SLOT_BAG_END; ++i)
+	{
+		if(m_pItems[i]&&m_pItems[i]->GetTypeId()==TYPEID_CONTAINER)
+		{
+			for(uint32 j = 0; j < m_pItems[i]->GetProto()->ContainerSlots; ++j)
+			{
+				Item * inneritem = ((Container*)m_pItems[i])->GetItem(j);
+				if(inneritem && inneritem->GetGUID()==guid)
+					return i;
+			}
+		}
+	}
+
+	return ITEM_NO_SLOT_AVAILABLE; //was changed from 0 cuz 0 is the slot for head
+}
+
+
 //-------------------------------------------------------------------//
 //Description: Adds a Item to a free slot
 //-------------------------------------------------------------------//
@@ -1029,6 +1070,7 @@ bool ItemInterface::AddItemToFreeSlot(Item *item)
 {
 	if(!item) { return false; }
 	uint32 i = 0;
+	bool result2;
 
 	//detect special bag item
 	if(item->GetProto()->BagFamily)
@@ -1039,8 +1081,13 @@ bool ItemInterface::AddItemToFreeSlot(Item *item)
 			{
 				if(m_pItems[i] == NULL)
 				{
-					bool result = SafeAddItem(item, INVENTORY_SLOT_NOT_SET, i);
-					if(result) { return true; }
+					result2 = SafeAddItem(item, INVENTORY_SLOT_NOT_SET, i);
+					if(result2) {
+						result.ContainerSlot = INVENTORY_SLOT_NOT_SET;
+						result.Slot = i;
+						result.Result = true;
+						return true;
+					}
 				}
 			}
 		}
@@ -1054,8 +1101,14 @@ bool ItemInterface::AddItemToFreeSlot(Item *item)
 					{
 						if(m_pItems[i]->IsContainer())
 						{
-							bool result = static_cast<Container*>(m_pItems[i])->AddItemToFreeSlot(item);
-							if (result) { return true; }
+							uint32 r_slot;
+							result2 = static_cast<Container*>(m_pItems[i])->AddItemToFreeSlot(item, &r_slot);
+							if (result2) {
+								result.ContainerSlot = i;
+								result.Slot = r_slot;
+								result.Result = true;
+								return true;
+							}
 						}
 					}
 				}
@@ -1068,7 +1121,13 @@ bool ItemInterface::AddItemToFreeSlot(Item *item)
 	{
 		if(m_pItems[i] == NULL)
 		{
-			return SafeAddItem(item, INVENTORY_SLOT_NOT_SET, i);
+			result2 = SafeAddItem(item, INVENTORY_SLOT_NOT_SET, i);
+			if(result2) {
+				result.ContainerSlot = INVENTORY_SLOT_NOT_SET;
+				result.Slot = i;
+				result.Result = true;
+				return true;
+			}
 		}
 	}
 
@@ -1082,7 +1141,13 @@ bool ItemInterface::AddItemToFreeSlot(Item *item)
 				Item *item2 = ((Container*)m_pItems[i])->GetItem(j);
 				if (item2 == NULL)
 				{
-					return SafeAddItem(item, i, j);
+					result2 = SafeAddItem(item, i, j);
+					if(result2) {
+						result.ContainerSlot = i;
+						result.Slot = j;
+						result.Result = true;
+						return true;
+					}
 				}
 			}
 		}
@@ -2352,8 +2417,8 @@ bool ItemInterface::AddItemToFreeBankSlot(Item *item)
 			{
 				if(m_pItems[i]->IsContainer())
 				{
-					bool result =  static_cast<Container*>(m_pItems[i])->AddItemToFreeSlot(item);
-					if(result) { return true; }
+					bool result2 =  static_cast<Container*>(m_pItems[i])->AddItemToFreeSlot(item, NULL);
+					if(result2) { return true; }
 				}
 			}
 		}

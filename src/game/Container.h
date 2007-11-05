@@ -31,7 +31,7 @@ public:
 	void LoadFromDB( Field*fields);
 
 	bool AddItem(int8 slot, Item *item);
-	bool AddItemToFreeSlot(Item *pItem);
+	bool AddItemToFreeSlot(Item *pItem, uint32 * r_slot);
 	inline Item *GetItem(int8 slot)
 	{
 		if((uint8)slot < GetProto()->ContainerSlots)

@@ -122,6 +122,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		GetPlayer()->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
 		
 		sQuestMgr.OnPlayerItemPickup(GetPlayer(),item);
+		_player->GetSession()->SendItemPushResult(item,false,true,true,true,slotresult.ContainerSlot,slotresult.Slot,1);
 	}
 	else 
 	{	
@@ -129,6 +130,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		add->m_isDirty = true;
 
 		sQuestMgr.OnPlayerItemPickup(GetPlayer(),add);
+		_player->GetSession()->SendItemPushResult(add, false, true, true, false, _player->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()), 0xFFFFFFFF, 1);
 	}
 
 	pLoot->items.at(lootSlot).iItemsCount=0;
@@ -143,7 +145,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 			plr->GetSession()->SendPacket(&data);
 	}
 
-    WorldPacket idata(45);
+/*    WorldPacket idata(45);
     if(it->Class == ITEM_CLASS_QUEST)
     {
         uint32 pcount = _player->GetItemInterface()->GetItemCount(it->ItemId, true);
@@ -154,7 +156,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	if(_player->InGroup())
 		_player->GetGroup()->SendPacketToAll(&idata);
 	else
-		SendPacket(&idata);
+		SendPacket(&idata);*/
 
 	/* any left yet? (for fishing bobbers) */
 	if(pGO && pGO->GetEntry() ==GO_FISHING_BOBBER)
@@ -1645,6 +1647,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	}
 
 	player->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
+	player->GetSession()->SendItemPushResult(item,false,true,true,true,slotresult.ContainerSlot,slotresult.Slot,1);
 	
 	sQuestMgr.OnPlayerItemPickup(player,item);
 
@@ -1661,7 +1664,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 			plr->GetSession()->SendPacket(&data);
 	}
 
-    WorldPacket idata(45);
+/*    WorldPacket idata(45);
     if(it->Class == ITEM_CLASS_QUEST)
     {
         uint32 pcount = player->GetItemInterface()->GetItemCount(it->ItemId, true);
@@ -1675,7 +1678,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	if(_player->InGroup())
 		_player->GetGroup()->SendPacketToAll(&idata);
 	else
-		SendPacket(&idata);
+		SendPacket(&idata);*/
 }
 
 void WorldSession::HandleLootRollOpcode(WorldPacket& recv_data)

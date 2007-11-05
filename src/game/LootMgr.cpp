@@ -730,6 +730,7 @@ void LootRoll::Finalize()
 
 
 		_player->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
+		_player->GetSession()->SendItemPushResult(item,false,true,true,true,slotresult.ContainerSlot,slotresult.Slot,1);
 
 		sQuestMgr.OnPlayerItemPickup(_player,item);
 	}
@@ -738,6 +739,7 @@ void LootRoll::Finalize()
 		add->SetCount(add->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + amt);
 		add->m_isDirty = true;
 		sQuestMgr.OnPlayerItemPickup(_player,add);
+		_player->GetSession()->SendItemPushResult(add, false, true, true, false, _player->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()), 0xFFFFFFFF, 1);
 	}
 
 	pLoot->items.at(_slotid).iItemsCount=0;
@@ -751,13 +753,14 @@ void LootRoll::Finalize()
 			plr->GetSession()->SendPacket(&data);
 	}
 
-	WorldPacket idata(45);
+	/*WorldPacket idata(45);
 	_player->GetSession()->BuildItemPushResult(&idata, _player->GetGUID(), ITEM_PUSH_TYPE_LOOT, amt, itemid, pLoot->items.at(_slotid).iRandomProperty ? pLoot->items.at(_slotid).iRandomProperty->ID : 0);
 
 	if(_player->InGroup())
 		_player->GetGroup()->SendPacketToAll(&idata);
 	else
-		_player->GetSession()->SendPacket(&idata);
+		_player->GetSession()->SendPacket(&idata);*/
+
 	delete this;
 }
 

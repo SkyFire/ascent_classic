@@ -311,7 +311,7 @@ public:
 
 	int __fastcall Update(uint32 InstanceID);
 
-    void BuildItemPushResult(WorldPacket *data, uint64 guid, uint32 type, uint32 count, uint32 itemid, uint32 randomprop, uint8 unk = 0xFF, uint32 unk2 = 0, uint32 unk3 = 1, uint32 count_have = 0);
+	void SendItemPushResult(Item * pItem, bool Created, bool Received, bool SendToSet, bool NewItem, uint8 DestBagSlot, uint32 DestSlot, uint32 AddCount);
 	void SendBuyFailed(uint64 guid, uint32 itemid, uint8 error);
 	void SendSellItem(uint64 vendorguid, uint64 itemid, uint8 error);
 	void SendNotification(const char *message, ...);

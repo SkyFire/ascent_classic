@@ -63,6 +63,7 @@ public:
 	Item *GetInventoryItem(int8 ContainerSlot, int8 slot);
 	int8 GetInventorySlotById(uint32 ID);
 	int8 GetInventorySlotByGuid(uint64 guid);
+	int8 GetBagSlotByGuid(uint64 guid);
 
 	Item *SafeAddItem(uint32 ItemId, int8 ContainerSlot, int8 slot);
 	bool SafeAddItem(Item *pItem, int8 ContainerSlot, int8 slot);

@@ -264,7 +264,7 @@ bool Container::SafeFullRemoveItemFromSlot(int8 slot)
 	return true;
 }
 
-bool Container::AddItemToFreeSlot(Item *pItem)
+bool Container::AddItemToFreeSlot(Item *pItem, uint32 * r_slot)
 {
 	uint32 slot;
 	for(slot = 0; slot < GetProto()->ContainerSlots; slot++)
@@ -286,6 +286,8 @@ bool Container::AddItemToFreeSlot(Item *pItem)
 				uint32 count = pItem->BuildCreateUpdateBlockForPlayer( &buf, m_owner );
 				m_owner->PushCreationData(&buf, count);
 			}
+			if(r_slot)
+				*r_slot = slot;
 			return true;
 		}
 	}

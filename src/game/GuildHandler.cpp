@@ -1006,9 +1006,10 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			_player->GetItemInterface()->AddItemToFreeSlot(i);
 			c->SaveToDB();
 
-			WorldPacket data(45);
+			/*WorldPacket data(45);
 			BuildItemPushResult(&data, _player->GetGUID(), ITEM_PUSH_TYPE_RECEIVE, 1, item_ids[arena_type], 0);
-			SendPacket(&data);
+			SendPacket(&data);*/
+			SendItemPushResult(i, false, true, false, true, _player->GetItemInterface()->LastSearchItemBagSlot(), _player->GetItemInterface()->LastSearchItemSlot(), 1);
 
 			_player->m_charters[arena_index] = c;
 			_player->SaveToDB(false);
@@ -1066,10 +1067,11 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			_player->GetItemInterface()->AddItemToFreeSlot(i);
 			c->SaveToDB();
 
-			data.clear();
+			/*data.clear();
 			data.resize(45);
 			BuildItemPushResult(&data, _player->GetGUID(), ITEM_PUSH_TYPE_RECEIVE, 1, ITEM_ENTRY_GUILD_CHARTER, 0);
-			SendPacket(&data);
+			SendPacket(&data);*/
+			SendItemPushResult(i, false, true, false, true, _player->GetItemInterface()->LastSearchItemBagSlot(), _player->GetItemInterface()->LastSearchItemSlot(), 1);
 
 			_player->m_charters[CHARTER_TYPE_GUILD] = c;
 			_player->SaveToDB(false);

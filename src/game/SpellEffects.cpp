@@ -1438,9 +1438,10 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 
 			if(p_caster->GetItemInterface()->SafeAddItem(newItem,slotresult.ContainerSlot, slotresult.Slot))
 			{
-				WorldPacket data(45);
+				/*WorldPacket data(45);
 				p_caster->GetSession()->BuildItemPushResult(&data, p_caster->GetGUID(), 1, item_count, m_spellInfo->EffectSpellGroupRelation[i] ,0,0xFF,1,0xFFFFFFFF);
-				p_caster->SendMessageToSet(&data, true);
+				p_caster->SendMessageToSet(&data, true);*/
+				p_caster->GetSession()->SendItemPushResult(newItem,true,false,true,true,slotresult.ContainerSlot,slotresult.Slot,item_count);
 			} else {
 				delete newItem;
 			}
@@ -1471,17 +1472,20 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 						delete newItem;
 						item_count = item_count_filled;
 					}
+					else
+						p_caster->GetSession()->SendItemPushResult(newItem, true, false, true, true, slotresult.ContainerSlot, slotresult.Slot, item_count-item_count_filled);
                 }
 			}
 			else
 			{
 				add->SetCount(add->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + item_count);
 				add->m_isDirty = true;
+				p_caster->GetSession()->SendItemPushResult(newItem, true,false,true,false,p_caster->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()),0xFFFFFFFF,item_count);
 			}
 
-			WorldPacket data(45);
+			/*WorldPacket data(45);
 			p_caster->GetSession()->BuildItemPushResult(&data, p_caster->GetGUID(), 1, item_count, m_spellInfo->EffectSpellGroupRelation[i] ,0,0xFF,1,0xFFFFFFFF);
-			p_caster->SendMessageToSet(&data, true);
+			p_caster->SendMessageToSet(&data, true);*/
 			if(skill)
 				DetermineSkillUp(skill->skilline);
 		}

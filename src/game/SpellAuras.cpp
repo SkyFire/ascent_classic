@@ -4585,9 +4585,11 @@ void Aura::SpellAuraChannelDeathItem(bool apply)
 							delete item;
 							return;
 						}
-						WorldPacket data(45);
+						/*WorldPacket data(45);
 						pCaster->GetSession()->BuildItemPushResult(&data, pCaster->GetGUID(), 1, 1, itemid ,0,0xFF,1,0xFFFFFFFF);
-						pCaster->SendMessageToSet(&data, true);					
+						pCaster->SendMessageToSet(&data, true);					*/
+						SlotResult * lr = pCaster->GetItemInterface()->LastSearchResult();
+						pCaster->GetSession()->SendItemPushResult(item,true,false,true,true,lr->ContainerSlot,lr->Slot,1);
 					}
 				}
 			}
