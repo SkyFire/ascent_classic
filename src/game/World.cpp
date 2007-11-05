@@ -1591,6 +1591,17 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
 
+	//shaman - Ancestral healing
+	sp = dbcSpell.LookupEntry(16176); 
+	if(sp)
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	sp = dbcSpell.LookupEntry(16235); 
+	if(sp)
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	sp = dbcSpell.LookupEntry(16240); 
+	if(sp)
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+
 	//shaman - Totemic focus 
 	uint32 All_totems_grouprelation=536870912; //these are only selected flag since some totems contain more then 1 flag
 	All_totems_grouprelation |= 8;

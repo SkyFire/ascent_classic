@@ -857,6 +857,15 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									continue;
 							}
 							break;
+						//shaman - Ancestral healing
+						case 16177:
+						case 16236:
+						case 16237:
+							{
+								if (!CastingSpell || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) || this!=victim)
+									continue;
+							}
+							break;
 						//shaman - windfurry weapon
 						case 8232:
 						case 8235:
