@@ -34,7 +34,6 @@ Purge - Works well enough, in some cases it removes things it shouldent (Palidin
 Enhancement:
 Stoneclaw Totem - Doesn't work
 Flametongue Weapon - Doesn't work
-Windfury Totem (Rank 4+) - Doesn't work
 Far Sight - recheck
 Flametongue Totem - Doesn't work
 Grounding Totem - Doesn't work
@@ -108,10 +107,8 @@ Spells:
 Stoneclaw totem doesn't work
 Cure Disease don't work
 Grounding Totem don't work
-Windfury Totem don't work
 Disease Cleansing Totem don't work
 Wrath of Air Totem don't work
-Bloodlust don't give the effect on friends and members but on ennemy
 Totem of Wrath don't work
 Purge don't work
 Poison Cleansing Totem don't work
