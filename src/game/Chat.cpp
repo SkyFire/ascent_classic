@@ -382,7 +382,8 @@ void CommandTableStorage::Init()
 
 	static ChatCommand accountCommandTable[] =
 	{
-		{ "banned",	  'z', &ChatHandler::HandleAccountBannedCommand,   "Ban account. Pass it username and 0 or 1.", NULL, 0, 0, 0 },
+		{ "ban",	  'z', &ChatHandler::HandleAccountBannedCommand,   "Ban account. .account ban name timeperiod", NULL, 0, 0, 0 },
+		{ "unban",	  'z', &ChatHandler::HandleAccountUnbanCommand,		"Unbans account x.", NULL, 0, 0, 0 },
 		{ "create",	  'z', &ChatHandler::HandleCreateAccountCommand,   "Create account. Pass it username password email.", NULL, 0, 0, 0 },
 		{ "email",	  'z', &ChatHandler::HandleAccountEmailCommand,	   "Sets email address on account. Pass it username email_address.", NULL, 0, 0, 0},
 		{ "flags",	  'z', &ChatHandler::HandleAccountFlagsCommand,	   "Sets flags on account. Pass it username and 0 for Non-TBC or 8 for TBC.", NULL, 0, 0, 0},

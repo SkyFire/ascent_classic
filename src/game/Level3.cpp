@@ -1155,32 +1155,49 @@ bool ChatHandler::HandleAccountPasswordCommand(const char * args, WorldSession *
 	return true;
 }
 
+bool ChatHandler::HandleAccountUnbanCommand(const char * args, WorldSession * m_session)
+{
+	if(!*args) return false;
+	char * pAccount = (char*)args;
+	string escaped_account = CharacterDatabase.EscapeString(string(pAccount));
+	GreenSystemMessage(m_session, "Account '%s' has been unbanned. This change will be effective with the next reload cycle.", pAccount);
+	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET banned = 0 WHERE login = '%s'", escaped_account.c_str());
+	sGMLog.writefromsession(m_session, "unbanned account %s", pAccount);
+	return true;
+}
+
 bool ChatHandler::HandleAccountBannedCommand(const char * args, WorldSession * m_session)
 {
     if(!*args) return false;
 
-	char account[100];
+	/*char account[100];
 	uint32 banned;
 	int argc = sscanf(args, "%s %u", account, (unsigned int*)&banned);
 	if(argc != 2)
+		return false;*/
+
+	char * pAccount = (char*)args;
+	char * pDuration = strchr(pAccount, ' ');
+	if(pDuration == NULL)
 		return false;
+	*pDuration = 0;
+	++pDuration;
+
+	int32 timeperiod = GetTimePeriodFromString(pDuration);
+	if(timeperiod < 0)
+		return NULL;
+
+	uint32 banned = (timeperiod ? (uint32)UNIXTIME+timeperiod : 1);
 
 	stringstream my_sql;
-	my_sql << "UPDATE accounts SET banned = " << banned << " WHERE login = '" << account << "'";
+	my_sql << "UPDATE accounts SET banned = " << banned << " WHERE login = '" << CharacterDatabase.EscapeString(string(pAccount)) << "'";
 
 	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
 
-	switch(banned)
-	{
-	case 0: {
-		GreenSystemMessage(m_session, "Account '%s' has been unbanned. The change will be effective with the next reload cycle.", account);
-		}break;
+	GreenSystemMessage(m_session, "Account '%s' has been banned %s%s. The change will be effective with the next reload cycle.", pAccount, 
+		timeperiod ? "until " : "forever", timeperiod ? ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str() : "");
 
-	case 1: {
-		GreenSystemMessage(m_session, "Account '%s' has been banned. The change will be effective with the next reload cycle.", account);
-		}break;
-	}
-
+	sGMLog.writefromsession(m_session, "banned account %s until %s", pAccount, timeperiod ? ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str() : "permanant");
 	return true;
 }
 
