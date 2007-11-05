@@ -1480,7 +1480,7 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			{
 				add->SetCount(add->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + item_count);
 				add->m_isDirty = true;
-				p_caster->GetSession()->SendItemPushResult(newItem, true,false,true,false,p_caster->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()),0xFFFFFFFF,item_count);
+				p_caster->GetSession()->SendItemPushResult(add, true,false,true,false,p_caster->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()),0xFFFFFFFF,item_count);
 			}
 
 			/*WorldPacket data(45);

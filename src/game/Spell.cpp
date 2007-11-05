@@ -2599,7 +2599,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 			if(rangetolerate)
 				maxr *= 1.33f;
 			// Supalosa: +6 yards to max range: See extra/supalosa_range_research.txt
-			sLog.outString( "Cancast: Spell %u." , m_spellInfo->Id );
+			//sLog.outString( "Cancast: Spell %u." , m_spellInfo->Id );
 			if(!IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),target, ( maxr*maxr + 36 )))
 				return SPELL_FAILED_OUT_OF_RANGE;
 
