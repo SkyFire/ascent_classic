@@ -597,6 +597,7 @@ bool QuestMgr::OnGameObjectActivate(Player *plr, GameObject *go)
 
 			for(j = 0; j < 4; ++j)
 			{
+				printf("QLE: id %d, mobtype %d, mobid %d, mobcount %d\n",qle->GetQuest()->id,qle->GetQuest()->required_mobtype[0],qle->GetQuest()->required_mob[0],qle->GetQuest()->required_mobcount[0]);
 				if(qle->GetQuest()->required_mob[j] == entry &&
 					qle->GetQuest()->required_mobtype[j] == QUEST_MOB_TYPE_GAMEOBJECT &&
 					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
@@ -627,26 +628,30 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 	uint32 i, j;
 	uint32 entry = victim->GetEntry();
 	QuestLogEntry *qle;
-	for(i = 0; i < 25; ++i)
-	{
-		if((qle = plr->GetQuestLogInSlot(i)))
-		{
-			// dont waste time on quests without mobs
-			if(qle->GetQuest()->count_required_mob == 0)
-				continue;
 
-			for(j = 0; j < 4; ++j)
+	if (plr->HasQuestMob(entry))
+	{
+		for(i = 0; i < 25; ++i)
+		{
+			if((qle = plr->GetQuestLogInSlot(i)))
 			{
-				if(qle->GetQuest()->required_mob[j] == entry &&
-					qle->GetQuest()->required_mobtype[j] == QUEST_MOB_TYPE_CREATURE &&
-					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
+				// dont waste time on quests without mobs
+				if(qle->GetQuest()->count_required_mob == 0)
+					continue;
+
+				for(j = 0; j < 4; ++j)
 				{
-					// add another kill.(auto-dirtys it)
-					qle->SetMobCount(j, qle->m_mobcount[j] + 1);
-					qle->SendUpdateAddKill(j);
-					CALL_QUESTSCRIPT_EVENT(qle, OnCreatureKill)(entry, plr);
-					qle->UpdatePlayerFields();
-					break;
+					if(qle->GetQuest()->required_mob[j] == entry &&
+						qle->GetQuest()->required_mobtype[j] == QUEST_MOB_TYPE_CREATURE &&
+						qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
+					{
+						// add another kill.(auto-dirtys it)
+						qle->SetMobCount(j, qle->m_mobcount[j] + 1);
+						qle->SendUpdateAddKill(j);
+						CALL_QUESTSCRIPT_EVENT(qle, OnCreatureKill)(entry, plr);
+						qle->UpdatePlayerFields();
+						break;
+					}
 				}
 			}
 		}
@@ -668,9 +673,9 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 				for(gitr = pGroup->GetSubGroup(k)->GetGroupMembersBegin(); gitr != pGroup->GetSubGroup(k)->GetGroupMembersEnd(); ++gitr)
 				{
 					gplr = gitr->player;
-					if(gplr && gplr != plr) // dont double kills
+					if(gplr && gplr != plr && plr->isInRange(gplr,300) && gplr->HasQuestMob(entry)) // dont double kills also dont give kills to party members at another side of the world
 					{
-						for(i = 0; i < 20; ++i)
+						for(i = 0; i < 25; ++i)
 						{
 							if((qle = gplr->GetQuestLogInSlot(i)))
 							{
@@ -869,6 +874,11 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 				if (plr->HasQuestSpell(qst->required_spell[x]))
 					plr->RemoveQuestSpell(qst->required_spell[x]);
 			}
+			else if (qst->required_mob[x]!=0)
+			{
+				if (plr->HasQuestMob(qst->required_mob[x]))
+					plr->RemoveQuestMob(qst->required_mob[x]);
+			} 
 		}
 		qle->ClearAffectedUnits();
 		qle->Finish();

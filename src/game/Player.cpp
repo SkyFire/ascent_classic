@@ -9024,14 +9024,26 @@ void Player::EjectFromInstance()
 	SafeTeleport(m_bind_mapid, 0, m_bind_pos_x, m_bind_pos_y, m_bind_pos_z, 0);
 }
 
-bool Player::HasQuestSpell(uint32 spellid)
+bool Player::HasQuestSpell(uint32 spellid) //Only for Cast Quests
 {
 	if (quest_spells.size()>0 && quest_spells.find(spellid) != quest_spells.end())
 		return true;
 	return false;
 }
-void Player::RemoveQuestSpell(uint32 spellid)
+void Player::RemoveQuestSpell(uint32 spellid) //Only for Cast Quests
 {
 	if (quest_spells.size()>0)
 		quest_spells.erase(spellid);
+}
+
+bool Player::HasQuestMob(uint32 entry) //Only for Kill Quests
+{
+	if (quest_mobs.size()>0 && quest_mobs.find(entry) != quest_mobs.end())
+		return true;
+	return false;
+}
+void Player::RemoveQuestMob(uint32 entry) //Only for Kill Quests
+{
+	if (quest_mobs.size()>0)
+		quest_mobs.erase(entry);
 }

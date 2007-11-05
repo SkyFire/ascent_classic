@@ -148,6 +148,11 @@ void QuestLogEntry::Init(Quest* quest, Player* plr, uint32 slot)
 			if (!plr->HasQuestSpell(quest->required_spell[i]))
 				plr->quest_spells.insert(quest->required_spell[i]);
 		}
+		else if (quest->required_mob[i]!=0)
+		{
+			if (!plr->HasQuestMob(quest->required_mob[i]))
+				plr->quest_spells.insert(quest->required_mob[i]);
+		}
 	}
 
 
