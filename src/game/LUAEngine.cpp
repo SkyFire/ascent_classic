@@ -327,7 +327,27 @@ void LuaEngine::OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit, ui
 		lua_pushnil(L);
 	lua_pushinteger(L,Misc);
 	
-	int r = lua_pcall(L,3,LUA_MULTRET,0);
+	int r = lua_pcall(L,4,LUA_MULTRET,0);
+	if(r)
+		report(L);
+
+	m_Lock.Release();
+}
+
+void LuaEngine::CallFunction(Unit * pUnit, const char * FuncName)
+{
+	m_Lock.Acquire();
+	lua_pushstring(L, FuncName);
+	lua_gettable(L, LUA_GLOBALSINDEX);
+	if(lua_isnil(L,-1))
+	{
+		printf("Tried to call invalid LUA function '%s' from Ascent (Unit)!\n", FuncName);
+		m_Lock.Release();
+		return;
+	}
+
+	Lunar<Unit>::push(L, pUnit);
+	int r = lua_pcall(L,1,LUA_MULTRET,0);
 	if(r)
 		report(L);
 
@@ -382,6 +402,7 @@ int luaUnit_GetZ(lua_State * L, Unit * ptr);
 int luaUnit_GetO(lua_State * L, Unit * ptr);
 int luaUnit_IsPlayer(lua_State * L, Unit * ptr);
 int luaUnit_IsCreature(lua_State * L, Unit * ptr);
+int luaUnit_RegisterEvent(lua_State * L, Unit * ptr);
 
 int luaGameObject_GetName(lua_State * L, GameObject * ptr);
 
@@ -405,6 +426,7 @@ Unit::RegType Unit::methods[] = {
 	{ "GetO", &luaUnit_GetO },
 	{ "IsPlayer", &luaUnit_IsPlayer },
 	{ "IsCreature", &luaUnit_IsCreature },
+	{ "RegisterEvent", &luaUnit_RegisterEvent },
 	{ NULL, NULL },
 };
 
@@ -720,7 +742,23 @@ int luaGameObject_GetName(lua_State * L, GameObject * ptr)
 	return 1;
 }
 
+int luaUnit_RegisterEvent(lua_State * L, Unit * ptr)
+{
+	if(!ptr||ptr->GetTypeId()!=TYPEID_UNIT)
+		return 0;
 
+	const char * func_to_call = luaL_checkstring(L,1);
+	int delay=luaL_checkint(L,2);
+	int repeats=luaL_checkint(L,3);
+
+	if(!func_to_call||!delay)
+		return 0;
+
+	Creature * pCreature = ((Creature*)ptr);
+	string strFunc = string(func_to_call);
+	sEventMgr.AddEvent(pCreature, &Creature::TriggerScriptEvent, strFunc, EVENT_CREATURE_UPDATE, (uint32)delay, (uint32)repeats, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	return 0;
+}
 
 /************************************************************************/
 /* Manager Stuff                                                        */
@@ -812,6 +850,15 @@ void LuaEngineMgr::RegisterGameObjectEvent(uint32 Id, uint32 Event, const char *
 
 		itr->second.Functions[Event]=strdup(FunctionName);
 	}
+}
+
+void LuaEngineMgr::FinishedWithLuaEngine(LuaEngine * engine)
+{
+	m_lock.Acquire();
+	LuaEngineMap::iterator itr = m_engines.find(engine);
+	ASSERT(itr!=m_engines.end());
+	itr->second--;
+	m_lock.Release();
 }
 
 void LuaEngineMgr::ReloadScripts()
