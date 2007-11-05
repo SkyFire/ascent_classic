@@ -252,11 +252,11 @@ void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy
             {
                 if(isAttackable(u_caster, (Unit*)(*itr),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)))
                 {
-					did_hit_result = DidHit( ((Unit*)*itr) );
-					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
-						tmpMap->push_back((*itr)->GetGUID());
-					else
+					did_hit_result = DidHit(((Unit*)*itr));
+					if(did_hit_result != SPELL_DID_HIT_SUCCESS)
 						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(), did_hit_result));
+					else
+						tmpMap->push_back((*itr)->GetGUID());
                 }
 
             }
@@ -435,10 +435,6 @@ uint64 Spell::GetSinglePossibleFriend(float prange)
 
 uint8 Spell::DidHit(Unit* target)
 {
-	//MEH return true for physical attacks they can not be resisted it's not !!!  spell
-
-	if(m_spellInfo->School == 0)
-		return true;
 	//note resistchance is vise versa, is full hit chance
 	Unit *u_victim = target;
 	Player *p_victim = (target->GetTypeId()==TYPEID_PLAYER) ? ((Player*)target) : NULL;
@@ -475,14 +471,28 @@ uint8 Spell::DidHit(Unit* target)
 		return SPELL_DID_HIT_EVADE;
 
 	/************************************************************************/
-	/* TODO: Check for spell missing                                        */
+	/* Check if the target is immune to this spell school                   */
 	/************************************************************************/
-	/*if(spell_is_missed)
-		return SPELL_DID_HIT_MISS;*/
+	if(u_victim->SchoolImmunityList[m_spellInfo->School])
+		return SPELL_DID_HIT_IMMUNE;
+
+	/************************************************************************/
+	/* Check if the spell is a melee attack and if it was missed/parried    */
+	/************************************************************************/
+	uint32 melee_test_result;
+	if(m_spellInfo->is_melee_spell)
+	{
+		melee_test_result = u_caster->GetSpellDidHitResult(u_victim, GetType(), m_spellInfo);
+		if(melee_test_result != SPELL_DID_HIT_SUCCESS)
+			return (uint8)melee_test_result;
+	}
 
 	/************************************************************************/
 	/* Check if the spell is resisted.                                      */
 	/************************************************************************/
+	if(m_spellInfo->School==0)
+		return SPELL_DID_HIT_SUCCESS;
+
 	bool pvp =(p_caster && p_victim);
 
 	if(pvp)

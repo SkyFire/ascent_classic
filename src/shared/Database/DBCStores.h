@@ -349,6 +349,7 @@ struct SpellEntry
 	uint32 talent_tree;
 	bool removable_by_immunity;
 	uint32 in_front_status;
+	bool is_melee_spell;
 };
 
 struct ItemExtendedCostEntry

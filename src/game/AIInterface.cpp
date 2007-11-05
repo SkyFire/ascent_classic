@@ -871,7 +871,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 							//we require to know if strike was succesfull. If there was no dmg then target cannot be dazed by it
 							uint32 health_before_strike=m_nextTarget->GetUInt32Value(UNIT_FIELD_HEALTH);
 #endif
-							m_Unit->Strike(m_nextTarget, (agent==AGENT_MELEE)?0:2,NULL,0,0,0, false);
+							m_Unit->Strike(m_nextTarget, (agent==AGENT_MELEE)?0:2,NULL,0,0,0, false,false);
 #ifdef ENABLE_CREATURE_DAZE
 							//now if the target is facing his back to us then we could just cast dazed on him :P
 							//as far as i know dazed is casted by most of the creatures but feel free to remove this code if you think otherwise

@@ -478,7 +478,6 @@ void Spell::SpellTargetInFrontOfCaster(uint32 i, uint32 j)
 {
 	TargetsList *tmpMap=&m_targetUnits[i];
 	std::set<Object*>::iterator itr;
-	Unit * pTarget;
 	uint8 did_hit_result;
 	for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 	{

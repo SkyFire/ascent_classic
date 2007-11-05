@@ -1893,6 +1893,19 @@ protected:
 	bool        m_cancelled;
     //void _DamageRangeUpdate();
 
+	inline bool HasTarget(const uint64& guid, TargetsList* tmpMap)
+	{
+		for(TargetsList::iterator itr = tmpMap->begin(); itr != tmpMap->end(); ++itr)
+			if((*itr)==guid)
+				return true;
+
+		for(SpellTargetsList::iterator itr = ModeratedTargets.begin(); itr != ModeratedTargets.end(); ++itr)
+			if((*itr).TargetGuid==guid)
+				return true;
+
+		return false;
+	}
+
 private:
     TargetsList m_targetUnits[3];
     void SafeAddTarget(TargetsList* tgt,uint64 guid);

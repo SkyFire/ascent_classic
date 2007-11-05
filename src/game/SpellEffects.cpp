@@ -396,7 +396,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 		else 
 		{
 			if(u_caster)
-				u_caster->Strike(unitTarget,dmg_type,m_spellInfo,0,0,dmg, pSpellId==0);
+				u_caster->Strike(unitTarget,dmg_type,m_spellInfo,0,0,dmg, pSpellId==0,true);
 		}
 	}   
 }
@@ -1333,7 +1333,7 @@ void Spell::SpellEffectWeapondamageNoschool(uint32 i) // Weapon damage + (no Sch
 	if(!unitTarget ||!u_caster)
 		return;
 
-	u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:SPELL_TYPE_MELEE,m_spellInfo,damage,0,0, false);
+	u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:SPELL_TYPE_MELEE,m_spellInfo,damage,0,0, false,true);
 }
 
 void Spell::SpellEffectAddExtraAttacks(uint32 i) // Add Extra Attacks
@@ -1843,7 +1843,7 @@ void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage
 	if(!unitTarget  || !u_caster)
 		return;
 
-	u_caster->Strike(unitTarget,GetType(),m_spellInfo,add_damage,damage,0, false);
+	u_caster->Strike(unitTarget,GetType(),m_spellInfo,add_damage,damage,0, false,true);
 }
 
 void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
@@ -2788,7 +2788,7 @@ void Spell::SpellEffectWeapondamage(uint32 i) // Weapon damage +
 		add_damage += damage;
 		return;
 	}
-	u_caster->Strike(unitTarget,GetType(),m_spellInfo,damage,0,0, false);
+	u_caster->Strike(unitTarget,GetType(),m_spellInfo,damage,0,0, false,true);
 }
 
 void Spell::SpellEffectPowerBurn(uint32 i) // power burn
@@ -4106,7 +4106,7 @@ void Spell::SpellEffectDummyMelee(uint32 i) // Normalized Weapon damage +
 		return;
 	}
    
-	u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:0,m_spellInfo,damage,0,0, false);
+	u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:0,m_spellInfo,damage,0,0, false,true);
 
 }
 void Spell::SpellEffectSpellSteal(uint32 i)

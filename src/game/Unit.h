@@ -720,7 +720,8 @@ public:
 	//// Combat
    // void DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId = 0);   // to stop from falling, etc
 	//void AttackerStateUpdate(Unit *pVictim,uint32 damage_type);//0-melee,1-offhand(dual wield),2-ranged
-	void Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add_damage,int32 pct_dmg_mod,uint32 exclusive_damage,bool disable_proc);
+	uint32 GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry * ability);
+	void Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add_damage,int32 pct_dmg_mod,uint32 exclusive_damage,bool disable_proc, bool skip_hit_check);
 //	void PeriodicAuraLog(Unit *pVictim, SpellEntry* spellID, uint32 damage, uint32 damageType);
 	//void SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
 	uint32 m_procCounter;
