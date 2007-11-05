@@ -116,8 +116,9 @@ void InstanceMgr::Shutdown()
 
 		if(m_singleMaps[i] != NULL)
 		{
-			m_singleMaps[i]->KillThread();
-			delete m_singleMaps[i];
+			MapMgr * ptr = m_singleMaps[i];
+			ptr->KillThread();
+			delete ptr;
 			m_singleMaps[i]=NULL;
 		}
 	}

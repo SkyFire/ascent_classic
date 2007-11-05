@@ -114,6 +114,7 @@ struct SERVER_DECL Thread
 	ThreadBase * ExecutionTarget;
 	ThreadController ControlInterface;
 	Mutex SetupMutex;
+	bool DeleteAfterExit;
 };
 
 typedef std::set<Thread*> ThreadSet;

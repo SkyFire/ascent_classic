@@ -352,6 +352,7 @@ void LogonServer::Run(int argc, char ** argv)
 	delete IPBanner::getSingletonPtr();
 	delete SocketMgr::getSingletonPtr();
 	delete SocketGarbageCollector::getSingletonPtr();
+	delete pfc;
 	printf("Shutdown complete.\n");
 }
 

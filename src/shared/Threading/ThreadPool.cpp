@@ -60,6 +60,9 @@ bool CThreadPool::ThreadExit(Thread * t)
 		// kill us.
 		--_threadsToExit;
 		++_threadsExitedSinceLastCheck;
+		if(t->DeleteAfterExit)
+			m_freeThreads.erase(t);
+
 		_mutex.Release();
 		delete t;
 		return false;
@@ -200,18 +203,13 @@ void CThreadPool::KillFreeThreads(uint32 count)
 	Log.Debug("ThreadPool", "Killing %u excess threads.", count);
 	_mutex.Acquire();
 	Thread * t;
-	for(uint32 i = 0; i < count; ++i)
+	ThreadSet::iterator itr;
+	uint32 i;
+	for(i = 0, itr = m_freeThreads.begin(); i < count && itr != m_freeThreads.end(); ++i, ++itr)
 	{
-		if(m_freeThreads.size() == 0)
-		{
-			_mutex.Release();
-			return;
-		}
-
-		t = *m_freeThreads.begin();
-		m_freeThreads.erase(m_freeThreads.begin());
-
+		t = *itr;
 		t->ExecutionTarget = NULL; 
+		t->DeleteAfterExit = true;
 		++_threadsToExit;
 		t->ControlInterface.Resume();
 	}
@@ -297,6 +295,7 @@ Thread * CThreadPool::StartThread(ThreadBase * ExecutionTarget)
 	HANDLE h;
 	Thread * t = new Thread;
 	
+	t->DeleteAfterExit = false;
 	t->ExecutionTarget = ExecutionTarget;
 	//h = (HANDLE)_beginthreadex(NULL, 0, &thread_proc, (void*)t, 0, NULL);
 	t->SetupMutex.Acquire();
@@ -344,6 +343,7 @@ Thread * CThreadPool::StartThread(ThreadBase * ExecutionTarget)
 	pthread_t target;
 	Thread * t = new Thread;
 	t->ExecutionTarget = ExecutionTarget;
+	t->DeleteAfterExit = false;
 
 	// lock the main mutex, to make sure id generation doesn't get messed up
 	_mutex.Acquire();
