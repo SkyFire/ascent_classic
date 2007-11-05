@@ -41,6 +41,8 @@ Rank 4/5 +4% Chance and 8 mace skill
 Rank 5/5 +6% Chance and 10 mace skill
 http://www.wowwiki.com/Mace_Specialization
 
+Assassination
+
 1.Murder
 Rank Effect
 1 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 1%.
