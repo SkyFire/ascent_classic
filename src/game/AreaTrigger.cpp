@@ -38,6 +38,7 @@ enum AreaTriggerFailures
 	AREA_TRIGGER_FAILURE_LEVEL			= 6,
 	AREA_TRIGGER_FAILURE_NO_GROUP		= 7,
 	AREA_TRIGGER_FAILURE_NO_KEY         = 8,
+	AREA_TRIGGER_FAILURE_LEVEL_HEROIC	= 9,
 };
 
 const char * AreaTriggerFailureMessages[] = {
@@ -50,6 +51,7 @@ const char * AreaTriggerFailureMessages[] = {
 	"You must be at least level %u to pass through here.",
 	"You must be in a party to pass through here.",
 	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
+	"You must be level 70 to enter heroic mode.",
 };
 
 inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSession, Player * pPlayer, MapInfo * pMapInfo)
@@ -87,6 +89,9 @@ inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession 
 		!pPlayer->GetItemInterface()->GetItemCount(pMapInfo->heroic_key_1, false) && 
 		!pPlayer->GetItemInterface()->GetItemCount(pMapInfo->heroic_key_2, false))
 		return AREA_TRIGGER_FAILURE_NO_KEY;
+
+	if(pPlayer->getLevel()<70 && pPlayer->iInstanceType==MODE_HEROIC && pMapInfo->type != INSTANCE_NULL)
+		return AREA_TRIGGER_FAILURE_LEVEL_HEROIC;
 
 	return AREA_TRIGGER_FAILURE_OK;
 }

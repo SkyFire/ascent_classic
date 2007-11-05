@@ -1277,7 +1277,8 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 		else Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)+10557.5);
 		if(Reduction > 0.75f) Reduction = 0.75f;
 		else if(Reduction < 0) Reduction = 0;
-		if(Reduction) dmg[0].full_damage = (uint32)(dmg[0].full_damage*(1-Reduction));	  // no multiply by 0
+		//if(Reduction) dmg[0].full_damage = (uint32)(dmg[0].full_damage*(1-Reduction));	  // no multiply by 0
+		if(Reduction) dmg[0].resisted_damage = (uint32)(dmg[0].full_damage*Reduction);      // no multiply by 0
 	}
 	else
 	{
