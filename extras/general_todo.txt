@@ -104,6 +104,7 @@ Zack - test my shit :
 - shaman - Elemental mastery 16166
 - shaman - Lightning Overload  30681
 - shaman - Improved Lightning shield 16291
+- shaman - Tidal focus 16217. missing a complete list of shaman heal spells
 
 ==========================================================================
 Capt - test my shit :

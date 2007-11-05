@@ -5,7 +5,6 @@ Elemental Fury - no effect - supposed to give a +200% crit damage on nature spel
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent
 
 Restoration Tree
-Tidal focus - no effect - supposed to give a max -5% mana reduction on healing spells
 Totemic focus - no effect - supposed to give a max of -25% mana reduction on totems
 Ancestral healing - no effect - supposed to give a max of +25% armor on target after critical healing spell.
 Tidal Mastery - no effect - supposed to give a max of +5% crit on healing and lighting spells.

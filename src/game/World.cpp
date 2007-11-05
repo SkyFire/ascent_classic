@@ -1562,6 +1562,35 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
 
+	//shaman - Tidal focus
+	uint32 TF_grouprelation;
+	sp = dbcSpell.LookupEntry(25357);//shaman - Healing Wave.
+	if(sp)
+		TF_grouprelation = sp->SpellGroupType;
+	else TF_grouprelation=0;
+	sp = dbcSpell.LookupEntry(25420);//shaman - Lesser Healing Wave.
+	if(sp)
+		TF_grouprelation = sp->SpellGroupType;
+	sp = dbcSpell.LookupEntry(1064);//shaman - Chain Heal.
+	if(sp)
+		TF_grouprelation = sp->SpellGroupType;
+	//shaman - Tidal focus r1
+	sp = dbcSpell.LookupEntry(16179); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+	sp = dbcSpell.LookupEntry(16214); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+	sp = dbcSpell.LookupEntry(16215); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+	sp = dbcSpell.LookupEntry(16216); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+	sp = dbcSpell.LookupEntry(16217); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+
 	//shaman - Call of Thunder 
 	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt.
 	uint32 Cthunder_grouprelation;
