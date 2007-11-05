@@ -1562,7 +1562,7 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
 
-	//shaman - Tidal focus
+	//shaman - Tidal focus . Add more heal spells here if i forgot any :P
 	uint32 TF_grouprelation;
 	sp = dbcSpell.LookupEntry(25357);//shaman - Healing Wave.
 	if(sp)
@@ -1590,6 +1590,29 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(16217); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+
+	//shaman - Totemic focus 
+	uint32 All_totems_grouprelation=536870912; //these are only selected flag since some totems contain more then 1 flag
+	All_totems_grouprelation |= 8;
+	All_totems_grouprelation |= 16;
+	All_totems_grouprelation |= 524288;
+	All_totems_grouprelation |= 4096;
+	//shaman - Totemic focus r1
+	sp = dbcSpell.LookupEntry(16173); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
+	sp = dbcSpell.LookupEntry(16222); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
+	sp = dbcSpell.LookupEntry(16223); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
+	sp = dbcSpell.LookupEntry(16224); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
+	sp = dbcSpell.LookupEntry(16225); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=All_totems_grouprelation;
 
 	//shaman - Call of Thunder 
 	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt.

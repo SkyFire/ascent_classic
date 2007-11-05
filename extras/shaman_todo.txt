@@ -5,7 +5,6 @@ Elemental Fury - no effect - supposed to give a +200% crit damage on nature spel
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent
 
 Restoration Tree
-Totemic focus - no effect - supposed to give a max of -25% mana reduction on totems
 Ancestral healing - no effect - supposed to give a max of +25% armor on target after critical healing spell.
 Tidal Mastery - no effect - supposed to give a max of +5% crit on healing and lighting spells.
 Focused Mind - no effect - supposed to give a -15% reduction time on stuns and silent durations
@@ -134,7 +133,6 @@ Elemental Devastation don't work
 Elemental Fury don't work
 Unrelenting Storm don't work
 Elemental Mastery don't have 100% luck to make a crit and don't reduce 100% of cost the mana spell
-Lightning Overload don't work
 Elemental Shields don't work
 Tidal Mastery don't work
-Improved Lightning Shield don't work
+
