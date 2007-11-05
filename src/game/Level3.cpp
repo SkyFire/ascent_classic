@@ -2412,56 +2412,35 @@ bool ChatHandler::HandleGlobalPlaySoundCommand(const char* args, WorldSession * 
 	return true;
 }
 
-bool ChatHandler::HandleBanAccountCommand(const char * args, WorldSession * m_session)
-{
-	BlueSystemMessage(m_session, "Account %s has been permanently banned.", args);
-	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET banned = 1 WHERE login = '%s'", WorldDatabase.EscapeString(args).c_str());
-
-	WorldSession * session = sWorld.FindSessionByName(args);
-	if(session)
-		session->Disconnect();
-
-	sLogonCommHandler.LogonDatabaseReloadAccounts();
-	BlueSystemMessage(m_session, "Accounts table reloaded.");
-	sGMLog.writefromsession(m_session, "Banned account %s", args);
-	return true;
-}
-
 bool ChatHandler::HandleIPBanCommand(const char * args, WorldSession * m_session)
 {
-	char ip[16] = {0};		// IPv4 address
-	uint32 dLength = 0;		// duration of ban, 0 = permanent
-	char dType = {0};		// duration type, defaults to minutes ( see convTimePeriod() )
+	char * pIp = (char*)args;
+	char * pDuration = strchr(pIp, ' ');
+	if(pDuration == NULL)
+		return false;
+	*pDuration = 0;
+	++pDuration;
 
-	// we require at least one argument, the network address to ban
-	if ( sscanf(args, "%15s %u%c", ip, (unsigned int*)&dLength, &dType) < 1 )
+	int32 timeperiod = GetTimePeriodFromString(pDuration);
+	if(timeperiod < 1)
 		return false;
 
 	uint32 o1, o2, o3, o4;
-	if ( sscanf(ip, "%3u.%3u.%3u.%3u", (unsigned int*)&o1, (unsigned int*)&o2, (unsigned int*)&o3, (unsigned int*)&o4) != 4
+	if ( sscanf(pIp, "%3u.%3u.%3u.%3u", (unsigned int*)&o1, (unsigned int*)&o2, (unsigned int*)&o3, (unsigned int*)&o4) != 4
 			|| o1 > 255 || o2 > 255 || o3 > 255 || o4 > 255)
 	{
-		RedSystemMessage(m_session, "Invalid IPv4 address [%s]", ip);
+		RedSystemMessage(m_session, "Invalid IPv4 address [%s]", pIp);
 		return true;	// error in syntax, but we wont remind client of command usage
 	}
 
 	time_t expire_time;
-	if ( dLength == 0)		// permanent ban
+	if ( timeperiod == 0)		// permanent ban
 		expire_time = 0;
 	else
-	{
-		time_t dPeriod = convTimePeriod(dLength, dType);
-		if ( dPeriod == 0)
-		{
-			RedSystemMessage(m_session, "Invalid ban duration");
-			return false;
-		}
-		time( &expire_time );
-		expire_time += dPeriod;
-	}
+		expire_time = UNIXTIME + (time_t)timeperiod;
 	
-	SystemMessage(m_session, "Adding [%s] to IP ban table, expires %s", ip, (expire_time == 0)? "Never" : ctime( &expire_time ));
-	sLogonCommHandler.LogonDatabaseSQLExecute("REPLACE INTO ipbans VALUES ('%s', %u);", WorldDatabase.EscapeString(ip).c_str(), (uint32)expire_time);
+	SystemMessage(m_session, "Adding [%s] to IP ban table, expires %s", pIp, (expire_time == 0)? "Never" : ctime( &expire_time ));
+	sLogonCommHandler.LogonDatabaseSQLExecute("REPLACE INTO ipbans VALUES ('%s', %u);", WorldDatabase.EscapeString(pIp).c_str(), (uint32)expire_time);
 	sLogonCommHandler.LogonDatabaseReloadAccounts();
 	return true;
 }

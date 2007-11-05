@@ -456,7 +456,6 @@ protected:
 	bool HandleGlobalPlaySoundCommand(const char* args, WorldSession * m_session);
 	bool HandleRecallPortPlayerCommand(const char* args, WorldSession * m_session);
 
-	bool HandleBanAccountCommand(const char * args, WorldSession * m_session);
 	bool HandleIPBanCommand(const char * args, WorldSession * m_session);
 	bool HandleIPUnBanCommand(const char * args, WorldSession * m_session);
 
