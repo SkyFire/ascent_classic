@@ -582,6 +582,7 @@ void CommandTableStorage::Init()
 		{ "rehash", 'z', &ChatHandler::HandleRehashCommand, "Reloads config file.", NULL, 0, 0, 0 },
 		{ "createarenateam", 'g', &ChatHandler::HandleCreateArenaTeamCommands, "Creates arena team", NULL, 0, 0, 0 },
 		{ "callgmfunction", 'g', &ChatHandler::HandleGMCallCommand, "Calls script function", NULL, 0, 0, 0 },
+		{ "whisperblock", 'g', &ChatHandler::HandleWhisperBlockCommand, "Blocks like .gmon except without the <GM> tag", NULL, 0, 0, 0 },
 		{ NULL,		  0, NULL,										 "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(commandTable, _commandTable);
@@ -1221,6 +1222,4 @@ void WordFilter::LogMessage(string& message, string& blockedKeyword, Player * pl
 	fflush(m_file);
 	fclose(m_file);
 }
-
-
 

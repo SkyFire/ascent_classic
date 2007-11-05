@@ -804,14 +804,8 @@ public:
     std::set<uint32>    m_QuestGOInProgress;
     std::set<uint32>    m_removequests;
     std::set<uint32>    m_finishedQuests;
-	std::set<uint64>    m_questaffected_units;
     uint32              m_questSharer;
     uint32              timed_quest_slot;
-
-	void AddQuestAffectedUnit(Unit* target);
-	void ClearQuestAffectedUnits();
-	bool IsUnitQuestAffected(Unit* target);
-
 
     /************************************************************************/
     /* Stun Immobilize                                                      */
@@ -951,9 +945,18 @@ public:
 	inline uint32       GetSubGroup() { return m_SubGroup; }
 	inline void         SetSubGroup(uint32 group) { m_SubGroup = group; }
     bool                IsGroupMember(Player *plyr);
-	inline bool         IsBanned() { return ((m_banned > 0) ? true : false); }
+	inline bool         IsBanned()
+	{
+		if(m_banned)
+		{
+			if(m_banned < 100 || UNIXTIME < m_banned)
+				return true;
+		}
+		return false;
+	}
     inline void         SetBanned() { m_banned = 4;}
 	inline void         SetBanned(string Reason) { m_banned = 4; m_banreason = Reason;}
+	inline void         SetBanned(uint32 timestamp, string& Reason) { m_banned = timestamp; m_banreason = Reason; }
 	inline void         UnSetBanned() { m_banned = 0; }
 	inline string       GetBanReason() {return m_banreason;}
 

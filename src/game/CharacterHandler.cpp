@@ -73,6 +73,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 		uint8 Class;
 		uint32 bytes2;
 		uint32 flags;
+		uint32 banned;
 		Field *fields;
 		do
 		{
@@ -98,18 +99,17 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			data << fields[9].GetFloat();		// Z
 			data << fields[7].GetUInt32();		// GuildID
 
-			if(fields[14].GetBool())
-			{
-				//data << (uint32)7;	// Banned (cannot login)
+			banned = fields[14].GetUInt32();
+			if(banned && (banned<10 || banned > UNIXTIME))
 				data << uint32(0x01A04040);
-			}
-			else if(fields[17].GetBool())
-				data << uint32(0x00A04342);  // wtf blizz? :P (rename pending)
-			else if(fields[16].GetUInt32() != 0)
-				data << (uint32)8704; // Dead (displaying as Ghost)
 			else
-				data << uint32(1);		// alive
-
+			{
+				if(fields[16].GetUInt32() != 0)
+					data << (uint32)8704; // Dead (displaying as Ghost)
+				else
+					data << uint32(1);		// alive
+			}
+			
 			data << fields[15].GetUInt8();		// Rest State
 
 			if(Class==9 || Class==3)

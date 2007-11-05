@@ -248,6 +248,7 @@ bool World::SetInitialWorldSettings()
 	//l->LoadScripts();
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");
 	CharacterDatabase.WaitExecute("UPDATE characters SET level = 70 WHERE level > 70");
+	CharacterDatabase.WaitExecute("UPDATE characters SET banned=0,banReason='' WHERE banned > 100 AND banned < %u", UNIXTIME);
    
 	m_lastTick = UNIXTIME;
 

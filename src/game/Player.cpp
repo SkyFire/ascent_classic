@@ -2308,7 +2308,7 @@ void Player::RemovePendingPlayer()
 bool Player::LoadFromDB(uint32 guid)
 {
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP0<Player>(this, &Player::LoadFromDBProc) );
-	q->AddQuery("SELECT * FROM characters WHERE guid=%u AND banned=0 AND forced_rename_pending = 0",guid);
+	q->AddQuery("SELECT * FROM characters WHERE guid=%u AND forced_rename_pending = 0",guid);
 	q->AddQuery("SELECT * FROM tutorials WHERE playerId=%u",guid);
 	q->AddQuery("SELECT * FROM playercooldownitems WHERE OwnerGuid=%u", guid);
 	q->AddQuery("SELECT * FROM questlog WHERE player_guid=%u",guid);
@@ -2349,6 +2349,13 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	{
 		sCheatLog.writefromsession(m_session, "player tried to load character not belonging to them (guid %u, on account %u)",
 			fields[0].GetUInt32(), fields[1].GetUInt32());
+		RemovePendingPlayer();
+		return;
+	}
+
+	uint32 banned = fields[32].GetUInt32();
+	if(banned && (banned < 100 || banned > UNIXTIME))
+	{
 		RemovePendingPlayer();
 		return;
 	}
@@ -8689,28 +8696,6 @@ void Player::SetSpellTargetType(uint32 Type, Unit* target)
 void Player::RecalculateHonor()
 {
 	HonorHandler::RecalculateHonorFields(this);
-}
-
-void Player::ClearQuestAffectedUnits()
-{
-	if (m_questaffected_units.size()>0)
-		m_questaffected_units.clear();
-}
-void Player::AddQuestAffectedUnit(Unit* target)
-{
-	if (!target || IsUnitQuestAffected(target))
-		return;
-	uint32 guid = target->GetGUID();
-	m_questaffected_units.insert(guid);
-}
-bool Player::IsUnitQuestAffected(Unit* target)
-{
-	if (!target)
-		return true;
-	uint64 guid = target->GetGUID();
-	if (m_finishedQuests.find(guid) != m_finishedQuests.end())
-		return true;
-	return false;
 }
 
 //wooot, crapy code rulez.....NOT

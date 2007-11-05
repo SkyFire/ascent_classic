@@ -1030,9 +1030,6 @@ void Spell::cast(bool check)
 
 	if(cancastresult == -1)
 	{
-		if (p_caster && p_caster->GetMapMgr())
-			sQuestMgr.OnPlayerCast(p_caster,p_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget),m_spellInfo->Id);
-
 		if(m_spellInfo->Attributes & ATTRIBUTE_ON_NEXT_ATTACK)
 		{
 			if(!m_triggeredSpell)
@@ -1308,7 +1305,6 @@ void Spell::cast(bool check)
 		SendCastResult(cancastresult);
 		finish();
 	}
-
 }
 
 void Spell::AddTime(uint32 type)
@@ -2603,7 +2599,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 			if(rangetolerate)
 				maxr *= 1.33f;
 			// Supalosa: +6 yards to max range: See extra/supalosa_range_research.txt
-			//sLog.outString( "Cancast: Spell %u." , m_spellInfo->Id );
+			sLog.outString( "Cancast: Spell %u." , m_spellInfo->Id );
 			if(!IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),target, ( maxr*maxr + 36 )))
 				return SPELL_FAILED_OUT_OF_RANGE;
 

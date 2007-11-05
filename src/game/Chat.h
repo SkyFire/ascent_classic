@@ -105,6 +105,8 @@ enum Languages
 #define CHECKSESSION if(m_session == NULL) return NULL; \
 	if(m_session->GetPlayer() == NULL) return NULL;
 
+
+
 class WordFilter : public Singleton<WordFilter>
 {
 	vector<string> blockedPhrases;
@@ -508,6 +510,7 @@ protected:
 	bool HandleGMCallCommand(const char * args, WorldSession * m_session);
 	bool HandleNpcSelectCommand(const char * args, WorldSession * m_session);
 	bool HandleWaypointAddFlyCommand(const char * args, WorldSession * m_session);
+	bool HandleWhisperBlockCommand(const char * args, WorldSession * m_session);
 
 	/* For skill related GM commands */
 	SkillNameMgr *SkillNameManager;

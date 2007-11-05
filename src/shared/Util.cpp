@@ -102,3 +102,209 @@ time_t convTimePeriod ( uint32 dLength, char dType )
 	}
 	return mktime(ti);
 }
+int32 GetTimePeriodFromString(const char * str)
+{
+	uint32 time_to_ban = 0;
+	char * p = (char*)str;
+	uint32 multiplier;
+	string number_temp;
+	uint32 multipliee;
+	number_temp.reserve(10);
+
+	while(*p != 0)
+	{
+		// always starts with a number.
+		if(!isdigit(*p))
+			break;
+
+		number_temp.clear();
+		while(isdigit(*p) && *p != 0)
+		{
+			number_temp += *p;
+			++p;
+		}
+
+		// try and find a letter
+		if(*p == 0)
+			break;
+
+		// check the type
+		switch(tolower(*p))
+		{
+		case 'y':
+			multiplier = TIME_YEAR;		// eek!
+			break;
+
+		case 'm':
+			multiplier = TIME_MONTH;
+			break;
+
+		case 'd':
+			multiplier = TIME_DAY;
+			break;
+
+		case 'h':
+			multiplier = TIME_HOUR;
+			break;
+
+		default:
+			return -1;
+			break;
+		}
+
+		++p;
+		multipliee = atoi(number_temp.c_str());
+		time_to_ban += (multiplier * multipliee);
+	}
+
+	return time_to_ban;
+}
+
+const char * szDayNames[7] = {
+	"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+};
+
+const char * szMonthNames[12] = {
+	"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+};
+
+void MakeIntString(char * buf, int num)
+{
+	if(num<10)
+	{
+		buf[0] = '0';
+		itoa(num, &buf[1], 10);
+	}
+	else
+	{
+		itoa(num,buf,10);
+	}
+}
+
+void MakeIntStringNoZero(char * buf, int num)
+{
+	itoa(num,buf,10);
+}
+
+string ConvertTimeStampToString(uint32 timestamp)
+{
+	int seconds = (int)timestamp;
+	int mins=0;
+	int hours=0;
+	int days=0;
+	int months=0;
+	int years=0;
+	if(seconds >= 60)
+	{
+		mins = seconds / 60;
+		if(mins)
+		{
+			seconds -= mins*60;
+			if(mins >= 60)
+			{
+				hours = mins / 60;
+				if(hours)
+				{
+					mins -= hours*60;
+					if(hours >= 24)
+					{
+						days = hours/24;
+						if(days)
+						{
+							hours -= days*24;
+							if(days >= 30)
+							{
+								months = days / 30;
+								if(months)
+								{
+									days -= months*30;
+									if(months >= 12)
+									{
+										years = months / 12;
+										if(years)
+										{
+											months -= years*12;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	char szTempBuf[100];
+	string szResult;
+
+	if(years) {
+		MakeIntStringNoZero(szTempBuf, years);
+		szResult += szTempBuf;
+		szResult += " years, ";
+	}
+
+	if(months) {
+		MakeIntStringNoZero(szTempBuf, months);
+		szResult += szTempBuf;
+		szResult += " months, ";
+	}
+
+	if(days) {
+		MakeIntStringNoZero(szTempBuf, days);
+		szResult += szTempBuf;
+		szResult += " days, ";
+	}
+
+	if(hours) {
+		MakeIntStringNoZero(szTempBuf, hours);
+		szResult += szTempBuf;
+		szResult += " hours, ";
+	}
+
+	if(mins) {
+		MakeIntStringNoZero(szTempBuf, mins);
+		szResult += szTempBuf;
+		szResult += " minutes, ";
+	}
+
+	if(seconds) {
+		MakeIntStringNoZero(szTempBuf, seconds);
+		szResult += szTempBuf;
+		szResult += " seconds";
+	}
+
+	return szResult;
+}
+
+string ConvertTimeStampToDataTime(uint32 timestamp)
+{
+	char szTempBuf[100];
+	time_t t = (time_t)timestamp;
+	tm * pTM = gmtime(&t);
+
+	string szResult;
+	szResult += szDayNames[pTM->tm_wday];
+	szResult += ", ";
+
+	MakeIntString(szTempBuf, pTM->tm_mday);
+	szResult += szTempBuf;
+	szResult += " ";
+
+	szResult += szMonthNames[pTM->tm_mon];
+	szResult += " ";
+
+	MakeIntString(szTempBuf, pTM->tm_year+1900);
+	szResult += szTempBuf;
+	szResult += ", ";
+	MakeIntString(szTempBuf, pTM->tm_hour);
+	szResult += szTempBuf;
+	szResult += ":";
+	MakeIntString(szTempBuf, pTM->tm_min);
+	szResult += szTempBuf;
+	szResult += ":";
+	MakeIntString(szTempBuf, pTM->tm_sec);
+	szResult += szTempBuf;
+
+	return szResult;
+}

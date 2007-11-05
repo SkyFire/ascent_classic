@@ -34,6 +34,8 @@ enum TimeVariables
 	TIME_MINUTE = TIME_SECOND * 60,
 	TIME_HOUR   = TIME_MINUTE * 60,
 	TIME_DAY	= TIME_HOUR * 24,
+	TIME_MONTH	= TIME_DAY * 30,
+	TIME_YEAR	= TIME_MONTH * 12,
 };
 
 enum MsTimeVariables
@@ -604,5 +606,9 @@ inline void reverse_array(uint8 * pointer, size_t count)
 }
 
 typedef std::vector<WayPoint*> WayPointMap;
+
+int32 GetTimePeriodFromString(const char * str);
+std::string ConvertTimeStampToString(uint32 timestamp);
+std::string ConvertTimeStampToDataTime(uint32 timestamp);
 
 #endif

@@ -578,47 +578,62 @@ bool ChatHandler::HandleLevelUpCommand(const char* args, WorldSession *m_session
 	return true;
 }
 
-//DK
 bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession *m_session)
 {
 	if(!*args)
 		return false;
 
-	char Character[255];
-	char Reason[1024];
-	bool HasReason = true;
+	// this is rather complicated due to ban reasons being able to have spaces. so we'll have to some c string magic
+	// rather than just sscanf'ing it.
+	char * pCharacter = (char*)args;
+	char * pBanDuration = strchr(pCharacter, ' ');
+	if(pBanDuration == NULL)
+		return false;
 
-	int Args = sscanf(args, "%s %s", Character, Reason);
-	if(Args == 1)
-		HasReason = false;
-	else if(Args == 0)
-	{
-		RedSystemMessage(m_session, "A character name and reason is required.");
-		return true;
-	}
+	char * pReason = strchr(pBanDuration+1, ' ');
+	if(pReason == NULL)
+		return false;
 
-	// Check if player is in world.
-	Player * pPlayer = ObjectMgr::getSingleton( ).GetPlayer(Character, false);
-	if(pPlayer != 0)
+	// zero them out to create sepearate strings.
+	*pBanDuration = 0;
+	++pBanDuration;
+	*pReason = 0;
+	++pReason;
+
+	int32 BanTime = GetTimePeriodFromString(pBanDuration);
+	if(BanTime < 1)
+		return false;
+
+	Player * pPlayer = objmgr.GetPlayer(pCharacter, false);
+	if(pPlayer == NULL)
 	{
-		GreenSystemMessage(m_session, "Banned player %s ingame.",pPlayer->GetName());
-		if(HasReason)
-			pPlayer->SetBanned(Reason);
-		else
-			pPlayer->SetBanned();
+		PlayerInfo * pInfo = objmgr.GetPlayerInfoByName(string(pCharacter));
+		if(pInfo == NULL)
+		{
+			SystemMessage(m_session, "Player not found.");
+			return true;
+		}
+
+		SystemMessage(m_session, "Banning player '%s' in database for '%s'.", pCharacter, pReason);
+		string escaped_reason = CharacterDatabase.EscapeString(string(pReason));
+		
+		CharacterDatabase.Execute("UPDATE characters SET banned = %u, banReason = '%s' WHERE guid = %u",
+			BanTime ? BanTime+(uint32)UNIXTIME : 1, escaped_reason.c_str(), pInfo->guid);
 	}
 	else
 	{
-		GreenSystemMessage(m_session, "Player %s not found ingame.", Character);
+		SystemMessage(m_session, "Banning player '%s' ingame for '%s'.", pCharacter, pReason);
+		pPlayer->SetBanned(BanTime ? BanTime+(uint32)UNIXTIME : 1, string(pReason));
 	}
 
-	// Ban in database
-	CharacterDatabase.Execute("UPDATE characters SET banned = 4 WHERE name = '%s'", WorldDatabase.EscapeString(string(Character)).c_str());
-	if(HasReason)
-		CharacterDatabase.Execute("UPDATE characters SET bannedReason = \"%s\" WHERE name = '%s'", WorldDatabase.EscapeString(string(Character)).c_str(), WorldDatabase.EscapeString(string(Reason)).c_str());
+	SystemMessage(m_session, "This ban is due to expire %s%s.", BanTime ? "on " : "", BanTime ? ConvertTimeStampToDataTime(BanTime+(uint32)UNIXTIME).c_str() : "Never");
+	if(pPlayer)
+	{
+		SystemMessage(m_session, "Kicking %s.", pPlayer->GetName());
+		pPlayer->Kick();
+	}
 
-	SystemMessage(m_session, "Banned character %s in database.", Character);
-	sGMLog.writefromsession(m_session, "used ban character on %s reason %s", Character, HasReason ? Reason : "NONE");
+	sGMLog.writefromsession(m_session, "used ban character on %s reason %s for %s", pCharacter, pReason, BanTime ? ConvertTimeStampToString(BanTime).c_str() : "ever");
 	return true;
 }
 
@@ -3238,5 +3253,14 @@ bool ChatHandler::HandleGMCallCommand(const char * args, WorldSession * m_sessio
 		SystemMessage(m_session, "Call succeeded.");
 	else
 		SystemMessage(m_session, "Call failed.");*/
+	return true;
+}
+
+bool ChatHandler::HandleWhisperBlockCommand(const char * args, WorldSession * m_session)
+{
+	if(m_session->GetPlayer()->bGMTagOn)
+		return false;
+
+	m_session->GetPlayer()->bGMTagOn = true;
 	return true;
 }
