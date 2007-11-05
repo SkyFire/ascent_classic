@@ -476,7 +476,10 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
             case EMOTE_STATE_SLEEP:
             case EMOTE_STATE_SIT:
             case EMOTE_STATE_KNEEL:
-                break;
+			case EMOTE_STATE_DANCE:
+				{
+					_player->SetUInt32Value(UNIT_NPC_EMOTESTATE, em->textid);
+				}break;
             default:
 				data << (uint32)em->textid;
 				data << (uint64)GetPlayer()->GetGUID();
