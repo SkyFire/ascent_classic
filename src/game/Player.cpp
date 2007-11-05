@@ -8691,6 +8691,28 @@ void Player::RecalculateHonor()
 	HonorHandler::RecalculateHonorFields(this);
 }
 
+void Player::ClearQuestAffectedUnits()
+{
+	if (m_questaffected_units.size()>0)
+		m_questaffected_units.clear();
+}
+void Player::AddQuestAffectedUnit(Unit* target)
+{
+	if (!target || IsUnitQuestAffected(target))
+		return;
+	uint32 guid = target->GetGUID();
+	m_questaffected_units.insert(guid);
+}
+bool Player::IsUnitQuestAffected(Unit* target)
+{
+	if (!target)
+		return true;
+	uint64 guid = target->GetGUID();
+	if (m_finishedQuests.find(guid) != m_finishedQuests.end())
+		return true;
+	return false;
+}
+
 //wooot, crapy code rulez.....NOT
 void Player::EventTalentHearthOfWildChange(bool apply)
 {

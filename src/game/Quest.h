@@ -136,6 +136,9 @@ struct Quest
 	uint32 required_mobcount[4];
 
 	uint32 required_spell[4];
+/*	uint32 req_point_x[4];
+	uint32 req_point_y[4];
+	uint32 req_point_z[4]; */
 
 	uint32 reward_choiceitem[6];
 	uint32 reward_choiceitemcount[6];

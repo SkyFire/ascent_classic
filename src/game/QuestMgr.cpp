@@ -711,39 +711,58 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 
 void QuestMgr::OnPlayerCast(Player* plr, Unit* victim, uint32 SpellId)
 {
-	if(!plr || !victim)
+	if(!plr)
+		return;
+	if (!victim)
 		return;
 
-	uint32 i, j;
-	uint32 entry = victim->GetEntry();
 	QuestLogEntry *qle;
-	for(i = 0; i < 25; ++i)
+	for(uint32 i = 0; i < 25; ++i)
 	{
 		if((qle = plr->GetQuestLogInSlot(i)))
 		{
+			Quest* quest = qle->GetQuest();
 			// dont waste time on quests without mobs
-			if(qle->GetQuest()->count_required_mob == 0)
+			if(!quest || quest->count_required_mob == 0)
 				continue;
 
-			for(j = 0; j < 4; ++j)
+			for(uint32 j = 0; j < 4; ++j)
 			{
-				if(qle->GetQuest()->required_mob[j] == entry &&
-					qle->GetQuest()->required_spell[j] == SpellId &&
-					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
+				if (victim)
 				{
-					sLog.outString( "part 2");
-					// add another kill.
-					// (auto-dirtys it)
+					uint32 entry = victim->GetEntry();
+					if(quest->required_mob[j] == entry &&
+						quest->required_spell[j] == SpellId &&
+						qle->m_mobcount[j] < quest->required_mobcount[j] &&
+						!plr->IsUnitQuestAffected(victim))
+					{
+						// add another kill.(auto-dirtys it)
+						plr->AddQuestAffectedUnit(victim);
+						qle->SetMobCount(j, qle->m_mobcount[j] + 1);
+						qle->SendUpdateAddKill(j);
+						qle->UpdatePlayerFields();
+						break;
+					}
+				}
+				/*
+
+				if (plr->IsInWorld() && 
+					plr->GetMapId() == quest->point_mapid &&
+					quest->required_spell[j] == SpellId &&
+					plr->GetDistanceSq(quest->req_point_x[j],quest->req_point_y[j],quest->req_point_z[j]) < 2500) //5 points i think enough ^^ 
+				{
+					// add another kill.(auto-dirtys it)
 					qle->SetMobCount(j, qle->m_mobcount[j] + 1);
 					qle->SendUpdateAddKill(j);
 					qle->UpdatePlayerFields();
 					break;
-					//Fixme: 10 casts on the same mob = 10 increments. ;(
 				}
+				*/
 			}
 		}
 	}
 }
+
 
 void QuestMgr::OnPlayerItemPickup(Player* plr, Item* item)
 {
@@ -849,6 +868,9 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 
 void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint32 reward_slot)
 {
+	if (plr)
+		plr->ClearQuestAffectedUnits();
+
     QuestLogEntry *qle = NULL;
     if(!qst->is_repeatable)
     {

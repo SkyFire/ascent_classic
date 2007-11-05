@@ -1672,7 +1672,10 @@ void Aura::SpellAuraDummy(bool apply)
 			SSAura* aura = new SSAura();
 			aura->spellid = 24932;
 			aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
-			pTarget->m_ssAuras.insert(aura);
+			if (apply)
+				static_cast<Player*>(pTarget)->m_ssAuras.insert(aura);
+			else 
+				static_cast<Player*>(pTarget)->m_ssAuras.erase(aura);
 		}break;
 	case 740:
 	case 8918:
@@ -2873,7 +2876,10 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 			SSAura* aura = new SSAura();
 			aura->forms = FORM_BEAR | FORM_CAT | FORM_DIREBEAR;
 			aura->spellid = 24864;
-			static_cast<Player*>(m_target)->m_ssAuras.insert(aura);
+			if (apply)
+				static_cast<Player*>(m_target)->m_ssAuras.insert(aura);
+			else 
+				static_cast<Player*>(m_target)->m_ssAuras.erase(aura);
 		}
 		break;
 	case 17002: //Feral Swiftness
@@ -2883,7 +2889,10 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 			SSAura* aura = new SSAura();
 			aura->forms = FORM_BEAR | FORM_CAT | FORM_DIREBEAR;
 			aura->spellid = 24867;
-			static_cast<Player*>(m_target)->m_ssAuras.insert(aura);
+			if (apply)
+				static_cast<Player*>(m_target)->m_ssAuras.insert(aura);
+			else 
+				static_cast<Player*>(m_target)->m_ssAuras.erase(aura);
 		}
 		break;
 

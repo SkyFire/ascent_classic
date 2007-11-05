@@ -804,8 +804,14 @@ public:
     std::set<uint32>    m_QuestGOInProgress;
     std::set<uint32>    m_removequests;
     std::set<uint32>    m_finishedQuests;
+	std::set<uint64>    m_questaffected_units;
     uint32              m_questSharer;
     uint32              timed_quest_slot;
+
+	void AddQuestAffectedUnit(Unit* target);
+	void ClearQuestAffectedUnits();
+	bool IsUnitQuestAffected(Unit* target);
+
 
     /************************************************************************/
     /* Stun Immobilize                                                      */
