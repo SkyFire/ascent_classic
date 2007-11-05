@@ -325,21 +325,27 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 {
 	if(!m_caster->IsInWorld())
 		return;
+	Unit * pTarget = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
+	if(!pTarget)
+		return;
 
 	TargetsList *tmpMap=&m_targetUnits[i];
-	if(m_spellInfo->TargetCreatureType  && GUID_HIPART(m_targets.m_unitTarget)==HIGHGUID_UNIT)
+	if(m_spellInfo->TargetCreatureType && pTarget->GetTypeId()==TYPEID_UNIT)
 	{		
-		Creature *cr=m_caster->GetMapMgr()->GetCreature((uint32) m_targets.m_unitTarget);
+		Creature *cr=((Creature*)pTarget);
 		if(!cr)return;
 
 		if(cr->GetCreatureName())
 			if(!(1<<(cr->GetCreatureName()->Type-1) & m_spellInfo->TargetCreatureType))
 				return;
 	}
-	if(DidHit(m_targets.m_unitTarget))
-		SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+
+	uint8 did_hit_result = DidHit(pTarget);
+	if(did_hit_result != SPELL_DID_HIT_SUCCESS)
+		SafeAddModeratedTarget(pTarget->GetGUID(), did_hit_result);
 	else
-		SafeAddMissedTarget(m_targets.m_unitTarget);
+		SafeAddTarget(tmpMap, pTarget->GetGUID());
+
 	if(m_spellInfo->EffectChainTarget[i])
 	{
 		uint32 jumps=m_spellInfo->EffectChainTarget[i]-1;
@@ -357,10 +363,12 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 			{
 				if(isAttackable(u_caster,(Unit*)(*itr)))
 				{
-					if(DidHit(m_targets.m_unitTarget))
-						SafeAddTarget(tmpMap,((Unit*)*itr)->GetGUID());
+					did_hit_result = DidHit(((Unit*)*itr));
+					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
+						SafeAddTarget(tmpMap, (*itr)->GetGUID());
 					else
-						SafeAddMissedTarget(((Unit*)*itr)->GetGUID());
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result);
+
 					if(!--jumps)
 						return;
 				}
@@ -470,6 +478,8 @@ void Spell::SpellTargetInFrontOfCaster(uint32 i, uint32 j)
 {
 	TargetsList *tmpMap=&m_targetUnits[i];
 	std::set<Object*>::iterator itr;
+	Unit * pTarget;
+	uint8 did_hit_result;
 	for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 	{
 		if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
@@ -481,10 +491,11 @@ void Spell::SpellTargetInFrontOfCaster(uint32 i, uint32 j)
 			{
 				if(isAttackable(u_caster, (Unit*)(*itr)))
 				{
-					if(DidHit(m_targets.m_unitTarget))
-						SafeAddTarget(tmpMap,((Unit*)*itr)->GetGUID());
+					did_hit_result = DidHit(((Unit*)*itr));
+					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
+						SafeAddTarget(tmpMap,(*itr)->GetGUID());
 					else
-						SafeAddMissedTarget(((Unit*)*itr)->GetGUID());
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result);
 				}	
 			}
 		}
@@ -835,6 +846,7 @@ void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
 {
 	TargetsList *tmpMap=&m_targetUnits[i];
 	std::set<Object*>::iterator itr;
+	uint8 did_hit_result;
 	for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 	{
 		if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
@@ -846,10 +858,11 @@ void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
 			{
 				if(isAttackable(u_caster, (Unit*)(*itr)))
 				{
-					if(DidHit(m_targets.m_unitTarget))
-						SafeAddTarget(tmpMap,((Unit*)*itr)->GetGUID());
+					did_hit_result = DidHit(((Unit*)*itr));
+					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
+						SafeAddTarget(tmpMap,(*itr)->GetGUID());
 					else
-						SafeAddMissedTarget(((Unit*)*itr)->GetGUID());
+						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result);
 				}	
 			}
 		}

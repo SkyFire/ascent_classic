@@ -229,6 +229,7 @@ void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy
 {
     //IsStealth()
     float r = range * range;
+	uint8 did_hit_result;
     for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
     {
         // don't add objects that are not units and that are dead
@@ -251,10 +252,11 @@ void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy
             {
                 if(isAttackable(u_caster, (Unit*)(*itr),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)))
                 {
-                    if(DidHit((*itr)->GetGUID()))
-                        tmpMap->push_back((*itr)->GetGUID());
-                    else
-                        ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(),2));
+					did_hit_result = DidHit( ((Unit*)*itr) );
+					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
+						tmpMap->push_back((*itr)->GetGUID());
+					else
+						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(), did_hit_result));
                 }
 
             }
@@ -291,6 +293,7 @@ void Spell::FillAllTargetsInArea(float srcx,float srcy,float srcz,uint32 ind)
 void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range)
 {
 	float r = range*range;
+	uint8 did_hit_result;
 	for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 	{
 		if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
@@ -309,10 +312,11 @@ void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float
 			{
 				if(isAttackable(u_caster, (Unit*)(*itr),false))
 				{
-					if(DidHit((*itr)->GetGUID()))
+					did_hit_result = DidHit( (Unit*)*itr );
+					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
 						tmpMap->push_back((*itr)->GetGUID());
 					else
-						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(),2));
+						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(),did_hit_result));
 				}
 			}
 			else //cast from GO
@@ -364,7 +368,7 @@ uint64 Spell::GetSinglePossibleEnemy(float prange)
 		{
 			if(u_caster)
 			{
-				if(isAttackable(u_caster, (Unit*)(*itr),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)) && DidHit((*itr)->GetGUID()))
+				if(isAttackable(u_caster, (Unit*)(*itr),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)) && DidHit(((Unit*)*itr))==SPELL_DID_HIT_SUCCESS)
 					return (*itr)->GetGUID(); 			
 			}
 			else //cast from GO
@@ -412,7 +416,7 @@ uint64 Spell::GetSinglePossibleFriend(float prange)
 		{
 			if(u_caster)
 			{
-				if(isFriendly(u_caster, (Unit*)(*itr)) && DidHit((*itr)->GetGUID()))
+				if(isFriendly(u_caster, (Unit*)(*itr)) && DidHit(((Unit*)*itr))==SPELL_DID_HIT_SUCCESS)
 					return (*itr)->GetGUID(); 			
 			}
 			else //cast from GO
@@ -429,44 +433,56 @@ uint64 Spell::GetSinglePossibleFriend(float prange)
 	return 0;
 }
 
-bool Spell::DidHit(uint64 target)
+uint8 Spell::DidHit(Unit* target)
 {
 	//MEH return true for physical attacks they can not be resisted it's not !!!  spell
 
 	if(m_spellInfo->School == 0)
 		return true;
 	//note resistchance is vise versa, is full hit chance
-	Unit *u_victim = NULL;
-	Player *p_victim = NULL;
-	switch(UINT32_LOPART(GUID_HIPART(target)))
-	{
-		case HIGHGUID_UNIT:
-			u_victim = m_caster->GetMapMgr()->GetCreature((uint32)target);
-			break;
-		case HIGHGUID_PLAYER:
-			p_victim = m_caster->GetMapMgr()->GetPlayer((uint32)target);
-			u_victim = p_victim;
-			break;
-		case HIGHGUID_PET:
-			u_victim = m_caster->GetMapMgr()->GetPet((uint32)target);
-			break;
-	}
+	Unit *u_victim = target;
+	Player *p_victim = (target->GetTypeId()==TYPEID_PLAYER) ? ((Player*)target) : NULL;
 
+	// 
 	float baseresist[3]={4.0f,5.0f,6.0f};
 	int32 lvldiff;
 	float resistchance ;
-	if(!u_victim && !p_victim)
-		return false;
+	if(!u_victim)
+		return SPELL_DID_HIT_MISS;
 	
+	/************************************************************************/
+	/* Elite mobs always hit                                                */
+	/************************************************************************/
 	if(u_caster && u_caster->GetTypeId()==TYPEID_UNIT && ((Creature*)u_caster)->GetCreatureName() && ((Creature*)u_caster)->GetCreatureName()->Rank >= 3)
-		return true;
+		return SPELL_DID_HIT_SUCCESS;
 
+	/************************************************************************/
+	/* Can't resist non-unit                                                */
+	/************************************************************************/
 	if(!u_caster)
-		return true;
+		return SPELL_DID_HIT_SUCCESS;
 
+	/************************************************************************/
+	/* Can't reduce your own spells                                         */
+	/************************************************************************/
 	if(u_caster == u_victim)
-		return true;
+		return SPELL_DID_HIT_SUCCESS;
 
+	/************************************************************************/
+	/* Check if the unit is evading                                         */
+	/************************************************************************/
+	if(u_victim->GetTypeId()==TYPEID_UNIT && u_victim->GetAIInterface()->getAIState()==STATE_EVADE)
+		return SPELL_DID_HIT_EVADE;
+
+	/************************************************************************/
+	/* TODO: Check for spell missing                                        */
+	/************************************************************************/
+	/*if(spell_is_missed)
+		return SPELL_DID_HIT_MISS;*/
+
+	/************************************************************************/
+	/* Check if the spell is resisted.                                      */
+	/************************************************************************/
 	bool pvp =(p_caster && p_victim);
 
 	if(pvp)
@@ -512,13 +528,13 @@ bool Spell::DidHit(uint64 target)
 
 
 	if(resistchance >= 100.0f)
-		return false;
+		return SPELL_DID_HIT_RESIST;
 	else
 	{
 		if(resistchance<=1.0)//resist chance >=1
-			return !Rand(1.0f);
+			return (Rand(1.0f) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 		else
-			return !Rand(resistchance);
+			return (Rand(resistchance) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 	}
  
 }
@@ -1030,7 +1046,7 @@ void Spell::cast(bool check)
 
 	if(cancastresult == -1)
 	{
-		if (p_caster &&& !m_triggeredSpell)
+		if (p_caster && !m_triggeredSpell)
 		{
 			sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,p_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget));
 		}

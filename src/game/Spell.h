@@ -1422,6 +1422,19 @@ typedef void(Spell::*pSpellTarget)(uint32 i, uint32 j);
 
 #define SPELL_SPELL_CHANNEL_UPDATE_INTERVAL 1000
 class DummySpellHandler;
+
+enum SpellDidHitResult
+{
+	SPELL_DID_HIT_SUCCESS					= 0,
+	SPELL_DID_HIT_MISS						= 1,
+	SPELL_DID_HIT_RESIST					= 2,
+	SPELL_DID_HIT_DODGE						= 3,
+	SPELL_DID_HIT_DEFLECT					= 4,
+	SPELL_DID_HIT_BLOCK						= 5,
+	SPELL_DID_HIT_EVADE						= 6,
+	SPELL_DID_HIT_IMMUNE					= 7,
+};
+
 // Spell instance
 class SERVER_DECL Spell
 {
@@ -1448,8 +1461,8 @@ public:
     void GenerateTargets(SpellCastTargets *store_buff);
     // Fills the target map of the spell packet
     void FillTargetMap(uint32);
-    // See if we hit the target or can it resist (evade/immune/resist on spellgo)
-    bool DidHit(uint64 target);
+    // See if we hit the target or can it resist (evade/immune/resist on spellgo) (0=success)
+    uint8 DidHit(Unit* target);
     // Prepares the spell thats going to cast to targets
     void prepare(SpellCastTargets * targets);
     // Cancels the current spell
