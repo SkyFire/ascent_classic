@@ -249,10 +249,7 @@ bool World::SetInitialWorldSettings()
 	new LuaEngineMgr;
 	LuaEngineMgr::getSingleton().Startup();
 	Log.Line();
-	Creature p(1,2);
-	p.SetUInt32Value(OBJECT_FIELD_ENTRY,100);
-	LuaEngine * e = LuaEngineMgr::getSingleton().GetLuaEngine();
-	e->OnUnitEvent(&p,1,&p);
+
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");
 	CharacterDatabase.WaitExecute("UPDATE characters SET level = 70 WHERE level > 70");
 	CharacterDatabase.WaitExecute("UPDATE characters SET banned=0,banReason='' WHERE banned > 100 AND banned < %u", UNIXTIME);

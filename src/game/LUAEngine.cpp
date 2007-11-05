@@ -303,7 +303,7 @@ void LuaEngine::LoadScripts()
 	}
 }
 
-void LuaEngine::OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit)
+void LuaEngine::OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit, uint32 Misc)
 {
 	const char * FuncName = LuaEngineMgr::getSingleton().GetUnitEvent(pUnit->GetEntry(), EventType);
 	if(FuncName==NULL)
@@ -321,7 +321,11 @@ void LuaEngine::OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit)
 
 	Lunar<Unit>::push(L, pUnit);
 	lua_pushinteger(L,EventType);
-	Lunar<Unit>::push(L, pMiscUnit);
+	if(pMiscUnit!=NULL)
+		Lunar<Unit>::push(L, pMiscUnit);
+	else
+		lua_pushnil(L);
+	lua_pushinteger(L,Misc);
 	
 	int r = lua_pcall(L,3,LUA_MULTRET,0);
 	if(r)
@@ -348,7 +352,10 @@ void LuaEngine::OnGameObjectEvent(GameObject * pGameObject, uint32 EventType, Un
 
 	Lunar<GameObject>::push(L, pGameObject);
 	lua_pushinteger(L,EventType);
-	Lunar<Unit>::push(L, pMiscUnit);
+	if(pMiscUnit)
+		lua_pushnil(L);
+	else
+		Lunar<Unit>::push(L, pMiscUnit);
 
 	int r = lua_pcall(L,3,LUA_MULTRET,0);
 	if(r)

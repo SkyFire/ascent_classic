@@ -487,7 +487,7 @@ public:
 	CreatureSpawn * m_spawn;
 	void OnPushToWorld();
 	void Despawn(uint32 delay, uint32 respawntime);
-	void TriggerScriptEvent(void * func);
+	void TriggerScriptEvent(string func);
 
 	AuctionHouse * auctionHouse;
 	bool has_waypoint_text;

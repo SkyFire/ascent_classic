@@ -1168,7 +1168,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	Player *plyr = GetPlayer();
    
 	CALL_GO_SCRIPT_EVENT(obj, OnActivate)(_player);
-	//ScriptSystem->OnGameObjectEvent(obj, _player, GAMEOBJECT_EVENT_ON_USE);
+	obj->GetMapMgr()->GetScriptEngine()->OnGameObjectEvent(obj,GAMEOBJECT_EVENT_ON_USE,_player);
 
 	uint32 type = obj->GetUInt32Value(GAMEOBJECT_TYPE_ID);
 	switch (type)

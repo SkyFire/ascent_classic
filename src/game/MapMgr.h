@@ -71,6 +71,7 @@ typedef HM_NAMESPACE::hash_map<uint32, GameObject*> GameObjectSqlIdMap;
 
 class Transporter;
 #define RESERVE_EXPAND_SIZE 1024
+class LuaEngine;
 
 class SERVER_DECL MapMgr : public CellHandler <MapCell>, public EventableObject,public CThread
 {
@@ -344,10 +345,12 @@ public:
 	GameObject * GetSqlIdGameObject(uint32 sqlid);
 	deque<uint32> _reusable_guids_gameobject;
 	deque<uint32> _reusable_guids_creature;
+	inline LuaEngine* GetScriptEngine() { return m_engine; }
 
 	bool forced_expire;
 	bool thread_kill_only;
 	bool thread_running;
+	LuaEngine * m_engine;
 };
 
 #endif

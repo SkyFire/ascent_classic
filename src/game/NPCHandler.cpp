@@ -332,7 +332,7 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 	sLog.outDebug( "WORLD: Received CMSG_GOSSIP_HELLO from %u",GUID_LOPART(guid) );
 
 	/* script */
-	//ScriptSystem->OnCreatureEvent(qst_giver, _player, CREATURE_EVENT_ON_GOSSIP_TALK);
+	qst_giver->GetMapMgr()->GetScriptEngine()->OnUnitEvent(qst_giver,CREATURE_EVENT_ON_GOSSIP_TALK,_player,0);
 
 	GossipScript * Script = qst_giver->GetGossipScript();
 	if(!Script)

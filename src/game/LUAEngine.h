@@ -73,8 +73,9 @@ public:
 	void RegisterCoreFunctions();
 	inline Mutex& GetLock() { return m_Lock; }
 
-	void OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit);
+	void OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit, uint32 Misc);
 	void OnGameObjectEvent(GameObject * pGameObject, uint32 EventType, Unit * pMiscUnit);
+	void CallFunction(Unit * pUnit, const char * FuncName);
 };
 
 struct LuaUnitBinding { const char * Functions[CREATURE_EVENT_COUNT]; };

@@ -979,7 +979,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 
 	has_combat_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_ENTER_COMBAT);
 	has_waypoint_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_RANDOM_WAYPOINT);
-	m_aiInterface->m_hasWaypointEvents = /*ScriptSystem->HasEventType(GetEntry(), CREATURE_EVENT_ON_REACH_WP)*/false;
+	m_aiInterface->m_hasWaypointEvents = (LuaEngineMgr::getSingleton().GetUnitEvent(GetEntry(),CREATURE_EVENT_ON_REACH_WP) != NULL) ? true : false;
 	m_aiInterface->m_isGuard = isGuard(GetEntry());
 
 	m_aiInterface->getMoveFlags();
@@ -1165,7 +1165,7 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 
 	has_combat_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_ENTER_COMBAT);
 	has_waypoint_text = objmgr.HasMonsterSay(GetEntry(), MONSTER_SAY_EVENT_RANDOM_WAYPOINT);
-	m_aiInterface->m_hasWaypointEvents = /*ScriptSystem->HasEventType(GetEntry(), CREATURE_EVENT_ON_REACH_WP)*/false;
+	m_aiInterface->m_hasWaypointEvents = (LuaEngineMgr::getSingleton().GetUnitEvent(GetEntry(),CREATURE_EVENT_ON_REACH_WP) != NULL) ? true : false;
 	m_aiInterface->m_isGuard = isGuard(GetEntry());
 
 	m_aiInterface->getMoveFlags();
@@ -1202,7 +1202,7 @@ void Creature::OnPushToWorld()
 	Unit::OnPushToWorld();
 
 	/* script */
-	//ScriptSystem->OnCreatureEvent(this, 0, CREATURE_EVENT_ON_SPAWN);
+	m_mapMgr->GetScriptEngine()->OnUnitEvent(this, CREATURE_EVENT_ON_SPAWN,NULL,0);
 
 	if(_myScriptClass)
 		_myScriptClass->OnLoad();
@@ -1269,9 +1269,10 @@ void Creature::Despawn(uint32 delay, uint32 respawntime)
 	}
 }
 
-void Creature::TriggerScriptEvent(void * func)
+void Creature::TriggerScriptEvent(string func)
 {
-	//ScriptSystem->OnCreatureEvent(this, (gmFunctionObject*)func);
+	if(m_mapMgr)
+		m_mapMgr->GetScriptEngine()->CallFunction(this, func.c_str());
 }
 
 void Creature::DestroyCustomWaypointMap()
@@ -1296,7 +1297,8 @@ void Creature::RemoveLimboState(Unit * healer)
 	m_limbostate = false;
 	SetUInt32Value(UNIT_NPC_EMOTESTATE, m_spawn ? m_spawn->emote_state : 0);
 	SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-	//ScriptSystem->OnCreatureEvent(this, healer ? healer : this, CREATURE_EVENT_ON_LEAVE_LIMBO);
+	if(m_mapMgr)
+		m_mapMgr->GetScriptEngine()->OnUnitEvent(this,CREATURE_EVENT_ON_LEAVE_LIMBO,healer?healer:this,0);
 	bInvincible = false;
 }
 

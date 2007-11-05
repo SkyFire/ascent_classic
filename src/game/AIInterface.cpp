@@ -167,7 +167,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 						objmgr.HandleMonsterSayEvent(((Creature*)m_Unit), MONSTER_SAY_EVENT_ENTER_COMBAT);
 
 					CALL_SCRIPT_EVENT(m_Unit, OnCombatStart)(pUnit);
-					//ScriptSystem->OnCreatureEvent(((Creature*)m_Unit), pUnit, CREATURE_EVENT_ON_ENTER_COMBAT);
+					m_Unit->GetMapMgr()->GetScriptEngine()->OnUnitEvent(m_Unit, CREATURE_EVENT_ON_ENTER_COMBAT, pUnit,0);
 
 					if(static_cast<Creature*>(m_Unit)->m_spawn && (static_cast<Creature*>(m_Unit)->m_spawn->channel_target_go || static_cast<Creature*>(m_Unit)->m_spawn->channel_target_creature))
 					{
@@ -217,7 +217,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 					if(static_cast<Creature*>(m_Unit)->original_emotestate)
 						m_Unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, static_cast<Creature*>(m_Unit)->original_emotestate);
 					
-					//ScriptSystem->OnCreatureEvent(((Creature*)m_Unit), pUnit, CREATURE_EVENT_ON_LEAVE_COMBAT);
+					m_Unit->GetMapMgr()->GetScriptEngine()->OnUnitEvent(m_Unit, CREATURE_EVENT_ON_LEAVE_COMBAT, pUnit,0);
 
 					if(static_cast<Creature*>(m_Unit)->m_spawn && (static_cast<Creature*>(m_Unit)->m_spawn->channel_target_go || static_cast<Creature*>(m_Unit)->m_spawn->channel_target_creature))
 					{
@@ -419,7 +419,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_UNITDIED:
 		{
 			CALL_SCRIPT_EVENT(m_Unit, OnDied)(pUnit);
-			//ScriptSystem->OnCreatureEvent(((Creature*)m_Unit), pUnit, CREATURE_EVENT_ON_DIED);
+			m_Unit->GetMapMgr()->GetScriptEngine()->OnUnitEvent(m_Unit, CREATURE_EVENT_ON_DIED, pUnit,0);
 			m_AIState = STATE_IDLE;
 
 			StopMovement(0);
@@ -2265,7 +2265,8 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 					if(wp)
 					{
 						CALL_SCRIPT_EVENT(m_Unit, OnReachWP)(wp->id, !m_moveBackward);
-						//ScriptSystem->OnCreatureEventArg(((Creature*)m_Unit), wp->id, CREATURE_EVENT_ON_REACH_WP);
+						if(m_hasWaypointEvents)
+							m_Unit->GetMapMgr()->GetScriptEngine()->OnUnitEvent(m_Unit, CREATURE_EVENT_ON_REACH_WP, m_Unit, wp->id);
 
 						if(((Creature*)m_Unit)->has_waypoint_text)
 							objmgr.HandleMonsterSayEvent(((Creature*)m_Unit), MONSTER_SAY_EVENT_RANDOM_WAYPOINT);
