@@ -607,7 +607,8 @@ bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession *m_se
 	Player * pPlayer = objmgr.GetPlayer(pCharacter, false);
 	if(pPlayer == NULL)
 	{
-		PlayerInfo * pInfo = objmgr.GetPlayerInfoByName(string(pCharacter));
+		string sCharacter = string(pCharacter);
+		PlayerInfo * pInfo = objmgr.GetPlayerInfoByName(sCharacter);
 		if(pInfo == NULL)
 		{
 			SystemMessage(m_session, "Player not found.");
@@ -623,7 +624,9 @@ bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession *m_se
 	else
 	{
 		SystemMessage(m_session, "Banning player '%s' ingame for '%s'.", pCharacter, pReason);
-		pPlayer->SetBanned(BanTime ? BanTime+(uint32)UNIXTIME : 1, string(pReason));
+		string sReason = string(pReason);
+		uint32 uBanTime = BanTime ? BanTime+(uint32)UNIXTIME : 1;
+		pPlayer->SetBanned(uBanTime, sReason);
 	}
 
 	SystemMessage(m_session, "This ban is due to expire %s%s.", BanTime ? "on " : "", BanTime ? ConvertTimeStampToDataTime(BanTime+(uint32)UNIXTIME).c_str() : "Never");
