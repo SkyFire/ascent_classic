@@ -118,6 +118,16 @@ enum GAMEOBJECT_TYPES
 class SERVER_DECL GameObject : public Object
 {
 public:
+	/************************************************************************/
+	/* LUA Stuff                                                            */
+	/************************************************************************/
+	typedef struct { const char *name; int(*mfunc)(lua_State*,GameObject*); } RegType;
+	static const char className[];
+	static RegType methods[];
+
+	// a lua script cannot create a unit.
+	GameObject(lua_State * L) { ASSERT(false); }
+
 	GameObject(uint32 high, uint32 low);
 	~GameObject( );
 

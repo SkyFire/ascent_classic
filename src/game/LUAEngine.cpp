@@ -1,5 +1,8 @@
 #include "StdAfx.h"
 
+bool lua_is_starting_up = false;
+initialiseSingleton(LuaEngineMgr);
+
 template <typename T> class Lunar {
 	typedef struct { T *pT; } userdataType;
 public:
@@ -205,9 +208,25 @@ private:
 	}
 };
 
+void report(lua_State * L)
+{
+	const char * msg= lua_tostring(L,-1);
+	while(msg)
+	{
+		lua_pop(L,-1);
+		printf("\t%s\n", msg);
+		msg=lua_tostring(L,-1);
+	}
+}
+
 LuaEngine::LuaEngine()
 {
 	this->L = lua_open();
+}
+
+LuaEngine::~LuaEngine()
+{
+	lua_close(L);
 }
 
 void LuaEngine::LoadScripts()
@@ -245,42 +264,97 @@ void LuaEngine::LoadScripts()
 			luaFiles.erase(it2);
 	}
 
-	printf("LUA Loader: Loading LUA Libraries...\n");
 	luaopen_base(L);
 	luaopen_table(L);
 	//luaopen_io(L);
 	luaopen_string(L);
 	luaopen_math(L);
 	luaopen_debug(L);
-
-	printf("LUA Loader: Registering Core Functions...\n");
 	RegisterCoreFunctions();
 
-	printf("LUA Loader: Loading LUA Scripts...\n");
+	if(lua_is_starting_up)
+		Log.Notice("LuaEngine", "Loading Scripts...");
+
 	char filename[200];
 
 	for(set<string>::iterator itr = luaFiles.begin(); itr != luaFiles.end(); ++itr)
 	{
 		snprintf(filename, 200, "scripts\\%s", itr->c_str());
-		printf("\t%s...", (*itr).c_str());
+		if(lua_is_starting_up)
+			Log.Notice("LuaEngine", "%s...", itr->c_str());
+
 		if(luaL_loadfile(L, filename) != 0)
 		{
 			printf("failed. (could not load)\n");
 			const char * msg = lua_tostring(L, -1);
-			if(msg!=NULL)
-				printf("%s\n",msg);
+			if(msg!=NULL&&lua_is_starting_up)
+				printf("\t%s\n",msg);
 		}
 		else
 		{
 			if(lua_pcall(L, 0, LUA_MULTRET, 0) != 0)
 			{
 				printf("failed. (could not run)\n");
-				//report(L);
+				const char * msg = lua_tostring(L, -1);
+				if(msg!=NULL&&lua_is_starting_up)
+					printf("\t%s\n",msg);
 			}
-			else
-				printf("ok!.\n");
 		}
 	}
+}
+
+void LuaEngine::OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit)
+{
+	const char * FuncName = LuaEngineMgr::getSingleton().GetUnitEvent(pUnit->GetEntry(), EventType);
+	if(FuncName==NULL)
+		return;
+
+	m_Lock.Acquire();
+	lua_pushstring(L, FuncName);
+	lua_gettable(L, LUA_GLOBALSINDEX);
+	if(lua_isnil(L,-1))
+	{
+		printf("Tried to call invalid LUA function '%s' from Ascent (Unit)!\n", FuncName);
+		m_Lock.Release();
+		return;
+	}
+
+	Lunar<Unit>::push(L, pUnit);
+	lua_pushinteger(L,EventType);
+	Lunar<Unit>::push(L, pMiscUnit);
+	
+	int r = lua_pcall(L,3,LUA_MULTRET,0);
+	if(r)
+		report(L);
+
+	m_Lock.Release();
+}
+
+void LuaEngine::OnGameObjectEvent(GameObject * pGameObject, uint32 EventType, Unit * pMiscUnit)
+{
+	const char * FuncName = LuaEngineMgr::getSingleton().GetGameObjectEvent(pGameObject->GetEntry(),EventType);
+	if(FuncName==NULL)
+		return;
+
+	m_Lock.Acquire();
+	lua_pushstring(L, FuncName);
+	lua_gettable(L, LUA_GLOBALSINDEX);
+	if(lua_isnil(L,-1))
+	{
+		printf("Tried to call invalid LUA function '%s' from Ascent! (GO)\n", FuncName);
+		m_Lock.Release();
+		return;
+	}
+
+	Lunar<GameObject>::push(L, pGameObject);
+	lua_pushinteger(L,EventType);
+	Lunar<Unit>::push(L, pMiscUnit);
+
+	int r = lua_pcall(L,3,LUA_MULTRET,0);
+	if(r)
+		report(L);
+
+	m_Lock.Release();
 }
 
 /************************************************************************/
@@ -299,6 +373,10 @@ int luaUnit_GetX(lua_State * L, Unit * ptr);
 int luaUnit_GetY(lua_State * L, Unit * ptr);
 int luaUnit_GetZ(lua_State * L, Unit * ptr);
 int luaUnit_GetO(lua_State * L, Unit * ptr);
+int luaUnit_IsPlayer(lua_State * L, Unit * ptr);
+int luaUnit_IsCreature(lua_State * L, Unit * ptr);
+
+int luaGameObject_GetName(lua_State * L, GameObject * ptr);
 
 /************************************************************************/
 /* SCRIPT FUNCTION TABLES                                               */
@@ -318,18 +396,93 @@ Unit::RegType Unit::methods[] = {
 	{ "GetY", &luaUnit_GetY },
 	{ "GetZ", &luaUnit_GetZ },
 	{ "GetO", &luaUnit_GetO },
+	{ "IsPlayer", &luaUnit_IsPlayer },
+	{ "IsCreature", &luaUnit_IsCreature },
 	{ NULL, NULL },
 };
 
+const char GameObject::className[] = "GameObject";
+GameObject::RegType GameObject::methods[] = {
+	{ "GetName", &luaGameObject_GetName },
+	{ NULL, NULL },
+};
+
+static int RegisterUnitEvent(lua_State * L);
+static int RegisterGameObjectEvent(lua_State * L);
+
 void LuaEngine::RegisterCoreFunctions()
 {
+	lua_pushcfunction(L, &RegisterUnitEvent);
+	lua_setglobal(L, "RegisterUnitEvent");
+
+	lua_pushcfunction(L, &RegisterGameObjectEvent);
+	lua_setglobal(L, "RegisterGameObjectEvent");
+
 	Lunar<Unit>::Register(L);
+}
+
+static int RegisterUnitEvent(lua_State * L)
+{
+	int entry = luaL_checkint(L, 1);
+	int ev = luaL_checkint(L, 2);
+	const char * str = luaL_checkstring(L, 3);
+
+	if(!entry || !ev || !str || !lua_is_starting_up)
+		return 0;
+
+	LuaEngineMgr::getSingleton().RegisterUnitEvent(entry,ev,str);
+	return 0;
+}
+
+static int RegisterGameObjectEvent(lua_State * L)
+{
+	int entry = luaL_checkint(L, 0);
+	int ev = luaL_checkint(L, 1);
+	const char * str = luaL_checkstring(L, 2);
+
+	if(!entry || !ev || !str || !lua_is_starting_up)
+		return 0;
+
+	LuaEngineMgr::getSingleton().RegisterGameObjectEvent(entry,ev,str);
+	return 0;
 }
 
 /************************************************************************/
 /* SCRIPT FUNCTION IMPLEMENTATION                                       */
 /************************************************************************/
 #define CHECK_TYPEID(expected_type) if(!ptr || !ptr->IsInWorld() || ptr->GetTypeId() != expected_type) { return 0; }
+
+int luaUnit_IsPlayer(lua_State * L, Unit * ptr)
+{
+	if(!ptr)
+	{
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+
+	if(ptr->IsPlayer())
+		lua_pushboolean(L, 1);
+	else
+		lua_pushboolean(L, 0);
+
+	return 1;
+}
+
+int luaUnit_IsCreature(lua_State * L, Unit * ptr)
+{
+	if(!ptr)
+	{
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+
+	if(ptr->GetTypeId()==TYPEID_UNIT)
+		lua_pushboolean(L, 1);
+	else
+		lua_pushboolean(L, 0);
+
+	return 1;
+}
 
 int luaUnit_GetName(lua_State * L, Unit * ptr)
 {
@@ -339,7 +492,7 @@ int luaUnit_GetName(lua_State * L, Unit * ptr)
 	switch(ptr->GetTypeId())
 	{
 	case TYPEID_UNIT:
-		lua_pushstring(L, ((Creature*)ptr)->GetCreatureName()->Name);
+		lua_pushstring(L, ((Creature*)ptr)->GetCreatureName() ? ((Creature*)ptr)->GetCreatureName()->Name : "Unknown");
 		break;
 
 	case TYPEID_PLAYER:
@@ -347,7 +500,7 @@ int luaUnit_GetName(lua_State * L, Unit * ptr)
 		break;
 
 	default:
-		return 0;
+		lua_pushstring(L, "Unknown");
 		break;
 	}
 
@@ -480,12 +633,18 @@ int luaUnit_SpawnCreature(lua_State * L, Unit * ptr)
 	uint32 duration = luaL_checkint(L, 7);
 	
 	if(!entry_id || !faction || !duration)
-		return 0;
+	{
+		lua_pushnil(L);
+		return 1;
+	}
 
 	CreatureProto * proto = CreatureProtoStorage.LookupEntry(entry_id);
 	CreatureInfo * inf = CreatureNameStorage.LookupEntry(entry_id);
 	if(!proto || !inf)
-		return 0;
+	{
+		lua_pushnil(L);
+		return 1;
+	}
 
 	Creature * pC = ptr->GetMapMgr()->CreateCreature();
 	pC->spawnid=0;
@@ -516,11 +675,17 @@ int luaUnit_SpawnGameObject(lua_State * L, Unit * ptr)
 	uint32 duration = luaL_checkint(L, 6);
 	
 	if(!entry_id || !duration)
-		return 0;
+	{
+		lua_pushnil(L);
+		return 1;
+	}
 
 	GameObjectInfo * goi = GameObjectNameStorage.LookupEntry(entry_id);
 	if(!goi)
-		return 0;
+	{
+		lua_pushnil(L);
+		return 1;
+	}
 
 	GameObject * pC = ptr->GetMapMgr()->CreateGameObject();
 	pC->spawnid=0;
@@ -532,6 +697,168 @@ int luaUnit_SpawnGameObject(lua_State * L, Unit * ptr)
 	if(duration)
 		sEventMgr.AddEvent(pC, &GameObject::ExpireAndDelete, EVENT_GAMEOBJECT_EXPIRE, duration, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
-	//Lunar<GameObject>::push(L, pC, false);
+	Lunar<GameObject>::push(L, pC, false);
 	return 1;
+}
+
+int luaGameObject_GetName(lua_State * L, GameObject * ptr)
+{
+	if(!ptr||ptr->GetTypeId()!=TYPEID_GAMEOBJECT||!ptr->GetInfo())
+	{
+		lua_pushstring(L,"Unknown");
+		return 1;
+	}
+
+	lua_pushstring(L,ptr->GetInfo()->Name);
+	return 1;
+}
+
+
+
+/************************************************************************/
+/* Manager Stuff                                                        */
+/************************************************************************/
+
+void LuaEngineMgr::Startup()
+{
+	// create 3
+	uint32 c = 3;
+	Log.Notice("LuaEngineMgr", "Spawning %u Lua Engines...", c);
+	for(uint32 i = 0; i < c; ++i)
+	{
+		if(i==0)
+			lua_is_starting_up=true;
+
+		LuaEngine * l = new LuaEngine();
+		l->LoadScripts();
+		m_engines.insert(make_pair(l,(uint32)0));
+
+		if(i==0)
+			lua_is_starting_up=false;
+	}
+}
+
+LuaEngine* LuaEngineMgr::GetLuaEngine()
+{
+	m_lock.Acquire();
+	uint32 lowest_c = 0;
+	LuaEngine * lowest=NULL;
+	LuaEngineMap::iterator ditr;
+	for(LuaEngineMap::iterator itr = m_engines.begin(); itr != m_engines.end(); ++itr)
+	{
+		if(itr->second < lowest_c || lowest==NULL)
+		{
+			lowest_c = itr->second;
+			lowest =itr->first;
+			ditr=itr;
+		}
+	}
+
+	if(lowest_c > 3||lowest==NULL)
+	{
+		// perferably we don't want any more than 3 instances sharing the same lua engine
+		lowest = new LuaEngine();
+		m_engines.insert(make_pair(lowest,(uint32)1));
+		m_lock.Release();
+		return lowest;
+	}
+	
+	// return that engine, after incrementing its used count.
+	ditr->second++;
+	m_lock.Release();
+	return lowest;
+}
+
+void LuaEngineMgr::RegisterUnitEvent(uint32 Id, uint32 Event, const char * FunctionName)
+{
+	UnitBindingMap::iterator itr = m_unitBinding.find(Id);
+	if(itr == m_unitBinding.end())
+	{
+		LuaUnitBinding ub;
+		memset(&ub,0,sizeof(LuaUnitBinding));
+		ub.Functions[Event] = strdup(FunctionName);
+		m_unitBinding.insert(make_pair(Id,ub));
+	}
+	else
+	{
+		if(itr->second.Functions[Event]!=NULL)
+			free((void*)itr->second.Functions[Event]);
+
+		itr->second.Functions[Event]=strdup(FunctionName);
+	}
+}
+
+void LuaEngineMgr::RegisterGameObjectEvent(uint32 Id, uint32 Event, const char * FunctionName)
+{
+	GameObjectBindingMap::iterator itr = m_gameobjectBinding.find(Id);
+	if(itr == m_gameobjectBinding.end())
+	{
+		LuaGameObjectBinding ub;
+		memset(&ub,0,sizeof(LuaGameObjectBinding));
+		ub.Functions[Event] = strdup(FunctionName);
+		m_gameobjectBinding.insert(make_pair(Id,ub));
+	}
+	else
+	{
+		if(itr->second.Functions[Event]!=NULL)
+			free((void*)itr->second.Functions[Event]);
+
+		itr->second.Functions[Event]=strdup(FunctionName);
+	}
+}
+
+void LuaEngineMgr::ReloadScripts()
+{
+	m_lock.Acquire();
+
+	// acquire the locks on all the luaengines so they don't do anything.
+	for(LuaEngineMap::iterator itr = m_engines.begin(); itr != m_engines.end(); ++itr)
+		itr->first->GetLock().Acquire();
+
+	// remove all the function name bindings
+	for(UnitBindingMap::iterator itr = m_unitBinding.begin(); itr != m_unitBinding.end(); ++itr)
+	{
+		for(uint32 i = 0; i < CREATURE_EVENT_COUNT; ++i)
+			if(itr->second.Functions[i] != NULL)
+				free((void*)itr->second.Functions[i]);
+	}
+	
+	for(GameObjectBindingMap::iterator itr = m_gameobjectBinding.begin(); itr != m_gameobjectBinding.end(); ++itr)
+	{
+		for(uint32 i = 0; i < GAMEOBJECT_EVENT_COUNT; ++i)
+			if(itr->second.Functions[i] != NULL)
+				free((void*)itr->second.Functions[i]);
+	}
+
+	// clear the maps
+	m_gameobjectBinding.clear();
+	m_unitBinding.clear();
+
+	// grab the first lua engine in the list, use it to re-create all the binding names.
+	LuaEngine * l = m_engines.begin()->first;
+	lua_is_starting_up = true;
+	l->Restart();
+	lua_is_starting_up = false;
+
+	// all our bindings have been re-created, go through the lua engines and restart them all, and then release their locks.
+	for(LuaEngineMap::iterator itr = m_engines.begin(); itr != m_engines.end(); ++itr)
+	{
+		if(itr->first != l)		// this one is already done
+		{
+			itr->first->Restart();
+			itr->first->GetLock().Release();
+		}
+	}
+
+	// release the big lock
+	m_lock.Release();
+}
+
+void LuaEngine::Restart()
+{
+	m_Lock.Acquire();
+	lua_close(L);
+	L = lua_open();
+	LoadScripts();
+	m_Lock.Release();
 }
