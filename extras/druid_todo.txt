@@ -6,6 +6,8 @@ Skills
 
 Talents
 Moonkin aura - change you into humanoid type and not beast ?
+Natural Shapeshifter - works but for a few seconds onlly (
+IMproved Mark of the Wild - affects only druid
 
 revision 1602 - win32-x86
 while in aquatic form and underwater, no breath bar is displayed(thats fine), but after a while, HP goes down, as if the breathbar reached zero.happens exactly after 60seconds
