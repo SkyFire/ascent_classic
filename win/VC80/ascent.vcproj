@@ -118,8 +118,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory=".\..\..\bin\Release_x64"
+			IntermediateDirectory=".\Release_x64"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
@@ -148,8 +148,8 @@
 				Optimization="4"
 				InlineFunctionExpansion="2"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\redirect;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src\gm"
-				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\dep\src"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;X64"
 				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
@@ -157,9 +157,9 @@
 				EnableFunctionLevelLinking="false"
 				EnableEnhancedInstructionSet="0"
 				PrecompiledHeaderFile=".\Release/ascent.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
+				AssemblerListingLocation=".\Release_x64/"
+				ObjectFile=".\Release_x64/"
+				ProgramDataBaseFileName=".\Release_x64/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="true"
@@ -179,14 +179,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib mswsock.lib"
-				OutputFile=".\..\..\bin\Release/ascent.exe"
+				OutputFile=".\..\..\bin\Release_x64/ascent.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\dep\lib\release"
+				AdditionalLibraryDirectories="..\..\dep\lib64"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\..\bin\Release/ascent.pdb"
+				ProgramDatabaseFile=".\..\..\bin\Release_x64/ascent.pdb"
 				SubSystem="1"
 				TargetMachine="17"
 				FixedBaseAddress="1"
@@ -214,7 +213,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib\release\*.dll ..\..\bin\release&#x0D;&#x0A;copy ..\..\dep\lib\*.dll ..\..\bin\release&#x0D;&#x0A;if not exist ..\..\bin\release\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\release&#x0D;&#x0A;if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\release&#x0D;&#x0A;"
+				CommandLine="copy ..\..\dep\lib64\*.dll ..\..\bin\release_x64&#x0D;&#x0A;if not exist ..\..\bin\release_x64\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\release_x64&#x0D;&#x0A;if not exist ..\..\bin\release_x64\realms.conf copy ..\..\src\realms.conf ..\..\bin\release_x64&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -375,6 +374,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				LinkLibraryDependencies="true"
 				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib mswsock.lib"
 				OutputFile=".\..\..\bin\Debug_x64\ascent.exe"
 				LinkIncremental="1"
@@ -411,205 +411,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib64\*.dll ..\..\bin\debug_x64&#x0D;&#x0A;if not exist ..\..\bin\debug\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\debug&#x0D;&#x0A;if not exist ..\..\bin\debug\realms.conf copy ..\..\src\realms.conf ..\..\bin\debug&#x0D;&#x0A;"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Hoard|Win32"
-			OutputDirectory=".\..\..\bin\Release"
-			IntermediateDirectory=".\Hoard"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TypeLibraryName=".\..\..\bin\Release/ascent.tlb"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				InlineFunctionExpansion="2"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\redirect;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src\gm"
-				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE;HOARD"
-				StringPooling="true"
-				MinimalRebuild="false"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="false"
-				EnableEnhancedInstructionSet="0"
-				PrecompiledHeaderFile=".\Hoard/ascent.pch"
-				AssemblerListingLocation=".\Hoard/"
-				ObjectFile=".\Hoard/"
-				ProgramDataBaseFileName=".\Hoard/"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-				CompileAs="0"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib mswsock.lib winhoard.lib"
-				OutputFile=".\..\..\bin\Release/ascent.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\dep\lib\release"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\..\bin\Release/ascent.pdb"
-				SubSystem="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib\release\*.dll ..\..\bin\release&#x0D;&#x0A;copy ..\..\dep\lib\*.dll ..\..\bin\release&#x0D;&#x0A;if not exist ..\..\bin\release\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\release&#x0D;&#x0A;if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\release&#x0D;&#x0A;"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Hoard|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="3"
-				TypeLibraryName=".\..\..\bin\Release/ascent.tlb"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				InlineFunctionExpansion="2"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\redirect;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src\gm"
-				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE;HOARD"
-				StringPooling="true"
-				MinimalRebuild="false"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				EnableFunctionLevelLinking="false"
-				EnableEnhancedInstructionSet="0"
-				PrecompiledHeaderFile=".\Hoard/ascent.pch"
-				AssemblerListingLocation=".\Hoard/"
-				ObjectFile=".\Hoard/"
-				ProgramDataBaseFileName=".\Hoard/"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-				CompileAs="0"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib mswsock.lib winhoard.lib"
-				OutputFile=".\..\..\bin\Release/ascent.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\..\dep\lib\release"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\..\bin\Release/ascent.pdb"
-				SubSystem="1"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib\release\*.dll ..\..\bin\release&#x0D;&#x0A;copy ..\..\dep\lib\*.dll ..\..\bin\release&#x0D;&#x0A;if not exist ..\..\bin\release\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\release&#x0D;&#x0A;if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\release&#x0D;&#x0A;"
+				CommandLine="copy ..\..\dep\lib64\*.dll ..\..\bin\debug_x64&#x0D;&#x0A;if not exist ..\..\bin\debug_x64\ascent.conf copy ..\..\src\ascent.conf ..\..\bin\debug_x64&#x0D;&#x0A;if not exist ..\..\bin\debug_x64\realms.conf copy ..\..\src\realms.conf ..\..\bin\debug_x64&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
