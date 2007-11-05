@@ -597,7 +597,6 @@ bool QuestMgr::OnGameObjectActivate(Player *plr, GameObject *go)
 
 			for(j = 0; j < 4; ++j)
 			{
-				printf("QLE: id %d, mobtype %d, mobid %d, mobcount %d\n",qle->GetQuest()->id,qle->GetQuest()->required_mobtype[0],qle->GetQuest()->required_mob[0],qle->GetQuest()->required_mobcount[0]);
 				if(qle->GetQuest()->required_mob[j] == entry &&
 					qle->GetQuest()->required_mobtype[j] == QUEST_MOB_TYPE_GAMEOBJECT &&
 					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
