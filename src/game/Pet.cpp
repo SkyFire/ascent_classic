@@ -1330,11 +1330,19 @@ void Pet::ApplyPetLevelAbilities()
 	static double R_pet_base_hp[70] = { 42, 55, 71, 86, 102, 120, 137, 156, 176, 198, 222, 247, 273, 300, 328, 356, 386, 417, 449, 484, 521, 562, 605, 651, 699, 750, 800, 853, 905, 955, 1006, 1057, 1110, 1163, 1220, 1277, 1336, 1395, 1459, 1524, 1585, 1651, 1716, 1782, 1848, 1919, 1990, 2062, 2138, 2215, 2292, 2371, 2453, 2533, 2614, 2699, 2784, 2871, 2961, 3052, 3144, 3237, 3331, 3425, 3524, 3624, 3728, 3834, 3941, 4049 };
 
 	// Calculate HP
-//	double pet_hp	= ( ( ( 0.6 * dlevel * dlevel + 10.6 * dlevel + 33 ) + ( pet_sta_bonus * 10 ) ) * pet_mod_sta);
-//	double pet_armor = ( ( -75 + 50 * dlevel ) * pet_mod_arm + pet_arm_bonus );
 	//patch from darken
-	double pet_hp = ( ( ( R_pet_base_hp[level-1]) + ( pet_sta_bonus * 10 ) ) * pet_mod_sta);
-	double pet_armor = ( (R_pet_base_armor[level-1] ) * pet_mod_arm + pet_arm_bonus );
+	double pet_hp;
+	double pet_armor;
+	if(level-1<70)
+	{
+		pet_hp= ( ( ( R_pet_base_hp[level-1]) + ( pet_sta_bonus * 10 ) ) * pet_mod_sta);
+		pet_armor= ( (R_pet_base_armor[level-1] ) * pet_mod_arm + pet_arm_bonus );
+	}
+	else
+	{
+		pet_hp	= ( ( ( 0.6 * dlevel * dlevel + 10.6 * dlevel + 33 ) + ( pet_sta_bonus * 10 ) ) * pet_mod_sta);
+		pet_armor = ( ( -75 + 50 * dlevel ) * pet_mod_arm + pet_arm_bonus );
+	}
 //	double pet_attack_power = ( ( ( 20 * dlevel) - 60 ) + pet_ap_bonus ) * pet_mod_dps;
 	double pet_attack_power = ( ( 7.9 * ( ( dlevel * dlevel ) / ( dlevel * 3 ) ) ) + ( pet_ap_bonus ) ) * pet_mod_dps;
 

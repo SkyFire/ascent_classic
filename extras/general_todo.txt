@@ -103,6 +103,7 @@ Zack - test my shit :
 - shaman - Call of Thunder 16120
 - shaman - Elemental mastery 16166
 - shaman - Lightning Overload  30681
+- shaman - Improved Lightning shield 16291
 
 ==========================================================================
 Capt - test my shit :

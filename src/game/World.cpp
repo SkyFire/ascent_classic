@@ -1545,6 +1545,23 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=0xFFFFFFFF;//nature+fire+frost is all that shaman can do
 	}
 
+	//shaman - Improved Lightning shield 
+	sp = dbcSpell.LookupEntry(324);//shaman - Lightning Shield.
+	uint32 ILS_grouprelation;
+	if(sp)
+		ILS_grouprelation = sp->SpellGroupType;
+	else ILS_grouprelation=0;
+	//shaman - Improved Lightning shield r1
+	sp = dbcSpell.LookupEntry(16261); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
+	sp = dbcSpell.LookupEntry(16290); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
+	sp = dbcSpell.LookupEntry(16291); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
+
 	//shaman - Call of Thunder 
 	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt.
 	uint32 Cthunder_grouprelation;

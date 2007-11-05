@@ -4,13 +4,6 @@ Elemental Tree
 Elemental Fury - no effect - supposed to give a +200% crit damage on nature spells and fire totems
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent
 
-I think Elemental shields and storm reach both also not work but have no evidence of that yet. More testing needed.
-
-Enhancement Tree
-Shield Specialization - only 1 talent point works - gives a max of +1% increased block and ammount blocked 5%, should be 5 and 25.
-Improved Lightning shield - no effect - supposed to give a max of +15% dmg to lighting shield.
-Weapon Mastery - no effect - supposed to give a max of +10% dmg to melee attacks
-
 Restoration Tree
 Tidal focus - no effect - supposed to give a max -5% mana reduction on healing spells
 Totemic focus - no effect - supposed to give a max of -25% mana reduction on totems
