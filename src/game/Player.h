@@ -796,6 +796,8 @@ public:
 	bool                HasFinishedQuest(uint32 quest_id);
 	bool                HasQuestForItem(uint32 itemid);
     bool                CanFinishQuest(Quest* qst);
+	bool                HasQuestSpell(uint32 spellid);
+	void                RemoveQuestSpell(uint32 spellid);
 
     //Quest related variables
 	uint32 m_questbarrier1[25];
@@ -806,6 +808,7 @@ public:
     std::set<uint32>    m_finishedQuests;
     uint32              m_questSharer;
     uint32              timed_quest_slot;
+	std::set<uint32>    quest_spells;
 
     /************************************************************************/
     /* Stun Immobilize                                                      */

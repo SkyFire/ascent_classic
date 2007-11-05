@@ -9023,3 +9023,15 @@ void Player::EjectFromInstance()
 
 	SafeTeleport(m_bind_mapid, 0, m_bind_pos_x, m_bind_pos_y, m_bind_pos_z, 0);
 }
+
+bool Player::HasQuestSpell(uint32 spellid)
+{
+	if (quest_spells.size()>0 && quest_spells.find(spellid) != quest_spells.end())
+		return true;
+	return false;
+}
+void Player::RemoveQuestSpell(uint32 spellid)
+{
+	if (quest_spells.size()>0)
+		quest_spells.erase(spellid);
+}

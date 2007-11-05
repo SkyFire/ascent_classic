@@ -139,6 +139,18 @@ void QuestLogEntry::Init(Quest* quest, Player* plr, uint32 slot)
 	m_plr = plr;
 	m_slot = slot;
 
+	iscastquest = false;
+	for (uint32 i=0;i<4;++i)
+	{
+		if (quest->required_spell[i]!=0)
+		{
+			iscastquest=true;
+			if (!plr->HasQuestSpell(quest->required_spell[i]))
+				plr->quest_spells.insert(quest->required_spell[i]);
+		}
+	}
+
+
 	// update slot
 	plr->SetQuestLogSlot(this, slot);
 	
@@ -154,6 +166,27 @@ void QuestLogEntry::Init(Quest* quest, Player* plr, uint32 slot)
 
 	LoadScript();
 	CALL_QUESTSCRIPT_EVENT(this, OnQuestStart)(plr);
+}
+
+void QuestLogEntry::ClearAffectedUnits()
+{
+	if (m_affected_units.size()>0)
+		m_affected_units.clear();
+}
+void QuestLogEntry::AddAffectedUnit(Unit* target)
+{
+	if (!target)
+		return;
+	if (!IsUnitAffected(target))
+		m_affected_units.insert(target->GetGUID());
+}
+bool QuestLogEntry::IsUnitAffected(Unit* target)
+{
+	if (!target)
+		return true;
+	if (m_affected_units.find(target->GetGUID()) != m_affected_units.end())
+		return true;
+	return false;
 }
 
 void QuestLogEntry::SaveToDB()

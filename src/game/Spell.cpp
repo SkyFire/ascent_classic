@@ -1030,6 +1030,10 @@ void Spell::cast(bool check)
 
 	if(cancastresult == -1)
 	{
+		if (p_caster)
+		{
+			sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,p_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget));
+		}
 		if(m_spellInfo->Attributes & ATTRIBUTE_ON_NEXT_ATTACK)
 		{
 			if(!m_triggeredSpell)

@@ -708,6 +708,43 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 	}
 }
 
+void QuestMgr::OnPlayerCast(Player* plr, uint32 spellid, Unit* victim)
+{
+	if(!plr || !plr->HasQuestSpell(spellid) || !victim)
+		return;
+
+	uint32 i, j;
+	uint32 entry = victim->GetEntry();
+	QuestLogEntry *qle;
+	for(i = 0; i < 25; ++i)
+	{
+		if((qle = plr->GetQuestLogInSlot(i)))
+		{
+			// dont waste time on quests without casts
+			if(!qle->IsCastQuest())
+				continue;
+
+			for(j = 0; j < 4; ++j)
+			{
+				if(qle->GetQuest()->required_mob[j] == entry &&
+					qle->GetQuest()->required_spell[j] == spellid &&
+					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j] &&
+					!qle->IsUnitAffected(victim))
+				{
+					// add another kill.(auto-dirtys it)
+					qle->AddAffectedUnit(victim);
+					qle->SetMobCount(j, qle->m_mobcount[j] + 1);
+					qle->SendUpdateAddKill(j);
+					qle->UpdatePlayerFields();
+					break;
+				}
+			}
+		}
+	}
+}
+
+
+
 void QuestMgr::OnPlayerItemPickup(Player* plr, Item* item)
 {
 	uint32 i, j;
@@ -823,7 +860,19 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
     if(!qst->is_repeatable) CALL_QUESTSCRIPT_EVENT(qle, OnQuestComplete)(plr);
 
 	//ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), plr, QUEST_EVENT_ON_COMPLETE);
-	if(!qst->is_repeatable) qle->Finish();
+	if(!qst->is_repeatable) 
+	{
+		for (uint32 x=0;x<4;x++)
+		{
+			if (qst->required_spell[x]!=0)
+			{
+				if (plr->HasQuestSpell(qst->required_spell[x]))
+					plr->RemoveQuestSpell(qst->required_spell[x]);
+			}
+		}
+		qle->ClearAffectedUnits();
+		qle->Finish();
+	}
 	
 	if(qst_giver->GetTypeId() == TYPEID_UNIT)
 	{

@@ -134,6 +134,7 @@ struct Quest
 
 	uint32 required_mob[4];
 	uint32 required_mobcount[4];
+	uint32 required_spell[4];
 
 	uint32 reward_choiceitem[6];
 	uint32 reward_choiceitemcount[6];
@@ -204,6 +205,11 @@ public:
 	void SetTrigger(uint32 i);
 	void SetMobCount(uint32 i, uint32 count);
 
+	bool IsUnitAffected(Unit* target);
+	inline bool IsCastQuest() { return iscastquest;}
+	void AddAffectedUnit(Unit* target);
+	void ClearAffectedUnits();
+
 	void SetSlot(int32 i);
 	void Finish();
 
@@ -233,6 +239,9 @@ private:
 	
 	uint32 m_mobcount[4];
 	uint32 m_explored_areas[4];
+
+	std::set<uint64> m_affected_units;
+	bool iscastquest;
 
 	uint32 m_time_left;
 	int32 m_slot;
