@@ -146,8 +146,15 @@ void Channel::Part(Player * plr)
 		SetOwner(NULL, NULL);
 	}
 
-	data << uint8(CHANNEL_NOTIFY_FLAG_YOULEFT) << m_name << m_id << uint32(0) << uint8(0);
-	plr->GetSession()->SendPacket(&data);
+	if(plr->GetSession() && plr->GetSession()->IsLoggingOut())
+	{
+
+	}
+	else
+	{
+		data << uint8(CHANNEL_NOTIFY_FLAG_YOULEFT) << m_name << m_id << uint32(0) << uint8(0);
+		plr->GetSession()->SendPacket(&data);
+	}
 
 	if(m_announce)
 	{

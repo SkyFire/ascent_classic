@@ -331,6 +331,7 @@ public:
 
 	void CharacterEnumProc(QueryResult * result);
 	void LoadAccountDataProc(QueryResult * result);
+	inline bool IsLoggingOut() { return _loggingOut; }
 
 protected:
 

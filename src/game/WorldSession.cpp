@@ -234,6 +234,9 @@ void WorldSession::LogoutPlayer(bool Save)
 			}
 		}
 
+		// part channels
+		_player->CleanupChannels();
+
 		if(_player->m_CurrentTransporter)
 			_player->m_CurrentTransporter->RemovePlayer(_player);
 		
