@@ -1598,6 +1598,14 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
 
+	//shaman - Enhancing Totems r1
+	sp = dbcSpell.LookupEntry(16259); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=65536 | 131072; //Strength of Earth and Grace of Air Totem effects
+	sp = dbcSpell.LookupEntry(16295); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=65536 | 131072;
+
 	//shaman - Ancestral healing
 	sp = dbcSpell.LookupEntry(16176); 
 	if(sp)

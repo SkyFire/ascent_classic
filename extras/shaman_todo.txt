@@ -1,22 +1,14 @@
-As tested on fully updated and latest rev.
-
 Elemental Tree
 Elemental Fury - no effect - supposed to give a +200% crit damage on nature spells and fire totems
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent
 
 Restoration Tree
-Tidal Mastery - no effect - supposed to give a max of +5% crit on healing and lighting spells.
 Focused Mind - no effect - supposed to give a -15% reduction time on stuns and silent durations
-nature's guardian - no effect - supposed to give you a 50% chance on a 10% heal off your total health when dropping below 30% health
-Nature's blessing - no effect - supposed to increase healing and spell dmg equally to 30% of your total intellect
 Earth shield - gives only two charges and no 30% chance on ignore spell interruption - supposed to give 10 charges and 30% chance of ignoring spell interruption.
 
 Talents
 
-Elemental:
-
 Enhancement:
-Enhancing Totems - Not working.
 Improved Weapon Totems - Not tested.
 Elemental Weapons - Not working.
 Stormstrike - removed aura effect on target since our spell system does not support it yet

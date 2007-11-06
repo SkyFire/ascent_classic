@@ -1258,7 +1258,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 	}
 	else
 	{
-		//yep, the usual special case. This one is shaman talen : Nature's guardian
+		//yep, the usual special case. This one is shaman talent : Nature's guardian
 		//health is below 30%, we have a mother spell to get value from
 		switch (m_spellInfo->Id)
 		{

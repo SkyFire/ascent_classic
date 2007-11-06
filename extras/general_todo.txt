@@ -107,6 +107,7 @@ Zack - test my shit :
 - shaman - Tidal focus 16217. missing a complete list of shaman heal spells
 - shaman - Totemic focus 16225
 - shaman - Ancestral healin 16240
+- shaman - Enhancing Totems 16295
 
 ==========================================================================
 Capt - test my shit :
