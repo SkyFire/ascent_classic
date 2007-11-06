@@ -403,8 +403,38 @@ int luaUnit_GetO(lua_State * L, Unit * ptr);
 int luaUnit_IsPlayer(lua_State * L, Unit * ptr);
 int luaUnit_IsCreature(lua_State * L, Unit * ptr);
 int luaUnit_RegisterEvent(lua_State * L, Unit * ptr);
+int luaUnit_SendBroadcastMessage(lua_State * L, Unit * ptr);
+int luaUnit_SendAreaTriggerMessage(lua_State * L, Unit * ptr);
+int luaUnit_KnockBack(lua_State * L, Unit * ptr);
+int luaUnit_MarkQuestObjectiveAsComplete(lua_State * L, Unit * ptr);
+int luaUnit_LearnSpell(lua_State * L, Unit* ptr);
+int luaUnit_UnlearnSpell(lua_State * L, Unit * ptr);
+int luaUnit_HasFinishedQuest(lua_State * L, Unit * ptr);
+int luaUnit_GetItemCount(lua_State * L, Unit * ptr);
+int luaUnit_GetHealthPct(lua_State * L, Unit * ptr);
+int luaUnit_Despawn(lua_State * L, Unit * ptr);
+int luaUnit_GetUnitBySqlId(lua_State * L, Unit * ptr);
+int luaUnit_PlaySoundToSet(lua_State * L, Unit * ptr);
+int luaUnit_RemoveAura(lua_State * L, Unit * ptr);
+int luaUnit_StopMovement(lua_State * L, Unit * ptr);
+int luaUnit_Emote(lua_State * L, Unit * ptr);
+int luaUnit_GetClosestPlayer(lua_State * L, Unit * ptr);
+int luaUnit_AddItem(lua_State * L, Unit * ptr);
+int luaUnit_RemoveItem(lua_State * L, Unit * ptr);
+int luaUnit_CreateCustomWaypointMap(lua_State * L, Unit * ptr);
+int luaUnit_CreateWaypoint(lua_State * L, Unit * ptr);
+int luaUnit_DestroyCustomWaypointMap(lua_State * L, Unit * ptr);
+int luaUnit_MoveToWaypoint(lua_State * L, Unit * ptr);
+int luaUnit_SetCombatCapable(lua_State * L, Unit * ptr);
+int luaUnit_SetNPCFlags(lua_State * L, Unit * ptr);
+int luaUnit_SetModel(lua_State * L, Unit * ptr);
+int luaUnit_SetScale(lua_State * L, Unit * ptr);
+int luaUnit_SetFaction(lua_State * L, Unit * ptr);
 
 int luaGameObject_GetName(lua_State * L, GameObject * ptr);
+int luaGameObject_SpawnCreature(lua_State * L, GameObject * ptr);
+int luaGameObject_PlayCustomAnim(lua_State * L, GameObject * ptr);
+int luaGameObject_PlaySoundToSet(lua_State * L, GameObject * ptr);
 
 /************************************************************************/
 /* SCRIPT FUNCTION TABLES                                               */
@@ -427,6 +457,33 @@ Unit::RegType Unit::methods[] = {
 	{ "IsPlayer", &luaUnit_IsPlayer },
 	{ "IsCreature", &luaUnit_IsCreature },
 	{ "RegisterEvent", &luaUnit_RegisterEvent },
+	{ "SendBroadcastMessage", &luaUnit_SendBroadcastMessage },
+	{ "SendAreaTriggerMessage", &luaUnit_SendAreaTriggerMessage },
+	{ "KnockBack", &luaUnit_KnockBack },
+	{ "MarkQuestObjectiveAsComplete", &luaUnit_MarkQuestObjectiveAsComplete },
+	{ "LearnSpell", &luaUnit_LearnSpell },
+	{ "UnlearnSpell", &luaUnit_UnlearnSpell },
+	{ "HasFinishedQuest", &luaUnit_HasFinishedQuest },
+	{ "GetItemCount", &luaUnit_GetItemCount },
+	{ "GetHealthPct", &luaUnit_GetHealthPct },
+	{ "Despawn", &luaUnit_Despawn },
+	{ "GetUnitBySqlId", &luaUnit_GetUnitBySqlId },
+	{ "PlaySoundToSet", &luaUnit_PlaySoundToSet },
+	{ "RemoveAura", &luaUnit_RemoveAura },
+	{ "StopMovement", &luaUnit_StopMovement },
+	{ "Emote", &luaUnit_Emote },
+	{ "GetClosestPlayer", &luaUnit_GetClosestPlayer },
+	{ "AddItem", &luaUnit_AddItem },
+	{ "RemoveItem", &luaUnit_RemoveItem },
+	{ "CreateCustomWaypointMap", &luaUnit_CreateCustomWaypointMap },
+	{ "CreateWaypoint", &luaUnit_CreateWaypoint },
+	{ "MoveToWaypoint", &luaUnit_MoveToWaypoint },
+	{ "DestroyCustomWaypointMap", &luaUnit_DestroyCustomWaypointMap },
+	{ "SetCombatCapable", &luaUnit_SetCombatCapable },
+	{ "SetNPCFlags", &luaUnit_SetNPCFlags },
+	{ "SetModel", &luaUnit_SetModel },
+	{ "SetScale", &luaUnit_SetScale },
+	{ "SetFaction", &luaUnit_SetFaction },
 	{ NULL, NULL },
 };
 
@@ -760,6 +817,290 @@ int luaUnit_RegisterEvent(lua_State * L, Unit * ptr)
 	return 0;
 }
 
+int luaUnit_SetFaction(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int faction = luaL_checkint(L,1);
+	if(!faction)
+		return 0;
+
+	ptr->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,faction);
+	ptr->_setFaction();
+	return 0;
+}
+
+int luaUnit_SetScale(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	double faction = luaL_checknumber(L,1);
+	if(faction==0.0)
+		return 0;
+
+	ptr->SetFloatValue(OBJECT_FIELD_SCALE_X,(float)faction);
+	return 0;
+}
+
+int luaUnit_SetModel(lua_State * L, Unit * ptr)
+{
+	if(!ptr||!ptr->IsUnit())
+		return 0;
+
+	int modelid = luaL_checkint(L,1);
+	if(modelid==0)
+		return 0;
+
+	ptr->SetUInt32Value(UNIT_FIELD_DISPLAYID,modelid);
+	return 0;
+}
+
+int luaUnit_SetNPCFlags(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int flags = luaL_checkint(L,1);
+	if(!flags)
+		return 0;
+
+	ptr->SetUInt32Value(UNIT_NPC_FLAGS,flags);
+	return 0;
+}
+
+int luaUnit_SetCombatCapable(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int enabled = luaL_checkint(L,1);
+	ptr->GetAIInterface()->disable_melee = (enabled > 0) ? true : false;
+	return 0;
+}
+
+int luaUnit_DestroyCustomWaypointMap(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	((Creature*)ptr)->DestroyCustomWaypointMap();
+	return 0;
+}
+
+int luaUnit_CreateCustomWaypointMap(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	Creature * pCreature = (Creature*)ptr;
+	if(pCreature->m_custom_waypoint_map)
+	{
+		for(WayPointMap::iterator itr = pCreature->m_custom_waypoint_map->begin(); itr != pCreature->m_custom_waypoint_map->end(); ++itr)
+			delete (*itr);
+		delete pCreature->m_custom_waypoint_map;
+	}
+
+	pCreature->m_custom_waypoint_map = new WayPointMap;
+	pCreature->GetAIInterface()->SetWaypointMap(pCreature->m_custom_waypoint_map);
+	return 0;
+}
+
+int luaUnit_CreateWaypoint(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	float x = (float)luaL_checknumber(L,1);
+	float y = (float)luaL_checknumber(L,2);
+	float z = (float)luaL_checknumber(L,3);
+	float o = (float)luaL_checknumber(L,4);
+	int waittime = luaL_checkint(L,5);
+	int flags = luaL_checkint(L,6);
+	int modelid = luaL_checkint(L,7);
+
+	Creature * pCreature = ((Creature*)ptr);
+	if(!pCreature->m_custom_waypoint_map)
+	{
+		pCreature->m_custom_waypoint_map = new WayPointMap;
+		pCreature->GetAIInterface()->SetWaypointMap(pCreature->m_custom_waypoint_map);
+	}
+
+	if(!modelid)
+		modelid = pCreature->GetUInt32Value(UNIT_FIELD_DISPLAYID);
+
+	WayPoint * wp = new WayPoint;
+	wp->id = (uint32)pCreature->m_custom_waypoint_map->size() + 1;
+	wp->x = x;
+	wp->y = y;
+	wp->z = z;
+	wp->o = o;
+	wp->flags = flags;
+	wp->backwardskinid = modelid;
+	wp->forwardskinid = modelid;
+	wp->backwardemoteid = wp->forwardemoteid = 0;
+	wp->backwardemoteoneshot = wp->forwardemoteoneshot = false;
+	wp->waittime = waittime;
+	pCreature->m_custom_waypoint_map->push_back(wp);
+
+	return 0;
+}
+
+int luaUnit_MoveToWaypoint(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int id = luaL_checkint(L,1);
+	if(!id)
+		return 0;
+
+	ptr->MoveToWaypoint(id);
+	return 0;
+}
+
+int luaUnit_RemoveItem(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_PLAYER);
+	int id = luaL_checkint(L,1);
+	int count = luaL_checkint(L,2);
+
+	((Player*)ptr)->GetItemInterface()->RemoveItemAmt(id,count);
+	return 0;
+}
+
+int luaUnit_AddItem(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_PLAYER);
+	int id = luaL_checkint(L,1);
+	int count = luaL_checkint(L,2);
+
+	Player * plr = (Player*)ptr;
+	ItemPrototype * proto = ItemPrototypeStorage.LookupEntry(id);
+	if(proto==NULL)
+		return 0;
+
+	Item * add = plr->GetItemInterface()->FindItemLessMax(id,count,false);
+	if(add==NULL)
+	{
+		add=objmgr.CreateItem(id,plr);
+		add->SetUInt32Value(ITEM_FIELD_STACK_COUNT,count);
+		if(plr->GetItemInterface()->AddItemToFreeSlot(add))
+			plr->GetSession()->SendItemPushResult(add,false,true,false,true,plr->GetItemInterface()->LastSearchItemBagSlot(),plr->GetItemInterface()->LastSearchItemSlot(),count);
+		else
+			delete add;
+	}
+	else
+	{
+		add->ModUInt32Value(ITEM_FIELD_STACK_COUNT,count);
+		plr->GetSession()->SendItemPushResult(add,false,true,false,false,plr->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()),0xFFFFFFFF,count);
+	}
+
+	return 0;
+}
+
+int luaUnit_GetClosestPlayer(lua_State * L, Unit * ptr)
+{
+	if(!ptr)
+		return 0;
+
+	float dist, d2;
+	Player * ret=NULL;
+
+	for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+	{
+		d2=(*itr)->GetDistanceSq(ptr);
+		if(!ret||d2<dist)
+		{
+			dist=d2;
+			ret=*itr;
+		}
+	}
+
+	if(ret==NULL)
+		lua_pushnil(L);
+	else
+		Lunar<Unit>::push(L,((Unit*)ret),false);
+
+	return 1;
+}
+
+int luaUnit_Emote(lua_State * L, Unit * ptr)
+{
+	if(!ptr)
+		return 0;
+
+	int emote = luaL_checkint(L,1);
+	ptr->Emote((EmoteType)emote);
+	return 0;
+}
+
+int luaUnit_StopMovement(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int tim = luaL_checkint(L,1);
+	ptr->GetAIInterface()->StopMovement(tim);
+	return 0;
+}
+
+int luaUnit_RemoveAura(lua_State * L, Unit * ptr)
+{
+	if(!ptr)return 0;
+	int auraid = luaL_checkint(L,1);
+	ptr->RemoveAura(auraid);
+	return 0;
+}
+
+int luaUnit_PlaySoundToSet(lua_State * L, Unit * ptr)
+{
+	if(!ptr) return 0;
+	int soundid = luaL_checkint(L,1);
+	ptr->PlaySoundToSet(soundid);
+	return 0;
+}
+
+int luaUnit_GetUnitBySqlId(lua_State * L, Unit * ptr)
+{
+	if(!ptr) return 0;
+	int sqlid = luaL_checkint(L,1);
+	return 0;
+}
+
+int luaUnit_Despawn(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
+int luaUnit_GetHealthPct(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
+int luaUnit_GetItemCount(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
+int luaUnit_HasFinishedQuest(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
+int luaUnit_UnlearnSpell(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
+int luaUnit_LearnSpell(lua_State * L, Unit* ptr)
+{
+	return 0;
+}
+
+int luaUnit_MarkQuestObjectiveAsComplete(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
+int luaUnit_KnockBack(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
+int luaUnit_SendAreaTriggerMessage(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
+int luaUnit_SendBroadcastMessage(lua_State * L, Unit * ptr)
+{
+	return 0;
+}
+
 /************************************************************************/
 /* Manager Stuff                                                        */
 /************************************************************************/
@@ -767,7 +1108,7 @@ int luaUnit_RegisterEvent(lua_State * L, Unit * ptr)
 void LuaEngineMgr::Startup()
 {
 	// create 3
-	uint32 c = 3;
+	uint32 c = 50;
 	Log.Notice("LuaEngineMgr", "Spawning %u Lua Engines...", c);
 	for(uint32 i = 0; i < c; ++i)
 	{
@@ -799,7 +1140,7 @@ LuaEngine* LuaEngineMgr::GetLuaEngine()
 		}
 	}
 
-	if(lowest_c > 3||lowest==NULL)
+	if(lowest_c > 20||lowest==NULL)
 	{
 		// perferably we don't want any more than 3 instances sharing the same lua engine
 		lowest = new LuaEngine();

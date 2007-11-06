@@ -283,6 +283,12 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	if(_player->GetQuestLogForEntry(qst->id))
 		return;
 
+	if(qst_giver->GetTypeId()==TYPEID_UNIT&&((Creature*)qst_giver)->m_escorter != NULL)
+	{
+		SystemMessage("You cannot accept this quest at this time.");
+		return;
+	}
+
 	// Check the player hasn't already taken this quest, or
 	// it isn't available.
 	uint32 status = sQuestMgr.CalcQuestStatus(qst_giver, _player,qst,3, bSkipLevelCheck);
