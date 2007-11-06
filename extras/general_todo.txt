@@ -109,6 +109,7 @@ Zack - test my shit :
 - shaman - Ancestral healin 16240
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
 - shaman - Restorative Totems 16208
+- shaman - Healing Way 29206
 
 ==========================================================================
 Capt - test my shit :

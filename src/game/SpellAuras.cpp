@@ -969,7 +969,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 				for(int i=0;i<3;i++)
 				{
 //					dmg +=parentsp->EffectBasePoints[i]*m_spellProto->EffectBasePoints[0];
-					dmg +=spell->CalculateEffect(i)*parentsp->EffectBasePoints[0]/100;
+					dmg +=spell->CalculateEffect(i,m_target->IsUnit()?(Unit*)m_target:NULL)*parentsp->EffectBasePoints[0]/100;
 				}
 				delete spell;
 			}
@@ -1203,6 +1203,33 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
+		//shaman - Healing Way - effect
+	case 29203:
+		{
+			if(m_target && m_target->IsUnit())
+			{
+				if(apply)
+				{
+					Unit *u_target=(Unit *)m_target;
+					std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_pct.find(0x08F1A7EF);
+					if(itr!=u_target->target_spell_effect_mod_pct.end())
+						itr->second += mod->m_amount;
+					else u_target->target_spell_effect_mod_pct.insert(make_pair(0x08F1A7EF, mod->m_amount)); //healing wave namehash
+				}
+				else
+				{
+					Unit *u_target=(Unit *)m_target;
+					std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_pct.find(0x08F1A7EF);
+					//it would be very wierd to not hit this "if"
+					if(itr!=u_target->target_spell_effect_mod_pct.end())
+					{
+						if(itr->second==mod->m_amount)
+							u_target->target_spell_effect_mod_pct.erase(0x08F1A7EF);//healing wave namehash
+						else itr->second -= mod->m_amount;
+					}
+				}
+			}
+		}
 	//druid - mangle
 	case 33876:
 	case 33982:

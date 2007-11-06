@@ -1488,7 +1488,7 @@ public:
     // Removes Reagents if cast is successful
     void RemoveItems();
     // Calculates the i'th effect value
-    int32 CalculateEffect(uint32);
+    int32 CalculateEffect(uint32, Unit *target);
     // Handles Teleport function
     void HandleTeleport(uint32 id, Unit* Target);
     // Determines how much skill caster going to gain

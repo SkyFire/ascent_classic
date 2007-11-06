@@ -857,6 +857,15 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									continue;
 							}
 							break;
+						//shaman - Healing Way
+						case 29203:
+							{
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
+								//only trigger effect for specified spells
+								if( CastingSpell->NameHash!=0x08F1A7EF) //healing wave
+									continue;
+							}break;
 						//shaman - windfurry weapon
 						case 8232:
 						case 8235:

@@ -2209,7 +2209,7 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 		}
 	}	
 
-	damage = CalculateEffect(i);  
+	damage = CalculateEffect(i,unitTarget);  
 
 	sLog.outDebug( "WORLD: Spell effect id = %u, damage = %d", m_spellInfo->Effect[i], damage); 
 	
@@ -3089,7 +3089,7 @@ void Spell::RemoveItems()
 	}
 }
 
-int32 Spell::CalculateEffect(uint32 i)
+int32 Spell::CalculateEffect(uint32 i,Unit *target)
 {
 	// TODO: Add ARMOR CHECKS; Add npc that have ranged weapons use them;
 
@@ -3257,7 +3257,20 @@ exit:
 	
 //printf("!!!!spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
 	
+		//now get mods from unit target. These are rare to find talents
+		if(target)
+		{
+			std::map<uint32,signed int>::iterator itr;
+			itr=target->target_spell_effect_mod_flat.find(m_spellInfo->Id);
+			if(itr!=target->target_spell_effect_mod_flat.end())
+				spell_flat_modifers += itr->second;
+			itr=target->target_spell_effect_mod_pct.find(m_spellInfo->Id);
+			if(itr!=target->target_spell_effect_mod_pct.end())
+				spell_pct_modifers += itr->second;
+		}
+
 		value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
+
 	}
 
 	return value;

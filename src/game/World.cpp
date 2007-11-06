@@ -1623,6 +1623,25 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
 	
+	//shaman - Healing Way
+	sp = dbcSpell.LookupEntry(29202); 
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;
+	}
+	sp = dbcSpell.LookupEntry(29205); 
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;
+	}
+	sp = dbcSpell.LookupEntry(29206); 
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;
+	}
 
 	//shaman - Ancestral healing
 	sp = dbcSpell.LookupEntry(16176); 
