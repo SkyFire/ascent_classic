@@ -2712,8 +2712,9 @@ void Spell::SpellEffectTameCreature(uint32 i)
 	Pet *pPet = objmgr.CreatePet();
 	pPet->SetInstanceID(p_caster->GetInstanceID());
 	pPet->CreateAsSummon(tame->GetEntry(), tame->GetCreatureName(), tame, static_cast<Unit*>(p_caster), NULL, 2, 0);
-	tame->SafeDelete();
+	//tame->SafeDelete();
 	//delete tame;
+	tame->Despawn(0,tame->proto->RespawnTime);
 }
 
 void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
