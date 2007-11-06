@@ -65,7 +65,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -176,7 +176,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -294,7 +294,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -406,7 +406,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -514,7 +514,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -653,7 +653,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -759,7 +759,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -864,7 +864,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -969,7 +969,7 @@ public:
 
     void AIUpdate()
     {
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -1123,7 +1123,7 @@ public:
 		}
 
 
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 

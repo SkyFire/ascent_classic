@@ -327,6 +327,7 @@ bool Master::Run(int argc, char ** argv)
 
 	LoadingTime = getMSTime() - LoadingTime;
 	sLog.outString ("\nServer is ready for connections. Startup time: %ums\n", LoadingTime );
+	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
  
 	/* write pid file */
 	FILE * fPid = fopen("ascent.pid", "w");
@@ -503,6 +504,7 @@ bool Master::Run(int argc, char ** argv)
 	delete VoiceChatHandler::getSingletonPtr();
 
 	sLog.outString("Deleting Script Engine...");
+	LuaEngineMgr::getSingleton().Unload();
 	//delete ScriptSystem;
 
 	delete GMCommand_Log;

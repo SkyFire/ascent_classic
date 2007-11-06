@@ -5,6 +5,7 @@
 
 #define TOTALBYTES    100*1024
 #define BYTEINCREMENT 10*1024
+#pragma warning(disable:4244)
 
 template <class T>
 class CPerfCounters

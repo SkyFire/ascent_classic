@@ -1305,6 +1305,16 @@ void LuaEngineMgr::ReloadScripts()
 	m_lock.Release();
 }
 
+void LuaEngineMgr::Unload()
+{
+	m_lock.Acquire();
+	for(LuaEngineMap::iterator itr = m_engines.begin(); itr != m_engines.end(); ++itr)
+	{
+		delete itr->first;
+	}
+	m_lock.Release();
+}
+
 void LuaEngine::Restart()
 {
 	m_Lock.Acquire();

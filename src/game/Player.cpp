@@ -1967,7 +1967,8 @@ void Player::DestroyForPlayer( Player *target ) const
 
 void Player::SaveToDB(bool bNewCharacter /* =false */)
 {
-	uint32 start_time = getMSTime();
+	if(m_uint32Values[PLAYER_CHARACTER_POINTS2]>2)
+		m_uint32Values[PLAYER_CHARACTER_POINTS2]=2;
  
 	//Calc played times
 	uint32 playedt = (uint32)UNIXTIME - m_playedtime[2];
@@ -2233,7 +2234,6 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 		_SavePet();
 		_SavePetSpells();
 	}
-	sLog.outDetail("[Player] Saved player %s ["I64FMT"], took %ums", GetName(), GetGUID(), getMSTime() - start_time);
 	m_nextSave = getMSTime() + sWorld.getIntRate(INTRATE_SAVE);
 }
 

@@ -107,7 +107,7 @@ public:
 			m_spellcheck[0] = false;
 			_unit->RemoveAura(TRANSFORM_BAT);
 		}
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 
@@ -250,7 +250,7 @@ public:
             m_spellcheck[0] = false;
 		}
 
-		float val = sRand.rand(100.0f);
+		float val = (float)sRand.rand(100.0f);
         SpellCast(val);
     }
 

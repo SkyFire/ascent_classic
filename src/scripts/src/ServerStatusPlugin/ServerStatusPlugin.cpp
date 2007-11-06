@@ -142,14 +142,14 @@ float GetCPUUsageWin32()
 
     double a = (double)lnValueDelta / DeltaPerfTime100nSec;
     a /= double(number_of_cpus);
-    return (a * 100);
+    return float(a * 100.0);
 }
 
 float GetRAMUsageWin32()
 {
     PROCESS_MEMORY_COUNTERS pmc;
     GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
-    float ram = pmc.PagefileUsage;
+    float ram = (float)pmc.PagefileUsage;
     ram /= 1024.0f;
     ram /= 1024.0f;
     return ram;
@@ -273,7 +273,7 @@ void StatDumper::DumpStats()
     }
     fprintf(f, "  </status>\n");
     Player * plr;
-    uint32 t = time(NULL);
+    uint32 t = (uint32)time(NULL);
     char otime[100];
     {
         fprintf(f, "  <instances>\n");
