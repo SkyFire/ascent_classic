@@ -5365,12 +5365,32 @@ void Player::SendInitialLogonPackets()
 	time_t minutes = sWorld.GetGameTime( ) / 60;
 	time_t hours = minutes / 60; minutes %= 60;
     time_t gameTime = 0;
-    
+
     // TODO: Add stuff to handle these variable's
-    uint32 DayOfTheWeek     = -1;    //(0b111 = (any) day, 0 = Monday ect)
-    uint32 DayOfTheMonth    = 20-1;   // Day - 1 (0 is actual 1) its now the 20e here. TODO: replace this one with the proper date
-    uint32 CurrentMonth     = 9-1;    // Month - 1 (0 is actual 1) same as above. TODO: replace it with the proper code
-    uint32 CurrentYear      = 7;    // 2000 + this number results in a correct value for this crap. TODO: replace this with the propper code
+
+	uint32 DayOfTheWeek = -1;		//	(0b111 = (any) day, 0 = Monday ect)
+    uint32 DayOfTheMonth = 20-1;	//	Day - 1 (0 is actual 1) its now the 20e here. TODO: replace this one with the proper date
+    uint32 CurrentMonth = 9-1;		//	Month - 1 (0 is actual 1) same as above. TODO: replace it with the proper code
+    uint32 CurrentYear = 7;			//	2000 + this number results in a correct value for this crap. TODO: replace this with the propper code
+
+#ifdef WIN32
+	SYSTEMTIME st;
+    GetSystemTime(&st);
+	DayOfTheWeek     = st.wDayOfWeek;
+    DayOfTheMonth    = st.wDay;
+    CurrentMonth     = st.wMonth;
+    CurrentYear      = st.wYear;
+#else
+	// Unix variant...
+	// Burlex or Aim related to this... I have the idea this is slow...
+	time_t tim = time(NULL);
+    struct tm * now=localtime(&tim);
+
+	DayOfTheWeek     = now->tm_wday;
+    DayOfTheMonth    = now->tm_mday;
+    CurrentMonth     = now->tm_mon;
+    CurrentYear      = now->tm_year + 100; // year + 1900
+#endif
 
     #define MINUTE_BITMASK      0x0000003F
     #define HOUR_BITMASK        0x000007C0
