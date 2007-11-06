@@ -236,6 +236,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 		SpellDmgDoneBySpr[x] = 0;
 		SpellHealDoneBySpr[x] = 0;
 		SpellDelayResist[x] = 0;
+		m_casted_amount[x] = 0;
 	} 
 		
 	for(uint32 x = 0; x < 5; x++)

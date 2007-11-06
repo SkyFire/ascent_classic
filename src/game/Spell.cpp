@@ -3532,6 +3532,9 @@ void Spell::Heal(int32 amount)
 	else
 		unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH, amount);
 
+	if (p_caster)
+		p_caster->m_casted_amount[m_spellInfo->School]=(uint32)(((curHealth + amount) >= maxHealth)? maxHealth-curHealth : amount);
+
 	int doneTarget = 0;
 
 	// add threat

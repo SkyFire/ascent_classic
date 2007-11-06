@@ -2209,6 +2209,9 @@ else
 //==========================================================================================
 //==============================Damage Dealing==============================================
 //==========================================================================================
+
+	if (this->IsPlayer() && ability)
+		static_cast<Player*>(this)->m_casted_amount[ability->School]=(uint32)(realdamage+abs);
 	if(realdamage)
 	{
 		DealDamage(pVictim, realdamage, 0, targetEvent, 0);

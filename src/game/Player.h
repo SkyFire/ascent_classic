@@ -1328,6 +1328,7 @@ public:
 	uint32 m_ModInterrMRegenPCT;
 	int32 m_ModInterrMRegen;
 	float m_RegenManaOnSpellResist;
+	uint32 m_casted_amount[7]; //Last casted spells amounts. Need for some spells. Like Ignite etc. DOesn't count HoTs and DoTs. Only directs
 	
 	uint32 FlatStatModPos[5];
 	uint32 FlatStatModNeg[5];

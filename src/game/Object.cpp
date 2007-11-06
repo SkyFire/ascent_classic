@@ -2247,7 +2247,9 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		static_cast<Unit*>(this)->HandleProc(aproc,pVictim,spellInfo, float2int32(res));
 		static_cast<Unit*>(this)->m_procCounter = 0;
 	}
-	
+	if (this->IsPlayer())
+			static_cast<Player*>(this)->m_casted_amount[school]=(uint32)(res+abs_dmg);
+
 	DealDamage(pVictim, float2int32(res),  2, 0, spellID);
 
 	if (pVictim->GetCurrentSpell())

@@ -962,16 +962,25 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 				SpellEntry * parentsp = dbcSpell.LookupEntry(pSpellId);
 				if(!parentsp)
 					return;
-				Spell *spell = new Spell(GetUnitCaster(), parentsp ,false,NULL);
-				SpellCastTargets targets(m_target->GetGUID());
-				//this is so not good, maybe parent spell has more then dmg effect and we use it to calc our new dmg :(
-				dmg = 0;
-				for(int i=0;i<3;i++)
+				if (c && c->IsPlayer())
 				{
-//					dmg +=parentsp->EffectBasePoints[i]*m_spellProto->EffectBasePoints[0];
-					dmg +=spell->CalculateEffect(i,m_target->IsUnit()?(Unit*)m_target:NULL)*parentsp->EffectBasePoints[0]/100;
+					dmg = float2int32(static_cast<Player*>(c)->m_casted_amount[SCHOOL_FIRE]*parentsp->EffectBasePoints[0]/100.0f);
 				}
-				delete spell;
+				else
+				{
+					if (!dmg)
+						return;
+					Spell *spell = new Spell(GetUnitCaster(), parentsp ,false,NULL);
+					SpellCastTargets targets(m_target->GetGUID());
+					//this is so not good, maybe parent spell has more then dmg effect and we use it to calc our new dmg :(
+					dmg = 0;
+					for(int i=0;i<3;i++)
+					{
+					  //dmg +=parentsp->EffectBasePoints[i]*m_spellProto->EffectBasePoints[0];
+						dmg +=spell->CalculateEffect(i,m_target->IsUnit()?(Unit*)m_target:NULL)*parentsp->EffectBasePoints[0]/100;
+					}
+					delete spell;
+				}
 			}
 		};
 		//this is warrior : Deep Wounds
@@ -1079,6 +1088,9 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				bonus = float2int32(fbonus);
 			}
 			else bonus = 0;
+
+			if (GetSpellProto() && GetSpellProto()->NameHash == 0xE931A943)  //static damage for Ignite. Need to be reowrked when "static DoTs" will be implemented
+				bonus=0;
 			res += bonus;
 			
 			if(m_spellProto->SpellGroupType)
