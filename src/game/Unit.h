@@ -928,6 +928,7 @@ public:
 	int32 * SM_PCooldownTime;
 	int32 * SM_FCooldownTime;
 	int32 * SM_FChanceOfSuccess;
+	void InheritSMMods(Unit *inherit_from);
 
 	//Events
 	void Emote (EmoteType emote);

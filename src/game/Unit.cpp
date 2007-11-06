@@ -4744,6 +4744,195 @@ void Unit::Energize(Unit* target,uint32 SpellId, uint32 amount,uint32 type)
 	}
 }
 
+void Unit::InheritSMMods(Unit *inherit_from)
+{
+	if(inherit_from->SM_CriticalChance)
+	{
+		if(SM_CriticalChance==0)
+			SM_CriticalChance = new int32[SPELL_GROUPS];
+		memcpy(SM_CriticalChance,inherit_from->SM_CriticalChance,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FDur)
+	{
+		if(SM_FDur==0)
+			SM_FDur = new int32[SPELL_GROUPS];
+		memcpy(SM_FDur,inherit_from->SM_FDur,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PDur)
+	{
+		if(SM_PDur==0)
+			SM_PDur = new int32[SPELL_GROUPS];
+		memcpy(SM_PDur,inherit_from->SM_PDur,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PRadius)
+	{
+		if(SM_PRadius==0)
+			SM_PRadius = new int32[SPELL_GROUPS];
+		memcpy(SM_PRadius,inherit_from->SM_PRadius,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FRadius)
+	{
+		if(SM_FRadius==0)
+			SM_FRadius = new int32[SPELL_GROUPS];
+		memcpy(SM_FRadius,inherit_from->SM_FRadius,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FRange)
+	{
+		if(SM_FRange==0)
+			SM_FRange = new int32[SPELL_GROUPS];
+		memcpy(SM_FRange,inherit_from->SM_FRange,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PCastTime)
+	{
+		if(SM_PCastTime==0)
+			SM_PCastTime = new int32[SPELL_GROUPS];
+		memcpy(SM_PCastTime,inherit_from->SM_PCastTime,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FCastTime)
+	{
+		if(SM_FCastTime==0)
+			SM_FCastTime = new int32[SPELL_GROUPS];
+		memcpy(SM_FCastTime,inherit_from->SM_FCastTime,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PCriticalDamage)
+	{
+		if(SM_PCriticalDamage==0)
+			SM_PCriticalDamage = new int32[SPELL_GROUPS];
+		memcpy(SM_PCriticalDamage,inherit_from->SM_PCriticalDamage,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FDOT)
+	{
+		if(SM_FDOT==0)
+			SM_FDOT = new int32[SPELL_GROUPS];
+		memcpy(SM_FDOT,inherit_from->SM_FDOT,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PDOT)
+	{
+		if(SM_PDOT==0)
+			SM_PDOT = new int32[SPELL_GROUPS];
+		memcpy(SM_PDOT,inherit_from->SM_PDOT,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FEffectBonus)
+	{
+		if(SM_FEffectBonus==0)
+			SM_FEffectBonus = new int32[SPELL_GROUPS];
+		memcpy(SM_FEffectBonus,inherit_from->SM_FEffectBonus,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PEffectBonus)
+	{
+		if(SM_PEffectBonus==0)
+			SM_PEffectBonus = new int32[SPELL_GROUPS];
+		memcpy(SM_PEffectBonus,inherit_from->SM_PEffectBonus,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FDamageBonus)
+	{
+		if(SM_FDamageBonus==0)
+			SM_FDamageBonus = new int32[SPELL_GROUPS];
+		memcpy(SM_FDamageBonus,inherit_from->SM_FDamageBonus,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PDamageBonus)
+	{
+		if(SM_PDamageBonus==0)
+			SM_PDamageBonus = new int32[SPELL_GROUPS];
+		memcpy(SM_PDamageBonus,inherit_from->SM_PDamageBonus,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PSPELL_VALUE)
+	{
+		if(SM_PSPELL_VALUE==0)
+			SM_PSPELL_VALUE = new int32[SPELL_GROUPS];
+		memcpy(SM_PSPELL_VALUE,inherit_from->SM_PSPELL_VALUE,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FSPELL_VALUE)
+	{
+		if(SM_FSPELL_VALUE==0)
+			SM_FSPELL_VALUE = new int32[SPELL_GROUPS];
+		memcpy(SM_FSPELL_VALUE,inherit_from->SM_FSPELL_VALUE,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FResist)
+	{
+		if(SM_FResist==0)
+			SM_FResist = new int32[SPELL_GROUPS];
+		memcpy(SM_FResist,inherit_from->SM_FResist,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PRange)
+	{
+		if(SM_PRange==0)
+			SM_PRange = new int32[SPELL_GROUPS];
+		memcpy(SM_PRange,inherit_from->SM_PRange,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PRadius)
+	{
+		if(SM_PRadius==0)
+			SM_PRadius = new int32[SPELL_GROUPS];
+		memcpy(SM_PRadius,inherit_from->SM_PRadius,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PAPBonus)
+	{
+		if(SM_PAPBonus==0)
+			SM_PAPBonus = new int32[SPELL_GROUPS];
+		memcpy(SM_PAPBonus,inherit_from->SM_PAPBonus,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PCost)
+	{
+		if(SM_PCost==0)
+			SM_PCost = new int32[SPELL_GROUPS];
+		memcpy(SM_PCost,inherit_from->SM_PCost,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FCost)
+	{
+		if(SM_FCost==0)
+			SM_FCost = new int32[SPELL_GROUPS];
+		memcpy(SM_FCost,inherit_from->SM_FCost,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FAdditionalTargets)
+	{
+		if(SM_FAdditionalTargets==0)
+			SM_FAdditionalTargets = new int32[SPELL_GROUPS];
+		memcpy(SM_FAdditionalTargets,inherit_from->SM_FAdditionalTargets,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PJumpReduce)
+	{
+		if(SM_PJumpReduce==0)
+			SM_PJumpReduce = new int32[SPELL_GROUPS];
+		memcpy(SM_PJumpReduce,inherit_from->SM_PJumpReduce,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FSpeedMod)
+	{
+		if(SM_FSpeedMod==0)
+			SM_FSpeedMod = new int32[SPELL_GROUPS];
+		memcpy(SM_FSpeedMod,inherit_from->SM_FSpeedMod,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PNonInterrupt)
+	{
+		if(SM_PNonInterrupt==0)
+			SM_PNonInterrupt = new int32[SPELL_GROUPS];
+		memcpy(SM_PNonInterrupt,inherit_from->SM_PNonInterrupt,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FPenalty)
+	{
+		if(SM_FPenalty==0)
+			SM_FPenalty = new int32[SPELL_GROUPS];
+		memcpy(SM_FPenalty,inherit_from->SM_FPenalty,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FCooldownTime)
+	{
+		if(SM_FCooldownTime==0)
+			SM_FCooldownTime = new int32[SPELL_GROUPS];
+		memcpy(SM_FCooldownTime,inherit_from->SM_FCooldownTime,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PCooldownTime)
+	{
+		if(SM_PCooldownTime==0)
+			SM_PCooldownTime = new int32[SPELL_GROUPS];
+		memcpy(SM_PCooldownTime,inherit_from->SM_PCooldownTime,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FChanceOfSuccess)
+	{
+		if(SM_FChanceOfSuccess==0)
+			SM_FChanceOfSuccess = new int32[SPELL_GROUPS];
+		memcpy(SM_FChanceOfSuccess,inherit_from->SM_FChanceOfSuccess,sizeof(int)*SPELL_GROUPS);
+	}
+}
 
 void CombatStatusHandler::TryToClearAttackTargets()
 {

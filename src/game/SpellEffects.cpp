@@ -3463,6 +3463,9 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	pTotem->m_faction = p_caster->m_faction;
 	pTotem->m_factionDBC = p_caster->m_factionDBC;
 
+	//added by Zack : Some shaman talents are casted on player but it should be inherited or something by totems
+	pTotem->InheritSMMods(p_caster);
+
 	// Set up AI, depending on our spells.
 	uint32 j;
 	for(j = 0; j < 3; ++j)

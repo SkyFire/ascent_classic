@@ -10,11 +10,13 @@ Talents
 
 Enhancement:
 Improved Weapon Totems - Not tested.
-Elemental Weapons - Not working.
+Elemental Weapons - Not working. Please note here the triggered spells for : 
+		Rockbiter Weapon by $s1%
+		Flametongue Weapon and Frostbrand Weapon by $s2%.
+		Windfury Weapon effect by $s3%
 Stormstrike - removed aura effect on target since our spell system does not support it yet
 
 Restoration:
-Restorative Totem - Doesn't work
 Healing Way - Doesn't work
 
 Spells

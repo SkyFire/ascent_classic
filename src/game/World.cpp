@@ -1606,6 +1606,24 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=65536 | 131072;
 
+	//shaman - Restorative Totems r1
+	sp = dbcSpell.LookupEntry(16259); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
+	sp = dbcSpell.LookupEntry(16205); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
+	sp = dbcSpell.LookupEntry(16206); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
+	sp = dbcSpell.LookupEntry(16207); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
+	sp = dbcSpell.LookupEntry(16208); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 8192; //Mana Spring and Healing Stream Totem effects
+	
+
 	//shaman - Ancestral healing
 	sp = dbcSpell.LookupEntry(16176); 
 	if(sp)
