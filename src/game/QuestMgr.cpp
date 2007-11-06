@@ -635,7 +635,7 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 			if((qle = plr->GetQuestLogInSlot(i)))
 			{
 				// dont waste time on quests without mobs
-				if(qle->GetQuest()->count_required_mob == 0)
+				if(qle->GetQuest()->count_required_mob == 0 || qle->IsCastQuest())
 					continue;
 
 				for(j = 0; j < 4; ++j)
