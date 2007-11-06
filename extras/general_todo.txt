@@ -110,6 +110,7 @@ Zack - test my shit :
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
 - shaman - Restorative Totems 16208
 - shaman - Healing Way 29206
+- shaman - Elemental Fury 16089. Should look up all the specified spells. Right now i just put all spells in there :P
 
 ==========================================================================
 Capt - test my shit :

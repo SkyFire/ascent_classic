@@ -1606,6 +1606,12 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=65536 | 131072;
 
+	//shaman - Elemental Fury - ! Not finished !
+	sp = dbcSpell.LookupEntry(16089); 
+	if(sp)
+//		sp->EffectSpellGroupRelation[0]=1073741824 | 32 | 1048576 | 1 | ... ; //Searing/Magma/Fire Nova Totem effects and Fire,Frost,Nature spells
+		sp->EffectSpellGroupRelation[0]=0xFFFFFFFF ; //damn, what other spells do there remain after that list ? Maybe later :P
+
 	//shaman - Restorative Totems r1
 	sp = dbcSpell.LookupEntry(16259); 
 	if(sp)

@@ -1,10 +1,15 @@
 Elemental Tree
 Elemental Fury - no effect - supposed to give a +200% crit damage on nature spells and fire totems
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent
+Earthbind Totem - It works vs other faction but not vs your own (fixed?), and vs mobs when it stacks with any other cripple effect a shaman has it makes the mob warp towards you at a very high speed (Usefull to control mobs still, BTW ;) )
+Purge - Works well enough, in some cases it removes things it shouldent (Palidins bubble) and on some things it doesn't work at all (Priests Divine Spirit)
 
 Restoration Tree
 Focused Mind - no effect - supposed to give a -15% reduction time on stuns and silent durations
 Earth shield - gives only two charges and no 30% chance on ignore spell interruption - supposed to give 10 charges and 30% chance of ignoring spell interruption.
+Tremor Totem - Doesn't work
+Poison Cleansing Totem - Doesn't work
+Disease Cleansing Totem - Doesn't work
 
 Talents
 
@@ -15,27 +20,12 @@ Elemental Weapons - Not working. Please note here the triggered spells for :
 		Flametongue Weapon and Frostbrand Weapon by $s2%.
 		Windfury Weapon effect by $s3%
 Stormstrike - removed aura effect on target since our spell system does not support it yet
-
-Spells
-
-Elemental:
-Earthbind Totem - It works vs other faction but not vs your own (fixed?), and vs mobs when it stacks with any other cripple effect a shaman has it makes the mob warp towards you at a very high speed (Usefull to control mobs still, BTW ;) )
-Purge - Works well enough, in some cases it removes things it shouldent (Palidins bubble) and on some things it doesn't work at all (Priests Divine Spirit)
-
-Enhancement:
 Stoneclaw Totem - Doesn't work
 Flametongue Weapon - Doesn't work
 Far Sight - recheck
 Flametongue Totem - Doesn't work
 Grounding Totem - Doesn't work
 Sentry Totem - Doesn't work
-
-Restoration:
-Tremor Totem - Doesn't work
-Poison Cleansing Totem - Doesn't work
-Disease Cleansing Totem - Doesn't work
-
-make Nature's grace to use SM variables. Preferably Spell:Calceffect
 
 [08:51:59] Spell::cast 3050, Unit: 7
 [08:51:59] WORLD: Spell effect id = 49, damage = 0
@@ -45,81 +35,17 @@ make Nature's grace to use SM variables. Preferably Spell:Calceffect
 [08:51:59] WORLD: Spell effect id = 39, damage = 1
 [08:51:59] Unhandled spell effect 39 in spell 29932.
 
-//maybe later the dummy spells. Probably will use scripts fr them ..
-
-[08:58:27] Spell::cast 29192, Unit: 7
-[08:58:27] WORLD: Spell effect id = 6, damage = 15
-[08:58:27] WORLD: Spell effect id = 6, damage = 6
-[08:58:27] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29192, i = 0, apply = true
-[08:58:27] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29192, i = 1, apply = true
-[08:58:30] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29192, i = 0, apply = false
-[08:58:30] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29192, i = 1, apply = false
-[08:58:30] Spell::cast 29193, Unit: 7
-[08:58:30] WORLD: Spell effect id = 6, damage = 30
-[08:58:30] WORLD: Spell effect id = 6, damage = 12
-[08:58:30] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29193, i = 0, apply = true
-[08:58:30] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 29193, i = 1, apply = true
-[09:10:56] Spell::cast 30675, Unit: 7
-[09:10:56] WORLD: Spell effect id = 6, damage = 1
-[09:10:56] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30675, i = 0, apply = true
-[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30675, i = 0, apply = false
-[09:10:57] Spell::cast 30678, Unit: 7
-[09:10:57] WORLD: Spell effect id = 6, damage = 2
-[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30678, i = 0, apply = true
-[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30678, i = 0, apply = false
-[09:10:57] Spell::cast 30679, Unit: 7
-[09:10:57] WORLD: Spell effect id = 6, damage = 3
-[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30679, i = 0, apply = true
-[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30679, i = 0, apply = false
-[09:10:57] Spell::cast 30680, Unit: 7
-[09:10:57] WORLD: Spell effect id = 6, damage = 4
-[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30680, i = 0, apply = true
-[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30680, i = 0, apply = false
-[09:10:57] Spell::cast 30681, Unit: 7
-[09:10:57] WORLD: Spell effect id = 6, damage = 5
-[09:10:57] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30681, i = 0, apply = true
-[09:10:58] WORLD: target = 7 , Spell Aura id = 4, SpellId  = 30681, i = 0, apply = false
-
-//place a mark on target so when this spell is casted again on him it will change it's effect
-[09:11:32] Spell::cast 29206, Unit: 7
-[09:11:32] WORLD: Spell effect id = 6, damage = 33
-[09:11:32] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29206, i = 0, apply = true
-[09:11:33] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29206, i = 0, apply = false
-[09:11:33] Spell::cast 29205, Unit: 7
-[09:11:33] WORLD: Spell effect id = 6, damage = 66
-[09:11:33] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29205, i = 0, apply = true
-[09:11:33] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29205, i = 0, apply = false
-[09:11:33] Spell::cast 29202, Unit: 7
-[09:11:33] WORLD: Spell effect id = 6, damage = 100
-[09:11:33] WORLD: target = 7 , Spell Aura id = 109, SpellId  = 29202, i = 0, apply = true
-
 Spells:
 
-Stoneclaw totem doesn't work
 Cure Disease don't work
-Grounding Totem don't work
-Disease Cleansing Totem don't work
 Wrath of Air Totem don't work
 Totem of Wrath don't work
 Purge don't work
-Poison Cleansing Totem don't work
 Water Shield don't work
 
 talents:
 
 Mental Quickness don't work
-Ancestral Healing don't work
-Healing Way don't work
-Focused Mind don't work
-Purification don't work
-Nature's Blessing don't work
-Nature's Guardian don't work
-Elemental Focus don't work
-Eye of the Storm don't work
 Elemental Devastation don't work
 Elemental Fury don't work
-Unrelenting Storm don't work
-Elemental Mastery don't have 100% luck to make a crit and don't reduce 100% of cost the mana spell
-Elemental Shields don't work
-Tidal Mastery don't work
 
