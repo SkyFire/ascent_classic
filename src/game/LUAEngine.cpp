@@ -537,6 +537,8 @@ static int RegisterGameObjectEvent(lua_State * L)
 /* SCRIPT FUNCTION IMPLEMENTATION                                       */
 /************************************************************************/
 #define CHECK_TYPEID(expected_type) if(!ptr || !ptr->IsInWorld() || ptr->GetTypeId() != expected_type) { return 0; }
+#define CHECK_TYPEID_RET(expected_type) if(!ptr || !ptr->IsInWorld() || ptr->GetTypeId() != expected_type) { lua_pushboolean(L,0); return 0; }
+#define CHECK_TYPEID_RET_INT(expected_type) if(!ptr || !ptr->IsInWorld() || ptr->GetTypeId() != expected_type) { lua_pushinteger(L,0); return 0; }
 
 int luaUnit_IsPlayer(lua_State * L, Unit * ptr)
 {
@@ -1053,51 +1055,105 @@ int luaUnit_GetUnitBySqlId(lua_State * L, Unit * ptr)
 
 int luaUnit_Despawn(lua_State * L, Unit * ptr)
 {
+	CHECK_TYPEID(TYPEID_UNIT);
+	int delay = luaL_checkint(L,1);
+	int respawntime = luaL_checkint(L,2);
+	((Creature*)ptr)->Despawn(delay,respawntime);
 	return 0;
 }
 
 int luaUnit_GetHealthPct(lua_State * L, Unit * ptr)
 {
-	return 0;
+	if(!ptr)
+		lua_pushinteger(L,0);
+	else
+		lua_pushinteger(L, ptr->GetHealthPct());
+
+	return 1;
 }
 
 int luaUnit_GetItemCount(lua_State * L, Unit * ptr)
 {
-	return 0;
+	CHECK_TYPEID_RET_INT(TYPEID_PLAYER);
+	int itemid = luaL_checkint(L,1);
+	lua_pushinteger(L, ((Player*)ptr)->GetItemInterface()->GetItemCount(itemid,false));
+	return 1;
 }
 
 int luaUnit_HasFinishedQuest(lua_State * L, Unit * ptr)
 {
-	return 0;
+	CHECK_TYPEID_RET(TYPEID_PLAYER);
+	int questid = luaL_checkint(L,1);
+	if(((Player*)ptr)->HasFinishedQuest(questid))
+		lua_pushboolean(L,1);
+	else
+		lua_pushboolean(L,0);
+
+	return 1;
 }
 
 int luaUnit_UnlearnSpell(lua_State * L, Unit * ptr)
 {
+	CHECK_TYPEID(TYPEID_PLAYER);
+	int spellid = luaL_checkint(L,1);
+	((Player*)ptr)->removeSpell(spellid,false,false,0);
 	return 0;
 }
 
 int luaUnit_LearnSpell(lua_State * L, Unit* ptr)
 {
+	CHECK_TYPEID(TYPEID_PLAYER);
+	int spellid = luaL_checkint(L,1);
+	((Player*)ptr)->addSpell(spellid);
 	return 0;
 }
 
 int luaUnit_MarkQuestObjectiveAsComplete(lua_State * L, Unit * ptr)
 {
+	CHECK_TYPEID(TYPEID_PLAYER);
+	int questid = luaL_checkint(L,1);
+	int objective = luaL_checkint(L,2);
+	Player * pl = ((Player*)ptr);
+	QuestLogEntry * qle = pl->GetQuestLogForEntry(questid);
+	qle->SetMobCount(objective, qle->GetQuest()->required_mobcount[objective]);
+	qle->SendUpdateAddKill(objective);
+	if(qle->CanBeFinished())
+		qle->SendQuestComplete();
+
 	return 0;
 }
 
 int luaUnit_KnockBack(lua_State * L, Unit * ptr)
 {
+	if(!ptr) return 0;
+	double dx = luaL_checknumber(L,1);
+	double dy = luaL_checknumber(L,2);
+	double affect1 = luaL_checknumber(L,3);
+	double affect2 = luaL_checknumber(L,4);
+	WorldPacket data(SMSG_MOVE_KNOCK_BACK, 30);
+	data << ptr->GetNewGUID();
+	data << getMSTime();
+	data << dx << dy << affect1 << affect2;
+	ptr->SendMessageToSet(&data, true);
+
 	return 0;
 }
 
 int luaUnit_SendAreaTriggerMessage(lua_State * L, Unit * ptr)
 {
+	CHECK_TYPEID(TYPEID_PLAYER);
+	const char * msg = luaL_checkstring(L,1);
+	if(!msg) return 0;
+	((Player*)ptr)->BroadcastMessage(msg);
 	return 0;
 }
 
 int luaUnit_SendBroadcastMessage(lua_State * L, Unit * ptr)
 {
+	CHECK_TYPEID(TYPEID_PLAYER);
+	const char * msg = luaL_checkstring(L,1);
+	if(!msg) return 0;
+	((Player*)ptr)->SendAreaTriggerMessage(msg);
 	return 0;
 }
 
@@ -1108,7 +1164,7 @@ int luaUnit_SendBroadcastMessage(lua_State * L, Unit * ptr)
 void LuaEngineMgr::Startup()
 {
 	// create 3
-	uint32 c = 50;
+	uint32 c = 5;
 	Log.Notice("LuaEngineMgr", "Spawning %u Lua Engines...", c);
 	for(uint32 i = 0; i < c; ++i)
 	{
