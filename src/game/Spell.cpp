@@ -2458,7 +2458,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 				else if(target->GetTypeId() == TYPEID_UNIT) 
 					{ 
 						Creature * c = (Creature*)(target);
-						if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank >0) //boss or rare or elite
+						if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank >ELITE_ELITE)
 							return SPELL_FAILED_HIGHLEVEL;
 					} 
 

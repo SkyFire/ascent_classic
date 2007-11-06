@@ -1143,7 +1143,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	if (!unitTarget->IsPlayer())
 	{
 		Creature * c = (Creature*)(unitTarget);
-		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
+		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 		{
 			switch(m_spellInfo->EffectApplyAuraName[i])
 			{
@@ -2875,7 +2875,7 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 	if(unitTarget->GetTypeId()==TYPEID_UNIT)
 	{
 		Creature * c = (Creature*)(unitTarget);
-		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
+		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			return;
 	}
 	// FIXME:This thing prevent target from spell casting too but cant find.

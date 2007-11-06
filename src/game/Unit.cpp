@@ -1366,7 +1366,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 		if(pVictim->m_objectTypeId == TYPEID_UNIT) 
 		{ 
 			Creature * c = (Creature*)(pVictim);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
+			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			{
 				victim_skill = max(victim_skill,((int32)this->getLevel()+3)*5); //used max to avoid situation when lowlvl hits boss.
 			}
@@ -1428,7 +1428,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 		if(m_objectTypeId == TYPEID_UNIT) 
 		{ 
 			Creature * c = (Creature*)(this);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
+			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 				self_skill = max(self_skill,((int32)pVictim->getLevel()+3)*5);//used max to avoid situation when lowlvl hits boss.
 		} 
 	}
@@ -1596,7 +1596,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 		if(pVictim->m_objectTypeId == TYPEID_UNIT) 
 		{ 
 			Creature * c = (Creature*)(pVictim);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
+			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			{
 				victim_skill = max(victim_skill,((int32)this->getLevel()+3)*5); //used max to avoid situation when lowlvl hits boss.
 			}
@@ -1661,7 +1661,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 		if(m_objectTypeId == TYPEID_UNIT) 
 		{ 
 			Creature * c = (Creature*)(this);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == 3) //boss
+			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 				self_skill = max(self_skill,((int32)pVictim->getLevel()+3)*5);//used max to avoid situation when lowlvl hits boss.
 		} 
 		crit = 5.0f; //will be modified later
