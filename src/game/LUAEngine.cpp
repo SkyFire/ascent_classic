@@ -419,6 +419,8 @@ int luaUnit_RemoveAura(lua_State * L, Unit * ptr);
 int luaUnit_StopMovement(lua_State * L, Unit * ptr);
 int luaUnit_Emote(lua_State * L, Unit * ptr);
 int luaUnit_GetClosestPlayer(lua_State * L, Unit * ptr);
+int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr);
+int luaUnit_GetRandomAlly(lua_State * L, Unit * ptr);
 int luaUnit_AddItem(lua_State * L, Unit * ptr);
 int luaUnit_RemoveItem(lua_State * L, Unit * ptr);
 int luaUnit_CreateCustomWaypointMap(lua_State * L, Unit * ptr);
@@ -473,6 +475,8 @@ Unit::RegType Unit::methods[] = {
 	{ "StopMovement", &luaUnit_StopMovement },
 	{ "Emote", &luaUnit_Emote },
 	{ "GetClosestPlayer", &luaUnit_GetClosestPlayer },
+	{ "GetRandomPlayer", &luaUnit_GetRandomPlayer },
+	{ "GetRandomAlly", &luaUnit_GetRandomAlly },
 	{ "AddItem", &luaUnit_AddItem },
 	{ "RemoveItem", &luaUnit_RemoveItem },
 	{ "CreateCustomWaypointMap", &luaUnit_CreateCustomWaypointMap },
@@ -532,7 +536,6 @@ static int RegisterGameObjectEvent(lua_State * L)
 	LuaEngineMgr::getSingleton().RegisterGameObjectEvent(entry,ev,str);
 	return 0;
 }
-
 /************************************************************************/
 /* SCRIPT FUNCTION IMPLEMENTATION                                       */
 /************************************************************************/
@@ -720,7 +723,7 @@ int luaUnit_SpawnCreature(lua_State * L, Unit * ptr)
 	uint32 faction = luaL_checkint(L, 6);
 	uint32 duration = luaL_checkint(L, 7);
 	
-	if(!entry_id || !faction || !duration)
+	if(!entry_id || !faction /*|| !duration*/) //Shady: is it really required?
 	{
 		lua_pushnil(L);
 		return 1;
@@ -1011,7 +1014,69 @@ int luaUnit_GetClosestPlayer(lua_State * L, Unit * ptr)
 
 	return 1;
 }
+int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
+{
+	if(!ptr)
+		return 0;
 
+	Player * ret=NULL;
+	uint32 count = (uint32)ptr->GetInRangePlayersCount();
+	uint32 r = sRand.randInt(count-1);
+	count=0;
+
+	for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+	{
+		if (count==r)
+		{
+			ret=*itr;
+			break;
+		}
+		++count;
+	}
+
+	if(ret==NULL)
+		lua_pushnil(L);
+	else
+		Lunar<Unit>::push(L,((Unit*)ret),false);
+
+	return 1;
+}
+int luaUnit_GetRandomAlly(lua_State * L, Unit * ptr)
+{
+	if(!ptr)
+		return 0;
+
+	Unit * ret=NULL;
+	uint32 count = 0;
+
+	for(set<Object*>::iterator itr = ptr->GetInRangeSetBegin(); itr != ptr->GetInRangeSetEnd(); ++itr)
+	{
+		Object* obj = (Object*)(*itr);
+		if (obj->IsUnit() && isFriendly(obj,ptr))
+			++count;
+	}
+	
+	if (count)
+	{
+		uint32 r = sRand.randInt(count-1);
+		count=0;
+		for(set<Object*>::iterator itr = ptr->GetInRangeSetBegin(); itr != ptr->GetInRangeSetEnd(); ++itr)
+		{
+			Object* obj = (Object*)(*itr);
+			if (obj->IsUnit() && isFriendly(obj,ptr) && count==r)
+			{
+				ret=(Unit*)obj;
+				break;
+			}
+			++count;
+		}
+	}
+	if(ret==NULL)
+		lua_pushnil(L);
+	else
+		Lunar<Unit>::push(L,(ret),false);
+	return 1;
+}
 int luaUnit_Emote(lua_State * L, Unit * ptr)
 {
 	if(!ptr)

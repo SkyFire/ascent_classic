@@ -355,6 +355,7 @@ public:
 	}
 
 	inline size_t GetInRangeCount() { return m_objectsInRange.size(); }
+	inline size_t GetInRangePlayersCount() { return m_inRangePlayers.size();}
 	inline InRangeSet::iterator GetInRangeSetBegin() { return m_objectsInRange.begin(); }
 	inline InRangeSet::iterator GetInRangeSetEnd() { return m_objectsInRange.end(); }
 	inline InRangeSet::iterator FindInRangeSet(Object * obj) { return m_objectsInRange.find(obj); }
