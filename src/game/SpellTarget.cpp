@@ -524,8 +524,8 @@ void Spell::SpellTargetGameobject_itemTarget(uint32 i, uint32 j)
 void Spell::SpellTargetPetOwner(uint32 i, uint32 j)
 { 
 	TargetsList *tmpMap=&m_targetUnits[i];
-	if (u_caster && u_caster->IsPet())
-		SafeAddTarget(tmpMap,((Pet*)u_caster)->GetPetOwner()->GetGUID());
+	if (u_caster && u_caster->IsPet() && ((Pet*)u_caster)->GetPetOwner())
+		SafeAddTarget(tmpMap, u_caster->GetUInt64Value(UNIT_FIELD_SUMMONEDBY));
 }
 
 /// this is handled in DO

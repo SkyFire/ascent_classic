@@ -2714,7 +2714,7 @@ void Spell::SpellEffectTameCreature(uint32 i)
 	pPet->CreateAsSummon(tame->GetEntry(), tame->GetCreatureName(), tame, static_cast<Unit*>(p_caster), NULL, 2, 0);
 	//tame->SafeDelete();
 	//delete tame;
-	tame->Despawn(0,tame->proto->RespawnTime);
+	tame->Despawn(0,tame->proto? tame->proto->RespawnTime:0);
 }
 
 void Spell::SpellEffectSummonPet(uint32 i) //summon - pet

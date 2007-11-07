@@ -721,7 +721,7 @@ bool World::SetInitialWorldSettings()
 					break;
 				}
 
-				if(sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE || sp->Effect[z] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || sp->Effect[z] == SPELL_EFFECT_DUMMYMELEE)
+				if((sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE&&sp->Spell_Dmg_Type==2) || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE || sp->Effect[z] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || sp->Effect[z] == SPELL_EFFECT_DUMMYMELEE)
 					sp->is_melee_spell = true;
 			}
 		}

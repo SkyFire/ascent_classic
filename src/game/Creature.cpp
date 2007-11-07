@@ -451,7 +451,7 @@ bool Creature::CanAddToWorld()
 	if(m_factionDBC == 0 || m_faction == 0)
 		_setFaction();
 
-	if(creature_info == 0 || m_faction == 0 || m_factionDBC == 0)
+	if(creature_info == 0 || m_faction == 0 || m_factionDBC == 0 || proto == 0)
 		return false;
 	
 	return true;

@@ -40,6 +40,7 @@ void OutputCrashLogLine(const char * format, ...)
 #ifdef WIN32
 
 #include "CircularQueue.h"
+Mutex m_crashLock;
 
 /* *
    @file CrashHandler.h
@@ -288,6 +289,13 @@ int __cdecl HandleCrash(PEXCEPTION_POINTERS pExceptPtrs)
 		{
 
 		}		
+	}
+
+	/* only allow one thread to crash. */
+	if(!m_crashLock.AttemptAcquire())
+	{
+		TerminateThread(GetCurrentThread(),-1);
+		// not reached
 	}
 
 	// Create the date/time string

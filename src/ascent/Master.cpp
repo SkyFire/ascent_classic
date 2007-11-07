@@ -327,7 +327,9 @@ bool Master::Run(int argc, char ** argv)
 
 	LoadingTime = getMSTime() - LoadingTime;
 	sLog.outString ("\nServer is ready for connections. Startup time: %ums\n", LoadingTime );
+#ifdef WIN32
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
+#endif
  
 	/* write pid file */
 	FILE * fPid = fopen("ascent.pid", "w");

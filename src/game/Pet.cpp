@@ -462,6 +462,7 @@ void Pet::InitializeMe(bool first)
 	GetAIInterface()->SetFollowDistance(3.0f);
 
 	SetCreatureName(CreatureNameStorage.LookupEntry(GetEntry()));
+	proto=CreatureProtoStorage.LookupEntry(GetEntry());
 	m_Owner->SetSummon(this);
 	m_Owner->SetUInt64Value(UNIT_FIELD_SUMMON, this->GetGUID());
 	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetGUIDLow());
