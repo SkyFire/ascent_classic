@@ -11,21 +11,12 @@ Tremor Totem - Doesn't work
 Poison Cleansing Totem - Doesn't work
 Disease Cleansing Totem - Doesn't work
 
-Talents
-
 Enhancement:
 Improved Weapon Totems - Not tested.
 Elemental Weapons - Not working. Please note here the triggered spells for : 
 		Rockbiter Weapon by $s1%
 		Flametongue Weapon and Frostbrand Weapon by $s2%.
 		Windfury Weapon effect by $s3%
-Stormstrike - removed aura effect on target since our spell system does not support it yet
-Stoneclaw Totem - Doesn't work
-Flametongue Weapon - Doesn't work
-Far Sight - recheck
-Flametongue Totem - Doesn't work
-Grounding Totem - Doesn't work
-Sentry Totem - Doesn't work
 
 [08:51:59] Spell::cast 3050, Unit: 7
 [08:51:59] WORLD: Spell effect id = 49, damage = 0
@@ -40,10 +31,12 @@ Spells:
 Cure Disease don't work
 Wrath of Air Totem don't work
 Totem of Wrath don't work
-Purge don't work
 Water Shield don't work
-
-talents:
-
-Mental Quickness don't work
+Stormstrike - removed aura effect on target since our spell system does not support it yet
+Stoneclaw Totem - Doesn't work
+Flametongue Weapon - Doesn't work
+Far Sight - recheck
+Flametongue Totem - Doesn't work
+Grounding Totem - Doesn't work
+Sentry Totem - Doesn't work
 

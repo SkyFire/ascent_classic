@@ -113,6 +113,7 @@ Zack - test my shit :
 - shaman - Healing Way 29206
 - shaman - Elemental Fury 16089. Should look up all the specified spells. Right now i just put all spells in there :P
 - shaman - Elemental Devastation 30160
+- shaman - Mental Quickness 30814. works only for half of the spells
 
 ==========================================================================
 Capt - test my shit :

@@ -1676,6 +1676,17 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 
+	//shaman - Mental Quickness. ! these are only a part (18 spells have no grouping)
+	sp = dbcSpell.LookupEntry(30812); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
+	sp = dbcSpell.LookupEntry(30813); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
+	sp = dbcSpell.LookupEntry(30814); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
+
 	//shaman - Totemic focus 
 	uint32 All_totems_grouprelation=536870912; //these are only selected flag since some totems contain more then 1 flag
 	All_totems_grouprelation |= 8;
