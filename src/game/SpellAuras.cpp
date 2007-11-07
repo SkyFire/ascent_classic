@@ -1215,33 +1215,22 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
+	case 19977:
+	case 19978:
+	case 19979:
+	case 27144:
+	case 32770:
+		{
+			if(mod->i==0)
+				SMTMod_On_target(apply,true,0x9B56A8F5,mod->m_amount); //holy light
+			if(mod->i==1)
+				SMTMod_On_target(apply,true,0x333C4740,mod->m_amount); //flash of light
+		}break;
 		//shaman - Healing Way - effect
 	case 29203:
 		{
-			if(m_target && m_target->IsUnit())
-			{
-				if(apply)
-				{
-					Unit *u_target=(Unit *)m_target;
-					std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_pct.find(0x08F1A7EF);
-					if(itr!=u_target->target_spell_effect_mod_pct.end())
-						itr->second += mod->m_amount;
-					else u_target->target_spell_effect_mod_pct.insert(make_pair(0x08F1A7EF, mod->m_amount)); //healing wave namehash
-				}
-				else
-				{
-					Unit *u_target=(Unit *)m_target;
-					std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_pct.find(0x08F1A7EF);
-					//it would be very wierd to not hit this "if"
-					if(itr!=u_target->target_spell_effect_mod_pct.end())
-					{
-						if(itr->second==mod->m_amount)
-							u_target->target_spell_effect_mod_pct.erase(0x08F1A7EF);//healing wave namehash
-						else itr->second -= mod->m_amount;
-					}
-				}
-			}
-		}
+			SMTMod_On_target(apply,true,0x08F1A7EF,mod->m_amount); // Healing Wave
+		}break;
 	//druid - mangle
 	case 33876:
 	case 33982:
@@ -6868,4 +6857,54 @@ void Aura::SendChannelUpdate(uint32 time, Object * m_caster)
 	data << time;
 
 	m_caster->SendMessageToSet(&data, true);	
+}
+
+void Aura::SMTMod_On_target(bool apply,bool is_pct,uint32 namehash, int value)
+{
+	if(m_target->IsUnit())
+	{
+		Unit *u_target=(Unit *)m_target;
+		if(apply)
+		{
+			if(is_pct)
+			{
+				std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_pct.find(namehash);
+				if(itr!=u_target->target_spell_effect_mod_pct.end())
+					itr->second += mod->m_amount;
+				else u_target->target_spell_effect_mod_pct.insert(make_pair(namehash, mod->m_amount));
+			}
+			else
+			{
+				std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_flat.find(namehash);
+				if(itr!=u_target->target_spell_effect_mod_flat.end())
+					itr->second += mod->m_amount;
+				else u_target->target_spell_effect_mod_flat.insert(make_pair(namehash, mod->m_amount));
+			}
+		}
+		else
+		{
+			if(is_pct)
+			{
+				std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_pct.find(namehash);
+				//it would be very wierd to not hit this "if"
+				if(itr!=u_target->target_spell_effect_mod_pct.end())
+				{
+					if(itr->second==mod->m_amount)
+						u_target->target_spell_effect_mod_pct.erase(namehash);
+					else itr->second -= mod->m_amount;
+				}
+			}
+			else
+			{
+				std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_flat.find(namehash);
+				//it would be very wierd to not hit this "if"
+				if(itr!=u_target->target_spell_effect_mod_flat.end())
+				{
+					if(itr->second==mod->m_amount)
+						u_target->target_spell_effect_mod_flat.erase(namehash);
+					else itr->second -= mod->m_amount;
+				}
+			}
+		}
+	}
 }

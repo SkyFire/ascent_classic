@@ -114,6 +114,8 @@ Zack - test my shit :
 - shaman - Elemental Fury 16089. Should look up all the specified spells. Right now i just put all spells in there :P
 - shaman - Elemental Devastation 30160
 - shaman - Mental Quickness 30814. works only for half of the spells
+- Druid - Ferocity 16938. Works only partially
+- paladin - Blessing of Light 32770 
 
 ==========================================================================
 Capt - test my shit :

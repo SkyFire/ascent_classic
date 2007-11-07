@@ -1446,71 +1446,37 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2]=0;
 	}
 
-/*
-	//disabled by Zack : BL will influence holy nova too if using flash of light spellgroup
-	//paladin - Blessing of Light
-		//first let us get the 2 spellgrouprelations
-	sp = dbcSpell.LookupEntry(635);//holy light
-	uint32 HL_grouprelation;
-	if(sp)
-		HL_grouprelation = sp->SpellGroupType;
-	else HL_grouprelation=0;
-	sp = dbcSpell.LookupEntry(19750);//Flash of light
-	uint32 FL_grouprelation;
-	if(sp)
-		FL_grouprelation = sp->SpellGroupType;
-	else FL_grouprelation=0;
-
+	//paladin - Blessing of Light. Changed to scripted because it needs to mod target and should not influence holy nova
 	sp = dbcSpell.LookupEntry(19977);
 	if(sp)
 	{
-		sp->EffectApplyAuraName[0] = 107;
-		sp->EffectApplyAuraName[1] = 107;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
-		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+		sp->EffectApplyAuraName[0] = 4;
+		sp->EffectApplyAuraName[1] = 4;
 	}
 	sp = dbcSpell.LookupEntry(19978);
 	if(sp)
 	{
-		sp->EffectApplyAuraName[0] = 107;
-		sp->EffectApplyAuraName[1] = 107;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
-		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+		sp->EffectApplyAuraName[0] = 4;
+		sp->EffectApplyAuraName[1] = 4;
 	}
 	sp = dbcSpell.LookupEntry(19979);
 	if(sp)
 	{
-		sp->EffectApplyAuraName[0] = 107;
-		sp->EffectApplyAuraName[1] = 107;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
-		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+		sp->EffectApplyAuraName[0] = 4;
+		sp->EffectApplyAuraName[1] = 4;
 	}
 	sp = dbcSpell.LookupEntry(27144);
 	if(sp)
 	{
-		sp->EffectApplyAuraName[0] = 107;
-		sp->EffectApplyAuraName[1] = 107;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
-		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
+		sp->EffectApplyAuraName[0] = 4;
+		sp->EffectApplyAuraName[1] = 4;
 	}
 	sp = dbcSpell.LookupEntry(32770);
 	if(sp)
 	{
-		sp->EffectApplyAuraName[0] = 107;
-		sp->EffectApplyAuraName[1] = 107;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[0]=HL_grouprelation;
-		sp->EffectSpellGroupRelation[1]=FL_grouprelation;
-	}*/
+		sp->EffectApplyAuraName[0] = 4;
+		sp->EffectApplyAuraName[1] = 4;
+	}
 
 	//shaman - Lightning Overload 
 	sp = dbcSpell.LookupEntry(30675); 
@@ -1942,6 +1908,23 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 23;
 		sp->EffectTriggerSpell[0] = 22845;
 	}
+
+	//Druid - Ferocity. Swipe, mangle and possibly the rest have only partial affects since they are missing groups
+	sp = dbcSpell.LookupEntry(16934); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	sp = dbcSpell.LookupEntry(16935); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	sp = dbcSpell.LookupEntry(16936); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	sp = dbcSpell.LookupEntry(16937); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	sp = dbcSpell.LookupEntry(16938); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2048 | 4096;
 
 	//paladin - seal of blood
 	sp = dbcSpell.LookupEntry(31892);
