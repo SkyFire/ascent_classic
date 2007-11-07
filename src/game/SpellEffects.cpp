@@ -1956,8 +1956,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 				{
 					if(gameObjTarget->loot.items.size() == 0)
 					{
-						lootmgr.FillProfessionLoot(&lootmgr.GOLoot,&gameObjTarget->loot,
-							gameObjTarget->GetEntry());
+						lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
 					}
 					else
 						bAlreadyUsed = true;
@@ -3578,7 +3577,7 @@ void Spell::SpellEffectSkinning(uint32 i)
 	if( (sk >= lvl*5)||((sk+100) >= lvl*10) )
 	{
 		//Fill loot for Skinning
-		lootmgr.FillProfessionLoot(&lootmgr.SkinningLoot,&((Creature*)unitTarget)->loot,unitTarget->GetEntry());
+		lootmgr.FillSkinningLoot(&((Creature*)unitTarget)->loot,unitTarget->GetEntry());
 		((Player*)m_caster)->SendLoot(unitTarget->GetGUID(),2);
 		
 		//Not skinable again

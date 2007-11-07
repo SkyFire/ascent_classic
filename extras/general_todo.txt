@@ -9,7 +9,6 @@ SMT_EFFECT_BONUS - check if it is used
 SMT_RESIST_DISPEL - check if it is used
 - test if cooldown reduction is showed client side too. If not then force cooldown update on spells that have cooldown change (+ use cooldown cheat here - needed for tests)
 - rogue - cold blood - need a log why does not trigger cooldown decrease
-- water shield gets removed on first trigger and does not show effect log. But why ?
 - !help : Flameblade = 7806, Bonespike= 16550, Bone Shards = 17014,Blessing of Sanctuary=20911,Worgen's Spite=30564,Shadow Shield=31976,Fel Fire = 32008,Shadowguard = 32861,Thorns=34343,Energy Flare =35922,Arcane Shield=36640,Prismatic Shield=38905,Shadow Strikes=40334,
 - deadly poison trigger maybe. This is a weapon enchant ?. Also added aurastate so envenom can be casted too
 
@@ -48,7 +47,6 @@ SMT_RESIST_DISPEL - check if it is used
 - you can use instant canst/nomana spells from mounts= baaaad.
 - creatures keep yelling no content messgs
 - rogues can exit combat instantly, this is bad i think.
-- quest loot from elites should be lootable by everybody who shares the quest
 - some kill quest does not give kill revard to whole group ?
 - megic wards( like fire ward) and shields ( like ice barrier ) doesnt absorbing dot spells
 - u aways suffer "1" dmg when u absorb a spell with ward/shield and losing casting time ..
@@ -99,13 +97,13 @@ Zack - test my shit :
 - aurastate gets consumed after using it
 - if you have hearth of the wild and reset talents...you will get negative dmg
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
-- priest - Focused Mind (33215)
-- shaman - COnvection 16112
-- shaman - Call of Thunder 16120
+- priest - Focused Mind (33215) - works
+- shaman - COnvection 16112 - works
+- shaman - Call of Thunder 16120 - works
 - shaman - Elemental mastery 16166
-- shaman - Lightning Overload  30681
-- shaman - Improved Lightning shield 16291
-- shaman - Tidal focus 16217. missing a complete list of shaman heal spells
+- shaman - Lightning Overload  30681 - doesn't work (or maybe i missed smthing)
+- shaman - Improved Lightning shield 16291 - was working before
+- shaman - Tidal focus 16217. missing a complete list of shaman heal spells - was working before
 - shaman - Totemic focus 16225
 - shaman - Ancestral healin 16240
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
@@ -125,3 +123,12 @@ Capt - test my shit :
 
 
 ==========================================================================
+Broken talent groups
+
+- Gift of Nature (druid), Healing Light (Paladin), Purification (Shaman) don't work, tho Spiritual Healing (Priest) works ?:)
+- "Increasing effect of your XX by additional Y% of your bonus damage/healing" (mostly 'empowered' talents)
+- Mechanics resists - Unbreakable Will, Iron Will, Focused Mind, ....
+- Talents reducing mana of spells which cost % of base mana don't work. Improved Blink, Natural Shapeshifter (this one works until u move), Absolution, Purifying Power, ...
+- Damage Shields don't work - Holy Shield, Blessing of Sanctuary
+- Clearcasting buff (shaman, druid, mage) doesn't work
+

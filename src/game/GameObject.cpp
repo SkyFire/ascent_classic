@@ -512,7 +512,7 @@ void GameObject::UseFishingNode(Player *player)
 	//Open loot on success, otherwise FISH_ESCAPED.
 	if(Rand(((player->_GetSkillLineCurrent(SKILL_FISHING,true)-minskill)*100)/maxskill))
 	{			  
-		lootmgr.FillProfessionLoot(&lootmgr.FishingLoot,&loot,zone);
+		lootmgr.FillFishingLoot(&loot,zone);
 		player->SendLoot(GetGUID(),3);
 		EndFishing(player, false);
 	}

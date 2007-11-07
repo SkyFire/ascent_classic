@@ -1046,7 +1046,7 @@ uint32 Item::GenerateRandomSuffixFactor(ItemPrototype * m_itemProto)
 	};
 
 	double value;
-	if(m_itemProto->Class == ITEM_CLASS_ARMOR && m_itemProto->Quality > ITEM_QUALITY_NORMAL_WHITE)
+	if(m_itemProto->Class == ITEM_CLASS_ARMOR && m_itemProto->Quality > ITEM_QUALITY_UNCOMMON_GREEN)
 		value = SuffixMods[m_itemProto->InventoryType] * 1.24;
 	else
 		value = SuffixMods[m_itemProto->InventoryType];

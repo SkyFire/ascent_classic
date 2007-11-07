@@ -453,6 +453,26 @@ void LootMgr::FillGOLoot(Loot * loot,uint32 loot_id, bool heroic)
 	else PushLoot(&tab->second,loot, heroic);
 }
 
+void LootMgr::FillFishingLoot(Loot * loot,uint32 loot_id)
+{
+    loot->items.clear();
+    loot->gold = 0;
+
+    LootStore::iterator tab = FishingLoot.find(loot_id);
+    if( FishingLoot.end() == tab) return;
+    else PushLoot(&tab->second, loot, false);
+}
+
+void LootMgr::FillSkinningLoot(Loot * loot,uint32 loot_id)
+{
+ loot->items.clear();
+ loot->gold = 0;
+
+ LootStore::iterator tab = SkinningLoot.find(loot_id);
+ if( SkinningLoot.end() == tab)return;
+ else PushLoot(&tab->second, loot, false);
+}
+
 void LootMgr::FillPickpocketingLoot(Loot * loot,uint32 loot_id)
 {
  loot->items.clear ();
@@ -461,54 +481,6 @@ void LootMgr::FillPickpocketingLoot(Loot * loot,uint32 loot_id)
  LootStore::iterator tab =PickpocketingLoot.find(loot_id);
  if( PickpocketingLoot.end()==tab)return;
  else PushLoot(&tab->second,loot,false);
-}
-
-//Puts 1 item always, no random properties
-void LootMgr::FillProfessionLoot(LootStore * store,Loot * loot,uint32 loot_id)
-{
-	loot->items.clear ();
-	loot->gold =0;
-	
-	LootStore::iterator tab =store->find(loot_id);
-	if( store->end()==tab)return;
-	StoreLootList *list=&(tab->second);
-	
-	// TODO: fix infinite loop with ' while(true) '
-	while(true)
-	for(uint32 x =0,pass=0; x<list->count; x++,pass++)
-	{
-		if(list->items[x].item.itemproto)// this check is needed until loot DB is fixed
-		{
-//			ItemPrototype *itemproto = ItemPrototypeStorage.LookupEntry(list->items[x].item.itemid);
-			if(Rand(list->items[x].chance))// || itemproto->Class == ITEM_CLASS_QUEST)
-			{
-				__LootItem itm;
-				itm.item =list->items[x].item;
-				itm.iItemsCount=1;
-				itm.passed = false;
-				itm.roll = 0;
-				/*if(itemproto->MaxCount>1)
-				{
-					uint32 c=1 + sRand.randInt(itemproto->MaxCount);
-					if(Rand(float(100.0/c)))
-						itm.iItemsCount=c;
-				
-				}*/
-				
-				itm.iRandomProperty=NULL;
-				itm.iRandomSuffix=NULL;
-			  
-				loot->items.push_back(itm);
-				return;
-			}	
-		}
-		
-		if(pass>100)
-		{
-			sLog.outError("WARNING: Loot %u has too low chances",loot_id);
-			return;		
-		}
-	}	
 }
 
 bool LootMgr::CanGODrop(uint32 LootId,uint32 itemid)

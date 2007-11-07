@@ -124,10 +124,11 @@ public:
 	LootMgr();
 	~LootMgr();
 
-	void FillProfessionLoot(LootStore * store,Loot * loot,uint32 loot_id);
 	void FillCreatureLoot(Loot * loot,uint32 loot_id, bool heroic);
 	void FillGOLoot(Loot * loot,uint32 loot_id, bool heroic);
 	void FillItemLoot(Loot *loot, uint32 loot_id);
+	void FillFishingLoot(Loot * loot,uint32 loot_id);
+	void FillSkinningLoot(Loot * loot,uint32 loot_id);
 	void FillPickpocketingLoot(Loot *loot, uint32 loot_id);
 
 	bool CanGODrop(uint32 LootId,uint32 itemid);
