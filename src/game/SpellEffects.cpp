@@ -3503,6 +3503,25 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 		pTotem->GetAIInterface()->totemspell = TotemSpell;
 		uint32 timer = 2000;	// need a proper resource for this.
 
+		switch(TotemSpell->Id)
+		{
+			case 8146: //Tremor Totem
+			case 8167: //Poison Cleansing Totem
+			case 8172: //Disease Cleansing Totem
+				timer =  5000;
+			break;
+			case 8349: //Fire Nova Totem 1
+			case 8502: //Fire Nova Totem 2
+			case 8503: //Fire Nova Totem 3
+			case 11306: //Fire Nova Totem 4
+			case 11307: //Fire Nova Totem 5
+			case 25535: //Fire Nova Totem 6
+			case 25537: //Fire Nova Totem 7
+				timer =  4000;
+			break;
+		default:break;
+		}
+
 		pTotem->GetAIInterface()->m_totemspelltimer = timer;
 		pTotem->GetAIInterface()->m_totemspelltime = timer;
 	}

@@ -427,7 +427,7 @@ void Player::Reputation_OnKilledUnit(Unit * pUnit, bool InnerLoop)
 		{
 			for(it = m_Group->GetSubGroup(i)->GetGroupMembersBegin(); it != m_Group->GetSubGroup(i)->GetGroupMembersEnd(); ++it)
 			{
-				if(it->player)
+				if(it->player && it->player->isInRange(this,100.0f))
 					it->player->Reputation_OnKilledUnit(pUnit, true);
 			}
 		}
@@ -446,10 +446,13 @@ void Player::Reputation_OnKilledUnit(Unit * pUnit, bool InnerLoop)
 				continue;
 
 			/* rep limit? */
-			if((*itr).replimit)
+			if (!IS_INSTANCE(GetMapId()) || (IS_INSTANCE(GetMapId()) && this->iInstanceType != MODE_HEROIC))
 			{
-				if(GetStanding((*itr).faction[team]) >= (int32)(*itr).replimit)
-					continue;
+				if((*itr).replimit)
+				{
+					if(GetStanding((*itr).faction[team]) >= (int32)(*itr).replimit)
+						continue;
+				}
 			}
 
 			int32 value = int32(float(itr->value) * sWorld.getRate(RATE_KILLREPUTATION));

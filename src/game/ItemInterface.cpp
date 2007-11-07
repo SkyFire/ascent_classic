@@ -962,6 +962,31 @@ uint32 ItemInterface::RemoveItemAmt(uint32 id, uint32 amt)
 	return 0;
 }
 
+void ItemInterface::RemoveAllConjured()
+{
+	for(uint32 x = INVENTORY_SLOT_BAG_START; x < INVENTORY_SLOT_ITEM_END; ++x)
+	{
+		if (m_pItems[x]!= NULL)
+		{
+			if(IsBagSlot(x) && m_pItems[x]->IsContainer())
+			{
+				Container * bag = (Container*)m_pItems[x];
+ 
+				for(uint32 i = 0; i < bag->GetProto()->ContainerSlots; i++)
+				{
+					if (bag->GetItem(i) != NULL && bag->GetItem(i)->GetProto() && (bag->GetItem(i)->GetProto()->Flags)& 2)
+						bag->SafeFullRemoveItemFromSlot(i);
+				}
+			}
+			else
+			{
+				if(m_pItems[x]->GetProto() && (m_pItems[x]->GetProto()->Flags)& 2 )
+					SafeFullRemoveItemFromSlot(INVENTORY_SLOT_NOT_SET, x);
+			}
+		}
+	}
+}
+
 
 //-------------------------------------------------------------------//
 //Description: Gets slot number by itemid, banks not included

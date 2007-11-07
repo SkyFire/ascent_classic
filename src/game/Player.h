@@ -1412,6 +1412,7 @@ public:
 	uint32 GetGlobalCooldown() { return GlobalCooldown; }
 	void SetGlobalCooldown(uint32 time) { GlobalCooldown = time; }
 	void ClearCooldownsOnLine(uint32 skill_line, uint32 called_from);
+	void ResetAllCooldowns();
 	void ClearCooldownForSpell(uint32 spell_id);
 	bool bProcessPending;
 	Mutex _bufferS;

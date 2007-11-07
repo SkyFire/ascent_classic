@@ -6166,6 +6166,71 @@ void Player::ClearCooldownsOnLine(uint32 skill_line, uint32 called_from)
 	}
 }
 
+void Player::ResetAllCooldowns()
+{
+	uint32 guid = (uint32)GetSelection();
+
+	switch(getClass())
+	{
+		case WARRIOR:
+		{
+			ClearCooldownsOnLine(26, guid);
+			ClearCooldownsOnLine(256, guid);
+			ClearCooldownsOnLine(257 , guid);
+		} break;
+		case PALADIN:
+		{
+			ClearCooldownsOnLine(594, guid);
+			ClearCooldownsOnLine(267, guid);
+			ClearCooldownsOnLine(184, guid);
+		} break;
+		case HUNTER:
+		{
+			ClearCooldownsOnLine(50, guid);
+			ClearCooldownsOnLine(51, guid);
+			ClearCooldownsOnLine(163, guid);
+		} break;
+		case ROGUE:
+		{
+			ClearCooldownsOnLine(253, guid);
+			ClearCooldownsOnLine(38, guid);
+			ClearCooldownsOnLine(39, guid);
+		} break;
+		case PRIEST:
+		{
+			ClearCooldownsOnLine(56, guid);
+			ClearCooldownsOnLine(78, guid);
+			ClearCooldownsOnLine(613, guid);
+		} break;
+		case SHAMAN:
+		{
+			ClearCooldownsOnLine(373, guid);
+			ClearCooldownsOnLine(374, guid);
+			ClearCooldownsOnLine(375, guid);
+		} break;
+		case MAGE:
+		{
+			ClearCooldownsOnLine(6, guid);
+			ClearCooldownsOnLine(8, guid);
+			ClearCooldownsOnLine(237, guid);
+		} break;
+		case WARLOCK:
+		{
+			ClearCooldownsOnLine(355, guid);
+			ClearCooldownsOnLine(354, guid);
+			ClearCooldownsOnLine(593, guid);
+		} break;
+		case DRUID:
+		{
+			ClearCooldownsOnLine(573, guid);
+			ClearCooldownsOnLine(574, guid);
+			ClearCooldownsOnLine(134, guid);
+		} break;
+
+		default: return; break;
+	}
+}
+
 void Player::PushUpdateData(ByteBuffer *data, uint32 updatecount)
 {
 	// imagine the bytebuffer getting appended from 2 threads at once! :D

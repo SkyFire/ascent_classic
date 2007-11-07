@@ -301,7 +301,7 @@ void Container::SaveBagToDB(int8 slot, bool first)
 
 	for(uint32 i = 0; i < m_itemProto->ContainerSlots; i++)
 	{
-		if (m_Slot[i])
+		if (m_Slot[i] && !((m_Slot[i]->GetProto()->Flags)& 2) )
 		{
 			m_Slot[i]->SaveToDB(slot, i, first);
 		}
