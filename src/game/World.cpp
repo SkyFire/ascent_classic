@@ -2374,6 +2374,12 @@ bool World::SetInitialWorldSettings()
 	//lacerate
 	sp = dbcSpell.LookupEntry(33745);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 //-----------------------
+	//Druid: Pounce
+	sp = dbcSpell.LookupEntry(9007);if (sp) sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntry(9824);if (sp) sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntry(9826);if (sp) sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntry(27007);if (sp) sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntry(14179);if (sp) sp->DurationIndex = 18000;
 	//Priest: Shadow Power
 	sp = dbcSpell.LookupEntry(15310);
 	if(sp)

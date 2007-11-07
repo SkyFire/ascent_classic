@@ -1752,7 +1752,7 @@ else
 	else
 	{
 		if (pVictim->IsPlayer())
-			hitchance = max(hitchance,95.0f+vsk*0.1f+hitmodifier); //wowwiki multiplier - 0.04 but i think 0.1 more balanced
+			hitchance = max(hitchance,95.0f+vsk*0.04f+hitmodifier);
 		else
 			hitchance = max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
 	}

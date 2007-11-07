@@ -1911,7 +1911,7 @@ void Aura::EventPeriodicHeal(uint32 amount)
 	{
 		int ticks= (amp) ? GetDuration()/amp : 0;
 		bonus= (ticks) ? bonus/ticks : 0;
-		bonus *= float2int32(float(GetDuration() / 15000.0f));
+		bonus = float2int32(float(bonus*GetDuration() / 15000.0f));
 	}
 	else bonus = 0;
 
