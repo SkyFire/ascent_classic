@@ -55,6 +55,8 @@ typedef struct
 	uint32 displayid;
 }_LootItem;
 
+typedef std::set<uint64> LooterSet;
+
 typedef struct
 {
 	_LootItem item;
@@ -63,6 +65,8 @@ typedef struct
 	ItemRandomSuffixEntry * iRandomSuffix;
 	LootRoll *roll;
 	bool passed;
+	LooterSet has_looted;
+	uint32 ffa_loot;
 }__LootItem;
 
 
@@ -73,6 +77,7 @@ typedef struct
 	float chance2;
 	uint32 mincount;
 	uint32 maxcount;
+	uint32 ffa_loot;
 }StoreLootItem;
 
 
@@ -81,8 +86,6 @@ typedef struct
 	uint32 count;
 	StoreLootItem*items;
 }StoreLootList;
-
-typedef std::set<uint32> LooterSet;
 
 typedef struct
 {
@@ -98,6 +101,7 @@ struct tempy
 	float chance_2;
 	uint32 mincount;
 	uint32 maxcount;
+	uint32 ffa_loot;
 };
 
 

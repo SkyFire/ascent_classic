@@ -336,7 +336,10 @@ void LogonCommClientSocket::HandleRequestAccountMapping(WorldPacket & recvData)
 
 		uncompressed.clear();
 	}	
-	sLog.outString("\nTook %u msec to build character mapping list for realm %u", getMSTime() - t, realm_id);
+	sLog.outColor(TNORMAL, "\n        >> Took ");
+	sLog.outColor(TGREEN, "%u", (getMSTime() - t));
+	sLog.outColor(TNORMAL, " msec to build character mapping list for realm");
+	sLog.outColor(TGREEN, " %u", realm_id);
 }
 
 void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)

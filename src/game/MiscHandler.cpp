@@ -74,11 +74,26 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 
 	amt = pLoot->items.at(lootSlot).iItemsCount;
 
-	if (!amt)//Test for party loot
-	{  
-		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
-		return;
-	} 
+	if (!pLoot->items.at(lootSlot).ffa_loot)
+	{
+		if (!amt)//Test for party loot
+		{  
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
+			return;
+		}
+	}
+	else
+	{
+		//make sure this player can still loot it in case of ffa_loot
+		LooterSet::iterator itr = pLoot->items.at(lootSlot).has_looted.find(_player->GetGUID());
+
+		if (pLoot->items.at(lootSlot).has_looted.end() != itr)
+		{
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
+			return;
+		}
+	}
+
 	itemid = pLoot->items.at(lootSlot).item.itemproto->ItemId;
 	ItemPrototype* it = pLoot->items.at(lootSlot).item.itemproto;
 
@@ -133,16 +148,29 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		_player->GetSession()->SendItemPushResult(add, false, true, true, false, _player->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()), 0xFFFFFFFF, 1);
 	}
 
-	pLoot->items.at(lootSlot).iItemsCount=0;
-	// this gets sent to all looters
-	WorldPacket data(1);
-	data.SetOpcode(SMSG_LOOT_REMOVED);
-	data << lootSlot;
-	Player * plr;
-	for(LooterSet::iterator itr = pLoot->looters.begin(); itr != pLoot->looters.end(); ++itr)
+	//in case of ffa_loot update only the player who recives it.
+	if (!pLoot->items.at(lootSlot).ffa_loot)
 	{
-		if((plr = _player->GetMapMgr()->GetPlayer(*itr)))
-			plr->GetSession()->SendPacket(&data);
+		pLoot->items.at(lootSlot).iItemsCount = 0;
+
+		// this gets sent to all looters
+		WorldPacket data(1);
+		data.SetOpcode(SMSG_LOOT_REMOVED);
+		data << lootSlot;
+		Player * plr;
+		for(LooterSet::iterator itr = pLoot->looters.begin(); itr != pLoot->looters.end(); ++itr)
+		{
+			if((plr = _player->GetMapMgr()->GetPlayer(*itr)))
+				plr->GetSession()->SendPacket(&data);
+		}
+	}
+	else
+	{
+		pLoot->items.at(lootSlot).has_looted.insert(_player->GetGUID());
+		WorldPacket data(1);
+		data.SetOpcode(SMSG_LOOT_REMOVED);
+		data << lootSlot;
+		_player->GetSession()->SendPacket(&data);
 	}
 
 /*    WorldPacket idata(45);
@@ -1607,11 +1635,26 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 
 	amt = pLoot->items.at(slotid).iItemsCount;
 
-	if (!amt)//Test for party loot
-	{  
-		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
-		return;
-	} 
+	if (!pLoot->items.at(slotid).ffa_loot)
+	{
+		if (!amt)//Test for party loot
+		{  
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
+			return;
+		} 
+	}
+	else
+	{
+		//make sure this player can still loot it in case of ffa_loot
+		LooterSet::iterator itr = pLoot->items.at(slotid).has_looted.find(player->GetGUID());
+
+		if (pLoot->items.at(slotid).has_looted.end() != itr)
+		{
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL,INV_ERR_ALREADY_LOOTED);
+			return;
+		}
+	}
+
 	itemid = pLoot->items.at(slotid).item.itemproto->ItemId;
 	ItemPrototype* it = pLoot->items.at(slotid).item.itemproto;
 
@@ -1654,14 +1697,24 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	pLoot->items.at(slotid).iItemsCount=0;
 
 	// this gets sent to all looters
-	WorldPacket data(1);
-	data.SetOpcode(SMSG_LOOT_REMOVED);
-	data << slotid;
-	Player * plr;
-	for(LooterSet::iterator itr = pLoot->looters.begin(); itr != pLoot->looters.end(); ++itr)
+	if (!pLoot->items.at(slotid).ffa_loot)
 	{
-		if((plr = _player->GetMapMgr()->GetPlayer(*itr)))
-			plr->GetSession()->SendPacket(&data);
+		pLoot->items.at(slotid).iItemsCount=0;
+
+		// this gets sent to all looters
+		WorldPacket data(1);
+		data.SetOpcode(SMSG_LOOT_REMOVED);
+		data << slotid;
+		Player * plr;
+		for(LooterSet::iterator itr = pLoot->looters.begin(); itr != pLoot->looters.end(); ++itr)
+		{
+			if((plr = _player->GetMapMgr()->GetPlayer(*itr)))
+				plr->GetSession()->SendPacket(&data);
+		}
+	}
+	else
+	{
+		pLoot->items.at(slotid).has_looted.insert(player->GetGUID());
 	}
 
 /*    WorldPacket idata(45);

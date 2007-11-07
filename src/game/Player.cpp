@@ -4911,6 +4911,10 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		if (iter->iItemsCount == 0)
 			continue;
 
+		LooterSet::iterator itr = iter->has_looted.find(GetGUID());
+		if (iter->has_looted.end() != itr)
+			continue;
+
 		ItemPrototype* itemProto =iter->item.itemproto;
 		if (!itemProto)		   
 			continue;
@@ -4983,6 +4987,10 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 			/* if all people passed anyone can loot it? :P */
 			if(iter->passed)
 				slottype = 0;					// All players passed on the loot
+
+			//if it is ffa loot and not an masterlooter
+			if(iter->ffa_loot && slottype != 2)
+				slottype = 0;
 		}
 
 		data << uint8(x); 

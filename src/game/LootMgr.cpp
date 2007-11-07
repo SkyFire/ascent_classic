@@ -279,6 +279,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 			t.chance_2 = fields[4].GetFloat();
 			t.mincount = fields[5].GetUInt32();
 			t.maxcount = fields[6].GetUInt32();
+			t.ffa_loot = fields[7].GetUInt32();
 		}
 		else
 		{
@@ -344,6 +345,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 					list.items[ind].chance2 = itr2->chance_2;
 					list.items[ind].mincount = itr2->mincount;
 					list.items[ind].maxcount = itr2->maxcount;
+					list.items[ind].ffa_loot = itr2->ffa_loot;
 
 					if(LootTable == &GOLoot)
 					{
@@ -409,6 +411,8 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 			itm.iItemsCount = count;
 			itm.roll = NULL;
 			itm.passed = false;
+			itm.ffa_loot = list->items[x].ffa_loot;
+			itm.has_looted.clear();
 			
 			if (itemproto->Quality > 1 && itemproto->ContainerSlots==0)
 			{

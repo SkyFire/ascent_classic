@@ -1244,6 +1244,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 		if(!chaindamage)
 		{
 			chaindamage = damage;
+			Heal((int32)chaindamage);
 		}
 		else
 		{

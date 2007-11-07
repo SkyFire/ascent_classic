@@ -3476,6 +3476,17 @@ void Spell::Heal(int32 amount)
 
 		float healdoneaffectperc = castaff / 3500;
 		
+		//Downranking
+		float downrank1 = 1.0f;
+		if (m_spellInfo->baseLevel < 20)
+			downrank1 = 1.0f - (20.0f - float(m_spellInfo->baseLevel) ) * 0.0375f;
+		float penaltyx = ( float(m_spellInfo->maxLevel) + 5.0f) / float(u_caster->getLevel());
+		if (penaltyx > 1.0f)
+			penaltyx = float(0);
+		float downrank2 = 1.0f - penaltyx;
+
+		float healdoneaffectperc = healdoneaffectpercx * downrank1 * downrank2;
+
 		amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
 		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
 		amount += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal

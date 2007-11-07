@@ -1158,6 +1158,11 @@ bool World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0]=31616;
 			sp->proc_interval = 5000;
 		}
+		//Chain Heal all ranks %50 heal value (49 + 1)
+		else if( strstr(nametext, "Chain Heal"))
+		{
+			sp->EffectDieSides[0] = 49;
+		}
 		//this starts to be an issue for trigger spell id : Deep Wounds
 		else if(strstr(nametext, "Deep Wounds") && sp->EffectTriggerSpell[0])
 		{
@@ -2011,6 +2016,44 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[1] = 64; //aura
 		sp->EffectTriggerSpell[1] = 30339; //evil , but this is good for us :D
 	}
+	// Hunter - Master Tactician
+	sp = dbcSpell.LookupEntry(34506);
+	if(sp)
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+	sp = dbcSpell.LookupEntry(34507);
+	if(sp)
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+	sp = dbcSpell.LookupEntry(34508);
+	if(sp)
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+	sp = dbcSpell.LookupEntry(34838);
+	if(sp)
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+	sp = dbcSpell.LookupEntry(34839);
+	if(sp)
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+
+	// Shaman - Storm Reach
+	sp = dbcSpell.LookupEntry(28999);
+	if(sp)
+	{
+		SpellEntry * tsp = dbcSpell.LookupEntry(421); // Chain Lightning
+		if(tsp)
+			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
+		tsp = dbcSpell.LookupEntry(403); // Lightning Bolt
+		if(tsp)
+			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
+	}
+	sp = dbcSpell.LookupEntry(29000);
+	if(sp)
+	{
+		SpellEntry * tsp = dbcSpell.LookupEntry(421); // Chain Lightning
+		if(tsp)
+			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
+		tsp = dbcSpell.LookupEntry(403); // Lightning Bolt
+		if(tsp)
+			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
+	}
 	//Rogue: Seal Fate
 	sp = dbcSpell.LookupEntry(14186);
 	if(sp) 
@@ -2374,12 +2417,6 @@ bool World::SetInitialWorldSettings()
 	//lacerate
 	sp = dbcSpell.LookupEntry(33745);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 //-----------------------
-	//Druid: Pounce
-	sp = dbcSpell.LookupEntry(9007);if (sp) sp->DurationIndex = 18000;
-	sp = dbcSpell.LookupEntry(9824);if (sp) sp->DurationIndex = 18000;
-	sp = dbcSpell.LookupEntry(9826);if (sp) sp->DurationIndex = 18000;
-	sp = dbcSpell.LookupEntry(27007);if (sp) sp->DurationIndex = 18000;
-	sp = dbcSpell.LookupEntry(14179);if (sp) sp->DurationIndex = 18000;
 	//Priest: Shadow Power
 	sp = dbcSpell.LookupEntry(15310);
 	if(sp)
