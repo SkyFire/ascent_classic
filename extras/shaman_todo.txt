@@ -46,6 +46,4 @@ Water Shield don't work
 talents:
 
 Mental Quickness don't work
-Elemental Devastation don't work
-Elemental Fury don't work
 

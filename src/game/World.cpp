@@ -1654,6 +1654,17 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 	}
 
+	//shaman - Elemental Devastation
+	sp = dbcSpell.LookupEntry(29179); 
+	if(sp)
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	sp = dbcSpell.LookupEntry(29180); 
+	if(sp)
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	sp = dbcSpell.LookupEntry(30160); 
+	if(sp)
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+
 	//shaman - Ancestral healing
 	sp = dbcSpell.LookupEntry(16176); 
 	if(sp)

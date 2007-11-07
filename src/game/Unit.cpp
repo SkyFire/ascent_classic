@@ -866,6 +866,17 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if( CastingSpell->NameHash!=0x08F1A7EF) //healing wave
 									continue;
 							}break;
+						//shaman - Elemental Devastation
+						case 29177:
+						case 29178:
+						case 30165:
+							{
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
+								//only trigger effect for specified spells
+								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //healing wave
+									continue;
+							}break;
 						//shaman - windfurry weapon
 						case 8232:
 						case 8235:
