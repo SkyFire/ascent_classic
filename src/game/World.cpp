@@ -1921,6 +1921,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648;
 	}
 
+	//priest - Shadow Reach 
+	sp = dbcSpell.LookupEntry(17322); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+	sp = dbcSpell.LookupEntry(17323); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry(27116);

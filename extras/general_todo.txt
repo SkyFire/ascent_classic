@@ -116,6 +116,7 @@ Zack - test my shit :
 - priest - Absolution 33172
 - priest - Mental Agility 14783
 - priest - Focused Power 33190
+- priest - Shadow Reach 17323
 
 ==========================================================================
 Capt - test my shit :
