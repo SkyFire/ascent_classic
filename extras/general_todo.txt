@@ -120,6 +120,8 @@ Zack - test my shit :
 - priest - Shadow Focus 15330
 - warlock - Amplify Curse 18288
 - warlock - Improved Howl of Terror 30057
+- warlock - Bane 17792 affects soulfire too Soul Fire.
+
 
 ==========================================================================
 Capt - test my shit :

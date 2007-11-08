@@ -2331,6 +2331,20 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->SpellGroupType=4096;
 
+	//warlock - Soul Fire. Has missign group type
+	sp = dbcSpell.LookupEntry(6353);
+	if(sp)
+		sp->SpellGroupType=4;
+	sp = dbcSpell.LookupEntry(17924);
+	if(sp)
+		sp->SpellGroupType=4;
+	sp = dbcSpell.LookupEntry(27211);
+	if(sp)
+		sp->SpellGroupType=4;
+	sp = dbcSpell.LookupEntry(30545);
+	if(sp)
+		sp->SpellGroupType=4;
+
 	//warlock - soul leech
 	sp = dbcSpell.LookupEntry(30293);
 	if(sp)

@@ -79,9 +79,7 @@ Demonology Spells
 -Soul Shatter: Doesn't reduce threat as it should.
 
 Talents - Affliction
--Improved howl of terror: doesn't decrease cast time by 1.5 seconds as it states.
 -Night fall: does not proc (Any damage on target should give u a chance to reduce next shadowbolt cast by 100% as stated)
--Grim reach: does not increase the range of your affliction spells as it should
 -Contagion: has no effect (+5% affliction corruption, curse of agony, seed of corruption damage. Also reduces chance of affliction spells from being reduced by 30%)
 -Shadow Mastery: for some reason only applies to rank 1 skills. Doesn't apply to drain spells. Only uses base spell damage, not total spell damage after +damage is taken into consideration.
 -Dark pact: should recieve +shadow spell dmg bonus (currently does not), otherwise it works ok. [url]http://www.wowwiki.com/Dark_Pact[/url]
@@ -91,9 +89,7 @@ Talents - Affliction
 Talents - Destruction
 -Ruin: gives + 100% crit damage but it doesn't work on soulfire as it is supposed to.
 -Intensity: has no noticable effect (supposed to give 70% at max lvl to reduce the chance of spell interruption).
--Backlash: gives 3% critical strike, but doesn't give the proc chance for the instant shadowbolt or incinerate.
 -Shadow and Flame: is supposed to give +20% damage to shadowbolt and incinerate but doesn't.
--Bane: reduces Shadow bolt cast time but not Soul Fire.
 -Emberstorm: only applies to base damage, not damage after spell casts.
 
 Talents - Demonology
@@ -101,6 +97,5 @@ Talents - Demonology
 -Demonic Sacrifice: Working, though fire damage gained from imp and shadow damage gained from succubus and felguard are applied to base spell damage, not total spell damage after all other effects. Also, ff you use Demonic Sacrifice and log out with no pet, your character will show a Voidwalker next to them. When you log onto another character than back on to your lock, you'll have both the Demonic Sacrifice you used, and a Voidwalker out. Sacrificing this one would make 2 Sacrifices stack.
 
 Pets
--Succubus' seduce: is somewhat bugged. It currently only works on mobs and not players.
 -If u have enough pet skills to go on the next page, u can't turn to the next page to access the skills.
 -Pets on defense/passive immediately attacks the closest enemy if it kills the current mob. It also immediately attacks the closest enemy if it is just summoned or from log in.
