@@ -394,7 +394,7 @@ Player::~Player ( )
 	}
 	m_references.clear();
 
-	if(!ok_to_remove)
+	if(!ok_to_remove||IsInWorld())
 	{
 		printf("Player deleted from non-logoutplayer!\n");
 		OutputCrashLogLine("Player deleted from non-logoutplayer!");
@@ -5254,7 +5254,7 @@ void Player::removeSpellByHashName(uint32 hash)
 #else
 			m_session->OutPacket(SMSG_REMOVED_SPELL, 4, &SpellID);		
 #endif
-			mSpells.erase(it);
+			mDeletedSpells.erase(it);
 		}
 	}
 }
