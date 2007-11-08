@@ -466,9 +466,9 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 			if((*iter)->GetTypeId() == TYPEID_PLAYER) {
 				if (((Player*)(*iter))->IsVisible(obj) && static_cast<Player*>(*iter)->m_TransporterGUID != obj->GetGUID())
 					((Player*)*iter)->PushOutOfRange(obj->GetNewGUID());
-
-				(*iter)->RemoveInRangeObject(obj);
 			}
+
+			(*iter)->RemoveInRangeObject(obj);
 		}
 	}
 	
