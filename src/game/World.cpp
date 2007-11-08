@@ -2316,6 +2316,21 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->SpellGroupType=1024;
 
+	//warlock - Improved Howl of Terror
+	sp = dbcSpell.LookupEntry(30054);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=4096;
+	sp = dbcSpell.LookupEntry(30057);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=4096;
+	//warlock - Howl of Terror. Has missign group type
+	sp = dbcSpell.LookupEntry(5484);
+	if(sp)
+		sp->SpellGroupType=4096;
+	sp = dbcSpell.LookupEntry(17928);
+	if(sp)
+		sp->SpellGroupType=4096;
+
 	//warlock - soul leech
 	sp = dbcSpell.LookupEntry(30293);
 	if(sp)

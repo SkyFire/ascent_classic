@@ -119,6 +119,7 @@ Zack - test my shit :
 - priest - Shadow Reach 17323
 - priest - Shadow Focus 15330
 - warlock - Amplify Curse 18288
+- warlock - Improved Howl of Terror 30057
 
 ==========================================================================
 Capt - test my shit :

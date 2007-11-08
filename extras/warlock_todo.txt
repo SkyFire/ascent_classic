@@ -56,7 +56,6 @@ Improved Drain Soul - no mana regeneration after shard is made
 Grim Reach - should increase range for affliction spells by 10 % - no increase
 Shadow Embrace - should give u 5% reduction on dmg received when you cast Corr , CoA , Siphon Life or Seed of Corr
 Nighfall - 4% chance when a target is dmged by Drain Life or Corr to make your next shadowbolt instant
-Improved Howl of Terror - should reduce your howl of terror cast by 1.6 sec - nothing happens
 Unstable Affliction - should make 1057 DoT and 1570 when dispelled - no dmg at dispell
 
 Demonology - anyway useless whitout minions fixes
