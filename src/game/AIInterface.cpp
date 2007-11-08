@@ -2500,20 +2500,33 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			float Fz;
 			// Calculate new angle to target.
 			float Fo = m_Unit->calcRadAngle(UnitToFear->GetPositionX(), UnitToFear->GetPositionY(), m_Unit->GetPositionX(), m_Unit->GetPositionY());
-				
-			Fx = m_Unit->GetPositionX() + 10*cosf(Fo);
-			Fy = m_Unit->GetPositionY() + 10*sinf(Fo);
-	
+			double fAngleAdd = sRand.rand(((M_PI/2) * 2)) - (M_PI/2);
+			Fo += (float)fAngleAdd;
+			
+			float dist = m_Unit->CalcDistance(UnitToFear);
+			if(dist > 30.0f || (Rand(25) && dist > 10.0f))	// not too far or too close
+			{
+				Fx = m_Unit->GetPositionX() - (float)(sRand.rand(15)+5)*cosf(Fo);
+				Fy = m_Unit->GetPositionY() - (float)(sRand.rand(15)+5)*sinf(Fo);
+			}
+			else
+			{
+				Fx = m_Unit->GetPositionX() + (float)(sRand.rand(20)+5)*cosf(Fo);
+				Fy = m_Unit->GetPositionY() + (float)(sRand.rand(20)+5)*sinf(Fo);
+			}
 			// Check if this point is in water.
 			float wl = m_Unit->GetMapMgr()->GetWaterHeight(Fx, Fy);
 //			uint8 wt = m_Unit->GetMapMgr()->GetWaterType(Fx, Fy);
 	
 			Fz = m_Unit->GetMapMgr()->GetLandHeight(Fx, Fy);
-			if(!(fabs(m_Unit->GetPositionZ() - Fz) > 4 || Fz < (wl-2))/* && wt & 0x1*/)
-			{		
+			if(fabs(m_Unit->GetPositionZ()-Fz) > 4 || (Fz != 0.0f && Fz < (wl-2.0f)))
+				m_FearTimer=getMSTime()+100;
+			else
+			{
+				m_moveRun=true;
 				MoveTo(Fx, Fy, Fz, Fo);
+				m_FearTimer = m_totalMoveTime + getMSTime() + 200;
 			}
-			m_FearTimer = m_totalMoveTime + getMSTime() + 200;
 		}
 	}
 	

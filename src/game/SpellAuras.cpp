@@ -4556,7 +4556,10 @@ void Aura::EventPeriodicHeal1(uint32 amount)
 		m_target->Emote(EMOTE_ONESHOT_EAT);
 	}
 	else
-		SendPeriodicHealAuraLog(amount);
+	{
+		if(!(m_spellProto->buffType & SPELL_TYPE_ARMOR))
+			SendPeriodicHealAuraLog(amount);
+	}
 }
 
 void Aura::SpellAuraModPowerRegen(bool apply)
