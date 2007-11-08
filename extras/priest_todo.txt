@@ -8,8 +8,6 @@ Vampiric Touch, doesn't give any mana.
 Prayer of Mending is not working.
 Same for Blessed Recovery/Resilience.
 
-Shadow Resilience http://www.wowhead.com/?spell=14910
-Shadow Focus http://www.wowhead.com/?spell=15260
 Improved Power Word: Fortitude http://www.wowhead.com/?spell=14749
 Improved Power Word: Shield http://www.wowhead.com/?spell=14748
 Improved Divine Spirit http://www.wowhead.com/?spell=33174
