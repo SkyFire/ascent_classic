@@ -403,6 +403,7 @@ int luaUnit_GetO(lua_State * L, Unit * ptr);
 int luaUnit_IsPlayer(lua_State * L, Unit * ptr);
 int luaUnit_IsCreature(lua_State * L, Unit * ptr);
 int luaUnit_RegisterEvent(lua_State * L, Unit * ptr);
+int luaUnit_RemoveEvents(lua_State * L, Unit * ptr);
 int luaUnit_SendBroadcastMessage(lua_State * L, Unit * ptr);
 int luaUnit_SendAreaTriggerMessage(lua_State * L, Unit * ptr);
 int luaUnit_KnockBack(lua_State * L, Unit * ptr);
@@ -459,6 +460,7 @@ Unit::RegType Unit::methods[] = {
 	{ "IsPlayer", &luaUnit_IsPlayer },
 	{ "IsCreature", &luaUnit_IsCreature },
 	{ "RegisterEvent", &luaUnit_RegisterEvent },
+	{ "RemoveEvents", &luaUnit_RemoveEvents },
 	{ "SendBroadcastMessage", &luaUnit_SendBroadcastMessage },
 	{ "SendAreaTriggerMessage", &luaUnit_SendAreaTriggerMessage },
 	{ "KnockBack", &luaUnit_KnockBack },
@@ -819,6 +821,15 @@ int luaUnit_RegisterEvent(lua_State * L, Unit * ptr)
 	Creature * pCreature = ((Creature*)ptr);
 	string strFunc = string(func_to_call);
 	sEventMgr.AddEvent(pCreature, &Creature::TriggerScriptEvent, strFunc, EVENT_CREATURE_UPDATE, (uint32)delay, (uint32)repeats, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	return 0;
+}
+int luaUnit_RemoveEvents(lua_State * L, Unit * ptr)
+{
+	if(!ptr||ptr->GetTypeId()!=TYPEID_UNIT)
+		return 0;
+
+	/*Creature * pCreature = ((Creature*)ptr);
+	sEventMgr.RemoveEvents(pCreature);*/
 	return 0;
 }
 

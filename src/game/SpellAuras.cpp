@@ -4682,13 +4682,13 @@ void Aura::SpellAuraPeriodicDamagePercent(bool apply)
 		//	}		
 		//}
 
-		if(m_spellProto->Id == 28347) //Dimensional Siphon
+		/*if(m_spellProto->Id == 28347) //Dimensional Siphon
 		{
 			uint32 dmg = (m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*5)/100;
 			sEventMgr.AddEvent(this, &Aura::EventPeriodicDamagePercent, dmg, 
 				EVENT_AURA_PERIODIC_DAMAGE_PERCENT, 1000, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 		}
-		else
+		else*/
 		{
 			uint32 dmg = mod->m_amount;
 			sEventMgr.AddEvent(this, &Aura::EventPeriodicDamagePercent, dmg, 
@@ -4706,20 +4706,10 @@ void Aura::EventPeriodicDamagePercent(uint32 amount)
 	if(m_target->SchoolImmunityList[GetSpellProto()->School])
 		return;
 
-	uint32 damage = amount;
+	uint32 damage = float2int32(amount/100.0f*m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 
-//	uint32 school = GetSpellProto()->School;
 	Unit * c = GetUnitCaster();
 
- /*   if (c)
-		SendPeriodicAuraLog(m_target, c, GetSpellProto()->Id, school, damage, FLAG_PERIODIC_DAMAGE);
-	else
-		SendPeriodicAuraLog(m_casterGuid, m_target, GetSpellProto()->Id, school, damage, FLAG_PERIODIC_DAMAGE);
-
-	if(c)
-		c->DealDamage(m_target, damage, 0, 0, GetSpellProto()->Id);
-	else
-		m_target->DealDamage(m_target, damage, 0, 0, GetSpellProto()->Id);*/
 	if(c)
 		c->SpellNonMeleeDamageLog(m_target, GetSpellProto()->Id, damage, pSpellId==0, true);
 	else
