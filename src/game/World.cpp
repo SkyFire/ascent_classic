@@ -1871,6 +1871,25 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=MF_grouprelation;
 
+	//priest - Absolution 
+	sp = dbcSpell.LookupEntry(33167); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648;
+	sp = dbcSpell.LookupEntry(33171); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648;
+	sp = dbcSpell.LookupEntry(33172); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648;
+	//priest - Abolish Disease - does not have a group type 
+	sp = dbcSpell.LookupEntry(552); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648;
+	//priest - Mass Dispel - does not have a group type 
+	sp = dbcSpell.LookupEntry(32375); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648;
+
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry(27116);

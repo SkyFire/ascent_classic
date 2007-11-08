@@ -114,6 +114,7 @@ Zack - test my shit :
 - shaman - Mental Quickness 30814. works only for half of the spells
 - Druid - Ferocity 16938. Works only partially
 - paladin - Blessing of Light 32770 
+- priest - Absolution 33172
 
 ==========================================================================
 Capt - test my shit :
