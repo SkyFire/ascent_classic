@@ -2274,6 +2274,10 @@ void Spell::HandleAddAura(uint64 guid)
 		spell->prepare(&targets);	
 	}
 
+	// avoid map corruption
+	if(Target->GetInstanceID()!=m_caster->GetInstanceID())
+		return;
+
 	std::map<uint32,Aura*>::iterator itr=Target->tmpAura.find(m_spellInfo->Id);
 	if(itr!=Target->tmpAura.end())
 	{
@@ -2650,7 +2654,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 				}
 				else if(m_spellInfo->Category==672)//Conflagrate, requires immolation spell on victim
 				{
-					if(!target->HasAura(46))
+					if(!target->HasAuraVisual(46))
 						return SPELL_FAILED_BAD_TARGETS;
 				}
 

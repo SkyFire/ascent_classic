@@ -85,7 +85,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	else
 	{
 		//make sure this player can still loot it in case of ffa_loot
-		LooterSet::iterator itr = pLoot->items.at(lootSlot).has_looted.find(_player->GetGUID());
+		LooterSet::iterator itr = pLoot->items.at(lootSlot).has_looted.find(_player->GetGUIDLow());
 
 		if (pLoot->items.at(lootSlot).has_looted.end() != itr)
 		{
@@ -166,7 +166,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	}
 	else
 	{
-		pLoot->items.at(lootSlot).has_looted.insert(_player->GetGUID());
+		pLoot->items.at(lootSlot).has_looted.insert(_player->GetGUIDLow());
 		WorldPacket data(1);
 		data.SetOpcode(SMSG_LOOT_REMOVED);
 		data << lootSlot;
@@ -1646,7 +1646,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	else
 	{
 		//make sure this player can still loot it in case of ffa_loot
-		LooterSet::iterator itr = pLoot->items.at(slotid).has_looted.find(player->GetGUID());
+		LooterSet::iterator itr = pLoot->items.at(slotid).has_looted.find(player->GetGUIDLow());
 
 		if (pLoot->items.at(slotid).has_looted.end() != itr)
 		{
@@ -1714,7 +1714,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	}
 	else
 	{
-		pLoot->items.at(slotid).has_looted.insert(player->GetGUID());
+		pLoot->items.at(slotid).has_looted.insert(player->GetGUIDLow());
 	}
 
 /*    WorldPacket idata(45);

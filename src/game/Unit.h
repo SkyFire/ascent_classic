@@ -769,7 +769,8 @@ public:
 	uint8 m_invisFlag;
 	int32 m_invisDetect[INVIS_FLAG_TOTAL];
 
-	bool HasAura(uint32 visualid);//not spell id!!!
+	bool HasAura(uint32 spellid);
+	bool HasAuraVisual(uint32 visualid);//not spell id!!!
 	bool HasActiveAura(uint32 spelllid);
 	bool HasActiveAura(uint32 spelllid,uint64);
 	

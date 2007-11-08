@@ -461,11 +461,15 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	for (Object::InRangeSet::iterator iter = obj->GetInRangeSetBegin();
 		iter != obj->GetInRangeSetEnd(); ++iter)
 	{
-		if((*iter)->GetTypeId() == TYPEID_PLAYER)
-			if (((Player*)(*iter))->IsVisible(obj) && static_cast<Player*>(*iter)->m_TransporterGUID != obj->GetGUID())
-				((Player*)*iter)->PushOutOfRange(obj->GetNewGUID());
+		if((*iter))
+		{
+			if((*iter)->GetTypeId() == TYPEID_PLAYER) {
+				if (((Player*)(*iter))->IsVisible(obj) && static_cast<Player*>(*iter)->m_TransporterGUID != obj->GetGUID())
+					((Player*)*iter)->PushOutOfRange(obj->GetNewGUID());
 
-		(*iter)->RemoveInRangeObject(obj);
+				(*iter)->RemoveInRangeObject(obj);
+			}
+		}
 	}
 	
 	// Clear object's in-range set

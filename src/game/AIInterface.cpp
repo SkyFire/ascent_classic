@@ -1014,7 +1014,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						}
 					}
 					// CastSpell(m_Unit, spellInfo, targets);
-					if(m_nextSpell->cooldown)
+					if(m_nextSpell&&m_nextSpell->cooldown)
 						m_nextSpell->cooldowntime = getMSTime() + m_nextSpell->cooldown;
 
 					//add pet spell after use to pet owner with some chance

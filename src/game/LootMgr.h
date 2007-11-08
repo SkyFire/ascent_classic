@@ -55,7 +55,7 @@ typedef struct
 	uint32 displayid;
 }_LootItem;
 
-typedef std::set<uint64> LooterSet;
+typedef std::set<uint32> LooterSet;
 
 typedef struct
 {

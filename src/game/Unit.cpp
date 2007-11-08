@@ -3577,7 +3577,7 @@ void Unit::RemoveAurasByInterruptFlag(uint32 flag)
 	}
 }
 
-bool Unit::HasAura(uint32 visualid)
+bool Unit::HasAuraVisual(uint32 visualid)
 {
 	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 	if(m_auras[x] && m_auras[x]->GetSpellProto()->SpellVisual==visualid)
@@ -3587,6 +3587,18 @@ bool Unit::HasAura(uint32 visualid)
 
 	return false;
 }
+
+bool Unit::HasAura(uint32 spellid)
+{
+	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+		if(m_auras[x] && m_auras[x]->GetSpellId())
+		{
+			return true;
+		}
+
+		return false;
+}
+
 
 void Unit::DropAurasOnDeath()
 {

@@ -3152,6 +3152,7 @@ void Player::RemoveFromWorld()
 	if(m_Summon)
 	{
 		m_Summon->GetAIInterface()->SetPetOwner(0);
+		m_Summon->ClearPetOwner();
 		m_Summon->Remove(false, true, false);
 	}
 
@@ -4911,7 +4912,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		if (iter->iItemsCount == 0)
 			continue;
 
-		LooterSet::iterator itr = iter->has_looted.find(GetGUID());
+		LooterSet::iterator itr = iter->has_looted.find(GetGUIDLow());
 		if (iter->has_looted.end() != itr)
 			continue;
 

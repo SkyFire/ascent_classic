@@ -781,7 +781,10 @@ ChannelMgr::~ChannelMgr()
 
 Channel::~Channel()
 {
-
+	m_lock.Acquire();
+	for(MemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+		itr->first->LeftChannel(this);
+	m_lock.Release();
 }
 
 void Channel::SendToAll(WorldPacket * data)

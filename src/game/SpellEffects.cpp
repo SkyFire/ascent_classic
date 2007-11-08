@@ -1160,6 +1160,11 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 			}
 		}
 	}
+	
+	// avoid map corruption.
+	if(unitTarget->GetInstanceID()!=m_caster->GetInstanceID())
+		return;
+
 	//check if we already have stronger aura
 	Aura *pAura;
 	std::map<uint32,Aura*>::iterator itr=unitTarget->tmpAura.find(m_spellInfo->Id);

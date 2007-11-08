@@ -2180,7 +2180,6 @@ void Charter::Destroy()
 	//meh remove from objmgr
 	objmgr.RemoveCharter(this);
 	// Kill the players with this (in db/offline)
-	CharacterDatabase.Execute("UPDATE characters SET charterId = 0 WHERE charterId = %u", CharterId);
 	CharacterDatabase.Execute("DELETE FROM charters WHERE charterId = %u", CharterId);
 	Player * p;
 	for(uint32 i = 0; i < Slots; ++i)
