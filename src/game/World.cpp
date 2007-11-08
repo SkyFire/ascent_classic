@@ -1907,6 +1907,20 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
 
+	//priest - Focused Power
+	sp = dbcSpell.LookupEntry(33186); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648;
+	}
+	sp = dbcSpell.LookupEntry(33190); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648;
+	}
+
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry(27116);

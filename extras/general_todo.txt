@@ -115,6 +115,7 @@ Zack - test my shit :
 - paladin - Blessing of Light 32770 
 - priest - Absolution 33172
 - priest - Mental Agility 14783
+- priest - Focused Power 33190
 
 ==========================================================================
 Capt - test my shit :
