@@ -3153,8 +3153,11 @@ void Player::RemoveFromWorld()
 	{
 		m_Summon->GetAIInterface()->SetPetOwner(0);
 		m_Summon->Remove(false, true, false);
-		m_Summon->ClearPetOwner();
-		m_Summon=NULL;
+		if(m_Summon)
+		{	
+			m_Summon->ClearPetOwner();
+			m_Summon=NULL;
+		}
 	}
 
 	if(m_SummonedObject)
@@ -4743,8 +4746,11 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 		{
 			m_Summon->Remove(true, true, false);
 		}
-		m_Summon->ClearPetOwner();
-		m_Summon = 0;
+		if(m_Summon)
+		{
+			m_Summon->ClearPetOwner();
+			m_Summon = 0;
+		}
 	}
 
 	/* wehee loop unrolling */
