@@ -1884,11 +1884,11 @@ bool World::SetInitialWorldSettings()
 	//priest - Abolish Disease - does not have a group type 
 	sp = dbcSpell.LookupEntry(552); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->SpellGroupType=2147483648;
 	//priest - Mass Dispel - does not have a group type 
 	sp = dbcSpell.LookupEntry(32375); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->SpellGroupType=2147483648;
 
 	//priest - Mental Agility - all instant spells. I wonder if it conflicts with any other spells 
 	sp = dbcSpell.LookupEntry(14520); 
@@ -2300,6 +2300,21 @@ bool World::SetInitialWorldSettings()
 	//rogue-shiv -> add 1 combo point
 	sp = dbcSpell.LookupEntry(5938);
 	if(sp)	sp->Effect[1]=80;
+
+	//warlock - Amplify Curse
+	sp = dbcSpell.LookupEntry(18288);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=1024;
+		sp->EffectSpellGroupRelation[1]=4194304;
+	}
+	//warlock - Curse of Doom. Has missign group type
+	sp = dbcSpell.LookupEntry(603);
+	if(sp)
+		sp->SpellGroupType=1024;
+	sp = dbcSpell.LookupEntry(30910);
+	if(sp)
+		sp->SpellGroupType=1024;
 
 	//warlock - soul leech
 	sp = dbcSpell.LookupEntry(30293);

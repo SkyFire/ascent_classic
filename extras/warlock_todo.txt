@@ -18,7 +18,6 @@ Demonology:
 3. Soul Link - deamon does not take any dmg instead of caster. 
 
 Affliction
-Curse of Tongues - nothing happens , no +x% casting time to enemy
 Unstable Affliction - no dmg when dispelled
 Seed of Corruption - no dmg when detonates
 
@@ -54,7 +53,6 @@ TALENTS
 Affliction
 Improved Life Tap - increases mana awarded by 10% - nothing happens no bonus <- should be fixed already
 Improved Drain Soul - no mana regeneration after shard is made
-Amplify Curse - should increase dmg for next Curse of Doom or Curse of Agony by 50 % , works sometimes only for CoA
 Grim Reach - should increase range for affliction spells by 10 % - no increase
 Shadow Embrace - should give u 5% reduction on dmg received when you cast Corr , CoA , Siphon Life or Seed of Corr
 Nighfall - 4% chance when a target is dmged by Drain Life or Corr to make your next shadowbolt instant

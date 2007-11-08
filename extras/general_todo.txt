@@ -118,6 +118,7 @@ Zack - test my shit :
 - priest - Focused Power 33190
 - priest - Shadow Reach 17323
 - priest - Shadow Focus 15330
+- warlock - Amplify Curse 18288
 
 ==========================================================================
 Capt - test my shit :
