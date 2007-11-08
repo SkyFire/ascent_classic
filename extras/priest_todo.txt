@@ -1,8 +1,6 @@
 Spells:
 	Mind Control - When used on anyone besides an NPC, the mind controlled victim is unusable.
 
-Mental Agility - Does not work at all.
-
 Focused Power - Does not work.
 
 Surge of Light - Does not work.

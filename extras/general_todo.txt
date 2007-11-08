@@ -89,7 +89,6 @@ Zack - test my shit :
 - mage - Frost Warding - 28332 - does not reflect
 - Gnomish Poultryizer trinket - Poultryizer - need aura duration to set to 15 sec
 - priest - Force of Will - 18550 - what is the group type to increase here ?, all spells ?
-- blessing of light applies it's effect on holy shock ? and value gets wrong
 - palading spiritual atunement procs 2 times.And it should proc if others cast heal spell on paladin
 - mobs continue casting after they die. Test spell CancelSpellCast.Specially test this : CastSpellAoF
 "yes, the thing is that if you have "Heart of the Wild" talent and you reset talents, if you shift you have like 500mil hp & insane dmg. You need to relog in order that things should work fine. Same thing for other talents ... leader of pack, imp leader of pack...they need to relog to lose them."
@@ -115,6 +114,7 @@ Zack - test my shit :
 - Druid - Ferocity 16938. Works only partially
 - paladin - Blessing of Light 32770 
 - priest - Absolution 33172
+- priest - Mental Agility 14783
 
 ==========================================================================
 Capt - test my shit :
