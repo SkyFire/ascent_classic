@@ -394,7 +394,7 @@ Player::~Player ( )
 	}
 	m_references.clear();
 
-	if(!ok_to_remove||IsInWorld())
+	if(!ok_to_remove)
 	{
 		printf("Player deleted from non-logoutplayer!\n");
 		OutputCrashLogLine("Player deleted from non-logoutplayer!");
@@ -1552,7 +1552,7 @@ void Player::_SavePet()
 	// Remove any existing info
 	CharacterDatabase.Execute("DELETE FROM playerpets WHERE ownerguid=%u", GetGUIDLow());
 
-	if(m_Summon)	// update PlayerPets array with current pet's info
+	if(m_Summon&&m_Summon->IsInWorld()&&m_Summon->GetPetOwner()==this)	// update PlayerPets array with current pet's info
 	{
 		m_Summon->UpdatePetInfo(false);
 
@@ -3152,8 +3152,9 @@ void Player::RemoveFromWorld()
 	if(m_Summon)
 	{
 		m_Summon->GetAIInterface()->SetPetOwner(0);
-		m_Summon->ClearPetOwner();
 		m_Summon->Remove(false, true, false);
+		m_Summon->ClearPetOwner();
+		m_Summon=NULL;
 	}
 
 	if(m_SummonedObject)
@@ -4742,6 +4743,7 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 		{
 			m_Summon->Remove(true, true, false);
 		}
+		m_Summon->ClearPetOwner();
 		m_Summon = 0;
 	}
 

@@ -529,7 +529,7 @@ void Pet::InitializeMe(bool first)
 
 void Pet::UpdatePetInfo(bool bSetToOffline)
 {
-	if(bExpires)
+	if(bExpires || m_Owner==NULL)
 		return;	// don't update expiring pets
 
 	PlayerPet *pi = m_Owner->GetPlayerPet(m_PetNumber);

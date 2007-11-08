@@ -72,40 +72,33 @@ void LogonCommHandler::RequestAddition(LogonCommClientSocket * Socket)
 void LogonCommHandler::Startup()
 {
 	// Try to connect to all logons.
-	sLog.outColor(TNORMAL, "\n >> loading realms and logon server definitions... ");
 	LoadRealmConfiguration();
 
-	sLog.outColor(TNORMAL, " >> attempting to connect to all logon servers... \n");
+	Log.Notice("LogonCommClient", "Attempting to connect to logon server...");
 	for(set<LogonServer*>::iterator itr = servers.begin(); itr != servers.end(); ++itr)
 		Connect(*itr);
-
-	sLog.outColor(TNORMAL, "\n");
 }
 
 void LogonCommHandler::Connect(LogonServer * server)
 {
-	sLog.outColor(TNORMAL, "	>> connecting to `%s` on `%s:%u`...", server->Name.c_str(), server->Address.c_str(), server->Port);
+	Log.Notice("LogonCommClient", "Connecting to logonserver on `%s:%u`...", server->Address.c_str(), server->Port );
 	server->RetryTime = (uint32)UNIXTIME + 10;
 	server->Registered = false;
 	LogonCommClientSocket * conn = ConnectToLogon(server->Address, server->Port);
 	logons[server] = conn;
 	if(conn == 0)
 	{
-		sLog.outColor(TRED, " fail!\n	   server connection failed. I will try again later.");
-		sLog.outColor(TNORMAL, "\n");
+		Log.Notice("LogonCommClient", "Connection failed. Will try again in 10 seconds.");
 		return;
 	}
-	sLog.outColor(TGREEN, " ok!\n");
-	sLog.outColor(TNORMAL, "        >> authenticating...\n");
-	sLog.outColor(TNORMAL, "        >> ");
+	Log.Notice("LogonCommClient", "Authenticating...");
 	uint32 tt = (uint32)UNIXTIME + 10;
 	conn->SendChallenge();
-	sLog.outColor(TNORMAL, "        >> result:");
 	while(!conn->authenticated)
 	{
 		if((uint32)UNIXTIME >= tt)
 		{
-			sLog.outColor(TYELLOW, " timeout.\n");
+			Log.Notice("LogonCommClient", "Authentication timed out.");
 			conn->Disconnect();
 			logons[server]=NULL;
 			return;
@@ -116,18 +109,18 @@ void LogonCommHandler::Connect(LogonServer * server)
 
 	if(conn->authenticated != 1)
 	{
-		sLog.outColor(TRED, " failure.\n");
+		Log.Notice("LogonCommClient","Authentication failed.");
 		logons[server] = 0;
 		conn->Disconnect();
 		return;
 	}
 	else
-		sLog.outColor(TGREEN, " ok!\n");
+		Log.Notice("LogonCommClient","Authentication succeeded.");
 
 	// Send the initial ping
 	conn->SendPing();
 
-	sLog.outColor(TNORMAL, "        >> registering realms... ");
+	Log.Notice("LogonCommClient", "Registering Realms...");
 	conn->_id = server->ID;
 
 	RequestAddition(conn);
@@ -140,7 +133,7 @@ void LogonCommHandler::Connect(LogonServer * server)
 		// Don't wait more than.. like 10 seconds for a registration
 		if((uint32)UNIXTIME >= st)
 		{
-			sLog.outColor(TYELLOW, "timeout.");
+			Log.Notice("LogonCommClient", "Realm registration timed out.");
 			logons[server] = 0;
 			conn->Disconnect();
 			break;
@@ -154,9 +147,7 @@ void LogonCommHandler::Connect(LogonServer * server)
 	// Wait for all realms to register
 	Sleep(200);
 
-	sLog.outColor(TNORMAL, "\n        >> ping test: ");
-	sLog.outColor(TYELLOW, "%ums", conn->latency);
-	sLog.outColor(TNORMAL, "\n");
+	Log.Notice("LogonCommClient", "Logonserver latency is %ums.", conn->latency);
 }
 
 void LogonCommHandler::AdditionAck(uint32 ID, uint32 ServID)
@@ -319,7 +310,6 @@ void LogonCommHandler::LoadRealmConfiguration()
 	ls->Address = Config.RealmConfig.GetStringDefault("LogonServer", "Address", "127.0.0.1");
 	ls->Port = Config.RealmConfig.GetIntDefault("LogonServer", "Port", 8093);
 	servers.insert(ls);
-	sLog.outColor(TYELLOW, "1 servers, ");
 
 	uint32 realmcount = Config.RealmConfig.GetIntDefault("LogonServer", "RealmCount", 1);
 	if(realmcount == 0)
@@ -354,7 +344,6 @@ void LogonCommHandler::LoadRealmConfiguration()
 			realm->Icon = type;
 			realms.insert(realm);
 		}
-		sLog.outColor(TBLUE, "%u realms.\n", realmcount);
 	}
 }
 

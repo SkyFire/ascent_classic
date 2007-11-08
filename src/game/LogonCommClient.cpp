@@ -129,9 +129,7 @@ void LogonCommClientSocket::HandleRegister(WorldPacket & recvData)
 	string realmname;
 	recvData >> error >> realmlid >> realmname;
 
-	sLog.outColor(TNORMAL, "\n        >> realm `%s` registered under id ", realmname.c_str());
-	sLog.outColor(TGREEN, "%u", realmlid);
-	
+	Log.Notice("LogonCommClient", "Realm `%s` registered as realm %u.", realmname.c_str(), realmlid);
 	LogonCommHandler::getSingleton().AdditionAck(_id, realmlid);
 	realm_ids.insert(realmlid);
 }
@@ -161,8 +159,6 @@ void LogonCommClientSocket::HandleSessionInfo(WorldPacket & recvData)
 
 void LogonCommClientSocket::HandlePong(WorldPacket & recvData)
 {
-	if(latency)
-		sLog.outDebug(">> logonserver latency: %ums", getMSTime() - pingtime);
 	latency = getMSTime() - pingtime;
 	last_pong = (uint32)UNIXTIME;
 }
@@ -227,14 +223,6 @@ LogonCommClientSocket::~LogonCommClientSocket()
 void LogonCommClientSocket::SendChallenge()
 {
 	uint8 * key = sLogonCommHandler.sql_passhash;
-
-	/* initialize rc4 keys */
-
-	printf("Key:");
-	sLog.outColor(TGREEN, " ");
-	for(int i = 0; i < 20; ++i)
-		printf("%.2X ", key[i]);
-	sLog.outColor(TNORMAL, "\n");
 
 	_recvCrypto.Setup(key, 20);
 	_sendCrypto.Setup(key, 20);	
@@ -336,10 +324,7 @@ void LogonCommClientSocket::HandleRequestAccountMapping(WorldPacket & recvData)
 
 		uncompressed.clear();
 	}	
-	sLog.outColor(TNORMAL, "\n        >> Took ");
-	sLog.outColor(TGREEN, "%u", (getMSTime() - t));
-	sLog.outColor(TNORMAL, " msec to build character mapping list for realm");
-	sLog.outColor(TGREEN, " %u", realm_id);
+	Log.Notice("LogonCommClient", "Build character mapping in %ums. (%u)", getMSTime()-t,mapping_to_send.size());
 }
 
 void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
