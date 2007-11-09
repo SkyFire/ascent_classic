@@ -961,7 +961,8 @@ void WorldSession::SendItemPushResult(Item * pItem, bool Created, bool Received,
 	data << pItem->GetItemRandomSuffixFactor();
 	data << pItem->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID);
 	data << AddCount;
-	data << uint32(0);
+	data << pItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
+
 	if(SendToSet)
 	{
 		if(Created)

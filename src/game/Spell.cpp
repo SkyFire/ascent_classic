@@ -52,11 +52,22 @@ void SpellCastTargets::read ( WorldPacket & data,uint64 caster )
 	if(m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
 	{
 		data >> m_srcX >> m_srcY >> m_srcZ;
+
+		if(!(m_targetMask & TARGET_FLAG_DEST_LOCATION)) {
+			m_destX = m_srcX;
+			m_destY = m_srcY;
+			m_destZ = m_srcZ;
+		}
 	}
 
 	if(m_targetMask & TARGET_FLAG_DEST_LOCATION)
 	{
 		data >> m_destX >> m_destY >> m_destZ;
+		if(!(m_targetMask & TARGET_FLAG_SOURCE_LOCATION)) {
+			m_srcX = m_destX;
+			m_srcY = m_destY;
+			m_srcZ = m_destZ;
+		}
 	}
 
 	if(m_targetMask & TARGET_FLAG_STRING)
