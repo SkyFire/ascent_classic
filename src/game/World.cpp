@@ -1174,33 +1174,6 @@ bool World::SetInitialWorldSettings()
 				sp->EffectTriggerSpell[0]=atoi(startofid);
 			}
 		}
-		/*else if(strstr(nametext, "Shred"))
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "damage plus ");
-			if(startofid)
-			{
-				startofid += strlen("damage plus ");
-				sp->EffectBasePoints[1]=atoi(startofid);
-			}
-		}
-		else if(strstr(nametext, "Ravage"))
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "damage plus ");
-			if(startofid)
-			{
-				startofid += strlen("damage plus ");
-				sp->EffectBasePoints[1]=atoi(startofid);
-			}
-		}
-		else if(strstr(nametext, "Mangle"))
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "damage plus ");
-			if(startofid)
-				sp->EffectBasePoints[1]=(sp->EffectBasePoints[0]+1)*(sp->EffectBasePoints[2]+1)/100;//kinda rough estimation no ? :P
-		}*/
 		else if(strstr(nametext, "Holy Shock"))
 		{
 			//check if we can find in the desription
@@ -1266,6 +1239,24 @@ bool World::SetInitialWorldSettings()
 /*		//if there is a proc spell and has 0 as charges then it's probably going to triger infinite times. Better not save these
 		if(sp->procCharges==0)
 			sp->procCharges=-1;*/
+
+		//Set Silencing spells mech.
+		if (sp->EffectApplyAuraName[0] == 27 || 
+			sp->EffectApplyAuraName[1] == 27 ||
+			sp->EffectApplyAuraName[2] == 27)
+			sp->MechanicsType = MECHANIC_SILENCED;
+		//Set Stunning spells mech.
+		if (sp->EffectApplyAuraName[0] == 12 || 
+			sp->EffectApplyAuraName[1] == 12 ||
+			sp->EffectApplyAuraName[2] == 12)
+			sp->MechanicsType = MECHANIC_STUNNED;
+		//Set Fearing spells mech
+		if (sp->EffectApplyAuraName[0] == 7 || 
+			sp->EffectApplyAuraName[1] == 7 ||
+			sp->EffectApplyAuraName[2] == 7)
+			sp->MechanicsType = MECHANIC_FLEEING;
+
+
 		if(sp->proc_interval!=0)
 			sp->procFlags |= PROC_REMOVEONUSE;
 
@@ -1276,24 +1267,20 @@ bool World::SetInitialWorldSettings()
 			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
 			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
 		}
-		
 		/* Seal of Jusice - Proc Chance */
-		if(sp->NameHash == 0xCC6D4182)
+		else if(sp->NameHash == 0xCC6D4182)
 			sp->procChance = 25;
-
 		/* Decapitate */
 		else if(sp->NameHash == 0xB6C3243C)
 			sp->procChance = 30;
-
 		//shaman - shock, has no spellgroup.very dangerous move !
 		else if(sp->NameHash == 0x561A665E)
 			sp->SpellGroupType = 4;
+		else if(sp->NameHash==0x9840A1A6 || sp->NameHash == 0x1513B967 || sp->NameHash==0x204D568D)
+			sp->MechanicsType=25;
 
 		if(sp->Id==25771 || sp->Id == 11196 || sp->Id == 6788)
 			sp->removable_by_immunity = false;
-
-		if(sp->NameHash==0x9840A1A6 || sp->NameHash == 0x1513B967 || sp->NameHash==0x204D568D)
-			sp->MechanicsType=25;
 
 		/* Backlash */
 		if(sp->NameHash == 0x5965939A)
@@ -2540,7 +2527,11 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(27003);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	//lacerate
 	sp = dbcSpell.LookupEntry(33745);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-//-----------------------
+//-------------------------------
+	//Druid: Natural Shapeshifter
+	sp = dbcSpell.LookupEntry(16833);if (sp) sp->DurationIndex = 0;
+	sp = dbcSpell.LookupEntry(16834);if (sp) sp->DurationIndex = 0;
+	sp = dbcSpell.LookupEntry(16835);if (sp) sp->DurationIndex = 0;
 	//Priest: Shadow Power
 	sp = dbcSpell.LookupEntry(15310);
 	if(sp)

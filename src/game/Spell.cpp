@@ -3199,12 +3199,18 @@ exit:
 			value +=float2int32(u_caster->GetRAP()*0.15f);
 	}else if(m_spellInfo->NameHash == 0x93C04185)//rake
 	{
-		if(u_caster) {
+		if(u_caster) 
+		{
 			if(i==0)
-				value+=(uint32)(u_caster->GetAP()*0.01);
+				value+=(uint32)(u_caster->GetAP()*0.03);
 			else if(i==1)
-				value+=(uint32)(u_caster->GetAP()*0.02);
+				value+=(uint32)(u_caster->GetAP()*0.06);
 		}
+	}else if(m_spellInfo->NameHash == 0x8B025B0C)//rip
+	{
+		if(u_caster) 
+				value+=(uint32)(u_caster->GetAP()*0.24);
+
 	}else if(m_spellInfo->NameHash == 0x5F076E9E)//Mongoose Bite
 	{// ${$AP*0.2+$m1} damage.
 		if(u_caster)

@@ -1119,10 +1119,16 @@ void Aura::EventPeriodicDamage(uint32 amount)
 
 		uint32 ress=(uint32)res;
 		uint32 abs_dmg = m_target->AbsorbDamage(school, &ress);
+		uint32 ms_abs_dmg= m_target->ManaShieldAbsorb(ress);
 		dealdamage dmg;
 		dmg.school_type = school;
 		dmg.full_damage = ress;
 		dmg.resisted_damage = 0;
+		if (ms_abs_dmg)
+		{
+			ress-=ms_abs_dmg;
+			abs_dmg += ms_abs_dmg;
+		}
 
 		
 		if(c && m_spellProto->MechanicsType != MECHANIC_BLEEDING)
@@ -4987,22 +4993,6 @@ void Aura::SpellAuraAddPctMod(bool apply)
 {
 	int32 val = apply?mod->m_amount:-mod->m_amount;
 	uint32 AffectedGroups = GetSpellProto()->EffectSpellGroupRelation[mod->i];
-
-	//if (apply)
-	//{
-	//	SpellEntry *s = GetSpellProto();
-	//	FILE *f = fopen("log.txt","a");
-	//	fprintf(f,"PCT ID %d DM %.2f %.2f %.2f M %d ESGR %d %d %d\n",s->Id,
-	//		s->dmg_multiplier[0],
-	//		s->dmg_multiplier[1],
-	//		s->dmg_multiplier[2],
-	//		mod->m_miscValue,
-	//		s->EffectSpellGroupRelation[0],
-	//		s->EffectSpellGroupRelation[1],
-	//		s->EffectSpellGroupRelation[2]
-	//	);
-	//	fclose(f);
-	//}
 //printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 
 	switch (mod->m_miscValue)//let's generate warnings for unknown types of modifiers
@@ -6130,24 +6120,6 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 {
 	int32 val = apply?mod->m_amount:-mod->m_amount;
 	uint32 AffectedGroups = GetSpellProto()->EffectSpellGroupRelation[mod->i];
-
-	//if (apply)
-	//{
-	//	SpellEntry *s = GetSpellProto();
-	//	FILE *f = fopen("log.txt","a");
-	//	fprintf(f,"FLAT ID %d DM %.2f %.2f %.2f E %d %d %d ESGR %d %d %d\n",s->Id,
-	//		s->dmg_multiplier[0],
-	//		s->dmg_multiplier[1],
-	//		s->dmg_multiplier[2],
-	//		s->Effect[0],
-	//		s->Effect[1],
-	//		s->Effect[2],
-	//		s->EffectSpellGroupRelation[0],
-	//		s->EffectSpellGroupRelation[1],
-	//		s->EffectSpellGroupRelation[2]
-	//	);
-	//	fclose(f);
-	//}
 
 //printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 

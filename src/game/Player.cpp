@@ -7836,6 +7836,7 @@ void Player::SetShapeShift(uint8 ss)
 			}
 
 			if (this->getClass()==DRUID)
+			{
 				for(uint32 y = 0; y < 3; ++y)
 				{
 					switch (m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
@@ -7852,6 +7853,7 @@ void Player::SetShapeShift(uint8 ss)
 					if(m_auras[x] == NULL)
 						break;
 				}
+			}
 		} 
 	}
 
