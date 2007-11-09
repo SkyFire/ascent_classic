@@ -1217,6 +1217,33 @@ bool World::SetInitialWorldSettings()
 				sp->procChance = 50;
 			}
 		}
+		else if(strstr(nametext, "Shred"))
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "damage plus ");
+			if(startofid)
+			{
+				startofid += strlen("damage plus ");
+				sp->EffectBasePoints[0]=atoi(startofid);
+			}
+		}
+		else if(strstr(nametext, "Ravage"))
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "damage plus ");
+			if(startofid)
+			{
+				startofid += strlen("damage plus ");
+				sp->EffectBasePoints[0]=atoi(startofid);
+			}
+		}
+		else if(strstr(nametext, "Mangle"))
+		{
+			//check if we can find in the desription
+			char *startofid=strstr(desc, "damage plus ");
+			if(startofid)
+				sp->EffectBasePoints[0]=(sp->EffectBasePoints[0]+1)*(sp->EffectBasePoints[2]+1)/100;//kinda rough estimation no ? :P
+		}
 		//some procs trigger at intervals
 		else if(strstr(nametext, "Water Shield"))
 		{
@@ -2702,25 +2729,10 @@ bool World::SetInitialWorldSettings()
 	// mage - Frost Warding
 	sp = dbcSpell.LookupEntry(11189);
 	if(sp)
-	{
-		SpellEntry * tsp = dbcSpell.LookupEntry(168); //frost armor
-		if(tsp)
-			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
-		tsp = dbcSpell.LookupEntry(7302); //ice armor
-		if(tsp)
-			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
-	}
+		sp->EffectSpellGroupRelation[0] = 33554432;
 	sp = dbcSpell.LookupEntry(28332);
 	if(sp)
-	{
-		SpellEntry * tsp = dbcSpell.LookupEntry(168); //frost armor
-		if(tsp)
-			sp->EffectSpellGroupRelation[0] = tsp->SpellGroupType;
-		tsp = dbcSpell.LookupEntry(7302); //ice armor
-		if(tsp)
-			sp->EffectSpellGroupRelation[0] |= tsp->SpellGroupType;
-//		sp->procChance = 100;
-	}
+		sp->EffectSpellGroupRelation[0] = 33554432;
 	//Gnomish Poultryizer trinket - Poultryizer
 	sp = dbcSpell.LookupEntry(30507);
 	if(sp)

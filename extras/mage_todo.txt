@@ -10,3 +10,20 @@ Problems not related with only one spell/talent:
 - Problem with multiple mages in one group: if a mage cast fireball for example on a mob, if i cast a lower rank of fireball it says that a another more powerfull spell effect is active...this should work on buffs like Arcane Intellect not casting damage spells
 
 Burning Soul should give you 70% chance to avoid interruption while you get damage
+
+Frost Warding
+Increases the armor and resistances given by your Frost Armor and Ice Armor spells by 15n%. In addition, gives your Frost Ward a 10n% chance to reflect Frost spells and effects while active.
+However it affects spells it shouldn't in ways it shouldn't. For example Frostbolt and Cone of Cold:
+
+Spell Power (Arcane) - Increases critical strike damage bonus of all spells by {25/50}%. - no effect
+Mind Mastery (Arcane) - Increases spell damage by up to {5/10/15/20/25}% of your total intellect. - no effect
+Burning Soul (Fire) - Gives your Fire spells a {35/70}% chance to not lose casting time when you take damage and reduces threat by {5/10%}. - no effect
+Master of Elements (Fire) - Your Fire and Frost spell criticals will refund {10/20/30}% of their base mana cost. - no effect
+Fire Power (Fire) - Increases the damage done by your Fire spells by {2/4/6/8/10}%. - no effect
+Combustion (Fire) - When activated, this spell causes each Fire damage spell you cast to increase your critical strike chance with Fire damage spells by 10%. This effect lasts until you have caused 3 critical strikes with Fire spells. - no effect (you get the buff, but the critical strike chance remains the same)
+Empowered Fireball (Fire) - Your Fireball spell gains an additional {3/6/9/12/15}% of your bonus spell damage effects. - no effect.
+Empowered Frostbolt (Frost) - Your Fireball spell gains an additional {3/6/9/12/15}% of your bonus spell damage effects. - no effect.
+
+But those are just a 'by the way'. I know other classes are a priority at the moment, this is just to let you guys know.
+
+Keep up the good work!
