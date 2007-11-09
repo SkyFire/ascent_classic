@@ -315,7 +315,6 @@ struct SpellCharge
     uint32 ProcFlag;
     uint32 lastproc;
     uint32 procdiff;
-    bool FromProc;
 };
 
 typedef set<uint32> AreaAuraList;

@@ -420,12 +420,16 @@ void Aura::Remove()
 
 	if(m_spellProto->procCharges>0 && m_spellProto->proc_interval==0)
 	{
-		std::map<uint32,struct SpellCharge>::iterator iter;
-		iter = m_target->m_chargeSpells.find(GetSpellId());
-		if(iter!=m_target->m_chargeSpells.end())
+		if(m_target->m_chargeSpellsInUse)
+			m_target->m_chargeSpellRemoveQueue.push_back(GetSpellId());
+		else
 		{
-			if(!(iter->second).FromProc)
-			m_target->m_chargeSpells.erase(iter);
+			std::map<uint32,struct SpellCharge>::iterator iter;
+			iter = m_target->m_chargeSpells.find(GetSpellId());
+			if(iter!=m_target->m_chargeSpells.end())
+			{
+				m_target->m_chargeSpells.erase(iter);
+			}
 		}
 	}
 

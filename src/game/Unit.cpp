@@ -225,6 +225,7 @@ Unit::Unit()
 	m_extraAttackCounter = false;
 	CombatStatus.SetUnit(this);
 	m_temp_summon=false;
+	m_chargeSpellsInUse=false;
 }
 
 Unit::~Unit()
@@ -1043,6 +1044,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 		}
 	}
 
+	m_chargeSpellsInUse=true;
 	std::map<uint32,struct SpellCharge>::iterator iter,iter2;
 	iter=m_chargeSpells.begin();
 	while(iter!= m_chargeSpells.end())
@@ -1095,17 +1097,13 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					if(iter2->second.procdiff>3000)
 					{
 						--(iter2->second.count);
-						iter2->second.FromProc=true;
 						RemoveAura(iter2->second.spellId);
-						iter2->second.FromProc=false;
 					}
 				}
 				else
 				{
 					--(iter2->second.count);
-					iter2->second.FromProc=true;
 					this->RemoveAura(iter2->second.spellId);
-					iter2->second.FromProc=false;
 				}
 			}
 		}
@@ -1114,6 +1112,14 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 			m_chargeSpells.erase(iter2);
 		}
 	}
+
+	for(;!m_chargeSpellRemoveQueue.empty();)
+	{
+		m_chargeSpells.erase( m_chargeSpellRemoveQueue.front() );
+		m_chargeSpellRemoveQueue.pop_front();
+	}
+
+	m_chargeSpellsInUse=false;
 	if(can_delete)
 		bProcInUse = false;
 }

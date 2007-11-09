@@ -837,6 +837,8 @@ public:
 	std::list<struct ProcTriggerSpell> m_procSpells;
 //	std::map<uint32,ProcTriggerSpellOnSpellList> m_procSpellonSpell; //index is namehash
 	std::map<uint32,struct SpellCharge> m_chargeSpells;
+	deque<uint32> m_chargeSpellRemoveQueue;
+	bool m_chargeSpellsInUse;
 	inline void SetOnMeleeSpell(uint32 spell ) { m_meleespell = spell; }
 	inline uint32 GetOnMeleeSpell() { return m_meleespell; }
 
