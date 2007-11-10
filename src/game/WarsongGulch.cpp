@@ -155,6 +155,7 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 			sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_CLOSE);
 			sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
 
+			m_mainLock.Acquire();
 			/* add the marks of honor to all players */
 			SpellEntry * winner_spell = dbcSpell.LookupEntry(24950);
 			SpellEntry * loser_spell = dbcSpell.LookupEntry(24951);
@@ -169,6 +170,7 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 						(*itr)->CastSpell((*itr), loser_spell, true);
 				}
 			}
+			m_mainLock.Release();
 		}
 
 		/* increment the score world state */

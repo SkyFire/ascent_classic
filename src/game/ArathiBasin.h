@@ -88,7 +88,7 @@ public:
 	const char * GetName() { return "Arathi Basin"; }
 	void OnStart();
 
-	void EventUpdateResources();
+	void EventUpdateResources(uint32 Team);
 	bool HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * pSpell);
 
 	/* AB Game Mechanics */

@@ -19,7 +19,6 @@
 
 #include "StdAfx.h"
 
-#define BASE_RESOURCES_UPDATE_TIME 2000/*10000/5*/
 #define BASE_RESOURCES_GAIN 10
 #define RESOURCES_WINVAL 2000
 #define RESOURCES_TO_GAIN_BH 200
@@ -143,6 +142,24 @@ uint32 buffentrys[3] = {180380,180362,180146};
 		AB_SHOW_BACKSMITH_ICON,
 		AB_SHOW_GOLDMINE_ICON,
 		AB_SHOW_LUMBERMILL_ICON,
+	};
+
+	static uint32 ResourceUpdateIntervals[6] = {
+		0,
+		12000,
+		9000,
+		6000,
+		3000,
+		1000,
+	};
+
+	static uint32 PointBonusPerUpdate[6] = {
+		0,
+		10,
+		10,
+		10,
+		10,
+		30,
 	};
 
 /* End BG Data */
@@ -294,6 +311,24 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 
 void ArathiBasin::OnCreate()
 {
+	// Alliance Gate
+	GameObject *gate = SpawnGameObject(180255, 529, 1284.597290f, 1281.166626f, -15.977916f, 0.706859f, 32, 114, 1.5799990f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION,0.0129570f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_01,-0.0602880f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_02,0.3449600f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_03,0.9365900f);
+	gate->PushToWorld(m_mapMgr);
+	m_gates.push_back(gate);
+
+	// horde gate
+	gate = SpawnGameObject(180256, 529, 708.0902710f, 708.4479370f, -17.3898964f, -2.3910990f, 32, 114, 1.5699990f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION,0.0502910f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_01,0.0151270f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_02,0.9292169f);
+	gate->SetFloatValue(GAMEOBJECT_ROTATION_03,-0.3657840f);
+	gate->PushToWorld(m_mapMgr);
+	m_gates.push_back(gate);
+
 	// spawn (default) control points
 	SpawnControlPoint(AB_CONTROL_POINT_STABLE,		AB_SPAWN_TYPE_NEUTRAL);
 	SpawnControlPoint(AB_CONTROL_POINT_BLACKSMITH,	AB_SPAWN_TYPE_NEUTRAL);
@@ -307,6 +342,10 @@ void ArathiBasin::OnCreate()
 	SpawnBuff(AB_BUFF_LUMBERMILL);
 	SpawnBuff(AB_BUFF_MINE);
 	SpawnBuff(AB_BUFF_FARM);
+
+	// spawn the h/a base spirit guides
+	SpawnSpiritGuide(NoBaseGYLocations[0][0],NoBaseGYLocations[0][1],NoBaseGYLocations[0][2], 0.0f, 0);
+	SpawnSpiritGuide(NoBaseGYLocations[1][0],NoBaseGYLocations[1][1],NoBaseGYLocations[1][2], 0.0f, 1);
 
 	// urrrgh worldstates
 	SetWorldState(0x8D8, 0x00);
@@ -367,8 +406,15 @@ void ArathiBasin::OnCreate()
 
 void ArathiBasin::OnStart()
 {
-	// spawn the resource update event
-	sEventMgr.AddEvent(this, &ArathiBasin::EventUpdateResources, EVENT_AB_RESOURCES_UPDATE, BASE_RESOURCES_UPDATE_TIME, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	// open gates
+	for(list<GameObject*>::iterator itr = m_gates.begin(); itr != m_gates.end(); ++itr)
+	{
+		(*itr)->SetUInt32Value(GAMEOBJECT_FLAGS, 64);
+		(*itr)->SetUInt32Value(GAMEOBJECT_STATE, 0);
+	}
+
+	/* correct? - burlex */
+	PlaySoundToAll(SOUND_BATTLEGROUND_BEGIN);
 }
 
 ArathiBasin::ArathiBasin(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : CBattleground(mgr,id,lgroup,t)
@@ -411,32 +457,69 @@ ArathiBasin::~ArathiBasin()
 	}
 }
 
-void ArathiBasin::EventUpdateResources()
+void ArathiBasin::EventUpdateResources(uint32 Team)
 {
 	uint32 resource_fields[2] = { AB_ALLIANCE_RESOURCES, AB_HORDE_RESOURCES };
 
-	for(uint32 i = 0; i < 2; ++i)
+	uint32 current_resources = m_resources[Team];
+	uint32 current_bases = m_capturedBases[Team];
+	uint32 last_resources = current_resources;
+
+	if(current_bases>5)
+		current_bases=5;
+
+	// figure out how much resources we have to add to that team based on the number of captured bases.
+	current_resources += (PointBonusPerUpdate[current_bases]);
+
+	// did it change?
+	if(current_resources == m_resources[Team])
+		return;
+
+	// check for overflow
+	if(current_resources > RESOURCES_WINVAL)
+		current_resources = RESOURCES_WINVAL;
+
+	m_resources[Team] = current_resources;
+	if((current_resources - m_lastHonorGainResources[Team]) >= RESOURCES_TO_GAIN_BH)
 	{
-		uint32 current_resources = m_resources[i];
-		uint32 current_bases = m_capturedBases[i];
+		m_mainLock.Acquire();
+		for(set<Player*>::iterator itr = m_players[Team].begin(); itr != m_players[Team].end(); ++itr)
+			(*itr)->m_bgScore.BonusHonor += BASE_BH_GAIN;
 
-		// figure out how much resources we have to add to that team based on the number of captured bases.
-		current_resources += BASE_RESOURCES_GAIN;
-		current_resources += (BASE_RESOURCES_GAIN * current_bases);
+		UpdatePvPData();
+		m_mainLock.Release();
+	}
 
-		m_resources[i] = current_resources;
-		if((current_resources - m_lastHonorGainResources[i]) >= RESOURCES_TO_GAIN_BH)
+	// update the world states
+	SetWorldState(resource_fields[Team], current_resources);
+
+	// check for winning condition
+	if(current_resources == RESOURCES_WINVAL)
+	{
+		m_ended = true;
+		m_winningteam = Team;
+		m_nextPvPUpdateTime = 0;
+
+		sEventMgr.RemoveEvents(this);
+		sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
+
+		/* add the marks of honor to all players */
+		m_mainLock.Acquire();
+
+		SpellEntry * winner_spell = dbcSpell.LookupEntry(24953);
+		SpellEntry * loser_spell = dbcSpell.LookupEntry(24952);
+		for(uint32 i = 0; i < 2; ++i)
 		{
-			m_mainLock.Acquire();
 			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-				(*itr)->m_bgScore.BonusHonor += BASE_BH_GAIN;
-
-			UpdatePvPData();
-			m_mainLock.Release();
+			{
+				(*itr)->Root();
+				if(i == m_winningteam)
+					(*itr)->CastSpell((*itr), winner_spell, true);
+				else
+					(*itr)->CastSpell((*itr), loser_spell, true);
+			}
 		}
-
-		// update the world states
-		SetWorldState(resource_fields[i], current_resources);
+		m_mainLock.Release();
 	}
 }
 
@@ -619,6 +702,19 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 	// update the map
 	SetWorldState(AssaultFields[Id][Team], 0);
 	SetWorldState(OwnedFields[Id][Team], 1);
+
+	// resource update event. :)
+	if(m_capturedBases[Team]==1)
+	{
+		// first
+		sEventMgr.AddEvent(this,&ArathiBasin::EventUpdateResources, (uint32)Team, EVENT_AB_RESOURCES_UPDATE_TEAM_0+Team, ResourceUpdateIntervals[1], 0,
+			EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	}
+	else
+	{
+		// not first
+		event_ModifyTime(EVENT_AB_RESOURCES_UPDATE_TEAM_0+Team, ResourceUpdateIntervals[m_capturedBases[Team]]);
+	}
 }
 
 void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
@@ -651,6 +747,12 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 
 		// reset the world states
 		SetWorldState(OwnedFields[Id][Owner], 0);
+
+		// modify the resource update time period
+		if(m_capturedBases[Owner]==0)
+			this->event_RemoveEvents(EVENT_AB_RESOURCES_UPDATE_TEAM_0+Owner);
+		else
+			this->event_ModifyTime(EVENT_AB_RESOURCES_UPDATE_TEAM_0 + Owner, ResourceUpdateIntervals[m_capturedBases[Owner]]);
 	}
 
 	// nigga stole my flag!
