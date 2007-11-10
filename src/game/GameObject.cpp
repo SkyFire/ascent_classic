@@ -227,10 +227,6 @@ void GameObject::Despawn(uint32 time)
 		SetUInt32Value(GAMEOBJECT_FLAGS, m_spawn->flags);
 	}
 
-	WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-	data << GetGUID();
-	SendMessageToSet(&data,true);
-
 	CALL_GO_SCRIPT_EVENT(this, OnDespawn)();
 
 	if(time)
@@ -684,6 +680,10 @@ void GameObject::OnRemoveInRangeObject(Object* pObj)
 
 void GameObject::RemoveFromWorld(bool free_guid)
 {
+	WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
+	data << GetGUID();
+	SendMessageToSet(&data,true);
+
 	sEventMgr.RemoveEvents(this, EVENT_GAMEOBJECT_TRAP_SEARCH_TARGET);
 	Object::RemoveFromWorld(free_guid);
 }
