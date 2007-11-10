@@ -1327,10 +1327,11 @@ GossipMenu::GossipMenu(uint64 Creature_Guid, uint32 Text_Id) : TextId(Text_Id), 
 
 }
 
-void GossipMenu::AddItem(uint16 Icon, const char* Text, int32 Id)
+void GossipMenu::AddItem(uint8 Icon, const char* Text, int32 Id /* = -1 */, int8 Extra /* = 0 */)
 {
 	GossipMenuItem Item;
 	Item.Icon = Icon;
+	Item.Extra = Extra;
 	Item.Text = Text;
 	Item.Id = (uint32)Menu.size();
 	if(Id > 0)
@@ -1357,6 +1358,7 @@ void GossipMenu::BuildPacket(WorldPacket& Packet)
 	{
 		Packet << iter->Id;
 		Packet << iter->Icon;
+		Packet << iter->Extra;
 		Packet << uint32(0);	// something new in tbc. maybe gold requirement or smth?
 		Packet << iter->Text;
 		Packet << uint8(0); // ?

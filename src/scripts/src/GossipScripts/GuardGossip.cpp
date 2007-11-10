@@ -18,13 +18,13 @@
 #ifdef BACK_BUTTON
 
 // Make code neater with this define.
-#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), textid, Plr); \
+#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, Plr); \
     Menu->SendTo(Plr);
 
 #else
 
 // Make code neater with this define.
-#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), textid, Plr); \
+#define SendQuickMenu(textid) objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), textid, Plr); \
     Menu->AddItem(0, "I was looking for something else.", 0); \
     Menu->SendTo(Plr);
 
@@ -37,11 +37,14 @@
 class SCRIPT_DECL StormwindGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(StormwindGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
 
         Menu->AddItem(0, "Auction House", 1);
         Menu->AddItem(0, "Bank of Stormwind", 2);
@@ -61,13 +64,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -132,7 +135,7 @@ public:
 
         case 12:    // Class Trainers
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4264, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
 				Menu->AddItem( 0, "Druid"      , 14);
                 Menu->AddItem( 0, "Hunter"     , 15);
                 Menu->AddItem( 0, "Mage"       , 16);
@@ -147,7 +150,7 @@ public:
 
         case 13:    // Profession Trainers
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4264, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 23);
                 Menu->AddItem( 0, "Blacksmithing"     , 24);
                 Menu->AddItem( 0, "Cooking"           , 25);
@@ -299,11 +302,14 @@ public:
 class SCRIPT_DECL DarnassusGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(DarnassusGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3016, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3016, Plr);
 
         Menu->AddItem( 0, "Auction House"      , 1);
         Menu->AddItem( 0, "The Bank"           , 2);
@@ -321,13 +327,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -382,7 +388,7 @@ public:
 			
 		case 10:    // Class Trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4264, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
                 Menu->AddItem( 0, "Druid"       , 12);
                 Menu->AddItem( 0, "Hunter"      , 13);
                 Menu->AddItem( 0, "Priest"      , 14);
@@ -393,7 +399,7 @@ public:
 
         case 11:    // Profession Trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4273, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4273, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 17);
                 Menu->AddItem( 0, "Cooking"           , 18);
                 Menu->AddItem( 0, "Enchanting"        , 19);
@@ -493,7 +499,7 @@ public:
 
 		}
 	}
-    void GossipEnd(Creature* pCreature, Player* Plr)
+    void GossipEnd(Object* pObject, Player* Plr)
     {
 
     }
@@ -502,11 +508,14 @@ public:
 class SCRIPT_DECL GoldshireGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(GoldshireGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
 		Menu->AddItem( 0, "Bank"                 , 1);
 		Menu->AddItem( 0, "Gryphon Master"       , 2);
 		Menu->AddItem( 0, "Guild Master"         , 3);
@@ -518,14 +527,14 @@ public:
             Menu->SendTo(Plr);
     }
 
-	void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+	void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {	
 	
 		case 0:     // Return to start
-			GossipHello(pCreature, Plr, true);
+			GossipHello(pObject, Plr, true);
 			break;
 
             //////////////////////
@@ -556,7 +565,7 @@ public:
 
 	   case 6:     //Class Trainer
 		   {
-		   objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4264, Plr);
+		   objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
 
 	       Menu->AddItem( 0, "Druid",                8);
 	       Menu->AddItem( 0, "Hunter",               9);
@@ -573,7 +582,7 @@ public:
 
 		case 7:		//Profession Trainer
 			{
-			objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4273, Plr);
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4273, Plr);
 
 			Menu->AddItem( 0, "Alchemy"              ,17);
 			Menu->AddItem( 0, "Blacksmithing"        ,18);
@@ -717,11 +726,14 @@ public:
 class SCRIPT_DECL UndercityGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(UndercityGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3543, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3543, Plr);
 		
 		Menu->AddItem(0, "The bank", 1);
 		Menu->AddItem(0, "The bat handler", 2);
@@ -739,13 +751,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -805,7 +817,7 @@ public:
 
         case 11:    // A class trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3542, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3542, Plr);
                 Menu->AddItem( 0, "Mage"		 , 13);
                 Menu->AddItem( 0, "Paladin"      , 14);
                 Menu->AddItem( 0, "Priest"       , 15);
@@ -817,7 +829,7 @@ public:
 
         case 12:    // A profession trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3541, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3541, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 19);
                 Menu->AddItem( 0, "Blacksmithing"     , 20);
                 Menu->AddItem( 0, "Cooking"           , 21);
@@ -951,11 +963,14 @@ public:
 class SCRIPT_DECL DolanaarGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(DolanaarGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4316, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4316, Plr);
 
         Menu->AddItem(0, "The Bank", 1);
 		Menu->AddItem(0, "Rut'Theran Ferry", 2);
@@ -969,13 +984,13 @@ public:
             Menu->SendTo(Plr);
     }
 	
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -1006,7 +1021,7 @@ public:
 
         case 6:    // Class Trainers
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4264, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4264, Plr);
                 Menu->AddItem( 0, "Druid"       , 8);
                 Menu->AddItem( 0, "Hunter"      , 9);
                 Menu->AddItem( 0, "Priest"     , 10);
@@ -1017,7 +1032,7 @@ public:
 
         case 7:    // Profession Trainers
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4273, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4273, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 13);
                 Menu->AddItem( 0, "Cooking"           , 14);
                 Menu->AddItem( 0, "Enchanting"        , 15);
@@ -1122,11 +1137,14 @@ public:
 class SCRIPT_DECL SilvermoonGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(SilvermoonGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9316, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9316, Plr);
 
         Menu->AddItem(0, "Auction House", 1);
         Menu->AddItem(0, "The Bank", 2);
@@ -1145,13 +1163,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -1159,14 +1177,14 @@ public:
             /////
 
         case 1:     // Auction House
-			objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9316, Plr);
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9316, Plr);
             Menu->AddItem(0, "To the west."  , 13);
             Menu->AddItem(0, "To the east."    , 14);
             Menu->SendTo(Plr);
             break;
 
         case 2:     // The Bank
-			objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9322, Plr);
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9322, Plr);
             Menu->AddItem(0, "The west."  , 15);
             Menu->AddItem(0, "The east."    , 16);
             Menu->SendTo(Plr);
@@ -1183,7 +1201,7 @@ public:
             break;
 
         case 5:     // The Inn
-			objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9325, Plr);
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9325, Plr);
             Menu->AddItem(0, "The Silvermoon City Inn."  , 17);
             Menu->AddItem(0, "The Wayfarer's Rest tavern."    , 18);
             Menu->SendTo(Plr);
@@ -1211,7 +1229,7 @@ public:
 
         case 10:    // Class Trainers
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9316, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9316, Plr);
                 Menu->AddItem( 0, "Druid"       , 19);
                 Menu->AddItem( 0, "Hunter"      , 20);
                 Menu->AddItem( 0, "Mage"        , 21);
@@ -1224,7 +1242,7 @@ public:
 
         case 11:    // Profession Trainers
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9338, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9338, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 26);
                 Menu->AddItem( 0, "Blacksmithing"     , 27);
                 Menu->AddItem( 0, "Cooking"           , 28);
@@ -1407,11 +1425,14 @@ public:
 class SCRIPT_DECL ExodarGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(ExodarGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9316, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9316, Plr);
         Menu->AddItem(0, "Auction House", 1);
         Menu->AddItem(0, "The Bank", 2);
         Menu->AddItem(0, "Hippogryph Master", 3);
@@ -1427,13 +1448,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -1482,14 +1503,14 @@ public:
 
 	    case 9:     // Battlemasters
             Plr->Gossip_SendPOI(-3999.82, -11368.33, 6, 6, 0, "Exodar, Battlemasters");
-			objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9316, Plr);
+			objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9316, Plr);
             Menu->AddItem(0, "Arena Battlemaster"  , 12);
             Menu->SendTo(Plr);
             break;
 
         case 10:    // Class Trainers
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9316, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9316, Plr);
                 Menu->AddItem( 0, "Druid"       , 13);
                 Menu->AddItem( 0, "Hunter"      , 14);
                 Menu->AddItem( 0, "Mage"        , 15);
@@ -1502,7 +1523,7 @@ public:
 
         case 11:    // Profession Trainers
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9316, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9316, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 20);
                 Menu->AddItem( 0, "Blacksmithing"     , 21);
                 Menu->AddItem( 0, "Enchanting"        , 22);
@@ -1655,11 +1676,14 @@ public:
 class SCRIPT_DECL OrgrimmarGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(OrgrimmarGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
         Menu->AddItem(0, "The bank", 1);
         Menu->AddItem(0, "The wind rider master", 2);
         Menu->AddItem(0, "The guild master", 3);
@@ -1677,13 +1701,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -1747,7 +1771,7 @@ public:
 
         case 12:    // A class trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2599, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2599, Plr);
                 Menu->AddItem( 0, "Hunter"       , 14);
                 Menu->AddItem( 0, "Mage"         , 15);
                 Menu->AddItem( 0, "Priest"       , 16);
@@ -1761,7 +1785,7 @@ public:
 
         case 13:    // A profession trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2594, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2594, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 22);
                 Menu->AddItem( 0, "Blacksmithing"     , 23);
                 Menu->AddItem( 0, "Cooking"           , 24);
@@ -1907,11 +1931,14 @@ public:
 class SCRIPT_DECL ThunderbluffGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(ThunderbluffGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3543, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3543, Plr);
         Menu->AddItem(0, "The bank", 1);
         Menu->AddItem(0, "The wind rider master", 2);
         Menu->AddItem(0, "The guild master", 3);
@@ -1927,13 +1954,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -1987,7 +2014,7 @@ public:
 
         case 10:    // A class trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3542, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3542, Plr);
                 Menu->AddItem( 0, "Druid"       , 12);
                 Menu->AddItem( 0, "Hunter"      , 13);
                 Menu->AddItem( 0, "Mage"        , 14);
@@ -1999,7 +2026,7 @@ public:
 
         case 11:    // A profession trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3541, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3541, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 18);
                 Menu->AddItem( 0, "Blacksmithing"     , 19);
                 Menu->AddItem( 0, "Cooking"           , 20);
@@ -2126,11 +2153,14 @@ public:
 class SCRIPT_DECL BloodhoofGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(BloodhoofGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3543, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3543, Plr);
         Menu->AddItem(0, "The bank", 1);
         Menu->AddItem(0, "The wind rider master", 2);
         Menu->AddItem(0, "The inn", 3);
@@ -2141,13 +2171,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -2174,7 +2204,7 @@ public:
 
         case 5:     // A class trainer
 			{
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4069, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4069, Plr);
                 Menu->AddItem( 0, "Druid"       , 7);
                 Menu->AddItem( 0, "Hunter"      , 8);
                 Menu->AddItem( 0, "Shaman"      , 9);
@@ -2184,7 +2214,7 @@ public:
 
         case 6:     // A profession trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3541, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3541, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 11);
                 Menu->AddItem( 0, "Blacksmithing"     , 12);
                 Menu->AddItem( 0, "Cooking"           , 13);
@@ -2294,11 +2324,14 @@ public:
 class SCRIPT_DECL RazorHillGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(RazorHillGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4037, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4037, Plr);
         Menu->AddItem(0, "The bank", 1);
         Menu->AddItem(0, "The wind rider master", 2);
         Menu->AddItem(0, "The inn", 3);
@@ -2309,13 +2342,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -2342,7 +2375,7 @@ public:
 
         case 5:     // A class trainer
 			{
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4035, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4035, Plr);
                 Menu->AddItem( 0, "Hunter"       , 7);
 				Menu->AddItem( 0, "Mage"         , 8);
 				Menu->AddItem( 0, "Priest"       , 9);
@@ -2355,7 +2388,7 @@ public:
 
         case 6:     // A profession trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 3541, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 3541, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 14);
                 Menu->AddItem( 0, "Blacksmithing"     , 15);
                 Menu->AddItem( 0, "Cooking"           , 16);
@@ -2492,11 +2525,14 @@ public:
 class SCRIPT_DECL BrillGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(BrillGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
         Menu->AddItem(0, "The bank", 1);
         Menu->AddItem(0, "The bat handler", 2);
         Menu->AddItem(0, "The inn", 3);
@@ -2507,13 +2543,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -2540,7 +2576,7 @@ public:
 
         case 5:     // A class trainer
 			{
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4292, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4292, Plr);
                 Menu->AddItem( 0, "Mage"         , 7);
 				Menu->AddItem( 0, "Paladin"      , 8);
 				Menu->AddItem( 0, "Priest"       , 9);
@@ -2552,7 +2588,7 @@ public:
 
         case 6:     // A profession trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4300, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4300, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 13);
                 Menu->AddItem( 0, "Blacksmithing"     , 14);
                 Menu->AddItem( 0, "Cooking"           , 15);
@@ -2682,11 +2718,14 @@ public:
 class SCRIPT_DECL IronforgeGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(IronforgeGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2760, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2760, Plr);
         Menu->AddItem(0, "Auction House", 1);
         Menu->AddItem(0, "Bank of Ironforge", 2);
         Menu->AddItem(0, "Deeprun Tram", 3);
@@ -2703,13 +2742,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -2768,7 +2807,7 @@ public:
 
         case 11:    // A class trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2766, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2766, Plr);
                 Menu->AddItem( 0, "Hunter"      , 13);
                 Menu->AddItem( 0, "Mage"        , 14);
                 Menu->AddItem( 0, "Paladin"     , 15);
@@ -2782,7 +2821,7 @@ public:
 
         case 12:    // A profession trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2793, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2793, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 21);
                 Menu->AddItem( 0, "Blacksmithing"     , 22);
                 Menu->AddItem( 0, "Cooking"           , 23);
@@ -2928,11 +2967,14 @@ public:
 class SCRIPT_DECL KharanosGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(KharanosGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
         Menu->AddItem(0, "Bank", 1);
         Menu->AddItem(0, "Gryphon Master", 2);
         Menu->AddItem(0, "Guild Master", 3);
@@ -2944,13 +2986,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -2981,7 +3023,7 @@ public:
 
         case 6:     //Class Trainer
 			{
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4292, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4292, Plr);
                 Menu->AddItem( 0, "Hunter"       , 8);
 				Menu->AddItem( 0, "Mage"         , 9);
 				Menu->AddItem( 0, "Paladin"      ,10);
@@ -2994,7 +3036,7 @@ public:
 
         case 7:     // Profession Trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4300, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4300, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 15);
                 Menu->AddItem( 0, "Blacksmithing"     , 16);
                 Menu->AddItem( 0, "Cooking"           , 17);
@@ -3128,11 +3170,14 @@ public:
 class SCRIPT_DECL FalconwingGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(FalconwingGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
         Menu->AddItem(0, "Bat Handler", 1);
         Menu->AddItem(0, "Guild Master", 2);
         Menu->AddItem(0, "The Inn", 3);
@@ -3143,13 +3188,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -3177,7 +3222,7 @@ public:
 
         case 5:     //Class Trainer
 			{
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4292, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4292, Plr);
                 Menu->AddItem( 0, "Druid"        , 7);
 				Menu->AddItem( 0, "Hunter"       , 8);
 				Menu->AddItem( 0, "Mage"         , 9);
@@ -3190,7 +3235,7 @@ public:
 
         case 6:     // Profession Trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 14);
                 Menu->AddItem( 0, "Blacksmithing"     , 15);
                 Menu->AddItem( 0, "Cooking"           , 16);
@@ -3334,11 +3379,15 @@ public:
 class SCRIPT_DECL AzureWatchGuard : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(AzureWatchGuard);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+	void Destroy()
+	{
+		delete this;
+	}
+
+    void GossipHello(Object* pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
         Menu->AddItem(0, "Bank", 1);
         Menu->AddItem(0, "Hippogryph Master", 2);
         Menu->AddItem(0, "Guild Master", 3);
@@ -3350,13 +3399,13 @@ public:
             Menu->SendTo(Plr);
     }
 
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * Code)
     {
         GossipMenu * Menu;
         switch(IntId)
         {
         case 0:     // Return to start
-            GossipHello(pCreature, Plr, true);
+            GossipHello(pObject, Plr, true);
             break;
 
             //////////////////////
@@ -3387,7 +3436,7 @@ public:
 
         case 6:     //Class Trainer
 			{
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 4292, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 4292, Plr);
                 Menu->AddItem( 0, "Druid"        , 8);
 				Menu->AddItem( 0, "Hunter"       , 9);
 				Menu->AddItem( 0, "Mage"        , 10);
@@ -3400,7 +3449,7 @@ public:
 
         case 7:     //Profession Trainer
             {
-                objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 2593, Plr);
+                objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 2593, Plr);
                 Menu->AddItem( 0, "Alchemy"           , 15);
                 Menu->AddItem( 0, "Blacksmithing"     , 16);
                 Menu->AddItem( 0, "Cooking"           , 17);
@@ -3544,42 +3593,59 @@ public:
 
 void SetupGuardGossip(ScriptMgr * mgr)
 {
+	GossipScript * gold = (GossipScript*) new GoldshireGuard();
+	GossipScript * sw = (GossipScript*) new StormwindGuard();
+	GossipScript * darn = (GossipScript*) new DarnassusGuard();
+	GossipScript * dol = (GossipScript*) new DolanaarGuard();
+	GossipScript * blood = (GossipScript*) new BloodhoofGuard();
+	GossipScript * razor = (GossipScript*) new RazorHillGuard();
+	GossipScript * brill = (GossipScript*) new BrillGuard();
+	GossipScript * irf = (GossipScript*) new IronforgeGuard();
+	GossipScript * khar = (GossipScript*) new KharanosGuard();
+	GossipScript * falcon = (GossipScript*) new FalconwingGuard();
+	GossipScript * azure = (AzureWatchGuard*) new AzureWatchGuard();
+	GossipScript * under = (GossipScript*) new UndercityGuard();
+	GossipScript * silver = (SilvermoonGuard*) new SilvermoonGuard();
+	GossipScript * exodar = (ExodarGuard*) new ExodarGuard();
+	GossipScript * ogri = (OrgrimmarGuard*) new OrgrimmarGuard();
+	GossipScript * thun = (ThunderbluffGuard*) new ThunderbluffGuard();
+
     /* Guard List */
-    mgr->register_gossip_script(1423,  &GoldshireGuard::Create);        // Stormwind Guard 
-    mgr->register_gossip_script(68,    &StormwindGuard::Create);        // Stormwind City Guard
-    mgr->register_gossip_script(1976,  &StormwindGuard::Create);        // Stormwind City Patroller
-    mgr->register_gossip_script(4262,  &DarnassusGuard::Create);        // Darnassus Sentinel
-    mgr->register_gossip_script(5624,  &UndercityGuard::Create);		// Undercity Guardian
-    mgr->register_gossip_script(3571,  &DolanaarGuard::Create);			// Teldrassil Sentinel
-	mgr->register_gossip_script(16222, &SilvermoonGuard::Create);	    // Silvermoon City Guardian
-	mgr->register_gossip_script(16733, &ExodarGuard::Create);	        // Exodar Peacekeeper
-	mgr->register_gossip_script(20674, &ExodarGuard::Create);	        // Shield of Velen
-	mgr->register_gossip_script(3296, &OrgrimmarGuard::Create);	        // Orgrimmar Grunt
-	mgr->register_gossip_script(3084, &ThunderbluffGuard::Create);	    // Bluffwatcher
-	mgr->register_gossip_script(3222, &BloodhoofGuard::Create);			// Brave Wildrunner
-	mgr->register_gossip_script(3224, &BloodhoofGuard::Create);			// Brave Cloudmane
-	mgr->register_gossip_script(3220, &BloodhoofGuard::Create);			// Brave Darksky
-	mgr->register_gossip_script(3219, &BloodhoofGuard::Create);			// Brave Leaping Deer
-	mgr->register_gossip_script(3217, &BloodhoofGuard::Create);			// Brave Dawneagle
-	mgr->register_gossip_script(3215, &BloodhoofGuard::Create);			// Brave Strongbash
-	mgr->register_gossip_script(3218, &BloodhoofGuard::Create);			// Brave Swiftwind
-	mgr->register_gossip_script(3221, &BloodhoofGuard::Create);			// Brave Rockhorn
-	mgr->register_gossip_script(3223, &BloodhoofGuard::Create);			// Brave Rainchaser
-	mgr->register_gossip_script(3212, &BloodhoofGuard::Create);			// Brave Ironhorn
-	mgr->register_gossip_script(5953, &RazorHillGuard::Create);			// Razor Hill Grunt
-	mgr->register_gossip_script(5725, &BrillGuard::Create);				// Deathguard Lundmark
-	mgr->register_gossip_script(1738, &BrillGuard::Create);				// Deathguard Terrence
-	mgr->register_gossip_script(1652, &BrillGuard::Create);				// Deathguard Burgess
-	mgr->register_gossip_script(1746, &BrillGuard::Create);				// Deathguard Cyrus
-	mgr->register_gossip_script(1745, &BrillGuard::Create);				// Deathguard Morris
-	mgr->register_gossip_script(1743, &BrillGuard::Create);				// Deathguard Lawrence
-	mgr->register_gossip_script(1744, &BrillGuard::Create);				// Deathguard Mort
-	mgr->register_gossip_script(1496, &BrillGuard::Create);				// Deathguard Dillinger
-	mgr->register_gossip_script(1742, &BrillGuard::Create);				// Deathguard Bartholomew
-	mgr->register_gossip_script(5595, &IronforgeGuard::Create);			// Ironforge Guard
-	mgr->register_gossip_script(727,  &KharanosGuard::Create);			// Ironforge Mountaineer
-	mgr->register_gossip_script(16221,&FalconwingGuard::Create);		// Silvermoon Guardian
-	mgr->register_gossip_script(18038,&AzureWatchGuard::Create);		// Azuremyst Peacekeeper
+    mgr->register_gossip_script(1423,  gold);        // Stormwind Guard 
+    mgr->register_gossip_script(68,    sw);        // Stormwind City Guard
+    mgr->register_gossip_script(1976,  sw);        // Stormwind City Patroller
+    mgr->register_gossip_script(4262,  darn);        // Darnassus Sentinel
+    mgr->register_gossip_script(5624,  under);		// Undercity Guardian
+    mgr->register_gossip_script(3571,  dol);			// Teldrassil Sentinel
+	mgr->register_gossip_script(16222, silver);	    // Silvermoon City Guardian
+	mgr->register_gossip_script(16733, exodar);	        // Exodar Peacekeeper
+	mgr->register_gossip_script(20674, exodar);	        // Shield of Velen
+	mgr->register_gossip_script(3296, ogri);	        // Orgrimmar Grunt
+	mgr->register_gossip_script(3084, thun);	    // Bluffwatcher
+	mgr->register_gossip_script(3222, blood);			// Brave Wildrunner
+	mgr->register_gossip_script(3224, blood);			// Brave Cloudmane
+	mgr->register_gossip_script(3220, blood);			// Brave Darksky
+	mgr->register_gossip_script(3219, blood);			// Brave Leaping Deer
+	mgr->register_gossip_script(3217, blood);			// Brave Dawneagle
+	mgr->register_gossip_script(3215, blood);			// Brave Strongbash
+	mgr->register_gossip_script(3218, blood);			// Brave Swiftwind
+	mgr->register_gossip_script(3221, blood);			// Brave Rockhorn
+	mgr->register_gossip_script(3223, blood);			// Brave Rainchaser
+	mgr->register_gossip_script(3212, blood);			// Brave Ironhorn
+	mgr->register_gossip_script(5953, razor);			// Razor Hill Grunt
+	mgr->register_gossip_script(5725, brill);				// Deathguard Lundmark
+	mgr->register_gossip_script(1738, brill);				// Deathguard Terrence
+	mgr->register_gossip_script(1652, brill);				// Deathguard Burgess
+	mgr->register_gossip_script(1746, brill);				// Deathguard Cyrus
+	mgr->register_gossip_script(1745, brill);				// Deathguard Morris
+	mgr->register_gossip_script(1743, brill);				// Deathguard Lawrence
+	mgr->register_gossip_script(1744, brill);				// Deathguard Mort
+	mgr->register_gossip_script(1496, brill);				// Deathguard Dillinger
+	mgr->register_gossip_script(1742, brill);				// Deathguard Bartholomew
+	mgr->register_gossip_script(5595, irf);			// Ironforge Guard
+	mgr->register_gossip_script(727,  khar);			// Ironforge Mountaineer
+	mgr->register_gossip_script(16221,falcon);		// Silvermoon Guardian
+	mgr->register_gossip_script(18038,azure);		// Azuremyst Peacekeeper
 }	
 
 	// To Bloodhoof Guards - I don't know if those are all guards with dialog menu,

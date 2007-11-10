@@ -819,6 +819,7 @@ Channel * ChannelMgr::GetCreateChannel(const char *name, Player * p)
 		if(!strnicmp( name, itr->c_str(), itr->size() ) )
 		{
 			lock.Release();
+			m_confSettingLock.Release();
 			return NULL;
 		}
 	}

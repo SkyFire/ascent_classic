@@ -80,7 +80,8 @@ struct GossipMenuItem
 {
 	uint32 Id;
 	uint32 IntId;
-	uint16 Icon;
+	uint8 Icon;
+	uint8 Extra;
 	string Text;
 };
 struct SpellEntry;
@@ -200,7 +201,7 @@ class SERVER_DECL GossipMenu
 public:
 	GossipMenu(uint64 Creature_Guid, uint32 Text_Id);
 	void AddItem(GossipMenuItem* GossipItem);
-	void AddItem(uint16 Icon, const char* Text, int32 Id = -1);
+	void AddItem(uint8 Icon, const char* Text, int32 Id = -1, int8 Extra = 0);
 	void BuildPacket(WorldPacket& Packet);
 	void SendTo(Player* Plr);
 	GossipMenuItem GetItem(uint32 Id);

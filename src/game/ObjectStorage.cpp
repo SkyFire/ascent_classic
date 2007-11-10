@@ -102,6 +102,8 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 			for(uint32 j = 0; j < ci->lowercase_name.length(); ++j)
 				ci->lowercase_name[j] = tolower(ci->lowercase_name[j]); // Darvaleo 2008/08/15 - Copied lowercase conversion logic from ItemPrototype task
 
+			ci->gossip_script = sScriptMgr.GetDefaultGossipScript();
+
 			if(!itr->Inc())
 				break;
 		}
@@ -282,6 +284,7 @@ void ObjectMgr::LoadExtraItemStuff()
 		for(uint32 j = 0; j < pItemPrototype->lowercase_name.length(); ++j)
 			pItemPrototype->lowercase_name[j] = tolower(pItemPrototype->lowercase_name[j]);
 
+		pItemPrototype->gossip_script=NULL;
         if(!itr->Inc())
 			break;
 	}

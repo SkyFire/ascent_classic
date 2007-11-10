@@ -334,7 +334,7 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 	/* script */
 	qst_giver->GetMapMgr()->GetScriptEngine()->OnUnitEvent(qst_giver,CREATURE_EVENT_ON_GOSSIP_TALK,_player,0);
 
-	GossipScript * Script = qst_giver->GetGossipScript();
+	GossipScript * Script = qst_giver->GetCreatureName() ? qst_giver->GetCreatureName()->gossip_script : NULL;
 	if(!Script)
 		return;
 
@@ -404,16 +404,34 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
 	//WorldPacket data;
 	uint32 option;
 	uint64 guid;
+	int8 extra=0;
 
 	recv_data >> guid >> option;
 
 	sLog.outDetail("WORLD: CMSG_GOSSIP_SELECT_OPTION Option %i Guid %.8X", option, guid );
-	Creature *qst_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
-	if(!qst_giver)
-		return;
+	GossipScript * Script=NULL;
+	Object * qst_giver=NULL;
 
-	GossipScript * Script = qst_giver->GetGossipScript();
-	if(!Script)
+	if(GUID_HIPART(guid)==HIGHGUID_UNIT)
+	{
+		Creature *crt = _player->GetMapMgr()->GetCreature((uint32)guid);
+		if(!crt)
+			return;
+
+		qst_giver=crt;
+		Script=crt->GetCreatureName()?crt->GetCreatureName()->gossip_script:NULL;
+	}
+	else if(GUID_HIPART(guid)==HIGHGUID_ITEM)
+	{
+		Item * pitem = _player->GetItemInterface()->GetItemByGUID(guid);
+		if(pitem==NULL)
+			return;
+
+		qst_giver=pitem;
+		Script=pitem->GetProto()->gossip_script;
+	}
+
+	if(!Script||!qst_giver)
 		return;
 
 	uint32 IntId = 1;
@@ -421,9 +439,19 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
 	{
 		GossipMenuItem item = _player->CurrentGossipMenu->GetItem(option);
 		IntId = item.IntId;
+		extra = item.Extra;
 	}
 
-	Script->GossipSelectOption(qst_giver, _player, option, IntId);
+	if(extra)
+	{
+		string str;
+		if(recv_data.rpos()!=recv_data.wpos())
+			recv_data >> str;
+
+		Script->GossipSelectOption(qst_giver, _player, option, IntId, str.c_str());
+	}
+	else
+		Script->GossipSelectOption(qst_giver, _player, option, IntId, NULL);
 }
 
 //////////////////////////////////////////////////////////////

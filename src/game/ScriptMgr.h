@@ -25,7 +25,6 @@
 #define MAKE_SCRIPT_VERSION(major, minor) (uint32)(((uint16)major << 16) | ((uint16)minor))
 #define SCRIPT_MODULE void*
 #define ADD_CREATURE_FACTORY_FUNCTION(cl) static CreatureAIScript * Create(Creature * c) { return new cl(c); }
-#define ADD_GOSSIP_FACTORY_FUNCTION(cl) static GossipScript * Create() { return new cl; }
 
 class Channel;
 class Guild;
@@ -73,6 +72,7 @@ typedef void(*tOnQuestAccept)(Player * pPlayer, Quest * pQuest);
 typedef void(*tOnZone)(Player * pPlayer, uint32 Zone);
 typedef void(*tOnChat)(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
 typedef void(*tOnLoot)(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId);
+typedef bool(*ItemScript)(Item * pItem, Player * pPlayer);
 
 class Spell;
 class Aura;
@@ -87,7 +87,6 @@ class QuestLogEntry;
 /* Factory Imports (from script lib) */
 typedef CreatureAIScript*(*exp_create_creature_ai)(Creature * pCreature);
 typedef GameObjectAIScript*(*exp_create_gameobject_ai)(GameObject * pGameObject);
-typedef GossipScript*(*exp_create_gossip_script)();
 typedef bool(*exp_handle_dummy_spell)(uint32 i, Spell * pSpell);
 typedef bool(*exp_handle_dummy_aura)(uint32 i, Aura * pAura, bool apply);
 typedef void(*exp_script_register)(ScriptMgr * mgr);
@@ -97,15 +96,18 @@ typedef uint32(*exp_get_version)();
 /* Hashmap typedefs */
 typedef HM_NAMESPACE::hash_map<uint32, exp_create_creature_ai> CreatureCreateMap;
 typedef HM_NAMESPACE::hash_map<uint32, exp_create_gameobject_ai> GameObjectCreateMap;
-typedef HM_NAMESPACE::hash_map<uint32, exp_create_gossip_script> GossipCreateMap;
 typedef HM_NAMESPACE::hash_map<uint32, exp_handle_dummy_aura> HandleDummyAuraMap;
 typedef HM_NAMESPACE::hash_map<uint32, exp_handle_dummy_spell> HandleDummySpellMap;
+typedef set<GossipScript*> CustomGossipScripts;
 typedef list<void*> ServerHookList;
 typedef list<SCRIPT_MODULE> LibraryHandleMap;
 
 class SERVER_DECL ScriptMgr : public Singleton<ScriptMgr>
 {
 public:
+
+	ScriptMgr();
+	~ScriptMgr();
 
 	friend class HookInterface;
 
@@ -117,24 +119,27 @@ public:
 
 	bool CallScriptedDummySpell(uint32 uSpellId, uint32 i, Spell* pSpell);
 	bool CallScriptedDummyAura( uint32 uSpellId, uint32 i, Aura* pAura, bool apply);
-
-	GossipScript* GetGossipScript(uint32 uEntryId);
+	bool CallScriptedItem(Item * pItem, Player * pPlayer);
 
 	void register_creature_script(uint32 entry, exp_create_creature_ai callback);
 	void register_gameobject_script(uint32 entry, exp_create_gameobject_ai callback);
-	void register_gossip_script(uint32 entry, exp_create_gossip_script callback);
+	void register_gossip_script(uint32 entry, GossipScript * gs);
 	void register_dummy_aura(uint32 entry, exp_handle_dummy_aura callback);
 	void register_dummy_spell(uint32 entry, exp_handle_dummy_spell callback);
 	void register_hook(ServerHookEvents event, void * function_pointer);
+	void register_item_gossip_script(uint32 entry, GossipScript * gs);
+
+	inline GossipScript * GetDefaultGossipScript() { return DefaultGossipScript; }
 
 protected:
 	CreatureCreateMap _creatures;
 	GameObjectCreateMap _gameobjects;
-	GossipCreateMap _gossips;
 	HandleDummyAuraMap _auras;
 	HandleDummySpellMap _spells;
 	LibraryHandleMap _handles;
 	ServerHookList _hooks[NUM_SERVER_HOOKS];
+	GossipScript * DefaultGossipScript;
+	CustomGossipScripts _customgossipscripts;
 };
 
 class SERVER_DECL CreatureAIScript
@@ -204,12 +209,10 @@ public:
 	GossipScript();
 	virtual ~GossipScript() {} 
 
-	virtual void GossipHello(Creature* pCreature, Player* Plr, bool AutoSend);
-	virtual void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId);
-	virtual void GossipEnd(Creature* pCreature, Player* Plr);
+	virtual void GossipHello(Object* pObject, Player* Plr, bool AutoSend);
+	virtual void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * EnteredCode);
+	virtual void GossipEnd(Object* pObject, Player* Plr);
 	virtual void Destroy();
-
-	bool AutoCreated;
 };
 
 class SERVER_DECL QuestScript

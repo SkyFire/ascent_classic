@@ -31,6 +31,16 @@
 initialiseSingleton(ScriptMgr);
 initialiseSingleton(HookInterface);
 
+ScriptMgr::ScriptMgr()
+{
+	DefaultGossipScript = new GossipScript();
+}
+
+ScriptMgr::~ScriptMgr()
+{
+
+}
+
 void ScriptMgr::LoadScripts()
 {
 	if(!HookInterface::getSingletonPtr())
@@ -161,6 +171,12 @@ void ScriptMgr::UnloadScripts()
 	if(HookInterface::getSingletonPtr())
 		delete HookInterface::getSingletonPtr();
 
+	for(CustomGossipScripts::iterator itr = _customgossipscripts.begin(); itr != _customgossipscripts.end(); ++itr)
+		(*itr)->Destroy();
+	_customgossipscripts.clear();
+	delete this->DefaultGossipScript;
+	this->DefaultGossipScript=NULL;
+
 	LibraryHandleMap::iterator itr = _handles.begin();
 	for(; itr != _handles.end(); ++itr)
 	{
@@ -193,9 +209,13 @@ void ScriptMgr::register_dummy_spell(uint32 entry, exp_handle_dummy_spell callba
 	_spells.insert( HandleDummySpellMap::value_type( entry, callback ) );
 }
 
-void ScriptMgr::register_gossip_script(uint32 entry, exp_create_gossip_script callback)
+void ScriptMgr::register_gossip_script(uint32 entry, GossipScript * gs)
 {
-	_gossips.insert( GossipCreateMap::value_type( entry, callback ) );
+	CreatureInfo * ci = CreatureNameStorage.LookupEntry(entry);
+	if(ci)
+		ci->gossip_script = gs;
+
+	_customgossipscripts.insert(gs);
 }
 
 CreatureAIScript* ScriptMgr::CreateAIScriptClassForEntry(Creature* pCreature)
@@ -218,18 +238,6 @@ GameObjectAIScript * ScriptMgr::CreateAIScriptClassForGameObject(uint32 uEntryId
 	return (function_ptr)(pGameObject);
 }
 
-GossipScript * ScriptMgr::GetGossipScript(uint32 uEntryId)
-{
-	GossipCreateMap::iterator itr = _gossips.find(uEntryId);
-	if(itr == _gossips.end())
-	{
-		return new GossipScript;
-	}
-
-	exp_create_gossip_script function_ptr = itr->second;
-	return (function_ptr)();
-}
-
 bool ScriptMgr::CallScriptedDummySpell(uint32 uSpellId, uint32 i, Spell* pSpell)
 {
 	HandleDummySpellMap::iterator itr = _spells.find(uSpellId);
@@ -248,6 +256,26 @@ bool ScriptMgr::CallScriptedDummyAura(uint32 uSpellId, uint32 i, Aura* pAura, bo
 
 	exp_handle_dummy_aura function_ptr = itr->second;
 	return (function_ptr)(i, pAura, apply);
+}
+
+bool ScriptMgr::CallScriptedItem(Item * pItem, Player * pPlayer)
+{
+	if(pItem->GetProto()->gossip_script)
+	{
+		pItem->GetProto()->gossip_script->GossipHello(pItem,pPlayer,true);
+		return true;
+	}
+	
+	return false;
+}
+
+void ScriptMgr::register_item_gossip_script(uint32 entry, GossipScript * gs)
+{
+	ItemPrototype * proto = ItemPrototypeStorage.LookupEntry(entry);
+	if(proto)
+		proto->gossip_script = gs;
+
+	_customgossipscripts.insert(gs);
 }
 
 /* CreatureAI Stuff */
@@ -305,19 +333,23 @@ void QuestScript::RemoveQuestEvent()
 
 GossipScript::GossipScript()
 {
-	AutoCreated = false;
+	
 }
 
-void GossipScript::GossipEnd(Creature* pCreature, Player* Plr)
+void GossipScript::GossipEnd(Object* pObject, Player* Plr)
 {
 	Plr->CleanupGossipMenu();
 }
 
 bool CanTrainAt(Player * plr, Trainer * trn);
-void GossipScript::GossipHello(Creature* pCreature, Player* Plr, bool AutoSend)
+void GossipScript::GossipHello(Object* pObject, Player* Plr, bool AutoSend)
 {
 	GossipMenu *Menu;
 	uint32 TextID = 2;
+	Creature * pCreature = (pObject->GetTypeId()==TYPEID_UNIT)?((Creature*)pObject):NULL;
+	if(!pCreature)
+		return;
+
 	Trainer *pTrainer = pCreature->GetTrainer();
 	uint32 Text = objmgr.GetGossipTextForNpc(pCreature->GetEntry());
 	if(Text != 0)
@@ -433,8 +465,12 @@ void GossipScript::GossipHello(Creature* pCreature, Player* Plr, bool AutoSend)
 		Menu->SendTo(Plr);
 }
 
-void GossipScript::GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+void GossipScript::GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * EnteredCode)
 {
+	Creature * pCreature = ((Creature*)pObject);
+	if(pObject->GetTypeId()!=TYPEID_UNIT)
+		return;
+
 	switch(IntId)
 	{
 	case 1:

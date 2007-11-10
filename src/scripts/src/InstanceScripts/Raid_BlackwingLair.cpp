@@ -1172,18 +1172,17 @@ protected:
 class SCRIPT_DECL VaelastraszGossip : public GossipScript
 {
 public:
-    ADD_GOSSIP_FACTORY_FUNCTION(VaelastraszGossip);
-    void GossipHello(Creature * pCreature, Player * Plr, bool AutoSend)
+    void GossipHello(Object * pObject, Player * Plr, bool AutoSend)
     {
         GossipMenu *Menu;
-        objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 9903, Plr);
+        objmgr.CreateGossipMenuForPlayer(&Menu, pObject->GetGUID(), 9903, Plr);
 
         if(AutoSend)
             Menu->SendTo(Plr);
 
     }
 	
-    void GossipSelectOption(Creature* pCreature, Player* Plr, uint32 Id, uint32 IntId)
+    void GossipSelectOption(Object * pObject, Player* Plr, uint32 Id, uint32 IntId)
     {
 
     }
@@ -1249,5 +1248,6 @@ void SetupBlackwingLair(ScriptMgr * mgr)
 	mgr->register_creature_script(CN_EBONROC, &EbonrocAI::Create);
 	mgr->register_creature_script(CN_FLAMEGOR, &FlamegorAI::Create);
 	mgr->register_creature_script(CN_VAELASTRASZ, &VaelastraszAI::Create);
-	mgr->register_gossip_script(CN_VAELASTRASZ, &VaelastraszGossip::Create);        // Vael Gossip TODO: change the flag to agressive
+	GossipScript* vg = (GossipScript*) new VaelastraszGossip;
+	mgr->register_gossip_script(CN_VAELASTRASZ, vg);        // Vael Gossip TODO: change the flag to agressive
 }

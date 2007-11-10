@@ -21,6 +21,7 @@
 #define WOWSERVER_CREATURE_H
 
 class CreatureTemplate;
+class GossipScript;
 
 #define MAX_CREATURE_ITEMS 128
 #define MAX_CREATURE_LOOT 8
@@ -58,6 +59,7 @@ struct CreatureInfo
 	uint8  Leader;
 
 	std::string lowercase_name;
+	GossipScript * gossip_script;
 	uint32 GenerateModelId(uint32 * dest)
 	{
 		/* only M */
@@ -473,9 +475,6 @@ public:
 		return creature_info; 
 	}
 	inline void SetCreatureName(CreatureInfo *ci) { creature_info = ci; }
-
-	inline GossipScript* GetGossipScript() { return _gossipScript; }
-	inline void SetGossipScript(GossipScript* GS) { _gossipScript = GS; }
 	inline Trainer* GetTrainer() { return mTrainer; }
 	void RegenerateFocus();
 
@@ -515,7 +514,6 @@ public:
 protected:
 	CreatureAIScript *_myScriptClass;
 	bool m_limbostate;
-	GossipScript *_gossipScript;
 	Trainer* mTrainer;
 
 	void _LoadGoods();

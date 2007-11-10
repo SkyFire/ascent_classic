@@ -557,6 +557,7 @@ struct ItemPrototype
 
 	// used in auctions
 	string lowercase_name;
+	GossipScript * gossip_script;
 };
 
 typedef struct {

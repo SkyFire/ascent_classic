@@ -76,7 +76,6 @@ Creature::Creature(uint32 high, uint32 low)
 	m_SellItems = NULL;
 	_myScriptClass = NULL;
 	m_TaxiNode = 0;
-	_gossipScript = NULL;
 	myFamily = 0;
 
 	loot.gold = 0;
@@ -109,9 +108,6 @@ Creature::~Creature()
 	if(IsTotem())
 		totemOwner->m_TotemSlots[totemSlot] = 0;
 
-	if(_gossipScript != 0)
-		_gossipScript->Destroy();
-	
 	if(_myScriptClass != 0)
 		_myScriptClass->Destroy();
 
@@ -900,9 +896,6 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	if ( HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TAXIVENDOR) )
 		m_TaxiNode = sTaxiMgr.GetNearestTaxiNode( m_position.x, m_position.y, m_position.z, GetMapId() );
 
-	if ( HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && _gossipScript == 0 )
-		SetGossipScript( sScriptMgr.GetGossipScript( GetEntry() ) );
-
 	if ( HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) )
 		mTrainer = objmgr.GetTrainer(GetEntry());
 
@@ -1099,9 +1092,6 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 
 	if ( HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TAXIVENDOR) )
 		m_TaxiNode = sTaxiMgr.GetNearestTaxiNode( m_position.x, m_position.y, m_position.z, GetMapId() );
-
-	if ( HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && _gossipScript == 0 )
-		SetGossipScript( sScriptMgr.GetGossipScript( GetEntry() ) );
 
 	if ( HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER) )
 		mTrainer = objmgr.GetTrainer(GetEntry());

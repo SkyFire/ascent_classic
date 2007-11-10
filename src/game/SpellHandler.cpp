@@ -43,6 +43,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	if(itemProto->Bonding == ITEM_BIND_ON_USE)
 		tmpItem->SoulBind();
 
+	if(sScriptMgr.CallScriptedItem(tmpItem,_player))
+		return;
+
 	if(itemProto->QuestId)
 	{
 		// Item Starter
