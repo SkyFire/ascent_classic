@@ -9130,7 +9130,7 @@ void Player::EventGroupFullUpdate()
 
 void Player::EjectFromInstance()
 {
-	if(m_bgEntryPointX && m_bgEntryPointY && m_bgEntryPointZ)
+	if(m_bgEntryPointX && m_bgEntryPointY && m_bgEntryPointZ && !IS_INSTANCE(m_bgEntryPointMap))
 	{
 		if(SafeTeleport(m_bgEntryPointMap, m_bgEntryPointInstance, m_bgEntryPointX, m_bgEntryPointY, m_bgEntryPointZ, m_bgEntryPointO))
 			return;

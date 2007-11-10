@@ -622,6 +622,9 @@ void WorldSession::FullLogin(Player * plr)
 	if(plr->getLevel()>70)
 		plr->SetUInt32Value(UNIT_FIELD_LEVEL,70);
 
+	// enable trigger cheat by default
+	plr->triggerpass_cheat = HasGMPermissions();
+
 	// Make sure our name exists (for premade system)
 	PlayerInfo * info = objmgr.GetPlayerInfo(plr->GetGUIDLow());
 	if(info == 0)
