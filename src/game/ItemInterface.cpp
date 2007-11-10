@@ -2379,8 +2379,8 @@ void ItemInterface::mLoadItemsFromDatabase(QueryResult * result)
 		{
 			Field *fields = result->Fetch();
 
-			containerslot = fields[11].GetInt8();
-			slot = fields[12].GetInt8();
+			containerslot = fields[13].GetInt8();
+			slot = fields[14].GetInt8();
 			proto = ItemPrototypeStorage.LookupEntry(fields[2].GetUInt32());
 
 			if(proto)

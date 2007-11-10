@@ -671,6 +671,7 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_AUTOSTORE_BANK_ITEM].handler					   = &WorldSession::HandleAutoStoreBankItemOpcode;
 	WorldPacketHandlers[CMSG_CANCEL_TEMPORARY_ENCHANTMENT].handler			  = &WorldSession::HandleCancelTemporaryEnchantmentOpcode;
 	WorldPacketHandlers[CMSG_SOCKET_GEMS].handler								= &WorldSession::HandleInsertGemOpcode;
+	WorldPacketHandlers[CMSG_WRAP_ITEM].handler									= &WorldSession::HandleWrapItemOpcode;
 	
 	// Spell System / Talent System
 	WorldPacketHandlers[CMSG_USE_ITEM].handler								  = &WorldSession::HandleUseItemOpcode;

@@ -1787,6 +1787,32 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket &recv_data)
 	if(!pItem)
 		return;
 
+	// gift wrapping handler
+	if(pItem->GetUInt32Value(ITEM_FIELD_GIFTCREATOR) && pItem->wrapped_item_id)
+	{
+		ItemPrototype * it = ItemPrototypeStorage.LookupEntry(pItem->wrapped_item_id);
+
+		pItem->SetUInt32Value(ITEM_FIELD_GIFTCREATOR,0);
+		pItem->SetUInt32Value(OBJECT_FIELD_ENTRY,pItem->wrapped_item_id);
+		pItem->wrapped_item_id=0;
+		pItem->SetProto(it);
+
+		if(it->Bonding==ITEM_BIND_ON_PICKUP)
+			pItem->SetUInt32Value(ITEM_FIELD_FLAGS,1);
+		else
+			pItem->SetUInt32Value(ITEM_FIELD_FLAGS,0);
+
+		if(it->MaxDurability)
+		{
+			pItem->SetUInt32Value(ITEM_FIELD_DURABILITY,it->MaxDurability);
+			pItem->SetUInt32Value(ITEM_FIELD_MAXDURABILITY,it->MaxDurability);
+		}
+
+		pItem->m_isDirty=true;
+		pItem->SaveToDB(containerslot,slot);
+		return;
+	}
+
 	Lock *lock = dbcLock.LookupEntry( pItem->GetProto()->LockId );
 	
 	uint32 removeLockItems[5] = {0,0,0,0,0};

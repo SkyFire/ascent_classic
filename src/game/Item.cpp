@@ -24,6 +24,7 @@ Item::Item( )//this is called when constructing as container
 	m_owner = NULL;
 	loot = NULL;
 	locked = false;
+	wrapped_item_id=0;
 }
 
 Item::Item(uint32 high,uint32 low)
@@ -46,6 +47,7 @@ Item::Item(uint32 high,uint32 low)
 	locked = false;
 	m_isDirty = true;
 	random_prop=random_suffix=0;
+	wrapped_item_id=0;
 }
 
 Item::~Item()
@@ -111,33 +113,35 @@ void Item::LoadFromDB(	Field *fields, Player * plr, bool light)
 	SetUInt32Value( OBJECT_FIELD_ENTRY, itemid );
 	m_owner = plr;
 
-  
-	SetUInt32Value( ITEM_FIELD_CREATOR, fields[3].GetUInt32() );
-	SetUInt32Value( ITEM_FIELD_STACK_COUNT,  fields[4].GetUInt32());
+	wrapped_item_id=fields[3].GetUInt32();
+	m_uint32Values[ITEM_FIELD_GIFTCREATOR] = fields[4].GetUInt32();
+	m_uint32Values[ITEM_FIELD_CREATOR] = fields[5].GetUInt32();
+
+	SetUInt32Value( ITEM_FIELD_STACK_COUNT,  fields[6].GetUInt32());
 	for(uint32 x=0;x<5;x++)
 	if(m_itemProto->Spells[x].Id)
 	{
-		SetUInt32Value( ITEM_FIELD_SPELL_CHARGES+x , fields[5].GetUInt32() );
+		SetUInt32Value( ITEM_FIELD_SPELL_CHARGES+x , fields[7].GetUInt32() );
 		break;
 	}
 	
-	SetUInt32Value( ITEM_FIELD_FLAGS, fields[6].GetUInt32());
-	random_prop = fields[7].GetUInt32();
-	random_suffix = fields[8].GetUInt32();
+	SetUInt32Value( ITEM_FIELD_FLAGS, fields[8].GetUInt32());
+	random_prop = fields[9].GetUInt32();
+	random_suffix = fields[10].GetUInt32();
 
 	if(random_prop)
 		SetRandomProperty(random_prop);
 	else if(random_suffix)
 		SetRandomSuffix(random_suffix);
 
-	SetUInt32Value( ITEM_FIELD_ITEM_TEXT_ID, fields[9].GetUInt32());
+	SetUInt32Value( ITEM_FIELD_ITEM_TEXT_ID, fields[11].GetUInt32());
 
 	SetUInt32Value( ITEM_FIELD_MAXDURABILITY, m_itemProto->MaxDurability);
-	SetUInt32Value( ITEM_FIELD_DURABILITY, fields[10].GetUInt32());
+	SetUInt32Value( ITEM_FIELD_DURABILITY, fields[12].GetUInt32());
 
 	if(light) return;
 
-	string enchant_field = fields[13].GetString();
+	string enchant_field = fields[15].GetString();
 	vector<string> enchants = StrSplit(enchant_field, ";");
 	uint32 enchant_id;
 	EnchantEntry * entry;
@@ -271,7 +275,10 @@ void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
 	ss << m_uint32Values[ITEM_FIELD_OWNER] << ",";
     ss << GetGUIDLow() << ",";
 	ss << m_uint32Values[OBJECT_FIELD_ENTRY] << ",";
-	ss << GetUInt32Value(ITEM_FIELD_CREATOR) << ",";
+	ss << wrapped_item_id << ",";
+	ss << m_uint32Values[ITEM_FIELD_GIFTCREATOR] << ",";
+	ss << m_uint32Values[ITEM_FIELD_CREATOR] << ",";
+
 	ss << GetUInt32Value(ITEM_FIELD_STACK_COUNT) << ",";
 	ss << GetChargesLeft() << ",";
 	ss << GetUInt32Value(ITEM_FIELD_FLAGS) << ",";

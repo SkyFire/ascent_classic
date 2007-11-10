@@ -50,6 +50,7 @@ public:
 	void Create( uint32 itemid, Player* owner );
 
 	inline ItemPrototype* GetProto() const { return m_itemProto; }
+	inline void SetProto(ItemPrototype* pr) { m_itemProto = pr; }
 
 	inline Player* GetOwner() const { return m_owner; }
 	void SetOwner(Player *owner);
@@ -165,6 +166,8 @@ public:
 		SetUInt32Value(ITEM_FIELD_PROPERTY_SEED, v);
 		random_suffix = id;
 	}
+
+	uint32 wrapped_item_id;
 
 protected:
 
