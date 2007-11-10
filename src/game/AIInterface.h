@@ -216,6 +216,7 @@ public:
 	uint32	getThreatByGUID(uint64 guid);
 	uint32	getThreatByPtr(Unit* obj);
 	Unit	*GetMostHated();
+	Unit	*GetSecondHated();
 	bool	modThreatByGUID(uint64 guid, int32 mod);
 	bool	modThreatByPtr(Unit* obj, int32 mod);
 	void	RemoveThreatByPtr(Unit* obj);

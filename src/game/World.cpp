@@ -1217,33 +1217,6 @@ bool World::SetInitialWorldSettings()
 				sp->procChance = 50;
 			}
 		}
-		else if(strstr(nametext, "Shred"))
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "damage plus ");
-			if(startofid)
-			{
-				startofid += strlen("damage plus ");
-				sp->EffectBasePoints[0]=atoi(startofid);
-			}
-		}
-		else if(strstr(nametext, "Ravage"))
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "damage plus ");
-			if(startofid)
-			{
-				startofid += strlen("damage plus ");
-				sp->EffectBasePoints[0]=atoi(startofid);
-			}
-		}
-		else if(strstr(nametext, "Mangle"))
-		{
-			//check if we can find in the desription
-			char *startofid=strstr(desc, "damage plus ");
-			if(startofid)
-				sp->EffectBasePoints[0]=(sp->EffectBasePoints[0]+1)*(sp->EffectBasePoints[2]+1)/100;//kinda rough estimation no ? :P
-		}
 		//some procs trigger at intervals
 		else if(strstr(nametext, "Water Shield"))
 		{

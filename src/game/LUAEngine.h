@@ -57,6 +57,18 @@ enum GameObjectEvents
 	GAMEOBJECT_EVENT_COUNT,
 };
 
+
+enum RandomFlags
+{
+	RANDOM_ANY           = 0,
+	RANDOM_IN_SHORTRANGE = 1,
+	RANDOM_IN_MIDRANGE   = 2,
+	RANDOM_IN_LONGRANGE  = 3,
+	RANDOM_WITH_MANA     = 4,
+	RANDOM_WITH_RAGE     = 5,
+	RANDOM_WITH_ENERGY   = 6,
+	RANDOM_NOT_MAINTANK  = 7
+};
 class LuaEngine
 {
 private:

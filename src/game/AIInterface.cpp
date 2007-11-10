@@ -2846,7 +2846,40 @@ Unit *AIInterface::GetMostHated()
 
 	return currentTarget.first;
 }
+Unit *AIInterface::GetSecondHated()
+{
+	Unit *ResultUnit=GetMostHated();
 
+	pair<Unit*, int32> currentTarget;
+	currentTarget.first = 0;
+	currentTarget.second = -1;
+
+	TargetMap::iterator it2 = m_aiTargets.begin();
+	TargetMap::iterator itr;
+	for(; it2 != m_aiTargets.end();)
+	{
+		itr = it2;
+		++it2;
+
+		/* check the target is valid */
+		if(itr->first->GetInstanceID() != m_Unit->GetInstanceID() || !itr->first->isAlive() || !isAttackable(m_Unit, itr->first))
+		{
+			m_aiTargets.erase(itr);
+			continue;
+		}
+
+		if((itr->second + itr->first->GetThreatModifyer()) > currentTarget.second &&
+			itr->first != ResultUnit)
+		{
+			/* new target */
+			currentTarget.first = itr->first;
+			currentTarget.second = itr->second + itr->first->GetThreatModifyer();
+			m_currentHighestThreat = currentTarget.second;
+		}
+	}
+
+	return currentTarget.first;
+}
 bool AIInterface::modThreatByGUID(uint64 guid, int32 mod)
 {
 	if (!m_aiTargets.size())

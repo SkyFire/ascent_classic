@@ -412,6 +412,12 @@ int luaUnit_LearnSpell(lua_State * L, Unit* ptr);
 int luaUnit_UnlearnSpell(lua_State * L, Unit * ptr);
 int luaUnit_HasFinishedQuest(lua_State * L, Unit * ptr);
 int luaUnit_GetItemCount(lua_State * L, Unit * ptr);
+int luaUnit_GetMainTank(lua_State * L, Unit * ptr);
+int luaUnit_GetAddTank(lua_State * L, Unit * ptr);
+int luaUnit_ClearThreatList(lua_State * L, Unit * ptr);
+int luaUnit_GetTauntedBy(lua_State * L, Unit * ptr);
+int luaUnit_SetTauntedBy(lua_State * L, Unit * ptr);
+int luaUnit_ChangeTarget(lua_State * L, Unit * ptr);
 int luaUnit_GetHealthPct(lua_State * L, Unit * ptr);
 int luaUnit_Despawn(lua_State * L, Unit * ptr);
 int luaUnit_GetUnitBySqlId(lua_State * L, Unit * ptr);
@@ -419,9 +425,10 @@ int luaUnit_PlaySoundToSet(lua_State * L, Unit * ptr);
 int luaUnit_RemoveAura(lua_State * L, Unit * ptr);
 int luaUnit_StopMovement(lua_State * L, Unit * ptr);
 int luaUnit_Emote(lua_State * L, Unit * ptr);
+int luaUnit_GetInstanceID(lua_State * L, Unit * ptr);
 int luaUnit_GetClosestPlayer(lua_State * L, Unit * ptr);
 int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr);
-int luaUnit_GetRandomAlly(lua_State * L, Unit * ptr);
+int luaUnit_GetRandomFriend(lua_State * L, Unit * ptr);
 int luaUnit_AddItem(lua_State * L, Unit * ptr);
 int luaUnit_RemoveItem(lua_State * L, Unit * ptr);
 int luaUnit_CreateCustomWaypointMap(lua_State * L, Unit * ptr);
@@ -469,6 +476,12 @@ Unit::RegType Unit::methods[] = {
 	{ "UnlearnSpell", &luaUnit_UnlearnSpell },
 	{ "HasFinishedQuest", &luaUnit_HasFinishedQuest },
 	{ "GetItemCount", &luaUnit_GetItemCount },
+	{ "GetMainTank", &luaUnit_GetMainTank },
+	{ "GetAddTank", &luaUnit_GetAddTank },
+	{ "ClearThreatList", &luaUnit_ClearThreatList },
+	{ "GetTauntedBy", &luaUnit_GetTauntedBy },
+	{ "SetTauntedBy", &luaUnit_SetTauntedBy },
+	{ "ChangeTarget", &luaUnit_ChangeTarget },
 	{ "GetHealthPct", &luaUnit_GetHealthPct },
 	{ "Despawn", &luaUnit_Despawn },
 	{ "GetUnitBySqlId", &luaUnit_GetUnitBySqlId },
@@ -476,9 +489,10 @@ Unit::RegType Unit::methods[] = {
 	{ "RemoveAura", &luaUnit_RemoveAura },
 	{ "StopMovement", &luaUnit_StopMovement },
 	{ "Emote", &luaUnit_Emote },
+	{ "GetInstanceID", &luaUnit_GetInstanceID },
 	{ "GetClosestPlayer", &luaUnit_GetClosestPlayer },
 	{ "GetRandomPlayer", &luaUnit_GetRandomPlayer },
-	{ "GetRandomAlly", &luaUnit_GetRandomAlly },
+	{ "GetRandomFriend", &luaUnit_GetRandomFriend },
 	{ "AddItem", &luaUnit_AddItem },
 	{ "RemoveItem", &luaUnit_RemoveItem },
 	{ "CreateCustomWaypointMap", &luaUnit_CreateCustomWaypointMap },
@@ -621,7 +635,7 @@ int luaUnit_MoveTo(lua_State * L, Unit * ptr)
 	double z = luaL_checknumber(L, 3);
 	double o = luaL_checknumber(L, 4);
 
-	if(x == 0 || y == 0 || z == 0 || o == 0)
+	if(x == 0 || y == 0 || z == 0)
 		return 0;
 
 	ptr->GetAIInterface()->MoveTo( (float)x, (float)y, (float)z, (float)o );
@@ -725,7 +739,7 @@ int luaUnit_SpawnCreature(lua_State * L, Unit * ptr)
 	uint32 faction = luaL_checkint(L, 6);
 	uint32 duration = luaL_checkint(L, 7);
 	
-	if(!entry_id || !faction /*|| !duration*/) //Shady: is it really required?
+	if( !x || !y || !z || !entry_id || !faction /*|| !duration*/) //Shady: is it really required?
 	{
 		lua_pushnil(L);
 		return 1;
@@ -828,8 +842,8 @@ int luaUnit_RemoveEvents(lua_State * L, Unit * ptr)
 	if(!ptr||ptr->GetTypeId()!=TYPEID_UNIT)
 		return 0;
 
-	/*Creature * pCreature = ((Creature*)ptr);
-	sEventMgr.RemoveEvents(pCreature);*/
+	Creature * pCreature = ((Creature*)ptr);
+	sEventMgr.RemoveEvents(pCreature);
 	return 0;
 }
 
@@ -953,8 +967,8 @@ int luaUnit_MoveToWaypoint(lua_State * L, Unit * ptr)
 {
 	CHECK_TYPEID(TYPEID_UNIT);
 	int id = luaL_checkint(L,1);
-	if(!id)
-		return 0;
+	//if(!id)
+	//	return 0;
 
 	ptr->MoveToWaypoint(id);
 	return 0;
@@ -999,6 +1013,12 @@ int luaUnit_AddItem(lua_State * L, Unit * ptr)
 
 	return 0;
 }
+int luaUnit_GetInstanceID(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	lua_pushinteger(L, (double)ptr->GetMapMgr()->GetInstanceID());
+	return 1;
+}
 
 int luaUnit_GetClosestPlayer(lua_State * L, Unit * ptr)
 {
@@ -1030,19 +1050,221 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 	if(!ptr)
 		return 0;
 
-	Player * ret=NULL;
-	uint32 count = (uint32)ptr->GetInRangePlayersCount();
-	uint32 r = sRand.randInt(count-1);
-	count=0;
+	int flag = luaL_checkint(L,1);
 
-	for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+	Player * ret=NULL;
+
+	switch (flag)
 	{
-		if (count==r)
+	case RANDOM_ANY:
 		{
-			ret=*itr;
-			break;
+			uint32 count = (uint32)ptr->GetInRangePlayersCount();
+			uint32 r = sRand.randInt(count-1);
+			count=0;
+
+			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+			{
+				if (count==r)
+				{
+					ret=*itr;
+					break;
+				}
+				++count;
+			}
 		}
-		++count;
+		break;
+	case RANDOM_IN_SHORTRANGE:
+		{
+			uint32 count = 0;
+			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+			{
+				Player* obj = (Player*)(*itr);
+				if (obj && obj->CalcDistance(obj,ptr)<=8)
+					++count;
+			}
+			if (count)
+			{
+				uint32 r = sRand.randInt(count-1);
+				count=0;
+				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+				{
+					Player* obj = (Player*)(*itr);
+					if (obj && obj->CalcDistance(obj,ptr)<=8 && count==r)
+					{
+						ret=obj;
+						break;
+					}
+					++count;
+				}
+			}
+		}
+		break;
+	case RANDOM_IN_MIDRANGE:
+		{
+			uint32 count = 0;
+			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+			{
+				Player* obj = (Player*)(*itr);
+				if (!obj)
+					continue;
+				float distance = obj->CalcDistance(obj,ptr);
+				if (distance<20 && distance>8)
+					++count;
+			}
+			if (count)
+			{
+				uint32 r = sRand.randInt(count-1);
+				count=0;
+				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+				{
+					Player* obj = (Player*)(*itr);
+					if (!obj)
+						continue;
+					float distance = obj->CalcDistance(obj,ptr);
+					if (distance<20 && distance>8 && count==r)
+					{
+						ret=obj;
+						break;
+					}
+					++count;
+				}
+			}
+		}
+		break;
+	case RANDOM_IN_LONGRANGE:
+		{
+			uint32 count = 0;
+			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+			{
+				Player* obj = (Player*)(*itr);
+				if (obj && obj->CalcDistance(obj,ptr)>=20)
+					++count;
+			}
+			if (count)
+			{
+				uint32 r = sRand.randInt(count-1);
+				count=0;
+				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+				{
+					Player* obj = (Player*)(*itr);
+					if (obj && obj->CalcDistance(obj,ptr)>=20 && count==r)
+					{
+						ret=obj;
+						break;
+					}
+					++count;
+				}
+			}
+		}
+		break;
+	case RANDOM_WITH_MANA:
+		{
+			uint32 count = 0;
+			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+			{
+				Player* obj = (Player*)(*itr);
+				if (obj && obj->GetPowerType() == POWER_TYPE_MANA)
+					++count;
+			}
+			if (count)
+			{
+				uint32 r = sRand.randInt(count-1);
+				count=0;
+				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+				{
+					Player* obj = (Player*)(*itr);
+					if (obj && obj->GetPowerType() == POWER_TYPE_MANA && count==r)
+					{
+						ret=obj;
+						break;
+					}
+					++count;
+				}
+			}
+		}
+		break;
+	case RANDOM_WITH_ENERGY:
+		{
+			uint32 count = 0;
+			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+			{
+				Player* obj = (Player*)(*itr);
+				if (obj && obj->GetPowerType() == POWER_TYPE_ENERGY)
+					++count;
+			}
+			if (count)
+			{
+				uint32 r = sRand.randInt(count-1);
+				count=0;
+				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+				{
+					Player* obj = (Player*)(*itr);
+					if (obj && obj->GetPowerType() == POWER_TYPE_ENERGY && count==r)
+					{
+						ret=obj;
+						break;
+					}
+					++count;
+				}
+			}
+		}
+		break;
+	case RANDOM_WITH_RAGE:
+		{
+			uint32 count = 0;
+			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+			{
+				Player* obj = (Player*)(*itr);
+				if (obj && obj->GetPowerType() == POWER_TYPE_RAGE)
+					++count;
+			}
+			if (count)
+			{
+				uint32 r = sRand.randInt(count-1);
+				count=0;
+				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+				{
+					Player* obj = (Player*)(*itr);
+					if (obj && obj->GetPowerType() == POWER_TYPE_RAGE && count==r)
+					{
+						ret=obj;
+						break;
+					}
+					++count;
+				}
+			}
+		}
+		break;
+	case RANDOM_NOT_MAINTANK:
+		{
+			uint32 count = 0;
+			Unit* mt = ptr->GetAIInterface()->GetMostHated();
+			if (!mt->IsPlayer())
+				return 0;
+
+			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+			{
+				Player* obj = (Player*)(*itr);
+				if (obj != mt)
+					++count;
+			}
+			if (count)
+			{
+				uint32 r = sRand.randInt(count-1);
+				count=0;
+				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
+				{
+					Player* obj = (Player*)(*itr);
+					if (obj && obj != mt && count==r)
+					{
+						ret=obj;
+						break;
+					}
+					++count;
+				}
+			}
+		}
+		break;
 	}
 
 	if(ret==NULL)
@@ -1052,7 +1274,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 
 	return 1;
 }
-int luaUnit_GetRandomAlly(lua_State * L, Unit * ptr)
+int luaUnit_GetRandomFriend(lua_State * L, Unit * ptr)
 {
 	if(!ptr)
 		return 0;
@@ -1153,6 +1375,66 @@ int luaUnit_GetItemCount(lua_State * L, Unit * ptr)
 	CHECK_TYPEID_RET_INT(TYPEID_PLAYER);
 	int itemid = luaL_checkint(L,1);
 	lua_pushinteger(L, ((Player*)ptr)->GetItemInterface()->GetItemCount(itemid,false));
+	return 1;
+}
+
+int luaUnit_GetMainTank(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID_RET_INT(TYPEID_UNIT);
+	Unit* ret = ptr->GetAIInterface()->GetMostHated();
+	if(ret==NULL)
+		lua_pushnil(L);
+	else
+		Lunar<Unit>::push(L,(ret),false);
+	return 1;
+}
+int luaUnit_GetAddTank(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID_RET_INT(TYPEID_UNIT);
+	Unit* ret = ptr->GetAIInterface()->GetSecondHated();
+	if(ret==NULL)
+		lua_pushnil(L);
+	else
+		Lunar<Unit>::push(L,(ret),false);
+	return 1;
+}
+int luaUnit_ClearThreatList(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID_RET_INT(TYPEID_UNIT);
+	ptr->WipeHateList();
+	return 1;
+}
+
+int luaUnit_GetTauntedBy(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT)
+
+		if (!ptr->GetAIInterface()->getTauntedBy())
+			lua_pushnil(L);
+		else
+			Lunar<Unit>::push(L,ptr->GetAIInterface()->getTauntedBy(),false);
+	return 1;
+}
+int luaUnit_SetTauntedBy(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT)
+		Unit * target = Lunar<Unit>::check(L, 2);
+
+	if (!target || ptr->GetAIInterface()->GetIsTaunted() || target==ptr)
+		return 0;
+	else
+		ptr->GetAIInterface()->taunt(target);
+	return 1;
+}
+int luaUnit_ChangeTarget(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT)
+		Unit * target = Lunar<Unit>::check(L, 2);
+
+	if (!target || !isHostile(ptr,target) || ptr==target)
+		return 0;
+	else
+		ptr->GetAIInterface()->SetNextTarget(target);
 	return 1;
 }
 
