@@ -62,7 +62,13 @@ WarsongGulch::WarsongGulch(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : C
 
 WarsongGulch::~WarsongGulch()
 {
-
+	// gates are always spawned, so mapmgr will clean them up
+	for(uint32 i = 0; i < 6; ++i)
+	{
+		// buffs may not be spawned, so delete them if they're not
+		if(m_buffs[i] && m_buffs[i]->IsInWorld()==false)
+			delete m_buffs[i];
+	}
 }
 
 void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)

@@ -132,6 +132,7 @@ public:
 	~GameObject( );
 
 	inline GameObjectInfo* GetInfo() { return pInfo; }
+	inline void SetInfo(GameObjectInfo * goi) { pInfo = goi; }
 
 	//void Create ( uint32 display_id, uint8 state, uint32 obj_field_entry, float scale, uint16 type, uint16 faction, uint32 mapid, float x, float y, float z, float ang );
    // void Create ( uint32 mapid, float x, float y, float z, float ang);

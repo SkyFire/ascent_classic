@@ -2018,6 +2018,10 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		case LOCKTYPE_SLOW_OPEN: // used for BG go's
 		{
 			if(!gameObjTarget ) return;
+			if(p_caster && p_caster->m_bg)
+				if(p_caster->m_bg->HookSlowLockOpen(gameObjTarget,p_caster,this))
+					return;
+
 			uint32 spellid = !gameObjTarget->GetInfo()->Unknown1 ? 23932 : gameObjTarget->GetInfo()->Unknown1;
 			SpellEntry*en=dbcSpell.LookupEntry(spellid);
 			Spell *sp=new Spell(p_caster,en,true,NULL);

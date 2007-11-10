@@ -19,6 +19,9 @@
 
 #include "StdAfx.h"
 
+//#define ENABLE_AB
+//#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
+
 initialiseSingleton(CBattlegroundManager);
 typedef CBattleground*(*CreateBattlegroundFunc)(MapMgr* mgr,uint32 iid,uint32 group, uint32 type);
 
@@ -37,7 +40,11 @@ const static CreateBattlegroundFunc BGCFuncs[BATTLEGROUND_NUM_TYPES] = {
 	NULL,						// 0
 	NULL,						// AV
 	&WarsongGulch::Create,		// WSG
+#ifdef ENABLE_AB
+	&ArathiBasin::Create,		// AB
+#else
 	NULL,						// AB
+#endif
 	NULL,						// 2v2
 	NULL,						// 3v3
 	NULL,						// 5v5
@@ -284,8 +291,13 @@ void CBattlegroundManager::EventQueueUpdate()
 			}
 			else
 			{
+#ifdef ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
+				if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG ||
+					tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
+#else
 				if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG &&
 					tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
+#endif
 				{
 					if(CanCreateInstance(i,j))
 					{
@@ -1182,7 +1194,7 @@ void CBattleground::Close()
 	m_mainLock.Release();
 }
 
-void CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, uint32 horde)
+Creature * CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, uint32 horde)
 {
 	if(horde > 1)
 		horde = 1;
@@ -1190,7 +1202,7 @@ void CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, uint32 
 	CreatureInfo * pInfo = CreatureNameStorage.LookupEntry(13116 + horde);
 	if(pInfo == 0)
 	{
-		return;
+		return NULL;
 	}
 
 	Creature * pCreature = m_mapMgr->CreateCreature();
@@ -1242,6 +1254,7 @@ void CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, uint32 
 
 	pCreature->DisableAI();
 	pCreature->PushToWorld(m_mapMgr);
+	return pCreature;
 }
 
 void CBattleground::QueuePlayerForResurrect(Player * plr)

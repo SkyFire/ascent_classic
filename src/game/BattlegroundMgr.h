@@ -404,13 +404,14 @@ public:
 	virtual void OnClose() {}
 
 	void SetWorldState(uint32 Index, uint32 Value);
-	void SpawnSpiritGuide(float x, float y, float z, float o, uint32 horde);
+	Creature * SpawnSpiritGuide(float x, float y, float z, float o, uint32 horde);
 
 	inline uint32 GetLastResurrect() { return m_lastResurrect; }
 	void QueuePlayerForResurrect(Player * plr);
 	void EventResurrectPlayers();
 	virtual bool CanPlayerJoin(Player * plr);
 	virtual bool CreateCorpse(Player * plr) { return true; }
+	virtual bool HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * pSpell) { return false; }
 
 	void BuildPvPUpdateDataPacket(WorldPacket * data);
 	virtual uint8 Rated() { return 0; }
