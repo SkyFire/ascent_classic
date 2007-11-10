@@ -5965,7 +5965,7 @@ void Player::RemovePlayerPet(uint32 pet_number)
 	}
 }
 #ifndef CLUSTERING
-void Player::_Relocate(uint32 mapid, const LocationVector & v, bool sendpending, bool force_new_world)
+void Player::_Relocate(uint32 mapid, const LocationVector & v, bool sendpending, bool force_new_world, uint32 instance_id)
 {
 	//this func must only be called when switching between maps!
 	WorldPacket data(41);
@@ -5976,19 +5976,22 @@ void Player::_Relocate(uint32 mapid, const LocationVector & v, bool sendpending,
 		GetSession()->SendPacket(&data);
 	}
 
-	uint32 status = sInstanceMgr.PreTeleport(mapid, this);
-	if(status != INSTANCE_OK)
-	{
-		data.Initialize(SMSG_TRANSFER_ABORTED);
-		data << mapid << status;
-		GetSession()->SendPacket(&data);
-		return;
-	}
-
-	SetPlayerStatus(TRANSFER_PENDING);
-	
 	if(m_mapId != mapid || force_new_world)
 	{
+		uint32 status = sInstanceMgr.PreTeleport(mapid, this, instance_id);
+		if(status != INSTANCE_OK)
+		{
+			data.Initialize(SMSG_TRANSFER_ABORTED);
+			data << mapid << status;
+			GetSession()->SendPacket(&data);
+			return;
+		}
+
+		if(instance_id)
+			m_instanceId=instance_id;
+
+		SetPlayerStatus(TRANSFER_PENDING);
+
 		if(IsInWorld())
 		{
 			RemoveFromWorld();
@@ -7092,7 +7095,7 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 		return false;
 	}
 
-	_Relocate(MapID, vec, true, instance);
+	_Relocate(MapID, vec, true, instance, InstanceID);
 	return true;
 #endif
 }

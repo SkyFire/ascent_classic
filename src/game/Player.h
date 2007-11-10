@@ -1381,7 +1381,7 @@ public:
 	GameObject *m_GM_SelectedGO;
 	
 #ifndef CLUSTERING
-	void _Relocate(uint32 mapid,const LocationVector & v, bool sendpending, bool force_new_world);
+	void _Relocate(uint32 mapid,const LocationVector & v, bool sendpending, bool force_new_world, uint32 instance_id);
 #else
 	void RelocateCallback(uint32 instance_were_going_to);
 #endif

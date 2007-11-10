@@ -118,7 +118,7 @@ public:
 			return m_maps[mapid];
 	}
 
-	uint32 PreTeleport(uint32 mapid, Player * plr);
+	uint32 PreTeleport(uint32 mapid, Player * plr, uint32 instanceid);
 	MapMgr * GetInstance(Object* obj);
 	uint32 GenerateInstanceID();
 	void BuildXMLStats(char * m_file);

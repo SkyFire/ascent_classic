@@ -126,7 +126,7 @@ void InstanceMgr::Shutdown()
 	delete FormationMgr::getSingletonPtr();
 }
 
-uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr)
+uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr, uint32 instanceid)
 {
 	// preteleport is where all the magic happens :P instance creation, etc.
 	MapInfo * inf = WorldMapInfoStorage.LookupEntry(mapid);
@@ -166,33 +166,54 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr)
 
 	if(instancemap == NULL)
 	{
+		if(instanceid != 0)
+		{
+			m_mapLock.Release();
+			return INSTANCE_ABORT_NOT_FOUND;
+		}
+
 		// gotta create the hashmap.
 		m_instances[mapid] = new InstanceMap;
 		instancemap = m_instances[mapid];
 	}
 	else
 	{
-		// search the instance and see if we have one here.
-		for(InstanceMap::iterator itr = instancemap->begin(); itr != instancemap->end();)
+		InstanceMap::iterator itr;
+		if(instanceid != 0)
 		{
-			in = itr->second;
-			++itr;
-			if(PlayerOwnsInstance(in, plr))
-			{
+			itr = instancemap->find(instanceid);
+			if(itr != instancemap->end()) {
 				m_mapLock.Release();
-
-				// check the player count and in combat status.
-				if(in->m_mapMgr)
-				{
-					if(in->m_mapMgr->IsCombatInProgress())
-						return INSTANCE_ABORT_ENCOUNTER;
-
-					if(in->m_mapMgr->GetPlayerCount() >= inf->playerlimit)
-						return INSTANCE_ABORT_FULL;
-				}
-
-				// found our instance, allow him in.
 				return INSTANCE_OK;
+			} else {
+				m_mapLock.Release();
+				return INSTANCE_ABORT_NOT_FOUND;
+			}
+		}
+		else
+		{
+			// search the instance and see if we have one here.
+			for(itr = instancemap->begin(); itr != instancemap->end();)
+			{
+				in = itr->second;
+				++itr;
+				if(PlayerOwnsInstance(in, plr))
+				{
+					m_mapLock.Release();
+
+					// check the player count and in combat status.
+					if(in->m_mapMgr)
+					{
+						if(in->m_mapMgr->IsCombatInProgress())
+							return INSTANCE_ABORT_ENCOUNTER;
+
+						if(in->m_mapMgr->GetPlayerCount() >= inf->playerlimit)
+							return INSTANCE_ABORT_FULL;
+					}
+
+					// found our instance, allow him in.
+					return INSTANCE_OK;
+				}
 			}
 		}
 	}
@@ -248,6 +269,17 @@ MapMgr * InstanceMgr::GetInstance(Object* obj)
 		instancemap = m_instances[obj->GetMapId()];
 		if(instancemap != NULL)
 		{
+			// check our saved instance id. see if its valid, and if we can join before trying to find one.
+			itr = instancemap->find(obj->GetInstanceID());
+			if(itr != instancemap->end())
+			{
+				if(itr->second->m_mapMgr)
+				{
+					m_mapLock.Release();
+					return itr->second->m_mapMgr;
+				}
+			}
+
 			// iterate over our instances, and see if any of them are owned/joinable by him.
 			for(itr = instancemap->begin(); itr != instancemap->end();)
 			{

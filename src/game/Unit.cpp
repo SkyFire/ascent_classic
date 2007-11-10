@@ -4718,11 +4718,24 @@ void Unit::CombatStatusHandler_ResetPvPTimeout()
 	if(!IsPlayer())
 		return;
 
+	m_lock.Acquire();
 	EventMap::iterator itr = m_events.find(EVENT_ATTACK_TIMEOUT);
-	if(itr == m_events.end())
-		sEventMgr.AddEvent(this, &Unit::CombatStatusHandler_UpdatePvPTimeout, EVENT_ATTACK_TIMEOUT, 5000, 1, 0);
-	else
-		itr->second->currTime = itr->second->msTime;
+	if(itr != m_events.end())
+	{
+		for(; itr != m_events.upper_bound(EVENT_ATTACK_TIMEOUT); ++itr)
+		{
+			if(!itr->second->deleted)
+			{
+				itr->second->currTime = 5000;
+				m_lock.Release();
+				return;
+			}
+		}
+	}
+
+	// yay for recursive mutexes
+	sEventMgr.AddEvent(this, &Unit::CombatStatusHandler_UpdatePvPTimeout, EVENT_ATTACK_TIMEOUT, 5000, 1, 0);
+	m_lock.Release();
 }
 
 void Unit::CombatStatusHandler_UpdatePvPTimeout()
@@ -4991,5 +5004,6 @@ void CombatStatusHandler::TryToClearAttackTargets()
 		}
 
 		RemoveAttackTarget(pt);
+		pt->CombatStatus.RemoveAttacker(m_Unit,m_Unit->GetGUID());
 	}
 }
