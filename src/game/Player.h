@@ -826,6 +826,8 @@ public:
     
     void EventPortToGM(Player *p);
 	inline uint32 GetTeam() { return m_team; }
+	inline void SetTeam(uint32 t) { m_team = t; m_bgTeam=t; }
+	inline void ResetTeam() { m_team = myRace->team_id==7 ? 0 : 1; m_bgTeam=m_team; }
 
 	inline bool IsInFeralForm()
 	{
@@ -1496,6 +1498,7 @@ public:
 	bool triggerpass_cheat;
 	bool SafeTeleport(uint32 MapID, uint32 InstanceID, float X, float Y, float Z, float O);
 	bool SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector & vec);
+	void SafeTeleport(MapMgr * mgr, const LocationVector & vec);
 	void EjectFromInstance();
 	bool raidgrouponlysent;
 	

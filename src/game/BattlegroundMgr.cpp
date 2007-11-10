@@ -132,6 +132,13 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, Worl
 	m_session->GetPlayer()->m_bgQueueInstanceId = instance;
 	m_session->GetPlayer()->m_bgQueueType = bgtype;
 
+	/* Set battleground entry point */
+	m_session->GetPlayer()->m_bgEntryPointX = m_session->GetPlayer()->GetPositionX();
+	m_session->GetPlayer()->m_bgEntryPointY = m_session->GetPlayer()->GetPositionY();
+	m_session->GetPlayer()->m_bgEntryPointZ = m_session->GetPlayer()->GetPositionZ();
+	m_session->GetPlayer()->m_bgEntryPointMap = m_session->GetPlayer()->GetMapId();
+	m_session->GetPlayer()->m_bgEntryPointInstance = m_session->GetPlayer()->GetInstanceID();
+
 	m_queueLock.Release();
 
 	/* We will get updated next few seconds =) */
@@ -266,6 +273,7 @@ void CBattlegroundManager::EventQueueUpdate()
 						plr = *tempPlayerVec[0].begin();
 						tempPlayerVec[0].pop_front();
 
+						plr->m_bgTeam=team;
 						arena->AddPlayer(plr, team);
 						team = arena->GetFreeTeam();
 
@@ -291,6 +299,7 @@ void CBattlegroundManager::EventQueueUpdate()
 							{
 								plr = *tempPlayerVec[k].begin();
 								tempPlayerVec[k].pop_front();
+								plr->m_bgTeam=k;
 								bg->AddPlayer(plr, k);
 								ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
 							}
@@ -702,6 +711,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		return;
 	}
 
+	plr->SetTeam(plr->m_bgTeam);
 	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
 	data << plr->GetGUID();
 	DistributePacketToAll(&data);
@@ -713,14 +723,11 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 
 	if(!skip_teleport)
 	{
-		/* This is where we actually teleport the player to the battleground. */
-		plr->m_bgEntryPointX = plr->GetPositionX();
-		plr->m_bgEntryPointY = plr->GetPositionY();
-		plr->m_bgEntryPointZ = plr->GetPositionZ();
-		plr->m_bgEntryPointMap = plr->GetMapId();
-		plr->m_bgEntryPointInstance = plr->GetInstanceID();
-	
-		plr->SafeTeleport(m_mapMgr->GetMapId(), m_mapMgr->GetInstanceID(), GetStartingCoords(plr->m_bgTeam));
+		/* This is where we actually teleport the player to the battleground. */	
+		//plr->SafeTeleport(m_mapMgr->GetMapId(), m_mapMgr->GetInstanceID(), GetStartingCoords(plr->m_bgTeam));
+		if(plr->IsInWorld())
+			plr->RemoveFromWorld();
+		plr->SafeTeleport(m_mapMgr,GetStartingCoords(plr->m_bgTeam));
 		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, (uint32)UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
 	}
 
@@ -771,7 +778,8 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 	{
 		/* arenas follow a different procedure. */
 		static const uint32 arena_map_ids[3] = { 559, 562, 572 };
-		uint32 mapid = arena_map_ids[sRand.randInt(3)];
+		uint32 mapid = arena_map_ids[sRand.randInt(2)];
+		mapid=562;
 		uint32 players_per_side;
 		mgr = sInstanceMgr.CreateBattlegroundInstance(mapid);
 		if(mgr == NULL)
@@ -1016,6 +1024,9 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	/* are we in the group? */
 	if(plr->GetGroup() == m_groups[plr->m_bgTeam])
 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
+
+	// reset team
+	plr->ResetTeam();
 
 	/* revive the player if he is dead */
 	if(!plr->isAlive())
@@ -1369,6 +1380,10 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 					itx->player->m_bgQueueInstanceId = 0;
 					itx->player->m_bgQueueType = BattlegroundType;
 					itx->player->GetSession()->SendPacket(&data);
+					itx->player->m_bgEntryPointX=itx->player->GetPositionX();
+					itx->player->m_bgEntryPointY=itx->player->GetPositionY();
+					itx->player->m_bgEntryPointZ=itx->player->GetPositionZ();
+					itx->player->m_bgEntryPointMap=itx->player->GetMapId();
 				}
 			}
 
@@ -1396,6 +1411,14 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 	m_session->GetPlayer()->m_bgIsQueued = true;
 	m_session->GetPlayer()->m_bgQueueInstanceId = 0;
 	m_session->GetPlayer()->m_bgQueueType = BattlegroundType;
+
+	/* Set battleground entry point */
+	m_session->GetPlayer()->m_bgEntryPointX = m_session->GetPlayer()->GetPositionX();
+	m_session->GetPlayer()->m_bgEntryPointY = m_session->GetPlayer()->GetPositionY();
+	m_session->GetPlayer()->m_bgEntryPointZ = m_session->GetPlayer()->GetPositionZ();
+	m_session->GetPlayer()->m_bgEntryPointMap = m_session->GetPlayer()->GetMapId();
+	m_session->GetPlayer()->m_bgEntryPointInstance = m_session->GetPlayer()->GetInstanceID();
+
 	m_queueLock.Release();
 }
 

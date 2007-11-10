@@ -7097,6 +7097,35 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 #endif
 }
 
+void Player::SafeTeleport(MapMgr * mgr, const LocationVector & vec)
+{
+	if(flying_aura && mgr->GetMapId()!=530) {
+		RemoveAura(flying_aura);
+		flying_aura=0;
+	}
+
+	if(IsInWorld())
+		RemoveFromWorld();
+
+	m_mapId = mgr->GetMapId();
+	m_instanceId = mgr->GetInstanceID();
+	m_mapMgr = mgr;
+
+	WorldPacket data(SMSG_TRANSFER_PENDING, 20);
+	data << mgr->GetMapId();
+	GetSession()->SendPacket(&data);
+
+	data.Initialize(SMSG_NEW_WORLD);
+	data << mgr->GetMapId() << vec << vec.o;
+	GetSession()->SendPacket(&data);
+
+	m_sentTeleportPosition = vec;
+	SetPosition(vec);
+	ResetHeartbeatCoords();
+
+	mgr->AddObject(this);
+}
+
 void Player::SetGuildId(uint32 guildId)
 {
 	myGuild = guildId ? objmgr.GetGuild(guildId) : 0;
