@@ -331,7 +331,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Anti-Fall Damage                                                     */
 		/************************************************************************/
-		if(movement_info.flags & MOVEFLAG_FALLING_FAR && (!movement_info.FallTime || movement_info.FallTime==848) && sWorld.antihack_falldmg &&
+		if(movement_info.flags & MOVEFLAG_FALLING_FAR && (!movement_info.FallTime) && sWorld.antihack_falldmg &&
 			!_player->bSafeFall && !_player->GodModeCheat)
 		{
 			sCheatLog.writefromsession(this, "Used fall damage hack, falltime is 0 and flags are %u", movement_info.flags);
@@ -342,12 +342,12 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Anti-"Classic" Fly                                                   */
 		/************************************************************************/
-		if(recv_data.GetOpcode() == MSG_MOVE_STOP_SWIM && ((!(movement_info.flags & MOVEFLAG_SWIMMING) && !(movement_info.flags & MOVEFLAG_FALLING)) || (movement_info.x == _player->GetPositionX() && movement_info.y == _player->GetPositionY())))
+		/*if(recv_data.GetOpcode() == MSG_MOVE_STOP_SWIM && ((!(movement_info.flags & MOVEFLAG_SWIMMING) && !(movement_info.flags & MOVEFLAG_FALLING)) || (movement_info.x == _player->GetPositionX() && movement_info.y == _player->GetPositionY())))
 		{
 			sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
 			Disconnect();
 			return;
-		}
+		}*/
 
 		/************************************************************************/
 		/* Anti-Water Walk                                                      */

@@ -53,6 +53,13 @@ bool ChatHandler::HandleBattlegroundCommand(const char* args, WorldSession *m_se
 
 bool ChatHandler::HandleSetWorldStateCommand(const char* args, WorldSession *m_session)
 {
+	uint32 id,val;
+	if(sscanf(args,"%u %u", &id,&val)!=2)
+		return false;
+
+	if(m_session->GetPlayer()->m_bg)
+		m_session->GetPlayer()->m_bg->SetWorldState(id,val);
+
 	return true;
 }
 

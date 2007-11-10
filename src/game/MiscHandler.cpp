@@ -1217,7 +1217,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	case GAMEOBJECT_TYPE_CHEST://cast da spell
 		{
 			spellInfo = dbcSpell.LookupEntry( OPEN_CHEST );
-			spell = new Spell(plyr, spellInfo, true, NULL);
+			spell = new Spell(plyr, spellInfo, false, NULL);
 			_player->m_currentSpell = spell;
 			targets.m_unitTarget = obj->GetGUID();
 			spell->prepare(&targets); 

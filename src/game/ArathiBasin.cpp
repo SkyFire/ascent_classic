@@ -25,6 +25,37 @@
 #define RESOURCES_TO_GAIN_BH 200
 #define BASE_BH_GAIN 14
 uint32 buffentrys[3] = {180380,180362,180146};
+// AB define's
+#define AB_CAPTURED_STABLES_ALLIANCE		0x6E7 //1767
+#define AB_CAPTURED_STABLES_HORDE		   0x6E8 //1768
+#define AB_CAPTURING_STABLES_ALLIANCE	   0x6E9 //1769
+#define AB_CAPTURING_STABLES_HORDE		  0x6EA //1770
+// 0x6EB is unknown
+#define AB_CAPTURED_FARM_ALLIANCE		   0x6EC //1772 // 1 is captured by the alliance
+#define AB_CAPTURED_FARM_HORDE			  0x6ED // 1773 / 1 is captured by the horde
+#define AB_CAPTURING_FARM_ALLIANCE		  0x6EE // 1774 1 is capturing by the alliance
+#define AB_CAPTURING_FARM_HORDE			 0x6EF // 1775 1 is capturing by the horde
+
+#define AB_CAPTURED_BLACKSMITH_ALLIANCE	 0x6F6 // 1782
+#define AB_CAPTURED_BLACKSMITH_HORDE		0x6F7 //1783
+#define AB_CAPTURING_BLACKSMITH_ALLIANCE	0x6F8 //1784
+#define AB_CAPTURING_BLACKSMITH_HORDE	   0x6F9 //1785
+// 0x6FA is unknown
+#define AB_CAPTURED_GOLDMINE_ALLIANCE	   0x6FB //1787
+#define AB_CAPTURED_GOLDMINE_HORDE		  0x6FC//1788
+#define AB_CAPTURING_GOLDMINE_ALLIANCE	  0x6FD//1789
+#define AB_CAPTURING_GOLDMINE_HORDE		 0x6FE//1790
+// 0x6FF is unknown
+#define AB_CAPTURED_LUMBERMILL_ALLIANCE	 0x700//1792
+#define AB_CAPTURED_LUMBERMILL_HORDE		0x701//1793
+#define AB_CAPTURING_LUMBERMILL_ALLIANCE	0x702//1794
+#define AB_CAPTURING_LUMBERMILL_HORDE	   0x703//1795
+
+#define AB_SHOW_STABLE_ICON				 0x732//1842
+#define AB_SHOW_GOLDMINE_ICON			   0x733//1843
+#define AB_SHOW_LUMBERMILL_ICON			 0x734//1844
+#define AB_SHOW_FARM_ICON				   0x735//1845
+#define AB_SHOW_BACKSMITH_ICON			  0x736//1846
 
 /* AB Battleground Data */
 
@@ -106,6 +137,14 @@ uint32 buffentrys[3] = {180380,180362,180146};
 		{ AB_CAPTURED_LUMBERMILL_ALLIANCE, AB_CAPTURED_LUMBERMILL_HORDE },							// LUMBERMILL
 	};
 
+	static uint32 NeutralFields[AB_NUM_CONTROL_POINTS] = {
+		AB_SHOW_STABLE_ICON,
+		AB_SHOW_FARM_ICON,
+		AB_SHOW_BACKSMITH_ICON,
+		AB_SHOW_GOLDMINE_ICON,
+		AB_SHOW_LUMBERMILL_ICON,
+	};
+
 /* End BG Data */
 
 void ArathiBasin::SpawnBuff(uint32 x)
@@ -161,17 +200,27 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 		m_controlPoints[Id]->SetFloatValue(GAMEOBJECT_ROTATION_02, ControlPointRotations[Id][0]);
 		m_controlPoints[Id]->SetFloatValue(GAMEOBJECT_ROTATION_03, ControlPointRotations[Id][1]);
 		m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_STATE, 1);
-		m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_TYPE_ID, GAMEOBJECT_TYPE_CHEST);
+		m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_TYPE_ID, gi->Type);
 		m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 		m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_DYN_FLAGS, 1);
 		m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_DISPLAYID, gi->DisplayID);
 
-		if(Type==AB_SPAWN_TYPE_ALLIANCE_ASSAULT||Type==AB_SPAWN_TYPE_ALLIANCE_CONTROLLED)
-			m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_FACTION, 1);
-		else if(Type==AB_SPAWN_TYPE_HORDE_ASSAULT||Type==AB_SPAWN_TYPE_HORDE_CONTROLLED)
+		switch(Type)
+		{
+		case AB_SPAWN_TYPE_ALLIANCE_ASSAULT:
+		case AB_SPAWN_TYPE_ALLIANCE_CONTROLLED:
 			m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_FACTION, 2);
-		else
+			break;
+
+		case AB_SPAWN_TYPE_HORDE_ASSAULT:
+		case AB_SPAWN_TYPE_HORDE_CONTROLLED:
+			m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_FACTION, 1);
+			break;
+
+		default:
 			m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_FACTION, 35);		// neutral
+			break;
+		}
 
 		m_controlPoints[Id]->bannerslot = Id;
 		m_controlPoints[Id]->PushToWorld(m_mapMgr);
@@ -185,13 +234,24 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 		m_controlPoints[Id]->SetNewGuid(m_mapMgr->GenerateGameobjectGuid());
 		m_controlPoints[Id]->SetUInt32Value(OBJECT_FIELD_ENTRY, gi->ID);
 		m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_DISPLAYID, gi->DisplayID);
+		m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_TYPE_ID, gi->Type);
 
-		if(Type==AB_SPAWN_TYPE_ALLIANCE_ASSAULT||Type==AB_SPAWN_TYPE_ALLIANCE_CONTROLLED)
-			m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_FACTION, 1);
-		else if(Type==AB_SPAWN_TYPE_HORDE_ASSAULT||Type==AB_SPAWN_TYPE_HORDE_CONTROLLED)
+		switch(Type)
+		{
+		case AB_SPAWN_TYPE_ALLIANCE_ASSAULT:
+		case AB_SPAWN_TYPE_ALLIANCE_CONTROLLED:
 			m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_FACTION, 2);
-		else
+			break;
+
+		case AB_SPAWN_TYPE_HORDE_ASSAULT:
+		case AB_SPAWN_TYPE_HORDE_CONTROLLED:
+			m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_FACTION, 1);
+			break;
+
+		default:
 			m_controlPoints[Id]->SetUInt32Value(GAMEOBJECT_FACTION, 35);		// neutral
+			break;
+		}
 
 		m_controlPoints[Id]->SetInfo(gi);
 		m_controlPoints[Id]->PushToWorld(m_mapMgr);
@@ -532,6 +592,10 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 		return;
 	}
 
+	// anticheat, not really necessary because this is a server method but anyway
+	if(m_basesAssaultedBy[Id] != Team)
+		return;
+
 	m_basesOwnedBy[Id] = Team;
 
 	// remove the other spirit guide (if it exists)
@@ -551,12 +615,22 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 
 	// respawn the control point with the correct aura
 	SpawnControlPoint(Id, Team ? AB_SPAWN_TYPE_HORDE_CONTROLLED : AB_SPAWN_TYPE_ALLIANCE_CONTROLLED);
+
+	// update the map
+	SetWorldState(AssaultFields[Id][Team], 0);
+	SetWorldState(OwnedFields[Id][Team], 1);
 }
 
 void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 {
 	uint32 Team = pPlayer->m_bgTeam;
 	uint32 Owner;
+
+	if(m_basesOwnedBy[Id]==-1 && m_basesAssaultedBy[Id]==-1)
+	{
+		// omgwtfbbq our flag is a virgin?
+		SetWorldState(NeutralFields[Id], 0);
+	}
 
 	if(m_basesOwnedBy[Id] != -1)
 	{
@@ -579,6 +653,7 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 		SetWorldState(OwnedFields[Id][Owner], 0);
 	}
 
+	// nigga stole my flag!
 	if(m_basesAssaultedBy[Id] != -1)
 	{
 		Owner = m_basesAssaultedBy[Id];
@@ -592,6 +667,8 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 
 		// no need to remove the spawn, SpawnControlPoint will do this.
 	}
+
+	m_basesAssaultedBy[Id] = Team;
 
 	// spawn the new control point gameobject
 	SpawnControlPoint(Id, Team ? AB_SPAWN_TYPE_HORDE_ASSAULT : AB_SPAWN_TYPE_ALLIANCE_ASSAULT);
