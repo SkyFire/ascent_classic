@@ -471,7 +471,9 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 		WorldPacket data(SMSG_EMOTE, 28 + namelen);
 
 		sHookInterface.OnEmote(_player, (EmoteType)em->textid);
-		CALL_SCRIPT_EVENT(pUnit,OnEmote)(_player,(EmoteType)em->textid);
+		if(pUnit)
+			CALL_SCRIPT_EVENT(pUnit,OnEmote)(_player,(EmoteType)em->textid);
+
         switch(em->textid)
         {
             case EMOTE_STATE_SLEEP:
