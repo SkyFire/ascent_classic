@@ -100,7 +100,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			data << fields[7].GetUInt32();		// GuildID
 
 			banned = fields[14].GetUInt32();
-			if(banned && (banned<10 || banned > UNIXTIME))
+			if(banned && (banned<10 || banned > (uint32)UNIXTIME))
 				data << uint32(0x01A04040);
 			else
 			{

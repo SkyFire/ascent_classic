@@ -101,7 +101,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket &recv_data)
 		return;
 	
 	uint32 restime = _player->m_bg->GetLastResurrect() + 30;
-	if(UNIXTIME > restime)
+	if((uint32)UNIXTIME > restime)
 		restime = 1000;
 	else
 		restime = (restime - (uint32)UNIXTIME) * 1000;
