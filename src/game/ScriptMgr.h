@@ -171,6 +171,7 @@ public:
 	virtual void OnReachWP(uint32 iWaypointId, bool bForwards) {}
 	virtual void OnLootTaken(Player* pPlayer, ItemPrototype *pItemPrototype) {}
 	virtual void AIUpdate() {}
+	virtual void OnEmote(Player * pPlayer, EmoteType Emote) {}
 
 	void RegisterAIUpdateEvent(uint32 frequency);
 	void RemoveAIUpdateEvent();
