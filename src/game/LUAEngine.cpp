@@ -1016,7 +1016,7 @@ int luaUnit_AddItem(lua_State * L, Unit * ptr)
 int luaUnit_GetInstanceID(lua_State * L, Unit * ptr)
 {
 	CHECK_TYPEID(TYPEID_UNIT);
-	lua_pushinteger(L, (double)ptr->GetMapMgr()->GetInstanceID());
+	/*lua_pushinteger(L,ptr->GetInstanceID());*///Commented cause don't work :)
 	return 1;
 }
 

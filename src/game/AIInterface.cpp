@@ -738,7 +738,8 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 	if(	m_AIType != AITYPE_PET 
 		&& (m_outOfCombatRange && m_Unit->GetDistanceSq(m_returnX,m_returnY,m_returnZ) > m_outOfCombatRange) 
 		&& m_AIState != STATE_EVADE
-		&& m_AIState != STATE_SCRIPTMOVE)
+		&& m_AIState != STATE_SCRIPTMOVE
+		&& !(m_Unit->IsInInstance()))
 	{
 		HandleEvent(EVENT_LEAVECOMBAT, m_Unit, 0);
 	}
@@ -3092,6 +3093,9 @@ void AIInterface::CheckTarget(Unit* target)
 
 uint32 AIInterface::_CalcThreat(uint32 damage, uint32 spellId, Unit* Attacker)
 {
+	if (isFriendly(m_Unit,Attacker))
+		return 0;
+
 	int32 mod = 0;
 	if(spellId != 0)
 	{
