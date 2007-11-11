@@ -1732,6 +1732,20 @@ void Aura::SpellAuraDummy(bool apply)
 				sEventMgr.RemoveEvents(this, EVENT_AURA_PERIODIC_HEAL);
             		
 		}break;
+
+	case 2584:			// Area spirit healer aura for BG's
+		{
+			if(!m_target->IsPlayer() || apply)		// already applied in opcode handler
+				return;
+
+			Player * pTarget = ((Player*)m_target);
+			uint32 crtguid = pTarget->m_areaspirithealer_guid;
+			Creature * pCreature = pTarget->IsInWorld() ? pTarget->GetMapMgr()->GetCreature(crtguid) : NULL;
+			if(pCreature==NULL || pTarget->m_bg==NULL)
+				return;
+
+			pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
+		}break;
 	}
 }
 

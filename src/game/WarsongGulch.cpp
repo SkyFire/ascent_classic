@@ -437,11 +437,8 @@ void WarsongGulch::OnCreate()
 	SetWorldState(WSG_CURRENT_HORDE_SCORE, 0);
 
 	/* spawn spirit guides */
-	// Alliance Spirit Guide
-	SpawnSpiritGuide(1423.218872f, 1554.663574f, 342.833801f, 3.124139f, 0);
-
-	// Horde Spirit Guide
-	SpawnSpiritGuide(1032.644775f, 1388.316040f, 340.559937f, 0.043200f, 1);
+	AddSpiritGuide(SpawnSpiritGuide(1423.218872f, 1554.663574f, 342.833801f, 3.124139f, 0));
+	AddSpiritGuide(SpawnSpiritGuide(1032.644775f, 1388.316040f, 340.559937f, 0.043200f, 1));
 }
 
 void WarsongGulch::OnStart()

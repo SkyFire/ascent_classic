@@ -265,7 +265,7 @@ protected:
 	uint8 m_winningteam;
 
 	/* resurrect queue */
-	set<uint32> m_resurrectQueue[2];
+	map<Creature*, set<uint32> > m_resurrectMap;
 	uint32 m_lastResurrect;
 
 public:
@@ -374,7 +374,10 @@ public:
 	Creature * SpawnSpiritGuide(float x, float y, float z, float o, uint32 horde);
 
 	inline uint32 GetLastResurrect() { return m_lastResurrect; }
-	void QueuePlayerForResurrect(Player * plr);
+	void AddSpiritGuide(Creature * pCreature);
+	void RemoveSpiritGuide(Creature * pCreature);
+	void QueuePlayerForResurrect(Player * plr, Creature * spirit_healer);
+	void RemovePlayerFromResurrect(Player * plr, Creature * spirit_healer);
 	void EventResurrectPlayers();
 	virtual bool CanPlayerJoin(Player * plr);
 	virtual bool CreateCorpse(Player * plr) { return true; }

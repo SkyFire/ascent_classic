@@ -95,9 +95,16 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket &recv_data)
 	if(!_player->IsInWorld() || !_player->m_bg) return;
 	uint64 guid;
 	recv_data >> guid;
+
+	Creature * psg = _player->GetMapMgr()->GetCreature((uint32)guid);
+	if(psg == NULL)
+		return;
 	
-	uint32 restime = (_player->m_bg->GetLastResurrect() + 30) - (uint32)UNIXTIME;
-	restime *= 1000;
+	uint32 restime = _player->m_bg->GetLastResurrect() + 30;
+	if(UNIXTIME > restime)
+		restime = 1000;
+	else
+		restime = (restime - (uint32)UNIXTIME) * 1000;
 
 	WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
 	data << guid << restime;
@@ -109,7 +116,12 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket &recv_data)
 	if(!_player->IsInWorld() || !_player->m_bg) return;
 	uint64 guid;
 	recv_data >> guid;
-	_player->m_bg->QueuePlayerForResurrect(_player);
+	Creature * psg = _player->GetMapMgr()->GetCreature((uint32)guid);
+	if(psg == NULL)
+		return;
+
+	_player->m_bg->QueuePlayerForResurrect(_player, psg);
+	_player->CastSpell(_player,2584,true);
 }
 
 void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket &recv_data)

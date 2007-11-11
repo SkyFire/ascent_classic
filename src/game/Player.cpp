@@ -380,6 +380,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	raidgrouponlysent=false;
 	loot.gold=0;
 	m_waterwalk=false;
+	m_areaspirithealer_guid=0;
 }
 
 

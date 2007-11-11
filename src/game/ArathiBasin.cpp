@@ -344,8 +344,8 @@ void ArathiBasin::OnCreate()
 	SpawnBuff(AB_BUFF_FARM);
 
 	// spawn the h/a base spirit guides
-	SpawnSpiritGuide(NoBaseGYLocations[0][0],NoBaseGYLocations[0][1],NoBaseGYLocations[0][2], 0.0f, 0);
-	SpawnSpiritGuide(NoBaseGYLocations[1][0],NoBaseGYLocations[1][1],NoBaseGYLocations[1][2], 0.0f, 1);
+	AddSpiritGuide(SpawnSpiritGuide(NoBaseGYLocations[0][0],NoBaseGYLocations[0][1],NoBaseGYLocations[0][2], 0.0f, 0));
+	AddSpiritGuide(SpawnSpiritGuide(NoBaseGYLocations[1][0],NoBaseGYLocations[1][1],NoBaseGYLocations[1][2], 0.0f, 1));
 
 	// urrrgh worldstates
 	SetWorldState(0x8D8, 0x00);
@@ -680,13 +680,18 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 		return;
 
 	m_basesOwnedBy[Id] = Team;
+	m_basesAssaultedBy[Id]=-1;
 
-	// remove the other spirit guide (if it exists)
+	// remove the other spirit guide (if it exists) // burlex: shouldnt' happen
 	if(m_spiritGuides[Id] != NULL)
+	{
+		RemoveSpiritGuide(m_spiritGuides[Id]);
 		m_spiritGuides[Id]->Despawn(0,0);
+	}
 
 	// spawn the spirit guide for our faction
 	m_spiritGuides[Id] = SpawnSpiritGuide(GraveyardLocations[Id][0], GraveyardLocations[Id][1], GraveyardLocations[Id][2], 0.0f, Team);
+	AddSpiritGuide(m_spiritGuides[Id]);
 
 	// send the chat message/sounds out
 	PlaySoundToAll(Team ? SOUND_HORDE_CAPTURE : SOUND_ALLIANCE_CAPTURE);
@@ -732,18 +737,28 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 	{
 		Owner = m_basesOwnedBy[Id];
 
+		// set it to uncontrolled for now
+		m_basesOwnedBy[Id] = -1;
+
 		// this control point just got taken over by someone! oh noes!
 		if(m_spiritGuides[Id] != NULL) {
+			map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find(m_spiritGuides[Id]);
+			if(itr != m_resurrectMap.end())
+			{
+				for(set<uint32>::iterator it2 = itr->second.begin(); it2 != itr->second.end(); ++it2)
+				{
+					Player * r_plr = m_mapMgr->GetPlayer((*it2));
+					HookHandleRepop(r_plr);
+				}
+			}
+			m_resurrectMap.erase(itr);
 			m_spiritGuides[Id]->Despawn(0,0);
 			m_spiritGuides[Id] = NULL;
 		}
 
 		// detract one from the teams controlled points
 		m_capturedBases[Owner] -= 1;
-		SetWorldState(m_basesOwnedBy[Owner] ? AB_HORDE_CAPTUREBASE : AB_ALLIANCE_CAPTUREBASE, m_capturedBases[Owner]);
-
-		// set it to uncontrolled for now
-		m_basesOwnedBy[Id] = -1;
+		SetWorldState(Owner ? AB_HORDE_CAPTUREBASE : AB_ALLIANCE_CAPTUREBASE, m_capturedBases[Owner]);
 
 		// reset the world states
 		SetWorldState(OwnedFields[Id][Owner], 0);

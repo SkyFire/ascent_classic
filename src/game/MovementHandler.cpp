@@ -451,6 +451,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			}
 
 			_player->m_TransporterGUID = 0;
+			_player->ResetHeartbeatCoords();
 		}
 		else if(movement_info.transGuid)
 		{
@@ -485,7 +486,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Anti-Speed Hack Checks                                               */
 	/************************************************************************/
-	if(!_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM])
+	if(!_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID)
 	{
 		// calculate distance between last heartbeat and this
 		if(_player->_lastHeartbeatTime && _player->_heartBeatDisabledUntil < UNIXTIME)

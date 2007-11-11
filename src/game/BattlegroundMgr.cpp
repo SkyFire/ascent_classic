@@ -19,7 +19,7 @@
 
 #include "StdAfx.h"
 
-//#define ENABLE_AB
+#define ENABLE_AB
 //#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
 
 initialiseSingleton(CBattlegroundManager);
@@ -1257,20 +1257,56 @@ Creature * CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, u
 	return pCreature;
 }
 
-void CBattleground::QueuePlayerForResurrect(Player * plr)
+void CBattleground::QueuePlayerForResurrect(Player * plr, Creature * spirit_healer)
 {
-	m_resurrectQueue[plr->m_bgTeam].insert(plr->GetGUIDLow());
+	m_mainLock.Acquire();
+	map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find(spirit_healer);
+	if(itr != m_resurrectMap.end())
+		itr->second.insert(plr->GetGUIDLow());
+	plr->m_areaspirithealer_guid=spirit_healer->GetGUIDLow();
+	m_mainLock.Release();
+}
+
+void CBattleground::RemovePlayerFromResurrect(Player * plr, Creature * spirit_healer)
+{
+	m_mainLock.Acquire();
+	map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find(spirit_healer);
+	if(itr != m_resurrectMap.end())
+		itr->second.erase(plr->GetGUIDLow());
+	plr->m_areaspirithealer_guid=0;
+	m_mainLock.Release();
+}
+
+void CBattleground::AddSpiritGuide(Creature * pCreature)
+{
+	m_mainLock.Acquire();
+	map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find(pCreature);
+	if(itr == m_resurrectMap.end())
+	{
+		set<uint32> ti;
+		m_resurrectMap.insert(make_pair(pCreature,ti));
+	}
+	m_mainLock.Release();
+}
+
+void CBattleground::RemoveSpiritGuide(Creature * pCreature)
+{
+	m_mainLock.Acquire();
+	m_resurrectMap.erase(pCreature);
+	m_mainLock.Release();
 }
 
 #define RESURRECT_SPELL 21074   // Spirit Healer Res
 void CBattleground::EventResurrectPlayers()
 {
+	m_mainLock.Acquire();
 	Player * plr;
 	set<uint32>::iterator itr;
+	map<Creature*,set<uint32> >::iterator i;
 	WorldPacket data(50);
-	for(uint32 i = 0; i < 2; ++i)
+	for(i = m_resurrectMap.begin(); i != m_resurrectMap.end(); ++i)
 	{
-		for(itr = m_resurrectQueue[i].begin(); itr != m_resurrectQueue[i].end(); ++itr)
+		for(itr = i->second.begin(); itr != i->second.end(); ++itr)
 		{
 			plr = m_mapMgr->GetPlayer(*itr);
 			if(plr && plr->isDead())
@@ -1290,9 +1326,10 @@ void CBattleground::EventResurrectPlayers()
 				plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
 			}
 		}
-		m_resurrectQueue[i].clear();
+		i->second.clear();
 	}
 	m_lastResurrect = (uint32)UNIXTIME;
+	m_mainLock.Release();
 }
 
 void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 BattlegroundType, uint8 as_group, uint8 rated_match)

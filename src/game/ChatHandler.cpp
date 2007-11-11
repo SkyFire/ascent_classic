@@ -481,12 +481,11 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 				{
 					_player->SetUInt32Value(UNIT_NPC_EMOTESTATE, em->textid);
 				}break;
-            default:
-				data << (uint32)em->textid;
-				data << (uint64)GetPlayer()->GetGUID();
-				GetPlayer()->SendMessageToSet(&data, true); //If player receives his own emote, his animation stops.
-                break;
-        }
+		}
+
+		data << (uint32)em->textid;
+		data << (uint64)GetPlayer()->GetGUID();
+		GetPlayer()->SendMessageToSet(&data, true); //If player receives his own emote, his animation stops.
 
 		data.Initialize(SMSG_TEXT_EMOTE);
 		data << (uint64)GetPlayer()->GetGUID();

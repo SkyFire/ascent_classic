@@ -37,6 +37,7 @@ bool HandleDummyAura(uint32 i, Aura* pAura, bool apply)
     {
         
     case 20154:         // Rank 1: "Melee attacks cause an additional $/87;20187s3 to $/25;20187s3 Holy damage."
+	case 21084:
         applyId = 20187;
         break; 
     case 20287:         // Rank 2: $/25;20280s3 
@@ -119,6 +120,7 @@ bool HandleDummyAura(uint32 i, Aura* pAura, bool apply)
 void SetupPaladinSpells(ScriptMgr * mgr)
 {
     mgr->register_dummy_aura(20154, &HandleDummyAura);
+	mgr->register_dummy_aura(21084, &HandleDummyAura);
     mgr->register_dummy_aura(20287, &HandleDummyAura);
     mgr->register_dummy_aura(20288, &HandleDummyAura);
     mgr->register_dummy_aura(20289, &HandleDummyAura);
