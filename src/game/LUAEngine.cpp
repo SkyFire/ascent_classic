@@ -390,6 +390,7 @@ void LuaEngine::OnGameObjectEvent(GameObject * pGameObject, uint32 EventType, Un
 int luaUnit_GetName(lua_State * L, Unit * ptr);
 int luaUnit_SendChatMessage(lua_State * L, Unit * ptr);
 int luaUnit_MoveTo(lua_State * L, Unit * ptr);
+int luaUnit_SetMovementType(lua_State * L, Unit * ptr);
 int luaUnit_CastSpell(lua_State * L, Unit * ptr);
 int luaUnit_CastSpellOnTarget(lua_State * L, Unit * ptr);
 int luaUnit_FullCastSpell(lua_State * L, Unit * ptr);
@@ -454,6 +455,7 @@ Unit::RegType Unit::methods[] = {
 	{ "GetName", &luaUnit_GetName },
 	{ "SendChatMessage", &luaUnit_SendChatMessage },
 	{ "MoveTo", &luaUnit_GetName },
+	{ "SetMovementType", &luaUnit_SetMovementType },
 	{ "CastSpell", &luaUnit_CastSpell },
 	{ "FullCastSpell", &luaUnit_FullCastSpell },
 	{ "CastSpellOnTarget", &luaUnit_CastSpell },
@@ -640,6 +642,13 @@ int luaUnit_MoveTo(lua_State * L, Unit * ptr)
 
 	ptr->GetAIInterface()->MoveTo( (float)x, (float)y, (float)z, (float)o );
 	return 0;
+}
+int luaUnit_SetMovementType(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	uint32 typ = luaL_checkint(L, 1);
+	ptr->GetAIInterface()->setMoveType(typ);
+
 }
 
 int luaUnit_GetX(lua_State * L, Unit * ptr)

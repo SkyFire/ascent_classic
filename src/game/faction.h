@@ -310,6 +310,11 @@ inline bool isFriendly(Object* objA, Object* objB)// B is friendly to A if its n
 	return !isHostile(objA, objB);
 }
 
+inline bool isSameFaction(Object* objA, Object* objB)
+{
+	return (objB->m_faction->Faction == objA->m_faction->Faction);
+}
+
 inline bool isCombatSupport(Object* objA, Object* objB)// B combat supports A?
 {
 	if(!objA || !objB)

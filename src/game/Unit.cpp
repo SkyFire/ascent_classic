@@ -1644,7 +1644,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 			hitmodifier+=pr->CalcRating(6);
 			self_skill = float2int32(pr->CalcRating(0));
-			disable_dR = true;
+			//disable_dR = true; Shady: wtf?! why ranged damage shouldn't be lowered by armor?
 			break;
 		}
 

@@ -2828,6 +2828,27 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(33759);
 	if(sp)
 		sp->proc_interval = 10000; //10 seconds.
+//--------FACTIONS----------------
+/*	FactionTemplateDBC* fe = dbcFactionTemplate.LookupEntry(1719);
+	if(fe)
+	{
+		for (uint32 x = 0;x<4;x++)
+			printf(" ! %d !F %d ",fe->EnemyFactions[x],fe->FriendlyFactions[x]);
+		printf("FM %d HM %d\n",fe->FriendlyMask,fe->HostileMask);
+		fe->EnemyFactions[0]=1720;
+		fe->FriendlyFactions[0]=1719;
+	}
+	fe = dbcFactionTemplate.LookupEntry(1720);
+	if(fe)
+	{
+		for (uint32 x = 0;x<4;x++)
+			printf(" = %d =F %d ",fe->EnemyFactions[x],fe->FriendlyFactions[x]);
+		printf("FM %d HM %d \n",fe->FriendlyMask,fe->HostileMask);
+		fe->EnemyFactions[0]=1719;
+		fe->FriendlyFactions[0]=1720;
+	} */
+
+		
 
 	//windfury weapon changes. Start to hate these day by day
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(283);

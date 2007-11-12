@@ -3093,7 +3093,7 @@ void AIInterface::CheckTarget(Unit* target)
 
 uint32 AIInterface::_CalcThreat(uint32 damage, uint32 spellId, Unit* Attacker)
 {
-	if (isFriendly(m_Unit,Attacker))
+	if (isSameFaction(m_Unit,Attacker))
 		return 0;
 
 	int32 mod = 0;
