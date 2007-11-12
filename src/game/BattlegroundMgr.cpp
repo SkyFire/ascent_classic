@@ -515,18 +515,18 @@ CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 
 	sEventMgr.AddEvent(this, &CBattleground::EventResurrectPlayers, EVENT_BATTLEGROUND_QUEUE_UPDATE, 30000, 0,0);
 
 	/* create raid groups */
-	for(uint32 i = 0; i < 2; ++i)
+	/*for(uint32 i = 0; i < 2; ++i)
 	{
 		m_groups[i] = new Group();
 		m_groups[i]->m_disbandOnNoMembers = false;
 		m_groups[i]->ExpandToRaid();
-	}
+	}*/
 }
 
 CBattleground::~CBattleground()
 {
 	sEventMgr.RemoveEvents(this);
-	for(uint32 i = 0; i < 2; ++i)
+	/*for(uint32 i = 0; i < 2; ++i)
 	{
 		Player * plr;
 		PlayerInfo *inf;
@@ -539,7 +539,7 @@ CBattleground::~CBattleground()
 			}
 		}
 		delete m_groups[i];
-	}
+	}*/
 }
 
 void CBattleground::UpdatePvPData()
@@ -759,13 +759,13 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	UpdatePvPData();
 
 	/* add the player to the group */
-	if(plr->GetGroup())
+	/*if(plr->GetGroup())
 	{
-		/* remove them from their group */
+		// remove them from their group
 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
 	}
 
-	m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);
+	m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);*/
 
 	if(!m_countdownStage)
 	{
@@ -1034,8 +1034,8 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	plr->m_bg = 0;
 
 	/* are we in the group? */
-	if(plr->GetGroup() == m_groups[plr->m_bgTeam])
-		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
+	/*if(plr->GetGroup() == m_groups[plr->m_bgTeam])
+		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);*/
 
 	// reset team
 	plr->ResetTeam();

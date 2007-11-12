@@ -72,6 +72,8 @@ void WorldSession::SendBattlegroundList(Creature* pCreature, uint32 mapid)
 	{
 		if(strstr(pCreature->GetCreatureName()->SubName, "Arena") != NULL)
 			t = BATTLEGROUND_ARENA_2V2;
+		else if(strstr(pCreature->GetCreatureName()->SubName, "Arathi") != NULL)
+			t = BATTLEGROUND_ARATHI_BASIN;
 		else if(strstr(pCreature->GetCreatureName()->SubName, "Warsong") != NULL)
 			t = BATTLEGROUND_WARSUNG_GULCH;
 	}

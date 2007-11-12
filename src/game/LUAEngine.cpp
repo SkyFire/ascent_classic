@@ -648,7 +648,7 @@ int luaUnit_SetMovementType(lua_State * L, Unit * ptr)
 	CHECK_TYPEID(TYPEID_UNIT);
 	uint32 typ = luaL_checkint(L, 1);
 	ptr->GetAIInterface()->setMoveType(typ);
-
+	return 0;
 }
 
 int luaUnit_GetX(lua_State * L, Unit * ptr)

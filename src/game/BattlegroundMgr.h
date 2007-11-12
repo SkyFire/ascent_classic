@@ -236,9 +236,13 @@ protected:
 	uint32 m_type;
 	uint32 m_levelGroup;
 
+public:
 	/* Team->Player Map */
 	set<Player*> m_players[2];
+	void Lock() { m_mainLock.Acquire(); }
+	void Unlock() { m_mainLock.Release(); }
 
+protected:
 	/* World States. This should be moved to mapmgr instead for world pvp :/ */
 	map<uint32, uint32> m_worldStates;
 

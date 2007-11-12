@@ -108,7 +108,42 @@ void HonorHandler::OnPlayerKilledUnit(Player *pPlayer, Unit* pVictim)
 
 	if(Points > 0)
 	{
-        if(pPlayer->GetGroup())
+		if(pPlayer->m_bg)
+		{
+			// hackfix for battlegrounds (since the gorups there are disabled, we need to do this manually)
+			vector<Player*> toadd;
+			uint32 t = pPlayer->m_bgTeam;
+			toadd.reserve(15);		// shouldnt have more than this
+			pPlayer->m_bg->Lock();
+			set<Player*> * s = &pPlayer->m_bg->m_players[t];
+
+			for(set<Player*>::iterator itr = s->begin(); itr != s->end(); ++itr)
+			{
+				if((*itr) == pPlayer || (*itr)->isInRange(pPlayer,100.0f))
+					toadd.push_back(*itr);
+			}
+
+			uint32 pts = Points / (uint32)toadd.size();
+			for(vector<Player*>::iterator vtr = toadd.begin(); vtr != toadd.end(); ++vtr)
+			{
+				AddHonorPointsToPlayer(*vtr, pts);
+
+				(*vtr)->m_killsToday++;
+				(*vtr)->m_killsLifetime++;
+				pPlayer->m_bg->HookOnHK(*vtr);
+				if(pVictim)
+				{
+					// Send PVP credit
+					WorldPacket data(SMSG_PVP_CREDIT, 12);
+					uint32 pvppoints = pts * 10;
+					data << pvppoints << pVictim->GetGUID() << uint32(static_cast<Player*>(pVictim)->GetPVPRank());
+					(*vtr)->GetSession()->SendPacket(&data);
+				}
+			}
+
+			pPlayer->m_bg->Unlock();
+		}
+		else if(pPlayer->GetGroup())
         {
             Group *pGroup = pPlayer->GetGroup();
             Player *gPlayer = NULL;

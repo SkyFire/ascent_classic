@@ -7127,6 +7127,9 @@ void Player::SafeTeleport(MapMgr * mgr, const LocationVector & vec)
 	SetPosition(vec);
 	ResetHeartbeatCoords();
 
+	if(m_session)
+		m_session->SetInstance(mgr->GetInstanceID());
+
 	mgr->AddObject(this);
 }
 
