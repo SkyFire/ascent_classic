@@ -3210,12 +3210,14 @@ exit:
 			value +=float2int32(u_caster->GetRAP()*0.15f);
 	}else if(m_spellInfo->NameHash == 0x93C04185)//rake
 	{
+		//Rake the target for ${$AP/100+$m1} bleed damage and an additional ${$m2*3+$AP*0.06} damage over $d.
 		if(u_caster) 
 		{
+			float ap = (float)u_caster->GetAP();
 			if(i==0)
-				value+=(uint32)(u_caster->GetAP()*0.03);
+				value+=(uint32)ceilf((ap*0.01f));	// / 100
 			else if(i==1)
-				value+=(uint32)(u_caster->GetAP()*0.06);
+				value=(int32)ceilf((float(value * 3) + ceilf((ap*0.06f))) / 3.0f);
 		}
 	}else if(m_spellInfo->NameHash == 0x8B025B0C)//rip
 	{
