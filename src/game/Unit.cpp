@@ -949,6 +949,16 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
+						//mage - Improved Blizzard
+						case 11185:
+						case 12487:
+						case 12488:
+							{
+								if(!CastingSpell)
+									continue;
+								if (CastingSpell->NameHash!=0xA1761A27 && victim!=this) //Blizzard
+									continue;
+							}break;
 						//priest - Reflective Shield 
 						case 33619:
 							{

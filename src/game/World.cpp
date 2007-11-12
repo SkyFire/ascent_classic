@@ -2228,6 +2228,30 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=5775504;
 		sp->EffectSpellGroupRelation[1]=10518528;
 	}*/
+
+	//Mage - Improved Blizzard
+	sp = dbcSpell.LookupEntry(11185);
+	if(sp)
+	{    
+		sp->EffectApplyAuraName[0]=42;
+		sp->EffectTriggerSpell[0]=12484;
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	}
+	sp = dbcSpell.LookupEntry(12487);
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0]=42;
+		sp->EffectTriggerSpell[0]=12485;
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	}
+	sp = dbcSpell.LookupEntry(12488);
+	if(sp)
+	{
+		sp->EffectApplyAuraName[0]=42;
+		sp->EffectTriggerSpell[0]=12486;
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	}
+
 	//mage: Fire Power
 	sp  = dbcSpell.LookupEntry(11124);
 	if (sp)
