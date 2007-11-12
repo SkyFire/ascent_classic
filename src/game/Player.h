@@ -1690,6 +1690,7 @@ public:
 
 	Mailbox m_mailBox;
 	bool m_waterwalk;
+	bool m_setwaterwalk;
 	uint32 m_areaspirithealer_guid;
 
 protected:
