@@ -3797,7 +3797,7 @@ bool CharacterLoaderThread::run()
 
 	for(;;)
 	{
-		//sWorld.PollCharacterInsertQueue();
+		sWorld.PollCharacterInsertQueue();
 		/* While this looks weird, it ensures the system doesn't waste time switching to these contexts.
 		   WaitForSingleObject will suspend the thread,
 		   and on unix, select will as well. - Burlex
