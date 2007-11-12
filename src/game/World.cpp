@@ -53,12 +53,12 @@ World::World()
 
 World::~World()
 {
-	sLog.outString("  Saving players to DB...");
+	/*sLog.outString("  Saving players to DB...");
 	for(SessionMap::iterator i=m_sessions.begin();i!=m_sessions.end();i++)
 	{
 		(i->second)->LogoutPlayer(true);
 	
-	}
+	}*/
 
 	sLog.outString("  Deleting world packet logger...");
 	delete WorldLog::getSingletonPtr();
