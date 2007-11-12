@@ -310,9 +310,11 @@ private:
 	bool _CellActive(uint32 x, uint32 y);
 	void UpdateInRangeSet(Object *obj, Player *plObj, MapCell* cell, ByteBuffer ** buf);
 
+public:
 	// Distance a Player can "see" other objects and receive updates from them (!! ALREADY dist*dist !!)
 	float m_UpdateDistance;
 
+private:
 	/* Update System */
 	FastMutex m_updateMutex;		// use a user-mode mutex for extra speed
 	UpdateQueue _updates;

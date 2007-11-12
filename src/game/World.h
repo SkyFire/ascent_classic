@@ -215,6 +215,7 @@ struct MapInfo
 	uint32 required_item;
 	uint32 heroic_key_1;
 	uint32 heroic_key_2;
+	float update_distance;
 
 	bool HasFlag(uint32 flag)
 	{
@@ -443,9 +444,6 @@ public:
 	void LoadNameGenData();
 	std::string GenerateName(uint32 type = 0);
 
-	void SetUpdateDistance(float dist) { m_UpdateDistance = (float)pow(dist, 2); }
-	inline float GetUpdateDistance() { return (m_UpdateDistance ? m_UpdateDistance : 79.1f); }
-
 	std::map<uint32, AreaTable*> mAreaIDToTable;
 	std::map<uint32, AreaTable*> mZoneIDToTable;
 
@@ -496,7 +494,7 @@ public:
 	uint32 flood_seconds;
 	bool flood_message;
 	bool gm_skip_attunement;
-	float m_UpdateDistance;
+
 	bool show_gm_in_who_list;
 	uint32 map_unload_time;
 

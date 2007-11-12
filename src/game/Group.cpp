@@ -937,10 +937,10 @@ void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribu
 		*data << uint8(0xFF);
 	}
 
-	if(Distribute)
+	if(Distribute&&pPlayer->IsInWorld())
 	{
 		Player * plr;
-		float dist = sWorld.m_UpdateDistance;
+		float dist = pPlayer->GetMapMgr()->m_UpdateDistance;
 		m_groupLock.Acquire();
 		for(uint32 i = 0; i < m_SubGroupCount; ++i)
 		{
@@ -951,7 +951,7 @@ void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribu
 
 				if(plr && plr != pPlayer && plr->GetMapMgr() == pPlayer->GetMapMgr())
 				{
-					if(plr->CalcDistance(pPlayer) > dist)
+					if(plr->GetDistance2dSq(pPlayer) > dist)
 						plr->GetSession()->SendPacket(data);
 				}
 			}

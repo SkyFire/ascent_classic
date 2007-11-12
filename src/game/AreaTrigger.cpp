@@ -103,11 +103,10 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 	AreaTrigger * pAreaTrigger = AreaTriggerStorage.LookupEntry(id);
 
 	// Are we REALLY here?
-	if(!pAreaTrigger)
+	if(!pAreaTrigger || !_player->IsInWorld())
 		return;
 
-	LocationVector l(pAreaTrigger->x, pAreaTrigger->y, pAreaTrigger->z);
-	if((_player->GetMapId() == pAreaTrigger->Mapid) && _player->CalcDistance(l) > sWorld.GetUpdateDistance())
+	if((_player->GetMapId() == pAreaTrigger->Mapid) && _player->GetPositionV()->Distance2DSq(pAreaTrigger->x,pAreaTrigger->y) > _player->GetMapMgr()->m_UpdateDistance)
 		return;
 
     // Search quest log, find any exploration quests

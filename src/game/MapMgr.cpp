@@ -30,8 +30,8 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 	ThreadType = THREADTYPE_MAPMGR;
 	_shutdown = false;
 	m_instanceID = instanceid;
-	m_UpdateDistance = sWorld.GetUpdateDistance();
 	pMapInfo = WorldMapInfoStorage.LookupEntry(mapId);
+	m_UpdateDistance = pMapInfo->update_distance * pMapInfo->update_distance;
 	iInstanceMode = 0;
 
 	// Create script interface
