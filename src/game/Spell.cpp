@@ -3222,7 +3222,7 @@ exit:
 	}else if(m_spellInfo->NameHash == 0x8B025B0C)//rip
 	{
 		if(u_caster) 
-				value+=(uint32)(u_caster->GetAP()*0.24);
+				value+=(uint32)(u_caster->GetAP()*0.04f);
 
 	}else if(m_spellInfo->NameHash == 0x5F076E9E)//Mongoose Bite
 	{// ${$AP*0.2+$m1} damage.
