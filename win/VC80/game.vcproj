@@ -600,6 +600,14 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\src\game\EyeOfTheStorm.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\game\EyeOfTheStorm.h"
+			>
+		</File>
+		<File
 			RelativePath="..\..\src\game\faction.h"
 			>
 		</File>

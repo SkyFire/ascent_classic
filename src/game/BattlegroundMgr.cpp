@@ -20,6 +20,7 @@
 #include "StdAfx.h"
 
 #define ENABLE_AB
+//#define ENABLE_EOTS
 //#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
 
 initialiseSingleton(CBattlegroundManager);
@@ -48,7 +49,11 @@ const static CreateBattlegroundFunc BGCFuncs[BATTLEGROUND_NUM_TYPES] = {
 	NULL,						// 2v2
 	NULL,						// 3v3
 	NULL,						// 5v5
+#ifdef ENABLE_EOTS
+	&EyeOfTheStorm::Create,		// Netherstorm
+#else
 	NULL,						// Netherstorm
+#endif
 };
 
 CBattlegroundManager::CBattlegroundManager() : EventableObject()

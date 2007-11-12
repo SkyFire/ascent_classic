@@ -86,6 +86,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "BattlegroundMgr.h"
 #include "AlteracValley.h"
 #include "ArathiBasin.h"
+#include "EyeOfTheStorm.h"
 #include "Arenas.h"
 #include "CellHandler.h"
 #include "Chat.h"
