@@ -3005,6 +3005,7 @@ bool World::SetInitialWorldSettings()
 
 	dw = new DayWatcherThread();
 	ThreadPool.ExecuteTask(dw);
+	ThreadPool.ExecuteTask(new CharacterLoaderThread());
 
 	sEventMgr.AddEvent(this, &World::CheckForExpiredInstances, EVENT_WORLD_UPDATEAUCTIONS, 120000, 0, 0);
 	return true;
@@ -3753,4 +3754,263 @@ void World::CleanupCheaters()
 void World::CheckForExpiredInstances()
 {
 	sInstanceMgr.CheckForExpiredInstances();
+}
+
+struct insert_playeritem
+{
+	uint32 ownerguid;
+	uint32 entry;
+	uint32 wrapped_item_id;
+	uint32 wrapped_creator;
+	uint32 creator;
+	uint32 count;
+	uint32 charges;
+	uint32 flags;
+	uint32 randomprop;
+	uint32 randomsuffix;
+	uint32 itemtext;
+	uint32 durability;
+	int32 containerslot;
+	int32 slot;
+	string enchantments;
+};
+
+#define LOAD_THREAD_SLEEP 180
+
+void CharacterLoaderThread::OnShutdown()
+{
+#ifdef WIN32
+	SetEvent(hEvent);
+	running=false;
+#endif
+}
+
+bool CharacterLoaderThread::run()
+{
+#ifdef WIN32
+	hEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
+#else
+	struct timeval tv;
+	tv.tv_usec=0;
+	tv.tv_sec = LOAD_THREAD_SLEEP;
+#endif
+
+	for(;;)
+	{
+		//sWorld.PollCharacterInsertQueue();
+		/* While this looks weird, it ensures the system doesn't waste time switching to these contexts.
+		   WaitForSingleObject will suspend the thread,
+		   and on unix, select will as well. - Burlex
+			*/
+#ifdef WIN32
+		WaitForSingleObject(hEvent,LOAD_THREAD_SLEEP*1000);
+#else
+		select(0,NULL,NULL,NULL,&tv);
+#endif
+		if(!running)
+			break;
+	}
+
+	return true;
+}
+
+void World::PollCharacterInsertQueue()
+{
+	// Our local stuff..
+	bool has_results = false;
+	map<uint32, vector<insert_playeritem> > itemMap;
+	map<uint32,vector<insert_playeritem> >::iterator itr;
+	Field * f;
+	insert_playeritem ipi;                          
+	static const char * characterTableFormat = "uSuuuuuussuuuuuuuuuuuuuuffffuususuufffuuuuusuuuUssuuuuuuffffuuuuufffssssssuuuuuuuu";
+
+	// Get a single connection to maintain for the whole process.
+	MysqlCon * con = CharacterDatabase.GetFreeConnection();
+	
+	// Lock the table to prevent any more inserts
+	CharacterDatabase.FWaitExecute("LOCK TABLES `playeritems_insert_queue` WRITE", con);
+
+	// Cache all items in memory. This will save us doing additional queries and slowing down the db.
+	QueryResult * result = CharacterDatabase.FQuery("SELECT * FROM playeritems_insert_queue", con);
+	if(result)
+	{
+		do 
+		{
+			f = result->Fetch();
+			
+			ipi.ownerguid = f[0].GetUInt32();
+			ipi.entry = f[1].GetUInt32();
+			ipi.wrapped_item_id = f[2].GetUInt32();
+			ipi.wrapped_creator = f[3].GetUInt32();
+			ipi.creator = f[4].GetUInt32();
+			ipi.count = f[5].GetUInt32();
+			ipi.charges = f[6].GetUInt32();
+			ipi.flags = f[7].GetUInt32();
+			ipi.randomprop = f[8].GetUInt32();
+			ipi.randomsuffix = f[9].GetUInt32();
+			ipi.itemtext = f[10].GetUInt32();
+			ipi.durability = f[11].GetUInt32();
+			ipi.containerslot = f[12].GetInt32();
+			ipi.slot = f[13].GetInt32();
+			ipi.enchantments = string(f[14].GetString());
+
+			itr = itemMap.find(ipi.ownerguid);
+			if(itr == itemMap.end())
+			{
+				vector<insert_playeritem> to_insert;
+				to_insert.push_back(ipi);
+				itemMap.insert(make_pair(ipi.ownerguid,to_insert));
+			}
+			else
+			{
+				itr->second.push_back(ipi);
+			}
+		
+		} while(result->NextRow());
+		delete result;
+	}
+
+	// Unlock the item table
+	CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);
+
+	// Lock the character table
+	CharacterDatabase.FWaitExecute("LOCK TABLES `characters_insert_queue` WRITE", con);
+
+	// Load the characters, and assign them their new guids, and insert them into the main db.
+	result = CharacterDatabase.FQuery("SELECT * FROM characters_insert_queue", con);
+
+	// Can be unlocked now.
+	CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);
+
+	if(result)
+	{
+		uint32 guid;
+		std::stringstream ss;
+		do 
+		{
+			f = result->Fetch();
+			char * p = (char*)characterTableFormat;
+			uint32 i = 1;
+			guid = f[0].GetUInt32();
+			uint32 new_guid = objmgr.GenerateLowGuid(HIGHGUID_PLAYER);
+			uint32 new_item_guid;
+			ss << "INSERT INTO characters VALUES(" << new_guid;
+
+			// create his playerinfo in the server
+			PlayerInfo * inf = new PlayerInfo();
+			inf->acct = f[1].GetUInt32();
+
+			while(*p != 0)
+			{
+				switch(*p)
+				{
+				case 's':
+					ss << ",'" << CharacterDatabase.EscapeString(f[i].GetString(), con) << "'";
+					break;
+
+				case 'f':
+					ss << ",'" << f[i].GetFloat() << "'";
+					break;
+
+				case 'S':
+					{
+						// this is the character name, append a hex version of the guid to it to prevent name clashes.
+						char newname[100];
+						snprintf(newname,20,"%5s%X",f[i].GetString(),new_guid);
+						ss << ",'" << CharacterDatabase.EscapeString(newname,con) << "'";
+						inf->name = strdup(newname);
+					}break;
+
+				case 'U':
+					{
+						// this is our forced rename field. force it to one.
+						ss << ",1";
+					}break;
+
+				default:
+					ss << "," << f[i].GetUInt32();
+					break;
+				}
+
+				++i;
+				++p;
+			}
+
+			ss << ")";
+			CharacterDatabase.FWaitExecute(ss.str().c_str(),con);
+
+			inf->cl = f[4].GetUInt32();
+			inf->gender = f[5].GetUInt32();
+			inf->guid = new_guid;
+			inf->lastLevel = f[7].GetUInt32();
+			inf->lastOnline = UNIXTIME;
+			inf->lastZone = 0;
+			inf->m_Group=NULL;
+			inf->m_loggedInPlayer=NULL;
+			inf->officerNote=NULL;
+			inf->publicNote=NULL;
+			inf->race=f[3].GetUInt32();
+			inf->Rank=0;
+			inf->subGroup=0;
+			switch(inf->race)
+			{
+			case RACE_HUMAN:
+			case RACE_GNOME:
+			case RACE_DWARF:
+			case RACE_NIGHTELF:
+			case RACE_DRAENEI:
+				inf->team=0;
+				break;
+
+			default:
+				inf->team=1;
+				break;
+			}
+			
+			// add playerinfo to objectmgr
+			objmgr.AddPlayerInfo(inf);
+
+			// grab all his items, assign them their new guids and insert them
+			itr = itemMap.find(guid);
+			if(itr != itemMap.end())
+			{
+				for(vector<insert_playeritem>::iterator vtr = itr->second.begin(); vtr != itr->second.end(); ++vtr)
+				{
+					ss.rdbuf()->str("");
+					ss << "INSERT INTO playeritems VALUES(";
+					new_item_guid = objmgr.GenerateLowGuid(HIGHGUID_ITEM);
+					ss << new_guid << ","
+						<< new_item_guid << ","
+						<< (*vtr).entry << ","
+						<< (*vtr).wrapped_item_id << ","
+						<< (*vtr).wrapped_creator << ","
+						<< (*vtr).creator << ","
+						<< (*vtr).count << ","
+						<< (*vtr).charges << ","
+						<< (*vtr).flags << ","
+						<< (*vtr).randomprop << ","
+						<< (*vtr).randomsuffix << ","
+						<< (*vtr).itemtext << ","
+						<< (*vtr).durability << ","
+						<< (*vtr).containerslot << ","
+						<< (*vtr).slot << ",'"
+						<< (*vtr).enchantments << "')";
+					CharacterDatabase.FWaitExecute(ss.str().c_str(),con);
+				}
+			}
+			ss.rdbuf()->str("");
+		} while(result->NextRow());
+		has_results = true;
+		delete result;
+	}
+
+	// Clear all the data in the tables.
+	if(has_results)
+	{
+		CharacterDatabase.FWaitExecute("DELETE FROM characters_insert_queue", con);
+		CharacterDatabase.FWaitExecute("DELETE FROM playeritems_insert_queue", con);
+	}
+
+	// Release the database connection
+	con->busy.Release();
 }

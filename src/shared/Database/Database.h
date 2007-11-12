@@ -71,6 +71,7 @@ public:
 	QueryResult* Query(const char* QueryString, ...);
 	QueryResult* QueryNA(const char* QueryString);
 	QueryResult * FQuery(const char * QueryString, MysqlCon * con);
+	void FWaitExecute(const char * QueryString, MysqlCon * con);
 	bool WaitExecute(const char* QueryString, ...);//Wait For Request Completion
 	bool WaitExecuteNA(const char* QueryString);//Wait For Request Completion
 	bool Execute(const char* QueryString, ...);
@@ -84,10 +85,13 @@ public:
 	inline uint32 GetQueueSize() { return queries_queue.get_size(); }
 
 	string EscapeString(string Escape);
+	string EscapeString(const char * esc, MysqlCon * con);
 	void QueueAsyncQuery(AsyncQuery * query);
 	void EndThreads();
 	void thread_proc_query();
 	void FreeQueryResult(QueryResult * p);
+
+	MysqlCon * GetFreeConnection();
 
 protected:
 
@@ -104,7 +108,7 @@ protected:
 	////////////////////////////////
 	FQueue<char*> queries_queue;
 	MysqlCon * Connections;
-	MysqlCon * GetFreeConnection();
+	
 	uint32 _counter;
 	///////////////////////////////
 

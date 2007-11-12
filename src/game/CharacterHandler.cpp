@@ -104,7 +104,9 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 				data << uint32(0x01A04040);
 			else
 			{
-				if(fields[16].GetUInt32() != 0)
+				if(fields[17].GetUInt32() != 0)
+					data << uint32(0x00A04342);
+				else if(fields[16].GetUInt32() != 0)
 					data << (uint32)8704; // Dead (displaying as Ghost)
 				else
 					data << uint32(1);		// alive

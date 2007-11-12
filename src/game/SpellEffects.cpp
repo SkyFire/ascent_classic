@@ -3383,8 +3383,10 @@ void Spell::SpellEffectStuck(uint32 i)
     if(!playerTarget)
         return;
 
-	
-	playerTarget->SafeTeleport(playerTarget->GetBindMapId(), 0, playerTarget->GetBindPositionX(), playerTarget->GetBindPositionY(), playerTarget->GetBindPositionZ(), 3.14f);
+	sEventMgr.AddEvent(playerTarget,&Player::EventTeleport,playerTarget->GetMapId(),playerTarget->GetBindPositionX(),playerTarget->GetBindPositionY(),
+		playerTarget->GetBindPositionZ(),EVENT_PLAYER_TELEPORT,50,1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	/*
+	playerTarget->SafeTeleport(playerTarget->GetBindMapId(), 0, playerTarget->GetBindPositionX(), playerTarget->GetBindPositionY(), playerTarget->GetBindPositionZ(), 3.14f);*/
 }
 
 void Spell::SpellEffectSummonPlayer(uint32 i)

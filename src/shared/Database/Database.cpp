@@ -182,6 +182,18 @@ string Database::EscapeString(string Escape)
 	return string(ret);
 }
 
+string Database::EscapeString(const char * esc, MysqlCon * con)
+{
+	char a2[16384] = {0};
+	const char * ret;
+	if(mysql_real_escape_string(con->con, a2, (char*)esc, (unsigned long)strlen(esc)) == 0)
+		ret = esc;
+	else
+		ret = a2;
+	
+	return string(ret);
+}
+
 void Database::Shutdown()
 {
 	sLog.outString("sql: Closing all Database connections...");
@@ -320,6 +332,11 @@ QueryResult * Database::FQuery(const char * QueryString, MysqlCon * con)
 	return qResult;
 }
 
+void Database::FWaitExecute(const char * QueryString, MysqlCon * con)
+{	
+	// Send the query
+	SendQuery(con, QueryString, false);
+}
 
 bool Database::Execute(const char* QueryString, ...)
 {

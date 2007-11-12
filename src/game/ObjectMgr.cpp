@@ -755,7 +755,7 @@ uint32 ObjectMgr::GenerateMailID()
 }
 uint32 ObjectMgr::GenerateLowGuid(uint32 guidhigh)
 {
-	ASSERT(guidhigh == HIGHGUID_ITEM || guidhigh == HIGHGUID_CONTAINER);
+	ASSERT(guidhigh == HIGHGUID_ITEM || guidhigh == HIGHGUID_CONTAINER || guidhigh == HIGHGUID_PLAYER);
 
 	uint32 ret;
 	if(guidhigh == HIGHGUID_ITEM)
@@ -763,8 +763,12 @@ uint32 ObjectMgr::GenerateLowGuid(uint32 guidhigh)
 		m_guidGenMutex.Acquire();
 		ret = ++m_hiItemGuid;
 		m_guidGenMutex.Release();
-	}else
+	}else if(guidhigh==HIGHGUID_PLAYER)
 	{
+		m_playerguidlock.Acquire();
+		ret = ++m_hiPlayerGuid;
+		m_playerguidlock.Release();
+	}else{
 		m_guidGenMutex.Acquire();
 		ret = ++m_hiContainerGuid;
 		m_guidGenMutex.Release();

@@ -252,6 +252,17 @@ public:
 	void execute();
 };
 
+struct CharacterLoaderThread : public ThreadBase
+{
+#ifdef WIN32
+	HANDLE hEvent;
+#endif
+	bool running;
+public:
+	void OnShutdown();
+	bool run();
+};
+
 class TaskList
 {
 	set<Task*> tasks;
@@ -506,6 +517,8 @@ public:
 
 	void CharacterEnumProc(QueryResultVector& results, uint32 AccountId);
 	void LoadAccountDataProc(QueryResultVector& results, uint32 AccountId);
+
+	void PollCharacterInsertQueue();
 
 protected:
 	// update Stuff, FIXME: use diff
