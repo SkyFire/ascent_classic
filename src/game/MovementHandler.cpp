@@ -55,6 +55,7 @@ inline uint32 mTimeStamp()
 
 void WorldSession::HandleMoveWorldportAckOpcode( WorldPacket & recv_data )
 {
+	EnableAntiHack();
 	if(_player->IsInWorld())
 	{
 		// get outta here
@@ -90,6 +91,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 			return;
 		}
 
+		EnableAntiHack();
 		sLog.outDebug( "WORLD: got MSG_MOVE_TELEPORT_ACK." );
 		GetPlayer()->SetPlayerStatus(NONE);
 		GetPlayer()->SetMovement(MOVE_UNROOT,5);
@@ -302,7 +304,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Anti-Hack Checks                                                     */
 	/************************************************************************/
-	if( !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->m_uint32Values[UNIT_FIELD_CHARM])
+	if( !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->m_uint32Values[UNIT_FIELD_CHARM] && antihack)
 	{
 		/************************************************************************/
 		/* Anti-Teleport                                                        */

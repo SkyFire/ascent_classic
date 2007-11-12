@@ -3112,6 +3112,9 @@ void Player::RemoveFromWorld()
 	if(raidgrouponlysent)
 		event_RemoveEvents(EVENT_PLAYER_EJECT_FROM_INSTANCE);
 
+	if(m_session)
+		m_session->DisableAntiHack();
+
 	load_health = m_uint32Values[UNIT_FIELD_HEALTH];
 	load_mana = m_uint32Values[UNIT_FIELD_POWER1];
 
@@ -6009,6 +6012,7 @@ void Player::_Relocate(uint32 mapid, const LocationVector & v, bool sendpending,
 		// via teleport ack msg
 		WorldPacket * data = BuildTeleportAckMsg(v);
 		m_session->SendPacket(data);
+		m_session->DisableAntiHack();
 		delete data;
 	}
 	
@@ -7128,7 +7132,10 @@ void Player::SafeTeleport(MapMgr * mgr, const LocationVector & vec)
 	ResetHeartbeatCoords();
 
 	if(m_session)
+	{
 		m_session->SetInstance(mgr->GetInstanceID());
+		m_session->DisableAntiHack();
+	}
 
 	mgr->AddObject(this);
 }

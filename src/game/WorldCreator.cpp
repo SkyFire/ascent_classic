@@ -145,6 +145,10 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr, uint32 instanceid)
 		return (m_singleMaps[mapid] != NULL) ? INSTANCE_OK : INSTANCE_ABORT_NOT_FOUND;
 	}
 
+	// shouldn't happen
+	if(inf->type==INSTANCE_PVP)
+		return INSTANCE_ABORT_NOT_FOUND;
+
 	// players without groups cannot enter raid instances (no soloing them:P)
 	if(plr->GetGroup() == NULL && (inf->type == INSTANCE_RAID || inf->type == INSTANCE_MULTIMODE) && !plr->triggerpass_cheat)
 		return INSTANCE_ABORT_NOT_IN_RAID_GROUP;

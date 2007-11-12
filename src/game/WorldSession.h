@@ -743,6 +743,9 @@ public:
 	void SystemMessage(const char * format, ...);
 	uint32 language;
 	WorldPacket* BuildQuestQueryResponse(Quest *qst);
+	bool antihack;
+	inline void DisableAntiHack() { antihack = false; }
+	inline void EnableAntiHack() { antihack = true; }
 };
 
 typedef std::set<WorldSession*> SessionSet;
