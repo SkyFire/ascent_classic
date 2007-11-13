@@ -229,7 +229,7 @@ void Map::LoadSpawns(bool reload)
 		delete result;
 	}
 
-	result = WorldDatabase.Query("SELECT * FROM gameobject_spawns WHERE Map = %u",this->_mapId);
+	result = WorldDatabase.Query("SELECT * FROM gameobject_spawns WHERE map = %u",this->_mapId);
 	if(result)
 	{
 		do{

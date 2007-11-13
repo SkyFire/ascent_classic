@@ -342,7 +342,7 @@ void Creature::DeleteFromDB()
 {
 	if(!GetSQL_id())return;
 	WorldDatabase.Execute("DELETE FROM creature_spawns WHERE id=%u", GetSQL_id());
-	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE creatureid=%u",GetSQL_id());
+	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE spawnid=%u",GetSQL_id());
 }
 
 
@@ -720,7 +720,7 @@ void Creature::ChannelLinkUpCreature(uint32 SqlId)
 void Creature::LoadAIAgents()
 {
 	/*std::stringstream ss;
-	ss << "SELECT * FROM ai_agents where entryId=" << GetUInt32Value(OBJECT_FIELD_ENTRY);
+	ss << "SELECT * FROM ai_agents where entry=" << GetUInt32Value(OBJECT_FIELD_ENTRY);
 	QueryResult *result = sDatabase.Query( ss.str().c_str() );
 
 	if( !result )

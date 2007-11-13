@@ -122,6 +122,7 @@ public:
 	//9,10 changes if you are not on foot
 	uint32 unk8, unk9, unk10, unk11, unk12, unk13;
 	uint32 unklast;//something related to collision
+	uint8 unk_230;
 
 	float x, y, z, orientation;
 	uint32 flags;
@@ -129,66 +130,8 @@ public:
 	uint64 transGuid;
 	float transX, transY, transZ, transO, transUnk;
 
-	void init(WorldPacket & data)
-	{
-		transGuid = 0;
-		unk13 = 0;
-		data >> flags >> time;
-		data >> x >> y >> z >> orientation;
-
-		if (flags & MOVEFLAG_TAXI)
-		{
-			data >> transGuid >> transX >> transY >> transZ >> transO >> transUnk;
-		}
-		if (flags & MOVEFLAG_SWIMMING)
-		{
-			data >> unk6;
-		}
-		if (flags & MOVEFLAG_FALLING)
-		{
-			data >> FallTime >> unk8 >> unk9 >> unk10;
-		}
-		if (flags & MOVEFLAG_SPLINE_MOVER)
-		{
-			data >> unk12;
-		}
-
-		data >> unklast;
-		if(data.rpos() != data.wpos())
-		{
-			if(data.rpos() + 4 == data.wpos())
-				data >> unk13;
-			else
-				sLog.outDebug("Extra bits of movement packet left");
-		}
-	}
-
-	void write(WorldPacket & data)
-	{
-		data << flags << getMSTime();
-
-		data << x << y << z << orientation;
-
-		if (flags & MOVEFLAG_TAXI)
-		{
-			data << transGuid << transX << transY << transZ << transO << transUnk;
-		}
-		if (flags & MOVEFLAG_SWIMMING)
-		{
-			data << unk6;
-		}
-		if (flags & MOVEFLAG_FALLING)
-		{
-			data << FallTime << unk8 << unk9 << unk10;
-		}
-		if (flags & MOVEFLAG_SPLINE_MOVER)
-		{
-			data << unk12;
-		}
-		data << unklast;
-		if(unk13)
-			data << unk13;
-	}
+	void init(WorldPacket & data);
+	void write(WorldPacket & data);
 };
 
 #define NOTIFICATION_MESSAGE_NO_PERMISSION "You do not have permission to perform that function."

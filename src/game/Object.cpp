@@ -353,13 +353,14 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 				flags2 |= static_cast<Creature*>(this)->proto->extra_a9_flags;
 			if(GetGUIDHigh() == HIGHGUID_WAYPOINT)
 			{
-				if(GetUInt32Value(UNIT_FIELD_PADDING) == 768)		// flying waypoint
+				if(GetUInt32Value(UNIT_FIELD_STAT0) == 768)		// flying waypoint
 					flags2 |= 0x800;
 			}
 		}
 
 		*data << (uint32)flags2;
 		*data << getMSTime(); // this appears to be time in ms but can be any thing
+		*data << uint8(0x39);		// wtf? added in 2.3.0
 	}
 
 	if (flags & 0x40)

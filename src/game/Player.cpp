@@ -2574,6 +2574,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	SetUInt32Value(PLAYER__FIELD_KNOWN_TITLES, PvPRanks[GetPVPRank() + offset]);
 	SetUInt32Value(PLAYER_FLAGS, get_next_field.GetUInt32());
 	SetUInt32Value(PLAYER_FIELD_BYTES, get_next_field.GetUInt32());
+	m_uint32Values[0x22]=(m_uint32Values[0x22]>0x46)?0x46:m_uint32Values[0x22];
 
 	m_position.x										= get_next_field.GetFloat();
 	m_position.y										= get_next_field.GetFloat();

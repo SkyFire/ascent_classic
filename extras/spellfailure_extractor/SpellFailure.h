@@ -173,7 +173,13 @@ enum SpellCastError
 	SPELL_FAILED_NOT_ON_MOUNTED                                  = 153,
 	SPELL_FAILED_TOO_SHALLOW                                     = 154,
 	SPELL_FAILED_TARGET_NOT_IN_SANCTUARY                         = 155,
-	SPELL_FAILED_UNKNOWN                                         = 156,
+	SPELL_FAILED_TARGET_IS_TRIVIAL                               = 156,
+	SPELL_FAILED_BM_OR_INVISGOD                                  = 157,
+	SPELL_FAILED_EXPERT_RIDING_REQUIREMENT                       = 158,
+	SPELL_FAILED_ARTISAN_RIDING_REQUIREMENT                      = 159,
+	SPELL_FAILED_NOT_IDLE                                        = 160,
+	SPELL_FAILED_NOT_INACTIVE                                    = 161,
+	SPELL_FAILED_UNKNOWN                                         = 162,
 };
 
 #endif

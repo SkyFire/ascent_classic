@@ -373,7 +373,7 @@ bool ChatHandler::HandleQuestItemCommand(const char * args, WorldSession * m_ses
 {
 	if(!*args) return false;
 
-	std::string my_item_lookup = "SELECT item_id, item_count FROM gameobject_quest_item_binding WHERE quest_id = " + string(args);
+	std::string my_item_lookup = "SELECT item, item_count FROM gameobject_quest_item_binding WHERE quest = " + string(args);
 
 	QueryResult *result = WorldDatabase.Query(my_item_lookup.c_str());
 
@@ -1201,7 +1201,7 @@ bool ChatHandler::HandleQuestSpawnCommand(const char * args, WorldSession * m_se
 		return true;
 	}
 
-	my_query = "SELECT map, x, y, z FROM creature_spawns WHERE entry = " + starterId;
+	my_query = "SELECT map, position_x, position_y, position_z FROM creature_spawns WHERE entry = " + starterId;
 	QueryResult *spawnResult = WorldDatabase.Query(my_query.c_str());
 
 	if(!spawnResult)

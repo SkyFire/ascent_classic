@@ -680,3 +680,64 @@ void WorldSession::HandleTeleportCheatOpcode(WorldPacket & recv_data)
 	vec.ChangeCoords(x,y,z,o);
 	_player->SafeTeleport(_player->GetMapId(),_player->GetInstanceID(),vec);
 }
+
+void MovementInfo::init(WorldPacket & data)
+{
+	transGuid = 0;
+	unk13 = 0;
+	data >> flags >> unk_230 >> time;
+	data >> x >> y >> z >> orientation;
+
+	if (flags & MOVEFLAG_TAXI)
+	{
+		data >> transGuid >> transX >> transY >> transZ >> transO >> transUnk;
+	}
+	if (flags & MOVEFLAG_SWIMMING)
+	{
+		data >> unk6;
+	}
+	if (flags & MOVEFLAG_FALLING)
+	{
+		data >> FallTime >> unk8 >> unk9 >> unk10;
+	}
+	if (flags & MOVEFLAG_SPLINE_MOVER)
+	{
+		data >> unk12;
+	}
+
+	data >> unklast;
+	if(data.rpos() != data.wpos())
+	{
+		if(data.rpos() + 4 == data.wpos())
+			data >> unk13;
+		else
+			sLog.outDebug("Extra bits of movement packet left");
+	}
+}
+
+void MovementInfo::write(WorldPacket & data)
+{
+	data << flags << unk_230 << getMSTime();
+
+	data << x << y << z << orientation;
+
+	if (flags & MOVEFLAG_TAXI)
+	{
+		data << transGuid << transX << transY << transZ << transO << transUnk;
+	}
+	if (flags & MOVEFLAG_SWIMMING)
+	{
+		data << unk6;
+	}
+	if (flags & MOVEFLAG_FALLING)
+	{
+		data << FallTime << unk8 << unk9 << unk10;
+	}
+	if (flags & MOVEFLAG_SPLINE_MOVER)
+	{
+		data << unk12;
+	}
+	data << unklast;
+	if(unk13)
+		data << unk13;
+}

@@ -2241,7 +2241,7 @@ bool ChatHandler::HandleFormationClearCommand(const char* args, WorldSession * m
 	c->GetAIInterface()->m_formationFollowDistance = 0.0f;
 	c->GetAIInterface()->SetUnitToFollow(0);
 	
-	WorldDatabase.Execute("DELETE FROM creature_formations WHERE creature_sqlid=%u", c->GetSQL_id());
+	WorldDatabase.Execute("DELETE FROM creature_formations WHERE spawn_id=%u", c->GetSQL_id());
 	return true;
 }
 
@@ -2918,7 +2918,7 @@ map<uint32, spell_thingo> aiagent_extra;
 
 bool ChatHandler::HandleAIAgentDebugBegin(const char * args, WorldSession * m_session)
 {
-	QueryResult * result = WorldDatabase.Query("SELECT DISTINCT spellId FROM ai_agents");
+	QueryResult * result = WorldDatabase.Query("SELECT DISTINCT spell FROM ai_agents");
 	if(!result) return false;
 
 	do 
@@ -2931,7 +2931,7 @@ bool ChatHandler::HandleAIAgentDebugBegin(const char * args, WorldSession * m_se
 
 	for(list<SpellEntry*>::iterator itr = aiagent_spells.begin(); itr != aiagent_spells.end(); ++itr)
 	{
-		result = WorldDatabase.Query("SELECT * FROM ai_agents WHERE spellId = %u", (*itr)->Id);
+		result = WorldDatabase.Query("SELECT * FROM ai_agents WHERE spell = %u", (*itr)->Id);
 		ASSERT(result);
 		spell_thingo t;
 		t.type = result->Fetch()[6].GetUInt32();
@@ -3072,12 +3072,12 @@ bool ChatHandler::HandleAddGuardCommand(const char * args, WorldSession * m_sess
 		return true;
 	}
 	uint32 zoneId = at->ZoneId;
-	string fieldName = (factionId>0) ? "hordeEntry" : "allianceEntry";
+	string fieldName = (factionId>0) ? "horde_entry" : "alliance_entry";
 	uint32 startTime = getMSTime();
 	if(!ZoneGuardStorage.LookupEntry(zoneId))
-		WorldDatabase.WaitExecute("INSERT INTO zoneguards (zoneId, %s) VALUES (%u, %u)", fieldName.c_str(), zoneId, guardId);
+		WorldDatabase.WaitExecute("INSERT INTO zoneguards (zone, %s) VALUES (%u, %u)", fieldName.c_str(), zoneId, guardId);
 	else
-		WorldDatabase.WaitExecute("UPDATE zoneguards SET %s = %u WHERE zoneId = %u", fieldName.c_str(), guardId, zoneId);
+		WorldDatabase.WaitExecute("UPDATE zoneguards SET %s = %u WHERE zone = %u", fieldName.c_str(), guardId, zoneId);
 	ZoneGuardStorage.Reload();
 
 	CreatureInfo * ci = CreatureNameStorage.LookupEntry(guardId);
