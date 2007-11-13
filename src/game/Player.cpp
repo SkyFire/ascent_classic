@@ -872,7 +872,9 @@ void Player::EventDismount(uint32 money, float x, float y, float z)
 	ModUInt32Value( PLAYER_FIELD_COINAGE , -(int32)money );
 
 	SetPosition(x, y, z, true);
-	SetTaxiState(false);
+	if(!m_taxiPaths.size())
+		SetTaxiState(false);
+
 	SetTaxiPath(NULL);
 	UnSetTaxiPos();
 	m_taxi_ride_time = 0;

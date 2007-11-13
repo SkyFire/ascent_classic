@@ -255,7 +255,7 @@ inline void _HandleBreathing(MovementInfo &movement_info, Player * _player, Worl
 
 void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 {
-	if(!_player->IsInWorld() || _player->m_uint32Values[UNIT_FIELD_CHARMEDBY] || _player->GetPlayerStatus() == TRANSFER_PENDING)
+	if(!_player->IsInWorld() || _player->m_uint32Values[UNIT_FIELD_CHARMEDBY] || _player->GetPlayerStatus() == TRANSFER_PENDING || _player->GetTaxiState())
 		return;
 
 	// spell cancel on movement, for now only fishing is added
