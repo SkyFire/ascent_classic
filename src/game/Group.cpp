@@ -876,8 +876,10 @@ void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribu
 	if(Flags & GROUP_UPDATE_FLAG_LEVEL)
 		*data << uint16(pPlayer->getLevel());
 
-	if(Flags & GROUP_UPDATE_FLAG_ZONEID)
-		*data << uint16(pPlayer->GetZoneId());
+	if(Flags & GROUP_UPDATE_FLAG_ZONEID) {
+        AreaTable * at = dbcArea.LookupEntry(pPlayer->GetAreaID());
+		*data << uint16(at->AreaId);
+    }
 
 	if(Flags & GROUP_UPDATE_FLAG_POSITION)
 	{
@@ -949,7 +951,7 @@ void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribu
 				plr = itr->player;
 				++itr;
 
-				if(plr && plr != pPlayer && plr->GetMapMgr() == pPlayer->GetMapMgr())
+				if(plr && plr != pPlayer)
 				{
 					if(plr->GetDistance2dSq(pPlayer) > dist)
 						plr->GetSession()->SendPacket(data);

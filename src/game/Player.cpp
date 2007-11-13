@@ -1126,6 +1126,8 @@ void Player::_EventExploration()
 	{
 		m_AreaID = AreaId;
 		UpdatePvPArea();
+		if(GetGroup())
+            GetGroup()->UpdateOutOfRangePlayer(this, 128, true, NULL);
 	}
 
 	if(at->ZoneId != 0 && m_zoneId != at->ZoneId)
