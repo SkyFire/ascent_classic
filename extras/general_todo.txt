@@ -127,6 +127,7 @@ Zack - test my shit :
 - mage - Combustion 28682
 - mage - Empowered Fireball 31660
 - mage - Empowered Frostbolt 31686
+- rogue - Improved Expose Armor 14169
 
 ==========================================================================
 Capt - test my shit :

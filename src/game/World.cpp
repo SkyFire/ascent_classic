@@ -1734,6 +1734,14 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Elusiveness_grouprelation;
 
+	//rogue - Improved Expose Armor
+	sp = dbcSpell.LookupEntry(14168); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=524288;
+	sp = dbcSpell.LookupEntry(14169); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=524288;
+
 	//rogue - Dirty Tricks 
 	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
 	uint32 DT_grouprelation;
