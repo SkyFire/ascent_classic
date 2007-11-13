@@ -956,7 +956,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							{
 								if(!CastingSpell)
 									continue;
-								if (CastingSpell->NameHash!=0xA1761A27 && victim!=this) //Blizzard
+								if (CastingSpell->NameHash!=0xA1761A27 || victim==this) //Blizzard
 									continue;
 							}break;
 						//priest - Reflective Shield 

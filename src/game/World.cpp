@@ -2283,17 +2283,15 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=868;
 		sp->EffectSpellGroupRelation[1]=868;
 	}
-	////mage: Spell Power
-	//sp = sSpellStore.LookupEntry(35581);
-	//if(sp)	
-	//{
-	//	sp->EffectSpellGroupRelation[0]=5775504;
-	//}
-	//sp = sSpellStore.LookupEntry(35578);
-	//if(sp)	
-	//{
-	//	sp->EffectSpellGroupRelation[0]=5775504;
-	//}
+	
+	//mage - Burning Soul
+	sp  = dbcSpell.LookupEntry(11083);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
+	sp  = dbcSpell.LookupEntry(12351);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
+
 	//mage: Blazing Speed
 	sp = dbcSpell.LookupEntry(31641); 
 	if(sp)	sp->EffectTriggerSpell[0]=31643;

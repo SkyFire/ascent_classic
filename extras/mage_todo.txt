@@ -12,8 +12,7 @@ Problems not related with only one spell/talent:
 Burning Soul should give you 70% chance to avoid interruption while you get damage
 
 Frost Warding
-Increases the armor and resistances given by your Frost Armor and Ice Armor spells by 15n%. In addition, gives your Frost Ward a 10n% chance to reflect Frost spells and effects while active.
-However it affects spells it shouldn't in ways it shouldn't. For example Frostbolt and Cone of Cold:
+In addition, gives your Frost Ward a 10n% chance to reflect Frost spells and effects while active.
 
 Spell Power (Arcane) - Increases critical strike damage bonus of all spells by {25/50}%. - no effect
 Mind Mastery (Arcane) - Increases spell damage by up to {5/10/15/20/25}% of your total intellect. - no effect
