@@ -123,6 +123,7 @@ Zack - test my shit :
 - warlock - Bane 17792 affects soulfire too Soul Fire.
 - mage - Burning Soul 12351
 - mage - Master of Elements 29076
+- mage - Fire Power 12378
 
 
 ==========================================================================

@@ -2256,32 +2256,32 @@ bool World::SetInitialWorldSettings()
 	sp  = dbcSpell.LookupEntry(11124);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=868;
-		sp->EffectSpellGroupRelation[1]=868;
+		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
+		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
 	sp  = dbcSpell.LookupEntry(12398);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=868;
-		sp->EffectSpellGroupRelation[1]=868;
+		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
+		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
 	sp  = dbcSpell.LookupEntry(12399);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=868;
-		sp->EffectSpellGroupRelation[1]=868;
+		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
+		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
 	sp  = dbcSpell.LookupEntry(12400);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=868;
-		sp->EffectSpellGroupRelation[1]=868;
+		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
+		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
 	sp  = dbcSpell.LookupEntry(12378);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=868;
-		sp->EffectSpellGroupRelation[1]=868;
+		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
+		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
 	
 	//mage - Burning Soul

@@ -14,7 +14,6 @@ Burning Soul should give you 70% chance to avoid interruption while you get dama
 Frost Warding
 In addition, gives your Frost Ward a 10n% chance to reflect Frost spells and effects while active.
 
-Fire Power (Fire) - Increases the damage done by your Fire spells by {2/4/6/8/10}%. - no effect
 Combustion (Fire) - When activated, this spell causes each Fire damage spell you cast to increase your critical strike chance with Fire damage spells by 10%. This effect lasts until you have caused 3 critical strikes with Fire spells. - no effect (you get the buff, but the critical strike chance remains the same)
 Empowered Fireball (Fire) - Your Fireball spell gains an additional {3/6/9/12/15}% of your bonus spell damage effects. - no effect.
 Empowered Frostbolt (Frost) - Your Fireball spell gains an additional {3/6/9/12/15}% of your bonus spell damage effects. - no effect.
