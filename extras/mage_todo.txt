@@ -14,8 +14,3 @@ Burning Soul should give you 70% chance to avoid interruption while you get dama
 Frost Warding
 In addition, gives your Frost Ward a 10n% chance to reflect Frost spells and effects while active.
 
-Empowered Frostbolt (Frost) - Your Fireball spell gains an additional {3/6/9/12/15}% of your bonus spell damage effects. - no effect.
-
-But those are just a 'by the way'. I know other classes are a priority at the moment, this is just to let you guys know.
-
-Keep up the good work!

@@ -2314,6 +2314,38 @@ bool World::SetInitialWorldSettings()
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
 
+	//mage - Empowered Frostbolt
+	sp  = dbcSpell.LookupEntry(31682);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=524288;
+		sp->EffectSpellGroupRelation[1]=524288;
+	}
+	sp  = dbcSpell.LookupEntry(31683);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=524288;
+		sp->EffectSpellGroupRelation[1]=524288;
+	}
+	sp  = dbcSpell.LookupEntry(31684);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=524288;
+		sp->EffectSpellGroupRelation[1]=524288;
+	}
+	sp  = dbcSpell.LookupEntry(31685);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=524288;
+		sp->EffectSpellGroupRelation[1]=524288;
+	}
+	sp  = dbcSpell.LookupEntry(31686);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=524288;
+		sp->EffectSpellGroupRelation[1]=524288;
+	}
+
 	//mage - Master of Elements
 	sp  = dbcSpell.LookupEntry(29074);
 	if (sp)
