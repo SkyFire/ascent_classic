@@ -1673,24 +1673,6 @@ public:
     Player *        p_caster;
     Object *        m_caster;
 
-    // get the diet flags for pet food
-    inline uint32 GetPetFoodFlags(const char* m_string)
-    {
-        if (strstr(m_string, "Meat")   || strstr(m_string, "meat"))
-            return 1;
-        if (strstr(m_string, "Fish")   || strstr(m_string, "fish"))
-            return 2;
-        if (strstr(m_string, "Cheese") || strstr(m_string, "cheese"))
-            return 4;
-        if (strstr(m_string, "Bread")  || strstr(m_string, "bread"))
-            return 8;
-        if (strstr(m_string, "Fungus") || strstr(m_string, "fungus"))
-            return 16;
-        if (strstr(m_string, "Fruit")  || strstr(m_string, "fruit"))
-            return 32;
-        return 0;
-    }
-    
     // 15007 = resurecting sickness
     inline uint32 GetType()//0 melee,1 magic ,2 ranged
     {      

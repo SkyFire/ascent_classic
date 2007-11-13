@@ -555,8 +555,8 @@ struct ItemPrototype
 	int32 DisenchantReqSkill;
 	uint32 ArmorDamageModifier;
 
-	// used in auctions
-	string lowercase_name;
+	string lowercase_name;	// used in auctions
+	uint32 FoodType;		//pet food type
 	GossipScript * gossip_script;
 };
 

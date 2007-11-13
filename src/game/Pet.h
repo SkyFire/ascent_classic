@@ -39,12 +39,12 @@ enum PET_FOOD
 };
 
 /* Pet Diet:
-   taken from http://www.wowwiki.com/Pet_(Hunter)
+   taken from http://petopia.brashendeavors.net/html/articles/stats_families.shtml#diet
    filled with "0" for unknown / non existing creature family's
    how to use: 
    value = PetDiet[number_creature_family];
 */
-static const unsigned char PetDiet[30] = { 0,1,3,1,63,63,3,3,58,48,0,1,52,0,0,0,0,0,0,0,1,178,0,0,48,33,1,14,0};
+static const unsigned char PetDiet[36] = { 0,1,3,1,63,63,3,3,58,48,0,1,52,0,0,0,0,0,0,0,1,178,0,0,48,33,1,14,0,0,227,65,162,60,65,195 };
 
 /*Loyalty and happiness ticks*/
 static const char LoyaltyTicks[3] = {-20, 10, 20};//loyalty_ticks for unhappy, content, happy
@@ -78,14 +78,14 @@ enum PET_SPELL
 
 enum StableState
 {
-	STABLE_STATE_ACTIVE = 1,
-	STABLE_STATE_PASSIVE = 3
+	STABLE_STATE_ACTIVE		= 1,
+	STABLE_STATE_PASSIVE	= 2
 };
 enum HappinessState
 {
-	UNHAPPY		=0,
-	CONTENT		=1,
-	HAPPY		=2
+	UNHAPPY		=1,
+	CONTENT		=2,
+	HAPPY		=3
 };
 enum LoyaltyLevel
 {
@@ -258,7 +258,7 @@ protected:
 
 #define PET_LOYALTY_UPDATE_TIMER 120000
 #define PET_LOYALTY_LVL_RANGE 300 //range for each layalty lvl, now (300) if pet HAPPY, it will gain higher loyalty lvl in 30 minutes (no idea what is Blizz): 300 / 20 * 120 000 = 1 800 000 ms = 30 min
-#define PET_HAPPINESS_UPDATE_VALUE 333000
+#define PET_HAPPINESS_UPDATE_VALUE 350000
 #define PET_HAPPINESS_UPDATE_TIMER 7500
 #define PET_PARTY_SPELLS_UPDATE_TIMER 10000
 

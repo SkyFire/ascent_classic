@@ -259,6 +259,19 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 
 void ObjectMgr::LoadExtraItemStuff()
 {
+	map<uint32,uint32> foodItems;
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM itempetfood ORDER BY entry");
+	if(result)
+	{
+		Field *f = result->Fetch();
+		do
+		{		
+			foodItems.insert( make_pair( f[0].GetUInt32(), f[1].GetUInt32() ) );
+		}
+		while(result->NextRow());
+	}
+	delete result;
+
 	StorageContainerIterator<ItemPrototype> * itr = ItemPrototypeStorage.MakeIterator();
 	ItemPrototype * pItemPrototype;
 	while(!itr->AtEnd())
@@ -285,11 +298,20 @@ void ObjectMgr::LoadExtraItemStuff()
 			pItemPrototype->lowercase_name[j] = tolower(pItemPrototype->lowercase_name[j]);
 
 		pItemPrototype->gossip_script=NULL;
+
+		//load item_pet_food_type from extra table
+		uint32 ft = 0;
+		map<uint32,uint32>::iterator iter = foodItems.find(pItemPrototype->ItemId);
+		if(iter != foodItems.end())
+			ft = iter->second;
+		pItemPrototype->FoodType = ft ;
+	
         if(!itr->Inc())
 			break;
 	}
 
 	itr->Destruct();
+	foodItems.clear();
 }
 
 #define make_task(storage, itype, storagetype, tablename, format) tl.AddTask( new Task( \

@@ -496,6 +496,7 @@ struct PlayerPet
 	string fields;
 	uint32 xp;
 	bool active;
+	char stablestate;
 	uint32 number;
 	uint32 level;
 	uint32 happiness;
@@ -1032,6 +1033,15 @@ public:
 	inline PlayerPet*   GetFirstPet(void) { return GetPlayerPet(GetFirstPetNumber()); }
 	inline void         SetStableSlotCount(uint8 count) { m_StableSlotCount = count; }
 	inline uint8        GetStableSlotCount(void) { return m_StableSlotCount; }
+	uint32              GetUnstabledPetNumber(void)
+	{
+		if(m_Pets.size() == 0) return 0;
+		std::map<uint32, PlayerPet*>::iterator itr = m_Pets.begin();
+		for(;itr != m_Pets.end();itr++)
+			if(itr->second->stablestate == STABLE_STATE_ACTIVE)
+				return itr->first;
+		return 0;
+	}
 
     /************************************************************************/
     /* Item Interface                                                       */
