@@ -2292,6 +2292,11 @@ bool World::SetInitialWorldSettings()
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 
+	//mage - Combustion
+	sp  = dbcSpell.LookupEntry(28682);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 4194304 | 1;
+
 	//mage - Master of Elements
 	sp  = dbcSpell.LookupEntry(29074);
 	if (sp)
