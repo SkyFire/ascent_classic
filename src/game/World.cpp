@@ -2292,6 +2292,29 @@ bool World::SetInitialWorldSettings()
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 
+	//mage - Master of Elements
+	sp  = dbcSpell.LookupEntry(29074);
+	if (sp)
+	{
+		sp->EffectApplyAuraName[0]=42;
+		sp->EffectTriggerSpell[0] = 29077;
+		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
+	}
+	sp  = dbcSpell.LookupEntry(29075);
+	if (sp)
+	{
+		sp->EffectApplyAuraName[0]=42;
+		sp->EffectTriggerSpell[0] = 29077;
+		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
+	}
+	sp  = dbcSpell.LookupEntry(29076);
+	if (sp)
+	{
+		sp->EffectApplyAuraName[0]=42;
+		sp->EffectTriggerSpell[0] = 29077;
+		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
+	}
+
 	//mage: Blazing Speed
 	sp = dbcSpell.LookupEntry(31641); 
 	if(sp)	sp->EffectTriggerSpell[0]=31643;

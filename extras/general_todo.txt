@@ -122,6 +122,7 @@ Zack - test my shit :
 - warlock - Improved Howl of Terror 30057
 - warlock - Bane 17792 affects soulfire too Soul Fire.
 - mage - Burning Soul 12351
+- mage - Master of Elements 29076
 
 
 ==========================================================================

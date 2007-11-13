@@ -1816,6 +1816,7 @@ public:
     
     int32 damage;
     Aura* m_triggeredByAura;
+	signed int	forced_basepoints[3]; //some talent inherit base points from previous caster spells
 
     bool m_triggeredSpell;
     bool m_AreaAura;

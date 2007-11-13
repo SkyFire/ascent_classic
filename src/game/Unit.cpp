@@ -959,6 +959,21 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if (CastingSpell->NameHash!=0xA1761A27 || victim==this) //Blizzard
 									continue;
 							}break;
+						//mage - Master of Elements
+						case 29077:
+							{
+								continue;
+/*								if(!CastingSpell)
+									continue;
+								if (CastingSpell->School!=SCHOOL_FIRE || CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
+									continue;
+								SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
+								Spell *spell = new Spell(this, spellInfo ,true, NULL);
+								spell->forced_basepoints[0] = CastingSpell->manaCost * (ospinfo->EffectBasePoints[0] + 1) / 100;
+								spell->ProcedOnSpell = CastingSpell;
+								spell->pSpellId=origId;
+								spell->prepare(&targets);*/
+							}break;
 						//priest - Reflective Shield 
 						case 33619:
 							{
@@ -1034,10 +1049,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				if(spellId==22858 && isInBack(victim)) //retatliation needs target to be not in front. Can be casted by creatures too
 					continue;
 				SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
+				/* removed by Zack : Check has been made when adding spell to list. This should never ocure unless memory corruption	
 				if(!spellInfo)
-				{
-					continue;
-				}
+					continue;*/
 				Spell *spell = new Spell(this, spellInfo ,true, NULL);
 				spell->ProcedOnSpell = CastingSpell;
 				//Spell *spell = new Spell(this,spellInfo,false,0,true,false);

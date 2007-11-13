@@ -188,6 +188,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	pSpellId = 0;
 	m_cancelled = false;
 	ProcedOnSpell = 0;
+	forced_basepoints[0]=forced_basepoints[1]=forced_basepoints[2]=0;
 }
 
 Spell::~Spell()
@@ -3121,7 +3122,12 @@ int32 Spell::CalculateEffect(uint32 i,Unit *target)
 
 	float basePointsPerLevel    = m_spellInfo->EffectRealPointsPerLevel[i];
 	float randomPointsPerLevel  = m_spellInfo->EffectDicePerLevel[i];
-	int32 basePoints            = m_spellInfo->EffectBasePoints[i] + 1;
+	int32 basePoints;
+
+	//added by Zack : some talents inherit their basepoints from the previously casted spell: see mage - Master of Elements
+	if(forced_basepoints[i])
+		basePoints = forced_basepoints[i];
+	else basePoints = m_spellInfo->EffectBasePoints[i] + 1;
 
 	/* Random suffix value calculation */
 	if(i_caster && (int32(i_caster->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID)) < 0))
