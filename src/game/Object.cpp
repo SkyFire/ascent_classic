@@ -2125,7 +2125,9 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		if(spellInfo->SpellGroupType)
 		{
 			SM_FIValue(caster->SM_FPenalty, &bonus_damage, spellInfo->SpellGroupType);
-			res += bonus_damage;
+			int penalty_pct=0;
+			SM_FIValue(caster->SM_PPenalty, &penalty_pct, spellInfo->SpellGroupType);
+			res += bonus_damage + bonus_damage*penalty_pct/100;
 
 			int32 ures = (int32)res;
 			SM_FIValue(caster->SM_FDamageBonus, &ures, spellInfo->SpellGroupType);

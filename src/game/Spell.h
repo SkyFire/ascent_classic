@@ -122,7 +122,7 @@ enum SPELL_MODIFIER_TYPE
     //SMT_CAST_TIME2        =21,// this one looks like cast time...
     SMT_SPELL_VALUE_PCT		=22,// damage done by ability by x% : SELECT id,name,description FROM dbc_spell where (effect_aura_1=108 and effect_misc_1=22) or (effect_aura_2=108 and effect_misc_2=22) or (effect_aura_3=108 and effect_misc_3=22)
     SMT_UNKNOWN23           =23,//increase the target's spell damage and healing by an amount equal to $s1% of their total Spirit." , this one is used with the 12 effect needs some decode
-    SMT_PENALTY             =24,// This is a modifer for the amount of +spell damage applied to the spell group, ill be implementing it soon (fishbait) (it should really have a better name ;) ) // GOOD
+    SMT_PENALTY             =24,// This is a modifer for the amount of +spell damage applied to the spell group from spell bonuses
     // 25 dont exist spells with it
     // 26 is obsolete stuff
     SMT_EFFECT_BONUS        =27,// mana lost cost per point of damage taken for mana shield,Health or Mana gained from Drain Life and Drain Mana increased by x%.

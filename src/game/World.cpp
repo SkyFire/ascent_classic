@@ -2297,6 +2297,23 @@ bool World::SetInitialWorldSettings()
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 4194304 | 1;
 
+	//mage - Empowered Fireball
+	sp  = dbcSpell.LookupEntry(31656);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+	sp  = dbcSpell.LookupEntry(31657);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+	sp  = dbcSpell.LookupEntry(31658);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+	sp  = dbcSpell.LookupEntry(31659);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+	sp  = dbcSpell.LookupEntry(31660);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+
 	//mage - Master of Elements
 	sp  = dbcSpell.LookupEntry(29074);
 	if (sp)
