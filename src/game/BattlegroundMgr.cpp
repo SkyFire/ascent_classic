@@ -1317,7 +1317,7 @@ void CBattleground::EventResurrectPlayers()
 			if(plr && plr->isDead())
 			{
                 data.Initialize(SMSG_SPELL_START);
-				data << plr->GetNewGUID() << plr->GetNewGUID() << uint32(RESURRECT_SPELL) << uint16(0) << uint32(0) << uint16(2) << plr->GetGUID();
+				data << plr->GetNewGUID() << plr->GetNewGUID() << uint32(RESURRECT_SPELL) << uint8(0) << uint16(0) << uint32(0) << uint16(2) << plr->GetGUID();
 				plr->SendMessageToSet(&data, true);
 
 				data.Initialize(SMSG_SPELL_GO);

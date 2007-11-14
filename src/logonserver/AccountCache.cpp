@@ -369,20 +369,21 @@ void InformationCore::SendRealms(AuthSocket * Socket)
 	HM_NAMESPACE::hash_map<uint32, uint8>::iterator it;
 	for(; itr != m_realms.end(); ++itr)
 	{
-		data << uint8(itr->second->Colour);
-		data << uint8(0);				   // Locked Flag
 		data << uint8(itr->second->Icon);
+		data << uint8(0);				   // Locked Flag
+		data << uint8(itr->second->Colour);		
 
 		// This part is the same for all.
 		data << itr->second->Name;
 		data << itr->second->Address;
-		data << itr->second->Population;
+		//data << itr->second->Population;
+		data << uint32(0x3fa1cac1);
 
 		/* Get our character count */
 		it = itr->second->CharacterMap.find(Socket->GetAccountID());
 		data << uint8( (it == itr->second->CharacterMap.end()) ? 0 : it->second );
-		data << uint8(itr->second->TimeZone);   // time zone
-		data << uint8(0);
+		data << uint8(1);   // time zone
+		data << uint8(6);
 	}
 	realmLock.Release();
 

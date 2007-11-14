@@ -331,13 +331,13 @@ void LogonCommHandler::LoadRealmConfiguration()
 
 			// process realm type
 			if(!stricmp(rt.c_str(), "pvp"))
-				type = REALMTYPE_PVP;
+				type = 1;
 			else if(!stricmp(rt.c_str(), "rp"))
-				type = REALMTYPE_RP;
+				type = 0;
 			else if(!stricmp(rt.c_str(), "rppvp"))
-				type = REALMTYPE_RPPVP;
+				type = 0;
 			else
-				type = REALMTYPE_NORMAL;
+				type = 0;
 
 			_realmType = type;
 

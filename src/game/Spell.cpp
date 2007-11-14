@@ -189,6 +189,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	m_cancelled = false;
 	ProcedOnSpell = 0;
 	forced_basepoints[0]=forced_basepoints[1]=forced_basepoints[2]=0;
+	extra_cast_number=0;
 }
 
 Spell::~Spell()
@@ -1611,6 +1612,7 @@ void Spell::SendSpellStart()
 		data << m_caster->GetNewGUID() << m_caster->GetNewGUID();
 
 	data << m_spellInfo->Id;
+	data << extra_cast_number;
 	data << cast_flags;
 	data << (uint32)m_castTime;
 		

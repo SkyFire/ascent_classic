@@ -1830,6 +1830,7 @@ public:
     int32 damageToHit;
     uint32 castedItemId;
     bool judgement;
+	uint8 extra_cast_number;
 
     void SendCastSuccess(Object * target);
     void SendCastSuccess(const uint64& guid);

@@ -621,6 +621,7 @@ void WorldSession::SendInnkeeperBind(Creature* pCreature)
 	data << pCreature->GetNewGUID();
 	data << pCreature->GetNewGUID();
 	data << uint32(BIND_SPELL_ID);
+	data << uint8(0);
 	data << uint16(0);
 	data << uint32(0);
 	data << uint16(2);

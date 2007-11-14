@@ -1092,6 +1092,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 			    WorldPacket data(SMSG_SPELL_START, 42);
 			    data << qst_giver->GetNewGUID() << qst_giver->GetNewGUID();
 			    data << uint32(7763);
+				data << uint8(0);
 			    data << uint16(0);
 			    data << uint32(0);
 			    data << uint16(2);

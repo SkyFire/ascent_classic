@@ -530,6 +530,7 @@ bool ChatHandler::HandleCastSpellNECommand(const char* args, WorldSession *m_ses
 	data << caster->GetNewGUID();
 	data << caster->GetNewGUID();
 	data << spellId;
+	data << uint8(0);
 	data << uint16(0);
 	data << uint32(0);
 	data << uint16(2);

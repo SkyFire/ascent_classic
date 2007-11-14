@@ -134,8 +134,9 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
 	if(!_player->IsInWorld()) return;
 	uint32 spellId;
+	uint8 cn;
 
-	recvPacket >> spellId;
+	recvPacket >> spellId >> cn;
 
 	sLog.outDetail("WORLD: got cast spell packet, spellId - %i, data length = %i",
 		spellId, recvPacket.size());
@@ -226,6 +227,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             return;
         }
 		Spell *spell = new Spell(GetPlayer(), spellInfo, false, NULL);
+		spell->extra_cast_number=cn;
 	
 		SpellCastTargets targets(recvPacket,GetPlayer()->GetGUID());
 		spell->prepare(&targets);
