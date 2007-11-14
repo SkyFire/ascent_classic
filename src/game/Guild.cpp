@@ -392,10 +392,22 @@ RankInfo * Guild::CreateRank(string name, uint32 perms)
 	RankInfo *newrank;
 
 	newrank = new RankInfo;
-	memset(newrank,0,sizeof(RankInfo));
 	newrank->rankid=(uint32)m_rankList.size();
 	newrank->name=name;
 	newrank->rights=perms;
+	newrank->rights_1=0;
+	newrank->rights_2=0;
+	newrank->rights_3=0;
+	newrank->rights_4=0;
+	newrank->rights_5=0;
+	newrank->rights_6=0;
+	newrank->rights_7=0;
+	newrank->rights_8=0;
+	newrank->rights_9=0;
+	newrank->rights_10=0;
+	newrank->rights_11=0;
+	newrank->rights_12=0;
+	newrank->rights_13=0;
 	m_rankList.push_back(newrank);
 	return newrank;
 }
