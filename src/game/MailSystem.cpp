@@ -105,6 +105,126 @@ bool MailMessage::AddMessageDataToPacket(WorldPacket& data)
 	if(deleted_flag)
 		return false;
 
+	data << uint16(0x0032);
+	data << message_id;
+	data << uint8(message_type);
+	if(message_type)
+		data << uint32(sender_guid);
+	else
+		data << sender_guid;
+
+	data << cod;			// cod
+	data << message_id;		// itempageid
+	data << uint32(0);
+	data << stationary;
+	data << money;		// money
+	data << uint32(0x10);
+	data << float(float(expire_time - (uint32)UNIXTIME) / 86400.0f);
+	data << uint32(0);
+	data << subject;
+	//data << uint8(0);		// item count
+
+	uint32 itementry = 0, itemcount = 0;
+	uint32 charges = 0, durability = 0, maxdurability = 0;
+
+	if(attached_item_guid)
+	{
+		QueryResult * result = CharacterDatabase.Query("SELECT `entry`, `count`, `charges`, `durability` FROM playeritems WHERE guid='%u'", GUID_LOPART(attached_item_guid));
+		if(result)
+		{
+			itementry = result->Fetch()[0].GetUInt32();
+			itemcount = result->Fetch()[1].GetUInt32();
+			charges = result->Fetch()[2].GetUInt32();
+			durability = result->Fetch()[3].GetUInt32();
+			ItemPrototype * it = ItemPrototypeStorage.LookupEntry(itementry);
+			maxdurability = it ? it->MaxDurability : durability;
+
+			delete result;
+		}
+	}
+
+	if(external_attached_item_guid)
+	{
+		QueryResult * result = CharacterDatabase.Query("SELECT `entry`, `count`, `charges`, `durability` FROM playeritems_external WHERE guid='%u'", GUID_LOPART(external_attached_item_guid));
+		if(result)
+		{
+			itementry = result->Fetch()[0].GetUInt32();
+			itemcount = result->Fetch()[1].GetUInt32();
+			charges = result->Fetch()[2].GetUInt32();
+			durability = result->Fetch()[3].GetUInt32();
+			ItemPrototype * it = ItemPrototypeStorage.LookupEntry(itementry);
+			maxdurability = it ? it->MaxDurability : durability;
+
+			delete result;
+		}
+	}
+
+	if(itementry)
+	{
+		/*
+		00
+		C5 85 0D 00
+		A6 01 00 00
+		00 00 00 00 
+		10 62 3B 47
+		00 00 00 00
+		00 00 00 00
+		10 62 3B 47
+		00 00 00 00
+		00 00 00 00
+		10 62 3B 47
+		00 00 00 00
+		00 00 00 00
+		10 62 3B 47
+		00 00 00 00
+		00 00 00 00
+		10 62 3B 47
+		00 00 00 00
+		00 00 00 00
+		10 62 3B 47
+		00 00 00 00
+		00 00 00 00
+		88 AF CA 62
+		04
+		FF FF FF FF
+		00 00 00 00
+		00 00 00 00
+		*/
+		data << uint8(1);		// one item
+		data << uint8(0);
+		data << uint32(0);			// something (0x000D85C5)
+		data << itementry;
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint32(0);
+		data << uint8(itemcount ? itemcount : 1);
+		data << uint32(charges);
+		data << uint32(maxdurability);
+		data << uint32(durability);
+	}
+	else
+		data << uint8(0);
+
+	return true;
+/*
+	data << uint16(0);
 	data << message_id;
 	data << uint8(message_type);
 	if(message_type)
@@ -175,7 +295,7 @@ bool MailMessage::AddMessageDataToPacket(WorldPacket& data)
 
 	data << uint32(0);
 
-	return true;
+	return true;*/
 }
 
 void MailSystem::SaveMessageToSQL(MailMessage * message)
@@ -206,12 +326,35 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	MailMessage msg;
 	uint64 gameobject;
 	uint32 unk2;
+	uint8 itemcount;
 	string recepient;
 	//uint32 err = MAIL_OK;
 
 	recv_data >> gameobject >> recepient;
 	recv_data >> msg.subject >> msg.body >> msg.stationary;
-	recv_data >> unk2 >> msg.attached_item_guid >> msg.money >> msg.cod;
+	recv_data >> unk2 >> itemcount;
+
+	if(itemcount>1)
+	{
+		SystemMessage("Sorry, Ascent does not support sending multiple items at this time. (don't want to lose your item do you) Remove some items, and try again.");
+		SendMailError(MAIL_ERR_INTERNAL_ERROR);
+		return;
+	}
+	
+	if(itemcount)
+	{
+		recv_data >> itemcount;		// bs field
+		recv_data >> msg.attached_item_guid;
+	}
+	else
+		msg.attached_item_guid=0;
+
+	recv_data >> msg.money;
+	recv_data >> msg.cod;
+	// left over: (TODO- FIX ME BURLEX!)
+	// uint32
+	// uint32
+	// uint8
 	
 	// Search for the recipient
 	PlayerInfo * player = ObjectMgr::getSingleton().GetPlayerInfoByName(recepient);
