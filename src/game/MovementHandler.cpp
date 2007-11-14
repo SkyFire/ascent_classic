@@ -374,20 +374,24 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Copy into the output buffer.                                         */
 	/************************************************************************/
-	move_time = (movement_info.time - (mstime - m_clientTimeDelay)) + MOVEMENT_PACKET_TIME_DELAY + mstime;
-	memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
-
-	/************************************************************************/
-	/* Distribute to all inrange players.                                   */
-	/************************************************************************/
-	for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
+	if(_player->m_inRangePlayers.size())
 	{
+		move_time = (movement_info.time - (mstime - m_clientTimeDelay)) + MOVEMENT_PACKET_TIME_DELAY + mstime;
+		move_time += 0x2E701441;
+		memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
+
+		/************************************************************************/
+		/* Distribute to all inrange players.                                   */
+		/************************************************************************/
+		for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
+		{
 #ifdef USING_BIG_ENDIAN
-		*(uint32*)&movement_packet[pos+5] = swap32(move_time + (*itr)->GetSession()->m_moveDelayTime);
+			*(uint32*)&movement_packet[pos+5] = swap32(move_time + (*itr)->GetSession()->m_moveDelayTime);
 #else
-		*(uint32*)&movement_packet[pos+5] = uint32(move_time + (*itr)->GetSession()->m_moveDelayTime);
+			*(uint32*)&movement_packet[pos+5] = uint32(move_time + (*itr)->GetSession()->m_moveDelayTime);
 #endif
-		(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), uint16(recv_data.size() + pos), movement_packet);
+			(*itr)->GetSession()->OutPacket(recv_data.GetOpcode(), uint16(recv_data.size() + pos), movement_packet);
+		}
 	}
 
 	/************************************************************************/
