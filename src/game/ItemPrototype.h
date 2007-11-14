@@ -552,6 +552,7 @@ struct ItemPrototype
 	uint32 SocketBonus;
 	uint32 GemProperties;
 	uint32 ItemExtendedCost;
+	uint32 ArenaRankRequirement;
 	int32 DisenchantReqSkill;
 	uint32 ArmorDamageModifier;
 

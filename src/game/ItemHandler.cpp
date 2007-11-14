@@ -716,6 +716,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
 	data << itemProto->SocketBonus;
 	data << itemProto->GemProperties;
 	data << itemProto->ItemExtendedCost;
+	data << itemProto->ArenaRankRequirement;
 	data << itemProto->DisenchantReqSkill;
 	data << itemProto->ArmorDamageModifier;
 	//WPAssert(data.size() == 453 + itemProto->Name1.length() + itemProto->Description.length());

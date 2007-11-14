@@ -690,7 +690,7 @@ WorldPacket * Object::BuildTeleportAckMsg(const LocationVector & v)
 	//Update player on the client with TELEPORT_ACK
 	((Player*)(this))->SetPlayerStatus(TRANSFER_PENDING);
 
-	WorldPacket * data = new WorldPacket(MSG_MOVE_TELEPORT_ACK, 50);
+	WorldPacket * data = new WorldPacket(MSG_MOVE_TELEPORT_ACK, 80);
 	*data << GetNewGUID();
 
 	//First 4 bytes = no idea what it is
