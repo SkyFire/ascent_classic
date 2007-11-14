@@ -234,6 +234,12 @@
 			<File
 				RelativePath="..\..\src\logonserver\AuthStructs.h">
 			</File>
+			<File
+				RelativePath="..\..\src\logonserver\AutoPatcher.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\logonserver\AutoPatcher.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="ThreadMgr"

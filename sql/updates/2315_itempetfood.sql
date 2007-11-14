@@ -6,7 +6,7 @@ CREATE TABLE `itempetfood` (
   `entry` int(11) NOT NULL,
   `food_type` int(11) NOT NULL,
   PRIMARY KEY  (`entry`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records 
