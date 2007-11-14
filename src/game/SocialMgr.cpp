@@ -165,9 +165,9 @@ void SocialMgr::AddFriend(Player* plr, std::string friendName)
 		plr->GetSession()->SendPacket( &data );
 		return;
 	}
-	if( friendInfo->team != playerInfo->team )
+	if( friendInfo->team != playerInfo->team && sWorld.FriendFactionLimitation )
 	{
-		sLog.outDebug("SocialMgr: %s tried to add an ennemy to his friendlist", plr->GetName());
+		sLog.outDebug("SocialMgr: %s tried to add an enemy to his friendlist", plr->GetName());
 		data << (uint8)FRIEND_ENEMY << (uint64)friendInfo->guid;
 		plr->GetSession()->SendPacket( &data );
 		return;
@@ -244,7 +244,7 @@ void SocialMgr::AddIgnore(Player* plr, std::string ignoreName)
 
 	if( pGuid == iGuid )
 	{
-		sLog.outDebug("SocialMgr: %s tried to add himself to his friendlist", plr->GetName());
+		sLog.outDebug("SocialMgr: %s tried to add himself to his ignorelist", plr->GetName());
 		data << (uint8)FRIEND_IGNORE_SELF << (uint64)iGuid;
 		plr->GetSession()->SendPacket(&data);
 		return;
