@@ -696,7 +696,7 @@ void MovementInfo::init(WorldPacket & data)
 	{
 		data >> unk6;
 	}
-	if (flags & MOVEFLAG_FALLING)
+	if (flags & MOVEFLAG_FALLING || flags & MOVEFLAG_REDIRECTED)
 	{
 		data >> FallTime >> unk8 >> unk9 >> unk10;
 	}
