@@ -50,7 +50,7 @@ const char * AreaTriggerFailureMessages[] = {
 	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
 	"You must be at least level %u to pass through here.",
 	"You must be in a party to pass through here.",
-	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
+	"Heroic Difficulty requires the %s.",
 	"You must be level 70 to enter heroic mode.",
 };
 
@@ -126,8 +126,10 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 				if(reason != AREA_TRIGGER_FAILURE_OK)
 				{
 					const char * pReason = AreaTriggerFailureMessages[reason];
-					WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 50);
+					WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 60);
 					data << uint32(0);
+
+					MapInfo * pMapInfo = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
                     
 					switch (reason)
 					{
@@ -135,6 +137,19 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 						char msg[50];
 						snprintf(msg,50,pReason,pAreaTrigger->required_level);
 						data << msg;
+						break;
+					case AREA_TRIGGER_FAILURE_NO_KEY:
+						if (pMapInfo)
+						{
+							ItemPrototype *itemProto = ItemPrototypeStorage.LookupEntry(pMapInfo->heroic_key_1);
+							if(itemProto)
+							{
+								char msg[60];
+								snprintf(msg,60,pReason,itemProto->Name1);
+								data << msg;
+							} data << pReason; // crappy - but i assume its a valid item.
+						}
+
 						break;
 					default:
 						data << pReason;

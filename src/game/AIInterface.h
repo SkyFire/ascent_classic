@@ -398,6 +398,7 @@ private:
 	bool m_hasFleed;
 	bool m_hasCalledForHelp;
 	uint32 m_outOfCombatRange;
+	uint32 m_outOfCombatInstanceMod;
 
 	Unit *m_Unit;
 	Unit *m_PetOwner;
