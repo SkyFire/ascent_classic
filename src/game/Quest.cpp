@@ -35,22 +35,36 @@ WorldPacket* WorldSession::BuildQuestQueryResponse(Quest *qst)
 	*data << uint32(qst->max_level);				// Quest level
 
 	if(qst->quest_sort > 0)
-		*data << uint32(qst->quest_sort);	  // Negative if pointing to a sort.
+		*data << int32(-(int32)qst->quest_sort);	  // Negative if pointing to a sort.
 	else
 		*data << uint32(qst->zone_id);			  // Positive if pointing to a zone.
 
 	*data << uint32(qst->type);					 // Info ID / Type
+	*data << uint32(0);								// suggested players
 	*data << uint32(qst->required_rep_faction);	 // Faction ID
 	*data << uint32(qst->required_rep_value);	   // Faction Amount
 	*data << uint32(0);							 // Unknown (always 0)
 	*data << uint32(0);							 // Unknown (always 0)
-	*data << uint32(0);							 // Unknown (always 0) was added for dirty fix remove this
 	*data << uint32(qst->next_quest_id);			// Next Quest ID
 	*data << uint32(qst->reward_money);			 // Copper reward
  // disabled for dirty fix remove this   *data << uint32(qst->reward_xp_as_money);	   // Copper given instead of XP
+	/**data << uint32(0);
+	*data << uint32(0);			
+	*data << uint32(271);
+	*data << uint32(69);
+	*data << uint32(56);
+	*data << uint32(2);*/
+	// unk
+	// effect
+	// unk
+	// bonus honor
+	// srcitem
+	// flags
+	
 	*data << uint32(qst->required_money);		   // Required Money
-	*data << uint32(qst->reward_spell);			 // Spell added to spellbook upon completion
 	*data << uint32(qst->effect_on_player);		 // Spell casted on player upon completion
+	*data << uint32(qst->reward_spell);			 // Spell added to spellbook upon completion
+	*data << uint32(0);								// 2.3.0 - bonus honor
 	*data << uint32(qst->srcitem);				  // Item given at the start of a quest (srcitem)
 	*data << uint32(qst->quest_flags);			  // Quest Flags
 
