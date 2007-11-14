@@ -48,11 +48,6 @@ Rank Effect
 1 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 1%.
 2 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 2%.
 
-2.Improved Expose Armor
-Rank Effect
-1 Increases the armor reduced by your Expose Armor ability by an additional 25%.
-2 Increases the armor reduced by your Expose Armor ability by an additional 50%.
-
 3.Vile Poisons
 Rank Effect
 1 Increases the damage dealt by your Poisons and Envenom ability by 4% and gives your poisons an additional 8% chance to resist Dispel effects.

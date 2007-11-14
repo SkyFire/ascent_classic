@@ -1275,6 +1275,12 @@ bool World::SetInitialWorldSettings()
 		//shaman - shock, has no spellgroup.very dangerous move !
 		else if(sp->NameHash == 0x561A665E)
 			sp->SpellGroupType = 4;
+		//druid - maul, has missing spellgroup.very dangerous move !
+		else if(sp->NameHash == 0x36278137)
+			sp->SpellGroupType |= 33554432;
+		//druid - swipe, has missing spellgroup.very dangerous move !
+		else if(sp->NameHash == 0xDCBA31B0)
+			sp->SpellGroupType |= 33554432;
 		else if(sp->NameHash==0x9840A1A6 || sp->NameHash == 0x1513B967 || sp->NameHash==0x204D568D)
 			sp->MechanicsType=25;
 
@@ -1981,19 +1987,34 @@ bool World::SetInitialWorldSettings()
 	//Druid - Ferocity. Swipe, mangle and possibly the rest have only partial affects since they are missing groups
 	sp = dbcSpell.LookupEntry(16934); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	{
+		sp->EffectSpellGroupRelation[0]=33554432;
+		sp->EffectSpellGroupRelation[1]=4096;
+	}
 	sp = dbcSpell.LookupEntry(16935); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	{
+		sp->EffectSpellGroupRelation[0]=33554432;
+		sp->EffectSpellGroupRelation[1]=4096;
+	}
 	sp = dbcSpell.LookupEntry(16936); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	{
+		sp->EffectSpellGroupRelation[0]=33554432;
+		sp->EffectSpellGroupRelation[1]=4096;
+	}
 	sp = dbcSpell.LookupEntry(16937); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	{
+		sp->EffectSpellGroupRelation[0]=33554432;
+		sp->EffectSpellGroupRelation[1]=4096;
+	}
 	sp = dbcSpell.LookupEntry(16938); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2048 | 4096;
+	{
+		sp->EffectSpellGroupRelation[0]=33554432;
+		sp->EffectSpellGroupRelation[1]=4096;
+	}
 
 	//paladin - seal of blood
 	sp = dbcSpell.LookupEntry(31892);

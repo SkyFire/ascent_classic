@@ -1,7 +1,8 @@
 select id,name,description,Effect_1,Effect_2,Effect_3,EffectApplyAuraName_1,EffectApplyAuraName_2,EffectApplyAuraName_3,EffectSpellGroupRelation_1,EffectSpellGroupRelation_1,EffectSpellGroupRelation_3,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3,EffectTriggerSpell_1,EffectTriggerSpell_2,EffectTriggerSpell_3 from dbc_spell 
-where name like "%Empowered Frostbolt%";
+where name like "%Improved Expose Armor%";
 
 #select id,name,description,school,SpellGroupType from dbc_spell where name like "%lightning bolt%" or id = 8443;
+#select id,name,description,school,SpellGroupType from dbc_spell where name like "%expose armor%";
 #select id,name,description,school,SpellGroupType from dbc_spell where description like "%totem%";
 #select id,name,description,SpellGroupType from dbc_spell where SpellGroupType & 1048576;
 #select * from dbc_spell where id=3050;
@@ -28,3 +29,8 @@ where name like "%Empowered Frostbolt%";
 
 #select id,name,description,EffectApplyAuraName_1,EffectApplyAuraName_2,EffectApplyAuraName_3,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3 from dbc_spell where 
 #((EffectApplyAuraName_1=107 or EffectApplyAuraName_1=108) and EffectMiscValue_1=24) or ((EffectApplyAuraName_2=107 or EffectApplyAuraName_2=108) and EffectMiscValue_2=24) or ((EffectApplyAuraName_3=107 or EffectApplyAuraName_3=108) and EffectMiscValue_3=24)
+
+#////////////////// druid spells
+#select id,name,description,SpellGroupType,Effect_1,Effect_2,Effect_3,EffectApplyAuraName_1,EffectApplyAuraName_2,EffectApplyAuraName_3,EffectSpellGroupRelation_1,EffectSpellGroupRelation_1,EffectSpellGroupRelation_3,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3,EffectTriggerSpell_1,EffectTriggerSpell_2,EffectTriggerSpell_3 from dbc_spell 
+#where (SpellGroupType & 2048) and (id in (22812,33786,26989,26993,33831,18658,27012,29166,27013,26988,24858,27009,26995,26986,18960,26992,26985,1066,8983,5487,768,5209,27000,27004,33357,26998,9634,5229,27011,27019,16979,24248,33943,36999,6795,33745,22570,33983,26996,27006,9913,27003,27005,27008,27002,40120,9754,2893,8946,26997,26979,33763,26990,17116,16864,26994,26980,26982,2782,18562,26983,33891,22812,33786,26989,26993,33831,18658,27012,29166,27013,26988,24858,27009,26995,26986,18960,26992,26985,1066,8983,5487,768,5209,27000,27004,33357,26998,9634,5229,27011,27019,16979,24248,33943,36999,6795,33745,22570,33983,26996,27006,9913,27003,27005,27008,27002,40120,9754,2893,8946,26997,26979,33763,26990,17116,16864,26994,26980,26982,2782,18562,26983,33891))
+
