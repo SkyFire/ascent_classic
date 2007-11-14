@@ -901,6 +901,8 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//rogue - Ruthlessness
 						case 14157:
 							{
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
 								//we need a finishing move for this 
 								if(CastingSpell->buffType!=SPELL_TYPE_FINISHING_MOVE || victim==this)
 									continue;
@@ -908,6 +910,8 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//rogue - Relentless Strikes
 						case 14181:
 							{
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
 								int32 proc_Chance;
 								//chance is based actually on combopoint count and not 100% always 
 								if(CastingSpell->buffType==SPELL_TYPE_FINISHING_MOVE && IsPlayer())
@@ -919,6 +923,8 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//rogue - Initiative
 						case 13977:
 							{
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
 								//we need a Ambush, Garrote, or Cheap Shot
 								if (CastingSpell->NameHash!=3345919181UL && //Cheap Shot
 									CastingSpell->NameHash!=566770777UL && //Ambush
@@ -963,7 +969,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 29077:
 							{
 								continue;
-/*								if(!CastingSpell)
+/*								
+								disabled until tested
+								if(!CastingSpell)
 									continue;
 								if (CastingSpell->School!=SCHOOL_FIRE || CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
 									continue;
