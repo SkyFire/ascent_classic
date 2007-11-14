@@ -17,6 +17,8 @@ logonserver_SOURCES = \
 	LogonOpcodes.h \
 	LogonStdAfx.cpp \
 	LogonStdAfx.h \
+	AutoPatcher.h \
+	AutoPatcher.cpp \
 	Main.cpp \
 	Main.h \
 	PeriodicFunctionCall_Thread.h \
