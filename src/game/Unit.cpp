@@ -4086,16 +4086,22 @@ uint32 Unit::AddAuraVisual(uint32 spellid, uint32 count, bool positive)
 
 	if(free == -1) return 0xFF;
 
-	uint8 flagslot = free >> 3;
+	uint8 flagslot = (free / 4);
 	uint32 value = GetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot));
 
-	uint8 aurapos = (free & 7) << 2;
+	/*uint8 aurapos = (free & 7) << 2;
 	uint32 setflag = AFLAG_SET;
 	if(positive)
 		setflag = 0xD;
 
 	uint32 value1 = (uint32)setflag << aurapos;
-	value |= value1;
+	value |= value1;*/
+	uint8 aurapos = (free%4)*8;
+	value &= (0xFF<<aurapos);
+	if(positive)
+		value |= (0x1F<<aurapos);
+	else
+		value |= (0x09<<aurapos);
 
 	SetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot), value);
 	SetUInt32Value(UNIT_FIELD_AURA + free, spellid);
@@ -4112,8 +4118,10 @@ void Unit::SetAuraSlotLevel(uint32 slot, bool positive)
 	uint32 bit = (slot % 4) * 8;
 	val &= ~(0xFF << bit);
 	if(positive)
-		val |= (0x11 << bit);
-
+		val |= (0x46 << bit);
+	else
+		val |= (0x19 << bit);
+	
 	SetUInt32Value(UNIT_FIELD_AURALEVELS + index, val);
 }
 
@@ -4128,11 +4136,13 @@ void Unit::RemoveAuraVisual(uint32 spellid, uint32 count)
 			if(test == 0)
 			{
 				// Aura has been removed completely.
-				uint8 flagslot = x >> 3;
+				uint8 flagslot = (x/4);
 				uint32 value = GetUInt32Value((uint16)(UNIT_FIELD_AURAFLAGS + flagslot));
-				uint8 aurapos = (x & 7) << 2;
+				/*uint8 aurapos = (x & 7) << 2;
 				uint32 value1 = ~( (uint32)0xF << aurapos );
-				value &= value1;
+				value &= value1;*/
+				uint8 aurapos = (x%4)*8;
+				value &= (0xFF<<aurapos);
 				SetUInt32Value(UNIT_FIELD_AURAFLAGS + flagslot,value);
 				SetUInt32Value(UNIT_FIELD_AURA + x, 0);
 				SetAuraSlotLevel(x, false);
