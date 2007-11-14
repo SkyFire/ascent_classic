@@ -22,7 +22,7 @@
 /** Table formats converted to strings
  */
 const char * gItemPrototypeFormat						= "uuuussssuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffuffuffuffuffuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuusuuuuuuuuuuuuuuuuuuuuuuuuuuuu";
-const char * gCreatureNameFormat						= "ussuuuuuuuuuuffcc";
+const char * gCreatureNameFormat						= "usscuuuuuuuuuuffcc";
 const char * gGameObjectNameFormat						= "uuusuuuuuuuuuuuuuuuuuuuuuuuu";
 const char * gCreatureProtoFormat						= "uuuuuuufuuffuffuuuuuuuuuuuuuuuuuuffsuuuufffu";
 const char * gAreaTriggerFormat							= "ucuusffffuu";

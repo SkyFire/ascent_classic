@@ -105,7 +105,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 			data << uint8(0) << uint8(0) << uint8(0);
 			data << lcn->SubName;
 		}
-		data << ci->Civilian;
+		data << ci->mouseFlags;
 		data << ci->Flags1;  
 		data << ci->Type;
 		data << ci->Family;
@@ -118,7 +118,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 		data << ci->unkint2;
 		data << ci->unkfloat1;
 		data << ci->unkfloat2;
-		data << ci->Leader;		
+		data << ci->Leader;
 	}
 
 	SendPacket( &data );

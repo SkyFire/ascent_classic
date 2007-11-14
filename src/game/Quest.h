@@ -21,6 +21,18 @@
 #define WOWSERVER_QUEST_H
 
 using namespace std;
+/*
+2.3.0 research
+not available because low level = 1
+available but quest low level = 2
+question mark = 3 (not got objectives)
+blue question mark = 4
+blue exclamation mark = 5
+yellow exclamation mark = 6
+yellow question mark = 7
+finished = 8
+132 error = 9
+*/
 
 enum QUEST_STATUS
 {
@@ -28,9 +40,10 @@ enum QUEST_STATUS
 	QMGR_QUEST_AVAILABLELOW_LEVEL	   = 0x01,	// Quest avaiable, and your level isnt enough.	 | "Gray Quotation Mark !"
 	QMGR_QUEST_CHAT					 = 0x02,	// Quest avaiable it shows a talk baloon.		  | "No Mark"
 	QMGR_QUEST_NOT_FINISHED			 = 0x03,	// Quest isnt finished yet.						| "Gray Question ? Mark"
-	QMGR_QUEST_REPEATABLE			   = 0x04,	// Quest repeatable								| "Blue Question ? Mark" 
-	QMGR_QUEST_AVAILABLE				= 0x05,	// Quest avaiable, and your level is enough		| "Yellow Quotation ! Mark" 
-	QMGR_QUEST_FINISHED				 = 0x07,	// Quest has been finished.						| "Yellow Question  ? Mark"
+	QMGR_QUEST_REPEATABLE_FINISHED		= 0x04,
+	QMGR_QUEST_REPEATABLE			   = 0x05,	// Quest repeatable								| "Blue Question ? Mark" 
+	QMGR_QUEST_AVAILABLE				= 0x06,	// Quest avaiable, and your level is enough		| "Yellow Quotation ! Mark" 
+	QMGR_QUEST_FINISHED				 = 0x08,	// Quest has been finished.						| "Yellow Question  ? Mark" (7 has no minimap icon)
 	//QUEST_ITEM_UPDATE				 = 0x06	 // Yellow Question "?" Mark. //Unknown
 };
 

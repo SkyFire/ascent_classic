@@ -1209,6 +1209,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 
 			WorldPacket data(MSG_MOVE_HEARTBEAT, 66);
 			data << plyr->GetNewGUID();
+			data << uint8(0);
 			data << uint64(0);
 			data << obj->GetPositionX() << obj->GetPositionY() << obj->GetPositionZ() << obj->GetOrientation();
 			plyr->SendMessageToSet(&data, true);
