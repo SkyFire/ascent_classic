@@ -27,9 +27,10 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	Player* p_User = GetPlayer();
 	sLog.outDetail("WORLD: got use Item packet, data length = %i",recvPacket.size());
 	int8 tmp1,slot,tmp3;
+	uint8 cn;
 	uint32 spellId = 0;
 
-	recvPacket >> tmp1 >> slot >> tmp3;
+	recvPacket >> tmp1 >> slot >> tmp3 >> cn;
 	Item* tmpItem = NULL;
 	tmpItem = p_User->GetItemInterface()->GetInventoryItem(tmp1,slot);
 	if (!tmpItem)
@@ -125,6 +126,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 
 	Spell *spell = new Spell(_player, spellInfo, false, NULL);
+	spell->extra_cast_number=cn;
 	spell->i_caster = tmpItem;
 	//GetPlayer()->setCurrentSpell(spell);
 	spell->prepare(&targets);
