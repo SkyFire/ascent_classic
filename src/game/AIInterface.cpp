@@ -2680,7 +2680,7 @@ AI_Spell *AIInterface::getSpell()
 	// look at our spells
 	AI_Spell *  sp = NULL;
 	AI_Spell *  def_spell = NULL;
-	uint32 cool_time=999999;
+	uint32 cool_time=0;
 	uint32 cool_time2;
 	uint32 nowtime = getMSTime();
 
@@ -2697,7 +2697,7 @@ AI_Spell *AIInterface::getSpell()
 			if(sp->cooldowntime && nowtime < sp->cooldowntime && sp->procChance >= 100)
 			{
 				cool_time2=sp->cooldowntime-nowtime;
-				if(cool_time2<cool_time)
+				if(!cool_time || cool_time2<cool_time)
 					cool_time=cool_time2;
 
 				waiting_for_cooldown = true;
@@ -2763,8 +2763,10 @@ AI_Spell *AIInterface::getSpell()
 	{
 		cool_time2 = cool_time / 1000;
 		if(cool_time2)
-			next_spell_time = cool_time2;
+			next_spell_time = (uint32)UNIXTIME + cool_time2;
 	}
+	else
+		next_spell_time = (uint32)UNIXTIME + 1;
 
 #ifdef _AI_DEBUG
 	sLog.outString("AI DEBUG: Returning no spell for unit %u", m_Unit->GetEntry());

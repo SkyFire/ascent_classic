@@ -3675,7 +3675,9 @@ void Spell::SafeAddMissedTarget(uint64 guid)
     for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
         if((*i).TargetGuid==guid)
         {
-            sLog.outDebug("[SPELL] Something goes wrong in spell target system");
+            //sLog.outDebug("[SPELL] Something goes wrong in spell target system");
+			// this isnt actually wrong, since we only have one missed target map,
+			// whereas hit targets have multiple maps per effect.
             return;
         }
 
@@ -3687,7 +3689,9 @@ void Spell::SafeAddModeratedTarget(uint64 guid, uint16 type)
 	for(SpellTargetsList::iterator i=ModeratedTargets.begin();i!=ModeratedTargets.end();i++)
 		if((*i).TargetGuid==guid)
         {
-            sLog.outDebug("[SPELL] Something goes wrong in spell target system");
+            //sLog.outDebug("[SPELL] Something goes wrong in spell target system");
+			// this isnt actually wrong, since we only have one missed target map,
+			// whereas hit targets have multiple maps per effect.
 			return;
         }
 
