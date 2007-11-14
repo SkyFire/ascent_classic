@@ -443,8 +443,8 @@ void GossipScript::GossipHello(Object* pObject, Player* Plr, bool AutoSend)
 	if(flags & UNIT_NPC_FLAG_SPIRITHEALER)
 		Menu->AddItem(0, "Bring me back to life.", 7);
 
-	if(flags & UNIT_NPC_FLAG_PETITIONER)
-		Menu->AddItem(0, "How do I create a guild?", 8);
+	if(flags & UNIT_NPC_FLAG_ARENACHARTER)
+		Menu->AddItem(0, "How do I create a guild/arena team?", 8);
 
 	if(flags & UNIT_NPC_FLAG_TABARDCHANGER)
 		Menu->AddItem(0, "I want to create a guild crest.", 9);
