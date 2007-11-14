@@ -3080,26 +3080,46 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 		}break;
 	case CHAT_MSG_MONSTER_YELL:
 		{
-			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
-			{
-				if((*i)->GetTypeId() == TYPEID_PLAYER)
-				{
-					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-					data << type;
-					data << lang;
-					data << GetGUID();
-					data << uint32(0);			// new in 2.1.0
-					data << uint32(UnitNameLength);
-					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
-					data << uint32(MessageLength);
-					data << msg;
-					data << uint8(0x00);
+			uint32 cell_radius = 2;
+			uint32 cellX = m_mapMgr->GetPosX(GetPositionX());
+			uint32 cellY = m_mapMgr->GetPosY(GetPositionY());
+			uint32 endX = ((cellX+cell_radius) <= _sizeX) ? cellX + cell_radius : (_sizeX-1);
+			uint32 endY = ((cellY+cell_radius) <= _sizeY) ? cellY + cell_radius : (_sizeY-1);
+			uint32 startX = (cellX-cell_radius) > 0 ? cellX - cell_radius : 0;
+			uint32 startY = (cellY-cell_radius) > 0 ? cellY - cell_radius : 0;
 
-					WorldSession *session = ((Player*)(*i))->GetSession();
-					session->SendPacket(&data);
+			for(uint32 x = startX; x < endX; ++x)
+			{
+				for(uint32 y = startY; y < endY; ++y)
+				{
+					MapCell * pCell = m_mapMgr->GetCell(x,y);
+					if(pCell)
+					{
+						for(Object::InRangeSet::iterator i = pCell->Begin(); i != pCell->End(); i++)
+						{
+							if((*i)->GetTypeId() == TYPEID_PLAYER)
+							{
+								WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
+								data << type;
+								data << lang;
+								data << GetGUID();
+								data << uint32(0);			// new in 2.1.0
+								data << uint32(UnitNameLength);
+								data << UnitName;
+								data << ((Player*)(*i))->GetGUID();
+								data << uint32(MessageLength);
+								data << msg;
+								data << uint8(0x00);
+
+								WorldSession *session = ((Player*)(*i))->GetSession();
+								session->SendPacket(&data);
+							}
+						}
+					}
 				}
 			}
+
+
 		}break;
 	case CHAT_MSG_CHANNEL:
 		{
