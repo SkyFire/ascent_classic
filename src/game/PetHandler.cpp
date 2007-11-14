@@ -256,22 +256,16 @@ void WorldSession::HandlePetNameQuery(WorldPacket & recv_data)
 void WorldSession::HandleStablePet(WorldPacket & recv_data)
 {
 	if(!_player->IsInWorld()) return;
-
-	// remove pet from world and association with player
-	Pet *pPet = _player->GetSummon();
-	if(pPet && pPet->GetUInt32Value(UNIT_CREATED_BY_SPELL) != 0) 
-		return;
-	
-	PlayerPet *pet = _player->GetPlayerPet(_player->GetUnstabledPetNumber());
-	if(!pet) return;
-	pet->stablestate = STABLE_STATE_PASSIVE;
-	
-	if(pPet) pPet->Remove(false, true, true);	// no safedelete needed
-
 	WorldPacket data(1);
 	data.SetOpcode(SMSG_STABLE_RESULT);
 	data << uint8(0x8);  // success
 	SendPacket(&data);
+
+	// remove pet from world and association with player
+	Pet *pPet = _player->GetSummon();
+	if(!pPet || pPet->GetUInt32Value(UNIT_CREATED_BY_SPELL) != 0) return;
+
+	pPet->Remove(false, true, true);	// no safedelete needed
 }
 
 void WorldSession::HandleUnstablePet(WorldPacket & recv_data)
@@ -288,45 +282,13 @@ void WorldSession::HandleUnstablePet(WorldPacket & recv_data)
 		sLog.outError("PET SYSTEM: Player "I64FMT" tried to unstable non-existant pet %d", _player->GetGUID(), petnumber);
 		return;
 	}
+
+	// much easier? :P
 	_player->SpawnPet(petnumber);
-	pet->stablestate = STABLE_STATE_ACTIVE;
 
 	WorldPacket data(1);
 	data.SetOpcode(SMSG_STABLE_RESULT);
 	data << uint8(0x9); // success?
-	SendPacket(&data);
-}
-void WorldSession::HandleStableSwapPet(WorldPacket & recv_data)
-{
-	if(!_player->IsInWorld()) return;
-
-	uint64 npcguid = 0;
-	uint32 petnumber = 0;
-	recv_data >> npcguid >> petnumber;
-
-	PlayerPet *pet = _player->GetPlayerPet(petnumber);
-	if(!pet)
-	{
-		sLog.outError("PET SYSTEM: Player "I64FMT" tried to unstable non-existant pet %d", _player->GetGUID(), petnumber);
-		return;
-	}
-	Pet *pPet = _player->GetSummon();
-	if(pPet && pPet->GetUInt32Value(UNIT_CREATED_BY_SPELL) != 0) return;
-
-	//stable current pet
-	PlayerPet *pet2 = _player->GetPlayerPet(_player->GetUnstabledPetNumber());
-	if(!pet2) return;
-	if(pPet)
-		pPet->Remove(false, true, true);	// no safedelete needed
-	pet2->stablestate = STABLE_STATE_PASSIVE;
-
-	//unstable selected pet
-	_player->SpawnPet(petnumber);
-	pet->stablestate = STABLE_STATE_ACTIVE;
-
-	WorldPacket data;
-	data.SetOpcode(SMSG_STABLE_RESULT);
-	data << uint8(0x09);
 	SendPacket(&data);
 }
 
@@ -342,7 +304,7 @@ void WorldSession::HandleStabledPetList(WorldPacket & recv_data)
 
 	data << uint8(_player->m_Pets.size());
 	data << uint8(_player->m_StableSlotCount);
-	char i=0;
+
 	for(std::map<uint32, PlayerPet*>::iterator itr = _player->m_Pets.begin(); itr != _player->m_Pets.end(); ++itr)
 	{
 		data << uint32(itr->first); // pet no
@@ -350,13 +312,10 @@ void WorldSession::HandleStabledPetList(WorldPacket & recv_data)
 		data << uint32(itr->second->level); // level
 		data << itr->second->name;		  // name
 		data << uint32(itr->second->loyaltylvl);
-		if(itr->second->stablestate == STABLE_STATE_ACTIVE)
+		if(itr->second->active && _player->GetSummon() != NULL)
 			data << uint8(STABLE_STATE_ACTIVE);
 		else
-		{
-			data << uint8(STABLE_STATE_PASSIVE + i);
-			i++;
-		}
+			data << uint8(STABLE_STATE_PASSIVE);
 	}
 
 	SendPacket(&data);

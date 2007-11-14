@@ -127,7 +127,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		// These need to be checked.
 		SetUInt32Value(UNIT_FIELD_FLAGS, 0x00080008);
 		SetUInt32Value(UNIT_FIELD_POWER5, PET_HAPPINESS_UPDATE_VALUE / 2);//happiness
-		SetUInt32Value(UNIT_FIELD_MAXPOWER5, PET_HAPPINESS_UPDATE_VALUE * 3);
+		SetUInt32Value(UNIT_FIELD_MAXPOWER5, 1000000);
 		SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
 		SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, GetNextLevelXP(getLevel()));
 		SetUInt32Value(UNIT_FIELD_BYTES_1, 0 | (REBELIOUS << 8));//loyalty level
@@ -171,7 +171,6 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		// Create PlayerPet struct (Rest done by UpdatePetInfo)
 		PlayerPet *pp = new PlayerPet;
 		pp->number = m_PetNumber;
-		pp->stablestate = STABLE_STATE_ACTIVE;
 		static_cast<Player*>(owner)->AddPlayerPet(pp, pp->number);
 	}	
 
@@ -253,7 +252,7 @@ void Pet::Update(uint32 time)
 		//Loyalty
 		if(m_LoyaltyTimer==0 && GetHappinessState()!=NULL)
 		{
-			UpdateLoyalty(LoyaltyTicks[GetHappinessState()-1]);//loyalty tick is happiness state dependent
+			UpdateLoyalty(LoyaltyTicks[GetHappinessState()]);//loyalty tick is happiness state dependent
 			m_LoyaltyTimer = PET_LOYALTY_UPDATE_TIMER;
 		} 
 		else 

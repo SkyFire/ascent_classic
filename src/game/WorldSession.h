@@ -557,7 +557,6 @@ protected:
 	void HandleStablePet(WorldPacket & recv_data);
 	void HandleUnstablePet(WorldPacket & recv_data);
 	void HandleStabledPetList(WorldPacket & recv_data);
-	void HandleStableSwapPet(WorldPacket & recv_data);
 	void HandlePetRename(WorldPacket & recv_data);
 	void HandlePetAbandon(WorldPacket & recv_data);
 

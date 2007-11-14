@@ -2707,7 +2707,7 @@ void Spell::SpellEffectTameCreature(uint32 i)
 		result = SPELL_FAILED_BAD_TARGETS;
 	else if(!tame->GetCreatureName()->Family)
 		result = SPELL_FAILED_BAD_TARGETS;
-	else if(p_caster->GetSummon() || p_caster->GetUnstabledPetNumber())
+	else if(p_caster->GetSummon())
 		result = SPELL_FAILED_ALREADY_HAVE_SUMMON;
 	{
 		CreatureFamilyEntry *cf = dbcCreatureFamily.LookupEntry(tame->GetCreatureName()->Family);
@@ -2718,6 +2718,11 @@ void Spell::SpellEffectTameCreature(uint32 i)
 	{
 		SendCastResult(result);
 		return;
+	}
+	Pet *old_tame = p_caster->GetSummon();
+	if(old_tame != NULL)
+	{
+		old_tame->Dismiss(false);
 	}
 	// Remove target
 	tame->GetAIInterface()->HandleEvent(EVENT_LEAVECOMBAT, p_caster, 0);
@@ -2743,7 +2748,7 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 			return;
 		}
 
-		uint32 petno = p_caster->GetUnstabledPetNumber();
+		uint32 petno = p_caster->GetFirstPetNumber();
 
 		if(petno)
 		{
@@ -3781,32 +3786,46 @@ void Spell::SpellEffectInebriate(uint32 i) // lets get drunk!
 
 void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 {
-	//food flags and food level are checked in Spell::CheckItems()
+	//TODO: implement SPELL_FAILED_FOOD_LOWLEVEL
+	//	  make sure that the pieces of code that belongs to cancast are in cancast
+	//	  http://www.wowwiki.com/Pet_Feeding
+
 	if(!itemTarget || !p_caster)
 		return;
 	
+	ItemPrototype *ip = itemTarget->GetProto();
+	if(!ip)
+		return;
+
+	if(ip->Class != ITEM_CLASS_CONSUMABLE)
+	{
+		SendCastResult(SPELL_FAILED_WRONG_PET_FOOD);
+		return;
+	}
+
+	// Update pet happyness level
 	Pet *pPet = p_caster->GetSummon();
 	if(!pPet)
 		return;
 
+	/*if (!(GetPetFoodFlags(ip->Name1.c_str()) & pPet->GetPetDiet()))
+	{
+		SendCastResult(SPELL_FAILED_WRONG_PET_FOOD);
+		return;
+	}*/
+	
+
 	if(!p_caster->GetItemInterface()->RemoveItemAmt(itemTarget->GetProto()->ItemId,1))
 		return;
 	
-	/**	Cast feed pet effect
-	- effect is item level and pet level dependent, aura ticks are 35, 17, 8 (*1000) happiness
-	- http://petopia.brashendeavors.net/html/articles/basics_feeding.shtml */
-	int8 deltaLvl = pPet->getLevel() - itemTarget->GetProto()->ItemLevel;
-	if(deltaLvl > 10)
-	{
-		if(deltaLvl <= 20) damage = 17000;
-		else damage = 8000;
-	}
-	SpellEntry *spellInfo = dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]);
-	spellInfo->EffectBasePoints[0] = damage - 1;
-	Spell *sp= new Spell((Object *)p_caster,spellInfo,true,NULL);
-	SpellCastTargets tgt;
-	tgt.m_unitTarget=pPet->GetGUID();
-	sp->prepare(&tgt);
+	if(pPet->GetUInt32Value(UNIT_FIELD_POWER5) + damage < pPet->GetUInt32Value(UNIT_FIELD_MAXPOWER5))
+		pPet->ModUInt32Value(UNIT_FIELD_POWER5, damage);
+	else
+		pPet->SetUInt32Value(UNIT_FIELD_POWER5, pPet->GetUInt32Value(UNIT_FIELD_MAXPOWER5));
+
+	//	TriggerSpellId = m_spellInfo->EffectTriggerSpell[i];
+
+	u_caster->CastSpell(u_caster,m_spellInfo->EffectTriggerSpell[i],true);//cast Feed effect
 }
 
 void Spell::SpellEffectReputation(uint32 i)

@@ -783,7 +783,6 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_BUY_STABLE_SLOT].handler						   = &WorldSession::HandleBuyStableSlot;
 	WorldPacketHandlers[CMSG_STABLE_PET].handler								= &WorldSession::HandleStablePet;
 	WorldPacketHandlers[CMSG_UNSTABLE_PET].handler							  = &WorldSession::HandleUnstablePet;
-	WorldPacketHandlers[CMSG_STABLE_SWAP_PET].handler							  = &WorldSession::HandleStableSwapPet;
 	WorldPacketHandlers[MSG_LIST_STABLED_PETS].handler						  = &WorldSession::HandleStabledPetList;
 	WorldPacketHandlers[CMSG_PET_SET_ACTION].handler							= &WorldSession::HandlePetSetActionOpcode;
 	WorldPacketHandlers[CMSG_PET_RENAME].handler								= &WorldSession::HandlePetRename;

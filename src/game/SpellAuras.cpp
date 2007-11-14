@@ -1628,6 +1628,11 @@ void Aura::SpellAuraDummy(bool apply)
 
 		}break;
 
+	case 1515:			// Tame beast
+		{
+			//reduce casters armor by 100%
+			static_cast<Player*>(m_target)->BaseResistanceModPctPos[0]+= apply ? -100 : 100;
+		}break;
 	//Second Wind - triggers only on stun and Immobilize
 	case 29834:
 		{

@@ -386,7 +386,7 @@ void InformationCore::SendRealms(AuthSocket * Socket)
 	}
 	realmLock.Release();
 
-	data << uint8(0x15);
+	data << uint8(0x17);
 	data << uint8(0);
 
 	// Re-calculate size.

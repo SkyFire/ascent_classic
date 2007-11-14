@@ -1561,10 +1561,7 @@ void Player::_SavePet()
 
 	if(m_Summon&&m_Summon->IsInWorld()&&m_Summon->GetPetOwner()==this)	// update PlayerPets array with current pet's info
 	{
-		PlayerPet*pPet = GetPlayerPet(m_Summon->m_PetNumber);
-		if(!pPet || pPet->active == false)
-			m_Summon->UpdatePetInfo(true);
-		else m_Summon->UpdatePetInfo(false);
+		m_Summon->UpdatePetInfo(false);
 
 		if(!m_Summon->Summon)	   // is a pet
 		{
@@ -1592,7 +1589,7 @@ void Player::_SavePet()
 			<< itr->second->entry << "','"
 			<< itr->second->fields << "','"
 			<< itr->second->xp << "','"
-			<< (itr->second->active ?  1 : 0) + itr->second->stablestate * 10 << "','"
+			<< itr->second->active << "','"
 			<< itr->second->level << "','"
 			<< itr->second->happiness << "','"
 			<< itr->second->actionbar << "','"
@@ -1746,8 +1743,7 @@ void Player::_LoadPet(QueryResult * result)
 		pet->entry   = fields[3].GetUInt32();
 		pet->fields  = fields[4].GetString();
 		pet->xp	  = fields[5].GetUInt32();
-		pet->active  = fields[6].GetInt8()%10 > 0 ? true : false;
-		pet->stablestate = fields[6].GetInt8() / 10;
+		pet->active  = (fields[6].GetUInt32()>0 ? true : false);
 		pet->level   = fields[7].GetUInt32();
 		pet->happiness = fields[8].GetUInt32();
 		pet->actionbar = fields[9].GetString();

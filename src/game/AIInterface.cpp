@@ -67,7 +67,6 @@ AIInterface::AIInterface()
 	UnitToFear = NULL;
 	firstLeaveCombat = true;
 	m_outOfCombatRange = 2500;
-	m_outOfCombatInstanceMod = 1;
 
 	tauntedBy = NULL;
 	isTaunted = false;
@@ -632,8 +631,6 @@ void AIInterface::_UpdateTargets()
 	AssistTargetSet::iterator i;
 	TargetMap::iterator itr;
 
-	if(m_outOfCombatInstanceMod == 1 && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL) m_outOfCombatInstanceMod = 16;
-
 	// Find new Assist Targets and remove old ones
 	if(m_AIState == STATE_FLEEING)
 	{
@@ -652,7 +649,7 @@ void AIInterface::_UpdateTargets()
 		//modified for vs2005 compatibility
 		for(i = m_assistTargets.begin(); i != m_assistTargets.end(); ++i)
 		{
-			if(m_Unit->GetDistanceSq((*i)) > (2500.0f*m_outOfCombatInstanceMod) || !(*i)->isAlive() || !(*i)->CombatStatus.IsInCombat())
+			if(m_Unit->GetDistanceSq((*i)) > 2500.0f/*50.0f*/ || !(*i)->isAlive() || !(*i)->CombatStatus.IsInCombat())
 			{
 				tokill.push_back(*i);
 			}
@@ -735,13 +732,11 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 
 	uint16 agent = m_aiCurrentAgent;
 
-	if(m_outOfCombatInstanceMod == 1 && m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type != INSTANCE_NULL) m_outOfCombatInstanceMod = 16;
-
 	// If creature is very far from spawn point return to spawnpoint
 	// If at instance dont return -- this is wrong ... instance creatures always returns to spawnpoint, dunno how do you got this ideia. 
 
 	if(	m_AIType != AITYPE_PET 
-		&& (m_outOfCombatRange && m_Unit->GetDistanceSq(m_returnX,m_returnY,m_returnZ) > (m_outOfCombatRange*m_outOfCombatInstanceMod))
+		&& (m_outOfCombatRange && m_Unit->GetDistanceSq(m_returnX,m_returnY,m_returnZ) > m_outOfCombatRange) 
 		&& m_AIState != STATE_EVADE
 		&& m_AIState != STATE_SCRIPTMOVE
 		&& !(m_Unit->IsInInstance()))
