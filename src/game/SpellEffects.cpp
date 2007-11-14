@@ -332,6 +332,14 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					p_caster->smsg_AttackStop(unitTarget);
 				}break;
 			}break;
+		case 0xa757ecfc:	// Maim: turns off your attack
+			{
+				if(p_caster)
+				{
+					p_caster->EventAttackStop();
+					p_caster->smsg_AttackStop(unitTarget);
+				}break;
+			}break;
 		case 0xCBC738B8:	// Bloodthirst
 			{
                 dmg = u_caster->GetAP()*(m_spellInfo->EffectBasePoints[0]+1) / 100;

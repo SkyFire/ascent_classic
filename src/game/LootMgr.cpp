@@ -554,7 +554,7 @@ void LootRoll::Finalize()
 
 	WorldPacket data(34);
 
-	/* grab any player */
+/*
 	Player * gplr = NULL;
 	for(std::map<uint64, uint32>::iterator itr = NeedRolls.begin(); itr != NeedRolls.end(); ++itr)
 	{
@@ -570,7 +570,7 @@ void LootRoll::Finalize()
 			if(gplr) break;
 		}
 	}
-
+*/
 	for(std::map<uint64, uint32>::iterator itr = NeedRolls.begin(); itr != NeedRolls.end(); ++itr)
 	{
 		if(itr->second > highest)
@@ -579,30 +579,35 @@ void LootRoll::Finalize()
 			player = itr->first;
 			hightype = NEED;
 		}
-
+		/*
 		data.Initialize(SMSG_LOOT_ROLL);
 		data << _guid << _slotid << itr->first;
 		data << _itemid << _itemunk1 << _itemunk2;
 		data << uint8(itr->second) << uint8(NEED);
 		if(gplr && gplr->GetGroup())
 			gplr->GetGroup()->SendPacketToAll(&data);
+		*/
 	}
 
-	for(std::map<uint64, uint32>::iterator itr = GreedRolls.begin(); itr != GreedRolls.end(); ++itr)
+	if(!highest)
 	{
-		if(!highest && itr->second > highest)
+		for(std::map<uint64, uint32>::iterator itr = GreedRolls.begin(); itr != GreedRolls.end(); ++itr)
 		{
-			highest = itr->second;
-			player = itr->first;
-			hightype = GREED;
-		}
-
+			if(itr->second > highest)
+			{
+				highest = itr->second;
+				player = itr->first;
+				hightype = GREED;
+			}
+		/*
 		data.Initialize(SMSG_LOOT_ROLL);
 		data << _guid << _slotid << itr->first;
 		data << _itemid << _itemunk1 << _itemunk2;
 		data << uint8(itr->second) << uint8(GREED);
 		if(gplr && gplr->GetGroup())
 			gplr->GetGroup()->SendPacketToAll(&data);
+		*/
+		}
 	}
 
 	Loot * pLoot = 0;
@@ -745,14 +750,6 @@ void LootRoll::PlayerRolled(Player *player, uint8 choice)
 	if(NeedRolls.find(player->GetGUID()) != NeedRolls.end() || GreedRolls.find(player->GetGUID()) != GreedRolls.end())
 		return; // dont allow cheaters
 
-	std::map<uint64, uint32>* rmap = 0;
-	
-	if(choice == NEED) {
-		rmap = &NeedRolls;
-	} else if(choice == GREED) {
-		rmap = &GreedRolls;
-	}
-
 	int roll = sRand.randInt(99)+1;
 	// create packet
 	WorldPacket data(34);
@@ -760,13 +757,15 @@ void LootRoll::PlayerRolled(Player *player, uint8 choice)
 	data << _guid << _slotid << player->GetGUID();
 	data << _itemid << _itemunk1 << _itemunk2;
 
-	if(rmap)
+	if(choice == NEED) {
+		NeedRolls.insert( std::make_pair(player->GetGUID(), roll) );
+		data << uint8(roll) << uint8(NEED);
+	} 
+	else if(choice == GREED)
 	{
-		rmap->insert ( std::make_pair(player->GetGUID(), roll) );
-		if(choice == GREED)
-			data << uint8(0xF9) << uint8(0x00);
-		else
-			data << uint8(0xC1) << uint8(0x00);
+		GreedRolls.insert( std::make_pair(player->GetGUID(), roll) );
+		data << uint8(roll) << uint8(GREED);
+
 	}
 	else
 	{
@@ -775,8 +774,6 @@ void LootRoll::PlayerRolled(Player *player, uint8 choice)
 
 		data << uint8(128) << uint8(128);
 	}
-
-	data << uint8(roll) << uint8(choice);
 	
 	if(player->InGroup())
 		player->GetGroup()->SendPacketToAll(&data);

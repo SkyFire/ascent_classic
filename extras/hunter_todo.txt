@@ -2,3 +2,4 @@ Lethal Shots (from Marksmanship Talent tree) doesn't add 1% crit, but 0.01% as d
 
 retest - quick shots
 
+With autoshot on, moving out of range and back in won't re-enable the autoshot. YOu have to manually switch it off and on for it to work again.
