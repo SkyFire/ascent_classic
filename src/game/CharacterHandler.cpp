@@ -257,9 +257,15 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	QueryResult * resulth = CharacterDatabase.Query("SELECT race FROM characters WHERE acct = %u AND race in (2,5,8,9,10)", _accountId);
 	SetSide(0);
 	if (resulta)
+	{
 		SetSide(1);
+		delete resulta;
+	}
 	if (resulth)
+	{
 		SetSide(2);
+		delete resulth;
+	}
 
 
 
