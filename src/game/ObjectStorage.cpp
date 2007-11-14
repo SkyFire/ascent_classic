@@ -140,6 +140,9 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 		sp->floatMisc1 = fields[9].GetFloat();
 		sp->autocast_type=(uint32)-1;
 		sp->custom_pointer=false;
+		sp->cooldowntime=getMSTime();
+		sp->procCounter=0;
+
 /*		if (!sp->procCountDB) 
 			sp->procCount = uint32(-1);
 		else sp->procCount = sp->procCountDB;*/

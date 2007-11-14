@@ -2672,17 +2672,16 @@ SpellCastTargets AIInterface::setSpellTargets(SpellEntry *spellInfo, Unit* targe
 
 AI_Spell *AIInterface::getSpell()
 {
-	/* limit spell query time to once every second */
-	if((time_t)next_spell_time >= UNIXTIME)
-		return 0;
+	if(next_spell_time > UNIXTIME)
+		return NULL;
 
-	next_spell_time = (uint32)UNIXTIME + 1;
 	waiting_for_cooldown = false;
 
 	// look at our spells
 	AI_Spell *  sp = NULL;
 	AI_Spell *  def_spell = NULL;
-	uint32	  cast_time;
+	uint32 cool_time=999999;
+	uint32 cool_time2;
 	uint32 nowtime = getMSTime();
 
 	if(m_Unit->GetGUIDHigh() == HIGHGUID_PET)
@@ -2695,8 +2694,12 @@ AI_Spell *AIInterface::getSpell()
 		{
 			sp = *itr;
 			++itr;
-			if(sp->cooldowntime && nowtime < sp->cooldowntime)
+			if(sp->cooldowntime && nowtime < sp->cooldowntime && sp->procChance >= 100)
 			{
+				cool_time2=sp->cooldowntime-nowtime;
+				if(cool_time2<cool_time)
+					cool_time=cool_time2;
+
 				waiting_for_cooldown = true;
 				continue;
 			}
@@ -2751,13 +2754,16 @@ AI_Spell *AIInterface::getSpell()
 		if(def_spell->procCount)
 			def_spell->procCounter++;
 
-		cast_time = GetCastTime(dbcSpellCastTime.LookupEntry( sp->spell->CastingTimeIndex ) );
-		cast_time /= 1000;
-		if(cast_time)
-			next_spell_time = (uint32)UNIXTIME + cast_time;
-
 		waiting_for_cooldown = false;
 		return def_spell;
+	}
+
+	// save some loops if waiting for cooldownz
+	if(cool_time)
+	{
+		cool_time2 = cool_time / 1000;
+		if(cool_time2)
+			next_spell_time = cool_time2;
 	}
 
 #ifdef _AI_DEBUG
