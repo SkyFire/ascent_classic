@@ -639,9 +639,7 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 	CHECK_PACKET_SIZE(recv_data, 9);
 	WorldPacket data;
 	Guild *pGuild;
-	std::string rankname;
 	uint32 rankId;
-	uint32 rights;
 
 	pGuild = objmgr.GetGuild(GetPlayer()->GetGuildId());
 	if(!pGuild)
@@ -657,13 +655,28 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 	}
 
 	recv_data >> rankId;
-	recv_data >> rights;
-	recv_data >> rankname;
 
-	sLog.outDebug( "WORLD: Changed RankName to %s , Rights to 0x%.4X",rankname.c_str() ,rights );
+	RankInfo * rnk = pGuild->GetRank(rankId);
+	if(rnk==NULL)
+		return;
 
-	pGuild->SetRankName(rankId,rankname);
-	pGuild->SetRankRights(rankId,rights);
+	recv_data >> rnk->rights;
+	recv_data >> rnk->name;
+	sLog.outDebug( "WORLD: Changed RankName to %s , Rights to 0x%.4X",rnk->name.c_str() ,rnk->rights );
+
+	recv_data >> rnk->rights_1;
+	recv_data >> rnk->rights_2;
+	recv_data >> rnk->rights_3;
+	recv_data >> rnk->rights_4;
+	recv_data >> rnk->rights_5;
+	recv_data >> rnk->rights_6;
+	recv_data >> rnk->rights_7;
+	recv_data >> rnk->rights_8;
+	recv_data >> rnk->rights_9;
+	recv_data >> rnk->rights_10;
+	recv_data >> rnk->rights_11;
+	recv_data >> rnk->rights_12;
+	recv_data >> rnk->rights_13;
 
 	pGuild->FillQueryData(&data);
 	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);

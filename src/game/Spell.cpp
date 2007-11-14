@@ -3096,7 +3096,10 @@ void Spell::RemoveItems()
 				i_caster->m_isDirty = true;
 			}
 			else                                                                    // No Charges Remaining
+			{
 				i_caster->GetOwner()->GetItemInterface()->SafeFullRemoveItemByGuid(i_caster->GetGUID()); // delete item
+				i_caster=NULL;
+			}
 		}
 		else if( i_caster->GetProto()->Spells[0].Charges > 0 )                      // NON-EXPENDABLE ITEM
 		{

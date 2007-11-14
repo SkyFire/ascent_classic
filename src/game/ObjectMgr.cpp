@@ -547,8 +547,21 @@ void ObjectMgr::LoadGuilds()
 
 				rankList.name = fields3[2].GetString();
 				rankList.rights = fields3[3].GetUInt32();
+				rankList.rights_1 = fields3[4].GetUInt32();
+				rankList.rights_2 = fields3[5].GetUInt32();
+				rankList.rights_3 = fields3[6].GetUInt32();
+				rankList.rights_4 = fields3[7].GetUInt32();
+				rankList.rights_5 = fields3[8].GetUInt32();
+				rankList.rights_6 = fields3[9].GetUInt32();
+				rankList.rights_7 = fields3[10].GetUInt32();
+				rankList.rights_8 = fields3[11].GetUInt32();
+				rankList.rights_9 = fields3[12].GetUInt32();
+				rankList.rights_10 = fields3[13].GetUInt32();
+				rankList.rights_11 = fields3[14].GetUInt32();
+				rankList.rights_12 = fields3[15].GetUInt32();
+				rankList.rights_13 = fields3[16].GetUInt32();
 
-				pGuild->CreateRank(rankList.name, rankList.rights );
+				pGuild->CreateRank(&rankList);
 			}while( result3->NextRow() );
 			delete result3;
 		}

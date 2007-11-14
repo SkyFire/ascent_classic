@@ -173,7 +173,23 @@ void Guild::FillGuildRosterData(WorldPacket *data)
 	*data << m_guildInfo;
 	*data << (uint32)m_rankList.size();
 	for (ritr = m_rankList.begin(); ritr != m_rankList.end();ritr++)
+	{
 		*data << (*ritr)->rights;
+		*data << (*ritr)->rights_1;
+		*data << (*ritr)->rights_2;
+		*data << (*ritr)->rights_3;
+		*data << (*ritr)->rights_4;
+		*data << (*ritr)->rights_5;
+		*data << (*ritr)->rights_6;
+		*data << (*ritr)->rights_7;
+		*data << (*ritr)->rights_8;
+		*data << (*ritr)->rights_9;
+		*data << (*ritr)->rights_10;
+		*data << (*ritr)->rights_11;
+		*data << (*ritr)->rights_12;
+		*data << (*ritr)->rights_13;
+	}
+
 	for (i = m_guildMembers.begin(); i != m_guildMembers.end(); i++) 
 	{
 		pMember = objmgr.GetPlayer((*i)->guid);
@@ -355,18 +371,46 @@ pPlayer->pClient->RegionOutPacket(SMSG_COMPRESSED_UPDATE_OBJECT, ptr, size);
 }
 }
 */
-void Guild::CreateRank(std::string name,uint32 rights)
+RankInfo * Guild::CreateRank(RankInfo * s0rs)
 {
 	if(m_rankList.size() >= MAX_GUILD_RANKS)
-		return;
+		return NULL;
 
 	RankInfo *newrank;
 
 	newrank = new RankInfo;
-	newrank->rankid = (uint32)m_rankList.size();
-	newrank->name = name;
-	newrank->rights = rights;
+	newrank->rankid=(uint32)m_rankList.size();
+	memcpy(newrank,s0rs,sizeof(RankInfo));
 	m_rankList.push_back(newrank);
+	return newrank;
+}
+RankInfo * Guild::CreateRank(string name, uint32 perms)
+{
+	if(m_rankList.size() >= MAX_GUILD_RANKS)
+		return NULL;
+
+	RankInfo *newrank;
+
+	newrank = new RankInfo;
+	memset(newrank,0,sizeof(RankInfo));
+	newrank->rankid=(uint32)m_rankList.size();
+	newrank->name=name;
+	newrank->rights=perms;
+	m_rankList.push_back(newrank);
+	return newrank;
+}
+
+RankInfo * Guild::GetRank(uint32 rankId)
+{
+	std::list<RankInfo*>::iterator itr;
+	if(rankId > m_rankList.size()-1) return NULL;
+
+	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
+	{
+		if ((*itr)->rankid == rankId)
+			return (*itr);
+	}
+	return NULL;
 }
 
 std::string Guild::GetRankName(uint32 rankId)
@@ -496,7 +540,20 @@ void Guild::SaveRanksToDb()
 		query << m_guildId << ", ";
 		query << (*itr)->rankid << ", ";
 		query << "'" << CharacterDatabase.EscapeString((*itr)->name) << "', ";
-		query << (*itr)->rights;
+		query << (*itr)->rights << ",";
+		query << (*itr)->rights_1 << ",";
+		query << (*itr)->rights_2 << ",";
+		query << (*itr)->rights_3 << ",";
+		query << (*itr)->rights_4 << ",";
+		query << (*itr)->rights_5 << ",";
+		query << (*itr)->rights_6 << ",";
+		query << (*itr)->rights_7 << ",";
+		query << (*itr)->rights_8 << ",";
+		query << (*itr)->rights_9 << ",";
+		query << (*itr)->rights_10 << ",";
+		query << (*itr)->rights_11 << ",";
+		query << (*itr)->rights_12 << ",";
+		query << (*itr)->rights_13;
 		query << ")";
 		CharacterDatabase.Execute( query.str().c_str() );
 	}

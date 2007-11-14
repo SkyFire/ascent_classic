@@ -1,0 +1,13 @@
+alter table guild_ranks add column rankRights_1 int(30) not null default 0;
+alter table guild_ranks add column rankRights_2 int(30) not null default 0;
+alter table guild_ranks add column rankRights_3 int(30) not null default 0;
+alter table guild_ranks add column rankRights_4 int(30) not null default 0;
+alter table guild_ranks add column rankRights_5 int(30) not null default 0;
+alter table guild_ranks add column rankRights_6 int(30) not null default 0;
+alter table guild_ranks add column rankRights_7 int(30) not null default 0;
+alter table guild_ranks add column rankRights_8 int(30) not null default 0;
+alter table guild_ranks add column rankRights_9 int(30) not null default 0;
+alter table guild_ranks add column rankRights_10 int(30) not null default 0;
+alter table guild_ranks add column rankRights_11 int(30) not null default 0;
+alter table guild_ranks add column rankRights_12 int(30) not null default 0;
+alter table guild_ranks add column rankRights_13 int(30) not null default 0;

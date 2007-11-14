@@ -64,6 +64,19 @@ struct RankInfo
 	uint32 rankid;
 	std::string name;
 	uint32 rights;
+	uint32 rights_1;
+	uint32 rights_2;
+	uint32 rights_3;
+	uint32 rights_4;
+	uint32 rights_5;
+	uint32 rights_6;
+	uint32 rights_7;
+	uint32 rights_8;
+	uint32 rights_9;
+	uint32 rights_10;
+	uint32 rights_11;
+	uint32 rights_12;
+	uint32 rights_13;
 };
 
 enum GuildRank
@@ -284,10 +297,12 @@ public:
 	uint32 GetCreatedMonth() { return m_createdMonth; }
 	uint32 GetCreatedYear() { return m_createdYear; }
 
-	void CreateRank(std::string name,uint32 rights);
+	RankInfo * CreateRank(RankInfo * s0rs);
+	RankInfo * CreateRank(string name, uint32 perms);
 	void DelRank(){ m_rankList.pop_back(); }
 	std::string GetRankName(uint32 rankId);
 	uint32 GetRankRights(uint32 rankId);
+	RankInfo * GetRank(uint32 rankId);
 	size_t GetNrRanks(){ return m_rankList.size(); }
 
 	void SetRankName(uint32 rankId, std::string name);

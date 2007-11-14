@@ -463,7 +463,7 @@ uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 count, uint32 vendorcount
 		case ITEM_CLASS_PROJECTILE:
 		case ITEM_CLASS_CONSUMABLE:
 		{
-			cost = ( proto->BuyPrice * ((count < 1) ? 1 : count) ) / proto->MaxCount;
+			cost = ( proto->BuyPrice * ((count < 1) ? 1 : count) );
 		}break;
 	default:
 		{

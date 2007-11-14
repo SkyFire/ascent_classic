@@ -382,6 +382,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_waterwalk=false;
 	m_setwaterwalk=false;
 	m_areaspirithealer_guid=0;
+	m_CurrentTaxiPath=NULL;
 }
 
 
@@ -2150,7 +2151,7 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	<< m_bgEntryPointInstance << ", ";
 
 	// taxi
-	if(m_onTaxi) {
+	if(m_onTaxi&&m_CurrentTaxiPath) {
 		ss << m_CurrentTaxiPath->GetID() << ", ";
 		ss << lastNode << ", ";
 		ss << GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID);
@@ -4694,7 +4695,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 void Player::AddInRangeObject(Object* pObj)
 {
 	//Send taxi move if we're on a taxi
-	if ((GetTaxiState()) && (pObj->GetTypeId() == TYPEID_PLAYER))
+	if (m_CurrentTaxiPath && (pObj->GetTypeId() == TYPEID_PLAYER))
 	{
 		uint32 ntime = getMSTime();
 

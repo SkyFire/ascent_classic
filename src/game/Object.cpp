@@ -694,13 +694,15 @@ WorldPacket * Object::BuildTeleportAckMsg(const LocationVector & v)
 	*data << GetNewGUID();
 
 	//First 4 bytes = no idea what it is
-	*data << uint32(5); // flags
-	*data << uint32(0x010); // mysterious value #1
+	*data << uint32(2); // flags
+	*data << uint32(0); // mysterious value #1
+	*data << uint8(0);
 
 	*data << float(0);
 	*data << v;
 	*data << v.o;
-	*data << uint32(0x0);
+	*data << uint16(2);
+	*data << uint8(0);
 	return data;
 }
 
