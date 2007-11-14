@@ -49,6 +49,7 @@
 #include "../game/NameTables.h"
 #include "AccountCache.h"
 #include "PeriodicFunctionCall_Thread.h"
+#include "../logonserver/AutoPatcher.h"
 #include "../logonserver/AuthSocket.h"
 #include "../logonserver/AuthStructs.h"
 #include "../logonserver/LogonOpcodes.h"

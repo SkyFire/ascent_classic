@@ -233,6 +233,7 @@ void LogonServer::Run(int argc, char ** argv)
 	Log.Notice("InfoCore", "Starting...");
 	new InformationCore;
 
+	new PatchMgr;
 	Log.Notice("AccountMgr", "Precaching accounts...");
 	sAccountMgr.ReloadAccounts(true);
 	Log.Notice("AccountMgr", "%u accounts are loaded and ready.", sAccountMgr.GetCount());
@@ -319,7 +320,8 @@ void LogonServer::Run(int argc, char ** argv)
 		sInfoCore.TimeoutSockets();
 		sSocketGarbageCollector.Update();
 		CheckForDeadSockets();			  // Flood Protection
-		Sleep(50);
+		PatchMgr::getSingleton().UpdateJobs();
+		Sleep(10);
 		UNIXTIME = time(NULL);
 	}
 

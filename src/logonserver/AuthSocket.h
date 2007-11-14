@@ -24,6 +24,8 @@
 #include "AuthStructs.h"
 
 class LogonCommServerSocket;
+struct Patch;
+class PatchJob;
 
 class AuthSocket : public Socket
 {
@@ -47,6 +49,9 @@ public:
 	void HandleRealmlist();
 	void HandleReconnectChallenge();
 	void HandleReconnectProof();
+	void HandleTransferAccept();
+	void HandleTransferResume();
+	void HandleTransferCancel();
 
 	///////////////////////////////////////////////////
 	// Server Packet Builders
@@ -80,6 +85,13 @@ protected:
 
 	BigNumber m_sessionkey;
 	time_t last_recv;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Patching stuff
+	//////////////////////////////////////////////////////////////////////////
+public:
+	Patch * m_patch;
+	PatchJob * m_patchJob;
 };
 
 #endif

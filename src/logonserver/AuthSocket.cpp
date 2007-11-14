@@ -43,6 +43,8 @@ AuthSocket::AuthSocket(SOCKET fd) : Socket(fd, 32768, 4096)
 	m_account = 0;
 	last_recv = time(NULL);
 	removedFromSet = false;
+	m_patch=NULL;
+	m_patchJob=NULL;
 	_authSocketLock.Acquire();
 	_authSockets.insert(this);
 	_authSocketLock.Release();
@@ -50,7 +52,7 @@ AuthSocket::AuthSocket(SOCKET fd) : Socket(fd, 32768, 4096)
 
 AuthSocket::~AuthSocket()
 {
-
+	ASSERT(!m_patchJob);
 }
 
 void AuthSocket::OnDisconnect()
@@ -60,6 +62,12 @@ void AuthSocket::OnDisconnect()
 		_authSocketLock.Acquire();
 		_authSockets.erase(this);
 		_authSocketLock.Release();
+	}
+
+	if(m_patchJob)
+	{
+		PatchMgr::getSingleton().AbortPatchJob(m_patchJob);
+		m_patchJob=NULL;
 	}
 }
 
@@ -100,14 +108,52 @@ void AuthSocket::HandleChallenge()
  
 	// Check client build.
 #ifdef USING_BIG_ENDIAN
-	if(swap16(m_challenge.build) > LogonServer::getSingleton().max_build ||
-		swap16(m_challenge.build) < LogonServer::getSingleton().min_build)
+	uint16 build = swap16(m_challenge.build);
 #else
-	if(m_challenge.build > LogonServer::getSingleton().max_build ||
-		m_challenge.build < LogonServer::getSingleton().min_build)
+	uint16 build = m_challenge.build;
 #endif
+
+	// Check client build.
+	if(build > LogonServer::getSingleton().max_build)
 	{
+		// wtf?
 		SendChallengeError(CE_WRONG_BUILD_NUMBER);
+		return;
+	}
+
+	if(build < LogonServer::getSingleton().min_build)
+	{
+		// can we patch?
+		char flippedloc[5] = {0,0,0,0,0};
+		flippedloc[0] = m_challenge.country[3];
+		flippedloc[1] = m_challenge.country[2];
+		flippedloc[2] = m_challenge.country[1];
+		flippedloc[3] = m_challenge.country[0];
+
+		m_patch = PatchMgr::getSingleton().FindPatchForClient(build, flippedloc);
+		if(m_patch == NULL)
+		{
+			// could not find a valid patch
+			SendChallengeError(CE_WRONG_BUILD_NUMBER);
+			return;
+		}
+
+		Log.Debug("Patch", "Selected patch %u%s for client.", m_patch->Version,m_patch->Locality);
+
+		BigNumber unk;
+		unk.SetRand(128);
+
+		uint8 response[119] = {
+			0x00, 0x00, 0x00, 0x72, 0x50, 0xa7, 0xc9, 0x27, 0x4a, 0xfa, 0xb8, 0x77, 0x80, 0x70, 0x22,
+			0xda, 0xb8, 0x3b, 0x06, 0x50, 0x53, 0x4a, 0x16, 0xe2, 0x65, 0xba, 0xe4, 0x43, 0x6f, 0xe3,
+			0x29, 0x36, 0x18, 0xe3, 0x45, 0x01, 0x07, 0x20, 0x89, 0x4b, 0x64, 0x5e, 0x89, 0xe1, 0x53,
+			0x5b, 0xbd, 0xad, 0x5b, 0x8b, 0x29, 0x06, 0x50, 0x53, 0x08, 0x01, 0xb1, 0x8e, 0xbf, 0xbf,
+			0x5e, 0x8f, 0xab, 0x3c, 0x82, 0x87, 0x2a, 0x3e, 0x9b, 0xb7, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xe1, 0x32, 0xa3,
+			0x49, 0x76, 0x5c, 0x5b, 0x35, 0x9a, 0x93, 0x3c, 0x6f, 0x3c, 0x63, 0x6d, 0xc0, 0x00
+		};
+		Send(response, 119);
 		return;
 	}
 
@@ -205,8 +251,22 @@ void AuthSocket::HandleChallenge()
 
 void AuthSocket::HandleProof()
 {
-	if(!m_account || GetReadBufferSize() < sizeof(sAuthLogonProof_C))
+	if(GetReadBufferSize() < sizeof(sAuthLogonProof_C))
 		return ;
+
+	// patch
+	if(m_patch&&!m_account)
+	{
+		RemoveReadBufferBytes(75,false);
+		sLog.outDebug("[AuthLogonProof] Intitiating PatchJob");
+		uint8 bytes[2] = {0x01,0x0a};
+		Send(bytes,2);
+		PatchMgr::getSingleton().InitiatePatch(m_patch, this);
+		return;
+	}
+
+	if(!m_account)
+		return;
 
 	sLog.outDebug("[AuthLogonProof] Interleaving and checking proof...");
 
@@ -346,7 +406,12 @@ void AuthSocket::SendProofError(uint8 Error, uint8 * M2)
 #define AUTH_RECHALLENGE 2
 #define AUTH_REPROOF 3
 #define REALM_LIST 16
-#define MAX_AUTH_CMD 17
+#define INITIATE_TRANSFER 48		// 0x30
+#define TRANSFER_DATA 49		// 0x31
+#define ACCEPT_TRANSFER 50		// 0x32
+#define RESUME_TRANSFER 51		// 0x33
+#define CANCEL_TRANSFER 52		// 0x34
+#define MAX_AUTH_CMD 53
 
 typedef void (AuthSocket::*AuthHandler)();
 static AuthHandler Handlers[MAX_AUTH_CMD] = {
@@ -367,6 +432,42 @@ static AuthHandler Handlers[MAX_AUTH_CMD] = {
 		NULL,									// 14
 		NULL,									// 15
 		&AuthSocket::HandleRealmlist,			// 16
+		NULL,									// 17
+		NULL,									// 18
+		NULL,									// 19
+		NULL,									// 20
+		NULL,									// 21
+		NULL,									// 22
+		NULL,									// 23
+		NULL,									// 24
+		NULL,									// 25
+		NULL,									// 26
+		NULL,									// 27
+		NULL,									// 28
+		NULL,									// 29
+		NULL,									// 30
+		NULL,									// 31
+		NULL,									// 32
+		NULL,									// 33
+		NULL,									// 34
+		NULL,									// 35
+		NULL,									// 36
+		NULL,									// 37
+		NULL,									// 38
+		NULL,									// 39
+		NULL,									// 40
+		NULL,									// 41
+		NULL,									// 42
+		NULL,									// 43
+		NULL,									// 44
+		NULL,									// 45
+		NULL,									// 46
+		NULL,									// 47
+		NULL,									// 48
+		NULL,									// 49
+		&AuthSocket::HandleTransferAccept,		// 50
+		&AuthSocket::HandleTransferResume,		// 51
+		&AuthSocket::HandleTransferCancel,		// 52
 };
 
 void AuthSocket::OnRead()
@@ -516,4 +617,35 @@ void AuthSocket::HandleReconnectProof()
 		uint32 x = 3;
 		Send((const uint8*)&x, 4);
 	}
+}
+
+void AuthSocket::HandleTransferAccept()
+{
+	sLog.outDebug("Accepted transfer");
+	if(!m_patch)
+		return;
+
+	RemoveReadBufferBytes(1,false);
+	PatchMgr::getSingleton().BeginPatchJob(m_patch,this,0);
+}
+
+void AuthSocket::HandleTransferResume()
+{
+	sLog.outDebug("Resuming transfer");
+	if(!m_patch)
+		return;
+
+	RemoveReadBufferBytes(1,false);
+	uint64 size;
+	Read(8,(uint8*)&size);
+	if(size>=m_patch->FileSize)
+		return;
+
+	PatchMgr::getSingleton().BeginPatchJob(m_patch,this,(uint32)size);
+}
+
+void AuthSocket::HandleTransferCancel()
+{
+	RemoveReadBufferBytes(1,false);
+	Disconnect();
 }
