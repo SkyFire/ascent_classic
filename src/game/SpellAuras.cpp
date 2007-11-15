@@ -659,6 +659,10 @@ void Aura::AddAuraVisual()
 		data << m_visualSlot << (uint32)m_duration;
 		((Player*)m_target)->GetSession()->SendPacket(&data);
 	}
+		
+	WorldPacket data(SMSG_PET_LEARNT_SPELL, 21);
+	data << m_target->GetNewGUID() << m_visualSlot << uint32(m_spellProto->Id) << uint32(m_duration) << uint32(m_duration);
+	m_target->SendMessageToSet(&data,false);
 
 	m_auraSlot = slot;
 }

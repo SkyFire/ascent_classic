@@ -1131,7 +1131,7 @@ bool ChatHandler::HandleListAIAgentCommand(const char* args, WorldSession *m_ses
 	sstext << "agentlist of creature: " << target->GetGUIDLow() << " " << target->GetGUIDHigh() << '\n';
 
 	std::stringstream ss;
-	ss << "SELECT * FROM ai_agents where entryId=" << target->GetUInt32Value(OBJECT_FIELD_ENTRY);
+	ss << "SELECT * FROM ai_agents where entry=" << target->GetUInt32Value(OBJECT_FIELD_ENTRY);
 	QueryResult *result = WorldDatabase.Query( ss.str().c_str() );
 
 	if( !result )
