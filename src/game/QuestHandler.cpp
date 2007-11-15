@@ -343,6 +343,10 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 			{
 				delete item;
 			}
+			else
+				SendItemPushResult(item, false, true, false, true, 
+				_player->GetItemInterface()->LastSearchItemBagSlot(), _player->GetItemInterface()->LastSearchItemSlot(),
+				1);
 		}
 	}
 

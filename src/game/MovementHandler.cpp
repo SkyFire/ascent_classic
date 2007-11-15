@@ -331,13 +331,13 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Anti-Fall Damage                                                     */
 		/************************************************************************/
-		if(movement_info.flags & MOVEFLAG_FALLING_FAR && (!movement_info.FallTime) && sWorld.antihack_falldmg &&
+		/*if(movement_info.flags & MOVEFLAG_FALLING_FAR && (!movement_info.FallTime) && sWorld.antihack_falldmg &&
 			!_player->bSafeFall && !_player->GodModeCheat)
 		{
 			sCheatLog.writefromsession(this, "Used fall damage hack, falltime is 0 and flags are %u", movement_info.flags);
 			Disconnect();
 			return;
-		}
+		}*/
 
 		/************************************************************************/
 		/* Anti-"Classic" Fly                                                   */

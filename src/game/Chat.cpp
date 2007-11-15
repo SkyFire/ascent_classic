@@ -1047,6 +1047,15 @@ bool ChatHandler::CmdSetValueField(WorldSession *m_session, uint32 field, uint32
 			if(field == UNIT_FIELD_BASE_HEALTH) 
 				cr->SetUInt32Value(UNIT_FIELD_HEALTH, av);
 
+			switch(field)
+			{
+			case UNIT_FIELD_FACTIONTEMPLATE:
+				{
+					if(cr->m_spawn)
+						WorldDatabase.Execute("UPDATE creature_spawns SET faction = %u WHERE entry = %u", av, cr->m_spawn->entry);
+				}break;
+			}
+
 			cr->SetUInt32Value(field, av);
 
 			if(fieldmax) {

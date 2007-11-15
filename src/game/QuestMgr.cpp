@@ -296,7 +296,9 @@ void QuestMgr::BuildOfferReward(WorldPacket *data, Quest* qst, Object* qst_giver
 
 	*data << qst->reward_money;
 	*data << qst->reward_spell;
-	*data << uint32(8);
+	*data << uint32(0);
+	*data << uint32(0);
+	*data << uint32(0);
 	*data << uint32(0);
 	*data << uint32(0);
 }
