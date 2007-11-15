@@ -4109,7 +4109,7 @@ uint32 Unit::AddAuraVisual(uint32 spellid, uint32 count, bool positive)
 	uint32 value1 = (uint32)setflag << aurapos;
 	value |= value1;*/
 	uint8 aurapos = (free%4)*8;
-	value &= (0xFF<<aurapos);
+	value &= ~(0xFF<<aurapos);
 	if(positive)
 		value |= (0x1F<<aurapos);
 	else
@@ -4154,7 +4154,7 @@ void Unit::RemoveAuraVisual(uint32 spellid, uint32 count)
 				uint32 value1 = ~( (uint32)0xF << aurapos );
 				value &= value1;*/
 				uint8 aurapos = (x%4)*8;
-				value &= (0xFF<<aurapos);
+				value &= ~(0xFF<<aurapos);
 				SetUInt32Value(UNIT_FIELD_AURAFLAGS + flagslot,value);
 				SetUInt32Value(UNIT_FIELD_AURA + x, 0);
 				SetAuraSlotLevel(x, false);
