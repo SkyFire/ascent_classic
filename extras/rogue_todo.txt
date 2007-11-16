@@ -31,16 +31,6 @@ Ruthlesness ads 2 combo points (again)
 
 Rogue - Relentless Strikes - procs 2 times ?
 
-Mace Specialization gives Rogues a passive chance on hit to stun an enemy for 3 seconds while wielding a mace. It also increases Weapon Skill with maces by 2 per rank taken.
-Prerequisites: Combat 20 (Minumum Level: 29)
-Rank Effect
-Rank 1/5 +1% Chance and 2 mace skill
-Rank 2/5 +2% Chance and 4 mace skill
-Rank 3/5 +3% Chance and 6 mace skill
-Rank 4/5 +4% Chance and 8 mace skill
-Rank 5/5 +6% Chance and 10 mace skill
-http://www.wowwiki.com/Mace_Specialization
-
 Assassination
 
 1.Murder
@@ -54,9 +44,6 @@ Rank Effect
 2 While affected by your Kidney Shot ability, target receives an additional 6% damage from all sources.
 3 While affected by your Kidney Shot ability, target receives an additional 9% damage from all sources
 
-8.Mutilate ( the problem here is -> No increasing damage from poisons, no increasing dmg from opportunity and no increasing critical strike dmg from lethality )
-Instantly attacks with both weapons for an additional X damage with each weapon. Damage is increased by 50% against Poisoned targets. Must be behind the target. Awards 2 combo points.
-
 9.Deadened Nerves ( this probably not working, should be seen from ascent )
 Rank Effect
 1 Decreases all physical damage taken by 1%.
@@ -66,9 +53,6 @@ Rank Effect
 5 Decreases all physical damage taken by 5%
 
 Combat
-
-3. Sword Specialization ( this was fixed and was working correctly since update to 2.2.2...something happened and stop working.
-Gives you a 1/2/3/4/5% chance to get an extra attack on the same target after dealing damage with your Sword.
 
 4. Nerves of Steel ( this talent not working probably cuz there is no Stub/Fear resist system.
 Increases your chance to resist Stun and Fear effects by an additional 5/10%.

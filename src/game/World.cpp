@@ -626,6 +626,7 @@ bool World::SetInitialWorldSettings()
 			sp->c_is_flags |= SPELL_FLAG_IS_HEALING;
 		if(IsTargetingStealthed(sp))
 			sp->c_is_flags |= SPELL_FLAG_IS_TARGETINGSTEALTHED;
+		
 
 		//stupid spell ranking problem
 		if(sp->spellLevel==0)
@@ -1234,15 +1235,30 @@ bool World::SetInitialWorldSettings()
 			sp->proc_interval = 10000; //10 seconds
 		//don't change to namehash since we are searching only a protion of the name
  		else if(strstr(nametext, "Crippling Poison"))
+		{
 			sp->SpellGroupType |= 16384; //some of them do have the flags but i's hard to write down those some from 130 spells
+			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
 		else if(strstr(nametext, "Mind-Numbing Poison"))
+		{
 			sp->SpellGroupType |= 32768; //some of them do have the flags but i's hard to write down those some from 130 spells
+			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
 		else if(strstr(nametext, "Instant Poison"))
+		{
 			sp->SpellGroupType |= 8192; //some of them do have the flags but i's hard to write down those some from 130 spells
+			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
 		else if(strstr(nametext, "Deadly Poison"))
+		{
 			sp->SpellGroupType |= 65536; //some of them do have the flags but i's hard to write down those some from 130 spells
+			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
 		else if(strstr(nametext, "Wound Poison"))
+		{
 			sp->SpellGroupType |= 268435456; //some of them do have the flags but i's hard to write down those some from 130 spells
+			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
 /*		else if(strstr(nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if(strstr(nametext, "Blinding Powder"))

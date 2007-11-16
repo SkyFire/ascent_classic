@@ -4092,6 +4092,17 @@ bool Unit::HasNegativeAura(uint32 spell_id)
 	return false;
 }
 
+bool Unit::IsPoisoned()
+{
+	for(uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
+	{
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_POISON)
+			return true;
+	}
+
+	return false;
+}
+
 uint32 Unit::AddAuraVisual(uint32 spellid, uint32 count, bool positive)
 {
 	int32 free = -1;

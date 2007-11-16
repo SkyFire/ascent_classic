@@ -4162,6 +4162,10 @@ void Spell::SpellEffectDummyMelee(uint32 i) // Normalized Weapon damage +
 		return;
 	}
    
+	//rogue - mutilate ads dmg if target is poisoned
+	if(	m_spellInfo->NameHash == 0x4637B2D2 && unitTarget->IsPoisoned())
+		damage = damage + damage*0.5f;
+
 	u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:0,m_spellInfo,damage,0,0, false,true);
 
 }

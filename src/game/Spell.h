@@ -961,6 +961,7 @@ enum SpellIsFlags
     SPELL_FLAG_IS_HEALING				= 0x00000002,
     SPELL_FLAG_IS_TARGETINGSTEALTHED	= 0x00000004,
     SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE	= 0x00000008, //it started with rogue cold blood but i'm sure others will come
+    SPELL_FLAG_IS_POISON				= 0x00000010, //rogue has a few spells that can stack so can;t use the spell_type enum ;)
 };
 
 inline bool CanAgroHash(uint32 spellhashname)
