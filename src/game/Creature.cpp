@@ -441,7 +441,24 @@ void Creature::AddToWorld()
 	if(m_faction == 0 || m_factionDBC == 0)
 		return;
 
-	Unit::AddToWorld();
+	Object::AddToWorld();
+}
+
+void Creature::AddToWorld(MapMgr * pMapMgr)
+{
+	// force set faction
+	if(m_faction == 0 || m_factionDBC == 0)
+		_setFaction();
+
+	if(creature_info == 0)
+		creature_info = CreatureNameStorage.LookupEntry(GetEntry());
+
+	if(creature_info == 0) return;
+
+	if(m_faction == 0 || m_factionDBC == 0)
+		return;
+
+	Object::AddToWorld(pMapMgr);
 }
 
 bool Creature::CanAddToWorld()

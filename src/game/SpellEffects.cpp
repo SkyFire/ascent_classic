@@ -1354,7 +1354,7 @@ void Spell::SpellEffectAddExtraAttacks(uint32 i) // Add Extra Attacks
 {
 	if(!u_caster)
 		return;
-	u_caster->m_extraattacks = damage;		
+	u_caster->m_extraattacks += damage;		
 }
 
 void Spell::SpellEffectDodge(uint32 i)
@@ -2075,11 +2075,11 @@ void Spell::SpellEffectOpenLockItem(uint32 i)
 	if(!caster && i_caster)
 		caster = i_caster->GetOwner();
 
-	if(!gameObjTarget) 
+	if(!gameObjTarget || !gameObjTarget->IsInWorld()) 
 		return;
 	
 	gameObjTarget->SetUInt32Value(GAMEOBJECT_STATE,0);
-	if(gameObjTarget->GetMapId() == 0 || gameObjTarget->GetMapId() == 1)//dont close doors for instances
+	if(gameObjTarget->GetMapMgr()->GetMapInfo()->type==INSTANCE_NULL)//dont close doors for instances
 		sEventMgr.AddEvent(gameObjTarget,&GameObject::EventCloseDoor,EVENT_GAMEOBJECT_DOOR_CLOSE,10000,1,0);
 }
 

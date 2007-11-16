@@ -1239,6 +1239,7 @@ void Spell::cast(bool check)
 				}
 			}
 			bool isDuelEffect = false;
+			uint32 spellid = m_spellInfo->Id;
 
             // if the spell is not reflected
 			if(!IsReflected())

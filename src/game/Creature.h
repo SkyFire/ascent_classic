@@ -248,6 +248,7 @@ public:
 	void Load(CreatureProto * proto_, float x, float y, float z);
 
 	void AddToWorld();
+	void AddToWorld(MapMgr * pMapMgr);
 	void RemoveFromWorld(bool addrespawnevent, bool free_guid);
 
 	/// Creation

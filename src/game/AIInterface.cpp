@@ -1476,6 +1476,7 @@ bool AIInterface::FindFriends(float dist)
 	uint32 family = (((Creature*)m_Unit)->GetCreatureName()) ? (((Creature*)m_Unit)->GetCreatureName()->Type) : 0;
 	if(family == HUMANOID && civilian && getMSTime() > m_guardTimer && !IS_INSTANCE(m_Unit->GetMapId()))
 	{
+		m_guardTimer = getMSTime() + 15000;
 		uint16 AreaId = m_Unit->GetMapMgr()->GetAreaID(m_Unit->GetPositionX(),m_Unit->GetPositionY());
 		AreaTable * at = dbcArea.LookupEntry(AreaId);
 		if(!at)
@@ -1492,8 +1493,6 @@ bool AIInterface::FindFriends(float dist)
 		if(team == 1) guardid = zoneSpawn->HordeEntry;
 		if(!guardid) return result;
 
-		uint32 languageid = (team == 0) ? LANG_COMMON : LANG_ORCISH;
-		m_Unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, languageid, "Guards, help me!");
 		CreatureInfo * ci = CreatureNameStorage.LookupEntry(guardid);
 		if(!ci)
 			return result;
@@ -1507,6 +1506,9 @@ bool AIInterface::FindFriends(float dist)
 
 		CreatureProto * cp = CreatureProtoStorage.LookupEntry(guardid);
 		if(!cp) return result;
+
+		uint32 languageid = (team == 0) ? LANG_COMMON : LANG_ORCISH;
+		m_Unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, languageid, "Guards, help me!");
 
 		for(size_t i = 1; i <= m_Unit->GetInRangeOppFactCount(); i++)
 		{
@@ -1526,7 +1528,7 @@ bool AIInterface::FindFriends(float dist)
 				if(t==0)
 					guard->PushToWorld(m_Unit->GetMapMgr());
 				else
-					sEventMgr.AddEvent(((Object*)guard), &Object::PushToWorld, m_Unit->GetMapMgr(), EVENT_UNK, t, 1, 0);
+					sEventMgr.AddEvent(guard,&Creature::AddToWorld, m_Unit->GetMapMgr(), EVENT_UNK, t, 1, 0);
 			}
 			else
 			{
@@ -1538,8 +1540,6 @@ bool AIInterface::FindFriends(float dist)
 			sEventMgr.AddEvent(guard, &Creature::SafeDelete, EVENT_CREATURE_SAFE_DELETE, 60*5*1000, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
 		}
-
-		m_guardTimer = getMSTime() + 15000;
 	}
 
 	return result;

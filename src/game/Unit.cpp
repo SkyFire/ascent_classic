@@ -3959,11 +3959,6 @@ AuraCheckResponse Unit::AuraCheck(uint32 name_hash, uint32 rank, Aura* aur)
 	return resp;
 }
 
-void Unit::AddToWorld()
-{
-	Object::AddToWorld();
-}
-
 void Unit::OnPushToWorld()
 {
 	for(uint32 x = 0; x < MAX_AURAS+MAX_PASSIVE_AURAS; ++x)

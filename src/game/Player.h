@@ -721,6 +721,7 @@ public:
 	void SetSpellTargetType(uint32 Type, Unit* target);
 
 	void AddToWorld();
+	void AddToWorld(MapMgr * pMapMgr);
 	void RemoveFromWorld();
 	bool Create ( WorldPacket &data );
 	

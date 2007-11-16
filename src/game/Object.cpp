@@ -914,6 +914,23 @@ void Object::AddToWorld()
 
 	mSemaphoreTeleport = false;
 }
+
+void Object::AddToWorld(MapMgr * pMapMgr)
+{
+	if(!pMapMgr)
+		return; //instance add failed
+
+	m_mapMgr = pMapMgr;
+	m_inQueue = true;
+
+	pMapMgr->AddObject(this);
+
+	// correct incorrect instance id's
+	m_instanceId = pMapMgr->GetInstanceID();
+
+	mSemaphoreTeleport = false;
+}
+
 //Unlike addtoworld it pushes it directly ignoring add pool
 //this can only be called from the thread of mapmgr!!!
 void Object::PushToWorld(MapMgr*mgr)

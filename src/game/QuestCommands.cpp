@@ -653,6 +653,8 @@ bool ChatHandler::HandleQuestListCommand(const char * args, WorldSession * m_ses
 			uint32 quest_id = fields[0].GetUInt32();
 
 			qst = QuestStorage.LookupEntry(quest_id);
+			if(qst==NULL)
+				continue;
 
 			string qid  = MyConvertIntToString(quest_id);
 			const char * qname = qst->title;

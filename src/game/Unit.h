@@ -666,7 +666,6 @@ public:
 	friend class Aura;
 
 	virtual void Update( uint32 time );
-	virtual void AddToWorld();
 	virtual void RemoveFromWorld(bool free_guid);
 	virtual void OnPushToWorld();
 

@@ -3037,8 +3037,40 @@ void Player::AddToWorld()
 		return;
 
 	m_beingPushed = true;
-	Unit::AddToWorld();
+	Object::AddToWorld();
 	
+	// Add failed.
+	if(m_mapMgr == NULL)
+	{
+		// eject from instance
+		m_beingPushed = false;
+		EjectFromInstance();
+		return;
+	}
+
+	if(m_session)
+		m_session->SetInstance(m_mapMgr->GetInstanceID());
+}
+
+void Player::AddToWorld(MapMgr * pMapMgr)
+{
+	FlyCheat = false;
+	// check transporter
+	if(m_TransporterGUID && m_CurrentTransporter)
+	{
+		SetPosition(m_CurrentTransporter->GetPositionX() + m_TransporterX,
+			m_CurrentTransporter->GetPositionY() + m_TransporterY,
+			m_CurrentTransporter->GetPositionZ() + m_TransporterZ,
+			GetOrientation(), false);
+	}
+
+	// If we join an invalid instance and get booted out, this will prevent our stats from doubling :P
+	if(IsInWorld())
+		return;
+
+	m_beingPushed = true;
+	Object::AddToWorld(pMapMgr);
+
 	// Add failed.
 	if(m_mapMgr == NULL)
 	{

@@ -111,6 +111,7 @@ public:
 	
 	inline bool IsInWorld() { return m_mapMgr != NULL; }
 	virtual void AddToWorld();
+	virtual void AddToWorld(MapMgr * pMapMgr);
 	void PushToWorld(MapMgr*);
 	virtual void OnPushToWorld() { }
 	virtual void RemoveFromWorld(bool free_guid);
