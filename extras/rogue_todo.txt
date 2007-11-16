@@ -67,11 +67,6 @@ Rank Effect
 
 Combat
 
-1.Improved Sprint
-Rank Effect
-1 Gives a 50% chance to remove all movement impairing effects when you activate your Sprint ability.
-2 Gives a 100% chance to remove all movement impairing effects when you activate your Sprint ability
-
 2.Mace Specialization ( GOD, THIS IS THE BEST COMBAT SPEC...Mace rogue...i hope someone will fix it )
 Rank Effect
 Rank 1/5 +1% Chance and 2 mace skill

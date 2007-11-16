@@ -1010,6 +1010,14 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								SpellNonMeleeDamageLog(victim,power_word_id, tdmg, false, true);
 								continue;
 							}break;
+						//rogue - improved sprint
+						case 30918:
+							{
+								if(!CastingSpell)
+									continue;
+								if (CastingSpell->NameHash!=0x59EEF122 || victim!=this) //sprint
+									continue;
+							}break;
 						//rogue - combat potency
 						case 35542:
 						case 35545:

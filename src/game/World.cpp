@@ -2385,14 +2385,13 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(13743);
 	if(sp)
 	{
-		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 		sp->procChance = 50;
 	}
 	sp = dbcSpell.LookupEntry(13875);
 	if(sp)
 	{
-		sp->EffectApplyAuraName[0] = 42;
+		sp->procChance = 100;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
 	//warlock: Shadow Mastery
