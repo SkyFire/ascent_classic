@@ -318,7 +318,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Anti-Fly                                                             */
 		/************************************************************************/
-		if(sWorld.antihack_flight && !_player->FlyCheat && (movement_info.flags & MOVEFLAG_FLYING ||
+		/*if(sWorld.antihack_flight && !_player->FlyCheat && (movement_info.flags & MOVEFLAG_FLYING ||
 			movement_info.flags & MOVEFLAG_AIR_SWIMMING) &&
 			!(movement_info.flags & MOVEFLAG_FALLING) && !(movement_info.flags & MOVEFLAG_TAXI) &&
 			time_t(_player->_delayAntiFlyUntil) < UNIXTIME)
@@ -326,7 +326,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			sCheatLog.writefromsession(this, "Used flying hack {1}, movement flags: %u", movement_info.flags);
 			Disconnect();
 			return;
-		}
+		}*/
 
 		/************************************************************************/
 		/* Anti-Fall Damage                                                     */
@@ -352,12 +352,12 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Anti-Water Walk                                                      */
 		/************************************************************************/
-		if(movement_info.flags & MOVEFLAG_WATER_WALK && !_player->m_waterwalk)
+		/*if(movement_info.flags & MOVEFLAG_WATER_WALK && !_player->m_waterwalk)
 		{
 			sCheatLog.writefromsession(this, "Used waterwalk hack {1}, movement flags: %u", movement_info.flags);
 			Disconnect();
 			return;
-		}
+		}*/
 
 		//printf("Flags: 0x%.8X FallTime %u, Opcode: %u %s\n", movement_info.flags, movement_info.FallTime, recv_data.GetOpcode(), LookupName(recv_data.GetOpcode(), g_worldOpcodeNames));
 	}
