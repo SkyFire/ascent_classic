@@ -48,16 +48,11 @@ Rank Effect
 1 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 1%.
 2 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 2%.
 
-5.Improved Kidney Shot
+5.Improved Kidney Shot - nasty , should add a new effect to kidney shot spell 
 Rank Effect
 1 While affected by your Kidney Shot ability, target receives an additional 3% damage from all sources.
 2 While affected by your Kidney Shot ability, target receives an additional 6% damage from all sources.
 3 While affected by your Kidney Shot ability, target receives an additional 9% damage from all sources
-
-6.Master Poisoner
-Rank Effect
-1 Reduces the chance your Poisons will be resisted by 5% and increases your chance to resist Poison effects by an additional 15%.
-2 Reduces the chance your poisons will be resisted by 10% and increases your chance to resist poison effects by an additional 30%.
 
 7.Find Weakness ( you get buff for 10 sec )
 Rank Effect

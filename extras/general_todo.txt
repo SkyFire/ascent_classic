@@ -130,6 +130,7 @@ Zack - test my shit :
 - rogue - Improved Expose Armor 14169
 - rogue - Vile Poisons 16720
 - rogue - Improved Poisons 14117
+- rogue - Master Poisoner 31227
 
 ==========================================================================
 Capt - test my shit :

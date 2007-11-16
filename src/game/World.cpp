@@ -1820,6 +1820,14 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=524288;
 
+	//rogue - Master Poisoner.
+	sp = dbcSpell.LookupEntry(31226); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+	sp = dbcSpell.LookupEntry(31227); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+
 	//rogue - Dirty Tricks 
 	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
 	uint32 DT_grouprelation;
