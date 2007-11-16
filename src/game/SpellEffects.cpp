@@ -1416,12 +1416,22 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			item_count = damage;
 
 		//conjure water ranks 7,8 & 9 and conjure food ranks 7 & 8 have different starting amounts
+		// tailoring specializations get +1 cloth bonus
 		switch(m_spellInfo->Id)
 		{
 		case 27389: //Conjure Food 7
 		case 10140: //Conjure Water 7
 		case 37420: //Conjure Water 8
 			item_count += 8;
+			break;
+		case 36686: //Shadowcloth
+			if(p_caster->HasSpell(26801)) item_count += 1;
+			break;
+		case 26751: // Primal Mooncloth
+			if(p_caster->HasSpell(26798)) item_count += 1;
+			break;
+		case 31373: //Spellcloth
+			if(p_caster->HasSpell(26797)) item_count += 1;
 			break;
 		}
 
