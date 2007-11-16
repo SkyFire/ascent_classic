@@ -623,7 +623,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						}break;
 						case 5530:
 						{
-							//warrior mace specialization can trigger only when using maces
+							//warrior/rogue mace specialization can trigger only when using maces
 							Item *it;
 							if(static_cast<Player*>(this)->GetItemInterface())
 							{

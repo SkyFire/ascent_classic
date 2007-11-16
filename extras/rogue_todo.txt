@@ -67,14 +67,6 @@ Rank Effect
 
 Combat
 
-2.Mace Specialization ( GOD, THIS IS THE BEST COMBAT SPEC...Mace rogue...i hope someone will fix it )
-Rank Effect
-Rank 1/5 +1% Chance and 2 mace skill
-Rank 2/5 +2% Chance and 4 mace skill
-Rank 3/5 +3% Chance and 6 mace skill
-Rank 4/5 +4% Chance and 8 mace skill
-Rank 5/5 +6% Chance and 10 mace skill
-
 3. Sword Specialization ( this was fixed and was working correctly since update to 2.2.2...something happened and stop working.
 Gives you a 1/2/3/4/5% chance to get an extra attack on the same target after dealing damage with your Sword.
 

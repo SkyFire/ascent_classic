@@ -1903,6 +1903,23 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 4194304;
 	}
 
+	//rogue - Mace Specialization.
+	sp = dbcSpell.LookupEntry(13709); 
+	if(sp)
+		sp->procFlags=PROC_ON_MELEE_ATTACK;
+	sp = dbcSpell.LookupEntry(13800); 
+	if(sp)
+		sp->procFlags=PROC_ON_MELEE_ATTACK;
+	sp = dbcSpell.LookupEntry(13801); 
+	if(sp)
+		sp->procFlags=PROC_ON_MELEE_ATTACK;
+	sp = dbcSpell.LookupEntry(13802); 
+	if(sp)
+		sp->procFlags=PROC_ON_MELEE_ATTACK;
+	sp = dbcSpell.LookupEntry(13803); 
+	if(sp)
+		sp->procFlags=PROC_ON_MELEE_ATTACK;
+
 	//rogue - Dirty Tricks 
 	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
 	uint32 DT_grouprelation;
