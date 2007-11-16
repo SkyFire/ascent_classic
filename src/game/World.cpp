@@ -1759,7 +1759,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(14168); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456; //poisons. Duuuh
 		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
 		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
 	}
@@ -1827,6 +1827,40 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(31227); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+
+	//rogue - Find Weakness.
+	sp = dbcSpell.LookupEntry(31233); 
+	if(sp)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	sp = dbcSpell.LookupEntry(31239); 
+	if(sp)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	sp = dbcSpell.LookupEntry(31240); 
+	if(sp)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	sp = dbcSpell.LookupEntry(31241); 
+	if(sp)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	sp = dbcSpell.LookupEntry(31242); 
+	if(sp)
+		sp->procFlags=PROC_ON_CAST_SPELL;
+	//rogue - Find Weakness. The effect
+	sp = dbcSpell.LookupEntry(31234); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+	sp = dbcSpell.LookupEntry(31235); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+	sp = dbcSpell.LookupEntry(31236); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+	sp = dbcSpell.LookupEntry(31237); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+	sp = dbcSpell.LookupEntry(31238); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+	
 
 	//rogue - Dirty Tricks 
 	sp = dbcSpell.LookupEntry(2094);//rogue - blind 

@@ -36,3 +36,7 @@ where name like "%Improved Expose Armor%";
 
 #////////////////// rogue poisons - blame wowwiki if something is wrong 
 select id,name,description,school,SpellGroupType,namehash from dbc_spell where name like "%Crippling Poison%" or name like "%Mind-Numbing Poison%" or name like "%Instant Poison%" or name like "%Deadly Poison%" or name like "%Wound Poison%" or name like "%Anesthetic Poison%" or name like "%Blinding Powder%";
+
+#////////////////// rogue spells
+#select id,name,description,SpellGroupType,Effect_1,Effect_2,Effect_3,EffectApplyAuraName_1,EffectApplyAuraName_2,EffectApplyAuraName_3,EffectSpellGroupRelation_1,EffectSpellGroupRelation_1,EffectSpellGroupRelation_3,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3,EffectTriggerSpell_1,EffectTriggerSpell_2,EffectTriggerSpell_3 from dbc_spell 
+#where id in (21835, 3421 ,27282, 26892 ,11400 ,27283 ,13750 ,27441 ,268 ,13877, 2094 ,1833 ,31224 ,14177 ,26679 ,2836 ,1842 ,1725 ,32684 ,26669 ,26865 ,26866 ,27448 ,26884 ,14278 ,38764 ,26864 ,27099 ,38768 ,8643 ,34413 ,1804 ,921 ,2842 ,14183 ,14185 ,14251 ,26867 ,1860 ,11297 ,36554 ,5938 ,26862 ,6774 ,11305 ,1787 ,26889)

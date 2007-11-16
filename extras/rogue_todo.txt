@@ -54,14 +54,6 @@ Rank Effect
 2 While affected by your Kidney Shot ability, target receives an additional 6% damage from all sources.
 3 While affected by your Kidney Shot ability, target receives an additional 9% damage from all sources
 
-7.Find Weakness ( you get buff for 10 sec )
-Rank Effect
-1 Your Finishing moves increase the damage of all offensive abilities by 2% for 10 seconds.
-2 Your Finishing moves increase the damage of all offensive abilities by 4% for 10 seconds.
-3 Your Finishing moves increase the damage of all offensive abilities by 6% for 10 seconds.
-4 Your Finishing moves increase the damage of all offensive abilities by 8% for 10 seconds.
-5 Your Finishing moves increase the damage of all offensive abilities by 10% for 10 seconds.
-
 8.Mutilate ( the problem here is -> No increasing damage from poisons, no increasing dmg from opportunity and no increasing critical strike dmg from lethality )
 Instantly attacks with both weapons for an additional X damage with each weapon. Damage is increased by 50% against Poisoned targets. Must be behind the target. Awards 2 combo points.
 
