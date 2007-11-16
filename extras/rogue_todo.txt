@@ -48,14 +48,6 @@ Rank Effect
 1 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 1%.
 2 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 2%.
 
-4.Improved Poisons ( some people think this talent works, but if he works -> he should change visual the % to cast poison on enemy when you move your mouse to icon of some poison -> but thats not happen, so not working )
-Rank Effect
-1 Increases the chance to apply Poisons to your target by 2%.
-2 Increases the chance to apply poisons to your target by 4%.
-3 Increases the chance to apply poisons to your target by 6%.
-4 Increases the chance to apply poisons to your target by 8%.
-5 Increases the chance to apply poisons to your target by 10%.
-
 5.Improved Kidney Shot
 Rank Effect
 1 While affected by your Kidney Shot ability, target receives an additional 3% damage from all sources.

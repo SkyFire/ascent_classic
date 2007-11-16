@@ -1792,6 +1792,26 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
 	}
 
+	//rogue - Improved Poisons
+	sp = dbcSpell.LookupEntry(14113); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+	sp = dbcSpell.LookupEntry(14114); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+	sp = dbcSpell.LookupEntry(14115); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+	sp = dbcSpell.LookupEntry(14116); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+	sp = dbcSpell.LookupEntry(14117); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+	sp = dbcSpell.LookupEntry(21881); 
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+
 	//rogue - Improved Expose Armor
 	sp = dbcSpell.LookupEntry(14168); 
 	if(sp)
