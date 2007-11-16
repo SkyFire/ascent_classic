@@ -132,6 +132,7 @@ Zack - test my shit :
 - rogue - Improved Poisons 14117
 - rogue - Master Poisoner 31227
 - rogue - Find Weakness 31242
+- rogue - Camouflage 14065
 
 ==========================================================================
 Capt - test my shit :

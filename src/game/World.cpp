@@ -1861,6 +1861,47 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
 	
+	//rogue - Camouflage.
+	sp = dbcSpell.LookupEntry(13975); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectSpellGroupRelation[1] = 4194304;
+	}
+	sp = dbcSpell.LookupEntry(14062); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectSpellGroupRelation[1] = 4194304;
+	}
+	sp = dbcSpell.LookupEntry(14063); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectSpellGroupRelation[1] = 4194304;
+	}
+	sp = dbcSpell.LookupEntry(14064); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectSpellGroupRelation[1] = 4194304;
+	}
+	sp = dbcSpell.LookupEntry(14065); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectSpellGroupRelation[1] = 4194304;
+	}
 
 	//rogue - Dirty Tricks 
 	sp = dbcSpell.LookupEntry(2094);//rogue - blind 

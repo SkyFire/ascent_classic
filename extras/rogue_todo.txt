@@ -94,9 +94,6 @@ Subtlety
 1.Sleight of Hand
 Reduces the chance you are critically hit by melee and ranged attacks by 1/2% and increases the threat reduced by your Feint ability by 10/20%.
 
-2.Camouflage
-ncreases your speed while stealthed by 3/6/9/12/15% and reduces the cooldown of your Stealth ability by 1/2/3/4/5 seconds.
-
 3.Serrated Blades ( probably one of the best subtlety passive talents )
 Causes your attacks to ignore 1.67/3.34/5 armor/level of your target's Armor and increases the damage dealt by your Rupture ability by 10/20/30%. The amount of Armor reduced increases with your level.
 
