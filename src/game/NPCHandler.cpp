@@ -119,7 +119,17 @@ void WorldSession::HandleTrainerListOpcode( WorldPacket & recv_data )
 void WorldSession::SendTrainerList(Creature* pCreature)
 {
 	Trainer * pTrainer = pCreature->GetTrainer();
-	if(pTrainer == 0 || !CanTrainAt(_player, pTrainer)) return;
+	//if(pTrainer == 0 || !CanTrainAt(_player, pTrainer)) return;
+	if(pTrainer==0)
+		return;
+
+	if(!CanTrainAt(_player,pTrainer))
+	{
+		GossipMenu * pMenu;
+		objmgr.CreateGossipMenuForPlayer(&pMenu,pCreature->GetGUID(),pTrainer->Cannot_Train_GossipTextId,_player);
+		pMenu->SendTo(_player);
+		return;
+	}
 
 	WorldPacket data(SMSG_TRAINER_LIST, 5000);
 	TrainerSpell * pSpell;

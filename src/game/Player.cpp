@@ -3505,14 +3505,36 @@ void Player::SetMovement(uint8 pType, uint32 flag)
 
 void Player::SetPlayerSpeed(uint8 SpeedType, float value)
 {
-	WorldPacket data(18);
+	/*WorldPacket data(18);
 	data << GetNewGUID();
 	data << m_speedChangeCounter++;
 	
 	if(SpeedType == RUN)			// nfi what this is.. :/
 		data << uint8(1);
 
-	data << value;
+	data << value;*/
+	WorldPacket data(50);
+	if(SpeedType==FLY)
+	{
+		data << GetNewGUID();
+		data << m_speedChangeCounter++;
+
+		if(SpeedType == RUN)			// nfi what this is.. :/
+			data << uint8(1);
+
+		data << value;
+	}
+	else
+	{
+		data << GetNewGUID();
+		data << uint32(0);
+		data << uint8(0);
+		data << uint32(getMSTime());
+		data << GetPosition();
+		data << m_position.o;
+		data << uint32(0);
+		data << value;
+	}
 	
 	switch(SpeedType)
 	{
@@ -3521,7 +3543,7 @@ void Player::SetPlayerSpeed(uint8 SpeedType, float value)
 			if(value == m_lastRunSpeed)
 				return;
 
-			data.SetOpcode(SMSG_FORCE_RUN_SPEED_CHANGE);
+			data.SetOpcode(MSG_MOVE_SET_RUN_SPEED);
 			m_runSpeed = value;
 			m_lastRunSpeed = value;
 		}break;
@@ -3530,7 +3552,7 @@ void Player::SetPlayerSpeed(uint8 SpeedType, float value)
 			if(value == m_lastRunBackSpeed)
 				return;
 
-			data.SetOpcode(SMSG_FORCE_RUN_BACK_SPEED_CHANGE);
+			data.SetOpcode(MSG_MOVE_SET_RUN_BACK_SPEED);
 			m_backWalkSpeed = value;
 			m_lastRunBackSpeed = value;
 		}break;
@@ -3539,7 +3561,7 @@ void Player::SetPlayerSpeed(uint8 SpeedType, float value)
 			if(value == m_lastSwimSpeed)
 				return;
 
-			data.SetOpcode(SMSG_FORCE_SWIM_SPEED_CHANGE);
+			data.SetOpcode(MSG_MOVE_SET_SWIM_SPEED);
 			m_swimSpeed = value;
 			m_lastSwimSpeed = value;
 		}break;

@@ -243,7 +243,7 @@ bool PatchJob::Update()
 	m_client->BurstEnd();
 
 	// no need to check the result here, could just be a full buffer and not necessarily a fatal error.
-	return m_bytesLeft;
+	return (m_bytesLeft>0)?true:false;
 }
 
 bool PatchMgr::InitiatePatch(Patch * pPatch, AuthSocket * pClient)
