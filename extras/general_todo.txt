@@ -128,6 +128,7 @@ Zack - test my shit :
 - mage - Empowered Fireball 31660
 - mage - Empowered Frostbolt 31686
 - rogue - Improved Expose Armor 14169
+- rogue - Vile Poisons 16720
 
 ==========================================================================
 Capt - test my shit :

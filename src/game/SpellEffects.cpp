@@ -1176,6 +1176,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	//check if we already have stronger aura
 	Aura *pAura;
 	std::map<uint32,Aura*>::iterator itr=unitTarget->tmpAura.find(m_spellInfo->Id);
+	//if we do not make a check to see if the aura owner is the same as the caster then we will stack the 2 auras and they will not be visible client sided
 	if(itr==unitTarget->tmpAura.end())
 	{
 		uint32 Duration=this->GetDuration();
@@ -1185,7 +1186,10 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 			::ApplyDiminishingReturnTimer(&Duration, unitTarget, m_spellInfo);
 
 		if(!Duration)
+		{
+			//maybe add some resist messege to client here ?
 			return;
+		}
 		if(g_caster && g_caster->GetUInt32Value(OBJECT_FIELD_CREATED_BY) && g_caster->m_summoner)
 			pAura=new Aura(m_spellInfo, Duration, g_caster->m_summoner, unitTarget);
 		else

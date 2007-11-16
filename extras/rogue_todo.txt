@@ -48,14 +48,6 @@ Rank Effect
 1 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 1%.
 2 Increases all damage caused against Humanoid, Giant, Beast, and Dragonkin targets by 2%.
 
-3.Vile Poisons
-Rank Effect
-1 Increases the damage dealt by your Poisons and Envenom ability by 4% and gives your poisons an additional 8% chance to resist Dispel effects.
-2 Increases the damage dealt by your poisons and Envenom ability by 8% and gives your poisons an additional 16% chance to resist dispel effects.
-3 Increases the damage dealt by your poisons and Envenom ability by 12% and gives your poisons an additional 24% chance to resist dispel effects.
-4 Increases the damage dealt by your poisons and Envenom ability by 16% and gives your poisons an additional 32% chance to resist dispel effects.
-5 Increases the damage dealt by your poisons and Envenom ability by 20% and gives your poisons an additional 40% chance to resist dispel effects.
-
 4.Improved Poisons ( some people think this talent works, but if he works -> he should change visual the % to cast poison on enemy when you move your mouse to icon of some poison -> but thats not happen, so not working )
 Rank Effect
 1 Increases the chance to apply Poisons to your target by 2%.

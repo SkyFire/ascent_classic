@@ -1232,6 +1232,21 @@ bool World::SetInitialWorldSettings()
 			sp->proc_interval = 10000; //10 seconds
 		else if(strstr(nametext, "Aviana's Purpose"))
 			sp->proc_interval = 10000; //10 seconds
+		//don't change to namehash since we are searching only a protion of the name
+ 		else if(strstr(nametext, "Crippling Poison"))
+			sp->SpellGroupType |= 16384; //some of them do have the flags but i's hard to write down those some from 130 spells
+		else if(strstr(nametext, "Mind-Numbing Poison"))
+			sp->SpellGroupType |= 32768; //some of them do have the flags but i's hard to write down those some from 130 spells
+		else if(strstr(nametext, "Instant Poison"))
+			sp->SpellGroupType |= 8192; //some of them do have the flags but i's hard to write down those some from 130 spells
+		else if(strstr(nametext, "Deadly Poison"))
+			sp->SpellGroupType |= 65536; //some of them do have the flags but i's hard to write down those some from 130 spells
+		else if(strstr(nametext, "Wound Poison"))
+			sp->SpellGroupType |= 268435456; //some of them do have the flags but i's hard to write down those some from 130 spells
+/*		else if(strstr(nametext, "Anesthetic Poison"))
+			sp->SpellGroupType |= 0; //not yet known ? 
+		else if(strstr(nametext, "Blinding Powder"))
+			sp->SpellGroupType |= 0; //not yet known ?*/
 //		else if(strstr(nametext, "Illumination"))
 //			sp->EffectTriggerSpell[0]=20272;
 		//sp->dummy=result;
@@ -1739,6 +1754,43 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(14066); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=Elusiveness_grouprelation;
+
+	//rogue - Vile Poisons
+	sp = dbcSpell.LookupEntry(14168); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+	}
+	sp = dbcSpell.LookupEntry(16514); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+	}
+	sp = dbcSpell.LookupEntry(16515); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+	}
+	sp = dbcSpell.LookupEntry(16719); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+	}
+	sp = dbcSpell.LookupEntry(16720); 
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+	}
 
 	//rogue - Improved Expose Armor
 	sp = dbcSpell.LookupEntry(14168); 
