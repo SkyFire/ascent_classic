@@ -49,6 +49,5 @@
  */
 //#define COLLISION 1
 
-
-
 #endif		// __ASCENTCONFIG_H
+
