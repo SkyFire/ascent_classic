@@ -62,7 +62,9 @@ MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>
 	pInstance = NULL;
 	thread_kill_only = false;
 	thread_running = false;
+#ifdef ENABLE_LUA_SCRIPTING
 	m_engine = LuaEngineMgr::getSingleton().GetLuaEngine();
+#endif
 }
 
 
@@ -116,7 +118,9 @@ MapMgr::~MapMgr()
 	}
 
 	Log.Notice("MapMgr", "Instance %u shutdown: Instance Closed Successfully. (MapId: %u)" , m_instanceID, _mapId);
+#ifdef ENABLE_LUA_SCRIPTING
 	LuaEngineMgr::getSingleton().FinishedWithLuaEngine(m_engine);
+#endif
 }
 
 

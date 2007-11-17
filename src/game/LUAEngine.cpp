@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 
+#ifdef ENABLE_LUA_SCRIPTING
+
 bool lua_is_starting_up = false;
 initialiseSingleton(LuaEngineMgr);
 
@@ -1690,3 +1692,5 @@ void LuaEngine::Restart()
 	LoadScripts();
 	m_Lock.Release();
 }
+
+#endif		// ENABLE_LUA_SCRIPTING

@@ -347,12 +347,14 @@ public:
 	GameObject * GetSqlIdGameObject(uint32 sqlid);
 	deque<uint32> _reusable_guids_gameobject;
 	deque<uint32> _reusable_guids_creature;
+#ifdef ENABLE_LUA_SCRIPTING
+	LuaEngine * m_engine;
 	inline LuaEngine* GetScriptEngine() { return m_engine; }
+#endif
 
 	bool forced_expire;
 	bool thread_kill_only;
 	bool thread_running;
-	LuaEngine * m_engine;
 };
 
 #endif

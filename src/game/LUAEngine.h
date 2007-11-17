@@ -21,6 +21,22 @@
 #ifndef __LUAENGINE_H
 #define __LUAENGINE_H
 
+#ifndef ENABLE_LUA_SCRIPTING
+
+/** Macros for calling lua-based events
+ */
+#define LUA_ON_UNIT_EVENT(unit,eventtype,miscunit,misc) 
+#define LUA_ON_GO_EVENT(go,evtype,miscunit) 
+#define LUA_CALL_FUNC(unit,funcname) 
+
+#else
+
+/** Macros for calling lua-based events
+ */
+#define LUA_ON_UNIT_EVENT(unit,eventtype,miscunit,misc) if(unit->GetTypeId()==TYPEID_UNIT && unit->IsInWorld()) { unit->GetMapMgr()->GetScriptEngine()->OnUnitEvent(unit,eventtype,miscunit,misc); }
+#define LUA_ON_GO_EVENT(unit,evtype,miscunit) if(unit->GetTypeId()==TYPEID_GAMEOBJECT && unit->IsInWorld()) { unit->GetMapMgr()->GetScriptEngine()->OnGameObjectEvent(unit,evtype,miscunit); }
+#define LUA_CALL_FUNC(unit,funcname) if(unit->GetTypeId()==TYPEID_UNIT && unit->IsInWorld()) { unit->GetMapMgr()->GetScriptEngine()->CallFunction(unit,funcname); }
+
 /** Quest Events
  */
 enum QuestEvents
@@ -131,5 +147,6 @@ public:
 	void ReloadScripts();
 };
 
+#endif
 #endif
 

@@ -243,10 +243,10 @@ void CreateDummySpell(uint32 id)
 
 bool World::SetInitialWorldSettings()
 {
-	//LuaEngine * l = new LuaEngine();
-	//l->LoadScripts();
+#ifdef ENABLE_LUA_SCRIPTING
 	new LuaEngineMgr;
 	LuaEngineMgr::getSingleton().Startup();
+#endif
 	Log.Line();
 
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");

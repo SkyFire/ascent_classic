@@ -502,8 +502,10 @@ bool Master::Run(int argc, char ** argv)
 	delete SocketGarbageCollector::getSingletonPtr();
 	delete VoiceChatHandler::getSingletonPtr();
 
+#ifdef ENABLE_LUA_SCRIPTING
 	sLog.outString("Deleting Script Engine...");
 	LuaEngineMgr::getSingleton().Unload();
+#endif
 	//delete ScriptSystem;
 
 	delete GMCommand_Log;

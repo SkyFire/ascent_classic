@@ -661,7 +661,7 @@ void GameObject::OnPushToWorld()
 {
 	Object::OnPushToWorld();
 	/* script */
-	m_mapMgr->GetScriptEngine()->OnGameObjectEvent(this,GAMEOBJECT_EVENT_ON_SPAWN,NULL);
+	LUA_ON_GO_EVENT(this,GAMEOBJECT_EVENT_ON_SPAWN,NULL);
 }
 
 void GameObject::OnRemoveInRangeObject(Object* pObj)

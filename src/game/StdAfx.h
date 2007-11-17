@@ -27,8 +27,6 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 };
 
 #define _GAME
-//#define CLUSTERING
-//#define COLLISION
 
 #include <list>
 #include <vector>
