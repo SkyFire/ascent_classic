@@ -32,6 +32,10 @@
 /** Enable/disable LUA scripting system.
  * Default: Disabled
  */
+
+#ifdef HAVE_LUASCRIPT
+#  define ENABLE_LUA_SCRIPTING 1
+#endif
 //#define ENABLE_LUA_SCRIPTING 1
 
 /** Enable/disable Ascent world server cluster support.

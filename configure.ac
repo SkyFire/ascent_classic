@@ -24,9 +24,10 @@ AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
 # autoheader templates
-AH_TEMPLATE([USE_EPOLL], [Define if you want to use the epoll socket engine module.])
-AH_TEMPLATE([USE_KQUEUE], [Define if you want to use the kqueue socket engine module.])
-AH_TEMPLATE([HAVE_DARWIN], [Define if you have MacOSX Darwin, to include the correct headers for kevent])
+AH_TEMPLATE([USE_EPOLL], Define if you want to use the epoll socket engine module.)
+AH_TEMPLATE([USE_KQUEUE], Define if you want to use the kqueue socket engine module.)
+AH_TEMPLATE([HAVE_DARWIN], Define if you have MacOSX Darwin, to include the correct headers for kevent)
+AH_TEMPLATE([HAVE_LUASCRIPT], Define if you want to enable lua scripting)
 
 # Default prefix
 AC_PREFIX_DEFAULT(`pwd`)
@@ -100,6 +101,14 @@ fi
 CPPFLAGS=""
 CFLAGS=""
 CXXFLAGS=""
+
+AC_ARG_ENABLE(lua_scripting,
+     AC_HELP_STRING([--enable-lua-scripting],[enable lua scripting])],
+     [ if test "x$enable_lua_scripting" = "xyes" ; then
+   	AC_DEFINE(HAVE_LUASCRIPT)
+       fi
+     ],
+)
 
 AC_ARG_ENABLE(gcov,
      AC_HELP_STRING([--enable-gcov],[enable codecovering])],
