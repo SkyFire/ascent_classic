@@ -20,6 +20,12 @@
 #include "LogonStdAfx.h"
 #include "../shared/Auth/MD5.h"
 
+#ifndef WIN32
+#include <fcntl.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#endif
+
 initialiseSingleton(PatchMgr);
 PatchMgr::PatchMgr()
 {
@@ -130,8 +136,7 @@ PatchMgr::PatchMgr()
 	while(filecount--)
 	{
 		snprintf(Buffer3,MAX_PATH*10,"./ClientPatches/%s",list[filecount]->d_name);
-		printf("Filename is: %s\n", Buffer3);
-		if(sscanf(fd.cFileName,"%4s%u.", locality, &srcversion) != 2)
+		if(sscanf(list[filecount]->d_name,"%4s%u.", locality, &srcversion) != 2)
 			continue;
 
 		read_fd = open(Buffer3, O_RDONLY);
@@ -141,7 +146,7 @@ PatchMgr::PatchMgr()
 			continue;
 		}
 
-		if(fstat(read_fd, &sb) <= 0)
+		if(fstat(read_fd, &sb) < 0)
 		{
 			printf("Cannot stat %s\n", Buffer3);
 			continue;
