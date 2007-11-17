@@ -100,6 +100,89 @@ PatchMgr::PatchMgr()
 	/* 
 	 *nix patch loader
 	 */
+	Log.Notice("PatchMgr", "Loading Patches...");
+	char Buffer[MAX_PATH*10];
+	char Buffer2[MAX_PATH*10];
+	char Buffer3[MAX_PATH*10];
+
+	struct dirent ** list;
+	int filecount;
+	uint32 count = 0;
+	int read_fd;
+	MD5Hash md5;
+	Patch * pPatch;
+	DWORD size,sizehigh;
+	uint32 srcversion;
+	char locality[5];
+	uint32 i;
+	struct stat sb;
+
+	strcpy(Buffer, "./ClientPatches");
+	strcpy(Buffer2,Buffer);
+
+	filecount = scandir("./ClientPatches", &list, 0, 0);
+	if(filecount <= 0 || list==NULL)
+	{
+		Log.Error("PatchMgr", "No patches found.");
+		return;
+	}
+
+	while(filecount--)
+	{
+		snprintf(Buffer3,MAX_PATH*10,"./ClientPatches/%s",list[filecount]->d_name);
+		printf("Filename is: %s\n", Buffer3);
+		if(sscanf(fd.cFileName,"%4s%u.", locality, &srcversion) != 2)
+			continue;
+
+		read_fd = open(Buffer3, O_RDONLY);
+		if(read_fd <= 0)
+		{
+			printf("Cannot open %s\n", Buffer3);
+			continue;
+		}
+
+		if(fstat(read_fd, &sb) <= 0)
+		{
+			printf("Cannot stat %s\n", Buffer3);
+			continue;
+		}
+
+		Log.Notice("PatchMgr", "Found patch for b%u locale `%s` (%u bytes).", srcversion,locality, sb.st_size);
+		pPatch = new Patch;
+		size = sb.st_size;
+		pPatch->FileSize = size;
+		pPatch->Data = new uint8[size];
+		pPatch->Version = srcversion;
+		for(i = 0; i < 4; ++i)
+			pPatch->Locality[i] = tolower(locality[i]);
+		pPatch->Locality[4] = 0;
+		pPatch->uLocality = *(uint32*)pPatch->Locality;
+
+		if(pPatch->Data==NULL)
+		{
+			// shouldn't really happen
+			delete pPatch;
+			close(read_fd);
+			continue;
+		}
+
+		// read the whole file
+		ASSERT(read(read_fd, pPatch->Data, size) == size);
+
+		// close handle
+		close(read_fd);
+
+		// md5hash the file
+		md5.Initialize();
+		md5.UpdateData(pPatch->Data, pPatch->FileSize);
+		md5.Finalize();
+		memcpy(pPatch->MD5, md5.GetDigest(), MD5_DIGEST_LENGTH);
+
+		// add the patch to the patchlist
+		m_patches.push_back(pPatch);
+		free(list[filecount]);
+	}
+	free(list);
 #endif
 }
 
