@@ -2,7 +2,7 @@
 
 AC_INIT([Ascent],
         [2.1.0],
-        [Ascent],
+        [the forum],
         [ascent])
 
 AC_PREREQ(2.5)
@@ -20,7 +20,7 @@ AM_MAINTAINER_MODE
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_RANLIB
+#AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
 # autoheader templates
@@ -28,6 +28,8 @@ AH_TEMPLATE([USE_EPOLL], Define if you want to use the epoll socket engine modul
 AH_TEMPLATE([USE_KQUEUE], Define if you want to use the kqueue socket engine module.)
 AH_TEMPLATE([HAVE_DARWIN], Define if you have MacOSX Darwin, to include the correct headers for kevent)
 AH_TEMPLATE([HAVE_LUASCRIPT], Define if you want to enable lua scripting)
+AH_TEMPLATE([ENABLE_CLUSTERING], Define if you want to enable clustering, this is experimental.)
+AH_TEMPLATE([ENABLE_COLLISION], Define if you want to enable collision calculation, warning. this can cause. a heavy load)
 
 # Default prefix
 AC_PREFIX_DEFAULT(`pwd`)
@@ -103,15 +105,31 @@ CFLAGS=""
 CXXFLAGS=""
 
 AC_ARG_ENABLE(lua_scripting,
-     AC_HELP_STRING([--enable-lua-scripting],[enable lua scripting])],
+     AC_HELP_STRING([--enable-lua-scripting],[enable lua scripting]),
      [ if test "x$enable_lua_scripting" = "xyes" ; then
    	AC_DEFINE(HAVE_LUASCRIPT)
        fi
      ],
 )
 
+AC_ARG_ENABLE(clustering,
+     AC_HELP_STRING([--enable-clustering],enable clustering. warning this is experimental.),
+     [ if test "x$enable_clustering" = "xyes" ; then
+   	AC_DEFINE(ENABLE_CLUSTERING)
+       fi
+     ],
+)
+
+AC_ARG_ENABLE(collision,
+     AC_HELP_STRING([--enable-collision],enable collision calculation. warning this can cause a high load),
+     [ if test "x$enable_collision" = "xyes" ; then
+   	AC_DEFINE(ENABLE_COLLISION)
+       fi
+     ],
+)
+
 AC_ARG_ENABLE(gcov,
-     AC_HELP_STRING([--enable-gcov],[enable codecovering])],
+     AC_HELP_STRING([--enable-gcov],[enable codecovering]),
      [ if test "x$enable_gcov" = "xyes" ; then
            CXXFLAGS="$CXXFLAGS -fprofile-arcs -ftest-coverage"
        fi
@@ -119,7 +137,7 @@ AC_ARG_ENABLE(gcov,
 )
 
 AC_ARG_ENABLE(debug,
-     AC_HELP_STRING([--enable-debug],[enable debug])],
+     AC_HELP_STRING([--enable-debug],[enable debug]),
      [ if test "x$enable_debug" = "xyes" ; then
            CXXFLAGS="$CXXFLAGS -g"
        fi
@@ -127,7 +145,7 @@ AC_ARG_ENABLE(debug,
 )
 
 AC_ARG_ENABLE(allwarnings,
-     AC_HELP_STRING([--enable-allwarnings],[enable Wall compiling])],
+     AC_HELP_STRING([--enable-allwarnings],[enable Wall compiling]),
      [ if test "x$enable_allwarnings" = "xyes" ; then
 	   CXXFLAGS="$CXXFLAGS -Wall"
        fi
@@ -135,7 +153,7 @@ AC_ARG_ENABLE(allwarnings,
 )
 
 AC_ARG_ENABLE(profiling,
-     AC_HELP_STRING([--enable-profiling],[build for profiling using gprof.])],
+     AC_HELP_STRING([--enable-profiling],[build for profiling using gprof.]),
      [ if test "x$enable_profiling" = "xyes" ; then
            CXXFLAGS="$CXXFLAGS -pg" ;
            #CFLAGS="$CFLAGS -pg" ;

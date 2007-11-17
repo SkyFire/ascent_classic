@@ -32,7 +32,6 @@
 /** Enable/disable LUA scripting system.
  * Default: Disabled
  */
-
 #ifdef HAVE_LUASCRIPT
 #  define ENABLE_LUA_SCRIPTING 1
 #endif
@@ -44,6 +43,10 @@
  * As of last update, it is nowhere near complete, only enable for dev use.
  * Default: Disabled
  */
+#ifdef ENABLE_CLUSTERING
+#  error Sorry but clustering is not finished yet. dont bother to try to compile it. it wont work.
+#  define CLUSTERING 1
+#endif
 //#define CLUSTERING 1
 
 /** Enable/disable 3D geometry calculations
@@ -51,6 +54,9 @@
  * As of last update, it was nowhere near complete. Only enable for dev use.
  * Default: Disabled
  */
+#ifdef ENABLE_COLLISION
+#  define COLLISION 1
+#endif
 //#define COLLISION 1
 
 #endif		// __ASCENTCONFIG_H
