@@ -84,6 +84,7 @@ void Object::_Create( uint32 mapid, float x, float y, float z, float ang )
 	m_mapId = mapid;
 	m_position.ChangeCoords(x, y, z, ang);
 	m_spawnLocation.ChangeCoords(x, y, z, ang);
+	m_lastMapUpdatePosition.ChangeCoords(x,y,z,ang);
 }
 
 uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
@@ -737,7 +738,7 @@ bool Object::SetPosition( float newX, float newY, float newZ, float newOrientati
 
 	//if (m_position.x != newX || m_position.y != newY)
 		//updateMap = true;
-	if(m_position.Distance2DSq(newX, newY) > 4.0f)		/* 2.0f */
+	if(m_lastMapUpdatePosition.Distance2DSq(newX, newY) > 4.0f)		/* 2.0f */
 		updateMap = true;
 
 	m_position.ChangeCoords(newX, newY, newZ, newOrientation);
@@ -752,6 +753,7 @@ bool Object::SetPosition( float newX, float newY, float newZ, float newOrientati
 
 	if (IsInWorld() && updateMap)
 	{
+		m_lastMapUpdatePosition.ChangeCoords(newX,newY,newZ,newOrientation);
 		m_mapMgr->ChangeObjectLocation(this);
 
 		if(m_objectTypeId == TYPEID_PLAYER && ((Player*)this)->GetGroup() &&

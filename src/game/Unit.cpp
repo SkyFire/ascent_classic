@@ -226,6 +226,7 @@ Unit::Unit()
 	CombatStatus.SetUnit(this);
 	m_temp_summon=false;
 	m_chargeSpellsInUse=false;
+	m_spellsbusy=false;
 }
 
 Unit::~Unit()
@@ -334,17 +335,18 @@ void Unit::Update( uint32 p_time )
 bool Unit::canReachWithAttack(Unit *pVictim)
 {
 //	float targetreach = pVictim->GetFloatValue(UNIT_FIELD_COMBATREACH);
-	float selfreach = GetFloatValue(UNIT_FIELD_COMBATREACH);
-	float targetradius = pVictim->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
-	float selfradius = GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
-	float targetscale = pVictim->GetFloatValue(OBJECT_FIELD_SCALE_X);
-	float selfscale = GetFloatValue(OBJECT_FIELD_SCALE_X);
+	float selfreach = m_floatValues[UNIT_FIELD_COMBATREACH];
+	float targetradius = pVictim->m_floatValues[UNIT_FIELD_BOUNDINGRADIUS];
+	float selfradius = m_floatValues[UNIT_FIELD_BOUNDINGRADIUS];
+	float targetscale = pVictim->m_floatValues[OBJECT_FIELD_SCALE_X];
+	float selfscale = m_floatValues[OBJECT_FIELD_SCALE_X];
 
 	if( GetMapId() != pVictim->GetMapId() )
 		return false;
-	float distance = sqrt(GetDistanceSq(pVictim));
 
+	float distance = sqrt(GetDistanceSq(pVictim));
 	float attackreach = (((targetradius*targetscale) + selfreach) + (((selfradius*selfradius)*selfscale)+1.50f));
+
 	//formula adjustment for player side.
 	if(this->IsPlayer())
 	{
@@ -352,6 +354,32 @@ bool Unit::canReachWithAttack(Unit *pVictim)
 		if (attackreach > 11) attackreach = 11; //distance limited to max 11 yards attack range //max attack distance
 		if (attackreach < 5 ) attackreach = 5; //normal units with too small reach.
 		//range can not be less than 5 yards - this is normal combat range, SCALE IS NOT SIZE
+
+		// latency compensation!!
+		// figure out how much extra distance we need to allow for based on our movespeed and latency.
+		if(pVictim->IsPlayer() && ((Player*)pVictim)->m_isMoving)
+		{
+			// this only applies to PvP.
+			uint32 lat = ((Player*)pVictim)->GetSession() ? ((Player*)pVictim)->GetSession()->GetLatency() : 0;
+
+			// if we're over 500 get fucked anyway.. your gonna lag! and this stops cheaters too
+			lat = (lat>500) ? 500 : lat;
+
+			// calculate the added distance
+			attackreach += (m_runSpeed*0.001f) * float(lat);
+		}
+
+		if(((Player*)this)->m_isMoving)
+		{
+			// this only applies to PvP.
+			uint32 lat = ((Player*)this)->GetSession() ? ((Player*)this)->GetSession()->GetLatency() : 0;
+
+			// if we're over 500 get fucked anyway.. your gonna lag! and this stops cheaters too
+			lat = (lat>500) ? 500 : lat;
+
+			// calculate the added distance
+			attackreach += (m_runSpeed*0.001f) * float(lat);
+		}
 	}
 
 	return (distance <= attackreach);
@@ -2948,9 +2976,12 @@ Aura* Unit::FindAura(uint32 spellId, uint64 guid)
 
 void Unit::_UpdateSpells( uint32 time )
 {
+	/* to avoid deleting the current spell */
 	if(m_currentSpell != NULL)
 	{
+		m_spellsbusy=true;
 		m_currentSpell->update(time);
+		m_spellsbusy=false;
 	}
 }
 
@@ -2959,7 +2990,13 @@ void Unit::castSpell( Spell * pSpell )
 	// check if we have a spell already casting etc
 	if(m_currentSpell&&pSpell!=m_currentSpell)
 	{
-		m_currentSpell->cancel();
+		if(m_spellsbusy)
+		{
+			// shouldn't really happen. but due to spell sytem bugs there are some cases where this can happen.
+			sEventMgr.AddEvent(this,&Unit::CancelSpell,m_currentSpell,EVENT_UNK,1,1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+		}
+		else
+			m_currentSpell->cancel();
 	}
 
 	m_currentSpell = pSpell;
@@ -2972,7 +3009,15 @@ void Unit::InterruptSpell()
 	{
 		//ok wtf is this
 		//m_currentSpell->SendInterrupted(SPELL_FAILED_INTERRUPTED);
-		m_currentSpell->cancel();
+		//m_currentSpell->cancel();
+		if(m_spellsbusy)
+		{
+			// shouldn't really happen. but due to spell sytem bugs there are some cases where this can happen.
+			sEventMgr.AddEvent(this,&Unit::CancelSpell,m_currentSpell,EVENT_UNK,1,1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+			m_currentSpell=NULL;
+		}
+		else
+			m_currentSpell->cancel();
 	}
 }
 
@@ -5108,4 +5153,16 @@ void CombatStatusHandler::TryToClearAttackTargets()
 		RemoveAttackTarget(pt);
 		pt->CombatStatus.RemoveAttacker(m_Unit,m_Unit->GetGUID());
 	}
+}
+
+void Unit::CancelSpell(Spell * ptr)
+{
+	ptr->cancel();
+}
+
+void Unit::EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage)
+{
+	Unit * victim = m_mapMgr ? m_mapMgr->GetUnit(guid) : NULL;
+	if(victim)
+		Strike(victim,SPELL_TYPE_RANGED,sp,0,0,0,false,true);
 }

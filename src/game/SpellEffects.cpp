@@ -1351,7 +1351,17 @@ void Spell::SpellEffectWeapondamageNoschool(uint32 i) // Weapon damage + (no Sch
 	if(!unitTarget ||!u_caster)
 		return;
 
-	u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:SPELL_TYPE_MELEE,m_spellInfo,damage,0,0, false,true);
+	if(GetType()==SPELL_TYPE_RANGED && m_spellInfo->speed>0.0f)
+	{
+		float time = (m_caster->CalcDistance(unitTarget) * 1000.0f) / m_spellInfo->speed;
+		if(time <= 100.0f)
+			u_caster->Strike(unitTarget,SPELL_TYPE_RANGED,m_spellInfo,0,0,0,false,true);
+		else
+			sEventMgr.AddEvent(u_caster,&Unit::EventStrikeWithAbility,unitTarget->GetGUID(),
+				m_spellInfo, (uint32)damage, EVENT_SPELL_DAMAGE_HIT, float2int32(time), 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	}
+	else
+		u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:SPELL_TYPE_MELEE,m_spellInfo,damage,0,0, false,true);
 }
 
 void Spell::SpellEffectAddExtraAttacks(uint32 i) // Add Extra Attacks

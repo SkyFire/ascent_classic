@@ -1140,6 +1140,10 @@ public:
 //	uint32 fearSpell;
 	CombatStatusHandler CombatStatus;
 	bool m_temp_summon;
+
+	void CancelSpell(Spell * ptr);
+	void EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage);
+	bool m_spellsbusy;
 	
 protected:
 	Unit ();

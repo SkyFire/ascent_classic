@@ -496,6 +496,7 @@ protected:
 	MapCell *m_mapCell;
 
 	LocationVector m_position;
+	LocationVector m_lastMapUpdatePosition;
 	LocationVector m_spawnLocation;
 
 	// Semaphores - needed to forbid two operations on the same object at the same very time (may cause crashing\lack of data)
