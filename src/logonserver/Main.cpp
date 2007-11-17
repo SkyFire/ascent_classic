@@ -317,12 +317,16 @@ void LogonServer::Run(int argc, char ** argv)
 		if(!(loop_counter%10000))	// 5mins
 			ThreadPool.IntegrityCheck();
 
-		sInfoCore.TimeoutSockets();
-		sSocketGarbageCollector.Update();
-		CheckForDeadSockets();			  // Flood Protection
+		if(!(loop_counter%10))
+		{
+			sInfoCore.TimeoutSockets();
+			sSocketGarbageCollector.Update();
+			CheckForDeadSockets();			  // Flood Protection
+			UNIXTIME = time(NULL);
+		}
+
 		PatchMgr::getSingleton().UpdateJobs();
 		Sleep(10);
-		UNIXTIME = time(NULL);
 	}
 
 	sLog.outString("Shutting down...");
