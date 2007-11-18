@@ -241,11 +241,12 @@ enum GuildEvent
 #define ARENA_TEAM_CHARTER_5v5      23562
 #define ARENA_TEAM_CHARTER_5v5_COST 2000000 // 200 G
 
-class Guild
+class SERVER_DECL Guild
 {
 public:
 	~Guild( );
 
+	static Guild* Create();
 	void SendMessageToGuild(uint64 ExcludePlayer, WorldPacket *data, uint8 Type);
 
 	void AddGuildMember(PlayerInfo *gMember) { m_guildMembers.push_back(gMember); }

@@ -677,3 +677,7 @@ void Guild::RenameGuild(std::string guildName)
 		pMember->SetUInt32Value(PLAYER_GUILD_TIMESTAMP, ttime);
 	}
 }
+Guild* Guild::Create()
+{
+	return new Guild();
+}
