@@ -3798,7 +3798,74 @@ void Aura::SpellAuraTransform(bool apply)
 		break;
 
 		case 16739: // Orb of Deception
-			break;
+		{
+			if (apply)
+			{
+				if(m_target->getRace() == RACE_ORC) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10139);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10140);
+				}
+				if(m_target->getRace() == RACE_TAUREN) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10136);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10147);
+				}
+				if(m_target->getRace() == RACE_TROLL) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10135);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10134);
+				}
+				if(m_target->getRace() == RACE_UNDEAD) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10146);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10145);
+				}
+				if(m_target->getRace() == RACE_BLOODELF) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 17829);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 17830);
+				}
+
+				if(m_target->getRace() == RACE_GNOME) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10148);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10149);
+				}
+				if(m_target->getRace() == RACE_DWARF) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10141);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10142);
+				}
+				if(m_target->getRace() == RACE_HUMAN) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10137);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10138);
+				}
+				if(m_target->getRace() == RACE_NIGHTELF) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10143);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 10144);
+				}
+				if(m_target->getRace() == RACE_DRAENEI) {
+					if(m_target->getGender() == 0) 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 17827);
+					else 
+						m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, 17828);
+				}
+			} 
+			else
+				m_target->SetUInt32Value (UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
+			} break;
 
 		case 42365:	// murloc costume
 			m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, apply?21723:m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
