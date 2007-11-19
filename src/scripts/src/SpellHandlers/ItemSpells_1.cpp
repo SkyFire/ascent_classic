@@ -339,7 +339,7 @@ bool NighInvulnBelt(uint32 i, Spell *pSpell)
 {
     if(!pSpell->p_caster) return true;
 
-    int chance = sRand.randInt(99)+1;
+    int chance = RandomUInt(99)+1;
 
     if(chance > 10) // Buff - Nigh-Invulnerability - 30456
         pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30456), true);
