@@ -6,3 +6,9 @@ Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
 blessing of freedom
 resurrection sickness can be canceled by divine shield
+
+Class: Paladin
+- Holy shield
+"Increases chance to block by 30% for 10 sec and deals 155 Holy damage for each attack blocked while active. Damage caused by Holy Shield causes 35% additional threat. Each block expends a charge"
+No damage from blocking attack.
+Retail: Takes profit from Holy spell damage, approx. 155+HSD/3

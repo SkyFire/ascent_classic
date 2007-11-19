@@ -2321,6 +2321,17 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
 
+	// Hunter - Hawk Eye
+	sp = dbcSpell.LookupEntry(19498);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1;
+	sp = dbcSpell.LookupEntry(19499);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1;
+	sp = dbcSpell.LookupEntry(19500);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1;
+
 	// Shaman - Storm Reach
 	sp = dbcSpell.LookupEntry(28999);
 	if(sp)
