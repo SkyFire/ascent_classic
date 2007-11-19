@@ -124,54 +124,6 @@ inline static uint32 GetLevelGrouping(uint32 level)
 #define MAXIMUM_BATTLEGROUNDS_PER_LEVEL_GROUP 3
 #define LEVEL_GROUP_70 7
 
-
-template<class T>
-int32 RandomFrom2Vectors(list<T*> * v1, list<T*> * v2, typename list<T*>::iterator &i1, typename list<T*>::iterator &i2)
-{
-	uint32 choice = Rand(50);
-	list<T*> * v;
-	uint32 n;
-	if(choice)
-	{
-		if(v2->size())
-			v=v2;
-		else
-			v=v1;
-	}
-	else
-	{
-		if(v1->size())
-			v=v1;
-		else
-			v=v2;
-	}
-
-	if(!v->size())
-		return -1;
-
-	n = sRand.randInt(v1->size());
-	typename list<T*>::iterator itr;
-	for(itr = v->begin(); itr != v->begin() && n; ++itr)
-		--n;
-
-	if(itr == v->end())
-		itr = v->begin();
-
-	if(itr == v->end())
-		return -1;
-
-	if(choice)
-	{
-		i1 = itr;
-		return 1;
-	}
-	else
-	{
-		i2 = itr;
-		return 0;
-	}
-}
-
 class CBattlegroundManager : public Singleton<CBattlegroundManager>, public EventableObject
 {
 	/* Battleground Instance Map */

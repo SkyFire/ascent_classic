@@ -20,11 +20,6 @@
 #ifndef _TERRAINMGR_H
 #define _TERRAINMGR_H
 
-/* Use memory mapping for map files for faster access (currently only available under windows */
-#ifdef WIN32
-//#define USE_MEMORY_MAPPING_FOR_MAPS
-#endif
-
 typedef struct
 {
 	uint16 AreaID[2][2];
@@ -126,6 +121,7 @@ private:
 
 	/// This holds the offsets of the cell information for each cell.
 	uint32 CellOffsets[_sizeX][_sizeY];
+	uint8 * m_Memory;
 
 #endif
 

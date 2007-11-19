@@ -519,7 +519,10 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 			sLog.outDetail("ITEM: Destroy, SrcInv Slot: %u Src slot: %u Failed", (uint32)SrcInvSlot, (uint32)SrcSlot);
 		}*/
 		Item * pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInvSlot,SrcSlot,false);
-		if(_player->GetCurrentSpell()->i_caster==pItem)
+		if(!pItem)
+			return;
+
+		if(_player->GetCurrentSpell() && _player->GetCurrentSpell()->i_caster==pItem)
 		{
 			_player->GetCurrentSpell()->i_caster=NULL;
 			_player->GetCurrentSpell()->cancel();

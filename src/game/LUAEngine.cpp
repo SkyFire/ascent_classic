@@ -256,6 +256,26 @@ void LuaEngine::LoadScripts()
 			luaBytecodeFiles.insert(string(fn));
 	} while(FindNextFile(h, &fd));
 	FindClose(h);
+#else
+	struct dirent ** list;
+	int filecount = scandir("./scripts", &list, 0, 0);
+	if(filecount <= 0 || !list)
+		return;
+
+	while(filecount--)
+	{
+		char * fn = strrchr(list[filecount]->d_name, '\\');
+		if(!fn)
+			fn=list[filecount]->d_name;
+		char * ext = strrchr(list[filecount]->d_name, '.');
+		if(!stricmp(ext, ".lua"))
+			luaFiles.insert(string(fn));
+		else if(!stricmp(ext, ".luc"))
+			luaBytecodeFiles.insert(string(fn));
+
+		free(list[filecount]);
+	}
+	free(list);
 #endif
 
 	// we prefer precompiled code.
