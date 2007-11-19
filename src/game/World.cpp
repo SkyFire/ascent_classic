@@ -1569,33 +1569,21 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=ILS_grouprelation;
 
 	//shaman - Tidal focus . Add more heal spells here if i forgot any :P
-	uint32 TF_grouprelation;
-	sp = dbcSpell.LookupEntry(25357);//shaman - Healing Wave.
-	if(sp)
-		TF_grouprelation = sp->SpellGroupType;
-	else TF_grouprelation=0;
-	sp = dbcSpell.LookupEntry(25420);//shaman - Lesser Healing Wave.
-	if(sp)
-		TF_grouprelation = sp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(1064);//shaman - Chain Heal.
-	if(sp)
-		TF_grouprelation = sp->SpellGroupType;
-	//shaman - Tidal focus r1
 	sp = dbcSpell.LookupEntry(16179); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+		sp->EffectSpellGroupRelation[0]=64 | 128 | 256;
 	sp = dbcSpell.LookupEntry(16214); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+		sp->EffectSpellGroupRelation[0]=64 | 128 | 256;
 	sp = dbcSpell.LookupEntry(16215); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+		sp->EffectSpellGroupRelation[0]=64 | 128 | 256;
 	sp = dbcSpell.LookupEntry(16216); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+		sp->EffectSpellGroupRelation[0]=64 | 128 | 256;
 	sp = dbcSpell.LookupEntry(16217); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=TF_grouprelation;
+		sp->EffectSpellGroupRelation[0]=64 | 128 | 256;
 
 	//shaman - Enhancing Totems r1
 	sp = dbcSpell.LookupEntry(16259); 
@@ -1731,33 +1719,21 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=Cthunder_grouprelation;
 
 	//shaman - COnvection
-	sp = dbcSpell.LookupEntry(28159);//shaman - shock. !!! we manually set this before. Might create conflicts later 
-	uint32 convection_grouprelation;
-	if(sp)
-		convection_grouprelation = sp->SpellGroupType;
-	else convection_grouprelation=0;
-	sp = dbcSpell.LookupEntry(403);//shaman - Lightning Bolt 
-	if(sp)
-		convection_grouprelation |= sp->SpellGroupType;
-	sp = dbcSpell.LookupEntry(421);//shaman - Chain Lightning 
-	if(sp)
-		convection_grouprelation |= sp->SpellGroupType;
-	//shaman - COnvection r1
 	sp = dbcSpell.LookupEntry(16039); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+		sp->EffectSpellGroupRelation[0]=1 | 4 | 2;
 	sp = dbcSpell.LookupEntry(16109); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+		sp->EffectSpellGroupRelation[0]=1 | 4 | 2;
 	sp = dbcSpell.LookupEntry(16110); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+		sp->EffectSpellGroupRelation[0]=1 | 4 | 2;
 	sp = dbcSpell.LookupEntry(16111); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+		sp->EffectSpellGroupRelation[0]=1 | 4 | 2;
 	sp = dbcSpell.LookupEntry(16112); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=convection_grouprelation;
+		sp->EffectSpellGroupRelation[0]=1 | 4 | 2;
 
 	//rogue - Elusiveness
 	sp = dbcSpell.LookupEntry(2094);//rogue - blind 

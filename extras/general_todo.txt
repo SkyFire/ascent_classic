@@ -97,17 +97,12 @@ Zack - test my shit :
 - if you have hearth of the wild and reset talents...you will get negative dmg
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
 - priest - Focused Mind (33215) - works
-- shaman - COnvection 16112 - works
-- shaman - Call of Thunder 16120 - works
-- shaman - Elemental mastery 16166
-- shaman - Lightning Overload  30681 - doesn't work (or maybe i missed smthing)
-- shaman - Improved Lightning shield 16291 - was working before
-- shaman - Tidal focus 16217. missing a complete list of shaman heal spells - was working before
+- shaman - Improved Lightning shield 16291 - was working before - improved dmg
+- shaman - Elemental mastery 16166 - crit and mana - Not working sice the aura remove happens before the trigger
 - shaman - Totemic focus 16225
 - shaman - Ancestral healin 16240
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
 - shaman - Restorative Totems 16208
-- shaman - Healing Way 29206
 - shaman - Elemental Fury 16089. Should look up all the specified spells. Right now i just put all spells in there :P
 - shaman - Elemental Devastation 30160
 - shaman - Mental Quickness 30814. works only for half of the spells

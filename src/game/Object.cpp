@@ -2187,7 +2187,15 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				CritChance += static_cast<Player*>(caster)->m_RootedCritChanceBonus;
 
 			if(spellInfo->SpellGroupType)
+			{
 				SM_FFValue(caster->SM_CriticalChance, &CritChance, spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+				float spell_flat_modifers=0;
+				SM_FFValue(caster->SM_CriticalChance,&spell_flat_modifers,spellInfo->SpellGroupType);
+				if(spell_flat_modifers!=0)
+					printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,spellInfo->SpellGroupType);
+#endif
+			}
 			if (pVictim->IsPlayer())
 				CritChance -=static_cast<Player*>(pVictim)->CalcRating(14);
 			if (CritChance<0) CritChance = 0;

@@ -602,6 +602,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				//since we did not allow to remove auras like these with interrupt flag we have to remove them manually.
 				if(itr2->procFlags & PROC_REMOVEONUSE)
 					RemoveAura(origId);
+				int dmg_overwrite=0;
 				//these are player talents. Fuckem they pull the emu speed down 
 				if(IsPlayer())
 				{
@@ -1011,19 +1012,13 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//mage - Master of Elements
 						case 29077:
 							{
+//								disabled until tested !!
 								continue;
-/*								
-								disabled until tested
 								if(!CastingSpell)
 									continue;
 								if (CastingSpell->School!=SCHOOL_FIRE || CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
 									continue;
-								SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
-								Spell *spell = new Spell(this, spellInfo ,true, NULL);
-								spell->forced_basepoints[0] = CastingSpell->manaCost * (ospinfo->EffectBasePoints[0] + 1) / 100;
-								spell->ProcedOnSpell = CastingSpell;
-								spell->pSpellId=origId;
-								spell->prepare(&targets);*/
+								dmg_overwrite = CastingSpell->manaCost * (ospinfo->EffectBasePoints[0] + 1) / 100;
 							}break;
 						//priest - Reflective Shield 
 						case 33619:
@@ -1081,15 +1076,17 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//shaman - Lightning Overload
 						case 39805:
 							{
-/*								if(!CastingSpell)
+								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//trigger on lightning and chain lightning. Spell should be identical , well maybe next time :P
 								if(	CastingSpell->NameHash==0x135F2AAF //lighning bolt
 									|| CastingSpell->NameHash==0xAAD25B2A //chain lightning
 									)
-									spellId = CastingSpell->Id; */
-								//this might crash your server so disabled until tested
-								continue;
+								{
+									spellId = CastingSpell->Id;
+									dmg_overwrite = (CastingSpell->EffectBasePoints[0] + 1) / 2; //only half dmg
+								}
+								else continue;
 							}break;
 /*						//paladin - illumination
 						case 18350:
@@ -1112,6 +1109,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				if(!spellInfo)
 					continue;*/
 				Spell *spell = new Spell(this, spellInfo ,true, NULL);
+				spell->forced_basepoints[0] = dmg_overwrite;
 				spell->ProcedOnSpell = CastingSpell;
 				//Spell *spell = new Spell(this,spellInfo,false,0,true,false);
 				if(spellId==974||spellId==32593||spellId==32594) // Earth Shield handler
@@ -1860,6 +1858,12 @@ else
 	{
 		SM_FFValue(SM_CriticalChance,&crit,ability->SpellGroupType);
 		SM_FFValue(SM_FResist,&hitchance,ability->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		float spell_flat_modifers=0;
+		SM_FFValue(SM_CriticalChance,&spell_flat_modifers,ability->SpellGroupType);
+		if(spell_flat_modifers!=0)
+			printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,ability->SpellGroupType);
+#endif
 	}
 
 	//--------------------------------by victim state-------------------------------------------
