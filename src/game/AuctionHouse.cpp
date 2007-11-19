@@ -476,7 +476,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 	AuctionHouse * ah = pCreature->auctionHouse;
 
 	uint32 item_worth = pItem->GetProto()->SellPrice * pItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
-	uint32 item_deposit = (uint32)(item_worth * ah->deposit_percent) * (uint32)(etime / 120.0f);
+	uint32 item_deposit = (uint32)(item_worth * ah->deposit_percent) * (uint32)(etime / 240.0f); // deposit is per 4 hours
 
 	if (_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < item_deposit)	// player cannot afford deposit
 	{
