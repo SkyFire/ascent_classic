@@ -30,7 +30,6 @@ SMT_RESIST_DISPEL - check if it is used
 - make DOTs do not require infront check
 - add a combat exit timer so warrior and rogue cannot charge.stealth any time
 - summon guardians not working : 49,
-- clearcasting
 - there should a trigger type named : proc on effect - so we can know the effect value at which we proc
 - make a spellgroup generator for featured spells
 - channeled spells have a big chance to get interrupted
@@ -136,6 +135,7 @@ Zack - test my shit :
 - rogue - Camouflage 14065
 - rogue - Mutilate 34413
 - hunter - hawk eye 19500
+- clearcasting 34754
 
 ==========================================================================
 Capt - test my shit :
@@ -152,5 +152,4 @@ Broken talent groups
 - Mechanics resists - Unbreakable Will, Iron Will, Focused Mind, ....
 - Talents reducing mana of spells which cost % of base mana don't work. Improved Blink, Natural Shapeshifter (this one works until u move), Absolution, Purifying Power, ...
 - Damage Shields don't work - Holy Shield, Blessing of Sanctuary
-- Clearcasting buff (shaman, druid, mage) doesn't work
 

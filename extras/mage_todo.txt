@@ -1,8 +1,5 @@
 Improved Scorch (talent) - not stacking on target
 
-Talents:
-Arcane Potency:Since there's no Clearcasting state (Arcane Concentration), Arcane pontency can't work
-
 Arcane:
 Blink: Doesn't release you from stun, just from bonds.
 

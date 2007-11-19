@@ -2332,6 +2332,32 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 1;
 
+	// general - clearcasting
+	sp = dbcSpell.LookupEntry(12536);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all possible spells we can affect
+		sp->EffectMiscValue[0] = SMT_NONINTERRUPT;
+	}
+	sp = dbcSpell.LookupEntry(16246);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all possible spells we can affect
+		sp->EffectMiscValue[0] = SMT_NONINTERRUPT;
+	}
+	sp = dbcSpell.LookupEntry(16870);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all possible spells we can affect
+		sp->EffectMiscValue[0] = SMT_NONINTERRUPT;
+	}
+	sp = dbcSpell.LookupEntry(34754);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all possible spells we can affect
+		sp->EffectMiscValue[0] = SMT_NONINTERRUPT;
+	}
+
 	// Shaman - Storm Reach
 	sp = dbcSpell.LookupEntry(28999);
 	if(sp)
