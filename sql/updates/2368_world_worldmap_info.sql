@@ -1,0 +1,1 @@
+alter table worldmap_info add column required_checkpoint int(30) not null default 0;

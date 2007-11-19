@@ -216,13 +216,45 @@ struct MapInfo
 	uint32 heroic_key_1;
 	uint32 heroic_key_2;
 	float update_distance;
+	uint32 checkpoint_id;
 
 	bool HasFlag(uint32 flag)
 	{
 		return (flags & flag) != 0;
 	}
 };
+#ifdef ENABLE_CHECKPOINT_SYSTEM
+
+struct MapCheckPoint
+{
+	uint32 checkpoint_id;
+	uint32 required_checkpoint_id;
+	uint32 creature_id;
+	char * name;
+	MapCheckPoint * pPrevCp;
+};
+
 #pragma pack(pop)
+
+class CheckpointMgr : public Singleton<CheckpointMgr>
+{
+	typedef HM_NAMESPACE::hash_map<uint32,vector<uint32> > CheckpointMap;
+	CheckpointMap m_checkpoints;
+
+	typedef HM_NAMESPACE::hash_map<uint32,set<uint32> > CheckpointCMap;
+	CheckpointCMap m_cCheckpoints;
+
+public:
+	~CheckpointMgr();
+	void Load();
+	void KilledCreature(uint32 GuildId, uint32 CreatureId);
+	void GuildCompletedCheckpoint(uint32 GuildId, uint32 Cid);
+	bool HasCompletedCheckpointAndPrequsites(uint32 GuildId, MapCheckPoint * pCheckpoint);
+};
+
+#else
+#pragma pack(pop)
+#endif
 
 enum REALM_TYPE
 {

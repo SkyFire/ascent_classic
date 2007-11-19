@@ -34,7 +34,7 @@ const char * gGraveyardFormat							= "uffffuuuux";
 const char * gTeleportCoordFormat						= "uxufffx";
 const char * gPvPAreaFormat								= "ush";
 const char * gFishingFormat								= "uuu";
-const char * gWorldMapInfoFormat						= "uuuuufffusuuuuuuuf";
+const char * gWorldMapInfoFormat						= "uuuuufffusuuuuuuufu";
 const char * gZoneGuardsFormat							= "uuu";
 
 /** SQLStorage symbols
@@ -52,6 +52,11 @@ SERVER_DECL SQLStorage<TeleportCoords, HashMapStorageContainer<TeleportCoords> >
 SERVER_DECL SQLStorage<FishingZoneEntry, HashMapStorageContainer<FishingZoneEntry> >		FishingZoneStorage;
 SERVER_DECL SQLStorage<MapInfo, ArrayStorageContainer<MapInfo> >							WorldMapInfoStorage;
 SERVER_DECL SQLStorage<ZoneGuardEntry, HashMapStorageContainer<ZoneGuardEntry> >			ZoneGuardStorage;
+
+#ifdef ENABLE_CHECKPOINT_SYSTEM
+SERVER_DECL SQLStorage<MapCheckPoint, ArrayStorageContainer<MapCheckPoint> >				CheckpointStorage;
+const char * gCheckpointFormat = "uuus";
+#endif
 
 void ObjectMgr::LoadExtraCreatureProtoStuff()
 {
@@ -314,6 +319,9 @@ void Storage_FillTaskList(TaskList & tl)
 	make_task(NpcTextStorage, GossipText, HashMapStorageContainer, "npc_text", gNpcTextFormat);
 	make_task(WorldMapInfoStorage, MapInfo, ArrayStorageContainer, "worldmap_info", gWorldMapInfoFormat);
 	make_task(ZoneGuardStorage, ZoneGuardEntry, HashMapStorageContainer, "zoneguards", gZoneGuardsFormat);
+#ifdef ENABLE_CHECKPOINT_SYSTEM
+	make_task(CheckpointStorage, MapCheckPoint, ArrayStorageContainer, "map_checkpoints", gCheckpointFormat);
+#endif
 }
 
 void Storage_Cleanup()

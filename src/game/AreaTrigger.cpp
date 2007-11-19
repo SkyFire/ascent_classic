@@ -34,11 +34,13 @@ enum AreaTriggerFailures
 	AREA_TRIGGER_FAILURE_NO_BC			= 2,
 	AREA_TRIGGER_FAILURE_NO_HEROIC		= 3,
 	AREA_TRIGGER_FAILURE_NO_RAID		= 4,
-	AREA_TRIGGER_FAILURE_NO_ATTUNE		= 5,
-	AREA_TRIGGER_FAILURE_LEVEL			= 6,
-	AREA_TRIGGER_FAILURE_NO_GROUP		= 7,
-	AREA_TRIGGER_FAILURE_NO_KEY         = 8,
+	AREA_TRIGGER_FAILURE_NO_ATTUNE_Q	= 5,
+	AREA_TRIGGER_FAILURE_NO_ATTUNE_I	= 6,
+	AREA_TRIGGER_FAILURE_LEVEL			= 7,
+	AREA_TRIGGER_FAILURE_NO_GROUP		= 8,
+	AREA_TRIGGER_FAILURE_NO_KEY         = 9,
 	AREA_TRIGGER_FAILURE_LEVEL_HEROIC	= 9,
+	AREA_TRIGGER_FAILURE_NO_CHECK		= 10,
 };
 
 const char * AreaTriggerFailureMessages[] = {
@@ -47,6 +49,7 @@ const char * AreaTriggerFailureMessages[] = {
 	"You must have The Burning Crusade Expansion to access this content.",
 	"Heroic mode unavailable for this instance.",
 	"You must be in a raid group to pass through here.",
+	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
 	"You do not have the required attunement to pass through here.", //TODO: Replace attunment with real itemname
 	"You must be at least level %u to pass through here.",
 	"You must be in a party to pass through here.",
@@ -79,10 +82,10 @@ inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession 
 		return AREA_TRIGGER_FAILURE_NO_GROUP;
 
 	if(pMapInfo && pMapInfo->required_quest && !pPlayer->HasFinishedQuest(pMapInfo->required_quest))
-		return AREA_TRIGGER_FAILURE_NO_ATTUNE;
+		return AREA_TRIGGER_FAILURE_NO_ATTUNE_Q;
 
 	if(pMapInfo && pMapInfo->required_item && !pPlayer->GetItemInterface()->GetItemCount(pMapInfo->required_item, true))
-		return AREA_TRIGGER_FAILURE_NO_ATTUNE;
+		return AREA_TRIGGER_FAILURE_NO_ATTUNE_I;
 
 	if (pPlayer->iInstanceType == MODE_HEROIC && 
 		pMapInfo->type == INSTANCE_MULTIMODE && 
@@ -92,6 +95,15 @@ inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession 
 
 	if(pPlayer->getLevel()<70 && pPlayer->iInstanceType==MODE_HEROIC && pMapInfo->type != INSTANCE_NULL)
 		return AREA_TRIGGER_FAILURE_LEVEL_HEROIC;
+
+#ifdef ENABLE_CHECKPOINT_SYSTEM
+	if(pMapInfo->checkpoint_id)
+	{
+		MapCheckPoint * pcp = CheckpointStorage.LookupEntry(pMapInfo->checkpoint_id);
+		if(pcp && pPlayer->GetGuildId() && !CheckpointMgr::getSingleton().HasCompletedCheckpointAndPrequsites(pPlayer->GetGuildId(), pcp))
+			return AREA_TRIGGER_FAILURE_NO_CHECK;
+	}
+#endif
 
 	return AREA_TRIGGER_FAILURE_OK;
 }
@@ -126,16 +138,45 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 				if(reason != AREA_TRIGGER_FAILURE_OK)
 				{
 					const char * pReason = AreaTriggerFailureMessages[reason];
+					char msg[200];
 					WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 50);
 					data << uint32(0);
                     
 					switch (reason)
 					{
 					case AREA_TRIGGER_FAILURE_LEVEL:
-						char msg[50];
-						snprintf(msg,50,pReason,pAreaTrigger->required_level);
+						snprintf(msg,200,pReason,pAreaTrigger->required_level);
 						data << msg;
 						break;
+					case AREA_TRIGGER_FAILURE_NO_ATTUNE_I:
+						{
+							MapInfo * pMi = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
+							ItemPrototype * pItem = ItemPrototypeStorage.LookupEntry(pMi->required_item);
+							if(pItem)
+								snprintf(msg,200,"You must have the item, `%s` to pass through here.",pItem->Name1);
+							else
+								snprintf(msg,200,"You must have the item, UNKNOWN to pass through here.");
+						}break;
+					case AREA_TRIGGER_FAILURE_NO_ATTUNE_Q:
+						{
+							MapInfo * pMi = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
+							Quest * pQuest = QuestStorage.LookupEntry(pMi->required_quest);
+							if(pQuest)
+								snprintf(msg,200,"You must have finished the quest, `%s` to pass through here.",pQuest->title);
+							else
+								snprintf(msg,200,"You must have finished the quest, UNKNOWN to pass through here.");
+						}break;
+#ifdef ENABLE_CHECKPOINT_SYSTEM
+					case AREA_TRIGGER_FAILURE_NO_CHECK:
+						{
+							MapInfo * pMi = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
+							MapCheckPoint * pCp = CheckpointStorage.LookupEntry(pMi->checkpoint_id);
+							if(pCp)
+								snprintf(msg,200,"You must have completed the checkpoint, `%s` to pass through here.",pCp->name);
+							else
+								snprintf(msg,200,"You must have completed the checkpoint, `%s` to pass through here.","UNKNOWN");
+						}break;
+#endif
 					default:
 						data << pReason;
 						break;

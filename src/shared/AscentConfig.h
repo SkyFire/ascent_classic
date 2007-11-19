@@ -59,5 +59,11 @@
 #endif
 //#define COLLISION 1
 
+/** Enable instance checkpoint system
+ * This is not blizzlike, but a cool feature :p
+ * Default: Disabled
+ */
+//#define ENABLE_CHECKPOINT_SYSTEM
+
 #endif		// __ASCENTCONFIG_H
 

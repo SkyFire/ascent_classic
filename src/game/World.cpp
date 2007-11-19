@@ -445,6 +445,10 @@ bool World::SetInitialWorldSettings()
 	new WordFilter;
 	sWordFilter.Load();
 
+#ifdef ENABLE_CHECKPOINT_SYSTEM
+	CheckpointMgr::getSingleton().Load();
+#endif
+
 	sLog.outString("");
 	Log.Notice("World", "Database loaded in %ums.", getMSTime() - start_time);
 	sLog.outString("");
@@ -4306,3 +4310,109 @@ void World::PollCharacterInsertQueue()
 	// Release the database connection
 	con->busy.Release();
 }
+
+#ifdef ENABLE_CHECKPOINT_SYSTEM
+initialiseSingleton(CheckpointMgr);
+CheckpointMgr::~CheckpointMgr()
+{
+
+}
+
+void CheckpointMgr::Load()
+{
+	StorageContainerIterator<MapCheckPoint> * itr = CheckpointStorage.MakeIterator();
+	while(!itr->AtEnd())
+	{
+		if(itr->Get()->required_checkpoint_id==0)
+			itr->Get()->pPrevCp=NULL;
+		else
+			itr->Get()->pPrevCp=CheckpointStorage.LookupEntry(itr->Get()->required_checkpoint_id);
+
+		CheckpointMap::iterator it2 = m_checkpoints.find(itr->Get()->creature_id);
+		if(it2==m_checkpoints.end())
+		{
+			vector<uint32> a;
+			a.push_back(itr->Get()->checkpoint_id);
+			m_checkpoints.insert(make_pair(itr->Get()->creature_id,a));
+		}
+		else
+			it2->second.push_back(itr->Get()->checkpoint_id);
+
+		if(!itr->Inc())
+			break;
+	}
+
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM guild_checkpoints");
+	if(!result)
+		return;
+
+	do 
+	{
+		Field * f = result->Fetch();
+		uint32 guildid = f[0].GetUInt32();
+		uint32 cid = f[1].GetUInt32();
+
+		CheckpointCMap::iterator it3 = m_cCheckpoints.find(guildid);
+		if(it3==m_cCheckpoints.end())
+		{
+			set<uint32> s;
+			s.insert(cid);
+			m_cCheckpoints.insert(make_pair(guildid,s));
+		}
+		else
+			it3->second.insert(cid);
+
+	} while(result->NextRow());
+	delete result;
+}
+
+void CheckpointMgr::GuildCompletedCheckpoint(uint32 GuildId, uint32 Cid)
+{
+	CheckpointCMap::iterator itr = m_cCheckpoints.find(GuildId);
+	if(itr==m_cCheckpoints.end())
+	{
+		set<uint32> s;
+		s.insert(Cid);
+		m_cCheckpoints.insert(make_pair(GuildId,s));
+	}
+	else
+		itr->second.insert(Cid);
+
+	CharacterDatabase.Execute("INSERT INTO guild_checkpoints VALUES(%u,%u)",GuildId,Cid);
+}
+
+bool CheckpointMgr::HasCompletedCheckpointAndPrequsites(uint32 GuildId, MapCheckPoint * pCheckpoint)
+{
+	MapCheckPoint * pcp2 = pCheckpoint->pPrevCp;
+	CheckpointCMap::iterator itr = m_cCheckpoints.find(GuildId);
+	if(itr==m_cCheckpoints.end())
+		return false;
+
+	if(itr->second.find(pCheckpoint->checkpoint_id)==itr->second.end())
+		return false;
+
+	while(pcp2)
+	{
+		if(itr->second.find(pcp2->checkpoint_id)!=itr->second.end())
+			return false;
+		
+		pcp2=pcp2->pPrevCp;
+	}
+	return true;
+}
+
+void CheckpointMgr::KilledCreature(uint32 GuildId, uint32 CreatureId)
+{
+	CheckpointMap::iterator itr = m_checkpoints.find(CreatureId);
+	if(itr==m_checkpoints.end())
+		return;
+
+	for(vector<uint32>::iterator i = itr->second.begin(); i != itr->second.end(); ++i)
+	{
+		MapCheckPoint * pcp = CheckpointStorage.LookupEntry((*i));
+		if(pcp)
+			GuildCompletedCheckpoint(GuildId,pcp->checkpoint_id);
+	}
+}
+
+#endif
