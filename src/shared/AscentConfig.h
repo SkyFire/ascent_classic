@@ -23,12 +23,6 @@
 #ifndef __ASCENTCONFIG_H
 #define __ASCENTCONFIG_H
 
-/** If you are building on OSX, enable this define
- * if you are on a big-endian machine.
- * Default: Disabled
- */
-//#define USING_BIG_ENDIAN 1
-
 /** Enable/disable LUA scripting system.
  * Default: Disabled
  */

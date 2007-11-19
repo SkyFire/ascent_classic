@@ -30,6 +30,8 @@ AH_TEMPLATE([HAVE_DARWIN], Define if you have MacOSX Darwin, to include the corr
 AH_TEMPLATE([HAVE_LUASCRIPT], Define if you want to enable lua scripting)
 AH_TEMPLATE([ENABLE_CLUSTERING], Define if you want to enable clustering, this is experimental.)
 AH_TEMPLATE([ENABLE_COLLISION], Define if you want to enable collision calculation, warning. this can cause. a heavy load)
+AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
+AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
 
 # Default prefix
 AC_PREFIX_DEFAULT(`pwd`)
@@ -64,6 +66,8 @@ case "$OSNAME" in
 		AC_MSG_RESULT(no)
 	;;
 esac
+
+AC_C_BIGENDIAN([AC_DEFINE(USING_BIG_ENDIAN)],[AC_DEFINE(USING_LITTLE_ENDIAN)],[])
 
 # Required for SVN revision magic
 AC_PROG_AWK
