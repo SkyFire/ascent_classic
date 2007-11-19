@@ -3791,6 +3791,8 @@ void Spell::SpellEffectDisenchant(uint32 i)
 		caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
 	AddItemFromDisenchant(it->GetProto(),caster);
 
+	if(it==i_caster)
+		i_caster=NULL;
 	delete it;
 }
 
