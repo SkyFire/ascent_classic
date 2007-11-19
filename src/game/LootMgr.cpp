@@ -54,7 +54,7 @@ const T& RandomChoice( const T* variant, int count )
   float totalChance = 0;
   for( int i = 0; i < count; i++)
     totalChance += variant[i].chance;
-  float val = sRand.rand(totalChance);
+  float val = RandomFloat(totalChance);
   for( int i = 0; i < count; i++)
   {
     val -= variant[i].chance;
