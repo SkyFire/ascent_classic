@@ -1101,8 +1101,8 @@ public:
 	bool HasNegativeAura(uint32 spell_id); //just to reduce search range in some cases
 	bool IsPoisoned();
 
-	AuraCheckResponse AuraCheck(uint32 name_hash, uint32 rank);
-	AuraCheckResponse AuraCheck(uint32 name_hash, uint32 rank, Aura* aur);
+	AuraCheckResponse AuraCheck(uint32 name_hash, uint32 rank, Object *caster);
+	AuraCheckResponse AuraCheck(uint32 name_hash, uint32 rank, Aura* aur, Object *caster);
 
 	uint16 m_diminishCount[23];
 	uint8  m_diminishAuraCount[23];

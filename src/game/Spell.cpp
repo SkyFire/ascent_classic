@@ -2681,7 +2681,7 @@ uint8 Spell::CanCast(bool rangetolerate)
 			}
 
 			// if we're replacing a higher rank, deny it
-			AuraCheckResponse acr = target->AuraCheck(m_spellInfo->NameHash, m_spellInfo->RankNumber);
+			AuraCheckResponse acr = target->AuraCheck(m_spellInfo->NameHash, m_spellInfo->RankNumber,m_caster);
 			if(acr.Error == AURA_CHECK_RESULT_HIGHER_BUFF_PRESENT)
 				return (uint8)SPELL_FAILED_AURA_BOUNCED;
 
