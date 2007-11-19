@@ -298,6 +298,8 @@ int __cdecl HandleCrash(PEXCEPTION_POINTERS pExceptPtrs)
 		// not reached
 	}
 
+	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
+
 	// Create the date/time string
 	time_t curtime = time(NULL);
 	tm * pTime = localtime(&curtime);
