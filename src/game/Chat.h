@@ -511,6 +511,7 @@ protected:
 	bool HandleNpcSelectCommand(const char * args, WorldSession * m_session);
 	bool HandleWaypointAddFlyCommand(const char * args, WorldSession * m_session);
 	bool HandleWhisperBlockCommand(const char * args, WorldSession * m_session);
+	bool HandleDispelAllCommand(const char * args, WorldSession * m_session);
 
 	/* For skill related GM commands */
 	SkillNameMgr *SkillNameManager;

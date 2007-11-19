@@ -343,7 +343,7 @@ void CBattlegroundManager::EventQueueUpdate()
 			group1 = group2 = NULL;
 			while(group1 == NULL)
 			{
-				n = sRand.randInt((uint32)m_queuedGroups[i].size()) - 1;
+				n = RandomUInt((uint32)m_queuedGroups[i].size()) - 1;
 				for(itz = m_queuedGroups[i].begin(); itz != m_queuedGroups[i].end() && n>0; ++itz)
 					--n;
 
@@ -364,7 +364,7 @@ void CBattlegroundManager::EventQueueUpdate()
 
 			while(group2 == NULL)
 			{
-				n = sRand.randInt((uint32)m_queuedGroups[i].size()) - 1;
+				n = RandomUInt((uint32)m_queuedGroups[i].size()) - 1;
 				for(itz = m_queuedGroups[i].begin(); itz != m_queuedGroups[i].end() && n>0; ++itz)
 					--n;
 
@@ -795,7 +795,7 @@ CBattleground * CBattlegroundManager::CreateInstance(uint32 Type, uint32 LevelGr
 	{
 		/* arenas follow a different procedure. */
 		static const uint32 arena_map_ids[3] = { 559, 562, 572 };
-		uint32 mapid = arena_map_ids[sRand.randInt(2)];
+		uint32 mapid = arena_map_ids[RandomUInt(2)];
 		mapid=562;
 		uint32 players_per_side;
 		mgr = sInstanceMgr.CreateBattlegroundInstance(mapid);

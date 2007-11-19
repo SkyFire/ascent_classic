@@ -166,7 +166,7 @@ uint32 buffentrys[3] = {180380,180362,180146};
 
 void ArathiBasin::SpawnBuff(uint32 x)
 {
-	uint32 chosen_buffid = buffentrys[sRand.randInt(2)];
+	uint32 chosen_buffid = buffentrys[RandomUInt(2)];
 	GameObjectInfo * goi = GameObjectNameStorage.LookupEntry(chosen_buffid);
 	if(goi == NULL)
 		return;

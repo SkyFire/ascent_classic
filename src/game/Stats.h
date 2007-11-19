@@ -718,7 +718,7 @@ inline uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type
 	float result = min_damage;
 
 	if(diff >= 1)
-		result += float(sRand.rand(diff));
+		result += float(RandomDouble(diff));
 
 	if(result >= 0)
 		return FL2UINT(result);

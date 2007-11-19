@@ -2673,10 +2673,10 @@ SlotResult ItemInterface::FindAmmoBag()
 
 void ItemInterface::ReduceItemDurability()
 {
-   uint32 f = sRand.randInt(100);
+   uint32 f = RandomUInt(100);
    if(f <= 10) //10% chance to loose 1 dur from a random valid item.
    {
-	   int32 slot = sRand.randInt(EQUIPMENT_SLOT_END);
+	   int32 slot = RandomUInt(EQUIPMENT_SLOT_END);
 	   Item *pItem = GetInventoryItem(INVENTORY_SLOT_NOT_SET, slot);
 	   if(pItem)
 	   {

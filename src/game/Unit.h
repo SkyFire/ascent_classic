@@ -1144,6 +1144,7 @@ public:
 	void CancelSpell(Spell * ptr);
 	void EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage);
 	bool m_spellsbusy;
+	void DispelAll(bool positive);
 	
 protected:
 	Unit ();

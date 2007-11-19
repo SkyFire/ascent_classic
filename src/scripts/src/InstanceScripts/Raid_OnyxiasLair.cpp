@@ -263,7 +263,7 @@ public:
             
             return;
         }
-        uint32 val = sRand.randInt(1000);
+        uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -296,7 +296,7 @@ public:
         }
         if(!m_fCastCount)
         {
-            uint32 val = sRand.randInt(1250);
+            uint32 val = RandomUInt(1250);
             if(val < 250)//Move left
             {
                 m_currentWP++;
@@ -371,7 +371,7 @@ public:
             m_aoeFearCooldown = 30;
             return;
         }
-        uint32 val = sRand.randInt(1000);
+        uint32 val = RandomUInt(1000);
         SpellCast(val);
         m_whelpCooldown--;
         m_aoeFearCooldown--;

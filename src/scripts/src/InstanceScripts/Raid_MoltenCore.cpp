@@ -42,7 +42,7 @@ public:
 
     void AIUpdate()
     {
-		uint32 val = sRand.randInt(1000);
+		uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -131,7 +131,7 @@ public:
             m_flames = false;
 		}
 		
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -209,7 +209,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -287,7 +287,7 @@ public:
     void AIUpdate()
     {
 	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -352,7 +352,7 @@ public:
     void AIUpdate()
     {
 	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -417,7 +417,7 @@ public:
     void AIUpdate()
     {
 	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -483,7 +483,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -560,7 +560,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -627,7 +627,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -709,7 +709,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -801,7 +801,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -894,7 +894,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -988,7 +988,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -1080,7 +1080,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -1160,7 +1160,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -1242,7 +1242,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -1338,7 +1338,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -1457,7 +1457,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -1523,7 +1523,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -1593,7 +1593,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 
@@ -1719,7 +1719,7 @@ public:
 
     void AIUpdate()
     {	
-	    uint32 val = sRand.randInt(1000);
+	    uint32 val = RandomUInt(1000);
         SpellCast(val);
     }
 

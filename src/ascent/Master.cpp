@@ -206,10 +206,8 @@ bool Master::Run(int argc, char ** argv)
 	printf("The key combination <Ctrl-C> will safely shut down the server at any time.\n");
 	Log.Line();
     
-	uint32 seed = (uint32)UNIXTIME;
-	new MTRand(seed);
-	srand(seed);
-	Log.Success("MTRand", "Initialized Random Number Generators.");
+	InitRandomNumberGenerators();
+	Log.Success("Rnd", "Initialized Random Number Generators.");
 
 	ThreadPool.Startup();
 	uint32 LoadingTime = getMSTime();

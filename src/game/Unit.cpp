@@ -1605,7 +1605,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	chances[3]=chances[2]+block;
 
 	//--------------------------------roll------------------------------------------------------
-	float Roll = (float)sRand.rand(100);
+	float Roll = RandomFloat(100.0f);
 	uint32 r = 0;
 	while (r<4&&Roll>chances[r])
 	{
@@ -1892,7 +1892,7 @@ else
 	chances[5]=chances[4]+crit;
 	chances[6]=chances[5]+crush;
 //--------------------------------roll------------------------------------------------------
-	float Roll = (float)sRand.rand(100);
+	float Roll = RandomFloat(100.0f);
 	uint32 r = 0;
 	while (r<7&&Roll>chances[r])
 	{
@@ -2248,7 +2248,7 @@ else
 				max_dmg = itr->second.maxdmg;
 				range = min_dmg - max_dmg;
 				dmg = min_dmg;
-				if(range) range += sRand.randInt(range);
+				if(range) range += RandomUInt(range);
 
 				SpellNonMeleeDamageLog(pVictim, itr->second.spellid, dmg, true);
 			}
@@ -5165,4 +5165,14 @@ void Unit::EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage)
 	Unit * victim = m_mapMgr ? m_mapMgr->GetUnit(guid) : NULL;
 	if(victim)
 		Strike(victim,SPELL_TYPE_RANGED,sp,0,0,0,false,true);
+}
+
+void Unit::DispelAll(bool positive)
+{
+	for(uint32 i = 0; i < MAX_AURAS; ++i)
+	{
+		if(m_auras[i]!=NULL)
+			if((m_auras[i]->IsPositive()&&positive)||!m_auras[i]->IsPositive())
+				m_auras[i]->Remove();
+	}
 }

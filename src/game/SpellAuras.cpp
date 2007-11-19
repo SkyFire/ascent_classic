@@ -3827,11 +3827,11 @@ void Aura::SpellAuraTransform(bool apply)
 						break;
 
 					case 28272:	 // Pig
-						displayId = 16356 + sRand.randInt(2);
+						displayId = 16356 + RandomUInt(2);
 						break;
 						
 					case 28271:	 // Turtle
-						displayId = 16359 + sRand.randInt(2);
+						displayId = 16359 + RandomUInt(2);
 						break;
 
 					default:

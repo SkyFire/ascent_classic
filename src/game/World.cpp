@@ -51,6 +51,7 @@ World::World()
 #endif
 }
 
+void CleanupRandomNumberGenerators();
 World::~World()
 {
 	/*sLog.outString("  Saving players to DB...");
@@ -98,7 +99,7 @@ World::~World()
 	delete WordFilter::getSingletonPtr();
 
 	sLog.outString("Deleting Random Number Generator...");
-	delete MTRand::getSingletonPtr();
+	CleanupRandomNumberGenerators();
 
 	for( AreaTriggerMap::iterator i = m_AreaTrigger.begin( ); i != m_AreaTrigger.end( ); ++ i ) 
 	{
@@ -3431,7 +3432,7 @@ std::string World::GenerateName(uint32 type)
 	if(_namegendata[type].size() == 0)
 		return "ERR";
 
-	uint32 ent = sRand.randInt((uint32)_namegendata[type].size()-1);
+	uint32 ent = RandomUInt((uint32)_namegendata[type].size()-1);
 	return _namegendata[type].at(ent).name;
 }
 

@@ -320,7 +320,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 				if(unitTarget->HasAurasWithNameHash(0x3dd5c872))
 				{
 					// random extra damage
-					uint32 extra_dmg = 111 + (m_spellInfo->RankNumber * 11) + sRand.randInt(m_spellInfo->RankNumber * 11);
+					uint32 extra_dmg = 111 + (m_spellInfo->RankNumber * 11) + RandomUInt(m_spellInfo->RankNumber * 11);
 					dmg += extra_dmg;
 				}
 			}break;
@@ -2608,7 +2608,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 	   
 		if (lootmgr.IsFishable(zone)) // only add this if there is fish in that zone.
 		{
-			uint32 seconds = sRand.randInt(17) + 2;
+			uint32 seconds = RandomUInt(17) + 2;
 			sEventMgr.AddEvent(go, &GameObject::FishHooked, (Player*)m_caster, EVENT_GAMEOBJECT_FISH_HOOKED, seconds*1000, 1,0);
 		}
 		sEventMgr.AddEvent(go, &GameObject::EndFishing, (Player*)m_caster,false, EVENT_GAMEOBJECT_END_FISHING,20000, 1,0);
@@ -2977,7 +2977,7 @@ void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
   lootmgr.FillPickpocketingLoot(&((Creature*)unitTarget)->loot,unitTarget->GetEntry());
 
 	uint32 _rank = ((Creature*)unitTarget)->GetCreatureName() ? ((Creature*)unitTarget)->GetCreatureName()->Rank : 0;
-	unitTarget->loot.gold = float2int32((_rank+1) * unitTarget->getLevel() * (sRand.randInt(5) + 1) * sWorld.getRate(RATE_MONEY));
+	unitTarget->loot.gold = float2int32((_rank+1) * unitTarget->getLevel() * (RandomUInt(5) + 1) * sWorld.getRate(RATE_MONEY));
 
 	p_caster->SendLoot(unitTarget->GetGUID(), 2);
 	target->SetPickPocketed(true);

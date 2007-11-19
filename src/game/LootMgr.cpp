@@ -29,21 +29,21 @@ struct loot_tb
 
 bool Rand(float chance)
 {
-	int32 val = sRand.randInt(10000);
+	int32 val = RandomUInt(10000);
 	int32 p = int32(chance * 100.0f);
 	return p >= val;
 }
 
 bool Rand(uint32 chance)
 {
-	int32 val = sRand.randInt(10000);
+	int32 val = RandomUInt(10000);
 	int32 p = int32(chance * 100);
 	return p >= val;
 }
 
 bool Rand(int32 chance)
 {
-	int32 val = sRand.randInt(10000);
+	int32 val = RandomUInt(10000);
 	int32 p = chance * 100;
 	return p >= val;
 }
@@ -77,7 +77,7 @@ T* RandomChoiceVector( vector<pair<T*, float> > & variant )
 	for(itr = variant.begin(); itr != variant.end(); ++itr)
 		totalChance += itr->second;
 
-	val = float(sRand.rand((double)totalChance));
+	val = RandomFloat(totalChance);
 	
 	for(itr = variant.begin(); itr != variant.end(); ++itr)
 	{
@@ -384,7 +384,7 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 			if(list->items[x].mincount == list->items[x].maxcount)
 				count = list->items[x].maxcount;
 			else
-				count = sRand.randInt(list->items[x].maxcount - list->items[x].mincount) + list->items[x].mincount;
+				count = RandomUInt(list->items[x].maxcount - list->items[x].mincount) + list->items[x].mincount;
 
 			for(i = 0; i < loot->items.size(); ++i)
 			{
@@ -750,7 +750,7 @@ void LootRoll::PlayerRolled(Player *player, uint8 choice)
 	if(NeedRolls.find(player->GetGUID()) != NeedRolls.end() || GreedRolls.find(player->GetGUID()) != GreedRolls.end())
 		return; // dont allow cheaters
 
-	int roll = sRand.randInt(99)+1;
+	int roll = RandomUInt(99)+1;
 	// create packet
 	WorldPacket data(34);
 	data.SetOpcode(SMSG_LOOT_ROLL);

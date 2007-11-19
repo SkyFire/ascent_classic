@@ -2433,7 +2433,7 @@ void ObjectMgr::HandleMonsterSayEvent(Creature * pCreature, MONSTER_SAY_EVENTS E
 	if(Rand(ms->Chance))
 	{
 		// chance successful.
-		int choice = (ms->TextCount == 1) ? 0 : sRand.randInt(ms->TextCount - 1);
+		int choice = (ms->TextCount == 1) ? 0 : RandomUInt(ms->TextCount - 1);
 		const char * text = ms->Texts[choice];
 		pCreature->SendChatMessage(ms->Type, ms->Language, text);
 	}

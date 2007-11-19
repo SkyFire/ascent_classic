@@ -1512,7 +1512,7 @@ AI_Spell * Pet::HandleAutoCastEvent()
 	if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
 	{
 		// more than one autocast spell. pick a random one.
-		uint32 c = sRand.randInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
+		uint32 c = RandomUInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
 		uint32 j = 0;
 		list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 
@@ -1568,7 +1568,7 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 			uint32 ms = getMSTime();
 			for(i=0;i<m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size();++i)
 			{
-				uint32 c = sRand.randInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
+				uint32 c = RandomUInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
 				uint32 j = 0;
 				list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 

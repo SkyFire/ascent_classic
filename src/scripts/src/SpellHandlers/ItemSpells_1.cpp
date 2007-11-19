@@ -48,7 +48,7 @@ bool NoggenFoggerElixr(uint32 i, Spell * pSpell)
 {
 	if(!pSpell->p_caster) return true;
 
-	uint32 chance = sRand.randInt(2);
+	uint32 chance = RandomUInt(2);
 
 	switch(chance)
 	{
@@ -71,7 +71,7 @@ bool HallowsEndCandy(uint32 i, Spell * pSpell)
 {
 	if(!pSpell->p_caster) return true;
 
-	int newspell = 24924 + sRand.randInt(3);
+	int newspell = 24924 + RandomUInt(3);
 
 	SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
 	if(!spInfo) return true;
@@ -86,7 +86,7 @@ bool DeviateFish(uint32 i, Spell * pSpell)
 {
 	if(!pSpell->p_caster) return true;
 
-	int newspell = 8064 + sRand.randInt(4);
+	int newspell = 8064 + RandomUInt(4);
 
 	SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
 	if(!spInfo) return true;
@@ -105,9 +105,9 @@ bool CookedDeviateFish(uint32 i, Spell * pSpell)
 	int newspell = 0;
 
 	if(pSpell->p_caster->getClass() == WARRIOR)
-		chance = sRand.randInt(6);
+		chance = RandomUInt(6);
 	else
-		chance = sRand.randInt(5);
+		chance = RandomUInt(5);
 
 	switch(chance)
 	{
@@ -183,7 +183,7 @@ bool NetOMatic(uint32 i, Spell * pSpell)
 	SpellEntry *spInfo = dbcSpell.LookupEntry(13099);
 	if(!spInfo) return true;
 
-	int chance = sRand.randInt(99)+1;
+	int chance = RandomUInt(99)+1;
 
 	if(chance < 51) // nets target: 50%
 		pSpell->p_caster->CastSpell(target, spInfo, true);

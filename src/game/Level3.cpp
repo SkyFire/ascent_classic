@@ -3265,3 +3265,36 @@ bool ChatHandler::HandleWhisperBlockCommand(const char * args, WorldSession * m_
 	m_session->GetPlayer()->bGMTagOn = true;
 	return true;
 }
+
+bool ChatHandler::HandleDispelAllCommand(const char * args, WorldSession * m_session)
+{
+	uint32 pos=0;
+	if(*args)
+		pos=atoi(args);
+
+	Player * plr;
+
+	sGMLog.writefromsession(m_session, "used dispelall command, pos %u", pos);
+
+	PlayerStorageMap::const_iterator itr;
+	objmgr._playerslock.AcquireReadLock();
+	for (itr = objmgr._players.begin(); itr != objmgr._players.end(); itr++)
+	{
+		plr = itr->second;
+		if(plr->GetSession() && plr->IsInWorld())
+		{
+			if(plr->GetMapMgr() != m_session->GetPlayer()->GetMapMgr())
+			{
+				sEventMgr.AddEvent(((Unit*)plr), &Unit::DispelAll, pos?true:false, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+			}
+			else
+			{
+				plr->DispelAll(pos?true:false);
+			}
+		}
+	}
+	objmgr._playerslock.ReleaseReadLock();
+
+	BlueSystemMessage(m_session, "Dispel action done.");
+	return true;
+}

@@ -1524,7 +1524,7 @@ bool AIInterface::FindFriends(float dist)
 		
 			if(guard->CanAddToWorld())
 			{
-				uint32 t = sRand.randInt(8)*1000;
+				uint32 t = RandomUInt(8)*1000;
 				if(t==0)
 					guard->PushToWorld(m_Unit->GetMapMgr());
 				else
@@ -2307,7 +2307,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 						}
 					}
 					else
-						m_moveTimer = sRand.randInt(m_moveRun ? 5000 : 10000); // wait before next move
+						m_moveTimer = RandomUInt(m_moveRun ? 5000 : 10000); // wait before next move
 				}
 
 				m_creatureState = STOPPED;
@@ -2421,7 +2421,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				if(m_moveType == MOVEMENTTYPE_RANDOMWP) //is random move on if so move to a random waypoint
 				{
 					if(GetWayPointsCount() > 1)
-						destpoint = sRand.randInt((uint32)GetWayPointsCount());
+						destpoint = RandomUInt((uint32)GetWayPointsCount());
 				}
 				else if (m_moveType == MOVEMENTTYPE_CIRCLEWP) //random move is not on lets follow the path in circles
 				{
@@ -2503,19 +2503,19 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			float Fz;
 			// Calculate new angle to target.
 			float Fo = m_Unit->calcRadAngle(UnitToFear->GetPositionX(), UnitToFear->GetPositionY(), m_Unit->GetPositionX(), m_Unit->GetPositionY());
-			double fAngleAdd = sRand.rand(((M_PI/2) * 2)) - (M_PI/2);
+			double fAngleAdd = RandomDouble(((M_PI/2) * 2)) - (M_PI/2);
 			Fo += (float)fAngleAdd;
 			
 			float dist = m_Unit->CalcDistance(UnitToFear);
 			if(dist > 30.0f || (Rand(25) && dist > 10.0f))	// not too far or too close
 			{
-				Fx = m_Unit->GetPositionX() - (float)(sRand.rand(15)+5)*cosf(Fo);
-				Fy = m_Unit->GetPositionY() - (float)(sRand.rand(15)+5)*sinf(Fo);
+				Fx = m_Unit->GetPositionX() - (RandomFloat(15.f)+5.0f)*cosf(Fo);
+				Fy = m_Unit->GetPositionY() - (RandomFloat(15.f)+5.0f)*sinf(Fo);
 			}
 			else
 			{
-				Fx = m_Unit->GetPositionX() + (float)(sRand.rand(20)+5)*cosf(Fo);
-				Fy = m_Unit->GetPositionY() + (float)(sRand.rand(20)+5)*sinf(Fo);
+				Fx = m_Unit->GetPositionX() + (RandomFloat(20.f)+5.0f)*cosf(Fo);
+				Fy = m_Unit->GetPositionY() + (RandomFloat(20.f)+5.0f)*sinf(Fo);
 			}
 			// Check if this point is in water.
 			float wl = m_Unit->GetMapMgr()->GetWaterHeight(Fx, Fy);
@@ -2535,7 +2535,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 	
 	if(m_AIState == STATE_WANDER && m_creatureState == STOPPED)
 	{
-		float wanderO = (float)sRand.rand(6);
+		float wanderO = RandomFloat(6);
 		float wanderX = m_Unit->GetPositionX() + cosf(wanderO);																											 
 		float wanderY = m_Unit->GetPositionY() + sinf(wanderO);																											  
 		float wanderZ;

@@ -3275,7 +3275,7 @@ exit:
 			{
 				//DK:FIXME->yeni bir map oluþtur
                 // Capt: WHAT THE FUCK DOES THIS MEAN....
-				value += (sRand.randIntInternal(true)%(*itrSO)->damage);
+				value += RandomUInt((*itrSO)->damage);
 			}
 		}
 	 }
