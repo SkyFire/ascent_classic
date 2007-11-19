@@ -3979,7 +3979,8 @@ AuraCheckResponse Unit::AuraCheck(uint32 name_hash, uint32 rank, Object *caster)
 	// look for spells with same namehash
 	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash && m_auras[x]->GetCaster()==caster)
+//		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash && m_auras[x]->GetCaster()==caster)
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash)
 		{
 			// we've got an aura with the same name as the one we're trying to apply
 			resp.Misc = m_auras[x]->GetSpellProto()->Id;
@@ -4008,7 +4009,8 @@ AuraCheckResponse Unit::AuraCheck(uint32 name_hash, uint32 rank, Aura* aur, Obje
 	resp.Misc  = 0;
 
 	// look for spells with same namehash
-	if(aur->GetSpellProto()->NameHash == name_hash && aur->GetCaster()==caster)
+//	if(aur->GetSpellProto()->NameHash == name_hash && aur->GetCaster()==caster)
+	if(aur->GetSpellProto()->NameHash == name_hash)
 	{
 		// we've got an aura with the same name as the one we're trying to apply
 		resp.Misc = aur->GetSpellProto()->Id;

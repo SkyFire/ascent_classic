@@ -136,6 +136,7 @@ Zack - test my shit :
 - rogue - Mutilate 34413
 - hunter - hawk eye 19500
 - clearcasting 34754
+- tets code from rev 2378
 
 ==========================================================================
 Capt - test my shit :
