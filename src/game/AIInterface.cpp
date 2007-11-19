@@ -2674,7 +2674,7 @@ SpellCastTargets AIInterface::setSpellTargets(SpellEntry *spellInfo, Unit* targe
 
 AI_Spell *AIInterface::getSpell()
 {
-	if(next_spell_time > UNIXTIME)
+	if(next_spell_time > (uint32)UNIXTIME)
 		return NULL;
 
 	waiting_for_cooldown = false;

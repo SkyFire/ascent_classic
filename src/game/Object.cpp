@@ -1802,7 +1802,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if(this->IsUnit())
 		{
 			CALL_SCRIPT_EVENT(this, OnTargetDied)(pVictim);
-			LUA_ON_UNIT_EVENT((Unit*)this,CREATURE_EVENT_ON_KILLED_TARGET,pVictim,damage);
+			LUA_ON_UNIT_EVENT(((Unit*)this),CREATURE_EVENT_ON_KILLED_TARGET,pVictim,damage);
 
 			((Unit*)this)->smsg_AttackStop(pVictim);
 		

@@ -1070,7 +1070,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 	case RANDOM_ANY:
 		{
 			uint32 count = (uint32)ptr->GetInRangePlayersCount();
-			uint32 r = sRand.randInt(count-1);
+			uint32 r = RandomUInt(count-1);
 			count=0;
 
 			for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
@@ -1095,7 +1095,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 			}
 			if (count)
 			{
-				uint32 r = sRand.randInt(count-1);
+				uint32 r = RandomUInt(count-1);
 				count=0;
 				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
 				{
@@ -1124,7 +1124,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 			}
 			if (count)
 			{
-				uint32 r = sRand.randInt(count-1);
+				uint32 r = RandomUInt(count-1);
 				count=0;
 				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
 				{
@@ -1153,7 +1153,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 			}
 			if (count)
 			{
-				uint32 r = sRand.randInt(count-1);
+				uint32 r = RandomUInt(count-1);
 				count=0;
 				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
 				{
@@ -1179,7 +1179,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 			}
 			if (count)
 			{
-				uint32 r = sRand.randInt(count-1);
+				uint32 r = RandomUInt(count-1);
 				count=0;
 				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
 				{
@@ -1205,7 +1205,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 			}
 			if (count)
 			{
-				uint32 r = sRand.randInt(count-1);
+				uint32 r = RandomUInt(count-1);
 				count=0;
 				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
 				{
@@ -1231,7 +1231,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 			}
 			if (count)
 			{
-				uint32 r = sRand.randInt(count-1);
+				uint32 r = RandomUInt(count-1);
 				count=0;
 				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
 				{
@@ -1261,7 +1261,7 @@ int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 			}
 			if (count)
 			{
-				uint32 r = sRand.randInt(count-1);
+				uint32 r = RandomUInt(count-1);
 				count=0;
 				for(set<Player*>::iterator itr = ptr->GetInRangePlayerSetBegin(); itr != ptr->GetInRangePlayerSetEnd(); ++itr)
 				{
@@ -1302,7 +1302,7 @@ int luaUnit_GetRandomFriend(lua_State * L, Unit * ptr)
 	
 	if (count)
 	{
-		uint32 r = sRand.randInt(count-1);
+		uint32 r = RandomUInt(count-1);
 		count=0;
 		for(set<Object*>::iterator itr = ptr->GetInRangeSetBegin(); itr != ptr->GetInRangeSetEnd(); ++itr)
 		{
