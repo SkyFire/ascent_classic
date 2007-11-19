@@ -333,7 +333,21 @@ bool SymbolOfLife(uint32 i, Spell *pSpell)
 	return true;
 }
 
+// -----------------------------------------------------------------------------
 
+bool NighInvulnBelt(uint32 i, Spell *pSpell)
+{
+    if(!pSpell->p_caster) return true;
+
+    int chance = sRand.randInt(99)+1;
+
+    if(chance > 10) // Buff - Nigh-Invulnerability - 30456
+        pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30456), true);
+    else // Malfunction - Complete Vulnerability - 30457
+        pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30457), true);
+
+    return true;
+}
 
 
 
@@ -360,6 +374,7 @@ void SetupItemSpells_1(ScriptMgr * mgr)
 	mgr->register_dummy_spell(19938, &ForemansBlackjack);  // Lazy Peons Quest
 	mgr->register_dummy_spell(39105, &NetherWraithBeacon); // Spellfire Tailor Quest
 	mgr->register_dummy_spell( 8593, &SymbolOfLife);       // Paladin's Redemption QuestLine
+	mgr->register_dummy_spell(30458, &NighInvulnBelt);     // Nigh Invulnerability Belt
 
 
 

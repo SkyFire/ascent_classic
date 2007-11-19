@@ -1445,6 +1445,28 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			break;
 		}
 
+		if (skill && skill->skilline == SKILL_ALCHEMY)
+		{
+			//Potion Master
+			if (strstr(m_itemProto->Name1, "Potion"))
+			{
+				if(p_caster->HasSpell(28675)) 
+					while (Rand(20)) item_count++;
+			}
+			//Elixir Master
+			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
+			{
+				if(p_caster->HasSpell(28677)) 
+					while (Rand(20)) item_count++;
+			}
+			//Transmutation Master
+			if (m_spellInfo->Category == 310)
+			{
+				if(p_caster->HasSpell(28675)) 
+					while (Rand(20)) item_count++;
+			}
+		}
+
 		// item count cannot be more than allowed in a single stack
 		if (item_count > m_itemProto->MaxCount)
 			item_count = m_itemProto->MaxCount;
