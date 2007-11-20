@@ -3948,11 +3948,15 @@ void Spell::SpellEffectDispelMechanic(uint32 i)
 		return;
 	if(!unitTarget->isAlive())
 		return;
-	
+	/*
 	for(uint32 x=MAX_POSITIVE_AURAS;x<MAX_AURAS;x++)
 		if(unitTarget->m_auras[x])
 			if(unitTarget->m_auras[x]->GetSpellProto()->MechanicsType)
 				unitTarget->m_auras[x]->Remove();	
+	*/
+
+	// Hehe, I love this function.
+	unitTarget->MechanicImmunityMassDispel( m_spellInfo->EffectMiscValue[i] , -1 , true );
 }
 
 void Spell::SpellEffectSummonDeadPet(uint32 i)

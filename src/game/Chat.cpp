@@ -470,6 +470,7 @@ void CommandTableStorage::Init()
 		{ "kick",		'b', &ChatHandler::HandleKickCommand,		  "Kicks player from server",	   NULL, 0, 0, 0},
 
 		{ "kill",		'r', &ChatHandler::HandleKillCommand,		  ".kill - Kills selected unit.",   NULL, 0, 0, 0},
+		{ "killplr" ,   'r', &ChatHandler::HandleKillByPlrCommand,         ".killplr <name> - Kills specified player" , NULL , 0 , 0 , 0 },
 		{ "revive",	  'r', &ChatHandler::HandleReviveCommand,		"Revives you.",				   NULL, 0, 0, 0},
 		{ "reviveplr",   'r', &ChatHandler::HandleReviveStringcommand,  "Revives player specified.",	  NULL, 0, 0, 0},
 
@@ -585,6 +586,7 @@ void CommandTableStorage::Init()
 		{ "createarenateam", 'g', &ChatHandler::HandleCreateArenaTeamCommands, "Creates arena team", NULL, 0, 0, 0 },
 		{ "callgmfunction", 'g', &ChatHandler::HandleGMCallCommand, "Calls script function", NULL, 0, 0, 0 },
 		{ "whisperblock", 'g', &ChatHandler::HandleWhisperBlockCommand, "Blocks like .gmon except without the <GM> tag", NULL, 0, 0, 0 },
+		{ "logcomment" , '1' , &ChatHandler::HandleGmLogCommentCommand, "Adds a comment to the GM log for the admins to read." , NULL , 0 , 0 , 0 },
 		{ NULL,		  0, NULL,										 "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(commandTable, _commandTable);

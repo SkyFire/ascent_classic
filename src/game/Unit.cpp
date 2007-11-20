@@ -4542,7 +4542,7 @@ void Unit::SetFacing(float newo)
 	data << uint32(0);				// time
 	data << m_position;				// position
 	SendMessageToSet(&data, true);*/
-	m_aiInterface->SendMoveToPacket(m_position.x,m_position.y,m_position.z,m_position.o,1,1);
+	m_aiInterface->SendMoveToPacket(m_position.x,m_position.y,m_position.z,m_position.o,1,1); // 0x00000100 = 3 (?)
 }
 
 //guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
@@ -5181,4 +5181,50 @@ void Unit::DispelAll(bool positive)
 			if((m_auras[i]->IsPositive()&&positive)||!m_auras[i]->IsPositive())
 				m_auras[i]->Remove();
 	}
+}
+
+/* bool Unit::MechanicImmunityMassDispel
+- Removes all auras on this unit that are of a specific mechanic.
+- Useful for things like.. Apply Aura: Immune Mechanic, where existing (de)buffs are *always supposed* to be removed.
+- I'm not sure if this goes here under unit.
+* Arguments:
+	- uint32 MechanicType
+		*
+
+* Returns;
+	- False if no buffs were dispelled, true if more than 0 were dispelled.
+*/
+bool Unit::MechanicImmunityMassDispel( uint32 MechanicType , uint32 MaxDispel = -1 , bool HostileOnly = true )
+{
+	sLog.outString( "Unit::MechanicImmunityMassDispel called, mechanic: %u" , MechanicType );
+	uint32 DispelCount = 0;
+	for(uint32 x = ( HostileOnly ? MAX_POSITIVE_AURAS : 0 ) ; x < MAX_AURAS ; x++ ) // If HostileOnly = 1, then we use aura slots 40-56 (hostile). Otherwise, we use 0-56 (all)
+		{
+			if( DispelCount >= MaxDispel && MaxDispel > 0 )
+			return true;
+
+			if( m_auras[x] )
+			{
+					if( m_auras[x]->GetSpellProto()->MechanicsType == MechanicType ) // Remove all mechanics of type MechanicType (my english goen boom)
+					{
+						sLog.outString( "Removed aura. [AuraSlot %u, SpellId %u]" , x , m_auras[x]->GetSpellId() );
+						// TODO: Stop moving if fear was removed.
+						m_auras[x]->Remove(); // EZ-Remove
+						DispelCount ++;
+					}
+					else if( MechanicType == MECHANIC_ENSNARED ) // if got immunity for slow, remove some that are not in the mechanics
+					{
+						for( int i=0 ; i<3 ; i++ )
+						{
+							// SNARE + ROOT
+							if( m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED || m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
+							{
+								m_auras[x]->Remove();
+								break;
+							}
+						}
+					}
+			}
+		}
+	return ( DispelCount == 0 );
 }

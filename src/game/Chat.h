@@ -200,7 +200,7 @@ protected:
 	bool HandleDismountCommand(const char* args, WorldSession *m_session);
 	bool HandleSaveCommand(const char* args, WorldSession *m_session);
 	bool HandleGMListCommand(const char* args, WorldSession *m_session);
-
+	bool HandleGmLogCommentCommand( const char *args , WorldSession *m_session);
 	// Level 1 commands
 	bool CmdSetValueField(WorldSession *m_session, uint32 field, uint32 fieldmax, const char *fieldname, const char* args);
 	bool CmdSetFloatField(WorldSession *m_session, uint32 field, uint32 fieldmax, const char *fieldname, const char* args);
@@ -286,6 +286,7 @@ protected:
 	bool HandleInvincibleCommand(const char *args, WorldSession *m_session);
 	bool HandleInvisibleCommand(const char *args, WorldSession *m_session);
 	bool HandleKillCommand(const char *args, WorldSession *m_session);
+	bool HandleKillByPlrCommand( const char *args , WorldSession *m_session );
 	bool HandleAddSpiritCommand(const char *args, WorldSession *m_session);
 	bool HandleNPCFactionCommand(const char *args, WorldSession *m_session);
 	bool HandleCreatureSpawnCommand(const char *args, WorldSession *m_session);

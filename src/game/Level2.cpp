@@ -466,6 +466,28 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 	return true;
 }
 
+bool ChatHandler::HandleKillByPlrCommand( const char *args , WorldSession *m_session )
+{
+	Player *plr = objmgr.GetPlayer(args, false);
+	if(!plr)
+	{
+		RedSystemMessage(m_session, "Player %s is not online or does not exist.", args);
+		return true;
+	}
+
+	if(plr->isDead())
+	{
+		RedSystemMessage(m_session, "Player %s is already dead.", args);
+	} else {
+		plr->SetUInt32Value(UNIT_FIELD_HEALTH, 0); // Die, insect
+		plr->KillPlayer();
+		BlueSystemMessageToPlr(plr, "You were killed by %s with a GM command.", m_session->GetPlayer()->GetName());
+		GreenSystemMessage(m_session, "Killed player %s.", args);
+		sGMLog.writefromsession(m_session, "remote killed "I64FMT" (Name: %s)", plr->GetGUID(), plr->GetNameString() );
+
+	}
+	return true;
+}
 bool ChatHandler::HandleCastSpellCommand(const char* args, WorldSession *m_session)
 {
 	Unit *caster = m_session->GetPlayer();

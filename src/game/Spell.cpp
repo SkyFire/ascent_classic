@@ -488,6 +488,35 @@ uint8 Spell::DidHit(Unit* target)
 	/************************************************************************/
 	if(u_victim->SchoolImmunityList[m_spellInfo->School])
 		return SPELL_DID_HIT_IMMUNE;
+	
+	/*************************************************************************/
+	/* Check if the target is immune to this mechanic                        */
+	/*************************************************************************/
+	if(u_victim->MechanicsDispels[m_spellInfo->MechanicsType])
+	{
+		return SPELL_DID_HIT_IMMUNE; // Moved here from Spell::CanCast
+	}
+	
+	/**** HACK FIX: AoE Snare/Root spells (i.e. Frost Nova) ****/
+	/* If you find any other AoE effects that also apply something that SHOULD be a mechanic, add it here. */
+	if( u_victim->MechanicsDispels[MECHANIC_ROOTED] ||
+		u_victim->MechanicsDispels[MECHANIC_ENSNARED]
+		)
+	{
+	for( int i = 1 ; i <= 3 ; i ++ )
+		{
+			if( u_victim->MechanicsDispels[MECHANIC_ROOTED] && m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
+				return SPELL_DID_HIT_IMMUNE;
+			if( u_victim->MechanicsDispels[MECHANIC_ENSNARED] && m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED )
+				return SPELL_DID_HIT_IMMUNE;
+		}
+
+	}
+
+	/************************************************************************/
+	/* Check if the target has a % resistance to this mechanic              */
+	/************************************************************************/
+		/* Never mind, it's already done below. Lucky I didn't go through with this, or players would get double resistance. */
 
 	/************************************************************************/
 	/* Check if the spell is a melee attack and if it was missed/parried    */
@@ -870,7 +899,7 @@ void Spell::prepare(SpellCastTargets * targets)
 		   cancastresult = -1;
 	  else
 		   cancastresult = CanCast(false);
-
+	//sLog.outString( "CanCast result: %u. Refer to SpellFailure.h to work out why." , cancastresult );
 	if(cancastresult != -1)
 	{
 		SendCastResult(cancastresult);
@@ -1110,6 +1139,7 @@ void Spell::cast(bool check)
 			}
 		}
 		SendCastResult(cancastresult);
+		sLog.outString( "CanCastResult: %u" , cancastresult );
 		if(!m_triggeredSpell)
 			AddCooldown();
 		
@@ -2226,7 +2256,6 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 	}	
 
 	damage = CalculateEffect(i,unitTarget);  
-
 	sLog.outDebug( "WORLD: Spell effect id = %u, damage = %d", m_spellInfo->Effect[i], damage); 
 	
 	if(m_spellInfo->Effect[i]<TOTAL_SPELL_EFFECTS)
@@ -2677,8 +2706,9 @@ uint8 Spell::CanCast(bool rangetolerate)
 				if(target->dispels[m_spellInfo->DispelType])
 					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1;			// hackfix - burlex
 				
-				if(target->MechanicsDispels[m_spellInfo->MechanicsType])
-					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1; // Why not just use 	SPELL_FAILED_DAMAGE_IMMUNE                                   = 144,
+				// Removed by Supalosa and moved to 'completed cast'
+				//if(target->MechanicsDispels[m_spellInfo->MechanicsType])
+				//	return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1; // Why not just use 	SPELL_FAILED_DAMAGE_IMMUNE                                   = 144,
 			}
 
 			// if we're replacing a higher rank, deny it
@@ -2834,17 +2864,25 @@ uint8 Spell::CanCast(bool rangetolerate)
 		if(u_caster->m_silenced && m_spellInfo->School != NORMAL_DAMAGE)// can only silence non-physical
 			return SPELL_FAILED_SILENCED;
 
-		if(target)
+		if(target) /* -Supalosa- Shouldn't this be handled on Spell Apply? */
 		{
 			for(int i=0;i<3;i++) // if is going to cast a spell that breaks stun remove stun auras, looks a bit hacky but is the best way i can find
             {
-				if(m_spellInfo->EffectApplyAuraName[i] == 77 && (m_spellInfo->EffectMiscValue[i] == 12 || m_spellInfo->EffectMiscValue[i] == 17))
+				if( m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MECHANIC_IMMUNITY  )
+				{
+					target->MechanicImmunityMassDispel( m_spellInfo->EffectMiscValue[i] , -1 , true );
+					// Remove all debuffs of that mechanic type.
+					// This is also done in SpellAuras.cpp - wtf?
+				}
+				/*
+				if(m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MECHANIC_IMMUNITY && (m_spellInfo->EffectMiscValue[i] == 12 || m_spellInfo->EffectMiscValue[i] == 17))
 				{
 					for(uint32 x=MAX_POSITIVE_AURAS;x<MAX_AURAS;x++)
 						if(target->m_auras[x])
 							if(target->m_auras[x]->GetSpellProto()->MechanicsType == m_spellInfo->EffectMiscValue[i])
 								target->m_auras[x]->Remove();
 				}
+				*/
             }
 		}
 
@@ -2872,7 +2910,15 @@ uint8 Spell::CanCast(bool rangetolerate)
 			{
 			case 0x768F3B4B: //Ice Block
 			case 0x9840A1A6: //Divine Shield
+			case 0x1513B967: //Divine Protection
 			case 0xCD4CDF55: //Barkskin
+				break;
+			/* -Supalosa- For some reason, being charmed or sleep'd is counted as 'Stunned'. 
+			Check it: http://www.wowhead.com/?spell=700 */
+
+			case 0xC7C45478: /* Immune Movement Impairment and Loss of Control (PvP Trinkets) */
+				break;
+			case 0x3DFA70E5: /* Will of the Forsaken (Undead Racial) */
 				break;
 			default:
 				return SPELL_FAILED_STUNNED;

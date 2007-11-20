@@ -406,3 +406,8 @@ bool ChatHandler::HandleRangeCheckCommand( const char *args , WorldSession *m_se
 	m_session->SystemMessage( "GetDistance2dSq:   %u" , FL2UINT( Dist2DSq ) );
 	return true;
 }
+
+bool ChatHandler::HandleGmLogCommentCommand( const char *args , WorldSession *m_session )
+{
+	return true;
+}
