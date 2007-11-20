@@ -3129,6 +3129,23 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all spells, too bad not all spells have grouping flags :S
 
+	// druid - Starlight Wrath
+	sp = dbcSpell.LookupEntry(16814);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
+	sp = dbcSpell.LookupEntry(16815);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
+	sp = dbcSpell.LookupEntry(16816);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
+	sp = dbcSpell.LookupEntry(16817);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
+	sp = dbcSpell.LookupEntry(16818);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
+
 ///////////////////////////////
 /*	// druid - Improved Mark of the Wild
 	uint32 imarkofthv_group=0;
