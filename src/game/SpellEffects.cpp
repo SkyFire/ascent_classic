@@ -1462,7 +1462,7 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			//Transmutation Master
 			if (m_spellInfo->Category == 310)
 			{
-				if(p_caster->HasSpell(28675)) 
+				if(p_caster->HasSpell(28672)) 
 					while (Rand(20) && item_count<10) item_count++;
 			}
 		}
