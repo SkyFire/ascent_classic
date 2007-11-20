@@ -3147,7 +3147,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1 | 4;
 
 ///////////////////////////////
-/*	// druid - Improved Mark of the Wild
+/*	// druid - Improved Mark of the Wild - already working ?
 	uint32 imarkofthv_group=0;
 	tsp = dbcSpell.LookupEntry(1126); //Mark of the wild
 	if(tsp)
@@ -3169,17 +3169,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
 	sp = dbcSpell.LookupEntry(17055);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	//rogue - initiative
-	sp = dbcSpell.LookupEntry(13976);
-	if(sp)
-		sp->procChance = 25;
-	sp = dbcSpell.LookupEntry(13979);
-	if(sp)
-		sp->procChance = 50;
-	sp = dbcSpell.LookupEntry(13980);
-	if(sp)
-		sp->procChance = 75;*/
+		sp->EffectSpellGroupRelation[0] = imarkofthv_group;*/
 //---------ITEMS-----------------
 	sp = dbcSpell.LookupEntry(33758);
 	if(sp)
