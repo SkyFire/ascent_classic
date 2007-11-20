@@ -1451,22 +1451,19 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			if (strstr(m_itemProto->Name1, "Potion"))
 			{
 				if(p_caster->HasSpell(28675)) 
-//					while (Rand(20)) item_count++;
-					if (Rand(20)) item_count++;
+					while (Rand(20) && item_count<10) item_count++;
 			}
 			//Elixir Master
 			if (strstr(m_itemProto->Name1, "Elixir") || strstr(m_itemProto->Name1, "Flask"))
 			{
 				if(p_caster->HasSpell(28677)) 
-//					while (Rand(20)) item_count++;
-					if (Rand(20)) item_count++;
+					while (Rand(20) && item_count<10) item_count++;
 			}
 			//Transmutation Master
 			if (m_spellInfo->Category == 310)
 			{
 				if(p_caster->HasSpell(28675)) 
-//					while (Rand(20)) item_count++;
-					if (Rand(20)) item_count++;
+					while (Rand(20) && item_count<10) item_count++;
 			}
 		}
 

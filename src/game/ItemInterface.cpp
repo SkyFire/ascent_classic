@@ -1356,23 +1356,17 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 		{
 			if(!(m_pOwner->GetWeaponProficiency()&(((uint32)(1))<<proto->SubClass)))
 				return INV_ERR_NO_REQUIRED_PROFICIENCY;
-
 		}
-	/*
-	uint32 SubClassSkill = GetSkillByProto(proto);
-
-	// removed those loops, use the skill lookup functions
-	if(SubClassSkill)
-	{
-	if(!HasSkillLine(SubClassSkill))
-	return INV_ERR_NO_REQUIRED_PROFICIENCY;
-	}*/
 
 		if(proto->RequiredSkill)
 			if (proto->RequiredSkillRank > m_pOwner->_GetSkillLineCurrent(proto->RequiredSkill,true))
 				return INV_ERR_SKILL_ISNT_HIGH_ENOUGH;
 
-		// You are dead !
+		if(proto->RequiredSkillSubRank)
+			if (!m_pOwner->HasSpell(proto->RequiredSkillSubRank))
+				return INV_ERR_NO_REQUIRED_PROFICIENCY;
+
+				// You are dead !
 		if(m_pOwner->getDeathState() == DEAD)
 			return INV_ERR_YOU_ARE_DEAD;
 	}

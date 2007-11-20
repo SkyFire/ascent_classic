@@ -1744,7 +1744,7 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 	{
 		if(ColorMatch && (FilledSlots==TargetItem->GetSocketsCount()))
 		{
-			if(TargetItem->HasEnchantment(TargetItem->GetProto()->SocketBonus))
+			if(TargetItem->HasEnchantment(TargetItem->GetProto()->SocketBonus) > 0)
 				return;
 
 			Enchantment = dbcEnchant.LookupEntry(TargetItem->GetProto()->SocketBonus);
