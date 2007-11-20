@@ -421,6 +421,7 @@ bool Database::run()
 			SendQuery(con,query);
 			con->busy.Release();
 			delete [] query;
+			query=queries_queue.pop_nowait();
 		}
 	}
 
