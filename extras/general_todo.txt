@@ -132,6 +132,7 @@ Zack - test my shit :
 - hunter - hawk eye 19500
 - clearcasting 34754
 - tets code from rev 2378
+- druid - nature's grace 16880 + 16886
 
 ==========================================================================
 Capt - test my shit :

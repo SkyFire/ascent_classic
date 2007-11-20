@@ -3120,6 +3120,15 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(5420);
 	if(sp)
 		sp->EffectSpellGroupRelation[2] = 268435456 | 32 | 64 | 16; //for the mana cost tweak
+
+	// druid - Nature's Grace
+	sp = dbcSpell.LookupEntry(16880);
+	if(sp)
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	sp = dbcSpell.LookupEntry(16886);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all spells, too bad not all spells have grouping flags :S
+
 ///////////////////////////////
 /*	// druid - Improved Mark of the Wild
 	uint32 imarkofthv_group=0;

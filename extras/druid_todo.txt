@@ -20,14 +20,6 @@ Aquatic Form:
 Thorns:
 -Works fine but you lose this aura when u transform
 
-Talents:
-Omen of Clarity - yesterday
-
-
-
-Nature's Grace:
-
--All spell criticals grace you with a blessing of nature, reducing the casting time of your next spell by 0.5 sec. -Not working at all
 
 Starlight Wrath:
 
