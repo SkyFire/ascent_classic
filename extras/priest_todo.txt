@@ -9,22 +9,8 @@ Spell Warding http://www.wowhead.com/?spell=27900
 Mind Control http://www.wowhead.com/?spell=605 Controled player can't attack and can't cast any skill/spell, controled mob can attack only in meele, can't use their skills, you loose crontrol of player/mob if you walk away from your own character.
 Psychic Scream http://www.wowhead.com/?spell=8124 Using Psychic Scream makes player/mob walk from you, not run.
 Mind Vision http://www.wowhead.com/?spell=20
-
-Focused Power: Doesn't Work
-Inner Focus : Works
-Absolution : Doesn't Work
-Imp Div Spirit : don't know
 Holy Nova : Half Works (it does damage, but it doesn't heal)
 
 Most annoying bugs are :
-- Prayer of Mending
 - Shadowfiend
-- Blessed Recovery & Blessed Resilience
 - Devouring Plague (doesn't show damage and doesn't gain bonus from Spell damage)
-- Touch of Weakness (it procs on yourself :| however i can train only rank 2 so...)
-
-
-Updated
-
-Surge of Light, Prayer of Mending, and Shadowfiend are really usefull for a priest.
-Blessed Recovery + Blessed resilience has allowed the Healer Arena Build 28 33 to exist. (so they're much important)

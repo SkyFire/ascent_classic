@@ -134,6 +134,7 @@ Zack - test my shit :
 - tets code from rev 2378
 - druid - nature's grace 16880 + 16886
 - druid - Starlight Wrath 16818
+- paladin - Holy shield - 41026
 
 ==========================================================================
 Capt - test my shit :
