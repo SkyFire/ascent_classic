@@ -1139,7 +1139,7 @@ void Spell::cast(bool check)
 			}
 		}
 		SendCastResult(cancastresult);
-		sLog.outString( "CanCastResult: %u" , cancastresult );
+		//sLog.outString( "CanCastResult: %u" , cancastresult );
 		if(!m_triggeredSpell)
 			AddCooldown();
 		
