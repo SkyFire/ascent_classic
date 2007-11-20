@@ -1326,6 +1326,9 @@ bool World::SetInitialWorldSettings()
 		//druid - swipe, has missing spellgroup.very dangerous move !
 		else if(sp->NameHash == 0xDCBA31B0)
 			sp->SpellGroupType |= 33554432;
+		//mage - fireball. Only some of the spell has the flags 
+		else if(sp->NameHash == 0xB39201EC)
+			sp->SpellGroupType |= 1;
 		else if(sp->NameHash==0x9840A1A6 || sp->NameHash == 0x1513B967 || sp->NameHash==0x204D568D)
 			sp->MechanicsType=25;
 

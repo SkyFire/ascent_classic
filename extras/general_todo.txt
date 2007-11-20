@@ -97,15 +97,11 @@ Zack - test my shit :
 - if you have hearth of the wild and reset talents...you will get negative dmg
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
 - priest - Focused Mind (33215) - works
-- shaman - Improved Lightning shield 16291 - was working before - improved dmg
 - shaman - Elemental mastery 16166 - crit and mana - Not working sice the aura remove happens before the trigger
 - shaman - Totemic focus 16225
-- shaman - Ancestral healin 16240
+- shaman - Elemental Devastation 30160
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
 - shaman - Restorative Totems 16208
-- shaman - Elemental Fury 16089. Should look up all the specified spells. Right now i just put all spells in there :P
-- shaman - Elemental Devastation 30160
-- shaman - Mental Quickness 30814. works only for half of the spells
 - Druid - Ferocity 16938. Works only partially
 - paladin - Blessing of Light 32770 
 - priest - Absolution 33172
@@ -116,12 +112,7 @@ Zack - test my shit :
 - warlock - Amplify Curse 18288
 - warlock - Improved Howl of Terror 30057
 - warlock - Bane 17792 affects soulfire too Soul Fire.
-- mage - Burning Soul 12351
-- mage - Master of Elements 29076
-- mage - Fire Power 12378
-- mage - Combustion 28682
-- mage - Empowered Fireball 31660
-- mage - Empowered Frostbolt 31686
+- mage - Master of Elements 29076 - !
 - rogue - Improved Expose Armor 14169
 - rogue - Vile Poisons 16720
 - rogue - Improved Poisons 14117

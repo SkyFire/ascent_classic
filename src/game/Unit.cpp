@@ -1012,8 +1012,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//mage - Master of Elements
 						case 29077:
 							{
-//								disabled until tested !!
-								continue;
 								if(!CastingSpell)
 									continue;
 								if (CastingSpell->School!=SCHOOL_FIRE || CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals

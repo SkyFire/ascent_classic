@@ -2157,10 +2157,26 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			bonus_damage += bonus_damage*penalty_pct/100;
 			SM_FIValue(caster->SM_FPenalty, &bonus_damage, spellInfo->SpellGroupType);
 			res += bonus_damage;
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			int spell_flat_modifers=0;
+			int spell_pct_modifers=0;
+			SM_FIValue(caster->SM_FPenalty,&spell_flat_modifers,spellInfo->SpellGroupType);
+			SM_FIValue(caster->SM_PPenalty,&spell_pct_modifers,spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
+#endif
 
 			int32 ures = (int32)res;
 			SM_FIValue(caster->SM_FDamageBonus, &ures, spellInfo->SpellGroupType);
 			SM_PIValue(caster->SM_PDamageBonus, &ures, spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			spell_flat_modifers=0;
+			spell_pct_modifers=0;
+			SM_FIValue(caster->SM_FDamageBonus,&spell_flat_modifers,spellInfo->SpellGroupType);
+			SM_FIValue(caster->SM_PDamageBonus,&spell_pct_modifers,spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
+#endif
 			res = (float)ures;
 		}
 		else

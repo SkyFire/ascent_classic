@@ -6311,7 +6311,9 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 
 		// as far as I know its not yet used!!!
 	case SMT_PENALTY:
-		SendModifierLog(&m_target->SM_FPenalty,val,AffectedGroups,mod->m_miscValue);
+//		SendModifierLog(&m_target->SM_FPenalty,val,AffectedGroups,mod->m_miscValue);
+		//all values seem to be pct. Based of 8/8 spells
+		SendModifierLog(&m_target->SM_PPenalty,val,AffectedGroups,mod->m_miscValue);
 		break;
 	
 	case SMT_COOLDOWN_DECREASE:

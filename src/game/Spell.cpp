@@ -856,6 +856,14 @@ void Spell::prepare(SpellCastTargets * targets)
 		{
 			SM_FIValue(u_caster->SM_FCastTime,(int32*)&m_castTime,m_spellInfo->SpellGroupType);
 			SM_PIValue(u_caster->SM_PCastTime,(int32*)&m_castTime,m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			int spell_flat_modifers=0;
+			int spell_pct_modifers=0;
+			SM_FIValue(u_caster->SM_FCastTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(u_caster->SM_PCastTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!spell casttime mod flat %d , spell casttime mod pct %d , spell casttime %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,m_castTime,m_spellInfo->SpellGroupType);
+#endif
 		}
 
 		// handle MOD_CAST_TIME
@@ -1025,6 +1033,14 @@ void Spell::AddCooldown()
 		{
 			SM_FIValue(u_caster->SM_FCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
 			SM_PIValue(u_caster->SM_PCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			int spell_flat_modifers=0;
+			int spell_pct_modifers=0;
+			SM_FIValue(u_caster->SM_FCooldownTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(u_caster->SM_PCooldownTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!spell cooldown mod flat %d , spell cooldown mod pct %d , spell cooldown %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cooltime,m_spellInfo->SpellGroupType);
+#endif
 		}
 
 		if(cooltime > 0)
@@ -1053,6 +1069,14 @@ void Spell::AddStartCooldown()
 		{
 			SM_FIValue(u_caster->SM_FCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
 			SM_PIValue(u_caster->SM_PCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			int spell_flat_modifers=0;
+			int spell_pct_modifers=0;
+			SM_FIValue(u_caster->SM_FCooldownTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(u_caster->SM_PCooldownTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!spell cooldown mod flat %d , spell cooldown mod pct %d , spell cooldown %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cooltime,m_spellInfo->SpellGroupType);
+#endif
 		}
 
 		if(cooltime > 0)
@@ -1394,6 +1418,12 @@ void Spell::AddTime(uint32 type)
 		{
 			float ch=0;
 			SM_FFValue(u_caster->SM_PNonInterrupt,&ch,m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			float spell_pct_modifers=0;
+			SM_FFValue(u_caster->SM_PNonInterrupt,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+			if(spell_pct_modifers!=0)
+				printf("!!!!!spell interrupt chance mod pct %f , uninterrupt chance %f, spell group %u\n",spell_pct_modifers,ch,m_spellInfo->SpellGroupType);
+#endif
 			if(Rand(ch))
 				return;
 		}
