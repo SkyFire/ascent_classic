@@ -3956,7 +3956,7 @@ void Spell::SpellEffectDispelMechanic(uint32 i)
 	*/
 
 	// Hehe, I love this function.
-	unitTarget->MechanicImmunityMassDispel( m_spellInfo->EffectMiscValue[i] , -1 , true );
+	unitTarget->RemoveAllAurasByMechanic( m_spellInfo->EffectMiscValue[i] , -1 , true );
 }
 
 void Spell::SpellEffectSummonDeadPet(uint32 i)

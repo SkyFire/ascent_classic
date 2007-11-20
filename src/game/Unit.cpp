@@ -5183,7 +5183,7 @@ void Unit::DispelAll(bool positive)
 	}
 }
 
-/* bool Unit::MechanicImmunityMassDispel
+/* bool Unit::RemoveAllAurasByMechanic (renamed from MechanicImmunityMassDispel)
 - Removes all auras on this unit that are of a specific mechanic.
 - Useful for things like.. Apply Aura: Immune Mechanic, where existing (de)buffs are *always supposed* to be removed.
 - I'm not sure if this goes here under unit.
@@ -5194,9 +5194,9 @@ void Unit::DispelAll(bool positive)
 * Returns;
 	- False if no buffs were dispelled, true if more than 0 were dispelled.
 */
-bool Unit::MechanicImmunityMassDispel( uint32 MechanicType , uint32 MaxDispel = -1 , bool HostileOnly = true )
+bool Unit::RemoveAllAurasByMechanic( uint32 MechanicType , uint32 MaxDispel = -1 , bool HostileOnly = true )
 {
-	sLog.outString( "Unit::MechanicImmunityMassDispel called, mechanic: %u" , MechanicType );
+	//sLog.outString( "Unit::MechanicImmunityMassDispel called, mechanic: %u" , MechanicType );
 	uint32 DispelCount = 0;
 	for(uint32 x = ( HostileOnly ? MAX_POSITIVE_AURAS : 0 ) ; x < MAX_AURAS ; x++ ) // If HostileOnly = 1, then we use aura slots 40-56 (hostile). Otherwise, we use 0-56 (all)
 		{
@@ -5207,7 +5207,7 @@ bool Unit::MechanicImmunityMassDispel( uint32 MechanicType , uint32 MaxDispel = 
 			{
 					if( m_auras[x]->GetSpellProto()->MechanicsType == MechanicType ) // Remove all mechanics of type MechanicType (my english goen boom)
 					{
-						sLog.outString( "Removed aura. [AuraSlot %u, SpellId %u]" , x , m_auras[x]->GetSpellId() );
+						//sLog.outString( "Removed aura. [AuraSlot %u, SpellId %u]" , x , m_auras[x]->GetSpellId() );
 						// TODO: Stop moving if fear was removed.
 						m_auras[x]->Remove(); // EZ-Remove
 						DispelCount ++;

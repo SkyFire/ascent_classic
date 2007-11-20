@@ -794,7 +794,7 @@ public:
 	bool RemoveAuraPosByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAuraNegByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAuras(uint32 * SpellIds);
-	bool MechanicImmunityMassDispel( uint32 MechanicType , uint32 MaxDispel , bool HostileOnly ); // Removes all (de)buffs on unit of a specific mechanic type.
+
 	void EventRemoveAura(uint32 SpellId)
 	{
 		RemoveAura(SpellId);
@@ -806,6 +806,8 @@ public:
 	bool RemoveAllAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAllPosAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAllNegAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
+	bool RemoveAllAurasByMechanic( uint32 MechanicType , uint32 MaxDispel , bool HostileOnly ); // Removes all (de)buffs on unit of a specific mechanic type.
+	
 	void RemoveNegativeAuras();
 	void RemoveAllAreaAuras();
 	// Temporary remove all auras

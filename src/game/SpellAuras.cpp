@@ -4449,10 +4449,10 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 					}
 				}
 			*/
-			/* Supa's test run of Unit::MechanicImmunityMassDispel */
+			/* Supa's test run of Unit::RemoveAllAurasByMechanic */
 			if( m_target ) // just to be sure?
 			{
-				m_target->MechanicImmunityMassDispel( (uint32)mod->m_miscValue , -1 , true );
+				m_target->RemoveAllAurasByMechanic( (uint32)mod->m_miscValue , -1 , true );
 			}
 		}
 		else
