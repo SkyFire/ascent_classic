@@ -1264,6 +1264,15 @@ bool World::SetInitialWorldSettings()
 			sp->SpellGroupType |= 268435456; //some of them do have the flags but i's hard to write down those some from 130 spells
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
 		}
+		//druid - Swiftmend - required for tree of life
+		if(sp->NameHash == 0x176A8339)
+			sp->SpellGroupType |= 268435456; //dangerous move !
+		//druid - Innervate - required for tree of life
+		if(sp->NameHash == 0xC6386A59)
+			sp->SpellGroupType |= 268435456; //dangerous move !
+		//druid - Nature's Swiftness - required for tree of life
+		if(sp->NameHash == 0x4CE6BBE1)
+			sp->SpellGroupType |= 268435456; //dangerous move !
 /*		else if(strstr(nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if(strstr(nametext, "Blinding Powder"))
@@ -3119,6 +3128,10 @@ bool World::SetInitialWorldSettings()
         }
     }
 
+	// druid - Tree of Life
+	sp = dbcSpell.LookupEntry(5420);
+	if(sp)
+		sp->EffectSpellGroupRelation[2] = 268435456 | 32 | 64 | 16; //for the mana cost tweak
 ///////////////////////////////
 /*	// druid - Improved Mark of the Wild
 	uint32 imarkofthv_group=0;

@@ -12,3 +12,32 @@ IMproved Mark of the Wild - affects only druid
 revision 1602 - win32-x86
 while in aquatic form and underwater, no breath bar is displayed(thats fine), but after a while, HP goes down, as if the breathbar reached zero.happens exactly after 60seconds
 
+
+Aquatic Form:
+
+-You drowng, just take more time than usual (like 2 mins)
+
+
+Thorns:
+
+-Works fine but you lose this aura when u transform
+
+
+
+Talents:
+
+Omen of Clarity:
+
+-Shows aura but doesn't reduce any cost of a spell
+
+
+Nature's Grace:
+
+-All spell criticals grace you with a blessing of nature, reducing the casting time of your next spell by 0.5 sec. -Not working at all
+
+Starlight Wrath:
+
+-Reduces the cast time of your Wrath and Starfire spells by 0,5(max rank)
+Not working for Starfire.For wrath is working OK.
+
+There are other bugs but I think they aren't so important than this. Thanks 4 everything.....
