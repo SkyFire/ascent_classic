@@ -1,4 +1,3 @@
-# Sunder Armor - not stackable
 # Overpower - should work
 focused rage: should decrease the rage of all damage-dealing abilities and of all debuffs. And it should be stackable with Improved Sunder Armor and Improved Heroic Strike talents
 Piercing howl should detect stealth
