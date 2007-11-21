@@ -1000,9 +1000,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									continue;
 							}break;
 						//mage - Improved Blizzard
-						case 11185:
-						case 12487:
-						case 12488:
+						case 12484:
+						case 12485:
+						case 12486:
 							{
 								if(!CastingSpell)
 									continue;
