@@ -66,6 +66,7 @@ public:
 };
 
 #else
+#ifndef HAVE_DARWIN
 #include <semaphore.h>
 int GenerateThreadId();
 
@@ -106,6 +107,44 @@ public:
 
 	inline uint32 GetId() { return (uint32)thread_id; }
 };
+
+#else
+int GenerateThreadId();
+class ThreadController
+{
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
+	int thread_id;
+	pthread_t handle;
+public:
+	void Setup(pthread_t h)
+	{
+		handle = h;
+		pthread_mutex_init(&mutex,NULL);
+		pthread_cond_init(&cond,NULL);
+		thread_id = GenerateThreadId();
+	}
+	~ThreadController()
+	{
+		pthread_mutex_destroy(&mutex);
+		pthread_cond_destroy(&cond);
+	}
+	void Suspend()
+	{
+		pthread_cond_wait(&cond, &mutex);
+	}
+	void Resume()
+	{
+		pthread_cond_signal(&cond);
+	}
+	void Join()
+	{
+		pthread_join(handle,NULL);
+	}
+	inline uint32 GetId() { return (uint32)thread_id; }
+};
+
+#endif
 
 #endif
 
