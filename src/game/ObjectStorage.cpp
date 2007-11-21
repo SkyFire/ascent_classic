@@ -320,7 +320,7 @@ void Storage_FillTaskList(TaskList & tl)
 	make_task(WorldMapInfoStorage, MapInfo, ArrayStorageContainer, "worldmap_info", gWorldMapInfoFormat);
 	make_task(ZoneGuardStorage, ZoneGuardEntry, HashMapStorageContainer, "zoneguards", gZoneGuardsFormat);
 #ifdef ENABLE_CHECKPOINT_SYSTEM
-	make_task(CheckpointStorage, MapCheckPoint, ArrayStorageContainer, "map_checkpoints", gCheckpointFormat);
+	make_task(CheckpointStorage, MapCheckPoint, ArrayStorageContainer, "map_checkpoint", gCheckpointFormat);
 #endif
 }
 
@@ -354,6 +354,9 @@ void Storage_Cleanup()
 	NpcTextStorage.Cleanup();
 	WorldMapInfoStorage.Cleanup();
 	ZoneGuardStorage.Cleanup();
+#ifdef ENABLE_CHECKPOINT_SYSTEM
+	CheckpointStorage.Cleanup();
+#endif
 }
 
 bool Storage_ReloadTable(const char * TableName)

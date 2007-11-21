@@ -450,6 +450,9 @@ private:
 	MovementState m_MovementState;
 	uint32 m_guardTimer;
 	int32 m_currentHighestThreat;
+	bool m_is_in_instance;
+public:
+	bool skip_reset_hp;
 
 };
 #endif

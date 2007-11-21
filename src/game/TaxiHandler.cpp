@@ -286,8 +286,16 @@ void WorldSession::HandleMultipleActivateTaxiOpcode(WorldPacket & recvPacket)
 		return;
 	}
 
+	uint32 totalcost = taxipath->GetPrice();
+	for(uint32 i = 2; i < nodecount; ++i)
+	{
+		TaxiPath * np = sTaxiMgr.GetTaxiPath(pathes[i-1], pathes[i]);
+		if(!np) return;
+		totalcost += np->GetPrice();
+	}
+
 	// Check for gold
-	newmoney = ((GetPlayer()->GetUInt32Value(PLAYER_FIELD_COINAGE)) - taxipath->GetPrice());
+	newmoney = ((GetPlayer()->GetUInt32Value(PLAYER_FIELD_COINAGE)) - totalcost);
 	if(newmoney < 0 )
 	{
 		data << uint32( 3 );

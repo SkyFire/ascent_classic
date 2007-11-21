@@ -1669,9 +1669,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	if ((isCritter || health <= damage) )
 	{
 #ifdef ENABLE_CHECKPOINT_SYSTEM
-		if(pVictim->IsUnit() && IsPlayer())
+		if(pVictim->GetTypeId()==TYPEID_UNIT && IsPlayer())
 		{
-			if( ((Creature*)pVictim)->GetCreatureName()->Rank>0 && ((Player*)this)->GetGuildId())
+			if( ((Creature*)pVictim)->GetCreatureName() && ((Creature*)pVictim)->GetCreatureName()->Rank>0 && ((Player*)this)->GetGuildId())
 				CheckpointMgr::getSingleton().KilledCreature( ((Player*)this)->GetGuildId(), pVictim->GetEntry() );
 		}
 #endif

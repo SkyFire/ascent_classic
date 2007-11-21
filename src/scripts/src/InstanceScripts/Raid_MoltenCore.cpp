@@ -1697,6 +1697,7 @@ public:
     void OnCombatStart(Unit* mTarget)
     {
 		RegisterAIUpdateEvent(_unit->GetUInt32Value(UNIT_FIELD_BASEATTACKTIME));
+		_unit->GetAIInterface()->skip_reset_hp=true;
     }
 
     void OnCombatStop(Unit *mTarget)

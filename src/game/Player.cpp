@@ -7679,8 +7679,10 @@ void Player::OnWorldPortAck()
 			welcome_msg += ". ";
             if(pMapinfo->type != INSTANCE_NONRAID && m_mapMgr->pInstance)
 			{
+				/*welcome_msg += "This instance is scheduled to reset on ";
+				welcome_msg += asctime(localtime(&m_mapMgr->pInstance->m_expiration));*/
 				welcome_msg += "This instance is scheduled to reset on ";
-				welcome_msg += asctime(localtime(&m_mapMgr->pInstance->m_expiration));
+				welcome_msg += ConvertTimeStampToDataTime((uint32)m_mapMgr->pInstance->m_expiration);
 			}
 			sChatHandler.SystemMessage(m_session, welcome_msg.c_str());
 		}

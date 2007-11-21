@@ -1101,7 +1101,7 @@ void Spell::cast(bool check)
 {
 	if(duelSpell && (
 		(p_caster && p_caster->GetDuelState() != DUEL_STATE_STARTED) ||
-		(u_caster && u_caster->IsPet() && ((Pet*)u_caster)->GetPetOwner()->GetDuelState() != DUEL_STATE_STARTED)))
+		(u_caster && u_caster->IsPet() && ((Pet*)u_caster)->GetPetOwner() && ((Pet*)u_caster)->GetPetOwner()->GetDuelState() != DUEL_STATE_STARTED)))
 	{
 		// Can't cast that!
 		SendInterrupted(SPELL_FAILED_TARGET_FRIENDLY);

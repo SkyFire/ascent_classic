@@ -128,6 +128,7 @@ public:
         m_kAway = false;
         m_wBuffet = false;
         m_Cleave = false;
+		_unit->GetAIInterface()->skip_reset_hp=true;
     }
 
     void OnCombatStop(Unit *mTarget)

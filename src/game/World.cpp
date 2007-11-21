@@ -446,6 +446,7 @@ bool World::SetInitialWorldSettings()
 	sWordFilter.Load();
 
 #ifdef ENABLE_CHECKPOINT_SYSTEM
+	new CheckpointMgr;
 	CheckpointMgr::getSingleton().Load();
 #endif
 
@@ -4375,7 +4376,7 @@ void CheckpointMgr::Load()
 			break;
 	}
 
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM guild_checkpoints");
+	QueryResult * result = CharacterDatabase.Query("SELECT * FROM guild_checkpoints");
 	if(!result)
 		return;
 
@@ -4411,7 +4412,21 @@ void CheckpointMgr::GuildCompletedCheckpoint(uint32 GuildId, uint32 Cid)
 	else
 		itr->second.insert(Cid);
 
-	CharacterDatabase.Execute("INSERT INTO guild_checkpoints VALUES(%u,%u)",GuildId,Cid);
+	CharacterDatabase.WaitExecute("INSERT INTO guild_checkpoints VALUES(%u,%u)",GuildId,Cid);
+
+	Guild * pGuild = objmgr.GetGuild(GuildId);
+	MapCheckPoint * pCheck = CheckpointStorage.LookupEntry(Cid);
+	if(pCheck&&pGuild)
+	{
+		char msg[300];
+		snprintf(msg,300,"Your guild has now passed the `%s` checkpoint.", pCheck->name);
+		WorldPacket * data = sChatHandler.FillSystemMessageData(msg);
+		list<PlayerInfo*>::iterator itr = pGuild->Begin();
+		for(; itr != pGuild->End(); ++itr)
+			if((*itr)->m_loggedInPlayer)
+				(*itr)->m_loggedInPlayer->GetSession()->SendPacket(data);
+		delete data;
+	}
 }
 
 bool CheckpointMgr::HasCompletedCheckpointAndPrequsites(uint32 GuildId, MapCheckPoint * pCheckpoint)
@@ -4426,7 +4441,7 @@ bool CheckpointMgr::HasCompletedCheckpointAndPrequsites(uint32 GuildId, MapCheck
 
 	while(pcp2)
 	{
-		if(itr->second.find(pcp2->checkpoint_id)!=itr->second.end())
+		if(itr->second.find(pcp2->checkpoint_id)==itr->second.end())
 			return false;
 		
 		pcp2=pcp2->pPrevCp;

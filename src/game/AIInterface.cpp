@@ -90,6 +90,8 @@ AIInterface::AIInterface()
 	m_AIState_backup = m_AIState;
 	UnitToFollow_backup = NULL;
 	m_isGuard = false;
+	m_is_in_instance=false;
+	skip_reset_hp=false;
 }
 
 void AIInterface::Init(Unit *un, AIType at, MovementType mt)
@@ -119,6 +121,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
 	m_guardTimer = getMSTime();
+	m_is_in_instance=un->IsInInstance();
 }
 
 AIInterface::~AIInterface()
@@ -147,6 +150,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 	m_sourceX = un->GetPositionX();
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
+	m_is_in_instance=un->IsInInstance();
 }
 
 void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
@@ -566,7 +570,7 @@ void AIInterface::Update(uint32 p_time)
 				}
 			}
 			// Set health to full if they at there last location before attacking
-			if(m_AIType != AITYPE_PET)
+			if(m_AIType != AITYPE_PET&&!skip_reset_hp)
 				m_Unit->SetUInt32Value(UNIT_FIELD_HEALTH,m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 		}
 	}
@@ -739,7 +743,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 		&& (m_outOfCombatRange && m_Unit->GetDistanceSq(m_returnX,m_returnY,m_returnZ) > m_outOfCombatRange) 
 		&& m_AIState != STATE_EVADE
 		&& m_AIState != STATE_SCRIPTMOVE
-		&& !(m_Unit->IsInInstance()))
+		&& !m_is_in_instance)
 	{
 		HandleEvent(EVENT_LEAVECOMBAT, m_Unit, 0);
 	}
