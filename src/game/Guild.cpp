@@ -380,7 +380,23 @@ RankInfo * Guild::CreateRank(RankInfo * s0rs)
 
 	newrank = new RankInfo;
 	newrank->rankid=(uint32)m_rankList.size();
-	memcpy(newrank,s0rs,sizeof(RankInfo));
+	//memcpy(newrank,s0rs,sizeof(RankInfo));
+	newrank->name=s0rs->name;
+	newrank->rights=s0rs->rights;
+	newrank->rights_1=s0rs->rights_1;
+	newrank->rights_2=s0rs->rights_2;
+	newrank->rights_3=s0rs->rights_3;
+	newrank->rights_4=s0rs->rights_4;
+	newrank->rights_5=s0rs->rights_5;
+	newrank->rights_6=s0rs->rights_6;
+	newrank->rights_7=s0rs->rights_7;
+	newrank->rights_8=s0rs->rights_8;
+	newrank->rights_9=s0rs->rights_9;
+	newrank->rights_10=s0rs->rights_10;
+	newrank->rights_11=s0rs->rights_11;
+	newrank->rights_12=s0rs->rights_12;
+	newrank->rights_13=s0rs->rights_13;
+	
 	m_rankList.push_back(newrank);
 	return newrank;
 }
