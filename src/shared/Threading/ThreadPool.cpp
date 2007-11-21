@@ -30,7 +30,6 @@
 	int GenerateThreadId()
 	{
 		int i = ++threadid_count;
-		printf("threadid generated: %u\n", i);
 		return i;
 	}
 
@@ -330,9 +329,7 @@ static void * thread_proc(void * param)
 		else
 		{
 			// enter "suspended" state. when we return, the threadpool will either tell us to fuk off, or to execute a new task.
-			printf("Entering Supsend()\n");
 			t->ControlInterface.Suspend();
-			printf("Leaving Suspend()\n");
 			// after resuming, this is where we will end up. start the loop again, check for tasks, then go back to the threadpool.
 		}
 	}

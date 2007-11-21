@@ -120,7 +120,11 @@ char *ext;
 		while(filecount--)
 		{
 			ext = strrchr(list[filecount]->d_name, '.');
-			if (ext != NULL && !strcmp(ext, ".so")) {
+#ifdef HAVE_DARWIN
+			if (ext != NULL && strstr(list[filecount]->d_name, ".0.dylib") == NULL && !strcmp(ext, ".dylib")) {
+#else
+                        if (ext != NULL && !strcmp(ext, ".so")) {
+#endif
 				string full_path = "../lib/" + string(list[filecount]->d_name);
 				SCRIPT_MODULE mod = dlopen(full_path.c_str(), RTLD_NOW);
 				printf("  %s : 0x%08X : ", list[filecount]->d_name, (unsigned long)mod);
