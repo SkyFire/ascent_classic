@@ -16,3 +16,4 @@ Most annoying bugs are :
 - Devouring Plague (doesn't show damage and doesn't gain bonus from Spell damage)
 Mind Flay got broken couple of hundred revs ago, it doesn't receive spell damage bonus (got broken at the same time Ice Lance did, but Ice Lance was fixed afterwards).
 http://www.wowwiki.com/Mind_Flay
+Shadowguard

@@ -127,6 +127,7 @@ Zack - test my shit :
 - druid - Starlight Wrath 16818
 - paladin - Holy shield - 41026
 - http://thottbot.com/i29301
+- mage - combustion 11129 - it adds the bonus but it is never removed
 
 ==========================================================================
 Capt - test my shit :

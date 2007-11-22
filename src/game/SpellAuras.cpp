@@ -1232,6 +1232,7 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
+		//paladin - Blessing of Light.
 	case 19977:
 	case 19978:
 	case 19979:
@@ -1239,9 +1240,9 @@ void Aura::SpellAuraDummy(bool apply)
 	case 32770:
 		{
 			if(mod->i==0)
-				SMTMod_On_target(apply,true,0x9B56A8F5,mod->m_amount); //holy light
+				SMTMod_On_target(apply,false,0x9B56A8F5,mod->m_amount); //holy light
 			if(mod->i==1)
-				SMTMod_On_target(apply,true,0x333C4740,mod->m_amount); //flash of light
+				SMTMod_On_target(apply,false,0x333C4740,mod->m_amount); //flash of light
 		}break;
 		//shaman - Healing Way - effect
 	case 29203:
