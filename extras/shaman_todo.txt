@@ -37,6 +37,5 @@ Stoneclaw Totem - Doesn't work
 Flametongue Weapon - Doesn't work
 Far Sight - recheck
 Flametongue Totem - Doesn't work
-Grounding Totem - Doesn't work
 Sentry Totem - Doesn't work
 

@@ -933,7 +933,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//we need a finishing move for this 
-								if(CastingSpell->buffType!=SPELL_TYPE_FINISHING_MOVE || victim==this)
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE) || victim==this)
 									continue;
 							}break;
 						//rogue - Relentless Strikes
@@ -943,7 +943,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									continue;//this should not ocur unless we made a fuckup somewhere
 								int32 proc_Chance;
 								//chance is based actually on combopoint count and not 100% always 
-								if(CastingSpell->buffType==SPELL_TYPE_FINISHING_MOVE && IsPlayer())
+								if(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE && IsPlayer())
 									proc_Chance = static_cast<Player*>(this)->m_comboPoints*ospinfo->EffectBasePoints[1];
 								else continue;
 								if(!Rand(proc_Chance))
@@ -958,7 +958,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 							{
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->buffType!=SPELL_TYPE_FINISHING_MOVE)
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE))
 									continue;
 							}break;
 						//rogue - Initiative

@@ -31,6 +31,8 @@ Ruthlesness ads 2 combo points (again)
 
 Rogue - Relentless Strikes - procs 2 times ?
 
+Opportunity increases the damage of your Mutilate by 4%, 8%, 12%, 16%, or 20%.
+Lethality increases the critical strike damage bonus of your mutilate by 6%, 12%, 18%, 24%, or 30%.
 Assassination
 
 1.Murder

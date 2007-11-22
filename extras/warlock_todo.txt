@@ -4,12 +4,6 @@ Nether Protection procs of shadow and fire dmg DoT's ticks
 pet is not controlable
 
 *Warlock pets will attack someone who uses bandages on them.
-*if warlock imp cast "fire shield" on someone who stay near the NPC, NPC will attack them. (imp must be near the NPC)
-*summon imp, aura "blood pact" activ. dismiss imp, aura will stay(while you logout)
-
-Warlock:
-
-2. Improved Howl of Terror - are not working. It's supposed to reduce cast time of that spell by 1.5sec, so make it instant, which does not happens.
 
 Demonology:
 
@@ -18,25 +12,19 @@ Demonology:
 3. Soul Link - deamon does not take any dmg instead of caster. 
 
 Affliction
-Unstable Affliction - no dmg when dispelled
 Seed of Corruption - no dmg when detonates
 
 Demonology
-Eye of Kilrogg - they eye gets summoned but u still have control on you
 SoulWell - nothing appears - wtf ? i can;t find this spell :S
 Destruction
 Minions:
 Each time u resummon your pet you have to drag and drop your spells in minion action bar .
 
 Imp:
-* Blood Pact - no +43 stamina received neither in party/raid/self alone
 *Phase Shift - nothing happens imp still get's attacked by enemy
-*Fire Shield - no shield protect your target
-* Consume Shadows - no hp regained
 Succubus ( succy )
 *Seduction - nothing happens
 *Shooting Kiss - no aggro made
-*Lesser Invisibility - doesn't works
 Felhunter
 *Spell lock - no spell lock for 8 seconds
 *Devour Magic - no buffs dispelled
@@ -66,7 +54,6 @@ Soul Link - 20% or dmg received by caster is taken by minion and increases dmg d
 
 Destruction
 Cataclysm - reduces mana cost by destruction spells by 5% - no reduction
-Bane - casting time reduced by 0.5 sec for shadowbolt and 1 sec for shoul fire - no reduction for soul fire and immolate
 Intensity - 70% chance to resist intreruption when channeling destro spells ( Rain of Fire and Hellfire ) - nothing
 Blacklash - increases critical chance by 3% and has a 25% when dmged to have a Shadow bolt or Incinerate spell instant - nothing
 
@@ -75,7 +62,6 @@ General
 -Temporary +spell damage buffs (trinkets, potions, etc) will only apply the +damage to DoT's while the effect is in place - Not when you start the spell cast. For example, say you used a trinket that gives +150 spell damage. You apply Corruption and Unstable Affliction. You gain the +150 spell damage bonus as normal - your Unstable Affliction and Corruption should gain around 25 damage a tick. Half way through the ticks, the trinket wears off. You will now LOSE that 25 damage a tick, even though the DoT was applied when you initiated the cast.
 
 Demonology Spells
--Eye of krilrogg: summons a movable eye for scouting but this cancels at any attempt to move it.
 -Soul Shatter: Doesn't reduce threat as it should.
 
 Talents - Affliction
@@ -87,7 +73,6 @@ Talents - Affliction
 -Empowered corruption: does not add any damage to corruption as it should (+36% at maximum lvl)
 
 Talents - Destruction
--Ruin: gives + 100% crit damage but it doesn't work on soulfire as it is supposed to.
 -Intensity: has no noticable effect (supposed to give 70% at max lvl to reduce the chance of spell interruption).
 -Shadow and Flame: is supposed to give +20% damage to shadowbolt and incinerate but doesn't.
 -Emberstorm: only applies to base damage, not damage after spell casts.
@@ -97,5 +82,4 @@ Talents - Demonology
 -Demonic Sacrifice: Working, though fire damage gained from imp and shadow damage gained from succubus and felguard are applied to base spell damage, not total spell damage after all other effects. Also, ff you use Demonic Sacrifice and log out with no pet, your character will show a Voidwalker next to them. When you log onto another character than back on to your lock, you'll have both the Demonic Sacrifice you used, and a Voidwalker out. Sacrificing this one would make 2 Sacrifices stack.
 
 Pets
--If u have enough pet skills to go on the next page, u can't turn to the next page to access the skills.
 -Pets on defense/passive immediately attacks the closest enemy if it kills the current mob. It also immediately attacks the closest enemy if it is just summoned or from log in.

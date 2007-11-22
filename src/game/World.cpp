@@ -616,8 +616,6 @@ bool World::SetInitialWorldSettings()
 			type |= SPELL_TYPE_WARLOCK_IMMOLATE;
 		else if(strstr(nametext, "Amplify Magic") || strstr(nametext, "Dampen Magic"))
 			type |= SPELL_TYPE_MAGE_AMPL_DUMP;
-		else if(strstr(desc, "Finishing move")==desc)
-			type |= SPELL_TYPE_FINISHING_MOVE;
         else if(strstr(desc, "Battle Elixir"))
             type |= SPELL_TYPE_ELIXIR_BATTLE;
         else if(strstr(desc, "Guardian Elixir"))
@@ -626,6 +624,8 @@ bool World::SetInitialWorldSettings()
             type |= SPELL_TYPE_ELIXIR_FLASK;
 		else if(namehash==0xFF89ABD2)		// hunter's mark
 			type |= SPELL_TYPE_HUNTER_MARK;
+		else if(strstr(desc, "Finishing move")==desc)
+			sp->c_is_flags |= SPELL_FLAG_IS_FINISHING_MOVE;
 		if(IsDamagingSpell(sp))
 			sp->c_is_flags |= SPELL_FLAG_IS_DAMAGING;
 		if(IsHealingSpell(sp))
