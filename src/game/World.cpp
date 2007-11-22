@@ -1057,6 +1057,8 @@ bool World::SetInitialWorldSettings()
 						pr|=PROC_ON_MELEE_ATTACK_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
 					if(strstr(desc,"damage on hit"))
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+					if(strstr(desc,"chance on hit"))
+						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc,"after being hit by any damaging attack"))
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
 					if(strstr(desc,"striking melee or ranged attackers"))

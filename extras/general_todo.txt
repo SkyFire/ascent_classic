@@ -126,6 +126,7 @@ Zack - test my shit :
 - druid - nature's grace 16880 + 16886
 - druid - Starlight Wrath 16818
 - paladin - Holy shield - 41026
+- http://thottbot.com/i29301
 
 ==========================================================================
 Capt - test my shit :
