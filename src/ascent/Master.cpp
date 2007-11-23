@@ -170,12 +170,24 @@ bool Master::Run(int argc, char ** argv)
 	}
 
 	printf(BANNER, BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
+#ifdef REPACK
+	printf("\nRepack: %s | Author: %s | %s\n", REPACK, REPACK_AUTHOR, REPACK_WEBSITE);
+#endif
 	printf("\nCopyright (C) 2005-2007 Ascent Team. http://www.ascentemu.com/\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY, and is FREE SOFTWARE.\n");
 	printf("You are welcome to redistribute it under the terms of the GNU General\n");
 	printf("Public License, either version 3 or any later version. For a copy of\n");
 	printf("this license, see the COPYING file provided with this distribution.\n");
 	Log.Line();
+#ifdef REPACK
+	Log.Color(TRED);
+	printf("Warning: Using repacks is potentially dangerous. You should always compile\n");
+	printf("from the source yourself at www.ascentemu.com.\n");
+	printf("By using this repack, you agree to not visit the ascent website and ask\nfor support.\n");
+	printf("For all support, you should visit the repacker's website at %s\n", REPACK_WEBSITE);
+	Log.Color(TNORMAL);
+	Log.Line();
+#endif
 	Log.log_level = 3;
 
 	if(do_version)

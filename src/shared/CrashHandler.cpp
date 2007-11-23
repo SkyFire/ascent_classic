@@ -197,6 +197,9 @@ void PrintCrashInformation(PEXCEPTION_POINTERS except)
 	echo("Server has crashed. Reason was:\n");
 	echo("   %s at 0x%08X\n", GetExceptionDescription(except->ExceptionRecord->ExceptionCode),
 		(unsigned long)except->ExceptionRecord->ExceptionAddress);
+#ifdef REPACK
+	echo("%s repack by %s has crashed. Visit %s for support.", REPACK, REPACK_AUTHOR, REPACK_WEBSITE);
+#endif
 	echo("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n");
 	/*echo("Call Stack: \n");
 	CStackWalker sw;

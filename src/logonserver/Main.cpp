@@ -185,6 +185,9 @@ void LogonServer::Run(int argc, char ** argv)
 	}
 	
 	sLog.outString(BANNER, BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
+#ifdef REPACK
+	sLog.outString("Repack: %s | Author: %s | %s\n", REPACK, REPACK_AUTHOR, REPACK_WEBSITE);
+#endif
 	sLog.outString("==============================================================================");
 	sLog.outString("");
 	if(do_version)
