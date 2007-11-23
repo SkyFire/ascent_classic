@@ -6639,13 +6639,6 @@ void Player::Gossip_Complete()
 	CleanupGossipMenu();
 }
 
-void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name)
-{
-	WorldPacket data(SMSG_GOSSIP_POI, 21+strlen(Name));
-	data << Flags << X << Y << Icon << Data << Name;
-	GetSession()->SendPacket(&data);
-}
-
 void Player::ZoneUpdate(uint32 ZoneId)
 {
 	m_zoneId = ZoneId;

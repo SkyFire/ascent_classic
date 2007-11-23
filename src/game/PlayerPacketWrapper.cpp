@@ -22,6 +22,17 @@
 /// collection of client packets in a warper to keep the player.cpp clean
 
 #pragma pack(push,1) 
+
+struct Gossip_POI_Packet
+{
+	uint32 flags;
+	float X;
+	float Y;
+	uint32 icon;
+	uint32 data;
+	const char* name;
+};
+
 struct Levelup_Info_Packet
 {
     uint32 level;
@@ -100,6 +111,18 @@ struct LoginVerifyWorldPacket
 
 #pragma pack(pop)
 
+void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name)
+{
+	Gossip_POI_Packet packet;
+	packet.data = Data;
+	packet.flags = Flags;
+	packet.icon = Icon;
+	packet.name = Name;
+	packet.X = X;
+	packet.Y = Y;
+
+	GetSession()->OutPacket(SMSG_GOSSIP_POI, sizeof(Gossip_POI_Packet), (const char*)&packet);
+}
   
 void Player::SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4)
 {

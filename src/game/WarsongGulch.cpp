@@ -448,6 +448,7 @@ void WarsongGulch::OnStart()
 	{
 		(*itr)->SetUInt32Value(GAMEOBJECT_FLAGS, 64);
 		(*itr)->SetUInt32Value(GAMEOBJECT_STATE, 0);
+		(*itr)->Despawn(5000);
 	}
 
 	/* add the flags to the world */
