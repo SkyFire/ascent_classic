@@ -837,6 +837,8 @@ bool World::SetInitialWorldSettings()
 					//dirty code for procs, if any1 got any better idea-> u are welcome
 					//139944 --- some magic number, it will trigger on all hits etc
 						//for seems to be smth like custom check
+					if(strstr(desc,"chance on hit"))
+						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc,"takes damage"))
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
 					if(strstr(desc,"attackers when hit"))
@@ -879,7 +881,7 @@ bool World::SetInitialWorldSettings()
 						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
 					if(strstr(desc,"when the caster is using melee attacks"))
 						pr|=PROC_ON_MELEE_ATTACK;
-					if(strstr(desc,"when struck in combat"))
+					if(strstr(desc,"when struck in combat") || strstr(desc,"When struck in combat"))
 						pr|=PROC_ON_MELEE_ATTACK_VICTIM;
 					if(strstr(desc,"successful melee attack"))
 						pr|=PROC_ON_MELEE_ATTACK;
@@ -3206,6 +3208,17 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1 | 4;
 
 ///////////////////////////////
+	//items
+	// Band of the Eternal Sage
+	sp = dbcSpell.LookupEntry(35083);
+	if(sp)
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	// Band of the Eternal Restorer 
+	sp = dbcSpell.LookupEntry(35086);
+	if(sp)
+		sp->procFlags = PROC_ON_CAST_SPELL;
+
+
 /*	// druid - Improved Mark of the Wild - already working ?
 	uint32 imarkofthv_group=0;
 	tsp = dbcSpell.LookupEntry(1126); //Mark of the wild

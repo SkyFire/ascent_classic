@@ -129,6 +129,10 @@ Zack - test my shit :
 - http://thottbot.com/i29301
 - mage - combustion 11129 - it adds the bonus but it is never removed
 - shaman - Shamanistic Focus - 43338. It triggers spell 43339 which might need the group flags. Have to update my db
+- Band of the Eternal Defender 35077
+- Band of the Eternal Champion 35080
+- Band of the Eternal Sage 35083
+- Band of the Eternal Restorer 35086
 
 ==========================================================================
 Capt - test my shit :

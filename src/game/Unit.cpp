@@ -1086,6 +1086,22 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								}
 								else continue;
 							}break;
+						//item - Band of the Eternal Sage
+						case 35084:
+							{
+								if(!CastingSpell)
+									continue;
+								if (!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //requires offensive spell. ! might not cover all spells
+									continue;
+							}break;
+						//item - Band of the Eternal Restorer 
+						case 35087:
+							{
+								if(!CastingSpell)
+									continue;
+								if (!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING)) //requires healing spell.
+									continue;
+							}break;
 /*						//paladin - illumination
 						case 18350:
 							{
