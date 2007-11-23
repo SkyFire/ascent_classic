@@ -528,6 +528,7 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 			_player->GetCurrentSpell()->cancel();
 		}
 
+		pItem->DeleteFromDB();
 		delete pItem;
 	}
 }
