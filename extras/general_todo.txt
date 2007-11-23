@@ -128,6 +128,7 @@ Zack - test my shit :
 - paladin - Holy shield - 41026
 - http://thottbot.com/i29301
 - mage - combustion 11129 - it adds the bonus but it is never removed
+- shaman - Shamanistic Focus - 43338. It triggers spell 43339 which might need the group flags. Have to update my db
 
 ==========================================================================
 Capt - test my shit :
