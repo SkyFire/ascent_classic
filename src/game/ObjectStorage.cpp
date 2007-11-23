@@ -53,6 +53,9 @@ SERVER_DECL SQLStorage<FishingZoneEntry, HashMapStorageContainer<FishingZoneEntr
 SERVER_DECL SQLStorage<MapInfo, ArrayStorageContainer<MapInfo> >							WorldMapInfoStorage;
 SERVER_DECL SQLStorage<ZoneGuardEntry, HashMapStorageContainer<ZoneGuardEntry> >			ZoneGuardStorage;
 
+extern SERVER_DECL set<string> ExtraMapCreatureTables;
+extern SERVER_DECL set<string> ExtraMapGameObjectTables;
+
 #ifdef ENABLE_CHECKPOINT_SYSTEM
 SERVER_DECL SQLStorage<MapCheckPoint, ArrayStorageContainer<MapCheckPoint> >				CheckpointStorage;
 const char * gCheckpointFormat = "uuus";
@@ -361,9 +364,19 @@ void Storage_Cleanup()
 
 vector<pair<string,string> > additionalTables;
 
-void LoadAdditionalTable(const char * TableName, const char * SecondName)
+bool LoadAdditionalTable(const char * TableName, const char * SecondName)
 {
-	if(!stricmp(TableName, "items"))					// Items
+	if(!stricmp(TableName, "creature_spawns"))
+	{
+		ExtraMapCreatureTables.insert(string(SecondName));
+		return false;
+	}
+	else if(!stricmp(TableName, "gameobject_spawns"))
+	{
+		ExtraMapGameObjectTables.insert(string(SecondName));
+		return false;
+	}
+	else if(!stricmp(TableName, "items"))					// Items
 		ItemPrototypeStorage.LoadAdditionalData(SecondName, gItemPrototypeFormat);
 	else if(!stricmp(TableName, "creature_proto"))		// Creature Proto
 		CreatureProtoStorage.LoadAdditionalData(SecondName, gCreatureProtoFormat);
@@ -389,6 +402,10 @@ void LoadAdditionalTable(const char * TableName, const char * SecondName)
 		WorldMapInfoStorage.LoadAdditionalData(SecondName, gWorldMapInfoFormat);
 	else if(!stricmp(TableName, "zoneguards"))
 		ZoneGuardStorage.LoadAdditionalData(SecondName, gZoneGuardsFormat);
+	else
+		return false;
+
+	return true;
 }
 
 bool Storage_ReloadTable(const char * TableName)
@@ -436,6 +453,9 @@ bool Storage_ReloadTable(const char * TableName)
 
 void Storage_LoadAdditionalTables()
 {
+	ExtraMapCreatureTables.insert(string("creature_spawns"));
+	ExtraMapGameObjectTables.insert(string("gameobject_spawns"));
+
 	string strData = Config.MainConfig.GetStringDefault("Startup", "LoadAdditionalTables", "");
 	if(strData.empty())
 		return;
@@ -451,11 +471,12 @@ void Storage_LoadAdditionalTables()
 		if(sscanf((*itr).c_str(), "%s->%s", s1, s2) != 2)
 			continue;
 
-		pair<string,string> tmppair;
-		tmppair.first = string(s1);
-		tmppair.second = string(s2);
-		additionalTables.push_back(tmppair);
-
-		LoadAdditionalTable(s2, s1);
+		if(LoadAdditionalTable(s2, s1)) {
+			pair<string,string> tmppair;
+			tmppair.first = string(s1);
+			tmppair.second = string(s2);
+			additionalTables.push_back(tmppair);
+		}
 	}
 }
+

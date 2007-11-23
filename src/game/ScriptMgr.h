@@ -174,6 +174,7 @@ public:
 	virtual void OnEmote(Player * pPlayer, EmoteType Emote) {}
 
 	void RegisterAIUpdateEvent(uint32 frequency);
+	void ModifyAIUpdateEvent(uint32 newfrequency);
 	void RemoveAIUpdateEvent();
 
 	virtual void Destroy() {}

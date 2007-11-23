@@ -293,6 +293,11 @@ void CreatureAIScript::RegisterAIUpdateEvent(uint32 frequency)
 	sEventMgr.AddEvent(_unit, &Creature::CallScriptUpdate, EVENT_SCRIPT_UPDATE_EVENT, frequency, 0,0);
 }
 
+void CreatureAIScript::ModifyAIUpdateEvent(uint32 newfrequency)
+{
+	sEventMgr.ModifyEventTimeAndTimeLeft(_unit, EVENT_SCRIPT_UPDATE_EVENT, newfrequency);
+}
+
 void CreatureAIScript::RemoveAIUpdateEvent()
 {
 	sEventMgr.RemoveEvents(_unit, EVENT_SCRIPT_UPDATE_EVENT);

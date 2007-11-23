@@ -289,6 +289,11 @@ public:
 		obj->event_ModifyTimeLeft(type, time,unconditioned);
 	}
 
+	template <class Class> void ModifyEventTimeAndTimeLeft(Class *obj, uint32 type, uint32 time)
+	{
+		obj->event_ModifyTimeAndTimeLeft(type, time);
+	}
+
 	template <class Class> void ModifyEventTime(Class *obj, uint32 type, uint32 time)
 	{
 		obj->event_ModifyTime(type, time);

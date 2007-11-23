@@ -126,47 +126,52 @@ void Map::LoadSpawns(bool reload)
 			spawns[x][y]=NULL;
 		}
 
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM creature_spawns WHERE Map = %u",this->_mapId);
-	if(result)
+	QueryResult * result;
+	set<string>::iterator tableiterator;
+	for(tableiterator=ExtraMapCreatureTables.begin(); tableiterator!=ExtraMapCreatureTables.end();++tableiterator)
 	{
-		do{
-			Field * fields = result->Fetch();
-			CreatureSpawn * cspawn = new CreatureSpawn;
-			cspawn->id = fields[0].GetUInt32();
-			cspawn->form = FormationMgr::getSingleton().GetFormation(cspawn->id);
-			cspawn->entry = fields[1].GetUInt32();
-			cspawn->x = fields[3].GetFloat();
-			cspawn->y = fields[4].GetFloat();
-			cspawn->z = fields[5].GetFloat();
-			cspawn->o = fields[6].GetFloat();
-			/*uint32 cellx=float2int32(((_maxX-cspawn->x)/_cellSize));
-			uint32 celly=float2int32(((_maxY-cspawn->y)/_cellSize));*/
-			uint32 cellx=CellHandler<MapMgr>::GetPosX(cspawn->x);
-			uint32 celly=CellHandler<MapMgr>::GetPosY(cspawn->y);
-			if(spawns[cellx]==NULL)
-			{
-				spawns[cellx]=new CellSpawns*[_sizeY];
-				memset(spawns[cellx],0,sizeof(CellSpawns*)*_sizeY);
-			}
+		result = WorldDatabase.Query("SELECT * FROM %s WHERE Map = %u",(*tableiterator).c_str(),this->_mapId);
+		if(result)
+		{
+			do{
+				Field * fields = result->Fetch();
+				CreatureSpawn * cspawn = new CreatureSpawn;
+				cspawn->id = fields[0].GetUInt32();
+				cspawn->form = FormationMgr::getSingleton().GetFormation(cspawn->id);
+				cspawn->entry = fields[1].GetUInt32();
+				cspawn->x = fields[3].GetFloat();
+				cspawn->y = fields[4].GetFloat();
+				cspawn->z = fields[5].GetFloat();
+				cspawn->o = fields[6].GetFloat();
+				/*uint32 cellx=float2int32(((_maxX-cspawn->x)/_cellSize));
+				uint32 celly=float2int32(((_maxY-cspawn->y)/_cellSize));*/
+				uint32 cellx=CellHandler<MapMgr>::GetPosX(cspawn->x);
+				uint32 celly=CellHandler<MapMgr>::GetPosY(cspawn->y);
+				if(spawns[cellx]==NULL)
+				{
+					spawns[cellx]=new CellSpawns*[_sizeY];
+					memset(spawns[cellx],0,sizeof(CellSpawns*)*_sizeY);
+				}
 
-			if(!spawns[cellx][celly])
-				spawns[cellx][celly]=new CellSpawns;
-			cspawn->movetype = fields[7].GetUInt32();
-			cspawn->displayid = fields[8].GetUInt32();
-			cspawn->factionid = fields[9].GetUInt32();
-			cspawn->flags = fields[10].GetUInt32();
-			cspawn->bytes = fields[11].GetUInt32();
-			cspawn->bytes2 = fields[12].GetUInt32();
-			cspawn->emote_state = fields[13].GetUInt32();
-			cspawn->respawnNpcLink = fields[14].GetUInt32();
-			cspawn->channel_spell = fields[15].GetUInt32();
-			cspawn->channel_target_go = fields[16].GetUInt32();
-			cspawn->channel_target_creature = fields[17].GetUInt32();
-			spawns[cellx][celly]->CreatureSpawns.push_back(cspawn);
-			++CreatureSpawnCount;
-		}while(result->NextRow());
+				if(!spawns[cellx][celly])
+					spawns[cellx][celly]=new CellSpawns;
+				cspawn->movetype = fields[7].GetUInt32();
+				cspawn->displayid = fields[8].GetUInt32();
+				cspawn->factionid = fields[9].GetUInt32();
+				cspawn->flags = fields[10].GetUInt32();
+				cspawn->bytes = fields[11].GetUInt32();
+				cspawn->bytes2 = fields[12].GetUInt32();
+				cspawn->emote_state = fields[13].GetUInt32();
+				cspawn->respawnNpcLink = fields[14].GetUInt32();
+				cspawn->channel_spell = fields[15].GetUInt32();
+				cspawn->channel_target_go = fields[16].GetUInt32();
+				cspawn->channel_target_creature = fields[17].GetUInt32();
+				spawns[cellx][celly]->CreatureSpawns.push_back(cspawn);
+				++CreatureSpawnCount;
+			}while(result->NextRow());
 
-		delete result;
+			delete result;
+		}
 	}
 
 	result = WorldDatabase.Query("SELECT * FROM creature_staticspawns WHERE Map = %u",this->_mapId);
@@ -229,46 +234,49 @@ void Map::LoadSpawns(bool reload)
 		delete result;
 	}
 
-	result = WorldDatabase.Query("SELECT * FROM gameobject_spawns WHERE map = %u",this->_mapId);
-	if(result)
+	for(tableiterator=ExtraMapGameObjectTables.begin(); tableiterator!=ExtraMapGameObjectTables.end();++tableiterator)
 	{
-		do{
-			Field * fields = result->Fetch();
-			GOSpawn * gspawn = new GOSpawn;
-			gspawn->entry = fields[1].GetUInt32();
-			gspawn->id = fields[0].GetUInt32();
-			gspawn->x=fields[3].GetFloat();
-			gspawn->y=fields[4].GetFloat();
-			gspawn->z=fields[5].GetFloat();
-			gspawn->facing=fields[6].GetFloat();
-			gspawn->o =fields[7].GetFloat();
-			gspawn->o1=fields[8].GetFloat();
-			gspawn->o2=fields[9].GetFloat();
-			gspawn->o3=fields[10].GetFloat();
-			gspawn->state=fields[11].GetUInt32();
-			gspawn->flags=fields[12].GetUInt32();
-			gspawn->faction=fields[13].GetUInt32();
-			gspawn->scale = fields[14].GetFloat();
-			gspawn->stateNpcLink = fields[15].GetUInt32();
+		result = WorldDatabase.Query("SELECT * FROM %s WHERE map = %u",(*tableiterator).c_str(),this->_mapId);
+		if(result)
+		{
+			do{
+				Field * fields = result->Fetch();
+				GOSpawn * gspawn = new GOSpawn;
+				gspawn->entry = fields[1].GetUInt32();
+				gspawn->id = fields[0].GetUInt32();
+				gspawn->x=fields[3].GetFloat();
+				gspawn->y=fields[4].GetFloat();
+				gspawn->z=fields[5].GetFloat();
+				gspawn->facing=fields[6].GetFloat();
+				gspawn->o =fields[7].GetFloat();
+				gspawn->o1=fields[8].GetFloat();
+				gspawn->o2=fields[9].GetFloat();
+				gspawn->o3=fields[10].GetFloat();
+				gspawn->state=fields[11].GetUInt32();
+				gspawn->flags=fields[12].GetUInt32();
+				gspawn->faction=fields[13].GetUInt32();
+				gspawn->scale = fields[14].GetFloat();
+				gspawn->stateNpcLink = fields[15].GetUInt32();
 
-			//uint32 cellx=float2int32(((_maxX-gspawn->x)/_cellSize));
-			//uint32 celly=float2int32(((_maxY-gspawn->y)/_cellSize));
-			uint32 cellx=CellHandler<MapMgr>::GetPosX(gspawn->x);
-			uint32 celly=CellHandler<MapMgr>::GetPosY(gspawn->y);
-			if(spawns[cellx]==NULL)
-			{
-				spawns[cellx]=new CellSpawns*[_sizeY];
-				memset(spawns[cellx],0,sizeof(CellSpawns*)*_sizeY);
-			}
+				//uint32 cellx=float2int32(((_maxX-gspawn->x)/_cellSize));
+				//uint32 celly=float2int32(((_maxY-gspawn->y)/_cellSize));
+				uint32 cellx=CellHandler<MapMgr>::GetPosX(gspawn->x);
+				uint32 celly=CellHandler<MapMgr>::GetPosY(gspawn->y);
+				if(spawns[cellx]==NULL)
+				{
+					spawns[cellx]=new CellSpawns*[_sizeY];
+					memset(spawns[cellx],0,sizeof(CellSpawns*)*_sizeY);
+				}
 
-			if(!spawns[cellx][celly])
-				spawns[cellx][celly]=new CellSpawns;
+				if(!spawns[cellx][celly])
+					spawns[cellx][celly]=new CellSpawns;
 
-			spawns[cellx][celly]->GOSpawns.push_back(gspawn);
-			++GameObjectSpawnCount;
-		}while(result->NextRow());
+				spawns[cellx][celly]->GOSpawns.push_back(gspawn);
+				++GameObjectSpawnCount;
+			}while(result->NextRow());
 
-		delete result;
+			delete result;
+		}
 	}
 
 	Log.Notice("Map", "%u creatures / %u gameobjects on map %u cached.", CreatureSpawnCount, GameObjectSpawnCount, _mapId);

@@ -83,6 +83,7 @@ public:
         m_whelpCooldown = 7;
         m_aoeFearCooldown = 30;
         m_fCastCount = 5;
+		m_breathCooldown=0;
         _unit->GetAIInterface()->setMoveType(4);
         _unit->GetAIInterface()->addWayPoint(CreateWaypoint(1, 2000, RUN));
         _unit->GetAIInterface()->addWayPoint(CreateWaypoint(2, 0, FLY));
@@ -454,7 +455,13 @@ public:
         {
             if(m_fBreath)
             {
-                _unit->CastSpell(_unit, infoFBreath, false);
+				uint32 t = (uint32)time(NULL);
+				if(t>m_breathCooldown)
+				{
+					_unit->CastSpell(_unit, infoFBreath, false);
+					m_breathCooldown = t+30;
+				}
+
                 m_fBreath = false;
                 return;
             }
@@ -520,6 +527,7 @@ protected:
     uint32 m_aoeFearCooldown;
     uint32 m_fCastCount;
     uint32 m_currentWP;
+	uint32 m_breathCooldown;
     SpellEntry *infoFear, *infoWBuffet, *infoCleave, *infoFBreath, *infoKAway, *infoSFireball, *infoDeepBreath;
 };
 
