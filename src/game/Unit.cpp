@@ -3585,7 +3585,7 @@ void Unit::VampiricTouch(uint32 dmg,Unit* tgt)
                 return;//just in case
         
         int32 perc = 5;
-        SM_FIValue(SM_FSPELL_VALUE,&perc,4); // need fixing if required
+        //SM_FIValue(SM_FSPELL_VALUE,&perc,4);
 		if (perc*dmg<0)
 			return;
         uint32 man = (dmg*perc) / 100;

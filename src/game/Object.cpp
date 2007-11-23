@@ -1470,6 +1470,13 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if( isHostile( this, pVictim ) )
 			((Player*)this)->SetPvPFlag();
 	}
+	//If our pet attacks  - flag us.
+	if (this->IsPet())
+	{
+		Pet* uPet = (Pet*)(this);
+		if (uPet->GetPetOwner() && uPet->GetPetOwner()->isAlive())
+			uPet->GetPetOwner()->SetPvPFlag();		
+	}
 
 	if(!no_remove_auras)
 	{
