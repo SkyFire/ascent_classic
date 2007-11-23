@@ -605,6 +605,8 @@ protected:
 	uint32	m_KickAFKPlayers;//don't lag the server if you are useless anyway :P
 public:
 	list<SpellEntry*> dummyspells;
+	uint32 m_levelCap;
+	uint32 m_genLevelCap;
 };
 
 #define sWorld World::getSingleton()

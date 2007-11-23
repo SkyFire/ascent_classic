@@ -49,6 +49,8 @@ World::World()
 	SocketSendBufSize = WORLDSOCKET_SENDBUF_SIZE;
 	SocketRecvBufSize = WORLDSOCKET_RECVBUF_SIZE;
 #endif
+	m_levelCap=70;
+	m_genLevelCap=70;
 }
 
 void CleanupRandomNumberGenerators();
@@ -251,7 +253,7 @@ bool World::SetInitialWorldSettings()
 	Log.Line();
 
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");
-	CharacterDatabase.WaitExecute("UPDATE characters SET level = 70 WHERE level > 70");
+	//CharacterDatabase.WaitExecute("UPDATE characters SET level = 70 WHERE level > 70");
 	CharacterDatabase.WaitExecute("UPDATE characters SET banned=0,banReason='' WHERE banned > 100 AND banned < %u", UNIXTIME);
    
 	m_lastTick = UNIXTIME;
@@ -4065,6 +4067,8 @@ void World::Rehash(bool load)
 	antihack_flight = Config.MainConfig.GetBoolDefault("AntiHack", "Flight", true);
 	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", false);
 	SpeedhackProtection = antihack_speed;
+	m_levelCap = Config.MainConfig.GetIntDefault("Server", "LevelCap", 70);
+	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
 	Channel::LoadConfSettings();
 }
 

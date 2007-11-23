@@ -678,7 +678,7 @@ bool Player::Create(WorldPacket& data )
 	SetUInt32Value(PLAYER_FIELD_BYTES, 0x08 );
 	SetUInt32Value(PLAYER_CHARACTER_POINTS2,2);
 	SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
-	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, 70);
+	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld.m_levelCap);
   
 	for(uint32 x=0;x<7;x++)
 		SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT+x, 1.00);
@@ -2408,8 +2408,8 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 
 	// set level
 	m_uint32Values[UNIT_FIELD_LEVEL] = get_next_field.GetUInt32();
-	if(m_uint32Values[UNIT_FIELD_LEVEL] > 70)
-		m_uint32Values[UNIT_FIELD_LEVEL] = 70;
+	/*if(m_uint32Values[UNIT_FIELD_LEVEL] > 70)
+		m_uint32Values[UNIT_FIELD_LEVEL] = 70;*/
 
 	// obtain level/stats information
 	lvlinfo = objmgr.GetLevelInfo(getRace(), getClass(), getLevel());
@@ -2577,7 +2577,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	SetUInt32Value(PLAYER__FIELD_KNOWN_TITLES, PvPRanks[GetPVPRank() + offset]);
 	SetUInt32Value(PLAYER_FLAGS, get_next_field.GetUInt32());
 	SetUInt32Value(PLAYER_FIELD_BYTES, get_next_field.GetUInt32());
-	m_uint32Values[0x22]=(m_uint32Values[0x22]>0x46)?0x46:m_uint32Values[0x22];
+	//m_uint32Values[0x22]=(m_uint32Values[0x22]>0x46)?0x46:m_uint32Values[0x22];
 
 	m_position.x										= get_next_field.GetFloat();
 	m_position.y										= get_next_field.GetFloat();
@@ -2628,7 +2628,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	}
 
 	SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
-	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, (GetSession()->HasFlag(ACCOUNT_FLAG_XPACK_01)?70:60));
+	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld.m_levelCap);
 	SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, info->factiontemplate);
 	if(cfaction)
 	{
