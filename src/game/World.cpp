@@ -1566,6 +1566,40 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=0xFFFFFFFF;//nature+fire+frost is all that shaman can do
 	}
 
+	//Shaman - Eye of the Storm
+	sp = dbcSpell.LookupEntry(29062);
+	if(sp)
+		sp->procFlags=PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry(29064);
+	if(sp)
+		sp->procFlags=PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry(29065);
+	if(sp)
+		sp->procFlags=PROC_ON_CRIT_HIT_VICTIM;
+
+	//Shaman - Focused Casting
+	sp = dbcSpell.LookupEntry(29063);
+	if(sp)
+	//        sp->EffectSpellGroupRelation[0]= 1 | 2 | 64 | 128 | 256;
+		sp->EffectSpellGroupRelation[0]= 0xFFFFFFFF; // shaman spells. Guess that wraps them all 
+
+	//Shaman - Healing Focus
+	sp = dbcSpell.LookupEntry(16181);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 64 | 128 | 256;
+	sp = dbcSpell.LookupEntry(16230);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 64 | 128 | 256;
+	sp = dbcSpell.LookupEntry(16232);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 64 | 128 | 256;
+	sp = dbcSpell.LookupEntry(16233);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 64 | 128 | 256;
+	sp = dbcSpell.LookupEntry(16234);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 64 | 128 | 256;
+
 	//shaman - Improved Lightning shield 
 	sp = dbcSpell.LookupEntry(324);//shaman - Lightning Shield.
 	uint32 ILS_grouprelation;
@@ -2466,6 +2500,23 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=10518528;
 	}*/
 
+	//Mage - Ice Shards
+	sp = dbcSpell.LookupEntry(11207);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+	sp = dbcSpell.LookupEntry(12672);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+	sp = dbcSpell.LookupEntry(15047);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+	sp = dbcSpell.LookupEntry(15052);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+	sp = dbcSpell.LookupEntry(15053);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+
 	//Mage - Improved Blizzard
 	sp = dbcSpell.LookupEntry(11185);
 	if(sp)
@@ -2555,32 +2606,32 @@ bool World::SetInitialWorldSettings()
 	sp  = dbcSpell.LookupEntry(31682);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=524288;
-		sp->EffectSpellGroupRelation[1]=524288;
+		sp->EffectSpellGroupRelation[0]=32;
+		sp->EffectSpellGroupRelation[1]=32;
 	}
 	sp  = dbcSpell.LookupEntry(31683);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=524288;
-		sp->EffectSpellGroupRelation[1]=524288;
+		sp->EffectSpellGroupRelation[0]=32;
+		sp->EffectSpellGroupRelation[1]=32;
 	}
 	sp  = dbcSpell.LookupEntry(31684);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=524288;
-		sp->EffectSpellGroupRelation[1]=524288;
+		sp->EffectSpellGroupRelation[0]=32;
+		sp->EffectSpellGroupRelation[1]=32;
 	}
 	sp  = dbcSpell.LookupEntry(31685);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=524288;
-		sp->EffectSpellGroupRelation[1]=524288;
+		sp->EffectSpellGroupRelation[0]=32;
+		sp->EffectSpellGroupRelation[1]=32;
 	}
 	sp  = dbcSpell.LookupEntry(31686);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=524288;
-		sp->EffectSpellGroupRelation[1]=524288;
+		sp->EffectSpellGroupRelation[0]=32;
+		sp->EffectSpellGroupRelation[1]=32;
 	}
 
 	//mage - Master of Elements
