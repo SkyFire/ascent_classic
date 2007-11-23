@@ -359,6 +359,38 @@ void Storage_Cleanup()
 #endif
 }
 
+vector<pair<string,string> > additionalTables;
+
+void LoadAdditionalTable(const char * TableName, const char * SecondName)
+{
+	if(!stricmp(TableName, "items"))					// Items
+		ItemPrototypeStorage.LoadAdditionalData(SecondName, gItemPrototypeFormat);
+	else if(!stricmp(TableName, "creature_proto"))		// Creature Proto
+		CreatureProtoStorage.LoadAdditionalData(SecondName, gCreatureProtoFormat);
+	else if(!stricmp(TableName, "creature_names"))		// Creature Names
+		CreatureNameStorage.LoadAdditionalData(SecondName, gCreatureNameFormat);
+	else if(!stricmp(TableName, "gameobject_names"))	// GO Names
+		GameObjectNameStorage.LoadAdditionalData(SecondName, gGameObjectNameFormat);
+	else if(!stricmp(TableName, "areatriggers"))		// Areatriggers
+		AreaTriggerStorage.LoadAdditionalData(SecondName, gAreaTriggerFormat);
+	else if(!stricmp(TableName, "itempages"))			// Item Pages
+		ItemPrototypeStorage.LoadAdditionalData(SecondName, gItemPageFormat);
+	else if(!stricmp(TableName, "quests"))				// Quests
+		QuestStorage.LoadAdditionalData(SecondName, gQuestFormat);
+	else if(!stricmp(TableName, "npc_text"))			// NPC Text Storage
+		NpcTextStorage.LoadAdditionalData(SecondName, gNpcTextFormat);
+	else if(!stricmp(TableName, "fishing"))				// Fishing Zones
+		FishingZoneStorage.LoadAdditionalData(SecondName, gFishingFormat);
+	else if(!stricmp(TableName, "teleport_coords"))		// Teleport coords
+		TeleportCoordStorage.LoadAdditionalData(SecondName, gTeleportCoordFormat);
+	else if(!stricmp(TableName, "graveyards"))			// Graveyards
+		GraveyardStorage.LoadAdditionalData(SecondName, gGraveyardFormat);
+	else if(!stricmp(TableName, "worldmap_info"))		// WorldMapInfo
+		WorldMapInfoStorage.LoadAdditionalData(SecondName, gWorldMapInfoFormat);
+	else if(!stricmp(TableName, "zoneguards"))
+		ZoneGuardStorage.LoadAdditionalData(SecondName, gZoneGuardsFormat);
+}
+
 bool Storage_ReloadTable(const char * TableName)
 {
 	// bur: mah god this is ugly :P
@@ -383,12 +415,47 @@ bool Storage_ReloadTable(const char * TableName)
 	else if(!stricmp(TableName, "teleport_coords"))		// Teleport coords
 		TeleportCoordStorage.Reload();
 	else if(!stricmp(TableName, "graveyards"))			// Graveyards
-		TeleportCoordStorage.Reload();
+		GraveyardStorage.Reload();
 	else if(!stricmp(TableName, "worldmap_info"))		// WorldMapInfo
 		WorldMapInfoStorage.Reload();
 	else if(!stricmp(TableName, "zoneguards"))
 		ZoneGuardStorage.Reload();
 	else
 		return false;
+	
+	uint32 len = (uint32)strlen(TableName);
+	uint32 len2;
+	for(vector<pair<string,string> >::iterator itr = additionalTables.begin(); itr != additionalTables.end(); ++itr)
+	{
+		len2=(uint32)itr->second.length();
+		if(!strnicmp(TableName, itr->second.c_str(), min(len,len2)))
+			LoadAdditionalTable(TableName, itr->first.c_str());
+	}
 	return true;
+}
+
+void Storage_LoadAdditionalTables()
+{
+	string strData = Config.MainConfig.GetStringDefault("Startup", "LoadAdditionalTables", "");
+	if(strData.empty())
+		return;
+
+	vector<string> strs = StrSplit(strData, " ");
+	if(strs.empty())
+		return;
+
+	for(vector<string>::iterator itr = strs.begin(); itr != strs.end(); ++itr)
+	{
+		char s1[200];
+		char s2[200];
+		if(sscanf((*itr).c_str(), "%s->%s", s1, s2) != 2)
+			continue;
+
+		pair<string,string> tmppair;
+		tmppair.first = string(s1);
+		tmppair.second = string(s2);
+		additionalTables.push_back(tmppair);
+
+		LoadAdditionalTable(s2, s1);
+	}
 }

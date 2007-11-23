@@ -622,6 +622,58 @@ public:
 		//Log.Success("Storage", "Loaded database cache from `%s`.", IndexName);
 	}
 
+	void LoadAdditionalData(const char * IndexName, const char * FormatString)
+	{
+		Storage<T, StorageType>::Load(IndexName, FormatString);
+		QueryResult * result;
+		if(Storage<T, StorageType>::_storage.NeedsMax())
+		{
+			result = WorldDatabase.Query("SELECT MAX(entry) FROM %s", IndexName);
+			uint32 Max = 999999;
+			if(result)
+			{
+				Max = result->Fetch()[0].GetUInt32() + 1;
+				delete result;
+			}
+
+			Storage<T, StorageType>::_storage.Resetup(Max);
+		}
+
+		size_t cols = strlen(FormatString);
+		result = WorldDatabase.Query("SELECT * FROM %s", IndexName);
+		if (!result)
+			return;
+		Field * fields = result->Fetch();
+
+		if(result->GetFieldCount() != cols)
+		{
+			if(result->GetFieldCount() > cols)
+			{
+				Log.Warning("Storage", "Invalid format in %s (%u/%u), loading anyway because we have enough data\n", IndexName, (unsigned int)cols, (unsigned int)result->GetFieldCount());
+			}
+			else
+			{
+				Log.Error("Storage", "Invalid format in %s (%u/%u), not enough data to proceed.\n", IndexName, (unsigned int)cols, (unsigned int)result->GetFieldCount());
+				delete result;
+				return;
+			}
+		}
+
+		uint32 Entry;
+		T * Allocated;
+		do 
+		{
+			Entry = fields[0].GetUInt32();
+			Allocated = Storage<T, StorageType>::_storage.LookupEntryAllocate(Entry);
+			if(!Allocated)
+				continue;
+
+			LoadBlock(fields, Allocated);
+		} while(result->NextRow());
+		Log.Notice("Storage", "%u entries loaded from table %s.", result->GetRowCount(), IndexName);
+		delete result;
+	}
+
 	/** Reloads the storage container
 	 */
 	void Reload()

@@ -41,6 +41,7 @@ extern SERVER_DECL SQLStorage<MapCheckPoint, ArrayStorageContainer<MapCheckPoint
 void Storage_FillTaskList(TaskList & tl);
 void Storage_Cleanup();
 bool Storage_ReloadTable(const char * TableName);
+void Storage_LoadAdditionalTables();
 
 #endif
 
