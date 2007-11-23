@@ -220,41 +220,42 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//197 Apply Aura: Reduce Attacker Critical Hit Chance by %
 		&Aura::SpellAuraIncreaseAllWeaponSkill,//198
 		&Aura::SpellAuraIncreaseHitRate,//199 Apply Aura: Increases Spell % To Hit (Fire, Nature, Frost)
-		&Aura::SpellAuraNULL,//200
+		&Aura::SpellAuraNULL,//200 // Increases experience earned by $s1%.  Lasts $d.
 		&Aura::SpellAuraNULL,//201 Apply Aura: Cannot be Dodged
-		&Aura::SpellAuraNULL,//202
+		&Aura::SpellAuraNULL,//202 // Finishing moves cannot be dodged - 32601, 44452
 		&Aura::SpellAuraNULL,//203 Apply Aura: Reduces Attacker Critical Hit Damage with Melee by %
 		&Aura::SpellAuraNULL,//204 Apply Aura: Reduces Attacker Critical Hit Damage with Ranged by %
-		&Aura::SpellAuraNULL,//205
-		&Aura::SpellAuraNULL,//206
+		&Aura::SpellAuraNULL,//205 // "School" Vulnerability
+		&Aura::SpellAuraNULL,//206 // Take flight on a worn old carpet. - Spell 43343
 		&Aura::SpellAuraEnableFlight,//207 set fly
 		&Aura::SpellAuraEnableFlightWithUnmountedSpeed,//208
-		&Aura::SpellAuraNULL,//209
-		&Aura::SpellAuraNULL,//210
+		&Aura::SpellAuraNULL,//209  // mod flight speed?
+		&Aura::SpellAuraNULL,//210	// commentator's command - spell 42009
 		&Aura::SpellAuraIncreaseFlightSpeed,//211
 		&Aura::SpellAuraIncreaseRangedAPStatPCT,//SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_INTELLECT //212 Apply Aura: Increase Ranged Atk Power by % of Intellect
 		&Aura::SpellAuraIncreaseRageFromDamageDealtPCT, //213 Apply Aura: Increase Rage from Damage Dealt by %
-		&Aura::SpellAuraNULL,//214
-		&Aura::SpellAuraNULL,//215
+		&Aura::SpellAuraNULL,//214 // Tamed Pet Passive (DND)
+		&Aura::SpellAuraNULL,//215 // arena preparation buff - cancel soul shard requirement?
 		&Aura::SpellAuraModCastingSpeed,//216 Increases casting time %, reuse existing handler...
-		&Aura::SpellAuraNULL,//217
-		&Aura::SpellAuraNULL,//218
+		&Aura::SpellAuraNULL,//217 // not used
+		&Aura::SpellAuraNULL,//218 // increases time between ranged attacks
 		&Aura::SpellAuraRegenManaStatPCT,//219 Regenerate mana equal to $s1% of your Intellect every 5 sec, even while casting
 		&Aura::SpellAuraSpellHealingStatPCT,//220 Increases your healing spells  by up to $s1% of your Strength
-		&Aura::SpellAuraNULL,//221
-		&Aura::SpellAuraNULL,//222
-		&Aura::SpellAuraNULL,//223
-		&Aura::SpellAuraNULL,//224
-		&Aura::SpellAuraNULL,//225
-		&Aura::SpellAuraNULL,//226
+		&Aura::SpellAuraNULL,//221 Detaunt "Ignores an enemy, forcing the caster to not attack it unless there is no other target nearby. When the effect wears off, the creature will attack the most threatening target."
+		&Aura::SpellAuraNULL,//222 // not used
+		&Aura::SpellAuraNULL,//223 // used in one spell, cold stare 43593
+		&Aura::SpellAuraNULL,//224 // not used
+		&Aura::SpellAuraNULL,//225 // Prayer of Mending "Places a spell on the target that heals them for $s1 the next time they take damage.  When the heal occurs, Prayer of Mending jumps to a raid member within $a1 yards.  Jumps up to $n times and lasts $d after each jump.  This spell can only be placed on one target at a time."
+		&Aura::SpellAuraNULL,//226 // used in brewfest spells, headless hoerseman
 		&Aura::SpellAuraNULL,//227 Inflicts [SPELL DAMAGE] damage to enemies in a cone in front of the caster. (based on combat range) http://www.thottbot.com/s40938
 		&Aura::SpellAuraNULL,//228 Stealth Detection. http://www.thottbot.com/s34709
 		&Aura::SpellAuraNULL,//229 Apply Aura:Reduces the damage your pet takes from area of effect attacks http://www.thottbot.com/s35694
 		&Aura::SpellAuraIncreaseMaxHealth,//230 Increase Max Health (commanding shout);
         //231 curse a target http://www.thottbot.com/s40303
-        //232
-        //233
+        //232 // Reduces duration of Magic effects by $s2%.
+        //233 // Beer Goggles
         //234 Apply Aura: Reduces Silence or Interrupt effects, Item spell magic http://www.thottbot.com/s42184
+		//235 33206 Instantly reduces a friendly target's threat by $44416s1%, reduces all damage taken by $s1% and increases resistance to Dispel mechanics by $s2% for $d.
 };
 /*
 inline void ApplyFloatSM(float ** m,float v,uint32 mask, float def)

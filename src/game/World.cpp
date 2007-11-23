@@ -4531,7 +4531,13 @@ void CheckpointMgr::KilledCreature(uint32 GuildId, uint32 CreatureId)
 	{
 		MapCheckPoint * pcp = CheckpointStorage.LookupEntry((*i));
 		if(pcp)
+		{
+			// check prerequsites
+			if(pcp->pPrevCp && !HasCompletedCheckpointAndPrequsites(GuildId, pcp->pPrevCp))
+				return;
+
 			GuildCompletedCheckpoint(GuildId,pcp->checkpoint_id);
+		}
 	}
 }
 
