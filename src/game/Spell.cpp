@@ -1122,11 +1122,9 @@ void Spell::cast(bool check)
 
 	if(cancastresult == -1)
 	{
-		if (p_caster && !m_triggeredSpell && p_caster->IsInWorld())
+		if (p_caster && !m_triggeredSpell && p_caster->IsInWorld() && GUID_HIPART(m_targets.m_unitTarget)==HIGHGUID_UNIT)
 		{
-			Unit * pUnit = p_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
-			if(pUnit)
-				sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,pUnit);
+			sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,m_targets.m_unitTarget);
 		}
 		if(m_spellInfo->Attributes & ATTRIBUTE_ON_NEXT_ATTACK)
 		{

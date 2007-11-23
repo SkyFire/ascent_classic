@@ -714,9 +714,13 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 	}
 }
 
-void QuestMgr::OnPlayerCast(Player* plr, uint32 spellid, Unit* victim)
+void QuestMgr::OnPlayerCast(Player* plr, uint32 spellid, uint64& victimguid)
 {
-	if(!plr || !plr->HasQuestSpell(spellid) || !victim)
+	if(!plr || !plr->HasQuestSpell(spellid))
+		return;
+
+	Unit * victim = plr->GetMapMgr() ? plr->GetMapMgr()->GetUnit(victimguid) : NULL;
+	if(victim==NULL)
 		return;
 
 	uint32 i, j;
