@@ -53,8 +53,8 @@ SERVER_DECL SQLStorage<FishingZoneEntry, HashMapStorageContainer<FishingZoneEntr
 SERVER_DECL SQLStorage<MapInfo, ArrayStorageContainer<MapInfo> >							WorldMapInfoStorage;
 SERVER_DECL SQLStorage<ZoneGuardEntry, HashMapStorageContainer<ZoneGuardEntry> >			ZoneGuardStorage;
 
-extern SERVER_DECL set<string> ExtraMapCreatureTables;
-extern SERVER_DECL set<string> ExtraMapGameObjectTables;
+SERVER_DECL set<string> ExtraMapCreatureTables;
+SERVER_DECL set<string> ExtraMapGameObjectTables;
 
 #ifdef ENABLE_CHECKPOINT_SYSTEM
 SERVER_DECL SQLStorage<MapCheckPoint, ArrayStorageContainer<MapCheckPoint> >				CheckpointStorage;
