@@ -1250,14 +1250,13 @@ void Aura::SpellAuraDummy(bool apply)
 			SMTMod_On_target(apply,true,0x08F1A7EF,mod->m_amount); // Healing Wave
 		}break;
 	//druid - mangle
+	case 33878:
+	case 33986:
+	case 33987:
 	case 33876:
 	case 33982:
 	case 33983:
-	case 33878:
-	case 33986:
 		{
-			if (GetUnitCaster() && GetUnitCaster()->IsPlayer())
-				static_cast<Player*>(GetUnitCaster())->AddComboPoints(m_target->GetGUID(),1);
 			int32 val = (apply) ? 30 : -30;
 			m_target->ModDamageTakenByMechPCT[MECHANIC_BLEEDING] += float(val)/100.0f;
 		}break;

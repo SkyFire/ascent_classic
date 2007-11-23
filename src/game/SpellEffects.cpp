@@ -2846,6 +2846,9 @@ void Spell::SpellEffectWeapondamage(uint32 i) // Weapon damage +
 	if(!unitTarget ||!u_caster)
 		return;
 
+	if (m_spellInfo->NameHash == 0xA938E257 && u_caster->IsPlayer()) //Hacky fix for druid - Mangle.
+			static_cast<Player*>(u_caster)->AddComboPoints(unitTarget->GetGUID(),1);
+
 	// Hacky fix for druid spells where it would "double attack".
 	if(m_spellInfo->Effect[2] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
 	{

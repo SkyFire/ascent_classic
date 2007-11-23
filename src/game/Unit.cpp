@@ -624,14 +624,12 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					switch(spellId)
 					{
 						case 14189: //Seal Fate
-						case 16953: //Blood Frenzy & Primal Fury
-						case 16959:
+						case 16953: //Blood Frenzy
 						{
 							if (!this->IsPlayer() || 
 								!CastingSpell || 
 								CastingSpell->Id == 14189 ||
-								CastingSpell->Id == 16953 ||
-								CastingSpell->Id == 16959)
+								CastingSpell->Id == 16953)
 								continue;
 							if (CastingSpell->Effect[0]!=80 &&
 								CastingSpell->Effect[1]!=80 &&
