@@ -1787,9 +1787,7 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 	       
 	       /* not sure on this */
 	       sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE, /*GetDuration()*/45000, 1, 0);
-		
 	}
-
 }
 
 void Spell::SpellEffectLeap(uint32 i) // Leap
@@ -2169,13 +2167,71 @@ void Spell::SpellEffectSendEvent(uint32 i) //Send Event
 		{
 
 		}break;
-		case 29297:
+	case 29297:
 		{
 			QuestLogEntry *en=p_caster->GetQuestLogForEntry(9427);
 			if(!en)
 				return;
 			en->SendQuestComplete();
-		
+		}break;
+	//Warlock: Summon Succubus Quest
+	case 8674:
+	case 9223:
+	case 9224:
+		{
+			CreatureInfo * ci = CreatureNameStorage.LookupEntry(1863);
+			CreatureProto * cp = CreatureProtoStorage.LookupEntry(1863);
+			if( !ci || !cp )
+				return;
+
+		   Creature * pCreature = p_caster->GetMapMgr()->CreateCreature();
+		   pCreature->Load(cp, p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ());
+		   pCreature->_setFaction();
+		   pCreature->GetAIInterface()->Init(pCreature,AITYPE_AGRO,MOVEMENTTYPE_NONE);
+		   pCreature->GetAIInterface()->taunt(p_caster,true);
+		   pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
+		   pCreature->_setFaction();
+		   pCreature->PushToWorld(p_caster->GetMapMgr());
+		   sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE,60000, 1, 0);
+		}break;
+	//Warlock: Summon Voidwalker Quest
+	case 30208:
+	case 9221:
+	case 9222:
+	case 7728:
+		{
+			CreatureInfo * ci = CreatureNameStorage.LookupEntry(1860);
+			CreatureProto * cp = CreatureProtoStorage.LookupEntry(1860);
+			if( !ci || !cp )
+				return;
+
+		   Creature * pCreature = p_caster->GetMapMgr()->CreateCreature();
+		   pCreature->Load(cp, p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ());
+		   pCreature->_setFaction();
+		   pCreature->GetAIInterface()->Init(pCreature,AITYPE_AGRO,MOVEMENTTYPE_NONE);
+		   pCreature->GetAIInterface()->taunt(p_caster,true);
+		   pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
+		   pCreature->_setFaction();
+		   pCreature->PushToWorld(p_caster->GetMapMgr());
+		   sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE,60000, 1, 0);
+		}break;
+	//Warlock: Summon Felhunter Quest
+	case 8712:
+		{
+			CreatureInfo * ci = CreatureNameStorage.LookupEntry(417);
+			CreatureProto * cp = CreatureProtoStorage.LookupEntry(417);
+			if( !ci || !cp )
+				return;
+
+		   Creature * pCreature = p_caster->GetMapMgr()->CreateCreature();
+		   pCreature->Load(cp, p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ());
+		   pCreature->_setFaction();
+		   pCreature->GetAIInterface()->Init(pCreature,AITYPE_AGRO,MOVEMENTTYPE_NONE);
+		   pCreature->GetAIInterface()->taunt(p_caster,true);
+		   pCreature->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
+		   pCreature->_setFaction();
+		   pCreature->PushToWorld(p_caster->GetMapMgr());
+		   sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE,60000, 1, 0);
 		}break;
 	};
 }
