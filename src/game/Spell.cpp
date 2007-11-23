@@ -1122,9 +1122,11 @@ void Spell::cast(bool check)
 
 	if(cancastresult == -1)
 	{
-		if (p_caster && !m_triggeredSpell)
+		if (p_caster && !m_triggeredSpell && p_caster->IsInWorld())
 		{
-			sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,p_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget));
+			Unit * pUnit = p_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
+			if(pUnit)
+				sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,pUnit);
 		}
 		if(m_spellInfo->Attributes & ATTRIBUTE_ON_NEXT_ATTACK)
 		{
