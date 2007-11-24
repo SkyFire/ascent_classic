@@ -3210,17 +3210,6 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 1 | 4;
 
-///////////////////////////////
-	//items
-	// Band of the Eternal Sage
-	sp = dbcSpell.LookupEntry(35083);
-	if(sp)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-	// Band of the Eternal Restorer 
-	sp = dbcSpell.LookupEntry(35086);
-	if(sp)
-		sp->procFlags = PROC_ON_CAST_SPELL;
-
 
 /*	// druid - Improved Mark of the Wild - already working ?
 	uint32 imarkofthv_group=0;
@@ -3252,25 +3241,31 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(33759);
 	if(sp)
 		sp->proc_interval = 10000; //10 seconds.
-//--------FACTIONS----------------
-/*	FactionTemplateDBC* fe = dbcFactionTemplate.LookupEntry(1719);
-	if(fe)
+	// Band of the Eternal Sage
+	sp = dbcSpell.LookupEntry(35083);
+	if(sp)
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	// Band of the Eternal Restorer 
+	sp = dbcSpell.LookupEntry(35086);
+	if(sp)
+		sp->procFlags = PROC_ON_CAST_SPELL;
+
+	// Everbloom Idol
+	sp = dbcSpell.LookupEntry(33693);
+	if (sp)
 	{
-		for (uint32 x = 0;x<4;x++)
-			printf(" ! %d !F %d ",fe->EnemyFactions[x],fe->FriendlyFactions[x]);
-		printf("FM %d HM %d\n",fe->FriendlyMask,fe->HostileMask);
-		fe->EnemyFactions[0]=1720;
-		fe->FriendlyFactions[0]=1719;
+		SpellEntry* sh = dbcSpell.LookupEntry(16968);
+		if (sh)
+			sp->EffectSpellGroupRelation[0] = sh->EffectSpellGroupRelation[0];
 	}
-	fe = dbcFactionTemplate.LookupEntry(1720);
-	if(fe)
+	//Nordrassil Harness setbonus
+	sp = dbcSpell.LookupEntry(37333);
+	if (sp)
 	{
-		for (uint32 x = 0;x<4;x++)
-			printf(" = %d =F %d ",fe->EnemyFactions[x],fe->FriendlyFactions[x]);
-		printf("FM %d HM %d \n",fe->FriendlyMask,fe->HostileMask);
-		fe->EnemyFactions[0]=1719;
-		fe->FriendlyFactions[0]=1720;
-	} */
+		SpellEntry* sh = dbcSpell.LookupEntry(16968);
+		if (sh)
+			sp->EffectSpellGroupRelation[0] = sh->EffectSpellGroupRelation[0];
+	}
 
 		
 
