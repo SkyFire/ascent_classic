@@ -458,7 +458,6 @@ void QuestMgr::BuildQuestComplete(Player*plr, Quest* qst)
 	data << uint32(0);
 	data <<  uint32(qst->count_reward_item); //Reward item count
 
-	ItemPrototype *ip;
 	for(uint32 i = 0; i < 4; ++i)
 	{
 		if(qst->reward_item[i])
