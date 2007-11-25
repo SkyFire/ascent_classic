@@ -281,7 +281,7 @@ void QuestMgr::BuildOfferReward(WorldPacket *data, Quest* qst, Object* qst_giver
 	*data << qst->count_reward_item;
     if (qst->count_reward_item)
     {
-        for(uint32 i = 0; i < 6; ++i)
+        for(uint32 i = 0; i < 4; ++i)
         {
             if(qst->reward_item[i])
             {
@@ -455,21 +455,16 @@ void QuestMgr::BuildQuestComplete(Player*plr, Quest* qst)
 	   // data <<  uint32(GenerateQuestXP(NULL,qst)); //xp
 	data << xp;
 	data <<  uint32(qst->reward_money);
+	data << uint32(0);
 	data <<  uint32(qst->count_reward_item); //Reward item count
 
 	ItemPrototype *ip;
 	for(uint32 i = 0; i < 4; ++i)
 	{
-		data << qst->reward_item[i];
-		data << qst->reward_itemcount[i];
 		if(qst->reward_item[i])
-		{ 
-			ip = ItemPrototypeStorage.LookupEntry(qst->reward_item[i]);
-			   data << ((ip != NULL) ? ip->DisplayInfoID : uint32(0));
-		}
-		else
 		{
-			data << (uint32)0;
+			data << qst->reward_item[i];
+			data << qst->reward_itemcount[i];
 		}
 	}
 	plr->GetSession()->SendPacket(&data);
