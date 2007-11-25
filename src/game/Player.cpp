@@ -383,6 +383,18 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_setwaterwalk=false;
 	m_areaspirithealer_guid=0;
 	m_CurrentTaxiPath=NULL;
+	this->OnLogin();
+}
+
+void Player::OnLogin()
+{
+	if (this->getClass() == DRUID)
+	{
+		SSAura* aura = new SSAura();
+		aura->spellid = 24907;
+		aura->forms = FORM_MOONKIN;
+		this->m_ssAuras.insert(aura);
+	}
 }
 
 
