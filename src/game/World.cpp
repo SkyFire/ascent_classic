@@ -2886,7 +2886,6 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(9824);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	sp = dbcSpell.LookupEntry(9826);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	sp = dbcSpell.LookupEntry(27007);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntry(14179);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	//rend
 	sp = dbcSpell.LookupEntry(772);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 	sp = dbcSpell.LookupEntry(6546);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
@@ -2921,6 +2920,11 @@ bool World::SetInitialWorldSettings()
 	//lacerate
 	sp = dbcSpell.LookupEntry(33745);if (sp) sp->MechanicsType = MECHANIC_BLEEDING;
 //-------------------------------
+	//Druid: Pounce Bleed
+	sp = dbcSpell.LookupEntry(9007);if (sp) sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntry(9824);if (sp) sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntry(9826);if (sp) sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntry(27007);if (sp) sp->DurationIndex = 18000;
 	//Druid: Natural Shapeshifter
 	sp = dbcSpell.LookupEntry(16833);if (sp) sp->DurationIndex = 0;
 	sp = dbcSpell.LookupEntry(16834);if (sp) sp->DurationIndex = 0;

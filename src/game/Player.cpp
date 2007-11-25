@@ -8918,11 +8918,11 @@ void Player::EventTalentHearthOfWildChange(bool apply)
 		UpdateStats();
 		UpdateChances();
 	}
-	//increase stamina if :
+	//increase attackpower if :
 	else if(SS==FORM_CAT)
 	{
-		SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER,GetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER)+tval/2);
-		SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, GetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER)+tval/2);
+		SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER,GetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER)+tval/200);
+		SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, GetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER)+tval/200);
 		UpdateStats();
 		UpdateChances();
 	}
