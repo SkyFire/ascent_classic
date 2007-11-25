@@ -70,6 +70,8 @@ AIInterface::AIInterface()
 
 	tauntedBy = NULL;
 	isTaunted = false;
+	soullinkedWith = NULL;
+	isSoulLinked = false;
 	m_AllowedToEnterCombat = true;
 	m_totalMoveTime = 0;
 	m_lastFollowX = m_lastFollowY = 0;
@@ -121,6 +123,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
 	m_guardTimer = getMSTime();
+	m_is_in_instance = un->IsInInstance();
 }
 
 AIInterface::~AIInterface()
@@ -2983,6 +2986,12 @@ void AIInterface::WipeHateList()
 		itr->second = 0;
 	m_currentHighestThreat = 0;
 }
+void AIInterface::ClearHateList() //without leaving combat
+{
+	for(TargetMap::iterator itr = m_aiTargets.begin(); itr != m_aiTargets.end(); ++itr)
+		itr->second = 1;
+	m_currentHighestThreat = 1;
+}
 
 void AIInterface::WipeTargetList()
 {
@@ -3055,6 +3064,39 @@ bool AIInterface::GetIsTaunted()
 		}
 	}
 	return isTaunted;
+}
+
+void AIInterface::SetSoulLinkedWith(Unit* target)
+{
+	if (!target)
+		return;
+	soullinkedWith = target;
+	isSoulLinked = true;
+}
+
+Unit* AIInterface::getSoullinkedWith()
+{
+	if(GetIsTaunted())
+	{
+		return soullinkedWith;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+bool AIInterface::GetIsSoulLinked()
+{
+	if(isSoulLinked)
+	{
+		if(!soullinkedWith || !soullinkedWith->isAlive())
+		{
+			isSoulLinked = false;
+			soullinkedWith = NULL;
+		}
+	}
+	return isSoulLinked;
 }
 
 void AIInterface::CheckTarget(Unit* target)

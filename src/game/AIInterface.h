@@ -223,11 +223,15 @@ public:
 	inline AssistTargetSet GetAssistTargets() { return m_assistTargets; }
 	inline TargetMap *GetAITargets() { return &m_aiTargets; }
 	void addAssistTargets(Unit* Friends);
+	void ClearHateList();
 	void WipeHateList();
 	void WipeTargetList();
 	bool taunt(Unit* caster, bool apply = true);
 	Unit* getTauntedBy();
 	bool GetIsTaunted();
+	Unit* getSoullinkedWith();
+	void SetSoulLinkedWith(Unit* target);
+	bool GetIsSoulLinked();
 	inline size_t getAITargetsCount() { return m_aiTargets.size(); }
 	inline uint32 getOutOfCombatRange() { return m_outOfCombatRange; }
 	void setOutOfCombatRange(uint32 val) { m_outOfCombatRange = val; }
@@ -413,8 +417,10 @@ private:
 	AI_State m_AIState_backup;
 	AI_Agent m_aiCurrentAgent;
 
-	Unit* tauntedBy;
+	Unit* tauntedBy; //This mob will hit only tauntedBy mob.
 	bool isTaunted;
+	Unit* soullinkedWith; //This mob can be hitten only by soullinked unit
+	bool isSoulLinked;
 
 
 	// Movement

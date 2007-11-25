@@ -2531,7 +2531,8 @@ uint8 Spell::CanCast(bool rangetolerate)
                 }
 				else
 				{
-					if (target->GetAIInterface()->getAIState() == STATE_EVADE)
+					if (target->GetAIInterface()->getAIState() == STATE_EVADE ||
+						(target->GetAIInterface()->GetIsSoulLinked() && u_caster && target->GetAIInterface()->getSoullinkedWith() != u_caster))
 						return SPELL_FAILED_BAD_TARGETS;
 				}
             }
@@ -3323,6 +3324,10 @@ exit:
 	{// ${$AP*0.2+$m1} damage.
 		if(u_caster)
 			value+=u_caster->GetAP()/5;
+	}else if(m_spellInfo->NameHash == 0xDCBA31B0)//Swipe
+	{// ${$AP*0.06+$m1} damage.
+		if(u_caster)
+			value+=float2int32(u_caster->GetAP()*0.06f);
 	}
 	
 	if(p_caster)

@@ -849,6 +849,7 @@ public:
 
 	// AIInterface
 	AIInterface *GetAIInterface() { return m_aiInterface; }
+	void ClearHateList();
 	void WipeHateList();
 	void WipeTargetList();
 	inline void setAItoUse(bool value){m_useAI = value;}
@@ -964,6 +965,7 @@ public:
 	void SendNotifyToNearbyCreature(uint32 msgid, uint32 entryid);
 
 	inline int GetHealthPct() { return (int)(GetUInt32Value(UNIT_FIELD_HEALTH) * 100 / GetUInt32Value(UNIT_FIELD_MAXHEALTH)); };
+    inline void SetHealthPct(uint32 val) { if (val>0) SetUInt32Value(UNIT_FIELD_HEALTH,float2int32(val*0.01f*GetUInt32Value(UNIT_FIELD_MAXHEALTH))); };
 	inline int GetManaPct() { return (int)(GetUInt32Value(UNIT_FIELD_POWER1) * 100 / GetUInt32Value(UNIT_FIELD_MAXPOWER1)); };
 		
 	uint32 GetResistance(uint32 type);	

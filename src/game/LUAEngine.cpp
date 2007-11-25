@@ -440,8 +440,11 @@ int luaUnit_GetAddTank(lua_State * L, Unit * ptr);
 int luaUnit_ClearThreatList(lua_State * L, Unit * ptr);
 int luaUnit_GetTauntedBy(lua_State * L, Unit * ptr);
 int luaUnit_SetTauntedBy(lua_State * L, Unit * ptr);
+int luaUnit_GetSoulLinkedWith(lua_State * L, Unit * ptr);
+int luaUnit_SetSoulLinkedWith(lua_State * L, Unit * ptr);
 int luaUnit_ChangeTarget(lua_State * L, Unit * ptr);
 int luaUnit_GetHealthPct(lua_State * L, Unit * ptr);
+int luaUnit_SetHealthPct(lua_State * L, Unit * ptr);
 int luaUnit_Despawn(lua_State * L, Unit * ptr);
 int luaUnit_GetUnitBySqlId(lua_State * L, Unit * ptr);
 int luaUnit_PlaySoundToSet(lua_State * L, Unit * ptr);
@@ -505,8 +508,11 @@ Unit::RegType Unit::methods[] = {
 	{ "ClearThreatList", &luaUnit_ClearThreatList },
 	{ "GetTauntedBy", &luaUnit_GetTauntedBy },
 	{ "SetTauntedBy", &luaUnit_SetTauntedBy },
+	{ "SetSoulLinkedWith", &luaUnit_SetSoulLinkedWith },
+	{ "GetSoulLinkedWith", &luaUnit_GetSoulLinkedWith },
 	{ "ChangeTarget", &luaUnit_ChangeTarget },
 	{ "GetHealthPct", &luaUnit_GetHealthPct },
+	{ "SetHealthPct", &luaUnit_SetHealthPct },
 	{ "Despawn", &luaUnit_Despawn },
 	{ "GetUnitBySqlId", &luaUnit_GetUnitBySqlId },
 	{ "PlaySoundToSet", &luaUnit_PlaySoundToSet },
@@ -1400,7 +1406,13 @@ int luaUnit_GetHealthPct(lua_State * L, Unit * ptr)
 
 	return 1;
 }
-
+int luaUnit_SetHealthPct(lua_State * L, Unit * ptr)
+{
+	int val = luaL_checkint(L,1);
+	if (val>0)
+		ptr->SetHealthPct(val);
+	return 1;
+}
 int luaUnit_GetItemCount(lua_State * L, Unit * ptr)
 {
 	CHECK_TYPEID_RET_INT(TYPEID_PLAYER);
@@ -1432,7 +1444,7 @@ int luaUnit_GetAddTank(lua_State * L, Unit * ptr)
 int luaUnit_ClearThreatList(lua_State * L, Unit * ptr)
 {
 	CHECK_TYPEID_RET_INT(TYPEID_UNIT);
-	ptr->WipeHateList();
+	ptr->ClearHateList();
 	return 1;
 }
 
@@ -1455,6 +1467,28 @@ int luaUnit_SetTauntedBy(lua_State * L, Unit * ptr)
 		return 0;
 	else
 		ptr->GetAIInterface()->taunt(target);
+	return 1;
+}
+
+int luaUnit_GetSoulLinkedWith(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT)
+
+		if (!ptr->GetAIInterface()->GetIsSoulLinked())
+			lua_pushnil(L);
+		else
+			Lunar<Unit>::push(L,ptr->GetAIInterface()->getSoullinkedWith(),false);
+	return 1;
+}
+int luaUnit_SetSoulLinkedWith(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT)
+		Unit * target = Lunar<Unit>::check(L, 2);
+
+	if (!target || ptr->GetAIInterface()->GetIsSoulLinked() || target==ptr)
+		return 0;
+	else
+		ptr->GetAIInterface()->SetSoulLinkedWith(ptr);
 	return 1;
 }
 int luaUnit_ChangeTarget(lua_State * L, Unit * ptr)

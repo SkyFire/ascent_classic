@@ -2191,7 +2191,8 @@ else
 //--------------------------special states processing---------------------------------------
 	if(pVictim->GetTypeId() == TYPEID_UNIT)
 	{
-		if(pVictim->GetAIInterface() && pVictim->GetAIInterface()->getAIState()== STATE_EVADE)
+		if(pVictim->GetAIInterface() && (pVictim->GetAIInterface()->getAIState()== STATE_EVADE ||
+										(pVictim->GetAIInterface()->GetIsSoulLinked() && pVictim->GetAIInterface()->getSoullinkedWith() != this)))
 		{
 			vstate = EVADE;
 			realdamage = 0;
@@ -3269,6 +3270,10 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 void Unit::WipeHateList()
 { 
 	GetAIInterface()->WipeHateList(); 
+}
+void Unit::ClearHateList()
+{
+	GetAIInterface()->ClearHateList();
 }
 
 void Unit::WipeTargetList() 

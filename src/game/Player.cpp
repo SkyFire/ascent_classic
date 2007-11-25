@@ -8909,8 +8909,8 @@ void Player::EventTalentHearthOfWildChange(bool apply)
 	//increase stamina if :
 	else if(SS==FORM_CAT)
 	{
-		TotalStatModPctPos[STAT_STRENGTH] += tval; 
-		CalcStat(STAT_STRENGTH);	
+		SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER,GetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER)+tval/2);
+		SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, GetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER)+tval/2);
 		UpdateStats();
 		UpdateChances();
 	}
