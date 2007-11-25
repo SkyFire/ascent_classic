@@ -361,7 +361,20 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 
 		*data << (uint32)flags2;
 		*data << getMSTime(); // this appears to be time in ms but can be any thing
-		*data << uint8(0x00);		// wtf? added in 2.3.0
+
+		// this stuff:
+		//   0x01 -> Enable Swimming?
+		//   0x04 -> ??
+		//   0x10 -> disables movement compensation and causes players to jump around all the place
+		//   0x40 -> disables movement compensation and causes players to jump around all the place
+
+		/*static uint8 fl = 0x04;
+		*data << uint8(fl);		// wtf? added in 2.3.0*/
+		/*if(target==this)
+			*data<<uint8(0x53);
+		else
+			*data<<uint8(0);*/
+		*data << uint8(0x1);
 	}
 
 	if (flags & 0x40)
