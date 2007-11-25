@@ -24,32 +24,24 @@
 #include "WoWGuid.h"
 #include "LocationVector.h"
 
-#define DEFAULT_SIZE 0x1000
-#define RESERVE_SIZE 100
-
 class SERVER_DECL ByteBuffer {
 public:
 	class error {
 	};
 
-	ByteBuffer(): _rpos(0), _wpos(0),_storage(NULL) {
-		reserve(DEFAULT_SIZE);
+	const static size_t DEFAULT_SIZE = 0x1000;
+
+	ByteBuffer(): _rpos(0), _wpos(0) {
+		_storage.reserve(DEFAULT_SIZE);
 	}
-	ByteBuffer(size_t res): _rpos(0), _wpos(0),_storage(NULL) {
-		reserve(res);
+	ByteBuffer(size_t res): _rpos(0), _wpos(0) {
+		_storage.reserve(res);
 	}
-	//ByteBuffer(const ByteBuffer &buf): _rpos(buf._rpos), _wpos(buf._wpos), _storage(buf._storage) { }
-	ByteBuffer(const ByteBuffer & buf)
-	{
-		_storage=NULL;
-		reserve(buf._reserveSize);
-		memcpy(_storage,buf._storage,buf._reserveSize);
-		_wpos=buf._wpos;
-		_rpos=buf._rpos;
-	}
-	virtual ~ByteBuffer() { if(_storage) { free(_storage); } }
+	ByteBuffer(const ByteBuffer &buf): _rpos(buf._rpos), _wpos(buf._wpos), _storage(buf._storage) { }
+	virtual ~ByteBuffer() {}
 
 	void clear() {
+		_storage.clear();
 		_rpos = _wpos = 0;
 	}
 
@@ -335,27 +327,17 @@ public:
 		_rpos += len;
 	}
 
-	const uint8 *contents() const { return _storage; };
+	const uint8 *contents() const { return &_storage[0]; };
 
-	inline size_t size() const { return _wpos; };
+	inline size_t size() const { return _storage.size(); };
 	// one should never use resize probably
 	void resize(size_t newsize) {
-		reserve(newsize);
-		_wpos=newsize;
+		_storage.resize(newsize);
 		_rpos = 0;
+		_wpos = size();
 	};
-
 	void reserve(size_t ressize) {
-		if(_storage==NULL)
-		{
-			_storage=(uint8*)malloc(ressize);
-			_reserveSize=ressize;
-		}
-		else if (ressize > _reserveSize)
-		{
-			_storage = (uint8*)realloc(_storage,ressize);
-			_reserveSize=ressize;
-		}
+		if (ressize > size()) _storage.reserve(ressize);
 	};
 
 		// appending to the end of buffer
@@ -368,109 +350,18 @@ public:
 	void append(const uint8 *src, size_t cnt) {
 		if (!cnt) return;
 
-		if (_reserveSize < _wpos + cnt)
-			reserve(_wpos + cnt + RESERVE_SIZE);	// reserve
+		// noone should even need uint8buffer longer than 10mb
+		// if you DO need, think about it
+		// then think some more
+		// then use something else
+		// -- qz
+		ASSERT(size() < 10000000);
 
-		// we can do this in one mov operation if its a certain number of bytes ;)
-		// faster than a memcpy for sure
-		switch(cnt)
-		{
-		case 1:
-			*(uint8*)(&_storage[_wpos]) = *(uint8*)src;
-			break;
-
-		case 2:
-			*(uint16*)(&_storage[_wpos]) = *(uint16*)src;
-			break;
-
-		case 4:
-			*(uint32*)(&_storage[_wpos]) = *(uint32*)src;
-			break;
-
-		case 8:
-			*(uint64*)(&_storage[_wpos]) = *(uint64*)src;
-			break;
-
-		default:
-			memcpy(&_storage[_wpos], src, cnt);
-			break;
-		}
-
+		if (_storage.size() < _wpos + cnt)
+			_storage.resize(_wpos + cnt);
+		memcpy(&_storage[_wpos], src, cnt);
 		_wpos += cnt;
 	}
-
-	void AddUInt32(const uint32& src)
-	{
-		if (_reserveSize < _wpos + sizeof(uint32))
-			reserve(_wpos + sizeof(uint32) + RESERVE_SIZE);	// reserve
-
-		*(uint32*)&_storage[_wpos] = src;
-		_wpos += sizeof(uint32);
-	}
-
-	void AddInt32(const int32& src)
-	{
-		if (_reserveSize < _wpos + sizeof(int32))
-			reserve(_wpos + sizeof(int32) + RESERVE_SIZE);	// reserve
-
-		*(int32*)&_storage[_wpos] = src;
-		_wpos += sizeof(int32);
-	}
-
-	void AddUInt16(const uint16& src)
-	{
-		if (_reserveSize < _wpos + sizeof(uint16))
-			reserve(_wpos + sizeof(uint16) + RESERVE_SIZE);	// reserve
-
-		*(uint16*)&_storage[_wpos] = src;
-		_wpos += sizeof(uint16);
-	}
-
-	void AddInt16(const int16& src)
-	{
-		if (_reserveSize < _wpos + sizeof(int16))
-			reserve(_wpos + sizeof(int16) + RESERVE_SIZE);	// reserve
-
-		*(int16*)&_storage[_wpos] = src;
-		_wpos += sizeof(int16);
-	}
-
-	void AddUInt8(const uint8& src)
-	{
-		if (_reserveSize < _wpos + sizeof(uint8))
-			reserve(_wpos + sizeof(uint8) + RESERVE_SIZE);	// reserve
-
-		*(uint8*)&_storage[_wpos] = src;
-		_wpos += sizeof(uint8);
-	}
-
-	void AddInt8(const int8& src)
-	{
-		if (_reserveSize < _wpos + sizeof(int8))
-			reserve(_wpos + sizeof(int8) + RESERVE_SIZE);	// reserve
-
-		*(int8*)&_storage[_wpos] = src;
-		_wpos += sizeof(int8);
-	}
-
-	void AddFloat(const float& src)
-	{
-		if (_reserveSize < _wpos + sizeof(float))
-			reserve(_wpos + sizeof(float) + RESERVE_SIZE);	// reserve
-
-		*(float*)&_storage[_wpos] = src;
-		_wpos += sizeof(float);
-	}
-
-	void AddUInt64(const uint64& src)
-	{
-		if (_reserveSize < _wpos + sizeof(uint64))
-			reserve(_wpos + sizeof(uint64) + RESERVE_SIZE);	// reserve
-
-		*(uint64*)&_storage[_wpos] = src;
-		_wpos += sizeof(float);
-	}
-
 	void append(const ByteBuffer& buffer) {
 		if(buffer.size() > 0) append(buffer.contents(),buffer.size());
 	}
@@ -541,14 +432,13 @@ public:
 
 	inline void reverse()
 	{
-		//std::reverse(_storage.begin(), _storage.end());
+		std::reverse(_storage.begin(), _storage.end());
 	}
 
 protected:
 	// read and write positions
 	size_t _rpos, _wpos;
-	size_t _reserveSize;
-	uint8 * _storage;
+	std::vector<uint8> _storage;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

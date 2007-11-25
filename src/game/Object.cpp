@@ -163,13 +163,13 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 	}
 
 	// build our actual update
-	data->AddUInt8(updatetype);
+	*data << updatetype;
 
 	// we shouldn't be here, under any cercumstances, unless we have a wowguid..
 	ASSERT(m_wowGuid.GetNewGuidLen());
 	*data << m_wowGuid;
 	
-	data->AddUInt8(m_objectTypeId);
+	*data << m_objectTypeId;
 
 	_BuildMovementUpdate(data, flags, flags2, target);
 
@@ -359,8 +359,8 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			}
 		}
 
-		//*data << (uint32)flags2;
-		//*data << getMSTime(); // this appears to be time in ms but can be any thing
+		*data << (uint32)flags2;
+		*data << getMSTime(); // this appears to be time in ms but can be any thing
 
 		// this stuff:
 		//   0x01 -> Enable Swimming?
@@ -374,59 +374,55 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			*data<<uint8(0x53);
 		else
 			*data<<uint8(0);*/
-		//*data << uint8(0x1);
-		data->AddUInt32(flags2);
-		data->AddUInt32(getMSTime());
-		if(target==this)
-			data->AddUInt8(0x53);
-		else
-			data->AddUInt8(0x00);
+		*data << uint8(0x1);
 	}
 
 	if (flags & 0x40)
 	{
-		data->AddFloat(m_position.x);
-		data->AddFloat(m_position.y);
-		data->AddFloat(m_position.z);
-		data->AddFloat(m_position.o);
+		if(flags & 0x2)
+		{
+			*data << (float)m_position.x;
+			*data << (float)m_position.y;
+			*data << (float)m_position.z;
+			*data << (float)m_position.o;
+		}
+		else
+		{
+			*data << m_position;
+			*data << m_position.o;
+		}
 
 		if(flags & 0x20 && flags2 & 0x0200)
 		{
-			//*data << pThis->m_TransporterGUID;
-			//*data << pThis->m_TransporterX << pThis->m_TransporterY << pThis->m_TransporterZ << pThis->m_TransporterO;
-			//*data << pThis->m_TransporterUnk;
-			data->AddUInt64(pThis->m_TransporterGUID);
-			data->AddFloat(pThis->m_TransporterX);
-			data->AddFloat(pThis->m_TransporterY);
-			data->AddFloat(pThis->m_TransporterZ);
-			data->AddFloat(pThis->m_TransporterO);
-			data->AddFloat(pThis->m_TransporterUnk);
+			*data << pThis->m_TransporterGUID;
+			*data << pThis->m_TransporterX << pThis->m_TransporterY << pThis->m_TransporterZ << pThis->m_TransporterO;
+			*data << pThis->m_TransporterUnk;
 		}
 	}
 
 	if (flags & 0x20)
 	{
-		data->AddUInt32(0);
+		*data << (uint32)0;
 	}
 
 	if (flags & 0x20 && flags2 & 0x2000)
 	{
-		data->AddFloat(0);
-		data->AddFloat(1.0f);		// 1.0f
-		data->AddFloat(0);
-		data->AddFloat(0);
+		*data << (float)0;
+		*data << (float)1.0;
+		*data << (float)0;
+		*data << (float)0;
 	}
 
 	if (flags & 0x20)
 	{
-		data->AddFloat(m_walkSpeed);
-		data->AddFloat(m_runSpeed);
-		data->AddFloat(m_backWalkSpeed);
-		data->AddFloat(m_swimSpeed);
-		data->AddFloat(m_backSwimSpeed);
-		data->AddFloat(m_flySpeed);
-		data->AddFloat(m_backFlySpeed);
-		data->AddFloat(m_turnRate);
+		*data << m_walkSpeed;	 // walk speed
+		*data << m_runSpeed;	  // run speed
+		*data << m_backWalkSpeed; // backwards walk speed
+		*data << m_swimSpeed;	 // swim speed
+		*data << m_backSwimSpeed; // backwards swim speed
+		*data << m_flySpeed;		// fly speed
+		*data << m_backFlySpeed;	// back fly speed
+		*data << m_turnRate;	  // turn rate
 	}
 
 	if(splinebuf)
@@ -439,12 +435,12 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 	{
 		/* burlex: i don't think this data really matters.. but I'm just gonna use these, since it may help us with
 		   debugging later on */
-		data->AddUInt32((uint32)m_instanceId);
+		*data << GetInstanceID();
 		if(flags & 0x10)
-			data->AddUInt32(GetEntry());
+			*data << GetEntry();
 	}
 	else if(flags & 0x10)
-		data->AddUInt32(GetEntry());
+		*data << GetEntry();
 
 	if(flags & 0x2)
 	{
@@ -453,10 +449,10 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			/*int32 m_time = TimeStamp() - target->GetSession()->m_clientTimeDelay;
 			m_time += target->GetSession()->m_moveDelayTime;
 			*data << m_time;*/
-			data->AddUInt32(TimeStamp());
+			*data << TimeStamp();
 		}
 		else
-			data->AddUInt32(getMSTime());
+            *data << getMSTime();
 	}
 }
 
@@ -596,7 +592,7 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 		values_count=m_valuesCount;
 	}
 
-	data->AddUInt8(bc);
+	*data << (uint8)bc;
 	data->append( updateMask->GetMask(), bc*4 );
 	  
 	for( uint32 index = 0; index < values_count; index ++ )
@@ -614,19 +610,19 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 						switch(m_objectTypeId)
 						{
 						case TYPEID_PLAYER:
-							data->AddUInt32(m_uint32Values[index]);
+							*data << m_uint32Values[index];
 						break;
 
 						case TYPEID_UNIT:
 							{
 								if(IsPet())
 								{
-									data->AddUInt32(m_uint32Values[index]);
+									*data << m_uint32Values[index];
 									break;
 								}
 								else
 								{
-									data->AddUInt32(100);
+									*data << (uint32)100;	
 								}
 							}
 						}
@@ -636,20 +632,20 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 			case UNIT_FIELD_HEALTH:
 				{
 					if(m_valuesCount < UNIT_END)
-						data->AddUInt32(m_uint32Values[index]);
+						*data << m_uint32Values[index];
 					else
 					{
 						switch(m_objectTypeId)
 						{
 						case TYPEID_PLAYER:
-							data->AddUInt32(m_uint32Values[index]);
+							*data << m_uint32Values[index];
 						break;
 
 						case TYPEID_UNIT:
 							{
 								if(IsPet())
 								{
-									data->AddUInt32(m_uint32Values[index]);
+									*data << m_uint32Values[index];
 									break;
 								}
 								else
@@ -659,7 +655,7 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 									/* fix case where health value got rounded down and the client sees health as dead */
 									if(!pct && m_uint32Values[UNIT_FIELD_HEALTH] != 0)
 										++pct;
-									data->AddUInt32(pct);
+									*data << pct;	
 								}
 							}
 						}
@@ -668,7 +664,7 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 				break;
 
 			default:
-				data->AddUInt32(m_uint32Values[index]);
+				*data << m_uint32Values[ index ];
 				break;
 			}
 		}
