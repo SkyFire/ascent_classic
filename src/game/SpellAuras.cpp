@@ -226,7 +226,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//203 Apply Aura: Reduces Attacker Critical Hit Damage with Melee by %
 		&Aura::SpellAuraNULL,//204 Apply Aura: Reduces Attacker Critical Hit Damage with Ranged by %
 		&Aura::SpellAuraNULL,//205 // "School" Vulnerability
-		&Aura::SpellAuraNULL,//206 // Take flight on a worn old carpet. - Spell 43343
+		&Aura::SpellAuraEnableFlight,//206 // Take flight on a worn old carpet. - Spell 43343
 		&Aura::SpellAuraEnableFlight,//207 set fly
 		&Aura::SpellAuraEnableFlightWithUnmountedSpeed,//208
 		&Aura::SpellAuraNULL,//209  // mod flight speed?
