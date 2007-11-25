@@ -121,7 +121,6 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
 	m_guardTimer = getMSTime();
-	m_is_in_instance=un->IsInInstance();
 }
 
 AIInterface::~AIInterface()
@@ -150,7 +149,6 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 	m_sourceX = un->GetPositionX();
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
-	m_is_in_instance=un->IsInInstance();
 }
 
 void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)

@@ -1248,6 +1248,8 @@ void Creature::OnPushToWorld()
 			sEventMgr.AddEvent(this, &Creature::ChannelLinkUpGO, m_spawn->channel_target_go, EVENT_CREATURE_CHANNEL_LINKUP, 1000, 5, 0);	// only 5 attempts
 		}
 	}
+
+	m_aiInterface->m_is_in_instance = (m_mapMgr->GetMapInfo()->type!=INSTANCE_NULL) ? true : false;
 }
 
 // this is used for guardians. They are non respawnable creatures linked to a player
