@@ -13,3 +13,6 @@ Class: Warrior
 NPC/Area: n/a
 Explanation: It doesn`t prevent from losing rage as it should.
 
+the first bug - Victory Rush
+The spell is supposed to be active for 20 seconds after u kill something that gives honor and it can only be used once in those 20 seconds. The bug is that the spell can be used forever after killing someone ( meaning u can contineusly spam it) and it has no cooldown and requires no rage, does approximately 45% of attack power in dmg.
+An appropirate fix would be a disable of the spell or try to make it only useable once.

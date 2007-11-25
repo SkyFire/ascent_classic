@@ -94,7 +94,6 @@ Zack - test my shit :
 "yes, the thing is that if you have "Heart of the Wild" talent and you reset talents, if you shift you have like 500mil hp & insane dmg. You need to relog in order that things should work fine. Same thing for other talents ... leader of pack, imp leader of pack...they need to relog to lose them."
 - test pet spell targeting
 - aurastate gets consumed after using it
-- if you have hearth of the wild and reset talents...you will get negative dmg
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
 - priest - Focused Mind (33215) - works
 - shaman - Elemental mastery 16166 - crit and mana - Not working sice the aura remove happens before the trigger

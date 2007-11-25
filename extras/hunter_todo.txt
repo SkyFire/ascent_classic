@@ -2,3 +2,30 @@ Bug: Scatter shot failure
 Class: Hunter
 NPC/Area: N/A
 Explanation: Scatter shot will sometimes say "you cant do that while immune(sounds familiar...hmmm but from where?!?! *cough* alchemy >.>) but sometimes it will work,but most of the time the target can still act on their own will while SS'd(and yes,noone caused them damage)
+
+Mongoose Bite
+From WoWWiki
+Counter attack the enemy for damage equal to X plus 20% of your Attack Power. Can only be performed after you dodge.
+(does only the damage it has in the tooltip)
+
+Steady Shot
+From WoWWiki
+A steady shot that causes base weapon damage + X damage. Causes an additional Y damage against Dazed targets. Z% of your Ranged Attack Power is added to Steady Shot's damage. No cooldown.
+Formula: DamagePercentageBonus*RangedWeaponSpecialization*(150 + WeaponDamage/WeaponSpeed*2.8 + 0.2*RAP + [Dazed: 175])
+(just does the tooltip damage not taking in cosideration your base weapon damage,sometime add's the bonus dazed dmg,i thing the formula for base weapon damage could be taken from aimed shot.)
+
+Arcane Shot
+All ranks above 5 do the same damage as the rank 5.(it would be nice if at the least the damage get fixed,screw the magical effect removal)
+
+About the talents
+Lethal shot's - well they are in the list but i'll post it again to be double sure.(inc your crit strike chanse with ranged weapons by x%)
+Ranged weapon specialisation - doesnt inc your ranged wep damage by x%
+Hawk Eye - now this one is just redicouls,super easy to fix(inc your max range)
+Concussive Barrage - is a hunter talent that gives Auto Shot a 2% chance per rank, up to 6% at max rank, to daze the target for 4 seconds.(template could be taken from warlcok who has almost the same ability)
+at rev 2319 also Hunter's Mark (http://www.wowwiki.com/Hunter's_Mark) stopped working:
+Places the Hunter's Mark Places the Hunter's Mark on the target, increasing the ranged attack power of all attackers against that target by X /<-this was working b4/ and by an additional X each time they are struck by a ranged attack, up to a maximum of X. In addition, the target of this ability can always be seen by the hunter whether it stealths or turns invisible. The target also appears on the mini-map. Lasts for 2 min.
+part with "n additional X each time they are struck by a ranged attack" never worked b4, would b really nice to see it working
+
+also working Expose Weakness (http://www.wowwiki.com/Expose_Weakness) would make a point in going full survival build (bugged since ever, really usefull in instances)
+
++ all what scatler said (+30yard range of auto shot dry.gif ) + what i posted 2 weeks ago, and this is: Arcane Shot and Steady Shot crit chance based on intellect instead of agility and 1.5x crit damage for both of those shots (instead of 2x or 2.3x with talent)
