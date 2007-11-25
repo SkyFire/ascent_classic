@@ -123,7 +123,6 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt)
 	m_sourceY = un->GetPositionY();
 	m_sourceZ = un->GetPositionZ();
 	m_guardTimer = getMSTime();
-	m_is_in_instance = un->IsInInstance();
 }
 
 AIInterface::~AIInterface()
