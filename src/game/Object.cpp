@@ -1914,6 +1914,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
 					uint32 Flags = victim->m_uint32Values[UNIT_DYNAMIC_FLAGS];
 					Flags |= U_DYN_FLAG_LOOTABLE;
+					Flags |= U_DYN_FLAG_TAPPED_BY_PLAYER;
 
 					victim->BuildFieldUpdatePacket(&buf, UNIT_DYNAMIC_FLAGS, Flags);
 

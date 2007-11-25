@@ -1869,7 +1869,7 @@ void AIInterface::UpdateMove()
 	m_destinationY = m_nextPosY;
 	m_destinationZ = m_nextPosZ;
 	
-	if(m_moveFly != true)
+	/*if(m_moveFly != true)
 	{
 		if(m_Unit->GetMapMgr())
 		{
@@ -1877,7 +1877,7 @@ void AIInterface::UpdateMove()
 			if(fabsf(adt_Z - m_destinationZ) < 3.0f)
 				m_destinationZ = adt_Z;
 		}
-	}
+	}*/
 	m_nextPosX = m_nextPosY = m_nextPosZ = 0;
 
 	uint32 moveTime;
@@ -2334,7 +2334,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				float y = m_Unit->GetPositionY() + (m_destinationY - m_Unit->GetPositionY()) * q;
 				float z = m_Unit->GetPositionZ() + (m_destinationZ - m_Unit->GetPositionZ()) * q;
 				
-				if(m_moveFly != true)
+				/*if(m_moveFly != true)
 				{
 					if(m_Unit->GetMapMgr())
 					{
@@ -2342,7 +2342,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 						if(fabsf(adt_Z - z) < 1.5)
 							z = adt_Z;
 					}
-				}
+				}*/
 
 				m_Unit->SetPosition(x, y, z, m_Unit->GetOrientation());
 				
