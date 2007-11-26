@@ -132,6 +132,7 @@ Zack - test my shit :
 - Band of the Eternal Champion 35080
 - Band of the Eternal Sage 35083
 - Band of the Eternal Restorer 35086
+- general spell targeting type 30 -> 21172
 
 ==========================================================================
 Capt - test my shit :

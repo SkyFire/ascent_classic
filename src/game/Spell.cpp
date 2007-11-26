@@ -350,6 +350,54 @@ void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float
 	}	
 }
 
+/// We fill all the targets in the area, including the stealth ed one's
+void Spell::FillAllFriendlyInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range)
+{
+	float r = range*range;
+	uint8 did_hit_result;
+	for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+	{
+		if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
+			continue;
+		if(m_spellInfo->TargetCreatureType)
+		{
+			if((*itr)->GetTypeId()!= TYPEID_UNIT)
+				continue;
+			CreatureInfo *inf = ((Creature*)(*itr))->GetCreatureName();
+			if(!inf || !(1<<(inf->Type-1) & m_spellInfo->TargetCreatureType))
+				continue;
+		}
+		if(IsInrange(srcx,srcy,srcz,(*itr),r))
+		{
+			if(u_caster)
+			{
+				if(isFriendly(u_caster, (Unit*)(*itr)))
+				{
+					did_hit_result = DidHit( (Unit*)*itr );
+					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
+						tmpMap->push_back((*itr)->GetGUID());
+					else
+						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(),did_hit_result));
+				}
+			}
+			else //cast from GO
+			{
+				if(g_caster && g_caster->GetUInt32Value(OBJECT_FIELD_CREATED_BY) && g_caster->m_summoner)
+				{
+					//trap, check not to attack owner and friendly
+					if(isFriendly(g_caster->m_summoner,(Unit*)(*itr)))
+						tmpMap->push_back((*itr)->GetGUID());
+				}
+				else
+					tmpMap->push_back((*itr)->GetGUID());
+			}			
+			if(m_spellInfo->MaxTargets)
+				if(m_spellInfo->MaxTargets == tmpMap->size())
+					return;
+		}
+	}	
+}
+
 uint64 Spell::GetSinglePossibleEnemy(float prange)
 {
 	float r;
@@ -831,6 +879,10 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 				case 61:{ // targets with the same group/raid and the same class
 					//shit again
 				}break;
+				case EFF_TARGET_ALL_FRIENDLY_IN_AREA:{
+
+				}break;
+					
 			}//end switch
 		}//end for
 	if(store_buff->m_unitTarget)

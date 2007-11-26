@@ -42,3 +42,5 @@ where name like "%Improved Expose Armor%";
 #where id in (21835, 3421 ,27282, 26892 ,11400 ,27283 ,13750 ,27441 ,268 ,13877, 2094 ,1833 ,31224 ,14177 ,26679 ,2836 ,1842 ,1725 ,32684 ,26669 ,26865 ,26866 ,27448 ,26884 ,14278 ,38764 ,26864 ,27099 ,38768 ,8643 ,34413 ,1804 ,921 ,2842 ,14183 ,14185 ,14251 ,26867 ,1860 ,11297 ,36554 ,5938 ,26862 ,6774 ,11305 ,1787 ,26889)
 
 #SELECT id,name,description,EffectBasePoints_1,EffectApplyAuraName_1,EffectMiscValue_1,EffectBasePoints_2,EffectApplyAuraName_2,EffectMiscValue_2,EffectBasePoints_3,EffectApplyAuraName_3,EffectMiscValue_3 FROM dbc_spell where (EffectApplyAuraName_1=108 and EffectMiscValue_1=23) or (EffectApplyAuraName_2=108 and EffectMiscValue_2=23) or (EffectApplyAuraName_3=108 and EffectMiscValue_3=23) or (EffectApplyAuraName_1=107 and EffectMiscValue_1=23) or (EffectApplyAuraName_2=107 and EffectMiscValue_2=23) or (EffectApplyAuraName_3=107 and EffectMiscValue_3=23)
+
+#SELECT id,name,description from dbc_spell where EffectImplicitTargetA_1=30 or EffectImplicitTargetA_2=30 or EffectImplicitTargetA_1=30 or EffectImplicitTargetB_1=30 or EffectImplicitTargetB_2=30 or EffectImplicitTargetB_3=30

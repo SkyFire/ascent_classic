@@ -53,7 +53,7 @@ pSpellTarget SpellTargetHandler[TOTAL_SPELL_TARGET] =
 	&Spell::SpellTargetPetOwner,				// 27
 	&Spell::SpellTargetEnemysAreaOfEffect,	  // 28 channeled
 	&Spell::SpellTargetTypeTAOE,				// 29
-	&Spell::SpellTargetPartyBasedAreaEffect,	// 30
+	&Spell::SpellTargetAllyBasedAreaEffect,	// 30
 	&Spell::SpellTargetScriptedEffects,		 // 31
 	&Spell::SpellTargetSummon,				  // 32
 	&Spell::SpellTargetNearbyPartyMembers,	  // 33
@@ -562,7 +562,7 @@ void Spell::SpellTargetTypeTAOE(uint32 i, uint32 j)
 }
 
 /// Spell Target Handling for type 30: PBAE Party Based Area Effect
-void Spell::SpellTargetPartyBasedAreaEffect(uint32 i, uint32 j)
+void Spell::SpellTargetAllyBasedAreaEffect(uint32 i, uint32 j)
 {
 	/* Description
 	We take the selected party member(also known as target), then we get a list of all the party members in the area
@@ -571,6 +571,7 @@ void Spell::SpellTargetPartyBasedAreaEffect(uint32 i, uint32 j)
 	26043 -> Battle Shout
 	*/
 	TargetsList *tmpMap=&m_targetUnits[i];
+	FillAllFriendlyInArea(tmpMap,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
 }
 
 /// Spell Target Handling for type 31: related to scripted effects

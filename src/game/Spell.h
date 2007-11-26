@@ -1454,6 +1454,8 @@ public:
     void FillAllTargetsInArea(float srcx,float srcy,float srcz,uint32 ind);
     // Fills the targets at the area of effect. We suppose we already inited this spell and know the details
     void FillAllTargetsInArea(LocationVector & location,uint32 ind);
+    // Fills the targets at the area of effect. We suppose we already inited this spell and know the details
+    void FillAllFriendlyInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range);
     //get single Enemy as target
     uint64 GetSinglePossibleEnemy(float prange=0);
     //get single Enemy as target
@@ -1647,7 +1649,7 @@ public:
     void SpellTargetPetOwner(uint32 i, uint32 j);
     void SpellTargetEnemysAreaOfEffect(uint32 i, uint32 j);
     void SpellTargetTypeTAOE(uint32 i, uint32 j);
-    void SpellTargetPartyBasedAreaEffect(uint32 i, uint32 j);
+    void SpellTargetAllyBasedAreaEffect(uint32 i, uint32 j);
     void SpellTargetScriptedEffects(uint32 i, uint32 j);
     void SpellTargetSummon(uint32 i, uint32 j);
     void SpellTargetNearbyPartyMembers(uint32 i, uint32 j);
