@@ -3493,7 +3493,39 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 		pts.LastTrigger = 0;
 		pts.deleted = false;
 
-		if(m_spellProto->NameHash == 0xE4573D4A)
+		// fix for dragonspine, madness of the betrayer and romulo's
+		// todo: needs to be tied in with the DB at some stage!
+		// todo: procs per minute calculation is a bit dodgy
+		//        1. it only gets calculated when you equip the trinket, so if you use a slow weapon, equip trinket, then change to two quick 1 handers == exploit
+		//        2. uses unmodified weapon speed, this is blizzlike, but it's not overly good, think of a druid in cat form with a 2h mace.
+		if(m_spellProto->NameHash == 0xCFBFA2DA || m_spellProto->NameHash == 0x37AA84E3 || m_spellProto->NameHash == 0xF144ECC0)    
+		{
+			float ppm = 1.0;
+			switch(m_spellProto->NameHash)
+			{
+				case 0xCFBFA2DA: ppm = 1.5; break; // dragonspine trophy
+				case 0x37AA84E3: ppm = 1.5; break; // romulo's
+				case 0xF144ECC0: ppm = 1.0; break; // madness of the betrayer
+			}
+
+			Item * mh = ((Player*)m_target)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+			Item * of = ((Player*)m_target)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+			if (mh && of)
+			{
+				float mhs = float(mh->GetProto()->Delay);
+				float ohs = float(of->GetProto()->Delay);
+				pts.procChance = FL2UINT((mhs+ohs)/1000*ppm/0.6f);
+			}
+			else if (mh)
+			{
+				float mhs = float(mh->GetProto()->Delay);
+				pts.procChance = FL2UINT(mhs/1000*ppm/0.6f);
+			}
+			else
+				pts.procChance = 0;
+		}
+
+		else if(m_spellProto->NameHash == 0xE4573D4A)
 		{
 			/* The Twin Blades of Azzinoth.
 			 * According to comments on wowhead, this proc has ~0.75ppm (procs-per-minute). */
@@ -3507,7 +3539,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 		}
 
 		/* We have a custom formula for seal of command. */
-		if(m_spellProto->NameHash == 0xC5C30B39)
+		else if(m_spellProto->NameHash == 0xC5C30B39)
 		{
 			// default chance of proc
 			pts.procChance = 25;

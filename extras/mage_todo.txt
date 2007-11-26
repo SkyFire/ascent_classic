@@ -9,3 +9,4 @@ Problems not related with only one spell/talent:
 Frost Warding
 In addition, gives your Frost Ward a 10n% chance to reflect Frost spells and effects while active.
 
+there's a bug with cold snap. if u summon a water elemental, then use cold snap and summon again water elemtanal you'll have 2 elementals at the same time. please add a trigger to dismiss water elemental when casting cold snap
