@@ -2929,7 +2929,7 @@ void Spell::SpellEffectThreat(uint32 i) // Threat
 	if(!unitTarget || !unitTarget->isAlive() )
 		return;
 
-	bool chck = unitTarget->GetAIInterface()->modThreatByPtr(unitTarget,m_spellInfo->EffectBasePoints[i]);
+	bool chck = unitTarget->GetAIInterface()->modThreatByPtr(u_caster,m_spellInfo->EffectBasePoints[i]);
 	if(chck == false)
 		unitTarget->GetAIInterface()->AttackReaction(u_caster,1,0);	
 }
