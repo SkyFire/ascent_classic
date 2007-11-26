@@ -2230,7 +2230,7 @@ void Spell::SpellEffectSendEvent(uint32 i) //Send Event
 		   pCreature->PushToWorld(p_caster->GetMapMgr());
 		   sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE,60000, 1, 0);
 		}break;
-	};
+	}
 }
 
 void Spell::SpellEffectApplyAA(uint32 i) // Apply Area Aura

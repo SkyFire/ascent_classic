@@ -2320,7 +2320,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	}
 	if (this->IsPlayer())
 	{
-			static_cast<Player*>(this)->m_casted_amount[school]=damage;
+			static_cast<Player*>(this)->m_casted_amount[school]=res;
 	}
 
 	DealDamage(pVictim, float2int32(res),  2, 0, spellID);

@@ -3217,7 +3217,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(16864);
 	if (sp)
 	{
-		sp->procChance=2;
+		sp->procChance=3;
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
 	}
 
@@ -3277,6 +3277,15 @@ bool World::SetInitialWorldSettings()
 		if (sh)
 			sp->EffectSpellGroupRelation[0] = sh->EffectSpellGroupRelation[0];
 	}
+	//all Drums 
+	sp = dbcSpell.LookupEntry(35474);if (sp) sp->RequiredShapeShift=0;
+	sp = dbcSpell.LookupEntry(35475);if (sp) sp->RequiredShapeShift=0;
+	sp = dbcSpell.LookupEntry(35476);if (sp) sp->RequiredShapeShift=0;
+	sp = dbcSpell.LookupEntry(35477);if (sp) sp->RequiredShapeShift=0;
+	sp = dbcSpell.LookupEntry(35478);if (sp) sp->RequiredShapeShift=0;
+	
+	
+
 		
 
 	//windfury weapon changes. Start to hate these day by day
