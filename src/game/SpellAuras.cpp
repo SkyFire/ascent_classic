@@ -1617,13 +1617,8 @@ void Aura::SpellAuraDummy(bool apply)
 		 {
 			 if(!apply)
 			 {
-				 SpellEntry* spe = dbcSpell.LookupEntry(33763);
-				 if (spe)
-				 {
-					 Spell* spell = new Spell(m_target,spe,false,NULL);
-					 spell->SetUnitTarget(m_target);
-					 spell->Heal((uint32)mod->m_amount);
-				 }
+				 if (this->GetUnitCaster())
+						 this->GetUnitCaster()->Heal(m_target,33763,600);
 			 }
 		 }break;
 

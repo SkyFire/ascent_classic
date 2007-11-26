@@ -3213,6 +3213,13 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(16818);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 1 | 4;
+	// Druid: Omen of Clarity
+	sp = dbcSpell.LookupEntry(16864);
+	if (sp)
+	{
+		sp->procChance=2;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
+	}
 
 
 /*	// druid - Improved Mark of the Wild - already working ?
@@ -3270,7 +3277,6 @@ bool World::SetInitialWorldSettings()
 		if (sh)
 			sp->EffectSpellGroupRelation[0] = sh->EffectSpellGroupRelation[0];
 	}
-
 		
 
 	//windfury weapon changes. Start to hate these day by day

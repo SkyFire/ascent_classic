@@ -2531,8 +2531,7 @@ uint8 Spell::CanCast(bool rangetolerate)
                 }
 				else
 				{
-					if (target->GetAIInterface()->getAIState() == STATE_EVADE ||
-						(target->GetAIInterface()->GetIsSoulLinked() && u_caster && target->GetAIInterface()->getSoullinkedWith() != u_caster))
+					if (target->GetAIInterface()->GetIsSoulLinked() && u_caster && target->GetAIInterface()->getSoullinkedWith() != u_caster)
 						return SPELL_FAILED_BAD_TARGETS;
 				}
             }
@@ -3659,7 +3658,7 @@ void Spell::Heal(int32 amount)
 		unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH, amount);
 
 	if (p_caster)
-		p_caster->m_casted_amount[m_spellInfo->School]=(uint32)(((curHealth + amount) >= maxHealth)? maxHealth-curHealth : amount);
+		p_caster->m_casted_amount[m_spellInfo->School]=amount;
 
 	int doneTarget = 0;
 
