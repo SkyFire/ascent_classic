@@ -1867,8 +1867,12 @@ void Aura::SpellAuraModFear(bool apply)
 		if(p_target)
 		{
 			m_target->setAItoUse(true);
+			// this is a hackfix to stop player from moving
+			WorldPacket data1(9);
+			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
+			data1 << m_target->GetNewGUID() << uint8(0x00);
+			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
 		}
-		//m_target->m_pacified++;
 		m_target->m_special_state |= UNIT_STATE_FEAR;
 		m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_FEARED);
 		m_target->GetAIInterface()->HandleEvent(EVENT_FEAR, u_caster, 0);
@@ -1878,10 +1882,14 @@ void Aura::SpellAuraModFear(bool apply)
 		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, u_caster, 0);
 		m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_FEARED);
 		m_target->m_special_state &= ~UNIT_STATE_FEAR;
-		//m_target->m_pacified--;
 
 		if(p_target)
 		{
+			WorldPacket data1(9);
+			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
+			data1 << m_target->GetNewGUID() << uint8(0x01); //enable player movement ?
+			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
+
 			m_target->setAItoUse(false);
 			sHookInterface.OnEnterCombat(p_target, u_caster);
 		}

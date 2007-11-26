@@ -89,7 +89,6 @@ AIInterface::AIInterface()
 	next_spell_time = 0;
 	m_hasWaypointEvents = false;
 	waiting_for_cooldown = false;
-	m_AIState_backup = m_AIState;
 	UnitToFollow_backup = NULL;
 	m_isGuard = false;
 	m_is_in_instance=false;
@@ -330,87 +329,79 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				SetNextTarget(NULL);
 				m_moveRun = true;
 			}break;
+
 		case EVENT_FEAR:
-			{   
+			{
+				m_FearTimer = 0;
 				SetUnitToFear(pUnit);
+
 				CALL_SCRIPT_EVENT(m_Unit, OnFear)(pUnit, 0);
-				m_AIState_backup = m_AIState;
 				m_AIState = STATE_FEAR;
 				StopMovement(1);
+
 				UnitToFollow_backup = UnitToFollow;
 				UnitToFollow = NULL;
 				m_lastFollowX = m_lastFollowY = 0;
 				FollowDistance_backup = FollowDistance;
 				FollowDistance = 0.0f;
 
-				m_aiTargets.clear();			
+				m_aiTargets.clear(); // we'll get a new target after we are unfeared
 				m_fleeTimer = 0;
 				m_hasFleed = false;
 				m_hasCalledForHelp = false;
-				m_moveRun = false;
-				
+
 				// update speed
+				m_moveRun = true;
 				getMoveFlags();
 
-				m_nextSpell = NULL;
-
+				SetNextSpell(NULL);
 				SetNextTarget(NULL);
 			}break;
+
 		case EVENT_UNFEAR:
 			{
-				m_moveRun = true;
-				// update speed
-				getMoveFlags();
-
-				//maybe we were not idle before fear. Like a guardian could have been doing something
-				//m_AIState = STATE_IDLE;
-				m_AIState = m_AIState_backup;
 				UnitToFollow = UnitToFollow_backup;
 				FollowDistance = FollowDistance_backup;
+				m_AIState = STATE_IDLE; // we need this to prevent permanent fear, wander, and other problems
 
 				SetUnitToFear(NULL);
 				StopMovement(1);
 			}break;
+
 		case EVENT_WANDER:
-			{   
+			{
 				//CALL_SCRIPT_EVENT(m_Unit, OnWander)(pUnit, 0); FIXME
-				m_AIState_backup = m_AIState;
 				m_AIState = STATE_WANDER;
 				StopMovement(1);
+
 				UnitToFollow_backup = UnitToFollow;
 				UnitToFollow = NULL;
 				m_lastFollowX = m_lastFollowY = 0;
 				FollowDistance_backup = FollowDistance;
 				FollowDistance = 0.0f;
 
-				//comented by Zack : why do we need to forget our old targets ?. Maybe this was put here with a reason
-				//m_aiTargets.clear();
+				m_aiTargets.clear(); // we'll get a new target after we are unwandered
 				m_fleeTimer = 0;
 				m_hasFleed = false;
 				m_hasCalledForHelp = false;
-				m_moveRun = false;
-				
+
 				// update speed
+				m_moveRun = true;
 				getMoveFlags();
 
-				m_nextSpell = NULL;
-
+				SetNextSpell(NULL);
 				SetNextTarget(NULL);
-				//m_Unit->setAttackTarget(NULL);
-
 			}break;
+
 		case EVENT_UNWANDER:
 			{
-				m_moveRun = true;
-				// update speed
-				getMoveFlags();
-
 				UnitToFollow = UnitToFollow_backup;
 				FollowDistance = FollowDistance_backup;
-				m_AIState = m_AIState_backup;
+				m_AIState = STATE_IDLE; // we need this to prevent permanent fear, wander, and other problems
 
 				StopMovement(1);
-			}break;	   
+			}break;
+
 		default:
 			{
 			}break;
@@ -2530,7 +2521,6 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				m_FearTimer=getMSTime()+100;
 			else
 			{
-				m_moveRun=true;
 				MoveTo(Fx, Fy, Fz, Fo);
 				m_FearTimer = m_totalMoveTime + getMSTime() + 200;
 			}

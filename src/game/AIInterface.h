@@ -414,7 +414,6 @@ private:
 	AssistTargetSet m_assistTargets;
 	AIType m_AIType;
 	AI_State m_AIState;
-	AI_State m_AIState_backup;
 	AI_Agent m_aiCurrentAgent;
 
 	Unit* tauntedBy; //This mob will hit only tauntedBy mob.
