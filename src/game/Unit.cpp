@@ -574,6 +574,51 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						continue;
 			}			
 			uint32 proc_Chance = itr2->procChance;
+
+			SpellEntry* spe  = dbcSpell.LookupEntry(itr2->spellId);
+			//Custom procchance modifications based on equipped weapon speed.
+			if(victim->IsPlayer()&&spe&&(spe->NameHash == 0xCFBFA2DA || 
+								  		   spe->NameHash == 0x37AA84E3 || 
+										   spe->NameHash == 0xF144ECC0 ||
+										   spe->Id == 16870))
+			{
+				float ppm = 1.0;
+				switch(spe->NameHash)
+				{
+					case 0xCFBFA2DA: ppm = 1.5; break; // dragonspine trophy
+					case 0x37AA84E3: ppm = 1.5; break; // romulo's
+					case 0xF144ECC0: ppm = 1.0; break; // madness of the betrayer
+				}
+				switch(spe->Id)
+				{
+					case 16870: ppm=2.0;break; //druid: clearcasting
+				}
+
+				Item * mh = ((Player*)victim)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+				Item * of = ((Player*)victim)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+				if (mh && of)
+				{
+					float mhs = float(mh->GetProto()->Delay);
+					float ohs = float(of->GetProto()->Delay);
+					proc_Chance = FL2UINT((mhs+ohs)*0.001f*ppm/0.6f);
+				}
+				else if (mh)
+				{
+					float mhs = float(mh->GetProto()->Delay);
+					proc_Chance = FL2UINT(mhs*0.001f*ppm/0.6f);
+				}
+				else
+					proc_Chance = 0;
+
+				if (((Player*)victim)->IsInFeralForm())
+				{
+					if (((Player*)victim)->GetShapeShift() == FORM_CAT)
+						proc_Chance = FL2UINT(ppm/60.0f);
+					else if (((Player*)victim)->GetShapeShift() == FORM_BEAR || ((Player*)victim)->GetShapeShift() == FORM_DIREBEAR )
+						proc_Chance = FL2UINT(ppm/24.0f);
+				}
+			}
+
 			SM_FIValue(SM_FChanceOfSuccess, (int32*)&proc_Chance, ospinfo->SpellGroupType);
 			if(spellId && Rand(proc_Chance))
 			{

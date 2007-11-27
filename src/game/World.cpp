@@ -3217,7 +3217,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(16864);
 	if (sp)
 	{
-		sp->procChance=3;
+		sp->procChance=100;
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
 	}
 
