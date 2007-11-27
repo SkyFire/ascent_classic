@@ -110,3 +110,17 @@ color: #FFCC33;
 background: #444;
 color: #FFCC33;
 }
+
+.about_this_page {
+background: #333;
+width: 350px;
+border: 1px solid #444444;
+padding-left: 6px;
+padding-right: 6px;
+padding-top: 3px;
+padding-bottom: 3px;
+font-size: 11px;
+}
+.about_this_page b {
+font-size: 12px;
+}
