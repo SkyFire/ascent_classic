@@ -34,6 +34,7 @@ bool ChatHandler::HandleResetReputationCommand(const char *args, WorldSession *m
 	
 	plr->_InitialReputation();
 	SystemMessage(m_session, "Done. Relog for changes to take effect.");
+	sGMLog.writefromsession(m_session, "used reset reputation for %s", plr->GetName());
 	return true;
 }
 
@@ -48,6 +49,8 @@ bool ChatHandler::HandleInvincibleCommand(const char *args, WorldSession *m_sess
 	} else {
 		snprintf(msg, 100, "Select a player or yourself first.");
 	}
+	if(chr!=m_session->GetPlayer())
+		sGMLog.writefromsession(m_session, "toggled invincibility on %s", chr->GetName());
 	SystemMessage(m_session, msg);
 	return true;
 }
@@ -76,22 +79,6 @@ bool ChatHandler::HandleInvisibleCommand(const char *args, WorldSession *m_sessi
 	snprintf(msg, 256, "%s You may have to leave and re-enter this zone for changes to take effect.", msg);
 
 	GreenSystemMessage(m_session, (const char*)msg);
-	return true;
-}
-
-bool ChatHandler::HandleGUIDCommand(const char* args, WorldSession *m_session)
-{
-	uint64 guid;
-	guid = m_session->GetPlayer()->GetSelection();
-	if (guid == 0)
-	{
-	   SystemMessage(m_session, "No selection.");
-		return true;
-	}
-
-	char buf[256];
-	snprintf((char*)buf,256,"Object guid is: lowpart %u highpart %X", (unsigned int)GUID_LOPART(guid), (unsigned int)GUID_HIPART(guid));
-   SystemMessage(m_session,  buf);
 	return true;
 }
 
@@ -274,6 +261,7 @@ bool ChatHandler::HandleItemCommand(const char* args, WorldSession *m_session)
 		sstext << "Item '" << item << "' Not Found in Database." << '\0';
 	}
 
+	sGMLog.writefromsession(m_session, "added item %u to vendor %s", pCreature->GetEntry(), item);
 	SystemMessage(m_session,  sstext.str().c_str());
 
 	return true;
@@ -333,47 +321,6 @@ bool ChatHandler::HandleItemRemoveCommand(const char* args, WorldSession *m_sess
 	return true;
 }
 
-bool ChatHandler::HandleRunCommand(const char* args, WorldSession *m_session)
-{
-	if(!*args)
-		return false;
-
-	int option = atoi((char*)args);
-
-	if(option != 0 && option != 1)
-	{
-		SystemMessage(m_session,  "Incorrect value, use 0 or 1");
-		return true;
-	}
-
-	uint64 guid = m_session->GetPlayer()->GetSelection();
-	if (guid == 0)
-	{
-		SystemMessage(m_session, "No selection.");
-		return true;
-	}
-
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
-	if(!pCreature)
-	{
-		SystemMessage(m_session, "You should select a creature.");
-		return true;
-	}
-
-	char sql[512];
-
-	snprintf(sql, 512, "UPDATE creatures SET running = '%i' WHERE id = '%u'", (int)option, (unsigned int)GUID_LOPART(guid));
-	WorldDatabase.Execute( sql );
-
-	pCreature->GetAIInterface()->setMoveRunFlag(option > 0);
-
-	SystemMessage(m_session, "Value saved.");
-
-	return true;
-}
-
-
-
 bool ChatHandler::HandleNPCFlagCommand(const char* args, WorldSession *m_session)
 {
 	if (!*args)
@@ -421,6 +368,7 @@ bool ChatHandler::HandleSaveAllCommand(const char *args, WorldSession *m_session
 	snprintf(msg, 100, "Saved all %d online players in %d msec.", (int)count, int((uint32)now() - stime));
 	sWorld.SendWorldText(msg);
 	sWorld.SendWorldWideScreenText(msg);
+	sGMLog.writefromsession(m_session, "saved all players");
 	//sWorld.SendIRCMessage(msg);
 	return true;
 }
@@ -434,7 +382,17 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 		return true;
 	}
 
-	sGMLog.writefromsession(m_session, "used kill command on "I64FMT, target->GetGUID());
+	switch(target->GetTypeId())
+	{
+	case TYPEID_PLAYER:
+		sGMLog.writefromsession(m_session, "used kill command on PLAYER %s", ((Player*)target)->GetName());
+		break;
+
+	case TYPEID_UNIT:
+		sGMLog.writefromsession(m_session, "used kill command on CREATURE %s", ((Creature*)target)->GetCreatureName() ?  ((Creature*)target)->GetCreatureName()->Name : "unknown");
+		break;
+	}
+	
 
 	// If we're killing a player, send a message indicating a gm killed them.
 	if(target->IsPlayer())
@@ -446,21 +404,21 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 	}
 	else
 	{
-/*
+
 		// Cast insta-kill.
-		SpellEntry * se = sSpellStore.LookupEntry(5);
+		SpellEntry * se = dbcSpell.LookupEntry(5);
 		if(se == 0) return false;
 
 		SpellCastTargets targets(target->GetGUID());
 		Spell * sp = new Spell(m_session->GetPlayer(), se, true, 0);
 		sp->prepare(&targets);
-*/
-		SpellEntry * se = dbcSpell.LookupEntry(20479);
+
+/*		SpellEntry * se = dbcSpell.LookupEntry(20479);
 		if(se == 0) return false;
 		
 		SpellCastTargets targets(target->GetGUID());
 		Spell * sp = new Spell(target, se, true, 0);
-		sp->prepare(&targets);
+		sp->prepare(&targets);*/
 	}
 
 	return true;
@@ -973,12 +931,6 @@ bool ChatHandler::HandleGOScale(const char* args, WorldSession* m_session)
 	return true;
 }
 
-bool ChatHandler::HandleUptimeCommand(const char* args, WorldSession* m_session)
-{
-	BlueSystemMessage(m_session, "Server Uptime is %s", sWorld.GetUptimeString().c_str());
-	return true;
-}
-
 bool ChatHandler::HandleReviveStringcommand(const char* args, WorldSession* m_session)
 {
 	Player *plr = objmgr.GetPlayer(args, false);
@@ -1118,28 +1070,6 @@ bool ChatHandler::HandleAddAIAgentCommand(const char* args, WorldSession *m_sess
 	return true;
 }
 
-bool ChatHandler::HandleDelAIAgentCommand(const char* args, WorldSession *m_session)
-{
-  /*  char* agent = strtok((char*)args, " ");
-	if(!agent)
-		return false;
-	char* spellId = strtok(NULL, " ");
-	if(!spellId)
-		return false;
-
-	Unit* target = m_session->GetPlayer()->GetMapMgr()->.GetCreature(m_session->GetPlayer()->GetSelection());
-	if(!target)
-	{
-		RedSystemMessage(m_session, "You have to select a Creature!");
-		return false;
-	}
-
-	std::stringstream qry;
-	qry << "DELETE FROM ai_agents where (entryId = '" << target->GetEntry() << "') AND (AI_AGENT = '" << atoi(agent) << "') AND (spellId = '" << atoi(spellId) << "')";
-*/
-	return true;
-}
-
 bool ChatHandler::HandleListAIAgentCommand(const char* args, WorldSession *m_session)
 {
 	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
@@ -1205,26 +1135,6 @@ bool ChatHandler::HandleGOExport(const char * args, WorldSession * m_session)
 	m_session->GetPlayer()->m_GM_SelectedGO->SaveToFile(name);
 
 	BlueSystemMessage(m_session, "Go saved to: %s", name.str().c_str());
-	return true;
-}
-
-bool ChatHandler::HandleNpcExport(const char * args, WorldSession * m_session)
-{
-	Creature* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
-	if (!target)
-		return false;
-	
-	std::stringstream name;
-	if (*args)
-	{
-		name << "NPC_" << args << ".sql";
-	}
-	else
-	{
-		name << "NPC_" << target->GetEntry() << ".sql";
-	}
-	target->SaveToFile(name);
-	BlueSystemMessage(m_session, "Creature/npc saved to: %s", name.str().c_str());
 	return true;
 }
 

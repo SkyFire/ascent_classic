@@ -190,34 +190,6 @@ bool ChatHandler::HandleKickCommand(const char* args, WorldSession *m_session)
 	return true;
 }
 
-
-bool ChatHandler::HandleSetRankCommand(const char *args, WorldSession *m_session)
-{
-	if(strlen(args) < 1)
-	{
-		char buf[256];
-		snprintf((char*)buf, 256, ".setrank <rank> - Sets player PVP rank.");
-		SystemMessage(m_session, buf);
-		return true;
-	}
-
-	int8 rank = atoi(args);
-	Player *chr = getSelectedChar(m_session);
-	if (chr == NULL) return true;
-	
-	chr->SetPVPRank(rank);
-	return true;
-}
-
-bool ChatHandler::HandleGetRankCommand(const char *args, WorldSession *m_session)
-{
-	Player *chr = getSelectedChar(m_session);
-	if (chr == NULL) return true;
-   
-	GreenSystemMessage(m_session, "%s's PVP Rank is |r%d", chr->GetName(), chr->GetPVPRank());
-	return true;
-}
-
 bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_session)
 {
 	uint32 itemid, count=1;
@@ -278,6 +250,8 @@ bool ChatHandler::HandleSummonCommand(const char* args, WorldSession *m_session)
 {
 	if(!*args)
 		return false;
+
+	sGMLog.writefromsession(m_session, "summoned %s", args);
 
 	Player *chr = objmgr.GetPlayer(args, false);
 	if (chr)
@@ -663,15 +637,6 @@ bool ChatHandler::HandleModifyGoldCommand(const char* args, WorldSession *m_sess
 	return true;
 }
 
-bool ChatHandler::HandleGenerateNameCommand(const char *args, WorldSession *m_session)
-{
-	SystemMessage(m_session, "Generating 7 names:");
-	for(int i=0;i<7;i++)
-		SystemMessage(m_session, "%s", sWorld.GenerateName(0).c_str());
-	GreenSystemMessage(m_session, "Done.");
-	return true;
-}
-
 bool ChatHandler::HandleTriggerCommand(const char* args, WorldSession* m_session)
 {
 	int32 instance_id;
@@ -710,6 +675,8 @@ bool ChatHandler::HandleUnlearnCommand(const char* args, WorldSession * m_sessio
 		return true;
 	}
 
+	sGMLog.writefromsession(m_session, "removed spell %u from %s", SpellId, plr->GetName());
+
 	if(plr->HasSpell(SpellId))
 	{
 		GreenSystemMessageToPlr(plr, "Removed spell %u.", SpellId);
@@ -742,30 +709,6 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 	{
 		RedSystemMessage(m_session, "Sql entry invalid %u", id);
 	}
-
-	return true;
-}
-
-bool ChatHandler::HandleGoStateLinkCommand(const char* args, WorldSession *m_session)
-{
-	/*uint32 id;
-	char sql[512];
-	GameObject *GObj = NULL;
-
-	GObj = m_session->GetPlayer()->m_GM_SelectedGO;
-	if( !GObj )
-		return false;
-
-	int valcount = sscanf(args, "%u", &id);
-	if(id)
-	{
-		snprintf(sql, 512, "UPDATE creature_spawns SET respawnlink = '%u' WHERE id = '%u'", id, GObj->GetSQL_id());
-		sDatabase.Execute( sql );
-	}
-	else
-	{
-		RedSystemMessage(m_session, "Sql entry invalid %u", id);
-	}*/
 
 	return true;
 }
