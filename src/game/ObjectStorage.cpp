@@ -460,7 +460,7 @@ void Storage_LoadAdditionalTables()
 	if(strData.empty())
 		return;
 
-	vector<string> strs = StrSplit(strData, " ");
+	vector<string> strs = StrSplit(strData, ",");
 	if(strs.empty())
 		return;
 
@@ -468,7 +468,7 @@ void Storage_LoadAdditionalTables()
 	{
 		char s1[200];
 		char s2[200];
-		if(sscanf((*itr).c_str(), "%s->%s", s1, s2) != 2)
+		if(sscanf((*itr).c_str(), "%s %s", s1, s2) != 2)
 			continue;
 
 		if(LoadAdditionalTable(s2, s1)) {

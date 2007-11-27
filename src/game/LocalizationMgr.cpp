@@ -280,7 +280,7 @@ void LocalizationMgr::Reload(bool first)
 		uint32 entry;
 		Field * f;
 		uint32 lid;
-		uint32 counter=2;
+		uint32 counter;
 
 		result = WorldDatabase.Query("SELECT * FROM npc_text_localized");
 		if(result)
@@ -295,6 +295,7 @@ void LocalizationMgr::Reload(bool first)
 				if(lid == 0)
 					continue;		// no loading enus stuff.. lawl
 
+				counter = 2;
 				for(uint32 i = 0; i < 8; ++i)
 				{
 					nt.Texts[i][0] = strdup(f[counter++].GetString());
