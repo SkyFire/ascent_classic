@@ -562,6 +562,12 @@ bool World::SetInitialWorldSettings()
 		if(namehash == 0x56392512)			/* seal of light */
 			sp->procChance=45;	/* this will do */
 
+		if(namehash==0xC5C30B39)		/* seal of command */
+			sp->Spell_Dmg_Type=1;
+
+		if(namehash==0x11d6b48c)		/* judgement of command */
+			sp->Spell_Dmg_Type=1;
+
 		//these mostly do not mix so we can use else 
         // look for seal, etc in name
         if(strstr(nametext, "Seal"))

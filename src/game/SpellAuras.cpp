@@ -3754,6 +3754,16 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		else
 			m_caster->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
 		
+		//SendPeriodicHealAuraLog(Amount);
+		WorldPacket data(SMSG_PERIODICAURALOG, 32);
+		data << m_caster->GetNewGUID();
+		data << m_target->GetNewGUID();
+		data << m_spellProto->Id;
+		data << uint32(1);
+		data << uint32(FLAG_PERIODIC_HEAL);
+		data << uint32(Amount);
+		m_target->SendMessageToSet(&data,true);
+
 		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, FLAG_PERIODIC_LEECH);
 		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id,true);
 	}	

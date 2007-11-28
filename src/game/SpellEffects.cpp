@@ -1901,7 +1901,15 @@ void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage
 	if(!unitTarget  || !u_caster)
 		return;
 
-	u_caster->Strike(unitTarget,GetType(),m_spellInfo,add_damage,damage,0, false,true);
+	uint32 ty = GetType();
+	if(ty==SPELL_TYPE_MAGIC)
+	{
+		float fdmg = (float)CalculateDamage(u_caster, unitTarget, MELEE, 0, m_spellInfo);
+		uint32 dmg = float2int32(fdmg*(float(damage/100.0f)));
+		u_caster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, dmg, false, false, false);
+	}
+	else
+		u_caster->Strike(unitTarget,GetType()==SPELL_TYPE_RANGED?RANGED:MELEE,m_spellInfo,add_damage,damage,0, false,true);
 }
 
 void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
