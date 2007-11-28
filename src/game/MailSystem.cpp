@@ -69,6 +69,9 @@ WorldPacket * Mailbox::BuildMailboxListingPacket()
 	{
 		if(itr->second.expire_time && t > itr->second.expire_time)
 			continue;	   // expired mail -> skip it
+
+		if(UNIXTIME < itr->second.delivery_time)
+			continue;		// undelivered
 		
 		if(itr->second.AddMessageDataToPacket(*data))
 			++count;
@@ -769,26 +772,49 @@ void WorldSession::HandleItemTextQuery(WorldPacket & recv_data)
 	SendPacket(&data);
 }
 
-bool Mailbox::HasUnreadMessages()
+void Mailbox::FillTimePacket(WorldPacket& data)
 {
+	uint32 c = 0;
 	MessageMap::iterator iter = Messages.begin();
+	data << uint32(0) << uint32(0);
+
 	for(; iter != Messages.end(); ++iter)
 	{
-		if(iter->second.read_flag == 0)
-			return true;
+		if(iter->second.read_flag == 0 && UNIXTIME >= iter->second.delivery_time)
+		{
+			// unread message, w00t.
+			++c;
+			data << uint64(iter->second.sender_guid);
+			data << uint32(0);
+			data << uint32(0);// money or smth?
+			data << uint32(iter->second.stationary);
+			//data << float(UNIXTIME-iter->second.delivery_time);
+			data << float(-9.0f);	// maybe the above?
+		}
 	}
 
-	return false;
+	if(c==0)
+	{
+#ifdef USING_BIG_ENDIAN
+		*(uint32*)(&data.contents()[0])=swap32(0xc7a8c000);
+#else
+		*(uint32*)(&data.contents()[0])=0xc7a8c000;
+#endif
+	}
+	else
+	{
+#ifdef USING_BIG_ENDIAN
+		*(uint32*)(&data.contents()[4])=swap32(c);
+#else
+		*(uint32*)(&data.contents()[4])=c;
+#endif
+	}
 }
 
 void WorldSession::HandleMailTime(WorldPacket & recv_data)
 {
-	WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 4);
-	if(_player->m_mailBox.HasUnreadMessages())
-		data << uint32(0);
-	else
-		data << uint32(0xc7a8c000);
-	
+	WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 100);
+	_player->m_mailBox.FillTimePacket(data);
 	SendPacket(&data);
 }
 
