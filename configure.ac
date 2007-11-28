@@ -32,6 +32,8 @@ AH_TEMPLATE([ENABLE_CLUSTERING], Define if you want to enable clustering, this i
 AH_TEMPLATE([ENABLE_COLLISION], Define if you want to enable collision calculation, warning. this can cause. a heavy load)
 AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
 AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
+AH_TEMPLATE([X64], Define this if you are under an X64-based operating system.)
+AH_TEMPLATE([X86], Define this if you are under an X86-based 32bit operating system.)
 
 # Default prefix
 AC_PREFIX_DEFAULT(`pwd`)
@@ -64,6 +66,25 @@ case "$OSNAME" in
 	;;
 	*)
 		AC_MSG_RESULT(no)
+	;;
+esac
+
+AC_MSG_CHECKING([uname -m for detecting host operating system architecture])
+ARCH=`uname -m`
+case "$ARCH" in
+	amd64*)
+		dnl yay 21st century hardware
+		AC_MSG_RESULT(x64 feel teh power)
+		AC_DEFINE(X64)
+	;;
+	x86_64*)
+		dnl yay 21st century hardware
+                AC_MSG_RESULT(x64 feel teh power)
+                AC_DEFINE(X64)
+	;;
+	*)
+		AC_MSG_RESULT(x86 oh noes i ran out of address space)
+		AC_DEFINE(X86)
 	;;
 esac
 
