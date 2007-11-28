@@ -333,7 +333,15 @@ void LogonServer::Run(int argc, char ** argv)
 	}
 
 	sLog.outString("Shutting down...");
-	ThreadPool.ShowStats();
+        signal(SIGINT, 0);
+        signal(SIGTERM, 0);
+        signal(SIGABRT, 0);
+#ifdef _WIN32
+        signal(SIGBREAK, 0);
+#else
+        signal(SIGHUP, 0);
+#endif
+
 	pfc->kill();
 
 	cl->Close();
