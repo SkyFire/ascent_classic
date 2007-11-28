@@ -2500,12 +2500,12 @@ bool World::SetInitialWorldSettings()
 		}
 	}
 	//mage: Arcane Power
-	/*sp  = dbcSpell.LookupEntry(12042);
+	sp  = dbcSpell.LookupEntry(12042);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=5775504;
-		sp->EffectSpellGroupRelation[1]=10518528;
-	}*/
+		sp->EffectSpellGroupRelation[0]=0xFFFFFFFF;
+		sp->EffectSpellGroupRelation[1]=0xFFFFFFFF;
+	}
 
 	//Mage - Ice Shards
 	sp = dbcSpell.LookupEntry(11207);
