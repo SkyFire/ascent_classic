@@ -49,7 +49,7 @@ bool ChatHandler::HandleInvincibleCommand(const char *args, WorldSession *m_sess
 	} else {
 		snprintf(msg, 100, "Select a player or yourself first.");
 	}
-	if(chr!=m_session->GetPlayer())
+	if(chr!=m_session->GetPlayer()&&chr)
 		sGMLog.writefromsession(m_session, "toggled invincibility on %s", chr->GetName());
 	SystemMessage(m_session, msg);
 	return true;

@@ -1386,7 +1386,7 @@ void Spell::cast(bool check)
 					}
 				}
 				// spells that proc on spell cast, some talents
-				if(p_caster && p_caster->IsInWorld() && !m_triggeredSpell)
+				if(p_caster && p_caster->IsInWorld())
 				{
 					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
 					{
@@ -1395,21 +1395,11 @@ void Spell::cast(bool check)
 						if(!Target)
 							continue; //we already made this check, so why make it again ?
 
-						p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,Target, m_spellInfo);
-						p_caster->m_procCounter = 0; //this is required for to be able to count the depth of procs (though i have no idea where/why we use proc on proc)
-
-					}
-				}
-
-				//should merge all these iterations. wonder how it is faster. Make 1 if and iteration or iteration and more ifs
-				if(m_spellInfo->TargetAuraState)
-				{
-					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
-					{
-						Unit * Target = p_caster->GetMapMgr()->GetUnit((*i));
-
-						if(!Target)
-							continue; //we already made this check, so why make it again ?
+						if(!m_triggeredSpell)
+						{
+							p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,Target, m_spellInfo);
+							p_caster->m_procCounter = 0; //this is required for to be able to count the depth of procs (though i have no idea where/why we use proc on proc)
+						}
 
 						Target->RemoveFlag(UNIT_FIELD_AURASTATE,m_spellInfo->TargetAuraState);
 					}
