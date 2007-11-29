@@ -147,8 +147,5 @@ Capt - test my shit :
 Broken talent groups
 
 - Gift of Nature (druid), Healing Light (Paladin), Purification (Shaman) don't work, tho Spiritual Healing (Priest) works ?:)
-- "Increasing effect of your XX by additional Y% of your bonus damage/healing" (mostly 'empowered' talents)
-- Mechanics resists - Unbreakable Will, Iron Will, Focused Mind, ....
 - Talents reducing mana of spells which cost % of base mana don't work. Improved Blink, Natural Shapeshifter (this one works until u move), Absolution, Purifying Power, ...
-- Damage Shields don't work - Holy Shield, Blessing of Sanctuary
 
