@@ -1571,6 +1571,20 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
 
+	//shaman - Purge 
+	sp = dbcSpell.LookupEntry(370); 
+	if(sp)
+		sp->DispelType=DISPEL_MAGIC;
+	sp = dbcSpell.LookupEntry(8012); 
+	if(sp)
+		sp->DispelType=DISPEL_MAGIC;
+	sp = dbcSpell.LookupEntry(27626); 
+	if(sp)
+		sp->DispelType=DISPEL_MAGIC;
+	sp = dbcSpell.LookupEntry(33625); 
+	if(sp)
+		sp->DispelType=DISPEL_MAGIC;
+
 	//shaman - Elemental mastery 
 	sp = dbcSpell.LookupEntry(16166); 
 	if(sp)

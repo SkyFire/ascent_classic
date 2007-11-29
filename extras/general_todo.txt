@@ -135,6 +135,7 @@ Zack - test my shit :
 - Band of the Eternal Restorer 35086
 - general spell targeting type 30 -> 21172
 - mage - arcane power 12042
+- shaman - purge 8012
 
 ==========================================================================
 Capt - test my shit :
