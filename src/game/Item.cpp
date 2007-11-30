@@ -453,7 +453,7 @@ uint32 GetSellPriceForItem(ItemPrototype *proto, uint32 count)
 	return cost;
 }
 
-uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 count, uint32 vendorcount)
+uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 total_count, uint32 vendorcount)
 {
 	int32 cost;
 
@@ -466,15 +466,14 @@ uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 count, uint32 vendorcount
 			//removed by zack
 //			cost = ( proto->BuyPrice * ((count < 1) ? 1 : count) );
 			//in 2.3 item sellprices are for whole stack
-			int newcount;
-			if(vendorcount>count)
+			if(vendorcount>total_count)
 				cost = proto->BuyPrice; //how the hell did we manage to buy less then a stack ?
 			else 
-				cost = proto->BuyPrice * count / vendorcount;
+				cost = proto->BuyPrice * total_count / vendorcount;
 		}break;
 	default:
 		{
-			cost = ( proto->BuyPrice * ((count < 1) ? 1 : count));
+			cost = ( proto->BuyPrice * ((total_count < 1) ? 1 : total_count));
 		}break;
 	}
 
@@ -489,10 +488,10 @@ uint32 GetSellPriceForItem(uint32 itemid, uint32 count)
 		return 1;
 }
 
-uint32 GetBuyPriceForItem(uint32 itemid, uint32 count, uint32 vendorcount)
+uint32 GetBuyPriceForItem(uint32 itemid, uint32 total_count, uint32 vendorcount)
 {
 	if(ItemPrototype *proto = ItemPrototypeStorage.LookupEntry(itemid))
-		return GetBuyPriceForItem(proto, count, vendorcount);
+		return GetBuyPriceForItem(proto, total_count, vendorcount);
 	else
 		return 1;
 }

@@ -1025,7 +1025,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		return;
 	}
 
-	if((error = _player->GetItemInterface()->CanAffordItem(it,amount*itemd.amount)))
+	if((error = _player->GetItemInterface()->CanAffordItem(it,amount*itemd.amount,itemd.amount)))
 	{
 		SendBuyFailed(srcguid, itemd.itemid, error);
 		return;
@@ -1111,7 +1111,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		SendPacket(&data);*/
 	}
 
-	_player->GetItemInterface()->BuyItem(it,amount*itemd.amount);
+	_player->GetItemInterface()->BuyItem(it,amount*itemd.amount,itemd.amount);
 
 	WorldPacket data(SMSG_BUY_ITEM, 12);
 	data << uint64(srcguid);
@@ -1174,7 +1174,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 		return;
 	}
 
-   if((error = _player->GetItemInterface()->CanAffordItem(it,amount*item.amount)))
+   if((error = _player->GetItemInterface()->CanAffordItem(it,amount*item.amount,item.amount)))
    {
       SendBuyFailed(srcguid, itemid, error);
       return;
@@ -1238,7 +1238,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	 data << uint32(itemid) << uint32(amount);
 	 SendPacket( &data );
 		
-	 _player->GetItemInterface()->BuyItem(it,amount);
+	 _player->GetItemInterface()->BuyItem(it,amount*item.amount,item.amount);
 }
 
 void WorldSession::HandleListInventoryOpcode( WorldPacket & recv_data )

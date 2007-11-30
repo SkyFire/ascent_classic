@@ -1740,11 +1740,11 @@ int8 ItemInterface::CanReceiveItem(ItemPrototype * item, uint32 amount)
 	return (int8)NULL;
 }
 
-void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount)
+void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount,uint32 vendorcount)
 {
 	if(item->BuyPrice)
 	{
-		int32 itemprice = GetBuyPriceForItem(item, amount, amount);
+		int32 itemprice = GetBuyPriceForItem(item, total_amount, vendorcount);
 		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice);
 	}
 	ItemExtendedCostEntry *ex = dbcItemExtendedCost.LookupEntry(item->ItemExtendedCost);
@@ -1773,7 +1773,7 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 amount)
 
 }
 
-int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount)
+int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 total_amount,uint32 vendorcount)
 {
 	if(item->ItemExtendedCost)
 	{
@@ -1797,7 +1797,7 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 amount)
 	}
 	if(item->BuyPrice)
 	{
-		int32 price = GetBuyPriceForItem(item, amount, amount);
+		int32 price = GetBuyPriceForItem(item, total_amount, vendorcount);
 		if((int32)m_pOwner->GetUInt32Value(PLAYER_FIELD_COINAGE) < price)
 		{
 			return INV_ERR_NOT_ENOUGH_MONEY;

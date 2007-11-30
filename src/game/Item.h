@@ -183,9 +183,9 @@ protected:
 uint32 GetSkillByProto(uint32,uint32);
 
 uint32 GetSellPriceForItem(ItemPrototype *proto, uint32 count);
-uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 count, uint32 vendorcount);
+uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 total_count, uint32 vendorcount);
 
 uint32 GetSellPriceForItem(uint32 itemid, uint32 count);
-uint32 GetBuyPriceForItem(uint32 itemid, uint32 count, uint32 vendorcount);
+uint32 GetBuyPriceForItem(uint32 itemid, uint32 total_count, uint32 vendorcount);
 
 #endif
