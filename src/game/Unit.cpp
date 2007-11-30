@@ -836,6 +836,8 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
+								if (!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+									continue;
 								if( CastingSpell->School!=SCHOOL_FIRE &&
 									CastingSpell->School!=SCHOOL_SHADOW)
 									continue;
