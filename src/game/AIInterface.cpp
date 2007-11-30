@@ -1714,7 +1714,7 @@ void AIInterface::SendMoveToPacket(float toX, float toY, float toZ, float toO, u
 	} else {
 		data << uint8(0);
 	}
-	data << MoveFlags; // <- For the function Unit::SetFacing, this would be set to 1. That's not even walking.
+	data << MoveFlags;
 	data << time;
 	data << uint32(1);	  // 1 waypoint
 	data << toX << toY << toZ;
