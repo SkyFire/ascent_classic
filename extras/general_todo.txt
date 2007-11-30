@@ -136,6 +136,8 @@ Zack - test my shit :
 - general spell targeting type 30 -> 21172
 - mage - arcane power 12042
 - shaman - purge 8012
+- check the prices of the stackable projectiles at vendors to be the same as in db
+- started playin with grounding totem effect, but it is defenetly not finished
 
 ==========================================================================
 Capt - test my shit :

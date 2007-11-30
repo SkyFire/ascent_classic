@@ -463,7 +463,14 @@ uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 count, uint32 vendorcount
 		case ITEM_CLASS_PROJECTILE:
 		case ITEM_CLASS_CONSUMABLE:
 		{
-			cost = ( proto->BuyPrice * ((count < 1) ? 1 : count) );
+			//removed by zack
+//			cost = ( proto->BuyPrice * ((count < 1) ? 1 : count) );
+			//in 2.3 item sellprices are for whole stack
+			int newcount;
+			if(vendorcount>count)
+				cost = proto->BuyPrice; //how the hell did we manage to buy less then a stack ?
+			else 
+				cost = proto->BuyPrice * count / vendorcount;
 		}break;
 	default:
 		{
