@@ -2391,7 +2391,7 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 				data << (uint32)1;
 				data << aur->GetSpellId();
 				m_caster->SendMessageToSet(&data,true);
-				unitTarget->RemoveAura(aur);
+				unitTarget->RemoveAllAuras(aur->GetSpellProto()->Id,aur->GetCasterGUID());
 				if(!--damage)
 					return;
 			}			

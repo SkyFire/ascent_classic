@@ -2880,6 +2880,23 @@ bool Unit::RemoveAuraNegByNameHash(uint32 namehash)
 	return false;
 }
 
+bool Unit::RemoveAllAuras(uint32 spellId, uint64 guid)
+{   
+	bool res = false;
+	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+	{
+		if(m_auras[x])
+		{
+			if(m_auras[x]->GetSpellId()==spellId && m_auras[x]->m_casterGuid == guid)
+			{
+				m_auras[x]->Remove();
+				res = true;
+			}
+		}
+	}
+	return res;
+}
+
 bool Unit::RemoveAllAuraByNameHash(uint32 namehash)
 {
 	bool res = false;
