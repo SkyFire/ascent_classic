@@ -136,9 +136,9 @@ void Creature::Update( uint32 p_time )
 		sEventMgr.RemoveEvents(this);
 		if(this->proto==NULL)
 			sEventMgr.AddEvent(this, &Creature::OnRemoveCorpse, EVENT_CREATURE_REMOVE_CORPSE, 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-		else if (this->proto->boss == ELITE_WORLDBOSS)
+		else if (this->creature_info->Rank == ELITE_WORLDBOSS)
 			sEventMgr.AddEvent(this, &Creature::OnRemoveCorpse, EVENT_CREATURE_REMOVE_CORPSE, TIME_CREATURE_REMOVE_BOSSCORPSE, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-		else if ( this->proto->boss == ELITE_RAREELITE || this->proto->boss == ELITE_RARE)
+		else if ( this->creature_info->Rank == ELITE_RAREELITE || this->creature_info->Rank == ELITE_RARE)
 			sEventMgr.AddEvent(this, &Creature::OnRemoveCorpse, EVENT_CREATURE_REMOVE_CORPSE, TIME_CREATURE_REMOVE_RARECORPSE, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 		else
 			sEventMgr.AddEvent(this, &Creature::OnRemoveCorpse, EVENT_CREATURE_REMOVE_CORPSE, TIME_CREATURE_REMOVE_CORPSE, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);

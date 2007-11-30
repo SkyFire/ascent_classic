@@ -1594,7 +1594,11 @@ void Spell::finish()
 		if(m_usesMana && !GetSpellFailed() && u_caster->GetPowerType()==POWER_TYPE_MANA) 
 		{
 			u_caster->setPRegenTimer(5000); /* 5 Seconds */
-			u_caster->setPIRegenTimer(2000);
+			if (!u_caster->GetInterruptedRegen())
+			{
+				u_caster->setPIRegenTimer(2000);
+				u_caster->SetInterruptedRegen(true);
+			}
 		}
 	}
 	/* Mana Regenerates while in combat but not for 5 seconds after each spell */

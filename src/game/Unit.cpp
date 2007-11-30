@@ -149,6 +149,7 @@ Unit::Unit()
 	m_attackTimer = 0;
 	m_H_regenTimer = 2000;
 	m_P_regenTimer = 2000;
+	isInterruptedRegen = false;
 	m_P_I_regenTimer = 2000;
 
 
@@ -287,7 +288,10 @@ void Unit::Update( uint32 p_time )
 		    m_H_regenTimer -= p_time;
 	    //most of the times the 2 timers will be the same (except on spell casts)
 	    if(p_time >= m_P_regenTimer)
+		{
+			SetInterruptedRegen(false);
 		    RegeneratePower(false);	
+		}
 	    else
 		{
 			if (p_time >= m_P_I_regenTimer&&this->IsPlayer())
@@ -1350,8 +1354,11 @@ void Unit::RegenerateHealth()
 void Unit::RegeneratePower(bool isinterrupted)
 {
         // This is only 2000 IF the power is not rage
-    m_P_regenTimer = 2000;//set next regen time 
-	m_P_I_regenTimer = 2000;//set next interrupted regen time
+	if (isinterrupted)
+		m_P_I_regenTimer = 2000;//set next interrupted regen time
+	else
+		m_P_regenTimer = 2000;//set next regen time 
+	
 
 	if (!isAlive())
 		return;

@@ -1008,6 +1008,8 @@ public:
 	float PctRegenModifier;//1.0 by default
 	float PctPowerRegenModifier[4];
 	inline uint32 GetPowerType(){ return (GetUInt32Value(UNIT_FIELD_BYTES_0)>> 24);}
+	inline void SetInterruptedRegen(bool value) { isInterruptedRegen = value; }
+	inline bool GetInterruptedRegen() { return isInterruptedRegen; }
 
 	void RemoveSoloAura(uint32 type);
 
@@ -1163,6 +1165,7 @@ protected:
 	uint32 m_H_regenTimer;
 	uint32 m_P_regenTimer;
 	uint32 m_P_I_regenTimer; //PowerInterruptedegenTimer.
+	bool isInterruptedRegen;
 	uint32 m_state;		 // flags for keeping track of some states
 	uint32 m_attackTimer;   // timer for attack
 	uint32 m_attackTimer_1;
