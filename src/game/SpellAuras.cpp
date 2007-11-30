@@ -4937,6 +4937,31 @@ void Aura::SpellAuraMagnet(bool apply)
 	for example a damage spell
 	so you wont get damage of that 1 spell
 	next spell will deal damage on you of course*/
+	/*
+	//started by zack. If this text is not removed it means it never got to testing fase so feel free to delete or rewrite it
+	//check if there is something to be removed from target
+	if(m_target)
+	{
+		Aura *target_aura=NULL;
+		for(uint32 x=0;x<MAX_POSITIVE_AURAS;x++)
+			if(	m_target->m_auras[x] 
+//				&& !m_target->m_auras[x]->IsPositive() //this check was already made when we added to negative auras ;)
+				)
+			{
+				target_aura = m_target->m_auras[x];
+				break;
+			}
+		if(target_aura)
+		{
+			//add to self
+			Spell*sp=new Spell(GetCaster(),target_aura->GetSpellProto(),true,NULL); //make or do not make triggers on this action ?
+			SpellCastTargets tgt(GetCaster()->GetGUID());
+			sp->prepare(&tgt);
+			//remove it from target
+			m_target->RemoveAllAuras(target_aura->GetSpellProto()->Id,target_aura->GetCasterGUID());
+		}
+	}
+	*/
 }
 
 void Aura::SpellAuraManaShield(bool apply)
