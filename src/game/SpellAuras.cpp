@@ -3899,7 +3899,7 @@ void Aura::SpellAuraTransform(bool apply)
 			} 
 			else
 				m_target->SetUInt32Value (UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
-			} break;
+		}break;
 
 		case 42365:	// murloc costume
 			m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, apply?21723:m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
@@ -3945,8 +3945,7 @@ void Aura::SpellAuraTransform(bool apply)
 				if(apply)
 				{
 					m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, displayId);
-					m_target->m_silenced++;
-					m_target->m_pacified++;
+
 					// remove the current spell (for channelers)
 					if(m_target->m_currentSpell && m_target->GetGUID() != m_casterGuid && 
 						m_target->m_currentSpell->getState() == SPELL_STATE_CASTING )
@@ -3954,36 +3953,17 @@ void Aura::SpellAuraTransform(bool apply)
 						m_target->m_currentSpell->cancel();
 						m_target->m_currentSpell = 0;
 					}
+
 					sEventMgr.AddEvent(this, &Aura::EventPeriodicHeal1,(uint32)1000,EVENT_AURA_PERIODIC_HEAL,1000,0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 					m_target->polySpell = GetSpellProto()->Id;
 				}
 				else
 				{
 					m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
-					m_target->m_silenced--;
-					m_target->m_pacified--;
 					m_target->polySpell = 0;
 				}
 			}break;
 
-		case 228:
-			{
-				if(!displayId) return;
-				
-				if (apply) 
-				{
-					m_target->m_pacified++;
-					//((Modifier *)mod)->SetValue1 (m_target->GetUInt32Value (UNIT_FIELD_DISPLAYID));
-					m_target->SetUInt32Value (UNIT_FIELD_DISPLAYID, displayId);
-				}
-				else 
-				{
-					m_target->m_pacified--;
-					if(m_target->m_pacified < 0) 
-						m_target->m_pacified = 0;
-					m_target->SetUInt32Value (UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
-				}
-			}break;
 		case 19937:
 			{
 				if (apply)
@@ -4001,6 +3981,7 @@ void Aura::SpellAuraTransform(bool apply)
 					m_target->SetUInt32Value (UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
 				}
 			}break;
+
 		default:
 		{
 			if(!displayId) return;
