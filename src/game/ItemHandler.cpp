@@ -1152,8 +1152,8 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 
 	CreatureItem item;
 	unit->GetSellItemByItemId(itemid, item);
-	if((amount == 1) && (item.amount > amount))
-		amount = item.amount;
+//	if((amount == 1) && (item.amount > amount))
+//		amount = item.amount;
 	if(item.itemid == 0)
 	{
 		// vendor does not sell this item.. bitch about cheaters?
@@ -1168,7 +1168,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 		return;
 	}
 
-	if((error = _player->GetItemInterface()->CanReceiveItem(it, amount)))
+	if((error = _player->GetItemInterface()->CanReceiveItem(it, amount*item.amount)))
 	{
 		_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, error);
 		return;
@@ -1181,7 +1181,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
    }
  
 	// Find free slot and break if inv full
-	add = _player->GetItemInterface()->FindItemLessMax(itemid,amount, false);
+	add = _player->GetItemInterface()->FindItemLessMax(itemid,amount*item.amount, false);
 	if (!add)
 	{
 		slotresult = _player->GetItemInterface()->FindFreeInventorySlot(it);
@@ -1202,7 +1202,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 			return;
 		}
 
-		itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, amount);
+		itm->SetUInt32Value(ITEM_FIELD_STACK_COUNT, amount*item.amount);
 
 		if(slotresult.ContainerSlot == ITEM_NO_SLOT_AVAILABLE)
 		{
@@ -1225,7 +1225,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	}
 	else
 	{
-		add->ModUInt32Value(ITEM_FIELD_STACK_COUNT, amount);
+		add->ModUInt32Value(ITEM_FIELD_STACK_COUNT, amount*item.amount);
 		add->m_isDirty = true;
 		SendItemPushResult(add, false, true, false, false, _player->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()), 1, 1);
 	}
@@ -1235,7 +1235,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 
 	 data.Initialize( SMSG_BUY_ITEM );
 	 data << uint64(srcguid);
-	 data << uint32(itemid) << uint32(amount);
+	 data << uint32(itemid) << uint32(amount*item.amount);
 	 SendPacket( &data );
 		
 	 _player->GetItemInterface()->BuyItem(it,amount*item.amount,item.amount);
