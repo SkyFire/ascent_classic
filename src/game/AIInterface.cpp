@@ -370,6 +370,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 
 		case EVENT_WANDER:
 			{
+				m_WanderTimer = 0;
+
 				//CALL_SCRIPT_EVENT(m_Unit, OnWander)(pUnit, 0); FIXME
 				m_AIState = STATE_WANDER;
 				StopMovement(1);
@@ -2526,25 +2528,36 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			}
 		}
 	}
-	
+
+	// Wander AI movement code
 	if(m_AIState == STATE_WANDER && m_creatureState == STOPPED)
 	{
-		float wanderO = RandomFloat(6);
-		float wanderX = m_Unit->GetPositionX() + cosf(wanderO);																											 
-		float wanderY = m_Unit->GetPositionY() + sinf(wanderO);																											  
-		float wanderZ;
-			
+		if(getMSTime() < m_WanderTimer) // is it time to move again?
+			return;
 
+		// calculate a random distance and angle to move
+		float wanderD = RandomFloat(2.0f) + 2.0f;
+		float wanderO = RandomFloat(6.283f);
+		float wanderX = m_Unit->GetPositionX() + wanderD * cosf(wanderO);
+		float wanderY = m_Unit->GetPositionY() + wanderD * sinf(wanderO);
+		float wanderZ = m_Unit->GetMapMgr()->GetLandHeight(wanderX, wanderY);
 
-		// Check if this point is in water.
-		float wl = m_Unit->GetMapMgr()->GetWaterHeight(wanderX, wanderY);
-//		uint8 wt = m_Unit->GetMapMgr()->GetWaterType(wanderX, wanderY);
+		// without these next checks we could fall through the "ground" (WMO) and get stuck
+		// wander won't work correctly in cities until we get some way to fix this and remove these checks
+		float currentZ = m_Unit->GetPositionZ();
+		float landZ = m_Unit->GetMapMgr()->GetLandHeight(m_Unit->GetPositionX(), m_Unit->GetPositionY());
 
-		wanderZ = m_Unit->GetMapMgr()->GetLandHeight(wanderX, wanderY);
-		if(!(fabs(m_Unit->GetPositionZ() - wanderZ) > 4 || wanderZ < (wl-2))/* && wt & 0x1*/)
+		if( currentZ > landZ + 1.0f // are we more than 1yd above ground? (possible WMO)
+		 || wanderZ < currentZ - 5.0f // is our destination land height too low? (possible WMO)
+		 || wanderZ > currentZ + wanderD) // is our destination too high to climb?
 		{
-			MoveTo(wanderX,wanderY,wanderZ,wanderO);
-		}   
+			m_WanderTimer = getMSTime() + 1000; // wait 1 second before we try again
+			return;
+		}
+
+		m_Unit->SetOrientation(wanderO);
+		MoveTo(wanderX, wanderY, wanderZ, wanderO);
+		m_WanderTimer = getMSTime() + m_totalMoveTime + 300; // time till next move (+ pause)
 	}
 
 	//Unit Follow Code
