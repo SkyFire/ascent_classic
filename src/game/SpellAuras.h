@@ -344,7 +344,7 @@ public:
 	void SetPositive(signed char value=1) { m_positive += value; }
 
 	Object* GetCaster();
-	uint64 GetCasterGUID(){return m_casterGuid;}
+	inline uint64 GetCasterGUID(){return m_casterGuid;}
 	Unit* GetUnitCaster();
 	inline Unit* GetTarget() { return m_target; }
 

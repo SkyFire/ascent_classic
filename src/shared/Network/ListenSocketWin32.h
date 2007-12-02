@@ -65,7 +65,8 @@ public:
 	{
 		while(m_opened)
 		{
-			aSocket = accept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len);
+			//aSocket = accept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len);
+			aSocket = WSAAccept(m_socket, (sockaddr*)&m_tempAddress, (socklen_t*)&len, NULL, NULL);
 			if(aSocket == INVALID_SOCKET)
 				continue;		// shouldn't happen, we are blocking.
 

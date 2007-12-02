@@ -235,6 +235,11 @@ void Spell::SpellEffectInstantKill(uint32 i)
 	case 20402:
 		{
 		}break;
+
+	case 29364:	// encapsulate voidwalker
+		{
+			return;
+		}break;
 	case 18788: //Demonic Sacrifice (508745)
 		uint32 spellid1 = 0;
 		switch(unitTarget->GetEntry())

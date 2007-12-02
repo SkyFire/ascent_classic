@@ -411,6 +411,8 @@ bool World::SetInitialWorldSettings()
 	/* storage stuff has to be loaded first */
 	tl.wait();
 
+	Storage_LoadAdditionalTables();
+
 	MAKE_TASK(ObjectMgr, LoadCreatureWaypoints);
 	MAKE_TASK(ObjectMgr, LoadTrainers);
 	MAKE_TASK(ObjectMgr, LoadTotemSpells);
@@ -442,7 +444,6 @@ bool World::SetInitialWorldSettings()
 	// wait for all loading to complete.
 	tl.wait();
 	sLocalizationMgr.Reload(false);
-	Storage_LoadAdditionalTables();
 
 	CommandTableStorage::getSingleton().Load();
 	new WordFilter;

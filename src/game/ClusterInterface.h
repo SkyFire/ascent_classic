@@ -30,6 +30,7 @@ typedef void(ClusterInterface::*ClusterInterfaceHandler)(WorldPacket&);
 class ClusterInterface : public Singleton<ClusterInterface>
 {
 	Mutex m_onlinePlayerMapMutex;
+	typedef HM_NAMESPACE::hash_map<uint32,RPlayerInfo*> OnlinePlayerStorageMap;
 	OnlinePlayerStorageMap _onlinePlayers;
 	WSClient * _clientSocket;
 	FastQueue<WorldPacket*, Mutex> _pckQueue;
