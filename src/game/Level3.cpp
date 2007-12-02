@@ -755,6 +755,7 @@ bool ChatHandler::HandleAccountBannedCommand(const char * args, WorldSession * m
 	GreenSystemMessage(m_session, "Account '%s' has been banned %s%s. The change will be effective with the next reload cycle.", pAccount, 
 		timeperiod ? "until " : "forever", timeperiod ? ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str() : "");
 
+	sWorld.DisconnectUsersWithAccount(pAccount, m_session);
 	sGMLog.writefromsession(m_session, "banned account %s until %s", pAccount, timeperiod ? ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str() : "permanant");
 	return true;
 }
@@ -773,6 +774,7 @@ bool ChatHandler::HandleAccountFlagsCommand(const char * args, WorldSession * m_
 	my_sql << "UPDATE accounts SET flags = " << flags << " WHERE login = '" << account << "'";
 
 	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
+	sLogonCommHandler.LogonDatabaseReloadAccounts();
 
 	GreenSystemMessage(m_session, "Account '%s' flags have been updated. The change will be effective with the next reload cycle.", account);
 	sGMLog.writefromsession(m_session, "set account %s flags to %u", account, flags);
@@ -1381,16 +1383,7 @@ bool ChatHandler::HandleKillByPlayerCommand(const char* args, WorldSession* m_se
 		return true;
 	}
 
-	Player * plr = objmgr.GetPlayer(args, false);
-	if(plr == 0)
-	{
-		RedSystemMessage(m_session, "Player %s not found.", args);
-		return true;
-	}
-
-	GreenSystemMessage(m_session, "Disconnecting %s.", plr->GetName());
-	sGMLog.writefromsession(m_session, "disconnected %s via .killbyplayer", plr->GetName());
-	plr->GetSession()->Disconnect();
+	sWorld.DisconnectUsersWithPlayerName(args,m_session);
 	return true;
 }
 
@@ -1402,16 +1395,7 @@ bool ChatHandler::HandleKillBySessionCommand(const char* args, WorldSession* m_s
 		return true;
 	}
 
-	WorldSession * session = sWorld.FindSessionByName(args);
-	if(session == 0)
-	{
-		RedSystemMessage(m_session, "Active session with name %s not found.", args);
-		return true;
-	}
-
-	GreenSystemMessage(m_session, "Disconnecting %s.", session->GetAccountName().c_str());
-	sGMLog.writefromsession(m_session, "disconnected %s via .killbysession", session->GetAccountName().c_str());
-	session->Disconnect();
+	sWorld.DisconnectUsersWithAccount(args,m_session);
 	return true;
 }
 
@@ -1826,6 +1810,7 @@ bool ChatHandler::HandleIPBanCommand(const char * args, WorldSession * m_session
 	SystemMessage(m_session, "Adding [%s] to IP ban table, expires %s", pIp, (expire_time == 0)? "Never" : ctime( &expire_time ));
 	sLogonCommHandler.LogonDatabaseSQLExecute("REPLACE INTO ipbans VALUES ('%s', %u);", WorldDatabase.EscapeString(pIp).c_str(), (uint32)expire_time);
 	sLogonCommHandler.LogonDatabaseReloadAccounts();
+	sWorld.DisconnectUsersWithIP(pIp, m_session);
 	return true;
 }
 

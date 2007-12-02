@@ -4578,3 +4578,73 @@ void CheckpointMgr::KilledCreature(uint32 GuildId, uint32 CreatureId)
 }
 
 #endif
+
+void World::DisconnectUsersWithAccount(const char * account, WorldSession * m_session)
+{
+	SessionMap::iterator itr;
+	WorldSession * session;
+	m_sessionlock.AcquireReadLock();
+	for(itr = m_sessions.begin(); itr != m_sessions.end();)
+	{
+		session = itr->second;
+		++itr;
+
+		if(!stricmp(account, session->GetAccountNameS()))
+		{
+			m_session->SystemMessage("Disconnecting user with account `%s` IP `%s` Player `%s`.", session->GetAccountNameS(), 
+				session->GetSocket() ? session->GetSocket()->GetRemoteIP().c_str() : "noip", session->GetPlayer() ? session->GetPlayer()->GetName() : "noplayer");
+
+			session->Disconnect();
+		}
+	}
+	m_sessionlock.ReleaseReadLock();
+}
+
+void World::DisconnectUsersWithIP(const char * ip, WorldSession * m_session)
+{
+	SessionMap::iterator itr;
+	WorldSession * session;
+	m_sessionlock.AcquireReadLock();
+	for(itr = m_sessions.begin(); itr != m_sessions.end();)
+	{
+		session = itr->second;
+		++itr;
+
+		if(!session->GetSocket())
+			continue;
+
+		string ip2 = session->GetSocket()->GetRemoteIP().c_str();
+		if(!stricmp(ip, ip2.c_str()))
+		{
+			m_session->SystemMessage("Disconnecting user with account `%s` IP `%s` Player `%s`.", session->GetAccountNameS(), 
+				ip2.c_str(), session->GetPlayer() ? session->GetPlayer()->GetName() : "noplayer");
+
+			session->Disconnect();
+		}
+	}
+	m_sessionlock.ReleaseReadLock();
+}
+
+void World::DisconnectUsersWithPlayerName(const char * plr, WorldSession * m_session)
+{
+	SessionMap::iterator itr;
+	WorldSession * session;
+	m_sessionlock.AcquireReadLock();
+	for(itr = m_sessions.begin(); itr != m_sessions.end();)
+	{
+		session = itr->second;
+		++itr;
+
+		if(!session->GetPlayer())
+			continue;
+
+		if(!stricmp(plr, session->GetPlayer()->GetName()))
+		{
+			m_session->SystemMessage("Disconnecting user with account `%s` IP `%s` Player `%s`.", session->GetAccountNameS(), 
+				session->GetSocket() ? session->GetSocket()->GetRemoteIP().c_str() : "noip", session->GetPlayer() ? session->GetPlayer()->GetName() : "noplayer");
+
+			session->Disconnect();
+		}
+	}
+	m_sessionlock.ReleaseReadLock();
+}

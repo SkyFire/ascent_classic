@@ -262,6 +262,7 @@ public:
 	inline void SetInstance(uint32 Instance) { instanceId = Instance; }
 	inline uint32 GetLatency() { return _latency; }
 	inline string GetAccountName() { return _accountName; }
+	inline const char * GetAccountNameS() { return _accountName.c_str(); }
 
 	inline uint32 GetClientBuild() { return client_build; }
 	inline void SetClientBuild(uint32 build) { client_build = build; }

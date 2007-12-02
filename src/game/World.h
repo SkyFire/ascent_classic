@@ -551,6 +551,9 @@ public:
 	void LoadAccountDataProc(QueryResultVector& results, uint32 AccountId);
 
 	void PollCharacterInsertQueue();
+	void DisconnectUsersWithAccount(const char * account, WorldSession * session);
+	void DisconnectUsersWithIP(const char * ip, WorldSession * session);
+	void DisconnectUsersWithPlayerName(const char * plr, WorldSession * session);
 
 protected:
 	// update Stuff, FIXME: use diff
