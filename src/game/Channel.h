@@ -80,6 +80,7 @@ class Channel
 	MemberMap m_members;
 	set<uint32> m_bannedMembers;
 public:
+	friend class ChannelIterator;
 	static void LoadConfSettings();
 	string m_name;
 	string m_password;
@@ -132,6 +133,59 @@ public:
 	void PartVoiceChannel(Player * plr);
 	void SendVoiceUpdate();
 	void VoiceDied();
+};
+
+class ChannelIterator
+{
+	Channel::MemberMap::iterator m_itr;
+	Channel::MemberMap::iterator m_endItr;
+	bool m_searchInProgress;
+	Channel * m_target;
+public:
+	ChannelIterator(Channel* target) : m_target(target),m_searchInProgress(false) {}
+	~ChannelIterator() { if(m_searchInProgress) { EndSearch(); } }
+
+	void BeginSearch()
+	{
+		// iteminterface doesn't use mutexes, maybe it should :P
+		ASSERT(!m_searchInProgress);
+		m_target->m_lock.Acquire();
+		m_itr = m_target->m_members.begin();
+		m_endItr = m_target->m_members.end();
+		m_searchInProgress=true;
+	}
+
+	void EndSearch()
+	{
+		// nothing here either
+		ASSERT(m_searchInProgress);
+		m_target->m_lock.Release();
+		m_searchInProgress=false;
+	}
+
+	Player* operator*() const
+	{
+		return m_itr->first;
+	}
+
+	Player* operator->() const
+	{
+		return m_itr->first;
+	}
+
+	void Increment()
+	{
+		if(!m_searchInProgress)
+			BeginSearch();
+
+		if(m_itr==m_endItr)
+			return;
+
+		++m_itr;
+	}
+
+	inline Player* Grab() { return m_itr->first; }
+	inline bool End() { return (m_itr==m_endItr)?true:false; }
 };
 
 #endif

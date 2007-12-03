@@ -72,7 +72,7 @@ inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession 
 	if(pPlayer->triggerpass_cheat)
 		return AREA_TRIGGER_FAILURE_OK;
 
-	/*if(pPlayer->iInstanceType == MODE_HEROIC && pMapInfo->type != INSTANCE_MULTIMODE && pMapInfo->type != INSTANCE_NULL)
+	if(pPlayer->iInstanceType == MODE_HEROIC && pMapInfo->type != INSTANCE_MULTIMODE && pMapInfo->type != INSTANCE_NULL)
 		return AREA_TRIGGER_FAILURE_NO_HEROIC;
 
 	if(pMapInfo->type == INSTANCE_RAID && (!pPlayer->GetGroup() || (pPlayer->GetGroup() && pPlayer->GetGroup()->GetGroupType() != GROUP_TYPE_RAID)))
@@ -91,7 +91,7 @@ inline uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession 
 		pMapInfo->type == INSTANCE_MULTIMODE && 
 		!pPlayer->GetItemInterface()->GetItemCount(pMapInfo->heroic_key_1, false) && 
 		!pPlayer->GetItemInterface()->GetItemCount(pMapInfo->heroic_key_2, false))
-		return AREA_TRIGGER_FAILURE_NO_KEY;*/
+		return AREA_TRIGGER_FAILURE_NO_KEY;
 
 	if(pPlayer->getLevel()<70 && pPlayer->iInstanceType==MODE_HEROIC && pMapInfo->type != INSTANCE_NULL)
 		return AREA_TRIGGER_FAILURE_LEVEL_HEROIC;

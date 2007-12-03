@@ -2570,3 +2570,27 @@ bool ChatHandler::HandleDispelAllCommand(const char * args, WorldSession * m_ses
 	BlueSystemMessage(m_session, "Dispel action done.");
 	return true;
 }
+
+bool ChatHandler::HandleShowItems(const char * args, WorldSession * m_session)
+{
+	Player * plr = getSelectedChar(m_session, true);
+	if(!plr) return true;
+
+	ItemIterator itr(plr->GetItemInterface());
+	itr.BeginSearch();
+	for(; !itr.End(); itr.Increment())
+	{
+		SystemMessage(m_session, "Item %s count %u", (*itr)->GetProto()->Name1, (*itr)->GetUInt32Value(ITEM_FIELD_STACK_COUNT));
+	}
+	itr.EndSearch();
+
+	SkillIterator itr2(plr);
+	itr2.BeginSearch();
+	for(; !itr2.End(); itr2.Increment())
+	{
+		SystemMessage(m_session, "Skill %u %u/%u", itr2->Skill->id, itr2->CurrentValue, itr2->MaximumValue);
+	}
+	itr2.EndSearch();
+
+	return true;
+}

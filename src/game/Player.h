@@ -669,6 +669,7 @@ class SERVER_DECL Player : public Unit
 {
 	friend class WorldSession;
 	friend class Pet;
+	friend class SkillIterator;
 
 protected:
 	SkillMap m_skills;
@@ -1854,6 +1855,57 @@ protected:
 
 
 	void RemovePendingPlayer();
+};
+
+class SkillIterator
+{
+	SkillMap::iterator m_itr;
+	SkillMap::iterator m_endItr;
+	bool m_searchInProgress;
+	Player * m_target;
+public:
+	SkillIterator(Player* target) : m_target(target),m_searchInProgress(false) {}
+	~SkillIterator() { if(m_searchInProgress) { EndSearch(); } }
+
+	void BeginSearch()
+	{
+		// iteminterface doesn't use mutexes, maybe it should :P
+		ASSERT(!m_searchInProgress);
+		m_itr = m_target->m_skills.begin();
+		m_endItr = m_target->m_skills.end();
+		m_searchInProgress=true;
+	}
+
+	void EndSearch()
+	{
+		// nothing here either
+		ASSERT(m_searchInProgress);
+		m_searchInProgress=false;
+	}
+
+	PlayerSkill* operator*() const
+	{
+		return &m_itr->second;
+	}
+
+	PlayerSkill* operator->() const
+	{
+		return &m_itr->second;
+	}
+
+	void Increment()
+	{
+		if(!m_searchInProgress)
+			BeginSearch();
+
+		if(m_itr==m_endItr)
+			return;
+
+		++m_itr;
+	}
+
+	inline PlayerSkill* Grab() { return &m_itr->second; }
+	inline bool End() { return (m_itr==m_endItr)?true:false; }
 };
 
 #endif

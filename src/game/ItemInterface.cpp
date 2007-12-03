@@ -1750,29 +1750,32 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount,uint32 vend
 		int32 itemprice = GetBuyPriceForItem(item, total_amount, vendorcount);
 		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice);
 	}
-	ItemExtendedCostEntry *ex = dbcItemExtendedCost.LookupEntry(item->ItemExtendedCost);
-	if(ex)
+	if(item->ItemExtendedCost)
 	{
-		for(int i = 0;i<5;i++)
+		ItemExtendedCostEntry *ex = dbcItemExtendedCost.LookupEntry(item->ItemExtendedCost);
+		if(ex)
 		{
-			if(ex->item[i])
+			for(int i = 0;i<5;i++)
 			{
-				m_pOwner->GetItemInterface()->RemoveItemAmt(ex->item[i],ex->count[i]);
+				if(ex->item[i])
+				{
+					m_pOwner->GetItemInterface()->RemoveItemAmt(ex->item[i],ex->count[i]);
+				}
+			}
+			//just make sure we do not loop the value, Though we should have checked it before
+			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) >= ex->honor)
+			{
+				m_pOwner->ModUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, -int32(ex->honor));
+				m_pOwner->m_honorPoints -=int32(ex->honor);
+			}
+			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) >= ex->arena)
+			{
+				m_pOwner->ModUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, -int32(ex->arena));
+				m_pOwner->m_arenaPoints -=int32(ex->arena);
 			}
 		}
-		//just make sure we do not loop the value, Though we should have checked it before
-		if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) >= ex->honor)
-		{
-			m_pOwner->ModUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, -int32(ex->honor));
-			m_pOwner->m_honorPoints -=int32(ex->honor);
-		}
-		if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) >= ex->arena)
-		{
-			m_pOwner->ModUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, -int32(ex->arena));
-			m_pOwner->m_arenaPoints -=int32(ex->arena);
-		}
+		else sLog.outDebug("Warning: item %u has extended cost but could not find the value in ItemExtendedCostStore",item->ItemId);
 	}
-	else sLog.outDebug("Warning: item %u has extended cost but could not find the value in ItemExtendedCostStore",item->ItemId);
 
 }
 
