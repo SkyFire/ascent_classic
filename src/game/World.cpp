@@ -2776,6 +2776,23 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->SpellGroupType=4096;
 
+	//warlock - Emberstorm
+	sp = dbcSpell.LookupEntry(17954);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	sp = dbcSpell.LookupEntry(17955);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	sp = dbcSpell.LookupEntry(17956);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	sp = dbcSpell.LookupEntry(17957);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	sp = dbcSpell.LookupEntry(17958);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+
 	//warlock - Soul Fire. Has missign group type
 	sp = dbcSpell.LookupEntry(6353);
 	if(sp)

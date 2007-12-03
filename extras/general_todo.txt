@@ -145,6 +145,8 @@ Zack - test my shit :
 - warlock: Demonic Knowledge 35693
 - warlock: Devastation 18134
 - warlock: intensity 18136
+- warlock: Pyroclasm 18096
+- warlock - Emberstorm 17958
 
 
 ==========================================================================
