@@ -1293,6 +1293,12 @@ bool World::SetInitialWorldSettings()
 		//warlock - Fel armor and demon armor have missing 
 		if(sp->NameHash == 0xC6FDD110 || sp->NameHash == 0x915965D6)
 			sp->SpellGroupType |= 4096; //some of them do have the flags but i's hard to write down those some from 130 spells
+		//warlock - incinerate. Depracated spells are missing the spellgrouptype (maybe they are not depracated at all
+		if(sp->NameHash == 0x2BC0AE00)
+			sp->SpellGroupType |= 4096; //some of them do have the flags but i's hard to write down those some from 130 spells
+		//warlock - shadow bolt
+		if(sp->NameHash == 0x7A7B6753)
+			sp->SpellGroupType |= 8192; //some of them do have the flags but i's hard to write down those some from 130 spells
 /*		else if(strstr(nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if(strstr(nametext, "Blinding Powder"))
@@ -2792,6 +2798,23 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(17958);
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+
+	//warlock - Shadow and Flame
+	sp = dbcSpell.LookupEntry(30288);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=8192 | 512;
+	sp = dbcSpell.LookupEntry(30289);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=8192 | 512;
+	sp = dbcSpell.LookupEntry(30290);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=8192 | 512;
+	sp = dbcSpell.LookupEntry(30291);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=8192 | 512;
+	sp = dbcSpell.LookupEntry(30292);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=8192 | 512;
 
 	//warlock - Soul Fire. Has missign group type
 	sp = dbcSpell.LookupEntry(6353);
