@@ -151,6 +151,7 @@ Zack - test my shit :
 - warlock - Suppression 18178
 - warlock - Improved Curse of Agony 18829
 - warlock - Grim Reach 18219
+- warlock: Empowered Corruption 32383
 
 ==========================================================================
 Capt - test my shit :

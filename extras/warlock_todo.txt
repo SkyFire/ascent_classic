@@ -109,7 +109,6 @@ Affliction Tree:
 Improved Drain Soul - doesn't work
 Soul Siphon - doesn't work
 Nightfall - has never worked lolz
-Empowered Corruption - doensn' t work
 Siphon Life - works but no bonus from healing
 Shadow Mastery - doesn't work
 Contagion - doesn't work
