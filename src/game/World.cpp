@@ -2841,6 +2841,14 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=1024;
 
+	//warlock - Grim Reach
+	sp = dbcSpell.LookupEntry(18218);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+	sp = dbcSpell.LookupEntry(18219);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+
 	//warlock - Soul Fire. Has missign group type
 	sp = dbcSpell.LookupEntry(6353);
 	if(sp)
