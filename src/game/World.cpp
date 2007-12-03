@@ -1377,10 +1377,7 @@ bool World::SetInitialWorldSettings()
 		}
 
 		if(namehash==0x8D4A2E9F)		// warlock - intensity
-		{
-			sp->EffectSpellGroupRelation[0] |= 1;		// shadow bolt
-			sp->EffectSpellGroupRelation[0] |= 4;		// immolatate
-		}
+			sp->EffectSpellGroupRelation[0] |= 32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512; //destruction spell
 		else if(namehash==0x2bc0ae00)		// warlock - incinerate
 			sp->SpellGroupType=1;
 		else if(

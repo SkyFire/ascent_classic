@@ -102,7 +102,6 @@ Destruction Tree:
 
 Improves Lash of Pain - not tested, succy, felhunter, felguard spells all bugged out too much
 Shadow Burn - skill works but doesn't return soul shard if target died withing 5 secs
-Intensity - doesn't work
 Improved Searing Pain - doesn't work
 Pyroclasm - doesn't work <= may work but tested it with hellfire on a couple of mobs a couple of times didn't proc.
 Emberstorm - doens' t work
