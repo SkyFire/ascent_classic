@@ -992,7 +992,7 @@ bool ChatHandler::HandleMountCommand(const char *args, WorldSession *m_session)
 	}
 
 	m_target->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , modelid);
-	if(!m_target->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_MOUNT_SIT)) m_target->SetFlag( UNIT_FIELD_FLAGS , U_FIELD_FLAG_MOUNT_SIT );
+	m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
 	
 	BlueSystemMessage(m_session, "Now mounted with model %d.", modelid);
 	return true;

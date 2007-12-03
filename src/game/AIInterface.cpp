@@ -1257,7 +1257,7 @@ Unit* AIInterface::FindTarget()
 		pvp=false;
 
 	//target is immune to all form of attacks, cant attack either.
-	if(m_Unit->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_UNIT_UNTACKABLE_NO_SELECT))
+	if(m_Unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
 	{
 		return 0;
 	}
@@ -1286,7 +1286,7 @@ Unit* AIInterface::FindTarget()
 
 		//target is immune to unit attacks however can be targeted
 		//as a part of AI we allow this mode to attack creatures as seen many times on oficial.
-		if(m_Unit->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT) || m_Unit->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT_2))
+		if(m_Unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9))
 		{
 			if(pUnit->IsPlayer() || pUnit->IsPet())
 			{
@@ -1440,11 +1440,11 @@ bool AIInterface::FindFriends(float dist)
 		if(!pUnit->isAlive())
 			continue;
 
-		if(pUnit->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_UNIT_UNTACKABLE_NO_SELECT))
+		if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
 		{
 			continue;
 		}
-		if(pUnit->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT) || pUnit->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT_2))
+		if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9))
 		{
 			continue;
 		}
@@ -1516,7 +1516,7 @@ bool AIInterface::FindFriends(float dist)
 			guard->Load(cp, x, y, z);
 			guard->SetInstanceID(m_Unit->GetInstanceID());
 			guard->SetZoneId(m_Unit->GetZoneId());
-			guard->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PVP); /* shitty DBs */
+			guard->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); /* shitty DBs */
 			guard->m_noRespawn=true;
 		
 			if(guard->CanAddToWorld())

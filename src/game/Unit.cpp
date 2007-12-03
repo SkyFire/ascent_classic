@@ -39,7 +39,7 @@ Unit::Unit()
 	m_ObjectSlots[1] = 0;
 	m_ObjectSlots[2] = 0;
 	m_ObjectSlots[3] = 0;
-	m_silenced = false;
+	m_silenced = 0;
 	disarmed   = false;
 
 	// Pet
@@ -141,8 +141,7 @@ Unit::Unit()
 	m_stealthDetectBonus = 0;
 	m_stealth = 0;
 	m_can_stealth = true;
-	m_sleep = 0;
-	
+
 	for(uint32 x=0;x<5;x++)
 		BaseStats[x]=0;
 
@@ -2564,7 +2563,7 @@ void Unit::smsg_AttackStart(Unit* pVictim)
 	sLog.outDebug( "WORLD: Sent SMSG_ATTACKSTART" );
 
 	// FLAGS changed so other players see attack animation
-	//	addUnitFlag(0x00080000);
+	//	addUnitFlag(UNIT_FLAG_COMBAT);
 	//	setUpdateMaskBit(UNIT_FIELD_FLAGS );
 	if(pThis->cannibalize)
 	{
@@ -3862,7 +3861,7 @@ void Unit::DropAurasOnDeath()
 
 void Unit::UpdateSpeed(bool delay /* = false */)
 {
-	if(!HasFlag( UNIT_FIELD_FLAGS , U_FIELD_FLAG_MOUNT_SIT ))
+	if(!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT))
 	{
 		if(IsPlayer())
 			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_speedModifier)/100.0f);
@@ -4002,19 +4001,8 @@ void Unit::PlaySpellVisual(uint64 target, uint32 spellVisual)
 
 void Unit::Root()
 {
-	if(m_objectTypeId == TYPEID_PLAYER)
-	{
-		static_cast<Player*>(this)->SetMovement(MOVE_ROOT, 1);
-	}
-	else
-	{
-		m_aiInterface->m_canMove = false;
-	}
-}
-
-void Unit::Root(uint32 time)
-{
 	this->m_special_state |= UNIT_STATE_ROOT;
+
 	if(m_objectTypeId == TYPEID_PLAYER)
 	{
 		static_cast<Player*>(this)->SetMovement(MOVE_ROOT, 1);
@@ -4022,13 +4010,14 @@ void Unit::Root(uint32 time)
 	else
 	{
 		m_aiInterface->m_canMove = false;
-		m_aiInterface->StopMovement(time);
+		m_aiInterface->StopMovement(1);
 	}
 }
 
 void Unit::Unroot()
 {
-	this->m_special_state &= ~(UNIT_STATE_ROOT);
+	this->m_special_state &= ~UNIT_STATE_ROOT;
+
 	if(m_objectTypeId == TYPEID_PLAYER)
 	{
 		static_cast<Player*>(this)->SetMovement(MOVE_UNROOT, 5);
@@ -4746,13 +4735,13 @@ void CombatStatusHandler::UpdateFlag()
 		if(n_status)
 		{
 			//printf(I64FMT" is now in combat.\n", m_Unit->GetGUID());
-			m_Unit->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+			m_Unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_COMBAT);
 			if(!m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->addStateFlag(UF_ATTACKING);
 		}
 		else
 		{
 			//printf(I64FMT" is no longer in combat.\n", m_Unit->GetGUID());
-			m_Unit->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ATTACK_ANIMATION);
+			m_Unit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_COMBAT);
 			if(m_Unit->hasStateFlag(UF_ATTACKING)) m_Unit->clearStateFlag(UF_ATTACKING);
 
 			// remove any of our healers from combat too, if they are able to be.

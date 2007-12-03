@@ -134,7 +134,7 @@ void WorldSession::HandleActivateTaxiOpcode( WorldPacket & recv_data )
 
 	recv_data >> guid >> sourcenode >> destinationnode;
 
-	if( GetPlayer( )->GetUInt32Value( UNIT_FIELD_FLAGS ) & U_FIELD_FLAG_LOCK_PLAYER )
+	if(GetPlayer()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER))
 		return;
 
 	TaxiPath* taxipath = sTaxiMgr.GetTaxiPath(sourcenode, destinationnode);
@@ -252,7 +252,7 @@ void WorldSession::HandleMultipleActivateTaxiOpcode(WorldPacket & recvPacket)
 		pathes.push_back( recvPacket.read<uint32>() );
 	
 
-	if( GetPlayer( )->GetUInt32Value( UNIT_FIELD_FLAGS ) & U_FIELD_FLAG_LOCK_PLAYER )
+	if(GetPlayer()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER))
 		return;
 
 	// get first trip

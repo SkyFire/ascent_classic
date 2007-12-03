@@ -3119,7 +3119,7 @@ void Spell::SpellEffectAddFarsight(uint32 i) // Add Farsight
 		InvisibleSummon->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME+1, 2000);//ci->rangeattacktime); 
 		InvisibleSummon->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 100);  
 		InvisibleSummon->SetFloatValue(UNIT_FIELD_COMBATREACH,m_caster->GetFloatValue(UNIT_FIELD_COMBATREACH));
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_FLAGS, U_FIELD_FLAG_UNIT_UNTACKABLE_NO_SELECT);
+		InvisibleSummon->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 		InvisibleSummon->SetZoneId(m_caster->GetZoneId());
 		// Disable AI
 		InvisibleSummon->DisableAI();
@@ -3147,9 +3147,9 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 	m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, pCaster->GetGUID());
 	pCaster->SetUInt64Value(PLAYER_FARSIGHT, m_target->GetGUID());
 	pCaster->m_CurrentCharm = ((Creature*)m_target);
-	m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE);
+	m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
 	pCaster->m_noInterrupt = 1;
-	pCaster->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+	pCaster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 	WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE);
 	data << m_target->GetNewGUID() << uint8(1);
@@ -3176,7 +3176,7 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 		NewSummon->SetUInt32Value(UNIT_FIELD_MAXHEALTH , 100);
 		NewSummon->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, 35);
 		NewSummon->SetFloatValue(OBJECT_FIELD_SCALE_X,1.0f);
-		NewSummon->SetUInt64Value(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE | U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT);
+		NewSummon->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9 | UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
 
 		//Setting faction
 		NewSummon->_setFaction();
@@ -3190,7 +3190,7 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 
 		//p_caster->SetUInt64Value(UNIT_FIELD_SUMMON, NewSummon->GetGUID());
 		//p_caster->SetUInt64Value(PLAYER_FARSIGHT, NewSummon->GetGUID());
-		//p_caster->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+		//p_caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 		p_caster->Possess(NewSummon);
 		
 //		WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
@@ -3583,7 +3583,7 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	pTotem->SetUInt32Value(UNIT_FIELD_LEVEL, p_caster->getLevel());
 	pTotem->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, p_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 	pTotem->SetUInt32Value(UNIT_FIELD_BYTES_0, (1 << 8) | (2 << 16) | (1 << 24));
-	pTotem->SetUInt32Value(UNIT_FIELD_FLAGS, 2056);
+	pTotem->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_SELF_RES);
 	pTotem->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 2000);
 	pTotem->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, 2000);
 	pTotem->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.0f);
@@ -4176,7 +4176,7 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
 		// on corpse then :p
 
 		playerTarget->bShouldHaveLootableOnCorpse = false;
-		playerTarget->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_SKINNABLE);
+		playerTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 		playerTarget->SetFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
 
 		// Send the loot.

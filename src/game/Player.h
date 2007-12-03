@@ -1516,18 +1516,18 @@ public:
 	uint32 m_pvpTimer;
 	
 	//! Is PVP flagged?
-	inline bool IsPvPFlagged() { return HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PVP); }
+	inline bool IsPvPFlagged() { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); }
 	inline void SetPvPFlag()
 	{
 		// reset the timer as well..
 		StopPvPTimer();
-		SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PVP);
+		SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
 	}
 	//! Removal
 	inline void RemovePvPFlag()
 	{
 		StopPvPTimer();
-		RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PVP);			
+		RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
 	}
 	//! Do this on /pvp off
 	inline void ResetPvPTimer();

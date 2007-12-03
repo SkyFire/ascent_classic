@@ -1236,7 +1236,7 @@ Creature * CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, u
 	pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_INFO, 2 | (0xA << 8) | (2 << 16) | (0x11 << 24));
 	pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_INFO_01, 2);
 
-	pCreature->SetUInt32Value(UNIT_FIELD_FLAGS, 4928);
+	pCreature->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLUS_MOB | UNIT_FLAG_NOT_ATTACKABLE_9 | UNIT_FLAG_UNKNOWN_10 | UNIT_FLAG_PVP); // 4928
 
 	pCreature->SetUInt32Value(UNIT_FIELD_AURA, 22011);
 	pCreature->SetUInt32Value(UNIT_FIELD_AURAFLAGS, 9);

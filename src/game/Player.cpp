@@ -660,7 +660,7 @@ bool Player::Create(WorldPacket& data )
 		SetShapeShift(FORM_BATTLESTANCE);
 
 	SetUInt32Value(UNIT_FIELD_BYTES_2, (0x28 << 8) );
-	SetFlag(UNIT_FIELD_FLAGS , U_FIELD_FLAG_PLAYER_CONTROLLED );
+	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 	SetUInt32Value(UNIT_FIELD_STAT0, info->strength );
 	SetUInt32Value(UNIT_FIELD_STAT1, info->ability );
 	SetUInt32Value(UNIT_FIELD_STAT2, info->stamina );
@@ -895,10 +895,8 @@ void Player::EventDismount(uint32 money, float x, float y, float z)
 	//uint32 modelid = GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID);
 
 	SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID , 0);
-	RemoveFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_MOUNT_SIT );
-
-	if (HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER ))   
-		RemoveFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER );
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 	SetPlayerSpeed(RUN, m_runSpeed);
 
@@ -2626,7 +2624,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		SetShapeShift(FORM_BATTLESTANCE);
 
 	SetUInt32Value(UNIT_FIELD_BYTES_2, (0x28 << 8) );
-	SetFlag(UNIT_FIELD_FLAGS , U_FIELD_FLAG_PLAYER_CONTROLLED );
+	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 	SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 0.388999998569489f );
 	SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f   );
 
@@ -3669,8 +3667,7 @@ void Player::RepopRequestedPlayer()
 	UpdateVisibility();
 
 	// If we're in battleground, remove the skinnable flag.. has bad effects heheh
-	if(HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_SKINNABLE))
-		RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_SKINNABLE);
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 
 	bool corpse = (m_bg != NULL) ? m_bg->CreateCorpse(this) : true;
 	if(corpse)
@@ -3759,7 +3756,7 @@ void Player::KillPlayer()
 	StopMirrorTimer(1);
 	StopMirrorTimer(2);
 
-	SetFlag( UNIT_FIELD_FLAGS, 0x08 ); //player death animation, also can be used with DYNAMIC_FLAGS
+	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED); //player death animation, also can be used with DYNAMIC_FLAGS <- huh???
 	SetUInt32Value( UNIT_DYNAMIC_FLAGS, 0x00 );
 	if(this->getClass() == WARRIOR) //rage resets on death
 		SetUInt32Value(UNIT_FIELD_POWER2, 0);
@@ -3807,11 +3804,8 @@ void Player::CreateCorpse()
 	if(m_bg)
 	{
 		// remove our lootable flags
-		if(HasFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE))
-			RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
-
-		if(HasFlag(UNIT_FIELD_FLAGS,U_FIELD_FLAG_SKINNABLE))
-			RemoveFlag(UNIT_FIELD_FLAGS,U_FIELD_FLAG_SKINNABLE);
+		RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
+		RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 		
 		loot.gold = 0;
 
@@ -5163,7 +5157,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 	data << (uint8)count;
 
 	GetSession ()->SendPacket(&data);
-	SetFlag(UNIT_FIELD_FLAGS,U_FIELD_FLAG_ANIMATION_LOOTING);
+	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
 }
 
 void Player::EventAllowTiggerPort(bool enable)
@@ -5753,8 +5747,8 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 	
 	SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID, modelid );
 	
-	SetFlag( UNIT_FIELD_FLAGS ,U_FIELD_FLAG_LOCK_PLAYER );
-	SetFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_MOUNT_SIT );
+	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
+	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
 
 	SetTaxiPath(path);
 	SetTaxiPos();
@@ -5870,9 +5864,9 @@ void Player::JumpToEndTaxiNode(TaxiPath * path)
 	m_taxi_ride_time = 0;
 
 	SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID , 0);
-	RemoveFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_MOUNT_SIT );
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
 
-	RemoveFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER );
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 	SetPlayerSpeed(RUN, m_runSpeed);
 
@@ -8410,9 +8404,9 @@ void Player::Possess(Unit * pTarget)
 	pTarget->SetUInt64Value(UNIT_FIELD_CHARMEDBY, GetGUID());
 	pTarget->SetCharmTempVal(pTarget->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 	pTarget->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
-	pTarget->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE);
+	pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
 
-	SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 	
 	/* send "switch mover" packet */
 	WorldPacket data1(SMSG_DEATH_NOTIFY_OBSOLETE, 10);		/* burlex: this should be renamed SMSG_SWITCH_ACTIVE_MOVER :P */
@@ -8486,8 +8480,8 @@ void Player::UnPossess()
 	SetUInt64Value(UNIT_FIELD_CHARM, 0);
 	pTarget->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
 
-	RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
-	pTarget->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE);
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
+	pTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
 	pTarget->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, pTarget->GetCharmTempVal());
 	pTarget->_setFaction();
 	pTarget->UpdateOppFactionSet();

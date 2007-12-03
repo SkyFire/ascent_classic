@@ -429,23 +429,24 @@ enum StandState
 	STANDSTATE_KNEEL			= 8
 };
 
-enum UnitStates
+enum UnitSpecialStates
 {
-	UNIT_STATE_NORMAL    = 0x01,
-	UNIT_STATE_CHARM     = 0x02,
-	UNIT_STATE_FEAR      = 0x04,
-	UNIT_STATE_ROOT      = 0x08,
-	UNIT_STATE_SLEEP     = 0x10,
-	UNIT_STATE_SNARE     = 0x20,
-	UNIT_STATE_STUN      = 0x40,
-	UNIT_STATE_KNOCKOUT  = 0x80,
-	UNIT_STATE_BLEED     = 0x100,
-	UNIT_STATE_POLYMORPH = 0x200,
-	UNIT_STATE_BANISH    = 0x400,
-	UNIT_STATE_CONFUSE   = 0x800,
-	UNIT_STATE_PACIFY   = 0x1000,
+	UNIT_STATE_NORMAL    = 0x0000,
+	UNIT_STATE_DISARMED  = 0X0001,
+	UNIT_STATE_CHARM     = 0x0002,
+	UNIT_STATE_FEAR      = 0x0004,
+	UNIT_STATE_ROOT      = 0x0008,
+	UNIT_STATE_SLEEP     = 0x0010,  // never set
+	UNIT_STATE_SNARE     = 0x0020,  // never set
+	UNIT_STATE_STUN      = 0x0040,
+	UNIT_STATE_KNOCKOUT  = 0x0080,  // not used
+	UNIT_STATE_BLEED     = 0x0100,  // not used
+	UNIT_STATE_POLYMORPH = 0x0200,  // not used
+	UNIT_STATE_BANISH    = 0x0400,  // not used
+	UNIT_STATE_CONFUSE   = 0x0800,
+	UNIT_STATE_PACIFY    = 0x1000,
 	UNIT_STATE_SILENCE   = 0x2000,
-	UNIT_STATE_MOUNT   = 0x4000,
+	UNIT_STATE_FROZEN    = 0x4000,
 };
 
 enum UnitFieldBytes1
@@ -458,39 +459,40 @@ enum UnitFieldBytes2
 	U_FIELD_BYTES_HIDE_POS_AURAS = 0x01,
 };
 
-enum UnitFieldFlags
-{
-	U_FIELD_FLAG_UNKNOWN1                   = 0x01,
-	U_FIELD_FLAG_UNKNOWN2                   = 0x02,
-	U_FIELD_FLAG_LOCK_PLAYER                = 0x04,       // doesn't seem to work 
-	U_FIELD_FLAG_PLAYER_CONTROLLED          = 0x08,
-	U_FIELD_FLAG_UNKNOWN5                   = 0x10,
-	U_FIELD_FLAG_UNKNOWN6                   = 0x20,
-	U_FIELD_FLAG_PLUS_MOB                   = 0x40,
-	U_FIELD_FLAG_UNKNOWN8                   = 0x80,
-	U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT     = 0x100,
-	U_FIELD_FLAG_UNKNOWN10                  = 0x200,
-	U_FIELD_FLAG_ANIMATION_LOOTING          = 0x400,
-	U_FIELD_FLAG_SELF_RES                   = 0x800,
-	U_FIELD_FLAG_PVP                        = 0x1000,
-	U_FIELD_FLAG_MOUNT_SIT                  = 0x2000,
-	U_FIELD_FLAG_DEAD                       = 0x4000,
-	U_FIELD_FLAG_UNKNOWN16                  = 0x8000,
-	U_FIELD_FLAG_ALIVE                      = 0x10000,
-	U_FIELD_FLAG_UNKNOWN18                  = 0x20000,
-	U_FIELD_FLAG_NO_ROTATE                  = 0x40000,
-	U_FIELD_FLAG_ATTACK_ANIMATION           = 0x80000,
-	U_FIELD_FLAG_UNIT_UNTACKABLE_SELECT_2   = 0x100000,   // AI, UNIT can attack non players.
-	U_FIELD_FLAG_UNKNOWN22                  = 0x200000,
-	U_FIELD_FLAG_CONFUSED                   = 0x400000,
-	U_FIELD_FLAG_FEARED                     = 0x800000,
-	U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE = 0x1000000,
-	U_FIELD_FLAG_UNIT_UNTACKABLE_NO_SELECT  = 0x2000000,  // AI, UNIT cant attack any unit, no name is displayed
-	U_FIELD_FLAG_SKINNABLE                  = 0x4000000,
-	U_FIELD_FLAG_MAKE_CHAR_UNTOUCHABLE      = 0x8000000,
-	U_FIELD_FLAG_UNKNOWN29                  = 0x10000000,
-	U_FIELD_FLAG_UNKNOWN30                  = 0x20000000,
-	U_FIELD_FLAG_WEAPON_OFF                 = 0x40000000,
+enum UnitFieldFlags // UNIT_FIELD_FLAGS #46 - these are client flags
+{	//                                            Hex    Bit     Decimal  Comments
+	UNIT_FLAG_UNKNOWN_1                  = 0x00000001, // 1            1
+	UNIT_FLAG_NOT_ATTACKABLE_2           = 0x00000002, // 2            2  client won't let you attack them
+	UNIT_FLAG_LOCK_PLAYER                = 0x00000004, // 3            4  ? does nothing to client (probably wrong) - only taxi code checks this
+	UNIT_FLAG_PLAYER_CONTROLLED          = 0x00000008, // 4            8  makes players and NPCs attackable / not attackable
+	UNIT_FLAG_UNKNOWN_5                  = 0x00000010, // 5           16  ? some NPCs have this
+	UNIT_FLAG_UNKNOWN_6                  = 0x00000020, // 6           32
+	UNIT_FLAG_PLUS_MOB                   = 0x00000040, // 7           64  ? some NPCs have this (Rare/Elite/Boss?)
+	UNIT_FLAG_UNKNOWN_8                  = 0x00000080, // 8          128  ? can change attackable status 
+	UNIT_FLAG_NOT_ATTACKABLE_9           = 0x00000100, // 9          256  changes attackable status
+	UNIT_FLAG_UNKNOWN_10                 = 0x00000200, // 10         512  ? some NPCs have this
+	UNIT_FLAG_LOOTING                    = 0x00000400, // 11        1024
+	UNIT_FLAG_SELF_RES                   = 0x00000800, // 12        2048  ? some NPCs have this
+	UNIT_FLAG_PVP                        = 0x00001000, // 13        4096  sets PvP flag
+	UNIT_FLAG_SILENCED                   = 0x00002000, // 14        8192
+	UNIT_FLAG_DEAD                       = 0x00004000, // 15       16384  used for special "dead" NPCs like Withered Corpses
+	UNIT_FLAG_UNKNOWN_16                 = 0x00008000, // 16       32768  ? some NPCs have this
+	UNIT_FLAG_ALIVE                      = 0x00010000, // 17       65536  ?
+	UNIT_FLAG_PACIFIED                   = 0x00020000, // 18      131072
+	UNIT_FLAG_STUNNED                    = 0x00040000, // 19      262144
+	UNIT_FLAG_COMBAT                     = 0x00080000, // 20      524288  sets combat flag
+	UNIT_FLAG_MOUNT_SIT                  = 0x00100000, // 21     1048576  mounted or sitting (forces sit if not mounted)
+	UNIT_FLAG_DISARMED                   = 0x00200000, // 22     2097152
+	UNIT_FLAG_CONFUSED                   = 0x00400000, // 23     4194304
+	UNIT_FLAG_FLEEING                    = 0x00800000, // 24     8388608  fear
+	UNIT_FLAG_PLAYER_CONTROLLED_CREATURE = 0x01000000, // 25    16777216
+	UNIT_FLAG_NOT_SELECTABLE             = 0x02000000, // 26    33554432  cannot select the unit
+	UNIT_FLAG_SKINNABLE                  = 0x04000000, // 27    67108864
+	UNIT_FLAG_UNKNOWN_28                 = 0x08000000, // 28   134217728  ? was MAKE_CHAR_UNTOUCHABLE (probably wrong), nothing ever set it
+	UNIT_FLAG_UNKNOWN_29                 = 0x10000000, // 29   268435456
+	UNIT_FLAG_FEIGN_DEATH                = 0x20000000, // 30   536870912
+	UNIT_FLAG_UNKNOWN_31                 = 0x40000000, // 31  1073741824  ? was WEAPON_OFF and being used for disarm
+	UNIT_FLAG_UNKNOWN_32                 = 0x80000000, // 32  2147483648
 };
 
 enum UnitDynamicFlags
@@ -541,7 +543,7 @@ enum HitStatus
 	HITSTATUS_ABSORBED      = 0x20,
 	HITSTATUS_RESIST        = 0x40,
 	HITSTATUS_CRICTICAL     = 0x80,
-    HITSTATUS_BLOCK         = 0x800,
+	HITSTATUS_BLOCK         = 0x800,
 	HITSTATUS_GLANCING      = 0x4000,
 	HITSTATUS_CRUSHINGBLOW  = 0x8000,
 	HITSTATUS_NOACTION      = 0x10000,
@@ -834,7 +836,7 @@ public:
 	uint32 m_canMove;
 	
 	// Spell Effect Variables
-	uint16 m_silenced;
+	int32 m_silenced;
 	bool m_damgeShieldsInUse;
 	std::list<struct DamageProc> m_damageShields;
 	std::list<struct ReflectSpellSchool*> m_reflectSpellSchool;
@@ -1026,8 +1028,7 @@ public:
 	//std::set<SpellEntry*> m_onStrikeSpells;
 
 	int32 m_noInterrupt;
-	   uint32 m_sleep;
-	uint32 m_rooted;
+	int32 m_rooted;
 	bool disarmed;
 	uint64 m_detectRangeGUID[5];
 	int32  m_detectRangeMOD[5];
@@ -1098,7 +1099,6 @@ public:
 	}
 
 	void Root();
-	void Root(uint32 time);
 	void Unroot();
 
 	void SetFacing(float newo);//only working if creature is idle

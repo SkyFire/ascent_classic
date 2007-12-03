@@ -329,7 +329,7 @@ bool ChatHandler::HandleDismountCommand(const char* args, WorldSession *m_sessio
 	}
 
 	m_target->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0);
-	if(m_target->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_MOUNT_SIT)) m_target->RemoveFlag( UNIT_FIELD_FLAGS , U_FIELD_FLAG_MOUNT_SIT );
+	m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
 
 	BlueSystemMessage(m_session, "Now unmounted.");
 	return true;

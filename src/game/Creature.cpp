@@ -204,7 +204,7 @@ void Creature::OnRespawn(MapMgr * m)
 		SetUInt32Value(UNIT_NPC_EMOTESTATE, m_spawn->emote_state);
 	}
 
-	RemoveFlag(UNIT_FIELD_FLAGS,U_FIELD_FLAG_SKINNABLE);
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 	Skinned = false;
 	Tagged = false;
 	TaggerGuid = 0;

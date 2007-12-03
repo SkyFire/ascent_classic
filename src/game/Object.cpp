@@ -1583,18 +1583,6 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		}
 	}
 
-	// Awake sleeping Creatures.
-	if( damage && pVictim->m_sleep)
-	{
-		pVictim->RemoveAura(pVictim->m_sleep);
-	}
-	// break entangling roots
-/*	if( damage && pVictim->m_rooted)
-	{
-		if(Rand(35.0f)) // 35% chance to break the roots
-			pVictim->RemoveAura(pVictim->m_rooted);
-	}
-*/	
         ///Rage
         uint32 val;
 
@@ -1719,7 +1707,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
             && (IsPlayer() || IsPet()))
 		{
 			// Only NPCs that bear the PvP flag can be truly representing their faction.
-			if(((Creature*)pVictim)->HasFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PVP))
+			if(((Creature*)pVictim)->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP))
 			{
 				Player * pAttacker = NULL;
 				if(IsPet() && GetGUIDHigh() == HIGHGUID_PET)
@@ -1802,7 +1790,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			pVictim->SetUInt32Value(PLAYER_SELF_RES_SPELL, self_res_spell);
 
 			pVictim->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0);
-			pVictim->RemoveFlag( UNIT_FIELD_FLAGS , U_FIELD_FLAG_MOUNT_SIT );
+			pVictim->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
 		}
 
 		// Wipe our attacker set on death

@@ -384,7 +384,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 	SendPacket( &data );
 
 	_player->SetLootGUID(0);
-	_player->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_ANIMATION_LOOTING);
+	_player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
 	_player->m_currentLoot = 0;
 
 	if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_UNIT)
@@ -411,7 +411,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 			{
 				if(lootmgr.IsSkinnable(pCreature->GetEntry()))
 				{
-					pCreature->BuildFieldUpdatePacket(_player, UNIT_FIELD_FLAGS, U_FIELD_FLAG_SKINNABLE);
+					pCreature->BuildFieldUpdatePacket(_player, UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 				}
 			}
 		}
@@ -754,7 +754,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
 		pPlayer->SetMovement(MOVE_ROOT,1);
 
 		// Set the "player locked" flag, to prevent movement
-		pPlayer->SetFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER );
+		pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 		//make player sit
 		pPlayer->SetStandState(STANDSTATE_SIT);
@@ -796,7 +796,7 @@ void WorldSession::HandleLogoutCancelOpcode( WorldPacket & recv_data )
 	pPlayer->SetMovement(MOVE_UNROOT,5);
 
 	// Remove the "player locked" flag, to allow movement
-	pPlayer->RemoveFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER );
+	pPlayer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 	//make player stand
 	pPlayer->SetStandState(STANDSTATE_STAND);

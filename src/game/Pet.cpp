@@ -104,7 +104,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	{
 		Summon = true;
 		SetUInt32Value(UNIT_FIELD_BYTES_0, 2048 | (0 << 24));
-		SetUInt32Value(UNIT_FIELD_FLAGS, 8);
+		SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 2000);
 		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, 2000);
 		SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 0.5f);
@@ -125,7 +125,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		SetFloatValue(UNIT_FIELD_COMBATREACH, created_from_creature->GetFloatValue(UNIT_FIELD_COMBATREACH));
 
 		// These need to be checked.
-		SetUInt32Value(UNIT_FIELD_FLAGS, 0x00080008);
+		SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_COMBAT); // why combat ??
 		SetUInt32Value(UNIT_FIELD_POWER5, PET_HAPPINESS_UPDATE_VALUE / 2);//happiness
 		SetUInt32Value(UNIT_FIELD_MAXPOWER5, 1000000);
 		SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);

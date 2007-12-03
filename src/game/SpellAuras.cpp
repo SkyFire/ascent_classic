@@ -1343,7 +1343,7 @@ void Aura::SpellAuraDummy(bool apply)
 				m_target->SetUInt64Value(PLAYER_FARSIGHT,0);
 				Creature *summon = m_target->GetMapMgr()->GetCreature(m_target->GetUInt32Value(UNIT_FIELD_SUMMON));
 				m_target->SetUInt64Value(UNIT_FIELD_SUMMON, 0);
-				m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+				m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 				if(summon)
 				{
@@ -1565,9 +1565,9 @@ void Aura::SpellAuraDummy(bool apply)
 				m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, pCaster->GetGUID());
 				pCaster->SetUInt64Value(PLAYER_FARSIGHT, m_target->GetGUID());
 				pCaster->m_CurrentCharm = ((Creature*)m_target);
-				m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE);
+				m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
 				pCaster->m_noInterrupt = 1;
-				pCaster->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+				pCaster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 				WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
 				data << m_target->GetNewGUID() << uint8(0);
@@ -1582,9 +1582,9 @@ void Aura::SpellAuraDummy(bool apply)
 				m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
 				pCaster->SetUInt64Value(PLAYER_FARSIGHT, 0);
 				pCaster->m_CurrentCharm = 0;
-				m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_PLAYER_CONTROLLED_CREATURE);
+				m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
 				pCaster->m_noInterrupt = 0;
-				pCaster->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER);
+				pCaster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 				WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
 				data << pCaster->GetNewGUID() << uint8(1);
@@ -1761,24 +1761,36 @@ void Aura::SpellAuraModConfuse(bool apply)
 	{
 		SetNegative();
 		
-		if(p_target)
-		{
-			m_target->setAItoUse(true);
-		}
-		m_target->m_pacified++;
 		m_target->m_special_state |= UNIT_STATE_CONFUSE;
-		m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_CONFUSED);
+		m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+
+		m_target->setAItoUse(true);
 		m_target->GetAIInterface()->HandleEvent(EVENT_WANDER, u_caster, 0);
-	}
-	else
-	{
-		m_target->GetAIInterface()->HandleEvent(EVENT_UNWANDER, u_caster, 0);
-		m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_CONFUSED);
-		m_target->m_special_state &= ~UNIT_STATE_CONFUSE;
-		m_target->m_pacified--;
 
 		if(p_target)
 		{
+			// this is a hackfix to stop player from moving -> see AIInterface::_UpdateMovement() Wander AI for more info
+			WorldPacket data1(9);
+			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
+			data1 << m_target->GetNewGUID() << uint8(0x00);
+			p_target->GetSession()->SendPacket(&data1);
+		}
+	}
+	else
+	{
+		m_target->m_special_state &= ~UNIT_STATE_CONFUSE;
+		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
+
+		m_target->GetAIInterface()->HandleEvent(EVENT_UNWANDER, u_caster, 0);
+
+		if(p_target)
+		{
+			// re-enable movement
+			WorldPacket data1(9);
+			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
+			data1 << m_target->GetNewGUID() << uint8(0x01);
+			p_target->GetSession()->SendPacket(&data1);
+
 			m_target->setAItoUse(false);
 			sHookInterface.OnEnterCombat(p_target, u_caster);
 		}
@@ -1864,31 +1876,35 @@ void Aura::SpellAuraModFear(bool apply)
 	{
 		SetNegative();
 
-		if(p_target)
-		{
-			m_target->setAItoUse(true);
-			// this is a hackfix to stop player from moving
-			WorldPacket data1(9);
-			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
-			data1 << m_target->GetNewGUID() << uint8(0x00);
-			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
-		}
 		m_target->m_special_state |= UNIT_STATE_FEAR;
-		m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_FEARED);
+		m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+
+		m_target->setAItoUse(true);
 		m_target->GetAIInterface()->HandleEvent(EVENT_FEAR, u_caster, 0);
-	}
-	else
-	{
-		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, u_caster, 0);
-		m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_FEARED);
-		m_target->m_special_state &= ~UNIT_STATE_FEAR;
 
 		if(p_target)
 		{
+			// this is a hackfix to stop player from moving -> see AIInterface::_UpdateMovement() Fear AI for more info
 			WorldPacket data1(9);
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
-			data1 << m_target->GetNewGUID() << uint8(0x01); //enable player movement ?
-			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data1);
+			data1 << m_target->GetNewGUID() << uint8(0x00);
+			p_target->GetSession()->SendPacket(&data1);
+		}
+	}
+	else
+	{
+		m_target->m_special_state &= ~UNIT_STATE_FEAR;
+		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
+
+		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, u_caster, 0);
+
+		if(p_target)
+		{
+			// re-enable movement
+			WorldPacket data1(9);
+			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
+			data1 << m_target->GetNewGUID() << uint8(0x01);
+			p_target->GetSession()->SendPacket(&data1);
 
 			m_target->setAItoUse(false);
 			sHookInterface.OnEnterCombat(p_target, u_caster);
@@ -2113,34 +2129,25 @@ void Aura::SpellAuraModTaunt(bool apply)
 
 void Aura::SpellAuraModStun(bool apply)
 {
-	if(!m_target)
-		return;
+	if(!m_target) return;
 
-	if(m_spellProto->Id == 38554)		// Eye of gilrock
-		return;
+	if(m_spellProto->Id == 38554) return; // Absorb Eye of Grillok
 
 	if(apply)
 	{ 
 		SetNegative();
-		if(m_target->m_rooted == 0)
-			m_target->Root((uint32)GetDuration());
-
-		if(m_target->m_stunned == 0)
-		{
-			m_target->m_special_state |= UNIT_STATE_STUN;
-			// First stun. block rotation.
-			m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_NO_ROTATE);
-		}
-
 
 		m_target->m_rooted++;
+
+		if(m_target->m_rooted == 1)
+			m_target->Root();
+
 		m_target->m_stunned++;
+		m_target->m_special_state |= UNIT_STATE_STUN;
+		m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
 		if(m_target->GetTypeId() == TYPEID_UNIT)
-		{
-			// freeze rotation
-			m_target->SetUInt64Value(UNIT_FIELD_TARGET, 0);
-		}
+			m_target->GetAIInterface()->SetNextTarget(NULL);
 
 		// remove the current spell (for channelers)
 		if(m_target->m_currentSpell && m_target->GetGUID() != m_casterGuid && 
@@ -2151,22 +2158,22 @@ void Aura::SpellAuraModStun(bool apply)
 		}
 
 		//warrior talent - second wind triggers on stun and immobilize. This is not used as proc to be triggered always !
-		if(m_target->IsPlayer())//only players have talents
-			static_cast<Player*>(m_target)->EventStunOrImmobilize(NULL);
+		if(p_target)
+			p_target->EventStunOrImmobilize(NULL);
 	}
 	else
 	{
-		m_target->m_stunned--;
 		m_target->m_rooted--;
 
-		if(!m_target->m_rooted)
+		if(m_target->m_rooted == 0)
 			m_target->Unroot();
+
+		m_target->m_stunned--;
 
 		if(m_target->m_stunned == 0)
 		{
 			m_target->m_special_state &= ~UNIT_STATE_STUN;
-			// Last stun. Enable rotation again.
-			m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_NO_ROTATE);
+			m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 		}
 
 		// attack them back.. we seem to lose this sometimes for some reason
@@ -2732,71 +2739,52 @@ void Aura::EventPeriodicEnergize(uint32 amount,uint32 type)
 
 void Aura::SpellAuraModPacify(bool apply)
 {
-	// Cant Attack
+	// Can't Attack
 	if(apply)
 	{
 		if(m_spellProto->Id == 24937 || m_spellProto->NameHash == 541939341)
 			SetPositive();
 		else
 			SetNegative();
-		m_target->m_special_state |= UNIT_STATE_PACIFY;
+
 		m_target->m_pacified++;
+		m_target->m_special_state |= UNIT_STATE_PACIFY;
+		m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 	}
 	else
 	{
 		m_target->m_pacified--;
-		if (!m_target->m_pacified)
+
+		if(m_target->m_pacified == 0)
+		{
 			m_target->m_special_state &= ~UNIT_STATE_PACIFY;
+			m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+		}
 	}
 }
 
 void Aura::SpellAuraModRoot(bool apply)
 {
-	//if(m_spellProto->MechanicsType == DISPEL_MECHANIC_ROOT && m_spellProto->Attributes == 1073840128)
-		//m_target->m_rooted = m_spellProto->Id;
-
-	SetNegative();
 	if(apply)
 	{
-		
-	/**** Moved here from Spell::DidHit because root effects should still deal damage if the owner is immune to the Root mechanic */
-
-	/**** HACKFIX? AoE Snare/Root effects do not have the "MechanicsType" correct. ****/
-		//bool DidApply = true;
-	//if( m_target->MechanicsDispels[MECHANIC_ROOTED] )
-	//{
-	//	for( uint32 i = 1 ; i <= 3 ; i ++ )
-	//	{
-	//		if( m_spellProto->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
-	//		{
-	//		DidApply = false;
-	//		}
-	//	}
-	//}
-		
-	//if( DidApply )
-	//{
-		if(m_target->m_rooted == 0)
-			m_target->Root();
+		SetNegative();
 
 		m_target->m_rooted++;
-	//}
+
+		if(m_target->m_rooted == 1)
+			m_target->Root();
+
 		/* -Supalosa- TODO: Mobs will attack nearest enemy in range on aggro list when rooted. */
 	}
 	else
 	{
 		m_target->m_rooted--;
 
-		if(!m_target->m_rooted)
+		if(m_target->m_rooted == 0)
 			m_target->Unroot();
 
 		if(m_target->GetTypeId() == TYPEID_UNIT)
-		{
-			Unit * target = GetUnitCaster();
-			if(!target) return;
-
-			m_target->GetAIInterface()->AttackReaction(target, 1, 0);
-		}
+			m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, 0);
 	}
 }
 
@@ -2804,8 +2792,9 @@ void Aura::SpellAuraModSilence(bool apply)
 {
 	if(apply)
 	{
-		m_target->m_special_state |= UNIT_STATE_SILENCE;
 		m_target->m_silenced++;
+		m_target->m_special_state |= UNIT_STATE_SILENCE;
+		m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
 
 		// remove the current spell (for channelers)
 		if(m_target->m_currentSpell && m_target->GetGUID() != m_casterGuid && 
@@ -2818,8 +2807,12 @@ void Aura::SpellAuraModSilence(bool apply)
 	else
 	{
 		m_target->m_silenced--;
-		if (m_target->m_silenced==0)
+
+		if(m_target->m_silenced == 0)
+		{
 			m_target->m_special_state &= ~UNIT_STATE_SILENCE;
+			m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+		}
 	}
 }
 
@@ -4060,16 +4053,19 @@ void Aura::SpellAuraModCratureDmgDone(bool apply)
 
 void Aura::SpellAuraPacifySilence(bool apply)
 {
-	// Cant Attack and cast spell
+	// Can't Attack or Cast Spells
 	if(apply)
 	{
 		if(m_spellProto->Id == 24937)
 			SetPositive();
 		else
 			SetNegative();
-		m_target->m_special_state |= UNIT_STATE_SILENCE | UNIT_STATE_PACIFY;
-		m_target->m_silenced++;
+
 		m_target->m_pacified++;
+		m_target->m_silenced++;
+		m_target->m_special_state |= UNIT_STATE_PACIFY | UNIT_STATE_SILENCE;
+		m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_SILENCED);
+
 		if(m_target->m_currentSpell && m_target->GetGUID() != m_casterGuid && 
 			m_target->m_currentSpell->getState() == SPELL_STATE_CASTING )
 			{
@@ -4080,11 +4076,20 @@ void Aura::SpellAuraPacifySilence(bool apply)
 	else
 	{
 		m_target->m_pacified--;
-		m_target->m_silenced--;
-		if (m_target->m_pacified==0)
+
+		if(m_target->m_pacified == 0)
+		{
 			m_target->m_special_state &= ~UNIT_STATE_PACIFY;
-		if (m_target->m_silenced==0)
+			m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+		}
+
+		m_target->m_silenced--;
+
+		if(m_target->m_silenced == 0)
+		{
 			m_target->m_special_state &= ~UNIT_STATE_SILENCE;
+			m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+		}
 	}
 }
 
@@ -4191,7 +4196,7 @@ void Aura::SpellAuraFeighDeath(bool apply)
 		{
 			pTarget->EventDeath();
 			pTarget->SetFlag(UNIT_FIELD_FLAGS_2, 1);
-			pTarget->SetFlag(UNIT_FIELD_FLAGS, 0x20000000);
+			pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH);
 			
 			data.SetOpcode(SMSG_START_MIRROR_TIMER);
 			data << uint32(2);		// type
@@ -4205,7 +4210,7 @@ void Aura::SpellAuraFeighDeath(bool apply)
 		else
 		{
 			pTarget->RemoveFlag(UNIT_FIELD_FLAGS_2, 1);
-			pTarget->RemoveFlag(UNIT_FIELD_FLAGS, 0x20000000);
+			pTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH);
 			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
 			data << uint32(2);
 			pTarget->GetSession()->SendPacket(&data);
@@ -4215,14 +4220,22 @@ void Aura::SpellAuraFeighDeath(bool apply)
 
 void Aura::SpellAuraModDisarm(bool apply)
 {
-	if (m_target->IsPlayer() && static_cast<Player*>(m_target)->IsInFeralForm() &&
-		(static_cast<Player*>(m_target)->GetShapeShift() == FORM_CAT ||
-		static_cast<Player*>(m_target)->GetShapeShift() == FORM_BEAR ||
-		static_cast<Player*>(m_target)->GetShapeShift() == FORM_DIREBEAR))
-		return;
-	//U_FIELD_FLAG_WEAPON_OFF
-	apply ? m_target->SetFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_WEAPON_OFF) : m_target->RemoveFlag(UNIT_FIELD_FLAGS, U_FIELD_FLAG_WEAPON_OFF);
-	m_target->disarmed = apply;
+	if(p_target && p_target->IsInFeralForm()) return;
+
+	if(apply)
+	{
+		SetNegative();
+
+		m_target->disarmed = true;
+		m_target->m_special_state |= UNIT_STATE_DISARMED;
+		m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED);
+	}
+	else
+	{
+		m_target->disarmed = false;
+		m_target->m_special_state &= ~UNIT_STATE_DISARMED;
+		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED);
+	}
 }
 
 void Aura::SpellAuraModStalked(bool apply)
@@ -4488,7 +4501,7 @@ void Aura::SpellAuraMounted(bool apply)
 		uint32 displayId = ci->Male_DisplayID;
 		if(displayId != 0)
 		{
-			m_target->SetFlag( UNIT_FIELD_FLAGS , U_FIELD_FLAG_MOUNT_SIT );
+			m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
 			m_target->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , displayId);
 		}
 	}
@@ -4496,14 +4509,9 @@ void Aura::SpellAuraMounted(bool apply)
 	{
 		((Player*)m_target)->m_MountSpellId=0;
 
-		if(m_target->GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID) != 0)
-		{
-			m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID , 0);
-			m_target->RemoveFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_MOUNT_SIT );
-		}
-
-		if (m_target->GetUInt32Value(UNIT_FIELD_FLAGS) & U_FIELD_FLAG_LOCK_PLAYER )
-			m_target->RemoveFlag( UNIT_FIELD_FLAGS, U_FIELD_FLAG_LOCK_PLAYER );
+		m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
+		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
+		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 	}
 }
 
@@ -4877,7 +4885,11 @@ void Aura::SpellAuraPreventsFleeing(bool apply)
 
 void Aura::SpellAuraModUnattackable(bool apply)
 {
-	// U_FIELD_FLAG_MAKE_CHAR_UNTOUCHABLE
+/*
+		Also known as Apply Aura: Mod Uninteractible
+		Used by: Spirit of Redemption, Divine Intervention, Phase Shift, Flask of Petrification
+		It uses one of the UNIT_FIELD_FLAGS, either UNIT_FLAG_NOT_SELECTABLE or UNIT_FLAG_NOT_ATTACKABLE_2 
+*/
 }
 
 void Aura::SpellAuraInterruptRegen(bool apply)
