@@ -26,11 +26,10 @@
 #define REPACK_AUTHOR "Trelorn"
 #define REPACK_WEBSITE "www.google.com"*/
 
-/*#ifdef WIN32
-#pragma warning(disable:4996)
-#endif*/
-
 #ifdef WIN32
+#pragma warning(disable:4996)
+#define _CRT_SECURE_NO_DEPRECATE 1
+#define _CRT_SECURE_COPP_OVERLOAD_STANDARD_NAMES 1
 #pragma warning(disable:4251)		// dll-interface bullshit
 #endif
 
