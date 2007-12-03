@@ -2550,6 +2550,23 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[2]=2048;
 	}
 
+	//warlock: Devastation
+	sp  = dbcSpell.LookupEntry(18130);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512; //i have no idea if these are warlock destruction spells. There should be a list for this
+	sp  = dbcSpell.LookupEntry(18131);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512;
+	sp  = dbcSpell.LookupEntry(18132);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512;
+	sp  = dbcSpell.LookupEntry(18133);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512;
+	sp  = dbcSpell.LookupEntry(18134);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512;
+
 	//mage: Arcane Power
 	sp  = dbcSpell.LookupEntry(12042);
 	if (sp)

@@ -143,6 +143,7 @@ Zack - test my shit :
 - warlock: Improved Enslave Demon 18822
 - warlock: Master Conjuror 18768 - should work
 - warlock: Demonic Knowledge 35693
+- warlock: Devastation 18134
 
 
 ==========================================================================
