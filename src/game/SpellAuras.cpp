@@ -1263,7 +1263,7 @@ void Aura::SpellAuraDummy(bool apply)
 				val = -mod->fixed_amount[0];
 			for(uint32 x=1;x<7;x++)
 				if (mod->m_miscValue & (((uint32)1)<<x) )
-					p->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS,val);
+					p->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x,val);
 		}break;
 		//paladin - Blessing of Light.
 	case 19977:

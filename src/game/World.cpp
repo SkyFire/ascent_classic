@@ -2563,7 +2563,9 @@ bool World::SetInitialWorldSettings()
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=2048;
-		sp->EffectSpellGroupRelation[1]=2048;
+		sp->EffectMiscValue[0]=SMT_SPELL_VALUE_PCT;
+		sp->EffectBasePoints[0] = -(sp->EffectBasePoints[0]+2);
+//		sp->EffectSpellGroupRelation[1]=2048; //we do not handle this misc type yet anyway. Removed it just as a reminder
 		sp->EffectSpellGroupRelation[2]=2048;
 	}
 	sp  = dbcSpell.LookupEntry(18822);
@@ -2612,8 +2614,8 @@ bool World::SetInitialWorldSettings()
 	sp  = dbcSpell.LookupEntry(12042);
 	if (sp)
 	{
-		sp->EffectSpellGroupRelation[0]=0xFFFFFFFF;
-		sp->EffectSpellGroupRelation[1]=0xFFFFFFFF;
+		sp->EffectSpellGroupRelation[1]=1 | 8192 | 4194304 | 8388608 | 262144 | 131072 | 536870912 | 524352 | 4 | 4096 | 2 | 2048 | 16;
+		sp->EffectSpellGroupRelation[2]=1 | 8192 | 4194304 | 8388608 | 262144 | 131072 | 536870912 | 524352 | 4 | 4096 | 2 | 2048 | 16;
 	}
 
 	//Mage - Ice Shards
