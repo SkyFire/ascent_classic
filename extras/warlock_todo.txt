@@ -93,13 +93,10 @@ Fel Intellect - only increases the warlock max mana but doesn't increase pets in
 Improved Succubus - can't test since succy spells proc on self seduction doesn't work, soothing kiss procs on self...
 Fel Stamina - same as fel intellect, only increases warlocks max hp but not pets hp
 Unholy Power - doens't work (seems an talent that affects pet attributes don't work.)
-Master Conjuror- doesn't work
 Mana Feed - doesn't work
 Master Demonologist - doesn't work
 Demonic Resilience - doesn't work
 Soul Link - skill doesn't work
-Demonic Knowledge - doesn't work.
-
 
 Destruction Tree:
 
