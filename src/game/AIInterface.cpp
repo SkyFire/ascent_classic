@@ -768,11 +768,13 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 			if(!m_nextSpell)
 				m_nextSpell = this->getSpell();
 
+			/*
 			if(!m_nextSpell && waiting_for_cooldown)
 			{
-				/* don't start running to the target for melee if we're waiting for a cooldown. */
+				// don't start running to the target for melee if we're waiting for a cooldown. 
 				return;
 			}
+			*/
 
 			if(m_canFlee && !m_hasFleed 
 				&& ((m_Unit->GetUInt32Value(UNIT_FIELD_HEALTH) / m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) < m_FleeHealth ))

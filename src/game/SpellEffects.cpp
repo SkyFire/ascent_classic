@@ -1502,6 +1502,19 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			newItem->SetUInt64Value(ITEM_FIELD_CREATOR,m_caster->GetGUID());
 			newItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, item_count);
 
+			if (m_itemProto->RandomPropId)
+			{
+				RandomProps * iRandomProperty = lootmgr.GetRandomProperties(m_itemProto);
+				newItem->SetRandomProperty(iRandomProperty->ID);
+				newItem->ApplyRandomProperties(false);
+			}
+			if (m_itemProto->RandomSuffixId)
+			{
+				ItemRandomSuffixEntry * iRandomSuffix = lootmgr.GetRandomSuffix(m_itemProto);
+				newItem->SetRandomSuffix(iRandomSuffix->id);
+				newItem->ApplyRandomProperties(false);
+			}
+
 			if(p_caster->GetItemInterface()->SafeAddItem(newItem,slotresult.ContainerSlot, slotresult.Slot))
 			{
 				/*WorldPacket data(45);
@@ -4480,6 +4493,13 @@ void Spell::SpellEffectEnchantHeldItem(uint32 i)
 	if(!item) return;
 
 	uint32 Duration = 1800; // Needs to be found in dbc.. I guess?
+	switch(m_spellInfo->NameHash)
+	{
+		case 0xABE1EE81: // Windfury Totem Effect
+		{   
+			Duration = 10;
+		}
+	}
 	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(m_spellInfo->EffectMiscValue[i]);
 	if(!Enchantment) return;
 

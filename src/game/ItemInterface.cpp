@@ -1325,6 +1325,9 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 		if (!ignore_combat && m_pOwner->CombatStatus.IsInCombat())
 			return INV_ERR_CANT_DO_IN_COMBAT;
 
+		if(proto->Flags & ITEM_FLAG_UNIQUE_EQUIP && IsEquipped(proto->ItemId))
+			return INV_ERR_CANT_CARRY_MORE_OF_THIS;
+		
 		// Check to see if we have the correct race
 		if(!(proto->AllowableRace& (1<<m_pOwner->getRace())))
 			return INV_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
