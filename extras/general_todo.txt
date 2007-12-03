@@ -140,6 +140,7 @@ Zack - test my shit :
 - check the prices of the stackable projectiles at vendors to be the same as in db
 - started playin with grounding totem effect, but it is defenetly not finished
 - warlock: Demonic Aegis 30145
+- warlock: Improved Enslave Demon 18822
 
 ==========================================================================
 Capt - test my shit :

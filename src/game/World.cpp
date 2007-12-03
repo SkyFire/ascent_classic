@@ -2533,6 +2533,23 @@ bool World::SetInitialWorldSettings()
 	sp  = dbcSpell.LookupEntry(30145);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4096;
+
+	//warlock: Improved Enslave Demon
+	sp  = dbcSpell.LookupEntry(18821);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=2048;
+		sp->EffectSpellGroupRelation[1]=2048;
+		sp->EffectSpellGroupRelation[2]=2048;
+	}
+	sp  = dbcSpell.LookupEntry(18822);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=2048;
+		sp->EffectSpellGroupRelation[1]=2048;
+		sp->EffectSpellGroupRelation[2]=2048;
+	}
+
 	//mage: Arcane Power
 	sp  = dbcSpell.LookupEntry(12042);
 	if (sp)
