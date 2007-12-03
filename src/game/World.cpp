@@ -2591,6 +2591,23 @@ bool World::SetInitialWorldSettings()
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512 | 8192 | 4096;
 
+	//warlock - Shadow Mastery
+	sp = dbcSpell.LookupEntry(18271);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+	sp = dbcSpell.LookupEntry(18272);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+	sp = dbcSpell.LookupEntry(18273);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+	sp = dbcSpell.LookupEntry(18274);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+	sp = dbcSpell.LookupEntry(18275);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+
 	//mage: Arcane Power
 	sp  = dbcSpell.LookupEntry(12042);
 	if (sp)
