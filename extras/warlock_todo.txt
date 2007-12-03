@@ -108,7 +108,6 @@ Affliction Tree:
 
 Improved Drain Soul - doesn't work
 Soul Siphon - doesn't work
-Improved Curse of Agony - doesn't work even tho tool tip shows it does
 Grim Reach - doesn't work
 Nightfall - has never worked lolz
 Empowered Corruption - doensn' t work

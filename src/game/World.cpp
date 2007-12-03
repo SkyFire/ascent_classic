@@ -2833,6 +2833,14 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
 
+	//warlock - Improved Curse of Agony
+	sp = dbcSpell.LookupEntry(18827);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=1024;
+	sp = dbcSpell.LookupEntry(18829);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=1024;
+
 	//warlock - Soul Fire. Has missign group type
 	sp = dbcSpell.LookupEntry(6353);
 	if(sp)
