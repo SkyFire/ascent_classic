@@ -2816,6 +2816,23 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=8192 | 512;
 
+	//warlock - Suppression
+	sp = dbcSpell.LookupEntry(18174);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+	sp = dbcSpell.LookupEntry(18175);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+	sp = dbcSpell.LookupEntry(18176);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+	sp = dbcSpell.LookupEntry(18177);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+	sp = dbcSpell.LookupEntry(18178);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+
 	//warlock - Soul Fire. Has missign group type
 	sp = dbcSpell.LookupEntry(6353);
 	if(sp)

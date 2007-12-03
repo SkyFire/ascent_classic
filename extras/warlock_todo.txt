@@ -106,7 +106,6 @@ Improved Searing Pain - doesn't work
 
 Affliction Tree:
 
-Suppression - hard to test
 Improved Drain Soul - doesn't work
 Soul Siphon - doesn't work
 Improved Curse of Agony - doesn't work even tho tool tip shows it does
