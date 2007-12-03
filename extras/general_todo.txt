@@ -76,6 +76,7 @@ SMT_RESIST_DISPEL - check if it is used
 - "you can have 2 water elementals"
 - you gain combo point even on spell failed (backstab)
 - you should gain mining skill if the bar has been filled instead on cast action
+- some say that proc spells are not removed after they proc from items and taking items off you. Is this the same unexistatn bug as with talent unlearning ?
 
 ==========================================================================
 Zack - test my shit :
@@ -138,6 +139,7 @@ Zack - test my shit :
 - shaman - purge 8012
 - check the prices of the stackable projectiles at vendors to be the same as in db
 - started playin with grounding totem effect, but it is defenetly not finished
+- warlock: Demonic Aegis 30145
 
 ==========================================================================
 Capt - test my shit :

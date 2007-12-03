@@ -83,3 +83,48 @@ Talents - Demonology
 
 Pets
 -Pets on defense/passive immediately attacks the closest enemy if it kills the current mob. It also immediately attacks the closest enemy if it is just summoned or from log in.
+
+///////////////////////////////////////////////////////////////////////////////
+
+Demonology Tree:
+Improved Imp - doesn't work
+Improved void walker - doesn't work
+Fel Intellect - only increases the warlock max mana but doesn't increase pets intellect
+Improved Succubus - can't test since succy spells proc on self seduction doesn't work, soothing kiss procs on self...
+Fel Stamina - same as fel intellect, only increases warlocks max hp but not pets hp
+Unholy Power - doens't work (seems an talent that affects pet attributes don't work.)
+Improved Enslave Demon - haven't tested
+Master Conjuror- doesn't work
+Mana Feed - doesn't work
+Master Demonologist - doesn't work
+Demonic Resilience - doesn't work
+Soul Link - skill doesn't work
+Demonic Knowledge - doesn't work.
+
+
+Destruction Tree:
+
+Improves Lash of Pain - not tested, succy, felhunter, felguard spells all bugged out too much
+Devastation - doesn't work
+Shadow Burn - skill works but doesn't return soul shard if target died withing 5 secs
+Intensity - doesn't work
+Improved Searing Pain - doesn't work
+Pyroclasm - doesn't work <= may work but tested it with hellfire on a couple of mobs a couple of times didn't proc.
+Emberstorm - doens' t work
+Shadow and Flame - doesn't work
+
+Affliction Tree:
+
+Suppression - hard to test
+Improved Drain Soul - doesn't work
+Soul Siphon - doesn't work
+Improved Curse of Agony - doesn't work even tho tool tip shows it does
+Grim Reach - doesn't work
+Nightfall - has never worked lolz
+Empowered Corruption - doensn' t work
+Siphon Life - works but no bonus from healing
+Shadow Mastery - doesn't work
+Contagion - doesn't work
+Dark Pact - returns the extact mana drained from pet, no bonuses
+Improved Howl of Terror - works but requried to stand stilll to cast it instant otherwise it just says you need to be not moving..
+Malediction - doesn't work

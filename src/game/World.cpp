@@ -1290,6 +1290,9 @@ bool World::SetInitialWorldSettings()
 		//druid - Nature's Swiftness - required for tree of life
 		if(sp->NameHash == 0x4CE6BBE1)
 			sp->SpellGroupType |= 268435456; //dangerous move !
+		//warlock - Fel armor and demon armor have missing 
+		if(sp->NameHash == 0xC6FDD110 || sp->NameHash == 0x915965D6)
+			sp->SpellGroupType |= 4096; //some of them do have the flags but i's hard to write down those some from 130 spells
 /*		else if(strstr(nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if(strstr(nametext, "Blinding Powder"))
@@ -2520,6 +2523,16 @@ bool World::SetInitialWorldSettings()
 			sp->EffectSpellGroupRelation[1]=8421376;
 		}
 	}
+	//warlock: Demonic Aegis
+	sp  = dbcSpell.LookupEntry(30143);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=4096;
+	sp  = dbcSpell.LookupEntry(30144);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=4096;
+	sp  = dbcSpell.LookupEntry(30145);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=4096;
 	//mage: Arcane Power
 	sp  = dbcSpell.LookupEntry(12042);
 	if (sp)
