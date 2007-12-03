@@ -590,6 +590,7 @@ void Pet::Dismiss(bool bSafeDelete)//Abandon pet
 
 void Pet::Remove(bool bSafeDelete, bool bUpdate, bool bSetOffline)
 {
+	RemoveAllAuras(); // Prevent pet overbuffing
 	if(m_Owner)
 	{
 		// remove association with player

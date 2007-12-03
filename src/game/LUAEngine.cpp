@@ -479,7 +479,7 @@ const char Unit::className[] = "Unit";
 Unit::RegType Unit::methods[] = {
 	{ "GetName", &luaUnit_GetName },
 	{ "SendChatMessage", &luaUnit_SendChatMessage },
-	{ "MoveTo", &luaUnit_GetName },
+	{ "MoveTo", &luaUnit_MoveTo },
 	{ "SetMovementType", &luaUnit_SetMovementType },
 	{ "CastSpell", &luaUnit_CastSpell },
 	{ "FullCastSpell", &luaUnit_FullCastSpell },

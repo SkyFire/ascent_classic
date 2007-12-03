@@ -4469,7 +4469,6 @@ void Spell::SpellEffectDismissPet(uint32 i)
 	Pet *pPet = p_caster->GetSummon();
 	if(!pPet)
 		return;
-	pPet->RemoveAllAuras(); // Prevent pet overbuffing
 	pPet->Remove(true, true, true);
 }
 
