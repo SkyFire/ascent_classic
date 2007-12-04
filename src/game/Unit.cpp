@@ -2459,7 +2459,7 @@ else
 	uint32 val;
 	if(pVictim->IsPlayer())
 	{
-		if(this->GetPowerType() == POWER_TYPE_RAGE 
+		if(pVictim->GetPowerType() == POWER_TYPE_RAGE 
 //			&& !ability //zack : general opinion is that spells should generate rage. I share the feeling
 			&& pVictim != this
 			)
