@@ -1586,7 +1586,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
         ///Rage
         uint32 val;
 
-        if(pVictim->GetPowerType() == POWER_TYPE_RAGE && !spellId && pVictim != this)
+        if(pVictim->GetPowerType() == POWER_TYPE_RAGE 
+//			&& !spellId //zack : general opinion is that spells should generate rage. I share the feeling
+			&& pVictim != this)
 	  {
 	    if(pVictim->IsPlayer()) {				// WTF? - Burlex
 	      val = pVictim->GetUInt32Value(UNIT_FIELD_POWER2)+(damage*20)/(pVictim->getLevel()*3);

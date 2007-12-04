@@ -2459,7 +2459,9 @@ else
 	uint32 val;
 	if(IsPlayer())
 	{
-		if(this->GetPowerType() == POWER_TYPE_RAGE && !ability)
+		if(this->GetPowerType() == POWER_TYPE_RAGE 
+//			&& !ability //zack : general opinion is that spells should generate rage. I share the feeling
+			)
 		{
 		  // It only regens rage if in combat, don't know why but this is making
 		  // the player to regen 1 rage every 3 secs.....

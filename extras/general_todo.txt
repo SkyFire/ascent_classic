@@ -155,6 +155,8 @@ Zack - test my shit :
 - warlock: Nightfall 18095
 - warlock: Contagion 30064
 - warlock: Malediction 32484
+- warriors get rage for spell damage
+- equipping items multiple times should not double the proc spell count
 
 ==========================================================================
 Capt - test my shit :
