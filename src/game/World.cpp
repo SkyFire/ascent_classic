@@ -1298,7 +1298,7 @@ bool World::SetInitialWorldSettings()
 			sp->SpellGroupType |= 4096; //some of them do have the flags but i's hard to write down those some from 130 spells
 		//warlock - shadow bolt
 		if(sp->NameHash == 0x7A7B6753)
-			sp->SpellGroupType |= 8192; //some of them do have the flags but i's hard to write down those some from 130 spells
+			sp->SpellGroupType |= 1; //some of them do have the flags but i's hard to write down those some from 130 spells
 /*		else if(strstr(nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if(strstr(nametext, "Blinding Powder"))
@@ -1383,7 +1383,7 @@ bool World::SetInitialWorldSettings()
 		}
 
 		if(namehash==0x8D4A2E9F)		// warlock - intensity
-			sp->EffectSpellGroupRelation[0] |= 32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512; //destruction spell
+			sp->EffectSpellGroupRelation[0] |= 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spell
 		else if(namehash==0x2bc0ae00)		// warlock - incinerate
 			sp->SpellGroupType=1;
 		else if(
@@ -2538,6 +2538,17 @@ bool World::SetInitialWorldSettings()
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4096;
 
+	//warlock: Improved Searing Pain
+	sp  = dbcSpell.LookupEntry(17927);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=256;
+	sp  = dbcSpell.LookupEntry(17929);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=256;
+	sp  = dbcSpell.LookupEntry(17930);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=256;
+
 	//warlock: Empowered Corruption
 	sp  = dbcSpell.LookupEntry(32381);
 	if (sp)
@@ -2579,36 +2590,56 @@ bool World::SetInitialWorldSettings()
 	//warlock: Devastation
 	sp  = dbcSpell.LookupEntry(18130);
 	if (sp)
-		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512 | 8192 | 4096; //i have no idea if these are warlock destruction spells. There should be a list for this
+		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512; //i have no idea if these are warlock destruction spells. There should be a list for this
 	sp  = dbcSpell.LookupEntry(18131);
 	if (sp)
-		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512 | 8192 | 4096;
+		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512;
 	sp  = dbcSpell.LookupEntry(18132);
 	if (sp)
-		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512 | 8192 | 4096;
+		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512;
 	sp  = dbcSpell.LookupEntry(18133);
 	if (sp)
-		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512 | 8192 | 4096;
+		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512;
 	sp  = dbcSpell.LookupEntry(18134);
 	if (sp)
-		sp->EffectSpellGroupRelation[0]=32 | 64 | 4 | 2 | 16384 | 1024 | 256 | 128 | 512 | 8192 | 4096;
+		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512;
 
 	//warlock - Shadow Mastery
 	sp = dbcSpell.LookupEntry(18271);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
 	sp = dbcSpell.LookupEntry(18272);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
 	sp = dbcSpell.LookupEntry(18273);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
 	sp = dbcSpell.LookupEntry(18274);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
 	sp = dbcSpell.LookupEntry(18275);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 8192 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+
+	//warlock - Contagion
+	sp = dbcSpell.LookupEntry(30060);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+		sp->EffectSpellGroupRelation[2]= 2147483648 | 4194304 | 1024 | 32768;
+	}
+	sp = dbcSpell.LookupEntry(30061);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+	sp = dbcSpell.LookupEntry(30062);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+	sp = dbcSpell.LookupEntry(30063);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
+	sp = dbcSpell.LookupEntry(30064);
+	if(sp)
+		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
 
 	//mage: Arcane Power
 	sp  = dbcSpell.LookupEntry(12042);
@@ -2842,36 +2873,36 @@ bool World::SetInitialWorldSettings()
 	//warlock - Shadow and Flame
 	sp = dbcSpell.LookupEntry(30288);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=8192 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 512;
 	sp = dbcSpell.LookupEntry(30289);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=8192 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 512;
 	sp = dbcSpell.LookupEntry(30290);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=8192 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 512;
 	sp = dbcSpell.LookupEntry(30291);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=8192 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 512;
 	sp = dbcSpell.LookupEntry(30292);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=8192 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 512;
 
 	//warlock - Suppression
 	sp = dbcSpell.LookupEntry(18174);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768; //affliction spell
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304; //affliction spell
 	sp = dbcSpell.LookupEntry(18175);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	sp = dbcSpell.LookupEntry(18176);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	sp = dbcSpell.LookupEntry(18177);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	sp = dbcSpell.LookupEntry(18178);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
 	//warlock - Improved Curse of Agony
 	sp = dbcSpell.LookupEntry(18827);
@@ -2884,10 +2915,10 @@ bool World::SetInitialWorldSettings()
 	//warlock - Grim Reach
 	sp = dbcSpell.LookupEntry(18218);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	sp = dbcSpell.LookupEntry(18219);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 4194304 | 1024 | 32768;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
 	//warlock - Soul Fire. Has missign group type
 	sp = dbcSpell.LookupEntry(6353);

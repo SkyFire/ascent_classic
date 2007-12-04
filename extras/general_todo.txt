@@ -151,6 +151,7 @@ Zack - test my shit :
 - warlock - Grim Reach 18219
 - warlock: Empowered Corruption 32383
 - warlock - Shadow Mastery 18275
+- warlock: Improved Searing Pain 17930
 
 ==========================================================================
 Capt - test my shit :

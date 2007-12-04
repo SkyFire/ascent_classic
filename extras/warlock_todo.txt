@@ -102,7 +102,6 @@ Destruction Tree:
 
 Improves Lash of Pain - not tested, succy, felhunter, felguard spells all bugged out too much
 Shadow Burn - skill works but doesn't return soul shard if target died withing 5 secs
-Improved Searing Pain - doesn't work
 
 Affliction Tree:
 

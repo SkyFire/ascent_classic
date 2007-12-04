@@ -21,6 +21,10 @@ where name like "%Improved Expose Armor%";
 #////////////////// warlock spells
 #select id,name,description,SpellGroupType,Effect_1,Effect_2,Effect_3,EffectApplyAuraName_1,EffectApplyAuraName_2,EffectApplyAuraName_3,EffectSpellGroupRelation_1,EffectSpellGroupRelation_1,EffectSpellGroupRelation_3,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3,EffectTriggerSpell_1,EffectTriggerSpell_2,EffectTriggerSpell_3 from dbc_spell 
 #where id in (27250,27238,28172,18288,18647,30912,27216 ,27230 ,27218 ,30910 ,18223 ,27226 ,27229 ,11719 ,30909 ,27228 ,27265 ,11726 ,126 ,6215 ,28189 ,18708 ,27259 ,27213 ,17928 ,27215 ,32231 ,1122 ,27222 ,27212 ,18540 ,29893 ,698 ,30459 ,27243 ,5500 ,27209 ,28610 ,30546 ,30414 ,30911 ,30545 ,19028 ,27223 ,696 ,18788 ,132 ,27220 ,30908 ,27217 ,30545,19028 ,29858 ,23161 ,30146 ,691 ,5784 ,688 ,712 ,697 ,5697 ,30405)
+#destruction spells
+#where id in (348,686,5676,5740,17877,1949,18930 ,6353 ,30283)
+#affliction spells
+#where id in (172,702,1454,980,5782,1120,704 ,689 ,18288 ,5138 ,1714 ,18223 ,18879 ,18220 ,5484 ,6789 ,17862 ,30108 ,603 ,27243)
 
 #////////////////// mage spells
 #select id,name,description,SpellGroupType,Effect_1,Effect_2,Effect_3,EffectApplyAuraName_1,EffectApplyAuraName_2,EffectApplyAuraName_3,EffectSpellGroupRelation_1,EffectSpellGroupRelation_1,EffectSpellGroupRelation_3,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3,EffectTriggerSpell_1,EffectTriggerSpell_2,EffectTriggerSpell_3 from dbc_spell 
