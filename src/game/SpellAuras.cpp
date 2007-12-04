@@ -1031,8 +1031,8 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 				int spell_flat_modifers=0;
 				int spell_pct_modifers=0;
-				SM_FIValue(c->SM_FDamageBonus,&spell_flat_modifers,gr);
-				SM_FIValue(c->SM_PDamageBonus,&spell_pct_modifers,gr);
+				SM_FIValue(c->SM_FDOT,&spell_flat_modifers,gr);
+				SM_FIValue(c->SM_PDOT,&spell_pct_modifers,gr);
 				if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
 					printf("!!!!!spell periodic dmg mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg,gr);
 #endif
