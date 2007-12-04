@@ -2457,19 +2457,20 @@ else
 	}
 //--------------------------rage processing-------------------------------------------------
 	uint32 val;
-	if(IsPlayer())
+	if(pVictim->IsPlayer())
 	{
 		if(this->GetPowerType() == POWER_TYPE_RAGE 
 //			&& !ability //zack : general opinion is that spells should generate rage. I share the feeling
+			&& pVictim != this
 			)
 		{
 		  // It only regens rage if in combat, don't know why but this is making
 		  // the player to regen 1 rage every 3 secs.....
 		  // and the formula is wrong also ... TODO
-		  if(CombatStatus.IsInCombat()) {
-			val = GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/getLevel();
-			val += (static_cast<Player *>(this)->rageFromDamageDealt*val)/100;
-			SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
+		  if(pVictim->CombatStatus.IsInCombat()) {
+			val = pVictim->GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/pVictim->getLevel();
+			val += (static_cast<Player *>(pVictim)->rageFromDamageDealt*val)/100;
+			pVictim->SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
 		  }
 		}
 	}
