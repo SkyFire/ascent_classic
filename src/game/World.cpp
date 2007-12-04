@@ -1296,6 +1296,9 @@ bool World::SetInitialWorldSettings()
 		//warlock - shadow bolt
 		if(sp->NameHash == 0x7A7B6753)
 			sp->SpellGroupType |= 1; //some of them do have the flags but i's hard to write down those some from 130 spells
+		//warlock - Seed of Corruption
+		if(sp->NameHash == 0xFD712ED2)
+			sp->SpellGroupType |= 65536; 
 /*		else if(strstr(nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if(strstr(nametext, "Blinding Powder"))
@@ -2557,6 +2560,38 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 17941;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 		sp->procChance = 4;
+	}
+
+	//warlock: Contagion
+	sp  = dbcSpell.LookupEntry(30060);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+	}
+	sp  = dbcSpell.LookupEntry(30061);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+	}
+	sp  = dbcSpell.LookupEntry(30062);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+	}
+	sp  = dbcSpell.LookupEntry(30063);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+	}
+	sp  = dbcSpell.LookupEntry(30064);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	}
 
 	//warlock: Improved Searing Pain
