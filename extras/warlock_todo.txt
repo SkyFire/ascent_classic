@@ -107,7 +107,6 @@ Affliction Tree:
 
 Improved Drain Soul - doesn't work
 Soul Siphon - doesn't work
-Nightfall - has never worked lolz
 Siphon Life - works but no bonus from healing
 Contagion - doesn't work
 Dark Pact - returns the extact mana drained from pet, no bonuses

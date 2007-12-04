@@ -152,6 +152,7 @@ Zack - test my shit :
 - warlock: Empowered Corruption 32383
 - warlock - Shadow Mastery 18275
 - warlock: Improved Searing Pain 17930
+- warlock: Nightfall 18095
 
 ==========================================================================
 Capt - test my shit :

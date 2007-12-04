@@ -1293,9 +1293,6 @@ bool World::SetInitialWorldSettings()
 		//warlock - Fel armor and demon armor have missing 
 		if(sp->NameHash == 0xC6FDD110 || sp->NameHash == 0x915965D6)
 			sp->SpellGroupType |= 4096; //some of them do have the flags but i's hard to write down those some from 130 spells
-		//warlock - incinerate. Depracated spells are missing the spellgrouptype (maybe they are not depracated at all
-		if(sp->NameHash == 0x2BC0AE00)
-			sp->SpellGroupType |= 4096; //some of them do have the flags but i's hard to write down those some from 130 spells
 		//warlock - shadow bolt
 		if(sp->NameHash == 0x7A7B6753)
 			sp->SpellGroupType |= 1; //some of them do have the flags but i's hard to write down those some from 130 spells
@@ -1365,7 +1362,7 @@ bool World::SetInitialWorldSettings()
 		if(sp->NameHash == 0x5965939A)
 		{
 			sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM;
-			sp->EffectSpellGroupRelation[0] = 1;
+			sp->EffectSpellGroupRelation[0] = 1 | 8192;
 			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 		}
 
@@ -1384,8 +1381,6 @@ bool World::SetInitialWorldSettings()
 
 		if(namehash==0x8D4A2E9F)		// warlock - intensity
 			sp->EffectSpellGroupRelation[0] |= 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spell
-		else if(namehash==0x2bc0ae00)		// warlock - incinerate
-			sp->SpellGroupType=1;
 		else if(
 			((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (sp->AttributesEx & ATTRIBUTESEX_DELAY_SOME_TRIGGERS)) //rogue cold blood
 			|| ((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (!sp->AttributesEx || sp->AttributesEx & ATTRIBUTESEX_REMAIN_OOC))
@@ -2516,6 +2511,14 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 100;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
+	//warlock - incinerate. Depracated spells are missing the spellgrouptype (maybe they are not depracated at all
+	sp = dbcSpell.LookupEntry(29722);
+	if(sp)
+		sp->SpellGroupType |= 8192; //some of them do have the flags but i's hard to write down those some from 130 spells
+	sp = dbcSpell.LookupEntry(32231);
+	if(sp)
+		sp->SpellGroupType |= 8192; //some of them do have the flags but i's hard to write down those some from 130 spells
+
 	//warlock: Shadow Mastery
 	for (uint32 i=0;i<5;i++)
 	{
@@ -2537,6 +2540,24 @@ bool World::SetInitialWorldSettings()
 	sp  = dbcSpell.LookupEntry(30145);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4096;
+
+	//warlock: Nightfall
+	sp  = dbcSpell.LookupEntry(18094);
+	if (sp)
+	{
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 17941;
+		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procChance = 2;
+	}
+	sp  = dbcSpell.LookupEntry(18095);
+	if (sp)
+	{
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 17941;
+		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procChance = 4;
+	}
 
 	//warlock: Improved Searing Pain
 	sp  = dbcSpell.LookupEntry(17927);
@@ -2873,19 +2894,19 @@ bool World::SetInitialWorldSettings()
 	//warlock - Shadow and Flame
 	sp = dbcSpell.LookupEntry(30288);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=1 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 8192;
 	sp = dbcSpell.LookupEntry(30289);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=1 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 8192;
 	sp = dbcSpell.LookupEntry(30290);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=1 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 8192;
 	sp = dbcSpell.LookupEntry(30291);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=1 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 8192;
 	sp = dbcSpell.LookupEntry(30292);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=1 | 512;
+		sp->EffectSpellGroupRelation[0]=1 | 8192;
 
 	//warlock - Suppression
 	sp = dbcSpell.LookupEntry(18174);

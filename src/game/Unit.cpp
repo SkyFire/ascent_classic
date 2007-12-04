@@ -803,6 +803,16 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if( CastingSpell->NameHash!=0x7A7B6753)//shadow bolt								
 									continue;
 							}break;
+						//warlock - Nighfall
+						case 17941:
+							{
+								if(!CastingSpell)
+									continue;//this should not ocur unless we made a fuckup somewhere
+								//only trigger effect for specified spells
+								if( CastingSpell->NameHash!=0x2ADC25D7 && //Corruption
+									CastingSpell->NameHash!=0x20EFEA68)//Drain Life								
+									continue;
+							}break;
 						//warlock - Shadow Embrace
 						case 32386:
 						case 32388:
