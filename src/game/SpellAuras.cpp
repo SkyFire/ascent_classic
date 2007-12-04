@@ -3576,7 +3576,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 			{
 				//m_target->m_procSpells.erase(itr);
 				itr->deleted = true;
-				break;
+				break; //only 1 instance of a proc spell per caster ?
 			}
 		}
 	}

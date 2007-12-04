@@ -2254,12 +2254,12 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (srcslot*2), 0 );
 	}
 
-   // bool noreapply=( srcslot < EQUIPMENT_SLOT_END &&  dstslot < EQUIPMENT_SLOT_END);//just move inside inv, no equip/unequip
+    bool noreapply=( srcslot < EQUIPMENT_SLOT_END &&  dstslot < EQUIPMENT_SLOT_END);//just move inside inv, no equip/unequip
 
 	if(srcslot < INVENTORY_SLOT_BAG_END)	// source item is equiped
 	{
 		// remove mods from original item
-	  //  if(!noreapply)
+	    if(!noreapply)
 		{
 			if(m_pItems[(int)dstslot])		// Remove mods from the old item in this slot.
 				m_pOwner->ApplyItemMods(m_pItems[(int)dstslot], srcslot, false);

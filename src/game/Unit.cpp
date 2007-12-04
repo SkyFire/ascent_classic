@@ -524,8 +524,8 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32 dmg,uint32 abs)
 {
 	++m_procCounter;
-	bool can_delete = !bProcInUse;
-	bProcInUse = true;
+	bool can_delete = !bProcInUse; //if this is a nested proc then we should have this set to TRUE by the father proc
+	bProcInUse = true; //locking the proc list
 
 	std::list<uint32> remove;
 	std::list<struct ProcTriggerSpell>::iterator itr,itr2;
@@ -1273,7 +1273,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 	}
 
 	m_chargeSpellsInUse=false;
-	if(can_delete)
+	if(can_delete) //are we the upper level of nested procs ? If yes then we can remove the lock
 		bProcInUse = false;
 }
 

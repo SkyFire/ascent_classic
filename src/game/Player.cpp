@@ -3248,6 +3248,8 @@ void Player::RemoveFromWorld()
 void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 {
 	ASSERT(item);
+	if(slot>=INVENTORY_SLOT_ITEM_START)
+		return; //just make sure we do not apply stats for items placed in our bag
 	ItemPrototype *proto = item->GetProto();
 
 	//fast check to skip mod applying if the item doesnt meat the requirements.
