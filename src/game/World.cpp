@@ -1299,6 +1299,12 @@ bool World::SetInitialWorldSettings()
 		//warlock - Seed of Corruption
 		if(sp->NameHash == 0xFD712ED2)
 			sp->SpellGroupType |= 65536; 
+		//warlock - Curse of Shadow
+		if(sp->NameHash == 0xCB139720)
+			sp->SpellGroupType |= 131072; 
+		//warlock - curse of the elements
+		if(sp->NameHash == 0xA5FA5930)
+			sp->SpellGroupType |= 2097152; 
 /*		else if(strstr(nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if(strstr(nametext, "Blinding Powder"))
@@ -2593,6 +2599,17 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	}
+
+	//warlock: Malediction
+	sp  = dbcSpell.LookupEntry(32477);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=131072 | 2097152;
+	sp  = dbcSpell.LookupEntry(32483);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=131072 | 2097152;
+	sp  = dbcSpell.LookupEntry(32484);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=131072 | 2097152;
 
 	//warlock: Improved Searing Pain
 	sp  = dbcSpell.LookupEntry(17927);

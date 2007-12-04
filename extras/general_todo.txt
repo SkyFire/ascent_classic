@@ -154,6 +154,7 @@ Zack - test my shit :
 - warlock: Improved Searing Pain 17930
 - warlock: Nightfall 18095
 - warlock: Contagion 30064
+- warlock: Malediction 32484
 
 ==========================================================================
 Capt - test my shit :
