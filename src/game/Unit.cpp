@@ -1277,19 +1277,20 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 		bProcInUse = false;
 }
 
-void Unit::HandleProcDmgShield(uint32 flag, Unit* victim)
+//damage shield is a triggered spell by owner to atacker
+void Unit::HandleProcDmgShield(uint32 flag, Unit* attacker)
 {
 	//make sure we do not loop dmg procs
-	if(this==victim || !victim)
+	if(this==attacker || !attacker)
 		return;
-	if(victim->m_damgeShieldsInUse)
+	if(m_damgeShieldsInUse)
 		return;
-	victim->m_damgeShieldsInUse = true;
+	m_damgeShieldsInUse = true;
 	//charges are already removed in handleproc
 	WorldPacket data(24);
 	std::list<DamageProc>::iterator i;
 	std::list<DamageProc>::iterator i2;
-	for(i = victim->m_damageShields.begin();i != victim->m_damageShields.end();)     // Deal Damage to Attacker
+	for(i = m_damageShields.begin();i != m_damageShields.end();)     // Deal Damage to Attacker
 	{
 		i2 = i++; //we should not proc on proc.. not get here again.. not needed.Better safe then sorry.
 		if(	(flag & (*i2).m_flags) )
@@ -1297,22 +1298,22 @@ void Unit::HandleProcDmgShield(uint32 flag, Unit* victim)
 			if(PROC_MISC & (*i2).m_flags)
 			{
 				data.Initialize(SMSG_SPELLDAMAGESHIELD);
-				data << victim->GetGUID();
 				data << this->GetGUID();
+				data << attacker->GetGUID();
 				data << (*i2).m_damage;
 				data << (*i2).m_school;
 				SendMessageToSet(&data,true);
-				victim->DealDamage(this,(*i2).m_damage,0,0,(*i2).m_spellId);
+				this->DealDamage(attacker,(*i2).m_damage,0,0,(*i2).m_spellId);
 			}
 			else
 			{
 				SpellEntry	*ability=dbcSpell.LookupEntry((*i2).m_spellId);
 //				victim->Strike(this,(*i2).m_school,ability,0,0,(*i2).m_damage, true);
-				victim->Strike(this,RANGED,ability,0,0,(*i2).m_damage, true,false);
+				this->Strike(attacker,RANGED,ability,0,0,(*i2).m_damage, true,false);
 			}
 		}
 	}
-	victim->m_damgeShieldsInUse = false;
+	m_damgeShieldsInUse = false;
 }
 
 /*
@@ -1666,6 +1667,14 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	if(ability && ability->SpellGroupType)
 	{
 		SM_FFValue(SM_FResist,&hitchance,ability->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		int spell_pct_modifers=0;
+		SM_FIValue(SM_FDamageBonus,&spell_flat_modifers,ability->SpellGroupType);
+		SM_FIValue(SM_PDamageBonus,&spell_pct_modifers,ability->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!spell resist mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,hitchance,ability->SpellGroupType);
+#endif
 	}
 	//==========================================================================================
 	//==============================One Roll Processing=========================================
@@ -2067,6 +2076,14 @@ else
 			{	
 				SM_FIValue(((Unit*)this)->SM_FDamageBonus,&dmg.full_damage,ability->SpellGroupType);
 				SM_PIValue(((Unit*)this)->SM_PDamageBonus,&dmg.full_damage,ability->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+				int spell_flat_modifers=0;
+				int spell_pct_modifers=0;
+				SM_FIValue(((Unit*)this)->SM_FDamageBonus,&spell_flat_modifers,ability->SpellGroupType);
+				SM_FIValue(((Unit*)this)->SM_PDamageBonus,&spell_pct_modifers,ability->SpellGroupType);
+				if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+					printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg.full_damage,ability->SpellGroupType);
+#endif
 			}
 			dmg.full_damage += pVictim->DamageTakenMod[0]+add_damage;
 			if (damage_type==RANGED)
@@ -2461,7 +2478,7 @@ else
 	{
 		if(pVictim->GetPowerType() == POWER_TYPE_RAGE 
 //			&& !ability //zack : general opinion is that spells should generate rage. I share the feeling
-			&& pVictim != this
+//			&& pVictim != this //why in the hack would we strike ourselfs
 			)
 		{
 		  // It only regens rage if in combat, don't know why but this is making
@@ -3116,6 +3133,84 @@ void Unit::castSpell( Spell * pSpell )
 
 	m_currentSpell = pSpell;
 	pLastSpell = pSpell->m_spellInfo;
+}
+
+int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg)
+{
+	int32 plus_damage = 0;
+	Unit *caster=this;
+
+	if(caster->IsPlayer())
+	{
+		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneByInt[spellInfo->School] * float(caster->GetUInt32Value(UNIT_FIELD_STAT3)));
+		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneBySpr[spellInfo->School] * float(caster->GetUInt32Value(UNIT_FIELD_STAT4)));
+	}
+//------------------------------by school---------------------------------------------------
+	plus_damage += caster->GetDamageDoneMod(spellInfo->School);
+	plus_damage += pVictim->DamageTakenMod[spellInfo->School];
+//------------------------------by victim type----------------------------------------------
+	if(((Creature*)pVictim)->GetCreatureName() && caster->IsPlayer()&& !pVictim->IsPlayer())
+		plus_damage += static_cast<Player*>(caster)->IncreaseDamageByType[((Creature*)pVictim)->GetCreatureName()->Type];
+//==========================================================================================
+//==============================+Spell Damage Bonus Modifications===========================
+//==========================================================================================
+//------------------------------by cast duration--------------------------------------------
+	SpellCastTime *sd = dbcSpellCastTime.LookupEntry(spellInfo->CastingTimeIndex);
+	float castaff = float(GetCastTime(sd));
+	if(castaff < 1500) castaff = 1500;
+	else
+		if(castaff > 7000) castaff = 7000;
+
+	float dmgdoneaffectperc = castaff / 3500;
+//------------------------------by downranking----------------------------------------------
+	//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
+	float td = float(GetDuration(dbcSpellDuration.LookupEntry(spellInfo->DurationIndex)));
+	if (spellInfo->NameHash == 0x695C4940 || spellInfo->NameHash == 0x3DD5C872 || spellInfo->NameHash == 0xddaf1ac7 || spellInfo->NameHash == 0xCB75E5D1)
+		dmgdoneaffectperc *= float (1.0f - (( td / 15000.0f ) / (( td / 15000.0f ) + dmgdoneaffectperc)));
+
+	if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
+	{
+		float downrank1 = 1.0f;
+		if (spellInfo->baseLevel < 20)
+		    downrank1 = 1.0f - (20.0f - float (spellInfo->baseLevel) ) * 0.0375f;
+		float downrank2 = ( float(spellInfo->maxLevel + 5.0f) / float(static_cast<Player*>(caster)->getLevel()) );
+		if (downrank2 >= 1 || downrank2 < 0)
+		        downrank2 = 1.0f;
+		dmgdoneaffectperc *= downrank1 * downrank2;
+	}
+//==========================================================================================
+//==============================Bonus Adding To Main Damage=================================
+//==========================================================================================
+	int32 bonus_damage = float2int32(plus_damage * dmgdoneaffectperc);
+	bonus_damage +=pVictim->DamageTakenMod[spellInfo->School];
+	if(spellInfo->SpellGroupType)
+	{
+		int penalty_pct=0;
+		SM_FIValue(caster->SM_PPenalty, &penalty_pct, spellInfo->SpellGroupType);
+		bonus_damage += bonus_damage*penalty_pct/100;
+		SM_FIValue(caster->SM_FPenalty, &bonus_damage, spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		int spell_pct_modifers=0;
+		SM_FIValue(caster->SM_FPenalty,&spell_flat_modifers,spellInfo->SpellGroupType);
+		SM_FIValue(caster->SM_PPenalty,&spell_pct_modifers,spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
+#endif
+		SM_FIValue(caster->SM_FDamageBonus, &bonus_damage, spellInfo->SpellGroupType);
+		int dmg_bonus_pct=0;
+		SM_FIValue(caster->SM_PDamageBonus,&dmg_bonus_pct,spellInfo->SpellGroupType);
+		bonus_damage += base_dmg*dmg_bonus_pct;
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		spell_flat_modifers=0;
+		spell_pct_modifers=0;
+		SM_FIValue(caster->SM_FDamageBonus,&spell_flat_modifers,spellInfo->SpellGroupType);
+		SM_FIValue(caster->SM_PDamageBonus,&spell_pct_modifers,spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
+#endif
+	}
+return bonus_damage;
 }
 
 void Unit::InterruptSpell()

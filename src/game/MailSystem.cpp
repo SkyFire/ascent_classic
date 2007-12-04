@@ -70,7 +70,7 @@ WorldPacket * Mailbox::BuildMailboxListingPacket()
 		if(itr->second.expire_time && t > itr->second.expire_time)
 			continue;	   // expired mail -> skip it
 
-		if(UNIXTIME < itr->second.delivery_time)
+		if((uint32)UNIXTIME < itr->second.delivery_time)
 			continue;		// undelivered
 		
 		if(itr->second.AddMessageDataToPacket(*data))
@@ -780,7 +780,7 @@ void Mailbox::FillTimePacket(WorldPacket& data)
 
 	for(; iter != Messages.end(); ++iter)
 	{
-		if(iter->second.read_flag == 0 && UNIXTIME >= iter->second.delivery_time)
+		if(iter->second.read_flag == 0 && (uint32)UNIXTIME >= iter->second.delivery_time)
 		{
 			// unread message, w00t.
 			++c;

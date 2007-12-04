@@ -729,7 +729,7 @@ public:
 	//void SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
 	uint32 m_procCounter;
 	void HandleProc(uint32 flag, Unit* Victim, SpellEntry* CastingSpell,uint32 dmg=-1,uint32 abs=0);
-	void HandleProcDmgShield(uint32 flag, Unit* Victim);//almost the same as handleproc :P
+	void HandleProcDmgShield(uint32 flag, Unit* attacker);//almost the same as handleproc :P
 //	void HandleProcSpellOnSpell(Unit* Victim,uint32 damage,bool critical);//nasty, some spells proc other spells
 
 	int32 GetAP();
@@ -825,6 +825,9 @@ public:
 	   
 	void castSpell(Spell * pSpell);
 	void InterruptSpell();
+
+	//caller is the caster
+	int32 GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg);
    
 	Unit* create_guardian(uint32 guardian_entry,uint32 duration,float angle);//guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
 

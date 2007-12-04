@@ -2761,6 +2761,14 @@ uint8 Spell::CanCast(bool rangetolerate)
 			{
 				SM_FFValue(u_caster->SM_FRange,&maxr,m_spellInfo->SpellGroupType);
 				SM_PFValue(u_caster->SM_PRange,&maxr,m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+				int spell_flat_modifers=0;
+				int spell_pct_modifers=0;
+				SM_FIValue(u_caster->SM_FRange,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+				SM_FIValue(u_caster->SM_FRange,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+				if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+					printf("!!!!!spell range mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxr,m_spellInfo->SpellGroupType);
+#endif
 			}
 
 			if(rangetolerate)

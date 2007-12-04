@@ -77,6 +77,7 @@ SMT_RESIST_DISPEL - check if it is used
 - you gain combo point even on spell failed (backstab)
 - you should gain mining skill if the bar has been filled instead on cast action
 - some say that proc spells are not removed after they proc from items and taking items off you. Is this the same unexistatn bug as with talent unlearning ?
+- shadow trance is not removed by first shadow bolt
 
 ==========================================================================
 Zack - test my shit :
@@ -141,21 +142,7 @@ Zack - test my shit :
 - warlock: Improved Enslave Demon 18822
 - warlock: Master Conjuror 18768 - should work
 - warlock: Demonic Knowledge 35693
-- warlock: Devastation 18134
-- warlock: intensity 18136
 - warlock: Pyroclasm 18096
-- warlock - Emberstorm 17958
-- warlock - Shadow and Flame 30292
-- warlock - Suppression 18178
-- warlock - Improved Curse of Agony 18829
-- warlock - Grim Reach 18219
-- warlock: Empowered Corruption 32383
-- warlock - Shadow Mastery 18275
-- warlock: Improved Searing Pain 17930
-- warlock: Nightfall 18095
-- warlock: Contagion 30064
-- warlock: Malediction 32484
-- warriors get rage for spell damage
 - equipping items multiple times should not double the proc spell count
 
 ==========================================================================

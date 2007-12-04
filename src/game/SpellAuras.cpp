@@ -949,7 +949,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 {
 	if(apply)
 	{
-		uint32 dmg	= mod->m_amount;
+		int32 dmg	= mod->m_amount;
 		Unit *c = GetUnitCaster();
 		switch(m_spellProto->Id)
 		{
@@ -1028,10 +1028,21 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 			{
 				SM_FIValue(c->SM_FDOT,(int32*)&dmg,gr);
 				SM_PIValue(c->SM_PDOT,(int32*)&dmg,gr);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+				int spell_flat_modifers=0;
+				int spell_pct_modifers=0;
+				SM_FIValue(c->SM_FDamageBonus,&spell_flat_modifers,gr);
+				SM_FIValue(c->SM_PDamageBonus,&spell_pct_modifers,gr);
+				if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+					printf("!!!!!spell periodic dmg mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg,gr);
+#endif
 			}
 		}
 
-		sEventMgr.AddEvent(this, &Aura::EventPeriodicDamage,dmg, 
+		if(dmg<=0)
+			return; //who would want a neagtive dmg here ?
+
+		sEventMgr.AddEvent(this, &Aura::EventPeriodicDamage,(uint32)dmg, 
 			EVENT_AURA_PERIODIC_DAMAGE,GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
 		/*((Player*)c)->GetSession()->SystemMessage("dot will do %u damage every %u seconds (total of %u)", dmg,m_spellProto->EffectAmplitude[mod->i],(GetDuration()/m_spellProto->EffectAmplitude[mod->i])*dmg);
@@ -1077,6 +1088,8 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		{
 			c->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
 			
+/*
+			//removed whole thing, trying to make a function for all versions of it
 			float bonus_damage = (float)c->GetDamageDoneMod(school);
 			bonus_damage += float(m_target->DamageTakenMod[school]);
 			if(c->IsPlayer())
@@ -1101,7 +1114,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			}
 			else bonus = 0;
 
-			if (GetSpellProto() && GetSpellProto()->NameHash == 0xE931A943)  //static damage for Ignite. Need to be reowrked when "static DoTs" will be implemented
+			if (GetSpellProto() && GetSpellProto()->NameHash == 0xE931A943)  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
 				bonus=0;
 			res += bonus;
 			
@@ -1111,6 +1124,28 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				SM_FIValue(c->SM_FPenalty, &shit, m_spellProto->SpellGroupType);
 				res += shit;
 			}
+			*/
+
+			float bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount);
+
+			int amp = m_spellProto->EffectAmplitude[mod->i];
+			if(!amp) 
+				amp=	((EventableObject*)this)->event_GetEventPeriod(EVENT_AURA_PERIODIC_DAMAGE);
+
+			if(GetDuration())
+			{
+				float ticks= float((amp) ? GetDuration()/amp : 0);
+				float fbonus = float(bonus);
+				fbonus += (ticks) ? bonus_damage/ticks : 0;
+				fbonus *= float(GetDuration()) / 15000.0f;
+				bonus = float2int32(fbonus);
+			}
+			else bonus = 0;
+
+			if (GetSpellProto() && GetSpellProto()->NameHash == 0xE931A943)  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
+				bonus=0;
+
+			res += bonus;
 
 			if(res < 0)
 				res = 0;
