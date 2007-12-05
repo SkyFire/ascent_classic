@@ -3435,8 +3435,9 @@ exit:
 
 		SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
 		SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-		//it seems there is no Flat value only pct values for this mod. Maybe later ? Right now it is intended for testing
-		SM_FIValue(u_caster->SM_PDOT,&spell_pct_modifers2,m_spellInfo->SpellGroupType);
+
+		SM_FIValue(u_caster->SM_PEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 
 		//now get mods from unit target. These are rare to find talents
 		if(target)
@@ -3451,8 +3452,8 @@ exit:
 		}
 
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-if(spell_flat_modifers!=0 || spell_pct_modifers!=0 || spell_pct_modifers2!=0)
-	printf("!!!!spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0 || spell_pct_modifers2!=0)
+			printf("!!!!spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
 #endif
 		value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
 

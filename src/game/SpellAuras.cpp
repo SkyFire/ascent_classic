@@ -1088,46 +1088,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		{
 			c->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
 			
-/*
-			//removed whole thing, trying to make a function for all versions of it
-			float bonus_damage = (float)c->GetDamageDoneMod(school);
-			bonus_damage += float(m_target->DamageTakenMod[school]);
-			if(c->IsPlayer())
-			{
-				bonus_damage += static_cast<Player*>(c)->SpellDmgDoneByInt[school] * c->GetUInt32Value(UNIT_FIELD_STAT3);
-				bonus_damage += static_cast<Player*>(c)->SpellDmgDoneBySpr[school] * c->GetUInt32Value(UNIT_FIELD_STAT4);
-			}
-
-			//THIS IS NOT FUCKING DMG BONUS PER TICK BUT OVERALL BONUS TO SPELL!
-			//get amt per tick
-			int amp = m_spellProto->EffectAmplitude[mod->i];
-			if(!amp) 
-				amp=	((EventableObject*)this)->event_GetEventPeriod(EVENT_AURA_PERIODIC_DAMAGE);
-
-			if(GetDuration())
-			{
-				float ticks= float((amp) ? GetDuration()/amp : 0);
-				float fbonus = float(bonus);
-				fbonus += (ticks) ? bonus_damage/ticks : 0;
-				fbonus *= float(GetDuration()) / 15000.0f;
-				bonus = float2int32(fbonus);
-			}
-			else bonus = 0;
-
-			if (GetSpellProto() && GetSpellProto()->NameHash == 0xE931A943)  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
-				bonus=0;
-			res += bonus;
-			
-			if(m_spellProto->SpellGroupType)
-			{
-				int32 shit=0;
-				SM_FIValue(c->SM_FPenalty, &shit, m_spellProto->SpellGroupType);
-				res += shit;
-			}
-			*/
-
 			float bonus_damage;
-			
 
 			int amp = m_spellProto->EffectAmplitude[mod->i];
 			if(!amp) 
@@ -1136,9 +1097,8 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			if(GetDuration())
 			{
 				if (GetSpellProto() && GetSpellProto()->NameHash == 0xE931A943)  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
-					bonus=0;
+					bonus_damage=0;
 				else bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount);
-
 				float ticks= float((amp) ? GetDuration()/amp : 0);
 				float fbonus = float(bonus);
 				fbonus += (ticks) ? bonus_damage/ticks : 0;
@@ -1153,8 +1113,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				res = 0;
 			else
 			{
-				float summaryPCTmod=0;
-//				summaryPCTmod = c->GetDamageDonePctMod(school)+ c->DamageDoneModPCT[school] + m_target->DamageTakenPctMod[school] + m_target->ModDamageTakenByMechPCT[m_spellProto->MechanicsType]-1;
+				float summaryPCTmod=1.0f;
 				if (m_target->IsPlayer()) //Resilience
 				{
 					float dmg_reduction_pct=static_cast<Player*>(m_target)->CalcRating(14)/150;
@@ -1163,7 +1122,8 @@ void Aura::EventPeriodicDamage(uint32 amount)
 					summaryPCTmod -=dmg_reduction_pct;
 				}
 				res *= summaryPCTmod;
-				if(res < 0) res = 0;
+				if(res < 0) 
+					res = 0;
 			}
 		}
 
@@ -4177,12 +4137,6 @@ void Aura::SpellAuraPeriodicHealthFunnel(bool apply)
 	if(apply)
 	{
 		uint32 amt = mod->m_amount;
-		/*if(GetSpellProto()->SpellGroupType)
-		{
-			Unit*c=GetUnitCaster();
-			if(c)
-			SM_PIValue(c->SM_PEffectBonus,(int32*)&amt,GetSpellProto()->SpellGroupType);
-		}*/
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicHealthFunnel, amt,
 			EVENT_AURA_PERIODIC_HEALTH_FUNNEL, GetSpellProto()->EffectAmplitude[mod->i], 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
@@ -4217,12 +4171,6 @@ void Aura::SpellAuraPeriodicManaLeech(bool apply)
 	if(apply)
 	{
 		uint32 amt=mod->m_amount;
-		/*if(GetSpellProto()->SpellGroupType)
-		{
-			Unit*c=GetUnitCaster();
-			if(c)
-			SM_PIValue(c->SM_PEffectBonus,(int32*)&amt,GetSpellProto()->SpellGroupType);
-		}*/
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicManaLeech,amt,
 			EVENT_AURA_PERIODIC_LEECH,	 GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
