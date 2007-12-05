@@ -2123,13 +2123,6 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			res = 0;
 		else
 		{
-//------------------------------by school----------------------------------------------
-			float summaryPCTmod = caster->GetDamageDonePctMod(school);
-			summaryPCTmod += pVictim->DamageTakenPctMod[school]-1;
-			if (caster->DamageDoneModPCT[school])
-				summaryPCTmod += caster->DamageDoneModPCT[school];
-			summaryPCTmod += pVictim->ModDamageTakenByMechPCT[spellInfo->MechanicsType]-1;
-			res *= summaryPCTmod;
 
 //------------------------------critical strike chance--------------------------------------	
 			float CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerSpellCritChanceMod[school];

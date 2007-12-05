@@ -35,14 +35,9 @@ SMT_RESIST_DISPEL - check if it is used
 
 ==========================================================================
 ! BUGS !
-- group quest does not share quest loot.
-- sometimes items are not created client side, making them invisible. A logout fixes it though it is not a good solution. Maybe createpackets can't be mixed ?
-- sometimes mount is removed only visually and not the aura itself. (sitting chairs...)
 - creatures keep yelling no content messgs
-- some kill quest does not give kill revard to whole group ?
 - some teleportation spells have target_type 17 and they will not generate a target to be teleported. Right now there is a special if for this in spell.cpp (ugly)
 - some minable things give the : item is beeing used error. There should be a timeout for this
-- when i cross trigger 197 in fargodeep mine it will alter my orientation
 - fear, slowes you down forever
 - getrandomplayer,getmosthated not woking ?
 - why do we need enslavecount ?

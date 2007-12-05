@@ -3127,15 +3127,16 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 {
 	int32 plus_damage = 0;
 	Unit *caster=this;
+	uint32 school=spellInfo->School;
 
 	if(caster->IsPlayer())
 	{
-		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneByInt[spellInfo->School] * float(caster->GetUInt32Value(UNIT_FIELD_STAT3)));
-		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneBySpr[spellInfo->School] * float(caster->GetUInt32Value(UNIT_FIELD_STAT4)));
+		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneByInt[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT3)));
+		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneBySpr[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT4)));
 	}
 //------------------------------by school---------------------------------------------------
-	plus_damage += caster->GetDamageDoneMod(spellInfo->School);
-	plus_damage += pVictim->DamageTakenMod[spellInfo->School];
+	plus_damage += caster->GetDamageDoneMod(school);
+	plus_damage += pVictim->DamageTakenMod[school];
 //------------------------------by victim type----------------------------------------------
 	if(((Creature*)pVictim)->GetCreatureName() && caster->IsPlayer()&& !pVictim->IsPlayer())
 		plus_damage += static_cast<Player*>(caster)->IncreaseDamageByType[((Creature*)pVictim)->GetCreatureName()->Type];
@@ -3170,7 +3171,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 //==============================Bonus Adding To Main Damage=================================
 //==========================================================================================
 	int32 bonus_damage = float2int32(plus_damage * dmgdoneaffectperc);
-	bonus_damage +=pVictim->DamageTakenMod[spellInfo->School];
+	bonus_damage +=pVictim->DamageTakenMod[school];
 	if(spellInfo->SpellGroupType)
 	{
 		int penalty_pct=0;
@@ -3188,7 +3189,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 		SM_FIValue(caster->SM_FDamageBonus, &bonus_damage, spellInfo->SpellGroupType);
 		int dmg_bonus_pct=0;
 		SM_FIValue(caster->SM_PDamageBonus,&dmg_bonus_pct,spellInfo->SpellGroupType);
-		bonus_damage += base_dmg*dmg_bonus_pct;
+		bonus_damage += bonus_damage*dmg_bonus_pct;
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		spell_flat_modifers=0;
 		spell_pct_modifers=0;
@@ -3198,7 +3199,14 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 			printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus_damage,spellInfo->SpellGroupType);
 #endif
 	}
-return bonus_damage;
+//------------------------------by school----------------------------------------------
+	float summaryPCTmod = caster->GetDamageDonePctMod(school);
+	summaryPCTmod += pVictim->DamageTakenPctMod[school]-1;
+	if (caster->DamageDoneModPCT[school])
+		summaryPCTmod += caster->DamageDoneModPCT[school];
+	summaryPCTmod += pVictim->ModDamageTakenByMechPCT[spellInfo->MechanicsType]-1;
+	int32 res = (base_dmg+bonus_damage)*summaryPCTmod;
+return res;
 }
 
 void Unit::InterruptSpell()
