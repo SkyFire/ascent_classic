@@ -2254,20 +2254,26 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (srcslot*2), 0 );
 	}
 
-    bool noreapply=( srcslot < EQUIPMENT_SLOT_END &&  dstslot < EQUIPMENT_SLOT_END);//just move inside inv, no equip/unequip
+
+	//applying the item stats
+	if(srcslot < INVENTORY_SLOT_BAG_END && dstslot >= INVENTORY_SLOT_BAG_END) //src item was equiped and we are removing it to backpack or something
+	{
+		if(m_pItems[(int)srcslot])		
+			m_pOwner->ApplyItemMods(m_pItems[(int)srcslot], dstslot, true);
+		if(m_pItems[(int)dstslot])		
+			m_pOwner->ApplyItemMods(m_pItems[(int)dstslot], srcslot, false);
+	}
+	else if(srcslot >= INVENTORY_SLOT_BAG_END && dstslot < INVENTORY_SLOT_BAG_END) //item was not equiped but we are quiping it now
+	{
+		if(m_pItems[(int)srcslot])		
+			m_pOwner->ApplyItemMods(m_pItems[(int)srcslot], dstslot, false);
+		if(m_pItems[(int)dstslot])		
+			m_pOwner->ApplyItemMods(m_pItems[(int)dstslot], srcslot, true);
+	}
+
 
 	if(srcslot < INVENTORY_SLOT_BAG_END)	// source item is equiped
 	{
-		// remove mods from original item
-	    if(!noreapply)
-		{
-			if(m_pItems[(int)dstslot])		// Remove mods from the old item in this slot.
-				m_pOwner->ApplyItemMods(m_pItems[(int)dstslot], srcslot, false);
-
-			if(m_pItems[(int)srcslot])		// Apply mods from the new item into this slot
-				m_pOwner->ApplyItemMods(m_pItems[(int)srcslot], dstslot, true);
-		}
-
 		if(m_pItems[(int)srcslot]) // dstitem goes into here.
 		{
 			// Bags aren't considered "visible".
@@ -2310,15 +2316,8 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 
 	if(dstslot < INVENTORY_SLOT_BAG_END)   // source item is inside inventory
 	{
-		// remove mods from original item
-		 if(m_pItems[(int)srcslot])		// Remove mods from the old item in this slot.
-			 m_pOwner->ApplyItemMods(m_pItems[(int)srcslot], srcslot, false);
-
 		if(m_pItems[(int)dstslot]) // srcitem goes into here.
-		{
-			// Apply mods from the new item into this slot
-			m_pOwner->ApplyItemMods(m_pItems[(int)dstslot], dstslot, true);
-			
+		{	
 			// Bags aren't considered "visible".
 			if(dstslot < EQUIPMENT_SLOT_END)
 			{

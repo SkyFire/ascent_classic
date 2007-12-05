@@ -3358,7 +3358,7 @@ exit:
 		if(i==0 && u_caster)
 			value = (value*u_caster->GetAP())/100;
 	}
-	}else if(m_spellInfo->NameHash == 0x93C04185)//rake
+	else if(m_spellInfo->NameHash == 0x93C04185)//rake
 	{
 		//Rake the target for ${$AP/100+$m1} bleed damage and an additional ${$m2*3+$AP*0.06} damage over $d.
 		if(u_caster) 
