@@ -1153,7 +1153,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				res = 0;
 			else
 			{
-				float summaryPCTmod;
+				float summaryPCTmod=0;
 //				summaryPCTmod = c->GetDamageDonePctMod(school)+ c->DamageDoneModPCT[school] + m_target->DamageTakenPctMod[school] + m_target->ModDamageTakenByMechPCT[m_spellProto->MechanicsType]-1;
 				if (m_target->IsPlayer()) //Resilience
 				{

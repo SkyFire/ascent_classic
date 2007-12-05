@@ -116,6 +116,7 @@ Zack - test my shit :
 - warlock: Demonic Knowledge 35693
 - warlock: Pyroclasm 18096
 - equipping items multiple times should not double the proc spell count
+- hunter - Expose Weakness 34503
 
 ==========================================================================
 Capt - test my shit :

@@ -848,6 +848,8 @@ bool World::SetInitialWorldSettings()
 					//dirty code for procs, if any1 got any better idea-> u are welcome
 					//139944 --- some magic number, it will trigger on all hits etc
 						//for seems to be smth like custom check
+					if(strstr(desc,"your ranged criticals"))
+						pr|=PROC_ON_RANGED_CRIT_ATTACK;
 					if(strstr(desc,"chance on hit"))
 						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc,"takes damage"))

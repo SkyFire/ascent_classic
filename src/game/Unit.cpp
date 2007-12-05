@@ -2206,6 +2206,11 @@ else
 					pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
 					vproc |= PROC_ON_CRIT_HIT_VICTIM;
 					aproc |= PROC_ON_CRIT_ATTACK;
+					if(damage_type == RANGED)
+					{
+						vproc |= PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
+						aproc |= PROC_ON_RANGED_CRIT_ATTACK;
+					}
 
 					if(this->IsPlayer())
 					{
@@ -3205,7 +3210,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	if (caster->DamageDoneModPCT[school])
 		summaryPCTmod += caster->DamageDoneModPCT[school];
 	summaryPCTmod += pVictim->ModDamageTakenByMechPCT[spellInfo->MechanicsType]-1;
-	int32 res = (base_dmg+bonus_damage)*summaryPCTmod;
+	int32 res = (int32)((base_dmg+bonus_damage)*summaryPCTmod);
 return res;
 }
 
