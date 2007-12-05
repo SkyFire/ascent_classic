@@ -3358,11 +3358,6 @@ exit:
 		if(i==0 && u_caster)
 			value = (value*u_caster->GetAP())/100;
 	}
-	else if(m_spellInfo->NameHash==0xF4D5F002)
-	{
-		//causes ${$RAP*0.2+$m1} Arcane damage." 
-		if(i==0 && u_caster)
-			value +=float2int32(u_caster->GetRAP()*0.15f);
 	}else if(m_spellInfo->NameHash == 0x93C04185)//rake
 	{
 		//Rake the target for ${$AP/100+$m1} bleed damage and an additional ${$m2*3+$AP*0.06} damage over $d.
