@@ -472,8 +472,12 @@ enum SpellTypes
 //custom stuff generated for spells that will not change in time
 enum SpellIsFlags
 {
-    SPELL_FLAG_IS_DAMAGING				= 0x00800000,
-    SPELL_FLAG_IS_HEALING				= 0x01000000,
+    SPELL_FLAG_IS_DAMAGING				= 0x00000001,
+    SPELL_FLAG_IS_HEALING				= 0x00000002,
+    SPELL_FLAG_IS_TARGETINGSTEALTHED	= 0x00000004,
+    SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE	= 0x00000008, //it started with rogue cold blood but i'm sure others will come
+    SPELL_FLAG_IS_POISON				= 0x00000010, //rogue has a few spells that can stack so can't use the spell_type enum ;)
+    SPELL_FLAG_IS_FINISHING_MOVE		= 0x00000020, //rogue has a few spells that can stack so can't use the spell_type enum ;)
 };
 
 
@@ -773,6 +777,26 @@ inline bool IsHealingSpell(SpellEntry *sp)
 		return true;
 	
     return false;
+}
+
+
+inline bool IsTargetingStealthed(SpellEntry *sp)
+{
+	if(
+		sp->EffectImplicitTargetA[0]==3 ||
+		sp->EffectImplicitTargetA[1]==3 ||
+		sp->EffectImplicitTargetA[2]==3 ||
+		sp->EffectImplicitTargetB[0]==3 ||
+		sp->EffectImplicitTargetB[1]==3 ||
+		sp->EffectImplicitTargetB[2]==3 ||
+		sp->EffectImplicitTargetA[0]==22 ||
+		sp->EffectImplicitTargetA[1]==22 ||
+		sp->EffectImplicitTargetA[2]==22 ||
+		sp->EffectImplicitTargetB[0]==22 ||
+		sp->EffectImplicitTargetB[1]==22 ||
+		sp->EffectImplicitTargetB[2]==22 )
+		return 1;
+	return 0;
 }
 
 /// Calculate the Diminishing Group. This is based on a name hash.
@@ -1182,7 +1206,8 @@ enum procFlags
     PROC_ON_CRIT_ATTACK             = 0x1000,
     PROC_ON_RANGED_ATTACK_VICTIM    = 0x2000,
     PROC_ANYTIME                    = 0x4000,
-    PROC_UNK2_DEFILLED              = 0x8000,
+//    PROC_UNK2_DEFILLED              = 0x8000,
+	PROC_ON_SPELL_LAND_VICTIM       = 0x8000,//custom flag. PROC only when spell landed on victim
     PROC_ON_CAST_SPECIFIC_SPELL     = 0x10000,
     PROC_ON_SPELL_HIT_VICTIM        = 0x20000,
     PROC_ON_SPELL_CRIT_HIT_VICTIM   = 0x40000,
@@ -1200,6 +1225,211 @@ enum procFlags
     PROC_ON_SPELL_CRIT_HIT          = 0x40000000,//added it as custom, maybe already exists in another form ?
     PROC_TAGRGET_SELF               = 0x80000000,//our custom flag to decide if proc target is self or victim
 };
+
+enum School
+{
+    SCHOOL_NORMAL = 0,
+    SCHOOL_HOLY   = 1,
+    SCHOOL_FIRE   = 2,
+    SCHOOL_NATURE = 3,
+    SCHOOL_FROST  = 4,
+    SCHOOL_SHADOW = 5,
+    SCHOOL_ARCANE = 6
+};
+
+enum SPELL_TYPE
+{
+    SPELL_TYPE_MELEE,
+    SPELL_TYPE_MAGIC,
+    SPELL_TYPE_RANGED
+};
+
+enum MECHANICS
+{
+    MECHANIC_CHARMED = 1,
+    MECHANIC_DISORIENTED, // 2
+    MECHANIC_DISARMED, // 3
+    MECHANIC_DISTRACED, // 4
+    MECHANIC_FLEEING, // 5
+    MECHANIC_CLUMSY, // 6
+    MECHANIC_ROOTED, // 7
+    MECHANIC_PACIFIED, // 8
+    MECHANIC_SILENCED, // 9
+    MECHANIC_ASLEEP, // 10
+    MECHANIC_ENSNARED, // 11
+    MECHANIC_STUNNED,
+    MECHANIC_FROZEN,
+    MECHANIC_INCAPACIPATED,
+    MECHANIC_BLEEDING,
+    MECHANIC_HEALING,
+    MECHANIC_POLYMORPHED,
+    MECHANIC_BANISHED,
+    MECHANIC_SHIELDED,
+    MECHANIC_SHACKLED,
+    MECHANIC_MOUNTED,
+    MECHANIC_SEDUCED,
+    MECHANIC_TURNED,
+    MECHANIC_HORRIFIED,
+    MECHANIC_INVULNARABLE,
+    MECHANIC_INTERRUPTED,
+    MECHANIC_DAZED
+};
+
+enum Attributes
+{
+    ATTRIBUTES_NULL								= 0x0,
+    ATTRIBUTES_UNK2								= 0x1,
+    ATTRIBUTES_UNK3								= 0x2, // related to ranged??
+    ATTRIBUTE_ON_NEXT_ATTACK					= 0x4,
+    ATTRIBUTES_UNK5								= 0x8, // not used.
+    ATTRIBUTES_UNK6								= 0x10,
+    ATTRIBUTES_UNK7								= 0x20, // Reagents
+    ATTRIBUTES_PASSIVE							= 0x40,
+    ATTRIBUTES_NO_VISUAL_AURA					= 0x80,
+    ATTRIBUTES_UNK10							= 0x100,//seems to be afflicts pet
+    ATTRIBUTES_UNK11							= 0x200, // only appears in shaman imbue weapon spells
+    ATTRIBUTES_UNK12							= 0x400,
+    ATTRIBUTES_UNK13							= 0x800,
+    ATTRIBUTES_UNUSED1							= 0x1000,
+    ATTRIBUTES_UNUSED2							= 0x2000,
+    ATTRIBUTES_UNUSED3							= 0x4000,
+    ATTRIBUTES_ONLY_OUTDOORS					= 0x8000,
+    ATTRIBUTES_UNK								= 0x10000,
+    ATTRIBUTES_REQ_STEALTH						= 0x20000,
+    ATTRIBUTES_UNK20							= 0x40000,//it's not : must be behind
+    ATTRIBUTES_UNK21							= 0x80000,
+    ATTRIBUTES_MUSTFACECASTER					= 0x100000,//may be wrong
+    ATTRIBUTES_UNK23							= 0x200000,
+    ATTRIBUTES_UNK24							= 0x400000,
+    ATTRIBUTES_UNK25							= 0x800000,
+    ATTRIBUTES_UNK26							= 0x1000000,
+    ATTRIBUTES_TRIGGER_COOLDOWN			        = 0x2000000, //also requires atributes ex = 32 ?
+    ATTRIBUTES_UNK28							= 0x4000000,
+    ATTRIBUTES_UNK29							= 0x8000000,
+    ATTRIBUTES_REQ_OOC							= 0x10000000, //     ATTRIBUTES_REQ_OUT_OF_COMBAT
+    ATTRIBUTES_UNK31							= 0x20000000,
+    ATTRIBUTES_UNK32							= 0x40000000,
+    ATTRIBUTES_UNUSED9							= 0x80000000,
+};
+
+enum AttributesEx
+{
+    ATTRIBUTESEX_NULL                         = 0x0,
+    ATTRIBUTESEX_UNK2                         = 0x1,
+    ATTRIBUTEEX_DRAIN_WHOLE_MANA              = 0x2,
+    ATTRIBUTESEX_UNK4                         = 0x4,
+    ATTRIBUTESEX_UNK5                         = 0x8,
+    ATTRIBUTESEX_UNK6                         = 0x10,
+    ATTRIBUTESEX_DELAY_SOME_TRIGGERS          = 0x20,
+    ATTRIBUTESEX_UNK8                         = 0x40,
+    ATTRIBUTESEX_UNK9                         = 0x80,
+    ATTRIBUTESEX_UNK10                        = 0x100,
+    ATTRIBUTESEX_UNK11                        = 0x200,
+    ATTRIBUTESEX_UNK12                        = 0x400,
+    ATTRIBUTESEX_UNK13                        = 0x800,
+    ATTRIBUTESEX_UNK14                        = 0x1000, // related to pickpocket
+    ATTRIBUTESEX_UNK15                        = 0x2000, // related to remote control
+    ATTRIBUTESEX_UNK16                        = 0x4000,
+    ATTRIBUTESEX_UNK17                        = 0x8000,
+    ATTRIBUTESEX_UNK18                        = 0x10000, 
+    ATTRIBUTESEX_REMAIN_OOC                   = 0x20000,
+    ATTRIBUTESEX_UNK20                        = 0x40000,
+    ATTRIBUTESEX_UNK21                        = 0x80000,
+    ATTRIBUTESEX_UNK22                        = 0x100000, // related to "Finishing move" and "Instantly overpowers"
+    ATTRIBUTESEX_UNK23                        = 0x200000,
+    ATTRIBUTESEX_UNK24                        = 0x400000, // only related to "Finishing move"
+    ATTRIBUTESEX_UNK25                        = 0x800000, // related to spells like "ClearAllBuffs"
+    ATTRIBUTESEX_UNK26                        = 0x1000000, // FISHING SPELLS
+    ATTRIBUTESEX_UNK27                        = 0x2000000, // related to "Detect" spell
+    ATTRIBUTESEX_UNK28                        = 0x4000000,
+    ATTRIBUTESEX_UNK29                        = 0x8000000,
+    ATTRIBUTESEX_UNK30                        = 0x10000000,
+    ATTRIBUTESEX_UNK31                        = 0x20000000,
+    ATTRIBUTESEX_UNK32                        = 0x40000000, // Overpower
+};
+
+typedef enum {
+   EFF_TARGET_NONE										= 0,
+   EFF_TARGET_SELF										= 1,
+   EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS		= 3,
+   EFF_TARGET_PET										= 5,
+   EFF_TARGET_SINGLE_ENEMY								= 6,
+   EFF_TARGET_SCRIPTED_TARGET							= 7,
+   EFF_TARGET_ALL_TARGETABLE_AROUND_LOCATION_IN_RADIUS  = 8,
+   EFF_TARGET_HEARTSTONE_LOCATION						= 9,
+   EFF_TARGET_ALL_ENEMY_IN_AREA							= 15,
+   EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT					= 16,
+   EFF_TARGET_TELEPORT_LOCATION							= 17,
+   EFF_TARGET_LOCATION_TO_SUMMON						= 18,
+   EFF_TARGET_ALL_PARTY_AROUND_CASTER					= 20,
+   EFF_TARGET_SINGLE_FRIEND								= 21,
+   EFF_TARGET_ALL_ENEMIES_AROUND_CASTER					= 22,
+   EFF_TARGET_GAMEOBJECT								= 23,
+   EFF_TARGET_IN_FRONT_OF_CASTER						= 24,
+   EFF_TARGET_DUEL										= 25,//Dont know the real name!!!
+   EFF_TARGET_GAMEOBJECT_ITEM							= 26,
+   EFF_TARGET_PET_MASTER								= 27,
+   EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED				= 28,
+   EFF_TARGET_ALL_PARTY_IN_AREA_CHANNELED				= 29,
+   EFF_TARGET_ALL_FRIENDLY_IN_AREA						= 30,
+   EFF_TARGET_ALL_TARGETABLE_AROUND_LOCATION_IN_RADIUS_OVER_TIME	= 31,
+   EFF_TARGET_MINION									= 32,
+   EFF_TARGET_ALL_PARTY_IN_AREA							= 33,
+   EFF_TARGET_SINGLE_PARTY								= 35,
+   EFF_TARGET_PET_SUMMON_LOCATION						= 36,
+   EFF_TARGET_ALL_PARTY									= 37,
+   EFF_TARGET_SCRIPTED_OR_SINGLE_TARGET					= 38,
+   EFF_TARGET_SELF_FISHING								= 39,
+   EFF_TARGET_SCRIPTED_GAMEOBJECT						= 40,
+   EFF_TARGET_TOTEM_EARTH								= 41,
+   EFF_TARGET_TOTEM_WATER								= 42,
+   EFF_TARGET_TOTEM_AIR									= 43,
+   EFF_TARGET_TOTEM_FIRE								= 44,
+   EFF_TARGET_CHAIN										= 45,
+   EFF_TARGET_SCIPTED_OBJECT_LOCATION					= 46,
+   EFF_TARGET_DYNAMIC_OBJECT							= 47,//not sure exactly where is used
+   EFF_TARGET_MULTIPLE_SUMMON_LOCATION					= 48,
+   EFF_TARGET_MULTIPLE_SUMMON_PET_LOCATION				= 49,
+   EFF_TARGET_SUMMON_LOCATION							= 50,
+   EFF_TARGET_CALIRI_EGS								= 51,
+   EFF_TARGET_LOCATION_NEAR_CASTER						= 52,
+   EFF_TARGET_CURRENT_SELECTION							= 53,
+   EFF_TARGET_TARGET_AT_ORIENTATION_TO_CASTER			= 54,
+   EFF_TARGET_LOCATION_INFRONT_CASTER					= 55,
+   EFF_TARGET_PARTY_MEMBER								= 57,
+   EFF_TARGET_TARGET_FOR_VISUAL_EFFECT					= 59,
+   EFF_TARGET_SCRIPTED_TARGET2							= 60,
+   EFF_TARGET_AREAEFFECT_PARTY_AND_CLASS				= 61,
+   EFF_TARGET_PRIEST_CHAMPION							= 62, //wtf ?
+   EFF_TARGET_NATURE_SUMMON_LOCATION					= 63, 
+   EFF_TARGET_BEHIND_TARGET_LOCATION					= 65, 
+   EFF_TARGET_MULTIPLE_GUARDIAN_SUMMON_LOCATION			= 72,
+   EFF_TARGET_NETHETDRAKE_SUMMON_LOCATION				= 73,
+   EFF_TARGET_SCRIPTED_LOCATION							= 74,
+   EFF_TARGET_LOCATION_INFRONT_CASTER_AT_RANGE			= 75,
+   EFF_TARGET_ENEMYS_IN_ARE_CHANNELED_WITH_EXCEPTIONS	= 76,
+   EFF_TARGET_SELECTED_ENEMY_CHANNELED					= 77,
+   EFF_TARGET_SELECTED_ENEMY_DEADLY_POISON				= 86,
+} SpellEffectTarget;
+
+enum DISPEL_TYPE
+{
+    DISPEL_ZGTRINKETS = -1,
+    DISPEL_NULL,
+    DISPEL_MAGIC,
+    DISPEL_CURSE,
+    DISPEL_DISEASE,
+    DISPEL_POISON,
+    DISPEL_STEALTH,
+    DISPEL_INVISIBILTY,
+    DISPEL_ALL,
+    DISPEL_SPECIAL_NPCONLY,
+    DISPEL_FRENZY,
+};
+
+#define SPELL_RANGED_GENERAL    3018
+#define SPELL_RANGED_THROW      2764
+#define SPELL_RANGED_WAND       5019
 
 //wooohooo, there are 19 spells that actually require to add a proccounter for these 
 //first spell catched is "presence of mind"

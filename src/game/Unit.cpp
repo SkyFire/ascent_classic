@@ -2286,18 +2286,6 @@ else
 	}
 //--------------------------dirty fixes-----------------------------------------------------
 	//vstate=1-wound,2-dodge,3-parry,4-interrupt,5-block,6-evade,7-immune,8-deflect	
-/*	// hack fix for stormstike loop here.
-	if(damage_type != DUALWIELD && !disable_proc)
-    {
-		if( !(ability && ability->NameHash == 0x2535ed19) )
-		{
-			this->HandleProc(aproc,pVictim, ability,realdamage,abs); //maybe using dmg.resisted_damage is better sometimes but then if using godmode dmg is resisted instead of absorbed....bad
-			m_procCounter = 0;
-		}
-
-		pVictim->HandleProc(vproc,this, ability,realdamage,abs);
-		m_procCounter = 0;
-	}*/
 	// the above code was remade it for reasons : damage shield needs moslty same flags as handleproc + dual wield should proc too ?
 	if(!disable_proc)
     {

@@ -669,7 +669,8 @@ bool World::SetInitialWorldSettings()
 					teachspell = sp->EffectTriggerSpell[2];
 				if(teachspell)
 				{
-					SpellEntry *spellInfo = dbcSpell.LookupEntry(teachspell );
+					SpellEntry *spellInfo;
+					spellInfo = dbcSpell.LookupEntry(teachspell);
 					spellInfo->spellLevel = new_level;
 					sp->spellLevel = new_level;
 				}
@@ -2529,18 +2530,18 @@ bool World::SetInitialWorldSettings()
 		sp->SpellGroupType |= 8192; //some of them do have the flags but i's hard to write down those some from 130 spells
 
 	//warlock: Demonic Aegis
-	sp  = dbcSpell.LookupEntry(30143);
+	sp = dbcSpell.LookupEntry(30143);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4096;
-	sp  = dbcSpell.LookupEntry(30144);
+	sp = dbcSpell.LookupEntry(30144);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4096;
-	sp  = dbcSpell.LookupEntry(30145);
+	sp = dbcSpell.LookupEntry(30145);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4096;
 
 	//warlock: Nightfall
-	sp  = dbcSpell.LookupEntry(18094);
+	sp = dbcSpell.LookupEntry(18094);
 	if (sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
@@ -2548,7 +2549,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags=PROC_ON_CAST_SPELL;
 		sp->procChance = 2;
 	}
-	sp  = dbcSpell.LookupEntry(18095);
+	sp = dbcSpell.LookupEntry(18095);
 	if (sp)
 	{
 		sp->EffectApplyAuraName[0] = 42;
@@ -2558,35 +2559,35 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//warlock: Contagion
-	sp  = dbcSpell.LookupEntry(30060);
+	sp = dbcSpell.LookupEntry(30060);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	}
-	sp  = dbcSpell.LookupEntry(30061);
+	sp = dbcSpell.LookupEntry(30061);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	}
-	sp  = dbcSpell.LookupEntry(30062);
+	sp = dbcSpell.LookupEntry(30062);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	}
-	sp  = dbcSpell.LookupEntry(30063);
+	sp = dbcSpell.LookupEntry(30063);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	}
-	sp  = dbcSpell.LookupEntry(30064);
+	sp = dbcSpell.LookupEntry(30064);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
@@ -2595,41 +2596,41 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//warlock: Malediction
-	sp  = dbcSpell.LookupEntry(32477);
+	sp = dbcSpell.LookupEntry(32477);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=131072 | 2097152;
-	sp  = dbcSpell.LookupEntry(32483);
+	sp = dbcSpell.LookupEntry(32483);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=131072 | 2097152;
-	sp  = dbcSpell.LookupEntry(32484);
+	sp = dbcSpell.LookupEntry(32484);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=131072 | 2097152;
 
 	//warlock: Improved Searing Pain
-	sp  = dbcSpell.LookupEntry(17927);
+	sp = dbcSpell.LookupEntry(17927);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=256;
-	sp  = dbcSpell.LookupEntry(17929);
+	sp = dbcSpell.LookupEntry(17929);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=256;
-	sp  = dbcSpell.LookupEntry(17930);
+	sp = dbcSpell.LookupEntry(17930);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=256;
 
 	//warlock: Empowered Corruption
-	sp  = dbcSpell.LookupEntry(32381);
+	sp = dbcSpell.LookupEntry(32381);
 	if (sp)
 	{
 		sp->EffectBasePoints[0] *= 6;
 		sp->EffectSpellGroupRelation[0]=2;
 	}
-	sp  = dbcSpell.LookupEntry(32382);
+	sp = dbcSpell.LookupEntry(32382);
 	if (sp)
 	{
 		sp->EffectBasePoints[0] *= 6;
 		sp->EffectSpellGroupRelation[0]=2;
 	}
-	sp  = dbcSpell.LookupEntry(32383);
+	sp = dbcSpell.LookupEntry(32383);
 	if (sp)
 	{
 		sp->EffectBasePoints[0] *= 6;
@@ -2637,7 +2638,7 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//warlock: Improved Enslave Demon
-	sp  = dbcSpell.LookupEntry(18821);
+	sp = dbcSpell.LookupEntry(18821);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=2048;
@@ -2646,7 +2647,7 @@ bool World::SetInitialWorldSettings()
 //		sp->EffectSpellGroupRelation[1]=2048; //we do not handle this misc type yet anyway. Removed it just as a reminder
 		sp->EffectSpellGroupRelation[2]=2048;
 	}
-	sp  = dbcSpell.LookupEntry(18822);
+	sp = dbcSpell.LookupEntry(18822);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=2048;
@@ -2655,19 +2656,19 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//warlock: Devastation
-	sp  = dbcSpell.LookupEntry(18130);
+	sp = dbcSpell.LookupEntry(18130);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spells
-	sp  = dbcSpell.LookupEntry(18131);
+	sp = dbcSpell.LookupEntry(18131);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512;
-	sp  = dbcSpell.LookupEntry(18132);
+	sp = dbcSpell.LookupEntry(18132);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512;
-	sp  = dbcSpell.LookupEntry(18133);
+	sp = dbcSpell.LookupEntry(18133);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512;
-	sp  = dbcSpell.LookupEntry(18134);
+	sp = dbcSpell.LookupEntry(18134);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=4 | 1 | 64 | 256 | 32 | 128 | 512;
 
@@ -2724,7 +2725,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
 
 	//mage: Arcane Power
-	sp  = dbcSpell.LookupEntry(12042);
+	sp = dbcSpell.LookupEntry(12042);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[1]=1 | 8192 | 4194304 | 8388608 | 262144 | 131072 | 536870912 | 524352 | 4 | 4096 | 2 | 2048 | 16;
@@ -2772,31 +2773,31 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//mage: Fire Power
-	sp  = dbcSpell.LookupEntry(11124);
+	sp = dbcSpell.LookupEntry(11124);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
-	sp  = dbcSpell.LookupEntry(12398);
+	sp = dbcSpell.LookupEntry(12398);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
-	sp  = dbcSpell.LookupEntry(12399);
+	sp = dbcSpell.LookupEntry(12399);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
-	sp  = dbcSpell.LookupEntry(12400);
+	sp = dbcSpell.LookupEntry(12400);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 		sp->EffectSpellGroupRelation[1]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 	}
-	sp  = dbcSpell.LookupEntry(12378);
+	sp = dbcSpell.LookupEntry(12378);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
@@ -2804,61 +2805,61 @@ bool World::SetInitialWorldSettings()
 	}
 	
 	//mage - Burning Soul
-	sp  = dbcSpell.LookupEntry(11083);
+	sp = dbcSpell.LookupEntry(11083);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
-	sp  = dbcSpell.LookupEntry(12351);
+	sp = dbcSpell.LookupEntry(12351);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
 
 	//mage - Combustion
-	sp  = dbcSpell.LookupEntry(28682);
+	sp = dbcSpell.LookupEntry(28682);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=8388608 | 16 | 2 | 4 | 4194304 | 1;
 
 	//mage - Empowered Fireball
-	sp  = dbcSpell.LookupEntry(31656);
+	sp = dbcSpell.LookupEntry(31656);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
-	sp  = dbcSpell.LookupEntry(31657);
+	sp = dbcSpell.LookupEntry(31657);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
-	sp  = dbcSpell.LookupEntry(31658);
+	sp = dbcSpell.LookupEntry(31658);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
-	sp  = dbcSpell.LookupEntry(31659);
+	sp = dbcSpell.LookupEntry(31659);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
-	sp  = dbcSpell.LookupEntry(31660);
+	sp = dbcSpell.LookupEntry(31660);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
 
 	//mage - Empowered Frostbolt
-	sp  = dbcSpell.LookupEntry(31682);
+	sp = dbcSpell.LookupEntry(31682);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=32;
 		sp->EffectSpellGroupRelation[1]=32;
 	}
-	sp  = dbcSpell.LookupEntry(31683);
+	sp = dbcSpell.LookupEntry(31683);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=32;
 		sp->EffectSpellGroupRelation[1]=32;
 	}
-	sp  = dbcSpell.LookupEntry(31684);
+	sp = dbcSpell.LookupEntry(31684);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=32;
 		sp->EffectSpellGroupRelation[1]=32;
 	}
-	sp  = dbcSpell.LookupEntry(31685);
+	sp = dbcSpell.LookupEntry(31685);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=32;
 		sp->EffectSpellGroupRelation[1]=32;
 	}
-	sp  = dbcSpell.LookupEntry(31686);
+	sp = dbcSpell.LookupEntry(31686);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=32;
@@ -2866,21 +2867,21 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//mage - Master of Elements
-	sp  = dbcSpell.LookupEntry(29074);
+	sp = dbcSpell.LookupEntry(29074);
 	if (sp)
 	{
 		sp->EffectApplyAuraName[0]=42;
 		sp->EffectTriggerSpell[0] = 29077;
 		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
 	}
-	sp  = dbcSpell.LookupEntry(29075);
+	sp = dbcSpell.LookupEntry(29075);
 	if (sp)
 	{
 		sp->EffectApplyAuraName[0]=42;
 		sp->EffectTriggerSpell[0] = 29077;
 		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
 	}
-	sp  = dbcSpell.LookupEntry(29076);
+	sp = dbcSpell.LookupEntry(29076);
 	if (sp)
 	{
 		sp->EffectApplyAuraName[0]=42;
@@ -3660,17 +3661,17 @@ bool World::SetInitialWorldSettings()
 
 	//fix for Predatory Strikes
 	uint32 mm=(1<<(FORM_BEAR-1))|(1<<(FORM_DIREBEAR-1))|(1<<(FORM_MOONKIN-1))|(1<<(FORM_CAT-1));
-	dbcSpell.LookupEntry(16972)->RequiredShapeShift = mm;
-	dbcSpell.LookupEntry(16974)->RequiredShapeShift = mm;
-	dbcSpell.LookupEntry(16975)->RequiredShapeShift = mm;
-	dbcSpell.LookupEntry(20134)->procChance = 50;
+	sp = dbcSpell.LookupEntry(16972); if(sp)sp->RequiredShapeShift = mm;
+	sp = dbcSpell.LookupEntry(16974); if(sp)sp->RequiredShapeShift = mm;
+	sp = dbcSpell.LookupEntry(16975); if(sp)sp->RequiredShapeShift = mm;
+	sp = dbcSpell.LookupEntry(20134); if(sp)sp->procChance = 50;
 
 	/* aspect of the pack - change to AA */
-	dbcSpell.LookupEntry(13159)->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
-	dbcSpell.LookupEntry(13159)->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
+	sp = dbcSpell.LookupEntry(13159); if(sp)sp->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
+	sp = dbcSpell.LookupEntry(13159); if(sp)sp->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
 	
 	/* shadowstep - change proc flags */
-	dbcSpell.LookupEntry(36563)->procFlags = 0;
+	sp = dbcSpell.LookupEntry(36563)->procFlags = 0;
 
 	/* thrown - add a 1.6 second cooldown */
 	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL,SPELL_RANGED_THROW,SPELL_RANGED_WAND, 26679, 27084, 29436, 37074, 41182, 41346, 0};

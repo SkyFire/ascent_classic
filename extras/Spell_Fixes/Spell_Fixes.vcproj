@@ -129,7 +129,7 @@
 				RelativePath="..\..\src\shared\Database\dbcfile.h">
 			</File>
 			<File
-				RelativePath="..\..\dep\lib\debug\libmySQL.lib">
+				RelativePath="..\..\dep\lib32\libmySQL.lib">
 			</File>
 		</Filter>
 	</Files>
