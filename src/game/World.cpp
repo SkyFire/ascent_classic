@@ -3671,7 +3671,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(13159); if(sp)sp->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
 	
 	/* shadowstep - change proc flags */
-	sp = dbcSpell.LookupEntry(36563)->procFlags = 0;
+	sp = dbcSpell.LookupEntry(36563); if(sp)sp->procFlags = 0;
 
 	/* thrown - add a 1.6 second cooldown */
 	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL,SPELL_RANGED_THROW,SPELL_RANGED_WAND, 26679, 27084, 29436, 37074, 41182, 41346, 0};

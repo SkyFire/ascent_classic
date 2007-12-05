@@ -2115,7 +2115,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	{
 		Unit* caster = (Unit*)(this);
 		caster->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
-		res += caster->GetSpellDmgBonus(pVictim,spellInfo,res);
+		res += caster->GetSpellDmgBonus(pVictim,spellInfo,(int)res);
 //==========================================================================================
 //==============================Post +SpellDamage Bonus Modifications=======================
 //==========================================================================================
@@ -2128,7 +2128,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			summaryPCTmod += pVictim->DamageTakenPctMod[school]-1;
 			if (caster->DamageDoneModPCT[school])
 				summaryPCTmod += caster->DamageDoneModPCT[school];
-			summaryPCTmod += pVictim->ModDamageTakenByMechPCT[m_spellProto->MechanicsType]-1
+			summaryPCTmod += pVictim->ModDamageTakenByMechPCT[spellInfo->MechanicsType]-1;
 			res *= summaryPCTmod;
 
 //------------------------------critical strike chance--------------------------------------	
