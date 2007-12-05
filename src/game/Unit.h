@@ -481,7 +481,7 @@ enum UnitFieldFlags // UNIT_FIELD_FLAGS #46 - these are client flags
 	UNIT_FLAG_PACIFIED                   = 0x00020000, // 18      131072
 	UNIT_FLAG_STUNNED                    = 0x00040000, // 19      262144
 	UNIT_FLAG_COMBAT                     = 0x00080000, // 20      524288  sets combat flag
-	UNIT_FLAG_MOUNT_SIT                  = 0x00100000, // 21     1048576  mounted or sitting (forces sit if not mounted)
+	UNIT_FLAG_MOUNTED_TAXI               = 0x00100000, // 21     1048576  mounted on a taxi
 	UNIT_FLAG_DISARMED                   = 0x00200000, // 22     2097152
 	UNIT_FLAG_CONFUSED                   = 0x00400000, // 23     4194304
 	UNIT_FLAG_FLEEING                    = 0x00800000, // 24     8388608  fear

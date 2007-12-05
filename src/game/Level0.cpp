@@ -306,9 +306,11 @@ bool ChatHandler::HandleNYICommand(const char* args, WorldSession *m_session)
 bool ChatHandler::HandleDismountCommand(const char* args, WorldSession *m_session)
 {
 	Unit *m_target = NULL;
-	Player *m_plyr = getSelectedChar(m_session, false);
-	if(m_plyr)
-		m_target = m_plyr;
+
+	Player *p_target = getSelectedChar(m_session, false);
+
+	if(p_target)
+		m_target = p_target;
 	else
 	{
 		Creature *m_crt = getSelectedCreature(m_session, false);
@@ -328,8 +330,11 @@ bool ChatHandler::HandleDismountCommand(const char* args, WorldSession *m_sessio
 		return true;
 	}
 
+	if(p_target && p_target->m_MountSpellId)
+		p_target->RemoveAura(p_target->m_MountSpellId);
+
 	m_target->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0);
-	m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
+	//m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 
 	BlueSystemMessage(m_session, "Now unmounted.");
 	return true;

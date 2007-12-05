@@ -892,10 +892,8 @@ void Player::EventDismount(uint32 money, float x, float y, float z)
 	UnSetTaxiPos();
 	m_taxi_ride_time = 0;
 
-	//uint32 modelid = GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID);
-
 	SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID , 0);
-	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 	SetPlayerSpeed(RUN, m_runSpeed);
@@ -5748,9 +5746,8 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 	}
 	
 	SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID, modelid );
-	
+	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
-	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
 
 	SetTaxiPath(path);
 	SetTaxiPos();
@@ -5866,8 +5863,7 @@ void Player::JumpToEndTaxiNode(TaxiPath * path)
 	m_taxi_ride_time = 0;
 
 	SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID , 0);
-	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
-
+	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 	SetPlayerSpeed(RUN, m_runSpeed);

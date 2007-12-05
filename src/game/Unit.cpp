@@ -3969,7 +3969,7 @@ void Unit::DropAurasOnDeath()
 
 void Unit::UpdateSpeed(bool delay /* = false */)
 {
-	if(!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT))
+	if(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID) == 0)
 	{
 		if(IsPlayer())
 			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_speedModifier)/100.0f);

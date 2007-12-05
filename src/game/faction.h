@@ -131,19 +131,10 @@ inline bool isAttackable(Object* objA, Object* objB, bool CheckStealth = true)//
 			return false;
 
 	// Checks for untouchable, unattackable
-	if(objA->IsUnit())
-	{
-		if(objA->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9))
-			return false;
-		if(objA->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-			return false;
-	}
-	if(objB->IsUnit())
-	{
-		if(objB->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9))
-			return false;
-		if(objB->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-			return false;
+	if(objA->IsUnit() && objA->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9 | UNIT_FLAG_MOUNTED_TAXI | UNIT_FLAG_NOT_SELECTABLE))
+		return false;
+	if(objB->IsUnit() && objB->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9 | UNIT_FLAG_MOUNTED_TAXI | UNIT_FLAG_NOT_SELECTABLE))
+		return false;
 
 		/// added by Zack : 
         /// we cannot attack sheathed units. Maybe checked in other places too ?

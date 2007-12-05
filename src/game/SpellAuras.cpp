@@ -3203,10 +3203,10 @@ void Aura::SpellAuraModIncreaseEnergy(bool apply)
 
 void Aura::SpellAuraModShapeshift(bool apply)
 {
-	if(!m_target->IsPlayer())
-		return;
-	if(static_cast<Player*>(m_target)->m_MountSpellId)
-		m_target->RemoveAura(static_cast<Player*>(m_target)->m_MountSpellId);//these spells are not compatible
+	if(!p_target) return;
+
+	if(p_target->m_MountSpellId)
+		m_target->RemoveAura(p_target->m_MountSpellId); // these spells are not compatible
 
 	uint32 spellId = 0;
 	uint32 modelId = 0;
@@ -3881,8 +3881,9 @@ void Aura::SpellAuraTransform(bool apply)
 	CreatureInfo* ci = CreatureNameStorage.LookupEntry(mod->m_miscValue);
 	if(ci)
 		displayId = ci->Male_DisplayID;
-	if(m_target->IsPlayer() &&  static_cast<Player*>(m_target)->m_MountSpellId)
-		m_target->RemoveAura(static_cast<Player*>(m_target)->m_MountSpellId);
+
+	if(p_target && p_target->m_MountSpellId)
+		m_target->RemoveAura(p_target->m_MountSpellId);
 	
    // SetPositive();
 	switch(GetSpellProto()->Id)
@@ -4539,8 +4540,7 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 
 void Aura::SpellAuraMounted(bool apply)
 {
-	if(!m_target->IsPlayer())
-		return;
+	if(!p_target) return;
 
 	if(m_target->IsStealth())
 	{
@@ -4549,36 +4549,35 @@ void Aura::SpellAuraMounted(bool apply)
 		m_target->RemoveAura(id);
 	}
 
-	Player * plr = static_cast<Player*>(m_target);
 	if(apply)
 	{   
-		//plr->AdvanceSkillLine(762); // advance riding skill
-		if(plr->m_bg)
-			plr->m_bg->HookOnMount(plr);
-
-		if(((Player*)m_target)->m_MountSpellId)
-			m_target->RemoveAura(((Player*)m_target)->m_MountSpellId);
-		((Player*)m_target)->m_MountSpellId=m_spellProto->Id;
- 
 		SetPositive();
+
+		//p_target->AdvanceSkillLine(762); // advance riding skill
+
+		if(p_target->m_bg)
+			p_target->m_bg->HookOnMount(p_target);
+
+		if(p_target->m_MountSpellId)
+			m_target->RemoveAura(p_target->m_MountSpellId);
+
 		m_target->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_MOUNT);
+
 		CreatureInfo* ci = CreatureNameStorage.LookupEntry(mod->m_miscValue);
-		if(!ci)
-			return;
+		if(!ci) return;
+
 		uint32 displayId = ci->Male_DisplayID;
-		if(displayId != 0)
-		{
-			m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
-			m_target->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , displayId);
-		}
+		if(!displayId) return;
+
+		p_target->m_MountSpellId = m_spellProto->Id;
+		m_target->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , displayId);
+		//m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 	}
 	else
 	{
-		((Player*)m_target)->m_MountSpellId=0;
-
+		p_target->m_MountSpellId = 0;
 		m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
-		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
-		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
+		//m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 	}
 }
 

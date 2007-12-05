@@ -2541,15 +2541,15 @@ uint8 Spell::CanCast(bool rangetolerate)
 				if(p_caster->m_onTaxi)
 					return (uint8)SPELL_FAILED_NOT_ON_TAXI;
 
+				if(p_caster->IsMounted())
+					return (uint8)SPELL_FAILED_NOT_MOUNTED;
+
 				if(m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOUNTED ||
 					m_spellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOUNTED ||
 					m_spellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOUNTED)
 				{
 					if(p_caster->m_CurrentTransporter)
 						return (uint8)SPELL_FAILED_NOT_ON_TRANSPORT;
-
-					if(p_caster->IsMounted())
-						return (uint8)SPELL_FAILED_NOT_MOUNTED;
 				}
 
 				if(m_spellInfo->Id == SPELL_RANGED_THROW)

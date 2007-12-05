@@ -1791,7 +1791,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			pVictim->SetUInt32Value(PLAYER_SELF_RES_SPELL, self_res_spell);
 
 			pVictim->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0);
-			pVictim->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT_SIT);
+			//pVictim->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 		}
 
 		// Wipe our attacker set on death
