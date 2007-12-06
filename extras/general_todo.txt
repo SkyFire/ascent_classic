@@ -117,6 +117,7 @@ Zack - test my shit :
 - warlock: Pyroclasm 18096
 - hunter - Expose Weakness 34503
 - hunter - arcane shot 14287
+- warrior - Booming Voice 12838
 
 ==========================================================================
 Capt - test my shit :

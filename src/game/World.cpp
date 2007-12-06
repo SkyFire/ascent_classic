@@ -3354,6 +3354,26 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
+	//warrior - Commanding Shout
+	sp = dbcSpell.LookupEntry(469);
+	if(sp)
+		sp->SpellGroupType = 1048576; //!! missing spell group type
+	//warrior - Booming Voice
+	sp = dbcSpell.LookupEntry(12321);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
+	sp = dbcSpell.LookupEntry(12835);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
+	sp = dbcSpell.LookupEntry(12836);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
+	sp = dbcSpell.LookupEntry(12837);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
+	sp = dbcSpell.LookupEntry(12838);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
 	// priest - Reflective Shield
 	sp = dbcSpell.LookupEntry(33201);
 	if(sp)

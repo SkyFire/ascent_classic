@@ -16,3 +16,11 @@ Explanation: It doesn`t prevent from losing rage as it should.
 the first bug - Victory Rush
 The spell is supposed to be active for 20 seconds after u kill something that gives honor and it can only be used once in those 20 seconds. The bug is that the spell can be used forever after killing someone ( meaning u can contineusly spam it) and it has no cooldown and requires no rage, does approximately 45% of attack power in dmg.
 An appropirate fix would be a disable of the spell or try to make it only useable once.
+
+2. spell reflection is not working at all now (some spells are just consumed)
+5. talent booming voice doesnt work on commanding shout
+11. Berserker rage (rage part and fear part is 'ok' but ^^) "The warrior enters a berserker rage, becoming immune to Fear and Incapacitate effects and generating extra rage when taking damage. Lasts 10 sec. So only left incapacitate effects and that means immune on every kind of stun. "Incapacitating" means it cancels the character's ability to fight so it shouldnt work for example on frost nova. I think that it was working for some time.
+Intimidating Shout
+Bug:
+If you damage target of Intimidating Shout - the one "cowering in fear" - you will fear yourself (and duration renews each time you damage "cowering in fear" target again - basic situation is having DoT on your target and fearing it - your target fear is sometimes removed after 1st DoT tick and you get 8sec fear on yourself, or DoT doesnt remove his fear and you keep getting 8sec fear each time your DoT damages your feared target).
+Enrage talent doesnt give a slightest bonus dmg. Good thing that Flurry seems to work fine.
