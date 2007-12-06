@@ -118,6 +118,7 @@ Zack - test my shit :
 - hunter - Expose Weakness 34503
 - hunter - arcane shot 14287
 - warrior - Booming Voice 12838
+- warrior - Improved Commanding Shout 38408
 
 ==========================================================================
 Capt - test my shit :

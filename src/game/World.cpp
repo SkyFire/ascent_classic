@@ -3374,6 +3374,10 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(12838);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
+	//warrior - Improved Commanding Shout
+	sp = dbcSpell.LookupEntry(38408);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1048576;
 	// priest - Reflective Shield
 	sp = dbcSpell.LookupEntry(33201);
 	if(sp)
