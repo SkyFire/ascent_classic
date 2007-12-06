@@ -11,4 +11,5 @@ In addition, gives your Frost Ward a 10n% chance to reflect Frost spells and eff
 
 there's a bug with cold snap. if u summon a water elemental, then use cold snap and summon again water elemtanal you'll have 2 elementals at the same time. please add a trigger to dismiss water elemental when casting cold snap
 
--arcane power gives more bonus to frost bolt then to fire bolt ? strange isn't it ?
+Combustion: http://www.wowwiki.com/Combustion
+The buff isn't removed by 3 fire critical strikes as it should, and this way it could be stacked to 10 charges, making every mage fire spell a critical hit until the mage dies or the effect is removed via right click (or some actually working dispell spell).

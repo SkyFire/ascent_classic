@@ -14,9 +14,6 @@ A steady shot that causes base weapon damage + X damage. Causes an additional Y 
 Formula: DamagePercentageBonus*RangedWeaponSpecialization*(150 + WeaponDamage/WeaponSpeed*2.8 + 0.2*RAP + [Dazed: 175])
 (just does the tooltip damage not taking in cosideration your base weapon damage,sometime add's the bonus dazed dmg,i thing the formula for base weapon damage could be taken from aimed shot.)
 
-Arcane Shot
-All ranks above 5 do the same damage as the rank 5.(it would be nice if at the least the damage get fixed,screw the magical effect removal)
-
 About the talents
 Ranged weapon specialisation - doesnt inc your ranged wep damage by x%
 Hawk Eye - now this one is just redicouls,super easy to fix(inc your max range)

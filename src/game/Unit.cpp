@@ -2467,22 +2467,23 @@ else
 	}
 //--------------------------rage processing-------------------------------------------------
 	uint32 val;
-	if(pVictim->IsPlayer())
+	//http://www.wowwiki.com/Formulas:Rage_generation
+	// It only regens rage if in combat, don't know why but this is making
+	// the player to regen 1 rage every 3 secs.....
+	// and the formula is wrong also ... TODO
+	//attacker made white damage
+	if(realdamage && IsPlayer() && GetPowerType() == POWER_TYPE_RAGE && !ability && CombatStatus.IsInCombat())
 	{
-		if(pVictim->GetPowerType() == POWER_TYPE_RAGE 
-//			&& !ability //zack : general opinion is that spells should generate rage. I share the feeling
-//			&& pVictim != this //why in the hack would we strike ourselfs
-			)
-		{
-		  // It only regens rage if in combat, don't know why but this is making
-		  // the player to regen 1 rage every 3 secs.....
-		  // and the formula is wrong also ... TODO
-		  if(pVictim->CombatStatus.IsInCombat()) {
-			val = pVictim->GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/pVictim->getLevel();
-			val += (static_cast<Player *>(pVictim)->rageFromDamageDealt*val)/100;
-			pVictim->SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
-		  }
-		}
+		val = GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/getLevel();
+		val += (static_cast<Player *>(this)->rageFromDamageDealt*val)/100;
+		SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
+	}
+	//victim received damage = we do not care the type of damage...we generate rage anyway
+	if(realdamage && pVictim->IsPlayer() && pVictim->GetPowerType() == POWER_TYPE_RAGE && pVictim->CombatStatus.IsInCombat())
+	{
+		val = pVictim->GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/pVictim->getLevel();
+		val += (static_cast<Player *>(pVictim)->rageFromDamageDealt*val)/100;
+		pVictim->SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
 	}
 		
 	RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
