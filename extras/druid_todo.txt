@@ -4,16 +4,24 @@ Can cast moonfire with they'r back,when they shouldn't.
 
 Skills
 
-Talents
+TALENTS
+--BAL--
+Nature's Grace: doesn't trigger a buff
+Dreamstate: not working (similar to shaman's unrelenting storm)
+Wrath of cenarius: doesn't work (like all "empowered" talents)
 Moonkin aura - change you into humanoid type and not beast ?
-Natural Shapeshifter - works but for a few seconds onlly (
-IMproved Mark of the Wild - affects only druid
+--RESTO--
+Naturalist: increases spell damage instead of melee damage
+Natural Shapeshifter - works but only until you move
+Improved Mark of the Wild - affects only druid
+Gift of Nature: doesn't work (+x% to healign spells)
+imp regrowth: doesn't work (+crit to regrowth, similar to sanctified light)
+emp touch: doesn't work (like all "empowered" talents)
+swiftmend: can never be used
+emp reju: doesn't work (like all "empowered" talents, affects reju, lifebloom and regrowth hot - but not regrowth itself)
 
 revision 1602 - win32-x86
 while in aquatic form and underwater, no breath bar is displayed(thats fine), but after a while, HP goes down, as if the breathbar reached zero.happens exactly after 60seconds
 
 Aquatic Form:
 -You drowng, just take more time than usual (like 2 mins)
-
-Thorns:
--Works fine but you lose this aura when u transform

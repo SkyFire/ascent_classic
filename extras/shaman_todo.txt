@@ -1,5 +1,5 @@
 Elemental Tree
-Elemental Fury - no effect - supposed to give a +200% crit damage on nature spells and fire totems
+Elemental Fury - no effect - supposed to give a +100% crit damage on nature spells and fire totems
 Unrelenting storm - no effect - supposed to regenerate mana equally to 2% of intellect even in combat for every point spent
 Earthbind Totem - It works vs other faction but not vs your own (fixed?), and vs mobs when it stacks with any other cripple effect a shaman has it makes the mob warp towards you at a very high speed (Usefull to control mobs still, BTW ;) )
 Purge - Works well enough, in some cases it removes things it shouldent (Palidins bubble) and on some things it doesn't work at all (Priests Divine Spirit)
@@ -10,6 +10,13 @@ Earth shield - gives only two charges and no 30% chance on ignore spell interrup
 Tremor Totem - Doesn't work
 Poison Cleansing Totem - Doesn't work
 Disease Cleansing Totem - Doesn't work
+Ancestral Healing: triggers only on self
+Healign focus: doesn't work (casting interrupt avoidance)
+Totemic Mastery: doesn't work (totems range to 40yrd, similar to aura mastery)
+Purification: doesn't work (+x% to healing spells, simiar to not working druid talent, tho priest's one works)
+Mana Tide Totem: doesn't work (even with correct spell in totem_spells table)
+imp chain heal: doesn't work (+x% heal to chain heal, similar to healing light and imp regrowth)
+Healing Way: the buff has no effect
 
 Enhancement:
 Improved Weapon Totems - Not tested.
@@ -25,6 +32,8 @@ Elemental Weapons - Not working. Please note here the triggered spells for :
 [08:51:59] Spell::cast 29932, Unit: 7
 [08:51:59] WORLD: Spell effect id = 39, damage = 1
 [08:51:59] Unhandled spell effect 39 in spell 29932.
+Mental Quickness: doesn't work (-mana cost)
+
 
 Spells:
 

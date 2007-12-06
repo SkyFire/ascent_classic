@@ -14,9 +14,47 @@ A steady shot that causes base weapon damage + X damage. Causes an additional Y 
 Formula: DamagePercentageBonus*RangedWeaponSpecialization*(150 + WeaponDamage/WeaponSpeed*2.8 + 0.2*RAP + [Dazed: 175])
 (just does the tooltip damage not taking in cosideration your base weapon damage,sometime add's the bonus dazed dmg,i thing the formula for base weapon damage could be taken from aimed shot.)
 
-About the talents
-Ranged weapon specialisation - doesnt inc your ranged wep damage by x%
-Hawk Eye - now this one is just redicouls,super easy to fix(inc your max range)
-Places the Hunter's Mark 
-Places the Hunter's Mark on the target, increasing the ranged attack power of all attackers against that target by X /<-this was working b4/ and by an additional X each time they are struck by a ranged attack, up to a maximum of X. In addition, the target of this ability can always be seen by the hunter whether it stealths or turns invisible. The target also appears on the mini-map. Lasts for 2 min.
+Arcane Shot
+Higher ranks don't dispel a magic effect
+
+TALENTS
+--BM--
+Improved Aspect of the Hawk: Triggers Quick shots, but that buff doesn't work
+Endurance Training: no effect on pet (inc hp)
+Focused Fire: increases your damage, no idea about the otehr part as kill command is never activated
+Thick Hide: no effect on pet (inc armor)
+Pathfinding: doesn't work (inc effect of AoC and AoP)
+Bustial Swiftness: doesn't work (increases pet movement speed)
+Ferocity: no effect (inc pet crit chance)
+Spirit bond: doesn't work (regen yours and pet's hp, if your pet is active)
+Animal Handler: only increases your mounted speed (inc pet hit chance)
+Ferocious Inspiration: doens't work (inc party dmg by x% after pet scores crit)
+Catlike Reflexes: only increases your dodge (inc pet's dodge)
+Serpent's Swiftness: increases only your attack speed (inc pet attack speed)
+The Beast Within: doesn't work (adds a buff for hunter onBestial Wrath)
+--MM--
+Lethal Shots: doesn't work (inc crit chance.. weird)
+Improved Hunter's Mark: doesn't work (grants also +melee ap)
+Improved Stings: Only the serpent sting part works (inc mana drained, inc dispel resists)
+Mortal Shots: doesn't work (used to work around r500... +crit damage)
+Improved Barrage: Doesn't work (inc crit, channeling interrupt avoidance)
+--SUR--
+Hawk Eye: doesn't apply on autoshot (inc range)
+Entrapment: doesn't work (chance to trigger entrapment - 19185)
+Clever Traps: doesn't work (inc duarion, damage... onyl changes tooltip)
+Surefoot: +hit works, not sure about the other part
+Killer Instinct: Increases only melee crit chance 
+Resourcefullness: doesn't work (reduces mana cost and duration)
+Thrill of the Hunt: doesn't work (returns mana cost on crit, similar to mage's Master of Elements)
+Expose Weakness: doesn't work (chance to trigger Expose Weakness - 34501, similar to hunter's mark
+Master Tactician: Increases only melee crit chance
+
+at rev 2319 also Hunter's Mark (http://www.wowwiki.com/Hunter's_Mark) stopped working:
+Places the Hunter's Mark Places the Hunter's Mark on the target, increasing the ranged attack power of all attackers against that target by X /<-this was working b4/ and by an additional X each time they are struck by a ranged attack, up to a maximum of X. In addition, the target of this ability can always be seen by the hunter whether it stealths or turns invisible. The target also appears on the mini-map. Lasts for 2 min.
 part with "n additional X each time they are struck by a ranged attack" never worked b4, would b really nice to see it working
+
+Auto shot:
+- static 30yard range (not affected by talent)
+- interrupts on movement
+
++ all what scatler said + what i posted 2 weeks ago, and this is: Arcane Shot and Steady Shot crit chance based on intellect instead of agility and 1.5x crit damage for both of those shots (instead of 2x or 2.3x with talent)

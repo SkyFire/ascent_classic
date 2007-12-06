@@ -1,14 +1,28 @@
 =====SPELLS AND ABILITIES =====
-Blessing of Protection - Doesn't work.
 Blessing of Sanctuary - Doesn't work.
-Divine protection - Doesn't work.
-Greater Blessing of Protection - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
-blessing of freedom
-resurrection sickness can be canceled by divine shield
 
 the second one - Seal of Righteousness
 The spell is supposed to do 43-60 dmg on a successful hit.
 The problem with this spell is that it takes alot more dmg from the Bonus spell damage than it should. Here is the formula that i found on blizz forums:"The coefficients for Seal of Righteousness is based on if you use a 1h or 2h. When using a 1h the formula is ((Weapons speed * 0.09) * 100) and for 2h it is ((Weapon speed * 0.11) * 100)". Meaning that with a one handed weapon the seal would get 9% of the bonus spell dmg per 1 second of weapon speed(a one handed weapon with 2 sec speed would get 18% from spell dmg) and for a 2 hander its 11% of spell damage per a second of weapon speed(meaning that with a 3 sec speed 2 handed weapon it would get 33% of the spell damage bonus.
 There are alot of palas using this seal because with a one hander it gets about 60%(even more) from spell dmg (no matter what the speed of the weapon is).
 Since i posted the formula to calculate its dmg i hope u could find a way to fix this.
+
+TALENTS:
+--HOLY--
+Healing light: doesn't work (+healing to holy light, odd)
+Aura Mastery: doesn't work (auras range to 40yrd)
+Divine Favor: doens't work (next spell 100% crit)
+sanctified light: doesn't work (+crit to holy light, odd, imp regrowth doesn't work either)
+light's grace: doesn't work (trigger 31834 : -0.5s to cast time)
+--PROT--
+reckoning: doesn't work
+Avenger's shield: stopped working :S
+Spell warding: doesn't work (-spell dmg taken)
+bless of sanctuary, holy shield, imp holy shield (not working on 2319)
+ardent defender: doesn't work (-dmg when under 35% hp)
+--RET--
+imp seal of crusader: doesn't work
+eye for an eye: doesn't work (crits return dmg)
+sanctified judgement: doesn't work (returns mana for a seal)
+sanctified crusader: doesn't work
