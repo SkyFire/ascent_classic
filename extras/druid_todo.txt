@@ -10,6 +10,11 @@ Nature's Grace: doesn't trigger a buff
 Dreamstate: not working (similar to shaman's unrelenting storm)
 Wrath of cenarius: doesn't work (like all "empowered" talents)
 Moonkin aura - change you into humanoid type and not beast ?
+--FERAL--
+Ferocity: after update at r2319 it applies only on rake and claw... before that it worked on all except mangle
+Feral Aggression: doesn't increase Ferocious Bite damage (similar to imp eviscerate)
+Primal Fury: doesn't work in bear form
+Shredding Attacks: doens't lower Lacerate cost (works on Shred)
 --RESTO--
 Naturalist: increases spell damage instead of melee damage
 Natural Shapeshifter - works but only until you move
