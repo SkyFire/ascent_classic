@@ -43,7 +43,7 @@ struct CreatureInfo
 	uint32 Id;
 	char * Name;
 	char * SubName;
-	uint8 mouseFlags;
+	char * info_str;
 	uint32 Flags1;
 	uint32 Type;
 	uint32 Family;

@@ -348,7 +348,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 		case 0xF4D5F002: //hunter - arcane shot
 			{
 				if(u_caster)
-					dmg += u_caster->GetRAP()*0.15f;
+					dmg += (uint32)(u_caster->GetRAP()*0.15f);
 			}break;
 		case 0xCBC738B8:	// Bloodthirst
 			{

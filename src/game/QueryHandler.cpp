@@ -105,7 +105,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 			data << uint8(0) << uint8(0) << uint8(0);
 			data << lcn->SubName;
 		}
-		data << ci->mouseFlags;
+		data << ci->info_str; //!!! this is a string in 2.3.0 Example: stormwind guard has : "Direction"
 		data << ci->Flags1;  
 		data << ci->Type;
 		data << ci->Family;
