@@ -40,6 +40,7 @@ ObjectMgr::ObjectMgr()
 	m_hiPlayerGuid = 0;
 	m_hiCorpseGuid = 0;
 	m_hiArenaTeamId=0;
+	m_hiGuildId=0;
 }
 
 
@@ -204,10 +205,6 @@ ObjectMgr::~ObjectMgr()
 
 	for(HM_NAMESPACE::hash_map<uint32, PlayerInfo*>::iterator itr = m_playersinfo.begin(); itr != m_playersinfo.end(); ++itr)
 	{
-		if(itr->second->publicNote)
-			free(itr->second->publicNote);
-		if(itr->second->officerNote)
-			free(itr->second->officerNote);
 		free(itr->second->name);
 		delete itr->second;
 	}
@@ -263,10 +260,13 @@ void ObjectMgr::DeletePlayerInfo( uint32 guid )
 		if(pl->m_Group)
 			pl->m_Group->RemovePlayer(pl,NULL,true);
 
-		if(pl->officerNote)
-			free(pl->officerNote);
-		if(pl->publicNote)
-			free(pl->publicNote);
+		if(pl->guild)
+		{
+			if(pl->guild->GetGuildLeader()==pl->guid)
+				pl->guild->Disband();
+			else
+				pl->guild->RemoveGuildMember(pl,NULL);
+		}
 
 		free(pl->name);
 		delete i->second;
@@ -320,7 +320,7 @@ skilllinespell* ObjectMgr::GetSpellSkill(uint32 id)
 void ObjectMgr::LoadPlayersInfo()
 {
 	PlayerInfo * pn;
-	QueryResult *result = CharacterDatabase.Query("SELECT guid,name,race,class,level,gender,zoneId,timestamp,publicNote,officerNote,guildRank,acct FROM characters");
+	QueryResult *result = CharacterDatabase.Query("SELECT guid,name,race,class,level,gender,zoneId,timestamp,acct FROM characters");
 	if(result)
 	{
 		do
@@ -335,19 +335,12 @@ void ObjectMgr::LoadPlayersInfo()
 			pn->gender = fields[5].GetUInt8();
 			pn->lastZone=fields[6].GetUInt32();
 			pn->lastOnline=fields[7].GetUInt32();
-			//pn->publicNote=fields[8].GetString();
-			//pn->officerNote= fields[9].GetString();
-			pn->publicNote=pn->officerNote=NULL;
-			if(strlen(fields[8].GetString()) > 1)
-				pn->publicNote = strdup(fields[8].GetString());
-			if(strlen(fields[9].GetString()) > 1)
-				pn->officerNote = strdup(fields[9].GetString());
-
-			pn->Rank=fields[10].GetUInt32();
-			pn->acct = fields[11].GetUInt32();
+			pn->acct = fields[8].GetUInt32();
 			pn->m_Group=0;
 			pn->subGroup=0;
 			pn->m_loggedInPlayer=NULL;
+			pn->guild=NULL;
+			pn->guildRank=NULL;
 
 			if(pn->race==RACE_HUMAN||pn->race==RACE_DWARF||pn->race==RACE_GNOME||pn->race==RACE_NIGHTELF||pn->race==RACE_DRAENEI)
 				pn->team = 0;
@@ -498,80 +491,20 @@ void ObjectMgr::LoadPlayerCreateInfo()
 void ObjectMgr::LoadGuilds()
 {
 	QueryResult *result = CharacterDatabase.Query( "SELECT * FROM guilds" );
-	QueryResult *result2;	
-	QueryResult *result3;
-
-	if(!result)
+	if(result)
 	{
-		return;
-	}
-
-	Guild *pGuild;
-	struct RankInfo rankList;
-
-	do
-	{
-		Field *fields = result->Fetch();
-
-		pGuild = new Guild;
-
-		pGuild->SetGuildId( fields[0].GetUInt32() );
-		pGuild->SetGuildName( fields[1].GetString() );
-		pGuild->SetGuildLeaderGuid(fields[2].GetUInt64() );
-		pGuild->SetGuildEmblemStyle( fields[3].GetUInt32() );
-		pGuild->SetGuildEmblemColor(fields[4].GetUInt32() );
-		pGuild->SetGuildBorderStyle( fields[5].GetUInt32() );
-		pGuild->SetGuildBorderColor( fields[6].GetUInt32() );
-		pGuild->SetGuildBackgroundColor( fields[7].GetUInt32() );
-		pGuild->SetGuildInfo( fields[8].GetString() );
-		pGuild->SetGuildMotd( fields[9].GetString() );
-
-		result2 = CharacterDatabase.Query( "SELECT guid FROM characters WHERE guildId=%u",pGuild->GetGuildId());
-		if(result2)
+		do 
 		{
-			do
+			Guild * pGuild = Guild::Create();
+			if(!pGuild->LoadFromDB(result->Fetch()))
 			{
-				PlayerInfo *pi=objmgr.GetPlayerInfo(result2->Fetch()->GetUInt32());
-				if(pi)
-				pGuild->AddGuildMember( pi );
-			}while( result2->NextRow() );
-			delete result2;
-		}
-
-		result3 = CharacterDatabase.Query("SELECT * FROM guild_ranks WHERE guildId=%u ORDER BY rankId", pGuild->GetGuildId());
-		if(result3)
-		{ 
-			do
-			{
-				Field *fields3 = result3->Fetch();
-
-				rankList.name = fields3[2].GetString();
-				rankList.rights = fields3[3].GetUInt32();
-				rankList.rights_1 = fields3[4].GetUInt32();
-				rankList.rights_2 = fields3[5].GetUInt32();
-				rankList.rights_3 = fields3[6].GetUInt32();
-				rankList.rights_4 = fields3[7].GetUInt32();
-				rankList.rights_5 = fields3[8].GetUInt32();
-				rankList.rights_6 = fields3[9].GetUInt32();
-				rankList.rights_7 = fields3[10].GetUInt32();
-				rankList.rights_8 = fields3[11].GetUInt32();
-				rankList.rights_9 = fields3[12].GetUInt32();
-				rankList.rights_10 = fields3[13].GetUInt32();
-				rankList.rights_11 = fields3[14].GetUInt32();
-				rankList.rights_12 = fields3[15].GetUInt32();
-				rankList.rights_13 = fields3[16].GetUInt32();
-
-				pGuild->CreateRank(&rankList);
-			}while( result3->NextRow() );
-			delete result3;
-		}
-		pGuild->LoadGuildCreationDate();
-
-		AddGuild(pGuild);
-
-	}while( result->NextRow() );
-
-	delete result;
+				delete pGuild;
+			}
+			else
+				mGuild.insert(make_pair(pGuild->GetGuildId(), pGuild));
+		} while(result->NextRow());
+		delete result;
+	}
 	Log.Notice("ObjectMgr", "%u guilds loaded.", mGuild.size());
 }
 
@@ -751,6 +684,13 @@ void ObjectMgr::SetHighestGuids()
 		delete result;
 	}
 
+	result = CharacterDatabase.Query("SELECT MAX(guildId) FROM guilds");
+	if(result)
+	{
+		m_hiGuildId = result->Fetch()[0].GetUInt32();
+		delete result;
+	}
+
 	Log.Notice("ObjectMgr", "HighGuid(CORPSE) = %u", m_hiCorpseGuid);
 	Log.Notice("ObjectMgr", "HighGuid(PLAYER) = %u", m_hiPlayerGuid);
 	Log.Notice("ObjectMgr", "HighGuid(GAMEOBJ) = %u", m_hiGameObjectSpawnId);
@@ -759,6 +699,7 @@ void ObjectMgr::SetHighestGuids()
 	Log.Notice("ObjectMgr", "HighGuid(CONTAINER) = %u", m_hiContainerGuid);
 	Log.Notice("ObjectMgr", "HighGuid(GROUP) = %u", m_hiGroupId);
 	Log.Notice("ObjectMgr", "HighGuid(CHARTER) = %u", m_hiCharterId);
+	Log.Notice("ObjectMgr", "HighGuid(GUILD) = %u", m_hiGuildId);
 }
 
 
@@ -1002,9 +943,8 @@ bool ObjectMgr::RemoveGuild(uint32 guildId)
 		return false;
 	}
 
-	i->second->RemoveFromDb();
-	mGuild.erase(i);
 
+	mGuild.erase(i);
 	return true;
 }
 
@@ -1021,7 +961,7 @@ Guild* ObjectMgr::GetGuildByLeaderGuid(uint64 leaderGuid)
 	GuildMap::const_iterator itr;
 	for (itr = mGuild.begin();itr != mGuild.end(); itr++)
 	{
-		if( itr->second->GetGuildLeaderGuid() == leaderGuid )
+		if( itr->second->GetGuildLeader() == leaderGuid )
 			return itr->second;
 	}
 	return NULL;

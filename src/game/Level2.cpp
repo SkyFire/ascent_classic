@@ -106,53 +106,13 @@ bool ChatHandler::CreateGuildCommand(const char* args, WorldSession *m_session)
 		}
 	}
 
-	if(objmgr.GetGuildByGuildName(args))
-	{
-		WorldPacket data(SMSG_GUILD_COMMAND_RESULT, 100);
-		data << uint32(0);
-		data << args;
-		data << uint32(C_R_GUILD_NAME_EXISTS);
-		m_session->SendPacket(&data);
-		return true;
-	}
+	Charter tempCharter(0, ptarget->GetGUIDLow(), CHARTER_TYPE_GUILD);
+	tempCharter.SignatureCount=0;
+	tempCharter.GuildName = string(args);
 
-	Guild *pGuild = new Guild;
-	uint32 guildId = pGuild->GetFreeGuildIdFromDb();
-
-	if(guildId == 0)
-	{
-		printf("Error Getting Free Guild ID");
-		delete pGuild;
-		return false;
-	}
-
-	//Guild Setup
-	pGuild->SetGuildId( guildId );
-	pGuild->SetGuildName( args );
-	pGuild->CreateRank("Guild Master", GR_RIGHT_ALL);
-	pGuild->CreateRank("Officer", GR_RIGHT_ALL);
-	pGuild->CreateRank("Veteran", GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);  
-	pGuild->CreateRank("Member", GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
-	pGuild->CreateRank("Initiate", GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
-	pGuild->SetGuildEmblemStyle( 0xFFFF );
-	pGuild->SetGuildEmblemColor( 0xFFFF );
-	pGuild->SetGuildBorderStyle( 0xFFFF );
-	pGuild->SetGuildBorderColor( 0xFFFF );
-	pGuild->SetGuildBackgroundColor( 0xFFFF );
-
-	objmgr.AddGuild(pGuild);
-
-	//Guild Leader Setup
-	ptarget->SetGuildId( pGuild->GetGuildId() );
-	ptarget->SetUInt32Value(PLAYER_GUILDID, pGuild->GetGuildId() );
-	ptarget->SetGuildRank(GUILDRANK_GUILD_MASTER);
-	ptarget->SetUInt32Value(PLAYER_GUILDRANK,GUILDRANK_GUILD_MASTER);
-	pGuild->SetGuildLeaderGuid( ptarget->GetGUID() );
-	pGuild->AddNewGuildMember( ptarget );
-
-	pGuild->SaveToDb();
-	pGuild->SaveRanksToDb();
-
+	Guild * pGuild = Guild::Create();
+	pGuild->CreateFromCharter(&tempCharter, ptarget->GetSession());
+	SystemMessage(m_session, "Guild created");
 	return true;
 }
 

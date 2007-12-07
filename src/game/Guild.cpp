@@ -19,680 +19,1046 @@
 
 #include "StdAfx.h"
 
+static const char * NULLMSG = "";
+Guild::Guild()
+{
+	m_commandLogging=true;
+	m_guildId=0;
+	m_guildLeader=0;
+	m_guildName="Goose";
+	m_guildInfo=NULL;
+	m_motd=NULL;
+	m_backgroundColor=0;
+	m_emblemColor=0;
+	m_emblemStyle=0;
+	m_borderColor=0;
+	m_borderStyle=0;
+	m_creationTimeStamp=0;
+	creationDay=creationMonth=creationYear=0;
+}
+
 Guild::~Guild()
 {
-	std::list<RankInfo*>::iterator itr = m_rankList.begin();
-	for(; itr != m_rankList.end(); ++itr)
+	for(GuildMemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+	{
+		if(itr->second->szOfficerNote)
+			free((void*)itr->second->szOfficerNote);
+		if(itr->second->szPublicNote)
+			free((void*)itr->second->szPublicNote);
+		delete itr->second;
+	}
+
+	for(GuildRankVector::iterator itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
+	{
+		if((*itr) != NULL)
+		{
+			free((*itr)->szRankName);
+			delete (*itr);
+		}
+	}
+
+	for(GuildLogList::iterator itr = m_log.begin(); itr != m_log.end(); ++itr)
+	{
 		delete (*itr);
-	m_rankList.clear();
+	}
 }
-void Guild::SendMessageToGuild(uint64 ExcludePlayer, WorldPacket *data, uint8 Type)
+
+void Guild::SendGuildCommandResult(WorldSession * pClient, uint32 iCmd, const char * szMsg, uint32 iType)
 {
-	std::list<PlayerInfo*>::iterator i;
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i)
+	WorldPacket data(SMSG_GUILD_COMMAND_RESULT, 100);
+	data << iCmd << szMsg << iType;
+	pClient->SendPacket(&data);
+}
+
+GuildRank * Guild::FindLowestRank()
+{
+	GuildRank * r= NULL;
+	for(GuildRankVector::iterator itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
 	{
-		if(Type == G_MSGTYPE_ALLBUTONE)
+		if((*itr) != NULL)
 		{
-			if((*i)->guid == ExcludePlayer)
-				continue;
+			if((*itr)->iId != 0 && (!r || (*itr)->iId > r->iId))
+				r = *itr;
 		}
+	}
 
-		Player *pMember = objmgr.GetPlayer( (*i)->guid);
-		if (!pMember || !pMember->IsInWorld() || !pMember->GetSession())
-			continue;
+	return r;
+}
 
-		uint32 MemberRank = pMember->GetGuildRank();
-		if(Type == G_MSGTYPE_OFFICERCHAT)
+GuildRank * Guild::FindHighestRank()
+{
+	GuildRank * r= NULL;
+	for(GuildRankVector::iterator itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
+	{
+		if((*itr) != NULL)
 		{
-			if(!HasRankRight(MemberRank,GR_RIGHT_OFFCHATLISTEN))
-				continue;
+			if((*itr)->iId != 0 && (!r || (*itr)->iId < r->iId))
+				r = *itr;
 		}
-		else if(Type == G_MSGTYPE_PUBLICCHAT)
+	}
+
+	return r;
+}
+
+GuildRank * Guild::FindNextLowestRank(GuildRank * r)
+{
+	GuildRank * rr= r;
+	for(GuildRankVector::iterator itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
+	{
+		if((*itr) != NULL)
 		{
-			if(!HasRankRight(MemberRank,GR_RIGHT_GCHATLISTEN))
-				continue;
+			if((*itr)->iId != 0 && ((*itr)->iId > rr->iId))
+				rr = *itr;
 		}
-		pMember->GetSession()->SendPacket(data);
 	}
+	if(rr=r)
+		rr=NULL;
+
+	return rr;
 }
 
-void Guild::GuildMemberLogoff(Player *pMember)
+
+bool GuildRank::CanPerformCommand(uint32 t)
 {
-	//set offline info
-	std::list<PlayerInfo*>::iterator i;
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
+	return ((iRights & t) >0 ? true : false);
+}
+
+void Guild::LogGuildEvent(uint8 iEvent, uint8 iStringCount, ...)
+{
+	if(!m_commandLogging)
+		return;
+
+	va_list ap;
+	char * strs[4] = {NULL,NULL,NULL,NULL};
+
+	va_start(ap, iStringCount);
+	ASSERT(iStringCount <= 4);
+
+	WorldPacket data(SMSG_GUILD_EVENT, 100);
+	uint32 i;
+	data << iEvent;
+	data << iStringCount;
+
+	for(i = 0; i < iStringCount; ++i)
 	{
-		if ((*i)->guid == pMember->GetGUID())
+		strs[i] = va_arg(ap, char*);
+		data << strs[i];
+	}
+
+	va_end(ap);
+	SendPacket(&data);
+}
+
+void Guild::AddGuildLogEntry(uint8 iEvent, uint8 iParamCount, ...)
+{
+	if(!m_commandLogging)
+		return;
+
+	va_list ap;
+	uint32 i;
+	GuildLogEvent * ev;
+
+	va_start(ap, iParamCount);
+	ASSERT(iParamCount<=3);
+
+	ev = new GuildLogEvent;
+	ev->iLogId = GenerateGuildLogEventId();
+	ev->iEvent = iEvent;
+	ev->iTimeStamp = (uint32)UNIXTIME;
+
+	for(i = 0; i < iParamCount; ++i)
+		ev->iEventData[i] = va_arg(ap, uint32);
+
+	for(; i < 3; ++i)
+		ev->iEventData[i] = 0;
+
+	CharacterDatabase.Execute("INSERT INTO guild_logs VALUES(%u, %u, %u, %u, %u, %u, %u)",
+		m_guildId, ev->iLogId, ev->iTimeStamp, ev->iEvent, ev->iEventData[0], ev->iEventData[1], ev->iEventData[2]);
+
+	m_lock.Acquire();
+	if(m_log.size() >= 250)
+	{
+		// limit it to 250 events.
+		// delete the first (oldest) event.
+		CharacterDatabase.Execute("DELETE FROM guild_logs WHERE log_id = %u AND guildid = %u", (*(m_log.begin()))->iLogId, m_guildId);
+		delete *(m_log.begin());
+		m_log.pop_front();
+	}
+
+	m_log.push_back(ev);
+	m_lock.Release();
+}
+
+void Guild::SendPacket(WorldPacket * data)
+{
+	m_lock.Acquire();
+	for(GuildMemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+	{
+		if(itr->first->m_loggedInPlayer != NULL && itr->first->m_loggedInPlayer->GetSession())
+			itr->first->m_loggedInPlayer->GetSession()->SendPacket(data);
+	}
+	m_lock.Release();
+}
+
+GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions)
+{
+	// find a free id
+	m_lock.Acquire();
+	for(uint32 i = 0; i < MAX_GUILD_RANKS; ++i)
+	{
+		if(m_ranks[i] == NULL)
 		{
-			(*i)->lastLevel = pMember->getLevel();
-			(*i)->lastZone = pMember->GetZoneId();
-			(*i)->Rank = pMember->GetGuildRank();
-			(*i)->lastOnline = UNIXTIME;
-			return;
+			GuildRank * r = new GuildRank;
+			r->iId = i;
+			r->iRights=iPermissions;
+			memset(r->iExtraRights, 0, sizeof(uint32)*13);
+			r->szRankName = strdup(szRankName);
+			m_ranks[i] = r;
+			m_lock.Release();
+
+			// save the rank into the database
+			CharacterDatabase.Execute("INSERT INTO guild_ranks (guildId, rankId, rankName, rankRights) VALUES(%u, %u, \"%s\", %u)",
+				m_guildId, r->iId, CharacterDatabase.EscapeString(string(r->szRankName)).c_str(), r->iRights);
+
+			return r;
 		}
 	}
-}
-
-void Guild::AddNewGuildMember(Player *plyr)
-{
-	PlayerInfo *gMember=objmgr.GetPlayerInfo(plyr->GetGUIDLow());
-	gMember->Rank = plyr->GetGuildRank();
-	gMember->lastLevel =plyr->getLevel();
-	gMember->lastZone =plyr->GetZoneId();
-	gMember->publicNote = NULL;
-	gMember->officerNote = NULL;
-	gMember->lastOnline = UNIXTIME;
-
-	AddGuildMember(gMember);
-	sHookInterface.OnGuildJoin(plyr, this);
-}
-
-bool Guild::DeleteGuildMember(uint64 guid)
-{
-	std::list<PlayerInfo*>::iterator i;
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
-	{
-		if ((*i)->guid == guid)
-		{
-			m_guildMembers.erase(i);
-
-			CharacterDatabase.Execute("UPDATE characters SET guildid=0,guildRank=0 WHERE guid=%u AND guildid=%u",GUID_LOPART(guid), m_guildId);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Guild::DeleteGuildMember(string name)
-{
-	std::list<PlayerInfo*>::iterator i;
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
-	{
-		if (!strcmp((*i)->name, name.c_str()))
-		{
-			m_guildMembers.erase(i);
-			CharacterDatabase.Execute("UPDATE characters SET guildid=0,guildRank=0 WHERE name='%s' AND guildid=%u",CharacterDatabase.EscapeString(name).c_str(), m_guildId);
-			return true;
-		}
-	}
-	return false;
-}
-
-void Guild::DeleteGuildMembers()
-{
-	Player *plyr;
-	std::list<PlayerInfo*>::iterator i;
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();) 
-	{
-		plyr = objmgr.GetPlayer( (*i)->guid );
-		if(plyr)
-		{
-			plyr->SetGuildId(0);
-			plyr->SetGuildRank(0);
-		}
-	
-		i++;
-	}
-	m_guildMembers.clear();
-}
-
-PlayerInfo* Guild::GetGuildMember(uint64 guid)
-{
-	std::list<PlayerInfo*>::iterator i;
-
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
-	{
-		if ((*i)->guid== guid)
-		{
-			return *i;
-		}
-	}
-	return false;
-}
-
-PlayerInfo* Guild::GetGuildMember(std::string name)
-{
-	std::list<PlayerInfo*>::iterator i;
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
-	{
-		if((*i)->name == name)
-			return *i;
-	}
-	return false;
-}
-
-void Guild::FillGuildRosterData(WorldPacket *data)
-{
-	Player *pMember;
-	std::list<PlayerInfo*>::iterator i;
-	std::list<RankInfo*>::iterator ritr;
-
-	data->Initialize(SMSG_GUILD_ROSTER);
-	*data << uint32(GetGuildMembersCount());
-	*data << m_motd;
-	*data << m_guildInfo;
-	*data << (uint32)m_rankList.size();
-	for (ritr = m_rankList.begin(); ritr != m_rankList.end();ritr++)
-	{
-		*data << (*ritr)->rights;
-		*data << (*ritr)->rights_1;
-		*data << (*ritr)->rights_2;
-		*data << (*ritr)->rights_3;
-		*data << (*ritr)->rights_4;
-		*data << (*ritr)->rights_5;
-		*data << (*ritr)->rights_6;
-		*data << (*ritr)->rights_7;
-		*data << (*ritr)->rights_8;
-		*data << (*ritr)->rights_9;
-		*data << (*ritr)->rights_10;
-		*data << (*ritr)->rights_11;
-		*data << (*ritr)->rights_12;
-		*data << (*ritr)->rights_13;
-	}
-
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end(); i++) 
-	{
-		pMember = objmgr.GetPlayer((*i)->guid);
-	
-		if (pMember && pMember->GetSession() && pMember->IsInWorld())
-		{
-			*data << pMember->GetGUID();
-			*data << (uint8)1; 
-			*data << pMember->GetName();
-			*data << pMember->GetGuildRank();
-			*data << (uint8)pMember->getLevel();
-			*data << pMember->getClass();
-			*data << pMember->GetZoneId();
-			if((*i)->publicNote)
-                *data << (*i)->publicNote;
-			else
-				*data << uint8(0);
-
-			if((*i)->officerNote)
-                *data << (*i)->officerNote;
-			else
-				*data << uint8(0);
-		}
-		else
-		{
-			*data << (*i)->guid;
-			*data << uint32(0);		// highguid
-			*data << (uint8)0; 
-			*data << (*i)->name;
-			*data << (*i)->Rank;
-			*data << (uint8)((*i)->lastLevel);
-			*data << (uint8)((*i)->cl);
-			*data << (*i)->lastZone;
-			*data << float((UNIXTIME-(*i)->lastOnline)/86400.0);
-			if((*i)->publicNote)
-                *data << (*i)->publicNote;
-			else
-				*data << uint8(0);
-
-			if((*i)->officerNote)
-				*data << (*i)->officerNote;
-			else
-				*data << uint8(0);
-		}
-	}
-}
-
-void Guild::BroadCastToGuild(WorldSession *session, std::string msg)
-{
-
-	if (session)
-	{
-		if(session->GetPlayer())
-		{	
-			uint32 MemberRank = session->GetPlayer()->GetGuildRank();
-			if(!HasRankRight(MemberRank,GR_RIGHT_GCHATSPEAK))
-				return;
-
-			WorldPacket *data;
-			if(session->GetPlayer()->m_modlanguage >=0)
-				data = sChatHandler.FillMessageData( CHAT_MSG_GUILD, session->GetPlayer()->m_modlanguage,  msg.c_str(),session->GetPlayer()->GetGUID());
-			else
-				data = sChatHandler.FillMessageData( CHAT_MSG_GUILD, LANG_UNIVERSAL, msg.c_str(),session->GetPlayer()->GetGUID());
-			SendMessageToGuild(0, data, G_MSGTYPE_PUBLICCHAT);
-			delete data;
-		}
-	}
-}
-
-void Guild::OfficerChannelChat(WorldSession *session, std::string msg)
-{
-	if (session)
-	{
-		if(session->GetPlayer())
-		{
-			uint32 MemberRank = session->GetPlayer()->GetGuildRank();
-			if(!HasRankRight(MemberRank,GR_RIGHT_OFFCHATSPEAK))
-				return;
-
-			WorldPacket *data;
-			if(session->GetPlayer()->m_modlanguage >=0)
-				data = sChatHandler.FillMessageData( CHAT_MSG_OFFICER, session->GetPlayer()->m_modlanguage,  msg.c_str(),session->GetPlayer()->GetGUID());
-			else
-				data = sChatHandler.FillMessageData( CHAT_MSG_OFFICER, LANG_UNIVERSAL, msg.c_str(),session->GetPlayer()->GetGUID());
-			SendMessageToGuild(0, data, G_MSGTYPE_OFFICERCHAT);
-			delete data;
-		}
-	}
-}
-
-void Guild::SetPublicNote(uint64 guid, std::string publicNote)
-{
-	std::list<PlayerInfo*>::iterator i;
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
-	{
-		if ((*i)->guid == guid)
-		{
-			if((*i)->publicNote)
-				free((*i)->publicNote);
-
-			(*i)->publicNote = strdup(publicNote.c_str());
-			break;
-		}
-	}
-}
-
-void Guild::SetOfficerNote(uint64 guid, std::string officerNote)
-{
-	std::list<PlayerInfo*>::iterator i;
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
-	{
-		if ((*i)->guid == guid)
-		{
-			if((*i)->officerNote)
-				free((*i)->officerNote);
-
-			(*i)->officerNote = strdup(officerNote.c_str());
-			break;
-		}
-	}
-}
-/*
-void Guild::UpdateTabard()
-{
-std::list<PlayerInfo*>::iterator i;
-for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i;) 
-{
-Player *pl = objmgr.GetPlayer( i->guid );
-if (pl)
-{
-uint64 TabardGuid = pl->GetUInt64Value();
-}
-}
-
-//UpdateData *data = new UpdateData;
-//data->BuildPacket()*/
-/*	CUpdateBlock block;
-char updateBuf[0x80];
-int size;
-char *ptr;
-map<string, unsigned long>::iterator i;
-for(i = Members.begin();i != Members.end();i++)
-{
-CPlayer *pPlayer = NULL;
-if(!DataManager.RetrieveObject((CWoWObject**)&pPlayer, OBJ_PLAYER, i->second))
-{
-#ifdef _DEBUG
-Debug.Log("CGuild::UpdateTabard() - Unable to retrieve an object found in the member list.");
-#endif
-continue;
-}
-
-pPlayer->Data.GuildTimestamp++;
-if(pPlayer->pClient != NULL)
-{
-block.ResetBlock(updateBuf, 0x80);
-block.AddDataUpdate(PLAYER_MAX_BITS, pPlayer->guid, PLAYERGUID_HIGH);
-block.Add(PLAYER_GUILD_TIMESTAMP, pPlayer->Data.GuildTimestamp);
-if(pPlayer->Data.Items[SLOT_TABARD] != 0)
-block.Add(PLAYER_INV_SLOTS+SLOT_TABARD*2, 0,0);
-
-ptr = block.GetCompressedData(size);
-if(size)
-{
-pPlayer->pClient->RegionOutPacket(SMSG_COMPRESSED_UPDATE_OBJECT, ptr, size);
-}
-if(pPlayer->Data.Items[SLOT_TABARD] != 0)
-{
-block.ResetBlock(updateBuf, 0x80);
-block.AddDataUpdate(PLAYER_MAX_BITS, pPlayer->guid, PLAYERGUID_HIGH);
-block.Add(PLAYER_INV_SLOTS+SLOT_TABARD*2, pPlayer->Data.Items[SLOT_TABARD], ITEMGUID_HIGH);
-ptr = block.GetCompressedData(size);
-if(size)
-{
-pPlayer->pClient->RegionOutPacket(SMSG_COMPRESSED_UPDATE_OBJECT, ptr, size);
-}
-}
-}
-}
-}
-*/
-RankInfo * Guild::CreateRank(RankInfo * s0rs)
-{
-	if(m_rankList.size() >= MAX_GUILD_RANKS)
-		return NULL;
-
-	RankInfo *newrank;
-
-	newrank = new RankInfo;
-	newrank->rankid=(uint32)m_rankList.size();
-	//memcpy(newrank,s0rs,sizeof(RankInfo));
-	newrank->name=s0rs->name;
-	newrank->rights=s0rs->rights;
-	newrank->rights_1=s0rs->rights_1;
-	newrank->rights_2=s0rs->rights_2;
-	newrank->rights_3=s0rs->rights_3;
-	newrank->rights_4=s0rs->rights_4;
-	newrank->rights_5=s0rs->rights_5;
-	newrank->rights_6=s0rs->rights_6;
-	newrank->rights_7=s0rs->rights_7;
-	newrank->rights_8=s0rs->rights_8;
-	newrank->rights_9=s0rs->rights_9;
-	newrank->rights_10=s0rs->rights_10;
-	newrank->rights_11=s0rs->rights_11;
-	newrank->rights_12=s0rs->rights_12;
-	newrank->rights_13=s0rs->rights_13;
-	
-	m_rankList.push_back(newrank);
-	return newrank;
-}
-RankInfo * Guild::CreateRank(string name, uint32 perms)
-{
-	if(m_rankList.size() >= MAX_GUILD_RANKS)
-		return NULL;
-
-	RankInfo *newrank;
-
-	newrank = new RankInfo;
-	newrank->rankid=(uint32)m_rankList.size();
-	newrank->name=name;
-	newrank->rights=perms;
-	newrank->rights_1=0;
-	newrank->rights_2=0;
-	newrank->rights_3=0;
-	newrank->rights_4=0;
-	newrank->rights_5=0;
-	newrank->rights_6=0;
-	newrank->rights_7=0;
-	newrank->rights_8=0;
-	newrank->rights_9=0;
-	newrank->rights_10=0;
-	newrank->rights_11=0;
-	newrank->rights_12=0;
-	newrank->rights_13=0;
-	m_rankList.push_back(newrank);
-	return newrank;
-}
-
-RankInfo * Guild::GetRank(uint32 rankId)
-{
-	std::list<RankInfo*>::iterator itr;
-	if(rankId > m_rankList.size()-1) return NULL;
-
-	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
-	{
-		if ((*itr)->rankid == rankId)
-			return (*itr);
-	}
+	m_lock.Release();
 	return NULL;
 }
 
-std::string Guild::GetRankName(uint32 rankId)
+// creating from a charter
+void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 {
-	std::list<RankInfo*>::iterator itr;
-	if(rankId > m_rankList.size()-1) return "Internal Error";
+	m_lock.Acquire();
 
-	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
+	m_guildId = objmgr.GenerateGuildId();
+	m_guildName = strdup(pCharter->GuildName.c_str());
+	m_guildLeader = pCharter->LeaderGuid;
+
+	m_ranks.resize(MAX_GUILD_RANKS, NULL);
+
+	// create the guild in the database
+	CreateInDB();
+
+	// rest of the fields have been nulled out, create some default ranks.
+	GuildRank * leaderRank = CreateGuildRank("Guild Master", GR_RIGHT_ALL);
+	CreateGuildRank("Officer", GR_RIGHT_ALL);
+	CreateGuildRank("Veteran", GR_RIGHT_DEFAULT);
+	CreateGuildRank("Member", GR_RIGHT_DEFAULT);
+	GuildRank * defRank = CreateGuildRank("Initiate", GR_RIGHT_DEFAULT);
+
+	// turn off command logging, we don't wanna spam the logs
+	m_commandLogging = false;
+
+	// add the leader to the guild
+	AddGuildMember(pTurnIn->GetPlayer()->m_playerInfo, NULL, leaderRank->iId);
+
+	// add all the other people
+	for(uint32 i = 0; i < pCharter->SignatureCount; ++i)
 	{
-		if ((*itr)->rankid == rankId)
-			return (*itr)->name;
+		PlayerInfo * pi = objmgr.GetPlayerInfo(pCharter->Signatures[i]);
+		if(pi)
+			AddGuildMember(pi, NULL, defRank->iId);
 	}
-	return "None";
+
+	// re-enable command logging
+	m_commandLogging = true;
+
+	m_lock.Release();
 }
 
-uint32 Guild::GetRankRights(uint32 rankId)
+void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 {
-	std::list<RankInfo*>::iterator itr;
-	if(rankId > m_rankList.size()-1) return 0;
+	if(pClient->GetPlayer()->m_playerInfo->guild != this || pMember->guild != this)
+		return;
 
-	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_PROMOTE))
 	{
-		if ((*itr)->rankid == rankId)
-			return (*itr)->rights;
+		SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
+		return;
 	}
-	return 0;
-}
 
-void Guild::SetRankName(uint32 rankId, std::string name)
-{
-	std::list<RankInfo*>::iterator itr;
-	if(rankId > m_rankList.size()-1) return;
-
-	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
+	// need a proper command result for this
+	if(pMember->guildRank->iId == 1)
 	{
-		if ((*itr)->rankid == rankId)
+		pClient->SystemMessage("You cannot promote this member any further.");
+		return;
+	}
+
+	// find the next highest rank
+	uint32 nh = 999999;
+	GuildRank * newRank = NULL;
+
+	m_lock.Acquire();
+	for(GuildRankVector::iterator vtr = m_ranks.begin(); vtr != m_ranks.end(); ++vtr) 
+	{
+		if((*vtr)->iId < nh || !newRank && (*vtr)->iId != 0)		// cannot promote to guildmaster
 		{
-			(*itr)->name = name;
-			break;
+			newRank = (*vtr);
+			nh = newRank->iId;
 		}
 	}
+
+	if(newRank==NULL)
+	{
+		m_lock.Release();
+		pClient->SystemMessage("Could not find a rank to promote this member to.");
+		return;
+	}
+
+	GuildMemberMap::iterator itr = m_members.find(pMember);
+	if(itr == m_members.end())
+	{
+		// shouldnt happen
+		m_lock.Release();
+		return;
+	}
+
+	itr->second->pRank = newRank;
+
+	// log it
+	LogGuildEvent(GUILD_EVENT_PROMOTION, 3, pClient->GetPlayer()->GetName(), pMember->name, newRank->szRankName);
+	AddGuildLogEntry(GUILD_LOG_EVENT_PROMOTION, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid, newRank->iId);
+
+	// update in the database
+	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, pMember->guid, m_guildId);
+
+	// if the player is online, update his guildrank
+	if(pMember->m_loggedInPlayer)
+		pMember->m_loggedInPlayer->SetGuildRank(newRank->iId);
+
+	// release lock
+	m_lock.Release();
 }
 
-void Guild::SetRankRights(uint32 rankId, uint32 rights)
+void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 {
-	std::list<RankInfo*>::iterator itr;
-	if(rankId > m_rankList.size()-1) return;
+	if(pClient->GetPlayer()->m_playerInfo->guild != this || pMember->guild != this)
+		return;
 
-	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_DEMOTE))
 	{
-		if ((*itr)->rankid == rankId)
+		SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
+		return;
+	}
+
+	// find the next highest rank
+	uint32 nh = 0;
+	GuildRank * newRank = NULL;
+
+	m_lock.Acquire();
+	for(GuildRankVector::iterator vtr = m_ranks.begin(); vtr != m_ranks.end(); ++vtr) 
+	{
+		if((*vtr)->iId > nh || !newRank)
 		{
-			(*itr)->rights = rights;
-			break;
+			newRank = (*vtr);
+			nh = newRank->iId;
 		}
 	}
-}
 
-void Guild::FillQueryData(WorldPacket *data)
-{
-	data->Initialize(SMSG_GUILD_QUERY_RESPONSE);
-	*data << GetGuildId();
-	*data << GetGuildName();
-	std::list<RankInfo*>::iterator itr;
-	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
-		*data << (*itr)->name;
-	for (uint32 r = (uint32)m_rankList.size(); r < MAX_GUILD_RANKS;++r)
-		*data << uint8(0);
-	*data << GetGuildEmblemStyle();
-	*data << GetGuildEmblemColor();
-	*data << GetGuildBorderStyle();
-	*data << GetGuildBorderColor();
-	*data << GetGuildBackgroundColor();
-}
-
-void Guild::SaveToDb()
-{
-	std::stringstream query;
-	query << "DELETE FROM guilds WHERE guildId = " << m_guildId;
-	CharacterDatabase.Execute( query.str( ).c_str( ) );
-
-	query.rdbuf()->str("");
-
-	query << "INSERT INTO guilds VALUES (";
-	query << m_guildId << ",'";
-	query << CharacterDatabase.EscapeString(m_guildName) << "', ";
-	query << m_leaderGuid << ", ";
-	query << m_emblemStyle << ", ";
-	query << m_emblemColor << ", ";
-	query << m_borderStyle << ", ";
-	query << m_borderColor << ", ";
-	query << m_backgroundColor << ", ";
-	query << "'" << CharacterDatabase.EscapeString(m_guildInfo) << "', ";
-	query << "'" << CharacterDatabase.EscapeString(m_motd) << "', NOW())";
-
-	CharacterDatabase.Execute( query.str().c_str() );
-}
-
-void Guild::UpdateGuildToDb()
-{
-	std::stringstream query;
-
-	query << "UPDATE guilds SET leaderGuid = " << m_leaderGuid << ", ";
-	query << "emblemStyle = " << m_emblemStyle << ", ";
-	query << "emblemColor = " << m_emblemColor << ", ";
-	query << "borderStyle = " << m_borderStyle << ", ";
-	query << "borderColor = " << m_borderColor << ", ";
-	query << "backgroundColor = " << m_backgroundColor << ", ";
-	query << "guildInfo = '" << CharacterDatabase.EscapeString(m_guildInfo) << "', ";
-	query << "motd = '" << CharacterDatabase.EscapeString(m_motd) << "' ";
-	query << "WHERE guildId = " << m_guildId;
-	CharacterDatabase.Execute( query.str( ).c_str( ) );
-}
-
-void Guild::SaveRanksToDb()
-{
-	std::stringstream query;
-
-	query << "DELETE FROM guild_ranks WHERE guildId = " << m_guildId;
-	CharacterDatabase.Execute( query.str( ).c_str( ) );
-
-	std::list<RankInfo*>::iterator itr;
-	for (itr = m_rankList.begin(); itr != m_rankList.end();itr++)
+	if(newRank==NULL)
 	{
-		query.rdbuf()->str("");
-		query << "INSERT INTO guild_ranks VALUES (";
-		query << m_guildId << ", ";
-		query << (*itr)->rankid << ", ";
-		query << "'" << CharacterDatabase.EscapeString((*itr)->name) << "', ";
-		query << (*itr)->rights << ",";
-		query << (*itr)->rights_1 << ",";
-		query << (*itr)->rights_2 << ",";
-		query << (*itr)->rights_3 << ",";
-		query << (*itr)->rights_4 << ",";
-		query << (*itr)->rights_5 << ",";
-		query << (*itr)->rights_6 << ",";
-		query << (*itr)->rights_7 << ",";
-		query << (*itr)->rights_8 << ",";
-		query << (*itr)->rights_9 << ",";
-		query << (*itr)->rights_10 << ",";
-		query << (*itr)->rights_11 << ",";
-		query << (*itr)->rights_12 << ",";
-		query << (*itr)->rights_13;
-		query << ")";
-		CharacterDatabase.Execute( query.str().c_str() );
+		m_lock.Release();
+		pClient->SystemMessage("Could not find a rank to demote this member to.");
+		return;
 	}
+
+	GuildMemberMap::iterator itr = m_members.find(pMember);
+	if(itr == m_members.end())
+	{
+		// shouldnt happen
+		m_lock.Release();
+		return;
+	}
+
+	itr->second->pRank = newRank;
+
+	// log it
+	LogGuildEvent(GUILD_EVENT_DEMOTION, 3, pClient->GetPlayer()->GetName(), pMember->name, newRank->szRankName);
+	AddGuildLogEntry(GUILD_LOG_EVENT_DEMOTION, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid, newRank->iId);
+
+	// update in the database
+	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, pMember->guid, m_guildId);
+
+	// if the player is online, update his guildrank
+	if(pMember->m_loggedInPlayer)
+		pMember->m_loggedInPlayer->SetGuildRank(newRank->iId);
+
+	// release lock
+	m_lock.Release();
 }
 
-/*
-void Guild::SaveGuildMemberToDb(uint64 guid)
+bool Guild::LoadFromDB(Field * f)
 {
-std::stringstream query;
-std::list<PlayerInfo*>::iterator i;
+	m_guildId = f[0].GetUInt32();
+	m_guildName = strdup(f[1].GetString());
+	m_guildLeader = f[2].GetUInt32();
+	m_emblemStyle = f[3].GetUInt32();
+	m_emblemColor = f[4].GetUInt32();
+	m_borderStyle = f[5].GetUInt32();
+	m_borderColor = f[6].GetUInt32();
+	m_backgroundColor = f[7].GetUInt32();
+	m_guildInfo = strlen(f[8].GetString()) ? strdup(f[8].GetString()) : NULL;
+	m_motd = strlen(f[9].GetString()) ? strdup(f[9].GetString()) : NULL;
+	m_creationTimeStamp = f[10].GetUInt32();
 
-for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
-{
-if((*i)->guid == guid)
-{
-query << "DELETE FROM playerguilds WHERE playerId = " << (*i)->guid;
-sDatabase.Execute( query.str( ).c_str( ) );
-query.rdbuf()->str("");	
+	// load ranks
+	uint32 i;
+	QueryResult * result = CharacterDatabase.Query("SELECT * FROM guild_ranks WHERE guildId = %u ORDER BY rankId ASC", m_guildId);
+	if(result==NULL)
+		return false;
 
-query << "INSERT INTO playerguilds VALUES (" << (*i)->guid << ", " << m_guildId << ", '" << (*i)->memberName << "', " << (*i)->Rank << ", '" << (*i)->publicNote << "', '" << (*i)->officerNote << "', " << (*i)->lastOnline << ")";
-sDatabase.Execute( query.str( ).c_str( ) );
-break;
-}
-}
-}
-*/
+	m_ranks.resize(MAX_GUILD_RANKS, NULL);
+	uint32 sid = 0;
 
-void Guild::UpdateGuildMembersDB(PlayerInfo *Member)
-{
-  CharacterDatabase.Execute(
-		"UPDATE characters SET publicNote='%s',officerNote='%s',guildid=%u,guildRank=%u WHERE guid=%u",
-		Member->publicNote ? CharacterDatabase.EscapeString(Member->publicNote).c_str() : "",
-		Member->officerNote ? CharacterDatabase.EscapeString(Member->officerNote).c_str() : "",
-		m_guildId,Member->Rank, (uint32)Member->guid );
-}
+	do 
+	{
+		GuildRank * r = new GuildRank;
+		Field * f2 = result->Fetch();
+		r->iId = f2[1].GetUInt32();
+		if(r->iId!=sid)
+		{
+			Log.Notice("Guild", "Renaming rank %u of guild %s to %u.", r->iId, m_guildName, sid);
+			CharacterDatabase.Execute("UPDATE guild_ranks SET rankId = %u WHERE guildId = %u AND rankName = \"%s\"", r->iId,
+				m_guildId, CharacterDatabase.EscapeString(string(f2[2].GetString())).c_str());
 
-void Guild::SaveAllGuildMembersToDb()
-{
-	std::list<PlayerInfo*>::iterator i;
+			r->iId=sid;
+		}
+		sid++;
+		r->szRankName = strdup(f2[2].GetString());
+		r->iRights = f2[3].GetUInt32();
 
-	for (i = m_guildMembers.begin(); i != m_guildMembers.end();++i) 
-		CharacterDatabase.Execute(
-		"UPDATE characters SET publicNote='%s',officerNote='%s',guildid=%u,guildRank=%u WHERE guid=%u",
-		(*i)->publicNote ? CharacterDatabase.EscapeString((*i)->publicNote).c_str() : "",
-		(*i)->officerNote ? CharacterDatabase.EscapeString((*i)->officerNote).c_str() : "",
-		m_guildId,(*i)->Rank,(uint32)( (*i)->guid) );
-	  
-}
+		for(i = 0; i < 13; ++i)
+			r->iExtraRights[i] = f2[4+i].GetUInt32();
 
-void Guild::RemoveFromDb()
-{
-	CharacterDatabase.Execute("DELETE FROM guilds WHERE guildId =%u",m_guildId );
-	CharacterDatabase.Execute("DELETE FROM guild_ranks WHERE guildId = %u", m_guildId );
-	CharacterDatabase.Execute("UPDATE characters SET guildid=0,guildRank=0,publicNote='',officerNote='' WHERE guildid=%u",m_guildId);
-}
+		//m_ranks.push_back(r);
+		ASSERT(m_ranks[r->iId] == NULL);
+		m_ranks[r->iId] = r;
 
-uint32 Guild::GetFreeGuildIdFromDb()
-{
+	} while(result->NextRow());
+	delete result;
 
-	QueryResult *result = CharacterDatabase.Query( "SELECT MAX(guildId) FROM guilds");
+	// load members
+	result = CharacterDatabase.Query("SELECT * FROM guild_data WHERE guildid = %u", m_guildId);
+	if(result==NULL)
+		return false;
+
+	do 
+	{
+		Field * f3 = result->Fetch();
+		GuildMember * gm = new GuildMember;
+		gm->pPlayer = objmgr.GetPlayerInfo(f3[1].GetUInt32());
+		if(gm->pPlayer == NULL)
+		{
+			delete gm;
+			continue;
+		}
+
+		if(f3[2].GetUInt32() >= MAX_GUILD_RANKS || m_ranks[f3[2].GetUInt32()] == NULL) 
+		{
+			delete gm;
+			continue;
+		}
+
+		gm->pRank = m_ranks[f3[2].GetUInt32()];
+		if(gm->pRank==NULL)
+			gm->pRank=FindLowestRank();
+		gm->pPlayer->guild=this;
+		gm->pPlayer->guildRank=gm->pRank;
+
+		if(strlen(f3[3].GetString()))
+			gm->szPublicNote = strdup(f3[3].GetString());
+		else
+			gm->szPublicNote = NULL;
+
+		if(strlen(f3[4].GetString()))
+			gm->szOfficerNote = strdup(f3[4].GetString());
+		else
+			gm->szOfficerNote = NULL;
+
+		m_members.insert(make_pair(gm->pPlayer, gm));
+
+	} while(result->NextRow());
+	delete result;
+
+	result = CharacterDatabase.Query("SELECT MAX(log_id) FROM guild_logs WHERE guildid = %u", m_guildId);
+	m_hiLogId = 1;
+	if(result != NULL)
+	{
+		m_hiLogId = result->Fetch()[0].GetUInt32() + 1;
+		delete result;
+	}
+
+	// load log
+	result = CharacterDatabase.Query("SELECT * FROM guild_logs WHERE guildid = %u ORDER BY timestamp ASC", m_guildId);
 	if(result)
 	{
-		uint32 guildId = result->Fetch()->GetUInt32();
+		do 
+		{
+			GuildLogEvent * li = new GuildLogEvent;
+			li->iLogId = result->Fetch()[0].GetUInt32();
+			li->iEvent = result->Fetch()[3].GetUInt32();
+			li->iTimeStamp = result->Fetch()[2].GetUInt32();
+			li->iEventData[0] = result->Fetch()[4].GetUInt32();
+			li->iEventData[1] = result->Fetch()[5].GetUInt32();
+			li->iEventData[2] = result->Fetch()[6].GetUInt32();
+		} while(result->NextRow());
 		delete result;
-
-		return guildId+1;
 	}
-	return 0;
+
+	Log.Debug("Guild", "Loaded guild %s, %u members.", m_guildName, m_members.size());
+	return true;
 }
 
-void Guild::LoadGuildCreationDate()
+void Guild::SetMOTD(const char * szNewMotd, WorldSession * pClient)
 {
-	Field *fields;
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
 
-	QueryResult *result1 = CharacterDatabase.Query( "SELECT DATE_FORMAT(createdate,\"%%d\") FROM guilds WHERE guildId =%u", m_guildId );
-	if(!result1) return;
-	fields = result1->Fetch();
-	m_createdDay = fields[0].GetUInt32();
-
-	delete result1;
-
-	QueryResult *result2 = CharacterDatabase.Query( "SELECT DATE_FORMAT(createdate,\"%%m\") FROM guilds WHERE guildId =%u", m_guildId );
-	if(!result2) return;
-	fields = result2->Fetch();
-	m_createdMonth = fields[0].GetUInt32();
-
-	delete result2;
-
-	QueryResult *result3 = CharacterDatabase.Query( "SELECT DATE_FORMAT(createdate,\"%%Y\") FROM guilds WHERE guildId =%u", m_guildId );
-	if(!result3) return;
-	fields = result3->Fetch();
-	m_createdYear = fields[0].GetUInt32();
-
-	delete result3;
-}
-
-void Guild::RenameGuild(std::string guildName)
-{
-	SetGuildName(guildName);
-	CharacterDatabase.Execute("UPDATE guilds SET guildName = '%s' WHERE guildId = %u", CharacterDatabase.EscapeString(guildName).c_str(), GetGuildId());
-	uint32 ttime = (uint32)UNIXTIME;
-
-	std::list<PlayerInfo*>::iterator itr = m_guildMembers.begin();
-	for (; itr != m_guildMembers.end(); itr++)
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_SETMOTD))
 	{
-		Player * pMember = objmgr.GetPlayer((*itr)->guid);
-		if(!pMember) continue;
+		Guild::SendGuildCommandResult(pClient, GUILD_INVITE_S, "", GUILD_PERMISSIONS);
+		return;
+	}
 
-		pMember->SetUInt32Value(PLAYER_GUILD_TIMESTAMP, ttime);
+	if(m_motd)
+		free(m_motd);
+
+	if(strlen(szNewMotd))
+	{
+		m_motd = strdup(szNewMotd);
+		CharacterDatabase.Execute("UPDATE guilds SET motd = \"%s\" WHERE guildId = %u", CharacterDatabase.EscapeString(string(szNewMotd)).c_str(), m_guildId);
+	}
+	else
+	{
+		m_motd= NULL;
+		CharacterDatabase.Execute("UPDATE guilds SET motd = "" WHERE guildId = %u", m_guildId);
+	}
+
+	LogGuildEvent(GUILD_EVENT_MOTD, 1, szNewMotd);
+}
+
+void Guild::SetGuildInformation(const char * szGuildInformation, WorldSession * pClient)
+{
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
+
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_EGUILDINFO))
+	{
+		Guild::SendGuildCommandResult(pClient, GUILD_INVITE_S, "", GUILD_PERMISSIONS);
+		return;
+	}
+
+	if(m_guildInfo)
+		free(m_guildInfo);
+
+	if(strlen(szGuildInformation))
+	{
+		m_guildInfo = strdup(szGuildInformation);
+		CharacterDatabase.Execute("UPDATE guilds SET guildInfo = \"%s\" WHERE guildId = %u", CharacterDatabase.EscapeString(string(szGuildInformation)).c_str(), m_guildId);
+	}
+	else
+	{
+		m_guildInfo= NULL;
+		CharacterDatabase.Execute("UPDATE guilds SET guildInfo = "" WHERE guildId = %u", m_guildId);
 	}
 }
+
+// adding a member
+void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 ForcedRank /* = -1 */)
+{
+	if(pMember->guild != NULL)
+		return;
+
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
+
+	if(pClient && !pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_INVITE))
+		return;
+
+	m_lock.Acquire();
+	GuildRank * r;
+	if(m_members.size())
+		r = (ForcedRank<=0) ? FindLowestRank() : m_ranks[ForcedRank];
+	else
+		r = (ForcedRank<0) ? FindLowestRank() : m_ranks[ForcedRank];
+
+	if(r==NULL)
+		r=FindLowestRank();
+
+	if(r==NULL)
+	{
+		// shouldnt happen
+		m_lock.Release();
+		return;
+	}
+
+	GuildMember * pm = new GuildMember;
+	pm->pPlayer = pMember;
+	pm->pRank = r;
+	pm->szOfficerNote = pm->szPublicNote = NULL;
+	m_members.insert(make_pair(pMember, pm));
+
+	pMember->guild=this;
+	pMember->guildRank=r;
+
+	if(pMember->m_loggedInPlayer)
+	{
+		pMember->m_loggedInPlayer->SetGuildId(m_guildId);
+		pMember->m_loggedInPlayer->SetGuildRank(r->iId);
+	}
+
+	CharacterDatabase.Execute("INSERT INTO guild_data VALUES(%u, %u, %u, '', '')", m_guildId, pMember->guid, r->iId);
+	LogGuildEvent(GUILD_EVENT_JOINED, 1, pMember->name);
+	AddGuildLogEntry(GUILD_LOG_EVENT_JOIN, 1, pMember->guid);
+	m_lock.Release();
+}
+
+void Guild::RemoveGuildMember(PlayerInfo * pMember, WorldSession * pClient)
+{
+	if(pMember->guild != this)
+		return;
+
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
+
+	if(pClient && !pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_REMOVE) && pClient->GetPlayer()->m_playerInfo != pMember)
+	{
+		Guild::SendGuildCommandResult(pClient, GUILD_CREATE_S, "", GUILD_PERMISSIONS);
+		return;
+	}
+
+	if(pMember->guildRank->iId==0)
+	{
+		if(pClient)
+			pClient->SystemMessage("You cannot remove the guild master.");
+
+		return;
+	}
+
+	CharacterDatabase.Execute("DELETE FROM guild_data WHERE playerid = %u", pMember->guid);
+
+	m_lock.Acquire();
+	GuildMemberMap::iterator itr = m_members.find(pMember);
+	if(itr != m_members.end())
+	{
+		// this should always exist.
+		if(itr->second->szOfficerNote)
+			free((void*)itr->second->szOfficerNote);
+		if(itr->second->szPublicNote)
+			free((void*)itr->second->szPublicNote);
+
+		delete itr->second;
+		m_members.erase(itr);
+	}
+
+	LogGuildEvent(GUILD_EVENT_LEFT, 1, pMember->name);
+	if(pClient)
+		LogGuildEvent(GUILD_LOG_EVENT_REMOVAL, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid);
+	else
+		LogGuildEvent(GUILD_LOG_EVENT_LEFT, 1, pMember->guid);
+
+	m_lock.Release();
+
+	pMember->guildRank=NULL;
+	pMember->guild=NULL;
+
+	if(pMember->m_loggedInPlayer)
+	{
+		pMember->m_loggedInPlayer->SetGuildRank(0);
+		pMember->m_loggedInPlayer->SetGuildId(0);
+	}
+}
+
+void Guild::SetPublicNote(PlayerInfo * pMember, const char * szNewNote, WorldSession * pClient)
+{
+	if(pMember->guild != this)
+		return;
+
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
+
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_EPNOTE))
+	{
+		Guild::SendGuildCommandResult(pClient, GUILD_MEMBER_S, "", GUILD_PERMISSIONS);
+		return;
+	}
+
+	m_lock.Acquire();
+	GuildMemberMap::iterator itr = m_members.find(pMember);
+	if(itr != m_members.end())
+	{
+		if(itr->second->szPublicNote)
+			free((void*)itr->second->szPublicNote);
+
+		if(szNewNote && szNewNote[0] != '\0')
+			itr->second->szPublicNote = strdup(szNewNote);
+		else
+			itr->second->szPublicNote = NULL;
+	}
+	m_lock.Release();
+
+	Guild::SendGuildCommandResult(pClient, GUILD_PUBLIC_NOTE_CHANGED_S, pMember->name, 0);
+}
+
+void Guild::SetOfficerNote(PlayerInfo * pMember, const char * szNewNote, WorldSession * pClient)
+{
+	if(pMember->guild != this)
+		return;
+
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
+
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_EOFFNOTE))
+	{
+		Guild::SendGuildCommandResult(pClient, GUILD_MEMBER_S, "", GUILD_PERMISSIONS);
+		return;
+	}
+
+	m_lock.Acquire();
+	GuildMemberMap::iterator itr = m_members.find(pMember);
+	if(itr != m_members.end())
+	{
+		if(itr->second->szOfficerNote)
+			free((void*)itr->second->szOfficerNote);
+
+		if(szNewNote && szNewNote[0] != '\0')
+			itr->second->szOfficerNote = strdup(szNewNote);
+		else
+			itr->second->szOfficerNote = NULL;
+	}
+	m_lock.Release();
+
+	Guild::SendGuildCommandResult(pClient, GUILD_OFFICER_NOTE_CHANGED_S, pMember->name, 0);
+}
+
+void Guild::RemoveGuildRank(WorldSession * pClient)
+{
+	m_lock.Acquire();
+
+	GuildRank * pLowestRank = FindLowestRank();
+	if(pLowestRank = NULL)
+	{
+		pClient->SystemMessage("Cannot find a rank to delete.");
+		m_lock.Release();
+		return;		
+	}
+
+	// check for players that need to be promoted
+	GuildRank * pNewLowestRank = FindNextLowestRank(pLowestRank);
+	GuildMemberMap::iterator itr = m_members.begin();
+	for(; itr != m_members.end(); ++itr)
+	{
+		if(itr->second->pRank == pLowestRank)
+		{
+			if(pNewLowestRank == NULL)
+			{
+				pClient->SystemMessage("There are still members using this rank and we cannot find them another rank to use!");
+				m_lock.Release();
+				return;
+			}
+
+			itr->second->pRank = pNewLowestRank;
+			itr->first->guildRank = pNewLowestRank;
+		}
+	}
+
+	m_ranks[pLowestRank->iId] = NULL;
+	delete pLowestRank;
+	m_lock.Release();
+}
+
+void Guild::Disband()
+{
+	m_lock.Acquire();
+	for(GuildMemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+	{
+		itr->first->guild=NULL;
+		itr->first->guildRank=NULL;
+		if(itr->first->m_loggedInPlayer != NULL)
+		{
+			itr->first->m_loggedInPlayer->SetGuildId(0);
+			itr->first->m_loggedInPlayer->SetGuildRank(0);
+		}
+
+		delete itr->second;
+	}
+	m_members.clear();
+	objmgr.RemoveGuild(m_guildId);
+	CharacterDatabase.Execute("DELETE FROM guilds WHERE guildId = %u", m_guildId);
+	CharacterDatabase.Execute("DELETE FROM guild_logs WHERE guildid = %u", m_guildId);
+	CharacterDatabase.Execute("DELETE FROM guild_ranks WHERE guildId = %u", m_guildId);
+	CharacterDatabase.Execute("DELETE FROM guild_data WHERE guildid = %u", m_guildId);
+	m_lock.Release();
+	delete this;
+}
+
+void Guild::ChangeGuildMaster(PlayerInfo * pNewMaster, WorldSession * pClient)
+{
+	if(pClient->GetPlayer()->GetGUIDLow() != m_guildLeader)
+	{
+		Guild::SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
+		return;
+	}
+
+	m_lock.Acquire();
+	GuildRank * newRank = FindHighestRank();
+	if(newRank==NULL)
+	{
+		m_lock.Release();
+		return;
+	}
+
+	GuildMemberMap::iterator itr = m_members.find(pNewMaster);
+	GuildMemberMap::iterator itr2 = m_members.find(pClient->GetPlayer()->m_playerInfo);
+	ASSERT(m_ranks[0]!=NULL);
+	if(itr==m_members.end() || itr2==m_members.end())
+	{
+		m_lock.Release();
+		return;
+	}
+
+	itr->second->pRank = m_ranks[0];
+	itr->first->guildRank = itr->second->pRank;
+	itr2->second->pRank = newRank;
+	itr2->first->guildRank = newRank;
+	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = 0 WHERE playerid = %u AND guildid = %u", itr->first->guid, m_guildId);
+	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, itr->first->guid, m_guildId);
+	CharacterDatabase.Execute("UPDATE guilds SET guildMaster = %u WHERE guildId = %u", itr->first->guid, m_guildId);
+	m_guildLeader = itr->first->guid;
+	m_lock.Release();
+}
+
+uint32 Guild::GenerateGuildLogEventId()
+{
+	uint32 r;
+	m_lock.Acquire();
+	r = ++m_hiLogId;
+	m_lock.Release();
+	return r;
+}
+
+void Guild::GuildChat(const char * szMessage, WorldSession * pClient, uint32 iType)
+{
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
+
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_GCHATSPEAK))
+	{
+		Guild::SendGuildCommandResult(pClient, GUILD_MEMBER_S, "", GUILD_PERMISSIONS);
+		return;
+	}
+
+	WorldPacket * data = sChatHandler.FillMessageData( CHAT_MSG_GUILD, iType==CHAT_MSG_ADDON?CHAT_MSG_ADDON:LANG_UNIVERSAL, szMessage,
+		pClient->GetPlayer()->GetGUID());
+
+	m_lock.Acquire();
+	for(GuildMemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+	{
+		if(itr->second->pRank->CanPerformCommand(GR_RIGHT_GCHATLISTEN) && itr->first->m_loggedInPlayer)
+			itr->first->m_loggedInPlayer->GetSession()->SendPacket(data);
+	}
+	m_lock.Release();
+
+	delete data;
+}
+
+void Guild::OfficerChat(const char * szMessage, WorldSession * pClient, uint32 iType)
+{
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
+
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_OFFCHATSPEAK))
+	{
+		Guild::SendGuildCommandResult(pClient, GUILD_MEMBER_S, "", GUILD_PERMISSIONS);
+		return;
+	}
+
+	WorldPacket * data = sChatHandler.FillMessageData( CHAT_MSG_OFFICER, iType==CHAT_MSG_ADDON?CHAT_MSG_ADDON:LANG_UNIVERSAL, szMessage,
+		pClient->GetPlayer()->GetGUID());
+
+	m_lock.Acquire();
+	for(GuildMemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+	{
+		if(itr->second->pRank->CanPerformCommand(GR_RIGHT_OFFCHATLISTEN) && itr->first->m_loggedInPlayer)
+			itr->first->m_loggedInPlayer->GetSession()->SendPacket(data);
+	}
+	m_lock.Release();
+
+	delete data;
+}
+
+void Guild::SendGuildLog(WorldSession * pClient)
+{
+	WorldPacket data(MSG_GUILD_LOG, 18*m_log.size()+1);
+	GuildLogList::iterator itr;
+
+	data << uint8(m_log.size() >= 250 ? 250 : m_log.size());
+	m_lock.Acquire();
+	for(itr = m_log.begin(); itr != m_log.end(); ++itr) {
+		data << uint8((*itr)->iEvent);
+		switch((*itr)->iEvent)
+		{
+		case GUILD_LOG_EVENT_DEMOTION:
+		case GUILD_LOG_EVENT_PROMOTION:
+			{
+				data << uint64((*itr)->iEventData[0]);
+				data << uint64((*itr)->iEventData[1]);
+				data << uint8((*itr)->iEventData[2]);
+			}break;
+			
+		case GUILD_LOG_EVENT_INVITE:
+		case GUILD_LOG_EVENT_REMOVAL:
+			{
+				data << uint64((*itr)->iEventData[0]);
+				data << uint64((*itr)->iEventData[1]);
+			}break;
+
+		case GUILD_LOG_EVENT_JOIN:
+		case GUILD_LOG_EVENT_LEFT:
+			{
+				data << uint64((*itr)->iEventData[0]);
+			}break;
+		}
+
+		data << uint32(UNIXTIME - (*itr)->iTimeStamp);
+	}
+	m_lock.Release();
+
+	pClient->SendPacket(&data);
+}
+
+void Guild::SendGuildRoster(WorldSession * pClient)
+{
+	WorldPacket data(SMSG_GUILD_ROSTER, (60*10) + (100 * m_members.size()) + 100);
+	GuildMemberMap::iterator itr;
+	GuildRank * r;
+	Player * pPlayer;
+	uint32 i;
+	GuildRank * myRank;
+	bool ofnote;
+	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
+
+	myRank = pClient->GetPlayer()->m_playerInfo->guildRank;
+	ofnote = myRank->CanPerformCommand(GR_RIGHT_VIEWOFFNOTE);
+
+	m_lock.Acquire();
+
+	data << uint32(m_members.size());
+	if(m_motd)
+		data << m_motd;
+	else
+		data << uint8(0);
+
+	if(m_guildInfo)
+		data << m_guildInfo;
+	else
+		data << uint8(0);
+
+	data << uint32(MAX_GUILD_RANKS);
+
+	for(i = 0; i < MAX_GUILD_RANKS; ++i)
+	{
+		r = m_ranks[i];
+		if(r == NULL)
+		{
+			data << uint64(0);
+			data << uint64(0);
+			data << uint64(0);
+			data << uint64(0);
+			data << uint64(0);
+			data << uint64(0);
+			data << uint64(0);
+		}
+		else
+		{
+			data << r->iRights;
+			data << r->iExtraRights[0];
+			data << r->iExtraRights[1];
+			data << r->iExtraRights[2];
+			data << r->iExtraRights[3];
+			data << r->iExtraRights[4];
+			data << r->iExtraRights[5];
+			data << r->iExtraRights[6];
+			data << r->iExtraRights[7];
+			data << r->iExtraRights[8];
+			data << r->iExtraRights[9];
+			data << r->iExtraRights[10];
+			data << r->iExtraRights[11];
+			data << r->iExtraRights[12];
+		}
+	}
+
+	for(itr = m_members.begin(); itr != m_members.end(); ++itr)
+	{
+		pPlayer = itr->second->pPlayer->m_loggedInPlayer;
+
+		data << itr->first->guid;
+		data << uint32(0);			// highguid
+		data << uint8( (pPlayer!=NULL) ? 1 : 0 );
+		data << itr->first->name;
+		data << itr->second->pRank->iId;
+		data << uint8(itr->first->lastLevel);
+		data << uint8(itr->first->cl);
+		data << itr->first->lastZone;
+
+		if(!pPlayer)
+			data << float((UNIXTIME-itr->first->lastOnline)/86400.0);
+
+		if(itr->second->szPublicNote)
+			data << itr->second->szPublicNote;
+		else
+			data << uint8(0);
+
+		if(!ofnote || itr->second->szOfficerNote == NULL)
+			data << uint8(0);
+		else
+			data << uint8(0);
+	}
+
+	m_lock.Release();
+
+	pClient->SendPacket(&data);
+}
+
+void Guild::SendGuildQuery(WorldSession * pClient)
+{
+	uint32 i = 0;
+	GuildRank * r;
+	WorldPacket data(SMSG_GUILD_QUERY_RESPONSE, 300);
+	data << m_guildId;
+	data << m_guildName;
+
+	m_lock.Acquire();
+	for(i = 0; i < MAX_GUILD_RANKS; ++i)
+	{
+		r = m_ranks[i];
+		if(r != NULL)
+			data << r->szRankName;
+		else
+			data << uint8(0);
+	}
+
+	m_lock.Release();
+
+	data << m_emblemStyle;
+	data << m_emblemColor;
+	data << m_borderStyle;
+	data << m_borderColor;
+	data << m_backgroundColor;
+
+	pClient->SendPacket(&data);
+}
+
+void Guild::CreateInDB()
+{
+	CharacterDatabase.Execute("INSERT INTO guilds VALUES(%u, \"%s\", %u, %u, %u, %u, %u, %u, '', '', %u)",
+		m_guildId, CharacterDatabase.EscapeString(string(m_guildName)).c_str(), m_guildLeader, m_emblemStyle, m_emblemColor, m_borderColor, m_borderStyle,
+		m_backgroundColor, m_creationTimeStamp);
+}
+
 Guild* Guild::Create()
 {
 	return new Guild();

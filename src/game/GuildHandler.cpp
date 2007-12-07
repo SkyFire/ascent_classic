@@ -22,70 +22,28 @@
 void WorldSession::HandleGuildQuery(WorldPacket & recv_data)
 {
 	CHECK_PACKET_SIZE(recv_data, 4);
-	WorldPacket data;
 
-	Guild *pGuild;
 	uint32 guildId;
-
 	recv_data >> guildId;
 
-	pGuild = objmgr.GetGuild( guildId );
-
+	// we can skip some searches here if this is our guild
+	if(_player && _player->GetGuildId() == guildId && _player->m_playerInfo->guild) {
+		_player->m_playerInfo->guild->SendGuildQuery(this);
+		return;
+	}
+	
+	Guild * pGuild = objmgr.GetGuild( guildId );
 	if(!pGuild)
 		return;
 
-	pGuild->FillQueryData(&data);
-	SendPacket(&data);
+	pGuild->SendGuildQuery(this);
 }
 
 void WorldSession::HandleCreateGuild(WorldPacket & recv_data)
 {
-	sLog.outDebug("GUILD CREATE");
-	/*	std::string guildName;
-	uint64 count;
-	int i;
-	Player * plyr = GetPlayer();
-
-	if(!plyr)
-	return;
-
-	recv_data >> guildName;
-
-	Guild *pGuild = new Guild;
-
-	count = objmgr.GetTotalGuildCount();
-
-	pGuild->SetGuildId( (uint32)(count+1) );
-	pGuild->SetGuildName( guildName );
-	pGuild->SetGuildRankName("Guild Master", 0);
-	pGuild->SetGuildRankName("Officer", 1);
-	pGuild->SetGuildRankName("Veteran", 2);  
-	pGuild->SetGuildRankName("Member", 3);
-	pGuild->SetGuildRankName("Initiate", 4);
-
-	for(i = 5;i < 10;i++)
-	pGuild->SetGuildRankName("Unused", i);
-
-	pGuild->SetGuildEmblemStyle( 0xFFFF );
-	pGuild->SetGuildEmblemColor( 0xFFFF );
-	pGuild->SetGuildBorderStyle( 0xFFFF );
-	pGuild->SetGuildBorderColor( 0xFFFF );
-	pGuild->SetGuildBackgroundColor( 0xFFFF );
-
-	objmgr.AddGuild(pGuild);
-
-	plyr->SetGuildId( pGuild->GetGuildId() );
-	//plyr->SetUInt32Value(PLAYER_GUILDID, pGuild->GetGuildId() );
-	plyr->SetGuildRank(GUILDRANK_GUILD_MASTER);
-	//plyr->SetUInt32Value(PLAYER_GUILDRANK,GUILDRANK_GUILD_MASTER);
-	pGuild->SetGuildLeaderGuid( plyr->GetGUID() );
-
-	pGuild->AddNewGuildMember( plyr );
-
-	pGuild->SaveToDb();*/
 }
 
-void WorldSession::SendGuildCommandResult(uint32 typecmd,const char *  str,uint32 cmdresult)
+/*void WorldSession::SendGuildCommandResult(uint32 typecmd,const char *  str,uint32 cmdresult)
 {
 	WorldPacket data;
 	data.SetOpcode(SMSG_GUILD_COMMAND_RESULT);
@@ -93,59 +51,58 @@ void WorldSession::SendGuildCommandResult(uint32 typecmd,const char *  str,uint3
 	data << str;
 	data << cmdresult;
 	SendPacket(&data);
-}
+}*/
 
 void WorldSession::HandleInviteToGuild(WorldPacket & recv_data)
 {
 	CHECK_PACKET_SIZE(recv_data, 1);
-	WorldPacket data;
-	std::string inviteeName;
 
+	std::string inviteeName;
 	recv_data >> inviteeName;
 
 	Player *plyr = objmgr.GetPlayer( inviteeName.c_str() , false);
-	Player *inviter = GetPlayer();
-	Guild *pGuild = objmgr.GetGuild( inviter->GetGuildId() );
-	 
+	Guild *pGuild = _player->m_playerInfo->guild;
 	
 	if(!plyr)
 	{
-		SendGuildCommandResult(GUILD_INVITE_S,inviteeName.c_str(),GUILD_PLAYER_NOT_FOUND);
+		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,inviteeName.c_str(),GUILD_PLAYER_NOT_FOUND);
 		return;
 	}
 	else if(!pGuild)
 	{
-		SendGuildCommandResult(GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
 		return;
 	}
+
 	if( plyr->GetGuildId() )
 	{
-		SendGuildCommandResult(GUILD_INVITE_S,plyr->GetName(),ALREADY_IN_GUILD);
+		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,plyr->GetName(),ALREADY_IN_GUILD);
 		return;
 	}
 	else if( plyr->GetGuildInvitersGuid())
 	{
-		SendGuildCommandResult(GUILD_INVITE_S,plyr->GetName(),ALREADY_INVITED_TO_GUILD);
+		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,plyr->GetName(),ALREADY_INVITED_TO_GUILD);
 		return;
 	}
-	else if(!pGuild->HasRankRight(inviter->GetGuildRank(),GR_RIGHT_INVITE))
+	else if(!_player->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_INVITE))
 	{
-		SendGuildCommandResult(GUILD_INVITE_S,"",GUILD_PERMISSIONS);
+		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_PERMISSIONS);
 		return;
 	}
 	else if(plyr->GetTeam()!=_player->GetTeam() && _player->GetSession()->GetPermissionCount() == 0)
 	{
-		SendGuildCommandResult(GUILD_INVITE_S,"",GUILD_NOT_ALLIED);
+		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_NOT_ALLIED);
 		return;
 	}
-	SendGuildCommandResult(GUILD_INVITE_S,inviteeName.c_str(),GUILD_U_HAVE_INVITED);
+	Guild::SendGuildCommandResult(this, GUILD_INVITE_S,inviteeName.c_str(),GUILD_U_HAVE_INVITED);
 	//41
   
-	data.Initialize(SMSG_GUILD_INVITE);
-	data << inviter->GetName();
+	WorldPacket data(SMSG_GUILD_INVITE, 100);
+	data << _player->GetName();
 	data << pGuild->GetGuildName();
 	plyr->GetSession()->SendPacket(&data);
-	plyr->SetGuildInvitersGuid( inviter->GetGUIDLow() );	
+
+	plyr->SetGuildInvitersGuid( _player->GetGUIDLow() );	
 }
 
 void WorldSession::HandleGuildAccept(WorldPacket & recv_data)
@@ -163,25 +120,13 @@ void WorldSession::HandleGuildAccept(WorldPacket & recv_data)
 		return;
 	}
 
-	Guild *pGuild = objmgr.GetGuild( inviter->GetGuildId() );
-
+	Guild *pGuild = inviter->m_playerInfo->guild;
 	if(!pGuild)
 	{
 		return;
 	}
 
-	plyr->SetGuildId( pGuild->GetGuildId() );
-	plyr->SetGuildRank(GUILDRANK_INITIATE);
-
-	pGuild->AddNewGuildMember( plyr );
-	//plyr->SaveGuild();
-
-	WorldPacket data;
-	data.Initialize(SMSG_GUILD_EVENT);
-	data << uint8(GUILD_EVENT_JOINED);
-	data << uint8(1);
-	data << plyr->GetName();
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
+	pGuild->AddGuildMember(plyr->m_playerInfo, NULL);
 }
 
 void WorldSession::HandleGuildDecline(WorldPacket & recv_data)
@@ -203,37 +148,26 @@ void WorldSession::HandleGuildDecline(WorldPacket & recv_data)
 	data << plyr->GetName();
 	inviter->GetSession()->SendPacket(&data);
 }
+
 void WorldSession::HandleSetGuildInformation(WorldPacket & recv_data)
 {
 	CHECK_PACKET_SIZE(recv_data, 1);
-	WorldPacket data;
 	std::string NewGuildInfo;
 	recv_data >> NewGuildInfo;
 
-	Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
-
+	Guild *pGuild = _player->m_playerInfo->guild;
 	if(!pGuild)
-		return;
-
-	uint32 plyrRank = GetPlayer()->GetGuildRank();
-
-	if(!pGuild->HasRankRight(plyrRank,GR_RIGHT_EGUILDINFO))
 	{
-		SendGuildCommandResult(3,"",GUILD_PERMISSIONS);
-		 return;
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
+		return;
 	}
 
-	pGuild->SetGuildInfo(NewGuildInfo);
-
-	pGuild->FillGuildRosterData(&data);
-	GetPlayer()->GetSession()->SendPacket(&data);
-
-	pGuild->UpdateGuildToDb();
+	pGuild->SetGuildInformation(NewGuildInfo.c_str(), this);
 }
 
 void WorldSession::HandleGuildInfo(WorldPacket & recv_data)
 {
-	WorldPacket data;
+	/*WorldPacket data;
 
 	Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
 
@@ -248,412 +182,156 @@ void WorldSession::HandleGuildInfo(WorldPacket & recv_data)
 	data << uint32(pGuild->GetGuildMembersCount());
 	data << uint32(pGuild->GetGuildMembersCount());//accountcount
 
-	SendPacket(&data);
+	SendPacket(&data);*/
 }
 
 void WorldSession::HandleGuildRoster(WorldPacket & recv_data)
 {
-	WorldPacket data;
-
-	Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
-
-	if(!pGuild)
+	if(!_player->m_playerInfo->guild)
 		return;
 
-	pGuild->FillGuildRosterData(&data);
-	GetPlayer()->GetSession()->SendPacket(&data);
+	_player->m_playerInfo->guild->SendGuildRoster(this);
 }
 
 void WorldSession::HandleGuildPromote(WorldPacket & recv_data)
 {
 	CHECK_PACKET_SIZE(recv_data, 1);
-	std::string name;
-	int32 plyrRank;
-	int32 pTargetRank;
 
+	std::string name;
 	recv_data >> name;
 
-	Player *plyr = GetPlayer();
-
-	if(!plyr)
-		return;
-
-	Guild *pGuild = objmgr.GetGuild( plyr->GetGuildId() );
-
-	if(!pGuild)
-		return;
-
-	PlayerInfo *pGuildMember = pGuild->GetGuildMember(name);
-
-	if(!pGuildMember)
+	if(!_player->m_playerInfo->guild)
 	{
-		 SendGuildCommandResult(GUILD_FOUNDER_S,name.c_str(),GUILD_PLAYER_NOT_IN_GUILD_S);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
 		return;
 	}
 
-	plyrRank = plyr->GetGuildRank();
-	pTargetRank = pGuildMember->Rank;
-
-	if(!pGuild->HasRankRight(plyrRank,GR_RIGHT_PROMOTE))
-	{
-		 SendGuildCommandResult(3,"",GUILD_PERMISSIONS);
+	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name);
+	if(dstplr==NULL)
 		return;
-	}
 
-	if( plyr->GetGUIDLow() == pGuildMember->guid )
-	{
-		sChatHandler.SystemMessage(this, "You cant promote yourself!");
-		return;
-	}
-
-	if( plyrRank >= pTargetRank )
-	{
-		sChatHandler.SystemMessage(this, "You must be a higher ranking guild member than the person you are going to promote!");
-		return;
-	}
-
-	if( (pTargetRank - plyrRank) == 1 )
-	{
-		sChatHandler.SystemMessage(this, "You can only promote up to one rank below yours!");
-		return;
-	}		  
-
-	pTargetRank--;
-
-	if(pTargetRank < GUILDRANK_GUILD_MASTER)
-		pTargetRank = GUILDRANK_GUILD_MASTER;
-
-	pGuildMember->Rank = pTargetRank;
-
-	Player *pTarget = objmgr.GetPlayer( name.c_str() );
-	if(pTarget)
-	{
-		//They Online
-		if(pTarget->GetInstanceID() != _player->GetInstanceID())
-		{
-			sEventMgr.AddEvent(pTarget, &Player::SetGuildRank, (uint32)pTargetRank, 1, 1, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-		}
-		else
-		{
-			pTarget->SetGuildRank(pTargetRank);
-		}
-	//	pTarget->SetUInt32Value(PLAYER_GUILDRANK, pTargetRank);
-	}
-
-	//Save new Info to DB
-	pGuild->UpdateGuildMembersDB(pGuildMember);
-
-	//check if its unused rank or not
-
-	WorldPacket data(SMSG_GUILD_EVENT, 100);
-	data << uint8(GUILD_EVENT_PROMOTION);
-	data << uint8(3);
-	data << plyr->GetName();
-	data << name.c_str();
-	data << pGuild->GetRankName( pTargetRank );
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
+	_player->m_playerInfo->guild->PromoteGuildMember(dstplr, this);
 }
 
 void WorldSession::HandleGuildDemote(WorldPacket & recv_data)
 {
 	CHECK_PACKET_SIZE(recv_data, 1);
-	std::string name;
-	uint32 plyrRank;
-	uint32 pTargetRank;
 
+	std::string name;
 	recv_data >> name;
 
-	Player *plyr = GetPlayer();
-
-	if(!plyr)
-		return;
-
-	Guild *pGuild = objmgr.GetGuild( plyr->GetGuildId() );
-
-	if(!pGuild)
-		return;
-
-	PlayerInfo *pGuildMember = pGuild->GetGuildMember(name);
-
-	if(!pGuildMember)
+	if(!_player->m_playerInfo->guild)
 	{
-		SendGuildCommandResult(GUILD_FOUNDER_S,name.c_str(),GUILD_PLAYER_NOT_IN_GUILD_S);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
 		return;
 	}
 
-	plyrRank = plyr->GetGuildRank();
-	pTargetRank = pGuildMember->Rank;
-
-	if(!pGuild->HasRankRight(plyrRank,GR_RIGHT_DEMOTE))
-	{
-		 SendGuildCommandResult(3,"",GUILD_PERMISSIONS);
+	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name);
+	if(dstplr==NULL)
 		return;
-	}
 
-	if( plyr->GetGUIDLow() == pGuildMember->guid )
-	{
-		sChatHandler.SystemMessage(this, "You cant demote yourself!");
-		return;
-	}
-
-	if( plyrRank >= pTargetRank )
-	{
-		sChatHandler.SystemMessage(this, "You must be a higher ranking guild member than the person you are going to demote!");
-		return;
-	}
-
-	if(pTargetRank == pGuild->GetNrRanks()-1)
-	{
-		sChatHandler.SystemMessage(this, "You cannot demote that member any further!");
-		return;
-	}
-
-	pTargetRank++;
-	if(pTargetRank > pGuild->GetNrRanks()-1)
-		pTargetRank = (uint32)pGuild->GetNrRanks()-1;
-
-	pGuildMember->Rank = pTargetRank;
-
-	Player *pTarget = objmgr.GetPlayer( name.c_str() );
-	if(pTarget)
-	{
-		//They Online
-		pTarget->SetGuildRank(pTargetRank);
-		//pTarget->SetUInt32Value(PLAYER_GUILDRANK, pTargetRank);
-	}
-
-	//Save new Info to DB
-	pGuild->UpdateGuildMembersDB(pGuildMember);
-
-	WorldPacket data(SMSG_GUILD_EVENT, 100);
-	data << uint8(GUILD_EVENT_DEMOTION);
-	data << uint8(3);
-	data << plyr->GetName();
-	data << name.c_str();
-	data << pGuild->GetRankName( pTargetRank );
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
+	_player->m_playerInfo->guild->DemoteGuildMember(dstplr, this);
 }
 
 void WorldSession::HandleGuildLeave(WorldPacket & recv_data)
 {
-	Player *plyr = GetPlayer();
-
-	if(!plyr)
+	if(!_player->m_playerInfo->guild)
+	{
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
 		return;
+	}
 
-	Guild *pGuild = objmgr.GetGuild( plyr->GetGuildId() );
-
-	if(!pGuild)
-		return;
-
-	if( pGuild->GetGuildLeaderGuid() == plyr->GetGUID() )
-		return;
-
-	plyr->SetGuildId(0);
-	plyr->SetGuildRank(0);
-	pGuild->DeleteGuildMember(plyr->GetGUID());
-
-	WorldPacket data(100);
-	data.Initialize(SMSG_GUILD_EVENT);
-	data << uint8(GUILD_EVENT_LEFT);
-	data << uint8(1);
-	data << plyr->GetName();
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
+	_player->m_playerInfo->guild->RemoveGuildMember(_player->m_playerInfo, this);
 }
 
 void WorldSession::HandleGuildRemove(WorldPacket & recv_data)
 {
 	CHECK_PACKET_SIZE(recv_data, 1);
-	WorldPacket data(100);
+
 	std::string name;
-	bool result = false;
-
 	recv_data >> name;
-	Player *plyr = objmgr.GetPlayer( name.c_str() );
-	Player *pRemover = GetPlayer();
 
-	if(!pRemover)
-		return;
-
-	Guild *pGuild = objmgr.GetGuild( pRemover->GetGuildId() );
-
-	if(!pGuild)
-		return;
-
-	uint32 RemoverRank = pRemover->GetGuildRank();
-
-	if(!pGuild->HasRankRight(RemoverRank,GR_RIGHT_REMOVE))
+	if(!_player->m_playerInfo->guild)
 	{
-		//Players not allowed to remove a guild member
-		 SendGuildCommandResult(3,"",GUILD_PERMISSIONS);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
 		return;
 	}
 
-	if(plyr)
-	{
-		plyr->SetGuildId(0);
-		plyr->SetGuildRank(0);
-		result = pGuild->DeleteGuildMember(plyr->GetGUID());
-	}
-	else
-	{
-		result = pGuild->DeleteGuildMember(name);
-	}
+	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name);
+	if(dstplr==NULL)
+		return;
 
-	if(result)
-	{
-		data.Initialize(SMSG_GUILD_EVENT);
-		data << uint8(GUILD_EVENT_REMOVED);
-		data << uint8(2);
-		data << name.c_str();
-		data << pRemover->GetName();
-		pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-	}
+	_player->m_playerInfo->guild->RemoveGuildMember(dstplr, this);
 }
 
 void WorldSession::HandleGuildDisband(WorldPacket & recv_data)
 {
-	Player *pLeader = GetPlayer();
-
-	if(!pLeader)
+	if(!_player->m_playerInfo->guild)
+	{
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
 		return;
+	}
 
-	Guild *pGuild = objmgr.GetGuild( pLeader->GetGuildId() );
-
-	if(!pGuild)
+	if(_player->m_playerInfo->guild->GetGuildLeader() != _player->GetGUIDLow())
+	{
+		Guild::SendGuildCommandResult(this, GUILD_INVITE_S, "", GUILD_PERMISSIONS);
 		return;
+	}
 
-	if(pLeader->GetGUID() != pGuild->GetGuildLeaderGuid())
-		return;
-
-	pGuild->DeleteGuildMembers();
-	pGuild->RemoveFromDb();
+	_player->m_playerInfo->guild->Disband();
 }
 
 void WorldSession::HandleGuildLeader(WorldPacket & recv_data)
 {
 	CHECK_PACKET_SIZE(recv_data, 1);
+
 	std::string name;
 	recv_data >> name;
 
-	Player *pLeader = GetPlayer();
-
-	if(!pLeader)
-		return;
-
-	Guild *pGuild = objmgr.GetGuild( pLeader->GetGuildId() );
-
-	if(!pGuild)
-		return;
-
-	PlayerInfo *pGuildMember = pGuild->GetGuildMember(name);
-	if(!pGuildMember)
-		return;
-
-	if(pLeader->GetGUIDLow() == pGuildMember->guid)
-		return;
-
-	if(pLeader->GetGUID() != pGuild->GetGuildLeaderGuid())
-		return;
-
-	PlayerInfo *pGuildLeader = pGuild->GetGuildMember(pLeader->GetGUID());
-	if(!pGuildLeader)
-		return;
-
-	pGuildLeader->Rank = GUILDRANK_OFFICER;
-	pLeader->SetGuildRank(GUILDRANK_OFFICER);  
-
-	pGuildMember->Rank = GUILDRANK_GUILD_MASTER;
-	Player *pNewLeader = objmgr.GetPlayer( name.c_str() );
-	if(pNewLeader)
+	if(!_player->m_playerInfo->guild)
 	{
-  //	  pNewLeader->SetUInt32Value(PLAYER_GUILDRANK,GUILDRANK_GUILD_MASTER);
-		pNewLeader->SetGuildRank(GUILDRANK_GUILD_MASTER);
-	   // pNewLeader->SaveGuild();
-	}
-	else
-	{
-		pGuild->UpdateGuildMembersDB(pGuildMember);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
+		return;
 	}
 
-	pGuild->SetGuildLeaderGuid( pGuildMember->guid );
-	pGuild->UpdateGuildToDb();
+	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name);
+	if(dstplr==NULL)
+		return;
 
-	WorldPacket data;
-	data.Initialize(SMSG_GUILD_EVENT);
-	data << (uint8)GUILD_EVENT_LEADER_CHANGED;
-	data << (uint8)2;
-	data << pLeader->GetName();
-	data << pGuildMember->name;
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-
-	/*
-	//demote old guildleader
-	data.Initialize(SMSG_GUILD_EVENT);
-	data << uint8(GUILD_EVENT_DEMOTION);
-	data << uint8(3);
-	data << pLeader->GetName();
-	data << pLeader->GetName();
-	data << pGuild->GetRankName( GUILDRANK_OFFICER );
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-
-	//promote new guildmaster
-	data.Initialize(SMSG_GUILD_EVENT);
-	data << uint8(GUILD_EVENT_PROMOTION);
-	data << uint8(3);
-	data << pLeader->GetName();
-	data << pNewLeader->GetName();
-	data << pGuild->GetRankName( GUILDRANK_GUILD_MASTER );
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-	*/
-	//data.clear();
-	//pGuild->FillGuildRosterData(&data);
-	//pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
+	_player->m_playerInfo->guild->ChangeGuildMaster(dstplr, this);
 }
 
 void WorldSession::HandleGuildMotd(WorldPacket & recv_data)
 {
-	WorldPacket data;
 	std::string motd;
 	if(recv_data.size())
 		recv_data >> motd;
 
-	Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
-
-	if(!pGuild)
+	if(!_player->m_playerInfo->guild)
+	{
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
 		return;
+	}
 
-	pGuild->SetGuildMotd(motd);
-
-	data.SetOpcode(SMSG_GUILD_EVENT);
-	data << uint8(GUILD_EVENT_MOTD);
-	data << uint8(0x01);
-	data << pGuild->GetGuildMotd();
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-
-	pGuild->UpdateGuildToDb();
+	_player->m_playerInfo->guild->SetMOTD(motd.c_str(), this);
 }
 
 void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 {
 	CHECK_PACKET_SIZE(recv_data, 9);
-	WorldPacket data;
-	Guild *pGuild;
-	uint32 rankId;
 
-	pGuild = objmgr.GetGuild(GetPlayer()->GetGuildId());
-	if(!pGuild)
+	if(!_player->m_playerInfo->guild)
 	{
-		SendGuildCommandResult(GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
 		return;
 	}
 
-	if(GetPlayer()->GetGUID() != pGuild->GetGuildLeaderGuid())
+	if(GetPlayer()->GetGUIDLow() != _player->m_playerInfo->guild->GetGuildLeader())
 	{
-		SendGuildCommandResult(GUILD_INVITE_S,"",GUILD_PERMISSIONS);
+		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_PERMISSIONS);
 		return;
 	}
-
+/*
 	recv_data >> rankId;
 
 	RankInfo * rnk = pGuild->GetRank(rankId);
@@ -685,12 +363,12 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 	pGuild->FillGuildRosterData(&data);
 	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
 
-	pGuild->SaveRanksToDb();
+	pGuild->SaveRanksToDb();*/
 }
 
 void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)
 {
-	CHECK_PACKET_SIZE(recv_data, 1);
+	/*CHECK_PACKET_SIZE(recv_data, 1);
 	WorldPacket data;
 	Guild *pGuild;
 	std::string rankname;
@@ -722,12 +400,12 @@ void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)
 	pGuild->FillGuildRosterData(&data);
 	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
 
-	pGuild->SaveRanksToDb();
+	pGuild->SaveRanksToDb();*/
 }
 
 void WorldSession::HandleGuildDelRank(WorldPacket & recv_data)
 {
-	WorldPacket data;
+	/*WorldPacket data;
 	Guild *pGuild;
 
 	pGuild = objmgr.GetGuild(GetPlayer()->GetGuildId());	
@@ -753,105 +431,42 @@ void WorldSession::HandleGuildDelRank(WorldPacket & recv_data)
 	pGuild->FillGuildRosterData(&data);
 	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
 
-	pGuild->SaveRanksToDb();
+	pGuild->SaveRanksToDb();*/
 }
 
 void WorldSession::HandleGuildSetPublicNote(WorldPacket & recv_data)
 {
-	CHECK_PACKET_SIZE(recv_data, 2);
-	WorldPacket data;
-	std::string TargetsName;
-	std::string publicNote;
+	string target, newnote;
+	recv_data >> target >> newnote;
 
-	recv_data >> TargetsName;
-	recv_data >> publicNote;
-
-	Player *pPlayer = GetPlayer();
-
-	if(!pPlayer)
+	PlayerInfo * pTarget = objmgr.GetPlayerInfoByName(target);
+	if(pTarget == NULL)
 		return;
 
-	Guild *pGuild = objmgr.GetGuild( pPlayer->GetGuildId() );
-
-	if(!pGuild)
+	if(!pTarget->guild)
 		return;
 
-	PlayerInfo *pGuildMember = pGuild->GetGuildMember(TargetsName);
-
-	if(!pGuildMember)
-	{
-		SendGuildCommandResult(GUILD_FOUNDER_S,TargetsName.c_str(),GUILD_PLAYER_NOT_IN_GUILD_S);
-		return;
-	}
-
-	uint32 plyrRank = pPlayer->GetGuildRank();
-
-	if(!pGuild->HasRankRight(plyrRank,GR_RIGHT_EPNOTE))
-	{
-		SendGuildCommandResult(3,"",GUILD_PERMISSIONS);
-		return;
-	}
-
-	pGuild->SetPublicNote(pGuildMember->guid, publicNote);
-
-	//Save new Info to DB
-	pGuild->UpdateGuildMembersDB(pGuildMember);
-
-	//Send Update (this seems to be how blizz does it couldn't find an event for it)
-	pGuild->FillGuildRosterData(&data);
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
+	pTarget->guild->SetPublicNote(pTarget, newnote.c_str(), this);
 }
 
 void WorldSession::HandleGuildSetOfficerNote(WorldPacket & recv_data)
 {
-	CHECK_PACKET_SIZE(recv_data, 2);
-	WorldPacket data;
-	std::string TargetsName;
-	std::string officerNote;
+	string target, newnote;
+	recv_data >> target >> newnote;
 
-	recv_data >> TargetsName;
-	recv_data >> officerNote;
-
-	Player *pPlayer = GetPlayer();
-
-
-	if(!pPlayer)
+	PlayerInfo * pTarget = objmgr.GetPlayerInfoByName(target);
+	if(pTarget == NULL)
 		return;
 
-	Guild *pGuild = objmgr.GetGuild( pPlayer->GetGuildId() );
-
-	if(!pGuild)
+	if(!pTarget->guild)
 		return;
 
-	PlayerInfo *pGuildMember = pGuild->GetGuildMember(TargetsName);
-
-	if(!pGuildMember)
-	{
-		SendGuildCommandResult(GUILD_FOUNDER_S, TargetsName.c_str(),GUILD_PLAYER_NOT_IN_GUILD_S);
-		return;
-	}
-
-	uint32 plyrRank = pPlayer->GetGuildRank();
-
-	if(!pGuild->HasRankRight(plyrRank,GR_RIGHT_EOFFNOTE))
-	{
-		SendGuildCommandResult(3,"",GUILD_PERMISSIONS);
-		return;
-	}
-
-	pGuild->SetOfficerNote(pGuildMember->guid, officerNote);
-
-	//Save new Info to DB
-	pGuild->UpdateGuildMembersDB(pGuildMember);
-
-	//Send Update (this seems to be how blizz does it couldn't find an event for it)
-	pGuild->FillGuildRosterData(&data);
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
+	pTarget->guild->SetOfficerNote(pTarget, newnote.c_str(), this);
 }
 
 void WorldSession::HandleSaveGuildEmblem(WorldPacket & recv_data)
 {
-	CHECK_PACKET_SIZE(recv_data, 20);
+/*	CHECK_PACKET_SIZE(recv_data, 20);
 	WorldPacket data;
 
 	Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
@@ -916,7 +531,7 @@ void WorldSession::HandleSaveGuildEmblem(WorldPacket & recv_data)
 	//data << pGuild->GetGuildMotd();
 	//pGuild->SendMessageToGuild(NULL, &data, G_MSGTYPE_ALL);
 
-	pGuild->UpdateGuildToDb();
+	pGuild->UpdateGuildToDb();*/
 }
 
 // Charter part
@@ -1290,8 +905,10 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 		// dont know hacky or not but only solution for now
 		// If everything is fine create guild
 
-		Guild *pGuild = new Guild;
-		uint32 guildId = pGuild->GetFreeGuildIdFromDb();
+		Guild *pGuild = Guild::Create();
+		pGuild->CreateFromCharter(gc, this);
+
+/*		uint32 guildId = pGuild->GetFreeGuildIdFromDb();
 
 		if(guildId == 0)
 		{
@@ -1350,7 +967,7 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 
 		pGuild->SaveToDb();
 		pGuild->SaveAllGuildMembersToDb();
-		pGuild->SaveRanksToDb();
+		pGuild->SaveRanksToDb();*/
 
 		// Destroy the charter
 		_player->m_charters[CHARTER_TYPE_GUILD] = 0;
@@ -1458,5 +1075,107 @@ void WorldSession::HandleCharterRename(WorldPacket & recv_data)
 	c->SaveToDB();
 	WorldPacket data(MSG_PETITION_RENAME, 100);
 	data << guid << name;
+	SendPacket(&data);
+}
+
+void WorldSession::HandleGuildLog(WorldPacket & recv_data)
+{
+	if(!_player->m_playerInfo->guild)
+		return;
+
+	_player->m_playerInfo->guild->SendGuildLog(this);
+}
+
+void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
+{
+	GameObject * pObj;
+	uint64 guid;
+	WorldPacket data(0x03E7, 3000);
+
+	if(!_player->IsInWorld())
+		return;
+
+	recv_data >> guid;
+	pObj = _player->GetMapMgr()->GetGameObject((uint32)guid);
+	if(pObj==NULL)
+		return;
+
+	uint8 tdata[] = {0x2F, 0x3F, 0x33, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01, 0x4C, 0x00, 0x11, 0x29, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0xC8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x11, 0x29, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC8, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x02, 0x6F, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xD2, 0x10, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xD2, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x05, 0xD2, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0xD2, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x14, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0E,
+		0x12, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x5A, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x7F, 0x26, 0x00, 0x00, 0x58, 0x03, 0x00, 0x00, 0x09, 0x0E, 0xB0, 0x45, 0x01, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x11, 0xFE, 0x1C, 0x00, 0x00, 0xAB, 0x03, 0x00, 0x00, 0x0C, 0x87, 0xA3, 0x82, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x12, 0x4F,
+		0x6F, 0x00, 0x00, 0xCD, 0xFF, 0xFF, 0xFF, 0x22, 0x00, 0xB3, 0x55, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x16, 0x66, 0x26, 0x00, 0x00, 0x50,
+		0x03, 0x00, 0x00, 0x6B, 0xD7, 0xAE, 0x59, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x17, 0xE2, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0xE3, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x19, 0xE4, 0x0F,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1C, 0x14, 0x60, 0x00, 0x00, 0xF1, 0xFF, 0xFF, 0xFF, 0x15, 0x00,
+		0xA7, 0x59, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1D, 0x97, 0x28, 0x00, 0x00, 0xDC, 0x00, 0x00, 0x00, 0x9E, 0x3F, 0xBA, 0x77, 0x01, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x1E, 0x0A, 0x19, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x23, 0x09, 0x09, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x25, 0x00, 0x2F, 0x00, 0x00, 0xB6, 0x00, 0x00, 0x00, 0x90, 0x18, 0xB9,
+		0x62, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2B, 0x3D, 0x4B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2C,
+		0x14, 0x85, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2D, 0x78, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2E, 0x90, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2F, 0x0E,
+		0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x0E, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x31, 0xF1, 0x3E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32, 0xF0, 0x3E,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x33, 0x26, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x34, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x35, 0x7A, 0x15, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0xB5, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x37, 0xE2, 0x2A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x38, 0x4C, 0x2B, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3A, 0x99, 0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x3B, 0xC1, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3C, 0xC5, 0x10, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3D, 0x63, 0x0E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x3E, 0x8D, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3F, 0xCC, 0x18, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0xC8, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x41, 0x1D, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x49, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x43, 0xC8, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44,
+		0x90, 0x2B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x45, 0x5E, 0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46, 0x4E, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x47, 0x1C,
+		0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x79, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x49, 0x74, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4A, 0xFB, 0x09,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4B, 0x54, 0x17, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x4C, 0x83, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4D, 0x1A, 0x0E, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4E, 0x4E, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x4F, 0xC9, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x54, 0x17, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x51, 0x91, 0x3D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x52, 0xC9, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x53, 0x41, 0x0D, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x54, 0xA5, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x55, 0xAC, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x56, 0xB2, 0x0A, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x57, 0xA8, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x58, 0xBF, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x59, 0xAE, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5A, 0xBE, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5B,
+		0xBC, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5C, 0xBD, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5D, 0xB9, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5E, 0xB6,
+		0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5F, 0xB8, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0xB4, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x61, 0xAA, 0x0A,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	// uint64 amount_you_have_deposited
+	/*data << uint64(1000000);
+	
+	data << uint8(1);
+	data << uint8(0);
+	data << uint8(0);
+	data << uint8(0);
+
+	data << uint8(0);
+	data << uint8(1);
+	data << uint8(0x4C);
+	data << uint8(0);
+	data << uint8(0x11);
+	data << uint8(0x29);
+
+	data << uint8(0);
+	data << uint8(1);
+	data << uint8(1);
+	data << uint8(0);
+	data << uint8(0);
+	data << uint8(0);*/
+
+	data.append(tdata,sizeof(tdata));
+
 	SendPacket(&data);
 }

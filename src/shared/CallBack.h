@@ -26,6 +26,16 @@ public:
 	virtual ~CallbackBase() {};
 };
 
+class CallbackFP {
+	typedef void(*callback)();
+	callback mycallback;
+public:
+	CallbackFP(callback cb) : mycallback(cb) {}
+	void operator()();
+	void execute();
+	void set(callback cb) { mycallback = cb; }
+	CallbackFP* Create();
+};
 
 template < class Class >
 class CallbackP0 : public CallbackBase
@@ -153,6 +163,7 @@ private:
 
 class QueryResult;
 struct AsyncQueryResult;
+#include <vector>
 typedef std::vector<AsyncQueryResult> QueryResultVector;
 
 class SQLCallbackBase
@@ -253,6 +264,5 @@ public:
 	~SQLFunctionCallbackP1();
 	void run(QueryResult * data) { method(data, p1); }
 };
-
 
 #endif

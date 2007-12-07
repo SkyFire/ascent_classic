@@ -329,6 +329,7 @@ public:
 	Mutex m_corpseguidlock;
     Mutex _TransportLock;
 	uint32 m_hiCorpseGuid;
+	uint32 m_hiGuildId;
 	
 	Item * CreateItem(uint32 entry,Player * owner);
 	Item * LoadItem(uint64 guid);
@@ -341,6 +342,16 @@ public:
 	{
 		return ++m_hiGroupId;
 	}
+
+	inline uint32 GenerateGuildId()
+	{
+		uint32 r;
+		m_guidGenMutex.Acquire();
+		r = ++m_hiGuildId;
+		m_guidGenMutex.Release();
+		return r;
+	}
+
 	void AddGroup(Group* group) { mGroupSet.insert( group ); }
 	void RemoveGroup(Group* group) { mGroupSet.erase( group ); }
 	void LoadGroups();

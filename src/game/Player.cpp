@@ -311,7 +311,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	linkTarget			  = 0;
 	stack_cheat			 = false;
 	triggerpass_cheat = false;
-	myGuild				 = 0;
 	m_pvpTimer			  = 0;
 	m_cooldownTimer		 = getMSTime() + 10000;
 	GlobalCooldown		  = 0;
@@ -2119,29 +2118,8 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 
 	<< m_talentresettimes	   << ", "
 	<< m_FirstLogin			 << ", "
-	<< rename_pending;
-	
-	Guild *pGuild;
-	PlayerInfo *   pMember;
-
-	if(GetGuildId() && (pGuild = objmgr.GetGuild(GetGuildId())) && (pMember = pGuild->GetGuildMember( GetGUID() )))
-	{
-		if(pMember->publicNote)
-			ss << ",'" << CharacterDatabase.EscapeString(pMember->publicNote) << "','";
-		else
-			ss << ",'','";
-
-		if(pMember->officerNote)
-            ss << CharacterDatabase.EscapeString(pMember->officerNote) << "'," << GetGuildId() << "," << GetGuildRank();
-		else
-			ss << "'," << GetGuildId() << "," << GetGuildRank();
-
-	   }else
-	{
-		ss << ",'','',0,0";
-	}
-
-	ss << "," << m_arenaPoints << ","
+	<< rename_pending
+	<< "," << m_arenaPoints << ","
 		<< (uint32)m_StableSlotCount << ",";
 	
 	// instances
@@ -2684,13 +2662,6 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	m_talentresettimes = get_next_field.GetUInt32();
 	m_FirstLogin = get_next_field.GetBool();
 	rename_pending = get_next_field.GetBool();
-
-	field_index++;
-	field_index++;	
-	//uint32 guildid = get_next_field.GetUInt32();
-	//uint32 guildrank = get_next_field.GetUInt32();
-	SetGuildId(get_next_field.GetUInt32());
-	SetUInt32Value(PLAYER_GUILDRANK,get_next_field.GetUInt32());
 	m_arenaPoints = get_next_field.GetUInt32();
 	for(uint32 z = 0; z < NUM_CHARTER_TYPES; ++z)
 		m_charters[z] = objmgr.GetCharterByGuid(GetGUID(), (CharterTypes)z);
@@ -7192,8 +7163,13 @@ void Player::SafeTeleport(MapMgr * mgr, const LocationVector & vec)
 
 void Player::SetGuildId(uint32 guildId)
 {
-	myGuild = guildId ? objmgr.GetGuild(guildId) : 0;
+	//
 	SetUInt32Value(PLAYER_GUILDID,guildId);
+}
+
+void Player::SetGuildRank(uint32 guildRank)
+{
+	SetUInt32Value(PLAYER_GUILDRANK, guildRank);
 }
 
 void Player::UpdatePvPArea()

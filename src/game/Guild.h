@@ -59,36 +59,6 @@ enum GuildMessageTypes
 	G_MSGTYPE_OFFICERCHAT,
 };
 
-struct RankInfo
-{
-	uint32 rankid;
-	std::string name;
-	uint32 rights;
-	uint32 rights_1;
-	uint32 rights_2;
-	uint32 rights_3;
-	uint32 rights_4;
-	uint32 rights_5;
-	uint32 rights_6;
-	uint32 rights_7;
-	uint32 rights_8;
-	uint32 rights_9;
-	uint32 rights_10;
-	uint32 rights_11;
-	uint32 rights_12;
-	uint32 rights_13;
-};
-
-enum GuildRank
-{
-	GUILDRANK_GUILD_MASTER = 0,
-	GUILDRANK_OFFICER = 1,
-	GUILDRANK_VETERAN = 2,
-	GUILDRANK_MEMBER = 3,
-	GUILDRANK_INITIATE = 4,
-	GUILDRANK_LOWEST = 9,
-};
-
 enum CommandErrors
 {
 	GUILD_U_HAVE_INVITED = 0x00,
@@ -185,8 +155,12 @@ enum typecommand
 	GUILD_CREATE_S	= 0x00,
 	GUILD_INVITE_S	= 0x01,
 	GUILD_QUIT_S	= 0x02,
+	GUILD_PROMOTE_S	= 0x03,
 	GUILD_FOUNDER_S = 0x0C,
 	GUILD_MEMBER_S = 0x0D,
+	GUILD_PUBLIC_NOTE_CHANGED_S = 0x13,
+	GUILD_OFFICER_NOTE_CHANGED_S = 0x14,
+
 };
 
 enum GuildRankRights
@@ -206,6 +180,7 @@ enum GuildRankRights
 	GR_RIGHT_EOFFNOTE		= 0x8040,
 	GR_RIGHT_EGUILDINFO		= 0x10000,
 	GR_RIGHT_ALL			= 0x1F1FF,
+	GR_RIGHT_DEFAULT		= GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK,
 };
 
 
@@ -232,6 +207,15 @@ enum GuildEvent
 	GUILD_EVENT_HASCOMEONLINE	   =0xC,
 	GUILD_EVENT_HASGONEOFFLINE	  =0xD,
 };
+enum GuildLogEventE
+{
+	GUILD_LOG_EVENT_INVITE		= 1,
+	GUILD_LOG_EVENT_JOIN		= 2,
+	GUILD_LOG_EVENT_PROMOTION	= 3,
+	GUILD_LOG_EVENT_DEMOTION	= 4,
+	GUILD_LOG_EVENT_REMOVAL		= 5,
+	GUILD_LOG_EVENT_LEFT		= 6,
+};
 
 #define ITEM_ENTRY_GUILD_CHARTER 5863
 #define ARENA_TEAM_CHARTER_2v2      23560
@@ -241,112 +225,210 @@ enum GuildEvent
 #define ARENA_TEAM_CHARTER_5v5      23562
 #define ARENA_TEAM_CHARTER_5v5_COST 2000000 // 200 G
 
+struct SERVER_DECL GuildRank
+{
+	uint32 iId;
+	uint32 iRights;
+	uint32 iExtraRights[13];
+	char * szRankName;
+	bool CanPerformCommand(uint32 t);
+};
+
+struct SERVER_DECL GuildMember
+{
+	PlayerInfo * pPlayer;
+	const char * szPublicNote;
+	const char * szOfficerNote;
+	GuildRank * pRank;
+};
+
+struct SERVER_DECL GuildLogEvent
+{
+	uint32 iLogId;
+	uint8 iEvent;
+	uint32 iTimeStamp;
+	uint32 iEventData[3];
+};
+
+class Charter;
+
 class SERVER_DECL Guild
 {
 public:
+	Guild();
 	~Guild( );
-
 	static Guild* Create();
-	void SendMessageToGuild(uint64 ExcludePlayer, WorldPacket *data, uint8 Type);
+	bool LoadFromDB(Field * f);
 
-	void AddGuildMember(PlayerInfo *gMember) { m_guildMembers.push_back(gMember); }
-	void AddNewGuildMember(Player *plyr);
-	bool DeleteGuildMember(uint64 guid);
-	bool DeleteGuildMember(string name);
-	void DeleteGuildMembers();
-	void GuildMemberLogoff(Player *pMember);
+	/** Log entry processing
+	 */
+protected:
+	uint32 m_hiLogId;
+public:
+	uint32 GenerateGuildLogEventId();
+	
+	/* only call at first create/save */
+	void CreateInDB();
 
-	PlayerInfo* GetGuildMember(uint64 guid);
-	PlayerInfo* GetGuildMember(std::string name);
-	size_t GetGuildMembersCount() { return m_guildMembers.size();}
+	/** Sets new MOTD, and updates in database
+	 */
+	void SetMOTD(const char * szNewMotd, WorldSession * pClient);
 
-	void FillGuildRosterData(WorldPacket *data);
-	void FillQueryData(WorldPacket *data);
+	/** Gets MOTD
+	 */
+	inline const char * GetMOTD() const { return m_motd; }
 
-	void SetPublicNote(uint64 guid, std::string publicNote);
-	void SetOfficerNote(uint64 guid, std::string officerNote);
+	/** Sets guild information, updates in database
+	 */
+	void SetGuildInformation(const char * szGuildInformation, WorldSession * pClient);
 
-	//void UpdateTabard();
+	/** Gets guild information
+	 */
+	inline const char * GetGuildInformation() const { return m_guildInfo; }
 
-	void BroadCastToGuild(WorldSession *session, std::string msg);
-	void OfficerChannelChat(WorldSession *session, std::string msg);
+	/** Sends the guild roster to this client.
+	 */
+	void SendGuildRoster(WorldSession * pClient);
 
-	//Variables
-	uint32 GetGuildId() { return m_guildId; }
-	void SetGuildId( uint32 guildId ) { m_guildId = guildId; }
-	std::string GetGuildName() { return m_guildName; }
-	inline const char * GetGuildNameC() { return m_guildName.c_str(); }
-	void SetGuildName( std::string guildName ) { m_guildName = guildName; }
+	/** Sends the guild query response to this client.
+	 */
+	void SendGuildQuery(WorldSession * pClient);
 
-	uint64 GetGuildLeaderGuid() { return m_leaderGuid; }
-	void SetGuildLeaderGuid( uint64 leaderGuid ) { m_leaderGuid = leaderGuid; }
-	uint32 GetGuildEmblemStyle() { return m_emblemStyle; }
-	void SetGuildEmblemStyle( uint32 emblemStyle ) { m_emblemStyle = emblemStyle; }
-	uint32 GetGuildEmblemColor() { return m_emblemColor; }
-	void SetGuildEmblemColor( uint32 emblemColor ) { m_emblemColor = emblemColor; }
-	uint32 GetGuildBorderStyle() { return m_borderStyle; }
-	void SetGuildBorderStyle( uint32 borderStyle ) { m_borderStyle = borderStyle; }
-	uint32 GetGuildBorderColor() { return m_borderColor; }
-	void SetGuildBorderColor( uint32 borderColor ) { m_borderColor = borderColor; }
-	uint32 GetGuildBackgroundColor() { return m_backgroundColor; }
-	void SetGuildBackgroundColor( uint32 backgroundColor ) { m_backgroundColor = backgroundColor; }
-	std::string GetGuildMotd() { return m_motd; }
-	void SetGuildMotd( std::string motd ) { m_motd = motd; }
-	std::string GetGuildInfo() { return m_guildInfo; }
-	void SetGuildInfo( std::string guildinfo ) { m_guildInfo = guildinfo; }
-	uint32 GetCreatedDay() { return m_createdDay; }
-	uint32 GetCreatedMonth() { return m_createdMonth; }
-	uint32 GetCreatedYear() { return m_createdYear; }
+	/** Adds a member to the guild, saves him into the database.
+	 * A provided rank of -1 means the lowest rank.
+	 */
+	void AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 ForcedRank = -1);
 
-	RankInfo * CreateRank(RankInfo * s0rs);
-	RankInfo * CreateRank(string name, uint32 perms);
-	void DelRank(){ m_rankList.pop_back(); }
-	std::string GetRankName(uint32 rankId);
-	uint32 GetRankRights(uint32 rankId);
-	RankInfo * GetRank(uint32 rankId);
-	size_t GetNrRanks(){ return m_rankList.size(); }
+	/** Removes a member from the guild.
+	 * If this member is the guild master, the guild will be automatically handed down to the next
+	 * highest member.
+	 */
+	void RemoveGuildMember(PlayerInfo * pMember, WorldSession * pClient);
 
-	void SetRankName(uint32 rankId, std::string name);
-	void SetRankRights(uint32 rankId, uint32 rights);
-	bool HasRankRight(uint32 rankId, uint32 right)
-	{
-		return ((GetRankRights(rankId) & right) != GR_RIGHT_EMPTY) ? true : false;
-	}
+	/** Promotes a member of a guild.
+	 * Do not use for changing guild master. Use ChangeGuildMaster() for that instead.
+	 */
+	void PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient);
 
-	void SaveToDb();
-	void UpdateGuildToDb();
-	void SaveRanksToDb();
-	void UpdateGuildMembersDB(PlayerInfo *Member);
-	//void SaveGuildMemberToDb(uint64 memberGuid);
-	void SaveAllGuildMembersToDb();
-	void RemoveFromDb();
-	//void RemoveGuildMemberFromDb(uint64 memberGuid);
-	void RemoveAllGuildMembersFromDb();
-	uint32 GetFreeGuildIdFromDb();
-	void LoadGuildCreationDate();
-	void RenameGuild(std::string guildName);
+	/** Demotes a member of a guild.
+	 * Do not use for changing guild master. Use ChangeGuildMaster() for that instead.
+	 */
+	void DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient);
 
-	inline list<PlayerInfo*>::iterator Begin() { return m_guildMembers.begin(); }
-	inline list<PlayerInfo*>::iterator End() { return m_guildMembers.end(); }
+	/** Changes the guild master of the guild.
+	 */
+	void ChangeGuildMaster(PlayerInfo * pNewMaster, WorldSession * pClient);
+
+	/** Sends a guild command packet to the client.
+	 */
+	static void SendGuildCommandResult(WorldSession * pClient, uint32 iCmd, const char * szMsg, uint32 iType);
+
+	/** Logs a guild event and sends it to all online players.
+	 */
+	void LogGuildEvent(uint8 iEvent, uint8 iStringCount, ...);
+	
+	/** Guild event logging.
+	 */
+	void AddGuildLogEntry(uint8 iEvent, uint8 iParamCount, ...);
+
+	/** Creates a guild from a charter.
+	 */
+	void CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn);
+
+	/** Sends a packet to all online players.
+	 */
+	void SendPacket(WorldPacket * data);
+
+	/** Sends a guild chat message.
+	 */
+	void GuildChat(const char * szMessage, WorldSession * pClient, uint32 iType);
+
+	/** Sends an officer chat message.
+	 */
+	void OfficerChat(const char * szMessage, WorldSession * pClient, uint32 iType);
+
+	/** Sends the guild log to a player.
+	 */
+	void SendGuildLog(WorldSession * pClient);
+
+	/** Sets the public note for a player.
+	 */
+	void SetPublicNote(PlayerInfo * pMember, const char * szNewNote, WorldSession * pClient);
+
+	/** Sets the officer note for a player.
+	 */
+	void SetOfficerNote(PlayerInfo * pMember, const char * szNewNote, WorldSession * pClient);
+
+	/** Disbands a guild.
+	 */
+	void Disband();
+
+	/** creation time stuff
+	 */
+	uint32 creationDay;
+	uint32 creationMonth;
+	uint32 creationYear;
+
+	/** Getters :P
+	 */
+	inline const char * GetGuildName() const { return m_guildName; }
+	inline const uint32 GetGuildLeader() const { return m_guildLeader; }
+	inline const uint32 GetGuildId() const { return m_guildId; }
+
+	/** Creates a guild rank with the specified permissions.
+	 */
+	GuildRank * CreateGuildRank(const char * szRankName, uint32 iPermissions);
+
+	/** "Pops" or removes the bottom guild rank.
+	 */
+	void RemoveGuildRank(WorldSession * pClient);
+
 
 protected:
-	std::list<PlayerInfo*> m_guildMembers;
-	std::list<RankInfo*> m_rankList;
-
-
+	
+	/** Enables/disables command logging.
+	 * Use when performing mass events such as guild creation or destruction.
+	 */
+	bool m_commandLogging;
+	
+	/** Internal variables
+	 */
 	uint32 m_guildId;
-	std::string m_guildName;
 	uint32 m_emblemStyle;
 	uint32 m_emblemColor;
 	uint32 m_borderStyle;
 	uint32 m_borderColor;
 	uint32 m_backgroundColor;
-	uint64 m_leaderGuid;
-	std::string m_motd;
-	std::string m_guildInfo;
-	uint32 m_createdYear;
-	uint32 m_createdMonth;
-	uint32 m_createdDay;
+	uint32 m_guildLeader;
+	uint32 m_creationTimeStamp;
+	char * m_guildName;
+	char * m_guildInfo;
+	char * m_motd;
+	
+	/** Guild Member Map.
+	 */
+	typedef map<PlayerInfo*, GuildMember*> GuildMemberMap;
+	GuildMemberMap m_members;
+
+	/** Guild Rank Information.
+	 */
+	typedef vector<GuildRank*> GuildRankVector;
+	GuildRankVector m_ranks;
+
+	/** Guild log. Ordered in first event -> last event.
+	 */
+	typedef list<GuildLogEvent*> GuildLogList;
+	GuildLogList m_log;
+
+	/** Guild lock.
+	 */
+	Mutex m_lock;
+
+	/** finds the lowest rank
+	 */
+	GuildRank * FindNextLowestRank(GuildRank * r);
+	GuildRank * FindLowestRank();
+	GuildRank * FindHighestRank();
 };
 
 

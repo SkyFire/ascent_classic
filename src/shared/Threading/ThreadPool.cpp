@@ -125,8 +125,6 @@ void CThreadPool::Startup()
 		StartThread(NULL);
 
 	Log.Debug("ThreadPool", "Startup, launched %u threads.", tcount);
-	Sleep(500);
-	IntegrityCheck();
 }
 
 void CThreadPool::ShowStats()

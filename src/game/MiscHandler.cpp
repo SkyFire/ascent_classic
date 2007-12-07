@@ -691,8 +691,8 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 		// if we're here, it means we've passed all testing
 		// so add the names :)
 		data << plr->GetName();
-		if(plr->myGuild)
-			data << plr->myGuild->GetGuildName();
+		if(plr->m_playerInfo->guild)
+			data << plr->m_playerInfo->guild->GetGuildName();
 		else
 			data << uint8(0);	   // Guild name
 

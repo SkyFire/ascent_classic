@@ -4682,10 +4682,9 @@ void World::PollCharacterInsertQueue()
 			inf->lastZone = 0;
 			inf->m_Group=NULL;
 			inf->m_loggedInPlayer=NULL;
-			inf->officerNote=NULL;
-			inf->publicNote=NULL;
+			inf->guild=NULL;
+			inf->guildRank=NULL;
 			inf->race=f[3].GetUInt32();
-			inf->Rank=0;
 			inf->subGroup=0;
 			switch(inf->race)
 			{

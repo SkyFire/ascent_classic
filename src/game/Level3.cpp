@@ -2371,17 +2371,7 @@ bool ChatHandler::HandleRenameGuildCommand(const char* args, WorldSession *m_ses
 	Player * plr = getSelectedChar(m_session);
 	if(!plr || !plr->GetGuildId() || !args || !strlen(args)) return false;
 
-	Guild * pGuild = objmgr.GetGuild(plr->GetGuildId());
-	if(!pGuild) return true; // how the fuck?
 
-	if(objmgr.GetGuildByGuildName(args))
-	{
-		RedSystemMessage(m_session, "Name already taken!");
-		return true;
-	}
-	sGMLog.writefromsession(m_session, "renamed guild %s to %s", pGuild->GetGuildNameC(), args);
-	pGuild->RenameGuild(args);
-	GreenSystemMessage(m_session, "Guild renamed!");
 	return true;
 }
 
@@ -2390,42 +2380,6 @@ bool ChatHandler::HandleGuildRemovePlayerCommand(const char* args, WorldSession 
 {
 	Player * plr = getSelectedChar(m_session);
 	if(!plr || !plr->GetGuildId()) return false;
-	bool result = false;
-
-	Guild * pGuild = objmgr.GetGuild(plr->GetGuildId());
-	if(!pGuild) return true;
-
-	//To prevent gm's from accidently removing themselves..
-	if(plr->GetGUID() == m_session->GetPlayer()->GetGUID())
-	{
-		RedSystemMessage(m_session, "GM self-protection. You can't force-remove yourself from a guild.");
-		return true;
-	}
-
-	if( pGuild->GetGuildLeaderGuid() == plr->GetGUID())
-	{
-		RedSystemMessage(m_session, "Player %s is a Guild Master. Disband the guild instead.",plr->GetName());
-		return true;
-	}
-
-	plr->SetGuildId(0);
-	plr->SetGuildRank(0);
-	result = pGuild->DeleteGuildMember(plr->GetGUID());
-
-	if(result)
-	{
-		WorldPacket data(100);
-		data.Initialize(SMSG_GUILD_EVENT);
-		data << uint8(GUILD_EVENT_REMOVED);
-		data << uint8(2);
-		data << plr->GetName();
-		data << m_session->GetPlayer()->GetName();
-		pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-	}
-
-	RedSystemMessage(plr->GetSession(), "You have been removed from your guild by a GM.");
-	RedSystemMessage(m_session, "Player %s was removed from the guild.",plr->GetName());
-	sGMLog.writefromsession(m_session, "removed player %s from his guild '%s'",plr->GetName(),pGuild->GetGuildNameC());
 	return true;
 }
 
@@ -2434,23 +2388,6 @@ bool ChatHandler::HandleGuildDisbandCommand(const char* args, WorldSession *m_se
 {
 	Player * plr = getSelectedChar(m_session);
 	if(!plr || !plr->GetGuildId() || !args || !strlen(args)) return false;
-
-	Guild * pGuild = objmgr.GetGuild(plr->GetGuildId());
-	if(!pGuild) return true;
-
-	//To prevent gm's from accidentally disbanding their own guild..
-	if(plr->GetGUID() == m_session->GetPlayer()->GetGUID())
-	{
-		RedSystemMessage(m_session, "GM self-protection. You can't disband your own guild with this command.");
-		return true;
-	}
-
-	pGuild->DeleteGuildMembers();
-	pGuild->RemoveFromDb();
-
-	RedSystemMessage(plr->GetSession(), "Your guild was disbanded by a GM. Reason: %s",args);
-	RedSystemMessage(m_session, "Guild %s was disbanded. Reason: %s",pGuild->GetGuildNameC(), args);
-	sGMLog.writefromsession(m_session, "disbanded guild '%s' Reason: %s",pGuild->GetGuildNameC(),args);
 	return true;
 }
 
@@ -2459,21 +2396,6 @@ bool ChatHandler::HandleGuildMembersCommand(const char* args, WorldSession *m_se
 {
 	Player * plr = getSelectedChar(m_session);
 	if(!plr || !plr->GetGuildId()) return false;
-
-	Guild * pGuild = objmgr.GetGuild(plr->GetGuildId());
-	if(!pGuild) return true;
-
-	size_t GuildSize = pGuild->GetGuildMembersCount();
-	GreenSystemMessage(m_session, "Listing %u members.", GuildSize);
-
-	std::list<PlayerInfo*>::iterator i;
-	size_t Counter=0;
-	for (i = pGuild->Begin(); i != pGuild->End();++i) 
-	{
-		Counter++;
-		GreenSystemMessage(m_session, "%u: %s (Rank: %u,%s)",Counter, (*i)->name,(*i)->Rank,pGuild->GetRankName((*i)->Rank).c_str());
-	}
-
 	return true;
 }
 

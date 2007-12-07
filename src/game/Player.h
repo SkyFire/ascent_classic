@@ -28,6 +28,7 @@ class GameObject;
 class Transporter;
 class Corpse;
 class Guild;
+struct GuildRank;
 class Pet;
 class Charter;
 struct LevelInfo;
@@ -477,10 +478,6 @@ struct PlayerInfo
 	uint32 cl;
 	uint32 team;
 	
-	//guild stuff
-	uint32 Rank;//guild rank
-	char * publicNote;
-	char * officerNote;
 	time_t lastOnline;
 	uint32 lastZone;
 	uint32 lastLevel;
@@ -488,6 +485,8 @@ struct PlayerInfo
 	uint8 subGroup;
 
 	Player * m_loggedInPlayer;
+	Guild * guild;
+	GuildRank * guildRank;
 };
 struct PlayerPet
 {
@@ -978,7 +977,7 @@ public:
 	inline uint32       GetGuildId() { return m_uint32Values[PLAYER_GUILDID]; }
 	void                SetGuildId(uint32 guildId);
 	inline uint32       GetGuildRank() { return m_uint32Values[PLAYER_GUILDRANK]; }
-	void                SetGuildRank(uint32 guildRank) { SetUInt32Value(PLAYER_GUILDRANK, guildRank); }
+	void                SetGuildRank(uint32 guildRank);
 	uint32              GetGuildInvitersGuid() { return m_invitersGuid; }
 	void                SetGuildInvitersGuid( uint32 guid ) { m_invitersGuid = guid; }
 	void                UnSetGuildInvitersGuid() { m_invitersGuid = 0; }
@@ -1200,7 +1199,6 @@ public:
 
     //Showing Units WayPoints
 	AIInterface* waypointunit;
-	void SaveGuild();
 	
 	uint32 m_nextSave;
 	//Tutorials
@@ -1510,7 +1508,6 @@ public:
 		SafeTeleport(MapID, InstanceID, vec);
 	}
 
-	Guild * myGuild;
 	/*****************
 	  PVP Stuff
 	******************/
@@ -1646,7 +1643,6 @@ public:
 	void save_Misc();
 	void save_PositionHP();
 	void save_BindPosition();
-	void save_GuildData();
 	void save_Honor();
 	void save_EntryPoint();
 	void save_Taxi();
@@ -1721,7 +1717,6 @@ protected:
 	void _SaveQuestLogEntry();
 	void _LoadQuestLogEntry(QueryResult * result);
 	// DK
-	void _LoadGuild();
 	void _LoadPet(QueryResult * result);
 	void _LoadPetNo();
 	void _LoadPetSpells(QueryResult * result);

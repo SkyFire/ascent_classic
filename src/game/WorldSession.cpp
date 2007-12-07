@@ -275,18 +275,9 @@ void WorldSession::LogoutPlayer(bool Save)
 		//Issue a message telling all guild members that this player signed off
 		if(_player->IsInGuild())
 		{
-			Guild *pGuild = objmgr.GetGuild( _player->GetGuildId() );
+			Guild *pGuild = _player->m_playerInfo->guild;
 			if(pGuild)
-			{
-				//Update Offline info
-				pGuild->GuildMemberLogoff(_player);
-				WorldPacket data(SMSG_GUILD_EVENT, 11+strlen(_player->GetName()));
-				data << uint8(GUILD_EVENT_HASGONEOFFLINE);
-				data << uint8(0x01);
-				data << _player->GetName();
-				data << _player->GetGUID();
-				pGuild->SendMessageToGuild(0,&data,G_MSGTYPE_ALL);
-			}
+				pGuild->LogGuildEvent(GUILD_EVENT_HASGONEOFFLINE, 1, _player->GetName());
 		}
 
 		_player->GetItemInterface()->EmptyBuyBack();
@@ -769,6 +760,8 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[MSG_PETITION_RENAME].handler							= &WorldSession::HandleCharterRename;
 	WorldPacketHandlers[MSG_SAVE_GUILD_EMBLEM].handler						  = &WorldSession::HandleSaveGuildEmblem;
 	WorldPacketHandlers[CMSG_SET_GUILD_INFORMATION].handler					 = &WorldSession::HandleSetGuildInformation;
+	WorldPacketHandlers[MSG_GUILD_LOG].handler								= &WorldSession::HandleGuildLog;
+	WorldPacketHandlers[0x03E5].handler										= &WorldSession::HandleGuildBankOpenVault;
 	
 	// Tutorials
 	WorldPacketHandlers[CMSG_TUTORIAL_FLAG].handler							 = &WorldSession::HandleTutorialFlag;

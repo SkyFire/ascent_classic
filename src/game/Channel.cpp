@@ -101,9 +101,9 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 		data << uint8(CHANNEL_NOTIFY_FLAG_JOINED) << m_name << plr->GetGUID();
 		SendToAll(&data);
 
-		data.Initialize(SMSG_PLAYER_JOINED_CHANNEL);
+		/*data.Initialize(SMSG_PLAYER_JOINED_CHANNEL);
 		data << plr->GetGUID() << uint8(0x14) << m_flags << m_id << m_name;
-		SendToAll(&data);
+		SendToAll(&data);*/
 	}
 
 	if(voice_enabled)
@@ -162,9 +162,9 @@ void Channel::Part(Player * plr)
 		data << uint8(CHANNEL_NOTIFY_FLAG_LEFT) << m_name << plr->GetGUID();
 		SendToAll(&data);
 	
-		data.Initialize(SMSG_PLAYER_LEFT_CHANNEL);
+/*		data.Initialize(SMSG_PLAYER_LEFT_CHANNEL);
 		data << plr->GetGUID() << m_flags << m_id << m_name;
-		SendToAll(&data);
+		SendToAll(&data);*/
 	}
 
     if(m_members.size() == 0)

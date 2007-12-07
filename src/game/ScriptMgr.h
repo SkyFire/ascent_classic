@@ -70,7 +70,7 @@ typedef void(*tOnTick)();
 typedef bool(*tOnLogoutRequest)(Player * pPlayer);
 typedef void(*tOnQuestAccept)(Player * pPlayer, Quest * pQuest);
 typedef void(*tOnZone)(Player * pPlayer, uint32 Zone);
-typedef void(*tOnChat)(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
+typedef bool(*tOnChat)(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
 typedef void(*tOnLoot)(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId);
 typedef bool(*ItemScript)(Item * pItem, Player * pPlayer);
 
@@ -260,7 +260,7 @@ public:
 	bool OnLogoutRequest(Player * pPlayer);
 	void OnQuestAccept(Player * pPlayer, Quest * pQuest);
 	void OnZone(Player * pPlayer, uint32 Zone);
-	void OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
+	bool OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
 	void OnLoot(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId);
 	void OnEnterWorld2(Player * pPlayer);
 };

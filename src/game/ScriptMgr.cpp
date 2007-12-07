@@ -670,11 +670,11 @@ void HookInterface::OnZone(Player * pPlayer, uint32 Zone)
 	OUTER_LOOP_END
 }
 
-void HookInterface::OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc)
+bool HookInterface::OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc)
 {
-	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_CHAT, tOnChat)
-		(call)(pPlayer, Type, Lang, Message, Misc);
-	OUTER_LOOP_END
+	OUTER_LOOP_BEGIN_COND(SERVER_HOOK_EVENT_ON_CHAT, tOnChat)
+		ret_val = (call)(pPlayer, Type, Lang, Message, Misc);
+	OUTER_LOOP_END_COND
 }
 
 void HookInterface::OnLoot(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId)

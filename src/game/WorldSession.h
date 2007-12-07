@@ -548,7 +548,10 @@ protected:
 	void HandleCharterSign(WorldPacket &recv_data);
 	void HandleCharterRename(WorldPacket & recv_data);
 	void HandleSetGuildInformation(WorldPacket & recv_data);
-	void SendGuildCommandResult(uint32 typecmd,const char *  str,uint32 cmdresult);
+	void HandleGuildLog(WorldPacket & recv_data);
+	void HandleGuildBankViewTab(WorldPacket & recv_data);
+	void HandleGuildBankView(WorldPacket & recv_data);
+	void HandleGuildBankOpenVault(WorldPacket & recv_data);
 
 	// Pet
 	void HandlePetAction(WorldPacket & recv_data);
@@ -626,9 +629,7 @@ protected:
 	void HandleTeleportToUnitOpcode(WorldPacket & recv_data);
 	void HandleWorldportOpcode(WorldPacket & recv_data);
 	void HandleWrapItemOpcode(WorldPacket& recv_data);
-	
-	
-	
+
 	// VOICECHAT
 	void HandleEnableMicrophoneOpcode(WorldPacket & recv_data);
 	void HandleVoiceChatQueryOpcode(WorldPacket & recv_data);

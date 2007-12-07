@@ -209,26 +209,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				if(sWordFilter.UsesBannedKeyword(msg, this))
 					return;
 
-			if (GetPlayer()->IsInGuild())
-			{
-				Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
-				if(pGuild)
-				{
-					if(pGuild->HasRankRight(GetPlayer()->GetGuildRank(), GR_RIGHT_GCHATSPEAK))
-					{
-						pGuild->BroadCastToGuild(this, msg);
-					}
-					else
-					{
-                        
-						WorldPacket data2(SMSG_GUILD_COMMAND_RESULT, 8 + pGuild->GetGuildName().size() + 1);
-						data2 << uint32(GUILD_MEMBER_S);
-						data2 << pGuild->GetGuildName();
-						data2 << uint32(C_R_DONT_HAVE_PERMISSION);
-						SendPacket(&data2);
-					}
-				}
-			}
+				if(_player->m_playerInfo->guild)
+					_player->m_playerInfo->guild->GuildChat(msg.c_str(), this, lang);
+
 			pMsg=msg.c_str();
 			pMisc=0;
 		} break;
@@ -242,23 +225,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			if(sWordFilter.UsesBannedKeyword(msg, this))
 				return;
 
-			if (GetPlayer()->IsInGuild())
-			{
-				Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
-				if(pGuild)
-				{
-					if(pGuild->HasRankRight(GetPlayer()->GetGuildRank(), GR_RIGHT_OFFCHATSPEAK))
-						pGuild->OfficerChannelChat(this, msg);
-					else
-					{
-						WorldPacket data2(SMSG_GUILD_COMMAND_RESULT, 8 + pGuild->GetGuildName().size() + 1);
-						data2 << uint32(GUILD_MEMBER_S);
-						data2 << pGuild->GetGuildName();
-						data2 << uint32(C_R_DONT_HAVE_PERMISSION);
-						SendPacket(&data2);
-					}
-				}
-			}
+			if(_player->m_playerInfo->guild)
+				_player->m_playerInfo->guild->OfficerChat(msg.c_str(), this, lang);
+
 			pMsg=msg.c_str();
 			pMisc=0;
 		} break;

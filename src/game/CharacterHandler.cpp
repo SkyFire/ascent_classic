@@ -81,38 +81,38 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			guid = fields[0].GetUInt32();
 			bytes2 = fields[6].GetUInt32();
 			Class = fields[3].GetUInt8();			
-			flags = fields[18].GetUInt32();
+			flags = fields[17].GetUInt32();
 
 			/* build character enum, w0000t :p */
 			data << fields[0].GetUInt64();		// guid
-			data << fields[8].GetString();		// name
+			data << fields[7].GetString();		// name
 			data << fields[2].GetUInt8();		// race
 			data << fields[3].GetUInt8();		// class
 			data << fields[4].GetUInt8();		// gender
 			data << fields[5].GetUInt32();		// PLAYER_BYTES
 			data << uint8(bytes2 & 0xFF);		// facial hair
 			data << fields[1].GetUInt8();		// Level
-			data << fields[13].GetUInt32();		// zoneid
-			data << fields[12].GetUInt32();		// Mapid
-			data << fields[11].GetFloat();		// X
-			data << fields[10].GetFloat();		// Y
-			data << fields[9].GetFloat();		// Z
-			data << fields[7].GetUInt32();		// GuildID
+			data << fields[12].GetUInt32();		// zoneid
+			data << fields[11].GetUInt32();		// Mapid
+			data << fields[8].GetFloat();		// X
+			data << fields[9].GetFloat();		// Y
+			data << fields[10].GetFloat();		// Z
+			data << fields[18].GetUInt32();		// GuildID
 
-			banned = fields[14].GetUInt32();
+			banned = fields[13].GetUInt32();
 			if(banned && (banned<10 || banned > (uint32)UNIXTIME))
 				data << uint32(0x01A04040);
 			else
 			{
-				if(fields[17].GetUInt32() != 0)
+				if(fields[16].GetUInt32() != 0)
 					data << uint32(0x00A04342);
-				else if(fields[16].GetUInt32() != 0)
+				else if(fields[15].GetUInt32() != 0)
 					data << (uint32)8704; // Dead (displaying as Ghost)
 				else
 					data << uint32(1);		// alive
 			}
 			
-			data << fields[15].GetUInt8();		// Rest State
+			data << fields[14].GetUInt8();		// Rest State
 
 			if(Class==9 || Class==3)
 			{
@@ -172,7 +172,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 {	
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::CharacterEnumProc, GetAccountId()) );
-	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, guildid, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags FROM characters WHERE acct=%u ORDER BY guid", GetAccountId());
+	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags, guild_data.guildid FROM characters LEFT JOIN guild_data ON characters.guid = guild_data.playerid WHERE acct=%u ORDER BY guid", GetAccountId());
 	CharacterDatabase.QueueAsyncQuery(q);
 }
 
@@ -308,12 +308,12 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	pn->cl = pNewChar->getClass();
 	pn->race = pNewChar->getRace();
 	pn->gender = pNewChar->getGender();
-	pn->publicNote=NULL;
-	pn->officerNote=NULL;
 	pn->m_Group=0;
 	pn->subGroup=0;
 	pn->m_loggedInPlayer=NULL;
 	pn->team = pNewChar->GetTeam ();
+	pn->guild=NULL;
+	pn->guildRank=NULL;
 	objmgr.AddPlayerInfo(pn);
 
 	pNewChar->ok_to_remove = true;
@@ -427,13 +427,20 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 		fail = 0x3B;
 	} else {
 
-		QueryResult * result = CharacterDatabase.Query("SELECT guildid, name FROM characters WHERE guid = %u", (uint32)guid);
+		QueryResult * result = CharacterDatabase.Query("SELECT name FROM characters WHERE guid = %u", (uint32)guid);
 		PlayerInfo * inf = objmgr.GetPlayerInfo((uint32)guid);
 		if(!result || !inf)
 			return;
 
-		uint32 guildid = result->Fetch()[0].GetUInt32();
-		string name = result->Fetch()[1].GetString();
+		if(inf->guild)
+		{
+			if(inf->guild->GetGuildLeader()==inf->guid)
+				inf->guild->Disband();
+			else
+				inf->guild->RemoveGuildMember(inf,NULL);
+		}
+
+		string name = result->Fetch()[0].GetString();
 		delete result;
 
 		for(int i = 0; i < NUM_CHARTER_TYPES; ++i)
@@ -451,21 +458,6 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 				t->RemoveMember(inf);
 		}
 		
-		if(guildid)
-		{
-			Guild *pGuild = objmgr.GetGuild(guildid);
-			if(pGuild)
-			{
-				if(pGuild->GetGuildLeaderGuid() == guid)
-				{
-					pGuild->DeleteGuildMembers();
-					pGuild->RemoveFromDb();
-				}
-				else
-					pGuild->DeleteGuildMember(guid);
-			}
-		}
-
 		sPlrLog.write("Account: %s | IP: %s >> Deleted player %s", GetAccountName().c_str(), GetSocket()->GetRemoteIP().c_str(), name.c_str());
 
 		sSocialMgr.RemovePlayer((uint32)guid);
@@ -645,16 +637,21 @@ void WorldSession::FullLogin(Player * plr)
 		info->lastLevel = plr->getLevel();
 		info->lastOnline = UNIXTIME;
 		info->lastZone = plr->GetZoneId();
-		info->officerNote = NULL;
-		info->publicNote = NULL;
 		info->race = plr->getRace();
-		info->Rank = plr->GetPVPRank();
 		info->team = plr->GetTeam();
+		info->guild=NULL;
+		info->guildRank=NULL;
 		info->m_Group=0;
 		info->subGroup=0;
 		objmgr.AddPlayerInfo(info);
 	}
 	plr->m_playerInfo = info;
+	if(plr->m_playerInfo->guild)
+	{
+		plr->m_uint32Values[PLAYER_GUILDID] = plr->m_playerInfo->guild->GetGuildId();
+		plr->m_uint32Values[PLAYER_GUILDRANK] = plr->m_playerInfo->guildRank->iId;
+	}
+
 	info->m_loggedInPlayer = plr;
 
 	// account data == UI config
@@ -787,22 +784,20 @@ void WorldSession::FullLogin(Player * plr)
 	//Issue a message telling all guild members that this player has signed on
 	if(plr->IsInGuild())
 	{
-		Guild *pGuild = objmgr.GetGuild( plr->GetGuildId() );
+		Guild *pGuild = plr->m_playerInfo->guild;
 		if(pGuild)
 		{
 			WorldPacket data(50);
 			data.Initialize(SMSG_GUILD_EVENT);
 			data << uint8(GUILD_EVENT_MOTD);
 			data << uint8(0x01);
-			data << pGuild->GetGuildMotd();
+			if(pGuild->GetMOTD())
+				data << pGuild->GetMOTD();
+			else
+				data << uint8(0);
 			SendPacket(&data);
 
-			data.Initialize(SMSG_GUILD_EVENT);
-			data << uint8(GUILD_EVENT_HASCOMEONLINE);
-			data << uint8(0x01);
-			data << plr->GetName();
-			data << plr->GetGUID();
-			pGuild->SendMessageToGuild(0,&data,G_MSGTYPE_ALL);
+			pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 1, plr->GetName());
 		}
 	}
 
@@ -861,7 +856,7 @@ void WorldSession::FullLogin(Player * plr)
 	sHookInterface.OnEnterWorld2(_player);
 #endif
 
-	if(enter_world)
+	if(enter_world && !_player->GetMapMgr())
 	{
 /*		MapMgr * mapMgr = sWorldCreator.GetInstance(plr->GetMapId(), plr);
 		
