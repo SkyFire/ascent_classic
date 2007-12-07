@@ -1,5 +1,7 @@
 alter table characters drop column guildid;
 alter table characters drop column guildRank;
+alter table characters drop column publicNote;
+alter table characters drop column officerNote;
 alter table guilds modify column createdate int(30) not null default 0;
 
 CREATE TABLE `guild_logs` (

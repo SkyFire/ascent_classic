@@ -673,7 +673,7 @@ Item* ItemInterface::FindItemLessMax(uint32 itemid, uint32 cnt, bool IncBank)
 		Item *item = GetInventoryItem(i);
 		if (item)
 		{
-			if((item->GetEntry() == itemid) && (item->GetProto()->MaxCount >= (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + cnt)))
+			if((item->GetEntry() == itemid && item->wrapped_item_id==0) && (item->GetProto()->MaxCount >= (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + cnt)))
 			{
 				return item; 
 			}
@@ -690,7 +690,7 @@ Item* ItemInterface::FindItemLessMax(uint32 itemid, uint32 cnt, bool IncBank)
 					Item *item2 = ((Container*)item)->GetItem(j);
 					if (item2)
 					{
-						if((item2->GetProto()->ItemId == itemid) && (item2->GetProto()->MaxCount >= (item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + cnt)))
+						if((item2->GetProto()->ItemId == itemid && item->wrapped_item_id==0) && (item2->GetProto()->MaxCount >= (item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + cnt)))
 						{
 							return item2;
 						}
@@ -707,7 +707,7 @@ Item* ItemInterface::FindItemLessMax(uint32 itemid, uint32 cnt, bool IncBank)
 			Item *item = GetInventoryItem(i);
 			if (item)
 			{
-				if((item->GetEntry() == itemid) && (item->GetProto()->MaxCount >= (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + cnt)))
+				if((item->GetEntry() == itemid && item->wrapped_item_id==0) && (item->GetProto()->MaxCount >= (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + cnt)))
 				{
 					return item; 
 				}
@@ -725,7 +725,7 @@ Item* ItemInterface::FindItemLessMax(uint32 itemid, uint32 cnt, bool IncBank)
 						Item *item2 = ((Container*)item)->GetItem(j);
 						if (item2)
 						{
-							if((item2->GetProto()->ItemId == itemid) && (item2->GetProto()->MaxCount >= (item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + cnt)))
+							if((item2->GetProto()->ItemId == itemid && item->wrapped_item_id==0) && (item2->GetProto()->MaxCount >= (item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + cnt)))
 							{
 								return item2;
 							}
@@ -752,7 +752,7 @@ uint32 ItemInterface::GetItemCount(uint32 itemid, bool IncBank)
 
 		if (item)
 		{
-			if(item->GetEntry() == itemid)
+			if(item->GetEntry() == itemid && item->wrapped_item_id==0)
 			{
 				cnt += item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) ? item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) : 1; 
 			}
@@ -769,7 +769,7 @@ uint32 ItemInterface::GetItemCount(uint32 itemid, bool IncBank)
 					Item *item2 = ((Container*)item)->GetItem(j);
 					if (item2)
 					{
-						if (item2->GetEntry() == itemid)
+						if (item2->GetEntry() == itemid && item->wrapped_item_id==0)
 						{
 							cnt += item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) ? item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) : 1; 
 						}
@@ -785,7 +785,7 @@ uint32 ItemInterface::GetItemCount(uint32 itemid, bool IncBank)
 
 		if (item)
 		{
-			if(item->GetProto()->ItemId == itemid)
+			if(item->GetProto()->ItemId == itemid && item->wrapped_item_id==0)
 			{
 				cnt += item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) ? item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) : 1;
 			}
@@ -799,7 +799,7 @@ uint32 ItemInterface::GetItemCount(uint32 itemid, bool IncBank)
 			Item *item = GetInventoryItem(i);
 			if (item)
 			{
-				if(item->GetProto()->ItemId == itemid)
+				if(item->GetProto()->ItemId == itemid && item->wrapped_item_id==0)
 				{
 					cnt += item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) ? item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) : 1;
 				}
@@ -818,7 +818,7 @@ uint32 ItemInterface::GetItemCount(uint32 itemid, bool IncBank)
 						Item *item2 = ((Container*)item)->GetItem(j);
 						if (item2)
 						{
-							if(item2->GetProto()->ItemId == itemid)
+							if(item2->GetProto()->ItemId == itemid && item->wrapped_item_id==0)
 							{
 								cnt += item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) ? item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) : 1;
 							}
@@ -848,7 +848,7 @@ uint32 ItemInterface::RemoveItemAmt(uint32 id, uint32 amt)
 		Item *item = GetInventoryItem(i);
 		if (item)
 		{
-			if(item->GetEntry() == id)
+			if(item->GetEntry() == id && item->wrapped_item_id==0)
 			{
 				if(item->GetProto()->ContainerSlots > 0 && ((Container*)item)->HasItems())
 				{
@@ -894,7 +894,7 @@ uint32 ItemInterface::RemoveItemAmt(uint32 id, uint32 amt)
 				Item *item2 = ((Container*)item)->GetItem(j);
 				if (item2)
 				{
-					if (item2->GetProto()->ItemId == id)
+					if (item2->GetProto()->ItemId == id && item->wrapped_item_id==0)
 					{
 						if (item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > amt)
 						{
@@ -931,7 +931,7 @@ uint32 ItemInterface::RemoveItemAmt(uint32 id, uint32 amt)
 		Item *item = GetInventoryItem(i);
 		if (item)
 		{
-			if(item->GetProto()->ItemId == id)
+			if(item->GetProto()->ItemId == id && item->wrapped_item_id==0)
 			{
 				if (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > amt)
 				{

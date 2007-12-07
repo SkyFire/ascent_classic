@@ -571,7 +571,7 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 	if(pMember->guild != NULL)
 		return;
 
-	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+	if(pClient && pClient->GetPlayer()->m_playerInfo->guild != this)
 		return;
 
 	if(pClient && !pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_INVITE))
