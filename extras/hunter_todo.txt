@@ -58,3 +58,6 @@ Auto shot:
 - interrupts on movement
 
 + all what scatler said + what i posted 2 weeks ago, and this is: Arcane Shot and Steady Shot crit chance based on intellect instead of agility and 1.5x crit damage for both of those shots (instead of 2x or 2.3x with talent)
+
+The Hunter spell Feign Death is bugged.
+You should fall "dead" on the floor and shake off the enemy's around you. You fall dead, but the enemy is still attacking.Feign Death is also usefull in PvP, coz when u fall "dead" every1 who is targeting u, lose their target (like with normal mobz, u attack and when it dies u r loosing the target). So imagine warlock/mage (whatever) casting shadowbolt/fireball (fe when u r slowed and can do shit) u could always use feign death to interrupt the cast (its only 1 spell but it saves the day sometimes ;p). So addind that small 'detargetting thing' could be pretty nice.

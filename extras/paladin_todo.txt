@@ -26,3 +26,6 @@ imp seal of crusader: doesn't work
 eye for an eye: doesn't work (crits return dmg)
 sanctified judgement: doesn't work (returns mana for a seal)
 sanctified crusader: doesn't work
+
+Judgement of Wisdom - will be placed but will NOT add mana on hit (neither self nor party)
+Judgement of Light - will be placed on target but will NOT add HP on hit (neither self nor party)

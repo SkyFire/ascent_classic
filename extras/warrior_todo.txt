@@ -24,3 +24,27 @@ Intimidating Shout
 Bug:
 If you damage target of Intimidating Shout - the one "cowering in fear" - you will fear yourself (and duration renews each time you damage "cowering in fear" target again - basic situation is having DoT on your target and fearing it - your target fear is sometimes removed after 1st DoT tick and you get 8sec fear on yourself, or DoT doesnt remove his fear and you keep getting 8sec fear each time your DoT damages your feared target).
 Enrage talent doesnt give a slightest bonus dmg. Good thing that Flurry seems to work fine.
+
+
+1. overpower doesn't work
+2. abilities that does damage in melee range such as mortal strike, bloodthirst, hamstring, slam etc. isn't doing damage in melee range.
+3. whirlwind doesn't hit enemies around 8 yards.
+4. second wind doesn't activate when getting immobilized by frost nova.
+5. disarm doesn't work
+
+talent -
+arms
+1. imp intercept doesn't decrease cool down
+2. impale doesn't increase critical damage
+3. two-handed weapon specialization doesn't increase damage
+
+fury
+3. imp whirlwind doesn't decrease cool down
+4. precision doesn't increase hit rating
+4. sweeping strike doesn't work
+5. rampage doesn't stacks(only gives the initial AP)
+
+protection
+6. tactical mastery doesn't work
+7. focused rage doesn't reduce rage cost of offensive ability
+8. one-handed weapon specialization doesn't increase damage
