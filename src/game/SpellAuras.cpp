@@ -3769,6 +3769,37 @@ void Aura::EventPeriodicLeech(uint32 amount)
 			return;
 	
 		uint32 Amount = min(amount,m_target->GetUInt32Value(UNIT_FIELD_HEALTH));
+
+		//deal damage before we add healing bonus to damage
+		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id,true);
+
+		//add here bonus to healing taken. Maybe not all spells should receive it ?
+		/*
+		//zack : have no idea if we should use downranking here so i'm removing it until confirmed
+		float healdoneaffectperc = 1500 / 3500;
+		//Downranking
+		if(GetSpellProto()->baseLevel > 0 && GetSpellProto()->maxLevel > 0)
+		{
+			float downrank1 = 1.0f;
+			if (GetSpellProto()->baseLevel < 20)
+			downrank1 = 1.0f - (20.0f - float (GetSpellProto()->baseLevel) ) * 0.0375f;
+			float downrank2 = ( float(GetSpellProto()->maxLevel + 5.0f) / float(m_caster->getLevel()) );
+			if (downrank2 >= 1 || downrank2 < 0)
+			downrank2 = 1.0f;
+			healdoneaffectperc *= downrank1 * downrank2;
+		}
+		Amount += float2int32(m_caster->HealDoneMod[GetSpellProto()->School] * healdoneaffectperc);*/
+		Amount += m_caster->HealDoneMod[GetSpellProto()->School];
+		Amount += (Amount*m_caster->HealDonePctMod[GetSpellProto()->School])/100;
+		Amount += m_caster->HealTakenMod[GetSpellProto()->School];//amt of health that u RECIVE, not heal
+		Amount += float2int32(m_caster->HealTakenPctMod[GetSpellProto()->School]*Amount);
+		if(m_caster->IsPlayer())  
+		{
+			Player *p_caster=(Player*)m_caster;
+			Amount += float2int32(p_caster->SpellHealDoneByInt[GetSpellProto()->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
+			Amount += float2int32(p_caster->SpellHealDoneBySpr[GetSpellProto()->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+		}
+
 		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
 		
 		uint32 mh = m_caster->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
@@ -3788,7 +3819,6 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		m_target->SendMessageToSet(&data,true);
 
 		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, FLAG_PERIODIC_LEECH);
-		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id,true);
 	}	
 }
 

@@ -3210,7 +3210,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	summaryPCTmod += pVictim->DamageTakenPctMod[school]-1;
 	if (caster->DamageDoneModPCT[school])
 		summaryPCTmod += caster->DamageDoneModPCT[school];
-	summaryPCTmod += pVictim->ModDamageTakenByMechPCT[spellInfo->MechanicsType]-1;
+	summaryPCTmod += pVictim->ModDamageTakenByMechPCT[spellInfo->MechanicsType];
 	int32 res = (int32)((base_dmg+bonus_damage)*summaryPCTmod);
 return res;
 }

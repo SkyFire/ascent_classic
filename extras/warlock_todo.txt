@@ -110,3 +110,5 @@ Soul Siphon - doesn't work
 Siphon Life - works but no bonus from healing
 Dark Pact - returns the extact mana drained from pet, no bonuses
 Improved Howl of Terror - works but requried to stand stilll to cast it instant otherwise it just says you need to be not moving..
+- unstable affliction doesn't silence the target if dispelled
+- amplify curse doesn't affect curse of exhaustion
