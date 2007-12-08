@@ -1269,7 +1269,7 @@ void Player::BuildEnumData( WorldPacket * p_data )
 	
 	if(getClass()==WARLOCK || getClass()==HUNTER)
 	{
-		QueryResult *result = CharacterDatabase.Query("SELECT entryid FROM playerpets WHERE ownerguid=%u AND active=1", GetGUIDLow());
+		QueryResult *result = CharacterDatabase.Query("SELECT entry FROM playerpets WHERE ownerguid=%u AND active=1", GetGUIDLow());
 		
 		if(result)
 		{

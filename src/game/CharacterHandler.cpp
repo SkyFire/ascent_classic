@@ -116,7 +116,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 
 			if(Class==9 || Class==3)
 			{
-				res = CharacterDatabase.Query("SELECT entryid FROM playerpets WHERE ownerguid="I64FMTD" AND active=1", guid);
+				res = CharacterDatabase.Query("SELECT entry FROM playerpets WHERE ownerguid="I64FMTD" AND active=1", guid);
 
 				if(res)
 				{
