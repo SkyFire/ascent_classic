@@ -1045,7 +1045,7 @@ CREATE TABLE `quests_localized` (
 
 CREATE TABLE `recall` (
   `id` bigint(20) unsigned NOT NULL auto_increment,
-  `locname` varchar(100) NOT NULL,
+  `name` varchar(100) NOT NULL,
   `MapId` int(10) unsigned NOT NULL default '0',
   `positionX` float NOT NULL default '0',
   `positionY` float NOT NULL default '0',

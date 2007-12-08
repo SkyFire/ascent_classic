@@ -1,1 +1,0 @@
-ALTER TABLE `recall` CHANGE `name` `locname` varchar(100) NOT NULL;

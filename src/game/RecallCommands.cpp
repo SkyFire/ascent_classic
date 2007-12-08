@@ -55,7 +55,7 @@ bool ChatHandler::HandleRecallAddCommand(const char* args, WorldSession *m_sessi
 	if(!*args)
 		return false;
 	
-	QueryResult *result = WorldDatabase.Query( "SELECT locname FROM recall" );
+	QueryResult *result = WorldDatabase.Query( "SELECT name FROM recall" );
 	if(!result)
 		return false;
 	do
@@ -76,7 +76,7 @@ bool ChatHandler::HandleRecallAddCommand(const char* args, WorldSession *m_sessi
 	
 	string rc_locname = string(args);
 
-	ss << "INSERT INTO recall (locname, mapid, positionX, positionY, positionZ) VALUES ('"
+	ss << "INSERT INTO recall (name, mapid, positionX, positionY, positionZ) VALUES ('"
 	<< WorldDatabase.EscapeString(rc_locname).c_str() << "' , "
 	<< plr->GetMapId() << ", "
 	<< plr->GetPositionX() << ", " 
@@ -98,7 +98,7 @@ bool ChatHandler::HandleRecallDelCommand(const char* args, WorldSession *m_sessi
 	   if(!*args)
 		return false;
 
-	QueryResult *result = WorldDatabase.Query( "SELECT id,locname FROM recall" );
+	QueryResult *result = WorldDatabase.Query( "SELECT id,name FROM recall" );
 	if(!result)
 		return false;
 
@@ -127,7 +127,7 @@ bool ChatHandler::HandleRecallDelCommand(const char* args, WorldSession *m_sessi
 
 bool ChatHandler::HandleRecallListCommand(const char* args, WorldSession *m_session)
 {
-	QueryResult *result = WorldDatabase.Query( "SELECT id,locname FROM recall ORDER BY locname" );
+	QueryResult *result = WorldDatabase.Query( "SELECT id,name FROM recall ORDER BY name" );
 	if(!result)
 		return false;
 	std::string recout;
