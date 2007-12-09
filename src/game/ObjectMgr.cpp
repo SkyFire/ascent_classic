@@ -190,9 +190,9 @@ ObjectMgr::~ObjectMgr()
 	}
 
 	sLog.outString("Deleting groups...");
-	for(GroupSet::iterator itr = mGroupSet.begin(); itr != mGroupSet.end();)
+	for(GroupMap::iterator itr = m_groups.begin(); itr != m_groups.end();)
 	{
-		Group * pGroup = *itr;
+		Group * pGroup = itr->second;
 		++itr;
 
 		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); ++i)
@@ -2498,7 +2498,7 @@ void ObjectMgr::LoadGroups()
 		delete result;
 	}
 
-	Log.Notice("ObjectMgr", "%u groups loaded.", this->mGroupSet.size());
+	Log.Notice("ObjectMgr", "%u groups loaded.", this->m_groups.size());
 }
 
 void ObjectMgr::LoadArenaTeams()
