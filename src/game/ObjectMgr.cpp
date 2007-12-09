@@ -219,30 +219,33 @@ ObjectMgr::~ObjectMgr()
 
 Group * ObjectMgr::GetGroupByLeader(Player* pPlayer)
 {
-	GroupSet::const_iterator itr;
-	for (itr = mGroupSet.begin(); itr != mGroupSet.end(); itr++)
+	GroupMap::iterator itr;
+	Group * ret=NULL;
+	m_groupLock.AcquireReadLock();
+	for(itr = m_groups.begin(); itr != m_groups.end(); ++itr)
 	{
-		if ((*itr)->GetLeader() == pPlayer)
+		if(itr->second->GetLeader()==pPlayer)
 		{
-			return *itr;
+			ret = itr->second;
+			break;
 		}
 	}
 
-	return NULL;
+	m_groupLock.ReleaseReadLock();
+	return ret;
 }
 
 Group * ObjectMgr::GetGroupById(uint32 id)
 {
-	GroupSet::const_iterator itr;
-	for (itr = mGroupSet.begin(); itr != mGroupSet.end(); itr++)
-	{
-		if ((*itr)->GetID() == id)
-		{
-			return *itr;
-		}
-	}
+	GroupMap::iterator itr;
+	Group * ret=NULL;
+	m_groupLock.AcquireReadLock();
+	itr = m_groups.find(id);
+	if(itr!=m_groups.end())
+		ret=itr->second;
 
-	return NULL;
+	m_groupLock.ReleaseReadLock();
+	return ret;
 }
 
 //

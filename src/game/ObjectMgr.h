@@ -287,7 +287,7 @@ public:
 	// other objects
     
     // Set typedef's
-	typedef std::set< Group * >                                         GroupSet;
+	typedef HM_NAMESPACE::hash_map<uint32, Group*>						GroupMap;
 	
     // HashMap typedef's
     typedef HM_NAMESPACE::hash_map<uint64, Item*>                       ItemMap;
@@ -340,7 +340,11 @@ public:
 	Group * GetGroupById(uint32 id);
 	inline uint32 GenerateGroupId()
 	{
-		return ++m_hiGroupId;
+		uint32 r;
+		m_guidGenMutex.Acquire();
+		r = ++m_hiGroupId;
+		m_guidGenMutex.Release();
+		return r;
 	}
 
 	inline uint32 GenerateGuildId()
@@ -352,8 +356,20 @@ public:
 		return r;
 	}
 
-	void AddGroup(Group* group) { mGroupSet.insert( group ); }
-	void RemoveGroup(Group* group) { mGroupSet.erase( group ); }
+	void AddGroup(Group* group)
+	{
+		m_groupLock.AcquireWriteLock();
+		m_groups.insert(make_pair(group->GetID(), group));
+		m_groupLock.ReleaseWriteLock();
+	}
+
+	void RemoveGroup(Group* group)
+	{
+		m_groupLock.AcquireWriteLock();
+		m_groups.erase(group->GetID());
+		m_groupLock.ReleaseWriteLock();
+	}
+
 	void LoadGroups();
 
 	// player names
@@ -572,7 +588,8 @@ protected:
 	// These tables are modified as creatures are created and destroyed in the world
 
 	// Group List
-	GroupSet			mGroupSet;
+	RWLock m_groupLock;
+	GroupMap m_groups;
 
 	// Map of all starting infos needed for player creation
 	PlayerCreateInfoMap mPlayerCreateInfo;

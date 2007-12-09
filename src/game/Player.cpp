@@ -5581,12 +5581,12 @@ void Player::CalcResistance(uint32 type)
 	pos+=FlatResistanceModifierPos[type];
 	neg+=FlatResistanceModifierNeg[type];
 	res=BaseResistance[type]+pos-neg;
-	if(type==0)res+=GetUInt32Value(UNIT_FIELD_STAT1)*2;//fix armor from agi
+	if(type==0)res+=m_uint32Values[UNIT_FIELD_STAT1]*2;//fix armor from agi
 	if(res<0)res=0;
 	pos+=(res*ResistanceModPctPos[type])/100;
 	neg+=(res*ResistanceModPctNeg[type])/100;
 	res=pos-neg+BaseResistance[type];
-	if(type==0)res+=GetUInt32Value(UNIT_FIELD_STAT1)*2;//fix armor from agi
+	if(type==0)res+=m_uint32Values[UNIT_FIELD_STAT1]*2;//fix armor from agi
 	SetUInt32Value(UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE+type,pos);
 	SetUInt32Value(UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE+type,neg);
 	SetUInt32Value(UNIT_FIELD_RESISTANCES+type,res>0?res:0);

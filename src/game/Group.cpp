@@ -945,6 +945,9 @@ void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribu
 		m_groupLock.Acquire();
 		for(uint32 i = 0; i < m_SubGroupCount; ++i)
 		{
+			if(m_SubGroups[i]==NULL)
+				continue;
+
 			for(GroupMembersSet::iterator itr = m_SubGroups[i]->GetGroupMembersBegin(); itr != m_SubGroups[i]->GetGroupMembersEnd();)
 			{
 				plr = itr->player;
@@ -986,6 +989,9 @@ void Group::UpdateAllOutOfRangePlayersFor(Player * pPlayer)
 	m_groupLock.Acquire();
 	for(uint32 i = 0; i < m_SubGroupCount; ++i)
 	{
+		if(m_SubGroups[i]==NULL)
+			continue;
+
 		for(GroupMembersSet::iterator itr = m_SubGroups[i]->GetGroupMembersBegin(); itr != m_SubGroups[i]->GetGroupMembersEnd(); ++itr)
 		{
 			plr = itr->player;
