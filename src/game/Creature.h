@@ -360,6 +360,7 @@ public:
 	float ModDamageDonePct[7];
 	void CalcResistance(uint32 type);
 	void CalcStat(uint32 type);
+	bool m_canRegenerateHP;
 	void RegenerateHealth();
 	void RegenerateMana();
 

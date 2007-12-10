@@ -98,6 +98,7 @@ Creature::Creature(uint32 high, uint32 low)
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
 	m_noRespawn=false;
+    m_canRegenerateHP = true;
 }
 
 
@@ -597,7 +598,7 @@ void Creature::CalcStat(uint32 type)
 
 void Creature::RegenerateHealth()
 {
-	if(m_limbostate)
+	if(m_limbostate || !m_canRegenerateHP)
 		return;
 
 	uint32 cur=GetUInt32Value(UNIT_FIELD_HEALTH);
