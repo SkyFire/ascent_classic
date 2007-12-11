@@ -128,18 +128,27 @@ void CommandTableStorage::Override(const char * command, const char * level)
 				{
 					while(p2->Name != 0)
 					{
-						if(!strnicmp(p2->Name, subcommand_name, len2))
+						if(!strnicmp("*",subcommand_name,1))
 						{
-							// change the level
-							p2->CommandGroup = level[0];
-							printf("Changing command level of command `%s`:`%s` to %c.\n", p->Name, p2->Name, level[0]);
-							break;
+								p2->CommandGroup = level[0];
+								printf("Changing command level of command (wildcard) `%s`:`%s` to %c.\n", p->Name, p2->Name, level[0]);
+						}else{
+							if(!strnicmp(p2->Name, subcommand_name, len2))
+							{
+								// change the level
+								p2->CommandGroup = level[0];
+								printf("Changing command level of command `%s`:`%s` to %c.\n", p->Name, p2->Name, level[0]);
+								break;
+							}
 						}
 						p2++;
 					}
 					if(p2->Name == 0)
 					{
-						printf("Invalid subcommand referenced: `%s` under `%s`.\n", subcommand_name, p->Name);
+						if(strnicmp("*",subcommand_name,1)) //Hacky.. meh.. -DGM
+						{
+							printf("Invalid subcommand referenced: `%s` under `%s`.\n", subcommand_name, p->Name);
+						}
 						break;
 					}
 				}

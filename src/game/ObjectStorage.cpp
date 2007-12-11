@@ -437,6 +437,12 @@ bool Storage_ReloadTable(const char * TableName)
 		WorldMapInfoStorage.Reload();
 	else if(!stricmp(TableName, "zoneguards"))
 		ZoneGuardStorage.Reload();
+	else if(!stricmp(TableName, "command_overrides"))	// Command Overrides
+	{
+		CommandTableStorage::getSingleton().Dealloc();
+		CommandTableStorage::getSingleton().Init();
+		CommandTableStorage::getSingleton().Load();
+	}
 	else
 		return false;
 	
