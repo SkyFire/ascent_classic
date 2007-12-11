@@ -293,7 +293,7 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	m_lock.Acquire();
 	for(GuildRankVector::iterator vtr = m_ranks.begin(); vtr != m_ranks.end(); ++vtr) 
 	{
-		if((*vtr)->iId < nh || !newRank && (*vtr)->iId != 0)		// cannot promote to guildmaster
+		if((*vtr) && (*vtr)->iId < nh || !newRank && (*vtr)->iId != 0)		// cannot promote to guildmaster
 		{
 			newRank = (*vtr);
 			nh = newRank->iId;
@@ -350,7 +350,7 @@ void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	m_lock.Acquire();
 	for(GuildRankVector::iterator vtr = m_ranks.begin(); vtr != m_ranks.end(); ++vtr) 
 	{
-		if((*vtr)->iId > nh || !newRank)
+		if((*vtr) && (*vtr)->iId > nh || !newRank)
 		{
 			newRank = (*vtr);
 			nh = newRank->iId;
@@ -1012,8 +1012,8 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 		else
 			data << uint8(0);
 
-		if(!ofnote || itr->second->szOfficerNote == NULL)
-			data << uint8(0);
+		if(ofnote && itr->second->szOfficerNote != NULL)
+			data << itr->second->szOfficerNote;
 		else
 			data << uint8(0);
 	}
