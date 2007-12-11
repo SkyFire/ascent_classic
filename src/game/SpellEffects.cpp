@@ -4141,7 +4141,39 @@ void Spell::SpellEffectResurrect(uint32 i) // Resurrect (Flat)
 {
 	if(!playerTarget)
 	{
-		if(!corpseTarget) return;
+		if(!corpseTarget)
+		{
+			// unit resurrection handler
+			if(unitTarget)
+			{
+				if(unitTarget->GetTypeId()==TYPEID_UNIT)
+				{
+					uint32 hlth = (m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH) : m_spellInfo->EffectBasePoints[i];
+					uint32 mana = (m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1) : m_spellInfo->EffectBasePoints[i];
+
+					if(!unitTarget->IsPet())
+					{
+						sEventMgr.RemoveEvents(unitTarget, EVENT_CREATURE_REMOVE_CORPSE);
+					}
+					else
+					{
+						sEventMgr.RemoveEvents(unitTarget, EVENT_PET_DELAYED_REMOVE);
+						sEventMgr.RemoveEvents(unitTarget, EVENT_CREATURE_REMOVE_CORPSE);
+					}
+					unitTarget->SetUInt32Value(UNIT_FIELD_HEALTH, hlth);
+					unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, mana);
+					unitTarget->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
+					unitTarget->setDeathState(ALIVE);
+					((Creature*)unitTarget)->Tagged=false;
+					((Creature*)unitTarget)->TaggerGuid=false;
+					((Creature*)unitTarget)->loot.gold=0;
+					((Creature*)unitTarget)->loot.looters.clear();
+					((Creature*)unitTarget)->loot.items.clear();
+				}
+			}
+
+			return;
+		}
 		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt32Value(CORPSE_FIELD_OWNER));
 		if(!playerTarget) return;
 	}
@@ -4405,7 +4437,39 @@ void Spell::SpellEffectResurrectNew(uint32 i)
 	//base p =hp,misc mana
 	if(!playerTarget)
 	{
-		if(!corpseTarget) return;
+		if(!corpseTarget)
+		{
+			// unit resurrection handler
+			if(unitTarget)
+			{
+				if(unitTarget->GetTypeId()==TYPEID_UNIT)
+				{
+					uint32 hlth = (m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH) : m_spellInfo->EffectBasePoints[i];
+					uint32 mana = (m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1) : m_spellInfo->EffectBasePoints[i];
+
+					if(!unitTarget->IsPet())
+					{
+						sEventMgr.RemoveEvents(unitTarget, EVENT_CREATURE_REMOVE_CORPSE);
+					}
+					else
+					{
+						sEventMgr.RemoveEvents(unitTarget, EVENT_PET_DELAYED_REMOVE);
+						sEventMgr.RemoveEvents(unitTarget, EVENT_CREATURE_REMOVE_CORPSE);
+					}
+					unitTarget->SetUInt32Value(UNIT_FIELD_HEALTH, hlth);
+					unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, mana);
+					unitTarget->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
+					unitTarget->setDeathState(ALIVE);
+					((Creature*)unitTarget)->Tagged=false;
+					((Creature*)unitTarget)->TaggerGuid=false;
+					((Creature*)unitTarget)->loot.gold=0;
+					((Creature*)unitTarget)->loot.looters.clear();
+					((Creature*)unitTarget)->loot.items.clear();
+				}
+			}
+
+			return;
+		}
 		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt32Value(CORPSE_FIELD_OWNER));
 		if(!playerTarget) return;
 	}
