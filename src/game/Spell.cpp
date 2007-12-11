@@ -1373,7 +1373,13 @@ void Spell::cast(bool check)
 								HandleEffects((*i),x);
                             }
 						}
+
+						// Capt: The way this is done is NOT GOOD. Target code should be redone.
 						else if(m_spellInfo->Effect[x] == SPELL_EFFECT_TELEPORT_UNITS)
+                        {
+							HandleEffects(m_caster->GetGUID(),x);
+                        }
+						else if(m_spellInfo->Effect[x] == SPELL_EFFECT_SUMMON_WILD)
                         {
 							HandleEffects(m_caster->GetGUID(),x);
                         }
