@@ -181,6 +181,10 @@ enum GuildRankRights
 	GR_RIGHT_EGUILDINFO		= 0x10000,
 	GR_RIGHT_ALL			= 0x1F1FF,
 	GR_RIGHT_DEFAULT		= GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK,
+
+	GR_RIGHT_GUILDBANKPERMS				= 0x100000,
+	GR_RIGHT_GUILD_BANK_VIEW_TAB		= GR_RIGHT_GUILDBANKPERMS | 0x01,
+	GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS	= GR_RIGHT_GUILDBANKPERMS | 0x02,
 };
 
 
@@ -206,6 +210,7 @@ enum GuildEvent
 	GUILD_EVENT_UNK2				=0xB,
 	GUILD_EVENT_HASCOMEONLINE	   =0xC,
 	GUILD_EVENT_HASGONEOFFLINE	  =0xD,
+	GUILD_EVENT_BANKTABBOUGHT		= 0xF,
 };
 enum GuildLogEventE
 {
@@ -229,7 +234,10 @@ struct SERVER_DECL GuildRank
 {
 	uint32 iId;
 	uint32 iRights;
-	uint32 iExtraRights[13];
+	uint32 iGoldLimitPerDay;
+	uint32 iBankTabFlags;
+	uint32 iItemStacksPerDay;
+	uint32 iExtraRights[10];
 	char * szRankName;
 	bool CanPerformCommand(uint32 t);
 };
@@ -383,6 +391,30 @@ public:
 	 */
 	void RemoveGuildRank(WorldSession * pClient);
 
+	/** Buys a new guild bank tab, usable only by guild master 
+	 */
+	void BuyBankTab(WorldSession * pClient);
+
+	/** Deposits money into the guild bank, usable by any member.
+	 */
+	void DepositMoney(WorldSession * pClient, uint32 uAmount);
+
+	/** Withdraws money from the guild bank, usable by members with that permission.
+	 */
+	void WithdrawMoney(WorldSession * pClient, uint32 uAmount);
+
+	/** Deposits an item into the guild bank.
+	 */
+	//void DepositItem
+
+	/** Retrieves a guild rank for editing
+	 */
+	inline GuildRank * GetGuildRank(uint32 Id)
+	{ 
+		if(Id >= MAX_GUILD_RANKS)
+			return NULL;
+		return m_ranks[Id];
+	}
 
 protected:
 	

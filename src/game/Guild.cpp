@@ -120,7 +120,10 @@ GuildRank * Guild::FindNextLowestRank(GuildRank * r)
 
 bool GuildRank::CanPerformCommand(uint32 t)
 {
-	return ((iRights & t) >0 ? true : false);
+	if(t & GR_RIGHT_GUILDBANKPERMS)
+		return ((iBankTabFlags & t) >0 ? true : false);
+	else
+		return ((iRights & t) >0 ? true : false);
 }
 
 void Guild::LogGuildEvent(uint8 iEvent, uint8 iStringCount, ...)
@@ -242,8 +245,8 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 	CreateInDB();
 
 	// rest of the fields have been nulled out, create some default ranks.
-	GuildRank * leaderRank = CreateGuildRank("Guild Master", GR_RIGHT_ALL);
-	CreateGuildRank("Officer", GR_RIGHT_ALL);
+	GuildRank * leaderRank = CreateGuildRank("Guild Master", GR_RIGHT_ALL | GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS | GR_RIGHT_GUILD_BANK_VIEW_TAB);
+	CreateGuildRank("Officer", GR_RIGHT_ALL | GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS | GR_RIGHT_GUILD_BANK_VIEW_TAB);
 	CreateGuildRank("Veteran", GR_RIGHT_DEFAULT);
 	CreateGuildRank("Member", GR_RIGHT_DEFAULT);
 	GuildRank * defRank = CreateGuildRank("Initiate", GR_RIGHT_DEFAULT);
@@ -293,7 +296,7 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	m_lock.Acquire();
 	for(GuildRankVector::iterator vtr = m_ranks.begin(); vtr != m_ranks.end(); ++vtr) 
 	{
-		if((*vtr) && (*vtr)->iId < nh || !newRank && (*vtr)->iId != 0)		// cannot promote to guildmaster
+		if((*vtr) && ((*vtr)->iId < nh || !newRank) && (*vtr)->iId != 0)		// cannot promote to guildmaster
 		{
 			newRank = (*vtr);
 			nh = newRank->iId;

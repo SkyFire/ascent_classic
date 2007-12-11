@@ -552,6 +552,7 @@ protected:
 	void HandleGuildBankViewTab(WorldPacket & recv_data);
 	void HandleGuildBankView(WorldPacket & recv_data);
 	void HandleGuildBankOpenVault(WorldPacket & recv_data);
+	void HandleGuildBankBuyTab(WorldPacket & recv_data);
 
 	// Pet
 	void HandlePetAction(WorldPacket & recv_data);

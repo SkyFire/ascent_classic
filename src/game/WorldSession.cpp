@@ -762,6 +762,7 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_SET_GUILD_INFORMATION].handler					 = &WorldSession::HandleSetGuildInformation;
 	WorldPacketHandlers[MSG_GUILD_LOG].handler								= &WorldSession::HandleGuildLog;
 	WorldPacketHandlers[0x03E5].handler										= &WorldSession::HandleGuildBankOpenVault;
+	WorldPacketHandlers[CMSG_GUILD_BANK_PURCHASE_TAB].handler				= &WorldSession::HandleGuildBankBuyTab;
 	
 	// Tutorials
 	WorldPacketHandlers[CMSG_TUTORIAL_FLAG].handler							 = &WorldSession::HandleTutorialFlag;
