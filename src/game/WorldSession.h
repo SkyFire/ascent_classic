@@ -550,9 +550,15 @@ protected:
 	void HandleSetGuildInformation(WorldPacket & recv_data);
 	void HandleGuildLog(WorldPacket & recv_data);
 	void HandleGuildBankViewTab(WorldPacket & recv_data);
-	void HandleGuildBankView(WorldPacket & recv_data);
+	void HandleGuildBankViewLog(WorldPacket & recv_data);
 	void HandleGuildBankOpenVault(WorldPacket & recv_data);
 	void HandleGuildBankBuyTab(WorldPacket & recv_data);
+	void HandleGuildBankDepositMoney(WorldPacket & recv_data);
+	void HandleGuildBankWithdrawMoney(WorldPacket & recv_data);
+	void HandleGuildBankDepositItem(WorldPacket & recv_data);
+	void HandleGuildBankWithdrawItem(WorldPacket & recv_data);
+	void HandleGuildBankGetAvailableAmount(WorldPacket & recv_data);
+	void HandleGuildBankModifyTab(WorldPacket & recv_data);
 
 	// Pet
 	void HandlePetAction(WorldPacket & recv_data);

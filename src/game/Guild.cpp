@@ -61,6 +61,15 @@ Guild::~Guild()
 	{
 		delete (*itr);
 	}
+
+	for(GuildBankTabVector::iterator itr = m_bankTabs.begin(); itr != m_bankTabs.end(); ++itr)
+	{
+		for(uint32 i = 0; i < MAX_GUILD_BANK_SLOTS; ++i)
+			if((*itr)->pSlots[i] != NULL)
+				delete (*itr)->pSlots[i];
+
+		delete (*itr);
+	}
 }
 
 void Guild::SendGuildCommandResult(WorldSession * pClient, uint32 iCmd, const char * szMsg, uint32 iType)
@@ -214,8 +223,11 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions)
 			GuildRank * r = new GuildRank;
 			r->iId = i;
 			r->iRights=iPermissions;
-			memset(r->iExtraRights, 0, sizeof(uint32)*13);
+			memset(r->iExtraRights, 0, sizeof(uint32)*10);
 			r->szRankName = strdup(szRankName);
+			r->iBankTabFlags=0;
+			r->iGoldLimitPerDay=0;
+			r->iItemStacksPerDay=0;
 			m_ranks[i] = r;
 			m_lock.Release();
 
@@ -245,11 +257,14 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 	CreateInDB();
 
 	// rest of the fields have been nulled out, create some default ranks.
-	GuildRank * leaderRank = CreateGuildRank("Guild Master", GR_RIGHT_ALL | GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS | GR_RIGHT_GUILD_BANK_VIEW_TAB);
-	CreateGuildRank("Officer", GR_RIGHT_ALL | GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS | GR_RIGHT_GUILD_BANK_VIEW_TAB);
+	GuildRank * leaderRank = CreateGuildRank("Guild Master", GR_RIGHT_ALL);
+	CreateGuildRank("Officer", GR_RIGHT_ALL);
 	CreateGuildRank("Veteran", GR_RIGHT_DEFAULT);
 	CreateGuildRank("Member", GR_RIGHT_DEFAULT);
 	GuildRank * defRank = CreateGuildRank("Initiate", GR_RIGHT_DEFAULT);
+
+	// lets set some guildbank fields
+	leaderRank->iBankTabFlags = (GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS | GR_RIGHT_GUILD_BANK_VIEW_TAB) & ~GR_RIGHT_GUILDBANKPERMS;
 
 	// turn off command logging, we don't wanna spam the logs
 	m_commandLogging = false;
@@ -405,6 +420,7 @@ bool Guild::LoadFromDB(Field * f)
 	m_guildInfo = strlen(f[8].GetString()) ? strdup(f[8].GetString()) : NULL;
 	m_motd = strlen(f[9].GetString()) ? strdup(f[9].GetString()) : NULL;
 	m_creationTimeStamp = f[10].GetUInt32();
+	m_bankTabCount = f[11].GetUInt32();
 
 	// load ranks
 	uint32 i;
@@ -431,9 +447,12 @@ bool Guild::LoadFromDB(Field * f)
 		sid++;
 		r->szRankName = strdup(f2[2].GetString());
 		r->iRights = f2[3].GetUInt32();
+		r->iGoldLimitPerDay = f2[4].GetUInt32();
+		r->iBankTabFlags = f2[5].GetUInt32();
+		r->iItemStacksPerDay = f2[6].GetUInt32();
 
-		for(i = 0; i < 13; ++i)
-			r->iExtraRights[i] = f2[4+i].GetUInt32();
+		for(i = 0; i < 10; ++i)
+			r->iExtraRights[i] = f2[7+i].GetUInt32();
 
 		//m_ranks.push_back(r);
 		ASSERT(m_ranks[r->iId] == NULL);
@@ -480,6 +499,12 @@ bool Guild::LoadFromDB(Field * f)
 		else
 			gm->szOfficerNote = NULL;
 
+		gm->uLastWithdrawReset = f3[5].GetUInt32();
+		gm->uWithdrawlsSinceLastReset = f3[6].GetUInt32();
+		gm->uLastItemWithdrawReset = f3[7].GetUInt32();
+		gm->uItemWithdrawlsSinceLastReset = f3[8].GetUInt32();
+		gm->uDepositedMoney = f3[9].GetUInt32();
+
 		m_members.insert(make_pair(gm->pPlayer, gm));
 
 	} while(result->NextRow());
@@ -507,6 +532,52 @@ bool Guild::LoadFromDB(Field * f)
 			li->iEventData[1] = result->Fetch()[5].GetUInt32();
 			li->iEventData[2] = result->Fetch()[6].GetUInt32();
 		} while(result->NextRow());
+		delete result;
+	}
+
+	result = CharacterDatabase.Query("SELECT * FROM guild_banktabs WHERE guildId = %u ORDER BY tabId ASC", m_guildId);
+	sid = 0;
+	if(result)
+	{
+		do 
+		{
+			if((sid++) != result->Fetch()[1].GetUInt32())
+			{
+				MessageBox(0, "Guild bank tabs are out of order!", "Internal error", MB_OK);
+				TerminateProcess(GetCurrentProcess(), 0);
+				return false;
+			}
+
+			QueryResult * res2 = CharacterDatabase.Query("SELECT * FROM guild_bankitems WHERE guildId = %u AND tabId = %u", m_guildId, result->Fetch()[1].GetUInt32());
+			GuildBankTab * pTab = new GuildBankTab;
+			pTab->iTabId = (uint8)result->Fetch()[1].GetUInt32();
+			pTab->szTabIcon = (strlen(result->Fetch()[2].GetString()) > 0) ? strdup(result->Fetch()[2].GetString()) : NULL;
+			pTab->szTabName = (strlen(result->Fetch()[3].GetString()) > 0) ? strdup(result->Fetch()[3].GetString()) : NULL;
+			
+			memset(pTab->pSlots, 0, sizeof(Item*) * MAX_GUILD_BANK_SLOTS);
+			memset(pTab->uOwnerGuid, 0, sizeof(uint32) * MAX_GUILD_BANK_SLOTS);
+
+			if(res2)
+			{
+				do 
+				{
+					Item * pItem = objmgr.LoadItem(res2->Fetch()[3].GetUInt64());
+					if(pItem == NULL)
+					{
+						CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE itemGuid = %u AND guildId = %u AND tabId = %u", res2->Fetch()[3].GetUInt32(), m_guildId, (uint32)pTab->iTabId);
+						continue;
+					}
+
+					pTab->pSlots[res2->Fetch()[2].GetUInt32()] = pItem;
+					pTab->uOwnerGuid[res2->Fetch()[2].GetUInt32()] = res2->Fetch()[4].GetUInt32();
+
+				} while (res2->NextRow());
+				delete res2;
+			}
+
+			m_bankTabs.push_back(pTab);
+
+		} while (result->NextRow());
 		delete result;
 	}
 
@@ -978,6 +1049,9 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 		else
 		{
 			data << r->iRights;
+			data << r->iGoldLimitPerDay;
+			data << r->iBankTabFlags;
+			data << r->iItemStacksPerDay;
 			data << r->iExtraRights[0];
 			data << r->iExtraRights[1];
 			data << r->iExtraRights[2];
@@ -988,9 +1062,6 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 			data << r->iExtraRights[7];
 			data << r->iExtraRights[8];
 			data << r->iExtraRights[9];
-			data << r->iExtraRights[10];
-			data << r->iExtraRights[11];
-			data << r->iExtraRights[12];
 		}
 	}
 
@@ -1065,4 +1136,29 @@ void Guild::CreateInDB()
 Guild* Guild::Create()
 {
 	return new Guild();
+}
+
+void Guild::BuyBankTab(WorldSession * pClient)
+{
+	if(pClient && pClient->GetPlayer()->GetGUIDLow() != m_guildLeader)
+		return;
+
+	m_lock.Acquire();
+
+	if(m_bankTabCount>=MAX_GUILD_BANK_TABS)
+		return;
+	
+	GuildBankTab * pTab = new GuildBankTab;
+	pTab->iTabId = m_bankTabCount;
+	memset(pTab->pSlots, 0, sizeof(Item*)*MAX_GUILD_BANK_SLOTS);
+	memset(pTab->uOwnerGuid,0,sizeof(uint32)*MAX_GUILD_BANK_SLOTS);
+	pTab->szTabName=NULL;
+	pTab->szTabIcon=NULL;
+
+	m_bankTabs.push_back(pTab);
+	m_bankTabCount++;
+
+	CharacterDatabase.Execute("INSERT INTO guild_banktabs VALUES(%u, %u, '', '')", m_guildId, (uint32)pTab->iTabId);
+	CharacterDatabase.Execute("UPDATE guilds SET bankTabCount = %u WHERE guildId = %u", (uint32)pTab->iTabId, m_guildId);
+	m_lock.Release();
 }

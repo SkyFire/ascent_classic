@@ -248,6 +248,11 @@ struct SERVER_DECL GuildMember
 	const char * szPublicNote;
 	const char * szOfficerNote;
 	GuildRank * pRank;
+	uint32 uLastWithdrawReset;
+	uint32 uWithdrawlsSinceLastReset;
+	uint32 uLastItemWithdrawReset;
+	uint32 uItemWithdrawlsSinceLastReset;
+	uint32 uDepositedMoney;
 };
 
 struct SERVER_DECL GuildLogEvent
@@ -256,6 +261,18 @@ struct SERVER_DECL GuildLogEvent
 	uint8 iEvent;
 	uint32 iTimeStamp;
 	uint32 iEventData[3];
+};
+
+#define MAX_GUILD_BANK_SLOTS 98
+#define MAX_GUILD_BANK_TABS 6
+
+struct SERVER_DECL GuildBankTab
+{
+	uint8 iTabId;
+	char * szTabName;
+	char * szTabIcon;
+	Item * pSlots[MAX_GUILD_BANK_SLOTS];
+	uint32 uOwnerGuid[MAX_GUILD_BANK_SLOTS];
 };
 
 class Charter;
@@ -382,6 +399,7 @@ public:
 	inline const char * GetGuildName() const { return m_guildName; }
 	inline const uint32 GetGuildLeader() const { return m_guildLeader; }
 	inline const uint32 GetGuildId() const { return m_guildId; }
+	inline const uint32 GetBankTabCount() const { return m_bankTabCount; }
 
 	/** Creates a guild rank with the specified permissions.
 	 */
@@ -413,7 +431,32 @@ public:
 	{ 
 		if(Id >= MAX_GUILD_RANKS)
 			return NULL;
+
 		return m_ranks[Id];
+	}
+
+	/** Gets a guild bank tab for editing/viewing
+	 */
+
+	inline GuildBankTab * GetBankTab(uint32 Id)
+	{
+		if(Id >= m_bankTabCount)
+			return NULL;
+
+		return m_bankTabs[Id];
+	}
+
+	/** Gets a guild member struct
+	 */
+	inline GuildMember * GetGuildMember(PlayerInfo * pInfo)
+	{
+		GuildMemberMap::iterator itr;
+		GuildMember * ret;
+		m_lock.Acquire();
+		itr = m_members.find(pInfo);
+		ret = (itr!=m_members.end()) ? itr->second : NULL;
+		m_lock.Release();
+		return ret;
 	}
 
 protected:
@@ -433,6 +476,11 @@ protected:
 	uint32 m_backgroundColor;
 	uint32 m_guildLeader;
 	uint32 m_creationTimeStamp;
+	uint32 m_bankTabCount;
+
+	typedef vector<GuildBankTab*> GuildBankTabVector;
+	GuildBankTabVector m_bankTabs;
+
 	char * m_guildName;
 	char * m_guildInfo;
 	char * m_motd;

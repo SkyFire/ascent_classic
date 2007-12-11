@@ -1104,7 +1104,92 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket & recv_data)
 		return;
 	}
 
+	_player->m_playerInfo->guild->BuyBankTab(this);
 	_player->m_playerInfo->guild->LogGuildEvent(GUILD_EVENT_BANKTABBOUGHT, 1, "");
+}
+
+void WorldSession::HandleGuildBankViewLog(WorldPacket & recv_data)
+{
+	// calculate using the last withdrawl blablabla
+	WorldPacket data(MSG_GUILD_BANK_GET_AVAILABLE_AMOUNT, 4);
+	data << uint32(0xFFFFFFFF);
+	SendPacket(&data);
+}
+
+void WorldSession::HandleGuildBankModifyTab(WorldPacket & recv_data)
+{
+	GuildBankTab * pTab;
+	uint64 guid;
+	uint8 slot;
+	string tabname;
+	string tabicon;
+	char * ptmp;
+
+	recv_data >> guid;
+	recv_data >> slot;
+	recv_data >> tabname;
+	recv_data >> tabicon;
+
+	if(_player->m_playerInfo->guild==NULL)
+		return;
+
+	pTab = _player->m_playerInfo->guild->GetBankTab((uint32)slot);
+	if(pTab==NULL)
+		return;
+
+	if(tabname.size())
+	{
+		if( !(pTab->szTabName && strcmp(pTab->szTabName, tabname.c_str()) == 0) )
+		{
+			ptmp = pTab->szTabName;
+			pTab->szTabName = strdup(tabname.c_str());
+			if(ptmp)
+				free(ptmp);
+	
+			CharacterDatabase.Execute("UPDATE guild_banktabs SET tabName = \"%s\" WHERE guildId = %u AND tabId = %u", 
+				CharacterDatabase.EscapeString(tabname).c_str(), _player->m_playerInfo->guild->GetGuildId(), (uint32)slot);
+		}
+	}
+	else
+	{
+		if(pTab->szTabName)
+		{
+			ptmp = pTab->szTabName;
+			pTab->szTabName = NULL;
+			if(ptmp)
+				free(ptmp);
+
+			CharacterDatabase.Execute("UPDATE guild_banktabs SET tabName = '' WHERE guildId = %u AND tabId = %u", 
+				_player->m_playerInfo->guild->GetGuildId(), (uint32)slot);
+		}
+	}
+
+	if(tabicon.size())
+	{
+		if( !(pTab->szTabIcon && strcmp(pTab->szTabIcon, tabicon.c_str()) == 0) )
+		{
+			ptmp = pTab->szTabIcon;
+			pTab->szTabIcon = strdup(tabname.c_str());
+			if(ptmp)
+				free(ptmp);
+
+			CharacterDatabase.Execute("UPDATE guild_banktabs SET tabIcon = \"%s\" WHERE guildId = %u AND tabId = %u", 
+				CharacterDatabase.EscapeString(tabicon).c_str(), _player->m_playerInfo->guild->GetGuildId(), (uint32)slot);
+		}
+	}
+	else
+	{
+		if(pTab->szTabIcon)
+		{
+			ptmp = pTab->szTabIcon;
+			pTab->szTabIcon = NULL;
+			if(ptmp)
+				free(ptmp);
+
+			CharacterDatabase.Execute("UPDATE guild_banktabs SET tabIcon = '' WHERE guildId = %u AND tabId = %u", 
+				_player->m_playerInfo->guild->GetGuildId(), (uint32)slot);
+		}
+	}
 }
 
 void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
@@ -1113,7 +1198,7 @@ void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 	uint64 guid;
 	WorldPacket data(0x03E7, 3000);
 
-	if(!_player->IsInWorld())
+	if(!_player->IsInWorld() || _player->m_playerInfo->guild==NULL)
 		return;
 
 	recv_data >> guid;
@@ -1121,12 +1206,35 @@ void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 	if(pObj==NULL)
 		return;
 
-	data << uint64(0);
-	data << uint8(1);
-	data << uint32(0xFFFFFFFF);
-	data << uint8(1);
-	data << uint8(0);
-	data << uint8(0);
+	GuildMember * pMember = _player->m_playerInfo->guild->GetGuildMember(_player->m_playerInfo);
+	if(pMember==NULL)
+		return;
+
+	data << uint64(pMember->uDepositedMoney);			// amount you have deposited
+	data << uint8(0);				// unknown
+	data << uint32(0xFFFFFFFF);		// wtf?
+	data << uint8(5);		// some sort of view flag?
+	data << uint16(_player->m_playerInfo->guild->GetBankTabCount());		// tab count?
+	
+	for(uint32 i = 0; i < _player->m_playerInfo->guild->GetBankTabCount(); ++i)
+	{
+		GuildBankTab * pTab = _player->m_playerInfo->guild->GetBankTab(i);
+		if(pTab==NULL)
+			data << uint16(0);		// shouldn't happen
+
+		if(pTab->szTabName)
+			data << pTab->szTabName;
+		else
+			data << uint8(0);
+
+		if(pTab->szTabIcon)
+			data << pTab->szTabIcon;
+		else
+			data << uint8(0);
+	}
+
+
+	//data << uint8(0);
 	// uint64 amount_you_have_deposited
 	/*data << uint64(1000000);
 	
