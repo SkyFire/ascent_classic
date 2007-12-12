@@ -430,6 +430,10 @@ Player::~Player ( )
 			pTarget->mTradeTarget = 0;
 	}
 
+	pTarget = objmgr.GetPlayer(GetInviter());
+	if(pTarget)
+		pTarget->SetInviter(0);
+
 	if(m_Summon)
 		m_Summon->ClearPetOwner();
 
