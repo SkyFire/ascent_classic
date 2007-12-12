@@ -435,6 +435,7 @@ int luaUnit_LearnSpell(lua_State * L, Unit* ptr);
 int luaUnit_UnlearnSpell(lua_State * L, Unit * ptr);
 int luaUnit_HasFinishedQuest(lua_State * L, Unit * ptr);
 int luaUnit_GetItemCount(lua_State * L, Unit * ptr);
+int luaUnit_IsInCombat(lua_State * L, Unit * ptr);
 int luaUnit_GetMainTank(lua_State * L, Unit * ptr);
 int luaUnit_GetAddTank(lua_State * L, Unit * ptr);
 int luaUnit_ClearThreatList(lua_State * L, Unit * ptr);
@@ -466,6 +467,7 @@ int luaUnit_SetNPCFlags(lua_State * L, Unit * ptr);
 int luaUnit_SetModel(lua_State * L, Unit * ptr);
 int luaUnit_SetScale(lua_State * L, Unit * ptr);
 int luaUnit_SetFaction(lua_State * L, Unit * ptr);
+int luaUnit_SetStandState(lua_State * L, Unit * ptr);
 
 int luaGameObject_GetName(lua_State * L, GameObject * ptr);
 int luaGameObject_SpawnCreature(lua_State * L, GameObject * ptr);
@@ -503,6 +505,7 @@ Unit::RegType Unit::methods[] = {
 	{ "UnlearnSpell", &luaUnit_UnlearnSpell },
 	{ "HasFinishedQuest", &luaUnit_HasFinishedQuest },
 	{ "GetItemCount", &luaUnit_GetItemCount },
+	{ "IsInCombat", &luaUnit_IsInCombat },
 	{ "GetMainTank", &luaUnit_GetMainTank },
 	{ "GetAddTank", &luaUnit_GetAddTank },
 	{ "ClearThreatList", &luaUnit_ClearThreatList },
@@ -534,6 +537,7 @@ Unit::RegType Unit::methods[] = {
 	{ "SetModel", &luaUnit_SetModel },
 	{ "SetScale", &luaUnit_SetScale },
 	{ "SetFaction", &luaUnit_SetFaction },
+	{ "SetStandState",&luaUnit_SetStandState },
 	{ NULL, NULL },
 };
 
@@ -894,6 +898,22 @@ int luaUnit_SetFaction(lua_State * L, Unit * ptr)
 	ptr->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,faction);
 	ptr->_setFaction();
 	return 0;
+}
+int luaUnit_SetStandState(lua_State * L, Unit * ptr) //states 0..8
+{
+	if (!ptr)
+		return 0;
+	int state = luaL_checkint(L,1);
+	if(state<=0)
+		return 0;
+	ptr->SetStandState(state);
+	return 0;
+}
+int luaUnit_IsInCombat(lua_State * L, Unit * ptr)
+{
+	if (!ptr)
+		return 0;
+	lua_pushboolean(L,ptr->IsInCombat());
 }
 
 int luaUnit_SetScale(lua_State * L, Unit * ptr)
