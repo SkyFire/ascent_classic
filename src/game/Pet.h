@@ -38,14 +38,6 @@ enum PET_FOOD
 	PET_FOOD_RAW_FISH  // not used in pet diet
 };
 
-/* Pet Diet:
-   taken from http://www.wowwiki.com/Pet_(Hunter)
-   filled with "0" for unknown / non existing creature family's
-   how to use: 
-   value = PetDiet[number_creature_family];
-*/
-static const unsigned char PetDiet[30] = { 0,1,3,1,63,63,3,3,58,48,0,1,52,0,0,0,0,0,0,0,1,178,0,0,48,33,1,14,0};
-
 /*Loyalty and happiness ticks*/
 static const char LoyaltyTicks[3] = {-20, 10, 20};//loyalty_ticks for unhappy, content, happy
 static const unsigned char HappinessTicks[6] = {70, 35, 17, 8, 4, 2};//loose_happiness ticks per loyalty lvl
@@ -78,14 +70,14 @@ enum PET_SPELL
 
 enum StableState
 {
-	STABLE_STATE_ACTIVE = 1,
-	STABLE_STATE_PASSIVE = 3
+	STABLE_STATE_ACTIVE		= 1,
+	STABLE_STATE_PASSIVE	= 2
 };
 enum HappinessState
 {
-	UNHAPPY		=0,
-	CONTENT		=1,
-	HAPPY		=2
+	UNHAPPY		=1,
+	CONTENT		=2,
+	HAPPY		=3
 };
 enum LoyaltyLevel
 {
@@ -144,7 +136,7 @@ public:
 	inline uint32 GetPetState(void) { return m_State; }
 
 	inline void SetPetDiet(uint32 diet) { m_Diet = diet; }
-	inline void SetPetDiet() { m_Diet = PetDiet[this->creature_info->Family]; }
+	inline void SetPetDiet() { m_Diet = myFamily->petdietflags; }
 
 	inline uint32 GetPetDiet(void) { return m_Diet; }
 	

@@ -3212,6 +3212,24 @@ int8 Spell::CheckItems()
 						return int8(SPELL_FAILED_BAD_TARGETS);
 				}
 			}
+			if(m_spellInfo->Id == 6991)	//Feed pet
+			{
+				Pet *pPet = p_caster->GetSummon();
+				if(!pPet || !it)
+					return int8(SPELL_FAILED_BAD_TARGETS);
+				
+				//check if item matches pets diet
+				uint32 flag = proto->FoodType ? 1<<(proto->FoodType - 1) : 0;
+				if(!flag || !(flag & pPet->GetPetDiet()))
+					return int8(SPELL_FAILED_WRONG_PET_FOOD);
+
+				//check food level: food should be max 30 lvls below pets level
+				int8 deltaLvl = pPet->getLevel() - proto->ItemLevel;
+				if (deltaLvl > 30)
+				{
+					return int8(SPELL_FAILED_FOOD_LOWLEVEL);
+				}
+			}
 		}
 		else 
 			return int8(SPELL_FAILED_ITEM_NOT_FOUND);

@@ -676,8 +676,8 @@ struct CreatureFamilyEntry
     float maxsize;
     uint32 maxlevel;
     uint32 skilline;
-    uint32 tameable;
-    uint32 pet_food_id;
+    uint32 tameable;		//second skill line - 270 Generic
+    uint32 petdietflags;
     //uint32 name;
     //uint32 namealt1;
     //uint32 namealt2;
