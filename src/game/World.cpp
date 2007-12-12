@@ -401,8 +401,6 @@ bool World::SetInitialWorldSettings()
 #define MAKE_TASK(sp, ptr) tl.AddTask(new Task(new CallbackP0<sp>(sp::getSingletonPtr(), &sp::ptr)))
 	// Fill the task list with jobs to do.
 	TaskList tl;
-	MAKE_TASK(ObjectMgr, LoadPlayerCreateInfo);
-	MAKE_TASK(ObjectMgr, LoadPlayersInfo);
 	Storage_FillTaskList(tl);
 
 	// spawn worker threads (2 * number of cpus)
@@ -412,6 +410,10 @@ bool World::SetInitialWorldSettings()
 	tl.wait();
 
 	Storage_LoadAdditionalTables();
+
+	MAKE_TASK(ObjectMgr, LoadPlayerCreateInfo);
+	MAKE_TASK(ObjectMgr, LoadPlayersInfo);
+	tl.wait();
 
 	MAKE_TASK(ObjectMgr, LoadCreatureWaypoints);
 	MAKE_TASK(ObjectMgr, LoadTrainers);

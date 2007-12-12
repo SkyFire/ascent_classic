@@ -272,7 +272,6 @@ struct SERVER_DECL GuildBankTab
 	char * szTabName;
 	char * szTabIcon;
 	Item * pSlots[MAX_GUILD_BANK_SLOTS];
-	uint32 uOwnerGuid[MAX_GUILD_BANK_SLOTS];
 };
 
 class Charter;
@@ -458,6 +457,10 @@ public:
 		m_lock.Release();
 		return ret;
 	}
+
+	/** Sends the guild bank to this client.
+	 */
+	void SendGuildBank(WorldSession * pClient);
 
 protected:
 	

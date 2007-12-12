@@ -1192,11 +1192,171 @@ void WorldSession::HandleGuildBankModifyTab(WorldPacket & recv_data)
 	}
 }
 
+void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
+{
+	uint64 guid;
+	uint8 source_isfrombank;
+	uint8 source_bank;
+	uint8 source_bankslot;
+	uint8 source_bagslot;
+	uint8 source_slot;
+	uint8 dest_bank;
+	uint8 dest_bankslot;
+	uint32 wtf;
+	uint8 wtf2;
+	GuildBankTab * pTab;
+	GuildBankTab * pTab2;
+	Item * pItem;
+	Item * pItem2;
+	Guild * pGuild = _player->m_playerInfo->guild;
+	
+	if(pGuild==NULL)
+		return;
+
+	recv_data >> guid >> source_isfrombank;
+	if(source_isfrombank)
+	{
+		/* read packet */
+		recv_data >> source_bank;
+		recv_data >> source_bankslot;
+		recv_data >> wtf;
+		recv_data >> dest_bank;
+		recv_data >> dest_bankslot;
+
+		/* sanity checks to avoid overflows */
+		if(source_bankslot >= MAX_GUILD_BANK_SLOTS ||
+			dest_bankslot >= MAX_GUILD_BANK_SLOTS ||
+			source_bank >= MAX_GUILD_BANK_TABS ||
+			dest_bank >= MAX_GUILD_BANK_TABS)
+		{
+			return;
+		}
+
+		/* locate the tabs */
+		pTab = pGuild->GetBankTab((uint32)dest_bank);
+		pTab2 = pGuild->GetBankTab((uint32)source_bank);
+		if(pTab==NULL || pTab2==NULL)
+			return;
+
+		/* swapping items - this will be kinda difficult in sql.. */
+		pItem = pTab->pSlots[source_bankslot];
+		pItem2 = pTab2->pSlots[dest_bankslot];
+
+		pTab->pSlots[source_bankslot] = pItem2;
+		pTab2->pSlots[dest_bankslot] = pItem;
+
+		/* resend it to the client to update him */
+		pGuild->SendGuildBank(this);
+
+		/* update it in the database */
+		if(pItem)
+		{
+			// this one goes in the destination slot
+			CharacterDatabase.Execute("UPDATE guild_bankitems SET slotId = %u, tabId = %u WHERE itemGuid = %u AND guildId = %u",
+				(uint32)dest_bankslot, (uint32)dest_bank, pItem->GetGUIDLow(), pGuild->GetGuildId());
+		}
+
+		if(pItem2)
+		{
+			// this one is the destination item coming into the source slot
+			CharacterDatabase.Execute("UPDATE guild_bankitems SET slotId = %u, tabId = %u WHERE itemGuid = %u AND guildId = %u",
+				(uint32)source_bankslot, (uint32)source_bank, pItem->GetGUIDLow(), pGuild->GetGuildId());
+		}
+	}
+	else
+	{
+		/* read packet */
+		recv_data >> dest_bank;
+		recv_data >> dest_bankslot;
+		recv_data >> wtf;
+		recv_data >> wtf2;
+
+		recv_data >> source_bagslot;
+		recv_data >> source_slot;
+
+		/* sanity checks to avoid overflows */
+		if(dest_bankslot >= MAX_GUILD_BANK_SLOTS ||
+			dest_bank >= MAX_GUILD_BANK_TABS)
+		{
+			return;
+		}
+
+		/* get tab */
+		pTab = pGuild->GetBankTab((uint32)dest_bank);
+		if(pTab==NULL)
+			return;
+
+		if(wtf==0)		// depositing an item
+		{
+			// get the item
+			pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
+			if(pItem==NULL)
+				return;
+
+			// remove owner association
+			pItem->SetOwner(NULL);
+			pItem->SetUInt32Value(ITEM_FIELD_OWNER, 0);
+			pItem->SaveToDB(0, 0, false);
+
+			// insert into the guild bank
+			pTab->pSlots[dest_bankslot] = pItem;
+			CharacterDatabase.Execute("INSERT INTO guild_bankitems VALUES(%u, %u, %u, %u)", pGuild->GetGuildId(),
+				(uint32)dest_bank, (uint32)dest_bankslot, pItem->GetGUIDLow());
+
+			pGuild->SendGuildBank(this);
+		}
+		else			// withdrawing an item
+		{
+			pItem = pTab->pSlots[dest_bankslot];
+			if(pItem==NULL)
+				return;
+
+			pItem2 = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
+			if(pItem2 != NULL)
+			{
+				// this actually means we're swapping.. urgh
+				// remove owner association
+				pItem2->SetOwner(NULL);
+				pItem2->SetUInt32Value(ITEM_FIELD_OWNER, 0);
+				pItem2->SaveToDB(0, 0, false);
+
+				// insert into the guild bank
+				pTab->pSlots[dest_bankslot] = pItem2;
+				CharacterDatabase.Execute("INSERT INTO guild_bankitems VALUES(%u, %u, %u, %u)", pGuild->GetGuildId(),
+					(uint32)dest_bank, (uint32)dest_bankslot, pItem->GetGUIDLow());
+			}
+
+			// set new owner of the item
+			pItem->SetOwner(_player);
+			pItem->SetUInt32Value(ITEM_FIELD_OWNER, _player->GetGUIDLow());
+			
+			// attempt to add it onto that slot
+			if(_player->GetItemInterface()->SafeAddItem(pItem, source_bagslot, source_slot))
+			{
+				// remove it from the bank in the database (having the same item in 2 places would be a disaster)
+				CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE guildId = %u AND tabId = %u AND slotId = %u AND itemGuid = %u", 
+					pGuild->GetGuildId(), (uint32)dest_bank, (uint32)dest_bankslot, pItem->GetGUIDLow());
+	
+				pItem->SaveToDB(source_bagslot, source_slot);
+				if(!pItem2)
+					pTab->pSlots[dest_bankslot] = NULL;
+			}
+			else
+			{
+				// reverse what we did, for some reason we can't add it :<
+				pItem->SetOwner(NULL);
+				pItem->SetUInt32Value(ITEM_FIELD_OWNER, 0);
+			}
+
+			pGuild->SendGuildBank(this);
+		}
+	}		
+}
+
 void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 {
 	GameObject * pObj;
 	uint64 guid;
-	WorldPacket data(0x03E7, 3000);
 
 	if(!_player->IsInWorld() || _player->m_playerInfo->guild==NULL)
 		return;
@@ -1206,21 +1366,33 @@ void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 	if(pObj==NULL)
 		return;
 
-	GuildMember * pMember = _player->m_playerInfo->guild->GetGuildMember(_player->m_playerInfo);
+	_player->m_playerInfo->guild->SendGuildBank(this);
+}
+
+void Guild::SendGuildBank(WorldSession * pClient)
+{
+	size_t pos;
+	uint32 count=0;
+	WorldPacket data(0x03E7, 3000);
+	GuildMember * pMember = GetGuildMember(pClient->GetPlayer()->m_playerInfo);
+
 	if(pMember==NULL)
 		return;
 
 	data << uint64(pMember->uDepositedMoney);			// amount you have deposited
 	data << uint8(0);				// unknown
-	data << uint32(0xFFFFFFFF);		// wtf?
-	data << uint8(5);		// some sort of view flag?
-	data << uint16(_player->m_playerInfo->guild->GetBankTabCount());		// tab count?
-	
-	for(uint32 i = 0; i < _player->m_playerInfo->guild->GetBankTabCount(); ++i)
+	data << uint32(0xFFFFFFFF);		// remaining stacks for this day
+	data << uint8(1);		// some sort of view flag?
+	data << uint8(GetBankTabCount());		// tab count?
+
+	for(uint32 i = 0; i < GetBankTabCount(); ++i)
 	{
-		GuildBankTab * pTab = _player->m_playerInfo->guild->GetBankTab(i);
+		GuildBankTab * pTab = GetBankTab(i);
 		if(pTab==NULL)
+		{
 			data << uint16(0);		// shouldn't happen
+			continue;
+		}
 
 		if(pTab->szTabName)
 			data << pTab->szTabName;
@@ -1233,11 +1405,51 @@ void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 			data << uint8(0);
 	}
 
+	pos = data.wpos();
+	data << uint8(0);
+
+	for(uint32 i = 0; i < GetBankTabCount(); ++i)
+	{
+		GuildBankTab * pTab = GetBankTab(i);
+		if(pTab)
+		{
+			for(uint32 j = 0; j < MAX_GUILD_BANK_SLOTS; ++j)
+			{
+				if(pTab->pSlots[j] != NULL)
+				{
+					++count;
+
+					data << uint8(j);
+					data << pTab->pSlots[j]->GetEntry();
+					data << uint32(0);
+					data << pTab->pSlots[j]->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
+					data << uint16(i);
+				}
+			}
+		}
+	}
+
+#ifdef USING_BIG_ENDIAN
+	*(uint8*)&data.contents()[pos] = swap16(count);
+#else
+	*(uint8*)&data.contents()[pos] = (uint8)count;
+#endif
+
+	// uint8 view_flag
+	// if view_flag = 0
+	// uint8 item count
+	// for each item
+	//     uint8 slot
+	//     uint32 entry
+	//     uint32 unk
+	//     uint32 stack_count
+	//     uint16 unk
+
 
 	//data << uint8(0);
 	// uint64 amount_you_have_deposited
 	/*data << uint64(1000000);
-	
+
 	data << uint8(1);
 	data << uint8(0);
 	data << uint8(0);
@@ -1257,6 +1469,5 @@ void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 	data << uint8(0);
 	data << uint8(0);*/
 
-	SendPacket(&data);
+	pClient->SendPacket(&data);
 }
-

@@ -551,11 +551,10 @@ bool Guild::LoadFromDB(Field * f)
 			QueryResult * res2 = CharacterDatabase.Query("SELECT * FROM guild_bankitems WHERE guildId = %u AND tabId = %u", m_guildId, result->Fetch()[1].GetUInt32());
 			GuildBankTab * pTab = new GuildBankTab;
 			pTab->iTabId = (uint8)result->Fetch()[1].GetUInt32();
-			pTab->szTabIcon = (strlen(result->Fetch()[2].GetString()) > 0) ? strdup(result->Fetch()[2].GetString()) : NULL;
-			pTab->szTabName = (strlen(result->Fetch()[3].GetString()) > 0) ? strdup(result->Fetch()[3].GetString()) : NULL;
+			pTab->szTabName = (strlen(result->Fetch()[2].GetString()) > 0) ? strdup(result->Fetch()[2].GetString()) : NULL;
+			pTab->szTabIcon = (strlen(result->Fetch()[3].GetString()) > 0) ? strdup(result->Fetch()[3].GetString()) : NULL;
 			
 			memset(pTab->pSlots, 0, sizeof(Item*) * MAX_GUILD_BANK_SLOTS);
-			memset(pTab->uOwnerGuid, 0, sizeof(uint32) * MAX_GUILD_BANK_SLOTS);
 
 			if(res2)
 			{
@@ -569,7 +568,6 @@ bool Guild::LoadFromDB(Field * f)
 					}
 
 					pTab->pSlots[res2->Fetch()[2].GetUInt32()] = pItem;
-					pTab->uOwnerGuid[res2->Fetch()[2].GetUInt32()] = res2->Fetch()[4].GetUInt32();
 
 				} while (res2->NextRow());
 				delete res2;
@@ -1151,7 +1149,6 @@ void Guild::BuyBankTab(WorldSession * pClient)
 	GuildBankTab * pTab = new GuildBankTab;
 	pTab->iTabId = m_bankTabCount;
 	memset(pTab->pSlots, 0, sizeof(Item*)*MAX_GUILD_BANK_SLOTS);
-	memset(pTab->uOwnerGuid,0,sizeof(uint32)*MAX_GUILD_BANK_SLOTS);
 	pTab->szTabName=NULL;
 	pTab->szTabIcon=NULL;
 
