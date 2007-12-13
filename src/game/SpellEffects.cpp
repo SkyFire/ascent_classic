@@ -2073,7 +2073,10 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		case LOCKTYPE_MINING:
 		{
 			if(!gameObjTarget ) return;
+
 			uint32 v = GetGOReqSkill(gameObjTarget);
+			bool bAlreadyUsed = false;
+
 			if(Rand(100.0f)) // 3% chance to fail//why?
 			{
 				if(((Player*)m_caster)->_GetSkillLineCurrent(SKILL_MINING) < v)
@@ -2081,13 +2084,13 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 				//	SendCastResult(SPELL_FAILED_LEVEL_REQUIREMENT);
 				  //  return;
 				}
-				else
-				if(gameObjTarget->loot.items.size() == 0)
+				else if(gameObjTarget->loot.items.size() == 0)
 				{
-//					lootmgr.FillProfessionLoot(&lootmgr.GOLoot,&gameObjTarget->loot,
-//						gameObjTarget->GetEntry());
 					lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
 				}	
+				else
+					bAlreadyUsed = true;
+
 				loottype=2;
 			}
 			else
@@ -2095,7 +2098,8 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 				SendCastResult( SPELL_FAILED_AUTOTRACK_INTERRUPTED);
 			}
 			//Skill up
-			DetermineSkillUp(SKILL_MINING,v/5);
+			if(!bAlreadyUsed) //Avoid cheats with opening/closing without taking the loot
+				DetermineSkillUp(SKILL_MINING,v/5);
 		}
 		break;
 		case LOCKTYPE_SLOW_OPEN: // used for BG go's
