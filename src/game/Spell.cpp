@@ -2545,6 +2545,12 @@ uint8 Spell::CanCast(bool tolerate)
 				return (uint8)SPELL_FAILED_NOT_ON_TRANSPORT;
 		}
 
+		// check if spell is allowed while not mounted
+		if(!p_caster->IsMounted())
+		{
+			if(m_spellInfo->Id == 25860) // Reindeer Transformation
+				return (uint8)SPELL_FAILED_ONLY_MOUNTED;
+		}
 	}
 
 	Unit *target = NULL;

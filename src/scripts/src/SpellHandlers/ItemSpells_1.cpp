@@ -269,6 +269,80 @@ bool NighInvulnBelt(uint32 i, Spell *pSpell)
 
 // -----------------------------------------------------------------------------
 
+bool ReindeerTransformation(uint32 i, Spell *pSpell)
+{
+	if(!pSpell->p_caster) return true;
+
+	if(pSpell->p_caster->GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID) != 0)
+	{
+		if(pSpell->p_caster->FlyCheat)
+			pSpell->p_caster->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 22724);
+		else
+			pSpell->p_caster->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 15902);
+	}
+	return true;
+}
+
+// -----------------------------------------------------------------------------
+
+bool SummonCritterDummy(uint32 i, Spell *pSpell)
+{
+	// the reason these spells have to be scripted is because they require a
+	// reagent to summon the critter pet, but don't require one to dismiss it
+
+	if(!pSpell->p_caster) return true;
+
+	uint32 currentCritterID = NULL;
+
+	if(pSpell->p_caster->critterPet && pSpell->p_caster->critterPet->GetCreatureName())
+		currentCritterID = pSpell->p_caster->critterPet->GetCreatureName()->Id;
+
+	uint32 newspell = 0;
+
+	switch(pSpell->m_spellInfo->Id)
+	{
+		case 26469: // Snowman Kit
+		{
+			if(currentCritterID == 15710) // do we already have this critter summoned?
+				newspell = 26468; // if so, dismiss it
+			else
+				newspell = 26045; // otherwise summon it
+		}	break;
+
+		case 26528: // Jingling Bell
+		{
+			if(currentCritterID == 15706) // do we already have this critter summoned?
+				newspell = 26530; // if so, dismiss it
+			else
+				newspell = 26529; // otherwise summon it
+		}	break;
+
+		case 26532: // Green Helper Box
+		{
+			if(currentCritterID == 15698) // do we already have this critter summoned?
+				newspell = 26534; // if so, dismiss it
+			else
+				newspell = 26533; // otherwise summon it
+		}	break;
+
+		case 26541: // Red Helper Box
+		{
+			if(currentCritterID == 15705) // do we already have this critter summoned?
+				newspell = 26537; // if so, dismiss it
+			else
+				newspell = 26536; // otherwise summon it
+		}	break;
+	}
+
+	SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
+	if(!spInfo) return true;
+
+	pSpell->p_caster->CastSpell(pSpell->p_caster, spInfo, false); // these spells have to check items, so "triggeredspell" must be false
+	return true;
+}
+
+// -----------------------------------------------------------------------------
+
 
 
 
@@ -291,6 +365,11 @@ void SetupItemSpells_1(ScriptMgr * mgr)
 	mgr->register_dummy_spell(39105, &NetherWraithBeacon);      // Spellfire Tailor Quest
 	mgr->register_dummy_spell( 8593, &SymbolOfLife);            // Paladin's Redemption QuestLine
 	mgr->register_dummy_spell(30458, &NighInvulnBelt);          // Nigh Invulnerability Belt
+	mgr->register_dummy_spell(25860, &ReindeerTransformation);  // Fresh Holly & Preserved Holly
+	mgr->register_dummy_spell(26469, &SummonCritterDummy);      // Snowman Kit
+	mgr->register_dummy_spell(26528, &SummonCritterDummy);      // Jingling Bell
+	mgr->register_dummy_spell(26532, &SummonCritterDummy);      // Green Helper Box
+	mgr->register_dummy_spell(26541, &SummonCritterDummy);      // Red Helper Box
 
 
 
