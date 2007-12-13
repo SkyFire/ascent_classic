@@ -4693,6 +4693,7 @@ void World::PollCharacterInsertQueue()
 			inf->m_loggedInPlayer=NULL;
 			inf->guild=NULL;
 			inf->guildRank=NULL;
+			inf->guildMember=NULL;
 			inf->race=f[3].GetUInt32();
 			inf->subGroup=0;
 			switch(inf->race)

@@ -487,6 +487,7 @@ struct PlayerInfo
 	Player * m_loggedInPlayer;
 	Guild * guild;
 	GuildRank * guildRank;
+	GuildMember * guildMember;
 };
 struct PlayerPet
 {

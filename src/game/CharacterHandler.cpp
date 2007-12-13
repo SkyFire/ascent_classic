@@ -314,6 +314,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	pn->team = pNewChar->GetTeam ();
 	pn->guild=NULL;
 	pn->guildRank=NULL;
+	pn->guildMember=NULL;
 	objmgr.AddPlayerInfo(pn);
 
 	pNewChar->ok_to_remove = true;
@@ -641,6 +642,7 @@ void WorldSession::FullLogin(Player * plr)
 		info->team = plr->GetTeam();
 		info->guild=NULL;
 		info->guildRank=NULL;
+		info->guildMember=NULL;
 		info->m_Group=0;
 		info->subGroup=0;
 		objmgr.AddPlayerInfo(info);

@@ -211,6 +211,7 @@ enum GuildEvent
 	GUILD_EVENT_HASCOMEONLINE	   =0xC,
 	GUILD_EVENT_HASGONEOFFLINE	  =0xD,
 	GUILD_EVENT_BANKTABBOUGHT		= 0xF,
+	GUILD_EVENT_SETNEWBALANCE		= 0x11,
 };
 enum GuildLogEventE
 {
@@ -252,7 +253,12 @@ struct SERVER_DECL GuildMember
 	uint32 uWithdrawlsSinceLastReset;
 	uint32 uLastItemWithdrawReset;
 	uint32 uItemWithdrawlsSinceLastReset;
-	uint32 uDepositedMoney;
+
+	uint32 CalculateAllowedItemWithdraws();
+	void OnItemWithdraw();
+	
+	uint32 CalculateAvailableAmount();
+	void OnMoneyWithdraw(uint32 amt);
 };
 
 struct SERVER_DECL GuildLogEvent
@@ -399,6 +405,7 @@ public:
 	inline const uint32 GetGuildLeader() const { return m_guildLeader; }
 	inline const uint32 GetGuildId() const { return m_guildId; }
 	inline const uint32 GetBankTabCount() const { return m_bankTabCount; }
+	inline const uint32 GetBankBalance() const { return m_bankBalance; }
 
 	/** Creates a guild rank with the specified permissions.
 	 */
@@ -419,10 +426,6 @@ public:
 	/** Withdraws money from the guild bank, usable by members with that permission.
 	 */
 	void WithdrawMoney(WorldSession * pClient, uint32 uAmount);
-
-	/** Deposits an item into the guild bank.
-	 */
-	//void DepositItem
 
 	/** Retrieves a guild rank for editing
 	 */
@@ -480,6 +483,7 @@ protected:
 	uint32 m_guildLeader;
 	uint32 m_creationTimeStamp;
 	uint32 m_bankTabCount;
+	uint32 m_bankBalance;
 
 	typedef vector<GuildBankTab*> GuildBankTabVector;
 	GuildBankTabVector m_bankTabs;

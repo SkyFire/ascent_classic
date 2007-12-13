@@ -1111,8 +1111,15 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket & recv_data)
 void WorldSession::HandleGuildBankViewLog(WorldPacket & recv_data)
 {
 	// calculate using the last withdrawl blablabla
+	if(_player->m_playerInfo->guildMember == NULL)
+		return;
+
+	uint32 money = _player->m_playerInfo->guild->GetBankBalance();
+	uint32 avail = _player->m_playerInfo->guildMember->CalculateAvailableAmount();
+
+	/* pls gm mi hero poor give 1 gold coin pl0x */
 	WorldPacket data(MSG_GUILD_BANK_GET_AVAILABLE_AMOUNT, 4);
-	data << uint32(0xFFFFFFFF);
+	data << uint32(money>avail ? avail : money);
 	SendPacket(&data);
 }
 
@@ -1192,6 +1199,34 @@ void WorldSession::HandleGuildBankModifyTab(WorldPacket & recv_data)
 	}
 }
 
+void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket & recv_data)
+{
+	uint64 guid;
+	uint32 money;
+
+	recv_data >> guid;
+	recv_data >> money;
+
+	if(_player->m_playerInfo->guild==NULL)
+		return;
+
+	_player->m_playerInfo->guild->WithdrawMoney(this, money);
+}
+
+void WorldSession::HandleGuildBankDepositMoney(WorldPacket & recv_data)
+{
+	uint64 guid;
+	uint32 money;
+
+	recv_data >> guid;
+	recv_data >> money;
+
+	if(_player->m_playerInfo->guild==NULL)
+		return;
+
+	_player->m_playerInfo->guild->DepositMoney(this, money);
+}
+
 void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 {
 	uint64 guid;
@@ -1209,8 +1244,9 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 	Item * pItem;
 	Item * pItem2;
 	Guild * pGuild = _player->m_playerInfo->guild;
+	GuildMember * pMember = _player->m_playerInfo->guildMember;
 	
-	if(pGuild==NULL)
+	if(pGuild==NULL || pMember==NULL)
 		return;
 
 	recv_data >> guid >> source_isfrombank;
@@ -1311,6 +1347,11 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			if(pItem==NULL)
 				return;
 
+			if(pMember->pRank->iItemStacksPerDay)
+				if(pMember->CalculateAllowedItemWithdraws() == 0)
+					return;
+
+			
 			pItem2 = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
 			if(pItem2 != NULL)
 			{
@@ -1340,6 +1381,9 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 				pItem->SaveToDB(source_bagslot, source_slot);
 				if(!pItem2)
 					pTab->pSlots[dest_bankslot] = NULL;
+
+				// mi banks mi bankz!
+				pMember->OnItemWithdraw();
 			}
 			else
 			{
@@ -1374,14 +1418,14 @@ void Guild::SendGuildBank(WorldSession * pClient)
 	size_t pos;
 	uint32 count=0;
 	WorldPacket data(0x03E7, 3000);
-	GuildMember * pMember = GetGuildMember(pClient->GetPlayer()->m_playerInfo);
+	GuildMember * pMember = pClient->GetPlayer()->m_playerInfo->guildMember;
 
 	if(pMember==NULL)
 		return;
 
-	data << uint64(pMember->uDepositedMoney);			// amount you have deposited
+	data << uint64(m_bankBalance);			// amount you have deposited
 	data << uint8(0);				// unknown
-	data << uint32(0xFFFFFFFF);		// remaining stacks for this day
+	data << uint32(pMember->CalculateAllowedItemWithdraws());		// remaining stacks for this day
 	data << uint8(1);		// some sort of view flag?
 	data << uint8(GetBankTabCount());		// tab count?
 
@@ -1419,9 +1463,10 @@ void Guild::SendGuildBank(WorldSession * pClient)
 				{
 					++count;
 
+					// what i don't understand here, where is the field for random properties? :P - Burlex
 					data << uint8(j);
 					data << pTab->pSlots[j]->GetEntry();
-					data << uint32(0);
+					data << uint32(0);			// this is an enchant
 					data << pTab->pSlots[j]->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 					data << uint16(i);
 				}

@@ -344,6 +344,7 @@ void ObjectMgr::LoadPlayersInfo()
 			pn->m_loggedInPlayer=NULL;
 			pn->guild=NULL;
 			pn->guildRank=NULL;
+			pn->guildMember=NULL;
 
 			if(pn->race==RACE_HUMAN||pn->race==RACE_DWARF||pn->race==RACE_GNOME||pn->race==RACE_NIGHTELF||pn->race==RACE_DRAENEI)
 				pn->team = 0;

@@ -421,6 +421,7 @@ bool Guild::LoadFromDB(Field * f)
 	m_motd = strlen(f[9].GetString()) ? strdup(f[9].GetString()) : NULL;
 	m_creationTimeStamp = f[10].GetUInt32();
 	m_bankTabCount = f[11].GetUInt32();
+	m_bankBalance = f[12].GetUInt32();
 
 	// load ranks
 	uint32 i;
@@ -488,6 +489,7 @@ bool Guild::LoadFromDB(Field * f)
 			gm->pRank=FindLowestRank();
 		gm->pPlayer->guild=this;
 		gm->pPlayer->guildRank=gm->pRank;
+		gm->pPlayer->guildMember=gm;
 
 		if(strlen(f3[3].GetString()))
 			gm->szPublicNote = strdup(f3[3].GetString());
@@ -503,7 +505,6 @@ bool Guild::LoadFromDB(Field * f)
 		gm->uWithdrawlsSinceLastReset = f3[6].GetUInt32();
 		gm->uLastItemWithdrawReset = f3[7].GetUInt32();
 		gm->uItemWithdrawlsSinceLastReset = f3[8].GetUInt32();
-		gm->uDepositedMoney = f3[9].GetUInt32();
 
 		m_members.insert(make_pair(gm->pPlayer, gm));
 
@@ -674,6 +675,11 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 
 	pMember->guild=this;
 	pMember->guildRank=r;
+	pMember->guildMember=pm;
+	pm->uItemWithdrawlsSinceLastReset=0;
+	pm->uLastItemWithdrawReset=0;
+	pm->uWithdrawlsSinceLastReset-9;
+	pm->uLastWithdrawReset=0;
 
 	if(pMember->m_loggedInPlayer)
 	{
@@ -681,7 +687,7 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 		pMember->m_loggedInPlayer->SetGuildRank(r->iId);
 	}
 
-	CharacterDatabase.Execute("INSERT INTO guild_data VALUES(%u, %u, %u, '', '')", m_guildId, pMember->guid, r->iId);
+	CharacterDatabase.Execute("INSERT INTO guild_data VALUES(%u, %u, %u, '', '', 0, 0, 0, 0)", m_guildId, pMember->guid, r->iId);
 	LogGuildEvent(GUILD_EVENT_JOINED, 1, pMember->name);
 	AddGuildLogEntry(GUILD_LOG_EVENT_JOIN, 1, pMember->guid);
 	m_lock.Release();
@@ -735,6 +741,7 @@ void Guild::RemoveGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 
 	pMember->guildRank=NULL;
 	pMember->guild=NULL;
+	pMember->guildMember=NULL;
 
 	if(pMember->m_loggedInPlayer)
 	{
@@ -1126,7 +1133,7 @@ void Guild::SendGuildQuery(WorldSession * pClient)
 
 void Guild::CreateInDB()
 {
-	CharacterDatabase.Execute("INSERT INTO guilds VALUES(%u, \"%s\", %u, %u, %u, %u, %u, %u, '', '', %u)",
+	CharacterDatabase.Execute("INSERT INTO guilds VALUES(%u, \"%s\", %u, %u, %u, %u, %u, %u, '', '', %u, 0, 0)",
 		m_guildId, CharacterDatabase.EscapeString(string(m_guildName)).c_str(), m_guildLeader, m_emblemStyle, m_emblemColor, m_borderColor, m_borderStyle,
 		m_backgroundColor, m_creationTimeStamp);
 }
@@ -1158,4 +1165,119 @@ void Guild::BuyBankTab(WorldSession * pClient)
 	CharacterDatabase.Execute("INSERT INTO guild_banktabs VALUES(%u, %u, '', '')", m_guildId, (uint32)pTab->iTabId);
 	CharacterDatabase.Execute("UPDATE guilds SET bankTabCount = %u WHERE guildId = %u", (uint32)pTab->iTabId, m_guildId);
 	m_lock.Release();
+}
+
+uint32 GuildMember::CalculateAllowedItemWithdraws()
+{
+	if(pRank->iItemStacksPerDay == 0)		// Unlimited
+		return 0xFFFFFFFF;
+
+	if((UNIXTIME - uLastItemWithdrawReset) >= TIME_DAY)
+		return pRank->iItemStacksPerDay;
+	else
+		return (pRank->iItemStacksPerDay - uItemWithdrawlsSinceLastReset);
+}
+
+void GuildMember::OnItemWithdraw()
+{
+	if(pRank->iItemStacksPerDay == 0)		// Unlimited
+		return;
+
+	// reset the counter if a day has passed
+	if(((uint32)UNIXTIME - uLastItemWithdrawReset) >= TIME_DAY)
+	{
+		uLastItemWithdrawReset = (uint32)UNIXTIME;
+		uItemWithdrawlsSinceLastReset = 1;
+		CharacterDatabase.Execute("UPDATE guild_data SET lastItemWithdrawReset = %u, itemWithdrawlsSinceLastReset = 1 WHERE playerid = %u",
+			uLastItemWithdrawReset, pPlayer->guid);
+	}
+	else
+	{
+		// increment counter
+		uItemWithdrawlsSinceLastReset++;
+		CharacterDatabase.Execute("UPDATE guild_data SET itemWithdrawlsSinceLastReset = %u WHERE playerid = %u",
+			uItemWithdrawlsSinceLastReset, pPlayer->guid);
+	}
+}
+
+uint32 GuildMember::CalculateAvailableAmount()
+{
+	if(pRank->iGoldLimitPerDay == 0)		// Unlimited
+		return 0xFFFFFFFF;
+
+	if((UNIXTIME - uLastWithdrawReset) >= TIME_DAY)
+		return pRank->iGoldLimitPerDay;
+	else
+		return (pRank->iGoldLimitPerDay - uWithdrawlsSinceLastReset);
+}
+
+void GuildMember::OnMoneyWithdraw(uint32 amt)
+{
+	if(pRank->iGoldLimitPerDay == 0)		// Unlimited
+		return;
+
+	// reset the counter if a day has passed
+	if(((uint32)UNIXTIME - uLastWithdrawReset) >= TIME_DAY)
+	{
+		uLastWithdrawReset = (uint32)UNIXTIME;
+		uWithdrawlsSinceLastReset = amt;
+		CharacterDatabase.Execute("UPDATE guild_data SET lastWithdrawReset = %u, withdrawlsSinceLastReset = %u WHERE playerid = %u",
+			uLastWithdrawReset, uWithdrawlsSinceLastReset, pPlayer->guid);
+	}
+	else
+	{
+		// increment counter
+		uWithdrawlsSinceLastReset++;
+		CharacterDatabase.Execute("UPDATE guild_data SET withdrawlsSinceLastReset = %u WHERE playerid = %u",
+			uWithdrawlsSinceLastReset, pPlayer->guid);
+	}
+}
+
+void Guild::DepositMoney(WorldSession * pClient, uint32 uAmount)
+{
+	if(pClient->GetPlayer()->GetUInt32Value(PLAYER_FIELD_COINAGE) < uAmount)
+		return;
+
+	// add to the bank balance
+	m_bankBalance += uAmount;
+
+	// update in db
+	CharacterDatabase.Execute("UPDATE guilds SET bankBalance = %u WHERE guildId = %u", m_bankBalance, m_guildId);
+
+	// take the money, oh noes gm pls gief gold mi hero poor
+	pClient->GetPlayer()->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)uAmount);
+
+	// broadcast guild event telling everyone the new balance
+	char buf[20];
+	snprintf(buf, 20, I64FMT, (uint64)m_bankBalance);
+	LogGuildEvent(GUILD_EVENT_SETNEWBALANCE, 1, buf);
+}
+
+void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
+{
+	GuildMember * pMember = pClient->GetPlayer()->m_playerInfo->guildMember;
+	if(pMember==NULL)
+		return;
+
+	// sanity checks
+	if(pMember->pRank->iGoldLimitPerDay)
+		if(pMember->CalculateAvailableAmount() < uAmount)
+			return;
+
+	if(m_bankBalance < uAmount)
+		return;
+
+	// update his bank state
+	pMember->OnMoneyWithdraw(uAmount);
+
+	// give the gold! GM PLS GOLD PLS 1 COIN
+	pClient->GetPlayer()->ModUInt32Value(PLAYER_FIELD_COINAGE, (uint32)uAmount);
+
+	// subtract the balance
+	m_bankBalance -= uAmount;
+
+	// notify everyone with the new balance
+	char buf[20];
+	snprintf(buf, 20, I64FMT, (uint64)m_bankBalance);
+	LogGuildEvent(GUILD_EVENT_SETNEWBALANCE, 1, buf);
 }
