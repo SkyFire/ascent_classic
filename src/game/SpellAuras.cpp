@@ -5863,7 +5863,7 @@ void Aura::SpellAuraModHaste(bool apply)
 void Aura::SpellAuraForceReaction(bool apply)
 {
 	// hackfix for spectacles
-	if(m_spellProto->EffectApplyAuraName[0] == SPELL_AURA_MOD_INVISIBILITY_DETECTION || m_target->GetTypeId() == TYPEID_PLAYER)
+	if(m_spellProto->EffectApplyAuraName[0] == SPELL_AURA_MOD_INVISIBILITY_DETECTION && m_target->GetTypeId() == TYPEID_PLAYER)
 		return;
 
 	if (apply)
