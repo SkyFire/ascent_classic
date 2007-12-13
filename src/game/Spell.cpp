@@ -2519,37 +2519,39 @@ bool Spell::IsSeal()
 		(m_spellInfo->Id == 20915) || (m_spellInfo->Id == 20918) || (m_spellInfo->Id == 20919) || (m_spellInfo->Id == 20920) || (m_spellInfo->Id == 21082) || (m_spellInfo->Id == 21084)); 
 }
 
-uint8 Spell::CanCast(bool rangetolerate)
+uint8 Spell::CanCast(bool tolerate)
 {
 	if(objmgr.IsSpellDisabled(m_spellInfo->Id))
-		return SPELL_FAILED_ERROR;
-	
+		return SPELL_FAILED_SPELL_UNAVAILABLE;
+
+	if(p_caster)
+	{
+		// check for cooldowns
+		if(!tolerate && !p_caster->CanCastDueToCooldown(m_spellInfo))
+				return SPELL_FAILED_NOT_READY;
+
+		// check if spell is allowed while player is on a taxi
+		if(p_caster->m_onTaxi)
+		{
+			if(m_spellInfo->Id != 33836) // exception for Area 52 Special
+				return (uint8)SPELL_FAILED_NOT_ON_TAXI;
+		}
+
+		// check if spell is allowed while player is on a transporter
+		if(p_caster->m_CurrentTransporter)
+		{
+			// no mounts while on transporters
+			if(m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOUNTED || m_spellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOUNTED || m_spellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOUNTED)
+				return (uint8)SPELL_FAILED_NOT_ON_TRANSPORT;
+		}
+
+	}
+
 	Unit *target = NULL;
 	float maxr = 0;
 
 	if(m_targets.m_unitTarget)
 	{
-		if(p_caster)
-		{
-			// check for cooldowns
-			if(!rangetolerate && !p_caster->CanCastDueToCooldown(m_spellInfo)) // what does range have to do with cooldowns?
- 				return SPELL_FAILED_NOT_READY;
-
-			// check for casting while player is on a taxi
-			if(p_caster->m_onTaxi)
-			{
-				return (uint8)SPELL_FAILED_NOT_ON_TAXI;
-			}
-
-			// check for casting while player is on a transporter
-			if(p_caster->m_CurrentTransporter)
-			{
-				// no mounts while on transporters
-				if(m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOUNTED || m_spellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOUNTED || m_spellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOUNTED)
-					return (uint8)SPELL_FAILED_NOT_ON_TRANSPORT;
-			}
-		}
-
 		target = (m_caster->IsInWorld()) ? m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget) : NULL;
 
 		if(target)
@@ -2776,11 +2778,13 @@ uint8 Spell::CanCast(bool rangetolerate)
 #endif
 			}
 
-			if(rangetolerate)
-				maxr *= 1.33f;
-			// Supalosa: +6 yards to max range: See extra/supalosa_range_research.txt
-			//sLog.outString( "Cancast: Spell %u." , m_spellInfo->Id );
-			if(!IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),target, ( maxr*maxr + 36 )))
+			// Partha: +2.52yds to max range, this matches the range the client is calculating.
+			// see extra/supalosa_range_research.txt for more info
+			maxr += 2.52f;
+
+			if(tolerate) maxr *= 1.33f;
+
+			if(!IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),target, (maxr * maxr)))
 				return SPELL_FAILED_OUT_OF_RANGE;
 
 			if(p_caster)
@@ -3053,78 +3057,75 @@ uint8 Spell::CanCast(bool rangetolerate)
 		}
 	}
 
-	if(i_caster) // if the caster is an item
+	// Item Spell Checks
+	if(i_caster)
 	{
-		// *** ITEM CHARGES CHECK - Partha ***
-		if(i_caster->GetProto()->Spells[0].Charges != 0 && ((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) == 0)
-			return SPELL_FAILED_NO_CHARGES_REMAIN; // Item has no charges left
-
-		// *** SHAPESHIFT CHECK - Partha ***
-		uint8 ss = p_caster->GetShapeShift();
-
-		switch(ss)
+		// Check if item spell is allowed while shapeshifted
+		if(!(i_caster->GetProto()->Flags & ITEM_FLAG_SHAPESHIFT_OK)) // a couple of strange items are allowed while shapeshifted
 		{
-			case 0: // normal form
-			case FORM_TREE:
-			case FORM_BATTLESTANCE:
-			case FORM_DEFENSIVESTANCE:
-			case FORM_BERSERKERSTANCE:
-			case FORM_SHADOW:
-			case FORM_STEALTH:
-			case FORM_MOONKIN:
-				break;
+			switch(p_caster->GetShapeShift())
+			{
+				case FORM_NORMAL:
+				case FORM_TREE:
+				case FORM_BATTLESTANCE:
+				case FORM_DEFENSIVESTANCE:
+				case FORM_BERSERKERSTANCE:
+				case FORM_SHADOW:
+				case FORM_STEALTH:
+				case FORM_MOONKIN:
+					break;
 
-			case FORM_SWIFT:
-			case FORM_FLIGHT:
-				return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+				case FORM_SWIFT:
+				case FORM_FLIGHT:
+						return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
 
-			//case FORM_CAT: 
-			//case FORM_TRAVEL:
-			//case FORM_AQUA:
-			//case FORM_BEAR:
-			//case FORM_AMBIENT:
-			//case FORM_GHOUL:
-			//case FORM_DIREBEAR:
-			//case FORM_CREATUREBEAR:
-			//case FORM_GHOSTWOLF:
-			//case FORM_SPIRITOFREDEMPTION:
+				//case FORM_CAT: 
+				//case FORM_TRAVEL:
+				//case FORM_AQUA:
+				//case FORM_BEAR:
+				//case FORM_AMBIENT:
+				//case FORM_GHOUL:
+				//case FORM_DIREBEAR:
+				//case FORM_CREATUREBEAR:
+				//case FORM_GHOSTWOLF:
+				//case FORM_SPIRITOFREDEMPTION:
 
-			default:  // only equipped items allowed in other forms
-				if(i_caster->GetProto()->InventoryType == INVTYPE_NON_EQUIP)
-					return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+				default:  // only equipped items allowed in other forms
+					if(i_caster->GetProto()->InventoryType == INVTYPE_NON_EQUIP)
+						return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+			}
 		}
 	}
 
-	// if we happen to get here we check if the caster is a player and apply check's for items 
-	if(p_caster)
-		return CheckItems();
-	else 
-		return uint8(-1);
+	return CheckItems();
 }
 
-// we check player items
 int8 Spell::CheckItems()
 {
-	// we check so we are sure we "are" a player
-	if(m_caster->GetTypeId() != TYPEID_PLAYER)
-		return int8(-1);
+	// only players need to be checked for items
+	if(!p_caster) return int8(-1);
 
-	// typecast Master to Player
-	Player* p_caster = (Player*)m_caster;
+	// Item Charges Check - Partha
+	if(i_caster && i_caster->GetProto()->Spells[0].Charges != 0 && ((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) == 0)
+		return SPELL_FAILED_NO_CHARGES_REMAIN;
 
-	ItemInterface * t_PlayerItemInterface = p_caster->GetItemInterface();
-
+	// Reagent Checks
 	for(uint32 i=0;i<8;i++)
 	{
 		if((m_spellInfo->Reagent[i] == 0) || (m_spellInfo->ReagentCount[i] == 0))
 			continue;
 
 		if(i_caster && i_caster->GetProto()->ItemId == m_spellInfo->Reagent[i])
-			usedItem = 1; // make sure the item being used doesn't get counted as an available reagent 
-		else usedItem = 0;
-
-		if(t_PlayerItemInterface->GetItemCount(m_spellInfo->Reagent[i]) - usedItem < m_spellInfo->ReagentCount[i])
-			return int8(SPELL_FAILED_ITEM_NOT_FOUND);
+		{
+			// if the item being used is the same as the reagent, then we need 1 more
+			if(p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Reagent[i]) < m_spellInfo->ReagentCount[i] + 1)
+				return int8(SPELL_FAILED_ITEM_GONE);
+		}
+		else
+		{
+			if(p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Reagent[i]) < m_spellInfo->ReagentCount[i])
+				return int8(SPELL_FAILED_ITEM_GONE);
+		}
 	}
 
 	if(m_spellInfo->Totem[0] != 0)

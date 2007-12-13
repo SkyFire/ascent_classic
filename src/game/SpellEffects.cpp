@@ -423,10 +423,10 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 {
 	uint32 spellId = m_spellInfo->Id;
 	
+	// Try a dummy SpellHandler
 	if(sScriptMgr.CallScriptedDummySpell(spellId, i, this))
 		return;
 
-	// INTERNAL HANDLERS
 	switch(spellId)
 	{
 	//curse of agony(18230) = periodic damage increased in 
@@ -587,10 +587,6 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 6668:// Red Firework
 		{
 			// Shoots a firework into the air that bursts into a thousand red stars
-		}break;
-	case 8213:// Cooked Deviate Fish
-		{
-
 		}break;
 	case 8344:// Universal Remote
 		{
@@ -1097,7 +1093,16 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 void Spell::SpellEffectTeleportUnits(uint32 i)  // Teleport Units
 {
-	if(m_spellInfo->NameHash == 0x068d7654 && unitTarget && p_caster && p_caster->IsInWorld())		// Shadowstep
+	uint32 spellId = m_spellInfo->Id;
+
+	if(!unitTarget) return;
+
+	// Try a dummy SpellHandler
+	if(sScriptMgr.CallScriptedDummySpell(spellId, i, this))
+		return;
+
+	// Shadowstep
+	if(m_spellInfo->NameHash == 0x068d7654 && p_caster && p_caster->IsInWorld())
 	{
 		/* this is rather tricky actually. we have to calculate the orientation of the creature/player, and then calculate a little bit of distance behind that. */
 		float ang;
@@ -1141,16 +1146,10 @@ void Spell::SpellEffectTeleportUnits(uint32 i)  // Teleport Units
 		return;
 	}
 
-	if(!unitTarget || unitTarget->GetTypeId()!= TYPEID_PLAYER)
-		return;
-
 	/* TODO: Remove Player From bg */
 
-	// Try a dummy spell handler.
-	if(sScriptMgr.CallScriptedDummySpell(m_spellInfo->Id, i, this))
-		return;
-
-	HandleTeleport(m_spellInfo->Id,unitTarget);
+	if(unitTarget->GetTypeId() == TYPEID_PLAYER)
+		HandleTeleport(spellId, unitTarget);
 }
 
 void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
@@ -2192,20 +2191,32 @@ void Spell::SpellEffectProficiency(uint32 i)
 
 void Spell::SpellEffectSendEvent(uint32 i) //Send Event
 {
-	//This is mostly used to trigger events on quests or someplaces
-	switch(m_spellInfo->Id)
+	//This is mostly used to trigger events on quests or some places
+
+	uint32 spellId = m_spellInfo->Id;
+
+	// Try a dummy SpellHandler
+	if(sScriptMgr.CallScriptedDummySpell(spellId, i, this))
+		return;
+
+	switch(spellId)
 	{
-	case 25720://Places the Bag of Gold at the designated Drop-Off Point.
+
+	// Place Loot
+	case 25720: // Places the Bag of Gold at the designated Drop-Off Point.
 		{
 
 		}break;
-	case 29297:
+
+	// Item - Cleansing Vial DND
+	case 29297: // Empty the vial near the Bones of Aggonar to cleanse the waters of their demonic taint.
 		{
 			QuestLogEntry *en=p_caster->GetQuestLogForEntry(9427);
 			if(!en)
 				return;
 			en->SendQuestComplete();
 		}break;
+
 	//Warlock: Summon Succubus Quest
 	case 8674:
 	case 9223:
@@ -2225,6 +2236,7 @@ void Spell::SpellEffectSendEvent(uint32 i) //Send Event
 		   pCreature->PushToWorld(p_caster->GetMapMgr());
 		   sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE,60000, 1, 0);
 		}break;
+
 	//Warlock: Summon Voidwalker Quest
 	case 30208:
 	case 9221:
@@ -2245,6 +2257,7 @@ void Spell::SpellEffectSendEvent(uint32 i) //Send Event
 		   pCreature->PushToWorld(p_caster->GetMapMgr());
 		   sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE,60000, 1, 0);
 		}break;
+
 	//Warlock: Summon Felhunter Quest
 	case 8712:
 		{
@@ -2262,6 +2275,7 @@ void Spell::SpellEffectSendEvent(uint32 i) //Send Event
 		   pCreature->PushToWorld(p_caster->GetMapMgr());
 		   sEventMgr.AddEvent(pCreature, &Creature::SafeDelete, EVENT_CREATURE_REMOVE_CORPSE,60000, 1, 0);
 		}break;
+
 	}
 }
 
@@ -3278,36 +3292,38 @@ void Spell::SpellEffectSummonObjectWild(uint32 i)
 
 void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 {
-	
 	uint32 spellId = m_spellInfo->Id;
+
+	// Try a dummy SpellHandler
+	if(sScriptMgr.CallScriptedDummySpell(spellId, i, this))
+		return;
+
 	switch(spellId)
 	{
-		/*Arcane Missiles*/
-		/*   case 5143://Rank 1
-		case 5144://Rank 2
-		case 5145://Rank 3
-		case 8416://Rank 4
-		case 8417://Rank 5
-		case 10211://Rank 6
-		case 10212://Rank 7
-		case 25345://Rank 8
+
+	// Arcane Missiles
+	/*
+	case 5143://Rank 1
+	case 5144://Rank 2
+	case 5145://Rank 3
+	case 8416://Rank 4
+	case 8417://Rank 5
+	case 10211://Rank 6
+	case 10212://Rank 7
+	case 25345://Rank 8
+	{
+		if(m_tmpAffect == 0)
 		{
-		if(m_tmpAffect == 0){
-		Affect* aff = new Affect(m_spellInfo,GetDuration(sSpellDuration.LookupEntry(m_spellInfo->DurationIndex)),m_GetGUID(),m_caster);
-		m_tmpAffect = aff;
+			Affect* aff = new Affect(m_spellInfo,GetDuration(sSpellDuration.LookupEntry(m_spellInfo->DurationIndex)),m_GetGUID(),m_caster);
+			m_tmpAffect = aff;
 		}
 		if(m_spellInfo->EffectBasePoints[0] < 0)
-		m_tmpAffect->SetNegative();
+			m_tmpAffect->SetNegative();
 
 		m_tmpAffect->SetPeriodicTriggerSpell(m_spellInfo->EffectTriggerSpell[0],m_spellInfo->EffectAmplitude[0],damage);
-		}break;*/						
-		/*
-		Creates a Healthstone that can be used to instantly restore 500 health.
-		Conjured items disappear if logged out for more than 15 minutes.*/
-		//FIXME: Conjured items disappear if logged out for more than 15 minutes.
-		//itemId's might be wrong
-		//Commenting out till items come
-	
+	}break;
+	*/
+
 	// Warlock Healthstones, just how much health does a lock need?
 	case 6201:		// Minor Healthstone
 		if (p_caster->HasSpell(18692))
@@ -3362,7 +3378,6 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 		CreateItem(5510);
 		break;
 	case 11730:		// Major Healthstone
-
 		if (p_caster->HasSpell(18693))	// Improved Healthstone (2)
 		{
 			CreateItem(19013);
@@ -3388,7 +3403,9 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 		}
 		CreateItem(22103);
 		break;
-	case 635:// Holy Light
+
+	// Holy Light
+	case 635:
 	case 639:
 	case 647:
 	case 1026:
@@ -3396,21 +3413,23 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 	case 3472:
 	case 10328:
 	case 10329:
-	case 10348:// Holy Light
+	case 10348:
 	case 25292:
 	case 27135:
 	case 27136:
-
-	case 19750://Flash of light
+	//Flash of light
+	case 19750:
 	case 19939:
 	case 19940:
 	case 19941:
 	case 19942:
-	case 19943://Flash of light
+	case 19943:
 	case 27137:
 		Heal((int32)damage);
 	break;
-	case 20271://judgment
+
+	// Judgement
+	case 20271:
 		{
 			if(!unitTarget || !p_caster) return;
 
@@ -3423,6 +3442,7 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 			sp->prepare(&tgt);
 			p_caster->RemoveAura(p_caster->Seal);
 		}break;
+
 	}
 }
 
@@ -3831,19 +3851,37 @@ void Spell::SpellEffectSummonCritter(uint32 i)
 	if(!u_caster || u_caster->IsInWorld() == false)
 		return;
 
+	uint32 SummonCritterID = m_spellInfo->EffectMiscValue[i];
+
+	// m_spellInfo->EffectDieSides[i] has something to do with dismissing our critter
+	// when it is 1, it means to just dismiss it if we already have it
+	// when it is 0, it could mean to always summon a new critter, but there seems to be exceptions
+
 	if(u_caster->critterPet)
 	{
-		u_caster->critterPet->RemoveFromWorld(false,true);
-		delete u_caster->critterPet;
-		u_caster->critterPet = NULL;
-		return;
+		// if we already have this critter, we will just dismiss it and return
+		if(u_caster->critterPet->GetCreatureName() && u_caster->critterPet->GetCreatureName()->Id == SummonCritterID)
+		{
+			u_caster->critterPet->RemoveFromWorld(false,true);
+			delete u_caster->critterPet;
+			u_caster->critterPet = NULL;
+			return;
+		}
+		// this is a different critter, so we will dismiss our current critter and then go on to summon the new one
+		else
+		{
+			u_caster->critterPet->RemoveFromWorld(false,true);
+			delete u_caster->critterPet;
+			u_caster->critterPet = NULL;
+		}
 	}
 
-	CreatureInfo * ci = CreatureNameStorage.LookupEntry(m_spellInfo->EffectMiscValue[i]);
-	CreatureProto * cp = CreatureProtoStorage.LookupEntry(m_spellInfo->EffectMiscValue[i]);
+	if(!SummonCritterID) return;
 
-	if(!ci || !cp)
-		return;
+	CreatureInfo * ci = CreatureNameStorage.LookupEntry(SummonCritterID);
+	CreatureProto * cp = CreatureProtoStorage.LookupEntry(SummonCritterID);
+
+	if(!ci || !cp) return;
 
 	Creature * pCreature = u_caster->GetMapMgr()->CreateCreature();
 	pCreature->SetInstanceID(u_caster->GetMapMgr()->GetInstanceID());
@@ -4374,7 +4412,7 @@ void Spell::SpellEffectProspecting(uint32 i)
 		//we need 5 items in order to perform this spell
 		if(itemsavailable<src_item_amt)
 		{
-			SendCastResult(SPELL_FAILED_ITEM_NOT_FOUND);
+			SendCastResult(SPELL_FAILED_ITEM_GONE);
 			return;
 		}
 

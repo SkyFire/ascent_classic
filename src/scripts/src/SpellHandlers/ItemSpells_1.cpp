@@ -189,65 +189,6 @@ bool BanishExile(uint32 i, Spell * pSpell)
 
 // -----------------------------------------------------------------------------
 
-bool HolyShock(uint32 i, Spell *pSpell)
-{
-	Unit *target = pSpell->GetUnitTarget();
-	if(!pSpell->p_caster || !target) return true;
-
-	uint32 newspell = 0;
-
-	if(isAttackable(pSpell->p_caster,target)) // if its an enemy
-	{
-		switch(pSpell->m_spellInfo->Id)
-		{
-		case 20473:
-			newspell = 25912;
-			break;
-		case 20929:
-			newspell = 25911;
-			break;
-		case 20930:
-			newspell = 25902;
-			break;
-		case 27174:
-			newspell = 27176;
-			break;
-		case 33072:
-			newspell = 33073;
-			break;
-		}
-	}
-	else // if its friendly
-	{
-		switch(pSpell->m_spellInfo->Id)
-		{
-		case 20473:
-			newspell = 25914;
-			break;
-		case 20929:
-			newspell = 25913;
-			break;
-		case 20930:
-			newspell = 25903;
-			break;
-		case 27174:
-			newspell = 27175;
-			break;
-		case 33072:
-			newspell = 33074;
-			break;
-		}
-	}
-
-	SpellEntry *spInfo = dbcSpell.LookupEntry(newspell);
-	if(!spInfo) return true;
-
-	pSpell->p_caster->CastSpell(target, spInfo, true);
-	return true;
-}
-
-// -----------------------------------------------------------------------------
-
 bool ForemansBlackjack(uint32 i, Spell *pSpell)
 {
 	Unit* target = pSpell->GetUnitTarget();
@@ -314,17 +255,20 @@ bool SymbolOfLife(uint32 i, Spell *pSpell)
 
 bool NighInvulnBelt(uint32 i, Spell *pSpell)
 {
-    if(!pSpell->p_caster) return true;
+	if(!pSpell->p_caster) return true;
 
-    int chance = RandomUInt(99)+1;
+	int chance = RandomUInt(99)+1;
 
-    if(chance > 10) // Buff - Nigh-Invulnerability - 30456
-        pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30456), true);
-    else // Malfunction - Complete Vulnerability - 30457
-        pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30457), true);
+	if(chance > 10) // Buff - Nigh-Invulnerability - 30456
+		pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30456), true);
+	else // Malfunction - Complete Vulnerability - 30457
+		pSpell->p_caster->CastSpell(pSpell->p_caster, dbcSpell.LookupEntry(30457), true);
 
-    return true;
+	return true;
 }
+
+// -----------------------------------------------------------------------------
+
 
 
 
@@ -333,25 +277,20 @@ bool NighInvulnBelt(uint32 i, Spell *pSpell)
 
 void SetupItemSpells_1(ScriptMgr * mgr)
 {
-	mgr->register_dummy_spell(23453, &GnomishTransporter); // Gnomish Transporter
-	mgr->register_dummy_spell(16589, &NoggenFoggerElixr);  // Noggenfogger
-	mgr->register_dummy_spell(24430, &HallowsEndCandy);    // Hallows End Candy
-	mgr->register_dummy_spell( 8063, &DeviateFish);        // Deviate Fish
-	mgr->register_dummy_spell( 8213, &CookedDeviateFish);  // Savory Deviate Delight
-	mgr->register_dummy_spell(26074, &HolidayCheer);       // Holiday Cheer
-	mgr->register_dummy_spell(13120, &NetOMatic);          // Net-o-Matic
-	mgr->register_dummy_spell( 4130, &BanishExile);        // Essence of the Exile Quest
-	mgr->register_dummy_spell( 4131, &BanishExile);        // Essence of the Exile Quest
-	mgr->register_dummy_spell( 4132, &BanishExile);        // Essence of the Exile Quest
-	mgr->register_dummy_spell(20473, &HolyShock);          // Holy Shock rank 1
-	mgr->register_dummy_spell(20929, &HolyShock);          // Holy Shock rank 2
-	mgr->register_dummy_spell(20930, &HolyShock);          // Holy Shock rank 3
-	mgr->register_dummy_spell(27174, &HolyShock);          // Holy Shock rank 4
-	mgr->register_dummy_spell(33072, &HolyShock);          // Holy Shock rank 5
-	mgr->register_dummy_spell(19938, &ForemansBlackjack);  // Lazy Peons Quest
-	mgr->register_dummy_spell(39105, &NetherWraithBeacon); // Spellfire Tailor Quest
-	mgr->register_dummy_spell( 8593, &SymbolOfLife);       // Paladin's Redemption QuestLine
-	mgr->register_dummy_spell(30458, &NighInvulnBelt);     // Nigh Invulnerability Belt
+	mgr->register_dummy_spell(23453, &GnomishTransporter);      // Gnomish Transporter
+	mgr->register_dummy_spell(16589, &NoggenFoggerElixr);       // Noggenfogger
+	mgr->register_dummy_spell(24430, &HallowsEndCandy);         // Hallows End Candy
+	mgr->register_dummy_spell( 8063, &DeviateFish);             // Deviate Fish
+	mgr->register_dummy_spell( 8213, &CookedDeviateFish);       // Savory Deviate Delight
+	mgr->register_dummy_spell(26074, &HolidayCheer);            // Holiday Cheer
+	mgr->register_dummy_spell(13120, &NetOMatic);               // Net-o-Matic
+	mgr->register_dummy_spell( 4130, &BanishExile);             // Essence of the Exile Quest
+	mgr->register_dummy_spell( 4131, &BanishExile);             // Essence of the Exile Quest
+	mgr->register_dummy_spell( 4132, &BanishExile);             // Essence of the Exile Quest
+	mgr->register_dummy_spell(19938, &ForemansBlackjack);       // Lazy Peons Quest
+	mgr->register_dummy_spell(39105, &NetherWraithBeacon);      // Spellfire Tailor Quest
+	mgr->register_dummy_spell( 8593, &SymbolOfLife);            // Paladin's Redemption QuestLine
+	mgr->register_dummy_spell(30458, &NighInvulnBelt);          // Nigh Invulnerability Belt
 
 
 

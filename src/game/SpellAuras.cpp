@@ -1198,11 +1198,14 @@ void Aura::EventPeriodicDamage(uint32 amount)
 
 void Aura::SpellAuraDummy(bool apply)
 {
-	bool dr = sScriptMgr.CallScriptedDummyAura(GetSpellId(), mod->i, this, apply);
+	// Try a dummy SpellHandler
+	if(sScriptMgr.CallScriptedDummyAura(GetSpellId(), mod->i, this, apply))
+		return;
+
 	uint32 triggerSpId = 0;
 
 	// for seal -> set judgement crap
-	if(GetSpellProto()->buffType & SPELL_TYPE_SEAL && !dr && mod->i == 2)
+	if(GetSpellProto()->buffType & SPELL_TYPE_SEAL && mod->i == 2)
 	{
 		Player*c=(Player*)GetUnitCaster();
 		if(c == 0) return;
@@ -1227,7 +1230,7 @@ void Aura::SpellAuraDummy(bool apply)
 		}
 	}
 
-    Player * _ptarget = (Player*)m_target;
+	Player * _ptarget = (Player*)m_target;
 
 	switch(GetSpellId())
 	{
@@ -1774,6 +1777,7 @@ void Aura::SpellAuraDummy(bool apply)
 
 			pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
 		}break;
+
 	}
 }
 
@@ -3865,8 +3869,13 @@ void Aura::SpellAuraModSpellHitChance(bool apply)
 
 void Aura::SpellAuraTransform(bool apply)
 {
+	// Try a dummy SpellHandler
+	if(sScriptMgr.CallScriptedDummyAura(GetSpellId(), mod->i, this, apply))
+		return;
+
 	uint32 displayId = 0;
 	CreatureInfo* ci = CreatureNameStorage.LookupEntry(mod->m_miscValue);
+
 	if(ci)
 		displayId = ci->Male_DisplayID;
 

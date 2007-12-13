@@ -437,7 +437,7 @@ enum ITEM_FLAG
 	ITEM_FLAG_UNKNOWN_21   = 0x100000, // not used in proto
 	ITEM_FLAG_UNKNOWN_22   = 0x200000, // player created health/mana/poisons
 	ITEM_FLAG_THROWN       = 0x400000,
-	ITEM_FLAG_FLIGHT_USE   = 0x800000,
+	ITEM_FLAG_SHAPESHIFT_OK= 0x800000,
 };
 
 enum SPECIAL_ITEM_TYPE

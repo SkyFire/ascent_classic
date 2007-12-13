@@ -57,3 +57,22 @@ Note that the point values were probably errors on my part - I obtained this 'cl
 }
 Conclusion:
 * Since we already have 3 extra yards, we need another 2.
+
+
+Edit by Partha: 
+
+Actually only about 0.5yds was being added to the max range.
+
+It appears that the client is indicating that you are in range at exactly 2.52yds outside of the range.
+The amount is the same for spells with 10yd range all the way up to 45yd range.
+Not sure why this is happening, but it must be either that the client is adding some kind of buffer zone,
+or it is using something like the bounding radius of the 2 units.
+
+Don't forget, the client won't let you attack if your not inside the range it calculates.
+This is actually just to prevent cheaters.
+
+I added a total of 2.52 true yards to the range, and the client and server is now synced up perfectly.
+
+Thanks to Supalosa for his work, and his great .debug rangecheck command!
+
+
