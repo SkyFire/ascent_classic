@@ -193,7 +193,7 @@ inline void _HandleBreathing(MovementInfo &movement_info, Player * _player, Worl
 		return;
 	}
 	//player not swiming
-	if(!(movement_info.flags & 0x200000) && _player->m_UnderwaterState)
+	if(!(movement_info.flags & 0x200000))
 	{
 		if(_player->m_lastMoveType)
 		{
