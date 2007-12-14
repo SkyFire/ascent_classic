@@ -18,6 +18,8 @@
  */
 
 #include "StdAfx.h"
+Mutex m_transportGuidGen;
+uint32 m_transportGuidMax = 50;
 
 bool Transporter::CreateAsTransporter(uint32 EntryID, const char* Name, uint32 Time)
 {
@@ -431,4 +433,45 @@ void Transporter::OnPushToWorld()
 {
 	// Create waypoint event
 	sEventMgr.AddEvent(this, &Transporter::UpdatePosition, EVENT_TRANSPORTER_NEXT_WAYPOINT, 100, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+}
+
+void Transporter::AddNPC(uint32 Entry, float offsetX, float offsetY, float offsetZ)
+{
+	uint32 guid;
+	m_transportGuidGen.Acquire();
+	guid = ++m_transportGuidMax;
+	m_transportGuidGen.Release();
+
+	CreatureInfo * inf = CreatureNameStorage.LookupEntry(Entry);
+	CreatureProto * proto = CreatureProtoStorage.LookupEntry(Entry);
+	if(inf==NULL||proto==NULL)
+		return;
+
+	Creature * pCreature = new Creature(HIGHGUID_TRANSPORTER, guid);
+	pCreature->Load(proto, m_position.x, m_position.y, m_position.z);
+	pCreature->m_transportPosition = new LocationVector(offsetX, offsetY, offsetZ);
+	pCreature->m_transportGuid = GetGUIDLow();
+	m_npcs.insert(make_pair(guid,pCreature));
+}
+
+Creature * Transporter::GetCreature(uint32 Guid)
+{
+	TransportNPCMap::iterator itr = m_npcs.find(Guid);
+	if(itr==m_npcs.end())
+		return NULL;
+	if(itr->second->GetTypeId()==TYPEID_UNIT)
+		return ((Creature*)itr->second);
+	else
+		return NULL;
+}
+
+uint32 Transporter::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target )
+{
+	uint32 cnt = Object::BuildCreateUpdateBlockForPlayer(data, target);
+
+	// add all the npcs to the packet
+	for(TransportNPCMap::iterator itr = m_npcs.begin(); itr != m_npcs.end(); ++itr)
+		cnt += itr->second->BuildCreateUpdateBlockForPlayer(data, target);
+
+	return cnt;
 }

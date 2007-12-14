@@ -322,6 +322,8 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 	{
 		if(pThis && pThis->m_TransporterGUID != 0)
 			flags2 |= 0x200;
+		else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportGuid != 0)
+			flags2 |= 0x200;
 
 		if(splinebuf)
 		{
@@ -394,9 +396,20 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 
 		if(flags & 0x20 && flags2 & 0x0200)
 		{
-			*data << pThis->m_TransporterGUID;
-			*data << pThis->m_TransporterX << pThis->m_TransporterY << pThis->m_TransporterZ << pThis->m_TransporterO;
-			*data << pThis->m_TransporterUnk;
+			if(pThis)
+			{
+				*data << pThis->m_TransporterGUID;
+				*data << pThis->m_TransporterX << pThis->m_TransporterY << pThis->m_TransporterZ << pThis->m_TransporterO;
+				*data << pThis->m_TransporterUnk;
+			}
+			else
+			{
+				*data << ((Creature*)this)->m_transportGuid;
+				*data << uint32(HIGHGUID_TRANSPORTER);
+				*data << ((Creature*)this)->m_transportPosition->x << ((Creature*)this)->m_transportPosition->y << 
+					((Creature*)this)->m_transportPosition->z << ((Creature*)this)->m_transportPosition->o;
+				*data << float(0.0f);
+			}
 		}
 	}
 

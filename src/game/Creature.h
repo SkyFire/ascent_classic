@@ -514,6 +514,8 @@ public:
 	bool m_corpseEvent;
 	MapCell * m_respawnCell;
 	bool m_noRespawn;
+	LocationVector * m_transportPosition;
+	uint32 m_transportGuid;
 protected:
 	CreatureAIScript *_myScriptClass;
 	bool m_limbostate;

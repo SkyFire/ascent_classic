@@ -1108,7 +1108,7 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket & recv_data)
 	_player->m_playerInfo->guild->LogGuildEvent(GUILD_EVENT_BANKTABBOUGHT, 1, "");
 }
 
-void WorldSession::HandleGuildBankViewLog(WorldPacket & recv_data)
+void WorldSession::HandleGuildBankGetAvailableAmount(WorldPacket & recv_data)
 {
 	// calculate using the last withdrawl blablabla
 	if(_player->m_playerInfo->guildMember == NULL)

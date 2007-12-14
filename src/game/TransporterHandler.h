@@ -94,8 +94,12 @@ typedef std::map<uint32, TWayPoint> WaypointMap;
 typedef std::map<uint32, TWayPoint>::iterator WaypointIterator;
 typedef std::map<uint32, Player*> PassengerMap;
 typedef std::map<uint32, Player*>::iterator PassengerIterator;
+typedef std::map<uint32, Object*> TransportNPCMap;
 
 bool FillTransporterPathVector(uint32 PathID, TransportPath & Path);
+
+extern Mutex m_transportGuidGen;
+extern uint32 m_transportGuidMax;
 
 class Transporter : public GameObject
 {
@@ -121,9 +125,15 @@ public:
 	WaypointIterator mNextWaypoint;
 
 	void OnPushToWorld();
+	uint32 __fastcall BuildCreateUpdateBlockForPlayer( ByteBuffer *data, Player *target );
+	void DestroyTransportNPCs(Player * target);
+	void AddNPC(uint32 Entry, float offsetX, float offsetY, float offsetZ);
+	Creature * GetCreature(uint32 Guid);
+	GameObject * GetGameObject(uint32 Guid);
 
 private:
 	
+	TransportNPCMap m_npcs;
 	WaypointMap m_WayPoints;
 	PassengerMap mPassengers;
 

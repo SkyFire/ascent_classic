@@ -99,6 +99,8 @@ Creature::Creature(uint32 high, uint32 low)
 	m_base_walkSpeed = m_walkSpeed;
 	m_noRespawn=false;
     m_canRegenerateHP = true;
+	m_transportGuid = 0;
+	m_transportPosition = NULL;
 }
 
 
