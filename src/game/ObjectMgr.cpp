@@ -2014,11 +2014,11 @@ Corpse * ObjectMgr::GetCorpse(uint32 corpseguid)
 	return rv;
 }
 
-Transporter * ObjectMgr::GetTransporter(uint64 guid)
+Transporter * ObjectMgr::GetTransporter(uint32 guid)
 {
 	Transporter * rv;
 	_TransportLock.Acquire();
-	HM_NAMESPACE::hash_map<uint64, Transporter*>::const_iterator itr = mTransports.find(guid);
+	HM_NAMESPACE::hash_map<uint32, Transporter*>::const_iterator itr = mTransports.find(guid);
 	rv = (itr != mTransports.end()) ? itr->second : 0;
 	_TransportLock.Release();
 	return rv;
@@ -2027,7 +2027,7 @@ Transporter * ObjectMgr::GetTransporter(uint64 guid)
 void ObjectMgr::AddTransport(Transporter *pTransporter)
 {
 	_TransportLock.Acquire();
-	mTransports[pTransporter->GetGUID()]=pTransporter;
+	mTransports[pTransporter->GetGUIDLow()]=pTransporter;
  	_TransportLock.Release();
 }
 
@@ -2035,7 +2035,7 @@ Transporter * ObjectMgr::GetTransporterByEntry(uint32 entry)
 {
 	Transporter * rv = 0;
 	_TransportLock.Acquire();
-	HM_NAMESPACE::hash_map<uint64, Transporter*>::iterator itr = mTransports.begin();
+	HM_NAMESPACE::hash_map<uint32, Transporter*>::iterator itr = mTransports.begin();
 	for(; itr != mTransports.end(); ++itr)
 	{
 		if(itr->second->GetEntry() == entry)

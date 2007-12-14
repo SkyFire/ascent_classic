@@ -835,7 +835,7 @@ bool ChatHandler::HandleGetTransporterTime(const char* args, WorldSession* m_ses
 	Player *plyr = m_session->GetPlayer();
 	if(plyr->m_TransporterGUID == 0) return false;
 
-	Transporter *trans = objmgr.GetTransporter(plyr->m_TransporterGUID);
+	Transporter *trans = objmgr.GetTransporter(GUID_LOPART(plyr->m_TransporterGUID));
 	if(!trans) return false;
 
 //	BlueSystemMessage(m_session, "Transporter Time: %d", trans->m_TravelTime);

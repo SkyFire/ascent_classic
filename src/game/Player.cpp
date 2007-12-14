@@ -2719,7 +2719,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	m_TransporterGUID = get_next_field.GetUInt32();
 	if(m_TransporterGUID)
 	{
-		Transporter * t = objmgr.GetTransporterByEntry((uint32)m_TransporterGUID);
+		Transporter * t = objmgr.GetTransporter(GUID_LOPART(m_TransporterGUID));
 		m_TransporterGUID = t ? t->GetGUID() : 0;
 	}
 

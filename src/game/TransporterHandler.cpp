@@ -415,7 +415,7 @@ void ObjectMgr::LoadTransporters()
 		uint32 entry = QR->Fetch()[0].GetUInt32();
 		uint32 period = QR->Fetch()[2].GetUInt32();
 
-		Transporter * pTransporter = new Transporter(HIGHGUID_TRANSPORTER,++guid);
+		Transporter * pTransporter = new Transporter(HIGHGUID_TRANSPORTER,entry);
 		if(!pTransporter->CreateAsTransporter(entry, "", period))
 		{
 			sLog.outError("Transporter %s failed creation for some reason.", QR->Fetch()[1].GetString());
@@ -423,6 +423,19 @@ void ObjectMgr::LoadTransporters()
 		}else
 		{
             AddTransport(pTransporter);
+
+			QueryResult * result2 = WorldDatabase.Query("SELECT * FROM transport_creatures WHERE transport_entry = %u", entry);
+			if(result2)
+			{
+				do 
+				{
+					pTransporter->AddNPC(result2->Fetch()[1].GetUInt32(), result2->Fetch()[2].GetFloat(),
+						result2->Fetch()[3].GetFloat(), result2->Fetch()[4].GetFloat(),
+						result2->Fetch()[5].GetFloat());
+
+				} while (result2->NextRow());
+				delete result2;
+			}
 		}
 
 	} while(QR->NextRow());
@@ -435,7 +448,7 @@ void Transporter::OnPushToWorld()
 	sEventMgr.AddEvent(this, &Transporter::UpdatePosition, EVENT_TRANSPORTER_NEXT_WAYPOINT, 100, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
 
-void Transporter::AddNPC(uint32 Entry, float offsetX, float offsetY, float offsetZ)
+void Transporter::AddNPC(uint32 Entry, float offsetX, float offsetY, float offsetZ, float offsetO)
 {
 	uint32 guid;
 	m_transportGuidGen.Acquire();
@@ -449,7 +462,7 @@ void Transporter::AddNPC(uint32 Entry, float offsetX, float offsetY, float offse
 
 	Creature * pCreature = new Creature(HIGHGUID_TRANSPORTER, guid);
 	pCreature->Load(proto, m_position.x, m_position.y, m_position.z);
-	pCreature->m_transportPosition = new LocationVector(offsetX, offsetY, offsetZ);
+	pCreature->m_transportPosition = new LocationVector(offsetX, offsetY, offsetZ, offsetO);
 	pCreature->m_transportGuid = GetGUIDLow();
 	m_npcs.insert(make_pair(guid,pCreature));
 }
@@ -471,7 +484,10 @@ uint32 Transporter::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *ta
 
 	// add all the npcs to the packet
 	for(TransportNPCMap::iterator itr = m_npcs.begin(); itr != m_npcs.end(); ++itr)
+	{
+		itr->second->SetPosition(GetPosition(), false);
 		cnt += itr->second->BuildCreateUpdateBlockForPlayer(data, target);
+	}
 
 	return cnt;
 }

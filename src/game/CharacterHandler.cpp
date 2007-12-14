@@ -695,7 +695,7 @@ void WorldSession::FullLogin(Player * plr)
 	// Find our transporter and add us if we're on one.
 	if(plr->m_TransporterGUID != 0)
 	{
-		Transporter * pTrans = objmgr.GetTransporter(plr->m_TransporterGUID);
+		Transporter * pTrans = objmgr.GetTransporter(GUID_LOPART(plr->m_TransporterGUID));
 		if(pTrans)
 		{
 			if(plr->isDead())

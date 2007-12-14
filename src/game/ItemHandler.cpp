@@ -602,14 +602,14 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
 {
-	CHECK_PACKET_SIZE(recv_data, 12);
+	CHECK_PACKET_SIZE(recv_data, 4);
  
 	int i;
 	uint32 itemid=0, guidlow=0, guidhigh=0;
-	recv_data >> itemid >> guidlow >> guidhigh; // guid is the guid of the ITEM OWNER - NO ITS NOT
+	recv_data >> itemid/* >> guidlow >> guidhigh; // guid is the guid of the ITEM OWNER - NO ITS NOT
 
 	sLog.outDetail( "WORLD: Recvd CMSG_ITEM_QUERY_SINGLE for item id %d, guid 0x%.8X 0x%.8X",
-		itemid, guidlow, guidhigh );
+		itemid, guidlow, guidhigh )*/;
 
 	ItemPrototype *itemProto = ItemPrototypeStorage.LookupEntry(itemid);
 	if(!itemProto)

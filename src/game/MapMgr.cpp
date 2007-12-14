@@ -235,6 +235,14 @@ void MapMgr::PushObject(Object *obj)
 	else
 		plObj = NULL;
 
+	if(plObj)
+	{
+		sLog.outDetail("Creating player "I64FMT" for himself.", obj->GetGUID());
+		ByteBuffer pbuf(10000);
+		count = plObj->BuildCreateUpdateBlockForPlayer(&pbuf, plObj);
+		plObj->PushCreationData(&pbuf, count);
+	}
+
 	//////////////////////
 	// Build in-range data
 	//////////////////////
@@ -249,14 +257,6 @@ void MapMgr::PushObject(Object *obj)
 				UpdateInRangeSet(obj, plObj, cell, &buf);
 			}
 		}
-	}
-
-	if(plObj)
-	{
-		sLog.outDetail("Creating player "I64FMT" for himself.", obj->GetGUID());
-		ByteBuffer pbuf(10000);
-		count = plObj->BuildCreateUpdateBlockForPlayer(&pbuf, plObj);
-		plObj->PushCreationData(&pbuf, count);
 	}
 
 	//Add to the cell's object list
@@ -623,14 +623,12 @@ void MapMgr::ChangeObjectLocation(Object *obj)
 			iter2 = iter++;
 			if(curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == ((Player*)curObj)->m_TransporterGUID)
 				fRange = 0.0f;			 // unlimited distance for people on same boat
-			else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER))
-				fRange = 0.0f;			  // unlimited distance for transporters (only up to 2 cells +/- anyway.)
-			else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT))
+			else if(curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER)
 				fRange = 0.0f;			  // unlimited distance for transporters (only up to 2 cells +/- anyway.)
 			else
 				fRange = m_UpdateDistance;	  // normal distance
 
-			if (curObj->GetDistance2dSq(obj) > fRange && fRange > 0)
+			if (fRange > 0.0f && curObj->GetDistance2dSq(obj) > fRange)
 			{
 				if( plObj )
 					plObj->RemoveIfVisible(curObj);
@@ -771,11 +769,9 @@ void MapMgr::UpdateInRangeSet(Object *obj, Player *plObj, MapCell* cell, ByteBuf
 	{
 		curObj = *iter;
 		++iter;
-		if(curObj->IsPlayer() && obj->IsPlayer() && plObj && plObj->m_TransporterGUID && plObj->m_TransporterGUID == ((Player*)curObj)->m_TransporterGUID)
+		if(curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == ((Player*)curObj)->m_TransporterGUID)
 			fRange = 0.0f;			 // unlimited distance for people on same boat
-		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER))
-			fRange = 0.0f;			  // unlimited distance for transporters (only up to 2 cells +/- anyway.)
-		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT))
+		else if(curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER)
 			fRange = 0.0f;			  // unlimited distance for transporters (only up to 2 cells +/- anyway.)
 		else
 			fRange = m_UpdateDistance;	  // normal distance
@@ -1448,7 +1444,7 @@ Object* MapMgr::_GetObject(const uint64 & guid)
 		return GetDynamicObject((uint32)guid);
 		break;
 	case	HIGHGUID_TRANSPORTER:
-		return objmgr.GetTransporter(guid);
+		return objmgr.GetTransporter(GUID_LOPART(guid));
 		break;
 	default:
 		return GetUnit(guid);

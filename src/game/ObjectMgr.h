@@ -297,7 +297,7 @@ public:
 	typedef HM_NAMESPACE::hash_map<uint32, Guild*>                      GuildMap;
 	typedef HM_NAMESPACE::hash_map<uint32, skilllinespell*>             SLMap;
 	typedef HM_NAMESPACE::hash_map<uint32, std::vector<CreatureItem>*>  VendorMap;
-    typedef HM_NAMESPACE::hash_map<uint64, Transporter*>                TransportMap;
+    typedef HM_NAMESPACE::hash_map<uint32, Transporter*>                TransportMap;
 	typedef HM_NAMESPACE::hash_map<uint32, Trainer*>                    TrainerMap;
 	typedef HM_NAMESPACE::hash_map<uint32, std::vector<TrainerSpell*> > TrainerSpellMap;
     typedef HM_NAMESPACE::hash_map<uint32, ReputationModifier*>         ReputationModMap;
@@ -504,7 +504,7 @@ public:
 		return r;
 	}
 
-	Transporter * GetTransporter(uint64 guid);
+	Transporter * GetTransporter(uint32 guid);
 	Transporter * GetTransporterByEntry(uint32 entry);
 
 	Charter * CreateCharter(uint32 LeaderGuid, CharterTypes Type);

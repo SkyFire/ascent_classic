@@ -141,10 +141,10 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 		{
 			case GAMEOBJECT_TYPE_MO_TRANSPORT:  
 				{
-					if(UINT32_LOPART(GetGUIDHigh()) != HIGHGUID_TRANSPORTER)
+					if(GetGUIDHigh() != HIGHGUID_TRANSPORTER)
 						return 0;   // bad transporter
 					else
-						flags = 0x4A;
+						flags = 0x5A;
 				}break;
 
 			case GAMEOBJECT_TYPE_TRANSPORT:
