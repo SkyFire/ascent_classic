@@ -913,7 +913,8 @@ int luaUnit_IsInCombat(lua_State * L, Unit * ptr)
 {
 	if (!ptr)
 		return 0;
-	lua_pushboolean(L,ptr->IsInCombat());
+	lua_pushboolean(L,ptr->CombatStatus.IsInCombat());
+	return 0;
 }
 
 int luaUnit_SetScale(lua_State * L, Unit * ptr)
