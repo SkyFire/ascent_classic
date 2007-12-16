@@ -1482,10 +1482,15 @@ void WorldSession::HandleSetActionBarTogglesOpcode(WorldPacket &recvPacket)
 // Handlers for acknowledgement opcodes (removes some 'unknown opcode' flood from the logs)
 void WorldSession::HandleAcknowledgementOpcodes( WorldPacket & recv_data )
 {
-	if(recv_data.GetOpcode()==CMSG_MOVE_WATER_WALK_ACK)
+	switch(recv_data.GetOpcode())
 	{
-		_player->m_waterwalk=_player->m_setwaterwalk;
-		return;
+	case CMSG_MOVE_WATER_WALK_ACK:
+		_player->m_waterwalk = _player->m_setwaterwalk;
+		break;
+
+	case CMSG_MOVE_SET_FLY_ACK:
+		_player->FlyCheat = _player->m_setflycheat;
+		break;
 	}
 
    /* uint16 opcode = recv_data.GetOpcode();

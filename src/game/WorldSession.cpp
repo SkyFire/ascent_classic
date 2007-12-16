@@ -525,6 +525,7 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_FORCE_MOVE_UNROOT_ACK].handler					 = &WorldSession::HandleAcknowledgementOpcodes;
 	WorldPacketHandlers[CMSG_MOVE_KNOCK_BACK_ACK].handler					   = &WorldSession::HandleAcknowledgementOpcodes;
 	WorldPacketHandlers[CMSG_MOVE_HOVER_ACK].handler							= &WorldSession::HandleAcknowledgementOpcodes;
+	WorldPacketHandlers[CMSG_MOVE_SET_FLY_ACK].handler							= &WorldSession::HandleAcknowledgementOpcodes;
 	WorldPacketHandlers[MSG_MOVE_FLY_DOWN_UNK].handler							= &WorldSession::HandleMovementOpcodes;
 	
 	// Action Buttons

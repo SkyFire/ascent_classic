@@ -4495,7 +4495,9 @@ void Unit::EnableFlight(bool delay /* = false */)
 		SendMessageToSet(&data, true);
 
 		if(IsPlayer())
-			((Player*)this)->_delayAntiFlyUntil = UNIXTIME + 3;
+		{
+			((Player*)this)->m_setflycheat = true;
+		}
 	}
 	else
 	{
@@ -4504,7 +4506,7 @@ void Unit::EnableFlight(bool delay /* = false */)
 		*data << uint32(2);
 		SendMessageToSet(data, false);
 		static_cast<Player*>(this)->delayedPackets.add(data);
-		static_cast<Player*>(this)->_delayAntiFlyUntil=UNIXTIME+3;
+		((Player*)this)->m_setflycheat = true;
 	}
 }
 
@@ -4518,7 +4520,7 @@ void Unit::DisableFlight(bool delay /* = false */)
 		SendMessageToSet(&data, true);
 
 		if(IsPlayer())
-			((Player*)this)->_delayAntiFlyUntil = UNIXTIME + 3;
+			((Player*)this)->m_setflycheat = false;
 	}
 	else
 	{
@@ -4527,7 +4529,7 @@ void Unit::DisableFlight(bool delay /* = false */)
 		*data << uint32(5);
 		SendMessageToSet(data, false);
 		static_cast<Player*>(this)->delayedPackets.add(data);
-		static_cast<Player*>(this)->_delayAntiFlyUntil=UNIXTIME+3;
+		((Player*)this)->m_setflycheat = false;
 	}
 }
 

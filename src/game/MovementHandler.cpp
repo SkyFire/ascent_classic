@@ -300,6 +300,24 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	}
 
 	/************************************************************************/
+	/* Dump movement flags - Wheee!                                         */
+	/************************************************************************/
+#if 0
+	printf("=========================================================\n");
+	printf("Full movement flags: 0x%.8X\n", movement_info.flags);
+	uint32 z, b;
+	for(z = 1, b = 1; b < 32;)
+	{
+		if(movement_info.flags & z)
+			printf("   Bit %u (0x%.8X or %u) is set!\n", b, z, z);
+
+		z <<= 1;
+		b+=1;
+	}
+	printf("=========================================================\n");
+#endif
+
+	/************************************************************************/
 	/* Anti-Hack Checks                                                     */
 	/************************************************************************/
 	if( !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->m_uint32Values[UNIT_FIELD_CHARM])

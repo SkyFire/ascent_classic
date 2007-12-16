@@ -81,7 +81,7 @@ enum Languages
     LANG_TROLL                                  = 0x0E,
     LANG_GUTTERSPEAK                            = 0x21,
     LANG_DRAENEI                                = 0x23,
-    NUM_LANGUAGES                               = 0x23
+    NUM_LANGUAGES                               = 0x24
 };
 
 /*#define MSG_COLOR_YELLOW	"|r"

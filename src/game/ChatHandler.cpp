@@ -22,6 +22,44 @@
 extern std::string LogFileName;
 extern bool bLogChat;
 
+static const uint32 LanguageSkills[NUM_LANGUAGES] = {
+	0,				// UNIVERSAL		0x00
+	109,			// ORCISH			0x01
+	113,			// DARNASSIAN		0x02
+	115,			// TAURAHE			0x03
+	0,				// -				0x04
+	0,				// -				0x05
+	111,			// DWARVISH			0x06
+	98,				// COMMON			0x07
+	139,			// DEMON TONGUE		0x08
+	140,			// TITAN			0x09
+	137,			// THALSSIAN		0x0A
+	138,			// DRACONIC			0x0B
+	0,				// KALIMAG			0x0C
+	313,			// GNOMISH			0x0D
+	315,			// TROLL			0x0E
+	0,				// -				0x0F
+	0,				// -				0x10
+	0,				// -				0x11
+	0,				// -				0x12
+	0,				// -				0x13
+	0,				// -				0x14
+	0,				// -				0x15
+	0,				// -				0x16
+	0,				// -				0x17
+	0,				// -				0x18
+	0,				// -				0x19
+	0,				// -				0x1A
+	0,				// -				0x1B
+	0,				// -				0x1C
+	0,				// -				0x1D
+	0,				// -				0x1E
+	0,				// -				0x1F
+	0,				// -				0x20
+	673,			// -				0x21
+	0,				// -				0x22
+	759,			// -				0x23
+};
 
 void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 {
@@ -125,6 +163,12 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			}
 			else
 			{
+				if(lang > 0 && LanguageSkills[lang] && _player->_HasSkillLine(LanguageSkills[lang]) == false)
+					return;
+
+				if(lang==0 && !CanUseCommand('c'))
+					return;
+
 				data = sChatHandler.FillMessageData( CHAT_MSG_SAY, lang, msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 				SendChatPacket(data, 1, lang, this);
 				for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
@@ -241,6 +285,12 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			if(sWordFilter.UsesBannedKeyword(msg, this))
 				return;
 
+			if(lang > 0 && LanguageSkills[lang] && _player->_HasSkillLine(LanguageSkills[lang]) == false)
+				return;
+
+			if(lang==0 && !CanUseCommand('c'))
+				return;
+
 			if(GetPlayer()->m_modlanguage >=0)
 				data = sChatHandler.FillMessageData( CHAT_MSG_YELL, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 			else
@@ -265,12 +315,6 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			Player *player = objmgr.GetPlayer(to.c_str(), false);
 			if(!player)
 			{
-				/*tmp = "Player \"";
-				tmp += to.c_str();
-				tmp += "\" is not online.";
-				data = sChatHandler.FillSystemMessageData(  tmp.c_str() );
-				SendPacket(data);			  
-				delete data;*/
 				data = new WorldPacket(SMSG_CHAT_PLAYER_NOT_FOUND, to.length() + 1);
 				*data << to;
 				SendPacket(data);
@@ -290,6 +334,12 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			}
 
 			if( sSocialMgr.HasIgnore(player, GetPlayer()) )
+				return;
+
+			if(lang > 0 && LanguageSkills[lang] && _player->_HasSkillLine(LanguageSkills[lang]) == false)
+				return;
+
+			if(lang==0 && !CanUseCommand('c'))
 				return;
 
 			if(GetPlayer()->m_modlanguage >=0)

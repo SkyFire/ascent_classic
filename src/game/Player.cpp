@@ -368,7 +368,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_speedChangeCounter=1;
 	memset(&m_bgScore,0,sizeof(BGScore));
 	m_arenaPoints = 0;
-	_delayAntiFlyUntil=0;
 	memset(&m_spellIndexTypeTargets, 0, sizeof(uint64)*NUM_SPELL_TYPE_INDEX);
 	m_base_runSpeed = m_runSpeed;
 	m_base_walkSpeed = m_walkSpeed;
@@ -382,6 +381,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_setwaterwalk=false;
 	m_areaspirithealer_guid=0;
 	m_CurrentTaxiPath=NULL;
+	m_setflycheat = false;
 	this->OnLogin();
 }
 
@@ -744,6 +744,8 @@ bool Player::Create(WorldPacket& data )
 			}
 		}
 	}
+
+	sHookInterface.OnCharacterCreate(this);
 
 	load_health = m_uint32Values[UNIT_FIELD_HEALTH];
 	load_mana = m_uint32Values[UNIT_FIELD_POWER1];
@@ -3010,6 +3012,7 @@ void Player::SetQuestLogSlot(QuestLogEntry *entry, uint32 slot)
 void Player::AddToWorld()
 {
 	FlyCheat = false;
+	m_setflycheat=false;
 	// check transporter
 	if(m_TransporterGUID && m_CurrentTransporter)
 	{
@@ -3042,6 +3045,7 @@ void Player::AddToWorld()
 void Player::AddToWorld(MapMgr * pMapMgr)
 {
 	FlyCheat = false;
+	m_setflycheat=false;
 	// check transporter
 	if(m_TransporterGUID && m_CurrentTransporter)
 	{

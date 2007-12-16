@@ -50,6 +50,7 @@ enum ServerHookEvents
 	SERVER_HOOK_EVENT_ON_LOOT				= 17,
 	SERVER_HOOK_EVENT_ON_GUILD_CREATE		= 18,
 	SERVER_HOOK_EVENT_ON_ENTER_WORLD_2		= 19,
+	SERVER_HOOK_EVENT_ON_CHARACTER_CREATE	= 20,
 
 	NUM_SERVER_HOOKS,
 };
@@ -57,6 +58,7 @@ enum ServerHookEvents
 /* Hook typedefs */
 typedef bool(*tOnNewCharacter)(uint32 Race, uint32 Class, WorldSession * Session, const char * Name);
 typedef void(*tOnKillPlayer)(Player * pPlayer, Player * pVictim);
+typedef void(*tOCharacterCreate)(Player * pPlayer);
 typedef void(*tOnFirstEnterWorld)(Player * pPlayer);
 typedef void(*tOnEnterWorld)(Player * pPlayer);
 typedef void(*tOnGuildCreate)(Player * pLeader, Guild * pGuild);
@@ -263,6 +265,7 @@ public:
 	bool OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
 	void OnLoot(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId);
 	void OnEnterWorld2(Player * pPlayer);
+	void OnCharacterCreate(Player * pPlayer);
 };
 
 #define sScriptMgr ScriptMgr::getSingleton()

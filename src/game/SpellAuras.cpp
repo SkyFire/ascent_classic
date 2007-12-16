@@ -6763,7 +6763,6 @@ void Aura::SpellAuraEnableFlight(bool apply)
 {
 	if(m_target->IsPlayer())
 	{
-		static_cast<Player*>(m_target)->FlyCheat = apply;
 		static_cast<Player*>(m_target)->flying_aura = m_spellProto->Id;
 	}
 
@@ -6786,7 +6785,6 @@ void Aura::SpellAuraEnableFlightWithUnmountedSpeed(bool apply)
 	// Used in flight form (only so far)
 	if(m_target->IsPlayer())
 	{
-		static_cast<Player*>(m_target)->FlyCheat = apply;
 		static_cast<Player*>(m_target)->flying_aura = m_spellProto->Id;
 	}
 

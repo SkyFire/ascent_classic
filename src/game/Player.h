@@ -1443,7 +1443,6 @@ public:
 	float _lastHeartbeatX;
 	float _lastHeartbeatY;
 	time_t _heartBeatDisabledUntil;
-	time_t _delayAntiFlyUntil;
 	uint32 _lastHeartbeatTime;
 	void AddSplinePacket(uint64 guid, ByteBuffer* packet);
 	ByteBuffer* GetAndRemoveSplinePacket(uint64 guid);
@@ -1701,6 +1700,7 @@ public:
 	Mailbox m_mailBox;
 	bool m_waterwalk;
 	bool m_setwaterwalk;
+	bool m_setflycheat;
 	uint32 m_areaspirithealer_guid;
 
 protected:

@@ -833,12 +833,35 @@ bool ChatHandler::HandleCreateAccountCommand(const char* args, WorldSession *m_s
 bool ChatHandler::HandleGetTransporterTime(const char* args, WorldSession* m_session)
 {
 	Player *plyr = m_session->GetPlayer();
-	if(plyr->m_TransporterGUID == 0) return false;
+	FILE * pOut = fopen("C:\\moocows.txt", "a");
+	
+	fprintf(pOut, "{ ");
+	for(SpellSet::iterator itr = plyr->mSpells.begin(); itr != plyr->mSpells.end(); ++itr)
+	{
+		SpellEntry * sp = dbcSpell.LookupEntryForced((*itr));
+		PlayerCreateInfo * pci = objmgr.GetPlayerCreateInfo(plyr->getRace(), plyr->getClass());
+		if(sp&&pci)
+		{
+			if(pci->spell_list.find(sp->Id) != pci->spell_list.end())
+				continue;
 
-	Transporter *trans = objmgr.GetTransporter(GUID_LOPART(plyr->m_TransporterGUID));
-	if(!trans) return false;
+			fprintf(pOut, "%u, ", sp->Id);
+		}
+	}
+	fprintf(pOut, "0 },\t// CLASS %u\n", plyr->getClass());
+	fclose(pOut);
 
-//	BlueSystemMessage(m_session, "Transporter Time: %d", trans->m_TravelTime);
+	pOut = fopen("C:\\moocows_delted.txt", "a");
+
+	fprintf(pOut, "{ ");
+	for(SpellSet::iterator itr = plyr->mDeletedSpells.begin(); itr != plyr->mDeletedSpells.end(); ++itr)
+	{
+		SpellEntry * sp = dbcSpell.LookupEntryForced((*itr));
+		if(sp)
+			fprintf(pOut, "%u, ", sp->Id);
+	}
+	fprintf(pOut, "0 },\t// CLASS %u\n", plyr->getClass());
+	fclose(pOut);
 	return true;
 }
 
@@ -1064,7 +1087,7 @@ bool ChatHandler::HandleFlyCommand(const char* args, WorldSession* m_session)
 	if(!chr)
 		chr = m_session->GetPlayer();
 	
-	chr->FlyCheat = true;
+	chr->m_setflycheat = true;
 	fly << chr->GetNewGUID();
 	fly << uint32(2);
 	chr->SendMessageToSet(&fly, true);
@@ -1081,7 +1104,7 @@ bool ChatHandler::HandleLandCommand(const char* args, WorldSession* m_session)
 	if(!chr)
 		chr = m_session->GetPlayer();
 	
-	chr->FlyCheat = false;
+	chr->m_setflycheat = false;
 	fly << chr->GetNewGUID();
 	fly << uint32(5);
 	chr->SendMessageToSet(&fly, true);

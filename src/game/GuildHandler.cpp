@@ -1296,7 +1296,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		{
 			// this one is the destination item coming into the source slot
 			CharacterDatabase.Execute("UPDATE guild_bankitems SET slotId = %u, tabId = %u WHERE itemGuid = %u AND guildId = %u",
-				(uint32)source_bankslot, (uint32)source_bank, pItem->GetGUIDLow(), pGuild->GetGuildId());
+				(uint32)source_bankslot, (uint32)source_bank, pItem2->GetGUIDLow(), pGuild->GetGuildId());
 		}
 	}
 	else

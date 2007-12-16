@@ -737,10 +737,14 @@ void Guild::RemoveGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	}
 
 	LogGuildEvent(GUILD_EVENT_LEFT, 1, pMember->name);
-	if(pClient)
-		LogGuildEvent(GUILD_LOG_EVENT_REMOVAL, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid);
+	if(pClient && pClient->GetPlayer()->m_playerInfo != pMember)
+	{
+		AddGuildLogEntry(GUILD_LOG_EVENT_REMOVAL, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid);
+	}
 	else
-		LogGuildEvent(GUILD_LOG_EVENT_LEFT, 1, pMember->guid);
+	{
+		AddGuildLogEntry(GUILD_LOG_EVENT_LEFT, 1, pMember->guid);
+	}
 
 	m_lock.Release();
 

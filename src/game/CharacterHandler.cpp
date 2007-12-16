@@ -893,7 +893,6 @@ void WorldSession::FullLogin(Player * plr)
 	}
 
 	/* delay antiflight hack checks and speedhack checks for 10 seconds. */
-	_player->_delayAntiFlyUntil = UNIXTIME + 10;
 	_player->_heartBeatDisabledUntil = UNIXTIME + 10;
 
 	objmgr.AddPlayer(_player);

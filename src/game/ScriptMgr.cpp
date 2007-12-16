@@ -593,6 +593,13 @@ void HookInterface::OnFirstEnterWorld(Player * pPlayer)
 	OUTER_LOOP_END
 }
 
+void HookInterface::OnCharacterCreate(Player * pPlayer)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_CHARACTER_CREATE, tOCharacterCreate)
+		(call)(pPlayer);
+	OUTER_LOOP_END
+}
+
 void HookInterface::OnEnterWorld(Player * pPlayer)
 {
 	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_ENTER_WORLD, tOnEnterWorld)
