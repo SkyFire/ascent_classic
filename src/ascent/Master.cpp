@@ -416,23 +416,27 @@ bool Master::Run(int argc, char ** argv)
 			}
 			if(getMSTime() >= next_send)
 			{
-				// broadcast packet.
-				WorldPacket data(20);
-				data.SetOpcode(SMSG_SERVER_MESSAGE);
-				data << uint32(SERVER_MSG_SHUTDOWN_TIME);
 				int time = m_ShutdownTimer / 1000;
-				if(time > 0)
+				if((time % 30 == 0) || time < 10)
 				{
-					int mins = 0, secs = 0;
-					if(time > 60)
-						mins = time / 60;
-					if(mins)
-						time -= (mins*60);
-					secs = time;
-					char str[20];
-					snprintf(str, 20, "%02u:%02u", mins, secs);
-					data << str;
-					sWorld.SendGlobalMessage(&data, NULL);
+					// broadcast packet.
+					WorldPacket data(20);
+					data.SetOpcode(SMSG_SERVER_MESSAGE);
+					data << uint32(SERVER_MSG_SHUTDOWN_TIME);
+					
+					if(time > 0)
+					{
+						int mins = 0, secs = 0;
+						if(time > 60)
+							mins = time / 60;
+						if(mins)
+							time -= (mins*60);
+						secs = time;
+						char str[20];
+						snprintf(str, 20, "%02u:%02u", mins, secs);
+						data << str;
+						sWorld.SendGlobalMessage(&data, NULL);
+					}
 				}
 				next_send = getMSTime() + 1000;
 			}
