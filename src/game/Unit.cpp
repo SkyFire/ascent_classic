@@ -2010,6 +2010,15 @@ else
 		pVictim->Emote(EMOTE_ONESHOT_PARRYUNARMED);			// Animation
 		if(pVictim->IsPlayer())
 		{
+			//allmighty warrior overpower
+			if(this->IsPlayer() && ((Player*)this)->getClass()==WARRIOR)
+			{
+				((Player*)this)->AddComboPoints(pVictim->GetGUID(),1);
+				((Player*)this)->UpdateComboPoints();
+				if(!sEventMgr.HasEvent((Player*)this,EVENT_COMBO_POINT_CLEAR_FOR_TARGET))
+					sEventMgr.AddEvent((Player*)this,&Player::NullComboPoints,(uint32)EVENT_COMBO_POINT_CLEAR_FOR_TARGET,(uint32)5000,(uint32)1,(uint32)0);
+				else sEventMgr.ModifyEventTimeLeft((Player*)this,EVENT_COMBO_POINT_CLEAR_FOR_TARGET,5000,0);
+			}
 			pVictim->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_DODGE_BLOCK);	//SB@L: Enables spells requiring dodge
 			if(!sEventMgr.HasEvent(pVictim,EVENT_DODGE_BLOCK_FLAG_EXPIRE))
 				sEventMgr.AddEvent(pVictim,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_DODGE_BLOCK,EVENT_DODGE_BLOCK_FLAG_EXPIRE,5000,1,0);
@@ -2160,7 +2169,7 @@ else
 							vproc |= PROC_ON_BLOCK_VICTIM;
 						}
 						if(pVictim->IsPlayer())//not necessary now but we'll have blocking mobs in future
-						{                                                          
+						{            
 							pVictim->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_DODGE_BLOCK);	//SB@L: Enables spells requiring dodge
 							if(!sEventMgr.HasEvent(pVictim,EVENT_DODGE_BLOCK_FLAG_EXPIRE))
 								sEventMgr.AddEvent(pVictim,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_DODGE_BLOCK,EVENT_DODGE_BLOCK_FLAG_EXPIRE,5000,1,0);

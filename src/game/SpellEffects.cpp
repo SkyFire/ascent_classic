@@ -4336,6 +4336,11 @@ void Spell::SpellEffectDummyMelee(uint32 i) // Normalized Weapon damage +
 
 		return;
 	}		*/
+	if(m_spellInfo->NameHash==0x99D86DF4 && p_caster) //warrior : overpower - let us clear the event and the combopoint count
+	{
+		p_caster->NullComboPoints(); //some say that we should only remove 1 point per dodge. Due to cooldown you can't cast it twice anyway..
+		sEventMgr.RemoveEvents(p_caster,EVENT_COMBO_POINT_CLEAR_FOR_TARGET);
+	}
 
 	if(m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
 	{
