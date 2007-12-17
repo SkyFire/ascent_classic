@@ -2815,6 +2815,29 @@ bool World::SetInitialWorldSettings()
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=65536;
 
+	//mage : Empowered Arcane Missiles
+	sp = dbcSpell.LookupEntry(31579);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=2097152;
+		sp->EffectBasePoints[0] *=5; //heh B thinks he is smart by adding this to description ? If it doesn;t work std then it still needs to made by hand
+		sp->EffectSpellGroupRelation[1]=2048;
+	}
+	sp = dbcSpell.LookupEntry(31582);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=2097152;
+		sp->EffectBasePoints[0] *=5; //heh B thinks he is smart by adding this to description ? If it doesn;t work std then it still needs to made by hand
+		sp->EffectSpellGroupRelation[1]=2048;
+	}
+	sp = dbcSpell.LookupEntry(31583);
+	if (sp)
+	{
+		sp->EffectSpellGroupRelation[0]=2097152;
+		sp->EffectBasePoints[0] *=5; //heh B thinks he is smart by adding this to description ? If it doesn;t work std then it still needs to made by hand
+		sp->EffectSpellGroupRelation[1]=2048;
+	}
+
 	//Mage - Ice Shards
 	sp = dbcSpell.LookupEntry(11207);
 	if(sp)

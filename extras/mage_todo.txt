@@ -5,9 +5,7 @@ Problems not related with only one spell/talent:
 
 TALENTS
 --ARC--
-imp blink: not working
-arcane potency: not working
-emp arc missiles: not working (the spelleffect isn't scripted for all "Empowered" talents)
+arcane potency: not working - this is a proc on proc or add effect to spell
 spell power: doesn't work? or it conflicts with ice shards?
 --FIRE--
 Master of Elements: still disabled, haven't tried it

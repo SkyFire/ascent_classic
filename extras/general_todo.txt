@@ -124,6 +124,7 @@ Zack - test my shit :
 - warrior - Booming Voice 12838
 - warrior - Improved Commanding Shout 38408
 - mage : Improved Blink 31570
+- mage : Empowered Arcane Missiles 31583
 
 ==========================================================================
 Capt - test my shit :
