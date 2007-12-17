@@ -150,3 +150,6 @@ Performs an instant off-hand weapon attack that automatically applies the poison
 Instantly removes all existing harmful spell effects and increases your chance to resist all spells by 90% for 5 sec
 Last time was working only -> 90% chance to resist for 5 sec.
 Also should remove Impairing/Slow effects and remove all DOT's ( Cannot remove Bleeding effects )
+
+
+Riposte

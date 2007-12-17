@@ -30,3 +30,5 @@ while in aquatic form and underwater, no breath bar is displayed(thats fine), bu
 
 Aquatic Form:
 -You drowng, just take more time than usual (like 2 mins)
+- When casting Force of Nature the target must be standing still if you cast it on a moving target the spell does nothing, at least no treants summon.
+- Treants don't chase after the target you cast the spell on they go after the nearest person/mob that they can attack.

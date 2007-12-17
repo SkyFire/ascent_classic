@@ -29,3 +29,72 @@ sanctified crusader: doesn't work
 
 Judgement of Wisdom - will be placed but will NOT add mana on hit (neither self nor party)
 Judgement of Light - will be placed on target but will NOT add HP on hit (neither self nor party)
+
+///////////////////////////////////////////
+
+Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbearance, as with Blessing of Protection and other spells which can be found on Divine Shield's description. Avenging Wrath should also debuff the paladin with Forbearance.
+
+- Holy Shield and Blessing of Sanctuary (Talent Spells): DONT do the retributive damage they should be doing each time the paladin blocks an attack, which makes the Protection build to be 50% less effective for both pvp and pve tanking.
+
+- Light's Grace (Talent Spell): doesnt reduce the cast time of the next Holy Light at all.
+
+- Improved Righteous Fury (Talent Spell) : I'm pretty sure this doesnt add the "reduces the damage taken by amount" spell effect.
+
+- Reckoning (Talent Spell): doesnt add an extra weapon swing like it should on each attack within X seconds -after triggering, which does- .
+
+- Divine Favor (Talent Spell): This spell, once its casted, should give 100% crit chance on the next Holy Shock, Holy Light or Flash Light. The problem is that it fades with ANY spell you cast after buffing with it. So lets say, if you cast Divine Favor, and use Avenging Wrath, Divine Favor will fade with it and start the cooldown -.- which is reaaaaally annoying.
+
+- Judgement (Trainer Spell) : Actually this spell works, what doesnt work is the judgement effect. The ones that create a debuff on the enemy target last for 30 seconds BUT they are supposed to refresh with your melee hits on that target, which doesnt happen. This is actually one of the worst paladin bugs since it means a huge mana loss if you were to judge seal of the crusader to burst your holy damage output since you shouldnt have to judge seal of the crusader more than once per fight.
+
+- Sanctified Judgement (Talent Spell): This talent is supposed to give a x% chance that your judgement will return z% of the mana cost of the judged seal, which doesnt work.
+
+- Judgement of Wisdom & Judgement of Light (Trainer Spells) : These effects dont work. They are supposed to return mana and heals and they dont do at all.
+
+- Seal of Wisdom & Seal of Light (Trainer Spells): These spells work , but the problem is that they have like 100% chance to trigger, and i believe they should have around 35% chance.
+
+- Seal of Vengeance (Faction spell- Alliance) : The seal doesnt work. It should add a holy damage tick on the target, and stack up to 5 times, and it doesnt do anything at all.
+
+Paladin Spell] Blessing of Light (does not add healing bonus)
+[Paladin Spell] Greater blessing of Light (does not add healing bonus)
+Holy:
+
+Unyielding Faith - dosnt work at all
+
+Illumination - dosnt work at all
+
+Divine Favor - icon show but no effect
+
+Light's Grace - dost work at all
+
+Blessed Life - dosnt work at all
+
+Holy Guidance - dosnt work at all
+
+
+Protection:
+
+Stoicism - dosnt work at all
+
+Reckoning - icon proc but no effect
+
+Artend Defender - blub blub
+
+
+Retribution
+
+Eye for an Eye - dosnt work at all
+
+Improved Sancity Aura - dosnt work at all
+
+Sanctified Judgement - dosnt work at all
+
+Divine Purpose - dosnt work at all
+
+Fanaticism - ??
+
+Crusader Strike - supposed be 6 second CD but there is 12.
+
+
+Skills:
+
+Seal of Vengeance and Seal of Blood both dosnt work.

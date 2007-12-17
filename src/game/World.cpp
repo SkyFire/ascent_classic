@@ -1112,6 +1112,8 @@ bool World::SetInitialWorldSettings()
 						pr|=PROC_ON_CAST_SPELL;
 					if(strstr(desc,"shadow damage spells have"))
 						pr|=PROC_ON_CAST_SPELL;
+					if(strstr(desc,"on successful spellcast"))
+						pr|=PROC_ON_CAST_SPELL;
 					if(strstr(desc,"your spell criticals have"))
 						pr|=PROC_ON_SPELL_CRIT_HIT | PROC_ON_SPELL_CRIT_HIT_VICTIM;
 					if(strstr(desc,"after dodging their attack"))

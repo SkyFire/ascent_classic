@@ -112,3 +112,134 @@ Dark Pact - returns the extact mana drained from pet, no bonuses
 Improved Howl of Terror - works but requried to stand stilll to cast it instant otherwise it just says you need to be not moving..
 - unstable affliction doesn't silence the target if dispelled
 - amplify curse doesn't affect curse of exhaustion
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+General (might affect more then just warlocks)
+- Should receive soul shard when pet is dismissed due to out of range or getting on windrider
+- Temporary +spell damage buffs (trinkets, potions, etc) will only apply the +damage to DoT's while the effect is in place - Not when you start the spell cast. For example, say you used a trinket that gives +150 spell damage. You apply Corruption and Unstable Affliction. You gain the +150 spell damage bonus as normal - your Unstable Affliction and Corruption should gain around 25 damage a tick. Half way through the ticks, the trinket wears off. You will now LOSE that 25 damage a tick, even though the DoT was applied when you initiated the cast.
+
+Drain life: (zack says he fixed this but my server hasnt updated yet, anyone with proof could PM me or post here please)
+- Isn't affected by +damage (shouldn't be affected by +healing); teh coefficient is 80% from +damage to this spell (wowwiki)
+- Doesn't show up in combat log so neither on screen, only the healing, but not the damage.
+- Isn't affected by soul siphon talent.
+
+Soul link:
+- Just doesn't work at all tongue.gif
+
+Hellfire/Rain of fire - must have a target selected else it will stop channeling immediately; channeling isn't affected by talent to reduce spell pushback; starts damaging only after good 3-4 seconds of channel.
+
+Curse of Agony:
+- Causes the "beginning damage" throughout the whole spell cast, making it to do much less damage than it should. (Its damage should ramp up <a href="http://www.wowwiki.com/Curse_of_Agony" target="_blank">http://www.wowwiki.com/Curse_of_Agony</a>
+
+Curse of Doom:
+- Works, but only gets 100% bonus from spell damage instead of 200%.
+
+Life Tap:
+- works, but it can kill you with durability loss and does not recieve spell damage bonus
+
+Eye of krilrogg:
+- Summons the eye, but you can control it only in OLs, and after moving a bit further away, you stop the channeling and disconnect 50% of the time. D/c 7/12 times already.
+
+Soul Shatter:
+- Doesn't reduce threat as it should.
+
+Summon Infernal:
+- No 200 damage stun. Dismissing the infernal won't release him from his chains and send him wild, but instead just disappear. Does less damage than normal.
+
+Unending breath:
+- Used to work but now it just takes away ur breath bar but u are actually still drowning.
+
+Enslave demon:
+- Does not have any effect on demons.
+
+Doom guard:
+- Proc (from curse of doom) and summoning (from ritual of doom) does not work.
+
+Ritual of soul:
+- Creates the soul well but does not allow raid members to extract a healthstone from it.
+
+Oh and minions just HAVE to be nerfed because they hit more than supposed and that doesn't pay up for the negative bugs.
+
+You were doing great success on other class' bugs though, good job on that!
+
+The moved up list:
+
+Fear mechanics need to be worked on, a little latency just breaks up all the effect, its not ever worth casting fear in pvp.
+
+Demons:
+- Attacks have no cooldown, if you set them on auto-attack they will cast every 0,5 second or so.
+- Sometime's you have to relog/resummon few times for the demon spells to work.
+- You don't get a soul shard when dismissing due to out of range or in flight.
+- Demons should get dismissed when mounted and get back when dismounted.
+
+Summoned demons DO NOT get any stats from the warlock such as health or mana resulting in one-shot kills in raid or pvp environment.
+
+IMP:
+
+All good. ^^
+
+SUCCUBUS:
+
+- Seduction seduces self or does nothing.
+- Lash of pain attacks rapidly as described above.
+- Soothing kiss - doesn't work.
+
+VOIDWALKER:
+
+- Consume shadows can work in combat making it available to solo instances lol.
+- Suffering seems to taunt mob in a VAST area, once taunted whole stormwind.
+- Torment does nothing.
+
+FELHUNTER:
+
+- Paranoia seems to work, or maybe stealth is gimped, I see stealthed people like 20 yards away.
+- Tainted blood puts the buff on but it does nothing.
+- Devour magic doesnt remove any buffs ever.
+- Spell lock doesn't work anymore (it did).
+
+FELGUARD:
+
+- Cleave attacks rapidly but only one target and most likely will attack self (could do ~100k dps if really wanted)
+- The passive buffs don't work.
+
+Affliction talents and spells:
+
+IMPORTANT - Soul siphon doesn't work at all. Should increase amount drained by drain life by an additional 2/4% for each affliction effect up to maximum 24/60% (if you have max rank and 4 affliction debuffs on target, it would increase drain life spell by 16%. Whenever a debuff is applied, it increases by another 4% up to 60%).
+- Improved life tap - Works. just doesn't show up on the tooltip.
+- Improved drain soul - doesn't work. should give 7/14% of mana back after killing something while draining soul.
+- Improved curse fo weakness - doesn't work. should increase curse of weakness effect by 10/20%
+- Nightfall - you can cast 3 instant shadowbolts lol.
+IMPORTANT - Siphon life - works but doesn't benefit from shadow damage so is useless.
+- Shadow embrace - actually it works, tested many many fights with same mob and advanced damage meter. will remove this line upon next update.
+- Contagion - does nothing.
+IMPORTANT - Dark pact - gives mana took from minion but isn't affected by shadow damage.
+- Improved howl of terror - is instant but you still can cast it only when standing still.
+- Unstable affliction - works, but doesn't silence after dispelling, just the damage part.
+
+Demonology:
+
+- Improved healthstone. doesn't work. should increase effect of healthstones by 10/20%
+- Improved imp. doesn't work. should increase effect of imp's firebolt/fireshield/bloodpact spells by 10/20/30%
+- Improved health funnel. doesn't increase the health given to minion when channeling.
+- Improved voidwalker. voidwalker's spells with threat stuff don't work.
+- Improved succubus. doesn't work. should increase effects and durations of succubus' spells by 10/20/30%
+- Demonic aegis. doesn't work. should increase effectiveness of demon armor and fel armor by 10/20/30%
+- Unholy power. doesn't work. should increase damage of minions by 4/8/12/16/20%
+- improved enslave demon. the spell itself doesn't work.
+- master conjuror. doesn't work. should increase effect of firestone and spellstone by 15/30%
+- mana feed. doesn't work. should give pet 100% of mana you gain by using life tap when used.
+IMPORTANT - master demonologist - doesn't work at all, with nothing. should give these effects when certain minions are active: imp = -20% threat caused; voidwalker = -10% physical damage caused; succubus = +10% all damage caused; felguard = +5% all damage caused and resistances = 0.5 x level
+- demonic resilience - can't actually test.
+IMPORTANT - soul link. doesn't work. when the buff is active 20% of damage taken is taken by your minion.
+- demonic knowledge - doesn't work. should increase spell damage by 5/10/15% of minions stamina+intellect
+
+Destruction:
+- Bane doesn't work with soulfire. should decrease casting time by 0.4/0.8/1.2/1.6/2 sec
+IMPORTANT - destructive reach - doesn't work. should increase range by 10/20% and decrease threat by 5/10%
+- pyroclasm - stuns self.
+- backlash - still have to be standing still to cast instant incinerate
+- shadow and flame - doesn't work. should increase spell damage bonus for shadow bolt and incinerate by 4/8/12/16/20%
+- shadowfury - can be cast while moving due to lag 

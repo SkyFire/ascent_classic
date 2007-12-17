@@ -25,3 +25,7 @@ emp frostbolt: see emp fireball
 
 Combustion: http://www.wowwiki.com/Combustion
 The buff isn't removed by 3 fire critical strikes as it should, and this way it could be stacked to 10 charges, making every mage fire spell a critical hit until the mage dies or the effect is removed via right click (or some actually working dispell spell).
+
+Cone of Cold is never applying any damage, only debufs.
+When summoning your water elemental, Winter's Chill is applied to the player himself/herself.
+Ritual of Refreshment mage spell does not work, the spell casts but when players of the party right click the bubble they get no items out of it.
