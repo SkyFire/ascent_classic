@@ -65,6 +65,7 @@ public:
 	void OnPlayerCast(Player* plr, uint32 spellid, uint64& victimguid);
 	void OnPlayerItemPickup(Player* plr, Item* item);
 	void OnPlayerExploreArea(Player* plr, uint32 AreaID);
+	void OnQuestAccepted(Player* plr, Quest* qst, Object *qst_giver);
 	void OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint32 reward_slot);
 
 	void GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_giver);

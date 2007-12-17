@@ -578,12 +578,12 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 			}			
 			uint32 proc_Chance = itr2->procChance;
 
-			SpellEntry* spe  = dbcSpell.LookupEntry(itr2->spellId);
+			SpellEntry* spe  = dbcSpell.LookupEntry(spellId);
 			//Custom procchance modifications based on equipped weapon speed.
-			if(victim->IsPlayer()&&spe&&(spe->NameHash == 0xCFBFA2DA || 
+			if(this->IsPlayer()&&spe&&(spe->NameHash == 0xCFBFA2DA || 
 								  		   spe->NameHash == 0x37AA84E3 || 
 										   spe->NameHash == 0xF144ECC0 ||
-										   spe->Id == 16870))
+										   spellId == 16870))
 			{
 				float ppm = 1.0;
 				switch(spe->NameHash)
@@ -592,13 +592,13 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					case 0x37AA84E3: ppm = 1.5; break; // romulo's
 					case 0xF144ECC0: ppm = 1.0; break; // madness of the betrayer
 				}
-				switch(spe->Id)
+				switch(spellId)
 				{
 					case 16870: ppm=2.0;break; //druid: clearcasting
 				}
 
-				Item * mh = ((Player*)victim)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-				Item * of = ((Player*)victim)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+				Item * mh = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+				Item * of = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
 				if (mh && of)
 				{
 					float mhs = float(mh->GetProto()->Delay);
@@ -613,12 +613,12 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				else
 					proc_Chance = 0;
 
-				if (((Player*)victim)->IsInFeralForm())
+				if (((Player*)this)->IsInFeralForm())
 				{
-					if (((Player*)victim)->GetShapeShift() == FORM_CAT)
-						proc_Chance = FL2UINT(ppm/60.0f);
-					else if (((Player*)victim)->GetShapeShift() == FORM_BEAR || ((Player*)victim)->GetShapeShift() == FORM_DIREBEAR )
-						proc_Chance = FL2UINT(ppm/24.0f);
+					if (((Player*)this)->GetShapeShift() == FORM_CAT)
+						proc_Chance = FL2UINT(ppm/0.6f);
+					else if (((Player*)this)->GetShapeShift() == FORM_BEAR || ((Player*)this)->GetShapeShift() == FORM_DIREBEAR )
+						proc_Chance = FL2UINT(ppm/0.24f);
 				}
 			}
 

@@ -850,6 +850,10 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 		plr->ModStanding(fact, amt);
 	}
 }
+void QuestMgr::OnQuestAccepted(Player* plr, Quest* qst, Object *qst_giver)
+{
+	LUA_ON_QUEST_EVENT(plr,qst->id,QUEST_EVENT_ON_ACCEPT,qst_giver);
+}
 
 void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint32 reward_slot)
 {
@@ -862,6 +866,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
     }
     BuildQuestComplete(plr, qst);
     if(!qst->is_repeatable) CALL_QUESTSCRIPT_EVENT(qle, OnQuestComplete)(plr);
+	LUA_ON_QUEST_EVENT(plr,qst->id,QUEST_EVENT_ON_COMPLETE,qst_giver);
 
 	//ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), plr, QUEST_EVENT_ON_COMPLETE);
 	if(!qst->is_repeatable) 

@@ -34,6 +34,8 @@ Guild::Guild()
 	m_borderColor=0;
 	m_borderStyle=0;
 	m_creationTimeStamp=0;
+	m_bankBalance =0;
+	m_bankTabCount=0;
 	creationDay=creationMonth=creationYear=0;
 }
 
@@ -250,7 +252,6 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 	m_guildId = objmgr.GenerateGuildId();
 	m_guildName = strdup(pCharter->GuildName.c_str());
 	m_guildLeader = pCharter->LeaderGuid;
-
 	m_ranks.resize(MAX_GUILD_RANKS, NULL);
 
 	// create the guild in the database
@@ -878,6 +879,7 @@ void Guild::Disband()
 	CharacterDatabase.Execute("DELETE FROM guild_logs WHERE guildid = %u", m_guildId);
 	CharacterDatabase.Execute("DELETE FROM guild_ranks WHERE guildId = %u", m_guildId);
 	CharacterDatabase.Execute("DELETE FROM guild_data WHERE guildid = %u", m_guildId);
+	//do we need to clear guild_bankitems ?
 	m_lock.Release();
 	delete this;
 }

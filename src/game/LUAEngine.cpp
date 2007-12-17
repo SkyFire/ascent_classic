@@ -355,7 +355,35 @@ void LuaEngine::OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit, ui
 
 	m_Lock.Release();
 }
+void LuaEngine::OnQuestEvent(Player * QuestOwner, uint32 QuestID, uint32 EventType, Object * QuestStarter)
+{
+	const char * FuncName = LuaEngineMgr::getSingleton().GetQuestEvent(QuestID, EventType);
+	if(FuncName==NULL)
+		return;
 
+	m_Lock.Acquire();
+	lua_pushstring(L, FuncName);
+	lua_gettable(L, LUA_GLOBALSINDEX);
+	if(lua_isnil(L,-1))
+	{
+		printf("Tried to call invalid LUA function '%s' from Ascent (Unit)!\n", FuncName);
+		m_Lock.Release();
+		return;
+	}
+
+	Lunar<Unit>::push(L, (Unit*)QuestOwner);
+	lua_pushinteger(L,EventType);
+	if(QuestStarter!=NULL && QuestStarter->GetTypeId() == TYPEID_UNIT)
+		Lunar<Unit>::push(L, (Unit*)QuestStarter);
+	else
+		lua_pushnil(L);
+
+	int r = lua_pcall(L,4,LUA_MULTRET,0);
+	if(r)
+		report(L);
+
+	m_Lock.Release();
+}
 void LuaEngine::CallFunction(Unit * pUnit, const char * FuncName)
 {
 	m_Lock.Acquire();
@@ -548,6 +576,7 @@ GameObject::RegType GameObject::methods[] = {
 };
 
 static int RegisterUnitEvent(lua_State * L);
+static int RegisterQuestEvent(lua_State * L);
 static int RegisterGameObjectEvent(lua_State * L);
 
 void LuaEngine::RegisterCoreFunctions()
@@ -557,6 +586,9 @@ void LuaEngine::RegisterCoreFunctions()
 
 	lua_pushcfunction(L, &RegisterGameObjectEvent);
 	lua_setglobal(L, "RegisterGameObjectEvent");
+
+	lua_pushcfunction(L, &RegisterQuestEvent);
+	lua_setglobal(L, "RegisterQuestEvent");
 
 	Lunar<Unit>::Register(L);
 }
@@ -571,6 +603,18 @@ static int RegisterUnitEvent(lua_State * L)
 		return 0;
 
 	LuaEngineMgr::getSingleton().RegisterUnitEvent(entry,ev,str);
+	return 0;
+}
+static int RegisterQuestEvent(lua_State * L)
+{
+	int entry = luaL_checkint(L, 1);
+	int ev = luaL_checkint(L, 2);
+	const char * str = luaL_checkstring(L, 3);
+
+	if(!entry || !ev || !str || !lua_is_starting_up)
+		return 0;
+
+	LuaEngineMgr::getSingleton().RegisterQuestEvent(entry,ev,str);
 	return 0;
 }
 
@@ -913,7 +957,7 @@ int luaUnit_IsInCombat(lua_State * L, Unit * ptr)
 {
 	if (!ptr)
 		return 0;
-	lua_pushboolean(L,ptr->CombatStatus.IsInCombat());
+	lua_pushboolean(L,(ptr->CombatStatus.IsInCombat())?1:0);
 	return 0;
 }
 
@@ -1674,6 +1718,24 @@ void LuaEngineMgr::RegisterUnitEvent(uint32 Id, uint32 Event, const char * Funct
 	}
 }
 
+void LuaEngineMgr::RegisterQuestEvent(uint32 Id, uint32 Event, const char * FunctionName)
+{
+	QuestBindingMap::iterator itr = m_questBinding.find(Id);
+	if(itr == m_questBinding.end())
+	{
+		LuaQuestBinding qb;
+		memset(&qb,0,sizeof(LuaQuestBinding));
+		qb.Functions[Event] = strdup(FunctionName);
+		m_questBinding.insert(make_pair(Id,qb));
+	}
+	else
+	{
+		if(itr->second.Functions[Event]!=NULL)
+			free((void*)itr->second.Functions[Event]);
+
+		itr->second.Functions[Event]=strdup(FunctionName);
+	}
+}
 void LuaEngineMgr::RegisterGameObjectEvent(uint32 Id, uint32 Event, const char * FunctionName)
 {
 	GameObjectBindingMap::iterator itr = m_gameobjectBinding.find(Id);
