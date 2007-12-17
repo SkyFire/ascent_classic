@@ -1381,6 +1381,10 @@ bool World::SetInitialWorldSettings()
 		//warlock - curse of the elements
 		if(sp->NameHash == 0xA5FA5930)
 			sp->SpellGroupType |= 2097152; 
+		//mage Ice Floes affects these spells : Cone of Cold,Cold Snap,Ice Barrier,Ice Block
+		if(sp->NameHash == 0x8F5290EB || sp->NameHash == 0x4774A4B0 || sp->NameHash == 0xCBC822EE || sp->NameHash == 0x768F3B4B)
+			sp->EffectSpellGroupRelation[0]=2097152;
+
 /*		else if(strstr(nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if(strstr(nametext, "Blinding Powder"))
@@ -2854,6 +2858,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(31660);
 	if (sp)
 		sp->EffectSpellGroupRelation[0]=1;
+
+	//mage : Ice Floes
+	sp = dbcSpell.LookupEntry(31670);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=2097152;
+	sp = dbcSpell.LookupEntry(31672);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=2097152;
 
 	//Mage - Ice Shards
 	sp = dbcSpell.LookupEntry(11207);

@@ -12,9 +12,6 @@ Imp fire ward: not working for me, tho similar frost talents works
 Molten Fury: doesn't work
 Combustion: never fades out => 100% crit all the time
 --FROST--
-permafrost: doesn't reduce speed
-frozen core: doesn't work (similar arcane talent works)
-ice floes: not working (reduces cooldown)
 emp frostbolt: see emp fireball
 
 Combustion: http://www.wowwiki.com/Combustion
