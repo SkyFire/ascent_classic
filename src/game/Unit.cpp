@@ -285,19 +285,22 @@ void Unit::Update( uint32 p_time )
 		    RegenerateHealth();
 	    else
 		    m_H_regenTimer -= p_time;
-	    //most of the times the 2 timers will be the same (except on spell casts)
-	    if(p_time >= m_P_regenTimer)
+
+		if(m_interruptedRegenTime != 0)
 		{
-			SetInterruptedRegen(false);
-		    RegeneratePower(false);	
-		}
-	    else
-		{
-			if (p_time >= m_P_I_regenTimer&&this->IsPlayer())
-				RegeneratePower(true);
+			if(p_time >= m_interruptedRegenTime)
+				m_interruptedRegenTime = 0;
 			else
-				m_P_I_regenTimer -= p_time;
-		    m_P_regenTimer -= p_time;
+				m_interruptedRegenTime -= p_time;
+
+			RegeneratePower(true);
+		}
+		else
+		{
+			if(p_time >= m_P_regenTimer)
+				RegeneratePower(false);
+			else
+				m_P_regenTimer -= p_time;
 		}
 
 		if(m_aiInterface != NULL && m_useAI)
@@ -1363,12 +1366,8 @@ void Unit::RegenerateHealth()
 
 void Unit::RegeneratePower(bool isinterrupted)
 {
-        // This is only 2000 IF the power is not rage
-	if (isinterrupted)
-		m_P_I_regenTimer = 2000;//set next interrupted regen time
-	else
-		m_P_regenTimer = 2000;//set next regen time 
-	
+    // This is only 2000 IF the power is not rage
+	m_P_regenTimer = 2000;//set next regen time 
 
 	if (!isAlive())
 		return;
@@ -1385,6 +1384,16 @@ void Unit::RegeneratePower(bool isinterrupted)
 		case POWER_TYPE_ENERGY:
 			static_cast<Player*>(this)->RegenerateEnergy();
 			break;
+
+		case POWER_TYPE_RAGE:
+			{
+				// These only NOT in combat
+				if(!CombatStatus.IsInCombat())
+				{
+					m_P_regenTimer = 3000;
+					static_cast<Player*>(this)->LooseRage();
+				}
+			}break;
 		}
 		
 		/*
@@ -1408,18 +1417,6 @@ void Unit::RegeneratePower(bool isinterrupted)
 		// druids regen mana when shapeshifted
 		if(getClass() == DRUID && powertype != POWER_TYPE_MANA)
 			static_cast<Player*>(this)->RegenerateMana(isinterrupted);
-
-		// These only NOT in combat
-		if(!CombatStatus.IsInCombat())
-		{
-	        // Rage timer is 3 seconds not 2
-	        if(powertype == POWER_TYPE_RAGE)
-			{
-		        m_P_regenTimer = 3000;
-				m_P_I_regenTimer = 3000;
-		        static_cast<Player*>(this)->LooseRage();
-			}
-		}
 	}
 	else
 	{

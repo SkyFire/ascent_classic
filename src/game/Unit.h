@@ -749,7 +749,7 @@ public:
 	void RegeneratePower(bool isinterrupted);
 	inline void setHRegenTimer(uint32 time) {m_H_regenTimer = time; }
 	inline void setPRegenTimer(uint32 time) {m_P_regenTimer = time; }
-	inline void setPIRegenTimer(uint32 time) {m_P_I_regenTimer = time; }
+	inline void DelayPowerRegeneration(uint32 time) { m_interruptedRegenTime = time; }
 	void DeMorph();
 	uint32 ManaShieldAbsorb(uint32 dmg);
 	void smsg_AttackStart(Unit* pVictim);
@@ -1013,9 +1013,6 @@ public:
 	float PctRegenModifier;//1.0 by default
 	float PctPowerRegenModifier[4];
 	inline uint32 GetPowerType(){ return (GetUInt32Value(UNIT_FIELD_BYTES_0)>> 24);}
-	inline void SetInterruptedRegen(bool value) { isInterruptedRegen = value; }
-	inline bool GetInterruptedRegen() { return isInterruptedRegen; }
-
 	void RemoveSoloAura(uint32 type);
 
 	void RemoveAurasByInterruptFlag(uint32 flag);
@@ -1167,8 +1164,7 @@ protected:
 
 	uint32 m_H_regenTimer;
 	uint32 m_P_regenTimer;
-	uint32 m_P_I_regenTimer; //PowerInterruptedegenTimer.
-	bool isInterruptedRegen;
+	uint32 m_interruptedRegenTime; //PowerInterruptedegenTimer.
 	uint32 m_state;		 // flags for keeping track of some states
 	uint32 m_attackTimer;   // timer for attack
 	uint32 m_attackTimer_1;

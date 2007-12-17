@@ -1280,8 +1280,16 @@ void Spell::cast(bool check)
 			{			
 				if(m_spellInfo->ChannelInterruptFlags != 0 && !m_triggeredSpell)
 				{
+					/*
+					Channeled spells are handled a little differently. The five second rule starts when the spell's channeling starts; i.e. when you pay the mana for it.
+					The rule continues for at least five seconds, and longer if the spell is channeled for more than five seconds. For example,
+					Mind Flay channels for 3 seconds and interrupts your regeneration for 5 seconds, while Tranquility channels for 10 seconds
+					and interrupts your regeneration for the full 10 seconds.
+					*/
+
+					uint32 channelDuration = GetDuration();
 					m_spellState = SPELL_STATE_CASTING;
-					SendChannelStart(GetDuration());
+					SendChannelStart(channelDuration);
 					if(p_caster)
 					{
 						//Use channel interrupt flags here
@@ -1310,6 +1318,13 @@ void Spell::cast(bool check)
 								return;
 							}
 						}
+					}
+					if(u_caster && u_caster->GetPowerType()==POWER_TYPE_MANA)
+					{
+						if(channelDuration <= 5000)
+							u_caster->DelayPowerRegeneration(5000);
+						else
+							u_caster->DelayPowerRegeneration(channelDuration);
 					}
 				}
 			}
@@ -1596,15 +1611,18 @@ void Spell::finish()
 	if(u_caster)
 	{
 		u_caster->m_canMove = true;
- 
-		if(m_usesMana && !GetSpellFailed() && u_caster->GetPowerType()==POWER_TYPE_MANA) 
+		// mana           channeled                                                     power type is mana
+		if(m_usesMana && (m_spellInfo->ChannelInterruptFlags != 0 && !m_triggeredSpell) && u_caster->GetPowerType()==POWER_TYPE_MANA)
 		{
-			u_caster->setPRegenTimer(5000); /* 5 Seconds */
-			if (!u_caster->GetInterruptedRegen())
-			{
-				u_caster->setPIRegenTimer(2000);
-				u_caster->SetInterruptedRegen(true);
-			}
+			/*
+			Five Second Rule
+			After a character expends mana in casting a spell, the effective amount of mana gained per tick from spirit-based regeneration becomes a ratio of the normal 
+			listed above, for a period of 5 seconds. During this period mana regeneration is said to be interrupted. This is commonly referred to as the five second rule. 
+			By default, your interrupted mana regeneration ratio is 0%, meaning that spirit-based mana regeneration is suspended for 5 seconds after casting.
+			Several effects can increase this ratio, including:
+			*/
+
+			u_caster->DelayPowerRegeneration(5000);
 		}
 	}
 	/* Mana Regenerates while in combat but not for 5 seconds after each spell */

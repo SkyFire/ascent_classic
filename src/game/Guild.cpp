@@ -612,7 +612,7 @@ void Guild::SetMOTD(const char * szNewMotd, WorldSession * pClient)
 	else
 	{
 		m_motd= NULL;
-		CharacterDatabase.Execute("UPDATE guilds SET motd = "" WHERE guildId = %u", m_guildId);
+		CharacterDatabase.Execute("UPDATE guilds SET motd = \"\" WHERE guildId = %u", m_guildId);
 	}
 
 	LogGuildEvent(GUILD_EVENT_MOTD, 1, szNewMotd);
