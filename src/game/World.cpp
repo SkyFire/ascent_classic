@@ -1042,7 +1042,7 @@ bool World::SetInitialWorldSettings()
 					if(strstr(desc, "melee attacks has"))
 						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc, "any damage spell hits a target"))
-						pr|=PROC_ON_ANY_DAMAGE_VICTIM;
+						pr|=PROC_ON_CAST_SPELL;
 					if(strstr(desc, "giving each melee attack a chance"))
 						pr|=PROC_ON_MELEE_ATTACK;
 					if(strstr(desc, "damage when hit"))
