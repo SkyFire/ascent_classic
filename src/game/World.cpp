@@ -2807,6 +2807,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[2]=1 | 8192 | 4194304 | 8388608 | 262144 | 131072 | 536870912 | 524352 | 4 | 4096 | 2 | 2048 | 16;
 	}
 
+	//mage : Improved Blink
+	sp = dbcSpell.LookupEntry(31569);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=65536;
+	sp = dbcSpell.LookupEntry(31570);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=65536;
+
 	//Mage - Ice Shards
 	sp = dbcSpell.LookupEntry(11207);
 	if(sp)

@@ -123,6 +123,7 @@ Zack - test my shit :
 - hunter - arcane shot 14287
 - warrior - Booming Voice 12838
 - warrior - Improved Commanding Shout 38408
+- mage : Improved Blink 31570
 
 ==========================================================================
 Capt - test my shit :
