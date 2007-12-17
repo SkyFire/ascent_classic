@@ -148,9 +148,6 @@ Unit::Unit()
 	m_attackTimer = 0;
 	m_H_regenTimer = 2000;
 	m_P_regenTimer = 2000;
-	isInterruptedRegen = false;
-	m_P_I_regenTimer = 2000;
-
 
 	//	if(GetTypeId() == TYPEID_PLAYER) //only player for now
 	//		CalculateActualArmor();
@@ -227,6 +224,7 @@ Unit::Unit()
 	m_temp_summon=false;
 	m_chargeSpellsInUse=false;
 	m_spellsbusy=false;
+	m_interruptedRegenTime = 0;
 }
 
 Unit::~Unit()
