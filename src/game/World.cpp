@@ -2475,6 +2475,14 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 1;
 
+	//Hunter : Pathfinding
+	sp = dbcSpell.LookupEntry(19559);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 2097152;
+	sp = dbcSpell.LookupEntry(19560);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 2097152;
+
 	// general - clearcasting
 	sp = dbcSpell.LookupEntry(12536);
 	if(sp)

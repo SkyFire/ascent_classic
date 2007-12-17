@@ -128,6 +128,7 @@ Zack - test my shit :
 - mage : Empowered Fireball 31660
 - mage : Ice Floes 31672
 - mage : Empowered Frostbolt 31686
+- Hunter : Pathfinding 19560
 
 ==========================================================================
 Capt - test my shit :

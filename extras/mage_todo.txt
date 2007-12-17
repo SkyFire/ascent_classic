@@ -10,7 +10,6 @@ arcane potency: not working - this is a proc on proc or add effect to spell
 Master of Elements: still disabled, haven't tried it -> what is the problem with it ? Should work
 Imp fire ward: not working for me, tho similar frost talents works
 Molten Fury: doesn't work
-Combustion: never fades out => 100% crit all the time
 
 Combustion: http://www.wowwiki.com/Combustion
 The buff isn't removed by 3 fire critical strikes as it should, and this way it could be stacked to 10 charges, making every mage fire spell a critical hit until the mage dies or the effect is removed via right click (or some actually working dispell spell).
