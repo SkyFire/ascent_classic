@@ -2962,6 +2962,8 @@ void Spell::SpellEffectPowerBurn(uint32 i) // power burn
 		return;
 	if(!unitTarget->isAlive())
 		return;
+	if (unitTarget->GetPowerType() != POWER_TYPE_MANA)
+		return;
 
 	int32 mana=min((int32)unitTarget->GetUInt32Value(UNIT_FIELD_POWER1),damage);
 	unitTarget->ModUInt32Value(UNIT_FIELD_POWER1,-mana);

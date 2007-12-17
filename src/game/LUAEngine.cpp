@@ -473,13 +473,14 @@ int luaUnit_GetSoulLinkedWith(lua_State * L, Unit * ptr);
 int luaUnit_SetSoulLinkedWith(lua_State * L, Unit * ptr);
 int luaUnit_ChangeTarget(lua_State * L, Unit * ptr);
 int luaUnit_GetHealthPct(lua_State * L, Unit * ptr);
+int luaUnit_GetManaPct(lua_State * L, Unit * ptr);
+int luaUnit_Emote(lua_State * L, Unit * ptr);
 int luaUnit_SetHealthPct(lua_State * L, Unit * ptr);
 int luaUnit_Despawn(lua_State * L, Unit * ptr);
 int luaUnit_GetUnitBySqlId(lua_State * L, Unit * ptr);
 int luaUnit_PlaySoundToSet(lua_State * L, Unit * ptr);
 int luaUnit_RemoveAura(lua_State * L, Unit * ptr);
 int luaUnit_StopMovement(lua_State * L, Unit * ptr);
-int luaUnit_Emote(lua_State * L, Unit * ptr);
 int luaUnit_GetInstanceID(lua_State * L, Unit * ptr);
 int luaUnit_GetClosestPlayer(lua_State * L, Unit * ptr);
 int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr);
@@ -544,6 +545,7 @@ Unit::RegType Unit::methods[] = {
 	{ "ChangeTarget", &luaUnit_ChangeTarget },
 	{ "GetHealthPct", &luaUnit_GetHealthPct },
 	{ "SetHealthPct", &luaUnit_SetHealthPct },
+	{ "GetManaPct", &luaUnit_GetManaPct },
 	{ "Despawn", &luaUnit_Despawn },
 	{ "GetUnitBySqlId", &luaUnit_GetUnitBySqlId },
 	{ "PlaySoundToSet", &luaUnit_PlaySoundToSet },
@@ -669,6 +671,31 @@ int luaUnit_IsCreature(lua_State * L, Unit * ptr)
 		lua_pushboolean(L, 0);
 
 	return 1;
+}
+
+int luaUnit_Emote(lua_State * L, Unit * ptr)
+{
+   if(ptr==NULL) return 0;
+   uint32 emote_id = luaL_checkint(L, 1);
+   uint32 time = luaL_checkint(L, 1);
+   if(emote_id==NULL) 
+	   return 0;
+   if (time)
+	ptr->EventAddEmote((EmoteType)emote_id,time);
+   else
+    ptr->Emote((EmoteType)emote_id);
+   return 1;
+}
+
+int luaUnit_GetManaPct(lua_State * L, Unit * ptr)
+{
+    if(!ptr) 
+		return 0;
+	if (ptr->GetPowerType() == POWER_TYPE_MANA)
+		lua_pushnumber(L, (int)(ptr->GetUInt32Value(UNIT_FIELD_POWER1) * 100.0f / ptr->GetUInt32Value(UNIT_FIELD_MAXPOWER1)));
+	else
+		lua_pushnil;
+    return 1;
 }
 
 int luaUnit_GetName(lua_State * L, Unit * ptr)
@@ -1413,15 +1440,6 @@ int luaUnit_GetRandomFriend(lua_State * L, Unit * ptr)
 	else
 		Lunar<Unit>::push(L,(ret),false);
 	return 1;
-}
-int luaUnit_Emote(lua_State * L, Unit * ptr)
-{
-	if(!ptr)
-		return 0;
-
-	int emote = luaL_checkint(L,1);
-	ptr->Emote((EmoteType)emote);
-	return 0;
 }
 
 int luaUnit_StopMovement(lua_State * L, Unit * ptr)
