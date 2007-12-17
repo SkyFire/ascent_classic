@@ -126,6 +126,8 @@ Zack - test my shit :
 - mage : Improved Blink 31570
 - mage : Empowered Arcane Missiles 31583
 - mage : Empowered Fireball 31660
+- mage : Ice Floes 31672
+- mage : Empowered Frostbolt 31686
 
 ==========================================================================
 Capt - test my shit :
