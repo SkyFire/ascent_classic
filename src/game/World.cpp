@@ -2838,6 +2838,23 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1]=2048;
 	}
 
+	//mage : Empowered Fireball
+	sp = dbcSpell.LookupEntry(31656);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+	sp = dbcSpell.LookupEntry(31657);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+	sp = dbcSpell.LookupEntry(31658);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+	sp = dbcSpell.LookupEntry(31659);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+	sp = dbcSpell.LookupEntry(31660);
+	if (sp)
+		sp->EffectSpellGroupRelation[0]=1;
+
 	//Mage - Ice Shards
 	sp = dbcSpell.LookupEntry(11207);
 	if(sp)

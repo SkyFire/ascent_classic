@@ -6,13 +6,11 @@ Problems not related with only one spell/talent:
 TALENTS
 --ARC--
 arcane potency: not working - this is a proc on proc or add effect to spell
-spell power: doesn't work? or it conflicts with ice shards?
 --FIRE--
-Master of Elements: still disabled, haven't tried it
+Master of Elements: still disabled, haven't tried it -> what is the problem with it ? Should work
 Imp fire ward: not working for me, tho similar frost talents works
 Molten Fury: doesn't work
 Combustion: never fades out => 100% crit all the time
-emp fireball: see emp am
 --FROST--
 permafrost: doesn't reduce speed
 frozen core: doesn't work (similar arcane talent works)
