@@ -422,7 +422,7 @@ void LuaEngine::OnGameObjectEvent(GameObject * pGameObject, uint32 EventType, Un
 
 	Lunar<GameObject>::push(L, pGameObject);
 	lua_pushinteger(L,EventType);
-	if(pMiscUnit)
+	if(!pMiscUnit)
 		lua_pushnil(L);
 	else
 		Lunar<Unit>::push(L, pMiscUnit);
@@ -591,6 +591,8 @@ void LuaEngine::RegisterCoreFunctions()
 	lua_setglobal(L, "RegisterQuestEvent");
 
 	Lunar<Unit>::Register(L);
+	Lunar<GameObject>::Register(L);
+	//Lunar<Quest>::Register(L); quest isn't a class
 }
 
 static int RegisterUnitEvent(lua_State * L)
@@ -620,9 +622,9 @@ static int RegisterQuestEvent(lua_State * L)
 
 static int RegisterGameObjectEvent(lua_State * L)
 {
-	int entry = luaL_checkint(L, 0);
-	int ev = luaL_checkint(L, 1);
-	const char * str = luaL_checkstring(L, 2);
+	int entry = luaL_checkint(L, 1);
+	int ev = luaL_checkint(L, 2);
+	const char * str = luaL_checkstring(L, 3);
 
 	if(!entry || !ev || !str || !lua_is_starting_up)
 		return 0;

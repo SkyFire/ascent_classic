@@ -693,7 +693,7 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 		pMember->m_loggedInPlayer->SetGuildRank(r->iId);
 	}
 
-	CharacterDatabase.Execute("INSERT INTO guild_data VALUES(%u, %u, %u, '', '', 0, 0, 0, 0)", m_guildId, pMember->guid, r->iId);
+	CharacterDatabase.Execute("INSERT INTO guild_data VALUES(%u, %u, %u, '', '', 0, 0, 0, 0, 0)", m_guildId, pMember->guid, r->iId);
 	LogGuildEvent(GUILD_EVENT_JOINED, 1, pMember->name);
 	AddGuildLogEntry(GUILD_LOG_EVENT_JOIN, 1, pMember->guid);
 	m_lock.Release();
@@ -1174,7 +1174,7 @@ void Guild::BuyBankTab(WorldSession * pClient)
 	m_bankTabCount++;
 
 	CharacterDatabase.Execute("INSERT INTO guild_banktabs VALUES(%u, %u, '', '')", m_guildId, (uint32)pTab->iTabId);
-	CharacterDatabase.Execute("UPDATE guilds SET bankTabCount = %u WHERE guildId = %u", (uint32)pTab->iTabId, m_guildId);
+	CharacterDatabase.Execute("UPDATE guilds SET bankTabCount = %u WHERE guildId = %u", m_bankTabCount, m_guildId);
 	m_lock.Release();
 }
 
@@ -1286,6 +1286,9 @@ void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
 
 	// subtract the balance
 	m_bankBalance -= uAmount;
+
+	// update in db
+	CharacterDatabase.Execute("UPDATE guilds SET bankBalance = %u WHERE guildId = %u", (m_bankBalance>0)?m_bankBalance:0, m_guildId);
 
 	// notify everyone with the new balance
 	char buf[20];
