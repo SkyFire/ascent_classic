@@ -704,7 +704,7 @@ void Guild::RemoveGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	if(pMember->guild != this)
 		return;
 
-	if(pClient->GetPlayer()->m_playerInfo->guild != this)
+	if(pClient && pClient->GetPlayer()->m_playerInfo->guild != this)
 		return;
 
 	if(pClient && !pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_REMOVE) && pClient->GetPlayer()->m_playerInfo != pMember)
@@ -879,7 +879,8 @@ void Guild::Disband()
 	CharacterDatabase.Execute("DELETE FROM guild_logs WHERE guildid = %u", m_guildId);
 	CharacterDatabase.Execute("DELETE FROM guild_ranks WHERE guildId = %u", m_guildId);
 	CharacterDatabase.Execute("DELETE FROM guild_data WHERE guildid = %u", m_guildId);
-	//do we need to clear guild_bankitems ?
+	CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE guildId = %u", m_guildId);
+	CharacterDatabase.Execute("DELETE FROM guild_banktabs WHERE guildId = %u", m_guildId);
 	m_lock.Release();
 	delete this;
 }

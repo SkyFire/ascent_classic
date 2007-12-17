@@ -1355,6 +1355,8 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			pItem2 = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
 			if(pItem2 != NULL)
 			{
+				_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot);
+
 				// this actually means we're swapping.. urgh
 				// remove owner association
 				pItem2->SetOwner(NULL);
