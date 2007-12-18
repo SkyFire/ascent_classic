@@ -244,7 +244,7 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions,
 			m_lock.Release();
 
 			// save the rank into the database
-			CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)",
+			CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
 				m_guildId, i, CharacterDatabase.EscapeString(string(szRankName)).c_str(),
 				r->iRights, r->iGoldLimitPerDay,
 				r->iTabPermissions[0].iFlags, r->iTabPermissions[0].iStacksPerDay,

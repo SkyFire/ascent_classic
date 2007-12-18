@@ -364,7 +364,7 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 		recv_data >> pRank->iTabPermissions[i].iStacksPerDay;
 	}
 
-	CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)",
+	CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
 		_player->m_playerInfo->guild->GetGuildId(), pRank->iId, CharacterDatabase.EscapeString(newName).c_str(),
 		pRank->iRights, pRank->iGoldLimitPerDay,
 		pRank->iTabPermissions[0].iFlags, pRank->iTabPermissions[0].iStacksPerDay,
@@ -1261,6 +1261,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 	uint8 source_isfrombank;
 	uint32 wtf;
 	uint8 wtf2;
+	uint32 i;
 
 	Guild * pGuild = _player->m_playerInfo->guild;
 	GuildMember * pMember = _player->m_playerInfo->guildMember;
@@ -1377,8 +1378,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		recv_data >> source_slot;
 
 		/* sanity checks to avoid overflows */
-		if(dest_bankslot >= MAX_GUILD_BANK_SLOTS ||
-			dest_bank >= MAX_GUILD_BANK_TABS)
+		if(dest_bank >= MAX_GUILD_BANK_TABS)
 		{
 			return;
 		}
@@ -1392,8 +1392,53 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		if(pTab==NULL)
 			return;
 
+		/* check if we are autoassigning */
+		if(dest_bankslot == 0xff)
+		{
+			for(i = 0; i < MAX_GUILD_BANK_SLOTS; ++i)
+			{
+				if(pTab->pSlots[i] == NULL)
+				{
+					dest_bankslot = (uint8)i;
+					break;
+				}
+			}
+
+			if(dest_bankslot==0xff)
+			{
+				_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_BAG_FULL);
+				return;
+			}
+		}
+
+		/* another check here */
+		if(dest_bankslot >= MAX_GUILD_BANK_SLOTS)
+			return;
+
 		/* check if we're pulling an item from the bank, make sure we're not cheating. */
 		pDestItem = pTab->pSlots[dest_bankslot];
+
+		/* grab the source/destination item */
+		if(source_bagslot == 1 && source_slot == 1)
+		{
+			// find a free bag slot
+			if(pDestItem == NULL)
+			{
+				// dis is fucked up mate
+				return;
+			}
+
+			SlotResult sr = _player->GetItemInterface()->FindFreeInventorySlot(pDestItem->GetProto());
+			if(!sr.Result)
+			{
+				_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_BAG_FULL);
+				return;
+			}
+
+			source_bagslot = sr.ContainerSlot;
+			source_slot = sr.Slot;
+		}
+
 		if(pDestItem != NULL)
 		{
 			if(pMember->pRank->iTabPermissions[dest_bank].iStacksPerDay)
@@ -1401,6 +1446,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 				if(pMember->CalculateAllowedItemWithdraws(dest_bank) == 0)
 				{
 					// a "no permissions" notice would probably be better here
+					SystemMessage("You have withdrawn the maximum amount for today.");
 					return;
 				}
 
@@ -1409,7 +1455,6 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			}
 		}
 
-		/* grab the source/destination item */
 		pSourceItem = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
 
 		/* make sure that both arent null - wtf ? */
@@ -1651,15 +1696,14 @@ void WorldSession::HandleGuildGetFullPermissions(WorldPacket & recv_data)
 
 	data << pRank->iId;
 	data << pRank->iRights;
-
 	data << pRank->iGoldLimitPerDay;
+	data << uint8(_player->GetGuild()->GetBankTabCount());
 
 	for(i = 0; i < MAX_GUILD_BANK_TABS; ++i) {
 		data << pRank->iTabPermissions[i].iFlags;
 		data << pRank->iTabPermissions[i].iStacksPerDay;
 	}
 
-	data << uint8(0);
 	SendPacket(&data);
 }
 
