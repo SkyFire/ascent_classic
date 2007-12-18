@@ -275,7 +275,7 @@ bool ReindeerTransformation(uint32 i, Spell *pSpell)
 
 	if(pSpell->p_caster->GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID) != 0)
 	{
-		if(pSpell->p_caster->FlyCheat)
+		if(pSpell->p_caster->m_setflycheat)
 			pSpell->p_caster->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 22724);
 		else
 			pSpell->p_caster->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 15902);

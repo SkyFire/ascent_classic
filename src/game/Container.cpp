@@ -63,14 +63,14 @@ void Container::LoadFromDB( Field*fields )
 	SetUInt32Value( OBJECT_FIELD_ENTRY, itemid );
 	
 
-	SetUInt32Value( ITEM_FIELD_CREATOR, fields[3].GetUInt32() );
+	SetUInt32Value( ITEM_FIELD_CREATOR, fields[5].GetUInt32() );
 	SetUInt32Value( ITEM_FIELD_STACK_COUNT, 1);
 	
-	SetUInt32Value( ITEM_FIELD_FLAGS, fields[6].GetUInt32());
-	SetUInt32Value( ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetUInt32());
+	SetUInt32Value( ITEM_FIELD_FLAGS, fields[8].GetUInt32());
+	SetUInt32Value( ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[9].GetUInt32());
 
 	SetUInt32Value( ITEM_FIELD_MAXDURABILITY, m_itemProto->MaxDurability);
-	SetUInt32Value( ITEM_FIELD_DURABILITY, fields[9].GetUInt32());
+	SetUInt32Value( ITEM_FIELD_DURABILITY, fields[12].GetUInt32());
   
 
 	SetUInt32Value( CONTAINER_FIELD_NUM_SLOTS, m_itemProto->ContainerSlots);

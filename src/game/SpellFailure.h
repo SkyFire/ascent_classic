@@ -185,6 +185,7 @@ enum SpellCastError
 	SPELL_FAILED_NOT_IDLE                                        = 160,
 	SPELL_FAILED_NOT_INACTIVE                                    = 161,
 	SPELL_FAILED_UNKNOWN                                         = 162,
+	SPELL_CANCAST_OK                                             = 255,
 };
 
 #endif
