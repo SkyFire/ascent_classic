@@ -319,18 +319,15 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 		return;
 	}
 
-	// find the next highest rank
-	uint32 nh = 999999;
+	// find the lowest rank that isnt his rank
+	uint32 nh = pMember->guildRank->iId - 1;
 	GuildRank * newRank = NULL;
 
 	m_lock.Acquire();
-	for(GuildRankVector::iterator vtr = m_ranks.begin(); vtr != m_ranks.end(); ++vtr) 
+	while(nh > 0 && newRank == NULL)
 	{
-		if((*vtr) && ((*vtr)->iId < nh || !newRank) && (*vtr)->iId != 0)		// cannot promote to guildmaster
-		{
-			newRank = (*vtr);
-			nh = newRank->iId;
-		}
+		newRank = m_ranks[nh];
+		nh--;
 	}
 
 	if(newRank==NULL)
@@ -349,6 +346,7 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	}
 
 	itr->second->pRank = newRank;
+	itr->second->pPlayer->guildRank = newRank;
 
 	// log it
 	LogGuildEvent(GUILD_EVENT_PROMOTION, 3, pClient->GetPlayer()->GetName(), pMember->name, newRank->szRankName);
@@ -370,24 +368,22 @@ void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	if(pClient->GetPlayer()->m_playerInfo->guild != this || pMember->guild != this)
 		return;
 
-	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_DEMOTE))
+	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_DEMOTE) ||
+		pMember->guid == GetGuildLeader())
 	{
 		SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
 		return;
 	}
 
 	// find the next highest rank
-	uint32 nh = 0;
+	uint32 nh = pMember->guildRank->iId + 1;
 	GuildRank * newRank = NULL;
 
 	m_lock.Acquire();
-	for(GuildRankVector::iterator vtr = m_ranks.begin(); vtr != m_ranks.end(); ++vtr) 
+	while(nh < 10 && newRank == NULL)
 	{
-		if((*vtr) && (*vtr)->iId > nh || !newRank)
-		{
-			newRank = (*vtr);
-			nh = newRank->iId;
-		}
+		newRank = m_ranks[nh];
+		++nh;
 	}
 
 	if(newRank==NULL)
@@ -406,6 +402,7 @@ void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	}
 
 	itr->second->pRank = newRank;
+	itr->second->pPlayer->guildRank = newRank;
 
 	// log it
 	LogGuildEvent(GUILD_EVENT_DEMOTION, 3, pClient->GetPlayer()->GetName(), pMember->name, newRank->szRankName);
@@ -708,7 +705,7 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 		pMember->m_loggedInPlayer->SetGuildRank(r->iId);
 	}
 
-	CharacterDatabase.Execute("INSERT INTO guild_data VALUES(%u, %u, %u, '', '', 0, 0, 0, 0, 0)", m_guildId, pMember->guid, r->iId);
+	CharacterDatabase.Execute("INSERT INTO guild_data VALUES(%u, %u, %u, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)", m_guildId, pMember->guid, r->iId);
 	LogGuildEvent(GUILD_EVENT_JOINED, 1, pMember->name);
 	AddGuildLogEntry(GUILD_LOG_EVENT_JOIN, 1, pMember->guid);
 	m_lock.Release();
@@ -850,21 +847,14 @@ void Guild::RemoveGuildRank(WorldSession * pClient)
 	}
 
 	// check for players that need to be promoted
-	GuildRank * pNewLowestRank = FindNextLowestRank(pLowestRank);
 	GuildMemberMap::iterator itr = m_members.begin();
 	for(; itr != m_members.end(); ++itr)
 	{
 		if(itr->second->pRank == pLowestRank)
 		{
-			if(pNewLowestRank == NULL)
-			{
-				pClient->SystemMessage("There are still members using this rank and we cannot find them another rank to use!");
-				m_lock.Release();
-				return;
-			}
-
-			itr->second->pRank = pNewLowestRank;
-			itr->first->guildRank = pNewLowestRank;
+			pClient->SystemMessage("There are still members using this rank. You cannot delete it yet!");
+			m_lock.Release();
+			return;
 		}
 	}
 
