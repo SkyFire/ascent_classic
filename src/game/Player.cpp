@@ -2680,11 +2680,11 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		m_arenaTeams[z] = objmgr.GetArenaTeamByGuid(GetGUIDLow(), z);
 		if(m_arenaTeams[z] != NULL)
 		{
-			SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5), m_arenaTeams[z]->m_id);
+			SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*6), m_arenaTeams[z]->m_id);
 			if(m_arenaTeams[z]->m_leader == GetGUIDLow())
-				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5) + 1, 0);
+				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*6) + 1, 0);
 			else
-				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*5) + 1, 1);
+				SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*6) + 1, 1);
 		}
 	}
 
