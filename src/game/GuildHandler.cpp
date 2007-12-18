@@ -1419,7 +1419,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		if(pSourceItem != NULL)
 		{
 			// make sure its not a soulbound item
-			if(pSourceItem->IsSoulbound())
+			if(pSourceItem->IsSoulbound() || pSourceItem->GetProto()->Class == ITEM_CLASS_QUEST)
 			{
 				_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_CANT_DROP_SOULBOUND);
 				return;

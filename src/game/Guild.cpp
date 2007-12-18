@@ -466,7 +466,7 @@ bool Guild::LoadFromDB(Field * f)
 		for(j = 0; j < MAX_GUILD_BANK_TABS; ++j)
 		{
 			r->iTabPermissions[j].iFlags = f2[5+(j*2)].GetUInt32();
-			r->iTabPermissions[j].iFlags = f2[6+(j*2)].GetUInt32();
+			r->iTabPermissions[j].iStacksPerDay = f2[6+(j*2)].GetUInt32();
 		}
 
 		//m_ranks.push_back(r);
@@ -536,6 +536,14 @@ bool Guild::LoadFromDB(Field * f)
 		delete result;
 	}
 
+	result = CharacterDatabase.Query("SELECT MAX(log_id) FROM guild_banklogs WHERE guildid = %u", m_guildId);
+	if(result)
+	{
+		if((result->Fetch()[0].GetUInt32() + 1) > m_hiLogId)
+			m_hiLogId = result->Fetch()[0].GetUInt32() + 1;
+		delete result;
+	}
+
 	// load log
 	result = CharacterDatabase.Query("SELECT * FROM guild_logs WHERE guildid = %u ORDER BY timestamp ASC", m_guildId);
 	if(result)
@@ -596,7 +604,45 @@ bool Guild::LoadFromDB(Field * f)
 				delete res2;
 			}
 
+			res2 = CharacterDatabase.Query("SELECT * FROM guild_banklogs WHERE guildid = %u AND tabid = %u ORDER BY timestamp ASC", m_guildId, result->Fetch()[1].GetUInt32());
+			if(res2 != NULL)
+			{
+				do 
+				{
+					GuildBankEvent * ev= new GuildBankEvent;
+					ev->iLogId=res2->Fetch()[0].GetUInt32();
+					ev->iAction=res2->Fetch()[3].GetUInt8();
+					ev->uPlayer=res2->Fetch()[4].GetUInt32();
+					ev->uEntry=res2->Fetch()[5].GetUInt32();
+					ev->iStack=res2->Fetch()[6].GetUInt8();
+					ev->uTimeStamp=res2->Fetch()[7].GetUInt32();
+
+					pTab->lLog.push_back(ev);
+
+				} while (res2->NextRow());
+				delete res2;
+			}
+
 			m_bankTabs.push_back(pTab);
+
+		} while (result->NextRow());
+		delete result;
+	}
+
+	result = CharacterDatabase.Query("SELECT * FROM guild_banklogs WHERE guildid = %u AND tabid = 6 ORDER BY timestamp ASC", m_guildId);
+	if(result != NULL)
+	{
+		do 
+		{
+			GuildBankEvent * ev= new GuildBankEvent;
+			ev->iLogId=result->Fetch()[0].GetUInt32();
+			ev->iAction=result->Fetch()[3].GetUInt8();
+			ev->uPlayer=result->Fetch()[4].GetUInt32();
+			ev->uEntry=result->Fetch()[5].GetUInt32();
+			ev->iStack=result->Fetch()[6].GetUInt8();
+			ev->uTimeStamp=result->Fetch()[7].GetUInt32();
+
+			m_moneyLog.push_back(ev);
 
 		} while (result->NextRow());
 		delete result;
