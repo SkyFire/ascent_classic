@@ -2207,6 +2207,29 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=MF_grouprelation;
 
+	//Priest: Shadowguard
+	sp = dbcSpell.LookupEntry(18137);
+	if(sp)
+		sp->EffectTriggerSpell[0]=28377;
+	sp = dbcSpell.LookupEntry(19308);
+	if(sp)
+		sp->EffectTriggerSpell[0]=28378;
+	sp = dbcSpell.LookupEntry(19309);
+	if(sp)
+		sp->EffectTriggerSpell[0]=28379;
+	sp = dbcSpell.LookupEntry(19310);
+	if(sp)
+		sp->EffectTriggerSpell[0]=28380;
+	sp = dbcSpell.LookupEntry(19311);
+	if(sp)
+		sp->EffectTriggerSpell[0]=28381;
+	sp = dbcSpell.LookupEntry(19312);
+	if(sp)
+		sp->EffectTriggerSpell[0]=28382;
+	sp = dbcSpell.LookupEntry(25477);
+	if(sp)
+		sp->EffectTriggerSpell[0]=28385;
+
 	//priest - Absolution 
 	sp = dbcSpell.LookupEntry(33167); 
 	if(sp)

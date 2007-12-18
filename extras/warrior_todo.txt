@@ -1,4 +1,3 @@
-# Overpower - should work
 focused rage: should decrease the rage of all damage-dealing abilities and of all debuffs. And it should be stackable with Improved Sunder Armor and Improved Heroic Strike talents
 Piercing howl should detect stealth
 Berserker rage should give you temporary stun ress
@@ -26,7 +25,6 @@ If you damage target of Intimidating Shout - the one "cowering in fear" - you wi
 Enrage talent doesnt give a slightest bonus dmg. Good thing that Flurry seems to work fine.
 
 
-1. overpower doesn't work
 2. abilities that does damage in melee range such as mortal strike, bloodthirst, hamstring, slam etc. isn't doing damage in melee range.
 3. whirlwind doesn't hit enemies around 8 yards.
 4. second wind doesn't activate when getting immobilized by frost nova.
@@ -48,3 +46,31 @@ protection
 6. tactical mastery doesn't work
 7. focused rage doesn't reduce rage cost of offensive ability
 8. one-handed weapon specialization doesn't increase damage
+
+//////////////////////////////////////////////
+
+
+2.3 talents trees: http://www.wowhead.com/?talent=L
+
+Arms - not working stuff
+- Imp Thunderclap (important debuff, should reduce attack speed of enemies by a total 20%)
+- Anger Management - stopped working some time ago (after 2.3, I think)
+- Impale - increases crit bonus by 20% (important part of warrior's burst damage)
+- Second Wind - some say it doesn't work for all roots and stuns
+- Imp Intercept - stopped working after 2.3, they moved it from Fury to Arms
+- Imp Mortal Strike - 5 wasted points to get last talent, should decrease cooldown of MS by 1s and increase it's damage by 5%
+
+Fury
+- Sweeping Strikes - stopped working after 2.3, they moved it from Arms to Fury
+- Imp Berserker Rage - should generate rage when used (no idea if it ever worked)
+
+Protection
+- Tactical Mastery - probably best talent for any PvP build, doesn't work. Allows the warrior to retain up to 15 rage when switching stances. The talent that you buy, that allows you to retain 10 rage works (corrected, I said it doesn't).
+---
+
+Abilities
+- Intimidating Shout - it's an instant AOE fear, that doesn't work right. It affects the warrior, too. Very important.
+
+
+--------------------
+to be continued...

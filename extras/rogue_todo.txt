@@ -153,3 +153,5 @@ Also should remove Impairing/Slow effects and remove all DOT's ( Cannot remove B
 
 
 Riposte
+
+I was successfully able to use envenom when I used deadly poison I and it will not work with any other level (it should)
