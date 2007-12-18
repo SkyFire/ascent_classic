@@ -59,6 +59,13 @@ enum GuildMessageTypes
 	G_MSGTYPE_OFFICERCHAT,
 };
 
+enum MONEY
+{
+	MONEY_ONE_COPPER			= 1,
+	MONEY_ONE_SILVER			= MONEY_ONE_COPPER * 100,
+	MONEY_ONE_GOLD				= MONEY_ONE_SILVER * 100,
+};
+
 enum CommandErrors
 {
 	GUILD_U_HAVE_INVITED = 0x00,

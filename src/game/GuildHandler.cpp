@@ -1112,8 +1112,19 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket & recv_data)
 		return;
 	}
 
-	_player->m_playerInfo->guild->BuyBankTab(this);
-	_player->m_playerInfo->guild->LogGuildEvent(GUILD_EVENT_BANKTABBOUGHT, 1, "");
+	if(_player->m_playerInfo->guild->GetBankTabCount() < 6)
+	{
+		//                                        tab1, tab2, tab3, tab4, tab5, tab6
+		const static int32 GuildBankPrices[6] = { 100, 250,  500,  1000, 2500, 5000 };
+		int32 cost = MONEY_ONE_GOLD * GuildBankPrices[_player->m_playerInfo->guild->GetBankTabCount()];
+
+		if(_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < (unsigned)cost)
+			return;
+
+		_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -cost);
+		_player->m_playerInfo->guild->BuyBankTab(this);
+		_player->m_playerInfo->guild->LogGuildEvent(GUILD_EVENT_BANKTABBOUGHT, 1, "");
+	}
 }
 
 void WorldSession::HandleGuildBankGetAvailableAmount(WorldPacket & recv_data)
@@ -1151,6 +1162,12 @@ void WorldSession::HandleGuildBankModifyTab(WorldPacket & recv_data)
 	pTab = _player->m_playerInfo->guild->GetBankTab((uint32)slot);
 	if(pTab==NULL)
 		return;
+
+	if(_player->m_playerInfo->guild->GetGuildLeader() != _player->GetGUIDLow())
+	{
+		Guild::SendGuildCommandResult(this, GUILD_MEMBER_S, "", GUILD_PERMISSIONS);
+		return;
+	}
 
 	if(tabname.size())
 	{
@@ -1279,6 +1296,11 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			return;
 		}
 
+		/* make sure we have permissions */
+		if(!pMember->pRank->CanPerformBankCommand(GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS, dest_bank) || 
+			!pMember->pRank->CanPerformBankCommand(GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS, source_bank))
+			return;
+
 		/* locate the tabs */
 		pSourceTab = pGuild->GetBankTab((uint32)source_bank);
 		pDestTab = pGuild->GetBankTab((uint32)dest_bank);
@@ -1360,6 +1382,10 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		{
 			return;
 		}
+
+		/* make sure we have permissions */
+		if(!pMember->pRank->CanPerformBankCommand(GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS, dest_bank))
+			return;
 
 		/* get tab */
 		pTab = pGuild->GetBankTab((uint32)dest_bank);
@@ -1478,7 +1504,7 @@ void WorldSession::HandleGuildBankViewTab(WorldPacket & recv_data)
 	recv_data >> guid;
 	recv_data >> tabid;
 
-	Log.Warning("HandleGuildBankViewTab", "Tab %u", (uint32)tabid);
+	//Log.Warning("HandleGuildBankViewTab", "Tab %u", (uint32)tabid);
 
 	// maybe last uint8 is "show additional info" such as tab names? *shrug*
 	if(pGuild==NULL)
@@ -1508,7 +1534,7 @@ void Guild::SendGuildBankInfo(WorldSession * pClient)
 	for(uint32 i = 0; i < m_bankTabCount; ++i)
 	{
 		GuildBankTab * pTab = GetBankTab(i);
-		if(pTab==NULL)
+		if(pTab==NULL || !pMember->pRank->CanPerformBankCommand(GR_RIGHT_GUILD_BANK_VIEW_TAB, i))
 		{
 			data << uint16(0);		// shouldn't happen
 			continue;
@@ -1533,13 +1559,13 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 {
 	size_t pos;
 	uint32 count=0;
-	WorldPacket data(0x03E7, 3000);
+	WorldPacket data(SMSG_GUILD_BANK_VIEW_RESPONSE, 1100);
 	GuildMember * pMember = pClient->GetPlayer()->m_playerInfo->guildMember;
 
-	if(pMember==NULL)
+	if(pMember==NULL || !pMember->pRank->CanPerformBankCommand(GR_RIGHT_GUILD_BANK_VIEW_TAB, pTab->iTabId))
 		return;
 
-	Log.Debug("SendGuildBank", "sending tab %u to client.", pTab->iTabId);
+	//Log.Debug("SendGuildBank", "sending tab %u to client.", pTab->iTabId);
 
 	data << uint64(m_bankBalance);			// amount you have deposited
 	data << uint8(pTab->iTabId);				// unknown
@@ -1606,40 +1632,6 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 #else
 	*(uint8*)&data.contents()[pos] = (uint8)count;
 #endif
-
-	// uint8 view_flag
-	// if view_flag = 0
-	// uint8 item count
-	// for each item
-	//     uint8 slot
-	//     uint32 entry
-	//     uint32 unk
-	//     uint32 stack_count
-	//     uint16 unk
-
-
-	//data << uint8(0);
-	// uint64 amount_you_have_deposited
-	/*data << uint64(1000000);
-
-	data << uint8(1);
-	data << uint8(0);
-	data << uint8(0);
-	data << uint8(0);
-
-	data << uint8(0);
-	data << uint8(1);
-	data << uint8(0x4C);
-	data << uint8(0);
-	data << uint8(0x11);
-	data << uint8(0x29);
-
-	data << uint8(0);
-	data << uint8(1);
-	data << uint8(1);
-	data << uint8(0);
-	data << uint8(0);
-	data << uint8(0);*/
 
 	pClient->SendPacket(&data);
 }

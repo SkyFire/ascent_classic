@@ -678,6 +678,10 @@ protected:
 
 public:
 
+	inline Guild * GetGuild() { return m_playerInfo->guild; }
+	inline GuildMember * GetGuildMember() { return m_playerInfo->guildMember; }
+	inline GuildRank * GetGuildRankS() { return m_playerInfo->guildRank; }
+
 	void EventGroupFullUpdate();
 	/************************************************************************/
 	/* Reference System	                                                    */

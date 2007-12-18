@@ -276,7 +276,7 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 
 	// rest of the fields have been nulled out, create some default ranks.
 	GuildRank * leaderRank = CreateGuildRank("Guild Master", GR_RIGHT_ALL, true);
-	CreateGuildRank("Officer", GR_RIGHT_ALL, false);
+	CreateGuildRank("Officer", GR_RIGHT_ALL, true);
 	CreateGuildRank("Veteran", GR_RIGHT_DEFAULT, false);
 	CreateGuildRank("Member", GR_RIGHT_DEFAULT, false);
 	GuildRank * defRank = CreateGuildRank("Initiate", GR_RIGHT_DEFAULT, false);
@@ -1177,11 +1177,11 @@ void Guild::BuyBankTab(WorldSession * pClient)
 	if(pClient && pClient->GetPlayer()->GetGUIDLow() != m_guildLeader)
 		return;
 
-	m_lock.Acquire();
-
 	if(m_bankTabCount>=MAX_GUILD_BANK_TABS)
 		return;
-	
+
+	m_lock.Acquire();
+
 	GuildBankTab * pTab = new GuildBankTab;
 	pTab->iTabId = m_bankTabCount;
 	memset(pTab->pSlots, 0, sizeof(Item*)*MAX_GUILD_BANK_SLOTS);
