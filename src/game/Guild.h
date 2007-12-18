@@ -182,9 +182,8 @@ enum GuildRankRights
 	GR_RIGHT_ALL			= 0x1F1FF,
 	GR_RIGHT_DEFAULT		= GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK,
 
-	GR_RIGHT_GUILDBANKPERMS				= 0x100000,
-	GR_RIGHT_GUILD_BANK_VIEW_TAB		= GR_RIGHT_GUILDBANKPERMS | 0x01,
-	GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS	= GR_RIGHT_GUILDBANKPERMS | 0x02,
+	GR_RIGHT_GUILD_BANK_VIEW_TAB		= 0x01,
+	GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS	= 0x02,
 };
 
 
@@ -231,16 +230,24 @@ enum GuildLogEventE
 #define ARENA_TEAM_CHARTER_5v5      23562
 #define ARENA_TEAM_CHARTER_5v5_COST 2000000 // 200 G
 
+#define MAX_GUILD_BANK_SLOTS 98
+#define MAX_GUILD_BANK_TABS 6
+
+struct SERVER_DECL GuildRankTabPermissions
+{
+	uint32 iFlags;
+	uint32 iStacksPerDay;
+};
+
 struct SERVER_DECL GuildRank
 {
 	uint32 iId;
 	uint32 iRights;
 	uint32 iGoldLimitPerDay;
-	uint32 iBankTabFlags;
-	uint32 iItemStacksPerDay;
-	uint32 iExtraRights[10];
+	GuildRankTabPermissions iTabPermissions[MAX_GUILD_BANK_TABS];
 	char * szRankName;
 	bool CanPerformCommand(uint32 t);
+	bool CanPerformBankCommand(uint32 t, uint32 tab);
 };
 
 struct SERVER_DECL GuildMember
@@ -251,11 +258,11 @@ struct SERVER_DECL GuildMember
 	GuildRank * pRank;
 	uint32 uLastWithdrawReset;
 	uint32 uWithdrawlsSinceLastReset;
-	uint32 uLastItemWithdrawReset;
-	uint32 uItemWithdrawlsSinceLastReset;
+	uint32 uLastItemWithdrawReset[MAX_GUILD_BANK_TABS];
+	uint32 uItemWithdrawlsSinceLastReset[MAX_GUILD_BANK_TABS];
 
-	uint32 CalculateAllowedItemWithdraws();
-	void OnItemWithdraw();
+	uint32 CalculateAllowedItemWithdraws(uint32 tab);
+	void OnItemWithdraw(uint32 tabid);
 	
 	uint32 CalculateAvailableAmount();
 	void OnMoneyWithdraw(uint32 amt);
@@ -268,9 +275,6 @@ struct SERVER_DECL GuildLogEvent
 	uint32 iTimeStamp;
 	uint32 iEventData[3];
 };
-
-#define MAX_GUILD_BANK_SLOTS 98
-#define MAX_GUILD_BANK_TABS 6
 
 struct SERVER_DECL GuildBankTab
 {
@@ -409,7 +413,7 @@ public:
 
 	/** Creates a guild rank with the specified permissions.
 	 */
-	GuildRank * CreateGuildRank(const char * szRankName, uint32 iPermissions);
+	GuildRank * CreateGuildRank(const char * szRankName, uint32 iPermissions, bool bFullGuildBankPermissions);
 
 	/** "Pops" or removes the bottom guild rank.
 	 */
@@ -463,7 +467,8 @@ public:
 
 	/** Sends the guild bank to this client.
 	 */
-	void SendGuildBank(WorldSession * pClient);
+	void SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 updated_slot1 = -1, int8 updated_slot2 = -1);
+	void SendGuildBankInfo(WorldSession * pClient);
 
 protected:
 	

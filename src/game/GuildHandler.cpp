@@ -344,27 +344,35 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 
 	recv_data >> pRank->iRights;
 	recv_data >> newName;
+
+	if(newName.length() < 2)
+		newName = string(pRank->szRankName);
 	
-	if(strcmp(newName.c_str(), pRank->szRankName))
+	if(strcmp(newName.c_str(), pRank->szRankName) != 0)
 	{
 		// name changed
 		char * pTmp = pRank->szRankName;
 		pRank->szRankName = strdup(newName.c_str());
 		free(pTmp);
-
-		CharacterDatabase.Execute("UPDATE guild_ranks SET rankName = \"%s\" WHERE guildId = %u AND rankId = %u", 
-			CharacterDatabase.EscapeString(newName).c_str(), _player->m_playerInfo->guild->GetGuildId(), rankId);
 	}
 
 	recv_data >> pRank->iGoldLimitPerDay;
-	recv_data >> pRank->iBankTabFlags;
-	recv_data >> pRank->iItemStacksPerDay;
 
-	for(i = 0; i < 10; ++i)
-		recv_data >> pRank->iExtraRights[i];
+	for(i = 0; i < MAX_GUILD_BANK_TABS; ++i)
+	{
+		recv_data >> pRank->iTabPermissions[i].iFlags;
+		recv_data >> pRank->iTabPermissions[i].iStacksPerDay;
+	}
 
-	CharacterDatabase.Execute("UPDATE guild_ranks SET rankRights = %u, goldLimitPerDay = %u, bankTabFlags = %u, itemStacksPerDay = %u WHERE rankId = %u AND guildId = %u",
-		pRank->iRights, pRank->iGoldLimitPerDay, pRank->iBankTabFlags, pRank->iItemStacksPerDay, pRank->iId, _player->m_playerInfo->guild->GetGuildId());
+	CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)",
+		_player->m_playerInfo->guild->GetGuildId(), pRank->iId, CharacterDatabase.EscapeString(newName).c_str(),
+		pRank->iRights, pRank->iGoldLimitPerDay,
+		pRank->iTabPermissions[0].iFlags, pRank->iTabPermissions[0].iStacksPerDay,
+		pRank->iTabPermissions[1].iFlags, pRank->iTabPermissions[1].iStacksPerDay,
+		pRank->iTabPermissions[2].iFlags, pRank->iTabPermissions[2].iStacksPerDay,
+		pRank->iTabPermissions[3].iFlags, pRank->iTabPermissions[3].iStacksPerDay,
+		pRank->iTabPermissions[4].iFlags, pRank->iTabPermissions[4].iStacksPerDay,
+		pRank->iTabPermissions[5].iFlags, pRank->iTabPermissions[5].iStacksPerDay);
 }
 
 void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)
@@ -1197,6 +1205,9 @@ void WorldSession::HandleGuildBankModifyTab(WorldPacket & recv_data)
 				_player->m_playerInfo->guild->GetGuildId(), (uint32)slot);
 		}
 	}
+
+	// update the client
+	_player->m_playerInfo->guild->SendGuildBankInfo(this);
 }
 
 void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket & recv_data)
@@ -1231,18 +1242,9 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 {
 	uint64 guid;
 	uint8 source_isfrombank;
-	uint8 source_bank;
-	uint8 source_bankslot;
-	uint8 source_bagslot;
-	uint8 source_slot;
-	uint8 dest_bank;
-	uint8 dest_bankslot;
 	uint32 wtf;
 	uint8 wtf2;
-	GuildBankTab * pTab;
-	GuildBankTab * pTab2;
-	Item * pItem;
-	Item * pItem2;
+
 	Guild * pGuild = _player->m_playerInfo->guild;
 	GuildMember * pMember = _player->m_playerInfo->guildMember;
 	
@@ -1252,12 +1254,21 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 	recv_data >> guid >> source_isfrombank;
 	if(source_isfrombank)
 	{
+		GuildBankTab * pSourceTab;
+		GuildBankTab * pDestTab;
+		Item * pSourceItem;
+		Item * pDestItem;
+		uint8 dest_bank;
+		uint8 dest_bankslot;
+		uint8 source_bank;
+		uint8 source_bankslot;
+
 		/* read packet */
-		recv_data >> source_bank;
-		recv_data >> source_bankslot;
-		recv_data >> wtf;
 		recv_data >> dest_bank;
 		recv_data >> dest_bankslot;
+		recv_data >> wtf;
+		recv_data >> source_bank;
+		recv_data >> source_bankslot;
 
 		/* sanity checks to avoid overflows */
 		if(source_bankslot >= MAX_GUILD_BANK_SLOTS ||
@@ -1269,38 +1280,71 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		}
 
 		/* locate the tabs */
-		pTab = pGuild->GetBankTab((uint32)dest_bank);
-		pTab2 = pGuild->GetBankTab((uint32)source_bank);
-		if(pTab==NULL || pTab2==NULL)
+		pSourceTab = pGuild->GetBankTab((uint32)source_bank);
+		pDestTab = pGuild->GetBankTab((uint32)dest_bank);
+		if(pSourceTab == NULL || pDestTab == NULL)
 			return;
 
-		/* swapping items - this will be kinda difficult in sql.. */
-		pItem = pTab->pSlots[source_bankslot];
-		pItem2 = pTab2->pSlots[dest_bankslot];
+		pSourceItem = pSourceTab->pSlots[source_bankslot];
+		pDestItem = pDestTab->pSlots[dest_bankslot];
 
-		pTab->pSlots[source_bankslot] = pItem2;
-		pTab2->pSlots[dest_bankslot] = pItem;
+		if(pSourceItem == NULL && pDestItem == NULL)
+			return;
 
-		/* resend it to the client to update him */
-		pGuild->SendGuildBank(this);
+		/* perform the actual swap */
+		pSourceTab->pSlots[source_bankslot] = pDestItem;
+		pDestTab->pSlots[dest_bankslot] = pSourceItem;
 
-		/* update it in the database */
-		if(pItem)
+		/* update the client */
+		if(pSourceTab == pDestTab)
 		{
-			// this one goes in the destination slot
-			CharacterDatabase.Execute("UPDATE guild_bankitems SET slotId = %u, tabId = %u WHERE itemGuid = %u AND guildId = %u",
-				(uint32)dest_bankslot, (uint32)dest_bank, pItem->GetGUIDLow(), pGuild->GetGuildId());
+			/* send both slots in the packet */
+			pGuild->SendGuildBank(this, pSourceTab, source_bankslot, dest_bankslot);
+		}
+		else
+		{
+			/* send a packet for each different bag */
+			pGuild->SendGuildBank(this, pSourceTab, source_bankslot, -1);
+			pGuild->SendGuildBank(this, pDestTab, dest_bankslot, -1);
 		}
 
-		if(pItem2)
+		/* update in sql */
+		if(pDestItem == NULL)
 		{
-			// this one is the destination item coming into the source slot
-			CharacterDatabase.Execute("UPDATE guild_bankitems SET slotId = %u, tabId = %u WHERE itemGuid = %u AND guildId = %u",
-				(uint32)source_bankslot, (uint32)source_bank, pItem2->GetGUIDLow(), pGuild->GetGuildId());
+			/* this means the source slot is no longer being used. */
+			CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE guildId = %u AND tabId = %u AND slotId = %u",
+				pGuild->GetGuildId(), (uint32)pSourceTab->iTabId, (uint32)source_bankslot);
+		}
+		else
+		{
+			/* insert the new item */
+			CharacterDatabase.Execute("REPLACE INTO guild_bankitems VALUES(%u, %u, %u, %u)", 
+				pGuild->GetGuildId(), (uint32)pSourceTab->iTabId, (uint32)source_bankslot, pDestItem->GetGUIDLow());
+		}
+
+		if(pSourceItem == NULL)
+		{
+			/* this means the destination slot is no longer being used. */
+			CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE guildId = %u AND tabId = %u AND slotId = %u",
+				pGuild->GetGuildId(), (uint32)pDestTab->iTabId, (uint32)dest_bankslot);
+		}
+		else
+		{
+			/* insert the new item */
+			CharacterDatabase.Execute("REPLACE INTO guild_bankitems VALUES(%u, %u, %u, %u)", 
+				pGuild->GetGuildId(), (uint32)pDestTab->iTabId, (uint32)dest_bankslot, pSourceItem->GetGUIDLow());
 		}
 	}
 	else
 	{
+		uint8 source_bagslot;
+		uint8 source_slot;
+		uint8 dest_bank;
+		uint8 dest_bankslot;
+		GuildBankTab * pTab;
+		Item * pSourceItem;
+		Item * pDestItem;
+
 		/* read packet */
 		recv_data >> dest_bank;
 		recv_data >> dest_bankslot;
@@ -1322,95 +1366,89 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		if(pTab==NULL)
 			return;
 
-		if(wtf==0)		// depositing an item
+		/* check if we're pulling an item from the bank, make sure we're not cheating. */
+		pDestItem = pTab->pSlots[dest_bankslot];
+		if(pDestItem != NULL)
 		{
-			// get the item
-			//pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
-			pItem = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
-			if(pItem==NULL)
-				return;
+			if(pMember->pRank->iTabPermissions[dest_bank].iStacksPerDay)
+			{
+				if(pMember->CalculateAllowedItemWithdraws(dest_bank) == 0)
+				{
+					// a "no permissions" notice would probably be better here
+					return;
+				}
 
-			if(pItem->IsSoulbound())
+				/* reduce his count by one */
+				pMember->OnItemWithdraw(dest_bank);
+			}
+		}
+
+		/* grab the source/destination item */
+		pSourceItem = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
+
+		/* make sure that both arent null - wtf ? */
+		if(pSourceItem == NULL && pDestItem == NULL)
+			return;
+
+		if(pSourceItem != NULL)
+		{
+			// make sure its not a soulbound item
+			if(pSourceItem->IsSoulbound())
 			{
 				_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_CANT_DROP_SOULBOUND);
 				return;
 			}
 
+			// pull the item from the slot
 			_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
-
-			// remove owner association
-			pItem->SetOwner(NULL);
-			pItem->SetUInt32Value(ITEM_FIELD_OWNER, 0);
-			pItem->SaveToDB(0, 0, false);
-
-			// insert into the guild bank
-			pTab->pSlots[dest_bankslot] = pItem;
-			CharacterDatabase.Execute("INSERT INTO guild_bankitems VALUES(%u, %u, %u, %u)", pGuild->GetGuildId(),
-				(uint32)dest_bank, (uint32)dest_bankslot, pItem->GetGUIDLow());
-
-			pGuild->SendGuildBank(this);
 		}
-		else			// withdrawing an item
+
+		/* perform the swap. */
+		/* pSourceItem = Source item from players backpack coming into guild bank */
+		if(pSourceItem == NULL)
 		{
-			pItem = pTab->pSlots[dest_bankslot];
-			if(pItem==NULL)
-				return;
-
-			if(pMember->pRank->iItemStacksPerDay)
-				if(pMember->CalculateAllowedItemWithdraws() == 0)
-					return;
-
-			
-			pItem2 = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
-			if(pItem2 != NULL)
-			{
-				if(pItem->IsSoulbound())
-				{
-					_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_CANT_DROP_SOULBOUND);
-					return;
-				}
-
-				_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot,false);
-
-				// this actually means we're swapping.. urgh
-				// remove owner association
-				pItem2->SetOwner(NULL);
-				pItem2->SetUInt32Value(ITEM_FIELD_OWNER, 0);
-				pItem2->SaveToDB(0, 0, false);
-
-				// insert into the guild bank
-				pTab->pSlots[dest_bankslot] = pItem2;
-				CharacterDatabase.Execute("INSERT INTO guild_bankitems VALUES(%u, %u, %u, %u)", pGuild->GetGuildId(),
-					(uint32)dest_bank, (uint32)dest_bankslot, pItem->GetGUIDLow());
-			}
-
-			// set new owner of the item
-			pItem->SetOwner(_player);
-			pItem->SetUInt32Value(ITEM_FIELD_OWNER, _player->GetGUIDLow());
-			
-			// attempt to add it onto that slot
-			if(_player->GetItemInterface()->SafeAddItem(pItem, source_bagslot, source_slot))
-			{
-				// remove it from the bank in the database (having the same item in 2 places would be a disaster)
-				CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE guildId = %u AND tabId = %u AND slotId = %u AND itemGuid = %u", 
-					pGuild->GetGuildId(), (uint32)dest_bank, (uint32)dest_bankslot, pItem->GetGUIDLow());
-	
-				pItem->SaveToDB(source_bagslot, source_slot);
-				if(!pItem2)
-					pTab->pSlots[dest_bankslot] = NULL;
-
-				// mi banks mi bankz!
-				pMember->OnItemWithdraw();
-			}
-			else
-			{
-				// reverse what we did, for some reason we can't add it :<
-				pItem->SetOwner(NULL);
-				pItem->SetUInt32Value(ITEM_FIELD_OWNER, 0);
-			}
-
-			pGuild->SendGuildBank(this);
+			/* that slot in the bank is now empty. */
+			pTab->pSlots[dest_bankslot] = NULL;
+			CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE guildId = %u AND tabId = %u AND slotId = %u",
+				pGuild->GetGuildId(), (uint32)pTab->iTabId, (uint32)dest_bankslot);
 		}
+		else
+		{
+			/* there is a new item in that slot. */
+			pTab->pSlots[dest_bankslot] = pSourceItem;
+			CharacterDatabase.Execute("REPLACE INTO guild_bankitems VALUES(%u, %u, %u, %u)", 
+				pGuild->GetGuildId(), (uint32)pTab->iTabId, (uint32)dest_bankslot, pSourceItem->GetGUIDLow());
+
+			/* remove the item's association with the player */
+			pSourceItem->SetOwner(NULL);
+			pSourceItem->SetUInt32Value(ITEM_FIELD_OWNER, 0);
+			pSourceItem->SaveToDB(0, 0, false);
+		}
+
+		/* pDestItem = Item from bank coming into players backpack */
+		if(pDestItem == NULL)
+		{
+			/* the item has already been removed from the players backpack at this stage,
+			   there isnt really much to do at this point. */			
+		}
+		else
+		{
+			/* the guild was robbed by some n00b! :O */
+			pDestItem->SetOwner(_player);
+			pDestItem->SetUInt32Value(ITEM_FIELD_OWNER, _player->GetGUIDLow());
+			pDestItem->SaveToDB(source_bagslot, source_slot);
+
+			/* add it to him in game */
+			if(!_player->GetItemInterface()->SafeAddItem(pDestItem, source_bagslot, source_slot))
+			{
+				/* this *really* shouldn't happen. */
+				pDestItem->DeleteFromDB();
+				delete pDestItem;
+			}
+		}
+
+		/* update the clients view of the bank tab */
+		pGuild->SendGuildBank(this, pTab, dest_bankslot);
 	}		
 }
 
@@ -1427,26 +1465,47 @@ void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 	if(pObj==NULL)
 		return;
 
-	_player->m_playerInfo->guild->SendGuildBank(this);
+	_player->m_playerInfo->guild->SendGuildBankInfo(this);
 }
 
-void Guild::SendGuildBank(WorldSession * pClient)
+void WorldSession::HandleGuildBankViewTab(WorldPacket & recv_data)
 {
-	size_t pos;
-	uint32 count=0;
-	WorldPacket data(0x03E7, 3000);
+	uint64 guid;
+	uint8 tabid;
+	GuildBankTab * pTab;
+	Guild * pGuild = _player->m_playerInfo->guild;
+
+	recv_data >> guid;
+	recv_data >> tabid;
+
+	Log.Warning("HandleGuildBankViewTab", "Tab %u", (uint32)tabid);
+
+	// maybe last uint8 is "show additional info" such as tab names? *shrug*
+	if(pGuild==NULL)
+		return;
+
+	pTab = pGuild->GetBankTab((uint32)tabid);
+	if(pTab==NULL)
+		return;
+
+	pGuild->SendGuildBank(this, pTab);
+}
+
+void Guild::SendGuildBankInfo(WorldSession * pClient)
+{
 	GuildMember * pMember = pClient->GetPlayer()->m_playerInfo->guildMember;
 
 	if(pMember==NULL)
 		return;
 
-	data << uint64(m_bankBalance);			// amount you have deposited
-	data << uint8(0);				// unknown
-	data << uint32(pMember->CalculateAllowedItemWithdraws());		// remaining stacks for this day
-	data << uint8(1);		// some sort of view flag?
-	data << uint8(GetBankTabCount());		// tab count?
+	WorldPacket data(SMSG_GUILD_BANK_VIEW_RESPONSE, 500);
+	data << uint64(m_bankBalance);
+	data << uint8(0);
+	data << uint32(0);
+	data << uint8(1);
+	data << uint8(m_bankTabCount);
 
-	for(uint32 i = 0; i < GetBankTabCount(); ++i)
+	for(uint32 i = 0; i < m_bankTabCount; ++i)
 	{
 		GuildBankTab * pTab = GetBankTab(i);
 		if(pTab==NULL)
@@ -1466,28 +1525,79 @@ void Guild::SendGuildBank(WorldSession * pClient)
 			data << uint8(0);
 	}
 
+	data << uint8(0);
+	pClient->SendPacket(&data);
+}
+
+void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 updated_slot1 /* = -1 */, int8 updated_slot2 /* = -1 */)
+{
+	size_t pos;
+	uint32 count=0;
+	WorldPacket data(0x03E7, 3000);
+	GuildMember * pMember = pClient->GetPlayer()->m_playerInfo->guildMember;
+
+	if(pMember==NULL)
+		return;
+
+	Log.Debug("SendGuildBank", "sending tab %u to client.", pTab->iTabId);
+
+	data << uint64(m_bankBalance);			// amount you have deposited
+	data << uint8(pTab->iTabId);				// unknown
+	data << uint32(pMember->CalculateAllowedItemWithdraws(pTab->iTabId));		// remaining stacks for this day
+	data << uint8(0);		// some sort of view flag?
+
+	// no need to send tab names here..
+
 	pos = data.wpos();
 	data << uint8(0);
 
-	for(uint32 i = 0; i < GetBankTabCount(); ++i)
+	for(uint32 j = 0; j < MAX_GUILD_BANK_SLOTS; ++j)
 	{
-		GuildBankTab * pTab = GetBankTab(i);
-		if(pTab)
+		if(pTab->pSlots[j] != NULL)
 		{
-			for(uint32 j = 0; j < MAX_GUILD_BANK_SLOTS; ++j)
-			{
-				if(pTab->pSlots[j] != NULL)
-				{
-					++count;
+			if(updated_slot1 >= 0 && j == updated_slot1)
+				updated_slot1 = -1;
 
-					// what i don't understand here, where is the field for random properties? :P - Burlex
-					data << uint8(j);
-					data << pTab->pSlots[j]->GetEntry();
-					data << uint32(0);			// this is an enchant
-					data << pTab->pSlots[j]->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
-					data << uint16(i);
-				}
-			}
+			if(updated_slot2 >= 0 && j == updated_slot2)
+				updated_slot2 = -1;
+
+			++count;
+
+			// what i don't understand here, where is the field for random properties? :P - Burlex
+			data << uint8(j);
+			data << pTab->pSlots[j]->GetEntry();
+			data << uint32(0);			// this is an enchant
+			data << pTab->pSlots[j]->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
+			data << uint16(0);
+		}
+	}
+
+	// send the forced update slots
+	if(updated_slot1 >= 0)
+	{
+		// this should only be hit if the items null though..
+		if(pTab->pSlots[updated_slot1]==NULL)
+		{
+			++count;
+			data << uint8(updated_slot1);
+			data << uint32(0);
+			data << uint32(0);
+			data << uint32(0);
+			data << uint16(0);
+		}
+	}
+
+	if(updated_slot2 >= 0)
+	{
+		// this should only be hit if the items null though..
+		if(pTab->pSlots[updated_slot2]==NULL)
+		{
+			++count;
+			data << uint8(updated_slot2);
+			data << uint32(0);
+			data << uint32(0);
+			data << uint32(0);
+			data << uint16(0);
 		}
 	}
 

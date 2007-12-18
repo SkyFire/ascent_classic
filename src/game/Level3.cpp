@@ -833,35 +833,9 @@ bool ChatHandler::HandleCreateAccountCommand(const char* args, WorldSession *m_s
 bool ChatHandler::HandleGetTransporterTime(const char* args, WorldSession* m_session)
 {
 	Player *plyr = m_session->GetPlayer();
-	FILE * pOut = fopen("C:\\moocows.txt", "a");
-	
-	fprintf(pOut, "{ ");
-	for(SpellSet::iterator itr = plyr->mSpells.begin(); itr != plyr->mSpells.end(); ++itr)
-	{
-		SpellEntry * sp = dbcSpell.LookupEntryForced((*itr));
-		PlayerCreateInfo * pci = objmgr.GetPlayerCreateInfo(plyr->getRace(), plyr->getClass());
-		if(sp&&pci)
-		{
-			if(pci->spell_list.find(sp->Id) != pci->spell_list.end())
-				continue;
+	int * p = 0;
+	*p = 1;
 
-			fprintf(pOut, "%u, ", sp->Id);
-		}
-	}
-	fprintf(pOut, "0 },\t// CLASS %u\n", plyr->getClass());
-	fclose(pOut);
-
-	pOut = fopen("C:\\moocows_delted.txt", "a");
-
-	fprintf(pOut, "{ ");
-	for(SpellSet::iterator itr = plyr->mDeletedSpells.begin(); itr != plyr->mDeletedSpells.end(); ++itr)
-	{
-		SpellEntry * sp = dbcSpell.LookupEntryForced((*itr));
-		if(sp)
-			fprintf(pOut, "%u, ", sp->Id);
-	}
-	fprintf(pOut, "0 },\t// CLASS %u\n", plyr->getClass());
-	fclose(pOut);
 	return true;
 }
 

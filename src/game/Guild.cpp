@@ -131,10 +131,12 @@ GuildRank * Guild::FindNextLowestRank(GuildRank * r)
 
 bool GuildRank::CanPerformCommand(uint32 t)
 {
-	if(t & GR_RIGHT_GUILDBANKPERMS)
-		return ((iBankTabFlags & t) >0 ? true : false);
-	else
-		return ((iRights & t) >0 ? true : false);
+	return ((iRights & t) >0 ? true : false);
+}
+
+bool GuildRank::CanPerformBankCommand(uint32 t, uint32 tab)
+{
+	return ((iTabPermissions[tab].iFlags & t) >0 ? true : false);
 }
 
 void Guild::LogGuildEvent(uint8 iEvent, uint8 iStringCount, ...)
@@ -214,28 +216,42 @@ void Guild::SendPacket(WorldPacket * data)
 	m_lock.Release();
 }
 
-GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions)
+GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions, bool bFullGuildBankPermissions)
 {
 	// find a free id
+	uint32 i, j;
 	m_lock.Acquire();
-	for(uint32 i = 0; i < MAX_GUILD_RANKS; ++i)
+	for(i = 0; i < MAX_GUILD_RANKS; ++i)
 	{
 		if(m_ranks[i] == NULL)
 		{
 			GuildRank * r = new GuildRank;
+			memset(r, 0, sizeof(GuildRank));
 			r->iId = i;
 			r->iRights=iPermissions;
-			memset(r->iExtraRights, 0, sizeof(uint32)*10);
 			r->szRankName = strdup(szRankName);
-			r->iBankTabFlags=0;
-			r->iGoldLimitPerDay=0;
-			r->iItemStacksPerDay=0;
+
+			if(bFullGuildBankPermissions)
+			{
+				for(j = 0; j < MAX_GUILD_BANK_TABS; ++j)
+				{
+					r->iTabPermissions[j].iFlags = 3;			// this is both use tab and withdraw
+					r->iTabPermissions[j].iStacksPerDay = 0;	// 0 = unlimited
+				}
+			}
 			m_ranks[i] = r;
 			m_lock.Release();
 
 			// save the rank into the database
-			CharacterDatabase.Execute("INSERT INTO guild_ranks (guildId, rankId, rankName, rankRights) VALUES(%u, %u, \"%s\", %u)",
-				m_guildId, r->iId, CharacterDatabase.EscapeString(string(r->szRankName)).c_str(), r->iRights);
+			CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u)",
+				m_guildId, i, CharacterDatabase.EscapeString(string(szRankName)).c_str(),
+				r->iRights, r->iGoldLimitPerDay,
+				r->iTabPermissions[0].iFlags, r->iTabPermissions[0].iStacksPerDay,
+				r->iTabPermissions[1].iFlags, r->iTabPermissions[1].iStacksPerDay,
+				r->iTabPermissions[2].iFlags, r->iTabPermissions[2].iStacksPerDay,
+				r->iTabPermissions[3].iFlags, r->iTabPermissions[3].iStacksPerDay,
+				r->iTabPermissions[4].iFlags, r->iTabPermissions[4].iStacksPerDay,
+				r->iTabPermissions[5].iFlags, r->iTabPermissions[5].iStacksPerDay);
 
 			return r;
 		}
@@ -247,6 +263,7 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions)
 // creating from a charter
 void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 {
+	uint32 i;
 	m_lock.Acquire();
 
 	m_guildId = objmgr.GenerateGuildId();
@@ -258,14 +275,11 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 	CreateInDB();
 
 	// rest of the fields have been nulled out, create some default ranks.
-	GuildRank * leaderRank = CreateGuildRank("Guild Master", GR_RIGHT_ALL);
-	CreateGuildRank("Officer", GR_RIGHT_ALL);
-	CreateGuildRank("Veteran", GR_RIGHT_DEFAULT);
-	CreateGuildRank("Member", GR_RIGHT_DEFAULT);
-	GuildRank * defRank = CreateGuildRank("Initiate", GR_RIGHT_DEFAULT);
-
-	// lets set some guildbank fields
-	leaderRank->iBankTabFlags = (GR_RIGHT_GUILD_BANK_DEPOSIT_ITEMS | GR_RIGHT_GUILD_BANK_VIEW_TAB) & ~GR_RIGHT_GUILDBANKPERMS;
+	GuildRank * leaderRank = CreateGuildRank("Guild Master", GR_RIGHT_ALL, true);
+	CreateGuildRank("Officer", GR_RIGHT_ALL, false);
+	CreateGuildRank("Veteran", GR_RIGHT_DEFAULT, false);
+	CreateGuildRank("Member", GR_RIGHT_DEFAULT, false);
+	GuildRank * defRank = CreateGuildRank("Initiate", GR_RIGHT_DEFAULT, false);
 
 	// turn off command logging, we don't wanna spam the logs
 	m_commandLogging = false;
@@ -274,7 +288,7 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 	AddGuildMember(pTurnIn->GetPlayer()->m_playerInfo, NULL, leaderRank->iId);
 
 	// add all the other people
-	for(uint32 i = 0; i < pCharter->SignatureCount; ++i)
+	for(i = 0; i < pCharter->SignatureCount; ++i)
 	{
 		PlayerInfo * pi = objmgr.GetPlayerInfo(pCharter->Signatures[i]);
 		if(pi)
@@ -425,7 +439,7 @@ bool Guild::LoadFromDB(Field * f)
 	m_bankBalance = f[12].GetUInt32();
 
 	// load ranks
-	uint32 i;
+	uint32 j;
 	QueryResult * result = CharacterDatabase.Query("SELECT * FROM guild_ranks WHERE guildId = %u ORDER BY rankId ASC", m_guildId);
 	if(result==NULL)
 		return false;
@@ -450,11 +464,12 @@ bool Guild::LoadFromDB(Field * f)
 		r->szRankName = strdup(f2[2].GetString());
 		r->iRights = f2[3].GetUInt32();
 		r->iGoldLimitPerDay = f2[4].GetUInt32();
-		r->iBankTabFlags = f2[5].GetUInt32();
-		r->iItemStacksPerDay = f2[6].GetUInt32();
-
-		for(i = 0; i < 10; ++i)
-			r->iExtraRights[i] = f2[7+i].GetUInt32();
+		
+		for(j = 0; j < MAX_GUILD_BANK_TABS; ++j)
+		{
+			r->iTabPermissions[j].iFlags = f2[5+(j*2)].GetUInt32();
+			r->iTabPermissions[j].iFlags = f2[6+(j*2)].GetUInt32();
+		}
 
 		//m_ranks.push_back(r);
 		ASSERT(m_ranks[r->iId] == NULL);
@@ -504,8 +519,11 @@ bool Guild::LoadFromDB(Field * f)
 
 		gm->uLastWithdrawReset = f3[5].GetUInt32();
 		gm->uWithdrawlsSinceLastReset = f3[6].GetUInt32();
-		gm->uLastItemWithdrawReset = f3[7].GetUInt32();
-		gm->uItemWithdrawlsSinceLastReset = f3[8].GetUInt32();
+		for(j = 0; j < MAX_GUILD_BANK_TABS; ++j)
+		{
+			gm->uLastItemWithdrawReset[j] = f3[7+(j*2)].GetUInt32();
+			gm->uItemWithdrawlsSinceLastReset[j] = f3[8+(j*2)].GetUInt32();
+		}
 
 		m_members.insert(make_pair(gm->pPlayer, gm));
 
@@ -674,6 +692,7 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 	}
 
 	GuildMember * pm = new GuildMember;
+	memset(pm, 0, sizeof(GuildMember));
 	pm->pPlayer = pMember;
 	pm->pRank = r;
 	pm->szOfficerNote = pm->szPublicNote = NULL;
@@ -682,10 +701,6 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 	pMember->guild=this;
 	pMember->guildRank=r;
 	pMember->guildMember=pm;
-	pm->uItemWithdrawlsSinceLastReset=0;
-	pm->uLastItemWithdrawReset=0;
-	pm->uWithdrawlsSinceLastReset=0;
-	pm->uLastWithdrawReset=0;
 
 	if(pMember->m_loggedInPlayer)
 	{
@@ -1067,18 +1082,20 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 		{
 			data << r->iRights;
 			data << r->iGoldLimitPerDay;
-			data << r->iBankTabFlags;
-			data << r->iItemStacksPerDay;
-			data << r->iExtraRights[0];
-			data << r->iExtraRights[1];
-			data << r->iExtraRights[2];
-			data << r->iExtraRights[3];
-			data << r->iExtraRights[4];
-			data << r->iExtraRights[5];
-			data << r->iExtraRights[6];
-			data << r->iExtraRights[7];
-			data << r->iExtraRights[8];
-			data << r->iExtraRights[9];
+
+			// i would do this with one big memcpy but grr grr struct alignment
+			data << r->iTabPermissions[0].iFlags;
+			data << r->iTabPermissions[0].iStacksPerDay;
+			data << r->iTabPermissions[1].iFlags;
+			data << r->iTabPermissions[1].iStacksPerDay;
+			data << r->iTabPermissions[2].iFlags;
+			data << r->iTabPermissions[2].iStacksPerDay;
+			data << r->iTabPermissions[3].iFlags;
+			data << r->iTabPermissions[3].iStacksPerDay;
+			data << r->iTabPermissions[4].iFlags;
+			data << r->iTabPermissions[4].iStacksPerDay;
+			data << r->iTabPermissions[5].iFlags;
+			data << r->iTabPermissions[5].iStacksPerDay;
 		}
 	}
 
@@ -1179,36 +1196,36 @@ void Guild::BuyBankTab(WorldSession * pClient)
 	m_lock.Release();
 }
 
-uint32 GuildMember::CalculateAllowedItemWithdraws()
+uint32 GuildMember::CalculateAllowedItemWithdraws(uint32 tab)
 {
-	if(pRank->iItemStacksPerDay == 0)		// Unlimited
+	if(pRank->iTabPermissions[tab].iStacksPerDay == 0)		// Unlimited
 		return 0xFFFFFFFF;
 
-	if((UNIXTIME - uLastItemWithdrawReset) >= TIME_DAY)
-		return pRank->iItemStacksPerDay;
+	if((UNIXTIME - uLastItemWithdrawReset[tab]) >= TIME_DAY)
+		return pRank->iTabPermissions[tab].iStacksPerDay;
 	else
-		return (pRank->iItemStacksPerDay - uItemWithdrawlsSinceLastReset);
+		return (pRank->iTabPermissions[tab].iStacksPerDay - uItemWithdrawlsSinceLastReset[tab]);
 }
 
-void GuildMember::OnItemWithdraw()
+void GuildMember::OnItemWithdraw(uint32 tab)
 {
-	if(pRank->iItemStacksPerDay == 0)		// Unlimited
+	if(pRank->iTabPermissions[tab].iStacksPerDay == 0)		// Unlimited
 		return;
 
 	// reset the counter if a day has passed
-	if(((uint32)UNIXTIME - uLastItemWithdrawReset) >= TIME_DAY)
+	if(((uint32)UNIXTIME - uLastItemWithdrawReset[tab]) >= TIME_DAY)
 	{
-		uLastItemWithdrawReset = (uint32)UNIXTIME;
-		uItemWithdrawlsSinceLastReset = 1;
-		CharacterDatabase.Execute("UPDATE guild_data SET lastItemWithdrawReset = %u, itemWithdrawlsSinceLastReset = 1 WHERE playerid = %u",
-			uLastItemWithdrawReset, pPlayer->guid);
+		uLastItemWithdrawReset[tab] = (uint32)UNIXTIME;
+		uItemWithdrawlsSinceLastReset[tab] = 1;
+		CharacterDatabase.Execute("UPDATE guild_data SET lastItemWithdrawReset%u = %u, itemWithdrawlsSinceLastReset%u = 1 WHERE playerid = %u",
+			tab, uLastItemWithdrawReset, tab, pPlayer->guid);
 	}
 	else
 	{
 		// increment counter
-		uItemWithdrawlsSinceLastReset++;
-		CharacterDatabase.Execute("UPDATE guild_data SET itemWithdrawlsSinceLastReset = %u WHERE playerid = %u",
-			uItemWithdrawlsSinceLastReset, pPlayer->guid);
+		uItemWithdrawlsSinceLastReset[tab]++;
+		CharacterDatabase.Execute("UPDATE guild_data SET itemWithdrawlsSinceLastReset%u = %u WHERE playerid = %u",
+			tab, uItemWithdrawlsSinceLastReset, pPlayer->guid);
 	}
 }
 
