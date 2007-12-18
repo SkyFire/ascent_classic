@@ -1617,9 +1617,6 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 			++count;
 			data << uint8(updated_slot1);
 			data << uint32(0);
-			data << uint32(0);
-			data << uint32(0);
-			data << uint16(0);
 		}
 	}
 
@@ -1631,9 +1628,6 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 			++count;
 			data << uint8(updated_slot2);
 			data << uint32(0);
-			data << uint32(0);
-			data << uint32(0);
-			data << uint16(0);
 		}
 	}
 
