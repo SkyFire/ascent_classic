@@ -1325,9 +1325,18 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		if(wtf==0)		// depositing an item
 		{
 			// get the item
-			pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
+			//pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
+			pItem = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
 			if(pItem==NULL)
 				return;
+
+			if(pItem->IsSoulbound())
+			{
+				_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_CANT_DROP_SOULBOUND);
+				return;
+			}
+
+			_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
 
 			// remove owner association
 			pItem->SetOwner(NULL);
@@ -1355,6 +1364,12 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			pItem2 = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
 			if(pItem2 != NULL)
 			{
+				if(pItem->IsSoulbound())
+				{
+					_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_CANT_DROP_SOULBOUND);
+					return;
+				}
+
 				_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot,false);
 
 				// this actually means we're swapping.. urgh
