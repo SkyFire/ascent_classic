@@ -229,6 +229,14 @@ enum GuildLogEventE
 	GUILD_LOG_EVENT_LEFT		= 6,
 };
 
+enum GuildBankLogEvents
+{
+	GUILD_BANK_LOG_EVENT_DEPOSIT_ITEM	= 1,
+	GUILD_BANK_LOG_EVENT_WITHDRAW_ITEM	= 2,
+	GUILD_BANK_LOG_EVENT_DEPOSIT_MONEY	= 4,
+	GUILD_BANK_LOG_EVENT_WITHDRAW_MONEY	= 5,
+};
+
 #define ITEM_ENTRY_GUILD_CHARTER 5863
 #define ARENA_TEAM_CHARTER_2v2      23560
 #define ARENA_TEAM_CHARTER_2v2_COST 800000  // 80 G
@@ -243,14 +251,14 @@ enum GuildLogEventE
 struct SERVER_DECL GuildRankTabPermissions
 {
 	uint32 iFlags;
-	uint32 iStacksPerDay;
+	int32 iStacksPerDay;
 };
 
 struct SERVER_DECL GuildRank
 {
 	uint32 iId;
 	uint32 iRights;
-	uint32 iGoldLimitPerDay;
+	int32 iGoldLimitPerDay;
 	GuildRankTabPermissions iTabPermissions[MAX_GUILD_BANK_TABS];
 	char * szRankName;
 	bool CanPerformCommand(uint32 t);
@@ -283,12 +291,23 @@ struct SERVER_DECL GuildLogEvent
 	uint32 iEventData[3];
 };
 
+struct SERVER_DECL GuildBankEvent
+{
+	uint32 iLogId;
+	uint8 iAction;
+	uint32 uPlayer;
+	uint32 uEntry;
+	uint8 iStack;
+	uint32 uTimeStamp;
+};
+
 struct SERVER_DECL GuildBankTab
 {
 	uint8 iTabId;
 	char * szTabName;
 	char * szTabIcon;
 	Item * pSlots[MAX_GUILD_BANK_SLOTS];
+	list<GuildBankEvent*> lLog;
 };
 
 class Charter;
@@ -308,6 +327,12 @@ protected:
 public:
 	uint32 GenerateGuildLogEventId();
 	
+	/* guild bank logging calls
+	 */
+	void LogGuildBankActionMoney(uint8 iAction, uint32 uGuid, uint32 uAmount);
+	void LogGuildBankAction(uint8 iAction, uint32 uGuid, uint32 uEntry, uint8 iStack, GuildBankTab * pTab);
+	static void ClearOutOfDateLogEntries();
+
 	/* only call at first create/save */
 	void CreateInDB();
 
@@ -391,6 +416,7 @@ public:
 	/** Sends the guild log to a player.
 	 */
 	void SendGuildLog(WorldSession * pClient);
+	void SendGuildBankLog(WorldSession * pClient, uint8 iSlot);
 
 	/** Sets the public note for a player.
 	 */
@@ -518,6 +544,7 @@ protected:
 	 */
 	typedef list<GuildLogEvent*> GuildLogList;
 	GuildLogList m_log;
+	list<GuildBankEvent*> m_moneyLog;
 
 	/** Guild lock.
 	 */

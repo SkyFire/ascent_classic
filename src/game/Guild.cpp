@@ -230,13 +230,14 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions,
 			r->iId = i;
 			r->iRights=iPermissions;
 			r->szRankName = strdup(szRankName);
+			r->iGoldLimitPerDay = bFullGuildBankPermissions ? -1 : 0;
 
 			if(bFullGuildBankPermissions)
 			{
 				for(j = 0; j < MAX_GUILD_BANK_TABS; ++j)
 				{
 					r->iTabPermissions[j].iFlags = 3;			// this is both use tab and withdraw
-					r->iTabPermissions[j].iStacksPerDay = 0;	// 0 = unlimited
+					r->iTabPermissions[j].iStacksPerDay = -1;	// -1 = unlimited
 				}
 			}
 			m_ranks[i] = r;
@@ -1188,8 +1189,10 @@ void Guild::BuyBankTab(WorldSession * pClient)
 
 uint32 GuildMember::CalculateAllowedItemWithdraws(uint32 tab)
 {
-	if(pRank->iTabPermissions[tab].iStacksPerDay == 0)		// Unlimited
+	if(pRank->iTabPermissions[tab].iStacksPerDay == -1)		// Unlimited
 		return 0xFFFFFFFF;
+	if(pRank->iTabPermissions[tab].iStacksPerDay == 0)		// none
+		return 0;
 
 	if((UNIXTIME - uLastItemWithdrawReset[tab]) >= TIME_DAY)
 		return pRank->iTabPermissions[tab].iStacksPerDay;
@@ -1199,7 +1202,7 @@ uint32 GuildMember::CalculateAllowedItemWithdraws(uint32 tab)
 
 void GuildMember::OnItemWithdraw(uint32 tab)
 {
-	if(pRank->iTabPermissions[tab].iStacksPerDay == 0)		// Unlimited
+	if(pRank->iTabPermissions[tab].iStacksPerDay <= 0)		// Unlimited
 		return;
 
 	// reset the counter if a day has passed
@@ -1221,8 +1224,11 @@ void GuildMember::OnItemWithdraw(uint32 tab)
 
 uint32 GuildMember::CalculateAvailableAmount()
 {
-	if(pRank->iGoldLimitPerDay == 0)		// Unlimited
+	if(pRank->iGoldLimitPerDay == -1)		// Unlimited
 		return 0xFFFFFFFF;
+
+	if(pRank->iGoldLimitPerDay == 0)
+		return 0;
 
 	if((UNIXTIME - uLastWithdrawReset) >= TIME_DAY)
 		return pRank->iGoldLimitPerDay;
@@ -1232,7 +1238,7 @@ uint32 GuildMember::CalculateAvailableAmount()
 
 void GuildMember::OnMoneyWithdraw(uint32 amt)
 {
-	if(pRank->iGoldLimitPerDay == 0)		// Unlimited
+	if(pRank->iGoldLimitPerDay <= 0)		// Unlimited
 		return;
 
 	// reset the counter if a day has passed
@@ -1270,6 +1276,9 @@ void Guild::DepositMoney(WorldSession * pClient, uint32 uAmount)
 	char buf[20];
 	snprintf(buf, 20, I64FMT, (uint64)m_bankBalance);
 	LogGuildEvent(GUILD_EVENT_SETNEWBALANCE, 1, buf);
+
+	// log it!
+	LogGuildBankActionMoney(GUILD_BANK_LOG_EVENT_DEPOSIT_MONEY, pClient->GetPlayer()->GetGUIDLow(), uAmount);
 }
 
 void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
@@ -1302,4 +1311,131 @@ void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
 	char buf[20];
 	snprintf(buf, 20, I64FMT, (uint64)m_bankBalance);
 	LogGuildEvent(GUILD_EVENT_SETNEWBALANCE, 1, buf);
+
+	// log it!
+	LogGuildBankActionMoney(GUILD_BANK_LOG_EVENT_WITHDRAW_MONEY, pClient->GetPlayer()->GetGUIDLow(), uAmount);
+}
+
+void Guild::SendGuildBankLog(WorldSession * pClient, uint8 iSlot)
+{
+	if(iSlot > 6)
+		return;
+
+	m_lock.Acquire();
+	if(iSlot == 6)
+	{
+		// sending the money log
+		WorldPacket data(MSG_GUILD_BANK_LOG, (17*m_moneyLog.size()) + 2);
+		uint32 lt = (uint32)UNIXTIME;
+		data << uint8(0x06);
+		data << uint8((m_moneyLog.size() < 250) ? m_moneyLog.size() : 250);
+		list<GuildBankEvent*>::iterator itr = m_moneyLog.begin();
+		for(; itr != m_moneyLog.end(); ++itr)
+		{
+			data << (*itr)->iAction;
+			data << (*itr)->uPlayer;
+			data << uint32(0);		// highguid
+			data << (*itr)->uEntry;
+			data << uint32(lt - (*itr)->uTimeStamp);
+		}
+
+		m_lock.Release();
+		pClient->SendPacket(&data);
+	}
+	else
+	{
+		if(iSlot >= m_bankTabCount)
+		{
+			m_lock.Release();
+			return;
+		}
+
+		GuildBankTab * pTab = m_bankTabs[iSlot];
+		if(pTab == NULL)
+		{
+			m_lock.Release();
+			return;
+		}
+
+		WorldPacket data(MSG_GUILD_BANK_LOG, (17*m_moneyLog.size()) + 2);
+		uint32 lt = (uint32)UNIXTIME;
+		data << uint8(iSlot);
+		data << uint8((pTab->lLog.size() < 250) ? pTab->lLog.size() : 250);
+
+		list<GuildBankEvent*>::iterator itr = pTab->lLog.begin();
+		for(; itr != pTab->lLog.end(); ++itr)
+		{
+			data << (*itr)->iAction;
+			data << (*itr)->uPlayer;
+			data << uint32(0);			// highguid
+			data << (*itr)->uEntry;
+			data << (*itr)->iStack;
+			data << uint32(lt - (*itr)->uTimeStamp);
+		}
+		
+		m_lock.Release();
+		SendPacket(&data);
+	}
+}
+
+void Guild::LogGuildBankAction(uint8 iAction, uint32 uGuid, uint32 uEntry, uint8 iStack, GuildBankTab * pTab)
+{
+	GuildBankEvent * ev = new GuildBankEvent;
+	uint32 timest = (uint32)UNIXTIME;
+	ev->iAction = iAction;
+	ev->iStack = iStack;
+	ev->uEntry = uEntry;
+	ev->uPlayer = uGuid;
+	ev->uTimeStamp = timest;
+
+	m_lock.Acquire();
+
+	if(pTab->lLog.size() >= 250)
+	{
+		// pop one off the end
+		GuildBankEvent * ev2 = *(pTab->lLog.begin());
+		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE guildid = %u AND log_id = %u",
+			m_guildId, ev2->iLogId);
+
+		pTab->lLog.pop_front();
+		delete ev2;
+	}
+
+	ev->iLogId = GenerateGuildLogEventId();
+	pTab->lLog.push_back(ev);
+	m_lock.Release();
+
+	CharacterDatabase.Execute("INSERT INTO guild_banklogs VALUES(%u, %u, %u, %u, %u, %u, %u, %u)",
+		ev->iLogId, m_guildId, (uint32)pTab->iTabId, (uint32)iAction, uGuid, uEntry, (uint32)iStack, timest);
+}
+
+void Guild::LogGuildBankActionMoney(uint8 iAction, uint32 uGuid, uint32 uAmount)
+{
+	GuildBankEvent * ev = new GuildBankEvent;
+	uint32 timest = (uint32)UNIXTIME;
+	ev->iAction = iAction;
+	ev->iStack = 0;
+	ev->uEntry = uAmount;
+	ev->uPlayer = uGuid;
+	ev->uTimeStamp = timest;
+
+	m_lock.Acquire();
+
+	if(m_moneyLog.size() >= 250)
+	{
+		// pop one off the end
+		GuildBankEvent * ev2 = *(m_moneyLog.begin());
+		CharacterDatabase.Execute("DELETE FROM guild_banklogs WHERE guildid = %u AND log_id = %u",
+			m_guildId, ev2->iLogId);
+
+		m_moneyLog.pop_front();
+		delete ev2;
+	}
+
+	ev->iLogId = GenerateGuildLogEventId();
+	m_moneyLog.push_back(ev);
+	m_lock.Release();
+
+	CharacterDatabase.Execute("INSERT INTO guild_banklogs VALUES(%u, %u, 6, %u, %u, %u, 0, %u)",
+		ev->iLogId, m_guildId, (uint32)iAction, uGuid, uAmount, timest);
 }

@@ -770,6 +770,8 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_GUILD_BANK_WITHDRAW_MONEY].handler				= &WorldSession::HandleGuildBankWithdrawMoney;
 	WorldPacketHandlers[CMSG_GUILD_BANK_DEPOSIT_MONEY].handler				= &WorldSession::HandleGuildBankDepositMoney;
 	WorldPacketHandlers[CMSG_GUILD_BANK_VIEW_TAB].handler					= &WorldSession::HandleGuildBankViewTab;
+	WorldPacketHandlers[MSG_GUILD_BANK_LOG].handler							= &WorldSession::HandleGuildBankViewLog;
+	WorldPacketHandlers[MSG_GUILD_GET_FULL_PERMISSIONS].handler				= &WorldSession::HandleGuildGetFullPermissions;
 	
 	// Tutorials
 	WorldPacketHandlers[CMSG_TUTORIAL_FLAG].handler							 = &WorldSession::HandleTutorialFlag;

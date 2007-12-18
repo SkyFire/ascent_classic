@@ -1449,6 +1449,10 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			pSourceItem->SetOwner(NULL);
 			pSourceItem->SetUInt32Value(ITEM_FIELD_OWNER, 0);
 			pSourceItem->SaveToDB(0, 0, false);
+
+			/* log it */
+			pGuild->LogGuildBankAction(GUILD_BANK_LOG_EVENT_DEPOSIT_ITEM, _player->GetGUIDLow(), pSourceItem->GetEntry(), 
+				(uint8)pSourceItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT), pTab);
 		}
 
 		/* pDestItem = Item from bank coming into players backpack */
@@ -1470,6 +1474,12 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 				/* this *really* shouldn't happen. */
 				pDestItem->DeleteFromDB();
 				delete pDestItem;
+			}
+			else
+			{
+				/* log it */
+				pGuild->LogGuildBankAction(GUILD_BANK_LOG_EVENT_WITHDRAW_ITEM, _player->GetGUIDLow(), pDestItem->GetEntry(), 
+					(uint8)pDestItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT), pTab);
 			}
 		}
 
@@ -1634,4 +1644,39 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 #endif
 
 	pClient->SendPacket(&data);
+}
+
+void WorldSession::HandleGuildGetFullPermissions(WorldPacket & recv_data)
+{
+	WorldPacket data(MSG_GUILD_GET_FULL_PERMISSIONS, 61);
+	GuildRank * pRank = _player->GetGuildRankS();
+	uint32 i;
+
+	if(_player->GetGuild() == NULL)
+		return;
+
+	data << pRank->iId;
+	data << pRank->iRights;
+
+	data << pRank->iGoldLimitPerDay;
+
+	for(i = 0; i < MAX_GUILD_BANK_TABS; ++i) {
+		data << pRank->iTabPermissions[i].iFlags;
+		data << pRank->iTabPermissions[i].iStacksPerDay;
+	}
+
+	data << uint8(0);
+	SendPacket(&data);
+}
+
+void WorldSession::HandleGuildBankViewLog(WorldPacket & recv_data)
+{
+	/* slot 6 = i'm requesting money log */
+	uint8 slotid;
+	recv_data >> slotid;
+
+	if(_player->GetGuild() == NULL)
+		return;
+
+	_player->GetGuild()->SendGuildBankLog(this, slotid);
 }

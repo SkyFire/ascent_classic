@@ -559,6 +559,7 @@ protected:
 	void HandleGuildBankWithdrawItem(WorldPacket & recv_data);
 	void HandleGuildBankGetAvailableAmount(WorldPacket & recv_data);
 	void HandleGuildBankModifyTab(WorldPacket & recv_data);
+	void HandleGuildGetFullPermissions(WorldPacket & recv_data);
 
 	// Pet
 	void HandlePetAction(WorldPacket & recv_data);

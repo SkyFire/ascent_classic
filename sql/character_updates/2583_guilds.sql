@@ -44,6 +44,37 @@ LOCK TABLES `guild_bankitems` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `guild_banklogs`
+--
+
+DROP TABLE IF EXISTS `guild_banklogs`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `guild_banklogs` (
+  `log_id` int(30) NOT NULL,
+  `guildid` int(30) NOT NULL,
+  `tabid` int(30) NOT NULL COMMENT 'tab 6 is money logs',
+  `action` int(5) NOT NULL,
+  `player_guid` int(30) NOT NULL,
+  `item_entry` int(30) NOT NULL,
+  `stack_count` int(30) NOT NULL,
+  `timestamp` int(30) NOT NULL,
+  PRIMARY KEY (`log_id`,`guildid`),
+  KEY `a` (`guildid`),
+  KEY `b` (`tabid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `guild_banklogs`
+--
+
+LOCK TABLES `guild_banklogs` WRITE;
+/*!40000 ALTER TABLE `guild_banklogs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `guild_banklogs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `guild_banktabs`
 --
 
@@ -106,6 +137,7 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `guild_data` WRITE;
 /*!40000 ALTER TABLE `guild_data` DISABLE KEYS */;
+INSERT INTO `guild_data` VALUES (2,1,0,'','',0,0,0,0,0,0,0,0,0,0,0,0,0,0),(2,4,4,'','',0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 /*!40000 ALTER TABLE `guild_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -133,6 +165,7 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `guild_logs` WRITE;
 /*!40000 ALTER TABLE `guild_logs` DISABLE KEYS */;
+INSERT INTO `guild_logs` VALUES (2,2,1198008687,4,1,4,0),(2,3,1198008697,3,1,4,0),(2,4,1198008700,3,1,4,0),(2,5,1198008711,3,1,4,0),(2,6,1198008714,4,1,4,0),(2,7,1198008715,4,1,4,0),(2,8,1198008715,4,1,4,0);
 /*!40000 ALTER TABLE `guild_logs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -160,7 +193,8 @@ CREATE TABLE `guild_ranks` (
   `bankTabFlags4` int(30) NOT NULL DEFAULT '0',
   `itemStacksPerDay4` int(30) NOT NULL DEFAULT '0',
   `bankTabFlags5` int(30) NOT NULL DEFAULT '0',
-  `itemStacksPerDay5` int(30) NOT NULL DEFAULT '0'
+  `itemStacksPerDay5` int(30) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guildId`,`rankId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
@@ -170,6 +204,7 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `guild_ranks` WRITE;
 /*!40000 ALTER TABLE `guild_ranks` DISABLE KEYS */;
+INSERT INTO `guild_ranks` VALUES (1,0,'Guild Master',127487,0,3,0,3,0,3,0,3,0,3,0,3,0),(1,1,'Officer',127487,0,3,0,3,0,3,0,3,0,3,0,3,0),(1,2,'Veteran',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(1,3,'Member',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(1,4,'Initiate',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(2,0,'Guild Master',127487,0,3,0,3,0,3,0,3,0,3,0,3,0),(2,1,'Officer',127487,0,3,0,3,0,3,0,3,0,3,0,3,0),(2,2,'Veteran',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(2,3,'Member',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(2,4,'Initiate',67,0,0,0,0,0,0,0,0,0,0,0,0,0);
 /*!40000 ALTER TABLE `guild_ranks` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,7 +231,7 @@ CREATE TABLE `guilds` (
   `bankBalance` int(30) NOT NULL,
   PRIMARY KEY (`guildId`),
   UNIQUE KEY `guildId` (`guildId`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -205,6 +240,7 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `guilds` WRITE;
 /*!40000 ALTER TABLE `guilds` DISABLE KEYS */;
+INSERT INTO `guilds` VALUES (1,'Moolicious',1,0,0,0,0,0,'','',0,0,0),(2,'Moooo',1,0,0,0,0,0,'','',0,0,0);
 /*!40000 ALTER TABLE `guilds` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -217,4 +253,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2007-12-18 19:35:59
+-- Dump completed on 2007-12-18 21:44:22
