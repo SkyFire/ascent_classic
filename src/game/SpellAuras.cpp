@@ -3744,12 +3744,6 @@ void Aura::SpellAuraPeriodicLeech(bool apply)
 	{
 		SetNegative();
 		uint32 amt = mod->m_amount;
-		/*if(GetSpellProto()->SpellGroupType)
-		{
-			Unit*c=GetUnitCaster();
-			if(c)
-			SM_PIValue(c->SM_PEffectBonus,(int32*)&amt,GetSpellProto()->SpellGroupType);
-		}*/
 		sEventMgr.AddEvent(this, &Aura::EventPeriodicLeech,amt,
 			EVENT_AURA_PERIODIC_LEECH,	GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
@@ -3766,6 +3760,9 @@ void Aura::EventPeriodicLeech(uint32 amount)
 	{
 		if(m_target->SchoolImmunityList[GetSpellProto()->School])
 			return;
+
+		//zack: latest new is that this spell uses spell damage bonus only and not healing bonus
+		amount += m_caster->GetSpellDmgBonus(m_target,GetSpellProto(),amount)*50/100;
 	
 		uint32 Amount = min(amount,m_target->GetUInt32Value(UNIT_FIELD_HEALTH));
 
@@ -3787,17 +3784,7 @@ void Aura::EventPeriodicLeech(uint32 amount)
 			downrank2 = 1.0f;
 			healdoneaffectperc *= downrank1 * downrank2;
 		}
-		Amount += float2int32(m_caster->HealDoneMod[GetSpellProto()->School] * healdoneaffectperc);*/
-		Amount += m_caster->HealDoneMod[GetSpellProto()->School];
-		Amount += (Amount*m_caster->HealDonePctMod[GetSpellProto()->School])/100;
-		Amount += m_caster->HealTakenMod[GetSpellProto()->School];//amt of health that u RECIVE, not heal
-		Amount += float2int32(m_caster->HealTakenPctMod[GetSpellProto()->School]*Amount);
-		if(m_caster->IsPlayer())  
-		{
-			Player *p_caster=(Player*)m_caster;
-			Amount += float2int32(p_caster->SpellHealDoneByInt[GetSpellProto()->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
-			Amount += float2int32(p_caster->SpellHealDoneBySpr[GetSpellProto()->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
-		}
+		*/
 
 		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
 		

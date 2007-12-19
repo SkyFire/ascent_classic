@@ -53,5 +53,5 @@ where name like "%Improved Expose Armor%";
 #SELECT id,name,description from dbc_spell where EffectImplicitTargetA_1=30 or EffectImplicitTargetA_2=30 or EffectImplicitTargetA_1=30 or EffectImplicitTargetB_1=30 or EffectImplicitTargetB_2=30 or EffectImplicitTargetB_3=30
 
 
-/////////////////////////// not working talent 107/108 selector
-and (((EffectApplyAuraName_1=107 or EffectApplyAuraName_1=108) and EffectSpellGroupRelation_1=0) or ((EffectApplyAuraName_2=107 or EffectApplyAuraName_2=108) and EffectSpellGroupRelation_2=0) or ((EffectApplyAuraName_3=107 or EffectApplyAuraName_3=108) and EffectSpellGroupRelation_3=0))
+#/////////////////////////// not working talent 107/108 selector
+#and (((EffectApplyAuraName_1=107 or EffectApplyAuraName_1=108) and EffectSpellGroupRelation_1=0) or ((EffectApplyAuraName_2=107 or EffectApplyAuraName_2=108) and EffectSpellGroupRelation_2=0) or ((EffectApplyAuraName_3=107 or EffectApplyAuraName_3=108) and EffectSpellGroupRelation_3=0))
