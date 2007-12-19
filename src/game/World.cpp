@@ -2573,9 +2573,26 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(19490);
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
-	sp = dbcSpell.LookupEntry(36413);
+
+	//Hunter : Improved Barrage
+	sp = dbcSpell.LookupEntry(35104);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+	{
+		sp->EffectSpellGroupRelation[0] = 4096;
+		sp->EffectSpellGroupRelation[1] = 8192;
+	}
+	sp = dbcSpell.LookupEntry(35110);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 4096;
+		sp->EffectSpellGroupRelation[1] = 8192;
+	}
+	sp = dbcSpell.LookupEntry(35111);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 4096;
+		sp->EffectSpellGroupRelation[1] = 8192;
+	}
 
 	// general - clearcasting
 	sp = dbcSpell.LookupEntry(12536);

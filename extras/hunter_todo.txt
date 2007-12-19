@@ -18,7 +18,6 @@ Serpent's Swiftness: increases only your attack speed (inc pet attack speed)
 The Beast Within: doesn't work (adds a buff for hunter onBestial Wrath)
 --MM--
 Improved Hunter's Mark: doesn't work (grants also +melee ap)
-Improved Barrage: Doesn't work (inc crit, channeling interrupt avoidance)
 --SUR--
 Hawk Eye: doesn't apply on autoshot (inc range)
 Entrapment: doesn't work (chance to trigger entrapment - 19185)
