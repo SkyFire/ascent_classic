@@ -133,6 +133,7 @@ Zack - test my shit :
 - Hunter : Improved Stings 19468
 - Hunter : Mortal Shots 19490
 - Hunter : Improved Barrage 35111
+- Hunter : Clever Traps 19245
 
 ==========================================================================
 Capt - test my shit :

@@ -2594,6 +2594,33 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 8192;
 	}
 
+	//Hunter : Clever Traps
+	sp = dbcSpell.LookupEntry(19239);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 16 | 8;
+		sp->EffectSpellGroupRelation[0] = 4;
+		sp->EffectSpellGroupRelation[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry(19245);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 16 | 8;
+		sp->EffectSpellGroupRelation[0] = 4;
+		sp->EffectSpellGroupRelation[0] = 128;
+	}
+
+/*	//Hunter : Entrapment
+	sp = dbcSpell.LookupEntry(19184);
+	if(sp)
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	sp = dbcSpell.LookupEntry(19387);
+	if(sp)
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	sp = dbcSpell.LookupEntry(19388);
+	if(sp)
+		sp->procFlags = PROC_ON_CAST_SPELL;*/
+
 	// general - clearcasting
 	sp = dbcSpell.LookupEntry(12536);
 	if(sp)

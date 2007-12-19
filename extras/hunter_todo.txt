@@ -19,9 +19,7 @@ The Beast Within: doesn't work (adds a buff for hunter onBestial Wrath)
 --MM--
 Improved Hunter's Mark: doesn't work (grants also +melee ap)
 --SUR--
-Hawk Eye: doesn't apply on autoshot (inc range)
 Entrapment: doesn't work (chance to trigger entrapment - 19185)
-Clever Traps: doesn't work (inc duarion, damage... onyl changes tooltip)
 Surefoot: +hit works, not sure about the other part
 Killer Instinct: Increases only melee crit chance 
 Resourcefullness: doesn't work (reduces mana cost and duration)
