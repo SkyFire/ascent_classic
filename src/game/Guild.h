@@ -537,8 +537,7 @@ protected:
 
 	/** Guild Rank Information.
 	 */
-	typedef vector<GuildRank*> GuildRankVector;
-	GuildRankVector m_ranks;
+	GuildRank * m_ranks[MAX_GUILD_RANKS];
 
 	/** Guild log. Ordered in first event -> last event.
 	 */
@@ -552,7 +551,6 @@ protected:
 
 	/** finds the lowest rank
 	 */
-	GuildRank * FindNextLowestRank(GuildRank * r);
 	GuildRank * FindLowestRank();
 	GuildRank * FindHighestRank();
 };

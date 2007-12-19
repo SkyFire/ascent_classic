@@ -377,70 +377,53 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 
 void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)
 {
-	/*CHECK_PACKET_SIZE(recv_data, 1);
-	WorldPacket data;
-	Guild *pGuild;
-	std::string rankname;
+	string rankName;
+	Guild * pGuild = _player->GetGuild();
 
-	pGuild = objmgr.GetGuild(GetPlayer()->GetGuildId());
-	if(!pGuild)
+	if(pGuild == NULL)
 	{
-		//not in Guild
-		SendGuildCommandResult(GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S, "", GUILD_PLAYER_NOT_IN_GUILD);
 		return;
 	}
 
-	if(GetPlayer()->GetGUID() != pGuild->GetGuildLeaderGuid())
+	if(pGuild->GetGuildLeader() != _player->GetGUIDLow())
 	{
-		//not GuildMaster
-		SendGuildCommandResult(GUILD_INVITE_S,"",GUILD_PERMISSIONS);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S, "", GUILD_PERMISSIONS);
 		return;
 	}
 
-	recv_data >> rankname;
+	recv_data >> rankName;
+	if(rankName.size() < 2)
+		return;
 
-	pGuild->CreateRank(rankname,GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
+	pGuild->CreateGuildRank(rankName.c_str(), GR_RIGHT_DEFAULT, false);
 
-	pGuild->FillQueryData(&data);
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-
-	data.clear();
-	//Maybe theres an event for this
-	pGuild->FillGuildRosterData(&data);
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-
-	pGuild->SaveRanksToDb();*/
+	// there is probably a command result for this. need to find it.
+	pGuild->SendGuildQuery(this);
+	pGuild->SendGuildRoster(this);
 }
 
 void WorldSession::HandleGuildDelRank(WorldPacket & recv_data)
 {
-	/*WorldPacket data;
-	Guild *pGuild;
+	Guild * pGuild = _player->GetGuild();
 
-	pGuild = objmgr.GetGuild(GetPlayer()->GetGuildId());	
-	if(!pGuild)
+	if(pGuild == NULL)
 	{
-		SendGuildCommandResult(GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S, "", GUILD_PLAYER_NOT_IN_GUILD);
 		return;
 	}
 
-	if(GetPlayer()->GetGUID() != pGuild->GetGuildLeaderGuid())
+	if(pGuild->GetGuildLeader() != _player->GetGUIDLow())
 	{
-		SendGuildCommandResult(GUILD_INVITE_S,"",GUILD_PERMISSIONS);
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S, "", GUILD_PERMISSIONS);
 		return;
 	}
 
-	pGuild->DelRank();
+	pGuild->RemoveGuildRank(this);
 
-	pGuild->FillQueryData(&data);
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-	data.clear();
-
-	//Maybe theres an event for this
-	pGuild->FillGuildRosterData(&data);
-	pGuild->SendMessageToGuild(0, &data, G_MSGTYPE_ALL);
-
-	pGuild->SaveRanksToDb();*/
+	// there is probably a command result for this. need to find it.
+	pGuild->SendGuildQuery(this);
+	pGuild->SendGuildRoster(this);
 }
 
 void WorldSession::HandleGuildSetPublicNote(WorldPacket & recv_data)
@@ -1545,7 +1528,10 @@ void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 	uint64 guid;
 
 	if(!_player->IsInWorld() || _player->m_playerInfo->guild==NULL)
+	{
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S, "", GUILD_PLAYER_NOT_IN_GUILD);
 		return;
+	}
 
 	recv_data >> guid;
 	pObj = _player->GetMapMgr()->GetGameObject((uint32)guid);
@@ -1682,12 +1668,7 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 		}
 	}
 
-#ifdef USING_BIG_ENDIAN
-	*(uint8*)&data.contents()[pos] = swap16(count);
-#else
 	*(uint8*)&data.contents()[pos] = (uint8)count;
-#endif
-
 	pClient->SendPacket(&data);
 }
 

@@ -37,6 +37,7 @@ Guild::Guild()
 	m_bankBalance =0;
 	m_bankTabCount=0;
 	creationDay=creationMonth=creationYear=0;
+	memset(m_ranks, 0, sizeof(GuildRank*)*MAX_GUILD_RANKS);
 }
 
 Guild::~Guild()
@@ -50,12 +51,12 @@ Guild::~Guild()
 		delete itr->second;
 	}
 
-	for(GuildRankVector::iterator itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
+	for(uint32 i = 0; i < MAX_GUILD_RANKS; ++i)
 	{
-		if((*itr) != NULL)
+		if(m_ranks[i] != NULL)
 		{
-			free((*itr)->szRankName);
-			delete (*itr);
+			free(m_ranks[i]->szRankName);
+			delete m_ranks[i];
 		}
 	}
 
@@ -91,51 +92,25 @@ void Guild::SendGuildCommandResult(WorldSession * pClient, uint32 iCmd, const ch
 
 GuildRank * Guild::FindLowestRank()
 {
-	GuildRank * r= NULL;
-	for(GuildRankVector::iterator itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
+	for(uint32 i = MAX_GUILD_RANKS-1; i > 0; ++i)
 	{
-		if((*itr) != NULL)
-		{
-			if((*itr)->iId != 0 && (!r || (*itr)->iId > r->iId))
-				r = *itr;
-		}
+		if(m_ranks[i] != NULL)
+			return m_ranks[i];
 	}
 
-	return r;
+	return NULL;
 }
 
 GuildRank * Guild::FindHighestRank()
 {
-	GuildRank * r= NULL;
-	for(GuildRankVector::iterator itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
+	for(uint32 i = 1; i < MAX_GUILD_RANKS; ++i)
 	{
-		if((*itr) != NULL)
-		{
-			if((*itr)->iId != 0 && (!r || (*itr)->iId < r->iId))
-				r = *itr;
-		}
+		if(m_ranks[i] != NULL)
+			return m_ranks[i];
 	}
 
-	return r;
+	return NULL;
 }
-
-GuildRank * Guild::FindNextLowestRank(GuildRank * r)
-{
-	GuildRank * rr= r;
-	for(GuildRankVector::iterator itr = m_ranks.begin(); itr != m_ranks.end(); ++itr)
-	{
-		if((*itr) != NULL)
-		{
-			if((*itr)->iId != 0 && ((*itr)->iId > rr->iId))
-				rr = *itr;
-		}
-	}
-	if(rr=r)
-		rr=NULL;
-
-	return rr;
-}
-
 
 bool GuildRank::CanPerformCommand(uint32 t)
 {
@@ -252,7 +227,7 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions,
 			m_lock.Release();
 
 			// save the rank into the database
-			CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
+			CharacterDatabase.Execute("INSERT INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
 				m_guildId, i, CharacterDatabase.EscapeString(string(szRankName)).c_str(),
 				r->iRights, r->iGoldLimitPerDay,
 				r->iTabPermissions[0].iFlags, r->iTabPermissions[0].iStacksPerDay,
@@ -261,6 +236,8 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions,
 				r->iTabPermissions[3].iFlags, r->iTabPermissions[3].iStacksPerDay,
 				r->iTabPermissions[4].iFlags, r->iTabPermissions[4].iStacksPerDay,
 				r->iTabPermissions[5].iFlags, r->iTabPermissions[5].iStacksPerDay);
+
+			Log.Notice("Guild", "Created rank %u on guild %u (%s)", i, m_guildId, szRankName);
 
 			return r;
 		}
@@ -278,7 +255,6 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 	m_guildId = objmgr.GenerateGuildId();
 	m_guildName = strdup(pCharter->GuildName.c_str());
 	m_guildLeader = pCharter->LeaderGuid;
-	m_ranks.resize(MAX_GUILD_RANKS, NULL);
 
 	// create the guild in the database
 	CreateInDB();
@@ -450,7 +426,6 @@ bool Guild::LoadFromDB(Field * f)
 	if(result==NULL)
 		return false;
 
-	m_ranks.resize(MAX_GUILD_RANKS, NULL);
 	uint32 sid = 0;
 
 	do 
@@ -895,7 +870,7 @@ void Guild::RemoveGuildRank(WorldSession * pClient)
 	m_lock.Acquire();
 
 	GuildRank * pLowestRank = FindLowestRank();
-	if(pLowestRank = NULL)
+	if(pLowestRank == NULL || pLowestRank->iId <= 5)		// cannot delete default ranks.
 	{
 		pClient->SystemMessage("Cannot find a rank to delete.");
 		m_lock.Release();
@@ -1089,6 +1064,8 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 	GuildRank * r;
 	Player * pPlayer;
 	uint32 i;
+	uint32 c =0;
+	uint32 pos;
 	GuildRank * myRank;
 	bool ofnote;
 	if(pClient->GetPlayer()->m_playerInfo->guild != this)
@@ -1110,22 +1087,13 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 	else
 		data << uint8(0);
 
+	pos = (uint32)data.wpos();
 	data << uint32(MAX_GUILD_RANKS);
 
 	for(i = 0; i < MAX_GUILD_RANKS; ++i)
 	{
 		r = m_ranks[i];
-		if(r == NULL)
-		{
-			data << uint64(0);
-			data << uint64(0);
-			data << uint64(0);
-			data << uint64(0);
-			data << uint64(0);
-			data << uint64(0);
-			data << uint64(0);
-		}
-		else
+		if(r != NULL)
 		{
 			data << r->iRights;
 			data << r->iGoldLimitPerDay;
@@ -1143,8 +1111,15 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 			data << r->iTabPermissions[4].iStacksPerDay;
 			data << r->iTabPermissions[5].iFlags;
 			data << r->iTabPermissions[5].iStacksPerDay;
+
+			++c;
 		}
 	}
+#ifdef USING_BIG_ENDIAN
+	*(uint32*)&data.contents()[pos] = swap32(c);
+#else
+	*(uint32*)&data.contents()[pos] = c;
+#endif
 
 	for(itr = m_members.begin(); itr != m_members.end(); ++itr)
 	{
