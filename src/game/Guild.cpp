@@ -92,7 +92,7 @@ void Guild::SendGuildCommandResult(WorldSession * pClient, uint32 iCmd, const ch
 
 GuildRank * Guild::FindLowestRank()
 {
-	for(uint32 i = MAX_GUILD_RANKS-1; i > 0; ++i)
+	for(uint32 i = MAX_GUILD_RANKS-1; i > 0; --i)
 	{
 		if(m_ranks[i] != NULL)
 			return m_ranks[i];
