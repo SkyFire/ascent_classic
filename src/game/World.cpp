@@ -2506,7 +2506,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(34497);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
 		sp->procChance = sp->EffectBasePoints[0]+1;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 34720;
@@ -2514,7 +2514,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(34498);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
 		sp->procChance = sp->EffectBasePoints[0]+1;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 34720;
@@ -2522,7 +2522,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(34499);
 	if(sp)
 	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
 		sp->procChance = sp->EffectBasePoints[0]+1;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 34720;

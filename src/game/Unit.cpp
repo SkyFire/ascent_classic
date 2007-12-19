@@ -5388,6 +5388,26 @@ void CombatStatusHandler::TryToClearAttackTargets()
 	}
 }
 
+void CombatStatusHandler::AttackersForgetHate()
+{
+	AttackerMap::iterator i, i2;
+	Unit * pt;
+
+	for(i = m_attackTargets.begin(); i != m_attackTargets.end();)
+	{
+		i2 = i++;
+		pt = m_Unit->GetMapMgr()->GetUnit(*i2);
+		if(pt == NULL)
+		{
+			m_attackTargets.erase(i2);
+			continue;
+		}
+
+		if(pt->GetAIInterface())
+			pt->GetAIInterface()->RemoveThreatByPtr(m_Unit);
+	}
+}
+
 void Unit::CancelSpell(Spell * ptr)
 {
 	ptr->cancel();

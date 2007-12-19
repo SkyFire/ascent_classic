@@ -4246,6 +4246,9 @@ void Aura::SpellAuraFeighDeath(bool apply)
 			data << uint8(0);
 			data << uint32(m_spellProto->Id);		// ???
 			pTarget->GetSession()->SendPacket(&data);
+
+			//now get rid of mobs agro
+//			pTarget->CombatStatus.AttackersForgetHate();
 		}
 		else
 		{

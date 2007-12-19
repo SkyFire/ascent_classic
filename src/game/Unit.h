@@ -629,6 +629,7 @@ public:
 	inline const uint64& GetPrimaryAttackTarget() { return m_primaryAttackTarget; }
 	inline void SetUnit(Unit * p) { m_Unit = p; }
 	void TryToClearAttackTargets();									// for pvp timeout
+	void AttackersForgetHate();										// used right now for Feign Death so attackers go home
 
 protected:
 	bool InternalIsInCombat();										// called by UpdateFlag, do not call from anything else!
