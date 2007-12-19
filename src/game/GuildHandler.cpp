@@ -1361,6 +1361,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 
 			// pull the item from the slot
 			_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
+            pSourceItem->RemoveFromWorld();
 		}
 
 		/* perform the swap. */
