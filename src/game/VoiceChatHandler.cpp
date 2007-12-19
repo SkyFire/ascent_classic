@@ -77,6 +77,9 @@ void WorldSession::HandleChannelVoiceQueryOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleVoiceChatQueryOpcode(WorldPacket & recv_data)
 {
+	if(!sVoiceChatHandler.CanUseVoiceChat())
+		return;
+
 	uint32 type;
 	string name;
 	recv_data >> type >> name;

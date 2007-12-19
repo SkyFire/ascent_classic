@@ -917,6 +917,7 @@ void Guild::Disband()
 	{
 		itr->first->guild=NULL;
 		itr->first->guildRank=NULL;
+		itr->first->guildMember=NULL;
 		if(itr->first->m_loggedInPlayer != NULL)
 		{
 			itr->first->m_loggedInPlayer->SetGuildId(0);
