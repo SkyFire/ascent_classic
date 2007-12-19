@@ -17,6 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+#ifndef __LUAENGINE_H
+#define __LUAENGINE_H
+
+#ifndef ENABLE_LUA_SCRIPTING
+
+/** Macros for calling lua-based events
+ */
+#define LUA_ON_UNIT_EVENT(unit,eventtype,miscunit,misc) 
+#define LUA_ON_QUEST_EVENT(plr,quest,eventtype,miscobject)
+#define LUA_ON_GO_EVENT(go,evtype,miscunit) 
+#define LUA_CALL_FUNC(unit,funcname) 
+
+#else
+
 /** Macros for calling lua-based events
  */
 #define LUA_ON_UNIT_EVENT(unit,eventtype,miscunit,misc) if(unit->GetTypeId()==TYPEID_UNIT && unit->IsInWorld()) { unit->GetMapMgr()->GetScriptEngine()->OnUnitEvent(unit,eventtype,miscunit,misc); }
@@ -144,3 +159,7 @@ public:
 
 	void ReloadScripts();
 };
+
+#endif
+#endif
+
