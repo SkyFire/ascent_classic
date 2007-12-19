@@ -6626,6 +6626,7 @@ void Player::Gossip_Complete()
 void Player::ZoneUpdate(uint32 ZoneId)
 {
 	m_zoneId = ZoneId;
+	m_playerInfo->lastZone = ZoneId;
 	sHookInterface.OnZone(this, ZoneId);
 
 	AreaTable * at = dbcArea.LookupEntry(GetAreaID());
@@ -6976,6 +6977,7 @@ void Player::ApplyLevelInfo(LevelInfo* Info, uint32 Level)
 	_UpdateMaxSkillCounts();
 	UpdateStats();
 	//UpdateChances();	
+	m_playerInfo->lastLevel = Level;
 
 	sLog.outDetail("Player %s set parameters to level %u", GetName(), Level);
 }

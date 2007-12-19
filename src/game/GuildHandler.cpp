@@ -861,67 +861,6 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 		Guild *pGuild = Guild::Create();
 		pGuild->CreateFromCharter(gc, this);
 
-/*		uint32 guildId = pGuild->GetFreeGuildIdFromDb();
-
-		if(guildId == 0)
-		{
-			printf("Error Getting Free Guild ID");
-			delete pGuild;
-			return;
-		}
-
-		//Guild Setup
-		pGuild->SetGuildId( guildId );
-		pGuild->SetGuildName( gc->GuildName );
-		pGuild->CreateRank("Guild Master", GR_RIGHT_ALL);
-		pGuild->CreateRank("Officer", GR_RIGHT_ALL);
-		pGuild->CreateRank("Veteran", GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);  
-		pGuild->CreateRank("Member", GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
-		pGuild->CreateRank("Initiate", GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
-		pGuild->SetGuildEmblemStyle( 0xFFFF );
-		pGuild->SetGuildEmblemColor( 0xFFFF );
-		pGuild->SetGuildBorderStyle( 0xFFFF );
-		pGuild->SetGuildBorderColor( 0xFFFF );
-		pGuild->SetGuildBackgroundColor( 0xFFFF );
-
-		objmgr.AddGuild(pGuild);
-
-		//Guild Leader Setup
-		_player->SetGuildId( pGuild->GetGuildId() );
-		_player->SetGuildRank(GUILDRANK_GUILD_MASTER);
-		pGuild->SetGuildLeaderGuid( _player->GetGUID() );
-		pGuild->AddNewGuildMember( _player );
-
-		//Other Guild Members Setup
-		Player *pMember;  
-
-		for(uint32 x=0;x<9;x++)
-		{	   
-			pMember = objmgr.GetPlayer(gc->Signatures[x]);
-			if(pMember)//online
-			{
-				pMember->SetGuildId( pGuild->GetGuildId() );
-				pMember->SetGuildRank(GUILDRANK_MEMBER);		
-				//Charters
-				pMember->m_charters[gc->CharterType] = 0;
-				pMember->SaveToDB(false);
-			}
-			else
-			{
-				CharacterDatabase.Execute("UPDATE characters SET guildid = %u WHERE guid = %u", pGuild->GetGuildId(), gc->Signatures[x]);
-				CharacterDatabase.Execute("UPDATE characters SET guildRank = %u WHERE guid = %u", GUILDRANK_MEMBER, gc->Signatures[x]);
-			}
-
-			PlayerInfo *p=objmgr.GetPlayerInfo(gc->Signatures[x]);
-			if(!p)continue;//this should not ever happen though
-			p->Rank = GUILDRANK_MEMBER;
-			pGuild->AddGuildMember(p);			
-		}	
-
-		pGuild->SaveToDb();
-		pGuild->SaveAllGuildMembersToDb();
-		pGuild->SaveRanksToDb();*/
-
 		// Destroy the charter
 		_player->m_charters[CHARTER_TYPE_GUILD] = 0;
 		gc->Destroy();
