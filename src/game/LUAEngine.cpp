@@ -264,14 +264,17 @@ void LuaEngine::LoadScripts()
 
 	while(filecount--)
 	{
-		char * fn = strrchr(list[filecount]->d_name, '\\');
-		if(!fn)
-			fn=list[filecount]->d_name;
-		char * ext = strrchr(list[filecount]->d_name, '.');
-		if(!stricmp(ext, ".lua"))
-			luaFiles.insert(string(fn));
+		ext = strrchr(list[filecount]->d_name, '.');
+		if(ext != NULL && !strcmp(ext, ".lua"))
+			{
+				string full_path = string(list[filecount]->d_name);
+				luaFiles.insert(string(full_path.c_str()));
+		}
 		else if(!stricmp(ext, ".luc"))
-			luaBytecodeFiles.insert(string(fn));
+		{
+		string full_path = string(list[filecount]->d_name);
+		luaBytecodeFiles.insert(string(full_path.c_str()));
+		}
 
 		free(list[filecount]);
 	}
@@ -286,12 +289,13 @@ void LuaEngine::LoadScripts()
 			luaFiles.erase(it2);
 	}
 
-	luaopen_base(L);
-	luaopen_table(L);
+	//luaopen_base(L);
+	//luaopen_table(L);
 	//luaopen_io(L);
-	luaopen_string(L);
-	luaopen_math(L);
-	luaopen_debug(L);
+	//luaopen_string(L);
+	//luaopen_math(L);
+	//luaopen_debug(L);
+	luaL_openlibs(L);
 	RegisterCoreFunctions();
 
 	if(lua_is_starting_up)
@@ -301,7 +305,11 @@ void LuaEngine::LoadScripts()
 
 	for(set<string>::iterator itr = luaFiles.begin(); itr != luaFiles.end(); ++itr)
 	{
-		snprintf(filename, 200, "scripts\\%s", itr->c_str());
+#ifdef WIN32
+			snprintf(filename, 200, "scripts\\%s", itr->c_str());
+#else
+			snprintf(filename, 200, "scripts/%s", itr->c_str());
+#endif
 		if(lua_is_starting_up)
 			Log.Notice("LuaEngine", "%s...", itr->c_str());
 
@@ -357,6 +365,7 @@ void LuaEngine::OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit, ui
 }
 void LuaEngine::OnQuestEvent(Player * QuestOwner, uint32 QuestID, uint32 EventType, Object * QuestStarter)
 {
+	
 	const char * FuncName = LuaEngineMgr::getSingleton().GetQuestEvent(QuestID, EventType);
 	if(FuncName==NULL)
 		return;
@@ -366,23 +375,29 @@ void LuaEngine::OnQuestEvent(Player * QuestOwner, uint32 QuestID, uint32 EventTy
 	lua_gettable(L, LUA_GLOBALSINDEX);
 	if(lua_isnil(L,-1))
 	{
-		printf("Tried to call invalid LUA function '%s' from Ascent (Unit)!\n", FuncName);
+		printf("Tried to call invalid LUA function '%s' from Ascent (Quest)!\n", FuncName);
 		m_Lock.Release();
 		return;
 	}
 
-	Lunar<Unit>::push(L, (Unit*)QuestOwner);
+	if (QuestOwner)
+		Lunar<Unit>::push(L, (Unit*)QuestOwner);
+	else
+		lua_pushnil(L);
+
 	lua_pushinteger(L,EventType);
+
 	if(QuestStarter!=NULL && QuestStarter->GetTypeId() == TYPEID_UNIT)
 		Lunar<Unit>::push(L, (Unit*)QuestStarter);
 	else
 		lua_pushnil(L);
 
-	int r = lua_pcall(L,4,LUA_MULTRET,0);
+	int r = lua_pcall(L,3,LUA_MULTRET,0);
 	if(r)
 		report(L);
 
 	m_Lock.Release();
+	
 }
 void LuaEngine::CallFunction(Unit * pUnit, const char * FuncName)
 {
@@ -497,8 +512,10 @@ int luaUnit_SetModel(lua_State * L, Unit * ptr);
 int luaUnit_SetScale(lua_State * L, Unit * ptr);
 int luaUnit_SetFaction(lua_State * L, Unit * ptr);
 int luaUnit_SetStandState(lua_State * L, Unit * ptr);
+int luaUnit_TeleportUnit(lua_State * L, Unit * ptr);
 
 int luaGameObject_GetName(lua_State * L, GameObject * ptr);
+int luaGameObject_Teleport(lua_State * L, GameObject * ptr);
 int luaGameObject_SpawnCreature(lua_State * L, GameObject * ptr);
 int luaGameObject_PlayCustomAnim(lua_State * L, GameObject * ptr);
 int luaGameObject_PlaySoundToSet(lua_State * L, GameObject * ptr);
@@ -568,12 +585,14 @@ Unit::RegType Unit::methods[] = {
 	{ "SetScale", &luaUnit_SetScale },
 	{ "SetFaction", &luaUnit_SetFaction },
 	{ "SetStandState",&luaUnit_SetStandState },
+	{ "Teleport" , &luaUnit_TeleportUnit },
 	{ NULL, NULL },
 };
 
 const char GameObject::className[] = "GameObject";
 GameObject::RegType GameObject::methods[] = {
 	{ "GetName", &luaGameObject_GetName },
+	{ "Teleport" , &luaGameObject_Teleport },
 	{ NULL, NULL },
 };
 
@@ -694,7 +713,7 @@ int luaUnit_GetManaPct(lua_State * L, Unit * ptr)
 	if (ptr->GetPowerType() == POWER_TYPE_MANA)
 		lua_pushnumber(L, (int)(ptr->GetUInt32Value(UNIT_FIELD_POWER1) * 100.0f / ptr->GetUInt32Value(UNIT_FIELD_MAXPOWER1)));
 	else
-		lua_pushnil;
+		lua_pushnil(L);
     return 1;
 }
 
@@ -987,7 +1006,7 @@ int luaUnit_IsInCombat(lua_State * L, Unit * ptr)
 	if (!ptr)
 		return 0;
 	lua_pushboolean(L,(ptr->CombatStatus.IsInCombat())?1:0);
-	return 0;
+	return 1;
 }
 
 int luaUnit_SetScale(lua_State * L, Unit * ptr)
@@ -1652,7 +1671,7 @@ int luaUnit_SendAreaTriggerMessage(lua_State * L, Unit * ptr)
 	CHECK_TYPEID(TYPEID_PLAYER);
 	const char * msg = luaL_checkstring(L,1);
 	if(!msg) return 0;
-	((Player*)ptr)->BroadcastMessage(msg);
+	((Player*)ptr)->SendAreaTriggerMessage(msg);
 	return 0;
 }
 
@@ -1661,9 +1680,41 @@ int luaUnit_SendBroadcastMessage(lua_State * L, Unit * ptr)
 	CHECK_TYPEID(TYPEID_PLAYER);
 	const char * msg = luaL_checkstring(L,1);
 	if(!msg) return 0;
-	((Player*)ptr)->SendAreaTriggerMessage(msg);
+	((Player*)ptr)->BroadcastMessage(msg);
 	return 0;
 }
+
+int luaUnit_TeleportUnit(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_PLAYER);
+	int mapId = luaL_checkint(L, 1);
+	float posX = (float)luaL_checknumber(L, 2);
+	float posY = (float)luaL_checknumber(L, 3);
+	float posZ = (float)luaL_checknumber(L, 4);
+	if(!mapId || !posX || !posY || !posZ)
+		return 0;
+	
+	LocationVector vec(posX, posY, posZ);
+	((Player*)ptr)->SafeTeleport((uint32)mapId, 0, vec);
+	return 0;
+}
+// Player Teleport (GO)
+int luaGameObject_Teleport(lua_State * L, GameObject * ptr)
+{
+	//CHECK_TYPEID(TYPEID_PLAYER);
+	CHECK_TYPEID(TYPEID_GAMEOBJECT);
+	Player* target = Lunar<Player>::check(L, 1);
+	int mapId = luaL_checkint(L, 2);
+	double posX = luaL_checknumber(L, 3);
+	double posY = luaL_checknumber(L, 4);
+	double posZ = luaL_checknumber(L, 5);
+	if(!mapId || !posX || !posY || !posZ)
+		return 0;
+	LocationVector vec((float)posX, (float)posY, (float)posZ);
+	((Player*)target)->SafeTeleport((uint32)mapId, 0, vec);
+	return 0;
+}
+
 
 /************************************************************************/
 /* Manager Stuff                                                        */

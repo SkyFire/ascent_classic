@@ -868,7 +868,6 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
     if(!qst->is_repeatable) CALL_QUESTSCRIPT_EVENT(qle, OnQuestComplete)(plr);
 	LUA_ON_QUEST_EVENT(plr,qst->id,QUEST_EVENT_ON_COMPLETE,qst_giver);
 
-	//ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), plr, QUEST_EVENT_ON_COMPLETE);
 	if(!qst->is_repeatable) 
 	{
 		for (uint32 x=0;x<4;x++)
