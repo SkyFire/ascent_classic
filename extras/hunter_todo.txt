@@ -20,7 +20,6 @@ The Beast Within: doesn't work (adds a buff for hunter onBestial Wrath)
 Improved Hunter's Mark: doesn't work (grants also +melee ap)
 --SUR--
 Entrapment: doesn't work (chance to trigger entrapment - 19185)
-Expose Weakness: doesn't work (chance to trigger Expose Weakness - 34501, similar to hunter's mark
 Master Tactician: Increases only melee crit chance
 
 at rev 2319 also Hunter's Mark (http://www.wowwiki.com/Hunter's_Mark) stopped working:

@@ -2528,6 +2528,17 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 34720;
 	}
 
+	// Hunter - Expose Weakness
+	sp = dbcSpell.LookupEntry(34500);
+	if(sp)
+		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
+	sp = dbcSpell.LookupEntry(34502);
+	if(sp)
+		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
+	sp = dbcSpell.LookupEntry(34503);
+	if(sp)
+		sp->procFlags = PROC_ON_RANGED_CRIT_ATTACK;
+
 	// Hunter - Hawk Eye
 	sp = dbcSpell.LookupEntry(19498);
 	if(sp)
