@@ -4,7 +4,7 @@
 #define _SVN_REVISION_H
 
 static const char * REVISION_TEXT	= "$Rev$";
-static const char * BUILD_TAG		= "2.5-TRUNK";
+static const char * BUILD_TAG		= "2.6-TRUNK";
 
 inline int g_getRevision()
 {
@@ -13,5 +13,5 @@ inline int g_getRevision()
 }
 
 //////////////////////////////////////////////////////////////////
-///
+////
 #endif 
