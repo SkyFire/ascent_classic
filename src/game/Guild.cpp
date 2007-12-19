@@ -870,7 +870,7 @@ void Guild::RemoveGuildRank(WorldSession * pClient)
 	m_lock.Acquire();
 
 	GuildRank * pLowestRank = FindLowestRank();
-	if(pLowestRank == NULL || pLowestRank->iId <= 5)		// cannot delete default ranks.
+	if(pLowestRank == NULL || pLowestRank->iId < 5)		// cannot delete default ranks.
 	{
 		pClient->SystemMessage("Cannot find a rank to delete.");
 		m_lock.Release();
@@ -889,6 +889,7 @@ void Guild::RemoveGuildRank(WorldSession * pClient)
 		}
 	}
 
+	CharacterDatabase.Execute("DELETE FROM guild_ranks WHERE guildId = %u AND rankId = %u", m_guildId, pLowestRank->iId);
 	m_ranks[pLowestRank->iId] = NULL;
 	delete pLowestRank;
 	m_lock.Release();
