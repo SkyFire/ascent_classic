@@ -237,7 +237,7 @@ GuildRank * Guild::CreateGuildRank(const char * szRankName, uint32 iPermissions,
 				r->iTabPermissions[4].iFlags, r->iTabPermissions[4].iStacksPerDay,
 				r->iTabPermissions[5].iFlags, r->iTabPermissions[5].iStacksPerDay);
 
-			Log.Notice("Guild", "Created rank %u on guild %u (%s)", i, m_guildId, szRankName);
+			Log.Debug("Guild", "Created rank %u on guild %u (%s)", i, m_guildId, szRankName);
 
 			return r;
 		}
@@ -1172,15 +1172,26 @@ void Guild::SendGuildQuery(WorldSession * pClient)
 			data << uint8(0);
 	}
 
-	m_lock.Release();
-
 	data << m_emblemStyle;
 	data << m_emblemColor;
 	data << m_borderStyle;
 	data << m_borderColor;
 	data << m_backgroundColor;
 
-	pClient->SendPacket(&data);
+	if(pClient != NULL)
+	{
+		pClient->SendPacket(&data);
+	}
+	else
+	{
+		for(GuildMemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+		{
+			if(itr->first->m_loggedInPlayer)
+				itr->first->m_loggedInPlayer->GetSession()->SendPacket(&data);
+		}
+	}
+
+	m_lock.Release();
 }
 
 void Guild::CreateInDB()
@@ -1481,4 +1492,17 @@ void Guild::LogGuildBankActionMoney(uint8 iAction, uint32 uGuid, uint32 uAmount)
 
 	CharacterDatabase.Execute("INSERT INTO guild_banklogs VALUES(%u, %u, 6, %u, %u, %u, 0, %u)",
 		ev->iLogId, m_guildId, (uint32)iAction, uGuid, uAmount, timest);
+}
+
+void Guild::SetTabardInfo(uint32 EmblemStyle, uint32 EmblemColor, uint32 BorderStyle, uint32 BorderColor, uint32 BackgroundColor)
+{
+	m_emblemStyle = EmblemStyle;
+	m_emblemColor = EmblemColor;
+	m_borderStyle = BorderStyle;
+	m_borderColor = BorderColor;
+	m_backgroundColor = BackgroundColor;
+
+	// update in db
+	CharacterDatabase.Execute("UPDATE guilds SET emblemStyle = %u, emblemColor = %u, borderStyle = %u, borderColor = %u, backgroundColor = %u WHERE guildId = %u",
+		EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor, m_guildId);
 }

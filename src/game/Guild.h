@@ -503,6 +503,10 @@ public:
 	void SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 updated_slot1 = -1, int8 updated_slot2 = -1);
 	void SendGuildBankInfo(WorldSession * pClient);
 
+	/** Changes the tabard info.
+	 */
+	void SetTabardInfo(uint32 EmblemStyle, uint32 EmblemColor, uint32 BorderStyle, uint32 BorderColor, uint32 BackgroundColor);
+
 protected:
 	
 	/** Enables/disables command logging.

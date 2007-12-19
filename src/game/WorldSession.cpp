@@ -861,18 +861,6 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_CHANNEL_VOICE_QUERY].handler = &WorldSession::HandleChannelVoiceQueryOpcode;
 }
 
-void WorldSession::CHECK_PACKET_SIZE(WorldPacket& data, uint32 size)
-{
-	if(data.size() < size && size)
-	{
-		// write to file
-		sCheatLog.writefromsession(this, "kicked for invalid packet (opcode %u), size %u less than %u", data.GetOpcode(), data.size(), size);
-		
-		// disconnect
-		Disconnect();
-	}
-}
-
 void SessionLogWriter::writefromsession(WorldSession* session, const char* format, ...)
 {
 	if(!IsOpen())

@@ -104,6 +104,9 @@ public:
 		case ARENA_TEAM_TYPE_5V5:
 			return 5;
 		}
+
+		// never reached
+		return 2;
 	}
 };
 

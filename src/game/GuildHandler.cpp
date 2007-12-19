@@ -399,7 +399,7 @@ void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)
 	pGuild->CreateGuildRank(rankName.c_str(), GR_RIGHT_DEFAULT, false);
 
 	// there is probably a command result for this. need to find it.
-	pGuild->SendGuildQuery(this);
+	pGuild->SendGuildQuery(NULL);
 	pGuild->SendGuildRoster(this);
 }
 
@@ -422,7 +422,7 @@ void WorldSession::HandleGuildDelRank(WorldPacket & recv_data)
 	pGuild->RemoveGuildRank(this);
 
 	// there is probably a command result for this. need to find it.
-	pGuild->SendGuildQuery(this);
+	pGuild->SendGuildQuery(NULL);
 	pGuild->SendGuildRoster(this);
 }
 
@@ -458,72 +458,47 @@ void WorldSession::HandleGuildSetOfficerNote(WorldPacket & recv_data)
 
 void WorldSession::HandleSaveGuildEmblem(WorldPacket & recv_data)
 {
-/*	CHECK_PACKET_SIZE(recv_data, 20);
-	WorldPacket data;
+	uint64 guid;
+	Guild * pGuild = _player->GetGuild();
+	int32 cost = MONEY_ONE_GOLD * 10;
+	uint32 emblemStyle, emblemColor, borderStyle, borderColor, backgroundColor;
+	WorldPacket data(MSG_SAVE_GUILD_EMBLEM, 4);
+	recv_data >> guid;
+	
+	CHECK_PACKET_SIZE(recv_data, 28);
+	CHECK_INWORLD_RETURN;
+	CHECK_GUID_EXISTS(guid);
 
-	Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
-
-	if(!pGuild)
+	recv_data >> emblemStyle >> emblemColor >> borderStyle >> borderColor >> backgroundColor;
+	if(pGuild==NULL)
 	{
-		data.Initialize(MSG_SAVE_GUILD_EMBLEM);
-		data <<	uint32(ERR_GUILDEMBLEM_NOGUILD);
+		data << uint32(ERR_GUILDEMBLEM_NOGUILD);
 		SendPacket(&data);
 		return;
 	}
 
-	Player *plyr = GetPlayer();
-
-	if(!plyr)
-		return;
-
-	if(plyr->GetGuildRank() != GUILDRANK_GUILD_MASTER)
+	if(pGuild->GetGuildLeader() != _player->GetGUIDLow())
 	{
-		data.Initialize(MSG_SAVE_GUILD_EMBLEM);
-		data <<	uint32(ERR_GUILDEMBLEM_NOTGUILDMASTER);
+		data << uint32(ERR_GUILDEMBLEM_NOTGUILDMASTER);
 		SendPacket(&data);
 		return;
 	}
-	uint32 Money = plyr->GetUInt32Value(PLAYER_FIELD_COINAGE);
-	uint32 Cost = 100000; //10 Gold
-	if(Money < Cost)
+
+	if(_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < (uint32)cost)
 	{
-		data.Initialize(MSG_SAVE_GUILD_EMBLEM);
 		data << uint32(ERR_GUILDEMBLEM_NOTENOUGHMONEY);
 		SendPacket(&data);
 		return;
 	}
-	plyr->SetUInt32Value(PLAYER_FIELD_COINAGE,(Money-Cost));
 
-	uint64 DesignerGuid;
-	recv_data >> DesignerGuid;
-
-	uint32 emblemPart;
-	recv_data >> emblemPart;
-	pGuild->SetGuildEmblemStyle( emblemPart );
-	recv_data >> emblemPart;
-	pGuild->SetGuildEmblemColor( emblemPart );
-	recv_data >> emblemPart;
-	pGuild->SetGuildBorderStyle( emblemPart );
-	recv_data >> emblemPart;
-	pGuild->SetGuildBorderColor( emblemPart );
-	recv_data >> emblemPart;
-	pGuild->SetGuildBackgroundColor( emblemPart );
-
-	data.Initialize(MSG_SAVE_GUILD_EMBLEM);
 	data <<	uint32(ERR_GUILDEMBLEM_SUCCESS);
 	SendPacket(&data);
 
-	data.clear();
-	pGuild->FillQueryData(&data);
-	pGuild->SendMessageToGuild(plyr->GetGUID(), &data, G_MSGTYPE_ALL);
+	// set in memory and database
+	pGuild->SetTabardInfo(emblemStyle, emblemColor, borderStyle, borderColor, backgroundColor);
 
-	//data.Initialize(SMSG_GUILD_EVENT);
-	//data << uint8(GUILD_EVENT_TABARDCHANGE);
-	//data << uint8(0x00);
-	//data << pGuild->GetGuildMotd();
-	//pGuild->SendMessageToGuild(NULL, &data, G_MSGTYPE_ALL);
-
-	pGuild->UpdateGuildToDb();*/
+	// update all clients (probably is an event for this, again.)
+	pGuild->SendGuildQuery(NULL);
 }
 
 // Charter part
