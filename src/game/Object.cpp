@@ -322,7 +322,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 	{
 		if(pThis && pThis->m_TransporterGUID != 0)
 			flags2 |= 0x200;
-		else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportGuid != 0)
+		else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportGuid != 0 && ((Creature*)this)->m_transportPosition != NULL)
 			flags2 |= 0x200;
 
 		if(splinebuf)
@@ -353,7 +353,10 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			if(static_cast<Unit*>(this)->GetAIInterface()->IsFlying())
 				flags2 |= 0x800;
 			if(static_cast<Creature*>(this)->proto && static_cast<Creature*>(this)->proto->extra_a9_flags)
-				flags2 |= static_cast<Creature*>(this)->proto->extra_a9_flags;
+			{
+				if(!(flags2 & 0x0200))
+					flags2 |= static_cast<Creature*>(this)->proto->extra_a9_flags;
+			}
 			if(GetGUIDHigh() == HIGHGUID_WAYPOINT)
 			{
 				if(GetUInt32Value(UNIT_FIELD_STAT0) == 768)		// flying waypoint
@@ -402,7 +405,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 				*data << pThis->m_TransporterX << pThis->m_TransporterY << pThis->m_TransporterZ << pThis->m_TransporterO;
 				*data << pThis->m_TransporterUnk;
 			}
-			else
+			else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportPosition != NULL)
 			{
 				*data << ((Creature*)this)->m_transportGuid;
 				*data << uint32(HIGHGUID_TRANSPORTER);
