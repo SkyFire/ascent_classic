@@ -130,6 +130,7 @@ Zack - test my shit :
 - mage : Empowered Frostbolt 31686
 - Hunter : Pathfinding 19560
 - hunter : Steady Shot 34120
+- Hunter : Improved Stings 19468
 
 ==========================================================================
 Capt - test my shit :

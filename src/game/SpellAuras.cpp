@@ -5519,6 +5519,14 @@ void Aura::SpellAuraOverrideClassScripts(bool apply)
 				}
 			}
 		}break;
+/*		case 19421: //hunter : Improved Hunter's Mark
+		case 19422:
+		case 19423:
+		case 19424:
+		case 19425:
+			{
+				//this shoul actually add a new functionality to the spell and not override it. There is a lot to decode and to be done here
+			}break;*/
 	default:
 		sLog.outError("Unknown override report to devs: %u", mod->m_miscValue);
 	};

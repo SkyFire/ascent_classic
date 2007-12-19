@@ -429,6 +429,11 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 	switch(spellId)
 	{
+/*	case 35029: //hunter: Focused Fire
+	case 35030:
+		{
+			///nasty spell, should add a trigger on pet summon desumon to be able to know when to apply remove this spells effect
+		}break;*/
 	//curse of agony(18230) = periodic damage increased in 
 	//flag 2031678
 	case 31789: //paladin - Righteous Defense

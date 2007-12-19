@@ -2520,6 +2520,43 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->EffectSpellGroupRelation[0] = 2097152;
 
+	//Hunter : Improved Stings
+	sp = dbcSpell.LookupEntry(19464);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 16384 | 65536;
+		sp->EffectSpellGroupRelation[1] = 65536;
+		sp->EffectSpellGroupRelation[2] = 16384 | 65536 | 32768;
+	}
+	sp = dbcSpell.LookupEntry(19465);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 16384 | 65536;
+		sp->EffectSpellGroupRelation[1] = 65536;
+		sp->EffectSpellGroupRelation[2] = 16384 | 65536 | 32768;
+	}
+	sp = dbcSpell.LookupEntry(19466);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 16384 | 65536;
+		sp->EffectSpellGroupRelation[1] = 65536;
+		sp->EffectSpellGroupRelation[2] = 16384 | 65536 | 32768;
+	}
+	sp = dbcSpell.LookupEntry(19467);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 16384 | 65536;
+		sp->EffectSpellGroupRelation[1] = 65536;
+		sp->EffectSpellGroupRelation[2] = 16384 | 65536 | 32768;
+	}
+	sp = dbcSpell.LookupEntry(19468);
+	if(sp)
+	{
+		sp->EffectSpellGroupRelation[0] = 16384 | 65536;
+		sp->EffectSpellGroupRelation[1] = 65536;
+		sp->EffectSpellGroupRelation[2] = 16384 | 65536 | 32768;
+	}
+
 	// general - clearcasting
 	sp = dbcSpell.LookupEntry(12536);
 	if(sp)
