@@ -1707,6 +1707,8 @@ public:
 	bool m_setflycheat;
 	uint32 m_areaspirithealer_guid;
 
+	inline bool IsAttacking() {return m_attacking; }
+
 protected:
 	LocationVector m_summonPos;
 	uint32 m_summonInstanceId;

@@ -204,6 +204,9 @@
 				RelativePath="..\..\src\shared\Database\DatabaseEnv.h">
 			</File>
 			<File
+				RelativePath="..\..\src\shared\Database\DatabaseNG.h">
+			</File>
+			<File
 				RelativePath="..\..\src\shared\Database\dbcfile.cpp">
 			</File>
 			<File

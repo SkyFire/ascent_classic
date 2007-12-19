@@ -23,7 +23,6 @@
 #include "Log.h"
 #include "Master.h"
 //#include <vld.h>
-//#include <vldapi.h>
 
 #ifdef WIN32
 #include "../shared/CrashHandler.h"

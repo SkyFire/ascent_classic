@@ -1219,8 +1219,9 @@ void Player::EventDeath()
 	if (m_onTaxi)
 		sEventMgr.RemoveEvents(this, EVENT_PLAYER_TAXI_DISMOUNT);
 
-	if(!IS_INSTANCE(GetMapId()) && !sEventMgr.HasEvent(this,EVENT_PLAYER_FORECED_RESURECT)) //Should never be true 
-		sEventMgr.AddEvent(this,&Player::RepopRequestedPlayer,EVENT_PLAYER_FORECED_RESURECT,PLAYER_FORCED_RESURECT_INTERVAL,1,0); //in case he forgets to release spirit (afk or something)
+	// commented by burlex - the client will send this automatically
+	/*if(!IS_INSTANCE(GetMapId()) && !sEventMgr.HasEvent(this,EVENT_PLAYER_FORECED_RESURECT)) //Should never be true 
+		sEventMgr.AddEvent(this,&Player::RepopRequestedPlayer,EVENT_PLAYER_FORECED_RESURECT,PLAYER_FORCED_RESURECT_INTERVAL,1,0); //in case he forgets to release spirit (afk or something)*/
 }
 
 void Player::BuildEnumData( WorldPacket * p_data )

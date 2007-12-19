@@ -4237,6 +4237,7 @@ void Aura::SpellAuraFeighDeath(bool apply)
 			pTarget->EventDeath();
 			pTarget->SetFlag(UNIT_FIELD_FLAGS_2, 1);
 			pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH);
+			pTarget->SetFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_DEAD);
 			
 			data.SetOpcode(SMSG_START_MIRROR_TIMER);
 			data << uint32(2);		// type
@@ -4247,11 +4248,14 @@ void Aura::SpellAuraFeighDeath(bool apply)
 			data << uint32(m_spellProto->Id);		// ???
 			pTarget->GetSession()->SendPacket(&data);
 
+			data.Initialize(0x03BE);
+			data << pTarget->GetGUID();
+
 			//now get rid of mobs agro. pTarget->CombatStatus.AttackersForgetHate() - this works only for already attacking mobs
 		    for(std::set<Object*>::iterator itr = pTarget->GetInRangeSetBegin(); itr != pTarget->GetInRangeSetEnd(); itr++ )
 				if((*itr)->IsUnit() && ((Unit*)(*itr))->isAlive())
 				{
-					if(((Unit*)(*itr))->GetAIInterface())
+					if((*itr)->GetTypeId()==TYPEID_UNIT)
 						((Unit*)(*itr))->GetAIInterface()->RemoveThreatByPtr(pTarget);
 					//if this is player and targeting us then we interrupt cast
 					if(((*itr))->IsPlayer())
@@ -4264,10 +4268,16 @@ void Aura::SpellAuraFeighDeath(bool apply)
 							((Player*)(*itr))->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 						}
 						//if player is enemy then he will exit combat
-						if(((Player*)(*itr))->GetTarget()==pTarget->GetGUID() && isAttackable((*itr),pTarget))
+						if(((Player*)(*itr))->GetTarget()==pTarget->GetGUID() && ((Player*)*itr)->IsAttacking())
+						{
+							((Player*)*itr)->smsg_AttackStop(pTarget);
 							((Player*)(*itr))->EventAttackStop();
+						}
+
 						if(((Player*)(*itr))->isCasting())
 							((Player*)(*itr))->CancelSpell(NULL); //cancel current casting spell
+
+						((Player*)(*itr))->GetSession()->SendPacket(&data);
 					}
 				}
 		}
@@ -4275,6 +4285,7 @@ void Aura::SpellAuraFeighDeath(bool apply)
 		{
 			pTarget->RemoveFlag(UNIT_FIELD_FLAGS_2, 1);
 			pTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH);
+			pTarget->RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_DEAD);
 			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
 			data << uint32(2);
 			pTarget->GetSession()->SendPacket(&data);

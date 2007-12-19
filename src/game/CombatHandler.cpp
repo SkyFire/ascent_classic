@@ -56,8 +56,12 @@ void WorldSession::HandleAttackSwingOpcode( WorldPacket & recv_data )
 	GetPlayer()->EventAttackStart();
 
 	// Set PVP Flag.
-	if(pEnemy->IsPlayer() && isHostile(_player, pEnemy))
-		_player->SetPvPFlag();
+	/*if(pEnemy->IsPlayer() && isHostile(_player, pEnemy))
+	{
+		// don't in duel.. this should be done in dealdamage anyway :S
+		if(((Player*)pEnemy)->GetTeam() != _player->GetTeam())
+			_player->SetPvPFlag();
+	}*/
 }
 
 void WorldSession::HandleAttackStopOpcode( WorldPacket & recv_data )
