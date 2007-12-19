@@ -2652,19 +2652,19 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(34491);
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0] = 128; //!! have to add here melee abilities
+		sp->EffectSpellGroupRelation[0] = 128 | 2 | 64; 
 		sp->EffectSpellGroupRelation[1] = 128;
 	}
 	sp = dbcSpell.LookupEntry(34492);
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0] = 128; //!! have to add here melee abilities
+		sp->EffectSpellGroupRelation[0] = 128 | 2 | 64; 
 		sp->EffectSpellGroupRelation[1] = 128;
 	}
 	sp = dbcSpell.LookupEntry(34493);
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0] = 128; //!! have to add here melee abilities
+		sp->EffectSpellGroupRelation[0] = 128 | 2 | 64; 
 		sp->EffectSpellGroupRelation[1] = 128;
 	}
 /*	//Hunter : Entrapment
