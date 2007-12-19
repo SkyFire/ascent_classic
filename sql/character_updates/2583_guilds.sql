@@ -137,7 +137,6 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `guild_data` WRITE;
 /*!40000 ALTER TABLE `guild_data` DISABLE KEYS */;
-INSERT INTO `guild_data` VALUES (2,1,0,'','',0,0,0,0,0,0,0,0,0,0,0,0,0,0),(2,4,4,'','',0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 /*!40000 ALTER TABLE `guild_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -165,7 +164,6 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `guild_logs` WRITE;
 /*!40000 ALTER TABLE `guild_logs` DISABLE KEYS */;
-INSERT INTO `guild_logs` VALUES (2,2,1198008687,4,1,4,0),(2,3,1198008697,3,1,4,0),(2,4,1198008700,3,1,4,0),(2,5,1198008711,3,1,4,0),(2,6,1198008714,4,1,4,0),(2,7,1198008715,4,1,4,0),(2,8,1198008715,4,1,4,0);
 /*!40000 ALTER TABLE `guild_logs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -204,7 +202,6 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `guild_ranks` WRITE;
 /*!40000 ALTER TABLE `guild_ranks` DISABLE KEYS */;
-INSERT INTO `guild_ranks` VALUES (1,0,'Guild Master',127487,0,3,0,3,0,3,0,3,0,3,0,3,0),(1,1,'Officer',127487,0,3,0,3,0,3,0,3,0,3,0,3,0),(1,2,'Veteran',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(1,3,'Member',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(1,4,'Initiate',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(2,0,'Guild Master',127487,0,3,0,3,0,3,0,3,0,3,0,3,0),(2,1,'Officer',127487,0,3,0,3,0,3,0,3,0,3,0,3,0),(2,2,'Veteran',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(2,3,'Member',67,0,0,0,0,0,0,0,0,0,0,0,0,0),(2,4,'Initiate',67,0,0,0,0,0,0,0,0,0,0,0,0,0);
 /*!40000 ALTER TABLE `guild_ranks` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -240,7 +237,6 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `guilds` WRITE;
 /*!40000 ALTER TABLE `guilds` DISABLE KEYS */;
-INSERT INTO `guilds` VALUES (1,'Moolicious',1,0,0,0,0,0,'','',0,0,0),(2,'Moooo',1,0,0,0,0,0,'','',0,0,0);
 /*!40000 ALTER TABLE `guilds` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
