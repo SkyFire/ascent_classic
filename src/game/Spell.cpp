@@ -3412,8 +3412,13 @@ exit:
 			{
 				Item *it;
 				if(p_caster->GetItemInterface())
+				{
 					it = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-				value += float2int32(float(it->GetProto()->Damage[0].Min)*float(it->GetProto()->Delay)*2.8f);
+					if(it)
+						value += float2int32(150 + float(it->GetProto()->Damage[0].Min)/float(it->GetProto()->Delay)*2.8f);
+				}
+				if(target->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
+					value += 175;
 			}
 			value += (uint32)(u_caster->GetRAP()*0.2);
 		}
