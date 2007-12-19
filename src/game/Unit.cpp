@@ -827,6 +827,14 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									CastingSpell->NameHash!=0x20EFEA68)//Drain Life								
 									continue;
 							}break;
+						//mage - Arcane Blast proc
+						case 36032:
+							{
+								if(!CastingSpell)
+									continue;
+								if (CastingSpell->NameHash!=0x2EAF9351) //Arcane Blast
+									continue;
+							}break;
 						//warlock - Shadow Embrace
 						case 32386:
 						case 32388:

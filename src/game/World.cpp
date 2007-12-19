@@ -2678,6 +2678,20 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->procFlags = PROC_ON_CAST_SPELL;*/
 
+	//Mage:Arcane Blast
+	sp = dbcSpell.LookupEntry(30451);
+	if(sp){
+		sp->EffectApplyAuraName[1]=42;
+		sp->EffectTriggerSpell[1]=36032;
+		sp->procFlags=PROC_ON_CAST_SPECIFIC_SPELL;
+	}
+	//Mage:Arcane Blast proc spell
+	sp = dbcSpell.LookupEntry(36032);
+	if(sp){
+		sp->EffectSpellGroupRelation[0] = 536870912;
+		sp->EffectSpellGroupRelation[1] = 536870912;
+	}
+
 	// general - clearcasting
 	sp = dbcSpell.LookupEntry(12536);
 	if(sp)
