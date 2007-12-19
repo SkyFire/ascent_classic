@@ -640,6 +640,20 @@ bool World::SetInitialWorldSettings()
 		if(namehash==0x11d6b48c)		/* judgement of command */
 			sp->Spell_Dmg_Type=1;
 
+		//Rogue: Posion time fix for 2.3
+		if(strstr(nametext, "Crippling Poison") && sp->Effect[0]==54)    //I, II
+			sp->EffectBasePoints[0]=3599;
+		if(strstr(nametext, "Mind-numbing Poison") && sp->Effect[0]==54)//I,II,III
+			sp->EffectBasePoints[0]=3599;
+		if(strstr(nametext, "Instant Poison") && sp->Effect[0]==54)        //I,II,III,IV,V,VI,VII    
+			sp->EffectBasePoints[0]=3599;
+		if(strstr(nametext, "Deadly Poison") && sp->Effect[0]==54)        //I,II,III,IV,V,VI,VII
+			sp->EffectBasePoints[0]=3599;
+		if(strstr(nametext, "Wound Poison") && sp->Effect[0]==54)        //I,II,III,IV,V
+			sp->EffectBasePoints[0]=3599;
+		if(strstr(nametext, "Anesthetic Poison") && sp->Effect[0]==54)    //I
+			sp->EffectBasePoints[0]=3599;
+
 		//these mostly do not mix so we can use else 
         // look for seal, etc in name
         if(strstr(nametext, "Seal"))
