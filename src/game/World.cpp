@@ -2557,6 +2557,26 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[2] = 16384 | 65536 | 32768;
 	}
 
+	//Hunter : Mortal Shots
+	sp = dbcSpell.LookupEntry(19485);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+	sp = dbcSpell.LookupEntry(19487);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+	sp = dbcSpell.LookupEntry(19488);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+	sp = dbcSpell.LookupEntry(19489);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+	sp = dbcSpell.LookupEntry(19490);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+	sp = dbcSpell.LookupEntry(36413);
+	if(sp)
+		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+
 	// general - clearcasting
 	sp = dbcSpell.LookupEntry(12536);
 	if(sp)

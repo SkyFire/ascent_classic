@@ -131,6 +131,7 @@ Zack - test my shit :
 - Hunter : Pathfinding 19560
 - hunter : Steady Shot 34120
 - Hunter : Improved Stings 19468
+- Hunter : Mortal Shots 19490
 
 ==========================================================================
 Capt - test my shit :
