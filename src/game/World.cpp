@@ -2549,22 +2549,27 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[2] = 16384 | 65536 | 32768;
 	}
 
+	//we need to adress this somehow : shot
+	sp = dbcSpell.LookupEntry(3018);
+	if(sp)
+		sp->SpellGroupType = 4;
+
 	//Hunter : Mortal Shots
 	sp = dbcSpell.LookupEntry(19485);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
 	sp = dbcSpell.LookupEntry(19487);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
 	sp = dbcSpell.LookupEntry(19488);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
 	sp = dbcSpell.LookupEntry(19489);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
 	sp = dbcSpell.LookupEntry(19490);
 	if(sp)
-		sp->EffectSpellGroupRelation[0] = 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
 
 	//Hunter : Improved Barrage
 	sp = dbcSpell.LookupEntry(35104);

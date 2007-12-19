@@ -4247,8 +4247,29 @@ void Aura::SpellAuraFeighDeath(bool apply)
 			data << uint32(m_spellProto->Id);		// ???
 			pTarget->GetSession()->SendPacket(&data);
 
-			//now get rid of mobs agro
-//			pTarget->CombatStatus.AttackersForgetHate();
+			//now get rid of mobs agro. pTarget->CombatStatus.AttackersForgetHate() - this works only for already attacking mobs
+		    for(std::set<Object*>::iterator itr = pTarget->GetInRangeSetBegin(); itr != pTarget->GetInRangeSetEnd(); itr++ )
+				if((*itr)->IsUnit() && ((Unit*)(*itr))->isAlive())
+				{
+					if(((Unit*)(*itr))->GetAIInterface())
+						((Unit*)(*itr))->GetAIInterface()->RemoveThreatByPtr(pTarget);
+					//if this is player and targeting us then we interrupt cast
+					if(((*itr))->IsPlayer())
+					{
+						//if player has selection on us
+						if(((Player*)(*itr))->GetSelection()==pTarget->GetGUID())							
+						{
+							//it seems that all these do not work in 2.3
+							((Player*)(*itr))->SetSelection(0);//loose selection
+							((Player*)(*itr))->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+						}
+						//if player is enemy then he will exit combat
+						if(((Player*)(*itr))->GetTarget()==pTarget->GetGUID() && isAttackable((*itr),pTarget))
+							((Player*)(*itr))->EventAttackStop();
+						if(((Player*)(*itr))->isCasting())
+							((Player*)(*itr))->CancelSpell(NULL); //cancel current casting spell
+					}
+				}
 		}
 		else
 		{

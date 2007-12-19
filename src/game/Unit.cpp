@@ -5418,7 +5418,10 @@ void CombatStatusHandler::AttackersForgetHate()
 
 void Unit::CancelSpell(Spell * ptr)
 {
-	ptr->cancel();
+	if(ptr)
+		ptr->cancel();
+	else if(m_currentSpell)
+		m_currentSpell->cancel();
 }
 
 void Unit::EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage)
