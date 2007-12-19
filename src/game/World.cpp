@@ -2484,6 +2484,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[1] = 64; //aura
 		sp->EffectTriggerSpell[1] = 30339; //evil , but this is good for us :D
 	}
+
 	// Hunter - Master Tactician
 	sp = dbcSpell.LookupEntry(34506);
 	if(sp)
@@ -2500,6 +2501,32 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(34839);
 	if(sp)
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+
+	// Hunter - Thrill of the Hunt
+	sp = dbcSpell.LookupEntry(34497);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+		sp->procChance = sp->EffectBasePoints[0]+1;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 34720;
+	}
+	sp = dbcSpell.LookupEntry(34498);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+		sp->procChance = sp->EffectBasePoints[0]+1;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 34720;
+	}
+	sp = dbcSpell.LookupEntry(34499);
+	if(sp)
+	{
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+		sp->procChance = sp->EffectBasePoints[0]+1;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 34720;
+	}
 
 	// Hunter - Hawk Eye
 	sp = dbcSpell.LookupEntry(19498);

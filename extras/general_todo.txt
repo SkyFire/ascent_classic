@@ -135,6 +135,7 @@ Zack - test my shit :
 - Hunter : Improved Barrage 35111
 - Hunter : Clever Traps 19245
 - Hunter : Resourcefulness 34493
+- Hunter : Thrill of the Hunt 34499
 
 ==========================================================================
 Capt - test my shit :

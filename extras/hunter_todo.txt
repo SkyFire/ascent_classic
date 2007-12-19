@@ -20,7 +20,6 @@ The Beast Within: doesn't work (adds a buff for hunter onBestial Wrath)
 Improved Hunter's Mark: doesn't work (grants also +melee ap)
 --SUR--
 Entrapment: doesn't work (chance to trigger entrapment - 19185)
-Thrill of the Hunt: doesn't work (returns mana cost on crit, similar to mage's Master of Elements)
 Expose Weakness: doesn't work (chance to trigger Expose Weakness - 34501, similar to hunter's mark
 Master Tactician: Increases only melee crit chance
 

@@ -1090,6 +1090,13 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 									continue;
 								dmg_overwrite = CastingSpell->manaCost * (ospinfo->EffectBasePoints[0] + 1) / 100;
 							}break;
+						//Hunter - Thrill of the Hunt
+						case 34720:
+							{
+								if(!CastingSpell)
+									continue;
+								dmg_overwrite = CastingSpell->manaCost * 40 / 100;
+							}break;
 						//priest - Reflective Shield 
 						case 33619:
 							{
