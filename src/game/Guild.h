@@ -506,6 +506,10 @@ public:
 	/** Changes the tabard info.
 	 */
 	void SetTabardInfo(uint32 EmblemStyle, uint32 EmblemColor, uint32 BorderStyle, uint32 BorderColor, uint32 BackgroundColor);
+	
+	/** Sends the guild information packet to the specified client.
+	 */
+	void SendGuildInfo(WorldSession * pClient);
 
 protected:
 	

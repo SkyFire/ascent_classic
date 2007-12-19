@@ -255,6 +255,7 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 	m_guildId = objmgr.GenerateGuildId();
 	m_guildName = strdup(pCharter->GuildName.c_str());
 	m_guildLeader = pCharter->LeaderGuid;
+	m_creationTimeStamp = (uint32)UNIXTIME;
 
 	// create the guild in the database
 	CreateInDB();
@@ -1505,4 +1506,21 @@ void Guild::SetTabardInfo(uint32 EmblemStyle, uint32 EmblemColor, uint32 BorderS
 	// update in db
 	CharacterDatabase.Execute("UPDATE guilds SET emblemStyle = %u, emblemColor = %u, borderStyle = %u, borderColor = %u, backgroundColor = %u WHERE guildId = %u",
 		EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor, m_guildId);
+}
+
+void Guild::SendGuildInfo(WorldSession * pClient)
+{
+	WorldPacket data(SMSG_GUILD_INFO, 4);
+
+	time_t ct = (time_t)m_creationTimeStamp;
+	tm * pTM = localtime(&ct);
+
+	data << m_guildName;
+	data << uint32(pTM->tm_year+1900);
+	data << uint32(pTM->tm_mon);
+	data << uint32(pTM->tm_mday);
+	data << uint32(m_members.size());
+	data << uint32(m_members.size());
+
+	pClient->SendPacket(&data);	
 }

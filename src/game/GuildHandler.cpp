@@ -167,22 +167,8 @@ void WorldSession::HandleSetGuildInformation(WorldPacket & recv_data)
 
 void WorldSession::HandleGuildInfo(WorldPacket & recv_data)
 {
-	/*WorldPacket data;
-
-	Guild *pGuild = objmgr.GetGuild( GetPlayer()->GetGuildId() );
-
-	if(!pGuild)
-		return;
-
-	data.Initialize(SMSG_GUILD_INFO);//not sure
-	data << pGuild->GetGuildName();
-	data << pGuild->GetCreatedYear();
-	data << pGuild->GetCreatedMonth();
-	data << pGuild->GetCreatedDay();
-	data << uint32(pGuild->GetGuildMembersCount());
-	data << uint32(pGuild->GetGuildMembersCount());//accountcount
-
-	SendPacket(&data);*/
+	if(_player->GetGuild() != NULL)
+		_player->GetGuild()->SendGuildInfo(this);
 }
 
 void WorldSession::HandleGuildRoster(WorldPacket & recv_data)
