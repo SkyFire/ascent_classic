@@ -2562,19 +2562,19 @@ void Unit::smsg_AttackStop(Unit* pVictim)
 		return;
 
 	WorldPacket data(SMSG_ATTACKSTOP, 24);
+	if(m_objectTypeId==TYPEID_PLAYER)
+	{
+		data << pVictim->GetNewGUID();
+		data << uint8(0);
+		data << uint32(0);
+		((Player*)this)->GetSession()->SendPacket(&data);
+		data.clear();
+	}
+
 	data << GetNewGUID();
 	data << pVictim->GetNewGUID();
-	data << uint32( pVictim->isDead() ? 1 : 0 );
-	SendMessageToSet(&data, IsPlayer() );
-	/*if(IsPlayer())
-		((Player*)this)->GetSession()->OutPacket(SMSG_CANCEL_COMBAT);*/
-	if(pVictim->isDead())
-	{
-		// this seems to be the way to stop combat when the victim is dead
-		data.Initialize(SMSG_ATTACKSTOP);
-		data << GetNewGUID() << uint8(0) << uint32(0);
-		SendMessageToSet(&data, IsPlayer());
-	}
+	data << uint32(0);
+	SendMessageToSet(&data, true );
 
 	pVictim->CombatStatus.RemoveAttacker(this, GetGUID());
 	CombatStatus.RemoveAttackTarget(pVictim);

@@ -18,6 +18,7 @@
  */
 
 #include "StdAfx.h"
+UpdateMask Player::m_visibleUpdateMask;
 
 Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 {
@@ -1879,13 +1880,9 @@ void Player::_SetCreateBits(UpdateMask *updateMask, Player *target) const
 	}
 	else
 	{
-		UpdateMask mask;
-		mask.SetCount(m_valuesCount);
-		_SetVisibleBits(&mask, target);
-
-		for(uint16 index = 0; index < m_valuesCount; index++)
+		for(uint32 index = 0; index < m_valuesCount; index++)
 		{
-			if(GetUInt32Value(index) != 0 && mask.GetBit(index))
+			if(m_uint32Values[index] != 0 && Player::m_visibleUpdateMask.GetBit(index))
 				updateMask->SetBit(index);
 		}
 	}
@@ -1900,88 +1897,86 @@ void Player::_SetUpdateBits(UpdateMask *updateMask, Player *target) const
 	}
 	else
 	{
-		UpdateMask mask;
-		mask.SetCount(m_valuesCount);
-		_SetVisibleBits(&mask, target);
-
 		Object::_SetUpdateBits(updateMask, target);
-		*updateMask &= mask;
+		*updateMask &= Player::m_visibleUpdateMask;
 	}
 }
 
 
-void Player::_SetVisibleBits(UpdateMask *updateMask, Player *target) const
+void Player::InitVisibleUpdateBits()
 {
-	updateMask->SetBit(OBJECT_FIELD_GUID);
-	updateMask->SetBit(OBJECT_FIELD_TYPE);
-	updateMask->SetBit(OBJECT_FIELD_SCALE_X);
+	Player::m_visibleUpdateMask.SetCount(PLAYER_END);
+	Player::m_visibleUpdateMask.SetBit(OBJECT_FIELD_GUID);
+	Player::m_visibleUpdateMask.SetBit(OBJECT_FIELD_TYPE);
+	Player::m_visibleUpdateMask.SetBit(OBJECT_FIELD_SCALE_X);
 
-	updateMask->SetBit(UNIT_FIELD_SUMMON);
-	updateMask->SetBit(UNIT_FIELD_SUMMON+1);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_SUMMON);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_SUMMON+1);
 
-	updateMask->SetBit(UNIT_FIELD_TARGET);
-	updateMask->SetBit(UNIT_FIELD_TARGET+1);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_TARGET);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_TARGET+1);
 
-	updateMask->SetBit(UNIT_FIELD_HEALTH);
-	updateMask->SetBit(UNIT_FIELD_POWER1);
-	updateMask->SetBit(UNIT_FIELD_POWER2);
-	updateMask->SetBit(UNIT_FIELD_POWER3);
-	updateMask->SetBit(UNIT_FIELD_POWER4);
-	updateMask->SetBit(UNIT_FIELD_POWER5);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_HEALTH);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_POWER1);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_POWER2);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_POWER3);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_POWER4);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_POWER5);
 
-	updateMask->SetBit(UNIT_FIELD_MAXHEALTH);
-	updateMask->SetBit(UNIT_FIELD_MAXPOWER1);
-	updateMask->SetBit(UNIT_FIELD_MAXPOWER2);
-	updateMask->SetBit(UNIT_FIELD_MAXPOWER3);
-	updateMask->SetBit(UNIT_FIELD_MAXPOWER4);
-	updateMask->SetBit(UNIT_FIELD_MAXPOWER5);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_MAXHEALTH);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_MAXPOWER1);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_MAXPOWER2);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_MAXPOWER3);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_MAXPOWER4);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_MAXPOWER5);
 
-	updateMask->SetBit(UNIT_FIELD_LEVEL);
-	updateMask->SetBit(UNIT_FIELD_FACTIONTEMPLATE);
-	updateMask->SetBit(UNIT_FIELD_BYTES_0);
-	updateMask->SetBit(UNIT_FIELD_FLAGS);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_LEVEL);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_FACTIONTEMPLATE);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_BYTES_0);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_FLAGS);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_FLAGS_2);
 	for(uint32 i = UNIT_FIELD_AURA; i <= UNIT_FIELD_AURASTATE; i ++)
-		updateMask->SetBit(i);
-	updateMask->SetBit(UNIT_FIELD_BASEATTACKTIME);
-	updateMask->SetBit(UNIT_FIELD_BASEATTACKTIME+1);
-	updateMask->SetBit(UNIT_FIELD_BOUNDINGRADIUS);
-	updateMask->SetBit(UNIT_FIELD_COMBATREACH);
-	updateMask->SetBit(UNIT_FIELD_DISPLAYID);
-	updateMask->SetBit(UNIT_FIELD_NATIVEDISPLAYID);
-	updateMask->SetBit(UNIT_FIELD_MOUNTDISPLAYID);
-	updateMask->SetBit(UNIT_FIELD_BYTES_1);
-	updateMask->SetBit(UNIT_FIELD_MOUNTDISPLAYID);
-	updateMask->SetBit(UNIT_FIELD_PETNUMBER);
-	updateMask->SetBit(UNIT_FIELD_PET_NAME_TIMESTAMP);
-	updateMask->SetBit(UNIT_FIELD_CHANNEL_OBJECT);
-	updateMask->SetBit(UNIT_FIELD_CHANNEL_OBJECT+1);
-	updateMask->SetBit(UNIT_CHANNEL_SPELL);
-	updateMask->SetBit(UNIT_DYNAMIC_FLAGS);
+		Player::m_visibleUpdateMask.SetBit(i);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_BASEATTACKTIME);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_BASEATTACKTIME+1);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_BOUNDINGRADIUS);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_COMBATREACH);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_DISPLAYID);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_NATIVEDISPLAYID);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_MOUNTDISPLAYID);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_BYTES_1);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_MOUNTDISPLAYID);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_PETNUMBER);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_PET_NAME_TIMESTAMP);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_CHANNEL_OBJECT);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_CHANNEL_OBJECT+1);
+	Player::m_visibleUpdateMask.SetBit(UNIT_CHANNEL_SPELL);
+	Player::m_visibleUpdateMask.SetBit(UNIT_DYNAMIC_FLAGS);
 
-	updateMask->SetBit(PLAYER_FLAGS);
-	updateMask->SetBit(PLAYER_BYTES);
-	updateMask->SetBit(PLAYER_BYTES_2);
-	updateMask->SetBit(PLAYER_BYTES_3);
-	updateMask->SetBit(PLAYER_GUILD_TIMESTAMP);
-	updateMask->SetBit(PLAYER_DUEL_TEAM);
-	updateMask->SetBit(PLAYER_DUEL_ARBITER);
-	updateMask->SetBit(PLAYER_DUEL_ARBITER+1);
-	updateMask->SetBit(PLAYER_GUILDID);
-	updateMask->SetBit(PLAYER_GUILDRANK);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_FLAGS);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_BYTES);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_BYTES_2);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_BYTES_3);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_GUILD_TIMESTAMP);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_DUEL_TEAM);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_DUEL_ARBITER);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_DUEL_ARBITER+1);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_GUILDID);
+	Player::m_visibleUpdateMask.SetBit(PLAYER_GUILDRANK);
 
 	for(uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
 	{
-		updateMask->SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0 + (i*16))); // visual items for other players
-		updateMask->SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+1 + (i*16))); // visual items for other players
+		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0 + (i*16))); // visual items for other players
+		Player::m_visibleUpdateMask.SetBit((uint16)(PLAYER_VISIBLE_ITEM_1_0+1 + (i*16))); // visual items for other players
 	}
 
 	/* fuck i hate const - burlex */
-	if(target && target->GetGroup() == const_cast<Player*>(this)->GetGroup() && const_cast<Player*>(this)->GetSubGroup() == target->GetSubGroup())
+	/*if(target && target->GetGroup() == const_cast<Player*>(this)->GetGroup() && const_cast<Player*>(this)->GetSubGroup() == target->GetSubGroup())
 	{
-		/* quest fields are the same for party members */
-		for(uint32 i = PLAYER_QUEST_LOG_1_01; i < PLAYER_QUEST_LOG_25_2; ++i)
-			updateMask->SetBit(i);
-	}
+	// quest fields are the same for party members
+	for(uint32 i = PLAYER_QUEST_LOG_1_01; i < PLAYER_QUEST_LOG_25_2; ++i)
+	Player::m_visibleUpdateMask.SetBit(i);
+	}*/
 }
 
 

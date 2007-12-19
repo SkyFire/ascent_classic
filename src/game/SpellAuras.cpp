@@ -4237,7 +4237,9 @@ void Aura::SpellAuraFeighDeath(bool apply)
 			pTarget->EventDeath();
 			pTarget->SetFlag(UNIT_FIELD_FLAGS_2, 1);
 			pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH);
+			//pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DEAD);
 			pTarget->SetFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_DEAD);
+			//pTarget->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
 			
 			data.SetOpcode(SMSG_START_MIRROR_TIMER);
 			data << uint32(2);		// type
@@ -4250,9 +4252,11 @@ void Aura::SpellAuraFeighDeath(bool apply)
 
 			data.Initialize(0x03BE);
 			data << pTarget->GetGUID();
+			pTarget->setDeathState(DEAD);
 
 			//now get rid of mobs agro. pTarget->CombatStatus.AttackersForgetHate() - this works only for already attacking mobs
 		    for(std::set<Object*>::iterator itr = pTarget->GetInRangeSetBegin(); itr != pTarget->GetInRangeSetEnd(); itr++ )
+			{
 				if((*itr)->IsUnit() && ((Unit*)(*itr))->isAlive())
 				{
 					if((*itr)->GetTypeId()==TYPEID_UNIT)
@@ -4264,8 +4268,8 @@ void Aura::SpellAuraFeighDeath(bool apply)
 						if(((Player*)(*itr))->GetSelection()==pTarget->GetGUID())							
 						{
 							//it seems that all these do not work in 2.3
-							((Player*)(*itr))->SetSelection(0);//loose selection
-							((Player*)(*itr))->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+							//((Player*)(*itr))->SetSelection(0);//loose selection
+							//((Player*)(*itr))->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 						}
 						//if player is enemy then he will exit combat
 						if(((Player*)(*itr))->GetTarget()==pTarget->GetGUID() && ((Player*)*itr)->IsAttacking())
@@ -4280,12 +4284,16 @@ void Aura::SpellAuraFeighDeath(bool apply)
 						((Player*)(*itr))->GetSession()->SendPacket(&data);
 					}
 				}
+			}
+			pTarget->setDeathState(ALIVE);
 		}
 		else
 		{
 			pTarget->RemoveFlag(UNIT_FIELD_FLAGS_2, 1);
 			pTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH);
 			pTarget->RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_DEAD);
+			//pTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DEAD);
+			//pTarget->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
 			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
 			data << uint32(2);
 			pTarget->GetSession()->SendPacket(&data);

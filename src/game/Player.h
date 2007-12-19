@@ -1709,6 +1709,9 @@ public:
 
 	inline bool IsAttacking() {return m_attacking; }
 
+	static void InitVisibleUpdateBits();
+	static UpdateMask m_visibleUpdateMask;
+
 protected:
 	LocationVector m_summonPos;
 	uint32 m_summonInstanceId;
@@ -1718,7 +1721,6 @@ protected:
 	uint32 iActivePet;
 	void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
 	void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;
-	void _SetVisibleBits(UpdateMask *updateMask, Player *target) const;
 /* Update system components */
 	ByteBuffer bUpdateBuffer;
     ByteBuffer bCreationBuffer;

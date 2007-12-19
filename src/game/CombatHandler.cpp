@@ -73,13 +73,17 @@ void WorldSession::HandleAttackStopOpcode( WorldPacket & recv_data )
 	if(guid)
 	{
 		pEnemy = _player->GetMapMgr()->GetUnit(guid);
-	}
-	if(!pEnemy)
-	{
-		sLog.outError( "WORLD: "I64FMT" doesn't exist.",guid);
-		return;
-	}
+		if(pEnemy)
+		{
+			GetPlayer()->EventAttackStop();
+			GetPlayer()->smsg_AttackStop(pEnemy);
 
-	GetPlayer()->EventAttackStop();
-	GetPlayer()->smsg_AttackStop(pEnemy);
+			/*WorldPacket data(SMSG_ATTACKSTOP, 20);
+			data << _player->GetNewGUID();
+			data << uint8(0);
+			data << uint32(0);
+			SendPacket(&data);*/
+		}
+	}
 }
+
