@@ -46,34 +46,34 @@ ObjectMgr::ObjectMgr()
 
 ObjectMgr::~ObjectMgr()
 {
-	sLog.outString("	Removing Corpses from Object Holder");
+	Log.Notice("ObjectMgr", "Deleting Corpses...");
 	CorpseCollectorUnload();
 
-	sLog.outString("	Deleting ItemSets...");
+	Log.Notice("ObjectMgr", "Deleting Itemsets...");
 	for(ItemSetContentMap::iterator i = mItemSets.begin(); i != mItemSets.end(); ++i)
 	{
 		delete i->second;
 	}
 	mItemSets.clear();
 
-	sLog.outString("	Deleting CreateInfo...");
+	Log.Notice("ObjectMgr", "Deleting PlayerCreateInfo...");
 	for( PlayerCreateInfoMap::iterator i = mPlayerCreateInfo.begin( ); i != mPlayerCreateInfo.end( ); ++ i ) {
 		delete i->second;
 	}
 	mPlayerCreateInfo.clear( );
 
-	sLog.outString("	Deleting Guilds...");
+	Log.Notice("ObjectMgr", "Deleting Guilds...");
 	for ( GuildMap::iterator i = mGuild.begin(); i != mGuild.end(); ++i ) {
 		delete i->second;
 	}
 
-	sLog.outString("	Deleting Vendors...");
+	Log.Notice("ObjectMgr", "Deleting Vendors...");
 	for( VendorMap::iterator i = mVendors.begin( ); i != mVendors.end( ); ++ i ) 
 	{
 		delete i->second;
 	}
 
-	sLog.outString("	Deleting AI Threat Spells...");
+	Log.Notice("ObjectMgr", "Deleting AI Threat Spells...");
 	for( ThreadToSpellList::iterator i = threatToSpells.begin( ); i != threatToSpells.end( ); ++ i ) 
 	{
 		ThreatToSpellId *gc=(*i);
@@ -81,12 +81,13 @@ ObjectMgr::~ObjectMgr()
 	}
 
 
-	sLog.outString("	Deleting Spell Override Map...");
+	Log.Notice("ObjectMgr", "Deleting Spell Override...");
 	for(OverrideIdMap::iterator i = mOverrideIdMap.begin(); i != mOverrideIdMap.end(); ++i)
 	{
 		delete i->second;
 	}
 
+	Log.Notice("ObjectMgr", "Deleting Trainers...");
 	for( TrainerMap::iterator i = mTrainers.begin( ); i != mTrainers.end( ); ++ i) {
 		Trainer * t = i->second;
 		if(t->UIMessage && t->UIMessage != (char*)NormalTalkMessage)
@@ -94,6 +95,7 @@ ObjectMgr::~ObjectMgr()
 		delete t;
 	}
 
+	Log.Notice("ObjectMgr", "Deleting Level Information...");
 	for( LevelInfoMap::iterator i = mLevelInfo.begin(); i != mLevelInfo.end(); ++i)
 	{
 		LevelMap * l = i->second;
@@ -105,34 +107,7 @@ ObjectMgr::~ObjectMgr()
 		delete l;
 	}
 
-	/*if(m_transporters)
-	{
-		for(uint32 i = 1; i <= this->TransportersCount; ++i)
-		{
-			if(m_transporters[i])
-			{
-				delete m_transporters[i];
-				m_transporters[i] = 0;
-			}
-		}
-		delete [] m_transporters;
-	}*/
-
-	/*BURSTORAGEREWRITEFIX*/
-	/*sLog.outString("Deleting Prototypes/Waypoints/AISpells...");
-	for(HM_NAMESPACE::hash_map<uint32, CreatureProto*>::iterator itr = m_creatureproto.begin(); itr != m_creatureproto.end(); ++itr)
-	{
-		CreatureProto * p = itr->second;
-		for(list<AI_Spell*>::iterator i = p->spells.begin(); i != p->spells.end(); ++i)
-			delete (*i);
-		delete p;
-	}*/
-
-	/*for(HM_NAMESPACE::hash_map<uint64, Transporter*>::iterator i = mTransports.begin(); i != mTransports.end(); ++i)
-	{
-		delete i->second;
-	}*/
-
+	Log.Notice("ObjectMgr", "Deleting Waypoint Cache...");
 	for(HM_NAMESPACE::hash_map<uint32, WayPointMap*>::iterator i = m_waypoints.begin(); i != m_waypoints.end(); ++i)
 	{
 		for(WayPointMap::iterator i2 = i->second->begin(); i2 != i->second->end(); ++i2)
@@ -142,7 +117,7 @@ ObjectMgr::~ObjectMgr()
 		delete i->second;
 	}
 
-	sLog.outString("Deleting npc_monstersay...");
+	Log.Notice("ObjectMgr", "Deleting NPC Say Texts...");
 	for(uint32 i = 0 ; i < NUM_MONSTER_SAY_EVENTS ; ++i)
 	{
 		NpcMonsterSay * p;
@@ -159,7 +134,7 @@ ObjectMgr::~ObjectMgr()
 		mMonsterSays[i].clear();
 	}
 
-	sLog.outString("Deleting Charters...");
+	Log.Notice("ObjectMgr", "Deleting Charters...");
 	for(int i = 0; i < NUM_CHARTER_TYPES; ++i)
 	{
 		for(HM_NAMESPACE::hash_map<uint32, Charter*>::iterator itr =  m_charters[i].begin(); itr != m_charters[i].end(); ++itr)
@@ -168,7 +143,7 @@ ObjectMgr::~ObjectMgr()
 		}
 	}
 
-	sLog.outString("Deleting reputation tables...");
+	Log.Notice("ObjectMgr", "Deleting Reputation Tables...");
 	for(ReputationModMap::iterator itr = this->m_reputation_creature.begin(); itr != m_reputation_creature.end(); ++itr)
 	{
 		ReputationModifier * mod = itr->second;
@@ -189,7 +164,7 @@ ObjectMgr::~ObjectMgr()
 		delete mod;
 	}
 
-	sLog.outString("Deleting groups...");
+	Log.Notice("ObjectMgr", "Deleting Groups...");
 	for(GroupMap::iterator itr = m_groups.begin(); itr != m_groups.end();)
 	{
 		Group * pGroup = itr->second;
@@ -203,12 +178,14 @@ ObjectMgr::~ObjectMgr()
 		delete pGroup;
 	}
 
+	Log.Notice("ObjectMgr", "Deleting Player Information...");
 	for(HM_NAMESPACE::hash_map<uint32, PlayerInfo*>::iterator itr = m_playersinfo.begin(); itr != m_playersinfo.end(); ++itr)
 	{
 		free(itr->second->name);
 		delete itr->second;
 	}
 
+	Log.Notice("ObjectMgr", "Deleting GM Tickets...");
 	for(GmTicketList::iterator itr = GM_TicketList.begin(); itr != GM_TicketList.end(); ++itr)
 		delete (*itr);
 }

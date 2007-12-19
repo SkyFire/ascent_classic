@@ -396,6 +396,13 @@ Transporter::Transporter(uint32 guidlow, uint32 guidhigh) : GameObject(guidlow, 
 Transporter::~Transporter()
 {
 	sEventMgr.RemoveEvents(this);
+	for(TransportNPCMap::iterator itr = m_npcs.begin(); itr != m_npcs.end(); ++itr)
+	{
+		if(itr->second->GetTypeId()==TYPEID_UNIT)
+			delete ((Creature*)itr->second)->m_transportPosition;
+
+		delete itr->second;
+	}
 }
 
 void ObjectMgr::LoadTransporters()

@@ -564,6 +564,8 @@ public:
 	void DisconnectUsersWithIP(const char * ip, WorldSession * session);
 	void DisconnectUsersWithPlayerName(const char * plr, WorldSession * session);
 
+	void LogoutPlayers();
+
 protected:
 	// update Stuff, FIXME: use diff
 	time_t _UpdateGameTime()

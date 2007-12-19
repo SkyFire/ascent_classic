@@ -478,6 +478,8 @@ protected:
 	bool HandleWhisperBlockCommand(const char * args, WorldSession * m_session);
 	bool HandleDispelAllCommand(const char * args, WorldSession * m_session);
 	bool HandleShowItems(const char * args, WorldSession * m_session);
+	bool HandleCollisionTestIndoor(const char * args, WorldSession * m_session);
+	bool HandleCollisionTestLOS(const char * args, WorldSession * m_session);
 
 	/* For skill related GM commands */
 	SkillNameMgr *SkillNameManager;

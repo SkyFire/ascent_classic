@@ -70,8 +70,16 @@ Guild::~Guild()
 			if((*itr)->pSlots[i] != NULL)
 				delete (*itr)->pSlots[i];
 
+		for(list<GuildBankEvent*>::iterator it2 = (*itr)->lLog.begin(); it2 != (*itr)->lLog.end(); ++it2)
+			delete (*it2);
+
 		delete (*itr);
 	}
+
+	for(list<GuildBankEvent*>::iterator it2 = m_moneyLog.begin(); it2 != m_moneyLog.end(); ++it2)
+		delete (*it2);
+
+	free(m_guildName);
 }
 
 void Guild::SendGuildCommandResult(WorldSession * pClient, uint32 iCmd, const char * szMsg, uint32 iType)
@@ -557,6 +565,7 @@ bool Guild::LoadFromDB(Field * f)
 			li->iEventData[0] = result->Fetch()[4].GetUInt32();
 			li->iEventData[1] = result->Fetch()[5].GetUInt32();
 			li->iEventData[2] = result->Fetch()[6].GetUInt32();
+			m_log.push_back(li);
 		} while(result->NextRow());
 		delete result;
 	}

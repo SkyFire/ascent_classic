@@ -22,6 +22,85 @@
 
 LocalizationMgr sLocalizationMgr;
 
+void LocalizationMgr::Shutdown()
+{
+	if(m_disabled)
+		return;
+
+#define SAFE_FREE_PTR(x) if(deletedPointers.find((x)) == deletedPointers.end()) { deletedPointers.insert((x)); free((x)); }
+
+	set<void*> deletedPointers;
+	uint32 maxid=0;
+	uint32 i,j;
+	vector<pair<uint32,uint32> >::iterator xtr = m_languages.begin();
+	for(; xtr != m_languages.end(); ++xtr)
+		if(xtr->second>maxid)
+			maxid=xtr->second;
+
+	maxid++;
+	Log.Notice("LocalizationMgr", "Beginning pointer cleanup...");
+	uint32 t = getMSTime();
+
+    for(i = 0; i < maxid; ++i)
+	{
+		for(HM_NAMESPACE::hash_map<uint32, LocalizedQuest>::iterator itr = m_Quests[i].begin(); itr != m_Quests[i].end(); ++itr)
+		{
+			SAFE_FREE_PTR(itr->second.Title);
+			SAFE_FREE_PTR(itr->second.Details);
+			SAFE_FREE_PTR(itr->second.Objectives);
+			SAFE_FREE_PTR(itr->second.CompletionText);
+			SAFE_FREE_PTR(itr->second.IncompleteText);
+			SAFE_FREE_PTR(itr->second.EndText);
+			SAFE_FREE_PTR(itr->second.ObjectiveText[0]);
+			SAFE_FREE_PTR(itr->second.ObjectiveText[1]);
+			SAFE_FREE_PTR(itr->second.ObjectiveText[2]);
+			SAFE_FREE_PTR(itr->second.ObjectiveText[3]);
+		}
+
+		for(HM_NAMESPACE::hash_map<uint32, LocalizedItem>::iterator itr = m_Items[i].begin(); itr != m_Items[i].end(); ++itr)
+		{
+			SAFE_FREE_PTR(itr->second.Name);
+			SAFE_FREE_PTR(itr->second.Description);
+		}
+
+		for(HM_NAMESPACE::hash_map<uint32, LocalizedNpcText>::iterator itr = m_NpcTexts[i].begin(); itr != m_NpcTexts[i].end(); ++itr)
+		{
+			for(j = 0; j < 8; ++j)
+			{
+				SAFE_FREE_PTR(itr->second.Texts[j][0]);
+				SAFE_FREE_PTR(itr->second.Texts[j][1]);
+			}
+		}
+
+		for(HM_NAMESPACE::hash_map<uint32, LocalizedCreatureName>::iterator itr = m_CreatureNames[i].begin(); itr != m_CreatureNames[i].end(); ++itr)
+		{
+			SAFE_FREE_PTR(itr->second.Name);
+			SAFE_FREE_PTR(itr->second.SubName);
+		}
+
+		for(HM_NAMESPACE::hash_map<uint32, LocalizedGameObjectName>::iterator itr = m_GameObjectNames[i].begin(); itr != m_GameObjectNames[i].end(); ++itr)
+		{
+			SAFE_FREE_PTR(itr->second.Name);
+		}
+
+		for(HM_NAMESPACE::hash_map<uint32, LocalizedItemPage>::iterator itr = m_ItemPages[i].begin(); itr != m_ItemPages[i].end(); ++itr)
+		{
+			SAFE_FREE_PTR(itr->second.Text);
+		}
+	}
+
+	deletedPointers.clear();
+	delete [] m_ItemPages;
+	delete [] m_CreatureNames;
+	delete [] m_GameObjectNames;
+	delete [] m_Items;
+	delete [] m_NpcTexts;
+	delete [] m_Quests;
+	m_languages.clear();
+	Log.Notice("LocalizationMgr", "Pointer cleanup completed in %.4f seconds.", float(float(getMSTime()-t) / 1000.0f));
+#undef SAFE_FREE_PTR
+}
+
 void LocalizationMgr::Lower(string& conv)
 {
 	for(size_t i = 0; i < conv.length(); ++i)
@@ -223,6 +302,11 @@ void LocalizationMgr::Reload(bool first)
 				if(lid == 0)
 					continue;		// no loading enus stuff.. lawl
 
+				if(m_Items[lid].find(entry) != m_Items[lid].end())
+				{
+					continue;
+				}
+
 				it.Name = strdup(f[2].GetString());
 				it.Description = strdup(f[3].GetString());
 				m_Items[lid].insert(make_pair(entry, it));
@@ -344,7 +428,11 @@ void LocalizationMgr::Reload(bool first)
 	{
 		uint32 source_language_id = GetLanguageId(itr->second);
 		uint32 dest_language_id = GetLanguageId(itr->first);
-		ASSERT(source_language_id>0&&dest_language_id>0);
+		if(source_language_id==0 || dest_language_id == 0)
+		{
+			Log.Error("LocalizationMgr", "Invalid locale conversion string specified: %u->%u (%s->%s)", source_language_id, dest_language_id, itr->second.c_str(), itr->first.c_str());
+			continue;
+		}
 
 		/* duplicate the hashmaps (we can save the pointers here) */
 		CopyHashMap<LocalizedItem>(&m_Items[source_language_id], &m_Items[dest_language_id]);

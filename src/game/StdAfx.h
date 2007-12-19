@@ -160,7 +160,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #endif
 
 #ifdef COLLISION
-#include "collision/Collision.h"
+#include "CollideInterface.h"
 #endif
 
 //#define COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS 1

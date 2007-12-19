@@ -62,6 +62,8 @@ struct LocalizedQuest
 class LocalizationMgr
 {
 public:
+	void Shutdown();
+
 	void Reload(bool first);
 	void Lower(string& conv);
 	uint32 GetLanguageId(uint32 full);

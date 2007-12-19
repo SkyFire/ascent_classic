@@ -36,10 +36,6 @@ void MapCell::Init(uint32 x, uint32 y, uint32 mapid, MapMgr *mapmgr)
 	_x=x;
 	_y=y;
 	_unloadpending=false;
-
-#ifdef COLLISION
-	m_collisionTile = NULL;
-#endif
 }
 
 void MapCell::AddObject(Object *obj)
@@ -73,7 +69,7 @@ void MapCell::SetActivity(bool state)
 			CancelPendingUnload();
 
 #ifdef COLLISION
-		m_collisionTile = Collision::GetTileManager(_mapmgr->GetMapId())->GetTile(Collision::GetXFromCellX(_y), Collision::GetYFromCellY(_x));
+		CollideInterface.ActivateTile(_mapmgr->GetMapId(), _x/8, _y/8);
 #endif
 
 	} else if(_active && !state)
@@ -89,11 +85,7 @@ void MapCell::SetActivity(bool state)
 			QueueUnloadPending();
 
 #ifdef COLLISION
-		if(m_collisionTile != NULL)
-		{
-			m_collisionTile->DecRef();
-			m_collisionTile = NULL;
-		}
+		CollideInterface.DeactivateTile(_mapmgr->GetMapId(), _x/8, _y/8);
 #endif
 	}
 

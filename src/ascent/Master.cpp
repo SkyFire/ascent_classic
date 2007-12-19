@@ -106,6 +106,7 @@ struct Addr
         static const char * default_realm_config_file = CONFDIR "/realms.conf";
 #endif
 
+bool bServerShutdown = false;
 
 bool Master::Run(int argc, char ** argv)
 {
@@ -468,22 +469,28 @@ bool Master::Run(int argc, char ** argv)
 
 	// begin server shutdown
 	time_t st = UNIXTIME;
-	sLog.outString("Server shutdown initiated at %s", ctime(&st));
+	Log.Notice("Shutdown", "Initiated at %s", ConvertTimeStampToDataTime((uint32)UNIXTIME).c_str());
+
+	if(lootmgr.is_loading)
+	{
+		Log.Notice("Shutdown", "Waiting for loot to finish loading...");
+		while(lootmgr.is_loading)
+			Sleep(100);
+	}
 
 	// send a query to wake it up if its inactive
-	sLog.outString("Executing pending database queries and closing database thread...");
+	Log.Notice("Database", "Clearing all pending queries...");
 	// kill the database thread first so we don't lose any queries/data
 	CharacterDatabase.EndThreads();
 	WorldDatabase.EndThreads();
 
-	sLog.outString("All pending database operations cleared.\n");
 	Log.Notice("DayWatcherThread", "Exiting...");
 	dw->terminate();
 	dw = NULL;
 
 	sWorld.SaveAllPlayers();
 
-	sLog.outString("Killing all sockets and network subsystem.");
+	Log.Notice("Network", "Shutting down network subsystem.");
 #ifndef CLUSTERING
 	ls->Close();
 #endif
@@ -492,28 +499,31 @@ bool Master::Run(int argc, char ** argv)
 #endif
 	sSocketMgr.CloseAll();
 
+	bServerShutdown = true;
+	ThreadPool.Shutdown();
+
+	sWorld.LogoutPlayers();
 	sLog.outString("");
 
 	delete LogonCommHandler::getSingletonPtr();
 
 	sWorld.ShutdownClasses();
-	sLog.outString("\nDeleting World...");
+	Log.Notice("World", "~World()");
 	delete World::getSingletonPtr();
-
-	ThreadPool.Shutdown();
 
 	sScriptMgr.UnloadScripts();
 	delete ScriptMgr::getSingletonPtr();
 
-	sLog.outString("Deleting Event Manager...");
+	Log.Notice("EventMgr", "~EventMgr()");
 	delete EventMgr::getSingletonPtr();
 
-	sLog.outString("Terminating MySQL connections...\n");
+	Log.Notice("Database", "Closing Connections...");
 	_StopDB();
 
-	sLog.outString("Deleting Network Subsystem...");
+	Log.Notice("Network", "Deleting Network Subsystem...");
 	delete SocketMgr::getSingletonPtr();
 	delete SocketGarbageCollector::getSingletonPtr();
+	Log.Notice("VoiceChatHandler", "~VoiceChatHandler()");
 	delete VoiceChatHandler::getSingletonPtr();
 
 #ifdef ENABLE_LUA_SCRIPTING
@@ -529,7 +539,7 @@ bool Master::Run(int argc, char ** argv)
 	// remove pid
 	remove("ascent.pid");
 
-	sLog.outString("\nServer shutdown completed successfully.\n");
+	Log.Notice("Shutdown", "Shutdown complete.");
 
 #ifdef WIN32
 	WSACleanup();
@@ -606,8 +616,6 @@ bool Master::_StartDB()
 
 void Master::_StopDB()
 {
-	CharacterDatabase.Shutdown();
-	WorldDatabase.Shutdown();
 	delete Database_World;
 	delete Database_Character;
 }

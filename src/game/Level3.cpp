@@ -2513,3 +2513,46 @@ bool ChatHandler::HandleShowItems(const char * args, WorldSession * m_session)
 
 	return true;
 }
+
+bool ChatHandler::HandleCollisionTestIndoor(const char * args, WorldSession * m_session)
+{
+#ifdef COLLISION
+	Player * plr = m_session->GetPlayer();
+	const LocationVector & loc = plr->GetPosition();
+	bool res = CollideInterface.IsIndoor(plr->GetMapId(), loc.x, loc.y, loc.z);
+	SystemMessage(m_session, "Result was: %s.", res ? "indoors" : "outside");
+	return true;
+#else
+	SystemMessage(m_session, "Ascent was not compiled with collision support.");
+	return true;
+#endif
+}
+
+bool ChatHandler::HandleCollisionTestLOS(const char * args, WorldSession * m_session)
+{
+#ifdef COLLISION
+	Object * pObj = NULL;
+	Creature * pCreature = getSelectedCreature(m_session, false);
+	Player * pPlayer = getSelectedChar(m_session, false);
+	if(pCreature)
+		pObj = pCreature;
+	else if(pPlayer)
+		pObj = pPlayer;
+
+	if(pObj == NULL)
+	{
+		SystemMessage(m_session, "Invalid target.");
+		return true;
+	}
+
+	const LocationVector & loc2 = pObj->GetPosition();
+	const LocationVector & loc1 = m_session->GetPlayer()->GetPosition();
+	bool res = CollideInterface.CheckLOS(pObj->GetMapId(), loc1.x, loc1.y, loc1.z, loc2.x, loc2.y, loc2.z);
+	SystemMessage(m_session, "Result was: %s.", res ? "in LOS" : "not in LOS");
+	return true;
+#else
+	SystemMessage(m_session, "Ascent was not compiled with collision support.");
+	return true;
+#endif
+}
+

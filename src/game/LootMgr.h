@@ -151,6 +151,8 @@ public:
 
 	RandomProps * GetRandomProperties(ItemPrototype * proto);
 	ItemRandomSuffixEntry * GetRandomSuffix(ItemPrototype * proto);
+
+	bool is_loading;
  
 private:
 	void LoadLootTables(const char * szTableName,LootStore * LootTable);

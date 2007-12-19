@@ -2793,6 +2793,9 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		// listid stuff
 		factdbc = dbcFaction.LookupEntryForced(id);
 		if(!factdbc) continue;
+		ReputationMap::iterator rtr = m_reputation.find(id);
+		if(rtr != m_reputation.end())
+			delete rtr->second;
 
 		rep = new FactionReputation;
 		rep->baseStanding = basestanding;

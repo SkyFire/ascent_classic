@@ -300,7 +300,13 @@
 			RelativePath="..\..\src\game\ClusterInterface.h">
 		</File>
 		<File
-			RelativePath="..\..\src\game\collision\Collision.h">
+			RelativePath="..\..\src\game\collide.h">
+		</File>
+		<File
+			RelativePath="..\..\src\game\CollideInterface.cpp">
+		</File>
+		<File
+			RelativePath="..\..\src\game\CollideInterface.h">
 		</File>
 		<File
 			RelativePath="..\..\src\game\CombatHandler.cpp">
@@ -522,18 +528,6 @@
 			RelativePath="..\..\src\game\MiscHandler.cpp">
 		</File>
 		<File
-			RelativePath="..\..\src\game\collision\Model.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\game\collision\Model.h">
-		</File>
-		<File
-			RelativePath="..\..\src\game\collision\ModelManager.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\game\collision\ModelManager.h">
-		</File>
-		<File
 			RelativePath="..\..\src\game\MovementHandler.cpp">
 		</File>
 		<File
@@ -703,18 +697,6 @@
 		</File>
 		<File
 			RelativePath="..\..\src\game\TerrainMgr.h">
-		</File>
-		<File
-			RelativePath="..\..\src\game\collision\Tile.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\game\collision\Tile.h">
-		</File>
-		<File
-			RelativePath="..\..\src\game\collision\TileManager.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\game\collision\TileManager.h">
 		</File>
 		<File
 			RelativePath="..\..\src\game\TradeHandler.cpp">

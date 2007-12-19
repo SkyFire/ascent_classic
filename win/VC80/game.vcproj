@@ -351,46 +351,6 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Collision"
-			>
-			<File
-				RelativePath="..\..\src\game\collision\Collision.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\collision\Model.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\collision\Model.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\collision\ModelManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\collision\ModelManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\collision\Tile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\collision\Tile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\collision\TileManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\collision\TileManager.h"
-				>
-			</File>
-		</Filter>
 		<File
 			RelativePath="..\..\src\game\AddonMgr.cpp"
 			>
@@ -521,6 +481,18 @@
 		</File>
 		<File
 			RelativePath="..\..\src\game\ClusterInterface.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\game\collide.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\game\CollideInterface.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\game\CollideInterface.h"
 			>
 		</File>
 		<File

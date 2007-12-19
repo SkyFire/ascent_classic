@@ -24,6 +24,7 @@
 #include "StdAfx.h"
 #define MAP_MGR_UPDATE_PERIOD 100
 #define MAPMGR_INACTIVE_MOVE_TIME 10
+extern bool bServerShutdown;
 
 MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>(map), _mapId(mapId), eventHolder(instanceid)
 {
@@ -1576,11 +1577,26 @@ void MapMgr::EventCorpseDespawn(uint64 guid)
 void MapMgr::TeleportPlayers()
 {
 	PlayerStorageMap::iterator itr =  m_PlayerStorage.begin();
-	for(; itr !=  m_PlayerStorage.end();)
+	if(!bServerShutdown)
 	{
-		Object *p = itr->second;
-		++itr;
-		static_cast<Player*>(p)->EjectFromInstance();
+		for(; itr !=  m_PlayerStorage.end();)
+		{
+			Player *p = itr->second;
+			++itr;
+			p->EjectFromInstance();
+		}
+	}
+	else
+	{
+		for(; itr !=  m_PlayerStorage.end();)
+		{
+			Player *p = itr->second;
+			++itr;
+			if(p->GetSession())
+				p->GetSession()->LogoutPlayer(false);
+			else
+				delete p;
+		}
 	}
 }
 

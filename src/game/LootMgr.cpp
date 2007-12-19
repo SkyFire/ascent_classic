@@ -89,11 +89,14 @@ T* RandomChoiceVector( vector<pair<T*, float> > & variant )
 }
 
 LootMgr::LootMgr()
-{}
+{
+	is_loading = false;
+}
 
 void LootMgr::LoadLoot()
 {
 	//THIS MUST BE CALLED AFTER LOADING OF ITEMS
+	is_loading = true;
 	LoadLootProp();
 	LoadLootTables("creatureloot",&CreatureLoot);
 	LoadLootTables("objectloot",&GOLoot);
@@ -102,6 +105,7 @@ void LootMgr::LoadLoot()
 	LoadLootTables("itemloot", &ItemLoot);
 	LoadLootTables("prospectingloot", &ProspectingLoot);
 	LoadLootTables("pickpocketingloot", &PickpocketingLoot);
+	is_loading = false;
 }
 
 RandomProps * LootMgr::GetRandomProperties(ItemPrototype * proto)
