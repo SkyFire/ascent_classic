@@ -1334,9 +1334,20 @@ void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
 		return;
 
 	// sanity checks
-	if(pMember->pRank->iGoldLimitPerDay)
+	if(pMember->pRank->iGoldLimitPerDay > 0)
+	{
 		if(pMember->CalculateAvailableAmount() < uAmount)
+		{
+			pClient->SystemMessage("You have already withdrawn too much today.");
 			return;
+		}
+	}
+
+	if(pMember->pRank->iGoldLimitPerDay == 0)
+	{
+		pClient->SystemMessage("You don't have permission to do that.");
+		return;
+	}
 
 	if(m_bankBalance < uAmount)
 		return;

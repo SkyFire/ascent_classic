@@ -1447,7 +1447,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 				return;
 			}
 
-			if(pMember->pRank->iTabPermissions[dest_bank].iStacksPerDay != -1)
+			if(pMember->pRank->iTabPermissions[dest_bank].iStacksPerDay > 0)
 			{
 				if(pMember->CalculateAllowedItemWithdraws(dest_bank) == 0)
 				{
