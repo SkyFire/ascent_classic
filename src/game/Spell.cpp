@@ -3407,7 +3407,16 @@ exit:
 		//		* The tooltip is proven to be wrong and the following is the best player worked out formula so far with data taken from [1]
 		//		* Formula: DamagePercentageBonus*RangedWeaponSpecialization*(150 + WeaponDamage/WeaponSpeed*2.8 + 0.2*RAP + [Dazed: 175]) 
 		if(i==0 && u_caster)
+		{
+			if(p_caster)
+			{
+				Item *it;
+				if(p_caster->GetItemInterface())
+					it = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+				value += float2int32(float(it->GetProto()->Damage[0].Min)*float(it->GetProto()->Delay)*2.8f);
+			}
 			value += (uint32)(u_caster->GetRAP()*0.2);
+		}
 	}
     // HACK FIX
     else if(m_spellInfo->Id == 34428 || m_spellInfo->Id ==23881 ||m_spellInfo->Id == 23892 || m_spellInfo->Id==23893 ||m_spellInfo->Id == 23894||

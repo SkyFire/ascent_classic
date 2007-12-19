@@ -3,11 +3,6 @@ Class: Hunter
 NPC/Area: N/A
 Explanation: Scatter shot will sometimes say "you cant do that while immune(sounds familiar...hmmm but from where?!?! *cough* alchemy >.>) but sometimes it will work,but most of the time the target can still act on their own will while SS'd(and yes,noone caused them damage)
 
-Mongoose Bite
-From WoWWiki
-Counter attack the enemy for damage equal to X plus 20% of your Attack Power. Can only be performed after you dodge.
-(does only the damage it has in the tooltip)
-
 Steady Shot
 From WoWWiki
 A steady shot that causes base weapon damage + X damage. Causes an additional Y damage against Dazed targets. Z% of your Ranged Attack Power is added to Steady Shot's damage. No cooldown.
