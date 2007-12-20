@@ -209,7 +209,7 @@ bool ChatHandler::HandleItemCommand(const char* args, WorldSession *m_session)
 	if(tmpItem)
 	{
 		std::stringstream ss;
-		ss << "INSERT INTO vendors VALUES ('" << pCreature->GetUInt32Value(OBJECT_FIELD_ENTRY) << "', '" << item << "', '" << amount << "')" << '\0';
+		ss << "INSERT INTO vendors VALUES (" << pCreature->GetUInt32Value(OBJECT_FIELD_ENTRY) << "', '" << item << "', '" << amount << "',0,0,0,0)" << '\0';
 		WorldDatabase.Execute( ss.str().c_str() );
 
 		pCreature->AddVendorItem(item, amount);
@@ -256,7 +256,7 @@ bool ChatHandler::HandleItemRemoveCommand(const char* args, WorldSession *m_sess
 		uint32 guidlow = GUID_LOPART(guid);
 
 		std::stringstream ss;
-		ss << "DELETE FROM vendors WHERE vendorGuid = " << guidlow << " AND itemGuid = " << itemguid << '\0';
+		ss << "DELETE FROM vendors WHERE entry = " << guidlow << " AND item = " << itemguid << '\0';
 		WorldDatabase.Execute( ss.str().c_str() );
 
 		pCreature->RemoveVendorItem(itemguid);

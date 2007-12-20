@@ -299,6 +299,25 @@ void Creature::SaveToDB()
 
 	WorldDatabase.Execute(ss.str().c_str());
 }
+void Creature::SaveItemToDB(uint32 itemid)
+{
+	if (this->HasItems())
+	{
+		for(std::vector<CreatureItem>::iterator itr = m_SellItems->begin(); itr != m_SellItems->end(); ++itr)
+		{
+			if (itr->itemid ==itemid)
+			{
+				std::stringstream query;
+				query << "UPDATE vendors SET av_amount = "
+					<< itr->available_amount << ", nextinc = "
+					<< itr->timetoinc << " WHERE entry = "
+					<< creature_info->Id <<" AND item = " << itr->itemid;
+				WorldDatabase.Execute(query.str().c_str());
+				break;
+			}
+		}
+	}
+}
 
 void Creature::SaveToFile(std::stringstream & name)
 {
@@ -675,12 +694,67 @@ void Creature::AddVendorItem(uint32 itemid, uint32 amount)
 	CreatureItem ci;
 	ci.amount = amount;
 	ci.itemid = itemid;
+	ci.available_amount = 0;
+	ci.max_amount = 0;
+	ci.timetoinc = 0;
+	ci.incrtime = 0;
 	if(!m_SellItems)
 	{
 		m_SellItems = new vector<CreatureItem>;
 		objmgr.SetVendorList(GetEntry(), m_SellItems);
 	}
 	m_SellItems->push_back(ci);
+}
+void Creature::ModAvItemAmount(uint32 itemid, int32 value)
+{
+	for(std::vector<CreatureItem>::iterator itr = m_SellItems->begin(); itr != m_SellItems->end(); ++itr)
+	{
+		if(itr->itemid == itemid)
+		{
+			if (itr->max_amount==0)
+				itr->available_amount=0;
+			else
+			{
+				itr->available_amount = (itr->available_amount+value<0) ? 0 : (itr->available_amount+value);
+				if (itr->available_amount<itr->max_amount)
+				{
+						itr->timetoinc = itr->incrtime;
+						sEventMgr.AddEvent(this, &Creature::UpdateItemAmount, itr->itemid, EVENT_ITEM_UPDATE, VENDOR_ITEMS_UPDATE_TIME, 1,0);
+				}
+				SaveItemToDB(itemid);
+			}
+			return;
+		}
+	}
+}
+void Creature::UpdateItemAmount(uint32 itemid)
+{
+	for(std::vector<CreatureItem>::iterator itr = m_SellItems->begin(); itr != m_SellItems->end(); ++itr)
+	{
+		if(itr->itemid == itemid)
+		{
+			if (itr->max_amount==0 || itr->timetoinc<=0 )
+				itr->available_amount=0;
+			else
+			{
+				if (itr->timetoinc <= VENDOR_ITEMS_UPDATE_TIME)
+				{
+					itr->available_amount++;
+					if (itr->available_amount<itr->max_amount)
+						itr->timetoinc=itr->incrtime;
+					else
+						itr->timetoinc=0;
+				}
+				else
+				{
+					itr->timetoinc-=VENDOR_ITEMS_UPDATE_TIME;
+					sEventMgr.AddEvent(this, &Creature::UpdateItemAmount, itemid, EVENT_ITEM_UPDATE, VENDOR_ITEMS_UPDATE_TIME, 1,0);
+				}
+				SaveItemToDB(itemid);
+			}
+			return;
+		}
+	}
 }
 
 void Creature::TotemExpire()
@@ -1253,6 +1327,17 @@ void Creature::OnPushToWorld()
 	}
 
 	m_aiInterface->m_is_in_instance = (m_mapMgr->GetMapInfo()->type!=INSTANCE_NULL) ? true : false;
+	if (this->HasItems())
+	{
+		for(std::vector<CreatureItem>::iterator itr = m_SellItems->begin(); itr != m_SellItems->end(); ++itr)
+		{
+				if (itr->max_amount == 0)
+					itr->available_amount=0;
+				else if (itr->available_amount<itr->max_amount)				
+					sEventMgr.AddEvent(this, &Creature::UpdateItemAmount, itr->itemid, EVENT_ITEM_UPDATE, VENDOR_ITEMS_UPDATE_TIME, 1,0);
+		}
+
+	}
 }
 
 // this is used for guardians. They are non respawnable creatures linked to a player

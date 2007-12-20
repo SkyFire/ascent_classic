@@ -26,12 +26,17 @@ class GossipScript;
 #define MAX_CREATURE_ITEMS 128
 #define MAX_CREATURE_LOOT 8
 #define MAX_PET_SPELL 4
+#define VENDOR_ITEMS_UPDATE_TIME 3600000
 #include "Map.h"
 
 struct CreatureItem
 {
 	uint32 itemid;
-	int amount;
+	uint32 amount; //!!!!! stack amount.
+	uint32 available_amount;
+	uint32 max_amount;
+	uint32 incrtime;
+	uint32 timetoinc;
 };
 
 SERVER_DECL bool Rand(float chance);
@@ -304,13 +309,16 @@ public:
 			}
 		}
 		ci.amount = 0;
+		ci.max_amount=0;
+		ci.available_amount =0;
+		ci.incrtime=0;
+		ci.timetoinc=0;
 		ci.itemid = 0;
 	}
 
 	inline std::vector<CreatureItem>::iterator GetSellItemBegin() { return m_SellItems->begin(); }
 	inline std::vector<CreatureItem>::iterator GetSellItemEnd()   { return m_SellItems->end(); }
 	inline size_t GetSellItemCount() { return m_SellItems->size(); }
-	
 	void RemoveVendorItem(uint32 itemid)
 	{
 		for(std::vector<CreatureItem>::iterator itr = m_SellItems->begin(); itr != m_SellItems->end(); ++itr)
@@ -322,8 +330,9 @@ public:
 			}
 		}
 	}
-
 	void AddVendorItem(uint32 itemid, uint32 amount);
+	void ModAvItemAmount(uint32 itemid, int32 value);
+	void UpdateItemAmount(uint32 itemid);
 	/// Quests
 	void _LoadQuests();
 	bool HasQuests() { return m_quests != NULL; };
@@ -427,6 +436,7 @@ public:
 
 	// Serialization
 	void SaveToDB();
+	void SaveItemToDB(uint32 itemid);
 	void SaveToFile(std::stringstream & name);
 	//bool LoadFromDB(uint32 guid);
 	//bool LoadFromDB(CreatureTemplate *t);

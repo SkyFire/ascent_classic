@@ -947,6 +947,17 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		return;
 	Container*c=NULL;
 
+
+	CreatureItem ci;
+	unit->GetSellItemByItemId(itemid,ci);
+
+	if (ci.max_amount!=0 && ci.available_amount<amount)
+	{
+		_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_ITEM_IS_CURRENTLY_SOLD_OUT);
+		return;
+	}
+
+
 	//if slot is diferent than -1, check for validation, else continue for auto storing.
 	if(slot != INVENTORY_SLOT_NOT_SET)
 	{
@@ -1008,7 +1019,6 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 	
 	CreatureItem itemd;
 	unit->GetSellItemByItemId(itemid, itemd);
-	itemd.amount = abs(itemd.amount);
 
 	if(itemd.itemid == 0)
 	{
@@ -1111,14 +1121,16 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		SendPacket(&data);*/
 	}
 
-	_player->GetItemInterface()->BuyItem(it,amount*itemd.amount,itemd.amount);
-
 	WorldPacket data(SMSG_BUY_ITEM, 12);
 	data << uint64(srcguid);
 	data << uint32(itemid) << uint32(amount);
  
 	SendPacket( &data );
 	sLog.outDetail( "WORLD: Sent SMSG_BUY_ITEM" );
+
+	_player->GetItemInterface()->BuyItem(it,amount*itemd.amount,itemd.amount);
+	unit->ModAvItemAmount(itemd.itemid,-itemd.amount);
+	SendInventoryList(unit);
 }
 
 void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click on item
@@ -1158,6 +1170,11 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	{
 		// vendor does not sell this item.. bitch about cheaters?
 		_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_DONT_OWN_THAT_ITEM);
+		return;
+	}
+	if (item.max_amount!=0 && item.available_amount<amount)
+	{
+		_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_ITEM_IS_CURRENTLY_SOLD_OUT);
 		return;
 	}
 
@@ -1239,6 +1256,8 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	 SendPacket( &data );
 		
 	 _player->GetItemInterface()->BuyItem(it,amount*item.amount,item.amount);
+	 unit->ModAvItemAmount(item.itemid,-item.amount);
+	 SendInventoryList(unit);
 }
 
 void WorldSession::HandleListInventoryOpcode( WorldPacket & recv_data )
@@ -1281,15 +1300,16 @@ void WorldSession::SendInventoryList(Creature* unit)
 
 	for(std::vector<CreatureItem>::iterator itr = unit->GetSellItemBegin(); itr != unit->GetSellItemEnd(); ++itr)
 	{
-		if(itr->itemid)
+		if(itr->itemid && (itr->max_amount == 0 || (itr->max_amount>0 && itr->available_amount >0)))
 		{
 			if((curItem = ItemPrototypeStorage.LookupEntry(itr->itemid)))
 			{
+				int32 av_am = (itr->max_amount>0)?itr->available_amount:-1;
 				data << (counter + 1);
 				data << curItem->ItemId;
 				data << curItem->DisplayInfoID;
-				data << (int32)(-1); //we dont suport this kind of buy, make them infinite
-				data << GetBuyPriceForItem(curItem, abs(itr->amount), abs(itr->amount));
+				data << av_am;
+				data << GetBuyPriceForItem(curItem, itr->amount, itr->amount);
 				data << uint32(0x00);
 				data << (int16)itr->amount;
 				data << uint16(0x00);

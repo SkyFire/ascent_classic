@@ -4388,7 +4388,6 @@ void World::SaveAllPlayers()
 	sLog.outString("Saved %u players.", count);
 }
 
-
 WorldSession* World::FindSessionByName(const char * Name)//case insensetive
 {
 	m_sessionlock.AcquireReadLock();
