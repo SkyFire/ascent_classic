@@ -1129,7 +1129,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 	sLog.outDetail( "WORLD: Sent SMSG_BUY_ITEM" );
 
 	_player->GetItemInterface()->BuyItem(it,amount*itemd.amount,itemd.amount);
-	unit->ModAvItemAmount(itemd.itemid,-itemd.amount);
+	unit->ModAvItemAmount(itemd.itemid,-(int32)itemd.amount);
 	SendInventoryList(unit);
 }
 
@@ -1256,7 +1256,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	 SendPacket( &data );
 		
 	 _player->GetItemInterface()->BuyItem(it,amount*item.amount,item.amount);
-	 unit->ModAvItemAmount(item.itemid,-item.amount);
+	 unit->ModAvItemAmount(item.itemid,-(int32)item.amount);
 	 SendInventoryList(unit);
 }
 
