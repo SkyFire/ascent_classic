@@ -1553,6 +1553,7 @@ public:
 	//! PvP Toggle (called on /pvp)
 	void PvPToggle();
 	bool CanCastDueToCooldown(SpellEntry * spellid);
+	bool CanCastItemDueToCooldown(ItemPrototype * pProto, uint32 x);
 	inline uint32 LastHonorResetTime() const { return m_lastHonorResetTime; }
 	inline void LastHonorResetTime(uint32 val) { m_lastHonorResetTime = val; }
 	uint32 OnlineTime;

@@ -7447,6 +7447,39 @@ void Player::PvPToggle()
     }
 }
 
+bool Player::CanCastItemDueToCooldown(ItemPrototype * pProto, uint32 x)
+{
+	ItemCooldownSet::iterator itr = m_itemcooldown.begin();
+	ItemCooldown * cool;
+	uint32 curtime = now();
+	if(pProto->Spells[x].Category)
+	{
+		for(; itr != m_itemcooldown.end(); ++itr)
+		{
+			cool = *itr;
+			if(cool->SpellCategory == pProto->Spells[x].Category ||
+				cool->ItemEntry == pProto->ItemId)
+			{
+				if(cool->CooldownTimeStamp > curtime)
+					return false;
+			}
+		}
+	}
+	else
+	{
+		for(; itr != m_itemcooldown.end(); ++itr)
+		{
+			cool = *itr;
+			if(cool->ItemEntry == pProto->ItemId)
+			{
+				if(cool->CooldownTimeStamp > curtime)
+					return false;
+			}
+		}
+	}
+	return true;
+}
+
 bool Player::CanCastDueToCooldown(SpellEntry * spellid)
 {
 	map<uint32, uint32>::iterator itr;
