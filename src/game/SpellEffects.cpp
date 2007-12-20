@@ -4000,9 +4000,6 @@ void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 	if(!pPet)
 		return;
 
-	if(!p_caster->GetItemInterface()->RemoveItemAmt(itemTarget->GetProto()->ItemId,1))
-		return;
-	
 	/**	Cast feed pet effect
 	- effect is item level and pet level dependent, aura ticks are 35, 17, 8 (*1000) happiness
 	- http://petopia.brashendeavors.net/html/articles/basics_feeding.shtml */
@@ -4013,11 +4010,22 @@ void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 	damage *= 1000;
 
 	SpellEntry *spellInfo = dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]);
-	spellInfo->EffectBasePoints[0] = damage - 1;
 	Spell *sp= new Spell((Object *)p_caster,spellInfo,true,NULL);
+	sp->forced_basepoints[0] = damage - 1;
 	SpellCastTargets tgt;
 	tgt.m_unitTarget=pPet->GetGUID();
 	sp->prepare(&tgt);
+
+	if(itemTarget->GetUInt32Value(ITEM_FIELD_STACK_COUNT)>1)
+	{
+		itemTarget->ModUInt32Value(ITEM_FIELD_STACK_COUNT, -1);
+		itemTarget->m_isDirty=true;
+	}
+	else
+	{
+		p_caster->GetItemInterface()->SafeFullRemoveItemByGuid(itemTarget->GetGUID());
+		itemTarget=NULL;
+	}
 }
 
 void Spell::SpellEffectReputation(uint32 i)
