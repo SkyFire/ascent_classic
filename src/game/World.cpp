@@ -2785,6 +2785,23 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 		sp->SpellGroupType |= 8192; //some of them do have the flags but i's hard to write down those some from 130 spells
 
+	//warlock -  soul link
+	sp = dbcSpell.LookupEntry(19028);
+	if (sp)
+	{
+		sp->Effect[0]=6;
+		sp->EffectApplyAuraName[0]=42;
+		sp->EffectTriggerSpell[0] = 25228;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+		sp->procFlags=PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry(25228);
+	if (sp)
+	{
+		sp->Effect[0]=3;	
+		sp->Effect[1]=0;//disable this part to not have multiple effects
+	}
+
 	//warlock: Demonic Aegis
 	sp = dbcSpell.LookupEntry(30143);
 	if (sp)

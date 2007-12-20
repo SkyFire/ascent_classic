@@ -1093,6 +1093,19 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ILotP.LastTrigger = 0;
 			u_caster->m_procSpells.push_back(ILotP);
 		}
+/*	case 19028:	//warlock - soul link
+		{
+		}break;*/
+	case 25228:	//warlock - soul link effect
+		{
+			if(!u_caster || !u_caster->isAlive() || !unitTarget || !unitTarget->isAlive())
+				return;
+			uint32 new_damage=this->forced_basepoints[0]*105/100;
+			uint32 pet_dmg = new_damage*20/100;
+			uint32 owner_dmg_recover = 16*this->forced_basepoints[0]/100; //ok i simplified the equasion. you can remake it from spell description :P
+			unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH,owner_dmg_recover);
+			unitTarget->DealDamage(u_caster,pet_dmg,0,0,25228,true);
+		}break;
 	}										 
 }
 

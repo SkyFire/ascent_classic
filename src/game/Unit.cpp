@@ -817,6 +817,29 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if( CastingSpell->NameHash!=0x7A7B6753)//shadow bolt								
 									continue;
 							}break;
+						//warlock soul link
+						case 25228:
+							{
+								//we need a pet for this, else we do not trigger it at all
+								if(!this->IsPlayer())
+									continue;
+								Unit *new_caster;
+								if(((Player*)this)->GetSummon())
+									new_caster = ((Player*)this)->GetSummon();
+								else if(GetUInt64Value(UNIT_FIELD_CHARM))
+									new_caster = GetMapMgr()->GetUnit(GetUInt64Value(UNIT_FIELD_CHARM));
+								else new_caster=NULL;
+								if(new_caster && new_caster->isAlive())
+								{
+									SpellEntry *spellInfo = dbcSpell.LookupEntry(25228); //we already modified this spell on server loading so it must exist
+									Spell *spell = new Spell(new_caster, spellInfo ,true, NULL);
+									spell->forced_basepoints[0] = dmg;
+									SpellCastTargets targets;
+									targets.m_unitTarget = GetGUID();
+									spell->prepare(&targets);
+								}
+								continue;
+							}break;
 						//warlock - Nighfall
 						case 17941:
 							{
@@ -1206,9 +1229,6 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				if(spellId==22858 && isInBack(victim)) //retatliation needs target to be not in front. Can be casted by creatures too
 					continue;
 				SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
-				/* removed by Zack : Check has been made when adding spell to list. This should never ocure unless memory corruption	
-				if(!spellInfo)
-					continue;*/
 				Spell *spell = new Spell(this, spellInfo ,true, NULL);
 				spell->forced_basepoints[0] = dmg_overwrite;
 				spell->ProcedOnSpell = CastingSpell;
