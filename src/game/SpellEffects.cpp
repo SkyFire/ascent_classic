@@ -4380,13 +4380,14 @@ void Spell::SpellEffectDummyMelee(uint32 i) // Normalized Weapon damage +
 		add_damage = (uint32)(damage * 1.5);
 		return;
 	}
-   
+
+	//hemorage
+	if(p_caster && m_spellInfo->NameHash==0xc89203f0)
+		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
+
 	//rogue - mutilate ads dmg if target is poisoned
 	if(	m_spellInfo->NameHash == 0x4637B2D2 && unitTarget->IsPoisoned())
 		damage = damage + float2int32((float)damage*0.5f);
-
-	if(p_caster && m_spellInfo->NameHash==0xc89203f0)
-		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
 
 	u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:0,m_spellInfo,damage,0,0, false,true);
 
