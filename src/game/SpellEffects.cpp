@@ -1349,6 +1349,32 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 				if (val)
 					mPlayer->Heal(mPlayer,22845,uint32(val*2.5f));
 			}break;
+		case 18562: //druid - swiftmend
+			{
+				if(unitTarget)
+				{
+					bool consumed_aura=false;
+					//consume rejuvenetaion and regrowth
+					if(unitTarget->HasAurasWithNameHash(0x62AFD7AC))
+					{
+						consumed_aura = true;
+						//do not remove flag is we still can cat it again
+						if(!unitTarget->HasAurasWithNameHash(0x431BDB1B))
+						{
+							unitTarget->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE);	
+							sEventMgr.RemoveEvents(unitTarget,EVENT_REJUVENATION_FLAG_EXPIRE);
+						}
+					}
+					else if(unitTarget->HasAurasWithNameHash(0x431BDB1B))
+					{
+						consumed_aura = true;
+						unitTarget->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE);	
+						sEventMgr.RemoveEvents(unitTarget,EVENT_REJUVENATION_FLAG_EXPIRE);
+					}
+					if(consumed_aura)
+						Heal((int32)damage);
+				}
+			}break;
 		default:
 			Heal((int32)damage);
 			break;
