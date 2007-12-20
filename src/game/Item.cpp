@@ -435,49 +435,25 @@ const ItemProf * GetProficiencyBySkill(uint32 skill)
 uint32 GetSellPriceForItem(ItemPrototype *proto, uint32 count)
 {
 	int32 cost;
-
-	switch(proto->Class)
-	{
-		case ITEM_CLASS_WEAPON:
-		case ITEM_CLASS_CONSUMABLE:
-		case ITEM_CLASS_PROJECTILE: // as far as i can tell these can't be sold at all
-		{
-			cost = (proto->SellPrice * ((count < 1) ? 1 : count)) / proto->MaxCount;
-		}break;
-	default:
-		{
-			cost = ( proto->SellPrice * ((count < 1) ? 1 : count) );
-		}break;
-	}
-
+	cost = proto->SellPrice * ((count < 1) ? 1 : count);
 	return cost;
 }
 
-uint32 GetBuyPriceForItem(ItemPrototype *proto, uint32 total_count, uint32 vendorcount)
+uint32 GetBuyPriceForItem(ItemPrototype * proto, uint32 count, Player * plr, Creature * vendor)
 {
 	int32 cost;
+	cost = proto->BuyPrice;
 
-	switch(proto->Class)
+	if(plr && vendor)
 	{
-		case ITEM_CLASS_WEAPON:
-		case ITEM_CLASS_PROJECTILE:
-		case ITEM_CLASS_CONSUMABLE:
-		{
-			//removed by zack
-//			cost = ( proto->BuyPrice * ((count < 1) ? 1 : count) );
-			//in 2.3 item sellprices are for whole stack
-			if(vendorcount>total_count)
-				cost = proto->BuyPrice; //how the hell did we manage to buy less then a stack ?
-			else 
-				cost = proto->BuyPrice * total_count / vendorcount;
-		}break;
-	default:
-		{
-			cost = ( proto->BuyPrice * ((total_count < 1) ? 1 : total_count));
-		}break;
+		//                                     HATED HOSTILE UNFRIENDLY NEUTRAL FRIENDLY HONORED REVERED EXHALTED
+		float pricemod[STANDING_EXALTED+1] = { 1.0f, 1.0f,   1.0f,      1.0f,   0.95f,   0.90f,  0.85f,  0.80f };
+		Standing plrstanding = plr->GetStandingRank(vendor->m_faction->Faction);
+		
+		cost = float2int32(ceilf( float(proto->BuyPrice) * pricemod[plrstanding] ));
 	}
 
-	return cost;
+	return cost*count;
 }
 
 uint32 GetSellPriceForItem(uint32 itemid, uint32 count)
@@ -488,10 +464,10 @@ uint32 GetSellPriceForItem(uint32 itemid, uint32 count)
 		return 1;
 }
 
-uint32 GetBuyPriceForItem(uint32 itemid, uint32 total_count, uint32 vendorcount)
+uint32 GetBuyPriceForItem(uint32 itemid, uint32 count, Player * plr, Creature * vendor)
 {
 	if(ItemPrototype *proto = ItemPrototypeStorage.LookupEntry(itemid))
-		return GetBuyPriceForItem(proto, total_count, vendorcount);
+		return GetBuyPriceForItem(proto, count, plr, vendor);
 	else
 		return 1;
 }

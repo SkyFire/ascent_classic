@@ -299,25 +299,6 @@ void Creature::SaveToDB()
 
 	WorldDatabase.Execute(ss.str().c_str());
 }
-void Creature::SaveItemToDB(uint32 itemid)
-{
-	if (this->HasItems())
-	{
-		for(std::vector<CreatureItem>::iterator itr = m_SellItems->begin(); itr != m_SellItems->end(); ++itr)
-		{
-			if (itr->itemid ==itemid)
-			{
-				std::stringstream query;
-				query << "UPDATE vendors SET av_amount = "
-					<< itr->available_amount << ", nextinc = "
-					<< itr->timetoinc << " WHERE entry = "
-					<< creature_info->Id <<" AND item = " << itr->itemid;
-				WorldDatabase.Execute(query.str().c_str());
-				break;
-			}
-		}
-	}
-}
 
 void Creature::SaveToFile(std::stringstream & name)
 {
@@ -696,7 +677,6 @@ void Creature::AddVendorItem(uint32 itemid, uint32 amount)
 	ci.itemid = itemid;
 	ci.available_amount = 0;
 	ci.max_amount = 0;
-	ci.timetoinc = 0;
 	ci.incrtime = 0;
 	if(!m_SellItems)
 	{
@@ -705,23 +685,24 @@ void Creature::AddVendorItem(uint32 itemid, uint32 amount)
 	}
 	m_SellItems->push_back(ci);
 }
-void Creature::ModAvItemAmount(uint32 itemid, int32 value)
+void Creature::ModAvItemAmount(uint32 itemid, uint32 value)
 {
 	for(std::vector<CreatureItem>::iterator itr = m_SellItems->begin(); itr != m_SellItems->end(); ++itr)
 	{
 		if(itr->itemid == itemid)
 		{
-			if (itr->max_amount==0)
-				itr->available_amount=0;
-			else
+			if(itr->available_amount)
 			{
-				itr->available_amount = (itr->available_amount+value<0) ? 0 : (itr->available_amount+value);
-				if (itr->available_amount<itr->max_amount)
+				if(value > itr->available_amount)	// shouldnt happen
 				{
-						itr->timetoinc = itr->incrtime;
-						sEventMgr.AddEvent(this, &Creature::UpdateItemAmount, itr->itemid, EVENT_ITEM_UPDATE, VENDOR_ITEMS_UPDATE_TIME, 1,0);
+					itr->available_amount=0;
+					return;
 				}
-				SaveItemToDB(itemid);
+				else
+					itr->available_amount -= value;
+                
+				if(!event_HasEvent(EVENT_ITEM_UPDATE))
+					sEventMgr.AddEvent(this, &Creature::UpdateItemAmount, itr->itemid, EVENT_ITEM_UPDATE, itr->incrtime, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 			}
 			return;
 		}
@@ -733,24 +714,11 @@ void Creature::UpdateItemAmount(uint32 itemid)
 	{
 		if(itr->itemid == itemid)
 		{
-			if (itr->max_amount==0 || itr->timetoinc<=0 )
+			if (itr->max_amount==0)		// shouldnt happen
 				itr->available_amount=0;
 			else
 			{
-				if (itr->timetoinc <= VENDOR_ITEMS_UPDATE_TIME)
-				{
-					itr->available_amount++;
-					if (itr->available_amount<itr->max_amount)
-						itr->timetoinc=itr->incrtime;
-					else
-						itr->timetoinc=0;
-				}
-				else
-				{
-					itr->timetoinc-=VENDOR_ITEMS_UPDATE_TIME;
-					sEventMgr.AddEvent(this, &Creature::UpdateItemAmount, itemid, EVENT_ITEM_UPDATE, VENDOR_ITEMS_UPDATE_TIME, 1,0);
-				}
-				SaveItemToDB(itemid);
+				itr->available_amount = itr->max_amount;
 			}
 			return;
 		}

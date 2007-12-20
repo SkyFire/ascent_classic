@@ -36,7 +36,6 @@ struct CreatureItem
 	uint32 available_amount;
 	uint32 max_amount;
 	uint32 incrtime;
-	uint32 timetoinc;
 };
 
 SERVER_DECL bool Rand(float chance);
@@ -312,7 +311,6 @@ public:
 		ci.max_amount=0;
 		ci.available_amount =0;
 		ci.incrtime=0;
-		ci.timetoinc=0;
 		ci.itemid = 0;
 	}
 
@@ -331,7 +329,7 @@ public:
 		}
 	}
 	void AddVendorItem(uint32 itemid, uint32 amount);
-	void ModAvItemAmount(uint32 itemid, int32 value);
+	void ModAvItemAmount(uint32 itemid, uint32 value);
 	void UpdateItemAmount(uint32 itemid);
 	/// Quests
 	void _LoadQuests();
@@ -436,7 +434,6 @@ public:
 
 	// Serialization
 	void SaveToDB();
-	void SaveItemToDB(uint32 itemid);
 	void SaveToFile(std::stringstream & name);
 	//bool LoadFromDB(uint32 guid);
 	//bool LoadFromDB(CreatureTemplate *t);

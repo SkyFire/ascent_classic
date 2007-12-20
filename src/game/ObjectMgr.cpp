@@ -1027,9 +1027,8 @@ void ObjectMgr::LoadVendors()
 			itm.itemid           = fields[1].GetUInt32();
 			itm.amount           = fields[2].GetUInt32();
 			itm.available_amount = fields[3].GetUInt32();
-			itm.max_amount       = fields[4].GetUInt32();
-			itm.incrtime         = fields[5].GetUInt32();
-			itm.timetoinc        = fields[6].GetUInt32();
+			itm.max_amount       = fields[3].GetUInt32();
+			itm.incrtime         = fields[4].GetUInt32();
 			items->push_back(itm);
 		}
 		while( result->NextRow() );

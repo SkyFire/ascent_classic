@@ -79,7 +79,7 @@ public:
 	uint32 GetItemCount(uint32 itemid, bool IncBank = false);
 	uint32 RemoveItemAmt(uint32 id, uint32 amt);
 	void RemoveAllConjured();
-	void BuyItem(ItemPrototype *item, uint32 total_amount,uint32 vendorcount);
+	void BuyItem(ItemPrototype *item, uint32 total_amount, Creature * pVendor);
 
 	uint32 CalculateFreeSlots(ItemPrototype *proto);
 	void ReduceItemDurability();
@@ -99,7 +99,7 @@ public:
 
 	int8 CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype* item, bool ignore_combat = false);
 	int8 CanReceiveItem(ItemPrototype * item, uint32 amount);
-	int8 CanAffordItem(ItemPrototype * item,uint32 total_amount,uint32 vendorcount);
+	int8 CanAffordItem(ItemPrototype * item,uint32 amount, Creature * pVendor);
 	int8 GetItemSlotByType(uint32 type);
 	Item* GetItemByGUID(uint64 itemGuid);
 

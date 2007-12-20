@@ -1743,12 +1743,15 @@ int8 ItemInterface::CanReceiveItem(ItemPrototype * item, uint32 amount)
 	return (int8)NULL;
 }
 
-void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount,uint32 vendorcount)
+void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount, Creature * pVendor)
 {
 	if(item->BuyPrice)
 	{
-		int32 itemprice = GetBuyPriceForItem(item, total_amount, vendorcount);
-		m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -itemprice);
+		uint32 itemprice = GetBuyPriceForItem(item, total_amount, m_pOwner, pVendor);
+		if(itemprice>m_pOwner->GetUInt32Value(PLAYER_FIELD_COINAGE))
+			m_pOwner->SetUInt32Value(PLAYER_FIELD_COINAGE,0);
+		else
+			m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)itemprice);
 	}
 	if(item->ItemExtendedCost)
 	{
@@ -1759,19 +1762,19 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount,uint32 vend
 			{
 				if(ex->item[i])
 				{
-					m_pOwner->GetItemInterface()->RemoveItemAmt(ex->item[i],ex->count[i]);
+					m_pOwner->GetItemInterface()->RemoveItemAmt(ex->item[i],(ex->count[i]*total_amount));
 				}
 			}
 			//just make sure we do not loop the value, Though we should have checked it before
-			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) >= ex->honor)
+			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) >= (ex->honor*total_amount))
 			{
-				m_pOwner->ModUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, -int32(ex->honor));
-				m_pOwner->m_honorPoints -=int32(ex->honor);
+				m_pOwner->ModUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, -int32((ex->honor*total_amount)));
+				m_pOwner->m_honorPoints -=int32(ex->honor*total_amount);
 			}
-			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) >= ex->arena)
+			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) >= (ex->arena*total_amount))
 			{
-				m_pOwner->ModUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, -int32(ex->arena));
-				m_pOwner->m_arenaPoints -=int32(ex->arena);
+				m_pOwner->ModUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, -int32(ex->arena*total_amount));
+				m_pOwner->m_arenaPoints -=int32(ex->arena*total_amount);
 			}
 		}
 		else sLog.outDebug("Warning: item %u has extended cost but could not find the value in ItemExtendedCostStore",item->ItemId);
@@ -1779,7 +1782,7 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount,uint32 vend
 
 }
 
-int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 total_amount,uint32 vendorcount)
+int8 ItemInterface::CanAffordItem(ItemPrototype * item,uint32 amount, Creature * pVendor)
 {
 	if(item->ItemExtendedCost)
 	{
@@ -1790,20 +1793,20 @@ int8 ItemInterface::CanAffordItem(ItemPrototype *item,uint32 total_amount,uint32
 			{
 				if(ex->item[i])
 				{
-					if(m_pOwner->GetItemInterface()->GetItemCount(ex->item[i], false) < ex->count[i])
+					if(m_pOwner->GetItemInterface()->GetItemCount(ex->item[i], false) < (ex->count[i]*amount))
 						return INV_ERR_NOT_ENOUGH_MONEY;
 				}
 			}
-			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) < ex->honor)
+			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) < (ex->honor*amount))
 				return INV_ERR_NOT_ENOUGH_MONEY;
-			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) < ex->arena)
+			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) < (ex->arena*amount))
 				return INV_ERR_NOT_ENOUGH_MONEY;
 		}
 		else sLog.outDebug("Warning: item %u has extended cost but could not find the value in ItemExtendedCostStore",item->ItemId);
 	}
 	if(item->BuyPrice)
 	{
-		int32 price = GetBuyPriceForItem(item, total_amount, vendorcount);
+		int32 price = GetBuyPriceForItem(item, amount, m_pOwner, pVendor) * amount;
 		if((int32)m_pOwner->GetUInt32Value(PLAYER_FIELD_COINAGE) < price)
 		{
 			return INV_ERR_NOT_ENOUGH_MONEY;
