@@ -867,7 +867,7 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
 
 	if(item->IsContainer() && ((Container*)item)->HasItems())
 	{
-		SendNotification("You cannot sell this bag with items in it.");
+		SendSellItem(vendorguid, itemguid, 6);
 		return;
 	}
 

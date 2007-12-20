@@ -93,6 +93,24 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		p_User->SetStandState(STANDSTATE_SIT);
 		// loop through the auras and removing existing eating spells
 	}
+
+	if(itemProto->RequiredSkill)
+	{
+		if(!_player->_HasSkillLine(itemProto->RequiredSkill))
+		{
+			_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+			return;
+		}
+
+		if(itemProto->RequiredSkillRank)
+		{
+			if(_player->_GetSkillLineCurrent(itemProto->RequiredSkill, false) < itemProto->RequiredSkillRank)
+			{
+				_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+				return;
+			}
+		}
+	}
 	
 	if (spellInfo->Category > 1) // 0 and -1 a.k.a. infinite not included
 	{
