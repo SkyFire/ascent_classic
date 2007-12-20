@@ -1247,18 +1247,26 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		uint8 source_slot;
 		uint8 dest_bank;
 		uint8 dest_bankslot;
+		uint8 withdraw_stack=0;
+		uint8 deposit_stack=0;
 		GuildBankTab * pTab;
 		Item * pSourceItem;
 		Item * pDestItem;
+		Item * pSourceItem2;
 
 		/* read packet */
 		recv_data >> dest_bank;
 		recv_data >> dest_bankslot;
 		recv_data >> wtf;
 		recv_data >> wtf2;
+		if(wtf2)
+			recv_data >> withdraw_stack;
 
 		recv_data >> source_bagslot;
 		recv_data >> source_slot;
+
+		if(!(source_bagslot == 1 && source_slot==0))
+			recv_data >> wtf2 >> deposit_stack;
 
 		/* sanity checks to avoid overflows */
 		if(dest_bank >= MAX_GUILD_BANK_TABS)
@@ -1302,7 +1310,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 		pDestItem = pTab->pSlots[dest_bankslot];
 
 		/* grab the source/destination item */
-		if(source_bagslot == 1 && source_slot == 1)
+		if(source_bagslot == 1 && source_slot == 0)
 		{
 			// find a free bag slot
 			if(pDestItem == NULL)
@@ -1360,18 +1368,45 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			}
 
 			// pull the item from the slot
-			_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
-            pSourceItem->RemoveFromWorld();
+			if(deposit_stack && pSourceItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > deposit_stack)
+			{
+				pSourceItem2 = pSourceItem;
+				pSourceItem = objmgr.CreateItem(pSourceItem2->GetEntry(), _player);
+				pSourceItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, deposit_stack);
+				pSourceItem->SetUInt32Value(ITEM_FIELD_CREATOR, pSourceItem2->GetUInt32Value(ITEM_FIELD_CREATOR));
+				pSourceItem2->ModUInt32Value(ITEM_FIELD_STACK_COUNT, -(int32)deposit_stack);
+				pSourceItem2->m_isDirty=true;
+			}
+			else
+			{
+				_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
+				pSourceItem->RemoveFromWorld();
+			}
 		}
 
 		/* perform the swap. */
 		/* pSourceItem = Source item from players backpack coming into guild bank */
 		if(pSourceItem == NULL)
 		{
-			/* that slot in the bank is now empty. */
-			pTab->pSlots[dest_bankslot] = NULL;
-			CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE guildId = %u AND tabId = %u AND slotId = %u",
-				pGuild->GetGuildId(), (uint32)pTab->iTabId, (uint32)dest_bankslot);
+			/* splitting */
+			if(pDestItem != NULL && deposit_stack>0 && pDestItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > deposit_stack)
+			{
+				pSourceItem2 = pDestItem;
+
+				pSourceItem2->ModUInt32Value(ITEM_FIELD_STACK_COUNT, -(int32)deposit_stack);
+				pSourceItem2->SaveToDB(0,0,true);
+
+				pDestItem = objmgr.CreateItem(pSourceItem2->GetEntry(), _player);
+				pDestItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, deposit_stack);
+				pDestItem->SetUInt32Value(ITEM_FIELD_CREATOR, pSourceItem2->GetUInt32Value(ITEM_FIELD_CREATOR));
+			}
+			else
+			{
+				/* that slot in the bank is now empty. */
+				pTab->pSlots[dest_bankslot] = NULL;
+				CharacterDatabase.Execute("DELETE FROM guild_bankitems WHERE guildId = %u AND tabId = %u AND slotId = %u",
+					pGuild->GetGuildId(), (uint32)pTab->iTabId, (uint32)dest_bankslot);
+			}			
 		}
 		else
 		{
@@ -1383,7 +1418,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			/* remove the item's association with the player */
 			pSourceItem->SetOwner(NULL);
 			pSourceItem->SetUInt32Value(ITEM_FIELD_OWNER, 0);
-			pSourceItem->SaveToDB(0, 0, false);
+			pSourceItem->SaveToDB(0, 0, true);
 
 			/* log it */
 			pGuild->LogGuildBankAction(GUILD_BANK_LOG_EVENT_DEPOSIT_ITEM, _player->GetGUIDLow(), pSourceItem->GetEntry(), 
@@ -1401,14 +1436,17 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			/* the guild was robbed by some n00b! :O */
 			pDestItem->SetOwner(_player);
 			pDestItem->SetUInt32Value(ITEM_FIELD_OWNER, _player->GetGUIDLow());
-			pDestItem->SaveToDB(source_bagslot, source_slot);
+			pDestItem->SaveToDB(source_bagslot, source_slot, true);
 
 			/* add it to him in game */
 			if(!_player->GetItemInterface()->SafeAddItem(pDestItem, source_bagslot, source_slot))
 			{
 				/* this *really* shouldn't happen. */
-				pDestItem->DeleteFromDB();
-				delete pDestItem;
+				if(!_player->GetItemInterface()->AddItemToFreeSlot(pDestItem))
+				{
+					pDestItem->DeleteFromDB();
+					delete pDestItem;
+				}
 			}
 			else
 			{
