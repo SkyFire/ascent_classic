@@ -210,9 +210,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_lockTransportVariables= false;
 
 	// Autoshot variables
-	m_AutoShotStartX		= 0;
-	m_AutoShotStartY		= 0;
-	m_AutoShotStartZ		= 0;
 	m_AutoShotTarget		= 0;
 	m_onAutoShot			= false;
 	m_AutoShotDuration	  = 0;
@@ -1357,9 +1354,6 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 		}
 	}
 	*/
-
-	if(m_Summon != NULL && m_Summon->GetUInt32Value(UNIT_CREATED_BY_SPELL) == 0)
-		m_Summon->GiveXP(xp);
 
 	int32 newxp = m_uint32Values[PLAYER_XP] + xp;
 	int32 nextlevelxp = lvlinfo->XPToNextLevel;
@@ -5166,27 +5160,18 @@ void Player::SendTalentResetConfirm()
 	GetSession()->SendPacket(&data);
 }
 
-bool Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
+int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 {
 	SpellEntry *spellinfo = dbcSpell.LookupEntry(spellid);
 	if(!spellinfo)
-		return false;
+		return -1;
 	
 	uint8 fail = 0;
 	Item *itm = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 	if(!itm)
 	{
 		fail = SPELL_FAILED_NO_AMMO;
-		return false;
-	}
-
-	if(this->m_AutoShotStartX != GetPositionX() ||
-		this->m_AutoShotStartY != GetPositionY() ||
-		this->m_AutoShotStartZ != GetPositionZ())
-	{
-		// We've moved
-		//printf("Autoshot: Detected player movement. canceling.\n");
-		fail = SPELL_FAILED_INTERRUPTED;
+		return -1;
 	}
 
 	if(m_curSelection != m_AutoShotTarget)
@@ -5194,12 +5179,14 @@ bool Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 		// Player has clicked off target. Fail spell.
 		fail = SPELL_FAILED_INTERRUPTED;
 	}
+	if(target->isDead())
+		fail = SPELL_FAILED_TARGETS_DEAD;
 
 	if(GetCurrentSpell())
-		return false;
+		return -1;
    
 	if(!target || target->isDead())
-		return false;	
+		return -1;	
 
 	SpellRange * range = dbcSpellRange.LookupEntry(spellinfo->rangeIndex);
 	float minrange = GetMinRange(range);
@@ -5232,9 +5219,14 @@ bool Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 	if(fail)// && fail != SPELL_FAILED_OUT_OF_RANGE)
 	{
         SendCastResult(autoshot ? 75 : spellid, fail, 0);
-		return false;
+		if(fail != SPELL_FAILED_OUT_OF_RANGE)
+		{
+			uint32 spellid2 = autoshot ? 75 : spellid;
+			m_session->OutPacket(SMSG_CANCEL_AUTO_REPEAT, 4, &spellid2);
+		}
+		return fail;
 	}
-	return true;
+	return 0;
 }
 
 void Player::EventRepeatSpell()
@@ -5243,10 +5235,26 @@ void Player::EventRepeatSpell()
 		return;
 	
 	Unit *target = GetMapMgr()->GetUnit(m_curSelection);
-
-	if(!target || !this->CanShootRangedWeapon(m_AutoShotSpell->Id, target, true))
+	if(target==NULL)
 	{
-		m_AutoShotAttackTimer = m_AutoShotDuration; //avoid flooding client with error mesages
+		m_AutoShotAttackTimer = 0; //avoid flooding client with error mesages
+		m_onAutoShot=false;
+		return;
+	}
+
+	int32 f= this->CanShootRangedWeapon(m_AutoShotSpell->Id, target, true);
+
+	if(f!=0)
+	{
+		if(f!=SPELL_FAILED_OUT_OF_RANGE)
+		{
+			m_AutoShotAttackTimer = 0; 
+			m_onAutoShot=false;
+		}
+		else
+		{
+			m_AutoShotAttackTimer = m_AutoShotDuration;//avoid flooding client with error mesages
+		}
 		return;
 	}
 	else

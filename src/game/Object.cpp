@@ -2017,6 +2017,13 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 					uint32 xp = CalculateXpToGive(pVictim, (Unit*)this);
 					if(xp)
 						((Player*)this)->GiveXP(xp, victimGuid, true);
+
+					if(((Player*)this)->GetSummon() && ((Player*)this)->GetSummon()->GetUInt32Value(UNIT_CREATED_BY_SPELL) == 0)
+					{
+						xp = CalculateXpToGive(pVictim, ((Player*)this)->GetSummon());
+						if(xp)
+							((Player*)this)->GetSummon()->GiveXP(xp);
+					}
 				}
 
 				if (pVictim->GetTypeId() != TYPEID_PLAYER)

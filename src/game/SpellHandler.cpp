@@ -222,9 +222,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
                     _player->SendCastResult(spellInfo->Id, SPELL_FAILED_NOT_MOUNTED, 0);
 					return;
 				}
-				_player->m_AutoShotStartX = _player->GetPositionX();
-				_player->m_AutoShotStartY = _player->GetPositionY();
-				_player->m_AutoShotStartZ = _player->GetPositionZ();
 				_player->m_AutoShotTarget = _player->GetSelection();
 				uint32 duration = _player->GetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME);
 				SpellCastTargets targets(recvPacket,GetPlayer()->GetGUID());
