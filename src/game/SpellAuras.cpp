@@ -419,7 +419,8 @@ void Aura::Remove()
 		}
 	}
 
-	if(m_spellProto->procCharges>0 && m_spellProto->proc_interval==0)
+	if(m_spellProto->procCharges>0
+		&& m_spellProto->proc_interval==0)
 	{
 		if(m_target->m_chargeSpellsInUse)
 			m_target->m_chargeSpellRemoveQueue.push_back(GetSpellId());
@@ -429,7 +430,10 @@ void Aura::Remove()
 			iter = m_target->m_chargeSpells.find(GetSpellId());
 			if(iter!=m_target->m_chargeSpells.end())
 			{
-				m_target->m_chargeSpells.erase(iter);
+				if(iter->second.count>1)
+					--iter->second.count;
+				else
+					m_target->m_chargeSpells.erase(iter);
 			}
 		}
 	}

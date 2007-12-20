@@ -1278,13 +1278,13 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 				{
 					if(iter2->second.procdiff>3000)
 					{
-						--(iter2->second.count);
+						//--(iter2->second.count);
 						RemoveAura(iter2->second.spellId);
 					}
 				}
 				else
 				{
-					--(iter2->second.count);
+					//--(iter2->second.count);		// done in Aura::Remove
 					this->RemoveAura(iter2->second.spellId);
 				}
 			}
@@ -1297,7 +1297,14 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 
 	for(;!m_chargeSpellRemoveQueue.empty();)
 	{
-		m_chargeSpells.erase( m_chargeSpellRemoveQueue.front() );
+		iter = m_chargeSpells.find(m_chargeSpellRemoveQueue.front());
+		if(iter != m_chargeSpells.end())
+		{
+			if(iter->second.count>1)
+				--iter->second.count;
+			else
+				m_chargeSpells.erase(iter);
+		}
 		m_chargeSpellRemoveQueue.pop_front();
 	}
 
