@@ -41,7 +41,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	if(!itemProto)
 		return;
 
-	if(_player->isDead())
+	if(_player->getDeathState()==CORPSE)
 		return;
 
 	if(itemProto->Bonding == ITEM_BIND_ON_USE)
@@ -156,7 +156,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
 	if(!_player->IsInWorld()) return;
-	if(_player->isDead())
+	if(_player->getDeathState()==CORPSE)
 		return;
 
 	uint32 spellId;
