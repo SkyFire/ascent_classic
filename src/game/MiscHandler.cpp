@@ -22,6 +22,9 @@
 void WorldSession::HandleRepopRequestOpcode( WorldPacket & recv_data )
 {
 	sLog.outDebug( "WORLD: Recvd CMSG_REPOP_REQUEST Message" );
+	if(_player->m_CurrentTransporter)
+		_player->m_CurrentTransporter->RemovePlayer(_player);
+
 	  GetPlayer()->RepopRequestedPlayer();
 }
 
