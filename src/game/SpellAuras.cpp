@@ -4553,6 +4553,33 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 			{
 				m_target->RemoveAllAurasByMechanic( (uint32)mod->m_miscValue , -1 , true );
 			}
+
+			if(m_spellProto->Id==42292)
+			{
+				// insignia of the A/H
+				for(uint32 x= MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
+				{
+					if(m_target->m_auras[x])
+					{
+						for(uint32 y = 0; y < 3; ++y)
+						{
+							switch(m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
+							{
+							case SPELL_AURA_MOD_STUN:
+							case SPELL_AURA_MOD_CONFUSE:
+							case SPELL_AURA_MOD_ROOT:
+								m_target->m_auras[x]->Remove();
+								goto out;
+								break;
+							}
+							continue;
+
+out:
+							break;
+						}
+					}
+				}
+			}
 		}
 		else
 			SetNegative();
