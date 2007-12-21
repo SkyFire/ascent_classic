@@ -2154,7 +2154,9 @@ else
 			
 			float summaryPCTmod = pVictim->DamageTakenPctMod[0]+this->DamageDoneModPCT[0];
 
-			dmg.full_damage = float2int32(dmg.full_damage*pct_dmg_mod);
+			if(pct_dmg_mod > 0)
+				dmg.full_damage = float2int32(dmg.full_damage*(float(pct_dmg_mod)/100.0f));
+
 			/*if (pct_dmg_mod) Should not be in summaryPCT mod cause it modifier in abilities like 250% of weapon damage
 				summaryPCTmod += pct_dmg_mod/100.0f - 1;*/
 

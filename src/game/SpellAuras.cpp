@@ -3777,6 +3777,25 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		amount += m_caster->GetSpellDmgBonus(m_target,GetSpellProto(),amount)*50/100;
 	
 		uint32 Amount = min(amount,m_target->GetUInt32Value(UNIT_FIELD_HEALTH));
+		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
+		
+		uint32 mh = m_caster->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+		if(newHealth <= mh)
+			m_caster->SetUInt32Value(UNIT_FIELD_HEALTH, newHealth);
+		else
+			m_caster->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
+		
+		//SendPeriodicHealAuraLog(Amount);
+		WorldPacket data(SMSG_PERIODICAURALOG, 32);
+		data << m_caster->GetNewGUID();
+		data << m_target->GetNewGUID();
+		data << m_spellProto->Id;
+		data << uint32(1);
+		data << uint32(FLAG_PERIODIC_HEAL);
+		data << uint32(Amount);
+		m_target->SendMessageToSet(&data,true);
+
+		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, FLAG_PERIODIC_LEECH);
 
 		//deal damage before we add healing bonus to damage
 		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id,true);
@@ -3797,26 +3816,6 @@ void Aura::EventPeriodicLeech(uint32 amount)
 			healdoneaffectperc *= downrank1 * downrank2;
 		}
 		*/
-
-		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
-		
-		uint32 mh = m_caster->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-		if(newHealth <= mh)
-			m_caster->SetUInt32Value(UNIT_FIELD_HEALTH, newHealth);
-		else
-			m_caster->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
-		
-		//SendPeriodicHealAuraLog(Amount);
-		WorldPacket data(SMSG_PERIODICAURALOG, 32);
-		data << m_caster->GetNewGUID();
-		data << m_target->GetNewGUID();
-		data << m_spellProto->Id;
-		data << uint32(1);
-		data << uint32(FLAG_PERIODIC_HEAL);
-		data << uint32(Amount);
-		m_target->SendMessageToSet(&data,true);
-
-		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, FLAG_PERIODIC_LEECH);
 	}	
 }
 
