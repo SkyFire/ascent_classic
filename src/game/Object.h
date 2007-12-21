@@ -244,7 +244,7 @@ public:
 		m_wowGuid.Init(GetGUID());
 	}
 
-	void EventSetUInt32Value(const uint32 index, const uint32 value);
+	void EventSetUInt32Value(uint32 index, uint32 value);
 	void __fastcall SetUInt32Value( const uint32 index, const uint32 value );
 
 	//! Set uint64 property

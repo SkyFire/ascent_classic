@@ -1477,7 +1477,7 @@ void Object::UpdateOppFactionSet()
 	}
 }
 
-void Object::EventSetUInt32Value(const uint32 index, const uint32 value)
+void Object::EventSetUInt32Value(uint32 index, uint32 value)
 {
 	SetUInt32Value(index,value);
 }
