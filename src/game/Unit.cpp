@@ -1859,7 +1859,6 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 			hitmodifier+=pr->CalcRating(6);
 			self_skill = float2int32(pr->CalcRating(0));
-			//disable_dR = true; Shady: wtf?! why ranged damage shouldn't be lowered by armor?
 			break;
 		}
 
@@ -2149,10 +2148,15 @@ else
 			{
 				dmg.full_damage+=pVictim->RangedDamageTaken;
 			}
-					
+			
+			if (ability && ability->MechanicsType == MECHANIC_BLEEDING)
+				disable_dR = true; 
+			
 			float summaryPCTmod = pVictim->DamageTakenPctMod[0]+this->DamageDoneModPCT[0];
-			if (pct_dmg_mod)
-				summaryPCTmod += pct_dmg_mod/100.0f - 1;
+
+			dmg.full_damage = float2int32(dmg.full_damage*pct_dmg_mod);
+			/*if (pct_dmg_mod) Should not be in summaryPCT mod cause it modifier in abilities like 250% of weapon damage
+				summaryPCTmod += pct_dmg_mod/100.0f - 1;*/
 
 			//a bit dirty fix
 			if (ability && ability->NameHash == 0x8401EC6A)
