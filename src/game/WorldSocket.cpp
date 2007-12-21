@@ -333,7 +333,6 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	if( (sWorld.GetNonGmSessionCount() < sWorld.GetPlayerLimit()) || mSession->HasGMPermissions() ) {
 		Authenticate();
 	} else {
-		mSession->deleteMutex.Release();
 		// Queued, sucker.
 		uint32 Position = sWorld.AddQueuedSocket(this);
 		mQueued = true;
@@ -342,6 +341,8 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 		// Send packet so we know what we're doing
 		UpdateQueuePosition(Position);
 	}
+
+	mSession->deleteMutex.Release();
 }
 
 void WorldSocket::Authenticate()
@@ -350,6 +351,7 @@ void WorldSocket::Authenticate()
 	mQueued = false;
 
 	if(!mSession) return;
+	mSession->deleteMutex.Acquire();
 
 	if(mSession->HasFlag(ACCOUNT_FLAG_XPACK_01))
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x01");

@@ -4355,6 +4355,7 @@ void World::UpdateQueuedSessions(uint32 diff)
 			{
 				QueuedSocket->GetSession()->deleteMutex.Acquire();
 				QueuedSocket->Authenticate();
+				QueuedSocket->GetSession()->deleteMutex.Release();
 			}
 		}
 
