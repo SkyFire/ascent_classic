@@ -1447,9 +1447,17 @@ void Player::smsg_InitialSpells()
 	if (itemCount)
 	{
 	   data << uint16(itemCount);			   // item / spell count
-	   ItemCooldownSet::iterator itr;
-	   for (itr = m_itemcooldown.begin(); itr != m_itemcooldown.end(); ++itr)
+	   ItemCooldownSet::iterator itr, itr2;
+	   uint32 n = now();
+	   for (itr = m_itemcooldown.begin(); itr != m_itemcooldown.end();)
 	   {
+		   if((*itr)->CooldownTimeStamp <= n)
+		   {
+			   itr2 = itr++;
+			   m_itemcooldown.erase(itr2);
+			   continue;
+		   }
+
 			//ItemCooldown * testje = (*itr);				   // for debug
 			data << uint16((*itr)->SpellID);					// spell id
 			data << uint16((*itr)->ItemEntry);				  // item entry
@@ -1466,6 +1474,8 @@ void Player::smsg_InitialSpells()
 				data << uint32(0);
 				data << uint32((*itr)->CooldownTimeStamp - now());  // Current time time remaining of the cooldown in ms
 			}
+
+			++itr;
 		}
 	}
 	else
@@ -1677,6 +1687,7 @@ void Player::_LoadItemCooldown(QueryResult * result)
 {
 	if(result)
 	{
+		uint32 n = now();
 		// TODO is there a better way to do this?
 		do
 		{
@@ -1686,9 +1697,9 @@ void Player::_LoadItemCooldown(QueryResult * result)
 			uint32 TempSpellCategory	= fields[3].GetUInt32();
 			uint32 TempTimestamp		= fields[4].GetUInt32();
 			uint32 TempCooldown		 = fields[5].GetUInt32();
-			uint32 DiffTimestamp		= TempTimestamp - now();
+			uint32 DiffTimestamp		= TempTimestamp - n;
 
-			if (now() > TempTimestamp || (now() < TempTimestamp && DiffTimestamp > TempCooldown)) //if timestamp overflow or dif time is larget than 7 days
+			if (n > TempTimestamp || (n < TempTimestamp && DiffTimestamp > TempCooldown)) //if timestamp overflow or dif time is larget than 7 days
 			{
 				CharacterDatabase.Execute( "DELETE FROM playercooldownitems WHERE OwnerGuid=%u AND ItemEntry=%u",
 					GetGUIDLow(),fields[1].GetUInt32());
@@ -1713,17 +1724,18 @@ void Player::_LoadSpellCoolDownSecurity(QueryResult * result)
 {
 	if(result)
 	{
+		uint32 n = now();
 		do
 		{
 			// if the current item does not have cooldown delete it from db
 			Field *fields			   = result->Fetch();
 			uint32 SpellID			  = fields[1].GetUInt32();
 			uint32 Timestamp			= fields[2].GetUInt32();
-			uint32 DiffTimestamp		= Timestamp - now();
+			uint32 DiffTimestamp		= Timestamp - n;
 			SpellEntry		*spellInfo = dbcSpell.LookupEntry( SpellID );
 			
-			if (now() + spellInfo->RecoveryTime > Timestamp && // cooldown did not expired somehow (not taking into care cooldown modifiers!)
-				now() < Timestamp + spellInfo->RecoveryTime )  // cooldown does not starts in future (not taking into care cooldown modifiers!)
+			if (n + spellInfo->RecoveryTime > Timestamp && // cooldown did not expired somehow (not taking into care cooldown modifiers!)
+				n < Timestamp + spellInfo->RecoveryTime )  // cooldown does not starts in future (not taking into care cooldown modifiers!)
 			{
 				AddCooldown(SpellID,DiffTimestamp);
 			}
