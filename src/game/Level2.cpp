@@ -1079,7 +1079,7 @@ bool ChatHandler::HandleGOAnimProgress(const char * args, WorldSession * m_sessi
 
 bool ChatHandler::HandleGOExport(const char * args, WorldSession * m_session)
 {
-	if(!m_session->GetPlayer()->m_GM_SelectedGO)
+	/*if(!m_session->GetPlayer()->m_GM_SelectedGO)
 		return false;
 	
 	std::stringstream name;
@@ -1094,7 +1094,22 @@ bool ChatHandler::HandleGOExport(const char * args, WorldSession * m_session)
    
 	m_session->GetPlayer()->m_GM_SelectedGO->SaveToFile(name);
 
-	BlueSystemMessage(m_session, "Go saved to: %s", name.str().c_str());
+	BlueSystemMessage(m_session, "Go saved to: %s", name.str().c_str());*/
+
+	Creature * pCreature = getSelectedCreature(m_session, true);
+	if(!pCreature) return true;
+	WorldDatabase.WaitExecute("INSERT INTO creature_names_export SELECT * FROM creature_names WHERE entry = %u", pCreature->GetEntry());
+	WorldDatabase.WaitExecute("INSERT INTO creature_proto_export SELECT * FROM creature_proto WHERE entry = %u", pCreature->GetEntry());
+	WorldDatabase.WaitExecute("INSERT INTO vendors_export SELECT * FROM vendors WHERE entry = %u", pCreature->GetEntry());
+	QueryResult * qr = WorldDatabase.Query("SELECT * FROM vendors WHERE entry = %u", pCreature->GetEntry());
+	if(qr != NULL)
+	{
+		do 
+		{
+			WorldDatabase.WaitExecute("INSERT INTO items_export SELECT * FROM items WHERE entry = %u", qr->Fetch()[1].GetUInt32());
+		} while (qr->NextRow());
+		delete qr;
+	}
 	return true;
 }
 

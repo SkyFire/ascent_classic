@@ -1379,7 +1379,9 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			}
 			else
 			{
-				_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false);
+				if(!_player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(source_bagslot, source_slot, false))
+					return;
+
 				pSourceItem->RemoveFromWorld();
 			}
 		}

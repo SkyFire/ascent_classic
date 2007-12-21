@@ -4340,7 +4340,7 @@ void World::UpdateQueuedSessions(uint32 diff)
 			return;
 		}
 		
-		if(m_sessions.size() < m_playerLimit)
+		while(m_sessions.size() < m_playerLimit && mQueuedSessions.size())
 		{
 			// Yay. We can let another player in now.
 			// Grab the first fucker from the queue, but guard of course, since
@@ -4367,9 +4367,13 @@ void World::UpdateQueuedSessions(uint32 diff)
 		// Update the remaining queue members.
 		QueueSet::iterator iter = mQueuedSessions.begin();
 		uint32 Position = 1;
-		for(; iter != mQueuedSessions.end(); ++iter, ++Position)
+		while(iter != mQueuedSessions.end())
 		{
-			(*iter)->UpdateQueuePosition(Position);
+			(*iter)->UpdateQueuePosition(Position++);
+			if(iter==mQueuedSessions.end())
+				break;
+			else
+				++iter;
 		}
 		queueMutex.Release();
 	} 

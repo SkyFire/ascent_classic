@@ -353,7 +353,7 @@ public:
 class WorldSocket;
 
 // Slow for remove in middle, oh well, wont get done much.
-typedef std::vector<WorldSocket*> QueueSet;
+typedef std::list<WorldSocket*> QueueSet;
 typedef set<WorldSession*> SessionSet;
 
 class SERVER_DECL World : public Singleton<World>, public EventableObject
