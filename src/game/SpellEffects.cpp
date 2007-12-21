@@ -1100,10 +1100,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		{
 			if(!u_caster || !u_caster->isAlive() || !unitTarget || !unitTarget->isAlive())
 				return;
-			uint32 new_damage=this->forced_basepoints[0]*105/100;
-			uint32 pet_dmg = new_damage*20/100;
-			uint32 owner_dmg_recover = 16*this->forced_basepoints[0]/100; //ok i simplified the equasion. you can remake it from spell description :P
-			unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH,owner_dmg_recover);
+			uint32 pet_dmg = this->forced_basepoints[0]*20/100;
+			unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH,pet_dmg);
 			unitTarget->DealDamage(u_caster,pet_dmg,0,0,25228,true);
 		}break;
 	}										 

@@ -2062,8 +2062,19 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				if(pVictim->IsPet())
 				{
 					static_cast<Pet*>(pVictim)->DelayedRemove(false, true);
+					//remove owner warlock soul link from caster
+					Player *owner=static_cast<Pet*>(pVictim)->GetPetOwner();
+					if(owner)
+						owner->RemoveAura((uint32)19028);
 				}
 				/* ----------------------------- PET DEATH HANDLING END -------------- */
+				else if(pVictim->GetUInt64Value(UNIT_FIELD_CHARMEDBY))
+				{
+					//remove owner warlock soul link from caster
+					Unit *owner=pVictim->GetMapMgr()->GetUnit(pVictim->GetUInt64Value(UNIT_FIELD_CHARMEDBY));
+					if(owner)
+						owner->RemoveAura((uint32)19028);
+				}
 			}
 		}
 		else if (pVictim->GetTypeId() == TYPEID_PLAYER)

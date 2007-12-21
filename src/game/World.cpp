@@ -2789,11 +2789,17 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(19028);
 	if (sp)
 	{
+		//this is for the trigger effect
 		sp->Effect[0]=6;
 		sp->EffectApplyAuraName[0]=42;
 		sp->EffectTriggerSpell[0] = 25228;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
 		sp->procFlags=PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_TARGET_PET;
+		//this is for the extra 5% dmg for caster. Yes sadly pet will not receive the bonus
+		sp->Effect[1]=6;
+		sp->EffectApplyAuraName[1]=79;
+		sp->EffectBasePoints[1]=4; //4+1=5
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
 	}
 	sp = dbcSpell.LookupEntry(25228);
 	if (sp)

@@ -601,7 +601,11 @@ void Pet::Dismiss(bool bSafeDelete)//Abandon pet
 	}
 
 	if(m_Owner)
+	{
 		m_Owner->RemovePlayerPet(m_PetNumber);
+		//remove owner warlock soul link from caster
+		m_Owner->RemoveAura((uint32)19028);
+	}
 
 	// find out playerpet entry, delete it
 	Remove(bSafeDelete, false, true);
