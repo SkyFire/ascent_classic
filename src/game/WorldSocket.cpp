@@ -62,12 +62,21 @@ WorldSocket::~WorldSocket()
 
 	if(pAuthenticationPacket)
 		delete pAuthenticationPacket;
+
+	if(mSession)
+	{
+		mSession->SetSocket(NULL);
+		mSession=NULL;
+	}
 }
 
 void WorldSocket::OnDisconnect()
 {
 	if(mSession)
+	{
 		mSession->SetSocket(0);
+		mSession=NULL;
+	}
 
 	if(mRequestID != 0)
 	{
@@ -76,7 +85,10 @@ void WorldSocket::OnDisconnect()
 	}
 
 	if(mQueued)
+	{
 		sWorld.RemoveQueuedSocket(this);	// Remove from queued sockets.
+		mQueued=false;
+	}
 }
 
 void WorldSocket::OutPacket(uint16 opcode, size_t len, const void* data)
@@ -343,6 +355,9 @@ void WorldSocket::Authenticate()
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x01");
 	else
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x00");
+
+	if(!mSession)
+		return;
 
 	sAddonMgr.SendAddonInfoPacket(pAuthenticationPacket, (uint32)pAuthenticationPacket->rpos(), mSession);
 	mSession->_latency = _latency;
