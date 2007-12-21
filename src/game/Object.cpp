@@ -1477,6 +1477,11 @@ void Object::UpdateOppFactionSet()
 	}
 }
 
+void Object::EventSetUInt32Value(const uint32 index, const uint32 value)
+{
+	SetUInt32Value(index,value);
+}
+
 void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId, bool no_remove_auras)
 {
 	Player * plr = 0;

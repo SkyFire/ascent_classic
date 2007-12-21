@@ -7186,7 +7186,7 @@ void Player::SetGuildId(uint32 guildId)
 {
 	if(IsInWorld())
 	{
-		sEventMgr.AddEvent(((Object*)this), &Object::SetUInt32Value, uint32(PLAYER_GUILDID), guildId, EVENT_PLAYER_SEND_PACKET, 1,
+		sEventMgr.AddEvent(((Object*)this), &Object::EventSetUInt32Value, uint32(PLAYER_GUILDID), guildId, EVENT_PLAYER_SEND_PACKET, 1,
 			1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
 	else
@@ -7199,7 +7199,7 @@ void Player::SetGuildRank(uint32 guildRank)
 {
 	if(IsInWorld())
 	{
-		sEventMgr.AddEvent(((Object*)this), &Object::SetUInt32Value, uint32(PLAYER_GUILDRANK), guildRank, EVENT_PLAYER_SEND_PACKET, 1,
+		sEventMgr.AddEvent(((Object*)this), &Object::EventSetUInt32Value, uint32(PLAYER_GUILDRANK), guildRank, EVENT_PLAYER_SEND_PACKET, 1,
 			1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
 	else
