@@ -165,6 +165,9 @@ void World::RemoveSession(uint32 id)
 
 void World::AddSession(WorldSession* s)
 {
+	if(!s)
+		return;
+
 	m_sessionlock.AcquireWriteLock();
 
 	ASSERT(s);
@@ -178,6 +181,9 @@ void World::AddSession(WorldSession* s)
 
 void World::AddGlobalSession(WorldSession *session)
 {
+	if(!session)
+		return;
+
 	SessionsMutex.Acquire();
 	Sessions.insert(session);
 	SessionsMutex.Release();

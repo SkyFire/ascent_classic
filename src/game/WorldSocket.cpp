@@ -75,7 +75,7 @@ void WorldSocket::OnDisconnect()
 	if(mSession)
 	{
 		mSession->SetSocket(0);
-		//mSession=NULL;
+		mSession=NULL;
 	}
 
 	if(mRequestID != 0)
@@ -308,19 +308,20 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	}
 
 	// Allocate session
-	mSession = new WorldSession(AccountID, AccountName, this);
+	WorldSession * pSession = new WorldSession(AccountID, AccountName, this);
+	mSession = pSession;
 	ASSERT(mSession);
-	mSession->deleteMutex.Acquire();
+	pSession->deleteMutex.Acquire();
 	
 	// Set session properties
-	mSession->SetClientBuild(mClientBuild);
-	mSession->LoadSecurity(GMFlags);
-	mSession->SetAccountFlags(AccountFlags);
-	mSession->m_lastPing = (uint32)UNIXTIME;
-	mSession->language = sLocalizationMgr.GetLanguageId(lang);
+	pSession->SetClientBuild(mClientBuild);
+	pSession->LoadSecurity(GMFlags);
+	pSession->SetAccountFlags(AccountFlags);
+	pSession->m_lastPing = (uint32)UNIXTIME;
+	pSession->language = sLocalizationMgr.GetLanguageId(lang);
 
 	for(uint32 i = 0; i < 8; ++i)
-		mSession->SetAccountData(i, NULL, true, 0);
+		pSession->SetAccountData(i, NULL, true, 0);
 
 	// queue the account loading
 	AsyncQuery * aq = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::LoadAccountDataProc, AccountID) );
@@ -330,7 +331,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	sLog.outString("> %s authenticated from %s:%u [%ums]", AccountName.c_str(), GetRemoteIP().c_str(), GetRemotePort(), _latency);
 
 	// Check for queue.
-	if( (sWorld.GetSessionCount() < sWorld.GetPlayerLimit()) || mSession->HasGMPermissions() ) {
+	if( (sWorld.GetSessionCount() < sWorld.GetPlayerLimit()) || pSession->HasGMPermissions() ) {
 		Authenticate();
 	} else {
 		// Queued, sucker.
@@ -342,38 +343,42 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 		UpdateQueuePosition(Position);
 	}
 
-	mSession->deleteMutex.Release();
+	pSession->deleteMutex.Release();
 }
 
 void WorldSocket::Authenticate()
 {
+	WorldSession * pSession = mSession;
 	ASSERT(pAuthenticationPacket);
 	mQueued = false;
 
-	if(!mSession) return;
-	mSession->deleteMutex.Acquire();
+	if(!pSession) return;
+	pSession->deleteMutex.Acquire();
 
-	if(mSession->HasFlag(ACCOUNT_FLAG_XPACK_01))
+	if(pSession->HasFlag(ACCOUNT_FLAG_XPACK_01))
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x01");
 	else
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x00");
 
 	sAddonMgr.SendAddonInfoPacket(pAuthenticationPacket, (uint32)pAuthenticationPacket->rpos(), mSession);
-	mSession->_latency = _latency;
+	pSession->_latency = _latency;
 
 	delete pAuthenticationPacket;
 	pAuthenticationPacket = 0;
 
-	sLog.outDetail("> Account %u authentication complete, adding session.", mSession->GetAccountId());
+	sLog.outDetail("> Account %u authentication complete, adding session.", pSession->GetAccountId());
 
-	sWorld.AddSession(mSession);
-	sWorld.AddGlobalSession(mSession);
+	if(mSession)
+	{
+		sWorld.AddSession(mSession);
+		sWorld.AddGlobalSession(mSession);
 
-	if(mSession->HasFlag(ACCOUNT_FLAG_XTEND_INFO))
-		sWorld.AddExtendedSession(mSession);
+/*		if(pSession->HasFlag(ACCOUNT_FLAG_XTEND_INFO))
+			sWorld.AddExtendedSession(pSession);*/
 
-	if(mSession->HasGMPermissions())
-		sWorld.gmList.insert(mSession);
+		if(pSession->HasGMPermissions() && mSession)
+			sWorld.gmList.insert(mSession);
+	}
 
 	mSession->deleteMutex.Release();
 }
