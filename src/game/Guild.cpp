@@ -37,6 +37,7 @@ Guild::Guild()
 	m_bankBalance =0;
 	m_bankTabCount=0;
 	creationDay=creationMonth=creationYear=0;
+	m_hiLogId=1;
 	memset(m_ranks, 0, sizeof(GuildRank*)*MAX_GUILD_RANKS);
 }
 
@@ -172,7 +173,7 @@ void Guild::AddGuildLogEntry(uint8 iEvent, uint8 iParamCount, ...)
 		ev->iEventData[i] = 0;
 
 	CharacterDatabase.Execute("INSERT INTO guild_logs VALUES(%u, %u, %u, %u, %u, %u, %u)",
-		m_guildId, ev->iLogId, ev->iTimeStamp, ev->iEvent, ev->iEventData[0], ev->iEventData[1], ev->iEventData[2]);
+		ev->iLogId, m_guildId, ev->iTimeStamp, ev->iEvent, ev->iEventData[0], ev->iEventData[1], ev->iEventData[2]);
 
 	m_lock.Acquire();
 	if(m_log.size() >= 250)
