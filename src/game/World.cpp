@@ -4248,10 +4248,10 @@ void World::DeleteSession(WorldSession *session)
 	// remove from big map
 	m_sessions.erase(session->GetAccountId());
 
-	m_sessionlock.ReleaseWriteLock();
-
 	// delete us
 	delete session;
+
+	m_sessionlock.ReleaseWriteLock();
 }
 
 uint32 World::GetNonGmSessionCount()
