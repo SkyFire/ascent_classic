@@ -970,3 +970,9 @@ void WorldSession::SendItemPushResult(Item * pItem, bool Created, bool Received,
 	else
 		SendPacket(&data);
 }
+
+void WorldSession::Delete()
+{
+	deleteMutex.Acquire();
+	delete this;
+}
