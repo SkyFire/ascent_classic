@@ -144,7 +144,7 @@ void LogonCommClientSocket::HandleSessionInfo(WorldPacket & recvData)
 
 	// find the socket with this request
 	WorldSocket * sock = sLogonCommHandler.GetSocketByRequest(request_id);
-	if(sock == 0 || sock->Authed)	   // Expired/Client disconnected
+	if(sock == 0 || sock->Authed || !sock->IsConnected())	   // Expired/Client disconnected
 	{
 		m.Release();
 		return;

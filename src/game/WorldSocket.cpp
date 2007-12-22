@@ -75,7 +75,7 @@ void WorldSocket::OnDisconnect()
 	if(mSession)
 	{
 		mSession->SetSocket(0);
-		mSession=NULL;
+		//mSession=NULL;
 	}
 
 	if(mRequestID != 0)
@@ -330,7 +330,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	sLog.outString("> %s authenticated from %s:%u [%ums]", AccountName.c_str(), GetRemoteIP().c_str(), GetRemotePort(), _latency);
 
 	// Check for queue.
-	if( (sWorld.GetNonGmSessionCount() < sWorld.GetPlayerLimit()) || mSession->HasGMPermissions() ) {
+	if( (sWorld.GetSessionCount() < sWorld.GetPlayerLimit()) || mSession->HasGMPermissions() ) {
 		Authenticate();
 	} else {
 		// Queued, sucker.
@@ -357,9 +357,6 @@ void WorldSocket::Authenticate()
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x01");
 	else
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x00");
-
-	if(!mSession)
-		return;
 
 	sAddonMgr.SendAddonInfoPacket(pAuthenticationPacket, (uint32)pAuthenticationPacket->rpos(), mSession);
 	mSession->_latency = _latency;
