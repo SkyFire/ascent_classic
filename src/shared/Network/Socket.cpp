@@ -22,7 +22,6 @@ Socket::Socket(SOCKET fd, uint32 sendbuffersize, uint32 recvbuffersize) : m_read
 #ifdef CONFIG_USE_IOCP
 	m_writeLock = 0;
 	m_completionPort = 0;
-	m_readEvent = NULL;
 #else
 	m_writeLock = 0;
 #endif

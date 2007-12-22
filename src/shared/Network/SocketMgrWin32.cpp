@@ -62,8 +62,6 @@ bool SocketWorkerThread::run()
 
 		if(ov->m_event < NUM_SOCKET_IO_EVENTS)
 			ophandlers[ov->m_event](s, len);
-
-		delete ov;
 	}
 
 	return true;
@@ -74,6 +72,7 @@ void HandleReadComplete(Socket * s, uint32 len)
 	//s->m_readEvent=NULL;
 	if(!s->IsDeleted())
 	{
+		s->m_readEvent.Unmark();
 		if(len)
 		{
 			s->AddRecvData(len);
@@ -89,6 +88,7 @@ void HandleWriteComplete(Socket * s, uint32 len)
 {
 	if(!s->IsDeleted())
 	{
+		s->m_writeEvent.Unmark();
 		s->BurstBegin();					// Lock
 		s->RemoveWriteBufferBytes(len, false);
 		if(s->GetWriteBufferSize() > 0)

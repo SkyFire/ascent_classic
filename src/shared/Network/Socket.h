@@ -134,9 +134,6 @@ public:
 
 	// Set completion port that this socket will be assigned to.
 	inline void SetCompletionPort(HANDLE cp) { m_completionPort = cp; }
-
-	// Post an I/O event to the FIFO queue.
-	OverlappedStruct * PostSocketMessage(SocketIOEvent type);
 	
 	// Atomic wrapper functions for increasing read/write locks
 	inline void IncSendLock() { InterlockedIncrement(&m_writeLock); }
@@ -151,7 +148,8 @@ public:
 			return true;
 		}
 	}
-	OverlappedStruct * m_readEvent;
+	OverlappedStruct m_readEvent;
+	OverlappedStruct m_writeEvent;
 
 private:
 	// Completion port socket is assigned to

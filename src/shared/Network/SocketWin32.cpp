@@ -28,7 +28,7 @@ void Socket::WriteCallback()
 		buf.len = m_writeByteCount;
 		buf.buf = (char*)m_writeBuffer;
 
-		OverlappedStruct * ov = new OverlappedStruct(SOCKET_IO_EVENT_WRITE_END);
+		/*OverlappedStruct * ov = new OverlappedStruct(SOCKET_IO_EVENT_WRITE_END);
 		int r = WSASend(m_fd, &buf, 1, &w_length, flags, &ov->m_overlap, 0);
 		if(r == SOCKET_ERROR)
 		{
@@ -37,12 +37,25 @@ void Socket::WriteCallback()
 				DecSendLock();
 				Disconnect();
 			}
+		}*/
+
+		m_writeEvent.Mark();
+		m_writeEvent.Reset(SOCKET_IO_EVENT_WRITE_END);
+		int r = WSASend(m_fd, &buf, 1, &w_length, flags, &m_writeEvent.m_overlap, 0);
+		if(r == SOCKET_ERROR)
+		{
+			if(WSAGetLastError() != WSA_IO_PENDING)
+			{
+				m_writeEvent.Unmark();
+				DecSendLock();
+				Disconnect();
+			}
 		}
 	}
 	else
 	{
 		// Write operation is completed.
-		PostSocketMessage(SOCKET_IO_EVENT_WRITE_END);
+		DecSendLock();
 	}
 	m_writeMutex.Release();
 }
@@ -60,12 +73,23 @@ void Socket::SetupReadEvent()
 	buf.len = m_readBufferSize - m_readByteCount;
 
 	// event that will trigger after data is receieved
-	OverlappedStruct * ov = new OverlappedStruct(SOCKET_IO_EVENT_READ_COMPLETE);
+	/*OverlappedStruct * ov = new OverlappedStruct(SOCKET_IO_EVENT_READ_COMPLETE);
 
 	if(WSARecv(m_fd, &buf, 1, &r_length, &flags, &ov->m_overlap, 0) == SOCKET_ERROR)
 	{
 		if(WSAGetLastError() != WSA_IO_PENDING)
 			Disconnect();
+	}*/
+
+	m_readEvent.Mark();
+	m_readEvent.Reset(SOCKET_IO_EVENT_READ_COMPLETE);
+	if(WSARecv(m_fd, &buf, 1, &r_length, &flags, &m_readEvent.m_overlap, 0) == SOCKET_ERROR)
+	{
+		if(WSAGetLastError() != WSA_IO_PENDING)
+		{
+			m_readEvent.Unmark();
+			Disconnect();
+		}
 	}
 	//m_readEvent = ov;
 	m_readMutex.Release();
@@ -82,25 +106,6 @@ void Socket::AssignToCompletionPort()
 {
 	/*HANDLE h = */CreateIoCompletionPort((HANDLE)m_fd, m_completionPort, (ULONG_PTR)this, 0);
 	//__asm int 3;
-}
-
-OverlappedStruct * Socket::PostSocketMessage(SocketIOEvent type)
-{
-	// don't post any more events
-	if(m_deleted)
-		return NULL;
-
-	// create struct
-	OverlappedStruct * ov = new OverlappedStruct(type);
-
-	// post it to the event queue.
-	if(!PostQueuedCompletionStatus(m_completionPort, 0, (ULONG_PTR)this, &ov->m_overlap))
-	{
-		// This shouldn't really happen.. :/
-		delete ov;
-		return NULL;
-	}
-	return ov;
 }
 
 void Socket::BurstPush()
