@@ -11,7 +11,7 @@ ascent_SOURCES = \
     CConsole.cpp \
     CConsole.h
 
-ascent_LDADD = -lgame -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork -llua
+ascent_LDADD = -lgame -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork -llua -lpcre
 
 ascent_LDFLAGS = -L$(srcdir)/../shared \
                -L$(srcdir)/../game \
