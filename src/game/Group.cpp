@@ -234,7 +234,7 @@ bool Group::AddMember(PlayerInfo * info, Player* pPlayer, int32 subgroupid)
 			}
 
 			Update();	// Send group update
-			if(info->m_Group != this)
+			if(info->m_Group && info->m_Group != this)
 				info->m_Group->RemovePlayer(info, NULL, true);
 
 			info->m_Group=this;

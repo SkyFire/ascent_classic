@@ -307,7 +307,7 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	}
 
 	// find the lowest rank that isnt his rank
-	uint32 nh = pMember->guildRank->iId - 1;
+	int32 nh = pMember->guildRank->iId - 1;
 	GuildRank * newRank = NULL;
 
 	m_lock.Acquire();
