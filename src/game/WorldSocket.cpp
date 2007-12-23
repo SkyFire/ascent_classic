@@ -377,10 +377,10 @@ void WorldSocket::Authenticate()
 			sWorld.AddExtendedSession(pSession);*/
 
 		if(pSession->HasGMPermissions() && mSession)
-			sWorld.gmList.insert(mSession);
+			sWorld.gmList.insert(pSession);
 	}
 
-	mSession->deleteMutex.Release();
+	pSession->deleteMutex.Release();
 }
 
 void WorldSocket::UpdateQueuePosition(uint32 Position)

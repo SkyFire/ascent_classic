@@ -116,11 +116,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		}
 	}
 	
-	if(!_player->CanCastItemDueToCooldown(itemProto, x))	// damn cheaters
-		return;
-
 	if(itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown)
 	{
+		if(!_player->CanCastItemDueToCooldown(itemProto, x))	// damn cheaters
+			return;
+
 		ItemCooldown * item = new ItemCooldown;
 	   	if(itemProto->Spells[x].Id)
 		{
