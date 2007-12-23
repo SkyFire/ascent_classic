@@ -116,7 +116,8 @@ World::~World()
 	//sLog.outString("Deleting Thread Manager..");
 	//delete ThreadMgr::getSingletonPtr();
 	Log.Notice("WordFilter", "~WordFilter()");
-	delete WordFilter::getSingletonPtr();
+	delete g_chatFilter;
+	delete g_characterNameFilter;
 
 	Log.Notice("Rnd", "~Rnd()");
 	CleanupRandomNumberGenerators();
@@ -473,8 +474,14 @@ bool World::SetInitialWorldSettings()
 	sLocalizationMgr.Reload(false);
 
 	CommandTableStorage::getSingleton().Load();
-	new WordFilter;
-	sWordFilter.Load();
+	Log.Notice("WordFilter", "Loading...");
+	
+	g_characterNameFilter = new WordFilter();
+	g_chatFilter = new WordFilter();
+	g_characterNameFilter->Load("wordfilter_character_names");
+	g_chatFilter->Load("wordfilter_chat");
+
+	Log.Notice("WordFilter", "Done.");
 
 #ifdef ENABLE_CHECKPOINT_SYSTEM
 	new CheckpointMgr;

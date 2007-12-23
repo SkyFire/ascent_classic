@@ -232,6 +232,12 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 		return;
 	}
 
+	if(g_characterNameFilter->Parse(name, false))
+	{
+		OutPacket(SMSG_CHAR_CREATE, 1, "\x31");
+		return;
+	}
+
 	if(objmgr.GetPlayerInfoByName(name) != 0)
 	{
 		OutPacket(SMSG_CHAR_CREATE, 1, "\x31");

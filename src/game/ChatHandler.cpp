@@ -153,8 +153,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
 
-			if(sWordFilter.UsesBannedKeyword(msg, this))
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
 				return;
+			}
 
 			if(GetPlayer()->m_modlanguage >=0)
 			{
@@ -194,8 +197,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
 			
-			if(sWordFilter.UsesBannedKeyword(msg, this))
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
 				return;
+			}
 
 			Group *pGroup = _player->GetGroup();
 			if(pGroup == NULL) break;
@@ -250,8 +256,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 					break;
 				}
 
-				if(sWordFilter.UsesBannedKeyword(msg, this))
+				if(g_chatFilter->Parse(msg) == true)
+				{
+					SystemMessage("Your chat message was blocked by a server-side filter.");
 					return;
+				}
 
 				if(_player->m_playerInfo->guild)
 					_player->m_playerInfo->guild->GuildChat(msg.c_str(), this, lang);
@@ -266,8 +275,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			if(sWorld.getReqGmClient() == false)
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
-			if(sWordFilter.UsesBannedKeyword(msg, this))
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
 				return;
+			}
 
 			if(_player->m_playerInfo->guild)
 				_player->m_playerInfo->guild->OfficerChat(msg.c_str(), this, lang);
@@ -282,9 +294,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			if(sWorld.getReqGmClient() == false)
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
-			if(sWordFilter.UsesBannedKeyword(msg, this))
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
 				return;
-
+			}
 			if(lang > 0 && LanguageSkills[lang] && _player->_HasSkillLine(LanguageSkills[lang]) == false)
 				return;
 
@@ -309,8 +323,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			std::string to = "",tmp;
 			recv_data >> to >> msg;
 
-			if(sWordFilter.UsesBannedKeyword(msg, this))
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
 				return;
+			}
 		 
 			Player *player = objmgr.GetPlayer(to.c_str(), false);
 			if(!player)
@@ -384,8 +401,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 					break;
 
-			if(sWordFilter.UsesBannedKeyword(msg, this))
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
 				return;
+			}
 
 			Channel *chn = channelmgr.GetChannel(channel.c_str(),GetPlayer()); 
 			if(chn) 
@@ -402,8 +422,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			recv_data >> reason;
 			GetPlayer()->SetAFKReason(reason);
 
-			if(sWordFilter.UsesBannedKeyword(reason, this))
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
 				return;
+			}
 
 			/* WorldPacket *data, WorldSession* session, uint32 type, uint32 language, const char *channelName, const char *message*/
 			if(GetPlayer()->HasFlag(PLAYER_FLAGS, 0x02))
@@ -425,8 +448,11 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			recv_data >> reason;
 			GetPlayer()->SetAFKReason(reason);
 
-			if(sWordFilter.UsesBannedKeyword(reason, this))
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
 				return;
+			}
 
 			if(GetPlayer()->HasFlag(PLAYER_FLAGS, 0x04))
 				GetPlayer()->RemoveFlag(PLAYER_FLAGS, 0x04);

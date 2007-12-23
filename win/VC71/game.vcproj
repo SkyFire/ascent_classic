@@ -741,6 +741,12 @@
 			RelativePath="..\..\src\game\WeatherMgr.h">
 		</File>
 		<File
+			RelativePath="..\..\src\game\WordFilter.cpp">
+		</File>
+		<File
+			RelativePath="..\..\src\game\WordFilter.h">
+		</File>
+		<File
 			RelativePath="..\..\src\game\WorkdSocketCluster.cpp">
 		</File>
 		<File

@@ -106,18 +106,6 @@ enum Languages
 	if(m_session->GetPlayer() == NULL) return NULL;
 
 
-
-class WordFilter : public Singleton<WordFilter>
-{
-	vector<string> blockedPhrases;
-public:
-	void Load();
-	bool UsesBannedKeyword(string& message, WorldSession * session);
-	void LogMessage(string& message, string& blockedKeyword, Player * plr);
-};
-
-#define sWordFilter WordFilter::getSingleton()
-
 class ChatCommand
 {
 public:

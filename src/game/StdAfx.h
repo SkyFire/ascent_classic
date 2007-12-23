@@ -72,6 +72,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #endif
 
 #include "../shared/CallBack.h"
+#include "WordFilter.h"
 #include "EventMgr.h"
 #include "EventableObject.h"
 #include "Object.h"

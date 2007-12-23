@@ -1,1 +1,1 @@
-SUBDIRS = lua zlib
+SUBDIRS = pcre lua zlib
