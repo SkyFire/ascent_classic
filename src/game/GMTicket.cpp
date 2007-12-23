@@ -27,7 +27,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 	std::string message = "";
 	std::string message2 = "";
 	GM_Ticket *ticket = new GM_Ticket;
-	WorldPacket data;
+	WorldPacket data(SMSG_GMTICKET_CREATE, 4);
 
 	// recv Data
 	recv_data >> type;
@@ -55,7 +55,6 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 	objmgr.AddGMTicket(ticket,false);
 
 	// Response - no errors
-	data.Initialize(SMSG_GMTICKET_CREATE);
 	data << uint32(2);
 
 	SendPacket(&data);
@@ -74,7 +73,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
 {
 	uint8 unk1;
 	std::string message = "";
-	WorldPacket data;
+	WorldPacket data(SMSG_GMTICKET_UPDATETEXT, 4);
 
 	// recv Data
 	recv_data >> unk1;
@@ -85,7 +84,6 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
 	if(!ticket) // Player doesnt have a GM Ticket yet
 	{
 		// Response - error couldnt find existing Ticket
-		data.Initialize(SMSG_GMTICKET_UPDATETEXT);
 		data << uint32(1);
 
 		SendPacket(&data);
@@ -98,7 +96,6 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
 	objmgr.AddGMTicket(ticket,false);
 
 	// Response - no errors
-	data.Initialize(SMSG_GMTICKET_UPDATETEXT);
 	data << uint32(2);
 
 	SendPacket(&data);
@@ -106,14 +103,13 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & recv_data)
 {
-	WorldPacket data;
+	WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
 	// no data
 
 	// remove Ticket
 	objmgr.remGMTicket(GetPlayer()->GetGUID());
 
 	// Response - no errors
-	data.Initialize(SMSG_GMTICKET_DELETETICKET);
 	data << uint32(9);
 
 	SendPacket(&data);
@@ -121,7 +117,7 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & recv_data)
 {
-	WorldPacket data;
+	WorldPacket data(SMSG_GMTICKET_GETTICKET, 400);
 	// no data
 
 	// get Current Ticket
@@ -129,14 +125,12 @@ void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & recv_data)
 
 	if(!ticket) // no Current Ticket
 	{
-		data.Initialize(SMSG_GMTICKET_GETTICKET);
 		data << uint32(10);
 		SendPacket(&data);
 		return;
 	}
 
 	// Send current Ticket
-	data.Initialize(SMSG_GMTICKET_GETTICKET);
 	data << uint32(6); // unk
 	data << ticket->message.c_str();
 	data << (uint8)ticket->type;
@@ -147,12 +141,11 @@ void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket & recv_data)
 {
-	WorldPacket data;
+	WorldPacket data(SMSG_GMTICKET_SYSTEMSTATUS, 4);
 
 	// no data
 
 	// Response - System is working Fine
-	data.Initialize(SMSG_GMTICKET_SYSTEMSTATUS);
 	if(sWorld.getGMTicketStatus())
 		data << uint32(1);
 	else

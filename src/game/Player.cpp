@@ -9287,3 +9287,9 @@ void Player::RemoveQuestMob(uint32 entry) //Only for Kill Quests
 	if (quest_mobs.size()>0)
 		quest_mobs.erase(entry);
 }
+
+PlayerInfo::~PlayerInfo()
+{
+	if(m_Group)
+		m_Group->RemovePlayer(this, NULL, true);
+}

@@ -279,7 +279,8 @@ void WorldSession::HandleGroupDisbandOpcode( WorldPacket & recv_data )
 	Group* pGroup = _player->GetGroup();
 	if(!pGroup) return;
 
-	pGroup->RemovePlayer(_player->m_playerInfo, _player, true);
+	pGroup->Disband();
+	//pGroup->RemovePlayer(_player->m_playerInfo, _player, true);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

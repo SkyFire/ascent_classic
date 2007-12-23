@@ -470,6 +470,7 @@ struct FactionReputation
 };
 struct PlayerInfo
 {
+	~PlayerInfo();
 	uint32 guid;
 	uint32 acct;
 	char * name;

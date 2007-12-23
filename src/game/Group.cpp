@@ -234,6 +234,9 @@ bool Group::AddMember(PlayerInfo * info, Player* pPlayer, int32 subgroupid)
 			}
 
 			Update();	// Send group update
+			if(info->m_Group != this)
+				info->m_Group->RemovePlayer(info, NULL, true);
+
 			info->m_Group=this;
 
 			m_groupLock.Release();
@@ -374,6 +377,7 @@ void Group::Update(bool delayed)
 void Group::Disband()
 {
 	m_groupLock.Acquire();
+	m_updateblock=true;
 
 	if(m_isqueued)
 	{
@@ -745,6 +749,7 @@ void Group::MovePlayer(PlayerInfo *info, uint8 subgroup)
 	sg = m_SubGroups[subgroup];
 	sg->AddPlayer(info,pl);
 	info->subGroup=sg->GetID();
+	info->m_Group = this;
 
 	Update();
 	m_groupLock.Release();
@@ -789,8 +794,13 @@ void Group::LoadFromDB(Field *fields)
 		for(int j = 0; j < 5; ++j)
 		{
 			uint32 guid = fields[5 + (i*5) + j].GetUInt32();
+			if(guid==NULL)
+				continue;
+
 			PlayerInfo * inf = objmgr.GetPlayerInfo(guid);
-			if(inf == NULL) continue;
+			if(inf == NULL)
+				continue;
+
 			AddMember(inf, NULL, i);
 			m_dirty=false;
 		}

@@ -51,6 +51,7 @@ World::World()
 #endif
 	m_levelCap=70;
 	m_genLevelCap=70;
+	m_limitedNames=false;
 }
 
 void CleanupRandomNumberGenerators();
@@ -4778,6 +4779,7 @@ void World::Rehash(bool load)
 	SpeedhackProtection = antihack_speed;
 	m_levelCap = Config.MainConfig.GetIntDefault("Server", "LevelCap", 70);
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
+	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", false);
 	Channel::LoadConfSettings();
 }
 

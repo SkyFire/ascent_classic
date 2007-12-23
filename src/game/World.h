@@ -621,6 +621,7 @@ public:
 	list<SpellEntry*> dummyspells;
 	uint32 m_levelCap;
 	uint32 m_genLevelCap;
+	bool m_limitedNames;
 };
 
 #define sWorld World::getSingleton()

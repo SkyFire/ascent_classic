@@ -23,17 +23,36 @@
 
 bool VerifyName(const char * name, size_t nlen)
 {
-	static const char * bannedCharacters = "\t\v\b\f\a\n\r\\\"\'\? <>[](){}_=+-|/!@#$%^&*~`.,0123456789\0";
 	const char * p;
-	for(size_t i = 0; i < nlen; ++i)
-	{
-		p = bannedCharacters;
-		while(*p != 0 && name[i] != *p && name[i] != 0)
-			++p;
+	size_t i;
 
-		if(*p != 0)
-			return false;
+	static const char * bannedCharacters = "\t\v\b\f\a\n\r\\\"\'\? <>[](){}_=+-|/!@#$%^&*~`.,0123456789\0";
+	static const char * allowedCharacters = "abcdefghijklmnopqrstuvwxyz";
+	if(sWorld.m_limitedNames)
+	{
+		for(i = 0; i < nlen; ++i)
+		{
+			p = bannedCharacters;
+			while(*p != 0 && name[i] == *p && name[i] != 0)
+				++p;
+
+			if(*p != 0)
+				return false;
+		}
 	}
+	else
+	{
+		for(i = 0; i < nlen; ++i)
+		{
+			p = bannedCharacters;
+			while(*p != 0 && name[i] != *p && name[i] != 0)
+				++p;
+
+			if(*p != 0)
+				return false;
+		}
+	}
+	
 	return true;
 }
 

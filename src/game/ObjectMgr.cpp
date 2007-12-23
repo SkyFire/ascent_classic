@@ -181,6 +181,7 @@ ObjectMgr::~ObjectMgr()
 	Log.Notice("ObjectMgr", "Deleting Player Information...");
 	for(HM_NAMESPACE::hash_map<uint32, PlayerInfo*>::iterator itr = m_playersinfo.begin(); itr != m_playersinfo.end(); ++itr)
 	{
+		itr->second->m_Group=NULL;
 		free(itr->second->name);
 		delete itr->second;
 	}
