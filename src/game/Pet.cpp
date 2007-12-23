@@ -1336,7 +1336,7 @@ void Pet::ApplyPetLevelAbilities()
 
 	double pet_mod_sta = 1, pet_mod_arm = 1, pet_mod_dps = 1;
 	if(creature_info->Family > 35 || R_pet_mod_sta[creature_info->Family] == 0)
-		sLog.outError("PETSTAT: Creature family %u [%s] has missing data. Assuming to be 1.", creature_info->Family, objmgr.GetCreatureFamilyName(dbcCreatureFamily.LookupEntry(creature_info->Family)->ID));
+		sLog.outError("PETSTAT: Creature family %u [%s] has missing data. Assuming to be 1.", creature_info->Family, objmgr.GetCreatureFamilyName(dbcCreatureFamily.LookupEntry(creature_info->Family)->ID).c_str());
 	else
 	{
 		pet_mod_sta = R_pet_mod_sta[creature_info->Family];

@@ -179,4 +179,6 @@ libgame_a_SOURCES = \
     CThreads.cpp \
     CThreads.h \
     WorldRunnable.h \
-    WorldRunnable.cpp
+    WorldRunnable.cpp \
+    WordFilter.h \
+    WordFilter.cpp
