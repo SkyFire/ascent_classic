@@ -1,9 +1,9 @@
 INCLUDES += -I$(srcdir)/../../include -I$(srcdir)/../../include/zlib
 
 noinst_LIBRARIES = libpcre.a
-CFLAGS+= -DHAVE_CONFIG_H
+AM_CFLAGS = -DHAVE_CONFIG_H
 
-liblua_a_SOURCES = \
+libpcre_a_SOURCES = \
 config.h \
 pcre.h \
 pcre_chartables.c \
