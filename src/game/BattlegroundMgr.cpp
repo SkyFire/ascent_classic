@@ -177,7 +177,7 @@ void CBattlegroundManager::EventQueueUpdate()
 	Player * plr;
 	CBattleground * bg;
 	list<uint32>::iterator it3, it4;
-	vector<Player*>::iterator it6;
+	//vector<Player*>::iterator it6;
 	map<uint32, CBattleground*>::iterator iitr;
 	Arena * arena;
 	int32 team;

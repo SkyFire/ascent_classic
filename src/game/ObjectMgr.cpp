@@ -26,7 +26,7 @@ initialiseSingleton( ObjectMgr );
 #else
 #define ToLower(str) for(unsigned int i=0;i<str.size();i++) tolower(str[i]);
 #endif
-#define ToUpper(yourstring) transform (yourstring.begin(),yourstring.end(), yourstring.begin(), towupper);
+#define ToUpper(yourstring) transform (yourstring.begin(),yourstring.end(), yourstring.begin(), toupper);
 
 const char * NormalTalkMessage = "What can I teach you, $N?";
 
@@ -856,7 +856,7 @@ Player* ObjectMgr::GetPlayer(const char* name, bool caseSensitive)
 	if(!caseSensitive)
 	{
 		std::string strName = name;
-		std::transform(strName.begin(),strName.end(),strName.begin(),towlower);
+		std::transform(strName.begin(),strName.end(),strName.begin(),tolower);
 		for (itr = _players.begin(); itr != _players.end(); ++itr)
 		{
 			if(!stricmp(itr->second->GetNameString()->c_str(), strName.c_str()))

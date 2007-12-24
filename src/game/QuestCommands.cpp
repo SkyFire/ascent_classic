@@ -76,7 +76,7 @@ bool ChatHandler::HandleQuestLookupCommand(const char * args, WorldSession * m_s
 	if(!*args) return false;
 
 	string x = string(args);
-	transform(x.begin(), x.end(), x.begin(), towlower);
+	transform(x.begin(), x.end(), x.begin(), tolower);
 	if(x.length() < 4)
 	{
 		RedSystemMessage(m_session, "Your search string must be at least 5 characters long.");
@@ -98,7 +98,7 @@ bool ChatHandler::HandleQuestLookupCommand(const char * args, WorldSession * m_s
 		i = itr->Get();
 
 		y = string(i->title);
-		transform(y.begin(), y.end(), y.begin(), towlower);
+		transform(y.begin(), y.end(), y.begin(), tolower);
 
 		if(FindXinYString(x, y))
 		{

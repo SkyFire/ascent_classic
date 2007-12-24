@@ -96,6 +96,9 @@ enum MsTimeVariables
 
 #ifdef _MSC_VER
 #  define COMPILER COMPILER_MICROSOFT
+#if _MSC_VER < 1400
+#define ENABLE_SHITTY_STL_HACKS 1
+#endif
 #elif defined( __BORLANDC__ )
 #  define COMPILER COMPILER_BORLAND
 #elif defined( __GNUC__ )

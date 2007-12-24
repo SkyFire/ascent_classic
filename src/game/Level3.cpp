@@ -2018,7 +2018,7 @@ bool ChatHandler::HandleLookupItemCommand(const char * args, WorldSession * m_se
 	if(!*args) return false;
 
 	string x = string(args);
-	transform(x.begin(), x.end(), x.begin(), towlower);
+	transform(x.begin(), x.end(), x.begin(), tolower);
 	if(x.length() < 4)
 	{
 		RedSystemMessage(m_session, "Your search string must be at least 5 characters long.");
@@ -2060,7 +2060,7 @@ bool ChatHandler::HandleLookupCreatureCommand(const char * args, WorldSession * 
 	if(!*args) return false;
 
 	string x = string(args);
-	transform(x.begin(), x.end(), x.begin(), towlower);
+	transform(x.begin(), x.end(), x.begin(), tolower);
 	if(x.length() < 4)
 	{
 		RedSystemMessage(m_session, "Your search string must be at least 5 characters long.");
