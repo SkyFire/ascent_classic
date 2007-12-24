@@ -1481,9 +1481,9 @@ void Player::smsg_InitialSpells()
 			++count;
 		}
 #ifdef USING_BIG_ENDIAN
-	   *(uint16*)data.contents()[pos] = swap16((uint16)count);
+	   *(uint16*)&data.contents()[pos] = swap16((uint16)count);
 #else
-	   *(uint16*)data.contents()[pos] = (uint16)count;
+	   *(uint16*)&data.contents()[pos] = (uint16)count;
 #endif
 	}
 	else
