@@ -614,4 +614,22 @@ int32 GetTimePeriodFromString(const char * str);
 std::string ConvertTimeStampToString(uint32 timestamp);
 std::string ConvertTimeStampToDataTime(uint32 timestamp);
 
+#ifdef WIN32
+#define ASCENT_INLINE __forceinline
+#else
+#define ASCENT_INLINE inline
+#endif
+
+ASCENT_INLINE void ASCENT_TOLOWER(std::string& str)
+{
+	for(size_t i = 0; i < str.length(); ++i)
+		str[i] = tolower(str[i]);
+};
+
+ASCENT_INLINE void ASCENT_TOUPPER(std::string& str)
+{
+	for(size_t i = 0; i < str.length(); ++i)
+		str[i] = toupper(str[i]);
+};
+
 #endif

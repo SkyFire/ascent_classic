@@ -195,16 +195,7 @@ bool ChatHandler::HandleStartCommand(const char* args, WorldSession *m_session)
 	else if (m_plyr && args && strlen(args) > 2)
 	{
 		race = args;
-		#ifdef WIN32
-			
-			transform(race.begin(), race.end(), race.begin(), tolower);
-		#else
-			race = "";
-			for (uint32 i = 0; i < race.size(); i++)
-			{
-				race.push_back(tolower(args[i]));
-			}
-		#endif
+		ASCENT_TOLOWER(race);
 
 		// Teleport to specific race
 		if(race == "human")

@@ -42,7 +42,7 @@ void AccountMgr::ReloadAccounts(bool silent)
 			AccountName = field[1].GetString();
 
 			// transform to uppercase
-			transform(AccountName.begin(), AccountName.end(), AccountName.begin(), toupper);
+			ASCENT_TOUPPER(AccountName);
 
 			//Use private __GetAccount, for locks
 			acct = __GetAccount(AccountName);
@@ -122,8 +122,8 @@ void AccountMgr::AddAccount(Field* field)
 		acct->forcedLocale = false;
 
 	// Convert username/password to uppercase. this is needed ;)
-	transform(Username.begin(), Username.end(), Username.begin(), toupper);
-	transform(Password.begin(), Password.end(), Password.begin(), toupper);
+	ASCENT_TOUPPER(Username);
+	ASCENT_TOUPPER(Password);
 	
 	// Prehash the I value.
 	hash.UpdateData((Username + ":" + Password));
@@ -164,8 +164,8 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 		acct->forcedLocale = false;
 
 	// Convert username/password to uppercase. this is needed ;)
-	transform(Username.begin(), Username.end(), Username.begin(), toupper);
-	transform(Password.begin(), Password.end(), Password.begin(), toupper);
+	ASCENT_TOUPPER(Username);
+	ASCENT_TOUPPER(Password);
 
 	// Prehash the I value.
 	hash.UpdateData((Username + ":" + Password));
