@@ -50,8 +50,8 @@ public:
 	void SocketDisconnected();
 	void OnRead(const uint8 * bytes, uint32 len);
 
-	inline uint32 GetVoiceServerIP() { return ip; }
-	inline uint16 GetVoiceServerPort() { return port; }
+	ASCENT_INLINE uint32 GetVoiceServerIP() { return ip; }
+	ASCENT_INLINE uint16 GetVoiceServerPort() { return port; }
 	void CreateVoiceChannel(Channel * chn);
 	void DestroyVoiceChannel(Channel * chn);
 	bool CanCreateVoiceChannel(Channel * chn);

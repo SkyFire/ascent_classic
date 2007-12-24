@@ -329,7 +329,7 @@ public:
 
 	const uint8 *contents() const { return &_storage[0]; };
 
-	inline size_t size() const { return _storage.size(); };
+	ASCENT_INLINE size_t size() const { return _storage.size(); };
 	// one should never use resize probably
 	void resize(size_t newsize) {
 		_storage.resize(newsize);
@@ -430,7 +430,7 @@ public:
 			printf("\n");
 		}
 
-	inline void reverse()
+	ASCENT_INLINE void reverse()
 	{
 		std::reverse(_storage.begin(), _storage.end());
 	}

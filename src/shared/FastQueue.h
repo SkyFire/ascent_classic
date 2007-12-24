@@ -25,8 +25,8 @@
 class DummyLock
 {
 public:
-	inline void Acquire() { }
-	inline void Release() { }
+	ASCENT_INLINE void Acquire() { }
+	ASCENT_INLINE void Release() { }
 };
 
 /** linked-list style queue
@@ -131,7 +131,7 @@ public:
 		m_lock.Release();
 	}
 
-	inline bool HasItems()
+	ASCENT_INLINE bool HasItems()
 	{
 		bool ret;
 		m_lock.Acquire();

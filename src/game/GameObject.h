@@ -156,8 +156,8 @@ public:
 	GameObject(uint32 high, uint32 low);
 	~GameObject( );
 
-	inline GameObjectInfo* GetInfo() { return pInfo; }
-	inline void SetInfo(GameObjectInfo * goi) { pInfo = goi; }
+	ASCENT_INLINE GameObjectInfo* GetInfo() { return pInfo; }
+	ASCENT_INLINE void SetInfo(GameObjectInfo * goi) { pInfo = goi; }
 
 	//void Create ( uint32 display_id, uint8 state, uint32 obj_field_entry, float scale, uint16 type, uint16 faction, uint32 mapid, float x, float y, float z, float ang );
    // void Create ( uint32 mapid, float x, float y, float z, float ang);
@@ -208,7 +208,7 @@ public:
 
 	void Deactivate();
 
-	inline bool isQuestGiver()
+	ASCENT_INLINE bool isQuestGiver()
 	{
 		if(GetUInt32Value(GAMEOBJECT_TYPE_ID) == 2)
 			return true;
@@ -239,19 +239,19 @@ public:
 	void CallScriptUpdate();
    
 
-	inline GameObjectAIScript* GetScript() { return myScript; }
+	ASCENT_INLINE GameObjectAIScript* GetScript() { return myScript; }
 
 	void TrapSearchTarget();	// Traps need to find targets faster :P
 	uint32 spawnid;
 
-	inline bool HasAI() { return spell != 0; }
+	ASCENT_INLINE bool HasAI() { return spell != 0; }
 	GOSpawn * m_spawn;
 	void OnPushToWorld();
 	void OnRemoveInRangeObject(Object* pObj);
 	void RemoveFromWorld(bool free_guid);
 
-	inline bool CanMine(){return mines_remaining != 1 && mines_remaining > 0;}
-	inline void UseMine(){ if(mines_remaining) mines_remaining--;}
+	ASCENT_INLINE bool CanMine(){return mines_remaining != 1 && mines_remaining > 0;}
+	ASCENT_INLINE void UseMine(){ if(mines_remaining) mines_remaining--;}
     bool HasLoot();
 	MapCell * m_respawnCell;
 

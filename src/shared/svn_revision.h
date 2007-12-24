@@ -6,7 +6,7 @@
 static const char * REVISION_TEXT	= "$Rev$";
 static const char * BUILD_TAG		= "2.6-TRUNK";
 
-inline int g_getRevision()
+ASCENT_INLINE int g_getRevision()
 {
 	const char * p = REVISION_TEXT + 6;
 	return atoi(p);

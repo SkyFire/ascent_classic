@@ -131,7 +131,7 @@ enum SPELL_MODIFIER_TYPE
 };
 
 
-inline void SM_FFValue(int32 *m, float *v,uint32 group)
+ASCENT_INLINE void SM_FFValue(int32 *m, float *v,uint32 group)
 {
     if(m == 0) return;
 
@@ -140,7 +140,7 @@ inline void SM_FFValue(int32 *m, float *v,uint32 group)
             (*v)+=m[x];
 }
 
-inline void SM_FIValue(int32 *m, int32 *v,uint32 group)
+ASCENT_INLINE void SM_FIValue(int32 *m, int32 *v,uint32 group)
 {
     if(m == 0) return;
 
@@ -149,7 +149,7 @@ inline void SM_FIValue(int32 *m, int32 *v,uint32 group)
             (*v)+=m[x];
 }
 
-inline void SM_PIValue(int32 *m, int32 *v,uint32 group)
+ASCENT_INLINE void SM_PIValue(int32 *m, int32 *v,uint32 group)
 {
     if(m == 0) return;
 
@@ -158,7 +158,7 @@ inline void SM_PIValue(int32 *m, int32 *v,uint32 group)
             (*v)+= ((*v)*(m[x]))/100;
 }
 
-inline void SM_PFValue(int32*m, float *v,uint32 group)
+ASCENT_INLINE void SM_PFValue(int32*m, float *v,uint32 group)
 {
     if(m == 0) return;
     
@@ -969,7 +969,7 @@ enum SpellIsFlags
     SPELL_FLAG_IS_FINISHING_MOVE		= 0x00000020, //rogue has a few spells that can stack so can't use the spell_type enum ;)
 };
 
-inline bool CanAgroHash(uint32 spellhashname)
+ASCENT_INLINE bool CanAgroHash(uint32 spellhashname)
 {
     if (spellhashname == 4287212498UL) //hunter's mark
         return false;
@@ -980,7 +980,7 @@ inline bool CanAgroHash(uint32 spellhashname)
 /************************************************************************/
 /* IsDamagingSpell, this function seems slow, its only used rarely      */
 /************************************************************************/
-inline bool IsDamagingSpell(SpellEntry *sp)
+ASCENT_INLINE bool IsDamagingSpell(SpellEntry *sp)
 {
     switch (sp->Effect[0])
     {
@@ -1057,7 +1057,7 @@ inline bool IsDamagingSpell(SpellEntry *sp)
     return false;
 }
 
-inline bool IsHealingSpell(SpellEntry *sp)
+ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
 {
     switch (sp->Effect[0])
     {
@@ -1126,7 +1126,7 @@ inline bool IsHealingSpell(SpellEntry *sp)
     return false;
 }
 
-inline bool IsTargetingStealthed(SpellEntry *sp)
+ASCENT_INLINE bool IsTargetingStealthed(SpellEntry *sp)
 {
 	if(
 		sp->EffectImplicitTargetA[0]==3 ||
@@ -1145,19 +1145,19 @@ inline bool IsTargetingStealthed(SpellEntry *sp)
 	return 0;
 }
 
-inline bool IsInrange(LocationVector & location, Object * o, float square_r)
+ASCENT_INLINE bool IsInrange(LocationVector & location, Object * o, float square_r)
 {
     float r = o->GetDistanceSq(location);
     return ( r<=square_r);
 }
 
-inline bool IsInrange(float x1,float y1, float z1, Object * o,float square_r)
+ASCENT_INLINE bool IsInrange(float x1,float y1, float z1, Object * o,float square_r)
 {
     float r = o->GetDistanceSq(x1, y1, z1);
     return ( r<=square_r);
 }
 
-inline bool IsInrange(float x1,float y1, float z1,float x2,float y2, float z2,float square_r)
+ASCENT_INLINE bool IsInrange(float x1,float y1, float z1,float x2,float y2, float z2,float square_r)
 {
     float t;
     float r;
@@ -1170,13 +1170,13 @@ inline bool IsInrange(float x1,float y1, float z1,float x2,float y2, float z2,fl
     return ( r<=square_r);
 }
     
-inline bool IsInrange(Object * o1,Object * o2,float square_r)
+ASCENT_INLINE bool IsInrange(Object * o1,Object * o2,float square_r)
 {
     return IsInrange(o1->GetPositionX(),o1->GetPositionY(),o1->GetPositionZ(),
         o2->GetPositionX(),o2->GetPositionY(),o2->GetPositionZ(),square_r);
 }
 
-inline bool TargetTypeCheck(Object *obj,uint32 ReqCreatureTypeMask)
+ASCENT_INLINE bool TargetTypeCheck(Object *obj,uint32 ReqCreatureTypeMask)
 {
 	if(!ReqCreatureTypeMask)
 		return true;
@@ -1493,7 +1493,7 @@ public:
     // Checks the caster is ready for cast
     uint8 CanCast(bool);
     // Checks the caster has needed items on it 
-    inline int8 CheckItems();
+    ASCENT_INLINE int8 CheckItems();
     // Removes Reagents if cast is successful
     void RemoveItems();
     // Calculates the i'th effect value
@@ -1510,8 +1510,8 @@ public:
 
     bool Reflect(Unit * refunit);
 
-    inline uint32 getState() { return m_spellState; }
-    inline void SetUnitTarget(Unit *punit){unitTarget=punit;}
+    ASCENT_INLINE uint32 getState() { return m_spellState; }
+    ASCENT_INLINE void SetUnitTarget(Unit *punit){unitTarget=punit;}
 
     // Send Packet functions
     void SendCastResult(int16 result);
@@ -1683,7 +1683,7 @@ public:
     Object *        m_caster;
 
     // 15007 = resurecting sickness
-    inline uint32 GetType()//0 melee,1 magic ,2 ranged
+    ASCENT_INLINE uint32 GetType()//0 melee,1 magic ,2 ranged
     {      
           //this is dirty fix, we must use weapon class to define dmg type
         if(m_spellInfo->Id == SPELL_RANGED_WAND) //wands are magic type. why do we need them as ranged ;P
@@ -1701,10 +1701,10 @@ public:
     std::vector<uint64> UniqueTargets;
     SpellTargetsList    ModeratedTargets;
 
-    inline Item* GetItemTarget() { return itemTarget; }
-    inline Unit* GetUnitTarget() { return unitTarget; }
-    inline Player* GetPlayerTarget() { return playerTarget; }
-    inline GameObject* GetGameObjectTarget() { return gameObjTarget; }
+    ASCENT_INLINE Item* GetItemTarget() { return itemTarget; }
+    ASCENT_INLINE Unit* GetUnitTarget() { return unitTarget; }
+    ASCENT_INLINE Player* GetPlayerTarget() { return playerTarget; }
+    ASCENT_INLINE GameObject* GetGameObjectTarget() { return gameObjTarget; }
 
     uint32 chaindamage;
     // -------------------------------------------
@@ -1775,7 +1775,7 @@ public:
         return this->Dur;
     }
 
-    inline float GetRadius(uint32 i)
+    ASCENT_INLINE float GetRadius(uint32 i)
     {
         if(bRadSet[i])return Rad[i];
         bRadSet[i]=true;
@@ -1789,7 +1789,7 @@ public:
         return Rad[i];
     }
 
-    inline uint32 GetBaseThreat(uint32 dmg)
+    ASCENT_INLINE uint32 GetBaseThreat(uint32 dmg)
     {
         //there should be a formula to determine what spell cause threat and which don't
 /*        switch(m_spellInfo->NameHash)
@@ -1828,22 +1828,22 @@ public:
 
     bool duelSpell;
 
-	inline void safe_cancel()
+	ASCENT_INLINE void safe_cancel()
 	{
 		m_cancelled = true;
 	}
 
     /// Spell state's
     /// Spell failed
-    inline bool GetSpellFailed(){return m_Spell_Failed;}
-    inline void SetSpellFailed(bool failed = true){m_Spell_Failed = failed;}
+    ASCENT_INLINE bool GetSpellFailed(){return m_Spell_Failed;}
+    ASCENT_INLINE void SetSpellFailed(bool failed = true){m_Spell_Failed = failed;}
 
-    inline bool IsReflected() {return m_IsReflected;}
-    inline void SetReflected(bool reflected = true) {m_IsReflected = reflected;}
+    ASCENT_INLINE bool IsReflected() {return m_IsReflected;}
+    ASCENT_INLINE void SetReflected(bool reflected = true) {m_IsReflected = reflected;}
     
     /// Spell possibility's
-    inline bool GetCanReflect() {return m_CanRelect;}
-    inline void SetCanReflect(bool reflect = true) {m_CanRelect = reflect;}
+    ASCENT_INLINE bool GetCanReflect() {return m_CanRelect;}
+    ASCENT_INLINE void SetCanReflect(bool reflect = true) {m_CanRelect = reflect;}
 
 
 protected:
@@ -1884,7 +1884,7 @@ protected:
 	bool        m_cancelled;
     //void _DamageRangeUpdate();
 
-	inline bool HasTarget(const uint64& guid, TargetsList* tmpMap)
+	ASCENT_INLINE bool HasTarget(const uint64& guid, TargetsList* tmpMap)
 	{
 		for(TargetsList::iterator itr = tmpMap->begin(); itr != tmpMap->end(); ++itr)
 			if((*itr)==guid)

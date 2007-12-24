@@ -49,10 +49,10 @@ public:
 	void __fastcall RemoveWriteBufferBytes(uint32 size, bool lock);
 
 	// Returns receive buffer offset.
-	inline uint8 * GetReadBuffer(uint32 offset) { return m_readBuffer + offset; }
+	ASCENT_INLINE uint8 * GetReadBuffer(uint32 offset) { return m_readBuffer + offset; }
 
 	// Increments the read size x bytes.
-	inline void AddRecvData(uint32 size) { m_readByteCount += size; }
+	ASCENT_INLINE void AddRecvData(uint32 size) { m_readByteCount += size; }
 
 	// Reads x bytes from the buffer into the destination array.
 	void __fastcall Read(uint32 size, uint8 * buffer);
@@ -63,7 +63,7 @@ public:
 	bool Send(const uint8 * Bytes, uint32 Size);
 
 	// Burst system - Locks the sending mutex.
-	inline void BurstBegin() { m_writeMutex.Acquire(); }
+	ASCENT_INLINE void BurstBegin() { m_writeMutex.Acquire(); }
 
 	// Burst system - Adds bytes to output buffer.
 	bool BurstSend(const uint8 * Bytes, uint32 Size);
@@ -72,14 +72,14 @@ public:
 	void BurstPush();
 
 	// Burst system - Unlocks the sending mutex.
-	inline void BurstEnd() { m_writeMutex.Release(); }
+	ASCENT_INLINE void BurstEnd() { m_writeMutex.Release(); }
 
 /* Client Operations */
 
 	// Get the client's ip in numerical form.
 	string GetRemoteIP();
-	inline uint32 GetRemotePort() { return ntohs(m_client.sin_port); }
-	inline SOCKET GetFd() { return m_fd; }
+	ASCENT_INLINE uint32 GetRemotePort() { return ntohs(m_client.sin_port); }
+	ASCENT_INLINE SOCKET GetFd() { return m_fd; }
 	
 /* Platform-specific methods */
 
@@ -87,17 +87,17 @@ public:
 	void ReadCallback(uint32 len);
 	void WriteCallback();
 
-	inline bool IsDeleted() { return m_deleted; }
-	inline bool IsConnected() { return m_connected; }
+	ASCENT_INLINE bool IsDeleted() { return m_deleted; }
+	ASCENT_INLINE bool IsConnected() { return m_connected; }
 
-	inline uint32 GetReadBufferSize() { return m_readByteCount; }
-	inline uint32 GetWriteBufferSize() { return m_writeByteCount; }
-	inline sockaddr_in & GetRemoteStruct() { return m_client; }
+	ASCENT_INLINE uint32 GetReadBufferSize() { return m_readByteCount; }
+	ASCENT_INLINE uint32 GetWriteBufferSize() { return m_writeByteCount; }
+	ASCENT_INLINE sockaddr_in & GetRemoteStruct() { return m_client; }
 
 /* Deletion */
 	void Delete();
 
-	inline in_addr GetRemoteAddress() { return m_client.sin_addr; }
+	ASCENT_INLINE in_addr GetRemoteAddress() { return m_client.sin_addr; }
 
 protected:
 
@@ -133,12 +133,12 @@ protected:
 public:
 
 	// Set completion port that this socket will be assigned to.
-	inline void SetCompletionPort(HANDLE cp) { m_completionPort = cp; }
+	ASCENT_INLINE void SetCompletionPort(HANDLE cp) { m_completionPort = cp; }
 	
 	// Atomic wrapper functions for increasing read/write locks
-	inline void IncSendLock() { InterlockedIncrement(&m_writeLock); }
-	inline void DecSendLock() { InterlockedDecrement(&m_writeLock); }
-	inline bool AcquireSendLock()
+	ASCENT_INLINE void IncSendLock() { InterlockedIncrement(&m_writeLock); }
+	ASCENT_INLINE void DecSendLock() { InterlockedDecrement(&m_writeLock); }
+	ASCENT_INLINE bool AcquireSendLock()
 	{
 		if(m_writeLock)
 			return false;
@@ -170,9 +170,9 @@ public:
 	void PostEvent(uint32 events);
 
 	// Atomic wrapper functions for increasing read/write locks
-	inline void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
-	inline void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
-	inline bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
+	ASCENT_INLINE void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
+	ASCENT_INLINE void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
+	ASCENT_INLINE bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
 	bool AcquireSendLock()
 	{
 	  bool rv;
@@ -199,9 +199,9 @@ public:
 	// Posts a epoll event with the specifed arguments.
 	void PostEvent(int events, bool oneshot);
 	// Atomic wrapper functions for increasing read/write locks
-	inline void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
-	inline void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
-	inline bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
+	ASCENT_INLINE void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
+	ASCENT_INLINE void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
+	ASCENT_INLINE bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
 	bool AcquireSendLock()
 	{
 		bool rv;
@@ -226,9 +226,9 @@ private:
 #ifdef CONFIG_USE_SELECT
 public:
 	// Atomic wrapper functions for increasing read/write locks
-	inline void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
-	inline void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
-	inline bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
+	ASCENT_INLINE void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
+	ASCENT_INLINE void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
+	ASCENT_INLINE bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
 	bool AcquireSendLock()
 	{
 		bool rv;
@@ -254,9 +254,9 @@ private:
 public:
 
 	// Atomic wrapper functions for increasing read/write locks
-	inline void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
-	inline void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
-	inline bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
+	ASCENT_INLINE void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
+	ASCENT_INLINE void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
+	ASCENT_INLINE bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
 	bool AcquireSendLock()
 	{
 		bool rv;

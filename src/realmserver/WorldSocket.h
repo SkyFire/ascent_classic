@@ -34,12 +34,12 @@ public:
 	~WorldSocket();
 
 	// vs8 fix - send null on empty buffer
-	inline void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
-	inline void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
+	ASCENT_INLINE void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
+	ASCENT_INLINE void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
 
 	void __fastcall OutPacket(uint16 opcode, size_t len, const void* data);
    
-	inline uint32 GetLatency() { return _latency; }
+	ASCENT_INLINE uint32 GetLatency() { return _latency; }
 
 	void Authenticate();
 	void InformationRetreiveCallback(WorldPacket & recvData, uint32 requestid);

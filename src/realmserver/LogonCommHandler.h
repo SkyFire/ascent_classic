@@ -85,7 +85,7 @@ public:
 	void LoadRealmConfiguration();
 	void AddServer(string Name, string Address, uint32 Port);
 
-	inline uint32 GetRealmType() { return _realmType; }
+	ASCENT_INLINE uint32 GetRealmType() { return _realmType; }
 	void SetRealmType(uint32 type) { _realmType = type; }
 
 	/////////////////////////////
@@ -95,7 +95,7 @@ public:
 	uint32 ClientConnected(string AccountName, WorldSocket * Socket);
 	void UnauthedSocketClose(uint32 id);
 	void RemoveUnauthedSocket(uint32 id);
-	inline WorldSocket* GetSocketByRequest(uint32 id)
+	ASCENT_INLINE WorldSocket* GetSocketByRequest(uint32 id)
 	{
 		//pendingLock.Acquire();
 
@@ -106,7 +106,7 @@ public:
 		//pendingLock.Release();
 		return sock;
 	}
-	inline Mutex & GetPendingLock() { return pendingLock; }		
+	ASCENT_INLINE Mutex & GetPendingLock() { return pendingLock; }		
 };
 
 #define sLogonCommHandler LogonCommHandler::getSingleton()

@@ -121,7 +121,7 @@ public:
 	void CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature *created_from_creature, Unit* owner, SpellEntry *created_by_spell, uint32 type, uint32 expiretime);
 
 	virtual void Update(uint32 time);
-	inline uint32 GetXP(void) { return m_PetXP; }
+	ASCENT_INLINE uint32 GetXP(void) { return m_PetXP; }
 
 	void InitializeSpells();
 	void ReInitializeSpells();
@@ -129,18 +129,18 @@ public:
 	void SendSpellsToOwner();
 	void SendNullSpellsToOwner();
 
-	inline void SetPetAction(uint32 act) { m_Action = act; }
-	inline uint32 GetPetAction(void) { return m_Action; }
+	ASCENT_INLINE void SetPetAction(uint32 act) { m_Action = act; }
+	ASCENT_INLINE uint32 GetPetAction(void) { return m_Action; }
 
-	inline void SetPetState(uint32 state) { m_State = state; }
-	inline uint32 GetPetState(void) { return m_State; }
+	ASCENT_INLINE void SetPetState(uint32 state) { m_State = state; }
+	ASCENT_INLINE uint32 GetPetState(void) { return m_State; }
 
-	inline void SetPetDiet(uint32 diet) { m_Diet = diet; }
-	inline void SetPetDiet() { m_Diet = myFamily->petdietflags; }
+	ASCENT_INLINE void SetPetDiet(uint32 diet) { m_Diet = diet; }
+	ASCENT_INLINE void SetPetDiet() { m_Diet = myFamily->petdietflags; }
 
-	inline uint32 GetPetDiet(void) { return m_Diet; }
+	ASCENT_INLINE uint32 GetPetDiet(void) { return m_Diet; }
 	
-	inline AI_Spell* GetAISpellForSpellId(uint32 spellid)
+	ASCENT_INLINE AI_Spell* GetAISpellForSpellId(uint32 spellid)
 	{
 		std::map<uint32, AI_Spell*>::iterator itr = m_AISpellStore.find(spellid);
 		if(itr != m_AISpellStore.end())
@@ -155,8 +155,8 @@ public:
 
 	void DelayedRemove(bool bTime, bool bDeath);
 
-	inline Player* GetPetOwner() { return m_Owner; }
-	inline void ClearPetOwner() { m_Owner = 0; }
+	ASCENT_INLINE Player* GetPetOwner() { return m_Owner; }
+	ASCENT_INLINE void ClearPetOwner() { m_Owner = 0; }
 	void GiveXP(uint32 xp);
 	uint32 GetNextLevelXP(uint32 currentlevel);
 	void ApplyStatsForLevel();
@@ -173,17 +173,17 @@ public:
 	void RemoveSpell(SpellEntry * sp);
 	void SetSpellState(SpellEntry * sp, uint16 State);
 	uint16 GetSpellState(SpellEntry * sp);
-	inline void RemoveSpell(uint32 SpellID)
+	ASCENT_INLINE void RemoveSpell(uint32 SpellID)
 	{
 		SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
 		if(sp) RemoveSpell(sp);
 	}
-	inline void SetSpellState(uint32 SpellID, uint16 State)
+	ASCENT_INLINE void SetSpellState(uint32 SpellID, uint16 State)
 	{
 		SpellEntry * sp = dbcSpell.LookupEntry(SpellID);
 		if(sp) SetSpellState(sp, State);
 	}
-	inline uint16 GetSpellState(uint32 SpellID)
+	ASCENT_INLINE uint16 GetSpellState(uint32 SpellID)
 	{
 		if(SpellID == 0)
 			return DEFAULT_SPELL_STATE;
@@ -195,12 +195,12 @@ public:
 	}
 	
 	AI_Spell * CreateAISpell(SpellEntry * info);
-	inline PetSpellMap* GetSpells() { return &mSpells; }
-	inline bool IsSummon() { return Summon; }
+	ASCENT_INLINE PetSpellMap* GetSpells() { return &mSpells; }
+	ASCENT_INLINE bool IsSummon() { return Summon; }
 
 	void __fastcall SetAutoCastSpell(AI_Spell * sp);
 	void Rename(string NewName);
-	inline string& GetName() { return m_name; }
+	ASCENT_INLINE string& GetName() { return m_name; }
 	void AddPetSpellToOwner(uint32 spellId);
 	uint16 SpellTP(uint32 spellId);
 	uint16 GetUsedTP();

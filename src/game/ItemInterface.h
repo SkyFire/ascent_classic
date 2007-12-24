@@ -110,7 +110,7 @@ public:
 	int8 GetInternalBankSlotFromPlayer(int8 islot); //converts inventory slots into 0-x numbers
 
 	//buyback stuff
-	inline Item* GetBuyBack(int32 slot) 
+	ASCENT_INLINE Item* GetBuyBack(int32 slot) 
 	{ 
 		if(slot >= 0 && slot <= 12)
 			return m_pBuyBack[slot];
@@ -234,8 +234,8 @@ public:
 		m_currentItem=NULL;
 	}
 
-	inline Item* Grab() { return m_currentItem; }
-	inline bool End() { return m_atEnd; }
+	ASCENT_INLINE Item* Grab() { return m_currentItem; }
+	ASCENT_INLINE bool End() { return m_atEnd; }
 };
 
 #endif

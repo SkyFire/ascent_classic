@@ -46,23 +46,23 @@ public:
 	void RemoveObject(Object *obj);
 	bool HasObject(Object *obj) { return (_objects.find(obj) != _objects.end()); }
 	bool HasPlayers() { return ((_playerCount > 0) ? true : false); }
-	inline size_t GetObjectCount() { return _objects.size(); }
+	ASCENT_INLINE size_t GetObjectCount() { return _objects.size(); }
 	void RemoveObjects();
-	inline ObjectSet::iterator Begin() { return _objects.begin(); }
-	inline ObjectSet::iterator End() { return _objects.end(); }
+	ASCENT_INLINE ObjectSet::iterator Begin() { return _objects.begin(); }
+	ASCENT_INLINE ObjectSet::iterator End() { return _objects.end(); }
 
 	//State Related
 	void SetActivity(bool state);
 
-	inline bool IsActive() { return _active; }
-	inline bool IsLoaded() { return _loaded; }
+	ASCENT_INLINE bool IsActive() { return _active; }
+	ASCENT_INLINE bool IsLoaded() { return _loaded; }
 
 	//Object Loading Managing
 	void LoadObjects(CellSpawns * sp);
-	inline uint32 GetPlayerCount() { return _playerCount; }
+	ASCENT_INLINE uint32 GetPlayerCount() { return _playerCount; }
 
-	inline bool IsUnloadPending() { return _unloadpending; }
-	inline void SetUnloadPending(bool up) { _unloadpending = up; }
+	ASCENT_INLINE bool IsUnloadPending() { return _unloadpending; }
+	ASCENT_INLINE void SetUnloadPending(bool up) { _unloadpending = up; }
 	void QueueUnloadPending();
 	void CancelPendingUnload();
 	void Unload();

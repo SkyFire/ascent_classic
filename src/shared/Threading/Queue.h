@@ -27,7 +27,7 @@ template<class T>
 class FQueue 
 {
 public:
-	inline FQueue() : cond(&lock) {first=last=NULL;size=0;}
+	ASCENT_INLINE FQueue() : cond(&lock) {first=last=NULL;size=0;}
 	volatile unsigned int size;
 
 	uint32 get_size()
@@ -128,7 +128,7 @@ public:
 		return returnVal;
 	}	
 
-	inline Condition& GetCond() { return cond; }
+	ASCENT_INLINE Condition& GetCond() { return cond; }
 	
 private:
 	struct h

@@ -264,10 +264,10 @@ public:
 	virtual void Update( uint32 time );
 
 	/// Creature inventory
-	inline uint32 GetItemIdBySlot(uint32 slot) { return m_SellItems->at(slot).itemid; }
-	inline uint32 GetItemAmountBySlot(uint32 slot) { return m_SellItems->at(slot).amount; }
+	ASCENT_INLINE uint32 GetItemIdBySlot(uint32 slot) { return m_SellItems->at(slot).itemid; }
+	ASCENT_INLINE uint32 GetItemAmountBySlot(uint32 slot) { return m_SellItems->at(slot).amount; }
 
-	inline bool HasItems() { return ((m_SellItems != NULL) ? true : false); }
+	ASCENT_INLINE bool HasItems() { return ((m_SellItems != NULL) ? true : false); }
 
 	int32 GetSlotByItemId(uint32 itemid)
 	{
@@ -292,7 +292,7 @@ public:
 		return 0;
 	}
 
-	inline void GetSellItemBySlot(uint32 slot, CreatureItem &ci)
+	ASCENT_INLINE void GetSellItemBySlot(uint32 slot, CreatureItem &ci)
 	{
 		ci = m_SellItems->at(slot);
 	}
@@ -314,9 +314,9 @@ public:
 		ci.itemid = 0;
 	}
 
-	inline std::vector<CreatureItem>::iterator GetSellItemBegin() { return m_SellItems->begin(); }
-	inline std::vector<CreatureItem>::iterator GetSellItemEnd()   { return m_SellItems->end(); }
-	inline size_t GetSellItemCount() { return m_SellItems->size(); }
+	ASCENT_INLINE std::vector<CreatureItem>::iterator GetSellItemBegin() { return m_SellItems->begin(); }
+	ASCENT_INLINE std::vector<CreatureItem>::iterator GetSellItemEnd()   { return m_SellItems->end(); }
+	ASCENT_INLINE size_t GetSellItemCount() { return m_SellItems->size(); }
 	void RemoveVendorItem(uint32 itemid)
 	{
 		for(std::vector<CreatureItem>::iterator itr = m_SellItems->begin(); itr != m_SellItems->end(); ++itr)
@@ -353,7 +353,7 @@ public:
 	list<QuestRelation *>::iterator QuestsEnd() { return m_quests->end(); };
 	void SetQuestList(std::list<QuestRelation *>* qst_lst) { m_quests = qst_lst; };
 
-	inline bool isQuestGiver() { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER ); };
+	ASCENT_INLINE bool isQuestGiver() { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER ); };
 	
 	int32 FlatResistanceMod[7];
 	int32 BaseResistanceModPct[7];
@@ -371,7 +371,7 @@ public:
 	void RegenerateHealth();
 	void RegenerateMana();
 
-	inline bool CanSee(Unit* obj) // * Invisibility & Stealth Detection - Partha *
+	ASCENT_INLINE bool CanSee(Unit* obj) // * Invisibility & Stealth Detection - Partha *
 	{
 		if(!obj)
 			return false;
@@ -425,8 +425,8 @@ public:
 	uint64 TaggerGuid;
 
 	/// Misc
-	inline void setEmoteState(uint8 emote) { m_emoteState = emote; };
-	inline uint32 GetSQL_id() { return spawnid; };
+	ASCENT_INLINE void setEmoteState(uint8 emote) { m_emoteState = emote; };
+	ASCENT_INLINE uint32 GetSQL_id() { return spawnid; };
 
 	virtual void setDeathState(DeathState s);
 
@@ -465,31 +465,31 @@ public:
 	void SetEnslaveSpell(uint32 spellId) { m_enslaveSpell = spellId; }
 	bool RemoveEnslave();
 
-	inline Player *GetTotemOwner() { return totemOwner; }
-	inline void SetTotemOwner(Player *owner) { totemOwner = owner; }
-	inline uint32 GetTotemSlot() { return totemSlot; }
-	inline void SetTotemSlot(uint32 slot) { totemSlot = slot; }
+	ASCENT_INLINE Player *GetTotemOwner() { return totemOwner; }
+	ASCENT_INLINE void SetTotemOwner(Player *owner) { totemOwner = owner; }
+	ASCENT_INLINE uint32 GetTotemSlot() { return totemSlot; }
+	ASCENT_INLINE void SetTotemSlot(uint32 slot) { totemSlot = slot; }
 
-	inline bool IsPickPocketed() { return m_PickPocketed; }
-	inline void SetPickPocketed(bool val = true) { m_PickPocketed = val; }
+	ASCENT_INLINE bool IsPickPocketed() { return m_PickPocketed; }
+	ASCENT_INLINE void SetPickPocketed(bool val = true) { m_PickPocketed = val; }
 
-	inline CreatureAIScript * GetScript() { return _myScriptClass; }
+	ASCENT_INLINE CreatureAIScript * GetScript() { return _myScriptClass; }
 	void LoadScript();
 
 	void CallScriptUpdate();
 
 	uint32 m_TaxiNode;
 	CreatureInfo *creature_info;
-	inline CreatureInfo *GetCreatureName()
+	ASCENT_INLINE CreatureInfo *GetCreatureName()
 	{
 		return creature_info; 
 	}
-	inline void SetCreatureName(CreatureInfo *ci) { creature_info = ci; }
-	inline Trainer* GetTrainer() { return mTrainer; }
+	ASCENT_INLINE void SetCreatureName(CreatureInfo *ci) { creature_info = ci; }
+	ASCENT_INLINE Trainer* GetTrainer() { return mTrainer; }
 	void RegenerateFocus();
 
 	CreatureFamilyEntry * myFamily;
-	inline bool IsTotem() { return totemOwner != 0 && totemSlot != -1; }
+	ASCENT_INLINE bool IsTotem() { return totemOwner != 0 && totemSlot != -1; }
 	void TotemExpire();
 	void FormationLinkUp(uint32 SqlId);
 	void ChannelLinkUpGO(uint32 SqlId);

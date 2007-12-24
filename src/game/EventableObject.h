@@ -48,7 +48,7 @@ protected:
 	void event_ModifyTimeAndTimeLeft(uint32 EventType, uint32 Time);
 	bool event_HasEvent(uint32 EventType);
 	void event_RemoveByPointer(TimedEvent * ev);
-	inline int32 event_GetCurrentInstanceId() { return m_event_Instanceid; }
+	ASCENT_INLINE int32 event_GetCurrentInstanceId() { return m_event_Instanceid; }
 
 public:
 	uint32 event_GetEventPeriod(uint32 EventType);
@@ -56,7 +56,7 @@ public:
 	EventableObject();
 	virtual ~EventableObject();
 
-	inline bool event_HasEvents() { return m_events.size() > 0 ? true : false; }
+	ASCENT_INLINE bool event_HasEvents() { return m_events.size() > 0 ? true : false; }
 	void event_AddEvent(TimedEvent * ptr);
 	void event_Relocate();
 	
@@ -97,7 +97,7 @@ public:
 	void AddEvent(TimedEvent * ev);
 	void AddObject(EventableObject * obj);
 
-	inline uint32 GetInstanceID() { return mInstanceId; }
+	ASCENT_INLINE uint32 GetInstanceID() { return mInstanceId; }
 
 protected:
 	int32 mInstanceId;

@@ -131,7 +131,7 @@ public:
 	void register_hook(ServerHookEvents event, void * function_pointer);
 	void register_item_gossip_script(uint32 entry, GossipScript * gs);
 
-	inline GossipScript * GetDefaultGossipScript() { return DefaultGossipScript; }
+	ASCENT_INLINE GossipScript * GetDefaultGossipScript() { return DefaultGossipScript; }
 
 protected:
 	CreatureCreateMap _creatures;

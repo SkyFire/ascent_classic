@@ -234,30 +234,30 @@ public:
 	void UpdateCellActivity(uint32 x, uint32 y, int radius);
 
 	// Terrain Functions
-	inline float  GetLandHeight(float x, float y) { return GetBaseMap()->GetLandHeight(x, y); }
-	inline float  GetWaterHeight(float x, float y) { return GetBaseMap()->GetWaterHeight(x, y); }
-	inline uint8  GetWaterType(float x, float y) { return GetBaseMap()->GetWaterType(x, y); }
-	inline uint8  GetWalkableState(float x, float y) { return GetBaseMap()->GetWalkableState(x, y); }
-	inline uint16 GetAreaID(float x, float y) { return GetBaseMap()->GetAreaID(x, y); }
+	ASCENT_INLINE float  GetLandHeight(float x, float y) { return GetBaseMap()->GetLandHeight(x, y); }
+	ASCENT_INLINE float  GetWaterHeight(float x, float y) { return GetBaseMap()->GetWaterHeight(x, y); }
+	ASCENT_INLINE uint8  GetWaterType(float x, float y) { return GetBaseMap()->GetWaterType(x, y); }
+	ASCENT_INLINE uint8  GetWalkableState(float x, float y) { return GetBaseMap()->GetWalkableState(x, y); }
+	ASCENT_INLINE uint16 GetAreaID(float x, float y) { return GetBaseMap()->GetAreaID(x, y); }
 
-	inline uint32 GetMapId() { return _mapId; }
+	ASCENT_INLINE uint32 GetMapId() { return _mapId; }
 
 	void PushToProcessed(Player* plr);
 
-	inline bool HasPlayers() { return (m_PlayerStorage.size() > 0); }
-	inline bool IsCombatInProgress() { return (_combatProgress.size() > 0); }
+	ASCENT_INLINE bool HasPlayers() { return (m_PlayerStorage.size() > 0); }
+	ASCENT_INLINE bool IsCombatInProgress() { return (_combatProgress.size() > 0); }
 	void TeleportPlayers();
 
-	inline uint32 GetInstanceID() { return m_instanceID; }
-	inline MapInfo *GetMapInfo() { return pMapInfo; }
+	ASCENT_INLINE uint32 GetInstanceID() { return m_instanceID; }
+	ASCENT_INLINE MapInfo *GetMapInfo() { return pMapInfo; }
 
 	bool _shutdown;
 
-	inline MapScriptInterface * GetInterface() { return ScriptInterface; }
+	ASCENT_INLINE MapScriptInterface * GetInterface() { return ScriptInterface; }
 	virtual int32 event_GetInstanceID() { return m_instanceID; }
 
 	void LoadAllCells();
-	inline size_t GetPlayerCount() { return m_PlayerStorage.size(); }
+	ASCENT_INLINE size_t GetPlayerCount() { return m_PlayerStorage.size(); }
 
 	void _PerformObjectDuties();
 	uint32 mLoopCounter;
@@ -349,7 +349,7 @@ public:
 	deque<uint32> _reusable_guids_creature;
 #ifdef ENABLE_LUA_SCRIPTING
 	LuaEngine * m_engine;
-	inline LuaEngine* GetScriptEngine() { return m_engine; }
+	ASCENT_INLINE LuaEngine* GetScriptEngine() { return m_engine; }
 #endif
 
 	bool forced_expire;

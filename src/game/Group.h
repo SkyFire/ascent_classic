@@ -75,22 +75,22 @@ public:
 
 	~SubGroup();
 
-	inline GroupMembersSet::iterator GetGroupMembersBegin(void) { return m_GroupMembers.begin(); }
-	inline GroupMembersSet::iterator GetGroupMembersEnd(void)   { return m_GroupMembers.end();   }
+	ASCENT_INLINE GroupMembersSet::iterator GetGroupMembersBegin(void) { return m_GroupMembers.begin(); }
+	ASCENT_INLINE GroupMembersSet::iterator GetGroupMembersEnd(void)   { return m_GroupMembers.end();   }
 
 	bool AddPlayer(PlayerInfo * info, Player *pPlayer);
 	void RemovePlayer(PlayerInfo * info, Player *pPlayer, bool forced_remove);
 	bool HasMember(uint64 guid);
 	
 
-	inline bool IsFull(void)				{ return m_GroupMembers.size() >= MAX_GROUP_SIZE_PARTY; }
-	inline size_t GetMemberCount(void)		{ return m_GroupMembers.size(); }
+	ASCENT_INLINE bool IsFull(void)				{ return m_GroupMembers.size() >= MAX_GROUP_SIZE_PARTY; }
+	ASCENT_INLINE size_t GetMemberCount(void)		{ return m_GroupMembers.size(); }
 	
-	inline uint32 GetID(void)			   { return m_Id; }
-	inline void SetID(uint32 newid)		 { m_Id = newid; }
+	ASCENT_INLINE uint32 GetID(void)			   { return m_Id; }
+	ASCENT_INLINE void SetID(uint32 newid)		 { m_Id = newid; }
 
-	inline void   SetParent(Group* parent)  { m_Parent = parent; }
-	inline Group* GetParent(void)		   { return m_Parent; }
+	ASCENT_INLINE void   SetParent(Group* parent)  { m_Parent = parent; }
+	ASCENT_INLINE Group* GetParent(void)		   { return m_Parent; }
 
 	void   Disband(bool bRemoveGroup);
 
@@ -138,7 +138,7 @@ public:
 	Player* FindFirstPlayer();
 	
 	// Accessing functions
-	inline SubGroup* GetSubGroup(uint32 Id)
+	ASCENT_INLINE SubGroup* GetSubGroup(uint32 Id)
 	{
 		if(Id >= 8)
 			return 0;
@@ -146,19 +146,19 @@ public:
 		return m_SubGroups[Id];
 	}
 
-	inline uint32 GetSubGroupCount(void) { return m_SubGroupCount; }
+	ASCENT_INLINE uint32 GetSubGroupCount(void) { return m_SubGroupCount; }
 
-	inline uint8 GetMethod(void) { return m_LootMethod; }
-	inline uint16 GetThreshold(void) { return m_LootThreshold; }
-	inline Player* GetLeader(void) { return m_Leader; }
-	inline Player* GetLooter(void) { return m_Looter; }
+	ASCENT_INLINE uint8 GetMethod(void) { return m_LootMethod; }
+	ASCENT_INLINE uint16 GetThreshold(void) { return m_LootThreshold; }
+	ASCENT_INLINE Player* GetLeader(void) { return m_Leader; }
+	ASCENT_INLINE Player* GetLooter(void) { return m_Looter; }
 
 	void MovePlayer(PlayerInfo* info, uint8 subgroup);
 
 	bool HasMember(Player *pPlayer);
 	bool HasMember(PlayerInfo * info);
-	inline uint32 MemberCount(void) { return m_MemberCount; }
-	inline bool IsFull() { return ((m_GroupType == GROUP_TYPE_PARTY && m_MemberCount >= MAX_GROUP_SIZE_PARTY) || (m_GroupType == GROUP_TYPE_RAID && m_MemberCount >= MAX_GROUP_SIZE_RAID)); }
+	ASCENT_INLINE uint32 MemberCount(void) { return m_MemberCount; }
+	ASCENT_INLINE bool IsFull() { return ((m_GroupType == GROUP_TYPE_PARTY && m_MemberCount >= MAX_GROUP_SIZE_PARTY) || (m_GroupType == GROUP_TYPE_RAID && m_MemberCount >= MAX_GROUP_SIZE_RAID)); }
 
 	SubGroup* FindFreeSubGroup();
 
@@ -167,8 +167,8 @@ public:
 	void SaveToDB();
 	void LoadFromDB(Field *fields);
 
-	inline uint8 GetGroupType() { return m_GroupType; }
-	inline uint32 GetID() { return m_Id; }
+	ASCENT_INLINE uint8 GetGroupType() { return m_GroupType; }
+	ASCENT_INLINE uint32 GetID() { return m_Id; }
 
 	void UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribute, WorldPacket * Packet);
 	void UpdateAllOutOfRangePlayersFor(Player * pPlayer);
@@ -177,9 +177,9 @@ public:
 
 	uint64 m_targetIcons[8];
 	bool m_disbandOnNoMembers;
-	inline Mutex& getLock() { return m_groupLock; }
-	inline void Lock() { m_groupLock.Acquire(); }
-	inline void Unlock() { return m_groupLock.Release(); }
+	ASCENT_INLINE Mutex& getLock() { return m_groupLock; }
+	ASCENT_INLINE void Lock() { m_groupLock.Acquire(); }
+	ASCENT_INLINE void Unlock() { return m_groupLock.Release(); }
 	bool m_isqueued;
 
 protected:

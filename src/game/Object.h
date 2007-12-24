@@ -109,7 +109,7 @@ public:
   //! True if object exists in world
  
 	
-	inline bool IsInWorld() { return m_mapMgr != NULL; }
+	ASCENT_INLINE bool IsInWorld() { return m_mapMgr != NULL; }
 	virtual void AddToWorld();
 	virtual void AddToWorld(MapMgr * pMapMgr);
 	void PushToWorld(MapMgr*);
@@ -118,19 +118,19 @@ public:
 
 	// guid always comes first
 #ifndef USING_BIG_ENDIAN
-	inline const uint64& GetGUID() const { return *((uint64*)m_uint32Values); }
+	ASCENT_INLINE const uint64& GetGUID() const { return *((uint64*)m_uint32Values); }
 #else
-	inline const uint64 GetGUID() const { return GetUInt64Value(0); }
+	ASCENT_INLINE const uint64 GetGUID() const { return GetUInt64Value(0); }
 #endif
-	inline const WoWGuid& GetNewGUID() const { return m_wowGuid; }
-	inline uint32 GetEntry(){return m_uint32Values[3];}
+	ASCENT_INLINE const WoWGuid& GetNewGUID() const { return m_wowGuid; }
+	ASCENT_INLINE uint32 GetEntry(){return m_uint32Values[3];}
 	
-	inline const uint32& GetGUIDLow() const { return m_uint32Values[0]; }
-	inline const uint32& GetGUIDHigh() const { return m_uint32Values[1]; }
+	ASCENT_INLINE const uint32& GetGUIDLow() const { return m_uint32Values[0]; }
+	ASCENT_INLINE const uint32& GetGUIDHigh() const { return m_uint32Values[1]; }
 
 	// type
-	inline const uint8& GetTypeId() const { return m_objectTypeId; }
-	inline bool IsPlayer() { return m_objectTypeId == TYPEID_PLAYER; }
+	ASCENT_INLINE const uint8& GetTypeId() const { return m_objectTypeId; }
+	ASCENT_INLINE bool IsPlayer() { return m_objectTypeId == TYPEID_PLAYER; }
 
 	//! This includes any nested objects we have, inventory for example.
 	virtual uint32 __fastcall BuildCreateUpdateBlockForPlayer( ByteBuffer *data, Player *target );
@@ -156,19 +156,19 @@ public:
 	bool SetPosition( const LocationVector & v, bool allowPorting = false);
 	void SetRotation( uint64 guid );
 
-	inline const float& GetPositionX( ) const { return m_position.x; }
-	inline const float& GetPositionY( ) const { return m_position.y; }
-	inline const float& GetPositionZ( ) const { return m_position.z; }
-	inline const float& GetOrientation( ) const { return m_position.o; }
-	inline void SetOrientation( float &o ) { m_position.o = o; }
+	ASCENT_INLINE const float& GetPositionX( ) const { return m_position.x; }
+	ASCENT_INLINE const float& GetPositionY( ) const { return m_position.y; }
+	ASCENT_INLINE const float& GetPositionZ( ) const { return m_position.z; }
+	ASCENT_INLINE const float& GetOrientation( ) const { return m_position.o; }
+	ASCENT_INLINE void SetOrientation( float &o ) { m_position.o = o; }
 
-	inline const float& GetSpawnX( ) const { return m_spawnLocation.x; }
-	inline const float& GetSpawnY( ) const { return m_spawnLocation.y; }
-	inline const float& GetSpawnZ( ) const { return m_spawnLocation.z; }
-	inline const float& GetSpawnO( ) const { return m_spawnLocation.o; }
+	ASCENT_INLINE const float& GetSpawnX( ) const { return m_spawnLocation.x; }
+	ASCENT_INLINE const float& GetSpawnY( ) const { return m_spawnLocation.y; }
+	ASCENT_INLINE const float& GetSpawnZ( ) const { return m_spawnLocation.z; }
+	ASCENT_INLINE const float& GetSpawnO( ) const { return m_spawnLocation.o; }
 
-	inline const LocationVector & GetPosition() { return m_position; }
-	inline LocationVector * GetPositionV() { return &m_position; }
+	ASCENT_INLINE const LocationVector & GetPosition() { return m_position; }
+	ASCENT_INLINE LocationVector * GetPositionV() { return &m_position; }
 
 	//Distance Calculation
 	float CalcDistance(Object* Ob);
@@ -178,20 +178,20 @@ public:
 	float CalcDistance(float OaX, float OaY, float OaZ, float ObX, float ObY, float ObZ);
 
 	//! Only for MapMgr use
-	inline MapCell* GetMapCell() const { return m_mapCell; }
+	ASCENT_INLINE MapCell* GetMapCell() const { return m_mapCell; }
 	//! Only for MapMgr use
-	inline void SetMapCell(MapCell* cell) { m_mapCell = cell; }
+	ASCENT_INLINE void SetMapCell(MapCell* cell) { m_mapCell = cell; }
 	//! Only for MapMgr use
-	inline MapMgr* GetMapMgr() const { return m_mapMgr; }
+	ASCENT_INLINE MapMgr* GetMapMgr() const { return m_mapMgr; }
 
-	inline void SetMapId(uint32 newMap) { m_mapId = newMap; }
+	ASCENT_INLINE void SetMapId(uint32 newMap) { m_mapId = newMap; }
 	void SetZoneId(uint32 newZone);
 
-	inline const uint32 GetMapId( ) const { return m_mapId; }
-	inline const uint32& GetZoneId( ) const { return m_zoneId; }
+	ASCENT_INLINE const uint32 GetMapId( ) const { return m_mapId; }
+	ASCENT_INLINE const uint32& GetZoneId( ) const { return m_zoneId; }
 
 	//! Get uint32 property
-	inline const uint32& GetUInt32Value( uint32 index ) const
+	ASCENT_INLINE const uint32& GetUInt32Value( uint32 index ) const
 	{
 		ASSERT( index < m_valuesCount );
 		return m_uint32Values[ index ];
@@ -201,7 +201,7 @@ public:
 #ifdef USING_BIG_ENDIAN
         __inline const uint64 GetUInt64Value( uint32 index ) const
 #else
-	inline const uint64& GetUInt64Value( uint32 index ) const
+	ASCENT_INLINE const uint64& GetUInt64Value( uint32 index ) const
 #endif
 	{
 		ASSERT( index + uint32(1) < m_valuesCount );
@@ -214,7 +214,7 @@ public:
 	}
 
 	//! Get float property
-	inline const float& GetFloatValue( uint32 index ) const
+	ASCENT_INLINE const float& GetFloatValue( uint32 index ) const
 	{
 		ASSERT( index < m_valuesCount );
 		return m_floatValues[ index ];
@@ -227,7 +227,7 @@ public:
 	//! Set uint32 property
 	void SetByte(uint32 index, uint32 index1,uint8 value);
 
-	inline uint8 GetByte(uint32 i,uint32 i1)
+	ASCENT_INLINE uint8 GetByte(uint32 i,uint32 i1)
 	{
 		ASSERT( i < m_valuesCount);
 		ASSERT(i1 < 4);
@@ -238,7 +238,7 @@ public:
 #endif
 	}
 	
-	inline void SetNewGuid(uint32 Guid)
+	ASCENT_INLINE void SetNewGuid(uint32 Guid)
 	{
 		SetUInt32Value(OBJECT_FIELD_GUID, Guid);
 		m_wowGuid.Init(GetGUID());
@@ -257,7 +257,7 @@ public:
 
 	void __fastcall RemoveFlag( const uint32 index, uint32 oldFlag );
 
-	inline bool HasFlag( const uint32 index, uint32 flag ) const
+	ASCENT_INLINE bool HasFlag( const uint32 index, uint32 flag ) const
 	{
 		ASSERT( index < m_valuesCount );
 		return (m_uint32Values[ index ] & flag) != 0;
@@ -289,35 +289,35 @@ public:
 	/* converts to 360 > x > 0 */
 	float getEasyAngle( float angle );
 
-	inline const float GetDistanceSq(Object* obj)
+	ASCENT_INLINE const float GetDistanceSq(Object* obj)
 	{
 		if(obj->GetMapId() != m_mapId) return 40000.0f; //enough for out of range
 		return m_position.DistanceSq(obj->GetPosition());
 	}
 
-	inline float GetDistanceSq(LocationVector & comp)
+	ASCENT_INLINE float GetDistanceSq(LocationVector & comp)
 	{
 		return comp.DistanceSq(m_position);
 	}
 
-	inline float CalcDistance(LocationVector & comp)
+	ASCENT_INLINE float CalcDistance(LocationVector & comp)
 	{
 		return comp.Distance(m_position);
 	}
 
-	inline const float GetDistanceSq(float x, float y, float z)
+	ASCENT_INLINE const float GetDistanceSq(float x, float y, float z)
 	{
 		return m_position.DistanceSq(x, y, z);
 	}
 
-	inline const float GetDistance2dSq(Object* obj)
+	ASCENT_INLINE const float GetDistance2dSq(Object* obj)
 	{
 		if(obj->GetMapId() != m_mapId) return 40000.0f; //enough for out of range
 		return m_position.Distance2DSq(obj->m_position);
 	}
 
 	// In-range object management, not sure if we need it
-	inline bool IsInRangeSet(Object* pObj) { return !(m_objectsInRange.find(pObj) == m_objectsInRange.end()); }
+	ASCENT_INLINE bool IsInRangeSet(Object* pObj) { return !(m_objectsInRange.find(pObj) == m_objectsInRange.end()); }
 	
 	virtual void AddInRangeObject(Object* pObj)
 	{
@@ -329,7 +329,7 @@ public:
 			m_inRangePlayers.insert( ((Player*)pObj) );
 	}
 
-	inline void RemoveInRangeObject(Object* pObj)
+	ASCENT_INLINE void RemoveInRangeObject(Object* pObj)
 	{
 		if(!pObj)
 			return;
@@ -338,7 +338,7 @@ public:
 		m_objectsInRange.erase(pObj);
 	}
 
-	inline bool HasInRangeObjects()
+	ASCENT_INLINE bool HasInRangeObjects()
 	{
 		return (m_objectsInRange.size() > 0);
 	}
@@ -356,17 +356,17 @@ public:
 		m_oppFactsInRange.clear();
 	}
 
-	inline size_t GetInRangeCount() { return m_objectsInRange.size(); }
-	inline size_t GetInRangePlayersCount() { return m_inRangePlayers.size();}
-	inline InRangeSet::iterator GetInRangeSetBegin() { return m_objectsInRange.begin(); }
-	inline InRangeSet::iterator GetInRangeSetEnd() { return m_objectsInRange.end(); }
-	inline InRangeSet::iterator FindInRangeSet(Object * obj) { return m_objectsInRange.find(obj); }
+	ASCENT_INLINE size_t GetInRangeCount() { return m_objectsInRange.size(); }
+	ASCENT_INLINE size_t GetInRangePlayersCount() { return m_inRangePlayers.size();}
+	ASCENT_INLINE InRangeSet::iterator GetInRangeSetBegin() { return m_objectsInRange.begin(); }
+	ASCENT_INLINE InRangeSet::iterator GetInRangeSetEnd() { return m_objectsInRange.end(); }
+	ASCENT_INLINE InRangeSet::iterator FindInRangeSet(Object * obj) { return m_objectsInRange.find(obj); }
 	void RemoveInRangeObject(InRangeSet::iterator itr)
 	{ 
 		OnRemoveInRangeObject(*itr);
 		m_objectsInRange.erase(itr);
 	}
-	inline bool RemoveIfInRange(Object * obj)
+	ASCENT_INLINE bool RemoveIfInRange(Object * obj)
 	{
 		InRangeSet::iterator itr = m_objectsInRange.find(obj);
 		if(obj->GetTypeId() == TYPEID_PLAYER)
@@ -379,32 +379,32 @@ public:
 		return true;
 	}
 
-	inline void AddInRangePlayer(Object * obj)
+	ASCENT_INLINE void AddInRangePlayer(Object * obj)
 	{
 		m_inRangePlayers.insert(((Player*)obj));
 	}
 
-	inline void RemoveInRangePlayer(Object * obj)
+	ASCENT_INLINE void RemoveInRangePlayer(Object * obj)
 	{
 		m_inRangePlayers.erase(((Player*)obj));
 	}
 
 	bool IsInRangeOppFactSet(Object* pObj) { return (m_oppFactsInRange.count(pObj) > 0); }
 	void UpdateOppFactionSet();
-	inline std::set<Object*>::iterator GetInRangeOppFactsSetBegin() { return m_oppFactsInRange.begin(); }
-	inline std::set<Object*>::iterator GetInRangeOppFactsSetEnd() { return m_oppFactsInRange.end(); }
-	inline std::set<Player*>::iterator GetInRangePlayerSetBegin() { return m_inRangePlayers.begin(); }
-	inline std::set<Player*>::iterator GetInRangePlayerSetEnd() { return m_inRangePlayers.end(); }
-	inline std::set<Player*> * GetInRangePlayerSet() { return &m_inRangePlayers; };
+	ASCENT_INLINE std::set<Object*>::iterator GetInRangeOppFactsSetBegin() { return m_oppFactsInRange.begin(); }
+	ASCENT_INLINE std::set<Object*>::iterator GetInRangeOppFactsSetEnd() { return m_oppFactsInRange.end(); }
+	ASCENT_INLINE std::set<Player*>::iterator GetInRangePlayerSetBegin() { return m_inRangePlayers.begin(); }
+	ASCENT_INLINE std::set<Player*>::iterator GetInRangePlayerSetEnd() { return m_inRangePlayers.end(); }
+	ASCENT_INLINE std::set<Player*> * GetInRangePlayerSet() { return &m_inRangePlayers; };
 
 	void __fastcall SendMessageToSet(WorldPacket *data, bool self,bool myteam_only=false);
-	inline void SendMessageToSet(StackBufferBase * data, bool self) { OutPacketToSet(data->GetOpcode(), data->GetSize(), data->GetBufferPointer(), self); }
+	ASCENT_INLINE void SendMessageToSet(StackBufferBase * data, bool self) { OutPacketToSet(data->GetOpcode(), data->GetSize(), data->GetBufferPointer(), self); }
 	void OutPacketToSet(uint16 Opcode, uint16 Len, const void * Data, bool self);
 
 	//! Fill values with data from a space seperated string of uint32s.
 	void LoadValues(const char* data);
 
-	inline uint16 GetValuesCount() const { return m_valuesCount; }
+	ASCENT_INLINE uint16 GetValuesCount() const { return m_valuesCount; }
 
 	//! Blizzard seem to send those for all object types. weird.
 	float m_walkSpeed;
@@ -419,7 +419,7 @@ public:
 	float m_base_runSpeed;
 	float m_base_walkSpeed;
 
-	inline bool IsUnit()//creature or player
+	ASCENT_INLINE bool IsUnit()//creature or player
 	{
 		return ( m_objectTypeId == TYPEID_UNIT || m_objectTypeId == TYPEID_PLAYER); 
 	}
@@ -441,8 +441,8 @@ public:
 	FactionTemplateDBC *m_faction;
 	FactionDBC *m_factionDBC;
 
-	inline void SetInstanceID(int32 instance) { m_instanceId = instance; }
-	inline int32 GetInstanceID() { return m_instanceId; }
+	ASCENT_INLINE void SetInstanceID(int32 instance) { m_instanceId = instance; }
+	ASCENT_INLINE int32 GetInstanceID() { return m_instanceId; }
 
 	int32 event_GetInstanceID();
 
@@ -451,7 +451,7 @@ public:
 	void Activate(MapMgr * mgr);
 	void Deactivate(MapMgr * mgr);
 	bool m_inQueue;
-	inline void SetMapMgr(MapMgr * mgr) { m_mapMgr = mgr; }
+	ASCENT_INLINE void SetMapMgr(MapMgr * mgr) { m_mapMgr = mgr; }
 
 	void Delete()
 	{
@@ -461,7 +461,7 @@ public:
 	}
 
 	void GMScriptEvent(void * function, uint32 argc, uint32 * argv, uint32 * argt);
-	inline size_t GetInRangeOppFactCount() { return m_oppFactsInRange.size(); }
+	ASCENT_INLINE size_t GetInRangeOppFactCount() { return m_oppFactsInRange.size(); }
 	void PlaySoundToSet(uint32 sound_entry);
 
 protected:

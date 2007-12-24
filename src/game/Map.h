@@ -90,12 +90,12 @@ public:
 	Map(uint32 mapid, MapInfo * inf);
 	~Map();
 
-	inline string GetNameString() { return name; }
-	inline const char* GetName() { return name.c_str(); }
-	inline MapEntry* GetDBCEntry() { return me; }
+	ASCENT_INLINE string GetNameString() { return name; }
+	ASCENT_INLINE const char* GetName() { return name.c_str(); }
+	ASCENT_INLINE MapEntry* GetDBCEntry() { return me; }
 	void BuildXMLStats(char * m_file);
 
-	inline CellSpawns *GetSpawnsList(uint32 cellx,uint32 celly)
+	ASCENT_INLINE CellSpawns *GetSpawnsList(uint32 cellx,uint32 celly)
 	{
 		ASSERT(cellx < _sizeX);
 		ASSERT(celly < _sizeY);
@@ -103,7 +103,7 @@ public:
 
 		return spawns[cellx][celly];
 	}
-	inline CellSpawns * GetSpawnsListAndCreate(uint32 cellx, uint32 celly)
+	ASCENT_INLINE CellSpawns * GetSpawnsListAndCreate(uint32 cellx, uint32 celly)
 	{
 		ASSERT(cellx < _sizeX);
 		ASSERT(celly < _sizeY);
@@ -122,7 +122,7 @@ public:
 	uint32 CreatureSpawnCount;
 	uint32 GameObjectSpawnCount;
 
-	inline float  GetLandHeight(float x, float y)
+	ASCENT_INLINE float  GetLandHeight(float x, float y)
 	{ 
 		if(_terrain)
 		{
@@ -134,7 +134,7 @@ public:
 		}
 	}
 
-	inline float  GetWaterHeight(float x, float y) 
+	ASCENT_INLINE float  GetWaterHeight(float x, float y) 
 	{ 
 		if(_terrain)
 		{ 
@@ -146,7 +146,7 @@ public:
 		}
 	}
 
-	inline uint8  GetWaterType(float x, float y)
+	ASCENT_INLINE uint8  GetWaterType(float x, float y)
 	{
 		if(_terrain)
 		{ 
@@ -158,7 +158,7 @@ public:
 		}
 	}
 
-	inline uint8  GetWalkableState(float x, float y)
+	ASCENT_INLINE uint8  GetWalkableState(float x, float y)
 	{
 		if(_terrain)
 		{ 
@@ -170,7 +170,7 @@ public:
 		}
 	}
 
-	inline uint16 GetAreaID(float x, float y)
+	ASCENT_INLINE uint16 GetAreaID(float x, float y)
 	{
 		if(_terrain)
 		{ 
@@ -182,7 +182,7 @@ public:
 		}
 	}
 
-	inline void CellGoneActive(uint32 x, uint32 y)
+	ASCENT_INLINE void CellGoneActive(uint32 x, uint32 y)
 	{ 
 		if(_terrain)
 		{ 
@@ -190,7 +190,7 @@ public:
 		}
 	}
 
-	inline void CellGoneIdle(uint32 x,uint32 y)
+	ASCENT_INLINE void CellGoneIdle(uint32 x,uint32 y)
 	{ 
 		if(_terrain)
 		{ 

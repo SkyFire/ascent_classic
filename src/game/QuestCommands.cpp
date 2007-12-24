@@ -16,14 +16,14 @@
 
 class ChatHandler;
 
-inline std::string MyConvertIntToString(const int arg)
+ASCENT_INLINE std::string MyConvertIntToString(const int arg)
 {
 	stringstream out;
 	out << arg;
 	return out.str();
 }
 
-inline std::string MyConvertFloatToString(const float arg)
+ASCENT_INLINE std::string MyConvertFloatToString(const float arg)
 {
 	stringstream out;
 	out << arg;

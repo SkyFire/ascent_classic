@@ -51,6 +51,12 @@ enum MsTimeVariables
 	MSTIME_DAY	= MSTIME_HOUR * 24,
 };
 
+#ifdef WIN32
+#define ASCENT_INLINE __forceinline
+#else
+#define ASCENT_INLINE ASCENT_INLINE
+#endif
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
@@ -310,16 +316,16 @@ typedef uint32_t DWORD;
 /* these can be optimized into assembly */
 #ifdef USING_BIG_ENDIAN
 
-/*inline static void swap16(uint16* p) { *p = ((*p >> 8) & 0xff) | (*p << 8); }
-inline static void swap32(uint32* p) { *p = ((*p >> 24 & 0xff)) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
-inline static void swap64(uint64* p) { *p = ((*p >> 56)) | ((*p >> 40) & 0x000000000000ff00ULL) | ((*p >> 24) & 0x0000000000ff0000ULL) | ((*p >> 8 ) & 0x00000000ff000000ULL) |
+/*ASCENT_INLINE static void swap16(uint16* p) { *p = ((*p >> 8) & 0xff) | (*p << 8); }
+ASCENT_INLINE static void swap32(uint32* p) { *p = ((*p >> 24 & 0xff)) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
+ASCENT_INLINE static void swap64(uint64* p) { *p = ((*p >> 56)) | ((*p >> 40) & 0x000000000000ff00ULL) | ((*p >> 24) & 0x0000000000ff0000ULL) | ((*p >> 8 ) & 0x00000000ff000000ULL) |
 								((*p << 8 ) & 0x000000ff00000000ULL) | ((*p << 24) & 0x0000ff0000000000ULL) | ((*p << 40) & 0x00ff000000000000ULL) | ((*p << 56)); }*/
 
-inline static void swap16(uint16* p) { *p = bswap_16((uint16_t)*p); }
-inline static void swap32(uint32* p) { *p = bswap_32((uint32_t)*p); }
-inline static void swap64(uint64* p) { *p = bswap_64((uint64_t)*p);; }
+ASCENT_INLINE static void swap16(uint16* p) { *p = bswap_16((uint16_t)*p); }
+ASCENT_INLINE static void swap32(uint32* p) { *p = bswap_32((uint32_t)*p); }
+ASCENT_INLINE static void swap64(uint64* p) { *p = bswap_64((uint64_t)*p);; }
 
-inline static float swapfloat(float p)
+ASCENT_INLINE static float swapfloat(float p)
 {
 	union { float asfloat; uint8 asbytes[4]; } u1, u2;
 	u1.asfloat = p;
@@ -332,7 +338,7 @@ inline static float swapfloat(float p)
 	return u2.asfloat;
 }
 
-inline static double swapdouble(double p)
+ASCENT_INLINE static double swapdouble(double p)
 {
 	union { double asfloat; uint8 asbytes[8]; } u1, u2;
 	u1.asfloat = p;
@@ -349,7 +355,7 @@ inline static double swapdouble(double p)
 	return u2.asfloat;
 }
 
-inline static void swapfloat(float * p)
+ASCENT_INLINE static void swapfloat(float * p)
 {
 	union { float asfloat; uint8 asbytes[4]; } u1, u2;
 	u1.asfloat = *p;
@@ -361,7 +367,7 @@ inline static void swapfloat(float * p)
 	*p = u2.asfloat;
 }
 
-inline static void swapdouble(double * p)
+ASCENT_INLINE static void swapdouble(double * p)
 {
 	union { double asfloat; uint8 asbytes[8]; } u1, u2;
 	u1.asfloat = *p;
@@ -377,32 +383,32 @@ inline static void swapdouble(double * p)
 	*p = u2.asfloat;
 }
 
-/*inline static uint16 swap16(uint16 p) { return ((p >> 8) & 0xff) | (p << 8); }
-inline static uint32 swap32(uint32 p) { return ((p >> 24) & 0xff) | ((p >> 8) & 0xff00) | ((p << 8) & 0xff0000) | (p << 24); }
-inline static uint64 swap64(uint64 p)  { p = (((p >> 56) & 0xff)) | ((p >> 40) & 0x000000000000ff00ULL) | ((p >> 24) & 0x0000000000ff0000ULL) | ((p >> 8 ) & 0x00000000ff000000ULL) |
+/*ASCENT_INLINE static uint16 swap16(uint16 p) { return ((p >> 8) & 0xff) | (p << 8); }
+ASCENT_INLINE static uint32 swap32(uint32 p) { return ((p >> 24) & 0xff) | ((p >> 8) & 0xff00) | ((p << 8) & 0xff0000) | (p << 24); }
+ASCENT_INLINE static uint64 swap64(uint64 p)  { p = (((p >> 56) & 0xff)) | ((p >> 40) & 0x000000000000ff00ULL) | ((p >> 24) & 0x0000000000ff0000ULL) | ((p >> 8 ) & 0x00000000ff000000ULL) |
 								((p << 8 ) & 0x000000ff00000000ULL) | ((p << 24) & 0x0000ff0000000000ULL) | ((p << 40) & 0x00ff000000000000ULL) | ((p << 56)); }
 
-inline static void swap16(int16* p) { *p = ((*p >> 8) & 0xff) | (*p << 8); }
-inline static void swap32(int32* p) { *p = ((*p >> 24) & 0xff) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
-inline static void swap64(int64* p) { *p = ((*p >> 56) & 0xff) | ((*p >> 40) & 0x000000000000ff00ULL) | ((*p >> 24) & 0x0000000000ff0000ULL) | ((*p >> 8 ) & 0x00000000ff000000ULL) |
+ASCENT_INLINE static void swap16(int16* p) { *p = ((*p >> 8) & 0xff) | (*p << 8); }
+ASCENT_INLINE static void swap32(int32* p) { *p = ((*p >> 24) & 0xff) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
+ASCENT_INLINE static void swap64(int64* p) { *p = ((*p >> 56) & 0xff) | ((*p >> 40) & 0x000000000000ff00ULL) | ((*p >> 24) & 0x0000000000ff0000ULL) | ((*p >> 8 ) & 0x00000000ff000000ULL) |
 								((*p << 8 ) & 0x000000ff00000000ULL) | ((*p << 24) & 0x0000ff0000000000ULL) | ((*p << 40) & 0x00ff000000000000ULL) | ((*p << 56)); }
 
-inline static int16 swap16(int16 p) { return ((p >> 8) & 0xff) | (p << 8); }
-inline static int32 swap32(int32 p) { return ((p >> 24) & 0xff) | ((p >> 8) & 0xff00) | ((p << 8) & 0xff0000) | (p << 24); }
-inline static int64 swap64(int64 p)  { return ((((p >> 56) & 0xff)) | ((p >> 40) & 0x000000000000ff00ULL) | ((p >> 24) & 0x0000000000ff0000ULL) | ((p >> 8 ) & 0x00000000ff000000ULL) |
+ASCENT_INLINE static int16 swap16(int16 p) { return ((p >> 8) & 0xff) | (p << 8); }
+ASCENT_INLINE static int32 swap32(int32 p) { return ((p >> 24) & 0xff) | ((p >> 8) & 0xff00) | ((p << 8) & 0xff0000) | (p << 24); }
+ASCENT_INLINE static int64 swap64(int64 p)  { return ((((p >> 56) & 0xff)) | ((p >> 40) & 0x000000000000ff00ULL) | ((p >> 24) & 0x0000000000ff0000ULL) | ((p >> 8 ) & 0x00000000ff000000ULL) |
 								((p << 8 ) & 0x000000ff00000000ULL) | ((p << 24) & 0x0000ff0000000000ULL) | ((p << 40) & 0x00ff000000000000ULL) | ((p << 56))); }*/
 
-inline static uint16 swap16(uint16 p) { return bswap_16((uint16_t)p); }
-inline static uint32 swap32(uint32 p) { return bswap_32((uint32_t)p); }
-inline static uint64 swap64(uint64 p)  { return bswap_64((uint64_t)p); }
+ASCENT_INLINE static uint16 swap16(uint16 p) { return bswap_16((uint16_t)p); }
+ASCENT_INLINE static uint32 swap32(uint32 p) { return bswap_32((uint32_t)p); }
+ASCENT_INLINE static uint64 swap64(uint64 p)  { return bswap_64((uint64_t)p); }
 
-inline static void swap16(int16* p) { *p = bswap_16((uint16_t)*p); }
-inline static void swap32(int32* p) { *p = bswap_32((uint32_t)*p); }
-inline static void swap64(int64* p) { *p = bswap_64((uint64_t)*p); }
+ASCENT_INLINE static void swap16(int16* p) { *p = bswap_16((uint16_t)*p); }
+ASCENT_INLINE static void swap32(int32* p) { *p = bswap_32((uint32_t)*p); }
+ASCENT_INLINE static void swap64(int64* p) { *p = bswap_64((uint64_t)*p); }
 
-inline static int16 swap16(int16 p) { return bswap_16((uint16_t)p); }
-inline static int32 swap32(int32 p) { return bswap_32((uint32_t)p); }
-inline static int64 swap64(int64 p)  { return bswap_64((uint64_t)p); }
+ASCENT_INLINE static int16 swap16(int16 p) { return bswap_16((uint16_t)p); }
+ASCENT_INLINE static int32 swap32(int32 p) { return bswap_32((uint32_t)p); }
+ASCENT_INLINE static int64 swap64(int64 p)  { return bswap_64((uint64_t)p); }
 
 #endif
 /* 
@@ -475,7 +481,7 @@ Scripting system exports/imports
 #define FIST_MAGIC_QROUND (((65536.0 * 65536.0 * 16.0) + (65536.0 * 0.5)) * 65536.0)
 
 /// Fastest Method of float2int32
-static inline int float2int32(const float value)
+static ASCENT_INLINE int float2int32(const float value)
 {
   union { int asInt[2]; double asDouble; } n;
   n.asDouble = value + 6755399441055744.0;
@@ -488,7 +494,7 @@ static inline int float2int32(const float value)
 }
 
 /// Fastest Method of long2int32
-static inline int long2int32(const double value)
+static ASCENT_INLINE int long2int32(const double value)
 {
   union { int asInt[2]; double asDouble; } n;
   n.asDouble = value + 6755399441055744.0;
@@ -501,14 +507,14 @@ static inline int long2int32(const double value)
 }
 
 /// Round a floating-point value and convert to integer
-static inline long QRound (double inval)
+static ASCENT_INLINE long QRound (double inval)
 {
 	double dtemp = FIST_MAGIC_QROUND + inval;
 	return GNL_LONG_AT_BYTE (dtemp, GNL_LOWER_WORD_BYTE) - 0x80000000;
 }
 
 /// Convert a float to a cross-platform 32-bit format (no endianess adjustments!)
-static inline long float2long (float f)
+static ASCENT_INLINE long float2long (float f)
 {
   int exp;
   long mant = QRound (frexp (f, &exp) * 0x1000000);
@@ -519,7 +525,7 @@ static inline long float2long (float f)
 }
 
 /// Convert a 32-bit cross-platform float to native format (no endianess adjustments!)
-static inline float long2float (long l)
+static ASCENT_INLINE float long2float (long l)
 {
   int exp = (l >> 24) & 0x7f;
   if (exp & 0x40) exp = exp | ~0x7f;
@@ -537,7 +543,7 @@ static inline float long2float (long l)
 #include <sys/timeb.h>
 #endif
 
-inline uint32 now()
+ASCENT_INLINE uint32 now()
 {	
 #ifdef WIN32
 	return GetTickCount();
@@ -599,7 +605,7 @@ struct WayPoint
 
 };
 
-inline void reverse_array(uint8 * pointer, size_t count)
+ASCENT_INLINE void reverse_array(uint8 * pointer, size_t count)
 {
 	uint8 * temp = (uint8*)malloc(count);
 	memcpy(temp, pointer, count);
@@ -613,12 +619,6 @@ typedef std::vector<WayPoint*> WayPointMap;
 int32 GetTimePeriodFromString(const char * str);
 std::string ConvertTimeStampToString(uint32 timestamp);
 std::string ConvertTimeStampToDataTime(uint32 timestamp);
-
-#ifdef WIN32
-#define ASCENT_INLINE __forceinline
-#else
-#define ASCENT_INLINE inline
-#endif
 
 ASCENT_INLINE void ASCENT_TOLOWER(std::string& str)
 {

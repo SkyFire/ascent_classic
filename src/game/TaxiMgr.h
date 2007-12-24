@@ -57,15 +57,15 @@ public:
 		}
 	}
 
-	inline const float & getLength( ) const { return m_length; };
+	ASCENT_INLINE const float & getLength( ) const { return m_length; };
 	void ComputeLen();
 	void SetPosForTime(float &x, float &y, float &z, uint32 time, uint32* lastnode);
-	inline uint32 GetID() { return id; }
+	ASCENT_INLINE uint32 GetID() { return id; }
 	void SendMoveForTime(Player *riding, Player *to, uint32 time);
 	void AddPathNode(uint32 index, TaxiPathNode* pn) { m_pathNodes[index] = pn; }
-	inline size_t GetNodeCount() { return m_pathNodes.size(); }
+	ASCENT_INLINE size_t GetNodeCount() { return m_pathNodes.size(); }
 	TaxiPathNode* GetPathNode(uint32 i);
-	inline uint32 GetPrice() { return price; }
+	ASCENT_INLINE uint32 GetPrice() { return price; }
 
 protected:
 

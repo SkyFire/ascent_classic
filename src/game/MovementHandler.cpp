@@ -30,7 +30,7 @@ uint32 TimeStamp()
 	return timeGetTime();
 }
 
-inline uint32 mTimeStamp()
+ASCENT_INLINE uint32 mTimeStamp()
 {
 	return timeGetTime();
 }
@@ -44,7 +44,7 @@ uint32 TimeStamp()
 	return (tp.tv_sec * 1000) + (tp.tv_usec / 1000);
 }
 
-inline uint32 mTimeStamp()
+ASCENT_INLINE uint32 mTimeStamp()
 {
 	struct timeval tp;
 	gettimeofday(&tp, NULL);
@@ -106,7 +106,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 
 }
 
-inline void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSession * pSession)
+ASCENT_INLINE void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSession * pSession)
 {
 	//player swiming.
 

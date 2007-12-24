@@ -444,8 +444,8 @@ struct FactionReputation
 	int32 standing;
 	uint8 flag;
 	int32 baseStanding;
-	inline int32 CalcStanding() { return standing - baseStanding; }
-	inline bool Positive() { return standing >= 0; }
+	ASCENT_INLINE int32 CalcStanding() { return standing - baseStanding; }
+	ASCENT_INLINE bool Positive() { return standing >= 0; }
 	FactionRating CalcRating()
 	{		
 		//changed by zack : nocturno patch : items bougth from Quartermasters relly on full standing value
@@ -679,17 +679,17 @@ protected:
 
 public:
 
-	inline Guild * GetGuild() { return m_playerInfo->guild; }
-	inline GuildMember * GetGuildMember() { return m_playerInfo->guildMember; }
-	inline GuildRank * GetGuildRankS() { return m_playerInfo->guildRank; }
+	ASCENT_INLINE Guild * GetGuild() { return m_playerInfo->guild; }
+	ASCENT_INLINE GuildMember * GetGuildMember() { return m_playerInfo->guildMember; }
+	ASCENT_INLINE GuildRank * GetGuildRankS() { return m_playerInfo->guildRank; }
 
 	void EventGroupFullUpdate();
 	/************************************************************************/
 	/* Reference System	                                                    */
 	/************************************************************************/
 
-	inline void AddReference(Player ** ptr) { m_references.insert(ptr); *ptr = this; }
-	inline void RemoveReference(Player ** ptr) { m_references.erase(ptr); *ptr = NULL; }
+	ASCENT_INLINE void AddReference(Player ** ptr) { m_references.insert(ptr); *ptr = this; }
+	ASCENT_INLINE void RemoveReference(Player ** ptr) { m_references.erase(ptr); *ptr = NULL; }
 
 	/************************************************************************/
 	/* Skill System															*/
@@ -738,8 +738,8 @@ public:
     void BuildFlagUpdateForNonGroupSet(uint32 index, uint32 flag);
 	std::string m_afk_reason;
 	void SetAFKReason(std::string reason) { m_afk_reason = reason; };
-	inline const char* GetName() { return m_name.c_str(); }
-	inline std::string* GetNameString() { return &m_name; }
+	ASCENT_INLINE const char* GetName() { return m_name.c_str(); }
+	ASCENT_INLINE std::string* GetNameString() { return &m_name; }
 	void Die();
 	//void KilledMonster(uint32 entry, const uint64 &guid);
 	void GiveXP(uint32 xp, const uint64 &guid, bool allowbonus);   // to stop rest xp being given
@@ -751,8 +751,8 @@ public:
     /************************************************************************/
     /* Taxi                                                                 */
     /************************************************************************/
-    inline TaxiPath*    GetTaxiPath() { return m_CurrentTaxiPath; }
-    inline bool         GetTaxiState() { return m_onTaxi; }
+    ASCENT_INLINE TaxiPath*    GetTaxiPath() { return m_CurrentTaxiPath; }
+    ASCENT_INLINE bool         GetTaxiState() { return m_onTaxi; }
     const uint32&       GetTaximask( uint8 index ) const { return m_taximask[index]; }
     void                LoadTaxiMask(const char* data);
     void                TaxiStart(TaxiPath* path, uint32 modelid, uint32 start_node);
@@ -760,11 +760,11 @@ public:
     void                EventDismount(uint32 money, float x, float y, float z);
     void                EventTaxiInterpolate();
 
-    inline void         SetTaxiState    (bool state) { m_onTaxi = state; }
-    inline void         SetTaximask     (uint8 index, uint32 value ) { m_taximask[index] = value; }
-    inline void         SetTaxiPath     (TaxiPath *path) { m_CurrentTaxiPath = path; }
-    inline void         SetTaxiPos()	{m_taxi_pos_x = m_position.x; m_taxi_pos_y = m_position.y; m_taxi_pos_z = m_position.z;}
-    inline void         UnSetTaxiPos()	{m_taxi_pos_x = 0; m_taxi_pos_y = 0; m_taxi_pos_z = 0; }
+    ASCENT_INLINE void         SetTaxiState    (bool state) { m_onTaxi = state; }
+    ASCENT_INLINE void         SetTaximask     (uint8 index, uint32 value ) { m_taximask[index] = value; }
+    ASCENT_INLINE void         SetTaxiPath     (TaxiPath *path) { m_CurrentTaxiPath = path; }
+    ASCENT_INLINE void         SetTaxiPos()	{m_taxi_pos_x = m_position.x; m_taxi_pos_y = m_position.y; m_taxi_pos_z = m_position.z;}
+    ASCENT_INLINE void         UnSetTaxiPos()	{m_taxi_pos_x = 0; m_taxi_pos_y = 0; m_taxi_pos_z = 0; }
     // Taxi related variables
 	vector<TaxiPath*>   m_taxiPaths;
     TaxiPath*           m_CurrentTaxiPath;
@@ -792,13 +792,13 @@ public:
 
 	int32                GetOpenQuestSlot();
 	QuestLogEntry*       GetQuestLogForEntry(uint32 quest);
-	inline QuestLogEntry*GetQuestLogInSlot(uint32 slot)  { return m_questlog[slot]; }
-    inline uint32        GetQuestSharer()                { return m_questSharer; }
+	ASCENT_INLINE QuestLogEntry*GetQuestLogInSlot(uint32 slot)  { return m_questlog[slot]; }
+    ASCENT_INLINE uint32        GetQuestSharer()                { return m_questSharer; }
     
-    inline void         SetQuestSharer(uint32 guid)     { m_questSharer = guid; }
+    ASCENT_INLINE void         SetQuestSharer(uint32 guid)     { m_questSharer = guid; }
     void                SetQuestLogSlot(QuestLogEntry *entry, uint32 slot);
     
-    inline void         PushToRemovedQuests(uint32 questid)	{ m_removequests.insert(questid);}
+    ASCENT_INLINE void         PushToRemovedQuests(uint32 questid)	{ m_removequests.insert(questid);}
     void                AddToFinishedQuests(uint32 quest_id);
     void                EventTimedQuestExpire(Quest *qst, QuestLogEntry *qle, uint32 log_slot);
 	
@@ -834,11 +834,11 @@ public:
 
     
     void EventPortToGM(Player *p);
-	inline uint32 GetTeam() { return m_team; }
-	inline void SetTeam(uint32 t) { m_team = t; m_bgTeam=t; }
-	inline void ResetTeam() { m_team = myRace->team_id==7 ? 0 : 1; m_bgTeam=m_team; }
+	ASCENT_INLINE uint32 GetTeam() { return m_team; }
+	ASCENT_INLINE void SetTeam(uint32 t) { m_team = t; m_bgTeam=t; }
+	ASCENT_INLINE void ResetTeam() { m_team = myRace->team_id==7 ? 0 : 1; m_bgTeam=m_team; }
 
-	inline bool IsInFeralForm()
+	ASCENT_INLINE bool IsInFeralForm()
 	{
 		int s = GetShapeShift();
 		if(!s)return false;
@@ -932,11 +932,11 @@ public:
     /************************************************************************/
     /* PVP                                                                  */
     /************************************************************************/
-	inline uint8 GetPVPRank()
+	ASCENT_INLINE uint8 GetPVPRank()
 	{
 		return (uint8)((GetUInt32Value(PLAYER_BYTES_3) >> 24) & 0xFF);
 	}
-	inline void SetPVPRank(int newrank)
+	ASCENT_INLINE void SetPVPRank(int newrank)
 	{
 		SetUInt32Value(PLAYER_BYTES_3, ((GetUInt32Value(PLAYER_BYTES_3) & 0x00FFFFFF) | (uint8(newrank) << 24)));
 	}
@@ -945,8 +945,8 @@ public:
     /* Groups                                                               */
     /************************************************************************/
 	void                SetInviter(uint32 pInviter) { m_GroupInviter = pInviter; }
-	inline uint32       GetInviter() { return m_GroupInviter; }
-	inline bool         InGroup() { return (m_Group != NULL && !m_GroupInviter); }
+	ASCENT_INLINE uint32       GetInviter() { return m_GroupInviter; }
+	ASCENT_INLINE bool         InGroup() { return (m_Group != NULL && !m_GroupInviter); }
 	bool                IsGroupLeader()
 	{
 		if(m_Group != NULL)
@@ -956,13 +956,13 @@ public:
 		}
 		return false;
 	}
-	inline int          HasBeenInvited() { return m_GroupInviter != 0; }
-	inline Group*       GetGroup() { return m_Group; }
-	inline void         SetGroup(Group* grp) { m_Group = grp; }
-	inline uint32       GetSubGroup() { return m_SubGroup; }
-	inline void         SetSubGroup(uint32 group) { m_SubGroup = group; }
+	ASCENT_INLINE int          HasBeenInvited() { return m_GroupInviter != 0; }
+	ASCENT_INLINE Group*       GetGroup() { return m_Group; }
+	ASCENT_INLINE void         SetGroup(Group* grp) { m_Group = grp; }
+	ASCENT_INLINE uint32       GetSubGroup() { return m_SubGroup; }
+	ASCENT_INLINE void         SetSubGroup(uint32 group) { m_SubGroup = group; }
     bool                IsGroupMember(Player *plyr);
-	inline bool         IsBanned()
+	ASCENT_INLINE bool         IsBanned()
 	{
 		if(m_banned)
 		{
@@ -971,19 +971,19 @@ public:
 		}
 		return false;
 	}
-    inline void         SetBanned() { m_banned = 4;}
-	inline void         SetBanned(string Reason) { m_banned = 4; m_banreason = Reason;}
-	inline void         SetBanned(uint32 timestamp, string& Reason) { m_banned = timestamp; m_banreason = Reason; }
-	inline void         UnSetBanned() { m_banned = 0; }
-	inline string       GetBanReason() {return m_banreason;}
+    ASCENT_INLINE void         SetBanned() { m_banned = 4;}
+	ASCENT_INLINE void         SetBanned(string Reason) { m_banned = 4; m_banreason = Reason;}
+	ASCENT_INLINE void         SetBanned(uint32 timestamp, string& Reason) { m_banned = timestamp; m_banreason = Reason; }
+	ASCENT_INLINE void         UnSetBanned() { m_banned = 0; }
+	ASCENT_INLINE string       GetBanReason() {return m_banreason;}
 
     /************************************************************************/
     /* Guilds                                                               */
     /************************************************************************/
-	inline  bool        IsInGuild() {return (m_uint32Values[PLAYER_GUILDID] != 0) ? true : false;}
-	inline uint32       GetGuildId() { return m_uint32Values[PLAYER_GUILDID]; }
+	ASCENT_INLINE  bool        IsInGuild() {return (m_uint32Values[PLAYER_GUILDID] != 0) ? true : false;}
+	ASCENT_INLINE uint32       GetGuildId() { return m_uint32Values[PLAYER_GUILDID]; }
 	void                SetGuildId(uint32 guildId);
-	inline uint32       GetGuildRank() { return m_uint32Values[PLAYER_GUILDRANK]; }
+	ASCENT_INLINE uint32       GetGuildRank() { return m_uint32Values[PLAYER_GUILDRANK]; }
 	void                SetGuildRank(uint32 guildRank);
 	uint32              GetGuildInvitersGuid() { return m_invitersGuid; }
 	void                SetGuildInvitersGuid( uint32 guid ) { m_invitersGuid = guid; }
@@ -997,9 +997,9 @@ public:
 	void                EndDuel(uint8 WinCondition);
 	void                DuelCountdown();
 	void                SetDuelStatus(uint8 status) { m_duelStatus = status; }
-	inline uint8        GetDuelStatus() { return m_duelStatus; }
+	ASCENT_INLINE uint8        GetDuelStatus() { return m_duelStatus; }
 	void                SetDuelState(uint8 state) { m_duelState = state; }
-	inline uint8        GetDuelState() { return m_duelState; }
+	ASCENT_INLINE uint8        GetDuelState() { return m_duelState; }
     // duel variables
     Player*             DuelingWith;
 
@@ -1007,7 +1007,7 @@ public:
     /* Trade                                                                */
     /************************************************************************/
 	void                SendTradeUpdate(void);
-	inline void         ResetTradeVariables()
+	ASCENT_INLINE void         ResetTradeVariables()
 	{
 		mTradeGold = 0;
 		memset(&mTradeItems, 0, sizeof(Item*) * 8);
@@ -1018,12 +1018,12 @@ public:
     /************************************************************************/
     /* Pets                                                                 */
     /************************************************************************/
-	inline void         SetSummon(Pet *pet) { m_Summon = pet; }
-	inline Pet*         GetSummon(void) { return m_Summon; }
+	ASCENT_INLINE void         SetSummon(Pet *pet) { m_Summon = pet; }
+	ASCENT_INLINE Pet*         GetSummon(void) { return m_Summon; }
 	uint32              GeneratePetNumber(void);
 	void                RemovePlayerPet(uint32 pet_number);
-	inline void         AddPlayerPet(PlayerPet* pet, uint32 index) { m_Pets[index] = pet; }
-	inline PlayerPet*   GetPlayerPet(uint32 idx)
+	ASCENT_INLINE void         AddPlayerPet(PlayerPet* pet, uint32 index) { m_Pets[index] = pet; }
+	ASCENT_INLINE PlayerPet*   GetPlayerPet(uint32 idx)
 	{
 		std::map<uint32, PlayerPet*>::iterator itr = m_Pets.find(idx);
 		if(itr != m_Pets.end()) return itr->second;
@@ -1038,9 +1038,9 @@ public:
 		std::map<uint32, PlayerPet*>::iterator itr = m_Pets.begin();
 		return itr->first;
 	}
-	inline PlayerPet*   GetFirstPet(void) { return GetPlayerPet(GetFirstPetNumber()); }
-	inline void         SetStableSlotCount(uint8 count) { m_StableSlotCount = count; }
-	inline uint8        GetStableSlotCount(void) { return m_StableSlotCount; }
+	ASCENT_INLINE PlayerPet*   GetFirstPet(void) { return GetPlayerPet(GetFirstPetNumber()); }
+	ASCENT_INLINE void         SetStableSlotCount(uint8 count) { m_StableSlotCount = count; }
+	ASCENT_INLINE uint8        GetStableSlotCount(void) { return m_StableSlotCount; }
 	uint32              GetUnstabledPetNumber(void)
 	{
 		if(m_Pets.size() == 0) return 0;
@@ -1054,16 +1054,16 @@ public:
     /************************************************************************/
     /* Item Interface                                                       */
     /************************************************************************/
-	inline ItemInterface* GetItemInterface() { return m_ItemInterface; } // Player Inventory Item storage
-	inline void         ApplyItemMods(Item *item, int8 slot, bool apply,bool justdrokedown=false) {  _ApplyItemMods(item, slot, apply,justdrokedown); }
+	ASCENT_INLINE ItemInterface* GetItemInterface() { return m_ItemInterface; } // Player Inventory Item storage
+	ASCENT_INLINE void         ApplyItemMods(Item *item, int8 slot, bool apply,bool justdrokedown=false) {  _ApplyItemMods(item, slot, apply,justdrokedown); }
     // item interface variables
     ItemInterface *     m_ItemInterface;
 	
     /************************************************************************/
     /* Loot                                                                 */
     /************************************************************************/
-	inline const uint64& GetLootGUID() const { return m_lootGuid; }
-	inline void         SetLootGUID(const uint64 &guid) { m_lootGuid = guid; }
+	ASCENT_INLINE const uint64& GetLootGUID() const { return m_lootGuid; }
+	ASCENT_INLINE void         SetLootGUID(const uint64 &guid) { m_lootGuid = guid; }
 	void                SendLoot(uint64 guid,uint8 loot_type);
     // loot variables
     uint64              m_lootGuid;
@@ -1073,7 +1073,7 @@ public:
     /************************************************************************/
     /* World Session                                                        */
     /************************************************************************/
-	inline WorldSession* GetSession() const { return m_session; }
+	ASCENT_INLINE WorldSession* GetSession() const { return m_session; }
 	void SetSession(WorldSession *s) { m_session = s; }
 	void SetBindPoint(float x, float y, float z, uint32 m, uint32 v) { m_bind_pos_x = x; m_bind_pos_y = y; m_bind_pos_z = z; m_bind_mapid = m; m_bind_zoneid = v;}
 	void SendDelayedPacket(WorldPacket *data, bool bDeleteOnSend)
@@ -1147,7 +1147,7 @@ public:
 	void EventDeath();
 	//Note:ModSkillLine -> value+=amt;ModSkillMax -->value=amt; --wierd
 	float GetSkillUpChance(uint32 id);
-	//inline std::list<struct skilllines>getSkillLines() { return m_skilllines; }
+	//ASCENT_INLINE std::list<struct skilllines>getSkillLines() { return m_skilllines; }
 	float SpellCrtiticalStrikeRatingBonus;
 	float SpellHasteRatingBonus;
 	void UpdateAttackSpeed();
@@ -1156,38 +1156,38 @@ public:
 	void UpdateHit(int32 hit);
    
 	bool canCast(SpellEntry *m_spellInfo);
-	inline float GetBlockFromSpell() { return m_blockfromspell; }
-	inline float GetSpellCritFromSpell() { return m_spellcritfromspell; }
-	inline float GetHitFromMeleeSpell() { return m_hitfrommeleespell; }
-	inline float GetHitFromSpell() { return m_hitfromspell; }
-	inline float GetParryFromSpell() { return m_parryfromspell; }
-	inline float GetDodgeFromSpell() { return m_dodgefromspell; }
+	ASCENT_INLINE float GetBlockFromSpell() { return m_blockfromspell; }
+	ASCENT_INLINE float GetSpellCritFromSpell() { return m_spellcritfromspell; }
+	ASCENT_INLINE float GetHitFromMeleeSpell() { return m_hitfrommeleespell; }
+	ASCENT_INLINE float GetHitFromSpell() { return m_hitfromspell; }
+	ASCENT_INLINE float GetParryFromSpell() { return m_parryfromspell; }
+	ASCENT_INLINE float GetDodgeFromSpell() { return m_dodgefromspell; }
 	void SetBlockFromSpell(float value) { m_blockfromspell = value; }
 	void SetSpellCritFromSpell(float value) { m_spellcritfromspell = value; }
 	void SetParryFromSpell(float value) { m_parryfromspell = value; }
 	void SetDodgeFromSpell(float value) { m_dodgefromspell = value; }
 	void SetHitFromMeleeSpell(float value) { m_hitfrommeleespell = value; }
 	void SetHitFromSpell(float value) { m_hitfromspell = value; }
-	inline uint32 GetHealthFromSpell() { return m_healthfromspell; }
-	inline uint32 GetManaFromSpell() { return m_manafromspell; }
+	ASCENT_INLINE uint32 GetHealthFromSpell() { return m_healthfromspell; }
+	ASCENT_INLINE uint32 GetManaFromSpell() { return m_manafromspell; }
 	void SetHealthFromSpell(uint32 value) { m_healthfromspell = value;}
 	void SetManaFromSpell(uint32 value) { m_manafromspell = value;}
 	uint32 CalcTalentResetCost(uint32 resetnum);
 	void SendTalentResetConfirm();
 	uint32 GetTalentResetTimes() { return m_talentresettimes; }
-	inline void SetTalentResetTimes(uint32 value) { m_talentresettimes = value; }
+	ASCENT_INLINE void SetTalentResetTimes(uint32 value) { m_talentresettimes = value; }
 	void SetPlayerStatus(uint8 pStatus) { m_status = pStatus; }
-	inline uint8 GetPlayerStatus() { return m_status; }
+	ASCENT_INLINE uint8 GetPlayerStatus() { return m_status; }
 	const float& GetBindPositionX( ) const { return m_bind_pos_x; }
 	const float& GetBindPositionY( ) const { return m_bind_pos_y; }
 	const float& GetBindPositionZ( ) const { return m_bind_pos_z; }
 	const uint32& GetBindMapId( ) const { return m_bind_mapid; }
 	const uint32& GetBindZoneId( ) const { return m_bind_zoneid; }
-	inline uint8 GetShapeShift()
+	ASCENT_INLINE uint8 GetShapeShift()
 	{
 		return GetByte(UNIT_FIELD_BYTES_1,2);
 	}
-	inline void setAttackTimer(int32 time, bool offhand)
+	ASCENT_INLINE void setAttackTimer(int32 time, bool offhand)
 	{
 		if(!time)
 			time = offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
@@ -1200,7 +1200,7 @@ public:
 			m_attackTimer = getMSTime() + time;
 	}
 	
-	inline void delayAttackTimer(int32 delay)
+	ASCENT_INLINE void delayAttackTimer(int32 delay)
 	{
 		if(!delay)
 			return;
@@ -1248,15 +1248,15 @@ public:
 	uint32 m_BreathDamageTimer;
 	// Visible objects
 	bool CanSee(Object* obj);
-	inline bool IsVisible(Object* pObj) { return !(m_visibleObjects.find(pObj) == m_visibleObjects.end()); }
+	ASCENT_INLINE bool IsVisible(Object* pObj) { return !(m_visibleObjects.find(pObj) == m_visibleObjects.end()); }
 	void AddInRangeObject(Object* pObj);
 	void OnRemoveInRangeObject(Object* pObj);
 	void ClearInRangeSet();
-	inline void AddVisibleObject(Object* pObj) { m_visibleObjects.insert(pObj); }
-	inline void RemoveVisibleObject(Object* pObj) { m_visibleObjects.erase(pObj); }
-	inline void RemoveVisibleObject(InRangeSet::iterator itr) { m_visibleObjects.erase(itr); }
-	inline InRangeSet::iterator FindVisible(Object * obj) { return m_visibleObjects.find(obj); }
-	inline void RemoveIfVisible(Object * obj)
+	ASCENT_INLINE void AddVisibleObject(Object* pObj) { m_visibleObjects.insert(pObj); }
+	ASCENT_INLINE void RemoveVisibleObject(Object* pObj) { m_visibleObjects.erase(pObj); }
+	ASCENT_INLINE void RemoveVisibleObject(InRangeSet::iterator itr) { m_visibleObjects.erase(itr); }
+	ASCENT_INLINE InRangeSet::iterator FindVisible(Object * obj) { return m_visibleObjects.find(obj); }
+	ASCENT_INLINE void RemoveIfVisible(Object * obj)
 	{
 		InRangeSet::iterator itr = m_visibleObjects.find(obj);
 		if(itr == m_visibleObjects.end())
@@ -1266,14 +1266,14 @@ public:
 		PushOutOfRange(obj->GetNewGUID());
 	}
 
-	inline bool GetVisibility(Object * obj, InRangeSet::iterator *itr)
+	ASCENT_INLINE bool GetVisibility(Object * obj, InRangeSet::iterator *itr)
 	{
 		*itr = m_visibleObjects.find(obj);
 		return ((*itr) != m_visibleObjects.end());
 	}
 
-	inline InRangeSet::iterator GetVisibleSetBegin() { return m_visibleObjects.begin(); }
-	inline InRangeSet::iterator GetVisibleSetEnd() { return m_visibleObjects.end(); }
+	ASCENT_INLINE InRangeSet::iterator GetVisibleSetBegin() { return m_visibleObjects.begin(); }
+	ASCENT_INLINE InRangeSet::iterator GetVisibleSetEnd() { return m_visibleObjects.end(); }
 	
 	//Transporters
 	bool m_lockTransportVariables;
@@ -1323,10 +1323,10 @@ public:
 	void UpdateNearbyGameObjects();
 	
 	void CalcResistance(uint32 type);
-	inline float res_M_crit_get(){return m_resist_critical[0];}
-	inline void res_M_crit_set(float newvalue){m_resist_critical[0]=newvalue;}
-	inline float res_R_crit_get(){return m_resist_critical[1];}
-	inline void res_R_crit_set(float newvalue){m_resist_critical[1]=newvalue;}
+	ASCENT_INLINE float res_M_crit_get(){return m_resist_critical[0];}
+	ASCENT_INLINE void res_M_crit_set(float newvalue){m_resist_critical[0]=newvalue;}
+	ASCENT_INLINE float res_R_crit_get(){return m_resist_critical[1];}
+	ASCENT_INLINE void res_R_crit_set(float newvalue){m_resist_critical[1]=newvalue;}
 	uint32 FlatResistanceModifierPos[7];
 	uint32 FlatResistanceModifierNeg[7];
 	uint32 BaseResistanceModPctPos[7];
@@ -1364,7 +1364,7 @@ public:
 		uint32 mRatingToPoint[37]; //block, skill.. cant be decimal values
 	};
 */
-	inline uint32* GetPlayedtime() { return m_playedtime; };
+	ASCENT_INLINE uint32* GetPlayedtime() { return m_playedtime; };
 	void CalcStat(uint32 t);
 	float CalcRating(uint32 t);
 	void RecalcAllRatings();
@@ -1377,10 +1377,10 @@ public:
 	uint32 SoulStoneReceiver;
 	void removeSoulStone();
 
-    inline uint32 GetSoulStoneReceiver(){return SoulStoneReceiver;}
-    inline void SetSoulStoneReceiver(uint32 StoneGUID){SoulStoneReceiver = StoneGUID;}
-    inline uint32 GetSoulStone(){return SoulStone;}
-    inline void SetSoulStone(uint32 StoneID){SoulStone = StoneID;}
+    ASCENT_INLINE uint32 GetSoulStoneReceiver(){return SoulStoneReceiver;}
+    ASCENT_INLINE void SetSoulStoneReceiver(uint32 StoneGUID){SoulStoneReceiver = StoneGUID;}
+    ASCENT_INLINE uint32 GetSoulStone(){return SoulStone;}
+    ASCENT_INLINE void SetSoulStone(uint32 StoneID){SoulStone = StoneID;}
 
 	bool bReincarnation;
 
@@ -1405,7 +1405,7 @@ public:
 	uint32 m_ShapeShifted;
 	uint32 m_MountSpellId;
     
-	inline bool IsMounted() {return (m_MountSpellId!=0 ? true : false); }
+	ASCENT_INLINE bool IsMounted() {return (m_MountSpellId!=0 ? true : false); }
 	
     bool bHasBindDialogOpen;
 	bool bGMTagOn;
@@ -1457,7 +1457,7 @@ public:
 	bool PowerCheat;
 	bool FlyCheat;
 	void ZoneUpdate(uint32 ZoneId);
-	inline uint32 GetAreaID() { return m_AreaID; }
+	ASCENT_INLINE uint32 GetAreaID() { return m_AreaID; }
 	void SetAreaID(uint32 area) { m_AreaID = area; }
 	
 	
@@ -1495,8 +1495,8 @@ public:
 	set<Player *> gmTargets;
 	uint32 m_UnderwaterMaxTime;
 	uint32 m_UnderwaterLastDmg;
-	inline void setMyCorpse(Corpse * corpse) { myCorpse = corpse; }
-	inline Corpse * getMyCorpse() { return myCorpse; }
+	ASCENT_INLINE void setMyCorpse(Corpse * corpse) { myCorpse = corpse; }
+	ASCENT_INLINE Corpse * getMyCorpse() { return myCorpse; }
 	bool bCorpseCreateable;
 	uint32 m_resurrectHealth, m_resurrectMana;
 	uint32 resurrector;
@@ -1526,23 +1526,23 @@ public:
 	uint32 m_pvpTimer;
 	
 	//! Is PVP flagged?
-	inline bool IsPvPFlagged() { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); }
-	inline void SetPvPFlag()
+	ASCENT_INLINE bool IsPvPFlagged() { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); }
+	ASCENT_INLINE void SetPvPFlag()
 	{
 		// reset the timer as well..
 		StopPvPTimer();
 		SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
 	}
 	//! Removal
-	inline void RemovePvPFlag()
+	ASCENT_INLINE void RemovePvPFlag()
 	{
 		StopPvPTimer();
 		RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
 	}
 	//! Do this on /pvp off
-	inline void ResetPvPTimer();
+	ASCENT_INLINE void ResetPvPTimer();
 	//! Stop the timer for pvp off
-	inline void StopPvPTimer() { m_pvpTimer = 0; }
+	ASCENT_INLINE void StopPvPTimer() { m_pvpTimer = 0; }
 	
 	//! Called at login to add the honorless buff, etc.
 	void LoginPvPSetup();
@@ -1552,8 +1552,8 @@ public:
 	void PvPToggle();
 	bool CanCastDueToCooldown(SpellEntry * spellid);
 	bool CanCastItemDueToCooldown(ItemPrototype * pProto, uint32 x);
-	inline uint32 LastHonorResetTime() const { return m_lastHonorResetTime; }
-	inline void LastHonorResetTime(uint32 val) { m_lastHonorResetTime = val; }
+	ASCENT_INLINE uint32 LastHonorResetTime() const { return m_lastHonorResetTime; }
+	ASCENT_INLINE void LastHonorResetTime(uint32 val) { m_lastHonorResetTime = val; }
 	uint32 OnlineTime;
 	bool tutorialsDirty;
 	LevelInfo * lvlinfo;
@@ -1574,7 +1574,7 @@ public:
 	bool resend_speed;
 	bool rename_pending;
 	uint32 iInstanceType;
-	inline void SetName(string& name) { m_name = name; }
+	ASCENT_INLINE void SetName(string& name) { m_name = name; }
 	// spell to (delay, last time)
 	
 	FactionReputation * reputationByListId[128];
@@ -1585,7 +1585,7 @@ public:
 	int8 m_spellcomboPoints; // rogue talent Ruthlessness will change combopoints while consuming them. solutions 1) add post cast prochandling, 2) delay adding the CP
 	void UpdateComboPoints();
 
-	inline void AddComboPoints(uint64 target, uint8 count)
+	ASCENT_INLINE void AddComboPoints(uint64 target, uint8 count)
 	{
         if(m_comboTarget == target)
 			m_comboPoints += count;
@@ -1597,7 +1597,7 @@ public:
 		UpdateComboPoints();
 	}
 
-	inline void NullComboPoints() { if(!m_retainComboPoints) { m_comboTarget = 0; m_comboPoints = 0; m_spellcomboPoints=0; } UpdateComboPoints(); }
+	ASCENT_INLINE void NullComboPoints() { if(!m_retainComboPoints) { m_comboTarget = 0; m_comboPoints = 0; m_spellcomboPoints=0; } UpdateComboPoints(); }
 	uint32 m_speedChangeCounter;
 
 	void SendAreaTriggerMessage(const char * message, ...);
@@ -1608,7 +1608,7 @@ public:
 	// Trade Target
 	//Player *getTradeTarget() {return mTradeTarget;};
 
-	inline Player * GetTradeTarget()
+	ASCENT_INLINE Player * GetTradeTarget()
 	{
 		if(!IsInWorld()) return 0;
 		return m_mapMgr->GetPlayer((uint32)mTradeTarget);
@@ -1625,7 +1625,7 @@ public:
 	void UnPossess();
 
 	/* Last Speeds */
-	inline void UpdateLastSpeeds()
+	ASCENT_INLINE void UpdateLastSpeeds()
 	{
 		m_lastRunSpeed = m_runSpeed;
 		m_lastRunBackSpeed = m_backWalkSpeed;
@@ -1706,7 +1706,7 @@ public:
 	bool m_setflycheat;
 	uint32 m_areaspirithealer_guid;
 
-	inline bool IsAttacking() {return m_attacking; }
+	ASCENT_INLINE bool IsAttacking() {return m_attacking; }
 
 	static void InitVisibleUpdateBits();
 	static UpdateMask m_visibleUpdateMask;
@@ -1917,8 +1917,8 @@ public:
 		++m_itr;
 	}
 
-	inline PlayerSkill* Grab() { return &m_itr->second; }
-	inline bool End() { return (m_itr==m_endItr)?true:false; }
+	ASCENT_INLINE PlayerSkill* Grab() { return &m_itr->second; }
+	ASCENT_INLINE bool End() { return (m_itr==m_endItr)?true:false; }
 };
 
 #endif

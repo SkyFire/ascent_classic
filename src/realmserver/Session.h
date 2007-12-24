@@ -47,16 +47,16 @@ protected:
 public:
 	static void InitHandlers();
 	void Update();
-	inline RPlayerInfo * GetPlayer() { return m_currentPlayer; }
+	ASCENT_INLINE RPlayerInfo * GetPlayer() { return m_currentPlayer; }
 
-	inline void ClearCurrentPlayer() { m_currentPlayer = 0; }
-	inline void ClearServers() { m_nextServer = m_server = 0; }
-	inline void SetNextServer() { m_server = m_nextServer; }
-	inline void SetServer(WServer * s) { m_server = s; }
-	inline WServer * GetServer() { return m_server; }
-	inline WorldSocket * GetSocket() { return m_socket; }
-	inline uint32 GetAccountId() { return m_accountId; }
-	inline uint32 GetSessionId() { return m_sessionId; }
+	ASCENT_INLINE void ClearCurrentPlayer() { m_currentPlayer = 0; }
+	ASCENT_INLINE void ClearServers() { m_nextServer = m_server = 0; }
+	ASCENT_INLINE void SetNextServer() { m_server = m_nextServer; }
+	ASCENT_INLINE void SetServer(WServer * s) { m_server = s; }
+	ASCENT_INLINE WServer * GetServer() { return m_server; }
+	ASCENT_INLINE WorldSocket * GetSocket() { return m_socket; }
+	ASCENT_INLINE uint32 GetAccountId() { return m_accountId; }
+	ASCENT_INLINE uint32 GetSessionId() { return m_sessionId; }
 
 	void SendPacket(WorldPacket * data)
 	{

@@ -22,7 +22,7 @@
 
 #include "Unit.h"
 
-inline bool isHostile(Object* objA, Object* objB)// B is hostile for A?
+ASCENT_INLINE bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 {
 	if(!objA || !objB)
 		return false;
@@ -105,7 +105,7 @@ inline bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 
 /// Where we check if we object A can attack object B. This is used in many feature's
 /// Including the spell class and the player class.
-inline bool isAttackable(Object* objA, Object* objB, bool CheckStealth = true)// A can attack B?
+ASCENT_INLINE bool isAttackable(Object* objA, Object* objB, bool CheckStealth = true)// A can attack B?
 {
 	if(!objA || !objB || objB->m_factionDBC == NULL || objA->m_factionDBC == NULL)
 		return false;
@@ -290,17 +290,17 @@ inline bool isAttackable(Object* objA, Object* objB, bool CheckStealth = true)//
 	return attackable;
 }
 
-inline bool isFriendly(Object* objA, Object* objB)// B is friendly to A if its not hostile
+ASCENT_INLINE bool isFriendly(Object* objA, Object* objB)// B is friendly to A if its not hostile
 {
 	return !isHostile(objA, objB);
 }
 
-inline bool isSameFaction(Object* objA, Object* objB)
+ASCENT_INLINE bool isSameFaction(Object* objA, Object* objB)
 {
 	return (objB->m_faction->Faction == objA->m_faction->Faction);
 }
 
-inline bool isCombatSupport(Object* objA, Object* objB)// B combat supports A?
+ASCENT_INLINE bool isCombatSupport(Object* objA, Object* objB)// B combat supports A?
 {
 	if(!objA || !objB)
 		return false;
@@ -341,7 +341,7 @@ inline bool isCombatSupport(Object* objA, Object* objB)// B combat supports A?
 }
 
 
-inline bool isAlliance(Object* objA)// A is alliance?
+ASCENT_INLINE bool isAlliance(Object* objA)// A is alliance?
 {
 	FactionTemplateDBC * m_sw_faction = dbcFactionTemplate.LookupEntry(11);
 	FactionDBC * m_sw_factionDBC = dbcFaction.LookupEntry(72);

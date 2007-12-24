@@ -85,11 +85,11 @@ public:
 	   QuestRelationList* GetGOQuestList(uint32 entryid);
 	uint32 GetGameObjectLootQuest(uint32 GO_Entry);
 	void SetGameObjectLootQuest(uint32 GO_Entry, uint32 Item_Entry);
-	inline bool IsQuestRepeatable(Quest *qst) { return (qst->is_repeatable!=0 ? true : false); }
+	ASCENT_INLINE bool IsQuestRepeatable(Quest *qst) { return (qst->is_repeatable!=0 ? true : false); }
 
 	bool CanStoreReward(Player *plyr, Quest *qst, uint32 reward_slot);
 
-	inline int32 QuestHasMob(Quest* qst, uint32 mob)
+	ASCENT_INLINE int32 QuestHasMob(Quest* qst, uint32 mob)
 	{
 		for(uint32 i = 0; i < 4; ++i)
 			if(qst->required_mob[i] == mob)
@@ -97,7 +97,7 @@ public:
 		return -1;
 	}
 
-	inline int32 GetOffsetForMob(Quest *qst, uint32 mob)
+	ASCENT_INLINE int32 GetOffsetForMob(Quest *qst, uint32 mob)
 	{
 		for(uint32 i = 0; i < 4; ++i)
 			if(qst->required_mob[i] == mob)
@@ -106,7 +106,7 @@ public:
 		return -1;
 	}
 
-	inline int32 GetOffsetForItem(Quest *qst, uint32 itm)
+	ASCENT_INLINE int32 GetOffsetForItem(Quest *qst, uint32 itm)
 	{
 		for(uint32 i = 0; i < 4; ++i)
 			if(qst->required_item[i] == itm)
@@ -133,11 +133,11 @@ private:
 	void _CleanLine(std::string *str);
 };
 
-template<> inline HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* >& QuestMgr::_GetList<Creature>()
+template<> ASCENT_INLINE HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* >& QuestMgr::_GetList<Creature>()
 	{return m_npc_quests;}
-template<> inline HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* >& QuestMgr::_GetList<GameObject>()
+template<> ASCENT_INLINE HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* >& QuestMgr::_GetList<GameObject>()
 	{return m_obj_quests;}
-template<> inline HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* >& QuestMgr::_GetList<Item>()
+template<> ASCENT_INLINE HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* >& QuestMgr::_GetList<Item>()
 	{return m_itm_quests;}
 
 

@@ -51,7 +51,7 @@ public:
 	Instance * GetInstanceByMapId(uint32 MapId);
 
 	WServer * CreateWorkerServer(WSSocket * s);
-	inline WServer * GetWorkerServer(uint32 Id) { return (Id < MAX_WORKER_SERVERS) ? WorkerServers[Id] : 0; }
+	ASCENT_INLINE WServer * GetWorkerServer(uint32 Id) { return (Id < MAX_WORKER_SERVERS) ? WorkerServers[Id] : 0; }
 	void AllocateInitialInstances(WServer * server, vector<uint32>& preferred);
 
 	// find the worker server with the least load for the new instance
@@ -71,7 +71,7 @@ public:
 	}
 
 	/* distribute packet to all worker servers */
-	inline void DistributePacketToAll(WorldPacket * data) { DistributePacketToAll(data, 0); }
+	ASCENT_INLINE void DistributePacketToAll(WorldPacket * data) { DistributePacketToAll(data, 0); }
 
 	/* distribute packet to all worker server excluding one */
 	void DistributePacketToAll(WorldPacket * data, WServer * exclude);

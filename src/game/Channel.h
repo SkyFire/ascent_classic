@@ -90,7 +90,7 @@ public:
 	bool m_muted;
 	bool m_announce;
 	uint32 m_team;
-	inline size_t GetNumMembers() { return m_members.size(); }
+	ASCENT_INLINE size_t GetNumMembers() { return m_members.size(); }
 	bool voice_enabled;
 	uint16 i_voice_channel_id;
 	MemberMap m_VoiceMembers;
@@ -184,8 +184,8 @@ public:
 		++m_itr;
 	}
 
-	inline Player* Grab() { return m_itr->first; }
-	inline bool End() { return (m_itr==m_endItr)?true:false; }
+	ASCENT_INLINE Player* Grab() { return m_itr->first; }
+	ASCENT_INLINE bool End() { return (m_itr==m_endItr)?true:false; }
 };
 
 #endif

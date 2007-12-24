@@ -58,7 +58,7 @@ public:
 		Clear();
 	}
 
-	inline void Clear()
+	ASCENT_INLINE void Clear()
 	{
 		oldguid = 0;
 		guidmask = 0;
@@ -69,7 +69,7 @@ public:
 		fieldcount = 0;
 	}
 
-	inline void Init(uint64 guid)
+	ASCENT_INLINE void Init(uint64 guid)
 	{
 		Clear();
 
@@ -78,7 +78,7 @@ public:
 		_CompileByOld();
 	}
 
-	inline void Init(uint8 mask)
+	ASCENT_INLINE void Init(uint8 mask)
 	{
 		Clear();
 
@@ -88,7 +88,7 @@ public:
 			_CompileByNew();
 	}
 
-	inline void Init(uint8 mask, uint8 *fields)
+	ASCENT_INLINE void Init(uint8 mask, uint8 *fields)
 	{
 		Clear();
 

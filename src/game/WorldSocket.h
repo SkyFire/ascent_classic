@@ -48,13 +48,13 @@ public:
 	~WorldSocket();
 
 	// vs8 fix - send null on empty buffer
-	inline void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
-	inline void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
+	ASCENT_INLINE void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
+	ASCENT_INLINE void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
 
 	void __fastcall OutPacket(uint16 opcode, size_t len, const void* data);
 	OUTPACKET_RESULT __fastcall _OutPacket(uint16 opcode, size_t len, const void* data);
    
-	inline uint32 GetLatency() { return _latency; }
+	ASCENT_INLINE uint32 GetLatency() { return _latency; }
 
 	void Authenticate();
 	void InformationRetreiveCallback(WorldPacket & recvData, uint32 requestid);
@@ -65,8 +65,8 @@ public:
 	void OnConnect();
 	void OnDisconnect();
 
-	inline void SetSession(WorldSession * session) { mSession = session; }
-	inline WorldSession * GetSession() { return mSession; }
+	ASCENT_INLINE void SetSession(WorldSession * session) { mSession = session; }
+	ASCENT_INLINE WorldSession * GetSession() { return mSession; }
 	bool Authed;
 
 	void UpdateQueuedPackets();
@@ -99,7 +99,7 @@ private:
 
 #endif
 
-inline void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid)
+ASCENT_INLINE void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid)
 {
 	// hehe speed freaks
 	uint8 guidmask = 0;
@@ -163,7 +163,7 @@ inline void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid)
 
 //!!! warning. This presumes that all guids can be compressed at least 1 byte
 //make sure you choose highguids acordingly
-inline unsigned int FastGUIDPack(const uint64 & oldguid, unsigned char * buffer, uint32 pos)
+ASCENT_INLINE unsigned int FastGUIDPack(const uint64 & oldguid, unsigned char * buffer, uint32 pos)
 {
 	// hehe speed freaks
 	uint8 guidmask = 0;
@@ -238,13 +238,13 @@ public:
 
 	void Disconnect();
 	bool IsConnected();
-	inline string GetRemoteIP() { return string(inet_ntoa(m_address.sin_addr)); }
-	inline uint32 GetRemotePort() { return ntohs(m_address.sin_port); }
+	ASCENT_INLINE string GetRemoteIP() { return string(inet_ntoa(m_address.sin_addr)); }
+	ASCENT_INLINE uint32 GetRemotePort() { return ntohs(m_address.sin_port); }
 
-	inline void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), (uint16)packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
-	inline void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
+	ASCENT_INLINE void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), (uint16)packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
+	ASCENT_INLINE void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
 	void __fastcall OutPacket(uint16 opcode, uint16 len, const void* data);
-	inline uint32 GetSessionId() { return m_sessionId; }
+	ASCENT_INLINE uint32 GetSessionId() { return m_sessionId; }
 
 protected:
 	uint32 m_sessionId;

@@ -126,7 +126,7 @@ public:
 
 	void AddAccount(Field* field);
 
-	inline Account* GetAccount(string Name)
+	ASCENT_INLINE Account* GetAccount(string Name)
 	{
 		setBusy.Acquire();
 		Account * pAccount = NULL;
@@ -148,10 +148,10 @@ public:
 	void ReloadAccounts(bool silent);
 	void ReloadAccountsCallback();
 
-	inline size_t GetCount() { return AccountDatabase.size(); }
+	ASCENT_INLINE size_t GetCount() { return AccountDatabase.size(); }
 
 private:
-	inline Account* __GetAccount(string Name)
+	ASCENT_INLINE Account* __GetAccount(string Name)
 	{
 		// this should already be uppercase!
 #ifdef WIN32
@@ -199,8 +199,8 @@ class InformationCore : public Singleton<InformationCore>
 	bool usepings;
 
 public:
-	inline Mutex & getServerSocketLock() { return serverSocketLock; }
-	inline Mutex & getRealmLock() { return realmLock; }
+	ASCENT_INLINE Mutex & getServerSocketLock() { return serverSocketLock; }
+	ASCENT_INLINE Mutex & getRealmLock() { return realmLock; }
 
 	InformationCore()
 	{ 
@@ -212,7 +212,7 @@ public:
 	void		  SendRealms(AuthSocket * Socket);
 	
 	// Realm management
-	inline uint32 GenerateRealmID()
+	ASCENT_INLINE uint32 GenerateRealmID()
 	{
 		realmhigh++;
 		return realmhigh;
@@ -222,8 +222,8 @@ public:
 	Realm*        GetRealm(uint32 realm_id);
 	void		  RemoveRealm(uint32 realm_id);
 
-	inline void   AddServerSocket(LogonCommServerSocket * sock) { serverSocketLock.Acquire(); m_serverSockets.insert( sock ); serverSocketLock.Release(); }
-	inline void   RemoveServerSocket(LogonCommServerSocket * sock) { serverSocketLock.Acquire(); m_serverSockets.erase( sock ); serverSocketLock.Release(); }
+	ASCENT_INLINE void   AddServerSocket(LogonCommServerSocket * sock) { serverSocketLock.Acquire(); m_serverSockets.insert( sock ); serverSocketLock.Release(); }
+	ASCENT_INLINE void   RemoveServerSocket(LogonCommServerSocket * sock) { serverSocketLock.Acquire(); m_serverSockets.erase( sock ); serverSocketLock.Release(); }
 
 	void		  TimeoutSockets();
 };

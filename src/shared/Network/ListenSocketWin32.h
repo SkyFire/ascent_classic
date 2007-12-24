@@ -94,7 +94,7 @@ public:
 			SocketOps::CloseSocket(m_socket);
 	}
 
-	inline bool IsOpen() { return m_opened; }
+	ASCENT_INLINE bool IsOpen() { return m_opened; }
 
 private:
 	SOCKET m_socket;

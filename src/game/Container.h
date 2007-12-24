@@ -32,7 +32,7 @@ public:
 
 	bool AddItem(int8 slot, Item *item);
 	bool AddItemToFreeSlot(Item *pItem, uint32 * r_slot);
-	inline Item *GetItem(int8 slot)
+	ASCENT_INLINE Item *GetItem(int8 slot)
 	{
 		if((uint8)slot < GetProto()->ContainerSlots)
 			return m_Slot[slot];

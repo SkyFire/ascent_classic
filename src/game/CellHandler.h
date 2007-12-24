@@ -54,12 +54,12 @@ public:
 	Class *CreateByCoords(float x, float y);
 	void Remove(uint32 x, uint32 y);
 
-	inline bool Allocated(uint32 x, uint32 y) { return _cells[x][y] != NULL; }
+	ASCENT_INLINE bool Allocated(uint32 x, uint32 y) { return _cells[x][y] != NULL; }
 
 	static uint32 GetPosX(float x); 
 	static uint32 GetPosY(float y);
 
-	inline Map *GetBaseMap() { return _map; }
+	ASCENT_INLINE Map *GetBaseMap() { return _map; }
 
 protected:
 	void _Init();

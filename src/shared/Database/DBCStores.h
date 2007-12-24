@@ -834,23 +834,23 @@ struct ItemRandomSuffixEntry
 
 #pragma pack(pop)
 
-inline float GetRadius(SpellRadius *radius)
+ASCENT_INLINE float GetRadius(SpellRadius *radius)
 {
     return radius->Radius;
 }
-inline uint32 GetCastTime(SpellCastTime *time)
+ASCENT_INLINE uint32 GetCastTime(SpellCastTime *time)
 {
     return time->CastTime;
 }
-inline float GetMaxRange(SpellRange *range)
+ASCENT_INLINE float GetMaxRange(SpellRange *range)
 {
     return range->maxRange;
 }
-inline float GetMinRange(SpellRange *range)
+ASCENT_INLINE float GetMinRange(SpellRange *range)
 {
     return range->minRange;
 }
-inline uint32 GetDuration(SpellDuration *dur)
+ASCENT_INLINE uint32 GetDuration(SpellDuration *dur)
 {
     return dur->Duration1;
 }
@@ -983,7 +983,7 @@ public:
 		}
 	}
 
-	inline uint32 GetNumRows()
+	ASCENT_INLINE uint32 GetNumRows()
 	{
 		return m_numrows;
 	}

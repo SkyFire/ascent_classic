@@ -48,12 +48,12 @@ public:
 
 	void SaveToDB();
 	void DeleteFromDB();
-	inline void SetCorpseState(uint32 state) { m_state = state; }
-	inline uint32 GetCorpseState() { return m_state; }
+	ASCENT_INLINE void SetCorpseState(uint32 state) { m_state = state; }
+	ASCENT_INLINE uint32 GetCorpseState() { return m_state; }
 	void Despawn();
 	
-	inline void SetLoadedFromDB(bool value) { _loadedfromdb = value; }
-	inline bool GetLoadedFromDB(void) { return _loadedfromdb; }
+	ASCENT_INLINE void SetLoadedFromDB(bool value) { _loadedfromdb = value; }
+	ASCENT_INLINE bool GetLoadedFromDB(void) { return _loadedfromdb; }
 	Loot loot;
 	void generateLoot();
 

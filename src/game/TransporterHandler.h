@@ -31,15 +31,15 @@ public:
 		uint32 delay;
 	};
 
-	inline void SetLength(const unsigned int sz)
+	ASCENT_INLINE void SetLength(const unsigned int sz)
 	{
 		i_nodes.resize( sz );
 	}
 
-	inline size_t Size(void) const { return i_nodes.size(); }
-	inline void Resize(unsigned int sz) { i_nodes.resize(sz); }
-	inline void Clear(void) { i_nodes.clear(); }
-	inline PathNode* GetNodes(void) { return static_cast<PathNode *>(&i_nodes[0]); }
+	ASCENT_INLINE size_t Size(void) const { return i_nodes.size(); }
+	ASCENT_INLINE void Resize(unsigned int sz) { i_nodes.resize(sz); }
+	ASCENT_INLINE void Clear(void) { i_nodes.clear(); }
+	ASCENT_INLINE PathNode* GetNodes(void) { return static_cast<PathNode *>(&i_nodes[0]); }
 	float GetTotalLength(void)
 	{
 		float len = 0, xd, yd, zd;
@@ -113,10 +113,10 @@ public:
 
 	bool GenerateWaypoints();
 
-	inline void AddPlayer(Player *pPlayer) { mPassengers[pPlayer->GetGUIDLow()] = pPlayer; }
-	inline void RemovePlayer(Player *pPlayer) {mPassengers.erase(pPlayer->GetGUIDLow()); }
-	inline bool HasPlayer(Player* pPlayer) { return mPassengers.find(pPlayer->GetGUIDLow()) != mPassengers.end(); }
-	inline void SetPeriod(uint32 val) { m_period = val; }
+	ASCENT_INLINE void AddPlayer(Player *pPlayer) { mPassengers[pPlayer->GetGUIDLow()] = pPlayer; }
+	ASCENT_INLINE void RemovePlayer(Player *pPlayer) {mPassengers.erase(pPlayer->GetGUIDLow()); }
+	ASCENT_INLINE bool HasPlayer(Player* pPlayer) { return mPassengers.find(pPlayer->GetGUIDLow()) != mPassengers.end(); }
+	ASCENT_INLINE void SetPeriod(uint32 val) { m_period = val; }
 
 	uint32 m_pathTime;
 	uint32 m_timer;

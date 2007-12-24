@@ -258,7 +258,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		//235 33206 Instantly reduces a friendly target's threat by $44416s1%, reduces all damage taken by $s1% and increases resistance to Dispel mechanics by $s2% for $d.
 };
 /*
-inline void ApplyFloatSM(float ** m,float v,uint32 mask, float def)
+ASCENT_INLINE void ApplyFloatSM(float ** m,float v,uint32 mask, float def)
 {
 	if(*m == 0)
 	{
@@ -281,7 +281,7 @@ inline void ApplyFloatSM(float ** m,float v,uint32 mask, float def)
 	}
 }*/
 /*
-inline void ApplyFloatPSM(float ** m,int32 v,uint32 mask, float def)
+ASCENT_INLINE void ApplyFloatPSM(float ** m,int32 v,uint32 mask, float def)
 {
 	if(*m == 0)
 	{

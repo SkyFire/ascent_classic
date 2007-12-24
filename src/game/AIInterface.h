@@ -231,11 +231,11 @@ public:
 	void SetFollowDistance(float dist) { FollowDistance = dist; };
 	void SetUnitToFollowAngle(float angle) { m_fallowAngle = angle; }
 	bool setInFront(Unit* target);
-	inline Unit* getUnitToFollow() { return UnitToFollow; }
+	ASCENT_INLINE Unit* getUnitToFollow() { return UnitToFollow; }
 	void setCreatureState(CreatureState state){ m_creatureState = state; }
-	inline uint8 getAIState() { return m_AIState; }
-	inline uint8 getAIType() { return m_AIType; }
-	inline uint8 getCurrentAgent() { return m_aiCurrentAgent; }
+	ASCENT_INLINE uint8 getAIState() { return m_AIState; }
+	ASCENT_INLINE uint8 getAIType() { return m_AIType; }
+	ASCENT_INLINE uint8 getCurrentAgent() { return m_aiCurrentAgent; }
 	void setCurrentAgent(AI_Agent agent) { m_aiCurrentAgent = agent; }
 	uint32	getThreatByGUID(uint64 guid);
 	uint32	getThreatByPtr(Unit* obj);
@@ -244,8 +244,8 @@ public:
 	bool	modThreatByGUID(uint64 guid, int32 mod);
 	bool	modThreatByPtr(Unit* obj, int32 mod);
 	void	RemoveThreatByPtr(Unit* obj);
-	inline AssistTargetSet GetAssistTargets() { return m_assistTargets; }
-	inline TargetMap *GetAITargets() { return &m_aiTargets; }
+	ASCENT_INLINE AssistTargetSet GetAssistTargets() { return m_assistTargets; }
+	ASCENT_INLINE TargetMap *GetAITargets() { return &m_aiTargets; }
 	void addAssistTargets(Unit* Friends);
 	void ClearHateList();
 	void WipeHateList();
@@ -256,8 +256,8 @@ public:
 	Unit* getSoullinkedWith();
 	void SetSoulLinkedWith(Unit* target);
 	bool GetIsSoulLinked();
-	inline size_t getAITargetsCount() { return m_aiTargets.size(); }
-	inline uint32 getOutOfCombatRange() { return m_outOfCombatRange; }
+	ASCENT_INLINE size_t getAITargetsCount() { return m_aiTargets.size(); }
+	ASCENT_INLINE uint32 getOutOfCombatRange() { return m_outOfCombatRange; }
 	void setOutOfCombatRange(uint32 val) { m_outOfCombatRange = val; }
 
 	// Spell
@@ -297,11 +297,11 @@ public:
 	WayPoint* getWayPoint(uint32 wpid);
 	void deleteWayPoint(uint32 wpid);
 	void deleteWaypoints();
-	inline bool hasWaypoints() { return m_waypoints!=NULL; }
-	inline void setMoveType(uint32 movetype) { m_moveType = movetype; }
-	inline uint32 getMoveType() { return m_moveType; }
-	inline void setMoveRunFlag(bool f) { m_moveRun = f; }
-	inline bool getMoveRunFlag() { return m_moveRun; }
+	ASCENT_INLINE bool hasWaypoints() { return m_waypoints!=NULL; }
+	ASCENT_INLINE void setMoveType(uint32 movetype) { m_moveType = movetype; }
+	ASCENT_INLINE uint32 getMoveType() { return m_moveType; }
+	ASCENT_INLINE void setMoveRunFlag(bool f) { m_moveRun = f; }
+	ASCENT_INLINE bool getMoveRunFlag() { return m_moveRun; }
 	void setWaypointToMove(uint32 id) { m_currentWaypoint = id; }
 	bool IsFlying();
 
@@ -313,10 +313,10 @@ public:
 	uint32 _CalcThreat(uint32 damage, uint32 spellId, Unit* Attacker);
 	
 	void SetAllowedToEnterCombat(bool val) { m_AllowedToEnterCombat = val; }
-	inline bool GetAllowedToEnterCombat(void) { return m_AllowedToEnterCombat; }
+	ASCENT_INLINE bool GetAllowedToEnterCombat(void) { return m_AllowedToEnterCombat; }
 
 	void CheckTarget(Unit* target);
-	inline void SetAIState(AI_State newstate) { m_AIState = newstate; }
+	ASCENT_INLINE void SetAIState(AI_State newstate) { m_AIState = newstate; }
 
 	// Movement
 	bool m_canMove;
@@ -348,10 +348,10 @@ public:
 
 	float m_sourceX, m_sourceY, m_sourceZ;
 	uint32 m_totalMoveTime;
-	inline void AddStopTime(uint32 Time) { m_moveTimer += Time; }
-	inline void SetNextSpell(AI_Spell * sp) { m_nextSpell = sp; }
-	inline Unit* GetNextTarget() { return m_nextTarget; }
-	inline void SetNextTarget (Unit *nextTarget) 
+	ASCENT_INLINE void AddStopTime(uint32 Time) { m_moveTimer += Time; }
+	ASCENT_INLINE void SetNextSpell(AI_Spell * sp) { m_nextSpell = sp; }
+	ASCENT_INLINE Unit* GetNextTarget() { return m_nextTarget; }
+	ASCENT_INLINE void SetNextTarget (Unit *nextTarget) 
 	{ 
 		m_nextTarget = nextTarget; 
 		if(nextTarget)
@@ -364,7 +364,7 @@ public:
 		else m_Unit->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 	}
 
-	/*inline void ResetProcCounts()
+	/*ASCENT_INLINE void ResetProcCounts()
 	{
 		AI_Spell * sp;
 		for(list<AI_Spell*>::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
@@ -381,7 +381,7 @@ public:
 
 	void WipeReferences();
 	WayPointMap *m_waypoints;
-	inline void SetPetOwner(Unit * owner) { m_PetOwner = owner; }
+	ASCENT_INLINE void SetPetOwner(Unit * owner) { m_PetOwner = owner; }
  
 	list<AI_Spell*> m_spells;
 	bool disable_melee;
@@ -396,7 +396,7 @@ public:
 
 	void ResetProcCounts();
 
-	inline void SetWaypointMap(WayPointMap * m) { m_waypoints = m; }
+	ASCENT_INLINE void SetWaypointMap(WayPointMap * m) { m_waypoints = m; }
 	bool m_hasWaypointEvents;
 	bool m_isGuard;
 //	bool m_fastMove;

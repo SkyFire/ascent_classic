@@ -101,7 +101,7 @@ public:
 	void Shutdown();
 	void Restart();
 	void RegisterCoreFunctions();
-	inline Mutex& GetLock() { return m_Lock; }
+	ASCENT_INLINE Mutex& GetLock() { return m_Lock; }
 
 	void OnUnitEvent(Unit * pUnit, uint32 EventType, Unit * pMiscUnit, uint32 Misc);
 	void OnQuestEvent(Player * QuestOwner, uint32 QuestID, uint32 EventType, Object * QuestStarter);
@@ -137,20 +137,20 @@ public:
 	void RegisterQuestEvent(uint32 Id, uint32 Event, const char * FunctionName);
 	void RegisterGameObjectEvent(uint32 Id, uint32 Event, const char * FunctionName);
 
-	inline const char * GetUnitEvent(uint32 Id, uint32 Event)
+	ASCENT_INLINE const char * GetUnitEvent(uint32 Id, uint32 Event)
 	{
 		UnitBindingMap::iterator itr = m_unitBinding.find(Id);
 		ASSERT(Event<CREATURE_EVENT_COUNT);
 		return (itr == m_unitBinding.end()) ? NULL : itr->second.Functions[Event];
 	}
-	inline const char * GetQuestEvent(uint32 Id, uint32 Event)
+	ASCENT_INLINE const char * GetQuestEvent(uint32 Id, uint32 Event)
 	{
 		QuestBindingMap::iterator itr = m_questBinding.find(Id);
 		ASSERT(Event<QUEST_EVENT_COUNT);
 		return (itr == m_questBinding.end()) ? NULL : itr->second.Functions[Event];
 	}
 
-	inline const char * GetGameObjectEvent(uint32 Id, uint32 Event)
+	ASCENT_INLINE const char * GetGameObjectEvent(uint32 Id, uint32 Event)
 	{
 		GameObjectBindingMap::iterator itr =m_gameobjectBinding.find(Id);
 		ASSERT(Event<GAMEOBJECT_EVENT_COUNT);

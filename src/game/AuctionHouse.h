@@ -81,7 +81,7 @@ public:
 	AuctionHouse(uint32 ID);
 	~AuctionHouse();
 
-	inline uint32 GetID() { return dbc->id; }
+	ASCENT_INLINE uint32 GetID() { return dbc->id; }
 	void LoadAuctions();
 
 	void UpdateAuctions();

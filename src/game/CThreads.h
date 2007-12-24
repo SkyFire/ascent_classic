@@ -72,9 +72,9 @@ public:
 	CThread();
 	~CThread();
 
-	inline void SetThreadState(CThreadState thread_state) { ThreadState = thread_state; }
-	inline CThreadState GetThreadState() { return ThreadState; }
-	inline CThreadType GetThreadType() { return ThreadType; }
+	ASCENT_INLINE void SetThreadState(CThreadState thread_state) { ThreadState = thread_state; }
+	ASCENT_INLINE CThreadState GetThreadState() { return ThreadState; }
+	ASCENT_INLINE CThreadType GetThreadType() { return ThreadType; }
 	int GetThreadId() { return ThreadId; }
 	time_t GetStartTime() { return start_time; }
 	virtual bool run();

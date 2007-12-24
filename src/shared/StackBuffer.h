@@ -125,7 +125,7 @@ public:
 	/** Ensures the buffer is big enough to fit the specified number of bytes.
 	 * @param bytes number of bytes to fit
 	 */
-	inline void EnsureBufferSize(uint32 Bytes)
+	ASCENT_INLINE void EnsureBufferSize(uint32 Bytes)
 	{
 		if(m_writePos + Bytes > m_space)
 			ReallocateOnHeap();

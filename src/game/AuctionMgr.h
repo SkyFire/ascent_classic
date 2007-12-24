@@ -42,7 +42,7 @@ public:
 
 	AuctionHouse * GetAuctionHouse(uint32 Entry);
 
-	inline uint32 GenerateAuctionId()
+	ASCENT_INLINE uint32 GenerateAuctionId()
 	{ 
 		lock.Acquire();
 		uint32 id=++maxId;

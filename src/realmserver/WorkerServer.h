@@ -35,12 +35,12 @@ public:
 	WServer(uint32 id, WSSocket * s);
 	~WServer();
 
-	inline size_t GetInstanceCount() { return m_instances.size(); }
-	inline void SendPacket(WorldPacket * data) { if(m_socket) m_socket->SendPacket(data); }
-	inline void SendWoWPacket(Session * from, WorldPacket * data) { if(m_socket) m_socket->SendWoWPacket(from, data); }
-	inline void AddInstance(Instance * pInstance) { m_instances.push_back(pInstance); }
-	inline void QueuePacket(WorldPacket * data) { m_recvQueue.Push(data); }
-	inline uint32 GetID() { return m_id; }
+	ASCENT_INLINE size_t GetInstanceCount() { return m_instances.size(); }
+	ASCENT_INLINE void SendPacket(WorldPacket * data) { if(m_socket) m_socket->SendPacket(data); }
+	ASCENT_INLINE void SendWoWPacket(Session * from, WorldPacket * data) { if(m_socket) m_socket->SendWoWPacket(from, data); }
+	ASCENT_INLINE void AddInstance(Instance * pInstance) { m_instances.push_back(pInstance); }
+	ASCENT_INLINE void QueuePacket(WorldPacket * data) { m_recvQueue.Push(data); }
+	ASCENT_INLINE uint32 GetID() { return m_id; }
 
 	void Update();
 

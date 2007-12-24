@@ -71,5 +71,5 @@ public:
 
 	void Finish();
 	uint8 Rated() { return rated_match; }
-	inline uint32 GetArenaTeamType() { return m_arenateamtype; }
+	ASCENT_INLINE uint32 GetArenaTeamType() { return m_arenateamtype; }
 };

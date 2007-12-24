@@ -40,7 +40,7 @@ class PatchJob
 
 public:
 	PatchJob(Patch * patch,AuthSocket* client,uint32 skip) : m_patchToSend(patch),m_client(client),m_bytesSent(skip),m_bytesLeft(patch->FileSize-skip),m_dataPointer(patch->Data+skip) {}
-	inline AuthSocket * GetClient() { return m_client; }
+	ASCENT_INLINE AuthSocket * GetClient() { return m_client; }
 	bool Update();
 };
 

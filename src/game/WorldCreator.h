@@ -110,7 +110,7 @@ public:
 	InstanceMgr();	
 	~InstanceMgr();
 
-	inline Map* GetMap(uint32 mapid)
+	ASCENT_INLINE Map* GetMap(uint32 mapid)
 	{
 		if(mapid>NUM_MAPS)
 			return NULL;
@@ -135,7 +135,7 @@ public:
 
 	// has an instance expired?
 	// can a player join?
-    inline bool PlayerOwnsInstance(Instance * pInstance, Player * pPlayer)
+    ASCENT_INLINE bool PlayerOwnsInstance(Instance * pInstance, Player * pPlayer)
 	{
 		// expired?
 		if( pInstance->m_expiration && (UNIXTIME+20) >= pInstance->m_expiration)
@@ -152,7 +152,7 @@ public:
 	}
 
 	// has an instance expired?
-	inline bool HasInstanceExpired(Instance * pInstance)
+	ASCENT_INLINE bool HasInstanceExpired(Instance * pInstance)
 	{
 		// expired?
 		if( pInstance->m_expiration && (UNIXTIME+20) >= pInstance->m_expiration)

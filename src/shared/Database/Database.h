@@ -51,7 +51,7 @@ public:
 	~AsyncQuery();
 	void AddQuery(const char * format, ...);
 	void Perform();
-	inline void SetDB(Database * dbb) { db = dbb; }
+	ASCENT_INLINE void SetDB(Database * dbb) { db = dbb; }
 };
 
 class SERVER_DECL Database : public CThread
@@ -80,9 +80,9 @@ public:
 	void CheckConnections();
 	bool ThreadRunning;
 
-	inline string GetHostName() { return mHostname; }
-	inline string GetDatabaseName() { return mDatabaseName; }
-	inline uint32 GetQueueSize() { return queries_queue.get_size(); }
+	ASCENT_INLINE string GetHostName() { return mHostname; }
+	ASCENT_INLINE string GetDatabaseName() { return mDatabaseName; }
+	ASCENT_INLINE uint32 GetQueueSize() { return queries_queue.get_size(); }
 
 	string EscapeString(string Escape);
 	string EscapeString(const char * esc, MysqlCon * con);
@@ -133,9 +133,9 @@ public:
 
 	bool NextRow();
 
-	inline Field* Fetch() { return mCurrentRow; }
-	inline uint32 GetFieldCount() const { return mFieldCount; }
-	inline uint32 GetRowCount() const { return mRowCount; }
+	ASCENT_INLINE Field* Fetch() { return mCurrentRow; }
+	ASCENT_INLINE uint32 GetFieldCount() const { return mFieldCount; }
+	ASCENT_INLINE uint32 GetRowCount() const { return mRowCount; }
 
 protected:
 	MYSQL_RES* mResult;

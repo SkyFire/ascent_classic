@@ -151,7 +151,7 @@ protected:
 			return entry.count==0;
 		}
 
-		inline void shift_generations_down()
+		ASCENT_INLINE void shift_generations_down()
 		{
 			if(std::remove_if(generations,generations+MAX_AWAITING_THREADS,no_waiters)==generations+MAX_AWAITING_THREADS)
 			{
@@ -171,7 +171,7 @@ protected:
 			dispose_entry(entry);
 		}
 
-		inline void dispose_entry(list_entry& entry)
+		ASCENT_INLINE void dispose_entry(list_entry& entry)
 		{
 			ASSERT(entry.count==0);
 			if(entry.semaphore)
@@ -182,7 +182,7 @@ protected:
 			entry.notified=false;
 		}
 
-		inline HANDLE duplicate_handle(HANDLE source)
+		ASCENT_INLINE HANDLE duplicate_handle(HANDLE source)
 		{
 			HANDLE const current_process=GetCurrentProcess();
 
@@ -205,7 +205,7 @@ protected:
 class Condition
 {
 public:
-	inline Condition(Mutex * mutex) : m_nLockCount(0), m_externalMutex(mutex)
+	ASCENT_INLINE Condition(Mutex * mutex) : m_nLockCount(0), m_externalMutex(mutex)
 	{
 		  ::InitializeCriticalSection(&m_critsecWaitSetProtection);
 	}
@@ -216,13 +216,13 @@ public:
 		assert(m_deqWaitSet.empty());
 	}
 
-	inline void BeginSynchronized()
+	ASCENT_INLINE void BeginSynchronized()
 	{
 		m_externalMutex->Acquire();
 		++m_nLockCount;
 	}
 
-	inline void EndSynchronized()
+	ASCENT_INLINE void EndSynchronized()
 	{
 		assert(LockHeldByCallingThread());
 		--m_nLockCount;
@@ -476,29 +476,29 @@ private:
 class Condition
 {
 public:
-	inline Condition(Mutex *m)
+	ASCENT_INLINE Condition(Mutex *m)
 	{
 		mut=m;
 		pthread_cond_init(&cond,NULL);
 	}
-	inline ~Condition()
+	ASCENT_INLINE ~Condition()
 	{
 		pthread_cond_destroy(&cond);
 	}
 
-	inline void Signal()
+	ASCENT_INLINE void Signal()
 	{
 		pthread_cond_signal(&cond);
 	}
-	inline void Broadcast()
+	ASCENT_INLINE void Broadcast()
 	{
 		pthread_cond_broadcast(&cond);
 	}
-	inline void Wait()
+	ASCENT_INLINE void Wait()
 	{
 		pthread_cond_wait(&cond,&mut->mutex);
 	}
-	inline bool Wait(time_t seconds)
+	ASCENT_INLINE bool Wait(time_t seconds)
 	{
 		timespec tv;
 		tv.tv_nsec = 0;
@@ -508,11 +508,11 @@ public:
 		else
 			return false;
 	}
-	inline void BeginSynchronized()
+	ASCENT_INLINE void BeginSynchronized()
 	{
 		mut->Acquire();
 	}
-	inline void EndSynchronized()
+	ASCENT_INLINE void EndSynchronized()
 	{
 		mut->Release();
 	}

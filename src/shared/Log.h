@@ -82,7 +82,7 @@ public:
 
 	void write(const char* format, ...);
 	void writefromsession(WorldSession* session, const char* format, ...);
-	inline bool IsOpen() { return (m_file != NULL); }
+	ASCENT_INLINE bool IsOpen() { return (m_file != NULL); }
 	void Open();
 	void Close();
 };

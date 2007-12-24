@@ -32,14 +32,14 @@ public:
 
 	}
 
-	inline void add(const TYPE& element)
+	ASCENT_INLINE void add(const TYPE& element)
 	{
 		mutex.Acquire();
 		queue.push_back(element);
 		mutex.Release();
 	}
 
-	inline TYPE next()
+	ASCENT_INLINE TYPE next()
 	{
 		mutex.Acquire();
 		assert(queue.size() > 0);
@@ -49,7 +49,7 @@ public:
 		return t;
 	}
 
-	inline size_t size()
+	ASCENT_INLINE size_t size()
 	{
 		mutex.Acquire();
 		size_t c = queue.size();
@@ -57,7 +57,7 @@ public:
 		return c;
 	}
 
-	inline TYPE get_first_element()
+	ASCENT_INLINE TYPE get_first_element()
 	{
 		mutex.Acquire();
 		TYPE t; 
@@ -69,7 +69,7 @@ public:
 		return t;			
 	}
 
-	inline void pop()
+	ASCENT_INLINE void pop()
 	{
 		mutex.Acquire();
 		ASSERT(queue.size() > 0);

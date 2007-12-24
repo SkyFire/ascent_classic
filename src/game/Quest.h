@@ -206,7 +206,7 @@ public:
 	QuestLogEntry();
 	~QuestLogEntry();
 
-	inline Quest* GetQuest() { return m_quest; };
+	ASCENT_INLINE Quest* GetQuest() { return m_quest; };
 	void Init(Quest* quest, Player* plr, uint32 slot);
 
 	bool CanBeFinished();
@@ -219,7 +219,7 @@ public:
 	void SetMobCount(uint32 i, uint32 count);
 
 	bool IsUnitAffected(Unit* target);
-	inline bool IsCastQuest() { return iscastquest;}
+	ASCENT_INLINE bool IsCastQuest() { return iscastquest;}
 	void AddAffectedUnit(Unit* target);
 	void ClearAffectedUnits();
 
@@ -228,15 +228,15 @@ public:
 
 	void SendQuestComplete();
 	void SendUpdateAddKill(uint32 i);
-	inline uint32 GetMobCount(uint32 i) { return m_mobcount[i]; }
-	inline uint32 GetExploredAreas(uint32 i) { return m_explored_areas[i]; }
+	ASCENT_INLINE uint32 GetMobCount(uint32 i) { return m_mobcount[i]; }
+	ASCENT_INLINE uint32 GetExploredAreas(uint32 i) { return m_explored_areas[i]; }
 
-	inline uint32 GetBaseField(uint32 slot)
+	ASCENT_INLINE uint32 GetBaseField(uint32 slot)
 	{
 		return PLAYER_QUEST_LOG_1_1 + (slot * 3);
 	}
 
-	inline QuestScript * GetScript() { return _questScript; }
+	ASCENT_INLINE QuestScript * GetScript() { return _questScript; }
 	void LoadScript();
 	void CallScriptUpdate();
 

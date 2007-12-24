@@ -30,7 +30,7 @@ struct NameTableEntry
 	const char *name;
 };
 
-inline const char* LookupName(uint32 id, NameTableEntry *table)
+ASCENT_INLINE const char* LookupName(uint32 id, NameTableEntry *table)
 {
 	for(uint32 i = 0; table[i].name != 0; i++)
 	{

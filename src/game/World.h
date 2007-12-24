@@ -318,14 +318,14 @@ public:
 	bool running;
 
 	Mutex tcMutex;
-	inline void incrementThreadCount()
+	ASCENT_INLINE void incrementThreadCount()
 	{
 		tcMutex.Acquire();
 		++thread_count;
 		tcMutex.Release();
 	}
 
-	inline void decrementThreadCount()
+	ASCENT_INLINE void decrementThreadCount()
 	{
 		tcMutex.Acquire();
 		--thread_count;
@@ -376,30 +376,30 @@ public:
 	void RemoveGlobalSession(WorldSession *session);
 	void DeleteSession(WorldSession *session);
 
-	inline size_t GetSessionCount() const { return m_sessions.size(); }
+	ASCENT_INLINE size_t GetSessionCount() const { return m_sessions.size(); }
 	uint32 GetNonGmSessionCount();
-	inline size_t GetQueueCount() { return mQueuedSessions.size(); }
+	ASCENT_INLINE size_t GetQueueCount() { return mQueuedSessions.size(); }
 	void GetStats(uint32 * GMCount, float * AverageLatency);
 
-	inline uint32 GetPlayerLimit() const { return m_playerLimit; }
+	ASCENT_INLINE uint32 GetPlayerLimit() const { return m_playerLimit; }
 	void SetPlayerLimit(uint32 limit) { m_playerLimit = limit; }
 
-	inline bool getAllowMovement() const { return m_allowMovement; }
+	ASCENT_INLINE bool getAllowMovement() const { return m_allowMovement; }
 	void SetAllowMovement(bool allow) { m_allowMovement = allow; }
-	inline bool getGMTicketStatus() { return m_gmTicketSystem; };
+	ASCENT_INLINE bool getGMTicketStatus() { return m_gmTicketSystem; };
 	bool toggleGMTicketStatus()
 	{
 		m_gmTicketSystem = !m_gmTicketSystem;
 		return m_gmTicketSystem;
 	};
 
-	inline bool getReqGmClient() { return reqGmClient; }
-	inline std::string getGmClientChannel() { return GmClientChannel; }
+	ASCENT_INLINE bool getReqGmClient() { return reqGmClient; }
+	ASCENT_INLINE std::string getGmClientChannel() { return GmClientChannel; }
 
 	void SetMotd(const char *motd) { m_motd = motd; }
-	inline const char* GetMotd() const { return m_motd.c_str(); }
+	ASCENT_INLINE const char* GetMotd() const { return m_motd.c_str(); }
 
-	inline time_t GetGameTime() const { return m_gameTime; }
+	ASCENT_INLINE time_t GetGameTime() const { return m_gameTime; }
 
 	bool SetInitialWorldSettings();
 
@@ -409,10 +409,10 @@ public:
 	void SendZoneMessage(WorldPacket *packet, uint32 zoneid, WorldSession *self = 0);
 	void SendFactionMessage(WorldPacket *packet, uint8 teamId);
 
-	inline void SetStartTime(uint32 val) { m_StartTime = val; }
-	inline uint32 GetUptime(void) { return (uint32)UNIXTIME - m_StartTime; }
-	inline uint32 GetStartTime(void) { return m_StartTime; }
-	inline std::string GetUptimeString()
+	ASCENT_INLINE void SetStartTime(uint32 val) { m_StartTime = val; }
+	ASCENT_INLINE uint32 GetUptime(void) { return (uint32)UNIXTIME - m_StartTime; }
+	ASCENT_INLINE uint32 GetStartTime(void) { return m_StartTime; }
+	ASCENT_INLINE std::string GetUptimeString()
 	{
 		int seconds = (uint32)UNIXTIME - m_StartTime;
 		int mins=0;
@@ -452,22 +452,22 @@ public:
    
 	void UpdateSessions(uint32 diff);
 
-	inline void setRate(int index,float value)
+	ASCENT_INLINE void setRate(int index,float value)
 	{
 		regen_values[index]=value;
 	}
 
-	inline float getRate(int index)
+	ASCENT_INLINE float getRate(int index)
 	{
 		return regen_values[index];
 	}
 	
-	inline uint32 getIntRate(int index)
+	ASCENT_INLINE uint32 getIntRate(int index)
 	{
 		return int_rates[index];
 	}
 
-	inline void setIntRate(int index, uint32 value)
+	ASCENT_INLINE void setIntRate(int index, uint32 value)
 	{
 		int_rates[index] = value;
 	}
@@ -476,7 +476,7 @@ public:
 	typedef std::map< uint32, uint32> SpellPricesMap;
 	SpellPricesMap mPrices;
 
-	inline uint32 GetTimeOut(){return TimeOut;}
+	ASCENT_INLINE uint32 GetTimeOut(){return TimeOut;}
 
 	struct NameGenData
 	{
@@ -522,8 +522,8 @@ public:
 	uint32 SocketSendBufSize;
 	uint32 SocketRecvBufSize;
 
-	inline void AddExtendedSession(WorldSession * session) { mExtendedSessions.insert(session); }
-	inline void RemoveExtendedSession(WorldSession * session) { mExtendedSessions.erase(session); }
+	ASCENT_INLINE void AddExtendedSession(WorldSession * session) { mExtendedSessions.insert(session); }
+	ASCENT_INLINE void RemoveExtendedSession(WorldSession * session) { mExtendedSessions.erase(session); }
 	void BroadcastExtendedMessage(WorldSession * self, const char* str, ...);	
 
 	uint32 HordePlayers;

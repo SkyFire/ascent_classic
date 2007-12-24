@@ -91,7 +91,7 @@ public:
 	void SetLeader(PlayerInfo * info);
 	ArenaTeamMember * GetMember(PlayerInfo * info);
 
-	inline uint32 GetPlayersPerTeam()
+	ASCENT_INLINE uint32 GetPlayersPerTeam()
 	{
 		switch(m_type)
 		{

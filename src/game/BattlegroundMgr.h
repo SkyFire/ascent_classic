@@ -100,7 +100,7 @@ struct BGScore
 #define AV_CONTROLED_STONEHEART_GRAVE_ALLIANCE  0x516 //1 -> alliance controled
 
 /* get level grouping for player */
-inline static uint32 GetLevelGrouping(uint32 level)
+ASCENT_INLINE static uint32 GetLevelGrouping(uint32 level)
 {
 	if(level < 10)
 		return 0;
@@ -249,9 +249,9 @@ public:
 	virtual void HookOnAreaTrigger(Player * plr, uint32 id) = 0;
 
 	/* Retreival Functions */
-	inline uint32 GetId() { return m_id; }
-	inline uint32 GetLevelGroup() { return m_levelGroup; }
-	inline MapMgr* GetMapMgr() { return m_mapMgr; }
+	ASCENT_INLINE uint32 GetId() { return m_id; }
+	ASCENT_INLINE uint32 GetLevelGroup() { return m_levelGroup; }
+	ASCENT_INLINE MapMgr* GetMapMgr() { return m_mapMgr; }
 
 	/* Creating a battleground requires a pre-existing map manager */
 	CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 type);
@@ -279,10 +279,10 @@ public:
 	void PlaySoundToAll(uint32 Sound);
 
 	/* Full? */
-	inline bool IsFull() { return !(HasFreeSlots(0) || HasFreeSlots(1)); }
+	ASCENT_INLINE bool IsFull() { return !(HasFreeSlots(0) || HasFreeSlots(1)); }
 
 	/* Are we full? */
-	inline bool HasFreeSlots(uint32 Team) { m_mainLock.Acquire(); bool res = ((m_players[Team].size() + m_pendPlayers[Team].size()) < m_playerCountPerTeam); m_mainLock.Release(); return res; }
+	ASCENT_INLINE bool HasFreeSlots(uint32 Team) { m_mainLock.Acquire(); bool res = ((m_players[Team].size() + m_pendPlayers[Team].size()) < m_playerCountPerTeam); m_mainLock.Release(); return res; }
 
 	/* Add Player */
 	void AddPlayer(Player * plr, uint32 team);
@@ -300,7 +300,7 @@ public:
 	void RemovePendingPlayer(Player * plr);
 
 	/* Gets the number of free slots */
-	inline uint32 GetFreeSlots(uint32 t)
+	ASCENT_INLINE uint32 GetFreeSlots(uint32 t)
 	{
 		m_mainLock.Acquire();
 		size_t s = m_playerCountPerTeam - m_players[t].size() - m_pendPlayers[t].size();
@@ -311,8 +311,8 @@ public:
 	GameObject * SpawnGameObject(uint32 entry,uint32 MapId , float x, float y, float z, float o, uint32 flags, uint32 faction, float scale);
 	void UpdatePvPData();
 
-	inline uint32 GetStartTime() { return m_startTime; }
-	inline uint32 GetType() { return m_type; }
+	ASCENT_INLINE uint32 GetStartTime() { return m_startTime; }
+	ASCENT_INLINE uint32 GetType() { return m_type; }
 
 	// events should execute in the correct context
 	int32 event_GetInstanceID();
@@ -329,7 +329,7 @@ public:
 	void SetWorldState(uint32 Index, uint32 Value);
 	Creature * SpawnSpiritGuide(float x, float y, float z, float o, uint32 horde);
 
-	inline uint32 GetLastResurrect() { return m_lastResurrect; }
+	ASCENT_INLINE uint32 GetLastResurrect() { return m_lastResurrect; }
 	void AddSpiritGuide(Creature * pCreature);
 	void RemoveSpiritGuide(Creature * pCreature);
 	void QueuePlayerForResurrect(Player * plr, Creature * spirit_healer);

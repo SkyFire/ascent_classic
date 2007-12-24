@@ -40,7 +40,7 @@ public:
 	void DestroyRPlayerInfo(uint32 guid);
 
 	/* get rplayer */
-	inline RPlayerInfo * GetRPlayer(uint32 guid)
+	ASCENT_INLINE RPlayerInfo * GetRPlayer(uint32 guid)
 	{
 		ClientMap::iterator itr = m_clients.find(guid);
 		return (itr != m_clients.end()) ? itr->second : 0;
@@ -49,7 +49,7 @@ public:
 	void SendPackedClientInfo(WServer * server);
 
 	/* get session by id */
-	inline Session * GetSession(uint32 Id) { return (Id < MAX_SESSIONS) ? m_sessions[Id] : 0; }
+	ASCENT_INLINE Session * GetSession(uint32 Id) { return (Id < MAX_SESSIONS) ? m_sessions[Id] : 0; }
 
 	/* create a new session, returns null if the player is already logged in */
 	Session * CreateSession(uint32 AccountId);

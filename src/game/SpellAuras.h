@@ -329,24 +329,24 @@ public:
     void Expire();
     void AddMod(uint32 t, int32 a,uint32 miscValue,uint32 i);
 
-    inline SpellEntry* GetSpellProto() const { return m_spellProto; }
-    inline uint32 GetSpellId() const {return m_spellProto->Id; }
-    inline bool IsPassive(){ if(!m_spellProto) return false; return (m_spellProto->Attributes & 64 && !m_areaAura);}
+    ASCENT_INLINE SpellEntry* GetSpellProto() const { return m_spellProto; }
+    ASCENT_INLINE uint32 GetSpellId() const {return m_spellProto->Id; }
+    ASCENT_INLINE bool IsPassive(){ if(!m_spellProto) return false; return (m_spellProto->Attributes & 64 && !m_areaAura);}
 
-    inline int32 GetDuration() const { return m_duration; }
+    ASCENT_INLINE int32 GetDuration() const { return m_duration; }
     void SetDuration(int32 duration) { m_duration = duration; }
 
-    inline uint8 GetAuraSlot() const { return m_auraSlot; }
+    ASCENT_INLINE uint8 GetAuraSlot() const { return m_auraSlot; }
 	void SetAuraSlot(uint8 slot) { m_auraSlot = slot; }
 
-	inline bool IsPositive() { return m_positive>0; }
+	ASCENT_INLINE bool IsPositive() { return m_positive>0; }
 	void SetNegative(signed char value=1) { m_positive -= value; }
 	void SetPositive(signed char value=1) { m_positive += value; }
 
 	Object* GetCaster();
-	inline uint64 GetCasterGUID(){return m_casterGuid;}
+	ASCENT_INLINE uint64 GetCasterGUID(){return m_casterGuid;}
 	Unit* GetUnitCaster();
-	inline Unit* GetTarget() { return m_target; }
+	ASCENT_INLINE Unit* GetTarget() { return m_target; }
 
 	Aura* StrongerThat(Aura *aur);
 	void ApplyModifiers(bool apply);
@@ -355,7 +355,7 @@ public:
 	void EventUpdateAA(float r);
 	void RemoveAA();
 		
-	inline uint32 GetTimeLeft()//in sec
+	ASCENT_INLINE uint32 GetTimeLeft()//in sec
 	{
 		if(m_duration==-1)return (uint32)-1;
 		int32 n=int32((UNIXTIME-time_t(timeleft))*1000);
@@ -569,7 +569,7 @@ public:
 	void RelocateEvents();
 	int32 event_GetInstanceID();
 
-	inline void SendPeriodicHealAuraLog(uint32 amt)
+	ASCENT_INLINE void SendPeriodicHealAuraLog(uint32 amt)
 	{
 		WorldPacket data(32);
 		data.SetOpcode(SMSG_PERIODICAURALOG);
@@ -582,7 +582,7 @@ public:
 		m_target->SendMessageToSet(&data,true);
 	}
 	// log message's
-	inline void SendPeriodicAuraLog(Unit * Caster, Unit * Target, uint32 SpellID, uint32 School, uint32 Amount, uint32 Flags)
+	ASCENT_INLINE void SendPeriodicAuraLog(Unit * Caster, Unit * Target, uint32 SpellID, uint32 School, uint32 Amount, uint32 Flags)
 	{
 		WorldPacket data(SMSG_PERIODICAURALOG, 46);
 		data << Target->GetNewGUID();		   // target guid
@@ -627,7 +627,7 @@ public:
 	uint32 pSpellId; //this represents the triggering spell id
 
 	// this stuff can be cached in spellproto.
-	inline bool IsCombatStateAffecting()
+	ASCENT_INLINE bool IsCombatStateAffecting()
 	{
 		for(uint32 x = 0; x < 3; ++x) {
 			if(m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_DAMAGE || 
@@ -649,7 +649,7 @@ private:
 	uint32 GetCasterFaction() { return m_casterfaction; }
 	void SetCasterFaction(uint32 faction){ m_casterfaction = faction; }
 
-	inline bool IsInrange(float x1,float y1, float z1, Object * o,float square_r)
+	ASCENT_INLINE bool IsInrange(float x1,float y1, float z1, Object * o,float square_r)
 	{
 		float t;
 		float r;

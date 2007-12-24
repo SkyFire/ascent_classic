@@ -21,7 +21,7 @@
 #define _OBJECTMGR_H
 #include "../shared/Threading/RWLock.h"
 
-inline bool FindXinYString(std::string& x, std::string& y)
+ASCENT_INLINE bool FindXinYString(std::string& x, std::string& y)
 {
 	return y.find(x) != std::string::npos;
 }
@@ -205,7 +205,7 @@ public:
 	void BuildPacket(WorldPacket& Packet);
 	void SendTo(Player* Plr);
 	GossipMenuItem GetItem(uint32 Id);
-	inline void SetTextID(uint32 TID) { TextId = TID; }
+	ASCENT_INLINE void SetTextID(uint32 TID) { TextId = TID; }
 
 protected:
 	uint32 TextId;
@@ -216,7 +216,7 @@ protected:
 class Charter
 {
 public:
-	inline uint32 GetNumberOfSlotsByType()
+	ASCENT_INLINE uint32 GetNumberOfSlotsByType()
 	{
 		switch(CharterType)
 		{
@@ -267,10 +267,10 @@ public:
 	void AddSignature(uint32 PlayerGuid);
 	void RemoveSignature(uint32 PlayerGuid);
 
-	inline uint32 GetLeader() { return LeaderGuid; }
-	inline uint32 GetID() { return CharterId; }
+	ASCENT_INLINE uint32 GetLeader() { return LeaderGuid; }
+	ASCENT_INLINE uint32 GetID() { return CharterId; }
 
-	inline bool IsFull() { return (SignatureCount == Slots); }
+	ASCENT_INLINE bool IsFull() { return (SignatureCount == Slots); }
 };
 
 typedef std::map<uint32, std::list<SpellEntry*>* >                  OverrideIdMap;
@@ -338,7 +338,7 @@ public:
 	// Groups
 	Group * GetGroupByLeader(Player *pPlayer);
 	Group * GetGroupById(uint32 id);
-	inline uint32 GenerateGroupId()
+	ASCENT_INLINE uint32 GenerateGroupId()
 	{
 		uint32 r;
 		m_guidGenMutex.Acquire();
@@ -347,7 +347,7 @@ public:
 		return r;
 	}
 
-	inline uint32 GenerateGuildId()
+	ASCENT_INLINE uint32 GenerateGuildId()
 	{
 		uint32 r;
 		m_guidGenMutex.Acquire();
@@ -536,7 +536,7 @@ public:
 	bool HandleInstanceReputationModifiers(Player * pPlayer, Unit * pVictim);
 	void LoadInstanceReputationModifiers();
 
-	inline bool IsSpellDisabled(uint32 spellid)
+	ASCENT_INLINE bool IsSpellDisabled(uint32 spellid)
 	{
 		if(m_disabled_spells.find(spellid) != m_disabled_spells.end())
 			return true;
@@ -544,8 +544,8 @@ public:
 	}
 
 	void LoadDisabledSpells();
-	inline GuildMap::iterator GetGuildsBegin() { return mGuild.begin(); }
-	inline GuildMap::iterator GetGuildsEnd() { return mGuild.end(); }
+	ASCENT_INLINE GuildMap::iterator GetGuildsBegin() { return mGuild.begin(); }
+	ASCENT_INLINE GuildMap::iterator GetGuildsEnd() { return mGuild.end(); }
 
 	const string& GetCreatureFamilyName(uint32 id);
 	void LoadCreatureFamilyNames();

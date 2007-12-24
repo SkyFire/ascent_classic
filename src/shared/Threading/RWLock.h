@@ -27,7 +27,7 @@ class RWLock
 {
 public: 
   
-	inline void AcquireReadLock()
+	ASCENT_INLINE void AcquireReadLock()
 	{
 		//_lock.Acquire();
 		_cond.BeginSynchronized();
@@ -36,7 +36,7 @@ public:
 		_cond.EndSynchronized();
 	}
 	
-	inline void ReleaseReadLock()
+	ASCENT_INLINE void ReleaseReadLock()
 	{
 		//_lock.Acquire();
 		_cond.BeginSynchronized();
@@ -47,7 +47,7 @@ public:
 		_cond.EndSynchronized();
 	}
 
-	inline void AcquireWriteLock()
+	ASCENT_INLINE void AcquireWriteLock()
 	{
 		//_lock.Acquire();
 		_cond.BeginSynchronized();
@@ -56,14 +56,14 @@ public:
 			_cond.Wait();
 	}
 
-	inline void ReleaseWriteLock()
+	ASCENT_INLINE void ReleaseWriteLock()
 	{
 		if(--_writers)
 			_cond.Signal();
 		//_lock.Release();
 		_cond.EndSynchronized();
 	}
-	inline RWLock() : _cond(&_lock) {_readers=0;_writers=0;}
+	ASCENT_INLINE RWLock() : _cond(&_lock) {_readers=0;_writers=0;}
   
 	private:
 		Mutex _lock;

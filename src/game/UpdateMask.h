@@ -64,11 +64,11 @@ public:
 			if(mUpdateMask[x])break;
 		return (x+1); 
 	}
-	inline uint32 GetBlockCount() const {return mBlocks;}
+	ASCENT_INLINE uint32 GetBlockCount() const {return mBlocks;}
 	
-	inline uint32 GetLength() const { return (mBlocks *sizeof(uint32)); }
-	inline uint32 GetCount() const { return mCount; }
-	inline const uint8* GetMask() const { return (uint8*)mUpdateMask; }
+	ASCENT_INLINE uint32 GetLength() const { return (mBlocks *sizeof(uint32)); }
+	ASCENT_INLINE uint32 GetCount() const { return mCount; }
+	ASCENT_INLINE const uint8* GetMask() const { return (uint8*)mUpdateMask; }
 
 	void SetCount(uint32 valuesCount)
 	{

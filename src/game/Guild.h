@@ -342,7 +342,7 @@ public:
 
 	/** Gets MOTD
 	 */
-	inline const char * GetMOTD() const { return m_motd; }
+	ASCENT_INLINE const char * GetMOTD() const { return m_motd; }
 
 	/** Sets guild information, updates in database
 	 */
@@ -350,7 +350,7 @@ public:
 
 	/** Gets guild information
 	 */
-	inline const char * GetGuildInformation() const { return m_guildInfo; }
+	ASCENT_INLINE const char * GetGuildInformation() const { return m_guildInfo; }
 
 	/** Sends the guild roster to this client.
 	 */
@@ -438,11 +438,11 @@ public:
 
 	/** Getters :P
 	 */
-	inline const char * GetGuildName() const { return m_guildName; }
-	inline const uint32 GetGuildLeader() const { return m_guildLeader; }
-	inline const uint32 GetGuildId() const { return m_guildId; }
-	inline const uint32 GetBankTabCount() const { return m_bankTabCount; }
-	inline const uint32 GetBankBalance() const { return m_bankBalance; }
+	ASCENT_INLINE const char * GetGuildName() const { return m_guildName; }
+	ASCENT_INLINE const uint32 GetGuildLeader() const { return m_guildLeader; }
+	ASCENT_INLINE const uint32 GetGuildId() const { return m_guildId; }
+	ASCENT_INLINE const uint32 GetBankTabCount() const { return m_bankTabCount; }
+	ASCENT_INLINE const uint32 GetBankBalance() const { return m_bankBalance; }
 
 	/** Creates a guild rank with the specified permissions.
 	 */
@@ -466,7 +466,7 @@ public:
 
 	/** Retrieves a guild rank for editing
 	 */
-	inline GuildRank * GetGuildRank(uint32 Id)
+	ASCENT_INLINE GuildRank * GetGuildRank(uint32 Id)
 	{ 
 		if(Id >= MAX_GUILD_RANKS)
 			return NULL;
@@ -477,7 +477,7 @@ public:
 	/** Gets a guild bank tab for editing/viewing
 	 */
 
-	inline GuildBankTab * GetBankTab(uint32 Id)
+	ASCENT_INLINE GuildBankTab * GetBankTab(uint32 Id)
 	{
 		if(Id >= m_bankTabCount)
 			return NULL;
@@ -487,7 +487,7 @@ public:
 
 	/** Gets a guild member struct
 	 */
-	inline GuildMember * GetGuildMember(PlayerInfo * pInfo)
+	ASCENT_INLINE GuildMember * GetGuildMember(PlayerInfo * pInfo)
 	{
 		GuildMemberMap::iterator itr;
 		GuildMember * ret;

@@ -488,7 +488,7 @@ Player::~Player ( )
 		delete (*itr);
 }
 
-inline uint32 GetSpellForLanguage(uint32 SkillID)
+ASCENT_INLINE uint32 GetSpellForLanguage(uint32 SkillID)
 {
 	switch(SkillID)
 	{

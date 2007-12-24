@@ -155,19 +155,19 @@ public:
 	~WorldSession();
 
 	Player * m_loggingInPlayer;
-	inline void SendPacket(WorldPacket* packet)
+	ASCENT_INLINE void SendPacket(WorldPacket* packet)
 	{
 		if(_socket && _socket->IsConnected())
 			_socket->SendPacket(packet);
 	}
 
-	inline void SendPacket(StackBufferBase * packet)
+	ASCENT_INLINE void SendPacket(StackBufferBase * packet)
 	{
 		if(_socket && _socket->IsConnected())
 			_socket->SendPacket(packet);
 	}
 
-	inline void OutPacket(uint16 opcode)
+	ASCENT_INLINE void OutPacket(uint16 opcode)
 	{
 		if(_socket && _socket->IsConnected())
 			_socket->OutPacket(opcode, 0, NULL);
@@ -180,8 +180,8 @@ public:
 	uint32 m_currMsTime;
 	uint32 m_lastPing;
 
-	inline uint32 GetAccountId() const { return _accountId; }
-	inline Player* GetPlayer() { return _player; }
+	ASCENT_INLINE uint32 GetAccountId() const { return _accountId; }
+	ASCENT_INLINE Player* GetPlayer() { return _player; }
 	
 	/* Acct flags */
 	void SetAccountFlags(uint32 flags) { _accountFlags = flags; }
@@ -192,10 +192,10 @@ public:
 	/* GM Permission System */
 	void LoadSecurity(std::string securitystring);
 	void SetSecurity(std::string securitystring);
-	inline char* GetPermissions() { return permissions; }
-	inline int GetPermissionCount() { return permissioncount; }
-	inline bool HasPermissions() { return (permissioncount > 0) ? true : false; }
-	inline bool HasGMPermissions()
+	ASCENT_INLINE char* GetPermissions() { return permissions; }
+	ASCENT_INLINE int GetPermissionCount() { return permissioncount; }
+	ASCENT_INLINE bool HasPermissions() { return (permissioncount > 0) ? true : false; }
+	ASCENT_INLINE bool HasGMPermissions()
 	{
 		if(!permissioncount)
 			return false;
@@ -206,13 +206,13 @@ public:
 	bool CanUseCommand(char cmdstr);
 
 	
-	inline void SetSocket(WorldSocket *sock)
+	ASCENT_INLINE void SetSocket(WorldSocket *sock)
 	{
 		_socket = sock;
 	}
-	inline void SetPlayer(Player *plr) { _player = plr; }
+	ASCENT_INLINE void SetPlayer(Player *plr) { _player = plr; }
 	
-	inline void SetAccountData(uint32 index, char* data, bool initial,uint32 sz)
+	ASCENT_INLINE void SetAccountData(uint32 index, char* data, bool initial,uint32 sz)
 	{
 		ASSERT(index < 8);
 		if(sAccountData[index].data)
@@ -225,7 +225,7 @@ public:
 			sAccountData[index].bIsDirty = false;
 	}
 	
-	inline AccountDataEntry* GetAccountData(uint32 index)
+	ASCENT_INLINE AccountDataEntry* GetAccountData(uint32 index)
 	{
 		ASSERT(index < 8);
 		return &sAccountData[index];
@@ -239,7 +239,7 @@ public:
 
 	void LogoutPlayer(bool Save);
 
-	inline void QueuePacket(WorldPacket* packet)
+	ASCENT_INLINE void QueuePacket(WorldPacket* packet)
 	{
 		_recvQueue.Push(packet);
 	}
@@ -250,7 +250,7 @@ public:
 			_socket->OutPacket(opcode, len, data);
 	}
 
-	inline WorldSocket* GetSocket() { return _socket; }
+	ASCENT_INLINE WorldSocket* GetSocket() { return _socket; }
 	
 	void Disconnect()
 	{
@@ -265,15 +265,15 @@ public:
 	void SendSellItem(uint64 vendorguid, uint64 itemid, uint8 error);
 	void SendNotification(const char *message, ...);
 
-	inline void SetInstance(uint32 Instance) { instanceId = Instance; }
-	inline uint32 GetLatency() { return _latency; }
-	inline string GetAccountName() { return _accountName; }
-	inline const char * GetAccountNameS() { return _accountName.c_str(); }
+	ASCENT_INLINE void SetInstance(uint32 Instance) { instanceId = Instance; }
+	ASCENT_INLINE uint32 GetLatency() { return _latency; }
+	ASCENT_INLINE string GetAccountName() { return _accountName; }
+	ASCENT_INLINE const char * GetAccountNameS() { return _accountName.c_str(); }
 
-	inline uint32 GetClientBuild() { return client_build; }
-	inline void SetClientBuild(uint32 build) { client_build = build; }
+	ASCENT_INLINE uint32 GetClientBuild() { return client_build; }
+	ASCENT_INLINE void SetClientBuild(uint32 build) { client_build = build; }
 	bool bDeleted;
-	inline uint32 GetInstance() { return instanceId; }
+	ASCENT_INLINE uint32 GetInstance() { return instanceId; }
 	Mutex deleteMutex;
 	void _HandleAreaTriggerOpcode(uint32 id);//real handle
 	int32 m_moveDelayTime;
@@ -281,7 +281,7 @@ public:
 
 	void CharacterEnumProc(QueryResult * result);
 	void LoadAccountDataProc(QueryResult * result);
-	inline bool IsLoggingOut() { return _loggingOut; }
+	ASCENT_INLINE bool IsLoggingOut() { return _loggingOut; }
 
 protected:
 

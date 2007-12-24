@@ -41,7 +41,7 @@ Standing Player::GetReputationRankFromStanding(int32 Standing_)
 	return STANDING_EXALTED;
 }
 
-inline void SetFlagAtWar(uint8 & flag)
+ASCENT_INLINE void SetFlagAtWar(uint8 & flag)
 {
 	if(flag & FACTION_FLAG_AT_WAR)
 		return;
@@ -49,7 +49,7 @@ inline void SetFlagAtWar(uint8 & flag)
 	flag |= FACTION_FLAG_AT_WAR;
 }
 
-inline void UnsetFlagAtWar(uint8 & flag)
+ASCENT_INLINE void UnsetFlagAtWar(uint8 & flag)
 {
 	if(!(flag & FACTION_FLAG_AT_WAR))
 		return;
@@ -57,7 +57,7 @@ inline void UnsetFlagAtWar(uint8 & flag)
 	flag &= ~FACTION_FLAG_AT_WAR;
 }
 
-inline void SetFlagVisible(uint8 & flag)
+ASCENT_INLINE void SetFlagVisible(uint8 & flag)
 {
 	if(flag & FACTION_FLAG_VISIBLE)
 		return;
@@ -65,7 +65,7 @@ inline void SetFlagVisible(uint8 & flag)
 	flag |= FACTION_FLAG_VISIBLE;
 }
 
-inline void UnsetFlagVisible(uint8 & flag)
+ASCENT_INLINE void UnsetFlagVisible(uint8 & flag)
 {
 	if(!(flag & FACTION_FLAG_VISIBLE))
 		return;
@@ -73,10 +73,10 @@ inline void UnsetFlagVisible(uint8 & flag)
 	flag &= ~FACTION_FLAG_VISIBLE;
 }
 
-inline bool AtWar(uint8 flag) { return (flag & FACTION_FLAG_AT_WAR) ? true : false; }
-inline bool Visible(uint8 flag) { return (flag & FACTION_FLAG_VISIBLE) ? true : false; }
+ASCENT_INLINE bool AtWar(uint8 flag) { return (flag & FACTION_FLAG_AT_WAR) ? true : false; }
+ASCENT_INLINE bool Visible(uint8 flag) { return (flag & FACTION_FLAG_VISIBLE) ? true : false; }
 
-inline bool RankChanged(int32 Standing, int32 Change)
+ASCENT_INLINE bool RankChanged(int32 Standing, int32 Change)
 {
 	if(Player::GetReputationRankFromStanding(Standing) != Player::GetReputationRankFromStanding(Standing + Change))
 		return true;
@@ -84,7 +84,7 @@ inline bool RankChanged(int32 Standing, int32 Change)
 		return false;
 }
 
-inline bool RankChangedFlat(int32 Standing, int32 NewStanding)
+ASCENT_INLINE bool RankChangedFlat(int32 Standing, int32 NewStanding)
 {
 	if(Player::GetReputationRankFromStanding(Standing) != Player::GetReputationRankFromStanding(NewStanding))
 		return true;

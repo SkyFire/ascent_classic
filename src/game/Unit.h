@@ -616,18 +616,18 @@ public:
 
 	void UpdateFlag();												// detects if we have changed combat state (in/out), and applies the flag.
 
-	inline bool IsInCombat() { return m_lastStatus; }				// checks if we are in combat or not.
+	ASCENT_INLINE bool IsInCombat() { return m_lastStatus; }				// checks if we are in combat or not.
 
 	void OnRemoveFromWorld();										// called when we are removed from world, kills all references to us.
 	
-	inline void Vanished()
+	ASCENT_INLINE void Vanished()
 	{
 		ClearAttackers();
 		ClearHealers();
 	}
 
-	inline const uint64& GetPrimaryAttackTarget() { return m_primaryAttackTarget; }
-	inline void SetUnit(Unit * p) { m_Unit = p; }
+	ASCENT_INLINE const uint64& GetPrimaryAttackTarget() { return m_primaryAttackTarget; }
+	ASCENT_INLINE void SetUnit(Unit * p) { m_Unit = p; }
 	void TryToClearAttackTargets();									// for pvp timeout
 	void AttackersForgetHate();										// used right now for Feign Death so attackers go home
 
@@ -672,7 +672,7 @@ public:
 	virtual void RemoveFromWorld(bool free_guid);
 	virtual void OnPushToWorld();
 
-    inline void setAttackTimer(int32 time, bool offhand)
+    ASCENT_INLINE void setAttackTimer(int32 time, bool offhand)
 	{
 		if(!time)
 			time = offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
@@ -687,7 +687,7 @@ public:
 			m_attackTimer = getMSTime() + time;
 	}
 
-	inline bool isAttackReady(bool offhand) const
+	ASCENT_INLINE bool isAttackReady(bool offhand) const
 	{
 		if(!offhand)
 			return getMSTime() >= m_attackTimer;
@@ -695,7 +695,7 @@ public:
 			return getMSTime() >= m_attackTimer_1;
 	}
 
-	inline void SetDuelWield(bool enabled)
+	ASCENT_INLINE void SetDuelWield(bool enabled)
 	{
 		m_duelWield = enabled;
 	}
@@ -705,21 +705,21 @@ public:
   //  void StrikeWithAbility(Unit *pVictim,Spell*spell,uint32 addspelldmg,uint32 damage_type);
 
 	/// State flags are server-only flags to help me know when to do stuff, like die, or attack
-	inline void addStateFlag(uint32 f) { m_state |= f; };
-	inline bool hasStateFlag(uint32 f) { return (m_state & f ? true : false); }
-	inline void clearStateFlag(uint32 f) { m_state &= ~f; };
+	ASCENT_INLINE void addStateFlag(uint32 f) { m_state |= f; };
+	ASCENT_INLINE bool hasStateFlag(uint32 f) { return (m_state & f ? true : false); }
+	ASCENT_INLINE void clearStateFlag(uint32 f) { m_state &= ~f; };
 
 	/// Stats
-	inline uint32 getLevel() { return m_uint32Values[ UNIT_FIELD_LEVEL ]; };
-	inline uint8 getRace() { return GetByte(UNIT_FIELD_BYTES_0,0); }
-	inline uint8 getClass() { return GetByte(UNIT_FIELD_BYTES_0,1); }
-	inline void setRace(uint8 race) { SetByte(UNIT_FIELD_BYTES_0,0,race); }
-	inline void setClass(uint8 class_) { SetByte(UNIT_FIELD_BYTES_0,1, class_ ); }
-	inline uint32 getClassMask() { return 1 << (getClass() - 1); }
-	inline uint32 getRaceMask() { return 1 << (getRace() - 1); }
-	inline uint8 getGender() { return GetByte(UNIT_FIELD_BYTES_0,2); }
-	inline void setGender(uint8 gender) { SetByte(UNIT_FIELD_BYTES_0,2,gender); }
-	inline uint8 getStandState() { return ((uint8)m_uint32Values[UNIT_FIELD_BYTES_1]); }
+	ASCENT_INLINE uint32 getLevel() { return m_uint32Values[ UNIT_FIELD_LEVEL ]; };
+	ASCENT_INLINE uint8 getRace() { return GetByte(UNIT_FIELD_BYTES_0,0); }
+	ASCENT_INLINE uint8 getClass() { return GetByte(UNIT_FIELD_BYTES_0,1); }
+	ASCENT_INLINE void setRace(uint8 race) { SetByte(UNIT_FIELD_BYTES_0,0,race); }
+	ASCENT_INLINE void setClass(uint8 class_) { SetByte(UNIT_FIELD_BYTES_0,1, class_ ); }
+	ASCENT_INLINE uint32 getClassMask() { return 1 << (getClass() - 1); }
+	ASCENT_INLINE uint32 getRaceMask() { return 1 << (getRace() - 1); }
+	ASCENT_INLINE uint8 getGender() { return GetByte(UNIT_FIELD_BYTES_0,2); }
+	ASCENT_INLINE void setGender(uint8 gender) { SetByte(UNIT_FIELD_BYTES_0,2,gender); }
+	ASCENT_INLINE uint8 getStandState() { return ((uint8)m_uint32Values[UNIT_FIELD_BYTES_1]); }
  
 	//// Combat
    // void DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId = 0);   // to stop from falling, etc
@@ -748,9 +748,9 @@ public:
     void CalculateResistanceReduction(Unit *pVictim,dealdamage *dmg) ;
 	void RegenerateHealth();
 	void RegeneratePower(bool isinterrupted);
-	inline void setHRegenTimer(uint32 time) {m_H_regenTimer = time; }
-	inline void setPRegenTimer(uint32 time) {m_P_regenTimer = time; }
-	inline void DelayPowerRegeneration(uint32 time) { m_interruptedRegenTime = time; }
+	ASCENT_INLINE void setHRegenTimer(uint32 time) {m_H_regenTimer = time; }
+	ASCENT_INLINE void setPRegenTimer(uint32 time) {m_P_regenTimer = time; }
+	ASCENT_INLINE void DelayPowerRegeneration(uint32 time) { m_interruptedRegenTime = time; }
 	void DeMorph();
 	uint32 ManaShieldAbsorb(uint32 dmg);
 	void smsg_AttackStart(Unit* pVictim);
@@ -762,10 +762,10 @@ public:
 	float get_chance_to_daze(Unit *target);
 
 	// Stealth  
-	inline int32 GetStealthLevel() { return m_stealthLevel; }
-	inline int32 GetStealthDetectBonus() { return m_stealthDetectBonus; }
-	inline void SetStealth(uint32 id) { m_stealth = id; }
-	inline bool IsStealth() { return (m_stealth!=0 ? true : false); }
+	ASCENT_INLINE int32 GetStealthLevel() { return m_stealthLevel; }
+	ASCENT_INLINE int32 GetStealthDetectBonus() { return m_stealthDetectBonus; }
+	ASCENT_INLINE void SetStealth(uint32 id) { m_stealth = id; }
+	ASCENT_INLINE bool IsStealth() { return (m_stealth!=0 ? true : false); }
 	float detectRange;
 
 	// Invisibility
@@ -781,8 +781,8 @@ public:
 	void GiveGroupXP(Unit *pVictim, Player *PlayerInGroup);
 
 	/// Combat / Death Status
-	inline bool isAlive() { return m_deathState == ALIVE; };
-	inline bool isDead() { return  m_deathState !=ALIVE; };
+	ASCENT_INLINE bool isAlive() { return m_deathState == ALIVE; };
+	ASCENT_INLINE bool isDead() { return  m_deathState !=ALIVE; };
 	virtual void setDeathState(DeathState s) {
 		m_deathState = s;
 	};
@@ -850,8 +850,8 @@ public:
 	std::map<uint32,struct SpellCharge> m_chargeSpells;
 	deque<uint32> m_chargeSpellRemoveQueue;
 	bool m_chargeSpellsInUse;
-	inline void SetOnMeleeSpell(uint32 spell ) { m_meleespell = spell; }
-	inline uint32 GetOnMeleeSpell() { return m_meleespell; }
+	ASCENT_INLINE void SetOnMeleeSpell(uint32 spell ) { m_meleespell = spell; }
+	ASCENT_INLINE uint32 GetOnMeleeSpell() { return m_meleespell; }
 
 	// Spell Crit
 	float spellcritperc;
@@ -861,7 +861,7 @@ public:
 	void ClearHateList();
 	void WipeHateList();
 	void WipeTargetList();
-	inline void setAItoUse(bool value){m_useAI = value;}
+	ASCENT_INLINE void setAItoUse(bool value){m_useAI = value;}
 
 
 	int32 GetThreatModifyer() { return m_threatModifyer; }
@@ -870,12 +870,12 @@ public:
 	void ModGeneratedThreatModifyer(int32 mod) { m_generatedThreatModifyer += mod; }
 
 	// DK:Affect
-	inline uint32 IsPacified() { return m_pacified; }
-	inline uint32 IsStunned() { return m_stunned; }
-	inline uint32 GetResistChanceMod() { return m_resistChance; }
-	inline void SetResistChanceMod(uint32 amount) { m_resistChance=amount; }
+	ASCENT_INLINE uint32 IsPacified() { return m_pacified; }
+	ASCENT_INLINE uint32 IsStunned() { return m_stunned; }
+	ASCENT_INLINE uint32 GetResistChanceMod() { return m_resistChance; }
+	ASCENT_INLINE void SetResistChanceMod(uint32 amount) { m_resistChance=amount; }
 	
-	inline uint16 HasNoInterrupt() { return m_noInterrupt; }
+	ASCENT_INLINE uint16 HasNoInterrupt() { return m_noInterrupt; }
 	bool setDetectRangeMod(uint64 guid, int32 amount);
 	void unsetDetectRangeMod(uint64 guid);
 	int32 getDetectRangeMod(uint64 guid);
@@ -951,15 +951,15 @@ public:
 	void Emote (EmoteType emote);
 	void EventAddEmote(EmoteType emote, uint32 time);
 	void EmoteExpire();
-	inline void setEmoteState(uint8 emote) { m_emoteState = emote; };
-	inline uint32 GetOldEmote() { return m_oldEmote; }
+	ASCENT_INLINE void setEmoteState(uint8 emote) { m_emoteState = emote; };
+	ASCENT_INLINE uint32 GetOldEmote() { return m_oldEmote; }
 	void EventSummonPetExpire();
 	void EventAurastateExpire(uint32 aurastateflag){RemoveFlag(UNIT_FIELD_AURASTATE,aurastateflag);} //hmm this looks like so not necesary :S
 	void EventHealthChangeSinceLastUpdate();
 
 	void SetStandState (uint8 standstate);
 
-	inline StandState GetStandState()
+	ASCENT_INLINE StandState GetStandState()
 	{
 		uint32 bytes1 = GetUInt32Value (UNIT_FIELD_BYTES_1);
 		return StandState (uint8 (bytes1));
@@ -973,26 +973,26 @@ public:
 	void SendNotifyToNearby(uint32 msgid);
 	void SendNotifyToNearbyCreature(uint32 msgid, uint32 entryid);
 
-	inline int GetHealthPct() { return (int)(GetUInt32Value(UNIT_FIELD_HEALTH) * 100 / GetUInt32Value(UNIT_FIELD_MAXHEALTH)); };
-    inline void SetHealthPct(uint32 val) { if (val>0) SetUInt32Value(UNIT_FIELD_HEALTH,float2int32(val*0.01f*GetUInt32Value(UNIT_FIELD_MAXHEALTH))); };
-	inline int GetManaPct() { return (int)(GetUInt32Value(UNIT_FIELD_POWER1) * 100 / GetUInt32Value(UNIT_FIELD_MAXPOWER1)); };
+	ASCENT_INLINE int GetHealthPct() { return (int)(GetUInt32Value(UNIT_FIELD_HEALTH) * 100 / GetUInt32Value(UNIT_FIELD_MAXHEALTH)); };
+    ASCENT_INLINE void SetHealthPct(uint32 val) { if (val>0) SetUInt32Value(UNIT_FIELD_HEALTH,float2int32(val*0.01f*GetUInt32Value(UNIT_FIELD_MAXHEALTH))); };
+	ASCENT_INLINE int GetManaPct() { return (int)(GetUInt32Value(UNIT_FIELD_POWER1) * 100 / GetUInt32Value(UNIT_FIELD_MAXPOWER1)); };
 		
 	uint32 GetResistance(uint32 type);	
 	
 	//Pet
-	inline void SetIsPet(bool chck) { m_isPet = chck; }
+	ASCENT_INLINE void SetIsPet(bool chck) { m_isPet = chck; }
 	
 	//In-Range
 	virtual void AddInRangeObject(Object* pObj);
 	virtual void OnRemoveInRangeObject(Object* pObj);
 	void ClearInRangeSet();
 
-	inline Spell * GetCurrentSpell(){return m_currentSpell;}
-	inline void SetCurrentSpell(Spell* cSpell) { m_currentSpell = cSpell; }
+	ASCENT_INLINE Spell * GetCurrentSpell(){return m_currentSpell;}
+	ASCENT_INLINE void SetCurrentSpell(Spell* cSpell) { m_currentSpell = cSpell; }
 
 	uint32 m_CombatUpdateTimer;
 
-	inline void setcanperry(bool newstatus){can_parry=newstatus;}
+	ASCENT_INLINE void setcanperry(bool newstatus){can_parry=newstatus;}
 		
 	std::map<uint32,Aura*> tmpAura;
 
@@ -1013,7 +1013,7 @@ public:
 
 	float PctRegenModifier;//1.0 by default
 	float PctPowerRegenModifier[4];
-	inline uint32 GetPowerType(){ return (GetUInt32Value(UNIT_FIELD_BYTES_0)>> 24);}
+	ASCENT_INLINE uint32 GetPowerType(){ return (GetUInt32Value(UNIT_FIELD_BYTES_0)>> 24);}
 	void RemoveSoloAura(uint32 type);
 
 	void RemoveAurasByInterruptFlag(uint32 flag);
@@ -1073,19 +1073,19 @@ public:
 	Creature *critterPet;
 	Creature *summonPet;
 
-	inline uint32 GetCharmTempVal() { return m_charmtemp; }
-	inline void SetCharmTempVal(uint32 val) { m_charmtemp = val; }
+	ASCENT_INLINE uint32 GetCharmTempVal() { return m_charmtemp; }
+	ASCENT_INLINE void SetCharmTempVal(uint32 val) { m_charmtemp = val; }
 	set<uint32> m_SpellList;
 
-	inline void DisableAI() { m_useAI = false; }
-	inline void EnableAI() { m_useAI = true; }
+	ASCENT_INLINE void DisableAI() { m_useAI = false; }
+	ASCENT_INLINE void EnableAI() { m_useAI = true; }
 
-	inline void SetPowerType(uint8 type)
+	ASCENT_INLINE void SetPowerType(uint8 type)
 	{
 		SetByte(UNIT_FIELD_BYTES_0,3,type);
 	}
 
-	inline bool IsSpiritHealer()
+	ASCENT_INLINE bool IsSpiritHealer()
 	{
 		switch(GetEntry())
 		{
