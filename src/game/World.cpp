@@ -4900,8 +4900,8 @@ struct insert_playeritem
 void CharacterLoaderThread::OnShutdown()
 {
 #ifdef WIN32
-	SetEvent(hEvent);
 	running=false;
+	SetEvent(hEvent);
 #endif
 }
 
