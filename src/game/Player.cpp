@@ -1446,6 +1446,8 @@ void Player::smsg_InitialSpells()
 
 	if (itemCount)
 	{
+		size_t pos = data.wpos();
+		size_t count = 0;
 	   data << uint16(itemCount);			   // item / spell count
 	   ItemCooldownSet::iterator itr, itr2;
 	   uint32 n = now();
@@ -1476,7 +1478,13 @@ void Player::smsg_InitialSpells()
 			}
 
 			++itr;
+			++count;
 		}
+#ifdef USING_BIG_ENDIAN
+	   *(uint16*)data.contents()[pos] = swap16((uint16)count);
+#else
+	   *(uint16*)data.contents()[pos] = (uint16)count;
+#endif
 	}
 	else
 	{
