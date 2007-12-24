@@ -42,26 +42,30 @@ enum GAMEOBJECT_FLAG_BIT
 	GAMEOBJECT_CLICKABLE = 0x20,
 };
 
-#ifdef ENABLE_SHITTY_STL_HACKS
+#if ENABLE_SHITTY_STL_HACKS == 1
 typedef HM_NAMESPACE::hash_map<Quest*, uint32 > GameObjectGOMap;
 #else
-template <>
-struct hash<Quest*>
+namespace HM_NAMESPACE
 {
-	union __vp
+	template <>
+	struct hash<Quest*>
 	{
-		size_t s;
-		Quest* p;
-	};
+		union __vp
+		{
+			size_t s;
+			Quest* p;
+		};
 
-	size_t operator()(Quest* __x) const
-	{
-		__vp vp;
-		vp.p = __x;
-		return vp.s;
-	}
+		size_t operator()(Quest* __x) const
+		{
+			__vp vp;
+			vp.p = __x;
+			return vp.s;
+		}
+	};
 };
-typedef HM_NAMESPACE::hash_map<Quest*, uint32, hash<Quest*> > GameObjectGOMap;
+
+typedef HM_NAMESPACE::hash_map<Quest*, uint32, HM_NAMESPACE::hash<Quest*> > GameObjectGOMap;
 #endif
 
 typedef HM_NAMESPACE::hash_map<Quest*, std::map<uint32, uint32> > GameObjectItemMap;

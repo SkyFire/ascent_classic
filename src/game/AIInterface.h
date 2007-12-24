@@ -185,27 +185,31 @@ struct AI_Spell
 bool isGuard(uint32 id);
 uint32 getGuardId(uint32 id);
 
-#ifdef ENABLE_SHITTY_STL_HACKS
+#if ENABLE_SHITTY_STL_HACKS == 1
 typedef HM_NAMESPACE::hash_map<Unit*, int32> TargetMap;
 #else
-template <>
-struct hash<Unit*>
+namespace HM_NAMESPACE
 {
-	union __vp {
-		size_t s;
-		Unit* p;
-	};
-
-	size_t operator()(Unit* __x) const
+	template <>
+	struct hash<Unit*>
 	{
-		__vp vp;
-		vp.p = __x;
-		return vp.s;
-	}
+		union __vp {
+			size_t s;
+			Unit* p;
+		};
+
+		size_t operator()(Unit* __x) const
+		{
+			__vp vp;
+			vp.p = __x;
+			return vp.s;
+		}
+	};
 };
 
-typedef HM_NAMESPACE::hash_map<Unit*, int32, hash<Unit*> > TargetMap;
+typedef HM_NAMESPACE::hash_map<Unit*, int32, HM_NAMESPACE::hash<Unit*> > TargetMap;
 #endif
+
 typedef std::set<Unit*> AssistTargetSet;
 typedef std::map<uint32, AI_Spell*> SpellMap;
 
