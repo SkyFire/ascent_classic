@@ -54,7 +54,7 @@ enum MsTimeVariables
 #ifdef WIN32
 #define ASCENT_INLINE __forceinline
 #else
-#define ASCENT_INLINE ASCENT_INLINE
+#define ASCENT_INLINE inline
 #endif
 
 #ifdef HAVE_CONFIG_H
