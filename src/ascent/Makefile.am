@@ -17,6 +17,7 @@ ascent_LDFLAGS = -L$(srcdir)/../shared \
                -L$(srcdir)/../game \
                -L$(srcdir)/../../dep/src/zlib \
                -L$(srcdir)/../../dep/src/lua \
+               -L$(srcdir)/../../dep/src/pcre \
                -L$(srcdir)/../../dep/src \
                -Wl,-export-dynamic
 #               @DLL_EXPORT@
