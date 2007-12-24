@@ -32,6 +32,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "realmserver", "VC90\realmse
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua", "VC90\lua.vcproj", "{10083E8F-1732-4870-BB74-10AB310B0FE3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcre", "VC90\pcre.vcproj", "{311F016D-F785-47EF-B032-5350397F16B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -92,6 +94,12 @@ Global
 		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Release|Win32.Build.0 = Release|Win32
 		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Release|x64.ActiveCfg = Release|x64
 		{10083E8F-1732-4870-BB74-10AB310B0FE3}.Release|x64.Build.0 = Release|x64
+		{311F016D-F785-47EF-B032-5350397F16B6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{311F016D-F785-47EF-B032-5350397F16B6}.Debug|Win32.Build.0 = Debug|Win32
+		{311F016D-F785-47EF-B032-5350397F16B6}.Debug|x64.ActiveCfg = Debug|x64
+		{311F016D-F785-47EF-B032-5350397F16B6}.Release|Win32.ActiveCfg = Release|Win32
+		{311F016D-F785-47EF-B032-5350397F16B6}.Release|Win32.Build.0 = Release|Win32
+		{311F016D-F785-47EF-B032-5350397F16B6}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

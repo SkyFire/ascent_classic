@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="lua"
-	ProjectGUID="{10083E8F-1732-4870-BB74-10AB310B0FE3}"
-	RootNamespace="lua"
+	Name="pcre"
+	ProjectGUID="{311F016D-F785-47EF-B032-5350397F16B6}"
+	RootNamespace="pcre"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -20,9 +20,10 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\lua___Win32_Debug"
-			IntermediateDirectory=".\lua___Win32_Debug"
+			OutputDirectory=".\pcre___Win32_Debug"
+			IntermediateDirectory=".\pcre___Win32_Debug"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -43,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;HAVE_CONFIG_H"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -63,7 +64,70 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile=".\lua___Win32_Debug\lua.lib"
+				OutputFile=".\pcre___Win32_Debug\pcre.lib"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory=".\pcre___Win32_Release"
+			IntermediateDirectory=".\pcre___Win32_Release"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;HAVE_CONFIG_H"
+				RuntimeLibrary="2"
+				EnableEnhancedInstructionSet="0"
+				FloatingPointModel="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile=".\pcre___Win32_Release\pcre.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -83,9 +147,10 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory=".\lua___Win32_Debug_x64"
-			IntermediateDirectory=".\lua___Win32_Debug_x64"
+			OutputDirectory=".\pcre___x64_Debug"
+			IntermediateDirectory=".\pcre___x64_Debug"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -107,7 +172,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;X64"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;HAVE_CONFIG_H"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -127,77 +192,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile=".\lua___Win32_Debug_x64\lua.lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory=".\lua___Win32_Release_x64"
-			IntermediateDirectory=".\lua___Win32_Release"
-			ConfigurationType="4"
-			CharacterSet="2"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				WholeProgramOptimization="true"
-				PreprocessorDefinitions="_HAS_ITERATOR_DEBUGGING=0;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="0"
-				BufferSecurityCheck="false"
-				EnableEnhancedInstructionSet="0"
-				FloatingPointModel="2"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile=".\lua___Win32_Release\lua.lib"
+				OutputFile=".\pcre___x64_Debug\pcre.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -217,9 +212,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory=".\lua___Win32_Release_x64"
-			IntermediateDirectory=".\lua___Win32_Release_x64"
+			OutputDirectory=".\pcre___x64_Release"
+			IntermediateDirectory=".\pcre___x64_Release"
 			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
 			>
 			<Tool
@@ -241,8 +237,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
-				PreprocessorDefinitions="_HAS_ITERATOR_DEBUGGING=0;WIN32;NDEBUG;_LIB_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;X64"
+				InlineFunctionExpansion="2"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;HAVE_CONFIG_H"
+				StringPooling="true"
+				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
+				BufferSecurityCheck="true"
 				EnableEnhancedInstructionSet="2"
 				FloatingPointModel="2"
 				UsePrecompiledHeader="0"
@@ -261,7 +262,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile=".\lua___Win32_Release_x64\lua.lib"
+				OutputFile=".\pcre___x64_Release\pcre.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -284,215 +285,95 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\dep\src\lua\lapi.c"
+			RelativePath="..\..\dep\src\pcre\config.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lapi.h"
+			RelativePath="..\..\dep\src\pcre\pcre.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lauxlib.c"
+			RelativePath="..\..\dep\src\pcre\pcre_chartables.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lauxlib.h"
+			RelativePath="..\..\dep\src\pcre\pcre_compile.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lbaselib.c"
+			RelativePath="..\..\dep\src\pcre\pcre_config.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lcode.c"
+			RelativePath="..\..\dep\src\pcre\pcre_dfa_exec.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lcode.h"
+			RelativePath="..\..\dep\src\pcre\pcre_exec.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\ldblib.c"
+			RelativePath="..\..\dep\src\pcre\pcre_fullinfo.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\ldebug.c"
+			RelativePath="..\..\dep\src\pcre\pcre_get.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\ldebug.h"
+			RelativePath="..\..\dep\src\pcre\pcre_globals.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\ldo.c"
+			RelativePath="..\..\dep\src\pcre\pcre_info.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\ldo.h"
+			RelativePath="..\..\dep\src\pcre\pcre_internal.h"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\ldump.c"
+			RelativePath="..\..\dep\src\pcre\pcre_maketables.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lfunc.c"
+			RelativePath="..\..\dep\src\pcre\pcre_newline.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lfunc.h"
+			RelativePath="..\..\dep\src\pcre\pcre_ord2utf8.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lgc.c"
+			RelativePath="..\..\dep\src\pcre\pcre_refcount.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lgc.h"
+			RelativePath="..\..\dep\src\pcre\pcre_study.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\linit.c"
+			RelativePath="..\..\dep\src\pcre\pcre_tables.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\liolib.c"
+			RelativePath="..\..\dep\src\pcre\pcre_try_flipped.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\llex.c"
+			RelativePath="..\..\dep\src\pcre\pcre_ucp_searchfuncs.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\llex.h"
+			RelativePath="..\..\dep\src\pcre\pcre_valid_utf8.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\llimits.h"
+			RelativePath="..\..\dep\src\pcre\pcre_version.c"
 			>
 		</File>
 		<File
-			RelativePath="..\..\dep\src\lua\lmathlib.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lmem.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lmem.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\loadlib.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lobject.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lobject.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lopcodes.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lopcodes.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\loslib.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lparser.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lparser.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lstate.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lstate.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lstring.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lstring.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lstrlib.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\ltable.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\ltable.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\ltablib.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\ltm.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\ltm.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lua.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\luaconf.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lualib.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lundump.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lundump.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lvm.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lvm.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lzio.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\lzio.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\dep\src\lua\print.c"
+			RelativePath="..\..\dep\src\pcre\pcre_xclass.c"
 			>
 		</File>
 	</Files>

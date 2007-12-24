@@ -57,6 +57,9 @@
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile=".\..\..\bin\Release/ascent.pdb"
 				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
 				FixedBaseAddress="1"/>
 			<Tool
 				Name="VCMIDLTool"
