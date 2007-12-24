@@ -24,6 +24,8 @@
 #pragma warning(disable:4312)
 #endif
 
+#define STORAGE_ARRAY_MAX 200000
+
 /** Base iterator class, returned by MakeIterator() functions.
  */
 template<class T>
@@ -575,10 +577,17 @@ public:
 		if(Storage<T, StorageType>::_storage.NeedsMax())
 		{
 			result = WorldDatabase.Query("SELECT MAX(entry) FROM %s", IndexName);
-			uint32 Max = 999999;
+			uint32 Max = STORAGE_ARRAY_MAX;
 			if(result)
 			{
 				Max = result->Fetch()[0].GetUInt32() + 1;
+				if(Max > STORAGE_ARRAY_MAX)
+				{
+					Log.Error("Storage", "The table, '%s', has a maximum entry of %u, which is higher than %u. Any items higher than this id will not be loaded.",
+						IndexName, STORAGE_ARRAY_MAX);
+
+					Max = STORAGE_ARRAY_MAX;
+				}
 				delete result;
 			}
 
@@ -629,16 +638,23 @@ public:
 		if(Storage<T, StorageType>::_storage.NeedsMax())
 		{
 			result = WorldDatabase.Query("SELECT MAX(entry) FROM %s", IndexName);
-			uint32 Max = 999999;
+			uint32 Max = STORAGE_ARRAY_MAX;
 			if(result)
 			{
 				Max = result->Fetch()[0].GetUInt32() + 1;
+				if(Max > STORAGE_ARRAY_MAX)
+				{
+					Log.Error("Storage", "The table, '%s', has a maximum entry of %u, which is higher than %u. Any items higher than this id will not be loaded.",
+						IndexName, STORAGE_ARRAY_MAX);
+
+					Max = STORAGE_ARRAY_MAX;
+				}
 				delete result;
 			}
 
 			Storage<T, StorageType>::_storage.Resetup(Max);
 		}
-
+		
 		size_t cols = strlen(FormatString);
 		result = WorldDatabase.Query("SELECT * FROM %s", IndexName);
 		if (!result)
@@ -688,7 +704,13 @@ public:
 		if(!Max)
 			return;
 
-		Storage<T, StorageType>::_storage.Resetup(Max+1);
+		if(Storage<T, StorageType>::_storage.NeedsMax())
+		{
+			if(Max > STORAGE_ARRAY_MAX)
+				Max = STORAGE_ARRAY_MAX;
+
+			Storage<T, StorageType>::_storage.Resetup(Max+1);
+		}
 
 		size_t cols = strlen(Storage<T, StorageType>::_formatString);
 		result = WorldDatabase.Query("SELECT * FROM %s", Storage<T, StorageType>::_indexName);
@@ -709,7 +731,9 @@ public:
 		{
 			Entry = fields[0].GetUInt32();
 			Allocated = Storage<T, StorageType>::_storage.LookupEntryAllocate(Entry);
-			LoadBlock(fields, Allocated);
+			if(Allocated)
+				LoadBlock(fields, Allocated);
+
 		} while(result->NextRow());
 		delete result;
 	}
