@@ -48,7 +48,7 @@ createFileSingleton( oLog );
 createFileSingleton(CLog);
 initialiseSingleton( WorldLog );
 
-time_t UNIXTIME;
+SERVER_DECL time_t UNIXTIME;
 #ifndef WIN32
 static const char* colorstrings[TBLUE+1] = {
 "",

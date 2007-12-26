@@ -1530,13 +1530,6 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 		else 
 			(*dmg).resisted_damage=0; 
 	}
-	// Checks for random bugs on spells
-	if ( (*dmg).full_damage > 10000 && GetTypeId() == TYPEID_PLAYER && ((Player*)this)->GetSession()->GetPermissionCount() == 0) // hits higher then 5.5k must be bugged
-	{
-		sCheatLog.writefromsession(static_cast<Player*>(this)->GetSession(),"some how caused %u damage using spell %u",(*dmg).full_damage,GetCurrentSpell());
-		(*dmg).resisted_damage = (*dmg).full_damage;
-		sChatHandler.RedSystemMessage(static_cast<Player*>(this)->GetSession(),"Your actions have been logged, please tell a GM how to re-produce this damage bug or risk getting banned.");
-	}
 	//sLog.outDebug("calc resistance - damage: %d , dmg type: %d , dmg abs: %d\n",*damage,damage_type,*dmgabs);
 }
 

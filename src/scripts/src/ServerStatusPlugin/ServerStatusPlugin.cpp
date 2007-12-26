@@ -27,7 +27,7 @@ bool m_bFirstTime = true;
 LONGLONG		m_lnOldValue = 0;
 LARGE_INTEGER	m_OldPerfTime100nSec;
 uint32 number_of_cpus;
-time_t UNIXTIME; // some crappy fix for crappy error.
+//time_t UNIXTIME; // some crappy fix for crappy error.
 #endif
 
 #ifdef WIN32
