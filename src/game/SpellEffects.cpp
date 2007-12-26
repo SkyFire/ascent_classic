@@ -1364,26 +1364,47 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 			{
 				if(unitTarget)
 				{
-					bool consumed_aura=false;
+					uint32 new_dmg=0;
 					//consume rejuvenetaion and regrowth
-					if(unitTarget->HasAurasWithNameHash(0x62AFD7AC))
+					Aura *taura=unitTarget->FindAuraPosByNameHash(0x62AFD7AC); //Regrowth
+					if(taura && taura->GetSpellProto())
 					{
-						consumed_aura = true;
+						uint32 amplitude=taura->GetSpellProto()->EffectAmplitude[1]/1000;
+						if(!amplitude)
+							amplitude=3;
+						//our hapiness is that we did not store the aura mod amount so we have to recalc it
+						Spell *spell = new Spell(m_caster, taura->GetSpellProto() ,false, NULL);				
+						uint32 healamount = spell->CalculateEffect(1,unitTarget);  
+						delete spell;
+						new_dmg = healamount * 18/amplitude;
 						//do not remove flag is we still can cat it again
 						if(!unitTarget->HasAurasWithNameHash(0x431BDB1B))
 						{
 							unitTarget->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE);	
 							sEventMgr.RemoveEvents(unitTarget,EVENT_REJUVENATION_FLAG_EXPIRE);
 						}
+						unitTarget->RemoveAura(taura);
 					}
-					else if(unitTarget->HasAurasWithNameHash(0x431BDB1B))
+					else
 					{
-						consumed_aura = true;
-						unitTarget->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE);	
-						sEventMgr.RemoveEvents(unitTarget,EVENT_REJUVENATION_FLAG_EXPIRE);
+						taura=unitTarget->FindAuraPosByNameHash(0x431BDB1B);//Rejuvenation
+						if(taura && taura->GetSpellProto())
+						{
+							uint32 amplitude=taura->GetSpellProto()->EffectAmplitude[0]/1000;
+							if(!amplitude)
+								amplitude=3;
+							//our hapiness is that we did not store the aura mod amount so we have to recalc it
+							Spell *spell = new Spell(m_caster, taura->GetSpellProto() ,false, NULL);				
+							uint32 healamount = spell->CalculateEffect(0,unitTarget);  
+							delete spell;
+							new_dmg = healamount * 12/amplitude;
+							unitTarget->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE);	
+							sEventMgr.RemoveEvents(unitTarget,EVENT_REJUVENATION_FLAG_EXPIRE);
+							unitTarget->RemoveAura(taura);
+						}
 					}
-					if(consumed_aura)
-						Heal((int32)damage);
+					if(new_dmg)
+						Heal((int32)new_dmg);
 				}
 			}break;
 		default:

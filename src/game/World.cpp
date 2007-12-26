@@ -2814,6 +2814,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[1]=79;
 		sp->EffectBasePoints[1]=4; //4+1=5
 		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntry(25228);
 	if (sp)

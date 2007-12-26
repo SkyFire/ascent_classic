@@ -3128,6 +3128,22 @@ bool Unit::SetAurDuration(uint32 spellId,uint32 duration)
 	return true;
 }
 
+
+Aura* Unit::FindAuraPosByNameHash(uint32 namehash)
+{
+	for(uint32 x=0;x<MAX_POSITIVE_AURAS;x++)
+	{
+		if(m_auras[x])
+		{
+			if(m_auras[x]->GetSpellProto()->NameHash==namehash)
+			{
+				return m_auras[x];
+			}
+		}
+	}
+	return NULL;
+}
+
 Aura* Unit::FindAura(uint32 spellId)
 {
 	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)

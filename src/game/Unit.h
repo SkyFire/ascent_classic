@@ -818,6 +818,7 @@ public:
 	void RemoveAllAreaAuras();
 	// Temporary remove all auras
 	   // Find auras
+	Aura *FindAuraPosByNameHash(uint32 namehash);
 	Aura* FindAura(uint32 spellId);
 	Aura* FindAura(uint32 spellId, uint64 guid);
 	bool SetAurDuration(uint32 spellId,Unit* caster,uint32 duration);
