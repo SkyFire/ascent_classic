@@ -180,6 +180,9 @@ int WorldSession::Update(uint32 InstanceID)
 			return 0;
 		}
 
+		if(_player->m_playerInfo->m_Group)
+			_player->m_playerInfo->m_Group->RemovePlayer(_player->m_playerInfo);
+
 		LogoutPlayer(true);
 	}
 
