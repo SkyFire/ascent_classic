@@ -105,9 +105,10 @@ bool SubGroup::AddPlayer(PlayerInfo * info)
 
 bool SubGroup::HasMember(uint32 guid)
 {
-	for(GroupMembersSet::iterator itr = m_GroupMembers.begin(); itr != m_GroupMembers.end(); ++itr)
-		if((*itr)->guid == guid)
-			return true;
+	for( GroupMembersSet::iterator itr = m_GroupMembers.begin(); itr != m_GroupMembers.end(); ++itr )
+		if( (*itr) != NULL )
+			if( (*itr)->guid == guid )
+				return true;
 
 	return false;
 }
@@ -205,18 +206,18 @@ void Group::Update()
 			m_Leader = pNewLeader->m_playerInfo;
 	}
 
-	if(m_Looter != NULL && m_Looter->m_loggedInPlayer == NULL)
+	if( m_Looter != NULL && m_Looter->m_loggedInPlayer == NULL)
 	{
-		if(!pNewLeader)
+		if( !pNewLeader )
 			pNewLeader = FindFirstPlayer();
-		if(pNewLeader != NULL)
+		if( pNewLeader != NULL )
 			m_Looter = pNewLeader->m_playerInfo;
 	}
 
-	WorldPacket data(50 + (m_MemberCount * 20));
+	WorldPacket data( 50 + ( m_MemberCount * 20 ) );
 	GroupMembersSet::iterator itr1, itr2;
 
-	uint32 i=0,j=0;
+	uint32 i = 0, j = 0;
 	uint8 flags;
 	SubGroup *sg1 = NULL;
 	SubGroup *sg2 = NULL;
@@ -247,55 +248,63 @@ void Group::Update()
 				data << uint64(0x500000000004BC0CULL);
 				data << uint32(m_MemberCount-1);	// we don't include self
 
-				for(j=0;j<m_SubGroupCount;j++)
+				for( j = 0; j < m_SubGroupCount; j++ )
 				{
 					sg2 = m_SubGroups[j];
-					for(itr2 = sg2->GetGroupMembersBegin(); itr2 != sg2->GetGroupMembersEnd(); ++itr2)
+
+					if( sg2 != NULL)
 					{
-						if((*itr1) == (*itr2))
-							continue;
+						for( itr2 = sg2->GetGroupMembersBegin(); itr2 != sg2->GetGroupMembersEnd(); ++itr2 )
+						{
+							if( (*itr1) == (*itr2) )
+								continue;
 
-						data << (*itr2)->name << (*itr2)->guid << uint32(0);	// highguid
-						
-						if((*itr2)->m_loggedInPlayer)
-							data << uint8(1);
-						else
-							data << uint8(0);
+							// should never happen but just in case
+							if( (*itr2) == NULL )
+								continue;
 
-						data << uint8(sg2->GetID());
-						
-						flags = 0;
+							data << (*itr2)->name << (*itr2)->guid << uint32(0);	// highguid
+							
+							if( (*itr2)->m_loggedInPlayer )
+								data << uint8( 1 );
+							else
+								data << uint8( 0 );
 
-						if((*itr2) == m_assistantLeader)
-							flags |= 1;
-						if((*itr2) == m_mainTank)
-							flags |= 2;
-						if((*itr2) == m_mainAssist)
-							flags |= 4;
+							data << uint8( sg2->GetID() );
+							
+							flags = 0;
 
-						data << flags;
+							if((*itr2) == m_assistantLeader)
+								flags |= 1;
+							if((*itr2) == m_mainTank)
+								flags |= 2;
+							if((*itr2) == m_mainAssist)
+								flags |= 4;
+
+							data << flags;
+						}
 					}
 				}
 
-				if(m_Leader)
-					data << m_Leader->guid << uint32(0);
+				if( m_Leader )
+					data << m_Leader->guid << uint32( 0 );
 				else
-					data << uint64(0);
+					data << uint64( 0 );
 
-				data << uint8(m_LootMethod);
+				data << uint8( m_LootMethod );
 
-				if(m_Looter)
-					data << m_Looter->guid << uint32(0);
+				if( m_Looter )
+					data << m_Looter->guid << uint32( 0 );
 				else
-					data << uint64(0);
+					data << uint64( 0 );
 
 				data << uint8(m_LootThreshold);
 				data << uint8(m_difficulty);
 
-				if(!(*itr1)->m_loggedInPlayer->IsInWorld())
-					(*itr1)->m_loggedInPlayer->CopyAndSendDelayedPacket(&data);
+				if( !(*itr1)->m_loggedInPlayer->IsInWorld() )
+					(*itr1)->m_loggedInPlayer->CopyAndSendDelayedPacket( &data );
 				else
-					(*itr1)->m_loggedInPlayer->GetSession()->SendPacket(&data);
+					(*itr1)->m_loggedInPlayer->GetSession()->SendPacket( &data );
 			}		
 		}
 	}
@@ -543,15 +552,17 @@ void Group::SendPacketToAllButOne(WorldPacket *packet, Player *pSkipTarget)
 bool Group::HasMember(Player * pPlayer)
 {
 	GroupMembersSet::iterator itr;
-	uint32 i = 0;
 	m_groupLock.Acquire();
 
-	for(; i < m_SubGroupCount; i++)
+	for( uint32 i = 0; i < m_SubGroupCount; i++ )
 	{
-		if(m_SubGroups[i]->m_GroupMembers.find(pPlayer->m_playerInfo) != m_SubGroups[i]->m_GroupMembers.end())
+		if( m_SubGroups[i] != NULL )
 		{
-			m_groupLock.Release();
-			return true;
+			if( m_SubGroups[i]->m_GroupMembers.find( pPlayer->m_playerInfo ) != m_SubGroups[i]->m_GroupMembers.end() )
+			{
+				m_groupLock.Release();
+				return true;
+			}
 		}
 	}
 
@@ -978,10 +989,12 @@ void Group::HandleUpdateFieldChange(uint32 Index, Player * pPlayer)
 	case UNIT_FIELD_LEVEL:
 		Flags = GROUP_UPDATE_FLAG_LEVEL;
 		break;
+	default:
+		break;
 	}
 
-	if(Flags)
-		UpdateOutOfRangePlayer(pPlayer, Flags, true, 0);
+	if( Flags != 0 )
+		UpdateOutOfRangePlayer( pPlayer, Flags, true, 0 );
 
 	m_groupLock.Release();
 }
