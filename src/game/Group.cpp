@@ -194,14 +194,14 @@ void Group::SetLeader(Player* pPlayer, bool silent)
 
 void Group::Update()
 {
-	if(m_updateblock)
+	if( m_updateblock )
 		return;
 
 	Player * pNewLeader = NULL;
-	if(m_Leader == NULL || m_Leader->m_loggedInPlayer == NULL)
+	if( m_Leader == NULL || m_Leader->m_loggedInPlayer == NULL )
 	{
 		pNewLeader = FindFirstPlayer();
-		if(pNewLeader != NULL)
+		if( pNewLeader != NULL )
 			m_Leader = pNewLeader->m_playerInfo;
 	}
 
@@ -218,78 +218,86 @@ void Group::Update()
 
 	uint32 i=0,j=0;
 	uint8 flags;
-	SubGroup *sg1=NULL;
-	SubGroup *sg2=NULL;
+	SubGroup *sg1 = NULL;
+	SubGroup *sg2 = NULL;
 	m_groupLock.Acquire();
 
-	for(i=0;i<m_SubGroupCount;i++)
+	for( i = 0; i < m_SubGroupCount; i++ )
 	{
 		sg1 = m_SubGroups[i];
-		for(itr1 = sg1->GetGroupMembersBegin(); itr1!=sg1->GetGroupMembersEnd(); ++itr1)
+
+		if( sg1 != NULL)
 		{
-			/* skip offline players */
-			if((*itr1)->m_loggedInPlayer == NULL)
-				continue;
-
-			data.Initialize(SMSG_GROUP_LIST);
-			data << uint8(m_GroupType);	//0=party,1=raid
-			data << uint8(0);   // unk
-			data << uint8(sg1->GetID());
-			data << uint8(0);	// unk2
-			//data << uint64(0);	// unk3
-			data << uint64(0x500000000004BC0CULL);
-			data << uint32(m_MemberCount-1);	// we don't include self
-
-			for(j=0;j<m_SubGroupCount;j++)
+			for( itr1 = sg1->GetGroupMembersBegin(); itr1 != sg1->GetGroupMembersEnd(); ++itr1 )
 			{
-				sg2 = m_SubGroups[j];
-				for(itr2 = sg2->GetGroupMembersBegin(); itr2 != sg2->GetGroupMembersEnd(); ++itr2)
+				// should never happen but just in case
+				if( (*itr1) == NULL )
+					continue;
+
+				/* skip offline players */
+				if( (*itr1)->m_loggedInPlayer == NULL )
+					continue;
+
+				data.Initialize(SMSG_GROUP_LIST);
+				data << uint8(m_GroupType);	//0=party,1=raid
+				data << uint8(0);   // unk
+				data << uint8(sg1->GetID());
+				data << uint8(0);	// unk2
+				//data << uint64(0);	// unk3
+				data << uint64(0x500000000004BC0CULL);
+				data << uint32(m_MemberCount-1);	// we don't include self
+
+				for(j=0;j<m_SubGroupCount;j++)
 				{
-					if((*itr1) == (*itr2))
-						continue;
+					sg2 = m_SubGroups[j];
+					for(itr2 = sg2->GetGroupMembersBegin(); itr2 != sg2->GetGroupMembersEnd(); ++itr2)
+					{
+						if((*itr1) == (*itr2))
+							continue;
 
-                    data << (*itr2)->name << (*itr2)->guid << uint32(0);	// highguid
-					
-					if((*itr2)->m_loggedInPlayer)
-						data << uint8(1);
-					else
-						data << uint8(0);
+						data << (*itr2)->name << (*itr2)->guid << uint32(0);	// highguid
+						
+						if((*itr2)->m_loggedInPlayer)
+							data << uint8(1);
+						else
+							data << uint8(0);
 
-					data << uint8(sg2->GetID());
-					
-					flags = 0;
+						data << uint8(sg2->GetID());
+						
+						flags = 0;
 
-					if((*itr2) == m_assistantLeader)
-						flags |= 1;
-					if((*itr2) == m_mainTank)
-						flags |= 2;
-					if((*itr2) == m_mainAssist)
-						flags |= 4;
+						if((*itr2) == m_assistantLeader)
+							flags |= 1;
+						if((*itr2) == m_mainTank)
+							flags |= 2;
+						if((*itr2) == m_mainAssist)
+							flags |= 4;
 
-					data << flags;
+						data << flags;
+					}
 				}
-			}
 
-			if(m_Leader)
-				data << m_Leader->guid << uint32(0);
-			else
-				data << uint64(0);
+				if(m_Leader)
+					data << m_Leader->guid << uint32(0);
+				else
+					data << uint64(0);
 
-			data << uint8(m_LootMethod);
+				data << uint8(m_LootMethod);
 
-			if(m_Looter)
-				data << m_Looter->guid << uint32(0);
-			else
-				data << uint64(0);
+				if(m_Looter)
+					data << m_Looter->guid << uint32(0);
+				else
+					data << uint64(0);
 
-			data << uint8(m_LootThreshold);
-			data << uint8(m_difficulty);
+				data << uint8(m_LootThreshold);
+				data << uint8(m_difficulty);
 
-			if(!(*itr1)->m_loggedInPlayer->IsInWorld())
-				(*itr1)->m_loggedInPlayer->CopyAndSendDelayedPacket(&data);
-			else
-				(*itr1)->m_loggedInPlayer->GetSession()->SendPacket(&data);
-		}		
+				if(!(*itr1)->m_loggedInPlayer->IsInWorld())
+					(*itr1)->m_loggedInPlayer->CopyAndSendDelayedPacket(&data);
+				else
+					(*itr1)->m_loggedInPlayer->GetSession()->SendPacket(&data);
+			}		
+		}
 	}
 
 	if(m_dirty)

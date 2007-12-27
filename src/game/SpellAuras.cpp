@@ -5935,15 +5935,15 @@ void Aura::SpellAuraModHaste( bool apply )
 		// same as with shield block not registering to the player that it is increased
 		if( apply )	
 		{
-			//static_cast<Player*>(m_target)->m_meleeattackspeedmod += mod->m_amount;
-			static_cast< Player* >(m_target)->ModifyBonuses( HASTE_RATING, mod->m_amount );
+			static_cast<Player*>(m_target)->m_meleeattackspeedmod += mod->m_amount;
+			//static_cast< Player* >(m_target)->ModifyBonuses( HASTE_RATING, mod->m_amount );
 		}
 		else
 		{
-			//static_cast<Player*>(m_target)->m_meleeattackspeedmod -= mod->m_amount;
-			static_cast< Player* >(m_target)->ModifyBonuses( HASTE_RATING,- mod->m_amount );
+			static_cast<Player*>(m_target)->m_meleeattackspeedmod -= mod->m_amount;
+			//static_cast< Player* >(m_target)->ModifyBonuses( HASTE_RATING,- mod->m_amount );
 		}
-		static_cast< Player* >(m_target)->UpdateStats();
+		static_cast< Player* >(m_target)->UpdateAttackSpeed();
 	}
 	else
 	{
@@ -6082,16 +6082,16 @@ void Aura::SpellAuraModShieldBlockPCT( bool apply )
 		// working with this method
 		if( apply )
 		{
-			//p_target->m_modblockabsorbvalue += ( uint32 )mod->m_amount;
-			p_target->ModifyBonuses( SHIELD_BLOCK_RATING, mod->m_amount );
+			p_target->m_modblockabsorbvalue += ( uint32 )mod->m_amount;
+			//p_target->ModifyBonuses( SHIELD_BLOCK_RATING, mod->m_amount );
 		}
 		else
 		{
-			//p_target->m_modblockabsorbvalue -= ( uint32 )mod->m_amount;
-			p_target->ModifyBonuses( SHIELD_BLOCK_RATING, -mod->m_amount );
+			p_target->m_modblockabsorbvalue -= ( uint32 )mod->m_amount;
+			//p_target->ModifyBonuses( SHIELD_BLOCK_RATING, -mod->m_amount );
 		}
 		// this definately was not happening before so it wouldn't update stats
-		p_target->UpdateStats();
+		p_target->UpdateChances();
 	}
 }
 
