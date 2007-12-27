@@ -368,18 +368,23 @@ void SubGroup::Disband()
 
 Player* Group::FindFirstPlayer()
 {
-//	SubGroup *sg = NULL;
 	GroupMembersSet::iterator itr;
 	m_groupLock.Acquire();
 
-	uint32 i = 0;
-	for(; i < m_SubGroupCount; i++) {
-		for(itr = m_SubGroups[i]->GetGroupMembersBegin(); itr != m_SubGroups[i]->GetGroupMembersEnd(); ++itr)
+	for( uint32 i = 0; i < m_SubGroupCount; i++ )
+	{
+		if( m_SubGroups[i] != NULL )
 		{
-			if((*itr)->m_loggedInPlayer != NULL)
+			for( itr = m_SubGroups[i]->GetGroupMembersBegin(); itr != m_SubGroups[i]->GetGroupMembersEnd(); ++itr )
 			{
-				m_groupLock.Release();
-				return (*itr)->m_loggedInPlayer;
+				if( (*itr) != NULL )
+				{
+					if( (*itr)->m_loggedInPlayer != NULL )
+					{
+						m_groupLock.Release();
+						return (*itr)->m_loggedInPlayer;
+					}
+				}
 			}
 		}
 	}
