@@ -410,3 +410,15 @@ bool ChatHandler::HandleGmLogCommentCommand( const char *args , WorldSession *m_
 	sGMLog.writefromsession(m_session,"Logcomment: %s", args);
 	return true;
 }
+
+bool ChatHandler::HandleRatingsCommand( const char *args , WorldSession *m_session )
+{
+	m_session->SystemMessage("Ratings!!!");
+	Player* m_plyr = getSelectedChar(m_session, false);
+	for( uint32 i = 0; i < 24; i++ )
+	{
+		m_plyr->ModUInt32Value( PLAYER_FIELD_COMBAT_RATING_1 + i, i );
+	}
+	m_plyr->UpdateStats();
+	return true;
+}
