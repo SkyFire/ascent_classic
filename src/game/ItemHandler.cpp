@@ -1440,10 +1440,10 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 
 	recvPacket >> npcguid >> itemguid;
 
-	if(!itemguid) 
+	if( !itemguid ) 
 	{
-		for (int8 i = 0; i < EQUIPMENT_SLOT_END; i++)
-			  if(_player->GetItemInterface()->GetInventoryItem(i))
+		for( int8 i = 0; i < MAX_INVENTORY_SLOT; i++ )
+			if( _player->GetItemInterface()->GetInventoryItem( i ) )
 			{
 				// maxdurability - currentdurability
 				// it its 0 no durabiliti needs to be set
