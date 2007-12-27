@@ -7745,6 +7745,8 @@ void Player::OnWorldPortAck()
 
 void Player::ModifyBonuses(uint32 type,int32 val)
 {
+	// Added some updateXXXX calls so when an item modifies a stat they get updated
+	// also since this is used by auras now it will handle it for those
 	switch (type) 
 		{
 		case POWER:

@@ -760,11 +760,10 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 				//spellid is enum ITEM_STAT_TYPE
 				//min=max is amount
 				int32 val = Entry->min[c];
-				if(RandomSuffixAmount)
-					val = RANDOM_SUFFIX_MAGIC_CALCULATION(RandomSuffixAmount, GetItemRandomSuffixFactor());
+				if( RandomSuffixAmount )
+					val = RANDOM_SUFFIX_MAGIC_CALCULATION( RandomSuffixAmount, GetItemRandomSuffixFactor() );
 
-				m_owner->ModifyBonuses(Entry->spell[c],
-					Apply ? val : -val);
+				m_owner->ModifyBonuses( Entry->spell[c], Apply ? val : -val );
 				m_owner->UpdateStats();
 			}break;
 

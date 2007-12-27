@@ -5910,9 +5910,9 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 
 void Aura::SpellAuraModHaste( bool apply )
 {
+	//blade flurry - attack a nearby opponent
 	if( m_spellProto->NameHash == 0x540d4874 )
 	{
-		/* blade flurry - attack a nearby opponent */
 		if( apply )
 			m_target->m_extrastriketargets++;
 		else
@@ -5924,18 +5924,26 @@ void Aura::SpellAuraModHaste( bool apply )
 	else 
 		SetPositive();
 
-	// TODO: fix the hacky fix 
+	// TODO: fix this hacky fix 
 	if( abs( mod->m_amount ) >= 100 )
 		return; 
 
 	if( m_target->GetTypeId() == TYPEID_PLAYER )
 	{
-		if( apply )			
-			static_cast<Player*>(m_target)->m_meleeattackspeedmod += mod->m_amount;
+		// test to see if we can fix haste not sowing the increases from auras and item hidden auras
+		// haste is a modified rating not a stat so im trying this
+		// same as with shield block not registering to the player that it is increased
+		if( apply )	
+		{
+			//static_cast<Player*>(m_target)->m_meleeattackspeedmod += mod->m_amount;
+			static_cast< Player* >(m_target)->ModifyBonuses( HASTE_RATING, mod->m_amount );
+		}
 		else
-			static_cast<Player*>(m_target)->m_meleeattackspeedmod -= mod->m_amount;
-
-		( ( Player* )m_target )->UpdateAttackSpeed();
+		{
+			//static_cast<Player*>(m_target)->m_meleeattackspeedmod -= mod->m_amount;
+			static_cast< Player* >(m_target)->ModifyBonuses( HASTE_RATING,- mod->m_amount );
+		}
+		static_cast< Player* >(m_target)->UpdateStats();
 	}
 	else
 	{
@@ -6070,7 +6078,8 @@ void Aura::SpellAuraModShieldBlockPCT( bool apply )
 		// this is a test. i think it should probably be modifying the visible block rating
 		// the commented lines below where the old way now i am trying to use the other
 		// method set aside for items. as all items use ( block ) spell auras not as you would
-		// think actual modifiers
+		// think actual modifiers. this is temporary until we get some feedback on how its
+		// working with this method
 		if( apply )
 		{
 			//p_target->m_modblockabsorbvalue += ( uint32 )mod->m_amount;
@@ -6081,6 +6090,8 @@ void Aura::SpellAuraModShieldBlockPCT( bool apply )
 			//p_target->m_modblockabsorbvalue -= ( uint32 )mod->m_amount;
 			p_target->ModifyBonuses( SHIELD_BLOCK_RATING, -mod->m_amount );
 		}
+		// this definately was not happening before so it wouldn't update stats
+		p_target->UpdateStats();
 	}
 }
 
@@ -6832,13 +6843,15 @@ void Aura::SpellAuraIncreaseAllWeaponSkill(bool apply)
 	}
 }
 
-void Aura::SpellAuraIncreaseHitRate(bool apply)
+void Aura::SpellAuraIncreaseHitRate( bool apply )
 {
-	if(!m_target->IsPlayer())
+	if( !m_target->IsPlayer() )
 		return;
-	if(apply)
-		static_cast<Player*>(m_target)->ModifyBonuses(SPELL_HIT_RATING,mod->m_amount);
-	else static_cast<Player*>(m_target)->ModifyBonuses(SPELL_HIT_RATING,-mod->m_amount);
+	if( apply )
+		static_cast<Player*>(m_target)->ModifyBonuses( SPELL_HIT_RATING, mod->m_amount );
+	else
+		static_cast<Player*>(m_target)->ModifyBonuses( SPELL_HIT_RATING, -mod->m_amount );
+	static_cast<Player*>(m_target)->UpdateStats();
 }
 
 void Aura::SpellAuraIncreaseRageFromDamageDealtPCT(bool apply)
@@ -6902,47 +6915,47 @@ void Aura::SpellAuraEnableFlightWithUnmountedSpeed(bool apply)
 	}
 }
 
-void Aura::SpellAuraIncreaseMovementAndMountedSpeed(bool apply)
+void Aura::SpellAuraIncreaseMovementAndMountedSpeed( bool apply )
 {
-	if(apply)
+	if( apply )
 		m_target->m_mountedspeedModifier += mod->m_amount;
 	else
 		m_target->m_mountedspeedModifier -= mod->m_amount;
-
 	m_target->UpdateSpeed();
 }
 
-void Aura::SpellAuraIncreaseFlightSpeed(bool apply)
+void Aura::SpellAuraIncreaseFlightSpeed( bool apply )
 {
-	if(apply)
+	if( apply )
 		m_target->m_flyspeedModifier += mod->m_amount;
 	else
 		m_target->m_flyspeedModifier -= mod->m_amount;
-
 	m_target->UpdateSpeed();
 }
 
 
-void Aura::SpellAuraIncreaseRating(bool apply)
+void Aura::SpellAuraIncreaseRating( bool apply )
 {
 	//value == amt
 	//misc = bitmask for ITEM_STAT_TYPE
 
-	int v = apply?mod->m_amount:-mod->m_amount;
-	if(!m_target->IsPlayer())return;
-	Player * plr = ((Player*)m_target);
-	 for(uint32 x=1;x<21;x++)//skip x=0
-		if((((uint32)1)<<x)& mod->m_miscValue)
-			plr->ModifyBonuses(11+x,v);
+	int v = apply ? mod->m_amount : -mod->m_amount;
 
-	if(mod->m_miscValue & 1)//weapon skill
+	if( !m_target->IsPlayer() )
+		return;
+
+	Player* plr = ((Player*)m_target);
+	for( uint32 x = 1; x < 21; x++ )//skip x=0
+		if( ( ( ( uint32 )1 ) << x ) & mod->m_miscValue )
+			plr->ModifyBonuses( 11 + x, v);
+
+	if( mod->m_miscValue & 1 )//weapon skill
 	{
 		std::map<uint32, uint32>::iterator i;
-		for(uint32 y=0;y<20;y++)
-			if(m_spellProto->EquippedItemSubClass & (((uint32)1)<<y))
+		for( uint32 y = 0; y < 20; y++ )
+			if( m_spellProto->EquippedItemSubClass & ( ( ( uint32 )1 ) << y ) )
 			{
-				
-					i=((Player*)m_target)->m_wratings.find(y);
+					i = ( ( Player*)m_target)->m_wratings.find(y);
 					if(i==((Player*)m_target)->m_wratings.end())//no prev
 					{
 						((Player*)m_target)->m_wratings[y]=v;
