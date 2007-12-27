@@ -92,7 +92,7 @@ enum MsTimeVariables
 #define FD_SETSIZE 2048 
 #endif
 
-#if PLATFORM == PLATFORM_WIN32
+#if defined( __WIN32__ ) || defined( WIN32 ) || defined( _WIN32 )
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
@@ -106,7 +106,6 @@ enum MsTimeVariables
 #include <signal.h>
 #include <netdb.h>
 #endif
-
 
 // current platform and compiler
 #define PLATFORM_WIN32 0
