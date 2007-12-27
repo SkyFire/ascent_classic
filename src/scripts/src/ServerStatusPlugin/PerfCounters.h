@@ -1,10 +1,14 @@
 #include <windows.h>
+#include <WinPerf.h>
+#undef min
+#undef max
 #include <stdio.h>
 #include <comdef.h>	// for using bstr_t class
 #include <vector>
 
-#define TOTALBYTES    100*1024
-#define BYTEINCREMENT 10*1024
+#define TOTALBYTES 100 * 1024
+#define BYTEINCREMENT 10 * 1024
+
 #pragma warning(disable:4244)
 
 template <class T>
@@ -18,22 +22,22 @@ public:
 	{
 	}
 
-	T GetCounterValue(PERF_DATA_BLOCK **pPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex, LPCTSTR pInstanceName = NULL)
+	T GetCounterValue( PERF_DATA_BLOCK** pPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex, LPCTSTR pInstanceName = NULL )
 	{
-		QueryPerformanceData(pPerfData, dwObjectIndex, dwCounterIndex);
+		QueryPerformanceData( pPerfData, dwObjectIndex, dwCounterIndex );
 
 	    PPERF_OBJECT_TYPE pPerfObj = NULL;
-		T lnValue = {0};
+		T lnValue = { 0 };
 
 		// Get the first object type.
 		pPerfObj = FirstObject( *pPerfData );
 
 		// Look for the given object index
 
-		for( DWORD i=0; i < (*pPerfData)->NumObjectTypes; i++ )
+		for( DWORD i = 0; i < (*pPerfData)->NumObjectTypes; i++ )
 		{
 
-			if (pPerfObj->ObjectNameTitleIndex == dwObjectIndex)
+			if( pPerfObj->ObjectNameTitleIndex == dwObjectIndex )
 			{
 				lnValue = GetCounterValue(pPerfObj, dwCounterIndex, pInstanceName);
 				break;
@@ -44,24 +48,24 @@ public:
 		return lnValue;
 	}
 
-	T GetCounterValueForProcessID(PERF_DATA_BLOCK **pPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex, DWORD dwProcessID)
+	T GetCounterValueForProcessID( PERF_DATA_BLOCK** pPerfData, DWORD dwObjectIndex, DWORD dwCounterIndex, DWORD dwProcessID )
 	{
-		QueryPerformanceData(pPerfData, dwObjectIndex, dwCounterIndex);
+		QueryPerformanceData( pPerfData, dwObjectIndex, dwCounterIndex );
 
 	    PPERF_OBJECT_TYPE pPerfObj = NULL;
-		T lnValue = {0};
+		T lnValue = { 0 };
 
 		// Get the first object type.
 		pPerfObj = FirstObject( *pPerfData );
 
 		// Look for the given object index
 
-		for( DWORD i=0; i < (*pPerfData)->NumObjectTypes; i++ )
+		for( DWORD i = 0; i < (*pPerfData)->NumObjectTypes; i++ )
 		{
 
-			if (pPerfObj->ObjectNameTitleIndex == dwObjectIndex)
+			if( pPerfObj->ObjectNameTitleIndex == dwObjectIndex )
 			{
-				lnValue = GetCounterValueForProcessID(pPerfObj, dwCounterIndex, dwProcessID);
+				lnValue = GetCounterValueForProcessID( pPerfObj, dwCounterIndex, dwProcessID );
 				break;
 			}
 
@@ -75,25 +79,25 @@ protected:
 	class CBuffer
 	{
 	public:
-		CBuffer(UINT Size)
+		CBuffer( UINT Size )
 		{
 			m_Size = Size;
-			m_pBuffer = (LPBYTE) malloc( Size*sizeof(BYTE) );
+			m_pBuffer = ( LPBYTE )malloc( Size * sizeof( BYTE ) );
 		}
 		~CBuffer()
 		{
-			free(m_pBuffer);
+			free( m_pBuffer );
 		}
-		void *Realloc(UINT Size)
+		void *Realloc( UINT Size )
 		{
 			m_Size = Size;
-			m_pBuffer = (LPBYTE) realloc( m_pBuffer, Size );
+			m_pBuffer = ( LPBYTE )realloc( m_pBuffer, Size );
 			return m_pBuffer;
 		}
 
 		void Reset()
 		{
-			memset(m_pBuffer,NULL,m_Size);
+			memset( m_pBuffer, NULL, m_Size );
 		}
 		operator LPBYTE ()
 		{
@@ -104,10 +108,13 @@ protected:
 		{
 			return m_Size;
 		}
+
 	public:
 		LPBYTE m_pBuffer;
+
 	private:
 		UINT m_Size;
+
 	};
 
 	//
