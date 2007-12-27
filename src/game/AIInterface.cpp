@@ -85,7 +85,14 @@ AIInterface::AIInterface()
 	m_formationLinkSqlId = 0;
 	m_currentHighestThreat = 0;
 
+	disable_combat = false;
+
 	disable_melee = false;
+	disable_ranged = false;
+	disable_spell = false;
+
+	disable_targeting = false;
+
 	next_spell_time = 0;
 	m_hasWaypointEvents = false;
 	waiting_for_cooldown = false;
@@ -620,9 +627,9 @@ void AIInterface::_UpdateTimer(uint32 p_time)
 
 void AIInterface::_UpdateTargets()
 {
-	if(m_Unit->IsPlayer() || (m_AIType != AITYPE_PET && disable_melee))
+	if( m_Unit->IsPlayer() || (m_AIType != AITYPE_PET && disable_targeting ))
 		return;
-	if(((Creature*)m_Unit)->GetCreatureName() && ((Creature*)m_Unit)->GetCreatureName()->Type == CRITTER)
+	if( ( ( Creature* )m_Unit )->GetCreatureName() && ( ( Creature* )m_Unit )->GetCreatureName()->Type == CRITTER )
 		return;
 
 	AssistTargetSet::iterator i;
@@ -638,7 +645,7 @@ void AIInterface::_UpdateTargets()
 		FindFriends(16.0f/*4.0f*/);
 	}
 
-	if(m_updateAssist)
+	if( m_updateAssist )
 	{
 		m_updateAssist = false;
 		deque<Unit*> tokill;
@@ -656,7 +663,7 @@ void AIInterface::_UpdateTargets()
 			m_assistTargets.erase(*i2);
 	}
 
-	if(m_updateTargets)
+	if( m_updateTargets )
 	{
 		m_updateTargets = false;
 		deque<Unit*> tokill;
@@ -694,10 +701,10 @@ void AIInterface::_UpdateTargets()
 				HandleEvent(EVENT_LEAVECOMBAT, m_Unit, 0);
 			}*/
 		}
-		else if(m_aiTargets.size() == 0 && (m_AIType == AITYPE_PET && (m_Unit->GetGUIDHigh() == HIGHGUID_PET && static_cast<Pet*>(m_Unit)->GetPetState() == PET_STATE_AGGRESSIVE) || (m_Unit->GetGUIDHigh() != HIGHGUID_PET && disable_melee==false)))
+		else if( m_aiTargets.size() == 0 && (m_AIType == AITYPE_PET && (m_Unit->GetGUIDHigh() == HIGHGUID_PET && static_cast<Pet*>(m_Unit)->GetPetState() == PET_STATE_AGGRESSIVE) || (m_Unit->GetGUIDHigh() != HIGHGUID_PET && disable_melee == false ) ) )
 		{
 			 Unit* target = FindTarget();
-			 if(target)
+			 if( target )
 			 {
 				 AttackReaction(target, 1, 0);
 			 }
@@ -720,7 +727,7 @@ void AIInterface::_UpdateTargets()
 ///====================================================================
 void AIInterface::_UpdateCombat(uint32 p_time)
 {
-	if(m_AIType != AITYPE_PET && disable_melee)
+	if( m_AIType != AITYPE_PET && disable_combat )
 		return;
 
 	//just make sure we are not hitting self. This was reported as an exploit.Should never ocure anyway
@@ -826,6 +833,12 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 		if(this->disable_melee && agent == AGENT_MELEE)
 			agent = AGENT_NULL;
 		  
+		if(this->disable_ranged && agent == AGENT_RANGED)
+			agent = AGENT_NULL;
+
+		if(this->disable_spell && agent == AGENT_SPELL)
+			agent = AGENT_NULL;
+
 		switch(agent)
 		{
 		case AGENT_MELEE:

@@ -384,8 +384,16 @@ public:
 	ASCENT_INLINE void SetPetOwner(Unit * owner) { m_PetOwner = owner; }
  
 	list<AI_Spell*> m_spells;
+
+	bool disable_combat;
+
 	bool disable_melee;
+	bool disable_ranged;
+	bool disable_spell;
+	bool disable_targeting;
+
 	bool waiting_for_cooldown;
+
 	uint32 next_spell_time;
 
 	void CheckNextSpell(AI_Spell * sp)

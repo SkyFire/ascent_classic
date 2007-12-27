@@ -1048,7 +1048,39 @@ int luaUnit_SetCombatCapable(lua_State * L, Unit * ptr)
 {
 	CHECK_TYPEID(TYPEID_UNIT);
 	int enabled = luaL_checkint(L,1);
+	ptr->GetAIInterface()->disable_combat = (enabled > 0) ? true : false;
+	return 0;
+}
+
+int luaUnit_SetCombatMeleeCapable(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int enabled = luaL_checkint(L,1);
 	ptr->GetAIInterface()->disable_melee = (enabled > 0) ? true : false;
+	return 0;
+}
+
+int luaUnit_SetCombatRangedCapable(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int enabled = luaL_checkint(L,1);
+	ptr->GetAIInterface()->disable_ranged = (enabled > 0) ? true : false;
+	return 0;
+}
+
+int luaUnit_SetCombatSpellCapable(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int enabled = luaL_checkint(L,1);
+	ptr->GetAIInterface()->disable_spell = (enabled > 0) ? true : false;
+	return 0;
+}
+
+int luaUnit_SetCombatTargetingCapable(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int enabled = luaL_checkint(L,1);
+	ptr->GetAIInterface()->disable_targeting = (enabled > 0) ? true : false;
 	return 0;
 }
 
