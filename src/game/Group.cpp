@@ -178,13 +178,16 @@ bool Group::AddMember(PlayerInfo * info, int32 subgroupid/* =-1 */)
 
 void Group::SetLeader(Player* pPlayer, bool silent)
 {
-	m_Leader = pPlayer->m_playerInfo;
-	m_dirty=true;
-	if(!silent && pPlayer)
+	if(pPlayer)
 	{
-		WorldPacket data(SMSG_GROUP_SET_LEADER, pPlayer->GetNameString()->size() + 1);
-		data << pPlayer->GetName();
-		SendPacketToAll(&data);
+		m_Leader = pPlayer->m_playerInfo;
+		m_dirty=true;
+		if(!silent && pPlayer)
+		{
+			WorldPacket data(SMSG_GROUP_SET_LEADER, pPlayer->GetNameString()->size() + 1);
+			data << pPlayer->GetName();
+			SendPacketToAll(&data);
+		}
 	}
 
 	Update();
