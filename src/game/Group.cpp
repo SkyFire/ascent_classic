@@ -265,7 +265,7 @@ void Group::Update()
 
 							data << (*itr2)->name << (*itr2)->guid << uint32(0);	// highguid
 							
-							if( (*itr2)->m_loggedInPlayer )
+							if( (*itr2)->m_loggedInPlayer != NULL )
 								data << uint8( 1 );
 							else
 								data << uint8( 0 );
@@ -274,11 +274,11 @@ void Group::Update()
 							
 							flags = 0;
 
-							if((*itr2) == m_assistantLeader)
+							if( (*itr2) == m_assistantLeader )
 								flags |= 1;
-							if((*itr2) == m_mainTank)
+							if( (*itr2) == m_mainTank )
 								flags |= 2;
-							if((*itr2) == m_mainAssist)
+							if( (*itr2) == m_mainAssist )
 								flags |= 4;
 
 							data << flags;
@@ -298,8 +298,8 @@ void Group::Update()
 				else
 					data << uint64( 0 );
 
-				data << uint8(m_LootThreshold);
-				data << uint8(m_difficulty);
+				data << uint8( m_LootThreshold );
+				data << uint8( m_difficulty );
 
 				if( !(*itr1)->m_loggedInPlayer->IsInWorld() )
 					(*itr1)->m_loggedInPlayer->CopyAndSendDelayedPacket( &data );
@@ -309,9 +309,9 @@ void Group::Update()
 		}
 	}
 
-	if(m_dirty)
+	if( m_dirty )
 	{
-		m_dirty=false;
+		m_dirty = false;
 		SaveToDB();
 	}
 

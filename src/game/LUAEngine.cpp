@@ -507,6 +507,10 @@ int luaUnit_CreateWaypoint(lua_State * L, Unit * ptr);
 int luaUnit_DestroyCustomWaypointMap(lua_State * L, Unit * ptr);
 int luaUnit_MoveToWaypoint(lua_State * L, Unit * ptr);
 int luaUnit_SetCombatCapable(lua_State * L, Unit * ptr);
+int luaUnit_SetCombatMeleeCapable(lua_State * L, Unit * ptr);
+int luaUnit_SetCombatRangedCapable(lua_State * L, Unit * ptr);
+int luaUnit_SetCombatSpellCapable(lua_State * L, Unit * ptr);
+int luaUnit_SetCombatTargetingCapable(lua_State * L, Unit * ptr);
 int luaUnit_SetNPCFlags(lua_State * L, Unit * ptr);
 int luaUnit_SetModel(lua_State * L, Unit * ptr);
 int luaUnit_SetScale(lua_State * L, Unit * ptr);
@@ -580,6 +584,10 @@ Unit::RegType Unit::methods[] = {
 	{ "MoveToWaypoint", &luaUnit_MoveToWaypoint },
 	{ "DestroyCustomWaypointMap", &luaUnit_DestroyCustomWaypointMap },
 	{ "SetCombatCapable", &luaUnit_SetCombatCapable },
+	{ "SetCombatMeleeCapable", &luaUnit_SetCombatMeleeCapable },
+	{ "SetCombatRangedCapable", &luaUnit_SetCombatRangedCapable },
+	{ "SetCombatSpellCapable", &luaUnit_SetCombatSpellCapable },
+	{ "SetCombatTargetingCapable", &luaUnit_SetCombatTargetingCapable },
 	{ "SetNPCFlags", &luaUnit_SetNPCFlags },
 	{ "SetModel", &luaUnit_SetModel },
 	{ "SetScale", &luaUnit_SetScale },
