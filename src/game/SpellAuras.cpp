@@ -304,44 +304,44 @@ ASCENT_INLINE void ApplyFloatPSM(float ** m,int32 v,uint32 mask, float def)
 	}
 }*/
 
-Unit * Aura::GetUnitCaster()
+Unit* Aura::GetUnitCaster()
 {
-	if(m_casterGuid == m_target->GetGUID())
+	if( m_casterGuid == m_target->GetGUID() )
 		return m_target;
-	if(m_target->GetMapMgr())
-		return m_target->GetMapMgr()->GetUnit(m_casterGuid);
+	if( m_target->GetMapMgr() )
+		return m_target->GetMapMgr()->GetUnit( m_casterGuid );
 	else
-		return 0;
+		return NULL;
 }
 
-Object * Aura::GetCaster()
+Object* Aura::GetCaster()
 {
-	if(m_casterGuid == m_target->GetGUID())
+	if( m_casterGuid == m_target->GetGUID() )
 		return m_target;
-	if(m_target->GetMapMgr())
-		return m_target->GetMapMgr()->_GetObject(m_casterGuid);
+	if( m_target->GetMapMgr() )
+		return m_target->GetMapMgr()->_GetObject( m_casterGuid );
 	else
-		return 0;
+		return NULL;
 }
 
-Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
+Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 {
 	m_castInDuel = false;
 	m_spellProto = proto;
-	m_duration   = duration;
-	m_positive	= 0; //we suppose spell will have positive impact on target
+	m_duration = duration;
+	m_positive = 0; //we suppose spell will have positive impact on target
 
 	m_casterGuid = caster->GetGUID();
 	m_target = target;
 
-	if(m_target->GetTypeId() == TYPEID_PLAYER)
+	if( m_target->GetTypeId() == TYPEID_PLAYER )
 		p_target = ((Player*)m_target);
 	else
 		p_target = NULL;
 
-	if(caster->GetTypeId() == TYPEID_PLAYER && target->GetTypeId() == TYPEID_PLAYER)
+	if( caster->GetTypeId() == TYPEID_PLAYER && target->GetTypeId() == TYPEID_PLAYER )
 	{
-		if(((Player*)caster)->DuelingWith == ((Player*)target))
+		if( ( ( Player* )caster )->DuelingWith == ( ( Player* )target ) )
 		{
 			m_castInDuel = true;
 		}
@@ -349,20 +349,20 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 
 	//SetCasterFaction(caster->_getFaction());
 
-//	m_auraSlot = 0;
+	//m_auraSlot = 0;
 	m_modcount = 0;
 	m_dynamicValue = 0;
 	m_areaAura = false;
 
-	if(caster->IsUnit())
+	if( caster->IsUnit() )
 	{
-		if(m_spellProto->buffIndexType > 0 && caster->IsPlayer())
+		if( m_spellProto->buffIndexType > 0 && caster->IsPlayer() )
 		{
-			((Player*)caster)->RemoveSpellTargets(m_spellProto->buffIndexType);
-			((Player*)caster)->SetSpellTargetType(m_spellProto->buffIndexType, target);
+			( ( Player* )caster )->RemoveSpellTargets( m_spellProto->buffIndexType);
+			( ( Player* )caster )->SetSpellTargetType( m_spellProto->buffIndexType, target);
 		}
 
-		if(isAttackable((Unit*)caster,target))
+		if( isAttackable( ( Unit* )caster, target ) )
 		{
 			SetNegative();
 			/*if(caster->IsPlayer())
@@ -380,57 +380,60 @@ Aura::Aura(SpellEntry *proto, int32 duration,Object* caster, Unit *target)
 			SetPositive();
 	}
 
-	if(!IsPassive())
+	if( !IsPassive() )
 	{
-		timeleft=(uint32)UNIXTIME;
+		timeleft = ( uint32 )UNIXTIME;
 	}
 
 	m_castedItemId = 0;
 	m_visualSlot = 0xFF;
-	pSpellId=0;
+	pSpellId = 0;
 	periodic_target = 0;
 
-//	fixed_amount = 0;//used only por percent values to be able to recover value correctly.No need to init this if we are not using it
+	//fixed_amount = 0;//used only por percent values to be able to recover value correctly.No need to init this if we are not using it
 }
 
 void Aura::Remove()
 {
- 	sEventMgr.RemoveEvents(this);
-	if(!IsPassive() || IsPassive() && m_spellProto->AttributesEx & 1024)
+ 	sEventMgr.RemoveEvents( this );
+
+	if( !IsPassive() || IsPassive() && m_spellProto->AttributesEx & 1024 )
 		RemoveAuraVisual();
-	ApplyModifiers(false);
+
+	ApplyModifiers( false );
 
 	// reset diminishing return timer if needed
-	::UnapplyDiminishingReturnTimer(m_target, m_spellProto);
+	::UnapplyDiminishingReturnTimer( m_target, m_spellProto );
 	
-	for(uint32 x=0;x<3;x++)
+	for( uint32 x = 0; x < 3; x++ )
 	{
-		if(!m_spellProto->Effect[x])
+		if( !m_spellProto->Effect[x] )
 			break;
-		if(m_spellProto->Effect[x]==SPELL_EFFECT_TRIGGER_SPELL)
+
+		if( m_spellProto->Effect[x] == SPELL_EFFECT_TRIGGER_SPELL )
 		{
 			//if(GetSpellProto()->EffectTriggerSpell[x]!=GetSpellId())
 			m_target->RemoveAura(GetSpellProto()->EffectTriggerSpell[x]);
 		}
-		else if(m_spellProto->Effect[x] == SPELL_EFFECT_APPLY_AREA_AURA 
-			&& m_casterGuid == m_target->GetGUID())
+		else if( m_spellProto->Effect[x] == SPELL_EFFECT_APPLY_AREA_AURA && m_casterGuid == m_target->GetGUID())
 		{
 			RemoveAA();
 		}
 	}
 
-	if(m_spellProto->procCharges>0
-		&& m_spellProto->proc_interval==0)
+	if( m_spellProto->procCharges > 0 && m_spellProto->proc_interval == 0 )
 	{
-		if(m_target->m_chargeSpellsInUse)
-			m_target->m_chargeSpellRemoveQueue.push_back(GetSpellId());
+		if( m_target->m_chargeSpellsInUse )
+		{
+			m_target->m_chargeSpellRemoveQueue.push_back( GetSpellId() );
+		}
 		else
 		{
-			std::map<uint32,struct SpellCharge>::iterator iter;
-			iter = m_target->m_chargeSpells.find(GetSpellId());
-			if(iter!=m_target->m_chargeSpells.end())
+			std::map< uint32, struct SpellCharge >::iterator iter;
+			iter = m_target->m_chargeSpells.find( GetSpellId() );
+			if( iter != m_target->m_chargeSpells.end() )
 			{
-				if(iter->second.count>1)
+				if( iter->second.count > 1 )
 					--iter->second.count;
 				else
 					m_target->m_chargeSpells.erase(iter);
@@ -440,32 +443,32 @@ void Aura::Remove()
 
 	m_target->m_auras[m_auraSlot] = NULL;
 
-	if(GetSpellProto()->SpellGroupType && m_target->GetTypeId() == TYPEID_PLAYER)
+	if( GetSpellProto()->SpellGroupType && m_target->GetTypeId() == TYPEID_PLAYER )
 	{
-		int32 speedmod=0;
-		SM_FIValue(m_target->SM_FSpeedMod,&speedmod,m_spellProto->SpellGroupType);
-		if(speedmod)
+		int32 speedmod = 0;
+		SM_FIValue( m_target->SM_FSpeedMod, &speedmod, m_spellProto->SpellGroupType );
+		if( speedmod )
 		{
-			m_target->m_speedModifier-=speedmod;
+			m_target->m_speedModifier -= speedmod;
 			m_target->UpdateSpeed();
 		}
 	}
 
 	// remove attacker
-	Unit * caster = GetUnitCaster();
-	if(caster)
+	Unit* caster = GetUnitCaster();
+	if( caster != NULL)
 	{
-		if(caster != m_target)
+		if( caster != m_target )
 		{
-			caster->CombatStatus.RemoveAttackTarget(m_target);
-			m_target->CombatStatus.RemoveAttacker(caster, caster->GetGUID());
+			caster->CombatStatus.RemoveAttackTarget( m_target );
+			m_target->CombatStatus.RemoveAttacker( caster, caster->GetGUID() );
 		}
 
-		if(m_spellProto->buffIndexType != 0 && m_target->IsPlayer())
-			((Player*)m_target)->RemoveSpellIndexReferences(m_spellProto->buffIndexType);
+		if( m_spellProto->buffIndexType != 0 && m_target->IsPlayer() )
+			( ( Player* )m_target )->RemoveSpellIndexReferences( m_spellProto->buffIndexType );
 	}
 	else
-		m_target->CombatStatus.RemoveAttacker(NULL, m_casterGuid);
+		m_target->CombatStatus.RemoveAttacker( NULL, m_casterGuid );
 
 	/**********************Cooldown**************************
 	* this is only needed for some spells
@@ -474,18 +477,18 @@ void Aura::Remove()
 	* m_spellProto->Attributes == 0x2040100
 	* are handled. Its possible there are more spells like this
 	*************************************************************/
-	if ( caster && caster->IsPlayer() && caster->IsInWorld() && m_spellProto->c_is_flags & SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE)
+	if( caster != NULL && caster->IsPlayer() && caster->IsInWorld() && m_spellProto->c_is_flags & SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE )
 	{
-		WorldPacket data(12);
-		data.SetOpcode(SMSG_COOLDOWN_EVENT);
+		WorldPacket data( 12 );
+		data.SetOpcode( SMSG_COOLDOWN_EVENT );
 		data << m_spellProto->Id << caster->GetGUID();
-		caster->SendMessageToSet(&data, true);
+		caster->SendMessageToSet( &data, true );
 	}
 
 	delete this; // suicide xD	leaking this shit out
 }
 
-void Aura::AddMod(uint32 t, int32 a,uint32 miscValue,uint32 i)
+void Aura::AddMod( uint32 t, int32 a, uint32 miscValue, uint32 i )
 {
 	//this is fix, when u have the same unit in target list several times
 	//for(uint32 x=0;x<m_modcount;x++)
@@ -496,7 +499,7 @@ void Aura::AddMod(uint32 t, int32 a,uint32 miscValue,uint32 i)
 		m_modList[2].m_type == t)
 		return; // dont duplicate mods // some spells apply duplicate mods, like some seals*/ 
 
-	if(m_modcount >= 3)
+	if( m_modcount >= 3 )
 	{
 		sLog.outString("Tried to add >3 (%u) mods to spellid %u [%u:%u, %u:%u, %u:%u]", m_modcount+1, this->m_spellProto->Id, m_modList[0].m_type, m_modList[0].m_amount, m_modList[1].m_type, m_modList[1].m_amount, m_modList[2].m_type, m_modList[2].m_amount);
 		return;
@@ -509,10 +512,10 @@ void Aura::AddMod(uint32 t, int32 a,uint32 miscValue,uint32 i)
 	//ASSERT(m_modcount<=3);
 }
 
-void Aura::ApplyModifiers(bool apply)
+void Aura::ApplyModifiers( bool apply )
 { 
 	
-	for (uint32 x=0;x<m_modcount; x++)
+	for( uint32 x = 0; x < m_modcount; x++ )
 	{
 		mod = &m_modList[x];
 		sLog.outDebug( "WORLD: target = %u , Spell Aura id = %u, SpellId  = %u, i = %u, apply = %s, duration = %u, damage = %d",
