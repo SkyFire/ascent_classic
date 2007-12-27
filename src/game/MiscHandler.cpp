@@ -732,9 +732,6 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
 			pPlayer->GetTaxiState() ||  // or we are on a taxi
 			HasGMPermissions())		   // or we are a gm
 		{
-			if(_player->m_playerInfo->m_Group)
-				_player->m_playerInfo->m_Group->RemovePlayer(_player->m_playerInfo);
-
 			LogoutPlayer(true);
 			return;
 		}
