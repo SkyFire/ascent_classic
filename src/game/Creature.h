@@ -371,7 +371,7 @@ public:
 	void RegenerateHealth();
 	void RegenerateMana();
 
-	ASCENT_INLINE bool CanSee(Unit* obj) // * Invisibility & Stealth Detection - Partha *
+	bool CanSee(Unit* obj) // * Invisibility & Stealth Detection - Partha *
 	{
 		if(!obj)
 			return false;

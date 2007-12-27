@@ -318,14 +318,14 @@ public:
 	bool running;
 
 	Mutex tcMutex;
-	ASCENT_INLINE void incrementThreadCount()
+	void incrementThreadCount()
 	{
 		tcMutex.Acquire();
 		++thread_count;
 		tcMutex.Release();
 	}
 
-	ASCENT_INLINE void decrementThreadCount()
+	void decrementThreadCount()
 	{
 		tcMutex.Acquire();
 		--thread_count;

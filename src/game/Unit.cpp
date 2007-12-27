@@ -1599,7 +1599,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 			Creature * c = (Creature*)(pVictim);
 			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			{
-				victim_skill = max(victim_skill,((int32)this->getLevel()+3)*5); //used max to avoid situation when lowlvl hits boss.
+				victim_skill = std::max(victim_skill,((int32)this->getLevel()+3)*5); //used max to avoid situation when lowlvl hits boss.
 			}
 		} 
 	}
@@ -1660,7 +1660,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 		{ 
 			Creature * c = (Creature*)(this);
 			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
-				self_skill = max(self_skill,((int32)pVictim->getLevel()+3)*5);//used max to avoid situation when lowlvl hits boss.
+				self_skill = std::max(self_skill,((int32)pVictim->getLevel()+3)*5);//used max to avoid situation when lowlvl hits boss.
 		} 
 	}
 	//==========================================================================================
@@ -1706,20 +1706,20 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 
 	//--------------------------------by skill difference---------------------------------------
 	float vsk = (float)self_skill-(float)victim_skill;
-	dodge = max(0.0f,dodge-vsk*0.04f);
+	dodge = std::max(0.0f,dodge-vsk*0.04f);
 	if (parry)
-		parry = max(0.0f,parry-vsk*0.04f);
+		parry = std::max(0.0f,parry-vsk*0.04f);
 	if (block)
-		block = max(0.0f,block-vsk*0.04f);
+		block = std::max(0.0f,block-vsk*0.04f);
 
 	if (vsk>0)
-		hitchance = max(hitchance,95.0f+vsk*0.02f+hitmodifier);
+		hitchance = std::max(hitchance,95.0f+vsk*0.02f+hitmodifier);
 	else
 	{
 		if (pVictim->IsPlayer())
-			hitchance = max(hitchance,95.0f+vsk*0.1f+hitmodifier); //wowwiki multiplier - 0.04 but i think 0.1 more balanced
+			hitchance = std::max(hitchance,95.0f+vsk*0.1f+hitmodifier); //wowwiki multiplier - 0.04 but i think 0.1 more balanced
 		else
-			hitchance = max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
+			hitchance = std::max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
 	}
 
 	if(ability && ability->SpellGroupType)
@@ -1739,7 +1739,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	//==========================================================================================
 	//--------------------------------cummulative chances generation----------------------------
 	float chances[4];
-	chances[0]=max(0.0f,100.0f-hitchance);
+	chances[0]=std::max(0.0f,100.0f-hitchance);
 	chances[1]=chances[0]+dodge;
 	chances[2]=chances[1]+parry;
 	chances[3]=chances[2]+block;
@@ -1837,7 +1837,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 			Creature * c = (Creature*)(pVictim);
 			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			{
-				victim_skill = max(victim_skill,((int32)this->getLevel()+3)*5); //used max to avoid situation when lowlvl hits boss.
+				victim_skill = std::max(victim_skill,((int32)this->getLevel()+3)*5); //used max to avoid situation when lowlvl hits boss.
 			}
 		} 
 	}
@@ -1900,7 +1900,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 		{ 
 			Creature * c = (Creature*)(this);
 			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
-				self_skill = max(self_skill,((int32)pVictim->getLevel()+3)*5);//used max to avoid situation when lowlvl hits boss.
+				self_skill = std::max(self_skill,((int32)pVictim->getLevel()+3)*5);//used max to avoid situation when lowlvl hits boss.
 		} 
 		crit = 5.0f; //will be modified later
 	}
@@ -1975,24 +1975,24 @@ else
 		}
 //--------------------------------by skill difference---------------------------------------
 	float vsk = (float)self_skill-(float)victim_skill;
-	dodge = max(0.0f,dodge-vsk*0.04f);
+	dodge = std::max(0.0f,dodge-vsk*0.04f);
 	if (parry)
-		parry = max(0.0f,parry-vsk*0.04f);
+		parry = std::max(0.0f,parry-vsk*0.04f);
 	if (block)
-		block = max(0.0f,block-vsk*0.04f);
+		block = std::max(0.0f,block-vsk*0.04f);
 
 	crit += pVictim->IsPlayer() ? vsk*0.04f : min(vsk*0.2f,0.0f) ; 
 	crit -= pVictim->IsPlayer() ? static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) : 0.0f;
 	if (crit<0) crit=0.0f;
 
 	if (vsk>0)
-			hitchance = max(hitchance,95.0f+vsk*0.02f+hitmodifier);
+			hitchance = std::max(hitchance,95.0f+vsk*0.02f+hitmodifier);
 	else
 	{
 		if (pVictim->IsPlayer())
-			hitchance = max(hitchance,95.0f+vsk*0.04f+hitmodifier);
+			hitchance = std::max(hitchance,95.0f+vsk*0.04f+hitmodifier);
 		else
-			hitchance = max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
+			hitchance = std::max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
 	}
 
 	if(ability && ability->SpellGroupType)
@@ -2029,7 +2029,7 @@ else
 //==========================================================================================
 //--------------------------------cummulative chances generation----------------------------
 	float chances[7];
-	chances[0]=max(0.0f,100.0f-hitchance);
+	chances[0]=std::max(0.0f,100.0f-hitchance);
 	chances[1]=chances[0]+dodge;
 	chances[2]=chances[1]+parry;
 	chances[3]=chances[2]+glanc;
@@ -4885,7 +4885,7 @@ float Unit::get_chance_to_daze(Unit *target)
 	if(!defense_skill)
 		defense_skill=1;
 	float chance_to_daze=attack_skill*20/defense_skill;//if level is equal then we get a 20% chance to daze
-	chance_to_daze = chance_to_daze*min(target->getLevel()/30.0f,1);//for targets below level 30 the chance decreses
+	chance_to_daze = chance_to_daze*std::min(target->getLevel()/30.0f,1.0f);//for targets below level 30 the chance decreses
 	if(chance_to_daze>40)
 		return 40.0f;
 	else return chance_to_daze;
@@ -5542,4 +5542,27 @@ bool Unit::RemoveAllAurasByMechanic( uint32 MechanicType , uint32 MaxDispel = -1
 			}
 		}
 	return ( DispelCount == 0 );
+}
+
+void Unit::setAttackTimer(int32 time, bool offhand)
+{
+	if(!time)
+		time = offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
+
+	time = std::max(1000,float2int32(float(time)*GetFloatValue(UNIT_MOD_CAST_SPEED)));
+	if(time>300000)		// just in case.. shouldn't happen though
+		time=offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
+
+	if(offhand)
+		m_attackTimer_1 = getMSTime() + time;
+	else
+		m_attackTimer = getMSTime() + time;
+}
+
+bool Unit::isAttackReady(bool offhand)
+{
+	if(offhand)
+		return (getMSTime() >= m_attackTimer_1) ? true : false;
+	else
+		return (getMSTime() >= m_attackTimer) ? true : false;
 }

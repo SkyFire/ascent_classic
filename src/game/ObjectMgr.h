@@ -216,7 +216,7 @@ protected:
 class Charter
 {
 public:
-	ASCENT_INLINE uint32 GetNumberOfSlotsByType()
+	uint32 GetNumberOfSlotsByType()
 	{
 		switch(CharterType)
 		{
@@ -338,7 +338,7 @@ public:
 	// Groups
 	Group * GetGroupByLeader(Player *pPlayer);
 	Group * GetGroupById(uint32 id);
-	ASCENT_INLINE uint32 GenerateGroupId()
+	uint32 GenerateGroupId()
 	{
 		uint32 r;
 		m_guidGenMutex.Acquire();
@@ -347,7 +347,7 @@ public:
 		return r;
 	}
 
-	ASCENT_INLINE uint32 GenerateGuildId()
+	uint32 GenerateGuildId()
 	{
 		uint32 r;
 		m_guidGenMutex.Acquire();

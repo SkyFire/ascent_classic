@@ -90,7 +90,7 @@ public:
 		};
 		fputs(colorstrings[color], stdout);
 #else
-        SetConsoleTextAttribute(stdout_handle, color);
+        SetConsoleTextAttribute(stdout_handle, (WORD)color);
 #endif
 	}
 

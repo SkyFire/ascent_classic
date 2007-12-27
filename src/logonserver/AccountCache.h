@@ -126,7 +126,7 @@ public:
 
 	void AddAccount(Field* field);
 
-	ASCENT_INLINE Account* GetAccount(string Name)
+	Account* GetAccount(string Name)
 	{
 		setBusy.Acquire();
 		Account * pAccount = NULL;
@@ -151,7 +151,7 @@ public:
 	ASCENT_INLINE size_t GetCount() { return AccountDatabase.size(); }
 
 private:
-	ASCENT_INLINE Account* __GetAccount(string Name)
+	Account* __GetAccount(string Name)
 	{
 		// this should already be uppercase!
 #ifdef WIN32
@@ -212,10 +212,9 @@ public:
 	void		  SendRealms(AuthSocket * Socket);
 	
 	// Realm management
-	ASCENT_INLINE uint32 GenerateRealmID()
+	uint32 GenerateRealmID()
 	{
-		realmhigh++;
-		return realmhigh;
+		return ++realmhigh;
 	}
 
 	Realm*		  AddRealm(uint32 realm_id, Realm * rlm);

@@ -95,7 +95,7 @@ public:
 	uint32 ClientConnected(string AccountName, WorldSocket * Socket);
 	void UnauthedSocketClose(uint32 id);
 	void RemoveUnauthedSocket(uint32 id);
-	ASCENT_INLINE WorldSocket* GetSocketByRequest(uint32 id)
+	WorldSocket* GetSocketByRequest(uint32 id)
 	{
 		//pendingLock.Acquire();
 

@@ -137,20 +137,20 @@ public:
 	void RegisterQuestEvent(uint32 Id, uint32 Event, const char * FunctionName);
 	void RegisterGameObjectEvent(uint32 Id, uint32 Event, const char * FunctionName);
 
-	ASCENT_INLINE const char * GetUnitEvent(uint32 Id, uint32 Event)
+	const char * GetUnitEvent(uint32 Id, uint32 Event)
 	{
 		UnitBindingMap::iterator itr = m_unitBinding.find(Id);
 		ASSERT(Event<CREATURE_EVENT_COUNT);
 		return (itr == m_unitBinding.end()) ? NULL : itr->second.Functions[Event];
 	}
-	ASCENT_INLINE const char * GetQuestEvent(uint32 Id, uint32 Event)
+	const char * GetQuestEvent(uint32 Id, uint32 Event)
 	{
 		QuestBindingMap::iterator itr = m_questBinding.find(Id);
 		ASSERT(Event<QUEST_EVENT_COUNT);
 		return (itr == m_questBinding.end()) ? NULL : itr->second.Functions[Event];
 	}
 
-	ASCENT_INLINE const char * GetGameObjectEvent(uint32 Id, uint32 Event)
+	const char * GetGameObjectEvent(uint32 Id, uint32 Event)
 	{
 		GameObjectBindingMap::iterator itr =m_gameobjectBinding.find(Id);
 		ASSERT(Event<GAMEOBJECT_EVENT_COUNT);

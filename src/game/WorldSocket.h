@@ -163,7 +163,7 @@ ASCENT_INLINE void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid)
 
 //!!! warning. This presumes that all guids can be compressed at least 1 byte
 //make sure you choose highguids acordingly
-ASCENT_INLINE unsigned int FastGUIDPack(const uint64 & oldguid, unsigned char * buffer, uint32 pos)
+static unsigned int FastGUIDPack(const uint64 & oldguid, unsigned char * buffer, uint32 pos)
 {
 	// hehe speed freaks
 	uint8 guidmask = 0;

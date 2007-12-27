@@ -192,7 +192,7 @@ struct SERVER_DECL TimedEvent
 	static TimedEvent * Allocate(void* object, CallbackBase* callback, uint32 flags, time_t time, uint32 repeat);
 
 #ifdef WIN32
-	ASCENT_INLINE void DecRef()
+	void DecRef()
 	{
 		InterlockedDecrement(&ref);
 		if(ref <= 0)
@@ -202,15 +202,15 @@ struct SERVER_DECL TimedEvent
 		}
 	}
 
-	ASCENT_INLINE void IncRef() { InterlockedIncrement(&ref); }
+	void IncRef() { InterlockedIncrement(&ref); }
 #else
 
-	/* espire: if anyone knows how to do the equivilent of InterlockedIncrement/Decrement on linux feel free
+	/* burlex: if anyone knows how to do the equivilent of InterlockedIncrement/Decrement on linux feel free
 	   to change this, I couldn't find the atomic functions anymore though :*( */
 
-	ASCENT_INLINE void IncRef() { ++ref; }
+	void IncRef() { ++ref; }
     
-	ASCENT_INLINE void DecRef()
+	void DecRef()
 	{
 		--ref;
 		if(ref <= 0)
@@ -281,7 +281,7 @@ public:
 		obj->event_AddEvent(event);
 	}
 
-	template <class Class> ASCENT_INLINE void RemoveEvents(Class *obj) { RemoveEvents(obj, -1); }
+	template <class Class> void RemoveEvents(Class *obj) { obj->event_RemoveEvents(-1); }
 	template <class Class> void RemoveEvents(Class *obj, int32 type)
 	{
 		obj->event_RemoveEvents(type);
@@ -314,21 +314,21 @@ public:
 		return itr->second;
 	}
 
-	ASCENT_INLINE void AddEventHolder(EventableObjectHolder * holder, int32 InstanceId)
+	void AddEventHolder(EventableObjectHolder * holder, int32 InstanceId)
 	{
 		holderLock.Acquire();
 		mHolders.insert( HolderMap::value_type( InstanceId, holder) );
 		holderLock.Release();
 	}
 
-	ASCENT_INLINE void RemoveEventHolder(int32 InstanceId)
+	void RemoveEventHolder(int32 InstanceId)
 	{
 		holderLock.Acquire();
 		mHolders.erase(InstanceId);
 		holderLock.Release();
 	}
 
-	ASCENT_INLINE void RemoveEventHolder(EventableObjectHolder * holder)
+	void RemoveEventHolder(EventableObjectHolder * holder)
 	{
 		holderLock.Acquire();
 		HolderMap::iterator itr = mHolders.begin();

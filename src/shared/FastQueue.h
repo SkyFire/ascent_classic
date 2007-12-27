@@ -131,7 +131,7 @@ public:
 		m_lock.Release();
 	}
 
-	ASCENT_INLINE bool HasItems()
+	bool HasItems()
 	{
 		bool ret;
 		m_lock.Acquire();

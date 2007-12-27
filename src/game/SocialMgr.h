@@ -44,17 +44,17 @@ public:
 	void DelIgnore(Player* plr, uint32 ignoreguid);
 
 	bool IsFriend(uint32 plrguid, uint32 target);
-	ASCENT_INLINE bool HasFriend(uint32 plrguid, uint32 mfriend); // Checking before adding a friend
+	bool HasFriend(uint32 plrguid, uint32 mfriend); // Checking before adding a friend
 	bool IsIgnore(uint32 plrguid, uint32 target);
-	ASCENT_INLINE bool HasIgnore(uint32 plrguid, uint32 mignore); // Checking before adding an ignore
+	bool HasIgnore(uint32 plrguid, uint32 mignore); // Checking before adding an ignore
 	bool HasIgnore(Player* plr, Player* mignore); // Checking for whispers blocking
 
 	void SendFriendList(Player* plr);
 	void SendIgnoreList(Player* plr);
 	void SendUpdateToFriends(Player* plr);
 
-	ASCENT_INLINE void SendOnlinePkt(Player* plr, SocialStr* pNfo);
-	ASCENT_INLINE void SendOfflinePkt(Player* plr, uint32 fGuid);
+	void SendOnlinePkt(Player* plr, SocialStr* pNfo);
+	void SendOfflinePkt(Player* plr, uint32 fGuid);
 
 	void LoggedIn(Player* plr); // To send a friend status update 'online' to people having him in their list
 	void LoggedOut(Player* plr); // To send a friend status update 'offline' to people having him in their list

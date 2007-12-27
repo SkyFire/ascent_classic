@@ -106,6 +106,14 @@ public:
 			assert(stringOffset < file.stringSize);
 			strcpy(reinterpret_cast<char*>(file.stringTable + stringOffset),value);
 		}
+
+		Record& operator=(Record& src)
+		{
+			this->file = src.file;
+			this->offset = src.offset;
+			return *this;
+		}
+
 	private:
 		Record(DBCFile &file, unsigned char *offset): file(file), offset(offset) {}
 		DBCFile &file;

@@ -408,7 +408,7 @@ bool SocialMgr::HasIgnore(Player* plr, Player* mignore)
 	return false;
 }
 
-ASCENT_INLINE void SocialMgr::SendOnlinePkt(Player* plr, SocialStr* pNfo)
+void SocialMgr::SendOnlinePkt(Player* plr, SocialStr* pNfo)
 {
 	if(!plr)
 	   return;
@@ -420,7 +420,7 @@ ASCENT_INLINE void SocialMgr::SendOnlinePkt(Player* plr, SocialStr* pNfo)
 	plr->GetSession()->SendPacket( &data );
 }
 
-ASCENT_INLINE void SocialMgr::SendOfflinePkt(Player* plr, uint32 fGuid)
+void SocialMgr::SendOfflinePkt(Player* plr, uint32 fGuid)
 {
 	if(!plr || !plr->GetSession())
 		return;

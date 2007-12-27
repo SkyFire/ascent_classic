@@ -31,7 +31,8 @@ void OutputCrashLogLine(const char* format, ...);
 
 #ifdef WIN32
 
-#include <Windows.h>
+//#include <Windows.h>
+#include "Common.h"
 #include <DbgHelp.h>
 #include "StackWalker.h"
 #include "CircularQueue.h"

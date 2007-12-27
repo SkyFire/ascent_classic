@@ -131,7 +131,7 @@ enum SPELL_MODIFIER_TYPE
 };
 
 
-ASCENT_INLINE void SM_FFValue(int32 *m, float *v,uint32 group)
+static void SM_FFValue(int32 *m, float *v,uint32 group)
 {
     if(m == 0) return;
 
@@ -140,7 +140,7 @@ ASCENT_INLINE void SM_FFValue(int32 *m, float *v,uint32 group)
             (*v)+=m[x];
 }
 
-ASCENT_INLINE void SM_FIValue(int32 *m, int32 *v,uint32 group)
+static void SM_FIValue(int32 *m, int32 *v,uint32 group)
 {
     if(m == 0) return;
 
@@ -149,7 +149,7 @@ ASCENT_INLINE void SM_FIValue(int32 *m, int32 *v,uint32 group)
             (*v)+=m[x];
 }
 
-ASCENT_INLINE void SM_PIValue(int32 *m, int32 *v,uint32 group)
+static void SM_PIValue(int32 *m, int32 *v,uint32 group)
 {
     if(m == 0) return;
 
@@ -158,7 +158,7 @@ ASCENT_INLINE void SM_PIValue(int32 *m, int32 *v,uint32 group)
             (*v)+= ((*v)*(m[x]))/100;
 }
 
-ASCENT_INLINE void SM_PFValue(int32*m, float *v,uint32 group)
+static void SM_PFValue(int32*m, float *v,uint32 group)
 {
     if(m == 0) return;
     
@@ -1493,7 +1493,7 @@ public:
     // Checks the caster is ready for cast
     uint8 CanCast(bool);
     // Checks the caster has needed items on it 
-    ASCENT_INLINE int8 CheckItems();
+    int8 CheckItems();
     // Removes Reagents if cast is successful
     void RemoveItems();
     // Calculates the i'th effect value

@@ -57,7 +57,7 @@ const char * AreaTriggerFailureMessages[] = {
 	"You must be level 70 to enter heroic mode.",
 };
 
-ASCENT_INLINE uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSession, Player * pPlayer, MapInfo * pMapInfo)
+uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSession, Player * pPlayer, MapInfo * pMapInfo)
 {
 	if(pAreaTrigger->required_level && pPlayer->getLevel() < pAreaTrigger->required_level)
 		return AREA_TRIGGER_FAILURE_LEVEL;

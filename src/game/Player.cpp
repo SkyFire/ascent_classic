@@ -4173,7 +4173,7 @@ void Player::UpdateChances()
 
 	tmp = 5.0f + this->GetParryFromSpell();
 	tmp += CalcRating( PLAYER_RATING_MODIFIER_PARRY );
-	SetFloatValue( PLAYER_PARRY_PERCENTAGE, max( 0, min( tmp, 95.0f ) ) ); //let us not use negative parry. Some spells decrease it
+	SetFloatValue( PLAYER_PARRY_PERCENTAGE, std::max( 0.0f, std::min( tmp, 95.0f ) ) ); //let us not use negative parry. Some spells decrease it
 /* The formula is generated as follows:
 
 [agility] / [crit constant*] + [skill modifier] + [bonuses]
@@ -7042,16 +7042,16 @@ float Player::CalcRating(uint32 index)
 	uint32 ind2 = PLAYER_FIELD_COMBAT_RATING_1 - index;
 	if( ind2 <= 10 || ( ind2 >= 14 && ind2 <= 21 ) )
 	{
-		int rating = m_uint32Values[index];
+		double rating = (double)m_uint32Values[index];
 		int l = getLevel();
 		if( l < 10 )
 			l = 10;//this is not dirty fix-> that's from wowwiki
 		double cost;
 		if( l < 60 )
-			cost = ( l - 8 ) / 52.0f;
+			cost=( l - 8 ) / 52.0;
 		else
-			cost = 82.0f / ( 262 - 3 * l );
-		return rating / float( BaseRating[ind2] * cost );
+			cost = 82.0 / double( 262 - 3 * l );
+		return float(rating / BaseRating[ind2] * cost);
 	}
 	else
 		return 0;
@@ -8252,7 +8252,7 @@ uint32 Player::GetMainMeleeDamage(uint32 AP_owerride)
 			r = lev + delta + ap_bonus * 2500.0f;
 		min_dmg = r * 0.9f;
 		max_dmg = r * 1.1f;
-		return float2int32(max((min_dmg + max_dmg)/2,0));
+		return float2int32(std::max((min_dmg + max_dmg)/2.0f,0.0f));
 	}
 //////no druid ss	
 	uint32 speed=2000;
@@ -8280,7 +8280,7 @@ uint32 Player::GetMainMeleeDamage(uint32 AP_owerride)
 	r *= tmp;
 	max_dmg = r * 1.1f;
 
-	return float2int32(max((min_dmg + max_dmg)/2,0));
+	return float2int32(std::max((min_dmg + max_dmg)/2.0f,0.0f));
 }
 
 void Player::EventPortToGM(Player *p)

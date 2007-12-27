@@ -51,7 +51,7 @@ Mutex m_crashLock;
 
 #include <stdio.h>
 #include <time.h>
-#include <windows.h>
+//#include <windows.h>
 #include "Log.h"
 #include <tchar.h>
 

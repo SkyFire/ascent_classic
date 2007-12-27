@@ -1023,7 +1023,7 @@ public:
     /* Trade                                                                */
     /************************************************************************/
 	void                SendTradeUpdate(void);
-	ASCENT_INLINE void         ResetTradeVariables()
+	void         ResetTradeVariables()
 	{
 		mTradeGold = 0;
 		memset(&mTradeItems, 0, sizeof(Item*) * 8);
@@ -1203,20 +1203,9 @@ public:
 	{
 		return GetByte(UNIT_FIELD_BYTES_1,2);
 	}
-	ASCENT_INLINE void setAttackTimer(int32 time, bool offhand)
-	{
-		if(!time)
-			time = offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
 
-		time = max(0,float2int32(time*GetFloatValue(UNIT_MOD_CAST_SPEED)));
-
-		if(offhand)
-			m_attackTimer_1 = getMSTime() + time;
-		else
-			m_attackTimer = getMSTime() + time;
-	}
 	
-	ASCENT_INLINE void delayAttackTimer(int32 delay)
+	void delayAttackTimer(int32 delay)
 	{
 		if(!delay)
 			return;

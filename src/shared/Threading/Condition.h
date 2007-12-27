@@ -21,7 +21,7 @@
 #define CONDITION_H
 
 #ifdef WIN32
-#include <windows.h>
+//#include <windows.h>
 #define MAX_AWAITING_THREADS 10
 
 struct list_entry

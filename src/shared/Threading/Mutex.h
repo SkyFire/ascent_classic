@@ -102,7 +102,7 @@ public:
 	ASCENT_INLINE void Acquire()
 	{
 		DWORD thread_id = GetCurrentThreadId(), owner;
-		if(thread_id == m_lock)
+		if(thread_id == (DWORD)m_lock)
 		{
 			++m_recursiveCount;
 			return;
@@ -123,7 +123,7 @@ public:
 	ASCENT_INLINE bool AttemptAcquire()
 	{
 		DWORD thread_id = GetCurrentThreadId();
-		if(thread_id == m_lock)
+		if(thread_id == (DWORD)m_lock)
 		{
 			++m_recursiveCount;
 			return true;

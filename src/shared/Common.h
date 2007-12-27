@@ -78,6 +78,36 @@ enum MsTimeVariables
 #include <math.h>
 #include <errno.h>
 
+#if defined( __WIN32__ ) || defined( WIN32 ) || defined( _WIN32 )
+#define WIN32_LEAN_AND_MEAN
+#define _WIN32_WINNT 0x0500
+#  include <windows.h>
+#else
+#  include <string.h>
+#  define MAX_PATH 1024
+#endif
+
+#ifdef CONFIG_USE_SELECT
+#undef FD_SETSIZE
+#define FD_SETSIZE 2048 
+#endif
+
+#if PLATFORM == PLATFORM_WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <signal.h>
+#include <netdb.h>
+#endif
+
+
 // current platform and compiler
 #define PLATFORM_WIN32 0
 #define PLATFORM_UNIX  1
@@ -155,7 +185,6 @@ enum MsTimeVariables
 
 #if PLATFORM == PLATFORM_WIN32
 #define STRCASECMP stricmp
-#define _WIN32_WINNT 0x0500
 #else
 #define STRCASECMP strcasecmp
 #endif
@@ -177,6 +206,14 @@ enum MsTimeVariables
 	#define CONFIG_USE_POLL
 #endif
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 #include <set>
 #include <list>
 #include <string>
@@ -192,12 +229,6 @@ enum MsTimeVariables
 					   + __GNUC_PATCHLEVEL__)
 #endif
 
-#if defined( __WIN32__ ) || defined( WIN32 ) || defined( _WIN32 )
-//#  include <windows.h>
-#else
-#  include <string.h>
-#  define MAX_PATH 1024
-#endif
 
 #ifndef WIN32
 #ifndef X64
@@ -227,25 +258,7 @@ enum MsTimeVariables
 #include <hash_set>
 #endif
 
-#ifdef CONFIG_USE_SELECT
-#undef FD_SETSIZE
-#define FD_SETSIZE 2048 
-#endif
 
-#if PLATFORM == PLATFORM_WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <signal.h>
-#include <netdb.h>
-#endif
 
 #ifdef _STLPORT_VERSION
 #define HM_NAMESPACE std
@@ -471,31 +484,45 @@ Scripting system exports/imports
 // fix buggy MSVC's for variable scoping to be reliable =S
 #define for if(true) for
 
-#ifdef USING_BIG_ENDIAN
-#  define GNL_LOWER_WORD_BYTE	4
-#else
-#  define GNL_LOWER_WORD_BYTE	0
+#if COMPILER == COMPILER_MICROSOFT
+#pragma float_control(push)
+#pragma float_control(precise, on)
 #endif
-
-#define GNL_LONG_AT_BYTE(x,b)	*(long *)(((char *)&x) + b)
-#define FIST_MAGIC_QROUND (((65536.0 * 65536.0 * 16.0) + (65536.0 * 0.5)) * 65536.0)
-
 /// Fastest Method of float2int32
-static ASCENT_INLINE int float2int32(const float value)
+static inline int float2int32(const float value)
 {
-  union { int asInt[2]; double asDouble; } n;
-  n.asDouble = value + 6755399441055744.0;
-  
-#if USING_BIG_ENDIAN
-  return n.asInt [1];
+#if !defined(X64) && COMPILER == COMPILER_MICROSOFT && !defined(USING_BIG_ENDIAN)
+	int i;
+	__asm {
+		fld f
+		frndint
+		fistp i
+	}
+	return i;
 #else
-  return n.asInt [0];
+	union { int asInt[2]; double asDouble; } n;
+	n.asDouble = value + 6755399441055744.0;
+
+#if USING_BIG_ENDIAN
+	return n.asInt [1];
+#else
+	return n.asInt [0];
+#endif
 #endif
 }
 
 /// Fastest Method of long2int32
-static ASCENT_INLINE int long2int32(const double value)
+static inline int long2int32(const double value)
 {
+#if !defined(X64) && COMPILER == COMPILER_MICROSOFT && !defined(USING_BIG_ENDIAN)
+	int i;
+	__asm {
+		fld f
+			frndint
+			fistp i
+	}
+	return i;
+#else
   union { int asInt[2]; double asDouble; } n;
   n.asDouble = value + 6755399441055744.0;
 
@@ -504,39 +531,11 @@ static ASCENT_INLINE int long2int32(const double value)
 #else
   return n.asInt [0];
 #endif
+#endif
 }
 
-/// Round a floating-point value and convert to integer
-static ASCENT_INLINE long QRound (double inval)
-{
-	double dtemp = FIST_MAGIC_QROUND + inval;
-	return GNL_LONG_AT_BYTE (dtemp, GNL_LOWER_WORD_BYTE) - 0x80000000;
-}
-
-/// Convert a float to a cross-platform 32-bit format (no endianess adjustments!)
-static ASCENT_INLINE long float2long (float f)
-{
-  int exp;
-  long mant = QRound (frexp (f, &exp) * 0x1000000);
-  long sign = mant & 0x80000000;
-  if (mant < 0) mant = -mant;
-  if (exp > 63) exp = 63; else if (exp < -64) exp = -64;
-  return sign | ((exp & 0x7f) << 24) | (mant & 0xffffff);
-}
-
-/// Convert a 32-bit cross-platform float to native format (no endianess adjustments!)
-static ASCENT_INLINE float long2float (long l)
-{
-  int exp = (l >> 24) & 0x7f;
-  if (exp & 0x40) exp = exp | ~0x7f;
-  float mant = float (l & 0x00ffffff) / 0x1000000;
-  if (l & 0x80000000) mant = -mant;
-  return (float) ldexp (mant, exp);
-}
-
-#ifndef max
-#define max(a,b) ((a)>(b))?(a):(b)
-#define min(a,b) ((a)<(b))?(a):(b)
+#if COMPILER == COMPILER_MICROSOFT
+#pragma float_control(pop)
 #endif
 
 #ifndef WIN32
@@ -607,9 +606,10 @@ struct WayPoint
 
 ASCENT_INLINE void reverse_array(uint8 * pointer, size_t count)
 {
+	size_t x;
 	uint8 * temp = (uint8*)malloc(count);
 	memcpy(temp, pointer, count);
-	for(size_t x = 0; x < count; ++x)
+	for(x = 0; x < count; ++x)
 		pointer[x] = temp[count-x-1];
 	free(temp);
 }
@@ -622,14 +622,14 @@ std::string ConvertTimeStampToDataTime(uint32 timestamp);
 
 ASCENT_INLINE void ASCENT_TOLOWER(std::string& str)
 {
-	for(size_t i = 0; i < str.length(); ++i)
-		str[i] = tolower(str[i]);
+	for(size_t i = 0; i < 1; ++i)
+		str[i] = (char)tolower(str[i]);
 };
 
 ASCENT_INLINE void ASCENT_TOUPPER(std::string& str)
 {
 	for(size_t i = 0; i < str.length(); ++i)
-		str[i] = toupper(str[i]);
+		str[i] = (char)toupper(str[i]);
 };
 
 #endif

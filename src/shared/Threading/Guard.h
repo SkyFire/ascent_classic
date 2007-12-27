@@ -40,6 +40,12 @@ public:
 		target.Release();
 	}
 
+	Guard& operator=(Guard& src)
+	{
+		this->target = src.target;
+		return *this;
+	}
+
 protected:
 	Mutex& target;
 };

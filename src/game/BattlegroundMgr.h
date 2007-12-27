@@ -100,7 +100,7 @@ struct BGScore
 #define AV_CONTROLED_STONEHEART_GRAVE_ALLIANCE  0x516 //1 -> alliance controled
 
 /* get level grouping for player */
-ASCENT_INLINE static uint32 GetLevelGrouping(uint32 level)
+static uint32 GetLevelGrouping(uint32 level)
 {
 	if(level < 10)
 		return 0;
@@ -282,7 +282,7 @@ public:
 	ASCENT_INLINE bool IsFull() { return !(HasFreeSlots(0) || HasFreeSlots(1)); }
 
 	/* Are we full? */
-	ASCENT_INLINE bool HasFreeSlots(uint32 Team) { m_mainLock.Acquire(); bool res = ((m_players[Team].size() + m_pendPlayers[Team].size()) < m_playerCountPerTeam); m_mainLock.Release(); return res; }
+	bool HasFreeSlots(uint32 Team) { m_mainLock.Acquire(); bool res = ((m_players[Team].size() + m_pendPlayers[Team].size()) < m_playerCountPerTeam); m_mainLock.Release(); return res; }
 
 	/* Add Player */
 	void AddPlayer(Player * plr, uint32 team);
@@ -300,7 +300,7 @@ public:
 	void RemovePendingPlayer(Player * plr);
 
 	/* Gets the number of free slots */
-	ASCENT_INLINE uint32 GetFreeSlots(uint32 t)
+	uint32 GetFreeSlots(uint32 t)
 	{
 		m_mainLock.Acquire();
 		size_t s = m_playerCountPerTeam - m_players[t].size() - m_pendPlayers[t].size();

@@ -566,9 +566,9 @@ bool World::SetInitialWorldSettings()
         namehash = crc32((const unsigned char*)nametext, (unsigned int)strlen(nametext));
 		sp->NameHash   = namehash; //need these set before we start processing spells
 
-		float radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[1])));
-		radius=max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[2])),radius);
-		radius=max(GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex)),radius);
+		float radius=std::max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[1])));
+		radius=std::max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[2])),radius);
+		radius=std::max(GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex)),radius);
 		sp->base_range_or_radius_sqr = radius*radius;
 
 		for(uint32 b=0;b<3;++b)

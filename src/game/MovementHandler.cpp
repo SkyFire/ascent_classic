@@ -106,7 +106,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 
 }
 
-ASCENT_INLINE void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSession * pSession)
+void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSession * pSession)
 {
 	//player swiming.
 

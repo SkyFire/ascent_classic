@@ -827,7 +827,7 @@ void Object::OutPacketToSet(uint16 Opcode, uint16 Len, const void * Data, bool s
 	}
 }
 
-ASCENT_INLINE void Object::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
+void Object::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 {
 	if(bToSelf && m_objectTypeId == TYPEID_PLAYER)
 	{

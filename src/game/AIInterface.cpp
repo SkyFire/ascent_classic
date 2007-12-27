@@ -1389,9 +1389,9 @@ Unit* AIInterface::FindTargetForSpell(AI_Spell *sp)
 	{
 		if(sp->spellType == STYPE_HEAL)
 		{
-			uint32 cur = m_Unit->GetUInt32Value(UNIT_FIELD_HEALTH);
-			uint32 max = m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-			float healthPercent = float(long2float(cur) / long2float(max));
+			uint32 cur = m_Unit->GetUInt32Value(UNIT_FIELD_HEALTH) + 1;
+			uint32 max = m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH) + 1;
+			float healthPercent = float(cur) / float(max);
 			if(healthPercent <= sp->floatMisc1) // Heal ourselves cause we got too low HP
 			{
 				m_Unit->SetUInt64Value(UNIT_FIELD_TARGET, 0);
@@ -1405,7 +1405,7 @@ Unit* AIInterface::FindTargetForSpell(AI_Spell *sp)
 				}
 				cur = (*i)->GetUInt32Value(UNIT_FIELD_HEALTH);
 				max = (*i)->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-				healthPercent = float(long2float(cur) / long2float(max));
+				healthPercent = float(cur) / float(max);
 				if(healthPercent <= sp->floatMisc1) // Heal ourselves cause we got too low HP
 				{
 					m_Unit->SetUInt64Value(UNIT_FIELD_TARGET, (*i)->GetGUID());
