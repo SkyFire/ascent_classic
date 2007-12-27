@@ -178,18 +178,17 @@ bool Group::AddMember(PlayerInfo * info, int32 subgroupid/* =-1 */)
 
 void Group::SetLeader(Player* pPlayer, bool silent)
 {
-	if(pPlayer)
+	if( pPlayer != NULL )
 	{
 		m_Leader = pPlayer->m_playerInfo;
-		m_dirty=true;
-		if(!silent && pPlayer)
+		m_dirty = true;
+		if( !silent )
 		{
-			WorldPacket data(SMSG_GROUP_SET_LEADER, pPlayer->GetNameString()->size() + 1);
+			WorldPacket data( SMSG_GROUP_SET_LEADER, pPlayer->GetNameString()->size() + 1 );
 			data << pPlayer->GetName();
-			SendPacketToAll(&data);
+			SendPacketToAll( &data );
 		}
 	}
-
 	Update();
 }
 
@@ -501,10 +500,13 @@ void Group::ExpandToRaid()
 
 void Group::SetLooter(Player *pPlayer, uint8 method, uint16 threshold)
 { 
-	m_LootMethod = method;
-	m_Looter = pPlayer->m_playerInfo;
-	m_LootThreshold  = threshold;
-	m_dirty=true;
+	if( pPlayer != NULL )
+	{
+		m_LootMethod = method;
+		m_Looter = pPlayer->m_playerInfo;
+		m_LootThreshold  = threshold;
+		m_dirty = true;
+	}
 	Update();
 }
 
