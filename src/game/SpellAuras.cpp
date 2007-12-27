@@ -538,7 +538,10 @@ void Aura::ApplyModifiers( bool apply )
 		}*/
 
 		if(mod->m_type<TOTAL_SPELL_AURAS)
+		{
+			sLog.outDebug("Known Aura id %d, value %d", (uint32)mod->m_type, (uint32)mod->m_amount );
 			(*this.*SpellAuraHandler[mod->m_type])(apply);
+		}
 		else
 			sLog.outError("Unknown Aura id %d", (uint32)mod->m_type);
 	}
@@ -5930,18 +5933,13 @@ void Aura::SpellAuraModHaste( bool apply )
 
 	if( m_target->GetTypeId() == TYPEID_PLAYER )
 	{
-		// test to see if we can fix haste not sowing the increases from auras and item hidden auras
-		// haste is a modified rating not a stat so im trying this
-		// same as with shield block not registering to the player that it is increased
 		if( apply )	
 		{
 			static_cast<Player*>(m_target)->m_meleeattackspeedmod += mod->m_amount;
-			//static_cast< Player* >(m_target)->ModifyBonuses( HASTE_RATING, mod->m_amount );
 		}
 		else
 		{
 			static_cast<Player*>(m_target)->m_meleeattackspeedmod -= mod->m_amount;
-			//static_cast< Player* >(m_target)->ModifyBonuses( HASTE_RATING,- mod->m_amount );
 		}
 		static_cast< Player* >(m_target)->UpdateAttackSpeed();
 	}
@@ -6073,24 +6071,18 @@ void Aura::SpellAuraResistPushback(bool apply)
 
 void Aura::SpellAuraModShieldBlockPCT( bool apply )
 {
-	if( p_target )
+	if( p_target != NULL )
 	{
-		// this is a test. i think it should probably be modifying the visible block rating
-		// the commented lines below where the old way now i am trying to use the other
-		// method set aside for items. as all items use ( block ) spell auras not as you would
-		// think actual modifiers. this is temporary until we get some feedback on how its
-		// working with this method
 		if( apply )
 		{
 			p_target->m_modblockabsorbvalue += ( uint32 )mod->m_amount;
-			//p_target->ModifyBonuses( SHIELD_BLOCK_RATING, mod->m_amount );
+
 		}
 		else
 		{
 			p_target->m_modblockabsorbvalue -= ( uint32 )mod->m_amount;
-			//p_target->ModifyBonuses( SHIELD_BLOCK_RATING, -mod->m_amount );
+
 		}
-		// this definately was not happening before so it wouldn't update stats
 		p_target->UpdateChances();
 	}
 }
@@ -7106,21 +7098,23 @@ void Aura::SpellAuraModRangedDamageTakenPCT(bool apply)
 
 void Aura::SpellAuraModBlockValue(bool apply)
 {
-	if (p_target)
+	if( p_target != NULL)
  	{
 		int32 amt;
- 		if(apply)
+ 		if( apply )
  		{
 			amt = mod->m_amount;
-			if(amt<0)
+			if( amt < 0 )
 				SetNegative();
 			else 
 				SetPositive();
  		}
 		else 
+		{
 			amt = -mod->m_amount;
-
+		}
 		p_target->m_modblockvaluefromspells += amt;
+		p_target->UpdateChances();
 	}
 }
 
