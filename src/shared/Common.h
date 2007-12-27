@@ -484,7 +484,7 @@ Scripting system exports/imports
 // fix buggy MSVC's for variable scoping to be reliable =S
 #define for if(true) for
 
-#if COMPILER == COMPILER_MICROSOFT
+#if COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1400
 #pragma float_control(push)
 #pragma float_control(precise, on)
 #endif
@@ -494,7 +494,7 @@ static inline int float2int32(const float value)
 #if !defined(X64) && COMPILER == COMPILER_MICROSOFT && !defined(USING_BIG_ENDIAN)
 	int i;
 	__asm {
-		fld f
+		fld value
 		frndint
 		fistp i
 	}
@@ -517,9 +517,9 @@ static inline int long2int32(const double value)
 #if !defined(X64) && COMPILER == COMPILER_MICROSOFT && !defined(USING_BIG_ENDIAN)
 	int i;
 	__asm {
-		fld f
-			frndint
-			fistp i
+		fld value
+		frndint
+		fistp i
 	}
 	return i;
 #else
@@ -534,7 +534,7 @@ static inline int long2int32(const double value)
 #endif
 }
 
-#if COMPILER == COMPILER_MICROSOFT
+#if COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1400
 #pragma float_control(pop)
 #endif
 
