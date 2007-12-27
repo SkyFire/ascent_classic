@@ -8,10 +8,9 @@ static const char * BUILD_TAG		= "2.7-TRUNK";
 
 ASCENT_INLINE int g_getRevision()
 {
-	const char * p = REVISION_TEXT + 6;
-	return atoi(p);
+	const char* p = REVISION_TEXT + 6;
+	return atoi( p );
 }
 
 //////////////////////////////////////////////////////////////////
-/////
 #endif 

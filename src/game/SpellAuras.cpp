@@ -6063,17 +6063,23 @@ void Aura::SpellAuraResistPushback(bool apply)
 	}
 }
 
-void Aura::SpellAuraModShieldBlockPCT(bool apply)
+void Aura::SpellAuraModShieldBlockPCT( bool apply )
 {
-	if(p_target)
+	if( p_target )
 	{
-		if(apply)
+		// this is a test. i think it should probably be modifying the visible block rating
+		// the commented lines below where the old way now i am trying to use the other
+		// method set aside for items. as all items use ( block ) spell auras not as you would
+		// think actual modifiers
+		if( apply )
 		{
-			p_target->m_modblockabsorbvalue += (uint32)mod->m_amount;
+			//p_target->m_modblockabsorbvalue += ( uint32 )mod->m_amount;
+			p_target->ModifyBonuses( SHIELD_BLOCK_RATING, mod->m_amount );
 		}
 		else
 		{
-			p_target->m_modblockabsorbvalue -= (uint32)mod->m_amount;
+			//p_target->m_modblockabsorbvalue -= ( uint32 )mod->m_amount;
+			p_target->ModifyBonuses( SHIELD_BLOCK_RATING, -mod->m_amount );
 		}
 	}
 }

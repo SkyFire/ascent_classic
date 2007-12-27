@@ -4162,18 +4162,21 @@ void Player::UpdateChances()
 
 	//block = 0 if no shield
 	Item* it = this->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
-	if( it && it->GetProto()->InventoryType == INVTYPE_SHIELD )
+	if( it != NULL && it->GetProto()->InventoryType == INVTYPE_SHIELD )
 	{
 		tmp = 5.0f + GetUInt32Value( UNIT_FIELD_STAT0 ) / 22.0f + this->GetBlockFromSpell();
 		tmp += CalcRating( PLAYER_RATING_MODIFIER_BLOCK );//block rating
 	}
 	else
 		tmp = 0.0f;
+
 	SetFloatValue( PLAYER_BLOCK_PERCENTAGE, min( tmp, 95.0f ) );
 
+	//parry
 	tmp = 5.0f + this->GetParryFromSpell();
 	tmp += CalcRating( PLAYER_RATING_MODIFIER_PARRY );
 	SetFloatValue( PLAYER_PARRY_PERCENTAGE, std::max( 0.0f, std::min( tmp, 95.0f ) ) ); //let us not use negative parry. Some spells decrease it
+
 /* The formula is generated as follows:
 
 [agility] / [crit constant*] + [skill modifier] + [bonuses]
@@ -7037,25 +7040,24 @@ const double BaseRating []= {
 
 };
 
-float Player::CalcRating(uint32 index)
+float Player::CalcRating( uint32 index )
 {
-	uint32 ind2 = PLAYER_FIELD_COMBAT_RATING_1 - index;
-	if( ind2 <= 10 || ( ind2 >= 14 && ind2 <= 21 ) )
+	uint32 relative_index = PLAYER_FIELD_COMBAT_RATING_1 - index;
+	if( relative_index <= 10 || ( relative_index >= 14 && relative_index <= 21 ) )
 	{
 		double rating = (double)m_uint32Values[index];
-		int l = getLevel();
-		if( l < 10 )
-			l = 10;//this is not dirty fix-> that's from wowwiki
+		int level = getLevel();
+		if( level < 10 )//this is not dirty fix -> it is from wowwiki
+			level = 10;
 		double cost;
-		if( l < 60 )
-			cost=( l - 8 ) / 52.0;
+		if( level < 60 )
+			cost = ( double( level ) - 8.0 ) / 52.0;
 		else
-			cost = 82.0 / double( 262 - 3 * l );
-		return float(rating / BaseRating[ind2] * cost);
+			cost = 82.0 / ( 262.0 - 3.0 *  double( level ) );
+		return float( rating / BaseRating[relative_index] * cost );
 	}
 	else
-		return 0;
-
+		return 0.0f;
 }
 
 bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, float X, float Y, float Z, float O)
