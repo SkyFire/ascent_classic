@@ -286,14 +286,14 @@ void Group::Update()
 					}
 				}
 
-				if( m_Leader )
+				if( m_Leader != NULL )
 					data << m_Leader->guid << uint32( 0 );
 				else
 					data << uint64( 0 );
 
 				data << uint8( m_LootMethod );
 
-				if( m_Looter )
+				if( m_Looter != NULL )
 					data << m_Looter->guid << uint32( 0 );
 				else
 					data << uint64( 0 );
