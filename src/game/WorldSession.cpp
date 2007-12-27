@@ -180,9 +180,6 @@ int WorldSession::Update(uint32 InstanceID)
 			return 0;
 		}
 
-		if(_player && _player->m_Group)
-			_player->m_Group->RemovePlayer(_player->m_playerInfo, _player, true);
-
 		LogoutPlayer(true);
 	}
 
@@ -282,8 +279,6 @@ void WorldSession::LogoutPlayer(bool Save)
 
 		_player->GetItemInterface()->EmptyBuyBack();
 		
-		// Remove ourself from a group
-		Group * group = _player->GetGroup();
 		
 		for(int i=0;i<3;++i)
 		{
@@ -309,11 +304,9 @@ void WorldSession::LogoutPlayer(bool Save)
 		  if(_player->IsInWorld())
 			_player->RemoveFromWorld();
 		
-		  if(group)
-		  {
-			  group->RemovePlayer(_player->m_playerInfo, NULL, false);
-			  _player->m_Group =NULL;
-		  }
+		  _player->m_playerInfo->m_loggedInPlayer=NULL;
+		  if(_player->m_playerInfo->m_Group)
+			  _player->m_playerInfo->m_Group->Update();
 	  
 		// Remove the "player locked" flag, to allow movement on next login
 		GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
@@ -614,6 +607,7 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_RAID_READYCHECK].handler						   = &WorldSession::HandleReadyCheckOpcode;
 	WorldPacketHandlers[MSG_GROUP_SET_PLAYER_ICON].handler					  = &WorldSession::HandleSetPlayerIconOpcode;
 	WorldPacketHandlers[CMSG_REQUEST_PARTY_MEMBER_STATS].handler				= &WorldSession::HandlePartyMemberStatsOpcode;
+	WorldPacketHandlers[CMSG_GROUP_PROMOTE].handler								= &WorldSession::HandleGroupPromote;
 
 	// LFG System
 	WorldPacketHandlers[CMSG_SET_LOOKING_FOR_GROUP_COMMENT].handler			 = &WorldSession::HandleSetLookingForGroupComment;

@@ -25,7 +25,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_objectTypeId = TYPEID_PLAYER;
 	m_valuesCount = PLAYER_END;
 	m_uint32Values = _fields;
-	m_Group=NULL;
+
 	memset(m_uint32Values, 0,(PLAYER_END)*sizeof(uint32));
 	m_updateMask.SetCount(PLAYER_END);
 	SetUInt32Value( OBJECT_FIELD_TYPE,TYPE_PLAYER|TYPE_UNIT|TYPE_OBJECT);
@@ -97,8 +97,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_currentSpell		  = NULL;
 	m_resurrectHealth	   = m_resurrectMana = 0;
 
-	m_Group				 = NULL;
-	m_SubGroup			  = 0;
 	m_GroupInviter		  = 0;
 	
 	Lfgcomment = "";
@@ -397,15 +395,6 @@ void Player::OnLogin()
 
 Player::~Player ( )
 {
-	Player ** ref;
-	for(ReferenceSet::iterator itr = m_references.begin(); itr != m_references.end(); ++itr)
-	{
-		ref = *itr;
-		if(*ref == this)
-			*ref = NULL;
-	}
-	m_references.clear();
-
 	if(!ok_to_remove)
 	{
 		printf("Player deleted from non-logoutplayer!\n");
@@ -466,10 +455,6 @@ Player::~Player ( )
 			delete (*itr);
 		}
 	}
-	
-
-	if(m_Group != NULL)
-		m_Group->RemovePlayer(m_playerInfo, this, true);
 
 	for(SplineMap::iterator itr = _splineMap.begin(); itr != _splineMap.end(); ++itr)
 		delete itr->second;
@@ -4045,10 +4030,11 @@ void Player::setAction(uint8 button, uint16 action, uint8 type, uint8 misc)
 //Groupcheck
 bool Player::IsGroupMember(Player *plyr)
 {
-	if(m_Group != NULL) return m_Group->HasMember(plyr);
-	else return false;
-}
+	if(m_playerInfo->m_Group != NULL)
+		return m_playerInfo->m_Group->HasMember(plyr->m_playerInfo);
 
+	return false;
+}
 
 int32 Player::GetOpenQuestSlot()
 {
@@ -4911,6 +4897,7 @@ bool Player::HasQuestForItem(uint32 itemid)
 */
 void Player::SendLoot(uint64 guid,uint8 loot_type)
 {	
+	Group * m_Group = m_playerInfo->m_Group;
 	if(!IsInWorld()) return;
 	Loot * pLoot = NULL;
 	
@@ -5124,20 +5111,21 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 					data2 << uint32(60000); // countdown
 				}
 
-				if(m_Group)
+				Group * pGroup = m_playerInfo->m_Group;
+				if(pGroup)
 				{
-					m_Group->Lock();
-					for(uint32 i = 0; i < m_Group->GetSubGroupCount(); ++i)
+					pGroup->Lock();
+					for(uint32 i = 0; i < pGroup->GetSubGroupCount(); ++i)
 					{
-						for(GroupMembersSet::iterator itr = m_Group->GetSubGroup(i)->GetGroupMembersBegin(); itr != m_Group->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
+						for(GroupMembersSet::iterator itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
 						{
-							if(itr->player && itr->player->GetItemInterface()->CanReceiveItem(itemProto, iter->iItemsCount) == 0)
+							if((*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer->GetItemInterface()->CanReceiveItem(itemProto, iter->iItemsCount) == 0)
 							{
-								itr->player->GetSession()->SendPacket(&data2);
+								(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&data2);
 							}
 						}
 					}
-					m_Group->Unlock();
+					pGroup->Unlock();
 				}
 				else
 				{
@@ -7695,15 +7683,11 @@ void Player::CompleteLoading()
 		BroadcastMessage("You have been banned for: %s", GetBanReason().c_str());
 	}
 
-	/* are we in a group? */
-	if(!m_Group && m_playerInfo->m_Group)
+	if(m_playerInfo->m_Group)
 	{
-		m_playerInfo->m_Group->AddMember(m_playerInfo, this, m_playerInfo->subGroup);
-        //player is not leader, check for instance difficulty
-        if(GetGroup() && !IsGroupLeader())
-        {
-            iInstanceType = this->GetGroup()->GetLeader()->iInstanceType;
-        }
+		sEventMgr.AddEvent(this, &Player::EventGroupFullUpdate, EVENT_UNK, 100, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+
+		//m_playerInfo->m_Group->Update();
 	}
 
 	if(raidgrouponlysent)
@@ -9257,8 +9241,11 @@ void Player::save_Auras()
 
 void Player::EventGroupFullUpdate()
 {
-	if(m_Group)
-		m_Group->UpdateAllOutOfRangePlayersFor(this);
+	if(m_playerInfo->m_Group)
+	{
+		//m_playerInfo->m_Group->Update();
+		//m_playerInfo->m_Group->UpdateAllOutOfRangePlayersFor(this);
+	}
 }
 
 void Player::EjectFromInstance()
@@ -9299,5 +9286,11 @@ void Player::RemoveQuestMob(uint32 entry) //Only for Kill Quests
 PlayerInfo::~PlayerInfo()
 {
 	if(m_Group)
-		m_Group->RemovePlayer(this, NULL, true);
+		m_Group->RemovePlayer(this);
+}
+
+void Player::CopyAndSendDelayedPacket(WorldPacket * data)
+{
+	WorldPacket * data2 = new WorldPacket(*data);
+	delayedPackets.add(data2);
 }

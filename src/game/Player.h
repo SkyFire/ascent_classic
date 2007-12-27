@@ -483,7 +483,7 @@ struct PlayerInfo
 	uint32 lastZone;
 	uint32 lastLevel;
 	Group * m_Group;
-	uint8 subGroup;
+	int8 subGroup;
 
 	Player * m_loggedInPlayer;
 	Guild * guild;
@@ -675,7 +675,6 @@ class SERVER_DECL Player : public Unit
 
 protected:
 	SkillMap m_skills;
-	ReferenceSet m_references;
 
 public:
 
@@ -684,12 +683,6 @@ public:
 	ASCENT_INLINE GuildRank * GetGuildRankS() { return m_playerInfo->guildRank; }
 
 	void EventGroupFullUpdate();
-	/************************************************************************/
-	/* Reference System	                                                    */
-	/************************************************************************/
-
-	ASCENT_INLINE void AddReference(Player ** ptr) { m_references.insert(ptr); *ptr = this; }
-	ASCENT_INLINE void RemoveReference(Player ** ptr) { m_references.erase(ptr); *ptr = NULL; }
 
 	/************************************************************************/
 	/* Skill System															*/
@@ -946,21 +939,19 @@ public:
     /************************************************************************/
 	void                SetInviter(uint32 pInviter) { m_GroupInviter = pInviter; }
 	ASCENT_INLINE uint32       GetInviter() { return m_GroupInviter; }
-	ASCENT_INLINE bool         InGroup() { return (m_Group != NULL && !m_GroupInviter); }
+	ASCENT_INLINE bool         InGroup() { return (m_playerInfo->m_Group != NULL && !m_GroupInviter); }
 	bool                IsGroupLeader()
 	{
-		if(m_Group != NULL)
+		if(m_playerInfo->m_Group != NULL)
 		{
-			if(m_Group->GetLeader() == this)
+			if(m_playerInfo->m_Group->GetLeader() == m_playerInfo)
 				return true;
 		}
 		return false;
 	}
 	ASCENT_INLINE int          HasBeenInvited() { return m_GroupInviter != 0; }
-	ASCENT_INLINE Group*       GetGroup() { return m_Group; }
-	ASCENT_INLINE void         SetGroup(Group* grp) { m_Group = grp; }
-	ASCENT_INLINE uint32       GetSubGroup() { return m_SubGroup; }
-	ASCENT_INLINE void         SetSubGroup(uint32 group) { m_SubGroup = group; }
+	ASCENT_INLINE Group*       GetGroup() { return m_playerInfo->m_Group; }
+	ASCENT_INLINE int8		   GetSubGroup() { return m_playerInfo->subGroup; }
     bool                IsGroupMember(Player *plyr);
 	ASCENT_INLINE bool         IsBanned()
 	{
@@ -1711,6 +1702,8 @@ public:
 	static void InitVisibleUpdateBits();
 	static UpdateMask m_visibleUpdateMask;
 
+	void CopyAndSendDelayedPacket(WorldPacket * data);
+
 protected:
 	LocationVector m_summonPos;
 	uint32 m_summonInstanceId;
@@ -1840,8 +1833,6 @@ protected:
 	// Visible objects
 	std::set<Object*> m_visibleObjects;
 	// Groups/Raids
-	Group* m_Group;
-	uint32 m_SubGroup;
 	uint32 m_GroupInviter;
 	uint8 m_StableSlotCount;
 

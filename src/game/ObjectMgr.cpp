@@ -166,7 +166,7 @@ ObjectMgr::~ObjectMgr()
 		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); ++i)
 		{
 			SubGroup * p = pGroup->GetSubGroup(i);
-			p->Disband(true);
+			p->Disband();
 		}
 		delete pGroup;
 	}
@@ -195,7 +195,7 @@ Group * ObjectMgr::GetGroupByLeader(Player* pPlayer)
 	m_groupLock.AcquireReadLock();
 	for(itr = m_groups.begin(); itr != m_groups.end(); ++itr)
 	{
-		if(itr->second->GetLeader()==pPlayer)
+		if(itr->second->GetLeader()==pPlayer->m_playerInfo)
 		{
 			ret = itr->second;
 			break;
@@ -232,7 +232,7 @@ void ObjectMgr::DeletePlayerInfo( uint32 guid )
 	{
 		pl=i->second;
 		if(pl->m_Group)
-			pl->m_Group->RemovePlayer(pl,NULL,true);
+			pl->m_Group->RemovePlayer(pl);
 
 		if(pl->guild)
 		{

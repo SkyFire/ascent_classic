@@ -376,6 +376,7 @@ protected:
 	void HandleGroupAssistantLeader(WorldPacket& recvPacket);
 	void HandleRequestRaidInfoOpcode(WorldPacket& recvPacket);
 	void HandleReadyCheckOpcode(WorldPacket& recv_data);
+	void HandleGroupPromote(WorldPacket& recv_data);
 	
 	// LFG opcodes
 	void HandleEnableAutoJoin(WorldPacket& recvPacket);

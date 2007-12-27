@@ -430,10 +430,10 @@ void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 		p->GetGroup()->Lock();
 		for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
 		{
-			if(!itr->player || m_caster == itr->player) 
+			if(!(*itr)->m_loggedInPlayer || m_caster == (*itr)->m_loggedInPlayer) 
 				continue;
-			if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),itr->player,r))
-				SafeAddTarget(tmpMap,itr->player->GetGUID());
+			if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr)->m_loggedInPlayer,r))
+				SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
 		}
 		p->GetGroup()->Unlock();
 	}
@@ -621,10 +621,10 @@ void Spell::SpellTargetNearbyPartyMembers(uint32 i, uint32 j)
 					for(GroupMembersSet::iterator itr = pGroup->GetGroupMembersBegin();
 						itr != pGroup->GetGroupMembersEnd(); ++itr)
 					{
-						if(!itr->player || p == itr->player) 
+						if(!(*itr)->m_loggedInPlayer || p == (*itr)->m_loggedInPlayer) 
 							continue;
-						if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),itr->player,r))
-							SafeAddTarget(tmpMap,itr->player->GetGUID());
+						if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr)->m_loggedInPlayer,r))
+							SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
 					}
 					p->GetGroup()->Unlock();
 				}
@@ -676,8 +676,8 @@ void Spell::SpellTargetPartyMember(uint32 i, uint32 j)
 		Target->GetGroup()->Lock();
 		for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
 		{
-			if(itr->player)
-				SafeAddTarget(tmpMap,itr->player->GetGUID());
+			if((*itr)->m_loggedInPlayer)
+				SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
 		}
 		Target->GetGroup()->Unlock();
 	}
@@ -770,11 +770,11 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 			for(itr = pGroup->GetGroupMembersBegin();
 				itr != pGroup->GetGroupMembersEnd(); ++itr)
 			{
-				if(!itr->player || itr->player==u_caster)
+				if(!(*itr)->m_loggedInPlayer || (*itr)->m_loggedInPlayer==u_caster)
 					continue;
-				if(IsInrange(u_caster->GetPositionX(),u_caster->GetPositionY(),u_caster->GetPositionZ(),itr->player, range))
+				if(IsInrange(u_caster->GetPositionX(),u_caster->GetPositionY(),u_caster->GetPositionZ(),(*itr)->m_loggedInPlayer, range))
 				{
-					SafeAddTarget(tmpMap,itr->player->GetGUID());
+					SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
 					if(!--jumps)
 					{
 						p_caster->GetGroup()->Unlock();
@@ -914,9 +914,9 @@ void Spell::SpellTargetSameGroupSameClass(uint32 i, uint32 j)
 		Target->GetGroup()->Lock();
 		for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
 		{
-			if(!itr->player || Target->getClass() != itr->player->getClass()) 
+			if(!(*itr)->m_loggedInPlayer || Target->getClass() != (*itr)->m_loggedInPlayer->getClass()) 
 				continue;
-			SafeAddTarget(tmpMap,itr->player->GetGUID());
+			SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
 		}
 		Target->GetGroup()->Unlock();
 	}

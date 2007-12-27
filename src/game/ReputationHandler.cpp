@@ -418,6 +418,7 @@ void Player::Reputation_OnKilledUnit(Unit * pUnit, bool InnerLoop)
 	if(pUnit->GetTypeId() != TYPEID_UNIT || pUnit->IsPet())
 		return;
 
+	Group * m_Group = m_playerInfo->m_Group;
 	if(!InnerLoop && m_Group)
 	{
 		/* loop the rep for group members */
@@ -427,8 +428,8 @@ void Player::Reputation_OnKilledUnit(Unit * pUnit, bool InnerLoop)
 		{
 			for(it = m_Group->GetSubGroup(i)->GetGroupMembersBegin(); it != m_Group->GetSubGroup(i)->GetGroupMembersEnd(); ++it)
 			{
-				if(it->player && it->player->isInRange(this,100.0f))
-					it->player->Reputation_OnKilledUnit(pUnit, true);
+				if((*it)->m_loggedInPlayer && (*it)->m_loggedInPlayer->isInRange(this,100.0f))
+					(*it)->m_loggedInPlayer->Reputation_OnKilledUnit(pUnit, true);
 			}
 		}
 		m_Group->getLock().Release();

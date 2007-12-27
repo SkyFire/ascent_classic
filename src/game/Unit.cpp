@@ -145,7 +145,6 @@ Unit::Unit()
 	for(uint32 x=0;x<5;x++)
 		BaseStats[x]=0;
 
-	m_attackTimer = 0;
 	m_H_regenTimer = 2000;
 	m_P_regenTimer = 2000;
 
@@ -434,7 +433,7 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 	for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) {
 		for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
 		{
-			pGroupGuy = itr->player;
+			pGroupGuy = (*itr)->m_loggedInPlayer;
 			if( pGroupGuy && 
 				pGroupGuy->isAlive() && 
 //				PlayerInGroup->GetInstanceID()==pGroupGuy->GetInstanceID() &&
@@ -458,7 +457,15 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 	pGroup->Unlock();
 	if(active_player_count<1) //killer is always close to the victim. This should never execute
 	{
-		if(PlayerInGroup == 0) PlayerInGroup = pGroup->GetLeader();
+		if(PlayerInGroup == 0)
+		{
+			PlayerInfo * pleaderinfo = pGroup->GetLeader();
+			if(!pleaderinfo->m_loggedInPlayer)
+				return;
+
+			PlayerInGroup = pleaderinfo->m_loggedInPlayer;
+		}
+
 		xp = CalculateXpToGive(pVictim, PlayerInGroup);
 		PlayerInGroup->GiveXP(xp, pVictim->GetGUID(), true);
 	}
@@ -476,7 +483,15 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 		}
 		else if(pGroup->GetGroupType() == GROUP_TYPE_RAID)
 			xp_mod=0.5f;
-		if(pHighLvlPlayer == 0) pHighLvlPlayer = pGroup->GetLeader();
+
+		if(pHighLvlPlayer == 0)
+		{
+			PlayerInfo * pleaderinfo = pGroup->GetLeader();
+			if(!pleaderinfo->m_loggedInPlayer)
+				return;
+
+			pHighLvlPlayer = pleaderinfo->m_loggedInPlayer;
+		}
 
 		xp = CalculateXpToGive(pVictim, pHighLvlPlayer);
 		//i'm not sure about this formula is correct or not. Maybe some brackets are wrong placed ?
@@ -3826,7 +3841,7 @@ void Unit::VampiricEmbrace(uint32 dmg,Unit* tgt)
 		((Player*)this)->GetGroup()->Lock();
 		for(itr = pGroup->GetGroupMembersBegin(); itr != pGroup->GetGroupMembersEnd(); ++itr)
 		{
-			Player *p = itr->player;
+			Player *p = (*itr)->m_loggedInPlayer;
 			if(!p || p==this || !p->isAlive())
 				continue;
 			this->Heal(p,15286,heal);
@@ -3858,9 +3873,9 @@ void Unit::VampiricTouch(uint32 dmg,Unit* tgt)
 				((Player*)this)->GetGroup()->Lock();
                 for(itr = pGroup->GetGroupMembersBegin(); itr != pGroup->GetGroupMembersEnd(); ++itr)
                 {
-                        if(!itr->player || itr->player == this)
+                        if(!(*itr)->m_loggedInPlayer || (*itr)->m_loggedInPlayer == this)
                                 continue;
-                        Player *p = itr->player;
+                        Player *p = (*itr)->m_loggedInPlayer;
                         if(!p->isAlive() || p->getClass()==WARRIOR || p->getClass() == ROGUE || p==this)
                                 continue;
 						this->Energize(p,34919,man,POWER_TYPE_MANA);

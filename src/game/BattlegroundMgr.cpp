@@ -390,19 +390,19 @@ void CBattlegroundManager::EventQueueUpdate()
 
 			for(itx = group1->GetSubGroup(0)->GetGroupMembersBegin(); itx != group1->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
 			{
-				if(itx->player)
+				if((*itx)->m_loggedInPlayer)
 				{
 					if( (team = ar->GetFreeTeam()) != -1 )
-                        ar->AddPlayer(itx->player, team);
+                        ar->AddPlayer((*itx)->m_loggedInPlayer, team);
 				}
 			}
 
 			for(itx = group2->GetSubGroup(0)->GetGroupMembersBegin(); itx != group2->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
 			{
-				if(itx->player)
+				if((*itx)->m_loggedInPlayer)
 				{
 					if( (team = ar->GetFreeTeam()) != -1 )
-						ar->AddPlayer(itx->player, team);
+						ar->AddPlayer((*itx)->m_loggedInPlayer, team);
 				}
 			}
 		}
@@ -454,8 +454,8 @@ void CBattlegroundManager::RemoveGroupFromQueues(Group * grp)
 	}
 
 	for(GroupMembersSet::iterator itr = grp->GetSubGroup(0)->GetGroupMembersBegin(); itr != grp->GetSubGroup(0)->GetGroupMembersEnd(); ++itr)
-		if(itr->player)
-			SendBattlefieldStatus(itr->player, 0, 0, 0, 0, 0, 0);
+		if((*itr)->m_loggedInPlayer)
+			SendBattlefieldStatus((*itr)->m_loggedInPlayer, 0, 0, 0, 0, 0, 0);
 
 	m_queueLock.Release();
 }
@@ -1352,7 +1352,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 			m_session->SystemMessage("Sorry, raid groups joining battlegrounds are currently unsupported.");
 			return;
 		}
-		if(pGroup->GetLeader() != m_session->GetPlayer())
+		if(pGroup->GetLeader() != m_session->GetPlayer()->m_playerInfo)
 		{
 			m_session->SystemMessage("You must be the party leader to add a group to an arena.");
 			return;
@@ -1365,8 +1365,8 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 			pGroup->Lock();
 			for(itx = pGroup->GetSubGroup(0)->GetGroupMembersBegin(); itx != pGroup->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
 			{
-				if(itx->player && !itx->player->m_bgIsQueued && !itx->player->m_bg)
-					HandleArenaJoin(itx->player->GetSession(), BattlegroundType, 0, 0);
+				if((*itx)->m_loggedInPlayer && !(*itx)->m_loggedInPlayer->m_bgIsQueued && !(*itx)->m_loggedInPlayer->m_bg)
+					HandleArenaJoin((*itx)->m_loggedInPlayer->GetSession(), BattlegroundType, 0, 0);
 			}
 			pGroup->Unlock();
 			return;
@@ -1404,16 +1404,16 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 					return;
 				}
 
-				if(itx->player_info->lastLevel < 70)
+				if((*itx)->lastLevel < 70)
 				{
 					m_session->SystemMessage("Sorry, some of your party members are not level 70.");
 					pGroup->Unlock();
 					return;
 				}
 
-				if(itx->player)
+				if((*itx)->m_loggedInPlayer)
 				{
-					if(itx->player->m_bg || itx->player->m_bg || itx->player->m_bgIsQueued)
+					if((*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bg || (*itx)->m_loggedInPlayer->m_bgIsQueued)
 					{
 						m_session->SystemMessage("One or more of your party members are already queued or inside a battleground.");
 						pGroup->Unlock();
@@ -1428,17 +1428,17 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 
 			for(itx = pGroup->GetSubGroup(0)->GetGroupMembersBegin(); itx != pGroup->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
 			{
-				if(itx->player)
+				if((*itx)->m_loggedInPlayer)
 				{
-					SendBattlefieldStatus(itx->player, 1, BattlegroundType, 0 , 0, 0,1);
-					itx->player->m_bgIsQueued = true;
-					itx->player->m_bgQueueInstanceId = 0;
-					itx->player->m_bgQueueType = BattlegroundType;
-					itx->player->GetSession()->SendPacket(&data);
-					itx->player->m_bgEntryPointX=itx->player->GetPositionX();
-					itx->player->m_bgEntryPointY=itx->player->GetPositionY();
-					itx->player->m_bgEntryPointZ=itx->player->GetPositionZ();
-					itx->player->m_bgEntryPointMap=itx->player->GetMapId();
+					SendBattlefieldStatus((*itx)->m_loggedInPlayer, 1, BattlegroundType, 0 , 0, 0,1);
+					(*itx)->m_loggedInPlayer->m_bgIsQueued = true;
+					(*itx)->m_loggedInPlayer->m_bgQueueInstanceId = 0;
+					(*itx)->m_loggedInPlayer->m_bgQueueType = BattlegroundType;
+					(*itx)->m_loggedInPlayer->GetSession()->SendPacket(&data);
+					(*itx)->m_loggedInPlayer->m_bgEntryPointX=(*itx)->m_loggedInPlayer->GetPositionX();
+					(*itx)->m_loggedInPlayer->m_bgEntryPointY=(*itx)->m_loggedInPlayer->GetPositionY();
+					(*itx)->m_loggedInPlayer->m_bgEntryPointZ=(*itx)->m_loggedInPlayer->GetPositionZ();
+					(*itx)->m_loggedInPlayer->m_bgEntryPointMap=(*itx)->m_loggedInPlayer->GetMapId();
 				}
 			}
 

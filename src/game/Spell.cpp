@@ -768,11 +768,11 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 							p->GetGroup()->Lock();
 							for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
 							{
-								if(!itr->player || m_caster == itr->player) 
+								if(!(*itr)->m_loggedInPlayer || m_caster == (*itr)->m_loggedInPlayer) 
 									continue;
-								if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),itr->player,r))
+								if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr)->m_loggedInPlayer,r))
 								{
-									store_buff->m_unitTarget = itr->player->GetGUID();
+									store_buff->m_unitTarget = (*itr)->m_loggedInPlayer->GetGUID();
 									break;
 								}
 							}
@@ -847,11 +847,11 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 								for(GroupMembersSet::iterator itr = pGroup->GetGroupMembersBegin();
 									itr != pGroup->GetGroupMembersEnd(); ++itr)
 								{
-									if(!itr->player || p == itr->player) 
+									if(!(*itr)->m_loggedInPlayer || p == (*itr)->m_loggedInPlayer) 
 										continue;
-									if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),itr->player,r))
+									if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr)->m_loggedInPlayer,r))
 									{
-										store_buff->m_unitTarget = itr->player->GetGUID();
+										store_buff->m_unitTarget = (*itr)->m_loggedInPlayer->GetGUID();
 										break;
 									}
 								}

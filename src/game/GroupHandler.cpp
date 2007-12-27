@@ -132,13 +132,15 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 
 	if(grp)
 	{
-		grp->AddMember(_player->m_playerInfo, _player);
-        _player->iInstanceType = grp->GetLeader()->iInstanceType;
+		grp->AddMember(_player->m_playerInfo);
+		if(grp->GetLeader()->m_loggedInPlayer)
+			_player->iInstanceType = grp->GetLeader()->m_loggedInPlayer->iInstanceType;
+
 #ifdef USING_BIG_ENDIAN
-		uint32 swapped = swap32(grp->GetLeader()->iInstanceType);
+		uint32 swapped = swap32(_player->iInstanceType);
 		_player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &swapped);
 #else
-        _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &grp->GetLeader()->iInstanceType);
+        _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &_player->iInstanceType);
 #endif
         //sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
 		return;
@@ -146,8 +148,8 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 	
 	// If we're this far, it means we have no existing group, and have to make one.
 	grp = new Group;
-	grp->AddMember(player->m_playerInfo, player);		// add the inviter first, therefore he is the leader
-	grp->AddMember(_player->m_playerInfo, _player);	   // add us.
+	grp->AddMember(player->m_playerInfo);		// add the inviter first, therefore he is the leader
+	grp->AddMember(_player->m_playerInfo);	   // add us.
     _player->iInstanceType = player->iInstanceType;
 #ifdef USING_BIG_ENDIAN
 	uint32 swapped2 = swap32(player->iInstanceType);
@@ -218,7 +220,7 @@ void WorldSession::HandleGroupUninviteOpcode( WorldPacket & recv_data )
 	group = _player->GetGroup();
 
 	if(group)
-		group->RemovePlayer(info, player, true);
+		group->RemovePlayer(info);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -279,8 +281,8 @@ void WorldSession::HandleGroupDisbandOpcode( WorldPacket & recv_data )
 	Group* pGroup = _player->GetGroup();
 	if(!pGroup) return;
 
-	pGroup->Disband();
-	//pGroup->RemovePlayer(_player->m_playerInfo, _player, true);
+	//pGroup->Disband();
+	pGroup->RemovePlayer(_player->m_playerInfo);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

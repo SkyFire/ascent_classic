@@ -667,7 +667,7 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 			{
 				for(gitr = pGroup->GetSubGroup(k)->GetGroupMembersBegin(); gitr != pGroup->GetSubGroup(k)->GetGroupMembersEnd(); ++gitr)
 				{
-					gplr = gitr->player;
+					gplr = (*gitr)->m_loggedInPlayer;
 					if(gplr && gplr != plr && plr->isInRange(gplr,300) && gplr->HasQuestMob(entry)) // dont double kills also dont give kills to party members at another side of the world
 					{
 						for(i = 0; i < 25; ++i)

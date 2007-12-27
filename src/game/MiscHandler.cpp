@@ -294,8 +294,8 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 				sgrp = party->GetSubGroup(i);
 				for(itr = sgrp->GetGroupMembersBegin(); itr != sgrp->GetGroupMembersEnd(); ++itr)
 				{
-					if(itr->player && itr->player->GetZoneId() == _player->GetZoneId() && _player->GetInstanceID() == itr->player->GetInstanceID())
-						targets.push_back(itr->player);
+					if((*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer->GetZoneId() == _player->GetZoneId() && _player->GetInstanceID() == (*itr)->m_loggedInPlayer->GetInstanceID())
+						targets.push_back((*itr)->m_loggedInPlayer);
 				}
 			}
 			party->getLock().Release();
@@ -346,9 +346,9 @@ void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 					s = party->GetSubGroup(i);
 					for(itr = s->GetGroupMembersBegin(); itr != s->GetGroupMembersEnd(); ++itr)
 					{
-						if(itr->player && _player->GetZoneId() == itr->player->GetZoneId())
+						if((*itr)->m_loggedInPlayer && _player->GetZoneId() == (*itr)->m_loggedInPlayer->GetZoneId())
 						{
-							data << itr->player->GetGUID();
+							data << (*itr)->m_loggedInPlayer->GetGUID();
 							++real_count;
 						}
 					}
@@ -732,10 +732,6 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
 			pPlayer->GetTaxiState() ||  // or we are on a taxi
 			HasGMPermissions())		   // or we are a gm
 		{
-			/* full remove from group */
-			if(_player->m_Group)
-				_player->m_Group->RemovePlayer(_player->m_playerInfo, _player, true);
-
 			LogoutPlayer(true);
 			return;
 		}
@@ -1397,7 +1393,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 		{
 			/* Use selection */
             Player * pPlayer = objmgr.GetPlayer((uint32)_player->GetSelection());
-			if(!pPlayer || _player->m_Group != pPlayer->m_Group || !_player->m_Group)
+			if(!pPlayer || _player->GetGroup() != pPlayer->GetGroup() || !_player->GetGroup())
 				return;
 
 			GameObjectInfo * info = GameObjectNameStorage.LookupEntry(179944);
@@ -1955,10 +1951,10 @@ void WorldSession::HandleDungeonDifficultyOpcode(WorldPacket& recv_data)
 		{
 			for(GroupMembersSet::iterator itr = m_Group->GetSubGroup(i)->GetGroupMembersBegin(); itr != m_Group->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
 			{
-				if(itr->player)
+				if((*itr)->m_loggedInPlayer)
 				{
-                    itr->player->iInstanceType = data;
-					itr->player->GetSession()->SendPacket(&pData);
+                    (*itr)->m_loggedInPlayer->iInstanceType = data;
+					(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&pData);
 				}
 			}
 		}

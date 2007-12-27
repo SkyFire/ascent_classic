@@ -22,28 +22,28 @@
 
 enum PartyErrors
 {
-	ERR_PARTY_NO_ERROR				  = 0,
-	ERR_PARTY_CANNOT_FIND			   = 1,
-	ERR_PARTY_IS_NOT_IN_YOUR_PARTY	  = 2,
-	ERR_PARTY_UNK = 3,
-	ERR_PARTY_IS_FULL				   = 4,
-	ERR_PARTY_ALREADY_IN_GROUP		  = 5,
-	ERR_PARTY_YOU_ARENT_IN_A_PARTY	  = 6,
+	ERR_PARTY_NO_ERROR					= 0,
+	ERR_PARTY_CANNOT_FIND				= 1,
+	ERR_PARTY_IS_NOT_IN_YOUR_PARTY		= 2,
+	ERR_PARTY_UNK						= 3,
+	ERR_PARTY_IS_FULL					= 4,
+	ERR_PARTY_ALREADY_IN_GROUP			= 5,
+	ERR_PARTY_YOU_ARENT_IN_A_PARTY		= 6,
 	ERR_PARTY_YOU_ARE_NOT_LEADER		= 7,
-	ERR_PARTY_WRONG_FACTION			 = 8,
-	ERR_PARTY_IS_IGNORING_YOU		   = 9,
+	ERR_PARTY_WRONG_FACTION				= 8,
+	ERR_PARTY_IS_IGNORING_YOU			= 9,
 };
 
 enum GroupTypes
 {
 	GROUP_TYPE_PARTY					= 0,
-	GROUP_TYPE_RAID					 = 1,
+	GROUP_TYPE_RAID						= 1,
 };
 
 enum MaxGroupCount
 {
 	MAX_GROUP_SIZE_PARTY				= 5,
-	MAX_GROUP_SIZE_RAID				 = 40,
+	MAX_GROUP_SIZE_RAID					= 40,
 };
 
 enum QuickGroupUpdateFlags
@@ -62,7 +62,7 @@ typedef struct
 class Group;
 class Player;
 
-typedef std::list<GroupMember> GroupMembersSet;
+typedef std::set<PlayerInfo*> GroupMembersSet;
 
 class SubGroup	  // Most stuff will be done through here, not through the "Group" class.
 {
@@ -78,11 +78,9 @@ public:
 	ASCENT_INLINE GroupMembersSet::iterator GetGroupMembersBegin(void) { return m_GroupMembers.begin(); }
 	ASCENT_INLINE GroupMembersSet::iterator GetGroupMembersEnd(void)   { return m_GroupMembers.end();   }
 
-	bool AddPlayer(PlayerInfo * info, Player *pPlayer);
-	void RemovePlayer(PlayerInfo * info, Player *pPlayer, bool forced_remove);
-	bool HasMember(uint64 guid);
+	bool AddPlayer(PlayerInfo * info);
+	void RemovePlayer(PlayerInfo * info);
 	
-
 	ASCENT_INLINE bool IsFull(void)				{ return m_GroupMembers.size() >= MAX_GROUP_SIZE_PARTY; }
 	ASCENT_INLINE size_t GetMemberCount(void)		{ return m_GroupMembers.size(); }
 	
@@ -92,7 +90,8 @@ public:
 	ASCENT_INLINE void   SetParent(Group* parent)  { m_Parent = parent; }
 	ASCENT_INLINE Group* GetParent(void)		   { return m_Parent; }
 
-	void   Disband(bool bRemoveGroup);
+	void   Disband();
+	bool HasMember(uint32 guid);
 
 protected:
 
@@ -114,19 +113,17 @@ public:
 	~Group();
 
 	// Adding/Removal Management
-	bool AddMember(PlayerInfo * info, Player* pPlayer, int32 subgroupid=-1);
-	void RemovePlayer(PlayerInfo * info, Player* pPlayer, bool forced_remove);
-	void UpdateMember(PlayerInfo * info, Player * pPlayer);
+	bool AddMember(PlayerInfo * info, int32 subgroupid=-1);
+	void RemovePlayer(PlayerInfo * info);
 
 	// Leaders and Looting
 	void SetLeader(Player* pPlayer,bool silent);
 	void SetLooter(Player *pPlayer, uint8 method, uint16 threshold);
-	Player* GetnextRRlooter();
 
 	// Transferring data to clients
-	void Update(bool delayed = false);
+	void Update();
 
-	void SendPacketToAll(WorldPacket *packet);
+	ASCENT_INLINE void SendPacketToAll(WorldPacket *packet) { SendPacketToAllButOne(packet, NULL); }
 	void SendPacketToAllButOne(WorldPacket *packet, Player *pSkipTarget);
 	void SendNullUpdate(Player *pPlayer);
 
@@ -150,8 +147,8 @@ public:
 
 	ASCENT_INLINE uint8 GetMethod(void) { return m_LootMethod; }
 	ASCENT_INLINE uint16 GetThreshold(void) { return m_LootThreshold; }
-	ASCENT_INLINE Player* GetLeader(void) { return m_Leader; }
-	ASCENT_INLINE Player* GetLooter(void) { return m_Looter; }
+	ASCENT_INLINE PlayerInfo* GetLeader(void) { return m_Leader; }
+	ASCENT_INLINE PlayerInfo* GetLooter(void) { return m_Looter; }
 
 	void MovePlayer(PlayerInfo* info, uint8 subgroup);
 
@@ -182,11 +179,23 @@ public:
 	ASCENT_INLINE void Unlock() { return m_groupLock.Release(); }
 	bool m_isqueued;
 
+	void SetAssistantLeader(PlayerInfo * pMember);
+	void SetMainTank(PlayerInfo * pMember);
+	void SetMainAssist(PlayerInfo * pMember);
+
+	ASCENT_INLINE PlayerInfo * GetAssistantLeader() { return m_assistantLeader; }
+	ASCENT_INLINE PlayerInfo * GetMainTank() { return m_mainTank; }
+	ASCENT_INLINE PlayerInfo * GetMainAssist() { return m_mainAssist; }
+
+	void SetDifficulty(uint8 difficulty);
+
 protected:
-	
-	Player* m_Leader;
-	Player* m_Looter;
-	Player* lastRRlooter; //used to determine next RR looter
+	PlayerInfo * m_Leader;
+	PlayerInfo * m_Looter;
+	PlayerInfo * m_assistantLeader;
+	PlayerInfo * m_mainTank;
+	PlayerInfo * m_mainAssist;
+
 	uint8 m_LootMethod;
 	uint16 m_LootThreshold;
 	uint8 m_GroupType;
@@ -198,6 +207,7 @@ protected:
 	Mutex m_groupLock;
 	bool m_dirty;
 	bool m_updateblock;
+	uint8 m_difficulty;
 };
 
 #endif  // _GROUP_H_

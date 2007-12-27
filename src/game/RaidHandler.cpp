@@ -26,7 +26,7 @@ void WorldSession::HandleConvertGroupToRaidOpcode(WorldPacket & recv_data)
 	Group *pGroup = _player->GetGroup();
 	if(!pGroup) return;
 
-	if ( pGroup->GetLeader() != _player )   //access denied
+	if ( pGroup->GetLeader() != _player->m_playerInfo )   //access denied
 	{
 		SendPartyCommandResult(_player, 0, "", ERR_PARTY_YOU_ARE_NOT_LEADER);
 		return;
@@ -46,7 +46,7 @@ void WorldSession::HandleGroupChangeSubGroup(WorldPacket & recv_data)
 	recv_data >> subGroup;
 
 	PlayerInfo * inf = objmgr.GetPlayerInfoByName(name);
-	if(inf == NULL || inf->m_Group == NULL || inf->m_Group != _player->m_Group)
+	if(inf == NULL || inf->m_Group == NULL || inf->m_Group != _player->m_playerInfo->m_Group)
 		return;
 
 	_player->GetGroup()->MovePlayer(inf, subGroup);
@@ -54,23 +54,79 @@ void WorldSession::HandleGroupChangeSubGroup(WorldPacket & recv_data)
 
 void WorldSession::HandleGroupAssistantLeader(WorldPacket & recv_data)
 {
-	/*if(!_player->IsInWorld()) return;
-	//80
+	uint64 guid;
+	uint8 on;
 
-	std::string name;
-	uint8 subGroup;
-
-	recv_data >> name;
-	recv_data >> subGroup;
-
-	Player *plyr = objmgr.GetPlayer(name.c_str());
-	if(!plyr)
+	if(!_player->IsInWorld())
 		return;
 
-	Group *pGroup = _player->GetGroup();
-	if(!pGroup) return;
+	if(_player->GetGroup() == NULL)
+		return;
 
-	pGroup->SetSubGroupLeader(plyr,subGroup);*/
+	if ( _player->GetGroup()->GetLeader() != _player->m_playerInfo )   //access denied
+	{
+		SendPartyCommandResult(_player, 0, "", ERR_PARTY_YOU_ARE_NOT_LEADER);
+		return;
+	}
+
+	recv_data >> guid >> on;
+	if(on == 0)
+        _player->GetGroup()->SetAssistantLeader(NULL);
+	else
+	{
+		PlayerInfo * np = objmgr.GetPlayerInfo((uint32)guid);
+		if(np==NULL)
+			_player->GetGroup()->SetAssistantLeader(NULL);
+		else
+		{
+			if(_player->GetGroup()->HasMember(np))
+				_player->GetGroup()->SetAssistantLeader(np);
+		}
+	}
+}
+
+void WorldSession::HandleGroupPromote(WorldPacket& recv_data)
+{
+	uint8 promotetype, on;
+	uint64 guid;
+
+	if(!_player->IsInWorld())
+		return;
+
+	if(_player->GetGroup() == NULL)
+		return;
+
+	if ( _player->GetGroup()->GetLeader() != _player->m_playerInfo )   //access denied
+	{
+		SendPartyCommandResult(_player, 0, "", ERR_PARTY_YOU_ARE_NOT_LEADER);
+		return;
+	}
+
+	recv_data >> promotetype >> on;
+	recv_data >> guid;
+
+	void(Group::*function_to_call)(PlayerInfo*);
+
+	if(promotetype == 0)
+		function_to_call = &Group::SetMainTank;
+	else if(promotetype==1)
+		function_to_call = &Group::SetMainAssist;
+	else
+		return;
+
+	if(on == 0)
+		(_player->GetGroup()->*function_to_call)(NULL);
+	else
+	{
+		PlayerInfo * np = objmgr.GetPlayerInfo((uint32)guid);
+		if(np==NULL)
+			(_player->GetGroup()->*function_to_call)(NULL);
+		else
+		{
+			if(_player->GetGroup()->HasMember(np))
+				(_player->GetGroup()->*function_to_call)(np);
+		}
+	}
 }
 
 void WorldSession::HandleRequestRaidInfoOpcode(WorldPacket & recv_data)
@@ -91,7 +147,7 @@ void WorldSession::HandleReadyCheckOpcode(WorldPacket& recv_data)
 
 	if(recv_data.size() == 0)
 	{
-		if(pGroup->GetLeader() == _player)
+		if(pGroup->GetLeader() == _player->m_playerInfo)
 		{
 			/* send packet to group */
 			pGroup->SendPacketToAllButOne(&data, _player);
@@ -103,12 +159,13 @@ void WorldSession::HandleReadyCheckOpcode(WorldPacket& recv_data)
 	}
 	else
 	{
-		if(_player != pGroup->GetLeader())
+		if(_player->m_playerInfo != pGroup->GetLeader())
 		{
 			recv_data >> ready;
 			data << _player->GetGUID();
 			data << ready;
-			pGroup->GetLeader()->GetSession()->SendPacket(&data);
+			if(pGroup->GetLeader() && pGroup->GetLeader()->m_loggedInPlayer)
+				pGroup->GetLeader()->m_loggedInPlayer->GetSession()->SendPacket(&data);
 		}
 	}
 }

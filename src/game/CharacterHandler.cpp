@@ -883,6 +883,9 @@ void WorldSession::FullLogin(Player * plr)
 	sHookInterface.OnEnterWorld2(_player);
 #endif
 
+	if(info->m_Group)
+		info->m_Group->Update();
+
 	if(enter_world && !_player->GetMapMgr())
 	{
 /*		MapMgr * mapMgr = sWorldCreator.GetInstance(plr->GetMapId(), plr);

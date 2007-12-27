@@ -2837,8 +2837,8 @@ void Spell::SpellEffectSummonObject(uint32 i)
 				for(GroupMembersSet::iterator itr = pGroup->GetGroupMembersBegin();
 					itr != pGroup->GetGroupMembersEnd(); ++itr)
 				{
-					if(itr->player && m_caster != itr->player)
-						itr->player->GetSession()->SendPacket(pkt);
+					if((*itr)->m_loggedInPlayer && m_caster != (*itr)->m_loggedInPlayer)
+						(*itr)->m_loggedInPlayer->GetSession()->SendPacket(pkt);
 				}
 				p_caster->GetGroup()->Unlock();
 			}
