@@ -1753,7 +1753,7 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 	TargetItem->m_isDirty = true;
 }
 
-void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
+void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 {
 	int8 sourceitem_bagslot, sourceitem_slot;
 	int8 destitem_bagslot, destitem_slot;
@@ -1763,79 +1763,79 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
 	recv_data >> sourceitem_bagslot >> sourceitem_slot;
 	recv_data >> destitem_bagslot >> destitem_slot;
 
-	if(!_player->IsInWorld())
+	if( !_player->IsInWorld() )
 		return;
 
-	src = _player->GetItemInterface()->GetInventoryItem(sourceitem_bagslot,sourceitem_slot);
-	dst = _player->GetItemInterface()->GetInventoryItem(destitem_bagslot,destitem_slot);
+	src = _player->GetItemInterface()->GetInventoryItem( sourceitem_bagslot, sourceitem_slot );
+	dst = _player->GetItemInterface()->GetInventoryItem( destitem_bagslot, destitem_slot );
 
-	if(!src || !dst)
+	if( !src || !dst )
 		return;
 
-	if(dst->GetProto()->MaxCount > 1)
+	if( dst->GetProto()->MaxCount > 1 )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(src,dst,INV_ERR_STACKABLE_CANT_BE_WRAPPED);
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_STACKABLE_CANT_BE_WRAPPED );
 		return;
 	}
 
-	if(dst->IsSoulbound())
+	if( dst->IsSoulbound() )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(src,dst,INV_ERR_BOUND_CANT_BE_WRAPPED);
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_BOUND_CANT_BE_WRAPPED );
 		return;
 	}
 
-	if(dst->wrapped_item_id)
+	if( dst->wrapped_item_id )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(src,dst,INV_ERR_WRAPPED_CANT_BE_WRAPPED);
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_WRAPPED_CANT_BE_WRAPPED );
 		return;
 	}
 
-	if(dst->GetProto()->Unique)
+	if( dst->GetProto()->Unique )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(src,dst,INV_ERR_UNIQUE_CANT_BE_WRAPPED);
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_UNIQUE_CANT_BE_WRAPPED );
 		return;
 	}
 
-	if(dst->IsContainer())
+	if( dst->IsContainer() )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(src,dst,INV_ERR_BAGS_CANT_BE_WRAPPED);
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_BAGS_CANT_BE_WRAPPED );
 		return;
 	}
 
-	if(destitem_bagslot==(uint8)0xFF && (destitem_slot >= EQUIPMENT_SLOT_START && destitem_slot <= EQUIPMENT_SLOT_END))
+	if( destitem_bagslot == (int8)0xFF && ( destitem_slot >= EQUIPMENT_SLOT_START && destitem_slot <= EQUIPMENT_SLOT_END ) )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(src,dst,INV_ERR_EQUIPPED_CANT_BE_WRAPPED);
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_EQUIPPED_CANT_BE_WRAPPED );
 		return;
 	}
 
 	// all checks passed ok
 	source_entry = src->GetEntry();
-	dst->SetProto(src->GetProto());
+	dst->SetProto( src->GetProto() );
 
-	if(src->GetUInt32Value(ITEM_FIELD_STACK_COUNT) <= 1)
+	if( src->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) <= 1 )
 	{
 		// destroy the source item
-		_player->GetItemInterface()->SafeFullRemoveItemByGuid(src->GetGUID());
+		_player->GetItemInterface()->SafeFullRemoveItemByGuid( src->GetGUID() );
 	}
 	else
 	{
 		// reduce stack count by one
-		src->ModUInt32Value(ITEM_FIELD_STACK_COUNT,-1);
-		src->m_isDirty=true;
+		src->ModUInt32Value( ITEM_FIELD_STACK_COUNT, -1 );
+		src->m_isDirty = true;
 	}
 
 	// change the dest item's entry
 	dst->wrapped_item_id = dst->GetEntry();
-	dst->SetUInt32Value(OBJECT_FIELD_ENTRY, source_entry);
+	dst->SetUInt32Value( OBJECT_FIELD_ENTRY, source_entry );
 
 	// set the giftwrapper fields
-	dst->SetUInt32Value(ITEM_FIELD_GIFTCREATOR, _player->GetGUIDLow());
-	dst->SetUInt32Value(ITEM_FIELD_DURABILITY,0);
-	dst->SetUInt32Value(ITEM_FIELD_MAXDURABILITY,0);
-	dst->SetUInt32Value(ITEM_FIELD_FLAGS,0x8008);
+	dst->SetUInt32Value( ITEM_FIELD_GIFTCREATOR, _player->GetGUIDLow() );
+	dst->SetUInt32Value( ITEM_FIELD_DURABILITY, 0 );
+	dst->SetUInt32Value( ITEM_FIELD_MAXDURABILITY, 0 );
+	dst->SetUInt32Value( ITEM_FIELD_FLAGS, 0x8008 );
 
 	// save it
-	dst->m_isDirty=true;
-	dst->SaveToDB(destitem_bagslot,destitem_slot);
+	dst->m_isDirty = true;
+	dst->SaveToDB( destitem_bagslot, destitem_slot );
 }
 
