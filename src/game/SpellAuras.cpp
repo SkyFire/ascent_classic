@@ -5908,12 +5908,12 @@ void Aura::SpellAuraModHaste(bool apply)
 	else 
 		SetPositive();
 
-	if(abs(mod->m_amount) >= 100)
+	if( abs( mod->m_amount ) >= 100 )
 		return; // hacky fix
 
-	if (m_target->GetTypeId() == TYPEID_PLAYER)
+	if( m_target->GetTypeId() == TYPEID_PLAYER )
 	{
-		if(apply)			
+		if( apply )			
 			static_cast<Player*>(m_target)->m_meleeattackspeedmod += mod->m_amount;
 		else
 			static_cast<Player*>(m_target)->m_meleeattackspeedmod -= mod->m_amount;
@@ -5922,17 +5922,17 @@ void Aura::SpellAuraModHaste(bool apply)
 	}
 	else
 	{
-		if(apply)
+		if( apply )
 		{
-			mod->fixed_amount[0] = m_target->GetModPUInt32Value(UNIT_FIELD_BASEATTACKTIME,mod->m_amount);
-			mod->fixed_amount[1] = m_target->GetModPUInt32Value(UNIT_FIELD_BASEATTACKTIME_01,mod->m_amount);
-			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME,mod->fixed_amount[0]);
-			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME_01,mod->fixed_amount[1]);
+			mod->fixed_amount[0] = m_target->GetModPUInt32Value( UNIT_FIELD_BASEATTACKTIME, mod->m_amount );
+			mod->fixed_amount[1] = m_target->GetModPUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, mod->m_amount );
+			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME, mod->fixed_amount[0] );
+			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, mod->fixed_amount[1] );
 		}
 		else
 		{
-			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME,-mod->fixed_amount[0]);
-			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME_01,-mod->fixed_amount[1]);
+			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME, -mod->fixed_amount[0] );
+			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, -mod->fixed_amount[1] );
 		}
 	}
 }

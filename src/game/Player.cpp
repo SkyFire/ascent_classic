@@ -7048,7 +7048,7 @@ float Player::CalcRating(uint32 index)
 			l = 10;//this is not dirty fix-> that's from wowwiki
 		double cost;
 		if( l < 60 )
-			cost=( l - 8 ) / 52.0f;
+			cost = ( l - 8 ) / 52.0f;
 		else
 			cost = 82.0f / ( 262 - 3 * l );
 		return rating / float( BaseRating[ind2] * cost );
