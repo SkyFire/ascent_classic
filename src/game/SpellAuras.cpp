@@ -5171,21 +5171,22 @@ void Aura::SpellAuraModResistancePCT(bool apply)
 
 void Aura::SpellAuraModCreatureAttackPower(bool apply)
 {
-	if(apply)
+	if( apply )
 	{
-		for(uint32 x = 0; x < 11; x++)
-			if (mod->m_miscValue & (((uint32)1)<<x) )
+		for( uint32 x = 0; x < 11; x++ )
+			if( mod->m_miscValue & ( ( ( uint32 )1 ) << x ) )
 				m_target->CreatureAttackPowerMod[x+1] += mod->m_amount;
-		if(mod->m_amount > 0)
+
+		if( mod->m_amount > 0 )
 			SetPositive();
 		else
 			SetNegative();
 	}
 	else
 	{
-		for(uint32 x = 0; x < 11; x++)
+		for( uint32 x = 0; x < 11; x++ )
 		{
-			if (mod->m_miscValue & (((uint32)1)<<x) )
+			if( mod->m_miscValue & ( ( ( uint32 )1 ) << x ) )
 			{
 				m_target->CreatureAttackPowerMod[x+1] -= mod->m_amount;
 			}
@@ -5194,238 +5195,249 @@ void Aura::SpellAuraModCreatureAttackPower(bool apply)
 	m_target->CalcDamage();
 }
 
-void Aura::SpellAuraModTotalThreat(bool apply)
+void Aura::SpellAuraModTotalThreat( bool apply )
 {
-	if(apply)
+	if( apply )
 	{
-		if(mod->m_amount < 0)
+		if( mod->m_amount < 0 )
 			SetPositive();
 		else
 			SetNegative();
-		if(m_target->GetThreatModifyer() > mod->m_amount) // replace old mod
+
+		if( m_target->GetThreatModifyer() > mod->m_amount ) // replace old mod
 		{
-			m_target->ModThreatModifyer(0);
-			m_target->ModThreatModifyer(mod->m_amount);
+			m_target->ModThreatModifyer( 0 );
+			m_target->ModThreatModifyer( mod->m_amount );
 		}
 	}
 	else
 	{
-		if(m_target->GetThreatModifyer() == mod->m_amount) // only remove it if it hasn't been replaced yet
+		if( m_target->GetThreatModifyer() == mod->m_amount ) // only remove it if it hasn't been replaced yet
 		{
 			m_target->ModThreatModifyer(-(mod->m_amount));
 		}
 	}
 }
 
-void Aura::SpellAuraWaterWalk(bool apply)
+void Aura::SpellAuraWaterWalk( bool apply )
 {	 
-	if (m_target->IsPlayer())
+	if( m_target->IsPlayer() )
 	{
-		WorldPacket data(12); 
-		if(apply)
+		WorldPacket data( 12 ); 
+		if( apply )
 		{
 			SetPositive();
-			data.SetOpcode(SMSG_MOVE_WATER_WALK);
+			data.SetOpcode( SMSG_MOVE_WATER_WALK );
 			data << m_target->GetNewGUID();
-			data << uint32(8);	   
+			data << uint32( 8 );	   
 		}
 		else
 		{
-			data.SetOpcode(SMSG_MOVE_LAND_WALK);
+			data.SetOpcode( SMSG_MOVE_LAND_WALK );
 			data << m_target->GetNewGUID();
-			data << uint32(4);		
+			data << uint32( 4 );		
 		}
-		static_cast<Player*>(m_target)->GetSession()->SendPacket(&data);
+		static_cast<Player*>(m_target)->GetSession()->SendPacket( &data );
 	}
 }
 
-void Aura::SpellAuraFeatherFall(bool apply)
+void Aura::SpellAuraFeatherFall( bool apply )
 {
-	//FIXME:Find true flag for this
-	if(!m_target->IsPlayer())
+	//TODO: FIXME: Find true flag for this
+	if( !m_target->IsPlayer() )
 		return;
 
-	WorldPacket data(12);
-	if(apply)
+	WorldPacket data( 12 );
+	if( apply )
 	{
 		SetPositive();
-		data.SetOpcode(SMSG_MOVE_FEATHER_FALL);
-		((Player*)m_target)->bSafeFall = true;
+		data.SetOpcode( SMSG_MOVE_FEATHER_FALL );
+		( ( Player* )m_target )->bSafeFall = true;
 	}
 	else 
 	{
 		data.SetOpcode(SMSG_MOVE_NORMAL_FALL);
-		((Player*)m_target)->bSafeFall = false;
+		( ( Player* )m_target )->bSafeFall = false;
 	}
   
 	data << m_target->GetNewGUID();
-	data << uint32(0);
-	static_cast<Player*>(m_target)->GetSession()->SendPacket(&data);
+	data << uint32( 0 );
+	static_cast<Player*>(m_target)->GetSession()->SendPacket( &data );
 }
 
-void Aura::SpellAuraHover(bool apply)
+void Aura::SpellAuraHover( bool apply )
 {
 	SetPositive();
 	  
-	//FIXME:Find true flag for this
+	//TODO: FIXME: Find true flag for this
 	if (m_target->GetTypeId() == TYPEID_PLAYER)
 	{
-		WorldPacket data(apply?SMSG_MOVE_SET_HOVER:SMSG_MOVE_UNSET_HOVER, 13);
+		WorldPacket data( apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 13 );
 		data << m_target->GetNewGUID();
-		data << uint32(0);
-		static_cast<Player*>(m_target)->GetSession()->SendPacket(&data);
+		data << uint32( 0 );
+		static_cast<Player*>(m_target)->GetSession()->SendPacket( &data );
 	}
 }
 
-void Aura::SpellAuraAddPctMod(bool apply)
+void Aura::SpellAuraAddPctMod( bool apply )
 {
-	int32 val = apply?mod->m_amount:-mod->m_amount;
+	int32 val = apply ? mod->m_amount : -mod->m_amount;
 	uint32 AffectedGroups = GetSpellProto()->EffectSpellGroupRelation[mod->i];
-//printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
+	//printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 
-	switch (mod->m_miscValue)//let's generate warnings for unknown types of modifiers
+	switch( mod->m_miscValue )//let's generate warnings for unknown types of modifiers
 	{
 	case SMT_CRITICAL:
-		SendModifierLog(&m_target->SM_CriticalChance,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_CriticalChance, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_DURATION:
-		SendModifierLog(&m_target->SM_PDur,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PDur, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_RADIUS:
-		SendModifierLog(&m_target->SM_PRadius,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PRadius, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_RANGE:
-		SendModifierLog(&m_target->SM_PRange,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PRange, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_CAST_TIME:
-		SendModifierLog(&m_target->SM_PCastTime,val,AffectedGroups,mod->m_miscValue,true); 
+		SendModifierLog( &m_target->SM_PCastTime, val, AffectedGroups, mod->m_miscValue, true ); 
 		break;
 
 	case SMT_COST:
-		SendModifierLog(&m_target->SM_PCost,val,AffectedGroups,mod->m_miscValue,true); 
+		SendModifierLog( &m_target->SM_PCost, val, AffectedGroups, mod->m_miscValue, true ); 
 		break;
 
 	case SMT_CRITICAL_DAMAGE:
-		SendModifierLog(&m_target->SM_PCriticalDamage,val,AffectedGroups,mod->m_miscValue,true); 
+		SendModifierLog( &m_target->SM_PCriticalDamage, val, AffectedGroups, mod->m_miscValue, true ); 
 		break;
 
 	case SMT_SPELL_VALUE_PCT:
-		SendModifierLog(&m_target->SM_PDOT,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PDOT, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_NONINTERRUPT:
-		SendModifierLog(&m_target->SM_PNonInterrupt,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PNonInterrupt, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_JUMP_REDUCE:
-		SendModifierLog(&m_target->SM_PJumpReduce,val,AffectedGroups,mod->m_miscValue,true); 
+		SendModifierLog( &m_target->SM_PJumpReduce, val, AffectedGroups, mod->m_miscValue, true ); 
 		break;
 
 	case SMT_EFFECT_BONUS:
 	case SMT_EFFECT:
-		SendModifierLog(&m_target->SM_PEffectBonus,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PEffectBonus, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_DAMAGE_DONE:
-		SendModifierLog(&m_target->SM_PDamageBonus,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PDamageBonus, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_SPELL_VALUE:
-		SendModifierLog(&m_target->SM_PSPELL_VALUE,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PSPELL_VALUE, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
 	case SMT_PENALTY:
-		SendModifierLog(&m_target->SM_PPenalty,val,AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PPenalty, val, AffectedGroups, mod->m_miscValue, true );
 		break;
-/*
-	//disabled until clarification
+	//TODO: disabled until clarified
+	/*
 	case SMT_ATTACK_POWER_BONUS:
 		SendModifierLog(&m_target->SM_PAPBonus,val,AffectedGroups,mod->m_miscValue,true); 
 		break;
-*/
+	*/
 	case SMT_COOLDOWN_DECREASE:
-		SendModifierLog(&m_target->SM_PCooldownTime, val, AffectedGroups,mod->m_miscValue,true);
+		SendModifierLog( &m_target->SM_PCooldownTime, val, AffectedGroups, mod->m_miscValue, true );
 		break;
 
-		//there are 2 spells in 2.1.1 that will only need attack power bonus
+	//there are 2 spells in 2.1.1 that will only need attack power bonus
 	case SMT_ATTACK_POWER_AND_DMG_BONUS:
 		{
 			if(GetSpellId()==36563 || GetSpellId()==37186)
 			{
-				SendModifierLog(&m_target->SM_PDamageBonus,val,AffectedGroups,mod->m_miscValue,true);
+				SendModifierLog( &m_target->SM_PDamageBonus, val, AffectedGroups, mod->m_miscValue, true );
 			}
 			else
 			{
 				//these are seal of crusader spells
-				SendModifierLog(&m_target->SM_PDamageBonus,val,AffectedGroups,mod->m_miscValue,true);
-				SendModifierLog(&m_target->SM_PAPBonus,val,AffectedGroups,mod->m_miscValue,true); 
+				SendModifierLog( &m_target->SM_PDamageBonus, val, AffectedGroups, mod->m_miscValue, true );
+				SendModifierLog( &m_target->SM_PAPBonus, val, AffectedGroups, mod->m_miscValue, true ); 
 			}
 		}break;
-
-/*	case SMT_BLOCK:
+	//TODO:
+	/*	
+	case SMT_BLOCK:
 	case SMT_THREAT_REDUCED:
 
 	case SMT_TRIGGER:
 	case SMT_TIME:
-		break;*/
-	default://unknown Modifier type
-		sLog.outError(
-			"Unknown spell modifier type %u in spell %u.<<--report this line to the developer\n",
-			mod->m_miscValue,GetSpellId());
+		break;
+	*/
+	//unknown Modifier type
+	default:
+		sLog.outError( "Unknown spell modifier type %u in spell %u.<<--report this line to the developer\n", mod->m_miscValue, GetSpellId() );
 		//don't add val, though we could formaly could do,but as we don't know what it is-> no sense
 		break;
 	}
 }
 
 
-void Aura::SendModifierLog(int32 ** m,int32 v,uint32 mask,uint8 type,bool pct)
+void Aura::SendModifierLog( int32** m, int32 v, uint32 mask, uint8 type, bool pct )
 {
-	WorldPacket data(SMSG_SET_FLAT_SPELL_MODIFIER+pct, 6);
+	WorldPacket data( SMSG_SET_FLAT_SPELL_MODIFIER + pct, 6 );
 
-	if(*m == 0)
+	if( *m == 0 )
 	{
 		*m = new int32[SPELL_GROUPS];
 
-		for(uint32 x=0;x<SPELL_GROUPS;x++)
+		for( uint32 x = 0; x < SPELL_GROUPS; x++ )
 		{
-			if((1<<x) & mask)
+			if( ( 1 << x ) & mask )
 			{
-				(*m)[x]=v;
-				if(!m_target->IsPlayer())continue;
-				data << uint8(x);//group
-				data << uint8(type);//type 
-				data << v;//value
-				static_cast<Player*>(m_target)->GetSession()->SendPacket(&data);
+				(*m)[x] = v;
+
+				if( !m_target->IsPlayer() )
+					continue;
+
+				data << uint8( x );		//group
+				data << uint8( type );	//type 
+				data << v;				//value
+
+				static_cast<Player*>(m_target)->GetSession()->SendPacket( &data );
 				data.clear();
 			}
 			else
-				(*m)[x]=0;
+				(*m)[x] = 0;
 		}
 	}
 	else
 	{
-		for(uint32 x=0;x<SPELL_GROUPS;x++)
-			if((1<<x) & mask)
+		for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+		{
+			if( ( 1 << x ) & mask )
 			{
-				(*m)[x]+=v;
-				if(!m_target->IsPlayer())continue;
-				data << uint8(x);//group
-				data << uint8(type);//type 
-				data << (*m)[x];//value
-				static_cast<Player*>(m_target)->GetSession()->SendPacket(&data);
+				(*m)[x] += v;
+
+				if( !m_target->IsPlayer() )
+					continue;
+
+				data << uint8( x );		//group
+				data << uint8( type );	//type 
+				data << (*m)[x];		//value
+
+				static_cast<Player*>(m_target)->GetSession()->SendPacket( &data );
 				data.clear();
 			}
+		}
 	}
-
 }
 
-void Aura::SendDummyModifierLog(std::map<SpellEntry*,uint32> * m,SpellEntry * spellInfo,uint32 i,bool apply,bool pct)
+void Aura::SendDummyModifierLog( std::map< SpellEntry*, uint32 >* m, SpellEntry* spellInfo, uint32 i, bool apply, bool pct )
 {
-	WorldPacket data(SMSG_SET_FLAT_SPELL_MODIFIER+pct, 6);
+	WorldPacket data( SMSG_SET_FLAT_SPELL_MODIFIER + pct, 6 );
 
 	int32 v = spellInfo->EffectBasePoints[i] + 1;
 	uint32 mask = spellInfo->EffectSpellGroupRelation[i];
@@ -5774,52 +5786,53 @@ void Aura::SpellAuraModIncreaseSpeedAlways(bool apply)
 	m_target->UpdateSpeed();
 }
 
-void Aura::SpellAuraModIncreaseEnergyPerc(bool apply)
+void Aura::SpellAuraModIncreaseEnergyPerc( bool apply )
 {
 	SetPositive();
 	uint32 maxField = UNIT_FIELD_MAXPOWER1 + mod->m_miscValue;
 
 	if(apply)
 	{
-		mod->fixed_amount[0] = m_target->GetModPUInt32Value(maxField,mod->m_amount);
-		m_target->ModUInt32Value(maxField,mod->fixed_amount[0]);
-		if(m_target->IsPlayer() && maxField == UNIT_FIELD_MAXPOWER1)
-			((Player*)m_target)->SetManaFromSpell(((Player*)m_target)->GetManaFromSpell() + mod->fixed_amount[0]); 
+		mod->fixed_amount[0] = m_target->GetModPUInt32Value( maxField, mod->m_amount );
+		m_target->ModUInt32Value( maxField, mod->fixed_amount[0] );
+		if( m_target->IsPlayer() && maxField == UNIT_FIELD_MAXPOWER1 )
+			( ( Player* )m_target )->SetManaFromSpell( ( ( Player* )m_target )->GetManaFromSpell() + mod->fixed_amount[0] ); 
 	}
 	else
 	{
-		m_target->ModUInt32Value(maxField,-mod->fixed_amount[0]);
-		if(m_target->IsPlayer() && maxField == UNIT_FIELD_MAXPOWER1)
-			((Player*)m_target)->SetManaFromSpell(((Player*)m_target)->GetManaFromSpell() + mod->fixed_amount[0]); 
+		m_target->ModUInt32Value( maxField, -mod->fixed_amount[0] );
+		if( m_target->IsPlayer() && maxField == UNIT_FIELD_MAXPOWER1 )
+			( ( Player* )m_target )->SetManaFromSpell( ( ( Player* )m_target )->GetManaFromSpell() + mod->fixed_amount[0] ); 
 	}
 }
 
-void Aura::SpellAuraModIncreaseHealthPerc(bool apply)
+void Aura::SpellAuraModIncreaseHealthPerc( bool apply )
 {
 	SetPositive();
-	if(apply)
+	if( apply )
 	{
-		mod->fixed_amount[0] = m_target->GetModPUInt32Value(UNIT_FIELD_MAXHEALTH,mod->m_amount);
-		m_target->ModUInt32Value(UNIT_FIELD_MAXHEALTH,mod->fixed_amount[0]);
-		if(m_target->IsPlayer())
-			((Player*)m_target)->SetHealthFromSpell(((Player*)m_target)->GetHealthFromSpell() + mod->fixed_amount[0]); 
+		mod->fixed_amount[0] = m_target->GetModPUInt32Value( UNIT_FIELD_MAXHEALTH, mod->m_amount );
+		m_target->ModUInt32Value( UNIT_FIELD_MAXHEALTH, mod->fixed_amount[0] );
+		if( m_target->IsPlayer() )
+			( ( Player* )m_target )->SetHealthFromSpell( ( ( Player* )m_target )->GetHealthFromSpell() + mod->fixed_amount[0] ); 
 	}
 	else
 	{
-		m_target->ModUInt32Value(UNIT_FIELD_MAXHEALTH,-mod->fixed_amount[0]);
-		if(m_target->IsPlayer())
-			((Player*)m_target)->SetHealthFromSpell(((Player*)m_target)->GetHealthFromSpell() - mod->fixed_amount[0]); 
+		m_target->ModUInt32Value( UNIT_FIELD_MAXHEALTH, -mod->fixed_amount[0] );
+		if( m_target->IsPlayer() )
+			( ( Player* )m_target )->SetHealthFromSpell( ( ( Player* )m_target )->GetHealthFromSpell() - mod->fixed_amount[0] ); 
 	}
 }
 
-void Aura::SpellAuraModManaRegInterrupt(bool apply)
+void Aura::SpellAuraModManaRegInterrupt( bool apply )
 {
-	if (m_target->IsPlayer())
+	if( m_target->IsPlayer() )
 	{
-		if (apply)
+		if( apply )
 			static_cast<Player*>(m_target)->m_ModInterrMRegenPCT += mod->m_amount;
 		else
 			static_cast<Player*>(m_target)->m_ModInterrMRegenPCT -= mod->m_amount;
+
 		static_cast<Player*>(m_target)->UpdateStats();
 	}
 }
@@ -5895,24 +5908,25 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 	}
 }
 
-void Aura::SpellAuraModHaste(bool apply)
+void Aura::SpellAuraModHaste( bool apply )
 {
-	if(m_spellProto->NameHash == 0x540d4874)
+	if( m_spellProto->NameHash == 0x540d4874 )
 	{
 		/* blade flurry - attack a nearby opponent */
-		if(apply)
+		if( apply )
 			m_target->m_extrastriketargets++;
 		else
 			m_target->m_extrastriketargets--;
 	}
 
-	if(mod->m_amount<0)
+	if( mod->m_amount < 0 )
 		SetNegative();
 	else 
 		SetPositive();
 
+	// TODO: fix the hacky fix 
 	if( abs( mod->m_amount ) >= 100 )
-		return; // hacky fix
+		return; 
 
 	if( m_target->GetTypeId() == TYPEID_PLAYER )
 	{
@@ -5921,7 +5935,7 @@ void Aura::SpellAuraModHaste(bool apply)
 		else
 			static_cast<Player*>(m_target)->m_meleeattackspeedmod -= mod->m_amount;
 
-		((Player*)m_target)->UpdateAttackSpeed();
+		( ( Player* )m_target )->UpdateAttackSpeed();
 	}
 	else
 	{
@@ -5940,7 +5954,7 @@ void Aura::SpellAuraModHaste(bool apply)
 	}
 }
 
-void Aura::SpellAuraForceReaction(bool apply)
+void Aura::SpellAuraForceReaction( bool apply )
 {
 	// hackfix for spectacles
 	if(m_spellProto->EffectApplyAuraName[0] == SPELL_AURA_MOD_INVISIBILITY_DETECTION && m_target->GetTypeId() == TYPEID_PLAYER)
