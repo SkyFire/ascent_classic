@@ -1118,17 +1118,17 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				res = 0;
 			else
 			{
-				float summaryPCTmod=1.0f;
-				if (m_target->IsPlayer()) //Resilience
+				float summaryPCTmod = 1.0f;
+				if( m_target->IsPlayer() )//resilience
 				{
-					float dmg_reduction_pct=static_cast<Player*>(m_target)->CalcRating(14)/150;
-					if(dmg_reduction_pct>1.0f)
+					float dmg_reduction_pct = static_cast<Player*>(m_target)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 150.0f;
+					if( dmg_reduction_pct > 1.0f )
 						dmg_reduction_pct = 1.0f;
-					summaryPCTmod -=dmg_reduction_pct;
+					summaryPCTmod -= dmg_reduction_pct;
 				}
 				res *= summaryPCTmod;
-				if(res < 0) 
-					res = 0;
+				if( res < 0.0f ) 
+					res = 0.0f;
 			}
 		}
 
@@ -5364,7 +5364,7 @@ void Aura::SpellAuraAddPctMod(bool apply)
 		}break;
 
 /*	case SMT_BLOCK:
-	case SMT_TREAT_REDUCED:
+	case SMT_THREAT_REDUCED:
 
 	case SMT_TRIGGER:
 	case SMT_TIME:
@@ -6484,7 +6484,7 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 		SendModifierLog(&m_target->SM_FChanceOfSuccess,val,AffectedGroups,mod->m_miscValue);
 		break;
 
-/*	case SMT_TREAT_REDUCED:
+/*	case SMT_THREAT_REDUCED:
 	case SMT_BLOCK:
 	case SMT_TRIGGER:
 	case SMT_TIME:*/

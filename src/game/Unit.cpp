@@ -1576,17 +1576,17 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 			//--------------------------------block chance----------------------------------------------
 			block = pVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE); //shield check already done in Update chances
 			//--------------------------------dodge chance----------------------------------------------
-			if (pVictim->m_stunned<=0) 
+			if( pVictim->m_stunned <= 0 ) 
 			{
-				dodge = pVictim->GetFloatValue(PLAYER_DODGE_PERCENTAGE);
+				dodge = pVictim->GetFloatValue( PLAYER_DODGE_PERCENTAGE );
 			}
 			//--------------------------------parry chance----------------------------------------------
-			if(pVictim->can_parry && !disarmed)
+			if( pVictim->can_parry && !disarmed )
 			{
-				parry = pVictim->GetFloatValue(PLAYER_PARRY_PERCENTAGE);
+				parry = pVictim->GetFloatValue( PLAYER_PARRY_PERCENTAGE );
 			}
 		}
-		victim_skill = float2int32(vskill+((Player*)pVictim)->CalcRating(1));
+		victim_skill = float2int32( vskill + ( ( Player* )pVictim )->CalcRating( PLAYER_RATING_MODIFIER_DEFENCE ) );
 	}
 	//--------------------------------mob defensive chances-------------------------------------
 	else
@@ -1614,20 +1614,20 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 
 		switch(damage_type)
 		{
-		case MELEE://melee,
-			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-			hitmodifier+=pr->CalcRating(5);
-			self_skill = float2int32(pr->CalcRating(20));
+		case MELEE://melee main hand,
+			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
+			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_MAIN_HAND_SKILL ) );
 			break;
-		case DUALWIELD://dual wield
-			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
-			hitmodifier+=pr->CalcRating(5);
-			self_skill = float2int32(pr->CalcRating(21));
+		case DUALWIELD://melee off hand ( duel wield )
+			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
+			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_OFF_HAND_SKILL ) );
 			break;
 		case RANGED: //ranged
-			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
-			hitmodifier+=pr->CalcRating(6);
-			self_skill = float2int32(pr->CalcRating(0));
+			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
+			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_HIT );
+			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_SKILL ) );
 			break;
 		}
 
@@ -1844,29 +1844,29 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 //==========================================================================================
 //==============================Attacker Skill Base Calculation=============================
 //==========================================================================================
-	if(this->IsPlayer())
+	if( this->IsPlayer() )
 	{	  
-		self_skill=0;
+		self_skill = 0;
 		Player *pr = ((Player*)this);
 		hitmodifier = pr->GetHitFromMeleeSpell();  
 		
 		switch(damage_type)
 		{
 		case MELEE://melee,
-			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-			hitmodifier+=pr->CalcRating(5);
-			self_skill = float2int32(pr->CalcRating(20));
+			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
+			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_MAIN_HAND_SKILL ) );
 			break;
 		case DUALWIELD://dual wield
-			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
-			hitmodifier+=pr->CalcRating(5);
-			self_skill = float2int32(pr->CalcRating(21));
+			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
+			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_OFF_HAND_SKILL ) );
 			hit_status |= HITSTATUS_DUALWIELD;//animation
 			break;
 		case RANGED: //ranged
-			it = (disarmed) ? NULL : pr->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
-			hitmodifier+=pr->CalcRating(6);
-			self_skill = float2int32(pr->CalcRating(0));
+			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
+			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_HIT );
+			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_SKILL ) );
 			break;
 		}
 
@@ -1982,7 +1982,7 @@ else
 		block = max(0.0f,block-vsk*0.04f);
 
 	crit += pVictim->IsPlayer() ? vsk*0.04f : min(vsk*0.2f,0.0f) ; 
-	crit -= pVictim->IsPlayer() ? static_cast<Player*>(pVictim)->CalcRating(14) : 0.0f;
+	crit -= pVictim->IsPlayer() ? static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) : 0.0f;
 	if (crit<0) crit=0.0f;
 
 	if (vsk>0)
@@ -2263,17 +2263,17 @@ else
 					}
 					if (pVictim->IsPlayer())
 					{
-//						dmg.full_damage=float2int32(float(dmg.full_damage)*(1.0f-2.0f*static_cast<Player*>(pVictim)->CalcRating(14)));
+//						dmg.full_damage=float2int32(float(dmg.full_damage)*(1.0f-2.0f*static_cast<Player*>(pVictim)->CalcRating(PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE)));
 
 						//Resilience is a special new rating which was created to reduce the effects of critical hits against your character.
 						//It has two components; it reduces the chance you will be critically hit by x%, 
 						//and it reduces the damage dealt to you by critical hits by 2x%. x is the percentage resilience granted by a given resilience rating. 
 						//It is believed that resilience also functions against spell crits, 
 						//though it's worth noting that NPC mobs cannot get critical hits with spells.
-						float dmg_reduction_pct=2*static_cast<Player*>(pVictim)->CalcRating(14)/100;
-						if(dmg_reduction_pct>1.0f)
+						float dmg_reduction_pct = 2.0f * static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
+						if( dmg_reduction_pct > 1.0f )
 							dmg_reduction_pct = 1.0f; //we cannot resist more then he is criticalling us, there is no point of the critical then :P
-						dmg.full_damage=float2int32(dmg.full_damage - dmg.full_damage*dmg_reduction_pct);
+						dmg.full_damage = float2int32( dmg.full_damage - dmg.full_damage*dmg_reduction_pct );
 					}
 					
 					pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);

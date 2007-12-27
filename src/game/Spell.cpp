@@ -619,7 +619,7 @@ uint8 Spell::DidHit(Unit* target)
 	//rating bonus
 	if(p_caster)
 	{
-		resistchance -= p_caster->CalcRating(7);
+		resistchance -= p_caster->CalcRating( PLAYER_RATING_MODIFIER_SPELL_HIT );
 		resistchance -= p_caster->GetHitFromSpell();
 	}
 

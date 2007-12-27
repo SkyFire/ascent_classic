@@ -4156,24 +4156,24 @@ void Player::UpdateChances()
  	const float baseSpellCrit[12] = { 0.0f, 0.0f, 3.3355f, 3.6020f, 0.0f, 1.2375f, 0.0f, 2.2010f, 0.9075f, 1.700f, 0.0f, 1.8515f };
 	const float baseCritChance[12] = { 0.0f, 1.144f, 0.652f, -1.532f, -0.295f, 3.183f, 0.0f, 1.675f, 3.4575f, 2.0f, 0.0f, 0.961f };
  
-	float tmp = baseDodge[pClass] + (GetUInt32Value( UNIT_FIELD_STAT1) / dodgeRatio[pClass]) + this->GetDodgeFromSpell();
-	tmp+=CalcRating(2);//dodge rating
-	SetFloatValue(PLAYER_DODGE_PERCENTAGE,min(tmp,95.0f));
+	float tmp = baseDodge[pClass] + ( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pClass] ) + this->GetDodgeFromSpell();
+	tmp += CalcRating( PLAYER_RATING_MODIFIER_DODGE );//dodge rating
+	SetFloatValue( PLAYER_DODGE_PERCENTAGE, min( tmp, 95.0f ) );
 
 	//block = 0 if no shield
-	Item* it = this->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
-	if(it && it->GetProto()->InventoryType==INVTYPE_SHIELD)
+	Item* it = this->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+	if( it && it->GetProto()->InventoryType == INVTYPE_SHIELD )
 	{
-		tmp = 5.0f + GetUInt32Value(UNIT_FIELD_STAT0) / 22.0f + this->GetBlockFromSpell();
-		tmp+=CalcRating(4);//block rating
+		tmp = 5.0f + GetUInt32Value( UNIT_FIELD_STAT0 ) / 22.0f + this->GetBlockFromSpell();
+		tmp += CalcRating( PLAYER_RATING_MODIFIER_BLOCK );//block rating
 	}
 	else
 		tmp = 0.0f;
-	SetFloatValue(PLAYER_BLOCK_PERCENTAGE,min(tmp,95.0f));
+	SetFloatValue( PLAYER_BLOCK_PERCENTAGE, min( tmp, 95.0f ) );
 
 	tmp = 5.0f + this->GetParryFromSpell();
-	tmp+=CalcRating(3);
-	SetFloatValue(PLAYER_PARRY_PERCENTAGE,max(0,min(tmp,95.0f))); //let us not use negative parry. Some spells decrease it
+	tmp += CalcRating( PLAYER_RATING_MODIFIER_PARRY );
+	SetFloatValue( PLAYER_PARRY_PERCENTAGE, max( 0, min( tmp, 95.0f ) ) ); //let us not use negative parry. Some spells decrease it
 /* The formula is generated as follows:
 
 [agility] / [crit constant*] + [skill modifier] + [bonuses]
@@ -4197,25 +4197,25 @@ The crit constant is class and level dependent and for a level 70 character as f
 	Item * tItem = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
 	//Shady: Damn, guys. What is it? Var naming like "b" not acceptably!! 
 	float b = 0;
-	for(;i!=tocritchance.end();++i)
+	for(; i != tocritchance.end(); ++i )
 	{
         //-1 = any weapon
-		if((i->second.wclass==(uint32)-1) || (tItem && (1 << tItem->GetProto()->SubClass & i->second.subclass)))
+		if( ( i->second.wclass == ( uint32 )-1 ) || ( tItem && ( 1 << tItem->GetProto()->SubClass & i->second.subclass ) ) )
 		{
-			b+=i->second.value;
+			b += i->second.value;
 		}
 	}
-	float cr=tmp+CalcRating(8)+b;
-	SetFloatValue(PLAYER_CRIT_PERCENTAGE,min(cr,95.0f));
+	float cr = tmp + CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT ) + b;
+	SetFloatValue( PLAYER_CRIT_PERCENTAGE, min( cr, 95.0f ) );
 
 
-	float rcr=tmp+CalcRating(9);
-	SetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE,min(rcr,95.0f));
+	float rcr = tmp + CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT );
+	SetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE, min( rcr, 95.0f ) );
 
 	spellcritperc = baseSpellCrit[pClass] +
-					GetUInt32Value(UNIT_FIELD_STAT3)*float(SpellCritFromInt[pLevel][pClass]) +
+					GetUInt32Value( UNIT_FIELD_STAT3 ) * float( SpellCritFromInt[pLevel][pClass] ) +
 					this->GetSpellCritFromSpell() +
-					this->CalcRating(10);
+					this->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT );
 	UpdateChanceFields();
 }
 
@@ -4240,29 +4240,29 @@ void Player::UpdateAttackSpeed()
 		speed = 2500;
 	}
 	else //regular
-	if(!disarmed)
+	if( !disarmed )
 	{
-		weap=GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-		if(weap)
-			speed=weap->GetProto()->Delay;
+		weap = GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND) ;
+		if( weap != NULL )
+			speed = weap->GetProto()->Delay;
 	}
-		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 
-			       (uint32)((speed*((100.0 - (float)m_meleeattackspeedmod) / 100.0))*((100.0 - CalcRating(17)) / 100.0)));
+	SetUInt32Value( UNIT_FIELD_BASEATTACKTIME, 
+				    ( uint32 )( ( speed * (( 100.0f - ( float )m_meleeattackspeedmod ) / 100.0f ) ) * ( ( 100.0f - CalcRating( PLAYER_RATING_MODIFIER_MELEE_HASTE ) ) / 100.0f ) ) );
 	
-	weap=GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
-	if(weap && weap->GetProto()->Class==2)//weapon
+	weap = GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+	if( weap != NULL && weap->GetProto()->Class == 2 )// 2 is a weapon
 	{
-		speed=weap->GetProto()->Delay;
-		SetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, 
-			       (uint32)((speed*((100.0 - (float)m_meleeattackspeedmod) / 100.0))*((100.0 - CalcRating(17)) / 100.0)));
+		speed = weap->GetProto()->Delay;
+		SetUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, 
+					    ( uint32 )( ( speed * ( ( 100.0f - ( float )m_meleeattackspeedmod ) / 100.0f ) ) * ( ( 100.0f - CalcRating( PLAYER_RATING_MODIFIER_MELEE_HASTE ) ) / 100.0f ) ) );
 	}
 	  
-	weap=GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
-	if(weap)
+	weap = GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
+	if( weap != NULL )
 	{
-		speed=weap->GetProto()->Delay;
-		SetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,
-			       (uint32)((speed*((100.0 - (float)m_rangedattackspeedmod) / 100.0))*((100.0 - CalcRating(18)) / 100.0)));
+		speed = weap->GetProto()->Delay;
+		SetUInt32Value( UNIT_FIELD_RANGEDATTACKTIME,
+					    ( uint32 )( ( speed * ( ( 100.0f - (float)m_rangedattackspeedmod ) / 100.0f ) ) * ( ( 100.0f - CalcRating(PLAYER_RATING_MODIFIER_RANGED_HASTE)) / 100.0f ) ) );
 	}
 }
 
@@ -4379,11 +4379,11 @@ void Player::UpdateStats()
 		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT,amt*m_ModInterrMRegenPCT/100.0f+m_ModInterrMRegen/5.0f);
 	}
 /////////////////////RATINGS STUFF/////////////////
-	float newb=CalcRating(19);
-	if(newb!=SpellHasteRatingBonus)
+	float newb = CalcRating( PLAYER_RATING_MODIFIER_SPELL_HASTE );
+	if( newb != SpellHasteRatingBonus )
 	{
-		ModFloatValue(UNIT_MOD_CAST_SPEED,(SpellHasteRatingBonus-newb)/100.0f);
-		SpellHasteRatingBonus=newb;
+		ModFloatValue( UNIT_MOD_CAST_SPEED, ( SpellHasteRatingBonus - newb ) / 100.0f);
+		SpellHasteRatingBonus = newb;
 	}
 ////////////////////RATINGS STUFF//////////////////////
 	UpdateChances();
@@ -7039,18 +7039,22 @@ const double BaseRating []= {
 
 float Player::CalcRating(uint32 index)
 {
-	if(index<=10|| (index>=14  && index <=21))
+	uint32 ind2 = PLAYER_FIELD_COMBAT_RATING_1 - index;
+	if( ind2 <= 10 || ( ind2 >= 14 && ind2 <= 21 ) )
 	{
-		int rating = GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1+index);
+		int rating = m_uint32Values[index];
 		int l = getLevel();
-		if(l<10)l=10;//this is not dirty fix-> that's from wowwiki
+		if( l < 10 )
+			l = 10;//this is not dirty fix-> that's from wowwiki
 		double cost;
-		if(l < 60)
-			cost=(l-8)/52.0f;
+		if( l < 60 )
+			cost=( l - 8 ) / 52.0f;
 		else
-			cost=82.0f/(262-3*l);
-		return rating /float(BaseRating[index] * cost);
-	}else return 0;
+			cost = 82.0f / ( 262 - 3 * l );
+		return rating / float( BaseRating[ind2] * cost );
+	}
+	else
+		return 0;
 
 }
 
@@ -7742,76 +7746,78 @@ void Player::ModifyBonuses(uint32 type,int32 val)
 	switch (type) 
 		{
 		case POWER:
-			ModUInt32Value(UNIT_FIELD_MAXPOWER1,val);
+			ModUInt32Value( UNIT_FIELD_MAXPOWER1, val );
 			m_manafromitems += val;
 			break;
 		case HEALTH:
-			ModUInt32Value(UNIT_FIELD_MAXHEALTH, val);
+			ModUInt32Value( UNIT_FIELD_MAXHEALTH, val );
 			m_healthfromitems += val;
 			break;
 		case AGILITY: // modify agility				
-			   FlatStatModPos[1]+=val;
-			CalcStat(1);
+			FlatStatModPos[1] += val;
+			CalcStat( 1 );
 			break;
-		case STRENGHT: //modify strength
-			FlatStatModPos[0]+=val;
-			CalcStat(0);
+		case STRENGTH: //modify strength
+			FlatStatModPos[0] += val;
+			CalcStat( 0 );
 			break;
 		case INTELLECT: //modify intellect 
-			   FlatStatModPos[3]+=val;
-			CalcStat(3);
+			FlatStatModPos[3] += val;
+			CalcStat( 3 );
 			break;
 		 case SPIRIT: //modify spirit
-			FlatStatModPos[4]+=val;
-			CalcStat(4);
+			FlatStatModPos[4] += val;
+			CalcStat( 4 );
 			break;
 		case STAMINA: //modify stamina
-			FlatStatModPos[2]+=val;
-			CalcStat(2);
+			FlatStatModPos[2] += val;
+			CalcStat( 2 );
 			break;
 		case WEAPON_SKILL_RATING:
 			{
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_SKILL, val ); // ranged
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_MAIN_HAND_SKILL, val ); // melee main hand
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_OFF_HAND_SKILL, val ); // melee off hand
 			}break;
 		case DEFENSE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_01, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_DEFENCE, val );
 			}break;
 		case DODGE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_02, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_DODGE, val );
 			}break;
 		case PARRY_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_03, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_PARRY, val );
 			}break;
 		case SHIELD_BLOCK_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_04, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_BLOCK, val );
 			}break;
 		case MELEE_HIT_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_05, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_HIT, val );
 			}break;
 		case RANGED_HIT_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_06, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_HIT, val );
 			}break;
 		case SPELL_HIT_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_07, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_SPELL_HIT, val );
 			}break;
 		case MELEE_CRITICAL_STRIKE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_08,val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_CRIT, val );
 			}break;
 		case RANGED_CRITICAL_STRIKE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_09, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_CRIT, val );
 			}break;
 		case SPELL_CRITICAL_STRIKE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_10, val);
-
+				ModUInt32Value( PLAYER_RATING_MODIFIER_SPELL_CRIT, val );
 			}break;
 		case MELEE_HIT_AVOIDANCE_RATING:
 			{
@@ -7839,29 +7845,33 @@ void Player::ModifyBonuses(uint32 type,int32 val)
 			}break;
 		case MELEE_HASTE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_17, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_HASTE, val );//melee
 			}break;
 		case RANGED_HASTE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_18, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_HASTE, val );//ranged
 			}break;
 		case SPELL_HASTE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_19, val);
+				ModUInt32Value( PLAYER_RATING_MODIFIER_SPELL_HASTE, val );//spell
 			}break;
 		case HIT_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_05, val);//melee
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_06, val);//ranged
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_HIT, val );//melee
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_HIT, val );//ranged
+				// maybe should do spell here? (7)
 			}break;
 		case CRITICAL_STRIKE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_08,val);//melee
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_09,val);//ranged
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_CRIT, val );//melee
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_CRIT, val );//ranged
+				// maybe should do spell here? (10)
 			}break;
-		case HIT_AVOIDANCE_RATING:
+		case HIT_AVOIDANCE_RATING:// this is guessed based on layout of other fields
 			{
-
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_HIT_AVOIDANCE, val );//melee
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_HIT_AVOIDANCE, val );//ranged
+				ModUInt32Value( PLAYER_RATING_MODIFIER_SPELL_HIT_AVOIDANCE, val );//spell
 			}break;
 		case CRITICAL_AVOIDANCE_RATING:
 			{
@@ -7869,16 +7879,15 @@ void Player::ModifyBonuses(uint32 type,int32 val)
 			}break;
 		case RESILIENCE_RATING:
 			{
-				//uses 3 fields
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_16, val);
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_15, val);
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_14, val);
-
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE, val );//melee
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE, val );//ranged
+				ModUInt32Value( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE, val );//spell
 			}break;
 		case HASTE_RATING:
 			{
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_17, val);//melee
-				ModUInt32Value(PLAYER_FIELD_COMBAT_RATING_18, val);//ranged
+				ModUInt32Value( PLAYER_RATING_MODIFIER_MELEE_HASTE, val );//melee
+				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_HASTE, val );//ranged
+				// maybe should do spell here? (19)
 			}break;
 		}
 }

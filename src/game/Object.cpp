@@ -2178,9 +2178,9 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 					printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,spellInfo->SpellGroupType);
 #endif
 			}
-			if (pVictim->IsPlayer())
-				CritChance -=static_cast<Player*>(pVictim)->CalcRating(14);
-			if (CritChance<0) CritChance = 0;
+			if( pVictim->IsPlayer() )
+				CritChance -= static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE );
+			if( CritChance < 0 ) CritChance = 0;
 
 			critical = Rand(CritChance);
 //==========================================================================================
@@ -2188,25 +2188,25 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 			if (critical)
 			{		
-				float b = res/2;
-				if(spellInfo->SpellGroupType)
-					SM_PFValue(caster->SM_PCriticalDamage, &b, spellInfo->SpellGroupType);
+				float b = res / 2.0f;
+				if( spellInfo->SpellGroupType )
+					SM_PFValue( caster->SM_PCriticalDamage, &b, spellInfo->SpellGroupType );
 				res += b;
-				if (pVictim->IsPlayer())
+				if( pVictim->IsPlayer() )
 				{
-//					res = res*(1.0f-2.0f*static_cast<Player*>(pVictim)->CalcRating(14));
+					//res = res*(1.0f-2.0f*static_cast<Player*>(pVictim)->CalcRating(PLAYER_RATING_MODIFIER_MELEE_CRIT_RESISTANCE));
 					//Resilience is a special new rating which was created to reduce the effects of critical hits against your character.
 					//It has two components; it reduces the chance you will be critically hit by x%, 
 					//and it reduces the damage dealt to you by critical hits by 2x%. x is the percentage resilience granted by a given resilience rating. 
 					//It is believed that resilience also functions against spell crits, 
 					//though it's worth noting that NPC mobs cannot get critical hits with spells.
-					float dmg_reduction_pct=2*static_cast<Player*>(pVictim)->CalcRating(14)/100;
-					if(dmg_reduction_pct>1.0f)
+					float dmg_reduction_pct = 2 * static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
+					if( dmg_reduction_pct > 1.0f )
 						dmg_reduction_pct = 1.0f; //we cannot resist more then he is criticalling us, there is no point of the critical then :P
-					res= res - res*dmg_reduction_pct;
+					res = res - res * dmg_reduction_pct;
 				}
 
-				pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
+				pVictim->Emote( EMOTE_ONESHOT_WOUNDCRITICAL );
 				aproc |= PROC_ON_SPELL_CRIT_HIT;
 				vproc |= PROC_ON_SPELL_CRIT_HIT_VICTIM;
 			}
