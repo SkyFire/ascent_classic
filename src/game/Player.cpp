@@ -4194,25 +4194,38 @@ The crit constant is class and level dependent and for a level 70 character as f
 	* Warrior [33] 
 */
 
-	tmp = baseCritChance[pClass] + GetUInt32Value(UNIT_FIELD_STAT1)*float(CritFromAgi[pLevel][pClass]);
+	tmp = baseCritChance[pClass] + GetUInt32Value( UNIT_FIELD_STAT1 ) * float( CritFromAgi[pLevel][pClass] );
+
 	//std::list<WeaponModifier>::iterator i = tocritchance.begin();
-	map<uint32, WeaponModifier>::iterator i = tocritchance.begin();
-	Item * tItem = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-	//Shady: Damn, guys. What is it? Var naming like "b" not acceptably!! 
-	float b = 0;
-	for(; i != tocritchance.end(); ++i )
+	map< uint32, WeaponModifier >::iterator itr = tocritchance.begin();
+
+	Item* tItemMelee = GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+	Item* tItemRanged = GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
+
+	float melee_bonus = 0;
+	float ranged_bonus = 0;
+
+	//-1 = any weapon
+
+	for(; itr != tocritchance.end(); ++itr )
 	{
-        //-1 = any weapon
-		if( ( i->second.wclass == ( uint32 )-1 ) || ( tItem && ( 1 << tItem->GetProto()->SubClass & i->second.subclass ) ) )
+		if( itr->second.wclass == ( uint32 )-1 )
 		{
-			b += i->second.value;
+			if( tItemMelee != NULL && ( 1 << tItemMelee->GetProto()->SubClass & itr->second.subclass ) )
+			{
+				melee_bonus += itr->second.value;
+			}
+			if( tItemRanged != NULL && ( 1 << tItemRanged->GetProto()->SubClass & itr->second.subclass ) )
+			{
+				ranged_bonus += itr->second.value;
+			}
 		}
 	}
-	float cr = tmp + CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT ) + b;
+
+	float cr = tmp + CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT ) + melee_bonus;
 	SetFloatValue( PLAYER_CRIT_PERCENTAGE, min( cr, 95.0f ) );
 
-
-	float rcr = tmp + CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT );
+	float rcr = tmp + CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT ) + ranged_bonus;
 	SetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE, min( rcr, 95.0f ) );
 
 	spellcritperc = baseSpellCrit[pClass] +
