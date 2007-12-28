@@ -45,7 +45,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="4"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
@@ -92,6 +92,9 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\..\bin\Release/realmserver.pdb"
 				SubSystem="1"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -253,7 +256,7 @@
 				IgnoreStandardIncludePath="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="RStdAfx.h"
 				PrecompiledHeaderFile=".\realmserver___Win32_Debug\realmserver.pch"
