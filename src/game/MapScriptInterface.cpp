@@ -106,7 +106,6 @@ Creature* MapScriptInterface::SpawnCreature(uint32 Entry, float cX, float cY, fl
 	}
 
 	CreatureSpawn * sp = new CreatureSpawn;
-	uint32 gender = info->GenerateModelId(&sp->displayid);
 	sp->entry = Entry;
 	sp->form = 0;
 	sp->id = 0;

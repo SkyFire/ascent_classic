@@ -433,7 +433,7 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 		char * p = strchr(ab, ',');
 		char * q = ab;
 		uint32 spellid;
-		uint16 spstate;
+		uint32 spstate;
 		uint32 i = 0;
 
 		while(p && i<10)

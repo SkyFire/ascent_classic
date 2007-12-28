@@ -2276,7 +2276,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 //==============================Post Damage Processing======================================
 //==========================================================================================
-	if (dmg.resisted_damage==dmg.full_damage && !abs_dmg)
+	if ((int32)dmg.resisted_damage==dmg.full_damage && !abs_dmg)
 	{		//Magic Absorption
 		if (pVictim->IsPlayer())
 		{

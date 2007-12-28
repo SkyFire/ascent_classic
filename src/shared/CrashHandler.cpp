@@ -311,7 +311,7 @@ int __cdecl HandleCrash(PEXCEPTION_POINTERS pExceptPtrs)
 		strcpy(modname, "UNKNOWN");
 
 	char * mname = strrchr(modname, '\\');
-	(void*)mname++;	 // Remove the last \
+	(void*)mname++;	 // Remove the last 
 
 	sprintf(filename, "CrashDumps\\dump-%s-%u-%u-%u-%u-%u-%u-%u.dmp",
 		mname, pTime->tm_year+1900, pTime->tm_mon, pTime->tm_mday,

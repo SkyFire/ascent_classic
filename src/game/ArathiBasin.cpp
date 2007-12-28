@@ -463,7 +463,6 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 
 	uint32 current_resources = m_resources[Team];
 	uint32 current_bases = m_capturedBases[Team];
-	uint32 last_resources = current_resources;
 
 	if(current_bases>5)
 		current_bases=5;
@@ -650,7 +649,7 @@ bool ArathiBasin::HookHandleRepop(Player * plr)
 
 	for(uint32 i = 0; i < AB_NUM_CONTROL_POINTS; ++i)
 	{
-		if(m_basesOwnedBy[i] == plr->m_bgTeam)
+		if(m_basesOwnedBy[i] == (int32)plr->m_bgTeam)
 		{
 			dist = plr->GetPositionV()->Distance2DSq(GraveyardLocations[i][0], GraveyardLocations[i][1]);
 			if(dist < current_distance)
@@ -676,7 +675,7 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 	}
 
 	// anticheat, not really necessary because this is a server method but anyway
-	if(m_basesAssaultedBy[Id] != Team)
+	if(m_basesAssaultedBy[Id] != (int32)Team)
 		return;
 
 	m_basesOwnedBy[Id] = Team;

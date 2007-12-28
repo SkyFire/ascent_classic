@@ -19,13 +19,12 @@
 
 #include "StdAfx.h"
 
-static const char * NULLMSG = "";
 Guild::Guild()
 {
 	m_commandLogging=true;
 	m_guildId=0;
 	m_guildLeader=0;
-	m_guildName="Goose";
+	m_guildName=(char*)"Goose";
 	m_guildInfo=NULL;
 	m_motd=NULL;
 	m_backgroundColor=0;
@@ -981,7 +980,7 @@ void Guild::GuildChat(const char * szMessage, WorldSession * pClient, uint32 iTy
 		return;
 	}
 
-	WorldPacket * data = sChatHandler.FillMessageData( CHAT_MSG_GUILD, iType==CHAT_MSG_ADDON?CHAT_MSG_ADDON:LANG_UNIVERSAL, szMessage,
+	WorldPacket * data = sChatHandler.FillMessageData( CHAT_MSG_GUILD, ((int32)iType)==CHAT_MSG_ADDON?-1:LANG_UNIVERSAL, szMessage,
 		pClient->GetPlayer()->GetGUID());
 
 	m_lock.Acquire();
@@ -1006,7 +1005,7 @@ void Guild::OfficerChat(const char * szMessage, WorldSession * pClient, uint32 i
 		return;
 	}
 
-	WorldPacket * data = sChatHandler.FillMessageData( CHAT_MSG_OFFICER, iType==CHAT_MSG_ADDON?CHAT_MSG_ADDON:LANG_UNIVERSAL, szMessage,
+	WorldPacket * data = sChatHandler.FillMessageData( CHAT_MSG_OFFICER, ((int32)iType)==CHAT_MSG_ADDON?-1:LANG_UNIVERSAL, szMessage,
 		pClient->GetPlayer()->GetGUID());
 
 	m_lock.Acquire();

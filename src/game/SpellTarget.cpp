@@ -652,7 +652,7 @@ void Spell::SpellTargetSingleTargetPartyMember(uint32 i, uint32 j)
 /// Spell Target Handling for type 36: these targets are scripted :s or something.. there seems to be a system...
 void Spell::SpellTargetScriptedEffects2(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
+	//TargetsList *tmpMap=&m_targetUnits[i];
 
 }
 
@@ -710,7 +710,7 @@ void Spell::SpellTargetFishing(uint32 i, uint32 j)
 /// movement proc, like traps.
 void Spell::SpellTargetType40(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
+	//TargetsList *tmpMap=&m_targetUnits[i];
 }
 
 /// Spell Target Handling for type 41 / 42 / 43 / 44: Totems
@@ -825,7 +825,7 @@ void Spell::SpellTargetSimpleTargetAdd(uint32 i, uint32 j)
 /// Spell Target Handling for type 53: Target Area by Players CurrentSelection()
 void Spell::SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
+	//TargetsList *tmpMap=&m_targetUnits[i];
 	Unit *Target = NULL;
 	if(m_caster->IsInWorld())
 	{

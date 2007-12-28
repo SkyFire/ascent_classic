@@ -422,3 +422,5 @@ bool ChatHandler::HandleRatingsCommand( const char *args , WorldSession *m_sessi
 	m_plyr->UpdateStats();
 	return true;
 }
+
+

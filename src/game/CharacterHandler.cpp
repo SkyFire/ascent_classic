@@ -44,7 +44,7 @@ bool VerifyName(const char * name, size_t nlen)
 	{
 		for(i = 0; i < nlen; ++i)
 		{
-			p = bannedCharacters;
+			p = allowedCharacters;
 			while(*p != 0 && name[i] != *p && name[i] != 0)
 				++p;
 

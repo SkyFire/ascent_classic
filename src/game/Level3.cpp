@@ -833,9 +833,6 @@ bool ChatHandler::HandleCreateAccountCommand(const char* args, WorldSession *m_s
 bool ChatHandler::HandleGetTransporterTime(const char* args, WorldSession* m_session)
 {
 	Player *plyr = m_session->GetPlayer();
-	int * p = 0;
-	*p = 1;
-
 	return true;
 }
 

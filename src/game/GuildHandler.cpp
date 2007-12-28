@@ -558,6 +558,9 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 		static uint32 item_ids[] = {ARENA_TEAM_CHARTER_2v2, ARENA_TEAM_CHARTER_3v3, ARENA_TEAM_CHARTER_5v5};
 		static uint32 costs[] = {ARENA_TEAM_CHARTER_2v2_COST,ARENA_TEAM_CHARTER_3v3_COST,ARENA_TEAM_CHARTER_5v5_COST};
 
+		if(_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < costs[arena_type])
+			return;			// error message needed here
+
 		ItemPrototype * ip = ItemPrototypeStorage.LookupEntry(item_ids[arena_type]);
 		ASSERT(ip);
 		SlotResult res = _player->GetItemInterface()->FindFreeInventorySlot(ip);
@@ -591,7 +594,7 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			BuildItemPushResult(&data, _player->GetGUID(), ITEM_PUSH_TYPE_RECEIVE, 1, item_ids[arena_type], 0);
 			SendPacket(&data);*/
 			SendItemPushResult(i, false, true, false, true, _player->GetItemInterface()->LastSearchItemBagSlot(), _player->GetItemInterface()->LastSearchItemSlot(), 1);
-
+			_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)costs[arena_type]);
 			_player->m_charters[arena_index] = c;
 			_player->SaveToDB(false);
 		}
@@ -1565,7 +1568,7 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 	pos = data.wpos();
 	data << uint8(0);
 
-	for(uint32 j = 0; j < MAX_GUILD_BANK_SLOTS; ++j)
+	for(int32 j = 0; j < MAX_GUILD_BANK_SLOTS; ++j)
 	{
 		if(pTab->pSlots[j] != NULL)
 		{

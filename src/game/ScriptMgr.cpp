@@ -127,7 +127,7 @@ char *ext;
 #endif
 				string full_path = "../lib/" + string(list[filecount]->d_name);
 				SCRIPT_MODULE mod = dlopen(full_path.c_str(), RTLD_NOW);
-				printf("  %s : 0x%08X : ", list[filecount]->d_name, (unsigned long)mod);
+				printf("  %s : 0x%p : ", list[filecount]->d_name, mod);
 				if(mod == 0)
 					printf("error! [%s]\n", dlerror());
 				else

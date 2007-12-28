@@ -1368,7 +1368,7 @@ void Spell::cast(bool check)
 				}
 			}
 			bool isDuelEffect = false;
-			uint32 spellid = m_spellInfo->Id;
+			//uint32 spellid = m_spellInfo->Id;
 
             // if the spell is not reflected
 			if(!IsReflected())
@@ -2158,7 +2158,7 @@ bool Spell::HasPower()
 		cost = m_spellInfo->manaCost;
 	}
 
-	if(m_spellInfo->powerType==POWER_TYPE_HEALTH)
+	if((int32)m_spellInfo->powerType==POWER_TYPE_HEALTH)
 		cost -= m_spellInfo->baseLevel;//FIX for life tap	
 	else if(u_caster)
 	{
@@ -2256,7 +2256,7 @@ bool Spell::TakePower()
 		cost = m_spellInfo->manaCost;
 	}
 	
-	if(m_spellInfo->powerType==POWER_TYPE_HEALTH)
+	if((int32)m_spellInfo->powerType==POWER_TYPE_HEALTH)
 			cost -= m_spellInfo->baseLevel;//FIX for life tap	
 	else if(u_caster)
 	{
@@ -2622,7 +2622,7 @@ uint8 Spell::CanCast(bool tolerate)
 
 			if(m_spellInfo->EffectApplyAuraName[0]==2)//mind control
 			if(m_spellInfo->EffectBasePoints[0])//got level req;
-				if((int32)target->getLevel() > m_spellInfo->EffectBasePoints[0]+1 + (p_caster->getLevel() - m_spellInfo->spellLevel))
+				if((int32)target->getLevel() > m_spellInfo->EffectBasePoints[0]+1 + int32(p_caster->getLevel() - m_spellInfo->spellLevel))
 					return SPELL_FAILED_HIGHLEVEL;
 				else if(target->GetTypeId() == TYPEID_UNIT) 
 				{ 

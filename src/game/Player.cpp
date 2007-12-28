@@ -2436,7 +2436,6 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	start = (char*)get_next_field.GetString();//buff;
 	
 	// new format
-	uint32 field = PLAYER_SKILL_INFO_1_1;
 	const ItemProf * prof;
 	if(!strchr(start, ' ') && !strchr(start,';'))
 	{

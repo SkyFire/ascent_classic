@@ -163,7 +163,7 @@ static inline void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid)
 
 //!!! warning. This presumes that all guids can be compressed at least 1 byte
 //make sure you choose highguids acordingly
-static unsigned int FastGUIDPack(const uint64 & oldguid, unsigned char * buffer, uint32 pos)
+static inline unsigned int FastGUIDPack(const uint64 & oldguid, unsigned char * buffer, uint32 pos)
 {
 	// hehe speed freaks
 	uint8 guidmask = 0;

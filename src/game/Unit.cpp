@@ -5566,3 +5566,4 @@ bool Unit::isAttackReady(bool offhand)
 	else
 		return (getMSTime() >= m_attackTimer) ? true : false;
 }
+

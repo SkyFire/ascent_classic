@@ -821,7 +821,7 @@ void InstanceMgr::PlayerLeftGroup(Group * pGroup, Player * pPlayer)
 				if(in->m_creatorGroup && in->m_creatorGroup == pGroup->GetID())
 				{
 					// better make sure we're actually in that instance.. :P
-					if(!pPlayer->raidgrouponlysent && pPlayer->GetInstanceID() == in->m_instanceId)
+					if(!pPlayer->raidgrouponlysent && pPlayer->GetInstanceID() == (int32)in->m_instanceId)
 					{
 						data << uint32(60000) << uint32(1);
 						pPlayer->GetSession()->SendPacket(&data);

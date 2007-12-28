@@ -4655,7 +4655,7 @@ Don't know why there is any weapon modifiers.
 		//126 == melee,
 		//127 == evrything
 		//else - schools
-		/*
+		*
 		//this is somehow wrong since fixed value will be owerwritten by other values
 		if(GetSpellProto()->EquippedItemClass==-1)//does not depend on weapon
 		{
@@ -4683,7 +4683,7 @@ Don't know why there is any weapon modifiers.
 			}
 			else 
 			{
-				/*std::list<WeaponModifier>::iterator i=((Player*)m_target)->damagedone.begin();
+				*std::list<WeaponModifier>::iterator i=((Player*)m_target)->damagedone.begin();
 
 				for(;i!=((Player*)m_target)->damagedone.end();i++)
 				{
