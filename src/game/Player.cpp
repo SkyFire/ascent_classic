@@ -4209,16 +4209,13 @@ The crit constant is class and level dependent and for a level 70 character as f
 
 	for(; itr != tocritchance.end(); ++itr )
 	{
-		if( itr->second.wclass == ( uint32 )-1 )
+		if( itr->second.wclass == ( uint32 )-1 || ( tItemMelee != NULL && ( 1 << tItemMelee->GetProto()->SubClass & itr->second.subclass ) ) )
 		{
-			if( tItemMelee != NULL && ( 1 << tItemMelee->GetProto()->SubClass & itr->second.subclass ) )
-			{
-				melee_bonus += itr->second.value;
-			}
-			if( tItemRanged != NULL && ( 1 << tItemRanged->GetProto()->SubClass & itr->second.subclass ) )
-			{
-				ranged_bonus += itr->second.value;
-			}
+			melee_bonus += itr->second.value;
+		}
+		if( itr->second.wclass == ( uint32 )-1 || ( tItemRanged != NULL && ( 1 << tItemRanged->GetProto()->SubClass & itr->second.subclass ) ) )
+		{
+			ranged_bonus += itr->second.value;
 		}
 	}
 
