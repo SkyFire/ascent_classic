@@ -472,6 +472,13 @@ Player::~Player ( )
 
 	for(set<SSAura*>::iterator itr = m_ssAuras.begin(); itr != m_ssAuras.end(); ++itr)
 		delete (*itr);
+
+	if(m_Summon)
+	{
+		m_Summon->ClearPetOwner();
+		m_Summon->Delete();
+		m_Summon=NULL;
+	}
 }
 
 ASCENT_INLINE uint32 GetSpellForLanguage(uint32 SkillID)
