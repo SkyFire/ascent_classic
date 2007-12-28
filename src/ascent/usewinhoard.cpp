@@ -26,6 +26,7 @@
 
 // Link this code with your executable to use winhoard.
 #ifdef HOARD
+#define NOMINMAX
 #include <windows.h>
 #if defined(_WIN64)
 #pragma comment(linker, "/include:ReferenceHoard")

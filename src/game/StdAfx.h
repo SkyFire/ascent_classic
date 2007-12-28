@@ -20,6 +20,14 @@
 #ifndef __STDAFX_H
 #define __STDAFX_H
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C function names.
 #include <lua/lua.h>
 #include <lua/lauxlib.h>
@@ -34,7 +42,6 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include <sstream>
 #include <string>
 //#include <fstream>
-
 
 #include "../shared/Common.h"
 #include "../shared/MersenneTwister.h"

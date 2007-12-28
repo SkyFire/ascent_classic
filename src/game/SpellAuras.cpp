@@ -3783,7 +3783,7 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		//zack: latest new is that this spell uses spell damage bonus only and not healing bonus
 		amount += m_caster->GetSpellDmgBonus(m_target,GetSpellProto(),amount)*50/100;
 	
-		uint32 Amount = min(amount,m_target->GetUInt32Value(UNIT_FIELD_HEALTH));
+		uint32 Amount = min( amount, m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) );
 		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
 		
 		uint32 mh = m_caster->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
