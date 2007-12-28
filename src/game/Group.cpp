@@ -199,7 +199,8 @@ void Group::Update()
 		return;
 
 	Player* pNewLeader = NULL;
-	if( m_Leader == NULL || m_Leader->m_loggedInPlayer == NULL )
+
+	if( m_Leader == NULL || ( m_Leader != NULL && m_Leader->m_loggedInPlayer == NULL ) )
 	{
 		pNewLeader = FindFirstPlayer();
 		if( pNewLeader != NULL )
