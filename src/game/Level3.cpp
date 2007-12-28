@@ -1539,7 +1539,7 @@ bool ChatHandler::HandleFormationLink2Command(const char* args, WorldSession * m
 
 	slave->GetAIInterface()->m_formationFollowDistance = dist;
 	slave->GetAIInterface()->m_formationFollowAngle = ang;
-	slave->GetAIInterface()->m_formationLinkTarget = ((Creature*)m_session->GetPlayer()->linkTarget);
+	slave->GetAIInterface()->m_formationLinkTarget = static_cast< Creature* >( m_session->GetPlayer()->linkTarget );
 	slave->GetAIInterface()->m_formationLinkSqlId = slave->GetAIInterface()->m_formationLinkTarget->GetSQL_id();
 	slave->GetAIInterface()->SetUnitToFollowAngle(ang);
 	
@@ -1548,7 +1548,7 @@ bool ChatHandler::HandleFormationLink2Command(const char* args, WorldSession * m
 		slave->GetSQL_id(), slave->GetAIInterface()->m_formationLinkSqlId, ang, dist);
 
 	BlueSystemMessage(m_session, "%s linked up to %s with a distance of %f at %f radians.", slave->GetCreatureName()->Name, 
-		((Creature*)m_session->GetPlayer()->linkTarget)->GetCreatureName()->Name, dist, ang);
+		static_cast< Creature* >( m_session->GetPlayer()->linkTarget )->GetCreatureName()->Name, dist, ang );
 
 	return true;
 }

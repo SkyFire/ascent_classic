@@ -104,15 +104,15 @@ void MapCell::RemoveObjects()
 		switch((*itr)->GetGUIDHigh())
 		{
 		case HIGHGUID_UNIT: {
-			_mapmgr->_reusable_guids_creature.push_back((*itr)->GetGUIDLow());
-			((Creature*)*itr)->m_respawnCell=NULL;
-			delete ((Creature*)*itr);
+			_mapmgr->_reusable_guids_creature.push_back( (*itr)->GetGUIDLow() );
+			static_cast< Creature* >( *itr )->m_respawnCell=NULL;
+			delete static_cast< Creature* >( *itr );
 			}break;
 
 		case HIGHGUID_GAMEOBJECT: {
-			_mapmgr->_reusable_guids_gameobject.push_back((*itr)->GetGUIDLow());
-			((GameObject*)*itr)->m_respawnCell=NULL;
-			delete ((GameObject*)*itr);
+			_mapmgr->_reusable_guids_gameobject.push_back( (*itr)->GetGUIDLow() );
+			static_cast< GameObject* >( *itr )->m_respawnCell=NULL;
+			delete static_cast< GameObject* >( *itr );
 			}break;
 		}
 	}
@@ -133,31 +133,31 @@ void MapCell::RemoveObjects()
 		if(_unloadpending && obj->GetTypeId()==TYPEID_CORPSE)
 			continue;
 
-		if(obj->Active)
-			obj->Deactivate(_mapmgr);
+		if( obj->Active )
+			obj->Deactivate( _mapmgr );
 
-		if (obj->IsInWorld())
-			obj->RemoveFromWorld(true);
+		if( obj->IsInWorld() )
+			obj->RemoveFromWorld( true );
 
-		if (obj->GetTypeId() == TYPEID_UNIT)
+		if( obj->GetTypeId() == TYPEID_UNIT )
 		{
 			if(obj->IsPet())
-				delete ((Pet*)(obj));
+				delete static_cast< Pet* >( obj );
 			else
-				delete ((Creature*)obj);
+				delete static_cast< Creature* >( obj );
 		}
-		else if (obj->GetTypeId() == TYPEID_GAMEOBJECT)
+		else if(obj->GetTypeId() == TYPEID_GAMEOBJECT)
 		{
-			if(obj->GetGUIDHigh()==HIGHGUID_TRANSPORTER)
-				delete ((Transporter*)obj);
+			if( obj->GetGUIDHigh() == HIGHGUID_TRANSPORTER )
+				delete static_cast< Transporter* >( obj );
 			else
-				delete ((GameObject*)obj);
+				delete static_cast< GameObject* >( obj );
 		}
-		else if (obj->GetTypeId() == TYPEID_DYNAMICOBJECT)
-			delete ((DynamicObject*)obj);
-		else if (obj->GetTypeId() == TYPEID_CORPSE)
+		else if( obj->GetTypeId() == TYPEID_DYNAMICOBJECT )
+			delete static_cast< DynamicObject* >( obj );
+		else if( obj->GetTypeId() == TYPEID_CORPSE )
 		{
-			delete ((Corpse*)obj);
+			delete static_cast< Corpse* >( obj );
 		}
 	}
 

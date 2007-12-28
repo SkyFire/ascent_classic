@@ -349,7 +349,7 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 		break;
 
 	case TYPEID_UNIT:
-		sGMLog.writefromsession(m_session, "used kill command on CREATURE %s", ((Creature*)target)->GetCreatureName() ?  ((Creature*)target)->GetCreatureName()->Name : "unknown");
+		sGMLog.writefromsession(m_session, "used kill command on CREATURE %s", static_cast< Creature* >( target )->GetCreatureName() ?  ((Creature*)target)->GetCreatureName()->Name : "unknown");
 		break;
 	}
 	
