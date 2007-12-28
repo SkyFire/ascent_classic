@@ -338,7 +338,7 @@ void WorldSession::LogoutPlayer(bool Save)
 		if(dirty)
 		{
 			ss	<<" WHERE acct="<< _accountId <<";";
-			CharacterDatabase.Execute(ss.str().c_str());
+			CharacterDatabase.ExecuteNA(ss.str().c_str());
 		}
 
 		delete _player;
