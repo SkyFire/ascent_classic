@@ -2244,7 +2244,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
 	sp = dbcSpell.LookupEntry(14782); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
 	sp = dbcSpell.LookupEntry(14783); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
@@ -2253,13 +2253,13 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(33186); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->EffectSpellGroupRelation[0]=2147483648UL;
 		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648UL;
 	}
 	sp = dbcSpell.LookupEntry(33190); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->EffectSpellGroupRelation[0]=2147483648UL;
 		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648UL;
 	}
 
@@ -2858,35 +2858,35 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
-		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144UL | 16 | 524288UL | 4194304UL;
 	}
 	sp = dbcSpell.LookupEntry(30061);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
-		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144UL | 16 | 524288UL | 4194304UL;
 	}
 	sp = dbcSpell.LookupEntry(30062);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
-		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144UL | 16 | 524288UL | 4194304UL;
 	}
 	sp = dbcSpell.LookupEntry(30063);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
-		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288UL | 4194304UL;
 	}
 	sp = dbcSpell.LookupEntry(30064);
 	if (sp)
 	{
 		sp->EffectSpellGroupRelation[0]=1024 | 2 | 65536;
 		sp->EffectSpellGroupRelation[1]=1024 | 2 | 65536;
-		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[2]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288UL | 4194304UL;
 	}
 
 	//warlock: Malediction
@@ -2970,32 +2970,32 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(18271);
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
-		sp->EffectSpellGroupRelation[1]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[1]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
 	}
 	sp = dbcSpell.LookupEntry(18272);
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
-		sp->EffectSpellGroupRelation[1]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[1]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
 	}
 	sp = dbcSpell.LookupEntry(18273);
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
-		sp->EffectSpellGroupRelation[1]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[1]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
 	}
 	sp = dbcSpell.LookupEntry(18274);
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
-		sp->EffectSpellGroupRelation[1]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[1]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
 	}
 	sp = dbcSpell.LookupEntry(18275);
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
-		sp->EffectSpellGroupRelation[1]= 2147483648 | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648 | 16777216 | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[0]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
+		sp->EffectSpellGroupRelation[1]= 2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
 	}
 
 	//warlock - Contagion
@@ -3003,7 +3003,7 @@ bool World::SetInitialWorldSettings()
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]= 524288 | 131072;
-		sp->EffectSpellGroupRelation[2]= 2147483648 | 4194304 | 1024 | 32768;
+		sp->EffectSpellGroupRelation[2]= 2147483648UL | 4194304UL | 1024 | 32768;
 	}
 	sp = dbcSpell.LookupEntry(30061);
 	if(sp)
@@ -3355,19 +3355,19 @@ bool World::SetInitialWorldSettings()
 	//warlock - Suppression
 	sp = dbcSpell.LookupEntry(18174);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304; //affliction spell
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304; //affliction spell
 	sp = dbcSpell.LookupEntry(18175);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	sp = dbcSpell.LookupEntry(18176);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	sp = dbcSpell.LookupEntry(18177);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	sp = dbcSpell.LookupEntry(18178);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
 	//warlock - Improved Curse of Agony
 	sp = dbcSpell.LookupEntry(18827);
@@ -3380,10 +3380,10 @@ bool World::SetInitialWorldSettings()
 	//warlock - Grim Reach
 	sp = dbcSpell.LookupEntry(18218);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 	sp = dbcSpell.LookupEntry(18219);
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648 | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->EffectSpellGroupRelation[0]=2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
 	//warlock - Soul Fire. Has missign group type
 	sp = dbcSpell.LookupEntry(6353);
@@ -3885,7 +3885,7 @@ bool World::SetInitialWorldSettings()
 	// druid - Tree of Life
 	sp = dbcSpell.LookupEntry(5420);
 	if(sp)
-		sp->EffectSpellGroupRelation[2] = 268435456 | 32 | 64 | 16; //for the mana cost tweak
+		sp->EffectSpellGroupRelation[2] = 268435456UL | 32 | 64 | 16; //for the mana cost tweak
 
 	// druid - Nature's Grace
 	sp = dbcSpell.LookupEntry(16880);
