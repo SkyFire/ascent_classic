@@ -33,11 +33,11 @@ enum Stats
 	STAT_SPIRIT,
 };
 
-uint32 getConColor(uint16 AttackerLvl, uint16 VictimLvl);
-uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker);
-uint32 CalculateStat(uint16 level,double a3, double a2, double a1, double a0);
-uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type, uint32 spellgroup, SpellEntry *ability);
-uint32 GainStat(uint16 level, uint8 playerclass,uint8 Stat);
-bool isEven (int num);
+SERVER_DECL uint32 getConColor(uint16 AttackerLvl, uint16 VictimLvl);
+SERVER_DECL uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker);
+SERVER_DECL uint32 CalculateStat(uint16 level,double a3, double a2, double a1, double a0);
+SERVER_DECL uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type, uint32 spellgroup, SpellEntry *ability);
+SERVER_DECL uint32 GainStat(uint16 level, uint8 playerclass,uint8 Stat);
+SERVER_DECL bool isEven (int num);
 
 #endif
