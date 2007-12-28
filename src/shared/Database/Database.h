@@ -85,6 +85,7 @@ public:
 	ASCENT_INLINE uint32 GetQueueSize() { return queries_queue.get_size(); }
 
 	string EscapeString(string Escape);
+	void EscapeLongString(const char * str, uint32 len, stringstream& out);
 	string EscapeString(const char * esc, MysqlCon * con);
 	void QueueAsyncQuery(AsyncQuery * query);
 	void EndThreads();

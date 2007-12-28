@@ -202,7 +202,10 @@ void WorldSession::LoadAccountDataProc(QueryResult * result)
 	char * d;
 
 	if(!result)
+	{
+		CharacterDatabase.Execute("INSERT INTO account_data VALUES(%u, '', '', '', '', '', '', '', '', '')", _accountId);
 		return;
+	}
 
 	for(uint32 i = 0; i < 7; ++i)
 	{

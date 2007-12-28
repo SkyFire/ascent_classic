@@ -74,9 +74,34 @@ void LogonCommHandler::Startup()
 	// Try to connect to all logons.
 	LoadRealmConfiguration();
 
+	Log.Notice("LogonCommClient", "Loading forced permission strings...");
+	QueryResult * result = CharacterDatabase.Query("SELECT * FROM account_forced_permissions");
+	if( result != NULL )
+	{
+		do 
+		{
+			string acct = result->Fetch()[0].GetString();
+			string perm = result->Fetch()[1].GetString();
+
+			ASCENT_TOUPPER(acct);
+            forced_permissions.insert(make_pair(acct,perm));
+
+		} while (result->NextRow());
+		delete result;
+	}
+
 	Log.Notice("LogonCommClient", "Attempting to connect to logon server...");
 	for(set<LogonServer*>::iterator itr = servers.begin(); itr != servers.end(); ++itr)
 		Connect(*itr);
+}
+
+const string* LogonCommHandler::GetForcedPermissions(string& username)
+{
+	ForcedPermissionMap::iterator itr = forced_permissions.find(username);
+	if(itr == forced_permissions.end())
+		return NULL;
+
+	return &itr->second;
 }
 
 void LogonCommHandler::Connect(LogonServer * server)

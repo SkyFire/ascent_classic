@@ -253,12 +253,18 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 
 	// Extract account information from the packet.
 	string AccountName;
+	const string * ForcedPermissions;
 	uint32 AccountID;
 	string GMFlags;
 	uint8 AccountFlags;
 	string lang = "enUS";
+	uint32 i;
 	
 	recvData >> AccountID >> AccountName >> GMFlags >> AccountFlags;
+	ForcedPermissions = sLogonCommHandler.GetForcedPermissions(AccountName);
+	if( ForcedPermissions != NULL )
+		GMFlags.assign(ForcedPermissions->c_str());
+
 	sLog.outDebug( " >> got information packet from logon: `%s` ID %u (request %u)", AccountName.c_str(), AccountID, mRequestID);
 //	sLog.outColor(TNORMAL, "\n");
 
@@ -324,9 +330,31 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 		pSession->SetAccountData(i, NULL, true, 0);
 
 	// queue the account loading
-	AsyncQuery * aq = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::LoadAccountDataProc, AccountID) );
+	/*AsyncQuery * aq = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::LoadAccountDataProc, AccountID) );
 	aq->AddQuery("SELECT * FROM account_data WHERE acct = %u", AccountID);
-	CharacterDatabase.QueueAsyncQuery(aq);
+	CharacterDatabase.QueueAsyncQuery(aq);*/
+	QueryResult * pResult = CharacterDatabase.Query("SELECT * FROM account_data WHERE acct = %u", AccountID);
+	if( pResult == NULL )
+		CharacterDatabase.Execute("INSERT INTO account_data VALUES(%u, '', '', '', '', '', '', '', '', '')", AccountID);
+	else
+	{
+		size_t len;
+		const char * data;
+		char * d;
+		for(i = 0; i < 8; ++i)
+		{
+			data = pResult->Fetch()[1+i].GetString();
+			len = data ? strlen(data) : 0;
+			if(len > 1)
+			{
+				d = new char[len+1];
+				memcpy(d, data, len+1);
+				pSession->SetAccountData(i, d, true, (uint32)len);
+			}
+		}
+
+		delete pResult;
+	}
 
 	sLog.outString("> %s authenticated from %s:%u [%ums]", AccountName.c_str(), GetRemoteIP().c_str(), GetRemotePort(), _latency);
 

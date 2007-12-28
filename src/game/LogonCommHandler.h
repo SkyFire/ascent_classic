@@ -53,6 +53,13 @@ class SocketLoadBalancer;
 
 class LogonCommHandler : public Singleton<LogonCommHandler>
 {
+#ifdef WIN32
+	typedef HM_NAMESPACE::hash_map<string, string> ForcedPermissionMap;
+#else
+	typedef map<string, string> ForcedPermissionMap;
+#endif
+
+	ForcedPermissionMap forced_permissions;
 	map<LogonServer*, LogonCommClientSocket*> logons;
 	map<uint32, WorldSocket*> pending_logons;
 	set<Realm*> realms;
@@ -107,6 +114,7 @@ public:
 		return sock;
 	}
 	ASCENT_INLINE Mutex & GetPendingLock() { return pendingLock; }		
+	const string* GetForcedPermissions(string& username);
 };
 
 #define sLogonCommHandler LogonCommHandler::getSingleton()

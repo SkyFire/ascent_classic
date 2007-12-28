@@ -182,6 +182,21 @@ string Database::EscapeString(string Escape)
 	return string(ret);
 }
 
+void Database::EscapeLongString(const char * str, uint32 len, stringstream& out)
+{
+	char a2[65536*3] = {0};
+
+	MysqlCon * con = GetFreeConnection();
+	const char * ret;
+	if(mysql_real_escape_string(con->con, a2, str, (unsigned long)len) == 0)
+		ret = str;
+	else
+		ret = a2;
+
+	out.write(a2, (std::streamsize)strlen(a2));
+	con->busy.Release();
+}
+
 string Database::EscapeString(const char * esc, MysqlCon * con)
 {
 	char a2[16384] = {0};

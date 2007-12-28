@@ -1011,6 +1011,12 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 		return;
 	}
 
+	if(uiDecompressedSize >= 65534)
+	{
+		// BLOB fields can't handle any more than this.
+		return;
+	}
+
 	size_t ReceivedPackedSize = recv_data.size() - 8;
 	char* data = new char[uiDecompressedSize+1];
 	memset(data,0,uiDecompressedSize+1);	/* fix umr here */

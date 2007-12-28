@@ -315,9 +315,9 @@ void WorldSession::LogoutPlayer(bool Save)
 		//_player->SaveHonorFields();
 
 		// Update any dirty account_data fields.
-		/*bool dirty=false;
+		bool dirty=false;
 		std::stringstream ss;
-		ss << "UPDATE accounts SET ";
+		ss << "UPDATE account_data SET ";
 		for(uint32 ui=0;ui<8;ui++)
 		{
 			if(sAccountData[ui].bIsDirty)
@@ -326,16 +326,20 @@ void WorldSession::LogoutPlayer(bool Save)
 					ss <<",";
 				ss << "uiconfig"<< ui <<"=\"";
 				if(sAccountData[ui].data)
-					ss.write(sAccountData[ui].data,sAccountData[ui].sz);
+				{
+					CharacterDatabase.EscapeLongString(sAccountData[ui].data, sAccountData[ui].sz, ss);
+					//ss.write(sAccountData[ui].data,sAccountData[ui].sz);
+				}
 				ss << "\"";
 				dirty=true;
+				sAccountData[ui].bIsDirty=false;
 			}
 		}			
 		if(dirty)
 		{
 			ss	<<" WHERE acct="<< _accountId <<";";
-			sLogonDatabase.Execute(ss.str().c_str());
-		}*/
+			CharacterDatabase.Execute(ss.str().c_str());
+		}
 
 		delete _player;
 		_player = NULL;
