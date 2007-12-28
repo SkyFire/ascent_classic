@@ -198,7 +198,7 @@ void Group::Update()
 	if( m_updateblock )
 		return;
 
-	Player * pNewLeader = NULL;
+	Player* pNewLeader = NULL;
 	if( m_Leader == NULL || m_Leader->m_loggedInPlayer == NULL )
 	{
 		pNewLeader = FindFirstPlayer();
@@ -208,7 +208,7 @@ void Group::Update()
 
 	if( m_Looter != NULL && m_Looter->m_loggedInPlayer == NULL )
 	{
-		if( !pNewLeader )
+		if( pNewLeader == NULL )
 			pNewLeader = FindFirstPlayer();
 		if( pNewLeader != NULL )
 			m_Looter = pNewLeader->m_playerInfo;
