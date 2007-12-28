@@ -1370,7 +1370,7 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 				return INV_ERR_NO_REQUIRED_PROFICIENCY;
 
 				// You are dead !
-		if(m_pOwner->getDeathState() == DEAD)
+		if(m_pOwner->getDeathState() != ALIVE)
 			return INV_ERR_YOU_ARE_DEAD;
 	}
 
