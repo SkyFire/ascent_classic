@@ -2588,23 +2588,3 @@ void ObjectMgr::UpdateArenaTeamRankings()
 	m_arenaTeamLock.Release();
 }
 
-const string& ObjectMgr::GetCreatureFamilyName(uint32 id)
-{
-	map<uint32,string>::iterator itr = _creaturefamilynames.find(id);
-	if(itr == _creaturefamilynames.end())
-		return _creaturefamilynames.begin()->second;
-	else
-		return itr->second;
-}
-
-void ObjectMgr::LoadCreatureFamilyNames()
-{
-	DBCFile dbc;
-	dbc.open("DBC/CreatureFamily.dbc");
-	for(uint32 i = 0; i < dbc.getRecordCount(); ++i)
-	{
-		uint32 id = dbc.getRecord(i).getUInt(0);
-		string str = string(dbc.getRecord(i).getString(8));
-		_creaturefamilynames[id] = str;
-	}
-}

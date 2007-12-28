@@ -547,10 +547,6 @@ public:
 	ASCENT_INLINE GuildMap::iterator GetGuildsBegin() { return mGuild.begin(); }
 	ASCENT_INLINE GuildMap::iterator GetGuildsEnd() { return mGuild.end(); }
 
-	const string& GetCreatureFamilyName(uint32 id);
-	void LoadCreatureFamilyNames();
-	map<uint32, string> _creaturefamilynames;
-
 protected:
 	RWLock playernamelock;
 	uint32 m_mailid;

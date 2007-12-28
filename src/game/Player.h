@@ -1476,6 +1476,7 @@ public:
 	uint32 m_bgTeam;
 	void UpdateChanceFields();
 	//Honor Variables
+	time_t m_fallDisabledUntil;
 	uint32 m_honorToday;
 	uint32 m_honorYesterday;
 	

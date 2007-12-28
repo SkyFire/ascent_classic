@@ -96,7 +96,11 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	m_OwnerGuid = m_Owner->GetGUID();
 	creature_info = ci;
 	myFamily = dbcCreatureFamily.LookupEntry(creature_info->Family);
-	m_name = objmgr.GetCreatureFamilyName(myFamily->ID);
+	//m_name = objmgr.GetCreatureFamilyName(myFamily->ID);
+	if( myFamily->name == NULL )
+		m_name = "Pet";
+	else
+		m_name.assign( myFamily->name );
 
 	// Create ourself	
 	Create(m_name.c_str(), owner->GetMapId(), owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
@@ -1336,7 +1340,12 @@ void Pet::ApplyPetLevelAbilities()
 
 	double pet_mod_sta = 1, pet_mod_arm = 1, pet_mod_dps = 1;
 	if(creature_info->Family > 35 || R_pet_mod_sta[creature_info->Family] == 0)
-		sLog.outError("PETSTAT: Creature family %u [%s] has missing data. Assuming to be 1.", creature_info->Family, objmgr.GetCreatureFamilyName(dbcCreatureFamily.LookupEntry(creature_info->Family)->ID).c_str());
+	{
+		if( myFamily == NULL && myFamily->name != NULL )
+            sLog.outError("PETSTAT: Creature family %u has missing data. Assuming to be 1.", creature_info->Family);
+		else
+			sLog.outError("PETSTAT: Creature family %u [%s] has missing data. Assuming to be 1.", creature_info->Family, myFamily->name);
+	}
 	else
 	{
 		pet_mod_sta = R_pet_mod_sta[creature_info->Family];

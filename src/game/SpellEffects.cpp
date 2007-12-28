@@ -4002,6 +4002,9 @@ void Spell::SpellEffectKnockBack(uint32 i)
 	data << affect;
 	data << -affect;
 	unitTarget->SendMessageToSet(&data, true);
+
+	if( playerTarget )
+		playerTarget->blinked = true;
 }
 
 void Spell::SpellEffectDisenchant(uint32 i)

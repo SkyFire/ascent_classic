@@ -163,9 +163,17 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 	uint8 cn;
 
 	recvPacket >> spellId >> cn;
+	// check for spell id
+	SpellEntry *spellInfo = dbcSpell.LookupEntryForced(spellId );
 
-	sLog.outDetail("WORLD: got cast spell packet, spellId - %i, data length = %i",
-		spellId, recvPacket.size());
+	if(!spellInfo || !sHookInterface.OnCastSpell(_player, spellInfo))
+	{
+		sLog.outError("WORLD: unknown spell id %i\n", spellId);
+		return;
+	}
+
+	sLog.outDetail("WORLD: got cast spell packet, spellId - %i (%s), data length = %i",
+		spellId, spellInfo->Name, recvPacket.size());
 	
 	// Cheat Detection only if player and not from an item
 	// this could fuck up things but meh it's needed ALOT of the newbs are using WPE now
@@ -179,14 +187,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
 	if (GetPlayer()->GetOnMeleeSpell() != spellId)
 	{
-		// check for spell id
-		SpellEntry *spellInfo = dbcSpell.LookupEntryForced(spellId );
-
-		if(!spellInfo || !sHookInterface.OnCastSpell(_player, spellInfo))
-		{
-			sLog.outError("WORLD: unknown spell id %i\n", spellId);
-			return;
-		}
 		//autoshot 75
 		if((spellInfo->Flags3 & FLAGS3_ACTIVATE_AUTO_SHOT) /*spellInfo->Attributes == 327698*/)	// auto shot..
 		{

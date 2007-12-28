@@ -378,6 +378,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_areaspirithealer_guid=0;
 	m_CurrentTaxiPath=NULL;
 	m_setflycheat = false;
+	m_fallDisabledUntil = 0;
 	this->OnLogin();
 }
 

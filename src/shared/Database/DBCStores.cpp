@@ -50,14 +50,14 @@ SERVER_DECL DBCStorage<MapEntry> dbcMap;
 SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 
-const char * ItemSetFormat = "uuxxxxxxxxxxxxxxxuuuuuuuuuxxxxxxxxxuuuuuuuuuuuuuuuuuu";
+const char * ItemSetFormat = "usxxxxxxxxxxxxxxxuuuuuuuuuxxxxxxxxxuuuuuuuuuuuuuuuuuu";
 const char * LockFormat = "uuuuuuxxxuuuuuxxxuuuuuxxxxxxxxxxx";
 const char * EmoteEntryFormat = "uxuuuuxuxuxxxxxxxxx";
 const char * skilllinespellFormat = "uuuxxxxxuuuuxxu";
-const char * EnchantEntrYFormat = "uuuuuuuuuuuuuxxxxxxxxxxxxxxxxxuuuu";
+const char * EnchantEntrYFormat = "uuuuuuuuuuuuusxxxxxxxxxxxxxxxxuuuu";
 const char * GemPropertyEntryFormat = "uuuuu";
-const char * skilllineentrYFormat = "uuuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-const char * spellentrYFormat = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuiuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffffffiiiiiiuuuuuuuuuuuuuuufffuuuuuuuuuuuufffuuuuuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxuuuuuuuuuuifffuuuuuu";
+const char * skilllineentrYFormat = "uuusxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char * spellentrYFormat = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuiuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffffffiiiiiiuuuuuuuuuuuuuuufffuuuuuuuuuuuufffuuuuusxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxuuuuuuuuuuifffuuuuuu";
 const char * itemextendedcostFormat = "uuuuuuuuuuuuux";
 const char * talententryFormat = "uuuuuuuuuxxxxuxxuxxxx";
 const char * spellcasttimeFormat = "uuxx";
@@ -65,59 +65,59 @@ const char * spellradiusFormat = "ufxf";
 const char * spellrangeFormat = "uffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char * spelldurationFormat = "uuuu";
 const char * randompropsFormat = "uxuuuxxxxxxxxxxxxxxxxxxx";
-const char * areatableFormat = "uuuuuxxxuxuxxxxxxxxxxxxxxxxxuxxxxxx";
+const char * areatableFormat = "uuuuuxxxuxusxxxxxxxxxxxxxxxxuxxxxxx";
 const char * factiontemplatedbcFormat = "uuuuuuuuuuuuuu";
 const char * auctionhousedbcFormat = "uuuuxxxxxxxxxxxxxxxxx";
-const char * factiondbcFormat = "uiuuuuxxxxiiiixxxxuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char * factiondbcFormat = "uiuuuuxxxxiiiixxxxusxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char * dbctaxinodeFormat = "uufffxxxxxxxxxxxxxxxxxuu";
 const char * dbctaxipathFormat = "uuuu";
 const char * dbctaxipathnodeFormat = "uuuufffuuxx";
 const char * creaturespelldataFormat = "uuuuuuuuu";
-const char * charraceFormat = "uxuxxxxxuxxxxuxxxxxxxxxxxxxxxxxxxxx";
-const char * charclassFormat = "uxuxxxxxxxxxxxxxxxxxxxxx";
-const char * creaturefamilyFormat = "ufufuuuuxxxxxxxxxxxxxxxxxx";
-const char * mapentryFormat = "uxuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char * charraceFormat = "uxuxxxxxuxxxsuxxxxxxxxxxxxxxxxxxxxx";
+const char * charclassFormat = "uxuxsxxxxxxxxxxxxxxxxxxx";
+const char * creaturefamilyFormat = "ufufuuuusxxxxxxxxxxxxxxxxx";
+const char * mapentryFormat = "usuxsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char * itemrandomsuffixformat = "uxxxxxxxxxxxxxxxxxxuuuuuu";
 
 template<class T>
-bool loader_stub(const char * filename, const char * format, bool ind, T& l)
+bool loader_stub(const char * filename, const char * format, bool ind, T& l, bool loadstrs)
 {
 	Log.Notice("DBC", "Loading %s.", filename);
-	return l.Load(filename, format, ind);
+	return l.Load(filename, format, ind, loadstrs);
 }
 
-#define LOAD_DBC(filename, format, ind, stor) if(!loader_stub(filename, format, ind, stor)) { return false; } 
+#define LOAD_DBC(filename, format, ind, stor, strings) if(!loader_stub(filename, format, ind, stor, strings)) { return false; } 
 
 bool LoadDBCs()
 {
-	LOAD_DBC("DBC/ItemSet.dbc", ItemSetFormat, true, dbcItemSet);
-	LOAD_DBC("DBC/Lock.dbc", LockFormat, true, dbcLock);
-	LOAD_DBC("DBC/EmotesText.dbc", EmoteEntryFormat, true, dbcEmoteEntry);
-	LOAD_DBC("DBC/SkillLineAbility.dbc", skilllinespellFormat, false, dbcSkillLineSpell);
-	LOAD_DBC("DBC/SpellItemEnchantment.dbc", EnchantEntrYFormat, true, dbcEnchant);
-	LOAD_DBC("DBC/GemProperties.dbc", GemPropertyEntryFormat, true, dbcGemProperty);
-	LOAD_DBC("DBC/SkillLine.dbc", skilllineentrYFormat, true, dbcSkillLine);
-	LOAD_DBC("DBC/Spell.dbc", spellentrYFormat, true, dbcSpell);
-	LOAD_DBC("DBC/ItemExtendedCost.dbc", itemextendedcostFormat, true, dbcItemExtendedCost);
-	LOAD_DBC("DBC/Talent.dbc", talententryFormat, true, dbcTalent);
-	LOAD_DBC("DBC/SpellCastTimes.dbc", spellcasttimeFormat, true, dbcSpellCastTime);
-	LOAD_DBC("DBC/SpellRadius.dbc", spellradiusFormat, true, dbcSpellRadius);
-	LOAD_DBC("DBC/SpellRange.dbc", spellrangeFormat, true, dbcSpellRange);
-	LOAD_DBC("DBC/SpellDuration.dbc", spelldurationFormat, true, dbcSpellDuration);
-	LOAD_DBC("DBC/ItemRandomProperties.dbc", randompropsFormat, true, dbcRandomProps);
-	LOAD_DBC("DBC/AreaTable.dbc", areatableFormat, true, dbcArea);
-	LOAD_DBC("DBC/FactionTemplate.dbc", factiontemplatedbcFormat, true, dbcFactionTemplate);
-	LOAD_DBC("DBC/Faction.dbc", factiondbcFormat, true, dbcFaction);
-	LOAD_DBC("DBC/TaxiNodes.dbc", dbctaxinodeFormat, false, dbcTaxiNode);
-	LOAD_DBC("DBC/TaxiPath.dbc", dbctaxipathFormat, false, dbcTaxiPath);
-	LOAD_DBC("DBC/TaxiPathNode.dbc", dbctaxipathnodeFormat, false, dbcTaxiPathNode);
-	LOAD_DBC("DBC/CreatureSpellData.dbc", creaturespelldataFormat, true, dbcCreatureSpellData);
-	LOAD_DBC("DBC/CreatureFamily.dbc", creaturefamilyFormat, true, dbcCreatureFamily);
-	LOAD_DBC("DBC/ChrRaces.dbc", charraceFormat, true, dbcCharRace);
-	LOAD_DBC("DBC/ChrClasses.dbc", charclassFormat, true, dbcCharClass);
-	LOAD_DBC("DBC/Map.dbc", mapentryFormat, true, dbcMap);
-	LOAD_DBC("DBC/AuctionHouse.dbc", auctionhousedbcFormat, true, dbcAuctionHouse);
-	LOAD_DBC("DBC/ItemRandomSuffix.dbc", itemrandomsuffixformat, true, dbcItemRandomSuffix);
+	LOAD_DBC("DBC/ItemSet.dbc", ItemSetFormat, true, dbcItemSet, true);
+	LOAD_DBC("DBC/Lock.dbc", LockFormat, true, dbcLock, false);
+	LOAD_DBC("DBC/EmotesText.dbc", EmoteEntryFormat, true, dbcEmoteEntry, false);
+	LOAD_DBC("DBC/SkillLineAbility.dbc", skilllinespellFormat, false, dbcSkillLineSpell, false);
+	LOAD_DBC("DBC/SpellItemEnchantment.dbc", EnchantEntrYFormat, true, dbcEnchant, true);
+	LOAD_DBC("DBC/GemProperties.dbc", GemPropertyEntryFormat, true, dbcGemProperty, false);
+	LOAD_DBC("DBC/SkillLine.dbc", skilllineentrYFormat, true, dbcSkillLine, true);
+	LOAD_DBC("DBC/Spell.dbc", spellentrYFormat, true, dbcSpell, true);
+	LOAD_DBC("DBC/ItemExtendedCost.dbc", itemextendedcostFormat, true, dbcItemExtendedCost, false);
+	LOAD_DBC("DBC/Talent.dbc", talententryFormat, true, dbcTalent, false);
+	LOAD_DBC("DBC/SpellCastTimes.dbc", spellcasttimeFormat, true, dbcSpellCastTime, false);
+	LOAD_DBC("DBC/SpellRadius.dbc", spellradiusFormat, true, dbcSpellRadius, false);
+	LOAD_DBC("DBC/SpellRange.dbc", spellrangeFormat, true, dbcSpellRange, false);
+	LOAD_DBC("DBC/SpellDuration.dbc", spelldurationFormat, true, dbcSpellDuration, false);
+	LOAD_DBC("DBC/ItemRandomProperties.dbc", randompropsFormat, true, dbcRandomProps, false);
+	LOAD_DBC("DBC/AreaTable.dbc", areatableFormat, true, dbcArea, true);
+	LOAD_DBC("DBC/FactionTemplate.dbc", factiontemplatedbcFormat, true, dbcFactionTemplate, false);
+	LOAD_DBC("DBC/Faction.dbc", factiondbcFormat, true, dbcFaction, true);
+	LOAD_DBC("DBC/TaxiNodes.dbc", dbctaxinodeFormat, false, dbcTaxiNode, false);
+	LOAD_DBC("DBC/TaxiPath.dbc", dbctaxipathFormat, false, dbcTaxiPath, false);
+	LOAD_DBC("DBC/TaxiPathNode.dbc", dbctaxipathnodeFormat, false, dbcTaxiPathNode, false);
+	LOAD_DBC("DBC/CreatureSpellData.dbc", creaturespelldataFormat, true, dbcCreatureSpellData, false);
+	LOAD_DBC("DBC/CreatureFamily.dbc", creaturefamilyFormat, true, dbcCreatureFamily, true);
+	LOAD_DBC("DBC/ChrRaces.dbc", charraceFormat, true, dbcCharRace, true);
+	LOAD_DBC("DBC/ChrClasses.dbc", charclassFormat, true, dbcCharClass, true);
+	LOAD_DBC("DBC/Map.dbc", mapentryFormat, true, dbcMap, true);
+	LOAD_DBC("DBC/AuctionHouse.dbc", auctionhousedbcFormat, true, dbcAuctionHouse, false);
+	LOAD_DBC("DBC/ItemRandomSuffix.dbc", itemrandomsuffixformat, true, dbcItemRandomSuffix, false);
 	return true;
 }
 

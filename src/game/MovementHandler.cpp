@@ -302,7 +302,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Dump movement flags - Wheee!                                         */
 	/************************************************************************/
-#if 0
+#if 1
 	printf("=========================================================\n");
 	printf("Full movement flags: 0x%.8X\n", movement_info.flags);
 	uint32 z, b;
@@ -416,45 +416,57 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/* Falling damage checks                                                */
 	/************************************************************************/
 
-	if (movement_info.flags & 0x2000) // Falling
+	if(movement_info.flags & MOVEFLAG_REDIRECTED && !(movement_info.flags & MOVEFLAG_FALLING))
 	{
-		if( _player->m_fallTime < movement_info.FallTime)
-			_player->m_fallTime = movement_info.FallTime;
-
-		_player->ResetHeartbeatCoords();
+		if( !_player->blinked )
+			_player->blinked = true;
 	}
-	else //once we done falling lets do some damage
+	else
 	{
-		if(_player->m_fallTime > 1000 && _player->isAlive() && !_player->GodModeCheat)
+		if( _player->blinked )
 		{
-			//Check if we aren't falling in water
-			if(!_player->bSafeFall)
-			{
-				if( !(movement_info.flags & 0x200000) && !_player->blinked)
-				{
-					//10% dmg per sec after first 3 seconds
-					//it rL a*t*t
-					double coeff = 0.000000075*(_player->m_fallTime*_player->m_fallTime - _player->m_fallTime);
-					if (coeff<0)
-						coeff=0;
-					uint32 damage = (uint32)(_player->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*coeff);
-					if(damage > _player->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) // Can only deal 100% damage.
-						damage = _player->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-
-					_player->SendEnvironmentalDamageLog((uint64&)_player->GetGUID(), DAMAGE_FALL, damage);
-					_player->DealDamage(_player, damage, 0, 0, 0);
-				}
-			}
-
-			_player->m_fallTime = 0;
 			_player->blinked = false;
+			_player->m_fallDisabledUntil = UNIXTIME + 5;
 			_player->ResetHeartbeatCoords();
 		}
 		else
 		{
-			//player is dead, no need to keep increasing falltime
-			_player->m_fallTime = 0;
-			_player->blinked = false;
+			if (movement_info.flags & 0x2000) // Falling
+			{
+				if( _player->m_fallTime < movement_info.FallTime)
+					_player->m_fallTime = movement_info.FallTime;
+			}
+			else //once we done falling lets do some damage
+			{
+				if(_player->m_fallTime > 1000 && _player->isAlive() && !_player->GodModeCheat)
+				{
+					//Check if we aren't falling in water
+					if( !(movement_info.flags & 0x200000))
+					{
+						if(!_player->bSafeFall && UNIXTIME > _player->m_fallDisabledUntil)
+						{
+							//10% dmg per sec after first 3 seconds
+							//it rL a*t*t
+							double coeff = 0.000000075*(_player->m_fallTime*_player->m_fallTime - _player->m_fallTime);
+							if (coeff<0)
+								coeff=0;
+							uint32 damage = (uint32)(_player->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*coeff);
+							if(damage > _player->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) // Can only deal 100% damage.
+								damage = _player->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
+
+							_player->SendEnvironmentalDamageLog((uint64&)_player->GetGUID(), DAMAGE_FALL, damage);
+							_player->DealDamage(_player, damage, 0, 0, 0);
+						}
+					}
+
+					_player->m_fallTime = 0;
+				}
+				else
+				{
+					//player is dead, no need to keep increasing falltime
+					_player->m_fallTime = 0;
+				}
+			}
 		}
 	}
 

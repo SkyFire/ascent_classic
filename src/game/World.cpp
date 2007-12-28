@@ -460,7 +460,6 @@ bool World::SetInitialWorldSettings()
 	MAKE_TASK(ObjectMgr, LoadMonsterSay);
 	MAKE_TASK(WeatherMgr, LoadFromDB);
 	MAKE_TASK(ObjectMgr,LoadGroups);
-	MAKE_TASK(ObjectMgr, LoadCreatureFamilyNames);
 
 	MAKE_TASK(ObjectMgr, LoadExtraCreatureProtoStuff);
 	MAKE_TASK(ObjectMgr, LoadExtraItemStuff);

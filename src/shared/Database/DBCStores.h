@@ -29,7 +29,7 @@
 struct ItemSetEntry
 {
     uint32 id;                  //1
-    uint32 name;                //2
+    char* name;                //2
     //uint32 unused_shit[15];      //3 - 9
     uint32 flag;                //10 constant
     uint32 itemid[8];           //11 - 18
@@ -100,7 +100,7 @@ struct EnchantEntry
     int32 min[3];//for compat, in practice min==max
     int32 max[3];
     uint32 spell[3];
-    //uint32 Name;
+    char* Name;
     //uint32 NameAlt1;
     //uint32 NameAlt2;
     //uint32 NameAlt3;
@@ -137,7 +137,7 @@ struct skilllineentry //SkillLine.dbc
     uint32 id;
     uint32 type;
     uint32 unk1;
-    //uint32 Name;
+    char* Name;
     //int32 NameAlt1;
     //uint32 NameAlt2;
     //uint32 NameAlt3;
@@ -250,7 +250,7 @@ struct SpellEntry
     uint32 dummy;                           //121
     uint32 CoSpell;                         //122   activeIconID;
     uint32 spellPriority;                   //123
-    //uint32 Name;                            //124
+    char * Name;                            //124
     //uint32 NameAlt1;                        //125
     //uint32 NameAlt2;                        //126
     //uint32 NameAlt3;                        //127
@@ -267,7 +267,7 @@ struct SpellEntry
     //uint32 NameAlt14;                       //138
     //uint32 NameAlt15;                       //139
     //uint32 NameFlags;                       //140
-    //uint32 Rank;                            //141
+	char * Rank;                            //141
     //uint32 RankAlt1;                        //142
     //uint32 RankAlt2;                        //143
     //uint32 RankAlt3;                        //144
@@ -284,7 +284,7 @@ struct SpellEntry
     //uint32 RankAlt14;                       //155
     //uint32 RankAlt15;                       //156
     //uint32 RankFlags;                       //157
-    //uint32 Description;                     //158
+    char * Description;                     //158
     //uint32 DescriptionAlt1;                 //159
     //uint32 DescriptionAlt2;                 //160
     //uint32 DescriptionAlt3;                 //161
@@ -301,7 +301,7 @@ struct SpellEntry
     //uint32 DescriptionAlt14;                //172
     //uint32 DescriptionAlt15;                //173
     //uint32 DescriptionFlags;                //174
-    //uint32 BuffDescription;                 //175
+    char * BuffDescription;                 //175
     //uint32 BuffDescriptionAlt1;             //176
     //uint32 BuffDescriptionAlt2;             //177
     //uint32 BuffDescriptionAlt3;             //178
@@ -455,7 +455,7 @@ struct AreaTable
     uint32 EXP;//not XP
     //uint32 unk5;
     uint32 level;
-    //uint32 name;
+    char* name;
     //uint32 nameAlt1;
     //uint32 nameAlt2;
     //uint32 nameAlt3;
@@ -527,7 +527,7 @@ struct FactionDBC
     int32 baseRepValue[4];
     //uint32 unk2[4];
     uint32 parentFaction;
-    //uint32 Name;
+    char* Name;
     //uint32 shit[16];
     //uint32 Description;
     //uint32 shit2[16];
@@ -584,14 +584,6 @@ struct DBCTaxiPathNode
     //uint32 unk3;
 };
 
-struct NameGenEntry
-{
-    int32  id;
-    uint32  offsetindex;
-    //int32  unk1;
-    //bool   unk2;
-};
-
 struct CreatureSpellDataEntry
 {
     uint32 id;
@@ -615,7 +607,7 @@ struct CharRaceEntry
     //uint32 unk7;
     //uint32 unk8;
     //uint32 unk9;
-    //uint32 name1;
+    char* name1;
     uint32 cinematic_id;
     //uint32 name2;
     //uint32 unk10;
@@ -646,7 +638,7 @@ struct CharClassEntry
     //uint32 unk1;
     uint32 power_type;
     //uint32 unk2;
-    //uint32 name;
+    char* name;
     //uint32 namealt1;
     //uint32 namealt2;
     //uint32 namealt3;
@@ -678,7 +670,7 @@ struct CreatureFamilyEntry
     uint32 skilline;
     uint32 tameable;		//second skill line - 270 Generic
     uint32 petdietflags;
-    //uint32 name;
+    char* name;
     //uint32 namealt1;
     //uint32 namealt2;
     //uint32 namealt3;
@@ -701,10 +693,10 @@ struct CreatureFamilyEntry
 struct MapEntry
 {
     uint32 id;
-    //uint32 name_internal;
+    char* name_internal;
     uint32 map_type;
     //uint32 unk;
-    //uint32 real_name;
+    char* real_name;
     //uint32 unk_1;
     //uint32 unk1;
     //uint32 unk2;
@@ -866,6 +858,8 @@ class SERVER_DECL DBCStorage
 	T ** m_entries;
 	uint32 m_max;
 	uint32 m_numrows;
+	uint32 m_stringlength;
+	char * m_stringData;
 
 public:
 	
@@ -876,6 +870,8 @@ public:
 		m_firstEntry = NULL;
 		m_max = 0;
 		m_numrows = 0;
+		m_stringlength=0;
+		m_stringData = NULL;
 	}
 
 	~DBCStorage()
@@ -884,9 +880,11 @@ public:
 			free(m_heapBlock);
 		if(m_entries)
 			free(m_entries);
+		if( m_stringData != NULL )
+			free(m_stringData);
 	}
 
-	bool Load(const char * filename, const char * format, bool load_indexed)
+	bool Load(const char * filename, const char * format, bool load_indexed, bool load_strings)
 	{
 		uint32 rows;
 		uint32 cols;
@@ -894,6 +892,7 @@ public:
 		uint32 string_length;
 		uint32 header;
 		uint32 i;
+		long pos;
 #ifdef USING_BIG_ENDIAN
 		uint32 j;
 		uint32 * base;
@@ -908,6 +907,17 @@ public:
 		fread(&cols, 4, 1, f);
 		fread(&useless_shit, 4, 1, f);
 		fread(&string_length, 4, 1, f);
+		pos = ftell(f);
+
+		if( load_strings )
+		{
+			fseek( f, 20 + ( rows * cols * 4 ), SEEK_SET );
+			m_stringData = (char*)malloc(string_length);
+			m_stringlength = string_length;
+			fread( m_stringData, string_length, 1, f );
+		}
+
+		fseek(f, pos, SEEK_SET);
 
 #ifdef USING_BIG_ENDIAN
 		swap32(&rows); swap32(&cols); swap32(&useless_shit); swap32(&string_length);
@@ -945,6 +955,7 @@ public:
 		}
 
 		m_numrows = rows;
+
 		fclose(f);
 		return true;
 	}
@@ -953,7 +964,6 @@ public:
 	{
 		const char * t = format;
 		uint32 * dest_ptr = (uint32*)dest;
-		uint32 v = 0;
 		uint32 c = 0;
 		uint32 val;
 		size_t len = strlen(format);
@@ -978,7 +988,25 @@ public:
 #ifdef USING_BIG_ENDIAN
 			swap32(&val);
 #endif
-			dest_ptr[v++] = val;
+			if(*t == 's')
+			{
+				char ** new_ptr = (char**)dest_ptr;
+				char * ptr;
+				if( val < m_stringlength )
+					ptr = m_stringData + val;
+				else
+					ptr = "";
+
+				*new_ptr = ptr;
+				new_ptr++;
+				dest_ptr = (uint32*)new_ptr;
+			}
+			else
+			{
+				*dest_ptr = val;
+				dest_ptr++;
+			}
+
 			++t;
 		}
 	}
