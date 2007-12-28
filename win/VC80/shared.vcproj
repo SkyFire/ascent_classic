@@ -129,7 +129,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="4"
 				InlineFunctionExpansion="2"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\dep\include,..\..\src\shared,..\..\src\game,..\..\src\realmlist"
@@ -139,8 +139,8 @@
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="false"
-				EnableEnhancedInstructionSet="2"
-				FloatingPointModel="2"
+				EnableEnhancedInstructionSet="0"
+				FloatingPointModel="0"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\shared___Win32_Release_x64/shared.pch"
 				AssemblerListingLocation=".\shared___Win32_Release_x64/"

@@ -242,11 +242,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="4"
+				InlineFunctionExpansion="2"
 				PreprocessorDefinitions="_HAS_ITERATOR_DEBUGGING=0;WIN32;NDEBUG;_LIB_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;X64"
 				RuntimeLibrary="2"
-				EnableEnhancedInstructionSet="2"
-				FloatingPointModel="2"
+				EnableEnhancedInstructionSet="0"
+				FloatingPointModel="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"

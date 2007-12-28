@@ -151,7 +151,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="4"
 				InlineFunctionExpansion="2"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\dep\src"
@@ -161,8 +161,8 @@
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="false"
-				EnableEnhancedInstructionSet="2"
-				FloatingPointModel="2"
+				EnableEnhancedInstructionSet="0"
+				FloatingPointModel="0"
 				PrecompiledHeaderFile=".\Release/ascent.pch"
 				AssemblerListingLocation=".\Release_x64/"
 				ObjectFile=".\Release_x64/"

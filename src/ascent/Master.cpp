@@ -488,12 +488,13 @@ bool Master::Run(int argc, char ** argv)
 	dw->terminate();
 	dw = NULL;
 
-	sWorld.SaveAllPlayers();
-
-	Log.Notice("Network", "Shutting down network subsystem.");
 #ifndef CLUSTERING
 	ls->Close();
 #endif
+
+	sWorld.SaveAllPlayers();
+
+	Log.Notice("Network", "Shutting down network subsystem.");
 #ifdef WIN32
 	sSocketMgr.ShutdownThreads();
 #endif

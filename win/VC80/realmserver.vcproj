@@ -150,7 +150,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="4"
 				InlineFunctionExpansion="2"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\redirect;..\..\src\game;..\..\src\shared;..\..\src\ascent;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src\gm"
@@ -160,8 +160,8 @@
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="false"
-				EnableEnhancedInstructionSet="2"
-				FloatingPointModel="2"
+				EnableEnhancedInstructionSet="0"
+				FloatingPointModel="0"
 				PrecompiledHeaderFile=".\Release/realmserver.pch"
 				AssemblerListingLocation=".\realmserver___Win32_Release/"
 				ObjectFile=".\realmserver___Win32_Release/"
