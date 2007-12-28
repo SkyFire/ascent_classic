@@ -142,9 +142,6 @@ bool Group::AddMember(PlayerInfo * info, int32 subgroupid/* =-1 */)
 			return false;
 		}
 
-		if(m_Leader==NULL && info->m_loggedInPlayer)
-			m_Leader=info;
-
 		if(subgroup->AddPlayer(info))
 		{
 			if(pPlayer)
@@ -156,7 +153,11 @@ bool Group::AddMember(PlayerInfo * info, int32 subgroupid/* =-1 */)
 			if(info->m_Group && info->m_Group != this)
 				info->m_Group->RemovePlayer(info);
 
+			if(m_Leader==NULL && info->m_loggedInPlayer)
+				m_Leader=info;
+
 			info->m_Group=this;
+			info->subGroup = (int8)subgroup->GetID();
 
 			m_groupLock.Release();
 			return true;
@@ -172,6 +173,8 @@ bool Group::AddMember(PlayerInfo * info, int32 subgroupid/* =-1 */)
 	}
 	else
 	{
+		info->m_Group = NULL;
+		info->subGroup = -1;
 		m_groupLock.Release();
 		return false;
 	}
@@ -361,9 +364,10 @@ void SubGroup::Disband()
 		{
 			(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&data);
 			(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&data2);
-			(*itr)->m_Group=NULL;
-			(*itr)->subGroup=-1;
 		}
+
+		(*itr)->m_Group=NULL;
+		(*itr)->subGroup=-1;
 
 		m_Parent->m_MemberCount--;
 		it2 = itr;
@@ -416,7 +420,7 @@ void Group::RemovePlayer(PlayerInfo * info)
 	}
 	
 	SubGroup *sg=NULL;
-	if(info->subGroup > 0 && info->subGroup <= 8)
+	if(info->subGroup >= 0 && info->subGroup <= 8)
 		sg = m_SubGroups[info->subGroup];
 
 	if(sg == NULL || sg->m_GroupMembers.find(info) == sg->m_GroupMembers.end())
@@ -602,7 +606,12 @@ bool Group::HasMember(PlayerInfo * info)
 
 void Group::MovePlayer(PlayerInfo *info, uint8 subgroup)
 {
-	ASSERT(subgroup < m_SubGroupCount);
+	if( subgroup >= m_SubGroupCount )
+		return;
+
+	if(m_SubGroups[subgroup]->IsFull())
+		return;
+
 	m_groupLock.Acquire();
 	SubGroup *sg=NULL;
 
@@ -634,10 +643,16 @@ void Group::MovePlayer(PlayerInfo *info, uint8 subgroup)
     
 	// Grab the new group, and insert
 	sg = m_SubGroups[subgroup];
-	sg->AddPlayer(info);
-
-	info->subGroup=(int8)sg->GetID();
-	info->m_Group=this;
+	if(!sg->AddPlayer(info))
+	{
+		RemovePlayer(info);
+		info->m_Group=NULL;
+	}
+	else
+	{
+		info->subGroup=(int8)sg->GetID();
+		info->m_Group=this;
+	}
 
 	Update();
 	m_groupLock.Release();

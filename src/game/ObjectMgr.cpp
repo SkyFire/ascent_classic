@@ -232,7 +232,10 @@ void ObjectMgr::DeletePlayerInfo( uint32 guid )
 	{
 		pl=i->second;
 		if(pl->m_Group)
+		{
 			pl->m_Group->RemovePlayer(pl);
+			pl->m_Group = NULL;
+		}
 
 		if(pl->guild)
 		{
