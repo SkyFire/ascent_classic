@@ -3028,7 +3028,7 @@ void Spell::SpellEffectPowerBurn(uint32 i) // power burn
 	if (unitTarget->GetPowerType() != POWER_TYPE_MANA)
 		return;
 
-	int32 mana=min((int32)unitTarget->GetUInt32Value(UNIT_FIELD_POWER1),damage);
+	int32 mana = min( (int32)unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ), damage );
 	unitTarget->ModUInt32Value(UNIT_FIELD_POWER1,-mana);
 	
 	m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, (uint32)(mana * m_spellInfo->Effectunknown[i]), pSpellId==0,true);   

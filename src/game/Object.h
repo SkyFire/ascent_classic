@@ -505,8 +505,8 @@ protected:
 
 	//! Object properties.
 	union {
-		uint32 *m_uint32Values;
-		float *m_floatValues;
+		uint32* m_uint32Values;
+		float* m_floatValues;
 	};
 
 	//! Number of properties

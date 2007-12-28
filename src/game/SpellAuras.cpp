@@ -4223,7 +4223,7 @@ void Aura::EventPeriodicManaLeech(uint32 amount)
 	if(m_target->isAlive() && m_caster->isAlive())
 	{
 	
-		int32 amt = min(amount,m_target->GetUInt32Value(UNIT_FIELD_POWER1));
+		int32 amt = min( amount, m_target->GetUInt32Value( UNIT_FIELD_POWER1 ) );
 		uint32 cm = m_caster->GetUInt32Value(UNIT_FIELD_POWER1)+amt;
 		uint32 mm = m_caster->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
 		if(cm <= mm)
@@ -6221,7 +6221,7 @@ void Aura::EventPeriodicBurn(uint32 amount, uint32 misc)
 
 		uint32 field = UNIT_FIELD_POWER1 + misc;
 	
-		uint32 Amount = min(amount,m_target->GetUInt32Value(field));
+		uint32 Amount = min( amount, m_target->GetUInt32Value( field ) );
 		uint32 newHealth = m_target->GetUInt32Value(field) - Amount ;
 				
 		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, newHealth, FLAG_PERIODIC_DAMAGE);
