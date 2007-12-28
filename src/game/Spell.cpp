@@ -901,18 +901,18 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 		store_buff->m_targetMask |= TARGET_FLAG_DEST_LOCATION;
 }//end function
 
-void Spell::prepare(SpellCastTargets * targets)
+void Spell::prepare( SpellCastTargets * targets )
 {
-	chaindamage=0;
+	chaindamage = 0;
 	m_targets = *targets;
 
-	if(!m_triggeredSpell && p_caster && p_caster->CastTimeCheat)
+	if( !m_triggeredSpell && p_caster && p_caster->CastTimeCheat )
 		m_castTime = 0;
 	else
 	{
-		m_castTime = GetCastTime(dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex));
+		m_castTime = GetCastTime( dbcSpellCastTime.LookupEntry( m_spellInfo->CastingTimeIndex ) );
 
-		if (m_castTime && m_spellInfo->SpellGroupType && u_caster)
+		if( m_castTime && m_spellInfo->SpellGroupType && u_caster != NULL )
 		{
 			SM_FIValue(u_caster->SM_FCastTime,(int32*)&m_castTime,m_spellInfo->SpellGroupType);
 			SM_PIValue(u_caster->SM_PCastTime,(int32*)&m_castTime,m_spellInfo->SpellGroupType);
@@ -927,56 +927,57 @@ void Spell::prepare(SpellCastTargets * targets)
 		}
 
 		// handle MOD_CAST_TIME
-		if(u_caster && m_castTime)
+		if( u_caster != NULL && m_castTime )
 		{
-			m_castTime = float2int32(m_castTime*u_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+			m_castTime = float2int32( m_castTime * u_caster->GetFloatValue( UNIT_MOD_CAST_SPEED ) );
 		}
 	}
 
-
-	if(p_caster)
+	if( p_caster != NULL )
 	{
-		if(p_caster->cannibalize)
+		if( p_caster->cannibalize )
 		{
-			sEventMgr.RemoveEvents(p_caster, EVENT_CANNIBALIZE);
-			p_caster->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+			sEventMgr.RemoveEvents( p_caster, EVENT_CANNIBALIZE );
+			p_caster->SetUInt32Value( UNIT_NPC_EMOTESTATE, 0 );
 			p_caster->cannibalize = false;
 		}
 	}
 	
 	//let us make sure cast_time is within decent range
-
-	if(m_castTime<0)
-		m_castTime=0;
 	//this is a hax but there is no spell that has more then 10 minutes cast time
-	else if(m_castTime>60*10*1000)
-		m_castTime=60*10*1000; //we should limit cast time to 10 minutes right ?
+
+	if( m_castTime < 0 )
+		m_castTime = 0;
+	else if( m_castTime > 60 * 10 * 1000)
+		m_castTime = 60 * 10 * 1000; //we should limit cast time to 10 minutes right ?
 
 	m_timer = m_castTime;
-   // if(p_caster)
-	 //   m_castTime -= 100;	  // session update time
+
+	//if(p_caster)
+	//   m_castTime -= 100;	  // session update time
 
 	SendSpellStart();
 
-	if(!m_triggeredSpell && p_caster && p_caster->CooldownCheat)
-		p_caster->ClearCooldownForSpell(m_spellInfo->Id);
+	if( !m_triggeredSpell && p_caster != NULL && p_caster->CooldownCheat )
+		p_caster->ClearCooldownForSpell( m_spellInfo->Id );
 
 	m_spellState = SPELL_STATE_PREPARING;
 	
-	if(m_triggeredSpell)
-		   cancastresult = -1;
-	  else
-		   cancastresult = CanCast(false);
-	//sLog.outString( "CanCast result: %u. Refer to SpellFailure.h to work out why." , cancastresult );
-	if(cancastresult != -1)
-	{
-		SendCastResult(cancastresult);
+	if( m_triggeredSpell )
+		cancastresult = -1;
+	else
+		cancastresult = CanCast(false);
 
-		if(m_triggeredByAura)
+	//sLog.outString( "CanCast result: %u. Refer to SpellFailure.h to work out why." , cancastresult );
+	if( cancastresult != -1 )
+	{
+		SendCastResult( cancastresult );
+
+		if( m_triggeredByAura )
 		{
-			SendChannelUpdate(0);
-			if(u_caster)
-				u_caster->RemoveAura(m_triggeredByAura);
+			SendChannelUpdate( 0 );
+			if( u_caster != NULL )
+				u_caster->RemoveAura( m_triggeredByAura );
 		}
 		else
 		{
@@ -984,10 +985,10 @@ void Spell::prepare(SpellCastTargets * targets)
 			// when a spell is channeling and a new spell is casted
 			// that is a channeling spell, but not triggert by a aura
 			// the channel bar/spell is bugged
-			if(u_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT) > 0 && u_caster->GetCurrentSpell())
+			if( u_caster->GetUInt64Value( UNIT_FIELD_CHANNEL_OBJECT) > 0 && u_caster->GetCurrentSpell() )
 			{
 				u_caster->GetCurrentSpell()->cancel();
-				SendChannelUpdate(0);
+				SendChannelUpdate( 0 );
 				cancel();
 				return;
 			}
@@ -998,22 +999,21 @@ void Spell::prepare(SpellCastTargets * targets)
 	else
 	{
 		// start cooldown handler
-		if(p_caster && !m_triggeredSpell)
+		if( p_caster != NULL && !m_triggeredSpell )
 		{
 			AddStartCooldown();
 		}
-
 		
-		if(!i_caster)
+		if( i_caster == NULL )
 		{
-			if(p_caster && m_timer > 0 && !m_triggeredSpell)
-				p_caster->delayAttackTimer(m_timer+1000);
-//				p_caster->setAttackTimer(m_timer + 1000, false);
+			if( p_caster != NULL && m_timer > 0 && !m_triggeredSpell )
+				p_caster->delayAttackTimer( m_timer + 1000 );
+				//p_caster->setAttackTimer(m_timer + 1000, false);
 		}
 	}
 
 	//instant cast(or triggered) and not channeling
-	if(u_caster && (m_castTime>0 || m_spellInfo->ChannelInterruptFlags) && !m_triggeredSpell)	
+	if( u_caster != NULL && ( m_castTime > 0 || m_spellInfo->ChannelInterruptFlags ) && !m_triggeredSpell )	
 	{
 		m_castPositionX = m_caster->GetPositionX();
 		m_castPositionY = m_caster->GetPositionY();
@@ -1023,11 +1023,11 @@ void Spell::prepare(SpellCastTargets * targets)
 
 		//remove Aurastates required for this spell from caster and target
 		//not sure if this is the right spot for this
-		if(m_spellInfo->CasterAuraState)
-			u_caster->RemoveFlag(UNIT_FIELD_AURASTATE,m_spellInfo->CasterAuraState);
+		if( m_spellInfo->CasterAuraState )
+			u_caster->RemoveFlag( UNIT_FIELD_AURASTATE, m_spellInfo->CasterAuraState );
 	}
 	else
-		cast(false);
+		cast( false );
 }
 
 void Spell::cancel()

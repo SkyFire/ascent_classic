@@ -714,20 +714,21 @@ void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 
 		case 3:		 // Cast spell (usually means apply aura)
 			{
-				if(Apply)
+				if( Apply )
 				{
-					SpellCastTargets targets(m_owner->GetGUID());
+					SpellCastTargets targets( m_owner->GetGUID() );
 					SpellEntry * sp;
 					Spell * spell;
 					
-					if(Entry->spell[c] != 0)
+					if( Entry->spell[c] != 0 )
 					{
-						sp = dbcSpell.LookupEntry(Entry->spell[c]);
-						if(!sp) continue;
+						sp = dbcSpell.LookupEntry( Entry->spell[c] );
+						if( sp == NULL )
+							continue;
 
-						spell = new Spell(m_owner, sp, true, 0);
+						spell = new Spell( m_owner, sp, true, 0 );
 						spell->i_caster = this;
-						spell->prepare(&targets);
+						spell->prepare( &targets );
 					}
 				}
 				else
