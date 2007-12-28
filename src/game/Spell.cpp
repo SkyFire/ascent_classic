@@ -1905,7 +1905,7 @@ void Spell::SendSpellGo()
 	m_targets.write( data ); // this write is included the target flag
 
 	// er why handle it being null inside if if you can't get into if if its null
-	if( GetType() == SPELL_TYPE_RANGED && p_caster != NULL ) //ranged
+	if( GetType() == SPELL_TYPE_RANGED ) //ranged
 	{
 		ItemPrototype* ip = NULL;
 		if( m_spellInfo->Id == SPELL_RANGED_THROW )
