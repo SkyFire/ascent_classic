@@ -550,6 +550,7 @@ void CommandTableStorage::Init()
 		{ "showitems", 'm', &ChatHandler::HandleShowItems, "test for ItemIterator", NULL, 0, 0, 0 },
 		{ "testlos", 'm', &ChatHandler::HandleCollisionTestLOS, "tests los", NULL, 0, 0, 0 },
 		{ "testindoor", 'm', &ChatHandler::HandleCollisionTestIndoor, "tests indoor", NULL, 0, 0, 0 },
+		{ "renameallinvalidchars", 'z', &ChatHandler::HandleRenameAllCharacter, "Renames all invalid character names", NULL, 0,0, 0 },
 		{ NULL,		  0, NULL,										 "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(commandTable, _commandTable);

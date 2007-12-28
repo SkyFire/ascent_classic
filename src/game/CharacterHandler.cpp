@@ -60,6 +60,41 @@ cont:
 	return true;
 }
 
+bool ChatHandler::HandleRenameAllCharacter(const char * args, WorldSession * m_session)
+{
+	uint32 uCount = 0;
+	uint32 ts = getMSTime();
+	QueryResult * result = CharacterDatabase.Query("SELECT guid, name FROM characters");
+	if( result )
+	{
+		do 
+		{
+			uint32 uGuid = result->Fetch()[0].GetUInt32();
+			const char * pName = result->Fetch()[1].GetString();
+			size_t szLen = strlen(pName);
+
+			if( !VerifyName(pName, szLen) )
+			{
+				printf("renaming character %s, %u\n", pName,uGuid);
+                Player * pPlayer = objmgr.GetPlayer(uGuid);
+				if( pPlayer != NULL )
+				{
+					pPlayer->rename_pending = true;
+					pPlayer->GetSession()->SystemMessage("Your character has had a force rename set, you will be prompted to rename your character at next login in conformance with server rules.");
+				}
+
+				CharacterDatabase.WaitExecute("UPDATE characters SET forced_rename_pending = 1 WHERE guid = %u", uGuid);
+				++uCount;
+			}
+
+		} while (result->NextRow());
+		delete result;
+	}
+
+	SystemMessage(m_session, "Procedure completed in %u ms. %u character(s) forced to rename.", getMSTime() - ts, uCount);
+	return true;
+}
+
 void CapitalizeString(string& arg)
 {
 	if(arg.length() == 0) return;
