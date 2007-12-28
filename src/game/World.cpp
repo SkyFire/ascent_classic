@@ -1820,7 +1820,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
 
 	//shaman - Totemic focus 
-	uint32 All_totems_grouprelation=536870912; //these are only selected flag since some totems contain more then 1 flag
+	uint32 All_totems_grouprelation=536870912UL; //these are only selected flag since some totems contain more then 1 flag
 	All_totems_grouprelation |= 8;
 	All_totems_grouprelation |= 16;
 	All_totems_grouprelation |= 524288;
@@ -1906,58 +1906,58 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(14168); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456; //poisons. Duuuh
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL; //poisons. Duuuh
 		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	}
 	sp = dbcSpell.LookupEntry(16514); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	}
 	sp = dbcSpell.LookupEntry(16515); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	}
 	sp = dbcSpell.LookupEntry(16719); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	}
 	sp = dbcSpell.LookupEntry(16720); 
 	if(sp)
 	{
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 		sp->EffectSpellGroupRelation[1]=8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[2]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	}
 
 	//rogue - Improved Poisons
 	sp = dbcSpell.LookupEntry(14113); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	sp = dbcSpell.LookupEntry(14114); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	sp = dbcSpell.LookupEntry(14115); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	sp = dbcSpell.LookupEntry(14116); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	sp = dbcSpell.LookupEntry(14117); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	sp = dbcSpell.LookupEntry(21881); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 
 	//rogue - Improved Expose Armor
 	sp = dbcSpell.LookupEntry(14168); 
@@ -1970,10 +1970,10 @@ bool World::SetInitialWorldSettings()
 	//rogue - Master Poisoner.
 	sp = dbcSpell.LookupEntry(31226); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 	sp = dbcSpell.LookupEntry(31227); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456;
+		sp->EffectSpellGroupRelation[0]=16384 | 32768 | 8192 | 65536 | 268435456UL;
 
 	//rogue - Find Weakness.
 	sp = dbcSpell.LookupEntry(31233); 
@@ -1994,19 +1994,19 @@ bool World::SetInitialWorldSettings()
 	//rogue - Find Weakness. The effect
 	sp = dbcSpell.LookupEntry(31234); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+		sp->EffectSpellGroupRelation[0]=536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
 	sp = dbcSpell.LookupEntry(31235); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+		sp->EffectSpellGroupRelation[0]=536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
 	sp = dbcSpell.LookupEntry(31236); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+		sp->EffectSpellGroupRelation[0]=536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
 	sp = dbcSpell.LookupEntry(31237); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+		sp->EffectSpellGroupRelation[0]=536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
 	sp = dbcSpell.LookupEntry(31238); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=536870912 | 8388608 | 1048576 | 256 | 8 | 16 | 67108864;//damaging spells
+		sp->EffectSpellGroupRelation[0]=536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
 	
 	//rogue - Camouflage.
 	sp = dbcSpell.LookupEntry(13975); 
@@ -2131,9 +2131,9 @@ bool World::SetInitialWorldSettings()
 	L_grouprelation |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)
 	L_grouprelation |= 4;//rogue - backstab (only a part of the whole group since it would affect other spells too)
 	L_grouprelation |= 8;//rogue - Gouge (only a part of the whole group since it would affect other spells too)
-	L_grouprelation |= 33554432;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
-	L_grouprelation |= 536870912;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
-	L_grouprelation |= 1073741824;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 33554432UL;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 536870912UL;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
+	L_grouprelation |= 1073741824UL;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
 	sp = dbcSpell.LookupEntry(14128); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=L_grouprelation;
@@ -2216,13 +2216,13 @@ bool World::SetInitialWorldSettings()
 	//priest - Absolution 
 	sp = dbcSpell.LookupEntry(33167); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->EffectSpellGroupRelation[0]=2147483648UL;
 	sp = dbcSpell.LookupEntry(33171); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->EffectSpellGroupRelation[0]=2147483648UL;
 	sp = dbcSpell.LookupEntry(33172); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648;
+		sp->EffectSpellGroupRelation[0]=2147483648UL;
 	//priest - Abolish Disease - does not have a group type 
 	sp = dbcSpell.LookupEntry(552); 
 	if(sp)
@@ -2235,58 +2235,58 @@ bool World::SetInitialWorldSettings()
 	//priest - Mental Agility - all instant spells. I wonder if it conflicts with any other spells 
 	sp = dbcSpell.LookupEntry(14520); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
 	sp = dbcSpell.LookupEntry(14780); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
 	sp = dbcSpell.LookupEntry(14781); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
 	sp = dbcSpell.LookupEntry(14782); 
 	if(sp)
 		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
 	sp = dbcSpell.LookupEntry(14783); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
 
 	//priest - Focused Power
 	sp = dbcSpell.LookupEntry(33186); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=2147483648;
-		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648;
+		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648UL;
 	}
 	sp = dbcSpell.LookupEntry(33190); 
 	if(sp)
 	{
 		sp->EffectSpellGroupRelation[0]=2147483648;
-		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648;
+		sp->EffectSpellGroupRelation[1]=128 | 8192 | 2147483648UL;
 	}
 
 	//priest - Shadow Reach 
 	sp = dbcSpell.LookupEntry(17322); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 	sp = dbcSpell.LookupEntry(17323); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 
 	//priest - Shadow Focus 
 	sp = dbcSpell.LookupEntry(15260); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=67108864 | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=67108864UL | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 	sp = dbcSpell.LookupEntry(15327); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=67108864 | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=67108864UL | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 	sp = dbcSpell.LookupEntry(15328); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=67108864 | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=67108864UL | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 	sp = dbcSpell.LookupEntry(15329); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 	sp = dbcSpell.LookupEntry(15330); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
