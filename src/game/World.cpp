@@ -1811,13 +1811,13 @@ bool World::SetInitialWorldSettings()
 	//shaman - Mental Quickness. ! these are only a part (18 spells have no grouping)
 	sp = dbcSpell.LookupEntry(30812); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912UL | 268435456UL | 2147483648UL;
 	sp = dbcSpell.LookupEntry(30813); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912UL | 268435456UL | 2147483648UL;
 	sp = dbcSpell.LookupEntry(30814); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912 | 268435456 | 2147483648;
+		sp->EffectSpellGroupRelation[0]=8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912UL | 268435456UL | 2147483648UL;
 
 	//shaman - Totemic focus 
 	uint32 All_totems_grouprelation=536870912UL; //these are only selected flag since some totems contain more then 1 flag
@@ -2226,28 +2226,28 @@ bool World::SetInitialWorldSettings()
 	//priest - Abolish Disease - does not have a group type 
 	sp = dbcSpell.LookupEntry(552); 
 	if(sp)
-		sp->SpellGroupType=2147483648;
+		sp->SpellGroupType=2147483648UL;
 	//priest - Mass Dispel - does not have a group type 
 	sp = dbcSpell.LookupEntry(32375); 
 	if(sp)
-		sp->SpellGroupType=2147483648;
+		sp->SpellGroupType=2147483648UL;
 
 	//priest - Mental Agility - all instant spells. I wonder if it conflicts with any other spells 
 	sp = dbcSpell.LookupEntry(14520); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
 	sp = dbcSpell.LookupEntry(14780); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
 	sp = dbcSpell.LookupEntry(14781); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
 	sp = dbcSpell.LookupEntry(14782); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648 | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
 	sp = dbcSpell.LookupEntry(14783); 
 	if(sp)
-		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864 | 4 | 1 | 64 | 32 | 4194304 | 32768 | 8388608 | 8 | 16384 | 2 | 256 | 16777216 | 2097152 | 33554432;
+		sp->EffectSpellGroupRelation[0]=2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
 
 	//priest - Focused Power
 	sp = dbcSpell.LookupEntry(33186); 
