@@ -273,7 +273,7 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 		}*/
 
 		//Check for stacking
-		if(DstItem && SrcItem->GetEntry()==DstItem->GetEntry() && SrcItem->GetProto()->MaxCount>1)
+		if(DstItem && SrcItem->GetEntry()==DstItem->GetEntry() && SrcItem->GetProto()->MaxCount>1 && SrcItem->wrapped_item_id == 0 && DstItem->wrapped_item_id == 0)
 		{
 			uint32 total=SrcItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT)+DstItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 			if(total<=DstItem->GetProto()->MaxCount)

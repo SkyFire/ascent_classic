@@ -3092,7 +3092,6 @@ void Player::OnPushToWorld()
 	m_lockTransportVariables = false;
 
 	// delay the unlock movement packet
-	UpdateChances();
 	WorldPacket * data = new WorldPacket(SMSG_MOVE_UNLOCK_MOVEMENT, 4);
 	*data << uint32(0);
 	delayedPackets.add(data);

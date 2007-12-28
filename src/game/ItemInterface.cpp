@@ -2217,7 +2217,7 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 	Item *SrcItem = GetInventoryItem(srcslot);
 	Item *DstItem = GetInventoryItem(dstslot);
 
-	if(SrcItem && DstItem && SrcItem->GetEntry()==DstItem->GetEntry()&& SrcItem->GetProto()->MaxCount>1)
+	if(SrcItem && DstItem && SrcItem->GetEntry()==DstItem->GetEntry()&& SrcItem->GetProto()->MaxCount>1 && SrcItem->wrapped_item_id == 0 && DstItem->wrapped_item_id == 0)
 	{
 		uint32 total=SrcItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT)+DstItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 		if(total<=DstItem->GetProto()->MaxCount)
