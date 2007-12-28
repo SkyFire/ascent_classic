@@ -99,7 +99,7 @@ private:
 
 #endif
 
-ASCENT_INLINE void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid)
+static inline void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid)
 {
 	// hehe speed freaks
 	uint8 guidmask = 0;

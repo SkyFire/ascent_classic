@@ -1882,7 +1882,7 @@ class SkillIterator
 	bool m_searchInProgress;
 	Player * m_target;
 public:
-	SkillIterator(Player* target) : m_target(target),m_searchInProgress(false) {}
+	SkillIterator(Player* target) : m_searchInProgress(false),m_target(target) {}
 	~SkillIterator() { if(m_searchInProgress) { EndSearch(); } }
 
 	void BeginSearch()

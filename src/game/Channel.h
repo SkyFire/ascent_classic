@@ -142,7 +142,7 @@ class ChannelIterator
 	bool m_searchInProgress;
 	Channel * m_target;
 public:
-	ChannelIterator(Channel* target) : m_target(target),m_searchInProgress(false) {}
+	ChannelIterator(Channel* target) : m_searchInProgress(false),m_target(target) {}
 	~ChannelIterator() { if(m_searchInProgress) { EndSearch(); } }
 
 	void BeginSearch()

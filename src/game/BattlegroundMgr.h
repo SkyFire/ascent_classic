@@ -100,7 +100,7 @@ struct BGScore
 #define AV_CONTROLED_STONEHEART_GRAVE_ALLIANCE  0x516 //1 -> alliance controled
 
 /* get level grouping for player */
-static uint32 GetLevelGrouping(uint32 level)
+static inline uint32 GetLevelGrouping(uint32 level)
 {
 	if(level < 10)
 		return 0;

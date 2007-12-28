@@ -609,6 +609,10 @@
 			>
 		</File>
 		<File
+			RelativePath="..\..\src\game\faction.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\src\game\faction.h"
 			>
 		</File>
@@ -966,6 +970,10 @@
 		</File>
 		<File
 			RelativePath="..\..\src\game\SpellTarget.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\game\Stats.cpp"
 			>
 		</File>
 		<File

@@ -135,7 +135,7 @@ class ItemIterator
 	Item * m_currentItem;
 	ItemInterface* m_target;
 public:
-	ItemIterator(ItemInterface* target) : m_target(target),m_slot(0),m_container(NULL),m_searchInProgress(false),m_atEnd(false),m_containerSlot(0) {}
+	ItemIterator(ItemInterface* target) : m_atEnd(false),m_searchInProgress(false),m_slot(0),m_containerSlot(0),m_container(NULL),m_target(target) {}
 	~ItemIterator() { if(m_searchInProgress) { EndSearch(); } }
 
 	void BeginSearch()

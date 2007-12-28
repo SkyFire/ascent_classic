@@ -150,7 +150,7 @@ class SERVER_DECL QueryThread : public CThread
 	friend class Database;
 	Database * db;
 public:
-	QueryThread(Database * d) : db(d), CThread() {}
+	QueryThread(Database * d) : CThread(), db(d) {}
 	~QueryThread();
 	bool run();
 };

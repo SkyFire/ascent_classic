@@ -384,6 +384,9 @@
 			RelativePath="..\..\src\game\EventMgr.h">
 		</File>
 		<File
+			RelativePath="..\..\src\game\faction.cpp">
+		</File>
+		<File
 			RelativePath="..\..\src\game\faction.h">
 		</File>
 		<File
@@ -649,6 +652,9 @@
 		</File>
 		<File
 			RelativePath="..\..\src\game\SpellTarget.cpp">
+		</File>
+		<File
+			RelativePath="..\..\src\game\Stats.cpp">
 		</File>
 		<File
 			RelativePath="..\..\src\game\Stats.h">

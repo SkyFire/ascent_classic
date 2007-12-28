@@ -61,6 +61,7 @@ libgame_a_SOURCES = \
     EventMgr.cpp \
     EventMgr.h \
     faction.h \
+    faction.cpp \
     GameObject.cpp \
     GameObject.h \
     GMTicket.cpp \
@@ -149,6 +150,7 @@ libgame_a_SOURCES = \
     SpellEffects.cpp \
     SpellHandler.cpp \
     Stats.h \
+    Stats.cpp \
     StdAfx.cpp \
     StdAfx.h \
     TaxiHandler.cpp \

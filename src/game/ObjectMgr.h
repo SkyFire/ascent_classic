@@ -247,7 +247,7 @@ public:
 	string GuildName;
 
 	Charter(Field * fields);
-	Charter(uint32 id, uint32 leader, uint32 type) : CharterId(id), LeaderGuid(leader), CharterType(type)
+	Charter(uint32 id, uint32 leader, uint32 type) : CharterType(type), LeaderGuid(leader), CharterId(id)
 	{
 		SignatureCount = 0;
 		ItemGuid = 0;
