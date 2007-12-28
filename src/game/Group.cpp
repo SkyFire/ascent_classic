@@ -557,6 +557,9 @@ void Group::SendPacketToAllButOne(WorldPacket *packet, Player *pSkipTarget)
 
 bool Group::HasMember(Player * pPlayer)
 {
+	if( !pPlayer )
+		return;
+
 	GroupMembersSet::iterator itr;
 	m_groupLock.Acquire();
 
