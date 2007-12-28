@@ -1312,7 +1312,7 @@ int8 ItemInterface::GetInternalBankSlotFromPlayer(int8 islot)
 //-------------------------------------------------------------------//
 //Description: checks if the item can be equiped on a specific slot
 //-------------------------------------------------------------------//
-int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype *proto, bool ignore_combat)
+int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype* proto, bool ignore_combat /* = false */, bool skip_2h_check /* = false */)
 {
 	uint32 type=proto->InventoryType;
 	
@@ -1472,7 +1472,7 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 	case EQUIPMENT_SLOT_MAINHAND:
 		{
 			if(type == INVTYPE_WEAPON || type == INVTYPE_WEAPONMAINHAND ||
-				(type == INVTYPE_2HWEAPON && !GetInventoryItem(EQUIPMENT_SLOT_OFFHAND)))
+				(type == INVTYPE_2HWEAPON && (!GetInventoryItem(EQUIPMENT_SLOT_OFFHAND) || skip_2h_check)))
 				return 0;
 			else
 				return INV_ERR_ITEM_DOESNT_GO_TO_SLOT;
@@ -1494,7 +1494,12 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 								return INV_ERR_CANT_DUAL_WIELD;
 						}
 						else
-							return INV_ERR_CANT_EQUIP_WITH_TWOHANDED;
+						{
+							if(!skip_2h_check)
+								return INV_ERR_CANT_EQUIP_WITH_TWOHANDED;
+							else
+								return 0;
+						}
 					}
 				}
 				else
@@ -1517,7 +1522,12 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 							return 0;
 						}
 						else
-							return INV_ERR_CANT_EQUIP_WITH_TWOHANDED;
+						{
+							if(!skip_2h_check)
+								return INV_ERR_CANT_EQUIP_WITH_TWOHANDED;
+							else
+								return 0;
+						}
 					}
 				}
 				else

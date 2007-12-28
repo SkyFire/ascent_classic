@@ -564,10 +564,78 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	if((error = _player->GetItemInterface()->CanEquipItemInSlot(INVENTORY_SLOT_NOT_SET, Slot, eitem->GetProto())))
+	// handle equipping of 2h when we have two items equipped! :) special case.
+	if(Slot == EQUIPMENT_SLOT_MAINHAND || Slot == EQUIPMENT_SLOT_OFFHAND)
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL, error);
-		return;
+		Item * mainhandweapon = _player->GetItemInterface()->GetInventoryItem(INVENTORY_SLOT_NOT_SET, EQUIPMENT_SLOT_MAINHAND);
+		if( mainhandweapon != NULL && mainhandweapon->GetProto()->InventoryType == INVTYPE_2HWEAPON )
+		{
+			if( Slot == EQUIPMENT_SLOT_OFFHAND && eitem->GetProto()->InventoryType == INVTYPE_WEAPON )
+			{
+				Slot = EQUIPMENT_SLOT_MAINHAND;
+			}
+		}
+
+		if((error = _player->GetItemInterface()->CanEquipItemInSlot(INVENTORY_SLOT_NOT_SET, Slot, eitem->GetProto(), true, true)))
+		{
+			_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL, error);
+			return;
+		}
+
+		if(eitem->GetProto()->InventoryType == INVTYPE_2HWEAPON)
+		{
+			// see if we have a weapon equipped in the offhand, if so we need to remove it
+			Item * offhandweapon = _player->GetItemInterface()->GetInventoryItem(INVENTORY_SLOT_NOT_SET, EQUIPMENT_SLOT_OFFHAND);
+			if( offhandweapon != NULL )
+			{
+				// we need to de-equip this
+				SlotResult result = _player->GetItemInterface()->FindFreeInventorySlot(offhandweapon->GetProto());
+				if( !result.Result )
+				{
+					// no free slots for this item
+					_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL, INV_ERR_BAG_FULL);
+					return;
+				}
+
+				offhandweapon = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(INVENTORY_SLOT_NOT_SET, EQUIPMENT_SLOT_OFFHAND, false);
+				if( offhandweapon == NULL )
+					return;		// should never happen
+
+				if( !_player->GetItemInterface()->SafeAddItem(offhandweapon, result.ContainerSlot, result.Slot) )
+					_player->GetItemInterface()->AddItemToFreeSlot(offhandweapon);		// shouldn't happen either.
+			}
+		}
+		else
+		{
+			// can't equip a non-two-handed weapon with a two-handed weapon
+			mainhandweapon = _player->GetItemInterface()->GetInventoryItem(INVENTORY_SLOT_NOT_SET, EQUIPMENT_SLOT_MAINHAND);
+			if( mainhandweapon != NULL && mainhandweapon->GetProto()->InventoryType == INVTYPE_2HWEAPON )
+			{
+				// we need to de-equip this
+				SlotResult result = _player->GetItemInterface()->FindFreeInventorySlot(mainhandweapon->GetProto());
+				if( !result.Result )
+				{
+					// no free slots for this item
+					_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL, INV_ERR_BAG_FULL);
+					return;
+				}
+
+				mainhandweapon = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(INVENTORY_SLOT_NOT_SET, EQUIPMENT_SLOT_MAINHAND, false);
+				if( mainhandweapon == NULL )
+					return;		// should never happen
+
+				if( !_player->GetItemInterface()->SafeAddItem(mainhandweapon, result.ContainerSlot, result.Slot) )
+					_player->GetItemInterface()->AddItemToFreeSlot(mainhandweapon);		// shouldn't happen either.
+			}
+		}
+	}
+	else
+	{
+		if((error = _player->GetItemInterface()->CanEquipItemInSlot(INVENTORY_SLOT_NOT_SET, Slot, eitem->GetProto())))
+		{
+			_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL, error);
+			return;
+		}
 	}
 
 	Item*oitem=NULL;
