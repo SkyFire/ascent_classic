@@ -906,7 +906,7 @@ void Spell::prepare( SpellCastTargets * targets )
 	chaindamage = 0;
 	m_targets = *targets;
 
-	if( !m_triggeredSpell && p_caster && p_caster->CastTimeCheat )
+	if( !m_triggeredSpell && p_caster != NULL && p_caster->CastTimeCheat )
 		m_castTime = 0;
 	else
 	{
@@ -914,8 +914,8 @@ void Spell::prepare( SpellCastTargets * targets )
 
 		if( m_castTime && m_spellInfo->SpellGroupType && u_caster != NULL )
 		{
-			SM_FIValue(u_caster->SM_FCastTime,(int32*)&m_castTime,m_spellInfo->SpellGroupType);
-			SM_PIValue(u_caster->SM_PCastTime,(int32*)&m_castTime,m_spellInfo->SpellGroupType);
+			SM_FIValue( u_caster->SM_FCastTime, (int32*)&m_castTime, m_spellInfo->SpellGroupType );
+			SM_PIValue( u_caster->SM_PCastTime, (int32*)&m_castTime, m_spellInfo->SpellGroupType );
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 			int spell_flat_modifers=0;
 			int spell_pct_modifers=0;
@@ -953,7 +953,7 @@ void Spell::prepare( SpellCastTargets * targets )
 
 	m_timer = m_castTime;
 
-	//if(p_caster)
+	//if( p_caster != NULL )
 	//   m_castTime -= 100;	  // session update time
 
 	SendSpellStart();
@@ -1729,23 +1729,22 @@ enum SpellStartFlags
 void Spell::SendSpellStart()
 {
 	// no need to send this on passive spells
-	if(!m_caster->IsInWorld() || m_spellInfo->Attributes & 64 || m_triggeredSpell)
+	if( !m_caster->IsInWorld() || m_spellInfo->Attributes & 64 || m_triggeredSpell )
 		return;
 
-	WorldPacket data(150);
+	WorldPacket data( 150 );
 
 	uint16 cast_flags = 2;
 
-	if(GetType() == SPELL_TYPE_RANGED)
+	if( GetType() == SPELL_TYPE_RANGED )
 		cast_flags |= 0x20;
 
     // hacky yeaaaa
-    if (m_spellInfo->Id == 8326) // death
+    if( m_spellInfo->Id == 8326 ) // death
         cast_flags = 0x0F;
 
-
-	data.SetOpcode(SMSG_SPELL_START);
-	if(i_caster)
+	data.SetOpcode( SMSG_SPELL_START );
+	if( i_caster != NULL )
 		data << i_caster->GetNewGUID() << u_caster->GetNewGUID();
 	else
 		data << m_caster->GetNewGUID() << m_caster->GetNewGUID();
@@ -1757,15 +1756,15 @@ void Spell::SendSpellStart()
 		
 	m_targets.write( data );
 
-	if(GetType() == SPELL_TYPE_RANGED)
+	if( GetType() == SPELL_TYPE_RANGED )
 	{
 		ItemPrototype* ip = NULL;
-        if (m_spellInfo->Id == SPELL_RANGED_THROW) // throw
+        if( m_spellInfo->Id == SPELL_RANGED_THROW ) // throw
         {
-			if(p_caster)
+			if( p_caster != NULL )
 			{
-				Item *itm = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
-				if(itm)
+				Item *itm = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
+				if( itm != NULL )
 				{
 	                ip = itm->GetProto();
 					/* Throwing Weapon Patch by Supalosa
@@ -1775,32 +1774,32 @@ void Spell::SendSpellStart()
 					*/
 	
 					// burlex - added a check here anyway (wpe suckers :P)
-					if(itm->GetDurability() > 0)
+					if( itm->GetDurability() > 0 )
 					{
 	                    itm->SetDurability( itm->GetDurability() - 1 );
-						if(itm->GetDurability() == 0)
-							p_caster->ApplyItemMods(itm, EQUIPMENT_SLOT_RANGED, false, true);
+						if( itm->GetDurability() == 0 )
+							p_caster->ApplyItemMods( itm, EQUIPMENT_SLOT_RANGED, false, true );
 					}
 				}
 				else
 				{
-					ip = ItemPrototypeStorage.LookupEntry(2512);	/*rough arrow*/
+					ip = ItemPrototypeStorage.LookupEntry( 2512 );	/*rough arrow*/
 				}
             }
         }
-        else if(m_spellInfo->Flags4 & FLAGS4_PLAYER_RANGED_SPELLS)
+        else if( m_spellInfo->Flags4 & FLAGS4_PLAYER_RANGED_SPELLS )
         {
-			if(p_caster)
-				ip = ItemPrototypeStorage.LookupEntry(p_caster->GetUInt32Value(PLAYER_AMMO_ID));
+			if( p_caster != NULL )
+				ip = ItemPrototypeStorage.LookupEntry( p_caster->GetUInt32Value( PLAYER_AMMO_ID ) );
 			else
-				ip = ItemPrototypeStorage.LookupEntry(2512);	/*rough arrow*/
+				ip = ItemPrototypeStorage.LookupEntry( 2512 );	/*rough arrow*/
         }
 		
-		if(ip)
+		if( ip != NULL )
 			data << ip->DisplayInfoID << ip->InventoryType;
 	}
 
-	m_caster->SendMessageToSet(&data, true);
+	m_caster->SendMessageToSet( &data, true );
 }
 
 /************************************************************************/
@@ -1831,25 +1830,25 @@ void Spell::SendSpellGo()
     
 
 	// Fill UniqueTargets
-	TargetsList::iterator i,j;
-	for(uint32 x=0;x<3;x++)
+	TargetsList::iterator i, j;
+	for( uint32 x = 0; x < 3; x++ )
 	{
-		if(m_spellInfo->Effect[x])
+		if( m_spellInfo->Effect[x] )
 		{
             bool add = true;
-			for ( i = m_targetUnits[x].begin(); i != m_targetUnits[x].end(); i++ )
+			for( i = m_targetUnits[x].begin(); i != m_targetUnits[x].end(); i++ )
 			{
 				add = true;
-				for(j = UniqueTargets.begin(); j != UniqueTargets.end(); j++ )
+				for( j = UniqueTargets.begin(); j != UniqueTargets.end(); j++ )
 				{
-					if((*j) == (*i))
+					if( (*j) == (*i) )
 					{
 						add = false;
 						break;
 					}
 				}
-				if(add && (*i) != 0)
-					UniqueTargets.push_back((*i));
+				if( add && (*i) != 0 )
+					UniqueTargets.push_back( (*i) );
                 //TargetsList::iterator itr = std::unique(m_targetUnits[x].begin(), m_targetUnits[x].end());
                 //UniqueTargets.insert(UniqueTargets.begin(),));
                 //UniqueTargets.insert(UniqueTargets.begin(), itr);
@@ -1858,29 +1857,29 @@ void Spell::SendSpellGo()
 	}
 	
     // no need to send this on passive spells
-    if(!m_caster->IsInWorld() || m_spellInfo->Attributes & 64)
+    if( !m_caster->IsInWorld() || m_spellInfo->Attributes & 64 )
         return;
 
 	// Start Spell
-	WorldPacket data(200);
-	data.SetOpcode(SMSG_SPELL_GO);
+	WorldPacket data( 200 );
+	data.SetOpcode( SMSG_SPELL_GO );
 	uint16 flags = 0;
 
 	if (GetType() == SPELL_TYPE_RANGED) //ranged
-		flags |= 0x20;				    // 0x20 RANGED
+		flags |= 0x20; // 0x20 RANGED
 
-	if(i_caster)
+	if( i_caster != NULL )
 		flags |= SPELL_GO_FLAGS_ITEM_CASTER; // 0x100 ITEM CASTER
 
-	if(ModeratedTargets.size() > 0)
-		flags |= 0x400;				    // 0x400 TARGET MISSES AND OTHER MESSAGES LIKE "Resist"
+	if( ModeratedTargets.size() > 0 )
+		flags |= 0x400; // 0x400 TARGET MISSES AND OTHER MESSAGES LIKE "Resist"
 
     // hacky..
-    if (m_spellInfo->Id == 8326)      // death
+    if( m_spellInfo->Id == 8326 ) // death
         flags = SPELL_GO_FLAGS_ITEM_CASTER | 0x0D;
     
 
-	if(i_caster && u_caster)			// this is needed for correct cooldown on items
+	if( i_caster != NULL && u_caster != NULL ) // this is needed for correct cooldown on items
 	{
 		data << i_caster->GetNewGUID() << u_caster->GetNewGUID();
 	} 
@@ -1893,27 +1892,28 @@ void Spell::SendSpellGo()
 	data << flags;
 	data << (uint8)(UniqueTargets.size()); //number of hits
 	
-	if (flags & 0x400)
+	if( flags & 0x400 )
 		data << (uint8)(ModeratedTargets.size()); //number if misses
   
-	writeSpellGoTargets(&data);
+	writeSpellGoTargets( &data );
 	
-	if (flags & 0x400)
-		writeSpellMissedTargets(&data);
+	if( flags & 0x400 )
+		writeSpellMissedTargets( &data );
 	else
-		data << uint8(0);
+		data << uint8( 0 );
 
 	m_targets.write( data ); // this write is included the target flag
 
-	if (GetType() == SPELL_TYPE_RANGED && p_caster)//ranged
+	// er why handle it being null inside if if you can't get into if if its null
+	if( GetType() == SPELL_TYPE_RANGED && p_caster != NULL ) //ranged
 	{
-		ItemPrototype* ip=NULL;
-		if(m_spellInfo->Id == SPELL_RANGED_THROW)
+		ItemPrototype* ip = NULL;
+		if( m_spellInfo->Id == SPELL_RANGED_THROW )
 		{
-			if(p_caster)
+			if( p_caster != NULL )
 			{
-				Item * it=p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
-				if(it)
+				Item* it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
+				if( it != NULL )
 					ip = it->GetProto();
 			}
 			else
@@ -1923,16 +1923,16 @@ void Spell::SendSpellGo()
         }
 		else
 		{
-			if(p_caster)
-				ip = ItemPrototypeStorage.LookupEntry(p_caster->GetUInt32Value(PLAYER_AMMO_ID));
+			if( p_caster != NULL )
+				ip = ItemPrototypeStorage.LookupEntry(p_caster->GetUInt32Value( PLAYER_AMMO_ID ) );
 			else // HACK FIX
 				ip = ItemPrototypeStorage.LookupEntry(2512);	/*rough arrow*/
 		}
-		if(ip)
+		if( ip != NULL)
 			data << ip->DisplayInfoID << ip->InventoryType;
 	}
    
-	m_caster->SendMessageToSet(&data, true);
+	m_caster->SendMessageToSet( &data, true );
 
 	// spell log execute is still send 2.08
 	// as I see with this combination, need to test it more
