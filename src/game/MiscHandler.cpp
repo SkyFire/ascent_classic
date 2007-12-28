@@ -1006,7 +1006,10 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 	}
 
 	if(uiDecompressedSize>100000)
+	{
+		Disconnect();
 		return;
+	}
 
 	size_t ReceivedPackedSize = recv_data.size() - 8;
 	char* data = new char[uiDecompressedSize+1];
@@ -1426,6 +1429,12 @@ void WorldSession::HandleTutorialFlag( WorldPacket & recv_data )
 
 	uint32 wInt = (iFlag / 32);
 	uint32 rInt = (iFlag % 32);
+
+	if(wInt >= 7)
+	{
+		Disconnect();
+		return;
+	}
 
 	uint32 tutflag = GetPlayer()->GetTutorialInt( wInt );
 	tutflag |= (1 << rInt);
