@@ -933,6 +933,9 @@ bool ChatHandler::HandleAddItemSetCommand(const char* args, WorldSession* m_sess
 	{
 		Item *itm = objmgr.CreateItem((*itr)->ItemId, m_session->GetPlayer());
 		if(!itm) continue;
+		if(itm->GetProto()->Bonding == ITEM_BIND_ON_PICKUP)
+			itm->SoulBind();
+
 		if(!chr->GetItemInterface()->AddItemToFreeSlot(itm))
 		{
 			m_session->SendNotification("No free slots left!");

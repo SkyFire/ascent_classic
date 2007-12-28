@@ -213,6 +213,8 @@ bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_sess
 		Item *item;
 		item = objmgr.CreateItem( itemid, chr);
 		item->SetUInt32Value(ITEM_FIELD_STACK_COUNT, ((count > it->MaxCount) ? it->MaxCount : count));
+		if(it->Bonding==ITEM_BIND_ON_PICKUP)
+			item->SoulBind();
 		if(randomprop!=0)
 		{
 			if(randomprop<0)
