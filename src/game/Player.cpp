@@ -7977,20 +7977,24 @@ void Player::SaveAuras(stringstream &ss)
 
 void Player::SetShapeShift(uint8 ss)
 {
+	uint8 old_ss = GetByte(UNIT_FIELD_BYTES_1, 2);
 	SetByte(UNIT_FIELD_BYTES_1,2,ss);
 	//remove auras that we should not have
 	for(uint32 x =0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 	{
 		if(m_auras[x])
 		{
-			if(m_auras[x]->GetSpellProto()->RequiredShapeShift && m_auras[x]->IsPositive())
+			uint32 reqss = m_auras[x]->GetSpellProto()->RequiredShapeShift;
+			if(reqss && m_auras[x]->IsPositive())
 			{
-				//Shady:commented cause a lot of spells has wrong RequiredShapeShift
-				//if(!ss || !(((uint32)1 << (ss-1))&m_auras[x]->GetSpellProto()->RequiredShapeShift))
-				if(!ss)
+				if( old_ss > 0 )
 				{
-					m_auras[x]->Remove();
-					continue;
+					if(  ( ((uint32)1 << (old_ss-1)) & reqss ) &&		// we were in the form that required it
+						!( ((uint32)1 << (ss-1) & reqss) ) )			// new form doesnt have the right form
+					{
+						m_auras[x]->Remove();
+						continue;
+					}
 				}
 			}
 
