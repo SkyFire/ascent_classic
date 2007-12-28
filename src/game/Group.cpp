@@ -31,16 +31,16 @@ enum PartyUpdateFlags
 	GROUP_UPDATE_FLAG_LEVEL						= 64,		// 0x00000040  uint16
 	GROUP_UPDATE_FLAG_ZONEID					= 128,		// 0x00000080  uint16
 	GROUP_UPDATE_FLAG_POSITION					= 256,		// 0x00000100  uint16, uint16
-	GROUP_UPDATE_FLAG_UNK_STRANGE				= 512,		// 0x00000200  uint64, uint16 for each uint64
-	GROUP_UPDATE_FLAG_UNK_1						= 1024,		// 0x00000400  uint64
+	GROUP_UPDATE_FLAG_PLAYER_AURAS				= 512,		// 0x00000200  uint64, uint16 for each uint64
+	GROUP_UPDATE_FLAG_PET_GUID					= 1024,		// 0x00000400  uint64
 	GROUP_UPDATE_FLAG_PET_NAME					= 2048,		// 0x00000800  string
-	GROUP_UPDATE_FLAG_PET_UNK_1					= 4096,		// 0x00001000  uint16
-	GROUP_UPDATE_FLAG_PET_UNK_2					= 8192,		// 0x00002000  uint16
-	GROUP_UPDATE_FLAG_PET_UNK_3					= 16384,	// 0x00004000  uint16
-	GROUP_UPDATE_FLAG_PET_UNK_4					= 32768,	// 0x00008000  uint8
-	GROUP_UPDATE_FLAG_UNK_3						= 65535,	// 0x00010000  uint16
-	GROUP_UPDATE_FLAG_UNK_4						= 131070,	// 0x00020000  uint16
-	GROUP_UPDATE_FLAG_UNK_5						= 262144,	// 0x00040000  uint64, uint16 for each uint64
+	GROUP_UPDATE_FLAG_PET_DISPLAYID				= 4096,		// 0x00001000  uint16
+	GROUP_UPDATE_FLAG_PET_HEALTH				= 8192,		// 0x00002000  uint16
+	GROUP_UPDATE_FLAG_PET_MAXHEALTH				= 16384,	// 0x00004000  uint16
+	GROUP_UPDATE_FLAG_PET_POWER_TYPE			= 32768,	// 0x00008000  uint8
+	GROUP_UPDATE_FLAG_PET_POWER					= 65535,	// 0x00010000  uint16
+	GROUP_UPDATE_FLAG_PET_MAXPOWER				= 131070,	// 0x00020000  uint16
+	GROUP_UPDATE_FLAG_PET_AURAS					= 262144,	// 0x00040000  uint64, uint16 for each uint64
 };
 
 enum PartyUpdateFlagGroups
@@ -48,7 +48,7 @@ enum PartyUpdateFlagGroups
 	GROUP_UPDATE_TYPE_FULL_CREATE				=	GROUP_UPDATE_FLAG_ONLINE | GROUP_UPDATE_FLAG_HEALTH | GROUP_UPDATE_FLAG_MAXHEALTH |
 													GROUP_UPDATE_FLAG_POWER | GROUP_UPDATE_FLAG_LEVEL |
 													GROUP_UPDATE_FLAG_ZONEID | GROUP_UPDATE_FLAG_MAXPOWER | GROUP_UPDATE_FLAG_POSITION,
-	GROUP_UPDATE_TYPE_FULL_REQUEST_REPLY		=   0x7FFC1800,
+	GROUP_UPDATE_TYPE_FULL_REQUEST_REPLY		=   0x7FFC0BFF,
 };
 
 Group::Group()
@@ -773,6 +773,7 @@ void Group::SaveToDB()
 
 void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribute, WorldPacket * Packet)
 {
+	uint8 member_flags = 0x01;
 	WorldPacket * data = Packet;
 	if(!Packet)
 		data = new WorldPacket(SMSG_PARTY_MEMBER_STATS, 500);
@@ -790,9 +791,13 @@ void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribu
 	if(Flags & GROUP_UPDATE_FLAG_ONLINE)
 	{
 		if(pPlayer->IsPvPFlagged())
-			*data << uint8(3);
-		else
-			*data << uint8(1);
+			member_flags |= 0x02;
+		if(pPlayer->getDeathState() == CORPSE)
+			member_flags |= 0x08;
+		else if(pPlayer->isDead())
+			member_flags |= 0x10;
+
+		*data << member_flags;
 	}
 
 	if(Flags & GROUP_UPDATE_FLAG_HEALTH)
@@ -825,54 +830,9 @@ void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribu
 
 	if(Flags & GROUP_UPDATE_TYPE_FULL_REQUEST_REPLY)
 	{
-		// Full update - we have to put some weird extra shit on the end :/
-        
-		/*
-		{SERVER} Packet: (0x02F2) CMSG_PET_UNLEARN PacketSize = 46
-
-		07 EB BB 69 - guid
-		F7 1B FC 7F - mask - 1111111111111000001101111110111 - full
-		// known parts
-		0000000000000000000000000000001 - online
-		0000000000000000000000000000010 - health
-		0000000000000000000000000000100 - max health
-		0000000000000000000000000010000 - power
-		0000000000000000000000000100000 - max power
-		0000000000000000000000001000000 - level
-		0000000000000000000000010000000 - zoneid
-		0000000000000000000000100000000 - level
-		0000000000000000000001000000000 - position
-
-		// unknown parts
-		1111111111111000001101111110111 - full
-		0000000000001000000000000000000 - GROUP_UPDATE_FLAG_UNK_5 = 262144,	// 0x00040000  uint64, uint16 for each uint64
-		1111111111111000000000000000000 - 
-
-		03 - online
-		7D 02 - health
-		0E 04 - max health
-		37 05 - power
-		BA|07 - max power
-		1B 00 - level
-		28 00 - zoneid
-		39 D8 B9 03 - position
-
-		-- this is what we append on the end of a full update.. no idea what is is
-		01 00 00 00
-		00 00 00 FF
-		4A 78 00 58
-		26 00 00 00
-		00 00 00 00
-		FF
-		-------------------------------------------------------------------
-
-		*/
-		*data << uint32(0x00000001);
-		*data << uint32(0xFF000000);
-		*data << uint32(0x5800784A);
-		*data << uint32(0x00000026);
-		*data << uint32(0x00000000);
-		*data << uint8(0xFF);
+		*data << uint64(0xFF00000000000000ULL);
+		*data << uint8(0);
+		*data << uint64(0xFF00000000000000ULL);
 	}
 
 	if(Distribute&&pPlayer->IsInWorld())

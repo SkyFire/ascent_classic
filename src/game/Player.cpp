@@ -9279,7 +9279,7 @@ void Player::EventGroupFullUpdate()
 	if(m_playerInfo->m_Group)
 	{
 		//m_playerInfo->m_Group->Update();
-		//m_playerInfo->m_Group->UpdateAllOutOfRangePlayersFor(this);
+		m_playerInfo->m_Group->UpdateAllOutOfRangePlayersFor(this);
 	}
 }
 
