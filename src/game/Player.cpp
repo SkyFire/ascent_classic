@@ -4739,9 +4739,9 @@ void Player::AddInRangeObject(Object* pObj)
 		uint32 ntime = getMSTime();
 
 		if (ntime > m_taxi_ride_time)
-			m_CurrentTaxiPath->SendMoveForTime(this, (Player*)pObj, ntime - m_taxi_ride_time);
+			m_CurrentTaxiPath->SendMoveForTime( this, static_cast< Player* >( pObj ), ntime - m_taxi_ride_time);
 		else
-			m_CurrentTaxiPath->SendMoveForTime(this, (Player*)pObj, m_taxi_ride_time - ntime);
+			m_CurrentTaxiPath->SendMoveForTime( this, static_cast< Player* >( pObj ), m_taxi_ride_time - ntime);
 	}
 
 	Unit::AddInRangeObject(pObj);
@@ -5890,18 +5890,18 @@ void Player::RemoveSpellsFromLine(uint32 skill_line)
 void Player::CalcStat(uint32 type)
 {
 	int32 res;
-	ASSERT(type < 5);
-	int32 pos=(BaseStats[type]*StatModPctPos[type])/100+FlatStatModPos[type];
-	int32 neg=(BaseStats[type]*StatModPctNeg[type])/100+FlatStatModNeg[type];
-	res=pos+BaseStats[type]-neg;
-	pos+=(res*((Player*)this)->TotalStatModPctPos[type])/100;
-	neg+=(res*((Player*)this)->TotalStatModPctNeg[type])/100;
-	res=pos+BaseStats[type]-neg;
-	SetUInt32Value(UNIT_FIELD_POSSTAT0+type,pos);
-	SetUInt32Value(UNIT_FIELD_NEGSTAT0+type,neg);
-	SetUInt32Value(UNIT_FIELD_STAT0+type,res>0?res:0);
-	if(type==1)
-	   CalcResistance(0);
+	ASSERT( type < 5 );
+	int32 pos = (BaseStats[type] * StatModPctPos[type] ) / 100 + FlatStatModPos[type];
+	int32 neg = (BaseStats[type] * StatModPctNeg[type] ) / 100 + FlatStatModNeg[type];
+	res = pos + BaseStats[type] - neg;
+	pos += ( res * static_cast< Player* >( this )->TotalStatModPctPos[type] ) / 100;
+	neg += ( res * static_cast< Player* >( this )->TotalStatModPctNeg[type] ) / 100;
+	res = pos + BaseStats[type] - neg;
+	SetUInt32Value( UNIT_FIELD_POSSTAT0 + type, pos );
+	SetUInt32Value( UNIT_FIELD_NEGSTAT0 + type, neg );
+	SetUInt32Value( UNIT_FIELD_STAT0 + type, res > 0 ?res : 0 );
+	if( type == 1 )
+	   CalcResistance( 0 );
 }
 
 void Player::RegenerateMana(bool is_interrupted)
@@ -7333,16 +7333,16 @@ void Player::BuildFlagUpdateForNonGroupSet(uint32 index, uint32 flag)
 		iter++;
         if(curObj->IsPlayer())
         {
-            Group *pGroup = static_cast<Player*>(curObj)->GetGroup();
-            if(pGroup && pGroup == GetGroup())
+            Group* pGroup = static_cast< Player* >( curObj )->GetGroup();
+            if( pGroup != NULL && pGroup == GetGroup())
             {
+				//TODO: huh? if this is unneeded change the if to the inverse and don't waste jmp space
             }
             else
             {
-                BuildFieldUpdatePacket(((Player*)curObj),index,flag);
+                BuildFieldUpdatePacket( static_cast< Player* >( curObj ), index, flag );
             }
         }
-       
     }
 }
 
@@ -8124,21 +8124,22 @@ void Player::CalcDamage()
 		r *= tmp;
 		SetFloatValue(UNIT_FIELD_MAXDAMAGE,r>0?r:0);
 
-		uint32 cr=0;
-		if(it)
+		uint32 cr = 0;
+		if( it )
 		{
-			if(((Player*)this)->m_wratings.size ())
+			if( static_cast< Player* >( this )->m_wratings.size() )
 			{
-				std::map<uint32, uint32>::iterator itr=m_wratings.find(it->GetProto()->SubClass);
-				if(itr!=m_wratings.end())
+				std::map<uint32, uint32>::iterator itr = m_wratings.find( it->GetProto()->SubClass );
+				if( itr != m_wratings.end() )
 					cr=itr->second;
 			}
 		}
 		SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_20,cr);
-///////////////////////MAIN HAND end
-		////////sec hand start
-		cr=0;
-		it = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+		/////////////// MAIN HAND END
+
+		/////////////// OFF HAND START
+		cr = 0;
+		it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
 		if(it)
 		{
 			if(!disarmed)

@@ -393,22 +393,22 @@ void Player::UpdateInrangeSetsBasedOnReputation()
 	Unit * pUnit;
 	bool rep_value;
 	bool enemy_current;
-	for(itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr)
+	for( itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr )
 	{
-		if((*itr)->GetTypeId() != TYPEID_UNIT)
+		if( (*itr)->GetTypeId() != TYPEID_UNIT )
 			continue;
 
-		pUnit = ((Unit*)*itr);
+		pUnit = static_cast< Unit* >( *itr );
 		if(pUnit->m_factionDBC->RepListId < 0)
 			continue;
 
-		rep_value = IsHostileBasedOnReputation(pUnit->m_factionDBC);
-		enemy_current = IsInRangeOppFactSet(pUnit);
+		rep_value = IsHostileBasedOnReputation( pUnit->m_factionDBC );
+		enemy_current = IsInRangeOppFactSet( pUnit );
 
-		if(rep_value && !enemy_current) // We are now enemies.
-			m_oppFactsInRange.insert(pUnit);
-		else if(!rep_value && enemy_current)
-			m_oppFactsInRange.erase(pUnit);
+		if( rep_value && !enemy_current ) // We are now enemies.
+			m_oppFactsInRange.insert( pUnit );
+		else if( !rep_value && enemy_current )
+			m_oppFactsInRange.erase( pUnit );
 	}
 }
 

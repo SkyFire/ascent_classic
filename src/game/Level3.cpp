@@ -857,7 +857,7 @@ bool ChatHandler::HandleParalyzeCommand(const char* args, WorldSession *m_sessio
 	}
 
 	BlueSystemMessage(m_session, "Rooting target.");
-	BlueSystemMessageToPlr(((Player*)plr), "You have been rooted by %s.", m_session->GetPlayer()->GetName());
+	BlueSystemMessageToPlr( static_cast< Player* >( plr ), "You have been rooted by %s.", m_session->GetPlayer()->GetName() );
 	WorldPacket data;
 	data.Initialize(SMSG_FORCE_MOVE_ROOT);
 	data << plr->GetNewGUID();
@@ -879,7 +879,7 @@ bool ChatHandler::HandleUnParalyzeCommand(const char* args, WorldSession *m_sess
 	}
 	
 	BlueSystemMessage(m_session, "Unrooting target.");
-	BlueSystemMessageToPlr(((Player*)plr), "You have been unrooted by %s.", m_session->GetPlayer()->GetName());
+	BlueSystemMessageToPlr( static_cast< Player* >( plr ), "You have been unrooted by %s.", m_session->GetPlayer()->GetName() );
 	WorldPacket data;
 	data.Initialize(SMSG_FORCE_MOVE_UNROOT);
 	data << plr->GetNewGUID();
@@ -1450,7 +1450,7 @@ bool ChatHandler::HandleCastAllCommand(const char* args, WorldSession* m_session
 		{
 			if(plr->GetMapMgr() != m_session->GetPlayer()->GetMapMgr())
 			{
-				sEventMgr.AddEvent(((Unit*)plr), &Unit::EventCastSpell, ((Unit*)plr), info, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+				sEventMgr.AddEvent( static_cast< Unit* >( plr ), &Unit::EventCastSpell, static_cast< Unit* >( plr ), info, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 			}
 			else
 			{
@@ -2468,7 +2468,7 @@ bool ChatHandler::HandleDispelAllCommand(const char * args, WorldSession * m_ses
 		{
 			if(plr->GetMapMgr() != m_session->GetPlayer()->GetMapMgr())
 			{
-				sEventMgr.AddEvent(((Unit*)plr), &Unit::DispelAll, pos?true:false, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+				sEventMgr.AddEvent( static_cast< Unit* >( plr ), &Unit::DispelAll, pos ? true : false, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 			}
 			else
 			{

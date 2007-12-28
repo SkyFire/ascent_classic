@@ -151,7 +151,7 @@ void MapMgr::PushObject(Object *obj)
 	{
 		if(obj->IsPlayer())
 		{
-			Player * plr = ((Player*)obj);
+			Player * plr = static_cast< Player* >( obj );
 			if(plr->GetBindMapId() != GetMapId())
 			{
 				plr->SafeTeleport(plr->GetBindMapId(),0,plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
@@ -187,7 +187,7 @@ void MapMgr::PushObject(Object *obj)
 	{
 		if(obj->IsPlayer())
 		{
-			Player * plr = ((Player*)obj);
+			Player * plr = static_cast< Player* >( obj );
 			if(plr->GetBindMapId() != GetMapId())
 			{
 				plr->SafeTeleport(plr->GetBindMapId(),0,plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
@@ -232,7 +232,7 @@ void MapMgr::PushObject(Object *obj)
 	Player *plObj;
 
 	if(obj->GetTypeId() == TYPEID_PLAYER)
-		plObj = ((Player*)obj);
+		plObj = static_cast< Player* >( obj );
 	else
 		plObj = NULL;
 
@@ -374,9 +374,9 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	if(obj->Active)
 		obj->Deactivate(this);
 
-	_updates.erase(obj);
+	_updates.erase( obj );
 	obj->ClearUpdateMask();
-	Player * plObj = (obj->GetTypeId() == TYPEID_PLAYER) ? ((Player*)obj) : 0;
+	Player* plObj = (obj->GetTypeId() == TYPEID_PLAYER) ? static_cast< Player* >( obj ) : 0;
 
 	///////////////////////////////////////
 	// Remove object from all needed places
@@ -458,21 +458,21 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	// Clear any updates pending
 	if(obj->GetTypeId() == TYPEID_PLAYER)
 	{
-		_processQueue.erase(((Player*)obj));
-		((Player*)obj)->ClearAllPendingUpdates();
+		_processQueue.erase( static_cast< Player* >( obj ) );
+		static_cast< Player* >( obj )->ClearAllPendingUpdates();
 	}
 	
 	// Remove object from all objects 'seeing' him
 	for (Object::InRangeSet::iterator iter = obj->GetInRangeSetBegin();
 		iter != obj->GetInRangeSetEnd(); ++iter)
 	{
-		if((*iter))
+		if( (*iter) )
 		{
-			if((*iter)->GetTypeId() == TYPEID_PLAYER) {
-				if (((Player*)(*iter))->IsVisible(obj) && static_cast<Player*>(*iter)->m_TransporterGUID != obj->GetGUID())
-					((Player*)*iter)->PushOutOfRange(obj->GetNewGUID());
+			if( (*iter)->GetTypeId() == TYPEID_PLAYER )
+			{
+				if( static_cast< Player* >( *iter )->IsVisible( obj ) && static_cast<Player*>( *iter )->m_TransporterGUID != obj->GetGUID() )
+					static_cast< Player* >( *iter )->PushOutOfRange(obj->GetNewGUID());
 			}
-
 			(*iter)->RemoveInRangeObject(obj);
 		}
 	}
@@ -495,7 +495,7 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 			uint32 y = GetPosY(obj->GetPositionY());
 			UpdateCellActivity(x, y, 2);
 		}
-		m_PlayerStorage.erase(((Player*)obj)->GetGUIDLow());
+		m_PlayerStorage.erase( static_cast< Player* >( obj )->GetGUIDLow() );
 	}
 
 	// Remove the session from our set if it is a player.
@@ -522,20 +522,23 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	}
 }
 
-void MapMgr::ChangeObjectLocation(Object *obj)
+void MapMgr::ChangeObjectLocation( Object *obj )
 {
 	// Items and containers are of no interest for us
-	if(obj->GetTypeId() == TYPEID_ITEM || obj->GetTypeId() == TYPEID_CONTAINER || obj->GetMapMgr() != this)
+	if( obj->GetTypeId() == TYPEID_ITEM || obj->GetTypeId() == TYPEID_CONTAINER || obj->GetMapMgr() != this )
 	{
 		return;
 	}
 
-	Player *plObj;
+	Player* plObj;
 	ByteBuffer * buf = 0;
 
-	if(obj->GetTypeId() == TYPEID_PLAYER) {
-		plObj = ((Player*)obj);
-	} else {
+	if( obj->GetTypeId() == TYPEID_PLAYER )
+	{
+		plObj = static_cast< Player* >( obj );
+	}
+	else
+	{
 		plObj = NULL;
 	}
 
@@ -622,24 +625,24 @@ void MapMgr::ChangeObjectLocation(Object *obj)
 		{
 			curObj = *iter;
 			iter2 = iter++;
-			if(curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == ((Player*)curObj)->m_TransporterGUID)
-				fRange = 0.0f;			 // unlimited distance for people on same boat
-			else if(curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER)
-				fRange = 0.0f;			  // unlimited distance for transporters (only up to 2 cells +/- anyway.)
+			if( curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID )
+				fRange = 0.0f; // unlimited distance for people on same boat
+			else if( curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER )
+				fRange = 0.0f; // unlimited distance for transporters (only up to 2 cells +/- anyway.)
 			else
-				fRange = m_UpdateDistance;	  // normal distance
+				fRange = m_UpdateDistance; // normal distance
 
-			if (fRange > 0.0f && curObj->GetDistance2dSq(obj) > fRange)
+			if( fRange > 0.0f && curObj->GetDistance2dSq(obj) > fRange )
 			{
 				if( plObj )
 					plObj->RemoveIfVisible(curObj);
 
 				if( curObj->IsPlayer() )
-					((Player*)curObj)->RemoveIfVisible(obj);
+					static_cast< Player* >( curObj )->RemoveIfVisible(obj);
 
 				curObj->RemoveInRangeObject(obj);
 
-				if(obj->GetMapMgr() != this)
+				if( obj->GetMapMgr() != this )
 				{
 					/* Something removed us. */
 					return;
@@ -663,7 +666,7 @@ void MapMgr::ChangeObjectLocation(Object *obj)
 	{
 		if(obj->IsPlayer())
 		{
-			Player * plr = ((Player*)obj);
+			Player* plr = static_cast< Player* >( obj );
 			if(plr->GetBindMapId() != GetMapId())
 			{
 				plr->SafeTeleport(plr->GetBindMapId(),0,plr->GetBindPositionX(),plr->GetBindPositionY(),plr->GetBindPositionZ(),0);
@@ -777,7 +780,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 		if( curObj == NULL )
 			continue;
 
-		if( curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == ((Player*)curObj)->m_TransporterGUID )
+		if( curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID )
 			fRange = 0.0f; // unlimited distance for people on same boat
 		else if( curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER )
 			fRange = 0.0f; // unlimited distance for transporters (only up to 2 cells +/- anyway.)
@@ -823,7 +826,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 				// Check visiblility
 				if( curObj->IsPlayer() )
 				{
-					plObj2 = ((Player*)curObj);
+					plObj2 = static_cast< Player* >( curObj );
 					cansee = plObj2->CanSee(obj);
 					isvisible = plObj2->GetVisibility(obj, &itr);
 					if(!cansee && isvisible)
@@ -841,21 +844,21 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 					}
 				}
 
-				if(plObj)
+				if( plObj )
 				{
-					cansee = plObj->CanSee(curObj);
-					isvisible = plObj->GetVisibility(curObj, &itr);
+					cansee = plObj->CanSee( curObj );
+					isvisible = plObj->GetVisibility( curObj, &itr );
 					if(!cansee && isvisible)
 					{
-						plObj->PushOutOfRange(curObj->GetNewGUID());
-						plObj->RemoveVisibleObject(itr);
+						plObj->PushOutOfRange( curObj->GetNewGUID() );
+						plObj->RemoveVisibleObject( itr );
 					}
 					else if(cansee && !isvisible)
 					{
 						CHECK_BUF;
-						count = curObj->BuildCreateUpdateBlockForPlayer(*buf, plObj);
-						plObj->PushCreationData(*buf, count);
-						plObj->AddVisibleObject(curObj);
+						count = curObj->BuildCreateUpdateBlockForPlayer( *buf, plObj );
+						plObj->PushCreationData( *buf, count );
+						plObj->AddVisibleObject( curObj );
 						(*buf)->clear();
 					}
 				}
@@ -1014,37 +1017,41 @@ void MapMgr::_UpdateObjects()
 		if(pObj->GetTypeId() == TYPEID_ITEM || pObj->GetTypeId() == TYPEID_CONTAINER)
 		{
 			// our update is only sent to the owner here.
-			pOwner = static_cast<Item*>(pObj)->GetOwner();
-			if(pOwner != NULL)
+			pOwner = static_cast< Item* >(pObj)->GetOwner();
+			if( pOwner != NULL )
 			{
-				count = static_cast<Item*>(pObj)->BuildValuesUpdateBlockForPlayer(&update, pOwner);
+				count = static_cast< Item* >( pObj )->BuildValuesUpdateBlockForPlayer( &update, pOwner );
 				// send update to owner
-				if(count)
+				if( count )
 				{
-					pOwner->PushUpdateData(&update, count);
+					pOwner->PushUpdateData( &update, count );
 					update.clear();
 				}
 			}
-		} else {
-			if(pObj->IsInWorld())
+		}
+		else
+		{
+			if( pObj->IsInWorld() )
 			{
 				// players have to receive their own updates ;)
-				if(pObj->GetTypeId() == TYPEID_PLAYER)
+				if( pObj->GetTypeId() == TYPEID_PLAYER )
 				{
 					// need to be different! ;)
-					count = pObj->BuildValuesUpdateBlockForPlayer(&update, static_cast<Player*>(pObj));
-					if(count)
+					count = pObj->BuildValuesUpdateBlockForPlayer( &update, static_cast< Player* >( pObj ) );
+					if( count )
 					{
-						((Player*)pObj)->PushUpdateData(&update, count);
+						static_cast< Player* >( pObj )->PushUpdateData( &update, count );
 						update.clear();
 					}
 				}
 
-				if(pObj->IsUnit() && pObj->HasUpdateField(UNIT_FIELD_HEALTH))
-					((Unit*)pObj)->EventHealthChangeSinceLastUpdate();
+				if( pObj->IsUnit() && pObj->HasUpdateField( UNIT_FIELD_HEALTH ) )
+					static_cast< Unit* >( pObj )->EventHealthChangeSinceLastUpdate();
+
 				// build the update
-				count = pObj->BuildValuesUpdateBlockForPlayer(&update, ((Player*)0));
-				if(count)
+				count = pObj->BuildValuesUpdateBlockForPlayer( &update, static_cast< Player* >( NULL ) );
+
+				if( count )
 				{
 					it_start = pObj->GetInRangePlayerSetBegin();
 					it_end = pObj->GetInRangePlayerSetEnd();
@@ -1053,8 +1060,8 @@ void MapMgr::_UpdateObjects()
 						lplr = *itr;
 						++itr;
 						// Make sure that the target player can see us.
-						if(lplr->GetTypeId() == TYPEID_PLAYER && lplr->IsVisible(pObj))
-							lplr->PushUpdateData(&update, count);
+						if( lplr->GetTypeId() == TYPEID_PLAYER && lplr->IsVisible( pObj ) )
+							lplr->PushUpdateData( &update, count );
 					}
 					update.clear();
 				}
@@ -1497,28 +1504,28 @@ void MapMgr::_PerformObjectDuties()
 	{
 		PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
 		Player * ptr;
-		for(; itr != m_PlayerStorage.end();)
+		for(; itr != m_PlayerStorage.end(); )
 		{
-			ptr = ((Player*)(itr->second));
+			ptr = static_cast< Player* >( (itr->second) );
 			++itr;
-			ptr->Update(difftime);
+			ptr->Update( difftime );
 		}
 
 		lastUnitUpdate = mstime;
 	}
 
 	// Update gameobjects (not on every loop, however)
-	if(mLoopCounter % 2)
+	if( mLoopCounter % 2 )
 	{
 		difftime = mstime - lastGameobjectUpdate;
 
 		GameObjectSet::iterator itr = activeGameObjects.begin();
 		GameObject * ptr;
-		for(; itr != activeGameObjects.end();)
+		for(; itr != activeGameObjects.end(); )
 		{
 			ptr = *itr;
 			++itr;
-			ptr->Update(difftime);
+			ptr->Update( difftime );
 		}
 
 		lastGameobjectUpdate = mstime;

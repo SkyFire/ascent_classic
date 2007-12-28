@@ -642,24 +642,24 @@ void Group::MovePlayer(PlayerInfo *info, uint8 subgroup)
 	m_groupLock.Release();
 }
 
-void Group::SendNullUpdate(Player *pPlayer)
+void Group::SendNullUpdate( Player *pPlayer )
 {
 	// this packet is 24 bytes long.		// AS OF 2.1.0
 	uint8 buffer[24];
 	memset(buffer, 0, 24);
-	pPlayer->GetSession()->OutPacket(SMSG_GROUP_LIST, 24, buffer);
+	pPlayer->GetSession()->OutPacket( SMSG_GROUP_LIST, 24, buffer );
 }
 
 // player is object class becouse its called from unit class
-void Group::SendPartyKillLog(Object * player, Object * Unit)
+void Group::SendPartyKillLog( Object * player, Object * Unit )
 {
-	if (!player || !Unit || !HasMember(((Player*)player)))
+	if( !player || !Unit || !HasMember( static_cast< Player* >( player ) ) )
 		return;
 
-	WorldPacket data(SMSG_PARTYKILLLOG, 16);
+	WorldPacket data( SMSG_PARTYKILLLOG, 16 );
 	data << player->GetGUID();
 	data << Unit->GetGUID();
-	SendPacketToAll(&data);
+	SendPacketToAll( &data );
 }
 
 void Group::LoadFromDB(Field *fields)

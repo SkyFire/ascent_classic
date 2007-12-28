@@ -345,7 +345,7 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 	switch(target->GetTypeId())
 	{
 	case TYPEID_PLAYER:
-		sGMLog.writefromsession(m_session, "used kill command on PLAYER %s", ((Player*)target)->GetName());
+		sGMLog.writefromsession(m_session, "used kill command on PLAYER %s", static_cast< Player* >( target )->GetName() );
 		break;
 
 	case TYPEID_UNIT:

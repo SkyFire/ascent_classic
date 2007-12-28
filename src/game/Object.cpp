@@ -718,7 +718,7 @@ WorldPacket * Object::BuildTeleportAckMsg(const LocationVector & v)
 {
 	///////////////////////////////////////
 	//Update player on the client with TELEPORT_ACK
-	((Player*)(this))->SetPlayerStatus(TRANSFER_PENDING);
+	static_cast< Player* >( this )->SetPlayerStatus( TRANSFER_PENDING );
 
 	WorldPacket * data = new WorldPacket(MSG_MOVE_TELEPORT_ACK, 80);
 	*data << GetNewGUID();
@@ -785,10 +785,9 @@ bool Object::SetPosition( float newX, float newY, float newZ, float newOrientati
 		m_lastMapUpdatePosition.ChangeCoords(newX,newY,newZ,newOrientation);
 		m_mapMgr->ChangeObjectLocation(this);
 
-		if(m_objectTypeId == TYPEID_PLAYER && ((Player*)this)->GetGroup() &&
-			((Player*)this)->m_last_group_position.Distance2DSq(m_position) > 25.0f)			// distance of 5.0
+		if( m_objectTypeId == TYPEID_PLAYER && static_cast< Player* >( this )->GetGroup() && static_cast< Player* >( this )->m_last_group_position.Distance2DSq(m_position) > 25.0f ) // distance of 5.0
 		{
-            ((Player*)this)->GetGroup()->HandlePartialChange(PARTY_UPDATE_FLAG_POSITION, ((Player*)this));
+            static_cast< Player* >( this )->GetGroup()->HandlePartialChange( PARTY_UPDATE_FLAG_POSITION, static_cast< Player* >( this ) );
 		}	
 	}
 
@@ -813,15 +812,17 @@ void Object::OutPacketToSet(uint16 Opcode, uint16 Len, const void * Data, bool s
 
 	std::set<Player*>::iterator itr = m_inRangePlayers.begin();
 	std::set<Player*>::iterator it_end = m_inRangePlayers.end();
-	int gm = (m_objectTypeId == TYPEID_PLAYER ? ((Player*)this)->m_isGmInvisible : 0);
+	int gm = ( m_objectTypeId == TYPEID_PLAYER ? static_cast< Player* >( this )->m_isGmInvisible : 0 );
 	for(; itr != it_end; ++itr)
 	{
 		ASSERT((*itr)->GetSession());
-		if(gm)
+		if( gm )
 		{
-			if((*itr)->GetSession()->GetPermissionCount() > 0)
+			if( (*itr)->GetSession()->GetPermissionCount() > 0 )
 				(*itr)->GetSession()->OutPacket(Opcode, Len, Data);
-		} else {
+		}
+		else
+		{
 			(*itr)->GetSession()->OutPacket(Opcode, Len, Data);
 		}
 	}
@@ -839,7 +840,7 @@ void Object::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 
 	std::set<Player*>::iterator itr = m_inRangePlayers.begin();
 	std::set<Player*>::iterator it_end = m_inRangePlayers.end();
-	bool gminvis = (m_objectTypeId == TYPEID_PLAYER ? ((Player*)this)->m_isGmInvisible : false);
+	bool gminvis = (m_objectTypeId == TYPEID_PLAYER ? static_cast< Player* >( this )->m_isGmInvisible : false);
 	//Zehamster: Splitting into if/else allows us to avoid testing "gminvis==true" at each loop...
 	//		   saving cpu cycles. Chat messages will be sent to everybody even if player is invisible.
 	if(myteam_only)
@@ -1029,9 +1030,9 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 	{
 		if(IsInWorld())
 		{
-			Group * pGroup = ((Player*)this)->GetGroup();
-			if(pGroup)
-				pGroup->HandleUpdateFieldChange(index, ((Player*)this));
+			Group* pGroup = static_cast< Player* >( this )->GetGroup();
+			if( pGroup != NULL )
+				pGroup->HandleUpdateFieldChange( index, static_cast< Player* >( this ) );
 		}
 
 #ifdef OPTIMIZED_PLAYER_SAVING
@@ -1420,10 +1421,10 @@ bool Object::isInRange(Object* target, float range)
 
 bool Object::IsPet()
 {
-	if(this->GetTypeId()!=TYPEID_UNIT)
+	if( this->GetTypeId() != TYPEID_UNIT )
 		return false;
 
-	if(((Unit*)this)->m_isPet && m_uint32Values[UNIT_FIELD_CREATEDBY] != 0 && m_uint32Values[UNIT_FIELD_SUMMONEDBY] != 0)
+	if( static_cast< Unit* >( this )->m_isPet && m_uint32Values[UNIT_FIELD_CREATEDBY] != 0 && m_uint32Values[UNIT_FIELD_SUMMONEDBY] != 0 )
 		return true;
 
 	return false;
@@ -1502,7 +1503,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	if(pVictim->IsPlayer() && IsPlayer() && static_cast<Player*>(pVictim)->DuelingWith != static_cast<Player*>(this))
 	{
 		if( isHostile( this, pVictim ) )
-			((Player*)this)->SetPvPFlag();
+			static_cast< Player* >( this )->SetPvPFlag();
 	}
 	//If our pet attacks  - flag us.
 	if (this->IsPet())
@@ -1597,10 +1598,10 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			}
 		}		
 
-		if(pVictim->IsUnit() && pVictim != this)
+		if( pVictim->IsUnit() && pVictim != this )
 		{
 			// Set our attack target to the victim.
-			((Unit*)this)->CombatStatus.OnDamageDealt(pVictim);
+			static_cast< Unit* >( this )->CombatStatus.OnDamageDealt( pVictim );
 		}
 	}
 
@@ -1608,7 +1609,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
         uint32 val;
 
         if(pVictim->GetPowerType() == POWER_TYPE_RAGE 
-//			&& !spellId //zack : general opinion is that spells should generate rage. I share the feeling
+			//&& !spellId //zack : general opinion is that spells should generate rage. I share the feeling
 			&& pVictim != this
 			&& pVictim->IsPlayer())
 	  {
@@ -1632,9 +1633,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	if(pVictim != this)
 	{
 		if(IsPlayer())
-			plr = ((Player*)this);
+			plr = static_cast< Player* >( this );
 		else if(IsPet())
-			plr = ((Pet*)this)->GetPetOwner();
+			plr = static_cast< Pet* >( this )->GetPetOwner();
 
 		if(plr && plr->m_bg)
 		{
@@ -1706,40 +1707,38 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		}
 #endif
 		//warlock - seed of corruption
-		pVictim->HandleProc(PROC_ON_DIE,pVictim,NULL);
+		pVictim->HandleProc( PROC_ON_DIE, pVictim, NULL );
 		pVictim->m_procCounter = 0;
 
 		/* victim died! */
-		if(pVictim->IsPlayer())
-			((Player*)pVictim)->KillPlayer();
+		if( pVictim->IsPlayer() )
+			static_cast< Player* >( pVictim )->KillPlayer();
 		else
 		{
-			pVictim->setDeathState(JUST_DIED);
-			pVictim->GetAIInterface()->HandleEvent(EVENT_LEAVECOMBAT, ((Unit*)this), 0);
+			pVictim->setDeathState( JUST_DIED );
+			pVictim->GetAIInterface()->HandleEvent( EVENT_LEAVECOMBAT, static_cast< Unit* >( this ), 0);
 		}
 
-		if(pVictim->IsPlayer() && (!IsPlayer() || pVictim == this))
+		if( pVictim->IsPlayer() && (!IsPlayer() || pVictim == this ) )
 		{
-			((Player*)pVictim)->DeathDurabilityLoss(0.10);
+			static_cast< Player* >( pVictim )->DeathDurabilityLoss(0.10);
 		}
 
 		/* Zone Under Attack */
         MapInfo * pMapInfo = WorldMapInfoStorage.LookupEntry(GetMapId());
-        if(pMapInfo && pMapInfo->type == INSTANCE_NULL && !pVictim->IsPlayer() && !pVictim->IsPet() 
-            && (IsPlayer() || IsPet()))
+        if( pMapInfo && pMapInfo->type == INSTANCE_NULL && !pVictim->IsPlayer() && !pVictim->IsPet() && ( IsPlayer() || IsPet() ) )
 		{
 			// Only NPCs that bear the PvP flag can be truly representing their faction.
-			if(((Creature*)pVictim)->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP))
+			if( ((Creature*)pVictim)->HasFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PVP ) )
 			{
 				Player * pAttacker = NULL;
-				if(IsPet() && GetGUIDHigh() == HIGHGUID_PET)
-					pAttacker = ((Pet*)this)->GetPetOwner();
+				if( IsPet() && GetGUIDHigh() == HIGHGUID_PET )
+					pAttacker = static_cast< Pet* >( this )->GetPetOwner();
 				else if(IsPlayer())
-					pAttacker = ((Player*)this);
+					pAttacker = static_cast< Player* >( this );
 
-				if(pAttacker)
+				if( pAttacker != NULL)
                 {
-
 				    uint8 teamId = (uint8)pAttacker->GetTeam();
 				    if(teamId == 0) // Swap it.
 					    teamId = 1;
@@ -1786,32 +1785,31 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		pVictim->DropAurasOnDeath();
 
 		/* Stop victim from attacking */
-		if(this->IsUnit())
-			pVictim->smsg_AttackStop(((Unit*)this));
+		if( this->IsUnit() )
+			pVictim->smsg_AttackStop( static_cast< Unit* >( this ) );
 
-		if(pVictim->GetTypeId() == TYPEID_PLAYER)
-			((Player*)pVictim)->EventAttackStop();
+		if( pVictim->GetTypeId() == TYPEID_PLAYER )
+			static_cast< Player* >( pVictim )->EventAttackStop();
 
 		/* Set victim health to 0 */
 		pVictim->SetUInt32Value(UNIT_FIELD_HEALTH, 0);
 		if(pVictim->IsPlayer())
 		{
-			uint32 self_res_spell = ((Player*)pVictim)->SoulStone;
-			((Player*)pVictim)->SoulStone = ((Player*)pVictim)->SoulStoneReceiver = 0;
+			uint32 self_res_spell = static_cast< Player* >( pVictim )->SoulStone;
+			static_cast< Player* >( pVictim )->SoulStone = static_cast< Player* >( pVictim )->SoulStoneReceiver = 0;
 
-			if(!self_res_spell && ((Player*)pVictim)->bReincarnation)
+			if( !self_res_spell && static_cast< Player* >( pVictim )->bReincarnation )
 			{
-				SpellEntry *m_reincarnSpellInfo = dbcSpell.LookupEntry(20608);
-				if(((Player*)pVictim)->CanCastDueToCooldown(m_reincarnSpellInfo))
+				SpellEntry* m_reincarnSpellInfo = dbcSpell.LookupEntry( 20608 );
+				if( static_cast< Player* >( pVictim )->CanCastDueToCooldown( m_reincarnSpellInfo ) )
 				{
-					uint32 ankh_count = ((Player*)pVictim)->GetItemInterface()->GetItemCount(17030);
-					if(ankh_count)
+					uint32 ankh_count = static_cast< Player* >( pVictim )->GetItemInterface()->GetItemCount( 17030 );
+					if( ankh_count )
 						self_res_spell = 21169;
 				}
 			}
-			pVictim->SetUInt32Value(PLAYER_SELF_RES_SPELL, self_res_spell);
-
-			pVictim->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0);
+			pVictim->SetUInt32Value( PLAYER_SELF_RES_SPELL, self_res_spell );
+			pVictim->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0 );
 			//pVictim->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 		}
 
@@ -1826,32 +1824,32 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				((Player*)this)->GetGroup()->SendPartyKillLog(this,pVictim);*/
 
 		/* Stop Unit from attacking */
-		if(this->IsPlayer())
-			((Player*)this)->EventAttackStop();
+		if( this->IsPlayer() )
+			static_cast< Player* >( this )->EventAttackStop();
 	   
-		if(this->IsUnit())
+		if( this->IsUnit() )
 		{
-			CALL_SCRIPT_EVENT(this, OnTargetDied)(pVictim);
-			LUA_ON_UNIT_EVENT(((Unit*)this),CREATURE_EVENT_ON_KILLED_TARGET,pVictim,damage);
+			CALL_SCRIPT_EVENT( this, OnTargetDied )( pVictim );
+			LUA_ON_UNIT_EVENT( static_cast< Unit* >( this ), CREATURE_EVENT_ON_KILLED_TARGET, pVictim, damage );
 
-			((Unit*)this)->smsg_AttackStop(pVictim);
+			static_cast< Unit* >( this )->smsg_AttackStop( pVictim );
 		
 			/* Tell Unit that it's target has Died */
-			((Unit*)this)->addStateFlag(UF_TARGET_DIED);
+			static_cast< Unit* >( this )->addStateFlag( UF_TARGET_DIED );
 
 			// We will no longer be attacking this target, as it's dead.
 			//static_cast<Unit*>(this)->setAttackTarget(NULL);
 		}
 		//so now we are completely dead
 		//lets see if we have spirit of redemption
-		if(pVictim->IsPlayer())
+		if( pVictim->IsPlayer() )
 		{
-			if(((Player*)pVictim)->HasSpell(20711)) //check for spirit of Redemption
+			if( static_cast< Player* >( pVictim)->HasSpell( 20711 ) ) //check for spirit of Redemption
 			{
-				SpellEntry * sorInfo = dbcSpell.LookupEntry(27827);
-				if(sorInfo)
+				SpellEntry* sorInfo = dbcSpell.LookupEntry(27827);
+				if( sorInfo != NULL )
 				{
-					Spell *sor = new Spell(pVictim, sorInfo, true, NULL);
+					Spell *sor = new Spell( pVictim, sorInfo, true, NULL );
 					SpellCastTargets targets;
 					targets.m_unitTarget = pVictim->GetGUID();
 					sor->prepare(&targets);
@@ -1859,41 +1857,42 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			}
 		}
 		/* -------------------------------- HONOR + BATTLEGROUND CHECKS ------------------------ */
-		plr = 0;
-		if(IsPlayer())
-			plr = ((Player*)this);
+		plr = NULL;
+		if( IsPlayer() )
+			plr = static_cast< Player* >( this );
 		else if(IsPet())
-			plr = ((Pet*)this)->GetPetOwner();
+			plr = static_cast< Pet* >( this )->GetPetOwner();
 		
-		if(plr)
+		if( plr != NULL)
 		{
-			if(plr->m_bg != 0)
-				plr->m_bg->HookOnPlayerKill(plr, pVictim);
+			if( plr->m_bg != 0 )
+				plr->m_bg->HookOnPlayerKill( plr, pVictim );
 
-			if(pVictim->IsPlayer())
+			if( pVictim->IsPlayer() )
 			{
-				sHookInterface.OnKillPlayer(plr, ((Player*)pVictim));
+				sHookInterface.OnKillPlayer( plr, static_cast< Player* >( pVictim ) );
 				if(plr->getLevel() > pVictim->getLevel())
 				{
 					unsigned int diff = plr->getLevel() - pVictim->getLevel();
-					if(diff <= 8)
+					if( diff <= 8 )
 					{
 						HonorHandler::OnPlayerKilledUnit(plr, pVictim);
-						SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+						SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 					}
-					else RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+					else
+						RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 				}
 				else
 				{
-					HonorHandler::OnPlayerKilledUnit(plr, pVictim);
-					SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+					HonorHandler::OnPlayerKilledUnit( plr, pVictim );
+					SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 				}
 			}
 			else
 			{
 				// REPUTATION
-				plr->Reputation_OnKilledUnit(pVictim, false);
-				RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_LASTKILLWITHHONOR);
+				plr->Reputation_OnKilledUnit( pVictim, false );
+				RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
 			}
 		}
 		/* -------------------------------- HONOR + BATTLEGROUND CHECKS END------------------------ */
@@ -2011,87 +2010,91 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				pVictim->GetUInt64Value(OBJECT_FIELD_CREATED_BY) == 0 &&
 				!pVictim->IsPet())
 			{
+				// TODO: lots of casts are bad make a temp member pointer to use for batches like this
+				// that way no local loadhitstore and its just one assignment 
+
 				// Is this player part of a group
-				if(((Player*)this)->InGroup())
+				if( static_cast< Player* >( this)->InGroup() )
 				{
 					//Calc Group XP
-					((Player*)this)->GiveGroupXP(pVictim,(Player*)this);
+					static_cast< Player* >( this )->GiveGroupXP( pVictim, static_cast< Player* >( this ) );
 				}
 				else
 				{
-					uint32 xp = CalculateXpToGive(pVictim, (Unit*)this);
-					if(xp)
-						((Player*)this)->GiveXP(xp, victimGuid, true);
+					uint32 xp = CalculateXpToGive( pVictim, static_cast< Unit* >( this ) );
+					if( xp )
+						static_cast< Player* >( this )->GiveXP( xp, victimGuid, true );
 
-					if(((Player*)this)->GetSummon() && ((Player*)this)->GetSummon()->GetUInt32Value(UNIT_CREATED_BY_SPELL) == 0)
+					if( static_cast< Player* >( this )->GetSummon() && static_cast< Player* >( this )->GetSummon()->GetUInt32Value( UNIT_CREATED_BY_SPELL ) == 0 )
 					{
-						xp = CalculateXpToGive(pVictim, ((Player*)this)->GetSummon());
-						if(xp)
-							((Player*)this)->GetSummon()->GiveXP(xp);
+						xp = CalculateXpToGive( pVictim, static_cast< Player* >( this )->GetSummon() );
+						if( xp )
+							static_cast< Player* >( this )->GetSummon()->GiveXP( xp );
 					}
 				}
 
-				if (pVictim->GetTypeId() != TYPEID_PLAYER)
-					sQuestMgr.OnPlayerKill((Player*)this, (Creature*)pVictim);
+				if( pVictim->GetTypeId() != TYPEID_PLAYER )
+					sQuestMgr.OnPlayerKill( static_cast< Player* >( this ), static_cast< Creature* >( pVictim ) );
 			}
 			else /* is Creature or GameObject*/
 			{
 				/* ----------------------------- PET XP HANDLING -------------- */
-				if(IsPet() && !pVictim->IsPet())
+				if( IsPet() && !pVictim->IsPet() )
 				{
-					Player *petOwner = static_cast<Pet*>(this)->GetPetOwner();
-					if(petOwner && petOwner->GetTypeId() == TYPEID_PLAYER)
+					Player* petOwner = static_cast< Pet* >( this )->GetPetOwner();
+					if( petOwner && petOwner->GetTypeId() == TYPEID_PLAYER )
 					{
-						if(petOwner->InGroup())
+						if( petOwner->InGroup() )
 						{
 							//Calc Group XP
-							((Unit*)this)->GiveGroupXP(pVictim,petOwner);
+							static_cast< Unit* >( this )->GiveGroupXP( pVictim, petOwner );
 						}
 						else
 						{
-							uint32 xp = CalculateXpToGive(pVictim, petOwner);
-							petOwner->GiveXP(xp, victimGuid, true);
+							uint32 xp = CalculateXpToGive( pVictim, petOwner );
+							petOwner->GiveXP( xp, victimGuid, true );
 						}
 					}
-					if (pVictim->GetTypeId() != TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_UNIT)
-						sQuestMgr.OnPlayerKill(petOwner, (Creature*)pVictim);
+					if( pVictim->GetTypeId() != TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_UNIT )
+						sQuestMgr.OnPlayerKill( petOwner, static_cast< Creature* >( pVictim ) );
 				}
 				/* ----------------------------- PET XP HANDLING END-------------- */
 
 				/* ----------------------------- PET DEATH HANDLING -------------- */
 				if(pVictim->IsPet())
 				{
-					static_cast<Pet*>(pVictim)->DelayedRemove(false, true);
+					static_cast< Pet* >( pVictim )->DelayedRemove( false, true );
 					//remove owner warlock soul link from caster
-					Player *owner=static_cast<Pet*>(pVictim)->GetPetOwner();
-					if(owner)
-						owner->RemoveAura((uint32)19028);
+					Player* owner = static_cast<Pet*>( pVictim )->GetPetOwner();
+					if( owner != NULL )
+						owner->RemoveAura( (uint32)19028 );
 				}
 				/* ----------------------------- PET DEATH HANDLING END -------------- */
-				else if(pVictim->GetUInt64Value(UNIT_FIELD_CHARMEDBY))
+				else if( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) )
 				{
 					//remove owner warlock soul link from caster
-					Unit *owner=pVictim->GetMapMgr()->GetUnit(pVictim->GetUInt64Value(UNIT_FIELD_CHARMEDBY));
-					if(owner)
-						owner->RemoveAura((uint32)19028);
+					Unit *owner=pVictim->GetMapMgr()->GetUnit( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) );
+					if( owner != NULL )
+						owner->RemoveAura( (uint32)19028 );
 				}
 			}
 		}
-		else if (pVictim->GetTypeId() == TYPEID_PLAYER)
+		else if( pVictim->GetTypeId() == TYPEID_PLAYER )
 		{
 			
 			/* -------------------- RESET BREATH STATE ON DEATH -------------- */
-			((Player*)pVictim)->m_UnderwaterTime = 0;
-			((Player*)pVictim)->m_UnderwaterState = 0;
-			((Player*)pVictim)->m_BreathDamageTimer = 0;
-			((Player*)pVictim)->m_SwimmingTime = 0;
+			static_cast< Player* >( pVictim )->m_UnderwaterTime = 0;
+			static_cast< Player* >( pVictim )->m_UnderwaterState = 0;
+			static_cast< Player* >( pVictim )->m_BreathDamageTimer = 0;
+			static_cast< Player* >( pVictim )->m_SwimmingTime = 0;
+
 			/* -------------------- KILL PET WHEN PLAYER DIES ---------------*/
-			if(static_cast<Player*>(pVictim)->GetSummon() != NULL)
+			if( static_cast< Player* >( pVictim )->GetSummon() != NULL )
 			{
-				if(pVictim->GetUInt32Value(UNIT_CREATED_BY_SPELL) > 0)
-					static_cast<Player*>(pVictim)->GetSummon()->Dismiss(true);
+				if( pVictim->GetUInt32Value( UNIT_CREATED_BY_SPELL ) > 0 )
+					static_cast< Player* >( pVictim )->GetSummon()->Dismiss( true );
 				else
-					static_cast<Player*>(pVictim)->GetSummon()->Remove(true, true, true);
+					static_cast< Player* >( pVictim )->GetSummon()->Remove( true, true, true );
 			}
 			/* -------------------- KILL PET WHEN PLAYER DIES END---------------*/
 		}
@@ -2102,16 +2105,16 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if(pVictim != this /* && updateskill */)
 		{
 			// Send AI Reaction UNIT vs UNIT
-			if (GetTypeId() ==TYPEID_UNIT)
+			if( GetTypeId() ==TYPEID_UNIT )
 			{
-				((Unit*)this)->GetAIInterface()->AttackReaction(pVictim, damage, spellId);
+				static_cast< Unit* >( this )->GetAIInterface()->AttackReaction( pVictim, damage, spellId );
 			}
 			
 			// Send AI Victim Reaction
-			if(this->IsPlayer() || this->GetTypeId()==TYPEID_UNIT)
-			if (pVictim->GetTypeId() != TYPEID_PLAYER)
+			if( this->IsPlayer() || this->GetTypeId()==TYPEID_UNIT )
+			if( pVictim->GetTypeId() != TYPEID_PLAYER )
 			{
-				((Creature*)pVictim)->GetAIInterface()->AttackReaction((Unit*)this, damage, spellId);
+				static_cast< Creature* >( pVictim )->GetAIInterface()->AttackReaction( static_cast< Unit* >( this ), damage, spellId );
 			}
 		}
 		
@@ -2150,25 +2153,25 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==============================+Spell Damage Bonus Calculations============================
 //==========================================================================================
 //------------------------------by stats----------------------------------------------------
-	if(this->IsUnit() && !static_damage)
+	if( this->IsUnit() && !static_damage )
 	{
-		Unit* caster = (Unit*)(this);
-		caster->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
-		res += caster->GetSpellDmgBonus(pVictim,spellInfo,(int)res);
+		Unit* caster = static_cast< Unit* >( this );
+		caster->RemoveAurasByInterruptFlag( AURA_INTERRUPT_ON_START_ATTACK );
+		res += caster->GetSpellDmgBonus( pVictim, spellInfo, ( int )res );
 //==========================================================================================
 //==============================Post +SpellDamage Bonus Modifications=======================
 //==========================================================================================
-		if(res < 0)
+		if( res < 0 )
 			res = 0;
 		else
 		{
 
 //------------------------------critical strike chance--------------------------------------	
 			float CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerSpellCritChanceMod[school];
-			if (caster->IsPlayer()&&(pVictim->m_rooted-pVictim->m_stunned))	
-				CritChance += static_cast<Player*>(caster)->m_RootedCritChanceBonus;
+			if( caster->IsPlayer() && ( pVictim->m_rooted - pVictim->m_stunned ) )	
+				CritChance += static_cast< Player* >( caster )->m_RootedCritChanceBonus;
 
-			if(spellInfo->SpellGroupType)
+			if( spellInfo->SpellGroupType )
 			{
 				SM_FFValue(caster->SM_CriticalChance, &CritChance, spellInfo->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
@@ -2256,61 +2259,68 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 	SendSpellNonMeleeDamageLog(this, pVictim, spellID, float2int32(res), school, abs_dmg, dmg.resisted_damage, false, 0, critical, IsPlayer());
 	
-	if(this->IsUnit() && allowProc && spellInfo->Id != 25501)
+	if( this->IsUnit() && allowProc && spellInfo->Id != 25501 )
 	{
-		pVictim->HandleProc(vproc,(Unit*)this,spellInfo, float2int32(res));
+		pVictim->HandleProc( vproc, static_cast< Unit* >( this ), spellInfo, float2int32( res ) );
 		pVictim->m_procCounter = 0;
-		static_cast<Unit*>(this)->HandleProc(aproc,pVictim,spellInfo, float2int32(res));
-		static_cast<Unit*>(this)->m_procCounter = 0;
+		static_cast< Unit* >( this )->HandleProc( aproc, pVictim, spellInfo, float2int32( res ) );
+		static_cast< Unit* >( this )->m_procCounter = 0;
 	}
-	if (this->IsPlayer())
+	if( this->IsPlayer() )
 	{
-			static_cast<Player*>(this)->m_casted_amount[school]=(uint32)res;
+			static_cast< Player* >( this )->m_casted_amount[school] = ( uint32 )res;
 	}
 
-	DealDamage(pVictim, float2int32(res),  2, 0, spellID);
+	DealDamage( pVictim, float2int32( res ), 2, 0, spellID );
 
-	if (pVictim->GetCurrentSpell())
-		pVictim->GetCurrentSpell()->AddTime(school);
+	if( pVictim->GetCurrentSpell() )
+		pVictim->GetCurrentSpell()->AddTime( school );
 
 //==========================================================================================
 //==============================Post Damage Processing======================================
 //==========================================================================================
-	if ((int32)dmg.resisted_damage==dmg.full_damage && !abs_dmg)
-	{		//Magic Absorption
-		if (pVictim->IsPlayer())
+	if( (int32)dmg.resisted_damage == dmg.full_damage && !abs_dmg )
+	{
+		//Magic Absorption
+		if( pVictim->IsPlayer() )
 		{
-			if (static_cast<Player*>(pVictim)->m_RegenManaOnSpellResist)
+			if( static_cast< Player* >( pVictim )->m_RegenManaOnSpellResist )
 			{
-				Player* pl = (Player*)pVictim;
-				uint32 maxmana = pl->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
+				Player* pl = static_cast< Player* >( pVictim );
+				uint32 maxmana = pl->GetUInt32Value( UNIT_FIELD_MAXPOWER1 );
+
+				//TODO: wtf is this ugly mess of casting bullshit
 				uint32 amount = uint32(float( float(maxmana)*pl->m_RegenManaOnSpellResist));
-				pVictim->Energize(pVictim,29442,amount,POWER_TYPE_MANA);
+
+				pVictim->Energize( pVictim, 29442, amount, POWER_TYPE_MANA );
 			}
 		}
 	}
-	if(school == SHADOW_DAMAGE)
+	if( school == SHADOW_DAMAGE ) 
 	{
-                //VampiricEmbrace
-		if(pVictim->VampEmbCaster.find(this->GetGUID()) != pVictim->VampEmbCaster.end() && IsUnit())
+		//VampiricEmbrace
+		if( pVictim->VampEmbCaster.find( this->GetGUID() ) != pVictim->VampEmbCaster.end() && IsUnit() )
 		{
-			if(static_cast<Unit*>(this)->isAlive())
-				static_cast<Unit*>(this)->VampiricEmbrace(float2int32(res), pVictim);
+			if( static_cast< Unit* >( this )->isAlive() )
+				static_cast< Unit* >( this )->VampiricEmbrace( float2int32( res ), pVictim );
 		}
-                //VampiricTouch
-		if(this->GetGUID() == pVictim->VampTchCaster && IsUnit())
+        
+		//VampiricTouch
+		if( this->GetGUID() == pVictim->VampTchCaster && IsUnit())
 		{
-			if(static_cast<Unit*>(this)->isAlive())
-				static_cast<Unit*>(this)->VampiricTouch(float2int32(res), pVictim);
+			if( static_cast< Unit* >( this )->isAlive() )
+				static_cast< Unit* >( this )->VampiricTouch( float2int32( res ), pVictim );
 		}
-		if (pVictim->isAlive()&&this->IsUnit())
-		{    //Shadow Word:Death
-			if (spellID==32379||spellID==32996) 
+
+		if( pVictim->isAlive() && this->IsUnit() )
+		{
+			//Shadow Word:Death
+			if( spellID == 32379 || spellID == 32996 ) 
 			{
-				uint32 damage = (uint32)(res+abs_dmg);
-				uint32 absorbed = static_cast<Unit*>(this)->AbsorbDamage(school,&damage);
-				DealDamage((Unit*)this,damage,2,0,spellID);
-				SendSpellNonMeleeDamageLog(this,this,spellID,damage,school,absorbed,0,false,0,false,this->IsPlayer());
+				uint32 damage = (uint32)( res + abs_dmg );
+				uint32 absorbed = static_cast< Unit* >( this )->AbsorbDamage( school, &damage );
+				DealDamage( static_cast< Unit* >( this ), damage, 2, 0, spellID );
+				SendSpellNonMeleeDamageLog( this, this, spellID, damage, school, absorbed, 0, false, 0, false, this->IsPlayer() );
 			}
 		}
 	}
@@ -2459,8 +2469,8 @@ void Object::SetByte(uint32 index, uint32 index1,uint8 value)
 void Object::SetZoneId(uint32 newZone)
 {
 	m_zoneId = newZone;
-	if(m_objectTypeId == TYPEID_PLAYER && ((Player*)this)->GetGroup())
-		((Player*)this)->GetGroup()->HandlePartialChange(PARTY_UPDATE_FLAG_ZONEID, ((Player*)this));
+	if( m_objectTypeId == TYPEID_PLAYER && static_cast< Player* >( this )->GetGroup() )
+		static_cast< Player* >( this )->GetGroup()->HandlePartialChange( PARTY_UPDATE_FLAG_ZONEID, static_cast< Player* >( this ) );
 }
 
 void Object::PlaySoundToSet(uint32 sound_entry)

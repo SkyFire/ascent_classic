@@ -763,7 +763,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 		if(m_Unit->GetTypeId() == TYPEID_UNIT)
 			cansee=((Creature*)m_Unit)->CanSee(m_nextTarget);
 		else
-			cansee = ((Player*)m_Unit)->CanSee(m_nextTarget);
+			cansee = static_cast< Player* >( m_Unit )->CanSee(m_nextTarget);
 	}
 	else 
 		cansee=false;
@@ -814,12 +814,12 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				if(m_nextTarget->GetTypeId() == TYPEID_PLAYER)
 				{
 					float dist = m_Unit->GetDistanceSq(m_nextTarget);
-					if(((Player*)m_nextTarget)->m_currentMovement == MOVE_ROOT || dist >= 64.0f)
+					if( static_cast< Player* >( m_nextTarget )->m_currentMovement == MOVE_ROOT || dist >= 64.0f )
 					{
 						agent =  AGENT_RANGED;
 					}
 				}
-				else if(m_nextTarget->m_canMove == false || m_Unit->GetDistanceSq(m_nextTarget) >= 64.0f)
+				else if( m_nextTarget->m_canMove == false || m_Unit->GetDistanceSq(m_nextTarget) >= 64.0f )
 				{
 				   agent = AGENT_RANGED;
 				}
@@ -1225,15 +1225,15 @@ bool AIInterface::HealReaction(Unit* caster, Unit* victim, uint32 amount)
 	{
 		modThreatByPtr(caster, amount);
 		// both are players so they might be in the same group
-		if(caster->GetTypeId() == TYPEID_PLAYER && victim->GetTypeId() == TYPEID_PLAYER)
+		if( caster->GetTypeId() == TYPEID_PLAYER && victim->GetTypeId() == TYPEID_PLAYER )
 		{
-			if(((Player*)caster)->GetGroup() == ((Player*)victim)->GetGroup())
+			if( static_cast< Player* >( caster )->GetGroup() == static_cast< Player* >( victim )->GetGroup() )
 			{
 				// get victim into combat since they are both
 				// in the same party
-				if(isHostile(m_Unit, victim))
+				if( isHostile( m_Unit, victim ) )
 				{
-					m_aiTargets.insert(TargetMap::value_type(victim, 1));
+					m_aiTargets.insert( TargetMap::value_type( victim, 1 ) );
 					return true;
 				}
 				return false;
@@ -1368,7 +1368,7 @@ Unit* AIInterface::FindTarget()
 		{
 			WorldPacket data(SMSG_AI_REACTION, 12);
 			data << m_Unit->GetGUID() << uint32(2);		// Aggro sound
-			((Player*)target)->GetSession()->SendPacket(&data);
+			static_cast< Player* >( target )->GetSession()->SendPacket( &data );
 		}
 		if(target->GetUInt32Value(UNIT_FIELD_CREATEDBY) != 0)
 		{
@@ -1464,12 +1464,11 @@ bool AIInterface::FindFriends(float dist)
 			continue;
 		}
 
-		if(isCombatSupport(m_Unit, pUnit) 
-			&& (pUnit->GetAIInterface()->getAIState() == STATE_IDLE || pUnit->GetAIInterface()->getAIState() == STATE_SCRIPTIDLE))//Not sure
+		if( isCombatSupport( m_Unit, pUnit ) && ( pUnit->GetAIInterface()->getAIState() == STATE_IDLE || pUnit->GetAIInterface()->getAIState() == STATE_SCRIPTIDLE ) )//Not sure
 		{
-			if(m_Unit->GetDistanceSq(pUnit) < dist)
+			if( m_Unit->GetDistanceSq(pUnit) < dist)
 			{
-				if(m_assistTargets.count(pUnit) > 0)	// already have him
+				if( m_assistTargets.count( pUnit ) > 0 ) // already have him
 					break;
 
 				result = true;
@@ -1477,7 +1476,7 @@ bool AIInterface::FindFriends(float dist)
 					
 				for(it = m_aiTargets.begin(); it != m_aiTargets.end(); ++it)
 				{
-					((Unit*)(*itr))->GetAIInterface()->AttackReaction(it->first, 1, 0);
+					static_cast< Unit* >( *itr )->GetAIInterface()->AttackReaction( it->first, 1, 0 );
 				}
 			}
 		}
@@ -1629,7 +1628,7 @@ void AIInterface::_CalcDestinationAndMove(Unit *target, float dist)
 		float angle = m_Unit->calcAngle(m_Unit->GetPositionX(), m_Unit->GetPositionY(), target->GetPositionX(), target->GetPositionY()) * float(M_PI) / 180.0f;
 		float x = dist * cosf(angle);
 		float y = dist * sinf(angle);
-		if(target->GetTypeId() == TYPEID_PLAYER && ((Player*)target)->m_isMoving)
+		if( target->GetTypeId() == TYPEID_PLAYER && static_cast< Player* >( target )->m_isMoving )
 		{
 			// cater for moving player vector based on orientation
 			x -= cosf(target->GetOrientation());
@@ -1832,8 +1831,8 @@ bool AIInterface::IsFlying()
 		}
 	}
 	return false;*/
-	if(m_Unit->GetTypeId() == TYPEID_PLAYER)
-		return ((Player*)m_Unit)->FlyCheat;
+	if( m_Unit->GetTypeId() == TYPEID_PLAYER )
+		return static_cast< Player* >( m_Unit )->FlyCheat;
 
 	return false;
 }

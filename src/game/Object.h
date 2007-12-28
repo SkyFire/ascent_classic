@@ -310,43 +310,53 @@ public:
 		return m_position.DistanceSq(x, y, z);
 	}
 
-	ASCENT_INLINE const float GetDistance2dSq(Object* obj)
+	ASCENT_INLINE const float GetDistance2dSq( Object* obj )
 	{
-		if(obj->GetMapId() != m_mapId) return 40000.0f; //enough for out of range
-		return m_position.Distance2DSq(obj->m_position);
+		if( obj->GetMapId() != m_mapId )
+			return 40000.0f; //enough for out of range
+		return m_position.Distance2DSq( obj->m_position );
 	}
 
 	// In-range object management, not sure if we need it
-	ASCENT_INLINE bool IsInRangeSet(Object* pObj) { return !(m_objectsInRange.find(pObj) == m_objectsInRange.end()); }
+	ASCENT_INLINE bool IsInRangeSet( Object* pObj )
+	{
+		return !( m_objectsInRange.find( pObj ) == m_objectsInRange.end() );
+	}
 	
 	virtual void AddInRangeObject(Object* pObj)
 	{
-		if(!pObj)
+		if( pObj == NULL )
 			return;
 
-		m_objectsInRange.insert(pObj);
-		if(pObj->GetTypeId() == TYPEID_PLAYER)
-			m_inRangePlayers.insert( ((Player*)pObj) );
+		m_objectsInRange.insert( pObj );
+
+		// NOTES: Since someone will come along and try and change it.
+		// Don't reinrepret_cast has to be used static_cast will not work when we are
+		// inside the class we are casting from if we want to cast up the inheritance
+		// chain, as Object has no concept of Player.
+
+		if( pObj->GetTypeId() == TYPEID_PLAYER )
+			m_inRangePlayers.insert( reinterpret_cast< Player* >( pObj ) );
 	}
 
-	ASCENT_INLINE void RemoveInRangeObject(Object* pObj)
+	ASCENT_INLINE void RemoveInRangeObject( Object* pObj )
 	{
-		if(!pObj)
+		if( pObj == NULL )
 			return;
 
-		OnRemoveInRangeObject(pObj);
-		m_objectsInRange.erase(pObj);
+		OnRemoveInRangeObject( pObj );
+		m_objectsInRange.erase( pObj );
 	}
 
 	ASCENT_INLINE bool HasInRangeObjects()
 	{
-		return (m_objectsInRange.size() > 0);
+		return ( m_objectsInRange.size() > 0 );
 	}
 
-	virtual void OnRemoveInRangeObject(Object * pObj)
+	virtual void OnRemoveInRangeObject( Object * pObj )
 	{
-		if(pObj->GetTypeId() == TYPEID_PLAYER)
-			ASSERT(m_inRangePlayers.erase( ((Player*)pObj) ) == 1);
+		if( pObj->GetTypeId() == TYPEID_PLAYER )
+			ASSERT( m_inRangePlayers.erase( reinterpret_cast< Player* >( pObj ) ) == 1 );
 	}
 
 	virtual void ClearInRangeSet()
@@ -361,32 +371,34 @@ public:
 	ASCENT_INLINE InRangeSet::iterator GetInRangeSetBegin() { return m_objectsInRange.begin(); }
 	ASCENT_INLINE InRangeSet::iterator GetInRangeSetEnd() { return m_objectsInRange.end(); }
 	ASCENT_INLINE InRangeSet::iterator FindInRangeSet(Object * obj) { return m_objectsInRange.find(obj); }
+
 	void RemoveInRangeObject(InRangeSet::iterator itr)
 	{ 
 		OnRemoveInRangeObject(*itr);
 		m_objectsInRange.erase(itr);
 	}
-	ASCENT_INLINE bool RemoveIfInRange(Object * obj)
+
+	ASCENT_INLINE bool RemoveIfInRange( Object * obj )
 	{
 		InRangeSet::iterator itr = m_objectsInRange.find(obj);
-		if(obj->GetTypeId() == TYPEID_PLAYER)
-			m_inRangePlayers.erase(((Player*)obj));
+		if( obj->GetTypeId() == TYPEID_PLAYER )
+			m_inRangePlayers.erase( reinterpret_cast< Player* >( obj ) );
 
-		if(itr == m_objectsInRange.end())
+		if( itr == m_objectsInRange.end() )
 			return false;
 		
-		m_objectsInRange.erase(itr);
+		m_objectsInRange.erase( itr );
 		return true;
 	}
 
-	ASCENT_INLINE void AddInRangePlayer(Object * obj)
+	ASCENT_INLINE void AddInRangePlayer( Object * obj )
 	{
-		m_inRangePlayers.insert(((Player*)obj));
+		m_inRangePlayers.insert( reinterpret_cast< Player* >( obj ) );
 	}
 
-	ASCENT_INLINE void RemoveInRangePlayer(Object * obj)
+	ASCENT_INLINE void RemoveInRangePlayer( Object * obj )
 	{
-		m_inRangePlayers.erase(((Player*)obj));
+		m_inRangePlayers.erase( reinterpret_cast< Player* >( obj ) );
 	}
 
 	bool IsInRangeOppFactSet(Object* pObj) { return (m_oppFactsInRange.count(pObj) > 0); }

@@ -100,30 +100,30 @@ void DynamicObject::Create(Unit * caster, Spell * pSpell, float x, float y, floa
 	sEventMgr.AddEvent(this, &DynamicObject::UpdateTargets, EVENT_DYNAMICOBJECT_UPDATE, 100, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
 
-void DynamicObject::AddInRangeObject(Object* pObj)
+void DynamicObject::AddInRangeObject( Object* pObj )
 {
-	if(pObj->IsUnit())
+	if( pObj->IsUnit() )
 	{
 		bool attackable;
-		if(p_caster)
-			attackable = isAttackable(p_caster, pObj);
+		if( p_caster != NULL)
+			attackable = isAttackable( p_caster, pObj );
 		else
-			attackable = isAttackable(this, pObj);
+			attackable = isAttackable( this, pObj );
 		
-		if(attackable)
-			m_inRangeOppFactions.insert(((Unit*)pObj));
+		if( attackable )
+			m_inRangeOppFactions.insert( static_cast< Unit* >( pObj ) );
 	}
-	Object::AddInRangeObject(pObj);
+	Object::AddInRangeObject( pObj );
 }
 
-void DynamicObject::OnRemoveInRangeObject(Object* pObj)
+void DynamicObject::OnRemoveInRangeObject( Object* pObj )
 {
-	if(pObj->IsUnit())
+	if( pObj->IsUnit() )
 	{
-		m_inRangeOppFactions.erase(((Unit*)pObj));
-		targets.erase(((Unit*)pObj));
+		m_inRangeOppFactions.erase( static_cast< Unit* >( pObj ) );
+		targets.erase( static_cast< Unit* >( pObj ) );
 	}
-	Object::OnRemoveInRangeObject(pObj);
+	Object::OnRemoveInRangeObject( pObj );
 }
 
 void DynamicObject::UpdateTargets()
