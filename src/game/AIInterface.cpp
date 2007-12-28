@@ -2777,6 +2777,9 @@ AI_Spell *AIInterface::getSpell()
 		if(def_spell->procCount)
 			def_spell->procCounter++;
 
+		if(def_spell->cooldown)
+			def_spell->cooldowntime = nowtime + def_spell->cooldown;
+
 		waiting_for_cooldown = false;
 		return def_spell;
 	}

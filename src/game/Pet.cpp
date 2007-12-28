@@ -390,6 +390,7 @@ AI_Spell * Pet::CreateAISpell(SpellEntry * info)
 	sp->spellType = STYPE_DAMAGE;
 	sp->spelltargetType = TTYPE_SINGLETARGET;
 	sp->cooldown = objmgr.GetPetSpellCooldown(info->Id);
+	sp->cooldowntime = 0;
 	if(info->Effect[0] == SPELL_EFFECT_APPLY_AURA || info->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA)
 		sp->spellType = STYPE_BUFF;
 
@@ -1572,8 +1573,14 @@ AI_Spell * Pet::HandleAutoCastEvent()
 	}
 	else if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size())
 	{
-		if( (*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin())->autocast_type == AUTOCAST_EVENT_ATTACK )
-			return *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+		AI_Spell * sp = *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+		if( sp->autocast_type == AUTOCAST_EVENT_ATTACK )
+		{
+			if( sp->cooldown && getMSTime() >= sp->cooldowntime )
+				return *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+			else
+				return NULL;
+		}
 		else
 		{
 			// bad pointers somehow end up here :S
@@ -1619,8 +1626,13 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 			}
 		}
 		else if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size())
-			m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
+		{
+			AI_Spell * sp =*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+			if(sp->cooldown && getMSTime() < sp->cooldowntime)
+				return;
 
+			m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
+		}
 		return;
 	}
 
