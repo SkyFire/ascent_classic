@@ -3085,6 +3085,7 @@ void Player::OnPushToWorld()
 	m_lockTransportVariables = false;
 
 	// delay the unlock movement packet
+	UpdateChances();
 	WorldPacket * data = new WorldPacket(SMSG_MOVE_UNLOCK_MOVEMENT, 4);
 	*data << uint32(0);
 	delayedPackets.add(data);
@@ -7052,7 +7053,7 @@ const double BaseRating []= {
 
 float Player::CalcRating( uint32 index )
 {
-	uint32 relative_index = index - PLAYER_FIELD_COMBAT_RATING_1;
+	uint32 relative_index = index - (PLAYER_FIELD_COMBAT_RATING_1);
 	if( relative_index <= 10 || ( relative_index >= 14 && relative_index <= 21 ) )
 	{
 		double rating = (double)m_uint32Values[index];
@@ -7064,7 +7065,7 @@ float Player::CalcRating( uint32 index )
 			cost = ( double( level ) - 8.0 ) / 52.0;
 		else
 			cost = 82.0 / ( 262.0 - 3.0 *  double( level ) );
-		return float( rating / BaseRating[relative_index] * cost );
+		return float( rating / (BaseRating[relative_index] * cost) );
 	}
 	else
 		return 0.0f;
