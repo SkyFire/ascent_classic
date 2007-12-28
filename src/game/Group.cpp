@@ -206,7 +206,7 @@ void Group::Update()
 			m_Leader = pNewLeader->m_playerInfo;
 	}
 
-	if( m_Looter != NULL && m_Looter->m_loggedInPlayer == NULL)
+	if( m_Looter != NULL && m_Looter->m_loggedInPlayer == NULL )
 	{
 		if( !pNewLeader )
 			pNewLeader = FindFirstPlayer();
@@ -479,15 +479,21 @@ void Group::RemovePlayer(PlayerInfo * info)
 	if(m_Looter == info)
 	{
 		newPlayer = FindFirstPlayer();
-		m_Looter = newPlayer->m_playerInfo;
+		if( newPlayer != NULL )
+            m_Looter = newPlayer->m_playerInfo;
+		else
+			m_Looter = NULL;
 	}
 
 	if(m_Leader == info)
 	{
-		if(newPlayer==NULL)
+		if( newPlayer==NULL )
 			newPlayer=FindFirstPlayer();
 
-		SetLeader(newPlayer, false);
+		if( newPlayer != NULL )
+			SetLeader(newPlayer, false);
+		else
+			m_Leader = NULL;
 	}
 
 	Update();
