@@ -299,6 +299,7 @@
 		</Configuration>
 		<Configuration
 			Name="Hoard|Win32"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
