@@ -7052,7 +7052,7 @@ const double BaseRating []= {
 
 float Player::CalcRating( uint32 index )
 {
-	uint32 relative_index = PLAYER_FIELD_COMBAT_RATING_1 - index;
+	uint32 relative_index = index - PLAYER_FIELD_COMBAT_RATING_1;
 	if( relative_index <= 10 || ( relative_index >= 14 && relative_index <= 21 ) )
 	{
 		double rating = (double)m_uint32Values[index];
