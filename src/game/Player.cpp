@@ -4177,10 +4177,15 @@ void Player::UpdateChances()
 	SetFloatValue( PLAYER_DODGE_PERCENTAGE, min( tmp, 95.0f ) );
 
 	//block = 0 if no shield
+	//Block% = 5% base chance + 
+	//contribution from Block Rating +
+	//contribution from talents +
+	//((Defense skill - attacker's weapon skill) * 0.04)
 	Item* it = this->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
 	if( it != NULL && it->GetProto()->InventoryType == INVTYPE_SHIELD )
 	{
-		tmp = 5.0f + GetUInt32Value( UNIT_FIELD_STAT0 ) / 22.0f + this->GetBlockFromSpell();
+		tmp = 5.0f;
+		tmp += GetUInt32Value( UNIT_FIELD_STAT0 ) / 22.0f + this->GetBlockFromSpell();
 		tmp += CalcRating( PLAYER_RATING_MODIFIER_BLOCK );//block rating
 	}
 	else
@@ -4416,15 +4421,14 @@ void Player::UpdateStats()
 		ModFloatValue( UNIT_MOD_CAST_SPEED, ( SpellHasteRatingBonus - cast_speed ) / 100.0f);
 		SpellHasteRatingBonus = cast_speed;
 	}
-
-	//int32 block = GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) + m_modblockvaluefromspells * ( 1 + (uint32)( m_modblockabsorbvalue * 0.01 ) ) + ( ( str / 20 ) - 1 );
-	//int32 blockable_damage = ( GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) * ( m_modblockvaluefromspells * 0.11 ) ) + ( ( str / 20 ) - 1 );
-	float block_multiplier = float( m_modblockvaluefromspells ) * 0.11f;
-	if( block_multiplier < 1.0f )block_multiplier = 1.0f;
-	
-	int32 blockable_damage = float2int32( ( float( GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( str ) / 20.0f ) - 1.0f ) );
-	SetUInt32Value( PLAYER_SHIELD_BLOCK, blockable_damage );
 	////////////////////RATINGS STUFF//////////////////////
+
+	// Shield Block
+	float block_multiplier = ( 100.0f + float( m_modblockabsorbvalue ) ) / 100.0f;
+	if( block_multiplier < 1.0f )block_multiplier = 1.0f;
+
+	int32 blockable_damage = float2int32( ( float( m_modblockvaluefromspells + GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( str ) / 20.0f ) - 1.0f ) );
+	SetUInt32Value( PLAYER_SHIELD_BLOCK, blockable_damage );
 
 	UpdateChances();
 	CalcDamage();

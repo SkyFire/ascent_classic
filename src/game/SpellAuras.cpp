@@ -3724,7 +3724,7 @@ void Aura::SpellAuraModBlockPerc(bool apply)
 			amt = -mod->m_amount;
 
 		static_cast<Player*>(m_target)->SetBlockFromSpell(static_cast<Player*>(m_target)->GetBlockFromSpell() + amt);
-		static_cast<Player*>(m_target)->UpdateChances();
+		static_cast<Player*>(m_target)->UpdateStats();
 	}
 }
 
@@ -6084,7 +6084,7 @@ void Aura::SpellAuraModShieldBlockPCT( bool apply )
 			p_target->m_modblockabsorbvalue -= ( uint32 )mod->m_amount;
 
 		}
-		p_target->UpdateChances();
+		p_target->UpdateStats();
 	}
 }
 
@@ -7115,7 +7115,7 @@ void Aura::SpellAuraModBlockValue(bool apply)
 			amt = -mod->m_amount;
 		}
 		p_target->m_modblockvaluefromspells += amt;
-		p_target->UpdateChances();
+		p_target->UpdateStats();
 	}
 }
 
