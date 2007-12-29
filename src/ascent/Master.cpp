@@ -36,7 +36,7 @@
 
 #include <signal.h>
 
-createFileSingleton(Master);
+createFileSingleton( Master );
 std::string LogFileName;
 bool bLogChat;
 bool crashed = false;
@@ -48,9 +48,9 @@ SERVER_DECL Database* Database_Character;
 SERVER_DECL Database* Database_World;
 
 // mainserv defines
-SessionLogWriter * GMCommand_Log;
-SessionLogWriter * Anticheat_Log;
-SessionLogWriter * Player_Log;
+SessionLogWriter* GMCommand_Log;
+SessionLogWriter* Anticheat_Log;
+SessionLogWriter* Player_Log;
 extern DayWatcherThread * dw;
 
 void Master::_OnSignal(int s)
@@ -99,11 +99,11 @@ struct Addr
 #define DEF_VALUE_NOT_SET 0xDEADBEEF
 
 #ifdef WIN32
-        static const char * default_config_file = "ascent.conf";
-        static const char * default_realm_config_file = "realms.conf";
+        static const char* default_config_file = "ascent.conf";
+        static const char* default_realm_config_file = "realms.conf";
 #else
-        static const char * default_config_file = CONFDIR "/ascent.conf";
-        static const char * default_realm_config_file = CONFDIR "/realms.conf";
+        static const char* default_config_file = CONFDIR "/ascent.conf";
+        static const char* default_realm_config_file = CONFDIR "/realms.conf";
 #endif
 
 bool bServerShutdown = false;
@@ -194,81 +194,81 @@ bool Master::Run(int argc, char ** argv)
 	if(do_version)
 		return true;
 
-	if(do_check_conf)
+	if( do_check_conf )
 	{
-		Log.Notice("Config", "Checking config file: %s", config_file);
-		if(Config.MainConfig.SetSource(config_file, true))
-			Log.Success("Config", "Passed without errors.");
+		Log.Notice( "Config", "Checking config file: %s", config_file );
+		if( Config.MainConfig.SetSource(config_file, true ) )
+			Log.Success( "Config", "Passed without errors." );
 		else
-			Log.Warning("Config", "Encountered one or more errors.");
+			Log.Warning( "Config", "Encountered one or more errors." );
 
-		Log.Notice("Config", "Checking config file: %s\n", realm_config_file);
-		if(Config.RealmConfig.SetSource(realm_config_file, true))
-			Log.Success("Config", "Passed without errors.\n");
+		Log.Notice( "Config", "Checking config file: %s\n", realm_config_file );
+		if( Config.RealmConfig.SetSource( realm_config_file, true ) )
+			Log.Success( "Config", "Passed without errors.\n" );
 		else
-			Log.Warning("Config", "Encountered one or more errors.\n");
+			Log.Warning( "Config", "Encountered one or more errors.\n" );
 
 		/* test for die variables */
 		string die;
-		if(Config.MainConfig.GetString("die", "msg", &die) || Config.MainConfig.GetString("die2", "msg", &die))
-			Log.Warning("Config", "Die directive received: %s", die.c_str());
+		if( Config.MainConfig.GetString( "die", "msg", &die) || Config.MainConfig.GetString("die2", "msg", &die ) )
+			Log.Warning( "Config", "Die directive received: %s", die.c_str() );
 
 		return true;
 	}
 
-	printf("The key combination <Ctrl-C> will safely shut down the server at any time.\n");
+	printf( "The key combination <Ctrl-C> will safely shut down the server at any time.\n" );
 	Log.Line();
     
 	InitRandomNumberGenerators();
-	Log.Success("Rnd", "Initialized Random Number Generators.");
+	Log.Success( "Rnd", "Initialized Random Number Generators." );
 
 	ThreadPool.Startup();
 	uint32 LoadingTime = getMSTime();
 
-	Log.Notice("Config", "Loading Config Files...\n");
-	if(Config.MainConfig.SetSource(config_file))
-		Log.Success("Config", ">> ascent.conf");
+	Log.Notice( "Config", "Loading Config Files...\n" );
+	if( Config.MainConfig.SetSource( config_file ) )
+		Log.Success( "Config", ">> ascent.conf" );
 	else
 	{
-		Log.Error("Config", ">> ascent.conf");
+		Log.Error( "Config", ">> ascent.conf" );
 		return false;
 	}
 
 	string die;
-	if(Config.MainConfig.GetString("die", "msg", &die) || Config.MainConfig.GetString("die2", "msg", &die))
+	if( Config.MainConfig.GetString( "die", "msg", &die) || Config.MainConfig.GetString( "die2", "msg", &die ) )
 	{
-		Log.Warning("Config", "Die directive received: %s", die.c_str());
+		Log.Warning( "Config", "Die directive received: %s", die.c_str() );
 		return false;
 	}	
 
 	if(Config.RealmConfig.SetSource(realm_config_file))
-		Log.Success("Config", ">> realms.conf");
+		Log.Success( "Config", ">> realms.conf" );
 	else
 	{
-		Log.Error("Config", ">> realms.conf");
+		Log.Error( "Config", ">> realms.conf" );
 		return false;
 	}
 
-	if(!_StartDB())
+	if( !_StartDB() )
 	{
 		return false;
 	}
 
 	if(do_database_clean)
 	{
-		printf("\nEntering database maintenance mode.\n\n");
+		printf( "\nEntering database maintenance mode.\n\n" );
 		new DatabaseCleaner;
 		DatabaseCleaner::getSingleton().Run();
 		delete DatabaseCleaner::getSingletonPtr();
 		Log.Color(TYELLOW);
-		printf("\nMaintenence finished. Take a moment to review the output, and hit space to continue startup.");
+		printf( "\nMaintenence finished. Take a moment to review the output, and hit space to continue startup." );
 		Log.Color(TNORMAL);
 		fflush(stdout);
 		sConsole.WaitForSpace();
 	}
 
 	Log.Line();
-	sLog.outString("");
+	sLog.outString( "" );
 
 	//ScriptSystem = new ScriptEngine;
 	//ScriptSystem->Reload();
@@ -277,35 +277,35 @@ bool Master::Run(int argc, char ** argv)
 	new World;
 
 	// open cheat log file
-	Anticheat_Log = new SessionLogWriter(FormatOutputString("logs", "cheaters", false).c_str(), false);
-	GMCommand_Log = new SessionLogWriter(FormatOutputString("logs", "gmcommand", false).c_str(), false);
-	Player_Log = new SessionLogWriter(FormatOutputString("logs", "players", false).c_str(), false);
+	Anticheat_Log = new SessionLogWriter(FormatOutputString( "logs", "cheaters", false).c_str(), false );
+	GMCommand_Log = new SessionLogWriter(FormatOutputString( "logs", "gmcommand", false).c_str(), false );
+	Player_Log = new SessionLogWriter(FormatOutputString( "logs", "players", false).c_str(), false );
 
 	/* load the config file */
 	sWorld.Rehash(false);
 
 	/* set new log levels */
-	if(screen_log_level != (int)DEF_VALUE_NOT_SET)
+	if( screen_log_level != (int)DEF_VALUE_NOT_SET )
 		sLog.SetScreenLoggingLevel(screen_log_level);
 	
-	if(file_log_level != (int)DEF_VALUE_NOT_SET)
+	if( file_log_level != (int)DEF_VALUE_NOT_SET )
 		sLog.SetFileLoggingLevel(file_log_level);
 
 	// Initialize Opcode Table
 	WorldSession::InitPacketHandlerTable();
 
-	string host = Config.MainConfig.GetStringDefault("Listen", "Host", DEFAULT_HOST);
-	int wsport = Config.MainConfig.GetIntDefault("Listen", "WorldServerPort", DEFAULT_WORLDSERVER_PORT);
+	string host = Config.MainConfig.GetStringDefault( "Listen", "Host", DEFAULT_HOST );
+	int wsport = Config.MainConfig.GetIntDefault( "Listen", "WorldServerPort", DEFAULT_WORLDSERVER_PORT );
 
 	new ScriptMgr;
 
-	if(!sWorld.SetInitialWorldSettings())
+	if( !sWorld.SetInitialWorldSettings() )
 	{
-		Log.Error("Server", "SetInitialWorldSettings() failed. Something went wrong? Exiting.");
+		Log.Error( "Server", "SetInitialWorldSettings() failed. Something went wrong? Exiting." );
 		return false;
 	}
 
-	if(do_cheater_check)
+	if( do_cheater_check )
 		sWorld.CleanupCheaters();
 
 	sWorld.SetStartTime((uint32)UNIXTIME);
@@ -328,20 +328,19 @@ bool Master::Run(int argc, char ** argv)
 	uint32 next_printout = getMSTime(), next_send = getMSTime();
 
 	// Start Network Subsystem
-	sLog.outString("Starting network subsystem...");
+	sLog.outString( "Starting network subsystem..." );
 	new SocketMgr;
 	new SocketGarbageCollector;
 	sSocketMgr.SpawnWorkerThreads();
 
 	sScriptMgr.LoadScripts();
 
-
 	LoadingTime = getMSTime() - LoadingTime;
-	sLog.outString ("\nServer is ready for connections. Startup time: %ums\n", LoadingTime );
+	sLog.outString ( "\nServer is ready for connections. Startup time: %ums\n", LoadingTime );
  
 	/* write pid file */
-	FILE * fPid = fopen("ascent.pid", "w");
-	if(fPid)
+	FILE * fPid = fopen( "ascent.pid", "w" );
+	if( fPid )
 	{
 		uint32 pid;
 #ifdef WIN32
@@ -349,14 +348,14 @@ bool Master::Run(int argc, char ** argv)
 #else
 		pid = getpid();
 #endif
-		fprintf(fPid, "%u", (unsigned int)pid);
-		fclose(fPid);
+		fprintf( fPid, "%u", (unsigned int)pid );
+		fclose( fPid );
 	}
 #ifdef WIN32
 	HANDLE hThread = GetCurrentThread();
 #endif
 
-	uint32 loopcounter=0;
+	uint32 loopcounter = 0;
 	//ThreadPool.Gobble();
 
 #ifndef CLUSTERING
@@ -372,10 +371,10 @@ bool Master::Run(int argc, char ** argv)
 	ListenSocket<WorldSocket> * ls = new ListenSocket<WorldSocket>(host.c_str(), wsport);
     bool listnersockcreate = ls->IsOpen();
 #ifdef WIN32
-	if(listnersockcreate)
+	if( listnersockcreate )
 		ThreadPool.ExecuteTask(ls);
 #endif
-	while(!m_stopEvent && listnersockcreate)
+	while( !m_stopEvent && listnersockcreate )
 #else
 	new ClusterInterface;
 	sClusterInterface.ConnectToRealmServer();
@@ -401,47 +400,48 @@ bool Master::Run(int argc, char ** argv)
 		/* UPDATE */
 		last_time = now();
 		etime = last_time - start;
-		if(m_ShutdownEvent)
+		if( m_ShutdownEvent )
 		{
-			if(getMSTime() >= next_printout)
+			if( getMSTime() >= next_printout )
 			{
 				if(m_ShutdownTimer > 60000.0f)
 				{
-					if(!((int)(m_ShutdownTimer)%60000))
-						sLog.outString("Server shutdown in %i minutes.", (int)(m_ShutdownTimer / 60000.0f));
+					if( !( (int)(m_ShutdownTimer) % 60000 ) )
+						sLog.outString( "Server shutdown in %i minutes.", (int)(m_ShutdownTimer / 60000.0f ) );
 				}
 				else
-					sLog.outString("Server shutdown in %i seconds.", (int)(m_ShutdownTimer / 1000.0f));
+					sLog.outString( "Server shutdown in %i seconds.", (int)(m_ShutdownTimer / 1000.0f ) );
 					
 				next_printout = getMSTime() + 500;
 			}
-			if(getMSTime() >= next_send)
+
+			if( getMSTime() >= next_send )
 			{
 				int time = m_ShutdownTimer / 1000;
-				if((time % 30 == 0) || time < 10)
+				if( ( time % 30 == 0 ) || time < 10 )
 				{
 					// broadcast packet.
-					WorldPacket data(20);
-					data.SetOpcode(SMSG_SERVER_MESSAGE);
-					data << uint32(SERVER_MSG_SHUTDOWN_TIME);
+					WorldPacket data( 20 );
+					data.SetOpcode( SMSG_SERVER_MESSAGE );
+					data << uint32( SERVER_MSG_SHUTDOWN_TIME );
 					
-					if(time > 0)
+					if( time > 0 )
 					{
 						int mins = 0, secs = 0;
 						if(time > 60)
 							mins = time / 60;
 						if(mins)
-							time -= (mins*60);
+							time -= (mins * 60);
 						secs = time;
 						char str[20];
-						snprintf(str, 20, "%02u:%02u", mins, secs);
+						snprintf( str, 20, "%02u:%02u", mins, secs );
 						data << str;
-						sWorld.SendGlobalMessage(&data, NULL);
+						sWorld.SendGlobalMessage( &data, NULL );
 					}
 				}
 				next_send = getMSTime() + 1000;
 			}
-			if(diff >= m_ShutdownTimer)
+			if( diff >= m_ShutdownTimer )
 				break;
 			else
 				m_ShutdownTimer -= diff;
@@ -449,42 +449,43 @@ bool Master::Run(int argc, char ** argv)
 		
 		Database_Character->CheckConnections();
 		Database_World->CheckConnections();
-		sWorld.UpdateQueuedSessions(diff);
+		sWorld.UpdateQueuedSessions( diff );
 
-		if(50 > etime)
+		if( 50 > etime )
 		{
 #ifdef WIN32
-			WaitForSingleObject(hThread, 50 - etime);
+			WaitForSingleObject( hThread, 50 - etime );
 #else
-			Sleep(50-etime);
+			Sleep( 50 - etime );
 #endif
 		}
 	}
 	_UnhookSignals();
 
-    wr->SetThreadState(THREADSTATE_TERMINATE);
+    wr->SetThreadState( THREADSTATE_TERMINATE );
 	ThreadPool.ShowStats();
 	/* Shut down console system */
 	sCConsole.Kill();
 
 	// begin server shutdown
 	time_t st = UNIXTIME;
-	Log.Notice("Shutdown", "Initiated at %s", ConvertTimeStampToDataTime((uint32)UNIXTIME).c_str());
+	Log.Notice( "Shutdown", "Initiated at %s", ConvertTimeStampToDataTime( (uint32)UNIXTIME).c_str() );
 
-	if(lootmgr.is_loading)
+	if( lootmgr.is_loading )
 	{
-		Log.Notice("Shutdown", "Waiting for loot to finish loading...");
-		while(lootmgr.is_loading)
-			Sleep(100);
+		Log.Notice( "Shutdown", "Waiting for loot to finish loading..." );
+		while( lootmgr.is_loading )
+			Sleep( 100 );
 	}
 
 	// send a query to wake it up if its inactive
-	Log.Notice("Database", "Clearing all pending queries...");
+	Log.Notice( "Database", "Clearing all pending queries..." );
+
 	// kill the database thread first so we don't lose any queries/data
 	CharacterDatabase.EndThreads();
 	WorldDatabase.EndThreads();
 
-	Log.Notice("DayWatcherThread", "Exiting...");
+	Log.Notice( "DayWatcherThread", "Exiting..." );
 	dw->terminate();
 	dw = NULL;
 
@@ -494,7 +495,7 @@ bool Master::Run(int argc, char ** argv)
 
 	sWorld.SaveAllPlayers();
 
-	Log.Notice("Network", "Shutting down network subsystem.");
+	Log.Notice( "Network", "Shutting down network subsystem." );
 #ifdef WIN32
 	sSocketMgr.ShutdownThreads();
 #endif
@@ -504,27 +505,27 @@ bool Master::Run(int argc, char ** argv)
 	ThreadPool.Shutdown();
 
 	sWorld.LogoutPlayers();
-	sLog.outString("");
+	sLog.outString( "" );
 
 	delete LogonCommHandler::getSingletonPtr();
 
 	sWorld.ShutdownClasses();
-	Log.Notice("World", "~World()");
+	Log.Notice( "World", "~World()" );
 	delete World::getSingletonPtr();
 
 	sScriptMgr.UnloadScripts();
 	delete ScriptMgr::getSingletonPtr();
 
-	Log.Notice("EventMgr", "~EventMgr()");
+	Log.Notice( "EventMgr", "~EventMgr()" );
 	delete EventMgr::getSingletonPtr();
 
-	Log.Notice("Database", "Closing Connections...");
+	Log.Notice( "Database", "Closing Connections..." );
 	_StopDB();
 
-	Log.Notice("Network", "Deleting Network Subsystem...");
+	Log.Notice( "Network", "Deleting Network Subsystem..." );
 	delete SocketMgr::getSingletonPtr();
 	delete SocketGarbageCollector::getSingletonPtr();
-	Log.Notice("VoiceChatHandler", "~VoiceChatHandler()");
+	Log.Notice( "VoiceChatHandler", "~VoiceChatHandler()" );
 	delete VoiceChatHandler::getSingletonPtr();
 
 #ifdef ENABLE_LUA_SCRIPTING
@@ -538,9 +539,9 @@ bool Master::Run(int argc, char ** argv)
 	delete Player_Log;
 
 	// remove pid
-	remove("ascent.pid");
+	remove( "ascent.pid" );
 
-	Log.Notice("Shutdown", "Shutdown complete.");
+	Log.Notice( "Shutdown", "Shutdown complete." );
 
 #ifdef WIN32
 	WSACleanup();
@@ -565,50 +566,47 @@ bool Master::_StartDB()
 	//int ltype = 1;
 	// Configure Main Database
 	
-	bool result = Config.MainConfig.GetString("WorldDatabase", "Username", &username);
-	Config.MainConfig.GetString("WorldDatabase", "Password", &password);
-	result = !result ? result : Config.MainConfig.GetString("WorldDatabase", "Hostname", &hostname);
-	result = !result ? result : Config.MainConfig.GetString("WorldDatabase", "Name", &database);
-	result = !result ? result : Config.MainConfig.GetInt("WorldDatabase", "Port", &port);
-	result = !result ? result : Config.MainConfig.GetInt("WorldDatabase", "Type", &type);
+	bool result = Config.MainConfig.GetString( "WorldDatabase", "Username", &username );
+	Config.MainConfig.GetString( "WorldDatabase", "Password", &password );
+	result = !result ? result : Config.MainConfig.GetString( "WorldDatabase", "Hostname", &hostname );
+	result = !result ? result : Config.MainConfig.GetString( "WorldDatabase", "Name", &database );
+	result = !result ? result : Config.MainConfig.GetInt( "WorldDatabase", "Port", &port );
+	result = !result ? result : Config.MainConfig.GetInt( "WorldDatabase", "Type", &type );
 	Database_World = new Database();
 
 	if(result == false)
 	{
-		sLog.outError("sql: One or more parameters were missing from WorldDatabase directive.");
+		sLog.outError( "sql: One or more parameters were missing from WorldDatabase directive." );
 		return false;
 	}
 
 	// Initialize it
-	if(!WorldDatabase.Initialize(hostname.c_str(), (unsigned int)port, username.c_str(),
-		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault("WorldDatabase", "ConnectionCount", 3),
-		16384))
+	if( !WorldDatabase.Initialize(hostname.c_str(), (unsigned int)port, username.c_str(),
+		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault( "WorldDatabase", "ConnectionCount", 3 ), 16384 ) )
 	{
-		sLog.outError("sql: Main database initialization failed. Exiting.");
+		sLog.outError( "sql: Main database initialization failed. Exiting." );
 		return false;
 	}
 
-
-	result = Config.MainConfig.GetString("CharacterDatabase", "Username", &username);
-	Config.MainConfig.GetString("CharacterDatabase", "Password", &password);
-	result = !result ? result : Config.MainConfig.GetString("CharacterDatabase", "Hostname", &hostname);
-	result = !result ? result : Config.MainConfig.GetString("CharacterDatabase", "Name", &database);
-	result = !result ? result : Config.MainConfig.GetInt("CharacterDatabase", "Port", &port);
-	result = !result ? result : Config.MainConfig.GetInt("CharacterDatabase", "Type", &type);
+	result = Config.MainConfig.GetString( "CharacterDatabase", "Username", &username );
+	Config.MainConfig.GetString( "CharacterDatabase", "Password", &password );
+	result = !result ? result : Config.MainConfig.GetString( "CharacterDatabase", "Hostname", &hostname );
+	result = !result ? result : Config.MainConfig.GetString( "CharacterDatabase", "Name", &database );
+	result = !result ? result : Config.MainConfig.GetInt( "CharacterDatabase", "Port", &port );
+	result = !result ? result : Config.MainConfig.GetInt( "CharacterDatabase", "Type", &type );
 	Database_Character = new Database();
 
 	if(result == false)
 	{
-		sLog.outError("sql: One or more parameters were missing from Database directive.");
+		sLog.outError( "sql: One or more parameters were missing from Database directive." );
 		return false;
 	}
 
 	// Initialize it
-	if(!CharacterDatabase.Initialize(hostname.c_str(), (unsigned int)port, username.c_str(),
-		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault("CharacterDatabase", "ConnectionCount", 3),
-		16384))
+	if( !CharacterDatabase.Initialize( hostname.c_str(), (unsigned int)port, username.c_str(),
+		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault( "CharacterDatabase", "ConnectionCount", 3 ), 16384 ) )
 	{
-		sLog.outError("sql: Main database initialization failed. Exiting.");
+		sLog.outError( "sql: Main database initialization failed. Exiting." );
 		return false;
 	}
 
@@ -623,25 +621,25 @@ void Master::_StopDB()
 
 void Master::_HookSignals()
 {
-	signal(SIGINT, _OnSignal);
-	signal(SIGTERM, _OnSignal);
-	signal(SIGABRT, _OnSignal);
+	signal( SIGINT, _OnSignal );
+	signal( SIGTERM, _OnSignal );
+	signal( SIGABRT, _OnSignal );
 #ifdef _WIN32
-	signal(SIGBREAK, _OnSignal);
+	signal( SIGBREAK, _OnSignal );
 #else
-	signal(SIGHUP, _OnSignal);
+	signal( SIGHUP, _OnSignal );
 #endif
 }
 
 void Master::_UnhookSignals()
 {
-	signal(SIGINT, 0);
-	signal(SIGTERM, 0);
-	signal(SIGABRT, 0);
+	signal( SIGINT, 0 );
+	signal( SIGTERM, 0 );
+	signal( SIGABRT, 0 );
 #ifdef _WIN32
-	signal(SIGBREAK, 0);
+	signal( SIGBREAK, 0 );
 #else
-	signal(SIGHUP, 0);
+	signal( SIGHUP, 0 );
 #endif
 
 }
@@ -651,40 +649,41 @@ void Master::_UnhookSignals()
 Mutex m_crashedMutex;
 
 // Crash Handler
-void OnCrash(bool Terminate)
+void OnCrash( bool Terminate )
 {
-	sLog.outString("Advanced crash handler initialized.");
-	if(!m_crashedMutex.AttemptAcquire())
-		TerminateThread(GetCurrentThread(), 0);
+	sLog.outString( "Advanced crash handler initialized." );
+
+	if( !m_crashedMutex.AttemptAcquire() )
+		TerminateThread( GetCurrentThread(), 0 );
 
 	try
 	{
-		if(World::getSingletonPtr() != 0 )
+		if( World::getSingletonPtr() != 0 )
 		{
-			sLog.outString("Waiting for all database queries to finish...");
+			sLog.outString( "Waiting for all database queries to finish..." );
 			WorldDatabase.EndThreads();
 			CharacterDatabase.EndThreads();
-			sLog.outString("All pending database operations cleared.\n");
+			sLog.outString( "All pending database operations cleared.\n" );
 			sWorld.SaveAllPlayers();
-			sLog.outString("Data saved.");
+			sLog.outString( "Data saved." );
 		}
 	}
 	catch(...)
 	{
-		sLog.outString("Threw an exception while attempting to save all data.");
+		sLog.outString( "Threw an exception while attempting to save all data." );
 	}
 
-	sLog.outString("Closing.");
+	sLog.outString( "Closing." );
 	
 	// beep
 	//printf("\x7");
 	
 	// Terminate Entire Application
-	if(Terminate)
+	if( Terminate )
 	{
-		HANDLE pH = OpenProcess(PROCESS_TERMINATE, TRUE, GetCurrentProcessId());
-		TerminateProcess(pH, 1);
-		CloseHandle(pH);
+		HANDLE pH = OpenProcess( PROCESS_TERMINATE, TRUE, GetCurrentProcessId() );
+		TerminateProcess( pH, 1 );
+		CloseHandle( pH );
 	}
 }
 

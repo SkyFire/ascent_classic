@@ -18,6 +18,7 @@
  */
 
 #include "Common.h"
+
 #include "Database/DatabaseEnv.h"
 #include "Config/ConfigEnv.h"
 #include "Log.h"
@@ -57,28 +58,28 @@ int unix_main(int argc, char ** argv)
 
 #else
 
-int win32_main(int argc, char ** argv)
+int win32_main( int argc, char ** argv )
 {
-	SetThreadName("Main Thread");
+	SetThreadName( "Main Thread" );
 	StartCrashHandler();
 
 	THREAD_TRY_EXECUTION
 	{
-		sMaster.Run(argc, argv);
+		sMaster.Run( argc, argv );
 	}
 	THREAD_HANDLE_CRASH;
-	exit(0);
+	exit( 0 );
 	return 0;
 }
 
 #endif
 
-int main(int argc, char ** argv)
+int main( int argc, char ** argv )
 {
 #ifdef WIN32
-	win32_main(argc, argv);
+	win32_main( argc, argv );
 #else
-	unix_main(argc, argv);
+	unix_main( argc, argv );
 #endif
 }
 

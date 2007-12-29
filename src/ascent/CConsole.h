@@ -32,7 +32,7 @@ public:
 	bool run();
 };
 
-class CConsole :  public Singleton < CConsole >
+class CConsole :  public Singleton< CConsole >
 {
 	friend class CConsoleThread;
 
@@ -40,37 +40,37 @@ protected:					// Protected methods:
 	CConsoleThread *_thread;
 
 	// Process one command
-	void ProcessCmd(char *cmd);
+	void ProcessCmd( char* cmd );
 
 	// ver[sion]
-	void TranslateVersion(char *str);
+	void TranslateVersion( char* str );
 	void ProcessVersion();
 
 	// quit | exit
-	void TranslateQuit(char *str);
-	void ProcessQuit(int delay);
-	void CancelShutdown(char *str);
+	void TranslateQuit( char* str );
+	void ProcessQuit( int delay );
+	void CancelShutdown( char* str );
 
 	// help | ?
-	void TranslateHelp(char *str);
-	void ProcessHelp(char *command);
+	void TranslateHelp( char* str );
+	void ProcessHelp(char* command);
 
 
-	void TranslateThreads(char* str);
-	void ObjectStats(char *str);
+	void TranslateThreads( char* str );
+	void ObjectStats( char* str );
 
 	// getuptime
-	void GetUptime(char *str);
+	void GetUptime( char* str );
 
-	void WideAnnounce(char *str);
-	void Announce(char* str);
-	void SaveallPlayers(char *str);
-	void Kick(char *str);
-	void IPBan(char *str);
-	void IPUnBan(char *str);
-	void BanAccount(char *str);
-	void PlayerInfo(char *str);
-//	void ReloadGMScripts(char * str);
+	void WideAnnounce( char* str );
+	void Announce( char* str );
+	void SaveallPlayers( char* str );
+	void Kick( char* str );
+	void IPBan( char* str );
+	void IPUnBan( char* str );
+	void BanAccount( char* str );
+	void PlayerInfo( char* str );
+//	void ReloadGMScripts(char*  str);
 public:
 	void Kill();
 };
@@ -80,8 +80,8 @@ public:
 class Console : public Singleton<Console>
 {
 public:
-	const char * GetLine(uint32 Delay);
-	bool PollConsole(uint32 Time);
+	const char* GetLine( uint32 Delay );
+	bool PollConsole( uint32 Time);
 	bool PollForD();		// Used at startup :P
 	bool WaitForSpace();
 };

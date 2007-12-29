@@ -49,16 +49,17 @@ void CConsole::Kill()
 	ir[1].Event.KeyEvent.wRepeatCount = 1;
 	ir[1].Event.KeyEvent.wVirtualKeyCode = 13;
 	ir[1].Event.KeyEvent.wVirtualScanCode = 28;
-	_thread->kill=true;
-	WriteConsoleInput (GetStdHandle(STD_INPUT_HANDLE), ir, 2, & dwTmp);
-	printf("Waiting for console thread to terminate....\n");
-	while(_thread != NULL)
+	_thread->kill = true;
+	WriteConsoleInput( GetStdHandle( STD_INPUT_HANDLE ), ir, 2, & dwTmp );
+	printf( "Waiting for console thread to terminate....\n" );
+	while( _thread != NULL )
 	{
-		Sleep(100);
+		Sleep( 100 );
 	}
-	printf("Console shut down.\n");
+	printf( "Console shut down.\n" );
 #endif
 }
+
 bool CConsoleThread::run()
 {
 	SetThreadName("Console Interpreter");
@@ -66,14 +67,15 @@ bool CConsoleThread::run()
 	size_t i = 0;
 	char cmd[96];
 
-	while (kill != true)
+	while( kill != true )
 	{
 		// Make sure our buffer is clean to avoid Array bounds overflow
-		memset(cmd,0,sizeof(cmd)); 
-		// Read in single line from "stdin"
-		fgets(cmd, 80, stdin);
+		memset( cmd, 0, sizeof( cmd ) ); 
 
-		if(kill)
+		// Read in single line from "stdin"
+		fgets( cmd, 80, stdin );
+
+		if( kill )
 			break;
 
 		for( i = 0 ; i < 80 || cmd[i] != '\0' ; i++ )
@@ -81,13 +83,13 @@ bool CConsoleThread::run()
 			if( cmd[i] =='\n' )
 			{
 				cmd[i]='\0';
-				sCConsole.ProcessCmd(cmd);
-				fflush(stdin);
+				sCConsole.ProcessCmd( cmd );
+				fflush( stdin );
 				break;
 			}
 		}
 	}
-	sCConsole._thread=NULL;
+	sCConsole._thread = NULL;
 	return true;
 }
 
@@ -95,12 +97,12 @@ bool CConsoleThread::run()
 // Protected methods:
 //------------------------------------------------------------------------------
 // Process one command
-void CConsole::ProcessCmd(char *cmd)
+void CConsole::ProcessCmd( char *cmd )
 {
 	typedef void (CConsole::*PTranslater)(char *str);
 	struct SCmd
 	{
-		const char *name;
+		const char* name;
 		PTranslater tr;
 	};
 
@@ -125,32 +127,32 @@ void CConsole::ProcessCmd(char *cmd)
 	};
 
 	char cmd2[80];
-	strcpy(cmd2, cmd);
-	for(size_t i = 0; i < strlen(cmd); ++i)
-		cmd2[i] = tolower(cmd[i]);
+	strcpy( cmd2, cmd );
+	for( size_t i = 0; i < strlen( cmd ); ++i )
+		cmd2[i] = tolower( cmd[i] );
 
-	for (size_t i = 0; i < sizeof(cmds)/sizeof(SCmd); i++)
-		if (strncmp(cmd2, cmds[i].name, strlen(cmds[i].name)) == 0)
+	for( size_t i = 0; i < sizeof( cmds ) / sizeof( SCmd ); i++ )
+		if( strncmp( cmd2, cmds[i].name, strlen( cmds[i].name ) ) == 0 )
 		{
-			(this->*(cmds[i].tr)) (cmd + strlen(cmds[i].name) +1);
+			(this->*(cmds[i].tr))( cmd + strlen( cmds[i].name ) + 1 );
 			return;
 		}
 
 		printf("Console: Unknown console command (use \"help\" for help).\n");
 }
 
-void CConsole::CancelShutdown(char *str)
+void CConsole::CancelShutdown( char *str )
 {
-	printf("Shutdown aborted.\n");
-	WorldPacket data(20);
-	data.SetOpcode(SMSG_SERVER_MESSAGE);
-	data << uint32(SERVER_MSG_SHUTDOWN_CANCELLED);
-	sWorld.SendGlobalMessage(&data);
+	printf( "Shutdown aborted.\n" );
+	WorldPacket data( 20 );
+	data.SetOpcode( SMSG_SERVER_MESSAGE );
+	data << uint32( SERVER_MSG_SHUTDOWN_CANCELLED );
+	sWorld.SendGlobalMessage( &data );
 	sMaster.m_ShutdownEvent = false;
 	sMaster.m_ShutdownTimer = 0;
 }
 
-void CConsole::GetUptime(char *str)
+void CConsole::GetUptime( char *str )
 {
 	uint32 count = (uint32)objmgr._players.size();
 
@@ -164,36 +166,40 @@ void CConsole::TranslateVersion(char *str)
 {
 	ProcessVersion();
 }
+
 void CConsole::ProcessVersion()
 {
     sLog.outString("Console: Server %s, Rev: %d", _FULLVERSION, g_getRevision());
 }
+
 //------------------------------------------------------------------------------
 // quit | exit
 void CConsole::TranslateQuit(char *str)
 {
-	int delay = str != NULL ? atoi(str) : 5000;
-	if(!delay)
+	int delay = str != NULL ? atoi( str ) : 5000;
+	if( !delay )
 		delay = 5000;
 	else
 		delay *= 1000;
 
-	ProcessQuit(delay);
+	ProcessQuit( delay );
 }
-void CConsole::ProcessQuit(int delay)
+
+void CConsole::ProcessQuit( int delay )
 {
 	sMaster.m_ShutdownTimer = delay;
 	sMaster.m_ShutdownEvent = true;
 }
 //------------------------------------------------------------------------------
 // help | ?
-void CConsole::TranslateHelp(char *str)
+void CConsole::TranslateHelp( char *str )
 {
-	ProcessHelp(NULL);
+	ProcessHelp( NULL );
 }
-void CConsole::ProcessHelp(char *command)
+
+void CConsole::ProcessHelp( char *command )
 {
-	if (command == NULL)
+	if( command == NULL )
 	{
 		sLog.outString("Console:--------help--------");
 		sLog.outString("   help, ?: print this text");
@@ -212,14 +218,15 @@ void CConsole::ProcessHelp(char *command)
 		sLog.outString("   quit, exit: close program");
 	}
 }
+
 //------------------------------------------------------------------------------
 
 CConsoleThread::CConsoleThread()
 {
-	kill=false;
+	kill = false;
 }
 
-void CConsole::TranslateThreads(char* str)
+void CConsole::TranslateThreads( char* str )
 {
 	ThreadPool.ShowStats();
 }
@@ -229,48 +236,47 @@ CConsoleThread::~CConsoleThread()
 
 }
 
-void CConsole::ObjectStats(char *str)
+void CConsole::ObjectStats( char *str )
 {
-	printf("\n");
-	printf("Loaded object information:\n");
-	printf("\n");
+	printf( "\n" );
+	printf( "Loaded object information:\n" );
+	printf( "\n" );
 }
 
 void CConsole::Announce(char* str)
 {
-	if(!str)
+	if( !str )
 		return;
 
 	char msg[500];
-	snprintf(msg, 500, "%sConsole:%s%s", "|cff00ccff", "|r", str);
-	sWorld.SendWorldText(msg, 0);
+	snprintf( msg, 500, "%sConsole:%s%s", "|cff00ccff", "|r", str );
+	sWorld.SendWorldText( msg, 0 );
 }
 
-void CConsole::BanAccount(char* str)
+void CConsole::BanAccount( char* str )
 {
-	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET banned = 1 WHERE login = '%s'", str);
-	sLog.outString("User %s banned!", str);
+	sLogonCommHandler.LogonDatabaseSQLExecute( "UPDATE accounts SET banned = 1 WHERE login = '%s'", str );
+	sLog.outString( "User %s banned!", str );
 	sLogonCommHandler.LogonDatabaseReloadAccounts();
 }
 
-void CConsole::IPBan(char* str)
+void CConsole::IPBan( char* str )
 {
-	char ip[16] = {0};		// IPv4 address
-	uint32 dLength = 0;		// duration of ban, 0 = permanent
-	char dType = {0};		// duration type, defaults to minutes ( see convTimePeriod() )
+	char ip[16] = { 0 };		// IPv4 address
+	uint32 dLength = 0;			// duration of ban, 0 = permanent
+	char dType = { 0 };			// duration type, defaults to minutes ( see convTimePeriod() )
 
 	// we require at least one argument, the network address to ban
-	if ( sscanf(str, "%15s %u%c", ip, (unsigned int*)&dLength, &dType) < 1 )
+	if( sscanf(str, "%15s %u%c", ip, (unsigned int*)&dLength, &dType) < 1 )
 	{
-		sLog.outString("usage: banip <address> [duration]");
+		sLog.outString( "usage: banip <address> [duration]" );
 		return;
 	}
 
 	uint32 o1, o2, o3, o4;
-	if ( sscanf(ip, "%3u.%3u.%3u.%3u", (unsigned int*)&o1, (unsigned int*)&o2, (unsigned int*)&o3, (unsigned int*)&o4) != 4
-			|| o1 > 255 || o2 > 255 || o3 > 255 || o4 > 255)
+	if( sscanf( ip, "%3u.%3u.%3u.%3u", (unsigned int*)&o1, (unsigned int*)&o2, (unsigned int*)&o3, (unsigned int*)&o4) != 4 || o1 > 255 || o2 > 255 || o3 > 255 || o4 > 255 )
 	{
-		sLog.outString("Invalid IPv4 address [%s]", ip);
+		sLog.outString( "Invalid IPv4 address [%s]", ip );
 		return;
 	}
 
@@ -279,29 +285,29 @@ void CConsole::IPBan(char* str)
 		expire_time = 0;
 	else
 	{
-		time_t dPeriod = convTimePeriod(dLength, dType);
+		time_t dPeriod = convTimePeriod( dLength, dType );
 		if ( dPeriod == 0)
 		{
-			sLog.outString("Invalid ban duration");
+			sLog.outString( "Invalid ban duration" );
 			return;
 		}
 		time( &expire_time );
 		expire_time += dPeriod;
 	}
 
-	sLog.outString("Adding [%s] to IP ban table, expires: %s", ip, (expire_time == 0)? "Never" : ctime( &expire_time ));
-	sLogonCommHandler.LogonDatabaseSQLExecute("REPLACE INTO ipbans VALUES ('%s', %u);", WorldDatabase.EscapeString(ip).c_str(), (uint32)expire_time);
+	sLog.outString( "Adding [%s] to IP ban table, expires: %s", ip, (expire_time == 0) ? "Never" : ctime( &expire_time ) );
+	sLogonCommHandler.LogonDatabaseSQLExecute( "REPLACE INTO ipbans VALUES ('%s', %u);", WorldDatabase.EscapeString(ip).c_str(), (uint32)expire_time );
 	sLogonCommHandler.LogonDatabaseReloadAccounts();
 }
 
-void CConsole::IPUnBan(char* str)
+void CConsole::IPUnBan( char* str )
 {
-	char ip[16] = {0};		// IPv4 address
+	char ip[16] = {0}; // IPv4 address
 
 	// we require at least one argument, the network address to unban
-	if ( sscanf(str, "%15s", ip) < 1)
+	if ( sscanf( str, "%15s", ip ) < 1)
 	{
-		sLog.outString("usage: unbanip <address>");
+		sLog.outString( "usage: unbanip <address>" );
 		return;
 	}
 
@@ -312,27 +318,26 @@ void CConsole::IPUnBan(char* str)
 	 * no idea if the address existed and so the account/IPBanner cache requires reloading.
 	 */
 
-	sLog.outString("Removing [%s] from IP ban table if it exists", ip);
-	sLogonCommHandler.LogonDatabaseSQLExecute("DELETE FROM ipbans WHERE ip = '%s';", WorldDatabase.EscapeString(ip).c_str());
+	sLog.outString( "Removing [%s] from IP ban table if it exists", ip );
+	sLogonCommHandler.LogonDatabaseSQLExecute( "DELETE FROM ipbans WHERE ip = '%s';", WorldDatabase.EscapeString( ip ).c_str() );
 	sLogonCommHandler.LogonDatabaseReloadAccounts();
 	return;
 }
 
-void CConsole::PlayerInfo(char* str)
+void CConsole::PlayerInfo( char* str )
 {
 	char player[100];
-	if(sscanf(str, "%s", player) != 1)
+
+	if( sscanf(str, "%s", player ) != 1 )
 		return;
 
-	Player * _plr = objmgr.GetPlayer(player, false);
-	if(!_plr)
+	Player* _plr = objmgr.GetPlayer( player, false );
+	if( _plr == NULL )
 	{
-		sLog.outString("Cannot find online player %s", str);
+		sLog.outString( "Cannot find online player %s", str );
 		return;
 	}
-	
-	if(!_plr) return;
-	if(!_plr->GetSession())
+	if( !_plr->GetSession())
 	{
 		sLog.outString("ERROR: this player hasn't got any session !");
 		return;
@@ -340,83 +345,82 @@ void CConsole::PlayerInfo(char* str)
 
 	WorldSession* sess = _plr->GetSession();
 
-		static const char* _classes[12] =
+	static const char* _classes[12] =
 	{"None","Warrior", "Paladin", "Hunter", "Rogue", "Priest", "None", "Shaman", "Mage", "Warlock", "None", "Druid"};
+
 	static const char* _races[12] =
 	{"None","Human","Orc","Dwarf","Night Elf","Undead","Tauren","Gnome","Troll","None","Blood Elf","Draenei"};
 
-
-	sLog.outColor(TGREEN, "Name: ");
-	sLog.outColor(TNORMAL, "%s\n", _plr->GetName());
-	sLog.outColor(TGREEN, "Account: ");
-	sLog.outColor(TNORMAL, "%s\n", sess->GetAccountName().c_str());
-	sLog.outColor(TGREEN, "Level: ");
-	sLog.outColor(TNORMAL, "%d\n",  _plr->getLevel());
-	sLog.outColor(TGREEN, "Race: ");
-	sLog.outColor(TNORMAL, "%s\n", _races[_plr->getRace()]);
-	sLog.outColor(TGREEN, "Class: ");
-	sLog.outColor(TNORMAL, "%s\n", _classes[_plr->getClass()]);
-	sLog.outColor(TGREEN, "Map: ");
-	sLog.outColor(TNORMAL, "%d\n",  _plr->GetMapId());
-	sLog.outColor(TGREEN, "Banned: ");
-	sLog.outColor(TNORMAL, "%s\n",  (_plr->IsBanned() ? "Yes" : "No"));
+	sLog.outColor( TGREEN, "Name: " );
+	sLog.outColor( TNORMAL, "%s\n", _plr->GetName() );
+	sLog.outColor( TGREEN, "Account: " );
+	sLog.outColor( TNORMAL, "%s\n", sess->GetAccountName().c_str() );
+	sLog.outColor( TGREEN, "Level: " );
+	sLog.outColor( TNORMAL, "%d\n",  _plr->getLevel() );
+	sLog.outColor( TGREEN, "Race: " );
+	sLog.outColor( TNORMAL, "%s\n", _races[_plr->getRace()] );
+	sLog.outColor( TGREEN, "Class: " );
+	sLog.outColor( TNORMAL, "%s\n", _classes[_plr->getClass()] );
+	sLog.outColor( TGREEN, "Map: " );
+	sLog.outColor( TNORMAL, "%d\n",  _plr->GetMapId() );
+	sLog.outColor( TGREEN, "Banned: " );
+	sLog.outColor( TNORMAL, "%s\n",  (_plr->IsBanned() ? "Yes" : "No" ) );
 }
 
-void CConsole::Kick(char* str)
+void CConsole::Kick( char* str )
 {
 	char player[100];
 	char reason[256];
-	if(sscanf(str, "%s %s", player, reason) != 2)
+
+	if( sscanf( str, "%s %s", player, reason ) != 2 )
 		return;
 
-	Player * _plr = objmgr.GetPlayer(player, false);
-	if(!_plr)
+	Player* _plr = objmgr.GetPlayer( player, false );
+	if( _plr == NULL )
 	{
-		sLog.outColor(TRED, "Unable to find player %s\n", player);
+		sLog.outColor( TRED, "Unable to find player %s\n", player );
 		return;
 	}
 
-	_plr->BroadcastMessage("|cff00ccffYou have been kicked for |cffff0000%s", reason);
+	_plr->BroadcastMessage( "|cff00ccffYou have been kicked for |cffff0000%s", reason );
 	_plr->Kick(6000);
 
-
-	
 }
 
-void CConsole::WideAnnounce(char *str)
+void CConsole::WideAnnounce( char *str )
 {
-	if(!str)
+	if( str == NULL)
 		return;
 
 	char msg[500];
-	snprintf(msg, 500, "%sConsole:%s%s", "|cff00ccff", "|r", str);
-	sWorld.SendWorldText(msg, 0);
-	sWorld.SendWorldWideScreenText(msg, 0);
+	snprintf( msg, 500, "%sConsole:%s%s", "|cff00ccff", "|r", str );
+	sWorld.SendWorldText( msg, 0 );
+	sWorld.SendWorldWideScreenText( msg, 0 );
 }
 
-void CConsole::SaveallPlayers(char *str)
+void CConsole::SaveallPlayers( char *str )
 {
 	PlayerStorageMap::const_iterator itr;
 	uint32 stime = now();
 	uint32 count = 0;
 	objmgr._playerslock.AcquireReadLock();
-	for (itr = objmgr._players.begin(); itr != objmgr._players.end(); itr++)
+	for( itr = objmgr._players.begin(); itr != objmgr._players.end(); itr++ )
 	{
-		if(itr->second->GetSession())
+		if( itr->second->GetSession() )
 		{
-			itr->second->SaveToDB(false);
+			itr->second->SaveToDB( false );
 			count++;
 		}
 	}
 	objmgr._playerslock.ReleaseReadLock();
 	char msg[100];
-	snprintf(msg, 100, "Saved all %d online players in %d msec.", (unsigned int)count, (unsigned int)((uint32)now() - stime));
-	sWorld.SendWorldText(msg);
-	sWorld.SendWorldWideScreenText(msg);
+	snprintf( msg, 100, "Saved all %d online players in %d msec.", (unsigned int)count, (unsigned int)((uint32)now() - stime) );
+	sWorld.SendWorldText( msg );
+	sWorld.SendWorldWideScreenText( msg );
 }
 
 /*
-void CConsole::ReloadGMScripts(char * str)
+void CConsole::ReloadGMScripts( char * str )
 {
 	//ScriptSystem->Reload();
 }
@@ -430,24 +434,26 @@ const char * Console::GetLine(uint32 Delay)
 	{
 #ifdef WIN32
 		DWORD Bytes_Read;
-		DWORD Result = ReadFile(GetStdHandle(STD_INPUT_HANDLE), ConsoleBuffer, 65536, &Bytes_Read, NULL);
-		if(Bytes_Read != 0 && Result)
+		DWORD Result = ReadFile( GetStdHandle(STD_INPUT_HANDLE), ConsoleBuffer, 65536, &Bytes_Read, NULL );
+		if( Bytes_Read != 0 && Result )
 			return ConsoleBuffer;
 		else
 			return NULL;
 #else
 		struct termios initial_settings, new_settings;
-        	tcgetattr(0,&initial_settings);
-        	tcgetattr(0,&new_settings);
-       		new_settings.c_lflag &= ~ICANON;
-        	new_settings.c_lflag &= ~ECHO;
-       		new_settings.c_lflag &= ~ISIG;
-	        tcsetattr(0,TCSANOW,&new_settings);
+        
+		tcgetattr( 0,&initial_settings );
+        tcgetattr( 0,&new_settings );
+       	new_settings.c_lflag &= ~ICANON;
+        new_settings.c_lflag &= ~ECHO;
+       	new_settings.c_lflag &= ~ISIG;
+	    tcsetattr( 0,TCSANOW,&new_settings );
 
-		int br = read(fileno(stdin), ConsoleBuffer, 65536);
-        	tcsetattr(0,TCSANOW,&initial_settings);
+		int br = read( fileno(stdin), ConsoleBuffer, 65536 );
+        
+		tcsetattr( 0, TCSANOW, &initial_settings );
 
-		if(br != 0)
+		if( br != 0 )
 			return ConsoleBuffer;
 #endif
 	}
@@ -462,34 +468,34 @@ bool Console::PollConsole(uint32 Time)
 	timeval tv;
 
 	struct termios initial_settings, new_settings;
-	tcgetattr(0,&initial_settings);
-	tcgetattr(0,&new_settings);
+	tcgetattr( 0, &initial_settings );
+	tcgetattr( 0, &new_settings );
 	new_settings.c_lflag &= ~ICANON;
 	new_settings.c_lflag &= ~ECHO;
 	new_settings.c_lflag &= ~ISIG;
-	tcsetattr(0,TCSANOW,&new_settings);
+	tcsetattr( 0, TCSANOW, &new_settings );
 	
-	FD_ZERO(&fds);
-	FD_SET(fileno(stdin), &fds);
+	FD_ZERO( &fds );
+	FD_SET( fileno( stdin ), &fds );
 	
 	tv.tv_sec  = Time / 1000;
 	tv.tv_usec = (Time % 1000) * 1000;
 
-	int result = select(1, &fds, NULL, NULL, &tv);
-	tcsetattr(0,TCSANOW,&initial_settings);
-	if(result > 0)
+	int result = select( 1, &fds, NULL, NULL, &tv );
+	tcsetattr( 0, TCSANOW, &initial_settings );
+	if( result > 0 )
 		return true;
 	else
 		return false;
 #else
 	uint32 e = getMSTime() + Time;
 	uint32 n = getMSTime();
-	while(n < e)
+	while( n < e )
 	{
-        if(GetAsyncKeyState(VK_RETURN) != 0)
+        if( GetAsyncKeyState( VK_RETURN ) != 0 )
 			return true;
 
-		Sleep(100);
+		Sleep( 100 );
 	}
 	return false;
 #endif
@@ -499,18 +505,18 @@ bool Console::PollForD()
 {
 #ifndef WIN32
 	const char * buf = GetLine(1000);
-	if(!buf || buf[0] != 27)
+	if( buf == NULL || buf[0] != 27 )
 		return false;
 	return true;
 #else
 	uint32 e = getMSTime() + 1000;
 	uint32 n = getMSTime();
-	while(n < e)
+	while( n < e )
 	{
-		if(GetAsyncKeyState(VK_F1) != 0)
+		if( GetAsyncKeyState(VK_F1) != 0 )
 			return true;
 
-		Sleep(100);
+		Sleep( 100 );
 		n = getMSTime();
 	}
 	return false;
@@ -520,19 +526,18 @@ bool Console::PollForD()
 bool Console::WaitForSpace()
 {
 #ifndef WIN32
-	const char * buf = GetLine(100000);
-	if(buf && buf[0] != ' ')
+	const char * buf = GetLine( 100000 );
+	if( buf != NULL && buf[0] != ' ' )
 		WaitForSpace();
 
 	return true;
-
 #else
 	while(true)
 	{
-		if(GetAsyncKeyState(VK_SPACE) != 0)
+		if( GetAsyncKeyState( VK_SPACE ) != 0 )
 			return true;
 
-		Sleep(100);
+		Sleep( 100 );
 	}
 	return false;
 #endif

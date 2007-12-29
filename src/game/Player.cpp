@@ -3228,45 +3228,44 @@ void Player::RemoveFromWorld()
 	sWorld.mInWorldPlayerCount--;
 }
 
-
-
 // TODO: perhaps item should just have a list of mods, that will simplify code
-void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
+void Player::_ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedown )
 {
-	ASSERT(item);
+	ASSERT( item );
 	ItemPrototype *proto = item->GetProto();
 
 	//fast check to skip mod applying if the item doesnt meat the requirements.
-	if(item->GetUInt32Value(ITEM_FIELD_DURABILITY)==0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) && justdrokedown==false)
+	if( item->GetUInt32Value( ITEM_FIELD_DURABILITY ) == 0 && item->GetUInt32Value( ITEM_FIELD_MAXDURABILITY ) && justdrokedown == false )
 	{
 		return;
 	}
 
 	//check for rnd prop
-	item->ApplyRandomProperties(true);
+	item->ApplyRandomProperties( true );
 
 	//Items Set check
-	uint32 setid=proto->ItemSet;
-	
-	if(setid)
+	uint32 setid = proto->ItemSet;
+
+	if( setid )
 	{
-		ItemSetEntry *set=dbcItemSet.LookupEntry(setid);
-		ASSERT(set);
-		ItemSet* Set=NULL;
+		ItemSetEntry* set = dbcItemSet.LookupEntry(setid);
+		ASSERT( set );
+		ItemSet* Set = NULL;
 		std::list<ItemSet>::iterator i;
-		for(i=m_itemsets.begin();i!=m_itemsets.end();i++)
+		for( i = m_itemsets.begin(); i != m_itemsets.end(); i++ )
 		{
-			if(i->setid==setid)
+			if( i->setid == setid )
 			{   
 				Set = &(*i);
 				break;
 			}
 		}
-		if(apply)
+
+		if( apply )
 		{
-			if(!Set) 
+			if( !Set ) 
 			{
-				Set=new ItemSet;
+				Set = new ItemSet;
 				memset(Set,0,sizeof(ItemSet));
 				Set->itemscount=1;
 				Set->setid=setid;
@@ -3274,39 +3273,38 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 			else
 				Set->itemscount++;
 
-			if(!set->RequiredSkillID || (_GetSkillLineCurrent(set->RequiredSkillID,true) >= set->RequiredSkillAmt))
+			if( !set->RequiredSkillID || ( _GetSkillLineCurrent( set->RequiredSkillID, true ) >= set->RequiredSkillAmt ) )
 			{
-				for(uint32 x=0;x<8;x++)
+				for( uint32 x=0;x<8;x++)
 				{
-					if(Set->itemscount==set->itemscount[x])
+					if( Set->itemscount==set->itemscount[x])
 					{//cast new spell
-						SpellEntry *info= dbcSpell.LookupEntry(set->SpellID[x]);
-						Spell * spell=new Spell(this,info,true,NULL);
+						SpellEntry *info = dbcSpell.LookupEntry( set->SpellID[x] );
+						Spell * spell = new Spell( this, info, true, NULL );
 						SpellCastTargets targets;
 						targets.m_unitTarget = this->GetGUID();
-						spell->prepare(&targets);
-						if(info->RequiredShapeShift && (getClass()==DRUID || getClass()==WARRIOR))
+						spell->prepare( &targets );
+						if( info->RequiredShapeShift && (getClass() == DRUID || getClass() == WARRIOR ) )
 							m_SSSPecificSpells.insert(info->Id);
 					}
 				}
 			}
-			if(i==m_itemsets.end())
+			if( i == m_itemsets.end() )
 			{
-				m_itemsets.push_back(*Set);
+				m_itemsets.push_back( *Set );
 				delete Set;
 			}
 		}
 		else
 		{
-			if(Set)
+			if( Set )
 			{
-				for(uint32 x=0;x<8;x++)
-				if(Set->itemscount == set->itemscount[x])
+				for( uint32 x = 0; x < 8; x++ )
+				if( Set->itemscount == set->itemscount[x] )
 				{
-					this->RemoveAura(set->SpellID[x],GetGUID());
-					if(m_SSSPecificSpells.size())
-							m_SSSPecificSpells.erase(set->SpellID[x]);
-
+					this->RemoveAura( set->SpellID[x], GetGUID() );
+					if( m_SSSPecificSpells.size() )
+							m_SSSPecificSpells.erase( set->SpellID[x] );
 				}
 	   
 				if(!(--Set->itemscount))
@@ -3315,62 +3313,64 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 		}
 	}
  
+	// Armor
+	if( proto->Armor )
+	{
+		if( apply )BaseResistance[0 ]+= proto->Armor;  
+		else  BaseResistance[0] -= proto->Armor;
+		CalcResistance( 0 );
+	}
+
 	// Resistances
-	if (proto->Armor)
+	//TODO: FIXME: can there be negative resistances from items?
+	if( proto->FireRes )
 	{
-		if(apply)
-		BaseResistance[0]+=proto->Armor;  
-		else  BaseResistance[0]-=proto->Armor;
-		CalcResistance(0);
-
-	}  
-
-	//FIXME: can there be negative resistances from items?
-	if (proto->FireRes)
-	{
-		if(apply)FlatResistanceModifierPos[2]+=proto->FireRes;
-		else FlatResistanceModifierPos[2]-=proto->FireRes;
-		CalcResistance(2);
+		if( apply )FlatResistanceModifierPos[2] += proto->FireRes;
+		else FlatResistanceModifierPos[2] -= proto->FireRes;
+		CalcResistance( 2 );
 	}
 		
-	if (proto->NatureRes)
+	if( proto->NatureRes )
 	{
-		if(apply)FlatResistanceModifierPos[3]+=proto->NatureRes;
-		else FlatResistanceModifierPos[3]-=proto->NatureRes;
-		CalcResistance(3);
+		if( apply )FlatResistanceModifierPos[3] += proto->NatureRes;
+		else FlatResistanceModifierPos[3] -= proto->NatureRes;
+		CalcResistance( 3 );
 	}
 
-	if (proto->FrostRes)
+	if( proto->FrostRes )
 	{
-		if(apply)FlatResistanceModifierPos[4]+=proto->FrostRes;
-		else FlatResistanceModifierPos[4]-=proto->FrostRes;
-		CalcResistance(4);	
+		if( apply )FlatResistanceModifierPos[4] += proto->FrostRes;
+		else FlatResistanceModifierPos[4] -= proto->FrostRes;
+		CalcResistance( 4 );	
 	}
 
-	if (proto->ShadowRes)
+	if( proto->ShadowRes )
 	{
-		if(apply)FlatResistanceModifierPos[5]+=proto->ShadowRes;
-		else FlatResistanceModifierPos[5]-=proto->ShadowRes;
-		CalcResistance(5);	
+		if( apply )FlatResistanceModifierPos[5] += proto->ShadowRes;
+		else FlatResistanceModifierPos[5] -= proto->ShadowRes;
+		CalcResistance( 5 );	
 	}
 	 
-	if (proto->ArcaneRes)
+	if( proto->ArcaneRes )
 	{
-		if(apply)FlatResistanceModifierPos[6]+=proto->ArcaneRes;
-		else FlatResistanceModifierPos[6]-=proto->ArcaneRes;
-		CalcResistance(6);
+		if( apply )FlatResistanceModifierPos[6] += proto->ArcaneRes;
+		else FlatResistanceModifierPos[6] -= proto->ArcaneRes;
+		CalcResistance( 6 );
 	}
 	
 	// Stats
-	for (int i = 0; i < 10; i++)
+	for( int i = 0; i < 10; i++ )
 	{
 		int32 val = proto->Stats[i].Value;
 		if(val == 0) continue;
 		ModifyBonuses(proto->Stats[i].Type,apply?val:-val);
 	}
 	
+	// Shield block rating
+	ModifyBonuses( SHIELD_BLOCK_RATING, apply ? proto->Block : -proto->Block );
 
-	if(proto->Damage[0].Min)
+	// Damage
+	if( proto->Damage[0].Min )
 	{
 		if( proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_RANGEDRIGHT || 
 			proto->InventoryType == INVTYPE_THROWN )	
@@ -3394,26 +3394,26 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 	}
 
 	// Misc
-	if (apply)
+	if( apply )
 	{
 		// Apply all enchantment bonuses
 		item->ApplyEnchantmentBonuses();
 
 		for (int k = 0; k < 5;k++)
 		{
-			if (item->GetProto()->Spells[k].Trigger == 1)
+			if( item->GetProto()->Spells[k].Trigger == 1 )
 			{
-				SpellEntry* spells = dbcSpell.LookupEntry(item->GetProto()->Spells[k].Id);
-				Spell *spell = new Spell(this, spells ,true,NULL);
+				SpellEntry* spells = dbcSpell.LookupEntry( item->GetProto()->Spells[k].Id );
+				Spell *spell = new Spell( this, spells ,true, NULL );
 				SpellCastTargets targets;
 				targets.m_unitTarget = this->GetGUID();
 				spell->castedItemId = item->GetEntry();
-				spell->prepare(&targets);
-				if(spells->RequiredShapeShift && (getClass()==DRUID || getClass()==WARRIOR))
+				spell->prepare( &targets );
+				if( spells->RequiredShapeShift && ( getClass()==DRUID || getClass()==WARRIOR ) )
 						m_SSSPecificSpells.insert(spells->Id);
 
 			}
-			else if(item->GetProto()->Spells[k].Trigger == 2)
+			else if( item->GetProto()->Spells[k].Trigger == 2 )
 			{
 				ProcTriggerSpell ts;
 				ts.origId=0;
@@ -3430,26 +3430,32 @@ void Player::_ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown)
 	{
 		// Remove all enchantment bonuses
 		item->RemoveEnchantmentBonuses();
-		for (int k = 0; k < 5;k++)
+		for( int k = 0; k < 5; k++ )
 		{
-			if (item->GetProto()->Spells[k].Trigger == 1)
+			if( item->GetProto()->Spells[k].Trigger == 1 )
 			{
-				this->RemoveAura(item->GetProto()->Spells[k].Id); 
-				if(m_SSSPecificSpells.size())
-					m_SSSPecificSpells.erase(item->GetProto()->Spells[k].Id);
-
-
-			}else if(item->GetProto()->Spells[k].Trigger == 2)
+				this->RemoveAura( item->GetProto()->Spells[k].Id ); 
+				if( m_SSSPecificSpells.size() )
+				{
+					m_SSSPecificSpells.erase( item->GetProto()->Spells[k].Id );
+				}
+			}
+			else if( item->GetProto()->Spells[k].Trigger == 2 )
 			{
 				std::list<struct ProcTriggerSpell>::iterator i;
-				for(i=m_procSpells.begin();i!=m_procSpells.end();i++)
-				if((*i).spellId==item->GetProto()->Spells[k].Id)
+				// Debug: i changed this a bit the if was not indented to the for
+				// so it just set last one to deleted looks like unintended behaviour
+				// because you can just use end()-1 to remove last so i put the if
+				// into the for
+				for( i = m_procSpells.begin(); i != m_procSpells.end(); i++ )
 				{
-					//m_procSpells.erase(i);
-					i->deleted = true;
-					break;
+					if( (*i).spellId == item->GetProto()->Spells[k].Id )
+					{
+						//m_procSpells.erase(i);
+						i->deleted = true;
+						break;
+					}
 				}
-
 			}
 		}
 	}

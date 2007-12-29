@@ -1728,7 +1728,8 @@ protected:
 	uint32 iActivePet;
 	void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
 	void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;
-/* Update system components */
+
+	/* Update system components */
 	ByteBuffer bUpdateBuffer;
     ByteBuffer bCreationBuffer;
 	uint32 mUpdateCount;
@@ -1736,12 +1737,14 @@ protected:
 	uint32 mOutOfRangeIdCount;
 	ByteBuffer mOutOfRangeIds;
 	SplineMap _splineMap;
-/* End update system */
+	/* End update system */
+
 	void _LoadTutorials(QueryResult * result);
 	void _SaveTutorials();
 	void _SaveInventory(bool firstsave);
 	void _SaveQuestLogEntry();
 	void _LoadQuestLogEntry(QueryResult * result);
+
 	// DK
 	void _LoadPet(QueryResult * result);
 	void _LoadPetNo();
@@ -1751,14 +1754,15 @@ protected:
 	void _SaveItemCooldown();
 	void _LoadItemCooldown(QueryResult * result);
 	void _SaveSpellCoolDownSecurity();
-	void _LoadSpellCoolDownSecurity(QueryResult * result);
-	void _ApplyItemMods(Item *item, int8 slot,bool apply,bool justdrokedown=false);
-   
-	void _EventAttack(bool offhand);
+	void _LoadSpellCoolDownSecurity( QueryResult* result );
+	void _ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedown = false );
+	void _EventAttack( bool offhand );
 	void _EventExploration();
 	void UpdateCooldowns();
+
 	// Water level related stuff
 	void SetNoseLevel();
+
 	// Cooldown stuff
 	std::map<uint32,uint32>	 SpellCooldownMap;
 	std::map<uint32,uint32>	 SpellCooldownCategoryMap;
