@@ -540,7 +540,7 @@ void CommandTableStorage::Init()
 		{ "lookupitem", 'l', &ChatHandler::HandleLookupItemCommand, "Looks up item string x.", NULL, 0, 0, 0 },
 		{ "lookupquest", 'l', &ChatHandler::HandleQuestLookupCommand, "Looks up quest string x.", NULL, 0, 0, 0 },
 		{ "lookupcreature", 'l', &ChatHandler::HandleLookupCreatureCommand, "Looks up item string x.", NULL, 0, 0, 0 },
-//		{ "reloadscripts", 'w', &ChatHandler::HandleReloadScriptsCommand, "Reloads GM Scripts", NULL, 0, 0, 0 },
+		//{ "reloadscripts", 'w', &ChatHandler::HandleReloadScriptsCommand, "Reloads GM Scripts", NULL, 0, 0, 0 },
 		{ "silentplayer", 't', &ChatHandler::HandleSilentPlayerCommand, "Player cannot chat for x minutes <duration> (default 5 minutes)", NULL, 0, 0, 0 },
 		{ "changepassword", 'z', &ChatHandler::HandleChangePasswordCommand, "Changes your accounts password.", NULL, 0, 0, 0 },
 		{ "rehash", 'z', &ChatHandler::HandleRehashCommand, "Reloads config file.", NULL, 0, 0, 0 },
@@ -551,6 +551,8 @@ void CommandTableStorage::Init()
 		{ "testlos", 'm', &ChatHandler::HandleCollisionTestLOS, "tests los", NULL, 0, 0, 0 },
 		{ "testindoor", 'm', &ChatHandler::HandleCollisionTestIndoor, "tests indoor", NULL, 0, 0, 0 },
 		{ "renameallinvalidchars", 'z', &ChatHandler::HandleRenameAllCharacter, "Renames all invalid character names", NULL, 0,0, 0 },
+		{ "removesickness",   'm', &ChatHandler::HandleRemoveRessurectionSickessAuraCommand,   "Removes ressurrection sickness from the target",  NULL, 0, 0, 0},
+	
 		{ NULL,		  0, NULL,										 "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(commandTable, _commandTable);

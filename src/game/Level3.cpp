@@ -845,6 +845,16 @@ bool ChatHandler::HandleRemoveAurasCommand(const char *args, WorldSession *m_ses
 	return true;
 }
 
+bool ChatHandler::HandleRemoveRessurectionSickessAuraCommand(const char *args, WorldSession *m_session)
+{
+	Player *plr = getSelectedChar(m_session, true);
+	if(!plr) return false;
+
+	BlueSystemMessage(m_session, "Removing ressurection sickness...");
+	plr->RemoveAura( 15007 );
+	return true;
+}
+
 bool ChatHandler::HandleParalyzeCommand(const char* args, WorldSession *m_session)
 {
 	//Player *plr = getSelectedChar(m_session, true);
