@@ -4418,7 +4418,11 @@ void Player::UpdateStats()
 	}
 
 	//int32 block = GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) + m_modblockvaluefromspells * ( 1 + (uint32)( m_modblockabsorbvalue * 0.01 ) ) + ( ( str / 20 ) - 1 );
-	int32 blockable_damage = ( GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) * ( ( 100 + m_modblockvaluefromspells ) / 100 ) + ( ( str ) / 20 ) - 1 );
+	//int32 blockable_damage = ( GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) * ( m_modblockvaluefromspells * 0.11 ) ) + ( ( str / 20 ) - 1 );
+	float block_multiplier = float( m_modblockvaluefromspells ) * 0.11f;
+	if( block_multiplier < 1.0f )block_multiplier = 1.0f;
+	
+	int32 blockable_damage = float2int32( ( float( GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( str ) / 20.0f ) - 1.0f ) );
 	SetUInt32Value( PLAYER_SHIELD_BLOCK, blockable_damage );
 	////////////////////RATINGS STUFF//////////////////////
 

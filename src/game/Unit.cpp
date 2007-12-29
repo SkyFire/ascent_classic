@@ -2224,7 +2224,12 @@ else
 						targetEvent = 2;
 						pVictim->Emote(EMOTE_ONESHOT_PARRYSHIELD);// Animation
 						//blocked_damage = uint32( (shield->GetProto()->Block + static_cast< Player* >( pVictim )->m_modblockvaluefromspells) * (1+(((Player*)pVictim)->m_modblockabsorbvalue*0.01)) + pVictim->GetUInt32Value(UNIT_FIELD_STAT0)/20 );
-						blocked_damage = pVictim->GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) * ( ( 100 + static_cast< Player* >( pVictim )->m_modblockvaluefromspells ) / 100 ) + ( ( pVictim->GetUInt32Value( UNIT_FIELD_STAT0 ) / 20 ) - 1 );
+						//blocked_damage = pVictim->GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) * ( static_cast< Player* >( pVictim )->m_modblockvaluefrompells * 0.11 ) + ( ( pVictim->GetUInt32Value( UNIT_FIELD_STAT0 ) / 20 ) - 1 );
+
+						float block_multiplier = float( static_cast< Player* >( pVictim )->m_modblockvaluefromspells ) * 0.11f;
+						if( block_multiplier < 1.0f )block_multiplier = 1.0f;
+
+						blocked_damage = float2int32( ( float( pVictim->GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( pVictim->GetUInt32Value( UNIT_FIELD_STAT0 ) ) / 20.0f ) - 1.0f ) );
 
 						if(dmg.full_damage <= (int32)blocked_damage)
 						{
