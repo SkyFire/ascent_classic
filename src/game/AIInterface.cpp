@@ -556,6 +556,9 @@ void AIInterface::Update(uint32 p_time)
 			m_AIState = STATE_IDLE;
 			m_returnX = m_returnY = m_returnZ = 0.0f;
 			m_moveRun = false;
+			//remowed by zack : in scripted events if we keep reducing this it will bug the world out !
+			//On Blizz it will return to previous wp but we can except the fact that it will move on to next one
+			/*
 			if(hasWaypoints())
 			{
 				if(m_moveBackward)
@@ -569,6 +572,7 @@ void AIInterface::Update(uint32 p_time)
 						m_currentWaypoint--;
 				}
 			}
+			*/
 			// Set health to full if they at there last location before attacking
 			if(m_AIType != AITYPE_PET&&!skip_reset_hp)
 				m_Unit->SetUInt32Value(UNIT_FIELD_HEALTH,m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
@@ -2458,7 +2462,10 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				{
 					++m_currentWaypoint;
 					if(m_currentWaypoint > GetWayPointsCount())
+					{
+						//hmm maybe we should stop being path walker since we are waiting here anyway
 						destpoint = -1;
+					}
 					else
 						destpoint = m_currentWaypoint;
 				}
