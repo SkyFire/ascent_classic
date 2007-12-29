@@ -4359,50 +4359,51 @@ void Player::UpdateStats()
 	/* modifiers */
 	RAP += int32(float(float(m_rap_mod_pct) * float(float(m_uint32Values[UNIT_FIELD_STAT3]) / 100.0f)));
 
-	if(RAP <0) RAP=0;
-	if(AP < 0) AP=0;
-	SetUInt32Value(UNIT_FIELD_ATTACK_POWER, AP);
-	SetUInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER, RAP); 
+	if( RAP < 0 )RAP = 0;
+	if( AP < 0 )AP = 0;
 
-	LevelInfo * lvlinfo = objmgr.GetLevelInfo(this->getRace(),this->getClass(),lev);
-	int32 hpdelta = lvlinfo->Stat[2]*10;
-	int32 manadelta = lvlinfo->Stat[3]*15;
-	lvlinfo = objmgr.GetLevelInfo(this->getRace(),this->getClass(),1);
-	hpdelta -= lvlinfo->Stat[2]*10;
-	manadelta -= lvlinfo->Stat[3]*15;
+	SetUInt32Value( UNIT_FIELD_ATTACK_POWER, AP );
+	SetUInt32Value( UNIT_FIELD_RANGED_ATTACK_POWER, RAP ); 
+
+	LevelInfo* lvlinfo = objmgr.GetLevelInfo( this->getRace(), this->getClass(),lev );
+	int32 hpdelta = lvlinfo->Stat[2] * 10;
+	int32 manadelta = lvlinfo->Stat[3] * 15;
+	lvlinfo = objmgr.GetLevelInfo( this->getRace(), this->getClass(), 1 );
+	hpdelta -= lvlinfo->Stat[2] * 10;
+	manadelta -= lvlinfo->Stat[3] * 15;
 	
-	int32 hp=GetUInt32Value(UNIT_FIELD_BASE_HEALTH);
-	int32 bonus=(GetUInt32Value(UNIT_FIELD_POSSTAT2)-GetUInt32Value(UNIT_FIELD_NEGSTAT2))*10+m_healthfromspell+m_healthfromitems;
-	int32 res=hp+bonus+hpdelta;
-    int32 oldmaxhp=GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-	if(res<hp)res=hp;
-	SetUInt32Value(UNIT_FIELD_MAXHEALTH, res  );
+	int32 hp = GetUInt32Value( UNIT_FIELD_BASE_HEALTH );
+	int32 bonus = ( GetUInt32Value( UNIT_FIELD_POSSTAT2 ) - GetUInt32Value( UNIT_FIELD_NEGSTAT2 ) ) * 10 + m_healthfromspell + m_healthfromitems;
+	int32 res = hp + bonus + hpdelta;
+    int32 oldmaxhp = GetUInt32Value( UNIT_FIELD_MAXHEALTH );
+
+	if( res < hp ) res = hp;
+	SetUInt32Value( UNIT_FIELD_MAXHEALTH, res );
 	
-	if((int32)GetUInt32Value(UNIT_FIELD_HEALTH)>res)
-		SetUInt32Value(UNIT_FIELD_HEALTH,res);
-    else if ( (cl==DRUID) && (GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR) )
+	if( ( int32 )GetUInt32Value( UNIT_FIELD_HEALTH ) > res )
+		SetUInt32Value( UNIT_FIELD_HEALTH, res );
+    else if( ( cl == DRUID) && ( GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR ) )
     {
-        res= float2int32((float)GetUInt32Value(UNIT_FIELD_MAXHEALTH)*(float)GetUInt32Value(UNIT_FIELD_HEALTH)/float(oldmaxhp));
-        SetUInt32Value(UNIT_FIELD_HEALTH,res);
+        res = float2int32( ( float )GetUInt32Value( UNIT_FIELD_MAXHEALTH ) * ( float )GetUInt32Value( UNIT_FIELD_HEALTH ) / float( oldmaxhp ) );
+        SetUInt32Value( UNIT_FIELD_HEALTH, res );
     }
-	
 		
-	if(cl!=WARRIOR&&cl!=ROGUE)
+	if( cl != WARRIOR && cl != ROGUE )
 	{
-	// MP
-		int32 mana = GetUInt32Value(UNIT_FIELD_BASE_MANA);
-		bonus=(GetUInt32Value(UNIT_FIELD_POSSTAT3)-GetUInt32Value(UNIT_FIELD_NEGSTAT3))*15+m_manafromspell +m_manafromitems ;
-		res=mana+bonus+manadelta;
-		if(res<mana)res=mana;	
+		// MP
+		int32 mana = GetUInt32Value( UNIT_FIELD_BASE_MANA );
+		bonus = (GetUInt32Value( UNIT_FIELD_POSSTAT3)-GetUInt32Value(UNIT_FIELD_NEGSTAT3))*15+m_manafromspell +m_manafromitems ;
+		res = mana + bonus + manadelta;
+		if( res < mana )res = mana;	
 		SetUInt32Value(UNIT_FIELD_MAXPOWER1, res);
 
 		if((int32)GetUInt32Value(UNIT_FIELD_POWER1)>res)
 			SetUInt32Value(UNIT_FIELD_POWER1,res);
 
-	//Manaregen
-		const static float ClassMultiplier[12]={0.0f,0.0f,0.2f,0.2f,0.0f,0.25f,0.0f,0.2f,0.25f,0.2f,0.0f,0.225f};
-		const static float ClassFlatMod[12]={0.0f,0.0f,15.0f,15.0f,0.0f,12.5f,0.0f,15.0f,12.5f,15.0f,0.0f,15.0f};
-		uint32 Spirit = GetUInt32Value(UNIT_FIELD_STAT4);
+		//Manaregen
+		const static float ClassMultiplier[12] = {0.0f,0.0f,0.2f,0.2f,0.0f,0.25f,0.0f,0.2f,0.25f,0.2f,0.0f,0.225f};
+		const static float ClassFlatMod[12] = {0.0f,0.0f,15.0f,15.0f,0.0f,12.5f,0.0f,15.0f,12.5f,15.0f,0.0f,15.0f};
+		uint32 Spirit = GetUInt32Value( UNIT_FIELD_STAT4 );
 		float amt = (Spirit*ClassMultiplier[cl]+ClassFlatMod[cl])*PctPowerRegenModifier[POWER_TYPE_MANA]*0.5f;
 		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN,amt+m_ModInterrMRegen/5.0f);
 		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT,amt*m_ModInterrMRegenPCT/100.0f+m_ModInterrMRegen/5.0f);
@@ -4416,8 +4417,9 @@ void Player::UpdateStats()
 		SpellHasteRatingBonus = cast_speed;
 	}
 
-	int block = float2int32( CalcRating( PLAYER_RATING_MODIFIER_BLOCK ) + ( ( float( str ) / 20.0f ) - 1.0f ) );
-	SetUInt32Value( PLAYER_SHIELD_BLOCK, block );
+	//int32 block = GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) + m_modblockvaluefromspells * ( 1 + (uint32)( m_modblockabsorbvalue * 0.01 ) ) + ( ( str / 20 ) - 1 );
+	int32 blockable_damage = ( GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) * ( ( 100 + m_modblockvaluefromspells ) / 100 ) + ( ( str ) / 20 ) - 1 );
+	SetUInt32Value( PLAYER_SHIELD_BLOCK, blockable_damage );
 	////////////////////RATINGS STUFF//////////////////////
 
 	UpdateChances();
