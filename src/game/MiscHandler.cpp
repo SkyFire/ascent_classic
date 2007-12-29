@@ -722,13 +722,13 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
 {
 	Player *pPlayer = GetPlayer();
-	sHookInterface.OnLogoutRequest(pPlayer);
 	WorldPacket data(SMSG_LOGOUT_RESPONSE, 9);
 
 	sLog.outDebug( "WORLD: Recvd CMSG_LOGOUT_REQUEST Message" );
 
 	if(pPlayer)
 	{
+		sHookInterface.OnLogoutRequest(pPlayer);
 		if(pPlayer->m_isResting ||	  // We are resting so log out instantly
 			pPlayer->GetTaxiState() ||  // or we are on a taxi
 			HasGMPermissions())		   // or we are a gm
