@@ -3362,12 +3362,15 @@ void Player::_ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedo
 	for( int i = 0; i < 10; i++ )
 	{
 		int32 val = proto->Stats[i].Value;
-		if(val == 0) continue;
-		ModifyBonuses(proto->Stats[i].Type,apply?val:-val);
+		if( val == 0 ) continue;
+		ModifyBonuses( proto->Stats[i].Type, apply ? val : -val );
 	}
 	
 	// Shield block rating
-	ModifyBonuses( SHIELD_BLOCK_RATING, apply ? proto->Block : -proto->Block );
+	ModifyBonuses( SHIELD_BLOCK_RATING, apply ? (int32)proto->Block : -(int32)proto->Block );
+
+	// Expertise
+	//PLAYER_EXPERTISE
 
 	// Damage
 	if( proto->Damage[0].Min )
@@ -4404,14 +4407,19 @@ void Player::UpdateStats()
 		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN,amt+m_ModInterrMRegen/5.0f);
 		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT,amt*m_ModInterrMRegenPCT/100.0f+m_ModInterrMRegen/5.0f);
 	}
-/////////////////////RATINGS STUFF/////////////////
-	float newb = CalcRating( PLAYER_RATING_MODIFIER_SPELL_HASTE );
-	if( newb != SpellHasteRatingBonus )
+
+	/////////////////////RATINGS STUFF/////////////////
+	float cast_speed = CalcRating( PLAYER_RATING_MODIFIER_SPELL_HASTE );
+	if( cast_speed != SpellHasteRatingBonus )
 	{
-		ModFloatValue( UNIT_MOD_CAST_SPEED, ( SpellHasteRatingBonus - newb ) / 100.0f);
-		SpellHasteRatingBonus = newb;
+		ModFloatValue( UNIT_MOD_CAST_SPEED, ( SpellHasteRatingBonus - cast_speed ) / 100.0f);
+		SpellHasteRatingBonus = cast_speed;
 	}
-////////////////////RATINGS STUFF//////////////////////
+
+	int block = float2int32( CalcRating( PLAYER_RATING_MODIFIER_BLOCK ) + ( ( float( str ) / 20.0f ) - 1.0f ) );
+	SetUInt32Value( PLAYER_SHIELD_BLOCK, block );
+	////////////////////RATINGS STUFF//////////////////////
+
 	UpdateChances();
 	CalcDamage();
 }
