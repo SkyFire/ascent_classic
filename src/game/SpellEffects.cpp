@@ -356,12 +356,15 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			}break;
 		case 2189817683UL:	// Shield Slam - damage is increased by block value
 			{
-				if(p_caster)
+				if( p_caster != NULL )
 				{
-					Item *it = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
-					if(it && it->GetProto()->InventoryType == INVTYPE_SHIELD)
+					Item *it = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+					if( it && it->GetProto()->InventoryType == INVTYPE_SHIELD )
 					{
-						dmg += it->GetProto()->Block;
+						float block_multiplier = ( 100.0f + float( p_caster->m_modblockabsorbvalue ) ) / 100.0f;
+						if( block_multiplier < 1.0f )block_multiplier = 1.0f;
+						int32 blockable_damage = float2int32( float( it->GetProto()->Block ) +( float( m_modblockvaluefromspells + GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( str ) / 20.0f ) - 1.0f ) );
+						dmg += blockable_damage;
 					}
 				}
 			}break;

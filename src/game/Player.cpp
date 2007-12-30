@@ -4180,7 +4180,6 @@ void Player::UpdateChances()
 	tmp += CalcRating( PLAYER_RATING_MODIFIER_DODGE ) + this->GetDodgeFromSpell();
 	tmp += defence_contribution;
 	if( tmp < 0.0f )tmp = 0.0f;
-	if( getRace() == RACE_NIGHTELF )tmp += 1.0f;
 
 	SetFloatValue( PLAYER_DODGE_PERCENTAGE, min( tmp, 95.0f ) );
 
