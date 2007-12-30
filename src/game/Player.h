@@ -1238,6 +1238,7 @@ public:
 	//falling?
 	uint32 m_fallTime;
 	bool bSafeFall;
+	bool bFeatherFall;
 	// Gossip
 	GossipMenu* CurrentGossipMenu;
 	void CleanupGossipMenu();

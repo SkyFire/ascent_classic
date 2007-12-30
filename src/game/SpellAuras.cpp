@@ -5256,12 +5256,12 @@ void Aura::SpellAuraFeatherFall( bool apply )
 	{
 		SetPositive();
 		data.SetOpcode( SMSG_MOVE_FEATHER_FALL );
-		( ( Player* )m_target )->bSafeFall = true;
+		( ( Player* )m_target )->bFeatherFall = true;
 	}
 	else 
 	{
 		data.SetOpcode(SMSG_MOVE_NORMAL_FALL);
-		( ( Player* )m_target )->bSafeFall = false;
+		( ( Player* )m_target )->bFeatherFall = false;
 	}
   
 	data << m_target->GetNewGUID();
