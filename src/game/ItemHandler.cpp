@@ -1849,7 +1849,7 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 		return;
 	}
 
-	if( dst->wrapped_item_id )
+	if( dst->wrapped_item_id || src->wrapped_item_id )
 	{
 		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_WRAPPED_CANT_BE_WRAPPED );
 		return;
