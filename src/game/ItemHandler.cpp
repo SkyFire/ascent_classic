@@ -1867,6 +1867,11 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 		return;
 	}
 
+	if( dst->HasEnchantments() )
+	{
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_ITEM_LOCKED );
+		return;
+	}
 	if( destitem_bagslot == (int8)0xFF && ( destitem_slot >= EQUIPMENT_SLOT_START && destitem_slot <= EQUIPMENT_SLOT_END ) )
 	{
 		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_EQUIPPED_CANT_BE_WRAPPED );

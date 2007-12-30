@@ -167,6 +167,8 @@ public:
 		random_suffix = id;
 	}
 
+	bool HasEnchantments() { return (Enchantments.size() > 0) ? true : false; }
+
 	uint32 wrapped_item_id;
 
 protected:
