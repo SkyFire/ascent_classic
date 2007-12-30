@@ -2,7 +2,7 @@
 SQLyog Enterprise - MySQL GUI v6.13
 MySQL - 5.0.41-community-nt : Database - character
 *********************************************************************
-*/
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -14,15 +14,25 @@ MySQL - 5.0.41-community-nt : Database - character
 
 CREATE TABLE `account_data` (
   `acct` int(30) NOT NULL,
-  `accountdata0` text NOT NULL,
-  `accountdata1` text NOT NULL,
-  `accountdata2` text NOT NULL,
-  `accountdata3` text NOT NULL,
-  `accountdata4` text NOT NULL,
-  `accountdata5` text NOT NULL,
-  `accountdata6` text NOT NULL,
-  `accountdata7` text NOT NULL,
-  PRIMARY KEY  (`acct`)
+  `uiconfig0` blob,
+  `uiconfig1` blob,
+  `uiconfig2` blob,
+  `uiconfig3` blob,
+  `uiconfig4` blob,
+  `uiconfig5` blob,
+  `uiconfig6` blob,
+  `uiconfig7` blob,
+  `uiconfig8` blob,
+  PRIMARY KEY  (`acct`),
+  UNIQUE KEY `a` (`acct`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+/*Table structure for table `account_forced_permissions` */
+
+CREATE TABLE `account_forced_permissions` (
+  `login` varchar(50) NOT NULL,
+  `permissions` varchar(100) NOT NULL,
+  PRIMARY KEY  (`login`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*Table structure for table `arenateams` */
@@ -305,6 +315,10 @@ CREATE TABLE `groups` (
   `subgroup_count` tinyint(3) unsigned NOT NULL,
   `loot_method` tinyint(3) unsigned NOT NULL,
   `loot_threshold` tinyint(3) unsigned NOT NULL,
+  `difficulty` int(30) NOT NULL default '0',
+  `assistant_leader` int(30) NOT NULL default '0',
+  `main_tank` int(30) NOT NULL default '0',
+  `main_assist` int(30) NOT NULL default '0',
   `group1member1` int(10) unsigned NOT NULL,
   `group1member2` int(10) unsigned NOT NULL,
   `group1member3` int(10) unsigned NOT NULL,
@@ -349,13 +363,54 @@ CREATE TABLE `groups` (
   PRIMARY KEY  (`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+/*Table structure for table `guild_bankitems` */
+
+CREATE TABLE `guild_bankitems` (
+  `guildId` int(30) NOT NULL,
+  `tabId` int(30) NOT NULL,
+  `slotId` int(30) NOT NULL,
+  `itemGuid` int(30) NOT NULL,
+  PRIMARY KEY  (`guildId`,`tabId`,`slotId`),
+  KEY `a` (`guildId`),
+  KEY `b` (`tabId`),
+  KEY `c` (`slotId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+/*Table structure for table `guild_banklogs` */
+
+CREATE TABLE `guild_banklogs` (
+  `log_id` int(30) NOT NULL,
+  `guildid` int(30) NOT NULL,
+  `tabid` int(30) NOT NULL COMMENT 'tab 6 is money logs',
+  `action` int(5) NOT NULL,
+  `player_guid` int(30) NOT NULL,
+  `item_entry` int(30) NOT NULL,
+  `stack_count` int(30) NOT NULL,
+  `timestamp` int(30) NOT NULL,
+  PRIMARY KEY  (`log_id`,`guildid`),
+  KEY `a` (`guildid`),
+  KEY `b` (`tabid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+/*Table structure for table `guild_banktabs` */
+
+CREATE TABLE `guild_banktabs` (
+  `guildId` int(30) NOT NULL,
+  `tabId` int(30) NOT NULL,
+  `tabName` varchar(200) NOT NULL,
+  `tabIcon` varchar(200) NOT NULL,
+  PRIMARY KEY  (`guildId`,`tabId`),
+  KEY `a` (`guildId`),
+  KEY `b` (`tabId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 /*Table structure for table `guild_checkpoints` */
 
 CREATE TABLE `guild_checkpoints` (
   `guildid` int(30) NOT NULL,
   `checkid` int(30) NOT NULL,
   PRIMARY KEY  (`guildid`,`checkid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*Table structure for table `guild_data` */
 
@@ -364,8 +419,22 @@ CREATE TABLE `guild_data` (
   `playerid` int(30) NOT NULL,
   `guildRank` int(30) NOT NULL,
   `publicNote` varchar(300) NOT NULL,
-  `officerNote` varchar(300) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `officerNote` varchar(300) NOT NULL,
+  `lastWithdrawReset` int(30) NOT NULL default '0',
+  `withdrawlsSinceLastReset` int(30) NOT NULL default '0',
+  `lastItemWithdrawReset0` int(30) NOT NULL default '0',
+  `itemWithdrawlsSinceLastReset0` int(30) NOT NULL default '0',
+  `lastItemWithdrawReset1` int(30) NOT NULL,
+  `itemWithdrawlsSinceLastReset1` int(30) NOT NULL,
+  `lastItemWithdrawReset2` int(30) NOT NULL,
+  `itemWithdrawlsSinceLastReset2` int(30) NOT NULL,
+  `lastItemWithdrawReset3` int(30) NOT NULL,
+  `itemWithdrawlsSinceLastReset3` int(30) NOT NULL,
+  `lastItemWithdrawReset4` int(30) NOT NULL,
+  `itemWithdrawlsSinceLastReset4` int(30) NOT NULL,
+  `lastItemWithdrawReset5` int(30) NOT NULL,
+  `itemWithdrawlsSinceLastReset5` int(30) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*Table structure for table `guild_logs` */
 
@@ -377,46 +446,50 @@ CREATE TABLE `guild_logs` (
   `misc1` int(30) NOT NULL,
   `misc2` int(30) NOT NULL,
   `misc3` int(30) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*Table structure for table `guild_ranks` */
 
 CREATE TABLE `guild_ranks` (
-  `guildId` int(10) unsigned NOT NULL,
-  `rankId` int(10) unsigned NOT NULL default '0',
-  `rankName` varchar(32) character set utf8 collate utf8_unicode_ci NOT NULL default '',
-  `rankRights` int(10) unsigned NOT NULL default '0',
-  `rankRights_1` int(30) NOT NULL default '0',
-  `rankRights_2` int(30) NOT NULL default '0',
-  `rankRights_3` int(30) NOT NULL default '0',
-  `rankRights_4` int(30) NOT NULL default '0',
-  `rankRights_5` int(30) NOT NULL default '0',
-  `rankRights_6` int(30) NOT NULL default '0',
-  `rankRights_7` int(30) NOT NULL default '0',
-  `rankRights_8` int(30) NOT NULL default '0',
-  `rankRights_9` int(30) NOT NULL default '0',
-  `rankRights_10` int(30) NOT NULL default '0',
-  `rankRights_11` int(30) NOT NULL default '0',
-  `rankRights_12` int(30) NOT NULL default '0',
-  `rankRights_13` int(30) NOT NULL default '0'
+  `guildId` int(6) unsigned NOT NULL default '0',
+  `rankId` int(1) NOT NULL default '0',
+  `rankName` varchar(255) NOT NULL default '',
+  `rankRights` int(3) unsigned NOT NULL default '0',
+  `goldLimitPerDay` int(30) NOT NULL default '0',
+  `bankTabFlags0` int(30) NOT NULL default '0',
+  `itemStacksPerDay0` int(30) NOT NULL default '0',
+  `bankTabFlags1` int(30) NOT NULL default '0',
+  `itemStacksPerDay1` int(30) NOT NULL default '0',
+  `bankTabFlags2` int(30) NOT NULL default '0',
+  `itemStacksPerDay2` int(30) NOT NULL default '0',
+  `bankTabFlags3` int(30) NOT NULL default '0',
+  `itemStacksPerDay3` int(30) NOT NULL default '0',
+  `bankTabFlags4` int(30) NOT NULL default '0',
+  `itemStacksPerDay4` int(30) NOT NULL default '0',
+  `bankTabFlags5` int(30) NOT NULL default '0',
+  `itemStacksPerDay5` int(30) NOT NULL default '0',
+  PRIMARY KEY  (`guildId`,`rankId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*Table structure for table `guilds` */
 
 CREATE TABLE `guilds` (
-  `guildId` int(10) unsigned NOT NULL auto_increment,
-  `guildName` varchar(32) collate utf8_unicode_ci NOT NULL,
-  `leaderGuid` int(10) unsigned NOT NULL default '0',
-  `emblemStyle` int(10) unsigned NOT NULL default '0',
-  `emblemColor` int(10) unsigned NOT NULL default '0',
-  `borderStyle` int(10) unsigned NOT NULL default '0',
-  `borderColor` int(10) unsigned NOT NULL default '0',
-  `backgroundColor` int(10) unsigned NOT NULL default '0',
-  `guildInfo` varchar(100) collate utf8_unicode_ci NOT NULL default '',
-  `motd` varchar(100) collate utf8_unicode_ci NOT NULL default '',
+  `guildId` bigint(20) NOT NULL auto_increment,
+  `guildName` varchar(32) NOT NULL default '',
+  `leaderGuid` bigint(20) NOT NULL default '0',
+  `emblemStyle` int(10) NOT NULL default '0',
+  `emblemColor` int(10) NOT NULL default '0',
+  `borderStyle` int(10) NOT NULL default '0',
+  `borderColor` int(10) NOT NULL default '0',
+  `backgroundColor` int(10) NOT NULL default '0',
+  `guildInfo` varchar(100) NOT NULL default '',
+  `motd` varchar(100) NOT NULL default '',
   `createdate` int(30) NOT NULL default '0',
-  PRIMARY KEY  (`guildId`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Guilds';
+  `bankTabCount` int(30) NOT NULL default '0',
+  `bankBalance` int(30) NOT NULL,
+  PRIMARY KEY  (`guildId`),
+  UNIQUE KEY `guildId` (`guildId`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*Table structure for table `instances` */
 

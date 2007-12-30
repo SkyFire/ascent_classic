@@ -2,7 +2,7 @@
 SQLyog Enterprise - MySQL GUI v6.13
 MySQL - 5.0.41-community-nt : Database - logon
 *********************************************************************
-*/
+*/
 
 /*!40101 SET NAMES utf8 */;
 
@@ -25,7 +25,7 @@ CREATE TABLE `accounts` (
   `forceLanguage` varchar(5) collate utf8_unicode_ci NOT NULL default 'enUS',
   PRIMARY KEY  (`acct`),
   UNIQUE KEY `login` (`login`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Account Information';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Account Information';
 
 /*Table structure for table `ipbans` */
 
