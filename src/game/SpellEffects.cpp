@@ -4097,7 +4097,7 @@ void Spell::SpellEffectSummonObjectSlot(uint32 i)
 
 	GameObject *GoSummon = NULL;
 
-	uint32 slot=m_spellInfo->Effect[i]-SPELL_EFFECT_SUMMON_OBJECT_SLOT1;
+	uint32 slot=m_spellInfo->Effect[i] - SPELL_EFFECT_SUMMON_OBJECT_SLOT1;
 	GoSummon = u_caster->m_ObjectSlots[slot] ? u_caster->GetMapMgr()->GetGameObject(u_caster->m_ObjectSlots[slot]) : 0;
 	u_caster->m_ObjectSlots[slot] = 0;
 	

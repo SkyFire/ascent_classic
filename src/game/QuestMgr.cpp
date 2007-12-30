@@ -822,18 +822,18 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 	for(int z = 0; z < 2; z++)
 	{
 		uint32 fact = 19;   // default to 19 if no factiondbc
-		uint32 amt  = uint32(float(GenerateQuestXP(plr, qst)) * 0.1f);   // guess
+		int32 amt  = float2int32( float( GenerateQuestXP( plr, qst) ) * 0.1f );   // guess
 		if(!qst->reward_repfaction[z])
 		{
-			if(z == 1)
+			if( z == 1 )
 				break;
 
 			// Let's do this properly. Determine the faction of the creature, and give reputation to his faction.
-			if(qst_giver->GetTypeId() == TYPEID_UNIT)
-				if(((Creature*)qst_giver)->m_factionDBC != NULL)
+			if( qst_giver->GetTypeId() == TYPEID_UNIT )
+				if(((Creature*)qst_giver)->m_factionDBC != NULL )
 					fact = ((Creature*)qst_giver)->m_factionDBC->ID;
-			if(qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)
-				fact = qst_giver->GetUInt32Value(GAMEOBJECT_FACTION);
+			if( qst_giver->GetTypeId() == TYPEID_GAMEOBJECT )
+				fact = qst_giver->GetUInt32Value(GAMEOBJECT_FACTION );
 		}
 		else
 		{
@@ -846,7 +846,7 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 			if(plr->GetStanding(fact) >= (int32)qst->reward_replimit)
 				continue;
 	  
-		amt = float2int32(float(amt)*sWorld.getRate(RATE_QUESTREPUTATION)); // reputation rewards 
+		amt = float2int32( float( amt ) * sWorld.getRate( RATE_QUESTREPUTATION ) ); // reputation rewards 
 		plr->ModStanding(fact, amt);
 	}
 }
