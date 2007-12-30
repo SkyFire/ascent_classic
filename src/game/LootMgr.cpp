@@ -392,7 +392,7 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 		if(chance == 0.0f) continue;
 		
 		// Do we already have more than 16 items? (client-side limitation)
-		if( totalloot > 16 )
+		if( totalloot >= 16 )
 		break;
 
 		ItemPrototype *itemproto = list->items[x].item.itemproto;
