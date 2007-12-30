@@ -4163,30 +4163,49 @@ void Player::UpdateHit(int32 hit)
 
 void Player::UpdateChances()
 {
-	uint32 pClass = (uint32)this->getClass();
-	uint32 pLevel = (this->getLevel()>70) ? 70 : this->getLevel();
-				// - War Paladin Hunter Rogue Priest - Shaman Mage Warlock - Druid
+	uint32 pClass = (uint32)getClass();
+	uint32 pRace = (uint32)getRace();
+	uint32 pLevel = (getLevel() > 70) ? 70 : getLevel();
+	float tmp = 0;
+	float defence_contribution = 0;
+
+	// Warrior, Paladin, Hunter, Rogue, Priest, Shaman, Mage, Warlock, Druid
 	const float baseDodge[12] = { 0.0f, 0.7580f, 0.6520f, -5.4500f, -0.5900f, 3.1830f, 0.0f, 1.6750f, 3.4575f, 2.0350f, 0.0f, -1.8720f };
+
 	// TODO: get proper ratios for all levels, these values are valid for lvl 70 only
 	const float dodgeRatio[12] = { 0.0f, 30.0f, 25.0f, 25.0f, 20.0f, 25.0f, 0.0f, 25.0f, 25.0f, 25.0f, 0.0f, 14.7059f };
  	const float baseSpellCrit[12] = { 0.0f, 0.0f, 3.3355f, 3.6020f, 0.0f, 1.2375f, 0.0f, 2.2010f, 0.9075f, 1.700f, 0.0f, 1.8515f };
 	const float baseCritChance[12] = { 0.0f, 1.144f, 0.652f, -1.532f, -0.295f, 3.183f, 0.0f, 1.675f, 3.4575f, 2.0f, 0.0f, 0.961f };
- 
-	float tmp = baseDodge[pClass] + ( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pClass] ) + this->GetDodgeFromSpell();
-	tmp += CalcRating( PLAYER_RATING_MODIFIER_DODGE );//dodge rating
+
+	// Dodge Table
+	//Class 	Base (D)odge 	AGI:D Ratio 	D Rating:D Rati
+	//Warrior	0.75%			30				18.9231
+	//Paladin	0.65%			25				18.9231
+	//Hunter	-5.45%			25				18.9231
+	//Rogue		-0.59%			20				18.9231
+	//Priest	3.18%			25				18.9231
+	//Shaman	1.67%			25				18.9231
+	//Mage		3.45%			25				18.9231
+	//Warlock	2.03%			25				18.9231
+	//Druid		-1.87%			14.7059			18.9231
+
+	// defence contribution estimate
+	defence_contribution = float( GetUInt32Value( PLAYER_RATING_MODIFIER_DEFENCE ) ) - ( float( pLevel ) * 5.0f );
+	if( defence_contribution < 0.0f )defence_contribution = 0.0f;
+
+	// dodge
+	tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pClass] );
+	tmp += CalcRating( PLAYER_RATING_MODIFIER_DODGE ) + this->GetDodgeFromSpell();
+	tmp += defence_contribution;
+
 	SetFloatValue( PLAYER_DODGE_PERCENTAGE, min( tmp, 95.0f ) );
 
-	//block = 0 if no shield
-	//Block% = 5% base chance + 
-	//contribution from Block Rating +
-	//contribution from talents +
-	//((Defense skill - attacker's weapon skill) * 0.04)
+	// block
 	Item* it = this->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
 	if( it != NULL && it->GetProto()->InventoryType == INVTYPE_SHIELD )
 	{
-		tmp = 5.0f;
-		tmp += GetUInt32Value( UNIT_FIELD_STAT0 ) / 22.0f + this->GetBlockFromSpell();
-		tmp += CalcRating( PLAYER_RATING_MODIFIER_BLOCK );//block rating
+		tmp = 5.0f + CalcRating( PLAYER_RATING_MODIFIER_BLOCK ) + GetBlockFromSpell();
+		tmp += defence_contribution;
 	}
 	else
 		tmp = 0.0f;
@@ -4194,26 +4213,29 @@ void Player::UpdateChances()
 	SetFloatValue( PLAYER_BLOCK_PERCENTAGE, min( tmp, 95.0f ) );
 
 	//parry
-	tmp = 5.0f + this->GetParryFromSpell();
-	tmp += CalcRating( PLAYER_RATING_MODIFIER_PARRY );
+	tmp = 5.0f + CalcRating( PLAYER_RATING_MODIFIER_PARRY ) + GetParryFromSpell();
+	tmp += defence_contribution;
+
 	SetFloatValue( PLAYER_PARRY_PERCENTAGE, std::max( 0.0f, std::min( tmp, 95.0f ) ) ); //let us not use negative parry. Some spells decrease it
 
-/* The formula is generated as follows:
+	//crits
 
-[agility] / [crit constant*] + [skill modifier] + [bonuses]
+	/* The formula is generated as follows:
 
-The crit constant is class and level dependent and for a level 70 character as follows:
+	[agility] / [crit constant*] + [skill modifier] + [bonuses]
 
-	* Rogue [40]
-	* Druid [25.00]
-	* Hunter [40]
-	* Mage [25.00]
-	* Paladin [25.00]
-	* Priest [25.00]
-	* Shaman [25.00]
-	* Warlock [24.69]
-	* Warrior [33] 
-*/
+	The crit constant is class and level dependent and for a level 70 character as follows:
+
+		* Rogue [40]
+		* Druid [25.00]
+		* Hunter [40]
+		* Mage [25.00]
+		* Paladin [25.00]
+		* Priest [25.00]
+		* Shaman [25.00]
+		* Warlock [24.69]
+		* Warrior [33] 
+	*/
 
 	tmp = baseCritChance[pClass] + GetUInt32Value( UNIT_FIELD_STAT1 ) * float( CritFromAgi[pLevel][pClass] );
 
