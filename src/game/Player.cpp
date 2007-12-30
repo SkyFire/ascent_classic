@@ -4174,7 +4174,7 @@ void Player::UpdateChances()
 
 	// defence contribution estimate
 	defence_contribution = ( float( _GetSkillLineCurrent( SKILL_DEFENSE, true ) ) - ( float( pLevel ) * 5.0f ) ) * 0.04f;
-	defence_contribution += CalcRating( PLAYER_RATING_MODIFIER_DEFENCE );
+	defence_contribution += CalcRating( PLAYER_RATING_MODIFIER_DEFENCE ) * 0.04f;
 
 	// dodge
 	tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pClass] );
