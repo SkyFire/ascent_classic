@@ -376,11 +376,24 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 {
 	uint32 i;
 	uint32 count;
+	uint32 totalloot = 0; // This counter is incremented for every item that is pushed into the loot list.
+						  // Using this, we prevent more than 16 items being generated for a single mob.
+						  // The client can only show 16 items, and re-opening the corpse does not show the 
+						  // excess items.
+						  // This limitation does not affect blizzlike servers, and will only affect
+						  // servers with very high drop rates - and it will protect the players from
+						  // the need/greed popup spam.
+						  // This is just a temporary measure, I'm going to move this to a post-generation
+						  // check that just removes the items based on their rarity (worst items are removed first)
 	for(uint32 x =0; x<list->count;x++)
 	if(list->items[x].item.itemproto)// this check is needed until loot DB is fixed
 	{
 		float chance = heroic ? list->items[x].chance2 : list->items[x].chance;
 		if(chance == 0.0f) continue;
+		
+		// Do we already have more than 16 items? (client-side limitation)
+		if( totalloot > 16 )
+		break;
 
 		ItemPrototype *itemproto = list->items[x].item.itemproto;
 		if(Rand(chance * sWorld.getRate(RATE_DROP0 + itemproto->Quality)) )//|| itemproto->Class == ITEM_CLASS_QUEST)
@@ -431,6 +444,8 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 			}
 
 			loot->items.push_back(itm);
+			// Prevent more than 16 items getting pushed
+			totalloot ++;
 		}	
 	}
 }
