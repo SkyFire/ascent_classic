@@ -594,15 +594,16 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 		reset = true;
 	}
 
-	WPAssert(updateMask && updateMask->GetCount() == m_valuesCount);
+	WPAssert( updateMask && updateMask->GetCount() == m_valuesCount );
 	uint32 bc;
 	uint32 values_count;
-	if(m_valuesCount>(2*0x20))//if number of blocks > 2->  unit and player+item container
+	if( m_valuesCount > ( 2 * 0x20 ) )//if number of blocks > 2->  unit and player+item container
 	{
-		bc=updateMask->GetUpdateBlockCount();
-		values_count=min(bc*32,m_valuesCount);
+		bc = updateMask->GetUpdateBlockCount();
+		values_coun t = min( bc * 32, m_valuesCount );
 
-	}else
+	}
+	else
 	{
 		bc=updateMask->GetBlockCount();
 		values_count=m_valuesCount;

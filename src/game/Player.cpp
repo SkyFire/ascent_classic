@@ -3365,12 +3365,6 @@ void Player::_ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedo
 		if( val == 0 ) continue;
 		ModifyBonuses( proto->Stats[i].Type, apply ? val : -val );
 	}
-	
-	// Shield block rating
-	ModifyBonuses( SHIELD_BLOCK_RATING, apply ? (int32)proto->Block : -(int32)proto->Block );
-
-	// Expertise
-	//PLAYER_EXPERTISE
 
 	// Damage
 	if( proto->Damage[0].Min )
@@ -4164,39 +4158,29 @@ void Player::UpdateHit(int32 hit)
 void Player::UpdateChances()
 {
 	uint32 pClass = (uint32)getClass();
-	uint32 pRace = (uint32)getRace();
 	uint32 pLevel = (getLevel() > 70) ? 70 : getLevel();
+
 	float tmp = 0;
 	float defence_contribution = 0;
 
-	// Warrior, Paladin, Hunter, Rogue, Priest, Shaman, Mage, Warlock, Druid
+	// UNUSED, Warrior, Paladin, Hunter, Rogue, Priest, UNUSED, Shaman, Mage, Warlock, UNUSED, Druid
 	const float baseDodge[12] = { 0.0f, 0.7580f, 0.6520f, -5.4500f, -0.5900f, 3.1830f, 0.0f, 1.6750f, 3.4575f, 2.0350f, 0.0f, -1.8720f };
 
 	// TODO: get proper ratios for all levels, these values are valid for lvl 70 only
 	const float dodgeRatio[12] = { 0.0f, 30.0f, 25.0f, 25.0f, 20.0f, 25.0f, 0.0f, 25.0f, 25.0f, 25.0f, 0.0f, 14.7059f };
- 	const float baseSpellCrit[12] = { 0.0f, 0.0f, 3.3355f, 3.6020f, 0.0f, 1.2375f, 0.0f, 2.2010f, 0.9075f, 1.700f, 0.0f, 1.8515f };
+ 
+	const float baseSpellCrit[12] = { 0.0f, 0.0f, 3.3355f, 3.6020f, 0.0f, 1.2375f, 0.0f, 2.2010f, 0.9075f, 1.700f, 0.0f, 1.8515f };
 	const float baseCritChance[12] = { 0.0f, 1.144f, 0.652f, -1.532f, -0.295f, 3.183f, 0.0f, 1.675f, 3.4575f, 2.0f, 0.0f, 0.961f };
 
-	// Dodge Table
-	//Class 	Base (D)odge 	AGI:D Ratio 	D Rating:D Rati
-	//Warrior	0.75%			30				18.9231
-	//Paladin	0.65%			25				18.9231
-	//Hunter	-5.45%			25				18.9231
-	//Rogue		-0.59%			20				18.9231
-	//Priest	3.18%			25				18.9231
-	//Shaman	1.67%			25				18.9231
-	//Mage		3.45%			25				18.9231
-	//Warlock	2.03%			25				18.9231
-	//Druid		-1.87%			14.7059			18.9231
-
 	// defence contribution estimate
-	defence_contribution = float( GetUInt32Value( PLAYER_RATING_MODIFIER_DEFENCE ) ) - ( float( pLevel ) * 5.0f );
-	if( defence_contribution < 0.0f )defence_contribution = 0.0f;
+	defence_contribution = ( float( _GetSkillLineCurrent( SKILL_DEFENSE, true ) ) - ( float( pLevel ) * 5.0f ) ) * 0.04f;
 
 	// dodge
 	tmp = baseDodge[pClass] + float( GetUInt32Value( UNIT_FIELD_STAT1 ) / dodgeRatio[pClass] );
 	tmp += CalcRating( PLAYER_RATING_MODIFIER_DODGE ) + this->GetDodgeFromSpell();
 	tmp += defence_contribution;
+	if( tmp < 0.0f )tmp = 0.0f;
+	if( getRace() == RACE_NIGHTELF )tmp += 1.0f;
 
 	SetFloatValue( PLAYER_DODGE_PERCENTAGE, min( tmp, 95.0f ) );
 
@@ -4206,19 +4190,26 @@ void Player::UpdateChances()
 	{
 		tmp = 5.0f + CalcRating( PLAYER_RATING_MODIFIER_BLOCK ) + GetBlockFromSpell();
 		tmp += defence_contribution;
+		if( tmp < 0.0f )tmp = 0.0f;
+	}
+	else
+		tmp = 0.0f;
+	
+	SetFloatValue( PLAYER_BLOCK_PERCENTAGE, min( tmp, 95.0f ) );
+
+	//parry
+	if( HasSpell( 3127 ) )
+	{
+		tmp = 5.0f + CalcRating( PLAYER_RATING_MODIFIER_PARRY ) + GetParryFromSpell();
+		tmp += defence_contribution;
+		if( tmp < 0.0f )tmp = 0.0f;
 	}
 	else
 		tmp = 0.0f;
 
-	SetFloatValue( PLAYER_BLOCK_PERCENTAGE, min( tmp, 95.0f ) );
-
-	//parry
-	tmp = 5.0f + CalcRating( PLAYER_RATING_MODIFIER_PARRY ) + GetParryFromSpell();
-	tmp += defence_contribution;
-
 	SetFloatValue( PLAYER_PARRY_PERCENTAGE, std::max( 0.0f, std::min( tmp, 95.0f ) ) ); //let us not use negative parry. Some spells decrease it
 
-	//crits
+	//critical
 
 	/* The formula is generated as follows:
 
@@ -4446,11 +4437,19 @@ void Player::UpdateStats()
 	////////////////////RATINGS STUFF//////////////////////
 
 	// Shield Block
-	float block_multiplier = ( 100.0f + float( m_modblockabsorbvalue ) ) / 100.0f;
-	if( block_multiplier < 1.0f )block_multiplier = 1.0f;
+	Item* shield = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+	if( shield != NULL && shield->GetProto()->InventoryType == INVTYPE_SHIELD )
+	{
+		float block_multiplier = ( 100.0f + float( m_modblockabsorbvalue ) ) / 100.0f;
+		if( block_multiplier < 1.0f )block_multiplier = 1.0f;
 
-	int32 blockable_damage = float2int32( ( float( m_modblockvaluefromspells + GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( str ) / 20.0f ) - 1.0f ) );
-	SetUInt32Value( PLAYER_SHIELD_BLOCK, blockable_damage );
+		int32 blockable_damage = float2int32( float( shield->GetProto()->Block ) +( float( m_modblockvaluefromspells + GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( str ) / 20.0f ) - 1.0f ) );
+		SetUInt32Value( PLAYER_SHIELD_BLOCK, blockable_damage );
+	}
+	else
+	{
+		SetUInt32Value( PLAYER_SHIELD_BLOCK, 0 );
+	}
 
 	UpdateChances();
 	CalcDamage();
@@ -7117,7 +7116,7 @@ float Player::CalcRating( uint32 index )
 			cost = ( double( level ) - 8.0 ) / 52.0;
 		else
 			cost = 82.0 / ( 262.0 - 3.0 *  double( level ) );
-		return float( rating / (BaseRating[relative_index] * cost) );
+		return float( rating / ( BaseRating[relative_index] * cost ) );
 	}
 	else
 		return 0.0f;
@@ -7940,9 +7939,11 @@ void Player::ModifyBonuses(uint32 type,int32 val)
 				ModUInt32Value( PLAYER_RATING_MODIFIER_RANGED_HIT_AVOIDANCE, val );//ranged
 				ModUInt32Value( PLAYER_RATING_MODIFIER_SPELL_HIT_AVOIDANCE, val );//spell
 			}break;
-		case CRITICAL_AVOIDANCE_RATING:
+		case EXPERTISE_RATING:
+		case EXPERTISE_RATING_2:
 			{
-
+				ModUInt32Value( PLAYER_RATING_MODIFIER_EXPERTISE, val );
+				ModUInt32Value( PLAYER_EXPERTISE, float2int32( CalcRating( PLAYER_RATING_MODIFIER_EXPERTISE ) ) );
 			}break;
 		case RESILIENCE_RATING:
 			{

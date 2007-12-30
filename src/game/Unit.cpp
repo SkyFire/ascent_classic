@@ -2218,16 +2218,23 @@ else
 //--------------------------------block-----------------------------------------------------
 			case 4:
 				{
-					Item * shield = ((Player*)pVictim)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
-					if(shield)
+					Item* shield = static_cast< Player* >( pVictim )->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+					if( shield != NULL )
 					{
 						targetEvent = 2;
 						pVictim->Emote(EMOTE_ONESHOT_PARRYSHIELD);// Animation
 
-						float block_multiplier = ( 100.0f + float( static_cast< Player* >( pVictim )->m_modblockabsorbvalue ) ) / 100.0f;
-						if( block_multiplier < 1.0f )block_multiplier = 1.0f;
+						if( shield->GetProto()->InventoryType == INVTYPE_SHIELD )
+						{
+							float block_multiplier = ( 100.0f + float( static_cast< Player* >( pVictim )->m_modblockabsorbvalue ) ) / 100.0f;
+							if( block_multiplier < 1.0f )block_multiplier = 1.0f;
 
-						blocked_damage = float2int32( ( float( static_cast< Player* >( pVictim )->m_modblockvaluefromspells + pVictim->GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( pVictim->GetUInt32Value( UNIT_FIELD_STAT0 ) ) / 20.0f ) - 1.0f ) );
+							blocked_damage = float2int32( float( shield->GetProto()->Block ) + ( float( static_cast< Player* >( pVictim )->m_modblockvaluefromspells + pVictim->GetUInt32Value( PLAYER_RATING_MODIFIER_BLOCK ) ) * block_multiplier ) + ( ( float( pVictim->GetUInt32Value( UNIT_FIELD_STAT0 ) ) / 20.0f ) - 1.0f ) );
+						}
+						else
+						{
+							blocked_damage = 0;
+						}
 
 						if(dmg.full_damage <= (int32)blocked_damage)
 						{
@@ -2236,7 +2243,7 @@ else
 							vstate = BLOCK;
 							vproc |= PROC_ON_BLOCK_VICTIM;
 						}
-						if(pVictim->IsPlayer())//not necessary now but we'll have blocking mobs in future
+						if( pVictim->IsPlayer() )//not necessary now but we'll have blocking mobs in future
 						{            
 							pVictim->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_DODGE_BLOCK);	//SB@L: Enables spells requiring dodge
 							if(!sEventMgr.HasEvent(pVictim,EVENT_DODGE_BLOCK_FLAG_EXPIRE))

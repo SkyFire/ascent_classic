@@ -6938,7 +6938,7 @@ void Aura::SpellAuraIncreaseRating( bool apply )
 		return;
 
 	Player* plr = ((Player*)m_target);
-	for( uint32 x = 1; x < 21; x++ )//skip x=0
+	for( uint32 x = 1; x < 24; x++ )//skip x=0
 		if( ( ( ( uint32 )1 ) << x ) & mod->m_miscValue )
 			plr->ModifyBonuses( 11 + x, v);
 
