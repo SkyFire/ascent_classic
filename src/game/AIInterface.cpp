@@ -557,7 +557,7 @@ void AIInterface::Update(uint32 p_time)
 			m_returnX = m_returnY = m_returnZ = 0.0f;
 			m_moveRun = false;
 			//remowed by zack : in scripted events if we keep reducing this it will bug the world out !
-			//On Blizz it will return to previous wp but we can except the fact that it will move on to next one
+			//On Blizz it will return to previous wp but we can accept the fact that it will move on to next one
 			/*
 			if(hasWaypoints())
 			{
