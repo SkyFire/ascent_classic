@@ -3230,7 +3230,7 @@ void Player::RemoveFromWorld()
 }
 
 // TODO: perhaps item should just have a list of mods, that will simplify code
-void Player::_ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedown )
+void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedown /* = false */, bool skip_stat_apply /* = false  */)
 {
 	ASSERT( item );
 	ItemPrototype *proto = item->GetProto();
@@ -3458,7 +3458,8 @@ void Player::_ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedo
 		}
 	}
 	
-	UpdateStats();
+	if(skip_stat_apply)
+		UpdateStats();
 }
 
 
@@ -6148,22 +6149,24 @@ void Player::_Relocate(uint32 mapid, const LocationVector & v, bool sendpending,
 
 void Player::AddItemsToWorld()
 {
-	for(int32 i = 0; i < INVENTORY_KEYRING_END; i++)
+	Item * pItem;
+	for(uint32 i = 0; i < INVENTORY_KEYRING_END; i++)
 	{
-		if(GetItemInterface()->GetInventoryItem(i))
+		pItem = GetItemInterface()->GetInventoryItem(i);
+		if( pItem != NULL )
 		{
-			GetItemInterface()->GetInventoryItem(i)->PushToWorld(m_mapMgr);
+			pItem->PushToWorld(m_mapMgr);
 			
 			if(i < INVENTORY_SLOT_BAG_END)	  // only equipment slots get mods.
 			{
-				_ApplyItemMods(GetItemInterface()->GetInventoryItem(i), i, true);
+				_ApplyItemMods(pItem, i, true, false, true);
 			}
 
-			if(GetItemInterface()->GetInventoryItem(i)->IsContainer() && GetItemInterface()->IsBagSlot(i))
+			if(pItem->IsContainer() && GetItemInterface()->IsBagSlot(i))
 			{
-				for(uint32 e=0; e < GetItemInterface()->GetInventoryItem(i)->GetProto()->ContainerSlots; e++)
+				for(uint32 e=0; e < pItem->GetProto()->ContainerSlots; e++)
 				{
-					Item *item = ((Container*)GetItemInterface()->GetInventoryItem(i))->GetItem(e);
+					Item *item = ((Container*)pItem)->GetItem(e);
 					if(item)
 					{
 						item->PushToWorld(m_mapMgr);
@@ -6172,6 +6175,8 @@ void Player::AddItemsToWorld()
 			}
 		}
 	}
+
+	UpdateStats();
 }
 
 // Player::RemoveItemsFromWorld
@@ -6179,22 +6184,26 @@ void Player::AddItemsToWorld()
 
 void Player::RemoveItemsFromWorld()
 {
-	for(int8 i = 0; i < INVENTORY_KEYRING_END; i++)
+	Item * pItem;
+	for(uint32 i = 0; i < INVENTORY_KEYRING_END; i++)
 	{
-		if(GetItemInterface()->GetInventoryItem(i))
+		pItem = m_ItemInterface->GetInventoryItem((int8)i);
+		if(pItem)
 		{
-			if(i < INVENTORY_SLOT_BAG_END)	  // only equipment slots get mods.
+			if(pItem->IsInWorld())
 			{
-				_ApplyItemMods(GetItemInterface()->GetInventoryItem(i), i, false);
-			}
-
-			GetItemInterface()->GetInventoryItem(i)->RemoveFromWorld();
-		
-			if(GetItemInterface()->GetInventoryItem(i)->IsContainer() && GetItemInterface()->IsBagSlot(i))
-			{
-				for(uint32 e=0; e < GetItemInterface()->GetInventoryItem(i)->GetProto()->ContainerSlots; e++)
+				if(i < INVENTORY_SLOT_BAG_END)	  // only equipment slots get mods.
 				{
-					Item *item = ((Container*)GetItemInterface()->GetInventoryItem(i))->GetItem(e);
+					_ApplyItemMods(pItem, i, false, false, true);
+				}
+				pItem->RemoveFromWorld();
+			}
+	
+			if(pItem->IsContainer() && GetItemInterface()->IsBagSlot(i))
+			{
+				for(uint32 e=0; e < pItem->GetProto()->ContainerSlots; e++)
+				{
+					Item *item = ((Container*)pItem)->GetItem(e);
 					if(item && item->IsInWorld())
 					{
 						item->RemoveFromWorld();
@@ -6203,6 +6212,8 @@ void Player::RemoveItemsFromWorld()
 			}
 		}
 	}
+
+	UpdateStats();
 }
 
 uint32 Player::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target )

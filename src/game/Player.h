@@ -1756,7 +1756,7 @@ protected:
 	void _LoadItemCooldown(QueryResult * result);
 	void _SaveSpellCoolDownSecurity();
 	void _LoadSpellCoolDownSecurity( QueryResult* result );
-	void _ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedown = false );
+	void _ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedown = false, bool skip_stat_apply = false );
 	void _EventAttack( bool offhand );
 	void _EventExploration();
 	void UpdateCooldowns();
