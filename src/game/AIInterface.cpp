@@ -735,8 +735,8 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 		return;
 
 	//just make sure we are not hitting self. This was reported as an exploit.Should never ocure anyway
-	if(m_nextTarget==m_Unit)
-		m_nextTarget=GetMostHated();
+	if( m_nextTarget == m_Unit )
+		m_nextTarget = GetMostHated();
 
 	uint16 agent = m_aiCurrentAgent;
 
@@ -749,15 +749,15 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 		&& m_AIState != STATE_SCRIPTMOVE
 		&& !m_is_in_instance)
 	{
-		HandleEvent(EVENT_LEAVECOMBAT, m_Unit, 0);
+		HandleEvent( EVENT_LEAVECOMBAT, m_Unit, 0 );
 	}
-	else if(!m_nextTarget && m_AIState != STATE_FOLLOWING && m_AIState != STATE_SCRIPTMOVE)
+	else if( m_nextTarget == NULL && m_AIState != STATE_FOLLOWING && m_AIState != STATE_SCRIPTMOVE )
 	{
 //		SetNextTarget(FindTargetForSpell(m_nextSpell));
-		m_nextTarget=GetMostHated();
-		if(!m_nextTarget)
+		m_nextTarget = GetMostHated();
+		if( m_nextTarget == NULL )
 		{
-			HandleEvent(EVENT_LEAVECOMBAT, m_Unit, 0);
+			HandleEvent( EVENT_LEAVECOMBAT, m_Unit, 0 );
 		}
 	}
 

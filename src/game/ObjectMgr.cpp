@@ -73,7 +73,6 @@ ObjectMgr::~ObjectMgr()
 		delete gc;
 	}
 
-
 	Log.Notice("ObjectMgr", "Deleting Spell Override...");
 	for(OverrideIdMap::iterator i = mOverrideIdMap.begin(); i != mOverrideIdMap.end(); ++i)
 	{
@@ -160,15 +159,21 @@ ObjectMgr::~ObjectMgr()
 	Log.Notice("ObjectMgr", "Deleting Groups...");
 	for(GroupMap::iterator itr = m_groups.begin(); itr != m_groups.end();)
 	{
-		Group * pGroup = itr->second;
+		Group* pGroup = itr->second;
 		++itr;
 
-		for(uint32 i = 0; i < pGroup->GetSubGroupCount(); ++i)
+		if( pGroup != NULL )
 		{
-			SubGroup * p = pGroup->GetSubGroup(i);
-			p->Disband();
+			for( uint32 i = 0; i < pGroup->GetSubGroupCount(); ++i )
+			{
+				SubGroup* pSubGroup = pGroup->GetSubGroup( i );
+				if( pSubGroup != NULL )
+				{
+					pSubGroup->Disband();
+				}
+			}
+			delete pGroup;
 		}
-		delete pGroup;
 	}
 
 	Log.Notice("ObjectMgr", "Deleting Player Information...");
