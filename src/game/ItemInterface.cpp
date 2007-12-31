@@ -683,7 +683,7 @@ Item* ItemInterface::FindItemLessMax(uint32 itemid, uint32 cnt, bool IncBank)
 	for(i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
 	{
 		Item *item = GetInventoryItem(i);
-		if(item)
+		if(item && item->IsContainer())
 		{
 			  for (uint32 j =0; j < item->GetProto()->ContainerSlots; j++)
 				{
@@ -717,7 +717,7 @@ Item* ItemInterface::FindItemLessMax(uint32 itemid, uint32 cnt, bool IncBank)
 		for(i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; i++)
 		{
 			Item *item = GetInventoryItem(i);
-			if(item)
+			if(item && item->IsContainer())
 			{
 			   
 					for (uint32 j =0; j < item->GetProto()->ContainerSlots; j++)
@@ -762,7 +762,7 @@ uint32 ItemInterface::GetItemCount(uint32 itemid, bool IncBank)
 	for(i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
 	{
 		Item *item = GetInventoryItem(i);
-		if(item)
+		if(item && item->IsContainer())
 		{
 				for (uint32 j =0; j < item->GetProto()->ContainerSlots;j++)
 				{
@@ -850,7 +850,7 @@ uint32 ItemInterface::RemoveItemAmt(uint32 id, uint32 amt)
 		{
 			if(item->GetEntry() == id && item->wrapped_item_id==0)
 			{
-				if(item->GetProto()->ContainerSlots > 0 && ((Container*)item)->HasItems())
+				if(item->GetProto()->ContainerSlots > 0 && item->IsContainer() && ((Container*)item)->HasItems())
 				{
 					/* sounds weird? no. this will trigger a callstack display due to my other debug code. */
 					item->DeleteFromDB();
@@ -887,7 +887,7 @@ uint32 ItemInterface::RemoveItemAmt(uint32 id, uint32 amt)
 	for(i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
 	{
 		Item *item = GetInventoryItem(i);
-		if(item)
+		if(item && item->IsContainer())
 		{
 			for (uint32 j =0; j < item->GetProto()->ContainerSlots;j++)
 			{
@@ -1159,7 +1159,7 @@ bool ItemInterface::AddItemToFreeSlot(Item *item)
 	//INVENTORY BAGS
 	for(i=INVENTORY_SLOT_BAG_START;i<INVENTORY_SLOT_BAG_END;i++)
 	{
-		if(m_pItems[i] != NULL && m_pItems[i]->GetProto()->BagFamily == 0) //special bags ignored
+		if(m_pItems[i] != NULL && m_pItems[i]->GetProto()->BagFamily == 0 && m_pItems[i]->IsContainer()) //special bags ignored
 		{
 			for (uint32 j =0; j < m_pItems[i]->GetProto()->ContainerSlots;j++)
 			{
@@ -1994,7 +1994,7 @@ Item* ItemInterface::GetItemByGUID(uint64 Guid)
 	//INVENTORY BAGS
 	for(i=INVENTORY_SLOT_BAG_START;i<INVENTORY_SLOT_BAG_END;i++)
 	{
-		if(m_pItems[i] != NULL)
+		if(m_pItems[i] != NULL && m_pItems[i]->IsContainer())
 		{
 			if(m_pItems[i]->GetGUID()==Guid) 
 			{
@@ -2471,7 +2471,7 @@ bool ItemInterface::AddItemToFreeBankSlot(Item *item)
 
 	for(uint32 i=BANK_SLOT_BAG_START;i<BANK_SLOT_BAG_END;i++)
 	{
-		if(m_pItems[i] != NULL && m_pItems[i]->GetProto()->BagFamily == 0) //special bags ignored
+		if(m_pItems[i] != NULL && m_pItems[i]->GetProto()->BagFamily == 0 && m_pItems[i]->IsContainer()) //special bags ignored
 		{
 			for (uint32 j =0; j < m_pItems[i]->GetProto()->ContainerSlots;j++)
 			{

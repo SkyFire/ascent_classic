@@ -331,7 +331,7 @@ void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
 
 void Item::DeleteFromDB()
 {
-	if(m_itemProto->ContainerSlots>0)
+	if(m_itemProto->ContainerSlots>0 && GetTypeId()==TYPEID_CONTAINER)
 	{
 		/* deleting a container */
 		for(uint32 i = 0; i < m_itemProto->ContainerSlots; ++i)
