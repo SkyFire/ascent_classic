@@ -2424,19 +2424,22 @@ void ItemInterface::mSaveItemsToDatabase(bool first)
 {
 	uint32 x;
 
-	for(x = EQUIPMENT_SLOT_START; x < INVENTORY_KEYRING_END; ++x)
+	for( x = EQUIPMENT_SLOT_START; x < INVENTORY_KEYRING_END; ++x )
 	{
-		if(GetInventoryItem(x) != NULL&&GetInventoryItem(x)->GetProto())
+		if( GetInventoryItem( x ) != NULL )
 		{
-			if(!( (GetInventoryItem(x)->GetProto()->Flags)&2 )) // skip conjured item on save
+			if( GetInventoryItem( x )->GetProto() != NULL )
 			{
-				if(IsBagSlot(x) && GetInventoryItem(x)->IsContainer())
+				if( !( (GetInventoryItem( x )->GetProto()->Flags) & 2 ) ) // skip conjured item on save
 				{
-					((Container*)GetInventoryItem(x))->SaveBagToDB(x, first);
-				}
-				else
-				{
-					GetInventoryItem(x)->SaveToDB(INVENTORY_SLOT_NOT_SET, x, first);
+					if( IsBagSlot( x ) && GetInventoryItem( x )->IsContainer() )
+					{
+						static_cast< Container* >( GetInventoryItem( x ) )->SaveBagToDB( x, first );
+					}
+					else
+					{
+						GetInventoryItem( x )->SaveToDB( INVENTORY_SLOT_NOT_SET, x, first );
+					}
 				}
 			}
 		}
