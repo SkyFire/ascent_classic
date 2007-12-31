@@ -2106,7 +2106,7 @@ void Aura::SpellAuraModAttackSpeed(bool apply)
 			static_cast<Player*>(m_target)->m_meleeattackspeedmod -= mod->m_amount;
 			static_cast<Player*>(m_target)->m_rangedattackspeedmod -= mod->m_amount;
 		}
-		((Player*)m_target)->UpdateAttackSpeed();
+		static_cast<Player*>(m_target)->UpdateStats();
 	}
 	else
 	{
@@ -2979,7 +2979,7 @@ void Aura::SpellAuraModSkill(bool apply)
 		else
 			static_cast<Player*>(m_target)->_ModifySkillBonus(mod->m_miscValue, -mod->m_amount); 
 
-		static_cast<Player*>(m_target)->UpdateChances();
+		static_cast<Player*>(m_target)->UpdateStats();
 	}
 }
 
@@ -5111,7 +5111,7 @@ void Aura::SpellAuraSkillTalent(bool apply)
 		else  
 			static_cast<Player*>(m_target)->_ModifySkillBonus(mod->m_miscValue,-mod->m_amount);
 	   
-		static_cast<Player*>(m_target)->UpdateChances();
+		static_cast<Player*>(m_target)->UpdateStats();
 	}
 }
 
@@ -6832,7 +6832,7 @@ void Aura::SpellAuraIncreaseAllWeaponSkill(bool apply)
 			static_cast<Player*>(m_target)->_ModifySkillBonus(SKILL_POLEARMS, -mod->m_amount); 
 		}
 
-		static_cast<Player*>(m_target)->UpdateChances();
+		static_cast<Player*>(m_target)->UpdateStats();
 	}
 }
 
