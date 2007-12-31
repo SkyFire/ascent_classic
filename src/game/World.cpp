@@ -1460,9 +1460,9 @@ bool World::SetInitialWorldSettings()
 			sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
 		}
 
-		if(namehash==0x8401EC6A)
+		if( namehash==0x8401EC6A || namehash==0xD3D32C05 || namehash==0x21C83C59 )
 		{
-			// shred
+			// Shred, Backstab, Ambush
 			sp->in_front_status = 2;
 		}
 
