@@ -289,32 +289,35 @@ void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
 	ss << static_cast<int>(slot) << ",'";
 
 	// Pack together enchantment fields
-	EnchantmentMap::iterator itr = Enchantments.begin();
-	for(; itr != Enchantments.end(); ++itr)
+	if(Enchantments.size() > 0)
 	{
-		 if(itr->second.RemoveAtLogout)
-			   continue;
-
-		uint32 elapsed_duration = uint32(UNIXTIME - itr->second.ApplyTime);
-		int32 remaining_duration = itr->second.Duration - elapsed_duration;
-		if(remaining_duration < 0) remaining_duration = 0;
-	  /*  if(!itr->second.RemoveAtLogout && 
-			(remaining_duration > 5 && itr->second.Slot != 2) || itr->second.Slot == 2)  // no point saving stuff with < 5 seconds... unless is perm enchant
+		EnchantmentMap::iterator itr = Enchantments.begin();
+		for(; itr != Enchantments.end(); ++itr)
 		{
-			ss << itr->second.Enchantment->Id << ",";
-			ss << remaining_duration << ",";
-			ss << itr->second.Slot << ";";
-		}*/
+			if(itr->second.RemoveAtLogout)
+				continue;
 
-		  
-		if (itr->second.Enchantment && (remaining_duration && remaining_duration >5) || (itr->second.Duration==0))
-		{
-			ss << itr->second.Enchantment->Id << ",";
-			ss << remaining_duration << ",";
-			ss << itr->second.Slot << ";";
+			uint32 elapsed_duration = uint32(UNIXTIME - itr->second.ApplyTime);
+			int32 remaining_duration = itr->second.Duration - elapsed_duration;
+			if(remaining_duration < 0) remaining_duration = 0;
+		/*  if(!itr->second.RemoveAtLogout && 
+				(remaining_duration > 5 && itr->second.Slot != 2) || itr->second.Slot == 2)  // no point saving stuff with < 5 seconds... unless is perm enchant
+			{
+				ss << itr->second.Enchantment->Id << ",";
+				ss << remaining_duration << ",";
+				ss << itr->second.Slot << ";";
+			}*/
+
+			  
+			if (itr->second.Enchantment && (remaining_duration && remaining_duration >5) || (itr->second.Duration==0))
+			{
+				ss << itr->second.Enchantment->Id << ",";
+				ss << remaining_duration << ",";
+				ss << itr->second.Slot << ";";
+			}
+
+
 		}
-
-
 	}
 	ss << "')";
 	

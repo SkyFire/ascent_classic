@@ -1837,6 +1837,12 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 	if( !src || !dst )
 		return;
 
+	if(src == dst)
+	{
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_WRAPPED_CANT_BE_WRAPPED );
+		return;
+	}
+
 	if( dst->GetProto()->MaxCount > 1 )
 	{
 		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_STACKABLE_CANT_BE_WRAPPED );
