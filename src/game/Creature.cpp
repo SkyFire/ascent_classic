@@ -885,15 +885,19 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	SetUInt32Value(UNIT_FIELD_MAXPOWER1,proto->Mana);
 	SetUInt32Value(UNIT_FIELD_BASE_MANA,proto->Mana);
 	
-	SetUInt32Value(UNIT_FIELD_DISPLAYID,spawn->displayid);
-	SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID,spawn->displayid);
-	SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,proto->MountedDisplayID);
-
 	// Whee, thank you blizz, I love patch 2.2! Later on, we can randomize male/female mobs! xD
 	// Determine gender (for voices)
-	if(spawn->displayid != creature_info->Male_DisplayID)
-		setGender(1);   // Female
+	//if(spawn->displayid != creature_info->Male_DisplayID)
+	//	setGender(1);   // Female
 	
+	uint32 model;
+	uint32 gender = creature_info->GenerateModelId(&model);
+	setGender(gender);
+
+	SetUInt32Value(UNIT_FIELD_DISPLAYID,model);
+	SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID,model);
+	SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID,proto->MountedDisplayID);
+
     //SetUInt32Value(UNIT_FIELD_LEVEL, (mode ? proto->Level + (info ? info->lvl_mod_a : 0) : proto->Level));
 	SetUInt32Value(UNIT_FIELD_LEVEL, proto->MinLevel + (RandomUInt(proto->MaxLevel - proto->MinLevel)));
 	if(mode && info)
