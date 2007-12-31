@@ -1568,9 +1568,9 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	//==========================================================================================
 	//==============================Victim Skill Base Calculation===============================
 	//==========================================================================================
-	if(pVictim->IsPlayer())
+	if( pVictim->IsPlayer() )
 	{
-		vskill = ((Player*)pVictim)->_GetSkillLineCurrent(SKILL_DEFENSE);
+		vskill = static_cast< Player*>( pVictim )->_GetSkillLineCurrent( SKILL_DEFENSE );
 		if((damage_type != RANGED) && !backAttack)
 		{
 			//--------------------------------block chance----------------------------------------------
@@ -1581,12 +1581,15 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 				dodge = pVictim->GetFloatValue( PLAYER_DODGE_PERCENTAGE );
 			}
 			//--------------------------------parry chance----------------------------------------------
-			if( pVictim->can_parry && !disarmed )
+			if( pVictim->can_parry && !pVictim->disarmed )
 			{
-				parry = pVictim->GetFloatValue( PLAYER_PARRY_PERCENTAGE );
+				if( static_cast< Player*>( pVictim )->HasSpell( 3127 ) || static_cast< Player*>( pVictim )->HasSpell( 18848 ) )
+				{
+					parry = pVictim->GetFloatValue( PLAYER_PARRY_PERCENTAGE );
+				}
 			}
 		}
-		victim_skill = float2int32( vskill + ( ( Player* )pVictim )->CalcRating( PLAYER_RATING_MODIFIER_DEFENCE ) );
+		victim_skill = float2int32( vskill + static_cast< Player*>( pVictim )->CalcRating( PLAYER_RATING_MODIFIER_DEFENCE ) );
 	}
 	//--------------------------------mob defensive chances-------------------------------------
 	else

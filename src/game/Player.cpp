@@ -4200,14 +4200,9 @@ void Player::UpdateChances()
 	SetFloatValue( PLAYER_BLOCK_PERCENTAGE, min( tmp, 95.0f ) );
 
 	//parry
-	if( HasSpell( 3127 ) )
-	{
-		tmp = 5.0f + CalcRating( PLAYER_RATING_MODIFIER_PARRY ) + GetParryFromSpell();
-		tmp += defence_contribution;
-		if( tmp < 0.0f )tmp = 0.0f;
-	}
-	else
-		tmp = 0.0f;
+	tmp = 5.0f + CalcRating( PLAYER_RATING_MODIFIER_PARRY ) + GetParryFromSpell();
+	tmp += defence_contribution;
+	if( tmp < 0.0f )tmp = 0.0f;
 
 	SetFloatValue( PLAYER_PARRY_PERCENTAGE, std::max( 0.0f, std::min( tmp, 95.0f ) ) ); //let us not use negative parry. Some spells decrease it
 
