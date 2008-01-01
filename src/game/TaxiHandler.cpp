@@ -247,9 +247,19 @@ void WorldSession::HandleMultipleActivateTaxiOpcode(WorldPacket & recvPacket)
 	if(nodecount < 2)
 		return;
 
+	if(nodecount > 25)
+	{
+		Disconnect();
+		return;
+	}
 
 	for(uint32 i = 0; i < nodecount; ++i)
+	{
+		if(recvPacket.rpos() > recvPacket.wpos())
+			return;
+	
 		pathes.push_back( recvPacket.read<uint32>() );
+	}
 	
 
 	if(GetPlayer()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER))
