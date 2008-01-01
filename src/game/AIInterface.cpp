@@ -3127,23 +3127,26 @@ bool AIInterface::GetIsSoulLinked()
 
 void AIInterface::CheckTarget(Unit* target)
 {
-	if(target == UnitToFollow)		  // fix for crash here
+	if( target == NULL )
+		return;
+
+	if( target == UnitToFollow )		  // fix for crash here
 	{
 		UnitToFollow = NULL;
 		m_lastFollowX = m_lastFollowY = 0;
-		FollowDistance=0;
+		FollowDistance = 0;
 	}
 
-	if(target == UnitToFollow_backup)
+	if( target == UnitToFollow_backup )
 	{
-		UnitToFollow_backup = 0;
+		UnitToFollow_backup = NULL;
 	}
 
-	TargetMap::iterator it2 = m_aiTargets.find(target);
-	if(it2 != m_aiTargets.end() || target==m_nextTarget)
+	TargetMap::iterator it2 = m_aiTargets.find( target );
+	if( it2 != m_aiTargets.end() || target == m_nextTarget )
 	{
-		target->CombatStatus.RemoveAttacker(m_Unit, m_Unit->GetGUID());
-		m_Unit->CombatStatus.RemoveAttackTarget(target);
+		target->CombatStatus.RemoveAttacker( m_Unit, m_Unit->GetGUID() );
+		m_Unit->CombatStatus.RemoveAttackTarget( target );
 	}
 
 	if(it2 != m_aiTargets.end())

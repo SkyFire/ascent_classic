@@ -6940,7 +6940,7 @@ void Aura::SpellAuraIncreaseRating( bool apply )
 	Player* plr = ((Player*)m_target);
 	for( uint32 x = 1; x < 24; x++ )//skip x=0
 		if( ( ( ( uint32 )1 ) << x ) & mod->m_miscValue )
-			plr->ModifyBonuses( 11 + x, v);
+			plr->ModifyBonuses( 11 + x, v );
 
 	if( mod->m_miscValue & 1 )//weapon skill
 	{
@@ -6958,7 +6958,6 @@ void Aura::SpellAuraIncreaseRating( bool apply )
 						if(i->second==0)
 							((Player*)m_target)->m_wratings.erase(i);
 					}
-				
 			}
 	}
 	plr->UpdateStats();
