@@ -1447,7 +1447,7 @@ void Player::smsg_InitialSpells()
 	   uint32 n = now();
 	   for (itr = m_itemcooldown.begin(); itr != m_itemcooldown.end();)
 	   {
-		   if((*itr)->CooldownTimeStamp <= n)
+		   if( n >= (*itr)->CooldownTimeStamp || ( ((*itr)->CooldownTimeStamp - n) < 5000 ) )
 		   {
 			   itr2 = itr++;
 			   m_itemcooldown.erase(itr2);
