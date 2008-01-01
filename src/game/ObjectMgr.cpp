@@ -2124,14 +2124,14 @@ void Charter::Destroy()
 	//meh remove from objmgr
 	objmgr.RemoveCharter(this);
 	// Kill the players with this (in db/offline)
-	CharacterDatabase.Execute("DELETE FROM charters WHERE charterId = %u", CharterId);
+	CharacterDatabase.Execute( "DELETE FROM charters WHERE charterId = %u", CharterId );
 	Player * p;
-	for(uint32 i = 0; i < Slots; ++i)
+	for( uint32 i = 0; i < Slots; ++i )
 	{
 		if(!Signatures[i])
 			continue;
-		p =  objmgr.GetPlayer(Signatures[i]) ;
-		if(p)
+		p =  objmgr.GetPlayer( Signatures[i] );
+		if( p != NULL)
 			p->m_charters[CharterType] = 0;
 	}
 
@@ -2227,6 +2227,13 @@ Charter * ObjectMgr::GetCharterByName(string &charter_name, CharterTypes Type)
 
 void ObjectMgr::RemoveCharter(Charter * c)
 {
+	if( c == NULL )
+		return;
+	if( c->CharterType > NUM_CHARTER_TYPES )
+	{
+		Log.Notice("ObjectMgr", "Charter %u cannot be destroyed as type %u is not a sane type value.", c->CharterId, c->CharterType );
+		return;
+	}
 	m_charterLock.AcquireWriteLock();
 	m_charters[c->CharterType].erase(c->CharterId);
 	m_charterLock.ReleaseWriteLock();
