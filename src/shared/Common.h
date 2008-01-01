@@ -630,7 +630,7 @@ std::string ConvertTimeStampToDataTime(uint32 timestamp);
 
 ASCENT_INLINE void ASCENT_TOLOWER(std::string& str)
 {
-	for(size_t i = 0; i < 1; ++i)
+	for(size_t i = 0; i < str.length(); ++i)
 		str[i] = (char)tolower(str[i]);
 };
 
