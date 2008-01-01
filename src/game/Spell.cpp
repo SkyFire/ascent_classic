@@ -198,6 +198,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	ProcedOnSpell = 0;
 	forced_basepoints[0] = forced_basepoints[1] = forced_basepoints[2] = 0;
 	extra_cast_number = 0;
+	m_reflectedParent = NULL;
 }
 
 Spell::~Spell()
@@ -3928,6 +3929,9 @@ void Spell::SafeAddModeratedTarget(uint64 guid, uint16 type)
 bool Spell::Reflect(Unit *refunit)
 {
 	SpellEntry * refspell = NULL;
+
+	if( m_reflectedParent != NULL )
+		return false;
 
 	// if the spell to reflect is a reflect spell, do nothing.
 	for(int i=0; i<3; i++)

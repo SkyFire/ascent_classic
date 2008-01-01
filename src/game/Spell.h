@@ -1846,6 +1846,8 @@ public:
     ASCENT_INLINE void SetCanReflect(bool reflect = true) {m_CanRelect = reflect;}
 
 
+	Spell * m_reflectedParent;
+
 protected:
 
     /// Spell state's
