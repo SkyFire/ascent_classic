@@ -3246,139 +3246,76 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 
 	//Items Set check
 	uint32 setid = proto->ItemSet;
-	uint32 subsetid[2] = { 0, 0 };
 
-	// These itemsets are interchangeable and each set group has the same
-	// bonuses on each set we will change the setid to be the lowest version
-	// of each set group
+	// These season pvp itemsets are interchangeable and each set group has the same
+	// bonuses if you have a full set made up of parts from any of the 3 similar sets
+	// you will get the highest sets bonus
+
+	// TODO: make a config for server so they can configure which season is active season
 
 	// * Gladiator's Battlegear
 	if( setid == 701 || setid == 736 || setid == 567 )
-	{
-		setid = 701;
-		subsetid[0] = 746;
-		subsetid[1] = 567;
-	}
+		setid = 746;
 	
 	// * Gladiator's Dreadgear
 	if( setid == 702 || setid == 734 || setid == 568 )
-	{
-		setid = 702;
-		subsetid[0] = 734;
-		subsetid[1] = 568;
-	}
+		setid = 734;
 
 	// * Gladiator's Earthshaker
 	if( setid == 703 || setid == 732 || setid == 578 )
-	{
-		setid = 703;
-		subsetid[0] = 732;
-		subsetid[1] = 578;
-	}
+		setid= 732;
 
 	// * Gladiator's Felshroud
 	if( setid == 704 || setid == 735 || setid == 615 )
-	{
-		setid = 704;
-		subsetid[0] = 735;
-		subsetid[1] = 615;
-	}
+		setid = 735;
 
 	// * Gladiator's Investiture
 	if( setid == 705 || setid == 728 || setid == 687 )
-	{
-		setid = 705;
-		subsetid[0] = 728;
-		subsetid[1] = 687;
-	}
+		setid = 728;
 
 	// * Gladiator's Pursuit
 	if( setid == 706 || setid == 723 || setid == 586 )
-	{
-		setid = 706;
-		subsetid[0] = 723;
-		subsetid[1] = 586;
-	}
+		setid = 723;
 
 	// * Gladiator's Raiment
 	if( setid == 707 || setid == 729 || setid == 581 )
-	{
-		setid = 707;
-		subsetid[0] = 729;
-		subsetid[1] = 581;
-	}
+		setid = 729;
 
 	// * Gladiator's Redemption
 	if( setid == 708 || setid == 725 || setid == 690 )
-	{
-		setid = 708;
-		subsetid[0] = 725;
-		subsetid[1] = 690;
-	}
+		setid = 725;
 
 	// * Gladiator's Refuge
 	if( setid == 709 || setid == 720 || setid == 685 )
-	{
-		setid = 709;
-		subsetid[0] = 720;
-		subsetid[1] = 685;
-	}
+		setid = 720;
 
 	// * Gladiator's Regalia
 	if( setid == 710 || setid == 724 || setid == 579 )
-	{
-		setid = 710;
-		subsetid[0] = 724;
-		subsetid[1] = 579;
-	}
+		setid = 724;
 
 	// * Gladiator's Sanctuary
 	if( setid == 711 || setid == 721 || setid == 584 )
-	{
-		setid = 711;
-		subsetid[0] = 721;
-		subsetid[1] = 584;
-	}
+		setid = 721;
 
 	// * Gladiator's Thunderfist
 	if( setid == 712 || setid == 733 || setid == 580 )
-	{
-		setid = 712;
-		subsetid[0] = 733;
-		subsetid[1] = 580;
-	}
+		setid = 733;
 
 	// * Gladiator's Vestments
 	if( setid == 713 || setid == 730 || setid == 577 )
-	{
-		setid = 713;
-		subsetid[0] = 730;
-		subsetid[1] = 577;
-	}
+		setid = 730;
 
 	// * Gladiator's Vindication
 	if( setid == 714 || setid == 726 || setid == 583 )
-	{
-		setid = 714;
-		subsetid[0] = 726;
-		subsetid[1] = 583;
-	}
+		setid = 726;
 
 	// * Gladiator's Wartide
 	if( setid == 715 || setid == 731 || setid == 686 )
-	{
-		setid = 715;
-		subsetid[0] = 731;
-		subsetid[1] = 686;
-	}
+		setid = 731;
 
 	// * Gladiator's Wildhide
 	if( setid == 716 || setid == 722 || setid == 585 )
-	{
-		setid = 716;
-		subsetid[0] = 722;
-		subsetid[1] = 585;
-	}
+		setid = 722;
 
 	// Set
 	if( setid != 0 )
@@ -3448,142 +3385,6 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 		}
 	}
  
-	// Sub Set 0
-	if( subsetid[0] != 0 )
-	{
-		ItemSetEntry* set = dbcItemSet.LookupEntry( subsetid[0] );
-		ASSERT( set );
-		ItemSet* Set = NULL;
-		std::list<ItemSet>::iterator i;
-		for( i = m_itemsets.begin(); i != m_itemsets.end(); i++ )
-		{
-			if( i->setid == subsetid[0] )
-			{   
-				Set = &(*i);
-				break;
-			}
-		}
-
-		if( apply )
-		{
-			if( Set == NULL ) 
-			{
-				Set = new ItemSet;
-				memset( Set, 0, sizeof( ItemSet ) );
-				Set->itemscount = 1;
-				Set->setid = subsetid[0];
-			}
-			else
-				Set->itemscount++;
-
-			if( !set->RequiredSkillID || ( _GetSkillLineCurrent( set->RequiredSkillID, true ) >= set->RequiredSkillAmt ) )
-			{
-				for( uint32 x=0;x<8;x++)
-				{
-					if( Set->itemscount==set->itemscount[x])
-					{//cast new spell
-						SpellEntry *info = dbcSpell.LookupEntry( set->SpellID[x] );
-						Spell * spell = new Spell( this, info, true, NULL );
-						SpellCastTargets targets;
-						targets.m_unitTarget = this->GetGUID();
-						spell->prepare( &targets );
-						if( info->RequiredShapeShift && (getClass() == DRUID || getClass() == WARRIOR ) )
-							m_SSSPecificSpells.insert(info->Id);
-					}
-				}
-			}
-			if( i == m_itemsets.end() )
-			{
-				m_itemsets.push_back( *Set );
-				delete Set;
-			}
-		}
-		else
-		{
-			if( Set )
-			{
-				for( uint32 x = 0; x < 8; x++ )
-				if( Set->itemscount == set->itemscount[x] )
-				{
-					this->RemoveAura( set->SpellID[x], GetGUID() );
-					if( m_SSSPecificSpells.size() )
-							m_SSSPecificSpells.erase( set->SpellID[x] );
-				}
-	   
-				if(!(--Set->itemscount))
-				m_itemsets.erase(i);
-			}
-		}
-	}
-
-	// Sub Set 1
-	if( subsetid[1] != 0 )
-	{
-		ItemSetEntry* set = dbcItemSet.LookupEntry( subsetid[1] );
-		ASSERT( set );
-		ItemSet* Set = NULL;
-		std::list<ItemSet>::iterator i;
-		for( i = m_itemsets.begin(); i != m_itemsets.end(); i++ )
-		{
-			if( i->setid == subsetid[1] )
-			{   
-				Set = &(*i);
-				break;
-			}
-		}
-
-		if( apply )
-		{
-			if( Set == NULL ) 
-			{
-				Set = new ItemSet;
-				memset( Set, 0, sizeof( ItemSet ) );
-				Set->itemscount = 1;
-				Set->setid = subsetid[1];
-			}
-			else
-				Set->itemscount++;
-
-			if( !set->RequiredSkillID || ( _GetSkillLineCurrent( set->RequiredSkillID, true ) >= set->RequiredSkillAmt ) )
-			{
-				for( uint32 x=0;x<8;x++)
-				{
-					if( Set->itemscount==set->itemscount[x])
-					{//cast new spell
-						SpellEntry *info = dbcSpell.LookupEntry( set->SpellID[x] );
-						Spell * spell = new Spell( this, info, true, NULL );
-						SpellCastTargets targets;
-						targets.m_unitTarget = this->GetGUID();
-						spell->prepare( &targets );
-						if( info->RequiredShapeShift && (getClass() == DRUID || getClass() == WARRIOR ) )
-							m_SSSPecificSpells.insert(info->Id);
-					}
-				}
-			}
-			if( i == m_itemsets.end() )
-			{
-				m_itemsets.push_back( *Set );
-				delete Set;
-			}
-		}
-		else
-		{
-			if( Set )
-			{
-				for( uint32 x = 0; x < 8; x++ )
-				if( Set->itemscount == set->itemscount[x] )
-				{
-					this->RemoveAura( set->SpellID[x], GetGUID() );
-					if( m_SSSPecificSpells.size() )
-							m_SSSPecificSpells.erase( set->SpellID[x] );
-				}
-	   
-				if(!(--Set->itemscount))
-				m_itemsets.erase(i);
-			}
-		}
-	}
-
 	// Armor
 	if( proto->Armor )
 	{
