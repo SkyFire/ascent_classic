@@ -1503,12 +1503,13 @@ void MapMgr::_PerformObjectDuties()
 	// Update players.
 	{
 		PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
-		Player * ptr;
+		Player* ptr;
 		for(; itr != m_PlayerStorage.end(); )
 		{
 			ptr = static_cast< Player* >( (itr->second) );
 			++itr;
-			ptr->Update( difftime );
+			if( ptr != NULL )
+				ptr->Update( difftime );
 		}
 
 		lastUnitUpdate = mstime;
