@@ -17,14 +17,110 @@
 *
 */
 
+/* EDIT THESE TO YOUR SERVERS CONFIGURATION */
+const char * username = "root";
+const char * password = "";
+const char * dbname = "moo";
+
 #include "stdafx.h"
 #include "Database/DatabaseEnv.h"
 #include "Common.h"
 #include "Skill.h"
 #include <sstream>
+#include <conio.h>
 
 CLog Log;
 Database sDatabase;
+
+const char * data_table_create_string = "CREATE TABLE `guild_data_new` (\n"
+"  `guildid` int(30) NOT NULL,\n"
+"  `playerid` int(30) NOT NULL,\n"
+"  `guildRank` int(30) NOT NULL,\n"
+"  `publicNote` varchar(300) NOT NULL,\n"
+"  `officerNote` varchar(300) NOT NULL,\n"
+"  `lastWithdrawReset` int(30) NOT NULL DEFAULT '0',\n"
+"  `withdrawlsSinceLastReset` int(30) NOT NULL DEFAULT '0',\n"
+"  `lastItemWithdrawReset0` int(30) NOT NULL DEFAULT '0',\n"
+"  `itemWithdrawlsSinceLastReset0` int(30) NOT NULL DEFAULT '0',\n"
+"  `lastItemWithdrawReset1` int(30) NOT NULL,\n"
+"  `itemWithdrawlsSinceLastReset1` int(30) NOT NULL,\n"
+"  `lastItemWithdrawReset2` int(30) NOT NULL,\n"
+"  `itemWithdrawlsSinceLastReset2` int(30) NOT NULL,\n"
+"  `lastItemWithdrawReset3` int(30) NOT NULL,\n"
+"  `itemWithdrawlsSinceLastReset3` int(30) NOT NULL,\n"
+"  `lastItemWithdrawReset4` int(30) NOT NULL,\n"
+"  `itemWithdrawlsSinceLastReset4` int(30) NOT NULL,\n"
+"  `lastItemWithdrawReset5` int(30) NOT NULL,\n"
+"  `itemWithdrawlsSinceLastReset5` int(30) NOT NULL,\n"
+"  KEY `a` (`guildid`,`playerid`)\n"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;\n";
+
+const char * rank_table_create_string = "CREATE TABLE `guild_ranks_new` (\n"
+"`guildId` int(6) unsigned NOT NULL DEFAULT '0',\n"
+"`rankId` int(1) NOT NULL DEFAULT '0',\n"
+"`rankName` varchar(255) NOT NULL DEFAULT '',\n"
+"`rankRights` int(3) unsigned NOT NULL DEFAULT '0',\n"
+"`goldLimitPerDay` int(30) NOT NULL DEFAULT '0',\n"
+"`bankTabFlags0` int(30) NOT NULL DEFAULT '0',\n"
+"`itemStacksPerDay0` int(30) NOT NULL DEFAULT '0',\n"
+"`bankTabFlags1` int(30) NOT NULL DEFAULT '0',\n"
+"`itemStacksPerDay1` int(30) NOT NULL DEFAULT '0',\n"
+"`bankTabFlags2` int(30) NOT NULL DEFAULT '0',\n"
+"`itemStacksPerDay2` int(30) NOT NULL DEFAULT '0',\n"
+"`bankTabFlags3` int(30) NOT NULL DEFAULT '0',\n"
+"`itemStacksPerDay3` int(30) NOT NULL DEFAULT '0',\n"
+"`bankTabFlags4` int(30) NOT NULL DEFAULT '0',\n"
+"`itemStacksPerDay4` int(30) NOT NULL DEFAULT '0',\n"
+"`bankTabFlags5` int(30) NOT NULL DEFAULT '0',\n"
+"`itemStacksPerDay5` int(30) NOT NULL DEFAULT '0',\n"
+"PRIMARY KEY (`guildId`,`rankId`),\n"
+"KEY `a` (`guildId`,`rankId`)\n"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;\n";
+
+const char * table1_s = "CREATE TABLE `guild_bankitems` (\n"
+"  `guildId` int(30) NOT NULL,\n"
+"  `tabId` int(30) NOT NULL,\n"
+"  `slotId` int(30) NOT NULL,\n"
+"  `itemGuid` int(30) NOT NULL,\n"
+"  PRIMARY KEY (`guildId`,`tabId`,`slotId`),\n"
+"  KEY `a` (`guildId`),\n"
+"  KEY `b` (`tabId`),\n"
+"  KEY `c` (`slotId`)\n"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
+
+const char * table2_s = "CREATE TABLE `guild_banklogs` (\n"
+"  `log_id` int(30) NOT NULL,\n"
+"  `guildid` int(30) NOT NULL,\n"
+"  `tabid` int(30) NOT NULL COMMENT 'tab 6 is money logs',\n"
+"  `action` int(5) NOT NULL,\n"
+"  `player_guid` int(30) NOT NULL,\n"
+"  `item_entry` int(30) NOT NULL,\n"
+"  `stack_count` int(30) NOT NULL,\n"
+"  `timestamp` int(30) NOT NULL,\n"
+"  PRIMARY KEY (`log_id`,`guildid`),\n"
+"  KEY `a` (`guildid`),\n"
+"  KEY `b` (`tabid`)\n"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
+
+const char * table3_s = "CREATE TABLE `guild_banktabs` (\n"
+"  `guildId` int(30) NOT NULL,\n"
+"  `tabId` int(30) NOT NULL,\n"
+"  `tabName` varchar(200) NOT NULL,\n"
+"  `tabIcon` varchar(200) NOT NULL,\n"
+"  PRIMARY KEY (`guildId`,`tabId`),\n"
+"  KEY `a` (`guildId`),\n"
+"  KEY `b` (`tabId`)\n"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
+
+const char * table4_s = "CREATE TABLE `guild_logs` (\n"
+"  `log_id` int(30) NOT NULL,\n"
+"  `guildid` int(30) NOT NULL,\n"
+"  `timestamp` int(30) NOT NULL,\n"
+"  `event_type` int(30) NOT NULL,\n"
+"  `misc1` int(30) NOT NULL,\n"
+"  `misc2` int(30) NOT NULL,\n"
+"  `misc3` int(30) NOT NULL\n"
+") ENGINE=MyISAM DEFAULT CHARSET=latin1;";
 
 string escapestring(const char * str)
 {
@@ -46,20 +142,28 @@ string escapestring(const char * str)
 int _tmain(int argc, _TCHAR* argv[])
 {
 	Log.loglevel = 999;
-	const char * username = "root";
-	const char * password = "";
-	const char * dbname = "moo";
+
 	if(!sDatabase.Initialize("localhost", 3306, username, password, dbname, 1, 65536))
 	{
 		Log.Error("SQL", "could not connect");
 		return 1;
 	}
 
+	printf("MAKE SURE YOU HAVE MADE A FULL BACKUP OF YOUR DATABASE BEFOREHAND!\n");
+	printf("IF YOU HAVE DONE THIS, PLEASE CLOSE THIS WINDOW NOW AND DO SO!\n");
+	printf("IF YOU HAVE MADE A BACKUP, HIT ENTER TO CONTINUE.\n");
+	getch();
+
+	Log.Notice("convert", "Making new tables");
+	sDatabase.Query("DROP TABLE guild_data_new");
+	sDatabase.Query("DROP TABLE guild_ranks_new");
+	sDatabase.Query(data_table_create_string);
+	sDatabase.Query(rank_table_create_string);
 	QueryResult * result = sDatabase.Query("SELECT * FROM guilds");
 	do 
 	{
 		uint32 guildid = result->Fetch()[0].GetUInt32();
-		printf("converting guild '%s' id %u.\n", result->Fetch()[1].GetString(), result->Fetch()[0].GetUInt32());
+		Log.Notice("convert", "converting guild '%s' id %u.", result->Fetch()[1].GetString(), result->Fetch()[0].GetUInt32());
 		QueryResult * result2 = sDatabase.Query("SELECT * FROM guild_ranks WHERE guildId = %u ORDER BY rankId ASC", guildid);
 		QueryResult * result3 = sDatabase.Query("SELECT COUNT(guid) FROM characters WHERE guildid = %u", guildid);
 		
@@ -112,6 +216,37 @@ int _tmain(int argc, _TCHAR* argv[])
 		delete result3;
 
 	} while (result->NextRow());
+	delete result;
+
+	Log.Notice("convert", "doing some sanity checks...");
+	sDatabase.Query("DELETE FROM guild_ranks_new WHERE rankId > 9");
+
+	Log.Notice("convert", "moving new tables to proper names...");
+	sDatabase.Query("DROP TABLE guild_ranks");
+	sDatabase.Query("RENAME TABLE guild_ranks_new TO guild_ranks");
+	sDatabase.Query("RENAME TABLE guild_data_new TO guild_data");
+
+	Log.Notice("convert", "altering table characters structure... 1... ");
+	sDatabase.Query("ALTER TABLE characters DROP COLUMN publicNote");
+	Log.Notice("convert", "altering table characters structure... 2... ");
+	sDatabase.Query("ALTER TABLE characters DROP COLUMN officerNote");
+	Log.Notice("convert", "altering table characters structure... 3... ");
+	sDatabase.Query("ALTER TABLE characters DROP COLUMN guildid");
+	Log.Notice("convert", "altering table characters structure... 4... ");
+	sDatabase.Query("ALTER TABLE characters DROP COLUMN guildrank");
+
+
+	Log.Notice("convert", "Updating guild table structure...");
+	sDatabase.Query("ALTER TABLE guilds DROP COLUMN createdate");
+	sDatabase.Query("ALTER TABLE guilds ADD COLUMN createdate int(30) NOT NULL DEFAULT '%u'", time(NULL));
+	sDatabase.Query("ALTER TABLE guilds ADD COLUMN bankTabCount int(30) NOT NULL DEFAULT '0'");
+	sDatabase.Query("ALTER TABLE guilds ADD COLUMN bankBalance int(30) NOT NULL");
+
+	sDatabase.Query(table1_s);
+	sDatabase.Query(table2_s);
+	sDatabase.Query(table3_s);
+	sDatabase.Query(table4_s);
+
 	sDatabase.Shutdown();
 	Log.Success("Program", "Exit normally");
 	return 0;
