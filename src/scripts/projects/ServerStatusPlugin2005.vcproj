@@ -219,6 +219,7 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\shared;..\..\game;..\..\..\dep\include;..\..\..\dep\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTLIB"
+				StringPooling="true"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
 				FloatingPointModel="2"

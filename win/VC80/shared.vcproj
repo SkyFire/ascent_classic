@@ -52,7 +52,7 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\dep\include,..\..\src\shared,..\..\src\game,..\..\src\realmlist"
 				PreprocessorDefinitions="WIN32,NDEBUG,_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS"
-				StringPooling="false"
+				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"

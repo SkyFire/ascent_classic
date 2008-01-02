@@ -214,7 +214,7 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared;..\..\src\lua\src;..\..\src\luabind;..\..\src\script;..\..\dep\src"
 				PreprocessorDefinitions="_HAS_ITERATOR_DEBUGGING=0;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS"
-				StringPooling="false"
+				StringPooling="true"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
