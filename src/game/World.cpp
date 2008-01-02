@@ -2628,13 +2628,13 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 128 | 2 | 64; 
 		sp->EffectSpellGroupRelation[1] = 128;
 	}
-	sp = dbcSpell.LookupEntry(34492);
+	sp = dbcSpell.LookupEntry( 34492 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 128 | 2 | 64; 
 		sp->EffectSpellGroupRelation[1] = 128;
 	}
-	sp = dbcSpell.LookupEntry(34493);
+	sp = dbcSpell.LookupEntry( 34493 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 128 | 2 | 64; 
@@ -2652,15 +2652,18 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;*/
 
 	//Mage:Arcane Blast
-	sp = dbcSpell.LookupEntry(30451);
-	if( sp != NULL ){
-		sp->EffectApplyAuraName[1]=42;
-		sp->EffectTriggerSpell[1]=36032;
-		sp->procFlags=PROC_ON_CAST_SPECIFIC_SPELL;
+	sp = dbcSpell.LookupEntry( 30451 );
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1] = 42;
+		sp->EffectTriggerSpell[1] = 36032;
+		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
 	}
+
 	//Mage:Arcane Blast proc spell
-	sp = dbcSpell.LookupEntry(36032);
-	if( sp != NULL ){
+	sp = dbcSpell.LookupEntry( 36032 );
+	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 536870912;
 		sp->EffectSpellGroupRelation[1] = 536870912;
 	}

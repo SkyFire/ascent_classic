@@ -2,6 +2,10 @@
 
 #ifdef ENABLE_LUA_SCRIPTING
 
+#if PLATFORM != PLATFORM_WIN32
+#include <dirent.h>
+#endif
+
 bool lua_is_starting_up = false;
 initialiseSingleton(LuaEngineMgr);
 
@@ -264,7 +268,7 @@ void LuaEngine::LoadScripts()
 
 	while(filecount--)
 	{
-		ext = strrchr(list[filecount]->d_name, '.');
+		char* ext = strrchr(list[filecount]->d_name, '.');
 		if(ext != NULL && !strcmp(ext, ".lua"))
 			{
 				string full_path = string(list[filecount]->d_name);
