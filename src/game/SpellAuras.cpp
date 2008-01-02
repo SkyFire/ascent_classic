@@ -6132,11 +6132,11 @@ void Aura::SpellAuraModUnderwaterBreathing(bool apply)
 {
 	if(m_target->GetTypeId() == TYPEID_PLAYER)
 	{
-                uint32 m_UnderwaterMaxTimeSaved = static_cast<Player*>(m_target)->m_UnderwaterMaxTime;
-		if(apply)
-			static_cast<Player*>(m_target)->m_UnderwaterMaxTime *= (1 + mod->m_amount/100);
+		uint32 m_UnderwaterMaxTimeSaved = static_cast<Player*>(m_target)->m_UnderwaterMaxTime;
+		if( apply )
+			static_cast<Player*>(m_target)->m_UnderwaterMaxTime *= (1 + mod->m_amount / 100 );
 		else
-			static_cast<Player*>(m_target)->m_UnderwaterMaxTime /= (1 + mod->m_amount/100);
+			static_cast<Player*>(m_target)->m_UnderwaterMaxTime /= (1 + mod->m_amount / 100 );
                 static_cast<Player*>(m_target)->m_UnderwaterTime *= static_cast<Player*>(m_target)->m_UnderwaterMaxTime / m_UnderwaterMaxTimeSaved;
 	}
 }
@@ -6144,24 +6144,16 @@ void Aura::SpellAuraModUnderwaterBreathing(bool apply)
 void Aura::SpellAuraSafeFall(bool apply)
 {
 	//FIXME:Find true flag
-	if(m_target->GetTypeId() == TYPEID_PLAYER)
+	if( m_target->GetTypeId() == TYPEID_PLAYER )
 	{
-		WorldPacket data(12);
-		if(apply)
+		if( apply )
 		{
-			SetPositive();
-			data.SetOpcode(SMSG_MOVE_FEATHER_FALL);
 			static_cast<Player*>(m_target)->bSafeFall = true;
 		}
 		else
 		{
-			data.SetOpcode(SMSG_MOVE_NORMAL_FALL);
 			static_cast<Player*>(m_target)->bSafeFall = false;
 		}
-		data << m_target->GetNewGUID();
-		data << uint32(0);
-   
-		static_cast<Player*>(m_target)->GetSession()->SendPacket(&data);
 	}
 }
 
