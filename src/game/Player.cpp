@@ -7272,6 +7272,9 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 		SpellCastTargets targets;
 		Spell * dismount=new Spell(this,spe,true,NULL); 
 		dismount->prepare(&targets);*/
+		// try this instead
+		RemoveAura( m_MountSpellId );
+		SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , 0);
 	}
 	else if(m_mapId != MapID)
 	{
