@@ -250,7 +250,7 @@ void GameObject::Despawn(uint32 time)
 void GameObject::SaveToDB()
 {
 	std::stringstream ss;
-	ss << "INSERT INTO gameobject_spawns VALUES("
+	ss << "REPLACE INTO gameobject_spawns VALUES("
 		<< spawnid << ","
 		<< GetEntry() << ","
 		<< GetMapId() << ","
