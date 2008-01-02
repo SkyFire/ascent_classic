@@ -1257,26 +1257,27 @@ void Aura::SpellAuraDummy(bool apply)
 			if(!m_target || !m_target->IsPlayer())
 				return; //only players may have this type of buff
 			int val;
-			Player *p=(Player*)GetCaster();
-			if(apply)
+			Player* p = static_cast< Player* > ( GetCaster() );
+			if( apply )
 			{
-				val = mod->m_amount/100;
-				if(mod->m_amount>0)
+				val = mod->m_amount / 100;
+				if( mod->m_amount > 0 )
 					SetPositive();
 				else
 					SetNegative();
 				//get a hold on our pet
-				Pet *ps=p->GetSummon();
-				if(!ps) 
+				Pet* ps = p->GetSummon();
+				if( ps == NULL ) 
 					return;//nothin to use to calc eff value
-				val = val*(ps->GetUInt32Value(UNIT_FIELD_STAT3)+ps->GetUInt32Value(UNIT_FIELD_STAT4));
+				val = val * ( ps->GetUInt32Value( UNIT_FIELD_STAT2 ) + ps->GetUInt32Value( UNIT_FIELD_STAT3 ) );
 				mod->fixed_amount[0] = val;
 			}
 			else
 				val = -mod->fixed_amount[0];
-			for(uint32 x=1;x<7;x++)
-				if (mod->m_miscValue & (((uint32)1)<<x) )
-					p->ModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x,val);
+
+			for( uint32 x = 1; x < 7; x++ )
+				if( mod->m_miscValue & ( ( ( uint32 )1 ) << x ) )
+					p->ModUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, val );
 		}break;
 		//paladin - Blessing of Light.
 	case 19977:
