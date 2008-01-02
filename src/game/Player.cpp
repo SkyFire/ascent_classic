@@ -7266,14 +7266,28 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 	{
 		instance = true;
 		this->SetInstanceID(InstanceID);
+		// if we are mounted remove it
 		if( m_MountSpellId )
 			RemoveAura( m_MountSpellId );
+		// if we are in ghost wolf remove it
+		if( this->FindAura( 2645 ) )
+			RemoveAura( 2645 );
+		// if we are in travel form remove it
+		if( this->FindAura( 783 ) )
+			RemoveAura( 783 );
 	}
 	else if(m_mapId != MapID)
 	{
 		instance = true;
+		// if we are mounted remove it
 		if( m_MountSpellId )
 			RemoveAura( m_MountSpellId );
+		// if we are in ghost wolf remove it
+		if( this->FindAura( 2645 ) )
+			RemoveAura( 2645 );
+		// if we are in travel form remove it
+		if( this->FindAura( 783 ) )
+			RemoveAura( 783 );
 	}
 
 	// make sure player does not drown when teleporting from under water
