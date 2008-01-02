@@ -530,10 +530,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Anti-Speed Hack Checks                                               */
 	/************************************************************************/
-	if(!_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID)
+	if( !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID )
 	{
 		// calculate distance between last heartbeat and this
-		if(_player->_lastHeartbeatTime && _player->_heartBeatDisabledUntil < UNIXTIME)
+		if( _player->_lastHeartbeatTime && _player->_heartBeatDisabledUntil < UNIXTIME )
 		{
 			int32 time_diff = movement_info.time - _player->_lastHeartbeatTime;
 			//float distance_travelled = _player->m_position.Distance2D(_player->_lastHeartbeatX, _player->_lastHeartbeatY);

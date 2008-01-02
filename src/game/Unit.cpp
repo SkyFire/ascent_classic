@@ -2457,9 +2457,12 @@ else
 
 	if(!ability)
 	{
-		if(dmg.full_damage)
+		if( dmg.full_damage > 0 )
 			if(dmg.full_damage == (int32)dmg.resisted_damage)
 				hit_status |= HITSTATUS_ABSORBED;
+
+		if( dmg.full_damage < 0 )
+			dmg.full_damage = 0;
 
 		data << (uint32)hit_status;   
 		data << GetNewGUID();
@@ -2485,7 +2488,7 @@ else
 	}
 	else
 	{
-		if(realdamage)//FIXME: add log for miss,block etc for ability and ranged
+		if( realdamage > 0 )//FIXME: add log for miss,block etc for ability and ranged
 		{
 			SendSpellNonMeleeDamageLog(this,pVictim,ability->Id,realdamage,0,dmg.resisted_damage,0,false,blocked_damage,((hit_status & HITSTATUS_CRICTICAL) ? true : false),true);
 		}
@@ -3919,24 +3922,27 @@ void Unit::RemoveAllAreaAuras()
 	}
 }
 */
-uint32 Unit::AbsorbDamage(uint32 School,uint32 * dmg)
+uint32 Unit::AbsorbDamage( uint32 School, uint32* dmg )
 {
-	SchoolAbsorb::iterator i,j;
-	uint32 abs=0;
-	for(i=Absorbs[School].begin();i!=Absorbs[School].end();)
+	if( dmg == NULL )
+		return 0;
+
+	SchoolAbsorb::iterator i, j;
+	uint32 abs = 0;
+	for( i = Absorbs[School].begin(); i != Absorbs[School].end(); )
 	{
-		if ((int32)(*dmg) >= (*i)->amt)//remove this absorb
+		if( (int32)(*dmg) >= (*i)->amt)//remove this absorb
 		{
-			*dmg -= (*i)->amt;
+			(*dmg) -= (*i)->amt;
 			abs += (*i)->amt;
 			j = i++;
 
-			if(i != Absorbs[School].end())
+			if( i != Absorbs[School].end() )
 			{
-				while((*i)->spellid == (*j)->spellid)
+				while( (*i)->spellid == (*j)->spellid )
 				{
 					++i;
-					if(i == Absorbs[School].end())
+					if( i == Absorbs[School].end() )
 						break;
 				}
 			}

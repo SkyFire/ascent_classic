@@ -36,11 +36,11 @@ ItemInterface::~ItemInterface()
 {
 	for(int i = 0; i < MAX_INVENTORY_SLOT; i++)
 	{
-		if(m_pItems[i])
+		if( m_pItems[i] != NULL )
 		{
-			if(m_pItems[i]->IsContainer())
+			if( m_pItems[i]->IsContainer() )
 			{
-				delete ((Container*)(m_pItems[i]));
+				delete static_cast< Container* >( m_pItems[i] );
 			}
 			else
 			{

@@ -1004,7 +1004,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	GetAIInterface()->setMoveRunFlag(0);
 	
 	// load formation data
-	if(spawn->form)
+	if( spawn->form != NULL )
 	{
 		m_aiInterface->m_formationLinkSqlId = spawn->form->fol;
 		m_aiInterface->m_formationFollowDistance = spawn->form->dist;
