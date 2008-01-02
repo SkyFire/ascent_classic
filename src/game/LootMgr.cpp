@@ -376,81 +376,92 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 {
 	uint32 i;
 	uint32 count;
-	uint32 totalloot = 0; // This counter is incremented for every item that is pushed into the loot list.
-						  // Using this, we prevent more than 16 items being generated for a single mob.
-						  // The client can only show 16 items, and re-opening the corpse does not show the 
-						  // excess items.
-						  // This limitation does not affect blizzlike servers, and will only affect
-						  // servers with very high drop rates - and it will protect the players from
-						  // the need/greed popup spam.
-						  // This is just a temporary measure, I'm going to move this to a post-generation
-						  // check that just removes the items based on their rarity (worst items are removed first)
-	for(uint32 x =0; x<list->count;x++)
-	if(list->items[x].item.itemproto)// this check is needed until loot DB is fixed
+
+	for( uint32 x = 0; x < list->count; x++ )
 	{
-		float chance = heroic ? list->items[x].chance2 : list->items[x].chance;
-		if(chance == 0.0f) continue;
-		
-		// Do we already have more than 16 items? (client-side limitation)
-		if( totalloot >= 16 )
-		break;
-
-		ItemPrototype *itemproto = list->items[x].item.itemproto;
-		if(Rand(chance * sWorld.getRate(RATE_DROP0 + itemproto->Quality)) )//|| itemproto->Class == ITEM_CLASS_QUEST)
+		if( list->items[x].item.itemproto )// this check is needed until loot DB is fixed
 		{
-			if(list->items[x].mincount == list->items[x].maxcount)
-				count = list->items[x].maxcount;
-			else
-				count = RandomUInt(list->items[x].maxcount - list->items[x].mincount) + list->items[x].mincount;
-
-			for(i = 0; i < loot->items.size(); ++i)
+			float chance = heroic ? list->items[x].chance2 : list->items[x].chance;
+			if(chance == 0.0f) continue;
+			
+			ItemPrototype *itemproto = list->items[x].item.itemproto;
+			if( Rand( chance * sWorld.getRate( RATE_DROP0 + itemproto->Quality ) ) )//|| itemproto->Class == ITEM_CLASS_QUEST)
 			{
-				//itemid rand match a already placed item, if item is stackable and unique(stack), increment it, otherwise skips
-				if((loot->items[i].item.itemproto == list->items[x].item.itemproto) && itemproto->MaxCount && ((loot->items[i].iItemsCount + count) < itemproto->MaxCount))
+				if( list->items[x].mincount == list->items[x].maxcount )
+					count = list->items[x].maxcount;
+				else
+					count = RandomUInt(list->items[x].maxcount - list->items[x].mincount) + list->items[x].mincount;
+
+				for( i = 0; i < loot->items.size(); ++i )
 				{
-					if(itemproto->Unique && ((loot->items[i].iItemsCount+count) < itemproto->Unique))
+					//itemid rand match a already placed item, if item is stackable and unique(stack), increment it, otherwise skips
+					if((loot->items[i].item.itemproto == list->items[x].item.itemproto) && itemproto->MaxCount && ((loot->items[i].iItemsCount + count) < itemproto->MaxCount))
 					{
-						loot->items[i].iItemsCount += count;
-						break;
-					}
-					else if (!itemproto->Unique)
-					{
-						loot->items[i].iItemsCount += count;
-						break;
+						if(itemproto->Unique && ((loot->items[i].iItemsCount+count) < itemproto->Unique))
+						{
+							loot->items[i].iItemsCount += count;
+							break;
+						}
+						else if (!itemproto->Unique)
+						{
+							loot->items[i].iItemsCount += count;
+							break;
+						}
 					}
 				}
-			}
-			if(i != loot->items.size())
-				continue;
 
-			__LootItem itm;
-			itm.item =list->items[x].item;
-			itm.iItemsCount = count;
-			itm.roll = NULL;
-			itm.passed = false;
-			itm.ffa_loot = list->items[x].ffa_loot;
-			itm.has_looted.clear();
-			
-			if (itemproto->Quality > 1 && itemproto->ContainerSlots==0)
-			{
-				itm.iRandomProperty=GetRandomProperties(itemproto);
-				itm.iRandomSuffix=GetRandomSuffix(itemproto);
-			}
-			else
-			{
-				// save some calls :P
-				itm.iRandomProperty=NULL;
-				itm.iRandomSuffix=NULL;
-			}
+				if( i != loot->items.size() )
+					continue;
 
-			loot->items.push_back(itm);
-			// Prevent more than 16 items getting pushed
-			totalloot ++;
-		}	
+				__LootItem itm;
+				itm.item =list->items[x].item;
+				itm.iItemsCount = count;
+				itm.roll = NULL;
+				itm.passed = false;
+				itm.ffa_loot = list->items[x].ffa_loot;
+				itm.has_looted.clear();
+				
+				if( itemproto->Quality > 1 && itemproto->ContainerSlots == 0 )
+				{
+					itm.iRandomProperty=GetRandomProperties( itemproto );
+					itm.iRandomSuffix=GetRandomSuffix( itemproto );
+				}
+				else
+				{
+					// save some calls :P
+					itm.iRandomProperty = NULL;
+					itm.iRandomSuffix = NULL;
+				}
+
+				loot->items.push_back(itm);
+			}
+		}
 	}
+	if( loot->items.size() > 16 )
+	{
+		std::vector<__LootItem>::iterator item_to_remove;
+		std::vector<__LootItem>::iterator itr;
+		uint32 item_quality;
+		uint32 quest_id;
+		while( loot->items.size() > 16 )
+		{
+			item_to_remove = loot->items.begin();
+			item_quality = 0;
+			quest_id = 0;
+			for( itr = loot->items.begin(); itr != loot->items.end(); ++itr )
+			{
+				item_quality = (*itr).item.itemproto->Quality;
+				quest_id = (*itr).item.itemproto->QuestId;
+				if( (*item_to_remove).item.itemproto->Quality > item_quality && quest_id == 0 )
+				{
+					item_to_remove = itr;
+				}
+			}
+			loot->items.erase( item_to_remove );
+		}
+	}
+
 }
-
-
 
 void LootMgr::FillCreatureLoot(Loot * loot,uint32 loot_id, bool heroic)
 {
