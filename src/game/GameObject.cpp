@@ -465,10 +465,6 @@ bool GameObject::Load(GOSpawn *spawn)
 	return true;
 }
 
-
-
-
-
 void GameObject::DeleteFromDB()
 {
 	WorldDatabase.Execute("DELETE FROM gameobject_spawns WHERE id=%u", spawnid);
@@ -619,7 +615,6 @@ void GameObject::_LoadQuests()
 {
 	sQuestMgr.LoadGOQuests(this);
 }
-
 
 /////////////////
 // Summoned Go's

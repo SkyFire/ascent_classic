@@ -1676,11 +1676,11 @@ public:
 
     void Heal(int32 amount);
 
-    GameObject *    g_caster;
-    Unit *          u_caster;
-    Item *          i_caster;
-    Player *        p_caster;
-    Object *        m_caster;
+    GameObject*		g_caster;
+    Unit*			u_caster;
+    Item*			i_caster;
+    Player*			p_caster;
+    Object*			m_caster;
 
     // 15007 = resurecting sickness
     ASCENT_INLINE uint32 GetType()//0 melee,1 magic ,2 ranged

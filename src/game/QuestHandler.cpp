@@ -422,6 +422,8 @@ void WorldSession::HandleQuestlogRemoveQuestOpcode(WorldPacket& recvPacket)
 		GetPlayer()->timed_quest_slot = 0;
 	}
 	GetPlayer()->UpdateNearbyGameObjects();
+
+	sHookInterface.OnQuestCancelled(_player, qPtr);
 }
 
 void WorldSession::HandleQuestQueryOpcode( WorldPacket & recv_data )
@@ -620,6 +622,8 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 		SendPacket(&data);
 		sLog.outDebug( "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS." );
 	}
+	
+	sHookInterface.OnQuestFinished(_player, qst);
 }
 
 void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvPacket)

@@ -697,3 +697,17 @@ void HookInterface::OnEnterWorld2(Player * pPlayer)
 		(call)(pPlayer);
 	OUTER_LOOP_END
 }
+
+void HookInterface::OnQuestCancelled(Player * pPlayer, Quest * pQuest)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_QUEST_CANCELLED, tOnQuestCancel)
+		(call)(pPlayer, pQuest);
+	OUTER_LOOP_END
+}
+
+void HookInterface::OnQuestFinished(Player * pPlayer, Quest * pQuest)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_QUEST_FINISHED, tOnQuestFinished)
+		(call)(pPlayer, pQuest);
+	OUTER_LOOP_END
+}
