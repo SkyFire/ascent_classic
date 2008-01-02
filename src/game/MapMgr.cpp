@@ -559,7 +559,7 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 		curObj = *iter; \
 		iter2 = iter; \
 		++iter; \
-		if(curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == ((Player*)curObj)->m_TransporterGUID) \
+		if(curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID ) \
 			fRange = 0.0f;		\
 		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER)) \
 			fRange = 0.0f;		\
@@ -582,7 +582,7 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 				curObj->RemoveInRangeObject(obj);
 
 			if(curObj->IsPlayer())
-				((Player*)curObj)->RemoveIfVisible(obj);
+				static_cast< Player* >( curObj )->RemoveIfVisible(obj);
 		}
 		END_IN_RANGE_LOOP
 	}
@@ -594,7 +594,7 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 				curObj->RemoveInRangeObject(obj);
 
 			if(curObj->IsPlayer())
-				((Player*)curObj)->RemoveIfVisible(obj);
+				static_cast< Player* >( curObj )->RemoveIfVisible(obj);
 
 			obj->RemoveInRangeObject(iter2);
 		}
@@ -609,7 +609,7 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 
 			if(curObj->IsPlayer())
 			{
-				((Player*)curObj)->RemoveIfVisible(obj);
+				static_cast< Player* >( curObj )->RemoveIfVisible(obj);
 				obj->RemoveInRangePlayer(curObj);
 			}
 		}
@@ -871,7 +871,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 	{ \
 		curObj = *iter; \
 		++iter; \
-		if(curObj->IsPlayer() && obj->IsPlayer() && plObj && plObj->m_TransporterGUID && plObj->m_TransporterGUID == ((Player*)curObj)->m_TransporterGUID) \
+		if(curObj->IsPlayer() && obj->IsPlayer() && plObj && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID) \
 			fRange = 0.0f; \
 		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER)) \
 			fRange = 0.0f; \
@@ -892,7 +892,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 				} \
 				if(curObj->IsPlayer()) \
 				{ \
-					plObj2 = ((Player*)curObj); \
+					plObj2 = static_cast< Player* >( curObj ); \
 					if (plObj2->CanSee(obj) && !plObj2->IsVisible(obj))  \
 					{ \
 						CHECK_BUF; \
@@ -909,7 +909,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 			{ \
 				if(curObj->IsPlayer()) \
 				{ \
-					plObj2 = ((Player*)curObj); \
+					plObj2 = static_cast< Player* >( curObj ); \
 					cansee = plObj2->CanSee(obj); \
 					isvisible = plObj2->GetVisibility(obj, &itr); \
 					if(!cansee && isvisible) \

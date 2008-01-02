@@ -1126,9 +1126,9 @@ void AIInterface::DismissPet()
 		return;
 
 	if(m_Unit->GetUInt32Value(UNIT_CREATED_BY_SPELL) == 0)
-		((Player*)m_PetOwner)->SetFreePetNo(false, (int)m_Unit->GetUInt32Value(UNIT_FIELD_PETNUMBER));
-	((Player*)m_PetOwner)->SetPet(NULL);
-	((Player*)m_PetOwner)->SetPetName("");
+		static_cast< Player* >( m_PetOwner )->SetFreePetNo(false, (int)m_Unit->GetUInt32Value(UNIT_FIELD_PETNUMBER));
+	static_cast< Player* >( m_PetOwner )->SetPet(NULL);
+	static_cast< Player* >( m_PetOwner )->SetPetName("");
 	
 	//FIXME:Check hunter pet or not
 	//FIXME:Check enslaved creature
@@ -1137,7 +1137,7 @@ void AIInterface::DismissPet()
 	WorldPacket data;
 	data.Initialize(SMSG_PET_SPELLS);
 	data << (uint64)0;
-	((Player*)m_PetOwner)->GetSession()->SendPacket(&data);
+	static_cast< Player* >( m_PetOwner )->GetSession()->SendPacket(&data);
 	
 	sEventMgr.RemoveEvents(((Creature*)m_Unit));
 	if(m_Unit->IsInWorld())

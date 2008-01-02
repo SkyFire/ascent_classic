@@ -1049,8 +1049,8 @@ void Player::_EventCharmAttack()
 			//pvp timeout reset
 			/*if(pVictim->IsPlayer())
 			{
-				if(((Player*)pVictim)->DuelingWith == NULL)//Dueling doesn't trigger PVP
-					((Player*)pVictim)->PvPTimeoutUpdate(false); //update targets timer
+				if( static_cast< Player* >( pVictim )->DuelingWith == NULL)//Dueling doesn't trigger PVP
+					static_cast< Player* >( pVictim )->PvPTimeoutUpdate(false); //update targets timer
 
 				if(DuelingWith == NULL)//Dueling doesn't trigger PVP
 					PvPTimeoutUpdate(false); //update casters timer
@@ -4184,7 +4184,7 @@ void Player::SetTutorialInt(uint32 intId, uint32 value)
 
 //Player stats calculation for saving at lvl up, etc
 /*void Player::CalcBaseStats()
-{//((Player*)this)->getClass() == HUNTER ||
+{//static_cast< Player* >( this )->getClass() == HUNTER ||
 	//TODO take into account base stats at create
 	uint32 AP, RAP;
 	//Save AttAck power

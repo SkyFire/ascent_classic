@@ -985,50 +985,57 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag & drop
 {
-	if(!_player->IsInWorld()) return;
-	CHECK_PACKET_SIZE(recv_data, 22);
+	if( !_player->IsInWorld() )
+		return;
+
+	CHECK_PACKET_SIZE( recv_data, 22 );
+
 	sLog.outDetail( "WORLD: Received CMSG_BUY_ITEM_IN_SLOT" );
 
-	if(!GetPlayer())
+	if( GetPlayer() == NULL )
 		return;
 
 	uint64 srcguid, bagguid;
 	uint32 itemid;
 	int8 slot;
-	uint8 amount=0;
+	uint8 amount = 0;
 	uint8 error;
-	uint8 bagslot=0xff;
+	uint8 bagslot = 0xff;
 
 	recv_data >> srcguid >> itemid;
 	recv_data >> bagguid; 
 	recv_data >> slot;
 	recv_data >> amount;
 
-	if(_player->isCasting())
+	if( _player->isCasting() )
 		_player->InterruptSpell();
 
-	Creature *unit = _player->GetMapMgr()->GetCreature((uint32)srcguid);
-	if (unit == NULL || !unit->HasItems())
+	Creature* unit = _player->GetMapMgr()->GetCreature( ( uint32 )srcguid );
+	if( unit == NULL || !unit->HasItems() )
 		return;
-	Container*c=NULL;
+
+	Container* c = NULL;
 
 	CreatureItem ci;
-	unit->GetSellItemByItemId(itemid,ci);
+	unit->GetSellItemByItemId( itemid, ci );
 
-	if(ci.itemid==0)
+	if( ci.itemid == 0 )
 		return;
 
-	if (ci.max_amount>0 && ci.available_amount<amount)
+	if( ci.max_amount > 0 && ci.available_amount < amount )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_ITEM_IS_CURRENTLY_SOLD_OUT);
+		_player->GetItemInterface()->BuildInventoryChangeError( 0, 0, INV_ERR_ITEM_IS_CURRENTLY_SOLD_OUT );
 		return;
 	}
 
-	ItemPrototype *it = ItemPrototypeStorage.LookupEntry(itemid);
-	if(!it) return;
-	if(ci.amount*amount > it->MaxCount)
+	ItemPrototype* it = ItemPrototypeStorage.LookupEntry( itemid );
+	
+	if( it == NULL)
+		return;
+
+	if( ci.amount*amount > it->MaxCount)
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_CANT_CARRY_MORE_OF_THIS);
+		_player->GetItemInterface()->BuildInventoryChangeError( 0, 0, INV_ERR_CANT_CARRY_MORE_OF_THIS );
 		return;
 	}
 

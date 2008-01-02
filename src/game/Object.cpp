@@ -1041,11 +1041,11 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 		{
 		case UNIT_FIELD_LEVEL:
 		case PLAYER_XP:
-			((Player*)this)->save_LevelXP();
+			static_cast< Player* >( this )->save_LevelXP();
 			break;
 
 		case PLAYER_FIELD_COINAGE:
-			((Player*)this)->save_Gold();
+			static_cast< Player* >( this )->save_Gold();
 			break;
 		}
 #endif
@@ -1106,11 +1106,11 @@ void Object::ModUInt32Value(uint32 index, int32 value )
 		{
 		case UNIT_FIELD_LEVEL:
 		case PLAYER_XP:
-			((Player*)this)->save_LevelXP();
+			static_cast< Player* >( this )->save_LevelXP();
 			break;
 
 		case PLAYER_FIELD_COINAGE:
-			((Player*)this)->save_Gold();
+			static_cast< Player* >( this )->save_Gold();
 			break;
 		}
 #endif
@@ -1534,10 +1534,10 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	if(this->IsUnit())
 	{
 /*		if(!pVictim->isInCombat() && pVictim->IsPlayer())
-			sHookInterface.OnEnterCombat((Player*)pVictim, ((Unit*)this));
+			sHookInterface.OnEnterCombat( static_cast< Player* >( pVictim ), static_cast< Unit* >( this ) );
 
-		if(IsPlayer() && !((Player*)this)->isInCombat())
-			sHookInterface.OnEnterCombat(((Player*)this), ((Player*)this));*/
+		if(IsPlayer() && ! static_cast< Player* >( this )->isInCombat())
+			sHookInterface.OnEnterCombat( static_cast< Player* >( this ), static_cast< Player* >( this ) );*/
 
 		plr = 0;
 		if(IsPet())
@@ -1703,8 +1703,8 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 #ifdef ENABLE_CHECKPOINT_SYSTEM
 		if(pVictim->GetTypeId()==TYPEID_UNIT && IsPlayer())
 		{
-			if( ((Creature*)pVictim)->GetCreatureName() && ((Creature*)pVictim)->GetCreatureName()->Rank>0 && ((Player*)this)->GetGuildId())
-				CheckpointMgr::getSingleton().KilledCreature( ((Player*)this)->GetGuildId(), pVictim->GetEntry() );
+			if( ((Creature*)pVictim)->GetCreatureName() && ((Creature*)pVictim)->GetCreatureName()->Rank>0 && static_cast< Player* >( this )->GetGuildId())
+				CheckpointMgr::getSingleton().KilledCreature( static_cast< Player* >( this )->GetGuildId(), pVictim->GetEntry() );
 		}
 #endif
 		//warlock - seed of corruption
@@ -1821,8 +1821,8 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		//		 range they won't know this guid exists -> possible 132.
 
 		/*if (this->IsPlayer())
-			if (((Player*)this)->InGroup())
-				((Player*)this)->GetGroup()->SendPartyKillLog(this,pVictim);*/
+			if( static_cast< Player* >( this )->InGroup() )
+				static_cast< Player* >( this )->GetGroup()->SendPartyKillLog( this, pVictim );*/
 
 		/* Stop Unit from attacking */
 		if( this->IsPlayer() )
@@ -2120,7 +2120,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		}
 		
 		// TODO: Mark victim as a HK
-		/*if(((Player*)pVictim)->GetCurrentBattleground() != NULL && ((Player*)this)->GetCurrentBattleground() != NULL)
+		/*if( static_cast< Player* >( pVictim )->GetCurrentBattleground() != NULL && static_cast< Player* >( this )->GetCurrentBattleground() != NULL)
 		{
 			
 		}*/	

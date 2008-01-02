@@ -59,7 +59,7 @@ void WorldSession::HandleAttackSwingOpcode( WorldPacket & recv_data )
 	/*if(pEnemy->IsPlayer() && isHostile(_player, pEnemy))
 	{
 		// don't in duel.. this should be done in dealdamage anyway :S
-		if(((Player*)pEnemy)->GetTeam() != _player->GetTeam())
+		if( static_cast< Player* >( pEnemy )->GetTeam() != _player->GetTeam() )
 			_player->SetPvPFlag();
 	}*/
 }
