@@ -3138,7 +3138,8 @@ void Player::OnPushToWorld()
 
 void Player::ResetHeartbeatCoords()
 {
-	_lastHeartbeatX = _lastHeartbeatY = _lastHeartbeatZ = _lastHeartbeatO = _lastHeartbeatT = _lastHeartbeatV = 0;
+	_lastHeartbeatX = _lastHeartbeatY = _lastHeartbeatZ = _lastHeartbeatO = _lastHeartbeatV = 0.0f;
+	_lastHeartbeatT = 0;
 	_heartBeatDisabledUntil = UNIXTIME + 3;
 }
 
