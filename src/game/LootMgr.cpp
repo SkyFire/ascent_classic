@@ -447,7 +447,7 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 		{
 			item_to_remove = loot->items.begin();
 			item_quality = 0;
-			quest_item = false;GetProto()->Class == ITEM_CLASS_QUEST;
+			quest_item = false;
 			for( itr = loot->items.begin(); itr != loot->items.end(); ++itr )
 			{
 				item_quality = (*itr).item.itemproto->Quality;
