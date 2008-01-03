@@ -303,7 +303,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	myCorpse				= 0;
 	bCorpseCreateable	   = true;
 	blinked				 = false;
-	m_speedhackChances	  = 1;
+	m_speedhackChances	  = 2;
 	m_explorationTimer	  = getMSTime();
 	linkTarget			  = 0;
 	stack_cheat			 = false;
@@ -3138,8 +3138,7 @@ void Player::OnPushToWorld()
 
 void Player::ResetHeartbeatCoords()
 {
-	_lastHeartbeatX = _lastHeartbeatY = 0;
-	_lastHeartbeatTime = 0;
+	_lastHeartbeatX = _lastHeartbeatY = _lastHeartbeatZ = _lastHeartbeatO = _lastHeartbeatT = _lastHeartbeatV = 0;
 	_heartBeatDisabledUntil = UNIXTIME + 3;
 }
 

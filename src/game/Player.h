@@ -1447,11 +1447,17 @@ public:
 	
 	uint32 GetArmorProficiency() { return armor_proficiency; }
 	uint32 GetWeaponProficiency() { return weapon_proficiency; }
+
 	void ResetHeartbeatCoords();
+
 	float _lastHeartbeatX;
 	float _lastHeartbeatY;
+	float _lastHeartbeatZ;
+	float _lastHeartbeatO; // orientation
+	float _lastHeartbeatV; // velocity
+	time_t _lastHeartbeatT; // time
 	time_t _heartBeatDisabledUntil;
-	uint32 _lastHeartbeatTime;
+
 	void AddSplinePacket(uint64 guid, ByteBuffer* packet);
 	ByteBuffer* GetAndRemoveSplinePacket(uint64 guid);
 	void ClearSplinePackets();
