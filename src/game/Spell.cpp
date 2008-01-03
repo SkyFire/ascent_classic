@@ -2720,12 +2720,12 @@ uint8 Spell::CanCast(bool tolerate)
 	// Targetted Item Checks
 	if(m_targets.m_itemTarget && p_caster)
 	{
-		Item *i_target;
+		Item *i_target = NULL;
 
 		// check if the targeted item is in the trade box
-		if(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
+		if( m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM )
 		{
-			switch(m_spellInfo->Effect[0])
+			switch( m_spellInfo->Effect[0] )
 			{
 				// only lockpicking and enchanting can target items in the trade box
 				case SPELL_EFFECT_OPEN_LOCK:
@@ -2733,12 +2733,12 @@ uint8 Spell::CanCast(bool tolerate)
 				case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
 				{
 					// check for enchants that can only be done on your own items
-					if(m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY)
+					if( m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY )
 						return SPELL_FAILED_BAD_TARGETS;
 					// get the player we are trading with
-					Player * t_player = p_caster->GetTradeTarget();
+					Player* t_player = p_caster->GetTradeTarget();
 					// get the targeted trade item
-					if(t_player)
+					if( t_player != NULL )
 						i_target = t_player->getTradeItem((uint32)m_targets.m_itemTarget);
 				}
 			}
@@ -2746,13 +2746,14 @@ uint8 Spell::CanCast(bool tolerate)
 		// targeted item is not in a trade box, so get our own item
 		else
 		{
-			i_target = p_caster->GetItemInterface()->GetItemByGUID(m_targets.m_itemTarget);
+			i_target = p_caster->GetItemInterface()->GetItemByGUID( m_targets.m_itemTarget );
 		}
 
 		// check to make sure we have a targeted item
-		if(!i_target) return SPELL_FAILED_BAD_TARGETS;
+		if( i_target == NULL )
+			return SPELL_FAILED_BAD_TARGETS;
 
-		ItemPrototype *proto = i_target->GetProto();
+		ItemPrototype* proto = i_target->GetProto();
 
 		// check to make sure we have it's prototype info
 		if(!proto) return SPELL_FAILED_BAD_TARGETS;
