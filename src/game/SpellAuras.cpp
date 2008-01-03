@@ -4631,12 +4631,14 @@ void Aura::SpellAuraMounted(bool apply)
 		if(!displayId) return;
 
 		p_target->m_MountSpellId = m_spellProto->Id;
+		p_target->flying_aura = 0;
 		m_target->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID , displayId);
 		//m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 	}
 	else
 	{
 		p_target->m_MountSpellId = 0;
+		p_target->flying_aura = 0;
 		m_target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
 		//m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 	}
@@ -6859,44 +6861,50 @@ void Aura::RelocateEvents()
 
 void Aura::SpellAuraEnableFlight(bool apply)
 {
-	if(m_target->IsPlayer())
-	{
-		static_cast<Player*>(m_target)->flying_aura = m_spellProto->Id;
-	}
-
 	if(apply)
 	{
 		m_target->EnableFlight(true);
 		m_target->m_flyspeedModifier += mod->m_amount;
 		m_target->UpdateSpeed(true);
+		if(m_target->IsPlayer())
+		{
+			static_cast<Player*>(m_target)->flying_aura = m_spellProto->Id;
+		}
 	}
 	else
 	{
 		m_target->DisableFlight(true);
 		m_target->m_flyspeedModifier -= mod->m_amount;
 		m_target->UpdateSpeed(true);
+		if(m_target->IsPlayer())
+		{
+			static_cast<Player*>(m_target)->flying_aura = 0;
+		}
 	}
 }
 
 void Aura::SpellAuraEnableFlightWithUnmountedSpeed(bool apply)
 {
 	// Used in flight form (only so far)
-	if(m_target->IsPlayer())
-	{
-		static_cast<Player*>(m_target)->flying_aura = m_spellProto->Id;
-	}
-
 	if(apply)
 	{
 		m_target->EnableFlight(true);
 		m_target->m_flyspeedModifier += mod->m_amount;
 		m_target->UpdateSpeed(true);
+		if(m_target->IsPlayer())
+		{
+			static_cast<Player*>(m_target)->flying_aura = m_spellProto->Id;
+		}
 	}
 	else
 	{
 		m_target->DisableFlight(true);
 		m_target->m_flyspeedModifier -= mod->m_amount;
 		m_target->UpdateSpeed(true);
+		if(m_target->IsPlayer())
+		{
+			static_cast<Player*>(m_target)->flying_aura = 0;
+		}
 	}
 }
 
