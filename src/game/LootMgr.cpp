@@ -442,17 +442,17 @@ void LootMgr::PushLoot(StoreLootList *list,Loot * loot, bool heroic)
 		std::vector<__LootItem>::iterator item_to_remove;
 		std::vector<__LootItem>::iterator itr;
 		uint32 item_quality;
-		uint32 quest_id;
+		bool quest_item;
 		while( loot->items.size() > 16 )
 		{
 			item_to_remove = loot->items.begin();
 			item_quality = 0;
-			quest_id = 0;
+			quest_item = false;GetProto()->Class == ITEM_CLASS_QUEST;
 			for( itr = loot->items.begin(); itr != loot->items.end(); ++itr )
 			{
 				item_quality = (*itr).item.itemproto->Quality;
-				quest_id = (*itr).item.itemproto->QuestId;
-				if( (*item_to_remove).item.itemproto->Quality > item_quality && quest_id == 0 )
+				quest_item = (*itr).item.itemproto->Class == ITEM_CLASS_QUEST;
+				if( (*item_to_remove).item.itemproto->Quality > item_quality && !quest_item )
 				{
 					item_to_remove = itr;
 				}
