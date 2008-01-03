@@ -21,27 +21,42 @@
 
 bool ChatHandler::HandleRecallGoCommand(const char* args, WorldSession *m_session)
 {
-	if(!*args)
+	if( args == NULL )
+		return false;
+
+	if( !*args )
+		return false;
+
+	if( m_session == NULL )
 		return false;
 
 	QueryResult *result = WorldDatabase.Query( "SELECT * FROM recall" );
-	if(!result)
+
+	if( result == NULL)
 		return false;
 
 	do
 	{
-		Field *fields = result->Fetch();
-		const char * locname = fields[1].GetString();
+		Field* fields = result->Fetch();
+		const char* locname = fields[1].GetString();
 		uint32 locmap = fields[2].GetUInt32();
 		float x = fields[3].GetFloat();
 		float y = fields[4].GetFloat();
 		float z = fields[5].GetFloat();
 
-		if (strnicmp((char*)args,locname,strlen(args))==0)
+		if( strnicmp( const_cast< char* >( args ), locname, strlen( args ) ) == 0 )
 		{
-			m_session->GetPlayer()->SafeTeleport(locmap, 0, LocationVector(x, y, z));
-			delete result;
-			return true;
+			if( m_session->GetPlayer() != NULL )
+			{
+				m_session->GetPlayer()->SafeTeleport(locmap, 0, LocationVector(x, y, z));
+				delete result;
+				return true;
+			}
+			else
+			{
+				delete result;
+				return false;
+			}
 		}
 
 	}while (result->NextRow());

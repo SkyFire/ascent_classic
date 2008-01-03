@@ -2455,14 +2455,17 @@ else
 	//0x4--dualwield,0x10 miss,0x20 absorbed,0x80 crit,0x4000 -glancing,0x8000-crushing
 	//only for melee!
 
-	if(!ability)
+	if( !ability )
 	{
 		if( dmg.full_damage > 0 )
-			if(dmg.full_damage == (int32)dmg.resisted_damage)
+			if( dmg.full_damage == (int32)dmg.resisted_damage )
 				hit_status |= HITSTATUS_ABSORBED;
 
 		if( dmg.full_damage < 0 )
 			dmg.full_damage = 0;
+
+		if( realdamage < 0 )
+			realdamage = 0;
 
 		data << (uint32)hit_status;   
 		data << GetNewGUID();
