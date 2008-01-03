@@ -559,12 +559,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			
 			float distance_travelled = sqrtf( delta_x * delta_x + delta_y * delta_y ); //distance traveled between last heartbeat
 
-			double max_dist = speed / 2.0 + 0.1;
+			double max_dist = ( speed * 0.5 ) + 0.1;
 			double distance_delta = distance_travelled - ( max_dist * time_diff );
 
-			float client_speed = distance_travelled * 2.0f;
-
-			if( distance_delta > 350 )
+			if( distance_delta > 350.0 )
 			{
 				switch ( _player->m_speedhackChances )
 				{
