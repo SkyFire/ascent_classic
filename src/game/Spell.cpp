@@ -181,7 +181,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	bRadSet[1] = false;
 	bRadSet[2] = false;
 	
-	cancastresult = -1;
+	cancastresult = SPELL_CANCAST_OK;
 	
 	m_requiresCP = false;
 	unitTarget = NULL;
@@ -206,8 +206,9 @@ Spell::~Spell()
 	if( u_caster != NULL && u_caster->GetCurrentSpell() == this )
 		u_caster->SetCurrentSpell(NULL); 
 	
-	if( ( cancastresult == -1 && !GetSpellFailed() ) || hadEffect )
-		RemoveItems();
+	if( p_caster )
+		if( hadEffect || ( cancastresult == SPELL_CANCAST_OK && !GetSpellFailed() ) )
+			RemoveItems();
 }
 
 //i might forget conditions here. Feel free to add them
@@ -966,12 +967,13 @@ void Spell::prepare( SpellCastTargets * targets )
 	m_spellState = SPELL_STATE_PREPARING;
 	
 	if( m_triggeredSpell )
-		cancastresult = -1;
+		cancastresult = SPELL_CANCAST_OK;
 	else
 		cancastresult = CanCast(false);
 
 	//sLog.outString( "CanCast result: %u. Refer to SpellFailure.h to work out why." , cancastresult );
-	if( cancastresult != -1 )
+
+	if( cancastresult != SPELL_CANCAST_OK )
 	{
 		SendCastResult( cancastresult );
 
@@ -1172,17 +1174,13 @@ void Spell::cast(bool check)
 	}
 
 	sLog.outDebug("Spell::cast %u, Unit: %u", m_spellInfo->Id, m_caster->GetGUIDLow());
-	if(check)
-	{
-		/*if(m_caster->IsPet())
-			castResult = -1;
-		else*/
-			cancastresult = CanCast(true);
-	}
-	else 
-		cancastresult = -1;
 
-	if(cancastresult == -1)
+	if(check)
+		cancastresult = CanCast(true);
+	else 
+		cancastresult = SPELL_CANCAST_OK;
+
+	if(cancastresult == SPELL_CANCAST_OK)
 	{
 		if (p_caster && !m_triggeredSpell && p_caster->IsInWorld() && GUID_HIPART(m_targets.m_unitTarget)==HIGHGUID_UNIT)
 		{
@@ -1683,28 +1681,22 @@ void Spell::finish()
 	}
 }
 
-void Spell::SendCastResult(int16 result)
+void Spell::SendCastResult(uint8 result)
 {
-	if(result != -1)
-		SetSpellFailed();
+	if(result == SPELL_CANCAST_OK) return;
 
-	if(!m_caster->IsInWorld())
-		return;
+	SetSpellFailed();
 
-	if(result != -1)
-	{
-        Player * plr = p_caster;
-        if(!plr && u_caster)
-            plr = u_caster->m_redirectSpellPackets;
-        if (plr)
-        {
-            plr->SendCastResult(m_spellInfo->Id,(uint8)result,(result == SPELL_FAILED_REQUIRES_SPELL_FOCUS) ? m_spellInfo->RequiresSpellFocus : 0);
-        }
-	}
-	//else
-	//{
-		// result packet sent in handleeffects()
-	//}
+	if(!m_caster->IsInWorld()) return;
+
+	Player * plr = p_caster;
+
+	if(!plr && u_caster)
+		plr = u_caster->m_redirectSpellPackets;
+	if(!plr) return;
+
+	// for some reason, the result extra is not working for anything, including SPELL_FAILED_REQUIRES_SPELL_FOCUS
+	plr->SendCastResult(m_spellInfo->Id, result, 0);
 }
 
 // uint16 0xFFFF
@@ -2002,10 +1994,9 @@ void Spell::SendLogExecute(uint32 damage, uint64 & targetGuid)
 
 void Spell::SendInterrupted(uint8 result)
 {
-	if(result != (uint8)-1)
-		SetSpellFailed();
-	if(!m_caster->IsInWorld())
-		return;
+	SetSpellFailed();
+
+	if(!m_caster->IsInWorld()) return;
 
 	WorldPacket data(SMSG_SPELL_FAILURE, 20);
 
@@ -2556,7 +2547,7 @@ uint8 Spell::CanCast(bool tolerate)
 		if(p_caster->m_onTaxi)
 		{
 			if(m_spellInfo->Id != 33836) // exception for Area 52 Special
-				return (uint8)SPELL_FAILED_NOT_ON_TAXI;
+				return SPELL_FAILED_NOT_ON_TAXI;
 		}
 
 		// check if spell is allowed while player is on a transporter
@@ -2564,33 +2555,343 @@ uint8 Spell::CanCast(bool tolerate)
 		{
 			// no mounts while on transporters
 			if(m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOUNTED || m_spellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOUNTED || m_spellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOUNTED)
-				return (uint8)SPELL_FAILED_NOT_ON_TRANSPORT;
+				return SPELL_FAILED_NOT_ON_TRANSPORT;
 		}
 
 		// check if spell is allowed while not mounted
 		if(!p_caster->IsMounted())
 		{
 			if(m_spellInfo->Id == 25860) // Reindeer Transformation
-				return (uint8)SPELL_FAILED_ONLY_MOUNTED;
+				return SPELL_FAILED_ONLY_MOUNTED;
+		}
+
+		// check if spell is allowed while shapeshifted
+		if(p_caster->GetShapeShift())
+		{
+			switch(p_caster->GetShapeShift())
+			{
+				case FORM_TREE:
+				case FORM_BATTLESTANCE:
+				case FORM_DEFENSIVESTANCE:
+				case FORM_BERSERKERSTANCE:
+				case FORM_SHADOW:
+				case FORM_STEALTH:
+				case FORM_MOONKIN:
+				{
+					break;
+				}
+
+				case FORM_SWIFT:
+				case FORM_FLIGHT:
+				{
+					// check if item is allowed (only special items allowed in flight forms)
+					if(i_caster && !(i_caster->GetProto()->Flags & ITEM_FLAG_SHAPESHIFT_OK))
+						return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+
+					break;
+				}
+
+				//case FORM_CAT: 
+				//case FORM_TRAVEL:
+				//case FORM_AQUA:
+				//case FORM_BEAR:
+				//case FORM_AMBIENT:
+				//case FORM_GHOUL:
+				//case FORM_DIREBEAR:
+				//case FORM_CREATUREBEAR:
+				//case FORM_GHOSTWOLF:
+				//case FORM_SPIRITOFREDEMPTION:
+
+				default:
+				{
+					// check if item is allowed (only special & equipped items allowed in other forms)
+					if(i_caster && !(i_caster->GetProto()->Flags & ITEM_FLAG_SHAPESHIFT_OK))
+						if(i_caster->GetProto()->InventoryType == INVTYPE_NON_EQUIP)
+							return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+				}
+			}
+		}
+
+		// check if spell is allowed while we have a battleground flag
+		if(p_caster->m_bgHasFlag)
+		{
+			switch(m_spellInfo->Id)
+			{
+				// stealth spells
+				case 1784:
+				case 1785:
+				case 1786:
+				case 1787:
+				case 5215:
+				case 6783:
+				case 9913:
+				case 1856:
+				case 1857:
+				case 26889:
+				{
+					return SPELL_FAILED_SPELL_UNAVAILABLE;
+					break;
+				}
+			}
+		}
+
+		// item spell checks
+		if(i_caster)
+		{
+			if(i_caster->GetProto()->Spells[0].Charges != 0)
+			{
+				// check if the item has the required charges
+				if(i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES) == 0)
+					return SPELL_FAILED_NO_CHARGES_REMAIN;
+
+				// for items that combine to create a new item, check if we have the required quantity of the item
+				if(i_caster->GetProto()->ItemId == m_spellInfo->Reagent[0])
+					if(p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Reagent[0]) < 1 + m_spellInfo->ReagentCount[0])
+						return SPELL_FAILED_ITEM_GONE;
+			}
+		}
+
+		// check if we have the required reagents
+		for(uint32 i=0; i<8 ;i++)
+		{
+			if(m_spellInfo->Reagent[i] == 0 || m_spellInfo->ReagentCount[i] == 0)
+				continue;
+
+			if(p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Reagent[i]) < m_spellInfo->ReagentCount[i])
+				return SPELL_FAILED_ITEM_GONE;
+		}
+
+		// check if we have the required tools, totems, etc
+		if(m_spellInfo->Totem[0] != 0)
+		{
+			if(!p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Totem[0]))
+				return SPELL_FAILED_ITEM_GONE;
+		}
+		if(m_spellInfo->Totem[1] != 0)
+		{
+			if(!p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Totem[1]))
+				return SPELL_FAILED_ITEM_GONE;
+		}
+
+		// check if we have the required gameobject focus
+		if(m_spellInfo->RequiresSpellFocus)
+		{
+			float focusRange;
+			// professions use rangeIndex 1, which is 0yds, so we will use 5yds, which is standard interaction range.
+			if(m_spellInfo->rangeIndex == 1)
+				focusRange = 5.0f;
+			else
+				focusRange = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+
+			bool found = false;
+
+			for(std::set<Object*>::iterator itr = p_caster->GetInRangeSetBegin(); itr != p_caster->GetInRangeSetEnd(); itr++ )
+			{
+				if((*itr)->GetTypeId() != TYPEID_GAMEOBJECT)
+					continue;
+
+				if((*itr)->GetUInt32Value(GAMEOBJECT_TYPE_ID) != GAMEOBJECT_TYPE_SPELL_FOCUS)
+					continue;
+
+				// check if focus object is close enough
+				if(!IsInrange(p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ(), (*itr), (focusRange * focusRange)))
+					continue;
+
+				GameObjectInfo *info = ((GameObject*)(*itr))->GetInfo();
+
+				if(!info)
+				{
+					sLog.outDebug("Warning: could not find info about game object %u",(*itr)->GetEntry());
+					continue;
+				}
+
+				if(info->SpellFocus == m_spellInfo->RequiresSpellFocus)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(!found)
+				return SPELL_FAILED_REQUIRES_SPELL_FOCUS;
 		}
 	}
 
-	Unit *target = NULL;
-	float maxr = 0;
+	// Targetted Item Checks
+	if(m_targets.m_itemTarget && p_caster)
+	{
+		Item *i_target;
 
+		// check if the targeted item is in the trade box
+		if(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
+		{
+			switch(m_spellInfo->Effect[0])
+			{
+				// only lockpicking and enchanting can target items in the trade box
+				case SPELL_EFFECT_OPEN_LOCK:
+				case SPELL_EFFECT_ENCHANT_ITEM:
+				case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
+				{
+					// check for enchants that can only be done on your own items
+					if(m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY)
+						return SPELL_FAILED_BAD_TARGETS;
+					// get the player we are trading with
+					Player * t_player = p_caster->GetTradeTarget();
+					// get the targeted trade item
+					if(t_player)
+						i_target = t_player->getTradeItem((uint32)m_targets.m_itemTarget);
+				}
+			}
+		}
+		// targeted item is not in a trade box, so get our own item
+		else
+		{
+			i_target = p_caster->GetItemInterface()->GetItemByGUID(m_targets.m_itemTarget);
+		}
+
+		// check to make sure we have a targeted item
+		if(!i_target) return SPELL_FAILED_BAD_TARGETS;
+
+		ItemPrototype *proto = i_target->GetProto();
+
+		// check to make sure we have it's prototype info
+		if(!proto) return SPELL_FAILED_BAD_TARGETS;
+
+		// check to make sure the targeted item is acceptable
+		switch(m_spellInfo->Effect[0])
+		{
+			// Lock Picking Targeted Item Check
+			case SPELL_EFFECT_OPEN_LOCK:
+			{
+				// this is currently being handled in SpellEffects
+				break;
+			}
+
+			// Enchanting Targeted Item Check
+			case SPELL_EFFECT_ENCHANT_ITEM:
+			case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
+			{
+				// check for enchants that can only be done on your own items, make sure they are soulbound
+				if(m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY && !(i_target->IsSoulbound()))
+					return SPELL_FAILED_BAD_TARGETS;
+
+				// check if we have the correct class, subclass, and inventory type of target item
+				if(m_spellInfo->EquippedItemClass != proto->Class)
+					return SPELL_FAILED_BAD_TARGETS;
+
+				if(m_spellInfo->EquippedItemSubClass && !(m_spellInfo->EquippedItemSubClass & (1 << proto->SubClass)))
+					return SPELL_FAILED_BAD_TARGETS;
+
+				if(m_spellInfo->RequiredItemFlags && !(m_spellInfo->RequiredItemFlags & (1 << proto->InventoryType)))
+					return SPELL_FAILED_BAD_TARGETS;
+
+				break;
+			}
+
+			// Disenchanting Targeted Item Check
+			case SPELL_EFFECT_DISENCHANT:
+			{
+				// check if item can be disenchanted
+				if(proto->DisenchantReqSkill < 1)
+					return SPELL_FAILED_CANT_BE_DISENCHANTED;
+
+				// check if we have high enough skill
+				if((int32)p_caster->_GetSkillLineCurrent(SKILL_ENCHANTING) < proto->DisenchantReqSkill)
+					return SPELL_FAILED_CANT_BE_DISENCHANTED_SKILL;
+
+				break;
+			}
+
+			// Feed Pet Targeted Item Check
+			case SPELL_EFFECT_FEED_PET:
+			{
+				Pet *pPet = p_caster->GetSummon();
+
+				// check if we have a pet
+				if(!pPet)
+					return SPELL_FAILED_NO_PET;
+
+				// check if item is food
+				if(!proto->FoodType)
+					return SPELL_FAILED_BAD_TARGETS;
+
+				// check if food type matches pets diet
+				if(!(pPet->GetPetDiet() & (1 << (proto->FoodType - 1))))
+					return SPELL_FAILED_WRONG_PET_FOOD;
+
+				// check food level: food should be max 30 lvls below pets level
+				if(pPet->getLevel() > proto->ItemLevel + 30)
+					return SPELL_FAILED_FOOD_LOWLEVEL;
+
+				break;
+			}
+
+			// Prospecting Targeted Item Check
+			case SPELL_EFFECT_PROSPECTING:
+			{
+				// check if the item can be prospected
+				if(!(proto->Flags & ITEM_FLAG_PROSPECTABLE))
+					return SPELL_FAILED_CANT_BE_PROSPECTED;
+
+				// check if we have at least 5 of the item
+				if(p_caster->GetItemInterface()->GetItemCount(proto->ItemId) < 5)
+					return SPELL_FAILED_ITEM_GONE;
+
+				// check if we have high enough skill
+				if(p_caster->_GetSkillLineCurrent(SKILL_JEWELCRAFTING) < proto->RequiredSkillRank)
+					return SPELL_FAILED_LOW_CASTLEVEL;
+
+				break;
+			}
+		}
+	}
+
+	// set up our max Range
+	float maxRange = GetMaxRange( dbcSpellRange.LookupEntry( m_spellInfo->rangeIndex ) );
+
+	if( m_spellInfo->SpellGroupType && u_caster )
+	{
+		SM_FFValue( u_caster->SM_FRange, &maxRange, m_spellInfo->SpellGroupType );
+		SM_PFValue( u_caster->SM_PRange, &maxRange, m_spellInfo->SpellGroupType );
+	}
+
+	// Targeted Location Checks (AoE spells)
+	if( m_targets.m_targetMask == TARGET_FLAG_DEST_LOCATION )
+	{
+		if( !IsInrange( m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster, ( maxRange * maxRange ) ) )
+			return SPELL_FAILED_OUT_OF_RANGE;
+	}
+
+	Unit *target = NULL;
+
+	// Targeted Unit Checks
 	if(m_targets.m_unitTarget)
 	{
 		target = (m_caster->IsInWorld()) ? m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget) : NULL;
 
 		if(target)
 		{
+			// Partha: +2.52yds to max range, this matches the range the client is calculating.
+			// see extra/supalosa_range_research.txt for more info
+
+			if( tolerate ) // add an extra 33% to range on final check (squared = 1.78x)
+			{
+				if( !IsInrange( m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), target, ( ( maxRange + 2.52f ) * ( maxRange + 2.52f ) * 1.78f ) ) )
+					return SPELL_FAILED_OUT_OF_RANGE;
+			}
+			else
+			{
+				if( !IsInrange( m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), target, ( ( maxRange + 2.52f ) * ( maxRange + 2.52f ) ) ) )
+					return SPELL_FAILED_OUT_OF_RANGE;
+			}
+
 			if(p_caster)
 			{
 				if(m_spellInfo->Id == SPELL_RANGED_THROW)
 				{
 					Item * itm = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 					if(!itm || itm->GetDurability() == 0)
-						return (uint8)SPELL_FAILED_NO_AMMO;
+						return SPELL_FAILED_NO_AMMO;
 				}
 
 				if(target->IsPlayer())
@@ -2706,7 +3007,7 @@ uint8 Spell::CanCast(bool tolerate)
 					if(m_spellInfo->Spell_Dmg_Type == 3) // 3 is ranged so we do not need to check, we just need inface
 					{ // our spell is a ranged spell
 						if(!p_caster->isInFront(target))
-							return (uint8)SPELL_FAILED_UNIT_NOT_INFRONT;
+							return SPELL_FAILED_UNIT_NOT_INFRONT;
 					}
 					else
 					{ // our spell is not a ranged spell
@@ -2714,13 +3015,13 @@ uint8 Spell::CanCast(bool tolerate)
 						{
 							// must be in front
 							if(!u_caster->isInFront(target))
-								return (uint8)SPELL_FAILED_UNIT_NOT_INFRONT;
+								return SPELL_FAILED_UNIT_NOT_INFRONT;
 						}
 						else if(m_spellInfo->in_front_status == 2)
 						{
 							// behind
 							if(target->isInFront(u_caster))
-								return (uint8)SPELL_FAILED_NOT_BEHIND;
+								return SPELL_FAILED_NOT_BEHIND;
 						}
 					}
 				}
@@ -2790,31 +3091,6 @@ uint8 Spell::CanCast(bool tolerate)
 				}
 			}
 
-			maxr = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
-
-			if(m_spellInfo->SpellGroupType && u_caster)
-			{
-				SM_FFValue(u_caster->SM_FRange,&maxr,m_spellInfo->SpellGroupType);
-				SM_PFValue(u_caster->SM_PRange,&maxr,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-				int spell_flat_modifers=0;
-				int spell_pct_modifers=0;
-				SM_FIValue(u_caster->SM_FRange,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-				SM_FIValue(u_caster->SM_FRange,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-				if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-					printf("!!!!!spell range mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxr,m_spellInfo->SpellGroupType);
-#endif
-			}
-
-			// Partha: +2.52yds to max range, this matches the range the client is calculating.
-			// see extra/supalosa_range_research.txt for more info
-			maxr += 2.52f;
-
-			if(tolerate) maxr *= 1.33f;
-
-			if(!IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),target, (maxr * maxr)))
-				return SPELL_FAILED_OUT_OF_RANGE;
-
 			if(p_caster)
 			{
 				if(m_spellInfo->NameHash==0xCCC8A100)// Gouge
@@ -2836,24 +3112,24 @@ uint8 Spell::CanCast(bool tolerate)
 				}
 
 				if(target->dispels[m_spellInfo->DispelType])
-					return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1;			// hackfix - burlex
+					return SPELL_FAILED_PREVENTED_BY_MECHANIC-1;			// hackfix - burlex
 				
 				// Removed by Supalosa and moved to 'completed cast'
 				//if(target->MechanicsDispels[m_spellInfo->MechanicsType])
-				//	return (uint8)SPELL_FAILED_PREVENTED_BY_MECHANIC-1; // Why not just use 	SPELL_FAILED_DAMAGE_IMMUNE                                   = 144,
+				//	return SPELL_FAILED_PREVENTED_BY_MECHANIC-1; // Why not just use 	SPELL_FAILED_DAMAGE_IMMUNE                                   = 144,
 			}
 
 			// if we're replacing a higher rank, deny it
 			AuraCheckResponse acr = target->AuraCheck(m_spellInfo->NameHash, m_spellInfo->RankNumber,m_caster);
 			if(acr.Error == AURA_CHECK_RESULT_HIGHER_BUFF_PRESENT)
-				return (uint8)SPELL_FAILED_AURA_BOUNCED;
+				return SPELL_FAILED_AURA_BOUNCED;
 
 			//check if we are trying to stealth or turn invisible but it is not allowed right now
 			if(IsStealthSpell() || IsInvisibilitySpell())
 			{
 				//if we have Faerie Fire, we cannot stealth or turn invisible
 				if(u_caster->HasNegativeAuraWithNameHash(2787586002UL) || u_caster->HasNegativeAuraWithNameHash(372053642UL))
-					return SPELL_FAILED_CANT_STEALTH;
+					return SPELL_FAILED_SPELL_UNAVAILABLE;
 			}
 
 			/*SpellReplacement*rp=objmgr.GetReplacingSpells(m_spellInfo->Id);
@@ -2883,72 +3159,7 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 	}	
 
-	if(m_targets.m_targetMask==TARGET_FLAG_DEST_LOCATION)
-	{
-		maxr = GetMaxRange (dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
-		if(!IsInrange(m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,m_caster, (maxr*maxr+2)))
-			return SPELL_FAILED_OUT_OF_RANGE;
-	}
-
-	if(p_caster)
-	{
-		if(p_caster->m_bgHasFlag)
-		{
-			switch(m_spellInfo->Id)
-			{
-				case 1784:
-				case 1785:
-				case 1786:
-				case 1787:
-				case 5215:
-				case 6783:
-				case 9913:
-				case 1856:
-				case 1857:
-				case 26889:
-				{
-					// Player has the flag in WSG, he cant stealth now.
-					return SPELL_FAILED_SPELL_UNAVAILABLE;
-				}
-					break;
-
-				default:
-					break;
-			}
-		}
-		if(m_spellInfo->RequiresSpellFocus)
-		{
-			if(m_spellInfo->rangeIndex == 1) // somehow range that is needed for brazers for cooking is not in the range spell
-				maxr = 3.0f;
-			bool found = false;
-			for(std::set<Object*>::iterator itr = p_caster->GetInRangeSetBegin(); itr != p_caster->GetInRangeSetEnd(); itr++ )
-			{
-				if((*itr)->GetTypeId() != TYPEID_GAMEOBJECT)
-					continue;
-				if((*itr)->GetUInt32Value( GAMEOBJECT_TYPE_ID) != GAMEOBJECT_TYPE_SPELL_FOCUS)
-					continue;
-				if(!IsInrange(p_caster->GetPositionX(),p_caster->GetPositionY(),
-					p_caster->GetPositionZ(),(*itr),maxr*maxr))
-					continue;
-				GameObjectInfo *info = ((GameObject*)(*itr))->GetInfo();
-				//GameObjectNameStorage.LookupEntry((*itr)->GetEntry());
-				if(!info)
-				{
-					sLog.outDebug("Warning: could not find info about game object %u",(*itr)->GetEntry());
-					continue;
-				}
-				if(info->SpellFocus == m_spellInfo->RequiresSpellFocus)
-				{
-					found = true;
-					break;
-				}
-			}
-			if(!found)
-				return SPELL_FAILED_REQUIRES_SPELL_FOCUS;
-		}
-	}
-
-	// If the caster is a Unit
+	// Special State Checks (for creatures & players)
 	if( u_caster )
 	{
 		if( u_caster->SchoolCastPrevent[m_spellInfo->School] )
@@ -3091,234 +3302,57 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 	}
 
-	// Item Spell Checks
-	if(i_caster)
-	{
-		// Check if item spell is allowed while shapeshifted
-		if(!(i_caster->GetProto()->Flags & ITEM_FLAG_SHAPESHIFT_OK)) // a couple of strange items are allowed while shapeshifted
-		{
-			switch(p_caster->GetShapeShift())
-			{
-				case FORM_NORMAL:
-				case FORM_TREE:
-				case FORM_BATTLESTANCE:
-				case FORM_DEFENSIVESTANCE:
-				case FORM_BERSERKERSTANCE:
-				case FORM_SHADOW:
-				case FORM_STEALTH:
-				case FORM_MOONKIN:
-					break;
-
-				case FORM_SWIFT:
-				case FORM_FLIGHT:
-						return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
-
-				//case FORM_CAT: 
-				//case FORM_TRAVEL:
-				//case FORM_AQUA:
-				//case FORM_BEAR:
-				//case FORM_AMBIENT:
-				//case FORM_GHOUL:
-				//case FORM_DIREBEAR:
-				//case FORM_CREATUREBEAR:
-				//case FORM_GHOSTWOLF:
-				//case FORM_SPIRITOFREDEMPTION:
-
-				default:  // only equipped items allowed in other forms
-					if(i_caster->GetProto()->InventoryType == INVTYPE_NON_EQUIP)
-						return SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
-			}
-		}
-	}
-
-	return CheckItems();
-}
-
-int8 Spell::CheckItems()
-{
-	// only players need to be checked for items
-	if(!p_caster) return int8(-1);
-
-	// Item Charges Check - Partha
-	if(i_caster && i_caster->GetProto()->Spells[0].Charges != 0 && ((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) == 0)
-		return SPELL_FAILED_NO_CHARGES_REMAIN;
-
-	// Reagent Checks
-	for(uint32 i=0;i<8;i++)
-	{
-		if((m_spellInfo->Reagent[i] == 0) || (m_spellInfo->ReagentCount[i] == 0))
-			continue;
-
-		if(i_caster && i_caster->GetProto()->ItemId == m_spellInfo->Reagent[i])
-		{
-			// if the item being used is the same as the reagent, then we need 1 more
-			if(p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Reagent[i]) < m_spellInfo->ReagentCount[i] + 1)
-				return int8(SPELL_FAILED_ITEM_GONE);
-		}
-		else
-		{
-			if(p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Reagent[i]) < m_spellInfo->ReagentCount[i])
-				return int8(SPELL_FAILED_ITEM_GONE);
-		}
-	}
-
-	if(m_spellInfo->Totem[0] != 0)
-	{
-		if(!p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Totem[0]))
-			return int8(SPELL_FAILED_ITEM_NOT_FOUND);
-	}
-	else if(m_spellInfo->Totem[1] != 0)
-	{
-		if(!p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Totem[1]))
-			return int8(SPELL_FAILED_ITEM_NOT_FOUND);
-	}
-
-	if(m_targets.m_itemTarget)
-	{
-		Item *it = 0;
-		if(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
-		{
-			//only allow some item targetable spells to work in trade windows
-			switch(m_spellInfo->Effect[0])
-			{
-				case SPELL_EFFECT_OPEN_LOCK://lock picking
-				case SPELL_EFFECT_ENCHANT_ITEM://enchanting
-				case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY://temporary enchanting
-				{
-					if( p_caster != NULL )
-					{
-						Player* plr = p_caster->GetTradeTarget();
-						if( plr != NULL )
-							it = plr->getTradeItem((uint32)m_targets.m_itemTarget);
-					}
-				}break;
-
-			default:
-				return int8(SPELL_FAILED_BAD_TARGETS);
-				break;
-			}
-		}
-		else
-			it = static_cast< Player* >( m_caster )->GetItemInterface()->GetItemByGUID( m_targets.m_itemTarget );
-
-		if( it != NULL)
-		{
-			ItemPrototype* proto = it->GetProto();
-			ASSERT(proto);
-
-			if( m_spellInfo->Id == 13262 ) // check for disenchantable item and high enough skill
-			{
-				if( proto->DisenchantReqSkill < 1 )
-					return SPELL_FAILED_CANT_BE_DISENCHANTED;
-
-				if((int32)p_caster->_GetSkillLineCurrent(SKILL_ENCHANTING) < proto->DisenchantReqSkill)
-					return SPELL_FAILED_CANT_BE_DISENCHANTED_SKILL;
-			}
-			else
-			{
-				if(m_spellInfo->EquippedItemClass != (uint32)-1)//all items
-				if(m_spellInfo->Effect[0] == SPELL_EFFECT_ENCHANT_ITEM)
-				{
-					if(m_spellInfo->RequiredItemFlags == 0x10000)
-					{
-						if(proto->InventoryType != INVTYPE_CLOAK)
-							return int8(SPELL_FAILED_BAD_TARGETS);
-					}
-					else if(m_spellInfo->RequiredItemFlags == 0x800)
-					{
-						if(proto->InventoryType != INVTYPE_FINGER)
-							return int8(SPELL_FAILED_BAD_TARGETS);
-					}
-					else
-					{
-						if((m_spellInfo->EquippedItemClass != proto->Class)||
-						  !(m_spellInfo->EquippedItemSubClass & (1 << proto->SubClass)) ||
-						   (m_spellInfo->RequiredItemFlags && !(m_spellInfo->RequiredItemFlags & (1<<proto->InventoryType))))
-							return int8(SPELL_FAILED_BAD_TARGETS);
-					}
-				}
-				else
-				{
-					if((m_spellInfo->EquippedItemClass != proto->Class)||
-					  !(m_spellInfo->EquippedItemSubClass & (1 << proto->SubClass)) ||
-					 // replaced the dummy code with correct code
-					 //(m_spellInfo->dummy && !(m_spellInfo->dummy & (1<<proto->InventoryType))))		
-					   (m_spellInfo->RequiredItemFlags && !(m_spellInfo->RequiredItemFlags & (1<<proto->InventoryType))))		
-						return int8(SPELL_FAILED_BAD_TARGETS);
-				}
-			}
-			if(m_spellInfo->Id == 6991)	//Feed pet
-			{
-				Pet *pPet = p_caster->GetSummon();
-				if(!pPet || !it)
-					return int8(SPELL_FAILED_BAD_TARGETS);
-				
-				//check if item matches pets diet
-				uint32 flag = proto->FoodType ? 1<<(proto->FoodType - 1) : 0;
-				if(!flag || !(flag & pPet->GetPetDiet()))
-					return int8(SPELL_FAILED_WRONG_PET_FOOD);
-
-				//check food level: food should be max 30 lvls below pets level
-				int8 deltaLvl = pPet->getLevel() - proto->ItemLevel;
-				if (deltaLvl > 30)
-				{
-					return int8(SPELL_FAILED_FOOD_LOWLEVEL);
-				}
-			}
-		}
-		else 
-			return int8(SPELL_FAILED_ITEM_NOT_FOUND);
-	}
-
-	return int8(-1);
+	// no problems found, so we must be ok
+	return SPELL_CANCAST_OK;
 }
 
 void Spell::RemoveItems()
 {
-	// ITEM CHARGES REMOVAL, created by Partha
+	// Item Charges & Used Item Removal
 	if(i_caster)
 	{
-		if(i_caster->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > 1) // STACKABLE ITEM
+		// Stackable Item -> remove 1 from stack
+		if(i_caster->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > 1)
 		{
-			i_caster->ModUInt32Value(ITEM_FIELD_STACK_COUNT,-1); // remove 1 from stack
+			i_caster->ModUInt32Value(ITEM_FIELD_STACK_COUNT, -1);
 			i_caster->m_isDirty = true;
 		}
-		else if(i_caster->GetProto()->Spells[0].Charges < 0 // EXPENDABLE ITEM
-		     || i_caster->GetProto()->Spells[1].Category == 1153) // healthstones/mana gems <-- hackfix for wrong db values
+		// Expendable Item
+		else if(i_caster->GetProto()->Spells[0].Charges < 0
+		     || i_caster->GetProto()->Spells[1].Charges == -1) // hackfix for healthstones/mana gems/depleted items
 		{
-			if(((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) < -1) // Has Charges Remaining
+			// if item has charges remaining -> remove 1 charge
+			if(((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) < -1)
 			{
-				i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES,1); // remove 1 charge
+				i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES, 1);
 				i_caster->m_isDirty = true;
 			}
-			else // No Charges Remaining
+			// if item has no charges remaining -> delete item
+			else
 			{
-				i_caster->GetOwner()->GetItemInterface()->SafeFullRemoveItemByGuid(i_caster->GetGUID()); // delete item
-				i_caster=NULL;
+				i_caster->GetOwner()->GetItemInterface()->SafeFullRemoveItemByGuid(i_caster->GetGUID());
+				i_caster = NULL;
 			}
 		}
-		else if(i_caster->GetProto()->Spells[0].Charges > 0) // NON-EXPENDABLE ITEM
+		// Non-Expendable Item -> remove 1 charge
+		else if(i_caster->GetProto()->Spells[0].Charges > 0)
 		{
-			i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES,-1); // remove 1 charge
+			i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES, -1);
 			i_caster->m_isDirty = true;
 		}
 	} 
-	// END -> ITEM CHARGES REMOVAL
 
-	if(m_caster->GetTypeId() != TYPEID_PLAYER)
-		return;
-
-	Player* p_caster = static_cast< Player* >( m_caster );
-
-	if(m_spellInfo->Flags3 == FLAGS3_REQ_RANGED_WEAPON || m_spellInfo->Flags4 & 0x8000) //0x8000 //0x20000
+	// Ammo Removal
+	if(m_spellInfo->Flags3 == FLAGS3_REQ_RANGED_WEAPON || m_spellInfo->Flags4 & FLAGS4_PLAYER_RANGED_SPELLS)
 	{
-		p_caster->GetItemInterface()->RemoveItemAmt(p_caster->GetUInt32Value(PLAYER_AMMO_ID),1);
+		p_caster->GetItemInterface()->RemoveItemAmt(p_caster->GetUInt32Value(PLAYER_AMMO_ID), 1);
 	}
 
-	for(uint32 i=0;i<8;i++)
+	// Reagent Removal
+	for(uint32 i=0; i<8 ;i++)
 	{
 		if(m_spellInfo->Reagent[i])
-			p_caster->GetItemInterface()->RemoveItemAmt(m_spellInfo->Reagent[i],m_spellInfo->ReagentCount[i]);
+			p_caster->GetItemInterface()->RemoveItemAmt(m_spellInfo->Reagent[i], m_spellInfo->ReagentCount[i]);
 	}
 }
 

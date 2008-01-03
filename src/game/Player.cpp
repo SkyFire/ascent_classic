@@ -5333,6 +5333,11 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 	float minrange = GetMinRange(range);
 	float dist = CalcDistance(this, target);
 	float maxr = GetMaxRange(range);
+
+	// Partha: +2.52yds to max range, this matches the range the client is calculating.
+	// see extra/supalosa_range_research.txt for more info
+	maxr += 2.52f;
+
 	// Check for close
 	if(spellid != SPELL_RANGED_WAND)//no min limit for wands
 		if(minrange > dist)
@@ -5359,7 +5364,7 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 
 	if(fail)// && fail != SPELL_FAILED_OUT_OF_RANGE)
 	{
-        SendCastResult(autoshot ? 75 : spellid, fail, 0);
+		SendCastResult(autoshot ? 75 : spellid, fail, 0);
 		if(fail != SPELL_FAILED_OUT_OF_RANGE)
 		{
 			uint32 spellid2 = autoshot ? 75 : spellid;

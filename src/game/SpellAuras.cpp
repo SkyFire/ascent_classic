@@ -2687,22 +2687,21 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 	}
 
 	Unit *pTarget = ((Unit*)oTarget);
-	int8 fail = -1;
+
 	if(!oTarget->IsUnit())
 		return;
 	
 	if(!pTarget || pTarget->isDead())
 	{
-		fail = SPELL_FAILED_TARGETS_DEAD;
+		SendInterrupted(SPELL_FAILED_TARGETS_DEAD, m_caster);
+		SendChannelUpdate(0, m_caster);
+		this->Remove();
+		return;
 	}
-	else
+
+	if(pTarget != m_caster && !isAttackable(m_caster, pTarget))
 	{
-		if(pTarget != m_caster && !isAttackable(m_caster, pTarget))
-			fail = SPELL_FAILED_BAD_TARGETS;
-	}
-	if(fail > 0)
-	{
-		SendInterrupted(fail, m_caster);
+		SendInterrupted(SPELL_FAILED_BAD_TARGETS, m_caster);
 		SendChannelUpdate(0, m_caster);
 		this->Remove();
 		return;

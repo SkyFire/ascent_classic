@@ -343,6 +343,44 @@ bool SummonCritterDummy(uint32 i, Spell *pSpell)
 
 // -----------------------------------------------------------------------------
 
+bool WinterWondervolt(uint32 i, Spell * pSpell)
+{
+	Unit* target = pSpell->GetUnitTarget();
+
+	if(!target || target->GetTypeId() != TYPEID_PLAYER) return true;
+
+	target->CastSpell(target, dbcSpell.LookupEntry(26274), true);
+
+	return true;
+}
+
+// -----------------------------------------------------------------------------
+
+bool WinterWondervoltAura(uint32 i, Aura* pAura, bool apply)
+{
+	Unit *u_caster = pAura->GetUnitCaster();
+
+	if(!u_caster || !u_caster->IsPlayer()) return true;
+
+	if(apply)
+	{
+		uint32 displayId;
+		uint32 chance = RandomUInt(7);
+
+		if(u_caster->getGender() == 1) displayId = 15795 + chance; // female 0-7
+		else if(chance == 0)           displayId = 15687;          // male   0
+		else                           displayId = 15802 + chance; // male   1-7
+
+		u_caster->SetUInt32Value(UNIT_FIELD_DISPLAYID, displayId);
+	}
+	else
+		u_caster->SetUInt32Value(UNIT_FIELD_DISPLAYID, u_caster->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));
+
+	return true;
+}
+
+// -----------------------------------------------------------------------------
+
 
 
 
@@ -370,6 +408,8 @@ void SetupItemSpells_1(ScriptMgr * mgr)
 	mgr->register_dummy_spell(26528, &SummonCritterDummy);      // Jingling Bell
 	mgr->register_dummy_spell(26532, &SummonCritterDummy);      // Green Helper Box
 	mgr->register_dummy_spell(26541, &SummonCritterDummy);      // Red Helper Box
+	mgr->register_dummy_spell(26275, &WinterWondervolt);        // PX-238 Winter Wondervolt Trap
+	mgr->register_dummy_aura( 26274, &WinterWondervoltAura);    // PX-238 Winter Wondervolt Transform Aura
 
 
 

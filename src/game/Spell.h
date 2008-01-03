@@ -413,7 +413,7 @@ enum Flags3
     FLAGS3_TAME_X             = 0x400,  // tame [creature]
     FLAGS3_FUNNEL             = 0x800,  // only funnel spells
     FLAGS3_UNK14              = 0x1000, // swipe / Cleave spells
-    FLAGS3_MODIFY_ITEM_STAT   = 0x2000, // modify's item stat's temporary and permeability, enchantment or not
+    FLAGS3_ENCHANT_OWN_ONLY   = 0x2000, // no trade window targets, BoE items get soulbound to you
     FLAGS3_SPELL_PLAYER_EVENT = 0x4000, // Player event's like logging in, finishing quests, triggering cinematic, being adored, Heartbroken etc
     FLAGS3_UNUSED3            = 0x8000,
     FLAGS3_CONTROL_UNIT       = 0x10000, // PvP Controller, RC, Creature taming, Taming Lesson
@@ -1492,9 +1492,7 @@ public:
     void TriggerSpell();
     // Checks the caster is ready for cast
     uint8 CanCast(bool);
-    // Checks the caster has needed items on it 
-    int8 CheckItems();
-    // Removes Reagents if cast is successful
+    // Removes reagents, ammo, and items/charges
     void RemoveItems();
     // Calculates the i'th effect value
     int32 CalculateEffect(uint32, Unit *target);
@@ -1514,7 +1512,7 @@ public:
     ASCENT_INLINE void SetUnitTarget(Unit *punit){unitTarget=punit;}
 
     // Send Packet functions
-    void SendCastResult(int16 result);
+    void SendCastResult(uint8 result);
     void SendSpellStart();
     void SendSpellGo();
     void SendLogExecute(uint32 damage, uint64 & targetGuid);
@@ -1878,7 +1876,7 @@ protected:
     Corpse*     corpseTarget;
     uint32      add_damage;
 
-    int8        cancastresult;
+    uint8       cancastresult;
     uint32      Dur;
     bool        bDurSet;
     float       Rad[3];

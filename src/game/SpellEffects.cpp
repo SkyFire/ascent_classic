@@ -2103,8 +2103,8 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			{
 				if(((Player*)m_caster)->_GetSkillLineCurrent(SKILL_HERBALISM) < v)
 				{
-			//		SendCastResult(SPELL_FAILED_LEVEL_REQUIREMENT);
-				//	return;
+					//SendCastResult(SPELL_FAILED_LOW_CASTLEVEL);
+					return;
 				}
 				else
 				{
@@ -2129,7 +2129,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 					delete pkt;
 
 				}*/
-				SendCastResult( SPELL_FAILED_AUTOTRACK_INTERRUPTED);
+				SendCastResult(SPELL_FAILED_TRY_AGAIN);
 			}
 			//Skill up
 			if(!bAlreadyUsed) //Avoid cheats with opening/closing without taking the loot
@@ -2147,8 +2147,8 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			{
 				if(((Player*)m_caster)->_GetSkillLineCurrent(SKILL_MINING) < v)
 				{
-				//	SendCastResult(SPELL_FAILED_LEVEL_REQUIREMENT);
-				  //  return;
+					//SendCastResult(SPELL_FAILED_LOW_CASTLEVEL);
+					return;
 				}
 				else if(gameObjTarget->loot.items.size() == 0)
 				{
@@ -2161,7 +2161,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			}
 			else
 			{
-				SendCastResult( SPELL_FAILED_AUTOTRACK_INTERRUPTED);
+				SendCastResult(SPELL_FAILED_TRY_AGAIN);
 			}
 			//Skill up
 			if(!bAlreadyUsed) //Avoid cheats with opening/closing without taking the loot
@@ -2782,7 +2782,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		minskill = fishentry->MinSkill;
 		spell->SendChannelStart(20000);//30 seconds
 		/*spell->SendSpellStart();
-		spell->SendCastResult(-1);
+		spell->SendCastResult(SPELL_CANCAST_OK);
 		spell->SendSpellGo ();*/
 
 		
@@ -2908,7 +2908,7 @@ void Spell::SpellEffectTameCreature(uint32 i)
 	if(!tame)
 		return;
 
-	int8 result = -1;
+	uint8 result = SPELL_CANCAST_OK;
 
 	if(!tame || !p_caster || !p_caster->isAlive() || !tame->isAlive())
 		result = SPELL_FAILED_BAD_TARGETS;
@@ -2929,7 +2929,7 @@ void Spell::SpellEffectTameCreature(uint32 i)
 		if(cf && !cf->tameable)
 				result = SPELL_FAILED_BAD_TARGETS;
 	}
-	if(result > 0)
+	if(result != SPELL_CANCAST_OK)
 	{
 		SendCastResult(result);
 		return;
@@ -4045,7 +4045,7 @@ void Spell::SpellEffectInebriate(uint32 i) // lets get drunk!
 
 void Spell::SpellEffectFeedPet(uint32 i)  // Feed Pet
 {
-	//food flags and food level are checked in Spell::CheckItems()
+	// food flags and food level are checked in Spell::CanCast()
 	if(!itemTarget || !p_caster)
 		return;
 	
@@ -4495,65 +4495,27 @@ void Spell::SpellEffectSpellSteal(uint32 i)
 			}			
 		}
 	}   
-	
 }
 
-//1 spell is using it :S = 31252
 void Spell::SpellEffectProspecting(uint32 i)
 {
-	if(!p_caster || !m_targets.m_itemTarget)
+	if(!p_caster) return;
+
+	if(!itemTarget) // this should never happen
+	{
+		SendCastResult(SPELL_FAILED_ITEM_GONE);
 		return;
-
-	//damage is amount of items required
-	//stupid spell does not store the src item type :S nor the output
-	Item *src_item;
-	ItemPrototype *m_itemProto;
-	uint32 src_item_amt=5;
-	if(m_spellInfo->Id==31252)
-	{
-		src_item=p_caster->GetItemInterface()->GetItemByGUID(m_targets.m_itemTarget);
-		if(!src_item)
-			return;
-		uint32 entry=src_item->GetEntry();
-		uint32 itemsavailable=p_caster->GetItemInterface()->GetItemCount(entry,false);
-		//we need 5 items in order to perform this spell
-		if(itemsavailable<src_item_amt)
-		{
-			SendCastResult(SPELL_FAILED_ITEM_GONE);
-			return;
-		}
-
-        //Check for required skill
-		uint32 req_skill = src_item->GetProto()->RequiredSkillRank; 
-		if(req_skill >p_caster->_GetSkillLineCurrent(SKILL_JEWELCRAFTING)) 
-		{
-			SendCastResult(SPELL_FAILED_LOW_CASTLEVEL);
-			return;
-		}
-		
-		//get the proto before we kick the original items
-		m_itemProto=src_item->GetProto();
-
-		//if we can cast it then we can remove items
-		if(!p_caster->GetItemInterface()->RemoveItemAmt(entry, src_item_amt))
-		{
-			//ugh something went very wrong, a few ns ago we had the items :S
-			return;
-		}
-   
-		AddItemFromProspecting(entry,p_caster);
-
-/*		//prospecting does not increase SKILL !!!
-		uint32 skill=caster->GetBaseSkillAmt(SKILL_JEWELCRAFTING);
-		if(skill < 350)//can up skill
-		if(Rand(float(100-skill*100.0/350.0)))
-			caster->AdvanceSkillLine(SKILL_JEWELCRAFTING);*/
 	}
-	else
+
+	uint32 entry = itemTarget->GetEntry();
+
+	if(p_caster->GetItemInterface()->RemoveItemAmt(entry, 5))
 	{
-		sLog.outError("Trying to use prospect effect for spell %u that is not handled yet",m_spellInfo->Id);
-		//should also send some cast result failed or something
-		SendCastResult(SPELL_FAILED_CANT_BE_DISENCHANTED);
+		AddItemFromProspecting(entry, p_caster);
+	}
+	else // this should never happen either
+	{
+		SendCastResult(SPELL_FAILED_ITEM_GONE);
 		return;
 	}
 }
