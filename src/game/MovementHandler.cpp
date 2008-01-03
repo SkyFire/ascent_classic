@@ -574,6 +574,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 						sEventMgr.AddEvent( _player, &Player::SetMovement, uint8(MOVE_UNROOT), uint32(1), EVENT_DELETE_TIMER, 5000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 						_player->ResetHeartbeatCoords();
 						_player->m_speedhackChances--;
+						break;
 					}
 				case 1:
 					{
@@ -583,6 +584,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 						sEventMgr.AddEvent( _player, &Player::SetMovement, uint8(MOVE_UNROOT), uint32(1), EVENT_DELETE_TIMER, 30000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 						_player->ResetHeartbeatCoords();
 						_player->m_speedhackChances--;
+						break;
 					}
 				case 0:
 					{
@@ -591,6 +593,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 						_player->m_KickDelay = 0;
 						sEventMgr.AddEvent(_player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1,0);
 						_player->SetMovement(MOVE_ROOT, 1);
+						break;
 					}
 				}
 			}
