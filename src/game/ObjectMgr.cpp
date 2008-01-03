@@ -1010,14 +1010,24 @@ void ObjectMgr::LoadVendors()
 	CreatureItem itm;
   
 	QueryResult *result = WorldDatabase.Query("SELECT * FROM vendors");
-	if(result)
+	if( result != NULL )
 	{
+		if( result->GetFieldCount() < 5 )
+		{
+			Log.Notice("ObjectMgr", "Invalid format in vendors (%u/5) columns, not enough data to proceed.\n", result->GetFieldCount() );
+		}
+		else if( result->GetFieldCount() > 5 )
+		{
+			Log.Notice("ObjectMgr", "Invalid format in vendors (%u/5) columns, loading anyway because we have enough data\n", result->GetFieldCount() );
+		}
+
 		do
 		{
-			Field *fields = result->Fetch();
+			Field* fields = result->Fetch();
 
-			itr = mVendors.find(fields[0].GetUInt32());
-			if (itr == mVendors.end())
+			itr = mVendors.find( fields[0].GetUInt32() );
+
+			if( itr == mVendors.end() )
 			{
 				items = new std::vector<CreatureItem>;
 				mVendors[fields[0].GetUInt32()] = items;
@@ -1026,12 +1036,13 @@ void ObjectMgr::LoadVendors()
 			{
 				items = itr->second;
 			}
+
 			itm.itemid           = fields[1].GetUInt32();
 			itm.amount           = fields[2].GetUInt32();
 			itm.available_amount = fields[3].GetUInt32();
 			itm.max_amount       = fields[3].GetUInt32();
 			itm.incrtime         = fields[4].GetUInt32();
-			items->push_back(itm);
+			items->push_back( itm );
 		}
 		while( result->NextRow() );
 
