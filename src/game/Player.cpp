@@ -780,22 +780,22 @@ void Player::Update( uint32 p_time )
 	}
 	
 	// Breathing
-	if(m_UnderwaterState & UNDERWATERSTATE_UNDERWATER)
+	if( m_UnderwaterState & UNDERWATERSTATE_UNDERWATER )
 	{
 		// keep subtracting timer
-		if(m_UnderwaterTime)
+		if( m_UnderwaterTime )
 		{
 			// not taking dmg yet
 			if(p_time >= m_UnderwaterTime)
 				m_UnderwaterTime = 0;
 			else
-                                m_UnderwaterTime -= p_time;
+				m_UnderwaterTime -= p_time;
 		}
 
-		if(!m_UnderwaterTime)
+		if( !m_UnderwaterTime )
 		{
 			// check last damage dealt timestamp, and if enough time has elapsed deal damage
-			if(mstime >= m_UnderwaterLastDmg)
+			if( mstime >= m_UnderwaterLastDmg )
 			{
 				uint32 damage = m_uint32Values[UNIT_FIELD_MAXHEALTH] / 10;
 				WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, 21);
@@ -814,6 +814,7 @@ void Player::Update( uint32 p_time )
 		{
 			// regenning
 			m_UnderwaterTime += (p_time * 10);
+
 			if(m_UnderwaterTime >= m_UnderwaterMaxTime)
 			{
 				m_UnderwaterTime = m_UnderwaterMaxTime;

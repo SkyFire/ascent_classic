@@ -365,6 +365,9 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 		}
 
 		*data << (uint32)flags2;
+
+		*data << (uint8)0;
+
 		*data << getMSTime(); // this appears to be time in ms but can be any thing
 
 		// this stuff:
@@ -379,7 +382,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			*data<<uint8(0x53);
 		else
 			*data<<uint8(0);*/
-		*data << uint8(0x1);
+		//*data << uint8(0x1);
 	}
 
 	if (flags & 0x40)
