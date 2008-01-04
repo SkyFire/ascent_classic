@@ -1466,7 +1466,7 @@ void WorldSession::HandleSetSheathedOpcode( WorldPacket & recv_data )
 {
 	uint32 active;
 	recv_data >> active;
-	_player->SetByte(UNIT_FIELD_BYTES_2,0,active); 
+	_player->SetByte(UNIT_FIELD_BYTES_2,0,(uint8)active); 
 }
 
 void WorldSession::HandlePlayedTimeOpcode( WorldPacket & recv_data )

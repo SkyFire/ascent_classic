@@ -127,7 +127,7 @@ void MapCell::RemoveObjects()
 
 		itr++;
 
-		if(!obj || _unloadpending && obj->GetGUIDHigh()==HIGHGUID_TRANSPORTER)
+		if(!obj || (_unloadpending && obj->GetGUIDHigh()==HIGHGUID_TRANSPORTER))
 			continue;
 
 		if(_unloadpending && obj->GetTypeId()==TYPEID_CORPSE)

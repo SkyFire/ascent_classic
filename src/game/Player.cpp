@@ -1972,6 +1972,7 @@ void Player::InitVisibleUpdateBits()
 	Player::m_visibleUpdateMask.SetBit(PLAYER_DUEL_ARBITER+1);
 	Player::m_visibleUpdateMask.SetBit(PLAYER_GUILDID);
 	Player::m_visibleUpdateMask.SetBit(PLAYER_GUILDRANK);
+	Player::m_visibleUpdateMask.SetBit(UNIT_FIELD_BYTES_2);
 
 	for(uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
 	{
