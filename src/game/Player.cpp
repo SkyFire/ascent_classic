@@ -7039,14 +7039,6 @@ void Player::EndDuel(uint8 WinCondition)
 	WorldPacket data(SMSG_DUEL_WINNER, 500);
 	data << uint8(WinCondition);
 	data << GetName() << DuelingWith->GetName();
-
-	if(WinCondition == DUEL_WINNER_KNOCKOUT)
-	{
-		/*DuelingWith->Emote(EMOTE_ONESHOT_BEG);
-		DuelingWith->Root();
-		sEventMgr.AddEvent<Player>(DuelingWith, &Unit::Unroot, EVENT_UNIT_UNROOT, 3000, 1,0); */
-	}
-
 	SendMessageToSet(&data, true);
 
 	data.Initialize(SMSG_DUEL_COMPLETE);
