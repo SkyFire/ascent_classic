@@ -3590,20 +3590,6 @@ void Spell::SpellEffectDuel(uint32 i) // Duel
 		return; // Already Dueling
 	}
 
-	//uint32 zoneId = p_caster->GetZoneId();
-	if (
-		//zoneId == 1519 /* Stormwind */ || zoneId == 1657 /* Darnassus */ ||
-	 //   zoneId == 1537 /* Ironforge */ || /* zoneId == .... /* Exodar  ||*/
-	//	zoneId == 1637 /* Orgrimmar */ || zoneId == 1638 /* Thunder Bluff */ ||
-	//	zoneId == 1497 /* Undercity */ /*|| zoneId == .... /* Silvermoon */ ||
-   //	 (p_caster->GetMapId() != 0 && p_caster->GetMapId() != 1 || p_caster->GetMapId() == 530) // Duels allowed only in main maps (no instances).
-		IS_INSTANCE(p_caster->GetMapId())	 
-   )
-	{
-		SendCastResult(SPELL_FAILED_NO_DUELING);
-		return; // Dueling forbidden in those zones
-	}
-
 	p_caster->RequestDuel(playerTarget);
 }
 

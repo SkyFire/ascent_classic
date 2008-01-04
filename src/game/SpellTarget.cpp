@@ -340,6 +340,16 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 				return;
 	}
 
+	if(p_caster)
+	{
+		// this is mostly used for things like duels
+		if(!isAttackable(p_caster, pTarget, false))
+		{
+			cancastresult = SPELL_FAILED_BAD_TARGETS;
+			return;
+		}
+	}
+
 	uint8 did_hit_result = DidHit(pTarget);
 	if(did_hit_result != SPELL_DID_HIT_SUCCESS)
 		SafeAddModeratedTarget(pTarget->GetGUID(), did_hit_result);

@@ -339,13 +339,13 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 	else
 		p_target = NULL;
 
-	if( caster->GetTypeId() == TYPEID_PLAYER && target->GetTypeId() == TYPEID_PLAYER )
+	/*if( caster->GetTypeId() == TYPEID_PLAYER && target->GetTypeId() == TYPEID_PLAYER )
 	{
 		if( ( ( Player* )caster )->DuelingWith == ( ( Player* )target ) )
 		{
 			m_castInDuel = true;
 		}
-	}
+	}*/
 
 	//SetCasterFaction(caster->_getFaction());
 

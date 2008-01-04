@@ -7023,6 +7023,9 @@ void Player::EndDuel(uint8 WinCondition)
 	sEventMgr.RemoveEvents(DuelingWith, EVENT_PLAYER_DUEL_BOUNDARY_CHECK);
 	sEventMgr.RemoveEvents(DuelingWith, EVENT_PLAYER_DUEL_COUNTDOWN);
 
+	// spells waiting to hit
+	sEventMgr.RemoveEvents(this, EVENT_SPELL_DAMAGE_HIT);
+
 	for(uint32 x = 0; x < MAX_AURAS; ++x)
 	{
 		if(!DuelingWith->m_auras[x]) continue;
@@ -7039,11 +7042,15 @@ void Player::EndDuel(uint8 WinCondition)
 
 	if(WinCondition == DUEL_WINNER_KNOCKOUT)
 	{
-		DuelingWith->Emote(EMOTE_ONESHOT_BEG);
+		/*DuelingWith->Emote(EMOTE_ONESHOT_BEG);
 		DuelingWith->Root();
-		sEventMgr.AddEvent<Player>(DuelingWith, &Unit::Unroot, EVENT_UNIT_UNROOT, 3000, 1,0); 
+		sEventMgr.AddEvent<Player>(DuelingWith, &Unit::Unroot, EVENT_UNIT_UNROOT, 3000, 1,0); */
 	}
 
+	SendMessageToSet(&data, true);
+
+	data.Initialize(SMSG_DUEL_COMPLETE);
+	data << uint8(1);
 	SendMessageToSet(&data, true);
 
 	//get Arbiter

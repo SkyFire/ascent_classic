@@ -1222,16 +1222,23 @@ void Spell::cast(bool check)
 				}
 			}
 		}
-		SendCastResult(cancastresult);
-		//sLog.outString( "CanCastResult: %u" , cancastresult );
-		if(!m_triggeredSpell)
-			AddCooldown();
 		
 		for(uint32 i=0;i<3;i++)
         {
 			if(m_spellInfo->Effect[i] && m_spellInfo->Effect[i] != SPELL_EFFECT_PERSISTENT_AREA_AURA)
 				 FillTargetMap(i);
         }
+
+		SendCastResult(cancastresult);
+		if(cancastresult != SPELL_CANCAST_OK)
+		{
+			finish();
+			return;
+		}
+
+		//sLog.outString( "CanCastResult: %u" , cancastresult );
+		if(!m_triggeredSpell)
+			AddCooldown();
 
 		if(p_caster)
 		{
@@ -2542,6 +2549,14 @@ uint8 Spell::CanCast(bool tolerate)
 		// check for cooldowns
 		if(!tolerate && !p_caster->CanCastDueToCooldown(m_spellInfo))
 				return SPELL_FAILED_NOT_READY;
+
+		// check for duel areas
+		if(p_caster && m_spellInfo->Id == 7266)
+		{
+			AreaTable* at = dbcArea.LookupEntry( p_caster->GetAreaID() );
+			if(at->AreaFlags & AREA_CITY_AREA)
+				return SPELL_FAILED_NO_DUELING;
+		}
 
 		// check if spell is allowed while player is on a taxi
 		if(p_caster->m_onTaxi)
