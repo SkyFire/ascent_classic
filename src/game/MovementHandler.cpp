@@ -572,7 +572,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				case 2:
 					{
 						sChatHandler.SystemMessage( this, "Speedhacker detected this is your first warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 5 seconds.");
-						sCheatLog.writefromsession( this, "Speedhacker first warning, delta of %g", distance_delta );
+						sCheatLog.writefromsession( this, "Speedhacker first warning, deterministic data ( %g, %x, %g, %g, %g, %i, %i )", distance_delta, movement_info.flags, delta_x, delta_y, speed, _player->_lastHeartbeatT, time_diff );
 						_player->SetMovement( MOVE_ROOT, 1 );
 						sEventMgr.AddEvent( _player, &Player::SetMovement, uint8(MOVE_UNROOT), uint32(1), EVENT_DELETE_TIMER, 5000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 						_player->ResetHeartbeatCoords();
@@ -582,7 +582,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				case 1:
 					{
 						sChatHandler.SystemMessage( this, "Speedhacker detected this is your second warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 30 seconds.");
-						sCheatLog.writefromsession( this, "Speedhacker second warning, delta of %g", distance_delta );
+						sCheatLog.writefromsession( this, "Speedhacker second warning, deterministic data ( %g, %x, %g, %g, %g, %i, %i )", distance_delta, movement_info.flags, delta_x, delta_y, speed, _player->_lastHeartbeatT, time_diff );
 						_player->SetMovement( MOVE_ROOT, 1 );
 						sEventMgr.AddEvent( _player, &Player::SetMovement, uint8(MOVE_UNROOT), uint32(1), EVENT_DELETE_TIMER, 30000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 						_player->ResetHeartbeatCoords();
@@ -592,7 +592,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				case 0:
 					{
 						sChatHandler.SystemMessage( this, "Speedhacker detected you where warned. Your account has been flagged for later processing by server administrators. You will now be removed from the server.");
-						sCheatLog.writefromsession( this, "Speedhacker kicked, delta of %g", distance_delta );
+						sCheatLog.writefromsession( this, "Speedhacker kicked, deterministic data ( %g, %x, %g, %g, %g, %i, %i )", distance_delta, movement_info.flags, delta_x, delta_y, speed, _player->_lastHeartbeatT, time_diff );
 						_player->m_KickDelay = 0;
 						sEventMgr.AddEvent(_player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1,0);
 						_player->SetMovement(MOVE_ROOT, 1);
