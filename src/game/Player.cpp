@@ -312,7 +312,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_cooldownTimer		 = getMSTime() + 10000;
 	GlobalCooldown		  = 0;
 	m_lastHonorResetTime	= 0;
-	memset(&mActions, 0, sizeof(ActionButton) * 120);
+	memset(&mActions, 0, PLAYER_ACTION_BUTTON_SIZE);
 	tutorialsDirty = true;
 	m_TeleportState = 1;
 	m_beingPushed = false;
@@ -2744,8 +2744,26 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		*end=0;
 		//mSpells.insert(atol(start));
 		spProto = dbcSpell.LookupEntryForced(atol(start));
+//#define _language_fix_ 1
+#ifndef _language_fix_
 		if(spProto)
 			mSpells.insert(spProto->Id);
+#else		
+		if (spProto)
+		{
+			skilllinespell * _spell = objmgr.GetSpellSkill(spProto->Id);
+			if (_spell)
+			{
+				skilllineentry * _skill = dbcSkillLine.LookupEntry(_spell->skilline);
+				if (_skill && _skill->type != SKILL_TYPE_LANGUAGE)
+				{
+					mSpells.insert(spProto->Id);
+				}
+			}
+		}
+#endif
+//#undef _language_fix_
+			
 		start = end +1;
 	}
 
@@ -4092,11 +4110,11 @@ void Player::CleanupChannels()
 void Player::SendInitialActions()
 {
 #ifndef USING_BIG_ENDIAN
-	m_session->OutPacket(SMSG_ACTION_BUTTONS, 480, &mActions);
+	m_session->OutPacket(SMSG_ACTION_BUTTONS, PLAYER_ACTION_BUTTON_SIZE, &mActions);
 #else
 	/* we can't do this the fast way on ppc, due to endianness */
-	WorldPacket data(SMSG_ACTION_BUTTONS, 480);
-	for(uint32 i = 0; i < 480; ++i)
+	WorldPacket data(SMSG_ACTION_BUTTONS, PLAYER_ACTION_BUTTON_SIZE);
+	for(uint32 i = 0; i < PLAYER_ACTION_BUTTON_SIZE; ++i)
 	{
 		data << mActions[i].Action << mActions[i].Type << mActions[i].Misc;
 	}

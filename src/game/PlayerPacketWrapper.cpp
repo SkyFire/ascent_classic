@@ -25,79 +25,79 @@
 
 struct Gossip_POI_Packet
 {
-	uint32 flags;
-	float X;
-	float Y;
-	uint32 icon;
-	uint32 data;
+	uint32	flags;
+	float	pos_x;
+	float	pos_y;
+	uint32	icon;
+	uint32	data;
 	const char* name;
 };
 
 struct Levelup_Info_Packet
 {
-    uint32 level;
-    uint32 Hp;
-    uint32 Mana;
-    uint32 unk0;
-    uint32 unk1;
-    uint32 unk2;
-    uint32 unk3;
-    uint32 Stat0;
-    uint32 Stat1;
-    uint32 Stat2;
-    uint32 Stat3;
-    uint32 Stat4;
+    uint32	level;
+    uint32	Hp;
+    uint32	Mana;
+    uint32	unk0;
+    uint32	unk1;
+    uint32	unk2;
+    uint32	unk3;
+    uint32	Stat0;
+    uint32	Stat1;
+    uint32	Stat2;
+    uint32	Stat3;
+    uint32	Stat4;
 };
 
 struct LogXPGainPacket
 {
-    uint64 guid;                                    // Player guid
-    uint32 xp;                                      // Normal XP
-    uint8  type;                                    // 0 for xp gained from killing creature's and 1 for xp gained from quests
-    uint32 restxp;                                  // "Rest XP", is equal to XP for no rest xp message
-    float  unk2; //1.0f                             // static data.. Seems to always be 1.0f
+    uint64	guid;                                    // Player guid
+    uint32	xp;                                      // Normal XP
+    uint8	type;                                    // 0 for xp gained from killing creature's and 1 for xp gained from quests
+    uint32	restxp;                                  // "Rest XP", is equal to XP for no rest xp message
+    float	unk2; //1.0f                             // static data.. Seems to always be 1.0f
 };
 
 struct LogQuestXPGainPacket
 {
-    uint64 guid;                                    // Always 0
-    uint32 xp;                                      // Normal XP
-    uint8  type;                                    // Unknown.. seems to always be 0		
+    uint64	guid;                                    // Always 0
+    uint32	xp;                                      // Normal XP
+    uint8	type;                                    // Unknown.. seems to always be 0		
 };
 
 struct CastResultPacketWExtra
 {
-    uint32 SpellId;
-    uint8 ErrorMessage;
-    uint32 Extra;
+    uint32	SpellId;
+    uint8	ErrorMessage;
+    uint32	Extra;
 };
 
 struct CastResultPacket
 {
-    uint32 SpellId;
-    uint8 ErrorMessage;
+    uint32	SpellId;
+    uint8	ErrorMessage;
 };
 
 struct BindPointUpdatePacket
 {
-    float pos_x;
-    float pos_y;
-    float pos_z;
-    uint32 mapid;
-    uint32 zoneid;
+    float	pos_x;
+    float	pos_y;
+    float	pos_z;
+    uint32	mapid;
+    uint32	zoneid;
 };
 
 struct SetProfinciencyPacket
 {
-    uint8 ItemClass;
-    uint32 Profinciency;
+    uint8	ItemClass;
+    uint32	Profinciency;
 };
 
 struct EnvironmentalDamageLogPacket
 {
-    uint64 Guid;
-    uint8  Type;
-    uint32 Damage;
+    uint64	Guid;
+    uint8	Type;
+    uint32	Damage;
 };
 
 struct LoginVerifyWorldPacket
@@ -118,8 +118,8 @@ void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 
 	packet.flags = Flags;
 	packet.icon = Icon;
 	packet.name = Name;
-	packet.X = X;
-	packet.Y = Y;
+	packet.pos_x = X;
+	packet.pos_y = Y;
 
 	GetSession()->OutPacket(SMSG_GOSSIP_POI, sizeof(Gossip_POI_Packet), (const char*)&packet);
 }

@@ -39,6 +39,9 @@ struct LevelInfo;
 #define PLAYER_NORMAL_FLIGHT_SPEED 7.0f
 #define PLAYER_HONORLESS_TARGET_SPELL 2479
 #define MONSTER_NORMAL_RUN_SPEED 8.0f
+/* action button defines */
+#define PLAYER_ACTION_BUTTON_COUNT 132
+#define PLAYER_ACTION_BUTTON_SIZE PLAYER_ACTION_BUTTON_COUNT * sizeof(ActionButton)
 //====================================================================
 //  Inventory
 //  Holds the display id and item type id for objects in
@@ -1849,7 +1852,7 @@ protected:
 	// Raid
 	uint8 m_targetIcon;
 	//Player Action Bar
-	ActionButton mActions[120];
+	ActionButton mActions[PLAYER_ACTION_BUTTON_SIZE];
 	// Player Reputation
 	ReputationMap m_reputation;
 	// Pointer to this char's game client
