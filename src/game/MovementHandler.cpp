@@ -532,7 +532,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Anti-Speed Hack Checks                                               */
 	/************************************************************************/
-	if( _player->_lastHeartbeatT < UNIXTIME && !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && recv_data.GetOpcode() == MSG_MOVE_HEARTBEAT && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
+
+	//sLog.outDebug( "1 Speedhacker HB(%u) UT(%u) FF(%u) B(%u) E(%u) C(%u) T(%u) O(%i) F(%x)",_player->_lastHeartbeatT, time(NULL), _player->bFeatherFall,_player->blinked, sWorld.antihack_speed, _player->m_uint32Values[UNIT_FIELD_CHARM],_player->m_TransporterGUID, recv_data.GetOpcode(), movement_info.flags );
+
+	if( !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
 	{
 		float speed;
 
@@ -552,20 +555,23 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		if( _player->flying_aura )
 			speed = _player->m_flySpeed;
 
+		//sLog.outDebug( "2 Speedhacker V(%g) S(%g)", _player->_lastHeartbeatV, speed );
+
 		if( _player->_lastHeartbeatV >= speed )
 		{
-
-			time_t time_diff = _player->_lastHeartbeatT - UNIXTIME; //server time since last heartbeat
+			time_t time_diff = time(NULL) - _player->_lastHeartbeatT; //server time since last heartbeat
 
 			float delta_x = movement_info.x - _player->_lastHeartbeatX;
 			float delta_y = movement_info.y - _player->_lastHeartbeatY;
 			
 			float distance_travelled = sqrtf( delta_x * delta_x + delta_y * delta_y ); //distance traveled between last heartbeat
 
-			double max_dist = ( speed * 0.5 ) + 0.1;
-			double distance_delta = distance_travelled - ( max_dist * time_diff );
+			float max_dist = ( speed * 0.5f ) + 0.1f;
+			float distance_delta = distance_travelled - ( max_dist * time_diff );
 
-			if( distance_delta > 350.0 )
+			//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
+
+			if( distance_delta > 16.0f )
 			{
 				switch ( _player->m_speedhackChances )
 				{
@@ -602,7 +608,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			}
 		}
 
-		_player->_lastHeartbeatT = UNIXTIME;
+		_player->_lastHeartbeatT = time(NULL);
 		_player->_lastHeartbeatX = movement_info.x;
 		_player->_lastHeartbeatY = movement_info.y;
 		_player->_lastHeartbeatZ = movement_info.z;
