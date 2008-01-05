@@ -52,17 +52,12 @@ void CConsole::Kill()
 	ir[1].Event.KeyEvent.wVirtualScanCode = 28;
 	WriteConsoleInput( GetStdHandle( STD_INPUT_HANDLE ), ir, 2, & dwTmp );
 #else
-	printf("Sending the kill signal to the console thread.\n");
-	kill(getpid(), SIGUSR1);
-#endif
-
 	printf( "Waiting for console thread to terminate....\n" );
 	while( _thread != NULL )
 	{
 		Sleep( 100 );
 	}
 	printf( "Console shut down.\n" );
-#endif
 }
 
 bool CConsoleThread::run()
@@ -73,9 +68,9 @@ bool CConsoleThread::run()
 	char cmd[300];
 #ifndef WIN32
 	FD_SET fds;
-	sigset_t signals;
-	sigemptyset(&signals);
-	sigaddset(&signals, SIGUSR1);
+	struct timeval tv;
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
 #endif
 
 	while( kill != true )
@@ -86,13 +81,23 @@ bool CConsoleThread::run()
 #ifdef WIN32
 		// Read in single line from "stdin"
 		fgets( cmd, 300, stdin );
+
+		if( kill )
+			break;
+
 #else
 		FD_ZERO(&fds);
 		FD_SET(STDIN_FILENO, &fds);
-		printf("pselect returned %d\n", pselect(1, &fds, NULL, NULL, NULL, &signals));
+		if(select(1, &fds, NULL, NULL, NULL, &tv) <= 0)
+		{
+			if(!kill)	// timeout
+				continue;
+			else
+				break;
+		}
+
+		fgets( cmd, 300, stdin );
 #endif
-		if( kill )
-			break;
 
 		for( i = 0 ; i < 300 || cmd[i] != '\0' ; i++ )
 		{
