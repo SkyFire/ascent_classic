@@ -88,7 +88,7 @@ bool CConsoleThread::run()
 #else
 		FD_ZERO(&fds);
 		FD_SET(STDIN_FILENO, &fds);
-		if(select(1, &fds, NULL, NULL, NULL, &tv) <= 0)
+		if(select(1, &fds, NULL, NULL, &tv) <= 0)
 		{
 			if(!kill)	// timeout
 				continue;
