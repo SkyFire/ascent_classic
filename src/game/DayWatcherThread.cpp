@@ -46,8 +46,7 @@ void DayWatcherThread::terminate()
 #ifdef WIN32
 	SetEvent(m_abortEvent);
 #else
-	printf("sending the singal.\n");
-	pthread_cond_singal(&abortcond);
+	pthread_cond_signal(&abortcond);
 #endif
 }
 
@@ -173,7 +172,7 @@ bool DayWatcherThread::run()
 		WaitForSingleObject(m_abortEvent, 120000);
 #else
 		gettimeofday(&now, NULL);
-		tv.tv_sec = now.tv_sec + 5;
+		tv.tv_sec = now.tv_sec + 120;
 		tv.tv_nsec = now.tv_usec * 1000;
 		pthread_mutex_lock(&abortmutex);
 		pthread_cond_timedwait(&abortcond, &abortmutex, &tv);

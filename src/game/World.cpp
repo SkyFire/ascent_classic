@@ -4968,7 +4968,7 @@ bool CharacterLoaderThread::run()
 		WaitForSingleObject(hEvent,LOAD_THREAD_SLEEP*1000);
 #else
 		gettimeofday(&now, NULL);
-		tv.tv_sec = now.tv_sec + 5;
+		tv.tv_sec = now.tv_sec + LOAD_THREAD_SLEEP;
 		tv.tv_nsec = now.tv_usec * 1000;
 		pthread_mutex_lock(&mutex);
 		pthread_cond_timedwait(&cond, &mutex, &tv);
