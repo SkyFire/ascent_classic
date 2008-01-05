@@ -3245,6 +3245,10 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	Unit *caster=this;
 	uint32 school=spellInfo->School;
 
+	/* arcane shot shouldnt be affected by +spell damage, TODO for burlex - replace this with a flag. */
+	if(spellInfo->NameHash == 0xF4D5F002)
+		return 0;
+
 	if(caster->IsPlayer())
 	{
 		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneByInt[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT3)));
