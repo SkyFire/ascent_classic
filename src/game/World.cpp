@@ -750,43 +750,43 @@ bool World::SetInitialWorldSettings()
 		sp->buffIndexType=0;
 		switch(namehash)
 		{
-		case 0xFF89ABD2:		// Hunter's mark
+		case SPELL_HASH_HUNTER_S_MARK:		// Hunter's mark
 			sp->buffIndexType = SPELL_TYPE_INDEX_MARK;
 			break;
 
-		case 0x2266F1F2:		// Polymorph
-		case 0xB15D524E:		// Polymorph: Chicken
-		case 0xA73086F1:		// Polymorph: Pig
-		case 0xBD6B76DC:		// Polymorph: Sheep
-		case 0x0128F8E9:		// Polymorph: Turtle
+		case SPELL_HASH_POLYMORPH:			// Polymorph
+		case SPELL_HASH_POLYMORPH__CHICKEN:	// Polymorph: Chicken
+		case SPELL_HASH_POLYMORPH__PIG:		// Polymorph: Pig
+		case SPELL_HASH_POLYMORPH__SHEEP:	// Polymorph: Sheep
+		case SPELL_HASH_POLYMORPH__TURTLE:	// Polymorph: Turtle
 			sp->buffIndexType = SPELL_TYPE_INDEX_POLYMORPH;
 			break;
 
-		case 0x328E44DC:		// Fear
+		case SPELL_HASH_FEAR:				// Fear
 			sp->buffIndexType = SPELL_TYPE_INDEX_FEAR;
 			break;
 
-		case 0x4219BB33:		// Sap
+		case SPELL_HASH_SAP:				// Sap
 			sp->buffIndexType = SPELL_TYPE_INDEX_SAP;
 			break;
 
-		case 0x94675337:		// Scare Beast
+		case SPELL_HASH_SCARE_BEAST:		// Scare Beast
 			sp->buffIndexType = SPELL_TYPE_INDEX_SCARE_BEAST;
 			break;
 
-		case 0x898B6207:		// Hibernate
+		case SPELL_HASH_HIBERNATE:			// Hibernate
 			sp->buffIndexType = SPELL_TYPE_INDEX_HIBERNATE;
 			break;
 
-		case 0x0227BA8B:		// Earth Shield
+		case SPELL_HASH_EARTH_SHIELD:		// Earth Shield
 			sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
 			break;
 
-		case 0x73812928:		// Cyclone
+		case SPELL_HASH_CYCLONE:			// Cyclone
 			sp->buffIndexType = SPELL_TYPE_INDEX_CYCLONE;
 			break;
 
-		case 0x3D46465A:		// Banish
+		case SPELL_HASH_BANISH:				// Banish
 			sp->buffIndexType = SPELL_TYPE_INDEX_BANISH;
 			break;
 		}

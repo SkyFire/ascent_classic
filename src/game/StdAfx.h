@@ -70,6 +70,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "../shared/FastQueue.h"
 #include "../shared/CircularQueue.h"
 
+#include "SpellNameHashes.h"
 #include "UpdateFields.h"
 #include "UpdateMask.h"
 #include "Opcodes.h"
