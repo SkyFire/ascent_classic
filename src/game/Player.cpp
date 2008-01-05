@@ -3778,7 +3778,7 @@ void Player::RepopRequestedPlayer()
 		RepopAtGraveyard(GetPositionX(),GetPositionY(),GetPositionZ(),GetMapId());
 	}
 	
-	if(corpse)
+	if( corpse )
 	{
 		SpawnCorpseBody();
 
@@ -3787,6 +3787,17 @@ void Player::RepopRequestedPlayer()
 		data << m_mapId << m_position;
 		m_session->SendPacket(&data);
 	}
+
+	switch( pMapinfo->mapid )
+	{
+		case 550: //The Eye
+		case 552: //The Arcatraz
+		case 553: //The Botanica
+		case 554: //The Mechanar
+			ResurrectPlayer();
+			break;
+	}
+
 }
 
 void Player::ResurrectPlayer()
