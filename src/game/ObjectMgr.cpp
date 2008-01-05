@@ -1015,6 +1015,7 @@ void ObjectMgr::LoadVendors()
 		if( result->GetFieldCount() < 5 )
 		{
 			Log.Notice("ObjectMgr", "Invalid format in vendors (%u/5) columns, not enough data to proceed.\n", result->GetFieldCount() );
+			return;
 		}
 		else if( result->GetFieldCount() > 5 )
 		{
@@ -1681,19 +1682,18 @@ LevelInfo* ObjectMgr::GetLevelInfo(uint32 Race, uint32 Class, uint32 Level)
 {
 	// Iterate levelinfo map until we find the right class+race.
 	LevelInfoMap::iterator itr = mLevelInfo.begin();
-	for(; itr != mLevelInfo.end(); ++itr)
+	for(; itr != mLevelInfo.end(); ++itr )
 	{
-		if(itr->first.first == Race &&
-			itr->first.second == Class)
+		if( itr->first.first == Race && itr->first.second == Class)
 		{
 			// We got a match.
 			// Let's check that our level is valid first.
-			if(Level > sWorld.m_genLevelCap) // too far.
+			if( Level > sWorld.m_genLevelCap ) // too far.
 				Level = sWorld.m_genLevelCap;
 
 			// Pull the level information from the second map.
-			LevelMap::iterator it2 = itr->second->find(Level);
-			ASSERT(it2 != itr->second->end());
+			LevelMap::iterator it2 = itr->second->find( Level );
+			ASSERT( it2 != itr->second->end() );
 
 			return it2->second;
 		}

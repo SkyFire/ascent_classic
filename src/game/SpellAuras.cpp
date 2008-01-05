@@ -6937,7 +6937,7 @@ void Aura::SpellAuraIncreaseRating( bool apply )
 	if( !m_target->IsPlayer() )
 		return;
 
-	Player* plr = ((Player*)m_target);
+	Player* plr = static_cast< Player* >( m_target );
 	for( uint32 x = 1; x < 24; x++ )//skip x=0
 		if( ( ( ( uint32 )1 ) << x ) & mod->m_miscValue )
 			plr->ModifyBonuses( 11 + x, v );
@@ -6960,6 +6960,7 @@ void Aura::SpellAuraIncreaseRating( bool apply )
 					}
 			}
 	}
+
 	plr->UpdateStats();
 }
 

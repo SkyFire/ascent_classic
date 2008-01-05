@@ -4404,62 +4404,68 @@ void Player::UpdateAttackSpeed()
 void Player::UpdateStats()
 {   
 	UpdateAttackSpeed();
-	//formulas from wowwiki
-	int32 AP = 0, RAP = 0;
 
-	uint32 str,agi,lev;
-	str=GetUInt32Value(UNIT_FIELD_STAT0);
-	agi=GetUInt32Value(UNIT_FIELD_STAT1);
-	lev=getLevel();
+	// formulas from wowwiki
+
+	int32 AP = 0
+	int32 RAP = 0;
+	int32 hpdelta = 128;
+	int32 manadelta = 128;
+
+	uint32 str = GetUInt32Value(UNIT_FIELD_STAT0);
+	uint32 agi = GetUInt32Value(UNIT_FIELD_STAT1);
+	uint32 lev = getLevel();
+
 	// Attack power
-	uint32 cl=getClass();   
+	uint32 cl = getClass();   
 	switch (cl)
 	{
 		case DRUID:
-		AP=str*2-20;
+			AP = str * 2 - 20;
 		
-		if(GetShapeShift()==FORM_CAT)
-			AP += agi + lev * 2;
+			if( GetShapeShift() == FORM_CAT )
+				AP += agi + lev * 2;
 
-		if(GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR)
-			AP += lev * 3;
+			if( GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR )
+				AP += lev * 3;
 
-		break;
+			break;
 		
 		case ROGUE:
-		//AP = lev * 2 + str + agi - 20;
-		//RAP = lev + agi * 2 - 20;
-//		AP = str + agi - 20;
-		AP = lev * 2 + str + agi - 20;
-		RAP = lev + agi - 10;
-		break;
+			//AP = lev * 2 + str + agi - 20;
+			//RAP = lev + agi * 2 - 20;
+			//AP = str + agi - 20;
+			AP = lev * 2 + str + agi - 20;
+			RAP = lev + agi - 10;
+			break;
 		
 		case HUNTER:
-		//AP = lev* 2 + str + agi - 20;
-		//RAP = (lev + agi)*2 - 20;
-		AP = str + agi - 20;
-		RAP = lev * 2 + agi - 10;
-		break;
+			//AP = lev* 2 + str + agi - 20;
+			//RAP = (lev + agi)*2 - 20;
+			AP = str + agi - 20;
+			RAP = lev * 2 + agi - 10;
+			break;
 
 		case SHAMAN:
-		AP= (lev+str)*2 - 20;
-		break;
+			AP = (lev+str)*2 - 20;
+			break;
 	
 		case PALADIN:
-		//AP = lev * 3 + str * 2 - 20;
-//		AP = str * 2 - 20;
-		AP = lev * 3 + str * 2 - 20;
-		break;
+			//AP = lev * 3 + str * 2 - 20;
+			//AP = str * 2 - 20;
+			AP = lev * 3 + str * 2 - 20;
+			break;
 
 		case WARRIOR:
-//		AP = lev * 3 + str * 2 - 20;
-		//RAP = (lev+agi)*2 - 20;
-//		AP = str * 2 - 20;
-		AP = lev * 3 + str * 2 - 20;
-		RAP = lev + agi - 20;
-		break;
+			//AP = lev * 3 + str * 2 - 20;
+			//RAP = (lev+agi)*2 - 20;
+			//AP = str * 2 - 20;
+			AP = lev * 3 + str * 2 - 20;
+			RAP = lev + agi - 20;
+			break;
+
 		default://mage,priest,warlock
-		AP = str-10;
+			AP = str - 10;
 	}
 
 	/* modifiers */
@@ -4471,13 +4477,22 @@ void Player::UpdateStats()
 	SetUInt32Value( UNIT_FIELD_ATTACK_POWER, AP );
 	SetUInt32Value( UNIT_FIELD_RANGED_ATTACK_POWER, RAP ); 
 
-	LevelInfo* lvlinfo = objmgr.GetLevelInfo( this->getRace(), this->getClass(),lev );
-	int32 hpdelta = lvlinfo->Stat[2] * 10;
-	int32 manadelta = lvlinfo->Stat[3] * 15;
+	LevelInfo* lvlinfo = objmgr.GetLevelInfo( this->getRace(), this->getClass(), lev );
+
+	if( lvlinfo != NULL )
+	{
+		hpdelta = lvlinfo->Stat[2] * 10;
+		manadelta = lvlinfo->Stat[3] * 15;
+	}
+
 	lvlinfo = objmgr.GetLevelInfo( this->getRace(), this->getClass(), 1 );
-	hpdelta -= lvlinfo->Stat[2] * 10;
-	manadelta -= lvlinfo->Stat[3] * 15;
-	
+
+	if( lvlinfo != NULL )
+	{
+		hpdelta -= lvlinfo->Stat[2] * 10;
+		manadelta -= lvlinfo->Stat[3] * 15;
+	}
+
 	int32 hp = GetUInt32Value( UNIT_FIELD_BASE_HEALTH );
 	int32 bonus = ( GetUInt32Value( UNIT_FIELD_POSSTAT2 ) - GetUInt32Value( UNIT_FIELD_NEGSTAT2 ) ) * 10 + m_healthfromspell + m_healthfromitems;
 	int32 res = hp + bonus + hpdelta;
