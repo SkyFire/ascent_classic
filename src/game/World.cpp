@@ -4088,6 +4088,9 @@ bool World::SetInitialWorldSettings()
 	/* aspect of the pack - change to AA */
 	sp = dbcSpell.LookupEntry(13159); if( sp != NULL )sp->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
 	sp = dbcSpell.LookupEntry(13159); if( sp != NULL )sp->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
+
+	/* aspect of the cheetah - add proc flags */
+	sp = dbcSpell.LookupEntry(5118); if( sp != NULL ) sp->procFlags = 139944;
 	
 	/* shadowstep - change proc flags */
 	sp = dbcSpell.LookupEntry(36563); if( sp != NULL )sp->procFlags = 0;
