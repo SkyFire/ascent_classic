@@ -4926,7 +4926,7 @@ void CharacterLoaderThread::OnShutdown()
 #ifdef WIN32
 	SetEvent(hEvent);
 #else
-	printf("signal = %u\n", pthread_cond_signal(&cond));
+	pthread_cond_signal(&cond);
 #endif
 }
 
@@ -4940,6 +4940,8 @@ CharacterLoaderThread::~CharacterLoaderThread()
 #ifdef WIN32
 	CloseHandle(hEvent);
 #else
+	pthread_cond_destroy(&cond);
+	pthread_mutex_destroy(&mutex);
 #endif
 }
 

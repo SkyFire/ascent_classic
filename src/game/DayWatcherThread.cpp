@@ -24,6 +24,9 @@
 #include "StdAfx.h"
 #ifdef WIN32
 static HANDLE m_abortEvent = INVALID_HANDLE_VALUE;
+#else
+static pthread_cond_t abortcond;
+static pthread_mutex_t abortmutex;
 #endif
 
 DayWatcherThread::DayWatcherThread()
@@ -42,6 +45,9 @@ void DayWatcherThread::terminate()
 	m_running = false;
 #ifdef WIN32
 	SetEvent(m_abortEvent);
+#else
+	printf("sending the singal.\n");
+	pthread_cond_singal(&abortcond);
 #endif
 }
 
@@ -137,6 +143,12 @@ bool DayWatcherThread::run()
 	m_busy = false;
 #ifdef WIN32
 	m_abortEvent = CreateEvent(NULL, NULL, FALSE, NULL);
+#else
+	struct timeval now;
+	struct timespec tv;
+
+	pthread_mutex_init(&abortmutex,NULL);
+	pthread_cond_init(&abortcond,NULL);
 #endif
 	
 	while(ThreadState != THREADSTATE_TERMINATE)
@@ -160,13 +172,20 @@ bool DayWatcherThread::run()
 #ifdef WIN32
 		WaitForSingleObject(m_abortEvent, 120000);
 #else
-		Sleep(120000);
+		gettimeofday(&now, NULL);
+		tv.tv_sec = now.tv_sec + 5;
+		tv.tv_nsec = now.tv_usec * 1000;
+		pthread_mutex_lock(&abortmutex);
+		pthread_cond_timedwait(&abortcond, &abortmutex, &tv);
+		pthread_mutex_unlock(&abortmutex);
 #endif
 		if(!m_running)
 			break;
 	}
 #ifdef WIN32
 	CloseHandle(m_abortEvent);
+	pthread_destroy_mutex(&abortmutex);
+	pthread_destroy_cond(&abortcond);
 #endif
 	return true;
 }
