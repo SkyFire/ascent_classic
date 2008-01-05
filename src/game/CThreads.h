@@ -78,7 +78,7 @@ public:
 	int GetThreadId() { return ThreadId; }
 	time_t GetStartTime() { return start_time; }
 	virtual bool run();
-	void OnShutdown();
+	virtual void OnShutdown();
 
 protected:
 	CThreadState ThreadState;

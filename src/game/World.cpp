@@ -4922,14 +4922,12 @@ struct insert_playeritem
 
 void CharacterLoaderThread::OnShutdown()
 {
+	running=false;
 #ifdef WIN32
 	SetEvent(hEvent);
 #else
-	printf("CharacterLoaderThread::OnShutdown()\n");
-	pthread_cond_signal(&cond);
+	printf("signal = %u\n", pthread_cond_signal(&cond));
 #endif
-
-	running=false;
 }
 
 CharacterLoaderThread::CharacterLoaderThread()
@@ -4950,15 +4948,13 @@ bool CharacterLoaderThread::run()
 #ifdef WIN32
 	hEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
 #else
+	struct timeval now;
 	struct timespec tv;
-	tv.tv_nsec=0;
-	tv.tv_sec = LOAD_THREAD_SLEEP;
 
 	pthread_mutex_init(&mutex,NULL);
 	pthread_cond_init(&cond,NULL);
-
 #endif
-
+	running=true;
 	for(;;)
 	{
 		sWorld.PollCharacterInsertQueue();
@@ -4969,9 +4965,12 @@ bool CharacterLoaderThread::run()
 #ifdef WIN32
 		WaitForSingleObject(hEvent,LOAD_THREAD_SLEEP*1000);
 #else
-		//Sleep(LOAD_THREAD_SLEEP*1000);
+		gettimeofday(&now, NULL);
+		tv.tv_sec = now.tv_sec + 5;
+		tv.tv_nsec = now.tv_usec * 1000;
+		pthread_mutex_lock(&mutex);
 		pthread_cond_timedwait(&cond, &mutex, &tv);
-		printf("exiting CharacterLoaderThread? running = %u\n", running);
+		pthread_mutex_unlock(&mutex);
 #endif
 		if(!running)
 			break;
