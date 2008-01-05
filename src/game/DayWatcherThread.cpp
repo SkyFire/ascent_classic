@@ -279,7 +279,6 @@ void DayWatcherThread::update_arena()
 
 void DayWatcherThread::update_honor()
 {
-	return;		// FIXME
 	Log.Notice("DayWatcherThread", "Running Daily Honor Maintenance...");
 	uint32 guid, killstoday, killsyesterday, honortoday, honoryesterday, honorpoints, points_to_add;
 	Player * plr;
