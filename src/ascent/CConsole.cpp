@@ -51,7 +51,7 @@ void CConsole::Kill()
 	ir[1].Event.KeyEvent.wVirtualKeyCode = 13;
 	ir[1].Event.KeyEvent.wVirtualScanCode = 28;
 	WriteConsoleInput( GetStdHandle( STD_INPUT_HANDLE ), ir, 2, & dwTmp );
-#else
+#endif
 	printf( "Waiting for console thread to terminate....\n" );
 	while( _thread != NULL )
 	{
@@ -67,7 +67,7 @@ bool CConsoleThread::run()
 	size_t i = 0;
 	char cmd[300];
 #ifndef WIN32
-	FD_SET fds;
+	fd_set fds;
 	struct timeval tv;
 	tv.tv_sec = 1;
 	tv.tv_usec = 0;
