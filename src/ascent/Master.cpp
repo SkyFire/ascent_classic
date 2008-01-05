@@ -628,6 +628,7 @@ void Master::_HookSignals()
 	signal( SIGBREAK, _OnSignal );
 #else
 	signal( SIGHUP, _OnSignal );
+	signal(SIGUSR1, _OnSignal);
 #endif
 }
 

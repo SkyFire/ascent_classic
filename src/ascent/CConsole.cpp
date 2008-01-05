@@ -31,6 +31,7 @@ createFileSingleton(Console);
 createFileSingleton(CConsole);
 void CConsole::Kill()
 {
+	_thread->kill = true;
 #ifdef WIN32
 	/* write the return keydown/keyup event */
 	DWORD dwTmp;
@@ -49,8 +50,12 @@ void CConsole::Kill()
 	ir[1].Event.KeyEvent.wRepeatCount = 1;
 	ir[1].Event.KeyEvent.wVirtualKeyCode = 13;
 	ir[1].Event.KeyEvent.wVirtualScanCode = 28;
-	_thread->kill = true;
 	WriteConsoleInput( GetStdHandle( STD_INPUT_HANDLE ), ir, 2, & dwTmp );
+#else
+	printf("Sending the kill signal to the console thread.\n");
+	kill(getpid(), SIGUSR1);
+#endif
+
 	printf( "Waiting for console thread to terminate....\n" );
 	while( _thread != NULL )
 	{
@@ -65,20 +70,31 @@ bool CConsoleThread::run()
 	SetThreadName("Console Interpreter");
 	sCConsole._thread = this;
 	size_t i = 0;
-	char cmd[96];
+	char cmd[300];
+#ifndef WIN32
+	FD_SET fds;
+	sigset_t signals;
+	sigemptyset(&signals);
+	sigaddset(&signals, SIGUSR1);
+#endif
 
 	while( kill != true )
 	{
 		// Make sure our buffer is clean to avoid Array bounds overflow
 		memset( cmd, 0, sizeof( cmd ) ); 
 
+#ifdef WIN32
 		// Read in single line from "stdin"
-		fgets( cmd, 80, stdin );
-
+		fgets( cmd, 300, stdin );
+#else
+		FD_ZERO(&fds);
+		FD_SET(STDIN_FILENO, &fds);
+		printf("pselect returned %d\n", pselect(1, &fds, NULL, NULL, NULL, &signals));
+#endif
 		if( kill )
 			break;
 
-		for( i = 0 ; i < 80 || cmd[i] != '\0' ; i++ )
+		for( i = 0 ; i < 300 || cmd[i] != '\0' ; i++ )
 		{
 			if( cmd[i] =='\n' )
 			{
