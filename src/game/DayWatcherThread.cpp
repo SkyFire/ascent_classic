@@ -183,8 +183,9 @@ bool DayWatcherThread::run()
 	}
 #ifdef WIN32
 	CloseHandle(m_abortEvent);
-	pthread_destroy_mutex(&abortmutex);
-	pthread_destroy_cond(&abortcond);
+#else
+	pthread_mutex_destroy(&abortmutex);
+	pthread_cond_destroy(&abortcond);
 #endif
 	return true;
 }
