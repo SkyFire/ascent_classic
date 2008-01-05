@@ -2763,6 +2763,10 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 					mSpells.insert(spProto->Id);
 				}
 			}
+			else
+			{
+				mSpells.insert(spProto->Id);
+			}
 		}
 #endif
 //#undef _language_fix_
@@ -8811,7 +8815,7 @@ void Player::SummonRequest(uint32 Requestor, uint32 ZoneID, uint32 MapID, uint32
 	m_summoner = Requestor;
 	m_summonMapId = MapID;
 
-	WorldPacket data(SMSG_SUMMON_REQUEST, 50);
+	WorldPacket data(SMSG_SUMMON_REQUEST, 16);
 	data << uint64(Requestor) << ZoneID << uint32(120000);		// 2 minutes
 	m_session->SendPacket(&data);
 }
