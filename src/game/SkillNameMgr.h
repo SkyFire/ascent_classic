@@ -12,7 +12,12 @@ public:
 	SkillNameMgr()
 	{
 		DBCFile SkillDBC;
-		SkillDBC.open("DBC/SkillLine.dbc");
+		
+		if( !SkillDBC.open( "DBC/SkillLine.dbc" ) )
+		{
+			Log.Error( "SkillNameMgr", "Cannot find file ./DBC/SkillLine.dbc" );
+			return;
+		}
 
 		//This will become the size of the skill name lookup table
 		maxskill = SkillDBC.getRecord(SkillDBC.getRecordCount()-1).getUInt(0);

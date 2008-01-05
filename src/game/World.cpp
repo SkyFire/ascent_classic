@@ -383,7 +383,13 @@ bool World::SetInitialWorldSettings()
 
 	/* Convert area table ids/flags */
 	DBCFile area;
-	area.open("DBC/AreaTable.dbc");
+
+	if( !area.open( "DBC/AreaTable.dbc" ) )
+	{
+		Log.Error( "World", "Cannot find file ./DBC/AreaTable.dbc" );
+		return false;
+	}
+
 	uint32 flag_, area_, zone_;
 	for(uint32 i = 0; i < area.getRecordCount(); ++i)
 	{
@@ -512,7 +518,12 @@ bool World::SetInitialWorldSettings()
 	//dbc method will be changed in future
 	DBCFile dbc;
 
-	dbc.open("DBC/Spell.dbc");
+	if( !dbc.open( "DBC/Spell.dbc" ) )
+	{
+		Log.Error("World", "Cannot find file ./DBC/Spell.dbc" );
+		return false;
+	}
+
 	Log.Notice("World", "Processing %u spells...", dbc.getRecordCount());
 
 	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_proc_data");
@@ -4796,7 +4807,13 @@ void World::Rehash(bool load)
 void World::LoadNameGenData()
 {
 	DBCFile dbc;
-	dbc.open("DBC/NameGen.dbc");
+
+	if( !dbc.open( "DBC/NameGen.dbc" ) )
+	{
+		Log.Error( "World", "Cannot find file ./DBC/NameGen.dbc" );
+		return;
+	}
+
 	for(uint32 i = 0; i < dbc.getRecordCount(); ++i)
 	{
 		NameGenData d;

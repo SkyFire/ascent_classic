@@ -4411,7 +4411,7 @@ void Player::UpdateStats()
 
 	// formulas from wowwiki
 
-	int32 AP = 0
+	int32 AP = 0;
 	int32 RAP = 0;
 	int32 hpdelta = 128;
 	int32 manadelta = 128;

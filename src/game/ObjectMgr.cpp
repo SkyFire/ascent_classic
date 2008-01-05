@@ -1744,7 +1744,13 @@ set<SpellEntry*>* ObjectMgr::GetDefaultPetSpells(uint32 Entry)
 void ObjectMgr::LoadPetSpellCooldowns()
 {
 	DBCFile dbc;
-	dbc.open("DBC/CreatureSpellData.dbc");
+
+	if( !dbc.open( "DBC/CreatureSpellData.dbc" ) )
+	{
+		Log.Error( "ObjectMgr", "Cannot find file ./DBC/CreatureSpellData.dbc" );
+		return;
+	}
+
 	uint32 SpellId;
 	uint32 Cooldown;
 	for(uint32 i = 0; i < dbc.getRecordCount(); ++i)
