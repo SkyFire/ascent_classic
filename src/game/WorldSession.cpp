@@ -279,12 +279,7 @@ void WorldSession::LogoutPlayer(bool Save)
 
 		_player->GetItemInterface()->EmptyBuyBack();
 		
-		
-		for(int i=0;i<3;++i)
-		{
-			if(_player->LfgDungeonId[i] != 0)
-				sLfgMgr.RemoveFromLfgQueue(_player,_player->LfgDungeonId[i]);	   
-		}
+		sLfgMgr.RemovePlayerFromLfgQueues(_player);
 		
 		// Save HP/Mana
 		_player->load_health = _player->GetUInt32Value(UNIT_FIELD_HEALTH);
@@ -614,13 +609,15 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_GROUP_PROMOTE].handler								= &WorldSession::HandleGroupPromote;
 
 	// LFG System
-	WorldPacketHandlers[CMSG_SET_LOOKING_FOR_GROUP_COMMENT].handler			 = &WorldSession::HandleSetLookingForGroupComment;
-	WorldPacketHandlers[MSG_LOOKING_FOR_GROUP].handler						  = &WorldSession::HandleMsgLookingForGroup;
-	WorldPacketHandlers[CMSG_SET_LOOKING_FOR_GROUP].handler					 = &WorldSession::HandleSetLookingForGroup;
-	WorldPacketHandlers[CMSG_ENABLE_AUTOJOIN].handler						   = &WorldSession::HandleEnableAutoJoin;
-	WorldPacketHandlers[CMSG_DISABLE_AUTOJOIN].handler						  = &WorldSession::HandleDisableAutoJoin;
+	WorldPacketHandlers[CMSG_SET_LOOKING_FOR_GROUP_COMMENT].handler				= &WorldSession::HandleSetLookingForGroupComment;
+	WorldPacketHandlers[MSG_LOOKING_FOR_GROUP].handler							= &WorldSession::HandleMsgLookingForGroup;
+	WorldPacketHandlers[CMSG_SET_LOOKING_FOR_GROUP].handler						= &WorldSession::HandleSetLookingForGroup;
+	WorldPacketHandlers[CMSG_SET_LOOKING_FOR_MORE].handler						= &WorldSession::HandleSetLookingForMore;
+	WorldPacketHandlers[CMSG_ENABLE_AUTOJOIN].handler							= &WorldSession::HandleEnableAutoJoin;
+	WorldPacketHandlers[CMSG_DISABLE_AUTOJOIN].handler							= &WorldSession::HandleDisableAutoJoin;
 	WorldPacketHandlers[CMSG_ENABLE_AUTOADD_MEMBERS].handler					= &WorldSession::HandleEnableAutoAddMembers;
-	WorldPacketHandlers[CMSG_DISABLE_AUTOADD_MEMBERS].handler				   = &WorldSession::HandleDisableAutoAddMembers;
+	WorldPacketHandlers[CMSG_DISABLE_AUTOADD_MEMBERS].handler					= &WorldSession::HandleDisableAutoAddMembers;
+	WorldPacketHandlers[CMSG_CLEAR_LOOKING_FOR_GROUP_STATE].handler				= &WorldSession::HandleLfgClear;
 	
 	// Taxi / NPC Interaction
 	WorldPacketHandlers[CMSG_TAXINODE_STATUS_QUERY].handler					 = &WorldSession::HandleTaxiNodeStatusQueryOpcode;

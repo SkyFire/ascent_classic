@@ -30,56 +30,78 @@ void WorldSession::HandleSetLookingForGroupComment(WorldPacket& recvPacket)
 
 void WorldSession::HandleEnableAutoJoin(WorldPacket& recvPacket)
 {
-	GetPlayer()->m_Autojoin = true;
+	uint32 i;
+
+	// make sure they're not queued in any invalid cases
+	for(i = 0; i < MAX_LFG_QUEUE_ID; ++i)
+	{
+		if(_player->LfgDungeonId[i] != 0)
+		{
+			if(LfgDungeonTypes[_player->LfgDungeonId[i]] != LFG_INSTANCE && LfgDungeonTypes[_player->LfgDungeonId[i]] != LFG_HEROIC_DUNGEON)
+			{
+				return;
+			}
+		}
+	}
+
+	// enable autojoin, join any groups if possible.
+	_player->m_Autojoin = true;
+	
+	for(i = 0; i < MAX_LFG_QUEUE_ID; ++i)
+	{
+		if(_player->LfgDungeonId[i] != 0)
+		{
+			_player->SendMeetingStoneQueue(_player->LfgDungeonId[i], 1);
+			sLfgMgr.UpdateLfgQueue(_player->LfgDungeonId[i]);
+		}
+	}
 }
 
 void WorldSession::HandleDisableAutoJoin(WorldPacket& recvPacket)
 {
-	GetPlayer()->m_Autojoin = false;	
+	uint32 i;
+	_player->m_Autojoin = false;
+
+	for(i = 0; i < MAX_LFG_QUEUE_ID; ++i)
+	{
+		if(_player->LfgDungeonId[i] != 0)
+		{
+			if(LfgDungeonTypes[_player->LfgDungeonId[i]] == LFG_INSTANCE || LfgDungeonTypes[_player->LfgDungeonId[i]] == LFG_HEROIC_DUNGEON)
+				_player->SendMeetingStoneQueue(_player->LfgDungeonId[i], 0);
+		}
+	}
 }
 
 void WorldSession::HandleEnableAutoAddMembers(WorldPacket& recvPacket)
 {
-	GetPlayer()->m_AutoAddMem = true;
+	uint32 i;
+	_player->m_AutoAddMem = true;
+
+	for(i = 0; i < MAX_LFG_QUEUE_ID; ++i)
+	{
+		if(_player->LfgDungeonId[i] != 0)
+		{
+			sLfgMgr.UpdateLfgQueue(_player->LfgDungeonId[i]);
+		}
+	}
 }
 
 void WorldSession::HandleDisableAutoAddMembers(WorldPacket& recvPacket)
 {
-	GetPlayer()->m_AutoAddMem = false;	
+	_player->m_AutoAddMem = false;	
 }
 
 void WorldSession::HandleMsgLookingForGroup(WorldPacket& recvPacket)
 {
+	/* this is looking for more */
 	uint32 LfgType,LfgDungeonId,unk1;
-	WorldPacket data;
-	std::set<Player*>::iterator itr;
-	Player *pl;
-	int i=0;
-	
 	recvPacket >> LfgType >> LfgDungeonId >> unk1;
 	
-	if(LfgDungeonId >= MAX_DUNGEONS)
+	if(LfgDungeonId > MAX_DUNGEONS)
 		return;
-	
-	uint32 qsize = sLfgMgr.GetLfgQueueSize(LfgDungeonId);
-	
-	data.Initialize(MSG_LOOKING_FOR_GROUP);
-	data << LfgType << LfgDungeonId;
-	data << qsize << qsize;
-	
-	for(itr = sLfgMgr.GetLfgQueueBegin(LfgDungeonId); itr != sLfgMgr.GetLfgQueueEnd(LfgDungeonId) ; ++itr)
-	{
-		pl = *itr;
-		data << pl->GetNewGUID();
-		data << uint32(pl->getLevel());
-		data << pl->GetZoneId() << uint8(0);
-		for(i=0;i<3;i++)
-			data << pl->LfgDungeonId[i] << uint8(0) << pl->LfgType[i];
-		
-		data << pl->Lfgcomment << uint32(0);
-	}   
 
-	SendPacket(&data);
+	if(LfgDungeonId)
+		sLfgMgr.SendLfgList(_player, LfgDungeonId);
 }
 
 void WorldSession::HandleSetLookingForGroup(WorldPacket& recvPacket)
@@ -88,18 +110,106 @@ void WorldSession::HandleSetLookingForGroup(WorldPacket& recvPacket)
 	uint16 LfgDungeonId;
 	uint8 LfgType,unk1;
 	
-	//WorldPacket data;
-	
 	recvPacket >> LfgQueueId >> LfgDungeonId >> unk1 >> LfgType;
 	
-	if(LfgDungeonId >= MAX_DUNGEONS || LfgQueueId > 2)
+	if(LfgDungeonId >= MAX_DUNGEONS || LfgQueueId >= MAX_LFG_QUEUE_ID || LfgType != LfgDungeonTypes[LfgDungeonId])		// last one is for cheaters
 		return;
 	
-	sLfgMgr.RemoveFromLfgQueue(GetPlayer(),GetPlayer()->LfgDungeonId[LfgQueueId]);
+	if(_player->LfgDungeonId[LfgQueueId] != 0)
+		sLfgMgr.RemovePlayerFromLfgQueue(_player, _player->LfgDungeonId[LfgQueueId]);
 	
-	GetPlayer()->LfgDungeonId[LfgQueueId]=LfgDungeonId;
-	GetPlayer()->LfgType[LfgQueueId]=LfgType;
+	_player->LfgDungeonId[LfgQueueId]=LfgDungeonId;
+	_player->LfgType[LfgQueueId]=LfgType;
 
-	sLfgMgr.SetPlayerInLFGqueue(GetPlayer(),LfgDungeonId);
+	if(LfgDungeonId)
+	{
+		sLfgMgr.SetPlayerInLFGqueue(_player, LfgDungeonId);
+
+		if(LfgType == LFG_HEROIC_DUNGEON || LfgType == LFG_INSTANCE)
+		{
+			sLfgMgr.UpdateLfgQueue(LfgDungeonId);
+			if(_player->m_Autojoin)
+				_player->SendMeetingStoneQueue(LfgDungeonId, 1);
+		}
+	}
 }
 
+void WorldSession::HandleSetLookingForMore(WorldPacket& recvPacket)
+{
+	uint16 LfgDungeonId;
+	uint8 LfgType,unk1;
+
+	recvPacket >> LfgDungeonId >> unk1 >> LfgType;
+
+	// remove from an existing queue
+	if(LfgDungeonId != _player->LfmDungeonId && _player->LfmDungeonId)
+		sLfgMgr.RemovePlayerFromLfmList(_player, _player->LfmDungeonId);
+
+	_player->LfmDungeonId = LfgDungeonId;
+	_player->LfmType = LfgType;
+
+	if(LfgDungeonId)
+		sLfgMgr.SetPlayerInLfmList(_player, LfgDungeonId);
+}
+
+void WorldSession::HandleLfgClear(WorldPacket & recvPacket)
+{
+	sLfgMgr.RemovePlayerFromLfgQueues(_player);
+}
+
+void WorldSession::HandleLfgInviteAccept(WorldPacket & recvPacket)
+{
+	CHECK_INWORLD_RETURN
+	
+	if(_player->m_lfgMatch == NULL && _player->m_lfgInviterGuid == 0)
+	{
+		if(_player->m_lfgMatch == NULL)
+			OutPacket(SMSG_LFG_MATCHMAKING_AUTOJOIN_FAILED_NO_PLAYER);		// Matched Player(s) have gone offline.
+		else
+			OutPacket(SMSG_LFG_MATCHMAKING_AUTOJOIN_FAILED);				// Group no longer available.
+
+		return;
+	}
+
+	if( _player->m_lfgMatch != NULL )
+	{
+		// move into accepted players
+		_player->m_lfgMatch->lock.Acquire();
+		_player->m_lfgMatch->PendingPlayers.erase(_player);
+
+		if( !_player->GetGroup() )
+		{
+			_player->m_lfgMatch->AcceptedPlayers.insert(_player);
+
+			if(!_player->m_lfgMatch->PendingPlayers.size())
+			{
+				// all players have accepted
+				Group * pGroup = new Group();
+				for(set<Player*>::iterator itr = _player->m_lfgMatch->AcceptedPlayers.begin(); itr != _player->m_lfgMatch->AcceptedPlayers.end(); ++itr)
+					pGroup->AddMember((*itr)->m_playerInfo);
+
+				_player->m_lfgMatch->pGroup = pGroup;
+			}
+		}
+		_player->m_lfgMatch->lock.Release();
+	}
+	else
+	{
+		Player * pPlayer = objmgr.GetPlayer(_player->m_lfgInviterGuid);
+		if( pPlayer == NULL )
+		{
+			OutPacket(SMSG_LFG_MATCHMAKING_AUTOJOIN_FAILED_NO_PLAYER);			// Matched Player(s) have gone offline.
+			return;
+		}
+
+		if( pPlayer->GetGroup() == NULL || pPlayer->GetGroup()->IsFull() || pPlayer->GetGroup()->GetLeader() != pPlayer->m_playerInfo )
+		{
+			OutPacket(SMSG_LFG_MATCHMAKING_AUTOJOIN_FAILED);
+			return;
+		}
+
+		pPlayer->GetGroup()->AddMember(_player->m_playerInfo);
+	}
+	_player->m_lfgInviterGuid = 0;
+	_player->m_lfgMatch = NULL;
+}

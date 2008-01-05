@@ -386,6 +386,11 @@ protected:
 	void HandleSetLookingForGroupComment(WorldPacket& recvPacket);
 	void HandleMsgLookingForGroup(WorldPacket& recvPacket);
 	void HandleSetLookingForGroup(WorldPacket& recvPacket);
+	void HandleSetLookingForMore(WorldPacket& recvPacket);
+	void HandleSetLookingForNone(WorldPacket& recvPacket);
+	void HandleLfgClear(WorldPacket & recvPacket);
+	void HandleLfgInviteAccept(WorldPacket & recvPacket);
+	void HandleLfgInviteDeny(WorldPacket & recvPacket);
 
 	/// Taxi opcodes (TaxiHandler.cpp)
 	void HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvPacket);

@@ -31,6 +31,7 @@ class Guild;
 struct GuildRank;
 class Pet;
 class Charter;
+class LFGMatch;
 struct LevelInfo;
 #define myabs(a) (a<0)?(-a):a
 #define MAX_PET_NO 3
@@ -735,6 +736,11 @@ public:
 
 	void RecalculateHonor();
 
+	LfgMatch * m_lfgMatch;
+	uint32 m_lfgInviterGuid;
+
+	void EventTimeoutLfgInviter();
+
 protected:
 	void _UpdateSkillFields();
     
@@ -748,6 +754,7 @@ public:
 	void RemoveSpellTargets(uint32 Type);
 	void RemoveSpellIndexReferences(uint32 Type);
 	void SetSpellTargetType(uint32 Type, Unit* target);
+	void SendMeetingStoneQueue(uint32 DungeonId, uint8 Status);
 
 	void AddToWorld();
 	void AddToWorld(MapMgr * pMapMgr);
@@ -1479,6 +1486,8 @@ public:
 	std::string Lfgcomment;
 	uint16 LfgDungeonId[3];
 	uint8 LfgType[3];
+	uint16 LfmDungeonId;
+	uint8 LfmType;
 	bool m_Autojoin;
 	bool m_AutoAddMem;
 	void StopMirrorTimer(uint32 Type);

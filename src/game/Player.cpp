@@ -108,8 +108,10 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 		LfgDungeonId[i]=0;
 	}
 	
-	m_Autojoin = true;
+	m_Autojoin = false;
 	m_AutoAddMem = false;
+	LfmDungeonId=0;
+	LfmType=0;
 
 	m_invitersGuid		  = 0;
 
@@ -380,6 +382,8 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_CurrentTaxiPath=NULL;
 	m_setflycheat = false;
 	m_fallDisabledUntil = 0;
+	m_lfgMatch = NULL;
+	m_lfgInviterGuid = 0;
 	this->OnLogin();
 }
 
@@ -9505,4 +9509,11 @@ void Player::CopyAndSendDelayedPacket(WorldPacket * data)
 {
 	WorldPacket * data2 = new WorldPacket(*data);
 	delayedPackets.add(data2);
+}
+
+void Player::SendMeetingStoneQueue(uint32 DungeonId, uint8 Status)
+{
+	WorldPacket data(SMSG_MEETINGSTONE_SETQUEUE, 5);
+	data << DungeonId << Status;
+	m_session->SendPacket(&data);
 }
