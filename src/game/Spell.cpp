@@ -1621,7 +1621,7 @@ void Spell::finish()
 	{
 		u_caster->m_canMove = true;
 		// mana           channeled                                                     power type is mana
-		if(m_usesMana && (m_spellInfo->ChannelInterruptFlags != 0 && !m_triggeredSpell) && u_caster->GetPowerType()==POWER_TYPE_MANA)
+		if(m_usesMana && (m_spellInfo->ChannelInterruptFlags == 0 && !m_triggeredSpell) && u_caster->GetPowerType()==POWER_TYPE_MANA)
 		{
 			/*
 			Five Second Rule
