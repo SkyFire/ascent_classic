@@ -288,9 +288,14 @@ struct CharacterLoaderThread : public ThreadBase
 {
 #ifdef WIN32
 	HANDLE hEvent;
+#else
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
 #endif
 	bool running;
 public:
+	CharacterLoaderThread();
+	~CharacterLoaderThread();
 	void OnShutdown();
 	bool run();
 };

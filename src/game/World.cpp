@@ -4923,8 +4923,25 @@ struct insert_playeritem
 void CharacterLoaderThread::OnShutdown()
 {
 #ifdef WIN32
-	running=false;
 	SetEvent(hEvent);
+#else
+	printf("CharacterLoaderThread::OnShutdown()\n");
+	pthread_cond_signal(&cond);
+#endif
+
+	running=false;
+}
+
+CharacterLoaderThread::CharacterLoaderThread()
+{
+
+}
+
+CharacterLoaderThread::~CharacterLoaderThread()
+{
+#ifdef WIN32
+	CloseHandle(hEvent);
+#else
 #endif
 }
 
@@ -4933,9 +4950,13 @@ bool CharacterLoaderThread::run()
 #ifdef WIN32
 	hEvent = CreateEvent(NULL,FALSE,FALSE,NULL);
 #else
-	struct timeval tv;
-	tv.tv_usec=0;
+	struct timespec tv;
+	tv.tv_nsec=0;
 	tv.tv_sec = LOAD_THREAD_SLEEP;
+
+	pthread_mutex_init(&mutex,NULL);
+	pthread_cond_init(&cond,NULL);
+
 #endif
 
 	for(;;)
@@ -4948,7 +4969,9 @@ bool CharacterLoaderThread::run()
 #ifdef WIN32
 		WaitForSingleObject(hEvent,LOAD_THREAD_SLEEP*1000);
 #else
-		select(0,NULL,NULL,NULL,&tv);
+		//Sleep(LOAD_THREAD_SLEEP*1000);
+		pthread_cond_timedwait(&cond, &mutex, &tv);
+		printf("exiting CharacterLoaderThread? running = %u\n", running);
 #endif
 		if(!running)
 			break;
