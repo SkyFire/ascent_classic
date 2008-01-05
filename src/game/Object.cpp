@@ -2233,7 +2233,11 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	uint32 ms_abs_dmg= pVictim->ManaShieldAbsorb(ress);
 	if (ms_abs_dmg)
 	{
-		ress-=ms_abs_dmg;
+		if(ms_abs_dmg > ress)
+			ress = 0;
+		else
+			ress-=ms_abs_dmg;
+
 		abs_dmg += ms_abs_dmg;
 	}
 
@@ -2242,19 +2246,26 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	dmg.school_type = school;
 	dmg.full_damage = ress;
 	dmg.resisted_damage = 0;
+	
+	// can't resist if theres no damage.abs_dmg
 	if(res <= 0)
+	{
 		dmg.resisted_damage = dmg.full_damage = 1;
-//------------------------------resistance reducing-----------------------------------------	
-	if(this->IsUnit())
-	{
-		static_cast<Unit*>(this)->CalculateResistanceReduction(pVictim,&dmg);
-		res = float(dmg.full_damage - dmg.resisted_damage);
-	}
-//------------------------------special states----------------------------------------------
-	if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pVictim)->GodModeCheat == true)
-	{
-		res = float(dmg.full_damage);
-		dmg.resisted_damage = dmg.full_damage;
+	//------------------------------resistance reducing-----------------------------------------	
+		if(this->IsUnit())
+		{
+			static_cast<Unit*>(this)->CalculateResistanceReduction(pVictim,&dmg);
+			if((int32)dmg.resisted_damage > dmg.full_damage)
+				res = 0;
+			else
+                res = float(dmg.full_damage - dmg.resisted_damage);
+		}
+	//------------------------------special states----------------------------------------------
+		if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pVictim)->GodModeCheat == true)
+		{
+			res = float(dmg.full_damage);
+			dmg.resisted_damage = dmg.full_damage;
+		}
 	}
 	//DK:FIXME->SplitDamage
 	
