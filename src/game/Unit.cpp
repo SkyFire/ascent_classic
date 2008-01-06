@@ -285,17 +285,19 @@ void Unit::Update( uint32 p_time )
 
 		if(m_interruptedRegenTime != 0)
 		{
-			if(p_time >= m_interruptedRegenTime)
+			if( p_time >= m_interruptedRegenTime )
 				m_interruptedRegenTime = 0;
 			else
 				m_interruptedRegenTime -= p_time;
 
-			RegeneratePower(true);
+			// TODO: this is a temporary fix required more work
+			if( p_time >= m_H_regenTimer )
+				RegeneratePower( true );
 		}
 		else
 		{
-			if(p_time >= m_P_regenTimer)
-				RegeneratePower(false);
+			if( p_time >= m_P_regenTimer )
+				RegeneratePower( false );
 			else
 				m_P_regenTimer -= p_time;
 		}
