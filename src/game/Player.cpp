@@ -7266,7 +7266,7 @@ void Player::BroadcastMessage(const char* Format, ...)
 	m_session->SendPacket(data);
 	delete data;
 }
-
+/*
 const double BaseRating []= {
 	2.5,//weapon_skill_ranged!!!!
 	1.5,//defense=comba_r_1
@@ -7292,11 +7292,12 @@ const double BaseRating []= {
 	2.5,//melee second hand=21
 
 };
-
+*/
 float Player::CalcRating( uint32 index )
 {
 	uint32 relative_index = index - (PLAYER_FIELD_COMBAT_RATING_1);
-	if( relative_index <= 10 || ( relative_index >= 14 && relative_index <= 21 ) )
+	float rating = float(m_uint32Values[index]);
+	/*if( relative_index <= 10 || ( relative_index >= 14 && relative_index <= 21 ) )
 	{
 		double rating = (double)m_uint32Values[index];
 		int level = getLevel();
@@ -7310,7 +7311,17 @@ float Player::CalcRating( uint32 index )
 		return float( rating / ( BaseRating[relative_index] * cost ) );
 	}
 	else
-		return 0.0f;
+		return 0.0f;*/
+
+	uint32 level = m_uint32Values[UNIT_FIELD_LEVEL];
+	if( level > 100 )
+		level = 100;
+
+	CombatRatingDBC * pDBCEntry = dbcCombatRating.LookupEntryForced( relative_index * 100 + level - 1 );
+	if( pDBCEntry == NULL )
+		return rating;
+	else
+		return (rating / pDBCEntry->val);
 }
 
 bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, float X, float Y, float Z, float O)

@@ -824,6 +824,11 @@ struct ItemRandomSuffixEntry
 	uint32 prefixes[3];
 };
 
+struct CombatRatingDBC
+{
+	float val;
+};
+
 #pragma pack(pop)
 
 ASCENT_INLINE float GetRadius(SpellRadius *radius)
@@ -1126,6 +1131,7 @@ extern SERVER_DECL DBCStorage<CharRaceEntry> dbcCharRace;
 extern SERVER_DECL DBCStorage<MapEntry> dbcMap;
 extern SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 extern SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
+extern SERVER_DECL DBCStorage<CombatRatingDBC> dbcCombatRating;
 
 bool LoadDBCs();
 
