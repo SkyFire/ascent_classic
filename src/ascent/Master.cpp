@@ -3,16 +3,16 @@
  * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -176,9 +176,9 @@ bool Master::Run(int argc, char ** argv)
 #endif
 	printf("\nCopyright (C) 2005-2007 Ascent Team. http://www.ascentemu.com/\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY, and is FREE SOFTWARE.\n");
-	printf("You are welcome to redistribute it under the terms of the GNU General\n");
-	printf("Public License, either version 3 or any later version. For a copy of\n");
-	printf("this license, see the COPYING file provided with this distribution.\n");
+	printf("You are welcome to redistribute it under the terms of the GNU Affero\n");
+	printf("General Public License, either version 3 or any later version. For a\n");
+	printf("copy of this license, see the COPYING file provided with this distribution.\n");
 	Log.Line();
 #ifdef REPACK
 	Log.Color(TRED);
