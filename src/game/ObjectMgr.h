@@ -452,7 +452,7 @@ public:
 	Corpse* LoadCorpse(uint32 guid);
 	void LoadCorpses(MapMgr * mgr);
 	void LoadGMTickets();
-	void SaveGMTicket(uint64 guid);
+	void SaveGMTicket(uint64 guid, QueryBuffer * buf);
 	void LoadAuctions();
 	void LoadAuctionItems();
 	void LoadSpellSkills();

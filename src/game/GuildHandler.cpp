@@ -1399,7 +1399,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 				pSourceItem2 = pDestItem;
 
 				pSourceItem2->ModUInt32Value(ITEM_FIELD_STACK_COUNT, -(int32)deposit_stack);
-				pSourceItem2->SaveToDB(0,0,true);
+				pSourceItem2->SaveToDB(0,0,true, NULL);
 
 				pDestItem = objmgr.CreateItem(pSourceItem2->GetEntry(), _player);
 				pDestItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, deposit_stack);
@@ -1423,7 +1423,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			/* remove the item's association with the player */
 			pSourceItem->SetOwner(NULL);
 			pSourceItem->SetUInt32Value(ITEM_FIELD_OWNER, 0);
-			pSourceItem->SaveToDB(0, 0, true);
+			pSourceItem->SaveToDB(0, 0, true, NULL);
 
 			/* log it */
 			pGuild->LogGuildBankAction(GUILD_BANK_LOG_EVENT_DEPOSIT_ITEM, _player->GetGUIDLow(), pSourceItem->GetEntry(), 
@@ -1441,7 +1441,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			/* the guild was robbed by some n00b! :O */
 			pDestItem->SetOwner(_player);
 			pDestItem->SetUInt32Value(ITEM_FIELD_OWNER, _player->GetGUIDLow());
-			pDestItem->SaveToDB(source_bagslot, source_slot, true);
+			pDestItem->SaveToDB(source_bagslot, source_slot, true, NULL);
 
 			/* add it to him in game */
 			if(!_player->GetItemInterface()->SafeAddItem(pDestItem, source_bagslot, source_slot))

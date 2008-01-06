@@ -59,7 +59,7 @@ public:
 	
 	//! DB Serialization
 	void LoadFromDB(Field *fields, Player* plr, bool light);
-	void SaveToDB(int8 containerslot, int8 slot, bool firstsave = false);
+	void SaveToDB(int8 containerslot, int8 slot, bool firstsave, QueryBuffer * buf);
 	bool LoadAuctionItemFromDB(uint64 guid);
 	void DeleteFromDB();
 	

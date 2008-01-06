@@ -2420,7 +2420,7 @@ void ItemInterface::mLoadItemsFromDatabase(QueryResult * result)
 //-------------------------------------------------------------------//
 //Description: Item saving
 //-------------------------------------------------------------------//
-void ItemInterface::mSaveItemsToDatabase(bool first)
+void ItemInterface::mSaveItemsToDatabase(bool first, QueryBuffer * buf)
 {
 	uint32 x;
 
@@ -2434,11 +2434,11 @@ void ItemInterface::mSaveItemsToDatabase(bool first)
 				{
 					if( IsBagSlot( x ) && GetInventoryItem( x )->IsContainer() )
 					{
-						static_cast< Container* >( GetInventoryItem( x ) )->SaveBagToDB( x, first );
+						static_cast< Container* >( GetInventoryItem( x ) )->SaveBagToDB( x, first, buf );
 					}
 					else
 					{
-						GetInventoryItem( x )->SaveToDB( INVENTORY_SLOT_NOT_SET, x, first );
+						GetInventoryItem( x )->SaveToDB( INVENTORY_SLOT_NOT_SET, x, first, buf );
 					}
 				}
 			}

@@ -54,6 +54,16 @@ public:
 	ASCENT_INLINE void SetDB(Database * dbb) { db = dbb; }
 };
 
+class SERVER_DECL QueryBuffer
+{
+	vector<char*> queries;
+public:
+	friend class Database;
+	void AddQuery( const char * format, ... );
+	void AddQueryNA( const char * str );
+	void AddQueryStr(const string& str);
+};
+
 class SERVER_DECL Database : public CThread
 {
 	friend class QueryThread;
@@ -94,6 +104,9 @@ public:
 
 	MysqlCon * GetFreeConnection();
 
+	void PerformQueryBuffer(QueryBuffer * b);
+	void AddQueryBuffer(QueryBuffer * b);
+
 protected:
 
 	bool Connect(MysqlCon * con);
@@ -104,7 +117,8 @@ protected:
 	bool SendQuery(MysqlCon *con, const char* Sql, bool Self = false);
 
 	////////////////////////////////
-	FQueue<AsyncQuery*> qqueries_queue;
+	//FQueue<AsyncQuery*> qqueries_queue;
+	FQueue<QueryBuffer*> query_buffer;
 
 	////////////////////////////////
 	FQueue<char*> queries_queue;

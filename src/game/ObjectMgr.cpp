@@ -588,7 +588,7 @@ void ObjectMgr::LoadGMTickets()
 	delete result;
 }
 
-void ObjectMgr::SaveGMTicket(uint64 guid)
+void ObjectMgr::SaveGMTicket(uint64 guid, QueryBuffer * buf)
 {
 	GM_Ticket* ticket = GetGMTicket(guid);
 	if(!ticket)
@@ -599,7 +599,10 @@ void ObjectMgr::SaveGMTicket(uint64 guid)
 	std::stringstream ss1;
 	std::stringstream ss2;
 	ss1 << "DELETE FROM gm_tickets WHERE guid = " << guid << ";";
-	CharacterDatabase.Execute(ss1.str( ).c_str( ));
+	if( buf == NULL )
+		CharacterDatabase.Execute(ss1.str( ).c_str( ));
+	else
+		buf->AddQueryStr(ss1.str());
 
 	ss2 << "INSERT INTO gm_tickets (guid, name, level, type, posX, posY, posZ, message, timestamp) VALUES(";
 	ss2 << ticket->guid << ", '";
@@ -611,7 +614,11 @@ void ObjectMgr::SaveGMTicket(uint64 guid)
 	ss2 << ticket->posZ << ", '";
 	ss2 << CharacterDatabase.EscapeString(ticket->message) << "', ";
 	ss2 << ticket->timestamp << ");";
-	CharacterDatabase.Execute(ss2.str( ).c_str( ));
+
+	if(buf == NULL)
+		CharacterDatabase.Execute(ss2.str( ).c_str( ));
+	else
+		buf->AddQueryStr(ss2.str());
 }
 
 void ObjectMgr::SetHighestGuids()
@@ -969,7 +976,7 @@ void ObjectMgr::AddGMTicket(GM_Ticket *ticket,bool startup)
 
 	// save
 	if(!startup)
-		SaveGMTicket(ticket->guid);
+		SaveGMTicket(ticket->guid, NULL);
 }
 
 //modified for vs2005 compatibility

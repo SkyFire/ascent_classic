@@ -58,7 +58,7 @@ public:
 	void m_DestroyForPlayer();
 
 	void mLoadItemsFromDatabase(QueryResult * result);
-	void mSaveItemsToDatabase(bool first);
+	void mSaveItemsToDatabase(bool first, QueryBuffer * buf);
 
 	Item *GetInventoryItem(int8 slot);
 	Item *GetInventoryItem(int8 ContainerSlot, int8 slot);

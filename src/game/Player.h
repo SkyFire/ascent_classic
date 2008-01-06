@@ -1760,20 +1760,20 @@ protected:
 	/* End update system */
 
 	void _LoadTutorials(QueryResult * result);
-	void _SaveTutorials();
+	void _SaveTutorials(QueryBuffer * buf);
 	void _SaveInventory(bool firstsave);
-	void _SaveQuestLogEntry();
+	void _SaveQuestLogEntry(QueryBuffer * buf);
 	void _LoadQuestLogEntry(QueryResult * result);
 
 	// DK
 	void _LoadPet(QueryResult * result);
 	void _LoadPetNo();
 	void _LoadPetSpells(QueryResult * result);
-	void _SavePet();
-	void _SavePetSpells();
-	void _SaveItemCooldown();
+	void _SavePet(QueryBuffer * buf);
+	void _SavePetSpells(QueryBuffer * buf);
+	void _SaveItemCooldown(QueryBuffer * buf);
 	void _LoadItemCooldown(QueryResult * result);
-	void _SaveSpellCoolDownSecurity();
+	void _SaveSpellCoolDownSecurity(QueryBuffer * buf);
 	void _LoadSpellCoolDownSecurity( QueryResult* result );
 	void _ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedown = false, bool skip_stat_apply = false );
 	void _EventAttack( bool offhand );

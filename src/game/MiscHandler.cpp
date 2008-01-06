@@ -1836,7 +1836,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket &recv_data)
 		}
 
 		pItem->m_isDirty=true;
-		pItem->SaveToDB(containerslot,slot);
+		pItem->SaveToDB(containerslot,slot, false, NULL);
 		return;
 	}
 

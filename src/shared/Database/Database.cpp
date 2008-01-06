@@ -22,6 +22,8 @@
 #include "../CrashHandler.h"
 #include "../NGLog.h"
 
+#define ENABLE_INNODB
+
 SQLCallbackBase::~SQLCallbackBase()
 {
 
@@ -353,6 +355,63 @@ void Database::FWaitExecute(const char * QueryString, MysqlCon * con)
 	SendQuery(con, QueryString, false);
 }
 
+void QueryBuffer::AddQuery(const char * format, ...)
+{
+	char query[16384];
+	va_list vlist;
+	va_start(vlist, format);
+	vsnprintf(query, 16384, format, vlist);
+	va_end(vlist);
+
+	size_t len = strlen(query);
+	char * pBuffer = new char[len+1];
+	memcpy(pBuffer, query, len + 1);
+
+	queries.push_back(pBuffer);
+}
+
+void QueryBuffer::AddQueryNA( const char * str )
+{
+	size_t len = strlen(str);
+	char * pBuffer = new char[len+1];
+	memcpy(pBuffer, str, len + 1);
+
+	queries.push_back(pBuffer);
+}
+
+void QueryBuffer::AddQueryStr(const string& str)
+{
+	size_t len = str.size();
+	char * pBuffer = new char[len+1];
+	memcpy(pBuffer, str.c_str(), len + 1);
+
+	queries.push_back(pBuffer);
+}
+
+void Database::PerformQueryBuffer(QueryBuffer * b)
+{
+	if(!b->queries.size())
+		return;
+
+    MysqlCon * con = GetFreeConnection();
+	
+#ifdef ENABLE_INNODB
+	/* whee, transactions */
+	SendQuery(con, "START TRANSACTION", false);
+#endif
+
+	for(vector<char*>::iterator itr = b->queries.begin(); itr != b->queries.end(); ++itr)
+	{
+		SendQuery(con, *itr, false);
+		delete [] (*itr);
+	}
+
+#ifdef ENABLE_INNODB
+	/* whee, transactions */
+	SendQuery(con, "COMMIT", false);
+#endif
+}
+
 bool Database::Execute(const char* QueryString, ...)
 {
 	char query[16384];
@@ -414,17 +473,17 @@ bool Database::run()
 	SetThreadName("MySQL Database Execute Thread");
 	SetThreadState(THREADSTATE_BUSY);
 	char * query = queries_queue.pop();
+	MysqlCon * con=GetFreeConnection();
 	while(query)
 	{
-		MysqlCon * con=GetFreeConnection();
 		SendQuery(con,query);
-		con->busy.Release();
 		delete [] query;
 		if(ThreadState == THREADSTATE_TERMINATE)
 			break;
 
 		query = queries_queue.pop();
 	}
+	con->busy.Release();
 
 	if(queries_queue.get_size() > 0)
 	{
@@ -515,8 +574,8 @@ void Database::EndThreads()
 	SetThreadState(THREADSTATE_TERMINATE);
 	while(ThreadRunning || qt)
 	{
-		if(qqueries_queue.get_size() == 0)
-			qqueries_queue.GetCond().Broadcast();
+		if(query_buffer.get_size() == 0)
+			query_buffer.GetCond().Broadcast();
 	
 		if(queries_queue.get_size() == 0)
 			queries_queue.GetCond().Broadcast();
@@ -529,9 +588,9 @@ void Database::EndThreads()
 	}
 }
 
-bool QueryThread::run()
+bool QueryThread::run( )
 {
-	db->thread_proc_query();
+	db->thread_proc_query( );
 	return true;
 }
 
@@ -542,25 +601,28 @@ QueryThread::~QueryThread()
 
 void Database::thread_proc_query()
 {
-	AsyncQuery * q;
+	QueryBuffer * q;
 
-	q = qqueries_queue.pop();
-	while(q)
+	q = query_buffer.pop( );
+	while( q != NULL )
 	{
-		q->Perform();
+		PerformQueryBuffer(q);
+		delete q;
 
-		if(ThreadState == THREADSTATE_TERMINATE)
+		if( ThreadState == THREADSTATE_TERMINATE )
 			break;
 
-		q = qqueries_queue.pop();
+		q = query_buffer.pop( );
 	}
 
 	// kill any queries
-	q = qqueries_queue.pop_nowait();
-	while(q)
+	q = query_buffer.pop_nowait( );
+	while( q != NULL )
 	{
+		PerformQueryBuffer( q );
 		delete q;
-		q = qqueries_queue.pop_nowait();
+
+		q = query_buffer.pop_nowait( );
 	}
 }
 
@@ -575,6 +637,17 @@ void Database::QueueAsyncQuery(AsyncQuery * query)
 
 	qqueries_queue.push(query);*/
 	query->Perform();
+}
+
+void Database::AddQueryBuffer(QueryBuffer * b)
+{
+	if( qt != NULL )
+		query_buffer.push( b );
+	else
+	{
+		PerformQueryBuffer( b );
+		delete b;
+	}
 }
 
 void Database::FreeQueryResult(QueryResult * p)

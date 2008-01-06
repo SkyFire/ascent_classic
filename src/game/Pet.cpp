@@ -631,7 +631,7 @@ void Pet::Remove(bool bSafeDelete, bool bUpdate, bool bSetOffline)
 			if(!bExpires) 
 				UpdatePetInfo(bSetOffline);
 			if(!IsSummon())
-				m_Owner->_SavePet();//not perfect but working
+				m_Owner->_SavePet(NULL);//not perfect but working
 		}
 		m_Owner->SetSummon(NULL);
 		SendNullSpellsToOwner();

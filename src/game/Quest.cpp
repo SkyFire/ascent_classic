@@ -208,7 +208,7 @@ bool QuestLogEntry::IsUnitAffected(Unit* target)
 	return false;
 }
 
-void QuestLogEntry::SaveToDB()
+void QuestLogEntry::SaveToDB(QueryBuffer * buf)
 {
 	ASSERT(m_slot != -1);
 	if(!mDirty)
@@ -226,7 +226,10 @@ void QuestLogEntry::SaveToDB()
 
 	ss << ")";
 	
-	CharacterDatabase.Execute(ss.str().c_str());
+	if(buf == NULL)
+		CharacterDatabase.Execute(ss.str().c_str());
+	else
+		buf->AddQueryStr(ss.str());
 }
 
 bool QuestLogEntry::LoadFromDB(Field *fields)

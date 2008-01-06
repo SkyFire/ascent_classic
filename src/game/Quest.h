@@ -211,7 +211,7 @@ public:
 
 	bool CanBeFinished();
 	void SubtractTime(uint32 value);
-	void SaveToDB();
+	void SaveToDB(QueryBuffer * buf);
 	bool LoadFromDB(Field *fields);
 	void UpdatePlayerFields();
 

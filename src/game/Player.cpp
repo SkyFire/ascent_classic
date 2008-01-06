@@ -1496,14 +1496,17 @@ void Player::smsg_InitialSpells()
 
 /* Saves ItemCooldowns
    checks for invalid items and deletes them from the list and don't save them */
-void Player::_SaveItemCooldown()
+void Player::_SaveItemCooldown(QueryBuffer * buf)
 {
 	if(CooldownCheat) return;
 	// if we have nothing to save why save?
 	if (m_itemcooldown.size() == 0)
 		return;
 
-	CharacterDatabase.Execute("DELETE FROM playercooldownitems WHERE OwnerGuid = %u", GetGUIDLow() );
+	if(buf == NULL)
+		CharacterDatabase.Execute("DELETE FROM playercooldownitems WHERE OwnerGuid = %u", GetGUIDLow() );
+	else
+		buf->AddQuery("DELETE FROM playercooldownitems WHERE OwnerGuid = %u", GetGUIDLow() );
 
 	uint32 entrys_to_insert=0;
 	std::stringstream query;
@@ -1534,17 +1537,25 @@ void Player::_SaveItemCooldown()
 	}
 	//only execute if we have entrys to insert
 	if(entrys_to_insert)
-		CharacterDatabase.ExecuteNA( query.str().c_str() );
+	{
+		if(buf == NULL)
+			CharacterDatabase.ExecuteNA( query.str().c_str() );
+		else
+			buf->AddQueryStr(query.str());
+	}
 }
 
-void Player::_SaveSpellCoolDownSecurity()
+void Player::_SaveSpellCoolDownSecurity(QueryBuffer * buf)
 {
 	if(CooldownCheat) return;
 	// if we have nothing to save, then why save?
 	if (SpellCooldownMap.size() == 0)
 		return;
 
-	CharacterDatabase.Execute("DELETE FROM playercooldownsecurity WHERE OwnerGuid = %u", GetGUIDLow() );
+	if(buf == NULL)
+		CharacterDatabase.Execute("DELETE FROM playercooldownsecurity WHERE OwnerGuid = %u", GetGUIDLow() );
+	else
+		buf->AddQuery("DELETE FROM playercooldownsecurity WHERE OwnerGuid = %u", GetGUIDLow() );
 
 	SpellCooldownHolderMap::iterator itr, it2, itrend;
 
@@ -1576,13 +1587,21 @@ void Player::_SaveSpellCoolDownSecurity()
 		hascooldowns++;
 	}
 	if(hascooldowns)
-		CharacterDatabase.ExecuteNA( query.str().c_str( ) );
+	{
+		if(buf == NULL)
+			CharacterDatabase.ExecuteNA( query.str().c_str( ) );
+		else
+			buf->AddQueryStr(query.str());
+	}
 }
 
-void Player::_SavePet()
+void Player::_SavePet(QueryBuffer * buf)
 {
 	// Remove any existing info
-	CharacterDatabase.Execute("DELETE FROM playerpets WHERE ownerguid=%u", GetGUIDLow());
+	if(buf == NULL)
+		CharacterDatabase.Execute("DELETE FROM playerpets WHERE ownerguid=%u", GetGUIDLow());
+	else
+		buf->AddQuery("DELETE FROM playerpets WHERE ownerguid=%u", GetGUIDLow());
 
 	if(m_Summon&&m_Summon->IsInWorld()&&m_Summon->GetPetOwner()==this)	// update PlayerPets array with current pet's info
 	{
@@ -1596,11 +1615,17 @@ void Player::_SavePet()
 			// save pet spellz
 			PetSpellMap::iterator itr = m_Summon->mSpells.begin();
 			uint32 pn = m_Summon->m_PetNumber;
-			CharacterDatabase.Execute("DELETE FROM playerpetspells WHERE petnumber=%u", pn);
+			if(buf == NULL)
+				CharacterDatabase.Execute("DELETE FROM playerpetspells WHERE petnumber=%u", pn);
+			else
+				buf->AddQuery("DELETE FROM playerpetspells WHERE petnumber=%u", pn);
 
 			for(; itr != m_Summon->mSpells.end(); ++itr)
 			{
-				CharacterDatabase.Execute("INSERT INTO playerpetspells VALUES(%u, %u, %u, %u)", GetGUIDLow(), pn, itr->first->Id, itr->second);
+				if(buf == NULL)
+					CharacterDatabase.Execute("INSERT INTO playerpetspells VALUES(%u, %u, %u, %u)", GetGUIDLow(), pn, itr->first->Id, itr->second);
+				else
+					buf->AddQuery("INSERT INTO playerpetspells VALUES(%u, %u, %u, %u)", GetGUIDLow(), pn, itr->first->Id, itr->second);
 			}
 		}
 	}
@@ -1626,14 +1651,20 @@ void Player::_SavePet()
 			<< itr->second->loyaltypts << "','"
 			<< itr->second->loyaltyupdate << "')";
 			
-		CharacterDatabase.ExecuteNA(ss.str().c_str());
+		if(buf == NULL)
+			CharacterDatabase.ExecuteNA(ss.str().c_str());
+		else
+			buf->AddQueryStr(ss.str());
 	}
 }
 
-void Player::_SavePetSpells()
+void Player::_SavePetSpells(QueryBuffer * buf)
 {	
 	// Remove any existing
-	CharacterDatabase.Execute("DELETE FROM playersummonspells WHERE ownerguid=%u", GetGUIDLow());
+	if(buf == NULL)
+		CharacterDatabase.Execute("DELETE FROM playersummonspells WHERE ownerguid=%u", GetGUIDLow());
+	else
+		buf->AddQuery("DELETE FROM playersummonspells WHERE ownerguid=%u", GetGUIDLow());
 
 	// Save summon spells
 	map<uint32, set<uint32> >::iterator itr = SummonSpells.begin();
@@ -1642,7 +1673,10 @@ void Player::_SavePetSpells()
 		set<uint32>::iterator it = itr->second.begin();
 		for(; it != itr->second.end(); ++it)
 		{
-			CharacterDatabase.Execute("INSERT INTO playersummonspells VALUES(%u, %u, %u)", GetGUIDLow(), itr->first, (*it));
+			if(buf == NULL)
+				CharacterDatabase.Execute("INSERT INTO playersummonspells VALUES(%u, %u, %u)", GetGUIDLow(), itr->first, (*it));
+			else
+				buf->AddQuery("INSERT INTO playersummonspells VALUES(%u, %u, %u)", GetGUIDLow(), itr->first, (*it));
 		}
 	}
 }
@@ -2001,6 +2035,10 @@ void Player::DestroyForPlayer( Player *target ) const
 
 void Player::SaveToDB(bool bNewCharacter /* =false */)
 {
+	QueryBuffer * buf = NULL;
+	if(!bNewCharacter)
+		buf = new QueryBuffer;
+
 	if(m_uint32Values[PLAYER_CHARACTER_POINTS2]>2)
 		m_uint32Values[PLAYER_CHARACTER_POINTS2]=2;
  
@@ -2219,48 +2257,56 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	if(bNewCharacter)
 		CharacterDatabase.WaitExecuteNA(ss.str().c_str());
 	else
-		CharacterDatabase.ExecuteNA( ss.str().c_str() );
+		buf->AddQueryStr(ss.str());
 
 	//Save Other related player stuff
 
 	// Inventory
-	 GetItemInterface()->mSaveItemsToDatabase(bNewCharacter);
+	 GetItemInterface()->mSaveItemsToDatabase(bNewCharacter, buf);
 
 	// save quest progress
-	_SaveQuestLogEntry();
+	_SaveQuestLogEntry(buf);
 
 	// Tutorials
-	_SaveTutorials();
+	_SaveTutorials(buf);
 
 	// GM Ticket
-	objmgr.SaveGMTicket(GetGUID());
+	objmgr.SaveGMTicket(GetGUID(), buf);
 
 	// Cooldown Items
-	_SaveItemCooldown();
+	_SaveItemCooldown(buf);
 
 	// Spell Cooldowns security
-	_SaveSpellCoolDownSecurity();
+	_SaveSpellCoolDownSecurity(buf);
 	
 	// Pets
 	if(getClass() == HUNTER || getClass() == WARLOCK)
 	{
-		_SavePet();
-		_SavePetSpells();
+		_SavePet(buf);
+		_SavePetSpells(buf);
 	}
 	m_nextSave = getMSTime() + sWorld.getIntRate(INTRATE_SAVE);
+
+	if(buf)
+		CharacterDatabase.AddQueryBuffer(buf);
 }
 
-void Player::_SaveQuestLogEntry()
+void Player::_SaveQuestLogEntry(QueryBuffer * buf)
 {
 	for(std::set<uint32>::iterator itr = m_removequests.begin(); itr != m_removequests.end(); ++itr)
-		CharacterDatabase.Execute("DELETE FROM questlog WHERE player_guid=%u AND quest_id=%u", GetGUIDLow(), (*itr));
+	{
+		if(buf == NULL)
+			CharacterDatabase.Execute("DELETE FROM questlog WHERE player_guid=%u AND quest_id=%u", GetGUIDLow(), (*itr));
+		else
+			buf->AddQuery("DELETE FROM questlog WHERE player_guid=%u AND quest_id=%u", GetGUIDLow(), (*itr));
+	}
 
 	m_removequests.clear();
 
 	for(int i = 0; i < 25; ++i)
 	{
 		if(m_questlog[i] != NULL)
-			m_questlog[i]->SaveToDB();
+			m_questlog[i]->SaveToDB(buf);
 	}
 }
 
@@ -4195,11 +4241,15 @@ void Player::_LoadTutorials(QueryResult * result)
 	tutorialsDirty = false;
 }
 
-void Player::_SaveTutorials()
+void Player::_SaveTutorials(QueryBuffer * buf)
 {
 	if(tutorialsDirty)
 	{
-		CharacterDatabase.Execute("REPLACE INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+		if(buf == NULL)
+			CharacterDatabase.Execute("REPLACE INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+		else
+			buf->AddQuery("REPLACE INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+
 		tutorialsDirty = false;
 	}
 }

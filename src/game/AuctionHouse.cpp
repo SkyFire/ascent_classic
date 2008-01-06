@@ -500,7 +500,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 
 	pItem->RemoveFromWorld();
 	pItem->SetOwner(0);
-	pItem->SaveToDB(INVENTORY_SLOT_NOT_SET, 0, true);
+	pItem->SaveToDB(INVENTORY_SLOT_NOT_SET, 0, false, NULL);
 
 	// Create auction
 	Auction * auct = new Auction;

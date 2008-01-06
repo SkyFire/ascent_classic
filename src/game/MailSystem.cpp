@@ -422,7 +422,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 		// Save the item with no owner (to objectmgr)
 		attached_item->RemoveFromWorld();
 		attached_item->SetOwner( NULL );
-		attached_item->SaveToDB( INVENTORY_SLOT_NOT_SET, 0, true );
+		attached_item->SaveToDB( INVENTORY_SLOT_NOT_SET, 0, true, NULL );
 
 		// Cut out the high part of the attached item.
 		msg.attached_item_guid = attached_item->GetGUID();

@@ -1919,6 +1919,6 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 
 	// save it
 	dst->m_isDirty = true;
-	dst->SaveToDB( destitem_bagslot, destitem_slot );
+	dst->SaveToDB( destitem_bagslot, destitem_slot, false, NULL );
 }
 

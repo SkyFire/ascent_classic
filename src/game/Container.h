@@ -47,7 +47,7 @@ public:
 	Item *SafeRemoveAndRetreiveItemFromSlot(int8 slot, bool destroy); //doesnt destroy item from memory
 	bool SafeFullRemoveItemFromSlot(int8 slot); //destroys item fully
    
-	void SaveBagToDB(int8 slot, bool first);
+	void SaveBagToDB(int8 slot, bool first, QueryBuffer * buf);
 
 protected:
 	Item **m_Slot;

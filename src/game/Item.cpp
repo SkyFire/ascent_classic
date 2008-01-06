@@ -262,7 +262,7 @@ void Item::ApplyRandomProperties(bool apply)
 	}
 }
 
-void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
+void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave, QueryBuffer * buf)
 {
 	if(!m_isDirty && !firstsave)
 		return;
@@ -324,7 +324,12 @@ void Item::SaveToDB(int8 containerslot, int8 slot, bool firstsave)
 	if(firstsave)
 		CharacterDatabase.WaitExecute(ss.str().c_str());
 	else
-		CharacterDatabase.Execute( ss.str().c_str());
+	{
+		if(buf == NULL)
+			CharacterDatabase.Execute( ss.str().c_str());
+		else
+			buf->AddQueryStr(ss.str());
+	}
 
 	m_isDirty = false;
 }
