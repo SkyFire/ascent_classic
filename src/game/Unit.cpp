@@ -595,46 +595,60 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 			uint32 proc_Chance = itr2->procChance;
 
 			SpellEntry* spe  = dbcSpell.LookupEntry(spellId);
+
 			//Custom procchance modifications based on equipped weapon speed.
-			if(this->IsPlayer()&&spe&&(spe->NameHash == 0xCFBFA2DA || 
-								  		   spe->NameHash == 0x37AA84E3 || 
-										   spe->NameHash == 0xF144ECC0 ||
-										   spellId == 16870))
+			if( this->IsPlayer() && spe != NULL && (
+				spe->NameHash == SPELL_HASH_MAGTHERIDON_MELEE_TRINKET || 
+				spe->NameHash == SPELL_HASH_ROMULO_S_POISON || 
+				spe->NameHash == SPELL_HASH_BLACK_TEMPLE_MELEE_TRINKET || spellId == 16870))
 			{
-				float ppm = 1.0;
-				switch(spe->NameHash)
+				float ppm = 1.0f;
+				switch( spe->NameHash )
 				{
-					case 0xCFBFA2DA: ppm = 1.5; break; // dragonspine trophy
-					case 0x37AA84E3: ppm = 1.5; break; // romulo's
-					case 0xF144ECC0: ppm = 1.0; break; // madness of the betrayer
+					case SPELL_HASH_MAGTHERIDON_MELEE_TRINKET:
+						ppm = 1.5;
+						break; // dragonspine trophy
+					case SPELL_HASH_ROMULO_S_POISON:
+						ppm = 1.5;
+						break; // romulo's
+					case SPELL_HASH_BLACK_TEMPLE_MELEE_TRINKET:
+						ppm = 1.0;
+						break; // madness of the betrayer
 				}
-				switch(spellId)
+				switch( spellId )
 				{
-					case 16870: ppm=2.0;break; //druid: clearcasting
+					case 16870:
+						ppm = 2.0;
+						break; //druid: clearcasting
 				}
 
-				Item * mh = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-				Item * of = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
-				if (mh && of)
+				Item * mh = static_cast< Player*>( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+				Item * of = static_cast< Player*>( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+				
+				if( mh && of )
 				{
-					float mhs = float(mh->GetProto()->Delay);
-					float ohs = float(of->GetProto()->Delay);
-					proc_Chance = FL2UINT((mhs+ohs)*0.001f*ppm/0.6f);
+					float mhs = float( mh->GetProto()->Delay );
+					float ohs = float( of->GetProto()->Delay );
+					proc_Chance = FL2UINT( ( mhs + ohs ) * 0.001f * ppm / 0.6f );
 				}
-				else if (mh)
+				else if ( mh )
 				{
-					float mhs = float(mh->GetProto()->Delay);
-					proc_Chance = FL2UINT(mhs*0.001f*ppm/0.6f);
+					float mhs = float( mh->GetProto()->Delay );
+					proc_Chance = float2int32( mhs * 0.001f * ppm / 0.6f );
 				}
 				else
 					proc_Chance = 0;
 
-				if (((Player*)this)->IsInFeralForm())
+				if( static_cast< Player*>( this )->IsInFeralForm() )
 				{
-					if (((Player*)this)->GetShapeShift() == FORM_CAT)
+					if( static_cast< Player*>( this )->GetShapeShift() == FORM_CAT )
+					{
 						proc_Chance = FL2UINT(ppm/0.6f);
-					else if (((Player*)this)->GetShapeShift() == FORM_BEAR || ((Player*)this)->GetShapeShift() == FORM_DIREBEAR )
+					}
+					else if( static_cast< Player*>( this )->GetShapeShift() == FORM_BEAR || static_cast< Player*>( this )->GetShapeShift() == FORM_DIREBEAR )
+					{
 						proc_Chance = FL2UINT(ppm/0.24f);
+					}
 				}
 			}
 
@@ -796,7 +810,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if( CastingSpell->NameHash!=0xD3D32C05 && //immolation trap
 									CastingSpell->NameHash!=0xE876878A && //frost trap
 									CastingSpell->NameHash!=0x92253E33 && //shiv
-									CastingSpell->NameHash!=0xCCC8A100 ) //gouge
+									CastingSpell->NameHash!=SPELL_HASH_GOUGE ) //gouge
 									continue;
 						}break;*/
 						// Mage ignite talent only for fire dmg
@@ -813,10 +827,10 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 								if(!CastingSpell)
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=0xD3D32C05 && //backstab
-									CastingSpell->NameHash!=0xE876878A && //sinister strike
-									CastingSpell->NameHash!=0x92253E33 && //shiv
-									CastingSpell->NameHash!=0xCCC8A100 ) //gouge
+								if( CastingSpell->NameHash != 0xD3D32C05 && //backstab
+									CastingSpell->NameHash != 0xE876878A && //sinister strike
+									CastingSpell->NameHash != 0x92253E33 && //shiv
+									CastingSpell->NameHash != SPELL_HASH_GOUGE ) //gouge
 									continue;
 							}break;
 						//warlock - Improved Shadow Bolt
@@ -2693,12 +2707,12 @@ void Unit::smsg_AttackStart(Unit* pVictim)
 
 void Unit::AddAura(Aura *aur)
 {
-	if(m_mapId != 530)
+	if( m_mapId != 530 )
 	{
-		for(uint32 i = 0; i < 3; ++i)
+		for( uint32 i = 0; i < 3; ++i )
 		{
 			// Can't use flying auras in non-outlands.
-			if(aur->GetSpellProto()->EffectApplyAuraName[i] == 208 || aur->GetSpellProto()->EffectApplyAuraName[i] == 207)
+			if( aur->GetSpellProto()->EffectApplyAuraName[i] == 208 || aur->GetSpellProto()->EffectApplyAuraName[i] == 207 )
 			{
 				delete aur;
 				return;
@@ -2706,13 +2720,13 @@ void Unit::AddAura(Aura *aur)
 		}
 	}
 
-	if(aur->GetSpellProto()->School && SchoolImmunityList[aur->GetSpellProto()->School])
+	if( aur->GetSpellProto()->School && SchoolImmunityList[aur->GetSpellProto()->School] )
 	{
 		delete aur;
 		return;
 	}
 
-    if(!aur->IsPassive())
+    if( !aur->IsPassive() )
 	{
 		//uint32 aurName = aur->GetSpellProto()->Name;
 		//uint32 aurRank = aur->GetSpellProto()->Rank;
@@ -2724,17 +2738,19 @@ void Unit::AddAura(Aura *aur)
 
 		SpellEntry * info = aur->GetSpellProto();
 		//uint32 flag3 = aur->GetSpellProto()->Flags3;
+
 		AuraCheckResponse acr;
-		WorldPacket data(21);
+		WorldPacket data( 21 );
 		bool deleteAur = false;
+
 		//check if we already have this aura by this caster -> update duration
-		uint32 f=0;
-		for(uint32 x=0;x<MAX_AURAS;x++)
+		uint32 f = 0;
+		for( uint32 x = 0; x < MAX_AURAS; x++ )
 		{
-			if(m_auras[x])
+			if( m_auras[x] )
 			{
 				// Nasty check for Blood Fury debuff (spell system based on namehashes is bs anyways)
-				if(info->NameHash == 0xDE1C36C8)
+				if( info->NameHash == SPELL_HASH_BLOOD_FURY )
 					continue;
 
 				if(m_auras[x]->GetSpellProto()->Id != aur->GetSpellId())
@@ -3246,7 +3262,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	uint32 school=spellInfo->School;
 
 	/* arcane shot shouldnt be affected by +spell damage, TODO for burlex - replace this with a flag. */
-	if(spellInfo->NameHash == 0xF4D5F002)
+	if( spellInfo->NameHash == SPELL_HASH_ARCANE_SHOT )
 		return 0;
 
 	if(caster->IsPlayer())
@@ -3271,11 +3287,13 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 		if(castaff > 7000) castaff = 7000;
 
 	float dmgdoneaffectperc = castaff / 3500;
-//------------------------------by downranking----------------------------------------------
+
+	//------------------------------by downranking----------------------------------------------
 	//DOT-DD (Moonfire-Immolate-IceLance-Pyroblast)(Hack Fix)
-	float td = float(GetDuration(dbcSpellDuration.LookupEntry(spellInfo->DurationIndex)));
-	if (spellInfo->NameHash == 0x695C4940 || spellInfo->NameHash == 0x3DD5C872 || spellInfo->NameHash == 0xddaf1ac7 || spellInfo->NameHash == 0xCB75E5D1)
-		dmgdoneaffectperc *= float (1.0f - (( td / 15000.0f ) / (( td / 15000.0f ) + dmgdoneaffectperc)));
+
+	float td = float( GetDuration( dbcSpellDuration.LookupEntry( spellInfo->DurationIndex )  ));
+	if( spellInfo->NameHash == SPELL_HASH_MOONFIRE || spellInfo->NameHash == SPELL_HASH_IMMOLATE || spellInfo->NameHash == SPELL_HASH_ICE_LANCE || spellInfo->NameHash == SPELL_HASH_PYROBLAST )
+		dmgdoneaffectperc *= float( 1.0f - ( ( td / 15000.0f ) / ( ( td / 15000.0f ) + dmgdoneaffectperc ) ) );
 
 	if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
 	{

@@ -322,14 +322,14 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			break;
 		case 0x2bc0ae00:	// Incinerate -> Deals x-x extra damage if the target is affected by immolate
 			{
-				if(unitTarget->HasAurasWithNameHash(0x3dd5c872))
+				if( unitTarget->HasAurasWithNameHash( SPELL_HASH_IMMOLATE ) )
 				{
 					// random extra damage
 					uint32 extra_dmg = 111 + (m_spellInfo->RankNumber * 11) + RandomUInt(m_spellInfo->RankNumber * 11);
 					dmg += extra_dmg;
 				}
 			}break;
-		case 0xccc8a100:	// Gouge: turns off your combat
+		case SPELL_HASH_GOUGE:	// Gouge: turns off your combat
 			{
 				if(p_caster)
 				{
@@ -337,7 +337,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					p_caster->smsg_AttackStop(unitTarget);
 				}break;
 			}break;
-		case 0xa757ecfc:	// Maim: turns off your attack
+		case SPELL_HASH_MAIM:	// Maim: turns off your attack
 			{
 				if(p_caster)
 				{
@@ -345,7 +345,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					p_caster->smsg_AttackStop(unitTarget);
 				}break;
 			}break;
-		case 0xF4D5F002: //hunter - arcane shot
+		case SPELL_HASH_ARCANE_SHOT: //hunter - arcane shot
 			{
 				if(u_caster)
 					dmg += float2int32(float(u_caster->GetRAP())*0.15f);
@@ -1110,32 +1110,33 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	}										 
 }
 
-void Spell::SpellEffectTeleportUnits(uint32 i)  // Teleport Units
+void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 {
 	uint32 spellId = m_spellInfo->Id;
 
-	if(!unitTarget) return;
+	if( unitTarget == NULL )
+		return;
 
 	// Try a dummy SpellHandler
-	if(sScriptMgr.CallScriptedDummySpell(spellId, i, this))
+	if( sScriptMgr.CallScriptedDummySpell( spellId, i, this ) )
 		return;
 
 	// Shadowstep
-	if(m_spellInfo->NameHash == 0x068d7654 && p_caster && p_caster->IsInWorld())
+	if( m_spellInfo->NameHash == SPELL_HASH_SHADOWSTEP && p_caster && p_caster->IsInWorld() )
 	{
 		/* this is rather tricky actually. we have to calculate the orientation of the creature/player, and then calculate a little bit of distance behind that. */
 		float ang;
-		if(unitTarget == m_caster)
+		if( unitTarget == m_caster )
 		{
 			/* try to get a selection */
-			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
-			if(!unitTarget)
+			unitTarget = m_caster->GetMapMgr()->GetUnit( p_caster->GetSelection() );
+			if( unitTarget == NULL )
 				return;
 		}
 
-		if(unitTarget->GetTypeId() == TYPEID_UNIT)
+		if( unitTarget->GetTypeId() == TYPEID_UNIT )
 		{
-			if(unitTarget->GetUInt64Value(UNIT_FIELD_TARGET) != 0)
+			if( unitTarget->GetUInt64Value( UNIT_FIELD_TARGET ) != 0 )
 			{
 				/* We're chasing a target. We have to calculate the angle to this target, this is our orientation. */
 				ang = m_caster->calcAngle(m_caster->GetPositionX(), m_caster->GetPositionY(), unitTarget->GetPositionX(), unitTarget->GetPositionY());
@@ -1365,49 +1366,55 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 			}break;
 		case 18562: //druid - swiftmend
 			{
-				if(unitTarget)
+				if( unitTarget )
 				{
-					uint32 new_dmg=0;
+					uint32 new_dmg = 0;
 					//consume rejuvenetaion and regrowth
-					Aura *taura=unitTarget->FindAuraPosByNameHash(0x62AFD7AC); //Regrowth
-					if(taura && taura->GetSpellProto())
+					Aura * taura = unitTarget->FindAuraPosByNameHash( SPELL_HASH_REGROWTH ); //Regrowth
+					if( taura != NULL && taura->GetSpellProto() != NULL)
 					{
-						uint32 amplitude=taura->GetSpellProto()->EffectAmplitude[1]/1000;
-						if(!amplitude)
-							amplitude=3;
+						uint32 amplitude = taura->GetSpellProto()->EffectAmplitude[1] / 1000;
+						if( !amplitude )
+							amplitude = 3;
+
 						//our hapiness is that we did not store the aura mod amount so we have to recalc it
-						Spell *spell = new Spell(m_caster, taura->GetSpellProto() ,false, NULL);				
-						uint32 healamount = spell->CalculateEffect(1,unitTarget);  
+						Spell *spell = new Spell( m_caster, taura->GetSpellProto(), false, NULL );				
+						uint32 healamount = spell->CalculateEffect( 1, unitTarget );  
 						delete spell;
-						new_dmg = healamount * 18/amplitude;
-						//do not remove flag is we still can cat it again
-						if(!unitTarget->HasAurasWithNameHash(0x431BDB1B))
+						new_dmg = healamount * 18 / amplitude;
+
+						unitTarget->RemoveAura( taura );
+
+						//do not remove flag if we still can cast it again
+						if( !unitTarget->HasAurasWithNameHash( SPELL_HASH_REJUVENATION ) )
 						{
-							unitTarget->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE);	
-							sEventMgr.RemoveEvents(unitTarget,EVENT_REJUVENATION_FLAG_EXPIRE);
+							unitTarget->RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_REJUVENATE );	
+							sEventMgr.RemoveEvents( unitTarget, EVENT_REJUVENATION_FLAG_EXPIRE );
 						}
-						unitTarget->RemoveAura(taura);
 					}
 					else
 					{
-						taura=unitTarget->FindAuraPosByNameHash(0x431BDB1B);//Rejuvenation
-						if(taura && taura->GetSpellProto())
+						taura = unitTarget->FindAuraPosByNameHash( SPELL_HASH_REJUVENATION );//Rejuvenation
+						if( taura != NULL && taura->GetSpellProto() != NULL )
 						{
-							uint32 amplitude=taura->GetSpellProto()->EffectAmplitude[0]/1000;
-							if(!amplitude)
-								amplitude=3;
+							uint32 amplitude = taura->GetSpellProto()->EffectAmplitude[0] / 1000;
+							if( !amplitude )
+								amplitude = 3;
+
 							//our hapiness is that we did not store the aura mod amount so we have to recalc it
-							Spell *spell = new Spell(m_caster, taura->GetSpellProto() ,false, NULL);				
-							uint32 healamount = spell->CalculateEffect(0,unitTarget);  
+							Spell *spell = new Spell( m_caster, taura->GetSpellProto(), false, NULL );				
+							uint32 healamount = spell->CalculateEffect( 0, unitTarget );  
 							delete spell;
-							new_dmg = healamount * 12/amplitude;
-							unitTarget->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE);	
-							sEventMgr.RemoveEvents(unitTarget,EVENT_REJUVENATION_FLAG_EXPIRE);
-							unitTarget->RemoveAura(taura);
+							new_dmg = healamount * 12 / amplitude;
+
+							unitTarget->RemoveAura( taura );
+
+							unitTarget->RemoveFlag( UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE );	
+							sEventMgr.RemoveEvents( unitTarget,EVENT_REJUVENATION_FLAG_EXPIRE );
 						}
 					}
-					if(new_dmg)
-						Heal((int32)new_dmg);
+					if( new_dmg > 0 )
+						Heal( (int32)new_dmg );
 				}
 			}break;
 		default:
@@ -3005,21 +3012,21 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 	}
 }
 
-void Spell::SpellEffectWeapondamage(uint32 i) // Weapon damage +
+void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
 {
-	if(!unitTarget ||!u_caster)
+	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
-	if (m_spellInfo->NameHash == 0xA938E257 && u_caster->IsPlayer()) //Hacky fix for druid - Mangle.
-			static_cast<Player*>(u_caster)->AddComboPoints(unitTarget->GetGUID(),1);
+	if( m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ && u_caster->IsPlayer() ) //Hacky fix for druid - Mangle.
+			static_cast< Player* >( u_caster )->AddComboPoints( unitTarget->GetGUID(), 1 );
 
 	// Hacky fix for druid spells where it would "double attack".
-	if(m_spellInfo->Effect[2] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
+	if( m_spellInfo->Effect[2] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE )
 	{
 		add_damage += damage;
 		return;
 	}
-	u_caster->Strike(unitTarget,GetType(),m_spellInfo,damage,0,0, false,true);
+	u_caster->Strike( unitTarget, GetType(), m_spellInfo, damage, 0, 0, false, true );
 }
 
 void Spell::SpellEffectPowerBurn(uint32 i) // power burn
@@ -4393,9 +4400,9 @@ void Spell::SpellEffectApplyPetAura(uint32 i)
 	SpellEffectApplyAura(i);
 }
 
-void Spell::SpellEffectDummyMelee(uint32 i) // Normalized Weapon damage +
+void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 {
-	if(!unitTarget || !u_caster)
+	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
 	// fix double attack on backstab etc.
@@ -4416,30 +4423,30 @@ void Spell::SpellEffectDummyMelee(uint32 i) // Normalized Weapon damage +
 
 		return;
 	}		*/
-	if(m_spellInfo->NameHash==0x99D86DF4 && p_caster) //warrior : overpower - let us clear the event and the combopoint count
+	if( m_spellInfo->NameHash == SPELL_HASH_OVERPOWER && p_caster != NULL ) //warrior : overpower - let us clear the event and the combopoint count
 	{
 		p_caster->NullComboPoints(); //some say that we should only remove 1 point per dodge. Due to cooldown you can't cast it twice anyway..
-		sEventMgr.RemoveEvents(p_caster,EVENT_COMBO_POINT_CLEAR_FOR_TARGET);
+		sEventMgr.RemoveEvents( p_caster, EVENT_COMBO_POINT_CLEAR_FOR_TARGET );
 	}
 
-	if(m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
+	if( m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE )
 	{
 		add_damage = (uint32)(damage * 1.5);
 		return;
 	}
 
 	//hemorage
-	if(p_caster && m_spellInfo->NameHash==0xc89203f0)
+	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
 		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
 
 	//rogue - mutilate ads dmg if target is poisoned
-	if(	m_spellInfo->NameHash == 0x4637B2D2 && unitTarget->IsPoisoned())
-		damage = damage + float2int32((float)damage*0.5f);
+	if(	m_spellInfo->NameHash == SPELL_HASH_MUTILATE && unitTarget->IsPoisoned() )
+		damage = damage + float2int32( (float)damage * 0.5f );
 
-	u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:0,m_spellInfo,damage,0,0, false,true);
-
+	u_caster->Strike( unitTarget, GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED : 0, m_spellInfo, damage, 0, 0, false, true );
 }
-void Spell::SpellEffectSpellSteal(uint32 i)
+
+void Spell::SpellEffectSpellSteal( uint32 i )
 {
 	if (!unitTarget || !u_caster || !unitTarget->isAlive())
 		return;
@@ -4628,34 +4635,38 @@ void Spell::SpellEffectDismissPet(uint32 i)
 	pPet->Remove(true, true, true);
 }
 
-void Spell::SpellEffectEnchantHeldItem(uint32 i)
+void Spell::SpellEffectEnchantHeldItem( uint32 i )
 {
-	if(!playerTarget) return;
+	if( playerTarget == NULL )
+		return;
 
-	Item * item = playerTarget->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-	if(!item) return;
+	Item * item = playerTarget->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+	if( item == NULL )
+		return;
 
 	uint32 Duration = 1800; // Needs to be found in dbc.. I guess?
-	switch(m_spellInfo->NameHash)
+	switch( m_spellInfo->NameHash )
 	{
-		case 0xABE1EE81: // Windfury Totem Effect
+		case SPELL_HASH_WINDFURY_TOTEM_EFFECT: // Windfury Totem Effect
 		{   
 			Duration = 10;
 		}
 	}
-	EnchantEntry * Enchantment = dbcEnchant.LookupEntry(m_spellInfo->EffectMiscValue[i]);
-	if(!Enchantment) return;
+	EnchantEntry * Enchantment = dbcEnchant.LookupEntry( m_spellInfo->EffectMiscValue[i] );
+	
+	if( Enchantment == NULL )
+		return;
 
-	item->RemoveEnchantment(1);
-	item->AddEnchantment(Enchantment, Duration, false, true, false, 1);
+	item->RemoveEnchantment( 1 );
+	item->AddEnchantment( Enchantment, Duration, false, true, false, 1 );
 }
 
 void Spell::SpellEffectAddHonor(uint32 i)
 {
-	if(!playerTarget)
+	if( playerTarget == NULL )
 		return;
 
-	HonorHandler::AddHonorPointsToPlayer(playerTarget, m_spellInfo->EffectImplicitTargetA[i]);
+	HonorHandler::AddHonorPointsToPlayer( playerTarget, m_spellInfo->EffectImplicitTargetA[i] );
 }
 
 void Spell::SpellEffectSpawn(uint32 i)

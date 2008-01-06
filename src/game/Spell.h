@@ -1059,7 +1059,7 @@ ASCENT_INLINE bool IsDamagingSpell(SpellEntry *sp)
 
 ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
 {
-    switch (sp->Effect[0])
+    switch( sp->Effect[0] )
     {
         case SPELL_EFFECT_HEALTH_LEECH:
         case SPELL_EFFECT_HEAL:
@@ -1067,7 +1067,7 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         case SPELL_EFFECT_HEAL_MAX_HEALTH:
             return true;
     }
-    switch (sp->Effect[1])
+    switch( sp->Effect[1] )
     {
         case SPELL_EFFECT_HEALTH_LEECH:
         case SPELL_EFFECT_HEAL:
@@ -1075,7 +1075,7 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         case SPELL_EFFECT_HEAL_MAX_HEALTH:
             return true;
     }
-    switch (sp->Effect[2])
+    switch( sp->Effect[2] )
     {
         case SPELL_EFFECT_HEALTH_LEECH:
         case SPELL_EFFECT_HEAL:
@@ -1083,10 +1083,10 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         case SPELL_EFFECT_HEAL_MAX_HEALTH:
             return true;
     }
-    if( sp->Effect[0]==SPELL_EFFECT_APPLY_AURA ||
-       sp->Effect[0]==SPELL_EFFECT_APPLY_AREA_AURA)
+    if( sp->Effect[0] == SPELL_EFFECT_APPLY_AURA ||
+		sp->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
-        switch (sp->EffectApplyAuraName[0])
+        switch( sp->EffectApplyAuraName[0] )
         {
             case 8://SPELL_AURA_PERIODIC_HEAL:
             case 34://SPELL_AURA_MOD_INCREASE_HEALTH:
@@ -1094,8 +1094,8 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
                 return true;
         }
     }
-    if( sp->Effect[1]==SPELL_EFFECT_APPLY_AURA ||
-        sp->Effect[1]==SPELL_EFFECT_APPLY_AREA_AURA)
+    if( sp->Effect[1] == SPELL_EFFECT_APPLY_AURA ||
+        sp->Effect[1] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
         switch (sp->EffectApplyAuraName[1])
         {
@@ -1105,10 +1105,10 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
                 return true;
         }
     }
-    if( sp->Effect[2]==SPELL_EFFECT_APPLY_AURA ||
-        sp->Effect[2]==SPELL_EFFECT_APPLY_AREA_AURA)
+    if( sp->Effect[2] == SPELL_EFFECT_APPLY_AURA ||
+        sp->Effect[2] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
-        switch (sp->EffectApplyAuraName[2])
+        switch( sp->EffectApplyAuraName[2] )
         {
             case 8://SPELL_AURA_PERIODIC_HEAL:
             case 34://SPELL_AURA_MOD_INCREASE_HEALTH:
@@ -1117,10 +1117,11 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         }
     }
 	//holy light uses scripted effect which is not neceserally heal spell
-	if(sp->NameHash==0x9B56A8F5)
+	if( sp->NameHash == SPELL_HASH_HOLY_LIGHT )
 		return true;
+
 	//flash of light uses scripted effect which is not neceserally heal spell
-	if(sp->NameHash==0x333C4740)
+	if( sp->NameHash == SPELL_HASH_FLASH_OF_LIGHT )
 		return true;
 	
     return false;

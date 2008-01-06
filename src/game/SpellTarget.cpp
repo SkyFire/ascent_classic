@@ -561,14 +561,14 @@ mysql> select id,name from spell where EffectImplicitTargetb1 = 29;
 void Spell::SpellTargetTypeTAOE(uint32 i, uint32 j)
 {
 	Unit* Target = m_caster->GetMapMgr()->GetUnit(m_targets.m_unitTarget);
-	if(!Target)
+	if( Target == NULL )
 		return;
 
 	// tranquility
-	if(u_caster && m_spellInfo->NameHash==0x650C43C2)
-		m_targetUnits[i].push_back(u_caster->GetGUID());
+	if( u_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_TRANQUILITY )
+		m_targetUnits[i].push_back( u_caster->GetGUID() );
 	else
-		FillAllTargetsInArea((LocationVector&)Target->GetPosition(), i);
+		FillAllTargetsInArea( (LocationVector&)Target->GetPosition(), i );
 }
 
 /// Spell Target Handling for type 30: PBAE Party Based Area Effect

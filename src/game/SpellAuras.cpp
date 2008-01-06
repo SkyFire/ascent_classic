@@ -1060,22 +1060,22 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 		/*((Player*)c)->GetSession()->SystemMessage("dot will do %u damage every %u seconds (total of %u)", dmg,m_spellProto->EffectAmplitude[mod->i],(GetDuration()/m_spellProto->EffectAmplitude[mod->i])*dmg);
 		printf("dot will do %u damage every %u seconds (total of %u)\n", dmg,m_spellProto->EffectAmplitude[mod->i],(GetDuration()/m_spellProto->EffectAmplitude[mod->i])*dmg);*/
 		SetNegative();
-		if(m_spellProto->buffType & SPELL_TYPE_WARLOCK_IMMOLATE)
+		if( m_spellProto->buffType & SPELL_TYPE_WARLOCK_IMMOLATE )
 		{
 			m_target->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_IMMOLATE);
 		}
 		//maybe poison aurastate should get triggered on other spells too ?
-		else if(m_spellProto->NameHash==226259356)//deadly poison
+		else if( m_spellProto->NameHash == SPELL_HASH_DEADLY_POISON )//deadly poison
 		{
 			m_target->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_POISON);
 		}
 	}
 	else
 	{
-		if(m_spellProto->buffType & SPELL_TYPE_WARLOCK_IMMOLATE)
-			m_target->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_IMMOLATE);
+		if( m_spellProto->buffType & SPELL_TYPE_WARLOCK_IMMOLATE )
+			m_target->RemoveFlag( UNIT_FIELD_AURASTATE,AURASTATE_FLAG_IMMOLATE );
 		//maybe poison aurastate should get triggered on other spells too ?
-		else if(m_spellProto->NameHash==226259356)//deadly poison
+		else if( m_spellProto->NameHash == SPELL_HASH_DEADLY_POISON )//deadly poison
 		{
 			m_target->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_POISON);
 		}
@@ -1103,12 +1103,12 @@ void Aura::EventPeriodicDamage(uint32 amount)
 			float bonus_damage;
 
 			int amp = m_spellProto->EffectAmplitude[mod->i];
-			if(!amp) 
-				amp=	((EventableObject*)this)->event_GetEventPeriod(EVENT_AURA_PERIODIC_DAMAGE);
+			if( !amp ) 
+				amp = static_cast< EventableObject* >( this )->event_GetEventPeriod( EVENT_AURA_PERIODIC_DAMAGE );
 
 			if(GetDuration())
 			{
-				if (GetSpellProto() && GetSpellProto()->NameHash == 0xE931A943)  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
+				if( GetSpellProto() && GetSpellProto()->NameHash == SPELL_HASH_IGNITE )  //static damage for Ignite. Need to be reworked when "static DoTs" will be implemented
 					bonus_damage=0;
 				else bonus_damage = (float)c->GetSpellDmgBonus(m_target,m_spellProto,amount);
 				float ticks= float((amp) ? GetDuration()/amp : 0);
@@ -1956,25 +1956,29 @@ void Aura::SpellAuraModFear(bool apply)
 	}
 }
 
-void Aura::SpellAuraPeriodicHeal(bool apply)
+void Aura::SpellAuraPeriodicHeal( bool apply )
 {
-	if(apply)
+	if( apply )
 	{
 		SetPositive();
-			sEventMgr.AddEvent(this, &Aura::EventPeriodicHeal,(uint32)mod->m_amount,
-				EVENT_AURA_PERIODIC_HEAL,	GetSpellProto()->EffectAmplitude[mod->i],0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+		sEventMgr.AddEvent( this, &Aura::EventPeriodicHeal,(uint32)mod->m_amount, EVENT_AURA_PERIODIC_HEAL, GetSpellProto()->EffectAmplitude[mod->i], 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 
-		if(GetSpellProto()->NameHash==0x431BDB1B || GetSpellProto()->NameHash==0x62AFD7AC)
+		if( GetSpellProto()->NameHash == SPELL_HASH_REJUVENATION || GetSpellProto()->NameHash == SPELL_HASH_REGROWTH )
 		{
 			m_target->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_REJUVENATE);	
-			if(!sEventMgr.HasEvent(m_target,EVENT_REJUVENATION_FLAG_EXPIRE))
-				sEventMgr.AddEvent(m_target,&Unit::EventAurastateExpire,(uint32)AURASTATE_FLAG_REJUVENATE,EVENT_REJUVENATION_FLAG_EXPIRE,GetSpellProto()->EffectAmplitude[mod->i],1,0);
-			else sEventMgr.ModifyEventTimeLeft(m_target,EVENT_REJUVENATION_FLAG_EXPIRE,GetSpellProto()->EffectAmplitude[mod->i],0);
+			if(!sEventMgr.HasEvent( m_target, EVENT_REJUVENATION_FLAG_EXPIRE ) )
+			{
+				sEventMgr.AddEvent( m_target, &Unit::EventAurastateExpire, (uint32)AURASTATE_FLAG_REJUVENATE, EVENT_REJUVENATION_FLAG_EXPIRE, GetSpellProto()->EffectAmplitude[mod->i], 1, 0 );
+			}
+			else
+			{
+				sEventMgr.ModifyEventTimeLeft( m_target,EVENT_REJUVENATION_FLAG_EXPIRE, GetSpellProto()->EffectAmplitude[mod->i], 0 );
+			}
 		}
 	}
 }
 
-void Aura::EventPeriodicHeal(uint32 amount)
+void Aura::EventPeriodicHeal( uint32 amount )
 {
 	if(!m_target->isAlive())
 		return;
@@ -2430,10 +2434,10 @@ void Aura::SpellAuraModStealth(bool apply)
 		}
 
 		// hack fix for vanish stuff
-		if(m_spellProto->NameHash == 0xa50106d7 && m_target->GetTypeId() == TYPEID_PLAYER)	 // Vanish
+		if( m_spellProto->NameHash == SPELL_HASH_VANISH && m_target->GetTypeId() == TYPEID_PLAYER )	 // Vanish
 		{
 			// check for stealh spells
-			Player * p_caster = (Player*)m_target;
+			Player* p_caster = static_cast< Player* >( m_target );
 			uint32 stealth_id = 0;
 			SpellSet::iterator itr = p_caster->mSpells.begin();
 			SpellSet::iterator end = p_caster->mSpells.end();
@@ -2578,13 +2582,12 @@ void Aura::SpellAuraModResistance(bool apply)
 	else 
 		amt = -mod->m_amount;  
 
-	if (this->GetSpellProto() && //druid: faerie fire
-		(this->GetSpellProto()->NameHash == 0xA6272FD2 || this->GetSpellProto()->NameHash == 0x162D168A))
+	if( this->GetSpellProto() && ( this->GetSpellProto()->NameHash == SPELL_HASH_FAERIE_FIRE || this->GetSpellProto()->NameHash == SPELL_HASH_FAERIE_FIRE__FERAL_ ) )
 		m_target->m_can_stealth = !apply;
 	
-	if(m_target->GetTypeId() == TYPEID_PLAYER)
+	if( m_target->GetTypeId() == TYPEID_PLAYER )
 	{
-		for(uint32 x=0;x<7;x++)
+		for( uint32 x = 0; x < 7; x++ )
 		{
 			if(Flag & (((uint32)1)<< x) )
 			{
@@ -2789,9 +2792,9 @@ void Aura::EventPeriodicEnergize(uint32 amount,uint32 type)
 void Aura::SpellAuraModPacify(bool apply)
 {
 	// Can't Attack
-	if(apply)
+	if( apply )
 	{
-		if(m_spellProto->Id == 24937 || m_spellProto->NameHash == 541939341)
+		if( m_spellProto->Id == 24937 || m_spellProto->NameHash == SPELL_HASH_BLESSING_OF_PROTECTION )
 			SetPositive();
 		else
 			SetNegative();
@@ -3543,7 +3546,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 		pts.LastTrigger = 0;
 		pts.deleted = false;
 
-		if(m_spellProto->NameHash == 0xE4573D4A)
+		if( m_spellProto->NameHash == SPELL_HASH_THE_TWIN_BLADES_OF_AZZINOTH )
 		{
 			/* The Twin Blades of Azzinoth.
 			 * According to comments on wowhead, this proc has ~0.75ppm (procs-per-minute). */
@@ -3557,7 +3560,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 		}
 
 		/* We have a custom formula for seal of command. */
-		else if(m_spellProto->NameHash == 0xC5C30B39)
+		else if( m_spellProto->NameHash == SPELL_HASH_SEAL_OF_COMMAND )
 		{
 			// default chance of proc
 			pts.procChance = 25;
@@ -4915,9 +4918,9 @@ void Aura::SpellAuraModDamagePercTaken(bool apply)
 		val= -mod->m_amount/100.0f;
 	}
 	
-	if(m_spellProto->NameHash == 0xB0CBB1C3) // Ardent Defender it only applys on 20% hp :/
+	if( m_spellProto->NameHash == SPELL_HASH_ARDENT_DEFENDER ) // Ardent Defender it only applys on 20% hp :/
 	{
-		m_target->DamageTakenPctModOnHP +=val;
+		m_target->DamageTakenPctModOnHP += val;
 		return;
 	}
 	
@@ -5884,32 +5887,32 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 		if(m_target->IsPlayer())
 		{
 			//druid hearth of the wild should add more features based on form
-			if(m_spellProto->NameHash==0x6C22A0C3)
+			if( m_spellProto->NameHash == SPELL_HASH_HEART_OF_THE_WILD )
 			{
 				//we should remove effect first
-				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange(false);
+				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange( false );
 				//set new value
-				if(apply)
-					static_cast<Player*>(m_target)->SetTalentHearthOfWildPCT(val);
+				if( apply )
+					static_cast<Player*>(m_target)->SetTalentHearthOfWildPCT( val );
 				else
-					static_cast<Player*>(m_target)->SetTalentHearthOfWildPCT(0); //this happens on a talent reset
+					static_cast<Player*>(m_target)->SetTalentHearthOfWildPCT( 0 ); //this happens on a talent reset
 				//reapply
-				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange(true);
+				static_cast<Player*>(m_target)->EventTalentHearthOfWildChange( true );
 			}
 
-			if(mod->m_amount>0)
+			if( mod->m_amount > 0 )
 				static_cast<Player*>(m_target)->TotalStatModPctPos[mod->m_miscValue] += val; 
 			else  
 				static_cast<Player*>(m_target)->TotalStatModPctNeg[mod->m_miscValue] -= val;		
 			
-			static_cast<Player*>(m_target)->CalcStat(mod->m_miscValue);	
-			static_cast<Player*>(m_target)->UpdateStats();
-			static_cast<Player*>(m_target)->UpdateChances();
+			static_cast< Player* >( m_target )->CalcStat( mod->m_miscValue );	
+			static_cast< Player* >( m_target )->UpdateStats();
+			static_cast< Player* >( m_target )->UpdateChances();
 		}
-		else if(m_target->GetTypeId() == TYPEID_UNIT)
+		else if( m_target->GetTypeId() == TYPEID_UNIT )
 		{
-			static_cast<Creature*>(m_target)->TotalStatModPct[mod->m_miscValue]+=val;
-			static_cast<Creature*>(m_target)->CalcStat(mod->m_miscValue);
+			static_cast< Creature* >( m_target )->TotalStatModPct[mod->m_miscValue]+=val;
+			static_cast< Creature* >( m_target )->CalcStat(mod->m_miscValue);
 		}		
 	}
 }
@@ -5917,7 +5920,7 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 void Aura::SpellAuraModHaste( bool apply )
 {
 	//blade flurry - attack a nearby opponent
-	if( m_spellProto->NameHash == 0x540d4874 )
+	if( m_spellProto->NameHash == SPELL_HASH_BLADE_FLURRY )
 	{
 		if( apply )
 			m_target->m_extrastriketargets++;

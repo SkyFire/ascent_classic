@@ -607,17 +607,20 @@ bool World::SetInitialWorldSettings()
 			sp->talent_tree = talentSpellIterator->second;
 
 		// parse rank text
-		if(!sscanf(ranktext, "Rank %d", (unsigned int*)&rank))
+		if( !sscanf( ranktext, "Rank %d", (unsigned int*)&rank) )
 			rank = 0;
 
-		if(namehash == 0x56392512)			/* seal of light */
-			sp->procChance=45;	/* this will do */
+		//seal of light 
+		if( namehash == SPELL_HASH_SEAL_OF_LIGHT )			
+			sp->procChance = 45;	/* this will do */
 
-		if(namehash==0xC5C30B39)		/* seal of command */
-			sp->Spell_Dmg_Type=1;
+		//seal of command
+		if( namehash == SPELL_HASH_SEAL_OF_COMMAND )		
+			sp->Spell_Dmg_Type = 1;
 
-		if(namehash==0x11d6b48c)		/* judgement of command */
-			sp->Spell_Dmg_Type=1;
+		//judgement of command
+		if( namehash == SPELL_HASH_JUDGEMENT_OF_COMMAND )		
+			sp->Spell_Dmg_Type = 1;
 
 		//Rogue: Posion time fix for 2.3
 		if(strstr(nametext, "Crippling Poison") && sp->Effect[0]==54)    //I, II
@@ -1196,19 +1199,19 @@ bool World::SetInitialWorldSettings()
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		//omg lighning shield trigger spell id's are all wrong ?
 		//if you are bored you could make thiese by hand but i guess we might find other spells with this problem..and this way it's safe
-		if(strstr(nametext, "Lightning Shield") && sp->EffectTriggerSpell[0])
+		if( strstr(nametext, "Lightning Shield" ) && sp->EffectTriggerSpell[0] )
 		{
 			//check if we can find in the desription
-			char *startofid=strstr(desc, "for $");
-			if(startofid)
+			char *startofid = strstr(desc, "for $");
+			if( startofid )
 			{
 				startofid += strlen("for $");
-				sp->EffectTriggerSpell[0]=atoi(startofid); //get new lightning shield trigger id
+				sp->EffectTriggerSpell[0] = atoi( startofid ); //get new lightning shield trigger id
 			}
 			sp->proc_interval = 3000; //few seconds
 		}
 		//mage ignite talent should proc only on some chances
-		else if(strstr(nametext, "Ignite") && sp->Id>=11119 && sp->Id<=12848 && sp->EffectApplyAuraName[0]==4)
+		else if( strstr(nametext, "Ignite") && sp->Id>=11119 && sp->Id<=12848 && sp->EffectApplyAuraName[0] == 4 )
 		{
 			//check if we can find in the desription
 			char *startofid=strstr(desc, "an additional ");
@@ -1350,32 +1353,41 @@ bool World::SetInitialWorldSettings()
 			sp->SpellGroupType |= 268435456; //some of them do have the flags but i's hard to write down those some from 130 spells
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
 		}
+
 		//druid - Swiftmend - required for tree of life
-		if(sp->NameHash == 0x176A8339)
+		if( sp->NameHash == SPELL_HASH_SWIFTMEND )
 			sp->SpellGroupType |= 268435456; //dangerous move !
+
 		//druid - Innervate - required for tree of life
-		if(sp->NameHash == 0xC6386A59)
+		if( sp->NameHash == SPELL_HASH_INNERVATE )
 			sp->SpellGroupType |= 268435456; //dangerous move !
+
 		//druid - Nature's Swiftness - required for tree of life
-		if(sp->NameHash == 0x4CE6BBE1)
+		if( sp->NameHash == SPELL_HASH_NATURE_S_SWIFTNESS )
 			sp->SpellGroupType |= 268435456; //dangerous move !
+
 		//warlock - Fel armor and demon armor have missing 
-		if(sp->NameHash == 0xC6FDD110 || sp->NameHash == 0x915965D6)
+		if( sp->NameHash == SPELL_HASH_FEL_ARMOR || sp->NameHash == SPELL_HASH_DEMON_ARMOR )
 			sp->SpellGroupType |= 4096; //some of them do have the flags but i's hard to write down those some from 130 spells
+
 		//warlock - shadow bolt
-		if(sp->NameHash == 0x7A7B6753)
+		if( sp->NameHash == SPELL_HASH_SHADOW_BOLT )
 			sp->SpellGroupType |= 1; //some of them do have the flags but i's hard to write down those some from 130 spells
+
 		//warlock - Seed of Corruption
-		if(sp->NameHash == 0xFD712ED2)
-			sp->SpellGroupType |= 65536; 
+		if( sp->NameHash == SPELL_HASH_SEED_OF_CORRUPTION )
+			sp->SpellGroupType |= 65536;
+
 		//warlock - Curse of Shadow
-		if(sp->NameHash == 0xCB139720)
-			sp->SpellGroupType |= 131072; 
+		if( sp->NameHash == SPELL_HASH_CURSE_OF_SHADOW )
+			sp->SpellGroupType |= 131072;
+
 		//warlock - curse of the elements
-		if(sp->NameHash == 0xA5FA5930)
-			sp->SpellGroupType |= 2097152; 
+		if( sp->NameHash == SPELL_HASH_CURSE_OF_THE_ELEMENTS )
+			sp->SpellGroupType |= 2097152;
+
 		//mage Ice Floes affects these spells : Cone of Cold,Cold Snap,Ice Barrier,Ice Block
-		if(sp->NameHash == 0x8F5290EB || sp->NameHash == 0x4774A4B0 || sp->NameHash == 0xCBC822EE || sp->NameHash == 0x768F3B4B)
+		if( sp->NameHash == SPELL_HASH_CONE_OF_COLD || sp->NameHash == SPELL_HASH_COLD_SNAP || sp->NameHash == SPELL_HASH_ICE_BARRIER || sp->NameHash == SPELL_HASH_ICE_BLOCK )
 			sp->EffectSpellGroupRelation[0] = 2097152;
 
 /*		else if(strstr(nametext, "Anesthetic Poison"))
@@ -1390,58 +1402,66 @@ bool World::SetInitialWorldSettings()
 			sp->procCharges=-1;*/
 
 		//Set Silencing spells mech.
-		if (sp->EffectApplyAuraName[0] == 27 || 
+		if( sp->EffectApplyAuraName[0] == 27 || 
 			sp->EffectApplyAuraName[1] == 27 ||
-			sp->EffectApplyAuraName[2] == 27)
+			sp->EffectApplyAuraName[2] == 27 )
 			sp->MechanicsType = MECHANIC_SILENCED;
+
 		//Set Stunning spells mech.
-		if (sp->EffectApplyAuraName[0] == 12 || 
+		if( sp->EffectApplyAuraName[0] == 12 || 
 			sp->EffectApplyAuraName[1] == 12 ||
-			sp->EffectApplyAuraName[2] == 12)
+			sp->EffectApplyAuraName[2] == 12 )
 			sp->MechanicsType = MECHANIC_STUNNED;
+
 		//Set Fearing spells mech
-		if (sp->EffectApplyAuraName[0] == 7 || 
+		if( sp->EffectApplyAuraName[0] == 7 || 
 			sp->EffectApplyAuraName[1] == 7 ||
-			sp->EffectApplyAuraName[2] == 7)
+			sp->EffectApplyAuraName[2] == 7 )
 			sp->MechanicsType = MECHANIC_FLEEING;
 
-
-		if(sp->proc_interval!=0)
+		if( sp->proc_interval != 0 )
 			sp->procFlags |= PROC_REMOVEONUSE;
 
-		/* Seal of Command - Proc Chance */
-		if(sp->NameHash == 0xC5C30B39)
+		// Seal of Command - Proc Chance
+		if( sp->NameHash == SPELL_HASH_SEAL_OF_COMMAND )
 		{
 			sp->procChance = 25;
 			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
 			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
 		}
-		/* Seal of Jusice - Proc Chance */
-		else if(sp->NameHash == 0xCC6D4182)
-			sp->procChance = 25;
-		/* Decapitate */
-		else if(sp->NameHash == 0xB6C3243C)
-			sp->procChance = 30;
-		//shaman - shock, has no spellgroup.very dangerous move !
-		else if(sp->NameHash == 0x561A665E)
-			sp->SpellGroupType = 4;
-		//druid - maul, has missing spellgroup.very dangerous move !
-		else if(sp->NameHash == 0x36278137)
-			sp->SpellGroupType |= 33554432;
-		//druid - swipe, has missing spellgroup.very dangerous move !
-		else if(sp->NameHash == 0xDCBA31B0)
-			sp->SpellGroupType |= 33554432;
-		//mage - fireball. Only some of the spell has the flags 
-		else if(sp->NameHash == 0xB39201EC)
-			sp->SpellGroupType |= 1;
-		else if(sp->NameHash==0x9840A1A6 || sp->NameHash == 0x1513B967 || sp->NameHash==0x204D568D)
-			sp->MechanicsType=25;
 
-		if(sp->Id==25771 || sp->Id == 11196 || sp->Id == 6788)
+		//Seal of Jusice - Proc Chance
+		if( sp->NameHash == SPELL_HASH_SEAL_OF_JUSTICE )
+			sp->procChance = 25;
+
+		/* Decapitate */
+		if( sp->NameHash == SPELL_HASH_DECAPITATE )
+			sp->procChance = 30;
+
+		//shaman - shock, has no spellgroup.very dangerous move !
+		if( sp->NameHash == SPELL_HASH_SHOCK )
+			sp->SpellGroupType = 4;
+
+		//druid - maul, has missing spellgroup.very dangerous move !
+		if( sp->NameHash == SPELL_HASH_MAUL )
+			sp->SpellGroupType |= 33554432;
+
+		//druid - swipe, has missing spellgroup.very dangerous move !
+		if( sp->NameHash == SPELL_HASH_SWIPE )
+			sp->SpellGroupType |= 33554432;
+
+		//mage - fireball. Only some of the spell has the flags 
+		if( sp->NameHash == SPELL_HASH_FIREBALL )
+			sp->SpellGroupType |= 1;
+
+		if( sp->NameHash == SPELL_HASH_DIVINE_SHIELD || sp->NameHash == SPELL_HASH_DIVINE_PROTECTION || sp->NameHash == SPELL_HASH_BLESSING_OF_PROTECTION )
+			sp->MechanicsType = 25;
+
+		if( sp->Id == 25771 || sp->Id == 11196 || sp->Id == 6788 )
 			sp->removable_by_immunity = false;
 
-		/* Backlash */
-		if(sp->NameHash == 0x5965939A)
+		//Backlash
+		if( sp->NameHash == SPELL_HASH_BACKLASH)
 		{
 			sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM;
 			sp->EffectSpellGroupRelation[0] = 1 | 8192;
@@ -1449,19 +1469,20 @@ bool World::SetInitialWorldSettings()
 		}
 
 		/* hackfix for this - FIX ME LATER - Burlex */
-		if(namehash==3238263755UL)
-			sp->procFlags=0;
+		if( namehash == SPELL_HASH_SEAL_FATE )
+			sp->procFlags = 0;
 
-		map<uint32,pair<uint32,int32> >::iterator itr = procMap.find(namehash);
-		if(itr != procMap.end())
+		map< uint32, pair< uint32, int32 > >::iterator itr = procMap.find( namehash );
+		if( itr != procMap.end())
 		{
-			if(itr->second.second > 0)
+			if( itr->second.second > 0 )
 				sp->procFlags = (uint32)itr->second.second;
-			if(itr->first != 0)
+			if( itr->first != 0 )
 				sp->procChance = itr->first;
 		}
 
-		if(namehash==0x8D4A2E9F)		// warlock - intensity
+		// warlock - intensity
+		if( namehash == SPELL_HASH_INTENSITY)		
 			sp->EffectSpellGroupRelation[0] |= 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spell
 		else if(
 			((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (sp->AttributesEx & ATTRIBUTESEX_DELAY_SOME_TRIGGERS)) //rogue cold blood
@@ -1471,7 +1492,7 @@ bool World::SetInitialWorldSettings()
 			sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
 		}
 
-		if( namehash==0x8401EC6A || namehash==0xD3D32C05 || namehash==0x21C83C59 )
+		if( namehash == SPELL_HASH_SHRED || namehash == SPELL_HASH_BACKSTAB || namehash == SPELL_HASH_AMBUSH )
 		{
 			// Shred, Backstab, Ambush
 			sp->in_front_status = 2;

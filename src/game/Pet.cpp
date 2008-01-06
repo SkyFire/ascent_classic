@@ -27,57 +27,59 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 {
 	switch(ent->NameHash)
 	{
-		/************************************************************************/
-		/* Warlock Spells													   */
-		/************************************************************************/
 
-	case 0xAA60B4B0:		// Firebolt
-	case 0x593F01B3:		// Lash of Pain
-	case 0x866C169D:		// Torment
+	/************************************************************************/
+	/* Warlock Pet Spells													*/
+	/************************************************************************/
+
+	case SPELL_HASH_FIREBOLT:			// Firebolt
+	case SPELL_HASH_LASH_OF_PAIN:		// Lash of Pain
+	case SPELL_HASH_TORMENT:			// Torment
 		return AUTOCAST_EVENT_ATTACK;
 		break;
 
-	case 0x9D296A8A:		// Blood Pact
+	case SPELL_HASH_BLOOD_PACT:			// Blood Pact
 		return AUTOCAST_EVENT_ON_SPAWN;
 		break;
 
-	case 0x3211F67B:		// Fire Shield
+	case SPELL_HASH_FIRE_SHIELD:		// Fire Shield
 		return AUTOCAST_EVENT_OWNER_ATTACKED;
 		break;
 		
-	case 0xAF831F1C:		// Phase Shift
+	case SPELL_HASH_PHASE_SHIFT:		// Phase Shift
 		return AUTOCAST_EVENT_LEAVE_COMBAT;
 		break;
 
-		/************************************************************************/
-		/* HunterPet Spells													 */
-		/************************************************************************/
+	/************************************************************************/
+	/* Hunter Pet Spells													*/
+	/************************************************************************/
 
-	case 0x0090493C:		// Bite
-	case 0xE30500A1:		// Charge
-	case 0x7AEB7BEE:		// Claw
-	case 0x8B2934EB:		// Cower
-	case 0x1A18AD22:		// Dash
-	case 0x17CD7462:		// Dive 
-	case 0x16B96B70:		// Fire Breath
-	case 0x90EAAD86:		// Furious Howl
-	case 0x6599623A:		// Gore
-	case 0x4C14A211:		// Growl
-	case 0x058B5215:		// Lightning Breath
-	case 0x6A92F3A0:		// Poison Spit 
-	case 0x9ED4E983:		// Prowl
-	case 0xC654D8FB:		// Scorpid Poison
-	case 0x5012E285:		// Screech
-	case 0xCC6FB810:		// Shell Shield
-	case 0x039C2632:		// Thunderstomp
-	case 0x52C3FC44:		// Warp 
+	case SPELL_HASH_BITE:				// Bite
+	case SPELL_HASH_CHARGE:				// Charge
+	case SPELL_HASH_CLAW:				// Claw
+	case SPELL_HASH_COWER:				// Cower
+	case SPELL_HASH_DASH:				// Dash
+	case SPELL_HASH_DIVE:				// Dive 
+	case SPELL_HASH_FIRE_BREATH:		// Fire Breath
+	case SPELL_HASH_FURIOUS_HOWL:		// Furious Howl
+	case SPELL_HASH_GORE:				// Gore
+	case SPELL_HASH_GROWL:				// Growl
+	case SPELL_HASH_LIGHTNING_BREATH:	// Lightning Breath
+	case SPELL_HASH_POISON_SPIT:		// Poison Spit 
+	case SPELL_HASH_PROWL:				// Prowl
+	case SPELL_HASH_SCORPID_POISON:		// Scorpid Poison
+	case SPELL_HASH_SCREECH:			// Screech
+	case SPELL_HASH_SHELL_SHIELD:		// Shell Shield
+	case SPELL_HASH_THUNDERSTOMP:		// Thunderstomp
+	case SPELL_HASH_WARP:				// Warp 
 		return AUTOCAST_EVENT_ATTACK;
 		break;
 
-		/************************************************************************/
-		/* Water Elemental													  */
-		/************************************************************************/
-	case 0x85FA77FF:		// Waterbolt
+	/************************************************************************/
+	/* Mage Pet Spells														*/
+	/************************************************************************/
+
+	case SPELL_HASH_WATERBOLT:			// Waterbolt
 		return AUTOCAST_EVENT_ATTACK;
 		break;
 	}

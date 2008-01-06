@@ -2221,9 +2221,9 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==============================Post Roll Calculations======================================
 //==========================================================================================
 	//dirty fix for Ice Lance
-	if ((pVictim->m_rooted -pVictim->m_stunned)>0 && spellInfo->NameHash == 0xddaf1ac7) //Ice Lance deals 3x damage if target is frozen
+	if( ( pVictim->m_rooted -pVictim->m_stunned) > 0 && spellInfo->NameHash == SPELL_HASH_ICE_LANCE ) //Ice Lance deals 3x damage if target is frozen
 	{
-		res *=3;
+		res *= 3;
 	}
 //------------------------------absorption--------------------------------------------------	
 	uint32 ress=(uint32)res;
