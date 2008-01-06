@@ -1,6 +1,5 @@
 -- Remove MysISAM Indexes
 
-alter table ai_agents drop index a;
 alter table auctionhouse drop index entryid;
 alter table clientaddons drop index `index`;
 
