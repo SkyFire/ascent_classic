@@ -90,6 +90,9 @@ void LfgMgr::SetPlayerInLFGqueue(Player *pl,uint32 LfgDungeonId)
 	if( pl == NULL )
 		return;
 
+	if( LfgDungeonId > MAX_DUNGEONS )
+		return;
+
 	m_lock.Acquire();
 
 	// there are either no groups free or we don't have autojoin enabled, put us in the queue.
@@ -133,6 +136,9 @@ void LfgMgr::RemovePlayerFromLfgQueue( Player* plr, uint32 LfgDungeonId )
 	if( plr == NULL )
 		return;
 
+	if( LfgDungeonId > MAX_DUNGEONS )
+		return;
+
 	m_lock.Acquire();
 	m_lookingForGroup[LfgDungeonId].remove( plr );
 	m_lock.Release();
@@ -143,6 +149,9 @@ void LfgMgr::RemovePlayerFromLfgQueue( Player* plr, uint32 LfgDungeonId )
 
 void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
 {
+	if( LfgDungeonId > MAX_DUNGEONS )
+		return;
+
 	LfgPlayerList possibleGroupLeaders;
 	LfgPlayerList possibleMembers;
 	LfgPlayerList::iterator itr;
@@ -243,6 +252,9 @@ void LfgMgr::SendLfgList( Player* plr, uint32 Dungeon )
 	if( plr == NULL )
 		return;
 
+	if( Dungeon > MAX_DUNGEONS )
+		return;
+
 	LfgPlayerList::iterator itr;
 	GroupMembersSet::iterator it2;
 	uint32 count = 0;
@@ -337,6 +349,9 @@ void LfgMgr::SetPlayerInLfmList(Player * pl, uint32 LfgDungeonId)
 	if( !pl->IsInWorld() )
 		return;
 
+	if( LfgDungeonId > MAX_DUNGEONS )
+		return;
+
 	m_lock.Acquire();
 	m_lookingForMore[LfgDungeonId].push_back(pl);
 	m_lock.Release();
@@ -348,6 +363,9 @@ void LfgMgr::RemovePlayerFromLfmList(Player * pl, uint32 LfmDungeonId)
 		return;
 
 	if( !pl->IsInWorld() )
+		return;
+
+	if( LfgDungeonId > MAX_DUNGEONS )
 		return;
 
 	m_lock.Acquire();
