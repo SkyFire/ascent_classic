@@ -388,12 +388,14 @@ void QueryBuffer::AddQueryStr(const string& str)
 	queries.push_back(pBuffer);
 }
 
-void Database::PerformQueryBuffer(QueryBuffer * b)
+void Database::PerformQueryBuffer(QueryBuffer * b, MysqlCon * ccon)
 {
 	if(!b->queries.size())
 		return;
 
-    MysqlCon * con = GetFreeConnection();
+    MysqlCon * con = ccon;
+	if( ccon == NULL )
+		con = GetFreeConnection();
 	
 #ifdef ENABLE_INNODB
 	/* whee, transactions */
@@ -410,6 +412,9 @@ void Database::PerformQueryBuffer(QueryBuffer * b)
 	/* whee, transactions */
 	SendQuery(con, "COMMIT", false);
 #endif
+
+	if( ccon == NULL )
+		con->busy.Release();
 }
 
 bool Database::Execute(const char* QueryString, ...)
@@ -602,11 +607,12 @@ QueryThread::~QueryThread()
 void Database::thread_proc_query()
 {
 	QueryBuffer * q;
+	MysqlCon * con = GetFreeConnection();
 
 	q = query_buffer.pop( );
 	while( q != NULL )
 	{
-		PerformQueryBuffer(q);
+		PerformQueryBuffer( q, con );
 		delete q;
 
 		if( ThreadState == THREADSTATE_TERMINATE )
@@ -615,11 +621,13 @@ void Database::thread_proc_query()
 		q = query_buffer.pop( );
 	}
 
+	con->busy.Release();
+
 	// kill any queries
 	q = query_buffer.pop_nowait( );
 	while( q != NULL )
 	{
-		PerformQueryBuffer( q );
+		PerformQueryBuffer( q, NULL );
 		delete q;
 
 		q = query_buffer.pop_nowait( );
@@ -645,7 +653,7 @@ void Database::AddQueryBuffer(QueryBuffer * b)
 		query_buffer.push( b );
 	else
 	{
-		PerformQueryBuffer( b );
+		PerformQueryBuffer( b, NULL );
 		delete b;
 	}
 }

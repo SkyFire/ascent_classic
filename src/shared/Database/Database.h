@@ -104,7 +104,7 @@ public:
 
 	MysqlCon * GetFreeConnection();
 
-	void PerformQueryBuffer(QueryBuffer * b);
+	void PerformQueryBuffer(QueryBuffer * b, MysqlCon * ccon);
 	void AddQueryBuffer(QueryBuffer * b);
 
 protected:
