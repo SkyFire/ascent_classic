@@ -333,30 +333,33 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	/*AsyncQuery * aq = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::LoadAccountDataProc, AccountID) );
 	aq->AddQuery("SELECT * FROM account_data WHERE acct = %u", AccountID);
 	CharacterDatabase.QueueAsyncQuery(aq);*/
-	QueryResult * pResult = CharacterDatabase.Query("SELECT * FROM account_data WHERE acct = %u", AccountID);
-	if( pResult == NULL )
-		CharacterDatabase.Execute("INSERT INTO account_data VALUES(%u, '', '', '', '', '', '', '', '', '')", AccountID);
-	else
+	if(sWorld.m_useAccountData)
 	{
-		size_t len;
-		const char * data;
-		char * d;
-		for(i = 0; i < 8; ++i)
+		QueryResult * pResult = CharacterDatabase.Query("SELECT * FROM account_data WHERE acct = %u", AccountID);
+		if( pResult == NULL )
+			CharacterDatabase.Execute("INSERT INTO account_data VALUES(%u, '', '', '', '', '', '', '', '', '')", AccountID);
+		else
 		{
-			data = pResult->Fetch()[1+i].GetString();
-			len = data ? strlen(data) : 0;
-			if(len > 1)
+			size_t len;
+			const char * data;
+			char * d;
+			for(i = 0; i < 8; ++i)
 			{
-				d = new char[len+1];
-				memcpy(d, data, len+1);
-				pSession->SetAccountData(i, d, true, (uint32)len);
+				data = pResult->Fetch()[1+i].GetString();
+				len = data ? strlen(data) : 0;
+				if(len > 1)
+				{
+					d = new char[len+1];
+					memcpy(d, data, len+1);
+					pSession->SetAccountData(i, d, true, (uint32)len);
+				}
 			}
-		}
 
-		delete pResult;
+			delete pResult;
+		}
 	}
 
-	sLog.outString("> %s authenticated from %s:%u [%ums]", AccountName.c_str(), GetRemoteIP().c_str(), GetRemotePort(), _latency);
+	Log.Debug("Auth", "%s from %s:%u [%ums]", AccountName.c_str(), GetRemoteIP().c_str(), GetRemotePort(), _latency);
 
 	// Check for queue.
 	if( (sWorld.GetSessionCount() < sWorld.GetPlayerLimit()) || pSession->HasGMPermissions() ) {
@@ -365,7 +368,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 		// Queued, sucker.
 		uint32 Position = sWorld.AddQueuedSocket(this);
 		mQueued = true;
-		sLog.outString("> %s added to queue in position %u", AccountName.c_str(), Position);
+		Log.Debug("Queue", "%s added to queue in position %u", AccountName.c_str(), Position);
 
 		// Send packet so we know what we're doing
 		UpdateQueuePosition(Position);
@@ -393,8 +396,6 @@ void WorldSocket::Authenticate()
 
 	delete pAuthenticationPacket;
 	pAuthenticationPacket = 0;
-
-	sLog.outDetail("> Account %u authentication complete, adding session.", pSession->GetAccountId());
 
 	if(mSession)
 	{

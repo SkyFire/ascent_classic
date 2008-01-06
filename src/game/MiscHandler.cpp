@@ -983,9 +983,12 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 {
-	sLog.outDetail("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
+	//sLog.outDetail("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
 
 	uint32 uiID;
+	if(!sWorld.m_useAccountData)
+		return;
+
 	recv_data >> uiID;
 
 	if(uiID > 8)
@@ -1062,9 +1065,11 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 
 void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 {
-	sLog.outDetail("WORLD: Received CMSG_REQUEST_ACCOUNT_DATA");
+	//sLog.outDetail("WORLD: Received CMSG_REQUEST_ACCOUNT_DATA");
 
 	uint32 id;
+	if(!sWorld.m_useAccountData)
+		return;
 	recv_data >> id;
 	
 	if(id > 8)

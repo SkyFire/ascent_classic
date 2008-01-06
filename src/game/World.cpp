@@ -4825,6 +4825,7 @@ void World::Rehash(bool load)
 	m_levelCap = Config.MainConfig.GetIntDefault("Server", "LevelCap", 70);
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
 	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);
+	m_useAccountData = Config.MainConfig.GetBoolDefault("Server", "UseAccountData", false);
 	Channel::LoadConfSettings();
 }
 

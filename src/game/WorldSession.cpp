@@ -311,29 +311,32 @@ void WorldSession::LogoutPlayer(bool Save)
 
 		// Update any dirty account_data fields.
 		bool dirty=false;
-		std::stringstream ss;
-		ss << "UPDATE account_data SET ";
-		for(uint32 ui=0;ui<8;ui++)
+		if(sWorld.m_useAccountData)
 		{
-			if(sAccountData[ui].bIsDirty)
+			std::stringstream ss;
+			ss << "UPDATE account_data SET ";
+			for(uint32 ui=0;ui<8;ui++)
 			{
-				if(dirty)
-					ss <<",";
-				ss << "uiconfig"<< ui <<"=\"";
-				if(sAccountData[ui].data)
+				if(sAccountData[ui].bIsDirty)
 				{
-					CharacterDatabase.EscapeLongString(sAccountData[ui].data, sAccountData[ui].sz, ss);
-					//ss.write(sAccountData[ui].data,sAccountData[ui].sz);
+					if(dirty)
+						ss <<",";
+					ss << "uiconfig"<< ui <<"=\"";
+					if(sAccountData[ui].data)
+					{
+						CharacterDatabase.EscapeLongString(sAccountData[ui].data, sAccountData[ui].sz, ss);
+						//ss.write(sAccountData[ui].data,sAccountData[ui].sz);
+					}
+					ss << "\"";
+					dirty=true;
+					sAccountData[ui].bIsDirty=false;
 				}
-				ss << "\"";
-				dirty=true;
-				sAccountData[ui].bIsDirty=false;
+			}			
+			if(dirty)
+			{
+				ss	<<" WHERE acct="<< _accountId <<";";
+				CharacterDatabase.ExecuteNA(ss.str().c_str());
 			}
-		}			
-		if(dirty)
-		{
-			ss	<<" WHERE acct="<< _accountId <<";";
-			CharacterDatabase.ExecuteNA(ss.str().c_str());
 		}
 
 		delete _player;

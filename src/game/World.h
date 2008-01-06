@@ -627,6 +627,7 @@ public:
 	uint32 m_levelCap;
 	uint32 m_genLevelCap;
 	bool m_limitedNames;
+	bool m_useAccountData;
 };
 
 #define sWorld World::getSingleton()
