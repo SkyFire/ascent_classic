@@ -2555,8 +2555,11 @@ uint8 Spell::CanCast(bool tolerate)
 		{
 			for(i = 0; i < 3; ++i)
 			{
-				if(m_spellInfo->Effect[i] && m_spellInfo->Effect[i] != SPELL_EFFECT_APPLY_AURA && m_spellInfo->Effect[i] != SPELL_EFFECT_APPLY_PET_AURA)
+				if(m_spellInfo->Effect[i] && m_spellInfo->Effect[i] != SPELL_EFFECT_APPLY_AURA && m_spellInfo->Effect[i] != SPELL_EFFECT_APPLY_PET_AURA
+					&& m_spellInfo->Effect[i] != SPELL_EFFECT_APPLY_AREA_AURA)
+				{
 					return SPELL_FAILED_TARGET_DUELING;
+				}
 			}
 		}
 
