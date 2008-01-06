@@ -93,7 +93,7 @@ alter table `auctionhouse` drop index entryid;
 ALTER TABLE `auctionhouse` ADD PRIMARY KEY (`id`);
 ALTER TABLE `banned_names` ADD UNIQUE `a`(`name`);
 ALTER TABLE `banned_phrases` ADD UNIQUE `a`(`phrase`);
-ALTER TABLE `client_addons` ADD UNIQUE `a`(`id`);
+ALTER TABLE `clientaddons` ADD UNIQUE `a`(`id`);
 ALTER TABLE `command_overrides` ADD UNIQUE `a`(`command_name`);
 ALTER TABLE `creature_formations` ADD UNIQUE `a`(`spawn_id`);
 ALTER TABLE `creature_names` ADD UNIQUE `a`(`entry`);
