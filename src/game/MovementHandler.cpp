@@ -25,9 +25,22 @@
 
 #include <mmsystem.h>
 #pragma comment(lib, "winmm.lib")
+#define DELTA_EPOCH_IN_USEC  11644473600000000ULL
+
 uint32 TimeStamp()
 {
-	return timeGetTime();
+	//return timeGetTime();
+
+	FILETIME ft;
+	uint64 t;
+	GetSystemTimeAsFileTime(&ft);
+
+	t = (uint64)ft.dwHighDateTime << 32;
+	t |= ft.dwLowDateTime;
+	t /= 10;
+	t -= DELTA_EPOCH_IN_USEC;
+
+	return uint32(((t / 1000000L) * 1000) + ((t % 1000000L) / 1000));
 }
 
 ASCENT_INLINE uint32 mTimeStamp()
@@ -539,8 +552,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		float x = movement_info.x - movement_info.transX;
 		float y = movement_info.y - movement_info.transY;
 		float z = movement_info.z - movement_info.transZ;
-		Transporter* trans = _player->m_CurrentTransporter;
-		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));
+		/*Transporter* trans = _player->m_CurrentTransporter;
+		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));*/
 	}
 
 	/************************************************************************/

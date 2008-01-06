@@ -452,14 +452,12 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 
 	if(flags & 0x8)
 	{
-		/* burlex: i don't think this data really matters.. but I'm just gonna use these, since it may help us with
-		   debugging later on */
-		*data << GetInstanceID();
+		*data << GetGUIDLow();
 		if(flags & 0x10)
-			*data << GetEntry();
+			*data << GetGUIDHigh();
 	}
 	else if(flags & 0x10)
-		*data << GetEntry();
+		*data << GetGUIDLow();
 
 	if(flags & 0x2)
 	{
@@ -468,7 +466,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			/*int32 m_time = TimeStamp() - target->GetSession()->m_clientTimeDelay;
 			m_time += target->GetSession()->m_moveDelayTime;
 			*data << m_time;*/
-			*data << TimeStamp();
+			*data << uint32(TimeStamp()-150);
 		}
 		else
             *data << getMSTime();

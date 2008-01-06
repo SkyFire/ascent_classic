@@ -181,6 +181,7 @@ bool Transporter::GenerateWaypoints()
 		teleport = true;
 
 	TWayPoint pos(keyFrames[0].mapid, keyFrames[0].x, keyFrames[0].y, keyFrames[0].z, teleport);
+	uint32 last_t = 0;
 	m_WayPoints[0] = pos;
 	t += keyFrames[0].delay * 1000;
 
@@ -215,8 +216,11 @@ bool Transporter::GenerateWaypoints()
 
 					//					sLog.outString("T: %d, D: %f, x: %f, y: %f, z: %f", t, d, newX, newY, newZ);
 					TWayPoint pos(keyFrames[i].mapid, newX, newY, newZ, teleport);
-					if (teleport)
+					if (teleport || ((t - last_t) >= 1000))
+					{
 						m_WayPoints[t] = pos;
+						last_t = t;
+					}
 				}
 
 				if (tFrom < tTo)							// caught in tFrom dock's "gravitational pull"
@@ -270,6 +274,7 @@ bool Transporter::GenerateWaypoints()
 			pos.delayed = true;
 
 		m_WayPoints.insert(WaypointMap::value_type(t, pos));
+		last_t = t;
 
 		t += keyFrames[i + 1].delay * 1000;
 		//		sLog.outString("------");
@@ -300,8 +305,34 @@ void Transporter::UpdatePosition()
 	if (m_WayPoints.size() <= 1)
 		return;
 
-	m_timer = getMSTime() % m_period;
+	WaypointIterator olditer = mCurrentWaypoint;
 
+	m_timer = getMSTime() % m_pathTime;
+	if(mNextWaypoint->first <= m_timer)
+	{
+		/*printf("%s from %u %f %f %f to %u %f %f %f\n", this->GetInfo()->Name,
+			mCurrentWaypoint->second.mapid, mCurrentWaypoint->second.x,mCurrentWaypoint->second.y,mCurrentWaypoint->second.z,
+			mNextWaypoint->second.mapid, mNextWaypoint->second.x,mNextWaypoint->second.y,mNextWaypoint->second.z);*/
+
+		mCurrentWaypoint = mNextWaypoint;
+		mNextWaypoint = GetNextWaypoint();
+		if (mNextWaypoint->second.mapid != mCurrentWaypoint->second.mapid) {
+			mCurrentWaypoint = mNextWaypoint;
+			mNextWaypoint = GetNextWaypoint();
+			TransportPassengers(mCurrentWaypoint->second.mapid, GetMapId(),
+				mCurrentWaypoint->second.x, mCurrentWaypoint->second.y, mCurrentWaypoint->second.z);
+			//break;
+		} else {
+			SetPosition(mCurrentWaypoint->second.x, mCurrentWaypoint->second.y,
+				mCurrentWaypoint->second.z, m_position.o, false);
+		}
+
+		if(mCurrentWaypoint->second.delayed)
+		{
+			PlaySoundToSet(5495);		// BoatDockedWarning.wav
+		}
+	}
+/*
 	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) > ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
 	{
 		mCurrentWaypoint = mNextWaypoint;
@@ -321,7 +352,7 @@ void Transporter::UpdatePosition()
 		{
 			PlaySoundToSet(5495);		// BoatDockedWarning.wav
 		}
-	}
+	}*/
 }
 
 void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, float y, float z)
