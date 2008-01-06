@@ -67,9 +67,9 @@ bool Database::Initialize(const char* Hostname, unsigned int Port, const char* U
 	ThreadPool.ExecuteTask(this);
 
 	// launch the query thread
-	//qt = new QueryThread(this);
-	//ThreadPool.ExecuteTask(qt);
-	qt=NULL;
+	qt = new QueryThread(this);
+	ThreadPool.ExecuteTask(qt);
+	//qt=NULL;
 	
 	return true;
 }

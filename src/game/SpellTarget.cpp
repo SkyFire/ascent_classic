@@ -343,7 +343,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 	if(p_caster)
 	{
 		// this is mostly used for things like duels
-		if(pTarget != p_caster && !isAttackable(p_caster, pTarget, false))
+		if(pTarget != p_caster && pTarget->IsPlayer() && !isAttackable(p_caster, pTarget, false))
 		{
 			cancastresult = SPELL_FAILED_BAD_TARGETS;
 			return;

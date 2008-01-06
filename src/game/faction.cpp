@@ -21,18 +21,18 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 	uint32 faction = objB->m_faction->Mask;
 	uint32 host = objA->m_faction->HostileMask;
 
-	if( faction != 0 )
-	{
+	/*if( faction != 0 )
+	{*/
 		if(faction & host)
 		{
 			hostile = true;
 		}
-	}
+	/*}
 	else
 	{
 		// default to true
 		hostile = true;
-	}
+	}*/
 
 	// check friend/enemy list
 	for(uint32 i = 0; i < 4; i++)
