@@ -19,6 +19,11 @@
 
 #include "StdAfx.h"
 
+// only enable with COLLISION define.
+#ifdef COLLISION
+#define LOS_CHECKS 1
+#define LOS_ONLY_IN_INSTANCE 1
+#endif
 
 AIInterface::AIInterface()
 {
@@ -1266,6 +1271,14 @@ Unit* AIInterface::FindTarget()
 	float distance = 999999.0f; // that should do it.. :p
 	float crange;
 	float z_diff;
+#ifdef LOS_CHECKS
+	bool los = true;
+	bool check_los = true;
+#ifdef LOS_ONLY_IN_INSTANCE
+	if( m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_NULL )
+		check_los = false;
+#endif
+#endif
 
 	std::set<Object*>::iterator itr, it2;
 	Object *pObj;
@@ -1349,8 +1362,28 @@ Unit* AIInterface::FindTarget()
 		
 		if(dist <= _CalcAggroRange(pUnit) )
 		{
+#ifdef LOS_CHECKS
+
+	#ifdef LOS_ONLY_IN_INSTANCE
+			if( !check_los )
+			{
+				distance = dist;
+				target = pUnit;	
+				continue;
+			}
+
+	#endif		// LOS_ONLY_IN_INSTANCE
+
+            if( CollideInterface.CheckLOSMod( m_Unit->GetMapId( ), m_Unit->GetPositionV( ), pUnit->GetPositionV( ) ) )
+			{
+				distance = dist;
+				target = pUnit;
+			}
+#else
 			distance = dist;
-			target = pUnit;		
+			target = pUnit;
+#endif		// LOS_CHECKS
+
 		}
 	}
 
@@ -1514,10 +1547,19 @@ bool AIInterface::FindFriends(float dist)
 
 		float x = m_Unit->GetPositionX() + (float)( (float)(rand() % 150 + 100) / 1000.0f );
 		float y = m_Unit->GetPositionY() + (float)( (float)(rand() % 150 + 100) / 1000.0f );
+#ifdef COLLISION
+		float z = CollideInterface.GetHeight(m_Unit->GetMapId(), x, y, m_Unit->GetPositionZ() + 2.0f);
+		if( z == NO_WMO_HEIGHT )
+			z = m_Unit->GetMapMgr()->GetLandHeight(x, y);
+
+		if( abs( z - m_Unit->GetPositionZ() ) > 10.0f )
+			z = m_Unit->GetPositionZ();
+#else
 		float z = m_Unit->GetPositionZ();
 		float adt_z = m_Unit->GetMapMgr()->GetLandHeight(x, y);
 		if(fabs(z - adt_z) < 3)
 			z = adt_z;
+#endif
 
 		CreatureProto * cp = CreatureProtoStorage.LookupEntry(guardid);
 		if(!cp) return result;
@@ -2538,7 +2580,31 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			// Check if this point is in water.
 			float wl = m_Unit->GetMapMgr()->GetWaterHeight(Fx, Fy);
 //			uint8 wt = m_Unit->GetMapMgr()->GetWaterType(Fx, Fy);
-	
+#ifdef COLLISION
+			Fz = CollideInterface.GetHeight(m_Unit->GetMapId(), Fx, Fy, m_Unit->GetPositionZ() + 2.0f);
+			if( Fz == NO_WMO_HEIGHT )
+                Fz = m_Unit->GetMapMgr()->GetLandHeight(Fx, Fy);
+			else
+			{
+				if( CollideInterface.GetFirstPoint(m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ() + 2.0f,
+					Fx, Fy, Fz, &Fx, &Fy, &Fz, -1.0f) )
+				{
+					Fz = CollideInterface.GetHeight(m_Unit->GetMapId(), Fx, Fy, m_Unit->GetPositionZ() + 2.0f);
+				}
+			}
+
+			if( abs( m_Unit->GetPositionZ() - Fz ) > 10.0f || 
+				( wl != 0.0f && Fz < wl ) )		// in water
+			{
+				m_FearTimer=getMSTime() + 500;
+			}
+			else
+			{
+				MoveTo(Fx, Fy, Fz, Fo);
+				m_FearTimer = m_totalMoveTime + getMSTime() + 400;
+			}
+
+#else
 			Fz = m_Unit->GetMapMgr()->GetLandHeight(Fx, Fy);
 			if(fabs(m_Unit->GetPositionZ()-Fz) > 4 || (Fz != 0.0f && Fz < (wl-2.0f)))
 				m_FearTimer=getMSTime()+100;
@@ -2547,6 +2613,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				MoveTo(Fx, Fy, Fz, Fo);
 				m_FearTimer = m_totalMoveTime + getMSTime() + 200;
 			}
+#endif
 		}
 	}
 
@@ -2561,6 +2628,34 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 		float wanderO = RandomFloat(6.283f);
 		float wanderX = m_Unit->GetPositionX() + wanderD * cosf(wanderO);
 		float wanderY = m_Unit->GetPositionY() + wanderD * sinf(wanderO);
+
+#ifdef COLLISION
+		float wanderZ = CollideInterface.GetHeight(m_Unit->GetMapId(), wanderX, wanderY, m_Unit->GetPositionZ() + 2.0f);
+		float wanderZ2 = wanderZ;
+		if( wanderZ == NO_WMO_HEIGHT )
+			wanderZ = m_Unit->GetMapMgr()->GetLandHeight(wanderX, wanderY);
+		else
+		{
+			if( CollideInterface.GetFirstPoint(m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ() + 2.0f,
+				wanderX, wanderY, wanderZ + 2.0f, &wanderX, &wanderY, &wanderZ, -1.0f) )
+			{
+				wanderZ = CollideInterface.GetHeight(m_Unit->GetMapId(), wanderX, wanderY, m_Unit->GetPositionZ() + 2.0f);
+			}
+			else
+				wanderZ = wanderZ2;
+		}
+
+		if( abs( m_Unit->GetPositionZ() - wanderZ ) > 10.0f )
+		{
+			m_WanderTimer=getMSTime() + 1000;
+		}
+		else
+		{
+			m_Unit->SetOrientation(wanderO);
+			MoveTo(wanderX, wanderY, wanderZ, wanderO);
+			m_WanderTimer = getMSTime() + m_totalMoveTime + 300; // time till next move (+ pause)
+		}
+#else
 		float wanderZ = m_Unit->GetMapMgr()->GetLandHeight(wanderX, wanderY);
 
 		// without these next checks we could fall through the "ground" (WMO) and get stuck
@@ -2579,6 +2674,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 		m_Unit->SetOrientation(wanderO);
 		MoveTo(wanderX, wanderY, wanderZ, wanderO);
 		m_WanderTimer = getMSTime() + m_totalMoveTime + 300; // time till next move (+ pause)
+#endif
 	}
 
 	//Unit Follow Code

@@ -482,6 +482,7 @@ protected:
 	bool HandleCollisionTestIndoor(const char * args, WorldSession * m_session);
 	bool HandleCollisionTestLOS(const char * args, WorldSession * m_session);
 	bool HandleRenameAllCharacter(const char * args, WorldSession * m_session);
+	bool HandleCollisionGetHeight(const char * args, WorldSession * m_session);
 
 	/* For skill related GM commands */
 	SkillNameMgr *SkillNameManager;
