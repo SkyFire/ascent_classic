@@ -265,7 +265,7 @@ Unit::~Unit()
 	delete m_aiInterface;
 
 	/*for(int i = 0; i < 4; i++)
-		if (m_ObjectSlots[i])
+		if(m_ObjectSlots[i])
 			delete m_ObjectSlots[i];*/
 
 	if(m_currentSpell)
@@ -353,9 +353,9 @@ bool Unit::canReachWithAttack(Unit *pVictim)
 	//formula adjustment for player side.
 	if(this->IsPlayer())
 	{
-		if (attackreach <= 8 && attackreach >= 5 && targetradius >= 1.80f) attackreach = 11; //giant type units
-		if (attackreach > 11) attackreach = 11; //distance limited to max 11 yards attack range //max attack distance
-		if (attackreach < 5 ) attackreach = 5; //normal units with too small reach.
+		if(attackreach <= 8 && attackreach >= 5 && targetradius >= 1.80f) attackreach = 11; //giant type units
+		if(attackreach > 11) attackreach = 11; //distance limited to max 11 yards attack range //max attack distance
+		if(attackreach < 5 ) attackreach = 5; //normal units with too small reach.
 		//range can not be less than 5 yards - this is normal combat range, SCALE IS NOT SIZE
 
 		// latency compensation!!
@@ -537,7 +537,7 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 	}*/
 }
 
-void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32 dmg,uint32 abs)
+void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint32 dmg, uint32 abs )
 {
 	++m_procCounter;
 	bool can_delete = !bProcInUse; //if this is a nested proc then we should have this set to TRUE by the father proc
@@ -558,7 +558,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 		if(CastingSpell)
 		{
 			//this is to avoid spell proc on spellcast loop. We use dummy that is same for both spells
-			if(CastingSpell->Id == itr2->origId || CastingSpell->Id == itr2->spellId)
+			if( CastingSpell->Id == itr2->origId || CastingSpell->Id == itr2->spellId)
 			{
 				//printf("WOULD CRASH HERE ON PROC: CastingId: %u, OrigId: %u, SpellId: %u\n", CastingSpell->Id, itr2->origId, itr2->spellId);
 				continue;
@@ -572,7 +572,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 			if(itr2->procFlags & PROC_ON_CAST_SPECIFIC_SPELL)
 			{
 
-				if(!CastingSpell)
+				if( !CastingSpell )
 					continue;
 				
 				//this is wrong, dummy is too common to be based on this, we should use spellgroup or something
@@ -583,7 +583,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						continue;
 					if(ospinfo->School != CastingSpell->School)
 						continue;
-					if(CastingSpell->EffectImplicitTargetA[0] == 1 || 
+					if( CastingSpell->EffectImplicitTargetA[0] == 1 || 
 						CastingSpell->EffectImplicitTargetA[1] == 1 || 
 						CastingSpell->EffectImplicitTargetA[2] == 1) //Prevents school based procs affecting caster when self buffing
 						continue;
@@ -631,7 +631,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					float ohs = float( of->GetProto()->Delay );
 					proc_Chance = FL2UINT( ( mhs + ohs ) * 0.001f * ppm / 0.6f );
 				}
-				else if ( mh )
+				else if( mh )
 				{
 					float mhs = float( mh->GetProto()->Delay );
 					proc_Chance = float2int32( mhs * 0.001f * ppm / 0.6f );
@@ -704,20 +704,20 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 14189: //Seal Fate
 						case 16953: //Blood Frenzy
 						{
-							if (!this->IsPlayer() || 
+							if(!this->IsPlayer() || 
 								!CastingSpell || 
 								CastingSpell->Id == 14189 ||
 								CastingSpell->Id == 16953)
 								continue;
-							if (CastingSpell->Effect[0]!=80 &&
+							if( CastingSpell->Effect[0]!=80 &&
 								CastingSpell->Effect[1]!=80 &&
 								CastingSpell->Effect[2]!=80 &&
-								CastingSpell->NameHash != 0x7565ABA6)
+								CastingSpell->NameHash != SPELL_HASH_MANGLE )
 								continue;
 						}break;
 						case 17106: //druid intencity
 						{
-							if (CastingSpell->Id != 5229)//enrage
+							if( CastingSpell->Id != 5229)//enrage
 								continue;
 						}break;
 						case 31616:
@@ -804,32 +804,32 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						// hunter - Entrapment
 						case 19185:
 						{
-							if(!CastingSpell)
+							if( !CastingSpell )
 								continue;
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=0xD3D32C05 && //immolation trap
-									CastingSpell->NameHash!=0xE876878A && //frost trap
-									CastingSpell->NameHash!=0x92253E33 && //shiv
+								if( CastingSpell->NameHash!=SPELL_HASH_BACKSTAB && //immolation trap
+									CastingSpell->NameHash!=SPELL_HASH_SINISTER_STRIKE && //frost trap
+									CastingSpell->NameHash!=SPELL_HASH_SHIV && //shiv
 									CastingSpell->NameHash!=SPELL_HASH_GOUGE ) //gouge
 									continue;
 						}break;*/
 						// Mage ignite talent only for fire dmg
 						case 12654:
 						{
-							if(!CastingSpell)
+							if( !CastingSpell )
 								continue;
-							if(CastingSpell->School!=SCHOOL_FIRE)
+							if( CastingSpell->School!=SCHOOL_FIRE)
 								continue;
 						}break;
 						//rogue - blade twisting
 						case 31125:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash != 0xD3D32C05 && //backstab
-									CastingSpell->NameHash != 0xE876878A && //sinister strike
-									CastingSpell->NameHash != 0x92253E33 && //shiv
+								if( CastingSpell->NameHash != SPELL_HASH_BACKSTAB && //backstab
+									CastingSpell->NameHash != SPELL_HASH_SINISTER_STRIKE && //sinister strike
+									CastingSpell->NameHash != SPELL_HASH_SHIV && //shiv
 									CastingSpell->NameHash != SPELL_HASH_GOUGE ) //gouge
 									continue;
 							}break;
@@ -840,10 +840,10 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 17799:
 						case 17800:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=0x7A7B6753)//shadow bolt								
+								if( CastingSpell->NameHash!=SPELL_HASH_SHADOW_BOLT)//shadow bolt								
 									continue;
 							}break;
 						//warlock soul link
@@ -872,19 +872,19 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//warlock - Nighfall
 						case 17941:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=0x2ADC25D7 && //Corruption
-									CastingSpell->NameHash!=0x20EFEA68)//Drain Life								
+								if( CastingSpell->NameHash != SPELL_HASH_CORRUPTION && //Corruption
+									CastingSpell->NameHash != SPELL_HASH_DRAIN_LIFE )//Drain Life								
 									continue;
 							}break;
 						//mage - Arcane Blast proc
 						case 36032:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;
-								if (CastingSpell->NameHash!=0x2EAF9351) //Arcane Blast
+								if( CastingSpell->NameHash != SPELL_HASH_ARCANE_BLAST ) //Arcane Blast
 									continue;
 							}break;
 						//warlock - Shadow Embrace
@@ -894,36 +894,36 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 32390:
 						case 32391:
 							{
-								if (!CastingSpell)
+								if( !CastingSpell )
 									continue;
 								else
 								{
-									if (CastingSpell->NameHash!=0x2ADC25D7 &&// Corruption
-										CastingSpell->NameHash!=0x34C208A2 &&//CoA
-										CastingSpell->NameHash!=0x2979DFBA &&//Siphon Life
-										CastingSpell->NameHash!=0xFD712ED2)  //SoC
+									if( CastingSpell->NameHash != SPELL_HASH_FIRE_SHIELD_II && // Corruption
+										CastingSpell->NameHash != SPELL_HASH_CURSE_OF_AGONY && //CoA
+										CastingSpell->NameHash != SPELL_HASH_SIPHON_LIFE && //Siphon Life
+										CastingSpell->NameHash != SPELL_HASH_SEED_OF_CORRUPTION ) //SoC
 										continue;
 								}
 							}break;
 						//warlock - Aftermath
 						case 18118:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
 								skilllinespell* skillability = objmgr.GetSpellSkill(CastingSpell->Id);
-								if (!skillability)
+								if( !skillability )
 									continue;
-								if(skillability->skilline!=SKILL_DESTRUCTION)
+								if( skillability->skilline != SKILL_DESTRUCTION )
 									continue;
 							}break;
 						//warlock - Nether Protection
 						case 30300:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if (!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 								if( CastingSpell->School!=SCHOOL_FIRE &&
 									CastingSpell->School!=SCHOOL_SHADOW)
@@ -933,21 +933,21 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//this whole spell should get rewriten. Uses bad formulas, bad trigger method, spell is rewriten ...
 						case 30294:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
 								uint32 amount;
-								switch(CastingSpell->NameHash)
+								switch( CastingSpell->NameHash )
 								{
-									case 0x7A7B6753: //Shadow Bolt
-									case 0x9B1BA9E0: //Soul Fire
-									case 0x2BC0AE00: //Incinerate
-									case 0xD6269851: //Searing Pain
-									case 0xB767620F: //Conflagrate
+									case SPELL_HASH_SHADOW_BOLT: //Shadow Bolt
+									case SPELL_HASH_SOUL_FIRE: //Soul Fire
+									case SPELL_HASH_INCINERATE: //Incinerate
+									case SPELL_HASH_SEARING_PAIN: //Searing Pain
+									case SPELL_HASH_CONFLAGRATE: //Conflagrate
 									{
 										amount = CastingSpell->EffectBasePoints[0]+1;
 									}break;
-									case 0x1066956C: //Shadowburn
+									case SPELL_HASH_SHADOWBURN: //Shadowburn
 									{
 										amount = CastingSpell->EffectBasePoints[1]+1;
 									}break;
@@ -968,21 +968,21 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//warlock - pyroclasm
 						case 18093:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=0xBA051C13 && //Rain of Fire
-									CastingSpell->NameHash!=0x799839A4 && //Hellfire
-									CastingSpell->NameHash!=0x9B1BA9E0 ) //Soul Fire
+								if( CastingSpell->NameHash != SPELL_HASH_RAIN_OF_FIRE && //Rain of Fire
+									CastingSpell->NameHash != SPELL_HASH_HELLFIRE && //Hellfire
+									CastingSpell->NameHash != SPELL_HASH_SOUL_FIRE ) //Soul Fire
 									continue;
 							}break;
 						//mage - Improved Scorch
 						case 22959:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=1828847009) //Rain of Fire
+								if( CastingSpell->NameHash != SPELL_HASH_SCORCH ) //Scorch
 									continue;
 							}break;
 						//priest - Misery
@@ -992,22 +992,22 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 33197:
 						case 33196:
 							{
-								if (!CastingSpell)
+								if( !CastingSpell )
 									continue;
 								else
 								{
-									if (CastingSpell->NameHash!=0xC3D9ACEB &&// Mind Flay
-										CastingSpell->NameHash!=0x7335D7AF &&//SW:P
-										CastingSpell->NameHash!=0x34D76539)  //SoC
+									if( CastingSpell->NameHash != SPELL_HASH_MIND_FLAY && // Mind Flay
+										CastingSpell->NameHash != SPELL_HASH_INNER_FIRE && //SW:P
+										CastingSpell->NameHash != SPELL_HASH_VAMPIRIC_TOUCH ) //SoC
 										continue;
 								}
 							}break;
 						//priest - Shadow Weaving
 						case 15258:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //we need damaging spells for this, so we suppose all shadow spells casted on target are dmging spells = Wrong
+								if( CastingSpell->School != SCHOOL_SHADOW || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) ) //we need damaging spells for this, so we suppose all shadow spells casted on target are dmging spells = Wrong
 									continue;
 							}break;
 						//priest - Inspiration
@@ -1015,17 +1015,17 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 14893:
 						case 15357:
 							{
-								if (!CastingSpell || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
+								if( !CastingSpell || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) )
 									continue;
 							}
 							break;
 						//shaman - Healing Way
 						case 29203:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=0x08F1A7EF) //healing wave
+								if( CastingSpell->NameHash != SPELL_HASH_HEALING_WAVE ) //healing wave
 									continue;
 							}break;
 						//shaman - Elemental Devastation
@@ -1033,7 +1033,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 29178:
 						case 30165:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
 								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //healing wave
@@ -1062,7 +1062,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//rogue - Ruthlessness
 						case 14157:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//we need a finishing move for this 
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE) || victim==this)
@@ -1071,11 +1071,11 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//rogue - Relentless Strikes
 						case 14181:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								int32 proc_Chance;
 								//chance is based actually on combopoint count and not 100% always 
-								if(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE && IsPlayer())
+								if( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE && IsPlayer())
 									proc_Chance = static_cast<Player*>(this)->m_comboPoints*ospinfo->EffectBasePoints[1];
 								else continue;
 								if(!Rand(proc_Chance))
@@ -1088,7 +1088,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 31237:
 						case 31238:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE))
 									continue;
@@ -1096,23 +1096,23 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//rogue - Initiative
 						case 13977:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//we need a Ambush, Garrote, or Cheap Shot
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;
 
-								if (CastingSpell->NameHash!=3345919181UL && //Cheap Shot
-									CastingSpell->NameHash!=566770777UL && //Ambush
-									CastingSpell->NameHash!=891349384UL)  //Garrote
+								if( CastingSpell->NameHash != SPELL_HASH_CHEAP_SHOT && //Cheap Shot
+									CastingSpell->NameHash != SPELL_HASH_AMBUSH && //Ambush
+									CastingSpell->NameHash != SPELL_HASH_GARROTE )  //Garrote
 									continue;
 							}break;
 						//Priest - blackout
 						case 15269:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						//warrior - improved berserker rage 
@@ -1126,7 +1126,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 12536:
 							{
 								//requires damageing spell
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
@@ -1136,24 +1136,24 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 12485:
 						case 12486:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;
-								if (CastingSpell->NameHash!=0xA1761A27 || victim==this) //Blizzard
+								if( CastingSpell->NameHash != SPELL_HASH_BLIZZARD || victim == this ) //Blizzard
 									continue;
 							}break;
 						//mage - Master of Elements
 						case 29077:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;
-								if (CastingSpell->School!=SCHOOL_FIRE || CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
+								if( CastingSpell->School!=SCHOOL_FIRE || CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
 									continue;
 								dmg_overwrite = CastingSpell->manaCost * (ospinfo->EffectBasePoints[0] + 1) / 100;
 							}break;
 						//Hunter - Thrill of the Hunt
 						case 34720:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;
 								dmg_overwrite = CastingSpell->manaCost * 40 / 100;
 							}break;
@@ -1161,8 +1161,8 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						case 33619:
 							{
 								//requires Power Word: Shield active
-								int power_word_id = HasAurasWithNameHash(3248591006UL);
-								if(!power_word_id)
+								int power_word_id = HasAurasWithNameHash( SPELL_HASH_POWER_WORD__SHIELD );
+								if( !power_word_id )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//make a direct strike then exit rest of handler
 								int tdmg=abs*(ospinfo->EffectBasePoints[0]+1)/100;
@@ -1173,9 +1173,9 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//rogue - improved sprint
 						case 30918:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;
-								if (CastingSpell->NameHash!=0x59EEF122 || victim!=this) //sprint
+								if( CastingSpell->NameHash != SPELL_HASH_SPRINT || victim != this ) //sprint
 									continue;
 							}break;
 						//rogue - combat potency
@@ -1204,7 +1204,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//paladin - Spiritual Attunement
 						case 31786:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//trigger only on heal spell cast by NOT us
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) || this == victim)
@@ -1213,11 +1213,11 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//shaman - Lightning Overload
 						case 39805:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//trigger on lightning and chain lightning. Spell should be identical , well maybe next time :P
-								if(	CastingSpell->NameHash==0x135F2AAF //lighning bolt
-									|| CastingSpell->NameHash==0xAAD25B2A //chain lightning
+								if(	CastingSpell->NameHash == SPELL_HASH_LIGHTNING_BOLT //lighning bolt
+									|| CastingSpell->NameHash == SPELL_HASH_CHAIN_LIGHTNING //chain lightning
 									)
 								{
 									spellId = CastingSpell->Id;
@@ -1228,24 +1228,24 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 						//item - Band of the Eternal Sage
 						case 35084:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;
-								if (!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //requires offensive spell. ! might not cover all spells
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //requires offensive spell. ! might not cover all spells
 									continue;
 							}break;
 						//item - Band of the Eternal Restorer 
 						case 35087:
 							{
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;
-								if (!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING)) //requires healing spell.
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING)) //requires healing spell.
 									continue;
 							}break;
 /*						//paladin - illumination
 						case 18350:
 							{
 								continue; //disabled until finished
-								if(!CastingSpell)
+								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
 								if( CastingSpell->NameHash!=666 && //Holy light
@@ -1293,7 +1293,7 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					SpellCastTime *sd = dbcSpellCastTime.LookupEntry(CastingSpell->CastingTimeIndex);
 					if(!sd) continue; // this shouldnt happen though :P
 					//if we did not proc these then we should not remove them
-					if(CastingSpell->Id == iter2->second.spellId)
+					if( CastingSpell->Id == iter2->second.spellId)
 						continue;
 					switch(iter2->second.spellId)
 					{
@@ -1308,8 +1308,8 @@ void Unit::HandleProc(uint32 flag, Unit* victim, SpellEntry* CastingSpell,uint32
 					case 17116: //Shaman - Nature's Swiftness
 					case 16188:
 						{
-//							if(CastingSpell->School!=SCHOOL_NATURE||(!sd->CastTime||sd->CastTime>10000)) continue;
-							if(CastingSpell->School!=SCHOOL_NATURE||(sd->CastTime==0)) continue;
+//							if( CastingSpell->School!=SCHOOL_NATURE||(!sd->CastTime||sd->CastTime>10000)) continue;
+							if( CastingSpell->School!=SCHOOL_NATURE||(sd->CastTime==0)) continue;
 						}break;
 					case 16166:
 						{
@@ -1414,7 +1414,7 @@ bool Unit::isCasting()
 bool Unit::IsInInstance()
 {
 	MapInfo *pMapinfo = WorldMapInfoStorage.LookupEntry(this->GetMapId());
-	if (pMapinfo)
+	if(pMapinfo)
 		return (pMapinfo->type != INSTANCE_NULL);
 
 	return false;
@@ -1424,7 +1424,7 @@ void Unit::RegenerateHealth()
 {
 	m_H_regenTimer = 2000;//set next regen time 
 
-	if (!isAlive())
+	if(!isAlive())
 		return;
 
 	// player regen
@@ -1451,7 +1451,7 @@ void Unit::RegeneratePower(bool isinterrupted)
     // This is only 2000 IF the power is not rage
 	m_P_regenTimer = 2000;//set next regen time 
 
-	if (!isAlive())
+	if(!isAlive())
 		return;
 
 	// player regen
@@ -1533,8 +1533,8 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 //		double Reduction = double(pVictim->GetResistance(0)) / double(pVictim->GetResistance(0)+400+(85*getLevel()));
 		//dmg reduction formula from xinef
 		double Reduction = 0;
-		if (getLevel() < 60) Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)+400+(85*getLevel()));
-		else if (getLevel() > 59 && getLevel() < 70) Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)-22167.5+(467.5*getLevel()));
+		if(getLevel() < 60) Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)+400+(85*getLevel()));
+		else if(getLevel() > 59 && getLevel() < 70) Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)-22167.5+(467.5*getLevel()));
 		//
 		else Reduction = double(pVictim->GetResistance(0) - ArmorReduce) / double(pVictim->GetResistance(0)+10557.5);
 		if(Reduction > 0.75f) Reduction = 0.75f;
@@ -1551,7 +1551,7 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 		  // NOT WOWWIKILIKE but i think it's actual to add some fullresist chance frome resistances
 		  float Resistchance=(float)pVictim->GetResistance( (*dmg).school_type)/(float)pVictim->getLevel();
 		  Resistchance*=Resistchance*2;
-		  if (Rand(Resistchance))
+		  if(Rand(Resistchance))
 			  AverageResistance=1.0f;
 
 		if(AverageResistance>0)
@@ -1614,7 +1614,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 		if(pVictim->m_objectTypeId == TYPEID_UNIT) 
 		{ 
 			Creature * c = (Creature*)(pVictim);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+			if(c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			{
 				victim_skill = std::max(victim_skill,((int32)this->getLevel()+3)*5); //used max to avoid situation when lowlvl hits boss.
 			}
@@ -1648,19 +1648,19 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 			break;
 		}
 
-		if (it && it->GetProto())
+		if(it && it->GetProto())
 			SubClassSkill = GetSkillByProto(it->GetProto()->Class,it->GetProto()->SubClass);
 		else
 			SubClassSkill = SKILL_UNARMED;
 
-		if (SubClassSkill==SKILL_FIST_WEAPONS) 
+		if(SubClassSkill==SKILL_FIST_WEAPONS) 
 			SubClassSkill = SKILL_UNARMED;
 
 		//chances in feral form don't depend on weapon skill
-		if (static_cast<Player*>(this)->IsInFeralForm()) 
+		if(static_cast<Player*>(this)->IsInFeralForm()) 
 		{
 			uint8 form = static_cast<Player*>(this)->GetShapeShift();
-			if (form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
+			if(form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
 			{
 				SubClassSkill = SKILL_FERAL_COMBAT;
 				// Adjust skill for Level * 5 for Feral Combat
@@ -1676,7 +1676,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 		if(m_objectTypeId == TYPEID_UNIT) 
 		{ 
 			Creature * c = (Creature*)(this);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+			if(c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 				self_skill = std::max(self_skill,((int32)pVictim->getLevel()+3)*5);//used max to avoid situation when lowlvl hits boss.
 		} 
 	}
@@ -1685,30 +1685,30 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	//==========================================================================================
 	//<THE SHIT> to avoid Linux bug. 
 	float diffVcapped = (float)self_skill;
-	if (int32(pVictim->getLevel()*5)>victim_skill)
+	if(int32(pVictim->getLevel()*5)>victim_skill)
 		diffVcapped -=(float)victim_skill;
 	else
 		diffVcapped -=(float)(pVictim->getLevel()*5);
 
 	float diffAcapped = (float)victim_skill;
-	if (int32(this->getLevel()*5)>self_skill)
+	if(int32(this->getLevel()*5)>self_skill)
 		diffAcapped -=(float)self_skill;
 	else
 		diffAcapped -=(float)(this->getLevel()*5);
 	//<SHIT END>
 
 	//--------------------------------by victim state-------------------------------------------
-	if (pVictim->IsPlayer()&&pVictim->GetStandState()) //every not standing state is >0
+	if(pVictim->IsPlayer()&&pVictim->GetStandState()) //every not standing state is >0
 	{
 		hitchance = 100.0f;
 	}
 	//--------------------------------by damage type and by weapon type-------------------------
-	if (damage_type==RANGED) 
+	if(damage_type==RANGED) 
 	{
 		dodge=0.0f;
 		parry=0.0f;
 	}
-	else if (this->IsPlayer())
+	else if(this->IsPlayer())
 	{
 		it = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
 		if(it && it->GetProto()->InventoryType==INVTYPE_WEAPON && !ability)//dualwield to-hit penalty
@@ -1724,16 +1724,16 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	//--------------------------------by skill difference---------------------------------------
 	float vsk = (float)self_skill-(float)victim_skill;
 	dodge = std::max(0.0f,dodge-vsk*0.04f);
-	if (parry)
+	if(parry)
 		parry = std::max(0.0f,parry-vsk*0.04f);
-	if (block)
+	if(block)
 		block = std::max(0.0f,block-vsk*0.04f);
 
-	if (vsk>0)
+	if(vsk>0)
 		hitchance = std::max(hitchance,95.0f+vsk*0.02f+hitmodifier);
 	else
 	{
-		if (pVictim->IsPlayer())
+		if(pVictim->IsPlayer())
 			hitchance = std::max(hitchance,95.0f+vsk*0.1f+hitmodifier); //wowwiki multiplier - 0.04 but i think 0.1 more balanced
 		else
 			hitchance = std::max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
@@ -1778,7 +1778,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 //==========================================================================================
 //==============================Unacceptable Cases Processing===============================
 //==========================================================================================
-	if (!pVictim->isAlive() || !isAlive()  || IsStunned() || IsPacified())
+	if(!pVictim->isAlive() || !isAlive()  || IsStunned() || IsPacified())
 		return;
 	if(!isInFront(pVictim))
 		if(IsPlayer())
@@ -1831,7 +1831,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 //--------------------------------block chance----------------------------------------------
 				block = pVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE); //shield check already done in Update chances
 //--------------------------------dodge chance----------------------------------------------
-			if (pVictim->m_stunned<=0) 
+			if(pVictim->m_stunned<=0) 
 			{
 				dodge = pVictim->GetFloatValue(PLAYER_DODGE_PERCENTAGE);
 			}
@@ -1852,7 +1852,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 		if(pVictim->m_objectTypeId == TYPEID_UNIT) 
 		{ 
 			Creature * c = (Creature*)(pVictim);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+			if(c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			{
 				victim_skill = std::max(victim_skill,((int32)this->getLevel()+3)*5); //used max to avoid situation when lowlvl hits boss.
 			}
@@ -1887,19 +1887,19 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 			break;
 		}
 
-		if (it && it->GetProto())
+		if(it && it->GetProto())
 			SubClassSkill = GetSkillByProto(it->GetProto()->Class,it->GetProto()->SubClass);
 		else
 			SubClassSkill = SKILL_UNARMED;
 
-		if (SubClassSkill==SKILL_FIST_WEAPONS) 
+		if(SubClassSkill==SKILL_FIST_WEAPONS) 
 			SubClassSkill = SKILL_UNARMED;
 
 		//chances in feral form don't depend on weapon skill
-		if (static_cast<Player*>(this)->IsInFeralForm()) 
+		if(static_cast<Player*>(this)->IsInFeralForm()) 
 		{
 			uint8 form = static_cast<Player*>(this)->GetShapeShift();
-			if (form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
+			if(form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
 			{
 				SubClassSkill = SKILL_FERAL_COMBAT;
 				// Adjust skill for Level * 5 for Feral Combat
@@ -1916,7 +1916,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 		if(m_objectTypeId == TYPEID_UNIT) 
 		{ 
 			Creature * c = (Creature*)(this);
-			if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
+			if(c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 				self_skill = std::max(self_skill,((int32)pVictim->getLevel()+3)*5);//used max to avoid situation when lowlvl hits boss.
 		} 
 		crit = 5.0f; //will be modified later
@@ -1926,13 +1926,13 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 //==========================================================================================
 //<THE SHIT> to avoid Linux bug. 
 float diffVcapped = (float)self_skill;
-if (int32(pVictim->getLevel()*5)>victim_skill)
+if(int32(pVictim->getLevel()*5)>victim_skill)
 	diffVcapped -=(float)victim_skill;
 else
 	diffVcapped -=(float)(pVictim->getLevel()*5);
 
 float diffAcapped = (float)victim_skill;
-if (int32(this->getLevel()*5)>self_skill)
+if(int32(this->getLevel()*5)>self_skill)
 	diffAcapped -=(float)self_skill;
 else
 	diffAcapped -=(float)(this->getLevel()*5);
@@ -1941,16 +1941,16 @@ else
 //--------------------------------crushing blow chance--------------------------------------
 	if(pVictim->IsPlayer()&&!this->IsPlayer()&&!ability)
 	{
-		if (diffVcapped>=15.0f)
+		if(diffVcapped>=15.0f)
 			crush = -15.0f+2.0f*diffVcapped; 
 		else 
 			crush = 0.0f;
 	}
 //--------------------------------glancing blow chance--------------------------------------
-	if (this->IsPlayer()&&!pVictim->IsPlayer()&&!ability)
+	if(this->IsPlayer()&&!pVictim->IsPlayer()&&!ability)
 	{
 		glanc = 10.0f + diffAcapped;
-		if (glanc<0)
+		if(glanc<0)
 			glanc = 0.0f;
 	}
 //==========================================================================================
@@ -1971,14 +1971,14 @@ else
 		}
 	}
 //--------------------------------by damage type and by weapon type-------------------------
-	if (damage_type==RANGED) 
+	if(damage_type==RANGED) 
 	{
 		dodge=0.0f;
 		parry=0.0f;
 		glanc=0.0f;
 	}
 	else
-		if (this->IsPlayer())
+		if(this->IsPlayer())
 		{
 			it = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
 			if(it && it->GetProto()->InventoryType==INVTYPE_WEAPON && !ability)//dualwield to-hit penalty
@@ -1993,20 +1993,20 @@ else
 //--------------------------------by skill difference---------------------------------------
 	float vsk = (float)self_skill-(float)victim_skill;
 	dodge = std::max(0.0f,dodge-vsk*0.04f);
-	if (parry)
+	if(parry)
 		parry = std::max(0.0f,parry-vsk*0.04f);
-	if (block)
+	if(block)
 		block = std::max(0.0f,block-vsk*0.04f);
 
 	crit += pVictim->IsPlayer() ? vsk*0.04f : min(vsk*0.2f,0.0f) ; 
 	crit -= pVictim->IsPlayer() ? static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) : 0.0f;
-	if (crit<0) crit=0.0f;
+	if(crit<0) crit=0.0f;
 
-	if (vsk>0)
+	if(vsk>0)
 			hitchance = std::max(hitchance,95.0f+vsk*0.02f+hitmodifier);
 	else
 	{
-		if (pVictim->IsPlayer())
+		if(pVictim->IsPlayer())
 			hitchance = std::max(hitchance,95.0f+vsk*0.04f+hitmodifier);
 		else
 			hitchance = std::max(hitchance,100.0f+vsk*0.6f+hitmodifier); //not wowwiki but more balanced
@@ -2025,7 +2025,7 @@ else
 	}
 
 	//--------------------------------by victim state-------------------------------------------
-	if (pVictim->IsPlayer()&&pVictim->GetStandState()) //every not standing state is >0
+	if(pVictim->IsPlayer()&&pVictim->GetStandState()) //every not standing state is >0
 	{
 		hitchance = 100.0f;
 		dodge = 0.0f;
@@ -2169,12 +2169,12 @@ else
 #endif
 			}
 			dmg.full_damage += pVictim->DamageTakenMod[0]+add_damage;
-			if (damage_type==RANGED)
+			if(damage_type==RANGED)
 			{
 				dmg.full_damage+=pVictim->RangedDamageTaken;
 			}
 			
-			if (ability && ability->MechanicsType == MECHANIC_BLEEDING)
+			if(ability && ability->MechanicsType == MECHANIC_BLEEDING)
 				disable_dR = true; 
 			
 			float summaryPCTmod = pVictim->DamageTakenPctMod[0]+this->DamageDoneModPCT[0];
@@ -2182,15 +2182,15 @@ else
 			if(pct_dmg_mod > 0)
 				dmg.full_damage = float2int32(dmg.full_damage*(float(pct_dmg_mod)/100.0f));
 
-			/*if (pct_dmg_mod) Should not be in summaryPCT mod cause it modifier in abilities like 250% of weapon damage
+			/*if(pct_dmg_mod) Should not be in summaryPCT mod cause it modifier in abilities like 250% of weapon damage
 				summaryPCTmod += pct_dmg_mod/100.0f - 1;*/
 
 			//a bit dirty fix
-			if (ability && ability->NameHash == 0x8401EC6A)
+			if(ability && ability->NameHash == 0x8401EC6A)
 				summaryPCTmod += pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
 
 			/* RangedDamageTakenPct is not used
-			if (damage_type == RANGED)
+			if(damage_type == RANGED)
 			{
 				summaryPCTmod+=pVictim->RangedDamageTakenPct/100;	
 			}*/
@@ -2206,22 +2206,22 @@ else
 			case 3:
 				{
 					float low_dmg_mod = 1.5f - (0.05f * diffAcapped);
-					if (this->getClass() == MAGE || this->getClass() == PRIEST || this->getClass() == WARLOCK) //casters = additional penalty.
+					if(this->getClass() == MAGE || this->getClass() == PRIEST || this->getClass() == WARLOCK) //casters = additional penalty.
 					{
 						low_dmg_mod -= 0.7f;
 					}
-					if (low_dmg_mod<0.01)
+					if(low_dmg_mod<0.01)
 						low_dmg_mod = 0.01f;
-					if (low_dmg_mod>0.91)
+					if(low_dmg_mod>0.91)
 						low_dmg_mod = 0.91f;
 					float high_dmg_mod = 1.2f - (0.03f * diffAcapped);
-					if (this->getClass() == MAGE || this->getClass() == PRIEST || this->getClass() == WARLOCK) //casters = additional penalty.
+					if(this->getClass() == MAGE || this->getClass() == PRIEST || this->getClass() == WARLOCK) //casters = additional penalty.
 					{
 						high_dmg_mod -= 0.3f;
 					}
-					if (high_dmg_mod>0.99)
+					if(high_dmg_mod>0.99)
 						high_dmg_mod = 0.99f;
-					if (high_dmg_mod<0.2)
+					if(high_dmg_mod<0.2)
 						high_dmg_mod = 0.2f;
 
 					float damage_reduction = (high_dmg_mod + low_dmg_mod) / 2;
@@ -2289,7 +2289,7 @@ else
 						if(!pVictim->IsPlayer())
 							dmg.full_damage += float2int32(dmg.full_damage*static_cast<Player*>(this)->IncreaseCricticalByTypePCT[((Creature*)pVictim)->GetCreatureName() ? ((Creature*)pVictim)->GetCreatureName()->Type : 0]);
 					}
-					if (pVictim->IsPlayer())
+					if(pVictim->IsPlayer())
 					{
 //						dmg.full_damage=float2int32(float(dmg.full_damage)*(1.0f-2.0f*static_cast<Player*>(pVictim)->CalcRating(PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE)));
 
@@ -2522,7 +2522,7 @@ else
 //==============================Damage Dealing==============================================
 //==========================================================================================
 
-	if (this->IsPlayer() && ability)
+	if(this->IsPlayer() && ability)
 		static_cast<Player*>(this)->m_casted_amount[ability->School]=(uint32)(realdamage+abs);
 	if(realdamage)
 	{
@@ -2530,7 +2530,7 @@ else
 		//pVictim->HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,this);
 //		HandleProcDmgShield(PROC_ON_MELEE_ATTACK_VICTIM,pVictim);
 
-		if (pVictim->GetCurrentSpell())
+		if(pVictim->GetCurrentSpell())
 			pVictim->GetCurrentSpell()->AddTime(0);
 	}
 	else
@@ -2546,10 +2546,10 @@ else
 	if(pVictim->IsPlayer())
 	{
 		static_cast<Player*>(pVictim)->GetItemInterface()->ReduceItemDurability();
-		if (!this->IsPlayer())
+		if(!this->IsPlayer())
 		{
 			Player *pr = ((Player*)pVictim);
-			if (Rand(pr->GetSkillUpChance(SKILL_DEFENSE)*sWorld.getRate(RATE_SKILLCHANCE)))
+			if(Rand(pr->GetSkillUpChance(SKILL_DEFENSE)*sWorld.getRate(RATE_SKILLCHANCE)))
 			{
 				pr->_AdvanceSkillLine(SKILL_DEFENSE, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
 				pr->UpdateChances();
@@ -2562,11 +2562,11 @@ else
 	}
 	else
 	{
-		if (this->IsPlayer())//not pvp
+		if(this->IsPlayer())//not pvp
 		{
 			static_cast<Player*>(this)->GetItemInterface()->ReduceItemDurability();
 			Player *pr = ((Player*)this);
-			if (Rand(pr->GetSkillUpChance(SubClassSkill)*sWorld.getRate(RATE_SKILLCHANCE)))
+			if(Rand(pr->GetSkillUpChance(SubClassSkill)*sWorld.getRate(RATE_SKILLCHANCE)))
 			{
 				pr->_AdvanceSkillLine(SubClassSkill, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
 				//pr->UpdateChances();
@@ -3298,10 +3298,10 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	if(spellInfo->baseLevel > 0 && spellInfo->maxLevel > 0)
 	{
 		float downrank1 = 1.0f;
-		if (spellInfo->baseLevel < 20)
+		if(spellInfo->baseLevel < 20)
 		    downrank1 = 1.0f - (20.0f - float (spellInfo->baseLevel) ) * 0.0375f;
 		float downrank2 = ( float(spellInfo->maxLevel + 5.0f) / float(static_cast<Player*>(caster)->getLevel()) );
-		if (downrank2 >= 1 || downrank2 < 0)
+		if(downrank2 >= 1 || downrank2 < 0)
 		        downrank2 = 1.0f;
 		dmgdoneaffectperc *= downrank1 * downrank2;
 	}
@@ -3594,17 +3594,17 @@ void Unit::WipeTargetList()
 
 void Unit::AddInRangeObject(Object* pObj)
 {
-	if ((pObj->GetTypeId() == TYPEID_UNIT) || (pObj->GetTypeId() == TYPEID_PLAYER))
+	if((pObj->GetTypeId() == TYPEID_UNIT) || (pObj->GetTypeId() == TYPEID_PLAYER))
 	{
-		if (isHostile(this, (Unit*)pObj))
+		if(isHostile(this, (Unit*)pObj))
 			m_oppFactsInRange.insert(pObj);
-		if (GetTypeId()==TYPEID_PLAYER)
+		if(GetTypeId()==TYPEID_PLAYER)
 		{
-			if (((Player*)this)->InGroup())
+			if(((Player*)this)->InGroup())
 			{
 				if(pObj->GetTypeId() == TYPEID_UNIT)
 				{
-					if (((Creature*)pObj)->Tagged)
+					if(((Creature*)pObj)->Tagged)
 					{
 						if(((Player*)this)->GetGroup()->HasMember(pObj->GetMapMgr()->GetPlayer((uint32)((Creature*)pObj)->TaggerGuid)))
 						{
@@ -3630,7 +3630,7 @@ void Unit::OnRemoveInRangeObject(Object* pObj)
 
 	if(pObj->GetTypeId() == TYPEID_UNIT || pObj->GetTypeId() == TYPEID_PLAYER)
 	{
-		/*if (m_useAI)*/
+		/*if(m_useAI)*/
 
 		Unit *pUnit = static_cast<Unit*>(pObj);
 		GetAIInterface()->CheckTarget(pUnit);
@@ -3902,7 +3902,7 @@ void Unit::VampiricTouch(uint32 dmg,Unit* tgt)
         
         int32 perc = 5;
         //SM_FIValue(SM_FSPELL_VALUE,&perc,4);
-		if (perc*dmg<0)
+		if(perc*dmg<0)
 			return;
         uint32 man = (dmg*perc) / 100;
 		this->Energize(this,34919,man,POWER_TYPE_MANA);
@@ -4432,11 +4432,12 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 					case 33151:
 						{
 							//our luck. it got trigered on smite..we do not remove it just yet
-							if(m_currentSpell && m_currentSpell->m_spellInfo->NameHash==2272412495UL)
+							if( m_currentSpell && m_currentSpell->m_spellInfo->NameHash == SPELL_HASH_SMITE )
 								continue;
+
 							//this spell gets removed only when caasting smite
-						    SpellEntry *spi = dbcSpell.LookupEntry(skip);
-							if(spi && spi->NameHash!=2272412495UL)
+						    SpellEntry *spi = dbcSpell.LookupEntry( skip );
+							if( spi && spi->NameHash != SPELL_HASH_SMITE )
 								continue;
 						}
 				}
@@ -4717,7 +4718,7 @@ void Unit::UpdateVisibility()
 				}
 			}
 
-			if (pObj->GetTypeId() == TYPEID_PLAYER)
+			if(pObj->GetTypeId() == TYPEID_PLAYER)
 			{
 				pl = ((Player*)pObj);
 				can_see = pl->CanSee(plr);
@@ -5236,7 +5237,7 @@ void Unit::CombatStatusHandler_UpdatePvPTimeout()
 
 void Unit::Heal(Unit *target, uint32 SpellId, uint32 amount)
 {//Static heal
-	if (!target || !SpellId || !amount)
+	if(!target || !SpellId || !amount)
 		return;
 
 	uint32 ch=this->GetUInt32Value(UNIT_FIELD_HEALTH);
@@ -5263,7 +5264,7 @@ void Unit::Heal(Unit *target, uint32 SpellId, uint32 amount)
 }
 void Unit::Energize(Unit* target,uint32 SpellId, uint32 amount,uint32 type)
 {//Static energize
-	if (!target || !SpellId || !amount)
+	if(!target || !SpellId || !amount)
 		return;
 
 	uint32 cm=this->GetUInt32Value(UNIT_FIELD_POWER1+type);

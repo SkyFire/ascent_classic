@@ -658,32 +658,23 @@ bool World::SetInitialWorldSettings()
             type |= SPELL_TYPE_AURA;
 		else if(strstr(nametext, "Track")==nametext)
             type |= SPELL_TYPE_TRACK;
-//		else if(strstr(nametext, "Gift of the Wild") || strstr(nametext, "Mark of the Wild"))
-		else if(namehash==0xF77CAB47 || namehash==0x202F1D74)
+		else if( namehash == SPELL_HASH_GIFT_OF_THE_WILD || namehash == SPELL_HASH_MARK_OF_THE_WILD )
             type |= SPELL_TYPE_MARK_GIFT;
-//		else if(strstr(nametext, "Immolation Trap") || strstr(nametext, "Freezing Trap") || strstr(nametext, "Frost Trap") || strstr(nametext, "Explosive Trap") || strstr(nametext, "Snake Trap"))
-		else if(namehash==0x238FEAF2 || namehash==0x593D7EC7 || namehash==0xF7318BD7 || namehash==0x54B6F3EE || namehash==0xF57361BB)
+		else if( namehash == SPELL_HASH_IMMOLATION_TRAP || namehash == SPELL_HASH_FREEZING_TRAP || namehash == SPELL_HASH_FROST_TRAP || namehash == SPELL_HASH_EXPLOSIVE_TRAP || namehash == SPELL_HASH_SNAKE_TRAP )
             type |= SPELL_TYPE_HUNTER_TRAP;
-//		else if(strstr(nametext, "Arcane Intellect") || strstr(nametext, "Arcane Brilliance"))
-		else if(namehash==0x2F7018BA || namehash==0x9CA89B04)
+		else if( namehash == SPELL_HASH_ARCANE_INTELLECT || namehash == SPELL_HASH_ARCANE_BRILLIANCE )
             type |= SPELL_TYPE_MAGE_INTEL;
-//		else if(strstr(nametext, "Amplify Magic") || strstr(nametext, "Dampen Magic"))
-		else if(namehash==0x75E2ACFF || namehash==0x3C4E2404)
+		else if( namehash == SPELL_HASH_AMPLIFY_MAGIC || namehash == SPELL_HASH_DAMPEN_MAGIC )
             type |= SPELL_TYPE_MAGE_MAGI;
-//		else if(strstr(nametext, "Fire Ward") || strstr(nametext, "Frost Ward"))
-		else if(namehash==0xC83A99CB || namehash==0x80D1ACFF)
+		else if( namehash == SPELL_HASH_FIRE_WARD || namehash == SPELL_HASH_FROST_WARD )
             type |= SPELL_TYPE_MAGE_WARDS;
-//		else if(strstr(nametext, "Shadow Protection") || strstr(nametext, "Prayer of Shadow Protection"))
-		else if(namehash==0xD9948728 || namehash==0xBDA6C77C)
+		else if( namehash == SPELL_HASH_SHADOW_PROTECTION || namehash == SPELL_HASH_PRAYER_OF_SHADOW_PROTECTION )
             type |= SPELL_TYPE_PRIEST_SH_PPROT;
-//		else if(strstr(nametext, "Water Shield") || strstr(nametext, "Earth Shield") || strstr(nametext, "Lightning Shield"))
-		else if(namehash==0xB9DAC27E || namehash==0x0227BA8B || namehash==0x2123CF1E)
+		else if( namehash == SPELL_HASH_WATER_SHIELD || namehash == SPELL_HASH_EARTH_SHIELD || namehash == SPELL_HASH_LIGHTNING_SHIELD )
             type |= SPELL_TYPE_SHIELD;
-//		else if(strstr(nametext, "Power Word: Fortitude") || strstr(nametext, "Prayer of Fortitude"))
-		else if(namehash==0x9056D252 || namehash==0x519F97B3)
+		else if( namehash == SPELL_HASH_POWER_WORD__FORTITUDE || namehash == SPELL_HASH_PRAYER_OF_FORTITUDE )
             type |= SPELL_TYPE_FORTITUDE;
-//		else if(strstr(nametext, "Divine Spirit") || strstr(nametext, "Prayer of Spirit"))
-		else if(namehash==0xB1792C31 || namehash==0xC8F56DAF)
+		else if( namehash == SPELL_HASH_DIVINE_SPIRIT || namehash == SPELL_HASH_PRAYER_OF_SPIRIT )
             type |= SPELL_TYPE_SPIRIT;
 //		else if(strstr(nametext, "Curse of Weakness") || strstr(nametext, "Curse of Agony") || strstr(nametext, "Curse of Recklessness") || strstr(nametext, "Curse of Tongues") || strstr(nametext, "Curse of the Elements") || strstr(nametext, "Curse of Idiocy") || strstr(nametext, "Curse of Shadow") || strstr(nametext, "Curse of Doom"))
 //		else if(namehash==4129426293 || namehash==885131426 || namehash==626036062 || namehash==3551228837 || namehash==2784647472 || namehash==776142553 || namehash==3407058720 || namehash==202747424)
@@ -699,15 +690,15 @@ bool World::SetInitialWorldSettings()
             type |= SPELL_TYPE_ELIXIR_GUARDIAN;
         else if(strstr(desc, "Battle and Guardian elixir"))
             type |= SPELL_TYPE_ELIXIR_FLASK;
-		else if(namehash==0xFF89ABD2)		// hunter's mark
+		else if( namehash == SPELL_HASH_HUNTER_S_MARK )		// hunter's mark
 			type |= SPELL_TYPE_HUNTER_MARK;
 		else if(strstr(desc, "Finishing move")==desc)
 			sp->c_is_flags |= SPELL_FLAG_IS_FINISHING_MOVE;
-		if(IsDamagingSpell(sp))
+		if( IsDamagingSpell( sp ) )
 			sp->c_is_flags |= SPELL_FLAG_IS_DAMAGING;
-		if(IsHealingSpell(sp))
+		if( IsHealingSpell( sp ) )
 			sp->c_is_flags |= SPELL_FLAG_IS_HEALING;
-		if(IsTargetingStealthed(sp))
+		if( IsTargetingStealthed( sp ) )
 			sp->c_is_flags |= SPELL_FLAG_IS_TARGETINGSTEALTHED;
 		
 
