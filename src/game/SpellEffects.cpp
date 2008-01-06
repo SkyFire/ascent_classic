@@ -331,18 +331,26 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			}break;
 		case SPELL_HASH_GOUGE:	// Gouge: turns off your combat
 			{
-				if(p_caster)
+				if( p_caster != NULL )
 				{
 					p_caster->EventAttackStop();
-					p_caster->smsg_AttackStop(unitTarget);
+					p_caster->smsg_AttackStop( unitTarget );
+				}break;
+			}break;
+		case SPELL_HASH_BLIND:	// Blind: turns off your attack
+			{
+				if( p_caster != NULL )
+				{
+					p_caster->EventAttackStop();
+					p_caster->smsg_AttackStop( unitTarget );
 				}break;
 			}break;
 		case SPELL_HASH_MAIM:	// Maim: turns off your attack
 			{
-				if(p_caster)
+				if( p_caster != NULL )
 				{
 					p_caster->EventAttackStop();
-					p_caster->smsg_AttackStop(unitTarget);
+					p_caster->smsg_AttackStop( unitTarget );
 				}break;
 			}break;
 		case SPELL_HASH_ARCANE_SHOT: //hunter - arcane shot
@@ -394,7 +402,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 		//FIXME:Use this one and check player movement and update distance
 		//It now only checks the first distance and hits the player after time expires.
 		//sEventMgr.AddEvent(this, &Spell::_DamageRangeUpdate, (uint32)100, EVENT_SPELL_DAMAGE_HIT, 100, 0);
-		float dist = m_caster->CalcDistance(unitTarget);
+		float dist = m_caster->CalcDistance( unitTarget );
 		float time = ((dist*1000.0f)/m_spellInfo->speed);
 		if(time <= 100)
 			m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, dmg, pSpellId==0);
@@ -462,7 +470,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			for(int i=0;i<targets_got;i++)
 			{
 				//set threat to this target so we are the msot hated
-				uint32 threat_to_him = targets[i]->GetAIInterface()->getThreatByPtr(unitTarget);
+				uint32 threat_to_him = targets[i]->GetAIInterface()->getThreatByPtr( unitTarget );
 				uint32 threat_to_us = targets[i]->GetAIInterface()->getThreatByPtr(u_caster);
 				int threat_dif = threat_to_him - threat_to_us;
 				if(threat_dif>0)//should nto happen
@@ -1179,7 +1187,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	// can't apply stuns/fear/polymorph/root etc on boss
 	if (!unitTarget->IsPlayer())
 	{
-		Creature * c = (Creature*)(unitTarget);
+		Creature * c = (Creature*)( unitTarget );
 		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 		{
 			switch(m_spellInfo->EffectApplyAuraName[i])
@@ -1966,7 +1974,7 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 	}
 	else if (m_spellInfo->Id==2687){
 		modEnergy = damage;
-		if(p_caster)
+		if( p_caster != NULL )
 		{
 			/*for(set<uint32>::iterator itr = p_caster->mSpells.begin(); itr != p_caster->mSpells.end(); ++itr)
 			{
@@ -2435,7 +2443,7 @@ void Spell::SpellEffectLearnPetSpell(uint32 i)
 
 	if(unitTarget && UINT32_LOPART(unitTarget->GetGUIDHigh()) == HIGHGUID_PET && p_caster)
 	{
-		Pet * pPet = static_cast<Pet*>(unitTarget);
+		Pet * pPet = static_cast<Pet*>( unitTarget );
 		if(pPet->IsSummon())
 		{
 			p_caster->AddSummonSpell(unitTarget->GetEntry(), m_spellInfo->EffectTriggerSpell[i]);
@@ -2819,7 +2827,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		GameObjectInfo * goI = GameObjectNameStorage.LookupEntry(entry);
 		if(!goI)
 		{
-			if(p_caster)
+			if( p_caster != NULL )
 			{
 				sChatHandler.BlueSystemMessage(p_caster->GetSession(),
 				"non-existant gameobject %u tried to be created by SpellEffectSummonObject. Report to devs!", entry);
@@ -3113,7 +3121,7 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 	// can't apply stuns/fear/polymorph/root etc on boss
 	if(unitTarget->GetTypeId()==TYPEID_UNIT)
 	{
-		Creature * c = (Creature*)(unitTarget);
+		Creature * c = (Creature*)( unitTarget );
 		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
 			return;
 	}
@@ -3165,7 +3173,7 @@ void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
 	if(unitTarget->GetTypeId() != TYPEID_UNIT)
 		return;
 
-	Creature *target = static_cast<Creature*>(unitTarget);
+	Creature *target = static_cast<Creature*>( unitTarget );
 	if(target->IsPickPocketed() || (target->GetCreatureName() && target->GetCreatureName()->Type != HUMANOID))
 	{
 		SendCastResult(SPELL_FAILED_TARGET_NO_POCKETS);
@@ -3919,7 +3927,7 @@ void Spell::SpellEffectCharge(uint32 i)
 	
 	p_caster->SetPosition(x,y,z,alpha,true);
 	p_caster->addStateFlag(UF_ATTACKING);
-	p_caster ->smsg_AttackStart(unitTarget);
+	p_caster ->smsg_AttackStart( unitTarget );
 	p_caster->EventAttackStart();
 	p_caster->setAttackTimer(time, false);
 	p_caster->setAttackTimer(time, true);
