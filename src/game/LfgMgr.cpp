@@ -365,7 +365,7 @@ void LfgMgr::RemovePlayerFromLfmList(Player * pl, uint32 LfmDungeonId)
 	if( !pl->IsInWorld() )
 		return;
 
-	if( LfgDungeonId > MAX_DUNGEONS )
+	if( LfmDungeonId > MAX_DUNGEONS )
 		return;
 
 	m_lock.Acquire();
