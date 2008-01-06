@@ -51,6 +51,12 @@ LfgMgr::~LfgMgr()
 
 bool LfgMgr::AttemptLfgJoin(Player * pl, uint32 LfgDungeonId)
 {
+	if( pl == NULL )
+		return false;
+
+	if( !pl->IsInWorld() )
+		return false;
+
 	// if the player has autojoin enabled,
 	// search for any groups that have auto add members enabled, also have this dungeon, and add him
 	// if one is found.
@@ -81,6 +87,9 @@ bool LfgMgr::AttemptLfgJoin(Player * pl, uint32 LfgDungeonId)
 
 void LfgMgr::SetPlayerInLFGqueue(Player *pl,uint32 LfgDungeonId)
 {
+	if( pl == NULL )
+		return;
+
 	m_lock.Acquire();
 
 	// there are either no groups free or we don't have autojoin enabled, put us in the queue.
@@ -92,6 +101,9 @@ void LfgMgr::SetPlayerInLFGqueue(Player *pl,uint32 LfgDungeonId)
 
 void LfgMgr::RemovePlayerFromLfgQueues(Player * pl)
 {
+	if( pl == NULL )
+		return;
+
 	m_lock.Acquire();
 	for(uint32 i = 0; i < MAX_LFG_QUEUE_ID; ++i)
 	{
@@ -116,14 +128,17 @@ void LfgMgr::RemovePlayerFromLfgQueues(Player * pl)
 	m_lock.Release();
 }
 
-void LfgMgr::RemovePlayerFromLfgQueue(Player *pl,uint32 LfgDungeonId)
+void LfgMgr::RemovePlayerFromLfgQueue( Player* plr, uint32 LfgDungeonId )
 {
+	if( plr == NULL )
+		return;
+
 	m_lock.Acquire();
-	m_lookingForGroup[LfgDungeonId].remove(pl);
+	m_lookingForGroup[LfgDungeonId].remove( plr );
 	m_lock.Release();
 
-	if(pl->m_Autojoin)
-		pl->SendMeetingStoneQueue(LfgDungeonId, 0);
+	if( plr->m_Autojoin )
+		plr->SendMeetingStoneQueue( LfgDungeonId, 0 );
 }
 
 void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
@@ -223,8 +238,11 @@ void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
 	m_lock.Release();
 }
 
-void LfgMgr::SendLfgList(Player * plr, uint32 Dungeon)
+void LfgMgr::SendLfgList( Player* plr, uint32 Dungeon )
 {
+	if( plr == NULL )
+		return;
+
 	LfgPlayerList::iterator itr;
 	GroupMembersSet::iterator it2;
 	uint32 count = 0;
@@ -313,6 +331,12 @@ void LfgMgr::SendLfgList(Player * plr, uint32 Dungeon)
 
 void LfgMgr::SetPlayerInLfmList(Player * pl, uint32 LfgDungeonId)
 {
+	if( pl == NULL )
+		return;
+
+	if( !pl->IsInWorld() )
+		return;
+
 	m_lock.Acquire();
 	m_lookingForMore[LfgDungeonId].push_back(pl);
 	m_lock.Release();
@@ -320,6 +344,12 @@ void LfgMgr::SetPlayerInLfmList(Player * pl, uint32 LfgDungeonId)
 
 void LfgMgr::RemovePlayerFromLfmList(Player * pl, uint32 LfmDungeonId)
 {
+	if( pl == NULL )
+		return;
+
+	if( !pl->IsInWorld() )
+		return;
+
 	m_lock.Acquire();
 	m_lookingForMore[LfmDungeonId].remove(pl);
 	m_lock.Release();
