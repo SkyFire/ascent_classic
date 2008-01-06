@@ -360,24 +360,23 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	// uint8
 	
 	// Search for the recipient
-	PlayerInfo * player = ObjectMgr::getSingleton().GetPlayerInfoByName(recepient);
-	if(player == 0)
+	PlayerInfo* player = ObjectMgr::getSingleton().GetPlayerInfoByName(recepient);
+	if( player == NULL )
 	{
-		SendMailError(MAIL_ERR_RECIPIENT_NOT_FOUND);
+		SendMailError( MAIL_ERR_RECIPIENT_NOT_FOUND );
 		return;
 	}
 
 	bool interfaction = false;
-	if(sMailSystem.MailOption(MAIL_FLAG_CAN_SEND_TO_OPPOSITE_FACTION) ||
-		(HasGMPermissions() && sMailSystem.MailOption(MAIL_FLAG_CAN_SEND_TO_OPPOSITE_FACTION_GM)))
+	if( sMailSystem.MailOption( MAIL_FLAG_CAN_SEND_TO_OPPOSITE_FACTION ) || (HasGMPermissions() && sMailSystem.MailOption( MAIL_FLAG_CAN_SEND_TO_OPPOSITE_FACTION_GM ) ) )
 	{
 		interfaction = true;
 	}
 
 	// Check we're sending to the same faction (disable this for testing)
-	if(player->team != _player->GetTeam() && !interfaction)
+	if( player->team != _player->GetTeam() && !interfaction )
 	{
-		SendMailError(MAIL_ERR_NOT_YOUR_ALLIANCE);
+		SendMailError( MAIL_ERR_NOT_YOUR_ALLIANCE );
 		return;
 	}
 
@@ -393,28 +392,27 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
 	// Set up the cost
 	int32 cost = 0;
-	if(!sMailSystem.MailOption(MAIL_FLAG_DISABLE_POSTAGE_COSTS) &&
-		!(GetPermissionCount() && sMailSystem.MailOption(MAIL_FLAG_NO_COST_FOR_GM)))
+	if( !sMailSystem.MailOption( MAIL_FLAG_DISABLE_POSTAGE_COSTS ) && !( GetPermissionCount() && sMailSystem.MailOption( MAIL_FLAG_NO_COST_FOR_GM ) ) )
 	{
 		cost = 30;
 	}
 
 	// Check for attached money
-	if(msg.money > 0)
+	if( msg.money > 0 )
 		cost += msg.money;
 
 	// check that we have enough in our backpack
-	if((int32)_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < cost)
+	if( (int32)_player->GetUInt32Value( PLAYER_FIELD_COINAGE ) < cost )
 	{
-		SendMailError(MAIL_ERR_NOT_ENOUGH_MONEY);
+		SendMailError( MAIL_ERR_NOT_ENOUGH_MONEY );
 		return;
 	}
 
 	// Check for the item, and required item.
-	if(msg.attached_item_guid != 0)
+	if( msg.attached_item_guid != 0 )
 	{
 		Item * attached_item = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(msg.attached_item_guid, false);
-		if(attached_item == 0 || attached_item->IsSoulbound())
+		if( attached_item == 0 || attached_item->IsSoulbound() )
 		{
 			// could not find item
 			SendMailError(MAIL_ERR_INTERNAL_ERROR);
@@ -423,13 +421,13 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
 		// Save the item with no owner (to objectmgr)
 		attached_item->RemoveFromWorld();
-		attached_item->SetOwner(NULL);
-		attached_item->SaveToDB(INVENTORY_SLOT_NOT_SET, 0,true);
+		attached_item->SetOwner( NULL );
+		attached_item->SaveToDB( INVENTORY_SLOT_NOT_SET, 0, true );
 
 		// Cut out the high part of the attached item.
 		msg.attached_item_guid = attached_item->GetGUID();
 
-		if(GetPermissionCount() > 0)
+		if( GetPermissionCount() > 0 )
 		{
 			/* log the message */
 			sGMLog.writefromsession(this, "sent mail with item entry %u to %s, with gold %u.", attached_item->GetEntry(), player->name, msg.money);
