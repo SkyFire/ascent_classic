@@ -71,11 +71,11 @@ int32 HonorHandler::CalculateHonorPointsForKill( Player *pPlayer, Unit* pVictim 
 
 	if( k_level > 5 && k_level < 40 )
 	{
-		k_grey = k_level - 5 + float2int32( floor( ((float)k_level) / 10.0f ) );
+		k_grey = k_level - 5 - float2int32( floor( ((float)k_level) / 10.0f ) );
 	}
 	else
 	{
-		k_grey = k_level - 1 + float2int32( floor( ((float)k_level) / 5.0f ) );
+		k_grey = k_level - 1 - float2int32( floor( ((float)k_level) / 5.0f ) );
 	}
 
 	if( k_honor == 0 )
