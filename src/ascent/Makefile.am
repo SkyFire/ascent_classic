@@ -5,15 +5,15 @@ INCLUDES += -I$(srcdir)/../game
 bin_PROGRAMS = ascent
 
 ascent_SOURCES = \
-    Main.cpp \
-    Master.cpp \
-    Master.h \
-    CConsole.cpp \
-    CConsole.h \
+	Main.cpp \
+	Master.cpp \
+	Master.h \
+	CConsole.cpp \
+	CConsole.h \
 	BaseConsole.h \
 	ConsoleCommands.cpp \
 	ConsoleCommands.h \
-	ConsoleListener.h
+	ConsoleListener.cpp
 
 ascent_LDADD = -lgame -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork -llua -lpcre
 
