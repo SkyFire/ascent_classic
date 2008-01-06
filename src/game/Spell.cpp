@@ -2541,6 +2541,7 @@ bool Spell::IsSeal()
 
 uint8 Spell::CanCast(bool tolerate)
 {
+	uint32 i;
 	if(objmgr.IsSpellDisabled(m_spellInfo->Id))
 		return SPELL_FAILED_SPELL_UNAVAILABLE;
 
@@ -2549,6 +2550,15 @@ uint8 Spell::CanCast(bool tolerate)
 		// check for cooldowns
 		if(!tolerate && !p_caster->CanCastDueToCooldown(m_spellInfo))
 				return SPELL_FAILED_NOT_READY;
+
+		if(p_caster->GetDuelState() == DUEL_STATE_REQUESTED)
+		{
+			for(i = 0; i < 3; ++i)
+			{
+				if(m_spellInfo->Effect[i] && m_spellInfo->Effect[i] != SPELL_EFFECT_APPLY_AURA && m_spellInfo->Effect[i] != SPELL_EFFECT_APPLY_PET_AURA)
+					return SPELL_FAILED_TARGET_DUELING;
+			}
+		}
 
 		// check for duel areas
 		if(p_caster && m_spellInfo->Id == 7266)
@@ -2667,7 +2677,7 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 
 		// check if we have the required reagents
-		for(uint32 i=0; i<8 ;i++)
+		for(i=0; i<8 ;i++)
 		{
 			if(m_spellInfo->Reagent[i] == 0 || m_spellInfo->ReagentCount[i] == 0)
 				continue;
