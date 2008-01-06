@@ -9,7 +9,11 @@ ascent_SOURCES = \
     Master.cpp \
     Master.h \
     CConsole.cpp \
-    CConsole.h
+    CConsole.h \
+	BaseConsole.h \
+	ConsoleCommands.cpp \
+	ConsoleCommands.h \
+	ConsoleListener.h
 
 ascent_LDADD = -lgame -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork -llua -lpcre
 

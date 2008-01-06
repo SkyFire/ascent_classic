@@ -107,6 +107,8 @@ struct Addr
 #endif
 
 bool bServerShutdown = false;
+bool StartConsoleListener();
+ThreadBase * GetConsoleListener();
 
 bool Master::Run(int argc, char ** argv)
 {
@@ -337,6 +339,20 @@ bool Master::Run(int argc, char ** argv)
 
 	LoadingTime = getMSTime() - LoadingTime;
 	sLog.outString ( "\nServer is ready for connections. Startup time: %ums\n", LoadingTime );
+
+	Log.Notice("RemoteConsole", "Starting...");
+	if( StartConsoleListener() )
+	{
+#ifdef WIN32
+		ThreadPool.ExecuteTask( GetConsoleListener() );
+#endif
+		Log.Notice("RemoteConsole", "Now open.");
+	}
+	else
+	{
+		Log.Error("RemoteConsole", "Could not open!");
+	}
+	
  
 	/* write pid file */
 	FILE * fPid = fopen( "ascent.pid", "w" );
@@ -604,7 +620,7 @@ bool Master::_StartDB()
 
 	// Initialize it
 	if( !CharacterDatabase.Initialize( hostname.c_str(), (unsigned int)port, username.c_str(),
-		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault( "CharacterDatabase", "ConnectionCount", 3 ), 16384 ) )
+		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault( "CharacterDatabase", "ConnectionCount", 5 ), 16384 ) )
 	{
 		sLog.outError( "sql: Main database initialization failed. Exiting." );
 		return false;

@@ -243,10 +243,22 @@ if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\
 			Name="Console"
 			Filter="">
 			<File
+				RelativePath="..\..\src\ascent\BaseConsole.h">
+			</File>
+			<File
 				RelativePath="..\..\src\ascent\CConsole.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\ascent\CConsole.h">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent\ConsoleCommands.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent\ConsoleCommands.h">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent\ConsoleListener.cpp">
 			</File>
 		</Filter>
 		<Filter

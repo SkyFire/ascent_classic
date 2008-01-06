@@ -430,11 +430,27 @@
 			Name="Console"
 			>
 			<File
+				RelativePath="..\..\src\ascent\BaseConsole.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ascent\CConsole.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\ascent\CConsole.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent\ConsoleCommands.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent\ConsoleCommands.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent\ConsoleListener.cpp"
 				>
 			</File>
 		</Filter>
