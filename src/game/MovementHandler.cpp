@@ -63,9 +63,23 @@ void WorldSession::HandleMoveWorldportAckOpcode( WorldPacket & recv_data )
 	}
 	sLog.outDebug( "WORLD: got MSG_MOVE_WORLDPORT_ACK." );
 	
-	//GetPlayer()->SendInitialLogonPackets();
-	GetPlayer()->m_TeleportState = 2;
-	GetPlayer()->AddToWorld();
+	if(_player->m_CurrentTransporter && _player->GetMapId() != _player->m_CurrentTransporter->GetMapId())
+	{
+		/* wow, our pc must really suck. */
+		Transporter * pTrans = _player->m_CurrentTransporter;
+		float c_tposx = pTrans->GetPositionX() + _player->m_TransporterX;
+		float c_tposy = pTrans->GetPositionY() + _player->m_TransporterY;
+		float c_tposz = pTrans->GetPositionZ() + _player->m_TransporterZ;
+
+		WorldPacket dataw(SMSG_NEW_WORLD, 20);
+		dataw << pTrans->GetMapId() << c_tposx << c_tposy << c_tposz << _player->GetOrientation();
+		SendPacket(&dataw);
+	}
+	else
+	{
+		_player->m_TeleportState = 2;
+		_player->AddToWorld();
+	}
 }
 
 void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
