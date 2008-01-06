@@ -797,7 +797,7 @@ void WorldSession::FullLogin(Player * plr)
 	}
 #endif
 
-	sLog.outString("Player %s logged in.", plr->GetName());
+	Log.Debug("Login", "Player %s logged in.", plr->GetName());
 
 #ifndef CLUSTERING
 	// send extended message
