@@ -6,7 +6,7 @@
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
 
 static const char * REVISION_TEXT	= "$Rev$";
-static const char * BUILD_TAG		= "2.8-TRUNK";
+static const char * BUILD_TAG		= "2.9-TRUNK";
 
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
 
