@@ -9536,3 +9536,19 @@ void Player::SendMeetingStoneQueue(uint32 DungeonId, uint8 Status)
 	data << DungeonId << Status;
 	m_session->SendPacket(&data);
 }
+
+void Player::PartLFGChannel()
+{
+	Channel * pChannel = channelmgr.GetChannel("LookingForGroup", this);
+	if( pChannel == NULL )
+		return;
+
+	for(list<Channel*>::iterator itr = m_channels.begin(); itr != m_channels.end(); ++itr)
+	{
+		if( (*itr) == pChannel )
+		{
+			pChannel->Part(this);
+			return;
+		}
+	}
+}

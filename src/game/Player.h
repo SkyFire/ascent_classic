@@ -1737,6 +1737,7 @@ public:
 	static UpdateMask m_visibleUpdateMask;
 
 	void CopyAndSendDelayedPacket(WorldPacket * data);
+	void PartLFGChannel();
 
 protected:
 	LocationVector m_summonPos;

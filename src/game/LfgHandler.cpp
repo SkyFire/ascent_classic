@@ -109,6 +109,7 @@ void WorldSession::HandleSetLookingForGroup(WorldPacket& recvPacket)
 	uint32 LfgQueueId;
 	uint16 LfgDungeonId;
 	uint8 LfgType,unk1;
+	uint32 i;
 	
 	recvPacket >> LfgQueueId >> LfgDungeonId >> unk1 >> LfgType;
 	
@@ -131,6 +132,17 @@ void WorldSession::HandleSetLookingForGroup(WorldPacket& recvPacket)
 			if(_player->m_Autojoin)
 				_player->SendMeetingStoneQueue(LfgDungeonId, 1);
 		}
+	}
+	else
+	{
+		for(i = 0; i < 3; ++i)
+		{
+			if(_player->LfgDungeonId[i] != 0)
+				break;
+		}
+
+		if( i == 3 )
+			_player->PartLFGChannel();
 	}
 }
 
@@ -161,6 +173,7 @@ void WorldSession::HandleLfgInviteAccept(WorldPacket & recvPacket)
 {
 	CHECK_INWORLD_RETURN
 	
+	_player->PartLFGChannel();
 	if(_player->m_lfgMatch == NULL && _player->m_lfgInviterGuid == 0)
 	{
 		if(_player->m_lfgMatch == NULL)
