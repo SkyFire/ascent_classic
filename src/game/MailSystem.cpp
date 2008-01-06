@@ -778,7 +778,7 @@ void Mailbox::FillTimePacket(WorldPacket& data)
 
 	for(; iter != Messages.end(); ++iter)
 	{
-		if(iter->second.read_flag == 0 && (uint32)UNIXTIME >= iter->second.delivery_time)
+		if(iter->second.deleted_flag == 0 && iter->second.read_flag == 0 && (uint32)UNIXTIME >= iter->second.delivery_time)
 		{
 			// unread message, w00t.
 			++c;
@@ -914,6 +914,23 @@ void Mailbox::Load(QueryResult * result)
 		msg.copy_made = fields[i++].GetBool();
 		msg.read_flag = fields[i++].GetBool();
 		msg.deleted_flag = fields[i++].GetBool();
+
+		if( msg.copy_made )
+		{
+			QueryResult * result = CharacterDatabase.Query( "SELECT * FROM playeritems WHERE itemtext = %u", msg.message_id );
+			if( result == NULL )
+			{
+				if( msg.deleted_flag )
+					CharacterDatabase.WaitExecute( "DELETE FROM mailbox WHERE message_id = %u", msg.message_id );
+				else
+				{
+					msg.copy_made = false;
+					CharacterDatabase.WaitExecute( "UPDATE mailbox SET copy_made = 0 WHERE message_id = %u", msg.message_id	);
+				}
+			}
+			else
+				delete result;
+		}
 
 		// Add to the mailbox
 		AddMessage(&msg);
