@@ -697,6 +697,7 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 	}
 
 	MapCell *objCell = GetCell(cellX, cellY);
+	MapCell * pOldCell = obj->GetMapCell();
 	if (!objCell)
 	{
 		objCell = Create(cellX,cellY);
@@ -727,6 +728,15 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 		{
 			// have to unlock/lock here to avoid a deadlock situation.
 			UpdateCellActivity(cellX, cellY, 2);
+			if( pOldCell != NULL )
+			{
+				// only do the second check if theres -/+ 2 difference
+				if( abs( (int)cellX - (int)pOldCell->_x ) > 2 ||
+					abs( (int)cellY - (int)pOldCell->_y ) > 2 )
+				{
+					UpdateCellActivity( pOldCell->_x, pOldCell->_y, 2 );
+				}
+			}
 		}
 	}
 
