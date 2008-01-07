@@ -7,9 +7,6 @@ Skills
 TALENTS
 --BAL--
 Moonkin aura - change you into humanoid type and not beast ?
---FERAL--
-Primal Fury: doesn't work in bear form
-Shredding Attacks: doens't lower Lacerate cost (works on Shred)
 --RESTO--
 Naturalist: increases spell damage instead of melee damage
 Natural Shapeshifter - works but only until you move

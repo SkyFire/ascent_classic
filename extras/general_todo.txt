@@ -142,6 +142,7 @@ Zack - test my shit :
 - druid - Swiftmend 18562
 - druid - Wrath of cenariu 33607
 - Druid - Feral Aggression 16862
+- druid - Shredding Attacks 16968
 
 ==========================================================================
 Capt - test my shit :

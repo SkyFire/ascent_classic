@@ -1441,6 +1441,10 @@ bool World::SetInitialWorldSettings()
 		if( sp->NameHash == SPELL_HASH_SWIPE )
 			sp->SpellGroupType |= 33554432;
 
+		//druid - swipe, has missing spellgroup.very dangerous move !
+		if( sp->NameHash == SPELL_HASH_LACERATE )
+			sp->SpellGroupType |= 67108864;
+
 		//mage - fireball. Only some of the spell has the flags 
 		if( sp->NameHash == SPELL_HASH_FIREBALL )
 			sp->SpellGroupType |= 1;
@@ -2829,7 +2833,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 50;
 	}
-	//Primal Fury
+	//druid - Primal Fury
 	sp = dbcSpell.LookupEntry(16961);
 	if( sp != NULL ) 
 	{
@@ -3969,6 +3973,20 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(5420);
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[2] = 268435456UL | 32 | 64 | 16; //for the mana cost tweak
+
+	// druid - Shredding Attacks
+	sp = dbcSpell.LookupEntry(16966);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 32768;
+		sp->EffectSpellGroupRelation[1] = 67108864;
+	}
+	sp = dbcSpell.LookupEntry(16968);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 32768;
+		sp->EffectSpellGroupRelation[1] = 67108864;
+	}
 
 	// druid - Wrath of cenarius
 	sp = dbcSpell.LookupEntry(33603);
