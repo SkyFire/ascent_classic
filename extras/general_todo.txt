@@ -143,6 +143,7 @@ Zack - test my shit :
 - druid - Wrath of cenariu 33607
 - Druid - Feral Aggression 16862
 - druid - Shredding Attacks 16968
+- druid - Naturalist 17073. !!! right now affects all school attacks
 
 ==========================================================================
 Capt - test my shit :

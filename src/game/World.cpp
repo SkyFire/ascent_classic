@@ -3988,6 +3988,38 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 67108864;
 	}
 
+	// druid - Naturalist
+	sp = dbcSpell.LookupEntry(17069);
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+	}
+	sp = dbcSpell.LookupEntry(17070);
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+	}
+	sp = dbcSpell.LookupEntry(17071);
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+	}
+	sp = dbcSpell.LookupEntry(17072);
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+	}
+	sp = dbcSpell.LookupEntry(17073);
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+	}
+
 	// druid - Wrath of cenarius
 	sp = dbcSpell.LookupEntry(33603);
 	if( sp != NULL )

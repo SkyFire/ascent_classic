@@ -8,7 +8,6 @@ TALENTS
 --BAL--
 Moonkin aura - change you into humanoid type and not beast ?
 --RESTO--
-Naturalist: increases spell damage instead of melee damage
 Natural Shapeshifter - works but only until you move
 Improved Mark of the Wild - affects only druid
 Gift of Nature: doesn't work (+x% to healign spells)
