@@ -4024,32 +4024,32 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(17104);
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 	}
 	sp = dbcSpell.LookupEntry(24943);
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 	}
 	sp = dbcSpell.LookupEntry(24944);
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 	}
 	sp = dbcSpell.LookupEntry(24945);
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 	}
 	sp = dbcSpell.LookupEntry(24946);
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 	}
 
 	// druid - Empowered Touch
@@ -4059,6 +4059,23 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(33880);
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 32;
+
+	// druid - Empowered Rejuvenation
+	sp = dbcSpell.LookupEntry(33886);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
+	sp = dbcSpell.LookupEntry(33887);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
+	sp = dbcSpell.LookupEntry(33888);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
+	sp = dbcSpell.LookupEntry(33889);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
+	sp = dbcSpell.LookupEntry(33890);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64 | 16 | 128;
 
 	// druid - Wrath of cenarius
 	sp = dbcSpell.LookupEntry(33603);

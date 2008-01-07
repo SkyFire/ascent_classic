@@ -146,6 +146,7 @@ Zack - test my shit :
 - druid - Naturalist 17073
 - druid - Gift of Nature 24946
 - druid - Empowered Touch 33880
+- druid - Empowered Rejuvenation 33890
 
 ==========================================================================
 Capt - test my shit :
