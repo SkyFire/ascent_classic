@@ -1217,27 +1217,29 @@ void Aura::SpellAuraDummy(bool apply)
 	uint32 triggerSpId = 0;
 
 	// for seal -> set judgement crap
-	if(GetSpellProto()->buffType & SPELL_TYPE_SEAL && mod->i == 2)
+	if( GetSpellProto()->buffType & SPELL_TYPE_SEAL && mod->i == 2 )
 	{
-		Player*c=(Player*)GetUnitCaster();
-		if(c == 0) return;
-		
-		if(apply)
-		{
-			c->SetFlag(UNIT_FIELD_AURASTATE, AURASTATE_FLAG_JUDGEMENT);
+		Player* c = static_cast< Player* >( GetUnitCaster() );
 
-			if(!c->judgespell)
+		if( c == NULL )
+			return;
+		
+		if( apply )
+		{
+			c->SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_JUDGEMENT );
+
+			if( !c->judgespell )
 				c->judgespell = mod->m_amount;
-			if(!c->Seal)
+			if( !c->Seal )
 				c->Seal = m_spellProto->Id;
 		}
 		else
 		{
-			c->RemoveFlag(UNIT_FIELD_AURASTATE, AURASTATE_FLAG_JUDGEMENT);
+			c->RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_JUDGEMENT );
 
-			if(c->judgespell)
+			if( c->judgespell )
 				c->judgespell = 0;
-			if(c->Seal)
+			if( c->Seal )
 				c->Seal = 0;
 		}
 	}
@@ -1246,55 +1248,22 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
-		//warlock - Demonic Knowledge
-	case 35691:
-	case 35692:
-	case 35693:
-	case 35696:
-		{
-			if(!GetCaster() || !GetCaster()->IsPlayer())
-				return;//only players may have pets
-			if(!m_target || !m_target->IsPlayer())
-				return; //only players may have this type of buff
-			int val;
-			Player* p = static_cast< Player* > ( GetCaster() );
-			if( apply )
-			{
-				val = mod->m_amount / 100;
-				if( mod->m_amount > 0 )
-					SetPositive();
-				else
-					SetNegative();
-				//get a hold on our pet
-				Pet* ps = p->GetSummon();
-				if( ps == NULL ) 
-					return;//nothin to use to calc eff value
-				val = val * ( ps->GetUInt32Value( UNIT_FIELD_STAT2 ) + ps->GetUInt32Value( UNIT_FIELD_STAT3 ) );
-				mod->fixed_amount[0] = val;
-			}
-			else
-				val = -mod->fixed_amount[0];
-
-			for( uint32 x = 1; x < 7; x++ )
-				if( mod->m_miscValue & ( ( ( uint32 )1 ) << x ) )
-					p->ModUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, val );
-		}break;
-		//paladin - Blessing of Light.
+	//paladin - Blessing of Light.
 	case 19977:
 	case 19978:
 	case 19979:
 	case 27144:
 	case 32770:
 		{
-			if(mod->i==0)
-				SMTMod_On_target(apply,false,0x9B56A8F5,mod->m_amount); //holy light
-			if(mod->i==1)
-				SMTMod_On_target(apply,false,0x333C4740,mod->m_amount); //flash of light
+			if( mod->i == 0 )
+				SMTMod_On_target( apply, false, 0x9B56A8F5, mod->m_amount ); //holy light
+			if( mod->i == 1 )
+				SMTMod_On_target( apply, false, 0x333C4740, mod->m_amount ); //flash of light
 		}break;
-		//shaman - Healing Way - effect
+	//shaman - Healing Way - effect
 	case 29203:
 		{
-			SMTMod_On_target(apply,true,0x08F1A7EF,mod->m_amount); // Healing Wave
+			SMTMod_On_target( apply, true, 0x08F1A7EF, mod->m_amount ); // Healing Wave
 		}break;
 	//druid - mangle
 	case 33878:
@@ -1305,7 +1274,7 @@ void Aura::SpellAuraDummy(bool apply)
 	case 33983:
 		{
 			int32 val = (apply) ? 30 : -30;
-			m_target->ModDamageTakenByMechPCT[MECHANIC_BLEEDING] += float(val)/100.0f;
+			m_target->ModDamageTakenByMechPCT[MECHANIC_BLEEDING] += float( val ) / 100.0f;
 		}break;
 	//warrior - sweeping strikes
 	case 35429:

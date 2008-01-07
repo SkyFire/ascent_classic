@@ -881,6 +881,28 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									CastingSpell->NameHash != SPELL_HASH_DRAIN_LIFE )//Drain Life								
 									continue;
 							}break;
+                        //warlock - Demonic Knowledge
+                        case 39576:
+                            {
+                                if( !CastingSpell )
+                                    continue;
+                                if( CastingSpell->Effect[0] != 56 )
+                                    continue;
+                                Pet* ps = static_cast< Player* >( this )->GetSummon();
+                                if( ps == NULL)
+                                    return;//no pet
+                                int32 val;
+                                SpellEntry *parentproc= dbcSpell.LookupEntry( origId );
+                                val = parentproc->EffectBasePoints[0] + 1;
+                                val = val * (ps->GetUInt32Value( UNIT_FIELD_STAT2 ) + ps->GetUInt32Value( UNIT_FIELD_STAT3 ) );
+                                SpellEntry *spellInfo = dbcSpell.LookupEntry( 39576 );
+                                Spell *spell = new Spell( this, spellInfo ,true, NULL );
+                                spell->forced_basepoints[0] = ( val / 100 );
+                                SpellCastTargets targets;
+                                targets.m_unitTarget = GetGUID();
+                                spell->prepare( &targets );
+                                continue;
+                            }break;
 						//mage - Arcane Blast proc
 						case 36032:
 							{

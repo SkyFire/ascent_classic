@@ -1494,20 +1494,45 @@ bool World::SetInitialWorldSettings()
 //	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);
 	}
 	//this is so lame : shamanistic rage triggers a new spell which borrows it's stats from parent spell :S
-	SpellEntry * parentsp = dbcSpell.LookupEntry(30823);
-	SpellEntry * triggersp = dbcSpell.LookupEntry(30824);
-	if(parentsp && triggersp) 
+	SpellEntry * parentsp = dbcSpell.LookupEntry( 30823 );
+	SpellEntry * triggersp = dbcSpell.LookupEntry( 30824 );
+	if( parentsp && triggersp ) 
 		triggersp->EffectBasePoints[0] = parentsp->EffectBasePoints[0];
 
-	SpellEntry * sp = dbcSpell.LookupEntry(16164);
-	SpellEntry * sp2;
-	if(sp && sp->Id==16164)
-		sp->procFlags=PROC_ON_SPELL_CRIT_HIT_VICTIM;
+	SpellEntry* sp;
+	SpellEntry* sp2;
 
-	sp = dbcSpell.LookupEntry(17364);
+	sp = dbcSpell.LookupEntry( 16164 );
+	if( sp != NULL && sp->Id == 16164 )
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
+
 	//remove stormstrike effect 0
-	if(sp && sp->Id==17364)
-		sp->Effect[0]=0;
+	sp = dbcSpell.LookupEntry( 17364 );
+	if( sp != NULL && sp->Id == 17364 )
+		sp->Effect[0] = 0;
+
+    //Warlock: Demonic Knowledge
+    sp = dbcSpell.LookupEntry( 35691 );
+    if( sp != NULL )
+	{
+        sp->EffectApplyAuraName[0] = 42;
+        sp->EffectTriggerSpell[0] = 39576;
+        sp->procFlags = PROC_ON_CAST_SPELL;
+    }
+    sp = dbcSpell.LookupEntry( 35692 );
+    if( sp != NULL )
+	{
+        sp->EffectApplyAuraName[0] = 42;
+        sp->EffectTriggerSpell[0] = 39576;
+        sp->procFlags = PROC_ON_CAST_SPELL;
+    }
+    sp = dbcSpell.LookupEntry( 35693 );
+    if( sp != NULL )
+	{
+        sp->EffectApplyAuraName[0] = 42;
+        sp->EffectTriggerSpell[0] = 39576;
+        sp->procFlags = PROC_ON_CAST_SPELL;
+    }
 
 	//Bloodlust targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntry(2825);
@@ -1520,6 +1545,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[1]=0;
 		sp->EffectImplicitTargetB[2]=0;
 	}
+
 	//Heroism targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntry(32182);
 	if( sp != NULL )
