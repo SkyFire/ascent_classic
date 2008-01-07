@@ -2406,6 +2406,38 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 4096;
 	}
 
+	//Druid - Feral Aggression. Blizz made a mistake here ?
+	sp = dbcSpell.LookupEntry(16858); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 8;
+		sp->EffectSpellGroupRelation[1] = 8388608;
+	}
+	sp = dbcSpell.LookupEntry(16859); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 8;
+		sp->EffectSpellGroupRelation[1] = 8388608;
+	}
+	sp = dbcSpell.LookupEntry(16860); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 8;
+		sp->EffectSpellGroupRelation[1] = 8388608;
+	}
+	sp = dbcSpell.LookupEntry(16861); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 8;
+		sp->EffectSpellGroupRelation[1] = 8388608;
+	}
+	sp = dbcSpell.LookupEntry(16862); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 8;
+		sp->EffectSpellGroupRelation[1] = 8388608;
+	}
+
 	//paladin - seal of blood
 	sp = dbcSpell.LookupEntry(31892);
 	if( sp != NULL )
