@@ -4465,6 +4465,17 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		p_caster->NullComboPoints(); //some say that we should only remove 1 point per dodge. Due to cooldown you can't cast it twice anyway..
 		sEventMgr.RemoveEvents( p_caster, EVENT_COMBO_POINT_CLEAR_FOR_TARGET );
 	}
+	else if( m_spellInfo->NameHash == SPELL_HASH_DEVASTATE)
+	{
+		//count the number of sunder armors on target
+		uint32 sunder_count=0;
+		for(uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
+			if(unitTarget->m_auras[x]->GetSpellProto()->NameHash==SPELL_HASH_SUNDER_ARMOR)
+				sunder_count++;
+		if(!sunder_count)
+			return; //no damage = no joy
+		damage = damage*sunder_count;
+	}
 
 	if( m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE )
 	{
