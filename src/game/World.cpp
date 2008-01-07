@@ -3993,31 +3993,63 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+		sp->EffectMiscValue[1] = 1;  
 	}
 	sp = dbcSpell.LookupEntry(17070);
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+		sp->EffectMiscValue[1] = 1; 
 	}
 	sp = dbcSpell.LookupEntry(17071);
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+		sp->EffectMiscValue[1] = 1; 
 	}
 	sp = dbcSpell.LookupEntry(17072);
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+		sp->EffectMiscValue[1] = 1;
 	}
 	sp = dbcSpell.LookupEntry(17073);
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[1]=SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
-		sp->EffectMiscValue[1] = 1; //!!! this may change since core does not support it yet 
+		sp->EffectMiscValue[1] = 1; 
+	}
+
+	// druid - Gift of Nature
+	sp = dbcSpell.LookupEntry(17104);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+	}
+	sp = dbcSpell.LookupEntry(24943);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+	}
+	sp = dbcSpell.LookupEntry(24944);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+	}
+	sp = dbcSpell.LookupEntry(24945);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+	}
+	sp = dbcSpell.LookupEntry(24946);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
 	}
 
 	// druid - Wrath of cenarius

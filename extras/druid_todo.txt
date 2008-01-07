@@ -10,7 +10,6 @@ Moonkin aura - change you into humanoid type and not beast ?
 --RESTO--
 Natural Shapeshifter - works but only until you move
 Improved Mark of the Wild - affects only druid
-Gift of Nature: doesn't work (+x% to healign spells)
 imp regrowth: doesn't work (+crit to regrowth, similar to sanctified light)
 emp touch: doesn't work (like all "empowered" talents)
 swiftmend: can never be used
