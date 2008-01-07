@@ -10,7 +10,6 @@ Since i posted the formula to calculate its dmg i hope u could find a way to fix
 
 TALENTS:
 --HOLY--
-Aura Mastery: doesn't work (auras range to 40yrd)
 Divine Favor: doens't work (next spell 100% crit)
 sanctified light: doesn't work (+crit to holy light, odd, imp regrowth doesn't work either)
 light's grace: doesn't work (trigger 31834 : -0.5s to cast time)

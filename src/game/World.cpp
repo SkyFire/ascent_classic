@@ -1671,6 +1671,11 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectApplyAuraName[0] = 2147483648 | 1073741824;
 
+	//paladin - Aura Mastery
+	sp = dbcSpell.LookupEntry(31821);
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0] = 131072 | 67108864 | 8 | 64;
+
 	//shaman - Lightning Overload 
 	sp = dbcSpell.LookupEntry(30675); 
 	if( sp != NULL )

@@ -149,6 +149,7 @@ Zack - test my shit :
 - druid - Empowered Rejuvenation 33890
 - paladin - Healing Light 20239
 - warrior - devastate 30022
+- paladin - Aura Mastery 31821
 
 ==========================================================================
 Capt - test my shit :
