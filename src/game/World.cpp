@@ -4052,6 +4052,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 285212672;
 	}
 
+	// druid - Empowered Touch
+	sp = dbcSpell.LookupEntry(33879);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 32;
+	sp = dbcSpell.LookupEntry(33880);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 32;
+
 	// druid - Wrath of cenarius
 	sp = dbcSpell.LookupEntry(33603);
 	if( sp != NULL )
