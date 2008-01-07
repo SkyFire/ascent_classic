@@ -2996,6 +2996,9 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	m_mailBox.Load(results[8].result);
 	m_session->FullLogin(this);
 	m_session->m_loggingInPlayer=NULL;
+
+	if( !isAlive() )
+		myCorpse = objmgr.GetCorpseByOwner(GetGUIDLow());
 }
 
 bool Player::HasSpell(uint32 spell)
@@ -4842,8 +4845,14 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 			return (pObj->getDeathState() == CORPSE); // we can only see players that are spirits
 		}
 
-		if(myCorpse && myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
-			return true; // we can see everything within range of our corpse
+		if(myCorpse)
+		{
+			if(myCorpse == obj) 
+				return true;
+
+			if(myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
+				return true; // we can see everything within range of our corpse
+		}
 
 		if(m_deathVision) // if we have arena death-vision we can see everything
 			return true;

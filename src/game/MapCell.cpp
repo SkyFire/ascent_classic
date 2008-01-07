@@ -130,7 +130,7 @@ void MapCell::RemoveObjects()
 		if(!obj || (_unloadpending && obj->GetGUIDHigh()==HIGHGUID_TRANSPORTER))
 			continue;
 
-		if(_unloadpending && obj->GetTypeId()==TYPEID_CORPSE)
+		if(_unloadpending && obj->GetTypeId()==TYPEID_CORPSE && obj->GetUInt32Value(CORPSE_FIELD_OWNER) != 0)
 			continue;
 
 		if( obj->Active )
@@ -161,7 +161,6 @@ void MapCell::RemoveObjects()
 		}
 	}
 
-	_objects.clear();
 	_playerCount = 0;
 	_loaded = false;
 }
