@@ -3938,6 +3938,38 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[2] = 268435456UL | 32 | 64 | 16; //for the mana cost tweak
 
+	// druid - Wrath of cenarius
+	sp = dbcSpell.LookupEntry(33603);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+	sp = dbcSpell.LookupEntry(33604);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+	sp = dbcSpell.LookupEntry(33605);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+	sp = dbcSpell.LookupEntry(33606);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+	sp = dbcSpell.LookupEntry(33607);
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+
 	// druid - Nature's Grace
 	sp = dbcSpell.LookupEntry(16880);
 	if( sp != NULL )

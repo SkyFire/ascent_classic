@@ -6,9 +6,6 @@ Skills
 
 TALENTS
 --BAL--
-Nature's Grace: doesn't trigger a buff
-Dreamstate: not working (similar to shaman's unrelenting storm)
-Wrath of cenarius: doesn't work (like all "empowered" talents)
 Moonkin aura - change you into humanoid type and not beast ?
 --FERAL--
 Ferocity: after update at r2319 it applies only on rake and claw... before that it worked on all except mangle

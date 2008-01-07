@@ -98,3 +98,9 @@ Crusader Strike - supposed be 6 second CD but there is 12.
 Skills:
 
 Seal of Vengeance and Seal of Blood both dosnt work.
+
+
+/////////
+
+ sancity aura
+ this aura is adding holy dmg but, isnt stacking or adding dmg to seal of command 70% + 10% and crusader strike 40% + 10%

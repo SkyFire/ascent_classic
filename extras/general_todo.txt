@@ -54,6 +54,7 @@ SMT_RESIST_DISPEL - check if it is used
 - you should gain mining skill if the bar has been filled instead on cast action
 - some say that proc spells are not removed after they proc from items and taking items off you. Is this the same unexistatn bug as with talent unlearning ?
 - shadow trance is not removed by first shadow bolt
+- feign death kills player if it expires
 
 ==========================================================================
 Zack - test my shit :
@@ -139,6 +140,7 @@ Zack - test my shit :
 - Hunter - Expose Weakness 34503
 - hunter : Feign Death 5384 
 - druid - Swiftmend 18562
+- druid - Wrath of cenariu 33607
 
 ==========================================================================
 Capt - test my shit :
@@ -153,3 +155,5 @@ Broken talent groups
 - Gift of Nature (druid), Healing Light (Paladin), Purification (Shaman) don't work, tho Spiritual Healing (Priest) works ?:)
 - Talents reducing mana of spells which cost % of base mana don't work. Improved Blink, Natural Shapeshifter (this one works until u move), Absolution, Purifying Power, ...
 
+//// - just taking this home 
+BLESSING OF LIGHT la paladin: dai heal exagerat de mare (12k+ fara iteme la lvl 70) cu blessul pe target. COMBUSTION la mage: odata activat la fiecare fire spell se stackeaza pana ajunge la 10x si ai crit chance 100%. VICTORY RUSH la warrior : Dupa ce omori mob/player care iti da honor/xp ramane activat mereu si nu 20 de secunde cat ar trebui. Cum abilitatea nu cere rage devine deja exploit. SACRIFICE la warlock: Dupa ce sacrifici o data voidu` si iti da shieldu` de 3k absorb poti da shieldul mereu fara a mai avea nevoie de pet pt a folosi abilitatea. In PVP poti iesi din combat doar cu un simplu esc. E aproape imposibil sa bati un rogue care te tine numai in stealth/ cheap shot / kidney shot si iar stealth. Cand folosesti unstuck te da sub harta. 
