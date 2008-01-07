@@ -150,6 +150,7 @@ Zack - test my shit :
 - paladin - Healing Light 20239
 - warrior - devastate 30022
 - paladin - Aura Mastery 31821
+- paladin - Sanctified Light 20361
 
 ==========================================================================
 Capt - test my shit :

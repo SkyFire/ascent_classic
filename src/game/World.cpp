@@ -1676,6 +1676,17 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectApplyAuraName[0] = 131072 | 67108864 | 8 | 64;
 
+	//paladin - Sanctified Light
+	sp = dbcSpell.LookupEntry(20359);
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0] = 2147483648;
+	sp = dbcSpell.LookupEntry(20360);
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0] = 2147483648;
+	sp = dbcSpell.LookupEntry(20361);
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0] = 2147483648;
+
 	//shaman - Lightning Overload 
 	sp = dbcSpell.LookupEntry(30675); 
 	if( sp != NULL )
