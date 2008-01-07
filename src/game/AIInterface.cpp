@@ -22,7 +22,7 @@
 // only enable with COLLISION define.
 #ifdef COLLISION
 #define LOS_CHECKS 1
-#define LOS_ONLY_IN_INSTANCE 1
+//#define LOS_ONLY_IN_INSTANCE 1
 #endif
 
 AIInterface::AIInterface()

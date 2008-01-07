@@ -67,8 +67,7 @@ struct MailMessage
 	string subject;
 	string body;
 	uint32 money;
-	uint64 attached_item_guid;
-	uint64 external_attached_item_guid;
+	vector<uint64> items;
 	uint32 cod;
 	uint32 stationary;
 	uint32 expire_time;
