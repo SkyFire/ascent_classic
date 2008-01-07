@@ -1767,6 +1767,8 @@ void Aura::SpellAuraModConfuse(bool apply)
 {   
 	Unit* u_caster = GetUnitCaster();
 	if(!u_caster) return;
+	if( m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() )
+		return;
 
 	if(apply)
 	{
@@ -1819,6 +1821,9 @@ void Aura::SpellAuraModCharm(bool apply)
 	SetPositive(3); //we ignore the other 2 effect of this spell and force it to be a positive spell
 
 	if(!ucaster || ucaster->GetTypeId() != TYPEID_PLAYER || (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() || m_target->GetTypeId() != TYPEID_UNIT)
+		return;
+
+	if( m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() )
 		return;
 
 	// this should be done properly
@@ -1882,6 +1887,8 @@ void Aura::SpellAuraModFear(bool apply)
 {
 	Unit* u_caster = GetUnitCaster();
 	if(!u_caster) return;
+	if( m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() )
+		return;
 
 	if(apply)
 	{
