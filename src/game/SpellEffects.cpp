@@ -4469,15 +4469,27 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 	{
 		//count the number of sunder armors on target
 		uint32 sunder_count=0;
+		SpellEntry *spellInfo;
 		for(uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
-			if(unitTarget->m_auras[x]->GetSpellProto()->NameHash==SPELL_HASH_SUNDER_ARMOR)
+		{
+			if(unitTarget->m_auras[x] && unitTarget->m_auras[x]->GetSpellProto()->NameHash==SPELL_HASH_SUNDER_ARMOR)
+			{
 				sunder_count++;
+				spellInfo=unitTarget->m_auras[x]->GetSpellProto();
+			}
+		}	
 		if(!sunder_count)
 			return; //no damage = no joy
+		//we should also cast sunder armor effect on target
+		Spell *spell = new Spell(u_caster, spellInfo ,true, NULL);
+		spell->ProcedOnSpell = m_spellInfo;
+		spell->pSpellId=m_spellInfo->Id;
+		SpellCastTargets targets(unitTarget->GetGUID());
+		spell->prepare(&targets);
 		damage = damage*sunder_count;
 	}
 
-	if( m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE )
+	if( m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[2] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
 	{
 		add_damage = (uint32)(damage * 1.5);
 		return;

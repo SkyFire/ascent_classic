@@ -1380,7 +1380,7 @@ void Spell::cast(bool check)
             // if the spell is not reflected
 			if(!IsReflected())
 			{
-				for(uint32 x=0;x<3;x++)
+				for(signed int x=2;x>=0;x--)
 				{
                     // check if we actualy have a effect
 					if( m_spellInfo->Effect[x])
