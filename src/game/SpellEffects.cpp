@@ -4469,7 +4469,7 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 	{
 		//count the number of sunder armors on target
 		uint32 sunder_count=0;
-		SpellEntry *spellInfo;
+		SpellEntry *spellInfo=dbcSpell.LookupEntry(25225);
 		for(uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
 		{
 			if(unitTarget->m_auras[x] && unitTarget->m_auras[x]->GetSpellProto()->NameHash==SPELL_HASH_SUNDER_ARMOR)
@@ -4478,14 +4478,14 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 				spellInfo=unitTarget->m_auras[x]->GetSpellProto();
 			}
 		}	
-		if(!sunder_count)
-			return; //no damage = no joy
-		//we should also cast sunder armor effect on target
+		//we should also cast sunder armor effect on target with or without dmg
 		Spell *spell = new Spell(u_caster, spellInfo ,true, NULL);
 		spell->ProcedOnSpell = m_spellInfo;
 		spell->pSpellId=m_spellInfo->Id;
 		SpellCastTargets targets(unitTarget->GetGUID());
 		spell->prepare(&targets);
+		if(!sunder_count)
+			return; //no damage = no joy
 		damage = damage*sunder_count;
 	}
 
