@@ -3,27 +3,38 @@
 alter table account_data drop index a;
 alter table account_forced_permissions drop index a;
 alter table arenateams drop index a;
-alter table account_data drop index a;
-
-
-alter table auctions drop index auctionHouse;
-alter table characters drop index acct;
-alter table characters_insert_queue drop index guid;
-alter table characters_insert_queue drop index acct;
-alter table characters_insert_queue drop index guildid;
-alter table charters drop index leaderGuid;
+alter table auctions drop index a;
+alter table auctions drop index b;
+alter table charters drop index a;
+alter table corpses drop index a;
+alter table corpses drop index b;
+alter table gm_tickets drop index a;
+alter table groups drop index a;
 alter table guild_bankitems drop index a;
-alter table guild_bankitems drop index b;
-alter table guild_bankitems drop index c;
 alter table guild_banklogs drop index a;
-alter table guild_banklogs drop index b;
 alter table guild_banktabs drop index a;
-alter table guild_banktabs drop index b;
-alter table guilds drop index guildId;
-alter table playeritems drop index ownerguid;
-alter table playeritems_external drop index guid;
-alter table playeritems_external drop index ownerguid;
-alter table playeritems_insert_queue drop index ownerguid;
+alter table guild_data drop index a;
+alter table guild_logs drop index a;
+alter table guild_ranks drop index a;
+alter table guilds drop index a;
+alter table instances drop index a;
+alter table instances drop index b;
+alter table instances drop index c;
+alter table mail_box drop index a;
+alter table mail_box drop index b;
+alter table playercooldownitems drop index a;
+alter table playercooldownitems drop index b;
+alter table playercooldownsecurity drop index a;
+alter table playeritems drop index a;
+alter table playeritems_external drop index a;
+alter table playeritems_external drop index b;
+alter table playerpets drop index a;
+alter table playerpetspells drop index a;
+alter table playersummonspells drop index a;
+alter table questlog drop index a;
+alter table server_settings drop index a;
+alter table social drop index a;
+alter table tutorials drop index a;
 
 -- Add Indices
 
@@ -52,7 +63,7 @@ ALTER TABLE `playeritems_external` ADD INDEX `a`(`ownerguid`), ADD UNIQUE `b`(`g
 ALTER TABLE `playerpets` ADD INDEX `a`(`ownerguid`, `petnumber`);
 ALTER TABLE `playerpetspells` ADD INDEX `a`(`ownerguid`, `petnumber`);
 ALTER TABLE `playersummonspells` ADD INDEX `a`(`ownerguid`, `entryid`);
-ALTER TABLE `questlog` ADD INDEX `a`(`index`), INDEX `b`(`player_guid`), INDEX `c`(`quest_id`), INDEX `d`(`slot`);
+ALTER TABLE `questlog` ADD INDEX `a`(`index`), ADD INDEX `b`(`player_guid`), ADD INDEX `c`(`quest_id`), ADD INDEX `d`(`slot`);
 ALTER TABLE `server_settings` ADD UNIQUE `a`(`setting_id`);
 ALTER TABLE `social` ADD INDEX `a`(`guid`, `socialguid`, `flags`);
 ALTER TABLE `tutorials` ADD UNIQUE `a`(`playerId`);
