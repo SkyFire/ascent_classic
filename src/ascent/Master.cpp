@@ -108,6 +108,7 @@ struct Addr
 
 bool bServerShutdown = false;
 bool StartConsoleListener();
+void CloseConsoleListener();
 ThreadBase * GetConsoleListener();
 
 bool Master::Run(int argc, char ** argv)
@@ -509,6 +510,7 @@ bool Master::Run(int argc, char ** argv)
 	ls->Close();
 #endif
 
+	CloseConsoleListener();
 	sWorld.SaveAllPlayers();
 
 	Log.Notice( "Network", "Shutting down network subsystem." );

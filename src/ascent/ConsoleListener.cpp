@@ -102,7 +102,7 @@ public:
 	}
 };
 
-ListenSocket<ConsoleSocket> * g_pListenSocket;
+ListenSocket<ConsoleSocket> * g_pListenSocket = NULL;
 initialiseSingleton(ConsoleAuthMgr);
 
 void ConsoleAuthCallback(uint32 request, uint32 result)
@@ -115,6 +115,12 @@ void ConsoleAuthCallback(uint32 request, uint32 result)
 		pSocket->AuthCallback(true);
 	else
 		pSocket->AuthCallback(false);
+}
+
+void CloseConsoleListener()
+{
+	if(g_pListenSocket != NULL)
+		g_pListenSocket->Close();
 }
 
 bool StartConsoleListener( )
@@ -137,6 +143,7 @@ bool StartConsoleListener( )
 	{
 		g_pListenSocket->Close( );
 		delete g_pListenSocket;
+		g_pListenSocket = NULL;
 		return false;
 	}
 
