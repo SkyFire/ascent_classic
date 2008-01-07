@@ -2378,31 +2378,31 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(16934); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 33554432;
+		sp->EffectSpellGroupRelation[0] = 33554432 | 2048;
 		sp->EffectSpellGroupRelation[1] = 4096;
 	}
 	sp = dbcSpell.LookupEntry(16935); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 33554432;
+		sp->EffectSpellGroupRelation[0] = 33554432 | 2048;
 		sp->EffectSpellGroupRelation[1] = 4096;
 	}
 	sp = dbcSpell.LookupEntry(16936); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 33554432;
+		sp->EffectSpellGroupRelation[0] = 33554432 | 2048;
 		sp->EffectSpellGroupRelation[1] = 4096;
 	}
 	sp = dbcSpell.LookupEntry(16937); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 33554432;
+		sp->EffectSpellGroupRelation[0] = 33554432 | 2048;
 		sp->EffectSpellGroupRelation[1] = 4096;
 	}
 	sp = dbcSpell.LookupEntry(16938); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 33554432;
+		sp->EffectSpellGroupRelation[0] = 33554432 | 2048;
 		sp->EffectSpellGroupRelation[1] = 4096;
 	}
 

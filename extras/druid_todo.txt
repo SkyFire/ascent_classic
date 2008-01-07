@@ -8,7 +8,6 @@ TALENTS
 --BAL--
 Moonkin aura - change you into humanoid type and not beast ?
 --FERAL--
-Ferocity: after update at r2319 it applies only on rake and claw... before that it worked on all except mangle
 Feral Aggression: doesn't increase Ferocious Bite damage (similar to imp eviscerate)
 Primal Fury: doesn't work in bear form
 Shredding Attacks: doens't lower Lacerate cost (works on Shred)
