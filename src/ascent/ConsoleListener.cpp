@@ -19,18 +19,20 @@
 
 #include <Common.h>
 #include <Network/Network.h>
+#include <Config/ConfigEnv.h>
 #include <svn_revision.h>
 
 #include "BaseConsole.h"
 #include "ConsoleCommands.h"
 #define LOCAL_BUFFER_SIZE 2048
-//#define ENABLE_REMOTE_CONSOLE 1
+#define ENABLE_REMOTE_CONSOLE 1
 
 enum STATES
 {
 	STATE_USER		= 1,
 	STATE_PASSWORD	= 2,
 	STATE_LOGGED	= 3,
+	STATE_WAITING	= 4,
 };
 
 class ConsoleSocket : public Socket
@@ -42,6 +44,7 @@ class ConsoleSocket : public Socket
 	uint32 m_state;
 	string m_username;
 	string m_password;
+	uint32 m_requestNo;
 
 public:
 	ConsoleSocket(SOCKET iFd);
@@ -51,16 +54,82 @@ public:
 	void OnDisconnect();
 	void OnConnect();
 	void TryAuthenticate();
+	void AuthCallback(bool result);
+};
+
+class ConsoleAuthMgr : public Singleton<ConsoleAuthMgr>
+{
+	Mutex authmgrlock;
+	uint32 highrequestid;
+	map<uint32, ConsoleSocket*> requestmap;
+public:
+
+	ConsoleAuthMgr()
+	{
+		highrequestid = 1;
+	}
+
+	uint32 GenerateRequestId()
+	{
+		uint32 n;
+		authmgrlock.Acquire();
+		n = highrequestid++;
+		authmgrlock.Release();
+        return n;
+	}
+
+	void SetRequest(uint32 id, ConsoleSocket * sock)
+	{
+		authmgrlock.Acquire();
+		if( sock == NULL )
+			requestmap.erase(id);
+		else
+			requestmap.insert(make_pair(id, sock));
+		authmgrlock.Release();
+	}
+
+	ConsoleSocket * GetRequest(uint32 id)
+	{
+		ConsoleSocket* rtn;
+		authmgrlock.Acquire();
+		map<uint32,ConsoleSocket*>::iterator itr = requestmap.find(id);
+		if(itr == requestmap.end())
+			rtn = NULL;
+		else
+			rtn = itr->second;
+		authmgrlock.Release();
+		return rtn;
+	}
 };
 
 ListenSocket<ConsoleSocket> * g_pListenSocket;
+initialiseSingleton(ConsoleAuthMgr);
+
+void ConsoleAuthCallback(uint32 request, uint32 result)
+{
+	ConsoleSocket * pSocket = ConsoleAuthMgr::getSingleton().GetRequest(request);
+	if(pSocket == NULL || !pSocket->IsConnected())
+		return;
+
+    if(result)
+		pSocket->AuthCallback(true);
+	else
+		pSocket->AuthCallback(false);
+}
 
 bool StartConsoleListener( )
 {
 #ifndef ENABLE_REMOTE_CONSOLE
 	return false;
 #else
-	g_pListenSocket = new ListenSocket<ConsoleSocket>( "0.0.0.0", 8000 );
+	string lhost = Config.MainConfig.GetStringDefault("RemoteConsole", "Host", "0.0.0.0");
+	uint32 lport = Config.MainConfig.GetIntDefault("RemoteConsole", "Port", 8092);
+	bool enabled = Config.MainConfig.GetBoolDefault("RemoteConsole", "Enabled", false);
+
+	if( !enabled )
+		return false;
+
+	g_pListenSocket = new ListenSocket<ConsoleSocket>( lhost.c_str(), lport );
 	if( g_pListenSocket == NULL )
 		return false;
 
@@ -71,6 +140,7 @@ bool StartConsoleListener( )
 		return false;
 	}
 
+	new ConsoleAuthMgr;
 	return true;
 #endif
 }
@@ -96,7 +166,15 @@ ConsoleSocket::~ConsoleSocket( )
 
 	if( m_pConsole != NULL )
 		delete m_pConsole;
+
+	if(m_requestNo)
+	{
+		ConsoleAuthMgr::getSingleton().SetRequest(m_requestNo, NULL);
+		m_requestNo=0;
+	}
 }
+
+void TestConsoleLogin(string& username, string& password, uint32 requestid);
 
 void ConsoleSocket::OnRead()
 {
@@ -135,11 +213,14 @@ void ConsoleSocket::OnRead()
 				break;
 
 			case STATE_PASSWORD:
-				m_password = string(m_password);
+				m_password = string(m_pBuffer);
 				m_pConsole->Write("\r\nAttempting to authenticate. Please wait.\r\n");
-				m_pConsole->Write("\r\nYou are now logged in under user `%s` with password `%s`.\r\n", m_username.c_str(), m_password.c_str());
+				m_state = STATE_WAITING;
 
-				m_state = STATE_LOGGED;
+				m_requestNo = ConsoleAuthMgr::getSingleton().GenerateRequestId();
+				ConsoleAuthMgr::getSingleton().SetRequest(m_requestNo, this);
+
+                TestConsoleLogin(m_username, m_password, m_requestNo);
 				break;
 
 			case STATE_LOGGED:
@@ -173,7 +254,29 @@ void ConsoleSocket::OnConnect()
 
 void ConsoleSocket::OnDisconnect()
 {
-	printf("ConsoleSocket::OnDisconnect()\n");
+	if(m_requestNo)
+	{
+		ConsoleAuthMgr::getSingleton().SetRequest(m_requestNo, NULL);
+		m_requestNo=0;
+	}
+}
+
+void ConsoleSocket::AuthCallback(bool result)
+{
+	ConsoleAuthMgr::getSingleton().SetRequest(m_requestNo, NULL);
+	m_requestNo=0;
+
+	if( !result )
+	{
+		m_pConsole->Write("Authentication failed.\r\n\r\n");
+		Disconnect();
+	}
+	else
+	{
+		m_pConsole->Write("Authentication passed.\r\n");
+		m_pConsole->Write("You are now logged in under user `%s`.\r\n\r\n", m_username.c_str());
+		m_state = STATE_LOGGED;
+	}
 }
 
 RemoteConsole::RemoteConsole(ConsoleSocket* pSocket)

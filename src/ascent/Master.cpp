@@ -350,7 +350,7 @@ bool Master::Run(int argc, char ** argv)
 	}
 	else
 	{
-		Log.Error("RemoteConsole", "Could not open!");
+		Log.Warning("RemoteConsole", "Not enabled or failed listen.");
 	}
 	
  

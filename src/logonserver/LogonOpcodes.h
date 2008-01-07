@@ -50,8 +50,12 @@ enum RealmListOpcodes
 	RCMSG_UPDATE_CHARACTER_MAPPING_COUNT		= 13,
 	RSMSG_DISCONNECT_ACCOUNT					= 14,
 
+	// Console auth
+	RCMSG_TEST_CONSOLE_LOGIN					= 15,
+	RSMSG_CONSOLE_LOGIN_RESULT					= 16,
+
 	// count
-	RMSG_COUNT									= 15,
+	RMSG_COUNT									= 17,
 };
 
 #endif

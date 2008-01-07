@@ -46,6 +46,7 @@ public:
 	void HandleRequestAccountMapping(WorldPacket & recvData);
 	void UpdateAccountCount(uint32 account_id, uint8 add);
 	void HandleDisconnectAccount(WorldPacket & recvData);
+	void HandleConsoleAuthResult(WorldPacket & recvData);
 
 	void OnDisconnect();
 	void CompressAndSend(ByteBuffer & uncompressed);

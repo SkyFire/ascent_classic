@@ -384,4 +384,35 @@ void LogonCommHandler::UpdateAccountCount(uint32 account_id, uint8 add)
 	itr->second->UpdateAccountCount(account_id, add);
 }
 
+void LogonCommHandler::TestConsoleLogon(string& username, string& password, uint32 requestnum)
+{
+	string newuser = username;
+	string newpass = password;
+	string srpstr;
+
+	ASCENT_TOUPPER(newuser);
+	ASCENT_TOUPPER(newpass);
+
+	srpstr = newuser + ":" + newpass;
+
+	// Send request packet to server.
+	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
+	if(logons.size() == 0 || itr->second == 0)
+	{
+		// No valid logonserver is connected.
+		return;
+	}
+
+	Sha1Hash hash;
+	hash.UpdateData(srpstr);
+	hash.Finalize();
+
+	WorldPacket data(RCMSG_TEST_CONSOLE_LOGIN, 100);
+	data << requestnum;
+	data << newuser;
+	data.append(hash.GetDigest(), 20);
+
+	itr->second->SendPacket(&data, false);
+}
+
 #endif

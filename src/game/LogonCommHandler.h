@@ -115,6 +115,8 @@ public:
 	}
 	ASCENT_INLINE Mutex & GetPendingLock() { return pendingLock; }		
 	const string* GetForcedPermissions(string& username);
+
+	void TestConsoleLogon(string& username, string& password, uint32 requestnum);
 };
 
 #define sLogonCommHandler LogonCommHandler::getSingleton()

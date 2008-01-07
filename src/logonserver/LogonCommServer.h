@@ -49,6 +49,7 @@ public:
 	void HandleAuthChallenge(WorldPacket & recvData);
 	void HandleMappingReply(WorldPacket & recvData);
 	void HandleUpdateMapping(WorldPacket & recvData);
+	void HandleTestConsoleLogin(WorldPacket & recvData);
 
 	uint32 last_ping;
 	bool removed;

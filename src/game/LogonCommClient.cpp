@@ -112,7 +112,9 @@ void LogonCommClientSocket::HandlePacket(WorldPacket & recvData)
 		&LogonCommClientSocket::HandleRequestAccountMapping,// RSMSG_REQUEST_ACCOUNT_CHARACTER_MAPPING
 		NULL,												// RCMSG_ACCOUNT_CHARACTER_MAPPING_REPLY
 		NULL,												// RCMSG_UPDATE_CHARACTER_MAPPING_COUNT
-		&LogonCommClientSocket::HandleDisconnectAccount,
+		&LogonCommClientSocket::HandleDisconnectAccount,	// RSMSG_DISCONNECT_ACCOUNT
+		NULL,												// RCMSG_TEST_CONSOLE_LOGIN
+		&LogonCommClientSocket::HandleConsoleAuthResult,	// RSMSG_CONSOLE_LOGIN_RESULT
 	};
 
 	if(recvData.GetOpcode() >= RMSG_COUNT || Handlers[recvData.GetOpcode()] == 0)
@@ -394,6 +396,15 @@ void LogonCommClientSocket::HandleDisconnectAccount(WorldPacket & recvData)
 	WorldSession * sess = sWorld.FindSession(id);
 	if(sess != NULL)
 		sess->Disconnect();
+}
+
+void ConsoleAuthCallback(uint32 request, uint32 result);
+void LogonCommClientSocket::HandleConsoleAuthResult(WorldPacket & recvData)
+{
+	uint32 requestid, result;
+	recvData >> requestid >> result;
+
+	ConsoleAuthCallback(requestid, result);
 }
 
 #else

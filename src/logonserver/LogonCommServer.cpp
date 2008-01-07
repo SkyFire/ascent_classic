@@ -133,7 +133,9 @@ void LogonCommServerSocket::HandlePacket(WorldPacket & recvData)
 		NULL,												// RSMSG_REQUEST_ACCOUNT_CHARACTER_MAPPING
 		&LogonCommServerSocket::HandleMappingReply,			// RCMSG_ACCOUNT_CHARACTER_MAPPING_REPLY
 		&LogonCommServerSocket::HandleUpdateMapping,		// RCMSG_UPDATE_CHARACTER_MAPPING_COUNT
-		NULL,
+		NULL,												// RSMSG_DISCONNECT_ACCOUNT
+		&LogonCommServerSocket::HandleTestConsoleLogin,		// RCMSG_TEST_CONSOLE_LOGIN
+		NULL,												// RSMSG_CONSOLE_LOGIN_RESULT
 	};
 
 	if(recvData.GetOpcode() >= RMSG_COUNT || Handlers[recvData.GetOpcode()] == 0)
@@ -355,4 +357,37 @@ void LogonCommServerSocket::HandleUpdateMapping(WorldPacket & recvData)
 		realm->CharacterMap.insert( make_pair( account_id, chars_to_add ) );
 
 	sInfoCore.getRealmLock().Release();
+}
+
+void LogonCommServerSocket::HandleTestConsoleLogin(WorldPacket & recvData)
+{
+	WorldPacket data(RSMSG_CONSOLE_LOGIN_RESULT, 8);
+	uint32 request;
+	string accountname;
+	uint8 key[20];
+
+	recvData >> request;
+	recvData >> accountname;
+	recvData.read(key, 20);
+	printf("testing console login: %s\n", accountname.c_str());
+
+	data << request;
+
+	Account * pAccount = sAccountMgr.GetAccount(accountname);
+	if(pAccount == NULL)
+	{
+		data << uint32(0);
+		SendPacket(&data);
+		return;
+	}
+
+	if(memcmp(pAccount->SrpHash, key, 20) != 0)
+	{
+		data << uint32(0);
+		SendPacket(&data);
+		return;
+	}
+
+	data << uint32(1);
+	SendPacket(&data);
 }

@@ -128,3 +128,7 @@ bool HandleKickCommand(BaseConsole * pConsole, int argc, const char * argv[])
 	return false;
 }
 
+void TestConsoleLogin(string& username, string& password, uint32 requestno)
+{
+	sLogonCommHandler.TestConsoleLogon(username, password, requestno);
+}
