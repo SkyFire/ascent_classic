@@ -1660,6 +1660,17 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[1] = 4;
 	}
 
+	//paladin - Healing Light
+	sp = dbcSpell.LookupEntry(20237);
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0] = 2147483648 | 1073741824;
+	sp = dbcSpell.LookupEntry(20238);
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0] = 2147483648 | 1073741824;
+	sp = dbcSpell.LookupEntry(20239);
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0] = 2147483648 | 1073741824;
+
 	//shaman - Lightning Overload 
 	sp = dbcSpell.LookupEntry(30675); 
 	if( sp != NULL )
