@@ -151,6 +151,7 @@ Zack - test my shit :
 - warrior - devastate 30022
 - paladin - Aura Mastery 31821
 - paladin - Sanctified Light 20361
+- paladin - Light's Grace 31836
 
 ==========================================================================
 Capt - test my shit :

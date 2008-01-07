@@ -1687,6 +1687,17 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectApplyAuraName[0] = 2147483648;
 
+	//paladin - Light's Grace
+	sp = dbcSpell.LookupEntry(31833);
+	if( sp != NULL )
+		sp->procFlags=PROC_ON_CAST_SPELL;;
+	sp = dbcSpell.LookupEntry(31835);
+	if( sp != NULL )
+		sp->procFlags=PROC_ON_CAST_SPELL;;
+	sp = dbcSpell.LookupEntry(31836);
+	if( sp != NULL )
+		sp->procFlags=PROC_ON_CAST_SPELL;;
+
 	//shaman - Lightning Overload 
 	sp = dbcSpell.LookupEntry(30675); 
 	if( sp != NULL )

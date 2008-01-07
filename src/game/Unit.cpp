@@ -1234,6 +1234,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) || this == victim)
 									continue; 
 							}break;
+						//paladin - Light's Grace
+						case 31834:
+							{
+								if( !CastingSpell )
+									continue;//this should not ocur unless we made a fuckup somewhere
+								if(!(CastingSpell->NameHash!=SPELL_HASH_HOLY_LIGHT)
+									continue; 
+							}break;
 						//shaman - Lightning Overload
 						case 39805:
 							{
