@@ -1914,7 +1914,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 	else
 	{
 		if(damage_type != RANGED && !backAttack)
-			dodge = pVictim->GetUInt32Value(UNIT_FIELD_STAT1) / 14.5f; // what is this value?
+			dodge = pVictim->GetUInt32Value(UNIT_FIELD_STAT1) / 14.5f; // what is this value? (Agility)
 		victim_skill = pVictim->getLevel() * 5;
 		if(pVictim->m_objectTypeId == TYPEID_UNIT) 
 		{ 

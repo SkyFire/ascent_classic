@@ -501,6 +501,9 @@ public:
 		m_lock.Release();
 		return ret;
 	}
+	/** Gets members */
+	ASCENT_INLINE GuildMemberMap::iterator GetGuildMembersBegin() { return m_members.begin(); }
+	ASCENT_INLINE GuildMemberMap::iterator GetGuildMembersBegin() { return m_members.end(); }
 
 	/** Sends the guild bank to this client.
 	 */
