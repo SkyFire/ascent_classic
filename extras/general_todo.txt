@@ -37,6 +37,7 @@ SMT_RESIST_DISPEL - check if it is used
 - "would be cool if someone fixed the new player inspect tab where you can see the talent points. I think it came with 2.3"
 - Quagmirran's eye proc doesn't work. Never got the spell haste proc off any harmful spell.
 - The lightning Capacitor- no electrical charge saved from spell criticals so it doesn't fire off lightning bolts.
+- effect 121 should come before eff 31. (bonus calc -> damage) or bonus will not be applied
 ==========================================================================
 ! BUGS !
 - creatures keep yelling no content messgs
