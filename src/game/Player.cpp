@@ -5121,16 +5121,16 @@ void Player::LoadTaxiMask(const char* data)
 bool Player::HasQuestForItem(uint32 itemid)
 {
 	Quest *qst;
-	for(uint32 i = 0; i < 25; ++i)
+	for( uint32 i = 0; i < 25; ++i )
 	{
-		if(m_questlog[i] != NULL)
+		if( m_questlog[i] != NULL )
 		{
 			qst = m_questlog[i]->GetQuest();
-			if(!qst->count_required_item)
+			if( !qst->count_required_item )
 				continue;
 
-			for(uint32 j = 0; j < qst->count_required_item && j < 4; ++j)
-				if(qst->required_item[j] == itemid && (GetItemInterface()->GetItemCount(itemid) < qst->required_itemcount[j]))
+			for( uint32 j = 0; j < 4 && j < 4; ++j )
+				if( qst->required_item[j] == itemid && ( GetItemInterface()->GetItemCount( itemid ) < qst->required_itemcount[j] ) )
 					return true;
 		}
 	}

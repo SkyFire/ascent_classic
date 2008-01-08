@@ -585,25 +585,26 @@ bool QuestMgr::OnGameObjectActivate(Player *plr, GameObject *go)
 
 	for(i = 0; i < 25; ++i)
 	{
-		if((qle = plr->GetQuestLogInSlot(i)))
+		qle = plr->GetQuestLogInSlot( i );
+		if( qle != NULL )
 		{
 			// dont waste time on quests without mobs
-			if(qle->GetQuest()->count_required_mob == 0)
+			if( qle->GetQuest()->count_required_mob == 0 )
 				continue;
 
-			for(j = 0; j < 4; ++j)
+			for( j = 0; j < 4; ++j )
 			{
-				if(qle->GetQuest()->required_mob[j] == entry &&
+				if( qle->GetQuest()->required_mob[j] == entry &&
 					qle->GetQuest()->required_mobtype[j] == QUEST_MOB_TYPE_GAMEOBJECT &&
-					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
+					qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j] )
 				{
 					// add another kill.
 					// (auto-dirtys it)
-					qle->SetMobCount(j, qle->m_mobcount[j] + 1);
-					qle->SendUpdateAddKill(j);
-					CALL_QUESTSCRIPT_EVENT(qle, OnGameObjectActivate)(entry, plr);
+					qle->SetMobCount( j, qle->m_mobcount[j] + 1 );
+					qle->SendUpdateAddKill( j );
+					CALL_QUESTSCRIPT_EVENT( qle, OnGameObjectActivate )( entry, plr );
 
-					if(qle->CanBeFinished())
+					if( qle->CanBeFinished() )
 						qle->SendQuestComplete();
 
 					qle->UpdatePlayerFields();
@@ -628,22 +629,23 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 	{
 		for(i = 0; i < 25; ++i)
 		{
-			if((qle = plr->GetQuestLogInSlot(i)))
+			qle = plr->GetQuestLogInSlot( i );
+			if( qle != NULL )
 			{
 				// dont waste time on quests without mobs
-				if(qle->GetQuest()->count_required_mob == 0)
+				if( qle->GetQuest()->count_required_mob == 0 )
 					continue;
 
-				for(j = 0; j < 4; ++j)
+				for( j = 0; j < 4; ++j )
 				{
-					if(qle->GetQuest()->required_mob[j] == entry &&
+					if( qle->GetQuest()->required_mob[j] == entry &&
 						qle->GetQuest()->required_mobtype[j] == QUEST_MOB_TYPE_CREATURE &&
-						qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
+						qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j] )
 					{
 						// add another kill.(auto-dirtys it)
-						qle->SetMobCount(j, qle->m_mobcount[j] + 1);
-						qle->SendUpdateAddKill(j);
-						CALL_QUESTSCRIPT_EVENT(qle, OnCreatureKill)(entry, plr);
+						qle->SetMobCount( j, qle->m_mobcount[j] + 1 );
+						qle->SendUpdateAddKill( j );
+						CALL_QUESTSCRIPT_EVENT( qle, OnCreatureKill)( entry, plr );
 						qle->UpdatePlayerFields();
 						break;
 					}
@@ -670,30 +672,31 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 					gplr = (*gitr)->m_loggedInPlayer;
 					if(gplr && gplr != plr && plr->isInRange(gplr,300) && gplr->HasQuestMob(entry)) // dont double kills also dont give kills to party members at another side of the world
 					{
-						for(i = 0; i < 25; ++i)
+						for( i = 0; i < 25; ++i )
 						{
-							if((qle = gplr->GetQuestLogInSlot(i)))
+							qle = gplr->GetQuestLogInSlot(i);
+							if( qle != NULL )
 							{
 								// dont waste time on quests without mobs
-								if(qle->GetQuest()->count_required_mob == 0)
+								if( qle->GetQuest()->count_required_mob == 0 )
 									continue;
 
-								for(j = 0; j < 4; ++j)
+								for( j = 0; j < 4; ++j )
 								{
-									if(qle->GetQuest()->required_mob[j] == entry &&
+									if( qle->GetQuest()->required_mob[j] == entry &&
 										qle->GetQuest()->required_mobtype[j] == QUEST_MOB_TYPE_CREATURE &&
-										qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j])
+										qle->m_mobcount[j] < qle->GetQuest()->required_mobcount[j] )
 									{
 										// add another kill.
 										// (auto-dirtys it)
 										qle->SetMobCount(j, qle->m_mobcount[j] + 1);
-										qle->SendUpdateAddKill(j);
-										CALL_QUESTSCRIPT_EVENT(qle, OnCreatureKill)(entry, plr);
+										qle->SendUpdateAddKill( j );
+										CALL_QUESTSCRIPT_EVENT( qle, OnCreatureKill )( entry, plr );
 										qle->UpdatePlayerFields();
 
 										// lua stuff
 										//QUESTLUA_SendEvent(qst, victim, plr, ON_QUEST_KILLMOB, qle->m_mobcount[j]);
-										if(qle->CanBeFinished())
+										if( qle->CanBeFinished() )
 											qle->SendQuestComplete();
 										break;
 									}
@@ -755,13 +758,16 @@ void QuestMgr::OnPlayerItemPickup(Player* plr, Item* item)
 	uint32 pcount;
 	uint32 entry = item->GetEntry();
 	QuestLogEntry *qle;
-	for(i = 0; i < 25; ++i)
+	for( i = 0; i < 25; ++i )
 	{
-		if((qle = plr->GetQuestLogInSlot(i)))
+		if( ( qle = plr->GetQuestLogInSlot( i ) ) )
 		{
-			for(j = 0; j < qle->GetQuest()->count_required_item; ++j)
+			if( qle->GetQuest()->count_required_item == 0 )
+				continue;
+
+			for( j = 0; j < 4; ++j )
 			{
-				if(qle->GetQuest()->required_item[j] == entry)
+				if( qle->GetQuest()->required_item[j] == entry )
 				{
 					pcount = plr->GetItemInterface()->GetItemCount(entry, true);
 					CALL_QUESTSCRIPT_EVENT(qle, OnPlayerItemPickup)(entry, pcount, plr);
@@ -788,15 +794,15 @@ void QuestMgr::OnPlayerExploreArea(Player* plr, uint32 AreaID)
 {
 	uint32 i, j;
 	QuestLogEntry *qle;
-	for(i = 0; i < 25; ++i)
+	for( i = 0; i < 25; ++i )
 	{
 		if((qle = plr->GetQuestLogInSlot(i)))
 		{
-			// dont waste time on quests without mobs
-			if(qle->GetQuest()->count_requiredtriggers == 0)
+			// dont waste time on quests without triggers
+			if( qle->GetQuest()->count_requiredtriggers == 0 )
 				continue;
 
-			for(j = 0; j < 4; ++j)
+			for( j = 0; j < 4; ++j )
 			{
 				if(qle->GetQuest()->required_triggers[j] == AreaID &&
 					!qle->m_explored_areas[j])
@@ -1567,10 +1573,19 @@ void QuestMgr::LoadExtraQuestStuff()
 		qst = it->Get();
 
 		// 0 them out
-		qst->count_required_item = qst->count_required_mob = qst->count_requiredtriggers = qst->count_receiveitems =
-			qst->count_reward_item = qst->count_reward_choiceitem = qst->count_required_item = qst->reward_xp_as_money = 0;
+		qst->count_required_item = 0;
+		qst->count_required_mob = 0;
+		qst->count_requiredtriggers = 0;
+		qst->count_receiveitems = 0;
+		qst->count_reward_item = 0;
+		qst->count_reward_choiceitem = 0;
+		qst->reward_xp_as_money = 0;
 
-		qst->required_mobtype[0] = qst->required_mobtype[1] = qst->required_mobtype[2] = qst->required_mobtype[3] = 0;
+		qst->required_mobtype[0] = 0;
+		qst->required_mobtype[1] = 0;
+		qst->required_mobtype[2] = 0;
+		qst->required_mobtype[3] = 0;
+
 		qst->count_requiredquests = 0;
 
 		for(int i = 0 ; i < 4; ++i)

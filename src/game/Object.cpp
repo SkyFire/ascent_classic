@@ -530,23 +530,25 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 			GameObject *go = ((GameObject*)this);
 			QuestLogEntry *qle;
 			GameObjectInfo *info;
-			if(go->HasQuests()) {
+			if( go->HasQuests() )
+			{
 				activate_quest_object = true;
-			} else {
+			}
+			else
+			{
 				info = go->GetInfo();
-				if(info &&
-					(info->goMap.size() || info->itemMap.size()) )
+				if( info && ( info->goMap.size() || info->itemMap.size() ) )
 				{
-					for(GameObjectGOMap::iterator itr = go->GetInfo()->goMap.begin();
-						itr != go->GetInfo()->goMap.end();
-						++itr)
+					for( GameObjectGOMap::iterator itr = go->GetInfo()->goMap.begin(); itr != go->GetInfo()->goMap.end(); ++itr )
 					{
-						if((qle = target->GetQuestLogForEntry(itr->first->id)))
+						qle = target->GetQuestLogForEntry( itr->first->id );
+						if( qle != NULL )
 						{
-							for(uint32 i = 0; i < qle->GetQuest()->count_required_mob; ++i)
+							if( qle->GetQuest()->count_required_mob == 0 )
+								continue;
+							for( uint32 i = 0; i < 4; ++i )
 							{
-								if(qle->GetQuest()->required_mob[i] == go->GetEntry() &&
-									qle->GetMobCount(i) < qle->GetQuest()->required_mobcount[i])
+								if( qle->GetQuest()->required_mob[i] == go->GetEntry() && qle->GetMobCount(i) < qle->GetQuest()->required_mobcount[i])
 								{
 									activate_quest_object = true;
 									break;
