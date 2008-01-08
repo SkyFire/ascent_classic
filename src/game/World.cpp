@@ -1958,22 +1958,39 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = Cthunder_grouprelation;
 
-	//shaman - COnvection
+	//shaman - Convection
 	sp = dbcSpell.LookupEntry(16039); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1 | 4 | 2;
+		sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
 	sp = dbcSpell.LookupEntry(16109); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1 | 4 | 2;
+		sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
 	sp = dbcSpell.LookupEntry(16110); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1 | 4 | 2;
+		sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
 	sp = dbcSpell.LookupEntry(16111); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1 | 4 | 2;
+		sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
 	sp = dbcSpell.LookupEntry(16112); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1 | 4 | 2;
+		sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
+
+    //shaman - Concussion
+    sp = dbcSpell.LookupEntry(16035);
+    if( sp != NULL )
+        sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
+    sp = dbcSpell.LookupEntry(16105);
+    if( sp != NULL )
+        sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
+    sp = dbcSpell.LookupEntry(16106);
+    if( sp != NULL )
+        sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
+    sp = dbcSpell.LookupEntry(16107);
+    if( sp != NULL )
+        sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
+    sp = dbcSpell.LookupEntry(16108);
+    if( sp != NULL )
+        sp->EffectSpellGroupRelation[0] = 4 | 2 | 1;
 
 	//rogue - Elusiveness
 	sp = dbcSpell.LookupEntry(2094);//rogue - blind 
