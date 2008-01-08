@@ -466,7 +466,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			/*int32 m_time = TimeStamp() - target->GetSession()->m_clientTimeDelay;
 			m_time += target->GetSession()->m_moveDelayTime;
 			*data << m_time;*/
-			*data << uint32(TimeStamp()-150);
+			*data << getMSTime();
 		}
 		else
             *data << getMSTime();

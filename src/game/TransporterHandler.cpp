@@ -305,26 +305,25 @@ void Transporter::UpdatePosition()
 	if (m_WayPoints.size() <= 1)
 		return;
 
-	WaypointIterator olditer = mCurrentWaypoint;
-
-	m_timer = getMSTime() % m_pathTime;
-	if(mNextWaypoint->first <= m_timer)
+	m_timer = (getMSTime() - 62500) % m_pathTime;
+	
+	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) >= ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
 	{
-		/*printf("%s from %u %f %f %f to %u %f %f %f\n", this->GetInfo()->Name,
+		printf("%s from %u %f %f %f to %u %f %f %f\n", this->GetInfo()->Name,
 			mCurrentWaypoint->second.mapid, mCurrentWaypoint->second.x,mCurrentWaypoint->second.y,mCurrentWaypoint->second.z,
-			mNextWaypoint->second.mapid, mNextWaypoint->second.x,mNextWaypoint->second.y,mNextWaypoint->second.z);*/
+			mNextWaypoint->second.mapid, mNextWaypoint->second.x,mNextWaypoint->second.y,mNextWaypoint->second.z);
 
 		mCurrentWaypoint = mNextWaypoint;
 		mNextWaypoint = GetNextWaypoint();
-		if (mNextWaypoint->second.mapid != mCurrentWaypoint->second.mapid) {
+		if (mNextWaypoint->second.mapid != GetMapId()) {
 			mCurrentWaypoint = mNextWaypoint;
 			mNextWaypoint = GetNextWaypoint();
-			TransportPassengers(mCurrentWaypoint->second.mapid, GetMapId(),
-				mCurrentWaypoint->second.x, mCurrentWaypoint->second.y, mCurrentWaypoint->second.z);
-			//break;
+			TransportPassengers(mNextWaypoint->second.mapid, GetMapId(),
+				mNextWaypoint->second.x, mNextWaypoint->second.y, mNextWaypoint->second.z);
+			break;
 		} else {
-			SetPosition(mCurrentWaypoint->second.x, mCurrentWaypoint->second.y,
-				mCurrentWaypoint->second.z, m_position.o, false);
+			SetPosition(mNextWaypoint->second.x, mNextWaypoint->second.y,
+				mNextWaypoint->second.z, m_position.o, false);
 		}
 
 		if(mCurrentWaypoint->second.delayed)
@@ -332,27 +331,6 @@ void Transporter::UpdatePosition()
 			PlaySoundToSet(5495);		// BoatDockedWarning.wav
 		}
 	}
-/*
-	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) > ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
-	{
-		mCurrentWaypoint = mNextWaypoint;
-		mNextWaypoint = GetNextWaypoint();
-
-		if (mCurrentWaypoint->second.teleport == true) {
-			WaypointIterator iterPrev = mCurrentWaypoint;
-			TransportPassengers(mCurrentWaypoint->second.mapid, GetMapId(),
-				mCurrentWaypoint->second.x, mCurrentWaypoint->second.y, mCurrentWaypoint->second.z);
-			break;
-		} else {
-			SetPosition(mCurrentWaypoint->second.x, mCurrentWaypoint->second.y,
-				mCurrentWaypoint->second.z, m_position.o, false);
-		}
-
-		if(mCurrentWaypoint->second.delayed)
-		{
-			PlaySoundToSet(5495);		// BoatDockedWarning.wav
-		}
-	}*/
 }
 
 void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, float y, float z)
