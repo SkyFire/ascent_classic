@@ -2001,6 +2001,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry(1856);//rogue - vanish 
 	if( sp != NULL )
 		Elusiveness_grouprelation |= sp->SpellGroupType;
+
 	//rogue - Elusiveness r1
 	sp = dbcSpell.LookupEntry(13981); 
 	if( sp != NULL )

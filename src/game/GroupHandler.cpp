@@ -304,11 +304,12 @@ void WorldSession::HandleLootMethodOpcode( WorldPacket & recv_data )
 		return;
 	}
 	
-	Player *plyr = objmgr.GetPlayer((uint32)lootMaster);
+	// TODO: fix me burlex 
+	//Player *plyr = objmgr.GetPlayer((uint32)lootMaster);
 	//if(!plyr)return;
-	Group *pGroup = _player->GetGroup();
-	if(pGroup)
-		pGroup->SetLooter(plyr, lootMethod, threshold);
+	Group* pGroup = _player->GetGroup();
+	if( pGroup != NULL)
+		pGroup->SetLooter( _player, lootMethod, threshold );
 }
 
 void WorldSession::HandleMinimapPingOpcode( WorldPacket & recv_data )
