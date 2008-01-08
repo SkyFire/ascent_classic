@@ -6999,9 +6999,15 @@ void Player::SendTradeUpdate()
 
 void Player::RequestDuel(Player *pTarget)
 {
-	if (DuelingWith != NULL) return; // We Already Dueling or have Requested a Duel
+	// We Already Dueling or have already Requested a Duel
 
-	SetDuelState(DUEL_STATE_REQUESTED);
+	if( DuelingWith != NULL )
+		return;
+
+	if( m_duelState != DUEL_STATE_FINISHED )
+		return;
+
+	SetDuelState( DUEL_STATE_REQUESTED );
 
 	//Setup Duel
 	pTarget->DuelingWith = this;
@@ -7120,7 +7126,7 @@ void Player::DuelBoundaryTest()
 
 void Player::EndDuel(uint8 WinCondition)
 {
-	if(m_duelState == DUEL_STATE_FINISHED)
+	if( m_duelState == DUEL_STATE_FINISHED )
 		return;
 
 	// Remove the events

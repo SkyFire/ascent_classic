@@ -21,12 +21,18 @@
 
 void WorldSession::HandleDuelAccepted(WorldPacket & recv_data)
 {
-	if(!_player->IsInWorld()) return;
-	if(_player->DuelingWith == 0)
+	if( !_player->IsInWorld() )
+		return;
+
+	if( _player->DuelingWith == NULL )
+		return;
+
+	if( _player->m_duelState != DUEL_STATE_REQUESTED )
 		return;
 
 	_player->m_duelStatus = DUEL_STATUS_INBOUNDS;
 	_player->DuelingWith->m_duelStatus = DUEL_STATUS_INBOUNDS;
+
 	_player->m_duelState = DUEL_STATE_STARTED;
 	_player->DuelingWith->m_duelState = DUEL_STATE_STARTED;
 
