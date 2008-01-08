@@ -70,7 +70,6 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "../shared/FastQueue.h"
 #include "../shared/CircularQueue.h"
 
-#include "SpellNameHashes.h"
 #include "UpdateFields.h"
 #include "UpdateMask.h"
 #include "Opcodes.h"
@@ -130,6 +129,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "Skill.h"
 #include "SkillNameMgr.h"
 #include "SocialMgr.h"
+#include "SpellNameHashes.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "TaxiMgr.h"
@@ -140,6 +140,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "ItemInterface.h"
 #include "Stats.h"
 #include "WorldCreator.h"
+
 
 #include "ObjectMgr.h"
 
