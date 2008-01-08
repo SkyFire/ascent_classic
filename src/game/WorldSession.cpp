@@ -24,6 +24,7 @@
 #include "StdAfx.h"
 
 #define WORLDSOCKET_TIMEOUT		 80
+#define PLAYER_LOGOUT_DELAY (20*1000)		/* 20 seconds should be more than enough to gank ya. */
 
 OpcodeHandler WorldPacketHandlers[NUM_MSG_TYPES];
 
@@ -117,13 +118,18 @@ int WorldSession::Update(uint32 InstanceID)
 			return 0;
 		}
 
-		if(_player && _player->DuelingWith)
-			_player->EndDuel(DUEL_WINNER_RETREAT);
+		if(!_logoutTime)
+			_logoutTime = m_currMsTime + PLAYER_LOGOUT_DELAY;
 
-		bDeleted = true;
-		LogoutPlayer(true);
-		// 1 - Delete session completely.
-		return 1;
+/*
+				if(_player && _player->DuelingWith)
+					_player->EndDuel(DUEL_WINNER_RETREAT);
+		
+				bDeleted = true;
+				LogoutPlayer(true);
+				// 1 - Delete session completely.
+				return 1;*/
+		
 	}
 
 	while ((packet = _recvQueue.Pop()))
@@ -180,7 +186,14 @@ int WorldSession::Update(uint32 InstanceID)
 			return 0;
 		}
 
-		LogoutPlayer(true);
+		if( !_socket == NULL )
+		{
+			bDeleted = true;
+			LogoutPlayer(true);
+			return 1;
+		}
+		else
+			LogoutPlayer(true);
 	}
 
 	if(m_lastPing + WORLDSOCKET_TIMEOUT < (uint32)UNIXTIME)
@@ -214,6 +227,9 @@ void WorldSession::LogoutPlayer(bool Save)
 	_loggingOut = true;
 	if (_player)
 	{
+		if(_player->DuelingWith)
+			_player->EndDuel(DUEL_WINNER_RETREAT);
+
 		if(_player->m_currentLoot && _player->IsInWorld())
 		{
 			Object * obj = _player->GetMapMgr()->_GetObject(_player->m_currentLoot);
