@@ -107,7 +107,7 @@ public:
 	Transporter(uint32 guidlow, uint32 guidhigh);
 	~Transporter();
 
-	bool CreateAsTransporter(uint32 EntryID, const char* Name, uint32 Time);
+	bool CreateAsTransporter(uint32 EntryID, const char* Name, int32 Time);
 	void UpdatePosition();
 	void TransportPassengers(uint32 mapid, uint32 oldmap, float x, float y, float z);
 
@@ -137,7 +137,7 @@ private:
 	WaypointMap m_WayPoints;
 	PassengerMap mPassengers;
 
-	uint32 m_period;
+	int32 m_period;
 
 	WaypointIterator GetNextWaypoint();
 };
