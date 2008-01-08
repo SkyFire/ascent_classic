@@ -3827,7 +3827,7 @@ void Spell::Heal(int32 amount)
 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
 		if(critical = Rand(spellCrit))
 		{
-			int32 critbonus = amount / 2;
+			int32 critbonus = amount >> 1;
 			if( m_spellInfo->SpellGroupType)
 					SM_PIValue(static_cast<Unit*>(u_caster)->SM_PCriticalDamage, &critbonus, m_spellInfo->SpellGroupType);
 			amount += critbonus;

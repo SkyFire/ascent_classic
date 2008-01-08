@@ -7009,7 +7009,7 @@ void Player::RequestDuel(Player *pTarget)
 
 	//Get Flags position
 	float dist = CalcDistance(pTarget);
-	dist = dist/2; //half way
+	dist = dist * 0.5f; //half way
 	float x = (GetPositionX() + pTarget->GetPositionX()*dist)/(1+dist) + cos(GetOrientation()+(float(M_PI)/2))*2;
 	float y = (GetPositionY() + pTarget->GetPositionY()*dist)/(1+dist) + sin(GetOrientation()+(float(M_PI)/2))*2;
 	float z = (GetPositionZ() + pTarget->GetPositionZ()*dist)/(1+dist);

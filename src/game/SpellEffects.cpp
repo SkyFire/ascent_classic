@@ -318,7 +318,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 		{
 		case 0xddaf1ac7: // Ice Lance
 			if (dmg>300)   //dirty bugfix.
-				dmg = (int32)(damage/2);
+				dmg = (int32)(damage >> 1);
 			break;
 		case 0x2bc0ae00:	// Incinerate -> Deals x-x extra damage if the target is affected by immolate
 			{
@@ -394,7 +394,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 	if (m_spellInfo->unkne == 520)
 	{
 		if (!unitTarget->IsStunned())
-			dmg = dmg / 2;
+			dmg = dmg >> 1;
 	}
 
 	if(m_spellInfo->speed > 0)

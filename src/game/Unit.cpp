@@ -2283,7 +2283,7 @@ else
 					if(high_dmg_mod<0.2)
 						high_dmg_mod = 0.2f;
 
-					float damage_reduction = (high_dmg_mod + low_dmg_mod) / 2;
+					float damage_reduction = (high_dmg_mod + low_dmg_mod) / 2.0f;
 					if(damage_reduction > 0)
 					{
 							dmg.full_damage = float2int32(damage_reduction * float(dmg.full_damage));
@@ -2387,7 +2387,7 @@ else
 //--------------------------------crushing blow---------------------------------------------
 			case 6:
 				hit_status |= HITSTATUS_CRUSHINGBLOW;
-				dmg.full_damage = (dmg.full_damage*3)/2;
+				dmg.full_damage = (dmg.full_damage * 3) >> 1;
 				break;
 //--------------------------------regular hit-----------------------------------------------
 			default:
