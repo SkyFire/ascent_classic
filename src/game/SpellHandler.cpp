@@ -346,7 +346,7 @@ void WorldSession::HandleAddDynamicTargetOpcode(WorldPacket & recvPacket)
 	else if (flags & 0x2000)
 	{
 		recvPacket >> flags;		// skip one byte
-		recvPacket >> m_strTarget
+		recvPacket >> targets.m_strTarget
 	}
 	if(spellid == 33395)	// Summoned Water Elemental's freeze
 	{
