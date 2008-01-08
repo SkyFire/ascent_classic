@@ -590,34 +590,33 @@ bool World::SetInitialWorldSettings()
 		radius=std::max(GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex)),radius);
 		sp->base_range_or_radius_sqr = radius*radius;
 
-/*		//there are some spells that change the "damage" value of 1 effect to another : devastate = bonus first then damage
-		//this is a total bullshit so remove it when spell system supports effect ovewriting
+		//there are some spells that change the "damage" value of 1 effect to another : devastate = bonus first then damage
+		//this is a total bullshit so remove it when spell system supports effect overwriting
 		for( uint32 col1_swap = 0; col1_swap < 2 ; col1_swap++ )
 			for( uint32 col2_swap = col1_swap ; col2_swap < 3 ; col2_swap++ )
 				if( sp->Effect[col1_swap] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE && sp->Effect[col2_swap] == SPELL_EFFECT_DUMMYMELEE )
 				{
 					uint32 temp;
 					float ftemp;
-					temp = sp->Effect[col1_swap];			sp->Effect[col1_swap] = sp->Effect[col2_swap] ;						sp->Effect[col1_swap] = temp;
-					temp = sp->EffectDieSides[col1_swap];	sp->EffectDieSides[col1_swap] = sp->EffectDieSides[col2_swap] ;		sp->EffectDieSides[col1_swap] = temp;
-					temp = sp->EffectBaseDice[col1_swap];	sp->EffectBaseDice[col1_swap] = sp->EffectBaseDice[col2_swap] ;		sp->EffectBaseDice[col1_swap] = temp;
-					ftemp = sp->EffectDicePerLevel[col1_swap];			sp->EffectDicePerLevel[col1_swap] = sp->EffectDicePerLevel[col2_swap] ;				sp->EffectDicePerLevel[col1_swap] = ftemp;
-					ftemp = sp->EffectRealPointsPerLevel[col1_swap];	sp->EffectRealPointsPerLevel[col1_swap] = sp->EffectRealPointsPerLevel[col2_swap] ;	sp->EffectRealPointsPerLevel[col1_swap] = ftemp;
-					temp = sp->EffectBasePoints[col1_swap];	sp->EffectBasePoints[col1_swap] = sp->EffectBasePoints[col2_swap] ;	sp->EffectBasePoints[col1_swap] = temp;
-					temp = sp->EffectMechanic[col1_swap];	sp->EffectMechanic[col1_swap] = sp->EffectMechanic[col2_swap] ;	sp->EffectMechanic[col1_swap] = temp;
-					temp = sp->EffectImplicitTargetA[col1_swap];	sp->EffectImplicitTargetA[col1_swap] = sp->EffectImplicitTargetA[col2_swap] ;	sp->EffectImplicitTargetA[col1_swap] = temp;
-					temp = sp->EffectImplicitTargetB[col1_swap];	sp->EffectImplicitTargetB[col1_swap] = sp->EffectImplicitTargetB[col2_swap] ;	sp->EffectImplicitTargetB[col1_swap] = temp;
-					temp = sp->EffectRadiusIndex[col1_swap];	sp->EffectRadiusIndex[col1_swap] = sp->EffectRadiusIndex[col2_swap] ;	sp->EffectRadiusIndex[col1_swap] = temp;
-					temp = sp->EffectApplyAuraName[col1_swap];	sp->EffectApplyAuraName[col1_swap] = sp->EffectApplyAuraName[col2_swap] ;	sp->EffectApplyAuraName[col1_swap] = temp;
-					temp = sp->EffectAmplitude[col1_swap];		sp->EffectAmplitude[col1_swap] = sp->EffectAmplitude[col2_swap] ;	sp->EffectAmplitude[col1_swap] = temp;
-					ftemp = sp->Effectunknown[col1_swap];		sp->Effectunknown[col1_swap] = sp->Effectunknown[col2_swap] ;	sp->Effectunknown[col1_swap] = ftemp;
-					temp = sp->EffectChainTarget[col1_swap];	sp->EffectChainTarget[col1_swap] = sp->EffectChainTarget[col2_swap] ;	sp->EffectChainTarget[col1_swap] = temp;
-					temp = sp->EffectSpellGroupRelation[col1_swap];	sp->EffectSpellGroupRelation[col1_swap] = sp->EffectSpellGroupRelation[col2_swap] ;	sp->EffectSpellGroupRelation[col1_swap] = temp;
-					temp = sp->EffectMiscValue[col1_swap];		sp->EffectMiscValue[col1_swap] = sp->EffectMiscValue[col2_swap] ;	sp->EffectMiscValue[col1_swap] = temp;
-					temp = sp->EffectTriggerSpell[col1_swap];	sp->EffectTriggerSpell[col1_swap] = sp->EffectTriggerSpell[col2_swap] ;	sp->EffectTriggerSpell[col1_swap] = temp;
-					ftemp = sp->EffectPointsPerComboPoint[col1_swap];	sp->EffectPointsPerComboPoint[col1_swap] = sp->EffectPointsPerComboPoint[col2_swap] ;	sp->EffectPointsPerComboPoint[col1_swap] = ftemp;
+					temp = sp->Effect[col1_swap];			sp->Effect[col1_swap] = sp->Effect[col2_swap] ;						sp->Effect[col2_swap] = temp;
+					temp = sp->EffectDieSides[col1_swap];	sp->EffectDieSides[col1_swap] = sp->EffectDieSides[col2_swap] ;		sp->EffectDieSides[col2_swap] = temp;
+					temp = sp->EffectBaseDice[col1_swap];	sp->EffectBaseDice[col1_swap] = sp->EffectBaseDice[col2_swap] ;		sp->EffectBaseDice[col2_swap] = temp;
+					ftemp = sp->EffectDicePerLevel[col1_swap];			sp->EffectDicePerLevel[col1_swap] = sp->EffectDicePerLevel[col2_swap] ;				sp->EffectDicePerLevel[col2_swap] = ftemp;
+					ftemp = sp->EffectRealPointsPerLevel[col1_swap];	sp->EffectRealPointsPerLevel[col1_swap] = sp->EffectRealPointsPerLevel[col2_swap] ;	sp->EffectRealPointsPerLevel[col2_swap] = ftemp;
+					temp = sp->EffectBasePoints[col1_swap];	sp->EffectBasePoints[col1_swap] = sp->EffectBasePoints[col2_swap] ;	sp->EffectBasePoints[col2_swap] = temp;
+					temp = sp->EffectMechanic[col1_swap];	sp->EffectMechanic[col1_swap] = sp->EffectMechanic[col2_swap] ;	sp->EffectMechanic[col2_swap] = temp;
+					temp = sp->EffectImplicitTargetA[col1_swap];	sp->EffectImplicitTargetA[col1_swap] = sp->EffectImplicitTargetA[col2_swap] ;	sp->EffectImplicitTargetA[col2_swap] = temp;
+					temp = sp->EffectImplicitTargetB[col1_swap];	sp->EffectImplicitTargetB[col1_swap] = sp->EffectImplicitTargetB[col2_swap] ;	sp->EffectImplicitTargetB[col2_swap] = temp;
+					temp = sp->EffectRadiusIndex[col1_swap];	sp->EffectRadiusIndex[col1_swap] = sp->EffectRadiusIndex[col2_swap] ;	sp->EffectRadiusIndex[col2_swap] = temp;
+					temp = sp->EffectApplyAuraName[col1_swap];	sp->EffectApplyAuraName[col1_swap] = sp->EffectApplyAuraName[col2_swap] ;	sp->EffectApplyAuraName[col2_swap] = temp;
+					temp = sp->EffectAmplitude[col1_swap];		sp->EffectAmplitude[col1_swap] = sp->EffectAmplitude[col2_swap] ;	sp->EffectAmplitude[col2_swap] = temp;
+					ftemp = sp->Effectunknown[col1_swap];		sp->Effectunknown[col1_swap] = sp->Effectunknown[col2_swap] ;	sp->Effectunknown[col2_swap] = ftemp;
+					temp = sp->EffectChainTarget[col1_swap];	sp->EffectChainTarget[col1_swap] = sp->EffectChainTarget[col2_swap] ;	sp->EffectChainTarget[col2_swap] = temp;
+					temp = sp->EffectSpellGroupRelation[col1_swap];	sp->EffectSpellGroupRelation[col1_swap] = sp->EffectSpellGroupRelation[col2_swap] ;	sp->EffectSpellGroupRelation[col2_swap] = temp;
+					temp = sp->EffectMiscValue[col1_swap];		sp->EffectMiscValue[col1_swap] = sp->EffectMiscValue[col2_swap] ;	sp->EffectMiscValue[col2_swap] = temp;
+					temp = sp->EffectTriggerSpell[col1_swap];	sp->EffectTriggerSpell[col1_swap] = sp->EffectTriggerSpell[col2_swap] ;	sp->EffectTriggerSpell[col2_swap] = temp;
+					ftemp = sp->EffectPointsPerComboPoint[col1_swap];	sp->EffectPointsPerComboPoint[col1_swap] = sp->EffectPointsPerComboPoint[col2_swap] ;	sp->EffectPointsPerComboPoint[col2_swap] = ftemp;
 				}
-*/
 
 		for(uint32 b=0;b<3;++b)
 		{
@@ -1700,13 +1699,13 @@ bool World::SetInitialWorldSettings()
 	//paladin - Healing Light
 	sp = dbcSpell.LookupEntry( 20237 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648 | 1073741824;
+		sp->EffectSpellGroupRelation[0] = 2147483648UL | 1073741824UL;
 	sp = dbcSpell.LookupEntry( 20238 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648 | 1073741824;
+		sp->EffectSpellGroupRelation[0] = 2147483648UL | 1073741824UL;
 	sp = dbcSpell.LookupEntry( 20239 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648 | 1073741824;
+		sp->EffectSpellGroupRelation[0] = 2147483648UL | 1073741824UL;
 
 	//paladin - Aura Mastery
 	sp = dbcSpell.LookupEntry( 31821 );
@@ -1716,13 +1715,13 @@ bool World::SetInitialWorldSettings()
 	//paladin - Sanctified Light
 	sp = dbcSpell.LookupEntry( 20359 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 2147483648UL;
 	sp = dbcSpell.LookupEntry( 20360 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 2147483648UL;
 	sp = dbcSpell.LookupEntry( 20361 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 2147483648UL;
 
 	//paladin - Improved Seal of the Crusader
 	sp = dbcSpell.LookupEntry( 20335 );
@@ -1771,6 +1770,18 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
         sp->EffectTriggerSpell[0] = 27165;
 	}
+	sp = dbcSpell.LookupEntry( 20268 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+	sp = dbcSpell.LookupEntry( 20352 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+	sp = dbcSpell.LookupEntry( 20353 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+	sp = dbcSpell.LookupEntry( 27165 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
 
 	//paladin - Judgement of Light
 	sp = dbcSpell.LookupEntry( 20185 );
@@ -1803,6 +1814,21 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
         sp->EffectTriggerSpell[0] = 27163;
 	}
+	sp = dbcSpell.LookupEntry( 20267 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+	sp = dbcSpell.LookupEntry( 20341 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+	sp = dbcSpell.LookupEntry( 20342 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+	sp = dbcSpell.LookupEntry( 20343 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
+	sp = dbcSpell.LookupEntry( 27163 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SINGLE_ENEMY;
 
 	//paladin - Eye for an Eye
 	sp = dbcSpell.LookupEntry( 9799 );
@@ -1841,6 +1867,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
         sp->EffectApplyAuraName[0] = 42;
         sp->EffectTriggerSpell[0] = 31930;
+//sp->procChance=100;
 	}
 
 	//paladin - Blessed Life

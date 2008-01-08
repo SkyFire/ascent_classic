@@ -1245,8 +1245,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						//paladin - Eye for an Eye
 						case 25997:
 							{
-								SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //null pointer check was already made
-								dmg_overwrite = ( dmg *  (spellInfo->EffectBasePoints[0] + 1 )) / 100 ; //only half dmg
+								dmg_overwrite = ( dmg *  (ospinfo->EffectBasePoints[0] + 1 )) / 100 ; //only half dmg
 								int32 half_health = this->GetUInt32Value(UNIT_FIELD_HEALTH) >> 1;
 								if( dmg_overwrite > half_health )
 									dmg_overwrite = half_health ;
@@ -1258,10 +1257,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								ModUInt32Value(UNIT_FIELD_HEALTH,dmg/2);
 								continue; //there is no visual for this ?
 							}break;
-						//paladin - sanctified judgement
-/*							disabled until tested
+							//paladin - sanctified judgement
 							case 31930:
 							{
+//!! not working since we use post even hook and seal disapears before event
 								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								if(	CastingSpell->NameHash != SPELL_HASH_JUDGEMENT )
@@ -1269,13 +1268,15 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( !IsPlayer() )
 									continue; //great, we can only make this for players 
 								Player* c = static_cast< Player* >( this );
+//printf("is there a seal on the player ? %u \n",c->Seal);
 								if( !c->Seal )
 									continue; //how the hack did we manage to cast judgement without a seal ?
 								SpellEntry *spellInfo = dbcSpell.LookupEntry( c->Seal ); //null pointer check was already made
 								if( !spellInfo )
 									continue;	//now this is getting freeky, how the hell did we manage to create this bug ?
 								dmg_overwrite = spellInfo->manaCost / 2 ; //only half dmg
-							}break; */
+//printf("is there a seal on the player ? %u \n",dmg_overwrite);
+							}break; 
 						//shaman - Lightning Overload
 						case 39805:
 							{

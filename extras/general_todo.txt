@@ -38,6 +38,8 @@ SMT_RESIST_DISPEL - check if it is used
 - Quagmirran's eye proc doesn't work. Never got the spell haste proc off any harmful spell.
 - The lightning Capacitor- no electrical charge saved from spell criticals so it doesn't fire off lightning bolts.
 - effect 121 should come before eff 31. (bonus calc -> damage) or bonus will not be applied
+- intellect does not increase spell crit chance
+
 ==========================================================================
 ! BUGS !
 - creatures keep yelling no content messgs
@@ -83,7 +85,6 @@ Zack - test my shit :
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
 - shaman - Restorative Totems 16208
 - Druid - Ferocity 16938. Works only partially
-- paladin - Blessing of Light 32770 
 - priest - Absolution 33172
 - priest - Mental Agility 14783
 - priest - Focused Power 33190
@@ -149,16 +150,9 @@ Zack - test my shit :
 - druid - Empowered Touch 33880
 - druid - Empowered Rejuvenation 33890
 - paladin - Healing Light 20239
-- paladin - Aura Mastery 31821
 - paladin - Sanctified Light 20361
-- paladin - Light's Grace 31836
-- paladin - eye for an eye 25988
 - paladin - sanctified judgement 31878
-- paladin - Improved Seal of the Crusader 33557
-- paladin - Judgement of Wisdom 27164
-- paladin - Judgement of Light 27162
-- paladin - Light's Grace 31834
-- paladin - Blessed Life 31830
+- paladin - Improved Seal of the Crusader 33557	-	need to work on these, right now it is not implemented
 
 ==========================================================================
 Capt - test my shit :
