@@ -241,13 +241,14 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 		return;
 	}*/
 
+	if( DstSlot < INVENTORY_SLOT_BAG_START && DstInvSlot == INVENTORY_SLOT_NOT_SET ) //equip
+	{
+		if( SrcItem->GetProto()->Bonding == ITEM_BIND_ON_EQUIP )
+			SrcItem->SoulBind();
+	}
+
 	if( SrcInvSlot == DstInvSlot )//in 1 bag
 	{
-		if( DstSlot < INVENTORY_SLOT_BAG_START && DstInvSlot == INVENTORY_SLOT_NOT_SET ) //equip
-		{
-			if( SrcItem->GetProto()->Bonding == ITEM_BIND_ON_EQUIP )
-				SrcItem->SoulBind();
-		}
 		if( SrcInvSlot == INVENTORY_SLOT_NOT_SET ) //in backpack
 		{
 			_player->GetItemInterface()->SwapItemSlots( SrcSlot, DstSlot );
