@@ -333,6 +333,11 @@ void WorldSession::HandleAddDynamicTargetOpcode(WorldPacket & recvPacket)
 		recvPacket >> guid;
 		targets.m_unitTarget = guid.GetOldGuid();
 	}
+	else if(flags == 0x20)
+	{
+		recvPacket >> flags;		// skip one byte
+		recvPacket >> targets.m_srcX >> targets.m_srcY >> targets.m_srcZ;
+	}
 	else if(flags == 0x40)
 	{
 		recvPacket >> flags;		// skip one byte
