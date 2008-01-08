@@ -155,6 +155,7 @@ Zack - test my shit :
 - paladin - eye for an eye 25988
 - paladin - sanctified judgement 31878
 - paladin - Improved Seal of the Crusader 33557
+- paladin - Judgement of Wisdom 27164
 
 ==========================================================================
 Capt - test my shit :

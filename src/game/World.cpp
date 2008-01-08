@@ -1741,6 +1741,32 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 512;
 
+	//paladin - Judgement of Wisdom
+	sp = dbcSpell.LookupEntry( 20186 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+        sp->EffectTriggerSpell[0] = 20268;
+	}
+	sp = dbcSpell.LookupEntry( 20354 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+        sp->EffectTriggerSpell[0] = 20352;
+	}
+	sp = dbcSpell.LookupEntry( 20355 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+        sp->EffectTriggerSpell[0] = 20353;
+	}
+	sp = dbcSpell.LookupEntry( 27164 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+        sp->EffectTriggerSpell[0] = 27165;
+	}
+
 	//paladin - Eye for an Eye
 	sp = dbcSpell.LookupEntry( 9799 );
 	if( sp != NULL )

@@ -16,11 +16,7 @@ reckoning: doesn't work
 Avenger's shield: stopped working :S
 bless of sanctuary, holy shield, imp holy shield (not working on 2319)
 ardent defender: doesn't work (-dmg when under 35% hp). This is implemented actually but in a worng way
---RET--
-imp seal of the crusader: doesn't work
-sanctified crusader: doesn't work
 
-Judgement of Wisdom - will be placed but will NOT add mana on hit (neither self nor party)
 Judgement of Light - will be placed on target but will NOT add HP on hit (neither self nor party)
 
 ///////////////////////////////////////////
