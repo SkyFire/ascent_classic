@@ -1242,6 +1242,15 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell->NameHash != SPELL_HASH_HOLY_LIGHT )
 									continue; 
 							}break;
+						//paladin - Eye for an Eye
+						case 25997:
+							{
+								SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //null pointer check was already made
+								dmg_overwrite = ( dmg *  (spellInfo->EffectBasePoints[0] + 1 )) / 100 ; //only half dmg
+								int32 half_health = this->GetUInt32Value(UNIT_FIELD_HEALTH);
+								if( dmg_overwrite > half_health )
+									dmg_overwrite = half_health ;
+							}break;
 						//shaman - Lightning Overload
 						case 39805:
 							{

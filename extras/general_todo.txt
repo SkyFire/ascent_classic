@@ -152,6 +152,7 @@ Zack - test my shit :
 - paladin - Aura Mastery 31821
 - paladin - Sanctified Light 20361
 - paladin - Light's Grace 31836
+- paladin - eye for an eye 25988
 
 ==========================================================================
 Capt - test my shit :

@@ -1700,29 +1700,45 @@ bool World::SetInitialWorldSettings()
 	//paladin - Healing Light
 	sp = dbcSpell.LookupEntry( 20237 );
 	if( sp != NULL )
-		sp->EffectApplyAuraName[0] = 2147483648 | 1073741824;
+		sp->EffectSpellGroupRelation[0] = 2147483648 | 1073741824;
 	sp = dbcSpell.LookupEntry( 20238 );
 	if( sp != NULL )
-		sp->EffectApplyAuraName[0] = 2147483648 | 1073741824;
+		sp->EffectSpellGroupRelation[0] = 2147483648 | 1073741824;
 	sp = dbcSpell.LookupEntry( 20239 );
 	if( sp != NULL )
-		sp->EffectApplyAuraName[0] = 2147483648 | 1073741824;
+		sp->EffectSpellGroupRelation[0] = 2147483648 | 1073741824;
 
 	//paladin - Aura Mastery
 	sp = dbcSpell.LookupEntry( 31821 );
 	if( sp != NULL )
-		sp->EffectApplyAuraName[0] = 131072 | 67108864 | 8 | 64;
+		sp->EffectSpellGroupRelation[0] = 131072 | 67108864 | 8 | 64;
 
 	//paladin - Sanctified Light
 	sp = dbcSpell.LookupEntry( 20359 );
 	if( sp != NULL )
-		sp->EffectApplyAuraName[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 2147483648;
 	sp = dbcSpell.LookupEntry( 20360 );
 	if( sp != NULL )
-		sp->EffectApplyAuraName[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 2147483648;
 	sp = dbcSpell.LookupEntry( 20361 );
 	if( sp != NULL )
-		sp->EffectApplyAuraName[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 2147483648;
+
+	//paladin - Eye for an Eye
+	sp = dbcSpell.LookupEntry( 9799 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
+        sp->EffectApplyAuraName[0] = 42;
+        sp->EffectTriggerSpell[0] = 25997;
+	}
+	sp = dbcSpell.LookupEntry( 25988 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
+        sp->EffectApplyAuraName[0] = 42;
+        sp->EffectTriggerSpell[0] = 25997;
+	}
 
 	//paladin - Light's Grace
 	sp = dbcSpell.LookupEntry( 31833 );
