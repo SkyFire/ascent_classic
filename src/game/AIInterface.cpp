@@ -166,8 +166,7 @@ void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 
 void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 {
-	if(!pUnit || !m_Unit)
-		return;
+	if( m_Unit == NULL ) return;
 	
 	if(m_AIState != STATE_EVADE)
 	{
@@ -175,6 +174,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		{
 		case EVENT_ENTERCOMBAT:
 			{
+				if( pUnit == NULL ) return;
+
 				/* send the message */
 				if( m_Unit->GetTypeId() == TYPEID_UNIT )
 				{
@@ -224,6 +225,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}break;
 		case EVENT_LEAVECOMBAT:
 			{
+				if( pUnit == NULL ) return;
+
 				//cancel spells that we are casting. Should remove bug where creatures cast a spell after they died
 //				CancelSpellCast();
 				// restart emote
@@ -317,6 +320,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			}break;
 		case EVENT_DAMAGETAKEN:
 			{
+				if( pUnit == NULL ) return;
+
 				CALL_SCRIPT_EVENT(m_Unit, OnDamageTaken)(pUnit, float(misc1));
 				if(!modThreatByPtr(pUnit, misc1))
 				{
@@ -344,6 +349,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 
 		case EVENT_FEAR:
 			{
+				if( pUnit == NULL ) return;
+
 				m_FearTimer = 0;
 				SetUnitToFear(pUnit);
 
@@ -382,6 +389,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 
 		case EVENT_WANDER:
 			{
+				if( pUnit == NULL ) return;
+
 				m_WanderTimer = 0;
 
 				//CALL_SCRIPT_EVENT(m_Unit, OnWander)(pUnit, 0); FIXME
@@ -427,6 +436,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 	{
 		case EVENT_UNITDIED:
 		{
+			if( pUnit == NULL ) return;
+
 			CALL_SCRIPT_EVENT(m_Unit, OnDied)(pUnit);
 			LUA_ON_UNIT_EVENT(m_Unit, CREATURE_EVENT_ON_DIED, pUnit,0);
 			m_AIState = STATE_IDLE;

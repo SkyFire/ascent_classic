@@ -945,16 +945,33 @@ void Aura::SpellAuraBindSight(bool apply)
 void Aura::SpellAuraModPossess(bool apply)
 {
 	Unit *caster = GetUnitCaster();
-	if(!caster)
-		return;
-
-	if(caster->GetTypeId() != TYPEID_PLAYER || !caster->IsInWorld()) 
-		return;
 
 	if(apply)
-		static_cast<Player*>(caster)->Possess(m_target);
+	{
+		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER ) 
+			static_cast<Player*>(caster)->Possess( m_target );
+	}
 	else
-		static_cast<Player*>(caster)->UnPossess();
+	{
+		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER )
+			static_cast<Player*>(caster)->UnPossess();
+
+		// make sure Player::UnPossess() didn't fail, if it did we will just free the target here
+		if( m_target->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) != NULL )
+		{
+			if( m_target->GetTypeId() == TYPEID_UNIT )
+			{
+				m_target->setAItoUse( true );
+				m_target->m_redirectSpellPackets = 0;
+			}
+
+			m_target->SetUInt64Value( UNIT_FIELD_CHARMEDBY, NULL );
+			m_target->RemoveFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE );
+			m_target->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, m_target->GetCharmTempVal() );
+			m_target->_setFaction();
+			m_target->UpdateOppFactionSet();
+		}
+	}
 }
 
 void Aura::SpellAuraPeriodicDamage(bool apply)
@@ -1766,12 +1783,14 @@ void Aura::SpellAuraDummy(bool apply)
 void Aura::SpellAuraModConfuse(bool apply)
 {   
 	Unit* u_caster = GetUnitCaster();
-	if(!u_caster) return;
+
 	if( m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() )
 		return;
 
 	if(apply)
 	{
+		if( u_caster == NULL ) return;
+
 		SetNegative();
 		
 		m_target->m_special_state |= UNIT_STATE_CONFUSE;
@@ -1794,7 +1813,7 @@ void Aura::SpellAuraModConfuse(bool apply)
 		m_target->m_special_state &= ~UNIT_STATE_CONFUSE;
 		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
 
-		m_target->GetAIInterface()->HandleEvent(EVENT_UNWANDER, u_caster, 0);
+		m_target->GetAIInterface()->HandleEvent( EVENT_UNWANDER, NULL, 0 );
 
 		if(p_target)
 		{
@@ -1805,7 +1824,9 @@ void Aura::SpellAuraModConfuse(bool apply)
 			p_target->GetSession()->SendPacket(&data1);
 
 			m_target->setAItoUse(false);
-			sHookInterface.OnEnterCombat(p_target, u_caster);
+
+			if( u_caster != NULL )
+				sHookInterface.OnEnterCombat( p_target, u_caster );
 		}
 		else
 			m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
@@ -1820,23 +1841,23 @@ void Aura::SpellAuraModCharm(bool apply)
   
 	SetPositive(3); //we ignore the other 2 effect of this spell and force it to be a positive spell
 
-	if(!ucaster || ucaster->GetTypeId() != TYPEID_PLAYER || (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() || m_target->GetTypeId() != TYPEID_UNIT)
-		return;
-
 	if( m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() )
-		return;
-
-	// this should be done properly
-	if(apply && target->GetEnslaveCount() >= 10)
-		return;
-
-	if(apply && caster->GetUInt64Value(UNIT_FIELD_CHARM) != 0)
 		return;
 
 	if(apply)
 	{
+		if(!ucaster || ucaster->GetTypeId() != TYPEID_PLAYER || (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() || m_target->GetTypeId() != TYPEID_UNIT)
+			return;
+
+		// this should be done properly
+		if( target->GetEnslaveCount() >= 10 )
+			return;
+
+		if( caster->GetUInt64Value( UNIT_FIELD_CHARM ) != NULL )
+			return;
+
 		m_target->m_special_state |= UNIT_STATE_CHARM;
-		m_target->SetCharmTempVal(caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
+		m_target->SetCharmTempVal( m_target->GetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE ) );
 		m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 		m_target->_setFaction();
 		m_target->UpdateOppFactionSet();
@@ -1867,7 +1888,7 @@ void Aura::SpellAuraModCharm(bool apply)
 	else
 	{
 		m_target->m_special_state &= ~UNIT_STATE_CHARM;
-		m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, caster->GetCharmTempVal());
+		m_target->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, m_target->GetCharmTempVal() );
 		m_target->_setFaction();
 		m_target->GetAIInterface()->WipeHateList();
 		m_target->GetAIInterface()->WipeTargetList();
@@ -1886,12 +1907,14 @@ void Aura::SpellAuraModCharm(bool apply)
 void Aura::SpellAuraModFear(bool apply)
 {
 	Unit* u_caster = GetUnitCaster();
-	if(!u_caster) return;
+
 	if( m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() )
 		return;
 
 	if(apply)
 	{
+		if( u_caster == NULL ) return;
+
 		SetNegative();
 
 		m_target->m_special_state |= UNIT_STATE_FEAR;
@@ -1914,7 +1937,7 @@ void Aura::SpellAuraModFear(bool apply)
 		m_target->m_special_state &= ~UNIT_STATE_FEAR;
 		m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
 
-		m_target->GetAIInterface()->HandleEvent(EVENT_UNFEAR, u_caster, 0);
+		m_target->GetAIInterface()->HandleEvent( EVENT_UNFEAR, NULL, 0 );
 
 		if(p_target)
 		{
@@ -1925,7 +1948,9 @@ void Aura::SpellAuraModFear(bool apply)
 			p_target->GetSession()->SendPacket(&data1);
 
 			m_target->setAItoUse(false);
-			sHookInterface.OnEnterCombat(p_target, u_caster);
+
+			if( u_caster != NULL )
+				sHookInterface.OnEnterCombat( p_target, u_caster );
 		}
 		else
 			m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
@@ -4301,10 +4326,10 @@ void Aura::SpellAuraFeighDeath(bool apply)
 
 void Aura::SpellAuraModDisarm(bool apply)
 {
-	if(p_target && p_target->IsInFeralForm()) return;
-
 	if(apply)
 	{
+		if( p_target != NULL && p_target->IsInFeralForm() ) return;
+
 		SetNegative();
 
 		m_target->disarmed = true;
