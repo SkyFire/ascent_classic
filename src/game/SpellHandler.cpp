@@ -326,22 +326,27 @@ void WorldSession::HandleAddDynamicTargetOpcode(WorldPacket & recvPacket)
 
 	if(flags == 0)
 		targets.m_unitTarget = guid;
-	else if(flags == 0x02)
+	else if(flags & 0x02)
 	{
 		WoWGuid guid;
 		recvPacket >> flags;		// skip one byte
 		recvPacket >> guid;
 		targets.m_unitTarget = guid.GetOldGuid();
 	}
-	else if(flags == 0x20)
+	else if(flags & 0x20)
 	{
 		recvPacket >> flags;		// skip one byte
 		recvPacket >> targets.m_srcX >> targets.m_srcY >> targets.m_srcZ;
 	}
-	else if(flags == 0x40)
+	else if(flags & 0x40)
 	{
 		recvPacket >> flags;		// skip one byte
 		recvPacket >> targets.m_destX >> targets.m_destY >> targets.m_destZ;
+	}
+	else if (flags & 0x2000)
+	{
+		recvPacket >> flags;		// skip one byte
+		recvPacket >> m_strTarget
 	}
 	if(spellid == 33395)	// Summoned Water Elemental's freeze
 	{
