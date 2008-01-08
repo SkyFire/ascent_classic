@@ -4995,13 +4995,19 @@ void World::Rehash(bool load)
 			GMCommand_Log->Open();
 
 #ifdef WIN32
-	DWORD current_priority_class = GetPriorityClass(GetCurrentProcess());
-	bool high = Config.MainConfig.GetBoolDefault("Server", "AdjustPriority", false);
+	DWORD current_priority_class = GetPriorityClass( GetCurrentProcess() );
+	bool high = Config.MainConfig.GetBoolDefault( "Server", "AdjustPriority", false );
 
-	if(current_priority_class == HIGH_PRIORITY_CLASS && !high)
-		SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
-	else if(current_priority_class != HIGH_PRIORITY_CLASS && high)
-		SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+	if( high )
+	{
+		if( current_priority_class != HIGH_PRIORITY_CLASS )
+			SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS );
+	}
+	else
+	{
+		if( current_priority_class != NORMAL_PRIORITY_CLASS )
+			SetPriorityClass( GetCurrentProcess(), NORMAL_PRIORITY_CLASS );
+	}
 #endif
 
 	reqGmClient = Config.MainConfig.GetBoolDefault("GMClient", "ReqGmClient", false);

@@ -133,7 +133,7 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 	
 	recv_data >> DstInvSlot >> DstSlot >> SrcInvSlot >> SrcSlot;
 
-	sLog.outDetail("ITEM: swap, DstInvSlot %u DstSlot %u SrcInvSlot %u SrcSlot %u", (uint32)DstInvSlot, (uint32)DstSlot, (uint32)SrcInvSlot, (uint32)SrcSlot);
+	sLog.outDetail("ITEM: swap, DstInvSlot %i DstSlot %i SrcInvSlot %i SrcSlot %i", DstInvSlot, DstSlot, SrcInvSlot, SrcSlot);
 
 	if(DstInvSlot == SrcSlot && SrcInvSlot == -1) // player trying to add self container to self container slots
 	{
@@ -241,15 +241,20 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 		return;
 	}*/
 
-	if(SrcInvSlot==DstInvSlot)//in 1 bag
+	if( SrcInvSlot == DstInvSlot )//in 1 bag
 	{
-		if(SrcInvSlot == INVENTORY_SLOT_NOT_SET)//in backpack
+		if( DstSlot < INVENTORY_SLOT_BAG_START && DstInvSlot == INVENTORY_SLOT_NOT_SET ) //equip
 		{
-			_player->GetItemInterface()->SwapItemSlots(SrcSlot,DstSlot);
+			if( SrcItem->GetProto()->Bonding == ITEM_BIND_ON_EQUIP )
+				SrcItem->SoulBind();
+		}
+		if( SrcInvSlot == INVENTORY_SLOT_NOT_SET ) //in backpack
+		{
+			_player->GetItemInterface()->SwapItemSlots( SrcSlot, DstSlot );
 		}
 		else//in bag
 		{
-			((Container*)_player->GetItemInterface()->GetInventoryItem(SrcInvSlot))->SwapItems(SrcSlot,DstSlot);
+			static_cast< Container* >( _player->GetItemInterface()->GetInventoryItem( SrcInvSlot ) )->SwapItems( SrcSlot, DstSlot );
 		}
 	}
 	else
