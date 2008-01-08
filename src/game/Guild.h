@@ -447,7 +447,7 @@ public:
 	ASCENT_INLINE const uint32 GetGuildId() const { return m_guildId; }
 	ASCENT_INLINE const uint32 GetBankTabCount() const { return m_bankTabCount; }
 	ASCENT_INLINE const uint32 GetBankBalance() const { return m_bankBalance; }
-
+	ASCENT_INLINE const size_t GetNumMembers() const { return m_members.size(); }
 	/** Creates a guild rank with the specified permissions.
 	 */
 	GuildRank * CreateGuildRank(const char * szRankName, uint32 iPermissions, bool bFullGuildBankPermissions);
