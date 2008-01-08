@@ -18,7 +18,6 @@ bless of sanctuary, holy shield, imp holy shield (not working on 2319)
 ardent defender: doesn't work (-dmg when under 35% hp). This is implemented actually but in a worng way
 --RET--
 imp seal of the crusader: doesn't work
-: doesn't work (crits return dmg)
 sanctified judgement: doesn't work (returns mana for a seal)
 sanctified crusader: doesn't work
 

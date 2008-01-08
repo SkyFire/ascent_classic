@@ -1740,6 +1740,29 @@ bool World::SetInitialWorldSettings()
         sp->EffectTriggerSpell[0] = 25997;
 	}
 
+	//paladin - sanctified judgement
+	sp = dbcSpell.LookupEntry( 31876 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+        sp->EffectApplyAuraName[0] = 42;
+        sp->EffectTriggerSpell[0] = 31930;
+	}
+	sp = dbcSpell.LookupEntry( 31877 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+        sp->EffectApplyAuraName[0] = 42;
+        sp->EffectTriggerSpell[0] = 31930;
+	}
+	sp = dbcSpell.LookupEntry( 31878 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+        sp->EffectApplyAuraName[0] = 42;
+        sp->EffectTriggerSpell[0] = 31930;
+	}
+
 	//paladin - Light's Grace
 	sp = dbcSpell.LookupEntry( 31833 );
 	if( sp != NULL )

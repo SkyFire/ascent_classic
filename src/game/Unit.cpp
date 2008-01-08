@@ -1247,10 +1247,28 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //null pointer check was already made
 								dmg_overwrite = ( dmg *  (spellInfo->EffectBasePoints[0] + 1 )) / 100 ; //only half dmg
-								int32 half_health = this->GetUInt32Value(UNIT_FIELD_HEALTH);
+								int32 half_health = this->GetUInt32Value(UNIT_FIELD_HEALTH) / 2;
 								if( dmg_overwrite > half_health )
 									dmg_overwrite = half_health ;
 							}break;
+						//paladin - sanctified judgement
+/*							disabled until tested
+							case 31930:
+							{
+								if( !CastingSpell )
+									continue;//this should not ocur unless we made a fuckup somewhere
+								if(	CastingSpell->NameHash != SPELL_HASH_JUDGEMENT )
+									continue;
+								if( !IsPlayer() )
+									continue; //great, we can only make this for players 
+								Player* c = static_cast< Player* >( this );
+								if( !c->Seal )
+									continue; //how the hack did we manage to cast judgement without a seal ?
+								SpellEntry *spellInfo = dbcSpell.LookupEntry( c->Seal ); //null pointer check was already made
+								if( !spellInfo )
+									continue;	//now this is getting freeky, how the hell did we manage to create this bug ?
+								dmg_overwrite = spellInfo->manaCost / 2 ; //only half dmg
+							}break; */
 						//shaman - Lightning Overload
 						case 39805:
 							{

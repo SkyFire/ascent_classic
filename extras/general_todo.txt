@@ -153,6 +153,7 @@ Zack - test my shit :
 - paladin - Sanctified Light 20361
 - paladin - Light's Grace 31836
 - paladin - eye for an eye 25988
+- paladin - sanctified judgement 31878
 
 ==========================================================================
 Capt - test my shit :
