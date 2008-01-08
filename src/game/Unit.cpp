@@ -4638,7 +4638,7 @@ void Unit::RemoveAuraVisual(uint32 spellid, uint32 count)
 
 uint32 Unit::ModAuraStackCount(uint32 slot, int32 count)
 {
-	uint32 index = (slot / 4);
+	uint32 index = (slot >> 2);
 	uint32 byte  = (slot % 4);
 	uint32 val   = m_uint32Values[UNIT_FIELD_AURAAPPLICATIONS+index];
 
