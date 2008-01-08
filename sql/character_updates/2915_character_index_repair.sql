@@ -49,7 +49,7 @@ ALTER TABLE `arenateams` ADD UNIQUE `a`(`id`);
 ALTER TABLE `auctions` ADD UNIQUE `a`(`auctionId`), ADD INDEX `b`(`auctionHouse`);
 ALTER TABLE `characters` ADD UNIQUE `a`(`guid`), ADD INDEX `b`(`acct`), ADD INDEX `c`(`name`), ADD INDEX `d`(`banned`), ADD INDEX `e`(`online`);
 ALTER TABLE `charters` ADD UNIQUE `a`(`charterId`);
-ALTER TABLE `corpses` ADD UNIQUE `a`(`guid`), ADD INDEX `b`(`mapId`, `instanceId`);
+ALTER TABLE `corpses` ADD UNIQUE `a`(`guid`), ADD INDEX `b`(`mapId`), ADD INDEX `c`(`instanceId`);
 ALTER TABLE `gm_tickets` ADD UNIQUE `a`(`guid`);
 ALTER TABLE `groups` ADD UNIQUE `a`(`group_id`);
 ALTER TABLE `guild_bankitems` ADD INDEX `a`(`guildId`),  ADD INDEX `b`(`tabId`),  ADD INDEX `b`(`slotId`);
