@@ -154,6 +154,7 @@ Zack - test my shit :
 - paladin - Light's Grace 31836
 - paladin - eye for an eye 25988
 - paladin - sanctified judgement 31878
+- paladin - Improved Seal of the Crusader 33557
 
 ==========================================================================
 Capt - test my shit :

@@ -1724,6 +1724,23 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2147483648;
 
+	//paladin - Improved Seal of the Crusader
+	sp = dbcSpell.LookupEntry( 20335 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 512;
+	sp = dbcSpell.LookupEntry( 20336 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 512;
+	sp = dbcSpell.LookupEntry( 20337 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 512;
+	sp = dbcSpell.LookupEntry( 28852 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 512;
+	sp = dbcSpell.LookupEntry( 33557 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 512;
+
 	//paladin - Eye for an Eye
 	sp = dbcSpell.LookupEntry( 9799 );
 	if( sp != NULL )
