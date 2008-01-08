@@ -17,8 +17,6 @@ Avenger's shield: stopped working :S
 bless of sanctuary, holy shield, imp holy shield (not working on 2319)
 ardent defender: doesn't work (-dmg when under 35% hp). This is implemented actually but in a worng way
 
-Judgement of Light - will be placed on target but will NOT add HP on hit (neither self nor party)
-
 ///////////////////////////////////////////
 
 Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbearance, as with Blessing of Protection and other spells which can be found on Divine Shield's description. Avenging Wrath should also debuff the paladin with Forbearance.

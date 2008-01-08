@@ -1767,6 +1767,38 @@ bool World::SetInitialWorldSettings()
         sp->EffectTriggerSpell[0] = 27165;
 	}
 
+	//paladin - Judgement of Light
+	sp = dbcSpell.LookupEntry( 20185 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
+        sp->EffectTriggerSpell[0] = 20267;
+	}
+	sp = dbcSpell.LookupEntry( 20344 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
+        sp->EffectTriggerSpell[0] = 20341;
+	}
+	sp = dbcSpell.LookupEntry( 20345 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
+        sp->EffectTriggerSpell[0] = 20342;
+	}
+	sp = dbcSpell.LookupEntry( 20346 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
+        sp->EffectTriggerSpell[0] = 20343;
+	}
+	sp = dbcSpell.LookupEntry( 27162 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
+        sp->EffectTriggerSpell[0] = 27163;
+	}
+
 	//paladin - Eye for an Eye
 	sp = dbcSpell.LookupEntry( 9799 );
 	if( sp != NULL )
