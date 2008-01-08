@@ -552,8 +552,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		float x = movement_info.x - movement_info.transX;
 		float y = movement_info.y - movement_info.transY;
 		float z = movement_info.z - movement_info.transZ;
-		Transporter* trans = _player->m_CurrentTransporter;
-		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));
+		/*Transporter* trans = _player->m_CurrentTransporter;
+		if(trans) sChatHandler.SystemMessageToPlr(_player, "Client t pos: %f %f\nServer t pos: %f %f   Diff: %f %f", x,y, trans->GetPositionX(), trans->GetPositionY(), trans->CalcDistance(x,y,z), trans->CalcDistance(movement_info.x, movement_info.y, movement_info.z));*/
 	}
 
 	/************************************************************************/

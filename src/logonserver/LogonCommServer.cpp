@@ -381,6 +381,13 @@ void LogonCommServerSocket::HandleTestConsoleLogin(WorldPacket & recvData)
 		return;
 	}
 
+	if(pAccount->GMFlags == NULL || strchr(pAccount->GMFlags, 'z') == NULL)
+	{
+		data << uint32(0);
+		SendPacket(&data);
+		return;
+	}
+
 	if(memcmp(pAccount->SrpHash, key, 20) != 0)
 	{
 		data << uint32(0);

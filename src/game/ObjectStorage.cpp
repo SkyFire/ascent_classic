@@ -122,131 +122,134 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 	QueryResult * result = WorldDatabase.Query( "SELECT * FROM ai_agents" );
 	CreatureProto * cn;
 
-	if( !result )
-		return;
-
-	AI_Spell *sp;
-	uint32 entry;
-
-	do
+	if( result != NULL )
 	{
-		Field *fields = result->Fetch();
-		entry = fields[0].GetUInt32();
-		cn = CreatureProtoStorage.LookupEntry(entry);
-		if(!cn)
-			continue;
+		AI_Spell *sp;
+		uint32 entry;
 
-		sp = new AI_Spell;
-		sp->entryId = fields[0].GetUInt32();
-		sp->agent = fields[1].GetUInt16();
-		sp->procChance = fields[3].GetUInt32();
-		sp->procCount = fields[4].GetUInt32();
-		sp->spell = dbcSpell.LookupEntryForced(fields[5].GetUInt32());
-		sp->spellType = fields[6].GetUInt32();
-		sp->spelltargetType = fields[7].GetUInt32();
-		sp->cooldown = fields[8].GetUInt32();
-		sp->floatMisc1 = fields[9].GetFloat();
-		sp->autocast_type=(uint32)-1;
-		sp->custom_pointer=false;
-		sp->cooldowntime=getMSTime();
-		sp->procCounter=0;
-
-/*		if (!sp->procCountDB) 
-			sp->procCount = uint32(-1);
-		else sp->procCount = sp->procCountDB;*/
-		sp->Misc2 = fields[10].GetUInt32();
-		if(sp->agent == AGENT_SPELL)
+		if(Config.MainConfig.GetBoolDefault("Server", "LoadAIAgents", true))
 		{
-			if(!sp->spell)
+			do
 			{
-				//printf("SpellId %u in ai_agent for %u is invalid.\n", (unsigned int)fields[5].GetUInt32(), (unsigned int)sp->entryId);
-				delete sp;
-				continue;
-			}
-			
-			if(sp->spell->Effect[0] == SPELL_EFFECT_LEARN_SPELL || sp->spell->Effect[1] == SPELL_EFFECT_LEARN_SPELL ||
-				sp->spell->Effect[2] == SPELL_EFFECT_LEARN_SPELL)
-			{
-				//printf("Teaching spell %u in ai_agent for %u\n", (unsigned int)fields[5].GetUInt32(), (unsigned int)sp->entryId);
-				delete sp;
-				continue;
-			}
+				Field *fields = result->Fetch();
+				entry = fields[0].GetUInt32();
+				cn = CreatureProtoStorage.LookupEntry(entry);
+				if(!cn)
+					continue;
 
-			sp->minrange = GetMinRange(dbcSpellRange.LookupEntry(sp->spell->rangeIndex));
-			sp->maxrange = GetMaxRange(dbcSpellRange.LookupEntry(sp->spell->rangeIndex));
+				sp = new AI_Spell;
+				sp->entryId = fields[0].GetUInt32();
+				sp->agent = fields[1].GetUInt16();
+				sp->procChance = fields[3].GetUInt32();
+				sp->procCount = fields[4].GetUInt32();
+				sp->spell = dbcSpell.LookupEntryForced(fields[5].GetUInt32());
+				sp->spellType = fields[6].GetUInt32();
+				sp->spelltargetType = fields[7].GetUInt32();
+				sp->cooldown = fields[8].GetUInt32();
+				sp->floatMisc1 = fields[9].GetFloat();
+				sp->autocast_type=(uint32)-1;
+				sp->custom_pointer=false;
+				sp->cooldowntime=getMSTime();
+				sp->procCounter=0;
 
-			//omg the poor darling has no clue about making ai_agents
-			if(sp->cooldown==0xffffffff)
-			{
-				//now this will not be exact cooldown but maybe a bigger one to not make him spam spells to often
-				int cooldown;
-				SpellDuration *sd=dbcSpellDuration.LookupEntry(sp->spell->DurationIndex);
-				int Dur=0;
-				int Casttime=0;//most of the time 0
-				int RecoveryTime=sp->spell->RecoveryTime;
-	            if(sp->spell->DurationIndex)
-		            Dur =::GetDuration(sd);
-				Casttime=GetCastTime(dbcSpellCastTime.LookupEntry(sp->spell->CastingTimeIndex));
-				cooldown=Dur+Casttime+RecoveryTime;
-				if(cooldown<0)
-					sp->cooldown=0;//huge value that should not loop while adding some timestamp to it
-				else sp->cooldown=cooldown;
-			}
+		/*		if (!sp->procCountDB) 
+					sp->procCount = uint32(-1);
+				else sp->procCount = sp->procCountDB;*/
+				sp->Misc2 = fields[10].GetUInt32();
+				if(sp->agent == AGENT_SPELL)
+				{
+					if(!sp->spell)
+					{
+						//printf("SpellId %u in ai_agent for %u is invalid.\n", (unsigned int)fields[5].GetUInt32(), (unsigned int)sp->entryId);
+						delete sp;
+						continue;
+					}
+					
+					if(sp->spell->Effect[0] == SPELL_EFFECT_LEARN_SPELL || sp->spell->Effect[1] == SPELL_EFFECT_LEARN_SPELL ||
+						sp->spell->Effect[2] == SPELL_EFFECT_LEARN_SPELL)
+					{
+						//printf("Teaching spell %u in ai_agent for %u\n", (unsigned int)fields[5].GetUInt32(), (unsigned int)sp->entryId);
+						delete sp;
+						continue;
+					}
 
-			/*
-			//now apply the morron filter
-			if(sp->procChance==0)
-			{
-				//printf("SpellId %u in ai_agent for %u is invalid.\n", (unsigned int)fields[5].GetUInt32(), (unsigned int)sp->entryId);
-				delete sp;
-				continue;
-			}
-			if(sp->spellType==0)
-			{
-				//right now only these 2 are used
-				if(IsBeneficSpell(sp->spell))
-					sp->spellType==STYPE_HEAL;
-				else sp->spellType==STYPE_BUFF;
-			}
-			if(sp->spelltargetType==0)
-				sp->spelltargetType = RecommandAISpellTargetType(sp->spell);
-				*/
+					sp->minrange = GetMinRange(dbcSpellRange.LookupEntry(sp->spell->rangeIndex));
+					sp->maxrange = GetMaxRange(dbcSpellRange.LookupEntry(sp->spell->rangeIndex));
+
+					//omg the poor darling has no clue about making ai_agents
+					if(sp->cooldown==0xffffffff)
+					{
+						//now this will not be exact cooldown but maybe a bigger one to not make him spam spells to often
+						int cooldown;
+						SpellDuration *sd=dbcSpellDuration.LookupEntry(sp->spell->DurationIndex);
+						int Dur=0;
+						int Casttime=0;//most of the time 0
+						int RecoveryTime=sp->spell->RecoveryTime;
+						if(sp->spell->DurationIndex)
+							Dur =::GetDuration(sd);
+						Casttime=GetCastTime(dbcSpellCastTime.LookupEntry(sp->spell->CastingTimeIndex));
+						cooldown=Dur+Casttime+RecoveryTime;
+						if(cooldown<0)
+							sp->cooldown=0;//huge value that should not loop while adding some timestamp to it
+						else sp->cooldown=cooldown;
+					}
+
+					/*
+					//now apply the morron filter
+					if(sp->procChance==0)
+					{
+						//printf("SpellId %u in ai_agent for %u is invalid.\n", (unsigned int)fields[5].GetUInt32(), (unsigned int)sp->entryId);
+						delete sp;
+						continue;
+					}
+					if(sp->spellType==0)
+					{
+						//right now only these 2 are used
+						if(IsBeneficSpell(sp->spell))
+							sp->spellType==STYPE_HEAL;
+						else sp->spellType==STYPE_BUFF;
+					}
+					if(sp->spelltargetType==0)
+						sp->spelltargetType = RecommandAISpellTargetType(sp->spell);
+						*/
+				}
+
+				if(sp->agent == AGENT_RANGED)
+				{
+					cn->m_canRangedAttack = true;
+					delete sp;
+				}
+				else if(sp->agent == AGENT_FLEE)
+				{
+					cn->m_canFlee = true;
+					if(sp->floatMisc1)
+						cn->m_canFlee = (sp->floatMisc1>0.0f ? true : false);
+					else
+						cn->m_fleeHealth = 0.2f;
+
+					if(sp->Misc2)
+						cn->m_fleeDuration = sp->Misc2;
+					else
+						cn->m_fleeDuration = 10000;
+
+					delete sp;
+				}
+				else if(sp->agent == AGENT_CALLFORHELP)
+				{
+					cn->m_canCallForHelp = true;
+					if(sp->floatMisc1)
+						cn->m_callForHelpHealth = 0.2f;
+					delete sp;
+				}
+				else
+				{
+					cn->spells.push_back(sp);
+				}
+			} while( result->NextRow() );
 		}
 
-		if(sp->agent == AGENT_RANGED)
-		{
-			cn->m_canRangedAttack = true;
-			delete sp;
-		}
-		else if(sp->agent == AGENT_FLEE)
-		{
-			cn->m_canFlee = true;
-			if(sp->floatMisc1)
-				cn->m_canFlee = (sp->floatMisc1>0.0f ? true : false);
-			else
-				cn->m_fleeHealth = 0.2f;
-
-			if(sp->Misc2)
-				cn->m_fleeDuration = sp->Misc2;
-			else
-				cn->m_fleeDuration = 10000;
-
-			delete sp;
-		}
-		else if(sp->agent == AGENT_CALLFORHELP)
-		{
-			cn->m_canCallForHelp = true;
-			if(sp->floatMisc1)
-				cn->m_callForHelpHealth = 0.2f;
-			delete sp;
-		}
-		else
-		{
-			cn->spells.push_back(sp);
-		}
-	} while( result->NextRow() );
-
-	delete result;
+		delete result;
+	}
 	result = WorldDatabase.Query("SELECT Id,ExtraFlags FROM spellextra");
 	if(result)
 	{

@@ -309,9 +309,9 @@ void Transporter::UpdatePosition()
 	
 	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) >= ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
 	{
-		printf("%s from %u %f %f %f to %u %f %f %f\n", this->GetInfo()->Name,
+		/*printf("%s from %u %f %f %f to %u %f %f %f\n", this->GetInfo()->Name,
 			mCurrentWaypoint->second.mapid, mCurrentWaypoint->second.x,mCurrentWaypoint->second.y,mCurrentWaypoint->second.z,
-			mNextWaypoint->second.mapid, mNextWaypoint->second.x,mNextWaypoint->second.y,mNextWaypoint->second.z);
+			mNextWaypoint->second.mapid, mNextWaypoint->second.x,mNextWaypoint->second.y,mNextWaypoint->second.z);*/
 
 		mCurrentWaypoint = mNextWaypoint;
 		mNextWaypoint = GetNextWaypoint();
