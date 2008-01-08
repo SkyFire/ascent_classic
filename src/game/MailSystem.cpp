@@ -802,8 +802,8 @@ void MailSystem::SendAutomatedMessage(uint32 type, uint64 sender, uint64 receive
 	msg.body = body;
 	msg.money = money;
 	msg.cod = cod;
-	if( item_guid )
-		msg.items.push_back( item_guid );
+	if( GUID_LOPART(item_guid) != 0 )
+		msg.items.push_back( GUID_LOPART(item_guid) );
 
 	msg.stationary = stationary;
 	msg.delivery_time = (uint32)UNIXTIME;
