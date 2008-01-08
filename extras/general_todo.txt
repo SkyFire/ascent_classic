@@ -158,6 +158,7 @@ Zack - test my shit :
 - paladin - Judgement of Wisdom 27164
 - paladin - Judgement of Light 27162
 - paladin - Light's Grace 31834
+- paladin - Blessed Life 31830
 
 ==========================================================================
 Capt - test my shit :

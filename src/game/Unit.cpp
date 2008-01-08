@@ -1251,6 +1251,13 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( dmg_overwrite > half_health )
 									dmg_overwrite = half_health ;
 							}break;
+						//paladin - Blessed Life
+						case 31828:
+							{
+								//we should test is damage is from enviroment or not :S
+								ModUInt32Value(UNIT_FIELD_HEALTH,dmg/2);
+								continue; //there is no visual for this ?
+							}break;
 						//paladin - sanctified judgement
 /*							disabled until tested
 							case 31930:

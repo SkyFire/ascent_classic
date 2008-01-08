@@ -1843,6 +1843,26 @@ bool World::SetInitialWorldSettings()
         sp->EffectTriggerSpell[0] = 31930;
 	}
 
+	//paladin - Blessed Life
+	sp = dbcSpell.LookupEntry( 31828 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+        sp->EffectTriggerSpell[0] = 31828;
+	}
+	sp = dbcSpell.LookupEntry( 31829 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+        sp->EffectTriggerSpell[0] = 31828;
+	}
+	sp = dbcSpell.LookupEntry( 31830 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM;
+        sp->EffectTriggerSpell[0] = 31828;
+	}
+
 	//paladin - Light's Grace
 	sp = dbcSpell.LookupEntry( 31833 );
 	if( sp != NULL )

@@ -31,27 +31,14 @@ Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbea
 
 - Judgement (Trainer Spell) : Actually this spell works, what doesnt work is the judgement effect. The ones that create a debuff on the enemy target last for 30 seconds BUT they are supposed to refresh with your melee hits on that target, which doesnt happen. This is actually one of the worst paladin bugs since it means a huge mana loss if you were to judge seal of the crusader to burst your holy damage output since you shouldnt have to judge seal of the crusader more than once per fight.
 
-- Sanctified Judgement (Talent Spell): This talent is supposed to give a x% chance that your judgement will return z% of the mana cost of the judged seal, which doesnt work.
-
-- Judgement of Wisdom & Judgement of Light (Trainer Spells) : These effects dont work. They are supposed to return mana and heals and they dont do at all.
-
 - Seal of Wisdom & Seal of Light (Trainer Spells): These spells work , but the problem is that they have like 100% chance to trigger, and i believe they should have around 35% chance.
 
 - Seal of Vengeance (Faction spell- Alliance) : The seal doesnt work. It should add a holy damage tick on the target, and stack up to 5 times, and it doesnt do anything at all.
 
-Paladin Spell] Blessing of Light (does not add healing bonus)
 [Paladin Spell] Greater blessing of Light (does not add healing bonus)
 Holy:
 
 Unyielding Faith - dosnt work at all
-
-Illumination - dosnt work at all
-
-Divine Favor - icon show but no effect
-
-Light's Grace - dost work at all
-
-Blessed Life - dosnt work at all
 
 Holy Guidance - dosnt work at all
 
@@ -66,12 +53,6 @@ Artend Defender - blub blub
 
 
 Retribution
-
-Eye for an Eye - dosnt work at all
-
-Improved Sancity Aura - dosnt work at all
-
-Sanctified Judgement - dosnt work at all
 
 Divine Purpose - dosnt work at all
 
