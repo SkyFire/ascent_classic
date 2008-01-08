@@ -702,10 +702,10 @@ class SERVER_DECL Player : public Unit
 	friend class Pet;
 	friend class SkillIterator;
 
-protected:
-	SkillMap m_skills;
-
 public:
+
+	Player ( uint32 high, uint32 low );
+	~Player ( );
 
 	ASCENT_INLINE Guild * GetGuild() { return m_playerInfo->guild; }
 	ASCENT_INLINE GuildMember * GetGuildMember() { return m_playerInfo->guildMember; }
@@ -742,11 +742,13 @@ public:
 	void EventTimeoutLfgInviter();
 
 protected:
+
 	void _UpdateSkillFields();
-    
+
+	SkillMap m_skills;
+
 public:
-	Player ( uint32 high, uint32 low );
-	~Player ( );
+
 	bool ok_to_remove;
 	PlayerInfo * m_playerInfo;
 	uint64 m_spellIndexTypeTargets[NUM_SPELL_TYPE_INDEX];
@@ -793,7 +795,8 @@ public:
     ASCENT_INLINE void         SetTaxiPath     (TaxiPath *path) { m_CurrentTaxiPath = path; }
     ASCENT_INLINE void         SetTaxiPos()	{m_taxi_pos_x = m_position.x; m_taxi_pos_y = m_position.y; m_taxi_pos_z = m_position.z;}
     ASCENT_INLINE void         UnSetTaxiPos()	{m_taxi_pos_x = 0; m_taxi_pos_y = 0; m_taxi_pos_z = 0; }
-    // Taxi related variables
+ 
+	// Taxi related variables
 	vector<TaxiPath*>   m_taxiPaths;
     TaxiPath*           m_CurrentTaxiPath;
     uint32              taxi_model_id;
@@ -804,7 +807,15 @@ public:
     float               m_taxi_pos_y;
     float               m_taxi_pos_z;
     bool                m_onTaxi;
-    
+
+	// Base values per class for various calculations
+    static const float baseDodge[12];
+    static const float baseSpellCrit[12];
+    static const float baseCritChance[12];
+
+	// Ratio values per class for various calculations
+	static const float dodgeRatio[70][12];
+
     /************************************************************************/
     /* Quests                                                               */
     /************************************************************************/
