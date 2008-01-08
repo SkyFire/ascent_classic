@@ -477,6 +477,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 
 void AIInterface::Update(uint32 p_time)
 {
+	float tdist;
 	if(m_AIType == AITYPE_TOTEM)
 	{
 		assert(totemspell != 0);
@@ -556,7 +557,8 @@ void AIInterface::Update(uint32 p_time)
 	_UpdateMovement(p_time);
 	if(m_AIState==STATE_EVADE)
 	{
-		if(m_Unit->GetDistanceSq(m_returnX,m_returnY,m_returnZ) < 4.0f/*2.0*/)
+		tdist = m_Unit->GetDistanceSq(m_returnX,m_returnY,m_returnZ);
+		if(tdist <= 4.0f/*2.0*/)
 		{
 			m_AIState = STATE_IDLE;
 			m_returnX = m_returnY = m_returnZ = 0.0f;
