@@ -1247,7 +1247,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //null pointer check was already made
 								dmg_overwrite = ( dmg *  (spellInfo->EffectBasePoints[0] + 1 )) / 100 ; //only half dmg
-								int32 half_health = this->GetUInt32Value(UNIT_FIELD_HEALTH) / 2;
+								int32 half_health = this->GetUInt32Value(UNIT_FIELD_HEALTH) >> 1;
 								if( dmg_overwrite > half_health )
 									dmg_overwrite = half_health ;
 							}break;
