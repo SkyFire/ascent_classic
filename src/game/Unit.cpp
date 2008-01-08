@@ -1239,7 +1239,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(CastingSpell->NameHash!=SPELL_HASH_HOLY_LIGHT)
+								if( CastingSpell->NameHash != SPELL_HASH_HOLY_LIGHT )
 									continue; 
 							}break;
 						//shaman - Lightning Overload
