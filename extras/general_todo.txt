@@ -157,6 +157,7 @@ Zack - test my shit :
 - paladin - Improved Seal of the Crusader 33557
 - paladin - Judgement of Wisdom 27164
 - paladin - Judgement of Light 27162
+- paladin - Light's Grace 31834
 
 ==========================================================================
 Capt - test my shit :

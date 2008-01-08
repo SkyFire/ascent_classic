@@ -1741,6 +1741,11 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 512;
 
+	//paladin - Light's Grace
+	sp = dbcSpell.LookupEntry( 31834 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 2147483648;
+
 	//paladin - Judgement of Wisdom
 	sp = dbcSpell.LookupEntry( 20186 );
 	if( sp != NULL )

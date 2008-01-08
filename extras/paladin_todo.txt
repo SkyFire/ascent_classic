@@ -23,8 +23,6 @@ Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbea
 
 - Holy Shield and Blessing of Sanctuary (Talent Spells): DONT do the retributive damage they should be doing each time the paladin blocks an attack, which makes the Protection build to be 50% less effective for both pvp and pve tanking.
 
-- Light's Grace (Talent Spell): doesnt reduce the cast time of the next Holy Light at all.
-
 - Improved Righteous Fury (Talent Spell) : I'm pretty sure this doesnt add the "reduces the damage taken by amount" spell effect.
 
 - Reckoning (Talent Spell): doesnt add an extra weapon swing like it should on each attack within X seconds -after triggering, which does- .
