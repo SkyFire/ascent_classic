@@ -14,9 +14,8 @@ Divine Favor: doens't work (next spell 100% crit)
 --PROT--
 reckoning: doesn't work
 Avenger's shield: stopped working :S
-Spell warding: doesn't work (-spell dmg taken)
 bless of sanctuary, holy shield, imp holy shield (not working on 2319)
-ardent defender: doesn't work (-dmg when under 35% hp)
+ardent defender: doesn't work (-dmg when under 35% hp). This is implemented actually but in a worng way
 --RET--
 imp seal of crusader: doesn't work
 eye for an eye: doesn't work (crits return dmg)
@@ -100,3 +99,8 @@ Seal of Vengeance and Seal of Blood both dosnt work.
 
  sancity aura
  this aura is adding holy dmg but, isnt stacking or adding dmg to seal of command 70% + 10% and crusader strike 40% + 10%
+
+
+ ////////
+
+ consecration - should reveal hidden targets

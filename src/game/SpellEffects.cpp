@@ -4477,7 +4477,9 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 				sunder_count++;
 				spellInfo=unitTarget->m_auras[x]->GetSpellProto();
 			}
-		}	
+		}
+		if(!spellInfo)
+			return; //omg how did this happen ?
 		//we should also cast sunder armor effect on target with or without dmg
 		Spell *spell = new Spell(u_caster, spellInfo ,true, NULL);
 		spell->ProcedOnSpell = m_spellInfo;
