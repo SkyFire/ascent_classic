@@ -469,7 +469,7 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 
 	recv_data >> SrcInvSlot >> SrcSlot;
 
-	sLog.outDetail("ITEM: destroy, SrcInv Slot: %u Src slot: %u", (uint32)SrcInvSlot, (uint32)SrcSlot);
+	sLog.outDetail( "ITEM: destroy, SrcInv Slot: %i Src slot: %i", SrcInvSlot, SrcSlot );
 	Item *it = _player->GetItemInterface()->GetInventoryItem(SrcInvSlot,SrcSlot);
 
 	if(it)
@@ -552,7 +552,7 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 
 	recv_data >> SrcInvSlot >> SrcSlot;
 
-	sLog.outDetail("ITEM: autoequip, Inventory slot: %u Source Slot: %u", (uint32)SrcInvSlot, (uint32)SrcSlot);  
+	sLog.outDetail("ITEM: autoequip, Inventory slot: %i Source Slot: %i", SrcInvSlot, SrcSlot); 
 
 	Item *eitem=_player->GetItemInterface()->GetInventoryItem(SrcInvSlot,SrcSlot);
 
