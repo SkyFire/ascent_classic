@@ -364,8 +364,11 @@ void SubGroup::Disband()
 		{
 			if( (*itr)->m_loggedInPlayer )
 			{
-				(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&data);
-				(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&data2);
+				if( (*itr)->m_loggedInPlayer->GetSession() != NULL )
+				{
+					(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&data);
+					(*itr)->m_loggedInPlayer->GetSession()->SendPacket(&data2);
+				}
 			}
 
 			(*itr)->m_Group = NULL;
