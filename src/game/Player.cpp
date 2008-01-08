@@ -4153,12 +4153,14 @@ void Player::RepopAtGraveyard(float ox, float oy, float oz, uint32 mapid)
 
 void Player::JoinedChannel(Channel *c)
 {
-	m_channels.push_back(c);
+	if( c != NULL )
+		m_channels.push_back(c);
 }
 
 void Player::LeftChannel(Channel *c)
 {
-	m_channels.remove(c);
+	if( c != NULL )
+		m_channels.remove(c);
 }
 
 void Player::CleanupChannels()
