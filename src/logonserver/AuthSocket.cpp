@@ -477,7 +477,7 @@ void AuthSocket::OnRead()
 
 	uint8 Command = GetReadBuffer(0)[0];
 	last_recv = UNIXTIME;
-	if(Command < MAX_AUTH_CMD)
+	if(Command < MAX_AUTH_CMD && Handlers[Command] != NULL)
 		(this->*Handlers[Command])();
 	else
 		Log.Notice("AuthSocket", "Unknown cmd %u", Command);
