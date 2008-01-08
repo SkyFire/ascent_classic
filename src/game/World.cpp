@@ -4361,20 +4361,38 @@ bool World::SetInitialWorldSettings()
 
 	//fix for Predatory Strikes
 	uint32 mm=(1<<(FORM_BEAR-1))|(1<<(FORM_DIREBEAR-1))|(1<<(FORM_MOONKIN-1))|(1<<(FORM_CAT-1));
-	sp = dbcSpell.LookupEntry(16972); if( sp != NULL )sp->RequiredShapeShift = mm;
-	sp = dbcSpell.LookupEntry(16974); if( sp != NULL )sp->RequiredShapeShift = mm;
-	sp = dbcSpell.LookupEntry(16975); if( sp != NULL )sp->RequiredShapeShift = mm;
-	sp = dbcSpell.LookupEntry(20134); if( sp != NULL )sp->procChance = 50;
+
+	sp = dbcSpell.LookupEntry(16972);
+	if( sp != NULL )
+		sp->RequiredShapeShift = mm;
+	sp = dbcSpell.LookupEntry(16974);
+	if( sp != NULL )
+		sp->RequiredShapeShift = mm;
+	sp = dbcSpell.LookupEntry(16975);
+	if( sp != NULL )
+		sp->RequiredShapeShift = mm;
+
+	sp = dbcSpell.LookupEntry(20134);
+	if( sp != NULL )
+		sp->procChance = 50;
 
 	/* aspect of the pack - change to AA */
-	sp = dbcSpell.LookupEntry(13159); if( sp != NULL )sp->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
-	sp = dbcSpell.LookupEntry(13159); if( sp != NULL )sp->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
+	sp = dbcSpell.LookupEntry(13159);
+	if( sp != NULL )
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA;
+	sp = dbcSpell.LookupEntry(13159);
+	if( sp != NULL )
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AREA_AURA;
 
 	/* aspect of the cheetah - add proc flags */
-	sp = dbcSpell.LookupEntry(5118); if( sp != NULL ) sp->procFlags = 139944;
+	sp = dbcSpell.LookupEntry(5118);
+	if( sp != NULL )
+		sp->procFlags = 139944;
 	
 	/* shadowstep - change proc flags */
-	sp = dbcSpell.LookupEntry(36563); if( sp != NULL )sp->procFlags = 0;
+	sp = dbcSpell.LookupEntry(36563);
+	if( sp != NULL )
+		sp->procFlags = 0;
 
 	/* thrown - add a 1.6 second cooldown */
 	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL,SPELL_RANGED_THROW,SPELL_RANGED_WAND, 26679, 27084, 29436, 37074, 41182, 41346, 0};
