@@ -534,14 +534,13 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		if(!p_caster || !playerTarget)
 			return;
 
-		uint32 damage = m_spellInfo->EffectBasePoints[i]+1;
-		uint32 man = (damage *(100+playerTarget->m_lifetapbonus))/100;
+		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((p_caster->GetDamageDoneMod(SHADOW_DAMAGE)*m_spellInfo->dmg_bonus)/100);
 		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
-		playerTarget->ModUInt32Value(UNIT_FIELD_POWER1,man);
-		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1) > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
+		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
 			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
-
-		SendHealManaSpellOnPlayer(p_caster, playerTarget, damage, 0);
+		else
+			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage);
+			SendHealManaSpellOnPlayer(p_caster, playerTarget, damage, 0);
 		}break;
 	case 14185:
 		{
@@ -570,9 +569,9 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			if(heal32)
 				Heal(heal32);
 		}break;
-	case 28730:
+	case 28730: //Arcane Torrent (Mana)
 		{
-			// for each mana tap, gives you 12 mana
+			// for each mana tap, gives you (2.17*level+9.136) mana
 			if(!unitTarget) return;
 
 			uint32 count = 0;
@@ -585,13 +584,13 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				}
 			}
 
-			uint32 gain = count * 12;
-			gain += unitTarget->GetUInt32Value(UNIT_FIELD_POWER1);
+			uint32 gain = (uint32)(count * (2.17*p_caster->getLevel()+9.136));
 			uint32 max = unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-			if(gain > max)
-				gain = max;
-			unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, gain);
-			SendHealManaSpellOnPlayer(p_caster, ((Player*)unitTarget), count*12, 0);
+			if(unitTarget->GetUInt32Value(UNIT_FIELD_POWER1)+gain>max)
+				unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, max);
+			else
+				unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, unitTarget->GetUInt32Value(UNIT_FIELD_POWER1)+gain);
+			SendHealManaSpellOnPlayer(p_caster, ((Player*)unitTarget), gain, 0);
 		}break;
 	case 4141:// Summon Myzrael
 		{
@@ -1253,18 +1252,18 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 
 	uint32 powerField = UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
 	uint32 curPower = unitTarget->GetUInt32Value(powerField);
-	uint32 amt=damage;
+	uint32 amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*m_spellInfo->dmg_bonus)/100);
 	if(amt>curPower)
 	{
 		amt=curPower;
 	}
 	unitTarget->SetUInt32Value(powerField,curPower-amt);
 	uint32 m=u_caster->GetUInt32Value(UNIT_FIELD_MAXPOWER1+m_spellInfo->EffectMiscValue[i]);
-	amt+=u_caster->GetUInt32Value(powerField);
-	if(amt>m)amt=m;
-
-	u_caster->SetUInt32Value(powerField,amt);	
-	SendHealManaSpellOnPlayer(u_caster, u_caster, damage,m_spellInfo->EffectMiscValue[i]);
+	if(u_caster->GetUInt32Value(powerField)+amt>m)
+		u_caster->SetUInt32Value(powerField,m);
+	else
+		u_caster->SetUInt32Value(powerField,u_caster->GetUInt32Value(powerField)+amt);	
+	SendHealManaSpellOnPlayer(u_caster, u_caster, amt, m_spellInfo->EffectMiscValue[i]);
 }
 
 void Spell::SpellEffectHealthLeech(uint32 i) // Health Leech
