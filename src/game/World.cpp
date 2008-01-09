@@ -4128,6 +4128,16 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 12838 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
+	//warrior - Focused Rage
+	sp = dbcSpell.LookupEntry( 29787 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 123542345;
+	sp = dbcSpell.LookupEntry( 29790 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 123542345;
+	sp = dbcSpell.LookupEntry( 29792 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 123542345;
 	//warrior - Improved Commanding Shout
 	sp = dbcSpell.LookupEntry( 38408 );
 	if( sp != NULL )
