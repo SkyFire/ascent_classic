@@ -168,6 +168,7 @@ Zack - test my shit :
 - warrior - impale 16494
 - warrior - Improved Whirlwind 29776
 - warrior - sweeping strike 12328
+- warrior - Improved Mortal Strike 35451
 
 unbridled wrath
 ==========================================================================

@@ -4160,6 +4160,23 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1073741824;
 
+	//warrior - Improved Mortal Strike
+	sp = dbcSpell.LookupEntry( 35446 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 33554432;
+	sp = dbcSpell.LookupEntry( 35448 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 33554432;
+	sp = dbcSpell.LookupEntry( 35449 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 33554432;
+	sp = dbcSpell.LookupEntry( 35450 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 33554432;
+	sp = dbcSpell.LookupEntry( 35451 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 33554432;
+
 	//warrior - Focused Rage
 	sp = dbcSpell.LookupEntry( 29787 );
 	if( sp != NULL )
