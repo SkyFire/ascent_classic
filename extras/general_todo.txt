@@ -166,6 +166,7 @@ Zack - test my shit :
 - warrior - Unbridled Wrath 13002
 - warrior - Improved Intercept 29889
 - warrior - impale 16494
+- warrior - Improved Whirlwind 29776
 
 unbridled wrath
 ==========================================================================

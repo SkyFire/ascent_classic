@@ -18,7 +18,6 @@ Enrage talent doesnt give a slightest bonus dmg. Good thing that Flurry seems to
 
 talent -
 arms
-2. impale doesn't increase critical damage
 3. two-handed weapon specialization doesn't increase damage
 
 fury

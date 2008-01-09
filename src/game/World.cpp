@@ -1418,6 +1418,10 @@ bool World::SetInitialWorldSettings()
 		if( sp->NameHash == SPELL_HASH_CONE_OF_COLD || sp->NameHash == SPELL_HASH_COLD_SNAP || sp->NameHash == SPELL_HASH_ICE_BARRIER || sp->NameHash == SPELL_HASH_ICE_BLOCK )
 			sp->EffectSpellGroupRelation[0] = 2097152;
 
+		//warrior - whirlwind
+		if( sp->NameHash == SPELL_HASH_WHIRLWIND )
+			sp->SpellGroupType |= 1048576; //dangerous move !
+
 /*		else if( strstr( nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
 		else if( strstr( nametext, "Blinding Powder"))
@@ -4174,6 +4178,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 16494 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+
+	//warrior - Improved Whirlwind
+	sp = dbcSpell.LookupEntry( 29721 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1048576;
+	sp = dbcSpell.LookupEntry( 29776 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1048576;
 
 	//warrior - Improved Commanding Shout
 	sp = dbcSpell.LookupEntry( 38408 );
