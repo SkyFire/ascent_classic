@@ -61,6 +61,7 @@ Object::Object() : m_position(0,0,0,0), m_spawnLocation(0,0,0,0)
 	m_instanceId = 0;
 	Active = false;
 	m_inQueue = false;
+	m_extensions = NULL;
 }
 
 Object::~Object( )
@@ -76,6 +77,9 @@ Object::~Object( )
 	// for linux
 	m_instanceId = -1;
 	m_objectTypeId=TYPEID_UNUSED;
+	
+	if( m_extensions != NULL )
+		delete m_extensions;
 }
 
 
@@ -2497,4 +2501,12 @@ void Object::PlaySoundToSet(uint32 sound_entry)
 	WorldPacket data(SMSG_PLAY_SOUND, 4);
 	data << sound_entry;
 	SendMessageToSet(&data, true);
+}
+
+void Object::_SetExtension(const string& name, void* ptr)
+{
+	if( m_extensions == NULL )
+		m_extensions = new ExtensionSet;
+
+	m_extensions->insert( make_pair( name, ptr ) );
 }
