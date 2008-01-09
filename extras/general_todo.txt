@@ -155,6 +155,7 @@ Zack - test my shit :
 - paladin - Improved Seal of the Crusader 33557	-	need to work on these, right now it is not implemented
 - paladin - Improved Righteous Fury 20470 / 25780
 - paladin - Stoicism 31845
+- paladin - Reckoning 20182
 
 ==========================================================================
 Capt - test my shit :

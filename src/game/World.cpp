@@ -1753,6 +1753,38 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF;
 
+	//paladin - Reckoning
+	sp = dbcSpell.LookupEntry( 20177 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+        sp->EffectTriggerSpell[0] = 32746;
+	}
+	sp = dbcSpell.LookupEntry( 20179 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+        sp->EffectTriggerSpell[0] = 32746;
+	}
+	sp = dbcSpell.LookupEntry( 20180 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+        sp->EffectTriggerSpell[0] = 32746;
+	}
+	sp = dbcSpell.LookupEntry( 20181 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+        sp->EffectTriggerSpell[0] = 32746;
+	}
+	sp = dbcSpell.LookupEntry( 20182 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+        sp->EffectTriggerSpell[0] = 32746;
+	}
+
 	//paladin - Judgement of Wisdom
 	sp = dbcSpell.LookupEntry( 20186 );
 	if( sp != NULL )
