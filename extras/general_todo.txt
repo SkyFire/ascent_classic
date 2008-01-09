@@ -163,7 +163,9 @@ Zack - test my shit :
 - priest - Improved Divine Spirit 33182
 - priest - Empowered Healing 33182
 - warrior - Focused Rage 29792
+- warrior - Unbridled Wrath 13002
 
+unbridled wrath
 ==========================================================================
 Capt - test my shit :
 

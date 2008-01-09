@@ -4108,6 +4108,24 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
+
+	//warrior - Unbridled Wrath
+	sp = dbcSpell.LookupEntry( 12322 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+	sp = dbcSpell.LookupEntry( 12999 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+	sp = dbcSpell.LookupEntry( 13000 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+	sp = dbcSpell.LookupEntry( 13001 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+	sp = dbcSpell.LookupEntry( 13002 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+
 	//warrior - Commanding Shout
 	sp = dbcSpell.LookupEntry( 469 );
 	if( sp != NULL )
@@ -4128,16 +4146,18 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 12838 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
+
 	//warrior - Focused Rage
 	sp = dbcSpell.LookupEntry( 29787 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 123542345;
+		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
 	sp = dbcSpell.LookupEntry( 29790 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 123542345;
+		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
 	sp = dbcSpell.LookupEntry( 29792 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 123542345;
+		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+
 	//warrior - Improved Commanding Shout
 	sp = dbcSpell.LookupEntry( 38408 );
 	if( sp != NULL )
