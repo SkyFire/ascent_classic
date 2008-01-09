@@ -501,10 +501,6 @@ public:
 		m_lock.Release();
 		return ret;
 	}
-	/** Gets members */
-	typedef map<PlayerInfo*, GuildMember*> GuildMemberMap;
-	ASCENT_INLINE GuildMemberMap::iterator GetGuildMembersBegin() { return m_members.begin(); }
-	ASCENT_INLINE GuildMemberMap::iterator GetGuildMembersEnd() { return m_members.end(); }
 
 	/** Sends the guild bank to this client.
 	 */
@@ -548,7 +544,7 @@ protected:
 	
 	/** Guild Member Map.
 	 */
-
+	typedef map<PlayerInfo*, GuildMember*> GuildMemberMap;
 	GuildMemberMap m_members;
 
 	/** Guild Rank Information.
