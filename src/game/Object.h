@@ -122,6 +122,7 @@ public:
 #else
 	ASCENT_INLINE const uint64 GetGUID() const { return GetUInt64Value(0); }
 #endif
+
 	ASCENT_INLINE const WoWGuid& GetNewGUID() const { return m_wowGuid; }
 	ASCENT_INLINE uint32 GetEntry(){return m_uint32Values[3];}
 	
@@ -130,7 +131,10 @@ public:
 
 	// type
 	ASCENT_INLINE const uint8& GetTypeId() const { return m_objectTypeId; }
+	ASCENT_INLINE bool IsUnit()	{ return ( m_objectTypeId == TYPEID_UNIT || m_objectTypeId == TYPEID_PLAYER ); }
 	ASCENT_INLINE bool IsPlayer() { return m_objectTypeId == TYPEID_PLAYER; }
+	ASCENT_INLINE bool IsCreature() { return m_objectTypeId == TYPEID_UNIT; }
+	bool IsPet();
 
 	//! This includes any nested objects we have, inventory for example.
 	virtual uint32 __fastcall BuildCreateUpdateBlockForPlayer( ByteBuffer *data, Player *target );
@@ -431,10 +435,6 @@ public:
 	float m_base_runSpeed;
 	float m_base_walkSpeed;
 
-	ASCENT_INLINE bool IsUnit()//creature or player
-	{
-		return ( m_objectTypeId == TYPEID_UNIT || m_objectTypeId == TYPEID_PLAYER); 
-	}
 	void EventSpellDamage(uint64 Victim, uint32 SpellID, uint32 Damage);
 	void SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage, bool allowProc, bool static_damage = false, bool no_remove_auras = false);
 	
@@ -443,9 +443,7 @@ public:
 	//*****************************************************************************************
 	void SendSpellLog(Object *Caster, Object *Target,uint32 Ability, uint8 SpellLogType);
 	void SendSpellNonMeleeDamageLog(Object * Caster, Object * Target,uint32 SpellID,uint32 Damage, uint8 Damage_Type,uint32 AbsorbedDamage, uint32 ResistedDamage,bool PhysicalDamage, uint32 BlockedDamage, bool CriticalHit, bool bToSet);
-	
-	bool IsPet();
-	
+
 	//object faction
 	void _setFaction();
 	uint32 _getFaction(){return m_faction->Faction;}
