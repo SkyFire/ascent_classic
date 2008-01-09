@@ -45,6 +45,7 @@ public:
 	void SpawnBuff(uint32 x);
 	LocationVector GetStartingCoords(uint32 Team);
 	void DropFlag(Player * plr);
+	void ReturnFlag(uint32 team, WarsongGulch * ws);
 
 	static CBattleground * Create(MapMgr * m, uint32 i, uint32 l, uint32 t) { return new WarsongGulch(m, i, l, t); }
 

@@ -197,6 +197,8 @@ void WarsongGulch::DropFlag(Player * plr)
 	SetWorldState(plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 1);
 	plr->m_bgHasFlag = false;
 
+	sEventMgr.AddEvent(((WarsongGulch*)m_dropFlags[plr->GetTeam()]), &WarsongGulch::ReturnFlag, plr->GetTeam(), this, EVENT_BATTLEGROND_WSG_AUTO_RETURN_FLAG, 60000, 1, 0);
+
 	SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, plr->GetGUID(), "The %s flag was dropped by %s!", plr->GetTeam() ? "Alliance" : "Horde", plr->GetName());
 }
 
@@ -210,6 +212,7 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 			(obj->GetEntry() == 179786 && plr->GetTeam() == 1) )
 		{
 			uint32 x = plr->GetTeam() ? 0 : 1;
+			sEventMgr.RemoveEvents(((WarsongGulch*)m_dropFlags[x]), EVENT_BATTLEGROND_WSG_AUTO_RETURN_FLAG); 
 			m_dropFlags[x]->RemoveFromWorld(false);
 			if(m_homeFlags[x]->IsInWorld() == false)
 				m_homeFlags[x]->PushToWorld(m_mapMgr);
@@ -224,6 +227,7 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 		return;
 	}
 
+	sEventMgr.RemoveEvents(((WarsongGulch*)m_dropFlags[plr->GetTeam()]), EVENT_BATTLEGROND_WSG_AUTO_RETURN_FLAG);
 	m_dropFlags[plr->GetTeam()]->RemoveFromWorld(false);
 	m_flagHolders[plr->GetTeam()] = plr->GetGUIDLow();
 	plr->m_bgHasFlag = true;
@@ -240,6 +244,14 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 	SpellCastTargets targets(plr->GetGUID());
 	sp->prepare(&targets);
 	SetWorldState(plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 2);
+}
+
+void WarsongGulch::ReturnFlag(uint32 team, WarsongGulch * ws)
+{
+	if (ws->m_dropFlags[team]->IsInWorld())
+		ws->m_dropFlags[team]->RemoveFromWorld(false);
+	ws->m_homeFlags[team]->PushToWorld(ws->m_mapMgr);
+	ws->SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, 0, "The %s flag was returned to its base!", team ? "Alliance" : "Horde");
 }
 
 void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
