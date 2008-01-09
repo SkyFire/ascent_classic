@@ -3688,7 +3688,7 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 		}
 	}
 	
-	if(skip_stat_apply)
+	if(!skip_stat_apply)
 		UpdateStats();
 }
 

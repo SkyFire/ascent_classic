@@ -355,6 +355,9 @@ void HandleConsoleInput(BaseConsole * pConsole, const char * szInput)
 	if( q != NULL && *q != '\0' )
 		tokens.push_back( q	);
 
+	if( tokens.empty() )
+		return;
+
 	if( !stricmp(tokens[0], "help") || tokens[0][0] == '?' )
 	{
 		pConsole->Write("=========================================================================================\r\n");
