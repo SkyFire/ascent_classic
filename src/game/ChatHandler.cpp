@@ -472,7 +472,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 {
 	CHECK_PACKET_SIZE(recv_data, 16);
-	if(!_player->IsInWorld())
+	if(!_player->IsInWorld() || !_player->isAlive())
 		return;
 
 	uint64 guid;

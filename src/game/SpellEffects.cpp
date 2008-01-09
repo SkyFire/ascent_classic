@@ -534,7 +534,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		if(!p_caster || !playerTarget)
 			return;
 
-		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((p_caster->GetDamageDoneMod(SHADOW_DAMAGE)*m_spellInfo->dmg_bonus)/100);
+		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(m_spellInfo->School)*m_spellInfo->dmg_bonus)/100);
 		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
 		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
 			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
@@ -1172,8 +1172,7 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 		if( unitTarget == m_caster )
 		{
 			/* try to get a selection */
-			unitTarget = m_caster->GetMapMgr()->GetUnit( p_caster->GetSelection() );
-			if( unitTarget == NULL )
+			if( (unitTarget == NULL ) || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f))
 				return;
 		}
 
