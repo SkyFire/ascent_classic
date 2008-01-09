@@ -2526,6 +2526,23 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 32 ;
 	}
 
+	//priest - Empowered Healing 
+	sp = dbcSpell.LookupEntry( 33174 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4096 ;
+		sp->EffectSpellGroupRelation[1] = 2048 ;
+	}
+	sp = dbcSpell.LookupEntry( 33182 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4096 ;
+		sp->EffectSpellGroupRelation[1] = 2048 ;
+	}
+	sp = dbcSpell.LookupEntry( 32546 ); 
+	if( sp != NULL )
+		sp->SpellGroupType = 2048 ;
+
 	//Priest: Shadowguard
 	sp = dbcSpell.LookupEntry( 18137 );
 	if( sp != NULL )

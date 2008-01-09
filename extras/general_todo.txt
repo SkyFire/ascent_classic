@@ -161,6 +161,7 @@ Zack - test my shit :
 - paladin - Fanaticism 31883
 - paladin - Seal of Vengeance 31801
 - priest - Improved Divine Spirit 33182
+- priest - Empowered Healing 33182
 
 ==========================================================================
 Capt - test my shit :
