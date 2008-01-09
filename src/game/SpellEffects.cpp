@@ -594,8 +594,16 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		}break;
 	case 4141:// Summon Myzrael
 		{
-		//we need a NPC for this(we don't have it yet:S http://www.thottbot.com/?m=5608)
-		//when we have the npc we can cast the spell, the spell itself I think summons ENTRY 2755 name:Myzrael
+			//2755
+			CreatureInfo * ci = CreatureNameStorage.LookupEntry(2755);
+			CreatureProto * cp = CreatureProtoStorage.LookupEntry(2755);
+			if( !ci || !cp )
+				return;
+
+			/*here add code for AI and actualy summon the npc*/
+
+			//we need a NPC for this(we don't have it yet:S http://www.thottbot.com/?m=5608)
+		    //when we have the npc we can cast the spell, the spell itself I think summons ENTRY 2755 name:Myzrael
 		}break;
 
 		/*Normal Spells*/
@@ -640,6 +648,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		}break;
 	case 12151:// Summon Atal'ai Skeleton
 		{
+			//8324	Atal'ai Skeleton
+
 			//FIXME:Add here remove in time event
 		}break;
 	case 13535:// Tame Beast
@@ -944,6 +954,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		}break;
 	case 12189:// Summon Echeyakee
 		{
+			//3475	Echeyakee
+
 			//FIXME:Quest Echeyakee
 		}break;
 	case 12283:// Xiggs Signal Flare
@@ -1048,26 +1060,50 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		}break;
 	case 27184:// Summon Mor Grayhoof
 		{
+			//16044	Mor Grayhoof Trigger
+			//16080	Mor Grayhoof
+
 			//Related to quests The Left Piece of Lord Valthalak's Amulet  (Dungeon)
 			//and The Right Piece of Lord Valthalak's Amulet  (Dungeon)
 		}break;
 	case 27190:// Summon Isalien
 		{
+			//16045	Isalien Trigger
+			//16097	Isalien
+
 			//Related to quests The Left Piece of Lord Valthalak's Amulet  (Dungeon)
 			//and The Right Piece of Lord Valthalak's Amulet  (Dungeon)
 		}break;
 	case 27191:// Summon the remains of Jarien and Sothos
 		{
+			/*
+			16046	Jarien and Sothos Trigger
+			16101	Jarien
+			16103	Spirit of Jarien
+			
+			16102	Sothos
+			16104	Spirit of Sothos
+			*/
+
 			//Related to quests The Left Piece of Lord Valthalak's Amulet  (Dungeon)
 			//and The Right Piece of Lord Valthalak's Amulet  (Dungeon)
 		}break;
 	case 27201:// Summon the spirit of Kormok
 		{
+			/*16047	Kormok Trigger
+			16118	Kormok
+			*/
 			//Related to quests The Left Piece of Lord Valthalak's Amulet  (Dungeon)
 			//and The Right Piece of Lord Valthalak's Amulet  (Dungeon)
 		}break;
 	case 27202:// Summon Lord Valthalak
 		{
+			/*
+			16042	Lord Valthalak
+			16048	Lord Valthalak Trigger
+			16073	Spirit of Lord Valthalak
+
+			*/
 			//Related to quests The Left Piece of Lord Valthalak's Amulet  (Dungeon)
 			//and The Right Piece of Lord Valthalak's Amulet  (Dungeon)
 		}break;
