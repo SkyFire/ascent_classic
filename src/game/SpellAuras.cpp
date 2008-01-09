@@ -1193,7 +1193,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 						c->VampiricEmbrace(float2int32(res), m_target);
 				}
 			}
-			if(m_casterGuid == m_target->VampTchCaster)
+			if(m_target->VampTchCaster.find(m_casterGuid) != m_target->VampTchCaster.end())
 			{
 				if(GetUnitCaster() && GetUnitCaster()->isAlive())
 				{
@@ -1454,12 +1454,17 @@ void Aura::SpellAuraDummy(bool apply)
 			{
 				SetNegative();
 				Unit * caster = this->GetUnitCaster();
-				if(caster)
-					m_target->VampTchCaster = caster->GetGUID();
+				if(caster) m_target->VampTchCaster.insert(caster->GetGUID());
 			}
 			else
 			{
-				m_target->VampTchCaster = 0;
+				Unit * caster =this->GetUnitCaster();
+				if(caster)
+				{
+					std::set<uint64>::iterator itr = m_target->VampTchCaster.find(caster->GetGUID());
+					if(itr != m_target->VampTchCaster.end())
+						m_target->VampTchCaster.erase(itr);
+				}
 			}
 		}break;
 	case 18182:

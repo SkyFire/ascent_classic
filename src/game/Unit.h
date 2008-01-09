@@ -877,7 +877,7 @@ public:
 	float BaseOffhandDamage[2];
 	float BaseRangedDamage[2];
 	std::set<uint64> VampEmbCaster;
-	uint64 VampTchCaster;
+	std::set<uint64> VampTchCaster;
 	void VampiricEmbrace(uint32 dmg,Unit* tgt);
 	void VampiricTouch(uint32 dmg,Unit* tgt);
 	SchoolAbsorb Absorbs[7];
