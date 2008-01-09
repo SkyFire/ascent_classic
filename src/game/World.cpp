@@ -2512,6 +2512,20 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 8192 | 131072 | 8388608; // Mind Blast + Mind Control + Mind Flay
 
+	//priest - Improved Divine Spirit 
+	sp = dbcSpell.LookupEntry( 33174 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 32 ;
+		sp->EffectSpellGroupRelation[1] = 32 ;
+	}
+	sp = dbcSpell.LookupEntry( 33182 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 32 ;
+		sp->EffectSpellGroupRelation[1] = 32 ;
+	}
+
 	//Priest: Shadowguard
 	sp = dbcSpell.LookupEntry( 18137 );
 	if( sp != NULL )

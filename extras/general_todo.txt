@@ -160,6 +160,7 @@ Zack - test my shit :
 - paladin - Divine Purpose 31873
 - paladin - Fanaticism 31883
 - paladin - Seal of Vengeance 31801
+- priest - Improved Divine Spirit 33182
 
 ==========================================================================
 Capt - test my shit :

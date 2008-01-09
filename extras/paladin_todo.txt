@@ -2,12 +2,6 @@
 Blessing of Sanctuary - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
 
-the second one - Seal of Righteousness
-The spell is supposed to do 43-60 dmg on a successful hit.
-The problem with this spell is that it takes alot more dmg from the Bonus spell damage than it should. Here is the formula that i found on blizz forums:"The coefficients for Seal of Righteousness is based on if you use a 1h or 2h. When using a 1h the formula is ((Weapons speed * 0.09) * 100) and for 2h it is ((Weapon speed * 0.11) * 100)". Meaning that with a one handed weapon the seal would get 9% of the bonus spell dmg per 1 second of weapon speed(a one handed weapon with 2 sec speed would get 18% from spell dmg) and for a 2 hander its 11% of spell damage per a second of weapon speed(meaning that with a 3 sec speed 2 handed weapon it would get 33% of the spell damage bonus.
-There are alot of palas using this seal because with a one hander it gets about 60%(even more) from spell dmg (no matter what the speed of the weapon is).
-Since i posted the formula to calculate its dmg i hope u could find a way to fix this.
-
 TALENTS:
 --HOLY--
 Divine Favor: doens't work (next spell 100% crit)

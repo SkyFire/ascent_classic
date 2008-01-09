@@ -1,7 +1,5 @@
 
 TALENTS
---DISC--
-Improved Divine Spirit http://www.wowhead.com/?spell=33174
 --HOLY--
 Inspiration: only working on self (just like ancestral healing)
 Blessed Recovery http://www.wowhead.com/?spell=27811
