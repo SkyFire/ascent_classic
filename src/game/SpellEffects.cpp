@@ -534,7 +534,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		if(!p_caster || !playerTarget)
 			return;
 
-		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(m_spellInfo->School)*m_spellInfo->dmg_bonus)/100);
+		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(m_spellInfo->School)*80)/100);
 		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
 		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
 			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
@@ -1287,7 +1287,7 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 
 	uint32 powerField = UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
 	uint32 curPower = unitTarget->GetUInt32Value(powerField);
-	uint32 amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*m_spellInfo->dmg_bonus)/100);
+	uint32 amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*80)/100);
 	if(amt>curPower)
 	{
 		amt=curPower;
