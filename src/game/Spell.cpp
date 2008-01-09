@@ -2830,6 +2830,10 @@ uint8 Spell::CanCast(bool tolerate)
 				if( m_spellInfo->RequiredItemFlags && !(m_spellInfo->RequiredItemFlags & (1 << proto->InventoryType)))
 					return SPELL_FAILED_BAD_TARGETS;
 
+				if (m_spellInfo->Effect[0] == SPELL_EFFECT_ENCHANT_ITEM && 
+					m_spellInfo->baseLevel && (m_spellInfo->baseLevel > proto->ItemLevel))
+					return int8(SPELL_FAILED_BAD_TARGETS); // maybe there is different err code
+
 				break;
 			}
 
