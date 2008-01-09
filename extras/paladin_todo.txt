@@ -33,14 +33,9 @@ Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbea
 
 [Paladin Spell] Greater blessing of Light (does not add healing bonus)
 
-Retribution
-
-Fanaticism - ??
-
 Skills:
 
 Seal of Vengeance and Seal of Blood both dosnt work.
-
 
 /////////
 

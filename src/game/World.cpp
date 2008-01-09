@@ -1753,6 +1753,23 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF;
 
+	//paladin - Fanaticism
+	sp = dbcSpell.LookupEntry( 31879 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1048576 | 524288 | 1024 | 536870912 | 524288;
+	sp = dbcSpell.LookupEntry( 31880 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1048576 | 524288 | 1024 | 536870912 | 524288;
+	sp = dbcSpell.LookupEntry( 31881 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1048576 | 524288 | 1024 | 536870912 | 524288;
+	sp = dbcSpell.LookupEntry( 31882 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1048576 | 524288 | 1024 | 536870912 | 524288;
+	sp = dbcSpell.LookupEntry( 31883 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1048576 | 524288 | 1024 | 536870912 | 524288;
+
 	//paladin - Reckoning
 	sp = dbcSpell.LookupEntry( 20177 );
 	if( sp != NULL )

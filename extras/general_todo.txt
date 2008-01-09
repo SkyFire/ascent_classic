@@ -158,6 +158,7 @@ Zack - test my shit :
 - paladin - Reckoning 20182
 - paladin - Ardent Defender 31854
 - paladin - Divine Purpose 31873
+- paladin - Fanaticism 31883
 
 ==========================================================================
 Capt - test my shit :
