@@ -2363,9 +2363,9 @@ else
 					}
 
 					if( damage_type == RANGED )
-						dmg.full_damage -= dmg.full_damage * CritRangedDamageTakenPctMod[dmg_school] / 100;
+						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritRangedDamageTakenPctMod[dmg_school]) / 100;
 					else 
-						dmg.full_damage -= dmg.full_damage * CritMeleeDamageTakenPctMod[dmg_school] / 100;
+						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritMeleeDamageTakenPctMod[dmg_school]) / 100;
 
 					if(IsPlayer())
 					{

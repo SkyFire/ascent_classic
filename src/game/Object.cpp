@@ -1544,7 +1544,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
 		//the black sheep , no actually it is paladin : Ardent Defender
 		if(static_cast<Unit*>(this)->DamageTakenPctModOnHP35 && GetUInt32Value(UNIT_FIELD_HEALTH)<=35)
-			damage = damage * static_cast<Unit*>(this)->DamageTakenPctModOnHP35 / 100 ;
+			damage = damage - float2int32(damage * static_cast<Unit*>(this)->DamageTakenPctModOnHP35) / 100 ;
 			
 		plr = 0;
 		if(IsPet())
