@@ -223,8 +223,8 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//200 // Increases experience earned by $s1%.  Lasts $d.
 		&Aura::SpellAuraNULL,//201 Apply Aura: Cannot be Dodged
 		&Aura::SpellAuraNULL,//202 // Finishing moves cannot be dodged - 32601, 44452
-		&Aura::SpellAuraNULL,//203 Apply Aura: Reduces Attacker Critical Hit Damage with Melee by %
-		&Aura::SpellAuraNULL,//204 Apply Aura: Reduces Attacker Critical Hit Damage with Ranged by %
+		&Aura::SpellAuraReduceCritMeleeAttackDmg,//203 Apply Aura: Reduces Attacker Critical Hit Damage with Melee by %
+		&Aura::SpellAuraReduceCritRangedAttackDmg,//204 Apply Aura: Reduces Attacker Critical Hit Damage with Ranged by %
 		&Aura::SpellAuraNULL,//205 // "School" Vulnerability
 		&Aura::SpellAuraEnableFlight,//206 // Take flight on a worn old carpet. - Spell 43343
 		&Aura::SpellAuraEnableFlight,//207 set fly
@@ -4955,7 +4955,7 @@ void Aura::SpellAuraModDamagePercTaken(bool apply)
 	
 	if( m_spellProto->NameHash == SPELL_HASH_ARDENT_DEFENDER ) // Ardent Defender it only applys on 20% hp :/
 	{
-		m_target->DamageTakenPctModOnHP += val;
+		m_target->DamageTakenPctModOnHP35 += val;
 		return;
 	}
 	
@@ -6901,6 +6901,38 @@ int32 Aura::event_GetInstanceID()
 void Aura::RelocateEvents()
 {
 	event_Relocate();
+}
+
+void Aura::SpellAuraReduceCritMeleeAttackDmg(bool apply)
+{
+	if(!m_target)
+		return;
+
+	signed int val;
+	if(apply)
+		val = mod->m_amount;
+	else
+		val = -mod->m_amount;
+
+	for(uint32 x=1;x<7;x++)
+		if (mod->m_miscValue & (((uint32)1)<<x) )
+			m_target->CritMeleeDamageTakenPctMod[x] += val;
+}
+
+void Aura::SpellAuraReduceCritRangedAttackDmg(bool apply)
+{
+	if(!m_target)
+		return;
+
+	signed int val;
+	if(apply)
+		val = mod->m_amount;
+	else
+		val = -mod->m_amount;
+
+	for(uint32 x=1;x<7;x++)
+		if (mod->m_miscValue & (((uint32)1)<<x) )
+			m_target->CritRangedDamageTakenPctMod[x] += val;
 }
 
 void Aura::SpellAuraEnableFlight(bool apply)

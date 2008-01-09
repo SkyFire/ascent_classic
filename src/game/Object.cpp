@@ -1542,6 +1542,10 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if(IsPlayer() && ! static_cast< Player* >( this )->isInCombat())
 			sHookInterface.OnEnterCombat( static_cast< Player* >( this ), static_cast< Player* >( this ) );*/
 
+		//the black sheep , no actually it is paladin : Ardent Defender
+		if(static_cast<Unit*>(this)->DamageTakenPctModOnHP35 && GetUInt32Value(UNIT_FIELD_HEALTH)<=35)
+			damage = damage * static_cast<Unit*>(this)->DamageTakenPctModOnHP35 / 100 ;
+			
 		plr = 0;
 		if(IsPet())
 			plr = static_cast<Pet*>(this)->GetPetOwner();

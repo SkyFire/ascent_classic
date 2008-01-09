@@ -182,8 +182,10 @@ Unit::Unit()
 		PowerCostMod[x] = 0;
 		PowerCostPctMod[x] = 0; // armor penetration & spell penetration
 		AttackerSpellCritChanceMod[x]=0;
+		CritMeleeDamageTakenPctMod[x]=0;
+		CritRangedDamageTakenPctMod[x]=0;
 	}
-	DamageTakenPctModOnHP = 1;
+	DamageTakenPctModOnHP35 = 1;
 	RangedDamageTaken = 0;
 
 	for(int i = 0; i < 5; i++)
@@ -1889,7 +1891,10 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 	bool backAttack			 = isInBack( pVictim );
 	uint32 vskill            = 0;
 	bool disable_dR			 = false;
+	uint32	dmg_school		 = 0;
 	
+	if(ability)
+		dmg_school = ability->School;
 //==========================================================================================
 //==============================Victim Skill Base Calculation===============================
 //==========================================================================================
@@ -2347,8 +2352,21 @@ else
 					hit_status |= HITSTATUS_CRICTICAL;
 					int32 dmgbonus = dmg.full_damage;
 					if(ability && ability->SpellGroupType)
+					{
 						SM_FIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
-					dmg.full_damage += dmgbonus;
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+						int spell_flat_modifers=0;
+						SM_FIValue(SM_PCriticalDamage,&spell_flat_modifers,ability->SpellGroupType);
+						if(spell_flat_modifers!=0)
+							printf("!!!!!spell crit dmg bonus mod flat %d , spell crit dmg bonus %d, spell group %u\n",spell_flat_modifers,dmgbonus,ability->SpellGroupType);
+#endif
+					}
+
+					if( damage_type == RANGED )
+						dmg.full_damage -= dmg.full_damage * CritRangedDamageTakenPctMod[dmg_school] / 100;
+					else 
+						dmg.full_damage -= dmg.full_damage * CritMeleeDamageTakenPctMod[dmg_school] / 100;
+
 					if(IsPlayer())
 					{
 						if(damage_type != RANGED)

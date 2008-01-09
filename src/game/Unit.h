@@ -870,7 +870,9 @@ public:
 	float DamageDoneModPCT[7];
 	int32 DamageTakenMod[7];
 	float DamageTakenPctMod[7];
-	float DamageTakenPctModOnHP;
+	float DamageTakenPctModOnHP35;
+	float CritMeleeDamageTakenPctMod[7];
+	float CritRangedDamageTakenPctMod[7];
 	int32 RangedDamageTaken;
 	void CalcDamage();
 	float BaseDamage[2];

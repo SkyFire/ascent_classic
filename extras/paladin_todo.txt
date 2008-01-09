@@ -33,19 +33,9 @@ Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbea
 
 [Paladin Spell] Greater blessing of Light (does not add healing bonus)
 
-Protection:
-
-Artend Defender - blub blub
-
-
 Retribution
 
-Divine Purpose - dosnt work at all
-
 Fanaticism - ??
-
-Crusader Strike - supposed be 6 second CD but there is 12.
-
 
 Skills:
 
@@ -56,7 +46,6 @@ Seal of Vengeance and Seal of Blood both dosnt work.
 
  sancity aura
  this aura is adding holy dmg but, isnt stacking or adding dmg to seal of command 70% + 10% and crusader strike 40% + 10%
-
 
  ////////
 

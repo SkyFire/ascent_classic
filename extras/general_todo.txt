@@ -156,6 +156,8 @@ Zack - test my shit :
 - paladin - Improved Righteous Fury 20470 / 25780
 - paladin - Stoicism 31845
 - paladin - Reckoning 20182
+- paladin - Ardent Defender 31854
+- paladin - Divine Purpose 31873
 
 ==========================================================================
 Capt - test my shit :
