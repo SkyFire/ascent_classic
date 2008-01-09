@@ -4130,6 +4130,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 469 );
 	if( sp != NULL )
 		sp->SpellGroupType = 1048576; //!! missing spell group type
+
 	//warrior - Booming Voice
 	sp = dbcSpell.LookupEntry( 12321 );
 	if( sp != NULL )
@@ -4146,6 +4147,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 12838 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072 | 1048576;
+
+	//warrior - Improved Intercept
+	sp = dbcSpell.LookupEntry( 29888 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1073741824;
+	sp = dbcSpell.LookupEntry( 29889 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1073741824;
 
 	//warrior - Focused Rage
 	sp = dbcSpell.LookupEntry( 29787 );
