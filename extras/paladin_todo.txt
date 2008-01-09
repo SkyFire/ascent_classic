@@ -23,27 +23,19 @@ Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbea
 
 - Holy Shield and Blessing of Sanctuary (Talent Spells): DONT do the retributive damage they should be doing each time the paladin blocks an attack, which makes the Protection build to be 50% less effective for both pvp and pve tanking.
 
-- Improved Righteous Fury (Talent Spell) : I'm pretty sure this doesnt add the "reduces the damage taken by amount" spell effect.
-
 - Reckoning (Talent Spell): doesnt add an extra weapon swing like it should on each attack within X seconds -after triggering, which does- .
 
 - Divine Favor (Talent Spell): This spell, once its casted, should give 100% crit chance on the next Holy Shock, Holy Light or Flash Light. The problem is that it fades with ANY spell you cast after buffing with it. So lets say, if you cast Divine Favor, and use Avenging Wrath, Divine Favor will fade with it and start the cooldown -.- which is reaaaaally annoying.
 
 - Judgement (Trainer Spell) : Actually this spell works, what doesnt work is the judgement effect. The ones that create a debuff on the enemy target last for 30 seconds BUT they are supposed to refresh with your melee hits on that target, which doesnt happen. This is actually one of the worst paladin bugs since it means a huge mana loss if you were to judge seal of the crusader to burst your holy damage output since you shouldnt have to judge seal of the crusader more than once per fight.
 
-- Seal of Wisdom & Seal of Light (Trainer Spells): These spells work , but the problem is that they have like 100% chance to trigger, and i believe they should have around 35% chance.
-
 - Seal of Vengeance (Faction spell- Alliance) : The seal doesnt work. It should add a holy damage tick on the target, and stack up to 5 times, and it doesnt do anything at all.
 
 [Paladin Spell] Greater blessing of Light (does not add healing bonus)
-Holy:
-
-Unyielding Faith - dosnt work at all
-
-Holy Guidance - dosnt work at all
-
 
 Protection:
+
+- 8
 
 Stoicism - dosnt work at all
 

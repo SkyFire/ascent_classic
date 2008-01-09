@@ -1454,25 +1454,25 @@ public:
     // Fills specified targets at the area of effect
     void FillSpecifiedTargetsInArea(float srcx,float srcy,float srcz,uint32 ind, uint32 specification);
     // Fills specified targets at the area of effect. We suppose we already inited this spell and know the details
-    void FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range, uint32 specification);
+    void FillSpecifiedTargetsInArea(uint32 i,float srcx,float srcy,float srcz, float range, uint32 specification);
     // Fills the targets at the area of effect
-    void FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range);
+    void FillAllTargetsInArea(uint32 i, float srcx,float srcy,float srcz, float range);
     // Fills the targets at the area of effect. We suppose we already inited this spell and know the details
     void FillAllTargetsInArea(float srcx,float srcy,float srcz,uint32 ind);
     // Fills the targets at the area of effect. We suppose we already inited this spell and know the details
     void FillAllTargetsInArea(LocationVector & location,uint32 ind);
     // Fills the targets at the area of effect. We suppose we already inited this spell and know the details
-    void FillAllFriendlyInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range);
+    void FillAllFriendlyInArea(uint32 i, float srcx,float srcy,float srcz, float range);
     //get single Enemy as target
-    uint64 GetSinglePossibleEnemy(float prange=0);
+    uint64 GetSinglePossibleEnemy(uint32 i, float prange=0);
     //get single Enemy as target
-    uint64 GetSinglePossibleFriend(float prange=0);
+    uint64 GetSinglePossibleFriend(uint32 i, float prange=0);
     //generate possible target list for a spell. Use as last resort since it is not acurate
     void GenerateTargets(SpellCastTargets *store_buff);
     // Fills the target map of the spell packet
     void FillTargetMap(uint32);
     // See if we hit the target or can it resist (evade/immune/resist on spellgo) (0=success)
-    uint8 DidHit(Unit* target);
+    uint8 DidHit(uint32 effindex,Unit* target);
     // Prepares the spell thats going to cast to targets
     void prepare(SpellCastTargets * targets);
     // Cancels the current spell
@@ -1784,6 +1784,14 @@ public:
             SM_FFValue(u_caster->SM_FRadius,&Rad[i],m_spellInfo->SpellGroupType);
             SM_PFValue(u_caster->SM_PRadius,&Rad[i],m_spellInfo->SpellGroupType);
         }
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		int spell_pct_modifers=0;
+		SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!spell radius mod flat %d , spell radius mod pct %d , spell radius %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Rad[i],m_spellInfo->SpellGroupType);
+#endif
 
         return Rad[i];
     }

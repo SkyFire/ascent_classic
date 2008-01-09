@@ -153,6 +153,7 @@ Zack - test my shit :
 - paladin - Sanctified Light 20361
 - paladin - sanctified judgement 31878
 - paladin - Improved Seal of the Crusader 33557	-	need to work on these, right now it is not implemented
+- paladin - Improved Righteous Fury 20470 / 25780
 
 ==========================================================================
 Capt - test my shit :

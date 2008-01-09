@@ -924,6 +924,8 @@ public:
 	int32 * SM_PCooldownTime;
 	int32 * SM_FCooldownTime;
 	int32 * SM_FChanceOfSuccess;
+	int32 * SM_FRezist_dispell;
+	int32 * SM_PRezist_dispell;
 	void InheritSMMods(Unit *inherit_from);
 	std::map<uint32,signed int> target_spell_effect_mod_flat; //used very rarely by some talents. Will mod the value of a casted spell on target
 	std::map<uint32,signed int> target_spell_effect_mod_pct; //used very rarely by some talents. Store value in % format

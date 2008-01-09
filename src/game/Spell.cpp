@@ -235,12 +235,13 @@ bool Spell::IsInvisibilitySpell()
 
 void Spell::FillSpecifiedTargetsInArea( float srcx, float srcy, float srcz, uint32 ind, uint32 specification )
 {
-    FillSpecifiedTargetsInArea( &m_targetUnits[ind], srcx, srcy, srcz, GetRadius(ind), specification );
+    FillSpecifiedTargetsInArea( ind, srcx, srcy, srcz, GetRadius(ind), specification );
 }
 
 // for the moment we do invisible targets
-void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range, uint32 specification)
+void Spell::FillSpecifiedTargetsInArea(uint32 i,float srcx,float srcy,float srcz, float range, uint32 specification)
 {
+	TargetsList *tmpMap=&m_targetUnits[i];
     //IsStealth()
     float r = range * range;
 	uint8 did_hit_result;
@@ -266,7 +267,7 @@ void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy
             {
                 if( isAttackable( u_caster, static_cast< Unit* >( *itr ),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)))
                 {
-					did_hit_result = DidHit( static_cast< Unit* >( *itr ) );
+					did_hit_result = DidHit(i, static_cast< Unit* >( *itr ) );
 					if( did_hit_result != SPELL_DID_HIT_SUCCESS )
 						ModeratedTargets.push_back(SpellTargetMod((*itr)->GetGUID(), did_hit_result));
 					else
@@ -295,17 +296,18 @@ void Spell::FillSpecifiedTargetsInArea(TargetsList *tmpMap,float srcx,float srcy
 }
 void Spell::FillAllTargetsInArea(LocationVector & location,uint32 ind)
 {
-    FillAllTargetsInArea(&m_targetUnits[ind],location.x,location.y,location.z,GetRadius(ind));
+    FillAllTargetsInArea(ind,location.x,location.y,location.z,GetRadius(ind));
 }
 
 void Spell::FillAllTargetsInArea(float srcx,float srcy,float srcz,uint32 ind)
 {
-	FillAllTargetsInArea(&m_targetUnits[ind],srcx,srcy,srcz,GetRadius(ind));
+	FillAllTargetsInArea(ind,srcx,srcy,srcz,GetRadius(ind));
 }
 
 /// We fill all the targets in the area, including the stealth ed one's
-void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float srcz, float range)
+void Spell::FillAllTargetsInArea(uint32 i,float srcx,float srcy,float srcz, float range)
 {
+	TargetsList *tmpMap=&m_targetUnits[i];
 	float r = range*range;
 	uint8 did_hit_result;
 	for( std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
@@ -327,7 +329,7 @@ void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float
 			{
 				if( isAttackable( u_caster, static_cast< Unit* >( *itr ), false ) )
 				{
-					did_hit_result = DidHit( static_cast< Unit* >( *itr ) );
+					did_hit_result = DidHit(i, static_cast< Unit* >( *itr ) );
 					if( did_hit_result == SPELL_DID_HIT_SUCCESS )
 						tmpMap->push_back( (*itr)->GetGUID() );
 					else
@@ -353,8 +355,9 @@ void Spell::FillAllTargetsInArea(TargetsList *tmpMap,float srcx,float srcy,float
 }
 
 // We fill all the targets in the area, including the stealth ed one's
-void Spell::FillAllFriendlyInArea( TargetsList *tmpMap, float srcx, float srcy, float srcz, float range )
+void Spell::FillAllFriendlyInArea( uint32 i, float srcx, float srcy, float srcz, float range )
 {
+	TargetsList *tmpMap=&m_targetUnits[i];
 	float r = range * range;
 	uint8 did_hit_result;
 	for( std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
@@ -377,7 +380,7 @@ void Spell::FillAllFriendlyInArea( TargetsList *tmpMap, float srcx, float srcy, 
 			{
 				if( isFriendly( u_caster, static_cast< Unit* >( *itr ) ) )
 				{
-					did_hit_result = DidHit( static_cast< Unit* >( *itr ) );
+					did_hit_result = DidHit(i, static_cast< Unit* >( *itr ) );
 					if( did_hit_result == SPELL_DID_HIT_SUCCESS )
 						tmpMap->push_back( (*itr)->GetGUID() );
 					else
@@ -402,7 +405,7 @@ void Spell::FillAllFriendlyInArea( TargetsList *tmpMap, float srcx, float srcy, 
 	}	
 }
 
-uint64 Spell::GetSinglePossibleEnemy(float prange)
+uint64 Spell::GetSinglePossibleEnemy(uint32 i,float prange)
 {
 	float r;
 	if(prange)
@@ -434,7 +437,7 @@ uint64 Spell::GetSinglePossibleEnemy(float prange)
 		{
 			if( u_caster != NULL )
 			{
-				if(isAttackable(u_caster, static_cast< Unit* >( *itr ),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)) && DidHit(((Unit*)*itr))==SPELL_DID_HIT_SUCCESS)
+				if(isAttackable(u_caster, static_cast< Unit* >( *itr ),!(m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED)) && DidHit(i,((Unit*)*itr))==SPELL_DID_HIT_SUCCESS)
 					return (*itr)->GetGUID(); 			
 			}
 			else //cast from GO
@@ -451,7 +454,7 @@ uint64 Spell::GetSinglePossibleEnemy(float prange)
 	return 0;
 }
 
-uint64 Spell::GetSinglePossibleFriend(float prange)
+uint64 Spell::GetSinglePossibleFriend(uint32 i,float prange)
 {
 	float r;
 	if(prange)
@@ -482,7 +485,7 @@ uint64 Spell::GetSinglePossibleFriend(float prange)
 		{
 			if( u_caster != NULL )
 			{
-				if( isFriendly( u_caster, static_cast< Unit* >( *itr ) ) && DidHit(((Unit*)*itr))==SPELL_DID_HIT_SUCCESS)
+				if( isFriendly( u_caster, static_cast< Unit* >( *itr ) ) && DidHit(i, ((Unit*)*itr))==SPELL_DID_HIT_SUCCESS)
 					return (*itr)->GetGUID(); 			
 			}
 			else //cast from GO
@@ -499,7 +502,7 @@ uint64 Spell::GetSinglePossibleFriend(float prange)
 	return 0;
 }
 
-uint8 Spell::DidHit(Unit* target)
+uint8 Spell::DidHit(uint32 effindex,Unit* target)
 {
 	//note resistchance is vise versa, is full hit chance
 	Unit* u_victim = target;
@@ -631,6 +634,19 @@ uint8 Spell::DidHit(Unit* target)
 	if(p_victim)
 		resistchance += p_victim->m_resist_hit[2];
 
+	if( this->m_spellInfo->Effect[effindex] == SPELL_EFFECT_DISPEL && m_spellInfo->SpellGroupType && u_caster)
+	{
+		SM_FFValue(u_caster->SM_FRezist_dispell,&resistchance,m_spellInfo->SpellGroupType);
+		SM_PFValue(u_caster->SM_PRezist_dispell,&resistchance,m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		int spell_pct_modifers=0;
+		SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!spell dipell resist mod flat %d , spell dipell resist mod pct %d , spell dipell resist %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,resistchance,m_spellInfo->SpellGroupType);
+#endif
+	}
 
 	if(resistchance >= 100.0f)
 		return SPELL_DID_HIT_RESIST;
@@ -733,7 +749,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 						//try to get a whatever target
 						if(!store_buff->m_unitTarget)
 						{
-							store_buff->m_unitTarget=GetSinglePossibleEnemy();
+							store_buff->m_unitTarget=GetSinglePossibleEnemy(i);
 						}
 						//if we still couldn't get a target, check maybe we could use 
 //						if(!store_buff->m_unitTarget)
@@ -800,7 +816,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 								store_buff->m_unitTarget = u_caster->GetUInt64Value(UNIT_FIELD_CREATEDBY);
 							else store_buff->m_unitTarget = u_caster->GetGUID();
 						}
-						else store_buff->m_unitTarget=GetSinglePossibleFriend(r);			
+						else store_buff->m_unitTarget=GetSinglePossibleFriend(i,r);			
 					}break;
 				case EFF_TARGET_GAMEOBJECT:
 					{

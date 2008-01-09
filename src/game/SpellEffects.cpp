@@ -2409,16 +2409,6 @@ void Spell::SpellEffectApplyAA(uint32 i) // Apply Area Aura
 		unitTarget->tmpAura [m_spellInfo->Id]= pAura;
 	
 		float r=GetRadius(i);
-		SM_FFValue(u_caster->SM_FRadius,&r,m_spellInfo->SpellGroupType);
-		SM_PFValue(u_caster->SM_PRadius,&r,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell radius mod flat %d , spell radius mod pct %d , spell radius %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,r,m_spellInfo->SpellGroupType);
-#endif
 		if(!sEventMgr.HasEvent(pAura, EVENT_AREAAURA_UPDATE))		/* only add it once */
 			sEventMgr.AddEvent(pAura, &Aura::EventUpdateAA,r*r, EVENT_AREAAURA_UPDATE, 1000, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);	
 

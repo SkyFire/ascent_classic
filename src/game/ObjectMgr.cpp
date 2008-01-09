@@ -1670,7 +1670,7 @@ void ObjectMgr::GenerateLevelUpInfo()
 					double MXP = 235 + ( 5 * Level );
 					double DIFF = Level < 29 ? 0.0 : Level < 30 ? 1.0 : Level < 31 ? 3.0 : Level < 32 ? 6.0 : 5.0 * ( double( Level ) - 30.0 );
 					double XP = ( ( 8.0 * double( Level ) ) + DIFF ) * MXP;
-					nextLvlXP = (int)( ( XP / 100.0 ) + 0.5 ) * 100.0;
+					nextLvlXP = (int)( ( XP / 100.0 ) + 0.5 ) * 100;
 				}
 
 				lvl->XPToNextLevel = nextLvlXP;

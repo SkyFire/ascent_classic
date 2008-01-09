@@ -94,6 +94,8 @@ Unit::Unit()
 	SM_FCooldownTime = 0;
 	SM_PCooldownTime = 0;
 	SM_FChanceOfSuccess = 0;
+	SM_FRezist_dispell = 0;
+	SM_PRezist_dispell = 0;
 
 	m_pacified = 0;
 	m_interruptRegen = 0;
@@ -261,6 +263,8 @@ Unit::~Unit()
 	if(SM_FCooldownTime != 0) delete [] SM_FCooldownTime ;
 	if(SM_PCooldownTime != 0) delete [] SM_PCooldownTime ;
 	if(SM_FChanceOfSuccess != 0) delete [] SM_FChanceOfSuccess ;
+	if(SM_FRezist_dispell != 0) delete [] SM_FRezist_dispell ;
+	if(SM_PRezist_dispell != 0) delete [] SM_PRezist_dispell ;
 
 	delete m_aiInterface;
 
@@ -5544,6 +5548,18 @@ void Unit::InheritSMMods(Unit *inherit_from)
 		if(SM_FChanceOfSuccess==0)
 			SM_FChanceOfSuccess = new int32[SPELL_GROUPS];
 		memcpy(SM_FChanceOfSuccess,inherit_from->SM_FChanceOfSuccess,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_FRezist_dispell)
+	{
+		if(SM_FRezist_dispell==0)
+			SM_FRezist_dispell = new int32[SPELL_GROUPS];
+		memcpy(SM_FRezist_dispell,inherit_from->SM_FRezist_dispell,sizeof(int)*SPELL_GROUPS);
+	}
+	if(inherit_from->SM_PRezist_dispell)
+	{
+		if(SM_PRezist_dispell==0)
+			SM_PRezist_dispell = new int32[SPELL_GROUPS];
+		memcpy(SM_PRezist_dispell,inherit_from->SM_PRezist_dispell,sizeof(int)*SPELL_GROUPS);
 	}
 }
 

@@ -5416,6 +5416,9 @@ void Aura::SpellAuraAddPctMod( bool apply )
 		break;
 	*/
 	//unknown Modifier type
+	case SMT_RESIST_DISPEL:
+		SendModifierLog( &m_target->SM_PRezist_dispell, val, AffectedGroups, mod->m_miscValue, true );
+		break;
 	default:
 		sLog.outError( "Unknown spell modifier type %u in spell %u.<<--report this line to the developer\n", mod->m_miscValue, GetSpellId() );
 		//don't add val, though we could formaly could do,but as we don't know what it is-> no sense
@@ -6542,6 +6545,9 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 	case SMT_BLOCK:
 	case SMT_TRIGGER:
 	case SMT_TIME:*/
+		break;
+	case SMT_RESIST_DISPEL:
+		SendModifierLog(&m_target->SM_FRezist_dispell, val, AffectedGroups,mod->m_miscValue);
 		break;
 	default://unknown Modifier type
 		sLog.outError(

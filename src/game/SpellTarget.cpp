@@ -293,8 +293,7 @@ void Spell::SpellTargetSelf(uint32 i, uint32 j)
 }
 void Spell::SpellTargetInvisibleAOE(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	FillSpecifiedTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i),1); //TARGET_SPEC_INVISIBLE);
+	FillSpecifiedTargetsInArea(i,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i),1); //TARGET_SPEC_INVISIBLE);
 }
 
 /// Spell Target Handling for type 4: Target is holder of the aura
@@ -350,7 +349,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 		}
 	}
 
-	uint8 did_hit_result = DidHit(pTarget);
+	uint8 did_hit_result = DidHit(i,pTarget);
 	if(did_hit_result != SPELL_DID_HIT_SUCCESS)
 		SafeAddModeratedTarget(pTarget->GetGUID(), did_hit_result);
 	else
@@ -373,7 +372,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 			{
 				if(isAttackable(u_caster,(Unit*)(*itr)))
 				{
-					did_hit_result = DidHit(((Unit*)*itr));
+					did_hit_result = DidHit(i,((Unit*)*itr));
 					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
 						SafeAddTarget(tmpMap, (*itr)->GetGUID());
 					else
@@ -391,16 +390,14 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 /// Seems to be some kind of custom area of effect... Scripted... or something like that
 void Spell::SpellTargetCustomAreaOfEffect(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
 	// This should be good enough for now
-	FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+	FillAllTargetsInArea(i,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
 }
 
 /// Spell Target Handling for type 15 / 16: All Enemies in Area of Effect (instant)
 void Spell::SpellTargetAreaOfEffect(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+	FillAllTargetsInArea(i,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
 }
 
 /// Spell Target Handling for type 18: Land under caster
@@ -408,7 +405,7 @@ void Spell::SpellTargetLandUnderCaster(uint32 i, uint32 j) /// I don't think thi
 {
 	TargetsList *tmpMap=&m_targetUnits[i];
 	if(m_spellInfo->Effect[i] != SPELL_EFFECT_SUMMON_DEMON && m_spellInfo->Effect[i] != SPELL_EFFECT_SUMMON_OBJECT_WILD)
-		FillAllTargetsInArea(tmpMap,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
+		FillAllTargetsInArea(i,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
 	else
 		SafeAddTarget(tmpMap,m_caster->GetGUID());
 }
@@ -472,8 +469,7 @@ void Spell::SpellTargetAoE(uint32 i, uint32 j) // something special
 // grep: this is *totally* broken. AoE only attacking friendly party members and self
 // is NOT correct. // not correct at all:P
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	FillAllTargetsInArea(tmpMap,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
+	FillAllTargetsInArea(i,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
 }
 
 /// Spell Target Handling for type 23: Gameobject Target
@@ -500,7 +496,7 @@ void Spell::SpellTargetInFrontOfCaster(uint32 i, uint32 j)
 			{
 				if(isAttackable(u_caster, (Unit*)(*itr)))
 				{
-					did_hit_result = DidHit(((Unit*)*itr));
+					did_hit_result = DidHit(i,((Unit*)*itr));
 					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
 						SafeAddTarget(tmpMap,(*itr)->GetGUID());
 					else
@@ -542,8 +538,7 @@ void Spell::SpellTargetPetOwner(uint32 i, uint32 j)
 /// Spell Target Handling for type 28: All Enemies in Area of Effect(Blizzard/Rain of Fire/volley) channeled
 void Spell::SpellTargetEnemysAreaOfEffect(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+	FillAllTargetsInArea(i,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
 }
 
 // all object around the the caster / object
@@ -580,15 +575,13 @@ void Spell::SpellTargetAllyBasedAreaEffect(uint32 i, uint32 j)
 	// Used in
 	26043 -> Battle Shout
 	*/
-	TargetsList *tmpMap=&m_targetUnits[i];
-	FillAllFriendlyInArea(tmpMap,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
+	FillAllFriendlyInArea(i,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
 }
 
 /// Spell Target Handling for type 31: related to scripted effects
 void Spell::SpellTargetScriptedEffects(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+	FillAllTargetsInArea(i,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
 }
 
 /// Spell Target Handling for type 32 / 73: related to summoned pet or creature
@@ -704,7 +697,7 @@ void Spell::SpellTargetDummyTarget(uint32 i, uint32 j)
 	if(m_spellInfo->Id == 12938)
 	{
 		//FIXME:this ll be immortal targets
-		FillAllTargetsInArea(tmpMap,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
+		FillAllTargetsInArea(i,m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ,GetRadius(i));
 	}
 	SafeAddTarget(tmpMap,m_caster->GetGUID());
 }
@@ -868,7 +861,7 @@ void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
 			{
 				if(isAttackable(u_caster, (Unit*)(*itr)))
 				{
-					did_hit_result = DidHit(((Unit*)*itr));
+					did_hit_result = DidHit(i,((Unit*)*itr));
 					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
 						SafeAddTarget(tmpMap,(*itr)->GetGUID());
 					else
