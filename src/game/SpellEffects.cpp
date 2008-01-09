@@ -3739,8 +3739,27 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	pTotem->SetTotemOwner(p_caster);
 	pTotem->SetTotemSlot(slot);
 
-	pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX(), p_caster->GetPositionY(),
-		p_caster->GetPositionZ(), p_caster->GetOrientation());
+	switch (slot)
+	{
+	case 0:
+		pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX()+1.5f, p_caster->GetPositionY()+1.5f, p_caster->GetPositionZ(), p_caster->GetOrientation());
+		break;
+	case 1:
+		pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX()+1.5f, p_caster->GetPositionY()-1.5f, p_caster->GetPositionZ(), p_caster->GetOrientation());
+		break;
+	case 2:
+		pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX()-1.5f, p_caster->GetPositionY()-1.5f, p_caster->GetPositionZ(), p_caster->GetOrientation());
+		break;
+	case 3:
+		pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX()-1.5f, p_caster->GetPositionY()+1.5f, p_caster->GetPositionZ(), p_caster->GetOrientation());
+		break;
+	}
+
+	uint32 displayID;
+	if (!p_caster->GetTeam() && (ci->Female_DisplayID != 0))
+		displayID = ci->Female_DisplayID;
+	else
+		displayID = ci->Male_DisplayID;
 
 	// Set up the creature.
 	pTotem->SetUInt32Value(OBJECT_FIELD_ENTRY, entry);
@@ -3758,23 +3777,8 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	pTotem->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, 2000);
 	pTotem->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.0f);
 	pTotem->SetFloatValue(UNIT_FIELD_COMBATREACH, 1.0f);
-	if(p_caster && p_caster->getRace()==RACE_DRAENEI)
-	{
-		if(ci->Male_DisplayID==4587)
-			pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, 19075);
-		else if(ci->Male_DisplayID==4588)
-			pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, 19073);
-		else if(ci->Male_DisplayID==4589)
-			pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, 19074);
-		else if(ci->Male_DisplayID==4590)
-			pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, 19071);
-		else if(ci->Male_DisplayID==4683)
-			pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, 19074);
-		else pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, ci->Male_DisplayID);
-	}
-	else
-		pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, ci->Male_DisplayID);
-	pTotem->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->Male_DisplayID);
+	pTotem->SetUInt32Value(UNIT_FIELD_DISPLAYID, displayID);
+	pTotem->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, displayID);
 	pTotem->SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 	pTotem->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 	pTotem->SetUInt32Value(UNIT_FIELD_BYTES_2, 1 | (0x28 << 8));
