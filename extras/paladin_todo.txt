@@ -35,10 +35,6 @@ Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbea
 
 Protection:
 
-- 8
-
-Stoicism - dosnt work at all
-
 Reckoning - icon proc but no effect
 
 Artend Defender - blub blub

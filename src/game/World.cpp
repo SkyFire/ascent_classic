@@ -1745,6 +1745,14 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2147483648;
 
+	//paladin - Stoicism
+	sp = dbcSpell.LookupEntry( 31844 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF;
+	sp = dbcSpell.LookupEntry( 31845 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF;
+
 	//paladin - Judgement of Wisdom
 	sp = dbcSpell.LookupEntry( 20186 );
 	if( sp != NULL )
