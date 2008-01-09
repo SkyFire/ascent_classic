@@ -1770,6 +1770,15 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1048576 | 524288 | 1024 | 536870912 | 524288;
 
+	//paladin - Seal of Vengeance
+	sp = dbcSpell.LookupEntry( 31801 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+        sp->EffectTriggerSpell[0] = 31803;
+		sp->EffectApplyAuraName[0] = 42;
+	}
+
 	//paladin - Reckoning
 	sp = dbcSpell.LookupEntry( 20177 );
 	if( sp != NULL )

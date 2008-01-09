@@ -159,6 +159,7 @@ Zack - test my shit :
 - paladin - Ardent Defender 31854
 - paladin - Divine Purpose 31873
 - paladin - Fanaticism 31883
+- paladin - Seal of Vengeance 31801
 
 ==========================================================================
 Capt - test my shit :
