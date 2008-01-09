@@ -39,7 +39,6 @@ http://img82.imageshack.us/img82/5526/untitledlklklsg0.png
 Also for all caster classes i don't know why but sometimes even if i'm correctly positioned it tells me " Target must be in front of you " .
 TALENTS
 Affliction
-Improved Life Tap - increases mana awarded by 10% - nothing happens no bonus <- should be fixed already
 Improved Drain Soul - no mana regeneration after shard is made
 Grim Reach - should increase range for affliction spells by 10 % - no increase
 Shadow Embrace - should give u 5% reduction on dmg received when you cast Corr , CoA , Siphon Life or Seed of Corr
@@ -68,7 +67,6 @@ Talents - Affliction
 -Night fall: does not proc (Any damage on target should give u a chance to reduce next shadowbolt cast by 100% as stated)
 -Contagion: has no effect (+5% affliction corruption, curse of agony, seed of corruption damage. Also reduces chance of affliction spells from being reduced by 30%)
 -Shadow Mastery: for some reason only applies to rank 1 skills. Doesn't apply to drain spells. Only uses base spell damage, not total spell damage after +damage is taken into consideration.
--Dark pact: should recieve +shadow spell dmg bonus (currently does not), otherwise it works ok. [url]http://www.wowwiki.com/Dark_Pact[/url]
 -Fel Concentration: somewhat works, proc rate for cast time reduction seems to be less than 75% at maximum lvl
 -Empowered corruption: does not add any damage to corruption as it should (+36% at maximum lvl)
 
@@ -108,7 +106,6 @@ Affliction Tree:
 Improved Drain Soul - doesn't work
 Soul Siphon - doesn't work
 Siphon Life - works but no bonus from healing
-Dark Pact - returns the extact mana drained from pet, no bonuses
 Improved Howl of Terror - works but requried to stand stilll to cast it instant otherwise it just says you need to be not moving..
 - unstable affliction doesn't silence the target if dispelled
 - amplify curse doesn't affect curse of exhaustion
@@ -138,7 +135,7 @@ Curse of Doom:
 - Works, but only gets 100% bonus from spell damage instead of 200%.
 
 Life Tap:
-- works, but it can kill you with durability loss and does not recieve spell damage bonus
+- works, but it can kill you with durability loss
 
 Eye of krilrogg:
 - Summons the eye, but you can control it only in OLs, and after moving a bit further away, you stop the channeling and disconnect 50% of the time. D/c 7/12 times already.
@@ -215,7 +212,6 @@ IMPORTANT - Soul siphon doesn't work at all. Should increase amount drained by d
 IMPORTANT - Siphon life - works but doesn't benefit from shadow damage so is useless.
 - Shadow embrace - actually it works, tested many many fights with same mob and advanced damage meter. will remove this line upon next update.
 - Contagion - does nothing.
-IMPORTANT - Dark pact - gives mana took from minion but isn't affected by shadow damage.
 - Improved howl of terror - is instant but you still can cast it only when standing still.
 - Unstable affliction - works, but doesn't silence after dispelling, just the damage part.
 
