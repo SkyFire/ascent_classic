@@ -1164,12 +1164,13 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 			ang = unitTarget->GetOrientation();
 		}
 
-		const static float shadowstep_distance = 1.0f;			/* 1.0 feet behind the target */
+		// avoid teleporting into the model on scaled models
+		const static float shadowstep_distance = 1.6f * unitTarget->GetFloatValue(OBJECT_FIELD_SCALE_X);
 		float new_x = unitTarget->GetPositionX() - (shadowstep_distance * cosf(ang));
 		float new_y = unitTarget->GetPositionY() - (shadowstep_distance * sinf(ang));
 		
 		/* Send a movement packet to "charge" at this target. Similar to warrior charge. */
-		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, unitTarget->GetPositionZ(), unitTarget->GetOrientation()));
+		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, (unitTarget->GetPositionZ() + 0.1f), unitTarget->GetOrientation()));
 		
 		return;
 	}
