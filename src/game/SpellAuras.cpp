@@ -1294,9 +1294,7 @@ void Aura::SpellAuraDummy(bool apply)
 			m_target->ModDamageTakenByMechPCT[MECHANIC_BLEEDING] += float( val ) / 100.0f;
 		}break;
 	//warrior - sweeping strikes
-	case 35429:
-	case 18765:
-	case 12292:
+	case 12328:
 		{
 	      if(apply)
 			 m_target->m_extrastriketargets++;

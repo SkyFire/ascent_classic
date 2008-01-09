@@ -21,9 +21,6 @@ arms
 3. two-handed weapon specialization doesn't increase damage
 
 fury
-3. imp whirlwind doesn't decrease cool down
-4. precision doesn't increase hit rating
-4. sweeping strike doesn't work
 5. rampage doesn't stacks(only gives the initial AP)
 
 protection
