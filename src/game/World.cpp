@@ -4167,6 +4167,14 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
 
+	//warrior - impale
+	sp = dbcSpell.LookupEntry( 16493 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+	sp = dbcSpell.LookupEntry( 16494 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+
 	//warrior - Improved Commanding Shout
 	sp = dbcSpell.LookupEntry( 38408 );
 	if( sp != NULL )
