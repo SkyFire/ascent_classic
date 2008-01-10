@@ -4617,7 +4617,7 @@ bool World::SetInitialWorldSettings()
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 8235; //for the logs and rest
 			sp->procChance = 20;
-			sp->proc_interval = 6000; //http://www.wowwiki.com/Windfury_Weapon
+			sp->proc_interval = 3000; //http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 525 );
@@ -4631,7 +4631,7 @@ bool World::SetInitialWorldSettings()
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 10486; //for the logs and rest
 			sp->procChance = 20;
-			sp->proc_interval = 9000;//http://www.wowwiki.com/Windfury_Weapon
+			sp->proc_interval = 3000;//http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 1669 );
@@ -4645,7 +4645,7 @@ bool World::SetInitialWorldSettings()
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 16362; //for the logs and rest
 			sp->procChance = 20;
-			sp->proc_interval = 12000;//http://www.wowwiki.com/Windfury_Weapon
+			sp->proc_interval = 3000;//http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 2636 );
@@ -4659,7 +4659,7 @@ bool World::SetInitialWorldSettings()
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 25505; //for the logs and rest
 			sp->procChance = 20;
-			sp->proc_interval = 15000;//http://www.wowwiki.com/Windfury_Weapon
+			sp->proc_interval = 3000;//http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 
