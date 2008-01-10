@@ -1,6 +1,7 @@
 =====SPELLS AND ABILITIES =====
 Blessing of Sanctuary - Doesn't work.
 Greater Blessing of Sanctuary - Doesn't work.
+greater blessing of might, kings, wisdom, light and salvation - konyec
 
 TALENTS:
 --HOLY--
@@ -39,3 +40,5 @@ Seal of Blood both dosnt work.
  ////////
 
  consecration - should reveal hidden targets
+
+ blessing of salvation

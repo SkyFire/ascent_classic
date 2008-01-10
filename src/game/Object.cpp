@@ -1547,7 +1547,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			sHookInterface.OnEnterCombat( static_cast< Player* >( this ), static_cast< Player* >( this ) );*/
 
 		//the black sheep , no actually it is paladin : Ardent Defender
-		if(static_cast<Unit*>(this)->DamageTakenPctModOnHP35 && GetUInt32Value(UNIT_FIELD_HEALTH)<=35)
+		if(static_cast<Unit*>(this)->DamageTakenPctModOnHP35 && HasFlag(UNIT_FIELD_AURASTATE , AURASTATE_FLAG_HEALTH35) )
 			damage = damage - float2int32(damage * static_cast<Unit*>(this)->DamageTakenPctModOnHP35) / 100 ;
 			
 		plr = 0;
