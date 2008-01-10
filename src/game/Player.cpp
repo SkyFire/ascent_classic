@@ -5418,16 +5418,13 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 					data2 << guid;
 					data2 << x;
 					data2 << uint32(iter->item.itemproto->ItemId);
-					data2 << uint32(0);
-					if(!iter->iRandomProperty)
-					{
-						if(iter->iRandomSuffix)
-							data << uint32(-int32(iter->iRandomSuffix->id));
-						else
-							data2 << uint32(0);
-					}
-					else
+					data2 << uint32(factor);
+					if(iter->iRandomProperty)
 						data2 << uint32(iter->iRandomProperty->ID);
+					else if(iter->iRandomSuffix)
+						data2 << uint32(ipid);
+					else
+						data2 << uint32(0);
 
 					data2 << uint32(60000); // countdown
 				}
