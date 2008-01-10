@@ -65,7 +65,6 @@ Zack - test my shit :
 - test function RemoveThreatByPtr
 - don't let rogues stealth with dots
 - ai spell cooldown when not known
-- warrior - Sweeping Strikes strike aditional enemy - well it seems there is no support yet for this
 - warlock(affliction talent) - Curse of Idiocy - rewrite this spell :
 	1 ) do not make him loop self it will be casted by cater for eternity ;)
 	2 ) there is no visual sighn that spell had effect (the negative values are missing ex : 23+1-6)
@@ -166,7 +165,11 @@ Zack - test my shit :
 - warrior - Unbridled Wrath 13002
 - warrior - Improved Intercept 29889
 - warrior - impale 16494
-- warrior - Improved Whirlwind 29776
+- warrior - Improved Whirlwind 29776 : here is a list of spells that need somehow the spellgroup set
+	select id,name,description,SpellGroupType,unk201_1,unkne,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3 from dbc_spell where 
+	name like "cone of cold" or name like "cold snap" or name like "ice barrier" or name like "shock" or name like "maul" or name like "whirlwind"
+	- my guees is that unkne is actually some kind of spellgroup2 ?
+
 - warrior - sweeping strike 12328
 - warrior - Improved Mortal Strike 35451
 
