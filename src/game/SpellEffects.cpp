@@ -2471,6 +2471,76 @@ void Spell::SpellEffectLearnSpell(uint32 i) // Learn Spell
 		playerTarget->addSpell(spellToLearn);
 		//smth is wrong here, first we add this spell to player then we may cast it on player...
 		SpellEntry *spellinfo = dbcSpell.LookupEntry(spellToLearn);
+ 		//remove specializations
+		switch(spellinfo->Id)
+ 		{
+		case 26801: //Shadoweave Tailoring
+			playerTarget->removeSpell(26798,false,false,0); //Mooncloth Tailoring
+			playerTarget->removeSpell(26797,false,false,0); //Spellfire Tailoring
+ 			break;
+		case 26798: // Mooncloth Tailoring
+			playerTarget->removeSpell(26801,false,false,0); //Shadoweave Tailoring
+			playerTarget->removeSpell(26797,false,false,0); //Spellfire Tailoring
+ 			break;
+		case 26797: //Spellfire Tailoring
+			playerTarget->removeSpell(26801,false,false,0); //Shadoweave Tailoring
+			playerTarget->removeSpell(26798,false,false,0); //Mooncloth Tailoring
+ 			break;
+ 		case 10656: //Dragonscale Leatherworking
+			playerTarget->removeSpell(10658,false,false,0); //Elemental Leatherworking
+			playerTarget->removeSpell(10660,false,false,0); //Tribal Leatherworking
+ 			break;
+ 		case 10658: //Elemental Leatherworking
+			playerTarget->removeSpell(10656,false,false,0); //Dragonscale Leatherworking
+			playerTarget->removeSpell(10660,false,false,0); //Tribal Leatherworking
+ 			break;
+ 		case 10660: //Tribal Leatherworking
+			playerTarget->removeSpell(10656,false,false,0); //Dragonscale Leatherworking
+			playerTarget->removeSpell(10658,false,false,0); //Elemental Leatherworking
+ 			break;
+ 		case 28677: //Elixir Master
+			playerTarget->removeSpell(28675,false,false,0); //Potion Master
+			playerTarget->removeSpell(28672,false,false,0); //Transmutation Maste
+ 			break;
+ 		case 28675: //Potion Master
+			playerTarget->removeSpell(28677,false,false,0); //Elixir Master
+			playerTarget->removeSpell(28672,false,false,0); //Transmutation Maste
+ 			break;
+ 		case 28672: //Transmutation Master
+			playerTarget->removeSpell(28675,false,false,0); //Potion Master
+			playerTarget->removeSpell(28677,false,false,0); //Elixir Master
+ 			break;
+ 		case 20219: //Gnomish Engineer
+			playerTarget->removeSpell(20222,false,false,0); //Goblin Engineer
+ 			break;
+ 		case 20222: //Goblin Engineer
+			playerTarget->removeSpell(20219,false,false,0); //Gnomish Engineer
+ 			break;
+ 		case 9788: //Armorsmith
+			playerTarget->removeSpell(9787,false,false,0); //Weaponsmith
+			playerTarget->removeSpell(17039,false,false,0); //Master Swordsmith
+			playerTarget->removeSpell(17040,false,false,0); //Master Hammersmith
+			playerTarget->removeSpell(17041,false,false,0); //Master Axesmith
+ 			break;
+ 		case 9787: //Weaponsmith
+			playerTarget->removeSpell(9788,false,false,0); //Armorsmith
+ 			break;
+ 		case 17041: //Master Axesmith
+			playerTarget->removeSpell(9788,false,false,0); //Armorsmith
+			playerTarget->removeSpell(17040,false,false,0); //Master Hammersmith
+			playerTarget->removeSpell(17039,false,false,0); //Master Swordsmith
+ 			break;
+ 		case 17040: //Master Hammersmith
+			playerTarget->removeSpell(9788,false,false,0); //Armorsmith
+			playerTarget->removeSpell(17039,false,false,0); //Master Swordsmith
+			playerTarget->removeSpell(17041,false,false,0); //Master Axesmith
+ 			break;
+ 		case 17039: //Master Swordsmith
+			playerTarget->removeSpell(9788,false,false,0); //Armorsmith
+			playerTarget->removeSpell(17040,false,false,0); //Master Hammersmith
+			playerTarget->removeSpell(17041,false,false,0); //Master Axesmith
+ 			break;
+ 		}
 		for(uint32 i=0;i<3;i++)
 			if(spellinfo->Effect[i] == SPELL_EFFECT_WEAPON ||
 			   spellinfo->Effect[i] == SPELL_EFFECT_PROFICIENCY ||
