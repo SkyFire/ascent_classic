@@ -200,6 +200,16 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="AiAgents"
+			Filter="">
+			<File
+				RelativePath="..\..\src\game\AIAHealSuport.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\game\AIAHealSuport.h">
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\src\game\AddonMgr.cpp">
 		</File>
@@ -649,6 +659,9 @@
 		</File>
 		<File
 			RelativePath="..\..\src\game\SpellHandler.cpp">
+		</File>
+		<File
+			RelativePath="..\..\src\game\SpellNameHashes.h">
 		</File>
 		<File
 			RelativePath="..\..\src\game\SpellTarget.cpp">

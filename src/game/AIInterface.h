@@ -222,7 +222,7 @@ public:
 
 	// Misc
 	void Init(Unit *un, AIType at, MovementType mt);
-	void Init(Unit *un, AIType at, MovementType mt, Unit *owner); // used for pets
+	virtual void Init(Unit *un, AIType at, MovementType mt, Unit *owner); // used for pets
 	Unit *GetUnit() { return m_Unit; }
 	Unit *GetPetOwner() { return m_PetOwner; }
 	void DismissPet();
@@ -409,14 +409,14 @@ public:
 	bool m_isGuard;
 //	bool m_fastMove;
 	void setGuardTimer(uint32 timer) { m_guardTimer = timer; }
+	virtual void _UpdateCombat(uint32 p_time);
 
-private:
+protected:
 	bool m_AllowedToEnterCombat;
 
 	// Update
 	void _UpdateTargets();
 	void _UpdateMovement(uint32 p_time);
-	void _UpdateCombat(uint32 p_time);
 	void _UpdateTimer(uint32 p_time);
 	int m_updateAssist;
 	int m_updateTargets;

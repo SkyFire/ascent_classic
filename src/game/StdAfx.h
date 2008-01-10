@@ -35,6 +35,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 };
 
 #define _GAME
+//#define USE_SPECIFIC_AIAGENTS
 
 #include <list>
 #include <vector>
@@ -88,6 +89,9 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 
 #include "AddonMgr.h"
 #include "AIInterface.h"
+#ifdef USE_SPECIFIC_AIAGENTS
+	#include "AIAHealSuport.h"
+#endif
 #include "AreaTrigger.h"
 #include "BattlegroundMgr.h"
 #include "AlteracValley.h"
