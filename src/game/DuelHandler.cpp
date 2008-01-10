@@ -27,7 +27,7 @@ void WorldSession::HandleDuelAccepted(WorldPacket & recv_data)
 	if( _player->DuelingWith == NULL )
 		return;
 
-	if( _player->m_duelState != DUEL_STATE_REQUESTED )
+	if( _player->m_duelState != DUEL_STATE_FINISHED )
 		return;
 
 	_player->m_duelStatus = DUEL_STATUS_INBOUNDS;
@@ -51,8 +51,8 @@ void WorldSession::HandleDuelCancelled(WorldPacket & recv_data)
 		return;
 	if (_player->m_duelState == DUEL_STATE_STARTED)
 	{
-	 _player->DuelingWith->EndDuel(DUEL_WINNER_KNOCKOUT);
-    return;
+		_player->DuelingWith->EndDuel(DUEL_WINNER_KNOCKOUT);
+		return;
 	}
 	WorldPacket data(SMSG_DUEL_COMPLETE, 1);
 	data << uint8(0);
