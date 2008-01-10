@@ -268,9 +268,15 @@ void WorldSession::LogoutPlayer(bool Save)
 		}
 
 		if(_player->GetTeam() == 1)
-			sWorld.HordePlayers--;
+		{
+			if(sWorld.HordePlayers)
+				sWorld.HordePlayers--;
+		}
 		else
-			sWorld.AlliancePlayers--;
+		{
+			if(sWorld.AlliancePlayers)
+				sWorld.AlliancePlayers--;
+		}
 
 		if(_player->m_bg)
 			_player->m_bg->RemovePlayer(_player, true);
