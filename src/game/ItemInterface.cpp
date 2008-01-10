@@ -2720,51 +2720,28 @@ bool ItemInterface::IsEquipped(uint32 itemid)
 	return false;
 }
 
-/**********************************
-* DESCRIPTION:
-* Prevents items bound to a
-* specific area ID to leave the 
-* zone. Actually, it deletes it.
-* Very similar structure to
-* ItemInterface::GetItemCount()
-**********************************/
 
 void ItemInterface::CheckAreaItems()
 {
-	/* Being debugged by Supalosa - at the moment it doesn't seem to actually seem to 'find' the items...
-	sLog.outString( "Checking player %s for zone-specific items:" , GetOwner()->GetNameString());
-	// Check equipment and backpack first (not inventory)
-	for( uint32 i = EQUIPMENT_SLOT_START ; i < EQUIPMENT_SLOT_END ; i++ )
+	for(uint32 x = EQUIPMENT_SLOT_START; x < INVENTORY_SLOT_ITEM_END; ++x)
 	{
-		Item *item = GetInventoryItem( i );
-		if( item )
+		if (m_pItems[x]!= NULL)
 		{
-			// Field114 = MapID
-			if( item->GetProto()->Field114 != 0 && item->GetProto()->Field114 != GetOwner()->GetMapId() )
+			if(IsBagSlot(x) && m_pItems[x]->IsContainer())
 			{
-				sLog.outString( "    Found %s in slot %u, removing." , item->GetProto()->Name1 , i );
-				SafeFullRemoveItemByGuid(item->GetGUID());
-				
-			}
-
-		}
-	}
-	// Check inventory
-	for( uint32 j = INVENTORY_SLOT_BAG_START ; j < INVENTORY_SLOT_BAG_END ; j++ )
-	{
-		Container *item = ((Container*)GetInventoryItem( j )); // This will be a container.
-		if( item && item->GetTypeId() == TYPEID_CONTAINER )
-		{
-			for( uint32 h = 0 ; h < item->GetProto()->ContainerSlots ; h++ )
-			{
-				Item *innerItem = item->GetItem(h);
-				if( innerItem && innerItem->GetProto()->Field114 != 0 && innerItem->GetProto()->Field114 != GetOwner()->GetMapId() )
+				Container * bag = (Container*)m_pItems[x];
+ 
+				for(uint32 i = 0; i < bag->GetProto()->ContainerSlots; i++)
 				{
-					sLog.outString( "    Found %s in bag %u, slot %u, removing." , item->GetProto()->Name1 , j , h );
-					SafeFullRemoveItemByGuid(item->GetGUID());
+					if (bag->GetItem(i) != NULL && bag->GetItem(i)->GetProto() && bag->GetItem(i)->GetProto()->MapID && bag->GetItem(i)->GetProto()->MapID != GetOwner()->GetMapId())
+						bag->SafeFullRemoveItemFromSlot(i);
 				}
 			}
+			else
+			{
+				if(m_pItems[x]->GetProto() && m_pItems[x]->GetProto()->MapID && m_pItems[x]->GetProto()->MapID != GetOwner()->GetMapId() )
+					SafeFullRemoveItemFromSlot(INVENTORY_SLOT_NOT_SET, x);
+			}
 		}
 	}
-	*/
 }

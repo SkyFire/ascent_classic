@@ -780,7 +780,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
 	data << itemProto->ItemSet;
 	data << itemProto->MaxDurability;
 	data << itemProto->ZoneNameID;
-	data << itemProto->Field114;
+	data << itemProto->MapID;
 	data << itemProto->BagFamily;
 	data << itemProto->ToolCategory;
 	data << itemProto->Sockets[0].SocketColor ;

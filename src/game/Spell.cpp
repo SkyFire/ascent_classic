@@ -2682,6 +2682,11 @@ uint8 Spell::CanCast(bool tolerate)
 		// item spell checks
 		if(i_caster)
 		{
+			if( i_caster->GetProto()->ZoneNameID && i_caster->GetProto()->ZoneNameID != i_caster->GetZoneId() ) 
+				return SPELL_FAILED_NOT_HERE;
+			if( i_caster->GetProto()->MapID && i_caster->GetProto()->MapID != i_caster->GetMapId() )
+				return SPELL_FAILED_NOT_HERE;
+
 			if(i_caster->GetProto()->Spells[0].Charges != 0)
 			{
 				// check if the item has the required charges

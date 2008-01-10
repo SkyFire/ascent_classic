@@ -3289,10 +3289,10 @@ void Player::OnPushToWorld()
 
 	SetUInt32Value(UNIT_FIELD_HEALTH, load_health);
 	SetUInt32Value(UNIT_FIELD_POWER1, load_mana);
-	/* Being debugged by Supalosa
-	if( !GetSession()->HasGMPermissions() ) // Removed map check thingy - /me is an idiot. GM characters are allowed to take items out of the instance though :)
-	GetItemInterface()->CheckAreaItems(); // Removes items like Devastation when you leave their Field114 (MapID)
-	*/
+
+	if( !GetSession()->HasGMPermissions() )
+		GetItemInterface()->CheckAreaItems(); 
+
 }
 
 void Player::ResetHeartbeatCoords()
