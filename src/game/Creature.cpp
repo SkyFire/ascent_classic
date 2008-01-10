@@ -477,7 +477,9 @@ bool Creature::CanAddToWorld()
 
 void Creature::RemoveFromWorld(bool addrespawnevent, bool free_guid)
 {
-	if(GetGUIDHigh() != HIGHGUID_UNIT)		/* is a pet */
+	RemoveAllAuras();
+	
+	if(GetGUIDHigh() != HIGHGUID_UNIT) /* Is a pet: IsPet() actually returns false on a pet? o_X */
 	{
 		if(IsInWorld())
 			Unit::RemoveFromWorld(true);
@@ -488,18 +490,10 @@ void Creature::RemoveFromWorld(bool addrespawnevent, bool free_guid)
 
 	if(IsInWorld())
 	{
-		RemoveAllAuras();
-		sEventMgr.RemoveEvents(this);
-
-		if(addrespawnevent)
-		{
-			if(proto && proto->RespawnTime > 0)
-				Despawn(0, proto->RespawnTime);
-			else
-				Despawn(0,0);
-		}
-		else
-			Despawn(0,0);
+		uint32 delay = 0;
+		if(addrespawnevent && proto && proto->RespawnTime > 0)
+			delay = proto->RespawnTime;
+		Despawn(0, delay);
 	}
 }
 
