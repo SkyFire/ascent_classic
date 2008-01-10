@@ -544,10 +544,10 @@ void GameObject::EndFishing(Player* player, bool abort )
 
 void GameObject::FishHooked(Player * player)
 {
-	WorldPacket  data;
+	WorldPacket  data(12);
 	data.Initialize(SMSG_GAMEOBJECT_CUSTOM_ANIM); 
 	data << GetGUID();
-	data << (uint32)(0);
+	data << (uint32)(0); // value < 4
 	player->GetSession()->SendPacket(&data);
 	//SetUInt32Value(GAMEOBJECT_STATE, 0);
 	//BuildFieldUpdatePacket(player, GAMEOBJECT_FLAGS, 32);

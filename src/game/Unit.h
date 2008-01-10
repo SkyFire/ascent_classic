@@ -537,6 +537,7 @@ enum VisualState
 
 enum HitStatus
 {
+	HITSTATUS_unk			= 0x01,
 	HITSTATUS_HITANIMATION  = 0x02,
 	HITSTATUS_DUALWIELD     = 0x04,
 	HITSTATUS_MISS          = 0x10,

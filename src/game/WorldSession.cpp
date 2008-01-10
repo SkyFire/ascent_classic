@@ -522,7 +522,6 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[MSG_MOVE_FALL_LAND].handler							 = &WorldSession::HandleMovementOpcodes;
 	WorldPacketHandlers[MSG_MOVE_STOP].handler								  = &WorldSession::HandleMovementOpcodes;
 	WorldPacketHandlers[CMSG_MOVE_FLY_START_AND_END].handler					= &WorldSession::HandleMovementOpcodes;
-	WorldPacketHandlers[CMSG_FLY_PITCH_UP_Z].handler							= &WorldSession::HandleMovementOpcodes;
 	WorldPacketHandlers[CMSG_FLY_PITCH_DOWN_AFTER_UP].handler				   = &WorldSession::HandleMovementOpcodes;
 	WorldPacketHandlers[CMSG_MOVE_TIME_SKIPPED].handler						 = &WorldSession::HandleMoveTimeSkippedOpcode;
 	WorldPacketHandlers[CMSG_MOVE_NOT_ACTIVE_MOVER].handler					 = &WorldSession::HandleMoveNotActiveMoverOpcode;
