@@ -4395,12 +4395,12 @@ void Unit::RemoveAurasByBuffIndexType(uint32 buff_index_type, const uint64 &guid
 
 bool Unit::HasAurasOfBuffType(uint32 buff_type, const uint64 &guid,uint32 skip)
 {
-	uint64 sguid = buff_type >= SPELL_TYPE_BLESSING ? guid : 0;
+	uint64 sguid = (buff_type == SPELL_TYPE_BLESSING) ? guid : 0;
 
 	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
 		if(m_auras[x] && m_auras[x]->GetSpellProto()->buffType & buff_type && m_auras[x]->GetSpellId()!=skip)
-			if(!sguid || (sguid && m_auras[x]->m_casterGuid == sguid))
+			if(!sguid || (m_auras[x]->m_casterGuid == sguid))
 				return true;
 	}
 

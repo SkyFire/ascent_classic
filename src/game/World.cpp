@@ -1555,7 +1555,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL && sp->Id == 17364 )
 		sp->Effect[0] = 0;
 
-	//Warlock: Demonic Knowledge
+	//Warlock: Nether Protection
 	sp = dbcSpell.LookupEntry( 30299 );
 	if (sp != NULL)
 		sp->procChance = 10;

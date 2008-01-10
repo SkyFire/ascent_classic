@@ -473,6 +473,16 @@ void Group::RemovePlayer(PlayerInfo * info)
 			data << uint32(2) << uint8(0) << uint32(0);  // you leave the group
 			pPlayer->GetSession()->SendPacket( &data );
 		}
+
+		//Remove some party auras.
+		for (uint32 i=0;i<MAX_POSITIVE_AURAS;i++)
+		{
+			if (pPlayer->m_auras[i] && 
+				pPlayer->m_auras[i]->m_areaAura && 
+				pPlayer->m_auras[i]->GetUnitCaster() &&
+				(!pPlayer->m_auras[i]->GetUnitCaster() ||(pPlayer->m_auras[i]->GetUnitCaster()->IsPlayer() && pPlayer!=pPlayer->m_auras[i]->GetUnitCaster())))
+				pPlayer->m_auras[i]->Remove();
+		}
 	}
 
 	if(m_MemberCount < 2)

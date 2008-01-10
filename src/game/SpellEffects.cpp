@@ -1248,6 +1248,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 
 	//check if we already have stronger aura
 	Aura *pAura;
+
 	std::map<uint32,Aura*>::iterator itr=unitTarget->tmpAura.find(m_spellInfo->Id);
 	//if we do not make a check to see if the aura owner is the same as the caster then we will stack the 2 auras and they will not be visible client sided
 	if(itr==unitTarget->tmpAura.end())
@@ -1278,7 +1279,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	} 
 	pAura->AddMod(m_spellInfo->EffectApplyAuraName[i],damage,m_spellInfo->EffectMiscValue[i],i);	
 
-	//Duel stuff
+	//Duel stuff.
 	if (m_caster && m_caster->IsPlayer() && static_cast<Player*>(m_caster)->DuelingWith && 
 		static_cast<Player*>(m_caster)->GetDuelState() == DUEL_STATE_STARTED)
 		pAura->m_castInDuel=true;
