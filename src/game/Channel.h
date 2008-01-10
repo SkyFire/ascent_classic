@@ -128,6 +128,7 @@ public:
 	void SendModeChange(Player * plr, uint8 old_flags, uint8 new_flags);
 
 	void SendToAll(WorldPacket * data);
+	void SendToAll(WorldPacket * data, Player * plr);
 	void VoiceChannelCreated(uint16 id);
 	void JoinVoiceChannel(Player * plr);
 	void PartVoiceChannel(Player * plr);

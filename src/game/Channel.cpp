@@ -99,7 +99,7 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 	{
 		data.clear();
 		data << uint8(CHANNEL_NOTIFY_FLAG_JOINED) << m_name << plr->GetGUID();
-		SendToAll(&data);
+		SendToAll(&data, plr);
 
 		/*data.Initialize(SMSG_PLAYER_JOINED_CHANNEL);
 		data << plr->GetGUID() << uint8(0x14) << m_flags << m_id << m_name;
@@ -792,6 +792,16 @@ void Channel::SendToAll(WorldPacket * data)
 	Guard guard(m_lock);
 	for(MemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
 		itr->first->GetSession()->SendPacket(data);
+}
+
+void Channel::SendToAll(WorldPacket * data, Player * plr)
+{
+	Guard guard(m_lock);
+	for(MemberMap::iterator itr = m_members.begin(); itr != m_members.end(); ++itr) 
+	{
+		if (itr->first != plr)
+			itr->first->GetSession()->SendPacket(data);
+	}
 }
 
 Channel * ChannelMgr::GetCreateChannel(const char *name, Player * p)
