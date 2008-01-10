@@ -809,9 +809,10 @@ bool World::SetInitialWorldSettings()
 			sp->buffIndexType = SPELL_TYPE_INDEX_HIBERNATE;
 			break;
 
-		case SPELL_HASH_EARTH_SHIELD:		// Earth Shield
-			sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
-			break;
+//		removed by Zack Earth shield stacks 10 times. Current code does not support it
+//		case SPELL_HASH_EARTH_SHIELD:		// Earth Shield
+//			sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
+//			break;
 
 		case SPELL_HASH_CYCLONE:			// Cyclone
 			sp->buffIndexType = SPELL_TYPE_INDEX_CYCLONE;
