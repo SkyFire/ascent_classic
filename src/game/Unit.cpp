@@ -283,29 +283,30 @@ void Unit::Update( uint32 p_time )
 
 	if(!isDead())
 	{
-        if(p_time >= m_H_regenTimer)
+		//-----------------------POWER & HP REGENERATION-----------------
+/* Please dont do temp fixes. Better report to me. Thx. Shady */
+        if( p_time >= m_H_regenTimer )
 		    RegenerateHealth();
 	    else
 		    m_H_regenTimer -= p_time;
 
-		if(m_interruptedRegenTime != 0)
+		if( p_time >= m_P_regenTimer )
 		{
-			if( p_time >= m_interruptedRegenTime )
-				m_interruptedRegenTime = 0;
-			else
-				m_interruptedRegenTime -= p_time;
-
-			// TODO: this is a temporary fix required more work
-			if( p_time >= m_H_regenTimer )
-				RegeneratePower( true );
+			RegeneratePower( false );
+			m_interruptedRegenTime=0;
 		}
 		else
 		{
-			if( p_time >= m_P_regenTimer )
-				RegeneratePower( false );
-			else
-				m_P_regenTimer -= p_time;
+			m_P_regenTimer -= p_time;
+			if (m_interruptedRegenTime)
+			{
+				if(p_time>=m_interruptedRegenTime)
+					RegeneratePower( true );
+				else
+					m_interruptedRegenTime -= p_time;
+			}
 		}
+
 
 		if(m_aiInterface != NULL && m_useAI)
 			m_aiInterface->Update(p_time);
@@ -1528,7 +1529,10 @@ void Unit::RegenerateHealth()
 void Unit::RegeneratePower(bool isinterrupted)
 {
     // This is only 2000 IF the power is not rage
-	m_P_regenTimer = 2000;//set next regen time 
+	if (isinterrupted)
+		m_interruptedRegenTime =2000;
+	else
+		m_P_regenTimer = 2000;//set next regen time 
 
 	if(!isAlive())
 		return;

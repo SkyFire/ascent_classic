@@ -6234,21 +6234,18 @@ void Player::RegenerateMana(bool is_interrupted)
 	uint32 mm = GetUInt32Value(UNIT_FIELD_MAXPOWER1);
 	if(cur >= mm)return;
 	float amt = (is_interrupted) ? GetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT) : GetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN);
-	amt *= 2;
-
+	amt *= 2; //floats are Mana Regen Per Sec. Regen Applied every 2 secs so real value =X*2 . Shady
 	//Apply shit from conf file
 	amt *= sWorld.getRate(RATE_POWER1);
 
-	if(amt<=1.0)//this fixes regen like 0.98
+	if((amt<=1.0)&&(amt>0))//this fixes regen like 0.98
 	{
 		if(is_interrupted)
 			return;
-
 		cur++;
 	}
 	else
 		cur += float2int32(amt);	
-
 	SetUInt32Value(UNIT_FIELD_POWER1,(cur >= mm) ? mm : cur);
 }
 

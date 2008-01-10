@@ -1555,6 +1555,16 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL && sp->Id == 17364 )
 		sp->Effect[0] = 0;
 
+	//Warlock: Demonic Knowledge
+	sp = dbcSpell.LookupEntry( 30299 );
+	if (sp != NULL)
+		sp->procChance = 10;
+	sp = dbcSpell.LookupEntry( 30301 );
+	if (sp != NULL)
+		sp->procChance = 20;
+	sp = dbcSpell.LookupEntry( 30302 );
+	if (sp != NULL)
+		sp->procChance = 30;
     //Warlock: Demonic Knowledge
     sp = dbcSpell.LookupEntry( 35691 );
     if( sp != NULL )
@@ -4592,6 +4602,8 @@ bool World::SetInitialWorldSettings()
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 8232; //for the logs and rest
+			sp->procChance = 20;
+			sp->proc_interval = 3000;//http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 284 );
@@ -4604,6 +4616,8 @@ bool World::SetInitialWorldSettings()
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 8235; //for the logs and rest
+			sp->procChance = 20;
+			sp->proc_interval = 6000; //http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 525 );
@@ -4616,6 +4630,8 @@ bool World::SetInitialWorldSettings()
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 10486; //for the logs and rest
+			sp->procChance = 20;
+			sp->proc_interval = 9000;//http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 1669 );
@@ -4628,6 +4644,8 @@ bool World::SetInitialWorldSettings()
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 16362; //for the logs and rest
+			sp->procChance = 20;
+			sp->proc_interval = 12000;//http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 2636 );
@@ -4640,6 +4658,8 @@ bool World::SetInitialWorldSettings()
 			sp->EffectApplyAuraName[0] = 42; //who needs dummys anyway ?
 			sp->procFlags = PROC_ON_MELEE_ATTACK; //we do not need proc on spell ;)
 			sp->EffectTriggerSpell[0] = 25505; //for the logs and rest
+			sp->procChance = 20;
+			sp->proc_interval = 15000;//http://www.wowwiki.com/Windfury_Weapon
 		}
 	}
 

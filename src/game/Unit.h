@@ -730,7 +730,7 @@ public:
 	void RegeneratePower(bool isinterrupted);
 	ASCENT_INLINE void setHRegenTimer(uint32 time) {m_H_regenTimer = time; }
 	ASCENT_INLINE void setPRegenTimer(uint32 time) {m_P_regenTimer = time; }
-	ASCENT_INLINE void DelayPowerRegeneration(uint32 time) { m_interruptedRegenTime = time; }
+	ASCENT_INLINE void DelayPowerRegeneration(uint32 time) { m_P_regenTimer = time; if (!m_interruptedRegenTime) m_interruptedRegenTime = 2000; }
 	void DeMorph();
 	uint32 ManaShieldAbsorb(uint32 dmg);
 	void smsg_AttackStart(Unit* pVictim);

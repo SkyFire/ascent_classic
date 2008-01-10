@@ -647,6 +647,8 @@ public:
 
 	void SMTMod_On_target(bool apply,bool is_pct,uint32 namehash, int value);
 
+	bool m_castInDuel;
+
 private:
 	uint32 GetCasterFaction() { return m_casterfaction; }
 	void SetCasterFaction(uint32 faction){ m_casterfaction = faction; }
@@ -675,7 +677,6 @@ private:
 	Modifier m_modList[3];
 
 	uint32 m_dynamicValue;
-	bool m_castInDuel;
 
 protected:
 	uint32 m_casterfaction;
