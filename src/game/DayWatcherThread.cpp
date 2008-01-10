@@ -197,7 +197,7 @@ void DayWatcherThread::update_arena()
 	Player * plr;
 	uint32 guid, arenapoints, orig_arenapoints;
 	ArenaTeam * team;
-	long double X, Y;
+	double X, Y;
 	if(result)
 	{
 		do
@@ -219,7 +219,7 @@ void DayWatcherThread::update_arena()
 
 					/* we're in an arena team of this type! */
 					/* Source: http://www.wowwiki.com/Arena_point */
-					X = (long double)team->m_stat_rating;
+					X = (double)team->m_stat_rating;
 					if(X <= 510.0)	// "if X<=510"
 						continue;		// no change
 					else if(X > 510.0 && X <= 1500.0)		// "if 510 < X <= 1500"
@@ -234,11 +234,11 @@ void DayWatcherThread::update_arena()
 						//                   -0.00412*X
 						//    1+1639.28*2.71828
 
-						long double power = ((-0.00412) * X);
+						double power = ((-0.00412) * X);
 						//if(power < 1.0)
 						//	power = 1.0;
 
-						long double divisor = pow(((long double)(2.71828)), power);						
+						double divisor = pow(((double)(2.71828)), power);						
 						divisor *= 1639.28;
 						divisor += 1.0;
 						//if(divisor < 1.0)

@@ -337,12 +337,11 @@ void Arena::Finish()
 			//                   (PB - PA)/400
 			//              1 + 10
 
-			long double power = ( averageRating[j] - averageRating[i] ) / 400.0;
-
-			long double divisor = pow(((long double)(10.0)), power);
+			double power = (int)(averageRating[j] - averageRating[i]) / 400.0f;
+			double divisor = pow(((double)(10.0)), power);
 			divisor += 1.0;
 
-			long double winChance = 1.0 / divisor;
+			double winChance = 1.0 / divisor;
 
 			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
@@ -362,10 +361,9 @@ void Arena::Finish()
 						// New Rating = Old Rating + K * (outcome - Expected Win Chance)
 						// outcome = 1 for a win and 0 for a loss (0.5 for a draw ... but we cant have that)
 						// K is the maximum possible change
-						// Through investigation, K was estimated to be 30
-						// When used in chess, Elo uses K = 32 ... maybe this would be better? :/
-						long double multiplier = (outcome ? 1.0 : 0.0) - winChance;
-						long double deltaRating = 30.0 * multiplier;
+						// Through investigation, K was estimated to be 32 (same as chess)
+						double multiplier = (outcome ? 1.0 : 0.0) - winChance;
+						double deltaRating = 32.0 * multiplier;
 						if ( deltaRating < 0 && (-1.0 * deltaRating) > t->m_stat_rating )
 							t->m_stat_rating = 0;
 						else
