@@ -1329,6 +1329,9 @@ Unit* AIInterface::FindTarget()
 		/*if(pUnit->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pUnit)->FlyCheat)
 			continue;*/
 
+		//do not agro units that are faking death. Should this be based on chance ?
+		if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
+			continue;
 		//target is immune to unit attacks however can be targeted
 		//as a part of AI we allow this mode to attack creatures as seen many times on oficial.
 		if(m_Unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9))

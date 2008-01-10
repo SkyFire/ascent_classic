@@ -86,7 +86,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//SPELL_AURA_PERIODIC_MANA_FUNNEL = 63,//obselete?
 		&Aura::SpellAuraPeriodicManaLeech,//SPELL_AURA_PERIODIC_MANA_LEECH = 64,
 		&Aura::SpellAuraModCastingSpeed,//SPELL_AURA_MOD_CASTING_SPEED = 65,
-		&Aura::SpellAuraFeighDeath,//SPELL_AURA_FEIGN_DEATH = 66,
+		&Aura::SpellAuraFeignDeath,//SPELL_AURA_FEIGN_DEATH = 66,
 		&Aura::SpellAuraModDisarm,//SPELL_AURA_MOD_DISARM = 67,
 		&Aura::SpellAuraModStalked,//SPELL_AURA_MOD_STALKED = 68,
 		&Aura::SpellAuraSchoolAbsorb,//SPELL_AURA_SCHOOL_ABSORB = 69,
@@ -4278,7 +4278,7 @@ void Aura::SpellAuraModCastingSpeed(bool apply)
 	m_target->SetFloatValue(UNIT_MOD_CAST_SPEED, current);
 }
 
-void Aura::SpellAuraFeighDeath(bool apply)
+void Aura::SpellAuraFeignDeath(bool apply)
 {
 	if(m_target->IsPlayer())
 	{

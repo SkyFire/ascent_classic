@@ -204,10 +204,10 @@
 			Name="AiAgents"
 			Filter="">
 			<File
-				RelativePath="..\..\src\game\AIAHealSuport.cpp">
+				RelativePath="..\..\src\game\AIAHealSupport.cpp">
 			</File>
 			<File
-				RelativePath="..\..\src\game\AIAHealSuport.h">
+				RelativePath="..\..\src\game\AIAHealSupport.h">
 			</File>
 		</Filter>
 		<File

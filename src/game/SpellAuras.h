@@ -426,7 +426,7 @@ public:
 	void SpellAuraPeriodicHealthFunnel(bool apply);	
 	void SpellAuraPeriodicManaLeech(bool apply);
 	void SpellAuraModCastingSpeed(bool apply);
-	void SpellAuraFeighDeath(bool apply);
+	void SpellAuraFeignDeath(bool apply);
 	void SpellAuraModDisarm(bool apply);
 	void SpellAuraModStalked(bool apply);
 	void SpellAuraSchoolAbsorb(bool apply);	
