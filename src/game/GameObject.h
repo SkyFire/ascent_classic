@@ -255,7 +255,7 @@ public:
 	void CalcMineRemaining(bool force)
 	{
 		if(force || !mines_remaining)
-			mines_remaining = GetInfo()->sound4 + sRand.randInt(GetInfo()->sound5 - GetInfo()->sound4) - 1;
+			mines_remaining = GetInfo()->sound4 + RandomUInt(GetInfo()->sound5 - GetInfo()->sound4) - 1;
 	}
 	bool HasLoot();
 	MapCell * m_respawnCell;
