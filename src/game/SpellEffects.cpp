@@ -572,7 +572,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	case 28730: //Arcane Torrent (Mana)
 		{
 			// for each mana tap, gives you (2.17*level+9.136) mana
-			if(!unitTarget) return;
+			if( !unitTarget || !p_caster) 
+				return;
 
 			uint32 count = 0;
 			for(uint32 x = 0; x < MAX_AURAS; ++x)

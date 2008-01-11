@@ -90,7 +90,7 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "AddonMgr.h"
 #include "AIInterface.h"
 #ifdef USE_SPECIFIC_AIAGENTS
-	#include "AIAHealSuport.h"
+	#include "AIAHealSupport.h"
 #endif
 #include "AreaTrigger.h"
 #include "BattlegroundMgr.h"

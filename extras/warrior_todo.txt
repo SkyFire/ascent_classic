@@ -39,3 +39,6 @@ Fury
 
 Abilities
 - Intimidating Shout - it's an instant AOE fear, that doesn't work right. It affects the warrior, too. Very important.
+
+Blood Frenzy
+Commanding Presence

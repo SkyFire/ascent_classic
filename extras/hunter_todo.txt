@@ -28,3 +28,61 @@ part with "n additional X each time they are struck by a ranged attack" never wo
 + all what scatler said + what i posted 2 weeks ago, and this is: Arcane Shot and Steady Shot crit chance based on intellect instead of agility and 1.5x crit damage for both of those shots (instead of 2x or 2.3x with talent)
 
 -Counterattack
+
+
+//////////////////////////////////////////////////
+
+Adds to Beast Mastery:
+
+Unleashed Fury - Broken. Does not increase pet damage.
+Improved Aspect of the Hawk - It procs and shows the buff icon but there's no speed increase at all.
+
+Adds to Marksmanship:
+
+Rapid Killing - Broken. Does not reduce the cooldown of Rapid Fire.
+Ranged Weapon Specialization - Broken. Does not increase damage with ranged weapons.
+
+Adds to Survival:
+
+Hawk Eye - It seems to be affecting only mana-based shots. Should affect Auto-shot as well.
+
+All of these talents are essential for a hunter. Must be fixed asap.
+
+Skills:
+
+Eyes of the Beast - You start to control yourself (!) and you can't do anything until the spell is cancelled. This skill is pretty funny! tongue.gif
+Mend Pet - Still working as a channeled spell. This has changed. Now it should be an instant cast heal over time as of patch 2.1
+Flare - Broken. Does not reveal anyone. A stealthed rogue can dance samba above it.
+Track Hidden - Broken. Does not increase your stealth detection and of course, no target on the mini-map.
+Snake Trap - Never seen it working.
+
+Regarding Scatter Shot: it's a little bit confused in the list. Basically, in pvp, the target affected by Scatter will still be able to control itself. It will be unable to attack, but that's not the only effect we want.
+
+AUTO-SHOT: Currently I'm playing on the revision 2801 and Auto-Shot is all messed up!!! Most times you stand still and don't shoot. The only commit after 2801 that deals with it is the 2805 but is not clear if it's a fix. For God's sake, Hunter without Auto-shot is a rogue without stuns!!! It's ridiculous! If it's not fixed yet, please do it.
+
+Pets:
+
+Pet's attack power bonus based on Hunter's ranged attack power is not working properly. If you do any change in your atk power (increase/decrease), it won't affect the pet. It seems to be happening with stats like stamina and armor too. A feedback would be good.
+Also, Spell Damage Bonus is not adding any damage to pet spells.
+
+Skills like Dash and Dive are not working properly. You should be able to cast them anytime you want but they only work when the pet is hitting the target (which makes the skill useless).
+
+Natural Armor and Great Stamina reset the respectives stats to zero and adds only the amount mentioned.
+
+Most times if someone try to buff your pet will reset all stats to zero.
+
+*cough* Cobra Reflexes is decreasing attack speed instead of increasing and damage done should be reduced but it remains the same.
+
+Excluding the skills/spells, all training will be reset after some time and you'll get all training points back.
+
+In addition:
+
+There are a lot of beasts which should be tameable, but you can't tame them. You'll be able cast Tame Beast but nothing happens after it's done. I don't know if this is a core or DB issue. If it's DB just ignore.
+
+Some examples are:
+
+Blackwind Sabercat
+Scythetooth Raptor
+Ripfang Lynx
+And the vast majority of beasts inside instances.
+

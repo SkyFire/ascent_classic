@@ -27,11 +27,14 @@ class Player;
 class WorldSession;
 class SpellCastTargets;
 
-struct AI_Support_Spell
-{
-	SpellEntry  *m_spellinfo;
-	uint32		cooldown_remain;
-};
+#define SPELL_EFF_PCT_SCALE_WITH_DIFFICULTY 0.2f	//given as a float value we influence the effectiveness of our spells
+#define SPELL_COOLD_PCT_SCALE_WITH_DIFFICULTY 0.2f	//given as a float value we influence the effectiveness of our spells
+#define CREATURE_STATS_SCALE_WITH_DIFFICULTY 1
+
+#define HELPER_MOUNT_DISPLAY 14584
+
+#define HealSpellCount 10
+#define HealSpellLevels 17
 
 typedef std::map<uint32, uint32> CooldownMap;
 
@@ -43,10 +46,16 @@ public:
 	void _UpdateCombat(uint32 p_time);
 
 private:
-	list<SpellEntry*>	m_HealSpells;		//used to take actions on target
-	list<SpellEntry*>	m_HealGroupSpells;	//used to take actions on target
-	list<SpellEntry*>	m_DefendSpells;		//in case this is not a combat unit it should try to escape battle using these spells
-	list<SpellEntry*>	m_AugmentSpells;	//low priority spells	
+	SpellEntry*			Get_Best_Heal_Spell(Unit *for_unit);
+	bool				Protect_self();
+	bool				CheckCanCast(SpellEntry *sp,Unit *target);
+	void				SetSpellDuration(SpellEntry *sp);
+
+	SpellEntry			*m_HealSpells[HealSpellLevels][HealSpellCount];	//used to take actions on target
+	float				m_HealSpellsEficiency[HealSpellLevels][HealSpellCount];		
+	SpellEntry			*m_defend_self;
+/*	list<SpellEntry*>	m_HealGroupSpells;	//used to take actions on target
+	list<SpellEntry*>	m_AugmentSpells;	//low priority spells	*/
 	SpellEntry			*revive_spell;
 	CooldownMap			spell_cooldown_map;
 	uint32				DifficultyLevel; //spell values should scale up with the level of the support unit 
