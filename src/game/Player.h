@@ -1824,6 +1824,9 @@ public:
 	void CopyAndSendDelayedPacket(WorldPacket * data);
 	void PartLFGChannel();
 
+	ASCENT_INLINE map<uint32,uint32>::iterator SpellCoolDownMapStart() { return SpellCooldownMap.begin(); }
+	ASCENT_INLINE map<uint32,uint32>::iterator SpellCoolDownMapEnd() { return SpellCooldownMap.end(); }
+
 protected:
 	LocationVector m_summonPos;
 	uint32 m_summonInstanceId;

@@ -1015,6 +1015,23 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell->NameHash != SPELL_HASH_SCORCH ) //Scorch
 									continue;
 							}break;
+						//mage - Combustion
+						case 28682:
+							{
+								if( !CastingSpell )
+									continue;//this should not ocur unless we made a fuckup somewhere
+								//only trigger effect for specified spells
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)
+									|| CastingSpell->School != SCHOOL_FIRE )
+									continue;
+								if( flag & PROC_ON_SPELL_CRIT_HIT )
+								{
+									itr2->procCharges++;
+									if( itr2->procCharges >= 6 ) //whatch that number cause it depends on original stack count !
+										RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION );
+									continue;
+								}
+							}break;
 						//priest - Misery
 						case 33200:
 						case 33199:
@@ -1363,7 +1380,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 		iter2=iter++;
 		if(iter2->second.count)
 		{
-			if((iter2->second.ProcFlag&flag))
+			if((iter2->second.ProcFlag & flag))
 			{
 				//Fixes for spells that dont lose charges when dmg is absorbd
 				if(iter2->second.ProcFlag==680&&dmg==0) continue;
@@ -1400,6 +1417,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						{
 							if(victim==this || isFriendly(this, victim))
 								continue;
+						}break;
+					case 28682: //remove charge only for spell crit
+						{
+							continue; //this is useless, on 1 hand we are increasing this and the other hand we are decreasing it...that results in no action
 						}break;
 					}
 				}

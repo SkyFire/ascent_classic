@@ -1000,6 +1000,14 @@ bool ChatHandler::HandleCooldownCheatCommand(const char* args, WorldSession* m_s
 
 	plyr->CooldownCheat = !val;
 	sGMLog.writefromsession(m_session, "%s cooldown cheat on %s", val ? "disabled" : "enabled", plyr->GetName());
+
+	map<uint32,uint32>::iterator it2,itr2;
+	for ( itr2 = plyr->SpellCoolDownMapStart(); itr2 != plyr->SpellCoolDownMapEnd(); )
+	{
+		it2 = itr2++;
+		plyr->ClearCooldownForSpell(it2->first);
+	}
+
 	return true;
 }
 

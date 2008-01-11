@@ -913,6 +913,8 @@ bool ChatHandler::HandleModifyValueCommand(const char* args,  WorldSession* m_se
 
 	snprintf((char*)buf,256,"Set Field %i from %i to %i.", (unsigned int)field, (unsigned int)oldValue, (unsigned int)value);
 
+	if( obj->IsPlayer() )
+		static_cast<Player*>(obj)->UpdateChances();
 
 	SystemMessage(m_session, buf);
 

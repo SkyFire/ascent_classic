@@ -58,6 +58,7 @@ SMT_RESIST_DISPEL - check if it is used
 - some say that proc spells are not removed after they proc from items and taking items off you. Is this the same unexistatn bug as with talent unlearning ?
 - shadow trance is not removed by first shadow bolt
 - feign death kills player if it expires
+- when combustion triggers it will remove mother aura ..thus itself. Make a way so triggered auras will not remove mother aura
 
 ==========================================================================
 Zack - test my shit :
