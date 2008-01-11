@@ -1027,8 +1027,11 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( flag & PROC_ON_SPELL_CRIT_HIT )
 								{
 									itr2->procCharges++;
-									if( itr2->procCharges >= 6 ) //whatch that number cause it depends on original stack count !
+									if( itr2->procCharges >= 3 ) //whatch that number cause it depends on original stack count !
+									{
 										RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION );
+										RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION_PROC );
+									}
 									continue;
 								}
 							}break;
@@ -1418,10 +1421,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							if(victim==this || isFriendly(this, victim))
 								continue;
 						}break;
-					case 28682: //remove charge only for spell crit
+/*					case 28682: //remove charge only for spell crit
 						{
 							continue; //this is useless, on 1 hand we are increasing this and the other hand we are decreasing it...that results in no action
-						}break;
+						}break;*/
 					}
 				}
 				if(iter2->second.lastproc!=0)

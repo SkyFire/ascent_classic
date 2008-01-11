@@ -3531,6 +3531,7 @@
 #define SPELL_HASH_IMPROVED_FLAMESTRIKE                                                 0x35501174
 #define SPELL_HASH_CRITICAL_MASS                                                        0xCCEA73C6
 #define SPELL_HASH_COMBUSTION                                                           0xAF39E04E
+#define SPELL_HASH_COMBUSTION_PROC                                                      0xAF39E04F
 #define SPELL_HASH_ICICLE                                                               0x0EEA2AB5
 #define SPELL_HASH_TEACH_ORCISH_WAR_LEGGINGS                                            0x59B53511
 #define SPELL_HASH_BLESSED_ANVIL                                                        0xFB292531

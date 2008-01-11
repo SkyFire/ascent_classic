@@ -3594,12 +3594,15 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 11129 );
 	if( sp != NULL )
 	{
-		//sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
-		//disabled until i cant find the way to make it working like it should
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
+		sp->procCharges = 0;
 	}
 	sp = dbcSpell.LookupEntry( 28682 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 8388608 | 16 | 2 | 4 | 4194304 | 1;
+		sp->NameHash = SPELL_HASH_COMBUSTION_PROC;
+	}
 
 	//mage - Empowered Fireball
 	sp = dbcSpell.LookupEntry( 31656 );
