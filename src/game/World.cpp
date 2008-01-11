@@ -2526,7 +2526,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 33215 ); 
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 8192 | 131072 | 8388608; // Mind Blast + Mind Control + Mind Flay
-
+	//priest- Blessed Resilience
+	sp = dbcSpell.LookupEntry( 33142 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33145 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33146 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	//priest- Focused Will
+	sp = dbcSpell.LookupEntry( 45234 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 45243 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 45244 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	//priest - Improved Divine Spirit 
 	sp = dbcSpell.LookupEntry( 33174 ); 
 	if( sp != NULL )
@@ -3587,8 +3594,8 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 11129 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
-//		sp->procCharges = 0;
+		//sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
+		//disabled until i cant find the way to make it working like it should
 	}
 	sp = dbcSpell.LookupEntry( 28682 );
 	if( sp != NULL )
@@ -3843,18 +3850,21 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[0] = 42; 
+		sp->procChance =33;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 12872 );
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[0] = 42; 
+		sp->procChance =66;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 12873 );
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[0] = 42; 
+		sp->procChance =100;
 		sp->procFlags=PROC_ON_CAST_SPELL;
 	}
 

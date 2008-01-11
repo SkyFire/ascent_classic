@@ -1648,13 +1648,14 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 	else
 	{
 		// applying resistance to other type of damage 
-		AverageResistance = ((float)pVictim->GetResistance( (*dmg).school_type)- PowerCostPctMod[(*dmg).school_type]) / (float)(getLevel() * 5) * 0.75f;
+		uint32 RResist = pVictim->GetResistance( (*dmg).school_type) + max((pVictim->getLevel() - this->getLevel()) * 5, 0) - min(PowerCostPctMod[(*dmg).school_type], pVictim->GetResistance( (*dmg).school_type)); 
+		AverageResistance = (float)(RResist) / (float)(getLevel() * 5) * 0.75f;
 		  if(AverageResistance > 0.75f)
 			AverageResistance = 0.75f;
 
 		  // NOT WOWWIKILIKE but i think it's actual to add some fullresist chance frome resistances
 		  float Resistchance=(float)pVictim->GetResistance( (*dmg).school_type)/(float)pVictim->getLevel();
-		  Resistchance*=Resistchance*2;
+		  Resistchance*=Resistchance;
 		  if(Rand(Resistchance))
 			  AverageResistance=1.0f;
 
@@ -2385,8 +2386,6 @@ else
 					int32 dmgbonus = dmg.full_damage;
 					//sLog.outString( "DEBUG: Critical Strike! Full_damage: %u" , dmg.full_damage );
 					
-					// Supalosa - who took out this line? :P
-					dmg.full_damage += dmgbonus;
 					if(ability && ability->SpellGroupType)
 					{
 						SM_FIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
@@ -2397,11 +2396,7 @@ else
 							printf("!!!!!spell crit dmg bonus mod flat %d , spell crit dmg bonus %d, spell group %u\n",spell_flat_modifers,dmgbonus,ability->SpellGroupType);
 #endif
 					}
-
-					if( damage_type == RANGED )
-						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritRangedDamageTakenPctMod[dmg_school]) / 100;
-					else 
-						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritMeleeDamageTakenPctMod[dmg_school]) / 100;
+					
 					//sLog.outString( "DEBUG: After CritMeleeDamageTakenPctMod: %u" , dmg.full_damage );
 					if(IsPlayer())
 					{
@@ -2414,6 +2409,14 @@ else
 							dmg.full_damage += float2int32(dmg.full_damage*static_cast<Player*>(this)->IncreaseCricticalByTypePCT[((Creature*)pVictim)->GetCreatureName() ? ((Creature*)pVictim)->GetCreatureName()->Type : 0]);
 					//sLog.outString( "DEBUG: After IncreaseCricticalByTypePCT: %u" , dmg.full_damage );
 					}
+
+					dmg.full_damage += dmgbonus;
+
+					if( damage_type == RANGED )
+						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritRangedDamageTakenPctMod[dmg_school]) / 100;
+					else 
+						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritMeleeDamageTakenPctMod[dmg_school]) / 100;
+
 					if(pVictim->IsPlayer())
 					{
 //						dmg.full_damage=float2int32(float(dmg.full_damage)*(1.0f-2.0f*static_cast<Player*>(pVictim)->CalcRating(PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE)));
@@ -3435,7 +3438,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 //==============================Bonus Adding To Main Damage=================================
 //==========================================================================================
 	int32 bonus_damage = float2int32(plus_damage * dmgdoneaffectperc);
-	bonus_damage +=pVictim->DamageTakenMod[school];
+	//bonus_damage +=pVictim->DamageTakenMod[school]; Bad copy-past i guess :P
 	if(spellInfo->SpellGroupType)
 	{
 		int penalty_pct=0;

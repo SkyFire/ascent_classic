@@ -1145,7 +1145,7 @@ void Aura::EventPeriodicDamage(uint32 amount)
 				float summaryPCTmod = 1.0f;
 				if( m_target->IsPlayer() )//resilience
 				{
-					float dmg_reduction_pct = static_cast<Player*>(m_target)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 150.0f;
+					float dmg_reduction_pct = static_cast<Player*>(m_target)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
 					if( dmg_reduction_pct > 1.0f )
 						dmg_reduction_pct = 1.0f;
 					summaryPCTmod -= dmg_reduction_pct;
@@ -3582,7 +3582,7 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 				Item * itm = ((Player*)m_target)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
 				if(itm)
 					weapspeed = float(itm->GetProto()->Delay);
-				pts.procChance = FL2UINT( float(7.0f / (60.0f / weapspeed)) );
+				pts.procChance = FL2UINT( float(7.0f / (600.0f / weapspeed)) );
 				if(pts.procChance >= 50)
 					pts.procChance = 50;
 			}
