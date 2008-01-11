@@ -1039,8 +1039,9 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 	if( it == NULL)
 		return;
 
-	if( ci.amount*amount > it->MaxCount)
+	if( it->MaxCount > 0 && ci.amount*amount > it->MaxCount)
 	{
+//		sLog.outDebug( "SUPADBG can't carry #1 (%u>%u)" , ci.amount*amount , it->MaxCount );
 		_player->GetItemInterface()->BuildInventoryChangeError( 0, 0, INV_ERR_CANT_CARRY_MORE_OF_THIS );
 		return;
 	}
@@ -1124,6 +1125,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 
 		if((oldItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + count_per_stack) > it->MaxCount)
 		{
+//			sLog.outDebug( "SUPADBG can't carry #2" );
 			_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_CANT_CARRY_MORE_OF_THIS);
 			return;
 		}
@@ -1138,7 +1140,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		if(slot == INVENTORY_SLOT_NOT_SET)
 			slot = c->FindFreeSlot();
 		
-		if(slot==INVENTORY_SLOT_NOT_SET)
+		if(slot==ITEM_NO_SLOT_AVAILABLE || slot == INVENTORY_SLOT_NOT_SET )
 		{
 			_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_BAG_FULL);
 			return;
@@ -1149,6 +1151,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		{
 			pItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, count_per_stack);
 			pItem->m_isDirty = true;
+//			sLog.outDebug( "SUPADBG bagslot=%u, slot=%u" , bagslot, slot );
 			if(!_player->GetItemInterface()->SafeAddItem(pItem, bagslot, slot))
 			{
 				delete pItem;

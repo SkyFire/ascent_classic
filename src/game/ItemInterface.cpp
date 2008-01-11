@@ -2216,7 +2216,15 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 
 	Item *SrcItem = GetInventoryItem(srcslot);
 	Item *DstItem = GetInventoryItem(dstslot);
-
+	sLog.outDebug( "ItemInterface::SwapItemSlots(%u, %u);" , srcslot , dstslot );
+	Item * temp = GetInventoryItem( srcslot );
+//	if( temp )
+//	sLog.outDebug( "Source item: %s (inventoryType=%u, realslot=%u);" , temp->GetProto()->Name1 , temp->GetProto()->InventoryType , GetItemSlotByType( temp->GetProto()->InventoryType ) );
+//	temp = GetInventoryItem( dstslot );
+//	if( temp )
+//	sLog.outDebug( "Destination: Item: %s (inventoryType=%u, realslot=%u);" , temp->GetProto()->Name1 , temp->GetProto()->InventoryType , GetItemSlotByType( temp->GetProto()->InventoryType ) );
+//	else
+//	sLog.outDebug( "Destination: Empty" );
 	if(SrcItem && DstItem && SrcItem->GetEntry()==DstItem->GetEntry()&& SrcItem->GetProto()->MaxCount>1 && SrcItem->wrapped_item_id == 0 && DstItem->wrapped_item_id == 0)
 	{
 		uint32 total=SrcItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT)+DstItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
@@ -2241,9 +2249,10 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 			}
 		}
 	}
-
+//	sLog.outDebug( "Putting items into slots..." );
 	m_pItems[(int)srcslot] = DstItem;
 	m_pItems[(int)dstslot] = SrcItem;
+	
 	if(DstItem)
 		DstItem->m_isDirty = true;
 	if(SrcItem)
@@ -2251,19 +2260,23 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 
 	if(m_pItems[(int)dstslot])
 	{
+//		sLog.outDebug( "(SrcItem) PLAYER_FIELD_INV_SLOT_HEAD + %u is now %u" , dstslot * 2 , m_pItems[(int)dstslot]->GetGUID() );
 		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (dstslot*2),  m_pItems[(int)dstslot]->GetGUID()  );
 	}
 	else
 	{
+//		sLog.outDebug( "(SrcItem) PLAYER_FIELD_INV_SLOT_HEAD + %u is now 0" , dstslot * 2 );
 		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (dstslot*2), 0 );
 	}
 
 	if( m_pItems[(int)srcslot])
 	{
+//		sLog.outDebug( "(DstItem) PLAYER_FIELD_INV_SLOT_HEAD + %u is now %u" , dstslot * 2 , m_pItems[(int)srcslot]->GetGUID() );
 		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (srcslot*2), m_pItems[(int)srcslot]->GetGUID() );
 	}
 	else
 	{
+//		sLog.outDebug( "(DstItem) PLAYER_FIELD_INV_SLOT_HEAD + %u is now 0" , dstslot * 2 );
 		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (srcslot*2), 0 );
 	}
 
@@ -2522,6 +2535,7 @@ SlotResult ItemInterface::FindFreeInventorySlot(ItemPrototype *proto)
 	//special slots will be ignored of item is not set
 	if(proto)
 	{
+//		sLog.outDebug( "ItemInterface::FindFreeInventorySlot called for item %s" , proto->Name1 );
 		if(proto->BagFamily)
 		{
 			if(proto->BagFamily == ITEM_TYPE_KEYRING)
