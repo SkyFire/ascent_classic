@@ -2383,6 +2383,10 @@ else
 				{
 					hit_status |= HITSTATUS_CRICTICAL;
 					int32 dmgbonus = dmg.full_damage;
+					//sLog.outString( "DEBUG: Critical Strike! Full_damage: %u" , dmg.full_damage );
+					
+					// Supalosa - who took out this line? :P
+					dmg.full_damage += dmgbonus;
 					if(ability && ability->SpellGroupType)
 					{
 						SM_FIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
@@ -2398,7 +2402,7 @@ else
 						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritRangedDamageTakenPctMod[dmg_school]) / 100;
 					else 
 						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritMeleeDamageTakenPctMod[dmg_school]) / 100;
-
+					//sLog.outString( "DEBUG: After CritMeleeDamageTakenPctMod: %u" , dmg.full_damage );
 					if(IsPlayer())
 					{
 						if(damage_type != RANGED)
@@ -2408,6 +2412,7 @@ else
 						}
 						if(!pVictim->IsPlayer())
 							dmg.full_damage += float2int32(dmg.full_damage*static_cast<Player*>(this)->IncreaseCricticalByTypePCT[((Creature*)pVictim)->GetCreatureName() ? ((Creature*)pVictim)->GetCreatureName()->Type : 0]);
+					//sLog.outString( "DEBUG: After IncreaseCricticalByTypePCT: %u" , dmg.full_damage );
 					}
 					if(pVictim->IsPlayer())
 					{
@@ -2422,6 +2427,7 @@ else
 						if( dmg_reduction_pct > 1.0f )
 							dmg_reduction_pct = 1.0f; //we cannot resist more then he is criticalling us, there is no point of the critical then :P
 						dmg.full_damage = float2int32( dmg.full_damage - dmg.full_damage*dmg_reduction_pct );
+						//sLog.outString( "DEBUG: After Resilience check: %u" , dmg.full_damage );
 					}
 					
 					pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
