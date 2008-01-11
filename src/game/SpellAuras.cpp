@@ -1885,8 +1885,11 @@ void Aura::SpellAuraModCharm(bool apply)
 		data << uint32(PET_SPELL_AGRESSIVE);
 		data << uint32(PET_SPELL_DEFENSIVE);
 		data << uint32(PET_SPELL_PASSIVE);
-		caster->GetSession()->SendPacket(&data);
-		target->SetEnslaveSpell(m_spellProto->Id);
+		if( caster->GetSession() ) // crashfix
+		{
+			caster->GetSession()->SendPacket(&data);
+			target->SetEnslaveSpell(m_spellProto->Id);
+		}
 	}
 	else
 	{
