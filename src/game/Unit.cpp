@@ -1648,7 +1648,9 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 	else
 	{
 		// applying resistance to other type of damage 
-		uint32 RResist = pVictim->GetResistance( (*dmg).school_type) + max((pVictim->getLevel() - this->getLevel()) * 5, 0) - min(PowerCostPctMod[(*dmg).school_type], pVictim->GetResistance( (*dmg).school_type)); 
+		int32 RResist = pVictim->GetResistance( (*dmg).school_type) + ((pVictim->getLevel() > getLevel()) ? (pVictim->getLevel() - this->getLevel()) * 5 : 0) - PowerCostPctMod[(*dmg).school_type]; 
+		if (RResist<0)
+			RResist = 0;
 		AverageResistance = (float)(RResist) / (float)(getLevel() * 5) * 0.75f;
 		  if(AverageResistance > 0.75f)
 			AverageResistance = 0.75f;
