@@ -1874,19 +1874,19 @@ void Aura::SpellAuraModCharm(bool apply)
 
 		target->SetEnslaveCount(target->GetEnslaveCount() + 1);
 
-		WorldPacket data(SMSG_PET_SPELLS, 500);
-		data << target->GetGUID();
-		data << uint32(0) << uint32(0x1000);
-		data << uint32(PET_SPELL_ATTACK);
-		data << uint32(PET_SPELL_FOLLOW);
-		data << uint32(PET_SPELL_STAY);
-		for(int i = 0; i < 4; i++)
-			data << uint32(0);
-		data << uint32(PET_SPELL_AGRESSIVE);
-		data << uint32(PET_SPELL_DEFENSIVE);
-		data << uint32(PET_SPELL_PASSIVE);
 		if( caster->GetSession() ) // crashfix
 		{
+			WorldPacket data(SMSG_PET_SPELLS, 500);
+			data << target->GetGUID();
+			data << uint32(0) << uint32(0x1000);
+			data << uint32(PET_SPELL_ATTACK);
+			data << uint32(PET_SPELL_FOLLOW);
+			data << uint32(PET_SPELL_STAY);
+			for(int i = 0; i < 4; i++)
+				data << uint32(0);
+			data << uint32(PET_SPELL_AGRESSIVE);
+			data << uint32(PET_SPELL_DEFENSIVE);
+			data << uint32(PET_SPELL_PASSIVE);
 			caster->GetSession()->SendPacket(&data);
 			target->SetEnslaveSpell(m_spellProto->Id);
 		}
@@ -1903,10 +1903,13 @@ void Aura::SpellAuraModCharm(bool apply)
 		m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
 		caster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
 
-		WorldPacket data(SMSG_PET_SPELLS, 8);
-		data << uint64(0);
-		caster->GetSession()->SendPacket(&data);
-		target->SetEnslaveSpell(0);
+		if( caster->GetSession() ) // crashfix
+		{
+			WorldPacket data(SMSG_PET_SPELLS, 8);
+			data << uint64(0);
+			caster->GetSession()->SendPacket(&data);
+			target->SetEnslaveSpell(0);
+		}
 	}
 }
 
