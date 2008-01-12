@@ -526,7 +526,8 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 				t->RemoveMember(inf);
 		}
 		
-		sPlrLog.write("Account: %s | IP: %s >> Deleted player %s", GetAccountName().c_str(), GetSocket()->GetRemoteIP().c_str(), name.c_str());
+		if( _socket != NULL )
+			sPlrLog.write("Account: %s | IP: %s >> Deleted player %s", GetAccountName().c_str(), GetSocket()->GetRemoteIP().c_str(), name.c_str());
 
 		sSocialMgr.RemovePlayer((uint32)guid);
 
