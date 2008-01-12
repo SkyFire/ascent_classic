@@ -177,7 +177,7 @@ string Socket::GetRemoteIP()
 	if( ip != NULL )
 		return string( ip );
 	else
-		return string( "" );
+		return string( "noip" );
 }
 
 void Socket::Disconnect()
