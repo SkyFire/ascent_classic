@@ -50,6 +50,7 @@ SERVER_DECL DBCStorage<MapEntry> dbcMap;
 SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 SERVER_DECL DBCStorage<CombatRatingDBC> dbcCombatRating;
+SERVER_DECL DBCStorage<ChatChannelDBC> dbcChatChannels;
 
 const char * ItemSetFormat = "usxxxxxxxxxxxxxxxuuuuuuuuuxxxxxxxxxuuuuuuuuuuuuuuuuuu";
 const char * LockFormat = "uuuuuuxxxuuuuuxxxuuuuuxxxxxxxxxxx";
@@ -80,6 +81,7 @@ const char * creaturefamilyFormat = "ufufuuuusxxxxxxxxxxxxxxxxx";
 const char * mapentryFormat = "usuxsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char * itemrandomsuffixformat = "uxxxxxxxxxxxxxxxxxxuuuuuu";
 const char * combatratingformat = "f";
+const char * chatchannelformat = "uuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 template<class T>
 bool loader_stub(const char * filename, const char * format, bool ind, T& l, bool loadstrs)
@@ -121,6 +123,7 @@ bool LoadDBCs()
 	LOAD_DBC("DBC/AuctionHouse.dbc", auctionhousedbcFormat, true, dbcAuctionHouse, false);
 	LOAD_DBC("DBC/ItemRandomSuffix.dbc", itemrandomsuffixformat, true, dbcItemRandomSuffix, false);
 	LOAD_DBC("DBC/gtCombatRatings.dbc", combatratingformat, false, dbcCombatRating, false);
+	LOAD_DBC("DBC/ChatChannels.dbc", chatchannelformat, true, dbcChatChannels, false);
 	return true;
 }
 

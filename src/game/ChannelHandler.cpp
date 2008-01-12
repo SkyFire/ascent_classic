@@ -25,16 +25,16 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 {
 	CHECK_PACKET_SIZE(recvPacket, 1);
 	string channelname,pass;
-	uint32 code = 0;
+	uint32 dbc_id = 0;
 	uint16 crap;		// crap = some sort of channel type?
 	uint32 i;
 	Channel * chn;
 
-	recvPacket >> code >> crap;
+	recvPacket >> dbc_id >> crap;
 	recvPacket >> channelname;
 	recvPacket >> pass;
 
-	if(!stricmp(channelname.c_str(), "LookingForGroup"))
+	if(!stricmp(channelname.c_str(), "LookingForGroup") && HasFlag(ACCOUNT_FLAG_NO_AUTOJOIN))
 	{
 		// make sure we have lfg dungeons
 		for(i = 0; i < 3; ++i)
@@ -47,16 +47,9 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 			return;		// don't join lfg
 	}
 
-	chn = channelmgr.GetCreateChannel(channelname.c_str(), _player);
+	chn = channelmgr.GetCreateChannel(channelname.c_str(), _player, dbc_id);
 	if(chn == NULL)
 		return;
-
-	if(chn->GetNumMembers() == 0)
-	{
-		// just created
-		chn->m_flags = (uint8)crap;
-		chn->m_id = code;
-	}
 
 	chn->AttemptJoin(_player, pass.c_str());
 	Log.Debug("ChannelJoin", "%s", channelname.c_str());

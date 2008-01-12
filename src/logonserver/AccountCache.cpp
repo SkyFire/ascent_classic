@@ -28,7 +28,7 @@ void AccountMgr::ReloadAccounts(bool silent)
 	if(!silent) sLog.outString("[AccountMgr] Reloading Accounts...");
 
 	// Load *all* accounts.
-	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned, forceLanguage FROM accounts");
+	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned, forceLanguage, muted FROM accounts");
 	Field * field;
 	string AccountName;
 	set<string> account_list;

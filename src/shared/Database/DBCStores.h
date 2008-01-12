@@ -829,6 +829,12 @@ struct CombatRatingDBC
 	float val;
 };
 
+struct ChatChannelDBC
+{
+	uint32 id;
+	uint32 flags;
+};
+
 #pragma pack(pop)
 
 ASCENT_INLINE float GetRadius(SpellRadius *radius)
@@ -1132,6 +1138,7 @@ extern SERVER_DECL DBCStorage<MapEntry> dbcMap;
 extern SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 extern SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 extern SERVER_DECL DBCStorage<CombatRatingDBC> dbcCombatRating;
+extern SERVER_DECL DBCStorage<ChatChannelDBC> dbcChatChannels;
 
 bool LoadDBCs();
 

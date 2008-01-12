@@ -24,7 +24,7 @@ public:
 	ChannelMgr();
 	~ChannelMgr();
 
-	Channel *GetCreateChannel(const char *name, Player * p);
+	Channel *GetCreateChannel(const char *name, Player * p, uint32 type_id);
 	Channel *GetChannel(const char *name, Player * p);
 	Channel * GetChannel(const char * name, uint32 team);
 	void VoiceDied();

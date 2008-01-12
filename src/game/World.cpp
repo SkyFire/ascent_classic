@@ -4773,6 +4773,7 @@ bool World::SetInitialWorldSettings()
 		lootmgr.LoadLoot();
 	}
 
+	Channel::LoadConfSettings();
 	Log.Notice("BattlegroundManager", "Starting...");
 	new CBattlegroundManager;
 
@@ -5455,7 +5456,8 @@ void World::Rehash(bool load)
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
 	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);
 	m_useAccountData = Config.MainConfig.GetBoolDefault("Server", "UseAccountData", false);
-	Channel::LoadConfSettings();
+	if( load )
+		Channel::LoadConfSettings();
 }
 
 void World::LoadNameGenData()
