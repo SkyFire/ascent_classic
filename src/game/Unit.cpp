@@ -1950,7 +1950,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 	else
 	{
 		if (GetTypeId() == TYPEID_UNIT)
-			dmg.school_type = static_cast<Creature*>(this)->proto->AttackType;
+			dmg.school_type = ((Creature*)this)->BaseAttackType;
 		else
 			dmg.school_type = SCHOOL_NORMAL;
 	}

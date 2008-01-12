@@ -371,6 +371,7 @@ public:
 	bool m_canRegenerateHP;
 	void RegenerateHealth();
 	void RegenerateMana();
+	int BaseAttackType;
 
 	bool CanSee(Unit* obj) // * Invisibility & Stealth Detection - Partha *
 	{
