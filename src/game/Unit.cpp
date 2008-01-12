@@ -1069,6 +1069,25 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;
 							}
 							break;
+						//priest - Blessed Recovery
+                        case 27813:
+                        case 27817:
+                        case 27818:
+                            {
+                                if(!IsPlayer() || !dmg)
+                                    continue;
+                                SpellEntry *parentproc= dbcSpell.LookupEntry(origId);
+                                SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId);
+								if (!parentproc || !spellInfo)
+									continue;
+								int32 val = parentproc->EffectBasePoints[0] + 1;
+                                Spell *spell = new Spell(this, spellInfo ,true, NULL);
+                                spell->forced_basepoints[0] = (val*dmg)/300; //per tick
+                                SpellCastTargets targets;
+                                targets.m_unitTarget = GetGUID();
+                                spell->prepare(&targets);
+                                continue;
+                            }break;
 						//shaman - Healing Way
 						case 29203:
 							{
@@ -1929,10 +1948,16 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 	bool backAttack			 = isInBack( pVictim );
 	uint32 vskill            = 0;
 	bool disable_dR			 = false;
-	uint32	dmg_school		 = 0;
 	
 	if(ability)
-		dmg_school = ability->School;
+		dmg.school_type = ability->School;
+	else
+	{
+		if (GetTypeId() == TYPEID_UNIT)
+			dmg.school_type = static_cast<Creature*>(this)->proto->AttackType;
+		else
+			dmg.school_type = SCHOOL_NORMAL;
+	}
 //==========================================================================================
 //==============================Victim Skill Base Calculation===============================
 //==========================================================================================
@@ -2281,7 +2306,7 @@ else
 					printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg.full_damage,ability->SpellGroupType);
 #endif
 			}
-			dmg.full_damage += pVictim->DamageTakenMod[0]+add_damage;
+			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type]+add_damage;
 			if(damage_type==RANGED)
 			{
 				dmg.full_damage+=pVictim->RangedDamageTaken;
@@ -2290,23 +2315,14 @@ else
 			if(ability && ability->MechanicsType == MECHANIC_BLEEDING)
 				disable_dR = true; 
 			
-			float summaryPCTmod = pVictim->DamageTakenPctMod[0]+this->DamageDoneModPCT[0];
+			float summaryPCTmod = pVictim->DamageTakenPctMod[dmg.school_type]+this->DamageDoneModPCT[dmg.school_type];
 
 			if(pct_dmg_mod > 0)
 				dmg.full_damage = float2int32(dmg.full_damage*(float(pct_dmg_mod)/100.0f));
 
-			/*if(pct_dmg_mod) Should not be in summaryPCT mod cause it modifier in abilities like 250% of weapon damage
-				summaryPCTmod += pct_dmg_mod/100.0f - 1;*/
-
 			//a bit dirty fix
 			if(ability && ability->NameHash == 0x8401EC6A)
 				summaryPCTmod += pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
-
-			/* RangedDamageTakenPct is not used
-			if(damage_type == RANGED)
-			{
-				summaryPCTmod+=pVictim->RangedDamageTakenPct/100;	
-			}*/
 
 			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
 
@@ -2418,19 +2434,13 @@ else
 					dmg.full_damage += dmgbonus;
 
 					if( damage_type == RANGED )
-						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritRangedDamageTakenPctMod[dmg_school]) / 100;
+						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritRangedDamageTakenPctMod[dmg.school_type]) / 100;
 					else 
-						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritMeleeDamageTakenPctMod[dmg_school]) / 100;
+						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritMeleeDamageTakenPctMod[dmg.school_type]) / 100;
 
 					if(pVictim->IsPlayer())
 					{
-//						dmg.full_damage=float2int32(float(dmg.full_damage)*(1.0f-2.0f*static_cast<Player*>(pVictim)->CalcRating(PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE)));
-
 						//Resilience is a special new rating which was created to reduce the effects of critical hits against your character.
-						//It has two components; it reduces the chance you will be critically hit by x%, 
-						//and it reduces the damage dealt to you by critical hits by 2x%. x is the percentage resilience granted by a given resilience rating. 
-						//It is believed that resilience also functions against spell crits, 
-						//though it's worth noting that NPC mobs cannot get critical hits with spells.
 						float dmg_reduction_pct = 2.0f * static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) / 100.0f;
 						if( dmg_reduction_pct > 1.0f )
 							dmg_reduction_pct = 1.0f; //we cannot resist more then he is criticalling us, there is no point of the critical then :P
@@ -2473,10 +2483,7 @@ else
 //==========================================================================================
 //--------------------------absorption------------------------------------------------------
 			uint32 dm = dmg.full_damage;
-			abs = pVictim->AbsorbDamage(0,(uint32*)&dm);
-
-			if(abs)
-				vproc |= PROC_ON_ABSORB;
+			abs = pVictim->AbsorbDamage(dmg.school_type,(uint32*)&dm);
 		
 			if(dmg.full_damage > (int32)blocked_damage)
 			{
@@ -2488,13 +2495,22 @@ else
 					if(dmg.full_damage && !disable_dR)
 						CalculateResistanceReduction(pVictim,&dmg);
 					dmg.full_damage += sh;
-					dmg.resisted_damage += sh;
+					abs+=sh;
 				}
 				else if(!disable_dR)
-					CalculateResistanceReduction(pVictim,&dmg);
+					CalculateResistanceReduction(pVictim,&dmg);	
 			}
-			dmg.resisted_damage += abs;
-			realdamage = dmg.full_damage-dmg.resisted_damage-blocked_damage;
+
+			if(abs)
+				vproc |= PROC_ON_ABSORB;
+
+			if (dmg.school_type == SCHOOL_NORMAL)
+			{
+				abs+=dmg.resisted_damage;
+				dmg.resisted_damage=0;
+			}
+
+			realdamage = dmg.full_damage-abs-dmg.resisted_damage-blocked_damage;
 			if(realdamage < 0)
 			{
 				realdamage = 0;
@@ -2606,8 +2622,15 @@ else
 	if( !ability )
 	{
 		if( dmg.full_damage > 0 )
-			if( dmg.full_damage == (int32)dmg.resisted_damage )
+		{
+			if( dmg.full_damage == (int32)abs )
 				hit_status |= HITSTATUS_ABSORBED;
+			else if (dmg.full_damage <= (int32)dmg.resisted_damage)
+			{
+				hit_status |= HITSTATUS_RESIST;
+				dmg.resisted_damage = dmg.full_damage;
+			}
+		}
 
 		if( dmg.full_damage < 0 )
 			dmg.full_damage = 0;
@@ -2622,17 +2645,16 @@ else
 		data << (uint32)realdamage;		 // Realdamage;
 		data << (uint8)1;				   // Damage type counter / swing type
 
-		data << (uint32)0;				  // Damage school
+		data << (uint32)dmg.school_type;				  // Damage school
 		data << (float)dmg.full_damage;	 // Damage float
 		data << (uint32)dmg.full_damage;	// Damage amount
-		data << (uint32)dmg.resisted_damage;// Damage absorbed
-		data << (uint32)0;				  // Damage resisted
+		data << (uint32)abs;// Damage absorbed
+		data << (uint32)dmg.resisted_damage;				  // Damage resisted
 
 		data << (uint32)vstate;			 // new victim state
 		data << (int32)0;					// can be 0,1000 or -1
 		data << (uint32)0;				  // unknown
 		data << (uint32)blocked_damage;	 // Damage amount blocked
-		
 		data << (uint32) 0;
 
 		SendMessageToSet(&data, this->IsPlayer());
@@ -2657,7 +2679,7 @@ else
 //==========================================================================================
 
 	if(this->IsPlayer() && ability)
-		static_cast<Player*>(this)->m_casted_amount[ability->School]=(uint32)(realdamage+abs);
+		static_cast<Player*>(this)->m_casted_amount[dmg.school_type]=(uint32)(realdamage+abs);
 	if(realdamage)
 	{
 		DealDamage(pVictim, realdamage, 0, targetEvent, 0);

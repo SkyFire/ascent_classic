@@ -2526,6 +2526,25 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 33215 ); 
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 8192 | 131072 | 8388608; // Mind Blast + Mind Control + Mind Flay
+	//Priest: Blessed Recovery
+	sp = dbcSpell.LookupEntry(27811);
+	if(sp != NULL)
+	{
+		sp->EffectTriggerSpell[0] = 27813;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	}
+	sp = dbcSpell.LookupEntry(27815);
+	if(sp != NULL)
+	{
+		sp->EffectTriggerSpell[0] = 27817;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	}
+	sp = dbcSpell.LookupEntry(27816);
+	if(sp != NULL)
+	{
+		sp->EffectTriggerSpell[0] = 27818;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	}
 	//priest- Blessed Resilience
 	sp = dbcSpell.LookupEntry( 33142 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	sp = dbcSpell.LookupEntry( 33145 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;

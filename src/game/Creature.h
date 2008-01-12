@@ -114,6 +114,7 @@ struct CreatureProto
 	float  Scale;
 	uint32	NPCFLags;
 	uint32 AttackTime;
+	uint32 AttackType;
 	float MinDamage;
 	float MaxDamage;
 	uint32 RangedAttackTime;
