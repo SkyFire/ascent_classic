@@ -72,8 +72,6 @@ bool CConsoleThread::run()
 #ifndef WIN32
 	fd_set fds;
 	struct timeval tv;
-	tv.tv_sec = 1;
-	tv.tv_usec = 0;
 #endif
 
 	while( kill != true )
@@ -89,6 +87,8 @@ bool CConsoleThread::run()
 			break;
 
 #else
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
 		FD_ZERO(&fds);
 		FD_SET(STDIN_FILENO, &fds);
 		if(select(1, &fds, NULL, NULL, &tv) <= 0)
