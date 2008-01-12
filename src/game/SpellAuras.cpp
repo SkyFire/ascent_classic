@@ -1994,7 +1994,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 		return;
 	Unit * c = GetUnitCaster();
 
-	int bonus = 0;
+	int32 bonus = 0;
 
 	if(c && c->IsPlayer())
 	{
@@ -2005,7 +2005,24 @@ void Aura::EventPeriodicHeal( uint32 amount )
 		if (static_cast<Player*>(c)->IsInFeralForm() && static_cast<Player*>(c)->GetShapeShift() == FORM_TREE)
 			bonus += float2int32(0.25f*((Player*)c)->GetUInt32Value(UNIT_FIELD_STAT4));
 	}
-	bonus += m_target->HealTakenMod[GetSpellProto()->School];
+
+	bonus += m_target->HealTakenMod[GetSpellProto()->School] + (amount * c->HealDonePctMod[GetSpellProto()->School]) / 100;
+
+	if(GetSpellProto()->SpellGroupType && c)
+	{
+		int penalty_pct=0;
+		SM_FIValue(c->SM_PPenalty, &penalty_pct, GetSpellProto()->SpellGroupType);
+		bonus += bonus*penalty_pct/100;
+		SM_FIValue(c->SM_FPenalty, &bonus, GetSpellProto()->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		int spell_pct_modifers=0;
+		SM_FIValue(c->SM_FPenalty,&spell_flat_modifers,GetSpellProto()->SpellGroupType);
+		SM_FIValue(c->SM_PPenalty,&spell_pct_modifers,GetSpellProto()->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,GetSpellProto()->SpellGroupType);
+#endif
+	}
 
 	int amp = m_spellProto->EffectAmplitude[mod->i];
 	if(!amp) 

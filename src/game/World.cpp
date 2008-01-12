@@ -3580,6 +3580,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
 		sp->procCharges = 0;
+		sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
 	}
 	sp = dbcSpell.LookupEntry( 28682 );
 	if( sp != NULL )

@@ -1031,13 +1031,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									{
 										RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION );
 										RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION_PROC );
-										if( IsPlayer() )
-										{
-											WorldPacket data( 12 );
-											data.SetOpcode( SMSG_COOLDOWN_EVENT );
-											data << origId << GetGUID();
-											SendMessageToSet( &data, true );
-										}
 									}
 									continue;
 								}

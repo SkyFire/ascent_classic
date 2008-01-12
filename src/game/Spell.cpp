@@ -3818,7 +3818,9 @@ void Spell::Heal(int32 amount)
 	}
 
 	//Make it critical
-	bool critical=false;
+	bool critical = false;
+	int32 bonus = 0;
+	float healdoneaffectperc = 0;
 	if( u_caster != NULL )
 	{
 		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(m_spellInfo->CastingTimeIndex);
@@ -3830,7 +3832,7 @@ void Spell::Heal(int32 amount)
 		else if(castaff < 1500) 
             castaff = 1500;
 
-		float healdoneaffectperc = castaff / 3500;
+		healdoneaffectperc = castaff / 3500.0f;
 		
 		//Downranking
 		if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
@@ -3844,10 +3846,30 @@ void Spell::Heal(int32 amount)
 			healdoneaffectperc *= downrank1 * downrank2;
 		}
 
-		amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
-		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
-		amount += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
-		amount += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
+		//caster sided bonus
+		bonus += u_caster->HealDoneMod[m_spellInfo->School] + (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
+
+		if(m_spellInfo->SpellGroupType)
+		{
+			int penalty_pct=0;
+			SM_FIValue(u_caster->SM_PPenalty, &penalty_pct, m_spellInfo->SpellGroupType);
+			bonus += bonus*penalty_pct/100;
+			SM_FIValue(u_caster->SM_FPenalty, &bonus, m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			int spell_flat_modifers=0;
+			int spell_pct_modifers=0;
+			SM_FIValue(u_caster->SM_FPenalty,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(u_caster->SM_PPenalty,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!HEAL : spell dmg bonus(p=24) mod flat %d , spell dmg bonus(p=24) pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,bonus,m_spellInfo->SpellGroupType);
+#endif
+		}
+//		amount += float2int32(u_caster->HealDoneMod[m_spellInfo->School] * healdoneaffectperc);
+//		amount += (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
+		bonus += unitTarget->HealTakenMod[m_spellInfo->School];//amt of health that u RECIVE, not heal
+		bonus += float2int32(unitTarget->HealTakenPctMod[m_spellInfo->School]*amount);
+
+
 
 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
 		if(critical = Rand(spellCrit))
@@ -3866,13 +3888,20 @@ void Spell::Heal(int32 amount)
 		}
 		
 	}
-	if(amount < 0) amount = 0;
 
 	if( p_caster != NULL )  
 	{
-		amount += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
-		amount += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+		bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
+		bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+	}
 
+	amount = ( amount + bonus ) * healdoneaffectperc; //apply downranking on final value ?
+
+	if(amount < 0) 
+		amount = 0;
+
+	if( p_caster != NULL )  
+	{
 		if( unitTarget->IsPlayer() )
 		{
 			SendHealSpellOnPlayer( p_caster, static_cast< Player* >( unitTarget ), amount, critical );

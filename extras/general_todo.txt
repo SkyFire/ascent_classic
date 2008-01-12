@@ -145,8 +145,6 @@ Zack - test my shit :
 - druid - Shredding Attacks 16968
 - druid - Naturalist 17073
 - druid - Gift of Nature 24946
-- druid - Empowered Touch 33880
-- druid - Empowered Rejuvenation 33890
 - paladin - Healing Light 20239
 - paladin - Sanctified Light 20361
 - paladin - sanctified judgement 31878
