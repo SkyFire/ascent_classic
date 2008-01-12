@@ -74,8 +74,12 @@ void Item::Create( uint32 itemid, Player *owner )
 {
 	SetUInt32Value( OBJECT_FIELD_ENTRY, itemid );
  
-	SetUInt64Value( ITEM_FIELD_OWNER, owner->GetGUID() );
-	SetUInt64Value( ITEM_FIELD_CONTAINED, owner->GetGUID() );
+	if( owner != NULL )
+	{
+		SetUInt64Value( ITEM_FIELD_OWNER, owner->GetGUID() );
+		SetUInt64Value( ITEM_FIELD_CONTAINED, owner->GetGUID() );
+	}
+
 	SetUInt32Value( ITEM_FIELD_STACK_COUNT, 1 );
 
 	m_itemProto = ItemPrototypeStorage.LookupEntry( itemid );

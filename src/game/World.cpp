@@ -5608,7 +5608,11 @@ bool CharacterLoaderThread::run()
 	running=true;
 	for(;;)
 	{
-		sWorld.PollCharacterInsertQueue();
+		// Get a single connection to maintain for the whole process.
+		MysqlCon * con = CharacterDatabase.GetFreeConnection();
+
+		sWorld.PollCharacterInsertQueue(con);
+		sWorld.PollMailboxInsertQueue(con);
 		/* While this looks weird, it ensures the system doesn't waste time switching to these contexts.
 		   WaitForSingleObject will suspend the thread,
 		   and on unix, select will as well. - Burlex
@@ -5630,7 +5634,40 @@ bool CharacterLoaderThread::run()
 	return true;
 }
 
-void World::PollCharacterInsertQueue()
+void World::PollMailboxInsertQueue(MysqlCon * con)
+{
+	QueryResult * result;
+	Field * f;
+	Item * pItem;
+	uint32 itemid;
+
+	CharacterDatabase.FWaitExecute("LOCK TABLES `mailbox_insert_queue` WRITE", con);
+	result = CharacterDatabase.Query("SELECT * FROM mailbox_insert_queue");
+	if( result != NULL )
+	{
+		do 
+		{
+			f = result->Fetch();
+			itemid = f[6].GetUInt32();
+			
+			if( itemid != 0 )
+				pItem = objmgr.CreateItem( itemid, NULL );
+			else
+				pItem = NULL;
+
+			sMailSystem.SendAutomatedMessage( 0, f[0].GetUInt64(), f[1].GetUInt64(), f[2].GetString(), f[3].GetString(), f[5].GetUInt32(),
+				0, pItem ? pItem->GetGUID() : 0, f[4].GetUInt32() );
+
+		} while ( result->NextRow() );
+		delete result;
+		CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);
+		CharacterDatabase.FWaitExecute("DELETE FROM mailbox_insert_queue", con);
+	}
+	else
+		CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);	
+}
+
+void World::PollCharacterInsertQueue(MysqlCon * con)
 {
 	// Our local stuff..
 	bool has_results = false;
@@ -5640,9 +5677,6 @@ void World::PollCharacterInsertQueue()
 	insert_playeritem ipi;                          
 	static const char * characterTableFormat = "uSuuuuuussuuuuuuuuuuuuuuffffuususuufffuuuuusuuuUssuuuuuuffffuuuuufffssssssuuuuuuuu";
 
-	// Get a single connection to maintain for the whole process.
-	MysqlCon * con = CharacterDatabase.GetFreeConnection();
-	
 	// Lock the table to prevent any more inserts
 	CharacterDatabase.FWaitExecute("LOCK TABLES `playeritems_insert_queue` WRITE", con);
 
@@ -5826,9 +5860,6 @@ void World::PollCharacterInsertQueue()
 		CharacterDatabase.FWaitExecute("DELETE FROM characters_insert_queue", con);
 		CharacterDatabase.FWaitExecute("DELETE FROM playeritems_insert_queue", con);
 	}
-
-	// Release the database connection
-	con->busy.Release();
 }
 
 #ifdef ENABLE_CHECKPOINT_SYSTEM

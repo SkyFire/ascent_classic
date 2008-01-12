@@ -1,0 +1,9 @@
+CREATE TABLE `mailbox_insert_queue` (
+  `sender_guid` int(30) NOT NULL,
+  `receiver_guid` int(30) NOT NULL,
+  `subject` varchar(200) NOT NULL,
+  `body` varchar(500) NOT NULL,
+  `stationary` int(30) NOT NULL,
+  `money` int(30) NOT NULL,
+  `item_id` int(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
