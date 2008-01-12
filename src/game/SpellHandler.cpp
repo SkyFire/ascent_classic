@@ -190,6 +190,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 		//autoshot 75
 		if((spellInfo->Flags3 & FLAGS3_ACTIVATE_AUTO_SHOT) /*spellInfo->Attributes == 327698*/)	// auto shot..
 		{
+			//sLog.outString( "HandleSpellCast: Auto Shot-type spell cast (id %u, name %s)" , spellInfo->Id , spellInfo->Name );
 			Item *weapon = GetPlayer()->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 			if(!weapon) 
 				return;
@@ -226,7 +227,10 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 				uint32 duration = _player->GetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME);
 				SpellCastTargets targets(recvPacket,GetPlayer()->GetGUID());
 				if(!targets.m_unitTarget)
+				{
+					sLog.outString( "Cancelling auto-shot cast because targets.m_unitTarget is null!" );
 					return;
+				}
 				SpellEntry *sp = dbcSpell.LookupEntry(spellid);
 			
 				_player->m_AutoShotSpell = sp;

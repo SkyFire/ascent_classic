@@ -1019,7 +1019,7 @@ void Spell::prepare( SpellCastTargets * targets )
 	else
 	{
 		// start cooldown handler
-		if( p_caster != NULL && !m_triggeredSpell )
+		if( p_caster != NULL && p_caster->CastTimeCheat && !m_triggeredSpell )
 		{
 			AddStartCooldown();
 		}
@@ -1486,7 +1486,7 @@ void Spell::cast(bool check)
 			}*/
 			
 			SendCastResult(cancastresult);
-			if( u_caster != NULL )
+			if( u_caster != NULL )  
 				if (u_caster->GetOnMeleeSpell() != m_spellInfo->Id)
 					u_caster->SetOnMeleeSpell(m_spellInfo->Id);
 			finish();

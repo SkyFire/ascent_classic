@@ -5408,7 +5408,7 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 	SpellEntry *spellinfo = dbcSpell.LookupEntry(spellid);
 	if(!spellinfo)
 		return -1;
-	
+	//sLog.outString( "Canshootwithrangedweapon!?!? spell: [%u] %s" , spellinfo->Id , spellinfo->Name );
 	uint8 fail = 0;
 	Item *itm = GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 	if(!itm)
@@ -5431,22 +5431,31 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 	if(!target || target->isDead())
 		return -1;	
 
-	SpellRange * range = dbcSpellRange.LookupEntry(spellinfo->rangeIndex);
+	// Supalosa - The hunter ability Auto Shot is using Shoot range, which is 5 yards shorter.
+	// So we'll use 114, which is the correct 35 yard range used by the other Hunter abilities (arcane shot, concussive shot...)
+	uint32 rIndex = (autoshot) ? 114 : spellinfo->rangeIndex;
+	SpellRange * range = dbcSpellRange.LookupEntry( rIndex );
 	float minrange = GetMinRange(range);
 	float dist = CalcDistance(this, target);
 	float maxr = GetMaxRange(range);
-
+	//float bonusRange = 0;
+	// another hackfix: bonus range from hunter talent hawk eye: +2/4/6 yard range to ranged weapons
+	//if(autoshot)
+	//SM_FFValue( SM_FRange, &bonusRange, dbcSpell.LookupEntry( 75 )->SpellGroupType ); // HORRIBLE hackfixes :P
 	// Partha: +2.52yds to max range, this matches the range the client is calculating.
 	// see extra/supalosa_range_research.txt for more info
 	maxr += 2.52f;
-
+	//bonusRange = 2.52f;
 	// Check for close
 	if(spellid != SPELL_RANGED_WAND)//no min limit for wands
 		if(minrange > dist)
 			fail = SPELL_FAILED_TOO_CLOSE;
+	
 
-	if(maxr < dist)
+	//sLog.outString( "Bonus range = %f" , bonusRange );
+	if( dist > maxr)
 	{
+		sLog.outString( "Auto shot failed: out of range (Maxr: %f, Dist: %f)" , maxr , dist );
 		fail = SPELL_FAILED_OUT_OF_RANGE;
 	}
 
@@ -5472,6 +5481,7 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 			uint32 spellid2 = autoshot ? 75 : spellid;
 			m_session->OutPacket(SMSG_CANCEL_AUTO_REPEAT, 4, &spellid2);
 		}
+//		sLog.outString( "Result for CanShootWIthRangedWeapon: %u" , fail );
 		return fail;
 	}
 	return 0;
