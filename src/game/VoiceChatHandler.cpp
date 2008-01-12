@@ -68,7 +68,8 @@ void WorldSession::HandleChannelVoiceQueryOpcode(WorldPacket & recv_data)
 		return;
 
 	WorldPacket data(SMSG_CHANNEL_NOTIFY_AVAILABLE_VOICE_SESSION, 17+chn->m_name.size());
-	data << chn->m_id << uint32(0);
+	data << uint32(0x00002e57);
+	data << uint32(0xe0e10000);
 	data << uint8(0);		// 00=custom,03=party,04=raid
 	data << chn->m_name;
 	data << _player->GetGUID();
