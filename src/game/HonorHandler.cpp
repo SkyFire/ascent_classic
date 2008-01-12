@@ -96,27 +96,29 @@ int32 HonorHandler::CalculateHonorPointsForKill( Player *pPlayer, Unit* pVictim 
 	return float2int32( honor_points );
 }
 
-void HonorHandler::OnPlayerKilledUnit(Player *pPlayer, Unit* pVictim)
+void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 {
-	if( pVictim == NULL )
+	if( pVictim == NULL || pPlayer == NULL )
 		return;
 
-	if(pPlayer->GetTypeId() != TYPEID_PLAYER || !pVictim->IsUnit())
+	if( pPlayer->GetTypeId() != TYPEID_PLAYER || !pVictim->IsUnit() )
 		return;
 
-	if(pVictim && (!pVictim->IsPlayer() || static_cast<Player*>(pVictim)->m_honorless))
+	if( !pVictim->IsPlayer() || static_cast< Player* >( pVictim )->m_honorless )
 		return;
-    if(pVictim && pVictim->IsPlayer() && static_cast<Player*>(pVictim)->m_bgTeam == pPlayer->m_bgTeam)
+
+    if( pVictim->IsPlayer() && static_cast< Player* >( pVictim )->m_bgTeam == pPlayer->m_bgTeam )
         return;
-    if(pPlayer->GetTeam() == static_cast<Player*>(pVictim)->GetTeam())
+
+    if( pPlayer->GetTeam() == static_cast< Player* >( pVictim )->GetTeam() )
         return;
 
 	// Calculate points
 	int32 Points = CalculateHonorPointsForKill(pPlayer, pVictim);
 
-	if(Points > 0)
+	if( Points > 0 )
 	{
-		if(pPlayer->m_bg)
+		if( pPlayer->m_bg )
 		{
 			// hackfix for battlegrounds (since the gorups there are disabled, we need to do this manually)
 			vector<Player*> toadd;
