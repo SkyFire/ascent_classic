@@ -1901,10 +1901,10 @@ void Aura::SpellAuraModCharm(bool apply)
 		m_target->UpdateOppFactionSet();
 		m_target->GetAIInterface()->Init(m_target, AITYPE_AGRO, MOVEMENTTYPE_NONE);
 		m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
-		caster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
 
-		if( caster->GetSession() ) // crashfix
+		if( caster && caster->GetSession() ) // crashfix
 		{
+			caster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
 			WorldPacket data(SMSG_PET_SPELLS, 8);
 			data << uint64(0);
 			caster->GetSession()->SendPacket(&data);
