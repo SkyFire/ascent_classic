@@ -1064,8 +1064,9 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		{
 			c=(Container*)_player->GetItemInterface()->GetItemByGUID(bagguid);
 			if(!c)return;
+			bagslot = _player->GetItemInterface()->GetBagSlotByGuid(bagguid);
 
-			if(c->GetProto() && (uint32)slot > c->GetProto()->ContainerSlots)
+			if(bagslot == INVENTORY_SLOT_NOT_SET || (c->GetProto() && (uint32)slot > c->GetProto()->ContainerSlots))
 			{
 				_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_ITEM_DOESNT_GO_TO_SLOT);
 				return;
