@@ -137,7 +137,7 @@ static void SM_FFValue( int32* m, float* v, uint64 group )
 		return;
 
     for( uint32 x = 0; x < SPELL_GROUPS; x++ )
-        if( ( 1i64 << x) & group )
+        if( ( (uint64)1 << x) & group )
             (*v) += m[x];
 }
 
@@ -147,7 +147,7 @@ static void SM_FIValue( int32* m, int32* v, uint64 group )
 		return;
 
     for( uint32 x = 0; x < SPELL_GROUPS; x++ )
-        if( ( 1i64 << x ) & group )
+        if( ( (uint64)1 << x ) & group )
             (*v) += m[x];
 }
 
@@ -157,7 +157,7 @@ static void SM_PIValue( int32* m, int32* v, uint64 group )
 		return;
 
     for( uint32 x = 0; x < SPELL_GROUPS; x++ )
-        if( ( 1i64 << x ) & group )
+        if( ( (uint64)1 << x ) & group )
             (*v) += ( (*v) * m[x] ) / 100;
 }
 
@@ -167,7 +167,7 @@ static void SM_PFValue( int32* m, float* v, uint64 group )
 		return;
     
     for( uint32 x = 0; x < SPELL_GROUPS; x++ )
-        if( ( 1i64 << x ) & group )
+        if( ( (uint64)1 << x ) & group )
             (*v) += ( (*v) * m[x] ) / 100.0f;
 }
 
