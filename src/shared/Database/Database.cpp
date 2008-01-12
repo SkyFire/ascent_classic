@@ -662,3 +662,8 @@ void Database::FreeQueryResult(QueryResult * p)
 {
 	delete p;
 }
+
+void QueryResult::Delete()
+{
+	delete this;
+}

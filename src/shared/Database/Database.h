@@ -147,6 +147,7 @@ public:
 	~QueryResult();
 
 	bool NextRow();
+	void Delete();
 
 	ASCENT_INLINE Field* Fetch() { return mCurrentRow; }
 	ASCENT_INLINE uint32 GetFieldCount() const { return mFieldCount; }
