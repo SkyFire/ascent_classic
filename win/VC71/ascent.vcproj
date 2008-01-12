@@ -269,6 +269,9 @@ if not exist ..\..\bin\release\realms.conf copy ..\..\src\realms.conf ..\..\bin\
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\..\src\shared\CoreMemoryAllocator_Core.cpp">
+		</File>
+		<File
 			RelativePath="..\..\src\ascent\Main.cpp">
 		</File>
 		<File

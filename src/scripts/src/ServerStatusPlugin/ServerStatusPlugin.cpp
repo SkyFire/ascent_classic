@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "../../../shared/svn_revision.h"
 
+#include "CoreMemoryAllocator.cpp"
+
 #ifdef WIN32
 #pragma pack(push,8)
 #include "PerfCounters.h"

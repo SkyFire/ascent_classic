@@ -456,6 +456,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath="..\..\src\shared\CoreMemoryAllocator_Core.cpp"
+			>
+		</File>
+		<File
 			RelativePath="..\..\src\ascent\Main.cpp"
 			>
 		</File>
