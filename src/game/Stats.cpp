@@ -435,7 +435,7 @@ uint32 GainStat(uint16 level, uint8 playerclass,uint8 Stat)
 	return gain;
 }
 
-uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type, uint32 spellgroup, SpellEntry *ability)//spellid is used only for 2-3 spells, that have AP bonus
+uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type, uint64 spellgroup, SpellEntry *ability)//spellid is used only for 2-3 spells, that have AP bonus
 {
 	//TODO: Some awesome formula to determine how much damage to deal
 	//consider this is melee damage

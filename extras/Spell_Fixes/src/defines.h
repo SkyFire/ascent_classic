@@ -422,7 +422,7 @@ const char sql_translation_table[220][3][300] =
     {"uint32"  ,"StartRecoveryCategory","0"},           //195
     {"uint32"  ,"SpellFamilyName","0"},                 //196
     {"uint32"  ,"SpellGroupType","0"},                  //197   flags 
-    {"uint32"  ,"unkne","0"},                           //198   flags hackwow=shit 
+    {"uint32"  ,"SpellGroupType_high","0"},             //198   flags
     {"uint32"  ,"MaxTargets","0"},                      //199 
     {"uint32"  ,"Spell_Dmg_Type","0"},                  //200   dmg_class Integer      0=None, 1=Magic, 2=Melee, 3=Ranged
     {"uint32"  ,"FG","0"},                              //201   0,1,2 related to Spell_Dmg_Type I think

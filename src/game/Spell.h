@@ -131,7 +131,7 @@ enum SPELL_MODIFIER_TYPE
 };
 
 
-static void SM_FFValue(int32 *m, float *v,uint32 group)
+static void SM_FFValue(int32 *m, float *v,uint64 group)
 {
     if(m == 0) return;
 
@@ -140,7 +140,7 @@ static void SM_FFValue(int32 *m, float *v,uint32 group)
             (*v)+=m[x];
 }
 
-static void SM_FIValue(int32 *m, int32 *v,uint32 group)
+static void SM_FIValue(int32 *m, int32 *v,uint64 group)
 {
     if(m == 0) return;
 
@@ -149,7 +149,7 @@ static void SM_FIValue(int32 *m, int32 *v,uint32 group)
             (*v)+=m[x];
 }
 
-static void SM_PIValue(int32 *m, int32 *v,uint32 group)
+static void SM_PIValue(int32 *m, int32 *v,uint64 group)
 {
     if(m == 0) return;
 
@@ -158,7 +158,7 @@ static void SM_PIValue(int32 *m, int32 *v,uint32 group)
             (*v)+= ((*v)*(m[x]))/100;
 }
 
-static void SM_PFValue(int32*m, float *v,uint32 group)
+static void SM_PFValue(int32*m, float *v,uint64 group)
 {
     if(m == 0) return;
     
@@ -335,7 +335,7 @@ enum Attributes
     ATTRIBUTES_UNK7								= 0x20, // Reagents
     ATTRIBUTES_PASSIVE							= 0x40,
     ATTRIBUTES_NO_VISUAL_AURA					= 0x80,
-    ATTRIBUTES_UNK10							= 0x100,//seems to be afflicts pet
+    ATTRIBUTES_UNK10							= 0x100,	//seems to be afflicts pet
     ATTRIBUTES_UNK11							= 0x200, // only appears in shaman imbue weapon spells
     ATTRIBUTES_UNK12							= 0x400,
     ATTRIBUTES_UNK13							= 0x800,

@@ -388,14 +388,9 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 
 	/**************************************************************************
 	* This handles the correct damage of "Judgement of Command" (all ranks)
-	*
-	* note: "unkne" contains flags related to aura's and other scripted stuff
 	**************************************************************************/
-	if (m_spellInfo->unkne == 520)
-	{
-		if (!unitTarget->IsStunned())
+	if (m_spellInfo->NameHash == SPELL_HASH_JUDGEMENT_OF_COMMAND && !unitTarget->IsStunned())
 			dmg = dmg >> 1;
-	}
 
 	if(m_spellInfo->speed > 0)
 	{

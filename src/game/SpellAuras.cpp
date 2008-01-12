@@ -1049,7 +1049,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 				}
 			}
 		}
-		uint32 gr = GetSpellProto()->SpellGroupType;
+		uint64 gr = GetSpellProto()->SpellGroupType;
 		if(gr)
 		{
 			Unit*c=GetUnitCaster();
@@ -5330,7 +5330,7 @@ void Aura::SpellAuraHover( bool apply )
 void Aura::SpellAuraAddPctMod( bool apply )
 {
 	int32 val = apply ? mod->m_amount : -mod->m_amount;
-	uint32 AffectedGroups = GetSpellProto()->EffectSpellGroupRelation[mod->i];
+	uint64 AffectedGroups = (uint64)GetSpellProto()->EffectSpellGroupRelation[mod->i] + ((uint64)GetSpellProto()->EffectSpellGroupRelation_high[mod->i] << 32);
 	//printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 
 	switch( mod->m_miscValue )//let's generate warnings for unknown types of modifiers
@@ -5436,17 +5436,16 @@ void Aura::SpellAuraAddPctMod( bool apply )
 }
 
 
-void Aura::SendModifierLog( int32** m, int32 v, uint32 mask, uint8 type, bool pct )
+void Aura::SendModifierLog( int32** m, int32 v, uint64 mask, uint8 type, bool pct )
 {
 	WorldPacket data( SMSG_SET_FLAT_SPELL_MODIFIER + pct, 6 );
 
 	if( *m == 0 )
 	{
 		*m = new int32[SPELL_GROUPS];
-
 		for( uint32 x = 0; x < SPELL_GROUPS; x++ )
 		{
-			if( ( 1 << x ) & mask )
+			if( ( ((uint64)1) << x ) & mask )
 			{
 				(*m)[x] = v;
 
@@ -5468,7 +5467,7 @@ void Aura::SendModifierLog( int32** m, int32 v, uint32 mask, uint8 type, bool pc
 	{
 		for( uint32 x = 0; x < SPELL_GROUPS; x++ )
 		{
-			if( ( 1 << x ) & mask )
+			if( ( ((uint64)1) << x ) & mask )
 			{
 				(*m)[x] += v;
 
@@ -6478,7 +6477,7 @@ void Aura::SpellAuraIncreaseHealingBySpr(bool apply)
 void Aura::SpellAuraAddFlatModifier(bool apply)
 {
 	int32 val = apply?mod->m_amount:-mod->m_amount;
-	uint32 AffectedGroups = GetSpellProto()->EffectSpellGroupRelation[mod->i];
+	uint64 AffectedGroups = (uint64)GetSpellProto()->EffectSpellGroupRelation[mod->i] + ((uint64)GetSpellProto()->EffectSpellGroupRelation_high[mod->i] << 32);
 
 //printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 

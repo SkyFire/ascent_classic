@@ -58,7 +58,6 @@ SMT_RESIST_DISPEL - check if it is used
 - some say that proc spells are not removed after they proc from items and taking items off you. Is this the same unexistatn bug as with talent unlearning ?
 - shadow trance is not removed by first shadow bolt
 - feign death kills player if it expires
-- when combustion triggers it will remove mother aura ..thus itself. Make a way so triggered auras will not remove mother aura
 
 ==========================================================================
 Zack - test my shit :
@@ -108,7 +107,6 @@ Zack - test my shit :
 - druid - Starlight Wrath 16818
 - paladin - Holy shield - 41026
 - http://thottbot.com/i29301
-- mage - combustion 11129 - it adds the bonus but it is never removed
 - shaman - Shamanistic Focus - 43338. It triggers spell 43339 which might need the group flags. Have to update my db
 - Band of the Eternal Defender 35077
 - Band of the Eternal Champion 35080
@@ -166,15 +164,11 @@ Zack - test my shit :
 - warrior - Unbridled Wrath 13002
 - warrior - Improved Intercept 29889
 - warrior - impale 16494
-- warrior - Improved Whirlwind 29776 : here is a list of spells that need somehow the spellgroup set
-	select id,name,description,SpellGroupType,unk201_1,unkne,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3 from dbc_spell where 
-	name like "cone of cold" or name like "cold snap" or name like "ice barrier" or name like "shock" or name like "maul" or name like "whirlwind"
-	- my guees is that unkne is actually some kind of spellgroup2 ?
-
 - warrior - sweeping strike 12328
 - warrior - Improved Mortal Strike 35451
-
 unbridled wrath
+
+
 ==========================================================================
 Capt - test my shit :
 

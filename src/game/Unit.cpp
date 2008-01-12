@@ -1031,6 +1031,13 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									{
 										RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION );
 										RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION_PROC );
+										if( IsPlayer() )
+										{
+											WorldPacket data( 12 );
+											data.SetOpcode( SMSG_COOLDOWN_EVENT );
+											data << origId << GetGUID();
+											SendMessageToSet( &data, true );
+										}
 									}
 									continue;
 								}
@@ -1440,10 +1447,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							if(victim==this || isFriendly(this, victim))
 								continue;
 						}break;
-/*					case 28682: //remove charge only for spell crit
-						{
-							continue; //this is useless, on 1 hand we are increasing this and the other hand we are decreasing it...that results in no action
-						}break;*/
 					}
 				}
 				if(iter2->second.lastproc!=0)
