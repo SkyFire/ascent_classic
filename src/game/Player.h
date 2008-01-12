@@ -1803,7 +1803,7 @@ public:
     void SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, bool type);
     void SendBindPointUpdate(float x,float y,float z,uint32 mapid,uint32 zoneid);
     void SendSetProficiency(uint8 ItemClass, uint32 Proficiency);
-    void SendEnvironmentalDamageLog(uint64 & guid, uint8 type, uint32 damage);
+    void SendEnvironmentalDamageLog(const uint64 & guid, uint8 type, uint32 damage);
     void SendLoginVerifyWorld(uint32 MapId, float x, float y, float z, float o);
     void SendLoginVerifyWorld();
     /************************************************************************/

@@ -220,7 +220,7 @@ void Player::SendSetProficiency(uint8 ItemClass, uint32 Proficiency)
 }
 
 // this one needs to be send inrange...
-void Player::SendEnvironmentalDamageLog(uint64 & guid, uint8 type, uint32 damage)
+void Player::SendEnvironmentalDamageLog(const uint64 & guid, uint8 type, uint32 damage)
 {
     EnvironmentalDamageLogPacket packet;
     packet.Guid = guid;
