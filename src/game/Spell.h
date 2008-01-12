@@ -131,40 +131,44 @@ enum SPELL_MODIFIER_TYPE
 };
 
 
-static void SM_FFValue(int32 *m, float *v,uint64 group)
+static void SM_FFValue( int32* m, float* v, uint64 group )
 {
-    if(m == 0) return;
+    if( m == 0 )
+		return;
 
-    for(uint32 x=0;x<SPELL_GROUPS;x++)
-        if((1<<x) & group)
-            (*v)+=m[x];
+    for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+        if( ( 1i64 << x) & group )
+            (*v) += m[x];
 }
 
-static void SM_FIValue(int32 *m, int32 *v,uint64 group)
+static void SM_FIValue( int32* m, int32* v, uint64 group )
 {
-    if(m == 0) return;
+    if( m == 0 )
+		return;
 
-    for(uint32 x=0;x<SPELL_GROUPS;x++)
-        if((1<<x) & group)
-            (*v)+=m[x];
+    for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+        if( ( 1i64 << x ) & group )
+            (*v) += m[x];
 }
 
-static void SM_PIValue(int32 *m, int32 *v,uint64 group)
+static void SM_PIValue( int32* m, int32* v, uint64 group )
 {
-    if(m == 0) return;
+    if( m == 0 )
+		return;
 
-    for(uint32 x=0;x<SPELL_GROUPS;x++)
-        if((1<<x) & group)
-            (*v)+= ((*v)*(m[x]))/100;
+    for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+        if( ( 1i64 << x ) & group )
+            (*v) += ( (*v) * m[x] ) / 100;
 }
 
-static void SM_PFValue(int32*m, float *v,uint64 group)
+static void SM_PFValue( int32* m, float* v, uint64 group )
 {
-    if(m == 0) return;
+    if( m == 0 )
+		return;
     
-    for(uint32 x=0;x<SPELL_GROUPS;x++)
-        if((1<<x) & group)
-            (*v)+= ((*v)*m[x])/100.0f;
+    for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+        if( ( 1i64 << x ) & group )
+            (*v) += ( (*v) * m[x] ) / 100.0f;
 }
 
 //bool IsBeneficSpell(SpellEntry *sp);
