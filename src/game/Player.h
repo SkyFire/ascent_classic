@@ -1711,9 +1711,6 @@ public:
 	uint32 m_speedChangeCounter;
 
 	void SendAreaTriggerMessage(const char * message, ...);
-	void Set_Mute_on_player(uint32 until);
-	void Remove_Mute_on_player();
-	uint32 HasMuteOnPlayer(){return chat_disabled_until;};
         
 	// Trade Target
 	//Player *getTradeTarget() {return mTradeTarget;};
@@ -1972,7 +1969,6 @@ protected:
 	uint32      m_cooldownTimer;
 	uint32      m_lastHonorResetTime;
 	uint32      _fields[PLAYER_END];
-    uint32	    chat_disabled_until;    //force player to be silent. Yeah i'm pissed of on noobs
 	uint32	    trigger_on_stun;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
 	uint32	    trigger_on_stun_chance; //also using this for mage "Frostbite" talent
 	int			hearth_of_wild_pct;		//druid hearth of wild talent used on shapeshifting. We eighter know what is last talent level or memo on learn

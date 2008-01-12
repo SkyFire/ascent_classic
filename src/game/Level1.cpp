@@ -717,20 +717,6 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 	return true;
 }
 
-bool ChatHandler::HandleSilentPlayerCommand(const char* args, WorldSession *m_session)
-{
-	Player * plr = getSelectedChar(m_session, true);
-	if(plr == 0)
-		return true;
-
-	uint32 time = atol(args);
-	if(!time)
-		time = 5*60*1000 + now();
-	else time = time*60*1000 + now();
-	plr->Set_Mute_on_player(time);
-
-	return true;
-}
 
 
 

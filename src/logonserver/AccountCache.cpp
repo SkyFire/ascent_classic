@@ -121,6 +121,8 @@ void AccountMgr::AddAccount(Field* field)
 	else
 		acct->forcedLocale = false;
 
+    acct->Muted = field[7].GetUInt32();
+
 	// Convert username/password to uppercase. this is needed ;)
 	ASCENT_TOUPPER(Username);
 	ASCENT_TOUPPER(Password);
@@ -162,6 +164,8 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 	}
 	else
 		acct->forcedLocale = false;
+
+	acct->Muted = field[7].GetUInt32();
 
 	// Convert username/password to uppercase. this is needed ;)
 	ASCENT_TOUPPER(Username);

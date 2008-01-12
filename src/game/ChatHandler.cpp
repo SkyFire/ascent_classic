@@ -114,13 +114,12 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 	case CHAT_MSG_WHISPER:
 	case CHAT_MSG_CHANNEL:
 		{
-			if(_player->HasMuteOnPlayer())
+			if( m_muted && m_muted >= (uint32)UNIXTIME )
 			{
-				std::stringstream Reply; 
-				Reply << "Your voice has been taken away for "<< (_player->HasMuteOnPlayer()/1000/60) << " minutes by a GM.";
-				data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, LANG_UNIVERSAL, Reply.str().c_str(), _player->GetGUID(), 3);
+				SystemMessage("Your voice is currently muted by a moderator.");
+				return;
 			}
-		}
+		}break;
 	}
 
 	switch(type)

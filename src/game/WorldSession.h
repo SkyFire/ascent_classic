@@ -708,6 +708,7 @@ public:
 	void SystemMessage(const char * format, ...);
 	uint32 language;
 	WorldPacket* BuildQuestQueryResponse(Quest *qst);
+	uint32 m_muted;
 };
 
 typedef std::set<WorldSession*> SessionSet;

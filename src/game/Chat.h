@@ -225,7 +225,6 @@ protected:
 	bool HandleCalcThreatCommand(const char* args, WorldSession *m_session);
 	bool HandleThreatListCommand(const char* args, WorldSession *m_session);
 	bool HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_session);
-	bool HandleSilentPlayerCommand(const char* args, WorldSession *m_session);
 	bool HandleDebugDumpCoordsCommmand(const char * args, WorldSession * m_session);
     bool HandleSendpacket(const char * args, WorldSession * m_session);
 	bool HandleSQLQueryCommand(const char* args, WorldSession *m_session);
@@ -483,6 +482,7 @@ protected:
 	bool HandleCollisionTestLOS(const char * args, WorldSession * m_session);
 	bool HandleRenameAllCharacter(const char * args, WorldSession * m_session);
 	bool HandleCollisionGetHeight(const char * args, WorldSession * m_session);
+	bool HandleAccountMuteCommand(const char * args, WorldSession * m_session);
 
 	/* For skill related GM commands */
 	SkillNameMgr *SkillNameManager;

@@ -756,6 +756,39 @@ bool ChatHandler::HandleAccountBannedCommand(const char * args, WorldSession * m
 	return true;
 }
 
+bool ChatHandler::HandleAccountMuteCommand(const char * args, WorldSession * m_session)
+{
+	if(!*args) return false;
+
+	char * pAccount = (char*)args;
+	char * pDuration = strchr(pAccount, ' ');
+	if(pDuration == NULL)
+		return false;
+	*pDuration = 0;
+	++pDuration;
+
+	int32 timeperiod = GetTimePeriodFromString(pDuration);
+	if(timeperiod <= 0)
+		return false;
+
+	uint32 banned = (uint32)UNIXTIME+timeperiod;
+
+	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET banned = %u WHERE login = '%s'", banned, CharacterDatabase.EscapeString(string(pAccount)).c_str());
+	sLogonCommHandler.LogonDatabaseReloadAccounts();
+
+	GreenSystemMessage(m_session, "Account '%s' has been muted until %s. The change will be effective with the next reload cycle.", pAccount, 
+		ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str());
+
+	sWorld.DisconnectUsersWithAccount(pAccount, m_session);
+	sGMLog.writefromsession(m_session, "mutex account %s until %s", pAccount, ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str());
+
+	WorldSession * pSession = sWorld.FindSessionByName(pAccount);
+	if( pSession != NULL )
+		pSession->m_muted = banned;
+
+	return true;
+}
+
 bool ChatHandler::HandleAccountFlagsCommand(const char * args, WorldSession * m_session)
 {
     if(!*args) return false;

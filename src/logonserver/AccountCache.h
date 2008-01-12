@@ -32,6 +32,7 @@ struct Account
 	uint8 SrpHash[20];
 	uint8 * SessionKey;
 	string * UsernamePtr;
+	uint32 Muted;
 
 	Account()
 	{

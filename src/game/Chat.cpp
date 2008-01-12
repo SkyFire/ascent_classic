@@ -382,6 +382,7 @@ void CommandTableStorage::Init()
 		{ "flags",	  'z', &ChatHandler::HandleAccountFlagsCommand,	   "Sets flags on account. Pass it username and 0 for Non-TBC or 8 for TBC.", NULL, 0, 0, 0},
 		{ "level",	  'z', &ChatHandler::HandleAccountLevelCommand,    "Sets gm level on account. Pass it username and 0,1,2,3,az, etc.", NULL, 0, 0, 0 },
 		{ "password", 'z', &ChatHandler::HandleAccountPasswordCommand, "Sets password on account. Pass it username password.",	NULL, 0, 0, 0},
+		{ "mute",	  'a', &ChatHandler::HandleAccountMuteCommand,		"Mutes account for <timeperiod>.", NULL, 0, 0, 0 },
 
 		{ NULL, 0, NULL, "", NULL, 0, 0, 0},
 	};
@@ -541,7 +542,6 @@ void CommandTableStorage::Init()
 		{ "lookupquest", 'l', &ChatHandler::HandleQuestLookupCommand, "Looks up quest string x.", NULL, 0, 0, 0 },
 		{ "lookupcreature", 'l', &ChatHandler::HandleLookupCreatureCommand, "Looks up item string x.", NULL, 0, 0, 0 },
 		//{ "reloadscripts", 'w', &ChatHandler::HandleReloadScriptsCommand, "Reloads GM Scripts", NULL, 0, 0, 0 },
-		{ "silentplayer", 't', &ChatHandler::HandleSilentPlayerCommand, "Player cannot chat for x minutes <duration> (default 5 minutes)", NULL, 0, 0, 0 },
 		{ "changepassword", 'z', &ChatHandler::HandleChangePasswordCommand, "Changes your accounts password.", NULL, 0, 0, 0 },
 		{ "rehash", 'z', &ChatHandler::HandleRehashCommand, "Reloads config file.", NULL, 0, 0, 0 },
 		{ "createarenateam", 'g', &ChatHandler::HandleCreateArenaTeamCommands, "Creates arena team", NULL, 0, 0, 0 },

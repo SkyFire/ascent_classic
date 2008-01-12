@@ -326,6 +326,9 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	pSession->m_lastPing = (uint32)UNIXTIME;
 	pSession->language = sLocalizationMgr.GetLanguageId(lang);
 
+	if(recvData.rpos() != recvData.wpos())
+		recvData >> pSession->m_muted;
+
 	for(uint32 i = 0; i < 8; ++i)
 		pSession->SetAccountData(i, NULL, true, 0);
 
