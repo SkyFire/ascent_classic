@@ -332,7 +332,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_comboTarget = 0;
 	m_comboPoints = 0;
 
-	chat_disabled_until		= 0;
 	SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, 0.0f);
 	SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, 0.0f);
 
