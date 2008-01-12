@@ -488,7 +488,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 								if( damage > _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) ) // Can only deal 100% damage.
 									damage = _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH );
 
-								_player->SendEnvironmentalDamageLog( (uint64&)_player->GetGUID(), DAMAGE_FALL, damage );
+								_player->SendEnvironmentalDamageLog( _player->GetGUID(), DAMAGE_FALL, damage );
 								_player->DealDamage( _player, damage, 0, 0, 0 );
 							}
 						}

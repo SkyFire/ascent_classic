@@ -5659,6 +5659,7 @@ void Player::SendInitialLogonPackets()
     data << m_bind_zoneid;
     GetSession()->SendPacket( &data );
 #else
+	WorldPacket data(32);
     SendBindPointUpdate(m_bind_pos_x,m_bind_pos_y,m_bind_pos_z,m_bind_mapid,m_bind_zoneid);
 #endif
 
