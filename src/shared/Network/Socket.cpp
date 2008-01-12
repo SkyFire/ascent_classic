@@ -173,11 +173,11 @@ void Socket::RemoveWriteBufferBytes(uint32 size, bool lock)
 
 string Socket::GetRemoteIP()
 {
-	// inet_ntoa may leak memory, so we'll do this our own way.
-	char * ip = (char*)inet_ntoa(m_client.sin_addr);
-	string ret = string(ip);
-	//free(ip);
-	return ret;
+	char* ip = (char*)inet_ntoa( m_client.sin_addr );
+	if( ip != NULL )
+		return string( ip );
+	else
+		return string( "" );
 }
 
 void Socket::Disconnect()
