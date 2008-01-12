@@ -23,6 +23,8 @@
 #include "BaseConsole.h"
 #include "ConsoleCommands.h"
 
+#include "Master.h"
+
 bool HandleInfoCommand(BaseConsole * pConsole, int argc, const char * argv[])
 {
 	uint32 clientsNum = (uint32)sWorld.GetSessionCount();
@@ -125,7 +127,139 @@ bool HandleWAnnounceCommand(BaseConsole * pConsole, int argc, const char * argv[
 
 bool HandleKickCommand(BaseConsole * pConsole, int argc, const char * argv[])
 {
-	return false;
+	if(argc < 3)
+		return false;
+
+	char pAnnounce[1024];
+	Player * pPlayer;
+
+	pPlayer = objmgr.GetPlayer(argv[1]);
+	if( pPlayer == NULL )
+	{
+		pConsole->Write("Could not find player, %s.\r\n", argv[1]);
+		return true;
+	}
+
+	snprintf(pAnnounce, 1024, "%sConsole:|r %s was kicked from the server for: %s.", MSG_COLOR_LIGHTBLUE, pPlayer->GetName(), argv[2]);
+	pPlayer->BroadcastMessage("You were kicked by the console for: %s", argv[2]);
+	sWorld.SendWorldText(pAnnounce, NULL);
+	pPlayer->Kick(5000);
+	pConsole->Write("Kicked player %s.\r\n", pPlayer->GetName());
+	return true;
+}
+
+bool HandleQuitCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	uint32 delay = 5;
+	if(argc >= 2)
+		delay = atoi(argv[1]);
+
+    sMaster.m_ShutdownTimer = delay * 1000;
+	sMaster.m_ShutdownEvent = true;
+	pConsole->Write("Shutdown initiated.\r\n");
+	return true;
+}
+
+bool HandleCancelCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	pConsole->Write("Shutdown canceled.\r\n");
+	sMaster.m_ShutdownTimer = 5000;
+	sMaster.m_ShutdownEvent = false;
+	return true;
+}
+
+bool HandleUptimeCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	string up = sWorld.GetUptimeString();
+	pConsole->Write("Server Uptime: %s\r\n", up.c_str());
+	return true;
+}
+
+bool HandleBanAccountCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	if(argc < 3)
+		return false;
+
+	int32 timeperiod = GetTimePeriodFromString(argv[2]);
+	if(timeperiod < 0)
+		return false;
+
+	uint32 banned = (timeperiod ? (uint32)UNIXTIME+timeperiod : 1);
+
+	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET banned = %u WHERE login = '%s'", banned, CharacterDatabase.EscapeString(string(argv[1])).c_str());
+	sLogonCommHandler.LogonDatabaseReloadAccounts();
+
+	pConsole->Write("Account '%s' has been banned %s%s. The change will be effective with the next reload cycle.\r\n", argv[1], 
+		timeperiod ? "until " : "forever", timeperiod ? ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str() : "");
+	
+	return true;
+}
+
+bool HandleUnbanAccountCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	if(argc < 2)
+		return false;
+
+	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET banned = 0 WHERE login = '%s'", CharacterDatabase.EscapeString(string(argv[1])).c_str());
+	sLogonCommHandler.LogonDatabaseReloadAccounts();
+
+	pConsole->Write("Account '%s' has been unbanned.\r\n", argv[1]);
+	return true;
+}
+
+bool HandleCreateAccountCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	if(argc < 5)
+		return false;
+
+	const char * username = argv[1];
+	const char * password = argv[2];
+	const char * email = argv[3];
+	uint32 flags = atoi(argv[4]);
+
+	if(strlen(username) == 0 || strlen(password) == 0 || strlen(email) == 0)
+		return false;
+
+	string susername = CharacterDatabase.EscapeString(string(username));
+	string spassword = CharacterDatabase.EscapeString(string(password));
+	string semail = CharacterDatabase.EscapeString(string(email));
+
+	sLogonCommHandler.LogonDatabaseSQLExecute("INSERT INTO accounts (login, password, email, flags) VALUES('%s,'%s','%s',%u)",susername.c_str(), spassword.c_str(),
+		semail.c_str(), flags);
+
+	pConsole->Write("Account created.\r\n");
+	return true;
+}
+
+bool HandleMOTDCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	if(argc < 2)
+		return false;
+
+	sWorld.SetMotd(argv[1]);
+	pConsole->Write("MOTD has been set to '%s'.\r\n", argv[1]);
+	return true;
+}
+
+bool HandlePlayerInfoCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	if(argc < 2)
+		return false;
+
+	Player * plr = objmgr.GetPlayer(argv[1]);
+	if( plr == NULL )
+	{
+		pConsole->Write("Player not found.\r\n");
+		return true;
+	}
+
+	pConsole->Write("Player: %s\r\n", plr->GetName());
+	pConsole->Write("Race: %s\r\n", plr->myRace->name1);
+	pConsole->Write("Class: %s\r\n", plr->myClass->name);
+	pConsole->Write("IP: %s\r\n", plr->GetSession()->GetSocket() ? plr->GetSession()->GetSocket()->GetRemoteIP().c_str() : "disconnected");
+	pConsole->Write("Level: %u\r\n", plr->getLevel());
+	pConsole->Write("Account: %s\r\n", plr->GetSession()->GetAccountNameS());
+	return true;
 }
 
 void TestConsoleLogin(string& username, string& password, uint32 requestno)

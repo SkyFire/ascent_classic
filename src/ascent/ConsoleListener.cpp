@@ -332,6 +332,14 @@ void HandleConsoleInput(BaseConsole * pConsole, const char * szInput)
 		{ &HandleAnnounceCommand, "announce", "<announce string>", "Shows the message in all client chat boxes." },
 		{ &HandleWAnnounceCommand, "wannounce", "<wannounce string>", "Shows the message in all client title areas." },
 		{ &HandleKickCommand, "kick", "<plrname> <reason>", "Kicks player x for reason y." },
+		{ &HandleQuitCommand, "quit", "[delay]", "Shuts down server with optional delay in seconds." },
+		{ &HandleCancelCommand, "cancel", "none", "Cancels a pending shutdown." },
+		{ &HandleUptimeCommand, "uptime", "none", "Shows server uptime." },
+		{ &HandleBanAccountCommand, "banaccount", "<account> <timeperiod>", "Bans account x for time y." },
+		{ &HandleUnbanAccountCommand, "unbanaccount", "<account>", "Unbans account x." },
+		{ &HandleMOTDCommand, "motd", "<new motd>", "Sets MOTD" },
+		{ &HandlePlayerInfoCommand, "playerinfo", "<plrname>", "Shows information about a player." },
+		{ &HandleCreateAccountCommand, "createaccount", "<name> <pass> <email> <flags>", "Creates an account." },
 		{ NULL, NULL, NULL, NULL },
 	};
 
