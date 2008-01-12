@@ -5455,7 +5455,7 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit *target, bool autoshot)
 	//sLog.outString( "Bonus range = %f" , bonusRange );
 	if( dist > maxr)
 	{
-		sLog.outString( "Auto shot failed: out of range (Maxr: %f, Dist: %f)" , maxr , dist );
+		//	sLog.outString( "Auto shot failed: out of range (Maxr: %f, Dist: %f)" , maxr , dist );
 		fail = SPELL_FAILED_OUT_OF_RANGE;
 	}
 
