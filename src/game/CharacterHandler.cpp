@@ -321,29 +321,24 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	}
 
 	QueryResult * resulta = CharacterDatabase.Query("SELECT race FROM characters WHERE acct = %u AND race in (1,3,4,7,11)", _accountId);
-	QueryResult * resulth = CharacterDatabase.Query("SELECT race FROM characters WHERE acct = %u AND race in (2,5,8,9,10)", _accountId);
-	SetSide(0);
-	if (resulta)
+	QueryResult * resulth = CharacterDatabase.Query("SELECT race FROM characters WHERE acct = %u AND race in (2,5,6,8,10)", _accountId);
+	SetSide( 0 );
+	if( resulta != NULL )
 	{
-		SetSide(1);
+		SetSide( 1 );
 		delete resulta;
 	}
-	if (resulth)
+	if( resulth != NULL )
 	{
-		SetSide(2);
+		SetSide( 2 );
 		delete resulth;
 	}
 
-
-
 	//Same Faction limitation only applies to PVP and RPPVP realms :)
 	uint32 realmType = sLogonCommHandler.GetRealmType();
-	if(!HasGMPermissions() && (realmType==REALMTYPE_PVP||realmType==REALMTYPE_RPPVP))
+	if( !HasGMPermissions() && realmType == REALM_PVP )
 	{
-		if(
-			((pNewChar->GetTeam()== 0) && (_side == 2))||
-			((pNewChar->GetTeam()== 1) && (_side == 1))
-			)
+		if( ((pNewChar->GetTeam()== 0) && (_side == 2)) || ((pNewChar->GetTeam()== 1) && (_side == 1)) )
 		{
 			pNewChar->ok_to_remove = true;
 			delete pNewChar;
@@ -355,9 +350,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 		}
 	}
 	pNewChar->UnSetBanned();
-	
 	pNewChar->addSpell(22027);	  // Remove Insignia
-
 
 	if(pNewChar->getClass() == WARLOCK)
 	{

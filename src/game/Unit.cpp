@@ -3410,14 +3410,17 @@ void Unit::castSpell( Spell * pSpell )
 int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg)
 {
 	int32 plus_damage = 0;
-	Unit *caster=this;
-	uint32 school=spellInfo->School;
+	Unit* caster = this;
+	uint32 school = spellInfo->School;
 
-	/* arcane shot shouldnt be affected by +spell damage, TODO for burlex - replace this with a flag. */
+	/* arcane shot and serpent sting shouldnt be affected by +spell damage, TODO for burlex - replace this with a flag. */
 	if( spellInfo->NameHash == SPELL_HASH_ARCANE_SHOT )
 		return 0;
 
-	if(caster->IsPlayer())
+   if ( spellInfo->NameHash == SPELL_HASH_SERPENT_STING )
+        return 0;
+
+	if( caster->IsPlayer() )
 	{
 		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneByInt[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT3)));
 		plus_damage += float2int32(static_cast<Player*>(caster)->SpellDmgDoneBySpr[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT4)));
