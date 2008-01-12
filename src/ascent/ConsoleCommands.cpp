@@ -224,7 +224,7 @@ bool HandleCreateAccountCommand(BaseConsole * pConsole, int argc, const char * a
 	string spassword = CharacterDatabase.EscapeString(string(password));
 	string semail = CharacterDatabase.EscapeString(string(email));
 
-	sLogonCommHandler.LogonDatabaseSQLExecute("INSERT INTO accounts (login, password, email, flags) VALUES('%s,'%s','%s',%u)",susername.c_str(), spassword.c_str(),
+	sLogonCommHandler.LogonDatabaseSQLExecute("INSERT INTO accounts (login, password, email, flags) VALUES('%s','%s','%s',%u)",susername.c_str(), spassword.c_str(),
 		semail.c_str(), flags);
 
 	pConsole->Write("Account created.\r\n");
