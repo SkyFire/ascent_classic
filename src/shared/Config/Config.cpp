@@ -20,7 +20,7 @@
 #include "ConfigEnv.h"
 ConfigMgr Config;
 
-#define _CONFIG_DEBUG
+//#define _CONFIG_DEBUG
 
 ConfigFile::ConfigFile()
 {
