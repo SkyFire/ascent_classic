@@ -2015,9 +2015,11 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	if( c != NULL && m_spellProto->SpellGroupType )
 	{
 		int penalty_pct = 0;
+		int penalty_flt = 0;
 		SM_FIValue( c->SM_PPenalty, &penalty_pct, GetSpellProto()->SpellGroupType );
-		bonus += bonus * penalty_pct / 100;
-		SM_FIValue( c->SM_FPenalty, &bonus, GetSpellProto()->SpellGroupType );
+		bonus += bonus * ( penalty_pct / 100 );
+		SM_FIValue( c->SM_FPenalty, &penalty_flt, GetSpellProto()->SpellGroupType );
+		bonus += penalty_flt;
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		int spell_flat_modifers=0;
 		int spell_pct_modifers=0;

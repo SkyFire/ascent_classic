@@ -1517,7 +1517,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	//If our pet attacks  - flag us.
 	if( pVictim->IsPlayer() && IsPet() )
 	{
-		Player* owner = static_cast< Player* >( GetPetOwner() );
+		Player* owner = static_cast< Player* >( static_cast< Pet* >( this )->GetPetOwner() );
 		if( owner != NULL )
 			if( owner->isAlive() && static_cast< Player* >( pVictim )->DuelingWith != owner )
 				owner->SetPvPFlag();		

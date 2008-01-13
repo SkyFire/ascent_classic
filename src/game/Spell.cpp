@@ -3851,10 +3851,12 @@ void Spell::Heal(int32 amount)
 
 		if(m_spellInfo->SpellGroupType)
 		{
-			int penalty_pct=0;
-			SM_FIValue(u_caster->SM_PPenalty, &penalty_pct, m_spellInfo->SpellGroupType);
-			bonus += bonus*penalty_pct/100;
-			SM_FIValue(u_caster->SM_FPenalty, &bonus, m_spellInfo->SpellGroupType);
+			int penalty_pct = 0;
+			int penalty_flt = 0;
+			SM_FIValue( u_caster->SM_PPenalty, &penalty_pct, m_spellInfo->SpellGroupType );
+			bonus += bonus * ( penalty_pct / 100 );
+			SM_FIValue( u_caster->SM_FPenalty, &penalty_flt, m_spellInfo->SpellGroupType );
+			bonus += penalty_flt;
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 			int spell_flat_modifers=0;
 			int spell_pct_modifers=0;
