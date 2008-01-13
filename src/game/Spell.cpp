@@ -3897,7 +3897,7 @@ void Spell::Heal(int32 amount)
 		bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
 	}
 
-	amount = float2int32( float( amount + bonus ) * healdoneaffectperc ); //apply downranking on final value ?
+	amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
 
 	if(amount < 0) 
 		amount = 0;
