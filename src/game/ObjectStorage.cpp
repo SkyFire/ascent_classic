@@ -85,6 +85,8 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 				itr->Get()->MinHealth = 1;
 			if(!itr->Get()->MaxHealth)
 				itr->Get()->MaxHealth = 1;
+			if (itr->Get()->AttackType > SCHOOL_ARCANE)
+				itr->Get()->AttackType = SCHOOL_NORMAL;
 
 			cn->m_canFlee = cn->m_canRangedAttack = cn->m_canCallForHelp = false;
 			cn->m_fleeHealth = 0.0f;

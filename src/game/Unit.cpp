@@ -2318,7 +2318,7 @@ else
 				dmg.full_damage = float2int32(dmg.full_damage*(float(pct_dmg_mod)/100.0f));
 
 			//a bit dirty fix
-			if(ability && ability->NameHash == 0x8401EC6A)
+			if(ability && ability->NameHash == SPELL_HASH_SHRED)
 				summaryPCTmod += pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
 
 			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
