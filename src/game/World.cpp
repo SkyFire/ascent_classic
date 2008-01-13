@@ -5780,8 +5780,8 @@ void World::PollMailboxInsertQueue(MysqlCon * con)
 	Field * f;
 	Item * pItem;
 	uint32 itemid;
+	uint32 stackcount;
 
-	CharacterDatabase.FWaitExecute("LOCK TABLES `mailbox_insert_queue` WRITE", con);
 	result = CharacterDatabase.FQuery("SELECT * FROM mailbox_insert_queue", con);
 	if( result != NULL )
 	{
@@ -5789,9 +5789,14 @@ void World::PollMailboxInsertQueue(MysqlCon * con)
 		{
 			f = result->Fetch();
 			itemid = f[6].GetUInt32();
+			stackcount = f[7].GetUInt32();
 			
 			if( itemid != 0 )
+			{
 				pItem = objmgr.CreateItem( itemid, NULL );
+				if( pItem != NULL )
+					pItem->SetUInt32Value( ITEM_FIELD_STACK_COUNT, stackcount );
+			}
 			else
 				pItem = NULL;
 
@@ -5800,11 +5805,8 @@ void World::PollMailboxInsertQueue(MysqlCon * con)
 
 		} while ( result->NextRow() );
 		delete result;
-		CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);
 		CharacterDatabase.FWaitExecute("DELETE FROM mailbox_insert_queue", con);
 	}
-	else
-		CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);	
 }
 
 void World::PollCharacterInsertQueue(MysqlCon * con)
