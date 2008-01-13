@@ -101,6 +101,7 @@ Creature::Creature(uint32 high, uint32 low)
     m_canRegenerateHP = true;
 	m_transportGuid = 0;
 	m_transportPosition = NULL;
+	BaseAttackType = SCHOOL_NORMAL;
 }
 
 
