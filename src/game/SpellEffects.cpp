@@ -1168,6 +1168,7 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 		if( unitTarget == m_caster )
 		{
 			/* try to get a selection */
+ 			unitTarget = m_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
 			if( (unitTarget == NULL ) || !isHostile(p_caster, unitTarget) || (unitTarget->CalcDistance(p_caster) > 25.0f))
 				return;
 		}
