@@ -2006,8 +2006,8 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 		{
 			for(uint32 j = 0; j < 3; ++j)
 			{
-				if( p_caster->m_auras[i]->GetSpellProto()->Effect[j] == SPELL_AURA_MOD_STUN || 
-					p_caster->m_auras[i]->GetSpellProto()->Effect[j] == SPELL_AURA_MOD_ROOT )
+				if( p_caster->m_auras[i]->GetSpellProto()->EffectApplyAuraName[j] == SPELL_AURA_MOD_STUN || 
+					p_caster->m_auras[i]->GetSpellProto()->EffectApplyAuraName[j] == SPELL_AURA_MOD_ROOT )
 				{
 					p_caster->m_auras[i]->Remove();
 					break;
