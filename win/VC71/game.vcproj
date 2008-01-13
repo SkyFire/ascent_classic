@@ -313,6 +313,9 @@
 			RelativePath="..\..\src\game\CollideInterface.cpp">
 		</File>
 		<File
+			RelativePath="..\..\src\game\CollideInterface.h">
+		</File>
+		<File
 			RelativePath="..\..\src\game\CombatHandler.cpp">
 		</File>
 		<File
