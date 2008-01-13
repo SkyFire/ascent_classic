@@ -70,24 +70,17 @@ Zack - test my shit :
 	2 ) there is no visual sighn that spell had effect (the negative values are missing ex : 23+1-6)
 - mage - Frost Warding - 28332 - does not reflect
 - Gnomish Poultryizer trinket - Poultryizer - need aura duration to set to 15 sec
-- priest - Force of Will - 18550 - what is the group type to increase here ?, all spells ?
 - palading spiritual atunement procs 2 times.And it should proc if others cast heal spell on paladin
 - mobs continue casting after they die. Test spell CancelSpellCast.Specially test this : CastSpellAoF
 "yes, the thing is that if you have "Heart of the Wild" talent and you reset talents, if you shift you have like 500mil hp & insane dmg. You need to relog in order that things should work fine. Same thing for other talents ... leader of pack, imp leader of pack...they need to relog to lose them."
 - test pet spell targeting
 - aurastate gets consumed after using it
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
-- priest - Focused Mind (33215) - works
 - shaman - Elemental mastery 16166 - crit and mana - Not working sice the aura remove happens before the trigger
 - shaman - Totemic focus 16225
 - shaman - Elemental Devastation 30160
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
 - shaman - Restorative Totems 16208
-- priest - Absolution 33172
-- priest - Mental Agility 14783
-- priest - Focused Power 33190
-- priest - Shadow Reach 17323
-- priest - Shadow Focus 15330
 - warlock - Amplify Curse 18288
 - warlock - Improved Howl of Terror 30057
 - warlock - Bane 17792 affects soulfire too Soul Fire.
@@ -148,8 +141,6 @@ Zack - test my shit :
 - paladin - Divine Purpose 31873
 - paladin - Fanaticism 31883
 - paladin - Seal of Vengeance 31801
-- priest - Improved Divine Spirit 33182
-- priest - Empowered Healing 33182
 
 ==========================================================================
 Capt - test my shit :

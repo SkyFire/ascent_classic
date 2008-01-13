@@ -914,7 +914,7 @@ public:
 	int32 * SM_PDamageBonus;//pct
 	int32 * SM_PSPELL_VALUE;//pct
 	int32 * SM_FSPELL_VALUE;//flat
-	int32 * SM_FResist;//flat
+	int32 * SM_FHitchance;//flat
 	int32 * SM_PAPBonus;//pct
 	int32 * SM_PCost;
 	int32 * SM_FCost;

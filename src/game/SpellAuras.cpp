@@ -6457,13 +6457,16 @@ void Aura::SpellAuraIncreaseSpellDamageBySpr(bool apply)
 
 	if(m_target->IsPlayer())
 	{	
-		for(uint32 x=1;x<7;x++)
+		for(uint32 x=0;x<7;x++)
 		{
 			if (mod->m_miscValue & (((uint32)1)<<x) )
 			{
+				m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) + val);
 				static_cast<Player*>(m_target)->SpellDmgDoneBySpr[x]+=((float)(val))/100;
 			}
 		}
+		if(m_target->IsPlayer())
+			static_cast<Player*>(m_target)->UpdateChanceFields();
 	}
 }
 
@@ -6495,6 +6498,11 @@ void Aura::SpellAuraIncreaseHealingBySpr(bool apply)
 			{
 				static_cast<Player*>(m_target)->SpellHealDoneBySpr[x]+=((float)(val))/100;
 			}
+		}
+		if(m_target->IsPlayer())
+		{
+			static_cast<Player*>(m_target)->UpdateChanceFields();
+			m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) + val);
 		}
 	}
 }
@@ -6555,8 +6563,8 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 		SendModifierLog(&m_target->SM_FSPELL_VALUE,val,AffectedGroups,mod->m_miscValue);
 		break;
 
-	case SMT_RESIST:
-		SendModifierLog(&m_target->SM_FResist,val,AffectedGroups,mod->m_miscValue);
+	case SMT_HITCHANCE:
+		SendModifierLog(&m_target->SM_FHitchance,val,AffectedGroups,mod->m_miscValue);
 		break;
 
 		// as far as I know its not yet used!!!

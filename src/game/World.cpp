@@ -2509,6 +2509,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 45234 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	sp = dbcSpell.LookupEntry( 45243 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	sp = dbcSpell.LookupEntry( 45244 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+
 	//priest - Improved Divine Spirit 
 	sp = dbcSpell.LookupEntry( 33174 ); 
 	if( sp != NULL )
@@ -2524,17 +2525,87 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//priest - Empowered Healing 
-	sp = dbcSpell.LookupEntry( 33174 ); 
+	sp = dbcSpell.LookupEntry( 33158 ); 
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 4096 ;
+		sp->EffectSpellGroupRelation[1] = 2048 ;
 		sp->EffectSpellGroupRelation_high[1] = 4 ;
 	}
-	sp = dbcSpell.LookupEntry( 33182 ); 
+	sp = dbcSpell.LookupEntry( 33159 ); 
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 4096 ;
+		sp->EffectSpellGroupRelation[1] = 2048 ;
 		sp->EffectSpellGroupRelation_high[1] = 4 ;
+	}
+	sp = dbcSpell.LookupEntry( 33160 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4096 ;
+		sp->EffectSpellGroupRelation[1] = 2048 ;
+		sp->EffectSpellGroupRelation_high[1] = 4 ;
+	}
+	sp = dbcSpell.LookupEntry( 33161 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4096 ;
+		sp->EffectSpellGroupRelation[1] = 2048 ;
+		sp->EffectSpellGroupRelation_high[1] = 4 ;
+	}
+	sp = dbcSpell.LookupEntry( 33162 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4096 ;
+		sp->EffectSpellGroupRelation[1] = 2048 ;
+		sp->EffectSpellGroupRelation_high[1] = 4 ;
+	}
+
+	//priest - Force of Will 
+	sp = dbcSpell.LookupEntry( 18544 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
+		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
+		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
+		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
+	}
+	sp = dbcSpell.LookupEntry( 18547 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
+		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
+		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
+		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
+	}
+	sp = dbcSpell.LookupEntry( 18548 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
+		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
+		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
+		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
+	}
+	sp = dbcSpell.LookupEntry( 18549 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
+		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
+		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
+		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
+	}
+	sp = dbcSpell.LookupEntry( 18550 ); 
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
+		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
+		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
+		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
 	}
 
 	//Priest: Shadowguard
@@ -2622,19 +2693,34 @@ bool World::SetInitialWorldSettings()
 	//priest - Shadow Focus 
 	sp = dbcSpell.LookupEntry( 15260 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 67108864UL | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 | 67108864 | 131072 | 2147483648UL | 32768 | 8192 | 16 | 4 | 8388608 | 16384 | 256 | 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 2 | 1024;
+	}
 	sp = dbcSpell.LookupEntry( 15327 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 67108864UL | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 | 67108864 | 131072 | 2147483648UL | 32768 | 8192 | 16 | 4 | 8388608 | 16384 | 256 | 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 2 | 1024;
+	}
 	sp = dbcSpell.LookupEntry( 15328 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 67108864UL | 131072 | 32768 | 16384 | 256 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 | 67108864 | 131072 | 2147483648UL | 32768 | 8192 | 16 | 4 | 8388608 | 16384 | 256 | 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 2 | 1024;
+	}
 	sp = dbcSpell.LookupEntry( 15329 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 | 67108864 | 131072 | 2147483648UL | 32768 | 8192 | 16 | 4 | 8388608 | 16384 | 256 | 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 2 | 1024;
+	}
 	sp = dbcSpell.LookupEntry( 15330 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 | 67108864 | 131072 | 2147483648UL | 32768 | 8192 | 16 | 4 | 8388608 | 16384 | 256 | 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 2 | 1024;
+	}
 
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
@@ -2718,6 +2804,26 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 35364 ); 
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1 | 4;
+
+	//Druid - Celestial Focus
+	sp = dbcSpell.LookupEntry( 16850 ); 
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+	sp = dbcSpell.LookupEntry( 16923 ); 
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+	sp = dbcSpell.LookupEntry( 16924 ); 
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
 
 	//Druid - Feral Aggression. Blizz made a mistake here ?
 	sp = dbcSpell.LookupEntry( 16858 ); 

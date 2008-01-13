@@ -114,7 +114,7 @@ enum SPELL_MODIFIER_TYPE
     // 13 dont exist spells with it
     SMT_COST                =14,// mana/energy/rage cost reduction // GOOD
     SMT_CRITICAL_DAMAGE     =15,// increases critical strike damage bonus (no flat)
-    SMT_RESIST              =16,// enemy resist chance decrease (flat as %) // GOOD need work
+    SMT_HITCHANCE           =16,// enemy resist chance decrease (flat as %) // GOOD need work
     SMT_ADDITIONAL_TARGET   =17,// Your Healing Wave will now jump to additional nearby targets. Each jump reduces the effectiveness of the heal by 80% // GOOD
     SMT_TRIGGER             =18,// adds/increases chance to trigger some spell for example increase chance to apply poisons or entaglin // GOOD need work
     SMT_TIME                =19,// delay for nova, redirection time bonus for totem,maybe smth else // GOOD need work

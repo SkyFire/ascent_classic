@@ -641,10 +641,23 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		int spell_flat_modifers=0;
 		int spell_pct_modifers=0;
-		SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_FRezist_dispell,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PRezist_dispell,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
 			printf("!!!!!spell dipell resist mod flat %d , spell dipell resist mod pct %d , spell dipell resist %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,resistchance,m_spellInfo->SpellGroupType);
+#endif
+	}
+
+	if(m_spellInfo->SpellGroupType && u_caster)
+	{
+		float hitchance=0;
+		SM_FFValue(u_caster->SM_FHitchance,&hitchance,m_spellInfo->SpellGroupType);
+		resistchance -= hitchance;
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		float spell_flat_modifers=0;
+		SM_FFValue(u_caster->SM_FHitchance,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 )
+			printf("!!!!!spell to hit mod flat %f, spell resist chance %f, spell group %u\n",spell_flat_modifers,resistchance,m_spellInfo->SpellGroupType);
 #endif
 	}
 
@@ -2907,6 +2920,14 @@ uint8 Spell::CanCast(bool tolerate)
 	{
 		SM_FFValue( u_caster->SM_FRange, &maxRange, m_spellInfo->SpellGroupType );
 		SM_PFValue( u_caster->SM_PRange, &maxRange, m_spellInfo->SpellGroupType );
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		int spell_pct_modifers=0;
+		SM_FIValue(u_caster->SM_FRange,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PRange,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!spell range bonus mod flat %d , spell range bonus pct %d , spell range %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxRange,m_spellInfo->SpellGroupType);
+#endif
 	}
 
 	// Targeted Location Checks (AoE spells)
@@ -3606,7 +3627,7 @@ exit:
 		SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
 		SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 
-		SM_FIValue(u_caster->SM_PEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
 		SM_FIValue(u_caster->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 
 		//now get mods from unit target. These are rare to find talents

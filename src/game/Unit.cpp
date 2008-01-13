@@ -78,7 +78,7 @@ Unit::Unit()
 	SM_PDamageBonus=0;
 	SM_PSPELL_VALUE=0;
 	SM_FSPELL_VALUE=0;
-	SM_FResist=0;
+	SM_FHitchance=0;
 	SM_PRange=0;//pct
 	SM_PRadius=0;
 	SM_PAPBonus=0;
@@ -249,7 +249,7 @@ Unit::~Unit()
 	if(SM_PDamageBonus != 0) delete [] SM_PDamageBonus ;
 	if(SM_PSPELL_VALUE != 0) delete [] SM_PSPELL_VALUE ;
 	if(SM_FSPELL_VALUE != 0) delete [] SM_FSPELL_VALUE ;
-	if(SM_FResist != 0) delete [] SM_FResist ;
+	if(SM_FHitchance != 0) delete [] SM_FHitchance ;
 	if(SM_PRange != 0) delete [] SM_PRange ;//pct
 	if(SM_PRadius != 0) delete [] SM_PRadius ;
 	if(SM_PAPBonus != 0) delete [] SM_PAPBonus ;
@@ -791,7 +791,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}
 							else continue; //no weapon no joy
 						}break;
-						//Unbridled Wrath
+						//warrior - Unbridled Wrath
 						case 12964:
 						{
 							//let's recalc chance to cast since we have a full 100 all time on this one
@@ -1353,6 +1353,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //requires offensive spell. ! might not cover all spells
 									continue;
 							}break;
+						// druid - Celestial Focus
+						case 16922:
+							{
+								if( !CastingSpell )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_STARFIRE )
+									continue;
+							}break;
 						//item - Band of the Eternal Restorer 
 						case 35087:
 							{
@@ -1867,14 +1875,12 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 
 	if(ability && ability->SpellGroupType)
 	{
-		SM_FFValue(SM_FResist,&hitchance,ability->SpellGroupType);
+		SM_FFValue(SM_FHitchance,&hitchance,ability->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(SM_FDamageBonus,&spell_flat_modifers,ability->SpellGroupType);
-		SM_FIValue(SM_PDamageBonus,&spell_pct_modifers,ability->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell resist mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,hitchance,ability->SpellGroupType);
+		float spell_flat_modifers=0;
+		SM_FFValue(SM_FHitchance,&spell_flat_modifers,ability->SpellGroupType);
+		if(spell_flat_modifers!=0 )
+			printf("!!!!!spell resist mod flat %f,  spell resist bonus %f, spell group %u\n",spell_flat_modifers,hitchance,ability->SpellGroupType);
 #endif
 	}
 	//==========================================================================================
@@ -2150,7 +2156,7 @@ else
 	if(ability && ability->SpellGroupType)
 	{
 		SM_FFValue(SM_CriticalChance,&crit,ability->SpellGroupType);
-		SM_FFValue(SM_FResist,&hitchance,ability->SpellGroupType);
+		SM_FFValue(SM_FHitchance,&hitchance,ability->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 		float spell_flat_modifers=0;
 		SM_FFValue(SM_CriticalChance,&spell_flat_modifers,ability->SpellGroupType);
@@ -5545,11 +5551,11 @@ void Unit::InheritSMMods(Unit *inherit_from)
 			SM_FSPELL_VALUE = new int32[SPELL_GROUPS];
 		memcpy(SM_FSPELL_VALUE,inherit_from->SM_FSPELL_VALUE,sizeof(int)*SPELL_GROUPS);
 	}
-	if(inherit_from->SM_FResist)
+	if(inherit_from->SM_FHitchance)
 	{
-		if(SM_FResist==0)
-			SM_FResist = new int32[SPELL_GROUPS];
-		memcpy(SM_FResist,inherit_from->SM_FResist,sizeof(int)*SPELL_GROUPS);
+		if(SM_FHitchance==0)
+			SM_FHitchance = new int32[SPELL_GROUPS];
+		memcpy(SM_FHitchance,inherit_from->SM_FHitchance,sizeof(int)*SPELL_GROUPS);
 	}
 	if(inherit_from->SM_PRange)
 	{
