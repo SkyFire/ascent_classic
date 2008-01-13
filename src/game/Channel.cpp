@@ -56,7 +56,6 @@ Channel::Channel(const char * name, uint32 team, uint32 type_id)
 	m_name = string(name);
 	m_team = team;
 	m_id = type_id;
-	m_isAutoJoin = false;
 	voice_enabled = sVoiceChatHandler.CanUseVoiceChat();
 
 	pDBC = dbcChatChannels.LookupEntryForced(type_id);
@@ -81,7 +80,6 @@ Channel::Channel(const char * name, uint32 team, uint32 type_id)
 	else
 		m_flags = 0x01;
 
-	m_confSettingLock.Release();
 	i_voice_channel_id = -1;
 }
 
@@ -209,7 +207,7 @@ void Channel::Part(Player * plr)
 		SendToAll(&data);*/
 	}
 
-    if(m_members.size() == 0 && !m_isAutoJoin)
+    if(m_members.size() == 0 )
     {
         m_lock.Release();
 		channelmgr.RemoveChannel(this);

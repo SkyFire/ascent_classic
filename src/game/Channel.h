@@ -94,7 +94,6 @@ public:
 	bool voice_enabled;
 	uint16 i_voice_channel_id;
 	MemberMap m_VoiceMembers;
-	bool m_isAutoJoin;
 
 public:
 	Channel(const char * name, uint32 team, uint32 type_id);
