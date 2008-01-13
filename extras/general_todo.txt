@@ -83,7 +83,6 @@ Zack - test my shit :
 - shaman - Elemental Devastation 30160
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
 - shaman - Restorative Totems 16208
-- Druid - Ferocity 16938. Works only partially
 - priest - Absolution 33172
 - priest - Mental Agility 14783
 - priest - Focused Power 33190
@@ -138,13 +137,6 @@ Zack - test my shit :
 - Hunter : Resourcefulness 34493
 - Hunter : Thrill of the Hunt 34499
 - Hunter - Expose Weakness 34503
-- hunter : Feign Death 5384 
-- druid - Swiftmend 18562
-- druid - Wrath of cenariu 33607
-- Druid - Feral Aggression 16862
-- druid - Shredding Attacks 16968
-- druid - Naturalist 17073
-- druid - Gift of Nature 24946
 - paladin - Healing Light 20239
 - paladin - Sanctified Light 20361
 - paladin - sanctified judgement 31878
@@ -158,14 +150,6 @@ Zack - test my shit :
 - paladin - Seal of Vengeance 31801
 - priest - Improved Divine Spirit 33182
 - priest - Empowered Healing 33182
-- warrior - Focused Rage 29792
-- warrior - Unbridled Wrath 13002
-- warrior - Improved Intercept 29889
-- warrior - impale 16494
-- warrior - sweeping strike 12328
-- warrior - Improved Mortal Strike 35451
-unbridled wrath
-
 
 ==========================================================================
 Capt - test my shit :

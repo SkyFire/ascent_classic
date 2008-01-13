@@ -4216,13 +4216,22 @@ bool World::SetInitialWorldSettings()
 	//warrior - Focused Rage
 	sp = dbcSpell.LookupEntry( 29787 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+	{
+		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824UL | 2048 | 64 | 1024 | 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 8 | 256 | 64;
+	}
 	sp = dbcSpell.LookupEntry( 29790 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+	{
+		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824UL | 2048 | 64 | 1024 | 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 8 | 256 | 64;
+	}
 	sp = dbcSpell.LookupEntry( 29792 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824 | 2048 | 64 | 1024;
+	{
+		sp->EffectSpellGroupRelation[0] = 8 | 1 | 4 | 32 | 2 | 4194304 | 536870912 | 2097152 | 128 | 134217728 | 1073741824UL | 2048 | 64 | 1024 | 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 8 | 256 | 64;
+	}
 
 	//warrior - impale
 	sp = dbcSpell.LookupEntry( 16493 );
@@ -4419,31 +4428,36 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectSpellGroupRelation[1] = 0;
 	}
 	sp = dbcSpell.LookupEntry( 24943 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectSpellGroupRelation[1] = 0;
 	}
 	sp = dbcSpell.LookupEntry( 24944 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectSpellGroupRelation[1] = 0;
 	}
 	sp = dbcSpell.LookupEntry( 24945 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectSpellGroupRelation[1] = 0;
 	}
 	sp = dbcSpell.LookupEntry( 24946 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectSpellGroupRelation[1] = 0;
 	}
 
 	// druid - Empowered Touch

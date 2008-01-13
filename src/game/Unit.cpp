@@ -803,9 +803,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue; //no weapon no joy
 							}
 							else continue; //no weapon no joy
-//							float chance=it->GetProto()->Delay*100*talentlevel/60000;
-							float chance=float(it->GetProto()->Delay)*float(talentlevel)/600.0f;
-							if(!Rand(chance))
+//							float chance=float(it->GetProto()->Delay)*float(talentlevel)/600.0f;
+							float chance=float(it->GetProto()->Delay)*float(talentlevel)/300.0f; //zack this had a very low proc rate. Kinda liek a waisted talent
+							uint32 myroll=RandomUInt(100);
+							if (myroll > chance )
 								continue;
 						}break;
 /*						//disabled by zack until finished : this needs to get trigered on trap trigger and not trap cast
@@ -2402,7 +2403,6 @@ else
 					hit_status |= HITSTATUS_CRICTICAL;
 					int32 dmgbonus = dmg.full_damage;
 					//sLog.outString( "DEBUG: Critical Strike! Full_damage: %u" , dmg.full_damage );
-					
 					if(ability && ability->SpellGroupType)
 					{
 						SM_FIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
