@@ -2674,7 +2674,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[0] = 22845;
 	}
 
-	//Druid - Ferocity. Swipe, mangle and possibly the rest have only partial affects since they are missing groups
+	//Druid - Ferocity.
 	sp = dbcSpell.LookupEntry( 16934 ); 
 	if( sp != NULL )
 	{
@@ -2710,6 +2710,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64 | 1024;
 		sp->EffectSpellGroupRelation[1] = 4096;
 	}
+
+	//Druid - Focused Starlight
+	sp = dbcSpell.LookupEntry( 35363 ); 
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
+	sp = dbcSpell.LookupEntry( 35364 ); 
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 
 	//Druid - Feral Aggression. Blizz made a mistake here ?
 	sp = dbcSpell.LookupEntry( 16858 ); 
