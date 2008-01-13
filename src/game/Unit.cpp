@@ -3413,12 +3413,8 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 	Unit* caster = this;
 	uint32 school = spellInfo->School;
 
-	/* arcane shot and serpent sting shouldnt be affected by +spell damage, TODO for burlex - replace this with a flag. */
-	if( spellInfo->NameHash == SPELL_HASH_ARCANE_SHOT )
+	if( spellInfo->c_is_flags & SPELL_FLAG_IS_NOT_USING_DMG_BONUS )
 		return 0;
-
-   if ( spellInfo->NameHash == SPELL_HASH_SERPENT_STING )
-        return 0;
 
 	if( caster->IsPlayer() )
 	{

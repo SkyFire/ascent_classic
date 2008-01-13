@@ -652,12 +652,18 @@ bool World::SetInitialWorldSettings()
 			sp->procChance = 45;	/* this will do */
 
 		//seal of command
-		if( namehash == SPELL_HASH_SEAL_OF_COMMAND )		
+		else if( namehash == SPELL_HASH_SEAL_OF_COMMAND )		
 			sp->Spell_Dmg_Type = 1;
 
 		//judgement of command
-		if( namehash == SPELL_HASH_JUDGEMENT_OF_COMMAND )		
+		else if( namehash == SPELL_HASH_JUDGEMENT_OF_COMMAND )		
 			sp->Spell_Dmg_Type = 1;
+
+		else if( namehash == SPELL_HASH_ARCANE_SHOT )		
+			sp->c_is_flags |= SPELL_FLAG_IS_NOT_USING_DMG_BONUS;
+
+		else if( namehash == SPELL_HASH_SERPENT_STING )		
+			sp->c_is_flags |= SPELL_FLAG_IS_NOT_USING_DMG_BONUS;
 
 		//Rogue: Posion time fix for 2.3
 		if( strstr( nametext, "Crippling Poison") && sp->Effect[0] == 54 ) //I, II
