@@ -1493,32 +1493,34 @@ void Object::EventSetUInt32Value(uint32 index, uint32 value)
 
 void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId, bool no_remove_auras)
 {
-	Player * plr = 0;
-	if(!pVictim || !pVictim->isAlive() || !pVictim->IsInWorld() || !IsInWorld())
+	Player* plr = 0;
+
+	if( !pVictim || !pVictim->isAlive() || !pVictim->IsInWorld() || !IsInWorld() )
 		return;
-	if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pVictim)->GodModeCheat == true)
+	if( pVictim->GetTypeId() == TYPEID_PLAYER && static_cast< Player* >( pVictim )->GodModeCheat == true )
 		return;
-	if(pVictim->IsSpiritHealer())
+	if( pVictim->IsSpiritHealer() )
 		return;
 	
-	if( pVictim->GetStandState())//not standing-> standup
+	if( pVictim->GetStandState() )//not standing-> standup
 	{
-		pVictim->SetStandState(STANDSTATE_STAND);//probably mobs also must standup
+		pVictim->SetStandState( STANDSTATE_STAND );//probably mobs also must standup
 	}
 
 	// This one is easy. If we're attacking a hostile target, and we're not flagged, flag us.
 	// Also, you WONT get flagged if you are dueling that person - FiShBaIt
-	if(pVictim->IsPlayer() && IsPlayer() && static_cast<Player*>(pVictim)->DuelingWith != static_cast<Player*>(this))
+	if( pVictim->IsPlayer() && IsPlayer() )
 	{
-		if( isHostile( this, pVictim ) )
+		if( isHostile( this, pVictim ) && static_cast< Player* >( pVictim )->DuelingWith != static_cast< Player* >( this ) )
 			static_cast< Player* >( this )->SetPvPFlag();
 	}
 	//If our pet attacks  - flag us.
-	if (this->IsPet())
+	if( pVictim->IsPlayer() && IsPet() )
 	{
-		Pet* uPet = (Pet*)(this);
-		if (uPet->GetPetOwner() && uPet->GetPetOwner()->isAlive())
-			uPet->GetPetOwner()->SetPvPFlag();		
+		Player* owner = static_cast< Player* >( GetPetOwner() );
+		if( owner != NULL )
+			if( owner->isAlive() && static_cast< Player* >( pVictim )->DuelingWith != owner )
+				owner->SetPvPFlag();		
 	}
 
 	if(!no_remove_auras)
