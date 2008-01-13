@@ -186,8 +186,6 @@ public:
 	/* Acct flags */
 	void SetAccountFlags(uint32 flags) { _accountFlags = flags; }
 	bool HasFlag(uint32 flag) { return (_accountFlags & flag) != 0; }
-	uint32 GetSide() { return _side; }
-	void SetSide(uint32 side) { _side = side; };
 
 	/* GM Permission System */
 	void LoadSecurity(std::string securitystring);
@@ -684,7 +682,7 @@ private:
 	uint32 _accountId;
 	uint32 _accountFlags;
 	string _accountName;
-	uint32 _side;
+	int8 _side;
 
 	WoWGuid m_MoverWoWGuid;
 

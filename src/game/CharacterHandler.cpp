@@ -118,6 +118,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 	QueryResult * res;
 	CreatureInfo *info = NULL;
 	uint8 num = 0;
+	uint8 race;
 
 	// should be more than enough.. 200 bytes per char..
 	WorldPacket data(SMSG_CHAR_ENUM, (result ? result->GetRowCount() * 200 : 1));	
@@ -140,12 +141,34 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			bytes2 = fields[6].GetUInt32();
 			Class = fields[3].GetUInt8();			
 			flags = fields[17].GetUInt32();
+			race = fields[3].GetUInt8();
+
+			if( _side < 0 )
+			{
+				// work out the side
+				switch( race )
+				{
+				case RACE_BLOODELF:
+				case RACE_TROLL:
+				case RACE_TAUREN:
+				case RACE_UNDEAD:
+				case RACE_ORC:
+					{
+						_side = 1;
+					}break;
+					
+				default:
+					{
+						_side = 0;
+					}break;
+				}
+			}
 
 			/* build character enum, w0000t :p */
 			data << fields[0].GetUInt64();		// guid
 			data << fields[7].GetString();		// name
 			data << fields[2].GetUInt8();		// race
-			data << fields[3].GetUInt8();		// class
+			data << race;						// class
 			data << fields[4].GetUInt8();		// gender
 			data << fields[5].GetUInt32();		// PLAYER_BYTES
 			data << uint8(bytes2 & 0xFF);		// facial hair
@@ -320,25 +343,11 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	QueryResult * resulta = CharacterDatabase.Query("SELECT race FROM characters WHERE acct = %u AND race in (1,3,4,7,11)", _accountId);
-	QueryResult * resulth = CharacterDatabase.Query("SELECT race FROM characters WHERE acct = %u AND race in (2,5,6,8,10)", _accountId);
-	SetSide( 0 );
-	if( resulta != NULL )
-	{
-		SetSide( 1 );
-		delete resulta;
-	}
-	if( resulth != NULL )
-	{
-		SetSide( 2 );
-		delete resulth;
-	}
-
 	//Same Faction limitation only applies to PVP and RPPVP realms :)
 	uint32 realmType = sLogonCommHandler.GetRealmType();
-	if( !HasGMPermissions() && realmType == REALM_PVP )
+	if( !HasGMPermissions() && realmType == REALM_PVP && _side < 0 )
 	{
-		if( ((pNewChar->GetTeam()== 0) && (_side == 2)) || ((pNewChar->GetTeam()== 1) && (_side == 1)) )
+		if( ((pNewChar->GetTeam()== 0) && (_side == 1)) || ((pNewChar->GetTeam()== 1) && (_side == 0)) )
 		{
 			pNewChar->ok_to_remove = true;
 			delete pNewChar;
