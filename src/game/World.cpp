@@ -5668,7 +5668,7 @@ void World::PollMailboxInsertQueue(MysqlCon * con)
 	uint32 itemid;
 
 	CharacterDatabase.FWaitExecute("LOCK TABLES `mailbox_insert_queue` WRITE", con);
-	result = CharacterDatabase.Query("SELECT * FROM mailbox_insert_queue");
+	result = CharacterDatabase.FQuery("SELECT * FROM mailbox_insert_queue", con);
 	if( result != NULL )
 	{
 		do 

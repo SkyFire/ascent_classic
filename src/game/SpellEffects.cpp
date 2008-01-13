@@ -1999,6 +1999,22 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 
 	p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), dest );
 #endif
+	// just in case
+	for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
+	{
+		if( p_caster->m_auras[i] != NULL )
+		{
+			for(uint32 j = 0; j < 3; ++j)
+			{
+				if( p_caster->m_auras[i]->GetSpellProto()->Effect[j] == SPELL_AURA_MOD_STUN || 
+					p_caster->m_auras[i]->GetSpellProto()->Effect[j] == SPELL_AURA_MOD_ROOT )
+				{
+					p_caster->m_auras[i]->Remove();
+					break;
+				}
+			}
+		}
+	}
 }
 
 void Spell::SpellEffectEnergize(uint32 i) // Energize
