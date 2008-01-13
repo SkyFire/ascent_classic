@@ -5642,6 +5642,7 @@ bool CharacterLoaderThread::run()
 		   WaitForSingleObject will suspend the thread,
 		   and on unix, select will as well. - Burlex
 			*/
+		con->busy.Release();
 #ifdef WIN32
 		WaitForSingleObject(hEvent,LOAD_THREAD_SLEEP*1000);
 #else
