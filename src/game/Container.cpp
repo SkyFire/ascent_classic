@@ -87,8 +87,13 @@ void Container::Create( uint32 itemid, Player *owner )
 	ASSERT(m_itemProto);
 
 	SetUInt32Value( OBJECT_FIELD_ENTRY, itemid );
-	SetUInt64Value( ITEM_FIELD_OWNER, owner->GetGUID() );
-	SetUInt64Value( ITEM_FIELD_CONTAINED, owner->GetGUID() );
+
+	// TODO: this shouldnt get NULL form containers in mail fix me
+	if( owner != NULL )
+	{
+		SetUInt64Value( ITEM_FIELD_OWNER, owner->GetGUID() );
+		SetUInt64Value( ITEM_FIELD_CONTAINED, owner->GetGUID() );
+	}
 	SetUInt32Value( ITEM_FIELD_STACK_COUNT, 1 );
 	SetUInt32Value( CONTAINER_FIELD_NUM_SLOTS, m_itemProto->ContainerSlots);
 
