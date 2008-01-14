@@ -1094,7 +1094,7 @@ bool World::SetInitialWorldSettings()
 						else if( strstr( desc,"finishing moves"))
 							pr|=PROC_ON_CAST_SPELL;
 //						else if( strstr( desc,"shadow bolt, shadowburn, soul fire, incinerate, searing pain and conflagrate"))
-//							pr|=PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF;
+//							pr|=PROC_ON_CAST_SPELL|PROC_TARGET_SELF;
 						//we should find that specific spell (or group) on what we will trigger
 						else pr|=PROC_ON_CAST_SPECIFIC_SPELL;
 					}
@@ -1113,7 +1113,7 @@ bool World::SetInitialWorldSettings()
 					if( strstr( desc, "melee critical strike"))
 						pr|=PROC_ON_CRIT_ATTACK;
 					if( strstr( nametext, "Bloodthirst"))
-						pr|=PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+						pr|=PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 					if( strstr( desc, "experience or honor"))
 						pr|=PROC_ON_GAIN_EXPIERIENCE;
 					if( strstr( desc,"your next offensive ability"))
@@ -1156,7 +1156,7 @@ bool World::SetInitialWorldSettings()
 					{
 						pr|=PROC_ON_DODGE_VICTIM;
 						if( strstr( desc,"add a combo point"))
-							pr|=PROC_TAGRGET_SELF;
+							pr|=PROC_TARGET_SELF;
 					}
 					if( strstr( desc,"fully resisting"))
 						pr|=PROC_ON_RESIST_VICTIM;
@@ -1200,7 +1200,7 @@ bool World::SetInitialWorldSettings()
 					if( strstr( desc,"chance to reflect Fire spells"))
 						pr|=PROC_ON_SPELL_HIT_VICTIM;
 					if( strstr( desc,"hunter takes on the aspects of a hawk"))
-						pr|=PROC_TAGRGET_SELF | PROC_ON_RANGED_ATTACK;
+						pr|=PROC_TARGET_SELF | PROC_ON_RANGED_ATTACK;
 					if( strstr( desc,"successful auto shot attacks"))
 						pr|=PROC_ON_AUTO_SHOT_HIT;
 					if( strstr( desc,"after getting a critical effect from your"))
@@ -1226,7 +1226,7 @@ bool World::SetInitialWorldSettings()
 //				}
 			}//end "if aura"
 		}//end "for each effect"
-		sp->procFlags=pr;
+		sp->procFlags = pr;
 
 		if( strstr( desc, "Must remain seated"))
 		{
@@ -1289,7 +1289,7 @@ bool World::SetInitialWorldSettings()
 		//more triggered spell ids are wrong. I think blizz is trying to outsmart us :S
 		else if( strstr( nametext, "Nature's Guardian"))
 		{
-			sp->EffectTriggerSpell[0]=31616;
+			sp->EffectTriggerSpell[0] = 31616;
 			sp->proc_interval = 5000;
 		}
 		//Chain Heal all ranks %50 heal value (49 + 1)
@@ -1305,7 +1305,7 @@ bool World::SetInitialWorldSettings()
 			if(startofid)
 			{
 				startofid += strlen("over $");
-				sp->EffectTriggerSpell[0]=atoi(startofid);
+				sp->EffectTriggerSpell[0] = atoi(startofid);
 			}
 		}
 		else if( strstr( nametext, "Holy Shock"))
@@ -1315,7 +1315,7 @@ bool World::SetInitialWorldSettings()
 			if(startofid)
 			{
 				startofid += strlen("causing $");
-				sp->EffectTriggerSpell[0]=atoi(startofid);
+				sp->EffectTriggerSpell[0] = atoi(startofid);
 			}
 			//check if we can find in the desription
 			startofid=strstr(desc, " or $");
@@ -1332,7 +1332,7 @@ bool World::SetInitialWorldSettings()
 			if(startofid)
 			{
 				startofid += strlen("cause $");
-				sp->EffectTriggerSpell[0]=atoi(startofid);
+				sp->EffectTriggerSpell[0] = atoi(startofid);
 				sp->EffectTriggerSpell[1]=sp->EffectTriggerSpell[0]; //later versions of this spell changed to eff[1] the aura
 				sp->procFlags = uint32(PROC_ON_MELEE_ATTACK_VICTIM);
 			}
@@ -1345,8 +1345,8 @@ bool World::SetInitialWorldSettings()
 			if(startofid)
 			{
 				startofid += strlen("to deal $");
-				sp->EffectTriggerSpell[0]=atoi(startofid);
-				sp->EffectApplyAuraName[0]=42;
+				sp->EffectTriggerSpell[0] = atoi(startofid);
+				sp->EffectApplyAuraName[0] = 42;
 				sp->procFlags = PROC_ON_MELEE_ATTACK;
 				sp->procChance = 50;
 			}
@@ -1355,7 +1355,7 @@ bool World::SetInitialWorldSettings()
 		else if( strstr( nametext, "Water Shield"))
 		{
 			sp->proc_interval = 3000; //few seconds
-			sp->procFlags |= PROC_TAGRGET_SELF;
+			sp->procFlags |= PROC_TARGET_SELF;
 		}
 		else if( strstr( nametext, "Earth Shield"))
 			sp->proc_interval = 3000; //few seconds
@@ -1407,7 +1407,7 @@ bool World::SetInitialWorldSettings()
 		else if( strstr( nametext, "Blinding Powder"))
 			sp->SpellGroupType |= 0; //not yet known ?*/
 //		else if( strstr( nametext, "Illumination"))
-//			sp->EffectTriggerSpell[0]=20272;
+//			sp->EffectTriggerSpell[0] = 20272;
 		//sp->dummy=result;
 /*		//if there is a proc spell and has 0 as charges then it's probably going to triger infinite times. Better not save these
 		if(sp->procCharges==0)
@@ -1765,31 +1765,31 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 20177 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
         sp->EffectTriggerSpell[0] = 32746;
 	}
 	sp = dbcSpell.LookupEntry( 20179 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
         sp->EffectTriggerSpell[0] = 32746;
 	}
 	sp = dbcSpell.LookupEntry( 20180 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
         sp->EffectTriggerSpell[0] = 32746;
 	}
 	sp = dbcSpell.LookupEntry( 20181 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
         sp->EffectTriggerSpell[0] = 32746;
 	}
 	sp = dbcSpell.LookupEntry( 20182 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
         sp->EffectTriggerSpell[0] = 32746;
 	}
 
@@ -1941,64 +1941,71 @@ bool World::SetInitialWorldSettings()
 	//paladin - Light's Grace
 	sp = dbcSpell.LookupEntry( 31833 );
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CAST_SPELL;;
+		sp->procFlags = PROC_ON_CAST_SPELL;;
 	sp = dbcSpell.LookupEntry( 31835 );
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CAST_SPELL;;
+		sp->procFlags = PROC_ON_CAST_SPELL;;
 	sp = dbcSpell.LookupEntry( 31836 );
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CAST_SPELL;;
+		sp->procFlags = PROC_ON_CAST_SPELL;;
 
 	//shaman - Lightning Overload 
 	sp = dbcSpell.LookupEntry( 30675 ); 
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
-		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 30678 ); 
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
-		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 30679 ); 
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
-		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 30680 ); 
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
-		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 30681 ); 
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;//proc something (we will owerride this)
-		sp->EffectTriggerSpell[0]=39805;//proc something (we will owerride this)
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	}
+
+	//shaman - Energized 
+	sp = dbcSpell.LookupEntry( 43750 ); 
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
 	}
 
 	//shaman - Purge 
 	sp = dbcSpell.LookupEntry( 370 ); 
 	if( sp != NULL )
-		sp->DispelType=DISPEL_MAGIC;
+		sp->DispelType = DISPEL_MAGIC;
 	sp = dbcSpell.LookupEntry( 8012 ); 
 	if( sp != NULL )
-		sp->DispelType=DISPEL_MAGIC;
+		sp->DispelType = DISPEL_MAGIC;
 	sp = dbcSpell.LookupEntry( 27626 ); 
 	if( sp != NULL )
-		sp->DispelType=DISPEL_MAGIC;
+		sp->DispelType = DISPEL_MAGIC;
 	sp = dbcSpell.LookupEntry( 33625 ); 
 	if( sp != NULL )
-		sp->DispelType=DISPEL_MAGIC;
+		sp->DispelType = DISPEL_MAGIC;
 
 	//shaman - Elemental mastery 
 	sp = dbcSpell.LookupEntry( 16166 ); 
@@ -2011,13 +2018,13 @@ bool World::SetInitialWorldSettings()
 	//Shaman - Eye of the Storm
 	sp = dbcSpell.LookupEntry( 29062 );
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	sp = dbcSpell.LookupEntry( 29064 );
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	sp = dbcSpell.LookupEntry( 29065 );
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 
 	//Shaman - Focused Casting
 	sp = dbcSpell.LookupEntry( 29063 );
@@ -2330,19 +2337,19 @@ bool World::SetInitialWorldSettings()
 	//rogue - Find Weakness.
 	sp = dbcSpell.LookupEntry( 31233 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntry( 31239 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntry( 31240 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntry( 31241 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntry( 31242 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 
 	//rogue ( grouping ) Find Weakness
 	group_relation_rogue_find_weakness = 0x00000008 | 0x00000010 | 0x00000100 | 0x00100000 | 0x00800000 | 0x04000000 | 0x20000000;
@@ -2409,19 +2416,19 @@ bool World::SetInitialWorldSettings()
 	//rogue - Mace Specialization.
 	sp = dbcSpell.LookupEntry( 13709 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
 	sp = dbcSpell.LookupEntry( 13800 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
 	sp = dbcSpell.LookupEntry( 13801 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
 	sp = dbcSpell.LookupEntry( 13802 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
 	sp = dbcSpell.LookupEntry( 13803 ); 
 	if( sp != NULL )
-		sp->procFlags=PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
 
 	//rogue - Dirty Tricks 
 	sp = dbcSpell.LookupEntry( 14076 ); 
@@ -2628,25 +2635,25 @@ bool World::SetInitialWorldSettings()
 	//Priest: Shadowguard
 	sp = dbcSpell.LookupEntry( 18137 );
 	if( sp != NULL )
-		sp->EffectTriggerSpell[0]=28377;
+		sp->EffectTriggerSpell[0] = 28377;
 	sp = dbcSpell.LookupEntry( 19308 );
 	if( sp != NULL )
-		sp->EffectTriggerSpell[0]=28378;
+		sp->EffectTriggerSpell[0] = 28378;
 	sp = dbcSpell.LookupEntry( 19309 );
 	if( sp != NULL )
-		sp->EffectTriggerSpell[0]=28379;
+		sp->EffectTriggerSpell[0] = 28379;
 	sp = dbcSpell.LookupEntry( 19310 );
 	if( sp != NULL )
-		sp->EffectTriggerSpell[0]=28380;
+		sp->EffectTriggerSpell[0] = 28380;
 	sp = dbcSpell.LookupEntry( 19311 );
 	if( sp != NULL )
-		sp->EffectTriggerSpell[0]=28381;
+		sp->EffectTriggerSpell[0] = 28381;
 	sp = dbcSpell.LookupEntry( 19312 );
 	if( sp != NULL )
-		sp->EffectTriggerSpell[0]=28382;
+		sp->EffectTriggerSpell[0] = 28382;
 	sp = dbcSpell.LookupEntry( 25477 );
 	if( sp != NULL )
-		sp->EffectTriggerSpell[0]=28385;
+		sp->EffectTriggerSpell[0] = 28385;
 
 	//priest - Absolution 
 	sp = dbcSpell.LookupEntry( 33167 ); 
@@ -2893,14 +2900,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 31785 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TAGRGET_SELF ;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TARGET_SELF ;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
 	sp = dbcSpell.LookupEntry( 33776 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_TARGET_SELF;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
@@ -2973,25 +2980,25 @@ bool World::SetInitialWorldSettings()
 	// Hunter - Master Tactician
 	sp = dbcSpell.LookupEntry( 34506 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 34507 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 34508 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 34838 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 34839 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TARGET_SELF;
 
 	// Hunter - Thrill of the Hunt
 	sp = dbcSpell.LookupEntry( 34497 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF;
 		sp->procChance = sp->EffectBasePoints[0]+1;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 34720;
@@ -2999,7 +3006,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 34498 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF;
 		sp->procChance = sp->EffectBasePoints[0]+1;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 34720;
@@ -3007,7 +3014,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 34499 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF;
 		sp->procChance = sp->EffectBasePoints[0]+1;
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 34720;
@@ -3269,32 +3276,32 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 	   sp->EffectApplyAuraName[1] = 42;
-	   sp->procFlags=PROC_ON_CAST_SPELL;
+	   sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 17107 );
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[1] = 42;
-		 sp->procFlags=PROC_ON_CAST_SPELL;
+		 sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 17108 );
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[1] = 42;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
     //Improved Sprint
 	sp = dbcSpell.LookupEntry( 13743 );
 	if( sp != NULL )
 	{
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 50;
 	}
 	sp = dbcSpell.LookupEntry( 13875 );
 	if( sp != NULL )
 	{
 		sp->procChance = 100;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 
 	//warlock -  soul link
@@ -3303,10 +3310,10 @@ bool World::SetInitialWorldSettings()
 	{
 		//this is for the trigger effect
 		sp->Effect[0]=6;
-		sp->EffectApplyAuraName[0]=42;
+		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 25228;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-		sp->procFlags=PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_TARGET_PET;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_TARGET_PET;
 		//this is for the extra 5% dmg for caster. Yes sadly pet will not receive the bonus
 		sp->Effect[1]=6;
 		sp->EffectApplyAuraName[1]=79;
@@ -3338,7 +3345,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 17941;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 2;
 	}
 	sp = dbcSpell.LookupEntry( 18095 );
@@ -3346,7 +3353,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 17941;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 4;
 	}
 
@@ -3652,23 +3659,23 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 11185 );
 	if( sp != NULL )
 	{    
-		sp->EffectApplyAuraName[0]=42;
-		sp->EffectTriggerSpell[0]=12484;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 12484;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 12487 );
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;
-		sp->EffectTriggerSpell[0]=12485;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 12485;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 12488 );
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;
-		sp->EffectTriggerSpell[0]=12486;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectTriggerSpell[0] = 12486;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 
 	//mage: Fire Power
@@ -3715,7 +3722,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 11129 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF;
 		sp->procCharges = 0;
 		sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
 	}
@@ -3779,30 +3786,30 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 29074 );
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;
+		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 29077;
-		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TARGET_SELF);
 	}
 	sp = dbcSpell.LookupEntry( 29075 );
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;
+		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 29077;
-		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TARGET_SELF);
 	}
 	sp = dbcSpell.LookupEntry( 29076 );
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;
+		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 29077;
-		sp->procFlags=uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TARGET_SELF);
 	}
 
 	//mage: Blazing Speed
 	sp = dbcSpell.LookupEntry( 31641 ); 
-	if( sp != NULL )	sp->EffectTriggerSpell[0]=31643;
+	if( sp != NULL )	sp->EffectTriggerSpell[0] = 31643;
 	sp = dbcSpell.LookupEntry( 31642 );
-	if( sp != NULL )	sp->EffectTriggerSpell[0]=31643;
+	if( sp != NULL )	sp->EffectTriggerSpell[0] = 31643;
 
 	//mage talent "frostbyte". we make it to be dummy
 	sp = dbcSpell.LookupEntry( 11071 );
@@ -3938,7 +3945,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[0] = 6; //aura
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 30294;
-		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_CAST_SPELL|PROC_TARGET_SELF);
 	}
 	sp = dbcSpell.LookupEntry( 30295 );
 	if( sp != NULL )
@@ -3946,7 +3953,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[0] = 6; //aura
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 30294;
-		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_CAST_SPELL|PROC_TARGET_SELF);
 	}
 	sp = dbcSpell.LookupEntry( 30296 );
 	if( sp != NULL )
@@ -3954,7 +3961,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[0] = 6; //aura
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 30294;
-		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_CAST_SPELL|PROC_TARGET_SELF);
 	}
 
 	//warlock - Pyroclasm
@@ -3963,7 +3970,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->Effect[0] = 0; //delete this owerride effect :P
 		sp->EffectTriggerSpell[1] = 18093; //trigger spell was wrong :P
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 13; //god, save us from fixed values !
 	}
 	sp = dbcSpell.LookupEntry( 18096 );
@@ -3971,7 +3978,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->Effect[0] = 0; //delete this owerride effect :P
 		sp->EffectTriggerSpell[1] = 18093; //trigger spell was wrong :P
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 26; //god, save us from fixed values !
 	}
 
@@ -3981,21 +3988,21 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = 42; 
 		sp->procChance =33;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 12872 );
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[0] = 42; 
 		sp->procChance =66;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	sp = dbcSpell.LookupEntry( 12873 );
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[0] = 42; 
 		sp->procChance =100;
-		sp->procFlags=PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 
 	//Nature's Grasp
@@ -4163,17 +4170,17 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 14179 );
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0]=42;//proc spell
+		sp->EffectApplyAuraName[0] = 42;//proc spell
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->EffectBasePoints[1] = 20; //client showes 20% chance but whe do not have it ? :O
 	}
 	//priest - surge of light
 	sp = dbcSpell.LookupEntry( 33150 );
 	if( sp != NULL )
-		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_TARGET_SELF);
 	sp = dbcSpell.LookupEntry( 33154 );
 	if( sp != NULL )
-		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT_VICTIM | PROC_TARGET_SELF);
 	sp = dbcSpell.LookupEntry( 33151 );
 	if( sp != NULL )
 	{
@@ -4213,19 +4220,19 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[0] = 42;
-		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_CAST_SPELL|PROC_TARGET_SELF);
 	}
 	sp = dbcSpell.LookupEntry( 13979 );
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[0] = 42;
-		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_CAST_SPELL|PROC_TARGET_SELF);
 	}
 	sp = dbcSpell.LookupEntry( 13980 );
 	if( sp != NULL )
 	{
 		sp->EffectApplyAuraName[0] = 42;
-		sp->procFlags=uint32(PROC_ON_CAST_SPELL|PROC_TAGRGET_SELF);
+		sp->procFlags = uint32(PROC_ON_CAST_SPELL|PROC_TARGET_SELF);
 	}
 	//this an on equip item spell(2824) :  ice arrow(29501)
 	sp = dbcSpell.LookupEntry( 29501 );
@@ -4241,51 +4248,51 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[2] = 6;
 		sp->EffectApplyAuraName[2] = 42;
 		sp->EffectTriggerSpell[2] = 9174; //not sure if this is the one. In my time this adds 30 rage
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 	}
 	//warrior - improved berserker rage
 	sp = dbcSpell.LookupEntry( 20500 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 20501 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 	//warrior - Rampage
 	sp = dbcSpell.LookupEntry( 29801 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	sp = dbcSpell.LookupEntry( 30030 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	sp = dbcSpell.LookupEntry( 30033 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 
 	//warrior - Unbridled Wrath
 	sp = dbcSpell.LookupEntry( 12322 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 12999 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 13000 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 13001 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntry( 13002 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TAGRGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 
 	//warrior - Booming Voice
 	sp = dbcSpell.LookupEntry( 12321 );
@@ -4849,7 +4856,7 @@ bool World::SetInitialWorldSettings()
 
 	//improoved berserker stance should be triggered on berserker stance use
 	//sp = sSpellStore.LookupEntry(12704);
-	//if( sp != NULL )	sp->procFlags=PROC_ON_CAST_SPECIFIC_SPELL;
+	//if( sp != NULL )	sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
 
 	//sp = sSpellStore.LookupEntry(16280);
 	//if( sp != NULL )	printf("!!Interrupt flags %u interval %u charges %u\n",sp->AuraInterruptFlags,sp->proc_interval,sp->procCharges);

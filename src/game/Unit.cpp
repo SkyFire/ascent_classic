@@ -664,7 +664,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 			if(spellId && Rand(proc_Chance))
 			{
 				SpellCastTargets targets;
-				if(itr2->procFlags & PROC_TAGRGET_SELF)
+				if(itr2->procFlags & PROC_TARGET_SELF)
 					targets.m_unitTarget = GetGUID();
 				else 
 					targets.m_unitTarget = victim->GetGUID();

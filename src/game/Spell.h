@@ -264,7 +264,7 @@ enum procFlags
     PROC_MISC                       = 0x10000000,//our custom flag to decide if proc dmg or shield
     PROC_ON_BLOCK_VICTIM            = 0x20000000,//added it as custom, maybe already exists in another form ?
     PROC_ON_SPELL_CRIT_HIT          = 0x40000000,//added it as custom, maybe already exists in another form ?
-    PROC_TAGRGET_SELF               = 0x80000000,//our custom flag to decide if proc target is self or victim
+    PROC_TARGET_SELF               = 0x80000000,//our custom flag to decide if proc target is self or victim
 };
 
 enum CastInterruptFlags
