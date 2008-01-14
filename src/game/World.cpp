@@ -333,6 +333,8 @@ bool World::SetInitialWorldSettings()
 
 	// Relation Groups
 
+	uint32 group_relation_paladin_healing_light = 0;
+	uint32 group_relation_paladin_sanctified_light = 0;
 	uint32 group_relation_shaman_enhancing_totems = 0;
 	uint32 group_relation_shaman_restorative_totems = 0;
 	uint32 group_relation_shaman_totems = 0;
@@ -1288,7 +1290,7 @@ bool World::SetInitialWorldSettings()
 		}
 		//Improved Aspect of the Hawk
 		else if( strstr( nametext, "Improved Aspect of the Hawk"))
-			sp->EffectSpellGroupRelation[1] = 0x100000;
+			sp->EffectSpellGroupRelation[1] = 0x00100000;
 		//more triggered spell ids are wrong. I think blizz is trying to outsmart us :S
 		else if( strstr( nametext, "Nature's Guardian"))
 		{
@@ -1403,7 +1405,7 @@ bool World::SetInitialWorldSettings()
 
 		//mage Ice Floes affects these spells : Cone of Cold,Cold Snap,Ice Barrier,Ice Block
 		if( sp->NameHash == SPELL_HASH_CONE_OF_COLD || sp->NameHash == SPELL_HASH_COLD_SNAP || sp->NameHash == SPELL_HASH_ICE_BARRIER || sp->NameHash == SPELL_HASH_ICE_BLOCK )
-			sp->EffectSpellGroupRelation[0] = 2097152;
+			sp->EffectSpellGroupRelation[0] = 0x00200000;
 
 /*		else if( strstr( nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
@@ -1471,7 +1473,7 @@ bool World::SetInitialWorldSettings()
 		if( sp->NameHash == SPELL_HASH_BACKLASH)
 		{
 			sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM;
-			sp->EffectSpellGroupRelation[0] = 1 | 8192;
+			sp->EffectSpellGroupRelation[0] = 0x00000001 | 0x00002000;
 			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
 		}
 
@@ -1489,7 +1491,7 @@ bool World::SetInitialWorldSettings()
 		}
 
 		// warlock - intensity
-		if( namehash == SPELL_HASH_INTENSITY)		
+		if( namehash == SPELL_HASH_INTENSITY)
 			sp->EffectSpellGroupRelation[0] |= 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spell
 		else if(
 			((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (sp->AttributesEx & ATTRIBUTESEX_DELAY_SOME_TRIGGERS)) //rogue cold blood
@@ -1681,32 +1683,38 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[1] = 4;
 	}
 
-	//paladin - Healing Light
+	//paladin ( grouping ) Healing Light
+	group_relation_paladin_healing_light = 0x40000000 | 0x80000000;
+
+	//paladin - 
 	sp = dbcSpell.LookupEntry( 20237 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648UL | 1073741824UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
 	sp = dbcSpell.LookupEntry( 20238 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648UL | 1073741824UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
 	sp = dbcSpell.LookupEntry( 20239 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648UL | 1073741824UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
 
 	//paladin - Aura Mastery
 	sp = dbcSpell.LookupEntry( 31821 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 131072 | 67108864 | 8 | 64;
 
+	//paladin ( grouping ) Sanctified Light
+	group_relation_paladin_sanctified_light = 0x80000000;
+
 	//paladin - Sanctified Light
 	sp = dbcSpell.LookupEntry( 20359 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_paladin_sanctified_light;
 	sp = dbcSpell.LookupEntry( 20360 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_paladin_sanctified_light;
 	sp = dbcSpell.LookupEntry( 20361 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_paladin_sanctified_light;
 
 	//paladin - Improved Seal of the Crusader
 	sp = dbcSpell.LookupEntry( 20335 );
