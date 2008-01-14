@@ -684,6 +684,9 @@ bool World::SetInitialWorldSettings()
 		if( strstr( nametext, "Anesthetic Poison") && sp->Effect[0] == 54 ) //I
 			sp->EffectBasePoints[0] = 3599;
 
+        if( strstr( nametext, "Sharpen Blade") && sp->Effect[0] == 54 ) //All BS stones
+            sp->EffectBasePoints[0] = 3599;
+
 		//these mostly do not mix so we can use else 
         // look for seal, etc in name
         if( strstr( nametext, "Seal"))
@@ -2377,7 +2380,6 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
 		sp->EffectSpellGroupRelation[1] = 4194304;
 	}
 	sp = dbcSpell.LookupEntry( 14062 ); 
@@ -2385,7 +2387,6 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
 		sp->EffectSpellGroupRelation[1] = 4194304;
 	}
 	sp = dbcSpell.LookupEntry( 14063 ); 
@@ -2393,7 +2394,6 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
 		sp->EffectSpellGroupRelation[1] = 4194304;
 	}
 	sp = dbcSpell.LookupEntry( 14064 ); 
@@ -2401,7 +2401,6 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
 		sp->EffectSpellGroupRelation[1] = 4194304;
 	}
 	sp = dbcSpell.LookupEntry( 14065 ); 
@@ -2409,7 +2408,6 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
 		sp->EffectSpellGroupRelation[1] = 4194304;
 	}
 
@@ -4659,9 +4657,13 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 16880 );
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+
 	sp = dbcSpell.LookupEntry( 16886 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all spells, too bad not all spells have grouping flags :S
+		sp->procCharges = 0;
+	}
 
 	// druid - Starlight Wrath
 	sp = dbcSpell.LookupEntry( 16814 );
