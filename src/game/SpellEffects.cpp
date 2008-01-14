@@ -3687,7 +3687,20 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 
 void Spell::SpellEffectSanctuary(uint32 i) // Stop all attacks made to you
 {
-	/* Note to burlex: RE-WRITE ME! */
+	if(!u_caster)
+		return;
+
+	Object::InRangeSet::iterator itr = u_caster->GetInRangeOppFactsSetBegin();
+	Object::InRangeSet::iterator itr_end = u_caster->GetInRangeOppFactsSetBegin();
+	Unit * pUnit;
+
+	for( ; itr != itr_end; ++itr ) {
+		pUnit = static_cast<Unit*>(*itr);
+		++itr;
+
+		if( pUnit->GetTypeId() == TYPEID_UNIT )
+			pUnit->GetAIInterface()->RemoveThreatByPtr( u_caster );
+	}
 }
 
 void Spell::SpellEffectAddComboPoints(uint32 i) // Add Combo Points
