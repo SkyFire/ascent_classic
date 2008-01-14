@@ -4380,6 +4380,8 @@ void Aura::SpellAuraFeignDeath(bool apply)
 			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
 			data << uint32(2);
 			pTarget->GetSession()->SendPacket(&data);
+			if( sEventMgr.HasEvent(pTarget,EVENT_PLAYER_FORECED_RESURECT) ) 
+				sEventMgr.RemoveEvents(pTarget,EVENT_PLAYER_FORECED_RESURECT); //in case he forgets to release spirit (afk or something)
 		}
 	}
 }
