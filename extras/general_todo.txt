@@ -142,6 +142,7 @@ Zack - test my shit :
 - paladin - Fanaticism 31883
 - paladin - Seal of Vengeance 31801
 - Hunter : Rapid Killing 34949
+- Hunter - flare 1543
 
 ==========================================================================
 Capt - test my shit :

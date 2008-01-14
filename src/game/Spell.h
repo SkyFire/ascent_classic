@@ -1132,25 +1132,6 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
     return false;
 }
 
-ASCENT_INLINE bool IsTargetingStealthed(SpellEntry *sp)
-{
-	if(
-		sp->EffectImplicitTargetA[0]==3 ||
-		sp->EffectImplicitTargetA[1]==3 ||
-		sp->EffectImplicitTargetA[2]==3 ||
-		sp->EffectImplicitTargetB[0]==3 ||
-		sp->EffectImplicitTargetB[1]==3 ||
-		sp->EffectImplicitTargetB[2]==3 ||
-		sp->EffectImplicitTargetA[0]==22 ||
-		sp->EffectImplicitTargetA[1]==22 ||
-		sp->EffectImplicitTargetA[2]==22 ||
-		sp->EffectImplicitTargetB[0]==22 ||
-		sp->EffectImplicitTargetB[1]==22 ||
-		sp->EffectImplicitTargetB[2]==22 )
-		return 1;
-	return 0;
-}
-
 ASCENT_INLINE bool IsInrange(LocationVector & location, Object * o, float square_r)
 {
     float r = o->GetDistanceSq(location);
@@ -1405,6 +1386,33 @@ typedef enum {
    EFF_TARGET_SELECTED_ENEMY_CHANNELED					= 77,
    EFF_TARGET_SELECTED_ENEMY_DEADLY_POISON				= 86,
 } SpellEffectTarget;
+
+
+ASCENT_INLINE bool IsTargetingStealthed(SpellEntry *sp)
+{
+	if(
+		sp->EffectImplicitTargetA[0]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetA[1]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetA[2]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetB[0]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetB[1]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetB[2]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+		sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+		sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED
+		)
+		return 1;
+	return 0;
+}
 
 // slow
 struct SpellTargetMod

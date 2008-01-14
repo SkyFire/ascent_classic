@@ -37,22 +37,10 @@ Adds to Beast Mastery:
 Unleashed Fury - Broken. Does not increase pet damage.
 Improved Aspect of the Hawk - It procs and shows the buff icon but there's no speed increase at all.
 
-Adds to Marksmanship:
-
-Rapid Killing - Broken. Does not reduce the cooldown of Rapid Fire.
-Ranged Weapon Specialization - Broken. Does not increase damage with ranged weapons.
-
-Adds to Survival:
-
-Hawk Eye - It seems to be affecting only mana-based shots. Should affect Auto-shot as well.
-
-All of these talents are essential for a hunter. Must be fixed asap.
-
 Skills:
 
 Eyes of the Beast - You start to control yourself (!) and you can't do anything until the spell is cancelled. This skill is pretty funny! tongue.gif
 Mend Pet - Still working as a channeled spell. This has changed. Now it should be an instant cast heal over time as of patch 2.1
-Flare - Broken. Does not reveal anyone. A stealthed rogue can dance samba above it.
 Track Hidden - Broken. Does not increase your stealth detection and of course, no target on the mini-map.
 Snake Trap - Never seen it working.
 
