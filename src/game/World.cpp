@@ -2764,10 +2764,10 @@ bool World::SetInitialWorldSettings()
 	//priest - Shadow Reach 
 	sp = dbcSpell.LookupEntry( 17322 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
+		sp->EffectSpellGroupRelation[0] = 32768 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 	sp = dbcSpell.LookupEntry( 17323 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
+		sp->EffectSpellGroupRelation[0] = 32768 | 65536 | 4 | 8192 | 16 | 8388608 | 2147483648UL;
 
 	//priest - Shadow Focus 
 	sp = dbcSpell.LookupEntry( 15260 ); 
