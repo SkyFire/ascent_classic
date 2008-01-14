@@ -35,7 +35,7 @@ Arms - not working stuff
 - Second Wind - some say it doesn't work for all roots and stuns
 
 Fury
-- Imp Berserker Rage - should generate rage when used (no idea if it ever worked)
+- Imp Berserker Rage - should generate rage when used (no idea if it ever worked) - will need effect override for this one
 
 Abilities
 - Intimidating Shout - it's an instant AOE fear, that doesn't work right. It affects the warrior, too. Very important.
