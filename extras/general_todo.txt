@@ -39,6 +39,7 @@ SMT_RESIST_DISPEL - check if it is used
 - The lightning Capacitor- no electrical charge saved from spell criticals so it doesn't fire off lightning bolts.
 - effect 121 should come before eff 31. (bonus calc -> damage) or bonus will not be applied
 - intellect does not increase spell crit chance
+- detect all proc spells that have same name as mother spell and can be stacked more then once
 
 ==========================================================================
 ! BUGS !
@@ -84,7 +85,6 @@ Zack - test my shit :
 - warlock - Amplify Curse 18288
 - warlock - Improved Howl of Terror 30057
 - warlock - Bane 17792 affects soulfire too Soul Fire.
-- mage - Master of Elements 29076 - !
 - rogue - Improved Expose Armor 14169
 - rogue - Vile Poisons 16720
 - rogue - Improved Poisons 14117
@@ -92,7 +92,6 @@ Zack - test my shit :
 - rogue - Find Weakness 31242
 - rogue - Camouflage 14065
 - rogue - Mutilate 34413
-- hunter - hawk eye 19500
 - clearcasting 34754
 - tets code from rev 2378
 - druid - nature's grace 16880 + 16886
@@ -106,14 +105,11 @@ Zack - test my shit :
 - Band of the Eternal Restorer 35086
 - general spell targeting type 30 -> 21172
 - shaman - purge 8012
-- check the prices of the stackable projectiles at vendors to be the same as in db
 - started playin with grounding totem effect, but it is defenetly not finished
 - warlock: Improved Enslave Demon 18822
 - warlock: Master Conjuror 18768 - should work
 - warlock: Demonic Knowledge 35693
 - warlock: Pyroclasm 18096
-- hunter - Expose Weakness 34503
-- hunter - arcane shot 14287
 - warrior - Booming Voice 12838
 - warrior - Improved Commanding Shout 38408
 - mage : Improved Blink 31570
@@ -121,15 +117,7 @@ Zack - test my shit :
 - mage : Empowered Fireball 31660
 - mage : Ice Floes 31672
 - mage : Empowered Frostbolt 31686
-- Hunter : Pathfinding 19560
-- hunter : Steady Shot 34120
-- Hunter : Improved Stings 19468
-- Hunter : Mortal Shots 19490
-- Hunter : Improved Barrage 35111
-- Hunter : Clever Traps 19245
-- Hunter : Resourcefulness 34493
-- Hunter : Thrill of the Hunt 34499
-- Hunter - Expose Weakness 34503
+- mage - Master of Elements 29076 - !
 - paladin - Healing Light 20239
 - paladin - Sanctified Light 20361
 - paladin - sanctified judgement 31878
@@ -141,11 +129,19 @@ Zack - test my shit :
 - paladin - Divine Purpose 31873
 - paladin - Fanaticism 31883
 - paladin - Seal of Vengeance 31801
+- hunter - Expose Weakness 34503
+- hunter - arcane shot 14287
+- hunter - hawk eye 19500
+- Hunter : Pathfinding 19560
+- hunter : Steady Shot 34120
+- Hunter : Improved Stings 19468
+- Hunter : Mortal Shots 19490
+- Hunter : Improved Barrage 35111
+- Hunter : Clever Traps 19245
+- Hunter : Resourcefulness 34493
+- Hunter : Thrill of the Hunt 34499
+- Hunter - Expose Weakness 34503
 - Hunter : Rapid Killing 34949
-- Hunter - flare 1543
-- warrior - Blood Frenzy 30030
-- warrior - Commanding Presence 12861
-- Priest: Shadowguard 25477
 
 ==========================================================================
 Capt - test my shit :

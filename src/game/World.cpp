@@ -2648,49 +2648,49 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 18137 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->proc_interval = 3000; //every 3 seconds
 		sp->EffectTriggerSpell[0] = 28377;
 	}
 	sp = dbcSpell.LookupEntry( 19308 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->proc_interval = 3000; //every 3 seconds
 		sp->EffectTriggerSpell[0] = 28378;
 	}
 	sp = dbcSpell.LookupEntry( 19309 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->proc_interval = 3000; //every 3 seconds
 		sp->EffectTriggerSpell[0] = 28379;
 	}
 	sp = dbcSpell.LookupEntry( 19310 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->proc_interval = 3000; //every 3 seconds
 		sp->EffectTriggerSpell[0] = 28380;
 	}
 	sp = dbcSpell.LookupEntry( 19311 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->proc_interval = 3000; //every 3 seconds
 		sp->EffectTriggerSpell[0] = 28381;
 	}
 	sp = dbcSpell.LookupEntry( 19312 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->proc_interval = 3000; //every 3 seconds
 		sp->EffectTriggerSpell[0] = 28382;
 	}
 	sp = dbcSpell.LookupEntry( 25477 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_RANGED_ATTACK_VICTIM | PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->proc_interval = 3000; //every 3 seconds
 		sp->EffectTriggerSpell[0] = 28385;
 	}
@@ -4351,10 +4351,18 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->EffectApplyAuraName[0] = 42; // who uses 109 aura anyway ?
 	}
+	sp = dbcSpell.LookupEntry( 29859 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42; // who uses 109 aura anyway ?
+	}
+
+	//warrior - Rampage
 	sp = dbcSpell.LookupEntry( 30030 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	sp = dbcSpell.LookupEntry( 30033 );
@@ -4363,6 +4371,12 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
+	sp = dbcSpell.LookupEntry( 30031 );
+	if( sp != NULL )
+		sp->NameHash = SPELL_HASH_RAMPAGE_PROC;
+	sp = dbcSpell.LookupEntry( 30032 );
+	if( sp != NULL )
+		sp->NameHash = SPELL_HASH_RAMPAGE_PROC;
 
 	//warrior - Unbridled Wrath
 	sp = dbcSpell.LookupEntry( 12322 );

@@ -2730,6 +2730,7 @@
 #define SPELL_HASH_CURSE_OF_BLOOD                                                       0xDE7EA8EB
 #define SPELL_HASH_SNUFFLENOSE_COMMAND                                                  0x00A8E26E
 #define SPELL_HASH_RAMPAGE                                                              0x230EFEA1
+#define SPELL_HASH_RAMPAGE_PROC                                                         0x230EFEA2
 #define SPELL_HASH_SUMMON_BOAR_SPIRIT                                                   0x133823B2
 #define SPELL_HASH_CHAIN_BOLT                                                           0x8FD0FA07
 #define SPELL_HASH_DMG2                                                                 0x162094C7

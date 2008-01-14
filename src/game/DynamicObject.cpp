@@ -133,16 +133,29 @@ void DynamicObject::UpdateTargets()
 
 	if(m_aliveDuration >= 100)
 	{
-		FactionRangeList::iterator itr  = m_inRangeOppFactions.begin();
-		FactionRangeList::iterator iend = m_inRangeOppFactions.end();
+//		FactionRangeList::iterator itr  = m_inRangeOppFactions.begin();
+//		FactionRangeList::iterator iend = m_inRangeOppFactions.end();
+		std::set<Object*>::iterator itr = GetInRangeSetBegin(),itr2;
+		std::set<Object*>::iterator iend = GetInRangeSetEnd();
 		Unit * target;
 		Aura * pAura;
 		float radius = m_floatValues[DYNAMICOBJECT_RADIUS]*m_floatValues[DYNAMICOBJECT_RADIUS];
 
 		while(itr != iend)
 		{
-			target = *itr;
+//			target = *itr;
+//			++itr;
+
+			itr2 = itr;
 			++itr;
+
+			if( !( (*itr2)->IsUnit() ) || ! static_cast< Unit* >( *itr2 )->isAlive() )
+				continue;
+
+			target = static_cast< Unit* >( *itr2 );
+
+			if( !isAttackable( p_caster, target, !(m_spellProto->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED) ) )
+				continue;
 
 			// skip units already hit, their range will be tested later
 			if(targets.find(target) != targets.end())
