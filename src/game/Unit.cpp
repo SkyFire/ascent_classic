@@ -1187,6 +1187,18 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									CastingSpell->NameHash != SPELL_HASH_GARROTE )  //Garrote
 									continue;
 							}break;
+						//Priest - Shadowguard
+						case 28377:
+						case 28378:
+						case 28379:
+						case 28380:
+						case 28381:
+						case 28382:
+						case 28385:
+							{
+								if( CastingSpell && ( this == victim || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) ) ) //no self casts allowed or beneficial spells
+									continue;//we can proc on ranged weapons too
+							}break;
 						//Priest - blackout
 						case 15269:
 							{
