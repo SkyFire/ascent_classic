@@ -333,10 +333,15 @@ bool World::SetInitialWorldSettings()
 
 	// Relation Groups
 
+	uint32 group_relation_shaman_enhancing_totems = 0;
+	uint32 group_relation_shaman_restorative_totems = 0;
 	uint32 group_relation_shaman_totems = 0;
 	uint32 group_relation_shaman_lightning = 0;
 	uint32 group_relation_shaman_shock = 0;
+	uint32 group_relation_shaman_mental_quickness = 0;
 	uint32 group_relation_rogue_elusiveness = 0;
+	uint32 group_relation_rogue_poisons = 0;
+	uint32 group_relation_rogue_find_weakness = 0;
 
 	// Start
 
@@ -1720,7 +1725,7 @@ bool World::SetInitialWorldSettings()
 	//paladin - Light's Grace
 	sp = dbcSpell.LookupEntry( 31834 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 0x80000000;
 
 	//paladin - Stoicism
 	sp = dbcSpell.LookupEntry( 31844 );
@@ -2065,36 +2070,42 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 64 | 128 | 256;
 
-	//shaman - Enhancing Totems r1
+	//shaman ( grouping ) Enhancing Totems = Strength of Earth + Grace of Air
+	group_relation_shaman_enhancing_totems = 0x00010000 | 0x00020000;
+
+	//shaman - Enhancing Totems
 	sp = dbcSpell.LookupEntry( 16259 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 65536 | 131072; //Strength of Earth and Grace of Air Totem effects
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_enhancing_totems;
 	sp = dbcSpell.LookupEntry( 16295 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 65536 | 131072;
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_enhancing_totems;
 
 	//shaman - Elemental Fury - ! Not finished !
 	sp = dbcSpell.LookupEntry( 16089 ); 
 	if( sp != NULL )
-//		sp->EffectSpellGroupRelation[0] = 1073741824 | 32 | 1048576 | 1 | ... ; //Searing/Magma/Fire Nova Totem effects and Fire,Frost,Nature spells
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF ; //damn, what other spells do there remain after that list ? Maybe later :P
+		//sp->EffectSpellGroupRelation[0] = 1073741824 | 32 | 1048576 | 1 | ... ; //Searing/Magma/Fire Nova Totem effects and Fire,Frost,Nature spells
 
-	//shaman - Restorative Totems r1
+	//shaman ( grouping ) Restorative Totems = Mana Spring + Healing Stream
+	group_relation_shaman_restorative_totems = 0x00004000 | 0x00002000;
+
+	//shaman - Restorative Totems
 	sp = dbcSpell.LookupEntry( 16259 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 8192; //Mana Spring and Healing Stream Totem effects
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_restorative_totems;
 	sp = dbcSpell.LookupEntry( 16205 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 8192; //Mana Spring and Healing Stream Totem effects
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_restorative_totems;
 	sp = dbcSpell.LookupEntry( 16206 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 8192; //Mana Spring and Healing Stream Totem effects
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_restorative_totems;
 	sp = dbcSpell.LookupEntry( 16207 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 8192; //Mana Spring and Healing Stream Totem effects
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_restorative_totems;
 	sp = dbcSpell.LookupEntry( 16208 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 8192; //Mana Spring and Healing Stream Totem effects
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_restorative_totems;
 	
 	//shaman - Healing Way
 	sp = dbcSpell.LookupEntry( 29202 ); 
@@ -2138,23 +2149,22 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 
-	//shaman - Mental Quickness. ! these are only a part (18 spells have no grouping)
+	//shaman ( grouping ) Mental Quickness (missing 18 spells which have no grouping)
+	group_relation_shaman_mental_quickness = 0x00000008 | 0x00000010 | 0x00000200 | 0x00000400 | 0x00080000 | 0x00100000 | 0x00400000 | 0x20000000 | 0x10000000 | 0x80000000;
+
+	//shaman - Mental Quickness
 	sp = dbcSpell.LookupEntry( 30812 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912UL | 268435456UL | 2147483648UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_mental_quickness;
 	sp = dbcSpell.LookupEntry( 30813 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912UL | 268435456UL | 2147483648UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_mental_quickness;
 	sp = dbcSpell.LookupEntry( 30814 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 8 | 16 | 512 | 1024 | 524288 | 1048576 | 4194304 | 536870912UL | 268435456UL | 2147483648UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_shaman_mental_quickness;
 
-	//shaman - Totems
-	group_relation_shaman_totems |= 536870912UL; //these are only selected flag since some totems contain more then 1 flag
-	group_relation_shaman_totems |= 8;
-	group_relation_shaman_totems |= 16;
-	group_relation_shaman_totems |= 524288;
-	group_relation_shaman_totems |= 4096;
+	//shaman ( grouping ) Totems
+	group_relation_shaman_totems |= 0x00000008 | 0x00000010 | 0x00001000 | 0x00080000 | 0x20000000; //these are only selected flag since some totems contain more then 1 flag
 
 	//shaman - Totemic focus
 	sp = dbcSpell.LookupEntry( 16173 ); 
@@ -2173,8 +2183,8 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = group_relation_shaman_totems;
 
-	//shaman ( grouping ) - Lightning = Lightning Bolt + Chain Lightning
-	group_relation_shaman_lightning = 1 | 2;
+	//shaman ( grouping ) Lightning = Lightning Bolt + Chain Lightning
+	group_relation_shaman_lightning = 0x00000001 | 0x00000002;
 
 	//shaman - Call of Thunder
 	sp = dbcSpell.LookupEntry( 16041 ); 
@@ -2193,8 +2203,8 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = group_relation_shaman_lightning;
 
-    //shaman ( grouping ) Shock : Earth + Flame + Frost Shock
-	group_relation_shaman_shock = 1048576 | 268435456 | 2147483648;
+    //shaman ( grouping ) Shock = Earth + Flame + Frost
+	group_relation_shaman_shock = 0x00100000 | 0x10000000 | 0x80000000;
 
 	//shaman - Convection
 	sp = dbcSpell.LookupEntry( 16039 ); 
@@ -2230,8 +2240,8 @@ bool World::SetInitialWorldSettings()
     if( sp != NULL )
         sp->EffectSpellGroupRelation[0] = group_relation_shaman_shock | group_relation_shaman_lightning;
 
-	//rogue - Elusiveness
-	group_relation_rogue_elusiveness = 2048 | 16777216; // blind + vanish
+	//rogue ( grouping ) Elusiveness = blind + vanish
+	group_relation_rogue_elusiveness = 0x00000800 | 0x01000000;
 
 	//rogue - Elusiveness
 	sp = dbcSpell.LookupEntry( 13981 ); 
@@ -2241,78 +2251,81 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = group_relation_rogue_elusiveness;
 
+	//rogue ( grouping ) Poisons
+	group_relation_rogue_poisons = 0x00002000 | 0x00004000 | 0x00008000 | 0x00010000 | 0x10000000;
+
 	//rogue - Vile Poisons
 	sp = dbcSpell.LookupEntry( 14168 ); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL; //poisons. Duuuh
-		sp->EffectSpellGroupRelation[1] = 8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
+		sp->EffectSpellGroupRelation[1] = 0x00800000; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2] = group_relation_rogue_poisons;
 	}
 	sp = dbcSpell.LookupEntry( 16514 ); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
-		sp->EffectSpellGroupRelation[1] = 8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
+		sp->EffectSpellGroupRelation[1] = 0x00800000; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2] = group_relation_rogue_poisons;
 	}
 	sp = dbcSpell.LookupEntry( 16515 ); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
-		sp->EffectSpellGroupRelation[1] = 8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
+		sp->EffectSpellGroupRelation[1] = 0x00800000; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2] = group_relation_rogue_poisons;
 	}
 	sp = dbcSpell.LookupEntry( 16719 ); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
-		sp->EffectSpellGroupRelation[1] = 8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
+		sp->EffectSpellGroupRelation[1] = 0x00800000; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2] = group_relation_rogue_poisons;
 	}
 	sp = dbcSpell.LookupEntry( 16720 ); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
-		sp->EffectSpellGroupRelation[1] = 8388608; //maybe this is mixed up with 0 grouprelation ?
-		sp->EffectSpellGroupRelation[2] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
+		sp->EffectSpellGroupRelation[1] = 0x00800000; //maybe this is mixed up with 0 grouprelation ?
+		sp->EffectSpellGroupRelation[2] = group_relation_rogue_poisons;
 	}
 
 	//rogue - Improved Poisons
 	sp = dbcSpell.LookupEntry( 14113 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 	sp = dbcSpell.LookupEntry( 14114 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 	sp = dbcSpell.LookupEntry( 14115 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 	sp = dbcSpell.LookupEntry( 14116 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 	sp = dbcSpell.LookupEntry( 14117 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 	sp = dbcSpell.LookupEntry( 21881 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 
 	//rogue - Improved Expose Armor
 	sp = dbcSpell.LookupEntry( 14168 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 524288;
+		sp->EffectSpellGroupRelation[0] = 0x00080000;
 	sp = dbcSpell.LookupEntry( 14169 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 524288;
+		sp->EffectSpellGroupRelation[0] = 0x00080000;
 
 	//rogue - Master Poisoner.
 	sp = dbcSpell.LookupEntry( 31226 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 	sp = dbcSpell.LookupEntry( 31227 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 16384 | 32768 | 8192 | 65536 | 268435456UL;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_poisons;
 
 	//rogue - Find Weakness.
 	sp = dbcSpell.LookupEntry( 31233 ); 
@@ -2330,22 +2343,26 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 31242 ); 
 	if( sp != NULL )
 		sp->procFlags=PROC_ON_CAST_SPELL;
+
+	//rogue ( grouping ) Find Weakness
+	group_relation_rogue_find_weakness = 0x00000008 | 0x00000010 | 0x00000100 | 0x00100000 | 0x00800000 | 0x04000000 | 0x20000000;
+
 	//rogue - Find Weakness. The effect
 	sp = dbcSpell.LookupEntry( 31234 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_find_weakness;
 	sp = dbcSpell.LookupEntry( 31235 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_find_weakness;
 	sp = dbcSpell.LookupEntry( 31236 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_find_weakness;
 	sp = dbcSpell.LookupEntry( 31237 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_find_weakness;
 	sp = dbcSpell.LookupEntry( 31238 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 536870912UL | 8388608UL | 1048576UL | 256 | 8 | 16 | 67108864UL;//damaging spells
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_find_weakness;
 	
 	//rogue - Camouflage.
 	sp = dbcSpell.LookupEntry( 13975 ); 
