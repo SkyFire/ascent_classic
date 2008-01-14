@@ -5942,13 +5942,19 @@ void World::PollMailboxInsertQueue(MysqlCon * con)
 			{
 				pItem = objmgr.CreateItem( itemid, NULL );
 				if( pItem != NULL )
+				{
 					pItem->SetUInt32Value( ITEM_FIELD_STACK_COUNT, stackcount );
+					pItem->SaveToDB( 0, 0, true, NULL );
+				}
 			}
 			else
 				pItem = NULL;
 
 			sMailSystem.SendAutomatedMessage( 0, f[0].GetUInt64(), f[1].GetUInt64(), f[2].GetString(), f[3].GetString(), f[5].GetUInt32(),
 				0, pItem ? pItem->GetGUID() : 0, f[4].GetUInt32() );
+
+			if( pItem != NULL )
+				delete pItem;
 
 		} while ( result->NextRow() );
 		delete result;
