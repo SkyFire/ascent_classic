@@ -4317,7 +4317,7 @@ void Aura::SpellAuraFeignDeath(bool apply)
 		WorldPacket data(50);
 		if(apply)
 		{
-			pTarget->EventDeath();
+			pTarget->EventAttackStop();
 			pTarget->SetFlag(UNIT_FIELD_FLAGS_2, 1);
 			pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH);
 			//pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DEAD);
@@ -4333,9 +4333,10 @@ void Aura::SpellAuraFeignDeath(bool apply)
 			data << uint32(m_spellProto->Id);		// ???
 			pTarget->GetSession()->SendPacket(&data);
 
-			data.Initialize(0x03BE);
-			data << pTarget->GetGUID();
-			pTarget->setDeathState(DEAD);
+			//Zack : removed this packet. As far as i know it is not required
+//			data.Initialize(0x03BE);
+//			data << pTarget->GetGUID();
+//			pTarget->setDeathState(DEAD);
 
 			//now get rid of mobs agro. pTarget->CombatStatus.AttackersForgetHate() - this works only for already attacking mobs
 		    for(std::set<Object*>::iterator itr = pTarget->GetInRangeSetBegin(); itr != pTarget->GetInRangeSetEnd(); itr++ )
@@ -4380,8 +4381,6 @@ void Aura::SpellAuraFeignDeath(bool apply)
 			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
 			data << uint32(2);
 			pTarget->GetSession()->SendPacket(&data);
-			if( sEventMgr.HasEvent(pTarget,EVENT_PLAYER_FORECED_RESURECT) ) 
-				sEventMgr.RemoveEvents(pTarget,EVENT_PLAYER_FORECED_RESURECT); //in case he forgets to release spirit (afk or something)
 		}
 	}
 }
