@@ -170,6 +170,11 @@ int WorldSession::Update(uint32 InstanceID)
 			// If we hit this -> means a packet has changed our map.
 			return 2;
 		}
+
+		if( bDeleted )
+		{
+			return 1;
+		}
 	}
 
 	if(InstanceID != instanceId)
@@ -188,7 +193,7 @@ int WorldSession::Update(uint32 InstanceID)
 			return 0;
 		}
 
-		if( !_socket == NULL )
+		if( _socket == NULL )
 		{
 			bDeleted = true;
 			LogoutPlayer(true);
