@@ -1058,7 +1058,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								else
 								{
 									if( CastingSpell->NameHash != SPELL_HASH_MIND_FLAY && // Mind Flay
-										CastingSpell->NameHash != SPELL_HASH_INNER_FIRE && //SW:P
+										CastingSpell->NameHash != SPELL_HASH_SHADOW_WORD__PAIN && //SW:P
 										CastingSpell->NameHash != SPELL_HASH_VAMPIRIC_TOUCH ) //SoC
 										continue;
 								}
