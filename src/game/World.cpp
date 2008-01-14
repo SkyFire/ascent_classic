@@ -2040,8 +2040,11 @@ bool World::SetInitialWorldSettings()
 	//Shaman - Focused Casting
 	sp = dbcSpell.LookupEntry( 29063 );
 	if( sp != NULL )
+	{
 	//        sp->EffectSpellGroupRelation[0] =  1 | 2 | 64 | 128 | 256;
 		sp->EffectSpellGroupRelation[0] =  0xFFFFFFFF; // shaman spells. Guess that wraps them all 
+		sp->EffectSpellGroupRelation_high[0] =  0xFFFFFFFF; // shaman spells. Guess that wraps them all 
+	}
 
 	//Shaman - Healing Focus
 	sp = dbcSpell.LookupEntry( 16181 );
@@ -2102,8 +2105,11 @@ bool World::SetInitialWorldSettings()
 	//shaman - Elemental Fury - ! Not finished !
 	sp = dbcSpell.LookupEntry( 16089 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF ; //damn, what other spells do there remain after that list ? Maybe later :P
 		//sp->EffectSpellGroupRelation[0] = 1073741824 | 32 | 1048576 | 1 | ... ; //Searing/Magma/Fire Nova Totem effects and Fire,Frost,Nature spells
+		sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF ; //damn, what other spells do there remain after that list ? Maybe later :P
+	}
 
 	//shaman ( grouping ) Restorative Totems = Mana Spring + Healing Stream
 	group_relation_shaman_restorative_totems = 0x00004000 | 0x00002000;
@@ -2684,19 +2690,34 @@ bool World::SetInitialWorldSettings()
 	//priest - Mental Agility - all instant spells. I wonder if it conflicts with any other spells 
 	sp = dbcSpell.LookupEntry( 14520 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
+		sp->EffectSpellGroupRelation_high[0] = 1 | 64 | 2;
+	}
 	sp = dbcSpell.LookupEntry( 14780 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
+		sp->EffectSpellGroupRelation_high[0] = 1 | 64 | 2;
+	}
 	sp = dbcSpell.LookupEntry( 14781 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
+		sp->EffectSpellGroupRelation_high[0] = 1 | 64 | 2;
+	}
 	sp = dbcSpell.LookupEntry( 14782 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
+		sp->EffectSpellGroupRelation_high[0] = 1 | 64 | 2;
+	}
 	sp = dbcSpell.LookupEntry( 14783 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 2147483648UL | 65536 | 67108864UL | 4 | 1 | 64 | 32 | 4194304UL | 32768 | 8388608UL | 8 | 16384 | 2 | 256 | 16777216UL | 2097152UL | 33554432UL;
+		sp->EffectSpellGroupRelation_high[0] = 1 | 64 | 2;
+	}
 
 	//priest - Focused Power
 	sp = dbcSpell.LookupEntry( 33186 ); 
@@ -3055,6 +3076,27 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 19560 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2097152;
+
+	//Hunter : Rapid Killing - might need to add honor trigger too here. I'm guessing you receive Xp too so i'm avoiding double proc
+	sp = dbcSpell.LookupEntry( 34948 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_GAIN_EXPIERIENCE | PROC_TARGET_SELF;
+		sp->EffectSpellGroupRelation[1] = 32;
+	}
+	sp = dbcSpell.LookupEntry( 34949 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_GAIN_EXPIERIENCE | PROC_TARGET_SELF;
+		sp->EffectSpellGroupRelation[1] = 32;
+	}
+	//Hunter : Rapid Killing - PROC
+	sp = dbcSpell.LookupEntry( 35098 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 131072 | 2048 | 1;
+	sp = dbcSpell.LookupEntry( 35099 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 131072 | 2048 | 1;
 
 	//Hunter : Improved Stings
 	sp = dbcSpell.LookupEntry( 19464 );

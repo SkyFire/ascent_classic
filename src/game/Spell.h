@@ -1764,6 +1764,14 @@ public:
                 {
                     SM_FIValue(u_caster->SM_FDur,(int32*)&this->Dur,m_spellInfo->SpellGroupType);
                     SM_PIValue(u_caster->SM_PDur,(int32*)&this->Dur,m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+					int spell_flat_modifers=0;
+					int spell_pct_modifers=0;
+					SM_FIValue(u_caster->SM_FDur,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+					SM_FIValue(u_caster->SM_PDur,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+					if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+						printf("!!!!!spell duration mod flat %d , spell duration mod pct %d , spell duration %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Dur,m_spellInfo->SpellGroupType);
+#endif
                 }
             }
             else
@@ -1788,15 +1796,15 @@ public:
         {
             SM_FFValue(u_caster->SM_FRadius,&Rad[i],m_spellInfo->SpellGroupType);
             SM_PFValue(u_caster->SM_PRadius,&Rad[i],m_spellInfo->SpellGroupType);
-        }
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell radius mod flat %d , spell radius mod pct %d , spell radius %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Rad[i],m_spellInfo->SpellGroupType);
+			int spell_flat_modifers=0;
+			int spell_pct_modifers=0;
+			SM_FIValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+				printf("!!!!!spell radius mod flat %d , spell radius mod pct %d , spell radius %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Rad[i],m_spellInfo->SpellGroupType);
 #endif
+        }
 
         return Rad[i];
     }

@@ -141,6 +141,7 @@ Zack - test my shit :
 - paladin - Divine Purpose 31873
 - paladin - Fanaticism 31883
 - paladin - Seal of Vengeance 31801
+- Hunter : Rapid Killing 34949
 
 ==========================================================================
 Capt - test my shit :
