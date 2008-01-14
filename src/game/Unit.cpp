@@ -791,6 +791,16 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}
 							else continue; //no weapon no joy
 						}break;
+						//warrior - Blood Frenzy
+						case 30069:
+						case 30070:
+						{
+							if( !CastingSpell )
+								continue;
+								if( CastingSpell->NameHash != SPELL_HASH_REND && 
+									CastingSpell->NameHash != SPELL_HASH_DEEP_WOUNDS )
+									continue;
+						}break;
 						//warrior - Unbridled Wrath
 						case 12964:
 						{

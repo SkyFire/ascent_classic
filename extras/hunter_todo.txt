@@ -63,14 +63,3 @@ Most times if someone try to buff your pet will reset all stats to zero.
 
 Excluding the skills/spells, all training will be reset after some time and you'll get all training points back.
 
-In addition:
-
-There are a lot of beasts which should be tameable, but you can't tame them. You'll be able cast Tame Beast but nothing happens after it's done. I don't know if this is a core or DB issue. If it's DB just ignore.
-
-Some examples are:
-
-Blackwind Sabercat
-Scythetooth Raptor
-Ripfang Lynx
-And the vast majority of beasts inside instances.
-

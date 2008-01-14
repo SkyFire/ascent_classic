@@ -143,6 +143,7 @@ Zack - test my shit :
 - paladin - Seal of Vengeance 31801
 - Hunter : Rapid Killing 34949
 - Hunter - flare 1543
+- warrior - Blood Frenzy 30030
 
 ==========================================================================
 Capt - test my shit :

@@ -4305,17 +4305,28 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 20501 );
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
-	//warrior - Rampage
-	sp = dbcSpell.LookupEntry( 29801 );
+
+	//warrior - berserker rage is missing 1 effect = regenerate rage
+	sp = dbcSpell.LookupEntry( 18499 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
-		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
+		sp->Effect[2] = 6;
+		sp->EffectApplyAuraName[2] = 42;
+		sp->EffectTriggerSpell[2] = 9174; //not sure if this is the one. In my time this adds 30 rage
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
+	}
+
+	//warrior - Blood Frenzy
+	sp = dbcSpell.LookupEntry( 29836 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectApplyAuraName[0] = 42; // who uses 109 aura anyway ?
 	}
 	sp = dbcSpell.LookupEntry( 30030 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
 	sp = dbcSpell.LookupEntry( 30033 );
