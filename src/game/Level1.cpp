@@ -719,5 +719,3 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 
 
 
-
-

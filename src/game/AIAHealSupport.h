@@ -31,10 +31,20 @@ class SpellCastTargets;
 #define SPELL_COOLD_PCT_SCALE_WITH_DIFFICULTY 0.2f	//given as a float value we influence the effectiveness of our spells
 #define CREATURE_STATS_SCALE_WITH_DIFFICULTY 1
 
-#define HELPER_MOUNT_DISPLAY 14584
+#define HELPER_MOUNT_A_DISPLAY 14584
+#define HELPER_MOUNT_H_DISPLAY 5228
+
+#define OWNER_SIDE_HORDE 0
+#define OWNER_SIDE_ALIANCE 1
 
 #define HealSpellCount 10
 #define HealSpellLevels 17
+
+#define AugmentSpellCount 5
+#define AugmentSpellLevels 6
+
+#define PartySpellCount 3
+#define PartySpellLevels 4
 
 typedef std::map<uint32, uint32> CooldownMap;
 
@@ -53,13 +63,15 @@ private:
 
 	SpellEntry			*m_HealSpells[HealSpellLevels][HealSpellCount];	//used to take actions on target
 	float				m_HealSpellsEficiency[HealSpellLevels][HealSpellCount];		
+	SpellEntry			*m_AugmentSpells[AugmentSpellLevels][AugmentSpellCount];	//before we start to maniacly heal our master we should try to cast these
+	SpellEntry			*m_PartySpells[PartySpellLevels][PartySpellCount];	//before we start to maniacly heal our master we should try to cast these
 	SpellEntry			*m_defend_self;
-/*	list<SpellEntry*>	m_HealGroupSpells;	//used to take actions on target
-	list<SpellEntry*>	m_AugmentSpells;	//low priority spells	*/
 	SpellEntry			*revive_spell;
 	CooldownMap			spell_cooldown_map;
 	uint32				DifficultyLevel; //spell values should scale up with the level of the support unit 
 	SpellEntry			*m_castingSpell;
+	uint8				Owner_side; //can be A or H
+	bool				last_time_full_health;
 };
 
 #endif

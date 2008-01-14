@@ -390,6 +390,9 @@ protected:
 	bool HandleAddPetSpellCommand(const char* args, WorldSession* m_session);
 	bool HandleRemovePetSpellCommand(const char* args, WorldSession* m_session);
 	bool HandleRenamePetCommand(const char* args, WorldSession* m_session);
+#ifdef USE_SPECIFIC_AIAGENTS
+	bool HandlePetSpawnAIBot(const char * args, WorldSession * m_session);
+#endif
 
 	// shutdown
 	bool HandleShutdownCommand(const char* args, WorldSession* m_session);
@@ -483,7 +486,6 @@ protected:
 	bool HandleRenameAllCharacter(const char * args, WorldSession * m_session);
 	bool HandleCollisionGetHeight(const char * args, WorldSession * m_session);
 	bool HandleAccountMuteCommand(const char * args, WorldSession * m_session);
-
 	/* For skill related GM commands */
 	SkillNameMgr *SkillNameManager;
 };

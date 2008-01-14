@@ -840,6 +840,7 @@ public:
 
 	// AIInterface
 	AIInterface *GetAIInterface() { return m_aiInterface; }
+	void ReplaceAIInterface(AIInterface *new_interface) ;
 	void ClearHateList();
 	void WipeHateList();
 	void WipeTargetList();

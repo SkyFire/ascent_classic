@@ -44,13 +44,25 @@ void AiAgentHealSupport::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 	AIInterface::Init(un,at,mt,owner);//run the original init and we add our custom stuff too
 
 	m_fallowAngle = 2 * PI - PI / 6;
+	FollowDistance = 5 ; //we are support, we stand behind our master 
 
 	DifficultyLevel = m_PetOwner->GetUInt32Value(UNIT_FIELD_LEVEL) / HealSpellLevels;
 	if( DifficultyLevel > HealSpellLevels - 2 )
 		DifficultyLevel = HealSpellLevels - 2;
 	//scale health and mana
-	m_Unit->SetUInt32Value( UNIT_FIELD_HEALTH , m_Unit->GetUInt32Value( UNIT_FIELD_BASE_HEALTH ) * DifficultyLevel * CREATURE_STATS_SCALE_WITH_DIFFICULTY );
-	m_Unit->SetUInt32Value( UNIT_FIELD_POWER1 , m_Unit->GetUInt32Value( UNIT_FIELD_BASE_MANA ) * DifficultyLevel * CREATURE_STATS_SCALE_WITH_DIFFICULTY );
+	m_Unit->SetUInt32Value( UNIT_FIELD_MAXHEALTH , m_Unit->GetUInt32Value( UNIT_FIELD_BASE_HEALTH ) * DifficultyLevel * CREATURE_STATS_SCALE_WITH_DIFFICULTY );
+	m_Unit->SetUInt32Value( UNIT_FIELD_MAXPOWER1 , m_Unit->GetUInt32Value( UNIT_FIELD_BASE_MANA ) * DifficultyLevel * CREATURE_STATS_SCALE_WITH_DIFFICULTY );
+	m_Unit->SetUInt32Value( UNIT_FIELD_HEALTH , m_Unit->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) );
+	m_Unit->SetUInt32Value( UNIT_FIELD_POWER1 , m_Unit->GetUInt32Value( UNIT_FIELD_MAXPOWER1 ) );
+
+	uint8 race = m_PetOwner->getRace();
+
+	if( race == RACE_HUMAN || race == RACE_DWARF || race == RACE_NIGHTELF || race == RACE_GNOME || race == RACE_DRAENEI )
+		Owner_side = OWNER_SIDE_ALIANCE;
+	else
+		Owner_side = OWNER_SIDE_HORDE;
+
+	last_time_full_health = true; //before we start healing we should try to quick augment our master
 
 	m_defend_self = dbcSpell.LookupEntry( 642 ); // Divine Shield 1
 
@@ -61,8 +73,66 @@ void AiAgentHealSupport::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
 
 	//we are using const lists. You don't like it ? Write your own AI :P
 	//owner : Lesser Heal, Flash Heal, heal, Healing Touch, Greater Heal, Great Heal, Heal Brethren, Debuff Uber Heal Over Time
-	//group : Prayer of Healing, Chain Heal, Healing Aura, Powerful Healing Ward
+	//group : Prayer of Healing, Chain Heal, Healing Aura
 	//augment : Uber Heal Over Time, Spiritual Healing,Healing Light, renew
+	//augment : renew, power word shield, Dampen Magic, Blessing of Sanctuary 
+	local_itr = 0;
+	local_itr2 = 0;
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 596 ); // Prayer of Healing 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 10960 ); // Prayer of Healing 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 10961 ); // Prayer of Healing 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 25308 ); // Prayer of Healing 1
+
+	local_itr++;
+	local_itr2 = 0;
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 1064 ); // Chain Heal 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 10623 ); // Chain Heal 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 25423 ); // Chain Heal 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 33642 ); // Chain Heal 1
+
+	local_itr++;
+	local_itr2 = 0;
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 5607 ); // Healing Aura 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 5016 ); // Healing Aura 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 15870 ); // Healing Aura 1
+	m_PartySpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 11900 ); // Healing Aura 1
+
+	local_itr = 0;
+	local_itr2 = 0;
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 139 ); // Renew 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 6076 ); // Renew 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 10927 ); // Renew 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 25221 ); // Renew 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 37260 ); // Renew 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 36969 ); // Renew 2
+
+	local_itr++;
+	local_itr2 = 0;
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 17 ); // Power Word: Shield 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 3747 ); // Power Word: Shield 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 10898 ); // Power Word: Shield 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 10901 ); // Power Word: Shield 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 25217 ); // Power Word: Shield 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 25218 ); // Power Word: Shield 2
+
+	local_itr++;
+	local_itr2 = 0;
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 604 ); // Dampen Magic 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 8450 ); // Dampen Magic 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 8451 ); // Dampen Magic 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 10173 ); // Dampen Magic 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 10174 ); // Dampen Magic 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 33944 ); // Dampen Magic 2
+
+	local_itr++;
+	local_itr2 = 0;
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 20911 ); // Blessing of Sanctuary 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 20913 ); // Blessing of Sanctuary 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 20914 ); // Blessing of Sanctuary 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 20914 ); // Blessing of Sanctuary 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 27168 ); // Blessing of Sanctuary 1
+	m_AugmentSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 27169 ); // Blessing of Sanctuary 2
+
 	local_itr = 0;
 	local_itr2 = 0;
 	m_HealSpells[local_itr2++][local_itr] = dbcSpell.LookupEntry( 2050 ); // Lesser Heal 1
@@ -355,6 +425,14 @@ printf("we do have a target\n");
 	if( m_Unit->isCasting() )
 		return; // we are already supporting someone ...get back later
 
+	//for fun : mimic master standstate. Note that this might give strange results
+	if( m_PetOwner->GetStandState() != m_Unit->GetStandState() )
+		m_Unit->SetStandState( m_PetOwner->GetStandState() );
+
+	//we should be at same level at owner so we profit of fighting formulas same as owner
+	if(	m_Unit->GetUInt32Value( UNIT_FIELD_LEVEL ) != m_PetOwner->GetUInt32Value( UNIT_FIELD_LEVEL ) )
+		m_Unit->SetUInt32Value( UNIT_FIELD_LEVEL, m_PetOwner->GetUInt32Value( UNIT_FIELD_LEVEL ) );
+
 printf("we are not casting\n");
 
 	uint32 new_DifficultyLevel = m_PetOwner->GetUInt32Value(UNIT_FIELD_LEVEL) / HealSpellLevels;
@@ -363,17 +441,31 @@ printf("we are not casting\n");
 		if( new_DifficultyLevel > HealSpellLevels - 2 )
 			new_DifficultyLevel = HealSpellLevels - 2;
 		DifficultyLevel = new_DifficultyLevel;
-		//scale health and mana
-		m_Unit->SetUInt32Value( UNIT_FIELD_HEALTH , m_Unit->GetUInt32Value( UNIT_FIELD_BASE_HEALTH ) * new_DifficultyLevel * CREATURE_STATS_SCALE_WITH_DIFFICULTY );
-		m_Unit->SetUInt32Value( UNIT_FIELD_POWER1 , m_Unit->GetUInt32Value( UNIT_FIELD_BASE_MANA ) * new_DifficultyLevel * CREATURE_STATS_SCALE_WITH_DIFFICULTY );
+		//scale health and mana.when we level we max out our stats
+		m_Unit->SetUInt32Value( UNIT_FIELD_MAXHEALTH , m_Unit->GetUInt32Value( UNIT_FIELD_BASE_HEALTH ) * new_DifficultyLevel * CREATURE_STATS_SCALE_WITH_DIFFICULTY );
+		m_Unit->SetUInt32Value( UNIT_FIELD_MAXPOWER1 , m_Unit->GetUInt32Value( UNIT_FIELD_BASE_MANA ) * new_DifficultyLevel * CREATURE_STATS_SCALE_WITH_DIFFICULTY );
+		m_Unit->SetUInt32Value( UNIT_FIELD_HEALTH , m_Unit->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) );
+		m_Unit->SetUInt32Value( UNIT_FIELD_POWER1 , m_Unit->GetUInt32Value( UNIT_FIELD_MAXPOWER1 ) );
 	}
 
 	//if owner is mounted then we mount too. Speed is not set though
 	if( m_PetOwner->GetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID ) && m_Unit->GetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID ) == 0 )
-		m_Unit->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID, HELPER_MOUNT_DISPLAY );
-	else if( m_PetOwner->GetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID )==0 && m_Unit->GetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID ) != 0 )
+	{
+		if( Owner_side == OWNER_SIDE_ALIANCE )
+			m_Unit->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID, HELPER_MOUNT_A_DISPLAY );
+		else
+			m_Unit->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID, OWNER_SIDE_HORDE );
+		m_moveSprint =  true;
+	}
+	else if( m_PetOwner->GetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID ) == 0 && m_Unit->GetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID ) != 0 )
+	{
 		m_Unit->SetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID, 0 );
+		m_moveSprint = false;
+	}
 
+	if ( m_PetOwner->GetHealthPct() == 100 )
+		last_time_full_health = true;
+	
 	uint32 Time_Now = getMSTime();
 
 	SpellCastTargets targets;
@@ -388,6 +480,18 @@ printf("we are not casting\n");
 		m_castingSpell = revive_spell;
 		setSpellTargets(m_castingSpell, m_PetOwner);
 printf("master died, we are going to resurect him\n");
+	}
+
+	if ( last_time_full_health == true && m_PetOwner->GetHealthPct() != 100 && m_castingSpell == NULL )
+	{
+		uint32 augment_DifficultyLevel = m_PetOwner->GetUInt32Value(UNIT_FIELD_LEVEL) / AugmentSpellCount;
+		//pick 1 random augment spell
+		uint32 augment_spell = RandomUInt( AugmentSpellLevels );
+		if( m_AugmentSpells [ augment_DifficultyLevel ] [ augment_spell ] )
+		{
+			m_castingSpell = m_AugmentSpells [ augment_DifficultyLevel ] [ augment_spell ];
+			setSpellTargets( m_castingSpell, m_PetOwner );
+		}
 	}
 
 	if ( m_PetOwner->GetHealthPct() < 100 && m_castingSpell == NULL )
@@ -411,7 +515,17 @@ printf("we are injured, will try to heal us\n");
 else printf("we were not able to select any heal spells due to power %u or cooldown issues\n",m_Unit->GetUInt32Value(UNIT_FIELD_POWER1));
 	}
 
-	//check
+	if ( m_PetOwner->GetHealthPct() == 100 && m_castingSpell == NULL && m_PetOwner->IsPlayer() && static_cast< Player*>( m_PetOwner )->InGroup())
+	{
+		uint32 party_DifficultyLevel = m_PetOwner->GetUInt32Value(UNIT_FIELD_LEVEL) / PartySpellCount;
+		//pick 1 random augment spell
+		uint32 party_spell = RandomUInt( PartySpellLevels );
+		if( m_PartySpells [ party_DifficultyLevel ] [ party_spell ] )
+		{
+			m_castingSpell = m_PartySpells [ party_DifficultyLevel ] [ party_spell ];
+			setSpellTargets( m_castingSpell, m_PetOwner );
+		}
+	}
 
 	if( !m_castingSpell )
 		return; //sorry but we are out of juice

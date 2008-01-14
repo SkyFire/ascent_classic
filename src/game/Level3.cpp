@@ -1263,6 +1263,119 @@ bool ChatHandler::HandleCreatePetCommand(const char* args, WorldSession* m_sessi
 	return true;
 }
 
+
+#ifdef USE_SPECIFIC_AIAGENTS
+//this is custom stuff !
+bool ChatHandler::HandlePetSpawnAIBot(const char* args, WorldSession *m_session)
+{
+	if (!*args)
+		return false;
+
+	if( !m_session->GetPlayer() )
+		return false; //wtf ?
+
+	uint32 botprice = m_session->GetPlayer()->GetUInt32Value(UNIT_FIELD_LEVEL)*10000; //1 gold per level ?
+
+	if( m_session->GetPlayer()->GetUInt32Value(PLAYER_FIELD_COINAGE) < botprice )
+	{
+		GreenSystemMessage(m_session, "You need a total of %u coins to afford a bot", botprice);
+		return false;
+	}
+
+	uint8 botType = (uint8)atof((char*)args);
+
+	if ( botType!=0 )
+	{
+		RedSystemMessage(m_session, "Incorrect value. Accepting value 0 only = healbot :)");
+		return true;
+	}
+
+	uint32 Entry;
+	char name[50];
+	uint8 race = m_session->GetPlayer()->getRace();
+
+	if( race == RACE_HUMAN || race == RACE_DWARF || race == RACE_NIGHTELF || race == RACE_GNOME || race == RACE_DRAENEI )
+	{
+		Entry = 1826;
+		strcpy( name, "|cffff6060A_HealBot" );
+	}
+	else
+	{
+		Entry = 5473;
+		strcpy( name, "|cffff6060H_HealBot" );
+	}
+
+	CreatureProto * pTemplate = CreatureProtoStorage.LookupEntry(Entry);
+	CreatureInfo * pCreatureInfo = CreatureNameStorage.LookupEntry(Entry);
+	if(!pTemplate || !pCreatureInfo)
+	{
+		RedSystemMessage(m_session, "Invalid creature spawn template: %u", Entry);
+		return true;
+	}
+	Player * plr = m_session->GetPlayer();
+
+	// spawn a creature of this id to create from
+	Creature * pCreature = new Creature(HIGHGUID_UNIT ,1);//no need in guid
+	CreatureSpawn * sp = new CreatureSpawn;
+	sp->id = 1;
+	sp->bytes = 0;
+	sp->bytes2 = 0;
+	sp->displayid = pCreatureInfo->Male_DisplayID;
+	sp->emote_state = 0;
+	sp->entry = pCreatureInfo->Id;
+	sp->factionid = pTemplate->Faction;
+	sp->flags = 0;
+	sp->form = 0;
+	sp->movetype = 0;
+	sp->o = plr->GetOrientation();
+	sp->x = plr->GetPositionX();
+	sp->y = plr->GetPositionY();
+	sp->respawnNpcLink = 0;
+	sp->channel_spell=sp->channel_target_creature=sp->channel_target_go=0;
+	pCreature->Load(sp, (uint32)NULL, NULL);
+
+	Pet *old_tame = plr->GetSummon();
+	if(old_tame != NULL)
+	{
+		old_tame->Dismiss(true);
+	}
+
+	// create a pet from this creature
+	Pet * pPet = objmgr.CreatePet();
+	pPet->SetInstanceID(plr->GetInstanceID());
+	pPet->SetMapId(plr->GetMapId());
+
+	pPet->SetFloatValue ( OBJECT_FIELD_SCALE_X, pTemplate->Scale / 2); //we do not wish to block visualy other players
+	AiAgentHealSupport *new_interface = new AiAgentHealSupport;
+	pPet->ReplaceAIInterface( (AIInterface *) new_interface );
+//	new_interface->Init(pPet,AITYPE_PET,MOVEMENTTYPE_NONE,plr); // i think this will get called automatically for pet
+
+	pPet->CreateAsSummon(Entry, pCreatureInfo, pCreature, plr, NULL, 0x2, 0);
+
+	pPet->Rename(name);
+
+	//healer bot should not have any specific ations
+	pPet->SetActionBarSlot(0,PET_SPELL_FOLLOW);
+	pPet->SetActionBarSlot(1,PET_SPELL_STAY);
+	pPet->SetActionBarSlot(2,0);
+	pPet->SetActionBarSlot(3,0);
+	pPet->SetActionBarSlot(4,0);
+	pPet->SetActionBarSlot(5,0);
+	pPet->SetActionBarSlot(6,0);
+	pPet->SetActionBarSlot(7,0);
+	pPet->SetActionBarSlot(8,0);
+	pPet->SetActionBarSlot(9,0);
+	pPet->SendSpellsToOwner();
+
+	// remove the temp creature
+	delete sp;
+	delete pCreature;
+
+	sGMLog.writefromsession(m_session, "used create an AI bot");
+	return true;
+}
+#endif
+
 bool ChatHandler::HandleAddPetSpellCommand(const char* args, WorldSession* m_session)
 {
 	Player * plr = m_session->GetPlayer();

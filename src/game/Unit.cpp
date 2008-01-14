@@ -5805,3 +5805,9 @@ bool Unit::isAttackReady(bool offhand)
 		return (getMSTime() >= m_attackTimer) ? true : false;
 }
 
+void Unit::ReplaceAIInterface(AIInterface *new_interface) 
+{ 
+	delete m_aiInterface;	//be carefull when you do this. Might screw unit states !
+	m_aiInterface = new_interface; 
+}
+

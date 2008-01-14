@@ -167,6 +167,7 @@ public:
 
 	void SetDefaultSpells();
 	void SetDefaultActionbar();
+	void SetActionBarSlot(uint32 slot, uint32 spell){ ActionBar[ slot ] = spell; }
 
 	void LoadSpells();
 	void AddSpell(SpellEntry * sp, bool learning);
