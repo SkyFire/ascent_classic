@@ -4353,6 +4353,38 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 
+	//warrior - Commanding Presence
+	sp = dbcSpell.LookupEntry( 12318 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 ;
+		sp->EffectSpellGroupRelation_high[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry( 12857 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 ;
+		sp->EffectSpellGroupRelation_high[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry( 12858 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 ;
+		sp->EffectSpellGroupRelation_high[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry( 12860 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 ;
+		sp->EffectSpellGroupRelation_high[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry( 12861 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 65536 ;
+		sp->EffectSpellGroupRelation_high[0] = 128;
+	}
+
 	//warrior - Booming Voice
 	sp = dbcSpell.LookupEntry( 12321 );
 	if( sp != NULL )

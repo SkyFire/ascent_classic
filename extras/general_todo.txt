@@ -144,6 +144,7 @@ Zack - test my shit :
 - Hunter : Rapid Killing 34949
 - Hunter - flare 1543
 - warrior - Blood Frenzy 30030
+- warrior - Commanding Presence 12861
 
 ==========================================================================
 Capt - test my shit :
