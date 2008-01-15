@@ -3136,6 +3136,43 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
 	}
 
+	// Hunter - Serpent's Swiftness
+	sp = dbcSpell.LookupEntry( 34466 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HASTE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 34467 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HASTE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 34468 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HASTE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 34469 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HASTE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 34470 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HASTE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+
 	// Hunter - Ferocious Inspiration
 	sp = dbcSpell.LookupEntry( 34455 );
 	if( sp != NULL )
