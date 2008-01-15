@@ -3063,6 +3063,34 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TARGET_SELF;
 
+	// Hunter - Focused Fire
+	sp = dbcSpell.LookupEntry( 35029 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = 0;
+		sp->EffectSpellGroupRelation_high[1] = 2048;
+		sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL; //for the visual part
+		sp->EffectMiscValue[0] = 35060;
+	}
+	sp = dbcSpell.LookupEntry( 35030 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_DONE;
+		sp->EffectMiscValue[0] = 127;
+		sp->EffectSpellGroupRelation_high[1] = 2048;
+		sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL; //for the visual part
+		sp->EffectMiscValue[0] = 35061;
+	}
+	sp = dbcSpell.LookupEntry( 35060 );
+	if( sp != NULL )
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+	sp = dbcSpell.LookupEntry( 35061 );
+	if( sp != NULL )
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+
 	// Hunter - Endurance Training
 	sp = dbcSpell.LookupEntry( 19583 );
 	if( sp != NULL )
