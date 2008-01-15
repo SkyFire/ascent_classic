@@ -3113,6 +3113,38 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
 	}
 
+	// Hunter - Ferocious Inspiration
+	sp = dbcSpell.LookupEntry( 34455 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+		sp->EffectTriggerSpell[0] = 34456;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF; //maybe target master ?
+		sp->Effect[1] = 0; //remove this
+	}
+	sp = dbcSpell.LookupEntry( 34459 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+		sp->EffectTriggerSpell[0] = 34456;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF; //maybe target master ?
+		sp->Effect[1] = 0; //remove this
+	}
+	sp = dbcSpell.LookupEntry( 34460 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+		sp->EffectTriggerSpell[0] = 34456;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF; //maybe target master ?
+		sp->Effect[1] = 0; //remove this
+	}
+
 	// Hunter - Focused Fire
 	sp = dbcSpell.LookupEntry( 35029 );
 	if( sp != NULL )

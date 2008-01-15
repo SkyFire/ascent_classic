@@ -152,6 +152,7 @@ Zack - test my shit :
 - Hunter - Ferocity 19602
 - Hunter - Spirit Bond 20895
 - Hunter - Animal Handler 34454
+- Hunter - Ferocious Inspiration 34460
 
 ==========================================================================
 Capt - test my shit :
