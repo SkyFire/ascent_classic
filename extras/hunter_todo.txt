@@ -5,7 +5,6 @@ Explanation: Scatter shot will sometimes say "you cant do that while immune(soun
 
 TALENTS
 --BM--
-Thick Hide: no effect on pet (inc armor)
 Bustial Swiftness: doesn't work (increases pet movement speed)
 Ferocity: no effect (inc pet crit chance)
 Spirit bond: doesn't work (regen yours and pet's hp, if your pet is active)

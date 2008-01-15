@@ -147,6 +147,7 @@ Zack - test my shit :
 - Hunter : Rapid Killing 34949
 - Hunter - Endurance Training 19587
 - Hunter - Focused Fire 35030
+- Hunter - Thick Hide 19612
 
 ==========================================================================
 Capt - test my shit :

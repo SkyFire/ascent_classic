@@ -3068,21 +3068,19 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = 0;
-		sp->EffectSpellGroupRelation_high[1] = 2048;
-		sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL; //for the visual part
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectMiscValue[0] = 35060;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+		sp->EffectSpellGroupRelation_high[1] = 2048;
 	}
 	sp = dbcSpell.LookupEntry( 35030 );
 	if( sp != NULL )
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
-		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_DAMAGE_DONE;
-		sp->EffectMiscValue[0] = 127;
-		sp->EffectSpellGroupRelation_high[1] = 2048;
-		sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL; //for the visual part
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectMiscValue[0] = 35061;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+		sp->EffectSpellGroupRelation_high[1] = 2048;
 	}
 	sp = dbcSpell.LookupEntry( 35060 );
 	if( sp != NULL )
@@ -3090,6 +3088,32 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 35061 );
 	if( sp != NULL )
 		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+
+	// Hunter - Thick Hide
+	sp = dbcSpell.LookupEntry( 19609 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_RESISTANCE; //we do not support armor rating for pets yet !
+		sp->EffectBasePoints[0] *= 10; //just give it a little jiuce :P
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19610 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_RESISTANCE; //we do not support armor rating for pets yet !
+		sp->EffectBasePoints[0] *= 10; //just give it a little jiuce :P
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19612 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_RESISTANCE; //we do not support armor rating for pets yet !
+		sp->EffectBasePoints[0] *= 10; //just give it a little jiuce :P
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
 
 	// Hunter - Endurance Training
 	sp = dbcSpell.LookupEntry( 19583 );
