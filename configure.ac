@@ -111,7 +111,6 @@ AC_CHECK_LIB( pthread, pthread_create, [],
     ])
 AC_CHECK_LIB( z, compress, [],[AC_MSG_ERROR([Missing zlib])] )
 AC_CHECK_LIB( compat, ftime )
-AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
 
 if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_LIB( crypto, SHA1_Init, [], [AC_CHECK_LIB(ssl, SHA1_Init,[],[AC_MSG_ERROR([Missing openssl])])])
@@ -123,6 +122,8 @@ else
 	LIB_EXPORT="-Wl,--export-dynamic"
 	AC_SUBST(LIB_EXPORT)
 fi
+
+AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
 
 # THIS IS UGLY!
 CPPFLAGS=""
@@ -208,8 +209,8 @@ if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_HEADER(sys/event.h, , AC_MSG_ERROR([Cannot find sys/event.h for socket engine]))
 	AC_DEFINE(USE_KQUEUE)
 
-	INCLUDES="-I/sw/include/mysql -I/usr/include/openssl $INCLUDES"
-	LDFLAGS="-L/sw/lib/mysql $LDFLAGS -L/usr/lib"
+	INCLUDES="-I/sw/include -I/sw/include/mysql -I/usr/include/openssl $INCLUDES"
+	LDFLAGS="-L/sw/lib -L/sw/lib/mysql $LDFLAGS -L/usr/lib"
 fi
 
 CPPFLAGS_SAVE=$CPPFLAGS
