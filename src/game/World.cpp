@@ -3097,6 +3097,22 @@ bool World::SetInitialWorldSettings()
 		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
 	}
 
+	// Hunter - Animal Handler
+	sp = dbcSpell.LookupEntry( 34453 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HIT_CHANCE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 34454 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_HIT_CHANCE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+
 	// Hunter - Focused Fire
 	sp = dbcSpell.LookupEntry( 35029 );
 	if( sp != NULL )

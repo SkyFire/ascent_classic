@@ -151,6 +151,7 @@ Zack - test my shit :
 - Hunter - Bestial Swiftness 19596
 - Hunter - Ferocity 19602
 - Hunter - Spirit Bond 20895
+- Hunter - Animal Handler 34454
 
 ==========================================================================
 Capt - test my shit :

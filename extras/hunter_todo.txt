@@ -5,7 +5,6 @@ Explanation: Scatter shot will sometimes say "you cant do that while immune(soun
 
 TALENTS
 --BM--
-Animal Handler: only increases your mounted speed (inc pet hit chance)
 Ferocious Inspiration: doens't work (inc party dmg by x% after pet scores crit)
 Catlike Reflexes: only increases your dodge (inc pet's dodge)
 Serpent's Swiftness: increases only your attack speed (inc pet attack speed)
