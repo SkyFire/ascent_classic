@@ -1843,7 +1843,7 @@ void Aura::SpellAuraModCharm(bool apply)
   
 	SetPositive(3); //we ignore the other 2 effect of this spell and force it to be a positive spell
 
-	if( m_target == NULL || m_target->GetTypeId() != TYPEID_UNIT ||  )
+	if( m_target == NULL || m_target->GetTypeId() != TYPEID_UNIT )
 		return;
 
 	if( static_cast< Creature* >( m_target )->IsTotem() )
