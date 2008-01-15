@@ -367,12 +367,16 @@ bool ChatHandler::HandleGMTicketGetAllCommand(const char* args, WorldSession *m_
 		uint32 cont = 0;
 		uint32 zone = 0;
 		Player* plr = objmgr.GetPlayer((uint32)(*itr)->guid);
-		if(plr)
+		/*if(plr)
+		{
 			if(plr->IsInWorld())
 			{
 				zone = plr->GetZoneId();
 				cont = plr->GetMapId();
 			}
+		}*/
+		if( plr == NULL || !plr->IsInWorld() )
+			continue;
 
 			std::stringstream str;
 			str << "GmTicket 0,";
