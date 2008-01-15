@@ -21,8 +21,8 @@
 
 void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 {
-	uint32 type;
-	uint8 unk1;
+	uint32 unk1;
+	uint8 type;
 	float x, y, z;
 	std::string message = "";
 	std::string message2 = "";
@@ -30,8 +30,8 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 	WorldPacket data(SMSG_GMTICKET_CREATE, 4);
 
 	// recv Data
-	recv_data >> type;
 	recv_data >> unk1;
+	recv_data >> type;
 	recv_data >> x;
 	recv_data >> y;
 	recv_data >> z;
