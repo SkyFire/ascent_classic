@@ -1556,6 +1556,7 @@ bool World::SetInitialWorldSettings()
         sp->EffectApplyAuraName[0] = 42;
         sp->EffectTriggerSpell[0] = 39576;
         sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
     }
     sp = dbcSpell.LookupEntry( 35692 );
     if( sp != NULL )
@@ -1563,6 +1564,7 @@ bool World::SetInitialWorldSettings()
         sp->EffectApplyAuraName[0] = 42;
         sp->EffectTriggerSpell[0] = 39576;
         sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
     }
     sp = dbcSpell.LookupEntry( 35693 );
     if( sp != NULL )
@@ -1570,6 +1572,7 @@ bool World::SetInitialWorldSettings()
         sp->EffectApplyAuraName[0] = 42;
         sp->EffectTriggerSpell[0] = 39576;
         sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
     }
 
 	//Bloodlust targets sorounding creatures instead of us
@@ -3060,6 +3063,43 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TARGET_SELF;
 
+	// Hunter - Endurance Training
+	sp = dbcSpell.LookupEntry( 19583 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19584 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19585 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19586 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19587 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+
 	// Hunter - Thrill of the Hunt
 	sp = dbcSpell.LookupEntry( 34497 );
 	if( sp != NULL )
@@ -3400,13 +3440,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 25228;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_TARGET_PET;
-		//this is for the extra 5% dmg for caster. Yes sadly pet will not receive the bonus
+		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM ;
+		//this is for the extra 5% dmg for caster and pet
 		sp->Effect[1]=6;
 		sp->EffectApplyAuraName[1]=79;
 		sp->EffectBasePoints[1]=4; //4+1=5
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
-		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF ;
+		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET ;
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
 	}
 	sp = dbcSpell.LookupEntry( 25228 );
 	if( sp != NULL )

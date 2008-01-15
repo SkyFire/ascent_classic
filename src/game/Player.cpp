@@ -6277,6 +6277,7 @@ void Player::RemovePlayerPet(uint32 pet_number)
 	{
 		delete itr->second;
 		m_Pets.erase(itr);
+		EventDismissPet();
 	}
 }
 #ifndef CLUSTERING
@@ -9612,4 +9613,43 @@ void Player::PartLFGChannel()
 			return;
 		}
 	}
+}
+
+//if we charmed or simply summoned a pet, this function should get called
+void Player::EventSummonPet( Pet *new_pet )
+{
+	if ( !new_pet )
+		return ; //another wtf error
+
+	SpellSet::iterator it,iter;
+	
+	for(iter= mSpells.begin();iter != mSpells.end();)
+	{
+		it = iter++;
+		uint32 SpellID = *it;
+		SpellEntry *spellInfo = dbcSpell.LookupEntry(SpellID);
+		if( spellInfo->c_is_flags & SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER )
+		{
+			SpellCastTargets targets( this->GetGUID() );
+			Spell *spell = new Spell(this, spellInfo ,true, NULL);	//we cast it as a proc spell, maybe we should not !
+			spell->prepare(&targets);
+		}
+		if( spellInfo->c_is_flags & SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET )
+		{
+			SpellCastTargets targets( new_pet->GetGUID() );
+			Spell *spell = new Spell(this, spellInfo ,true, NULL);	//we cast it as a proc spell, maybe we should not !
+			spell->prepare(&targets);
+		}
+	}
+}
+
+//if pet/charm died or whatever happned we should call this function
+//!! note function mmiight get called multiple times :P
+void Player::EventDismissPet()
+{
+	RemoveAllLinkedPetAurasFromOwner();
+//	//remove owner warlock soul link from caster
+//	RemoveAura( (uint32)19028 );
+//	//remove owner warlock Demonic Knowledge from caster
+//	RemoveAura( (uint32)39576 );
 }

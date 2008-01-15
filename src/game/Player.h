@@ -1131,30 +1131,30 @@ public:
     /************************************************************************/
     /* Pets                                                                 */
     /************************************************************************/
-	ASCENT_INLINE void         SetSummon(Pet *pet) { m_Summon = pet; }
-	ASCENT_INLINE Pet*         GetSummon(void) { return m_Summon; }
-	uint32              GeneratePetNumber(void);
-	void                RemovePlayerPet(uint32 pet_number);
-	ASCENT_INLINE void         AddPlayerPet(PlayerPet* pet, uint32 index) { m_Pets[index] = pet; }
-	ASCENT_INLINE PlayerPet*   GetPlayerPet(uint32 idx)
+	ASCENT_INLINE void			SetSummon(Pet *pet) { m_Summon = pet; }
+	ASCENT_INLINE Pet*			GetSummon(void) { return m_Summon; }
+	uint32						GeneratePetNumber(void);
+	void						RemovePlayerPet(uint32 pet_number);
+	ASCENT_INLINE void			AddPlayerPet(PlayerPet* pet, uint32 index) { m_Pets[index] = pet; }
+	ASCENT_INLINE PlayerPet*	GetPlayerPet(uint32 idx)
 	{
 		std::map<uint32, PlayerPet*>::iterator itr = m_Pets.find(idx);
 		if(itr != m_Pets.end()) return itr->second;
 		else
 			return NULL;
 	}
-	void                SpawnPet(uint32 pet_number);
-	void                DespawnPet();
-	uint32              GetFirstPetNumber(void)
+	void						SpawnPet(uint32 pet_number);
+	void						DespawnPet();
+	uint32						GetFirstPetNumber(void)
 	{
 		if(m_Pets.size() == 0) return 0;
 		std::map<uint32, PlayerPet*>::iterator itr = m_Pets.begin();
 		return itr->first;
 	}
-	ASCENT_INLINE PlayerPet*   GetFirstPet(void) { return GetPlayerPet(GetFirstPetNumber()); }
-	ASCENT_INLINE void         SetStableSlotCount(uint8 count) { m_StableSlotCount = count; }
-	ASCENT_INLINE uint8        GetStableSlotCount(void) { return m_StableSlotCount; }
-	uint32              GetUnstabledPetNumber(void)
+	ASCENT_INLINE PlayerPet*	GetFirstPet(void) { return GetPlayerPet(GetFirstPetNumber()); }
+	ASCENT_INLINE void			SetStableSlotCount(uint8 count) { m_StableSlotCount = count; }
+	ASCENT_INLINE uint8			GetStableSlotCount(void) { return m_StableSlotCount; }
+	uint32						GetUnstabledPetNumber(void)
 	{
 		if(m_Pets.size() == 0) return 0;
 		std::map<uint32, PlayerPet*>::iterator itr = m_Pets.begin();
@@ -1163,6 +1163,8 @@ public:
 				return itr->first;
 		return 0;
 	}
+	void						EventSummonPet(Pet *new_pet); //if we charmed or simply summoned a pet, this function should get called
+	void						EventDismissPet(); //if pet/charm died or whatever happned we should call this function
 
     /************************************************************************/
     /* Item Interface                                                       */

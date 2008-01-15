@@ -203,6 +203,9 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	m_base_walkSpeed = m_walkSpeed = owner->m_base_walkSpeed; //should we be able to keep up with master ?
 
 	InitializeMe(true);
+
+	if( owner && owner->IsPlayer() )
+		static_cast<Player*>( owner )->EventSummonPet( this );
 }
 
 
@@ -610,12 +613,6 @@ void Pet::Dismiss(bool bSafeDelete)//Abandon pet
 	if(m_Owner)
 	{
 		m_Owner->RemovePlayerPet( m_PetNumber );
-
-		//remove owner warlock soul link from caster
-		m_Owner->RemoveAura( (uint32)19028 );
-
-		//remove owner warlock Demonic Knowledge from caster
-		m_Owner->RemoveAura( (uint32)39576 );
 	}
 
 	// find out playerpet entry, delete it

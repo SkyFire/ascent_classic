@@ -973,6 +973,9 @@ enum SpellIsFlags
     SPELL_FLAG_IS_FINISHING_MOVE		= 0x00000020, //rogue has a few spells that can stack so can't use the spell_type enum ;)
     SPELL_FLAG_IS_NOT_USING_DMG_BONUS	= 0x00000040, 
     SPELL_FLAG_IS_CHILD_SPELL			= 0x00000080, //auras proc auras that have same name, these should not remove mother aura when adding to target
+    SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET		= 0x00000100, //we should cast these on pet too
+    SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER	= 0x00000200, //we should cast these on owner too
+    SPELL_FLAG_IS_EXPIREING_WITH_PET	= 0x00000400, //when pet dies, we remove this too
 };
 
 ASCENT_INLINE bool CanAgroHash(uint32 spellhashname)

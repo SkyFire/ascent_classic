@@ -2081,15 +2081,15 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 					//remove owner warlock soul link from caster
 					Player* owner = static_cast<Pet*>( pVictim )->GetPetOwner();
 					if( owner != NULL )
-						owner->RemoveAura( (uint32)19028 );
+						owner->EventDismissPet();
 				}
 				/* ----------------------------- PET DEATH HANDLING END -------------- */
 				else if( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) )
 				{
 					//remove owner warlock soul link from caster
 					Unit *owner=pVictim->GetMapMgr()->GetUnit( pVictim->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) );
-					if( owner != NULL )
-						owner->RemoveAura( (uint32)19028 );
+					if( owner != NULL && owner->IsPlayer())
+						static_cast<Player*>( owner )->EventDismissPet();
 				}
 			}
 		}

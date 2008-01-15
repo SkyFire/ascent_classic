@@ -898,7 +898,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									CastingSpell->NameHash != SPELL_HASH_DRAIN_LIFE )//Drain Life								
 									continue;
 							}break;
-                        //warlock - Demonic Knowledge
+/*                        //warlock - Demonic Knowledge
                         case 39576:
                             {
                                 if( !CastingSpell )
@@ -919,7 +919,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
                                 targets.m_unitTarget = GetGUID();
                                 spell->prepare( &targets );
                                 continue;
-                            }break;
+                            }break;*/
 						//mage - Arcane Blast proc
 						case 36032:
 							{
@@ -3291,6 +3291,17 @@ void Unit::RemoveAllAuras()
 	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 	{
 		if(m_auras[x])
+		{
+			m_auras[x]->Remove();
+		}
+	}
+}
+
+void Unit::RemoveAllLinkedPetAurasFromOwner()
+{
+	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+	{
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET)
 		{
 			m_auras[x]->Remove();
 		}
