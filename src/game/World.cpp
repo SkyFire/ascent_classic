@@ -3113,6 +3113,29 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
 	}
 
+	// Hunter - Catlike Reflexes
+	sp = dbcSpell.LookupEntry( 34462 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 34464 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 34465 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+	}
+
 	// Hunter - Ferocious Inspiration
 	sp = dbcSpell.LookupEntry( 34455 );
 	if( sp != NULL )
