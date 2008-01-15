@@ -1,0 +1,1 @@
+ALTER TABLE `questlog` drop column `index`, DROP PRIMARY KEY, ADD PRIMARY KEY(`player_guid`,`quest_id`), DROP INDEX `b`, DROP INDEX `c`;

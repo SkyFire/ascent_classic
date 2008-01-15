@@ -217,7 +217,7 @@ void QuestLogEntry::SaveToDB(QueryBuffer * buf)
 	//Made this into a replace not an insert
 	//CharacterDatabase.Execute("DELETE FROM questlog WHERE player_guid=%u AND quest_id=%u", m_plr->GetGUIDLow(), m_quest->id);
 	std::stringstream ss;
-	ss << "REPLACE INTO questlog (index, player_guid, quest_id, slot, time_left, explored_area1, explored_area2, explored_area3, explored_area4, mob_kill1, mob_kill2, mob_kill3, mob_kill4) VALUES(NULL,";
+	ss << "REPLACE INTO questlog VALUES(";
 	ss << m_plr->GetGUIDLow() << "," << m_quest->id << "," << m_slot << "," << m_time_left;
 	for(int i = 0; i < 4; ++i)
 		ss << "," << m_explored_areas[i];
@@ -235,8 +235,8 @@ void QuestLogEntry::SaveToDB(QueryBuffer * buf)
 
 bool QuestLogEntry::LoadFromDB(Field *fields)
 {
-	// index,playerguid,questid,timeleft,area0,area1,area2,area3,kill0,kill1,kill2,kill3
-	int f = 4;
+	// playerguid,questid,timeleft,area0,area1,area2,area3,kill0,kill1,kill2,kill3
+	int f = 3;
 	ASSERT(m_plr && m_quest);
 	m_time_left = fields[f].GetUInt32();	f++;
 	for(int i = 0; i < 4; ++i)

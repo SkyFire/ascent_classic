@@ -3036,9 +3036,9 @@ void Player::_LoadQuestLogEntry(QueryResult * result)
 		do 
 		{
 			fields = result->Fetch();
-			questid = fields[2].GetUInt32();
+			questid = fields[1].GetUInt32();
 			quest = QuestStorage.LookupEntry(questid);
-			slot = fields[3].GetUInt32();
+			slot = fields[2].GetUInt32();
 			ASSERT(slot != -1);
 			
 			// remove on next save if bad quest
