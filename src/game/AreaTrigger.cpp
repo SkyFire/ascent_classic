@@ -115,15 +115,21 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 {		
 	sLog.outDebug("AreaTrigger: %u", id);
 
-	AreaTrigger * pAreaTrigger = AreaTriggerStorage.LookupEntry(id);
-
 	// Are we REALLY here?
-	if(!pAreaTrigger || !_player->IsInWorld())
+	if( !_player->IsInWorld() )
 		return;
 
     // Search quest log, find any exploration quests
 	sQuestMgr.OnPlayerExploreArea(GetPlayer(),id);
-	
+
+	AreaTrigger* pAreaTrigger = AreaTriggerStorage.LookupEntry( id );
+
+	if( _player->pAreaTrigger == NULL )
+	{
+		sLog.outDebug("Missing AreaTrigger: %u", id);
+		return;
+	}
+
 	// if in BG handle is triggers
 	if(_player->m_bg)
 	{
