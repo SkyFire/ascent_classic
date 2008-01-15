@@ -124,7 +124,7 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 
 	AreaTrigger* pAreaTrigger = AreaTriggerStorage.LookupEntry( id );
 
-	if( _player->pAreaTrigger == NULL )
+	if( pAreaTrigger == NULL )
 	{
 		sLog.outDebug("Missing AreaTrigger: %u", id);
 		return;

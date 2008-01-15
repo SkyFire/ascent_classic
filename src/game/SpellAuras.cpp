@@ -1904,7 +1904,7 @@ void Aura::SpellAuraModCharm(bool apply)
 		m_target->GetAIInterface()->Init(m_target, AITYPE_AGRO, MOVEMENTTYPE_NONE);
 		m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
 
-		if( caster && caster->GetSession() ) // crashfix
+		if( caster != NULL && caster->GetSession() != NULL ) // crashfix
 		{
 			caster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
 			WorldPacket data(SMSG_PET_SPELLS, 8);
