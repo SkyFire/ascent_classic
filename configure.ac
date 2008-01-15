@@ -115,7 +115,7 @@ AC_CHECK_LIB( compat, ftime )
 if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_LIB( crypto, SHA1_Init, [], [AC_CHECK_LIB(ssl, SHA1_Init,[],[AC_MSG_ERROR([Missing openssl])])])
 	AC_DEFINE(HAVE_DARWIN)
-	LIB_EXPORT="-u __dummy -framework System -framework Foundation"
+	LIB_EXPORT="-framework System -framework Foundation"
 	AC_SUBST(LIB_EXPORT)
 else
 	AC_CHECK_LIB( ssl, SHA1_Init, [], [AC_CHECK_LIB(ssl, SHA1_Init,[],[AC_MSG_ERROR([Missing openssl])])])
