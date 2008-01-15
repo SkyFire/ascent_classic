@@ -1837,21 +1837,24 @@ void Aura::SpellAuraModConfuse(bool apply)
 
 void Aura::SpellAuraModCharm(bool apply)
 {
-	Unit * ucaster = GetUnitCaster();
-	Player * caster = ((Player*)ucaster);
-	Creature * target = ((Creature*)m_target);
+	Unit* ucaster = GetUnitCaster();
+	Player* caster = static_cast< Player* >( ucaster );
+	Creature* target = static_cast< Creature* >( m_target );
   
 	SetPositive(3); //we ignore the other 2 effect of this spell and force it to be a positive spell
 
-	if( !m_target || m_target->GetTypeId() != TYPEID_UNIT || static_cast<Creature*>(m_target)->IsTotem() )
+	if( m_target == NULL || m_target->GetTypeId() != TYPEID_UNIT ||  )
+		return;
+
+	if( static_cast< Creature* >( m_target )->IsTotem() )
 		return;
 
 	if( ucaster == NULL || ucaster->GetTypeId() != TYPEID_PLAYER )
 		return;
 
-	if(apply)
+	if( apply )
 	{
-		if((int32)m_target->getLevel() > mod->m_amount || m_target->IsPet())
+		if( (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() )
 			return;
 
 		// this should be done properly
