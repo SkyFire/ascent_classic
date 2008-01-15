@@ -3115,6 +3115,51 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 
+	// Hunter - Ferocity
+	sp = dbcSpell.LookupEntry( 19612 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_CRIT_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19599 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_CRIT_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19600 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_CRIT_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19601 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_CRIT_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntry( 19602 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_CRIT_PERCENT;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+
+	// Hunter - Bestial Swiftness
+	sp = dbcSpell.LookupEntry( 19596 );
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_SPEED; 
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+
 	// Hunter - Endurance Training
 	sp = dbcSpell.LookupEntry( 19583 );
 	if( sp != NULL )

@@ -148,6 +148,8 @@ Zack - test my shit :
 - Hunter - Endurance Training 19587
 - Hunter - Focused Fire 35030
 - Hunter - Thick Hide 19612
+- Hunter - Bestial Swiftness 19596
+- Hunter - Ferocity 19602
 
 ==========================================================================
 Capt - test my shit :
