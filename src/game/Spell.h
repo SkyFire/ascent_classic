@@ -971,7 +971,8 @@ enum SpellIsFlags
     SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE	= 0x00000008, //it started with rogue cold blood but i'm sure others will come
     SPELL_FLAG_IS_POISON				= 0x00000010, //rogue has a few spells that can stack so can't use the spell_type enum ;)
     SPELL_FLAG_IS_FINISHING_MOVE		= 0x00000020, //rogue has a few spells that can stack so can't use the spell_type enum ;)
-    SPELL_FLAG_IS_NOT_USING_DMG_BONUS	= 0x00000040, //rogue has a few spells that can stack so can't use the spell_type enum ;)
+    SPELL_FLAG_IS_NOT_USING_DMG_BONUS	= 0x00000040, 
+    SPELL_FLAG_IS_CHILD_SPELL			= 0x00000080, //auras proc auras that have same name, these should not remove mother aura when adding to target
 };
 
 ASCENT_INLINE bool CanAgroHash(uint32 spellhashname)

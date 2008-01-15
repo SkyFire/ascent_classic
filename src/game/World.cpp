@@ -1469,14 +1469,6 @@ bool World::SetInitialWorldSettings()
 		if( sp->Id == 25771 || sp->Id == 11196 || sp->Id == 6788 )
 			sp->removable_by_immunity = false;
 
-		//Backlash
-		if( sp->NameHash == SPELL_HASH_BACKLASH)
-		{
-			sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM;
-			sp->EffectSpellGroupRelation[0] = 0x00000001 | 0x00002000;
-			sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
-		}
-
 		/* hackfix for this - FIX ME LATER - Burlex */
 		if( namehash == SPELL_HASH_SEAL_FATE )
 			sp->procFlags = 0;
@@ -1538,7 +1530,26 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 30302 );
 	if (sp != NULL)
 		sp->procChance = 30;
-    //Warlock: Demonic Knowledge
+
+	//Warlock: Backlash
+	sp = dbcSpell.LookupEntry( 34935 );
+	if (sp != NULL)
+		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+	sp = dbcSpell.LookupEntry( 34938 );
+	if (sp != NULL)
+		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+	sp = dbcSpell.LookupEntry( 34939 );
+	if (sp != NULL)
+		sp->procFlags |= PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+	sp = dbcSpell.LookupEntry( 34936 );
+	if (sp != NULL)
+	{
+		sp->AuraInterruptFlags |= AURA_INTERRUPT_ON_CAST_SPELL;
+		sp->EffectSpellGroupRelation[0] = 1 ;
+		sp->EffectSpellGroupRelation_high[0] = 64;
+	}
+
+	//Warlock: Demonic Knowledge
     sp = dbcSpell.LookupEntry( 35691 );
     if( sp != NULL )
 	{
@@ -3964,6 +3975,32 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[0] = 64;
 	}
 
+	//warlock - Ruin
+	sp = dbcSpell.LookupEntry( 17959 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+	}
+
+	//warlock - destructive reach 
+	sp = dbcSpell.LookupEntry( 17917 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+	}
+	sp = dbcSpell.LookupEntry( 17918 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+	}
+
 	//warlock - Suppression
 	sp = dbcSpell.LookupEntry( 18174 );
 	if( sp != NULL )
@@ -4000,19 +4037,34 @@ bool World::SetInitialWorldSettings()
 	//warlock - Bane
 	sp = dbcSpell.LookupEntry( 17788 );
 	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 		sp->EffectSpellGroupRelation_high[1] = 128;
+	}
 	sp = dbcSpell.LookupEntry( 17789 );
 	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 		sp->EffectSpellGroupRelation_high[1] = 128;
+	}
 	sp = dbcSpell.LookupEntry( 17790 );
 	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 		sp->EffectSpellGroupRelation_high[1] = 128;
+	}
 	sp = dbcSpell.LookupEntry( 17791 );
 	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 		sp->EffectSpellGroupRelation_high[1] = 128;
+	}
 	sp = dbcSpell.LookupEntry( 17792 );
 	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 		sp->EffectSpellGroupRelation_high[1] = 128;
+	}
 
 	//warlock - soul leech
 	sp = dbcSpell.LookupEntry( 30293 );

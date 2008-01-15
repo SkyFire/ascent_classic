@@ -118,14 +118,6 @@ General (might affect more then just warlocks)
 - Should receive soul shard when pet is dismissed due to out of range or getting on windrider
 - Temporary +spell damage buffs (trinkets, potions, etc) will only apply the +damage to DoT's while the effect is in place - Not when you start the spell cast. For example, say you used a trinket that gives +150 spell damage. You apply Corruption and Unstable Affliction. You gain the +150 spell damage bonus as normal - your Unstable Affliction and Corruption should gain around 25 damage a tick. Half way through the ticks, the trinket wears off. You will now LOSE that 25 damage a tick, even though the DoT was applied when you initiated the cast.
 
-Drain life: (zack says he fixed this but my server hasnt updated yet, anyone with proof could PM me or post here please)
-- Isn't affected by +damage (shouldn't be affected by +healing); teh coefficient is 80% from +damage to this spell (wowwiki)
-- Doesn't show up in combat log so neither on screen, only the healing, but not the damage.
-- Isn't affected by soul siphon talent.
-
-Soul link:
-- Just doesn't work at all tongue.gif
-
 Hellfire/Rain of fire - must have a target selected else it will stop channeling immediately; channeling isn't affected by talent to reduce spell pushback; starts damaging only after good 3-4 seconds of channel.
 
 Curse of Agony:
@@ -233,9 +225,5 @@ IMPORTANT - soul link. doesn't work. when the buff is active 20% of damage taken
 - demonic knowledge - doesn't work. should increase spell damage by 5/10/15% of minions stamina+intellect
 
 Destruction:
-- Bane doesn't work with soulfire. should decrease casting time by 0.4/0.8/1.2/1.6/2 sec
-IMPORTANT - destructive reach - doesn't work. should increase range by 10/20% and decrease threat by 5/10%
 - pyroclasm - stuns self.
-- backlash - still have to be standing still to cast instant incinerate
-- shadow and flame - doesn't work. should increase spell damage bonus for shadow bolt and incinerate by 4/8/12/16/20%
 - shadowfury - can be cast while moving due to lag 

@@ -1,5 +1,7 @@
 select id,name,description,Effect_1,Effect_2,Effect_3,EffectApplyAuraName_1,EffectApplyAuraName_2,EffectApplyAuraName_3,EffectSpellGroupRelation_1,EffectSpellGroupRelation_1,EffectSpellGroupRelation_3,EffectMiscValue_1,EffectMiscValue_2,EffectMiscValue_3,EffectTriggerSpell_1,EffectTriggerSpell_2,EffectTriggerSpell_3 from dbc_spell 
-where name like "%Improved Expose Armor%";
+where name like "%Improved Expose Armor%"
+#where description like "%Incinerate%" and (EffectApplyAuraName_1=107 or EffectApplyAuraName_1=108 or EffectApplyAuraName_2=107 or EffectApplyAuraName_2=108 or EffectApplyAuraName_3=107 or EffectApplyAuraName_3=108)
+;
 
 #select id,name,description,school,SpellGroupType,SpellGroupType_high from dbc_spell where name like "%lightning bolt%" or id = 8443;
 #select id,name,description,school,SpellGroupType,SpellGroupType_high from dbc_spell where name like "%expose armor%";

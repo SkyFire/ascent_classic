@@ -84,7 +84,7 @@ Zack - test my shit :
 - shaman - Restorative Totems 16208
 - warlock - Amplify Curse 18288
 - warlock - Improved Howl of Terror 30057
-- warlock - Bane 17792 affects soulfire too Soul Fire.
+- warlock - Bane 17792.
 - rogue - Improved Expose Armor 14169
 - rogue - Vile Poisons 16720
 - rogue - Improved Poisons 14117
@@ -110,6 +110,9 @@ Zack - test my shit :
 - warlock: Master Conjuror 18768 - should work
 - warlock: Demonic Knowledge 35693
 - warlock: Pyroclasm 18096
+- warlock - Backlash 34939 - should not remove mother spell
+- warlock - Ruin 17959
+- warlock - destructive reach 17918
 - warrior - Booming Voice 12838
 - warrior - Improved Commanding Shout 38408
 - mage : Improved Blink 31570
