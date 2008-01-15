@@ -32,7 +32,7 @@ typedef struct
 ASCENT_INLINE static void swap32(uint32* p) { *p = ((*p >> 24 & 0xff)) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
 #endif
 
-LogonCommClientSocket::LogonCommClientSocket(SOCKET fd) : Socket(fd, 524288, 65536)
+LogonCommClientSocket::LogonCommClientSocket(SOCKET fd) : Socket(fd, 724288, 262444)
 {
 	// do nothing
 	last_ping = last_pong = (uint32)UNIXTIME;

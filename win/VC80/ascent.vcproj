@@ -478,6 +478,10 @@
 			RelativePath="..\..\src\ascent\Master.h"
 			>
 		</File>
+		<File
+			RelativePath="..\..\src\shared\usewinhoard.cpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

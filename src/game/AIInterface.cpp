@@ -780,7 +780,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 	}
 
 	bool cansee;
-	if(m_nextTarget && m_nextTarget->GetInstanceID() == m_Unit->GetInstanceID())
+	if(m_nextTarget && m_nextTarget->event_GetCurrentInstanceId() == m_Unit->event_GetCurrentInstanceId())
 	{
 		if( m_Unit->GetTypeId() == TYPEID_UNIT )
 			cansee = static_cast< Creature* >( m_Unit )->CanSee( m_nextTarget );
@@ -788,7 +788,12 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 			cansee = static_cast< Player* >( m_Unit )->CanSee( m_nextTarget );
 	}
 	else 
+	{
+		if( m_nextTarget )
+			m_nextTarget = NULL;			// corupt pointer
+
 		cansee = false;
+	}
 
 	if( cansee && m_nextTarget && m_nextTarget->isAlive() && m_AIState != STATE_EVADE && !m_Unit->isCasting() )
 	{
@@ -3279,7 +3284,7 @@ void AIInterface::CheckTarget(Unit* target)
 		UnitToFear = NULL;
 
 	if(tauntedBy == target)
-		tauntedBy = 0;
+		tauntedBy = NULL;
 
 	AssistTargetSet::iterator  itr = m_assistTargets.find(target);
 	if(itr != m_assistTargets.end())

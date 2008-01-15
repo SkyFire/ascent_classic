@@ -423,7 +423,7 @@ void InformationCore::TimeoutSockets()
 		it2 = itr;
 		++itr;
 
-		if(s->last_ping < t && ((t - s->last_ping) > 60))
+		if(s->last_ping < t && ((t - s->last_ping) > 240))
 		{
 			// ping timeout
 			printf("Closing socket due to ping timeout.\n");

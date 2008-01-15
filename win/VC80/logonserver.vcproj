@@ -552,16 +552,8 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\ascent\usewinhoard.cpp"
+			RelativePath="..\..\src\shared\usewinhoard.cpp"
 			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="0"
-				/>
-			</FileConfiguration>
 			<FileConfiguration
 				Name="Release|x64"
 				>

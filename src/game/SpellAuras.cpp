@@ -1843,12 +1843,15 @@ void Aura::SpellAuraModCharm(bool apply)
   
 	SetPositive(3); //we ignore the other 2 effect of this spell and force it to be a positive spell
 
-	if( !m_target || (m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() ))
+	if( !m_target || m_target->GetTypeId() != TYPEID_UNIT || static_cast<Creature*>(m_target)->IsTotem() )
+		return;
+
+	if( ucaster == NULL || ucaster->GetTypeId() != TYPEID_PLAYER )
 		return;
 
 	if(apply)
 	{
-		if(!ucaster || ucaster->GetTypeId() != TYPEID_PLAYER || (int32)m_target->getLevel() > mod->m_amount || m_target->IsPet() || m_target->GetTypeId() != TYPEID_UNIT)
+		if((int32)m_target->getLevel() > mod->m_amount || m_target->IsPet())
 			return;
 
 		// this should be done properly

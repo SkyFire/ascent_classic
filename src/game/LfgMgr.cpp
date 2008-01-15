@@ -90,7 +90,7 @@ void LfgMgr::SetPlayerInLFGqueue(Player *pl,uint32 LfgDungeonId)
 	if( pl == NULL )
 		return;
 
-	if( LfgDungeonId > MAX_DUNGEONS )
+	if( LfgDungeonId >= MAX_DUNGEONS )
 		return;
 
 	m_lock.Acquire();
@@ -112,7 +112,9 @@ void LfgMgr::RemovePlayerFromLfgQueues(Player * pl)
 	{
 		if(pl->LfgDungeonId[i] != 0)
 		{
-			m_lookingForGroup[pl->LfgDungeonId[i]].remove(pl);
+			if( pl->LfgDungeonId[i] < MAX_DUNGEONS )
+				m_lookingForGroup[pl->LfgDungeonId[i]].remove(pl);
+
 			if(pl->m_Autojoin)
 				pl->SendMeetingStoneQueue(pl->LfgDungeonId[i], 0);
 
@@ -123,7 +125,9 @@ void LfgMgr::RemovePlayerFromLfgQueues(Player * pl)
 
 	if(pl->LfmDungeonId)
 	{
-		m_lookingForMore[pl->LfmDungeonId].remove(pl);
+		if( pl->LfmDungeonId < MAX_DUNGEONS )
+			m_lookingForMore[pl->LfmDungeonId].remove(pl);
+
 		pl->LfmDungeonId=0;
 		pl->LfmType=0;
 	}
@@ -136,7 +140,7 @@ void LfgMgr::RemovePlayerFromLfgQueue( Player* plr, uint32 LfgDungeonId )
 	if( plr == NULL )
 		return;
 
-	if( LfgDungeonId > MAX_DUNGEONS )
+	if( LfgDungeonId >= MAX_DUNGEONS )
 		return;
 
 	m_lock.Acquire();
@@ -159,7 +163,7 @@ void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
 	LfgPlayerList::iterator it3;
 	Player * plr;
 	uint32 i;
-	LfgMatch * pMatch;
+	//LfgMatch * pMatch;
 
 	// only update on autojoinable dungeons
 	if(LfgDungeonTypes[LfgDungeonId] != LFG_INSTANCE && LfgDungeonTypes[LfgDungeonId] != LFG_HEROIC_DUNGEON)
@@ -231,7 +235,7 @@ void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
 	// do we still have any members left over (enough to form a group)
 	while(possibleMembers.size() > 1)
 	{
-		pMatch = new LfgMatch(LfgDungeonId);
+		/*pMatch = new LfgMatch(LfgDungeonId);
 		pMatch->lock.Acquire();
 		for(i = 0; i < 5, possibleMembers.size() > 0; ++i)
 		{
@@ -241,7 +245,15 @@ void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
 			possibleMembers.front()->m_lfgMatch = pMatch;
 			possibleMembers.pop_front();
 		}
-		pMatch->lock.Release();
+		pMatch->lock.Release();*/
+		Group * pGroup = new Group;
+		for(i = 0; i < 5, possibleMembers.size() > 0; ++i)
+		{
+			pGroup->AddMember( possibleMembers.front()->m_playerInfo );
+			possibleMembers.front()->SendMeetingStoneQueue( LfgDungeonId, 0 );
+			m_lookingForGroup[LfgDungeonId].remove( possibleMembers.front() );
+			possibleMembers.pop_front();
+		}
 	}
 
 	m_lock.Release();
@@ -252,7 +264,7 @@ void LfgMgr::SendLfgList( Player* plr, uint32 Dungeon )
 	if( plr == NULL )
 		return;
 
-	if( Dungeon > MAX_DUNGEONS )
+	if( Dungeon >= MAX_DUNGEONS )
 		return;
 
 	LfgPlayerList::iterator itr;
@@ -349,7 +361,7 @@ void LfgMgr::SetPlayerInLfmList(Player * pl, uint32 LfgDungeonId)
 	if( !pl->IsInWorld() )
 		return;
 
-	if( LfgDungeonId > MAX_DUNGEONS )
+	if( LfgDungeonId >= MAX_DUNGEONS )
 		return;
 
 	m_lock.Acquire();
@@ -365,7 +377,7 @@ void LfgMgr::RemovePlayerFromLfmList(Player * pl, uint32 LfmDungeonId)
 	if( !pl->IsInWorld() )
 		return;
 
-	if( LfmDungeonId > MAX_DUNGEONS )
+	if( LfmDungeonId >= MAX_DUNGEONS )
 		return;
 
 	m_lock.Acquire();

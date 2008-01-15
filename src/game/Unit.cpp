@@ -2621,10 +2621,14 @@ else
 
 		if(IsPlayer() && ((Player*)this)->m_onStrikeSpellDmg.size())
 		{
-			map<uint32, OnHitSpell>::iterator itr = ((Player*)this)->m_onStrikeSpellDmg.begin();
+			map<uint32, OnHitSpell>::iterator it2 = ((Player*)this)->m_onStrikeSpellDmg.begin();
+			map<uint32, OnHitSpell>::iterator itr;
 			uint32 min_dmg, max_dmg, range, dmg;
-			for(; itr != ((Player*)this)->m_onStrikeSpellDmg.end(); ++itr)
+			for(; it2 != ((Player*)this)->m_onStrikeSpellDmg.end();)
 			{
+				itr = it2;
+				++it2;
+
 				min_dmg = itr->second.mindmg;
 				max_dmg = itr->second.maxdmg;
 				range = min_dmg - max_dmg;

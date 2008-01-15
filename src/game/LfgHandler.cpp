@@ -152,6 +152,8 @@ void WorldSession::HandleSetLookingForMore(WorldPacket& recvPacket)
 	uint8 LfgType,unk1;
 
 	recvPacket >> LfgDungeonId >> unk1 >> LfgType;
+	if( LfgDungeonId >= MAX_DUNGEONS )
+		return;
 
 	// remove from an existing queue
 	if(LfgDungeonId != _player->LfmDungeonId && _player->LfmDungeonId)
