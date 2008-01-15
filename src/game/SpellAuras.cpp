@@ -581,9 +581,8 @@ void Aura::ApplyModifiers( bool apply )
 		{
 			for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
 			{
-				if(itr->origId == GetSpellId() && itr->caster == m_casterGuid)
+				if(itr->origId == GetSpellId() && itr->caster == m_casterGuid && !itr->deleted)
 				{
-					//m_target->m_procSpells.erase(itr);
 					itr->deleted = true;
 					break;
 				}
@@ -3620,16 +3619,14 @@ void Aura::SpellAuraProcTriggerSpell(bool apply)
 			return;
 		}*/
 		m_target->m_procSpells.push_front(pts);
-//		sLog.outDebug("%u is registering %u chance %u flags %u charges %u triggeronself %u interval %u\n",pts.origId,pts.spellId,pts.ospinfo->procChance,pts.ospinfo->procFlags & ~PROC_TARGET_SELF,pts.ospinfo->procCharges,pts.ospinfo->procFlags & PROC_TARGET_SELF,pts.ospinfo->proc_interval);
 		sLog.outDebug("%u is registering %u chance %u flags %u charges %u triggeronself %u interval %u\n",pts.origId,pts.spellId,pts.procChance,m_spellProto->procFlags & ~PROC_TARGET_SELF,m_spellProto->procCharges,m_spellProto->procFlags & PROC_TARGET_SELF,m_spellProto->proc_interval);
 	}
 	else
 	{
 		for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
 		{
-			if(itr->origId == GetSpellId() && itr->caster == m_casterGuid)
+			if(itr->origId == GetSpellId() && itr->caster == m_casterGuid && !itr->deleted)
 			{
-				//m_target->m_procSpells.erase(itr);
 				itr->deleted = true;
 				break; //only 1 instance of a proc spell per caster ?
 			}

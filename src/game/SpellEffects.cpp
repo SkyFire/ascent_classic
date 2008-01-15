@@ -1274,12 +1274,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	{
 		 pAura=itr->second;
 	} 
-	pAura->AddMod(m_spellInfo->EffectApplyAuraName[i],damage,m_spellInfo->EffectMiscValue[i],i);	
-
-	//Duel stuff.
-	if (m_caster && m_caster->IsPlayer() && static_cast<Player*>(m_caster)->DuelingWith && 
-		static_cast<Player*>(m_caster)->GetDuelState() == DUEL_STATE_STARTED)
-		pAura->m_castInDuel=true;
+	pAura->AddMod(m_spellInfo->EffectApplyAuraName[i],damage,m_spellInfo->EffectMiscValue[i],i);
 }
 
 void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain

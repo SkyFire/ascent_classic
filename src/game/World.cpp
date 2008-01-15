@@ -2858,36 +2858,41 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 2048;
-		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64 | 1024;
+		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64;
 		sp->EffectSpellGroupRelation[1] = 4096;
+		sp->EffectSpellGroupRelation_high[1] = 1024;
 	}
 	sp = dbcSpell.LookupEntry( 16935 ); 
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 2048;
-		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64 | 1024;
+		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64;
 		sp->EffectSpellGroupRelation[1] = 4096;
+		sp->EffectSpellGroupRelation_high[1] = 1024;
 	}
 	sp = dbcSpell.LookupEntry( 16936 ); 
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 2048;
-		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64 | 1024;
+		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64;
 		sp->EffectSpellGroupRelation[1] = 4096;
+		sp->EffectSpellGroupRelation_high[1] = 1024;
 	}
 	sp = dbcSpell.LookupEntry( 16937 ); 
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 2048;
-		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64 | 1024;
+		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64;
 		sp->EffectSpellGroupRelation[1] = 4096;
+		sp->EffectSpellGroupRelation_high[1] = 1024;
 	}
 	sp = dbcSpell.LookupEntry( 16938 ); 
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 2048;
-		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64 | 1024;
+		sp->EffectSpellGroupRelation_high[0] = 1048576 | 64;
 		sp->EffectSpellGroupRelation[1] = 4096;
+		sp->EffectSpellGroupRelation_high[1] = 1024;
 	}
 
 	//Druid - Focused Starlight
@@ -3607,6 +3612,19 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 100;
+	}
+	//Druid: Savage Fury
+	sp = dbcSpell.LookupEntry(16998);if( sp != NULL ) 
+	{
+		sp->EffectSpellGroupRelation_high[0] |= 1024;
+		//sp->EffectSpellGroupRelation_high[1] |= 1024;
+		//sp->EffectSpellGroupRelation_high[2] |= 1024;
+	}
+	sp = dbcSpell.LookupEntry(16999);if( sp != NULL ) 
+	{
+		sp->EffectSpellGroupRelation_high[0] |= 1024;
+		//sp->EffectSpellGroupRelation_high[1] |= 1024;
+		//sp->EffectSpellGroupRelation_high[2] |= 1024;
 	}
 	//Druid: Primal Fury (2 parts)
 	//Blood Frenzy
@@ -5252,6 +5270,7 @@ bool World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 8232; //for the logs and rest
 			sp->procChance = 20;
 			sp->proc_interval = 3000;//http://www.wowwiki.com/Windfury_Weapon
+			sp->maxstack = 1;
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 284 );
@@ -5266,6 +5285,7 @@ bool World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 8235; //for the logs and rest
 			sp->procChance = 20;
 			sp->proc_interval = 3000; //http://www.wowwiki.com/Windfury_Weapon
+			sp->maxstack = 1;
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 525 );
@@ -5280,6 +5300,7 @@ bool World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 10486; //for the logs and rest
 			sp->procChance = 20;
 			sp->proc_interval = 3000;//http://www.wowwiki.com/Windfury_Weapon
+			sp->maxstack = 1;
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 1669 );
@@ -5294,6 +5315,7 @@ bool World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 16362; //for the logs and rest
 			sp->procChance = 20;
 			sp->proc_interval = 3000;//http://www.wowwiki.com/Windfury_Weapon
+			sp->maxstack = 1;
 		}
 	}
 	Enchantment = dbcEnchant.LookupEntry( 2636 );
@@ -5308,6 +5330,7 @@ bool World::SetInitialWorldSettings()
 			sp->EffectTriggerSpell[0] = 25505; //for the logs and rest
 			sp->procChance = 20;
 			sp->proc_interval = 3000;//http://www.wowwiki.com/Windfury_Weapon
+			sp->maxstack = 1;
 		}
 	}
 

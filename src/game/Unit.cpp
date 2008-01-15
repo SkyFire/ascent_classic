@@ -720,7 +720,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							if( CastingSpell->Effect[0]!=80 &&
 								CastingSpell->Effect[1]!=80 &&
 								CastingSpell->Effect[2]!=80 &&
-								CastingSpell->NameHash != SPELL_HASH_MANGLE )
+								CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_)
 								continue;
 						}break;
 						case 17106: //druid intencity
