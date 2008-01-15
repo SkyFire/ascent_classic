@@ -141,20 +141,7 @@ Zack - test my shit :
 - Hunter : Mortal Shots 19490
 - Hunter : Improved Barrage 35111
 - Hunter : Clever Traps 19245
-- Hunter : Resourcefulness 34493
 - Hunter : Thrill of the Hunt 34499
-- Hunter - Expose Weakness 34503
-- Hunter : Rapid Killing 34949
-- Hunter - Endurance Training 19587
-- Hunter - Focused Fire 35030
-- Hunter - Thick Hide 19612
-- Hunter - Bestial Swiftness 19596
-- Hunter - Ferocity 19602
-- Hunter - Spirit Bond 20895
-- Hunter - Animal Handler 34454
-- Hunter - Ferocious Inspiration 34460
-- Hunter - Catlike Reflexes 34460
-- Hunter - Serpent's Swiftness 34470
 
 ==========================================================================
 Capt - test my shit :

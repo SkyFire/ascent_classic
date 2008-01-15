@@ -3074,14 +3074,14 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectMiscValue[0] = 19579;
+		sp->EffectTriggerSpell[0] = 19579;
 	}
 	sp = dbcSpell.LookupEntry( 20895 );
 	if( sp != NULL )
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectMiscValue[0] = 24529;
+		sp->EffectTriggerSpell[0] = 24529;
 	}
 	sp = dbcSpell.LookupEntry( 19579 );
 	if( sp != NULL )
@@ -3089,8 +3089,10 @@ bool World::SetInitialWorldSettings()
 		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA; //we should do the same for player too as we did for pet
 		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
-		sp->EffectImplicitTargetA[1] = sp->EffectImplicitTargetA[0];
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
 		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+		sp->EffectAmplitude[1] = sp->EffectAmplitude[0];
+		sp->EffectDieSides[1] = sp->EffectDieSides[0];
 	}
 	sp = dbcSpell.LookupEntry( 24529 );
 	if( sp != NULL )
@@ -3098,8 +3100,10 @@ bool World::SetInitialWorldSettings()
 		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA; //we should do the same for player too as we did for pet
 		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
-		sp->EffectImplicitTargetA[1] = sp->EffectImplicitTargetA[0];
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
 		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+		sp->EffectAmplitude[1] = sp->EffectAmplitude[0];
+		sp->EffectDieSides[1] = sp->EffectDieSides[0];
 	}
 
 	// Hunter - Animal Handler
@@ -3196,7 +3200,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 		sp->EffectTriggerSpell[0] = 34456;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF; //maybe target master ?
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF; 
 		sp->Effect[1] = 0; //remove this
 	}
 	sp = dbcSpell.LookupEntry( 34460 );
@@ -3206,7 +3210,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 		sp->EffectTriggerSpell[0] = 34456;
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF; //maybe target master ?
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF;
 		sp->Effect[1] = 0; //remove this
 	}
 
@@ -3216,7 +3220,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectMiscValue[0] = 35060;
+		sp->EffectTriggerSpell[0] = 35060;
 		sp->EffectSpellGroupRelation_high[1] = 2048;
 	}
 	sp = dbcSpell.LookupEntry( 35030 );
@@ -3224,7 +3228,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectMiscValue[0] = 35061;
+		sp->EffectTriggerSpell[0] = 35061;
 		sp->EffectSpellGroupRelation_high[1] = 2048;
 	}
 	sp = dbcSpell.LookupEntry( 35060 );
@@ -3240,7 +3244,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_RESISTANCE; //we do not support armor rating for pets yet !
-		sp->EffectBasePoints[0] *= 10; //just give it a little jiuce :P
+		sp->EffectBasePoints[0] *= 10; //just give it a little juice :P
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntry( 19610 );
@@ -3248,7 +3252,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_RESISTANCE; //we do not support armor rating for pets yet !
-		sp->EffectBasePoints[0] *= 10; //just give it a little jiuce :P
+		sp->EffectBasePoints[0] *= 10; //just give it a little juice :P
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntry( 19612 );
@@ -3256,7 +3260,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_RESISTANCE; //we do not support armor rating for pets yet !
-		sp->EffectBasePoints[0] *= 10; //just give it a little jiuce :P
+		sp->EffectBasePoints[0] *= 10; //just give it a little juice :P
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 
@@ -3301,6 +3305,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 19596 );
 	if( sp != NULL )
 	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_SPEED; 
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
@@ -3309,35 +3314,35 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 19583 );
 	if( sp != NULL )
 	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntry( 19584 );
 	if( sp != NULL )
 	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntry( 19585 );
 	if( sp != NULL )
 	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntry( 19586 );
 	if( sp != NULL )
 	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntry( 19587 );
 	if( sp != NULL )
 	{
-		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}

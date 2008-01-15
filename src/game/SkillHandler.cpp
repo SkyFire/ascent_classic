@@ -222,9 +222,11 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 				}
 
 			}
-			if(spellInfo->Attributes & ATTRIBUTES_PASSIVE || (spellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL ||
-															  spellInfo->Effect[1] == SPELL_EFFECT_LEARN_SPELL ||
-															  spellInfo->Effect[2] == SPELL_EFFECT_LEARN_SPELL))
+			if( (spellInfo->Attributes & ATTRIBUTES_PASSIVE || (spellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL ||
+															   spellInfo->Effect[1] == SPELL_EFFECT_LEARN_SPELL ||
+															   spellInfo->Effect[2] == SPELL_EFFECT_LEARN_SPELL) 
+				&& ( (spellInfo->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET) == 0 || ( (spellInfo->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET) && _player->GetSummon() ) ) )
+				)
 			{
 				Spell*sp=new Spell(_player,spellInfo,true,NULL);
 				SpellCastTargets tgt;

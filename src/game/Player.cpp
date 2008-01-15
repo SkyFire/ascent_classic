@@ -1847,6 +1847,7 @@ void Player::SpawnPet(uint32 pet_number)
 	Pet *pPet = objmgr.CreatePet();
 	pPet->SetInstanceID(GetInstanceID());
 	pPet->LoadFromDB(this, itr->second);
+	EventSummonPet(pPet); //cast our talent on the little bastard :)
 }
 
 void Player::_LoadPetSpells(QueryResult * result)
@@ -7885,7 +7886,10 @@ void Player::CompleteLoading()
 	{
 		info = dbcSpell.LookupEntry(*itr);
 
-		if(info && (info->Attributes & ATTRIBUTES_PASSIVE)  ) // passive
+		if(	info  
+			&& (info->Attributes & ATTRIBUTES_PASSIVE)  // passive
+			&& !( info->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET ) //on pet summon talents
+			 ) 
 		{
 			Spell * spell=new Spell(this,info,true,NULL);
 			spell->prepare(&targets);
@@ -7915,6 +7919,10 @@ void Player::CompleteLoading()
 
 		// this stuff REALLY needs to be fixed - Burlex
 		SpellEntry * sp = dbcSpell.LookupEntry((*i).id);
+
+		if ( sp->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET )
+			continue; //do not load auras that only exist while pet exist. We should recast these when pet is created anyway
+
 		Aura * a = new Aura(sp,(*i).dur,this,this);
 
 		for(uint32 x =0;x<3;x++)
@@ -8228,6 +8236,9 @@ void Player::SaveAuras(stringstream &ss)
 					break;
 				}
 			}
+
+			if ( aur->m_spellProto->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET )
+				skip = true;
 
 			// skipped spells due to bugs
 			switch(aur->m_spellProto->Id)
@@ -9629,7 +9640,6 @@ void Player::EventSummonPet( Pet *new_pet )
 		return ; //another wtf error
 
 	SpellSet::iterator it,iter;
-	
 	for(iter= mSpells.begin();iter != mSpells.end();)
 	{
 		it = iter++;

@@ -418,7 +418,9 @@ void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 	if(!p)
 	{
 		if(((Creature*)u_caster)->IsTotem())
-			p=(Player*)((Creature*)u_caster)->GetTotemOwner();
+			p = (Player*)((Creature*)u_caster)->GetTotemOwner();
+		else if( u_caster->IsPet() && static_cast<Pet*>(u_caster)->GetPetOwner() ) 
+			p = static_cast<Pet*>(u_caster)->GetPetOwner();
 	}
 	if(!p)
 		return;
