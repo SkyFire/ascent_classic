@@ -555,6 +555,14 @@
 			RelativePath="..\..\src\shared\usewinhoard.cpp"
 			>
 			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					UsePrecompiledHeader="0"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
 				Name="Release|x64"
 				>
 				<Tool
