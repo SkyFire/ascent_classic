@@ -3856,7 +3856,7 @@ void Spell::Heal(int32 amount)
 		healdoneaffectperc = castaff / 3500.0f;
 		
 		//Downranking
-		if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
+		/*if( m_spellInfo->baseLevel > 0 && m_spellInfo->maxLevel > 0 && p_caster)
 		{
 			float downrank1 = 1.0f;
 			if (m_spellInfo->baseLevel < 20)
@@ -3865,7 +3865,7 @@ void Spell::Heal(int32 amount)
 			if (downrank2 >= 1 || downrank2 < 0)
 				downrank2 = 1.0f;
 			healdoneaffectperc *= downrank1 * downrank2;
-		}
+		}*/
 
 		//caster sided bonus
 		bonus += u_caster->HealDoneMod[m_spellInfo->School] + (amount*u_caster->HealDonePctMod[m_spellInfo->School])/100;
