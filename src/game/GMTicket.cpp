@@ -19,6 +19,20 @@
 
 #include "StdAfx.h"
 
+enum GMticketType
+{
+	GM_TICKET_TYPE_STUCK				= 1,
+	GM_TICKET_TYPE_BEHAVIOR_HARASSMENT	= 2,
+	GM_TICKET_TYPE_GUILD				= 3,
+	GM_TICKET_TYPE_ITEM					= 4,
+	GM_TICKET_TYPE_ENVIRONMENTAL		= 5,
+	GM_TICKET_TYPE_NON-QUEST_CREEP		= 6,
+	GM_TICKET_TYPE_QUEST_QUEST_NPC		= 7,
+	GM_TICKET_TYPE_TECHNICAL			= 8,
+	GM_TICKET_TYPE_ACCOUNT_BILLING		= 9,
+	GM_TICKET_TYPE_CHARACTER			= 10,
+};
+
 void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 {
 	uint32 type;
@@ -37,6 +51,24 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 	recv_data >> z;
 	recv_data >> message;
 	recv_data >> message2;
+
+	/*if (type == GM_TICKET_TYPE_BEHAVIOR_HARASSMENT)
+	{
+		// more magic
+		uint32 unk1;
+		uint32 unk2;
+		uint32 unk3;
+		string unk4;
+		recv_data >> unk1; // count of something
+		for (int i = 0; i < unk1; i++)
+		{
+			recv_data >> unk2
+			// do something with unk2
+		}
+		recv_data >> unk3;
+		if (unk3)
+			recv_data >> unk4;
+	}*/
 
 	// Create new Ticket and store it
 	objmgr.remGMTicket(GetPlayer()->GetGUID());
