@@ -123,8 +123,6 @@ else
 	AC_SUBST(LIB_EXPORT)
 fi
 
-AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
-
 # THIS IS UGLY!
 CPPFLAGS=""
 CFLAGS=""
@@ -212,6 +210,8 @@ if test "x$OSNAME" = "xDarwin" ; then
 	INCLUDES="-I/sw/include -I/sw/include/mysql -I/usr/include/openssl $INCLUDES"
 	LDFLAGS="-L/sw/lib -L/sw/lib/mysql $LDFLAGS -L/usr/lib"
 fi
+
+AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
 
 CPPFLAGS_SAVE=$CPPFLAGS
 CPPFLAGS=$INCLUDES $CPPFLAGS
