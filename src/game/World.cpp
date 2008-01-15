@@ -3063,6 +3063,40 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_RANGED_ATTACK | PROC_TARGET_SELF;
 
+	// Hunter - Spirit Bond
+	sp = dbcSpell.LookupEntry( 19578 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->EffectMiscValue[0] = 19579;
+	}
+	sp = dbcSpell.LookupEntry( 20895 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->EffectMiscValue[0] = 24529;
+	}
+	sp = dbcSpell.LookupEntry( 19579 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA; //we should do the same for player too as we did for pet
+		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
+		sp->EffectImplicitTargetA[1] = sp->EffectImplicitTargetA[0];
+		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+	}
+	sp = dbcSpell.LookupEntry( 24529 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA; //we should do the same for player too as we did for pet
+		sp->EffectApplyAuraName[1] = sp->EffectApplyAuraName[0];
+		sp->EffectImplicitTargetA[1] = sp->EffectImplicitTargetA[0];
+		sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+	}
+
 	// Hunter - Focused Fire
 	sp = dbcSpell.LookupEntry( 35029 );
 	if( sp != NULL )
@@ -3070,7 +3104,6 @@ bool World::SetInitialWorldSettings()
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectMiscValue[0] = 35060;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 		sp->EffectSpellGroupRelation_high[1] = 2048;
 	}
 	sp = dbcSpell.LookupEntry( 35030 );
@@ -3079,7 +3112,6 @@ bool World::SetInitialWorldSettings()
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectMiscValue[0] = 35061;
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 		sp->EffectSpellGroupRelation_high[1] = 2048;
 	}
 	sp = dbcSpell.LookupEntry( 35060 );

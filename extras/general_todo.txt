@@ -150,6 +150,7 @@ Zack - test my shit :
 - Hunter - Thick Hide 19612
 - Hunter - Bestial Swiftness 19596
 - Hunter - Ferocity 19602
+- Hunter - Spirit Bond 20895
 
 ==========================================================================
 Capt - test my shit :
