@@ -231,6 +231,12 @@ void ConsoleSocket::OnRead()
 				break;
 
 			case STATE_LOGGED:
+				if( !strnicmp( m_pBuffer, "quit", 4 ) )
+				{
+					Disconnect();
+					break;
+				}
+
                 HandleConsoleInput(m_pConsole, m_pBuffer);
 				break;
 			}
@@ -332,7 +338,7 @@ void HandleConsoleInput(BaseConsole * pConsole, const char * szInput)
 		{ &HandleAnnounceCommand, "announce", "<announce string>", "Shows the message in all client chat boxes." },
 		{ &HandleWAnnounceCommand, "wannounce", "<wannounce string>", "Shows the message in all client title areas." },
 		{ &HandleKickCommand, "kick", "<plrname> <reason>", "Kicks player x for reason y." },
-		{ &HandleQuitCommand, "quit", "[delay]", "Shuts down server with optional delay in seconds." },
+		{ &HandleQuitCommand, "shutdown", "[delay]", "Shuts down server with optional delay in seconds." },
 		{ &HandleCancelCommand, "cancel", "none", "Cancels a pending shutdown." },
 		{ &HandleUptimeCommand, "uptime", "none", "Shows server uptime." },
 		{ &HandleBanAccountCommand, "banaccount", "<account> <timeperiod>", "Bans account x for time y." },

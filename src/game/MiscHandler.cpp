@@ -1631,7 +1631,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 	uint8 slotid;
 	recv_data >> creatureguid >> slotid >> target_playerguid;
 
-	if(_player->GetGroup() != NULL || _player->GetGroup()->GetLooter() != _player->m_playerInfo)
+	if(_player->GetGroup() == NULL || _player->GetGroup()->GetLooter() != _player->m_playerInfo)
 		return;
 
 	Player *player = _player->GetMapMgr()->GetPlayer((uint32)target_playerguid);

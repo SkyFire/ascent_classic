@@ -590,7 +590,7 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket & recv_data)
 	}
 
 	name = WorldDatabase.EscapeString(name);
-	QueryResult * result2 = WorldDatabase.Query("SELECT COUNT(*) FROM banned_names WHERE name = '%s'", name.c_str());
+	/*QueryResult * result2 = WorldDatabase.Query("SELECT COUNT(*) FROM banned_names WHERE name = '%s'", name.c_str());
 	if(result2)
 	{
 		if(result2->Fetch()[0].GetUInt32() > 0)
@@ -601,7 +601,7 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket & recv_data)
 			SendPacket(&data);
 		}
 		delete result2;
-	}
+	}*/
 
 	// Check if name is in use.
 	if(objmgr.GetPlayerInfoByName(name) != 0)
