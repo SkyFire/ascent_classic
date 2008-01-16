@@ -1698,7 +1698,7 @@ void Aura::SpellAuraDummy(bool apply)
 				static_cast<Player*>(m_target)->m_RegenManaOnSpellResist += ((apply) ? 1:-1)*(float)mod->m_amount/100;
 			}
 		}break;
-	//warlock - seed of corruption
+/*	//warlock - seed of corruption
 	case 27243:
 	case 32863:
 	case 36123:
@@ -1735,7 +1735,7 @@ void Aura::SpellAuraDummy(bool apply)
 					}
 				}
 			}
-		}break;
+		}break;*/
 	case 17007: //Druid:Leader of the Pack
 		{
 			if (!m_target->IsPlayer())

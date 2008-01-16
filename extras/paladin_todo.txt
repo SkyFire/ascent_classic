@@ -42,3 +42,6 @@ Seal of Blood both dosnt work.
  consecration - should reveal hidden targets
 
  blessing of salvation
+
+Avenger's Shield
+Hurls a holy shield at the enemy, dealing X to Y Holy damage, Dazing them and then jumping to additional nearby enemies. Affects 3 total targets. Lasts 6 sec.

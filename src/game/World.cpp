@@ -2543,11 +2543,13 @@ bool World::SetInitialWorldSettings()
 	uint32 ss_grouprelation = 512;//rogue - ambush (only a part of the whole group since it would affect other spells too)
 	ss_grouprelation |= 4;//rogue - Backstab (only a part of the whole group since it would affect other spells too)
 	ss_grouprelation |= 256;//Garrote
+	ss_grouprelation |= 536870912 | 16 | 8 | 8389120 | 41943040 | 33554432 | 32 | 67108864 | 64 | 128 ;
 	//rogue - Shadowstep
 	sp = dbcSpell.LookupEntry( 36563 ); 
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[1] = ss_grouprelation;
+		sp->EffectSpellGroupRelation_high[1] = 256 | 128 ;
 		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 	}
 
@@ -3761,9 +3763,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 27243 );
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_DIE;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 27285;
+		sp->procFlags = PROC_ON_DIE;
+		sp->procChance = 100;
 	}
+	sp = dbcSpell.LookupEntry( 27285 );
+	if( sp != NULL )
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_FRIENDLY_IN_AREA;
 
 	//warlock -  soul link
 	sp = dbcSpell.LookupEntry( 19028 );
@@ -3771,7 +3778,7 @@ bool World::SetInitialWorldSettings()
 	{
 		//this is for the trigger effect
 		sp->Effect[0]=6;
-		sp->EffectApplyAuraName[0] = 42;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 25228;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM ;
@@ -5512,11 +5519,6 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = 139944;
 	
-	/* shadowstep - change proc flags */
-	sp = dbcSpell.LookupEntry( 36563 );
-	if( sp != NULL )
-		sp->procFlags = 0;
-
 	/* thrown - add a 1.6 second cooldown */
 	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL,SPELL_RANGED_THROW,SPELL_RANGED_WAND, 26679, 27084, 29436, 37074, 41182, 41346, 0};
 	for(i = 0; thrown_spells[i] != 0; ++i)

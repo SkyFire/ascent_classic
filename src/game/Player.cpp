@@ -8260,6 +8260,7 @@ void Player::SaveAuras(stringstream &ss)
 			{
 			case 12043: // Presence of mind
 			case 11129: // Combustion
+			case 28682: // Combustion proc
 			case 16188: // Natures Swiftness
 			case 17116: // Natures Swiftness
 			case 34936: // Backlash
@@ -9525,6 +9526,7 @@ void Player::save_Auras()
 			{
 			case 12043: // Presence of mind
 			case 11129: // Combustion
+			case 28682: // Combustion proc
 			case 16188: // Natures Swiftness
 			case 17116: // Natures Swiftness
 			case 34936: // Backlash

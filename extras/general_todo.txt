@@ -72,19 +72,13 @@ Zack - test my shit :
 - mage - Frost Warding - 28332 - does not reflect
 - Gnomish Poultryizer trinket - Poultryizer - need aura duration to set to 15 sec
 - palading spiritual atunement procs 2 times.And it should proc if others cast heal spell on paladin
-- mobs continue casting after they die. Test spell CancelSpellCast.Specially test this : CastSpellAoF
-"yes, the thing is that if you have "Heart of the Wild" talent and you reset talents, if you shift you have like 500mil hp & insane dmg. You need to relog in order that things should work fine. Same thing for other talents ... leader of pack, imp leader of pack...they need to relog to lose them."
 - test pet spell targeting
-- aurastate gets consumed after using it
 - check seal of command (again) to see if it gets armor reduction or resistance reduction
 - shaman - Elemental mastery 16166 - crit and mana - Not working sice the aura remove happens before the trigger
 - shaman - Totemic focus 16225
 - shaman - Elemental Devastation 30160
 - shaman - Enhancing Totems 16295. ! make totems inherit the casters enhancements !
 - shaman - Restorative Totems 16208
-- warlock - Amplify Curse 18288
-- warlock - Improved Howl of Terror 30057
-- warlock - Bane 17792.
 - rogue - Improved Expose Armor 14169
 - rogue - Vile Poisons 16720
 - rogue - Improved Poisons 14117
@@ -107,13 +101,11 @@ Zack - test my shit :
 - shaman - purge 8012
 - started playin with grounding totem effect, but it is defenetly not finished
 - warlock: Improved Enslave Demon 18822
-- warlock: Master Conjuror 18768 - should work
 - warlock: Demonic Knowledge 35693
-- warlock - Seed of Corruption 27243
 - warlock: Pyroclasm 18096
 - warlock - Backlash 34939 - should not remove mother spell
-- warlock - Ruin 17959
-- warlock - destructive reach 17918
+- warlock: Master Conjuror 18768 - should work
+- warlock - Seed of Corruption 27243 - might not be perfect in all cases
 - warrior - Booming Voice 12838
 - warrior - Improved Commanding Shout 38408
 - mage : Improved Blink 31570
