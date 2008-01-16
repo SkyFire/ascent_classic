@@ -2065,6 +2065,8 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 43750 ); 
 	if( sp != NULL )
 	{
+		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0] = 43751;//proc something (we will owerride this)
 		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
 	}
 
@@ -2072,6 +2074,8 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 33297 ); 
 	if( sp != NULL )
 	{
+		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
+		sp->EffectTriggerSpell[0] = 33370;//proc something (we will owerride this)
 		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
 	}
 
