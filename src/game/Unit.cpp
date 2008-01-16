@@ -1348,7 +1348,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							//paladin - sanctified judgement
 							case 31930:
 							{
-//!! not working since we use post even hook and seal disapears before event
+								//!! not working since we use post even hook and seal disapears before event
 								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								if(	CastingSpell->NameHash != SPELL_HASH_JUDGEMENT )
@@ -1356,24 +1356,38 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( !IsPlayer() )
 									continue; //great, we can only make this for players 
 								Player* c = static_cast< Player* >( this );
-//printf("is there a seal on the player ? %u \n",c->Seal);
+								//printf("is there a seal on the player ? %u \n",c->Seal);
 								if( !c->Seal )
 									continue; //how the hack did we manage to cast judgement without a seal ?
 								SpellEntry *spellInfo = dbcSpell.LookupEntry( c->Seal ); //null pointer check was already made
 								if( !spellInfo )
 									continue;	//now this is getting freeky, how the hell did we manage to create this bug ?
 								dmg_overwrite = spellInfo->manaCost / 2 ; //only half dmg
-//printf("is there a seal on the player ? %u \n",dmg_overwrite);
-							}break; 
+								//printf("is there a seal on the player ? %u \n",dmg_overwrite);
+							}break;
+						//Energized
+						case 43750:
+							{
+								if( !CastingSpell )
+									continue;
+								if(	CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT )
+									continue
+							}break;
+						//Spell Haste Trinket
+						case 33297:
+							{
+								if( !CastingSpell )
+									continue;
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) )
+									continue;
+							}break;
 						//shaman - Lightning Overload
 						case 39805:
 							{
 								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//trigger on lightning and chain lightning. Spell should be identical , well maybe next time :P
-								if(	CastingSpell->NameHash == SPELL_HASH_LIGHTNING_BOLT //lighning bolt
-									|| CastingSpell->NameHash == SPELL_HASH_CHAIN_LIGHTNING //chain lightning
-									)
+								if(	CastingSpell->NameHash == SPELL_HASH_LIGHTNING_BOLT || CastingSpell->NameHash == SPELL_HASH_CHAIN_LIGHTNING )
 								{
 									spellId = CastingSpell->Id;
 									dmg_overwrite = (CastingSpell->EffectBasePoints[0] + 1) / 2; //only half dmg
@@ -1385,7 +1399,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( !CastingSpell )
 									continue;
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //requires offensive spell. ! might not cover all spells
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) ) //requires offensive spell. ! might not cover all spells
 									continue;
 							}break;
 						// druid - Celestial Focus

@@ -2061,7 +2061,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 
-	//shaman - Energized 
+	//Energized 
 	sp = dbcSpell.LookupEntry( 43750 ); 
 	if( sp != NULL )
 	{
