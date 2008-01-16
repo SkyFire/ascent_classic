@@ -3183,10 +3183,13 @@ void Player::AddToWorld(MapMgr * pMapMgr)
 		m_session->SetInstance(m_mapMgr->GetInstanceID());
 }
 
-void Player::OnPushToWorld()
+void Player::OnPrePushToWorld()
 {
 	SendInitialLogonPackets();
+}
 
+void Player::OnPushToWorld()
+{
 	if(m_TeleportState == 2)   // Worldport Ack
 		OnWorldPortAck();
 
@@ -6600,12 +6603,12 @@ void Player::PushUpdateData(ByteBuffer *data, uint32 updatecount)
 	// imagine the bytebuffer getting appended from 2 threads at once! :D
 	_bufferS.Acquire();
 
-	/* this is a safe barrier. */
-	if(bUpdateBuffer.size() >= 40000)
-	{
-        /* force an update to push out our pending data */
+	// unfortunately there is no guarantee that all data will be compressed at a ratio
+	// that will fit into 2^16 bytes ( stupid client limitation on server packets )
+	// so if we get more than 63KB of update data, force an update and then append it
+	// to the clean buffer.
+	if( (data->size() + bUpdateBuffer.size() ) >= 63000 )
 		ProcessPendingUpdates();
-	}
 
 	mUpdateCount += updatecount;
 	bUpdateBuffer.append(*data);
@@ -6637,15 +6640,15 @@ void Player::PushOutOfRange(const WoWGuid & guid)
 
 void Player::PushCreationData(ByteBuffer *data, uint32 updatecount)
 {
-    	// imagine the bytebuffer getting appended from 2 threads at once! :D
+    // imagine the bytebuffer getting appended from 2 threads at once! :D
 	_bufferS.Acquire();
 
-	/* this is a safe barrier. */
-	if(bCreationBuffer.size() >= 40000)
-	{
-        /* force an update to push out our pending data */
+	// unfortunately there is no guarantee that all data will be compressed at a ratio
+	// that will fit into 2^16 bytes ( stupid client limitation on server packets )
+	// so if we get more than 63KB of update data, force an update and then append it
+	// to the clean buffer.
+	if( (data->size() + bCreationBuffer.size() + mOutOfRangeIds.size() ) >= 63000 )
 		ProcessPendingUpdates();
-	}
 
 	mCreationCount += updatecount;
 	bCreationBuffer.append(*data);

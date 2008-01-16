@@ -146,22 +146,8 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			if( _side < 0 )
 			{
 				// work out the side
-				switch( race )
-				{
-				case RACE_BLOODELF:
-				case RACE_TROLL:
-				case RACE_TAUREN:
-				case RACE_UNDEAD:
-				case RACE_ORC:
-					{
-						_side = 1;
-					}break;
-					
-				default:
-					{
-						_side = 0;
-					}break;
-				}
+				static uint8 sides[RACE_DRAENEI+1] = { 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0 };
+				_side = sides[race];
 			}
 
 			/* build character enum, w0000t :p */

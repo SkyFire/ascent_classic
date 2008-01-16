@@ -983,6 +983,8 @@ void Object::PushToWorld(MapMgr*mgr)
 	m_instanceId = mgr->GetInstanceID();
 
 	m_mapMgr = mgr;
+	OnPrePushToWorld();
+
 	mgr->PushObject(this);
 
 	// correct incorrect instance id's

@@ -115,6 +115,7 @@ public:
 	virtual void AddToWorld(MapMgr * pMapMgr);
 	void PushToWorld(MapMgr*);
 	virtual void OnPushToWorld() { }
+	virtual void OnPrePushToWorld() { }
 	virtual void RemoveFromWorld(bool free_guid);
 
 	// guid always comes first

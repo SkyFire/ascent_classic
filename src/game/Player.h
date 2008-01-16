@@ -1677,6 +1677,7 @@ public:
 	void CompleteLoading();
 	set<SpellEntry *> castSpellAtLogin;
 	void OnPushToWorld();
+	void OnPrePushToWorld();
 	void OnWorldPortAck();
 	uint32 m_TeleportState;
 	set<Unit*> visiblityChangableSet;
