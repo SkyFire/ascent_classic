@@ -1371,7 +1371,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( !CastingSpell )
 									continue;
 								if(	CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT )
-									continue
+									continue;
 							}break;
 						//Spell Haste Trinket
 						case 33297:
