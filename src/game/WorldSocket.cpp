@@ -440,7 +440,7 @@ void WorldSocket::_HandlePing(WorldPacket* recvPacket)
 	if(mSession)
 	{
 		mSession->_latency = _latency;
-		mSession->m_lastPing = (uint32)UNIXTIME;
+		//mSession->m_lastPing = (uint32)UNIXTIME;
 
 		// reset the move time diff calculator, don't worry it will be re-calculated next movement packet.
 		mSession->m_clientTimeDelay = 0;

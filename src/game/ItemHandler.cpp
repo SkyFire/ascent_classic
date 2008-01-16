@@ -1211,6 +1211,9 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	if (unit == NULL || !unit->HasItems())
 		return;
 
+	if(amount < 1)
+		amount = 1;
+
 	CreatureItem item;
 	unit->GetSellItemByItemId(itemid, item);
 
