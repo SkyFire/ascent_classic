@@ -3230,7 +3230,7 @@ void Aura::SpellAuraModShapeshift(bool apply)
 {
 	if(!p_target) return;
 
-	if(p_target->m_MountSpellId)
+	if(p_target->m_MountSpellId && p_target->m_MountSpellId != m_spellProto->Id)
 		m_target->RemoveAura(p_target->m_MountSpellId); // these spells are not compatible
 
 	uint32 spellId = 0;
