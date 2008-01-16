@@ -355,7 +355,8 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			}
 		
 			if(static_cast<Unit*>(this)->GetAIInterface()->IsFlying())
-				flags2 |= 0x800;
+//				flags2 |= 0x800; //in 2.3 this is some state that i was not able to decode yet
+				flags2 |= 0x400; //Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
 			if(static_cast<Creature*>(this)->proto && static_cast<Creature*>(this)->proto->extra_a9_flags)
 			{
 				if(!(flags2 & 0x0200))
