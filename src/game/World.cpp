@@ -3699,6 +3699,14 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 
+	//warlock -  Seed of Corruption
+	sp = dbcSpell.LookupEntry( 27243 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_DIE;
+		sp->EffectTriggerSpell[0] = 27285;
+	}
+
 	//warlock -  soul link
 	sp = dbcSpell.LookupEntry( 19028 );
 	if( sp != NULL )

@@ -1,18 +1,6 @@
 Vampiric Touch, doesn't give any mana.
 HealthStone rank 2
 Nether Protection procs of shadow and fire dmg DoT's ticks
-pet is not controlable
-
-*Warlock pets will attack someone who uses bandages on them.
-
-Demonology:
-
-1. Demonic Aegis - does not increases efectiveness of armor spells at any rank.
-2. Demonic Knowledge - does not increases spell dmg at all.
-3. Soul Link - deamon does not take any dmg instead of caster. 
-
-Affliction
-Seed of Corruption - no dmg when detonates
 
 Demonology
 SoulWell - nothing appears - wtf ? i can;t find this spell :S

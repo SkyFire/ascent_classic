@@ -5,8 +5,7 @@ Explanation: Scatter shot will sometimes say "you cant do that while immune(soun
 
 TALENTS
 --BM--
-Serpent's Swiftness: increases only your attack speed (inc pet attack speed)
-The Beast Within: doesn't work (adds a buff for hunter onBestial Wrath)
+The Beast Within: doesn't work (adds a buff for hunter onBestial Wrath) - has to trigger on cast spell and has to end when buff expires
 --MM--
 Improved Hunter's Mark: doesn't work (grants also +melee ap)
 --SUR--
