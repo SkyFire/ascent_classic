@@ -395,8 +395,10 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 
 void Aura::Remove()
 {
-	sLog.outDetail("Aura::Remove %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name, m_target->GetGUIDLow());
- 	sEventMgr.RemoveEvents( this );
+	if( m_spellProto == NULL )
+		sLog.outDetail("Aura::Remove %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name != NULL ? m_spellProto->Name : "", m_target != NULL ? m_target->GetGUIDLow() : 0 );
+ 	
+	sEventMgr.RemoveEvents( this );
 
 	if( !IsPassive() || IsPassive() && m_spellProto->AttributesEx & 1024 )
 		RemoveAuraVisual();

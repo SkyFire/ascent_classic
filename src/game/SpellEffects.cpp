@@ -1977,7 +1977,7 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	if(z == NO_WMO_HEIGHT)		// not found height, or on adt
 		z = m_caster->GetMapMgr()->GetLandHeight(posX,posY);
 
-	if( abs( z - m_caster->GetPositionZ() ) >= 10.0f )
+	if( fabs( z - m_caster->GetPositionZ() ) >= 10.0f )
 		return;
 
 	LocationVector dest(posX, posY, z + 2.0f, ori);

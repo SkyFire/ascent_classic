@@ -1411,7 +1411,7 @@ void Creature::SetGuardWaypoints()
 		if( wp->z == NO_WMO_HEIGHT )
 			wp->z = m_mapMgr->GetLandHeight(wp->x, wp->y);
 
-		if( abs( wp->z - m_spawnLocation.z ) > 10.0f )
+		if( fabs( wp->z - m_spawnLocation.z ) > 10.0f )
 			wp->z = m_spawnLocation.z;
 #else
 		wp->z = GetMapMgr()->GetLandHeight(wp->x, wp->y);
