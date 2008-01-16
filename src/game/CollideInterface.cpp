@@ -149,6 +149,15 @@ bool CCollideInterface::IsIndoor(uint32 mapId, LocationVector * pos)
 	return r;
 }
 
+bool CCollideInterface::IsIndoorMod(uint32 mapId, LocationVector * pos)
+{
+	bool r;
+	COLLISION_BEGINTIMER;
+	printf("[%u ns] IsIndoorMod Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos->x, pos->y, pos->z);
+	r = collision_check_indoor_mod(mapId, pos);
+	return r;
+}
+
 bool CCollideInterface::IsIndoor(uint32 mapId, float x, float y, float z)
 {
 	bool r;
@@ -249,6 +258,11 @@ float CCollideInterface::GetHeight(uint32 mapId, LocationVector * pos)
 bool CCollideInterface::IsIndoor(uint32 mapId, LocationVector * pos)
 {
 	return collision_check_indoor(mapId, pos);
+}
+
+bool CCollideInterface::IsIndoorMod(uint32 mapId, LocationVector * pos)
+{
+	return collision_check_indoor_mod(mapId, pos);
 }
 
 bool CCollideInterface::IsIndoor(uint32 mapId, float x, float y, float z)

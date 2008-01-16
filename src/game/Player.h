@@ -1984,7 +1984,7 @@ protected:
 	float       m_lastBackSwimSpeed;
 	float       m_lastFlySpeed;
 
-
+	uint32 m_mountCheckTimer;
 	void RemovePendingPlayer();
 };
 

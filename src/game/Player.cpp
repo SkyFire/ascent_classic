@@ -19,6 +19,7 @@
 
 #include "StdAfx.h"
 UpdateMask Player::m_visibleUpdateMask;
+#define COLLISION_MOUNT_CHECK_INTERVAL 1000
 
 Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 {
@@ -383,6 +384,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_fallDisabledUntil = 0;
 	m_lfgMatch = NULL;
 	m_lfgInviterGuid = 0;
+	m_mountCheckTimer = 0;
 	this->OnLogin();
 }
 
@@ -885,6 +887,24 @@ void Player::Update( uint32 p_time )
 		else
 			m_pvpTimer -= p_time;
 	}
+
+#ifdef COLLISION
+	if(m_MountSpellId != 0)
+	{
+		if( mstime >= m_mountCheckTimer )
+		{
+			if( CollideInterface.IsIndoorMod( m_mapId, &m_position ) )
+			{
+				RemoveAura( m_MountSpellId );
+				m_MountSpellId = 0;
+			}
+			else
+			{
+				m_mountCheckTimer = mstime + COLLISION_MOUNT_CHECK_INTERVAL;
+			}
+		}
+	}
+#endif
 }
 
 void Player::EventDismount(uint32 money, float x, float y, float z)
@@ -7410,28 +7430,20 @@ bool Player::SafeTeleport(uint32 MapID, uint32 InstanceID, const LocationVector 
 	{
 		instance = true;
 		this->SetInstanceID(InstanceID);
+#ifndef COLLISION
 		// if we are mounted remove it
 		if( m_MountSpellId )
 			RemoveAura( m_MountSpellId );
-		// if we are in ghost wolf remove it
-		if( this->FindAura( 2645 ) )
-			RemoveAura( 2645 );
-		// if we are in travel form remove it
-		if( this->FindAura( 783 ) )
-			RemoveAura( 783 );
+#endif
 	}
 	else if(m_mapId != MapID)
 	{
 		instance = true;
+#ifndef COLLISION
 		// if we are mounted remove it
 		if( m_MountSpellId )
 			RemoveAura( m_MountSpellId );
-		// if we are in ghost wolf remove it
-		if( this->FindAura( 2645 ) )
-			RemoveAura( 2645 );
-		// if we are in travel form remove it
-		if( this->FindAura( 783 ) )
-			RemoveAura( 783 );
+#endif
 	}
 
 	// make sure player does not drown when teleporting from under water

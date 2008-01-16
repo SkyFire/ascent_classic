@@ -2576,6 +2576,13 @@ uint8 Spell::CanCast(bool tolerate)
 
 	if( p_caster != NULL )
 	{
+#ifdef COLLISION
+		if( m_spellInfo->Attributes & ATTRIBUTES_ONLY_OUTDOORS )
+		{
+			if( CollideInterface.IsIndoorMod( p_caster->GetMapId(), p_caster->GetPositionV() ) )
+				return SPELL_FAILED_ONLY_OUTDOORS;
+		}
+#endif
 		// check for cooldowns
 		if(!tolerate && !p_caster->CanCastDueToCooldown(m_spellInfo))
 				return SPELL_FAILED_NOT_READY;

@@ -38,6 +38,7 @@ COLLISION_IMPORT void collision_activate_cell(uint32 mapid, uint32 x, uint32 y);
 COLLISION_IMPORT void collision_deactivate_cell(uint32 mapid, uint32 x, uint32 y);
 
 COLLISION_IMPORT bool collision_check_indoor(uint32 mapid, LocationVector * pos);
+COLLISION_IMPORT bool collision_check_indoor_mod(uint32 mapid, LocationVector * pos);
 COLLISION_IMPORT bool collision_check_los(uint32 mapid, LocationVector * pos1, LocationVector * pos2);
 COLLISION_IMPORT bool collision_check_losmod(uint32 mapid, LocationVector * pos1, LocationVector * pos2);
 COLLISION_IMPORT float collision_get_height(uint32 mapid, LocationVector * pos);
@@ -68,6 +69,7 @@ public:
 	bool CheckLOSMod(uint32 mapId, LocationVector * pos1, LocationVector * pos2);
 	bool GetFirstPoint(uint32 mapId, LocationVector * pos1, LocationVector * pos2, LocationVector * outvec, float distmod);
 	bool IsIndoor(uint32 mapId, LocationVector * pos);
+	bool IsIndoorMod(uint32 mapId, LocationVector * pos);
 	float GetHeight(uint32 mapId, LocationVector * pos);
 };
 
