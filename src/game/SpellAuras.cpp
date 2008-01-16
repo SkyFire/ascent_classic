@@ -3650,8 +3650,8 @@ void Aura::SpellAuraProcTriggerDamage(bool apply)
 		ds.m_school = GetSpellProto()->School;
 		ds.m_flags = m_spellProto->procFlags;
 		ds.owner = (void*)this;
-sLog.outDebug("registering dmg proc %u, school %u, flags %u, charges %u \n",ds.m_spellId,ds.m_school,ds.m_flags,m_spellProto->procCharges);
 		m_target->m_damageShields.push_back(ds);
+		sLog.outDebug("registering dmg proc %u, school %u, flags %u, charges %u \n",ds.m_spellId,ds.m_school,ds.m_flags,m_spellProto->procCharges);
 	}
 	else
 	{
