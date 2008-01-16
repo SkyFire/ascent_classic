@@ -1366,7 +1366,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								//printf("is there a seal on the player ? %u \n",dmg_overwrite);
 							}break;
 						//Energized
-						case 43750:
+						case 43751:
 							{
 								if( !CastingSpell )
 									continue;
@@ -1374,7 +1374,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;
 							}break;
 						//Spell Haste Trinket
-						case 33297:
+						case 33370:
 							{
 								if( !CastingSpell )
 									continue;
