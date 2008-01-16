@@ -2015,7 +2015,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 43750 ); 
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL | PROC_TARGET_SELF;
+	}
+
+	//Spell Haste Trinket
+	sp = dbcSpell.LookupEntry( 33297 ); 
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL | PROC_TARGET_SELF;
 	}
 
 	//shaman - Purge 
@@ -3658,6 +3665,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CRIT_ATTACK;
 		sp->procChance = 50;
 	}
+
 	//Druid:Intensity
 	sp = dbcSpell.LookupEntry( 17106 );
 	if( sp != NULL )
@@ -4877,6 +4885,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 38408 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1048576;
+
 	// priest - Reflective Shield
 	sp = dbcSpell.LookupEntry( 33201 );
 	if( sp != NULL )
@@ -4913,6 +4922,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
 	}
+
 	// mage - Frost Warding
 	sp = dbcSpell.LookupEntry( 11189 );
 	if( sp != NULL )
@@ -4920,6 +4930,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 28332 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 33554432;
+
 	//Gnomish Poultryizer trinket - Poultryizer
 	sp = dbcSpell.LookupEntry( 30507 );
 	if( sp != NULL )
@@ -4927,6 +4938,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[0] = 6;
 		sp->EffectApplyAuraName[0] = 56;
 	}
+
 	// paladin - benediction
 	sp = dbcSpell.LookupEntry( 20101 );
 	if( sp != NULL )
