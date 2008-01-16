@@ -738,16 +738,6 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	/* remove from any auto queue remove events */
 	sEventMgr.RemoveEvents(plr, EVENT_BATTLEGROUND_QUEUE_UPDATE);
 
-	if(!skip_teleport)
-	{
-		/* This is where we actually teleport the player to the battleground. */	
-		//plr->SafeTeleport(m_mapMgr->GetMapId(), m_mapMgr->GetInstanceID(), GetStartingCoords(plr->m_bgTeam));
-		if(plr->IsInWorld())
-			plr->RemoveFromWorld();
-		plr->SafeTeleport(m_mapMgr,GetStartingCoords(plr->m_bgTeam));
-		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, (uint32)UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
-	}
-
 	plr->m_pendingBattleground = 0;
 	plr->m_bg = this;
 	
@@ -781,6 +771,17 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 
 	sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_CLOSE);
 	OnAddPlayer(plr);
+
+	if(!skip_teleport)
+	{
+		/* This is where we actually teleport the player to the battleground. */	
+		//plr->SafeTeleport(m_mapMgr->GetMapId(), m_mapMgr->GetInstanceID(), GetStartingCoords(plr->m_bgTeam));
+		if(plr->IsInWorld())
+			plr->RemoveFromWorld();
+		plr->SafeTeleport(m_mapMgr,GetStartingCoords(plr->m_bgTeam));
+		BattlegroundManager.SendBattlefieldStatus(plr, 3, m_type, m_id, (uint32)UNIXTIME - m_startTime, m_mapMgr->GetMapId(),Rated());	// Elapsed time is the last argument
+	}
+
 	m_mainLock.Release();
 }
 
