@@ -1515,6 +1515,56 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL && sp->Id == 16164 )
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
 
+    //Solarian's Sapphire
+    sp = dbcSpell.LookupEntry(37536);
+     if( sp != NULL )
+        sp->EffectSpellGroupRelation[0] = 65536;
+
+    //Totem of the Pulsing Earth
+    sp = dbcSpell.LookupEntry(37740);
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 1;
+
+    //Totem of the Maelstrom
+    sp = dbcSpell.LookupEntry( 37738 );
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 64;
+
+    //Totem of Living Water
+    sp = dbcSpell.LookupEntry( 43752 );
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 256;
+
+    //Totem of Healing Rains
+    sp = dbcSpell.LookupEntry( 38322 );
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 256;
+
+    //Totem of Lightning
+    sp = dbcSpell.LookupEntry( 33696 );
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 1;
+
+    //Everbloom Idol
+    sp = dbcSpell.LookupEntry( 33693 );
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 32768;
+
+    //Idol of the Avian Heart
+    sp = dbcSpell.LookupEntry( 38321 );
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 32;
+
+    //Idol of the Crescent Goddess
+    sp = dbcSpell.LookupEntry( 37737 );
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 64;
+
+    //Idol of the Avenger
+    sp = dbcSpell.LookupEntry( 37760 );
+    if( sp != NULL )
+       sp->EffectSpellGroupRelation[0] = 1;
+
 	//remove stormstrike effect 0
 	sp = dbcSpell.LookupEntry( 17364 );
 	if( sp != NULL && sp->Id == 17364 )
