@@ -2180,9 +2180,8 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			res = 0;
 		else
 		{
-
 //------------------------------critical strike chance--------------------------------------	
-			float CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerSpellCritChanceMod[school];
+			float CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerCritChanceMod[school];
 			if( caster->IsPlayer() && ( pVictim->m_rooted - pVictim->m_stunned ) )	
 				CritChance += static_cast< Player* >( caster )->m_RootedCritChanceBonus;
 

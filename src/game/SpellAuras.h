@@ -531,6 +531,7 @@ public:
 	void SpellAuraIncreaseSpellDamageByInt(bool apply);
 	void SpellAuraIncreaseHealingByInt(bool apply);
 	void SpellAuraIncreaseAllWeaponSkill(bool apply);
+	void SpellAuraModAttackerCritChance(bool apply);
 	void SpellAuraIncreaseHitRate(bool apply);
 	void SpellAuraReduceCritMeleeAttackDmg(bool apply);
 	void SpellAuraReduceCritRangedAttackDmg(bool apply);

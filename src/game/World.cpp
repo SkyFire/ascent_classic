@@ -2830,6 +2830,10 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 20356 );if( sp != NULL ) sp->procChance = procchance;
 	sp = dbcSpell.LookupEntry( 20357 );if( sp != NULL ) sp->procChance = procchance;
 	sp = dbcSpell.LookupEntry( 27166 );if( sp != NULL ) sp->procChance = procchance;
+	//Druid: Natural Perfection
+	sp = dbcSpell.LookupEntry( 33881 );if ( sp != NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33882 );if ( sp != NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33883 );if ( sp != NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	//Druid: Frenzied Regeneration
 	sp = dbcSpell.LookupEntry( 22842 );
 	if( sp != NULL )
@@ -5074,6 +5078,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[1] = 0;
+		sp->EffectSpellGroupRelation_high[0] |= 16;
 	}
 	sp = dbcSpell.LookupEntry( 24943 );
 	if( sp != NULL )
@@ -5081,6 +5086,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[1] = 0;
+		sp->EffectSpellGroupRelation_high[0] |= 16;
 	}
 	sp = dbcSpell.LookupEntry( 24944 );
 	if( sp != NULL )
@@ -5088,6 +5094,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[1] = 0;
+		sp->EffectSpellGroupRelation_high[0] |= 16;
 	}
 	sp = dbcSpell.LookupEntry( 24945 );
 	if( sp != NULL )
@@ -5095,6 +5102,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[1] = 0;
+		sp->EffectSpellGroupRelation_high[0] |= 16;
 	}
 	sp = dbcSpell.LookupEntry( 24946 );
 	if( sp != NULL )
@@ -5102,6 +5110,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 		sp->EffectSpellGroupRelation[1] = 0;
+		sp->EffectSpellGroupRelation_high[0] |= 16;
 	}
 
 	// druid - Empowered Touch
@@ -5193,35 +5202,9 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 16864 );
 	if( sp != NULL )
 	{
-		sp->procChance=100;
+		sp->procChance=100; //procchance dynamic. 3ppm
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
 	}
-
-
-/*	// druid - Improved Mark of the Wild - already working ?
-	uint32 imarkofthv_group=0;
-	tsp = dbcSpell.LookupEntry( 1126 ); //Mark of the wild
-	if(tsp)
-		imarkofthv_group = tsp->SpellGroupType;
-	tsp = dbcSpell.LookupEntry( 21849 ); //Gift of the Wild
-	if(tsp)
-		imarkofthv_group |= tsp->SpellGroupType;
-	sp = dbcSpell.LookupEntry( 17050 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	sp = dbcSpell.LookupEntry( 17051 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	sp = dbcSpell.LookupEntry( 17053 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	sp = dbcSpell.LookupEntry( 17054 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;
-	sp = dbcSpell.LookupEntry( 17055 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = imarkofthv_group;*/
-
 //---------ITEMS-----------------
 
 	sp = dbcSpell.LookupEntry( 33758 );
@@ -5242,43 +5225,110 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
 
 	// Everbloom Idol
-	sp = dbcSpell.LookupEntry( 33693 );
-	if( sp != NULL )
+	sp = dbcSpell.LookupEntry( 33693 );if( sp != NULL )
 	{
-		SpellEntry* sh = dbcSpell.LookupEntry( 16968 );
-		if (sh)
-			sp->EffectSpellGroupRelation[0] = sh->EffectSpellGroupRelation[0];
+			sp->EffectSpellGroupRelation[0] |= 32768;
+	}
+	//Item Set: Thunderheart Harness
+	sp = dbcSpell.LookupEntry( 38447 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] |=1024;
+		sp->EffectSpellGroupRelation_high[1] |=64;
+	}
+	sp = dbcSpell.LookupEntry( 38416 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] |=8388608;
+		sp->EffectSpellGroupRelation_high[0] |=1048576;
+		sp->EffectSpellGroupRelation[1] |=8388608;
+	}
+	//Item Set: Thunderheart Regalia
+	sp = dbcSpell.LookupEntry( 38414 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] |=2;
+	}
+	sp = dbcSpell.LookupEntry( 38415 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] |=4;
+	}
+	//Item Set: Thunderheart Raiment
+	sp = dbcSpell.LookupEntry( 38417 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] |=2;
+	}
+	sp = dbcSpell.LookupEntry( 38420 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] |=32;
+	}
+	//Item Set: Nordrassil Harness
+	sp = dbcSpell.LookupEntry( 37333 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[1] |=256;
+		sp->EffectSpellGroupRelation[0] |=32768;
+	}
+	//Item Set: Nordrassil Raiment
+	sp = dbcSpell.LookupEntry( 37313 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] |=64;
+	}
+	sp = dbcSpell.LookupEntry( 37314 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] |=16;
+	}
+	//Item Set: Malorne Raiment
+	sp = dbcSpell.LookupEntry( 37292 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] |=524288;
+	}
+	//Item Set: Malorne Regalia
+	sp = dbcSpell.LookupEntry( 37297 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] |=4096;
+	}
+	//Item Set: Malorne Harness
+	sp = dbcSpell.LookupEntry( 37306 );if( sp != NULL )
+	{
+		sp->procChance = 4;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+	}
+	sp = dbcSpell.LookupEntry( 37311 );if( sp != NULL )
+	{
+		sp->procChance = 4;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+	}
+	//Item Set: Slayer's Armor
+	sp = dbcSpell.LookupEntry( 38388 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] |=262144;
+	}
+	sp = dbcSpell.LookupEntry( 38389 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] |= 2 | 4;
+		sp->EffectSpellGroupRelation[0] |=8388612 |8388610 |41943040;
+	}
+	//Item Set: Deathmantle
+	sp = dbcSpell.LookupEntry( 37170 );if( sp != NULL )
+	{
+		sp->procChance = 4;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+	}
+	//Item Set: Netherblade
+	sp = dbcSpell.LookupEntry( 37167 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] |=262144;
+	}
+	sp = dbcSpell.LookupEntry( 37168 );if( sp != NULL )
+	{
+		sp->procChance = 15;
+		//sp->procFlags = PROC_ON_CAST_SPELL; Need new flag - PROC_ON_FINISH_MOVE;
 	}
 
-	//Nordrassil Harness setbonus
-	sp = dbcSpell.LookupEntry( 37333 );
-	if( sp != NULL )
-	{
-		SpellEntry* sh = dbcSpell.LookupEntry( 16968 );
-		if (sh)
-			sp->EffectSpellGroupRelation[0] = sh->EffectSpellGroupRelation[0];
-	}
 
 	//all Drums 
-	sp = dbcSpell.LookupEntry( 35474 );
-	if( sp != NULL )
-		sp->RequiredShapeShift = 0;
-
-	sp = dbcSpell.LookupEntry( 35475 );
-	if( sp != NULL )
-		sp->RequiredShapeShift = 0;
-
-	sp = dbcSpell.LookupEntry( 35476 );
-	if( sp != NULL )
-		sp->RequiredShapeShift = 0;
-
-	sp = dbcSpell.LookupEntry( 35477 );
-	if( sp != NULL )
-		sp->RequiredShapeShift = 0;
-
-	sp = dbcSpell.LookupEntry( 35478 );
-	if( sp != NULL )
-		sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntry( 35474 );if( sp != NULL ) sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntry( 35475 );if( sp != NULL ) sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntry( 35476 );if( sp != NULL ) sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntry( 35477 );if( sp != NULL ) sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntry( 35478 );if( sp != NULL ) sp->RequiredShapeShift = 0;
 
 	//windfury weapon changes. Start to hate these day by day
 	EnchantEntry* Enchantment;

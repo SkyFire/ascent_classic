@@ -181,7 +181,7 @@ Unit::Unit()
 		SpellCritChanceSchool[x] = 0;
 		PowerCostMod[x] = 0;
 		PowerCostPctMod[x] = 0; // armor penetration & spell penetration
-		AttackerSpellCritChanceMod[x]=0;
+		AttackerCritChanceMod[x]=0;
 		CritMeleeDamageTakenPctMod[x]=0;
 		CritRangedDamageTakenPctMod[x]=0;
 	}
@@ -732,6 +732,19 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						{
 							//yep, another special case: Nature's grace
 							if(GetHealthPct()>30)
+								continue;
+						}break;
+						case 37309:
+						{
+							if (!this->IsPlayer())
+								continue;
+							if (static_cast<Player*>(this)->GetShapeShift() != FORM_BEAR ||
+								static_cast<Player*>(this)->GetShapeShift() != FORM_DIREBEAR)
+								continue;
+						}break;
+						case 37310:
+						{
+							if (!this->IsPlayer() || static_cast<Player*>(this)->GetShapeShift() != FORM_CAT)
 								continue;
 						}break;
 						case 5530:
@@ -2133,6 +2146,7 @@ else
 			hitmodifier += static_cast<Player*>(pVictim)->m_resist_hit[1];
 		}
 	}
+	crit += (float)(pVictim->AttackerCritChanceMod[0]);
 //--------------------------------by damage type and by weapon type-------------------------
 	if(damage_type==RANGED) 
 	{

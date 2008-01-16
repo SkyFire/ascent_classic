@@ -217,7 +217,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraIncreaseSpellDamageByInt,//194 Apply Aura: Increase Spell Damage by % of Intellect (All)
 		&Aura::SpellAuraIncreaseHealingByInt,//195 Apply Aura: Increase Healing by % of Intellect
 		&Aura::SpellAuraNULL,//196 Apply Aura: Mod All Weapon Skills (6)
-		&Aura::SpellAuraNULL,//197 Apply Aura: Reduce Attacker Critical Hit Chance by %
+		&Aura::SpellAuraModAttackerCritChance,//197 Apply Aura: Reduce Attacker Critical Hit Chance by %
 		&Aura::SpellAuraIncreaseAllWeaponSkill,//198
 		&Aura::SpellAuraIncreaseHitRate,//199 Apply Aura: Increases Spell % To Hit (Fire, Nature, Frost)
 		&Aura::SpellAuraNULL,//200 // Increases experience earned by $s1%.  Lasts $d.
@@ -6866,6 +6866,11 @@ void Aura::SpellAuraIncreaseHealingByInt(bool apply)
 		}
 	}
 }
+void Aura::SpellAuraModAttackerCritChance(bool apply)
+{
+	int32 val  = (apply) ? mod->m_amount : -mod->m_amount;
+	m_target->AttackerCritChanceMod[0] +=val;
+}
 
 void Aura::SpellAuraIncreaseAllWeaponSkill(bool apply)
 {
@@ -7161,15 +7166,23 @@ void Aura::SpellAuraSpiritOfRedemption(bool apply)
 
 void Aura::SpellAuraIncreaseAttackerSpellCrit(bool apply)
 {
-	int32 val = (apply) ? mod->m_amount : -mod->m_amount;
-	if (m_target->IsUnit())
-	{
-		SetNegative();
-		for(uint32 x=0;x<7;x++)
-			if (mod->m_miscValue & (((uint32)1)<<x))
-				static_cast<Unit*>(m_target)->AttackerSpellCritChanceMod[x] += val;
-	}
+	int32 val = mod->m_amount;
 
+	if (apply)
+	{
+		if (mod->m_amount>0)
+			SetNegative();
+		else
+			SetPositive();
+	}
+	else
+		val = -val;
+
+	for(uint32 x=0;x<7;x++)
+	{
+		if (mod->m_miscValue & (((uint32)1)<<x))
+			m_target->AttackerCritChanceMod[x] += val;
+	}
 }
 
 void Aura::SpellAuraIncreaseRepGainPct(bool apply)
