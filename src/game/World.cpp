@@ -2015,14 +2015,15 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 43750 ); 
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL | PROC_TARGET_SELF;
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->procFlags = PROC_ON_SPELL_LAND_VICTIM | PROC_TARGET_SELF;
 	}
 
 	//Spell Haste Trinket
 	sp = dbcSpell.LookupEntry( 33297 ); 
 	if( sp != NULL )
 	{
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
 	}
 
 	//shaman - Purge 
