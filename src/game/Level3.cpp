@@ -2686,7 +2686,7 @@ bool ChatHandler::HandleCollisionTestIndoor(const char * args, WorldSession * m_
 #ifdef COLLISION
 	Player * plr = m_session->GetPlayer();
 	const LocationVector & loc = plr->GetPosition();
-	bool res = CollideInterface.IsIndoor(plr->GetMapId(), loc.x, loc.y, loc.z);
+	bool res = CollideInterface.IsIndoor(plr->GetMapId(), loc.x, loc.y, loc.z + 2.0f);
 	SystemMessage(m_session, "Result was: %s.", res ? "indoors" : "outside");
 	return true;
 #else

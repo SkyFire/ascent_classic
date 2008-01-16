@@ -626,19 +626,23 @@ bool ChatHandler::HandleGODelete(const char *args, WorldSession *m_session)
 		return true;
 	}
 	
-	if(GObj->m_spawn != 0)
+	if(GObj->m_spawn != 0 && GObj->m_spawn->entry == GObj->GetEntry())
 	{
 		uint32 cellx=float2int32(((_maxX-GObj->m_spawn->x)/_cellSize));
 		uint32 celly=float2int32(((_maxY-GObj->m_spawn->y)/_cellSize));
-		//m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx,celly)->GOSpawns.erase(GObj->m_spawn);
-		CellSpawns * c = GObj->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly);
-		for(GOSpawnList::iterator itr = c->GOSpawns.begin(); itr != c->GOSpawns.end(); ++itr)
-			if((*itr) == GObj->m_spawn)
-			{
-				c->GOSpawns.erase(itr);
-				break;
-			}
-		delete GObj->m_spawn;
+
+		if(cellx < _sizeX && celly < _sizeY)
+		{
+			//m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx,celly)->GOSpawns.erase(GObj->m_spawn);
+			CellSpawns * c = GObj->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly);
+			for(GOSpawnList::iterator itr = c->GOSpawns.begin(); itr != c->GOSpawns.end(); ++itr)
+				if((*itr) == GObj->m_spawn)
+				{
+					c->GOSpawns.erase(itr);
+					break;
+				}
+			delete GObj->m_spawn;
+		}
 	}
 	GObj->DeleteFromDB();
 	GObj->Despawn(0);

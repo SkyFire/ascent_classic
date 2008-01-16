@@ -2986,7 +2986,7 @@ Unit *AIInterface::GetMostHated()
 		++it2;
 
 		/* check the target is valid */
-		if(itr->first->GetInstanceID() != m_Unit->GetInstanceID() || !itr->first->isAlive() || !isAttackable(m_Unit, itr->first))
+		if(itr->first->event_GetCurrentInstanceId() != m_Unit->event_GetCurrentInstanceId() || !itr->first->isAlive() || !isAttackable(m_Unit, itr->first))
 		{
 			m_aiTargets.erase(itr);
 			continue;

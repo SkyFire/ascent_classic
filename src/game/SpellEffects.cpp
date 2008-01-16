@@ -4382,12 +4382,12 @@ void Spell::SpellEffectDestroyAllTotems(uint32 i)
 	}
 
 	// get the current mana, get the max mana. Calc if we overflow
-	SendHealManaSpellOnPlayer(m_caster, unitTarget, (uint32)RetreivedMana, 0);
-	RetreivedMana += float(unitTarget->GetUInt32Value(UNIT_FIELD_POWER1));
-	uint32 max = unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
+	SendHealManaSpellOnPlayer(m_caster, m_caster, (uint32)RetreivedMana, 0);
+	RetreivedMana += float(m_caster->GetUInt32Value(UNIT_FIELD_POWER1));
+	uint32 max = m_caster->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
 	if((uint32)RetreivedMana > max)
 		RetreivedMana = (float)max;
-	unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, (uint32)RetreivedMana);
+	m_caster->SetUInt32Value(UNIT_FIELD_POWER1, (uint32)RetreivedMana);
 }
 
 void Spell::SpellEffectSummonDemon(uint32 i)
