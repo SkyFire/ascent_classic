@@ -650,6 +650,15 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 		}
 	}
 
+	if( Slot <= INVENTORY_SLOT_BAG_END )
+	{
+		if((error = _player->GetItemInterface()->CanEquipItemInSlot(INVENTORY_SLOT_NOT_SET, Slot, eitem->GetProto(), false, false)))
+		{
+			_player->GetItemInterface()->BuildInventoryChangeError(eitem,NULL, error);
+			return;
+		}
+	}
+
 	Item*oitem=NULL;
 
 	if(SrcInvSlot == INVENTORY_SLOT_NOT_SET)
