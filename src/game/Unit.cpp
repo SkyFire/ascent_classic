@@ -3343,17 +3343,6 @@ void Unit::RemoveAllAuras()
 	}
 }
 
-void Unit::RemoveAllLinkedPetAurasFromOwner()
-{
-	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
-	{
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET)
-		{
-			m_auras[x]->Remove();
-		}
-	}
-}
-
 //ex:to remove morph spells
 void Unit::RemoveAllAuraType(uint32 auratype)
 {

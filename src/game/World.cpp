@@ -4396,6 +4396,17 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
+	//warlock - Demonic Sacrifice
+	sp = dbcSpell.LookupEntry( 18788 );
+	if( sp != NULL )
+	{
+		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[1] = 18789;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+	}
+	sp = dbcSpell.LookupEntry( 18788 );
+	if( sp != NULL )
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
 
 	//warlock - Improved Healthstone
 	sp = dbcSpell.LookupEntry( 18692 );

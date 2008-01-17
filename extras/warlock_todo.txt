@@ -17,9 +17,7 @@ Felhunter
 *Paranoia - doesn't destealths rogues or druids
 
 Demonology - anyway useless whitout minions fixes
-Demonic Sacrifice - nothing happens
 Master Demonologyst - idem ^^
-Soul Link - 20% or dmg received by caster is taken by minion and increases dmg done by 5%
 
 Destruction
 Cataclysm - reduces mana cost by destruction spells by 5% - no reduction

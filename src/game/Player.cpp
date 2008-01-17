@@ -9678,13 +9678,18 @@ void Player::EventSummonPet( Pet *new_pet )
 			spell->prepare(&targets);
 		}
 	}
+	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_ON_PET)
+			m_auras[x]->Remove();
 }
 
 //if pet/charm died or whatever happned we should call this function
 //!! note function mmiight get called multiple times :P
 void Player::EventDismissPet()
 {
-	RemoveAllLinkedPetAurasFromOwner();
+	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET)
+			m_auras[x]->Remove();
 //	//remove owner warlock soul link from caster
 //	RemoveAura( (uint32)19028 );
 //	//remove owner warlock Demonic Knowledge from caster

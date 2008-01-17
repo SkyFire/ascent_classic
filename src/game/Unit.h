@@ -797,7 +797,6 @@ public:
 	
 	void RemoveNegativeAuras();
 	void RemoveAllAreaAuras();
-	void RemoveAllLinkedPetAurasFromOwner();	//stupid shit. When pet dies it should remove auras from caster
 	// Temporary remove all auras
 	   // Find auras
 	Aura *FindAuraPosByNameHash(uint32 namehash);
