@@ -5665,6 +5665,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_CAST_SPELL;
 
+
 	//Item Set: Thunderheart Harness
 	sp = dbcSpell.LookupEntryForced( 38447 );if( sp != NULL )
 	{
@@ -5677,6 +5678,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[0] |=1048576;
 		sp->EffectSpellGroupRelation[1] |=8388608;
 	}
+
 	//Item Set: Thunderheart Regalia
 	sp = dbcSpell.LookupEntryForced( 38414 );if( sp != NULL )
 	{
@@ -5686,6 +5688,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] |=4;
 	}
+
 	//Item Set: Thunderheart Raiment
 	sp = dbcSpell.LookupEntryForced( 38417 );if( sp != NULL )
 	{
@@ -5695,12 +5698,14 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation_high[0] |=32;
 	}
+
 	//Item Set: Nordrassil Harness
 	sp = dbcSpell.LookupEntryForced( 37333 );if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[1] |=256;
 		sp->EffectSpellGroupRelation[0] |=32768;
 	}
+
 	//Item Set: Nordrassil Raiment
 	sp = dbcSpell.LookupEntryForced( 37313 );if( sp != NULL )
 	{
@@ -5710,16 +5715,19 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation_high[0] |=16;
 	}
+
 	//Item Set: Malorne Raiment
 	sp = dbcSpell.LookupEntryForced( 37292 );if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] |=524288;
 	}
+
 	//Item Set: Malorne Regalia
 	sp = dbcSpell.LookupEntryForced( 37297 );if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] |=4096;
 	}
+
 	//Item Set: Malorne Harness
 	sp = dbcSpell.LookupEntryForced( 37306 );if( sp != NULL )
 	{
@@ -5731,6 +5739,7 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 4;
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
 	}
+
 	//Item Set: Slayer's Armor
 	sp = dbcSpell.LookupEntryForced( 38388 );if( sp != NULL )
 	{
@@ -5741,12 +5750,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[0] |= 2 | 4;
 		sp->EffectSpellGroupRelation[0] |=8388612 |8388610 |41943040;
 	}
+
 	//Item Set: Deathmantle
 	sp = dbcSpell.LookupEntryForced( 37170 );if( sp != NULL )
 	{
 		sp->procChance = 4;
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
 	}
+
 	//Item Set: Netherblade
 	sp = dbcSpell.LookupEntryForced( 37167 );if( sp != NULL )
 	{
@@ -5757,6 +5768,7 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 15;
 		//sp->procFlags = PROC_ON_CAST_SPELL; Need new flag - PROC_ON_FINISH_MOVE;
 	}
+
 	//Item Set: Tempest Regalia
 	sp = dbcSpell.LookupEntryForced( 38396 );if( sp != NULL )
 	{
@@ -5766,6 +5778,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 1572896 | 1 | 2048;
 	}
+
 	//Item Set: Tirisfal Regalia
 	sp = dbcSpell.LookupEntryForced( 37441 );if( sp != NULL )
 	{
@@ -5776,6 +5789,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 	}
+
 	//Item Set: Aldor Regalia
 	sp = dbcSpell.LookupEntryForced( 37438 );if( sp != NULL )
 	{
@@ -5787,6 +5801,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[1] = 64;
 		//sp->EffectSpellGroupRelation_high[2] = 64; NEED DBC 2.3.2 :P
 	}
+
 	//Item Set: Absolution Regalia
 	sp = dbcSpell.LookupEntryForced( 38413 );if( sp != NULL )
 	{
@@ -5796,6 +5811,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 8192;
 	}
+
 	//Item Set: Vestments of Absolution
 	sp = dbcSpell.LookupEntryForced( 38410 );if( sp != NULL )
 	{
@@ -5805,17 +5821,20 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 4096 ;
 	}
+
 	//Item Set: Avatar Raiment
 	sp = dbcSpell.LookupEntryForced( 26171 );if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 64;
 	}
+
 	//Item Set: Avatar Regalia
 	sp = dbcSpell.LookupEntryForced( 37600 );if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 6;
 	}
+
 	//Item Set: Incarnate Raiment
 	sp = dbcSpell.LookupEntryForced( 37568 );if( sp != NULL )
 	{
@@ -5825,6 +5844,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 4096;
 	}
+
 	//Item Set: Incarnate Regalia
 	sp = dbcSpell.LookupEntryForced( 37570 );if( sp != NULL )
 	{
@@ -5835,12 +5855,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 128;
 		sp->EffectSpellGroupRelation[1] = 8388608;
 	}
+
 	//Item Set: Malefic Raiment
 	sp = dbcSpell.LookupEntryForced( 38393 );if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1;
 		sp->EffectSpellGroupRelation_high[0] = 64;
 	}
+
 	//Item Set: Voidheart Raiment
 	sp = dbcSpell.LookupEntryForced( 37377 );if( sp != NULL )
 	{
@@ -5864,16 +5886,19 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 2|4;
 	}
+
 	//Item Set: Gronnstalker's Armor
 	sp = dbcSpell.LookupEntryForced( 38392 );if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 1;
 	}
+
 	//Item Set: Rift Stalker Armor
 	sp = dbcSpell.LookupEntryForced( 37505 );if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 1;
 	}
+
 	//Item Set: Demon Stalker Armor
 	sp = dbcSpell.LookupEntryForced( 37484 );
 	if( sp != NULL )
@@ -5885,12 +5910,14 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 4096;
 	}
+
 	//Item Set: Skyshatter Harness
 	sp = dbcSpell.LookupEntryForced( 38429 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1048576 | 268435456 | 2147483648UL;
 	}
+
 	//Item Set: Skyshatter Raiment
 	sp = dbcSpell.LookupEntryForced( 38434 );
 	if( sp != NULL )
@@ -5902,12 +5929,14 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 256;
 	}
+
 	//Item Set: Skyshatter Regalia
 	sp = dbcSpell.LookupEntryForced( 38436 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1;
 	}
+
 	//Item Set: Cataclysm Raiment
 	sp = dbcSpell.LookupEntryForced( 37225 );
 	if( sp != NULL )
@@ -5926,6 +5955,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 64;
 	}
+
 	//Item Set: Cataclysm Regalia
 	sp = dbcSpell.LookupEntryForced( 37228 );
 	if( sp != NULL )
@@ -5944,6 +5974,7 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 25;
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 	}
+
 	//Item Set: Cataclysm Harness
 	sp = dbcSpell.LookupEntryForced( 37239 );
 	if( sp != NULL )
@@ -5961,6 +5992,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation_high[0] = 512;
 	}
+
 	//Item Set: Cyclone Raiment
 	sp = dbcSpell.LookupEntryForced( 37210 );
 	if( sp != NULL )
@@ -5972,6 +6004,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation_high[0] = 524288;
 	}
+
 	//Item Set: Cyclone Harness
 	sp = dbcSpell.LookupEntryForced( 37224 );
 	if( sp != NULL )
@@ -5983,6 +6016,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 536870912UL;
 	}
+
 	//Item Set: Cyclone Regalia
 	sp = dbcSpell.LookupEntryForced( 37212 );
 	if( sp != NULL )
@@ -5995,6 +6029,7 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 11;
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 	}
+
 	//Item Set: Lightbringer Armor
 	sp = dbcSpell.LookupEntryForced( 38421 );
 	if( sp != NULL )
@@ -6006,6 +6041,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 32;
 	}
+
 	//Item Set: Lightbringer Battlegear
 	sp = dbcSpell.LookupEntryForced( 38427 );
 	if( sp != NULL )
@@ -6018,17 +6054,19 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 128;
 	}
+
 	//Item Set: Lightbringer Raiment
 	sp = dbcSpell.LookupEntryForced( 38426 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 2147483648UL;
 	}
 	sp = dbcSpell.LookupEntryForced( 38425 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 1073741824;
+		sp->EffectSpellGroupRelation[0] = 1073741824UL;
 	}
+
 	//Item Set: Crystalforge Armor
 	sp = dbcSpell.LookupEntryForced( 37190 );
 	if( sp != NULL )
@@ -6040,6 +6078,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
+
 	//Item Set: Crystalforge Battlegear
 	sp = dbcSpell.LookupEntryForced( 37190 );
 	if( sp != NULL )
@@ -6053,6 +6092,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 6;
 	}
+
 	//Item Set: Crystalforge Raiment
 	sp = dbcSpell.LookupEntryForced( 37189 );
 	if( sp != NULL )
@@ -6070,6 +6110,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
+
 	//Item Set: Justicar Raiment
 	sp = dbcSpell.LookupEntryForced( 37182 );
 	if( sp != NULL )
@@ -6081,6 +6122,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation_high[0] = 256;
 	}
+
 	//Item Set: Justicar Armor
 	sp = dbcSpell.LookupEntryForced( 37184 );
 	if( sp != NULL )
@@ -6094,6 +6136,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation_high[0] = 64;
 	}
+
 	//Item Set: Justicar Battlegear
 	sp = dbcSpell.LookupEntryForced( 37186 );
 	if( sp != NULL )
@@ -6105,6 +6148,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation_high[0] = 520;
 	}
+
 	//Item Set: Onslaught Battlegear
 	sp = dbcSpell.LookupEntryForced( 38399 );
 	if( sp != NULL )
@@ -6117,6 +6161,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 536870912UL;
 	}
+
 	//Item Set: Onslaught Armor
 	sp = dbcSpell.LookupEntryForced( 38408 );
 	if( sp != NULL )
@@ -6128,6 +6173,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation_high[0] = 513;
 	}
+
 	//Item Set: Destroyer Armor
 	sp = dbcSpell.LookupEntryForced( 37525 );
 	if( sp != NULL )
@@ -6135,6 +6181,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->procChance = 7;
 	}
+
 	//Item Set: Destroyer Battlegear
 	sp = dbcSpell.LookupEntryForced( 37528 );
 	if( sp != NULL )
@@ -6148,6 +6195,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 33554432;
 		sp->EffectSpellGroupRelation_high[0] = 1024;
 	}
+
 	//Item Set: Warbringer Armor
 	sp = dbcSpell.LookupEntryForced( 37516 );
 	if( sp != NULL )
@@ -6155,12 +6203,14 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 100;
 	}
+
 	//Item Set: Warbringer Battlegear
 	sp = dbcSpell.LookupEntryForced( 37518 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 4;
 	}
+
 	//all Drums 
 	sp = dbcSpell.LookupEntryForced( 35474 );
 	if( sp != NULL )
