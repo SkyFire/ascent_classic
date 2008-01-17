@@ -3729,13 +3729,15 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//druid Savage Fury
-	sp = dbcSpell.LookupEntryForced(16998);if( sp != NULL ) 
+	sp = dbcSpell.LookupEntryForced(16998);
+	if( sp != NULL ) 
 	{
 		sp->EffectSpellGroupRelation_high[0] |= 1024;
 		//sp->EffectSpellGroupRelation_high[1] |= 1024;
 		//sp->EffectSpellGroupRelation_high[2] |= 1024;
 	}
-	sp = dbcSpell.LookupEntryForced(16999);if( sp != NULL ) 
+	sp = dbcSpell.LookupEntryForced(16999);
+	if( sp != NULL ) 
 	{
 		sp->EffectSpellGroupRelation_high[0] |= 1024;
 		//sp->EffectSpellGroupRelation_high[1] |= 1024;
@@ -4301,20 +4303,26 @@ bool World::SetInitialWorldSettings()
 
 	//mage: Blazing Speed
 	sp = dbcSpell.LookupEntryForced( 31641 ); 
-	if( sp != NULL )	sp->EffectTriggerSpell[0] = 31643;
+	if( sp != NULL )
+		sp->EffectTriggerSpell[0] = 31643;
 	sp = dbcSpell.LookupEntryForced( 31642 );
-	if( sp != NULL )	sp->EffectTriggerSpell[0] = 31643;
+	if( sp != NULL )
+		sp->EffectTriggerSpell[0] = 31643;
 
 	//mage talent "frostbyte". we make it to be dummy
 	sp = dbcSpell.LookupEntryForced( 11071 );
-	if( sp != NULL )	sp->EffectApplyAuraName[0]=4;
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0]=4;
 	sp = dbcSpell.LookupEntryForced( 12496 );
-	if( sp != NULL )	sp->EffectApplyAuraName[0]=4;
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0]=4;
 	sp = dbcSpell.LookupEntryForced( 12497 );
-	if( sp != NULL )	sp->EffectApplyAuraName[0]=4;
+	if( sp != NULL )
+		sp->EffectApplyAuraName[0]=4;
 	//rogue-shiv -> add 1 combo point
 	sp = dbcSpell.LookupEntryForced( 5938 );
-	if( sp != NULL )	sp->Effect[1]=80;
+	if( sp != NULL )
+		sp->Effect[1]=80;
 
 	//warlock - Amplify Curse
 	sp = dbcSpell.LookupEntryForced( 18288 );
@@ -4863,6 +4871,7 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
 		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
 	}
+
 	//wrath of air totem targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 2895 );
 	if( sp != NULL )
@@ -4874,67 +4883,167 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[1]=0;
 		sp->EffectImplicitTargetB[2]=0;
 	}
-//-----BLEED effects----- (setting mech to BLEED)
+
+	//-----BLEED effects----- (setting mech to BLEED)
 	//garrot
+	sp = dbcSpell.LookupEntryForced( 14179 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 8631 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 8632 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 8633 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 11289 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 11290 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 26839 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 26884 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
 
-#define SPELLFIX( )
-
-	sp = dbcSpell.LookupEntryForced( 14179 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 8631 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 8632 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 8633 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 11289 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 11290 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 26839 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 26884 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
 	//pounce
-	sp = dbcSpell.LookupEntryForced( 9007 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 9824 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 9826 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 27007 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9007 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9824 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9826 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 27007 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+
 	//rend
-	sp = dbcSpell.LookupEntryForced( 772 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 6546 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 6547 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 6548 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 11572 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 11573 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 11574 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 25208 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 772 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 6546 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 6547 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 6548 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 11572 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 11573 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 11574 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 25208 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+
 	//rip
-	sp = dbcSpell.LookupEntryForced( 1079 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 9492 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 9493 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 9752 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 9894 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 9896 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 27008 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 1079 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9492 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9493 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9752 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9894 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9896 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 27008 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+
 	//rupture
-	sp = dbcSpell.LookupEntryForced( 1943 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 8639 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 8640 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 11273 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 11274 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 11275 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 26867 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 1943 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 8639 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 8640 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 11273 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 11274 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 11275 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 26867 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+
 	//rake
-	sp = dbcSpell.LookupEntryForced( 1822 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 1823 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 1824 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 9904 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-	sp = dbcSpell.LookupEntryForced( 27003 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 1822 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 1823 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 1824 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 9904 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+	sp = dbcSpell.LookupEntryForced( 27003 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+
 	//lacerate
-	sp = dbcSpell.LookupEntryForced( 33745 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
-//-------------------------------
-	//Druid: Pounce Bleed
-	sp = dbcSpell.LookupEntryForced( 9007 );if( sp != NULL ) sp->DurationIndex = 18000;
-	sp = dbcSpell.LookupEntryForced( 9824 );if( sp != NULL ) sp->DurationIndex = 18000;
-	sp = dbcSpell.LookupEntryForced( 9826 );if( sp != NULL ) sp->DurationIndex = 18000;
-	sp = dbcSpell.LookupEntryForced( 27007 );if( sp != NULL ) sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntryForced( 33745 );
+	if( sp != NULL )
+		sp->MechanicsType = MECHANIC_BLEEDING;
+
+	//deuid - Pounce Bleed
+	sp = dbcSpell.LookupEntryForced( 9007 );
+	if( sp != NULL )
+		sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntryForced( 9824 );
+	if( sp != NULL )
+		sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntryForced( 9826 );
+	if( sp != NULL )
+		sp->DurationIndex = 18000;
+	sp = dbcSpell.LookupEntryForced( 27007 );
+	if( sp != NULL )
+		sp->DurationIndex = 18000;
+
 	//Druid: Natural Shapeshifter
-	sp = dbcSpell.LookupEntryForced( 16833 );if( sp != NULL ) sp->DurationIndex = 0;
-	sp = dbcSpell.LookupEntryForced( 16834 );if( sp != NULL ) sp->DurationIndex = 0;
-	sp = dbcSpell.LookupEntryForced( 16835 );if( sp != NULL ) sp->DurationIndex = 0;
+	sp = dbcSpell.LookupEntryForced( 16833 );
+	if( sp != NULL )
+		sp->DurationIndex = 0;
+	sp = dbcSpell.LookupEntryForced( 16834 );
+	if( sp != NULL )
+		sp->DurationIndex = 0;
+	sp = dbcSpell.LookupEntryForced( 16835 );
+	if( sp != NULL )
+		sp->DurationIndex = 0;
+
 	//Priest: Shadow Power
 	sp = dbcSpell.LookupEntryForced( 15310 );
 	if( sp != NULL )
@@ -4956,6 +5065,7 @@ bool World::SetInitialWorldSettings()
 		if( sp != NULL )
 			sp->EffectSpellGroupRelation[0] = group;
 	}
+
 	//Relentless Strikes
 	sp = dbcSpell.LookupEntryForced( 14179 );
 	if( sp != NULL )
@@ -4979,6 +5089,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[2] = 128;
 		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
 	}
+
 	//Seal of Justice -lowered proc chance (experimental values !)
 	sp = dbcSpell.LookupEntryForced( 20164 );
 	if( sp != NULL )
@@ -4986,6 +5097,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 31895 );
 	if( sp != NULL )
 		sp->procChance = 20;
+
 	//make Berserking a simple spell 
 	sp = dbcSpell.LookupEntryForced( 20554 );
 	if( sp != NULL )
@@ -5005,6 +5117,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 26635;
 	}
+
 	//rogue - intiative
 	sp = dbcSpell.LookupEntryForced( 13976 );
 	if( sp != NULL )
@@ -5024,6 +5137,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->procFlags = uint32(PROC_ON_CAST_SPELL|PROC_TARGET_SELF);
 	}
+
 	//this an on equip item spell(2824) :  ice arrow(29501)
 	sp = dbcSpell.LookupEntryForced( 29501 );
 	if( sp != NULL )
@@ -5031,6 +5145,7 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 30;//some say it is triggered every now and then
 		sp->procFlags = PROC_ON_RANGED_ATTACK;
 	}
+
 	//warrior - berserker rage is missing 1 effect = regenerate rage
 	sp = dbcSpell.LookupEntryForced( 18499 );
 	if( sp != NULL )
@@ -5040,6 +5155,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[2] = 9174; //not sure if this is the one. In my time this adds 30 rage
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 	}
+
 	//warrior - improved berserker rage
 	sp = dbcSpell.LookupEntryForced( 20500 );
 	if( sp != NULL )
@@ -5772,249 +5888,308 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[0] = 1;
 	}
 	//Item Set: Demon Stalker Armor
-	sp = dbcSpell.LookupEntryForced( 37484 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37484 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 256;
 	}
-	sp = dbcSpell.LookupEntryForced( 37485 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37485 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 4096;
 	}
 	//Item Set: Skyshatter Harness
-	sp = dbcSpell.LookupEntryForced( 38429 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38429 );
+	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 1048576 | 268435456 | 2147483648;
+		sp->EffectSpellGroupRelation[0] = 1048576 | 268435456 | 2147483648UL;
 	}
 	//Item Set: Skyshatter Raiment
-	sp = dbcSpell.LookupEntryForced( 38434 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38434 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 256;
 	}
-	sp = dbcSpell.LookupEntryForced( 38435 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38435 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 256;
 	}
 	//Item Set: Skyshatter Regalia
-	sp = dbcSpell.LookupEntryForced( 38436 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38436 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1;
 	}
 	//Item Set: Cataclysm Raiment
-	sp = dbcSpell.LookupEntryForced( 37225 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37225 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 128;
 	}
-	sp = dbcSpell.LookupEntryForced( 37227 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37227 );
+	if( sp != NULL )
 	{
 		sp->proc_interval = 60000;
 		sp->procChance = 100;
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 	}
-	sp = dbcSpell.LookupEntryForced( 39950 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 39950 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 64;
 	}
 	//Item Set: Cataclysm Regalia
-	sp = dbcSpell.LookupEntryForced( 37228 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37228 );
+	if( sp != NULL )
 	{
 		sp->procChance = 7;
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
-	sp = dbcSpell.LookupEntryForced( 37234 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37234 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 128;
 	}
-	sp = dbcSpell.LookupEntryForced( 37237 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37237 );
+	if( sp != NULL )
 	{
 		sp->procChance = 25;
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 	}
 	//Item Set: Cataclysm Harness
-	sp = dbcSpell.LookupEntryForced( 37239 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37239 );
+	if( sp != NULL )
 	{
 		sp->procChance = 2;
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
 	}
-	sp = dbcSpell.LookupEntryForced( 37240 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37240 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 128;
 	}
-	sp = dbcSpell.LookupEntryForced( 37241 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37241 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 512;
 	}
 	//Item Set: Cyclone Raiment
-	sp = dbcSpell.LookupEntryForced( 37210 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37210 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 524288;
 	}
-	sp = dbcSpell.LookupEntryForced( 37211 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37211 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 524288;
 	}
 	//Item Set: Cyclone Harness
-	sp = dbcSpell.LookupEntryForced( 37224 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37224 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 16;
 	}
-	sp = dbcSpell.LookupEntryForced( 37223 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37223 );
+	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 536870912;
+		sp->EffectSpellGroupRelation[0] = 536870912UL;
 	}
 	//Item Set: Cyclone Regalia
-	sp = dbcSpell.LookupEntryForced( 37212 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37212 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 256;
 	}
-	sp = dbcSpell.LookupEntryForced( 37213 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37213 );
+	if( sp != NULL )
 	{
 		sp->procChance = 11;
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 	}
 	//Item Set: Lightbringer Armor
-	sp = dbcSpell.LookupEntryForced( 38421 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38421 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 4096;
 	}
-	sp = dbcSpell.LookupEntryForced( 38422 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38422 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 32;
 	}
 	//Item Set: Lightbringer Battlegear
-	sp = dbcSpell.LookupEntryForced( 38427 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38427 );
+	if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK;
 		sp->procChance = 20;
 	}
-	sp = dbcSpell.LookupEntryForced( 38424 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38424 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 128;
 	}
 	//Item Set: Lightbringer Raiment
-	sp = dbcSpell.LookupEntryForced( 38426 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38426 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 2147483648;
 	}
-	sp = dbcSpell.LookupEntryForced( 38425 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38425 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1073741824;
 	}
 	//Item Set: Crystalforge Armor
-	sp = dbcSpell.LookupEntryForced( 37190 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37190 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 8;
 	}
-	sp = dbcSpell.LookupEntryForced( 37191 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37191 );
+	if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	//Item Set: Crystalforge Battlegear
-	sp = dbcSpell.LookupEntryForced( 37190 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37190 );
+	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 1024 | 524288 | 1048576 |536870912;
+		sp->EffectSpellGroupRelation[0] = 1024 | 524288 | 1048576 | 536870912UL;
 		sp->EffectSpellGroupRelation_high[0] = 1|520;
 	}
-	sp = dbcSpell.LookupEntryForced( 37195 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37195 );
+	if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 6;
 	}
 	//Item Set: Crystalforge Raiment
-	sp = dbcSpell.LookupEntryForced( 37189 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37189 );
+	if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 		sp->proc_interval = 60000;
 	}
-	sp = dbcSpell.LookupEntryForced( 43837 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 43837 );
+	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 2147483648;
+		sp->EffectSpellGroupRelation[0] = 2147483648UL;
 	}
-	sp = dbcSpell.LookupEntryForced( 37188 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37188 );
+	if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	}
 	//Item Set: Justicar Raiment
-	sp = dbcSpell.LookupEntryForced( 37182 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37182 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 1;
 	}
-	sp = dbcSpell.LookupEntryForced( 37183 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37183 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 256;
 	}
 	//Item Set: Justicar Armor
-	sp = dbcSpell.LookupEntryForced( 37184 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37184 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 1024;
 		sp->EffectSpellGroupRelation[0] = 134217728;
 		sp->EffectSpellGroupRelation_high[1] = 8;
 	}
-	sp = dbcSpell.LookupEntryForced( 37185 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37185 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 64;
 	}
 	//Item Set: Justicar Battlegear
-	sp = dbcSpell.LookupEntryForced( 37186 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37186 );
+	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 536870912;
+		sp->EffectSpellGroupRelation[0] = 536870912UL;
 	}
-	sp = dbcSpell.LookupEntryForced( 37187 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37187 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 520;
 	}
 	//Item Set: Onslaught Battlegear
-	sp = dbcSpell.LookupEntryForced( 38399 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38399 );
+	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 33554432;
+		sp->EffectSpellGroupRelation[0] = 33554432UL;
 		sp->EffectSpellGroupRelation_high[0] = 1024;
 	}
-	sp = dbcSpell.LookupEntryForced( 38398 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38398 );
+	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 536870912;
+		sp->EffectSpellGroupRelation[0] = 536870912UL;
 	}
 	//Item Set: Onslaught Armor
-	sp = dbcSpell.LookupEntryForced( 38408 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38408 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 128;
 	}
-	sp = dbcSpell.LookupEntryForced( 38407 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 38407 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 513;
 	}
 	//Item Set: Destroyer Armor
-	sp = dbcSpell.LookupEntryForced( 37525 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37525 );
+	if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
 		sp->procChance = 7;
 	}
 	//Item Set: Destroyer Battlegear
-	sp = dbcSpell.LookupEntryForced( 37528 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37528 );
+	if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 100;
 	}
-	sp = dbcSpell.LookupEntryForced( 37535 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37535 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 33554432;
 		sp->EffectSpellGroupRelation_high[0] = 1024;
 	}
 	//Item Set: Warbringer Armor
-	sp = dbcSpell.LookupEntryForced( 37516 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37516 );
+	if( sp != NULL )
 	{
 		sp->procFlags = PROC_ON_CAST_SPELL;
 		sp->procChance = 100;
 	}
 	//Item Set: Warbringer Battlegear
-	sp = dbcSpell.LookupEntryForced( 37518 );if( sp != NULL )
+	sp = dbcSpell.LookupEntryForced( 37518 );
+	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation_high[0] = 4;
 	}
 	//all Drums 
-	sp = dbcSpell.LookupEntryForced( 35474 );if( sp != NULL ) sp->RequiredShapeShift = 0;
-	sp = dbcSpell.LookupEntryForced( 35475 );if( sp != NULL ) sp->RequiredShapeShift = 0;
-	sp = dbcSpell.LookupEntryForced( 35476 );if( sp != NULL ) sp->RequiredShapeShift = 0;
-	sp = dbcSpell.LookupEntryForced( 35477 );if( sp != NULL ) sp->RequiredShapeShift = 0;
-	sp = dbcSpell.LookupEntryForced( 35478 );if( sp != NULL ) sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntryForced( 35474 );
+	if( sp != NULL )
+		sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntryForced( 35475 );
+	if( sp != NULL )
+		sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntryForced( 35476 );
+	if( sp != NULL )
+		sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntryForced( 35477 );
+	if( sp != NULL )
+		sp->RequiredShapeShift = 0;
+	sp = dbcSpell.LookupEntryForced( 35478 );
+	if( sp != NULL )
+		sp->RequiredShapeShift = 0;
 
 	//windfury weapon changes. Start to hate these day by day
 	EnchantEntry* Enchantment;
