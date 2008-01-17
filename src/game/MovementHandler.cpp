@@ -467,7 +467,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			}
 			else //once we done falling lets do some damage
 			{
-				if( _player->m_fallTime > 1000 && _player->isAlive() && !_player->GodModeCheat )
+				if( _player->m_fallTime > 800 && _player->isAlive() && !_player->GodModeCheat )
 				{
 					//Check if we aren't falling in water
 					if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
