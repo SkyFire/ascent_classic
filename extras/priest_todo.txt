@@ -15,3 +15,4 @@ Psychic Scream http://www.wowhead.com/?spell=8124 Using Psychic Scream makes pla
 Most annoying bugs are :
 - Shadowfiend
 
+Greater Heal's Protection Buff, Buff is not beeing casted on players.

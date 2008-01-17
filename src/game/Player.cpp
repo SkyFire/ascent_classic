@@ -8252,6 +8252,9 @@ void Player::SaveAuras(stringstream &ss)
 				}
 			}
 
+			if( aur->pSpellId )
+				skip = true; //these auras were gained due to some proc. We do not save these eighter to avoid exploits of not removing them
+
 			if ( aur->m_spellProto->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET )
 				skip = true;
 

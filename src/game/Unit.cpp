@@ -2965,7 +2965,9 @@ void Unit::AddAura(Aura *aur)
 				if( info->NameHash == SPELL_HASH_BLOOD_FURY )
 					continue;
 
-				if(m_auras[x]->GetSpellProto()->Id != aur->GetSpellId())
+				if(	m_auras[x]->GetSpellProto()->Id != aur->GetSpellId() && 
+					( aur->pSpellId == 0 || aur->pSpellId != m_auras[x]->GetSpellProto()->Id ) //if this is a proc spell then it should not remove it's mother : test with combustion later
+					)
 				{
 					// Check for auras by specific type.
 					// Check for auras with the same name and a different rank.
