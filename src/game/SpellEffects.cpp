@@ -3678,7 +3678,257 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 			sp->prepare(&tgt);
 			p_caster->RemoveAura(p_caster->Seal);
 		}break;
-
+	//warlock - Master Demonologist
+	case 23784:
+		{
+			if( p_caster == NULL || unitTarget == NULL)
+				return; //can't imagine how this talent got to anybody else then a player casted on pet
+			uint32 casted_spell_id = 0 ;
+			uint32 inc_resist_by_level = 0 ;
+			uint32 inc_resist_by_level_spell = 0 ;
+			if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 416 ) //in case it is imp
+				casted_spell_id = 23759 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1860 ) //VoidWalker
+				casted_spell_id = 23760 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1863 ) //Succubus
+				casted_spell_id = 23761 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 417 ) //Felhunter
+			{
+				casted_spell_id = 0 ;
+				inc_resist_by_level_spell = 23762 ;
+				inc_resist_by_level = 20 ;
+			}
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 17252 ) //Felguard
+			{
+				casted_spell_id = 35702 ;
+				inc_resist_by_level_spell = 23762 ;
+				inc_resist_by_level = 10 ;
+			}
+			if( casted_spell_id )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell(  unitTarget, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+			if( inc_resist_by_level_spell )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+		}break;
+	case 23830:
+		{
+			if( p_caster == NULL || unitTarget == NULL)
+				return; //can't imagine how this talent got to anybody else then a player casted on pet
+			uint32 casted_spell_id = 0 ;
+			uint32 inc_resist_by_level = 0 ;
+			uint32 inc_resist_by_level_spell = 0 ;
+			if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 416 ) //in case it is imp
+				casted_spell_id = 23826 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1860 ) //VoidWalker
+				casted_spell_id = 23841 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1863 ) //Succubus
+				casted_spell_id = 23833 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 417 ) //Felhunter
+			{
+				casted_spell_id = 1 ;
+				inc_resist_by_level_spell = 23837 ;
+				inc_resist_by_level = 40 ;
+			}
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 17252 ) //Felguard
+			{
+				casted_spell_id = 35703 ;
+				inc_resist_by_level_spell = 23837 ;
+				inc_resist_by_level = 20 ;
+			}
+			if( casted_spell_id )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell(  unitTarget, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+			if( inc_resist_by_level_spell )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+		}break;
+	case 23831:
+		{
+			if( p_caster == NULL || unitTarget == NULL)
+				return; //can't imagine how this talent got to anybody else then a player casted on pet
+			uint32 casted_spell_id = 0 ;
+			uint32 inc_resist_by_level = 0 ;
+			uint32 inc_resist_by_level_spell = 0 ;
+			if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 416 ) //in case it is imp
+				casted_spell_id = 23827 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1860 ) //VoidWalker
+				casted_spell_id = 23842 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1863 ) //Succubus
+				casted_spell_id = 23834 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 417 ) //Felhunter
+			{
+				casted_spell_id = 0 ;
+				inc_resist_by_level_spell = 23838 ;
+				inc_resist_by_level = 60 ;
+			}
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 17252 ) //Felguard
+			{
+				casted_spell_id = 35704 ;
+				inc_resist_by_level_spell = 23838 ;
+				inc_resist_by_level = 30 ;
+			}
+			if( casted_spell_id )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell(  unitTarget, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+			if( inc_resist_by_level_spell )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+		}break;
+	case 23832:
+		{
+			if( p_caster == NULL || unitTarget == NULL)
+				return; //can't imagine how this talent got to anybody else then a player casted on pet
+			uint32 casted_spell_id = 0 ;
+			uint32 inc_resist_by_level = 0 ;
+			uint32 inc_resist_by_level_spell = 0 ;
+			if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 416 ) //in case it is imp
+				casted_spell_id = 23828 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1860 ) //VoidWalker
+				casted_spell_id = 23843 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1863 ) //Succubus
+				casted_spell_id = 23835 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 417 ) //Felhunter
+			{
+				casted_spell_id = 0 ;
+				inc_resist_by_level_spell = 23839 ;
+				inc_resist_by_level = 80 ;
+			}
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 17252 ) //Felguard
+			{
+				casted_spell_id = 35705 ;
+				inc_resist_by_level_spell = 23839 ;
+				inc_resist_by_level = 40 ;
+			}
+			if( casted_spell_id )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell(  unitTarget, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+			if( inc_resist_by_level_spell )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+		}break;
+	case 35708:
+		{
+			if( p_caster == NULL || unitTarget == NULL)
+				return; //can't imagine how this talent got to anybody else then a player casted on pet
+			uint32 casted_spell_id = 0 ;
+			uint32 inc_resist_by_level = 0 ;
+			uint32 inc_resist_by_level_spell = 0 ;
+			if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 416 ) //in case it is imp
+				casted_spell_id = 23829 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1860 ) //VoidWalker
+				casted_spell_id = 23844 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1863 ) //Succubus
+				casted_spell_id = 23836 ;
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 417 ) //Felhunter
+			{
+				casted_spell_id = 0 ;
+				inc_resist_by_level_spell = 23840 ;
+				inc_resist_by_level = 100 ;
+			}
+			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 17252 ) //Felguard
+			{
+				casted_spell_id = 35706 ;
+				inc_resist_by_level_spell = 23840 ;
+				inc_resist_by_level = 50 ;
+			}
+			if( casted_spell_id )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell(  unitTarget, dbcSpell.LookupEntry( casted_spell_id ), true, NULL );
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+			if( inc_resist_by_level_spell )
+			{
+				//for self
+				Spell *sp = new Spell( p_caster, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = p_caster->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt( p_caster->GetGUID() );
+				sp->prepare( &tgt );
+				//for pet
+				sp = new Spell( unitTarget, dbcSpell.LookupEntry( inc_resist_by_level_spell ), true, NULL );
+				sp->forced_basepoints[0] = unitTarget->GetUInt32Value( UNIT_FIELD_LEVEL ) * inc_resist_by_level / 100;
+				SpellCastTargets tgt1( unitTarget->GetGUID() );
+				sp->prepare( &tgt1 );
+			}
+		}break;
 	}
 }
 

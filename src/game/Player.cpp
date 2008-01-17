@@ -9683,8 +9683,8 @@ void Player::EventSummonPet( Pet *new_pet )
 			m_auras[x]->Remove();
 }
 
-//if pet/charm died or whatever happned we should call this function
-//!! note function mmiight get called multiple times :P
+//if pet/charm died or whatever hapened we should call this function
+//!! note function might get called multiple times :P
 void Player::EventDismissPet()
 {
 	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)

@@ -16,9 +16,6 @@ Felhunter
 *Tainted Blood - no dmg reduction
 *Paranoia - doesn't destealths rogues or druids
 
-Demonology - anyway useless whitout minions fixes
-Master Demonologyst - idem ^^
-
 Destruction
 Cataclysm - reduces mana cost by destruction spells by 5% - no reduction
 Intensity - 70% chance to resist intreruption when channeling destro spells ( Rain of Fire and Hellfire ) - nothing

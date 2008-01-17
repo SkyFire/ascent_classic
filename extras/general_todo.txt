@@ -140,6 +140,7 @@ Zack - test my shit :
 - warlock - Unstable Affliction 30405
 - warlock - Improved Healthstone 18693 ->check for conjured items when traded
 - warlock - Demonic Sacrifice 18788
+- warlock - Master Demonologist 23825
 
 ==========================================================================
 Capt - test my shit :

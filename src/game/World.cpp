@@ -4408,6 +4408,136 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
 
+	//warlock - Master Demonologist - 25 spells here
+	sp = dbcSpell.LookupEntry( 23785 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 23784;
+	}
+	sp = dbcSpell.LookupEntry( 23822 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 23830;
+	}
+	sp = dbcSpell.LookupEntry( 23823 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 23831;
+	}
+	sp = dbcSpell.LookupEntry( 23824 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 23832;
+	}
+	sp = dbcSpell.LookupEntry( 23825 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET | SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 35708;
+	}
+	//and the rest
+	sp = dbcSpell.LookupEntry( 23759 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+	}
+	sp = dbcSpell.LookupEntry( 23760 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+	}
+	sp = dbcSpell.LookupEntry( 23761 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+	}
+	sp = dbcSpell.LookupEntry( 23762 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+	}
+	sp = dbcSpell.LookupEntry( 23826 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+	}
+	sp = dbcSpell.LookupEntry( 23827 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+	}
+	sp = dbcSpell.LookupEntry( 23828 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+	}
+	sp = dbcSpell.LookupEntry( 23829 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+	}
+	for(uint32 i=23833;i<=23844;i++)
+	{
+		sp = dbcSpell.LookupEntry( i );
+		if( sp != NULL )
+		{
+			sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+			sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		}
+	}
+	sp = dbcSpell.LookupEntry( 35702 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		sp->Effect[1] = 0; //hacks, we are handling this in another way
+	}
+	sp = dbcSpell.LookupEntry( 35703 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		sp->Effect[1] = 0; //hacks, we are handling this in another way
+	}
+	sp = dbcSpell.LookupEntry( 35704 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		sp->Effect[1] = 0; //hacks, we are handling this in another way
+	}
+	sp = dbcSpell.LookupEntry( 35705 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		sp->Effect[1] = 0; //hacks, we are handling this in another way
+	}
+	sp = dbcSpell.LookupEntry( 35706 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		sp->Effect[1] = 0; //hacks, we are handling this in another way
+	}
+
 	//warlock - Improved Healthstone
 	sp = dbcSpell.LookupEntry( 18692 );
 	if( sp != NULL )
