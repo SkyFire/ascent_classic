@@ -4396,6 +4396,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
+
 	//warlock - Demonic Sacrifice
 	sp = dbcSpell.LookupEntry( 18788 );
 	if( sp != NULL )
@@ -4537,7 +4538,6 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
 		sp->Effect[1] = 0; //hacks, we are handling this in another way
 	}
-
 	//warlock - Improved Healthstone
 	sp = dbcSpell.LookupEntry( 18692 );
 	if( sp != NULL )
@@ -5499,14 +5499,6 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
 	}
 //---------ITEMS-----------------
-
-	sp = dbcSpell.LookupEntry( 33758 );
-	if( sp != NULL )
-		sp->proc_interval = 10000;
-	sp = dbcSpell.LookupEntry( 33759 );
-	if( sp != NULL )
-		sp->proc_interval = 10000;
-
 	// Band of the Eternal Sage
 	sp = dbcSpell.LookupEntry( 35083 );
 	if( sp != NULL )
@@ -5614,8 +5606,361 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 15;
 		//sp->procFlags = PROC_ON_CAST_SPELL; Need new flag - PROC_ON_FINISH_MOVE;
 	}
-
-
+	//Item Set: Tempest Regalia
+	sp = dbcSpell.LookupEntry( 38396 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 67108864;
+	}
+	sp = dbcSpell.LookupEntry( 38397 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1572896 | 1 | 2048;
+	}
+	//Item Set: Tirisfal Regalia
+	sp = dbcSpell.LookupEntry( 37441 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 536870912;
+		sp->EffectSpellGroupRelation[1] = 536870912;
+	}
+	sp = dbcSpell.LookupEntry( 37443 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	}
+	//Item Set: Aldor Regalia
+	sp = dbcSpell.LookupEntry( 37438 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1572896 | 1;
+	}
+	sp = dbcSpell.LookupEntry( 37439 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 32;
+		sp->EffectSpellGroupRelation_high[1] = 64;
+		//sp->EffectSpellGroupRelation_high[2] = 64; NEED DBC 2.3.2 :P
+	}
+	//Item Set: Absolution Regalia
+	sp = dbcSpell.LookupEntry( 38413 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 32768;
+	}
+	sp = dbcSpell.LookupEntry( 38412 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 8192;
+	}
+	//Item Set: Vestments of Absolution
+	sp = dbcSpell.LookupEntry( 38410 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 512;
+	}
+	sp = dbcSpell.LookupEntry( 38411 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4096 ;
+	}
+	//Item Set: Avatar Raiment
+	sp = dbcSpell.LookupEntry( 26171 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 64;
+	}
+	//Item Set: Avatar Regalia
+	sp = dbcSpell.LookupEntry( 37600 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procChance = 6;
+	}
+	//Item Set: Incarnate Raiment
+	sp = dbcSpell.LookupEntry( 37568 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	}
+	sp = dbcSpell.LookupEntry( 37565 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4096;
+	}
+	//Item Set: Incarnate Regalia
+	sp = dbcSpell.LookupEntry( 37570 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[1] = 256;
+	}
+	sp = dbcSpell.LookupEntry( 37571 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 128;
+		sp->EffectSpellGroupRelation[1] = 8388608;
+	}
+	//Item Set: Malefic Raiment
+	sp = dbcSpell.LookupEntry( 38393 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1;
+		sp->EffectSpellGroupRelation_high[0] = 64;
+	}
+	//Item Set: Voidheart Raiment
+	sp = dbcSpell.LookupEntry( 37377 );if( sp != NULL )
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 5;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->proc_interval = 20;
+		sp->EffectTriggerSpell[0] = 37379;
+	}
+	sp = dbcSpell.LookupEntry( 39437 );if( sp != NULL )
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 5;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->proc_interval = 20;
+		sp->EffectTriggerSpell[0] = 37378;
+	}
+	sp = dbcSpell.LookupEntry( 37380 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 2|4;
+	}
+	//Item Set: Gronnstalker's Armor
+	sp = dbcSpell.LookupEntry( 38392 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 1;
+	}
+	//Item Set: Rift Stalker Armor
+	sp = dbcSpell.LookupEntry( 37505 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 1;
+	}
+	//Item Set: Demon Stalker Armor
+	sp = dbcSpell.LookupEntry( 37484 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 256;
+	}
+	sp = dbcSpell.LookupEntry( 37485 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 4096;
+	}
+	//Item Set: Skyshatter Harness
+	sp = dbcSpell.LookupEntry( 38429 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1048576 | 268435456 | 2147483648;
+	}
+	//Item Set: Skyshatter Raiment
+	sp = dbcSpell.LookupEntry( 38434 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 256;
+	}
+	sp = dbcSpell.LookupEntry( 38435 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 256;
+	}
+	//Item Set: Skyshatter Regalia
+	sp = dbcSpell.LookupEntry( 38436 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1;
+	}
+	//Item Set: Cataclysm Raiment
+	sp = dbcSpell.LookupEntry( 37225 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry( 37227 );if( sp != NULL )
+	{
+		sp->proc_interval = 60000;
+		sp->procChance = 100;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	}
+	sp = dbcSpell.LookupEntry( 39950 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 64;
+	}
+	//Item Set: Cataclysm Regalia
+	sp = dbcSpell.LookupEntry( 37228 );if( sp != NULL )
+	{
+		sp->procChance = 7;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	}
+	sp = dbcSpell.LookupEntry( 37234 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry( 37237 );if( sp != NULL )
+	{
+		sp->procChance = 25;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	}
+	//Item Set: Cataclysm Harness
+	sp = dbcSpell.LookupEntry( 37239 );if( sp != NULL )
+	{
+		sp->procChance = 2;
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+	}
+	sp = dbcSpell.LookupEntry( 37240 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry( 37241 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 512;
+	}
+	//Item Set: Cyclone Raiment
+	sp = dbcSpell.LookupEntry( 37210 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 524288;
+	}
+	sp = dbcSpell.LookupEntry( 37211 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 524288;
+	}
+	//Item Set: Cyclone Harness
+	sp = dbcSpell.LookupEntry( 37224 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 16;
+	}
+	sp = dbcSpell.LookupEntry( 37223 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 536870912;
+	}
+	//Item Set: Cyclone Regalia
+	sp = dbcSpell.LookupEntry( 37212 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 256;
+	}
+	sp = dbcSpell.LookupEntry( 37213 );if( sp != NULL )
+	{
+		sp->procChance = 11;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+	}
+	//Item Set: Lightbringer Armor
+	sp = dbcSpell.LookupEntry( 38421 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 4096;
+	}
+	sp = dbcSpell.LookupEntry( 38422 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 32;
+	}
+	//Item Set: Lightbringer Battlegear
+	sp = dbcSpell.LookupEntry( 38427 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK;
+		sp->procChance = 20;
+	}
+	sp = dbcSpell.LookupEntry( 38424 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 128;
+	}
+	//Item Set: Lightbringer Raiment
+	sp = dbcSpell.LookupEntry( 38426 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 2147483648;
+	}
+	sp = dbcSpell.LookupEntry( 38425 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1073741824;
+	}
+	//Item Set: Crystalforge Armor
+	sp = dbcSpell.LookupEntry( 37190 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 8;
+	}
+	sp = dbcSpell.LookupEntry( 37191 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	}
+	//Item Set: Crystalforge Battlegear
+	sp = dbcSpell.LookupEntry( 37190 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1024 | 524288 | 1048576 |536870912;
+		sp->EffectSpellGroupRelation_high[0] = 1|520;
+	}
+	sp = dbcSpell.LookupEntry( 37195 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procChance = 6;
+	}
+	//Item Set: Crystalforge Raiment
+	sp = dbcSpell.LookupEntry( 37189 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+		sp->proc_interval = 60000;
+	}
+	sp = dbcSpell.LookupEntry( 43837 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 2147483648;
+	}
+	sp = dbcSpell.LookupEntry( 37188 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	}
+	//Item Set: Justicar Raiment
+	sp = dbcSpell.LookupEntry( 37182 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 1;
+	}
+	sp = dbcSpell.LookupEntry( 37183 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 256;
+	}
+	//Item Set: Justicar Armor
+	sp = dbcSpell.LookupEntry( 37184 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 1024;
+		sp->EffectSpellGroupRelation[0] = 134217728;
+		sp->EffectSpellGroupRelation_high[1] = 8;
+	}
+	sp = dbcSpell.LookupEntry( 37185 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 64;
+	}
+	//Item Set: Justicar Battlegear
+	sp = dbcSpell.LookupEntry( 37186 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 536870912;
+	}
+	sp = dbcSpell.LookupEntry( 37187 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 520;
+	}
+	//Item Set: Onslaught Battlegear
+	sp = dbcSpell.LookupEntry( 38399 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 1024;
+	}
+	sp = dbcSpell.LookupEntry( 38398 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 536870912;
+	}
+	//Item Set: Onslaught Armor
+	sp = dbcSpell.LookupEntry( 38408 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 128;
+	}
+	sp = dbcSpell.LookupEntry( 38407 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 513;
+	}
+	//Item Set: Destroyer Armor
+	sp = dbcSpell.LookupEntry( 37525 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM;
+		sp->procChance = 7;
+	}
+	//Item Set: Destroyer Battlegear
+	sp = dbcSpell.LookupEntry( 37528 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procChance = 100;
+	}
+	sp = dbcSpell.LookupEntry( 37535 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 33554432;
+		sp->EffectSpellGroupRelation_high[0] = 1024;
+	}
+	//Item Set: Warbringer Armor
+	sp = dbcSpell.LookupEntry( 37516 );if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procChance = 100;
+	}
+	//Item Set: Warbringer Battlegear
+	sp = dbcSpell.LookupEntry( 37518 );if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 4;
+	}
 	//all Drums 
 	sp = dbcSpell.LookupEntry( 35474 );if( sp != NULL ) sp->RequiredShapeShift = 0;
 	sp = dbcSpell.LookupEntry( 35475 );if( sp != NULL ) sp->RequiredShapeShift = 0;

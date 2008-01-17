@@ -1422,6 +1422,75 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell->NameHash != SPELL_HASH_STARFIRE )
 									continue;
 							}break;
+						case 37565: //setbonus
+							{
+								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL)
+									continue;
+							}break;
+						//SETBONUSES
+						case 37379:
+							{
+								if (!CastingSpell || CastingSpell->School != SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+									continue;
+							}break;
+						case 37378:
+							{
+								if (!CastingSpell || CastingSpell->School != SCHOOL_FIRE || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+									continue;
+							}break;
+						case 39950:
+							{
+								if (!CastingSpell ||  !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
+									continue;
+							}break;
+						case 37234:
+						case 37214:
+						case 37601:
+							{
+								if (!CastingSpell ||  !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+									continue;
+							}break;
+						case 37237:
+							{
+								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT)
+									continue;
+							}break;
+						case 37193:
+							{
+								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD)
+									continue;
+							}break;
+						case 37196:
+						case 43838:
+							{
+								if (!CastingSpell)
+									continue;
+								if (CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER &&
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_JUSTICE &&
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_LIGHT &&
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_WISDOM &&
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_RIGHTEOUSNESS &&
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_BLOOD &&
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_VENGEANCE &&
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_COMMAND)
+									continue
+							}break;
+						case 43837:
+							{
+								if (!CastingSpell || (CastingSpell->NameHash != SPELL_HASH_FLASH_OF_LIGHT && CastingSpell->NameHash != SPELL_HASH_HOLY_LIGHT))
+									continue;
+							}break;
+						case 37529:
+							{
+								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_OVERPOWER)
+									continue;
+							}break;
+						case 37517:
+							{
+								if (!CastingSpell || CastingSpell->Id == 37517 || CastingSpell->NameHash != SPELL_HASH_REVENGE)
+									continue; 
+							}break;
+						//SETBONUSES END
 						//item - Band of the Eternal Restorer 
 						case 35087:
 							{
