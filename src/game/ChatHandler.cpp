@@ -545,6 +545,19 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 	}
 }
 
+void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
+{
+    //CHECK_PACKET_SIZE(recvPacket, 8);
+
+    //GetPlayer()->GetSession()->OutPacket(SMSG_INSPECT_TALENTS, 0, 0 );
+
+    //uint64 guid;
+    //recvPacket >> guid;
+
+	// TODO return SMSG_INSPECT_TALENTS
+	return;
+}
+
 void WorldSession::HandleReportSpamOpcode(WorldPacket & recvPacket)
 {
 	CHECK_PACKET_SIZE(recvPacket, 29);

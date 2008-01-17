@@ -598,6 +598,7 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_SETSHEATHED].handler							   = &WorldSession::HandleSetSheathedOpcode;
 	WorldPacketHandlers[CMSG_MESSAGECHAT].handler							   = &WorldSession::HandleMessagechatOpcode;
 	WorldPacketHandlers[CMSG_TEXT_EMOTE].handler								= &WorldSession::HandleTextEmoteOpcode;
+	WorldPacketHandlers[CMSG_INSPECT].handler								= &WorldSession::HandleInspectOpcode;
 	
 	// Channels
 	WorldPacketHandlers[CMSG_JOIN_CHANNEL].handler							  = &WorldSession::HandleChannelJoin;

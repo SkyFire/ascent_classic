@@ -874,6 +874,7 @@ NameTableEntry g_worldOpcodeNames[] = {
 	{SMSG_REPORT_SPAM_RESPONSE,                    "SMSG_REPORT_SPAM_RESPONSE"},
 	{SMSG_ACTIVATE_SPAM_REPORTING,                 "SMSG_ACTIVATE_SPAM_REPORTING"},
 	{NUM_MSG_TYPES,                                "NUM_MSG_TYPES"},
+	{SMSG_INSPECT_TALENTS,						   "SMSG_INSPECT_TALENTS"},
 	{0,			0}
 };
 

@@ -329,7 +329,7 @@ protected:
 	void HandlePlayedTimeOpcode(WorldPacket & recv_data);
 	void HandleSetSheathedOpcode(WorldPacket & recv_data);
 	void HandleCompleteCinematic(WorldPacket & recv_data);
-
+	void HandleInspectOpcode( WorldPacket & recv_data );
 
 	/// Gm Ticket System in GMTicket.cpp:
 	void HandleGMTicketCreateOpcode(WorldPacket& recvPacket);
