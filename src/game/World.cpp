@@ -344,6 +344,8 @@ bool World::SetInitialWorldSettings()
 	uint32 group_relation_rogue_elusiveness = 0;
 	uint32 group_relation_rogue_poisons = 0;
 	uint32 group_relation_rogue_find_weakness = 0;
+	uint32 group_relation_rogue_shadow_step = 0;
+	uint32 group_relation_rogue_lethality = 0;
 
 	// Start
 
@@ -2539,43 +2541,46 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1024 | 256; // Cheap Shot + Garrote
 
-	//rogue - Shadowstep
-	uint32 ss_grouprelation = 512;//rogue - ambush (only a part of the whole group since it would affect other spells too)
-	ss_grouprelation |= 4;//rogue - Backstab (only a part of the whole group since it would affect other spells too)
-	ss_grouprelation |= 256;//Garrote
-	ss_grouprelation |= 536870912 | 16 | 8 | 8389120 | 41943040 | 33554432 | 32 | 67108864 | 64 | 128 ;
+
+	//rogue ( grouping ) Shadowstep
+	group_relation_rogue_shadow_step |= 512;//rogue - ambush (only a part of the whole group since it would affect other spells too)
+	group_relation_rogue_shadow_step |= 4;//rogue - Backstab (only a part of the whole group since it would affect other spells too)
+	group_relation_rogue_shadow_step |= 256;//Garrote
+	group_relation_rogue_shadow_step |= 536870912 | 16 | 8 | 8389120 | 41943040 | 33554432 | 32 | 67108864 | 64 | 128 ;
+
 	//rogue - Shadowstep
 	sp = dbcSpell.LookupEntry( 36563 ); 
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[1] = ss_grouprelation;
+		sp->EffectSpellGroupRelation[1] = group_relation_rogue_shadow_step;
 		sp->EffectSpellGroupRelation_high[1] = 256 | 128 ;
 		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 	}
 
-	//rogue - Lethality
-	uint32 L_grouprelation = 0;
-	L_grouprelation |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)
-	L_grouprelation |= 4;//rogue - backstab (only a part of the whole group since it would affect other spells too)
-	L_grouprelation |= 8;//rogue - Gouge (only a part of the whole group since it would affect other spells too)
-	L_grouprelation |= 33554432UL;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
-	L_grouprelation |= 536870912UL;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
-	L_grouprelation |= 1073741824UL;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
+	//rogue ( grouping ) Lethality
+	group_relation_rogue_lethality |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)
+	group_relation_rogue_lethality |= 4;//rogue - backstab (only a part of the whole group since it would affect other spells too)
+	group_relation_rogue_lethality |= 8;//rogue - Gouge (only a part of the whole group since it would affect other spells too)
+	group_relation_rogue_lethality |= 33554432UL;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
+	group_relation_rogue_lethality |= 536870912UL;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
+	group_relation_rogue_lethality |= 1073741824UL;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
+
+	//rogue Lethality
 	sp = dbcSpell.LookupEntry( 14128 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = L_grouprelation;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
 	sp = dbcSpell.LookupEntry( 14132 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = L_grouprelation;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
 	sp = dbcSpell.LookupEntry( 14135 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = L_grouprelation;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
 	sp = dbcSpell.LookupEntry( 14136 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = L_grouprelation;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
 	sp = dbcSpell.LookupEntry( 14137 ); 
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = L_grouprelation;
+		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
 
 	//rogue - Endurance 
 	sp = dbcSpell.LookupEntry( 13742 ); 
@@ -2615,13 +2620,26 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 	}
 	//priest- Blessed Resilience
-	sp = dbcSpell.LookupEntry( 33142 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
-	sp = dbcSpell.LookupEntry( 33145 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
-	sp = dbcSpell.LookupEntry( 33146 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33142 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33145 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33146 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+
 	//priest- Focused Will
-	sp = dbcSpell.LookupEntry( 45234 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
-	sp = dbcSpell.LookupEntry( 45243 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
-	sp = dbcSpell.LookupEntry( 45244 ); if (sp!=NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 45234 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 45243 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 45244 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
 
 	//priest - Improved Divine Spirit 
 	sp = dbcSpell.LookupEntry( 33174 ); 
@@ -2679,7 +2697,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
-		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
 		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
 		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
 		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
@@ -2688,7 +2706,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
-		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
 		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
 		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
 		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
@@ -2706,8 +2724,8 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
-		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
-		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
+		sp->EffectSpellGroupRelation[2] = 0;	//1-2 mod the same ?
 		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
 		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
 	}
@@ -2715,10 +2733,10 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
-		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864 ;
-		sp->EffectSpellGroupRelation[2] = 0 ;	//1-2 mod the same ?
-		sp->EffectSpellGroupRelation_high[0] = 2 | 1024 ;
-		sp->EffectSpellGroupRelation_high[1] = 2 | 1024 ;
+		sp->EffectSpellGroupRelation[1] = 4194304 | 128 | 32768 | 8192 | 16 | 1048576 | 8388608 | 2097152 | 67108864;
+		sp->EffectSpellGroupRelation[2] = 0;	//1-2 mod the same ?
+		sp->EffectSpellGroupRelation_high[0] = 2 | 1024;
+		sp->EffectSpellGroupRelation_high[1] = 2 | 1024;
 	}
 
 	//Priest: Shadowguard
