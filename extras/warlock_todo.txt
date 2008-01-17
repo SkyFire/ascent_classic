@@ -4,9 +4,6 @@ Nether Protection procs of shadow and fire dmg DoT's ticks
 
 Demonology
 SoulWell - nothing appears - wtf ? i can;t find this spell :S
-Destruction
-Minions:
-Each time u resummon your pet you have to drag and drop your spells in minion action bar .
 
 Imp:
 *Phase Shift - nothing happens imp still get's attacked by enemy
@@ -18,14 +15,7 @@ Felhunter
 *Devour Magic - no buffs dispelled
 *Tainted Blood - no dmg reduction
 *Paranoia - doesn't destealths rogues or druids
-Felguard
-First i don't even know where i sohlud get Grimoires for his spells so i cannot tell u how its bugged .
 
-Talents:
-http://img82.imageshack.us/img82/5526/untitledlklklsg0.png
-
-Also for all caster classes i don't know why but sometimes even if i'm correctly positioned it tells me " Target must be in front of you " .
-TALENTS
 Affliction
 Improved Drain Soul - no mana regeneration after shard is made
 Grim Reach - should increase range for affliction spells by 10 % - no increase
