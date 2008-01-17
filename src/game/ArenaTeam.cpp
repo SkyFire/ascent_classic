@@ -196,17 +196,21 @@ void ArenaTeam::Roster(WorldPacket & data)
 
 	for(uint32 i = 0; i < m_memberCount; ++i)
 	{
-		PlayerInfo * info = m_members[i].Info;
-		data << uint64(info->guid);
-		data << uint8( (info->m_loggedInPlayer != NULL) ? 1 : 0 );
-		data << info->name;
-		data << info->lastZone;
-		data << uint8( info->lastLevel );
-		data << uint8( info->cl );
-		data << m_members[i].Played_ThisWeek;
-		data << m_members[i].Won_ThisWeek;
-		data << m_members[i].Played_ThisSeason;
-		data << m_members[i].Won_ThisSeason;
+		PlayerInfo* info = m_members[i].Info;
+		// TODO : burlex figure out why this became null
+		if( info != NULL )
+		{
+			data << uint64(info->guid);
+			data << uint8( (info->m_loggedInPlayer != NULL) ? 1 : 0 );
+			data << info->name;
+			data << info->lastZone;
+			data << uint8( info->lastLevel );
+			data << uint8( info->cl );
+			data << m_members[i].Played_ThisWeek;
+			data << m_members[i].Won_ThisWeek;
+			data << m_members[i].Played_ThisSeason;
+			data << m_members[i].Won_ThisSeason;
+		}
 	}
 }
 
