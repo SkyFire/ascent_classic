@@ -5136,7 +5136,7 @@ bool Unit::GetSpeedDecrease()
 	m_slowdown = 0;
 	map< uint32, int32 >::iterator itr = speedReductionMap.begin();
 	for(; itr != speedReductionMap.end(); ++itr)
-		m_slowdown = min( m_slowdown, itr->second );
+		m_slowdown = (int32)min( m_slowdown, itr->second );
 
 	if(m_slowdown<-100)
 		m_slowdown = 100; //do not walk backwards !

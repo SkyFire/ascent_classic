@@ -3885,9 +3885,9 @@ void Player::ResurrectPlayer()
 {
 	sEventMgr.RemoveEvents(this,EVENT_PLAYER_FORECED_RESURECT); //in case somebody resurected us before this event happened
 	if( m_resurrectHealth )
-		SetUInt32Value( UNIT_FIELD_HEALTH, min( m_resurrectHealth, m_uint32Values[UNIT_FIELD_MAXHEALTH] ) );
+		SetUInt32Value( UNIT_FIELD_HEALTH, (uint32)min( m_resurrectHealth, m_uint32Values[UNIT_FIELD_MAXHEALTH] ) );
 	if( m_resurrectMana )
-		SetUInt32Value( UNIT_FIELD_POWER1, min( m_resurrectMana, m_uint32Values[UNIT_FIELD_MAXPOWER1] ) );
+		SetUInt32Value( UNIT_FIELD_POWER1, (uint32)min( m_resurrectMana, m_uint32Values[UNIT_FIELD_MAXPOWER1] ) );
 
 	m_resurrectHealth = m_resurrectMana = 0;
 

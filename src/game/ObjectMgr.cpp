@@ -1838,7 +1838,7 @@ void ObjectMgr::LoadSpellFixes()
 				}
 			}
 
-			sp->procChance = min(proc_chance, sp->procChance);			
+			sp->procChance = (uint32)min( proc_chance, sp->procChance );			
 		}
 
 		// FIX OTHER STUFF.. we'll find out..

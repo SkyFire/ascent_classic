@@ -3849,7 +3849,7 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		//zack: latest new is that this spell uses spell damage bonus only and not healing bonus
 		amount += m_caster->GetSpellDmgBonus(m_target,GetSpellProto(),amount)*50/100;
 	
-		uint32 Amount = min( amount, m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) );
+		uint32 Amount = (uint32)min( amount, m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) );
 		uint32 newHealth = m_caster->GetUInt32Value(UNIT_FIELD_HEALTH) + Amount ;
 		
 		uint32 mh = m_caster->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
@@ -4315,7 +4315,7 @@ void Aura::EventPeriodicManaLeech(uint32 amount)
 	if(m_target->isAlive() && m_caster->isAlive())
 	{
 	
-		int32 amt = min( amount, m_target->GetUInt32Value( UNIT_FIELD_POWER1 ) );
+		int32 amt = (int32)min( amount, m_target->GetUInt32Value( UNIT_FIELD_POWER1 ) );
 		uint32 cm = m_caster->GetUInt32Value(UNIT_FIELD_POWER1)+amt;
 		uint32 mm = m_caster->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
 		if(cm <= mm)
@@ -6313,7 +6313,7 @@ void Aura::EventPeriodicBurn(uint32 amount, uint32 misc)
 
 		uint32 field = UNIT_FIELD_POWER1 + misc;
 	
-		uint32 Amount = min( amount, m_target->GetUInt32Value( field ) );
+		uint32 Amount = (uint32)min( amount, m_target->GetUInt32Value( field ) );
 		uint32 newHealth = m_target->GetUInt32Value(field) - Amount ;
 				
 		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, newHealth, FLAG_PERIODIC_DAMAGE);

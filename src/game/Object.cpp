@@ -608,7 +608,7 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 	if( m_valuesCount > ( 2 * 0x20 ) )//if number of blocks > 2->  unit and player+item container
 	{
 		bc = updateMask->GetUpdateBlockCount();
-		values_count = min( bc * 32, m_valuesCount );
+		values_count = (uint32)min( bc * 32, m_valuesCount );
 
 	}
 	else
