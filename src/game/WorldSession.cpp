@@ -203,7 +203,7 @@ int WorldSession::Update(uint32 InstanceID)
 			LogoutPlayer(true);
 	}
 
-	if(m_lastPing + WORLDSOCKET_TIMEOUT > (uint32)UNIXTIME)
+	if(m_lastPing + WORLDSOCKET_TIMEOUT < (uint32)UNIXTIME)
 	{
 		// Check if the player is in the process of being moved. We can't delete him
 		// if we are.
