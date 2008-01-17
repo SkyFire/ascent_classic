@@ -1898,6 +1898,7 @@ void Spell::SpellEffectSummon(uint32 i) // Summon
 		summon->AddSpell(dbcSpell.LookupEntry(33395), true);
        summon->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, p_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
        summon->_setFaction();
+	   p_caster->m_tempSummon = summon;
 	}
 	else
 	{
