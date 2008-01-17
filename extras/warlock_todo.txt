@@ -17,7 +17,6 @@ Felhunter
 *Paranoia - doesn't destealths rogues or druids
 
 Demonology - anyway useless whitout minions fixes
-Improved Healthstone - grants 20% more hp at healthstone
 Demonic Sacrifice - nothing happens
 Master Demonologyst - idem ^^
 Soul Link - 20% or dmg received by caster is taken by minion and increases dmg done by 5%

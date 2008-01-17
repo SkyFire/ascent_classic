@@ -138,6 +138,7 @@ Zack - test my shit :
 - remake combustion and that other spell that were removing mother aura on proc. Do not rename namehashes ever again !
 - warlock - Improved Drain Soul 18372
 - warlock - Unstable Affliction 30405
+- warlock - Improved Healthstone 18693 ->check for conjured items when traded
 
 ==========================================================================
 Capt - test my shit :

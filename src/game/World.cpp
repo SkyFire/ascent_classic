@@ -4396,6 +4396,27 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
+
+	//warlock - Improved Healthstone
+	sp = dbcSpell.LookupEntry( 18692 );
+	if( sp != NULL )
+	{
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+		sp->EffectSpellGroupRelation[1] = 65536;
+	}
+	sp = dbcSpell.LookupEntry( 18693 );
+	if( sp != NULL )
+	{
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+		sp->EffectSpellGroupRelation[1] = 65536;
+	}
+
 	//warlock - Unstable Affliction
 	sp = dbcSpell.LookupEntry( 30108 );
 	if( sp != NULL )
