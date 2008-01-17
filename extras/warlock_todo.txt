@@ -16,11 +16,6 @@ Felhunter
 *Tainted Blood - no dmg reduction
 *Paranoia - doesn't destealths rogues or druids
 
-Affliction
-Shadow Embrace - should give u 5% reduction on dmg received when you cast Corr , CoA , Siphon Life or Seed of Corr
-Nighfall - 4% chance when a target is dmged by Drain Life or Corr to make your next shadowbolt instant
-Unstable Affliction - should make 1057 DoT and 1570 when dispelled - no dmg at dispell
-
 Demonology - anyway useless whitout minions fixes
 Improved Healthstone - grants 20% more hp at healthstone
 Demonic Sacrifice - nothing happens

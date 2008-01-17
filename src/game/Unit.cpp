@@ -884,6 +884,12 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								//null check was made before like 2 times already :P
 								dmg_overwrite = (ospinfo->EffectBasePoints[2] + 1) * GetUInt32Value( UNIT_FIELD_MAXPOWER1 ) / 100;
 							}break;
+						// warlock - Unstable Affliction
+						case 43523:
+							{
+								//null check was made before like 2 times already :P
+								dmg_overwrite = (ospinfo->EffectBasePoints[0] + 1) * 9;
+							}break;
 						//warlock soul link
 						case 25228:
 							{

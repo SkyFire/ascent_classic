@@ -245,7 +245,8 @@ enum procFlags
     PROC_ON_RANGED_CRIT_ATTACK_VICTIM = 0x800,
     PROC_ON_CRIT_ATTACK             = 0x1000,
     PROC_ON_RANGED_ATTACK_VICTIM    = 0x2000,
-    PROC_ANYTIME                    = 0x4000,
+//    PROC_ANYTIME                    = 0x4000,
+    PROC_ON_PRE_DISPELL_AURA_VICTIM = 0x4000,
 //    PROC_UNK2_DEFILLED              = 0x8000,
 	PROC_ON_SPELL_LAND_VICTIM       = 0x8000,//custom flag. PROC only when spell landed on victim
     PROC_ON_CAST_SPECIFIC_SPELL     = 0x10000,

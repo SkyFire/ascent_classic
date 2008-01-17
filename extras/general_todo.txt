@@ -137,6 +137,7 @@ Zack - test my shit :
 - Hunter : Thrill of the Hunt 34499
 - remake combustion and that other spell that were removing mother aura on proc. Do not rename namehashes ever again !
 - warlock - Improved Drain Soul 18372
+- warlock - Unstable Affliction 30405
 
 ==========================================================================
 Capt - test my shit :

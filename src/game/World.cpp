@@ -3991,26 +3991,6 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] =  2147483648UL | 4194304 | 1 | 2 | 16384 | 1024 | 8 | 262144 | 524288 | 2147483648UL | 16777216UL | 128 | 16 | 32768;
 	}
 
-	//warlock - Contagion
-	sp = dbcSpell.LookupEntry( 30060 );
-	if( sp != NULL )
-	{
-		sp->EffectSpellGroupRelation[0] =  524288 | 131072;
-		sp->EffectSpellGroupRelation[2] =  2147483648UL | 4194304UL | 1024 | 32768;
-	}
-	sp = dbcSpell.LookupEntry( 30061 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] =  524288 | 131072;
-	sp = dbcSpell.LookupEntry( 30062 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] =  524288 | 131072;
-	sp = dbcSpell.LookupEntry( 30063 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] =  524288 | 131072;
-	sp = dbcSpell.LookupEntry( 30064 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] =  524288 | 131072;
-
 	//mage: Arcane Power
 	sp = dbcSpell.LookupEntry( 12042 );
 	if( sp != NULL )
@@ -4416,6 +4396,38 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
+	//warlock - Unstable Affliction
+	sp = dbcSpell.LookupEntry( 30108 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_PRE_DISPELL_AURA_VICTIM ;
+		sp->procChance = 100;
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[1] = 43523;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
+	}
+	sp = dbcSpell.LookupEntry( 30404 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_PRE_DISPELL_AURA_VICTIM ;
+		sp->procChance = 100;
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[1] = 43523;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
+	}
+	sp = dbcSpell.LookupEntry( 30405 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_PRE_DISPELL_AURA_VICTIM ;
+		sp->procChance = 100;
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[1] = 43523;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
+	}
+
 	//warlock - Improved Drain Soul
 	sp = dbcSpell.LookupEntry( 18213 );
 	if( sp != NULL )
@@ -4440,6 +4452,38 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
 		sp->EffectSpellGroupRelation[1] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 		sp->Effect[2] = 0 ; //remove this effect
+	}
+
+	//warlock - Shadow Embrace
+	sp = dbcSpell.LookupEntry( 32385 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->Effect[1] = 0 ; //remove this effect ? Maybe remove the other one :P xD
+	}
+	sp = dbcSpell.LookupEntry( 32387 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->Effect[1] = 0 ; //remove this effect ? Maybe remove the other one :P xD
+	}
+	sp = dbcSpell.LookupEntry( 32392 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->Effect[1] = 0 ; //remove this effect ? Maybe remove the other one :P xD
+	}
+	sp = dbcSpell.LookupEntry( 32393 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->Effect[1] = 0 ; //remove this effect ? Maybe remove the other one :P xD
+	}
+	sp = dbcSpell.LookupEntry( 32394 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->Effect[1] = 0 ; //remove this effect ? Maybe remove the other one :P xD
 	}
 
 	//warlock - Bane

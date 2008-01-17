@@ -2644,6 +2644,7 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 		{
 			if(m_spellInfo->DispelType == DISPEL_ALL)
 			{
+				unitTarget->HandleProc( PROC_ON_PRE_DISPELL_AURA_VICTIM , u_caster , m_spellInfo, aur->GetSpellId() );
 				data.clear();
 				data << m_caster->GetNewGUID();
 				data << unitTarget->GetNewGUID();
