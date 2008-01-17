@@ -1517,56 +1517,6 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL && sp->Id == 16164 )
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
 
-    //Solarian's Sapphire
-    sp = dbcSpell.LookupEntryForced(37536);
-     if( sp != NULL )
-        sp->EffectSpellGroupRelation[0] = 65536;
-
-    //Totem of the Pulsing Earth
-    sp = dbcSpell.LookupEntryForced(37740);
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 1;
-
-    //Totem of the Maelstrom
-    sp = dbcSpell.LookupEntryForced( 37738 );
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 64;
-
-    //Totem of Living Water
-    sp = dbcSpell.LookupEntryForced( 43752 );
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 256;
-
-    //Totem of Healing Rains
-    sp = dbcSpell.LookupEntryForced( 38322 );
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 256;
-
-    //Totem of Lightning
-    sp = dbcSpell.LookupEntryForced( 33696 );
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 1;
-
-    //Everbloom Idol
-    sp = dbcSpell.LookupEntryForced( 33693 );
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 32768;
-
-    //Idol of the Avian Heart
-    sp = dbcSpell.LookupEntryForced( 38321 );
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 32;
-
-    //Idol of the Crescent Goddess
-    sp = dbcSpell.LookupEntryForced( 37737 );
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 64;
-
-    //Idol of the Avenger
-    sp = dbcSpell.LookupEntryForced( 37760 );
-    if( sp != NULL )
-       sp->EffectSpellGroupRelation[0] = 1;
-
 	//remove stormstrike effect 0
 	sp = dbcSpell.LookupEntryForced( 17364 );
 	if( sp != NULL && sp->Id == 17364 )
@@ -2061,24 +2011,6 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
 		sp->EffectTriggerSpell[0] = 39805;//proc something (we will owerride this)
 		sp->procFlags = PROC_ON_CAST_SPELL;
-	}
-
-	//Energized 
-	sp = dbcSpell.LookupEntryForced( 43750 ); 
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
-		sp->EffectTriggerSpell[0] = 43751;//proc something (we will owerride this)
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
-	}
-
-	//Spell Haste Trinket
-	sp = dbcSpell.LookupEntryForced( 33297 ); 
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[0] = 42;//proc something (we will owerride this)
-		sp->EffectTriggerSpell[0] = 33370;//proc something (we will owerride this)
-		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
 	}
 
 	//shaman - Purge 
@@ -5663,6 +5595,66 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
 	}
 //---------ITEMS-----------------
+	//Solarian's Sapphire
+	sp = dbcSpell.LookupEntryForced(37536);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 65536;
+
+	//Totem of the Pulsing Earth
+	sp = dbcSpell.LookupEntryForced(37740);
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1;
+
+	//Totem of the Maelstrom
+	sp = dbcSpell.LookupEntryForced( 37738 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64;
+
+	//Totem of Living Water
+	sp = dbcSpell.LookupEntryForced( 43752 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 256;
+
+	//Totem of Healing Rains
+	sp = dbcSpell.LookupEntryForced( 38322 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 256;
+
+	//Totem of Lightning
+	sp = dbcSpell.LookupEntryForced( 33696 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1;
+
+	//Everbloom Idol
+	sp = dbcSpell.LookupEntryForced( 33693 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 32768;
+
+	//Idol of the Avian Heart
+	sp = dbcSpell.LookupEntryForced( 38321 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 32;
+
+	//Idol of the Crescent Goddess
+	sp = dbcSpell.LookupEntryForced( 37737 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64;
+
+	//Idol of the Avenger
+	sp = dbcSpell.LookupEntryForced( 37760 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 1;
+
+	//Energized 
+	sp = dbcSpell.LookupEntryForced( 43750 ); 
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CAST_SPELL;
+
+	//Spell Haste Trinket
+	sp = dbcSpell.LookupEntryForced( 33297 ); 
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
+
 	// Band of the Eternal Sage
 	sp = dbcSpell.LookupEntryForced( 35083 );
 	if( sp != NULL )
@@ -5673,11 +5665,6 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_CAST_SPELL;
 
-	// Everbloom Idol
-	sp = dbcSpell.LookupEntryForced( 33693 );if( sp != NULL )
-	{
-			sp->EffectSpellGroupRelation[0] |= 32768;
-	}
 	//Item Set: Thunderheart Harness
 	sp = dbcSpell.LookupEntryForced( 38447 );if( sp != NULL )
 	{
