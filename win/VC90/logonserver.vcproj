@@ -542,7 +542,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\ascent\usewinhoard.cpp"
+			RelativePath="..\..\src\shared\usewinhoard.cpp"
 			>
 			<FileConfiguration
 				Name="Release|Win32"
