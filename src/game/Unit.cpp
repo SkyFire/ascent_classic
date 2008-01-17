@@ -1473,7 +1473,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_BLOOD &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_VENGEANCE &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_COMMAND)
-									continue
+									continue;
 							}break;
 						case 43837:
 							{
