@@ -1021,7 +1021,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 	int8 slot;
 	uint8 amount = 0;
 	uint8 error;
-	uint8 bagslot = 0xff;
+	int8 bagslot = 0x80;
 
 	recv_data >> srcguid >> itemid;
 	recv_data >> bagguid; 
@@ -1124,7 +1124,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 		return;
 	}
 
-	// ok our bagslot and slot are set.
+	// ok our z and slot are set.
 	Item * oldItem= NULL;
 	Item * pItem=NULL;
 	if(slot != INVENTORY_SLOT_NOT_SET)
