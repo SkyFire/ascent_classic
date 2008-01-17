@@ -239,7 +239,7 @@ public:
 
 	ASCENT_INLINE void QueuePacket(WorldPacket* packet)
 	{
-		m_lastPing = UNIXTIME;
+		m_lastPing = (uint32)UNIXTIME;
 		_recvQueue.Push(packet);
 	}
 	
