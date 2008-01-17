@@ -2899,15 +2899,32 @@ bool World::SetInitialWorldSettings()
 	//Paladin: Seal of Wisdom
 	uint32 procchance = 0;
 	sp = dbcSpell.LookupEntry( 27116 );
-	if( sp != NULL ) procchance = sp->procChance;
-	sp = dbcSpell.LookupEntry( 20166 );if( sp != NULL ) sp->procChance = procchance;
-	sp = dbcSpell.LookupEntry( 20356 );if( sp != NULL ) sp->procChance = procchance;
-	sp = dbcSpell.LookupEntry( 20357 );if( sp != NULL ) sp->procChance = procchance;
-	sp = dbcSpell.LookupEntry( 27166 );if( sp != NULL ) sp->procChance = procchance;
+	if( sp != NULL )
+		procchance = sp->procChance;
+	sp = dbcSpell.LookupEntry( 20166 );
+	if( sp != NULL )
+		sp->procChance = procchance;
+	sp = dbcSpell.LookupEntry( 20356 );
+	if( sp != NULL )
+		sp->procChance = procchance;
+	sp = dbcSpell.LookupEntry( 20357 );
+	if( sp != NULL )
+		sp->procChance = procchance;
+	sp = dbcSpell.LookupEntry( 27166 );
+	if( sp != NULL )
+		sp->procChance = procchance;
+
 	//Druid: Natural Perfection
-	sp = dbcSpell.LookupEntry( 33881 );if ( sp != NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
-	sp = dbcSpell.LookupEntry( 33882 );if ( sp != NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
-	sp = dbcSpell.LookupEntry( 33883 );if ( sp != NULL) sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33881 );
+	if ( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33882 );
+	if ( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+	sp = dbcSpell.LookupEntry( 33883 );
+	if ( sp != NULL )
+		sp->procFlags = PROC_ON_CRIT_HIT_VICTIM;
+
 	//Druid: Frenzied Regeneration
 	sp = dbcSpell.LookupEntry( 22842 );
 	if( sp != NULL )
@@ -3055,6 +3072,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31893;
 	}
+
 	//paladin - Spiritual Attunement 
 	sp = dbcSpell.LookupEntry( 31785 );
 	if( sp != NULL )
@@ -3070,6 +3088,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 31786;
 	}
+
 	//Druid: Leader of the Pack
 	sp = dbcSpell.LookupEntry( 24932 );
 	if( sp != NULL )
@@ -3077,6 +3096,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[1] = 0;
 		sp->Effect[2] = 0; //removing strange effects.
 	}
+
 	//Druid: Improved Leader of the Pack
 	sp = dbcSpell.LookupEntry( 34299 ); if( sp != NULL ) sp->proc_interval = 6000;//6 secs
 
