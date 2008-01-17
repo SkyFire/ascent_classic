@@ -587,7 +587,7 @@ bool World::SetInitialWorldSettings()
 		uint32 namehash = 0;
 
 		// get spellentry
-		SpellEntry * sp = dbcSpell.LookupEntryForced(spellid);
+		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
 
 		// hash the name
 		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
