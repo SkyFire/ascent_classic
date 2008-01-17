@@ -878,6 +878,12 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell->NameHash!=SPELL_HASH_SHADOW_BOLT)//shadow bolt								
 									continue;
 							}break;
+						// warlock - Improved Drain Soul
+						case 18371:
+							{
+								//null check was made before like 2 times already :P
+								dmg_overwrite = (ospinfo->EffectBasePoints[2] + 1) * GetUInt32Value( UNIT_FIELD_MAXPOWER1 ) / 100;
+							}break;
 						//warlock soul link
 						case 25228:
 							{
@@ -2966,7 +2972,7 @@ void Unit::AddAura(Aura *aur)
 					continue;
 
 				if(	m_auras[x]->GetSpellProto()->Id != aur->GetSpellId() && 
-					( aur->pSpellId == 0 || aur->pSpellId != m_auras[x]->GetSpellProto()->Id ) //if this is a proc spell then it should not remove it's mother : test with combustion later
+					( aur->pSpellId != m_auras[x]->GetSpellProto()->Id ) //if this is a proc spell then it should not remove it's mother : test with combustion later
 					)
 				{
 					// Check for auras by specific type.
@@ -2989,9 +2995,9 @@ void Unit::AddAura(Aura *aur)
 						}
 					}					   
 				}
-				else if(m_auras[x]->GetSpellId() == aur->GetSpellId()) // not the best formula to test this I know, but it works until we find a solution
+				else if( m_auras[x]->GetSpellId() == aur->GetSpellId() ) // not the best formula to test this I know, but it works until we find a solution
 				{
-					if(!aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid)
+					if( !aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid )
 						continue;
 					f++;
 					//if(maxStack > 1)

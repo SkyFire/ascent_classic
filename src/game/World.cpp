@@ -3765,7 +3765,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 27285;
-		sp->procFlags = PROC_ON_DIE;
+		sp->procFlags = PROC_ON_TARGET_DIE;
 		sp->procChance = 100;
 	}
 	sp = dbcSpell.LookupEntry( 27285 );
@@ -4415,6 +4415,32 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntry( 18219 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+
+	//warlock - Improved Drain Soul
+	sp = dbcSpell.LookupEntry( 18213 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_TARGET_DIE | PROC_TARGET_SELF;
+		sp->procChance = 100;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 18371;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+		sp->EffectSpellGroupRelation[1] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->Effect[2] = 0 ; //remove this effect
+	}
+	sp = dbcSpell.LookupEntry( 18372 );
+	if( sp != NULL )
+	{
+		sp->procFlags = PROC_ON_TARGET_DIE | PROC_TARGET_SELF;
+		sp->procChance = 100;
+		sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[0] = 18371;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+		sp->EffectSpellGroupRelation[1] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
+		sp->Effect[2] = 0 ; //remove this effect
+	}
 
 	//warlock - Bane
 	sp = dbcSpell.LookupEntry( 17788 );

@@ -1725,6 +1725,8 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 #endif
 		//warlock - seed of corruption
 		pVictim->HandleProc( PROC_ON_DIE, pVictim, NULL );
+		if( IsUnit() )
+			static_cast< Player* >( this )->HandleProc( PROC_ON_TARGET_DIE, pVictim, NULL );
 		pVictim->m_procCounter = 0;
 
 		/* victim died! */
