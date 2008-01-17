@@ -594,9 +594,9 @@ bool World::SetInitialWorldSettings()
         namehash = crc32((const unsigned char*)nametext, (unsigned int)strlen(nametext));
 		sp->NameHash   = namehash; //need these set before we start processing spells
 
-		float radius=std::max(::GetRadius(dbcSpellRadius.LookupEntryForced(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntryForced(sp->EffectRadiusIndex[1])));
-		radius=std::max(::GetRadius(dbcSpellRadius.LookupEntryForced(sp->EffectRadiusIndex[2])),radius);
-		radius=std::max(GetMaxRange(dbcSpellRange.LookupEntryForced(sp->rangeIndex)),radius);
+		float radius=std::max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntryForced(sp->EffectRadiusIndex[1])));
+		radius=std::max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[2])),radius);
+		radius=std::max(GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex)),radius);
 		sp->base_range_or_radius_sqr = radius*radius;
 
 		//there are some spells that change the "damage" value of 1 effect to another : devastate = bonus first then damage
@@ -4876,6 +4876,9 @@ bool World::SetInitialWorldSettings()
 	}
 //-----BLEED effects----- (setting mech to BLEED)
 	//garrot
+
+#define SPELLFIX( )
+
 	sp = dbcSpell.LookupEntryForced( 14179 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
 	sp = dbcSpell.LookupEntryForced( 8631 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
 	sp = dbcSpell.LookupEntryForced( 8632 );if( sp != NULL ) sp->MechanicsType = MECHANIC_BLEEDING;
