@@ -9,32 +9,6 @@ if [ ! -f configure ] ; then
   exit 1
 fi
 
-find . -type d | \
-	grep -v '.svn' | \
-	grep -v '.deps' | \
-	grep -v '.libs' | \
-	grep -v '^./win' | \
-	grep -v '^./extras' | \
-	grep -v 'autom4te.cache' | \
-	grep -v '^./sql' | \
-	xargs svn propset svn:ignore -F .svn.ignore.global
-
-cat .svn.ignore .svn.ignore.global > .svn.root.ignore
-svn propset svn:ignore -F .svn.root.ignore .
-rm .svn.root.ignore
-
-# Also add the 2 generated binaries.
-cat .svn.ignore.global > .svn.ascent.ignore
-echo "ascent" >> .svn.ascent.ignore
-svn propset svn:ignore -F .svn.ascent.ignore src/ascent/.
-rm .svn.ascent.ignore
-
-cat .svn.ignore.global > .svn.logonserver.ignore
-echo "logonserver" >> .svn.logonserver.ignore
-svn propset svn:ignore -F .svn.logonserver.ignore src/logonserver/.
-rm .svn.logonserver.ignore
-
-# Now fixing the eol-style's 
 echo "Updating eol-styles"
 
 NEWLINE='
