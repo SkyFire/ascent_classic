@@ -1533,13 +1533,12 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			if( talent_info == NULL )
 				continue;
 
-			if( talent_info->TalentTree != j )
+			if( talent_info->TalentTree != i )
 				continue;
 
 			talent_max_rank = 0;
 			for( uint32 k = 5; k > 0; --k )
 			{
-				// check if DBC still contains spell id's
 				if( talent_info->RankID[k - 1] && _player->GetMapMgr()->GetPlayer( (uint32)guid )->HasSpell( talent_info->RankID[k - 1]) )
 				{
 					talent_max_rank = k;

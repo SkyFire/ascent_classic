@@ -29,7 +29,7 @@
 #ifdef HAVE_LUASCRIPT
 #  define ENABLE_LUA_SCRIPTING 1
 #endif
-//#define ENABLE_LUA_SCRIPTING 1
+#define ENABLE_LUA_SCRIPTING 1
 
 /** Enable/disable Ascent world server cluster support.
  * Warning: Ascent will no longer function independantly when built in cluster mode. 
@@ -66,6 +66,7 @@
  */
 //#define USE_MEMORY_MAPPING_FOR_MAPS
 
+#define HOARD
 
 #endif		// __ASCENTCONFIG_H
 
