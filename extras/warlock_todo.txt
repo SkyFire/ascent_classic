@@ -39,7 +39,6 @@ Pets
 ///////////////////////////////////////////////////////////////////////////////
 
 Demonology Tree:
-Improved Succubus - can't test since succy spells proc on self seduction doesn't work, soothing kiss procs on self...
 Fel Stamina - same as fel intellect, only increases warlocks max hp but not pets hp
 Unholy Power - doens't work (seems an talent that affects pet attributes don't work.)
 Mana Feed - doesn't work
