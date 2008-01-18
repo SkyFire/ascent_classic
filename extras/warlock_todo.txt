@@ -17,7 +17,6 @@ Felhunter
 *Paranoia - doesn't destealths rogues or druids
 
 Destruction
-Cataclysm - reduces mana cost by destruction spells by 5% - no reduction
 Intensity - 70% chance to resist intreruption when channeling destro spells ( Rain of Fire and Hellfire ) - nothing
 Blacklash - increases critical chance by 3% and has a 25% when dmged to have a Shadow bolt or Incinerate spell instant - nothing
 

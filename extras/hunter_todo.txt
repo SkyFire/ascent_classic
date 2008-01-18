@@ -54,3 +54,4 @@ Most times if someone try to buff your pet will reset all stats to zero.
 
 Excluding the skills/spells, all training will be reset after some time and you'll get all training points back.
 
+Frenzy

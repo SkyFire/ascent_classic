@@ -2160,17 +2160,17 @@ void Aura::SpellAuraModAttackSpeed(bool apply)
 		if(apply)
 		{
 			mod->fixed_amount[0] = m_target->GetModPUInt32Value(UNIT_FIELD_BASEATTACKTIME,mod->m_amount);
-			mod->fixed_amount[1] = m_target->GetModPUInt32Value(UNIT_FIELD_BASEATTACKTIME,mod->m_amount);
-			mod->fixed_amount[2] = m_target->GetModPUInt32Value(UNIT_FIELD_BASEATTACKTIME,mod->m_amount);
-			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME,mod->fixed_amount[0]);
-			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME_01,mod->fixed_amount[1]);
-			m_target->ModUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,mod->fixed_amount[2]);
+			mod->fixed_amount[1] = m_target->GetModPUInt32Value(UNIT_FIELD_BASEATTACKTIME_01,mod->m_amount);
+			mod->fixed_amount[2] = m_target->GetModPUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,mod->m_amount);
+			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME, -mod->fixed_amount[0]);
+			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, -mod->fixed_amount[1]);
+			m_target->ModUInt32Value(UNIT_FIELD_RANGEDATTACKTIME, -mod->fixed_amount[2]);
 		}
 		else
 		{
-			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME,-mod->fixed_amount[0]);
-			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME_01,-mod->fixed_amount[1]);
-			m_target->ModUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,-mod->fixed_amount[2]);
+			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME, mod->fixed_amount[0]);
+			m_target->ModUInt32Value(UNIT_FIELD_BASEATTACKTIME_01, mod->fixed_amount[1]);
+			m_target->ModUInt32Value(UNIT_FIELD_RANGEDATTACKTIME, mod->fixed_amount[2]);
 		}
 	}
 	 
@@ -6049,10 +6049,12 @@ void Aura::SpellAuraModHaste( bool apply )
 		{
 			mod->fixed_amount[0] = m_target->GetModPUInt32Value( UNIT_FIELD_BASEATTACKTIME, mod->m_amount );
 			mod->fixed_amount[1] = m_target->GetModPUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, mod->m_amount );
+
 			if( m_target->GetUInt32Value ( UNIT_FIELD_BASEATTACKTIME ) <= mod->fixed_amount[0] )
 				mod->fixed_amount[0] = m_target->GetUInt32Value ( UNIT_FIELD_BASEATTACKTIME ); //watch it, a negative timer might be bad ;)
 			if( m_target->GetUInt32Value ( UNIT_FIELD_BASEATTACKTIME_01 ) <= mod->fixed_amount[1] )
 				mod->fixed_amount[1] = m_target->GetUInt32Value ( UNIT_FIELD_BASEATTACKTIME_01 );//watch it, a negative timer might be bad ;)
+
 			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME, -mod->fixed_amount[0] );
 			m_target->ModUInt32Value( UNIT_FIELD_BASEATTACKTIME_01, -mod->fixed_amount[1] );
 		}
@@ -6113,9 +6115,9 @@ void Aura::SpellAuraModRangedHaste(bool apply)
 		if(apply)
 		{
 			mod->fixed_amount[0] = m_target->GetModPUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,mod->m_amount);
-			m_target->ModUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,mod->fixed_amount[0]);
+			m_target->ModUInt32Value(UNIT_FIELD_RANGEDATTACKTIME, -mod->fixed_amount[0]);
 		}
-		else m_target->ModUInt32Value(UNIT_FIELD_RANGEDATTACKTIME,-mod->fixed_amount[0]);
+		else m_target->ModUInt32Value(UNIT_FIELD_RANGEDATTACKTIME, mod->fixed_amount[0]);
 	}
 }
 

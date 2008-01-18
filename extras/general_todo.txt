@@ -134,6 +134,7 @@ Zack - test my shit :
 - warlock - Demonic Sacrifice 18788
 - warlock - Master Demonologist 23825
 - check when dismissing pet if auras are removed too
+- warlock - Cataclysm 17782
 
 ==========================================================================
 Capt - test my shit :
