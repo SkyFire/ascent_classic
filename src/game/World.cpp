@@ -572,6 +572,8 @@ bool World::SetInitialWorldSettings()
 
 		for( uint32 j = 1; !(j & tab_info->ClassMask) && talent_class < 12; j <<= 1, ++talent_class );
 
+		sLog.outDebug( "HandleInspectOpcode: talent_class(%i) tab_info->TabPage(%i) i(%i)", talent_class, tab_info->TabPage, i );
+
 		InspectTalentTabPages[talent_class][tab_info->TabPage] = i;
 
 		for( std::map< uint32, uint32 >::iterator itr = InspectTalentTabBit.begin(); itr != InspectTalentTabBit.end(); ++itr )
