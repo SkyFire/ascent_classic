@@ -374,6 +374,19 @@ struct TalentEntry
     uint32  DependsOnRank;
     //uint32  unk2[4];
 };
+
+struct TalentTabEntry
+{
+    uint32	TalentTabID;
+    char*	Name[16];
+    uint32	NameFlags; 
+    uint32	SpellIcon;
+	//unit32  unk
+    uint32	ClassMask;
+    uint32	TabPage;
+    char*	InternalName;
+};
+
 struct Trainerspell
 {
     uint32 Id;
@@ -383,6 +396,7 @@ struct Trainerspell
     uint32 maxlvl;
     uint32 charclass;
 };
+
 struct SpellCastTime
 {
     uint32 ID;
@@ -1130,6 +1144,7 @@ extern SERVER_DECL DBCStorage<DBCTaxiPath> dbcTaxiPath;
 extern SERVER_DECL DBCStorage<DBCTaxiPathNode> dbcTaxiPathNode;
 extern SERVER_DECL DBCStorage<AuctionHouseDBC> dbcAuctionHouse;
 extern SERVER_DECL DBCStorage<TalentEntry> dbcTalent;
+extern SERVER_DECL DBCStorage<TalentTabEntry> dbcTalentTab;
 extern SERVER_DECL DBCStorage<CreatureSpellDataEntry> dbcCreatureSpellData;
 extern SERVER_DECL DBCStorage<CreatureFamilyEntry> dbcCreatureFamily;
 extern SERVER_DECL DBCStorage<CharClassEntry> dbcCharClass;

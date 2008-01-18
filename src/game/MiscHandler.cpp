@@ -1483,11 +1483,11 @@ void WorldSession::HandlePlayedTimeOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 {
-	CHECK_PACKET_SIZE(recv_data, 8);
+	CHECK_PACKET_SIZE( recv_data, 8 );
 
 	uint64 guid;
 	uint32 talent_points = 0x0000003D;
-	
+  
 	recv_data >> guid;
 	
 	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
@@ -1500,17 +1500,70 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 
     data << uint32( talent_points );
 
-	// zero max talent points
     for( uint32 i = 0; i < talent_points; ++i )
         data << uint8( 0 );
 
-	// page
+	uint32 talent_tab_pos = 0;
+	uint32 talent_max_rank;
+	uint32 talent_tab_id;
+	uint32 talent_index;
+	uint32 rank_index;
+	uint32 rank_slot;
+	uint32 rank_offset;
+	uint32 rank_index_boundary;
+	uint32 rank_slot_boundary;
+	uint32 rank_offset_boundary;
+	uint32 last_mask;
+
     for( uint32 i = 0; i < 3; ++i )
     {
-		// talent
+		talent_tab_id = sWorld.InspectTalentTabPages[_player->GetMapMgr()->GetPlayer( (uint32)guid )->getClass()][i];
+
+		for( uint32 j = 0; j < dbcTalent.GetNumRows(); ++j )
 		{
-			//data.put< uint8 >( 4 + talent_rank_slot, prev_mask & 0xFF );
+			TalentEntry const* talent_info = dbcTalent.LookupEntry( j );
+			if( talent_info == NULL )
+				continue;
+
+			if( talent_info->TalentTree != j )
+				continue;
+
+			talent_max_rank = 0;
+			for( uint32 k = 5; k > 0; --k )
+			{
+				if( talent_info->RankID[k - 1] && _player->GetMapMgr()->GetPlayer( (uint32)guid )->HasSpell( talent_info->RankID[k - 1]) )
+				{
+					talent_max_rank = k;
+					break;
+				}
+			}
+
+			if( talent_max_rank <= 0 )
+				continue;
+
+			talent_index = talent_tab_pos;
+
+			std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabPos.find( j );
+
+			if( itr != sWorld.InspectTalentTabPos.end() )
+				talent_index += itr->second;
+
+			rank_index = talent_index + talent_max_rank - 1;
+			rank_slot = rank_index / 7;
+			rank_offset = rank_index % 7;
+			rank_index_boundary = rank_slot * 8 + rank_offset;
+			rank_slot_boundary = rank_index_boundary / 8;
+			rank_offset_boundary = rank_index_boundary % 8;
+			last_mask = data.read< uint8 >( 4 + rank_slot );
+			last_mask |= ( 1 << rank_offset );
+			data.put< uint8 >( 4 + rank_slot, last_mask & 0xFF );
 		}
+
+		std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabSize.find( i );
+
+		if( itr != sWorld.InspectTalentTabSize.end() )
+			talent_tab_pos += itr->second;
+
 	}
 
     SendPacket( &data );

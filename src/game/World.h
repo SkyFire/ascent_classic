@@ -478,6 +478,12 @@ public:
 		int_rates[index] = value;
 	}
 
+	// talent inspection lookup tables
+	std::map< uint32, uint32 > InspectTalentTabPos;
+	std::map< uint32, uint32 > InspectTalentTabSize;
+	std::map< uint32, uint32 > InspectTalentTabBit;
+	uint32 InspectTalentTabPages[12][3];
+
 	// map text emote to spell prices
 	typedef std::map< uint32, uint32> SpellPricesMap;
 	SpellPricesMap mPrices;

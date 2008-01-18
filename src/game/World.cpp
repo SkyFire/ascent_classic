@@ -351,8 +351,8 @@ bool World::SetInitialWorldSettings()
 
 	uint32 start_time = getMSTime();
 
-	Log.Notice("World", "Loading DBC files...");
-	if(!LoadDBCs())
+	Log.Notice( "World", "Loading DBC files..." );
+	if( !LoadDBCs() )
 		return false;
 
 	/*{
@@ -531,6 +531,63 @@ bool World::SetInitialWorldSettings()
 	sLog.outString("");
 	LoadNameGenData();
 
+	// Preload and compile talent and talent tab data to speed up talent inspect
+
+	uint32 talent_max_rank;
+	uint32 talent_class;
+	uint32 talent_pos;
+
+    for( uint32 i = 1; i < dbcTalent.GetNumRows(); ++i )
+    {
+        TalentEntry const* talent_info = dbcTalent.LookupEntry( i );
+		if( talent_info == NULL )
+			continue;
+
+		TalentTabEntry const* tab_info = dbcTalentTab.LookupEntry( talent_info->TalentTree );
+		if( tab_info == NULL )
+			continue;
+
+        talent_max_rank = 0;
+        for( uint32 j = 5; j > 0; --j )
+        {
+            if( talent_info->RankID[j - 1] )
+            {
+                talent_max_rank = j;
+                break;
+            }
+		}
+
+		InspectTalentTabBit[( talent_info->Row << 24 ) + ( talent_info->Col << 16 ) + talent_info->TalentID] = talent_max_rank;
+		InspectTalentTabSize[talent_info->TalentTree] += talent_max_rank;
+	}
+
+	for( uint32 i = 1; i < dbcTalentTab.GetNumRows(); ++i )
+	{
+		TalentTabEntry const* tab_info = dbcTalentTab.LookupEntry( i );
+		if( tab_info == NULL )
+			continue;
+
+		talent_class = 1;
+		talent_pos = 0;
+
+		for( uint32 j = 1; !(j & tab_info->ClassMask) && talent_class < 12; j <<= 1, ++talent_class );
+
+		InspectTalentTabPages[talent_class][tab_info->TabPage] = i;
+
+		for( std::map< uint32, uint32 >::iterator itr = InspectTalentTabBit.begin(); itr != InspectTalentTabBit.end(); ++itr )
+		{
+			uint32 talent_id = itr->first & 0xFFFF;
+			TalentEntry const* talent_info = dbcTalent.LookupEntry( talent_id );
+			if( talent_info == NULL )
+				continue;
+
+			if( talent_info->TalentTree != i )
+				continue;
+
+			InspectTalentTabPos[talent_id] = talent_pos;
+			talent_pos += itr->second;
+		}
+	}
 
 	//Updating spell.dbc--this is slow like hell due to we cant read string fields
 	//dbc method will be changed in future
