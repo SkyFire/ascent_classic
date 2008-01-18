@@ -1490,9 +1490,9 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 	uint32 talent_points = 0x0000003D;
 	recv_data >> guid;
 
-		Player * pPlayer = _player->GetMapMgr()->GetPlayer( (uint32)guid );
+	Player * player = _player->GetMapMgr()->GetPlayer( (uint32)guid );
     
-	if( pPlayer == NULL )
+	if( player == NULL )
 	{
 		sLog.outError( "HandleInspectOpcode: guid was null" );
 		return;
@@ -1519,7 +1519,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 
     for( uint32 i = 0; i < 3; ++i )
     {
-		talent_tab_id = sWorld.InspectTalentTabPages[pPlayer->getClass()][i];
+		talent_tab_id = sWorld.InspectTalentTabPages[player->getClass()][i];
 
 		for( uint32 j = 0; j < dbcTalent.GetNumRows(); ++j )
 		{
@@ -1538,7 +1538,8 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			talent_max_rank = 0;
 			for( uint32 k = 5; k > 0; --k )
 			{
-				if( pPlayer->HasSpell( talent_info->RankID[k - 1] ) && talent_info->RankID[k - 1] )
+				sLog.outDebug( "HandleInspectOpcode: k(%i) talent_info->RankID[k - 1](%i) player->HasSpell( talent_info->RankID[k - 1] )(%i)", k, talent_info->RankID[k - 1], player->HasSpell( talent_info->RankID[k - 1] ) );
+				if( talent_info->RankID[k - 1] != 0 && player->HasSpell( talent_info->RankID[k - 1] ) )
 				{
 					talent_max_rank = k;
 					break;
