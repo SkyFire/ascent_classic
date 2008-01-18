@@ -186,9 +186,9 @@ void WorldSession::HandleArenaJoinOpcode(WorldPacket &recv_data)
 		BattlegroundManager.HandleArenaJoin(this, bgtype, as_group, rated_match);
 }
 
-void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket &recv_data)
+void WorldSession::HandleInspectHonorStatsOpcode( WorldPacket &recv_data )
 {
-    CHECK_PACKET_SIZE(recv_data,8);
+    CHECK_PACKET_SIZE( recv_data, 8 );
 
     uint64 guid;
     recv_data >> guid;
@@ -202,13 +202,14 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket &recv_data)
     }
 
     WorldPacket data( MSG_INSPECT_HONOR_STATS, 13 );
-    data << player->GetGUID();
-    data << (uint8)player->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY);
-    data << player->GetUInt32Value(PLAYER_FIELD_KILLS);
-    data << player->GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION);
-    data << player->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
-    data << player->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
-    SendPacket(&data);
+
+    data << player->GetGUID() << (uint8)player->GetUInt32Value( PLAYER_FIELD_HONOR_CURRENCY );
+    data << player->GetUInt32Value( PLAYER_FIELD_KILLS );
+    data << player->GetUInt32Value( PLAYER_FIELD_TODAY_CONTRIBUTION );
+    data << player->GetUInt32Value( PLAYER_FIELD_YESTERDAY_CONTRIBUTION );
+    data << player->GetUInt32Value( PLAYER_FIELD_LIFETIME_HONORBALE_KILLS );
+
+    SendPacket( &data );
 }
 
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket &recv_data)
