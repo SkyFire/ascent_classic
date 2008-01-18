@@ -1523,7 +1523,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 
 		for( uint32 j = 0; j < dbcTalent.GetNumRows(); ++j )
 		{
-			TalentEntry const* talent_info = dbcTalent.LookupEntry( j );
+			TalentEntry const* talent_info = dbcTalent.LookupRow( j );
 
 			//sLog.outDebug( "HandleInspectOpcode: i(%i) j(%i)", i, j );
 

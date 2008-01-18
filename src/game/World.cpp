@@ -6718,7 +6718,7 @@ bool World::SetInitialWorldSettings()
 
 	for( uint32 i = 1; i < dbcTalentTab.GetNumRows(); ++i )
 	{
-		TalentTabEntry const* tab_info = dbcTalentTab.LookupEntry( i );
+		TalentTabEntry const* tab_info = dbcTalentTab.LookupRow( i );
 		if( tab_info == NULL )
 			continue;
 
@@ -6729,8 +6729,6 @@ bool World::SetInitialWorldSettings()
 			if( tab_info->ClassMask & ( 1 << talent_class ) )
 				break;
 		}
-
-		sLog.outDebug( "HandleInspectOpcode: tab_info->ClassMask(%x) talent_class(%i) tab_info->TabPage(%i) i(%i) a(%i) b(%i) c(%i)", tab_info->ClassMask, talent_class, tab_info->TabPage, i, tab_info->a, tab_info->b, tab_info->c );
 
 		InspectTalentTabPages[talent_class][tab_info->TabPage] = i;
 
