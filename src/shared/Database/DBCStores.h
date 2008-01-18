@@ -391,15 +391,18 @@ struct TalentTabEntry
 	//unit32  unk12
 	//unit32  unk13
 	//unit32  unk14
-    //char*	InternalName;
+	//unit32  unk15
 	//unit32  unk16
 	//unit32  unk17
 	//unit32  unk18
 	//unit32  unk19
 	//unit32  unk20
+	uint32	a;
+	uint32	b;
     uint32	ClassMask;
     uint32	TabPage;
-	//unit32  unk23
+	uint32	c;
+    //char*	InternalName;
 };
 
 struct Trainerspell

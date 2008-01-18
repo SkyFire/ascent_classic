@@ -6730,7 +6730,7 @@ bool World::SetInitialWorldSettings()
 				break;
 		}
 
-		sLog.outDebug( "HandleInspectOpcode: tab_info->ClassMask(%x) talent_class(%i) tab_info->TabPage(%i) i(%i)", tab_info->ClassMask, talent_class, tab_info->TabPage, i );
+		sLog.outDebug( "HandleInspectOpcode: tab_info->ClassMask(%x) talent_class(%i) tab_info->TabPage(%i) i(%i) a(%i) b(%i) c(%i)", tab_info->ClassMask, talent_class, tab_info->TabPage, i, tab_info->a, tab_info->b, tab_info->c );
 
 		InspectTalentTabPages[talent_class][tab_info->TabPage] = i;
 
