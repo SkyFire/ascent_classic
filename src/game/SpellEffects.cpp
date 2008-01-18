@@ -1975,7 +1975,7 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	float ori = m_caster->GetOrientation();				
 	float posX = m_caster->GetPositionX()+(radius*(cosf(ori)));
 	float posY = m_caster->GetPositionY()+(radius*(sinf(ori)));
-	float z = CollideInterface.GetHeight(m_caster->GetMapId(), posX, posY, m_caster->GetPositionZ() + 5.0f);
+	float z = CollideInterface.GetHeight(m_caster->GetMapId(), posX, posY, m_caster->GetPositionZ() + 2.0f);
 	if(z == NO_WMO_HEIGHT)		// not found height, or on adt
 		z = m_caster->GetMapMgr()->GetLandHeight(posX,posY);
 
@@ -1986,10 +1986,11 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	LocationVector destest(posX, posY, dest.z, ori);
 	LocationVector src(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 2.0f);
 
-	if(CollideInterface.GetFirstPoint(m_caster->GetMapId(), src, destest, dest, -1.0f))
+	if(CollideInterface.GetFirstPoint(m_caster->GetMapId(), src, destest, dest, -1.5f))
 	{
 		// hit an object new point is in dest.
-		dest.z = CollideInterface.GetHeight(m_caster->GetMapId(), dest.x, dest.y, dest.z + 2.0f);
+		// is this necessary?
+		//dest.z = CollideInterface.GetHeight(m_caster->GetMapId(), dest.x, dest.y, dest.z + 2.0f);
 	}
 	else
 		dest.z = z;
