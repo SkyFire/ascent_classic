@@ -6730,7 +6730,7 @@ bool World::SetInitialWorldSettings()
 				break;
 		}
 
-		InspectTalentTabPages[talent_class][tab_info->TabPage] = tab_info.TalentTabID;
+		InspectTalentTabPages[talent_class][tab_info->TabPage] = tab_info->TalentTabID;
 
 		for( std::map< uint32, uint32 >::iterator itr = InspectTalentTabBit.begin(); itr != InspectTalentTabBit.end(); ++itr )
 		{
