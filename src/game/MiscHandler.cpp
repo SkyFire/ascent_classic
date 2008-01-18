@@ -1545,7 +1545,10 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			}
 
 			if( talent_max_rank <= 0 )
+			{
+				data.put< uint8 >( 0 );
 				continue;
+			}
 
 			talent_index = talent_tab_pos;
 
