@@ -780,18 +780,41 @@ bool ChatHandler::HandleAccountMuteCommand(const char * args, WorldSession * m_s
 
 	uint32 banned = (uint32)UNIXTIME+timeperiod;
 
-	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET banned = %u WHERE login = '%s'", banned, CharacterDatabase.EscapeString(string(pAccount)).c_str());
+	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET muted = %u WHERE login = '%s'", banned, CharacterDatabase.EscapeString(string(pAccount)).c_str());
 	sLogonCommHandler.LogonDatabaseReloadAccounts();
 
+	string tsstr = ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME);
 	GreenSystemMessage(m_session, "Account '%s' has been muted until %s. The change will be effective with the next reload cycle.", pAccount, 
-		ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str());
+		tsstr.c_str());
 
-	sWorld.DisconnectUsersWithAccount(pAccount, m_session);
 	sGMLog.writefromsession(m_session, "mutex account %s until %s", pAccount, ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str());
 
 	WorldSession * pSession = sWorld.FindSessionByName(pAccount);
 	if( pSession != NULL )
+	{
 		pSession->m_muted = banned;
+		pSession->SystemMessage("Your voice has been muted until %s by a GM. Until this time, you will not be able to speak in any form.", tsstr.c_str());
+	}
+
+	return true;
+}
+
+bool ChatHandler::HandleAccountUnmuteCommand(const char * args, WorldSession * m_session)
+{
+	string escaped_account = CharacterDatabase.EscapeString( string(args) );
+	if( escaped_account.empty() )
+		return false;
+
+	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET muted = 0 WHERE login = '%s'", escaped_account.c_str());
+	sLogonCommHandler.LogonDatabaseReloadAccounts();
+
+	GreenSystemMessage(m_session, "Account '%s' has been unmuted.", args);
+	WorldSession * pSession = sWorld.FindSessionByName(args);
+	if( pSession != NULL )
+	{
+		pSession->m_muted = 0;
+		pSession->SystemMessage("Your voice has restored. You may speak again.");
+	}
 
 	return true;
 }

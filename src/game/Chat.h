@@ -486,6 +486,7 @@ protected:
 	bool HandleRenameAllCharacter(const char * args, WorldSession * m_session);
 	bool HandleCollisionGetHeight(const char * args, WorldSession * m_session);
 	bool HandleAccountMuteCommand(const char * args, WorldSession * m_session);
+	bool HandleAccountUnmuteCommand(const char * args, WorldSession * m_session);
 	/* For skill related GM commands */
 	SkillNameMgr *SkillNameManager;
 };

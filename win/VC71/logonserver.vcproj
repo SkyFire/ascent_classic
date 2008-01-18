@@ -323,21 +323,6 @@
 		<File
 			RelativePath="..\..\src\logonserver\Main.h">
 		</File>
-		<File
-			RelativePath="..\..\src\ascent\usewinhoard.cpp">
-			<FileConfiguration
-				Name="Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="0"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Hoard|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					UsePrecompiledHeader="0"/>
-			</FileConfiguration>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

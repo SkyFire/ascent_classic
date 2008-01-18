@@ -383,6 +383,7 @@ void CommandTableStorage::Init()
 		{ "level",	  'z', &ChatHandler::HandleAccountLevelCommand,    "Sets gm level on account. Pass it username and 0,1,2,3,az, etc.", NULL, 0, 0, 0 },
 		{ "password", 'z', &ChatHandler::HandleAccountPasswordCommand, "Sets password on account. Pass it username password.",	NULL, 0, 0, 0},
 		{ "mute",	  'a', &ChatHandler::HandleAccountMuteCommand,		"Mutes account for <timeperiod>.", NULL, 0, 0, 0 },
+		{ "unmute",	  'a', &ChatHandler::HandleAccountUnmuteCommand,	"Unmutes account <x>", NULL, 0, 0, 0 },
 
 		{ NULL, 0, NULL, "", NULL, 0, 0, 0},
 	};

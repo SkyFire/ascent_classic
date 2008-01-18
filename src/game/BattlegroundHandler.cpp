@@ -225,19 +225,12 @@ void WorldSession::HandleInspectArenaStatsOpcode( WorldPacket & recv_data )
     uint64 guid;
     recv_data >> guid;
 
-  	if( _player == NULL )
-	{
-		sLog.outError( "HandleInspectHonorStatsOpcode : _player was null" );
-		return;
-	}
-
-	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
+    Player* player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
+	if( player == NULL )
 	{
 		sLog.outError( "HandleInspectHonorStatsOpcode : guid was null" );
 		return;
 	}
-
-    Player* player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
 
 	uint32 id;
 
