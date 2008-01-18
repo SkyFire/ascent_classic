@@ -640,6 +640,11 @@ bool World::SetInitialWorldSettings()
 				if(itr == TeachingSpellMap.end())
 					TeachingSpellMap.insert(make_pair(sp->EffectTriggerSpell[b],sp->Id));
 			}
+
+			if( sp->Attributes & ATTRIBUTES_ONLY_OUTDOORS && sp->EffectApplyAuraName[b] == SPELL_AURA_MOUNTED )
+			{
+				sp->Attributes &= ~ATTRIBUTES_ONLY_OUTDOORS;
+			}
 		}
 
 		sp->proc_interval = 0;//trigger at each event
