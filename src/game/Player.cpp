@@ -893,7 +893,7 @@ void Player::Update( uint32 p_time )
 	{
 		if( mstime >= m_mountCheckTimer )
 		{
-			if( CollideInterface.IsIndoorMod( m_mapId, &m_position ) )
+			if( CollideInterface.IsIndoor( m_mapId, m_position ) )
 			{
 				RemoveAura( m_MountSpellId );
 				m_MountSpellId = 0;

@@ -1395,7 +1395,7 @@ Unit* AIInterface::FindTarget()
 
 	#endif		// LOS_ONLY_IN_INSTANCE
 
-            if( CollideInterface.CheckLOSMod( m_Unit->GetMapId( ), m_Unit->GetPositionV( ), pUnit->GetPositionV( ) ) )
+            if( CollideInterface.CheckLOS( m_Unit->GetMapId( ), m_Unit->GetPositionNC( ), pUnit->GetPositionNC( ) ) )
 			{
 				distance = dist;
 				target = pUnit;
@@ -2608,7 +2608,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			else
 			{
 				if( CollideInterface.GetFirstPoint(m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ() + 2.0f,
-					Fx, Fy, Fz, &Fx, &Fy, &Fz, -1.0f) )
+					Fx, Fy, Fz, Fx, Fy, Fz, -1.0f) )
 				{
 					Fz = CollideInterface.GetHeight(m_Unit->GetMapId(), Fx, Fy, m_Unit->GetPositionZ() + 2.0f);
 				}
@@ -2658,7 +2658,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 		else
 		{
 			if( CollideInterface.GetFirstPoint(m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ() + 2.0f,
-				wanderX, wanderY, wanderZ + 2.0f, &wanderX, &wanderY, &wanderZ, -1.0f) )
+				wanderX, wanderY, wanderZ + 2.0f, wanderX, wanderY, wanderZ, -1.0f) )
 			{
 				wanderZ = CollideInterface.GetHeight(m_Unit->GetMapId(), wanderX, wanderY, m_Unit->GetPositionZ() + 2.0f);
 			}

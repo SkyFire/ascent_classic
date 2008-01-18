@@ -339,14 +339,23 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 				return;
 	}
 
-	if(p_caster)
+	if(p_caster && pTarget != p_caster)
 	{
 		// this is mostly used for things like duels
-		if(pTarget != p_caster && pTarget->IsPlayer() && !isAttackable(p_caster, pTarget, false))
+		if(pTarget->IsPlayer() && !isAttackable(p_caster, pTarget, false))
 		{
 			cancastresult = SPELL_FAILED_BAD_TARGETS;
 			return;
 		}
+
+#ifdef COLLISION
+		// this distance check may have to be removed in the future.
+		if( p_caster->GetDistance2dSq( pTarget ) < 4.0f && CollideInterface.CheckLOS( p_caster->GetMapId(), p_caster->GetPositionNC(), pTarget->GetPositionNC() ) )
+		{
+			cancastresult = SPELL_FAILED_LINE_OF_SIGHT;
+			return;
+		}
+#endif
 	}
 
 	uint8 did_hit_result = DidHit(i,pTarget);

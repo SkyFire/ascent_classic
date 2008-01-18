@@ -1986,7 +1986,7 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	LocationVector destest(posX, posY, dest.z, ori);
 	LocationVector src(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 2.0f);
 
-	if(CollideInterface.GetFirstPoint(m_caster->GetMapId(), &src, &destest, &dest, -1.0f))
+	if(CollideInterface.GetFirstPoint(m_caster->GetMapId(), src, destest, dest, -1.0f))
 	{
 		// hit an object new point is in dest.
 		dest.z = CollideInterface.GetHeight(m_caster->GetMapId(), dest.x, dest.y, dest.z + 2.0f);

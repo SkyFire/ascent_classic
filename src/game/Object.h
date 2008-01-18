@@ -174,6 +174,7 @@ public:
 	ASCENT_INLINE const float& GetSpawnO( ) const { return m_spawnLocation.o; }
 
 	ASCENT_INLINE const LocationVector & GetPosition() { return m_position; }
+	ASCENT_INLINE LocationVector & GetPositionNC() { return m_position; }
 	ASCENT_INLINE LocationVector * GetPositionV() { return &m_position; }
 
 	//Distance Calculation
