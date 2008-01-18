@@ -23,7 +23,6 @@
 #include "AABSPTree.h"
 #include "ManagedModelContainer.h"
 #include "IVMapManager.h"
-#include "DebugCmdLogger.h"
 #include "../LocationVector.h"
 
 #include <G3D/Table.h>
