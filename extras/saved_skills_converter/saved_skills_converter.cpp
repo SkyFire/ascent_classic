@@ -41,128 +41,31 @@ struct PlayerSkill
 
 // some proto's
 bool IsValidSkill(uint32 SkillID);
+struct data
+{
+	union
+	{
+		uint32 hipart;
+		uint32 lopart;
+	};
+	uint64 qpart;
+};
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	Log.loglevel = 999;
-	const char * username = "";
-	const char * password = "";
-	const char * dbname = "";
+	const char * username = "moocow";
+	const char * password = "moo";
+	const char * dbname = "moo2";
 	if(!sDatabase.Initialize("localhost", 3306, username, password, dbname, 1, 65536))
 	{
 		Log.Error("SQL", "could not connect");
 		return 1;
 	}
-	QueryResult * result = sDatabase.Query("SELECT guid, skills, name FROM characters");
+	QueryResult * result = sDatabase.Query("SELECT * FROM questlog");
 	do 
 	{
-        uint64          playerguid  = result->Fetch()[0].GetUInt64();
-		char *          skills      = strdup(result->Fetch()[1].GetString());
-        const char *    playername  = result->Fetch()[2].GetString();
-		if(strchr(skills, ',') != 0)
-		{
-			// need to convert
-			uint32 i = 0;
-			stringstream ss;
-			char * start = skills;
-			char * end;
-			for(;;)
-			{
-				// skill, skill+1, <add>0
-				end = strchr(start, ',');
-				if(!end)
-					break;
-				*end = '\0';
-				uint32 val = atoi(start);
-				start = end + 1;
-				ss << val << " ";
-				++i;
-				if(!(i % 2))
-					ss << "0 ";
-			}
-
-			sDatabase.Execute("UPDATE characters SET skills = '%s' WHERE guid = %u", ss.str().c_str(), result->Fetch()[0].GetUInt32());
-			Log.Debug("SQL", "UPDATE characters SET skills = '%s' WHERE guid = %u\n", ss.str().c_str(), result->Fetch()[0].GetUInt32());
-		}
-        else
-        // contains ' ' and NOT ','
-        if (strchr(skills, ' ') && !strchr(skills, ','))
-        {
-            stringstream ss;
-            char * start = skills;
-            char * end;
-            uint32 v1,v2,v3;
-            PlayerSkill sk;
-            uint32 errors = 0;
-            uint32 validskills = 0;
-            for(;;)
-            {
-                end = strchr(start, ' ');
-                if(!end)
-                    break;
-
-                *end = 0;
-                v1 = atol(start);
-                start = end + 1;
-
-                end = strchr(start, ' ');
-                if(!end)
-                    break;
-
-                *end = 0;
-                v2 = atol(start);
-                start = end + 1;
-
-                end = strchr(start, ' ');
-                if(!end)
-                    break;
-
-                v3 = atol(start);
-                start = end + 1;
-                
-                v1&=0xFFFF;
-                if (IsValidSkill(v1))
-                {
-                    // for info systems
-                    validskills++;
-
-                    sk.Reset(v1 & 0xFFFF);
-                    sk.CurrentValue = v2 & 0xFFFF;
-                    sk.MaximumValue = (v2 >> 16) & 0xFFFF;
-
-                    ss << sk.SkillID << ";";
-                    ss << sk.CurrentValue << ";";
-                    ss << sk.MaximumValue << ";";
-                }
-                else
-                {
-                    errors++;
-                }
-
-            }
-
-            // fuck yea we are running on paranoid mode....
-            // extra check just to make sure..... fuck I am paranoid
-            uint32 ParanoidMode = 0;
-            for (uint32 xxx = 0; xxx < ss.str().size(); xxx++)
-            {
-                if (ss.str().c_str()[xxx] == ';')
-                    ParanoidMode++;
-            }
-
-            // the result should be dividable by 3 and has no result
-            if ((ParanoidMode % 3) != 0)
-            {
-                printf("Something went VERY WRONG!!!!!!!!!!!!!!!!!!!!\n");
-                printf("we are closing down so you can find out what did happen....\n");
-                printf("The player that is fucked up: %s he has guid: %u", playername, playerguid);
-                system("pause");
-                exit(-1);
-            }
-
-            sDatabase.Execute("UPDATE characters SET skills = '%s' WHERE guid = %u", ss.str().c_str(), result->Fetch()[0].GetUInt32());
-            printf("Parsed:%s [%u] valid and [%u] invalid skill entry's\n",playername, validskills, errors);
-        }
+		sDatabase.Query("INSERT INTO questlog_copy SELECT * FROM questlog WHERE player_guid = %u AND quest_id = %u LIMIT 1", result->Fetch()[1].GetUInt32(), result->Fetch()[2].GetUInt32());
 	} while(result->NextRow());
 	delete result;
 	sDatabase.Shutdown();
