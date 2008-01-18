@@ -1533,7 +1533,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			if( talent_info == NULL )
 				continue;
 
-			if( talent_info->TalentTree != i )
+			if( talent_info->TalentTree != talent_tab_id )
 				continue;
 
 			talent_max_rank = 0;
@@ -1567,7 +1567,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			data.put< uint8 >( 4 + rank_slot_boundary, last_mask & 0xFF );
 		}
 
-		std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabSize.find( i );
+		std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabSize.find( talent_tab_id );
 
 		if( itr != sWorld.InspectTalentTabSize.end() )
 			talent_tab_pos += itr->second;
