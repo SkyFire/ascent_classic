@@ -1508,9 +1508,6 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 
     data << uint32( talent_points );
 
-    //for( uint32 i = 0; i < talent_points; ++i )
-    //   data << uint8( 0 );
-
 	uint32 talent_tab_pos = 0;
 	uint32 talent_max_rank;
 	uint32 talent_tab_id;
@@ -1539,6 +1536,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			talent_max_rank = 0;
 			for( uint32 k = 5; k > 0; --k )
 			{
+				// check if DBC still contains spell id's
 				if( talent_info->RankID[k - 1] && _player->GetMapMgr()->GetPlayer( (uint32)guid )->HasSpell( talent_info->RankID[k - 1]) )
 				{
 					talent_max_rank = k;
