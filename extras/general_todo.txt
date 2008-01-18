@@ -143,6 +143,7 @@ Zack - test my shit :
 - warlock - Fel Stamina 18750
 - warlock - Unholy Power 18773
 - mage spellsteal 30449 should steal only 1 spell 
+- warlock - Improved Curse of Weakness 18180
 
 ==========================================================================
 Capt - test my shit :

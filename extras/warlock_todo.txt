@@ -44,20 +44,10 @@ Demonic Resilience - doesn't work
 Demonic Tactics
 
 Destruction Tree:
-
-Improves Lash of Pain - not tested, succy, felhunter, felguard spells all bugged out too much
 Shadow Burn - skill works but doesn't return soul shard if target died withing 5 secs
 
 Affliction Tree:
-
-Improved Drain Soul - doesn't work
 Soul Siphon - doesn't work
-Siphon Life - works but no bonus from healing
-Improved Howl of Terror - works but requried to stand stilll to cast it instant otherwise it just says you need to be not moving..
-- unstable affliction doesn't silence the target if dispelled
-- amplify curse doesn't affect curse of exhaustion
-
-
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -79,14 +69,8 @@ Life Tap:
 Eye of krilrogg:
 - Summons the eye, but you can control it only in OLs, and after moving a bit further away, you stop the channeling and disconnect 50% of the time. D/c 7/12 times already.
 
-Soul Shatter:
-- Doesn't reduce threat as it should.
-
 Summon Infernal:
 - No 200 damage stun. Dismissing the infernal won't release him from his chains and send him wild, but instead just disappear. Does less damage than normal.
-
-Unending breath:
-- Used to work but now it just takes away ur breath bar but u are actually still drowning.
 
 Enslave demon:
 - Does not have any effect on demons.
@@ -97,25 +81,12 @@ Doom guard:
 Ritual of soul:
 - Creates the soul well but does not allow raid members to extract a healthstone from it.
 
-Oh and minions just HAVE to be nerfed because they hit more than supposed and that doesn't pay up for the negative bugs.
-
-You were doing great success on other class' bugs though, good job on that!
-
-The moved up list:
-
 Fear mechanics need to be worked on, a little latency just breaks up all the effect, its not ever worth casting fear in pvp.
 
 Demons:
-- Attacks have no cooldown, if you set them on auto-attack they will cast every 0,5 second or so.
-- Sometime's you have to relog/resummon few times for the demon spells to work.
-- You don't get a soul shard when dismissing due to out of range or in flight.
 - Demons should get dismissed when mounted and get back when dismounted.
 
 Summoned demons DO NOT get any stats from the warlock such as health or mana resulting in one-shot kills in raid or pvp environment.
-
-IMP:
-
-All good. ^^
 
 SUCCUBUS:
 
@@ -146,32 +117,12 @@ Affliction talents and spells:
 IMPORTANT - Soul siphon doesn't work at all. Should increase amount drained by drain life by an additional 2/4% for each affliction effect up to maximum 24/60% (if you have max rank and 4 affliction debuffs on target, it would increase drain life spell by 16%. Whenever a debuff is applied, it increases by another 4% up to 60%).
 - Improved life tap - does not work i think
 - Improved drain soul - doesn't work. should give 7/14% of mana back after killing something while draining soul.
-- Improved curse fo weakness - doesn't work. should increase curse of weakness effect by 10/20%
 IMPORTANT - Siphon life - works but doesn't benefit from shadow damage so is useless.
-- Shadow embrace - actually it works, tested many many fights with same mob and advanced damage meter. will remove this line upon next update.
-- Improved howl of terror - is instant but you still can cast it only when standing still.
-- Unstable affliction - works, but doesn't silence after dispelling, just the damage part.
 
 Demonology:
 
-- Improved healthstone. doesn't work. should increase effect of healthstones by 10/20%
-- Improved imp. doesn't work. should increase effect of imp's firebolt/fireshield/bloodpact spells by 10/20/30%
 - Improved health funnel. doesn't increase the health given to minion when channeling.
-- Improved voidwalker. voidwalker's spells with threat stuff don't work.
-- Improved succubus. doesn't work. should increase effects and durations of succubus' spells by 10/20/30%
-- Demonic aegis. doesn't work. should increase effectiveness of demon armor and fel armor by 10/20/30%
-- Unholy power. doesn't work. should increase damage of minions by 4/8/12/16/20%
 - improved enslave demon. the spell itself doesn't work.
 - master conjuror. doesn't work. should increase effect of firestone and spellstone by 15/30%
-- mana feed. doesn't work. should give pet 100% of mana you gain by using life tap when used.
-IMPORTANT - master demonologist - doesn't work at all, with nothing. should give these effects when certain minions are active: imp = -20% threat caused; voidwalker = -10% physical damage caused; succubus = +10% all damage caused; felguard = +5% all damage caused and resistances = 0.5 x level
-- demonic resilience - can't actually test.
-IMPORTANT - soul link. doesn't work. when the buff is active 20% of damage taken is taken by your minion.
-- demonic knowledge - doesn't work. should increase spell damage by 5/10/15% of minions stamina+intellect
-
-Destruction:
-- pyroclasm - stuns self.
-- shadowfury - can be cast while moving due to lag 
-
 
 - when infernal dies, server crashes

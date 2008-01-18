@@ -4324,6 +4324,14 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->Effect[1]=80;
 
+	//warlock - Improved Curse of Weakness
+	sp = dbcSpell.LookupEntryForced( 18179 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 32768;
+	sp = dbcSpell.LookupEntryForced( 18180 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 32768;
+
 	//warlock - Amplify Curse
 	sp = dbcSpell.LookupEntryForced( 18288 );
 	if( sp != NULL )
@@ -4631,6 +4639,21 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
 		sp->EffectMiscValue[0] = 2;
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+
+	//warlock - Demonic Tactics
+	sp = dbcSpell.LookupEntryForced( 30242 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+		//this is required since blizz uses spells for melee attacks while we use fixed functions
+		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_DONE;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+		sp->EffectMiscValue[1] = SCHOOL_NORMAL;
+		sp->EffectBasePoints[1] = sp->EffectBasePoints[0] ;
 	}
 
 	//warlock - Unholy Power
