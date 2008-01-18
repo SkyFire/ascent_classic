@@ -379,8 +379,6 @@ struct TalentTabEntry
 {
     uint32	TalentTabID;
     char*	Name;
-	//unit32  unk
-	//unit32  unk1
 	//unit32  unk2
 	//unit32  unk3
 	//unit32  unk4
@@ -389,9 +387,19 @@ struct TalentTabEntry
 	//unit32  unk7
 	//unit32  unk8
 	//unit32  unk9
+	//unit32  unk10
+	//unit32  unk11
+	//unit32  unk12
+	//unit32  unk13
+    char*	InternalName;
+	//unit32  unk15
+	//unit32  unk16
+	//unit32  unk17
+	//unit32  unk18
+	//unit32  unk19
     uint32	ClassMask;
     uint32	TabPage;
-    char*	InternalName;
+	//unit32  unk22
 };
 
 struct Trainerspell
