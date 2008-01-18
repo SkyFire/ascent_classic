@@ -580,7 +580,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	uint32 melee_test_result;
 	if( m_spellInfo->is_melee_spell)
 	{
-		melee_test_result = u_caster->GetSpellDidHitResult(u_victim, GetType(), m_spellInfo);
+		melee_test_result = u_caster->GetSpellDidHitResult( u_victim, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo );
 		if(melee_test_result != SPELL_DID_HIT_SUCCESS)
 			return (uint8)melee_test_result;
 	}
@@ -1766,7 +1766,7 @@ void Spell::SendSpellStart()
 
 	uint16 cast_flags = 2;
 
-	if( GetType() == SPELL_TYPE_RANGED )
+	if( GetType() == SPELL_DMG_TYPE_RANGED )
 		cast_flags |= 0x20;
 
     // hacky yeaaaa
@@ -1786,7 +1786,7 @@ void Spell::SendSpellStart()
 		
 	m_targets.write( data );
 
-	if( GetType() == SPELL_TYPE_RANGED )
+	if( GetType() == SPELL_DMG_TYPE_RANGED )
 	{
 		ItemPrototype* ip = NULL;
         if( m_spellInfo->Id == SPELL_RANGED_THROW ) // throw
@@ -1895,7 +1895,7 @@ void Spell::SendSpellGo()
 	data.SetOpcode( SMSG_SPELL_GO );
 	uint16 flags = 0;
 
-	if (GetType() == SPELL_TYPE_RANGED) //ranged
+	if ( GetType() == SPELL_DMG_TYPE_RANGED )
 		flags |= 0x20; // 0x20 RANGED
 
 	if( i_caster != NULL )
@@ -1935,7 +1935,7 @@ void Spell::SendSpellGo()
 	m_targets.write( data ); // this write is included the target flag
 
 	// er why handle it being null inside if if you can't get into if if its null
-	if( GetType() == SPELL_TYPE_RANGED ) //ranged
+	if( GetType() == SPELL_DMG_TYPE_RANGED )
 	{
 		ItemPrototype* ip = NULL;
 		if( m_spellInfo->Id == SPELL_RANGED_THROW )
@@ -3086,14 +3086,14 @@ uint8 Spell::CanCast(bool tolerate)
 				/* burlex: units are always facing the target! */
 				if(p_caster && !(m_spellInfo->buffType & SPELL_TYPE_CURSE))
 				{
-					if( m_spellInfo->Spell_Dmg_Type == 3) // 3 is ranged so we do not need to check, we just need inface
+					if( m_spellInfo->Spell_Dmg_Type == SPELL_DMG_TYPE_RANGED )
 					{ // our spell is a ranged spell
 						if(!p_caster->isInFront(target))
 							return SPELL_FAILED_UNIT_NOT_INFRONT;
 					}
 					else
 					{ // our spell is not a ranged spell
-						if(GetType() == SPELL_TYPE_MAGIC && m_spellInfo->in_front_status == 1)
+						if( GetType() == SPELL_DMG_TYPE_MAGIC && m_spellInfo->in_front_status == 1 )
 						{
 							// must be in front
 							if(!u_caster->isInFront(target))
@@ -3448,7 +3448,7 @@ int32 Spell::CalculateEffect(uint32 i,Unit *target)
 		if(!u_caster || !unitTarget)
 			return 0;
 
-		return ::CalculateDamage(u_caster,unitTarget,RANGED, m_spellInfo->SpellGroupType);//ranged
+		return ::CalculateDamage( u_caster, unitTarget, RANGED, m_spellInfo->SpellGroupType );
 	}
 */
 	int32 value = 0;

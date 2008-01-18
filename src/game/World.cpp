@@ -662,11 +662,11 @@ bool World::SetInitialWorldSettings()
 
 		//seal of command
 		else if( namehash == SPELL_HASH_SEAL_OF_COMMAND )		
-			sp->Spell_Dmg_Type = 1;
+			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
 
 		//judgement of command
 		else if( namehash == SPELL_HASH_JUDGEMENT_OF_COMMAND )		
-			sp->Spell_Dmg_Type = 1;
+			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
 
 		else if( namehash == SPELL_HASH_ARCANE_SHOT )		
 			sp->c_is_flags |= SPELL_FLAG_IS_NOT_USING_DMG_BONUS;
@@ -852,7 +852,7 @@ bool World::SetInitialWorldSettings()
 					break;
 				}
 
-				if((sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE&&sp->Spell_Dmg_Type==2) || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE || sp->Effect[z] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || sp->Effect[z] == SPELL_EFFECT_DUMMYMELEE)
+				if( ( sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE && sp->Spell_Dmg_Type == SPELL_DMG_TYPE_MELEE ) || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE || sp->Effect[z] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || sp->Effect[z] == SPELL_EFFECT_DUMMYMELEE )
 					sp->is_melee_spell = true;
 			}
 		}
@@ -1446,7 +1446,7 @@ bool World::SetInitialWorldSettings()
 		{
 			sp->procChance = 25;
 			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
-			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
+			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
 		}
 
 		//Seal of Jusice - Proc Chance
@@ -6364,6 +6364,13 @@ bool World::SetInitialWorldSettings()
 		if(sp->RecoveryTime==0 && sp->StartRecoveryTime == 0)
 			sp->RecoveryTime = 1600;
 	}
+
+	/* wands - s5019 - change Spell_Dmg_Type from magic to ranged (3) */
+	sp = dbcSpell.LookupEntryForced( SPELL_RANGED_WAND );
+	if( sp != NULL )
+		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
+
+// ------------------------------------------------------------------------------------------------
 
 	Log.Notice("World","Starting Transport System...");
 	objmgr.LoadTransporters();

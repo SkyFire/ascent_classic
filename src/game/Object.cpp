@@ -2375,7 +2375,7 @@ void Object::SendSpellLog(Object *Caster, Object *Target,uint32 Ability, uint8 S
 }
 
 
-void Object::SendSpellNonMeleeDamageLog(Object * Caster, Object * Target,uint32 SpellID,uint32 Damage, uint8 Damage_Type,uint32 AbsorbedDamage, uint32 ResistedDamage,bool PhysicalDamage, uint32 BlockedDamage, bool CriticalHit, bool bToset)
+void Object::SendSpellNonMeleeDamageLog( Object* Caster, Object* Target, uint32 SpellID, uint32 Damage, uint8 School, uint32 AbsorbedDamage, uint32 ResistedDamage, bool PhysicalDamage, uint32 BlockedDamage, bool CriticalHit, bool bToset )
 {
 	if ((!Caster || !Target) && SpellID)
 		return;
@@ -2383,17 +2383,17 @@ void Object::SendSpellNonMeleeDamageLog(Object * Caster, Object * Target,uint32 
 	WorldPacket data(SMSG_SPELLNONMELEEDAMAGELOG,40);
 	data << Target->GetNewGUID();
 	data << Caster->GetNewGUID();
-	data << SpellID;										// Spell / ability ID
-	data << Damage;										 // All damage
-	data << Damage_Type;									// Damage type
-	data << AbsorbedDamage;								 // Absorbed Damage
-	data << ResistedDamage;								 // Resisted Damage
-	data << BlockedDamage;								  // Blocked Damage
-	data << uint8(PhysicalDamage);						  // Physical Damage true / false
-	data << uint8(0);									   // unknown or it binds with PhysicalDamage
-	data << uint8(CriticalHit ? 2 : 0);					 // If critical hit this field is == 2
-	data << uint8(5);									   // unknown const
-	data << uint32(0);	
+	data << SpellID;                    // SpellID / AbilityID
+	data << Damage;                     // All Damage
+	data << School;                     // School
+	data << AbsorbedDamage;             // Absorbed Damage
+	data << ResistedDamage;             // Resisted Damage
+	data << BlockedDamage;              // Blocked Damage
+	data << uint8(PhysicalDamage);      // Physical Damage (true/false)
+	data << uint8(0);                   // unknown or it binds with Physical Damage
+	data << uint8(CriticalHit ? 2 : 0); // If critical hit this field is == 2
+	data << uint8(5);                   // unknown const
+	data << uint32(0);
 	Caster->SendMessageToSet( &data, bToset );
 }
 

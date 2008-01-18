@@ -435,11 +435,11 @@ uint32 GainStat(uint16 level, uint8 playerclass,uint8 Stat)
 	return gain;
 }
 
-uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type, uint64 spellgroup, SpellEntry *ability)//spellid is used only for 2-3 spells, that have AP bonus
+uint32 CalculateDamage( Unit* pAttacker, Unit* pVictim, uint32 weapon_damage_type, uint64 spellgroup, SpellEntry* ability ) // spellid is used only for 2-3 spells, that have AP bonus
 {
 	//TODO: Some awesome formula to determine how much damage to deal
 	//consider this is melee damage
-	//damage type =0 --melee, 1--dual wield, 2 - ranged
+	// weapon_damage_type: 0 = melee, 1 = offhand(dualwield), 2 = ranged
 
 	// Attack Power increases your base damage-per-second (DPS) by 1 for every 14 attack power.
 	// (c) wowwiki
@@ -454,12 +454,12 @@ uint32 CalculateDamage(Unit *pAttacker, Unit *pVictim, uint32 damage_type, uint6
 		offset=UNIT_FIELD_MINDAMAGE;
 		it = static_cast<Player*>(pAttacker)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
 	}
-	else if(damage_type == MELEE)
-		offset=UNIT_FIELD_MINDAMAGE;
-	else if(damage_type == DUALWIELD)
-		offset=UNIT_FIELD_MINOFFHANDDAMAGE;
-	else
-		offset=UNIT_FIELD_MINRANGEDDAMAGE;
+	else if( weapon_damage_type == MELEE )
+		offset = UNIT_FIELD_MINDAMAGE;
+	else if( weapon_damage_type == OFFHAND )
+		offset = UNIT_FIELD_MINOFFHANDDAMAGE;
+	else  // weapon_damage_type == RANGED
+		offset = UNIT_FIELD_MINRANGEDDAMAGE;
 
 	float min_damage = pAttacker->GetFloatValue(offset);
 	float max_damage = pAttacker->GetFloatValue(offset+1);

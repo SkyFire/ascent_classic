@@ -1159,8 +1159,8 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								uint32 AP_owerride=GetAP() + spellInfo->EffectBasePoints[0]+1;
 								uint32 dmg = static_cast<Player*>(this)->GetMainMeleeDamage(AP_owerride);
 								SpellEntry *sp_for_the_logs = dbcSpell.LookupEntry(spellId);
-								Strike(victim,MELEE,sp_for_the_logs,dmg,0,0,true,false);
-								Strike(victim,MELEE,sp_for_the_logs,dmg,0,0,true,false);
+								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
+								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
 								//nothing else to be done for this trigger
 								continue;
 							}break;
@@ -1651,8 +1651,7 @@ void Unit::HandleProcDmgShield(uint32 flag, Unit* attacker)
 			else
 			{
 				SpellEntry	*ability=dbcSpell.LookupEntry((*i2).m_spellId);
-//				victim->Strike(this,(*i2).m_school,ability,0,0,(*i2).m_damage, true);
-				this->Strike(attacker,RANGED,ability,0,0,(*i2).m_damage, true,false);
+				this->Strike( attacker, RANGED, ability, 0, 0, (*i2).m_damage, true, false );
 			}
 		}
 	}
@@ -1823,10 +1822,9 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg)
 		else 
 			(*dmg).resisted_damage=0; 
 	}
-	//sLog.outDebug("calc resistance - damage: %d , dmg type: %d , dmg abs: %d\n",*damage,damage_type,*dmgabs);
 }
 
-uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry * ability)
+uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability )
 {
 	Item * it = NULL;
 
@@ -1849,7 +1847,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	if( pVictim->IsPlayer() )
 	{
 		vskill = static_cast< Player*>( pVictim )->_GetSkillLineCurrent( SKILL_DEFENSE );
-		if((damage_type != RANGED) && !backAttack)
+		if( weapon_damage_type != RANGED && !backAttack )
 		{
 			//--------------------------------block chance----------------------------------------------
 			block = pVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE); //shield check already done in Update chances
@@ -1872,7 +1870,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	//--------------------------------mob defensive chances-------------------------------------
 	else
 	{
-		if(damage_type != RANGED && !backAttack)
+		if( weapon_damage_type != RANGED && !backAttack )
 			dodge = pVictim->GetUInt32Value(UNIT_FIELD_STAT1) / 14.5f; // what is this value?
 		victim_skill = pVictim->getLevel() * 5;
 		if(pVictim->m_objectTypeId == TYPEID_UNIT) 
@@ -1893,19 +1891,19 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 		Player *pr = ((Player*)this);
 		hitmodifier = pr->GetHitFromMeleeSpell();  
 
-		switch(damage_type)
+		switch( weapon_damage_type )
 		{
-		case MELEE://melee main hand,
+		case MELEE:   // melee main hand weapon
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
 			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_MAIN_HAND_SKILL ) );
 			break;
-		case DUALWIELD://melee off hand ( duel wield )
+		case OFFHAND: // melee offhand weapon (dualwield)
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
 			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_OFF_HAND_SKILL ) );
 			break;
-		case RANGED: //ranged
+		case RANGED:  // ranged weapon
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
 			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_SKILL ) );
@@ -1967,7 +1965,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 		hitchance = 100.0f;
 	}
 	//--------------------------------by damage type and by weapon type-------------------------
-	if(damage_type==RANGED) 
+	if( weapon_damage_type == RANGED ) 
 	{
 		dodge=0.0f;
 		parry=0.0f;
@@ -2035,7 +2033,7 @@ uint32 Unit::GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry
 	return roll_results[r];
 }
 
-void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add_damage,int32 pct_dmg_mod,uint32 exclusive_damage,bool disable_proc, bool skip_hit_check)
+void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability, int32 add_damage, int32 pct_dmg_mod, uint32 exclusive_damage, bool disable_proc, bool skip_hit_check )
 {
 //==========================================================================================
 //==============================Unacceptable Cases Processing===============================
@@ -2097,7 +2095,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 	if(pVictim->IsPlayer())
 	{
 		vskill = ((Player*)pVictim)->_GetSkillLineCurrent(SKILL_DEFENSE);
-		if((damage_type != RANGED) && !backAttack)
+		if( weapon_damage_type != RANGED && !backAttack )
 		{
 //--------------------------------block chance----------------------------------------------
 				block = pVictim->GetFloatValue(PLAYER_BLOCK_PERCENTAGE); //shield check already done in Update chances
@@ -2117,7 +2115,7 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 //--------------------------------mob defensive chances-------------------------------------
 	else
 	{
-		if(damage_type != RANGED && !backAttack)
+		if( weapon_damage_type != RANGED && !backAttack )
 			dodge = pVictim->GetUInt32Value(UNIT_FIELD_STAT1) / 14.5f; // what is this value? (Agility)
 		victim_skill = pVictim->getLevel() * 5;
 		if(pVictim->m_objectTypeId == TYPEID_UNIT) 
@@ -2138,20 +2136,20 @@ void Unit::Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add
 		Player *pr = ((Player*)this);
 		hitmodifier = pr->GetHitFromMeleeSpell();  
 		
-		switch(damage_type)
+		switch( weapon_damage_type )
 		{
-		case MELEE://melee,
+		case MELEE:   // melee main hand weapon
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
 			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_MAIN_HAND_SKILL ) );
 			break;
-		case DUALWIELD://dual wield
+		case OFFHAND: // melee offhand weapon (dualwield)
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
 			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_OFF_HAND_SKILL ) );
 			hit_status |= HITSTATUS_DUALWIELD;//animation
 			break;
-		case RANGED: //ranged
+		case RANGED:  // ranged weapon
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
 			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_SKILL ) );
@@ -2230,7 +2228,7 @@ else
 //--------------------------------by talents------------------------------------------------
 	if(pVictim->IsPlayer())
 	{
-		if((damage_type != RANGED))
+		if( weapon_damage_type != RANGED )
 		{
 			crit += static_cast<Player*>(pVictim)->res_M_crit_get();
 			hitmodifier += static_cast<Player*>(pVictim)->m_resist_hit[0];
@@ -2243,7 +2241,7 @@ else
 	}
 	crit += (float)(pVictim->AttackerCritChanceMod[0]);
 //--------------------------------by damage type and by weapon type-------------------------
-	if(damage_type==RANGED) 
+	if( weapon_damage_type == RANGED ) 
 	{
 		dodge=0.0f;
 		parry=0.0f;
@@ -2404,7 +2402,7 @@ else
 		{
 //--------------------------------state proc initialization---------------------------------
 			vproc |= PROC_ON_ANY_DAMAGE_VICTIM;			
-			if(damage_type != RANGED)
+			if( weapon_damage_type != RANGED )
 			{
 				aproc |= PROC_ON_MELEE_ATTACK;
 				vproc |= PROC_ON_MELEE_ATTACK_VICTIM;
@@ -2421,10 +2419,10 @@ else
 				dmg.full_damage = exclusive_damage;
 			else
 			{
-				if(damage_type == MELEE && ability)
-					dmg.full_damage = CalculateDamage(this, pVictim, damage_type, ability->SpellGroupType, ability);
+				if( weapon_damage_type == MELEE && ability )
+					dmg.full_damage = CalculateDamage( this, pVictim, MELEE, ability->SpellGroupType, ability );
 				else			
-					dmg.full_damage = CalculateDamage(this, pVictim, damage_type, 0, ability);
+					dmg.full_damage = CalculateDamage( this, pVictim, weapon_damage_type, 0, ability );
 			}
 
 			if(ability && ability->SpellGroupType)
@@ -2441,7 +2439,7 @@ else
 #endif
 			}
 			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type]+add_damage;
-			if(damage_type==RANGED)
+			if( weapon_damage_type == RANGED )
 			{
 				dmg.full_damage+=pVictim->RangedDamageTaken;
 			}
@@ -2554,7 +2552,7 @@ else
 					//sLog.outString( "DEBUG: After CritMeleeDamageTakenPctMod: %u" , dmg.full_damage );
 					if(IsPlayer())
 					{
-						if(damage_type != RANGED)
+						if( weapon_damage_type != RANGED )
 						{
 							float critextra=float(static_cast<Player*>(this)->m_modphyscritdmgPCT);
 							dmg.full_damage += int32((float(dmg.full_damage)*critextra/100.0f));
@@ -2566,7 +2564,7 @@ else
 
 					dmg.full_damage += dmgbonus;
 
-					if( damage_type == RANGED )
+					if( weapon_damage_type == RANGED )
 						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritRangedDamageTakenPctMod[dmg.school_type]) / 100;
 					else 
 						dmg.full_damage = dmg.full_damage - float2int32(dmg.full_damage * CritMeleeDamageTakenPctMod[dmg.school_type]) / 100;
@@ -2584,7 +2582,7 @@ else
 					pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
 					vproc |= PROC_ON_CRIT_HIT_VICTIM;
 					aproc |= PROC_ON_CRIT_ATTACK;
-					if(damage_type == RANGED)
+					if( weapon_damage_type == RANGED )
 					{
 						vproc |= PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
 						aproc |= PROC_ON_RANGED_CRIT_ATTACK;
@@ -2676,8 +2674,7 @@ else
 //--------------------------dirty fixes-----------------------------------------------------
 	//vstate=1-wound,2-dodge,3-parry,4-interrupt,5-block,6-evade,7-immune,8-deflect	
 	// the above code was remade it for reasons : damage shield needs moslty same flags as handleproc + dual wield should proc too ?
-	if(!disable_proc
-		&& damage_type!=DUALWIELD )
+	if( !disable_proc && weapon_damage_type != OFFHAND )
     {
 		this->HandleProc(aproc,pVictim, ability,realdamage,abs); //maybe using dmg.resisted_damage is better sometimes but then if using godmode dmg is resisted instead of absorbed....bad
 		m_procCounter = 0;
@@ -2705,7 +2702,6 @@ else
 			for(map< SpellEntry*, pair<uint32, uint32> >::iterator itr = ((Player*)this)->m_onStrikeSpells.begin();
 				itr != ((Player*)this)->m_onStrikeSpells.end(); ++itr)
 			{
-				//Strike(pVictim, 1, (*itr), add_damage, pct_dmg_mod, exclusive_damage);
 				if( itr->second.first )
 				{
 					// We have a *periodic* delayed spell.
@@ -2800,7 +2796,8 @@ else
 	{
 		if( realdamage > 0 )//FIXME: add log for miss,block etc for ability and ranged
 		{
-			SendSpellNonMeleeDamageLog(this,pVictim,ability->Id,realdamage,0,dmg.resisted_damage,0,false,blocked_damage,((hit_status & HITSTATUS_CRICTICAL) ? true : false),true);
+			// here we send "dmg.resisted_damage" for "AbsorbedDamage", "0" for "ResistedDamage", and "false" for "PhysicalDamage" even though "School" is "SCHOOL_NORMAL"   o_O
+			SendSpellNonMeleeDamageLog( this, pVictim, ability->Id, realdamage, SCHOOL_NORMAL, dmg.resisted_damage, 0, false, blocked_damage, ( ( hit_status & HITSTATUS_CRICTICAL ) != 0 ), true );
 		}
 		//FIXME: add log for miss,block etc for ability and ranged
 		//example how it works
@@ -2898,7 +2895,7 @@ else
 		while(extra_attacks > 0)
 		{
 			extra_attacks--;
-			Strike(pVictim,damage_type,ability,add_damage,pct_dmg_mod,exclusive_damage, false,false);
+			Strike( pVictim, weapon_damage_type, ability, add_damage, pct_dmg_mod, exclusive_damage, false, false );
 		}
 
 		m_extraAttackCounter = false;
@@ -2917,7 +2914,7 @@ else
 
 			if((*itr) != pVictim && (*itr)->IsUnit() && CalcDistance(*itr) < 10.0f && isAttackable(this, (*itr)) && (*itr)->isInFront(this))
 			{
-				Strike( ((Unit*)*itr), damage_type, ability, add_damage, pct_dmg_mod, exclusive_damage, false ,false);
+				Strike( static_cast< Unit* >( *itr ), weapon_damage_type, ability, add_damage, pct_dmg_mod, exclusive_damage, false ,false );
 				--m_extra;
 			}
 		}
@@ -5838,7 +5835,7 @@ void Unit::EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage)
 {
 	Unit * victim = m_mapMgr ? m_mapMgr->GetUnit(guid) : NULL;
 	if(victim)
-		Strike(victim,SPELL_TYPE_RANGED,sp,0,0,0,false,true);
+		Strike( victim, RANGED, sp, 0, 0, 0, false, true );
 }
 
 void Unit::DispelAll(bool positive)

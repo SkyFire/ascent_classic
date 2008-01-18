@@ -939,7 +939,7 @@ void Player::EventDismount(uint32 money, float x, float y, float z)
 	}
 }
 
-void Player::_EventAttack(bool offhand)
+void Player::_EventAttack( bool offhand )
 {
 	if (m_currentSpell)
 	{
@@ -1005,7 +1005,7 @@ void Player::_EventAttack(bool offhand)
 
 		if (!GetOnMeleeSpell())
 		{
-			Strike(pVictim,(uint32)offhand,NULL,0,0,0, false,false);
+			Strike( pVictim, ( offhand ? OFFHAND : MELEE ), NULL, 0, 0, 0, false, false );
 		} 
 		else 
 		{ 
@@ -1088,7 +1088,7 @@ void Player::_EventCharmAttack()
 
 			if (!m_CurrentCharm->GetOnMeleeSpell())
 			{
-				m_CurrentCharm->Strike(pVictim,0,NULL,0,0,0, false,false);
+				m_CurrentCharm->Strike( pVictim, MELEE, NULL, 0, 0, 0, false, false );
 			} 
 			else 
 			{ 

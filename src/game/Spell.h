@@ -174,20 +174,13 @@ static void SM_PFValue( int32* m, float* v, uint64 group )
 //bool IsBeneficSpell(SpellEntry *sp);
 //AI_SpellTargetType RecommandAISpellTargetType(SpellEntry *sp);
 
-enum SPELL_TYPE
+enum SPELL_DMG_TYPE // SPELL_ENTRY_Spell_Dmg_Type
 {
-    SPELL_TYPE_MELEE,
-    SPELL_TYPE_MAGIC,
-    SPELL_TYPE_RANGED
+	SPELL_DMG_TYPE_NONE   = 0,
+	SPELL_DMG_TYPE_MAGIC  = 1,
+	SPELL_DMG_TYPE_MELEE  = 2,
+	SPELL_DMG_TYPE_RANGED = 3
 };
-
-/*enum SPELL_TYPE
-{
-    SPELL_TYPE_NONE,
-    SPELL_TYPE_MELEE,
-    SPELL_TYPE_MAGIC,
-    SPELL_TYPE_RANGED
-};*/
 
 // value's for SendSpellLog
 enum SPELL_LOG
@@ -933,8 +926,7 @@ enum SpellTargetTypes
     SPELL_TARGET_TYPE_DEATH             = 0x8000,
 };
 
-// lets make this bitwise for more fun
-enum SpellTypes
+enum SpellTypes // SPELL_ENTRY_buffType
 {
     SPELL_TYPE_NONE                 = 0x00000000,
     SPELL_TYPE_SEAL                 = 0x00000001,
@@ -1701,20 +1693,10 @@ public:
     Object*			m_caster;
 
     // 15007 = resurecting sickness
-    ASCENT_INLINE uint32 GetType()//0 melee,1 magic ,2 ranged
-    {      
-          //this is dirty fix, we must use weapon class to define dmg type
-        if(m_spellInfo->Id == SPELL_RANGED_WAND) //wands are magic type. why do we need them as ranged ;P
-            return SPELL_TYPE_RANGED;
 
-        if(m_spellInfo->Spell_Dmg_Type ==1)//1=Magic, 2=Melee, 3=Ranged
-            return 1;
-        if(m_spellInfo->Spell_Dmg_Type ==2)
-            return 0;
-        if(m_spellInfo->Spell_Dmg_Type ==3)
-            return 2;
-        else return 1; //magic is better than ranged for sure ;P
-    }
+	// This returns SPELL_ENTRY_Spell_Dmg_Type where 0 = SPELL_DMG_TYPE_NONE, 1 = SPELL_DMG_TYPE_MAGIC, 2 = SPELL_DMG_TYPE_MELEE, 3 = SPELL_DMG_TYPE_RANGED
+	// It should NOT be used for weapon_damage_type which needs: 0 = MELEE, 1 = OFFHAND, 2 = RANGED
+	ASCENT_INLINE uint32 GetType() { return ( m_spellInfo->Spell_Dmg_Type == SPELL_DMG_TYPE_NONE ? SPELL_DMG_TYPE_MAGIC : m_spellInfo->Spell_Dmg_Type ); }
 
     std::vector<uint64> UniqueTargets;
     SpellTargetsList    ModeratedTargets;

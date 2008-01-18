@@ -516,11 +516,11 @@ enum DamageFlags
 	DAMAGE_FLAG_ARCANE  = 64
 };
 
-enum DamageType
+enum WeaponDamageType // this is NOT the same as SPELL_ENTRY_Spell_Dmg_Type, or Spell::GetType(), or SPELL_ENTRY_School !!
 {
-	MELEE,
-	DUALWIELD,
-	RANGED,
+	MELEE   = 0,
+	OFFHAND = 1,
+	RANGED  = 2,
 };
 
 enum VisualState
@@ -683,7 +683,7 @@ public:
 
 	bool __fastcall canReachWithAttack(Unit *pVictim);
 
-  //  void StrikeWithAbility(Unit *pVictim,Spell*spell,uint32 addspelldmg,uint32 damage_type);
+  //void StrikeWithAbility( Unit* pVictim, Spell* spell, uint32 addspelldmg, uint32 weapon_damage_type );
 
 	/// State flags are server-only flags to help me know when to do stuff, like die, or attack
 	ASCENT_INLINE void addStateFlag(uint32 f) { m_state |= f; };
@@ -704,9 +704,9 @@ public:
  
 	//// Combat
    // void DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId = 0);   // to stop from falling, etc
-	//void AttackerStateUpdate(Unit *pVictim,uint32 damage_type);//0-melee,1-offhand(dual wield),2-ranged
-	uint32 GetSpellDidHitResult(Unit * pVictim, uint32 damage_type, SpellEntry * ability);
-	void Strike(Unit *pVictim,uint32 damage_type,SpellEntry *ability,int32 add_damage,int32 pct_dmg_mod,uint32 exclusive_damage,bool disable_proc, bool skip_hit_check);
+	//void AttackerStateUpdate( Unit* pVictim, uint32 weapon_damage_type ); // weapon_damage_type: 0 = melee, 1 = offhand(dualwield), 2 = ranged
+	uint32 GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability );
+	void Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability, int32 add_damage, int32 pct_dmg_mod, uint32 exclusive_damage, bool disable_proc, bool skip_hit_check );
 //	void PeriodicAuraLog(Unit *pVictim, SpellEntry* spellID, uint32 damage, uint32 damageType);
 	//void SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
 	uint32 m_procCounter;

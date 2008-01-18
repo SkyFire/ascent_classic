@@ -198,10 +198,10 @@ void do_fixes(TCHAR *inf)
 			sp->procChance=45;	/* this will do */
 
 		if(namehash==0xC5C30B39)		/* seal of command */
-			sp->Spell_Dmg_Type=1;
+			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
 
 		if(namehash==0x11d6b48c)		/* judgement of command */
-			sp->Spell_Dmg_Type=1;
+			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC;
 
 		//these mostly do not mix so we can use else 
         // look for seal, etc in name
@@ -960,7 +960,7 @@ void do_fixes(TCHAR *inf)
 		{
 			sp->procChance = 25;
 			sp->School = SCHOOL_HOLY; //the procspells of the original seal of command have fizical school instead of holy
-			sp->Spell_Dmg_Type = SPELL_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
+			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_MAGIC; //heh, crazy spell uses melee/ranged/magic dmg type for 1 spell. Now which one is correct ?
 		}
 		/* Seal of Jusice - Proc Chance */
 		else if(sp->NameHash == 0xCC6D4182)

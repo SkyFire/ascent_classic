@@ -444,7 +444,7 @@ public:
 	//* SpellLog packets just to keep the code cleaner and better to read
 	//*****************************************************************************************
 	void SendSpellLog(Object *Caster, Object *Target,uint32 Ability, uint8 SpellLogType);
-	void SendSpellNonMeleeDamageLog(Object * Caster, Object * Target,uint32 SpellID,uint32 Damage, uint8 Damage_Type,uint32 AbsorbedDamage, uint32 ResistedDamage,bool PhysicalDamage, uint32 BlockedDamage, bool CriticalHit, bool bToSet);
+	void SendSpellNonMeleeDamageLog( Object* Caster, Object* Target, uint32 SpellID, uint32 Damage, uint8 School, uint32 AbsorbedDamage, uint32 ResistedDamage, bool PhysicalDamage, uint32 BlockedDamage, bool CriticalHit, bool bToSet );
 
 	//object faction
 	void _setFaction();

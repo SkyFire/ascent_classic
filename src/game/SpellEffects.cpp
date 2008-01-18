@@ -412,15 +412,14 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 	}
 	else
 	{
-		uint32 dmg_type = GetType();
-		if(dmg_type == SPELL_TYPE_MAGIC)		
+		if( GetType() == SPELL_DMG_TYPE_MAGIC )		
 		{
-			m_caster->SpellNonMeleeDamageLog(unitTarget,m_spellInfo->Id, dmg, pSpellId==0,static_damage);
+			m_caster->SpellNonMeleeDamageLog( unitTarget, m_spellInfo->Id, dmg, pSpellId == 0, static_damage );
 		}
 		else 
 		{
-			if(u_caster)
-				u_caster->Strike(unitTarget,dmg_type,m_spellInfo,0,0,dmg, pSpellId==0,true);
+			if( u_caster != NULL )
+				u_caster->Strike( unitTarget, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo, 0, 0, dmg, pSpellId == 0, true );
 		}
 	}   
 }
@@ -1469,23 +1468,24 @@ void Spell::SpellEffectQuestComplete(uint32 i) // Quest Complete
 {
 	//damage is id of the quest to complete
 }
+
 //wand->
 void Spell::SpellEffectWeapondamageNoschool(uint32 i) // Weapon damage + (no School)
 {
 	if(!unitTarget ||!u_caster)
 		return;
 
-	if(GetType()==SPELL_TYPE_RANGED && m_spellInfo->speed>0.0f)
+	if( GetType() == SPELL_DMG_TYPE_RANGED && m_spellInfo->speed > 0.0f )
 	{
 		float time = (m_caster->CalcDistance(unitTarget) * 1000.0f) / m_spellInfo->speed;
 		if(time <= 100.0f)
-			u_caster->Strike(unitTarget,SPELL_TYPE_RANGED,m_spellInfo,0,0,0,false,true);
+			u_caster->Strike( unitTarget, RANGED, m_spellInfo, 0, 0, 0, false, true );
 		else
 			sEventMgr.AddEvent(u_caster,&Unit::EventStrikeWithAbility,unitTarget->GetGUID(),
 				m_spellInfo, (uint32)damage, EVENT_SPELL_DAMAGE_HIT, float2int32(time), 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
 	else
-		u_caster->Strike(unitTarget,GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED:SPELL_TYPE_MELEE,m_spellInfo,damage,0,0, false,true);
+		u_caster->Strike( unitTarget, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo, damage, 0, 0, false, true );
 }
 
 void Spell::SpellEffectAddExtraAttacks(uint32 i) // Add Extra Attacks
@@ -2084,15 +2084,14 @@ void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage
 	if(!unitTarget  || !u_caster)
 		return;
 
-	uint32 ty = GetType();
-	if(ty==SPELL_TYPE_MAGIC)
+	if( GetType() == SPELL_DMG_TYPE_MAGIC )
 	{
-		float fdmg = (float)CalculateDamage(u_caster, unitTarget, MELEE, 0, m_spellInfo);
+		float fdmg = (float)CalculateDamage( u_caster, unitTarget, MELEE, 0, m_spellInfo );
 		uint32 dmg = float2int32(fdmg*(float(damage/100.0f)));
 		u_caster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, dmg, false, false, false);
 	}
 	else
-		u_caster->Strike(unitTarget,GetType()==SPELL_TYPE_RANGED?RANGED:MELEE,m_spellInfo,add_damage,damage,0, false,true);
+		u_caster->Strike( unitTarget, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo, add_damage, damage, 0, false, true );
 }
 
 void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
@@ -3184,7 +3183,7 @@ void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
 		add_damage += damage;
 		return;
 	}
-	u_caster->Strike( unitTarget, GetType(), m_spellInfo, damage, 0, 0, false, true );
+	u_caster->Strike( unitTarget, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo, damage, 0, 0, false, true );
 }
 
 void Spell::SpellEffectPowerBurn(uint32 i) // power burn
@@ -4894,7 +4893,7 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 	if(	m_spellInfo->NameHash == SPELL_HASH_MUTILATE && unitTarget->IsPoisoned() )
 		damage = damage + float2int32( (float)damage * 0.5f );
 
-	u_caster->Strike( unitTarget, GetType() == SPELL_TYPE_RANGED ? SPELL_TYPE_RANGED : 0, m_spellInfo, damage, 0, 0, false, true );
+	u_caster->Strike( unitTarget, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo, damage, 0, 0, false, true );
 }
 
 void Spell::SpellEffectSpellSteal( uint32 i )
