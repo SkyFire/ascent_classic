@@ -1488,13 +1488,23 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	uint32 talent_points = 0x0000003D;
   
+	sLog.outDebug("Received CMSG_INSPECT");
+
 	recv_data >> guid;
 	
-	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
+    if( _player == NULL )
+	{
+		sLog.outDebug("HandleInspectOpcode : _player was null");
 		return;
+	}
 
-    if( _player != NULL )
-        _player->SetSelection( guid );
+	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
+	{
+		sLog.outDebug("HandleInspectOpcode : guid was %i", (uint32)guid );
+		return;
+	}
+
+	_player->SetSelection( guid );
 
     WorldPacket data( SMSG_INSPECT_TALENTS, 4 + talent_points );
 
