@@ -34,5 +34,6 @@ g3dlite/System.cpp \
 g3dlite/Triangle.cpp \
 g3dlite/Vector3.cpp \
 g3dlite/Vector4.cpp \
-g3dlite/format.cpp
+g3dlite/format.cpp \
+Interface.cpp 
 

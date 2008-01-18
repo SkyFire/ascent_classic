@@ -15,7 +15,7 @@ ascent_SOURCES = \
 	ConsoleCommands.h \
 	ConsoleListener.cpp
 
-ascent_LDADD = -lgame -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork -llua -lpcre
+ascent_LDADD = -lgame -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork -llua -lpcre -lcollision
 
 ascent_LDFLAGS = -L$(srcdir)/../shared \
                -L$(srcdir)/../game \
@@ -23,4 +23,5 @@ ascent_LDFLAGS = -L$(srcdir)/../shared \
                -L$(srcdir)/../../dep/src/lua \
                -L$(srcdir)/../../dep/src/pcre \
                -L$(srcdir)/../../dep/src \
+               -L$(srcdir)/../../extras/collision/collision_dll \
                @LIB_EXPORT@

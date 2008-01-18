@@ -4,6 +4,8 @@ INCLUDES += -I$(srcdir)/../logonserver -I$(srcdir)/../../dep/src
 noinst_LIBRARIES = libgame.a
 
 libgame_a_SOURCES = \
+    CollideInterface.cpp \
+    CollideInterface.h \
     VoiceChatClientSocket.cpp \
     VoiceChatClientSocket.h \
     VoiceChatHandler.cpp \

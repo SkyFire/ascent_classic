@@ -1573,7 +1573,7 @@ bool AIInterface::FindFriends(float dist)
 		if( z == NO_WMO_HEIGHT )
 			z = m_Unit->GetMapMgr()->GetLandHeight(x, y);
 
-		if( abs( z - m_Unit->GetPositionZ() ) > 10.0f )
+		if( fabs( z - m_Unit->GetPositionZ() ) > 10.0f )
 			z = m_Unit->GetPositionZ();
 #else
 		float z = m_Unit->GetPositionZ();
@@ -2614,7 +2614,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				}
 			}
 
-			if( abs( m_Unit->GetPositionZ() - Fz ) > 10.0f || 
+			if( fabs( m_Unit->GetPositionZ() - Fz ) > 10.0f || 
 				( wl != 0.0f && Fz < wl ) )		// in water
 			{
 				m_FearTimer=getMSTime() + 500;
@@ -2666,7 +2666,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 				wanderZ = wanderZ2;
 		}
 
-		if( abs( m_Unit->GetPositionZ() - wanderZ ) > 10.0f )
+		if( fabs( m_Unit->GetPositionZ() - wanderZ ) > 10.0f )
 		{
 			m_WanderTimer=getMSTime() + 1000;
 		}

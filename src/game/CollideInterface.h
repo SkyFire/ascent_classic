@@ -23,8 +23,6 @@
 /* imports */
 #define NO_WMO_HEIGHT -100000.0f
 
-#ifdef _GAME
-
 //#define COLLISION_DEBUG 1
 
 #ifdef WIN32
@@ -156,5 +154,4 @@ public:
 
 extern CCollideInterface CollideInterface;
 
-#endif
 #endif
