@@ -143,7 +143,7 @@ int WorldSession::Update(uint32 InstanceID)
 		else
 		{
 
-					sLog.outDebug("[Session] DEBUG %s (0x%.4X)",
+					sLog.outError("[Session] DEBUG %s (0x%.4X)",
 						LookupName(packet->GetOpcode(), g_worldOpcodeNames), packet->GetOpcode());
 
 			Handler = &WorldPacketHandlers[packet->GetOpcode()];
