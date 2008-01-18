@@ -1263,7 +1263,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( !CastingSpell )
 									continue;
-								if( CastingSpell->School!=SCHOOL_FIRE || CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
+								if( CastingSpell->School!=SCHOOL_FIRE && CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
 									continue;
 								dmg_overwrite = CastingSpell->manaCost * (ospinfo->EffectBasePoints[0] + 1) / 100;
 							}break;

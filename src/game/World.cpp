@@ -3804,9 +3804,9 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_TARGET_DIE;
 		sp->procChance = 100;
 	}
-	sp = dbcSpell.LookupEntryForced( 27285 );
-	if( sp != NULL )
-		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_FRIENDLY_IN_AREA;
+//	sp = dbcSpell.LookupEntry( 27285 );
+//	if( sp != NULL )
+//		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_FRIENDLY_IN_AREA;
 
 	//warlock -  soul link
 	sp = dbcSpell.LookupEntryForced( 19028 );
@@ -4061,9 +4061,9 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 31583 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 2097152;
+		sp->EffectSpellGroupRelation[0] = 2097152; //damage
 		sp->EffectBasePoints[0] *= 5; //heh B thinks he is smart by adding this to description ? If it doesn;t work std then it still needs to made by hand
-		sp->EffectSpellGroupRelation[1] = 2048;
+		sp->EffectSpellGroupRelation[1] = 2048; //cost
 	}
 
 	//mage : Empowered Fireball
@@ -4086,10 +4086,16 @@ bool World::SetInitialWorldSettings()
 	//mage : Ice Floes
 	sp = dbcSpell.LookupEntryForced( 31670 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2097152;
+	{
+		sp->EffectSpellGroupRelation[0] = 512;
+		sp->EffectSpellGroupRelation_high[0] = 4 | 1;
+	}
 	sp = dbcSpell.LookupEntryForced( 31672 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 2097152;
+	{
+		sp->EffectSpellGroupRelation[0] = 512;
+		sp->EffectSpellGroupRelation_high[0] = 4 | 1;
+	}
 
 	//mage : Empowered Frostbolt
 	sp = dbcSpell.LookupEntryForced( 31682 );
@@ -4274,6 +4280,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 29077;
 		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TARGET_SELF);
+		sp->procChance = 100;
 	}
 	sp = dbcSpell.LookupEntryForced( 29075 );
 	if( sp != NULL )
@@ -4281,6 +4288,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 29077;
 		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TARGET_SELF);
+		sp->procChance = 100;
 	}
 	sp = dbcSpell.LookupEntryForced( 29076 );
 	if( sp != NULL )
@@ -4288,6 +4296,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[0] = 42;
 		sp->EffectTriggerSpell[0] = 29077;
 		sp->procFlags = uint32(PROC_ON_SPELL_CRIT_HIT|PROC_TARGET_SELF);
+		sp->procChance = 100;
 	}
 
 	//mage: Blazing Speed
@@ -5252,30 +5261,40 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072;
 		sp->EffectSpellGroupRelation_high[0] = 128;
+		sp->EffectSpellGroupRelation[1] = 65536 | 131072;
+		sp->EffectSpellGroupRelation_high[1] = 128;
 	}
 	sp = dbcSpell.LookupEntryForced( 12835 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072;
 		sp->EffectSpellGroupRelation_high[0] = 128;
+		sp->EffectSpellGroupRelation[1] = 65536 | 131072;
+		sp->EffectSpellGroupRelation_high[1] = 128;
 	}
 	sp = dbcSpell.LookupEntryForced( 12836 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072;
 		sp->EffectSpellGroupRelation_high[0] = 128;
+		sp->EffectSpellGroupRelation[1] = 65536 | 131072;
+		sp->EffectSpellGroupRelation_high[1] = 128;
 	}
 	sp = dbcSpell.LookupEntryForced( 12837 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072;
 		sp->EffectSpellGroupRelation_high[0] = 128;
+		sp->EffectSpellGroupRelation[1] = 65536 | 131072;
+		sp->EffectSpellGroupRelation_high[1] = 128;
 	}
 	sp = dbcSpell.LookupEntryForced( 12838 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 65536 | 131072;
 		sp->EffectSpellGroupRelation_high[0] = 128;
+		sp->EffectSpellGroupRelation[1] = 65536 | 131072;
+		sp->EffectSpellGroupRelation_high[1] = 128;
 	}
 
 	//warrior - Improved Intercept
@@ -5342,7 +5361,7 @@ bool World::SetInitialWorldSettings()
 	//warrior - Improved Commanding Shout
 	sp = dbcSpell.LookupEntryForced( 38408 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1048576;
+		sp->EffectSpellGroupRelation_high[0] = 128;
 
 	// priest - Reflective Shield
 	sp = dbcSpell.LookupEntryForced( 33201 );
