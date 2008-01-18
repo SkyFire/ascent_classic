@@ -1520,6 +1520,9 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 	uint32 rank_offset_boundary;
 	uint32 last_mask;
 
+    for( uint32 i = 0; i < talent_points; ++i )
+        data << uint8( 0 );
+
     for( uint32 i = 0; i < 3; ++i )
     {
 		talent_tab_id = sWorld.InspectTalentTabPages[_player->GetMapMgr()->GetPlayer( (uint32)guid )->getClass()][i];
@@ -1545,10 +1548,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			}
 
 			if( talent_max_rank <= 0 )
-			{
-				data.put< uint8 >( 0 );
 				continue;
-			}
 
 			talent_index = talent_tab_pos;
 
@@ -1563,9 +1563,9 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			rank_index_boundary = rank_slot * 8 + rank_offset;
 			rank_slot_boundary = rank_index_boundary / 8;
 			rank_offset_boundary = rank_index_boundary % 8;
-			last_mask = data.read< uint8 >( 4 + rank_slot );
-			last_mask |= ( 1 << rank_offset );
-			data.put< uint8 >( 4 + rank_slot, last_mask & 0xFF );
+			last_mask = data.read< uint8 >( 4 + rank_slot_boundary );
+			last_mask |= ( 1 << rank_offset_boundary );
+			data.put< uint8 >( 4 + rank_slot_boundary, last_mask & 0xFF );
 		}
 
 		std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabSize.find( i );
