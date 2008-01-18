@@ -4507,7 +4507,6 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
-
 	//warlock - Demonic Sacrifice
 	sp = dbcSpell.LookupEntryForced( 18788 );
 	if( sp != NULL )
@@ -4587,6 +4586,7 @@ bool World::SetInitialWorldSettings()
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
 		sp->EffectMiscValue[0] = 3;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntryForced( 18743 );
 	if( sp != NULL )
@@ -4594,6 +4594,7 @@ bool World::SetInitialWorldSettings()
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
 		sp->EffectMiscValue[0] = 3;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 	sp = dbcSpell.LookupEntryForced( 18744 );
 	if( sp != NULL )
@@ -4601,6 +4602,33 @@ bool World::SetInitialWorldSettings()
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
 		sp->EffectMiscValue[0] = 3;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+
+	//warlock - Fel Stamina
+	sp = dbcSpell.LookupEntryForced( 18748 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
+		sp->EffectMiscValue[0] = 2;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntryForced( 18749 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
+		sp->EffectMiscValue[0] = 2;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntryForced( 18750 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
+		sp->EffectMiscValue[0] = 2;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 
 	//warlock - Master Demonologist - 25 spells here
