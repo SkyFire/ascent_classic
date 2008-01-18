@@ -203,9 +203,6 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	m_base_walkSpeed = m_walkSpeed = owner->m_base_walkSpeed; //should we be able to keep up with master ?
 
 	InitializeMe(true);
-
-	if( owner && owner->IsPlayer() )
-		static_cast<Player*>( owner )->EventSummonPet( this );
 }
 
 
@@ -466,6 +463,7 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 
 		free(ab);
 	}
+
 	InitializeMe(false);
 
 	if(m_Owner && getLevel() > m_Owner->getLevel())
@@ -481,10 +479,18 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 		SetUInt32Value(x, 0);
 }
 
+void Pet::OnPushToWorld()
+{
+	//before we initialize pet spells so we can apply spell mods on them 
+	if( m_Owner && m_Owner->IsPlayer() )
+		static_cast<Player*>( m_Owner )->EventSummonPet( this );
+
+	Creature::OnPushToWorld();
+}
+
 void Pet::InitializeMe(bool first)
 {
 	// set up ai and shit
-	
 	GetAIInterface()->Init(this,AITYPE_PET,MOVEMENTTYPE_NONE,m_Owner);
 	GetAIInterface()->SetUnitToFollow(m_Owner);
 	GetAIInterface()->SetFollowDistance(3.0f);
@@ -537,7 +543,7 @@ void Pet::InitializeMe(bool first)
 		UpdateTP();
 	}
 
-	InitializeSpells();
+	InitializeSpells(); 
 	PushToWorld(m_Owner->GetMapMgr());
 
 	if(first)

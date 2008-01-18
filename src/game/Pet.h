@@ -121,6 +121,8 @@ public:
 	void CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature *created_from_creature, Unit* owner, SpellEntry *created_by_spell, uint32 type, uint32 expiretime);
 
 	virtual void Update(uint32 time);
+	void OnPushToWorld();
+
 	ASCENT_INLINE uint32 GetXP(void) { return m_PetXP; }
 
 	void InitializeSpells();

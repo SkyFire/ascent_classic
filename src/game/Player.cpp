@@ -1867,7 +1867,6 @@ void Player::SpawnPet(uint32 pet_number)
 	Pet *pPet = objmgr.CreatePet();
 	pPet->SetInstanceID(GetInstanceID());
 	pPet->LoadFromDB(this, itr->second);
-	EventSummonPet(pPet); //cast our talent on the little bastard :)
 }
 
 void Player::_LoadPetSpells(QueryResult * result)

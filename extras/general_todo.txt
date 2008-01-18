@@ -100,12 +100,6 @@ Zack - test my shit :
 - general spell targeting type 30 -> 21172
 - shaman - purge 8012
 - started playin with grounding totem effect, but it is defenetly not finished
-- warlock: Improved Enslave Demon 18822
-- warlock: Demonic Knowledge 35693
-- warlock: Pyroclasm 18096
-- warlock - Backlash 34939 - should not remove mother spell
-- warlock: Master Conjuror 18768 - should work
-- warlock - Seed of Corruption 27243 - might not be perfect in all cases
 - paladin - Healing Light 20239
 - paladin - Sanctified Light 20361
 - paladin - sanctified judgement 31878
@@ -128,22 +122,19 @@ Zack - test my shit :
 - Hunter : Clever Traps 19245
 - Hunter : Thrill of the Hunt 34499
 - remake combustion and that other spell that were removing mother aura on proc. Do not rename namehashes ever again !
+- mage spellsteal 30449 should steal only 1 spell 
+- check when dismissing pet if auras are removed too
+- warlock: Improved Enslave Demon 18822
+- warlock: Demonic Knowledge 35693
+- warlock: Pyroclasm 18096
+- warlock: Master Conjuror 18768 - should work
+- warlock - Seed of Corruption 27243 - might not be perfect in all cases
 - warlock - Improved Drain Soul 18372
 - warlock - Unstable Affliction 30405
 - warlock - Improved Healthstone 18693 ->check for conjured items when traded
 - warlock - Demonic Sacrifice 18788
-- warlock - Master Demonologist 23825
-- check when dismissing pet if auras are removed too
 - warlock - Cataclysm 17782
 - warlock - Intensity 18136
-- warlock - Improved Imp 18696
-- warlock - Improved Voidwalker 18707
-- warlock - Fel Intellect 18744
-- warlock - Improved Succubus 18756
-- warlock - Fel Stamina 18750
-- warlock - Unholy Power 18773
-- mage spellsteal 30449 should steal only 1 spell 
-- warlock - Improved Curse of Weakness 18180
 
 ==========================================================================
 Capt - test my shit :
