@@ -137,6 +137,7 @@ Zack - test my shit :
 - warlock - Cataclysm 17782
 - warlock - Intensity 18136
 - warlock - Improved Imp 18696
+- warlock - Improved Voidwalker 18707
 
 ==========================================================================
 Capt - test my shit :

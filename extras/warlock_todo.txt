@@ -39,7 +39,6 @@ Pets
 ///////////////////////////////////////////////////////////////////////////////
 
 Demonology Tree:
-Improved void walker - doesn't work
 Fel Intellect - only increases the warlock max mana but doesn't increase pets intellect
 Improved Succubus - can't test since succy spells proc on self seduction doesn't work, soothing kiss procs on self...
 Fel Stamina - same as fel intellect, only increases warlocks max hp but not pets hp

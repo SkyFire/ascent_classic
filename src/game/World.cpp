@@ -4540,6 +4540,26 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 
+	//warlock - Improved Voidwalker
+	sp = dbcSpell.LookupEntryForced( 18705 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntryForced( 18706 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntryForced( 18707 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+
 	//warlock - Master Demonologist - 25 spells here
 	sp = dbcSpell.LookupEntryForced( 23785 );
 	if( sp != NULL )
