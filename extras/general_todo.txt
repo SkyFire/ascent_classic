@@ -142,6 +142,7 @@ Zack - test my shit :
 - warlock - Improved Succubus 18756
 - warlock - Fel Stamina 18750
 - warlock - Unholy Power 18773
+- mage spellsteal 30449 should steal only 1 spell 
 
 ==========================================================================
 Capt - test my shit :

@@ -4903,6 +4903,7 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 
 		Aura *aur;
 	uint32 start,end;
+	int32 spells_to_steal = damage;
 	if(isAttackable(u_caster,unitTarget))
 	{
 		start=0;
@@ -4935,6 +4936,8 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 				u_caster->AddAura(aur);
 				u_caster->AddAuraVisual(aur->GetSpellId(),1,true);
 					return;*/
+				if( --spells_to_steal <= 0 )
+					break; //exit loop now
 			}			
 		}
 	}   
