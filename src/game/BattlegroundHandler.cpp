@@ -243,13 +243,13 @@ void WorldSession::HandleInspectArenaStatsOpcode( WorldPacket & recv_data )
             if( team != NULL )
 			{
 				WorldPacket data( MSG_INSPECT_ARENA_STATS, 8 + 1 + 4 * 5 );
-				data << player->GetGUID();					// player guid
-				data << team->m_type;						// slot (0...2)
-				data << team->m_id;							// arena team id
-				data << team->m_stat_rating;				// rating
-				data << team->m_stat_gamesplayedweek;		// games
-				data << team->m_stat_gameswonweek;			// wins
-				data << team->m_stat_gamesplayedseason;		// played (count of all games, that played...)
+				data << player->GetGUID();
+				data << team->m_type;
+				data << team->m_id;
+				data << team->m_stat_rating;
+				data << team->m_stat_gamesplayedweek;
+				data << team->m_stat_gameswonweek;
+				data << team->m_stat_gamesplayedseason;
 				SendPacket( &data );
 
 			}
