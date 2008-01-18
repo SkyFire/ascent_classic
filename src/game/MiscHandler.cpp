@@ -1481,6 +1481,41 @@ void WorldSession::HandlePlayedTimeOpcode( WorldPacket & recv_data )
 	SendPacket(&data);
 }
 
+void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
+{
+	CHECK_PACKET_SIZE(recv_data, 8);
+
+	uint64 guid;
+	uint32 talent_points = 0x0000003D;
+	
+	recv_data >> guid;
+	
+	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
+		return;
+
+    if( _player != NULL )
+        _player->SetSelection( guid );
+
+    WorldPacket data( SMSG_INSPECT_TALENTS, 4 + talent_points );
+
+    data << uint32( talent_points );
+
+	// zero max talent points
+    for( uint32 i = 0; i < talent_points; ++i )
+        data << uint8( 0 );
+
+	// page
+    for( uint32 i = 0; i < 3; ++i )
+    {
+		// talent
+		{
+			//data.put< uint8 >( 4 + talent_rank_slot, prev_mask & 0xFF );
+		}
+	}
+
+    SendPacket( &data );
+}
+
 void WorldSession::HandleSetActionBarTogglesOpcode(WorldPacket &recvPacket)
 {
 	uint8 cActionBarId;
