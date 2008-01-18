@@ -1994,6 +1994,7 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	else
 		dest.z = z;
 
+	dest.o = p_caster->GetOrientation();
 	p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), dest );
 #endif
 	// just in case
