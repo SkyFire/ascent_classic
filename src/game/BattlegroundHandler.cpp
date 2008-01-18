@@ -257,7 +257,7 @@ void WorldSession::HandleInspectArenaStatsOpcode( WorldPacket & recv_data )
 				data << team->m_stat_gamesplayedweek;		// games
 				data << team->m_stat_gameswonweek;			// wins
 				data << team->m_stat_gamesplayedseason;		// played (count of all games, that played...)
-				session->SendPacket( &data );
+				SendPacket( &data );
 
 			}
         }
