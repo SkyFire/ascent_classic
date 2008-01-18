@@ -16,19 +16,10 @@ Felhunter
 *Tainted Blood - no dmg reduction
 *Paranoia - doesn't destealths rogues or druids
 
-Destruction
-Blacklash - increases critical chance by 3% and has a 25% when dmged to have a Shadow bolt or Incinerate spell instant - nothing
-
 General
 -Should receive soul shard when pet is dismissed due to out of range or getting on windrider
--Temporary +spell damage buffs (trinkets, potions, etc) will only apply the +damage to DoT's while the effect is in place - Not when you start the spell cast. For example, say you used a trinket that gives +150 spell damage. You apply Corruption and Unstable Affliction. You gain the +150 spell damage bonus as normal - your Unstable Affliction and Corruption should gain around 25 damage a tick. Half way through the ticks, the trinket wears off. You will now LOSE that 25 damage a tick, even though the DoT was applied when you initiated the cast.
-
-Demonology Spells
--Soul Shatter: Doesn't reduce threat as it should.
 
 Talents - Affliction
--Night fall: does not proc (Any damage on target should give u a chance to reduce next shadowbolt cast by 100% as stated)
--Contagion: has no effect (+5% affliction corruption, curse of agony, seed of corruption damage. Also reduces chance of affliction spells from being reduced by 30%)
 -Shadow Mastery: for some reason only applies to rank 1 skills. Doesn't apply to drain spells. Only uses base spell damage, not total spell damage after +damage is taken into consideration.
 -Fel Concentration: somewhat works, proc rate for cast time reduction seems to be less than 75% at maximum lvl
 -Empowered corruption: does not add any damage to corruption as it should (+36% at maximum lvl)
@@ -48,7 +39,6 @@ Pets
 ///////////////////////////////////////////////////////////////////////////////
 
 Demonology Tree:
-Improved Imp - doesn't work
 Improved void walker - doesn't work
 Fel Intellect - only increases the warlock max mana but doesn't increase pets intellect
 Improved Succubus - can't test since succy spells proc on self seduction doesn't work, soothing kiss procs on self...
@@ -160,13 +150,11 @@ FELGUARD:
 Affliction talents and spells:
 
 IMPORTANT - Soul siphon doesn't work at all. Should increase amount drained by drain life by an additional 2/4% for each affliction effect up to maximum 24/60% (if you have max rank and 4 affliction debuffs on target, it would increase drain life spell by 16%. Whenever a debuff is applied, it increases by another 4% up to 60%).
-- Improved life tap - Works. just doesn't show up on the tooltip.
+- Improved life tap - does not work i think
 - Improved drain soul - doesn't work. should give 7/14% of mana back after killing something while draining soul.
 - Improved curse fo weakness - doesn't work. should increase curse of weakness effect by 10/20%
-- Nightfall - you can cast 3 instant shadowbolts lol.
 IMPORTANT - Siphon life - works but doesn't benefit from shadow damage so is useless.
 - Shadow embrace - actually it works, tested many many fights with same mob and advanced damage meter. will remove this line upon next update.
-- Contagion - does nothing.
 - Improved howl of terror - is instant but you still can cast it only when standing still.
 - Unstable affliction - works, but doesn't silence after dispelling, just the damage part.
 

@@ -9680,9 +9680,12 @@ void Player::EventSummonPet( Pet *new_pet )
 			spell->prepare(&targets);
 		}
 	}
+	//there are talents that stop working after you gain pet
 	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
 		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_ON_PET)
 			m_auras[x]->Remove();
+	//pet should inherit some of the talents from caster
+	//new_pet->InheritSMMods(); //not required yet. We cast full spell to have visual effect too
 }
 
 //if pet/charm died or whatever hapened we should call this function

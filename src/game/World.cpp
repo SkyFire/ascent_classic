@@ -4520,6 +4520,26 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
 
+	//warlock - Improved Imp
+	sp = dbcSpell.LookupEntryForced( 18694 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntryForced( 18695 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+	sp = dbcSpell.LookupEntryForced( 18696 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
+	}
+
 	//warlock - Master Demonologist - 25 spells here
 	sp = dbcSpell.LookupEntryForced( 23785 );
 	if( sp != NULL )

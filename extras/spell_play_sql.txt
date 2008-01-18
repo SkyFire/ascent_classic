@@ -8,6 +8,8 @@ where name like "%Improved Expose Armor%"
 #select id,name,description,school,SpellGroupType,SpellGroupType_high from dbc_spell where description like "%totem%";
 #select id,name,description,SpellGroupType,SpellGroupType_high from dbc_spell where SpellGroupType & 1048576;
 #select * from dbc_spell where id=3050;
+#select EffectImplicitTargetA_1,EffectImplicitTargetb_1,EffectImplicitTargetA_2,EffectImplicitTargetb_2,EffectImplicitTargetA_3,EffectImplicitTargetb_3 from dbc_spell 
+#where id=18694;
 #select * from dbc_spell where name like "stormstrike";
 #select id,name,description from dbc_spell where id=29206;
 

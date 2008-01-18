@@ -136,6 +136,7 @@ Zack - test my shit :
 - check when dismissing pet if auras are removed too
 - warlock - Cataclysm 17782
 - warlock - Intensity 18136
+- warlock - Improved Imp 18696
 
 ==========================================================================
 Capt - test my shit :
