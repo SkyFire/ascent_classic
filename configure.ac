@@ -266,6 +266,9 @@ AC_CONFIG_FILES([
    dep/src/pcre/Makefile
    dep/src/lua/Makefile
    dep/src/zlib/Makefile
+   extras/Makefile
+   extras/collision/Makefile
+   extras/collision/collision_dll/Makefile
 ])
 
 AC_OUTPUT
