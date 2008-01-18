@@ -142,6 +142,10 @@ int WorldSession::Update(uint32 InstanceID)
 			sLog.outError("[Session] Received out of range packet with opcode 0x%.4X", packet->GetOpcode());
 		else
 		{
+
+					sLog.outDebug("[Session] DEBUG %s (0x%.4X)",
+						LookupName(packet->GetOpcode(), g_worldOpcodeNames), packet->GetOpcode());
+
 			Handler = &WorldPacketHandlers[packet->GetOpcode()];
 			if(Handler->status == STATUS_LOGGEDIN && !_player && Handler->handler != 0)
 			{
