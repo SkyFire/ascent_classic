@@ -6690,6 +6690,7 @@ bool World::SetInitialWorldSettings()
 
 	uint32 talent_max_rank;
 	uint32 talent_pos;
+	uint32 talent_class;
 
     for( uint32 i = 1; i < dbcTalent.GetNumRows(); ++i )
     {
@@ -6723,7 +6724,7 @@ bool World::SetInitialWorldSettings()
 
 		talent_pos = 0;
         
-		for( uint32 talent_class = 0; talent_class < 12; ++talent_class )
+		for( talent_class = 0; talent_class < 12; ++talent_class )
 		{
 			if( tab_info->ClassMask & ( 1 << talent_class ) )
 				break;
