@@ -1492,13 +1492,13 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 	
     if( _player == NULL )
 	{
-		sLog.outError( "HandleInspectOpcode : _player was null" );
+		sLog.outError( "HandleInspectOpcode: _player was null" );
 		return;
 	}
 
 	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
 	{
-		sLog.outError( "HandleInspectOpcode : guid was null" );
+		sLog.outError( "HandleInspectOpcode: guid was null" );
 		return;
 	}
 
@@ -1512,13 +1512,11 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 	uint32 talent_max_rank;
 	uint32 talent_tab_id;
 	uint32 talent_index;
+	uint32 page_talent_rank_index;
 	uint32 rank_index;
 	uint32 rank_slot;
 	uint32 rank_offset;
-	uint32 rank_index_boundary;
-	uint32 rank_slot_boundary;
-	uint32 rank_offset_boundary;
-	uint32 last_mask;
+	uint32 mask;
 
     for( uint32 i = 0; i < talent_points; ++i )
         data << uint8( 0 );
@@ -1539,7 +1537,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			talent_max_rank = 0;
 			for( uint32 k = 5; k > 0; --k )
 			{
-				if( talent_info->RankID[k - 1] && _player->GetMapMgr()->GetPlayer( (uint32)guid )->HasSpell( talent_info->RankID[k - 1]) )
+				if( _player->GetMapMgr()->GetPlayer( (uint32)guid )->HasSpell( talent_info->RankID[k - 1] ) && talent_info->RankID[k - 1] )
 				{
 					talent_max_rank = k;
 					break;
@@ -1556,15 +1554,16 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			if( itr != sWorld.InspectTalentTabPos.end() )
 				talent_index += itr->second;
 
-			rank_index = talent_index + talent_max_rank - 1;
-			rank_slot = rank_index / 7;
-			rank_offset = rank_index % 7;
-			rank_index_boundary = rank_slot * 8 + rank_offset;
-			rank_slot_boundary = rank_index_boundary / 8;
-			rank_offset_boundary = rank_index_boundary % 8;
-			last_mask = data.read< uint8 >( 4 + rank_slot_boundary );
-			last_mask |= ( 1 << rank_offset_boundary );
-			data.put< uint8 >( 4 + rank_slot_boundary, last_mask & 0xFF );
+			page_talent_rank_index = talent_index + talent_max_rank - 1;
+			rank_index = ( page_talent_rank_index / 7 ) * 8 + ( page_talent_rank_index % 7 );
+			rank_slot = rank_index / 8;
+			rank_offset = rank_index % 8;
+			mask = 1 << rank_offset;
+			data.put< uint8 >( 4 + rank_slot, mask & 0xFF );
+
+			sLog.outDebug(
+				"HandleInspectOpcode: page_talent_rank_index(%i) rank_index(%i) rank_slot(%i) rank_offset(%i)",
+				page_talent_rank_index, rank_index, rank_slot, rank_offset );
 		}
 
 		std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabSize.find( talent_tab_id );

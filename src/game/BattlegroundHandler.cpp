@@ -193,13 +193,19 @@ void WorldSession::HandleInspectHonorStatsOpcode( WorldPacket &recv_data )
     uint64 guid;
     recv_data >> guid;
 
-    Player *player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
+  	if( _player == NULL )
+	{
+		sLog.outError( "HandleInspectHonorStatsOpcode : _player was null" );
+		return;
+	}
 
-    if( player == NULL )
-    {
-        sLog.outError("InspectHonorStats: player is null");
-        return;
-    }
+	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
+	{
+		sLog.outError( "HandleInspectHonorStatsOpcode : guid was null" );
+		return;
+	}
+
+    Player* player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
 
     WorldPacket data( MSG_INSPECT_HONOR_STATS, 13 );
 
@@ -211,6 +217,53 @@ void WorldSession::HandleInspectHonorStatsOpcode( WorldPacket &recv_data )
 
     SendPacket( &data );
 }
+
+void WorldSession::HandleInspectArenaStatsOpcode( WorldPacket & recv_data )
+{
+    CHECK_PACKET_SIZE( recv_data, 8 );
+
+    uint64 guid;
+    recv_data >> guid;
+
+  	if( _player == NULL )
+	{
+		sLog.outError( "HandleInspectHonorStatsOpcode : _player was null" );
+		return;
+	}
+
+	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
+	{
+		sLog.outError( "HandleInspectHonorStatsOpcode : guid was null" );
+		return;
+	}
+
+    Player* player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
+
+	uint32 id;
+
+    for( uint8 i = 0; i < 3; i++ )
+    {
+		id = player->GetUInt32Value( PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + ( i * 6 ) );
+        if( id > 0 )
+        {
+            ArenaTeam* team = objmgr.GetArenaTeamById( id );
+            if( team != NULL )
+			{
+				WorldPacket data( MSG_INSPECT_ARENA_STATS, 8 + 1 + 4 * 5 );
+				data << player->GetGUID();					// player guid
+				data << team->m_type;						// slot (0...2)
+				data << team->m_id;							// arena team id
+				data << team->m_stat_rating;				// rating
+				data << team->m_stat_gamesplayedweek;		// games
+				data << team->m_stat_gameswonweek;			// wins
+				data << team->m_stat_gamesplayedseason;		// played (count of all games, that played...)
+				session->SendPacket( &data );
+
+			}
+        }
+    }
+}
+
 
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket &recv_data)
 {

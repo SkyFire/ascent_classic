@@ -872,6 +872,7 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_ARENA_TEAM_REMOVE_PLAYER].handler = &WorldSession::HandleArenaTeamRemoveMemberOpcode;
 	WorldPacketHandlers[CMSG_ARENA_TEAM_DISBAND].handler = &WorldSession::HandleArenaTeamDisbandOpcode;
 	WorldPacketHandlers[CMSG_ARENA_TEAM_PROMOTE].handler = &WorldSession::HandleArenaTeamPromoteOpcode;
+	WorldPacketHandlers[MSG_INSPECT_ARENA_STATS].handler = &WorldSession::HandleInspectArenaStatsOpcode;
 
 #ifdef CLUSTERING
 	WorldPacketHandlers[CMSG_PING].handler = &WorldSession::HandlePingOpcode;

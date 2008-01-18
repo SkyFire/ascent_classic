@@ -643,6 +643,7 @@ protected:
 	void HandleArenaTeamPromoteOpcode(WorldPacket & recv_data);
 	void HandleArenaTeamQueryOpcode(WorldPacket & recv_data);
 	void HandleArenaTeamRosterOpcode(WorldPacket & recv_data);
+	void HandleInspectArenaStatsOpcode(WorldPacket & recv_data);
 
 	void HandleTeleportCheatOpcode(WorldPacket & recv_data);
 	void HandleTeleportToUnitOpcode(WorldPacket & recv_data);
