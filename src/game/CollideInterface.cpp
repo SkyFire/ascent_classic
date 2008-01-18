@@ -144,8 +144,8 @@ bool CCollideInterface::IsIndoor(uint32 mapId, LocationVector * pos)
 {
 	bool r;
 	COLLISION_BEGINTIMER;
-	printf("[%u ns] IsIndoor Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos->x, pos->y, pos->z);
 	r = collision_check_indoor(mapId, pos);
+	printf("[%u ns] IsIndoor Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos->x, pos->y, pos->z);
 	return r;
 }
 
@@ -153,8 +153,8 @@ bool CCollideInterface::IsIndoorMod(uint32 mapId, LocationVector * pos)
 {
 	bool r;
 	COLLISION_BEGINTIMER;
-	printf("[%u ns] IsIndoorMod Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos->x, pos->y, pos->z);
 	r = collision_check_indoor_mod(mapId, pos);
+	printf("[%u ns] IsIndoorMod Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos->x, pos->y, pos->z);
 	return r;
 }
 
@@ -162,8 +162,8 @@ bool CCollideInterface::IsIndoor(uint32 mapId, float x, float y, float z)
 {
 	bool r;
 	COLLISION_BEGINTIMER;
-	printf("[%u ns] IsIndoor Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x, y, z);
 	r = collision_check_indoor(mapId, x, y, z);
+	printf("[%u ns] IsIndoor Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x, y, z);
 	return r;
 }
 
@@ -171,8 +171,8 @@ bool CCollideInterface::CheckLOS(uint32 mapId, LocationVector * pos1, LocationVe
 {
 	bool r;
 	COLLISION_BEGINTIMER;
-	printf("[%u ns] CheckLOS Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos1->x, pos1->y, pos1->z, pos2->x, pos2->y, pos2->z);
 	r = collision_check_los(mapId, pos1, pos2);
+	printf("[%u ns] CheckLOS Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos1->x, pos1->y, pos1->z, pos2->x, pos2->y, pos2->z);
 	return r;
 }
 
@@ -180,8 +180,8 @@ bool CCollideInterface::CheckLOSMod(uint32 mapId, LocationVector * pos1, Locatio
 {
 	bool r;
 	COLLISION_BEGINTIMER;
-	printf("[%u ns] CheckLOSMod Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos1->x, pos1->y, pos1->z, pos2->x, pos2->y, pos2->z);
 	r = collision_check_losmod(mapId, pos1, pos2);
+	printf("[%u ns] CheckLOSMod Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos1->x, pos1->y, pos1->z, pos2->x, pos2->y, pos2->z);
 	return r;
 }
 
@@ -189,8 +189,8 @@ bool CCollideInterface::CheckLOS(uint32 mapId, float x1, float y1, float z1, flo
 {
 	bool r;
 	COLLISION_BEGINTIMER;
-	printf("[%u ns] CheckLOS Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x1, y1, z1, x2, y2, z2);
 	r = collision_check_los(mapId, x1, y1, z1, x2, y2, z2);
+	printf("[%u ns] CheckLOS Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x1, y1, z1, x2, y2, z2);
 	return r;
 }
 
@@ -198,8 +198,8 @@ bool CCollideInterface::GetFirstPoint(uint32 mapId, LocationVector * pos1, Locat
 {
 	bool r;
 	COLLISION_BEGINTIMER;
-	printf("[%u ns] GetFirstPoint Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos1->x, pos1->y, pos1->z, pos2->x, pos2->y, pos2->z);
 	r = collision_get_first_object_point(mapId, pos1, pos2, outvec, distmod);
+	printf("[%u ns] GetFirstPoint Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos1->x, pos1->y, pos1->z, pos2->x, pos2->y, pos2->z);
 	return r;
 }
 
@@ -207,8 +207,8 @@ bool CCollideInterface::GetFirstPoint(uint32 mapId, float x1, float y1, float z1
 {
 	bool r;
 	COLLISION_BEGINTIMER;
-	printf("[%u ns] GetFirstPoint Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x1, y1, z1, x2, y2, z2);
 	r = collision_get_first_object_point(mapId, x1, y1, z1, x2, y2, z2, outx, outy, outz, distmod);
+	printf("[%u ns] GetFirstPoint Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x1, y1, z1, x2, y2, z2);
 	return r;
 }
 
