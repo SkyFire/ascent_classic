@@ -397,11 +397,8 @@ struct TalentTabEntry
 	//unit32  unk18
 	//unit32  unk19
 	//unit32  unk20
-	uint32	a;
-	uint32	b;
     uint32	ClassMask;
     uint32	TabPage;
-	uint32	c;
     //char*	InternalName;
 };
 
