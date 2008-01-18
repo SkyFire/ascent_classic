@@ -1483,6 +1483,8 @@ void WorldSession::HandlePlayedTimeOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 {
+	sLog.outDebug("Received CMSG_INSPECT %i", recv_data.size() );
+
 	CHECK_PACKET_SIZE( recv_data, 8 );
 
 	uint64 guid;
