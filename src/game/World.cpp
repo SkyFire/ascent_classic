@@ -6725,7 +6725,7 @@ bool World::SetInitialWorldSettings()
         
 		for( uint32 talent_class = 0; talent_class < 12; ++talent_class )
 		{
-			if( tab_info->ClassMask & ( 1 << talent_class )
+			if( tab_info->ClassMask & ( 1 << talent_class ) )
 				break;
 		}
 
