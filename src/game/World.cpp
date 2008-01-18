@@ -4560,6 +4560,26 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 	}
 
+	//warlock - Fel Intellect
+	sp = dbcSpell.LookupEntryForced( 18731 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
+	}
+	sp = dbcSpell.LookupEntryForced( 18743 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
+	}
+	sp = dbcSpell.LookupEntryForced( 18744 );
+	if( sp != NULL )
+	{
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_ON_PET ;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_MOD_PERCENT_STAT;
+	}
+
 	//warlock - Master Demonologist - 25 spells here
 	sp = dbcSpell.LookupEntryForced( 23785 );
 	if( sp != NULL )
