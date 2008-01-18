@@ -192,3 +192,6 @@ IMPORTANT - soul link. doesn't work. when the buff is active 20% of damage taken
 Destruction:
 - pyroclasm - stuns self.
 - shadowfury - can be cast while moving due to lag 
+
+
+- when infernal dies, server crashes

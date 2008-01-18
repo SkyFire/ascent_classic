@@ -133,6 +133,7 @@ Zack - test my shit :
 - warlock - Improved Healthstone 18693 ->check for conjured items when traded
 - warlock - Demonic Sacrifice 18788
 - warlock - Master Demonologist 23825
+- check when dismissing pet if auras are removed too
 
 ==========================================================================
 Capt - test my shit :
