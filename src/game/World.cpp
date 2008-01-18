@@ -4456,6 +4456,24 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
 	}
 
+	//warlock - Intensity 
+	sp = dbcSpell.LookupEntryForced( 18135 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+	}
+	sp = dbcSpell.LookupEntryForced( 18136 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
+		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+	}
+
 	//warlock - Suppression
 	sp = dbcSpell.LookupEntryForced( 18174 );
 	if( sp != NULL )

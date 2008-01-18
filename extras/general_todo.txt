@@ -135,6 +135,7 @@ Zack - test my shit :
 - warlock - Master Demonologist 23825
 - check when dismissing pet if auras are removed too
 - warlock - Cataclysm 17782
+- warlock - Intensity 18136
 
 ==========================================================================
 Capt - test my shit :
