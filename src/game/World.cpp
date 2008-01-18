@@ -6692,9 +6692,9 @@ bool World::SetInitialWorldSettings()
 	uint32 talent_pos;
 	uint32 talent_class;
 
-    for( uint32 i = 1; i < dbcTalent.GetNumRows(); ++i )
+    for( uint32 i = 0; i < dbcTalent.GetNumRows(); ++i )
     {
-        TalentEntry const* talent_info = dbcTalent.LookupEntry( i );
+        TalentEntry const* talent_info = dbcTalent.LookupRow( i );
 		if( talent_info == NULL )
 			continue;
 
