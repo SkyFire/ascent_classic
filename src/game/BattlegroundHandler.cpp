@@ -188,11 +188,27 @@ void WorldSession::HandleArenaJoinOpcode(WorldPacket &recv_data)
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket &recv_data)
 {
-	/* This belongs in HonorHandler. :P
-	 * - Burlex
-	 */
+    CHECK_PACKET_SIZE(recv_data,8);
 
-	sLog.outString("Received MSG_INSPECT_HONOR_STATS");
+    uint64 guid;
+    recv_data >> guid;
+
+    Player *player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
+
+    if( player == NULL )
+    {
+        sLog.outError("InspectHonorStats: player is null");
+        return;
+    }
+
+    WorldPacket data( MSG_INSPECT_HONOR_STATS, 13 );
+    data << player->GetGUID();
+    data << (uint8)player->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY);
+    data << player->GetUInt32Value(PLAYER_FIELD_KILLS);
+    data << player->GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION);
+    data << player->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
+    data << player->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS);
+    SendPacket(&data);
 }
 
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket &recv_data)
