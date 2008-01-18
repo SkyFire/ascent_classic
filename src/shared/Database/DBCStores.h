@@ -378,10 +378,17 @@ struct TalentEntry
 struct TalentTabEntry
 {
     uint32	TalentTabID;
-    char*	Name[16];
-    uint32	NameFlags; 
-    uint32	SpellIcon;
+    char*	Name;
 	//unit32  unk
+	//unit32  unk1
+	//unit32  unk2
+	//unit32  unk3
+	//unit32  unk4
+	//unit32  unk5
+	//unit32  unk6
+	//unit32  unk7
+	//unit32  unk8
+	//unit32  unk9
     uint32	ClassMask;
     uint32	TabPage;
     char*	InternalName;
