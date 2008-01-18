@@ -378,7 +378,7 @@ struct TalentEntry
 struct TalentTabEntry
 {
     uint32	TalentTabID;
-    char*	Name;
+    //char*	Name;
 	//unit32  unk3
 	//unit32  unk4
 	//unit32  unk5
@@ -391,7 +391,7 @@ struct TalentTabEntry
 	//unit32  unk12
 	//unit32  unk13
 	//unit32  unk14
-    char*	InternalName;
+    //char*	InternalName;
 	//unit32  unk16
 	//unit32  unk17
 	//unit32  unk18
