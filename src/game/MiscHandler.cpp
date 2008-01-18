@@ -1483,26 +1483,22 @@ void WorldSession::HandlePlayedTimeOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 {
-	sLog.outError("Received CMSG_INSPECT %i", recv_data.size() );
-
 	CHECK_PACKET_SIZE( recv_data, 8 );
 
 	uint64 guid;
 	uint32 talent_points = 0x0000003D;
-  
-	sLog.outError("Received CMSG_INSPECT");
 
 	recv_data >> guid;
 	
     if( _player == NULL )
 	{
-		sLog.outError("HandleInspectOpcode : _player was null");
+		sLog.outError( "HandleInspectOpcode : _player was null" );
 		return;
 	}
 
 	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
 	{
-		sLog.outError("HandleInspectOpcode : guid was %i", (uint32)guid );
+		sLog.outError( "HandleInspectOpcode : guid was null" );
 		return;
 	}
 
@@ -1512,8 +1508,8 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 
     data << uint32( talent_points );
 
-    for( uint32 i = 0; i < talent_points; ++i )
-        data << uint8( 0 );
+    //for( uint32 i = 0; i < talent_points; ++i )
+    //   data << uint8( 0 );
 
 	uint32 talent_tab_pos = 0;
 	uint32 talent_max_rank;
