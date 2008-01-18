@@ -48,7 +48,7 @@ namespace VMAP
             {
 
                 // Integer representation of a floating-point value.
-            #define IR(x)   ((uint32&)x)
+            #define IR(x)   ((G3D::uint32&)x)
 
                 Inside = true;
                 const Vector3& MinB = box.low();

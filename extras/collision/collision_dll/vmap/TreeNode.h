@@ -19,8 +19,8 @@
 #ifndef _TREENODE_H
 #define _TREENODE_H
 
-#include "ShortVector.h"
-#include "ShortBox.h"
+//#include "ShortVector.h"
+//#include "ShortBox.h"
 
 #include <G3D/Vector3.h>
 #include <G3D/AABox.h>

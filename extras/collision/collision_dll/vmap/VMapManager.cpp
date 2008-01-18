@@ -66,7 +66,7 @@ namespace VMAP
 
     VMapManager::~VMapManager(void)
     {
-		for(uint32 i = 0; i < MAX_MAPS; ++i)
+		for(unsigned int i = 0; i < MAX_MAPS; ++i)
 		{
 			if( m_maps[i] != NULL )
 				delete m_maps[i];

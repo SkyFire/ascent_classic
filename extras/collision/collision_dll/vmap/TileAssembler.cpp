@@ -395,12 +395,12 @@ namespace VMAP
                             fclose(rf);
                             return(false);
                         }
-                        uint32 groups;
+                        unsigned int groups;
                         char blockId[5];
                         blockId[4] = 0;
                         int blocksize;
 
-                        if(fread(&groups, sizeof(uint32), 1, rf) != 1) { fclose(rf); return(false); }
+                        if(fread(&groups, sizeof(unsigned int), 1, rf) != 1) { fclose(rf); return(false); }
 
                         for(int g=0;g<(int)groups;g++)
                         {
@@ -410,19 +410,19 @@ namespace VMAP
 
                             AABSPTree<Triangle> *gtree = new AABSPTree<Triangle>();
 
-                            uint32 flags;
-                            if(fread(&flags, sizeof(uint32), 1, rf) != 1) { fclose(rf); return(false); }
+                            unsigned int flags;
+                            if(fread(&flags, sizeof(unsigned int), 1, rf) != 1) { fclose(rf); return(false); }
 
-                            uint32 branches;
+                            unsigned int branches;
                             if(fread(&blockId, 4, 1, rf) != 1) { fclose(rf); return(false); }
                             if(strcmp(blockId, "GRP ") != 0) { fclose(rf); return(false); }
                             if(fread(&blocksize, sizeof(int), 1, rf) != 1) { fclose(rf); return(false); }
-                            if(fread(&branches, sizeof(uint32), 1, rf) != 1) { fclose(rf); return(false); }
+                            if(fread(&branches, sizeof(unsigned int), 1, rf) != 1) { fclose(rf); return(false); }
                             for(int b=0;b<(int)branches; b++)
                             {
-                                uint32 indexes;
+                                unsigned int indexes;
                                 // indexes for each branch (not used jet)
-                                if(fread(&indexes, sizeof(uint32), 1, rf) != 1) { fclose(rf); return(false); }
+                                if(fread(&indexes, sizeof(unsigned int), 1, rf) != 1) { fclose(rf); return(false); }
                             }
 
                             // ---- indexes
@@ -430,7 +430,7 @@ namespace VMAP
                             if(strcmp(blockId, "INDX") != 0) { fclose(rf); return(false); }
                             if(fread(&blocksize, sizeof(int), 1, rf) != 1) { fclose(rf); return(false); }
                             unsigned int nindexes;
-                            if(fread(&nindexes, sizeof(uint32), 1, rf) != 1) { fclose(rf); return(false); }
+                            if(fread(&nindexes, sizeof(unsigned int), 1, rf) != 1) { fclose(rf); return(false); }
                             if(nindexes >0)
                             {
                                 unsigned short *indexarray = new unsigned short[nindexes*sizeof(unsigned short)];
