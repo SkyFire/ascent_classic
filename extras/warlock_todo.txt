@@ -39,9 +39,7 @@ Pets
 ///////////////////////////////////////////////////////////////////////////////
 
 Demonology Tree:
-Unholy Power - doens't work (seems an talent that affects pet attributes don't work.)
 Mana Feed - doesn't work
-Master Demonologist - doesn't work
 Demonic Resilience - doesn't work
 Demonic Tactics
 

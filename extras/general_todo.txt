@@ -141,6 +141,7 @@ Zack - test my shit :
 - warlock - Fel Intellect 18744
 - warlock - Improved Succubus 18756
 - warlock - Fel Stamina 18750
+- warlock - Unholy Power 18773
 
 ==========================================================================
 Capt - test my shit :
