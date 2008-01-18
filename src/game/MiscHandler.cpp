@@ -1525,12 +1525,12 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 		{
 			TalentEntry const* talent_info = dbcTalent.LookupRow( j );
 
-			sLog.outDebug( "HandleInspectOpcode: i(%i) j(%i)", i, j );
+			//sLog.outDebug( "HandleInspectOpcode: i(%i) j(%i)", i, j );
 
 			if( talent_info == NULL )
 				continue;
 
-			sLog.outDebug( "HandleInspectOpcode: talent_info->TalentTree(%i) talent_tab_id(%i)", talent_info->TalentTree, talent_tab_id );
+			//sLog.outDebug( "HandleInspectOpcode: talent_info->TalentTree(%i) talent_tab_id(%i)", talent_info->TalentTree, talent_tab_id );
 
 			if( talent_info->TalentTree != talent_tab_id )
 				continue;
@@ -1546,7 +1546,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 				}
 			}
 
-			sLog.outDebug( "HandleInspectOpcode: talent_max_rank(%i)", talent_max_rank );
+			//sLog.outDebug( "HandleInspectOpcode: talent_max_rank(%i)", talent_max_rank );
 
 			if( talent_max_rank <= 0 )
 				continue;
