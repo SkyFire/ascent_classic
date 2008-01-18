@@ -21,7 +21,7 @@
 #define __SPELL_H
 
 #include "SpellFailure.h"
-#include "stdafx.h"
+#include "StdAfx.h"
 
 class WorldSession;
 class Unit;

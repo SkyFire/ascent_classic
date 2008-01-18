@@ -59,7 +59,7 @@ Unholy Power - doens't work (seems an talent that affects pet attributes don't w
 Mana Feed - doesn't work
 Master Demonologist - doesn't work
 Demonic Resilience - doesn't work
-Soul Link - skill doesn't work
+Demonic Tactics
 
 Destruction Tree:
 

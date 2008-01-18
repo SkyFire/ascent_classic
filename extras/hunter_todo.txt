@@ -26,6 +26,7 @@ Adds to Beast Mastery:
 
 Unleashed Fury - Broken. Does not increase pet damage.
 Improved Aspect of the Hawk - It procs and shows the buff icon but there's no speed increase at all.
+Bestial Discipline
 
 Skills:
 
