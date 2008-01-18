@@ -1553,7 +1553,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 
 			talent_index = talent_tab_pos;
 
-			std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabPos.find( j );
+			std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabPos.find( talent_info->TalentID );
 
 			if( itr != sWorld.InspectTalentTabPos.end() )
 				talent_index += itr->second;
