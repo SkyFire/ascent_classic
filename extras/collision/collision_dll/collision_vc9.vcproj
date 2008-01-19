@@ -404,14 +404,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vmap\DebugCmdLogger.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\vmap\DebugCmdLogger.h"
-				>
-			</File>
-			<File
 				RelativePath=".\vmap\IVMapManager.h"
 				>
 			</File>
