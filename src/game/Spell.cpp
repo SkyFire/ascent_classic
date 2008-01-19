@@ -988,7 +988,6 @@ void Spell::prepare( SpellCastTargets * targets )
 	//if( p_caster != NULL )
 	//   m_castTime -= 100;	  // session update time
 
-	SendSpellStart();
 
 	if( !m_triggeredSpell && p_caster != NULL && p_caster->CooldownCheat )
 		p_caster->ClearCooldownForSpell( m_spellInfo->Id );
@@ -1031,6 +1030,8 @@ void Spell::prepare( SpellCastTargets * targets )
 	}
 	else
 	{
+		SendSpellStart();
+
 		// start cooldown handler
 		if( p_caster != NULL && p_caster->CastTimeCheat && !m_triggeredSpell )
 		{
@@ -2577,7 +2578,12 @@ uint8 Spell::CanCast(bool tolerate)
 	if( p_caster != NULL )
 	{
 #ifdef COLLISION
-		if( m_spellInfo->Attributes & ATTRIBUTES_ONLY_OUTDOORS )
+		if (m_spellInfo->MechanicsType == MECHANIC_MOUNTED)
+		{
+			if (CollideInterface.IsIndoor( p_caster->GetMapId(), p_caster->GetPositionNC() ))
+				return SPELL_FAILED_NO_MOUNTS_ALLOWED;
+		}
+		else if( m_spellInfo->Attributes & ATTRIBUTES_ONLY_OUTDOORS )
 		{
 			if( !CollideInterface.IsOutdoor( p_caster->GetMapId(), p_caster->GetPositionNC() ) )
 				return SPELL_FAILED_ONLY_OUTDOORS;
@@ -2966,6 +2972,12 @@ uint8 Spell::CanCast(bool tolerate)
 				if( !IsInrange( m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), target, ( ( maxRange + 2.52f ) * ( maxRange + 2.52f ) ) ) )
 					return SPELL_FAILED_OUT_OF_RANGE;
 			}
+
+#ifdef COLLISION
+			if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
+				return SPELL_FAILED_LINE_OF_SIGHT;
+#endif
+
 
 			if( p_caster != NULL )
 			{

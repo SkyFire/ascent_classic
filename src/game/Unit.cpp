@@ -747,6 +747,13 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							if (!this->IsPlayer() || static_cast<Player*>(this)->GetShapeShift() != FORM_CAT)
 								continue;
 						}break;
+                        case 34754: //holy concentration
+                        {
+                            if (!CastingSpell)
+								continue;
+							if (!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
+								continue;
+						}break;
 						case 5530:
 						{
 							//warrior/rogue mace specialization can trigger only when using maces

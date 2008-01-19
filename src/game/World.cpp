@@ -2528,6 +2528,23 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 64 | 32;	//Sprint + Evasion
 
+     //priest - Holy Concentration
+     sp = dbcSpell.LookupEntryForced( 34753 );
+     if (sp != NULL)
+          sp->procFlags = PROC_ON_CAST_SPELL;
+     sp = dbcSpell.LookupEntryForced( 34859 );
+     if (sp != NULL)
+	     sp->procFlags = PROC_ON_CAST_SPELL;
+     sp = dbcSpell.LookupEntryForced( 34860 );
+     if (sp != NULL)
+          sp->procFlags = PROC_ON_CAST_SPELL;
+     sp = dbcSpell.LookupEntryForced( 34754 );
+     if (sp != NULL)
+     {
+          sp->EffectSpellGroupRelation[0] = 2048 | 4096;
+          sp->EffectSpellGroupRelation_high[0] = 4;
+     }
+
 	//priest - Focused Mind 
 	sp = dbcSpell.LookupEntryForced( 33213 ); 
 	if( sp != NULL )
