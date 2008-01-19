@@ -112,7 +112,8 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 	};
 
 	player_item items[20];
-	uint32 slot;
+	int8 slot;
+	int8 containerslot;
 	uint32 i;
 	ItemPrototype * proto;
 	QueryResult * res;
@@ -201,21 +202,25 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			else
 				data << uint32(0) << uint32(0) << uint32(0);
 
-			res = CharacterDatabase.Query("SELECT slot, entry FROM playeritems WHERE ownerguid=%u and containerslot=-1 and slot < 19 and slot >= 0", GUID_LOPART(guid));
+			res = CharacterDatabase.Query("SELECT containerslot, slot, entry FROM playeritems WHERE ownerguid=%u", GUID_LOPART(guid));
 
 			memset(items, 0, sizeof(player_item) * 20);
 			if(res)
 			{
 				do 
 				{
-					proto = ItemPrototypeStorage.LookupEntry(res->Fetch()[1].GetUInt32());
-					if(proto)
+					containerslot = res->Fetch()[0].GetInt8();
+					slot = res->Fetch()[1].GetInt8();
+					if( containerslot == -1 && slot < 19 && slot >= 0 )
 					{
-						// slot0 = head, slot14 = cloak
-						slot = res->Fetch()[0].GetUInt32();
-						if(!(slot == 0 && (flags & (uint32)PLAYER_FLAG_NOHELM) != 0) && !(slot == 14 && (flags & (uint32)PLAYER_FLAG_NOCLOAK) != 0)) {
-							items[slot].displayid = proto->DisplayInfoID;
-							items[slot].invtype = proto->InventoryType;
+						proto = ItemPrototypeStorage.LookupEntry(res->Fetch()[2].GetUInt32());
+						if(proto)
+						{
+							// slot0 = head, slot14 = cloak
+							if(!(slot == 0 && (flags & (uint32)PLAYER_FLAG_NOHELM) != 0) && !(slot == 14 && (flags & (uint32)PLAYER_FLAG_NOCLOAK) != 0)) {
+								items[slot].displayid = proto->DisplayInfoID;
+								items[slot].invtype = proto->InventoryType;
+							}
 						}
 					}
 				} while(res->NextRow());
