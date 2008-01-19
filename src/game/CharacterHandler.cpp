@@ -483,7 +483,7 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 		fail = 0x3B;
 	} else {
 
-		QueryResult * result = CharacterDatabase.Query("SELECT name FROM characters WHERE guid = %u", (uint32)guid);
+		QueryResult * result = CharacterDatabase.Query("SELECT name FROM characters WHERE guid = %u AND acct = %u", (uint32)guid, _accountId);
 		PlayerInfo * inf = objmgr.GetPlayerInfo((uint32)guid);
 		if(!result || !inf)
 			return;
