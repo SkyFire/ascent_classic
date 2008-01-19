@@ -751,7 +751,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
                         {
                             if (!CastingSpell)
 								continue;
-							if (!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
+							if (CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL &&
+								CastingSpell->NameHash != SPELL_HASH_BINDING_HEAL &&
+								CastingSpell->NameHash != SPELL_HASH_GREATER_HEAL)
 								continue;
 						}break;
 						case 5530:

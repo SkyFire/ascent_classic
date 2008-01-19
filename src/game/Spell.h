@@ -1070,6 +1070,7 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         case SPELL_EFFECT_HEALTH_FUNNEL:
         case SPELL_EFFECT_HEAL_MAX_HEALTH:
             return true;
+		default: break;
     }
     switch( sp->Effect[1] )
     {
@@ -1078,6 +1079,7 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         case SPELL_EFFECT_HEALTH_FUNNEL:
         case SPELL_EFFECT_HEAL_MAX_HEALTH:
             return true;
+		default: break;
     }
     switch( sp->Effect[2] )
     {
@@ -1086,6 +1088,7 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         case SPELL_EFFECT_HEALTH_FUNNEL:
         case SPELL_EFFECT_HEAL_MAX_HEALTH:
             return true;
+		default: break;
     }
     if( sp->Effect[0] == SPELL_EFFECT_APPLY_AURA ||
 		sp->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA )
@@ -1093,9 +1096,9 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         switch( sp->EffectApplyAuraName[0] )
         {
             case 8://SPELL_AURA_PERIODIC_HEAL:
-            case 34://SPELL_AURA_MOD_INCREASE_HEALTH:
             case 62://SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
                 return true;
+			default: break;
         }
     }
     if( sp->Effect[1] == SPELL_EFFECT_APPLY_AURA ||
@@ -1104,9 +1107,9 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         switch (sp->EffectApplyAuraName[1])
         {
             case 8://SPELL_AURA_PERIODIC_HEAL:
-            case 34://SPELL_AURA_MOD_INCREASE_HEALTH:
             case 62://SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
                 return true;
+			default: break;
         }
     }
     if( sp->Effect[2] == SPELL_EFFECT_APPLY_AURA ||
@@ -1115,17 +1118,13 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
         switch( sp->EffectApplyAuraName[2] )
         {
             case 8://SPELL_AURA_PERIODIC_HEAL:
-            case 34://SPELL_AURA_MOD_INCREASE_HEALTH:
             case 62://SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
                 return true;
+			default: break;
         }
     }
-	//holy light uses scripted effect which is not neceserally heal spell
-	if( sp->NameHash == SPELL_HASH_HOLY_LIGHT )
-		return true;
-
-	//flash of light uses scripted effect which is not neceserally heal spell
-	if( sp->NameHash == SPELL_HASH_FLASH_OF_LIGHT )
+	//flash of light, holy light uses scripted effect which is not neceserally heal spell
+	if( sp->NameHash == SPELL_HASH_HOLY_LIGHT || sp->NameHash == SPELL_HASH_FLASH_OF_LIGHT  )
 		return true;
 	
     return false;

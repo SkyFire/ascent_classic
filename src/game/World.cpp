@@ -2541,7 +2541,7 @@ bool World::SetInitialWorldSettings()
      sp = dbcSpell.LookupEntryForced( 34754 );
      if (sp != NULL)
      {
-          sp->EffectSpellGroupRelation[0] = 2048 | 4096;
+          //sp->EffectSpellGroupRelation[0] = 2048 | 4096;
           sp->EffectSpellGroupRelation_high[0] = 4;
      }
 
