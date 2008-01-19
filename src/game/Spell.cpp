@@ -2974,8 +2974,8 @@ uint8 Spell::CanCast(bool tolerate)
 			}
 
 #ifdef COLLISION
-			if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
-				return SPELL_FAILED_LINE_OF_SIGHT;
+			//if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
+			//	return SPELL_FAILED_LINE_OF_SIGHT;
 #endif
 
 
