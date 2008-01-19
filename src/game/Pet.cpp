@@ -139,7 +139,6 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 			m_name = "Water Elemental";
 		else
 			m_name = sWorld.GenerateName();
-		ApplyDemonTalents();
 
 	} else {
 		SetUInt32Value(UNIT_FIELD_BYTES_0, 2048 | (0 << 24));
@@ -169,7 +168,6 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 
 		// create our spellz
 		SetDefaultSpells();
-		ApplyBeastTalents();
 	}
 
 	// Apply stats.
@@ -248,8 +246,6 @@ void Pet::Update(uint32 time)
 		return;
 
 	Creature::Update(time); // passthrough
-	this->m_base_runSpeed = this->m_runSpeed = m_Owner->m_runSpeed; //should be able to keep up with master
-	this->m_base_walkSpeed = this->m_walkSpeed = m_Owner->m_runSpeed; //should be able to keep up with master
 
 	if(bHasLoyalty && !bExpires)
 	{
@@ -350,265 +346,6 @@ void Pet::SendNullSpellsToOwner()
 	data.SetOpcode(SMSG_PET_SPELLS);
 	data << uint64(0);
 	m_Owner->GetSession()->SendPacket(&data);
-}
-
-//Implementation of some beast mastery talents to pet
-void Pet::ApplyBeastTalents()
-{
-	InheritSMMods(m_Owner);
-	Aura *pAura;
-	SpellEntry *sp;
-	int val;
-	
-	RemoveAura( 8875 );
-	RemoveAura( 19580 );
-	RemoveAura( 19581 );
-	RemoveAura( 19582 );
-	RemoveAura( 19589 );
-	RemoveAura( 19591 );
-	RemoveAura( 20784 );
-	RemoveAura( 34457 );
-	RemoveAura( 34666 );
-	RemoveAura( 34667 );
-	RemoveAura( 34675 );
-	CastSpell( this, 8875, false );//Unleashed fury
-	CastSpell( this, 19580, false );//Thick hide
-	CastSpell( this, 19581, false );//Endurance training
-	CastSpell( this, 19582, false );//Bestial swiftness
-	CastSpell( this, 19589, false );//Bestial discipline
-	CastSpell( this, 19591, false );//Ferocity
-
-	//Frenzy
-	sp = dbcSpell.LookupEntry( 20784 );
-	pAura = new Aura( sp, -1, this, this );
-	val = 0;
-	if( this->m_Owner->HasAura( 19621 ) )
-		val = 20;
-	if( this->m_Owner->HasAura( 19622 ) )
-		val = 40;
-	if( this->m_Owner->HasAura( 19623 ) )
-		val = 60;
-	if( this->m_Owner->HasAura( 19624 ) )
-		val = 80;
-	if( this->m_Owner->HasAura( 19625 ) )
-		val = 100;
-	pAura->AddMod( sp->EffectApplyAuraName[0], val, 0, 19615 );
-	this->AddAura( pAura );
-	CastSpell( this, 20784, false );
-
-	//Ferocious inspiration
-	sp = dbcSpell.LookupEntry( 34457 );
-	pAura = new Aura( sp, -1, this, this );
-	val = 0;
-	if( this->m_Owner->HasAura( 34455 ) )
-		val = 1;
-	if( this->m_Owner->HasAura( 34459 ) )
-		val = 2;
-	if( this->m_Owner->HasAura( 34460 ) )
-		val = 3;
-	pAura->AddMod( sp->EffectApplyAuraName[0], val, 0, 34456 );
-	this->AddAura( pAura );
-
-	//Animal handler
-	sp = dbcSpell.LookupEntry( 34666 );
-	pAura = new Aura(sp, -1, this, this );
-	val = 0;
-	if( this->m_Owner->HasAura( 34453 ) )
-		val = 2;
-	if( this->m_Owner->HasAura( 34454 ) )
-		val = 4;
-	pAura->AddMod( sp->EffectApplyAuraName[0], val, 0, 0 );
-	pAura->AddMod( sp->EffectApplyAuraName[1], val, 0, 0 );
-	this->AddAura( pAura );
-
-	//Catlike reflexes
-	sp = dbcSpell.LookupEntry( 34667 );
-	pAura = new Aura( sp, -1, this, this);
-	val = 0;
-	if( this->m_Owner->HasAura( 34462 ) )
-		val = 3;
-	if( this->m_Owner->HasAura( 34464 ) )
-		val = 6;
-	if( this->m_Owner->HasAura( 34465 ) )
-		val = 9;
-	pAura->AddMod( sp->EffectApplyAuraName[0], val, 0, 0 );
-	this->AddAura( pAura );
-
-	//Serpent's swiftness
-	sp = dbcSpell.LookupEntry(34675);
-	pAura = new Aura( sp, -1, this, this );
-	val = 0;
-	if(this->m_Owner->HasAura( 34466 ))
-		val = -4;
-	if(this->m_Owner->HasAura( 34467 ))
-		val = -8;
-	if(this->m_Owner->HasAura( 34468 ) )
-		val = -12;
-	if(this->m_Owner->HasAura( 34469 ) )
-		val = -16;
-	if(this->m_Owner->HasAura( 34470 ) )
-		val = -20;
-	pAura->AddMod( sp->EffectApplyAuraName[0], val, 0, 0 );
-	this->AddAura( pAura );
-
-	//Spirit Bond
-	val = 0;
-	if( this->m_Owner->HasAura( 19578 ) )
-		val = 19579;
-	if( this->m_Owner->HasAura( 20895 ) )
-		val = 24529;
-	if( val > 0 )
-	{
-		CastSpell( this,(uint32)val, false ); //cast on self
-		this->m_Owner->CastSpell( this->m_Owner, (uint32)val, false ); //cast on owner
-	}
-}
-
-//Implementation of some demonology talents to pet
-void Pet::ApplyDemonTalents()
-{
-	InheritSMMods( m_Owner );
-	SpellEntry *sp;
-	Aura *pAura;
-	int val;
-	
-	RemoveAura( 35695 );//Demonic tactics
-	RemoveAura( 35697 );//Demonic resilience
-
-	sp = dbcSpell.LookupEntry( 35695 );
-	pAura=new Aura( sp, -1, this, this );//Demonic tactics
-	val = 0;
-	if( this->m_Owner->HasAura( 30242 ) )
-		val = 1;
-	if( this->m_Owner->HasAura( 30245 ) )
-		val = 2;
-	if( this->m_Owner->HasAura( 30246 ) )
-		val = 3;
-	if( this->m_Owner->HasAura( 30247 ) )
-		val = 4;
-	if( this->m_Owner->HasAura( 30248 ) )
-		val = 5;
-	pAura->AddMod( sp->EffectApplyAuraName[0], val, 0,0 );
-	this->AddAura( pAura );
-	
-	sp =dbcSpell.LookupEntry( 35697 );
-	pAura=new Aura( sp, -1, this, this );//Demonic resilience
-	val = 0;
-	if( this->m_Owner->HasAura( 30319 ) )
-		val = -5;
-	if( this->m_Owner->HasAura( 30320 ) )
-		val = -10;
-	if( this->m_Owner->HasAura( 30321 ) )
-		val = -15;
-	pAura->AddMod( sp->EffectApplyAuraName[0], val, 0,0 );
-	this->AddAura( pAura );
-	
-	switch( this->GetEntry() )
-	{
-	//imp
-	case 416:
-		this->RemoveAura( 18728 );
-		this->RemoveAura( 18737 );
-		this->RemoveAura( 18740 );
-		this->CastSpell( this, 18728, false );	// Unholy power
-		this->CastSpell( this, 18737, false );	// Fel Stamina
-		this->CastSpell( this, 18740, false );	// Fel Intellect
-		break;
-	//voidvalker
-	case 1860 :
-		this->RemoveAura( 18727 );
-		this->RemoveAura( 18735 );
-		this->RemoveAura( 18742 );
-		this->CastSpell( this, 18727, false );	// Unholy power
-		this->CastSpell( this, 18735, false );	// Fel Stamina
-		this->CastSpell( this, 18742, false );	// Fel Intellect
-		break;
-	//succubus
-	case 1863:
-		this->RemoveAura( 18729 );
-		this->RemoveAura( 18736 );
-		this->RemoveAura( 18741 );
-		this->CastSpell( this, 18729, false );	// Unholy power
-		this->CastSpell( this, 18736, false );	// Fel Stamina
-		this->CastSpell( this, 18741, false );	// Fel Intellect
-		break;
-	//felhunter
-	case 417:
-		this->RemoveAura( 18730);
-		this->RemoveAura( 18738);
-		this->RemoveAura( 18739);
-		this->CastSpell( this, 18730, false );	// Unholy power
-		this->CastSpell( this, 18738, false );	// Fel Stamina
-		this->CastSpell( this, 18739, false );	// Fel Intellect
-		break;
-	//felguard
-	case 17252:
-		this->RemoveAura( 30147 );
-		this->RemoveAura( 30148 );
-		this->RemoveAura( 30149 );
-		this->CastSpell( this, 30147, false );	// Unholy power
-		this->CastSpell( this, 30148, false );	// Fel Stamina
-		this->CastSpell( this, 30149, false );	// Fel Intellect
-		break;
-	default: break;
-	}
-
-	val = 0;
-	if( this->m_Owner->HasAura( 23785 ) )// Master Demonologist talent apply
-		switch( this->GetEntry() )
-		{
-		case 416: val = 23759; break;	// imp
-		case 1860: val = 23760; break;	// voidwalker
-		case 1863: val = 23761; break;	// succubus
-		case 417: val = 23762; break;	// felhunter
-		case 17252: val = 35702; break;	// felguard
-		default: break;
-		}
-		if( this->m_Owner->HasAura( 23822 ) )
-		switch( this->GetEntry() )
-		{
-		case 416: val = 23826; break;	// imp
-		case 1860: val = 23841; break;	// voidwalker
-		case 1863: val = 23833; break;	// succubus
-		case 417: val = 23837; break;	// felhunter
-		case 17252: val = 35703; break;	// felguard
-		default: break;
-		}
-		if( this->m_Owner->HasAura( 23823 ) )
-		switch( this->GetEntry() )
-		{
-		case 416: val = 23827; break;	// imp
-		case 1860: val = 23842; break;	// voidwalker
-		case 1863: val = 23834; break;	// succubus
-		case 417: val = 23838; break;	// felhunter
-		case 17252: val = 35704; break;	// felguard
-		default: break;
-		}
-		if( this->m_Owner->HasAura( 23824 ) )
-		switch(this->GetEntry())
-		{
-		case 416: val = 23828; break;	// imp
-		case 1860: val = 23843; break;	// voidwalker
-		case 1863: val = 23835; break;	// succubus
-		case 417: val = 23839; break;	// felhunter
-		case 17252: val = 35705; break;	// felguard
-		default: break;
-		}
-		if( this->m_Owner->HasAura( 23825 ) )
-		switch( this->GetEntry() )
-		{
-		case 416: val = 23829; break;	// imp
-		case 1860: val = 23844; break;	// voidwalker
-		case 1863: val = 23836; break;	// succubus
-		case 417: val = 23840; break;	// felhunter
-		case 17252: val = 35706; break;	// felguard
-		default: break;
-		}
-		if( val > 0)
-		{
-			CastSpell(this,(uint32)val,false); //cast on pet
-			this->m_Owner->CastSpell(this->m_Owner,(uint32)val,false); //cast on owner
-		}
 }
 
 void Pet::InitializeSpells()
@@ -734,12 +471,8 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 		SetUInt32Value(UNIT_FIELD_LEVEL, m_Owner->getLevel());
 		SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
 		SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, GetNextLevelXP(m_Owner->getLevel()));
+		ApplyStatsForLevel();
 	}
-	ApplyStatsForLevel();//it is neccesary to recalculate pet stats on every call\summon to apply pet scaling
-	if( this->Summon )
-		ApplyDemonTalents();
-	else
-		ApplyBeastTalents();
 	
 	// Nuke auras
 	for(uint32 x = UNIT_FIELD_AURA_01; x <= UNIT_FIELD_AURA_55; x++)
@@ -886,59 +619,6 @@ void Pet::Dismiss(bool bSafeDelete)//Abandon pet
 	if(m_Owner)
 	{
 		m_Owner->RemovePlayerPet( m_PetNumber );
-
-		//remove demonic resilience from owner warlock
-		m_Owner->RemoveAura( 35695 );
-
-		//remove master demonology from owner warlock
-		switch( this->GetEntry() )
-		{
-		case 416: 
-			m_Owner->RemoveAura( 23759 );
-			m_Owner->RemoveAura( 23826 );
-			m_Owner->RemoveAura( 23827 );
-			m_Owner->RemoveAura( 23828 );
-			m_Owner->RemoveAura( 23829 );
-			break;	// imp
-		case 1860:
-			m_Owner->RemoveAura( 23760 );
-			m_Owner->RemoveAura( 23841 );
-			m_Owner->RemoveAura( 23842 );
-			m_Owner->RemoveAura( 23843 );
-			m_Owner->RemoveAura( 23844 );
-			break;	// voidwalker
-		case 1863:
-			m_Owner->RemoveAura( 23761 );
-			m_Owner->RemoveAura( 23833 );
-			m_Owner->RemoveAura( 23834 );
-			m_Owner->RemoveAura( 23835 );
-			m_Owner->RemoveAura( 23836 );
-			break;	// succubus
-		case 417:
-			m_Owner->RemoveAura( 23762 );
-			m_Owner->RemoveAura( 23837 );
-			m_Owner->RemoveAura( 23838 );
-			m_Owner->RemoveAura( 23839 );
-			m_Owner->RemoveAura( 23840 );
-			break;	// felhunter
-		case 17252:
-			m_Owner->RemoveAura( 35702 );
-			m_Owner->RemoveAura( 35703 );
-			m_Owner->RemoveAura( 35704 );
-			m_Owner->RemoveAura( 35705 );
-			m_Owner->RemoveAura( 35706 );
-			break;	// felguard
-		default: break;
-		}		
-
-		//remove demonic tactics from owner warlock
-		m_Owner->RemoveAura( (uint32)35697 );
-
-		//remove owner warlock soul link from caster
-		m_Owner->RemoveAura( (uint32)19028 );
-
-		//remove owner warlock Demonic Knowledge from caster
-		m_Owner->RemoveAura( (uint32)39576 );
 	}
 
 	// find out playerpet entry, delete it
@@ -948,15 +628,10 @@ void Pet::Dismiss(bool bSafeDelete)//Abandon pet
 void Pet::Remove(bool bSafeDelete, bool bUpdate, bool bSetOffline)
 {
 	RemoveAllAuras(); // Prevent pet overbuffing
-	
 	if(m_Owner)
 	{
-		m_Owner->RemoveAura( (uint32)19579 );	//remove spirit bond from owner hunter at pet remove
-		m_Owner->RemoveAura( (uint32)24529 );
-		
 		// remove association with player
 		m_Owner->SetUInt64Value(UNIT_FIELD_SUMMON, 0);
-	
 
 		if(bUpdate) 
 		{
@@ -1672,13 +1347,7 @@ void Pet::ApplyPetLevelAbilities()
 	static double R_pet_mod_sta[36] = { 0, 1, 0.98, 1, 1.08, 1.04, 0.95, 1, 0.96, 1.04, 0, 0.95, 1.05, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0.93, 1, 1, 1.1, 1 };
 	static double R_pet_mod_arm[36] = { 0, 1.05, 1, 1, 1.05, 1.09, 1.1, 1.05, 1.13, 1, 0, 1.03, 1, 0, 0, 0, 0, 0, 0, 0, 1.1, 1.13, 0, 0, 1, 1.05, 1, 1, 0, 0, 1, 1.05, 1.05, 1, 0.9, 1 };
 	static double R_pet_mod_dps[36] = { 0, 1, 1.10, 1.07, 0.91, 0.9, 1, 1, 0.95, 1.02, 0, 1.1, 1, 0, 0, 0, 0, 0, 0, 0, 0.94, 0.9, 0, 0, 1.07, 1, 1.07, 1.07, 0, 0, 1, 1.1, 0.94, 1, 1.03, 1 };
-	//"Base" part of pet damage (before applying of any modifiers) is equal for any pet family
-	//Presumed to be linear increasing per level (surely not fully correct)
-	double base_min_dmg = 1;
-	double base_max_dmg = 2;
-	double mod_min_dmg = 2;
-	double mod_max_dmg = 2.48;
-	
+
 	double pet_mod_sta = 1, pet_mod_arm = 1, pet_mod_dps = 1;
 	if(creature_info->Family > 35 || R_pet_mod_sta[creature_info->Family] == 0)
 	{
@@ -1730,13 +1399,8 @@ void Pet::ApplyPetLevelAbilities()
 	BaseResistance[0] = FL2UINT(pet_armor);
 	CalcResistance(0);
 
-	// Calculate damage. Lvl 70 damage values are based on hunter thread from official forums
-	// [url="http://forums.wow-europe.com/thread.html?topicId=184248445&postId=1842118585&sid=1#0"]http://forums.wow-europe.com/thread.html?t...585&sid=1#0[/url]
+	// Calculate damage.
 	SetUInt32Value(UNIT_FIELD_ATTACK_POWER, FL2UINT(pet_attack_power));
-	double pet_min_dmg = base_min_dmg + getLevel() * mod_min_dmg;
-	double pet_max_dmg = base_max_dmg + getLevel() * mod_max_dmg;
-	BaseDamage[0] = float( pet_min_dmg );
-	BaseDamage[1] = float( pet_max_dmg );
 	CalcDamage();
 
 	// These are just for visuals, no other actual purpose.

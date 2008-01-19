@@ -126,8 +126,6 @@ public:
 	ASCENT_INLINE uint32 GetXP(void) { return m_PetXP; }
 
 	void InitializeSpells();
-	void ApplyBeastTalents();
-	void ApplyDemonTalents();
 	void ReInitializeSpells();
 	void InitializeMe(bool first);
 	void SendSpellsToOwner();
