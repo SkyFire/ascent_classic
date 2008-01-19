@@ -2973,12 +2973,6 @@ uint8 Spell::CanCast(bool tolerate)
 					return SPELL_FAILED_OUT_OF_RANGE;
 			}
 
-#ifdef COLLISION
-			//if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
-			//	return SPELL_FAILED_LINE_OF_SIGHT;
-#endif
-
-
 			if( p_caster != NULL )
 			{
 				if( m_spellInfo->Id == SPELL_RANGED_THROW)
@@ -2987,6 +2981,10 @@ uint8 Spell::CanCast(bool tolerate)
 					if(!itm || itm->GetDurability() == 0)
 						return SPELL_FAILED_NO_AMMO;
 				}
+#ifdef COLLISION
+				if (p_caster->GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(p_caster->GetMapId(),p_caster->GetPositionNC(),target->GetPositionNC()))
+					return SPELL_FAILED_LINE_OF_SIGHT;
+#endif
 
 				if(target->IsPlayer())
 				{
