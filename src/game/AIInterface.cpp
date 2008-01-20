@@ -1190,7 +1190,7 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 		HandleEvent(EVENT_ENTERCOMBAT, pUnit, 0);
 	}
 
-	HandleEvent(EVENT_DAMAGETAKEN, pUnit, _CalcThreat(damage_dealt, spellId, pUnit));
+	HandleEvent(EVENT_DAMAGETAKEN, pUnit, _CalcThreat(damage_dealt, spellId ? dbcSpell.LookupEntryForced(spellId) : NULL, pUnit));
 }
 
 bool AIInterface::HealReaction(Unit* caster, Unit* victim, uint32 amount)
@@ -3307,19 +3307,15 @@ void AIInterface::CheckTarget(Unit* target)
 		m_assistTargets.erase(itr);
 }
 
-uint32 AIInterface::_CalcThreat(uint32 damage, uint32 spellId, Unit* Attacker)
+uint32 AIInterface::_CalcThreat(uint32 damage, SpellEntry * sp, Unit* Attacker)
 {
 	if (isSameFaction(m_Unit,Attacker))
 		return 0;
 
 	int32 mod = 0;
-	if(spellId != 0)
+	if( sp != NULL && sp->ThreatForSpell != 0 )
 	{
-		mod = objmgr.GetAIThreatToSpellId(spellId);
-		if(mod == 0)
-		{
-			mod = damage;
-		}
+		mod = sp->ThreatForSpell;
 	}
 	else
 	{

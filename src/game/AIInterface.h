@@ -310,7 +310,7 @@ public:
 	void _CalcDestinationAndMove(Unit *target, float dist);
 	float _CalcCombatRange(Unit* target, bool ranged);
 	float _CalcDistanceFromHome();
-	uint32 _CalcThreat(uint32 damage, uint32 spellId, Unit* Attacker);
+	uint32 _CalcThreat(uint32 damage, SpellEntry * sp, Unit* Attacker);
 	
 	void SetAllowedToEnterCombat(bool val) { m_AllowedToEnterCombat = val; }
 	ASCENT_INLINE bool GetAllowedToEnterCombat(void) { return m_AllowedToEnterCombat; }

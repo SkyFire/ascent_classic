@@ -66,13 +66,6 @@ ObjectMgr::~ObjectMgr()
 		delete i->second;
 	}
 
-	Log.Notice("ObjectMgr", "Deleting AI Threat Spells...");
-	for( ThreadToSpellList::iterator i = threatToSpells.begin( ); i != threatToSpells.end( ); ++ i ) 
-	{
-		ThreatToSpellId *gc=(*i);
-		delete gc;
-	}
-
 	Log.Notice("ObjectMgr", "Deleting Spell Override...");
 	for(OverrideIdMap::iterator i = mOverrideIdMap.begin(); i != mOverrideIdMap.end(); ++i)
 	{
@@ -1106,33 +1099,18 @@ void ObjectMgr::LoadAIThreatToSpellId()
 		return;
 	}
 
-	ThreatToSpellId *t2s = NULL;
+	SpellEntry * sp;
 
 	do
 	{
 		Field *fields = result->Fetch();
-
-		t2s = new ThreatToSpellId;
-		t2s->spellId = fields[0].GetUInt32();
-		t2s->mod = atoi(fields[1].GetString());
-		threatToSpells.push_back(t2s);
+		sp = dbcSpell.LookupEntryForced( fields[0].GetUInt32() );
+		if( sp != NULL )
+			sp->ThreatForSpell = fields[1].GetUInt32();
 
 	} while( result->NextRow() );
 
 	delete result;
-	Log.Notice("ObjectMgr", "%u spell threats loaded.", threatToSpells.size());
-}
-
-int32 ObjectMgr::GetAIThreatToSpellId(uint32 spellId)
-{
-	for(ThreadToSpellList::iterator i = threatToSpells.begin(); i != threatToSpells.end(); i++)
-	{
-		if((*i)->spellId == spellId)
-		{
-			return (*i)->mod;
-		}
-	}
-	return 0;
 }
 
 Item * ObjectMgr::CreateItem(uint32 entry,Player * owner)

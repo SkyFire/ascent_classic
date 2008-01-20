@@ -39,12 +39,6 @@ struct GM_Ticket
 	uint32 timestamp;
 };
 
-struct ThreatToSpellId
-{
-	uint32 spellId;
-	int32 mod;
-};
-
 #pragma pack(push,1)
 struct FishingZoneEntry
 {
@@ -312,13 +306,9 @@ public:
 	typedef std::map<uint32, uint32>                                    PetSpellCooldownMap;
 	typedef std::map<uint32, SpellEntry*>                               TotemSpellMap;
 
-    // List typedef's
-    typedef std::list<ThreatToSpellId*>                                 ThreadToSpellList;
-    
     // object holders
 	GmTicketList        GM_TicketList;
 	TotemSpellMap       m_totemSpells;
-	ThreadToSpellList   threatToSpells;
 	OverrideIdMap       mOverrideIdMap;
 
 	Player* GetPlayer(const char* name, bool caseSensitive = true);
@@ -413,9 +403,6 @@ public:
 
 	//Totem
 	SpellEntry* GetTotemSpell(uint32 spellId);
-
-	// AI Threat by SpellId
-	int32 GetAIThreatToSpellId(uint32 spellId);
 
 	std::list<ItemPrototype*>* GetListForItemSet(uint32 setid);
 

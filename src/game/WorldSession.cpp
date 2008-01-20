@@ -220,7 +220,7 @@ int WorldSession::Update(uint32 InstanceID)
 			_socket = NULL;
 		}
 
-		m_lastPing = UNIXTIME;		// Prevent calling this code over and over.
+		m_lastPing = (uint32)UNIXTIME;		// Prevent calling this code over and over.
 		if(!_logoutTime)
 			_logoutTime = m_currMsTime + PLAYER_LOGOUT_DELAY;
 	}
