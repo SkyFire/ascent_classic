@@ -385,6 +385,11 @@ public:
  
 	list<AI_Spell*> m_spells;
 
+#ifdef COLLISION_CRAP
+	list<LocationVector*> AttackWaypoints;
+	LocationVector* WaypointLOS;
+#endif
+
 	bool disable_combat;
 
 	bool disable_melee;

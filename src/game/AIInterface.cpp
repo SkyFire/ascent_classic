@@ -141,6 +141,10 @@ AIInterface::~AIInterface()
 	for(list<AI_Spell*>::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
 		if((*itr)->custom_pointer)
 			delete (*itr);
+#ifdef COLLISION_CRAP
+	for(list<LocationVector*>::iterator itr = AttackWaypoints.begin(); itr != AttackWaypoints.end(); ++itr)
+		delete (*itr);
+#endif
 }
 
 void AIInterface::Init(Unit *un, AIType at, MovementType mt, Unit *owner)
@@ -873,11 +877,11 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				float combatReach[2]; // Calculate Combat Reach
 				float distance = m_Unit->CalcDistance(m_nextTarget);
 
-				combatReach[0] = 0.0f;
+				combatReach[0] = PLAYER_SIZE;
 				combatReach[1] = _CalcCombatRange(m_nextTarget, false);
 
 				if(	
-//					distance >= combatReach[0] && 
+					distance >= combatReach[0] && 
 					distance <= combatReach[1] + DISTANCE_TO_SMALL_TO_WALK) // Target is in Range -> Attack
 				{
 					if(UnitToFollow != NULL)
@@ -942,6 +946,8 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 
 					if(dist < PLAYER_SIZE)
 						dist = PLAYER_SIZE; //unbelievable how this could happen
+					if (distance<combatReach[0])
+						dist = -(distance+combatReach[0]*0.6666f);
 
 					m_moveRun = true;
 					_CalcDestinationAndMove(m_nextTarget, dist);
@@ -1026,7 +1032,11 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					StopMovement(0);
 
 				float distance = m_Unit->GetDistanceSq(m_nextTarget);
-				if((distance <= (m_nextSpell->maxrange*m_nextSpell->maxrange)  && distance >= (m_nextSpell->minrange*m_nextSpell->minrange)) || m_nextSpell->maxrange == 0) // Target is in Range -> Attack
+				bool los = true;
+#ifdef COLLISION
+				los = CollideInterface.CheckLOS(m_Unit->GetMapId(), m_Unit->GetPositionNC(),m_nextTarget->GetPositionNC());
+#endif
+				if(los && ((distance <= (m_nextSpell->maxrange*m_nextSpell->maxrange)  && distance >= (m_nextSpell->minrange*m_nextSpell->minrange)) || m_nextSpell->maxrange == 0)) // Target is in Range -> Attack
 				{
 					SpellEntry* spellInfo = m_nextSpell->spell;
 /*					if(m_nextSpell->procCount)
@@ -1692,19 +1702,81 @@ void AIInterface::_CalcDestinationAndMove(Unit *target, float dist)
 	
 	if(target->GetTypeId() == TYPEID_UNIT || target->GetTypeId() == TYPEID_PLAYER)
 	{
-		float angle = m_Unit->calcAngle(m_Unit->GetPositionX(), m_Unit->GetPositionY(), target->GetPositionX(), target->GetPositionY()) * float(M_PI) / 180.0f;
+		float ResX = target->GetPositionX();
+		float ResY = target->GetPositionY();
+		float ResZ = target->GetPositionZ();
+
+#ifdef COLLISION_CRAP	
+		uint32 mapid = m_Unit->GetMapId();
+		LocationVector* v2add = new LocationVector(ResX,ResY,ResZ);
+
+		bool los = CollideInterface.CheckLOS(mapid,m_Unit->GetPositionNC(),target->GetPositionNC());
+		if (los)
+		{
+			AttackWaypoints.clear();
+			AttackWaypoints.push_back(v2add);
+		//	printf("Pushed: %f %f \n",v2add->x,v2add->y);
+		}
+		else
+		{
+			int32 i=0;
+			int32 index=-1;
+			//printf("\n===============\n");
+			for (list<LocationVector*>::iterator itr = AttackWaypoints.begin();itr!=AttackWaypoints.end();++itr)
+			{
+				LocationVector* cur = *itr;
+				if (CollideInterface.CheckLOS(mapid,m_Unit->GetPositionNC(),*cur))
+					index=i;
+				++i;
+			//	printf("List: %f %f \n",cur->x,cur->y);
+			}
+			//printf("===============\n");
+			//printf("Index: %d\n",index);
+
+			for (int32 x =0;x<index;x++)
+			{
+				if (AttackWaypoints.size()>0)
+				{
+					//printf(" deletion ");
+					AttackWaypoints.erase(AttackWaypoints.begin());
+				}
+			}
+
+			LocationVector* Res = v2add;
+			if (AttackWaypoints.size()>0)
+			{
+/*				LocationVector* Last = AttackWaypoints.back();
+				if (!CollideInterface.CheckLOS(mapid,*Last,target->GetPositionNC()))
+					AttackWaypoints.push_back(WaypointLOS);
+				*/
+
+				Res = *AttackWaypoints.begin();
+				//printf("Res: %f %f\n",Res->x,Res->y);
+			}
+
+			ResX = Res->x;
+			ResY = Res->y;
+		}
+		WaypointLOS = v2add;
+#endif
+
+		float angle = m_Unit->calcAngle(m_Unit->GetPositionX(), m_Unit->GetPositionY(), ResX, ResY) * float(M_PI) / 180.0f;
 		float x = dist * cosf(angle);
 		float y = dist * sinf(angle);
-		if( target->GetTypeId() == TYPEID_PLAYER && static_cast< Player* >( target )->m_isMoving )
+
+#ifdef COLLISION_CRAP
+		if (los)
+#endif
+		if(target->GetTypeId() == TYPEID_PLAYER && static_cast< Player* >( target )->m_isMoving )
 		{
 			// cater for moving player vector based on orientation
 			x -= cosf(target->GetOrientation());
 			y -= sinf(target->GetOrientation());
 		}
 
-		m_nextPosX = target->GetPositionX() - x;
-		m_nextPosY = target->GetPositionY() - y;
-		m_nextPosZ = target->GetPositionZ();
+		m_nextPosX = ResX - x;
+		m_nextPosY = ResY - y;
+		m_nextPosZ = ResZ;
 	}
 	else
 	{
