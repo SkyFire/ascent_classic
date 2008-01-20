@@ -891,7 +891,7 @@ void Mailbox::Load(QueryResult * result)
 		msg.read_flag = fields[i++].GetBool();
 		msg.deleted_flag = fields[i++].GetBool();
 
-		if( msg.copy_made )
+		/*if( msg.copy_made )
 		{
 			QueryResult * result = CharacterDatabase.Query( "SELECT * FROM playeritems WHERE itemtext = %u", msg.message_id );
 			if( result == NULL )
@@ -906,7 +906,7 @@ void Mailbox::Load(QueryResult * result)
 			}
 			else
 				delete result;
-		}
+		}*/
 
 		// Add to the mailbox
 		AddMessage(&msg);

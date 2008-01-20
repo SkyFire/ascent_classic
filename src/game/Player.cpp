@@ -6766,8 +6766,8 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 {
 	uint32 destsize = size + size/10 + 16;
 	int rate = sWorld.getIntRate(INTRATE_COMPRESSION);
-	if(size > 30000)
-		rate = 9;		// max
+	/*if(size > 30000)
+		rate = 9;		// max*/
 
 	// set up stream
 	z_stream stream;
@@ -6782,7 +6782,7 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 	}
 
 	uint8 *buffer = new uint8[destsize];
-	memset(buffer,0,destsize);	/* fix umr - burlex */
+	//memset(buffer,0,destsize);	/* fix umr - burlex */
 	
 	// set up stream pointers
 	stream.next_out  = (Bytef*)buffer+4;

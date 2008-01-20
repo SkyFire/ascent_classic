@@ -933,10 +933,7 @@ public:
 		uint32 header;
 		uint32 i;
 		long pos;
-#ifdef USING_BIG_ENDIAN
-		uint32 j;
-		uint32 * base;
-#endif
+
 		FILE * f = fopen(filename, "rb");
 		if(f == NULL)
 			return false;
@@ -949,6 +946,10 @@ public:
 		fread(&string_length, 4, 1, f);
 		pos = ftell(f);
 
+#ifdef USING_BIG_ENDIAN
+		swap32(&rows); swap32(&cols); swap32(&useless_shit); swap32(&string_length);
+#endif
+
 		if( load_strings )
 		{
 			fseek( f, 20 + ( rows * cols * 4 ), SEEK_SET );
@@ -959,9 +960,6 @@ public:
 
 		fseek(f, pos, SEEK_SET);
 
-#ifdef USING_BIG_ENDIAN
-		swap32(&rows); swap32(&cols); swap32(&useless_shit); swap32(&string_length);
-#endif
 		m_heapBlock = (T*)malloc(rows * sizeof(T));
 		ASSERT(m_heapBlock);
 
