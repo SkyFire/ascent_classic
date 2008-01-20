@@ -1241,14 +1241,14 @@ int luaUnit_GetClosestPlayer(lua_State * L, Unit * ptr)
 }
 int luaUnit_GetRandomPlayer(lua_State * L, Unit * ptr)
 {
-	if(!ptr)
+	if( ptr == NULL )
 		return 0;
 
-	int flag = luaL_checkint(L,1);
+	int flag = luaL_checkint( L, 1 );
 
-	Player * ret=NULL;
+	Player* ret = NULL;
 
-	switch (flag)
+	switch( flag )
 	{
 	case RANDOM_ANY:
 		{

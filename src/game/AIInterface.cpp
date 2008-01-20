@@ -1173,17 +1173,17 @@ void AIInterface::DismissPet()
 
 void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellId)
 {
-	if(m_AIState == STATE_EVADE || m_fleeTimer != 0 || !pUnit || !pUnit->isAlive()
-		|| m_Unit->IsPacified() || m_Unit->IsStunned() || !m_Unit->isAlive())
-	{
-		return;
-	}
-	if(m_Unit == pUnit)
+	if( m_AIState == STATE_EVADE || m_fleeTimer != 0 || !pUnit || !pUnit->isAlive() || m_Unit->IsPacified() || m_Unit->IsStunned() || !m_Unit->isAlive() )
 	{
 		return;
 	}
 
-	if(m_AIState == STATE_IDLE || m_AIState == STATE_FOLLOWING)
+	if( m_Unit == pUnit )
+	{
+		return;
+	}
+
+	if( m_AIState == STATE_IDLE || m_AIState == STATE_FOLLOWING )
 	{
 		WipeTargetList();
 		
@@ -2768,6 +2768,9 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 
 void AIInterface::CastSpell(Unit* caster, SpellEntry *spellInfo, SpellCastTargets targets)
 {
+	if( m_AIType != AITYPE_PET && disable_spell )
+		return;
+
 	// Stop movement while casting.
 	m_AIState = STATE_CASTING;
 #ifdef _AI_DEBUG
