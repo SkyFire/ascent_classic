@@ -345,10 +345,10 @@ struct SpellEntry
     uint32 RankNumber;                      //!!! CUSTOM, this protects players from having >1 rank of a spell
     uint32 NameHash;                        //!!! CUSTOM, related to custom spells, summon spell quest related spells
     float base_range_or_radius_sqr;         //!!! CUSTOM, needed for aoe spells most of the time
-	uint32 talent_tree;
-	bool removable_by_immunity;
-	uint32 in_front_status;
-	bool is_melee_spell;
+	uint32 talent_tree;						//!!! CUSTOM,
+	bool removable_by_immunity;				//!!! CUSTOM,
+	uint32 in_front_status;					//!!! CUSTOM,
+	bool is_melee_spell;					//!!! CUSTOM,
     uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
 };
 

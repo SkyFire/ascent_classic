@@ -1773,7 +1773,7 @@ float AIInterface::_CalcDistanceFromHome()
 SendMoveToPacket:
 Comments: Some comments on the SMSG_MONSTER_MOVE packet: 
 	the uint8 field:
-		0: nothing special													known
+		0: Default															known
 		1: Don't move														known
 		2: there is an extra 3 floats, also known as a vector				unknown
 		3: there is an extra uint64 most likely a guid.						unknown

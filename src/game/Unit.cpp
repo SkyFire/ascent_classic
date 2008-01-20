@@ -3541,7 +3541,7 @@ void Unit::_UpdateSpells( uint32 time )
 void Unit::castSpell( Spell * pSpell )
 {
 	// check if we have a spell already casting etc
-	if(m_currentSpell&&pSpell!=m_currentSpell)
+	if(m_currentSpell && pSpell != m_currentSpell)
 	{
 		if(m_spellsbusy)
 		{

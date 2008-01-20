@@ -1740,7 +1740,7 @@ void Spell::SendCastResult(uint8 result)
 enum SpellStartFlags
 {
     //0x01
-    SPELL_START_FLAG_DEFAULT = 0x02, // atm set as defailt flag
+    SPELL_START_FLAG_DEFAULT = 0x02, // atm set as default flag
     //0x04
     //0x08
     //0x10

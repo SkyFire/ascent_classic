@@ -1,0 +1,95 @@
+/*
+ * Ascent MMORPG Server
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+/* Written en maintained by Captnoord also known as Capt.
+ *
+ *
+ */
+
+
+Small document about packet structures.
+
+PURPOSE OF THIS DOCUMENT:
+The purpose of this document is to supply the developers with packet descriptions that are unknown
+or for some reason not correct.
+
+
+
+
+
+GLOBAL RULES REGARDING THE TYPE DEFENITIONS:
+
+uint64 = 8 bytes
+uint32 = 4 bytes
+uint16 = 2 bytes
+uint8  = 1 byte
+float  = 4 bytes
+guid   = Dynamic guid that can vary between 2 and 8 bytes.
+
+COMMON GRAMMAR RULES:
+
+Dynamic parts are indicated with the "[" and the "]" characters.
+the parts regarding this dynamic content are indicated between the "{" and the "}" characters.
+ 
+
+
+Unhandled and unknown packets:
+
+opcode: 			SMSG_MONSTER_MOVE_TRANSPORT
+Description: 			obviously its a addition to the SMSG_MONSTER_MOVE packet
+Amount of unknown fields:	1 + DYNAMIC PART
+
+Structure
+
+uint64 	guid;
+uint64 	guid_unknown;
+float  	PositionX;
+float  	PositionY;
+float  	PositionZ;
+uint32 	TimeStamp;
+
+uint8	MovementOptionModifier. ( 0 - 4 )
+
+[ dynamic part related to the MovementOptionModifier]
+	{ // 0 : default
+	}
+
+	{ // 1 : don't move
+	}
+
+	{ // 2 : 3 extra floats dono what they do
+		float unk1; // possible X
+		float unk2; // possible y
+		float unk3; // possible z
+	}
+	
+	{ // 3 : there is an extra uint64 most likely a guid.
+		uint64 unk1; // possible guid	
+	}
+
+	{ // 4 : there is an extra float that causes the orientation to be set.
+		float orientation;
+	}
+
+
+uint32 	MoveFlags;
+uint32 	Time; 		// time it take to get to the next point
+uint32	WaypointCount;
+[ dynamic part related on the amount of way points ]
+	{ float toXpos, toYpos, toZpos } x waypointcount;
