@@ -199,6 +199,12 @@ void WorldSession::HandleInspectHonorStatsOpcode( WorldPacket &recv_data )
 		return;
 	}
 
+	if( _player->GetMapMgr() == NULL )
+	{
+		sLog.outError( "HandleInspectHonorStatsOpcode : _player map mgr was null" );
+		return;
+	}
+
 	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
 	{
 		sLog.outError( "HandleInspectHonorStatsOpcode : guid was null" );
