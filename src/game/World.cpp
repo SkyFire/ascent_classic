@@ -6784,7 +6784,7 @@ bool World::SetInitialWorldSettings()
 			if( talent_info == NULL )
 				continue;
 
-			if( talent_info->TalentTree != i )
+			if( talent_info->TalentTree != tab_info->TalentTabID )
 				continue;
 
 			InspectTalentTabPos[talent_id] = talent_pos;

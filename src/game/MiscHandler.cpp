@@ -1538,7 +1538,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			talent_max_rank = 0;
 			for( uint32 k = 5; k > 0; --k )
 			{
-				sLog.outDebug( "HandleInspectOpcode: k(%i) talent_info->RankID[k - 1](%i) player->HasSpell( talent_info->RankID[k - 1] )(%i)", k, talent_info->RankID[k - 1], player->HasSpell( talent_info->RankID[k - 1] ) );
+				//sLog.outDebug( "HandleInspectOpcode: k(%i) talent_info->RankID[k - 1](%i) player->HasSpell( talent_info->RankID[k - 1] )(%i)", k, talent_info->RankID[k - 1], player->HasSpell( talent_info->RankID[k - 1] ) );
 				if( talent_info->RankID[k - 1] != 0 && player->HasSpell( talent_info->RankID[k - 1] ) )
 				{
 					talent_max_rank = k;
@@ -1565,7 +1565,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			mask = 1 << rank_offset;
 			data.put< uint8 >( 4 + rank_slot, mask & 0xFF );
 
-			sLog.outDebug( "HandleInspectOpcode: page_talent_rank_index(%i) rank_index(%i) rank_slot(%i) rank_offset(%i)", page_talent_rank_index, rank_index, rank_slot, rank_offset );
+			sLog.outDebug( "HandleInspectOpcode: talent_index(%i) talent_tab_pos(%i) page_talent_rank_index(%i) rank_index(%i) rank_slot(%i) rank_offset(%i)", talent_index, talent_tab_pos, page_talent_rank_index, rank_index, rank_slot, rank_offset );
 		}
 
 		std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabSize.find( talent_tab_id );
