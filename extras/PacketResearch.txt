@@ -57,9 +57,9 @@ Amount of unknown fields:	1 + DYNAMIC PART
 
 Structure
 
-uint64 	guid;
-uint64 	guid_unknown;
-float  	PositionX;
+uint64 	guid; - probably monster guid
+uint64 	guid_unknown; - probably transport guid
+float  	PositionX; - source positions
 float  	PositionY;
 float  	PositionZ;
 uint32 	TimeStamp;
@@ -73,13 +73,13 @@ uint8	MovementOptionModifier. ( 0 - 4 )
 	{ // 1 : don't move
 	}
 
-	{ // 2 : 3 extra floats dono what they do
+	{ // 2 : 3 extra floats dono what they do - location to face?
 		float unk1; // possible X
 		float unk2; // possible y
 		float unk3; // possible z
 	}
 	
-	{ // 3 : there is an extra uint64 most likely a guid.
+	{ // 3 : there is an extra uint64 most likely a guid. - burlex: this is guid to face
 		uint64 unk1; // possible guid	
 	}
 
