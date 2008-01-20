@@ -2395,13 +2395,13 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 	{
 		if( m_pItems[dstslot] != NULL )
 		{
-			m_pOwner->_ApplyItemMods( m_pItems[dstslot], dstslot, false, false, true );
-			m_pOwner->_ApplyItemMods( m_pItems[dstslot], dstslot, true, false, true );
+			m_pOwner->ApplyItemMods( m_pItems[dstslot], dstslot, false, false );
+			m_pOwner->ApplyItemMods( m_pItems[dstslot], dstslot, true, false );
 		}
 		if( m_pItems[srcslot] != NULL )
 		{
-			m_pOwner->_ApplyItemMods( m_pItems[srcslot], srcslot, false, false, true );
-			m_pOwner->_ApplyItemMods( m_pItems[srcslot], srcslot, true, false, true );
+			m_pOwner->ApplyItemMods( m_pItems[srcslot], srcslot, false, false );
+			m_pOwner->ApplyItemMods( m_pItems[srcslot], srcslot, true, false );
 		}
 	}
 
