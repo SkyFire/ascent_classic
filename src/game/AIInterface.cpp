@@ -1769,17 +1769,35 @@ float AIInterface::_CalcDistanceFromHome()
 	return 0.0f;
 }
 
+/************************************************************************************************************
+SendMoveToPacket:
+Comments: Some comments on the SMSG_MONSTER_MOVE packet: 
+	the uint8 field:
+		0: nothing special													known
+		1: Don't move														known
+		2: there is an extra 3 floats, also known as a vector				unknown
+		3: there is an extra uint64 most likely a guid.						unknown
+		4: there is an extra float that causes the orientation to be set.	known
+		
+		note:	when this field is 1. 
+			there is no need to send  the next 3 uint32's as they are'nt used by the client
+	
+	the MoveFlags:
+		0x00000000 - Walk
+		0x00000100 - Run
+		0x00000200 - Fly
+		some comments on that 0x00000300 - Fly = 0x00000100 | 0x00000200
+
+	waypoints:
+		TODO.... as they somehow seemed to be changed long time ago..
+		
+*************************************************************************************************************/
+
 void AIInterface::SendMoveToPacket(float toX, float toY, float toZ, float toO, uint32 time, uint32 MoveFlags)
 {
 	//this should NEVER be called directly !!!!!!
 	//use MoveTo()
 
-	/*
-	Move Flags
-	0x00000000 - Walk
-	0x00000100 - Run
-	0x00000300 - Fly
-	*/
 #ifndef USING_BIG_ENDIAN
 	StackWorldPacket<60> data(SMSG_MONSTER_MOVE);
 #else
@@ -1802,10 +1820,8 @@ void AIInterface::SendMoveToPacket(float toX, float toY, float toZ, float toO, u
 	data << uint32(1);	  // 1 waypoint
 	data << toX << toY << toZ;
 
-	if(m_Unit->GetTypeId() == TYPEID_PLAYER)
-		m_Unit->SendMessageToSet( &data, true );
-	else
-		m_Unit->SendMessageToSet( &data, false );
+	bool self = m_Unit->GetTypeId() == TYPEID_PLAYER;
+	m_Unit->SendMessageToSet( &data, self );
 }
 
 /*
