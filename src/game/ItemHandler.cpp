@@ -1768,13 +1768,7 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 	GemPropertyEntry * gp;
 	EnchantEntry * Enchantment;
 	recvPacket >> itemguid ;
-	enum {
-		GEM_META_SOCKET =	1,
-		GEM_RED_SOCKET =	2,
-		GEM_YELLOW_SOCKET =	4,
-		GEM_BLUE_SOCKET	=	8
-	};
-	
+
 	Item * TargetItem =_player->GetItemInterface()->GetItemByGUID(itemguid);
 	if(!TargetItem)
 		return;
@@ -1828,7 +1822,6 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 				TargetItem->AddEnchantment(Enchantment, 0, true,apply,false,2+i);
 		}
 	}
-
 
 	//Add color match bonus
 	if(TargetItem->GetProto()->SocketBonus)

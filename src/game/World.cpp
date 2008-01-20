@@ -6792,7 +6792,6 @@ bool World::SetInitialWorldSettings()
 		}
 	}
 
-
 	sEventMgr.AddEvent(this, &World::CheckForExpiredInstances, EVENT_WORLD_UPDATEAUCTIONS, 120000, 0, 0);
 	return true;
 }

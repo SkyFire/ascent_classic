@@ -21,6 +21,11 @@
 #define _ITEMPROTOTYPE_H
 class Spell;
 
+#define GEM_META_SOCKET 1
+#define GEM_RED_SOCKET 2
+#define GEM_YELLOW_SOCKET 4
+#define GEM_BLUE_SOCKET 8
+
 #define MAX_INVENTORY_SLOT 118
 #define MAX_BUYBACK_SLOT 12
 
