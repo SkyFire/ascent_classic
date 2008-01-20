@@ -93,3 +93,82 @@ uint32 	Time; 		// time it take to get to the next point
 uint32	WaypointCount;
 [ dynamic part related on the amount of way points ]
 	{ float toXpos, toYpos, toZpos } x waypointcount;
+
+
+
+
+
+
+
+**************************************************************************************************************
+Some un structured research.
+
+SMSG_UNIT_UNKNOWN								= 1016,	//(0x03F8)
+|guid|
+
+0x3fb
+GetUint64(Bufferclass, (int)&v12);
+GetUint8(v4, (int)&v13);
+GetUint8(v4, (int)&v14);
+GetUint32(v4, (int)&a2);
+GetString(v4, (int)&v16, 0x80u);
+
+0x3f5
+GetUint64(Bufferclass, (int)&v7);
+GetUint32(v6, (int)&a2);
+
+0x3f4
+GetUint8(a4, (int)&v7);
+
+0x3f3
+GetUint32(Bufferclass, (int)&a2);
+
+0x3f1
+GetUint64(Bufferclass, (int)&v12);
+GetUint8(v4, (int)&v13);
+GetUint8(v4, (int)&v14);
+GetUint32(v4, (int)&a2);
+GetString(v4, (int)&v16, 0x80u);
+
+0x3f0
+GetUint64(Bufferclass, (int)&v14);
+GetUint8(v4, (int)&v15);
+GetUint32(v4, (int)&a2);
+GetString(v4, (int)&v17, 0x80u);
+
+0x3Ef
+GetUint64(Bufferclass, (int)&v12);
+GetUint8(v4, (int)&v13);
+GetUint8(v4, (int)&v14);
+GetUint32(v4, (int)&a2);
+GetString(v4, (int)&v16, 0x80u);
+
+0x3e2 // related to enable mic...
+GetUint8(a4, (int)&v9);
+
+0x3d3
+GetUint32(Bufferclass, (int)&a2);
+
+0x3ae
+GetUint64(Bufferclass, (int)&a2);
+optional GetUint8(v4, (int)&v17);
+
+0x3ad
+GetGuid(a4, (int)&v6); // packed
+
+0x3ac
+GetGuid // packed
+
+0x3aa
+GetUint64(Bufferclass, (int)&v6);
+  GetUint64(v5, (int)&v7);
+  GetUint32(v5, (int)&a2);
+  GetUint32(v5, (int)&v9);
+  GetUint32(v5, (int)&v10);
+
+
+
+
+
+
+
