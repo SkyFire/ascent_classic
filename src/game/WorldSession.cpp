@@ -214,12 +214,15 @@ int WorldSession::Update(uint32 InstanceID)
 		}
 
 		// ping timeout!
-		Disconnect();
-		bDeleted = true;
-		LogoutPlayer(true);
+		if( _socket != NULL )
+		{
+			Disconnect();
+			_socket = NULL;
+		}
 
-		// 1 - Complete deletion
-		return 1;
+		m_lastPing = UNIXTIME;		// Prevent calling this code over and over.
+		if(!_logoutTime)
+			_logoutTime = m_currMsTime + PLAYER_LOGOUT_DELAY;
 	}
 
 	return 0;
@@ -384,7 +387,7 @@ void WorldSession::SendBuyFailed(uint64 guid, uint32 itemid, uint8 error)
 	WorldPacket data(13);
 	data.SetOpcode(SMSG_BUY_FAILED);
 	data << guid << itemid << error;
-	_socket->SendPacket(&data);
+	SendPacket(&data);
 }
 
 void WorldSession::SendSellItem(uint64 vendorguid, uint64 itemid, uint8 error)
@@ -392,7 +395,7 @@ void WorldSession::SendSellItem(uint64 vendorguid, uint64 itemid, uint8 error)
 	WorldPacket data(17);
 	data.SetOpcode(SMSG_SELL_ITEM);
 	data << vendorguid << itemid << error;
-	_socket->SendPacket(&data);
+	SendPacket(&data);
 }
 
 void WorldSession::LoadSecurity(std::string securitystring)
