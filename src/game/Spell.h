@@ -664,7 +664,7 @@ enum SpellEffects
     SPELL_EFFECT_DUMMYMELEE,                //    121
     SPELL_EFFECT_UNKNOWN1,                  //    122
     SPELL_EFFECT_UNKNOWN2,                  //    123
-    SPELL_EFFECT_UNKNOWN3,                  //    124
+    SPELL_EFFECT_PLAYER_PULL,               //    124
     SPELL_EFFECT_UNKNOWN4,                  //    125
     SPELL_EFFECT_UNKNOWN5,                  //    126
     SPELL_EFFECT_PROSPECTING,               //    127
@@ -1626,6 +1626,7 @@ public:
     void SpellEffectSkill(uint32 i);
     void SpellEffectApplyPetAura(uint32 i);
     void SpellEffectDummyMelee(uint32 i);
+    void SpellEffectPlayerPull( uint32 i );
     void SpellEffectSpellSteal(uint32 i);
     void SpellEffectProspecting(uint32 i);
     void SpellEffectOpenLockItem(uint32 i);

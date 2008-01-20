@@ -144,7 +144,7 @@ pSpellEffect SpellEffectsHandler[TOTAL_SPELL_EFFECTS]={
 		&Spell::SpellEffectDummyMelee,//SPELL_EFFECT_DUMMYMELEE	- 121
 		&Spell::SpellEffectNULL,//unknown - 122 //not used
 		&Spell::SpellEffectNULL,//SPELL_EFFECT_FILMING - 123 // http://www.thottbot.com/?sp=27998: flightpath 
-		&Spell::SpellEffectNULL,//SPELL_EFFECT_PULL - 124 //http://www.thottbot.com/?sp=28337
+		&Spell::SpellEffectPlayerPull, // SPELL_EFFECT_PLAYER_PULL - 124 - http://thottbot.com/e2312
 		&Spell::SpellEffectNULL,//unknown - 125 // Reduce Threat by % //http://www.thottbot.com/?sp=32835
 		&Spell::SpellEffectSpellSteal,//SPELL_EFFECT_SPELL_STEAL - 126 // Steal Beneficial Buff (Magic) //http://www.thottbot.com/?sp=30449
 		&Spell::SpellEffectProspecting,//unknown - 127 // Search 5 ore of a base metal for precious gems.  This will destroy the ore in the process.
@@ -156,14 +156,14 @@ pSpellEffect SpellEffectsHandler[TOTAL_SPELL_EFFECTS]={
 		&Spell::SpellEffectNULL,// SPELL_EFFECT_FORGET_SPECIALIZATION - 133 // http://www.thottbot.com/s36441 // I think this is a gm/npc spell
 		&Spell::SpellEffectNULL,// unknown - 134 // related to summoning objects and removing them, http://www.thottbot.com/s39161
 		&Spell::SpellEffectNULL,// unknown - 135 // no spells
-        &Spell::SpellEffectNULL,// unknown - 136 // http://www.thottbot.com/s41542 and http://www.thottbot.com/s39703
-        &Spell::SpellEffectNULL,// unknown - 137 // http://www.thottbot.com/s41542
-        &Spell::SpellEffectNULL,// unknown - 138 // related to superjump or even "*jump" spells http://www.thottbot.com/?e=Unknown%20138
-        &Spell::SpellEffectNULL,// unknown - 139 // no spells
-        &Spell::SpellEffectTeleportUnits,//SPELL_EFFECT_TELEPORT_UNITS - 140 IronForge teleport / portal only it seems
-        &Spell::SpellEffectNULL,// unknown - 141 // triggers spell, magic one,  (Mother spell) http://www.thottbot.com/s41065
-        &Spell::SpellEffectNULL,// unknown - 142 // triggers some kind of "Put spell on target" thing... (dono for sure) http://www.thottbot.com/s40872 and http://www.thottbot.com/s33076
-        &Spell::SpellEffectNULL,// unknown - 143 // Master -> deamon effecting spell, http://www.thottbot.com/s25228 and http://www.thottbot.com/s35696
+		&Spell::SpellEffectNULL,// unknown - 136 // http://www.thottbot.com/s41542 and http://www.thottbot.com/s39703
+		&Spell::SpellEffectNULL,// unknown - 137 // http://www.thottbot.com/s41542
+		&Spell::SpellEffectNULL,// unknown - 138 // related to superjump or even "*jump" spells http://www.thottbot.com/?e=Unknown%20138
+		&Spell::SpellEffectNULL,// unknown - 139 // no spells
+		&Spell::SpellEffectTeleportUnits,//SPELL_EFFECT_TELEPORT_UNITS - 140 IronForge teleport / portal only it seems
+		&Spell::SpellEffectNULL,// unknown - 141 // triggers spell, magic one,  (Mother spell) http://www.thottbot.com/s41065
+		&Spell::SpellEffectNULL,// unknown - 142 // triggers some kind of "Put spell on target" thing... (dono for sure) http://www.thottbot.com/s40872 and http://www.thottbot.com/s33076
+		&Spell::SpellEffectNULL,// unknown - 143 // Master -> deamon effecting spell, http://www.thottbot.com/s25228 and http://www.thottbot.com/s35696
 };
 
 void Spell::SpellEffectNULL(uint32 i)
@@ -4350,6 +4350,37 @@ void Spell::SpellEffectCharge(uint32 i)
 	p_caster->setAttackTimer(time, false);
 	p_caster->setAttackTimer(time, true);
 	p_caster->ResetHeartbeatCoords();
+}
+
+void Spell::SpellEffectPlayerPull( uint32 i )
+{
+	if( unitTarget == NULL || !unitTarget->isAlive() || !unitTarget->IsPlayer() )
+		return;
+
+	Player* p_target = static_cast< Player* >( unitTarget );
+
+	// calculate destination
+	float pullD = p_target->CalcDistance( m_caster ) - p_target->GetFloatValue( UNIT_FIELD_BOUNDINGRADIUS ) - m_caster->GetFloatValue( UNIT_FIELD_BOUNDINGRADIUS ) - 1.0f;
+	float pullO = p_target->calcRadAngle( p_target->GetPositionX(), p_target->GetPositionY(), m_caster->GetPositionX(), m_caster->GetPositionY() );
+	float pullX = p_target->GetPositionX() + pullD * cosf( pullO );
+	float pullY = p_target->GetPositionY() + pullD * sinf( pullO );
+	float pullZ = m_caster->GetPositionZ() + 0.3f;
+	uint32 time = uint32( pullD * 42.0f );
+
+	p_target->SetOrientation( pullO );
+
+	WorldPacket data( SMSG_MONSTER_MOVE, 60 );
+	data << p_target->GetNewGUID();
+	data << p_target->GetPositionX() << p_target->GetPositionY() << p_target->GetPositionZ();
+	data << getMSTime();
+	data << uint8( 4 );
+	data << pullO;
+	data << uint32( 0x00000100 );
+	data << time;
+	data << uint32( 1 );
+	data << pullX << pullY << pullZ;
+
+	p_target->SendMessageToSet( &data, true );   
 }
 
 void Spell::SpellEffectSummonCritter(uint32 i)
