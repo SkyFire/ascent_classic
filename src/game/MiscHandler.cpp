@@ -922,21 +922,38 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 
 	uint64 guid;
 	recv_data >> guid;
+
+	Corpse* pCorpse = objmgr.GetCorpse( (uint32)guid );
+
+	if( pCorpse == NULL )
+		return;
+
 	// Check that we're reviving from a corpse, and that corpse is associated with us.
-	Corpse * pCorpse = objmgr.GetCorpse((uint32)guid);
-	if(pCorpse == 0) return;
-
-	if(pCorpse == 0 ||
-		pCorpse->GetUInt32Value(CORPSE_FIELD_OWNER) != _player->GetGUIDLow() &&
-		pCorpse->GetUInt32Value(CORPSE_FIELD_FLAGS) == 5)
+	if( pCorpse->GetUInt32Value( CORPSE_FIELD_OWNER ) != _player->GetGUIDLow() && pCorpse->GetUInt32Value( CORPSE_FIELD_FLAGS ) == 5 )
 	{
-		WorldPacket data(SMSG_RESURRECT_FAILED, 4);
-		data << uint32(1);  // this is a real guess!
+		WorldPacket data( SMSG_RESURRECT_FAILED, 4 );
+		data << uint32(1); // this is a real guess!
 		SendPacket(&data);
-
 		return;
 	}
 
+	// Check we are actually in range of our corpse
+    if ( pCorpse->GetDistance2dSq( _player ) > CORPSE_MINIMUM_RECLAIM_RADIUS_SQ )
+  	{
+		WorldPacket data( SMSG_RESURRECT_FAILED, 4 );
+		data << uint32(1);
+		SendPacket(&data);
+		return;
+	}
+
+    // Check death clock before resurrect they must wait for release to complete
+    if( pCorpse->GetDeathClock() + CORPSE_RECLAIM_TIME > time( NULL ) )
+	{
+		WorldPacket data( SMSG_RESURRECT_FAILED, 4 );
+		data << uint32(1);
+		SendPacket(&data);
+		return;
+	}
 
 	GetPlayer()->ResurrectPlayer();
 	GetPlayer()->SetUInt32Value(UNIT_FIELD_HEALTH, GetPlayer()->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/2 );

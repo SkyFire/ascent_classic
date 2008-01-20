@@ -25,6 +25,7 @@ enum CORPSE_STATE
 	CORPSE_STATE_BODY = 0,
 	CORPSE_STATE_BONES = 1,
 };
+
 struct CorpseData
 {
 	uint32 LowGuid;
@@ -36,6 +37,11 @@ struct CorpseData
 	float z;
 	void DeleteFromDB();
 };
+
+#define CORPSE_RECLAIM_TIME 30
+#define CORPSE_RECLAIM_TIME_MS CORPSE_RECLAIM_TIME * 1000
+#define CORPSE_MINIMUM_RECLAIM_RADIUS 39 
+#define CORPSE_MINIMUM_RECLAIM_RADIUS_SQ CORPSE_MINIMUM_RECLAIM_RADIUS * CORPSE_MINIMUM_RECLAIM_RADIUS
 
 class SERVER_DECL Corpse : public Object
 {
@@ -59,8 +65,13 @@ public:
 
 	void SpawnBones();
 	void Delink();
+
+	void ResetDeathClock(){ m_time = time( NULL ); }
+	time_t GetDeathClock(){ return m_time; }
+
 private:
 	uint32 m_state;
+	time_t m_time;
 	uint32 _fields[CORPSE_END];
 	bool _loadedfromdb;
 };

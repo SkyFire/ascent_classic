@@ -3805,57 +3805,58 @@ void Player::BuildPlayerRepop()
 
 void Player::RepopRequestedPlayer()
 {
-	if(myCorpse)
+	if( myCorpse != NULL )
 	{
-		GetSession()->SendNotification(NOTIFICATION_MESSAGE_NO_PERMISSION);
+		GetSession()->SendNotification( NOTIFICATION_MESSAGE_NO_PERMISSION );
 		return;
 	}
 
-	if(m_CurrentTransporter != NULL)
+	if( m_CurrentTransporter != NULL )
 	{
-		m_CurrentTransporter->RemovePlayer(this);
+		m_CurrentTransporter->RemovePlayer( this );
 		m_CurrentTransporter = NULL;
 		m_TransporterGUID = 0;
 
 		ResurrectPlayer();
-		RepopAtGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId());
+		RepopAtGraveyard( GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId() );
 		return;
 	}
 
 	MapInfo * pMapinfo;
 
-	sEventMgr.RemoveEvents(this,EVENT_PLAYER_FORECED_RESURECT); //in case somebody resurrected us before this event happened
+	sEventMgr.RemoveEvents( this, EVENT_PLAYER_FORECED_RESURECT ); //in case somebody resurrected us before this event happened
 
 	// Set death state to corpse, that way players will lose visibility
-	setDeathState(CORPSE);
+	setDeathState( CORPSE );
 	
 	// Update visibility, that way people wont see running corpses :P
 	UpdateVisibility();
 
 	// If we're in battleground, remove the skinnable flag.. has bad effects heheh
-	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+	RemoveFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
 
-	bool corpse = (m_bg != NULL) ? m_bg->CreateCorpse(this) : true;
-	if(corpse)
+	bool corpse = (m_bg != NULL) ? m_bg->CreateCorpse( this ) : true;
+
+	if( corpse )
 		CreateCorpse();
 	
 	BuildPlayerRepop();
 
-	pMapinfo = WorldMapInfoStorage.LookupEntry(GetMapId());
-	if(pMapinfo)
+	pMapinfo = WorldMapInfoStorage.LookupEntry( GetMapId() );
+	if( pMapinfo != NULL )
 	{
-		if(pMapinfo->type == INSTANCE_NULL || pMapinfo->type == INSTANCE_PVP)
+		if( pMapinfo->type == INSTANCE_NULL || pMapinfo->type == INSTANCE_PVP )
 		{
-			RepopAtGraveyard(GetPositionX(),GetPositionY(),GetPositionZ(),GetMapId());
+			RepopAtGraveyard( GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId() );
 		}
 		else
 		{
-			RepopAtGraveyard(pMapinfo->repopx, pMapinfo->repopy, pMapinfo->repopz, pMapinfo->repopmapid);
+			RepopAtGraveyard( pMapinfo->repopx, pMapinfo->repopy, pMapinfo->repopz, pMapinfo->repopmapid );
 		}
 	}
 	else
 	{
-		RepopAtGraveyard(GetPositionX(),GetPositionY(),GetPositionZ(),GetMapId());
+		RepopAtGraveyard( GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId() );
 	}
 	
 	if( corpse )
@@ -3863,11 +3864,19 @@ void Player::RepopRequestedPlayer()
 		SpawnCorpseBody();
 
 		/* Send Spirit Healer Location */
-		WorldPacket data(SMSG_SPIRIT_HEALER_POS, 16);
+		WorldPacket data( SMSG_SPIRIT_HEALER_POS, 16 );
 		data << m_mapId << m_position;
-		m_session->SendPacket(&data);
+		m_session->SendPacket( &data );
+
+		/* Corpse reclaim delay */
+		WorldPacket data2( SMSG_CORPSE_RECLAIM_DELAY, 4 );
+		data2 << (uint32)( CORPSE_RECLAIM_TIME_MS );
+		GetSession()->SendPacket( &data2 );
 	}
 
+	if( myCorpse != NULL )
+		myCorpse->ResetDeathClock();
+	
 	switch( pMapinfo->mapid )
 	{
 		case 550: //The Eye
@@ -6766,8 +6775,8 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 {
 	uint32 destsize = size + size/10 + 16;
 	int rate = sWorld.getIntRate(INTRATE_COMPRESSION);
-	/*if(size > 30000)
-		rate = 9;		// max*/
+	if(size > 30000)
+		rate = 9;		// max
 
 	// set up stream
 	z_stream stream;
@@ -6782,7 +6791,7 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 	}
 
 	uint8 *buffer = new uint8[destsize];
-	//memset(buffer,0,destsize);	/* fix umr - burlex */
+	memset(buffer,0,destsize);	/* fix umr - burlex */
 	
 	// set up stream pointers
 	stream.next_out  = (Bytef*)buffer+4;
