@@ -1537,7 +1537,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			talent_max_rank = 0;
 			for( uint32 k = 5; k > 0; --k )
 			{
-				sLog.outDebug( "HandleInspectOpcode: k(%i) RankID(%i) HasSpell(%i) TalentTree(%i) Tab(%i)", k, talent_info->RankID[k - 1], player->HasSpell( talent_info->RankID[k - 1] ), talent_info->TalentTree, talent_tab_id(%i) );
+				sLog.outDebug( "HandleInspectOpcode: k(%i) RankID(%i) HasSpell(%i) TalentTree(%i) Tab(%i)", k, talent_info->RankID[k - 1], player->HasSpell( talent_info->RankID[k - 1] ), talent_info->TalentTree, talent_tab_id );
 				if( talent_info->RankID[k - 1] != 0 && player->HasSpell( talent_info->RankID[k - 1] ) )
 				{
 					talent_max_rank = k;

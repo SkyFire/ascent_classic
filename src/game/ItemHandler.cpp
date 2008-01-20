@@ -371,7 +371,7 @@ void WorldSession::HandleSwapInvItemOpcode( WorldPacket & recv_data )
 	bool skip_combat = false;
 	if( srcslot < EQUIPMENT_SLOT_END || dstslot < EQUIPMENT_SLOT_END )	  // We're doing an equip swap.
 	{
-		if(_player->CombatStatus.IsInCombat())
+		if( _player->CombatStatus.IsInCombat() )
 		{
 			if( srcslot < EQUIPMENT_SLOT_MAINHAND || dstslot < EQUIPMENT_SLOT_MAINHAND )	// These can't be swapped
 			{
@@ -382,23 +382,23 @@ void WorldSession::HandleSwapInvItemOpcode( WorldPacket & recv_data )
 		}
 	}
 
-	if (!srcitem)
+	if( !srcitem )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(srcitem,dstitem,INV_ERR_YOU_CAN_NEVER_USE_THAT_ITEM);
+		_player->GetItemInterface()->BuildInventoryChangeError( srcitem, dstitem, INV_ERR_YOU_CAN_NEVER_USE_THAT_ITEM );
 		return;
 	}
 
-	if (srcslot == dstslot)
+	if( srcslot == dstslot )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError(srcitem,dstitem, INV_ERR_ITEM_DOESNT_GO_TO_SLOT);
+		_player->GetItemInterface()->BuildInventoryChangeError( srcitem, dstitem, INV_ERR_ITEM_DOESNT_GO_TO_SLOT );
 		return;
 	}
 	
-	if((error=_player->GetItemInterface()->CanEquipItemInSlot(INVENTORY_SLOT_NOT_SET, dstslot, srcitem->GetProto(), skip_combat)))
+	if( ( error = _player->GetItemInterface()->CanEquipItemInSlot( INVENTORY_SLOT_NOT_SET, dstslot, srcitem->GetProto(), skip_combat ) ) )
 	{
-		if(dstslot < INVENTORY_KEYRING_END)
+		if( dstslot < INVENTORY_KEYRING_END )
 		{
-			_player->GetItemInterface()->BuildInventoryChangeError(srcitem,dstitem, error);
+			_player->GetItemInterface()->BuildInventoryChangeError( srcitem, dstitem, error );
 			return;
 		}
 	}
@@ -1737,14 +1737,14 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket &recvPacket)
 	}
 	else
 	{
-		if(slotresult.ContainerSlot == INVENTORY_SLOT_NOT_SET)
+		if( slotresult.ContainerSlot == INVENTORY_SLOT_NOT_SET )
 		{
 			_player->GetItemInterface()->SwapItemSlots(SrcSlot, slotresult.Slot);
 		}
 		else
 		{
-				eitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInvSlot, SrcSlot, false);
-				result = _player->GetItemInterface()->AddItemToFreeSlot(eitem);
+			eitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInvSlot, SrcSlot, false);
+			result = _player->GetItemInterface()->AddItemToFreeSlot(eitem);
 		}
 	}
 }
