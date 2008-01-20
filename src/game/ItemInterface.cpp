@@ -2380,14 +2380,31 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 				m_pOwner->SetUInt32Value(VisibleBase + 8, 0);
 			}
 		}
-	}  
-	if(dstslot == EQUIPMENT_SLOT_OFFHAND || srcslot == EQUIPMENT_SLOT_OFFHAND)
-	{
-		if(m_pItems[EQUIPMENT_SLOT_OFFHAND] != 0 && m_pItems[EQUIPMENT_SLOT_OFFHAND]->GetProto()->Class == ITEM_CLASS_WEAPON)
-			m_pOwner->SetDuelWield(true);
-		else
-			m_pOwner->SetDuelWield(false);
 	}
+
+	if( dstslot == EQUIPMENT_SLOT_OFFHAND || srcslot == EQUIPMENT_SLOT_OFFHAND )
+	{
+		if( m_pItems[EQUIPMENT_SLOT_OFFHAND] != NULL && m_pItems[EQUIPMENT_SLOT_OFFHAND]->GetProto()->Class == ITEM_CLASS_WEAPON )
+			m_pOwner->SetDuelWield( true );
+		else
+			m_pOwner->SetDuelWield( false );
+	}
+
+	// Reapply weapon mods immediately to prevent exploit
+	if( ( dstslot >= EQUIPMENT_SLOT_MAINHAND && dstslot <= EQUIPMENT_SLOT_RANGED ) || ( srcslot >= EQUIPMENT_SLOT_MAINHAND && srcslot <= EQUIPMENT_SLOT_RANGED ) )
+	{
+		if( m_pItems[dstslot] != NULL )
+		{
+			m_pOwner->_ApplyItemMods( m_pItems[dstslot], dstslot, false, false, true );
+			m_pOwner->_ApplyItemMods( m_pItems[dstslot], dstslot, true, false, true );
+		}
+		if( m_pItems[srcslot] != NULL )
+		{
+			m_pOwner->_ApplyItemMods( m_pItems[srcslot], srcslot, false, false, true );
+			m_pOwner->_ApplyItemMods( m_pItems[srcslot], srcslot, true, false, true );
+		}
+	}
+
 }
 
 //-------------------------------------------------------------------//
