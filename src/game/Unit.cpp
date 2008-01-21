@@ -2951,7 +2951,7 @@ else
 		while(extra_attacks > 0)
 		{
 			extra_attacks--;
-			Strike( pVictim, weapon_damage_type, ability, add_damage, pct_dmg_mod, exclusive_damage, false, false );
+			Strike( pVictim, weapon_damage_type, NULL, 0, 0, 0, false, false);
 		}
 
 		m_extraAttackCounter = false;
