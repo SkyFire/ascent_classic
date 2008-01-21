@@ -2914,7 +2914,7 @@ else
 		val *= (1 + (((Player*)this)->rageFromDamageDealt / 100.0f));
 		val *= 10;
 
-		sLog.outString("Dmg is %u. C is %f, and fs is %f %f. val is %f", dmg.full_damage, c, f, s, val);
+		//sLog.outString("Dmg is %u. C is %f, and fs is %f %f. val is %f", dmg.full_damage, c, f, s, val);
 		ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
 		if(GetUInt32Value(UNIT_FIELD_POWER2) > 1000)
 			ModUInt32Value(UNIT_FIELD_POWER2, 1000 - GetUInt32Value(UNIT_FIELD_POWER2));
