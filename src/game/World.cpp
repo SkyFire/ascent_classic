@@ -1581,6 +1581,44 @@ bool World::SetInitialWorldSettings()
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
     }
 
+    //Priest - Holy Nova
+    sp = dbcSpell.LookupEntry( 15237 );
+    if( sp != NULL )
+    {
+        sp->Effect[1] = 64;
+        sp->EffectTriggerSpell[1] = 23455;
+    }
+    sp = dbcSpell.LookupEntry( 15430 );
+    if( sp != NULL )
+    {
+        sp->Effect[1] = 64;
+        sp->EffectTriggerSpell[1] = 23458;
+    }
+    sp = dbcSpell.LookupEntry( 15431 );
+    if( sp != NULL )
+    {
+        sp->Effect[1] = 64;
+        sp->EffectTriggerSpell[1] = 23459;
+    }
+    sp = dbcSpell.LookupEntry( 27799 );
+    if( sp != NULL )
+    {
+        sp->Effect[1] = 64;
+        sp->EffectTriggerSpell[1] = 27803;
+    }
+    sp = dbcSpell.LookupEntry( 27800 );
+    if( sp != NULL )
+    {
+        sp->Effect[1] = 64;
+        sp->EffectTriggerSpell[1] = 27804;
+    }
+    sp = dbcSpell.LookupEntry( 27801 );
+    if( sp != NULL )
+    {
+        sp->Effect[1] = 64;
+        sp->EffectTriggerSpell[1] = 27805;
+    }
+
 	//Bloodlust targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 2825 );
 	if( sp != NULL )
