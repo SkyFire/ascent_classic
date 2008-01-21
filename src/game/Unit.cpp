@@ -2872,25 +2872,72 @@ else
 			}
 		}
 	}
-//--------------------------rage processing-------------------------------------------------
-	uint32 val;
+	//--------------------------rage processing-------------------------------------------------
+	float val;
 	//http://www.wowwiki.com/Formulas:Rage_generation
-	// It only regens rage if in combat, don't know why but this is making
-	// the player to regen 1 rage every 3 secs.....
-	// and the formula is wrong also ... TODO
-	//attacker made white damage
-	if(realdamage && IsPlayer() && GetPowerType() == POWER_TYPE_RAGE && !ability && CombatStatus.IsInCombat())
+
+	if(dmg.full_damage && IsPlayer() && GetPowerType() == POWER_TYPE_RAGE && !ability && 
+		CombatStatus.IsInCombat())
 	{
-		val = GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/getLevel();
-		val += (static_cast<Player *>(this)->rageFromDamageDealt*val)/100;
-		SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
+		float level = (float)getLevel();
+
+		// C thingy
+		float c = 0.0091107836f*level*level +3.225598133f*level+4.2652911f;
+
+		// Hit Factor
+		float f = (weapon_damage_type == OFFHAND) ? 1.75 : 3.5;
+
+		if(hit_status & HITSTATUS_CRICTICAL)
+			f *= 2;
+
+		float s = 1.0f;
+
+		// Weapon speed (normal)
+		Item * weapon = 
+			(((Player*)this)->GetItemInterface())->GetInventoryItem(INVENTORY_SLOT_NOT_SET, 
+			(weapon_damage_type == OFFHAND ? EQUIPMENT_SLOT_OFFHAND : EQUIPMENT_SLOT_MAINHAND));
+		if(!weapon)
+		{
+			if(weapon_damage_type == OFFHAND)
+				s = GetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01) / 1000.0f;
+			else
+				s = GetUInt32Value(UNIT_FIELD_BASEATTACKTIME) / 1000.0f;
+		}
+		uint32 entry = weapon->GetEntry();
+		ItemPrototype * pProto = ItemPrototypeStorage.LookupEntry(entry);
+		if(pProto)
+		{
+			s = pProto->Delay / 1000.0f;
+		}
+
+		val = (7.5 * dmg.full_damage / c + f * s) / 2.0f;
+		val *= (1 + (((Player*)this)->rageFromDamageDealt / 100.0f));
+		val *= 10;
+
+		sLog.outString("Dmg is %u. C is %f, and fs is %f %f. val is %f", dmg.full_damage, c, f, s, val);
+		ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
+		if(GetUInt32Value(UNIT_FIELD_POWER2) > 1000)
+			ModUInt32Value(UNIT_FIELD_POWER2, 1000 - GetUInt32Value(UNIT_FIELD_POWER2));
+
+
 	}
-	//victim received damage = we do not care the type of damage...we generate rage anyway
-	if(realdamage && pVictim->IsPlayer() && pVictim->GetPowerType() == POWER_TYPE_RAGE && pVictim->CombatStatus.IsInCombat())
+	// I am receiving damage!
+	if(dmg.full_damage && pVictim->IsPlayer() && pVictim->GetPowerType() == POWER_TYPE_RAGE 
+		&& pVictim->CombatStatus.IsInCombat())
 	{
-		val = pVictim->GetUInt32Value(UNIT_FIELD_POWER2)+(realdamage*20)/pVictim->getLevel();
-		val += (static_cast<Player *>(pVictim)->rageFromDamageDealt*val)/100;
-		pVictim->SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
+		// 2.5d / c
+		float level = (float)getLevel();
+
+		// C "thingy"
+		float c = 0.0091107836f*level*level +3.225598133f*level+4.2652911f;
+		val = 2.5f * dmg.full_damage / c;
+		val *= 10;
+
+		ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
+		if(GetUInt32Value(UNIT_FIELD_POWER2) > 1000)
+			ModUInt32Value(UNIT_FIELD_POWER2, 1000 - GetUInt32Value(UNIT_FIELD_POWER2));
+
+
 	}
 		
 	RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);
