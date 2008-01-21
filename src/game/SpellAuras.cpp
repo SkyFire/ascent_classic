@@ -3230,17 +3230,18 @@ void Aura::SpellAuraModIncreaseEnergy(bool apply)
 
 void Aura::SpellAuraModShapeshift(bool apply)
 {
-	if(!p_target) return;
+	if( p_target == NULL )
+		return;
 
-	if(p_target->m_MountSpellId && p_target->m_MountSpellId != m_spellProto->Id)
-		m_target->RemoveAura(p_target->m_MountSpellId); // these spells are not compatible
+	if( p_target->m_MountSpellId && p_target->m_MountSpellId != m_spellProto->Id )
+		m_target->RemoveAura( p_target->m_MountSpellId ); // these spells are not compatible
 
 	uint32 spellId = 0;
 	uint32 modelId = 0;
+
 	bool freeMovements = false;
 
-
-	switch(mod->m_miscValue)
+	switch( mod->m_miscValue )
 	{
 	case FORM_CAT: 
 		{//druid
@@ -3351,13 +3352,17 @@ void Aura::SpellAuraModShapeshift(bool apply)
 					static_cast<Player*>(m_target)->m_MountSpellId = 0;
 			}
 		} break;  
+	//case FORM_BATTLESTANCE:
+	//	{
+	//		spellId = 21156;
+	//	} break;
 	case FORM_DEFENSIVESTANCE:
 		{
-			spellId = 7376;			   
+			spellId = 7376;
 		} break;
 	case FORM_BERSERKERSTANCE:
 		{
-			spellId = 7381;   
+			spellId = 7381;
 		} break;
 	case FORM_SHADOW:
 		{
@@ -3413,28 +3418,28 @@ void Aura::SpellAuraModShapeshift(bool apply)
 		}break;
 	}
 
-	if (apply)
+	if( apply )
 	{
-		if(m_target->getClass() == WARRIOR && m_target->GetUInt32Value(UNIT_FIELD_POWER2) > static_cast<Player*>(m_target)->m_retainedrage)
-			m_target->SetUInt32Value(UNIT_FIELD_POWER2, static_cast<Player*>(m_target)->m_retainedrage);
+		if( m_target->getClass() == WARRIOR && m_target->GetUInt32Value( UNIT_FIELD_POWER2 ) > static_cast< Player* >( m_target )->m_retainedrage )
+			m_target->SetUInt32Value(UNIT_FIELD_POWER2, static_cast< Player* >( m_target )->m_retainedrage );
 
-		if(m_target->getClass() == DRUID)
+		if( m_target->getClass() == DRUID )
 		{
-			if(Rand(((Player*)m_target)->m_furorChance))
+			if( Rand( static_cast< Player* >( m_target )->m_furorChance ) )
 			{
 				uint32 furorSpell;
-				if(mod->m_miscValue == FORM_CAT)
+				if( mod->m_miscValue == FORM_CAT )
 					furorSpell = 17099;
-				else if(mod->m_miscValue == FORM_BEAR || mod->m_miscValue == FORM_DIREBEAR)
+				else if( mod->m_miscValue == FORM_BEAR || mod->m_miscValue == FORM_DIREBEAR )
 					furorSpell = 17057;
 				else
 					furorSpell = 0;
 
-				if(furorSpell)
+				if( furorSpell != 0 )
 				{
-					SpellEntry *spellInfo = dbcSpell.LookupEntry(furorSpell);
+					SpellEntry *spellInfo = dbcSpell.LookupEntry( furorSpell );
 
-					Spell *sp = new Spell(m_target, spellInfo, true, NULL);
+					Spell *sp = new Spell( m_target, spellInfo, true, NULL );
 					SpellCastTargets tgt;
 					tgt.m_unitTarget = m_target->GetGUID();
 					sp->prepare(&tgt);
@@ -3442,43 +3447,46 @@ void Aura::SpellAuraModShapeshift(bool apply)
 			}
 		}
 
-		if(spellId != GetSpellId())
+		if( spellId != GetSpellId() )
 		{
-			if(static_cast<Player*>(m_target)->m_ShapeShifted)
-				static_cast<Player*>(m_target)->RemoveAura(static_cast<Player*>(m_target)->m_ShapeShifted);
+			if( static_cast< Player* >( m_target )->m_ShapeShifted )
+				static_cast< Player* >( m_target )->RemoveAura( static_cast< Player* >( m_target )->m_ShapeShifted );
 
-			static_cast<Player*>(m_target)->m_ShapeShifted = GetSpellId();
+			static_cast< Player* >( m_target )->m_ShapeShifted = GetSpellId();
 		}
 
-		if(modelId)
-			m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, modelId);
+		if( modelId != 0 )
+			m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, modelId );
 
-		((Player*)m_target)->SetShapeShift(mod->m_miscValue);
+		static_cast< Player* >( m_target )->SetShapeShift( mod->m_miscValue );
 
-		if(spellId == 0)
-			return;
 		// check for spell id
-		SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
+		if( spellId == 0 )
+			return;
+
+		SpellEntry* spellInfo = dbcSpell.LookupEntry(spellId );
 		
-		Spell *sp = new Spell(m_target, spellInfo, true, NULL);
+		Spell *sp = new Spell( m_target, spellInfo, true, NULL );
 		SpellCastTargets tgt;
 		tgt.m_unitTarget = m_target->GetGUID();
-		sp->prepare(&tgt);
+		sp->prepare( &tgt );
 		
 		// remove the caster from imparing movements
-		if(freeMovements)
+		if( freeMovements )
 		{
-			for(uint32 x=MAX_POSITIVE_AURAS;x<MAX_AURAS;x++)
+			for( uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; x++ )
 			{
-				if(m_target->m_auras[x])
+				if( m_target->m_auras[x] != NULL )
 				{
-					if(m_target->m_auras[x]->GetSpellProto()->MechanicsType == 7 || m_target->m_auras[x]->GetSpellProto()->MechanicsType == 11) // Remove roots and slow spells
+					if( m_target->m_auras[x]->GetSpellProto()->MechanicsType == 7 || m_target->m_auras[x]->GetSpellProto()->MechanicsType == 11 ) // Remove roots and slow spells
+					{
 						m_target->m_auras[x]->Remove();
+					}
 					else // if got immunity for slow, remove some that are not in the mechanics
 					{
-						for(int i=0;i<3;i++)
+						for( int i = 0; i < 3; i++ )
 						{
-							if(m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED||m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT)
+							if( m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED || m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
 							{
 								m_target->m_auras[x]->Remove();
 								break;
@@ -3488,25 +3496,26 @@ void Aura::SpellAuraModShapeshift(bool apply)
 			   }
 			}
 		}
+
 		//execute after we changed shape
-		((Player*)m_target)->EventTalentHearthOfWildChange(true);
+		static_cast< Player* >( m_target )->EventTalentHearthOfWildChange( true );
 	}
 	else 
 	{
 		//execute before changing shape back
-		((Player*)m_target)->EventTalentHearthOfWildChange(false);
-		m_target->SetUInt32Value(UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID));				
-		if(spellId != GetSpellId())
+		static_cast< Player* >( m_target )->EventTalentHearthOfWildChange( false );
+		m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value( UNIT_FIELD_NATIVEDISPLAYID ) );				
+		if( spellId != GetSpellId() )
 		{
-			if(spellId)
-				m_target->RemoveAura(spellId);
+			if( spellId )
+				m_target->RemoveAura( spellId );
 		}
-		static_cast<Player*>(m_target)->m_ShapeShifted=0;
+		static_cast< Player* >( m_target )->m_ShapeShifted = 0;
 
-		((Player*)m_target)->SetShapeShift(0);
+		static_cast< Player* >( m_target )->SetShapeShift( 0 );
 
 	}
-	static_cast<Player*>(m_target)->UpdateStats();
+	static_cast< Player* >( m_target )->UpdateStats();
 }
 
 void Aura::SpellAuraModEffectImmunity(bool apply)
