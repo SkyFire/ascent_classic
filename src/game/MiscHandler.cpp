@@ -1554,7 +1554,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			talent_max_rank = 0;
 			for( uint32 k = 5; k > 0; --k )
 			{
-				sLog.outDebug( "HandleInspectOpcode: k(%i) RankID(%i) HasSpell(%i) TalentTree(%i) Tab(%i)", k, talent_info->RankID[k - 1], player->HasSpell( talent_info->RankID[k - 1] ), talent_info->TalentTree, talent_tab_id );
+				//sLog.outDebug( "HandleInspectOpcode: k(%i) RankID(%i) HasSpell(%i) TalentTree(%i) Tab(%i)", k, talent_info->RankID[k - 1], player->HasSpell( talent_info->RankID[k - 1] ), talent_info->TalentTree, talent_tab_id );
 				if( talent_info->RankID[k - 1] != 0 && player->HasSpell( talent_info->RankID[k - 1] ) )
 				{
 					talent_max_rank = k;
@@ -1573,6 +1573,8 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 
 			if( itr != sWorld.InspectTalentTabPos.end() )
 				talent_index += itr->second;
+			else
+				sLog.outDebug( "**** HandleInspectOpcode: talent(%i) rank_id(%i) talent_index(%i) talent_tab_pos(%i) rank_index(%i) rank_slot(%i) rank_offset(%i)", talent_info->TalentID, talent_info->RankID[talent_max_rank-1], talent_index, talent_tab_pos, rank_index, rank_slot, rank_offset );
 
 			rank_index = ( ( talent_index + talent_max_rank - 1 ) / 7 ) * 8 + ( ( talent_index + talent_max_rank - 1 ) % 7 );
 			rank_slot = rank_index / 8;
@@ -1580,7 +1582,7 @@ void WorldSession::HandleInspectOpcode( WorldPacket & recv_data )
 			mask = 1 << rank_offset;
 			data.put< uint8 >( 4 + rank_slot, mask & 0xFF );
 
-			//sLog.outDebug( "HandleInspectOpcode: talent_index(%i) talent_tab_pos(%i) page_talent_rank_index(%i) rank_index(%i) rank_slot(%i) rank_offset(%i)", talent_index, talent_tab_pos, page_talent_rank_index, rank_index, rank_slot, rank_offset );
+			sLog.outDebug( "HandleInspectOpcode: talent(%i) rank_id(%i) talent_index(%i) talent_tab_pos(%i) rank_index(%i) rank_slot(%i) rank_offset(%i)", talent_info->TalentID, talent_info->RankID[talent_max_rank-1], talent_index, talent_tab_pos, rank_index, rank_slot, rank_offset );
 		}
 
 		std::map< uint32, uint32 >::iterator itr = sWorld.InspectTalentTabSize.find( talent_tab_id );
