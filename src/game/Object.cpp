@@ -1623,15 +1623,21 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	}
 
         ///Rage
-        uint32 val;
+        float val;
 
         if(pVictim->GetPowerType() == POWER_TYPE_RAGE 
 			//&& !spellId //zack : general opinion is that spells should generate rage. I share the feeling
 			&& pVictim != this
 			&& pVictim->IsPlayer())
 	  {
-	      val = pVictim->GetUInt32Value(UNIT_FIELD_POWER2)+(damage*20)/(pVictim->getLevel()*3);
-	      pVictim->SetUInt32Value(UNIT_FIELD_POWER2, val>=1000?1000:val);
+		  float level = pVictim->getLevel();
+		  float c = 0.0091107836f*level*level +3.225598133f*level+4.2652911f;
+	      val = 2.5f * damage / c;
+		  uint32 rage = pVictim->GetUInt32Value(UNIT_FIELD_POWER2);
+		  if(rage + val > 1000)
+			  val = 1000 - pVictim->GetUInt32Value(UNIT_FIELD_POWER2);
+
+		  ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
 	  }
         //
 
