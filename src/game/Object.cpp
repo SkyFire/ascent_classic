@@ -1625,23 +1625,22 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
         ///Rage
         float val;
 
-        if(pVictim->GetPowerType() == POWER_TYPE_RAGE 
+		if( pVictim->GetPowerType() == POWER_TYPE_RAGE 
 			//&& !spellId //zack : general opinion is that spells should generate rage. I share the feeling
 			&& pVictim != this
 			&& pVictim->IsPlayer())
-	  {
-		  float level = pVictim->getLevel();
-		  float c = 0.0091107836f*level*level +3.225598133f*level+4.2652911f;
-	      val = 2.5f * damage / c;
-		  uint32 rage = pVictim->GetUInt32Value(UNIT_FIELD_POWER2);
-		  if(rage + val > 1000)
-			  val = 1000 - pVictim->GetUInt32Value(UNIT_FIELD_POWER2);
+		{
+			float level = (float)pVictim->getLevel();
+			float c = 0.0091107836f * level * level + 3.225598133f * level + 4.2652911f;
+			val = 2.5f * damage / c;
+			uint32 rage = pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
+			if( rage + float2int32( val ) > 1000 )
+			  val = 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
 
-		  ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
-	  }
-        //
+			ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
+		}
 
-	if(pVictim->IsPlayer())
+	if( pVictim->IsPlayer() )
 	{
 		Player *pThis = static_cast<Player *>(pVictim);
 		if(pThis->cannibalize)
