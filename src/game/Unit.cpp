@@ -2320,7 +2320,7 @@ else
 		dodge=parry=block=0.0f;
 	}
 
-	if(IsPlayer() && ((Player*)this)->m_finishingmovesdodge && (ability->EffectPointsPerComboPoint[0] > 0 || ability->EffectPointsPerComboPoint[1] > 0 || ability->EffectPointsPerComboPoint[2] > 0) )  // SPELL: Surprise Attacks
+	if(IsPlayer() && ((Player*)this)->m_finishingmovesdodge && ability && (ability->EffectPointsPerComboPoint[0] > 0 || ability->EffectPointsPerComboPoint[1] > 0 || ability->EffectPointsPerComboPoint[2] > 0) )  // SPELL: Surprise Attacks
 		dodge = 0.0f;
 
 //==========================================================================================

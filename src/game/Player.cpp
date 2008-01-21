@@ -34,7 +34,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	SetUInt32Value( OBJECT_FIELD_GUID+1,high);
 	m_wowGuid.Init(GetGUID());
 
-
+	m_finishingmovesdodge = false;
 	iActivePet			  = 0;
 	resurrector			 = 0;
 	SpellCrtiticalStrikeRatingBonus=0;
