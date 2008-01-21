@@ -958,7 +958,7 @@ void Aura::SpellAuraModPossess(bool apply)
 			static_cast<Player*>(caster)->UnPossess();
 
 		// make sure Player::UnPossess() didn't fail, if it did we will just free the target here
-		if( m_target->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) != NULL )
+		if( m_target->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) != 0 )
 		{
 			if( m_target->GetTypeId() == TYPEID_UNIT )
 			{
@@ -966,7 +966,7 @@ void Aura::SpellAuraModPossess(bool apply)
 				m_target->m_redirectSpellPackets = 0;
 			}
 
-			m_target->SetUInt64Value( UNIT_FIELD_CHARMEDBY, NULL );
+			m_target->SetUInt64Value( UNIT_FIELD_CHARMEDBY, 0 );
 			m_target->RemoveFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE );
 			m_target->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, m_target->GetCharmTempVal() );
 			m_target->_setFaction();
@@ -1863,7 +1863,7 @@ void Aura::SpellAuraModCharm(bool apply)
 		if( target->GetEnslaveCount() >= 10 )
 			return;
 
-		if( caster->GetUInt64Value( UNIT_FIELD_CHARM ) != NULL )
+		if( caster->GetUInt64Value( UNIT_FIELD_CHARM ) != 0 )
 			return;
 
 		m_target->m_special_state |= UNIT_STATE_CHARM;
