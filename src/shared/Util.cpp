@@ -161,7 +161,7 @@ int32 GetTimePeriodFromString(const char * str)
 }
 
 const char * szDayNames[7] = {
-	"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+	"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 };
 
 const char * szMonthNames[12] = {
@@ -284,7 +284,7 @@ string ConvertTimeStampToDataTime(uint32 timestamp)
 {
 	char szTempBuf[100];
 	time_t t = (time_t)timestamp;
-	tm * pTM = gmtime(&t);
+	tm * pTM = localtime(&t);
 
 	string szResult;
 	szResult += szDayNames[pTM->tm_wday];

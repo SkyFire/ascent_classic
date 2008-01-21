@@ -9,6 +9,8 @@
 #include "Network.h"
 #ifdef CONFIG_USE_IOCP
 
+#include "CrashHandler.h"
+
 initialiseSingleton(SocketMgr);
 SocketMgr::SocketMgr()
 {
@@ -37,6 +39,7 @@ void SocketMgr::SpawnWorkerThreads()
 
 bool SocketWorkerThread::run()
 {
+	THREAD_TRY_EXECUTION2
 	HANDLE cp = sSocketMgr.GetCompletionPort();
 	DWORD len;
 	Socket * s;
@@ -64,6 +67,7 @@ bool SocketWorkerThread::run()
 			ophandlers[ov->m_event](s, len);
 	}
 
+	THREAD_HANDLE_CRASH2
 	return true;
 }
 
