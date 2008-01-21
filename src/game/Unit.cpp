@@ -2888,10 +2888,10 @@ else
 		float level = (float)getLevel();
 
 		// C thingy
-		float c = 0.0091107836f*level*level +3.225598133f*level+4.2652911f;
+		float c = 0.0091107836f * level * level + 3.225598133f * level + 4.2652911f;
 
 		// Hit Factor
-		float f = (weapon_damage_type == OFFHAND) ? 1.75 : 3.5;
+		float f = (weapon_damage_type == OFFHAND) ? 1.75f : 3.5f;
 
 		if(hit_status & HITSTATUS_CRICTICAL)
 			f *= 2;
@@ -2899,31 +2899,32 @@ else
 		float s = 1.0f;
 
 		// Weapon speed (normal)
-		Item * weapon = 
-			(((Player*)this)->GetItemInterface())->GetInventoryItem(INVENTORY_SLOT_NOT_SET, 
-			(weapon_damage_type == OFFHAND ? EQUIPMENT_SLOT_OFFHAND : EQUIPMENT_SLOT_MAINHAND));
-		if(!weapon)
+		Item* weapon = ( static_cast< Player* >( this )->GetItemInterface())->GetInventoryItem( INVENTORY_SLOT_NOT_SET, ( weapon_damage_type == OFFHAND ? EQUIPMENT_SLOT_OFFHAND : EQUIPMENT_SLOT_MAINHAND ) );
+		if( weapon == NULL )
 		{
-			if(weapon_damage_type == OFFHAND)
-				s = GetUInt32Value(UNIT_FIELD_BASEATTACKTIME_01) / 1000.0f;
+			if( weapon_damage_type == OFFHAND )
+				s = GetUInt32Value( UNIT_FIELD_BASEATTACKTIME_01 ) / 1000.0f;
 			else
-				s = GetUInt32Value(UNIT_FIELD_BASEATTACKTIME) / 1000.0f;
+				s = GetUInt32Value( UNIT_FIELD_BASEATTACKTIME) / 1000.0f;
 		}
-		uint32 entry = weapon->GetEntry();
-		ItemPrototype * pProto = ItemPrototypeStorage.LookupEntry(entry);
-		if(pProto)
+		else
 		{
-			s = pProto->Delay / 1000.0f;
+			uint32 entry = weapon->GetEntry();
+			ItemPrototype* pProto = ItemPrototypeStorage.LookupEntry( entry );
+			if( pProto != NULL )
+			{
+				s = pProto->Delay / 1000.0f;
+			}
 		}
 
-		val = (7.5 * dmg.full_damage / c + f * s) / 2.0f;
-		val *= (1 + (((Player*)this)->rageFromDamageDealt / 100.0f));
+		val = ( 7.5f * dmg.full_damage / c + f * s ) / 2.0f;
+		val *= ( 1 + ( static_cast< Player* >( this )->rageFromDamageDealt / 100.0f ) );
 		val *= 10;
 
 		//sLog.outString("Dmg is %u. C is %f, and fs is %f %f. val is %f", dmg.full_damage, c, f, s, val);
-		ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
-		if(GetUInt32Value(UNIT_FIELD_POWER2) > 1000)
-			ModUInt32Value(UNIT_FIELD_POWER2, 1000 - GetUInt32Value(UNIT_FIELD_POWER2));
+		ModUInt32Value( UNIT_FIELD_POWER2, (int32)val );
+		if( GetUInt32Value( UNIT_FIELD_POWER2 ) > 1000 )
+			ModUInt32Value( UNIT_FIELD_POWER2, 1000 - GetUInt32Value( UNIT_FIELD_POWER2 ) );
 
 
 	}
