@@ -3560,8 +3560,7 @@ exit:
 		}
 	}
     // HACK FIX
-    else if( m_spellInfo->Id == 34428 || m_spellInfo->Id ==23881 ||m_spellInfo->Id == 23892 || m_spellInfo->Id==23893 ||m_spellInfo->Id == 23894||
-		    m_spellInfo->Id == 25251 || m_spellInfo->Id == 30335)
+    else if( m_spellInfo->NameHash == SPELL_HASH_VICTORY_RUSH )
 	{//causing ${$AP*$m1/100} damage
 		if(i==0 && u_caster)
 			value = (value*u_caster->GetAP())/100;
@@ -3576,6 +3575,36 @@ exit:
 				value+=(uint32)ceilf((ap*0.01f));	// / 100
 			else if(i==1)
 				value=(int32)ceilf((float(value * 3) + ceilf((ap*0.06f))) / 3.0f);
+		}
+	}
+	else if( m_spellInfo->NameHash == SPELL_HASH_GARROTE )
+	{
+		// WoWWiki says +( 0.18 * attack power / number of ticks )
+		// Tooltip gives no specific reading, but says ", increased by your attack power.".
+		if( u_caster != NULL )
+		{
+			float ap = (float)u_caster->GetAP();
+			if( i == 0 )
+			{
+				value += (uint32) ceilf( ( ap * 0.18f ) / 6 );
+			}
+		}
+
+	}
+	else if( m_spellInfo->NameHash == SPELL_HASH_RUPTURE )
+	{
+		/* 
+		1pt = Attack Power * 0.04 + x
+		2pt = Attack Power * 0.10 + y
+		3pt = Attack Power * 0.18 + z
+		4pt = Attack Power * 0.21 + a
+		5pt = Attack Power * 0.24 + b
+		*/
+		if( u_caster->IsPlayer() )
+		{
+			float ap = (float)u_caster->GetAP();
+			float cp = (float)static_cast<Player*>(u_caster)->m_comboPoints;
+			value += (uint32) ceilf( ( ap * ( 0.04f * cp ) ) / ( ( 6 + ( cp * 2 ) ) / 2 ) );
 		}
 	}
 	else if( m_spellInfo->NameHash == SPELL_HASH_RIP ) //rip
@@ -3630,6 +3659,7 @@ exit:
 			{
 				//DK:FIXME->yeni bir map oluþtur
                 // Capt: WHAT THE FUCK DOES THIS MEAN....
+				// Supa: WHAT THE FUCK DOES THIS MEAN?
 				value += RandomUInt((*itrSO)->damage);
 			}
 		}
