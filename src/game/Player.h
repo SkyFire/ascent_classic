@@ -955,12 +955,11 @@ public:
 	ASCENT_INLINE bool IsInFeralForm()
 	{
 		int s = GetShapeShift();
-		if(!s)return false;
-		//Fight forms that do not use player's weapon
-		if(s==1 || s == 5 || s == 8)
-			return true;
-		else 
+		if( s <= 0 )
 			return false;
+
+		//Fight forms that do not use player's weapon
+		return ( s == 1 || s == 5 || s == 8 );
 	}
 	void CalcDamage();
 	uint32 GetMainMeleeDamage(uint32 AP_owerride); //i need this for windfury
