@@ -222,7 +222,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraIncreaseHitRate,//199 Apply Aura: Increases Spell % To Hit (Fire, Nature, Frost)
 		&Aura::SpellAuraNULL,//200 // Increases experience earned by $s1%.  Lasts $d.
 		&Aura::SpellAuraNULL,//201 Apply Aura: Cannot be Dodged
-		&Aura::SpellAuraNULL,//202 // Finishing moves cannot be dodged - 32601, 44452
+		&Aura::SpellAuraFinishingMovesCannotBeDodged,//202 // Finishing moves cannot be dodged - 32601, 44452
 		&Aura::SpellAuraReduceCritMeleeAttackDmg,//203 Apply Aura: Reduces Attacker Critical Hit Damage with Melee by %
 		&Aura::SpellAuraReduceCritRangedAttackDmg,//204 Apply Aura: Reduces Attacker Critical Hit Damage with Ranged by %
 		&Aura::SpellAuraNULL,//205 // "School" Vulnerability
@@ -7150,6 +7150,24 @@ void Aura::SpellAuraSpellHealingStatPCT(bool apply)
 		for(uint32 x =1; x<7;x++)
 			m_target->HealDoneMod[x]-=mod->realamount;
 
+	}
+}
+
+void Aura::SpellAuraFinishingMovesCannotBeDodged(bool apply)
+{
+	if(apply)
+	{
+		if(!m_target->IsPlayer())
+			return;
+
+		((Player*)m_target)->m_finishingmovesdodge = true;
+	}
+	else
+	{
+		if(!m_target->IsPlayer())
+			return;
+
+		((Player*)m_target)->m_finishingmovesdodge = false;
 	}
 }
 

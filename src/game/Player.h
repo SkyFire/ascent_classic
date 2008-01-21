@@ -1817,6 +1817,7 @@ public:
 	bool m_setwaterwalk;
 	bool m_setflycheat;
 	uint32 m_areaspirithealer_guid;
+	bool m_finishingmovesdodge;
 
 	ASCENT_INLINE bool IsAttacking() {return m_attacking; }
 

@@ -2320,6 +2320,9 @@ else
 		dodge=parry=block=0.0f;
 	}
 
+	if(IsPlayer() && ((Player*)this)->m_finishingmovesdodge && (ability->EffectPointsPerComboPoint[0] > 0 || ability->EffectPointsPerComboPoint[1] > 0 || ability->EffectPointsPerComboPoint[2] > 0) )  // SPELL: Surprise Attacks
+		dodge = 0.0f;
+
 //==========================================================================================
 //==============================One Roll Processing=========================================
 //==========================================================================================
@@ -2332,6 +2335,7 @@ else
 	chances[4]=chances[3]+block;
 	chances[5]=chances[4]+crit;
 	chances[6]=chances[5]+crush;
+
 //--------------------------------roll------------------------------------------------------
 	float Roll = RandomFloat(100.0f);
 	uint32 r = 0;
@@ -2341,6 +2345,8 @@ else
 	}
 //--------------------------------postroll processing---------------------------------------
 	uint32 abs = 0;
+
+
 	switch(r)
 	{ 
 //--------------------------------miss------------------------------------------------------

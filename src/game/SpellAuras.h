@@ -235,6 +235,7 @@ enum MOD_TYPES
     SPELL_AURA_REDUCE_ATTACKER_CRICTICAL_HIT_CHANCE_PCT = 197,
     SPELL_AURA_INCREASE_SPELL_HIT_PCT = 199,
     SPELL_AURA_CANNOT_BE_DODGED = 201,
+	SPELL_AURA_FINISHING_MOVES_CANNOT_BE_DODGED = 202,
     SPELL_AURA_REDUCE_ATTACKER_CRICTICAL_HIT_DAMAGE_MELEE_PCT = 203,
     SPELL_AURA_REDUCE_ATTACKER_CRICTICAL_HIT_DAMAGE_RANGED_PCT = 204,
     SPELL_AURA_INCREASE_RANGED_ATTACK_POWER_PCT_OF_INTELLECT = 212,
@@ -551,6 +552,7 @@ public:
 	void SpellAuraIncreaseRangedAPStatPCT(bool apply);
 	//void SpellAuraModRangedDamageTakenPCT(bool apply);
 	void SpellAuraModBlockValue(bool apply);
+	void SpellAuraFinishingMovesCannotBeDodged(bool apply);
 
 	void SendModifierLog(int32 ** m,int32 v,uint64 mask,uint8 type,bool pct = false);
 	void SendDummyModifierLog(std::map<SpellEntry*,uint32> * m,SpellEntry * spellInfo,uint32 i,bool apply,bool pct = false);
