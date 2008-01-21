@@ -1635,7 +1635,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			val = 2.5f * damage / c;
 			uint32 rage = pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
 			if( rage + float2int32( val ) > 1000 )
-			  val = 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
+			  val = 1000.0f - (float)pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
 
 			ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
 		}

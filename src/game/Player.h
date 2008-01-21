@@ -33,7 +33,6 @@ class Pet;
 class Charter;
 class LFGMatch;
 struct LevelInfo;
-#define myabs(a) (a<0)?(-a):a
 #define MAX_PET_NO 3
 #define PLAYER_NORMAL_RUN_SPEED 7.0f
 #define PLAYER_NORMAL_SWIM_SPEED 4.722222f

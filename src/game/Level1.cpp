@@ -609,34 +609,59 @@ bool ChatHandler::HandleEmoteCommand(const char* args, WorldSession *m_session)
 
 bool ChatHandler::HandleModifyGoldCommand(const char* args, WorldSession *m_session)
 {
-	WorldPacket data;
+//	WorldPacket data;
 
-	if (!*args)
+	if ( *args == NULL )
 		return false;
 
-	int32 gold = atoi((char*)args);
+	Player *chr = getSelectedChar( m_session, true );
+	if( chr == NULL ) return true;
 
-	Player *chr = getSelectedChar(m_session, true);
-	if(!chr) return true;
+	int32 total   = atoi( (char*)args );
+
+	// gold = total / 10000;
+	// silver = (total / 100) % 100;
+	// copper = total % 100;
+	uint32 gold   = (uint32) floor( (float)int32abs( total ) / 10000.0f );
+	uint32 silver = (uint32) floor( ((float)int32abs( total ) / 100.0f) ) % 100;
+	uint32 copper = int32abs2uint32( total ) % 100;
 	
-	sGMLog.writefromsession(m_session, "used modify gold on %s, gold: %u", chr->GetName(), gold);
-	BlueSystemMessage(m_session, "Adding %d gold to %s's backpack...", gold, chr->GetName());
+	sGMLog.writefromsession( m_session, "used modify gold on %s, gold: %d", chr->GetName(), total );
 
-	int32 currentgold = chr->GetUInt32Value(PLAYER_FIELD_COINAGE);
-	int32 newgold = currentgold + gold;
+	int32 newgold = chr->GetUInt32Value( PLAYER_FIELD_COINAGE ) + total;
 
 	if(newgold < 0)
 	{
+		BlueSystemMessage( m_session, "Taking all gold from %s's backpack...", chr->GetName() );
 		GreenSystemMessageToPlr(chr, "%s took the all gold from your backpack.", m_session->GetPlayer()->GetName());
 		newgold = 0;
-	} else {
-		if(newgold > currentgold)
-			GreenSystemMessageToPlr(chr, "%s added %d gold to your backpack.", m_session->GetPlayer()->GetName(), myabs(gold));
+	}
+	else
+	{
+		if(total >= 0) {
+			BlueSystemMessage( m_session,
+				"Adding %u gold, %u silver, %u copper to %s's backpack...",
+				gold, silver, copper,
+				chr->GetName() );
+
+			GreenSystemMessageToPlr( chr, "%s added %u gold, %u silver, %u copper to your backpack.",
+				m_session->GetPlayer()->GetName(),
+				gold, silver, copper );
+		}
 		else
-			GreenSystemMessageToPlr(chr, "%s took %d gold from your backpack.", m_session->GetPlayer()->GetName(), myabs(gold));
+		{
+			BlueSystemMessage( m_session,
+				"Taking %u gold, %u silver, %u copper from %s's backpack...",
+				gold, silver, copper,
+				chr->GetName() );
+
+			GreenSystemMessageToPlr( chr, "%s took %u gold, %u silver, %u copper from your backpack.",
+				m_session->GetPlayer()->GetName(),
+				gold, silver, copper );
+		}
 	}
 
-	chr->SetUInt32Value(PLAYER_FIELD_COINAGE, newgold);
+	chr->SetUInt32Value( PLAYER_FIELD_COINAGE, newgold );
 	
 	return true;
 }
@@ -716,6 +741,7 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 
 	return true;
 }
+
 
 
 
