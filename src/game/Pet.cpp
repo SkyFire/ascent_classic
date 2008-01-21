@@ -268,13 +268,13 @@ void Pet::Update(uint32 time)
 		} 
 	else 
 		{
-			if(time > m_HappinessTimer)
+			if( time > m_HappinessTimer )
 				m_HappinessTimer = 0;
 			else
 				m_HappinessTimer -= time;
 		}
 		//Loyalty
-		if(m_LoyaltyTimer==0 && GetHappinessState()!=NULL)
+		if( m_LoyaltyTimer == 0 && GetHappinessState() != 0 )
 		{
 			UpdateLoyalty(LoyaltyTicks[GetHappinessState()-1]);//loyalty tick is happiness state dependent
 			m_LoyaltyTimer = PET_LOYALTY_UPDATE_TIMER;

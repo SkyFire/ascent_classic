@@ -721,7 +721,7 @@ void Group::LoadFromDB(Field *fields)
 		for(int j = 0; j < 5; ++j)
 		{
 			uint32 guid = fields[9 + (i*5) + j].GetUInt32();
-			if(guid==NULL)
+			if( guid == 0 )
 				continue;
 
 			PlayerInfo * inf = objmgr.GetPlayerInfo(guid);

@@ -738,14 +738,14 @@ bool ChatHandler::HandleAccountBannedCommand(const char * args, WorldSession * m
 
 	char * pAccount = (char*)args;
 	char * pDuration = strchr(pAccount, ' ');
-	if(pDuration == NULL)
+	if( pDuration == NULL )
 		return false;
 	*pDuration = 0;
 	++pDuration;
 
 	int32 timeperiod = GetTimePeriodFromString(pDuration);
-	if(timeperiod < 0)
-		return NULL;
+	if( timeperiod < 0 )
+		return false;
 
 	uint32 banned = (timeperiod ? (uint32)UNIXTIME+timeperiod : 1);
 

@@ -292,7 +292,7 @@ bool SummonCritterDummy(uint32 i, Spell *pSpell)
 
 	if(!pSpell->p_caster) return true;
 
-	uint32 currentCritterID = NULL;
+	uint32 currentCritterID = 0;
 
 	if(pSpell->p_caster->critterPet && pSpell->p_caster->critterPet->GetCreatureName())
 		currentCritterID = pSpell->p_caster->critterPet->GetCreatureName()->Id;
