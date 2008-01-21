@@ -1596,12 +1596,18 @@ bool AIInterface::FindFriends(float dist)
 		if(!cp) return result;
 
 		uint32 languageid = (team == 0) ? LANG_COMMON : LANG_ORCISH;
-		m_Unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, languageid, "Guards, help me!");
+		m_Unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, languageid, "Guards!");
 
-		for(size_t i = 1; i <= m_Unit->GetInRangeOppFactCount(); i++)
+		uint8 spawned;
+	
+		std::set<Player*>::iterator hostileItr = m_Unit->GetInRangePlayerSetBegin();
+		for(; hostileItr != m_Unit->GetInRangePlayerSetEnd(); hostileItr++)
 		{
-			if(i >= 3)
+			if(spawned >= 3)
 				break;
+
+			if(!isHostile(*hostileItr, m_Unit))
+				continue;
 
 			Creature * guard = m_Unit->GetMapMgr()->CreateCreature();
 			guard->Load(cp, x, y, z);
@@ -1626,7 +1632,7 @@ bool AIInterface::FindFriends(float dist)
 			
 			sEventMgr.AddEvent(guard, &Creature::SetGuardWaypoints, EVENT_UNK, 10000, 1,0);
 			sEventMgr.AddEvent(guard, &Creature::SafeDelete, EVENT_CREATURE_SAFE_DELETE, 60*5*1000, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
-
+			spawned++;
 		}
 	}
 
