@@ -161,9 +161,18 @@ void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSessio
 			}
 		}
 
-		if( !( movement_info.flags & MOVEFLAG_SWIMMING ) && !( movement_info.flags & MOVEFLAG_MOVE_STOP ) )
+		// player is flagged as under water
+		if( _player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER )
 		{
-			// player is above water level
+			_player->m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
+			WorldPacket data(SMSG_START_MIRROR_TIMER, 20);
+			data << uint32(1) << _player->m_UnderwaterTime << _player->m_UnderwaterMaxTime << int32(-1) << uint32(0);
+			pSession->SendPacket(&data);
+		}
+
+		// player is above water level
+		if( pSession->m_bIsWLevelSet )
+		{
 			if( ( movement_info.z + _player->m_noseLevel ) > pSession->m_wLevel )
 			{
 				// remove druid aquatic form on land
@@ -175,14 +184,6 @@ void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSessio
 			}
 		}
 
-		// player is flagged as under water
-		if( _player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER )
-		{
-			_player->m_UnderwaterState &= ~UNDERWATERSTATE_UNDERWATER;
-			WorldPacket data(SMSG_START_MIRROR_TIMER, 20);
-			data << uint32(1) << _player->m_UnderwaterTime << _player->m_UnderwaterMaxTime << int32(-1) << uint32(0);
-			pSession->SendPacket(&data);
-		}
 		return;
 	}
 
@@ -581,7 +582,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 	if( !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
 	{
-		if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
+		if( !HasGMPermissions() )
+		//if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
 		{
 			float speed;
 
@@ -617,7 +619,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 				//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
 
-				if( !HasGMPermissions() && distance_delta > 16.0f )
+				if( distance_delta > 16.0f )
 				{
 					switch ( _player->m_speedhackChances )
 					{
