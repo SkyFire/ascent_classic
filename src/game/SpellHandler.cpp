@@ -224,8 +224,9 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 			{
 				if(_player->IsMounted())
 				{
-                    _player->SendCastResult(spellInfo->Id, SPELL_FAILED_NOT_MOUNTED, 0);
-					return;
+					if( !( spellInfo->Id & 2457 | 71 | 2458 ) )
+	                    _player->SendCastResult(spellInfo->Id, SPELL_FAILED_NOT_MOUNTED, 0);
+						return;
 				}
 				_player->m_AutoShotTarget = _player->GetSelection();
 				uint32 duration = _player->GetUInt32Value(UNIT_FIELD_RANGEDATTACKTIME);

@@ -3234,7 +3234,8 @@ void Aura::SpellAuraModShapeshift(bool apply)
 		return;
 
 	if( p_target->m_MountSpellId && p_target->m_MountSpellId != m_spellProto->Id )
-		m_target->RemoveAura( p_target->m_MountSpellId ); // these spells are not compatible
+		if( !(mod->m_miscValue & FORM_BATTLESTANCE | FORM_DEFENSIVESTANCE | FORM_BERSERKERSTANCE ) )
+			m_target->RemoveAura( p_target->m_MountSpellId ); // these spells are not compatible
 
 	uint32 spellId = 0;
 	uint32 modelId = 0;
@@ -3352,10 +3353,10 @@ void Aura::SpellAuraModShapeshift(bool apply)
 					static_cast<Player*>(m_target)->m_MountSpellId = 0;
 			}
 		} break;  
-	//case FORM_BATTLESTANCE:
-	//	{
-	//		spellId = 21156;
-	//	} break;
+	case FORM_BATTLESTANCE:
+		{
+			spellId = 21156;
+		} break;
 	case FORM_DEFENSIVESTANCE:
 		{
 			spellId = 7376;
