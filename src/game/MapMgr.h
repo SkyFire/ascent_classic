@@ -276,6 +276,7 @@ public:
 
 	Instance * pInstance;
 	void BeginInstanceExpireCountdown();
+	void HookOnAreaTrigger(Player * plr, uint32 id);
 	
 	// better hope to clear any references to us when calling this :P
 	void InstanceShutdown()
