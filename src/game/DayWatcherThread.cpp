@@ -197,6 +197,7 @@ void DayWatcherThread::update_arena()
 	Player * plr;
 	uint32 guid, arenapoints, orig_arenapoints;
 	ArenaTeam * team;
+	uint32 arenapointsPerTeam[3] = {0};
 	double X, Y;
 	if(result)
 	{
@@ -206,6 +207,9 @@ void DayWatcherThread::update_arena()
 			guid = f[0].GetUInt32();
 			arenapoints = f[1].GetUInt32();
 			orig_arenapoints = arenapoints;
+
+			for(uint32 i = 0; i < 3; ++i)
+				arenapointsPerTeam[i] = 0;
 
 			/* are we in any arena teams? */
 			for(uint32 i = 0; i < 3; ++i)			// 3 arena team types
@@ -265,9 +269,12 @@ void DayWatcherThread::update_arena()
 					}
 					
 					if(Y > 1.0)
-						arenapoints += long2int32(double(ceil(Y)));
+						arenapointsPerTeam[i] += long2int32(double(ceil(Y)));
 				}
 			}
+
+			arenapointsPerTeam[0] = max(arenapointsPerTeam[0],arenapointsPerTeam[1]);
+			arenapoints += max(arenapointsPerTeam[0],arenapointsPerTeam[2]);
 
 			if(orig_arenapoints != arenapoints)
 			{
