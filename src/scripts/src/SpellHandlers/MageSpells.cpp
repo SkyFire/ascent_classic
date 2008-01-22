@@ -27,5 +27,5 @@ bool ColdSnap(uint32 i, Spell * pSpell)
 
 void SetupMageSpells(ScriptMgr * mgr)
 {
-    mgr->register_dummy_spell(12472, &ColdSnap);
+    mgr->register_dummy_spell(11958, &ColdSnap);
 }

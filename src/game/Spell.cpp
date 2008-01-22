@@ -2441,7 +2441,7 @@ void Spell::HandleAddAura(uint64 guid)
 		spellid = 11196;
 	else if( m_spellInfo->MechanicsType == 19 && m_spellInfo->Id != 6788) // Cast spell Weakened Soul
 		spellid = 6788;
-	else if( m_spellInfo->Id == 11958) // Cast spell Hypothermia
+	else if( m_spellInfo->Id == 45438) // Cast spell Hypothermia
 		spellid = 41425;
 	else if( m_spellInfo->Id == 30451) // Cast spell Arcane Blast
 		spellid = 36032;
