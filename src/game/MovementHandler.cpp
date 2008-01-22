@@ -603,7 +603,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 				//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
 
-				if( distance_delta > 16.0f )
+				if( !HasGMPermissions() && distance_delta > 16.0f )
 				{
 					switch ( _player->m_speedhackChances )
 					{
