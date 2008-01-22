@@ -3252,13 +3252,13 @@ uint8 Spell::CanCast(bool tolerate)
 	}	
 
 	//Checking for Debuffs that dont allow power word:shield, those Pala spells, ice block or use first aid, hacky, is there any way to check if he has "immune mechanic"?
-	if (m_spellInfo->NameHash == SPELL_HASH_POWER_WORD__SHIELD && (target) ? target->HasAura(6788) : u_caster->HasAura(6766)) //Weakened Soul
+	if (m_spellInfo->MechanicsType == 19 && ((target) ? target->HasAura(6788) : u_caster->HasAura(6766))) //Weakened Soul
 		return SPELL_FAILED_DAMAGE_IMMUNE;
-	if (((m_spellInfo->NameHash == SPELL_HASH_DIVINE_SHIELD) || (m_spellInfo->NameHash == SPELL_HASH_DIVINE_PROTECTION) || (m_spellInfo->NameHash == SPELL_HASH_BLESSING_OF_PROTECTION) || (m_spellInfo->NameHash == SPELL_HASH_AVENGING_WRATH)) && (target) ? target->HasAura(25771) : u_caster->HasAura(25771)) //Forbearance
+	if (m_spellInfo->MechanicsType == 25 && ((target) ? target->HasAura(25771) : u_caster->HasAura(25771))) //Forbearance
 		return SPELL_FAILED_DAMAGE_IMMUNE;
 	if (m_spellInfo->NameHash == SPELL_HASH_ICE_BLOCK && u_caster->HasAura(41425))
 		return SPELL_FAILED_DAMAGE_IMMUNE;
-	if (m_spellInfo->NameHash == SPELL_HASH_FIRST_AID && (target) ? target->HasAura(11196) : u_caster->HasAura(11196))
+	if (m_spellInfo->MechanicsType == 16 && ((target) ? target->HasAura(11196) : u_caster->HasAura(11196)))
 		return SPELL_FAILED_DAMAGE_IMMUNE;
 
 	// Special State Checks (for creatures & players)
