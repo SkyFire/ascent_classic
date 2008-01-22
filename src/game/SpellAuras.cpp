@@ -7089,9 +7089,6 @@ void Aura::SpellAuraIncreaseFlightSpeed( bool apply )
 
 void Aura::SpellAuraIncreaseRating( bool apply )
 {
-	//value == amt
-	//misc = bitmask for ITEM_STAT_TYPE
-
 	int v = apply ? mod->m_amount : -mod->m_amount;
 
 	if( !m_target->IsPlayer() )
@@ -7101,6 +7098,11 @@ void Aura::SpellAuraIncreaseRating( bool apply )
 	for( uint32 x = 1; x < 24; x++ )//skip x=0
 		if( ( ( ( uint32 )1 ) << x ) & mod->m_miscValue )
 			plr->ModifyBonuses( 11 + x, v );
+
+	//MELEE_CRITICAL_AVOIDANCE_RATING + RANGED_CRITICAL_AVOIDANCE_RATING + SPELL_CRITICAL_AVOIDANCE_RATING
+	//comes only as combination of them  - ModifyBonuses() not adding them individually anyhow
+	if( mod->m_miscValue & (0x0004000|0x0008000|0x0010000) )
+			plr->ModifyBonuses( RESILIENCE_RATING, v );
 
 	if( mod->m_miscValue & 1 )//weapon skill
 	{
