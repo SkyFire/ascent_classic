@@ -1093,21 +1093,27 @@ int8 ItemInterface::GetBagSlotByGuid(uint64 guid)
 //-------------------------------------------------------------------//
 bool ItemInterface::AddItemToFreeSlot(Item *item)
 {
-	if(!item) { return false; }
+	if( item == NULL )
+		return false;
+
+	if( item->GetProto() == NULL )
+		return false;
+
 	uint32 i = 0;
 	bool result2;
 
 	//detect special bag item
-	if(item->GetProto()->BagFamily)
+	if( item->GetProto()->BagFamily )
 	{
-		if(item->GetProto()->BagFamily == ITEM_TYPE_KEYRING)
+		if( item->GetProto()->BagFamily == ITEM_TYPE_KEYRING )
 		{
-			for(i=INVENTORY_KEYRING_START; i<INVENTORY_KEYRING_END; i++)
+			for(i=INVENTORY_KEYRING_START; i<INVENTORY_KEYRING_END; i++ )
 			{
 				if(m_pItems[i] == NULL)
 				{
-					result2 = SafeAddItem(item, INVENTORY_SLOT_NOT_SET, i);
-					if(result2) {
+					result2 = SafeAddItem( item, INVENTORY_SLOT_NOT_SET, i );
+					if( result2 )
+					{
 						result.ContainerSlot = INVENTORY_SLOT_NOT_SET;
 						result.Slot = i;
 						result.Result = true;
