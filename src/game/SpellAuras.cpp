@@ -1281,6 +1281,8 @@ void Aura::SpellAuraDummy(bool apply)
 	case 19979:
 	case 27144:
 	case 32770:
+	case 27145:
+	case 25890:
 		{
 			if( mod->i == 0 )
 				SMTMod_On_target( apply, false, 0x9B56A8F5, mod->m_amount ); //holy light
