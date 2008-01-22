@@ -529,6 +529,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			return;
 
 		uint32 damage = (((m_spellInfo->EffectBasePoints[i]+1)*(100+playerTarget->m_lifetapbonus))/100)+((playerTarget->GetDamageDoneMod(m_spellInfo->School)*80)/100);
+		if (damage >= playerTarget->GetUInt32Value(UNIT_FIELD_HEALTH))
+			return;
 		p_caster->DealDamage(playerTarget,damage,0,0,spellId);
 		if(playerTarget->GetUInt32Value(UNIT_FIELD_POWER1)+damage > playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1))
 			playerTarget->SetUInt32Value(UNIT_FIELD_POWER1,playerTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
@@ -4961,14 +4963,9 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 				data << (uint32)1;
 				data << aur->GetSpellId();
 				m_caster->SendMessageToSet(&data,true);
-				u_caster->CastSpell(u_caster, aur->GetSpellProto(), true);
+				Aura *aura = new Aura(aur->GetSpellProto(), (aur->GetDuration()>120000) ? 120000 : aur->GetDuration(), u_caster, u_caster);
+				u_caster->AddAura(aura);
 				unitTarget->RemoveAura(aur);
-				/*int32 dur = (aur->GetDuration()>120000) ? 120000 : aur->GetDuration();
-				//mb here should be another worldpacket for aurabuff.
-				aur->SetDuration(dur);
-				u_caster->AddAura(aur);
-				u_caster->AddAuraVisual(aur->GetSpellId(),1,true);
-					return;*/
 				if( --spells_to_steal <= 0 )
 					break; //exit loop now
 			}			
