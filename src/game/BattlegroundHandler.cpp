@@ -135,6 +135,7 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket &recv_dat
 
 void WorldSession::HandleBattleMasterJoinOpcode(WorldPacket &recv_data)
 {
+	CHECK_INWORLD_RETURN
 	if(_player->GetGroup() && _player->GetGroup()->m_isqueued)
 	{
 		SystemMessage("You are in a group that is already queued for a battleground or inside a battleground. Leave this first.");
@@ -151,6 +152,7 @@ void WorldSession::HandleBattleMasterJoinOpcode(WorldPacket &recv_data)
 
 void WorldSession::HandleArenaJoinOpcode(WorldPacket &recv_data)
 {
+	CHECK_INWORLD_RETURN
 	if(_player->GetGroup() && _player->GetGroup()->m_isqueued)
 	{
 		SystemMessage("You are in a group that is already queued for a battleground or inside a battleground. Leave this first.");
@@ -189,6 +191,7 @@ void WorldSession::HandleArenaJoinOpcode(WorldPacket &recv_data)
 void WorldSession::HandleInspectHonorStatsOpcode( WorldPacket &recv_data )
 {
     CHECK_PACKET_SIZE( recv_data, 8 );
+	CHECK_INWORLD_RETURN
 
     uint64 guid;
     recv_data >> guid;
@@ -227,6 +230,7 @@ void WorldSession::HandleInspectHonorStatsOpcode( WorldPacket &recv_data )
 void WorldSession::HandleInspectArenaStatsOpcode( WorldPacket & recv_data )
 {
     CHECK_PACKET_SIZE( recv_data, 8 );
+	CHECK_INWORLD_RETURN
 
     uint64 guid;
     recv_data >> guid;
@@ -266,6 +270,7 @@ void WorldSession::HandleInspectArenaStatsOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket &recv_data)
 {
+	CHECK_INWORLD_RETURN
 	if(_player->m_bg)
 		_player->m_bg->SendPVPData(_player);
 }

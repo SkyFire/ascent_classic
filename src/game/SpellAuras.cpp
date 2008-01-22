@@ -1428,13 +1428,16 @@ void Aura::SpellAuraDummy(bool apply)
 			}
 			else
 			{
-				Creature *summon = m_target->GetMapMgr()->GetCreature(m_target->GetUInt32Value(UNIT_FIELD_SUMMON));
+				// disabled this due to unstableness :S
+#if 0
+				Creature *summon = m_target->GetMapMgr()->GetCreature(m_target->GetUInt32Value(PLAYER_FARSIGHT));
 				if(summon)
 				{
 					summon->RemoveFromWorld(false,true);
 					delete summon;
 				}
 				m_target->SetUInt64Value(PLAYER_FARSIGHT,0);
+#endif
 			}
 		}break;
 	case 15286://Vampiric Embrace

@@ -3344,6 +3344,7 @@ void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
 
 void Spell::SpellEffectAddFarsight(uint32 i) // Add Farsight
 {
+#if 0
 	//farsight
 	//14501 and 11686
 	if(!p_caster)
@@ -3402,6 +3403,7 @@ void Spell::SpellEffectAddFarsight(uint32 i) // Add Farsight
 		// call changefarsightlocation
 		p_caster->GetMapMgr()->ChangeFarsightLocation(p_caster, InvisibleSummon);
 	}
+#endif
 }
 
 void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
