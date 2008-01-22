@@ -6372,21 +6372,21 @@ void Aura::SpellAuraModCritDmgPhysical(bool apply)
 }
 
 
-void Aura::SpellAuraWaterBreathing(bool apply)
+void Aura::SpellAuraWaterBreathing( bool apply )
 {
-   if(m_target->GetTypeId() == TYPEID_PLAYER)
+   if( m_target->GetTypeId() == TYPEID_PLAYER )
    {
-	   if(apply)
+	   if( apply )
 	   {
 			SetPositive();
-			   WorldPacket data(4);
-			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
-			data << uint32(1);
-			static_cast<Player*>(m_target)->GetSession()->SendPacket(&data);
-			static_cast<Player*>(m_target)->m_UnderwaterState = 0;			
+			WorldPacket data( 4 );
+			data.SetOpcode( SMSG_STOP_MIRROR_TIMER );
+			data << uint32( 1 );
+			static_cast< Player* >( m_target )->GetSession()->SendPacket( &data );
+			static_cast< Player* >( m_target )->m_UnderwaterState = 0;			
 	   }
 
-	   static_cast<Player*>(m_target)->m_bUnlimitedBreath=apply;
+	   static_cast< Player* >( m_target )->m_bUnlimitedBreath = apply;
    }
 }
 

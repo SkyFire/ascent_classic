@@ -161,6 +161,20 @@ void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSessio
 			}
 		}
 
+		if( !( movement_info.flags & MOVEFLAG_SWIMMING ) && !( movement_info.flags & MOVEFLAG_MOVE_STOP ) )
+		{
+			// player is above water level
+			if( ( movement_info.z + _player->m_noseLevel ) > pSession->m_wLevel )
+			{
+				// remove druid aquatic form on land
+				if( _player->getClass() == DRUID )
+					_player->RemoveAura( 1066 );
+
+				// unset swim session water level
+				pSession->m_bIsWLevelSet = false;
+			}
+		}
+
 		// player is flagged as under water
 		if( _player->m_UnderwaterState & UNDERWATERSTATE_UNDERWATER )
 		{
