@@ -115,9 +115,6 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 {		
 	sLog.outDebug("AreaTrigger: %u", id);
 
-	if (_player->GetSession()->CanUseCommand('z') && pAreaTrigger)
-		sChatHandler.BlueSystemMessage(this, "[%sSystem%s] |rEntered areatrigger: %s%u (%s).", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE, id, pAreaTrigger->Name);
-
 	// Are we REALLY here?
 	if( !_player->IsInWorld() )
 		return;
@@ -133,8 +130,11 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 		return;
 	}
 
+	if( _player->GetSession()->CanUseCommand('z') )
+		sChatHandler.BlueSystemMessage( this, "[%sSystem%s] |rEntered areatrigger: %s%u (%s).", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE, id, pAreaTrigger->Name );
+
 	// if in BG handle is triggers
-	if(_player->m_bg)
+	if( _player->m_bg )
 	{
 		_player->m_bg->HookOnAreaTrigger(_player, id);
 		return;
