@@ -40,6 +40,8 @@ SMT_RESIST_DISPEL - check if it is used
 - effect 121 should come before eff 31. (bonus calc -> damage) or bonus will not be applied
 - intellect does not increase spell crit chance
 - detect all proc spells that have same name as mother spell and can be stacked more then once
+- cast druid ranquility on target then target enters instance .. tranquility will remain on him
+- buged ? : avenger's shield, avenging wrath, judgement of seal of crusader (when they judge the seal of crusader the mob gets is like using the judgment of seal of light)
 
 ==========================================================================
 ! BUGS !

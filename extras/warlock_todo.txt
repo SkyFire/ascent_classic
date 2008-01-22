@@ -126,3 +126,5 @@ Demonology:
 - master conjuror. doesn't work. should increase effect of firestone and spellstone by 15/30%
 
 - when infernal dies, server crashes
+
+- put talent points into health funnel and see if caster dies like that

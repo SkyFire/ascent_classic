@@ -661,7 +661,9 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 	{
 		if(Group* pGroup = plr->GetGroup())
 		{
-			if(pGroup->GetGroupType() != GROUP_TYPE_PARTY) return;  // Raid's don't get shared kills.
+//			removed by Zack How the hell will healers get the kills then ?
+//			if(pGroup->GetGroupType() != GROUP_TYPE_PARTY) 
+//				return;  // Raid's don't get shared kills.
 
 			GroupMembersSet::iterator gitr;
 			pGroup->Lock();

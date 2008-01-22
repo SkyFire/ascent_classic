@@ -3553,9 +3553,9 @@ exit:
 					if(it)
 						value += float2int32(150 + float(it->GetProto()->Damage[0].Min)/float(it->GetProto()->Delay)*2.8f);
 				}
-				if(target->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
-					value += 175;
 			}
+			if(target && target->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
+				value += 175;
 			value += (uint32)(u_caster->GetRAP()*0.2);
 		}
 	}
