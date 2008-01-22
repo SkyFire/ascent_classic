@@ -250,8 +250,10 @@ void CBattlegroundManager::EventQueueUpdate()
 					{
 						plr = *tempPlayerVec[0].begin();
 						tempPlayerVec[0].pop_front();
+						plr->m_bgTeam=team;
 						arena->AddPlayer(plr, team);
 						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
+						team = arena->GetFreeTeam();
 					}
 				}
 				else
@@ -385,15 +387,14 @@ void CBattlegroundManager::EventQueueUpdate()
 
 			Arena * ar = ((Arena*)CreateInstance(i,LEVEL_GROUP_70));
 			GroupMembersSet::iterator itx;
-			int32 team;
 			ar->rated_match=true;
 
 			for(itx = group1->GetSubGroup(0)->GetGroupMembersBegin(); itx != group1->GetSubGroup(0)->GetGroupMembersEnd(); ++itx)
 			{
 				if((*itx)->m_loggedInPlayer)
 				{
-					if( (team = ar->GetFreeTeam()) != -1 )
-                        ar->AddPlayer((*itx)->m_loggedInPlayer, team);
+					if( ar->HasFreeSlots(0) )
+						ar->AddPlayer((*itx)->m_loggedInPlayer, 0);
 				}
 			}
 
@@ -401,8 +402,8 @@ void CBattlegroundManager::EventQueueUpdate()
 			{
 				if((*itx)->m_loggedInPlayer)
 				{
-					if( (team = ar->GetFreeTeam()) != -1 )
-						ar->AddPlayer((*itx)->m_loggedInPlayer, team);
+					if( ar->HasFreeSlots(1) )
+						ar->AddPlayer((*itx)->m_loggedInPlayer, 1);
 				}
 			}
 		}
