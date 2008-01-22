@@ -2260,31 +2260,31 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		abs_dmg += ms_abs_dmg;
 	}
 
+	if(ress < 0) ress = 0;
+
 	res=(float)ress;
 	dealdamage dmg;
 	dmg.school_type = school;
 	dmg.full_damage = ress;
 	dmg.resisted_damage = 0;
 	
-	// can't resist if theres no damage.abs_dmg
-	if(res <= 0)
-	{
-		dmg.resisted_damage = dmg.full_damage = 1;
+	if(res <= 0) 
+		dmg.resisted_damage = dmg.full_damage;
+
 	//------------------------------resistance reducing-----------------------------------------	
-		if(this->IsUnit())
-		{
-			static_cast<Unit*>(this)->CalculateResistanceReduction(pVictim,&dmg);
-			if((int32)dmg.resisted_damage > dmg.full_damage)
-				res = 0;
-			else
-                res = float(dmg.full_damage - dmg.resisted_damage);
-		}
+	if(res > 0 && this->IsUnit())
+	{
+		static_cast<Unit*>(this)->CalculateResistanceReduction(pVictim,&dmg);
+		if((int32)dmg.resisted_damage > dmg.full_damage)
+			res = 0;
+		else
+			res = float(dmg.full_damage - dmg.resisted_damage);
+	}
 	//------------------------------special states----------------------------------------------
-		if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pVictim)->GodModeCheat == true)
-		{
-			res = float(dmg.full_damage);
-			dmg.resisted_damage = dmg.full_damage;
-		}
+	if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pVictim)->GodModeCheat == true)
+	{
+		res = float(dmg.full_damage);
+		dmg.resisted_damage = dmg.full_damage;
 	}
 	//DK:FIXME->SplitDamage
 	

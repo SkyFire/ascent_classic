@@ -1160,29 +1160,38 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		uint32 ress=(uint32)res;
 		uint32 abs_dmg = m_target->AbsorbDamage(school, &ress);
 		uint32 ms_abs_dmg= m_target->ManaShieldAbsorb(ress);
-		dealdamage dmg;
-		dmg.school_type = school;
-		dmg.full_damage = ress;
-		dmg.resisted_damage = 0;
 		if (ms_abs_dmg)
 		{
-			ress-=ms_abs_dmg;
+			if(ms_abs_dmg > ress)
+				ress = 0;
+			else
+				ress-=ms_abs_dmg;
+
 			abs_dmg += ms_abs_dmg;
 		}
 
 		
-		if(c && m_spellProto->MechanicsType != MECHANIC_BLEEDING)
+		if(ress < 0) ress = 0;
+		res=(float)ress;
+		dealdamage dmg;
+		dmg.school_type = school;
+		dmg.full_damage = ress;
+		dmg.resisted_damage = 0;
+
+		if(res <= 0) 
+			dmg.resisted_damage = dmg.full_damage;
+
+		if(res > 0 && c && m_spellProto->MechanicsType != MECHANIC_BLEEDING)
 		{
 			c->CalculateResistanceReduction(m_target,&dmg);
-			res = float(dmg.full_damage - dmg.resisted_damage);
+			if((int32)dmg.resisted_damage > dmg.full_damage)
+				res = 0;
+			else
+				res = float(dmg.full_damage - dmg.resisted_damage);
 		}
 
 		
-		//DO NOT USE SPELL NOTN MELE >...
-		//it calcs damage in wrong way
-		//it displays wrong log
-		//it may have crit
-		SendPeriodicAuraLog(m_casterGuid, m_target, GetSpellProto()->Id, school, float2int32(res), FLAG_PERIODIC_DAMAGE);
+		SendPeriodicAuraLog(m_casterGuid, m_target, GetSpellProto()->Id, school, float2int32(res), abs_dmg, dmg.resisted_damage, FLAG_PERIODIC_DAMAGE);
 
 		if(school == SHADOW_DAMAGE)
 		{
@@ -2566,7 +2575,7 @@ void Aura::EventPeriodicHealPct(float RegenPct)
 	else
 		m_target->SetUInt32Value(UNIT_FIELD_HEALTH, m_target->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 
-	SendPeriodicAuraLog(m_casterGuid, m_target, m_spellProto->Id, m_spellProto->School, add, FLAG_PERIODIC_HEAL);
+	SendPeriodicAuraLog(m_casterGuid, m_target, m_spellProto->Id, m_spellProto->School, add, 0, 0, FLAG_PERIODIC_HEAL);
 
 	if(GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP)
 	{
@@ -2823,7 +2832,7 @@ void Aura::EventPeriodicEnergize(uint32 amount,uint32 type)
 	else
 		m_target->SetUInt32Value(POWER_TYPE,totalEnergy);
 	
-	SendPeriodicAuraLog( m_casterGuid, m_target, m_spellProto->Id, m_spellProto->School, amount, FLAG_PERIODIC_ENERGIZE);
+	SendPeriodicAuraLog( m_casterGuid, m_target, m_spellProto->Id, m_spellProto->School, amount, 0, 0, FLAG_PERIODIC_ENERGIZE);
 
 	if((GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP) && type == 0)
 	{
@@ -3878,7 +3887,7 @@ void Aura::EventPeriodicLeech(uint32 amount)
 		data << uint32(Amount);
 		m_target->SendMessageToSet(&data,true);
 
-		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, FLAG_PERIODIC_LEECH);
+		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, Amount, 0, 0, FLAG_PERIODIC_LEECH);
 
 		//deal damage before we add healing bonus to damage
 		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id,true);
@@ -4303,7 +4312,7 @@ void Aura::EventPeriodicHealthFunnel(uint32 amount)
 		else
 			m_caster->SetUInt32Value(UNIT_FIELD_HEALTH, mh);
 
-		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, 1000, FLAG_PERIODIC_LEECH);
+		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, 1000, 0, 0, FLAG_PERIODIC_LEECH);
 	}
 }
 
@@ -6332,7 +6341,7 @@ void Aura::EventPeriodicBurn(uint32 amount, uint32 misc)
 		uint32 Amount = (uint32)min( amount, m_target->GetUInt32Value( field ) );
 		uint32 newHealth = m_target->GetUInt32Value(field) - Amount ;
 				
-		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, newHealth, FLAG_PERIODIC_DAMAGE);
+		SendPeriodicAuraLog(m_target, m_target, m_spellProto->Id, m_spellProto->School, newHealth, 0, 0, FLAG_PERIODIC_DAMAGE);
 		m_target->DealDamage(m_target, Amount, 0, 0, GetSpellProto()->Id);
 	}  
 }

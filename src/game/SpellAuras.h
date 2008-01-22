@@ -587,7 +587,7 @@ public:
 		m_target->SendMessageToSet(&data,true);
 	}
 	// log message's
-	ASCENT_INLINE void SendPeriodicAuraLog(Unit * Caster, Unit * Target, uint32 SpellID, uint32 School, uint32 Amount, uint32 Flags)
+	ASCENT_INLINE void SendPeriodicAuraLog(Unit * Caster, Unit * Target, uint32 SpellID, uint32 School, uint32 Amount, uint32 abs_dmg, uint32 resisted_damage, uint32 Flags)
 	{
 		WorldPacket data(SMSG_PERIODICAURALOG, 46);
 		data << Target->GetNewGUID();		   // target guid
@@ -597,12 +597,13 @@ public:
 		data << uint32(Flags | 0x1);			// aura school
 		data << Amount;						 // amount of done to target / heal / damage
 		data << School;
-		data << uint64(0);
+		data << uint32(abs_dmg);
+		data << uint32(resisted_damage);
 
 		Caster->SendMessageToSet(&data, true);
 	}
 
-	void SendPeriodicAuraLog(const uint64& CasterGuid, Unit * Target, uint32 SpellID, uint32 School, uint32 Amount, uint32 Flags)
+	void SendPeriodicAuraLog(const uint64& CasterGuid, Unit * Target, uint32 SpellID, uint32 School, uint32 Amount, uint32 abs_dmg, uint32 resisted_damage, uint32 Flags)
 	{
 		WorldPacket data(SMSG_PERIODICAURALOG, 46);
 		data << Target->GetNewGUID();		   // target guid
@@ -612,7 +613,8 @@ public:
 		data << uint32(Flags | 0x1);			// aura school
 		data << Amount;						 // amount of done to target / heal / damage
 		data << School;
-		data << uint64(0);
+		data << uint32(abs_dmg);
+		data << uint32(resisted_damage);
 
 		Target->SendMessageToSet(&data, true);
 	}
