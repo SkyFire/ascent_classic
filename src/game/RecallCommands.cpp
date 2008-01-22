@@ -30,7 +30,7 @@ bool ChatHandler::HandleRecallGoCommand(const char* args, WorldSession *m_sessio
 	if( m_session == NULL )
 		return false;
 
-	QueryResult *result = WorldDatabase.Query( "SELECT * FROM recall" );
+	QueryResult *result = WorldDatabase.Query( "SELECT * FROM recall ORDER BY name" );
 
 	if( result == NULL)
 		return false;
@@ -181,7 +181,7 @@ bool ChatHandler::HandleRecallPortPlayerCommand(const char* args, WorldSession *
 	Player * plr = objmgr.GetPlayer(player, false);
 	if(!plr) return false;
 
-	QueryResult *result = WorldDatabase.Query( "SELECT * FROM recall" );
+	QueryResult *result = WorldDatabase.Query( "SELECT * FROM recall ORDER BY name" );
 	if(!result)
 		return false;
 
