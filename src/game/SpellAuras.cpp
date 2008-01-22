@@ -251,11 +251,16 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//228 Stealth Detection. http://www.thottbot.com/s34709
 		&Aura::SpellAuraNULL,//229 Apply Aura:Reduces the damage your pet takes from area of effect attacks http://www.thottbot.com/s35694
 		&Aura::SpellAuraIncreaseMaxHealth,//230 Increase Max Health (commanding shout);
-        //231 curse a target http://www.thottbot.com/s40303
-        //232 // Reduces duration of Magic effects by $s2%.
-        //233 // Beer Goggles
-        //234 Apply Aura: Reduces Silence or Interrupt effects, Item spell magic http://www.thottbot.com/s42184
-		//235 33206 Instantly reduces a friendly target's threat by $44416s1%, reduces all damage taken by $s1% and increases resistance to Dispel mechanics by $s2% for $d.
+        &Aura::SpellAuraNULL,//231 curse a target http://www.thottbot.com/s40303
+        &Aura::SpellAuraNULL,//232 // Reduces duration of Magic effects by $s2%.
+        &Aura::SpellAuraNULL,//233 // Beer Goggles
+        &Aura::SpellAuraNULL,//234 Apply Aura: Reduces Silence or Interrupt effects, Item spell magic http://www.thottbot.com/s42184
+		&Aura::SpellAuraNULL,//235 33206 Instantly reduces a friendly target's threat by $44416s1%, reduces all damage taken by $s1% and increases resistance to Dispel mechanics by $s2% for $d.
+		&Aura::SpellAuraNULL,//236
+		&Aura::SpellAuraNULL,//237
+		&Aura::SpellAuraNULL,//238
+		&Aura::SpellAuraNULL,//239
+		&Aura::SpellAuraAxeSkillModifier,//240 Increase Axe Skill http://www.wowhead.com/?spell=20574
 };
 /*
 ASCENT_INLINE void ApplyFloatSM(float ** m,float v,uint32 mask, float def)
@@ -7399,5 +7404,17 @@ void Aura::SMTMod_On_target(bool apply,bool is_pct,uint32 namehash, int value)
 				}
 			}
 		}
+	}
+}
+
+void Aura::SpellAuraAxeSkillModifier(bool apply)
+{
+	if( p_target != NULL )
+	{
+		SetPositive();
+		if( apply )
+			p_target->_ModifySkillBonus( SKILL_AXES, mod->m_amount );//re use
+		else
+			p_target->_ModifySkillBonus( SKILL_AXES, -mod->m_amount );//re use
 	}
 }
