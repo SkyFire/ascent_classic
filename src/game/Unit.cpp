@@ -2217,7 +2217,7 @@ else
 //<SHIT END>
 
 //--------------------------------crushing blow chance--------------------------------------
-	if(pVictim->IsPlayer()&&!this->IsPlayer()&&!ability)
+	if(pVictim->IsPlayer()&&!this->IsPlayer()&&!ability && !dmg.school_type)
 	{
 		if(diffVcapped>=15.0f)
 			crush = -15.0f+2.0f*diffVcapped; 
