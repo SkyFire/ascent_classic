@@ -101,7 +101,7 @@ pSpellEffect SpellEffectsHandler[TOTAL_SPELL_EFFECTS]={
 		&Spell::SpellEffectNULL,//SPELL_EFFECT_ATTACK - 78
 		&Spell::SpellEffectSanctuary,//SPELL_EFFECT_SANCTUARY - 79
 		&Spell::SpellEffectAddComboPoints,//SPELL_EFFECT_ADD_COMBO_POINTS - 80
-		&Spell::SpellEffectNULL,//SPELL_EFFECT_CREATE_HOUSE - 81
+		&Spell::SpellEffectCreateHouse,//SPELL_EFFECT_CREATE_HOUSE - 81
 		&Spell::SpellEffectNULL,//SPELL_EFFECT_BIND_SIGHT - 82
 		&Spell::SpellEffectDuel,//SPELL_EFFECT_DUEL - 83
 		&Spell::SpellEffectStuck,//SPELL_EFFECT_STUCK - 84
@@ -3971,6 +3971,12 @@ void Spell::SpellEffectAddComboPoints(uint32 i) // Add Combo Points
 		return;
 	}
 	p_caster->AddComboPoints(p_caster->GetSelection(), damage);
+}
+
+void Spell::SpellEffectCreateHouse(uint32 i) // Create House
+{
+
+
 }
 
 void Spell::SpellEffectDuel(uint32 i) // Duel

@@ -1371,29 +1371,53 @@ bool Object::inArc(float Position1X, float Position1Y, float FOV, float Orientat
 
 bool Object::isInFront(Object* target)
 {
-	double dx=double(target->GetPositionX()-GetPositionX());
-	double dy=double(target->GetPositionY()-GetPositionY());
-	double d = double(m_position.o);
+	// check if we facing something ( is the object within a 180 degree slice of our positive y axis )
 
-	while(d < 0) d+=2*M_PI;
-	while(d > 2*M_PI) d-=2*M_PI;
-	m_position.o = float(d);
+    double x = target->GetPositionX() - GetPositionX();
+    double y = target->GetPositionY() - GetPositionY();
 
-	if(dy>=0.0)
-	{
-		d-=atan(dy/dx);
+    double angle = atan2( y, x );
+    angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
+	angle -= m_position.o;
 
-		if(dx<0.0)
-			d-=M_PI;
-	}
-	else
-	{
-		d-=3*M_PI/2 - atan(dx/dy);
-	}
+    while( angle > M_PI)
+        angle -= 2.0 * M_PI;
 
-	if(d < -M_PI*2/3 || d > M_PI*2/3)
-		return false;
-	return true;
+    while(angle < -M_PI)
+        angle += 2.0 * M_PI;
+
+	// replace M_PI in the two lines below to reduce or increase angle
+
+    double left = -1.0 * ( M_PI / 2.0 );
+    double right = ( M_PI / 2.0 );
+
+    return( ( angle >= left ) && ( angle <= right ) );
+
+	// old version jsut in case
+
+	//double dx = double( target->GetPositionX()-GetPositionX() );
+	//double dy = double( target->GetPositionY()-GetPositionY() );
+	//double d = double( m_position.o );
+
+	//while(d < 0) d+=2*M_PI;
+	//while(d > 2*M_PI) d-=2*M_PI;
+
+	//m_position.o = float(d);
+
+	//if(dy>=0.0)
+	//{
+	//	d-=atan(dy/dx);
+	//	if(dx<0.0)
+	//		d-=M_PI;
+	//}
+	//else
+	//{
+	//	d-=3*M_PI/2 - atan(dx/dy);
+	//}
+
+	//if(d < -M_PI*2/3 || d > M_PI*2/3)
+	//	return false;
+	//return true;
 }
 
 
