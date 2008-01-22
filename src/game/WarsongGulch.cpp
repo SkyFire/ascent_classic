@@ -130,9 +130,14 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 		/* capture flag points */
 		plr->m_bgScore.Misc1++;
 
-		PlaySoundToAll(plr->GetTeam() ? SOUND_HORDE_SCORES : SOUND_ALLIANCE_SCORES);
-		SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, plr->GetGUID(), "%s captured the %s flag!", plr->GetName(), plr->GetTeam() ? "Alliance" : "Horde");
-		SetWorldState(plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 1);
+		PlaySoundToAll( plr->GetTeam() ? SOUND_HORDE_SCORES : SOUND_ALLIANCE_SCORES );
+
+		if( plr->GetTeam() == 1 )
+			SendChatMessage( CHAT_MSG_BG_EVENT_HORDE, plr->GetGUID(), "%s captured the Alliance flag!", plr->GetName() );
+		else
+			SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, plr->GetGUID(), "%s captured the Horde flag!", plr->GetName() );
+
+		SetWorldState( plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 1 );
 
 		/* respawn the home flag */
 		m_homeFlags[plr->GetTeam()]->PushToWorld(m_mapMgr);
@@ -199,7 +204,10 @@ void WarsongGulch::DropFlag(Player * plr)
 
 	sEventMgr.AddEvent(((WarsongGulch*)m_dropFlags[plr->GetTeam()]), &WarsongGulch::ReturnFlag, plr->GetTeam(), this, EVENT_BATTLEGROND_WSG_AUTO_RETURN_FLAG, 60000, 1, 0);
 
-	SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, plr->GetGUID(), "The %s flag was dropped by %s!", plr->GetTeam() ? "Alliance" : "Horde", plr->GetName());
+	if( plr->GetTeam() == 1 )
+		SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, plr->GetGUID(), "The Alliance flag was dropped by %s!", plr->GetName() );
+	else
+		SendChatMessage( CHAT_MSG_BG_EVENT_HORDE, plr->GetGUID(), "The Horde flag was dropped by %s!", plr->GetName() );
 }
 
 void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
@@ -220,7 +228,11 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 			plr->m_bgScore.Misc2++;
 			UpdatePvPData();
 
-			SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, plr->GetGUID(), "The %s flag was returned to its base by %s!", plr->GetTeam() ? "Horde" : "Alliance", plr->GetName());
+			if( plr->GetTeam() == 1 )
+				SendChatMessage( CHAT_MSG_BG_EVENT_HORDE, plr->GetGUID(), "The Horde flag was returned to its base by %s!", plr->GetName() );
+			else
+				SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, plr->GetGUID(), "The Alliance flag was returned to its base by %s!", plr->GetName() );
+
 			SetWorldState(plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 1);
 			PlaySoundToAll(plr->GetTeam() ? SOUND_HORDE_RETURNED : SOUND_ALLIANCE_RETURNED);
 		}
@@ -251,7 +263,11 @@ void WarsongGulch::ReturnFlag(uint32 team, WarsongGulch * ws)
 	if (ws->m_dropFlags[team]->IsInWorld())
 		ws->m_dropFlags[team]->RemoveFromWorld(false);
 	ws->m_homeFlags[team]->PushToWorld(ws->m_mapMgr);
-	ws->SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, 0, "The %s flag was returned to its base!", team ? "Alliance" : "Horde");
+	
+	if( team )
+		ws->SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, 0, "The Alliance flag was returned to its base!" );
+	else
+		ws->SendChatMessage( CHAT_MSG_BG_EVENT_HORDE, 0, "The Horde flag was returned to its base!" );
 }
 
 void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
@@ -272,7 +288,11 @@ void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
 	m_homeFlags[plr->GetTeam()]->RemoveFromWorld(false);
 	plr->m_bgHasFlag = true;
 
-	SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, 0, "The %s flag was picked up by %s!", plr->GetTeam() ? "Alliance" : "Horde", plr->GetName());
+	if( plr->GetTeam() == 1 )
+		SendChatMessage( CHAT_MSG_BG_EVENT_HORDE, plr->GetGUID(), "The Alliance flag was picked up by %s!", plr->GetName() );
+	else
+		SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, plr->GetGUID(), "The Horde flag was picked up by %s!", plr->GetName() );
+
 	PlaySoundToAll(plr->GetTeam() ? SOUND_HORDE_CAPTURE : SOUND_ALLIANCE_CAPTURE);
 	SetWorldState(plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 2);
 }
@@ -467,7 +487,7 @@ void WarsongGulch::OnStart()
 	for(int i = 0; i < 2; ++i)
 		m_homeFlags[i]->PushToWorld(m_mapMgr);
 
-	SendChatMessage(CHAT_MSG_BATTLEGROUND_EVENT, 0, "The flags are now placed at their bases.");
+	SendChatMessage( CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The flags are now placed at their bases." );
 
 	/* correct? - burlex */
 	PlaySoundToAll(SOUND_BATTLEGROUND_BEGIN);

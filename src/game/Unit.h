@@ -953,6 +953,7 @@ public:
 	}
 
 	void SendChatMessage(uint8 type, uint32 lang, const char *msg);
+	void SendChatMessageToPlayer(uint8 type, uint32 lang, const char *msg, Player *plr);
 	void SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg);
 	void RegisterPeriodicChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify);
 

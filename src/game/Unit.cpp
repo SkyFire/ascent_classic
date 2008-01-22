@@ -3725,7 +3725,7 @@ void Unit::DeMorph()
 	this->SetUInt32Value(UNIT_FIELD_DISPLAYID, displayid);
 }
 
-void Unit::Emote (EmoteType emote)
+void Unit::Emote(EmoteType emote)
 {
 	if(emote == 0)
 		return;
@@ -3734,6 +3734,47 @@ void Unit::Emote (EmoteType emote)
 	data << uint32(emote);
 	data << this->GetGUID();
 	SendMessageToSet (&data, true);
+}
+
+void Unit::SendChatMessageToPlayer(uint8 type, uint32 lang, const char *msg, Player *plr)
+{
+  if(plr == NULL)
+    return;
+
+  size_t UnitNameLength = 0, MessageLength = 0;
+  const char *UnitName = "";
+  CreatureInfo *ci;
+
+  ci = CreatureNameStorage.LookupEntry(GetEntry());
+  if(!ci)
+    return;
+
+  UnitName = ci->Name;
+  UnitNameLength = strlen((char*)UnitName) + 1;
+  MessageLength = strlen((char*)msg) + 1;
+
+  switch(type)
+  {
+  case CHAT_MSG_MONSTER_WHISPER:
+    {
+      WorldPacket data(SMSG_MESSAGECHAT, 200);
+
+      data << uint8(type);
+      data << uint32(lang);
+      data << uint64(GetGUID());
+      data << uint32(0);
+      data << uint32(UnitNameLength);
+      data << UnitName;
+      data << uint64(plr->GetGUID());
+      data << uint32(MessageLength);
+      data << msg;
+      data << uint8(0);      
+
+      WorldSession *session = plr->GetSession();
+      session->SendPacket(&data);
+
+    }break;
+  }
 }
 
 void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg)
