@@ -273,8 +273,8 @@ void DayWatcherThread::update_arena()
 				}
 			}
 
-			arenapointsPerTeam[0] = max(arenapointsPerTeam[0],arenapointsPerTeam[1]);
-			arenapoints += max(arenapointsPerTeam[0],arenapointsPerTeam[2]);
+			arenapointsPerTeam[0] = (uint32)max(arenapointsPerTeam[0],arenapointsPerTeam[1]);
+			arenapoints += (uint32)max(arenapointsPerTeam[0],arenapointsPerTeam[2]);
 
 			if(orig_arenapoints != arenapoints)
 			{
