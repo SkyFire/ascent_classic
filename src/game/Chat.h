@@ -60,6 +60,7 @@ enum ChatMsg
 	CHAT_MSG_BATTLEGROUND_EVENT						= 0x53,
 	CHAT_MSG_RAIDLEADER								= 0x57,
 	CHAT_MSG_RAIDWARNING							= 0x58,
+	CHAT_MSG_RAID_BOSS_EMOTE						= 0x5A,
     CHAT_MSG_MONEY,                                 // value is guessed...
 };
 
