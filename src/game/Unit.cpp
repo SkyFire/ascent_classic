@@ -3752,6 +3752,31 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 
 	switch(type)
 	{
+	case CHAT_MSG_MONSTER_EMOTE:
+		{
+			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
+			{
+				if((*i)->GetTypeId() == TYPEID_PLAYER)
+				{
+					std::stringstream szMessage;
+					szMessage << UnitName << msg;
+
+					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
+					data << type;
+					data << lang;
+					data << GetGUID();
+					data << uint32(0);			// new in 2.1.0
+					data << uint32(UnitNameLength);
+					data << UnitName;
+					data << ((Player*)(*i))->GetGUID();
+					data << uint32(strlen(szMessage.str().c_str())+1);
+					data << szMessage.str().c_str();
+					data << uint8(0x00);
+					WorldSession *session = ((Player*)(*i))->GetSession();
+					session->SendPacket(&data);
+				}
+			}
+		}break;
 	case CHAT_MSG_MONSTER_SAY:
 		{
 			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
