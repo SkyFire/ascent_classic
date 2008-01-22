@@ -74,6 +74,7 @@ private:
 	ObjectSet _objects;
 	bool _active, _loaded;
 	bool _unloadpending;
+
 	uint16 _playerCount;
 	MapMgr* _mapmgr;
 };

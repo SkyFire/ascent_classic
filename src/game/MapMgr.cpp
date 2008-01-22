@@ -1094,6 +1094,55 @@ void MapMgr::_UpdateObjects()
 			plyr->ProcessPendingUpdates();
 	}
 }
+void MapMgr::LoadAllCells()
+{
+	// eek
+	MapCell * cellInfo;
+	CellSpawns * spawns;
+
+	for( uint32 x = 0 ; x < _sizeX ; x ++ )
+	{
+		for( uint32 y = 0 ; y < _sizeY ; y ++ )
+		{
+			cellInfo = GetCell( x , y );
+			
+			if( !cellInfo )
+			{
+				// Cell doesn't exist, create it.
+				// There is no spoon. Err... cell.
+				cellInfo = Create( x , y );
+				cellInfo->Init( x , y , _mapId , this );
+				sLog.outDetail( "Created cell [%u,%u] on map %d (instance %d)." , x , y , _mapId , m_instanceID );
+				cellInfo->SetActivity( true );
+				_map->CellGoneActive( x , y );
+				ASSERT( !cellInfo->IsLoaded() );
+
+				spawns = _map->GetSpawnsList( x , y );
+				if( spawns )
+					cellInfo->LoadObjects( spawns );
+			}
+			else
+			{
+				// Cell exists, but is inactive
+				if ( !cellInfo->IsActive() )
+				{
+					sLog.outDetail("Activated cell [%u,%u] on map %d (instance %d).", x, y, _mapId, m_instanceID );
+					_map->CellGoneActive( x , y );
+					cellInfo->SetActivity( true );
+
+					if (!cellInfo->IsLoaded())
+					{
+						//sLog.outDetail("Loading objects for Cell [%d][%d] on map %d (instance %d)...", 
+						//	posX, posY, this->_mapId, m_instanceID);
+						spawns = _map->GetSpawnsList( x , y );
+						if( spawns )
+							cellInfo->LoadObjects( spawns );
+					}
+				}
+			}
+		}
+	}
+}
 
 void MapMgr::UpdateCellActivity(uint32 x, uint32 y, int radius)
 {
@@ -1152,7 +1201,7 @@ void MapMgr::UpdateCellActivity(uint32 x, uint32 y, int radius)
 					}
 				}
 				//Cell is no longer active
-				else if (!_CellActive(posX, posY) && objCell->IsActive())
+				else if (!_CellActive(posX, posY) && objCell->IsActive() && Config.MainConfig.GetBoolDefault( "Terrain" , "DisableCellIdle" , false ))
 				{
 					sLog.outDetail("Cell [%d,%d] on map %d (instance %d) is now idle.", 
 						posX, posY, this->_mapId, m_instanceID);
