@@ -414,16 +414,17 @@ bool ChatHandler::HandleModifySpeedCommand(const char* args, WorldSession *m_ses
 	}
 
 	Player *chr = getSelectedChar(m_session);
-	if (chr == NULL) return true;
+	if( chr == NULL )
+		return true;
 	
 	char buf[256];
 
 	// send message to user
-	BlueSystemMessage(m_session, "You set the speed to %2.2f of %s.", Speed, chr->GetName());
+	BlueSystemMessage(m_session, "You set the speed of %s to %2.2f.", chr->GetName(), Speed);
 
 	// send message to player
 	snprintf((char*)buf,256, "%s set your speed to %2.2f.", m_session->GetPlayer()->GetName(), Speed);
-   SystemMessage(m_session, buf);
+	SystemMessage(chr->GetSession(), buf);
 
 	chr->SetPlayerSpeed(RUN, Speed);
 	chr->SetPlayerSpeed(SWIM, Speed);
