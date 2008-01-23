@@ -31,7 +31,6 @@ SQLCallbackBase::~SQLCallbackBase()
 
 Database::Database() : CThread()
 {
-	ThreadType = THREADTYPE_DATABASE;
 	_counter=0;
 	Connections = NULL;
 	mConnectionCount = -1;   // Not connected.

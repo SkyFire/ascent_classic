@@ -44,27 +44,8 @@ enum CThreadState
 	THREADSTATE_AWAITING  = 4,
 };
 
-enum CThreadType
-{
-	THREADTYPE_UNASSIGNED,	  
-	THREADTYPE_OBJECTUPDATER,
-	THREADTYPE_MAPMGR,
-	THREADTYPE_WORLDRUNNABLE,
-	THREADTYPE_MAILDELIVERY,
-	THREADTYPE_CONSOLEINTERFACE,
-	THREADTYPE_IRCBOT,
-	THREADTYPE_AUCTIONHOUSE,
-	THREADTYPE_NETWORK,
-	THREADTYPE_SESSIONUPDATER,
-	THREADTYPE_SOCKETUPDATER,
-	THREADTYPE_DATABASE,
-	THREADTYPE_IOCPLISTENER,
-	THREADTYPE_IOCPWORKER,
-};
 
 struct NameTableEntry;
-extern NameTableEntry g_threadStates[];
-extern NameTableEntry g_threadTypes[];
 
 class SERVER_DECL CThread : public ThreadBase
 {
@@ -74,7 +55,6 @@ public:
 
 	ASCENT_INLINE void SetThreadState(CThreadState thread_state) { ThreadState = thread_state; }
 	ASCENT_INLINE CThreadState GetThreadState() { return ThreadState; }
-	ASCENT_INLINE CThreadType GetThreadType() { return ThreadType; }
 	int GetThreadId() { return ThreadId; }
 	time_t GetStartTime() { return start_time; }
 	virtual bool run();
@@ -82,7 +62,6 @@ public:
 
 protected:
 	CThreadState ThreadState;
-	CThreadType  ThreadType;
 	time_t start_time;
 	int ThreadId;
 };

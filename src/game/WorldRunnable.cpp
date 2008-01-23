@@ -26,7 +26,7 @@
 
 WorldRunnable::WorldRunnable() : CThread()
 {
-	ThreadType = THREADTYPE_WORLDRUNNABLE;
+
 }
 
 bool WorldRunnable::run()

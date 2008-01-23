@@ -28,7 +28,6 @@ extern bool bServerShutdown;
 
 MapMgr::MapMgr(Map *map, uint32 mapId, uint32 instanceid) : CellHandler<MapCell>(map), _mapId(mapId), eventHolder(instanceid)
 {
-	ThreadType = THREADTYPE_MAPMGR;
 	_shutdown = false;
 	m_instanceID = instanceid;
 	pMapInfo = WorldMapInfoStorage.LookupEntry(mapId);
