@@ -51,10 +51,7 @@ uint32 QuestMgr::PlayerMeetsReqs(Player* plr, Quest* qst, bool skiplevelcheck)
 		status = QMGR_QUEST_AVAILABLE;
 	else
     {
-        if(isRepeatableQuestFinished(plr, qst))
-            return QMGR_QUEST_FINISHED;
-		else
-			status = QMGR_QUEST_REPEATABLE;
+		status = QMGR_QUEST_REPEATABLE;
     }
 
 	if (plr->getLevel() < qst->min_level && !skiplevelcheck)
