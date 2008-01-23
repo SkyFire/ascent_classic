@@ -30,8 +30,6 @@ class Item;
 
 typedef std::list<QuestRelation *> QuestRelationList;
 
-#define CALL_QUESTSCRIPT_EVENT(obj, func) if(static_cast<QuestLogEntry*>(obj)->GetScript() != NULL) static_cast<QuestLogEntry*>(obj)->GetScript()->func
-
 class SERVER_DECL QuestMgr :  public Singleton < QuestMgr >
 {
 public:

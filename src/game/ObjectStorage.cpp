@@ -120,6 +120,20 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 		itr->Destruct();
 	}
 
+	{
+		StorageContainerIterator<Quest> * itr = QuestStorage.MakeIterator();
+		Quest * qst;
+		while(!itr->AtEnd())
+		{
+			qst = itr->Get();
+			qst->pQuestScript = NULL;
+
+			if( !itr->Inc() )
+				break;
+		}
+		itr->Destruct();
+	}
+
 	// Load AI Agents
 	QueryResult * result = WorldDatabase.Query( "SELECT * FROM ai_agents" );
 	CreatureProto * cn;

@@ -140,8 +140,12 @@ QuestLogEntry::QuestLogEntry()
 	m_quest = NULL;
 	mDirty = false;
 	m_slot = -1;
-	_questScript = NULL;
 	completed=0;
+}
+
+QuestLogEntry::~QuestLogEntry()
+{
+
 }
 
 void QuestLogEntry::Init(Quest* quest, Player* plr, uint32 slot)
@@ -183,8 +187,7 @@ void QuestLogEntry::Init(Quest* quest, Player* plr, uint32 slot)
 	else
 		m_time_left = 0;
 
-	LoadScript();
-	CALL_QUESTSCRIPT_EVENT(this, OnQuestStart)(plr);
+	CALL_QUESTSCRIPT_EVENT(this, OnQuestStart)(plr, this);
 }
 
 void QuestLogEntry::ClearAffectedUnits()
@@ -242,16 +245,16 @@ bool QuestLogEntry::LoadFromDB(Field *fields)
 	for(int i = 0; i < 4; ++i)
 	{
 		m_explored_areas[i] = fields[f].GetUInt32();	f++;
-		CALL_QUESTSCRIPT_EVENT(this, OnExploreArea)(m_explored_areas[i], m_plr);
+		CALL_QUESTSCRIPT_EVENT(this, OnExploreArea)(m_explored_areas[i], m_plr, this);
 	}
 
 	for(int i = 0; i < 4; ++i)
 	{
 		m_mobcount[i] = fields[f].GetUInt32();	f++;
 		if(GetQuest()->required_mobtype[i] == QUEST_MOB_TYPE_CREATURE)
-			CALL_QUESTSCRIPT_EVENT(this, OnCreatureKill)(GetQuest()->required_mob[i], m_plr);
+			CALL_QUESTSCRIPT_EVENT(this, OnCreatureKill)(GetQuest()->required_mob[i], m_plr, this);
 		else
-			CALL_QUESTSCRIPT_EVENT(this, OnGameObjectActivate)(GetQuest()->required_mob[i], m_plr);
+			CALL_QUESTSCRIPT_EVENT(this, OnGameObjectActivate)(GetQuest()->required_mob[i], m_plr, this);
 	}
 	mDirty = false;
 	return true;
@@ -395,29 +398,11 @@ void QuestLogEntry::SendQuestComplete()
 	data.SetOpcode(SMSG_QUESTUPDATE_COMPLETE);
 	data << m_quest->id;
 	m_plr->GetSession()->SendPacket(&data);
-	CALL_QUESTSCRIPT_EVENT(this, OnQuestComplete)(m_plr);
+	CALL_QUESTSCRIPT_EVENT(this, OnQuestComplete)(m_plr, this);
 }
 
 void QuestLogEntry::SendUpdateAddKill(uint32 i)
 {
 	sQuestMgr.SendQuestUpdateAddKill(m_plr, m_quest->id, m_quest->required_mob[i], m_mobcount[i], m_quest->required_mobcount[i], 0);
-}
-
-void QuestLogEntry::LoadScript()
-{
-	//_questScript = sScriptMgr.CreateQuestScriptClassForEntry(GetQuest()->id, this);
-}
-
-void QuestLogEntry::CallScriptUpdate()
-{
-	ASSERT(_questScript);
-	_questScript->EventUpdate();
-}
-
-QuestLogEntry::~QuestLogEntry()
-{
-	//sEventMgr.RemoveEvents(this);
-	if(_questScript != 0)
-		_questScript->Destroy();
 }
 

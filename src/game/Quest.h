@@ -108,6 +108,7 @@ enum QUEST_SHARE
 	QUEST_SHARE_MSG_FINISH_QUEST	= 8,
 };
 
+class QuestScript;
 #pragma pack(push,1)
 struct Quest
 {
@@ -185,6 +186,8 @@ struct Quest
 	uint32 required_mobtype[4];
 	uint32 count_reward_item;
 	uint32 reward_xp_as_money;
+
+	QuestScript* pQuestScript;
 };
 #pragma pack(pop)
 
@@ -195,7 +198,7 @@ enum QUEST_MOB_TYPES
 };
 
 class QuestScript;
-#define CALL_QUESTSCRIPT_EVENT(obj, func) if(static_cast<QuestLogEntry*>(obj)->GetScript() != NULL) static_cast<QuestLogEntry*>(obj)->GetScript()->func
+#define CALL_QUESTSCRIPT_EVENT(obj, func) if(static_cast<QuestLogEntry*>(obj)->GetQuest()->pQuestScript != NULL) static_cast<QuestLogEntry*>(obj)->GetQuest()->pQuestScript->func
 
 class SERVER_DECL QuestLogEntry : public EventableObject
 {
@@ -236,13 +239,8 @@ public:
 		return PLAYER_QUEST_LOG_1_1 + (slot * 3);
 	}
 
-	ASCENT_INLINE QuestScript * GetScript() { return _questScript; }
-	void LoadScript();
-	void CallScriptUpdate();
-
 private:
 	uint32 completed;
-	QuestScript *_questScript;
 
 	bool mInitialized;
 	bool mDirty;

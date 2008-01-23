@@ -599,7 +599,7 @@ bool QuestMgr::OnGameObjectActivate(Player *plr, GameObject *go)
 					// (auto-dirtys it)
 					qle->SetMobCount( j, qle->m_mobcount[j] + 1 );
 					qle->SendUpdateAddKill( j );
-					CALL_QUESTSCRIPT_EVENT( qle, OnGameObjectActivate )( entry, plr );
+					CALL_QUESTSCRIPT_EVENT( qle, OnGameObjectActivate )( entry, plr, qle );
 
 					if( qle->CanBeFinished() )
 						qle->SendQuestComplete();
@@ -642,7 +642,7 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 						// add another kill.(auto-dirtys it)
 						qle->SetMobCount( j, qle->m_mobcount[j] + 1 );
 						qle->SendUpdateAddKill( j );
-						CALL_QUESTSCRIPT_EVENT( qle, OnCreatureKill)( entry, plr );
+						CALL_QUESTSCRIPT_EVENT( qle, OnCreatureKill)( entry, plr, qle );
 						qle->UpdatePlayerFields();
 						break;
 					}
@@ -690,7 +690,7 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 										// (auto-dirtys it)
 										qle->SetMobCount(j, qle->m_mobcount[j] + 1);
 										qle->SendUpdateAddKill( j );
-										CALL_QUESTSCRIPT_EVENT( qle, OnCreatureKill )( entry, plr );
+										CALL_QUESTSCRIPT_EVENT( qle, OnCreatureKill )( entry, plr, qle );
 										qle->UpdatePlayerFields();
 
 										// lua stuff
@@ -769,7 +769,7 @@ void QuestMgr::OnPlayerItemPickup(Player* plr, Item* item)
 				if( qle->GetQuest()->required_item[j] == entry )
 				{
 					pcount = plr->GetItemInterface()->GetItemCount(entry, true);
-					CALL_QUESTSCRIPT_EVENT(qle, OnPlayerItemPickup)(entry, pcount, plr);
+					CALL_QUESTSCRIPT_EVENT(qle, OnPlayerItemPickup)(entry, pcount, plr, qle);
 					if(pcount < qle->GetQuest()->required_itemcount[j])
 					{
 						WorldPacket data(8);
@@ -807,7 +807,7 @@ void QuestMgr::OnPlayerExploreArea(Player* plr, uint32 AreaID)
 					!qle->m_explored_areas[j])
 				{
 					qle->SetTrigger(j);
-					CALL_QUESTSCRIPT_EVENT(qle, OnExploreArea)(qle->m_explored_areas[j], plr);
+					CALL_QUESTSCRIPT_EVENT(qle, OnExploreArea)(qle->m_explored_areas[j], plr, qle);
 					qle->UpdatePlayerFields();
 					if(qle->CanBeFinished())
 					{
@@ -870,7 +870,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 		    return;
     }
     BuildQuestComplete(plr, qst);
-    if(!qst->is_repeatable) CALL_QUESTSCRIPT_EVENT(qle, OnQuestComplete)(plr);
+    if(!qst->is_repeatable) CALL_QUESTSCRIPT_EVENT(qle, OnQuestComplete)(plr, qle);
 	LUA_ON_QUEST_EVENT(plr,qst->id,QUEST_EVENT_ON_COMPLETE,qst_giver);
 
 	if(!qst->is_repeatable) 

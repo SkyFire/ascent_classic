@@ -105,6 +105,7 @@ typedef HM_NAMESPACE::hash_map<uint32, exp_create_gameobject_ai> GameObjectCreat
 typedef HM_NAMESPACE::hash_map<uint32, exp_handle_dummy_aura> HandleDummyAuraMap;
 typedef HM_NAMESPACE::hash_map<uint32, exp_handle_dummy_spell> HandleDummySpellMap;
 typedef set<GossipScript*> CustomGossipScripts;
+typedef set<QuestScript*> QuestScripts;
 typedef list<void*> ServerHookList;
 typedef list<SCRIPT_MODULE> LibraryHandleMap;
 
@@ -134,6 +135,7 @@ public:
 	void register_dummy_spell(uint32 entry, exp_handle_dummy_spell callback);
 	void register_hook(ServerHookEvents event, void * function_pointer);
 	void register_item_gossip_script(uint32 entry, GossipScript * gs);
+	void register_quest_script(uint32 entry, QuestScript * qs);
 
 	ASCENT_INLINE GossipScript * GetDefaultGossipScript() { return DefaultGossipScript; }
 
@@ -146,6 +148,7 @@ protected:
 	ServerHookList _hooks[NUM_SERVER_HOOKS];
 	GossipScript * DefaultGossipScript;
 	CustomGossipScripts _customgossipscripts;
+	QuestScripts _questscripts;
 };
 
 class SERVER_DECL CreatureAIScript
@@ -226,25 +229,16 @@ public:
 class SERVER_DECL QuestScript
 {
 public:
-	QuestScript(QuestLogEntry* qle);
+	QuestScript() {};
 	virtual ~QuestScript() {};
 
-	virtual void OnQuestStart(Player* mTarget) {}
-	virtual void OnQuestComplete(Player* mTarget) {}
+	virtual void OnQuestStart(Player* mTarget, QuestLogEntry *qLogEntry) {}
+	virtual void OnQuestComplete(Player* mTarget, QuestLogEntry *qLogEntry) {}
 	virtual void OnQuestCancel(Player* mTarget) {}
-	virtual void OnGameObjectActivate(uint32 entry, Player* mTarget) {}
-	virtual void OnCreatureKill(uint32 entry, Player* mTarget) {}
-	virtual void OnExploreArea(uint32 areaId, Player* mTarget) {}
-	virtual void OnPlayerItemPickup(uint32 itemId, uint32 totalCount, Player* mTarget) {}
-	virtual void EventUpdate() {};
-
-	void RegisterQuestEvent(uint32 frequency);
-	void RemoveQuestEvent();
-
-	virtual void Destroy() {}
-
-protected:
-	QuestLogEntry *_qLogEntry;
+	virtual void OnGameObjectActivate(uint32 entry, Player* mTarget, QuestLogEntry *qLogEntry) {}
+	virtual void OnCreatureKill(uint32 entry, Player* mTarget, QuestLogEntry *qLogEntry) {}
+	virtual void OnExploreArea(uint32 areaId, Player* mTarget, QuestLogEntry *qLogEntry) {}
+	virtual void OnPlayerItemPickup(uint32 itemId, uint32 totalCount, Player* mTarget, QuestLogEntry *qLogEntry) {}
 };
 
 class SERVER_DECL HookInterface : public Singleton<HookInterface>

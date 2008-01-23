@@ -222,6 +222,15 @@ void ScriptMgr::register_gossip_script(uint32 entry, GossipScript * gs)
 	_customgossipscripts.insert(gs);
 }
 
+void ScriptMgr::register_quest_script(uint32 entry, QuestScript * qs)
+{
+	Quest * q = QuestStorage.LookupEntry( entry );
+	if( q != NULL )
+		q->pQuestScript = qs;
+
+	_questscripts.insert( qs );
+}
+
 CreatureAIScript* ScriptMgr::CreateAIScriptClassForEntry(Creature* pCreature)
 {
 	CreatureCreateMap::iterator itr = _creatures.find(pCreature->GetEntry());
@@ -323,20 +332,6 @@ InstanceScript::InstanceScript(MapMgr *instance) : _instance(instance)
 }
 
 /* QuestScript Stuff */
-
-QuestScript::QuestScript(QuestLogEntry *qle) : _qLogEntry(qle)
-{
-}
-
-void QuestScript::RegisterQuestEvent(uint32 frequency)
-{
-	sEventMgr.AddEvent(_qLogEntry, &QuestLogEntry::CallScriptUpdate, EVENT_SCRIPT_UPDATE_EVENT, frequency, 0,0);
-}
-
-void QuestScript::RemoveQuestEvent()
-{
-	sEventMgr.RemoveEvents(_qLogEntry, EVENT_SCRIPT_UPDATE_EVENT);
-}
 
 /* Gossip Stuff*/
 
