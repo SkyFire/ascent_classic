@@ -10,7 +10,7 @@ int LoadConfigs(int * udp_port, char * udp_address, int * tcp_port, char * tcp_a
 	int done=0;
 	int line=0;
 
-	f = fopen("voicechat.conf", "r");
+	f = fopen("ascent-voicechat.conf", "r");
 	if(!f)
 		return -2;
 
