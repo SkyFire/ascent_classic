@@ -19,7 +19,7 @@
 
 #include "StdAfx.h"
 
-createFileSingleton( ChatHandler );
+initialiseSingleton( ChatHandler );
 initialiseSingleton(CommandTableStorage);
 
 ChatCommand * ChatHandler::getCommandTable()

@@ -437,6 +437,7 @@ bool World::SetInitialWorldSettings()
 	new AddonMgr;
 	new SocialMgr;
 	new WorldLog;
+	new ChatHandler;
 
 	// grep: this only has to be done once between version updates
 	// to re-fill the table.
