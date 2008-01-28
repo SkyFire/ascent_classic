@@ -385,11 +385,6 @@ public:
  
 	list<AI_Spell*> m_spells;
 
-#ifdef COLLISION_CRAP
-	list<LocationVector*> AttackWaypoints;
-	LocationVector* WaypointLOS;
-#endif
-
 	bool disable_combat;
 
 	bool disable_melee;
@@ -410,7 +405,6 @@ public:
 	void ResetProcCounts();
 
 	ASCENT_INLINE void SetWaypointMap(WayPointMap * m) { m_waypoints = m; }
-	bool m_hasWaypointEvents;
 	bool m_isGuard;
 //	bool m_fastMove;
 	void setGuardTimer(uint32 timer) { m_guardTimer = timer; }
@@ -496,5 +490,8 @@ public:
 	bool m_is_in_instance;
 	bool skip_reset_hp;
 
+	void WipeCurrentTarget();
+	bool CheckCurrentTarget();
+	bool TargetUpdateCheck(Unit * ptr);
 };
 #endif

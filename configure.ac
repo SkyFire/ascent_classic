@@ -27,7 +27,6 @@ AC_PROG_LIBTOOL
 AH_TEMPLATE([USE_EPOLL], Define if you want to use the epoll socket engine module.)
 AH_TEMPLATE([USE_KQUEUE], Define if you want to use the kqueue socket engine module.)
 AH_TEMPLATE([HAVE_DARWIN], Define if you have MacOSX Darwin, to include the correct headers for kevent)
-AH_TEMPLATE([HAVE_LUASCRIPT], Define if you want to enable lua scripting)
 AH_TEMPLATE([ENABLE_CLUSTERING], Define if you want to enable clustering, this is experimental.)
 AH_TEMPLATE([ENABLE_COLLISION], Define if you want to enable collision calculation, warning. this can cause. a heavy load)
 AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
@@ -127,14 +126,6 @@ fi
 CPPFLAGS=""
 CFLAGS=""
 CXXFLAGS=""
-
-AC_ARG_ENABLE(lua_scripting,
-     AC_HELP_STRING([--enable-lua-scripting],[enable lua scripting]),
-     [ if test "x$enable_lua_scripting" = "xyes" ; then
-   	AC_DEFINE(HAVE_LUASCRIPT)
-       fi
-     ],
-)
 
 AC_ARG_ENABLE(clustering,
      AC_HELP_STRING([--enable-clustering],enable clustering. warning this is experimental.),
@@ -264,7 +255,6 @@ AC_CONFIG_FILES([
    dep/Makefile
    dep/src/Makefile
    dep/src/pcre/Makefile
-   dep/src/lua/Makefile
    dep/src/zlib/Makefile
    extras/Makefile
    extras/collision/Makefile

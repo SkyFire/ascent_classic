@@ -111,8 +111,6 @@ void WorldSession::HandleGroupPromote(WorldPacket& recv_data)
 		function_to_call = &Group::SetMainTank;
 	else if(promotetype==1)
 		function_to_call = &Group::SetMainAssist;
-	else
-		return;
 
 	if(on == 0)
 		(_player->GetGroup()->*function_to_call)(NULL);

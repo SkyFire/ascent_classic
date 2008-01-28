@@ -1540,7 +1540,7 @@ public:
     void writeSpellGoTargets( WorldPacket * data );
     void writeSpellMissedTargets( WorldPacket * data );
 
-    SpellEntry * m_spellInfo;
+    SpellEntry* m_spellInfo;
     uint32 pSpellId;
     SpellEntry *ProcedOnSpell; //some spells need to know the origins of the proc too
     SpellCastTargets m_targets;

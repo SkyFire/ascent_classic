@@ -98,6 +98,15 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		// loop through the auras and removing existing eating spells
 	}
 
+	if(itemProto->RequiredLevel)
+	{
+		if(_player->getLevel() < itemProto->RequiredLevel)
+		{
+			_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+			return;
+		}
+	}
+
 	if(itemProto->RequiredSkill)
 	{
 		if(!_player->_HasSkillLine(itemProto->RequiredSkill))

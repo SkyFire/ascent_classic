@@ -38,9 +38,10 @@ enum PET_FOOD
 	PET_FOOD_RAW_FISH  // not used in pet diet
 };
 
-/*Loyalty and happiness ticks*/
-static const char LoyaltyTicks[3] = {-20, 10, 20};//loyalty_ticks for unhappy, content, happy
-static const unsigned char HappinessTicks[6] = {70, 35, 17, 8, 4, 2};//loose_happiness ticks per loyalty lvl
+/* Loyalty and happiness */
+static const char LoyaltyTicks[3] = { -10, 5, 20 };//loyalty_ticks for unhappy, content, happy - PetPersonality.dbc
+static const uint32 HappinessTicks[6] = { 2783, 2088, 1670, 1392, 1193, 1044 };//loose_happiness ticks per loyalty lvl for 7.5s timer
+static const uint16 LoyLvlRange[7] = { 0, 150, 300, 450, 600, 900, 1200 };//loyalty level ranges (1200 is guessed)
 
 enum PET_ACTION
 {
@@ -214,6 +215,7 @@ public:
 	AI_Spell * HandleAutoCastEvent();
 	void SetPetSpellState(uint32 spell, uint16 state);
 	void SetAutoCast(AI_Spell * sp, bool on);
+	float GetHappinessDmgMod() { return 0.25f * GetHappinessState() + 0.5f; };
 
 protected:
 	bool bHasLoyalty;
@@ -239,6 +241,7 @@ protected:
 	uint64 m_OwnerGuid;
 	int16 TP;
 	int32 LoyaltyPts;
+	uint32 LoyaltyXP;
 	bool bExpires;
 	bool Summon;
 	string m_name;
@@ -246,13 +249,11 @@ protected:
 	HappinessState GetHappinessState();
 	uint32 GetHighestRankSpell(uint32 spellId);
 	void UpdateLoyalty(char pts);
-	void SetLoyaltyLvl(LoyaltyLevel lvl);
 
 	list<AI_Spell*> m_autoCastSpells[AUTOCAST_EVENT_COUNT];
 };
 
 #define PET_LOYALTY_UPDATE_TIMER 120000
-#define PET_LOYALTY_LVL_RANGE 300 //range for each layalty lvl, now (300) if pet HAPPY, it will gain higher loyalty lvl in 30 minutes (no idea what is Blizz): 300 / 20 * 120 000 = 1 800 000 ms = 30 min
 #define PET_HAPPINESS_UPDATE_VALUE 333000
 #define PET_HAPPINESS_UPDATE_TIMER 7500
 #define PET_PARTY_SPELLS_UPDATE_TIMER 10000

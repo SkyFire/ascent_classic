@@ -167,6 +167,13 @@ void WorldSession::HandleActivateTaxiOpcode( WorldPacket & recv_data )
 		return;
 	}
 
+	if (taxipath->GetID() == 766 || taxipath->GetID() == 767 || taxipath->GetID() == 771 || taxipath->GetID() == 772)
+	{
+		data << uint32( 2 );
+		SendPacket( &data );
+		return;
+	}
+
 	// Check for gold
 	newmoney = ((GetPlayer()->GetUInt32Value(PLAYER_FIELD_COINAGE)) - taxipath->GetPrice());
 	if(newmoney < 0 )
@@ -247,20 +254,8 @@ void WorldSession::HandleMultipleActivateTaxiOpcode(WorldPacket & recvPacket)
 	if(nodecount < 2)
 		return;
 
-	if(nodecount > 25)
-	{
-		Disconnect();
-		return;
-	}
-
 	for(uint32 i = 0; i < nodecount; ++i)
-	{
-		if(recvPacket.rpos() > recvPacket.wpos())
-			return;
-	
 		pathes.push_back( recvPacket.read<uint32>() );
-	}
-	
 
 	if(GetPlayer()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER))
 		return;
@@ -290,6 +285,13 @@ void WorldSession::HandleMultipleActivateTaxiOpcode(WorldPacket & recvPacket)
 	}
 
 	if (!taxipath || !taxipath->GetNodeCount())
+	{
+		data << uint32( 2 );
+		SendPacket( &data );
+		return;
+	}
+
+	if (taxipath->GetID() == 766 || taxipath->GetID() == 767 || taxipath->GetID() == 771 || taxipath->GetID() == 772)
 	{
 		data << uint32( 2 );
 		SendPacket( &data );
@@ -366,6 +368,12 @@ void WorldSession::HandleMultipleActivateTaxiOpcode(WorldPacket & recvPacket)
 	{
 		TaxiPath * np = sTaxiMgr.GetTaxiPath(pathes[i-1], pathes[i]);
 		if(!np) return;
+
+		if (np->GetID() == 766 || np->GetID() == 767 || np->GetID() == 771 || np->GetID() == 772)
+		{
+			_player->m_taxiPaths.clear();
+			return;
+		}
 
 		// add to the list.. :)
 		_player->m_taxiPaths.push_back(np);

@@ -250,7 +250,7 @@ struct SpellEntry
     uint32 dummy;                           //121
     uint32 CoSpell;                         //122   activeIconID;
     uint32 spellPriority;                   //123
-    char * Name;                            //124
+    char* Name;                             //124
     //uint32 NameAlt1;                        //125
     //uint32 NameAlt2;                        //126
     //uint32 NameAlt3;                        //127

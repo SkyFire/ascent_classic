@@ -96,18 +96,6 @@ uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSess
 	if(pPlayer->getLevel()<70 && pPlayer->iInstanceType>=MODE_HEROIC && pMapInfo->type != INSTANCE_NULL)
 		return AREA_TRIGGER_FAILURE_LEVEL_HEROIC;
 
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-	if(pMapInfo->checkpoint_id)
-	{
-		MapCheckPoint * pcp = CheckpointStorage.LookupEntry(pMapInfo->checkpoint_id);
-		if(pcp && ((pPlayer->GetGuildId() && !CheckpointMgr::getSingleton().HasCompletedCheckpointAndPrequsites(pPlayer->GetGuildId(), pcp)) ||
-			!pPlayer->GetGuildId()))
-		{
-			return AREA_TRIGGER_FAILURE_NO_CHECK;
-		}
-	}
-#endif
-
 	return AREA_TRIGGER_FAILURE_OK;
 }
 
@@ -185,19 +173,6 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 
 							data << msg;
 						}break;
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-					case AREA_TRIGGER_FAILURE_NO_CHECK:
-						{
-							MapInfo * pMi = WorldMapInfoStorage.LookupEntry(pAreaTrigger->Mapid);
-							MapCheckPoint * pCp = CheckpointStorage.LookupEntry(pMi->checkpoint_id);
-							if(pCp)
-								snprintf(msg,200,"You/your guild must have completed the checkpoint, `%s` to pass through here.",pCp->name);
-							else
-								snprintf(msg,200,"You/your guild must have completed the checkpoint, `%s` to pass through here.","UNKNOWN");
-
-							data << msg;
-						}break;
-#endif
 					default:
 						data << pReason;
 						break;

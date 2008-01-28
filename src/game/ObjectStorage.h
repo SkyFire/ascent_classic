@@ -34,10 +34,6 @@ extern SERVER_DECL SQLStorage<FishingZoneEntry, HashMapStorageContainer<FishingZ
 extern SERVER_DECL SQLStorage<MapInfo, ArrayStorageContainer<MapInfo> >							WorldMapInfoStorage;
 extern SERVER_DECL SQLStorage<ZoneGuardEntry, HashMapStorageContainer<ZoneGuardEntry> >			ZoneGuardStorage;
 
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-extern SERVER_DECL SQLStorage<MapCheckPoint, ArrayStorageContainer<MapCheckPoint> >				CheckpointStorage;
-#endif
-
 void Storage_FillTaskList(TaskList & tl);
 void Storage_Cleanup();
 bool Storage_ReloadTable(const char * TableName);

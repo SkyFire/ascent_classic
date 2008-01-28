@@ -587,7 +587,7 @@ struct PlayerPet
 	char stablestate;
 	uint32 number;
 	uint32 level;
-	uint32 happiness;
+	uint32 loyaltyxp;
 	uint32 happinessupdate;
 	string actionbar;
 	bool summon;

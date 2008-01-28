@@ -745,14 +745,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\game\LUAEngine.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\game\LUAEngine.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\src\game\MailSystem.cpp"
 			>
 		</File>

@@ -1,0 +1,1 @@
+alter table creature_spawns add column standstate int(10) not null default 0;

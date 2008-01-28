@@ -459,12 +459,13 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 	recv_data >> bid >> buyout >> etime;
 
 	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
-	if (!pCreature || !pCreature->auctionHouse)
+	if(  !pCreature || !pCreature->auctionHouse )
 		return;		// NPC doesnt exist or isnt an auctioneer
 
 	// Get item
 	Item * pItem = _player->GetItemInterface()->GetItemByGUID(item);
-	if (!pItem){
+	if( !pItem || pItem->IsSoulbound() || pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_CONJURED ) )
+	{
 		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 8);
 		data << uint32(0);
 		data << uint32(AUCTION_CREATE);
@@ -651,6 +652,7 @@ void AuctionHouse::SendAuctionList(Player * plr, WorldPacket * packet)
 
 void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
 {
+	CHECK_INWORLD_RETURN
 	uint64 guid;
 	recv_data >> guid;
 

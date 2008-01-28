@@ -53,9 +53,6 @@ WorldSession::~WorldSession()
 {
 	deleteMutex.Acquire();
 
-	if(HasFlag(ACCOUNT_FLAG_XTEND_INFO))
-		sWorld.RemoveExtendedSession(this);
-
 	if(HasGMPermissions())
 		sWorld.gmList.erase(this);
 
@@ -231,12 +228,14 @@ int WorldSession::Update(uint32 InstanceID)
 
 void WorldSession::LogoutPlayer(bool Save)
 {
+	Player *pPlayer = GetPlayer();
 	if(_loggingOut)
 		return;
 
 	_loggingOut = true;
 	if (_player)
 	{
+		sHookInterface.OnLogout(pPlayer);
 		if(_player->DuelingWith)
 			_player->EndDuel(DUEL_WINNER_RETREAT);
 
@@ -271,12 +270,6 @@ void WorldSession::LogoutPlayer(bool Save)
 
 		sSocialMgr.LoggedOut(_player);
 
-		// messages
-		if(HasGMPermissions())
-		{
-			sWorld.BroadcastExtendedMessage(this, "[SM:GMLOGOUT]%s", _player->GetName());
-		}
-
 		if(_player->GetTeam() == 1)
 		{
 			if(sWorld.HordePlayers)
@@ -293,9 +286,6 @@ void WorldSession::LogoutPlayer(bool Save)
 
 		if(_player->m_bgIsQueued)
 			BattlegroundManager.RemovePlayerFromQueues(_player);
-
-		// send info
-		sWorld.BroadcastExtendedMessage(0, "[SM:INFO:%u:%u]", sWorld.HordePlayers, sWorld.AlliancePlayers);
 
 		//Duel Cancel on Leave
 		if(_player->DuelingWith != NULL)

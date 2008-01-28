@@ -1382,7 +1382,7 @@ void Aura::SpellAuraDummy(bool apply)
 		}break;
 	case 126: //Eye of Killrog
 		{
-			if(m_target->IsInWorld() == false)
+			/*if(m_target->IsInWorld() == false)
 				return;
 
 			if(!apply)
@@ -1400,7 +1400,7 @@ void Aura::SpellAuraDummy(bool apply)
 				m_target->m_noInterrupt--;
 				if(m_target->m_noInterrupt < 0)
 					m_target->m_noInterrupt = 0;
-			}
+			}*/
 		}break;
 	case 17056://Furor
 	case 17058:
@@ -1653,7 +1653,7 @@ void Aura::SpellAuraDummy(bool apply)
 	case 24125:
 	case 21171:
 		{
-			if(!apply && m_target->GetTypeId() == TYPEID_PLAYER && m_target->IsInWorld())
+			/*if(!apply && m_target->GetTypeId() == TYPEID_PLAYER && m_target->IsInWorld())
 			{
 				// reset players vision
 				Player * plr = static_cast<Player*>(m_target);
@@ -1666,7 +1666,7 @@ void Aura::SpellAuraDummy(bool apply)
 					farsight->RemoveFromWorld(false,true);
 					delete farsight;
 				}
-			}
+			}*/
 		}break;
 	case 33763: // LifeBloom
 		 {
@@ -2352,30 +2352,31 @@ void Aura::SpellAuraModStun(bool apply)
 void Aura::SpellAuraModDamageDone(bool apply)
 {
 	int32 val;
-	if(m_target->IsPlayer())
+
+	if( m_target->IsPlayer() )
 	{
 		uint32 index;
 		 
-		if(mod->m_amount > 0)
+		if( mod->m_amount > 0 )
 		{
-			if(apply)
+			if( apply )
 			{
 				SetPositive();
 				val = mod->m_amount;
 			}
 			else
 			{
-				val =- mod->m_amount;
+				val = -mod->m_amount;
 			}
 			index = PLAYER_FIELD_MOD_DAMAGE_DONE_POS;
 		
 		}
 		else
 		{
-			if(apply)
+			if( apply )
 			{
 				SetNegative();
-				val =- mod->m_amount;
+				val = -mod->m_amount;
 			}
 			else
 			{
@@ -2384,52 +2385,52 @@ void Aura::SpellAuraModDamageDone(bool apply)
 			index = PLAYER_FIELD_MOD_DAMAGE_DONE_NEG;
 		}
 
-		for(uint32 x=0;x<7;x++)
+		for( uint32 x = 0; x < 7; x++ )
 		{
-			if (mod->m_miscValue & (((uint32)1)<<x) )
+			if( mod->m_miscValue & ( ( (uint32)1 ) << x ) )
 			{
-				m_target->ModUInt32Value(index + x,val);
+				m_target->ModUInt32Value( index + x, val );
 			}
 		}
 	}
-	else if(m_target->GetTypeId() == TYPEID_UNIT)
+	else if( m_target->GetTypeId() == TYPEID_UNIT )
 	{
-		if(mod->m_amount > 0)
+		if( mod->m_amount > 0 )
 		{
-			if(apply)
+			if( apply )
 			{
 				SetPositive();
 				val = mod->m_amount;
 			}
 			else
 			{
-				val =- mod->m_amount;
+				val = -mod->m_amount;
 			}
 
 		}
 		else
 		{
-			if(apply)
+			if( apply )
 			{
 				SetNegative();
 				val = mod->m_amount;
 			}
 			else
 			{
-				val =- mod->m_amount;
+				val = -mod->m_amount;
 			}
 		}
 
-		for(uint32 x=0;x<7;x++)
+		for( uint32 x = 0; x < 7; x++ )
 		{
-			if (mod->m_miscValue & (((uint32)1)<<x) )
+			if( mod->m_miscValue & ( ( (uint32)1 ) << x ) )
 			{
-				static_cast<Creature*>(m_target)->ModDamageDone[x]+=val;
+				static_cast< Creature* >( m_target )->ModDamageDone[x] += val;
 			}
 		}
 	}
    
-	if(mod->m_miscValue&1)
+	if( mod->m_miscValue & 1 )
 		m_target->CalcDamage();
 }
 
@@ -3347,7 +3348,7 @@ void Aura::SpellAuraModShapeshift(bool apply)
 			spellId = 9635;
 			if(apply)
 			{
-				 m_target->SetByte(UNIT_FIELD_BYTES_0,3,POWER_TYPE_RAGE);
+				m_target->SetByte(UNIT_FIELD_BYTES_0,3,POWER_TYPE_RAGE);
 				m_target->SetUInt32Value(UNIT_FIELD_MAXPOWER2, 1000);
 				m_target->SetUInt32Value(UNIT_FIELD_POWER2, 0);//0 rage
 				if(m_target->getRace() == 4)//NE
@@ -7413,8 +7414,15 @@ void Aura::SpellAuraAxeSkillModifier(bool apply)
 	{
 		SetPositive();
 		if( apply )
-			p_target->_ModifySkillBonus( SKILL_AXES, mod->m_amount );//re use
+		{
+			p_target->_ModifySkillBonus( SKILL_AXES, mod->m_amount );
+			p_target->_ModifySkillBonus( SKILL_2H_AXES, mod->m_amount );
+		}
 		else
-			p_target->_ModifySkillBonus( SKILL_AXES, -mod->m_amount );//re use
+		{
+			p_target->_ModifySkillBonus( SKILL_AXES, -mod->m_amount );
+			p_target->_ModifySkillBonus( SKILL_2H_AXES, -mod->m_amount );
+		}
+		p_target->UpdateStats();
 	}
 }

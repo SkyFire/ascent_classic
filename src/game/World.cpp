@@ -52,6 +52,7 @@ World::World()
 	m_levelCap=70;
 	m_genLevelCap=70;
 	m_limitedNames=false;
+	m_banTable = NULL;
 }
 
 void CleanupRandomNumberGenerators();
@@ -271,10 +272,6 @@ void CreateDummySpell(uint32 id)
 
 bool World::SetInitialWorldSettings()
 {
-#ifdef ENABLE_LUA_SCRIPTING
-	new LuaEngineMgr;
-	LuaEngineMgr::getSingleton().Startup();
-#endif
 	Log.Line();
 	Player::InitVisibleUpdateBits();
 
@@ -505,11 +502,6 @@ bool World::SetInitialWorldSettings()
 	g_chatFilter->Load("wordfilter_chat");
 
 	Log.Notice("WordFilter", "Done.");
-
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-	new CheckpointMgr;
-	CheckpointMgr::getSingleton().Load();
-#endif
 
 	sLog.outString("");
 	Log.Notice("World", "Database loaded in %ums.", getMSTime() - start_time);
@@ -3091,7 +3083,9 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//Druid: Improved Leader of the Pack
-	sp = dbcSpell.LookupEntryForced( 34299 ); if( sp != NULL ) sp->proc_interval = 6000;//6 secs
+	sp = dbcSpell.LookupEntryForced( 34299 );
+	if( sp != NULL )
+		sp->proc_interval = 6000;//6 secs
 
 	//fix for the right Enchant ID for Enchant Cloak - Major Resistance
 	sp = dbcSpell.LookupEntryForced( 27962 );
@@ -6899,6 +6893,25 @@ void World::SendZoneMessage(WorldPacket *packet, uint32 zoneid, WorldSession *se
 	m_sessionlock.ReleaseReadLock();
 }
 
+void World::SendInstanceMessage(WorldPacket *packet, uint32 instanceid, WorldSession *self)
+{
+	m_sessionlock.AcquireReadLock();
+
+	SessionMap::iterator itr;
+	for (itr = m_sessions.begin(); itr != m_sessions.end(); itr++)
+	{
+		if (itr->second->GetPlayer() &&
+			itr->second->GetPlayer()->IsInWorld()
+			&& itr->second != self)  // dont send to self!
+		{
+			if (itr->second->GetPlayer()->GetInstanceID() == instanceid)
+				itr->second->SendPacket(packet);
+		}
+	}
+
+	m_sessionlock.ReleaseReadLock();
+}
+
 void World::SendWorldText(const char* text, WorldSession *self)
 {
     uint32 textLen = (uint32)strlen((char*)text) + 1;
@@ -7159,25 +7172,6 @@ WorldSession* World::FindSessionByName(const char * Name)//case insensetive
 	return 0;
 }
 
-void World::BroadcastExtendedMessage(WorldSession * self, const char* str, ...)
-{
-	va_list ap;
-	va_start(ap, str);
-	char msg[1024];
-	vsnprintf(msg, 1024, str, ap);
-	va_end(ap);
-	SessionSet::iterator itr = mExtendedSessions.begin();
-	WorldSession * s;
-	for(; itr != mExtendedSessions.end(); )
-	{
-		s = *itr;
-		++itr;
-
-		if(s->GetPlayer() /*&& s != this*/)
-			s->GetPlayer()->BroadcastMessage(msg);
-	}
-}
-
 void World::ShutdownClasses()
 {
 	Log.Notice("AddonMgr", "~AddonMgr()");
@@ -7191,13 +7185,6 @@ void World::ShutdownClasses()
 
 	Log.Notice("MailSystem", "~MailSystem()");
 	delete MailSystem::getSingletonPtr();
-}
-
-void World::EventDeleteBattleground(Battleground * BG)
-{
-	// remove the instance
-	//sWorldCreator.DestroyBattlegroundInstance(BG);
-	//sBattlegroundMgr.RemoveBattleground(BG->GetID());
 }
 
 void World::GetStats(uint32 * GMCount, float * AverageLatency)
@@ -7441,6 +7428,18 @@ void World::Rehash(bool load)
 		if(log_enabled)
 			GMCommand_Log->Open();
 
+	log_enabled = Config.MainConfig.GetBoolDefault("Log", "Player", false);
+	if(Player_Log->IsOpen())
+	{
+		if(!log_enabled)
+			Player_Log->Close();
+	}
+	else
+	{
+		if(log_enabled)
+			Player_Log->Open();
+	}
+
 #ifdef WIN32
 	DWORD current_priority_class = GetPriorityClass( GetCurrentProcess() );
 	bool high = Config.MainConfig.GetBoolDefault( "Server", "AdjustPriority", false );
@@ -7505,6 +7504,15 @@ void World::Rehash(bool load)
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
 	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);
 	m_useAccountData = Config.MainConfig.GetBoolDefault("Server", "UseAccountData", false);
+
+	if( m_banTable != NULL )
+		free( m_banTable );
+
+	m_banTable = NULL;
+	string s = Config.MainConfig.GetStringDefault( "Server", "BanTable", "" );
+	if( !s.empty() )
+		m_banTable = strdup( s.c_str() );
+
 	if( load )
 		Channel::LoadConfSettings();
 }
@@ -7926,132 +7934,6 @@ void World::PollCharacterInsertQueue(MysqlCon * con)
 		CharacterDatabase.FWaitExecute("DELETE FROM playeritems_insert_queue", con);
 	}
 }
-
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-initialiseSingleton(CheckpointMgr);
-CheckpointMgr::~CheckpointMgr()
-{
-
-}
-
-void CheckpointMgr::Load()
-{
-	StorageContainerIterator<MapCheckPoint> * itr = CheckpointStorage.MakeIterator();
-	while(!itr->AtEnd())
-	{
-		if(itr->Get()->required_checkpoint_id==0)
-			itr->Get()->pPrevCp=NULL;
-		else
-			itr->Get()->pPrevCp=CheckpointStorage.LookupEntry(itr->Get()->required_checkpoint_id);
-
-		CheckpointMap::iterator it2 = m_checkpoints.find(itr->Get()->creature_id);
-		if(it2==m_checkpoints.end())
-		{
-			vector<uint32> a;
-			a.push_back(itr->Get()->checkpoint_id);
-			m_checkpoints.insert(make_pair(itr->Get()->creature_id,a));
-		}
-		else
-			it2->second.push_back(itr->Get()->checkpoint_id);
-
-		if(!itr->Inc())
-			break;
-	}
-
-	QueryResult * result = CharacterDatabase.Query("SELECT * FROM guild_checkpoints");
-	if(!result)
-		return;
-
-	do 
-	{
-		Field * f = result->Fetch();
-		uint32 guildid = f[0].GetUInt32();
-		uint32 cid = f[1].GetUInt32();
-
-		CheckpointCMap::iterator it3 = m_cCheckpoints.find(guildid);
-		if(it3==m_cCheckpoints.end())
-		{
-			set<uint32> s;
-			s.insert(cid);
-			m_cCheckpoints.insert(make_pair(guildid,s));
-		}
-		else
-			it3->second.insert(cid);
-
-	} while(result->NextRow());
-	delete result;
-}
-
-void CheckpointMgr::GuildCompletedCheckpoint(uint32 GuildId, uint32 Cid)
-{
-	CheckpointCMap::iterator itr = m_cCheckpoints.find(GuildId);
-	if(itr==m_cCheckpoints.end())
-	{
-		set<uint32> s;
-		s.insert(Cid);
-		m_cCheckpoints.insert(make_pair(GuildId,s));
-	}
-	else
-		itr->second.insert(Cid);
-
-	CharacterDatabase.WaitExecute("INSERT INTO guild_checkpoints VALUES(%u,%u)",GuildId,Cid);
-
-	Guild * pGuild = objmgr.GetGuild(GuildId);
-	MapCheckPoint * pCheck = CheckpointStorage.LookupEntry(Cid);
-	if(pCheck&&pGuild)
-	{
-		char msg[300];
-		snprintf(msg,300,"Your guild has now passed the `%s` checkpoint.", pCheck->name);
-		WorldPacket * data = sChatHandler.FillSystemMessageData(msg);
-		list<PlayerInfo*>::iterator itr = pGuild->Begin();
-		for(; itr != pGuild->End(); ++itr)
-			if((*itr)->m_loggedInPlayer)
-				(*itr)->m_loggedInPlayer->GetSession()->SendPacket(data);
-		delete data;
-	}
-}
-
-bool CheckpointMgr::HasCompletedCheckpointAndPrequsites(uint32 GuildId, MapCheckPoint * pCheckpoint)
-{
-	MapCheckPoint * pcp2 = pCheckpoint->pPrevCp;
-	CheckpointCMap::iterator itr = m_cCheckpoints.find(GuildId);
-	if(itr==m_cCheckpoints.end())
-		return false;
-
-	if(itr->second.find(pCheckpoint->checkpoint_id)==itr->second.end())
-		return false;
-
-	while(pcp2)
-	{
-		if(itr->second.find(pcp2->checkpoint_id)==itr->second.end())
-			return false;
-		
-		pcp2=pcp2->pPrevCp;
-	}
-	return true;
-}
-
-void CheckpointMgr::KilledCreature(uint32 GuildId, uint32 CreatureId)
-{
-	CheckpointMap::iterator itr = m_checkpoints.find(CreatureId);
-	if(itr==m_checkpoints.end())
-		return;
-
-	for(vector<uint32>::iterator i = itr->second.begin(); i != itr->second.end(); ++i)
-	{
-		MapCheckPoint * pcp = CheckpointStorage.LookupEntry((*i));
-		if(pcp)
-		{
-			// check prerequsites
-			if(pcp->pPrevCp && !HasCompletedCheckpointAndPrequsites(GuildId, pcp->pPrevCp))
-				return;
-
-			GuildCompletedCheckpoint(GuildId,pcp->checkpoint_id);
-		}
-	}
-}
-
-#endif
 
 void World::DisconnectUsersWithAccount(const char * account, WorldSession * m_session)
 {

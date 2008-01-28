@@ -390,42 +390,42 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 	_player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
 	_player->m_currentLoot = 0;
 
-	if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_UNIT)
+	if( UINT32_LOPART( GUID_HIPART( guid ) ) == HIGHGUID_UNIT )
 	{
-		Creature* pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
-		if(!pCreature)
+		Creature* pCreature = _player->GetMapMgr()->GetCreature( (uint32)guid );
+		if( pCreature == NULL )
 			return;
 		// remove from looter set
 		pCreature->loot.looters.erase(_player->GetGUIDLow());
-		if(!pCreature->loot.gold)
+		if( pCreature->loot.gold <= 0)
 		{			
-			for(std::vector<__LootItem>::iterator i=pCreature->loot.items.begin();i!=pCreature->loot.items.end();i++)
-			if(i->iItemsCount)
+			for( std::vector<__LootItem>::iterator i = pCreature->loot.items.begin(); i != pCreature->loot.items.end(); i++ )
+			if( i->iItemsCount > 0 )
 			{
-				ItemPrototype *proto=i->item.itemproto;
-				if(proto->Class != 12)
-				return;
-				if(_player->HasQuestForItem(i->item.itemproto->ItemId))
-				return;
+				ItemPrototype* proto = i->item.itemproto;
+				if( proto->Class != 12 )
+					return;
+				if( _player->HasQuestForItem( i->item.itemproto->ItemId ) )
+					return;
 			}
-			pCreature->BuildFieldUpdatePacket(_player, UNIT_DYNAMIC_FLAGS, 0);
+			pCreature->BuildFieldUpdatePacket( _player, UNIT_DYNAMIC_FLAGS, 0 );
 
-			if(!pCreature->Skinned)
+			if( !pCreature->Skinned )
 			{
-				if(lootmgr.IsSkinnable(pCreature->GetEntry()))
+				if( lootmgr.IsSkinnable( pCreature->GetEntry() ) )
 				{
-					pCreature->BuildFieldUpdatePacket(_player, UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+					pCreature->BuildFieldUpdatePacket( _player, UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
 				}
 			}
 		}
 	}
-	else if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_GAMEOBJECT)
+	else if( UINT32_LOPART( GUID_HIPART( guid ) ) == HIGHGUID_GAMEOBJECT )
 	{	   
-		GameObject* pGO = _player->GetMapMgr()->GetGameObject((uint32)guid);
-		if(!pGO)
+		GameObject* pGO = _player->GetMapMgr()->GetGameObject( (uint32)guid );
+		if( pGO == NULL )
 			return;
 
-        switch(pGO->GetUInt32Value(GAMEOBJECT_TYPE_ID))
+        switch( pGO->GetUInt32Value( GAMEOBJECT_TYPE_ID ) )
         {
         case GAMEOBJECT_TYPE_FISHINGNODE:
             {
@@ -438,37 +438,47 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
             }break;
         case GAMEOBJECT_TYPE_CHEST:
             {
-                pGO->loot.looters.erase(_player->GetGUIDLow());
+                pGO->loot.looters.erase( _player->GetGUIDLow() );
                 //check for locktypes
                 
-                Lock *pLock = dbcLock.LookupEntry(pGO->GetInfo()->SpellFocus);
-                if(pLock)
+                Lock* pLock = dbcLock.LookupEntry( pGO->GetInfo()->SpellFocus );
+                if( pLock )
                 {
-                    for(uint32 i=0; i < 5; i++)
+                    for( uint32 i=0; i < 5; i++ )
                     {
-                        if(pLock->locktype[i])
+                        if( pLock->locktype[i] )
                         {
-                            if(pLock->locktype[i] == 2) //locktype;
+                            if( pLock->locktype[i] == 2 ) //locktype;
                             {
                                 //herbalism and mining;
-                                if(pLock->lockmisc[i] == LOCKTYPE_MINING || pLock->lockmisc[i] == LOCKTYPE_HERBALISM)
+                                if( pLock->lockmisc[i] == LOCKTYPE_MINING || pLock->lockmisc[i] == LOCKTYPE_HERBALISM )
                                 {
                                     //we still have loot inside.
-                                    if(pGO->HasLoot())
+                                    if( pGO->HasLoot() )
                                     {
-                                        pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
+                                        pGO->SetUInt32Value( GAMEOBJECT_STATE, 1 );
+										// TODO : redo this temporary fix, because for some reason hasloot is true even when we loot everything
+										// my guess is we need to set up some even that rechecks the GO in 10 seconds or something
+										pGO->Despawn( 600000 + ( RandomUInt( 300000 ) ) );
                                         return;
-                                    }
-                                    if(pGO->CanMine())
-                                    {   pGO->loot.items.clear();
-                                        pGO->UseMine();
-                                       
                                     }
                                     else
                                     {
-    					    pGO->CalcMineRemaining(true);
-			                    pGO->Despawn(900000);
-					    return;
+										pGO->Despawn( 600000 + ( RandomUInt( 300000 ) ) );
+										return;
+                                    }
+
+                                    if( pGO->CanMine() )
+                                    {
+										pGO->loot.items.clear();
+                                        pGO->UseMine();
+										return;
+                                    }
+                                    else
+                                    {
+    									pGO->CalcMineRemaining( true );
+										pGO->Despawn( 600000 + ( RandomUInt( 300000 ) ) );
+										return;
                                     }
                                 }
                                 else //other type of locks that i dont bother to split atm ;P
@@ -496,7 +506,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                 }
                 else
                 {
-                    if(pGO->HasLoot())
+                    if( pGO->HasLoot() )
                     {
                         pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
                         return;
@@ -759,7 +769,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
 void WorldSession::HandlePlayerLogoutOpcode( WorldPacket & recv_data )
 {
 	sLog.outDebug( "WORLD: Recvd CMSG_PLAYER_LOGOUT Message" );
-	if(!_logoutTime && !HasGMPermissions())
+	if(!HasGMPermissions())
 	{
 		// send "You do not have permission to use this"
 		SendNotification(NOTIFICATION_MESSAGE_NO_PERMISSION);
@@ -1218,7 +1228,6 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	Player *plyr = GetPlayer();
    
 	CALL_GO_SCRIPT_EVENT(obj, OnActivate)(_player);
-	LUA_ON_GO_EVENT(obj,GAMEOBJECT_EVENT_ON_USE,_player);
 
 	uint32 type = obj->GetUInt32Value(GAMEOBJECT_TYPE_ID);
 	switch (type)

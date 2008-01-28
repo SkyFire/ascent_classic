@@ -609,7 +609,7 @@ void ObjectMgr::SaveGMTicket(uint64 guid, QueryBuffer * buf)
 	ss2 << ticket->timestamp << ");";
 
 	if(buf == NULL)
-		CharacterDatabase.Execute(ss2.str( ).c_str( ));
+		CharacterDatabase.ExecuteNA(ss2.str( ).c_str( ));
 	else
 		buf->AddQueryStr(ss2.str());
 }

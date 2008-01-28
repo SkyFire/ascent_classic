@@ -693,8 +693,6 @@ void QuestMgr::OnPlayerKill(Player* plr, Creature* victim)
 										CALL_QUESTSCRIPT_EVENT( qle, OnCreatureKill )( entry, plr, qle );
 										qle->UpdatePlayerFields();
 
-										// lua stuff
-										//QUESTLUA_SendEvent(qst, victim, plr, ON_QUEST_KILLMOB, qle->m_mobcount[j]);
 										if( qle->CanBeFinished() )
 											qle->SendQuestComplete();
 										break;
@@ -857,7 +855,7 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 }
 void QuestMgr::OnQuestAccepted(Player* plr, Quest* qst, Object *qst_giver)
 {
-	LUA_ON_QUEST_EVENT(plr,qst->id,QUEST_EVENT_ON_ACCEPT,qst_giver);
+	
 }
 
 void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint32 reward_slot)
@@ -871,8 +869,6 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
     }
     BuildQuestComplete(plr, qst);
     if(!qst->is_repeatable) CALL_QUESTSCRIPT_EVENT(qle, OnQuestComplete)(plr, qle);
-	LUA_ON_QUEST_EVENT(plr,qst->id,QUEST_EVENT_ON_COMPLETE,qst_giver);
-
 	if(!qst->is_repeatable) 
 	{
 		for (uint32 x=0;x<4;x++)
@@ -896,7 +892,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 	{
 		if(!((Creature*)qst_giver)->HasQuest(qst->id, 2))
 		{
-			sCheatLog.writefromsession(plr->GetSession(), "tried to finish quest from invalid npc.");
+			//sCheatLog.writefromsession(plr->GetSession(), "tried to finish quest from invalid npc.");
 			plr->GetSession()->Disconnect();
 			return;
 		}

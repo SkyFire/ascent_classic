@@ -303,7 +303,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 		recv_data >> itemguid;
 
         pItem = _player->GetItemInterface()->GetItemByGUID( itemguid );
-		if( pItem == NULL || pItem->IsSoulbound() )
+		if( pItem == NULL || pItem->IsSoulbound() || pItem->HasFlag( ITEM_FIELD_FLAGS, ITEM_FLAG_CONJURED ) )
 		{
 			SendMailError( MAIL_ERR_INTERNAL_ERROR );
 			return;

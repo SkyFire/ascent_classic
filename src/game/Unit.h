@@ -653,12 +653,12 @@ public:
 	/************************************************************************/
 	/* LUA Stuff                                                            */
 	/************************************************************************/
-	typedef struct { const char *name; int(*mfunc)(lua_State*,Unit*); } RegType;
+/*	typedef struct { const char *name; int(*mfunc)(lua_State*,Unit*); } RegType;
 	static const char className[];
 	static RegType methods[];
 	
 	// a lua script cannot create a unit.
-	Unit(lua_State * L) { ASSERT(false); }
+	Unit(lua_State * L) { ASSERT(false); }*/
 
 
 	void CombatStatusHandler_UpdatePvPTimeout();
@@ -956,10 +956,6 @@ public:
 	void SendChatMessageToPlayer(uint8 type, uint32 lang, const char *msg, Player *plr);
 	void SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg);
 	void RegisterPeriodicChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify);
-
-	void DelayedChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify);
-	void SendNotifyToNearby(uint32 msgid);
-	void SendNotifyToNearbyCreature(uint32 msgid, uint32 entryid);
 
 	ASCENT_INLINE int GetHealthPct() { return (int)(GetUInt32Value(UNIT_FIELD_HEALTH) * 100 / GetUInt32Value(UNIT_FIELD_MAXHEALTH)); };
     ASCENT_INLINE void SetHealthPct(uint32 val) { if (val>0) SetUInt32Value(UNIT_FIELD_HEALTH,float2int32(val*0.01f*GetUInt32Value(UNIT_FIELD_MAXHEALTH))); };

@@ -56,11 +56,6 @@ SERVER_DECL SQLStorage<ZoneGuardEntry, HashMapStorageContainer<ZoneGuardEntry> >
 SERVER_DECL set<string> ExtraMapCreatureTables;
 SERVER_DECL set<string> ExtraMapGameObjectTables;
 
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-SERVER_DECL SQLStorage<MapCheckPoint, ArrayStorageContainer<MapCheckPoint> >				CheckpointStorage;
-const char * gCheckpointFormat = "uuus";
-#endif
-
 void ObjectMgr::LoadExtraCreatureProtoStuff()
 {
 	{
@@ -362,9 +357,6 @@ void Storage_FillTaskList(TaskList & tl)
 	make_task(NpcTextStorage, GossipText, HashMapStorageContainer, "npc_text", gNpcTextFormat);
 	make_task(WorldMapInfoStorage, MapInfo, ArrayStorageContainer, "worldmap_info", gWorldMapInfoFormat);
 	make_task(ZoneGuardStorage, ZoneGuardEntry, HashMapStorageContainer, "zoneguards", gZoneGuardsFormat);
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-	make_task(CheckpointStorage, MapCheckPoint, ArrayStorageContainer, "map_checkpoint", gCheckpointFormat);
-#endif
 }
 
 void Storage_Cleanup()
@@ -397,9 +389,6 @@ void Storage_Cleanup()
 	NpcTextStorage.Cleanup();
 	WorldMapInfoStorage.Cleanup();
 	ZoneGuardStorage.Cleanup();
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-	CheckpointStorage.Cleanup();
-#endif
 }
 
 vector<pair<string,string> > additionalTables;

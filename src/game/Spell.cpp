@@ -1688,9 +1688,13 @@ void Spell::finish()
 		}
 		if(m_Delayed)
 		{
-			Unit *pTarget = p_caster->GetMapMgr()->GetUnit(m_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT));
-			if(!pTarget)
-				pTarget = p_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+			Unit *pTarget = NULL;
+			if( p_caster->IsInWorld() )
+			{
+				pTarget = p_caster->GetMapMgr()->GetUnit(m_caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT));
+				if(!pTarget)
+					pTarget = p_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
+			}
 			   
 			if(pTarget)
 			{
@@ -2748,6 +2752,13 @@ uint8 Spell::CanCast(bool tolerate)
 				return SPELL_FAILED_ITEM_GONE;
 		}
 
+		// stealth check
+		if( m_spellInfo->NameHash == SPELL_HASH_STEALTH )
+		{
+			if( p_caster->CombatStatus.IsInCombat() )
+				return SPELL_FAILED_TARGET_IN_COMBAT;
+		}
+
 		// check if we have the required gameobject focus
 		if( m_spellInfo->RequiresSpellFocus)
 		{
@@ -3012,6 +3023,19 @@ uint8 Spell::CanCast(bool tolerate)
 				{
 					if (target->GetAIInterface()->GetIsSoulLinked() && u_caster && target->GetAIInterface()->getSoullinkedWith() != u_caster)
 						return SPELL_FAILED_BAD_TARGETS;
+				}
+				
+				// check training points when teaching pet
+				if( m_spellInfo->EffectImplicitTargetA[0] == EFF_TARGET_PET &&
+					m_spellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL )
+				{
+					Pet *pPet = p_caster->GetSummon();
+					// check if we have a pet
+					if( pPet == NULL )
+						return SPELL_FAILED_NO_PET;
+					if( !pPet->IsSummon() )
+						if( !pPet->CanLearnSpellTP( m_spellInfo->EffectTriggerSpell[0] ) )
+							return SPELL_FAILED_TRAINING_POINTS;
 				}
 			}
 

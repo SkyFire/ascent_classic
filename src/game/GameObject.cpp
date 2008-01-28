@@ -655,8 +655,6 @@ void GameObject::CallScriptUpdate()
 void GameObject::OnPushToWorld()
 {
 	Object::OnPushToWorld();
-	/* script */
-	LUA_ON_GO_EVENT(this,GAMEOBJECT_EVENT_ON_SPAWN,NULL);
 }
 
 void GameObject::OnRemoveInRangeObject(Object* pObj)

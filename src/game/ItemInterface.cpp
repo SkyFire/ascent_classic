@@ -36,7 +36,7 @@ ItemInterface::~ItemInterface()
 {
 	for(int i = 0; i < MAX_INVENTORY_SLOT; i++)
 	{
-		if( m_pItems[i] != NULL )
+		if( m_pItems[i] != NULL && m_pItems[i]->GetOwner() == m_pOwner )
 		{
 			if( m_pItems[i]->IsContainer() )
 			{
@@ -186,8 +186,49 @@ bool ItemInterface::m_AddItem(Item *item, int8 ContainerSlot, int8 slot)
 {
 	ASSERT(slot < MAX_INVENTORY_SLOT);
 	ASSERT(ContainerSlot < MAX_INVENTORY_SLOT);
-	ASSERT(item != NULL);
+	if( item == NULL || !item->GetProto() )
+		return false;
+
 	item->m_isDirty = true;
+
+	// doublechecking
+	uint32 i, j, k;
+	Item * tempitem;
+	for(i = 0; i < MAX_INVENTORY_SLOT; ++i)
+	{
+		tempitem = m_pItems[i];
+		if( tempitem != NULL )
+		{
+			if( tempitem == item )
+			{
+#ifdef WIN32
+				//OutputCrashLogLine("item duplication, callstack:");
+				//printf("item duplication, callstack: ");
+				//CStackWalker ws;
+				//ws.ShowCallstack();
+#endif
+				return false;
+			}
+
+			if( tempitem->IsContainer() )
+			{
+				k = tempitem->GetProto()->ContainerSlots;
+				for(j = 0; j < k; ++j)
+				{
+					if( static_cast<Container*>(tempitem)->GetItem( j ) == item )
+					{
+#ifdef WIN32
+						//OutputCrashLogLine("item duplication in container, callstack:");
+						//printf("item duplication in container, callstack: ");
+						//CStackWalker ws;
+						//ws.ShowCallstack();
+#endif
+						return false;
+					}
+				}
+			}
+		}
+	}
 
 	if(item->GetProto())
 	{
@@ -334,33 +375,38 @@ Item *ItemInterface::SafeRemoveAndRetreiveItemFromSlot(int8 ContainerSlot, int8 
 		}
 
 		m_pItems[(int)slot] = NULL;
-		pItem->m_isDirty = true;
-
-		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (slot*2), 0 );
-
-		if ( slot < EQUIPMENT_SLOT_END )
+		if(pItem->GetOwner() == m_pOwner)
 		{
-			m_pOwner->ApplyItemMods( pItem, slot, false );
-			int VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + (slot * 16);
-			for (int i = VisibleBase; i < VisibleBase + 12; ++i)
+			pItem->m_isDirty = true;
+
+			m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (slot*2), 0 );
+
+			if ( slot < EQUIPMENT_SLOT_END )
 			{
-				m_pOwner->SetUInt32Value(i, 0);
+				m_pOwner->ApplyItemMods( pItem, slot, false );
+				int VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + (slot * 16);
+				for (int i = VisibleBase; i < VisibleBase + 12; ++i)
+				{
+					m_pOwner->SetUInt32Value(i, 0);
+				}
+			}
+			else if ( slot < INVENTORY_SLOT_BAG_END )
+				m_pOwner->ApplyItemMods( pItem, slot, false );
+
+			if(slot == EQUIPMENT_SLOT_OFFHAND)
+				m_pOwner->SetDuelWield(false);
+
+			if(destroy)
+			{
+				if (pItem->IsInWorld())
+				{
+					pItem->RemoveFromWorld();
+				}
+				pItem->DeleteFromDB();
 			}
 		}
-		else if ( slot < INVENTORY_SLOT_BAG_END )
-			m_pOwner->ApplyItemMods( pItem, slot, false );
-
-		if(slot == EQUIPMENT_SLOT_OFFHAND)
-			m_pOwner->SetDuelWield(false);
-
-		if(destroy)
-		{
-			if (pItem->IsInWorld())
-			{
-				pItem->RemoveFromWorld();
-			}
-			pItem->DeleteFromDB();
-		}
+		else
+			pItem = NULL;
 	}
 	else
 	{
@@ -491,32 +537,36 @@ bool ItemInterface::SafeFullRemoveItemFromSlot(int8 ContainerSlot, int8 slot)
 		}
 
 		m_pItems[(int)slot] = NULL;
-		pItem->m_isDirty = true;
-
-		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (slot*2), 0 );
-
-		if ( slot < EQUIPMENT_SLOT_END )
+		// hacky crashfix
+		if( pItem->GetOwner() == m_pOwner )
 		{
-			m_pOwner->ApplyItemMods(pItem, slot, false );
-			int VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + (slot * 16);
-			for (int i = VisibleBase; i < VisibleBase + 12; ++i)
+			pItem->m_isDirty = true;
+
+			m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD  + (slot*2), 0 );
+
+			if ( slot < EQUIPMENT_SLOT_END )
 			{
-				m_pOwner->SetUInt32Value(i, 0);
+				m_pOwner->ApplyItemMods(pItem, slot, false );
+				int VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + (slot * 16);
+				for (int i = VisibleBase; i < VisibleBase + 12; ++i)
+				{
+					m_pOwner->SetUInt32Value(i, 0);
+				}
 			}
+			else if( slot < INVENTORY_SLOT_BAG_END )
+				m_pOwner->ApplyItemMods(pItem, slot, false ); //watch containers that give attackspeed and stuff ;)
+
+			if(slot == EQUIPMENT_SLOT_OFFHAND)
+				m_pOwner->SetDuelWield(false);
+
+			if (pItem->IsInWorld())
+			{
+				pItem->RemoveFromWorld();
+			}
+
+			pItem->DeleteFromDB();
+			delete pItem;
 		}
-		else if( slot < INVENTORY_SLOT_BAG_END )
-			m_pOwner->ApplyItemMods(pItem, slot, false ); //watch containers that give attackspeed and stuff ;)
-
-		if(slot == EQUIPMENT_SLOT_OFFHAND)
-			m_pOwner->SetDuelWield(false);
-
-		if (pItem->IsInWorld())
-		{
-			pItem->RemoveFromWorld();
-		}
-
-		pItem->DeleteFromDB();
-		delete pItem;
 	}
 	else
 	{
@@ -1798,6 +1848,18 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount, Creature *
 
 }
 
+enum CanAffordItem
+{
+	CAN_AFFORD_ITEM_ERROR_NOT_FOUND				= 0,
+	CAN_AFFORD_ITEM_ERROR_SOLD_OUT				= 1,
+	CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY		= 2,
+	CAN_AFFORD_ITEM_ERROR_DOESNT_LIKE_YOU		= 4,
+	CAN_AFFORD_ITEM_ERROR_TOO_FAR_AWAY			= 5,
+	CAN_AFFORD_ITEM_ERROR_CANT_CARRY_ANY_MORE	= 8,
+	CAN_AFFORD_ITEM_ERROR_NOT_REQUIRED_RANK		= 11,
+	CAN_AFFORD_ITEM_ERROR_REPUTATION			= 12,
+};
+
 int8 ItemInterface::CanAffordItem(ItemPrototype * item,uint32 amount, Creature * pVendor)
 {
 	if(item->ItemExtendedCost)
@@ -1810,13 +1872,13 @@ int8 ItemInterface::CanAffordItem(ItemPrototype * item,uint32 amount, Creature *
 				if(ex->item[i])
 				{
 					if(m_pOwner->GetItemInterface()->GetItemCount(ex->item[i], false) < (ex->count[i]*amount))
-						return INV_ERR_NOT_ENOUGH_MONEY;
+						return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
 				}
 			}
 			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) < (ex->honor*amount))
-				return INV_ERR_NOT_ENOUGH_MONEY;
+				return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
 			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) < (ex->arena*amount))
-				return INV_ERR_NOT_ENOUGH_MONEY;
+				return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
 		}
 		else sLog.outDebug("Warning: item %u has extended cost but could not find the value in ItemExtendedCostStore",item->ItemId);
 	}
@@ -1825,7 +1887,7 @@ int8 ItemInterface::CanAffordItem(ItemPrototype * item,uint32 amount, Creature *
 		int32 price = GetBuyPriceForItem(item, amount, m_pOwner, pVendor) * amount;
 		if((int32)m_pOwner->GetUInt32Value(PLAYER_FIELD_COINAGE) < price)
 		{
-			return INV_ERR_NOT_ENOUGH_MONEY;
+			return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
 		}
 	}
 	if(item->RequiredFaction)
@@ -1838,10 +1900,10 @@ int8 ItemInterface::CanAffordItem(ItemPrototype * item,uint32 amount, Creature *
 		if(m_pOwner->reputationByListId[factdbc->RepListId] == 0 || m_pOwner->reputationByListId[factdbc->RepListId]->CalcRating()
 			< (int32)item->RequiredFactionStanding)
 		{
-			return INV_ERR_ITEM_REPUTATION_NOT_ENOUGH;
+			return CAN_AFFORD_ITEM_ERROR_REPUTATION;
 		}
 	}
-	return (int8)NULL;
+	return 0;
 }
 
 //-------------------------------------------------------------------//
@@ -2396,7 +2458,7 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 			m_pOwner->SetDuelWield( false );
 	}
 
-	// Reapply weapon mods immediately to prevent exploit
+/*	// Reapply weapon mods immediately to prevent exploit		// WTF? - Burlex
 	if( ( dstslot >= EQUIPMENT_SLOT_MAINHAND && dstslot <= EQUIPMENT_SLOT_RANGED ) || ( srcslot >= EQUIPMENT_SLOT_MAINHAND && srcslot <= EQUIPMENT_SLOT_RANGED ) )
 	{
 		if( m_pItems[dstslot] != NULL )
@@ -2409,7 +2471,7 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 			m_pOwner->ApplyItemMods( m_pItems[srcslot], srcslot, false, false );
 			m_pOwner->ApplyItemMods( m_pItems[srcslot], srcslot, true, false );
 		}
-	}
+	}*/
 
 }
 

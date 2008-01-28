@@ -192,7 +192,7 @@ enum AccountFlags
 {
 	ACCOUNT_FLAG_VIP		 = 0x1,
 	ACCOUNT_FLAG_NO_AUTOJOIN = 0x2,
-	ACCOUNT_FLAG_XTEND_INFO  = 0x4,
+	//ACCOUNT_FLAG_XTEND_INFO  = 0x4,
 	ACCOUNT_FLAG_XPACK_01	= 0x8,
 };
 
@@ -224,38 +224,8 @@ struct MapInfo
 		return (flags & flag) != 0;
 	}
 };
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-
-struct MapCheckPoint
-{
-	uint32 checkpoint_id;
-	uint32 required_checkpoint_id;
-	uint32 creature_id;
-	char * name;
-	MapCheckPoint * pPrevCp;
-};
 
 #pragma pack(pop)
-
-class CheckpointMgr : public Singleton<CheckpointMgr>
-{
-	typedef HM_NAMESPACE::hash_map<uint32,vector<uint32> > CheckpointMap;
-	CheckpointMap m_checkpoints;
-
-	typedef HM_NAMESPACE::hash_map<uint32,set<uint32> > CheckpointCMap;
-	CheckpointCMap m_cCheckpoints;
-
-public:
-	~CheckpointMgr();
-	void Load();
-	void KilledCreature(uint32 GuildId, uint32 CreatureId);
-	void GuildCompletedCheckpoint(uint32 GuildId, uint32 Cid);
-	bool HasCompletedCheckpointAndPrequsites(uint32 GuildId, MapCheckPoint * pCheckpoint);
-};
-
-#else
-#pragma pack(pop)
-#endif
 
 enum REALM_TYPE
 {
@@ -413,6 +383,7 @@ public:
 	void SendWorldWideScreenText(const char *text, WorldSession *self = 0);
 	void SendGlobalMessage(WorldPacket *packet, WorldSession *self = 0);
 	void SendZoneMessage(WorldPacket *packet, uint32 zoneid, WorldSession *self = 0);
+	void SendInstanceMessage(WorldPacket *packet, uint32 instanceid, WorldSession *self = 0);
 	void SendFactionMessage(WorldPacket *packet, uint8 teamId);
 
 	ASCENT_INLINE void SetStartTime(uint32 val) { m_StartTime = val; }
@@ -528,15 +499,10 @@ public:
 	bool UnloadMapFiles;
 	bool BreathingEnabled;
 	bool SpeedhackProtection;
-	void EventDeleteBattleground(Battleground * BG);
 	uint32 mInWorldPlayerCount;
 	uint32 mAcceptedConnections;
 	uint32 SocketSendBufSize;
 	uint32 SocketRecvBufSize;
-
-	ASCENT_INLINE void AddExtendedSession(WorldSession * session) { mExtendedSessions.insert(session); }
-	ASCENT_INLINE void RemoveExtendedSession(WorldSession * session) { mExtendedSessions.erase(session); }
-	void BroadcastExtendedMessage(WorldSession * self, const char* str, ...);	
 
 	uint32 HordePlayers;
 	uint32 AlliancePlayers;
@@ -627,7 +593,6 @@ protected:
 	uint32 m_queueUpdateTimer;
 
 	QueueSet mQueuedSessions;
-	SessionSet mExtendedSessions;
 
 	uint32	m_KickAFKPlayers;//don't lag the server if you are useless anyway :P
 public:
@@ -636,6 +601,8 @@ public:
 	uint32 m_genLevelCap;
 	bool m_limitedNames;
 	bool m_useAccountData;
+
+	char * m_banTable;
 };
 
 #define sWorld World::getSingleton()

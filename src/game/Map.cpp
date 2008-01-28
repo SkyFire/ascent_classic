@@ -155,17 +155,18 @@ void Map::LoadSpawns(bool reload)
 
 				if(!spawns[cellx][celly])
 					spawns[cellx][celly]=new CellSpawns;
-				cspawn->movetype = fields[7].GetUInt32();
+				cspawn->movetype = fields[7].GetUInt8();
 				cspawn->displayid = fields[8].GetUInt32();
 				cspawn->factionid = fields[9].GetUInt32();
 				cspawn->flags = fields[10].GetUInt32();
 				cspawn->bytes = fields[11].GetUInt32();
 				cspawn->bytes2 = fields[12].GetUInt32();
 				cspawn->emote_state = fields[13].GetUInt32();
-				cspawn->respawnNpcLink = fields[14].GetUInt32();
-				cspawn->channel_spell = fields[15].GetUInt32();
+				//cspawn->respawnNpcLink = fields[14].GetUInt32();
+				cspawn->channel_spell = fields[15].GetUInt16();
 				cspawn->channel_target_go = fields[16].GetUInt32();
 				cspawn->channel_target_creature = fields[17].GetUInt32();
+				cspawn->stand_state = fields[18].GetUInt16();
 				spawns[cellx][celly]->CreatureSpawns.push_back(cspawn);
 				++CreatureSpawnCount;
 			}while(result->NextRow());
@@ -187,17 +188,18 @@ void Map::LoadSpawns(bool reload)
 			cspawn->y = fields[4].GetFloat();
 			cspawn->z = fields[5].GetFloat();
 			cspawn->o = fields[6].GetFloat();
-			cspawn->movetype = fields[7].GetUInt32();
+			cspawn->movetype = fields[7].GetUInt8();
 			cspawn->displayid = fields[8].GetUInt32();
 			cspawn->factionid = fields[9].GetUInt32();
 			cspawn->flags = fields[10].GetUInt32();
 			cspawn->bytes = fields[11].GetUInt32();
 			cspawn->bytes2 = fields[12].GetUInt32();
 			cspawn->emote_state = fields[13].GetUInt32();
-			cspawn->respawnNpcLink = fields[14].GetUInt32();
+			//cspawn->respawnNpcLink = fields[14].GetUInt32();
 			cspawn->channel_spell=0;
 			cspawn->channel_target_creature=0;
 			cspawn->channel_target_go=0;
+			cspawn->stand_state = fields[18].GetUInt16();
 			staticSpawns.CreatureSpawns.push_back(cspawn);
 			++CreatureSpawnCount;
 		}while(result->NextRow());
@@ -226,7 +228,7 @@ void Map::LoadSpawns(bool reload)
 			gspawn->flags=fields[12].GetUInt32();
 			gspawn->faction=fields[13].GetUInt32();
 			gspawn->scale = fields[14].GetFloat();
-			gspawn->stateNpcLink = fields[15].GetUInt32();
+			//gspawn->stateNpcLink = fields[15].GetUInt32();
 			staticSpawns.GOSpawns.push_back(gspawn);
 			++GameObjectSpawnCount;
 		}while(result->NextRow());
@@ -256,7 +258,7 @@ void Map::LoadSpawns(bool reload)
 				gspawn->flags=fields[12].GetUInt32();
 				gspawn->faction=fields[13].GetUInt32();
 				gspawn->scale = fields[14].GetFloat();
-				gspawn->stateNpcLink = fields[15].GetUInt32();
+				//gspawn->stateNpcLink = fields[15].GetUInt32();
 
 				//uint32 cellx=float2int32(((_maxX-gspawn->x)/_cellSize));
 				//uint32 celly=float2int32(((_maxY-gspawn->y)/_cellSize));

@@ -731,7 +731,7 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 	gs->y = go->GetPositionY();
 	gs->z = go->GetPositionZ();
 	gs->state = go->GetUInt32Value(GAMEOBJECT_STATE);
-	gs->stateNpcLink = 0;
+	//gs->stateNpcLink = 0;
 
 	uint32 cx = m_session->GetPlayer()->GetMapMgr()->GetPosX(m_session->GetPlayer()->GetPositionX());
 	uint32 cy = m_session->GetPlayer()->GetMapMgr()->GetPosY(m_session->GetPlayer()->GetPositionY());

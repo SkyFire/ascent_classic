@@ -74,10 +74,6 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 		if(!pTarget) pTarget = pPet;	// target self
 	}
 
-	if(action==PET_ACTION_ACTION && misc==PET_ACTION_STAY)//sit if STAY commanded
-		pPet->SetStandState(STANDSTATE_SIT);
-	else 
-		pPet->SetStandState(STANDSTATE_STAND);
 	switch(action)
 	{
 	case PET_ACTION_ACTION:

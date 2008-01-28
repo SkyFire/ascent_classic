@@ -42,7 +42,7 @@ Container::~Container( )
 {
    for(uint32 i = 0; i < m_itemProto->ContainerSlots; i++)
 	{
-		if(m_Slot[i])
+		if(m_Slot[i] && m_Slot[i]->GetOwner() == m_owner)
 		{
 			if(m_Slot[i]->IsContainer())
 				delete ((Container*)m_Slot[i]);
@@ -173,7 +173,7 @@ bool Container::AddItem(int8 slot, Item *item)
 void Container::SwapItems(int8 SrcSlot, int8 DstSlot)
 {
 	Item *temp;
-	if(m_Slot[DstSlot] &&  m_Slot[SrcSlot]&&m_Slot[DstSlot]->GetEntry()==m_Slot[SrcSlot]->GetEntry() && m_Slot[DstSlot]->GetProto()->MaxCount>1)
+	if(m_Slot[DstSlot] &&  m_Slot[SrcSlot]&&m_Slot[DstSlot]->GetEntry()==m_Slot[SrcSlot]->GetEntry() && m_Slot[SrcSlot]->wrapped_item_id == 0 && m_Slot[DstSlot]->wrapped_item_id == 0 && m_Slot[DstSlot]->GetProto()->MaxCount>1)
 	{
 		uint32 total=m_Slot[SrcSlot]->GetUInt32Value(ITEM_FIELD_STACK_COUNT)+m_Slot[DstSlot]->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 		m_Slot[DstSlot]->m_isDirty = m_Slot[SrcSlot]->m_isDirty = true;
@@ -233,17 +233,22 @@ Item *Container::SafeRemoveAndRetreiveItemFromSlot(int8 slot, bool destroy)
 	if (pItem == NULL || pItem==this) return NULL;
 	m_Slot[slot] = NULL;
 
-	SetUInt64Value(CONTAINER_FIELD_SLOT_1  + slot*2, 0 );
-	pItem->SetUInt64Value(ITEM_FIELD_CONTAINED, 0);
-
-	if(destroy)
+	if( pItem->GetOwner() == m_owner )
 	{
-		if(pItem->IsInWorld())
+		SetUInt64Value(CONTAINER_FIELD_SLOT_1  + slot*2, 0 );
+		pItem->SetUInt64Value(ITEM_FIELD_CONTAINED, 0);
+
+		if(destroy)
 		{
-			pItem->RemoveFromWorld();
+			if(pItem->IsInWorld())
+			{
+				pItem->RemoveFromWorld();
+			}
+			pItem->DeleteFromDB();
 		}
-		pItem->DeleteFromDB();
 	}
+	else
+		pItem = NULL;
 
 	return pItem;
 }

@@ -28,12 +28,6 @@
 #undef max
 #endif
 
-extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C function names.
-#include <lua/lua.h>
-#include <lua/lauxlib.h>
-#include <lua/lualib.h>
-};
-
 #define _GAME
 //#define USE_SPECIFIC_AIAGENTS
 
@@ -165,7 +159,6 @@ extern "C" {		// we're C++, and LUA is C, so the compiler needs to know to use C
 #include "DatabaseCleaner.h"
 #include "DayWatcherThread.h"
 #include "VoiceChatHandler.h"
-#include "LUAEngine.h"
 #include "LocalizationMgr.h"
 
 #ifdef CLUSTERING

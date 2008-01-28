@@ -355,6 +355,7 @@ bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession *m_se
 	// rather than just sscanf'ing it.
 	char * pCharacter = (char*)args;
 	char * pBanDuration = strchr(pCharacter, ' ');
+	PlayerInfo * pInfo = NULL;
 	if(pBanDuration == NULL)
 		return false;
 
@@ -376,7 +377,7 @@ bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession *m_se
 	if(pPlayer == NULL)
 	{
 		string sCharacter = string(pCharacter);
-		PlayerInfo * pInfo = objmgr.GetPlayerInfoByName(sCharacter);
+		pInfo = objmgr.GetPlayerInfoByName(sCharacter);
 		if(pInfo == NULL)
 		{
 			SystemMessage(m_session, "Player not found.");
@@ -395,6 +396,7 @@ bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession *m_se
 		string sReason = string(pReason);
 		uint32 uBanTime = BanTime ? BanTime+(uint32)UNIXTIME : 1;
 		pPlayer->SetBanned(uBanTime, sReason);
+		pInfo = pPlayer->m_playerInfo;
 	}
 
 	SystemMessage(m_session, "This ban is due to expire %s%s.", BanTime ? "on " : "", BanTime ? ConvertTimeStampToDataTime(BanTime+(uint32)UNIXTIME).c_str() : "Never");
@@ -405,6 +407,11 @@ bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession *m_se
 	}
 
 	sGMLog.writefromsession(m_session, "used ban character on %s reason %s for %s", pCharacter, pReason, BanTime ? ConvertTimeStampToString(BanTime).c_str() : "ever");
+	if( sWorld.m_banTable && pInfo )
+	{
+		CharacterDatabase.Execute("INSERT INTO %s VALUES('%s', '%s', %u, %u, '%s')", sWorld.m_banTable,
+			m_session->GetPlayer()->GetName(), pInfo->name, (uint32)UNIXTIME, (uint32)UNIXTIME + BanTime, CharacterDatabase.EscapeString(string(pReason)).c_str() );
+	}
 	return true;
 }
 
@@ -1353,7 +1360,8 @@ bool ChatHandler::HandleCreatePetCommand(const char* args, WorldSession* m_sessi
 	sp->o = plr->GetOrientation();
 	sp->x = plr->GetPositionX();
 	sp->y = plr->GetPositionY();
-	sp->respawnNpcLink = 0;
+	//sp->respawnNpcLink = 0;
+	sp->stand_state = 0;
 	sp->channel_spell=sp->channel_target_creature=sp->channel_target_go=0;
 	pCreature->Load(sp, (uint32)NULL, NULL);
 
@@ -2137,7 +2145,8 @@ bool ChatHandler::HandleCreatureSpawnCommand(const char *args, WorldSession *m_s
 	sp->factionid = proto->Faction;
 	sp->bytes=0;
 	sp->bytes2=0;
-	sp->respawnNpcLink = 0;
+	//sp->respawnNpcLink = 0;
+	sp->stand_state = 0;
 	sp->channel_spell=sp->channel_target_creature=sp->channel_target_go=0;
 
 
@@ -2229,6 +2238,7 @@ bool ChatHandler::HandleForceRenameCommand(const char * args, WorldSession * m_s
 
 	CharacterDatabase.Execute("INSERT INTO banned_names VALUES('%s')", CharacterDatabase.EscapeString(string(pi->name)).c_str());
 	GreenSystemMessage(m_session, "Forcing %s to rename his character next logon.", args);
+	sGMLog.writefromsession(m_session, "forced %s to rename his charater (%u)", pi->name, pi->guid);
 	return true;
 }
 

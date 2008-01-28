@@ -573,7 +573,7 @@ bool Player::Create(WorldPacket& data )
 	if(!info)
 	{
 		// info not found... disconnect
-		sCheatLog.writefromsession(m_session, "tried to create invalid player with race %u and class %u", race, class_);
+		//sCheatLog.writefromsession(m_session, "tried to create invalid player with race %u and class %u", race, class_);
 		m_session->Disconnect();
 		return false;
 	}
@@ -581,7 +581,7 @@ bool Player::Create(WorldPacket& data )
 	// check that the account CAN create TBC characters, if we're making some
 	if(race >= RACE_BLOODELF && !m_session->HasFlag(ACCOUNT_FLAG_XPACK_01))
 	{
-		sCheatLog.writefromsession(m_session, "tried to create player with race %u and class %u but no expansion flags", race, class_);
+		//sCheatLog.writefromsession(m_session, "tried to create player with race %u and class %u but no expansion flags", race, class_);
 		m_session->Disconnect();
 		return false;
 	}
@@ -1669,7 +1669,7 @@ void Player::_SavePet(QueryBuffer * buf)
 			<< itr->second->xp << "','"
 			<< (itr->second->active ?  1 : 0) + itr->second->stablestate * 10 << "','"
 			<< itr->second->level << "','"
-			<< itr->second->happiness << "','"
+			<< itr->second->loyaltyxp << "','"
 			<< itr->second->actionbar << "','"
 			<< itr->second->happinessupdate << "','"
 			<< itr->second->summon << "','"
@@ -1835,7 +1835,7 @@ void Player::_LoadPet(QueryResult * result)
 		pet->active  = fields[6].GetInt8()%10 > 0 ? true : false;
 		pet->stablestate = fields[6].GetInt8() / 10;
 		pet->level   = fields[7].GetUInt32();
-		pet->happiness = fields[8].GetUInt32();
+		pet->loyaltyxp = fields[8].GetUInt32();
 		pet->actionbar = fields[9].GetString();
 		pet->happinessupdate = fields[10].GetUInt32();
 		pet->summon = (fields[11].GetUInt32()>0 ? true : false);
@@ -7946,7 +7946,20 @@ void Player::CompleteLoading()
 		if ( sp->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET )
 			continue; //do not load auras that only exist while pet exist. We should recast these when pet is created anyway
 
-		Aura * a = new Aura(sp,(*i).dur,this,this);
+		Aura * a;
+		if(sp->Id == 8326 || sp->Id == 9036 || sp->Id == 20584 || sp->Id == 150007)		// death auras
+		{
+			if(!isDead())
+				continue;
+
+			a = new Aura(sp,(*i).dur,this,this);
+			a->SetNegative();
+		}
+		else
+		{
+			a = new Aura(sp,(*i).dur,this,this);
+		}
+		
 
 		for(uint32 x =0;x<3;x++)
         {
@@ -7956,8 +7969,6 @@ void Player::CompleteLoading()
 		    }
         }
 
-		if(a->GetSpellId() == 8326 || a->GetSpellId() == 9036 || a->GetSpellId() == 20584 || a->GetSpellId() == 150007)		// death auras
-			a->SetNegative();
 
 		this->AddAura(a);		//FIXME: must save amt,pos/neg
 		//Somehow we should restore number of appearence. Right now i have no idea how :(
@@ -8313,15 +8324,16 @@ void Player::SaveAuras(stringstream &ss)
 
 void Player::SetShapeShift(uint8 ss)
 {
-	uint8 old_ss = GetByte(UNIT_FIELD_BYTES_1, 2);
-	SetByte(UNIT_FIELD_BYTES_1,2,ss);
+	uint8 old_ss = GetByte( UNIT_FIELD_BYTES_1, 2 );
+	SetByte( UNIT_FIELD_BYTES_1, 2, ss );
+
 	//remove auras that we should not have
-	for(uint32 x =0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+	for( uint32 x = 0; x < MAX_AURAS + MAX_PASSIVE_AURAS; x++ )
 	{
-		if(m_auras[x])
+		if( m_auras[x] != NULL )
 		{
 			uint32 reqss = m_auras[x]->GetSpellProto()->RequiredShapeShift;
-			if(reqss && m_auras[x]->IsPositive())
+			if( reqss != 0 && m_auras[x]->IsPositive() )
 			{
 				if( old_ss > 0 )
 				{
@@ -8334,22 +8346,24 @@ void Player::SetShapeShift(uint8 ss)
 				}
 			}
 
-			if (this->getClass()==DRUID)
+			if( this->getClass() == DRUID )
 			{
-				for(uint32 y = 0; y < 3; ++y)
+				for (uint32 y = 0; y < 3; ++y )
 				{
-					switch (m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
+					switch( m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
 					{
-					case 26: //Root
-					case 31: //Movement speed
-					case 5:  //Confuse (polymorph)
+					case SPELL_AURA_MOD_ROOT: //Root
+					case SPELL_AURA_MOD_DECREASE_SPEED: //Movement speed
+					case SPELL_AURA_MOD_CONFUSE:  //Confuse (polymorph)
+						{
 							m_auras[x]->Remove();
+						}
 						break;
 					default:
 						break;
 					}
 
-					if(m_auras[x] == NULL)
+					if( m_auras[x] == NULL )
 						break;
 				}
 			}
@@ -8409,7 +8423,7 @@ void Player::CalcDamage()
 	int ss = GetShapeShift();
 /////////////////MAIN HAND
 		float ap_bonus = GetAP()/14000.0f;
-		delta = float(GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS)-GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG));
+		delta = (float)GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS ) - (float)GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_NEG );
 		if(IsInFeralForm())
 		{
 			uint32 lev = getLevel();
@@ -8426,8 +8440,11 @@ void Player::CalcDamage()
 			//SetFloatValue(UNIT_FIELD_MINDAMAGE,r);
 			//SetFloatValue(UNIT_FIELD_MAXDAMAGE,r);
 
-			SetFloatValue(UNIT_FIELD_MINDAMAGE,r * 0.9f);
-			SetFloatValue(UNIT_FIELD_MAXDAMAGE,r * 1.1f);
+			r *= 0.9f;
+			r *= 1.1f;
+
+			SetFloatValue(UNIT_FIELD_MINDAMAGE,r>0?r:0);
+			SetFloatValue(UNIT_FIELD_MAXDAMAGE,r>0?r:0);
 
 			return;
 		}
@@ -8470,7 +8487,7 @@ void Player::CalcDamage()
 					cr=itr->second;
 			}
 		}
-		SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_20,cr);
+		SetUInt32Value( PLAYER_RATING_MODIFIER_MELEE_MAIN_HAND_SKILL, cr );
 		/////////////// MAIN HAND END
 
 		/////////////// OFF HAND START
@@ -8508,7 +8525,7 @@ void Player::CalcDamage()
 					cr=itr->second;
 			}
 		}
-		SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_21,cr);
+		SetUInt32Value( PLAYER_RATING_MODIFIER_MELEE_OFF_HAND_SKILL, cr );
 
 /////////////second hand end
 ///////////////////////////RANGED
@@ -8562,7 +8579,7 @@ void Player::CalcDamage()
 			}
 		
 		}
-		SetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1,cr);
+		SetUInt32Value( PLAYER_RATING_MODIFIER_RANGED_SKILL, cr );
 
 /////////////////////////////////RANGED end
 		tmp = 1;
@@ -8587,7 +8604,7 @@ uint32 Player::GetMainMeleeDamage(uint32 AP_owerride)
 		ap_bonus = AP_owerride/14000.0f;
 	else 
 		ap_bonus = GetAP()/14000.0f;
-	delta = float(GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS)-GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG));
+	delta = (float)GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS ) - (float)GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_NEG );
 	if(IsInFeralForm())
 	{
 		uint32 lev = getLevel();

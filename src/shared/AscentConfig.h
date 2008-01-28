@@ -23,14 +23,6 @@
 #ifndef __ASCENTCONFIG_H
 #define __ASCENTCONFIG_H
 
-/** Enable/disable LUA scripting system.
- * Default: Disabled
- */
-#ifdef HAVE_LUASCRIPT
-#  define ENABLE_LUA_SCRIPTING 1
-#endif
-//#define ENABLE_LUA_SCRIPTING 1
-
 /** Enable/disable Ascent world server cluster support.
  * Warning: Ascent will no longer function independantly when built in cluster mode. 
  * It will require a realmserver to function.
@@ -50,16 +42,8 @@
  */
 #ifdef ENABLE_COLLISION
 # define COLLISION 1
-# define COLLISION_CRAP
 #endif
 //#define COLLISION 1
-//#define COLLISION_CRAP 1
-
-/** Enable instance checkpoint system
- * This is not blizzlike, but a cool feature :p
- * Default: Disabled
- */
-//#define ENABLE_CHECKPOINT_SYSTEM
 
 /** Use memory mapping for map files for faster access (let OS take care of caching)
  * (currently only available under windows)
@@ -68,7 +52,7 @@
  */
 //#define USE_MEMORY_MAPPING_FOR_MAPS
 
-#define HOARD
+//#define HOARD
 
 #endif		// __ASCENTCONFIG_H
 

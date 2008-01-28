@@ -1425,7 +1425,17 @@ bool Object::isInBack(Object* target)
 {
 	double dx=double(target->GetPositionX()-GetPositionX());
 	double dy=double(target->GetPositionY()-GetPositionY());
-	double d=double(target->GetOrientation());
+	//double d=double(target->GetOrientation());
+	double d;
+
+	// if we are a unit and have a UNIT_FIELD_TARGET then we are always facing them
+	if( m_objectTypeId == TYPEID_UNIT && m_uint32Values[UNIT_FIELD_TARGET] != 0 && static_cast<Unit*>(this)->GetAIInterface()->GetNextTarget() )
+	{
+		Unit * pTarget = static_cast<Unit*>(this)->GetAIInterface()->GetNextTarget();
+		d = double( Object::calcRadAngle( target->m_position.x, target->m_position.y, pTarget->m_position.x, pTarget->m_position.y ) );
+	}
+	else
+		d = double( target->GetOrientation() );
 
 	while(d < 0) d+=2*M_PI;
 	while(d > 2*M_PI) d-=2*M_PI;
@@ -1745,13 +1755,6 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	/* -------------------------- HIT THAT CAUSES VICTIM TO DIE ---------------------------*/
 	if ((isCritter || health <= damage) )
 	{
-#ifdef ENABLE_CHECKPOINT_SYSTEM
-		if(pVictim->GetTypeId()==TYPEID_UNIT && IsPlayer())
-		{
-			if( ((Creature*)pVictim)->GetCreatureName() && ((Creature*)pVictim)->GetCreatureName()->Rank>0 && static_cast< Player* >( this )->GetGuildId())
-				CheckpointMgr::getSingleton().KilledCreature( static_cast< Player* >( this )->GetGuildId(), pVictim->GetEntry() );
-		}
-#endif
 		//warlock - seed of corruption
 		pVictim->HandleProc( PROC_ON_DIE, pVictim, NULL );
 		if( IsUnit() )
@@ -1878,8 +1881,6 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if( this->IsUnit() )
 		{
 			CALL_SCRIPT_EVENT( this, OnTargetDied )( pVictim );
-			LUA_ON_UNIT_EVENT( static_cast< Unit* >( this ), CREATURE_EVENT_ON_KILLED_TARGET, pVictim, damage );
-
 			static_cast< Unit* >( this )->smsg_AttackStop( pVictim );
 		
 			/* Tell Unit that it's target has Died */

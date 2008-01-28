@@ -653,9 +653,16 @@ bool HookInterface::OnCastSpell(Player * pPlayer, SpellEntry* pSpell)
 
 bool HookInterface::OnLogoutRequest(Player * pPlayer)
 {
-	OUTER_LOOP_BEGIN_COND(SERVER_HOOK_EVENT_ON_LOGOUT, tOnLogoutRequest)
+	OUTER_LOOP_BEGIN_COND(SERVER_HOOK_EVENT_ON_LOGOUT_REQUEST, tOnLogoutRequest)
 		ret_val = (call)(pPlayer);
 	OUTER_LOOP_END_COND
+}
+
+void HookInterface::OnLogout(Player * pPlayer)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_LOGOUT, tOnLogout)
+		(call)(pPlayer);
+	OUTER_LOOP_END
 }
 
 void HookInterface::OnQuestAccept(Player * pPlayer, Quest * pQuest)

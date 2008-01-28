@@ -1468,7 +1468,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 
 void Spell::SpellEffectQuestComplete(uint32 i) // Quest Complete
 {
-	//damage is id of the quest to complete
+	//misc value is id of the quest to complete
 }
 
 //wand->
@@ -1693,55 +1693,63 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 
 void Spell::SpellEffectWeapon(uint32 i)
 {
-	if(!playerTarget)
+	if( playerTarget == NULL )
 		return;
 
 	uint32 skill = 0;
 	uint32 spell = 0;
 
-	switch(this->m_spellInfo->Id)
+	switch( this->m_spellInfo->Id )
 	{
 	case 201:    // one-handed swords
-		skill = SKILL_SWORDS;
-		break;
+		{
+			skill = SKILL_SWORDS;
+		}break;
 	case 202:   // two-handed swords
-		skill = SKILL_2H_SWORDS;
-		break;
+		{
+			skill = SKILL_2H_SWORDS;
+		}break;
 	case 203:   // Unarmed
-		skill = SKILL_UNARMED;
-		break;
+		{
+			skill = SKILL_UNARMED;
+		}break;
 	case 199:   // two-handed maces
-		skill = SKILL_2H_MACES;
-		break;
+		{
+			skill = SKILL_2H_MACES;
+		}break;
 	case 198:   // one-handed maces
-		skill = SKILL_MACES;
-		break;
+		{
+			skill = SKILL_MACES;
+		}break;
 	case 197:   // two-handed axes
-		skill = SKILL_2H_AXES;
-		break;
+		{
+			skill = SKILL_2H_AXES;
+		}break;
 	case 196:   // one-handed axes
-		skill = SKILL_AXES;
-		break;
+		{
+			skill = SKILL_AXES;
+		}break;
 	case 5011: // crossbows
 		{
 			skill = SKILL_CROSSBOWS;
 			spell = SPELL_RANGED_GENERAL;
 		}break;
 	case 227:   // staves
-		skill = SKILL_STAVES;
-		break;
+		{
+			skill = SKILL_STAVES;
+		}break;
 	case 1180:  // daggers
-		skill = SKILL_DAGGERS;
-		break;
-	case 3386:  // spears
-		skill = 0;   // ??!!
-		break;
+		{
+			skill = SKILL_DAGGERS;
+		}break;
 	case 200:   // polearms
-		skill = SKILL_POLEARMS;
-		break;
+		{
+			skill = SKILL_POLEARMS;
+		}break;
 	case 15590: // fist weapons
-		skill = SKILL_UNARMED;
-		break;
+		{
+			skill = SKILL_UNARMED;
+		}break;
 	case 264:   // bows
 		{
 			skill = SKILL_BOWS;
@@ -1753,8 +1761,17 @@ void Spell::SpellEffectWeapon(uint32 i)
 			spell = SPELL_RANGED_GENERAL;
 		}break;
 	case 2567:  // thrown
-		skill = SKILL_THROWN;
-		break;
+		{
+			skill = SKILL_THROWN;
+		}break;
+	case 5009:  // wands
+		{
+			skill = SKILL_WANDS;
+			spell = SPELL_RANGED_GENERAL;
+		}break;
+	//case 3386:  // spears
+	//	skill = 0;   // ??!!
+	//	break;
 	default:
 		{
 			skill = 0;
@@ -2597,20 +2614,9 @@ void Spell::SpellEffectLearnPetSpell(uint32 i)
 	{
 		Pet * pPet = static_cast<Pet*>( unitTarget );
 		if(pPet->IsSummon())
-		{
 			p_caster->AddSummonSpell(unitTarget->GetEntry(), m_spellInfo->EffectTriggerSpell[i]);
-			pPet->AddSpell(dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]), true);
-		}
-		else
-		{
-			if(pPet->CanLearnSpellTP(m_spellInfo->EffectTriggerSpell[i]))
-				pPet->AddSpell(dbcSpell.LookupEntry(m_spellInfo->EffectTriggerSpell[i]), true);
-			else
-			{
-				SendCastResult(SPELL_FAILED_TRAINING_POINTS);
-				return;
-			}
-		}		
+		
+		pPet->AddSpell( dbcSpell.LookupEntry( m_spellInfo->EffectTriggerSpell[i] ), true );
 
 		// Send Packet
 		WorldPacket data(SMSG_PET_LEARNT_SPELL, 21);
@@ -3425,7 +3431,7 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 	pCaster->GetSession()->SendPacket(&data);
 	*/
 
-
+/*
 	CreatureInfo *ci = CreatureNameStorage.LookupEntry(m_spellInfo->EffectMiscValue[i]);
 	if( ci)
 	{
@@ -3461,33 +3467,7 @@ void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
 		//p_caster->SetUInt64Value(PLAYER_FARSIGHT, NewSummon->GetGUID());
 		//p_caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 		p_caster->Possess(NewSummon);
-		
-//		WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
-//		data << NewSummon->GetNewGUID() << uint8(1);
-//		p_caster->GetSession()->SendPacket(&data);
-		p_caster->m_noInterrupt++;
-
-		//FIXME: use Spell::SentCHannelStart
-		/*if(m_spellInfo->ChannelInterruptFlags != 0)
-		{
-			uint32 duration = GetDuration();
-			if (m_caster->GetTypeId() == TYPEID_PLAYER)
-			{
-				// Send Channel Start
-				WorldPacket data(MSG_CHANNEL_START, 8);
-				data << m_spellInfo->Id;
-				data << duration;
-				((Player*)m_caster)->GetSession()->SendPacket( &data );
-			}
-
-			m_timer = duration;
-
-			m_caster->SetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT,NewSummon->GetGUIDLow());
-			m_caster->SetUInt32Value(UNIT_FIELD_CHANNEL_OBJECT+1,NewSummon->GetGUIDHigh());
-			m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL,m_spellInfo->Id);					
-		}
-		sLog.outDebug("New Possesed has guid %u", NewSummon->GetGUID());*/
-	}
+	}*/
 }
 
 void Spell::SpellEffectCreateSummonTotem(uint32 i)
@@ -5014,7 +4994,7 @@ void Spell::SpellEffectResurrectNew(uint32 i)
 			// unit resurrection handler
 			if(unitTarget)
 			{
-				if(unitTarget->GetTypeId()==TYPEID_UNIT)
+				if(unitTarget->GetTypeId()==TYPEID_UNIT && unitTarget->IsPet() && unitTarget->isDead())
 				{
 					uint32 hlth = ((uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH) : (uint32)m_spellInfo->EffectBasePoints[i];
 					uint32 mana = ((uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1) : (uint32)m_spellInfo->EffectBasePoints[i];

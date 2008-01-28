@@ -452,6 +452,9 @@
 			</Filter>
 		</Filter>
 		<File
+			RelativePath="..\..\src\shared\AscentConfig.h">
+		</File>
+		<File
 			RelativePath="..\..\src\shared\AuthCodes.h">
 		</File>
 		<File

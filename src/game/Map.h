@@ -42,17 +42,18 @@ typedef struct
 	float	z;
 	float	o;
 	Formation* form;
-	uint32 movetype;
+	uint8 movetype;
 	uint32 displayid;
 	uint32 factionid;
 	uint32 flags;
 	uint32 bytes;
 	uint32 bytes2;
 	uint32 emote_state;
-	uint32 respawnNpcLink;
-	uint32 channel_spell;
+	//uint32 respawnNpcLink;
+	uint16 channel_spell;
 	uint32 channel_target_go;
 	uint32 channel_target_creature;
+	uint16 stand_state;
 }CreatureSpawn;
 
 typedef struct
@@ -72,7 +73,7 @@ typedef struct
 	uint32	faction;
 //	uint32	level;
 	float scale;
-	uint32 stateNpcLink;
+	//uint32 stateNpcLink;
 } GOSpawn;
 
 typedef std::vector<CreatureSpawn*> CreatureSpawnList;

@@ -72,6 +72,7 @@ typedef void(*tOnEnterCombat)(Player * pPlayer, Unit * pTarget);
 typedef bool(*tOnCastSpell)(Player * pPlayer, SpellEntry * pSpell);
 typedef void(*tOnTick)();
 typedef bool(*tOnLogoutRequest)(Player * pPlayer);
+typedef void(*tOnLogout)(Player * pPlayer);
 typedef void(*tOnQuestAccept)(Player * pPlayer, Quest * pQuest);
 typedef void(*tOnZone)(Player * pPlayer, uint32 Zone);
 typedef bool(*tOnChat)(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
@@ -181,6 +182,7 @@ public:
 	virtual void OnLootTaken(Player* pPlayer, ItemPrototype *pItemPrototype) {}
 	virtual void AIUpdate() {}
 	virtual void OnEmote(Player * pPlayer, EmoteType Emote) {}
+	virtual void StringFunctionCall(const char * pFunc) {}
 
 	void RegisterAIUpdateEvent(uint32 frequency);
 	void ModifyAIUpdateEvent(uint32 newfrequency);
@@ -258,6 +260,7 @@ public:
 	void OnEnterCombat(Player * pPlayer, Unit * pTarget);
 	bool OnCastSpell(Player * pPlayer, SpellEntry * pSpell);
 	bool OnLogoutRequest(Player * pPlayer);
+	void OnLogout(Player * pPlayer);
 	void OnQuestAccept(Player * pPlayer, Quest * pQuest);
 	void OnZone(Player * pPlayer, uint32 Zone);
 	bool OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);

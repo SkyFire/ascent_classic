@@ -68,6 +68,8 @@ Item::~Item()
 
 	if(IsInWorld())
 		RemoveFromWorld();
+
+	m_owner = NULL;
 }
 
 void Item::Create( uint32 itemid, Player *owner )

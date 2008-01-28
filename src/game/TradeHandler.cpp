@@ -192,15 +192,18 @@ void WorldSession::HandleCancelTrade(WorldPacket & recv_data)
 		plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	
 	    plr->mTradeTarget = 0;
+		plr->ResetTradeVariables();
     }
 	
 	_player->mTradeTarget = 0;
+	_player->ResetTradeVariables();
 }
 
 void WorldSession::HandleUnacceptTrade(WorldPacket & recv_data)
 {
 	if(!_player->IsInWorld()) return;
 	Player * plr = _player->GetTradeTarget();
+	_player->ResetTradeVariables();
 
 	if(_player->mTradeTarget == 0 || plr == 0)
 		return;
@@ -216,6 +219,7 @@ void WorldSession::HandleUnacceptTrade(WorldPacket & recv_data)
 
 	plr->mTradeTarget = 0;
 	_player->mTradeTarget = 0;
+	plr->ResetTradeVariables();
 }
 
 void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)
@@ -228,10 +232,29 @@ void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)
 	uint8 TradeSlot = recv_data.contents()[0];
 	uint8 SourceBag = recv_data.contents()[1];
 	uint8 SourceSlot = recv_data.contents()[2];
+	Player * pTarget = _player->GetMapMgr()->GetPlayer( _player->mTradeTarget );
 
 	Item * pItem = _player->GetItemInterface()->GetInventoryItem(SourceBag, SourceSlot);
-	if(pItem == 0 || TradeSlot > 6)
+	if( pTarget == NULL || pItem == 0 || TradeSlot > 6 || ( TradeSlot < 6 && pItem->IsSoulbound() ) )
 		return;
+
+	if(TradeSlot < 6 && pItem->IsSoulbound())
+	{
+		sCheatLog.writefromsession(this, "tried to cheat trade a soulbound item");
+		Disconnect();
+		return;
+	}
+
+	for(uint32 i = 0; i < 8; ++i)
+	{
+		// duping little shits
+		if(_player->mTradeItems[i] == pItem || pTarget->mTradeItems[i] == pItem)
+		{
+			sCheatLog.writefromsession(this, "tried to dupe an item through trade");
+			Disconnect();
+			return;
+		}
+	}
 
 	_player->mTradeItems[TradeSlot] = pItem;
 	_player->SendTradeUpdate();

@@ -180,8 +180,8 @@ void MapCell::LoadObjects(CellSpawns * sp)
 				if(pInstance->m_killedNpcs.find((*i)->id) != pInstance->m_killedNpcs.end())
 					continue;
 
-				if((*i)->respawnNpcLink && pInstance->m_killedNpcs.find((*i)->respawnNpcLink) != pInstance->m_killedNpcs.end())
-					continue;
+/*				if((*i)->respawnNpcLink && pInstance->m_killedNpcs.find((*i)->respawnNpcLink) != pInstance->m_killedNpcs.end())
+					continue;*/
 			}
 
 			Creature * c=_mapmgr->CreateCreature();

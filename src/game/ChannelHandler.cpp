@@ -34,7 +34,7 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 	recvPacket >> channelname;
 	recvPacket >> pass;
 
-	if(!stricmp(channelname.c_str(), "LookingForGroup") && HasFlag(ACCOUNT_FLAG_NO_AUTOJOIN))
+	if(!stricmp(channelname.c_str(), "LookingForGroup")/* && HasFlag(ACCOUNT_FLAG_NO_AUTOJOIN)*/)
 	{
 		// make sure we have lfg dungeons
 		for(i = 0; i < 3; ++i)

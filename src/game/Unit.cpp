@@ -2473,6 +2473,10 @@ else
 
 			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
 
+			//pet happiness state dmg modifier
+			if( IsPet() && !static_cast<Pet*>(this)->IsSummon() )
+				dmg.full_damage = ( dmg.full_damage <= 0 ) ? 0 : float2int32( dmg.full_damage * static_cast< Pet* >( this )->GetHappinessDmgMod() );
+
 			if(dmg.full_damage < 0)
 				dmg.full_damage = 0;
 //--------------------------------check for special hits------------------------------------
@@ -2879,22 +2883,21 @@ else
 		}
 	}
 	//--------------------------rage processing-------------------------------------------------
-	float val;
 	//http://www.wowwiki.com/Formulas:Rage_generation
 
-	if(dmg.full_damage && IsPlayer() && GetPowerType() == POWER_TYPE_RAGE && !ability && 
-		CombatStatus.IsInCombat())
+	if( dmg.full_damage && IsPlayer() && GetPowerType() == POWER_TYPE_RAGE && !ability && CombatStatus.IsInCombat() )
 	{
+		float val;
 		float level = (float)getLevel();
 
-		// C thingy
+		// Conversion Value
 		float c = 0.0091107836f * level * level + 3.225598133f * level + 4.2652911f;
 
 		// Hit Factor
-		float f = (weapon_damage_type == OFFHAND) ? 1.75f : 3.5f;
+		float f = ( weapon_damage_type == OFFHAND ) ? 1.75f : 3.5f;
 
-		if(hit_status & HITSTATUS_CRICTICAL)
-			f *= 2;
+		if( hit_status & HITSTATUS_CRICTICAL )
+			f *= 2.0f;
 
 		float s = 1.0f;
 
@@ -2905,7 +2908,7 @@ else
 			if( weapon_damage_type == OFFHAND )
 				s = GetUInt32Value( UNIT_FIELD_BASEATTACKTIME_01 ) / 1000.0f;
 			else
-				s = GetUInt32Value( UNIT_FIELD_BASEATTACKTIME) / 1000.0f;
+				s = GetUInt32Value( UNIT_FIELD_BASEATTACKTIME ) / 1000.0f;
 		}
 		else
 		{
@@ -2917,33 +2920,37 @@ else
 			}
 		}
 
-		val = ( 7.5f * dmg.full_damage / c + f * s ) / 2.0f;
+		val = ( 7.5f * dmg.full_damage / c + f * s ) / 2.0f;;
 		val *= ( 1 + ( static_cast< Player* >( this )->rageFromDamageDealt / 100.0f ) );
 		val *= 10;
 
-		//sLog.outString("Dmg is %u. C is %f, and fs is %f %f. val is %f", dmg.full_damage, c, f, s, val);
+		//float r = ( 7.5f * dmg.full_damage / c + f * s ) / 2.0f;
+		//float p = ( 1 + ( static_cast< Player* >( this )->rageFromDamageDealt / 100.0f ) );
+		//sLog.outDebug( "Rd(%i) d(%i) c(%f) f(%f) s(%f) p(%f) r(%f) rage = %f", realdamage, dmg.full_damage, c, f, s, p, r, val );
+
 		ModUInt32Value( UNIT_FIELD_POWER2, (int32)val );
 		if( GetUInt32Value( UNIT_FIELD_POWER2 ) > 1000 )
 			ModUInt32Value( UNIT_FIELD_POWER2, 1000 - GetUInt32Value( UNIT_FIELD_POWER2 ) );
 
-
 	}
+
 	// I am receiving damage!
-	if(dmg.full_damage && pVictim->IsPlayer() && pVictim->GetPowerType() == POWER_TYPE_RAGE 
-		&& pVictim->CombatStatus.IsInCombat())
+	if( dmg.full_damage && pVictim->IsPlayer() && pVictim->GetPowerType() == POWER_TYPE_RAGE && pVictim->CombatStatus.IsInCombat() )
 	{
-		// 2.5d / c
+		float val;
 		float level = (float)getLevel();
 
-		// C "thingy"
-		float c = 0.0091107836f*level*level +3.225598133f*level+4.2652911f;
+		// Conversion Value
+		float c = 0.0091107836f * level * level + 3.225598133f * level + 4.2652911f;
+
 		val = 2.5f * dmg.full_damage / c;
 		val *= 10;
 
-		ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
-		if(GetUInt32Value(UNIT_FIELD_POWER2) > 1000)
-			ModUInt32Value(UNIT_FIELD_POWER2, 1000 - GetUInt32Value(UNIT_FIELD_POWER2));
+		//sLog.outDebug( "Rd(%i) d(%i) c(%f) rage = %f", realdamage, dmg.full_damage, c, val );
 
+		pVictim->ModUInt32Value( UNIT_FIELD_POWER2, (int32)val );
+		if( pVictim->GetUInt32Value( UNIT_FIELD_POWER2) > 1000 )
+			pVictim->ModUInt32Value( UNIT_FIELD_POWER2, 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 ) );
 
 	}
 		
@@ -4117,81 +4124,11 @@ void Unit::EmoteExpire()
 	sEventMgr.RemoveEvents(this, EVENT_UNIT_EMOTE);
 }
 
-void Unit::RegisterPeriodicChatMessage(uint32 delay, uint32 msgid, std::string message,bool sendnotify)
-{
-	EventMgr::getSingleton().AddEvent(this, &Unit::DelayedChatMessage, uint32(0), msgid, message, sendnotify, EVENT_UNIT_REPEAT_MSG, delay, 0,0);
-}
-
-void Unit::DelayedChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify)
-{
-	if(delay == 0)	  // Send instantly
-	{
-		SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, message.c_str());
-		if(sendnotify && msgid) SendNotifyToNearby(msgid);
-	}
-	else
-	{
-		if(delay > 0)
-			EventMgr::getSingleton().AddEvent(this, &Unit::DelayedChatMessage, uint32(0), msgid, message, sendnotify, EVENT_UNIT_CHAT_MSG, delay, 1,0);
-		else
-			// We shouldn't get here; Repeat this function again, but with a delay of 0 ;)
-			DelayedChatMessage(0, msgid, message, sendnotify);
-	}
-}
-
-void Unit::SendNotifyToNearby(uint32 msgid)
-{
-	//Zehamster: commented the full code, since it does nothing but wasting cpu cycles
-	/*
-	InRangeSet::iterator itr = GetInRangeSetBegin();
-	for(;itr!=GetInRangeSetEnd();++itr)
-	{
-		if((*itr)->GetTypeId() == TYPEID_UNIT)
-		{
-			// Send lua event
-			Creature *crt = ((Creature*)(*itr));
-			//Log::getSingleton().outDebug("LUA: Sending \"NOTIFY\" Msg %d to mob %s", msgid, crt->GetCreatureName()->Name.c_str());
-			//crt->LUA_SendEvent(ON_UNIT_NOTIFYMSG, msgid);
-		}
-	}
-	*/
-}
-
-void Unit::SendNotifyToNearbyCreature(uint32 msgid, uint32 entryid)
-{
-	//Zehamster: commented the full code since it does nothing but wasting cpu cycles
-	/*
-	InRangeSet::iterator itr = GetInRangeSetBegin();
-	for(;itr!=GetInRangeSetEnd();++itr)
-	{
-		if((*itr)->GetTypeId() == TYPEID_UNIT && (*itr)->GetEntry() == entryid)
-		{
-			// Send lua event
-			Creature *crt = ((Creature*)(*itr));
- //		   Log::getSingleton().outDebug("LUA: Sending \"NOTIFY\" Msg %d to mob %s", msgid, GetCreatureName()->Name.c_str());
-			//crt->LUA_SendEvent(ON_UNIT_NOTIFYMSG, msgid);
-		}
-	}
-	*/
-}
 
 uint32 Unit::GetResistance(uint32 type)
 {
 	return GetUInt32Value(UNIT_FIELD_RESISTANCES+type);
 }
-
-// grep: note to self.. this should be moved to creature.
-/*
-void Unit::InitializeEscortQuest(uint32 questid, bool stopatend, bool returnondie)
-{
-	this->bEscortActive = false;
-	this->bHasEscortQuest = true;
-	this->bStopAtEndOfWaypoints = stopatend;
-	this->m_escortquestid = questid;
-	this->m_escortupdatetimer = 0;
-	if(this->m_useAI && this->GetAIInterface() != NULL)
-		GetAIInterface()->setMoveType(10);				// Quest
-}*/
 
 void Unit::MoveToWaypoint(uint32 wp_id)
 {
@@ -4212,43 +4149,12 @@ void Unit::MoveToWaypoint(uint32 wp_id)
 	}
 }
 
-/*
-void Unit::StartEscortQuest()
-{
-	this->bEscortActive = true;
-	this->m_escortupdatetimer = 1000;
-}
-
-void Unit::PauseEscortQuest()
-{
-	this->bEscortActive = false;
-}
-
-void Unit::EndEscortQuest()
-{
-	// Return to spawn
-	Creature *crt = ((Creature*)this);
-	GetAIInterface()->MoveTo(crt->respawn_cord[0], crt->respawn_cord[1], crt->respawn_cord[2], crt->respawn_cord[3]);
-	this->bEscortActive = false;
-	this->m_escortupdatetimer = 0;
-}
-
-void Unit::EscortSetStartWP(uint32 wp)
-{
-	this->m_escortStartWP = wp;
-}
-
-void Unit::EscortSetEndWP(uint32 wp)
-{
-	this->m_escortEndWP = wp;
-}*/
-
 int32 Unit::GetDamageDoneMod(uint32 school)
 {
-	if(this->IsPlayer())
-	   return (int32)(GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+school)-GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG+school));
+	if( this->IsPlayer() )
+	   return (int32)GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS + school ) - (int32)GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + school );
 	else
-	   return ((Creature*)this)->ModDamageDone[school];
+	   return static_cast< Creature* >( this )->ModDamageDone[school];
 }
 	
 float Unit::GetDamageDonePctMod(uint32 school)
@@ -4635,6 +4541,9 @@ void Unit::EventSummonPetExpire()
 
 void Unit::CastSpell(Unit* Target, SpellEntry* Sp, bool triggered)
 {
+	if( Sp == NULL )
+		return;
+
 	Spell *newSpell = new Spell(this, Sp, triggered, 0);
 	SpellCastTargets targets(0);
 	if(Target)
@@ -4659,6 +4568,9 @@ void Unit::CastSpell(Unit* Target, uint32 SpellID, bool triggered)
 
 void Unit::CastSpell(uint64 targetGuid, SpellEntry* Sp, bool triggered)
 {
+	if( Sp == NULL )
+		return;
+
 	SpellCastTargets targets(targetGuid);
 	Spell *newSpell = new Spell(this, Sp, triggered, 0);
 	newSpell->prepare(&targets);
@@ -4673,6 +4585,9 @@ void Unit::CastSpell(uint64 targetGuid, uint32 SpellID, bool triggered)
 }
 void Unit::CastSpellAoF(float x,float y,float z,SpellEntry* Sp, bool triggered)
 {
+	if( Sp == NULL )
+		return;
+
 	SpellCastTargets targets;
 	targets.m_destX = x;
 	targets.m_destY = y;
@@ -6077,4 +5992,5 @@ void Unit::ReplaceAIInterface(AIInterface *new_interface)
 	delete m_aiInterface;	//be carefull when you do this. Might screw unit states !
 	m_aiInterface = new_interface; 
 }
+
 
