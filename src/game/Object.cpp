@@ -1401,7 +1401,15 @@ bool Object::isInBack(Object* target)
 
     double angle = atan2( y, x );
     angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
-	angle -= target->GetOrientation();
+
+	// if we are a unit and have a UNIT_FIELD_TARGET then we are always facing them
+	if( m_objectTypeId == TYPEID_UNIT && m_uint32Values[UNIT_FIELD_TARGET] != 0 && static_cast< Unit* >( this )->GetAIInterface()->GetNextTarget() )
+	{
+		Unit* pTarget = static_cast< Unit* >( this )->GetAIInterface()->GetNextTarget();
+		angle -= double( Object::calcRadAngle( target->m_position.x, target->m_position.y, pTarget->m_position.x, pTarget->m_position.y ) );
+	}
+	else
+		angle -= target->GetOrientation();
 
     while( angle > M_PI)
         angle -= 2.0 * M_PI;
@@ -1415,37 +1423,7 @@ bool Object::isInBack(Object* target)
     double right = ( M_H_PI / 2.0 );
 
     return( ( angle <= left ) && ( angle >= right ) );
-	
 }
-/*
-{
-
-    double x = target->GetPositionX() - m_position.x;
-    double y = target->GetPositionY() - m_position.y;
-    double o = target->GetOrientation();
-
-    while( o > M_PI)
-        o -= 2.0 * M_PI;
-
-    while(o < -M_PI)
-        o += 2.0 * M_PI;
-
-	if( y >= 0.0 )
-	{
-		o -= atan( y / x );
-
-		if( x < 0.0 )
-			o -= M_PI;
-	}
-	else
-	{
-		o -= 3 * M_PI / 2 - atan( x / y );
-	}
-
-	if( o < -M_PI / 4 || o > M_PI/4)
-		return false;
-	return true;
-}*/
 
 bool Object::isInRange(Object* target, float range)
 {
