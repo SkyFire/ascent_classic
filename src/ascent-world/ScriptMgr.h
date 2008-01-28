@@ -57,6 +57,15 @@ enum ServerHookEvents
 	NUM_SERVER_HOOKS,
 };
 
+enum ScriptTypes
+{
+	SCRIPT_TYPE_MISC						= 0x01,
+	SCRIPT_TYPE_INFODUMPER					= 0x02,
+	SCRIPT_TYPE_SCRIPT_ENGINE				= 0x20,
+	SCRIPT_TYPE_SCRIPT_ENGINE_LUA			= 0x21,
+	SCRIPT_TYPE_SCRIPT_ENGINE_AS			= 0x22,
+};
+
 /* Hook typedefs */
 typedef bool(*tOnNewCharacter)(uint32 Race, uint32 Class, WorldSession * Session, const char * Name);
 typedef void(*tOnKillPlayer)(Player * pPlayer, Player * pVictim);
@@ -97,6 +106,7 @@ typedef GameObjectAIScript*(*exp_create_gameobject_ai)(GameObject * pGameObject)
 typedef bool(*exp_handle_dummy_spell)(uint32 i, Spell * pSpell);
 typedef bool(*exp_handle_dummy_aura)(uint32 i, Aura * pAura, bool apply);
 typedef void(*exp_script_register)(ScriptMgr * mgr);
+typedef uint32(*exp_get_script_type)();
 
 typedef uint32(*exp_get_version)();
 

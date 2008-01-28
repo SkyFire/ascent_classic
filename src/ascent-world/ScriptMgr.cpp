@@ -41,6 +41,17 @@ ScriptMgr::~ScriptMgr()
 
 }
 
+struct ScriptingEngine
+{
+#ifdef WIN32
+	HMODULE Handle;
+#else
+	void* Handle;
+#endif
+	exp_script_register InitializeCall;
+	uint32 Type;
+};
+
 void ScriptMgr::LoadScripts()
 {
 	if(!HookInterface::getSingletonPtr())
@@ -51,6 +62,8 @@ void ScriptMgr::LoadScripts()
 
 	string start_path = Config.MainConfig.GetStringDefault("Script", "BinaryLocation", "script_bin") + "\\";
 	string search_path = start_path + "*.";
+
+	vector<ScriptingEngine> ScriptEngines;
 
 	/* Loading system for win32 */
 #ifdef WIN32
@@ -75,7 +88,8 @@ void ScriptMgr::LoadScripts()
 				// find version import
 				exp_get_version vcall = (exp_get_version)GetProcAddress(mod, "_exp_get_version");
 				exp_script_register rcall = (exp_script_register)GetProcAddress(mod, "_exp_script_register");
-				if(vcall == 0 || rcall == 0)
+				exp_get_script_type scall = (exp_get_script_type)GetProcAddress(mod, "_exp_get_script_type");
+				if(vcall == 0 || rcall == 0 || scall == 0)
 				{
 					printf("version functions not found!\n");
 					FreeLibrary(mod);
@@ -83,12 +97,28 @@ void ScriptMgr::LoadScripts()
 				else
 				{
 					uint32 version = vcall();
+					uint32 stype = scall();
 					if(UINT32_LOPART(version) == SCRIPTLIB_VERSION_MINOR && UINT32_HIPART(version) == SCRIPTLIB_VERSION_MAJOR)
 					{
-						_handles.push_back(((SCRIPT_MODULE)mod));
-						printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
-						rcall(this);
-						printf("loaded.\n");
+						if( stype & SCRIPT_TYPE_SCRIPT_ENGINE )
+						{
+							printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
+							printf("delayed load.\n");
+
+							ScriptingEngine se;
+							se.Handle = mod;
+							se.InitializeCall = rcall;
+							se.Type = stype;
+
+							ScriptEngines.push_back( se );
+						}
+						else
+						{
+							_handles.push_back(((SCRIPT_MODULE)mod));
+							printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
+							rcall(this);
+							printf("loaded.\n");						
+						}
 
 						++count;
 					}
@@ -105,6 +135,44 @@ void ScriptMgr::LoadScripts()
 		sLog.outString("");
 		sLog.outString("Loaded %u external libraries.", count);
 		sLog.outString("");
+
+		sLog.outString("Loading optional scripting engines...");
+		for(vector<ScriptingEngine>::iterator itr = ScriptEngines.begin(); itr != ScriptEngines.end(); ++itr)
+		{
+			if( itr->Type & SCRIPT_TYPE_SCRIPT_ENGINE_LUA )
+			{
+				// lua :O
+				if( Config.MainConfig.GetBoolDefault("ScriptBackends", "LUA", false) )
+				{
+					sLog.outString("   Initializing LUA script engine...");
+					itr->InitializeCall(this);
+					_handles.push_back( (SCRIPT_MODULE)itr->Handle );
+				}
+				else
+				{
+					FreeLibrary( itr->Handle );
+				}
+			}
+			else if( itr->Type & SCRIPT_TYPE_SCRIPT_ENGINE_AS )
+			{
+				if( Config.MainConfig.GetBoolDefault("ScriptBackends", "AS", false) )
+				{
+					sLog.outString("   Initializing AngelScript script engine...");
+					itr->InitializeCall(this);
+					_handles.push_back( (SCRIPT_MODULE)itr->Handle );
+				}
+				else
+				{
+					FreeLibrary( (*itr).Handle );
+				}
+			}
+			else
+			{
+				sLog.outString("  Unknown script engine type: 0x%.2X, please contact developers.", (*itr).Type );
+				FreeLibrary( itr->Handle );
+			}
+		}
+		sLog.outString("Done loading script engines...");
 	}
 #else
 	/* Loading system for *nix */
@@ -135,7 +203,8 @@ char *ext;
 					// find version import
 					exp_get_version vcall = (exp_get_version)dlsym(mod, "_exp_get_version");
 					exp_script_register rcall = (exp_script_register)dlsym(mod, "_exp_script_register");
-					if(vcall == 0 || rcall == 0)
+					exp_get_script_type scall = (exp_get_script_type)dlsym(mod, "_exp_get_script_type");
+					if(vcall == 0 || rcall == 0 || scall == 0)
 					{
 						printf("version functions not found!\n");
 						dlclose(mod);
@@ -143,12 +212,28 @@ char *ext;
 					else
 					{
 						uint32 version = vcall();
+						uint32 stype = scall();
 						if(UINT32_LOPART(version) == SCRIPTLIB_VERSION_MINOR && UINT32_HIPART(version) == SCRIPTLIB_VERSION_MAJOR)
 						{
-							_handles.push_back(((SCRIPT_MODULE)mod));
-							printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
-							rcall(this);
-							printf("loaded.\n");
+							if( stype & SCRIPT_TYPE_SCRIPT_ENGINE )
+							{
+								printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
+								printf("delayed load.\n");
+
+								ScriptingEngine se;
+								se.Handle = mod;
+								se.InitializeCall = rcall;
+								se.Type = stype;
+
+								ScriptEngines.push_back( se );
+							}
+							else
+							{
+								_handles.push_back(((SCRIPT_MODULE)mod));
+								printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
+								rcall(this);
+								printf("loaded.\n");						
+							}
 
 							++count;
 						}
@@ -166,6 +251,44 @@ char *ext;
 		sLog.outString("");
 		sLog.outString("Loaded %u external libraries.", count);
 		sLog.outString("");
+
+		sLog.outString("Loading optional scripting engines...");
+		for(vector<ScriptingEngine>::iterator itr = ScriptEngines.begin(); itr != ScriptEngines.end(); ++itr)
+		{
+			if( itr->Type & SCRIPT_TYPE_SCRIPT_ENGINE_LUA )
+			{
+				// lua :O
+				if( Config.MainConfig.GetBoolDefault("ScriptBackends", "LUA", false) )
+				{
+					sLog.outString("   Initializing LUA script engine...");
+					itr->InitializeCall(this);
+					_handles.push_back( (SCRIPT_MODULE)itr->Handle );
+				}
+				else
+				{
+					dlclose( itr->Handle );
+				}
+			}
+			else if( itr->Type & SCRIPT_TYPE_SCRIPT_ENGINE_AS )
+			{
+				if( Config.MainConfig.GetBoolDefault("ScriptBackends", "AS", false) )
+				{
+					sLog.outString("   Initializing AngelScript script engine...");
+					itr->InitializeCall(this);
+					_handles.push_back( (SCRIPT_MODULE)itr->Handle );
+				}
+				else
+				{
+					dlclose( (*itr).Handle );
+				}
+			}
+			else
+			{
+				sLog.outString("  Unknown script engine type: 0x%.2X, please contact developers.", (*itr).Type );
+				dlclose( itr->Handle );
+			}
+		}
+		sLog.outString("Done loading script engines...");
 	}
 #endif
 }
