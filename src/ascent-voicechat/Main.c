@@ -43,18 +43,22 @@ int Bind()
 
 	ioctlsocket( m_boundFdUDP, FIONBIO, &arg );
 #else
-	u_long arg = 0;
+	uint32 arg = 0;
 
 	m_boundFdUDP = (int)socket(AF_INET, SOCK_DGRAM, 0);
 	if(m_boundFdUDP < 0)
 		return -1;
 
-	ioctlsocket( m_boundFdUDP, FIONBIO, &arg );
+	ioctl(fd, FIONBIO, &arg);
 #endif
 
 	if(bind(m_boundFdUDP, (const struct sockaddr*)&m_udplisten, sizeof(struct sockaddr_in)) < 0)
 	{
+#ifdef WIN32
 		closesocket(m_boundFdUDP);
+#else
+		close( m_boundFdUDP );
+#endif
 		return -2;
 	}
 
@@ -112,7 +116,11 @@ void OnUdpRead()
 	{
 		if( first == 0 )
 		{
+#ifdef WIN32
 			printf("recvfrom() returned <0 (error was %u)!\n", WSAGetLastError());
+#else
+			printf("recvfrom() returned <0 (error was %u)!\n", errno);
+#endif
 			first = 1;
 		}
 		return;
