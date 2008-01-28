@@ -994,11 +994,11 @@ void Player::_EventAttack( bool offhand )
 		//pvp timeout reset
 		if(pVictim->IsPlayer())
 		{
-			if (static_cast<Player *>(pVictim)->cannibalize)
+			if (static_cast< Player* >(pVictim)->cannibalize)
 			{
 				sEventMgr.RemoveEvents(pVictim, EVENT_CANNIBALIZE);
 				pVictim->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-				static_cast<Player *>(pVictim)->cannibalize = false;
+				static_cast< Player* >(pVictim)->cannibalize = false;
 			}
 		}
 
@@ -4884,7 +4884,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 	{
 		if(object_type == TYPEID_PLAYER)
 		{
-			Player *pObj = static_cast<Player *>(obj);
+			Player *pObj = static_cast< Player* >(obj);
 
 			if(myCorpse && myCorpse->GetDistanceSq(obj) <= CORPSE_VIEW_DISTANCE)
 				return !pObj->m_isGmInvisible; // we can see all players within range of our corpse except invisible GMs
@@ -4922,7 +4922,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 	{			
 		case TYPEID_PLAYER:
 			{
-				Player *pObj = static_cast<Player *>(obj);
+				Player *pObj = static_cast< Player* >(obj);
 
 				if(pObj->m_invisible) // Invisibility - Detection of Players
 				{

@@ -490,7 +490,7 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 	{
 		if(pUnit->IsPlayer())
 		{
-			name = static_cast<Player*>(pUnit)->GetName();
+			name = static_cast< Player* >( pUnit )->GetName();
 			namelen = (uint32)strlen(name) + 1;
 		}
 		else if(pUnit->GetTypeId() == TYPEID_UNIT)

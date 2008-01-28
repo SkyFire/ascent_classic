@@ -357,7 +357,7 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 	// If we're killing a player, send a message indicating a gm killed them.
 	if(target->IsPlayer())
 	{
-		Player * plr = static_cast<Player*>(target);
+		Player * plr = static_cast< Player* >(target);
 		plr->SetUInt32Value(UNIT_FIELD_HEALTH, 0);
 		plr->KillPlayer();
 		BlueSystemMessageToPlr(plr, "%s killed you with a GM command.", m_session->GetPlayer()->GetName());

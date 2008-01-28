@@ -730,13 +730,13 @@ void Aura::EventUpdateAA(float r)
 	Player * plr = 0;
 
 	if(u_caster->GetTypeId() == TYPEID_PLAYER)
-		plr = static_cast<Player*>(u_caster);
+		plr = static_cast< Player* >(u_caster);
 	else if(u_caster->GetTypeId() == TYPEID_UNIT)
 	{
 		if(u_caster->GetGUIDHigh() == HIGHGUID_PET)
 			plr = static_cast<Pet*>(u_caster)->GetPetOwner();
 		else
-			plr = static_cast<Player*>(static_cast<Creature*>(u_caster)->GetTotemOwner());
+			plr = static_cast< Player* >(static_cast<Creature*>(u_caster)->GetTotemOwner());
 	}
 
 
@@ -955,12 +955,12 @@ void Aura::SpellAuraModPossess(bool apply)
 	if(apply)
 	{
 		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER ) 
-			static_cast<Player*>(caster)->Possess( m_target );
+			static_cast< Player* >(caster)->Possess( m_target );
 	}
 	else
 	{
 		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER )
-			static_cast<Player*>(caster)->UnPossess();
+			static_cast< Player* >(caster)->UnPossess();
 
 		// make sure Player::UnPossess() didn't fail, if it did we will just free the target here
 		if( m_target->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) != 0 )
@@ -1008,7 +1008,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 					return;
 				if (c && c->IsPlayer())
 				{
-					dmg = float2int32(static_cast<Player*>(c)->m_casted_amount[SCHOOL_FIRE]*parentsp->EffectBasePoints[0]/100.0f);
+					dmg = float2int32(static_cast< Player* >(c)->m_casted_amount[SCHOOL_FIRE]*parentsp->EffectBasePoints[0]/100.0f);
 				}
 				else
 				{
@@ -1039,7 +1039,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 					multiplyer = 60;
 			if(multiplyer)
 			{
-				Player *pr=static_cast<Player*>(c);
+				Player *pr=static_cast< Player* >(c);
 				if(pr->GetItemInterface())
 				{
 					Item *it;
@@ -1609,7 +1609,7 @@ void Aura::SpellAuraDummy(bool apply)
 			// set charmed by and charm target
 			Unit * Caster = GetUnitCaster() ;
 			if(Caster == 0 || Caster->GetTypeId() != TYPEID_PLAYER) return;
-			Player * pCaster = static_cast<Player*>(Caster);
+			Player * pCaster = static_cast< Player* >(Caster);
 
 			if(apply)
 			{
@@ -1688,13 +1688,13 @@ void Aura::SpellAuraDummy(bool apply)
 		{
 			Unit *caster = GetUnitCaster();
 			if(caster && caster->IsPlayer())
-				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(29841,100);//fixed 100% chance
+				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(29841,100);//fixed 100% chance
 		}break;
 	case 29838:
 		{
 			Unit *caster = GetUnitCaster();
 			if(caster && caster->IsPlayer())
-				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(29842,100);//fixed 100% chance
+				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(29842,100);//fixed 100% chance
 		}break;
 	//mage Frostbite talent
 	case 11071:
@@ -1703,7 +1703,7 @@ void Aura::SpellAuraDummy(bool apply)
 		{
 			Unit *caster = GetUnitCaster();
 			if(caster && caster->IsPlayer())
-				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize(12494,mod->m_amount);
+				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(12494,mod->m_amount);
 		}break;
 	//mage Magic Absorption
 	case 29441:
@@ -1764,9 +1764,9 @@ void Aura::SpellAuraDummy(bool apply)
 			aura->spellid = 24932;
 			aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
 			if (apply)
-				static_cast<Player*>(pTarget)->m_ssAuras.insert(aura);
+				static_cast< Player* >(pTarget)->m_ssAuras.insert(aura);
 			else 
-				static_cast<Player*>(pTarget)->m_ssAuras.erase(aura);
+				static_cast< Player* >(pTarget)->m_ssAuras.erase(aura);
 		}break;
 	case 740:
 	case 8918:
@@ -3154,7 +3154,7 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 			Unit *caster=GetUnitCaster();
 			//yes we are freezing the bastard, so can we proc anything on this ?
 			if(caster && caster->IsPlayer() && m_target)
-				static_cast<Player*>(caster)->EventStunOrImmobilize(m_target);
+				static_cast< Player* >(caster)->EventStunOrImmobilize(m_target);
 		}
 		m_target->speedReductionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
 		//m_target->m_slowdown=this;
@@ -5654,7 +5654,7 @@ void Aura::SpellAuraOverrideClassScripts(bool apply)
 	//misc value is spell to add
 	//spell familyname && grouprelation
 
-	Player *plr = static_cast<Player*>(GetUnitCaster());
+	Player *plr = static_cast< Player* >(GetUnitCaster());
 
 	//Adding bonus to effect
 	switch(mod->m_miscValue)
@@ -6732,7 +6732,7 @@ void Aura::SpellAuraEmphaty(bool apply)
 	if(apply)
 		dynflags |= U_DYN_FLAG_PLAYER_INFO;
 
-	m_target->BuildFieldUpdatePacket(static_cast<Player*>(caster), UNIT_DYNAMIC_FLAGS, dynflags);
+	m_target->BuildFieldUpdatePacket(static_cast< Player* >(caster), UNIT_DYNAMIC_FLAGS, dynflags);
 }
 
 void Aura::SpellAuraModOffhandDamagePCT(bool apply)

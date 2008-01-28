@@ -2380,7 +2380,7 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 			case HIGHGUID_PLAYER:
 				{
 					unitTarget =  m_caster->GetMapMgr()->GetPlayer((uint32)guid);
-					playerTarget = static_cast<Player*>(unitTarget);
+					playerTarget = static_cast< Player* >(unitTarget);
 				}break;
 			case HIGHGUID_ITEM:
 				if( p_caster != NULL )
@@ -2427,9 +2427,9 @@ void Spell::HandleAddAura(uint64 guid)
 
 	// Applying an aura to a flagged target will cause you to get flagged.
     // self casting doesnt flag himself.
-	if(Target->IsPlayer() && p_caster && p_caster != static_cast<Player*>(Target))
+	if(Target->IsPlayer() && p_caster && p_caster != static_cast< Player* >(Target))
 	{
-		if(static_cast<Player*>(Target)->IsPvPFlagged())
+		if(static_cast< Player* >(Target)->IsPvPFlagged())
 			p_caster->SetPvPFlag();
 	}
 
@@ -3637,7 +3637,7 @@ exit:
 		if( u_caster->IsPlayer() )
 		{
 			float ap = (float)u_caster->GetAP();
-			float cp = (float)static_cast<Player*>(u_caster)->m_comboPoints;
+			float cp = (float)static_cast< Player* >(u_caster)->m_comboPoints;
 			value += (uint32) ceilf( ( ap * ( 0.04f * cp ) ) / ( ( 6 + ( cp * 2 ) ) / 2 ) );
 		}
 	}

@@ -2606,7 +2606,7 @@ void Spell::SpellEffectLearnPetSpell(uint32 i)
 	{
 		if(unitTarget->IsPet() && unitTarget->GetTypeId() == TYPEID_UNIT)
 		{
-			static_cast<Player*>(m_caster)->AddPetSpell(m_spellInfo->EffectTriggerSpell[i], unitTarget->GetEntry());
+			static_cast< Player* >(m_caster)->AddPetSpell(m_spellInfo->EffectTriggerSpell[i], unitTarget->GetEntry());
 		}
 	}*/
 
@@ -3167,7 +3167,7 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 		return;
 	
 	// remove old pet
-	Pet *old = static_cast<Player*>(m_caster)->GetSummon();
+	Pet *old = static_cast< Player* >(m_caster)->GetSummon();
 	if(old)
 		old->Dismiss(false);		
 	

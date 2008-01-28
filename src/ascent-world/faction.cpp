@@ -59,7 +59,7 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 		if(objB->IsPlayer())
 		{
 			// Check PvP Flags.
-			if(static_cast<Player*>(objB)->IsPvPFlagged())
+			if( static_cast< Player* >( objB )->IsPvPFlagged() )
 				return true;
 			else
 				return false;
@@ -136,15 +136,15 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 	if(objA->IsPlayer() && objB->IsPlayer())
 	{
 		if(
-			static_cast<Player *>(objA)->DuelingWith == static_cast<Player *>(objB) && 
-			static_cast<Player *>(objA)->GetDuelState() == DUEL_STATE_STARTED
+			static_cast< Player* >( objA )->DuelingWith == static_cast< Player* >(objB) && 
+			static_cast< Player* >( objA )->GetDuelState() == DUEL_STATE_STARTED
 			)
 		return true;
 
 		if(objA->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP) && objB->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		{
-			if(static_cast<Player*>(objA)->m_bg != NULL)
-				if(static_cast<Player*>(objA)->GetGroup() == static_cast<Player*>(objB)->GetGroup())
+			if( static_cast< Player* >( objA )->m_bg != NULL )
+				if( static_cast< Player* >( objA )->GetGroup() == static_cast< Player* >( objB )->GetGroup() )
 					return false;
 
 			return true;		// can hurt each other in FFA pvp
@@ -157,7 +157,7 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 		if(objB->IsPlayer())
 			if(
 				static_cast<Pet *>(objA)->GetPetOwner() &&
-				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast<Player *>(objB) && 
+				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast< Player* >(objB) && 
 				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
 				)
 				return true;
@@ -174,7 +174,7 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 		if(objA->IsPlayer())
 			if(
 				static_cast<Pet*>(objB)->GetPetOwner() && static_cast<Pet *>(objB)->GetPetOwner() &&
-				static_cast<Pet *>(objB)->GetPetOwner()->DuelingWith == static_cast<Player *>(objA) && 
+				static_cast<Pet *>(objB)->GetPetOwner()->DuelingWith == static_cast< Player* >(objA) && 
 				static_cast<Pet *>(objB)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
 				)
 				return true;
@@ -194,7 +194,7 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 		{
 			if(objB->IsPlayer())
 				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
-					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast<Player *>(objB) && 
+					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast< Player* >(objB) && 
 					static_cast<Creature *>(objA)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
 					)
 					return true;
@@ -212,7 +212,7 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 		{
 			if(objA->IsPlayer())
 				if( static_cast<Creature *>(objB)->GetTotemOwner() &&
-					static_cast<Creature *>(objB)->GetTotemOwner()->DuelingWith == static_cast<Player *>(objA) && 
+					static_cast<Creature *>(objB)->GetTotemOwner()->DuelingWith == static_cast< Player* >(objA) && 
 					static_cast<Creature *>(objB)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
 					)
 					return true;

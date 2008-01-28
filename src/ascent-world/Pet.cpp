@@ -106,7 +106,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	//std::string myname = sWorld.GenerateName();
 
 	if(!ci) return;
-	m_Owner = static_cast<Player*>(owner);
+	m_Owner = static_cast< Player* >(owner);
 	m_OwnerGuid = m_Owner->GetGUID();
 	creature_info = ci;
 	myFamily = dbcCreatureFamily.LookupEntry(creature_info->Family);
@@ -195,7 +195,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, owner->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 	m_PartySpellsUpdateTimer = 0;
 
-	m_PetNumber = static_cast<Player*>(owner)->GeneratePetNumber();
+	m_PetNumber = static_cast< Player* >(owner)->GeneratePetNumber();
 	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetGUIDLow());
 
 	m_ExpireTime = expiretime;
@@ -207,7 +207,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		PlayerPet *pp = new PlayerPet;
 		pp->number = m_PetNumber;
 		pp->stablestate = STABLE_STATE_ACTIVE;
-		static_cast<Player*>(owner)->AddPlayerPet(pp, pp->number);
+		static_cast< Player* >(owner)->AddPlayerPet(pp, pp->number);
 	}	
 
 	//maybe we should use speed from the tempalte we created the creature ?
@@ -495,7 +495,7 @@ void Pet::OnPushToWorld()
 {
 	//before we initialize pet spells so we can apply spell mods on them 
 	if( m_Owner && m_Owner->IsPlayer() )
-		static_cast<Player*>( m_Owner )->EventSummonPet( this );
+		static_cast< Player* >( m_Owner )->EventSummonPet( this );
 
 	Creature::OnPushToWorld();
 }

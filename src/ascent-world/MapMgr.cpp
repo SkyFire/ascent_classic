@@ -463,7 +463,7 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 		{
 			if( (*iter)->GetTypeId() == TYPEID_PLAYER )
 			{
-				if( static_cast< Player* >( *iter )->IsVisible( obj ) && static_cast<Player*>( *iter )->m_TransporterGUID != obj->GetGUID() )
+				if( static_cast< Player* >( *iter )->IsVisible( obj ) && static_cast< Player* >( *iter )->m_TransporterGUID != obj->GetGUID() )
 					static_cast< Player* >( *iter )->PushOutOfRange(obj->GetNewGUID());
 			}
 			(*iter)->RemoveInRangeObject(obj);
@@ -1724,7 +1724,7 @@ void MapMgr::SendMessageToCellPlayers(Object * obj, WorldPacket * packet, uint32
 				{
 					if((*iter)->IsPlayer())
 					{
-						static_cast<Player*>(*iter)->GetSession()->SendPacket(packet);
+						static_cast< Player* >(*iter)->GetSession()->SendPacket(packet);
 					}
 				}
 			}
@@ -1757,8 +1757,8 @@ void MapMgr::SendChatMessageToCellPlayers(Object * obj, WorldPacket * packet, ui
 				{
 					if((*iter)->IsPlayer())
 					{
-						//static_cast<Player*>(*iter)->GetSession()->SendPacket(packet);
-						static_cast<Player*>(*iter)->GetSession()->SendChatPacket(packet, langpos, lang, originator);
+						//static_cast< Player* >(*iter)->GetSession()->SendPacket(packet);
+						static_cast< Player* >(*iter)->GetSession()->SendChatPacket(packet, langpos, lang, originator);
 					}
 				}
 			}

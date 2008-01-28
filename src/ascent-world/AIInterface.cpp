@@ -1352,30 +1352,31 @@ Unit* AIInterface::FindTarget()
 		++itr;
 
 		pObj = (*it2);
-		if(pObj->GetTypeId() == TYPEID_PLAYER)
+		if( pObj->GetTypeId() == TYPEID_PLAYER )
 		{
-			if(static_cast<Player*>(pObj)->GetTaxiState())	  // skip players on taxi
+			if(static_cast< Player* >( pObj )->GetTaxiState() )	  // skip players on taxi
 				continue;
 		}
-		else if(pObj->GetTypeId() != TYPEID_UNIT)
+		else if( pObj->GetTypeId() != TYPEID_UNIT )
 				continue;
 
-		pUnit = static_cast<Unit*>(pObj);
-		if(pUnit->bInvincible)
+		pUnit = static_cast< Unit* >( pObj );
+		if( pUnit->bInvincible )
 			continue;
 
 		// don't agro players on flying mounts
-		/*if(pUnit->GetTypeId() == TYPEID_PLAYER && static_cast<Player*>(pUnit)->FlyCheat)
+		/*if(pUnit->GetTypeId() == TYPEID_PLAYER && static_cast< Player* >(pUnit)->FlyCheat)
 			continue;*/
 
 		//do not agro units that are faking death. Should this be based on chance ?
-		if(pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH))
+		if( pUnit->HasFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH ) )
 			continue;
+
 		//target is immune to unit attacks however can be targeted
 		//as a part of AI we allow this mode to attack creatures as seen many times on oficial.
-		if(m_Unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9))
+		if( m_Unit->HasFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9 ) )
 		{
-			if(pUnit->IsPlayer() || pUnit->IsPet())
+			if( pUnit->IsPlayer() || pUnit->IsPet() )
 			{
 				continue;
 			}
@@ -1709,7 +1710,7 @@ float AIInterface::_CalcAggroRange(Unit* target)
 	int32 modDetectRange = target->getDetectRangeMod(m_Unit->GetGUID());
 	AggroRange += modDetectRange;
 	if(target->IsPlayer())
-		AggroRange += static_cast<Player*>(target)->DetectedRange;
+		AggroRange += static_cast< Player* >( target )->DetectedRange;
 	if(AggroRange < 3.0f)
 	{
 		AggroRange = 3.0f;
