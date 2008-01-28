@@ -86,7 +86,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory=".\..\..\bin\Debug"
-			IntermediateDirectory=".\realmserver___Win32_Debug"
+			IntermediateDirectory=".\ascent-realmserver___Win32_Debug"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -95,7 +95,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\ascent-shared"
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE;INTEL_COMPILER"
 				IgnoreStandardIncludePath="FALSE"
 				MinimalRebuild="TRUE"
@@ -103,10 +103,10 @@
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="RStdAfx.h"
-				PrecompiledHeaderFile=".\realmserver___Win32_Debug\realmserver.pch"
-				AssemblerListingLocation=".\realmserver___Win32_Debug/"
-				ObjectFile=".\realmserver___Win32_Debug/"
-				ProgramDataBaseFileName=".\realmserver___Win32_Debug/"
+				PrecompiledHeaderFile="$(IntDir)\realmserver.pch"
+				AssemblerListingLocation="$(IntDir)/"
+				ObjectFile="$(IntDir)/"
+				ProgramDataBaseFileName="$(IntDir)/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -235,19 +235,6 @@
 			<File
 				RelativePath="..\..\src\ascent-realmserver\Structures.h">
 			</File>
-			<Filter
-				Name="Thread Crap"
-				Filter="">
-				<File
-					RelativePath="..\..\src\game\CThreads.cpp">
-					<FileConfiguration
-						Name="Debug|Win32">
-						<Tool
-							Name="VCCLCompilerTool"
-							UsePrecompiledHeader="0"/>
-					</FileConfiguration>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Storage"

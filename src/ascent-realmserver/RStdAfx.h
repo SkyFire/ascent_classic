@@ -26,34 +26,34 @@
 #include <string>
 //#include <fstream>
 
-#include "../shared/Common.h"
-#include "../shared/MersenneTwister.h"
-#include "../shared/WorldPacket.h"
-#include "../shared/Log.h"
-#include "../shared/NGLog.h"
-#include "../shared/ByteBuffer.h"
-#include "../shared/StackBuffer.h"
-#include "../shared/Config/ConfigEnv.h"
-#include "../shared/crc32.h"
-#include "../shared/LocationVector.h"
+#include "../ascent-shared/Common.h"
+#include "../ascent-shared/MersenneTwister.h"
+#include "../ascent-shared/WorldPacket.h"
+#include "../ascent-shared/Log.h"
+#include "../ascent-shared/NGLog.h"
+#include "../ascent-shared/ByteBuffer.h"
+#include "../ascent-shared/StackBuffer.h"
+#include "../ascent-shared/Config/ConfigEnv.h"
+#include "../ascent-shared/crc32.h"
+#include "../ascent-shared/LocationVector.h"
 
 #include <zlib/zlib.h>
 
-#include "../shared/Database/DatabaseEnv.h"
-#include "../shared/Database/DBCStores.h"
-#include "../shared/Database/dbcfile.h"
-#include "../shared/FastQueue.h"
+#include "../ascent-shared/Database/DatabaseEnv.h"
+#include "../ascent-shared/Database/DBCStores.h"
+#include "../ascent-shared/Database/dbcfile.h"
+#include "../ascent-shared/FastQueue.h"
 
 #include <Network/Network.h>
 
-#include "../shared/Auth/md5.h"
-#include "../shared/Auth/BigNumber.h"
-#include "../shared/Auth/Sha1.h"
-#include "../shared/Auth/WowCrypt.h"
-#include "../shared/CrashHandler.h"
+#include "../ascent-shared/Auth/md5.h"
+#include "../ascent-shared/Auth/BigNumber.h"
+#include "../ascent-shared/Auth/Sha1.h"
+#include "../ascent-shared/Auth/WowCrypt.h"
+#include "../ascent-shared/CrashHandler.h"
 
-#include "../game/Opcodes.h"
-#include "../shared/CallBack.h"
+#include "../ascent-world/Opcodes.h"
+#include "../ascent-shared/CallBack.h"
 
 #include "Master.h"
 #include "WorkerOpcodes.h"
@@ -66,5 +66,5 @@
 #include "ClientManager.h"
 #include "LogonCommClient.h"
 #include "LogonCommHandler.h"
-#include "../shared/Storage.h"
+#include "../ascent-shared/Storage.h"
 #include "ObjectStorage.h"

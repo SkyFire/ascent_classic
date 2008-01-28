@@ -18,7 +18,7 @@
  */
 
 #include "RStdAfx.h"
-#include "../shared/AuthCodes.h"
+#include "../ascent-shared/AuthCodes.h"
 
 #pragma pack(push, 1)
 struct ClientPktHeader

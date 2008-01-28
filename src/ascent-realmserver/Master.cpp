@@ -18,7 +18,7 @@
  */
 
 #include "RStdAfx.h"
-#include "../shared/svn_revision.h"
+#include "../ascent-shared/svn_revision.h"
 
 Database * Database_Character;
 Database * Database_World;
