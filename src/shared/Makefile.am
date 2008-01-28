@@ -1,6 +1,6 @@
 INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include
 
-noinst_LIBRARIES = libshared.a libauth.a libconfig.a libdatabase.a libnetwork.a
+noinst_LIBRARIES = libshared.a
 
 libshared_a_SOURCES = \
     Log.cpp \
@@ -30,9 +30,7 @@ libshared_a_SOURCES = \
     ascent_getopt.h \
     ascent_getopt.cpp \
     CrashHandler.h \
-    CrashHandler.cpp
-
-libauth_a_SOURCES = \
+    CrashHandler.cpp \
     Auth/BigNumber.cpp \
     Auth/BigNumber.h \
     Auth/MD5.cpp \
@@ -40,15 +38,10 @@ libauth_a_SOURCES = \
     Auth/Sha1.cpp \
     Auth/Sha1.h \
     Auth/WowCrypt.cpp \
-    Auth/WowCrypt.h
-
-
-libconfig_a_SOURCES = \
+    Auth/WowCrypt.h \
     Config/Config.cpp \
     Config/Config.h \
-    Config/ConfigEnv.h
-
-libdatabase_a_SOURCES = \
+    Config/ConfigEnv.h \
     Database/DBC.cpp \
     Database/Database.cpp \
     Database/DBC.h \
@@ -59,9 +52,7 @@ libdatabase_a_SOURCES = \
     Database/Field.h \
     Database/DataStore.h \
     Database/dbcfile.cpp \
-    Database/dbcfile.h
-
-libnetwork_a_SOURCES = \
+    Database/dbcfile.h \
     Network/ListenSocketPoll.h \
     Network/ListenSocketSelect.h \
     Network/ListenSocketLinux.h \

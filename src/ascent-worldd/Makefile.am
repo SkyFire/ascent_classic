@@ -1,9 +1,9 @@
 INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../shared
 INCLUDES += -I$(srcdir)/../logonserver -I$(srcdir)/../../dep/src
 
-noinst_LIBRARIES = libgame.a
+bin_PROGRAMS = ascent-worldd
 
-libgame_a_SOURCES = \
+ascent-worldd_SOURCES = \
     CollideInterface.cpp \
     CollideInterface.h \
     VoiceChatClientSocket.cpp \
@@ -183,4 +183,23 @@ libgame_a_SOURCES = \
     WorldRunnable.h \
     WorldRunnable.cpp \
     WordFilter.h \
-    WordFilter.cpp
+    WordFilter.cpp \
+	Main.cpp \
+	Master.cpp \
+	Master.h \
+	CConsole.cpp \
+	CConsole.h \
+	BaseConsole.h \
+	ConsoleCommands.cpp \
+	ConsoleCommands.h \
+	ConsoleListener.cpp
+	
+ascent-worldd_LDADD = -lshared -lzlib -lpcre -lcollision
+
+ascent-worldd_LDFLAGS = -L$(srcdir)/../shared \
+               -L$(srcdir)/../../dep/src/zlib \
+               -L$(srcdir)/../../dep/src/pcre \
+               -L$(srcdir)/../../dep/src \
+               -L$(srcdir)/../../extras/collision/collision_dll \
+               @LIB_EXPORT@
+               

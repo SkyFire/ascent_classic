@@ -34,6 +34,7 @@ int LoadConfigs(int * udp_port, char * udp_address, int * tcp_port, char * tcp_a
 
 int Bind()
 {
+#ifdef WIN32
 	u_long arg = 0;
 
 	m_boundFdUDP = (int)socket(AF_INET, SOCK_DGRAM, 0);
@@ -41,6 +42,15 @@ int Bind()
 		return -1;
 
 	ioctlsocket( m_boundFdUDP, FIONBIO, &arg );
+#else
+	u_long arg = 0;
+
+	m_boundFdUDP = (int)socket(AF_INET, SOCK_DGRAM, 0);
+	if(m_boundFdUDP < 0)
+		return -1;
+
+	ioctlsocket( m_boundFdUDP, FIONBIO, &arg );
+#endif
 
 	if(bind(m_boundFdUDP, (const struct sockaddr*)&m_udplisten, sizeof(struct sockaddr_in)) < 0)
 	{
@@ -184,7 +194,7 @@ void OnListenTcpRead()
 	ws = CreateServer(new_fd, &addr);
 }
 
-int SetFds(FD_SET * fds)
+int SetFds(fd_set * fds)
 {
 	struct WoWServer * current = m_serverBegin;
 	int fd_count = 2;
@@ -277,7 +287,7 @@ void HandleTcpRead(int fd)
 
 int MessageLoop()
 {
-	FD_SET read_fds;
+	fd_set read_fds;
 	u_int i;
 	int result;
 	int fd_count;
