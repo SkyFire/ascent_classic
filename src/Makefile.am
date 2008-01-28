@@ -1,1 +1,1 @@
-SUBDIRS = shared game scripts ascent-logonserverd ascent-worldd ascent-voicechatd ascent-realmserverd
+SUBDIRS = ascent-shared ascent-logonserver ascent-world ascent-voicechat ascent-realmserver scripts

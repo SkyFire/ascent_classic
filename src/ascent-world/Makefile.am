@@ -1,9 +1,9 @@
-INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../shared
-INCLUDES += -I$(srcdir)/../logonserver -I$(srcdir)/../../dep/src
+INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../ascent-shared
+INCLUDES += -I$(srcdir)/../../dep/src
 
-bin_PROGRAMS = ascent-worldd
+bin_PROGRAMS = ascent-world
 
-ascent-worldd_SOURCES = \
+ascent-world_SOURCES = \
     CollideInterface.cpp \
     CollideInterface.h \
     VoiceChatClientSocket.cpp \
@@ -194,9 +194,9 @@ ascent-worldd_SOURCES = \
 	ConsoleCommands.h \
 	ConsoleListener.cpp
 	
-ascent-worldd_LDADD = -lshared -lzlib -lpcre -lcollision
+ascent-world_LDADD = -lshared -lzlib -lpcre -lcollision
 
-ascent-worldd_LDFLAGS = -L$(srcdir)/../shared \
+ascent-world_LDFLAGS = -L$(srcdir)/../ascent-shared \
                -L$(srcdir)/../../dep/src/zlib \
                -L$(srcdir)/../../dep/src/pcre \
                -L$(srcdir)/../../dep/src \

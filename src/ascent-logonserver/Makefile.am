@@ -1,9 +1,8 @@
-INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../shared
-INCLUDES += -I$(srcdir)/../game
+INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../ascent-shared
 
-bin_PROGRAMS = logonserver
+bin_PROGRAMS = ascent-logonserver
 
-logonserver_SOURCES = \
+ascent-logonserver_SOURCES = \
 	AccountCache.cpp \
 	AccountCache.h \
 	AuthSocket.cpp \
@@ -21,13 +20,10 @@ logonserver_SOURCES = \
 	AutoPatcher.cpp \
 	Main.cpp \
 	Main.h \
-	PeriodicFunctionCall_Thread.h \
-    ../game/CThreads.cpp
+	PeriodicFunctionCall_Thread.h
 
-logonserver_LDADD = -ldatabase -lconfig -lauth -lshared -lzlib -lnetwork
+logonserver_LDADD = -lshared -lzlib
 
 
-logonserver_LDFLAGS = -L$(srcdir)/../shared \
+logonserver_LDFLAGS = -L$(srcdir)/../ascent-shared \
                -L$(srcdir)/../../dep/src/zlib \
-               -L$(srcdir)/../game
-

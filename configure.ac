@@ -1,8 +1,8 @@
 ## Process this file with autoconf to produce a configure script.
 
 AC_INIT([Ascent],
-        [2.1.0],
-        [the forum],
+        [3.6],
+        [www.ascentemu.com],
         [ascent])
 
 AC_PREREQ(2.5)
@@ -10,9 +10,9 @@ AC_PREREQ(2.5)
 if test -d obj; then rm -rf obj; fi
 
 AM_CONFIG_HEADER( config.h )
-INCLUDES="-I/usr/include/mysql -I/usr/local/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl"
+INCLUDES="-I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl"
 AC_SUBST(INCLUDES)
-LDFLAGS="-L/usr/lib/mysql -L/usr/local/lib/mysql"
+LDFLAGS="-L/usr/lib/mysql"
 AC_SUBST(LDFLAGS)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
@@ -20,7 +20,6 @@ AM_MAINTAINER_MODE
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
-#AC_PROG_RANLIB
 AC_PROG_LIBTOOL
 
 # autoheader templates
@@ -29,6 +28,7 @@ AH_TEMPLATE([USE_KQUEUE], Define if you want to use the kqueue socket engine mod
 AH_TEMPLATE([HAVE_DARWIN], Define if you have MacOSX Darwin, to include the correct headers for kevent)
 AH_TEMPLATE([ENABLE_CLUSTERING], Define if you want to enable clustering, this is experimental.)
 AH_TEMPLATE([ENABLE_COLLISION], Define if you want to enable collision calculation, warning. this can cause. a heavy load)
+AH_TEMPLATE([ENABLE_VOICECHAT], Define this if you want to enable voice chat system)
 AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
 AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
 AH_TEMPLATE([X64], Define this if you are under an X64-based operating system.)
@@ -39,10 +39,6 @@ AC_PREFIX_DEFAULT(`pwd`)
 test "$prefix" = "NONE" && prefix=`pwd`
 test "$sysconfdir" = "\${prefix}/etc" && sysconfdir='../etc'
 test "$scriptdir" = "" && scriptdir='../lib'
-
-# Determine architecture
-#AC_CHECK_FUNCS([ kqueue kevent ])
-#AC_CHECK_FUNCS([ epoll_ctl ])
 
 # Determine the operating system
 AC_MSG_CHECKING([uname -s for detecting host operating system])
@@ -98,9 +94,6 @@ if test -z "$SVN"; then AC_MSG_ERROR(Subversion not found); fi
 AC_CHECK_PROG([SED], [sed], yes)
 if test -z "$SED"; then AC_MSG_ERROR(Sed not found); fi
 
-AC_CHECK_PROG([TADA], [tada.wav\ extensions], yes)
-if test -z "$TADA"; then AC_MSG_WARN(this build has no tada.wav extensions); fi
-
 # Checks for libraries.
 AC_CHECK_LIB( pthread, pthread_create, [],
     [LDFLAGS="-pthread $LDFLAGS"
@@ -108,6 +101,7 @@ AC_CHECK_LIB( pthread, pthread_create, [],
         pthread_create();,
         [], [AC_MSG_ERROR([Missing pthread])])
     ])
+    
 AC_CHECK_LIB( z, compress, [],[AC_MSG_ERROR([Missing zlib])] )
 AC_CHECK_LIB( compat, ftime )
 
@@ -121,11 +115,6 @@ else
 	LIB_EXPORT="-Wl,--export-dynamic"
 	AC_SUBST(LIB_EXPORT)
 fi
-
-# THIS IS UGLY!
-CPPFLAGS=""
-CFLAGS=""
-CXXFLAGS=""
 
 AC_ARG_ENABLE(clustering,
      AC_HELP_STRING([--enable-clustering],enable clustering. warning this is experimental.),
@@ -176,6 +165,15 @@ AC_ARG_ENABLE(profiling,
      ],
 )
 
+AC_ARG_ENABLE(voicechat,
+     AC_HELP_STRING([--enable-voicechat],enable voice chat system),
+     [ if test "x$enable_voicechat" = "xyes" ; then
+   	AC_DEFINE(ENABLE_VOICECHAT)
+       fi
+     ],
+)
+
+
 # Check for networking stuff
 AC_MSG_CHECKING([detecting network socket engine])
 if test "x$OSNAME" = "xLinux" ; then
@@ -198,42 +196,12 @@ if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_HEADER(sys/event.h, , AC_MSG_ERROR([Cannot find sys/event.h for socket engine]))
 	AC_DEFINE(USE_KQUEUE)
 
-	INCLUDES="-I/sw/include -I/sw/include/mysql -I/usr/include/openssl $INCLUDES"
-	LDFLAGS="-L/sw/lib -L/sw/lib/mysql $LDFLAGS -L/usr/lib"
+	INCLUDES+="-I/sw/include -I/sw/include/mysql -I/usr/include/openssl"
+	LDFLAGS+="-L/sw/lib -L/sw/lib/mysql -L/usr/lib"
 fi
 
 AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
 
-CPPFLAGS_SAVE=$CPPFLAGS
-CPPFLAGS=$INCLUDES $CPPFLAGS
-
-# Checks for header files.
-AC_HEADER_STDC
-AC_HEADER_STDBOOL
-AC_HEADER_TIME
-AC_CHECK_HEADERS( \
-   limits.h sys/ioctl.h unistd.h fcntl.h float.h \
-   mysql.h netdb.h netinet/in.h stddef.h sys/socket.h \
-   sys/time.h opensslv.h \
- ,[],[AC_MSG_ERROR([Missing required header])])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_C_INLINE
-AC_C_VOLATILE
-AC_TYPE_SIZE_T
-AC_TYPE_SIGNAL
-AC_STRUCT_TM
-
-# Checks for library functions.
-AC_FUNC_MEMCMP
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
-AC_FUNC_SELECT_ARGTYPES
-AC_CHECK_FUNCS(                                           
-   floor gethostbyname gettimeofday memset socket sqrt  \
-   stpcpy strchr strrchr strstr strtoul  \
-)
 
 AC_DEFINE_UNQUOTED([PREFIX], "${prefix}", "Prefix")
 AC_DEFINE_UNQUOTED([SCRIPTDIR], "${scriptdir}", "librarydir")
