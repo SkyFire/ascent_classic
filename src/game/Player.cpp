@@ -5034,8 +5034,8 @@ void Player::AddInRangeObject(Object* pObj)
 	if(pObj->GetTypeId() == TYPEID_UNIT)
 	{
 		//add an event to send move update have to send guid as pointer was causing a crash :(
-		//sEventMgr.AddEvent(((Creature*)pObj)->GetAIInterface(), &AIInterface::SendCurrentMove, this->GetGUID(), EVENT_UNIT_SENDMOVE, 200, 1);
-		((Creature*)pObj)->GetAIInterface()->SendCurrentMove(this);
+		//sEventMgr.AddEvent( static_cast< Creature* >( pObj )->GetAIInterface(), &AIInterface::SendCurrentMove, this->GetGUID(), EVENT_UNIT_SENDMOVE, 200, 1);
+		static_cast< Creature* >( pObj )->GetAIInterface()->SendCurrentMove(this);
 	}
 }
 
@@ -5067,8 +5067,8 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 			m_currentSpell->cancel();	   // cancel the spell
 		m_CurrentCharm=NULL;
 
-		if(p->m_temp_summon&&p->GetTypeId()==TYPEID_UNIT)
-			((Creature*)p)->SafeDelete();
+		if( p->m_temp_summon&&p->GetTypeId() == TYPEID_UNIT )
+			static_cast< Creature* >( p )->SafeDelete();
 	}
  
 	if(pObj == m_Summon)

@@ -350,7 +350,7 @@ void GossipScript::GossipHello(Object* pObject, Player* Plr, bool AutoSend)
 {
 	GossipMenu *Menu;
 	uint32 TextID = 2;
-	Creature * pCreature = (pObject->GetTypeId()==TYPEID_UNIT)?((Creature*)pObject):NULL;
+	Creature * pCreature = (pObject->GetTypeId()==TYPEID_UNIT)?static_cast< Creature* >( pObject ):NULL;
 	if(!pCreature)
 		return;
 
@@ -471,11 +471,11 @@ void GossipScript::GossipHello(Object* pObject, Player* Plr, bool AutoSend)
 
 void GossipScript::GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * EnteredCode)
 {
-	Creature * pCreature = ((Creature*)pObject);
-	if(pObject->GetTypeId()!=TYPEID_UNIT)
+	Creature* pCreature = static_cast< Creature* >( pObject );
+	if( pObject->GetTypeId() != TYPEID_UNIT )
 		return;
 
-	switch(IntId)
+	switch( IntId )
 	{
 	case 1:
 		// vendor

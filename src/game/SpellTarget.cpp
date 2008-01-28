@@ -331,10 +331,12 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 	TargetsList *tmpMap=&m_targetUnits[i];
 	if(m_spellInfo->TargetCreatureType && pTarget->GetTypeId()==TYPEID_UNIT)
 	{		
-		Creature *cr=((Creature*)pTarget);
-		if(!cr)return;
+		Creature* cr = static_cast< Creature* >( pTarget );
+		
+		if( cr == NULL )
+			return;
 
-		if(cr->GetCreatureName())
+		if( cr->GetCreatureName() )
 			if(!(1<<(cr->GetCreatureName()->Type-1) & m_spellInfo->TargetCreatureType))
 				return;
 	}
@@ -424,28 +426,29 @@ void Spell::SpellTargetLandUnderCaster(uint32 i, uint32 j) /// I don't think thi
 /// Spell Target Handling for type 18: All Party Members around the Caster in given range NOT RAID
 void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	Player *p=p_caster;
-	if(!p)
+	TargetsList* tmpMap = &m_targetUnits[i];
+	Player* p = p_caster;
+
+	if( p == NULL )
 	{
-		if(((Creature*)u_caster)->IsTotem())
-			p = (Player*)((Creature*)u_caster)->GetTotemOwner();
-		else if( u_caster->IsPet() && static_cast<Pet*>(u_caster)->GetPetOwner() ) 
-			p = static_cast<Pet*>(u_caster)->GetPetOwner();
+		if( static_cast< Creature* >( u_caster)->IsTotem() )
+			p = static_cast< Player* >( static_cast< Creature* >( u_caster )->GetTotemOwner() );
+		else if( u_caster->IsPet() && static_cast< Pet* >( u_caster )->GetPetOwner() ) 
+			p = static_cast< Pet* >( u_caster )->GetPetOwner();
 	}
-	if(!p)
+
+	if( p == NULL )
 		return;
 
-	float r= GetRadius(i);
+	float r = GetRadius(i);
 
-	r*=r;
-	if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),p,r))
-		SafeAddTarget(tmpMap,p->GetGUID());	 
+	r *= r;
+	if( IsInrange( m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), p, r ) )
+		SafeAddTarget( tmpMap, p->GetGUID() );	 
 
-	SubGroup * subgroup = p->GetGroup() ?
-		p->GetGroup()->GetSubGroup(p->GetSubGroup()) : 0;
+	SubGroup* subgroup = p->GetGroup() ? p->GetGroup()->GetSubGroup( p->GetSubGroup() ) : 0;
 
-	if(subgroup)
+	if( subgroup != NULL )
 	{				
 		p->GetGroup()->Lock();
 		for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
@@ -542,9 +545,9 @@ void Spell::SpellTargetGameobject_itemTarget(uint32 i, uint32 j)
 /// Spell Target Handling for type 27: target is owner of pet
 void Spell::SpellTargetPetOwner(uint32 i, uint32 j)
 { 
-	TargetsList *tmpMap=&m_targetUnits[i];
-	if (u_caster && u_caster->IsPet() && ((Pet*)u_caster)->GetPetOwner())
-		SafeAddTarget(tmpMap, u_caster->GetUInt64Value(UNIT_FIELD_SUMMONEDBY));
+	TargetsList* tmpMap = &m_targetUnits[i];
+	if( u_caster != NULL && u_caster->IsPet() && static_cast< Pet* >( u_caster )->GetPetOwner() )
+		SafeAddTarget( tmpMap, u_caster->GetUInt64Value( UNIT_FIELD_SUMMONEDBY ) );
 }
 
 /// this is handled in DO
@@ -612,17 +615,18 @@ void Spell::SpellTargetNearbyPartyMembers(uint32 i, uint32 j)
 {
 	TargetsList *tmpMap=&m_targetUnits[i];
 	// this implementation is wrong.... this one is for totems
-	if(u_caster)
+	if( u_caster != NULL )
 	{
-		if(u_caster->GetTypeId()==TYPEID_UNIT)
+		if( u_caster->GetTypeId()==TYPEID_UNIT)
 		{
-			if(((Creature*)u_caster)->IsTotem())
+			if( static_cast< Creature* >( u_caster )->IsTotem() )
 			{
-				float r =GetRadius(i);
-				r*=r;
+				float r = GetRadius(i);
+				r *= r;
 
-				Player*p=(Player*) ((Creature*)u_caster)->GetTotemOwner();
-				if(!p)
+				Player* p = static_cast< Player* >( static_cast< Creature* >( u_caster )->GetTotemOwner() );
+				
+				if( p == NULL)
 					return;
 
 				if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),p,r))
@@ -739,23 +743,23 @@ void Spell::SpellTargetTotem(uint32 i, uint32 j)
 /// Spell Target Handling for type 45: Chain,!!only for healing!! for chain lightning =6 
 void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 {
-	if(!m_caster->IsInWorld())
+	if( !m_caster->IsInWorld() )
 		return;
 
 	TargetsList *tmpMap=&m_targetUnits[i];
 	//if selected target is party member, then jumps on party
 	Unit* firstTarget;
 
-	bool PartyOnly=false;
-	float range=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong,
+	bool PartyOnly = false;
+	float range = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));//this is probably wrong,
 	//this is cast distance, not searching distance
 	range *= range;
 
 	firstTarget = m_caster->GetMapMgr()->GetPlayer((uint32)m_targets.m_unitTarget);
-	if(firstTarget && p_caster)
+	if( firstTarget && p_caster != NULL )
 	{
-		if(p_caster->InGroup())
-			if(p_caster->GetSubGroup()==((Player*)firstTarget)->GetSubGroup())
+		if( p_caster->InGroup() )
+			if( p_caster->GetSubGroup() == static_cast< Player* >( firstTarget )->GetSubGroup() )
 				PartyOnly=true;					
 	}
 	else

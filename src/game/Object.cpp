@@ -316,7 +316,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 	Player * pThis = 0;
 	if(m_objectTypeId == TYPEID_PLAYER)
 	{
-		pThis = static_cast<Player*>(this);
+		pThis = static_cast< Player* >( this );
 		if(target == this)
 		{
 			// Updating our last speeds.
@@ -816,7 +816,7 @@ void Object::SetRotation( uint64 guid )
 void Object::OutPacketToSet(uint16 Opcode, uint16 Len, const void * Data, bool self)
 {
 	if(self && m_objectTypeId == TYPEID_PLAYER)
-		static_cast<Player*>(this)->GetSession()->OutPacket(Opcode, Len, Data);
+		static_cast< Player* >( this )->GetSession()->OutPacket(Opcode, Len, Data);
 
 	if(!IsInWorld())
 		return;
@@ -843,7 +843,7 @@ void Object::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 {
 	if(bToSelf && m_objectTypeId == TYPEID_PLAYER)
 	{
-		static_cast<Player*>(this)->GetSession()->SendPacket(data);		
+		static_cast< Player* >( this )->GetSession()->SendPacket(data);		
 	}
 
 	if(!IsInWorld())
@@ -856,7 +856,7 @@ void Object::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 	//		   saving cpu cycles. Chat messages will be sent to everybody even if player is invisible.
 	if(myteam_only)
 	{
-		uint32 myteam=static_cast<Player*>(this)->GetTeam();
+		uint32 myteam=static_cast< Player* >( this )->GetTeam();
 		if(gminvis && data->GetOpcode()!=SMSG_MESSAGECHAT)
 		{
 			for(; itr != it_end; ++itr)
@@ -1582,7 +1582,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		if(IsPet())
 			plr = static_cast<Pet*>(this)->GetPetOwner();
 		else if(IsPlayer())
-			plr = static_cast<Player*>(this);
+			plr = static_cast< Player* >( this );
 
 		if(pVictim->GetTypeId()==TYPEID_UNIT && plr && plr->GetTypeId() == TYPEID_PLAYER) // Units can't tag..
 		{
@@ -1692,9 +1692,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	uint32 health = pVictim->GetUInt32Value(UNIT_FIELD_HEALTH );
 
 	/*------------------------------------ DUEL HANDLERS --------------------------*/
-	if((pVictim->IsPlayer()) && (this->IsPlayer()) && static_cast<Player*>(pVictim)->DuelingWith == static_cast<Player*>(this) ) //Both Players
+	if((pVictim->IsPlayer()) && (this->IsPlayer()) && static_cast<Player*>(pVictim)->DuelingWith == static_cast< Player* >( this ) ) //Both Players
 	{
-		if((health <= damage) && static_cast<Player*>(this)->DuelingWith != NULL)
+		if((health <= damage) && static_cast< Player* >( this )->DuelingWith != NULL)
 		{
 			//Player in Duel and Player Victim has lost
 			uint32 NewHP = pVictim->GetUInt32Value(UNIT_FIELD_MAXHEALTH)/100;
@@ -1705,7 +1705,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			//Set there health to 1% or 5 if 1% is lower then 5
 			pVictim->SetUInt32Value(UNIT_FIELD_HEALTH, NewHP);
 			//End Duel
-			static_cast<Player*>(this)->EndDuel(DUEL_WINNER_KNOCKOUT);
+			static_cast< Player* >( this )->EndDuel(DUEL_WINNER_KNOCKOUT);
 
 			// surrender emote
 			pVictim->Emote(EMOTE_ONESHOT_BEG);			// Animation
@@ -2184,7 +2184,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	if(!spellInfo)
         return;
 
-	if (this->IsPlayer() && !static_cast<Player*>(this)->canCast(spellInfo))
+	if (this->IsPlayer() && !static_cast< Player* >( this )->canCast(spellInfo))
 		return;
 //==========================================================================================
 //==============================Variables Initialization====================================

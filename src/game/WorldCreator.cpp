@@ -257,16 +257,16 @@ MapMgr * InstanceMgr::GetInstance(Object* obj)
 	MapInfo * inf = WorldMapInfoStorage.LookupEntry(obj->GetMapId());
 
 	// we can *never* teleport to maps without a mapinfo.
-	if(inf == NULL || obj->GetMapId() >= NUM_MAPS)
+	if( inf == NULL || obj->GetMapId() >= NUM_MAPS )
 		return NULL;
 
-	if(obj->IsPlayer())
+	if( obj->IsPlayer() )
 	{
 		// players can join instances based on their groups/solo status.
-		plr = ((Player*)obj);
+		plr = static_cast< Player* >( obj );
 
 		// single-instance maps never go into the instance set.
-		if(inf->type == INSTANCE_NULL)
+		if( inf->type == INSTANCE_NULL )
 			return m_singleMaps[obj->GetMapId()];
 
 		m_mapLock.Acquire();

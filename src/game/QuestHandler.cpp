@@ -274,16 +274,16 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	if (!bValid || qst == NULL)
+	if( !bValid || qst == NULL )
 	{
 		sLog.outDebug("WORLD: Creature is not a questgiver.");
 		return;
 	}
 
-	if(_player->GetQuestLogForEntry(qst->id))
+	if( _player->GetQuestLogForEntry( qst->id ) )
 		return;
 
-	if(qst_giver->GetTypeId()==TYPEID_UNIT&&((Creature*)qst_giver)->m_escorter != NULL)
+	if( qst_giver->GetTypeId() == TYPEID_UNIT && static_cast< Creature* >( qst_giver )->m_escorter != NULL )
 	{
 		SystemMessage("You cannot accept this quest at this time.");
 		return;
@@ -326,7 +326,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 		}
 	}	
 	
-/*	if(qst_giver->GetTypeId() == TYPEID_UNIT && !ScriptSystem->OnQuestRequireEvent(qst, ((Creature*)qst_giver), _player, QUEST_EVENT_CAN_ACCEPT))
+/*	if(qst_giver->GetTypeId() == TYPEID_UNIT && !ScriptSystem->OnQuestRequireEvent(qst, static_cast< Creature* >( qst_giver ), _player, QUEST_EVENT_CAN_ACCEPT))
 		return;*/
 
 	QuestLogEntry *qle = new QuestLogEntry();
@@ -375,7 +375,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	if(qst->count_required_item || qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)	// gameobject quests deactivate
 		GetPlayer()->UpdateNearbyGameObjects();
 
-	//ScriptSystem->OnQuestEvent(qst, ((Creature*)qst_giver), _player, QUEST_EVENT_ON_ACCEPT);
+	//ScriptSystem->OnQuestEvent(qst, static_cast< Creature* >( qst_giver ), _player, QUEST_EVENT_ON_ACCEPT);
 
 	sQuestMgr.OnQuestAccepted(_player,qst,qst_giver);
 
@@ -711,7 +711,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvPacket)
 
 	
 	sQuestMgr.OnQuestFinished(GetPlayer(), qst, qst_giver, reward_slot);
-	//if(qst_giver->GetTypeId() == TYPEID_UNIT) qst->LUA_SendEvent(((Creature*)qst_giver),GetPlayer(),ON_QUEST_COMPLETEQUEST);
+	//if(qst_giver->GetTypeId() == TYPEID_UNIT) qst->LUA_SendEvent(static_cast< Creature* >( qst_giver ),GetPlayer(),ON_QUEST_COMPLETEQUEST);
 
 	if(qst->next_quest_id)
 	{

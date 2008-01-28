@@ -123,27 +123,27 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 	std::list<QuestRelation *>::const_iterator q_end;
 	bool bValid = false;
 
-	if(quest_giver->GetTypeId() == TYPEID_GAMEOBJECT)
+	if( quest_giver->GetTypeId() == TYPEID_GAMEOBJECT )
 	{
         bValid = ((GameObject*)quest_giver)->HasQuests();
         if(bValid)
 		{
 			q_begin = ((GameObject*)quest_giver)->QuestsBegin();
-			q_end   = ((GameObject*)quest_giver)->QuestsEnd();
+			q_end = ((GameObject*)quest_giver)->QuestsEnd();
 		}
 	} 
-	else if(quest_giver->GetTypeId() == TYPEID_UNIT)
+	else if( quest_giver->GetTypeId() == TYPEID_UNIT )
 	{
-		bValid = ((Creature*)quest_giver)->HasQuests();
+		bValid = static_cast< Creature* >( quest_giver )->HasQuests();
 		if(bValid)
 		{
 			q_begin = ((Creature*)quest_giver)->QuestsBegin();
-			q_end   = ((Creature*)quest_giver)->QuestsEnd();
+			q_end = ((Creature*)quest_giver)->QuestsEnd();
 		}
 	}
-    else if(quest_giver->GetTypeId() == TYPEID_ITEM)
+    else if( quest_giver->GetTypeId() == TYPEID_ITEM )
     {
-        if(static_cast<Item*>(quest_giver)->GetProto()->QuestId)
+        if( static_cast< Item* >( quest_giver )->GetProto()->QuestId )
             bValid = true;
     }
 	//This will be handled at quest share so nothing important as status

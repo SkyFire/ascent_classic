@@ -583,18 +583,18 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 			uint32 gain = (uint32)(count * (2.17*p_caster->getLevel()+9.136));
 			uint32 max = unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-			if(unitTarget->GetUInt32Value(UNIT_FIELD_POWER1)+gain>max)
-				unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, max);
+			if( unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain > max )
+				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, max );
 			else
-				unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, unitTarget->GetUInt32Value(UNIT_FIELD_POWER1)+gain);
-			SendHealManaSpellOnPlayer(p_caster, ((Player*)unitTarget), gain, 0);
+				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain );
+			SendHealManaSpellOnPlayer( p_caster, static_cast< Player* >( unitTarget ), gain, 0 );
 		}break;
 	case 4141:// Summon Myzrael
 		{
 			//2755
-			CreatureInfo * ci = CreatureNameStorage.LookupEntry(2755);
-			CreatureProto * cp = CreatureProtoStorage.LookupEntry(2755);
-			if( !ci || !cp )
+			CreatureInfo* ci = CreatureNameStorage.LookupEntry(2755);
+			CreatureProto* cp = CreatureProtoStorage.LookupEntry(2755);
+			if( ci == NULL || cp == NULL )
 				return;
 
 			/*here add code for AI and actualy summon the npc*/
@@ -1379,14 +1379,14 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 				if (!unitTarget->IsPlayer() || !unitTarget->isAlive())
 					break;
 
-				Player* mPlayer = (Player*)unitTarget;
-				if (!mPlayer->IsInFeralForm() || 
-					(mPlayer->GetShapeShift() != FORM_CAT &&
+				Player* mPlayer = static_cast< Player* >( unitTarget );
+				if( !mPlayer->IsInFeralForm() || (
+					mPlayer->GetShapeShift() != FORM_CAT &&
 					mPlayer->GetShapeShift() != FORM_BEAR &&
-					mPlayer->GetShapeShift() != FORM_DIREBEAR))
+					mPlayer->GetShapeShift() != FORM_DIREBEAR ) )
 					break;
-				uint32 max = mPlayer->GetUInt32Value(UNIT_FIELD_MAXHEALTH);
-				uint32 val = float2int32(((mPlayer->FindAura(34300)) ? 0.04f : 0.02f)*max);
+				uint32 max = mPlayer->GetUInt32Value( UNIT_FIELD_MAXHEALTH );
+				uint32 val = float2int32( ( ( mPlayer->FindAura( 34300 ) ) ? 0.04f : 0.02f ) * max );
 				if (val)
 					mPlayer->Heal(mPlayer,34299,(uint32)(val));
 			}break;
@@ -1394,7 +1394,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 			{
 				if (!unitTarget->IsPlayer() || !unitTarget->isAlive())
 					break;
-				Player* mPlayer = (Player*)unitTarget;
+				Player* mPlayer = static_cast< Player* >( unitTarget );
 				if (!mPlayer->IsInFeralForm() || 
 					(mPlayer->GetShapeShift() != FORM_BEAR &&
 					mPlayer->GetShapeShift() != FORM_DIREBEAR))
@@ -2215,21 +2215,21 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		 
 			if(Rand(100.0f)) // 3% chance to fail//why?
 			{
-				if(((Player*)m_caster)->_GetSkillLineCurrent(SKILL_HERBALISM) < v)
+				if( static_cast< Player* >( m_caster )->_GetSkillLineCurrent( SKILL_HERBALISM ) < v )
 				{
 					//SendCastResult(SPELL_FAILED_LOW_CASTLEVEL);
 					return;
 				}
 				else
 				{
-					if(gameObjTarget->loot.items.size() == 0)
+					if( gameObjTarget->loot.items.size() == 0 )
 					{
 						lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
 					}
 					else
 						bAlreadyUsed = true;
 				}
-				loottype=2;
+				loottype = 2;
 			}
 			else
 			{
@@ -2239,7 +2239,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 					//30% chance to not be able to reskin on fail
 					((Creature*)unitTarget)->Skinned = true;
 					WorldPacket *pkt=unitTarget->BuildFieldUpdatePacket(UNIT_FIELD_FLAGS,0);
-					((Player*)m_caster)->GetSession()->SendPacket(pkt);
+					static_cast< Player* >( m_caster )->GetSession()->SendPacket(pkt);
 					delete pkt;
 
 				}*/
@@ -2257,21 +2257,21 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			uint32 v = GetGOReqSkill(gameObjTarget);
 			bool bAlreadyUsed = false;
 
-			if(Rand(100.0f)) // 3% chance to fail//why?
+			if( Rand( 100.0f ) ) // 3% chance to fail//why?
 			{
-				if(((Player*)m_caster)->_GetSkillLineCurrent(SKILL_MINING) < v)
+				if( static_cast< Player* >( m_caster )->_GetSkillLineCurrent( SKILL_MINING ) < v )
 				{
 					//SendCastResult(SPELL_FAILED_LOW_CASTLEVEL);
 					return;
 				}
-				else if(gameObjTarget->loot.items.size() == 0)
+				else if( gameObjTarget->loot.items.size() == 0 )
 				{
 					lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
 				}	
 				else
 					bAlreadyUsed = true;
 
-				loottype=2;
+				loottype = 2;
 			}
 			else
 			{
@@ -2324,8 +2324,8 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		}
 		break;
 	};
-	  if(gameObjTarget)
-		((Player*)m_caster)->SendLoot(gameObjTarget->GetGUID(),loottype);
+	if( gameObjTarget != NULL )
+		static_cast< Player* >( m_caster )->SendLoot( gameObjTarget->GetGUID(), loottype );
 }
 
 void Spell::SpellEffectOpenLockItem(uint32 i)
@@ -2686,10 +2686,10 @@ void Spell::SpellEffectDualWield(uint32 i)
 	if(m_caster->GetTypeId() != TYPEID_PLAYER) 
 		return;
 
-	Player *pPlayer = ((Player*)m_caster);
+	Player *pPlayer = static_cast< Player* >( m_caster );
 
-	if(!pPlayer->_HasSkillLine(SKILL_DUAL_WIELD))
-		 pPlayer->_AddSkillLine(SKILL_DUAL_WIELD, 1, 1);
+	if( !pPlayer->_HasSkillLine( SKILL_DUAL_WIELD ) )
+		 pPlayer->_AddSkillLine( SKILL_DUAL_WIELD, 1, 1 );
 	
 		// Increase it by one
 		//dual wield is 1/1 , it never increases it's not even displayed in skills tab
@@ -2984,10 +2984,10 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		if (lootmgr.IsFishable(zone)) // only add this if there is fish in that zone.
 		{
 			uint32 seconds = RandomUInt(17) + 2;
-			sEventMgr.AddEvent(go, &GameObject::FishHooked, (Player*)m_caster, EVENT_GAMEOBJECT_FISH_HOOKED, seconds*1000, 1,0);
+			sEventMgr.AddEvent( go, &GameObject::FishHooked, static_cast< Player* >( m_caster ), EVENT_GAMEOBJECT_FISH_HOOKED, seconds * 1000, 1, 0 );
 		}
-		sEventMgr.AddEvent(go, &GameObject::EndFishing, (Player*)m_caster,false, EVENT_GAMEOBJECT_END_FISHING,20000, 1,0);
-		p_caster->SetSummonedObject(go);
+		sEventMgr.AddEvent( go, &GameObject::EndFishing, static_cast< Player* >( m_caster ),false, EVENT_GAMEOBJECT_END_FISHING, 20000, 1, 0 );
+		p_caster->SetSummonedObject( go );
 	}
 	else
 	{//portal, lightwell
@@ -3266,21 +3266,21 @@ void Spell::SpellEffectPowerFunnel(uint32 i) // Power Funnel
 
 void Spell::SpellEffectHealMaxHealth(uint32 i)   // Heal Max Health
 {
-	if(!unitTarget || !unitTarget->isAlive())
+	if( unitTarget == NULL || !unitTarget->isAlive() )
 		return;
 
-	uint32 dif=unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)-unitTarget->GetUInt32Value(UNIT_FIELD_HEALTH);
-	if(!dif)
+	uint32 dif = unitTarget->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) - unitTarget->GetUInt32Value( UNIT_FIELD_HEALTH );
+	if( !dif )
 	{
-		SendCastResult(SPELL_FAILED_ALREADY_AT_FULL_HEALTH);
+		SendCastResult( SPELL_FAILED_ALREADY_AT_FULL_HEALTH );
 		return;
 	}
 
-	if(unitTarget->GetTypeId() == TYPEID_PLAYER)
+	if( unitTarget->GetTypeId() == TYPEID_PLAYER)
 	{
-		 SendHealSpellOnPlayer(((Player*)m_caster), ((Player*)unitTarget), dif,false);
+		 SendHealSpellOnPlayer( static_cast< Player* >( m_caster ), static_cast< Player* >( unitTarget ), dif, false );
 	}
-	unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH,dif);
+	unitTarget->ModUInt32Value( UNIT_FIELD_HEALTH, dif );
 }
 
 void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
@@ -4263,23 +4263,25 @@ void Spell::SpellEffectSelfResurrect(uint32 i)
 
 void Spell::SpellEffectSkinning(uint32 i)
 {
-	if(!unitTarget)
+	if( unitTarget == NULL )
 		return;
-	uint32 sk=((Player*)m_caster)->_GetSkillLineCurrent(SKILL_SKINNING);
-	uint32 lvl=unitTarget->getLevel();
-	if( (sk >= lvl*5)||((sk+100) >= lvl*10) )
+
+	uint32 sk = static_cast< Player* >( m_caster )->_GetSkillLineCurrent( SKILL_SKINNING );
+	uint32 lvl = unitTarget->getLevel();
+
+	if( ( sk >= lvl * 5 ) || ( ( sk + 100 ) >= lvl * 10 ) )
 	{
 		//Fill loot for Skinning
 		lootmgr.FillSkinningLoot(&((Creature*)unitTarget)->loot,unitTarget->GetEntry());
-		((Player*)m_caster)->SendLoot(unitTarget->GetGUID(),2);
+		static_cast< Player* >( m_caster )->SendLoot( unitTarget->GetGUID(), 2 );
 		
 		//Not skinable again
 		((Creature*)unitTarget)->Skinned = true;
-		unitTarget->BuildFieldUpdatePacket(p_caster, UNIT_FIELD_FLAGS, 0);
+		unitTarget->BuildFieldUpdatePacket( p_caster, UNIT_FIELD_FLAGS, 0 );
 
 		//still lootable
 		//pkt=unitTarget->BuildFieldUpdatePacket(UNIT_DYNAMIC_FLAGS,U_DYN_FLAG_LOOTABLE);
-		//((Player*)m_caster)->GetSession()->SendPacket(pkt);
+		//static_cast< Player* >( m_caster )->GetSession()->SendPacket(pkt);
 		//delete pkt;	 
 		DetermineSkillUp(SKILL_SKINNING,sk<lvl*5?sk/5:lvl);
 	}
@@ -4463,13 +4465,13 @@ void Spell::SpellEffectKnockBack(uint32 i)
 
 void Spell::SpellEffectDisenchant(uint32 i)
 {
-	Player*caster=(Player*)m_caster;
-	Item* it=caster->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(m_targets.m_itemTarget, true);
-	if(!it)
+	Player* caster = static_cast< Player* >( m_caster );
+	Item* it = caster->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid( m_targets.m_itemTarget, true );
+	if( it == NULL )
 		return;
    
 	//Check for skill first, we can increase it upto 75 
-	uint32 skill=caster->_GetSkillLineCurrent(SKILL_ENCHANTING);
+	uint32 skill=caster->_GetSkillLineCurrent( SKILL_ENCHANTING );
 	if(skill < 75)//can up skill
 	if(Rand(float(100-skill*100.0/75.0)))
 		caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));

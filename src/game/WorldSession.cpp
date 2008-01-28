@@ -228,29 +228,31 @@ int WorldSession::Update(uint32 InstanceID)
 
 void WorldSession::LogoutPlayer(bool Save)
 {
-	Player *pPlayer = GetPlayer();
-	if(_loggingOut)
+	Player* pPlayer = GetPlayer();
+
+	if( _loggingOut )
 		return;
 
 	_loggingOut = true;
-	if (_player)
-	{
-		sHookInterface.OnLogout(pPlayer);
-		if(_player->DuelingWith)
-			_player->EndDuel(DUEL_WINNER_RETREAT);
 
-		if(_player->m_currentLoot && _player->IsInWorld())
+	if( _player != NULL )
+	{
+		sHookInterface.OnLogout( pPlayer );
+		if( _player->DuelingWith )
+			_player->EndDuel( DUEL_WINNER_RETREAT );
+
+		if( _player->m_currentLoot && _player->IsInWorld() )
 		{
-			Object * obj = _player->GetMapMgr()->_GetObject(_player->m_currentLoot);
-			if(obj)
+			Object* obj = _player->GetMapMgr()->_GetObject( _player->m_currentLoot );
+			if( obj != NULL )
 			{
-				switch(obj->GetTypeId())
+				switch( obj->GetTypeId() )
 				{
 				case TYPEID_UNIT:
-					((Creature*)obj)->loot.looters.erase(_player->GetGUIDLow());
+					static_cast< Creature* >( obj )->loot.looters.erase( _player->GetGUIDLow() );
 					break;
 				case TYPEID_GAMEOBJECT:
-					((GameObject*)obj)->loot.looters.erase(_player->GetGUIDLow());
+					static_cast< GameObject* >( obj )->loot.looters.erase( _player->GetGUIDLow() );
 					break;
 				}
 			}
@@ -259,81 +261,81 @@ void WorldSession::LogoutPlayer(bool Save)
 		// part channels
 		_player->CleanupChannels();
 
-		if(_player->m_CurrentTransporter)
-			_player->m_CurrentTransporter->RemovePlayer(_player);
-		
-	  
+		if( _player->m_CurrentTransporter != NULL )
+			_player->m_CurrentTransporter->RemovePlayer( _player );
 
 		// cancel current spell
-		if(_player->m_currentSpell)
+		if( _player->m_currentSpell != NULL )
 			_player->m_currentSpell->cancel();
 
-		sSocialMgr.LoggedOut(_player);
+		sSocialMgr.LoggedOut( _player );
 
-		if(_player->GetTeam() == 1)
+		if( _player->GetTeam() == 1 )
 		{
-			if(sWorld.HordePlayers)
+			if( sWorld.HordePlayers )
 				sWorld.HordePlayers--;
 		}
 		else
 		{
-			if(sWorld.AlliancePlayers)
+			if( sWorld.AlliancePlayers )
 				sWorld.AlliancePlayers--;
 		}
 
-		if(_player->m_bg)
-			_player->m_bg->RemovePlayer(_player, true);
+		if( _player->m_bg )
+			_player->m_bg->RemovePlayer( _player, true );
 
-		if(_player->m_bgIsQueued)
-			BattlegroundManager.RemovePlayerFromQueues(_player);
+		if( _player->m_bgIsQueued )
+			BattlegroundManager.RemovePlayerFromQueues( _player );
 
 		//Duel Cancel on Leave
-		if(_player->DuelingWith != NULL)
-			_player->EndDuel(DUEL_WINNER_RETREAT);
+		if( _player->DuelingWith != NULL )
+			_player->EndDuel( DUEL_WINNER_RETREAT );
 
 		//Issue a message telling all guild members that this player signed off
-		if(_player->IsInGuild())
+		if( _player->IsInGuild() )
 		{
-			Guild *pGuild = _player->m_playerInfo->guild;
-			if(pGuild)
-				pGuild->LogGuildEvent(GUILD_EVENT_HASGONEOFFLINE, 1, _player->GetName());
+			Guild* pGuild = _player->m_playerInfo->guild;
+			if( pGuild != NULL )
+				pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 1, _player->GetName() );
 		}
 
 		_player->GetItemInterface()->EmptyBuyBack();
 		
-		sLfgMgr.RemovePlayerFromLfgQueues(_player);
+		sLfgMgr.RemovePlayerFromLfgQueues( _player );
 		
 		// Save HP/Mana
-		_player->load_health = _player->GetUInt32Value(UNIT_FIELD_HEALTH);
-		_player->load_mana = _player->GetUInt32Value(UNIT_FIELD_POWER1);
+		_player->load_health = _player->GetUInt32Value( UNIT_FIELD_HEALTH );
+		_player->load_mana = _player->GetUInt32Value( UNIT_FIELD_POWER1 );
 		
-		objmgr.RemovePlayer(_player);		
+		objmgr.RemovePlayer( _player );		
 		_player->ok_to_remove = true;
 
-		if(_player->GetSummon() != NULL)
-			_player->GetSummon()->Remove(false, true, false);
+		if( _player->GetSummon() != NULL )
+			_player->GetSummon()->Remove( false, true, false );
 
-   //	 _player->SaveAuras();
-		if(Save)
+		//_player->SaveAuras();
+
+		if( Save )
 			_player->SaveToDB(false);
 		
 		_player->RemoveAllAuras();
-		  if(_player->IsInWorld())
+		if( _player->IsInWorld() )
 			_player->RemoveFromWorld();
 		
-		  _player->m_playerInfo->m_loggedInPlayer=NULL;
-		  if(_player->m_playerInfo->m_Group)
-			  _player->m_playerInfo->m_Group->Update();
+		_player->m_playerInfo->m_loggedInPlayer = NULL;
+
+		if( _player->m_playerInfo->m_Group != NULL )
+			_player->m_playerInfo->m_Group->Update();
 	  
 		// Remove the "player locked" flag, to allow movement on next login
-		GetPlayer()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
+		GetPlayer()->RemoveFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER );
 
 		// Save Honor Points
 		//_player->SaveHonorFields();
 
 		// Update any dirty account_data fields.
-		bool dirty=false;
-		if(sWorld.m_useAccountData)
+		bool dirty = false;
+		if( sWorld.m_useAccountData )
 		{
 			std::stringstream ss;
 			ss << "UPDATE account_data SET ";
@@ -350,8 +352,8 @@ void WorldSession::LogoutPlayer(bool Save)
 						//ss.write(sAccountData[ui].data,sAccountData[ui].sz);
 					}
 					ss << "\"";
-					dirty=true;
-					sAccountData[ui].bIsDirty=false;
+					dirty = true;
+					sAccountData[ui].bIsDirty = false;
 				}
 			}			
 			if(dirty)

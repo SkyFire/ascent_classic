@@ -661,15 +661,15 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 			}
 
 			SM_FIValue(SM_FChanceOfSuccess, (int32*)&proc_Chance, ospinfo->SpellGroupType);
-			if(spellId && Rand(proc_Chance))
+			if( spellId && Rand( proc_Chance ) )
 			{
 				SpellCastTargets targets;
-				if(itr2->procFlags & PROC_TARGET_SELF)
+				if( itr2->procFlags & PROC_TARGET_SELF )
 					targets.m_unitTarget = GetGUID();
 				else 
 					targets.m_unitTarget = victim->GetGUID();
 				/* hmm whats a reasonable value here */
-				if(m_procCounter > 40)
+				if( m_procCounter > 40 )
 				{
 					/* something has proceed over 10 times in a loop :/ dump the spellids to the crashlog, as the crashdump will most likely be useless. */
 					// BURLEX FIX ME!
@@ -678,7 +678,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 				}
 
 				//check if we can trigger due to time limitation
-				if(ospinfo->proc_interval)
+				if( ospinfo->proc_interval )
 				{
 					uint32 now_in_ms=getMSTime();
 					if(itr2->LastTrigger+ospinfo->proc_interval>now_in_ms)
@@ -686,14 +686,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 					itr2->LastTrigger = now_in_ms; // consider it triggered
 				}
 				//since we did not allow to remove auras like these with interrupt flag we have to remove them manually.
-				if(itr2->procFlags & PROC_REMOVEONUSE)
-					RemoveAura(origId);
-				int dmg_overwrite=0;
+				if( itr2->procFlags & PROC_REMOVEONUSE )
+					RemoveAura( origId );
+				int dmg_overwrite = 0;
 				//these are player talents. Fuckem they pull the emu speed down 
-				if(IsPlayer())
+				if( IsPlayer() )
 				{
-					uint32 talentlevel=0;
-					switch(origId)
+					uint32 talentlevel = 0;
+					switch( origId )
 					{
 						//mace specialization
 						case 12284:	{talentlevel=1;}break;
@@ -707,102 +707,106 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 13001:	{talentlevel=3;}break;
 						case 13002:	{talentlevel=4;}break;
 					}
-					switch(spellId)
+
+					switch( spellId )
 					{
 						case 14189: //Seal Fate
 						case 16953: //Blood Frenzy
 						{
-							if(!this->IsPlayer() || 
+							if( !this->IsPlayer() || 
 								!CastingSpell || 
 								CastingSpell->Id == 14189 ||
 								CastingSpell->Id == 16953)
 								continue;
-							if( CastingSpell->Effect[0]!=80 &&
-								CastingSpell->Effect[1]!=80 &&
-								CastingSpell->Effect[2]!=80 &&
-								CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_)
+							if( CastingSpell->Effect[0] != 80 &&
+								CastingSpell->Effect[1] != 80 &&
+								CastingSpell->Effect[2] != 80 &&
+								CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_ )
 								continue;
 						}break;
 						case 17106: //druid intencity
 						{
-							if( CastingSpell->Id != 5229)//enrage
+							if( CastingSpell->Id != 5229 )//enrage
 								continue;
 						}break;
 						case 31616:
 						{
 							//yep, another special case: Nature's grace
-							if(GetHealthPct()>30)
+							if( GetHealthPct() > 30 )
 								continue;
 						}break;
 						case 37309:
 						{
-							if (!this->IsPlayer())
+							if( !this->IsPlayer() )
 								continue;
-							if (static_cast<Player*>(this)->GetShapeShift() != FORM_BEAR ||
-								static_cast<Player*>(this)->GetShapeShift() != FORM_DIREBEAR)
+							if( static_cast< Player* >( this )->GetShapeShift() != FORM_BEAR ||
+								static_cast< Player* >( this )->GetShapeShift() != FORM_DIREBEAR )
 								continue;
 						}break;
 						case 37310:
 						{
-							if (!this->IsPlayer() || static_cast<Player*>(this)->GetShapeShift() != FORM_CAT)
+							if( !this->IsPlayer() || static_cast< Player* >( this )->GetShapeShift() != FORM_CAT )
 								continue;
 						}break;
                         case 34754: //holy concentration
                         {
-                            if (!CastingSpell)
-								continue;
-							if (CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL &&
+
+							if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL &&
 								CastingSpell->NameHash != SPELL_HASH_BINDING_HEAL &&
-								CastingSpell->NameHash != SPELL_HASH_GREATER_HEAL)
+								CastingSpell->NameHash != SPELL_HASH_GREATER_HEAL )
 								continue;
 						}break;
 						case 5530:
 						{
 							//warrior/rogue mace specialization can trigger only when using maces
 							Item *it;
-							if(static_cast<Player*>(this)->GetItemInterface())
+							if( static_cast< Player* >( this )->GetItemInterface())
 							{
-								it = static_cast<Player*>(this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-								if(it && it->GetProto())
+								it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+								if( it && it->GetProto() )
 								{
 									uint32 reqskill=GetSkillByProto(it->GetProto()->Class,it->GetProto()->SubClass);
-									if(reqskill!=SKILL_MACES && reqskill!=SKILL_2H_MACES)
+									if( reqskill != SKILL_MACES && reqskill != SKILL_2H_MACES )
 										continue;
 								}
-								else continue; //no weapon no joy
+								else
+									continue; //no weapon no joy
 							}
-							else continue; //no weapon no joy
+							else
+								continue; //no weapon no joy
 							//let's recalc chance to cast since we have a full 100 all time on this one
 							//how lame to get talentpointlevel for this spell :(
 //							float chance=it->GetProto()->Delay*100*talentlevel/60000;
-							float chance=float(it->GetProto()->Delay)*float(talentlevel)/600.0f;
-							if(!Rand(chance))
+							float chance = float( it->GetProto()->Delay ) * float( talentlevel ) / 600.0f;
+							if( !Rand( chance ) )
 								continue;
 						}break;
 						case 4350:
 						{
 							//sword specialization
-							if(static_cast<Player*>(this)->GetItemInterface())
+							if( static_cast< Player* >( this )->GetItemInterface())
 							{
 								Item *it;
-								it = static_cast<Player*>(this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
-								if(it && it->GetProto())
+								it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+								if( it && it->GetProto() )
 								{
-									uint32 reqskill=GetSkillByProto(it->GetProto()->Class,it->GetProto()->SubClass);
-									if(reqskill!=SKILL_SWORDS && reqskill!=SKILL_2H_SWORDS)
+									uint32 reqskill=GetSkillByProto( it->GetProto()->Class, it->GetProto()->SubClass );
+									if( reqskill != SKILL_SWORDS && reqskill != SKILL_2H_SWORDS )
 										continue;
 								}
-								else continue; //no weapon no joy
+								else
+									continue; //no weapon no joy
 							}
-							else continue; //no weapon no joy
+							else
+								continue; //no weapon no joy
 						}break;
 						case 12721:
 						{
 							//deep wound requires a melee weapon
-							if(static_cast<Player*>(this)->GetItemInterface())
+							if( static_cast< Player* >( this )->GetItemInterface())
 							{
 								Item *it;
-								it = static_cast<Player*>(this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+								it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
 								if(it && it->GetProto())
 								{
 									//class 2 means weapons ;)
@@ -828,9 +832,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						{
 							//let's recalc chance to cast since we have a full 100 all time on this one
 							Item *it;
-							if(static_cast<Player*>(this)->GetItemInterface())
+							if(static_cast< Player* >( this )->GetItemInterface())
 							{
-								it = static_cast<Player*>(this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+								it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
 								if(!(it && it->GetProto()))
 									continue; //no weapon no joy
 							}
@@ -1166,7 +1170,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								//we have to recalc the value of this spell
 								SpellEntry *spellInfo = dbcSpell.LookupEntry(origId);
 								uint32 AP_owerride=GetAP() + spellInfo->EffectBasePoints[0]+1;
-								uint32 dmg = static_cast<Player*>(this)->GetMainMeleeDamage(AP_owerride);
+								uint32 dmg = static_cast< Player* >( this )->GetMainMeleeDamage(AP_owerride);
 								SpellEntry *sp_for_the_logs = dbcSpell.LookupEntry(spellId);
 								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
 								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
@@ -1190,7 +1194,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								int32 proc_Chance;
 								//chance is based actually on combopoint count and not 100% always 
 								if( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE && IsPlayer())
-									proc_Chance = static_cast<Player*>(this)->m_comboPoints*ospinfo->EffectBasePoints[1];
+									proc_Chance = static_cast< Player* >( this )->m_comboPoints*ospinfo->EffectBasePoints[1];
 								else continue;
 								if(!Rand(proc_Chance))
 									continue;
@@ -1709,10 +1713,10 @@ void Unit::RegenerateHealth()
 		// These only NOT in combat
 		if(!CombatStatus.IsInCombat())
 		{
-			static_cast<Player*>(this)->RegenerateHealth(false);
+			static_cast< Player* >( this )->RegenerateHealth(false);
 		}
 		else
-			static_cast<Player*>(this)->RegenerateHealth(true);
+			static_cast< Player* >( this )->RegenerateHealth(true);
 	}
 	else
 	{
@@ -1740,10 +1744,10 @@ void Unit::RegeneratePower(bool isinterrupted)
 		switch(powertype)
 		{
 		case POWER_TYPE_MANA:
-			static_cast<Player*>(this)->RegenerateMana(isinterrupted);
+			static_cast< Player* >( this )->RegenerateMana(isinterrupted);
 			break;
 		case POWER_TYPE_ENERGY:
-			static_cast<Player*>(this)->RegenerateEnergy();
+			static_cast< Player* >( this )->RegenerateEnergy();
 			break;
 
 		case POWER_TYPE_RAGE:
@@ -1752,7 +1756,7 @@ void Unit::RegeneratePower(bool isinterrupted)
 				if(!CombatStatus.IsInCombat())
 				{
 					m_P_regenTimer = 3000;
-					static_cast<Player*>(this)->LooseRage();
+					static_cast< Player* >( this )->LooseRage();
 				}
 			}break;
 		}
@@ -1777,7 +1781,7 @@ void Unit::RegeneratePower(bool isinterrupted)
 
 		// druids regen mana when shapeshifted
 		if(getClass() == DRUID && powertype != POWER_TYPE_MANA)
-			static_cast<Player*>(this)->RegenerateMana(isinterrupted);
+			static_cast< Player* >( this )->RegenerateMana(isinterrupted);
 	}
 	else
 	{
@@ -1938,9 +1942,9 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 			SubClassSkill = SKILL_UNARMED;
 
 		//chances in feral form don't depend on weapon skill
-		if(static_cast<Player*>(this)->IsInFeralForm()) 
+		if(static_cast< Player* >( this )->IsInFeralForm()) 
 		{
-			uint8 form = static_cast<Player*>(this)->GetShapeShift();
+			uint8 form = static_cast< Player* >( this )->GetShapeShift();
 			if(form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
 			{
 				SubClassSkill = SKILL_FERAL_COMBAT;
@@ -2062,7 +2066,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 	if(!isInFront(pVictim))
 		if(IsPlayer())
 		{
-			static_cast<Player*>(this)->GetSession()->OutPacket(SMSG_ATTACKSWING_BADFACING);
+			static_cast< Player* >( this )->GetSession()->OutPacket(SMSG_ATTACKSWING_BADFACING);
 			return;
 		}
 //==========================================================================================
@@ -2184,9 +2188,9 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 			SubClassSkill = SKILL_UNARMED;
 
 		//chances in feral form don't depend on weapon skill
-		if(static_cast<Player*>(this)->IsInFeralForm()) 
+		if(static_cast< Player* >( this )->IsInFeralForm()) 
 		{
-			uint8 form = static_cast<Player*>(this)->GetShapeShift();
+			uint8 form = static_cast< Player* >( this )->GetShapeShift();
 			if(form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
 			{
 				SubClassSkill = SKILL_FERAL_COMBAT;
@@ -2583,11 +2587,11 @@ else
 					{
 						if( weapon_damage_type != RANGED )
 						{
-							float critextra=float(static_cast<Player*>(this)->m_modphyscritdmgPCT);
+							float critextra=float(static_cast< Player* >( this )->m_modphyscritdmgPCT);
 							dmg.full_damage += int32((float(dmg.full_damage)*critextra/100.0f));
 						}
 						if(!pVictim->IsPlayer())
-							dmg.full_damage += float2int32(dmg.full_damage*static_cast<Player*>(this)->IncreaseCricticalByTypePCT[((Creature*)pVictim)->GetCreatureName() ? ((Creature*)pVictim)->GetCreatureName()->Type : 0]);
+							dmg.full_damage += float2int32(dmg.full_damage*static_cast< Player* >( this )->IncreaseCricticalByTypePCT[((Creature*)pVictim)->GetCreatureName() ? ((Creature*)pVictim)->GetCreatureName()->Type : 0]);
 					//sLog.outString( "DEBUG: After IncreaseCricticalByTypePCT: %u" , dmg.full_damage );
 					}
 
@@ -2842,7 +2846,7 @@ else
 //==========================================================================================
 
 	if(this->IsPlayer() && ability)
-		static_cast<Player*>(this)->m_casted_amount[dmg.school_type]=(uint32)(realdamage+abs);
+		static_cast< Player* >( this )->m_casted_amount[dmg.school_type]=(uint32)(realdamage+abs);
 	if(realdamage)
 	{
 		DealDamage(pVictim, realdamage, 0, targetEvent, 0);
@@ -2876,14 +2880,14 @@ else
 		}
 		else
 		{
-			 static_cast<Player*>(this)->GetItemInterface()->ReduceItemDurability();
+			 static_cast< Player* >( this )->GetItemInterface()->ReduceItemDurability();
 		}
 	}
 	else
 	{
 		if(this->IsPlayer())//not pvp
 		{
-			static_cast<Player*>(this)->GetItemInterface()->ReduceItemDurability();
+			static_cast< Player* >( this )->GetItemInterface()->ReduceItemDurability();
 			Player *pr = ((Player*)this);
 			if(Rand(pr->GetSkillUpChance(SubClassSkill)*sWorld.getRate(RATE_SKILLCHANCE)))
 			{
@@ -4493,11 +4497,11 @@ void Unit::UpdateSpeed(bool delay /* = false */)
 	if(IsPlayer())
 	{
 		if(delay)
-			static_cast<Player*>(this)->resend_speed = delay;
+			static_cast< Player* >( this )->resend_speed = delay;
 		else
 		{
-			static_cast<Player*>(this)->SetPlayerSpeed(RUN, m_runSpeed);
-			static_cast<Player*>(this)->SetPlayerSpeed(FLY, m_flySpeed);
+			static_cast< Player* >( this )->SetPlayerSpeed(RUN, m_runSpeed);
+			static_cast< Player* >( this )->SetPlayerSpeed(FLY, m_flySpeed);
 		}
 	}
 }
@@ -4620,7 +4624,7 @@ void Unit::Root()
 
 	if(m_objectTypeId == TYPEID_PLAYER)
 	{
-		static_cast<Player*>(this)->SetMovement(MOVE_ROOT, 1);
+		static_cast< Player* >( this )->SetMovement(MOVE_ROOT, 1);
 	}
 	else
 	{
@@ -4635,7 +4639,7 @@ void Unit::Unroot()
 
 	if(m_objectTypeId == TYPEID_PLAYER)
 	{
-		static_cast<Player*>(this)->SetMovement(MOVE_UNROOT, 5);
+		static_cast< Player* >( this )->SetMovement(MOVE_UNROOT, 5);
 	}
 	else
 	{
@@ -5003,7 +5007,7 @@ void Unit::EnableFlight(bool delay /* = false */)
 		*data << GetNewGUID();
 		*data << uint32(2);
 		SendMessageToSet(data, false);
-		static_cast<Player*>(this)->delayedPackets.add(data);
+		static_cast< Player* >( this )->delayedPackets.add(data);
 		((Player*)this)->m_setflycheat = true;
 	}
 }
@@ -5026,7 +5030,7 @@ void Unit::DisableFlight(bool delay /* = false */)
 		*data << GetNewGUID();
 		*data << uint32(5);
 		SendMessageToSet(data, false);
-		static_cast<Player*>(this)->delayedPackets.add(data);
+		static_cast< Player* >( this )->delayedPackets.add(data);
 		((Player*)this)->m_setflycheat = false;
 	}
 }

@@ -1164,12 +1164,13 @@ ASCENT_INLINE bool IsInrange(Object * o1,Object * o2,float square_r)
 
 ASCENT_INLINE bool TargetTypeCheck(Object *obj,uint32 ReqCreatureTypeMask)
 {
-	if(!ReqCreatureTypeMask)
+	if( !ReqCreatureTypeMask )
 		return true;
-	if(obj->GetTypeId()== TYPEID_UNIT)
+
+	if( obj->GetTypeId() == TYPEID_UNIT )
 	{
-		CreatureInfo *inf = ((Creature*)(obj))->GetCreatureName();
-		if(!inf || !(1<<(inf->Type-1) & ReqCreatureTypeMask))
+		CreatureInfo* inf = static_cast< Creature* >( obj )->GetCreatureName();
+		if( inf == NULL || !( 1 << ( inf->Type - 1 ) & ReqCreatureTypeMask ) )
 			return false;
 	}
 	else if(obj->GetTypeId() == TYPEID_PLAYER && !(UNIT_TYPE_HUMANOID_BIT & ReqCreatureTypeMask))

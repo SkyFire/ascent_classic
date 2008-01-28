@@ -93,7 +93,7 @@ uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 	if(pAttacker->IsPlayer())
 	max_level = pAttacker->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
 	else if(pAttacker->IsPet())
-	max_level = ((Pet*)pAttacker)->GetPetOwner()->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
+	max_level = static_cast< Pet* >( pAttacker )->GetPetOwner()->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL);
 
 	if(pAttacker->getLevel() >= max_level)
 	return 0;

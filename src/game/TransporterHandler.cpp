@@ -408,7 +408,7 @@ Transporter::~Transporter()
 	for(TransportNPCMap::iterator itr = m_npcs.begin(); itr != m_npcs.end(); ++itr)
 	{
 		if(itr->second->GetTypeId()==TYPEID_UNIT)
-			delete ((Creature*)itr->second)->m_transportPosition;
+			delete static_cast< Creature* >( itr->second )->m_transportPosition;
 
 		delete itr->second;
 	}
@@ -488,7 +488,7 @@ Creature * Transporter::GetCreature(uint32 Guid)
 	if(itr==m_npcs.end())
 		return NULL;
 	if(itr->second->GetTypeId()==TYPEID_UNIT)
-		return ((Creature*)itr->second);
+		return static_cast< Creature* >( itr->second );
 	else
 		return NULL;
 }

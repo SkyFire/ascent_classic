@@ -276,7 +276,7 @@ void MapMgr::PushObject(Object *obj)
 			break;
 
 		case HIGHGUID_PET:
-			m_PetStorage[obj->GetGUIDLow()] = (Pet*)obj;
+			m_PetStorage[obj->GetGUIDLow()] = static_cast< Pet* >( obj );
 			break;
 
 		case HIGHGUID_DYNAMICOBJECT:
@@ -337,7 +337,7 @@ void MapMgr::PushStaticObject(Object *obj)
 			break;
 
 		case HIGHGUID_PET:
-			m_PetStorage[obj->GetGUIDLow()] = (Pet*)obj;
+			m_PetStorage[obj->GetGUIDLow()] = static_cast< Pet* >( obj );
 			break;
 
 		case HIGHGUID_DYNAMICOBJECT:

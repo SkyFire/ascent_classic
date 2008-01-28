@@ -847,7 +847,7 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 				case 27:{ // target is owner of pet
 					// please correct this if not correct does the caster variablen need a Pet caster variable?
 						if(u_caster && u_caster->IsPet())
-							store_buff->m_unitTarget = ((Pet*)u_caster)->GetPetOwner()->GetGUID();
+							store_buff->m_unitTarget = static_cast< Pet* >( u_caster )->GetPetOwner()->GetGUID();
 					}break;
 				case EFF_TARGET_MINION:
 				case 73:
@@ -1193,12 +1193,12 @@ void Spell::AddStartCooldown()
 
 void Spell::cast(bool check)
 {
-	if(duelSpell && (
-		(p_caster && p_caster->GetDuelState() != DUEL_STATE_STARTED) ||
-		(u_caster && u_caster->IsPet() && ((Pet*)u_caster)->GetPetOwner() && ((Pet*)u_caster)->GetPetOwner()->GetDuelState() != DUEL_STATE_STARTED)))
+	if( duelSpell && (
+		( p_caster != NULL && p_caster->GetDuelState() != DUEL_STATE_STARTED ) ||
+		( u_caster != NULL && u_caster->IsPet() && static_cast< Pet* >( u_caster )->GetPetOwner() && static_cast< Pet* >( u_caster )->GetPetOwner()->GetDuelState() != DUEL_STATE_STARTED ) ) )
 	{
 		// Can't cast that!
-		SendInterrupted(SPELL_FAILED_TARGET_FRIENDLY);
+		SendInterrupted( SPELL_FAILED_TARGET_FRIENDLY );
 		finish();
 		return;
 	}

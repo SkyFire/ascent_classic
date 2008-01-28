@@ -229,17 +229,17 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 	// Dueling is already catered for
 	AreaTable *atA;
 	AreaTable *atB;
-	if(objA->IsPet() && ((Pet*)objA)->GetPetOwner())
-		atA = dbcArea.LookupEntry(static_cast<Pet *>(objA)->GetPetOwner()->GetAreaID());
-	else if (objA->IsPlayer())
-		atA = dbcArea.LookupEntry(static_cast<Player *>(objA)->GetAreaID());
+	if( objA->IsPet() && static_cast< Pet* >( objA )->GetPetOwner() )
+		atA = dbcArea.LookupEntry( static_cast< Pet* >( objA )->GetPetOwner()->GetAreaID() );
+	else if( objA->IsPlayer() )
+		atA = dbcArea.LookupEntry( static_cast< Player* >( objA )->GetAreaID() );
 	else
 		atA = NULL;
 
-	if(objB->IsPet() && ((Pet*)objB)->GetPetOwner())
-		atB = dbcArea.LookupEntry(static_cast<Pet *>(objB)->GetPetOwner()->GetAreaID());
-	else if (objB->IsPlayer())
-		atB = dbcArea.LookupEntry(static_cast<Player *>(objB)->GetAreaID());
+	if( objB->IsPet() && static_cast< Pet* >( objB )->GetPetOwner() )
+		atB = dbcArea.LookupEntry( static_cast< Pet* >( objB )->GetPetOwner()->GetAreaID() );
+	else if( objB->IsPlayer() )
+		atB = dbcArea.LookupEntry( static_cast< Player* >( objB )->GetAreaID() );
 	else
 		atB = NULL;
 
