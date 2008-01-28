@@ -47,7 +47,7 @@ Unit::Unit()
 	
 	//DK:modifiers
 	PctRegenModifier = 0;
-	for (uint32 x=0;x<4;x++)
+	for( uint32 x = 0; x < 4; x++ )
 	{
 		PctPowerRegenModifier[x] = 1;
 	}
@@ -573,6 +573,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 		if( CastingSpell != NULL )
 		{
 			//this is to avoid spell proc on spellcast loop. We use dummy that is same for both spells
+			//if( CastingSpell->Id == itr2->spellId )
 			if( CastingSpell->Id == itr2->origId || CastingSpell->Id == itr2->spellId )
 			{
 				//printf("WOULD CRASH HERE ON PROC: CastingId: %u, OrigId: %u, SpellId: %u\n", CastingSpell->Id, itr2->origId, itr2->spellId);
