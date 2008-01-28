@@ -2736,39 +2736,43 @@ void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 	//these are not pets. Just some creatures that will fight on your side. 
 	//They follow you and attack your target but you cannot command them
 	//number of creatures is actualy dmg (the usual formula), sometimes =3 sometimes =1
-	uint32 cr_entry=m_spellInfo->EffectMiscValue[i];
-	CreatureProto * proto = CreatureProtoStorage.LookupEntry(cr_entry);
-	CreatureInfo * info = CreatureNameStorage.LookupEntry(cr_entry);
-	if(!proto || !info)
+	uint32 cr_entry = m_spellInfo->EffectMiscValue[i];
+
+	CreatureProto* proto = CreatureProtoStorage.LookupEntry( cr_entry );
+	CreatureInfo* info = CreatureNameStorage.LookupEntry( cr_entry );
+
+	if( proto == NULL || info == NULL )
 	{
-		sLog.outDetail("Warning : Missing summon creature template %u used by spell %u!",cr_entry,m_spellInfo->Id);
+		sLog.outDetail( "Warning : Missing summon creature template %u used by spell %u!", cr_entry, m_spellInfo->Id );
 		return;
 	}
-	float angle_for_each_spawn=-float(M_PI)*2/damage;
-	for(int i=0;i<damage;i++)
+
+	float angle_for_each_spawn = -float(M_PI) * 2 / damage;
+
+	for( int i = 0; i < damage; i++ )
 	{
-		float m_fallowAngle=angle_for_each_spawn*i;
-		float x = u_caster->GetPositionX()+(3*(cosf(m_fallowAngle+u_caster->GetOrientation())));
-		float y = u_caster->GetPositionY()+(3*(sinf(m_fallowAngle+u_caster->GetOrientation())));
+		float m_fallowAngle = angle_for_each_spawn * i;
+		float x = u_caster->GetPositionX() + ( 3 * ( cosf( m_fallowAngle + u_caster->GetOrientation() ) ) );
+		float y = u_caster->GetPositionY() + ( 3 * ( sinf( m_fallowAngle + u_caster->GetOrientation() ) ) );
 		float z = u_caster->GetPositionZ();
-		Creature * p = u_caster->GetMapMgr()->CreateCreature();
-		p->SetInstanceID(u_caster->GetMapMgr()->GetInstanceID());
-		//ASSERT(p);
-		p->Load(proto, x, y, z);
-		p->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID());
-        p->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
-        p->SetZoneId(m_caster->GetZoneId());
-		p->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,u_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
+
+		Creature* p = u_caster->GetMapMgr()->CreateCreature();
+
+		p->SetInstanceID( u_caster->GetMapMgr()->GetInstanceID() );
+		p->Load( proto, x, y, z );
+		p->SetUInt64Value( UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID() );
+        p->SetUInt64Value( UNIT_FIELD_CREATEDBY, m_caster->GetGUID() );
+        p->SetZoneId( m_caster->GetZoneId() );
+		p->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, u_caster->GetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE ) );
 		p->_setFaction();
+		p->GetAIInterface()->Init( p,AITYPE_PET,MOVEMENTTYPE_NONE, u_caster );
+		p->GetAIInterface()->SetUnitToFollow( u_caster );
+		p->GetAIInterface()->SetUnitToFollowAngle( m_fallowAngle );
+		p->GetAIInterface()->SetFollowDistance( 3.0f );
+		p->PushToWorld( u_caster->GetMapMgr() );
 
-		p->GetAIInterface()->Init(p,AITYPE_PET,MOVEMENTTYPE_NONE,u_caster);
-		p->GetAIInterface()->SetUnitToFollow(u_caster);
-		p->GetAIInterface()->SetUnitToFollowAngle(m_fallowAngle);
-		p->GetAIInterface()->SetFollowDistance(3.0f);
-
-		p->PushToWorld(u_caster->GetMapMgr());
 		//make sure they will be desumonized (roxor)
-		sEventMgr.AddEvent(p, &Creature::SummonExpire, EVENT_SUMMON_EXPIRE, GetDuration(), 1,0);
+		sEventMgr.AddEvent( p, &Creature::SummonExpire, EVENT_SUMMON_EXPIRE, GetDuration(), 1, 0 );
 	}
 }
 
@@ -2778,10 +2782,10 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 	if(m_caster->GetTypeId() != TYPEID_PLAYER)
 	{
 		// Check targets
-		if(m_targets.m_unitTarget)
+		if( m_targets.m_unitTarget )
 		{
 			target = objmgr.GetPlayer((uint32)m_targets.m_unitTarget);
-			if(!target) 
+			if( target == NULL ) 
 				return;
 		}
 		else
@@ -2789,38 +2793,42 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 	}
 	else
 	{
-		target = ((Player*)m_caster);
+		target = static_cast< Player* >( m_caster );
 	}
 	
-	uint32 skill=m_spellInfo->EffectMiscValue[i];
-	if(skill == 242) skill = SKILL_LOCKPICKING; // somehow for lockpicking misc is different than the skill :s
-	skilllineentry *sk=dbcSkillLine.LookupEntry(skill);
-	if(!sk)
+	uint32 skill = m_spellInfo->EffectMiscValue[i];
+	if( skill == 242 )
+		skill = SKILL_LOCKPICKING; // somehow for lockpicking misc is different than the skill :s
+
+	skilllineentry* sk = dbcSkillLine.LookupEntry( skill );
+
+	if( sk == NULL )
 		return;
+
 	uint32 max = 1;
-	switch (sk->type)
+	switch( sk->type )
 	{
 		case SKILL_TYPE_PROFESSION:
 		case SKILL_TYPE_SECONDARY:
-			max=damage*75;
+			max = damage * 75;
 			break;
 		case SKILL_TYPE_WEAPON:
-			max=5*target->getLevel();
+			max = 5 * target->getLevel();
 			break;
 		case SKILL_TYPE_CLASS:
 		case SKILL_TYPE_ARMOR:
-			if(skill == SKILL_LOCKPICKING)
-				max=damage*75;
+			if( skill == SKILL_LOCKPICKING )
+				max = damage * 75;
 			else
-				max=1;
+				max = 1;
 			break;
 		default: //u cant learn other types in game
 			return;
 	};
 
-	if(target->_HasSkillLine(skill))
+	if( target->_HasSkillLine( skill ) )
 	{
-		target->_ModifySkillMaximum(skill, max);
+		target->_ModifySkillMaximum( skill, max );
 	}		
 	else
 	{
@@ -2828,79 +2836,81 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 		/*if((m_spellInfo->Attributes & 64) && playerTarget->m_TeleportState == 1)
 			return;*/
 
-		if(sk->type==SKILL_TYPE_PROFESSION)
-			target->ModUInt32Value(PLAYER_CHARACTER_POINTS2,-1);
+		if( sk->type == SKILL_TYPE_PROFESSION )
+			target->ModUInt32Value( PLAYER_CHARACTER_POINTS2, -1 );
 	  
-		if(skill == SKILL_RIDING)
-			target->_AddSkillLine(skill, max, max);
+		if( skill == SKILL_RIDING )
+			target->_AddSkillLine( skill, max, max );
 		else
-			target->_AddSkillLine(skill, 1, max);
+			target->_AddSkillLine( skill, 1, max );
 	}
-	switch (skill)//professions fix, for unknow reason when u learn profession it 
-			//does not teach find herbs for herbalism etc. moreover there is no spell
-			//in spell.dbc that would teach u this. It means blizz does it in some tricky way too
-		{
-			case SKILL_ALCHEMY:
-				target->addSpell(2330);//Minor Healing Potion
-				target->addSpell(2329);//Elixir of Lion's Strength
-				target->addSpell(7183);//Elixir of Minor Defense
-				break;
-			case SKILL_ENCHANTING:
-				target->addSpell(7418);//Enchant Bracer - Minor Health
-				target->addSpell(7420);//Enchant Chest - Minor Health
-				target->addSpell(7421);//Runed Copper Rod
-				target->addSpell(13262);//Disenchant
-				break;
-			case SKILL_HERBALISM:
-				target->addSpell(2383);//find herbs
-				break;
-			case SKILL_MINING:
-				target->addSpell(2657);//smelt copper
-				target->addSpell(2656);//smelting
-				target->addSpell(2580);//find minerals
-				break;
-			case SKILL_FIRST_AID:
-				target->addSpell(3275);//Linen Bandage
-				break;
-			case SKILL_TAILORING:
-				target->addSpell(2963);//Bolt of Linen Cloth
-				target->addSpell(2964);//bolt of woolen cloth
-				target->addSpell(2387);//Linen Cloak
-				target->addSpell(2393);//White Linen Shirt
-				target->addSpell(3915);//Brown Linen Shirt
-				target->addSpell(12044);//Simple Linen Pants
-				break;
-			case SKILL_LEATHERWORKING:
-				target->addSpell(2149);//Handstitched Leather Boots
-				target->addSpell(2152);//Light Armor Kit
-				target->addSpell(2881);//Light Leather
-				target->addSpell(7126);//Handstitched Leather Vest
-				target->addSpell(9058);//Handstitched Leather Cloak
-				target->addSpell(9059);//Handstitched Leather Bracers
-				break;
-			case SKILL_ENGINERING:
-				target->addSpell(3918);//Rough Blasting Powder
-				target->addSpell(3919);//Rough Dynamite
-				target->addSpell(3920);//Crafted Light Shot
-				break;
-			case SKILL_COOKING:
-				target->addSpell(2538);//Charred Wolf Meat
-				target->addSpell(2540);//Roasted Boar Meat
-				target->addSpell(818);//Basic Campfire
-				break;
-			case SKILL_BLACKSMITHING:
-				target->addSpell(2660);//Rough Sharpening Stone
-				target->addSpell(2663);//Copper Bracers
-				target->addSpell(12260);//Rough Copper Vest
-				target->addSpell(2662);//Copper Chain Pants
-				break;
-			case SKILL_JEWELCRAFTING:
-				target->addSpell(25255);	// Delicate Copper Wire
-				target->addSpell(25493);	
-				target->addSpell(26925);	
-				target->addSpell(32259);
-				break;
-		};
+
+	//professions fix, for unknow reason when u learn profession it 
+	//does not teach find herbs for herbalism etc. moreover there is no spell
+	//in spell.dbc that would teach u this. It means blizz does it in some tricky way too
+	switch( skill )
+	{
+		case SKILL_ALCHEMY:
+			target->addSpell( 2330 );//Minor Healing Potion
+			target->addSpell( 2329 );//Elixir of Lion's Strength
+			target->addSpell( 7183 );//Elixir of Minor Defense
+			break;
+		case SKILL_ENCHANTING:
+			target->addSpell( 7418 );//Enchant Bracer - Minor Health
+			target->addSpell( 7420 );//Enchant Chest - Minor Health
+			target->addSpell( 7421 );//Runed Copper Rod
+			target->addSpell( 13262 );//Disenchant
+			break;
+		case SKILL_HERBALISM:
+			target->addSpell( 2383 );//find herbs
+			break;
+		case SKILL_MINING:
+			target->addSpell( 2657 );//smelt copper
+			target->addSpell( 2656 );//smelting
+			target->addSpell( 2580 );//find minerals
+			break;
+		case SKILL_FIRST_AID:
+			target->addSpell( 3275 );//Linen Bandage
+			break;
+		case SKILL_TAILORING:
+			target->addSpell( 2963 );//Bolt of Linen Cloth
+			target->addSpell( 2964 );//bolt of woolen cloth
+			target->addSpell( 2387 );//Linen Cloak
+			target->addSpell( 2393 );//White Linen Shirt
+			target->addSpell( 3915 );//Brown Linen Shirt
+			target->addSpell( 12044 );//Simple Linen Pants
+			break;
+		case SKILL_LEATHERWORKING:
+			target->addSpell( 2149 );//Handstitched Leather Boots
+			target->addSpell( 2152 );//Light Armor Kit
+			target->addSpell( 2881 );//Light Leather
+			target->addSpell( 7126 );//Handstitched Leather Vest
+			target->addSpell( 9058 );//Handstitched Leather Cloak
+			target->addSpell( 9059 );//Handstitched Leather Bracers
+			break;
+		case SKILL_ENGINERING:
+			target->addSpell( 3918 );//Rough Blasting Powder
+			target->addSpell( 3919 );//Rough Dynamite
+			target->addSpell( 3920 );//Crafted Light Shot
+			break;
+		case SKILL_COOKING:
+			target->addSpell( 2538 );//Charred Wolf Meat
+			target->addSpell( 2540 );//Roasted Boar Meat
+			target->addSpell( 818 );//Basic Campfire
+			break;
+		case SKILL_BLACKSMITHING:
+			target->addSpell( 2660 );//Rough Sharpening Stone
+			target->addSpell( 2663 );//Copper Bracers
+			target->addSpell( 12260 );//Rough Copper Vest
+			target->addSpell( 2662 );//Copper Chain Pants
+			break;
+		case SKILL_JEWELCRAFTING:
+			target->addSpell( 25255 );// Delicate Copper Wire
+			target->addSpell( 25493 );	
+			target->addSpell( 26925 );	
+			target->addSpell( 32259 );
+			break;
+	};
 }
 
 void Spell::SpellEffectSummonObject(uint32 i)

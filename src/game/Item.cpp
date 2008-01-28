@@ -640,6 +640,9 @@ void Item::RemoveEnchantment(uint32 EnchantmentSlot)
 
 void Item::ApplyEnchantmentBonus(uint32 Slot, bool Apply)
 {
+	if( m_owner == NULL )
+		return;
+
 	EnchantmentMap::iterator itr = Enchantments.find(Slot);
 	if(itr == Enchantments.end())
 		return;

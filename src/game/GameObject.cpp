@@ -565,9 +565,9 @@ void GameObject::AddQuest(QuestRelation *Q)
 void GameObject::DeleteQuest(QuestRelation *Q)
 {
 	list<QuestRelation *>::iterator it;
-	for ( it = m_quests->begin(); it != m_quests->end(); ++it )
+	for( it = m_quests->begin(); it != m_quests->end(); ++it )
 	{
-		if (((*it)->type == Q->type) && ((*it)->qst == Q->qst ))
+		if( ( (*it)->type == Q->type ) && ( (*it)->qst == Q->qst ) )
 		{
 			delete (*it);
 			m_quests->erase(it);
@@ -578,12 +578,11 @@ void GameObject::DeleteQuest(QuestRelation *Q)
 
 Quest* GameObject::FindQuest(uint32 quest_id, uint8 quest_relation)
 {   
-	list<QuestRelation *>::iterator it;
-	for (it = m_quests->begin(); it != m_quests->end(); ++it)
+	list< QuestRelation* >::iterator it;
+	for( it = m_quests->begin(); it != m_quests->end(); ++it )
 	{
-		QuestRelation *ptr = (*it);
-
-		if ((ptr->qst->id == quest_id) && (ptr->type & quest_relation))
+		QuestRelation* ptr = (*it);
+		if( ( ptr->qst->id == quest_id ) && ( ptr->type & quest_relation ) )
 		{
 			return ptr->qst;
 		}
@@ -594,11 +593,10 @@ Quest* GameObject::FindQuest(uint32 quest_id, uint8 quest_relation)
 uint16 GameObject::GetQuestRelation(uint32 quest_id)
 {
 	uint16 quest_relation = 0;
-	list<QuestRelation *>::iterator it;
-
-	for (it = m_quests->begin(); it != m_quests->end(); ++it)
+	list< QuestRelation* >::iterator it;
+	for( it = m_quests->begin(); it != m_quests->end(); ++it )
 	{
-		if ((*it)->qst->id == quest_id)
+		if( (*it) != NULL && (*it)->qst->id == quest_id )
 		{
 			quest_relation |= (*it)->type;
 		}

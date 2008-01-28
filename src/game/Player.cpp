@@ -3501,36 +3501,46 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 	//TODO: FIXME: can there be negative resistances from items?
 	if( proto->FireRes )
 	{
-		if( apply )FlatResistanceModifierPos[2] += proto->FireRes;
-		else FlatResistanceModifierPos[2] -= proto->FireRes;
+		if( apply )
+			FlatResistanceModifierPos[2] += proto->FireRes;
+		else
+			FlatResistanceModifierPos[2] -= proto->FireRes;
 		CalcResistance( 2 );
 	}
 		
 	if( proto->NatureRes )
 	{
-		if( apply )FlatResistanceModifierPos[3] += proto->NatureRes;
-		else FlatResistanceModifierPos[3] -= proto->NatureRes;
+		if( apply )
+			FlatResistanceModifierPos[3] += proto->NatureRes;
+		else
+			FlatResistanceModifierPos[3] -= proto->NatureRes;
 		CalcResistance( 3 );
 	}
 
 	if( proto->FrostRes )
 	{
-		if( apply )FlatResistanceModifierPos[4] += proto->FrostRes;
-		else FlatResistanceModifierPos[4] -= proto->FrostRes;
+		if( apply )
+			FlatResistanceModifierPos[4] += proto->FrostRes;
+		else
+			FlatResistanceModifierPos[4] -= proto->FrostRes;
 		CalcResistance( 4 );	
 	}
 
 	if( proto->ShadowRes )
 	{
-		if( apply )FlatResistanceModifierPos[5] += proto->ShadowRes;
-		else FlatResistanceModifierPos[5] -= proto->ShadowRes;
+		if( apply )
+			FlatResistanceModifierPos[5] += proto->ShadowRes;
+		else
+			FlatResistanceModifierPos[5] -= proto->ShadowRes;
 		CalcResistance( 5 );	
 	}
 	 
 	if( proto->ArcaneRes )
 	{
-		if( apply )FlatResistanceModifierPos[6] += proto->ArcaneRes;
-		else FlatResistanceModifierPos[6] -= proto->ArcaneRes;
+		if( apply )
+			FlatResistanceModifierPos[6] += proto->ArcaneRes;
+		else
+			FlatResistanceModifierPos[6] -= proto->ArcaneRes;
 		CalcResistance( 6 );
 	}
 	
@@ -3538,30 +3548,30 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 	for( int i = 0; i < 10; i++ )
 	{
 		int32 val = proto->Stats[i].Value;
-		if( val == 0 ) continue;
+		if( val == 0 )
+			continue;
 		ModifyBonuses( proto->Stats[i].Type, apply ? val : -val );
 	}
 
 	// Damage
 	if( proto->Damage[0].Min )
 	{
-		if( proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_RANGEDRIGHT || 
-			proto->InventoryType == INVTYPE_THROWN )	
+		if( proto->InventoryType == INVTYPE_RANGED || proto->InventoryType == INVTYPE_RANGEDRIGHT || proto->InventoryType == INVTYPE_THROWN )	
 		{	
-			BaseRangedDamage[0]+=apply ? proto->Damage[0].Min : -proto->Damage[0].Min;
-			BaseRangedDamage[1]+=apply ? proto->Damage[0].Max : -proto->Damage[0].Max;
+			BaseRangedDamage[0] += apply ? proto->Damage[0].Min : -proto->Damage[0].Min;
+			BaseRangedDamage[1] += apply ? proto->Damage[0].Max : -proto->Damage[0].Max;
 		}
 		else
 		{
-			if(slot==EQUIPMENT_SLOT_OFFHAND)
+			if( slot == EQUIPMENT_SLOT_OFFHAND )
 			{
-				BaseOffhandDamage[0]=apply ? proto->Damage[0].Min : 0;
-				BaseOffhandDamage[1]=apply ? proto->Damage[0].Max : 0;
+				BaseOffhandDamage[0] = apply ? proto->Damage[0].Min : 0;
+				BaseOffhandDamage[1] = apply ? proto->Damage[0].Max : 0;
 			}
 			else
 			{
-				BaseDamage[0]=apply ? proto->Damage[0].Min : 1;
-				BaseDamage[1]=apply ? proto->Damage[0].Max : 1;
+				BaseDamage[0] = apply ? proto->Damage[0].Min : 1;
+				BaseDamage[1] = apply ? proto->Damage[0].Max : 1;
 			}
 		}
 	}
@@ -3572,7 +3582,7 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 		// Apply all enchantment bonuses
 		item->ApplyEnchantmentBonuses();
 
-		for (int k = 0; k < 5;k++)
+		for( int k = 0; k < 5; k++ )
 		{
 			if( item->GetProto()->Spells[k].Trigger == 1 )
 			{
@@ -3582,20 +3592,20 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 				targets.m_unitTarget = this->GetGUID();
 				spell->castedItemId = item->GetEntry();
 				spell->prepare( &targets );
-				if( spells->RequiredShapeShift && ( getClass()==DRUID || getClass()==WARRIOR ) )
-						m_SSSPecificSpells.insert(spells->Id);
+				if( spells->RequiredShapeShift && ( getClass() == DRUID || getClass() == WARRIOR ) )
+					m_SSSPecificSpells.insert( spells->Id );
 
 			}
 			else if( item->GetProto()->Spells[k].Trigger == 2 )
 			{
 				ProcTriggerSpell ts;
-				ts.origId=0;
-				ts.spellId=item->GetProto()->Spells[k].Id;
-				ts.procChance=5;
-				ts.caster=this->GetGUID();
-				ts.procFlags=PROC_ON_MELEE_ATTACK;
+				ts.origId = 0;
+				ts.spellId = item->GetProto()->Spells[k].Id;
+				ts.procChance = 5;
+				ts.caster = this->GetGUID();
+				ts.procFlags = PROC_ON_MELEE_ATTACK;
 				ts.deleted = false;
-				this->m_procSpells.push_front(ts);			
+				m_procSpells.push_front( ts );			
 			}
 		}
 	}
@@ -3633,7 +3643,7 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 		}
 	}
 	
-	if(!skip_stat_apply)
+	if( !skip_stat_apply )
 		UpdateStats();
 }
 
