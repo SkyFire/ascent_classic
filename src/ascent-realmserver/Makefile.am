@@ -3,7 +3,7 @@ INCLUDES += -I$(srcdir)/../../dep/src
 
 bin_PROGRAMS = ascent-realmserver
 
-ascent-realmserver_SOURCES = \
+ascent_realmserver_SOURCES = \
 ClientManager.h \
 ClusterManager.h \
 LogonCommClient.h \
@@ -29,11 +29,11 @@ RStdAfx.cpp \
 Session.cpp \
 WorkerServer.cpp \
 WorkerServerSocket.cpp \
-WorldSocket.cpp \
+WorldSocket.cpp 
 	
-ascent-realmserver_LDADD = -lshared -lzlib
+ascent_realmserver_LDADD = -lshared -lzlib
 
-ascent-realmserver_LDFLAGS = -L$(srcdir)/../shared \
+ascent_realmserver_LDFLAGS = -L$(srcdir)/../shared \
                -L$(srcdir)/../../dep/src/zlib \
-               -L$(srcdir)/../../dep/src \
+               -L$(srcdir)/../../dep/src 
                

@@ -3,7 +3,7 @@ INCLUDES += -I$(srcdir)/../../dep/src
 
 bin_PROGRAMS = ascent-world
 
-ascent-world_SOURCES = \
+ascent_world_SOURCES = \
     CollideInterface.cpp \
     CollideInterface.h \
     VoiceChatClientSocket.cpp \
@@ -178,8 +178,6 @@ ascent-world_SOURCES = \
     WorldSession.h \
     WorldSocket.cpp \
     WorldSocket.h \
-    CThreads.cpp \
-    CThreads.h \
     WorldRunnable.h \
     WorldRunnable.cpp \
     WordFilter.h \
@@ -194,9 +192,9 @@ ascent-world_SOURCES = \
 	ConsoleCommands.h \
 	ConsoleListener.cpp
 	
-ascent-world_LDADD = -lshared -lzlib -lpcre -lcollision
+ascent_world_LDADD = -lshared -lzlib -lpcre -lcollision
 
-ascent-world_LDFLAGS = -L$(srcdir)/../ascent-shared \
+ascent_world_LDFLAGS = -L$(srcdir)/../ascent-shared \
                -L$(srcdir)/../../dep/src/zlib \
                -L$(srcdir)/../../dep/src/pcre \
                -L$(srcdir)/../../dep/src \

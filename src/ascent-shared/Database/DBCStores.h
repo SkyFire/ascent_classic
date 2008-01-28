@@ -1031,11 +1031,12 @@ public:
 			if(*t == 's')
 			{
 				char ** new_ptr = (char**)dest_ptr;
+				static const char * null_str = "";
 				char * ptr;
 				if( val < m_stringlength )
 					ptr = m_stringData + val;
 				else
-					ptr = "";
+					ptr = (char*)null_str;
 
 				*new_ptr = ptr;
 				new_ptr++;

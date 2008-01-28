@@ -2,7 +2,7 @@ INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../ascent-shar
 
 bin_PROGRAMS = ascent-logonserver
 
-ascent-logonserver_SOURCES = \
+ascent_logonserver_SOURCES = \
 	AccountCache.cpp \
 	AccountCache.h \
 	AuthSocket.cpp \
@@ -22,8 +22,6 @@ ascent-logonserver_SOURCES = \
 	Main.h \
 	PeriodicFunctionCall_Thread.h
 
-logonserver_LDADD = -lshared -lzlib
-
-
-logonserver_LDFLAGS = -L$(srcdir)/../ascent-shared \
-               -L$(srcdir)/../../dep/src/zlib \
+ascent_logonserver_LDADD = -lshared -lzlib
+ascent_logonserver_LDFLAGS = -L$(srcdir)/../ascent-shared \
+               -L$(srcdir)/../../dep/src/zlib

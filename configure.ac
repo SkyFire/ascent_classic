@@ -10,9 +10,9 @@ AC_PREREQ(2.5)
 if test -d obj; then rm -rf obj; fi
 
 AM_CONFIG_HEADER( config.h )
-INCLUDES="-I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl"
+INCLUDES="-I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include"
 AC_SUBST(INCLUDES)
-LDFLAGS="-L/usr/lib/mysql"
+LDFLAGS="-L/usr/lib/mysql -L/usr/local/lib -L/usr/local/lib/mysql"
 AC_SUBST(LDFLAGS)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
@@ -210,10 +210,11 @@ AC_DEFINE_UNQUOTED([CONFDIR], "${sysconfdir}", "configdir")
 AC_CONFIG_FILES([
    ./Makefile
    src/Makefile
-   src/ascent/Makefile
-   src/shared/Makefile
-   src/logonserver/Makefile
-   src/game/Makefile
+   src/ascent-shared/Makefile
+   src/ascent-world/Makefile
+   src/ascent-logonserver/Makefile
+   src/ascent-voicechat/Makefile
+   src/ascent-realmserver/Makefile
    src/scripts/Makefile
    src/scripts/src/Makefile
    src/scripts/src/GossipScripts/Makefile
