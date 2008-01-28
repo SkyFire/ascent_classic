@@ -61,7 +61,9 @@
 				EnableFunctionLevelLinking="false"
 				EnableEnhancedInstructionSet="0"
 				FloatingPointModel="2"
-				PrecompiledHeaderFile=".\Release/realmserver.pch"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="RStdAfx.h"
+				PrecompiledHeaderFile="$(IntDir)/realmserver.pch"
 				AssemblerListingLocation="$(IntDir)\"
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\"
@@ -544,6 +546,14 @@
 		<File
 			RelativePath="..\..\src\ascent-realmserver\RStdAfx.cpp"
 			>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					UsePrecompiledHeader="1"
+				/>
+			</FileConfiguration>
 			<FileConfiguration
 				Name="Release|x64"
 				>
