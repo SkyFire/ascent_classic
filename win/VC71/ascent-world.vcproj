@@ -79,9 +79,9 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\game___Win32_Release"
-			IntermediateDirectory=".\game___Win32_Release"
-			ConfigurationType="4"
+			OutputDirectory=".\..\..\bin\Release"
+			IntermediateDirectory=".\ascent-world___Win32_Release"
+			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
 			CharacterSet="2"
@@ -95,7 +95,7 @@
 				WholeProgramOptimization="FALSE"
 				OptimizeForProcessor="0"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\dep\src;..\..\src\shared;..\..\src\logonserver"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\dep\src;..\..\src\ascent-shared"
 				PreprocessorDefinitions="WIN32,NDEBUG,_LIB;INTEL_COMPILER"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -104,10 +104,10 @@
 				EnableFunctionLevelLinking="FALSE"
 				EnableEnhancedInstructionSet="0"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderFile=".\Release/game.pch"
-				AssemblerListingLocation=".\game___Win32_Release/"
-				ObjectFile=".\game___Win32_Release/"
-				ProgramDataBaseFileName=".\game___Win32_Release/"
+				PrecompiledHeaderFile="$(IntDir)/game.pch"
+				AssemblerListingLocation="$(IntDir)/"
+				ObjectFile="$(IntDir)/"
+				ProgramDataBaseFileName="$(IntDir)/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -116,9 +116,15 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile=".\Release\game.lib"
-				SuppressStartupBanner="TRUE"/>
+				Name="VCLinkerTool"
+				AdditionalDependencies="ws2_32.lib libeay32.lib libmysql.lib dbghelp.lib"
+				OutputFile="$(OutDir)/ascent-world.exe"
+				AdditionalLibraryDirectories="..\..\dep\lib32"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/ascent-world.pdb"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -135,6 +141,8 @@
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
 			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
@@ -161,6 +169,12 @@
 				RelativePath="..\..\src\ascent-shared\CoreMemoryAllocator_Core.cpp">
 				<FileConfiguration
 					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						UsePrecompiledHeader="0"/>

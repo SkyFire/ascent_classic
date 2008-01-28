@@ -14,7 +14,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory=".\..\..\bin\Release"
-			IntermediateDirectory=".\realmserver___Win32_Release"
+			IntermediateDirectory=".\ascent-realmserver___Win32_Release"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -27,7 +27,7 @@
 				WholeProgramOptimization="FALSE"
 				OptimizeForProcessor="0"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\game;..\..\src\shared;..\..\src\ascent"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\ascent-shared"
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE;INTEL_COMPILER"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -35,10 +35,12 @@
 				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="FALSE"
 				EnableEnhancedInstructionSet="0"
-				PrecompiledHeaderFile=".\Release/realmserver.pch"
-				AssemblerListingLocation=".\realmserver___Win32_Release/"
-				ObjectFile=".\realmserver___Win32_Release/"
-				ProgramDataBaseFileName=".\realmserver___Win32_Release/"
+				UsePrecompiledHeader="3"
+				PrecompiledHeaderThrough="RStdAfx.h"
+				PrecompiledHeaderFile="$(IntDir)/realmserver.pch"
+				AssemblerListingLocation="$(IntDir)/"
+				ObjectFile="$(IntDir)/"
+				ProgramDataBaseFileName="$(IntDir)/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -50,20 +52,18 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib mswsock.lib"
-				OutputFile=".\..\..\bin\Release/realmserver.exe"
+				OutputFile=".\..\..\bin\Release/ascent-realmserver.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\dep\lib32"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\..\bin\Release/realmserver.pdb"
+				ProgramDatabaseFile=".\..\..\bin\Release/ascent-realmserver.pdb"
 				SubSystem="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				TypeLibraryName=".\..\..\bin\Release/realmserver.tlb"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib32\*.dll ..\..\bin\release
-"/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -254,6 +254,12 @@
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-realmserver\RStdAfx.cpp">
+			<FileConfiguration
+				Name="Release|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					UsePrecompiledHeader="1"/>
+			</FileConfiguration>
 			<FileConfiguration
 				Name="Debug|Win32">
 				<Tool
