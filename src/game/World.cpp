@@ -5714,7 +5714,8 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 20105 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = All_Seal_Groups_Combined | 8388608;
-/*	// paladin - Improved Hammer of Justice
+
+	/*// paladin - Improved Hammer of Justice
 	uint32 Hammer_of_Justice_group=0;
 	tsp = dbcSpell.LookupEntryForced( 853 ); //Hammer of Justice
 	if(tsp)
@@ -5731,13 +5732,17 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 24188 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = Hammer_of_Justice_group; 
-	// paladin - Improved Judgement
+	*/
+
+	/*// paladin - Improved Judgement
 	sp = dbcSpell.LookupEntryForced( 25956 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = judgement_group;
 	sp = dbcSpell.LookupEntryForced( 25957 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = judgement_group; */
+		sp->EffectSpellGroupRelation[0] = judgement_group;
+	*/
+
 	// paladin - Improved Sanctity Aura
 	sp = dbcSpell.LookupEntryForced( 31869 );
 	if( sp != NULL )
@@ -5945,6 +5950,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 16818 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1 | 4;
+
 	// Druid: Omen of Clarity
 	sp = dbcSpell.LookupEntryForced( 16864 );
 	if( sp != NULL )
@@ -5952,7 +5958,9 @@ bool World::SetInitialWorldSettings()
 		sp->procChance=100; //procchance dynamic. 3ppm
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
 	}
-//---------ITEMS-----------------
+
+	//---------ITEMS-----------------
+
 	//Solarian's Sapphire
 	sp = dbcSpell.LookupEntryForced(37536);
 	if( sp != NULL )
@@ -6565,9 +6573,7 @@ bool World::SetInitialWorldSettings()
 	//Item Set: Warbringer Battlegear
 	sp = dbcSpell.LookupEntryForced( 37518 );
 	if( sp != NULL )
-	{
 		sp->EffectSpellGroupRelation_high[0] = 4;
-	}
 
 	//all Drums 
 	sp = dbcSpell.LookupEntryForced( 35474 );
@@ -6585,6 +6591,14 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 35478 );
 	if( sp != NULL )
 		sp->RequiredShapeShift = 0;
+
+	//Paladin - Improved Lay on Hands
+	sp = dbcSpell.LookupEntryForced( 20234 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CAST_SPELL;
+	sp = dbcSpell.LookupEntryForced( 20235 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CAST_SPELL;
 
 	//windfury weapon changes. Start to hate these day by day
 	EnchantEntry* Enchantment;
@@ -6604,6 +6618,7 @@ bool World::SetInitialWorldSettings()
 			sp->maxstack = 1;
 		}
 	}
+
 	Enchantment = dbcEnchant.LookupEntryForced( 284 );
 	if( Enchantment != NULL )
 	{
@@ -6619,6 +6634,7 @@ bool World::SetInitialWorldSettings()
 			sp->maxstack = 1;
 		}
 	}
+
 	Enchantment = dbcEnchant.LookupEntryForced( 525 );
 	if( Enchantment != NULL )
 	{
@@ -6634,6 +6650,7 @@ bool World::SetInitialWorldSettings()
 			sp->maxstack = 1;
 		}
 	}
+
 	Enchantment = dbcEnchant.LookupEntryForced( 1669 );
 	if( Enchantment != NULL )
 	{
@@ -6649,6 +6666,7 @@ bool World::SetInitialWorldSettings()
 			sp->maxstack = 1;
 		}
 	}
+
 	Enchantment = dbcEnchant.LookupEntryForced( 2636 );
 	if( Enchantment != NULL )
 	{
@@ -6666,14 +6684,14 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//for test only
-	sp = dbcSpell.LookupEntryForced( 32796 );
-	if( sp != NULL )
-	{
+	//sp = dbcSpell.LookupEntryForced( 32796 );
+	//if( sp != NULL )
+	//{
 		//printf("!!!!!!hash %u \n",sp->NameHash);
 		//sp->procChance=100;
 		//SpellDuration *sd=sSpellDuration.LookupEntryForced(sp->DurationIndex);
 		//printf("iterruptflag %u, duration %u",sp->AuraInterruptFlags,GetDuration(sd));
-	}
+	//}
 
 	//improoved berserker stance should be triggered on berserker stance use
 	//sp = sSpellStore.LookupEntryForced(12704);

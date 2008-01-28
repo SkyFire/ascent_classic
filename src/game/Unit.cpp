@@ -1322,18 +1322,28 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 31893:
 							{
 								//we loose health depending on father of trigger spell when trigering this effect
-								int healthtoloose=ospinfo->EffectBasePoints[1]*GetUInt32Value(UNIT_FIELD_BASE_HEALTH)/100;
-								if(healthtoloose>(int)GetUInt32Value(UNIT_FIELD_HEALTH))
-									SetUInt32Value(UNIT_FIELD_HEALTH,1);
-								else ModUInt32Value(UNIT_FIELD_HEALTH,-(int32)healthtoloose);
+								int32 healthtoloose = ospinfo->EffectBasePoints[1] * GetUInt32Value( UNIT_FIELD_BASE_HEALTH ) / 100;
+								if( healthtoloose > (int32)GetUInt32Value( UNIT_FIELD_HEALTH ) )
+									SetUInt32Value( UNIT_FIELD_HEALTH, 1 );
+								else
+									ModUInt32Value( UNIT_FIELD_HEALTH, -healthtoloose );
+							}break;
+						//paladin - Improved Lay on Hands
+						case 20233:
+						case 20236:
+							{
+								if( !CastingSpell )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_LAY_ON_HANDS )
+									continue;
 							}break;
 						//paladin - Spiritual Attunement
 						case 31786:
 							{
 								if( !CastingSpell )
-									continue;//this should not ocur unless we made a fuckup somewhere
+									continue;
 								//trigger only on heal spell cast by NOT us
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) || this == victim)
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) || this == victim )
 									continue; 
 							}break;
 						//paladin - Light's Grace

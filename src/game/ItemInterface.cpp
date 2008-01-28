@@ -2238,36 +2238,36 @@ void ItemInterface::AddBuyBackItem(Item *it,uint32 price)
 void ItemInterface::RemoveBuyBackItem(uint32 index)
 {
 	int32 j = 0;
-	for (j = index;j < 11;j++)
+	for( j = index;j < 11; j++ )
 	{
-		if (m_pOwner->GetUInt64Value(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (j*2)) != 0)
+		if (m_pOwner->GetUInt64Value( PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ( j * 2 ) ) != 0 )
 		{
-			m_pOwner->SetUInt64Value(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (2*j), m_pOwner->GetUInt64Value(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ((j+1)*2)));
-			m_pOwner->SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + j, m_pOwner->GetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + j+1));
-			m_pOwner->SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + j, m_pOwner->GetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + j+1));
+			m_pOwner->SetUInt64Value( PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ( 2 * j ), m_pOwner->GetUInt64Value( PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ( ( j + 1 ) * 2 ) ) );
+			m_pOwner->SetUInt32Value( PLAYER_FIELD_BUYBACK_PRICE_1 + j, m_pOwner->GetUInt32Value( PLAYER_FIELD_BUYBACK_PRICE_1 + j+1));
+			m_pOwner->SetUInt32Value( PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + j, m_pOwner->GetUInt32Value( PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + j + 1 ) );
 			
-			if ((m_pBuyBack[j+1] != NULL) && (m_pOwner->GetUInt64Value(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ((j+1)*2)) != 0))
+			if( m_pBuyBack[j+1] != NULL && ( m_pOwner->GetUInt64Value( PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ( ( j + 1 ) * 2 ) ) != 0 ) )
 			{
 				m_pBuyBack[j] = m_pBuyBack[j+1];
 			}
 			else
 			{
-				if(m_pBuyBack[j])
+				if( m_pBuyBack[j] != NULL )
 				{
 						m_pBuyBack[j] = NULL;
 				}
 
-				sLog.outDetail("nulling %u\n",(j));
+				sLog.outDetail( "nulling %u\n", j );
 			}
 		}
 		else
 			return;
 	}
 	j = 11;
-	m_pOwner->SetUInt64Value(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (2*j), m_pOwner->GetUInt64Value(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ((j+1)*2)));
-	m_pOwner->SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + j, m_pOwner->GetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + j+1));
-	m_pOwner->SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + j, m_pOwner->GetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + j+1));
-	if(m_pBuyBack[11])
+	m_pOwner->SetUInt64Value( PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ( 2 * j ), m_pOwner->GetUInt64Value( PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + ( ( j + 1 ) * 2 ) ) );
+	m_pOwner->SetUInt32Value( PLAYER_FIELD_BUYBACK_PRICE_1 + j, m_pOwner->GetUInt32Value( PLAYER_FIELD_BUYBACK_PRICE_1 + j + 1 ) );
+	m_pOwner->SetUInt32Value( PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + j, m_pOwner->GetUInt32Value( PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + j + 1 ) );
+	if( m_pBuyBack[11] )
 	{
 		m_pBuyBack[11] = NULL;
 	}
@@ -2348,23 +2348,23 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 	if( m_pItems[(int)dstslot] != NULL )
 	{
 		//sLog.outDebug( "(SrcItem) PLAYER_FIELD_INV_SLOT_HEAD + %u is now %u" , dstslot * 2 , m_pItems[(int)dstslot]->GetGUID() );
-		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD + (dstslot*2),  m_pItems[(int)dstslot]->GetGUID() );
+		m_pOwner->SetUInt64Value( PLAYER_FIELD_INV_SLOT_HEAD + (dstslot*2),  m_pItems[(int)dstslot]->GetGUID() );
 	}
 	else
 	{
 		//sLog.outDebug( "(SrcItem) PLAYER_FIELD_INV_SLOT_HEAD + %u is now 0" , dstslot * 2 );
-		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD + (dstslot*2), 0 );
+		m_pOwner->SetUInt64Value( PLAYER_FIELD_INV_SLOT_HEAD + (dstslot*2), 0 );
 	}
 
 	if( m_pItems[(int)srcslot] != NULL )
 	{
 		//sLog.outDebug( "(DstItem) PLAYER_FIELD_INV_SLOT_HEAD + %u is now %u" , dstslot * 2 , m_pItems[(int)srcslot]->GetGUID() );
-		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD + (srcslot*2), m_pItems[(int)srcslot]->GetGUID() );
+		m_pOwner->SetUInt64Value( PLAYER_FIELD_INV_SLOT_HEAD + (srcslot*2), m_pItems[(int)srcslot]->GetGUID() );
 	}
 	else
 	{
 		//sLog.outDebug( "(DstItem) PLAYER_FIELD_INV_SLOT_HEAD + %u is now 0" , dstslot * 2 );
-		m_pOwner->SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD + (srcslot*2), 0 );
+		m_pOwner->SetUInt64Value( PLAYER_FIELD_INV_SLOT_HEAD + (srcslot*2), 0 );
 	}
 
 	if( srcslot < INVENTORY_SLOT_BAG_END )	// source item is equiped
@@ -2485,32 +2485,33 @@ void ItemInterface::mLoadItemsFromDatabase(QueryResult * result)
 {
 	int8 containerslot, slot;
 	Item* item;
-	ItemPrototype *proto;
-	if(result)
+	ItemPrototype* proto;
+
+	if( result )
 	{
 		do
 		{
-			Field *fields = result->Fetch();
+			Field* fields = result->Fetch();
 
 			containerslot = fields[13].GetInt8();
 			slot = fields[14].GetInt8();
 			proto = ItemPrototypeStorage.LookupEntry(fields[2].GetUInt32());
 
-			if(proto)
+			if( proto != NULL )
 			{
-				if(proto->InventoryType == INVTYPE_BAG)
+				if( proto->InventoryType == INVTYPE_BAG )
 				{
-					item=new Container(HIGHGUID_CONTAINER,fields[1].GetUInt32());
-					((Container*)item)->LoadFromDB(fields);
+					item = new Container( HIGHGUID_CONTAINER, fields[1].GetUInt32() );
+					static_cast< Container* >( item )->LoadFromDB( fields );
 
 				}
 				else
 				{
-					item = new Item(HIGHGUID_ITEM,fields[1].GetUInt32());
-					item->LoadFromDB(fields, m_pOwner, false);
+					item = new Item( HIGHGUID_ITEM, fields[1].GetUInt32() );
+					item->LoadFromDB( fields, m_pOwner, false);
 
 				}
-				if(SafeAddItem(item, containerslot, slot))
+				if( SafeAddItem( item, containerslot, slot ) )
 				    item->m_isDirty = false;
 			}
 		}
