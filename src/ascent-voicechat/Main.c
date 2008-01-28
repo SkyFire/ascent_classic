@@ -314,6 +314,7 @@ int MessageLoop()
 
 			if(fd_count > 2)
 			{
+#ifdef WIN32
 				// we have servers connected
 				for(i = 0; i < read_fds.fd_count; ++i)
 				{
@@ -322,6 +323,17 @@ int MessageLoop()
 
 					HandleTcpRead((int)read_fds.fd_array[i]);
 				}
+#else
+				struct WoWServer * ws_cur, *ws_next;
+				for( ws_next = m_serverBegin; ws_next != NULL; ++ws_next )
+				{
+					ws_cur = ws_next;
+					ws_next = ws_next->next;
+
+					if( FD_ISSET( ws_cur->fd, &read_fds ) )
+						HandleTcpRead( ws_cur->fd );
+				}
+#endif
 			}
 		}
 	}
