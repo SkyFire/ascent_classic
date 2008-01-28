@@ -489,7 +489,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 		return;
 	}
 
-	pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(item, false);
+	pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(item, true);
 	if (!pItem){
 		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 8);
 		data << uint32(0);
@@ -499,9 +499,9 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 		return;
 	};
 
-	pItem->RemoveFromWorld();
 	pItem->SetOwner(0);
-	pItem->SaveToDB(INVENTORY_SLOT_NOT_SET, 0, false, NULL);
+	pItem->m_isDirty = true;
+	pItem->SaveToDB(INVENTORY_SLOT_NOT_SET, 0, true, NULL);
 
 	// Create auction
 	Auction * auct = new Auction;
