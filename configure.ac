@@ -221,6 +221,7 @@ AC_CONFIG_FILES([
    src/scripts/src/InstanceScripts/Makefile
    src/scripts/src/ServerStatusPlugin/Makefile
    src/scripts/src/SpellHandlers/Makefile
+   src/scripts/src/LUAScripting/Makefile
    dep/Makefile
    dep/src/Makefile
    dep/src/pcre/Makefile
