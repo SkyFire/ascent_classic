@@ -234,7 +234,8 @@ enum procFlags
 //    PROC_ON_UNK_DAMAGE_VICTIM       = 0x80,//seems to be on ranged dmg victim 99% sure('each melee or ranged attack' -> flag =680 (dec))
     PROC_ON_PHYSICAL_ATTACK         = 0x100,
     PROC_ON_MELEE_ATTACK_VICTIM     = 0x200,
-    PROC_ON_ANY_ACTION              = 0x400,
+//    PROC_ON_ANY_ACTION              = 0x400,
+    PROC_ON_SPELL_LAND              = 0x400,
 //    PROC_UNK_DEFILLED               = 0x800,
     PROC_ON_RANGED_CRIT_ATTACK_VICTIM = 0x800,
     PROC_ON_CRIT_ATTACK             = 0x1000,
@@ -951,9 +952,9 @@ enum SpellTypes // SPELL_ENTRY_buffType
     SPELL_TYPE_MAGE_AMPL_DUMP       = 0x00020000,
     SPELL_TYPE_WARLOCK_IMMOLATE     = 0x00040000, //maybe there is a better way to trigger the aura state for immolate spell
     SPELL_TYPE_ELIXIR_BATTLE		= 0x00080000, 
-    SPELL_TYPE_ELIXIR_GUARDIAN      = 0x00010000, 
+    SPELL_TYPE_ELIXIR_GUARDIAN      = 0x00100000, 
     SPELL_TYPE_ELIXIR_FLASK         = SPELL_TYPE_ELIXIR_BATTLE | SPELL_TYPE_ELIXIR_GUARDIAN, //weee, this contains both battle and guardian elixirs ;)
-    SPELL_TYPE_HUNTER_MARK			= 0x00020000,
+    SPELL_TYPE_HUNTER_MARK			= 0x00200000,
 };
 
 //custom stuff generated for spells that will not change in time
@@ -1154,7 +1155,7 @@ ASCENT_INLINE bool IsInrange(float x1,float y1, float z1,float x2,float y2, floa
     r+=t*t;
     return ( r<=square_r);
 }
-    
+   
 ASCENT_INLINE bool IsInrange(Object * o1,Object * o2,float square_r)
 {
     return IsInrange(o1->GetPositionX(),o1->GetPositionY(),o1->GetPositionZ(),
@@ -1695,7 +1696,7 @@ public:
     Object*			m_caster;
 
     // 15007 = resurecting sickness
-
+	
 	// This returns SPELL_ENTRY_Spell_Dmg_Type where 0 = SPELL_DMG_TYPE_NONE, 1 = SPELL_DMG_TYPE_MAGIC, 2 = SPELL_DMG_TYPE_MELEE, 3 = SPELL_DMG_TYPE_RANGED
 	// It should NOT be used for weapon_damage_type which needs: 0 = MELEE, 1 = OFFHAND, 2 = RANGED
 	ASCENT_INLINE uint32 GetType() { return ( m_spellInfo->Spell_Dmg_Type == SPELL_DMG_TYPE_NONE ? SPELL_DMG_TYPE_MAGIC : m_spellInfo->Spell_Dmg_Type ); }

@@ -850,6 +850,11 @@ bool World::SetInitialWorldSettings()
 
 				if( ( sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE && sp->Spell_Dmg_Type == SPELL_DMG_TYPE_MELEE ) || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL || sp->Effect[z] == SPELL_EFFECT_WEAPON_DAMAGE || sp->Effect[z] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || sp->Effect[z] == SPELL_EFFECT_DUMMYMELEE )
 					sp->is_melee_spell = true;
+				if( ( sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE && sp->Spell_Dmg_Type == SPELL_DMG_TYPE_RANGED ) )
+				{
+					//sLog.outString( "Ranged Spell: %u [%s]" , sp->Id , sp->Name );
+					sp->is_ranged_spell = true;
+				}
 			}
 		}
 
@@ -1480,10 +1485,7 @@ bool World::SetInitialWorldSettings()
 				sp->procChance = itr->first;
 		}
 
-		// warlock - intensity
-		if( namehash == SPELL_HASH_INTENSITY)
-			sp->EffectSpellGroupRelation[0] |= 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spell
-		else if(
+		if(
 			((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (sp->AttributesEx & ATTRIBUTESEX_DELAY_SOME_TRIGGERS)) //rogue cold blood
 			|| ((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (!sp->AttributesEx || sp->AttributesEx & ATTRIBUTESEX_REMAIN_OOC))
 			)
@@ -1551,27 +1553,52 @@ bool World::SetInitialWorldSettings()
     sp = dbcSpell.LookupEntryForced( 35691 );
     if( sp != NULL )
 	{
-        sp->EffectApplyAuraName[0] = 42;
-        sp->EffectTriggerSpell[0] = 39576;
-        sp->procFlags = PROC_ON_CAST_SPELL;
+        sp->EffectApplyAuraName[0] = 13;
+		sp->EffectImplicitTargetA[0]=EFF_TARGET_SELF;
+        sp->Effect[1] = 6;
+        sp->EffectApplyAuraName[1] = 13;
+        sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+		sp->EffectImplicitTargetA[1]=EFF_TARGET_PET;
+        sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL;
+        sp->EffectTriggerSpell[2] = 35696;
+		sp->EffectImplicitTargetA[2]=EFF_TARGET_PET;
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
     }
     sp = dbcSpell.LookupEntryForced( 35692 );
     if( sp != NULL )
 	{
-        sp->EffectApplyAuraName[0] = 42;
-        sp->EffectTriggerSpell[0] = 39576;
-        sp->procFlags = PROC_ON_CAST_SPELL;
+        sp->EffectApplyAuraName[0] = 13;
+		sp->EffectImplicitTargetA[0]=EFF_TARGET_SELF;
+        sp->Effect[1] = 6;
+        sp->EffectApplyAuraName[1] = 13;
+        sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+		sp->EffectImplicitTargetA[1]=EFF_TARGET_PET;
+        sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL;
+        sp->EffectTriggerSpell[2] = 35696;
+		sp->EffectImplicitTargetA[2]=EFF_TARGET_PET;
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
     }
     sp = dbcSpell.LookupEntryForced( 35693 );
     if( sp != NULL )
 	{
-        sp->EffectApplyAuraName[0] = 42;
-        sp->EffectTriggerSpell[0] = 39576;
-        sp->procFlags = PROC_ON_CAST_SPELL;
+        sp->EffectApplyAuraName[0] = 13;
+		sp->EffectImplicitTargetA[0]=EFF_TARGET_SELF;
+        sp->Effect[1] = 6;
+        sp->EffectApplyAuraName[1] = 13;
+        sp->EffectBasePoints[1] = sp->EffectBasePoints[0];
+		sp->EffectImplicitTargetA[1]=EFF_TARGET_PET;
+        sp->Effect[2] = SPELL_EFFECT_TRIGGER_SPELL;
+        sp->EffectTriggerSpell[2] = 35696;
+		sp->EffectImplicitTargetA[2]=EFF_TARGET_PET;
 		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER | SPELL_FLAG_IS_EXPIREING_WITH_PET;
     }
+    sp = dbcSpell.LookupEntryForced( 35696 );
+    if( sp != NULL )
+	{
+        sp->Effect[0] = 6; //making this only for the visible effect
+        sp->EffectApplyAuraName[0] = 4; //no effect here
+		sp->EffectImplicitTargetA[0]=EFF_TARGET_PET;
+	}
 
     //Priest - Holy Nova
     sp = dbcSpell.LookupEntry( 15237 );
@@ -3797,14 +3824,11 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 27243 );
 	if( sp != NULL )
 	{
-		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[0] = 27285;
-		sp->procFlags = PROC_ON_TARGET_DIE;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->EffectTriggerSpell[1] = 27285;
+		sp->procFlags = PROC_ON_SPELL_HIT_VICTIM | PROC_ON_DIE;
 		sp->procChance = 100;
 	}
-//	sp = dbcSpell.LookupEntry( 27285 );
-//	if( sp != NULL )
-//		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_FRIENDLY_IN_AREA;
 
 	//warlock -  soul link
 	sp = dbcSpell.LookupEntryForced( 19028 );
@@ -4217,10 +4241,7 @@ bool World::SetInitialWorldSettings()
 	}
 	sp = dbcSpell.LookupEntryForced( 28682 );
 	if( sp != NULL )
-	{
 		sp->EffectSpellGroupRelation[0] = 8388608 | 16 | 2 | 4 | 4194304 | 1;
-		sp->NameHash = SPELL_HASH_COMBUSTION_PROC;
-	}
 
 	//mage - Empowered Fireball
 	sp = dbcSpell.LookupEntryForced( 31656 );
@@ -4514,16 +4535,22 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 2 | 8 | 32768 | 2147483648UL | 1024 | 16384 | 262144 | 16 | 524288 | 4194304;
 
 	//warlock - Demonic Sacrifice
-	sp = dbcSpell.LookupEntryForced( 18788 );
-	if( sp != NULL )
-	{
-		sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[1] = 18789;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
-	}
-	sp = dbcSpell.LookupEntryForced( 18788 );
+	sp = dbcSpell.LookupEntryForced( 18789 );
 	if( sp != NULL )
 		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
+	sp = dbcSpell.LookupEntryForced( 18790 );
+	if( sp != NULL )
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
+	sp = dbcSpell.LookupEntryForced( 18791 );
+	if( sp != NULL )
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
+	sp = dbcSpell.LookupEntryForced( 18792 );
+	if( sp != NULL )
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
+	sp = dbcSpell.LookupEntryForced( 35701 );
+	if( sp != NULL )
+		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
+	
 
 	//warlock - Improved Imp
 	sp = dbcSpell.LookupEntryForced( 18694 );
@@ -4875,20 +4902,18 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 18692 );
 	if( sp != NULL )
 	{
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
-		sp->EffectSpellGroupRelation[1] = 65536;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+		sp->EffectSpellGroupRelation[0] = 65536;
 	}
 	sp = dbcSpell.LookupEntryForced( 18693 );
 	if( sp != NULL )
 	{
-		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-		sp->EffectApplyAuraName[1] = SPELL_AURA_ADD_PCT_MODIFIER;
-		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
-		sp->EffectSpellGroupRelation[1] = 65536;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
+		sp->EffectSpellGroupRelation[0] = 65536;
 	}
 
 	//warlock - Unstable Affliction
@@ -4900,7 +4925,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
 		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[1] = 43523;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_FRIEND;
 	}
 	sp = dbcSpell.LookupEntryForced( 30404 );
 	if( sp != NULL )
@@ -4910,7 +4935,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
 		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[1] = 43523;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_FRIEND;
 	}
 	sp = dbcSpell.LookupEntryForced( 30405 );
 	if( sp != NULL )
@@ -4920,7 +4945,7 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[1] = SPELL_EFFECT_APPLY_AURA;
 		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[1] = 43523;
-		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_ENEMY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_SINGLE_FRIEND;
 	}
 
 	//warlock - Improved Drain Soul
@@ -5045,7 +5070,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->Effect[0] = 0; //delete this owerride effect :P
 		sp->EffectTriggerSpell[1] = 18093; //trigger spell was wrong :P
-		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
 		sp->procChance = 13; //god, save us from fixed values !
 	}
 	sp = dbcSpell.LookupEntryForced( 18096 );
@@ -5053,7 +5078,7 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->Effect[0] = 0; //delete this owerride effect :P
 		sp->EffectTriggerSpell[1] = 18093; //trigger spell was wrong :P
-		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->procFlags = PROC_ON_ANY_HOSTILE_ACTION;
 		sp->procChance = 26; //god, save us from fixed values !
 	}
 

@@ -4947,7 +4947,9 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 							detectRange = 5.0f + getLevel() + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
 						else
 							detectRange = 65.0f + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
-
+						// Hehe... stealth skill is increased by 5 each level and detection skill is increased by 5 each level too.
+						// This way, a level 70 should easily be able to detect a level 4 rogue (level 4 because that's when you get stealth)
+						//	detectRange += 0.2f * ( getLevel() - pObj->getLevel() );
 						if(detectRange < 1.0f) detectRange = 1.0f; // Minimum Detection Range = 1yd
 					}
 					else // stealthed player is behind us
@@ -4958,8 +4960,8 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 					detectRange += GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of player
 					detectRange += pObj->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of stealthed player
-
-					if(GetDistance2dSq(pObj) > detectRange * detectRange)
+					//sLog.outString( "Player::CanSee(%s): detect range = %f yards (%f ingame units), cansee = %s , distance = %f" , pObj->GetName() , detectRange , detectRange * detectRange , ( GetDistance2dSq(pObj) > detectRange * detectRange ) ? "yes" : "no" , GetDistanceSq(pObj) );
+					if(GetDistanceSq(pObj) > detectRange * detectRange)
 						return bGMTagOn; // GM can see stealthed players
 				}
 
@@ -5529,8 +5531,10 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 			m_session->OutPacket( SMSG_CANCEL_AUTO_REPEAT, 4, &spellid2 );
 		}
 		//sLog.outString( "Result for CanShootWIthRangedWeapon: %u" , fail );
+		//sLog.outDebug( "Can't shoot with ranged weapon: %u (Timer: %u)" , fail , m_AutoShotAttackTimer );
 		return fail;
 	}
+
 	return 0;
 }
 
@@ -5544,6 +5548,7 @@ void Player::EventRepeatSpell()
 	{
 		m_AutoShotAttackTimer = 0; //avoid flooding client with error mesages
 		m_onAutoShot = false;
+		//sLog.outDebug( "Can't cast Autoshot: Target changed! (Timer: %u)" , m_AutoShotAttackTimer );
 		return;
 	}
 
@@ -5552,7 +5557,9 @@ void Player::EventRepeatSpell()
 	if( m_isMoving )
 	{
 		//sLog.outDebug( "HUNTER AUTOSHOT 2) %i, %i", m_AutoShotAttackTimer, m_AutoShotDuration );
-		m_AutoShotAttackTimer = m_AutoShotDuration;//avoid flooding client with error mesages
+		//m_AutoShotAttackTimer = m_AutoShotDuration;//avoid flooding client with error mesages
+		//sLog.outDebug( "Can't cast Autoshot: You're moving! (Timer: %u)" , m_AutoShotAttackTimer );
+		m_AutoShotAttackTimer = 100; // shoot when we can
 		return;
 	}
 

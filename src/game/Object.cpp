@@ -22,7 +22,9 @@
 using namespace std;
 
 //#define DEG2RAD (M_PI/180.0)
-#define M_PI	   3.14159265358979323846
+#define M_PI		3.14159265358979323846
+#define M_H_PI		1.57079632679489661923
+#define M_Q_PI		0.785398163397448309615
 
 Object::Object() : m_position(0,0,0,0), m_spawnLocation(0,0,0,0)
 {
@@ -1011,10 +1013,6 @@ void Object::RemoveFromWorld(bool free_guid)
 	event_Relocate();
 }
 
-
-
-
-
 //! Set uint32 property
 void Object::SetUInt32Value( const uint32 index, const uint32 value )
 {
@@ -1373,8 +1371,8 @@ bool Object::isInFront(Object* target)
 {
 	// check if we facing something ( is the object within a 180 degree slice of our positive y axis )
 
-    double x = target->GetPositionX() - GetPositionX();
-    double y = target->GetPositionY() - GetPositionY();
+    double x = target->GetPositionX() - m_position.x;
+    double y = target->GetPositionY() - m_position.y;
 
     double angle = atan2( y, x );
     angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
@@ -1392,76 +1390,67 @@ bool Object::isInFront(Object* target)
     double right = ( M_PI / 2.0 );
 
     return( ( angle >= left ) && ( angle <= right ) );
-
-	// old version jsut in case
-
-	//double dx = double( target->GetPositionX()-GetPositionX() );
-	//double dy = double( target->GetPositionY()-GetPositionY() );
-	//double d = double( m_position.o );
-
-	//while(d < 0) d+=2*M_PI;
-	//while(d > 2*M_PI) d-=2*M_PI;
-
-	//m_position.o = float(d);
-
-	//if(dy>=0.0)
-	//{
-	//	d-=atan(dy/dx);
-	//	if(dx<0.0)
-	//		d-=M_PI;
-	//}
-	//else
-	//{
-	//	d-=3*M_PI/2 - atan(dx/dy);
-	//}
-
-	//if(d < -M_PI*2/3 || d > M_PI*2/3)
-	//	return false;
-	//return true;
 }
-
 
 bool Object::isInBack(Object* target)
 {
-	double dx=double(target->GetPositionX()-GetPositionX());
-	double dy=double(target->GetPositionY()-GetPositionY());
-	//double d=double(target->GetOrientation());
-	double d;
+	// check if we are behind something ( is the object within a 180 degree slice of our negative y axis )
 
-	// if we are a unit and have a UNIT_FIELD_TARGET then we are always facing them
-	if( m_objectTypeId == TYPEID_UNIT && m_uint32Values[UNIT_FIELD_TARGET] != 0 && static_cast<Unit*>(this)->GetAIInterface()->GetNextTarget() )
-	{
-		Unit * pTarget = static_cast<Unit*>(this)->GetAIInterface()->GetNextTarget();
-		d = double( Object::calcRadAngle( target->m_position.x, target->m_position.y, pTarget->m_position.x, pTarget->m_position.y ) );
-	}
-	else
-		d = double( target->GetOrientation() );
+    double x = m_position.x - target->GetPositionX();
+    double y = m_position.y - target->GetPositionY();
 
-	while(d < 0) d+=2*M_PI;
-	while(d > 2*M_PI) d-=2*M_PI;
+    double angle = atan2( y, x );
+    angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
+	angle -= target->GetOrientation();
+
+    while( angle > M_PI)
+        angle -= 2.0 * M_PI;
+
+    while(angle < -M_PI)
+        angle += 2.0 * M_PI;
+
+	// replace M_H_PI in the two lines below to reduce or increase angle
+
+    double left = -1.0 * ( M_H_PI / 2.0 );
+    double right = ( M_H_PI / 2.0 );
+
+    return( ( angle <= left ) && ( angle >= right ) );
 	
-	if(dy>=0.0)
-	{
-		d-=atan(dy/dx);
+}
+/*
+{
 
-		if(dx<0.0)
-			d-=M_PI;
+    double x = target->GetPositionX() - m_position.x;
+    double y = target->GetPositionY() - m_position.y;
+    double o = target->GetOrientation();
+
+    while( o > M_PI)
+        o -= 2.0 * M_PI;
+
+    while(o < -M_PI)
+        o += 2.0 * M_PI;
+
+	if( y >= 0.0 )
+	{
+		o -= atan( y / x );
+
+		if( x < 0.0 )
+			o -= M_PI;
 	}
 	else
 	{
-		d-=3*M_PI/2 - atan(dx/dy);
+		o -= 3 * M_PI / 2 - atan( x / y );
 	}
 
-	if(d < -M_PI/4 || d > M_PI/4)
+	if( o < -M_PI / 4 || o > M_PI/4)
 		return false;
 	return true;
-}
-
+}*/
 
 bool Object::isInRange(Object* target, float range)
 {
-	float dist = CalcDistance(target);
-	return (dist <= range);
+	float dist = CalcDistance( target );
+	return( dist <= range );
 }
 
 bool Object::IsPet()
@@ -1756,10 +1745,17 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	if ((isCritter || health <= damage) )
 	{
 		//warlock - seed of corruption
-		pVictim->HandleProc( PROC_ON_DIE, pVictim, NULL );
 		if( IsUnit() )
-			static_cast< Player* >( this )->HandleProc( PROC_ON_TARGET_DIE, pVictim, NULL );
-		pVictim->m_procCounter = 0;
+		{
+			SpellEntry *killerspell;
+			if( spellId )
+				killerspell = dbcSpell.LookupEntry( spellId );
+			else killerspell = NULL;
+			pVictim->HandleProc( PROC_ON_DIE, static_cast< Unit* >( this ), killerspell );
+			pVictim->m_procCounter = 0;
+			static_cast< Unit* >( this )->HandleProc( PROC_ON_TARGET_DIE, pVictim, killerspell );
+			static_cast< Unit* >( this )->m_procCounter = 0;
+		}
 
 		/* victim died! */
 		if( pVictim->IsPlayer() )
@@ -2215,25 +2211,47 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		else
 		{
 //------------------------------critical strike chance--------------------------------------	
-			float CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerCritChanceMod[school];
-			if( caster->IsPlayer() && ( pVictim->m_rooted - pVictim->m_stunned ) )	
-				CritChance += static_cast< Player* >( caster )->m_RootedCritChanceBonus;
-
-			if( spellInfo->SpellGroupType )
+			// lol ranged spells were using spell crit chance
+			float CritChance;
+			if( spellInfo->is_ranged_spell )
 			{
-				SM_FFValue(caster->SM_CriticalChance, &CritChance, spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-				float spell_flat_modifers=0;
-				SM_FFValue(caster->SM_CriticalChance,&spell_flat_modifers,spellInfo->SpellGroupType);
-				if(spell_flat_modifers!=0)
-					printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,spellInfo->SpellGroupType);
-#endif
-			}
-			if( pVictim->IsPlayer() )
-				CritChance -= static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE );
-			if( CritChance < 0 ) CritChance = 0;
 
+				if( IsPlayer() )
+				{
+					CritChance = GetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE );
+					CritChance += static_cast<Player*>(pVictim)->res_R_crit_get();
+					CritChance += (float)(pVictim->AttackerCritChanceMod[spellInfo->School]);
+				}
+				else
+				{
+					CritChance = 5.0f; // static value for mobs.. not blizzlike, but an unfinished formula is not fatal :)
+				}
+				if( pVictim->IsPlayer() )
+				CritChance -= static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE );
+			}
+			else
+			{
+				CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerCritChanceMod[school];
+				if( caster->IsPlayer() && ( pVictim->m_rooted - pVictim->m_stunned ) )	
+					CritChance += static_cast< Player* >( caster )->m_RootedCritChanceBonus;
+
+				if( spellInfo->SpellGroupType )
+				{
+					SM_FFValue(caster->SM_CriticalChance, &CritChance, spellInfo->SpellGroupType);
+	#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+					float spell_flat_modifers=0;
+					SM_FFValue(caster->SM_CriticalChance,&spell_flat_modifers,spellInfo->SpellGroupType);
+					if(spell_flat_modifers!=0)
+						printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,spellInfo->SpellGroupType);
+	#endif
+				}
+				if( pVictim->IsPlayer() )
+				CritChance -= static_cast<Player*>(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE );
+			}
+			if( CritChance < 0 ) CritChance = 0;
+			if( CritChance > 95 ) CritChance = 95;
 			critical = Rand(CritChance);
+			//sLog.outString( "SpellNonMeleeDamageLog: Crit Chance %f%%, WasCrit = %s" , CritChance , critical ? "Yes" : "No" );
 //==========================================================================================
 //==============================Spell Critical Hit==========================================
 //==========================================================================================
