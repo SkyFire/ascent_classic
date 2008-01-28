@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "../../../shared/svn_revision.h"
+#include "../../../ascent-shared/svn_revision.h"
 
 #include "CoreMemoryAllocator.cpp"
 
