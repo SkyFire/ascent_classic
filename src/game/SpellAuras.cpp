@@ -5930,13 +5930,13 @@ void Aura::SpellAuraModIncreaseEnergyPerc( bool apply )
 		mod->fixed_amount[0] = m_target->GetModPUInt32Value( maxField, mod->m_amount );
 		m_target->ModUInt32Value( maxField, mod->fixed_amount[0] );
 		if( m_target->IsPlayer() && maxField == UNIT_FIELD_MAXPOWER1 )
-			( ( Player* )m_target )->SetManaFromSpell( ( ( Player* )m_target )->GetManaFromSpell() + mod->fixed_amount[0] ); 
+			static_cast< Player* >( m_target )->SetManaFromSpell( ( ( Player* )m_target )->GetManaFromSpell() + mod->fixed_amount[0] ); 
 	}
 	else
 	{
 		m_target->ModUInt32Value( maxField, -mod->fixed_amount[0] );
 		if( m_target->IsPlayer() && maxField == UNIT_FIELD_MAXPOWER1 )
-			( ( Player* )m_target )->SetManaFromSpell( ( ( Player* )m_target )->GetManaFromSpell() + mod->fixed_amount[0] ); 
+			static_cast< Player* >( m_target )->SetManaFromSpell( ( ( Player* )m_target )->GetManaFromSpell() - mod->fixed_amount[0] ); 
 	}
 }
 
