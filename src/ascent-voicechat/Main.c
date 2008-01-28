@@ -18,6 +18,7 @@
  *
  */
 
+#include <errno.h>
 #include "VoiceChat.h"
 
 int m_boundFdUDP;
@@ -49,7 +50,7 @@ int Bind()
 	if(m_boundFdUDP < 0)
 		return -1;
 
-	ioctl(fd, FIONBIO, &arg);
+	ioctl(m_boundFdUDP, FIONBIO, &arg);
 #endif
 
 	if(bind(m_boundFdUDP, (const struct sockaddr*)&m_udplisten, sizeof(struct sockaddr_in)) < 0)
@@ -73,13 +74,21 @@ int Listen()
 
 	if(bind(m_listenFdTCP, (const struct sockaddr*)&m_tcplisten, sizeof(struct sockaddr_in)) < 0)
 	{
-		closesocket(m_boundFdUDP);
+#ifdef WIN32
+		closesocket(m_listenFdTCP);
+#else
+		close(m_listenFdTCP);
+#endif
 		return -2;
 	}
 
 	if(listen(m_listenFdTCP, 5) < 0)
 	{
+#ifdef WIN32
 		closesocket(m_listenFdTCP);
+#else
+		close(m_listenFdTCP);
+#endif
 		return -3;
 	}
 
