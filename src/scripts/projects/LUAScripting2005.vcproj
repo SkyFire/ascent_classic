@@ -43,7 +43,7 @@
 				Optimization="0"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="..\..\ascent-shared;..\..\ascent-world;..\..\..\dep\include;..\..\..\dep\src"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SCRIPTLIB"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SCRIPTLIB;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -124,7 +124,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\ascent-shared;..\..\ascent-world;..\..\..\dep\include;..\..\..\dep\src"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTLIB"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTLIB;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
