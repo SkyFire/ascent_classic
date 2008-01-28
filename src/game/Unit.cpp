@@ -1238,14 +1238,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if( CastingSpell->School!=SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell->School != SCHOOL_SHADOW || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) )
 									continue;
 							}break;
 						//warrior - improved berserker rage 
 						case 23690:
 						case 23691:
 							{
-								if(!HasActiveAura(18499))
+								if( !HasActiveAura( 18499 ) )
 									continue;
 							}break;
 						//mage - Arcane Concentration 
@@ -1254,7 +1254,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								//requires damageing spell
 								if( !CastingSpell )
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) )
 									continue;
 							}break;
 						//mage - Improved Blizzard
@@ -1274,7 +1274,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;
 								if( CastingSpell->School!=SCHOOL_FIRE && CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
 									continue;
-								dmg_overwrite = CastingSpell->manaCost * (ospinfo->EffectBasePoints[0] + 1) / 100;
+								dmg_overwrite = CastingSpell->manaCost * ( ospinfo->EffectBasePoints[0] + 1 ) / 100;
 							}break;
 						//Hunter - Thrill of the Hunt
 						case 34720:
@@ -1291,9 +1291,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( !power_word_id )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//make a direct strike then exit rest of handler
-								int tdmg=abs*(ospinfo->EffectBasePoints[0]+1)/100;
+								int tdmg = abs * ( ospinfo->EffectBasePoints[0] + 1 ) / 100;
 								//somehow we should make this not caused any threat (tobedone)
-								SpellNonMeleeDamageLog(victim,power_word_id, tdmg, false, true);
+								SpellNonMeleeDamageLog( victim, power_word_id, tdmg, false, true );
 								continue;
 							}break;
 						//rogue - improved sprint
@@ -1311,11 +1311,11 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 35547:
 						case 35548:
 							{
-								if(!IsPlayer() || !dmg)
+								if( !IsPlayer() || !dmg )
 									continue;
 								//this needs offhand weapon
-								Item *it = ((Player*)this)->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
-								if(!it || it->GetProto()->InventoryType!=INVTYPE_WEAPON )
+								Item* it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+								if( it == NULL || it->GetProto()->InventoryType != INVTYPE_WEAPON )
 									continue;
 							}break;
 						//paladin - Seal of Blood
