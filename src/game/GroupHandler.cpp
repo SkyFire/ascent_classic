@@ -147,7 +147,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 	}
 	
 	// If we're this far, it means we have no existing group, and have to make one.
-	grp = new Group;
+	grp = new Group(true);
 	grp->AddMember(player->m_playerInfo);		// add the inviter first, therefore he is the leader
 	grp->AddMember(_player->m_playerInfo);	   // add us.
     _player->iInstanceType = player->iInstanceType;

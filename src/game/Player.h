@@ -1829,6 +1829,11 @@ public:
 	ASCENT_INLINE map<uint32,uint32>::iterator SpellCoolDownMapStart() { return SpellCooldownMap.begin(); }
 	ASCENT_INLINE map<uint32,uint32>::iterator SpellCoolDownMapEnd() { return SpellCooldownMap.end(); }
 
+#ifdef VOICE_CHAT
+	bool m_inPartyVoice;
+	uint8 m_inPartyVoiceId;
+#endif
+
 protected:
 	LocationVector m_summonPos;
 	uint32 m_summonInstanceId;

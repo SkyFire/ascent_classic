@@ -20,6 +20,8 @@
 
 #include "StdAfx.h"
 
+#ifdef VOICE_CHAT
+
 VoiceChatClientSocket::VoiceChatClientSocket(uint32 fd) : Socket(fd, 250000, 250000)
 {
 
@@ -34,3 +36,5 @@ void VoiceChatClientSocket::OnRead()
 {
 	sVoiceChatHandler.OnRead(GetReadBuffer(0), GetReadBufferSize());
 }
+
+#endif		// VOICE_CHAT

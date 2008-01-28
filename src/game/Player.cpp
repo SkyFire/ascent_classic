@@ -386,6 +386,10 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_lfgInviterGuid = 0;
 	m_mountCheckTimer = 0;
 	this->OnLogin();
+#ifdef VOICE_CHAT
+	m_inPartyVoice = false;
+	m_inPartyVoiceId = 0;
+#endif
 }
 
 void Player::OnLogin()

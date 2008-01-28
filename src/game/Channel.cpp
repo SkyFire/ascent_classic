@@ -56,14 +56,20 @@ Channel::Channel(const char * name, uint32 team, uint32 type_id)
 	m_name = string(name);
 	m_team = team;
 	m_id = type_id;
+#ifdef VOICE_CHAT
 	voice_enabled = sVoiceChatHandler.CanUseVoiceChat();
+	i_voice_channel_id = -1;
+#endif
 
 	pDBC = dbcChatChannels.LookupEntryForced(type_id);
 	if( pDBC != NULL )
 	{
 		m_general = true;
 		m_announce = false;
+
+#ifdef VOICE_CHAT
 		voice_enabled = false;
+#endif
 
 		m_flags |= 0x10;			// general flag
 		// flags (0x01 = custom?, 0x04 = trade?, 0x20 = city?, 0x40 = lfg?, , 0x80 = voice?,		
@@ -79,8 +85,6 @@ Channel::Channel(const char * name, uint32 team, uint32 type_id)
 	}
 	else
 		m_flags = 0x01;
-
-	i_voice_channel_id = -1;
 }
 
 void Channel::AttemptJoin(Player * plr, const char * password)
@@ -133,6 +137,7 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 
 	plr->GetSession()->SendPacket(&data);
 
+#ifdef VOICE_CHAT
 	if(voice_enabled)
 	{
 		data.Initialize(SMSG_CHANNEL_NOTIFY);
@@ -152,6 +157,7 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 		data << plr->GetGUID();
 		plr->GetSession()->SendPacket(&data);
 	}
+#endif
 }
 
 void Channel::Part(Player * plr)
@@ -170,6 +176,8 @@ void Channel::Part(Player * plr)
     
 	flags = itr->second;
 	m_members.erase(itr);
+
+#ifdef VOICE_CHAT
 	itr = m_VoiceMembers.find(plr);
 	if(itr != m_VoiceMembers.end())
 	{
@@ -177,6 +185,7 @@ void Channel::Part(Player * plr)
 		if(i_voice_channel_id != (uint16)-1)
 			SendVoiceUpdate();
 	}
+#endif
 
 	plr->LeftChannel(this);
 
@@ -448,6 +457,7 @@ void Channel::Kick(Player * plr, Player * die_player, bool ban)
 	}
 
 	m_members.erase(itr);
+#ifdef VOICE_CHAT
 	itr = m_VoiceMembers.find(plr);
 	if(itr != m_VoiceMembers.end())
 	{
@@ -455,6 +465,7 @@ void Channel::Kick(Player * plr, Player * die_player, bool ban)
 		if(i_voice_channel_id != (uint16)-1)
 			SendVoiceUpdate();
 	}
+#endif
 
 	if(flags & CHANNEL_FLAG_OWNER)
 		SetOwner(NULL, NULL);
@@ -950,6 +961,7 @@ ChannelMgr::ChannelMgr()
 
 }
 
+#ifdef VOICE_CHAT
 void Channel::VoiceChannelCreated(uint16 id)
 {
 	Log.Debug("VoiceChannelCreated", "id %u", id);
@@ -1060,3 +1072,5 @@ void ChannelMgr::VoiceDied()
 	}
 	lock.Release();
 }
+
+#endif

@@ -21,6 +21,8 @@
 #ifndef _VOICECHATCLIENTSOCKET_H
 #define _VOICECHATCLIENTSOCKET_H
 
+#ifdef VOICE_CHAT
+
 class VoiceChatClientSocket : public Socket
 {
 public:
@@ -29,5 +31,6 @@ public:
 	void OnRead();
 };
 
+#endif		// VOICE_CHAT
 #endif		// _VOICECHATCLIENTSOCKET_H
 

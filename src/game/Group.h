@@ -101,6 +101,7 @@ protected:
 
 };
 
+typedef set<Player*> VoiceMemberSet;
 class Arena;
 class SERVER_DECL Group
 {
@@ -109,7 +110,7 @@ public:
 
 	static Group* Create();
 
-	Group();
+	Group(bool Assign);
 	~Group();
 
 	// Adding/Removal Management
@@ -188,6 +189,23 @@ public:
 	ASCENT_INLINE PlayerInfo * GetMainAssist() { return m_mainAssist; }
 
 	void SetDifficulty(uint8 difficulty);
+	
+	/************************************************************************/
+	/* Voicechat                                                            */
+	/************************************************************************/
+#ifdef VOICE_CHAT
+	void AddVoiceMember(Player * pPlayer);
+	void RemoveVoiceMember(Player * pPlayer);
+	void SendVoiceUpdate();
+	void CreateVoiceSession();
+	void VoiceChannelCreated(uint16 id);
+
+protected:
+	bool m_voiceChannelRequested;
+	int16 m_voiceChannelId;
+	uint8 m_voiceMemberHigh;
+	VoiceMemberSet m_voiceMembers;
+#endif	// VOICE_CHAT
 
 protected:
 	PlayerInfo * m_Leader;

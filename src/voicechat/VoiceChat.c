@@ -46,6 +46,19 @@ struct VoiceChatChannelMember * GetChannelMember(uint8 user_id, struct VoiceChat
 	if(user_id > channel->member_slots)
 		return NULL;
 
+	if( !channel->members[user_id].initialized )
+		return NULL;
+	else
+		return &channel->members[user_id];
+}
+
+struct VoiceChatChannelMember * SetChannelMember(uint8 user_id, struct VoiceChatChannel * channel, struct sockaddr * addr)
+{
+	if(user_id > channel->member_slots)
+		return NULL;
+
+	memcpy( &channel->members[user_id].address, addr, sizeof(struct sockaddr) );
+	channel->members[user_id].initialized = 1;
 	return &channel->members[user_id];
 }
 
@@ -54,6 +67,7 @@ struct VoiceChatChannel * CreateChannel(uint16 channel_id, uint8 channel_type)
 	struct VoiceChatChannel * chn;
 	struct VoiceChatChannel * chn_prev;
 	struct VoiceChatChannel * chn_loop;
+	uint32 i;
 
 	chn = (struct VoiceChatChannel*)malloc(sizeof(struct VoiceChatChannel));
 	assert(chn);
@@ -104,6 +118,12 @@ struct VoiceChatChannel * CreateChannel(uint16 channel_id, uint8 channel_type)
 
 	chn->members = (struct VoiceChatChannelMember*)malloc(sizeof(struct VoiceChatChannelMember) * chn->member_slots);
 	chn->member_count = 0;
+
+	for( i = 0; i < chn->member_slots; ++i )
+	{
+		chn->members[i].initialized = 0;
+	}
+
 	m_channelEnd = chn;
 
 	return chn;

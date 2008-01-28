@@ -268,7 +268,7 @@ void StatDumper::DumpStats()
         fprintf(f, "    <avglat>%.3f</avglat>\n", AvgLat);
 		fprintf(f, "    <threads>%u</threads>\n", (unsigned int)ThreadPool.GetActiveThreadCount());
 		fprintf(f, "    <fthreads>%u</fthreads>\n", (unsigned int)ThreadPool.GetFreeThreadCount());
-        time_t t = time(NULL);
+        time_t t = (time_t)UNIXTIME;
         fprintf(f, "    <gmcount>%u</gmcount>\n", (unsigned int)GMCount);
         fprintf(f, "    <lastupdate>%s</lastupdate>\n", asctime(localtime(&t)));
         fprintf(f, "    <alliance>%u</alliance>\n", (unsigned int)sWorld.AlliancePlayers);

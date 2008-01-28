@@ -21,6 +21,8 @@
 #ifndef _VOICECHATHANDLER_H
 #define _VOICECHATHANDLER_H
 
+#ifdef VOICE_CHAT
+
 #include "../voicechat/VoiceChatOpcodes.h"
 #include "VoiceChatClientSocket.h"
 
@@ -30,6 +32,7 @@ struct VoiceChatChannelRequest
 	string channel_name;
 	uint32 team;
 	uint32 id;
+	uint32 groupid;
 };
 
 class VoiceChatHandler : public Singleton<VoiceChatHandler>
@@ -56,8 +59,11 @@ public:
 	void DestroyVoiceChannel(Channel * chn);
 	bool CanCreateVoiceChannel(Channel * chn);
 	bool CanUseVoiceChat();
+
+	void CreateGroupChannel(Group * pGroup);
 };
 
 #define sVoiceChatHandler VoiceChatHandler::getSingleton()
 
+#endif		// VOICE_CHAT
 #endif		// _VOICECHATHANDLER_H

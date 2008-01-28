@@ -381,8 +381,10 @@ bool Master::Run(int argc, char ** argv)
 	sLogonCommHandler.Startup();
 
 	/* voicechat */
+#ifdef VOICE_CHAT
 	new VoiceChatHandler();
 	sVoiceChatHandler.Startup();
+#endif
 
 	// Create listener
 	ListenSocket<WorldSocket> * ls = new ListenSocket<WorldSocket>(host.c_str(), wsport);
@@ -408,7 +410,9 @@ bool Master::Run(int argc, char ** argv)
 
 #ifndef CLUSTERING
 		sLogonCommHandler.UpdateSockets();
+#ifdef VOICE_CHAT
 		sVoiceChatHandler.Update();
+#endif
 #else
 		sClusterInterface.Update();
 #endif
@@ -543,8 +547,10 @@ bool Master::Run(int argc, char ** argv)
 	Log.Notice( "Network", "Deleting Network Subsystem..." );
 	delete SocketMgr::getSingletonPtr();
 	delete SocketGarbageCollector::getSingletonPtr();
+#ifdef VOICE_CHAT
 	Log.Notice( "VoiceChatHandler", "~VoiceChatHandler()" );
 	delete VoiceChatHandler::getSingletonPtr();
+#endif
 
 #ifdef ENABLE_LUA_SCRIPTING
 	sLog.outString("Deleting Script Engine...");

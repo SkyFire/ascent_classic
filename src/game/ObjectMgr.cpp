@@ -2491,7 +2491,7 @@ void ObjectMgr::LoadGroups()
 	{
 		do 
 		{
-			Group * g = new Group();
+			Group * g = new Group(false);
 			g->LoadFromDB(result->Fetch());
 		} while(result->NextRow());
 		delete result;

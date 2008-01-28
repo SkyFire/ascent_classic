@@ -20,6 +20,8 @@
 
 #include "StdAfx.h"
 
+#ifdef VOICE_CHAT
+
 void WorldSession::HandleEnableMicrophoneOpcode(WorldPacket & recv_data)
 {
 	uint8 enabled, unk;
@@ -133,10 +135,18 @@ void VoiceChatHandler::OnRead(const uint8 * bytes, uint32 len)
 			{
 				if(itr->id == request_id)
 				{
-					Channel * chn = channelmgr.GetChannel(itr->channel_name.c_str(), itr->team);
-					if(chn != NULL)
-						chn->VoiceChannelCreated((uint16)channel_id);
-
+					if( itr->groupid == 0 )
+					{
+						Channel * chn = channelmgr.GetChannel(itr->channel_name.c_str(), itr->team);
+						if(chn != NULL)
+							chn->VoiceChannelCreated((uint16)channel_id);
+					}
+					else
+					{
+						Group * grp = objmgr.GetGroupById( itr->groupid );
+						if( grp != NULL )
+							grp->VoiceChannelCreated( (uint16) channel_id );
+					}
 					m_requests.erase(itr);
 					break;
 				}
@@ -178,12 +188,37 @@ void VoiceChatHandler::CreateVoiceChannel(Channel * chn)
 	req.id = request_high++;
 	req.channel_name = chn->m_name;
 	req.team = chn->m_team;
+	req.groupid = 0;
 	m_requests.push_back(req);
 
 	buf << uint32(VOICECHAT_CMSG_CREATE_CHANNEL);
 	buf << uint32(0);
 	buf << req.id;
 	m_client->Send(buf.contents(), 12);
+	m_lock.Release();
+}
+
+void VoiceChatHandler::CreateGroupChannel(Group * pGroup)
+{
+	if( m_client == NULL )
+		return;
+
+	Log.Debug("VoiceChatHandler", "CreateGroupChannel for group %u", pGroup->GetID());
+	ByteBuffer buf(50);
+	VoiceChatChannelRequest req;
+
+	m_lock.Acquire();
+
+	req.id = request_high++;
+	req.groupid = pGroup->GetID();
+	req.team = 0;
+
+	m_requests.push_back( req );
+	buf << uint32(VOICECHAT_CMSG_CREATE_CHANNEL);
+	buf << uint32(3);
+	buf << req.id;
+	m_client->Send(buf.contents(), 12);
+	
 	m_lock.Release();
 }
 
@@ -241,3 +276,23 @@ void VoiceChatHandler::Update()
 		}
 	}
 }
+
+#else			// VOICE_CHAT
+
+
+void WorldSession::HandleEnableMicrophoneOpcode(WorldPacket & recv_data)
+{
+
+}
+
+void WorldSession::HandleChannelVoiceQueryOpcode(WorldPacket & recv_data)
+{
+
+}
+
+void WorldSession::HandleVoiceChatQueryOpcode(WorldPacket & recv_data)
+{
+
+}
+
+#endif			// VOICE_CHAT

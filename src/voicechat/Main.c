@@ -34,9 +34,13 @@ int LoadConfigs(int * udp_port, char * udp_address, int * tcp_port, char * tcp_a
 
 int Bind()
 {
+	u_long arg = 0;
+
 	m_boundFdUDP = (int)socket(AF_INET, SOCK_DGRAM, 0);
 	if(m_boundFdUDP < 0)
 		return -1;
+
+	ioctlsocket( m_boundFdUDP, FIONBIO, &arg );
 
 	if(bind(m_boundFdUDP, (const struct sockaddr*)&m_udplisten, sizeof(struct sockaddr_in)) < 0)
 	{
@@ -72,10 +76,11 @@ void dumphex(char * buf, int len)
 {
 	int i;
 	for(i = 0; i < len; ++i)
-		printf("%.2X ", buf[i]);
+		printf("%.2X ", ((unsigned char*)buf)[i]);
 	printf("\n");
 }
 
+int first = 0;
 void OnUdpRead()
 {
 	char buffer[4096];
@@ -86,21 +91,80 @@ void OnUdpRead()
 	uint32 header;
 	uint16 channel_id;
 	uint8 user_id;
+	uint32 z,x;
 	struct VoiceChatChannel * chn;
 	struct VoiceChatChannelMember * chn_member;
 	struct VoiceChatChannelMember * chn_destmember;
 
+	recv_len = sizeof(struct sockaddr);
 	result = recvfrom(m_boundFdUDP, buffer, 4096, 0, (struct sockaddr*)&from, &recv_len);
 	if(result < 0)
 	{
-		printf("recvfrom() returned <0!\n");
+		if( first == 0 )
+		{
+			printf("recvfrom() returned <0 (error was %u)!\n", WSAGetLastError());
+			first = 1;
+		}
 		return;
 	}
 
+	first = 1;
+	recv_len = result;
+
+	channel_id = *(uint16*)(&buffer[5]);
+	user_id = buffer[4];
+	z = (uint32)channel_id;
+	x = (uint32)user_id;
+
 	printf("from: %s:%u (%u bytes)\n", inet_ntoa(from.sin_addr), ntohs(from.sin_port), recv_len);
+	printf("this is channel %u and player id %u\n", z, x );
 	dumphex(buffer, recv_len);
 
-    // TODO: Decrypt the header.
+	// TODO: Decrypt the header.
+	header = *(uint32*)&buffer[0];
+
+	chn = GetChannel( channel_id );
+	if( chn == NULL )
+	{
+		printf("received data with non-valid channel\n");
+		return;
+	}
+
+	if( recv_len == 7 )
+	{
+		// add the member if its non-existant
+		chn_member = GetChannelMember( user_id, chn );
+		if( chn_member == NULL )
+		{
+			chn_member = SetChannelMember( user_id, chn, (struct sockaddr*)&from );
+			printf("initializing member %u: %s\n", x, chn_member ? "success" : "failure");			
+		}
+
+		return;		// some sort of init packet?
+	}
+	else
+		chn_member = GetChannelMember( user_id, chn );
+	
+	if( chn_member == NULL )
+	{
+		printf("received data from valid channel but invalid user\n");
+		return;
+	}
+
+	for( i = 0; i < chn->member_slots; ++i )
+	{
+		chn_destmember = &chn->members[i];
+		if( !chn_destmember->initialized )
+			continue;
+		
+		if( chn_destmember != chn_member )
+		{
+			printf("sendto result to %s: %d\n", inet_ntoa(chn_destmember->address.sin_addr),
+				sendto( m_boundFdUDP, buffer, recv_len, 0, (const struct sockaddr*)&chn_destmember->address, sizeof(struct sockaddr) ) );
+		}
+	}
+
+    /*
 
 	header = *(uint32*)&buffer[0];
 	channel_id = *(uint16*)&buffer[4];
@@ -131,7 +195,7 @@ void OnUdpRead()
 		{
 			result = sendto(m_boundFdUDP, buffer, recv_len, 0, (const struct sockaddr*)&chn_destmember->address, recv_len);
 		}
-	}
+	}*/
 }
 
 void OnListenTcpRead()

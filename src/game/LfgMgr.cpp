@@ -246,7 +246,7 @@ void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
 			possibleMembers.pop_front();
 		}
 		pMatch->lock.Release();*/
-		Group * pGroup = new Group;
+		Group * pGroup = new Group(true);
 		for(i = 0; i < 5, possibleMembers.size() > 0; ++i)
 		{
 			pGroup->AddMember( possibleMembers.front()->m_playerInfo );

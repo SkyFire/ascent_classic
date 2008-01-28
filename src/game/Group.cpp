@@ -51,7 +51,7 @@ enum PartyUpdateFlagGroups
 	GROUP_UPDATE_TYPE_FULL_REQUEST_REPLY		=   0x7FFC0BFF,
 };
 
-Group::Group()
+Group::Group(bool Assign)
 {
 	m_GroupType = GROUP_TYPE_PARTY;	 // Always init as party
 
@@ -66,8 +66,12 @@ Group::Group()
 	m_SubGroupCount = 1;
 	m_MemberCount = 0;
 
-	m_Id = objmgr.GenerateGroupId();
-	ObjectMgr::getSingleton().AddGroup(this);
+	if( Assign )
+	{
+		m_Id = objmgr.GenerateGroupId();
+		ObjectMgr::getSingleton().AddGroup(this);
+	}
+
 	m_dirty=false;
 	m_updateblock=false;
 	m_disbandOnNoMembers = true;
@@ -75,6 +79,11 @@ Group::Group()
 	m_isqueued=false;
 	m_difficulty=0;
 	m_assistantLeader=m_mainAssist=m_mainTank=NULL;
+#ifdef VOICE_CHAT
+	m_voiceChannelRequested = false;
+	m_voiceChannelId = 0;
+	m_voiceMemberHigh = 1;
+#endif
 }
 
 Group::~Group()
@@ -242,6 +251,14 @@ void Group::Update()
 				/* skip offline players */
 				if( (*itr1)->m_loggedInPlayer == NULL )
 					continue;
+
+#ifdef VOICE_CHAT
+				if( !(*itr1)->m_loggedInPlayer->m_inPartyVoice && sVoiceChatHandler.CanUseVoiceChat() )
+				{
+					AddVoiceMember( (*itr1)->m_loggedInPlayer );
+					(*itr1)->m_loggedInPlayer->m_inPartyVoice = true;
+				}
+#endif
 
 				data.Initialize(SMSG_GROUP_LIST);
 				data << uint8(m_GroupType);	//0=party,1=raid
@@ -701,6 +718,9 @@ void Group::LoadFromDB(Field *fields)
 	uint32 g;
 	m_updateblock=true;
 	m_Id = fields[0].GetUInt32();
+
+	ObjectMgr::getSingleton().AddGroup( this );
+
 	m_GroupType = fields[1].GetUInt8();
 	m_SubGroupCount = fields[2].GetUInt8();
 	m_LootMethod = fields[3].GetUInt8();
@@ -1049,7 +1069,7 @@ void WorldSession::HandlePartyMemberStatsOpcode(WorldPacket & recv_data)
 
 Group* Group::Create()
 {
-	return new Group;
+	return new Group(true);
 }
 
 void Group::SetMainAssist(PlayerInfo * pMember)
@@ -1082,3 +1102,118 @@ void Group::SetAssistantLeader(PlayerInfo * pMember)
 	Update();
 }
 
+
+/************************************************************************/
+/* Voicechat                                                            */
+/************************************************************************/
+#ifdef VOICE_CHAT
+
+void Group::CreateVoiceSession()
+{
+	sVoiceChatHandler.CreateGroupChannel( this );
+}
+
+void Group::VoiceChannelCreated(uint16 id)
+{
+	Log.Debug("Group", "voicechannelcreated: id %u", (uint32)id);
+	m_voiceChannelId = id;
+	SendVoiceUpdate();
+}
+
+void Group::AddVoiceMember(Player * pPlayer)
+{
+	m_groupLock.Acquire();
+	Log.Debug("Group", "adding voice member %u to group %u", pPlayer->GetGUIDLow(), GetID());
+
+	m_voiceMembers.insert( pPlayer );
+	pPlayer->m_inPartyVoiceId = m_voiceMemberHigh++;
+
+	if( !m_voiceChannelRequested )
+	{
+		if( m_voiceMembers.size() >= 2 )		// Don't create channels with only one member
+		{
+			CreateVoiceSession();
+			m_voiceChannelRequested = true;
+		}
+	}
+	else
+	{
+		if( m_voiceChannelId != 0 )
+			SendVoiceUpdate();
+	}
+
+	m_groupLock.Release();
+}
+
+void Group::RemoveVoiceMember(Player * pPlayer)
+{
+
+}
+
+void Group::SendVoiceUpdate()
+{
+	m_groupLock.Acquire();
+	Log.Debug("Group", "sendgroupupdate id %u", (uint32)m_voiceChannelId);
+
+	//static uint8 EncryptionKey[16] = { 0x14, 0x60, 0xcf, 0xaf, 0x9e, 0xa2, 0x78, 0x38, 0xce, 0xc7, 0xaf, 0x0b, 0x3a, 0x23, 0x61, 0x44 };
+	static uint8 EncryptionKey[16] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+	uint8 counter = 1;
+	size_t pos;
+	VoiceMemberSet::iterator itr, it2;
+	WorldPacket data(SMSG_VOICE_SESSION, 100);
+	data << uint32( 0x000016a2 );
+	data << uint32( 0xe0e10000 );		// this appears to be constant :S
+
+	data << uint16( m_voiceChannelId );		// voice channel id, used in udp packet
+	//data << uint16( 0xb168 );
+	data << uint8( 2 );						// party voice channel
+	data << uint8( 0 );						// for channels this is name
+	data.append( EncryptionKey, 16 );		// encryption key
+
+	// IP
+	// these dont appear to be in network byte order.. gg
+	data << uint8( 27 );					// 27
+	data << uint8( 1 );						// 1
+	data << uint8( 168 );					// 168
+	data << uint8( 192 );					// 192
+	// :
+	data << uint16( 3727 );					// port
+	
+	data << uint8( m_voiceMembers.size() );
+	pos = data.wpos();
+
+	for( itr = m_voiceMembers.begin(); itr != m_voiceMembers.end(); ++itr )
+	{
+		// Append ourself first, always.
+		data << uint64 ( (*itr)->GetGUID() );
+		data << uint8( (*itr)->m_inPartyVoiceId );
+
+		/*if( (*itr)->m_playerInfo == m_Leader )
+			data << uint8( 0x80 );
+		else*/
+			data << uint8( 0x06 );
+
+		for( it2 = m_voiceMembers.begin(); it2 != m_voiceMembers.end(); ++it2 )
+		{
+			if( (*it2) == (*itr) )
+				continue;
+
+			data << uint64( (*it2)->GetGUID() );
+			data << uint8( (*it2)->m_inPartyVoiceId );
+
+			if( (*itr)->m_playerInfo == m_Leader )
+				data << uint8( 0x80 );
+			else
+				data << uint8( 0xC8 );
+		}
+
+		data << uint8( 6 );
+
+		(*itr)->GetSession()->SendPacket( &data );
+		data.wpos( pos );
+	}
+
+	m_groupLock.Release();
+}
+#endif
