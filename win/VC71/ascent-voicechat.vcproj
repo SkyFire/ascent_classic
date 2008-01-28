@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="voicechat"
+	Name="ascent-voicechat"
 	ProjectGUID="{C36E06CE-9CBF-4B13-AA03-DA3F886F6B59}"
 	Keyword="Win32Proj">
 	<Platforms>
@@ -13,13 +13,13 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory=".\..\..\bin\Debug"
-			IntermediateDirectory="voicechat__2003_debug"
+			IntermediateDirectory="ascent-voicechat__2003_debug"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\shared;..\..\src\game"
+				AdditionalIncludeDirectories="..\..\dep\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -27,16 +27,16 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/voicechat.exe"
+				OutputFile="$(OutDir)/ascent-voicechat.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/voicechat.pdb"
+				ProgramDatabaseFile="$(OutDir)/ascent-voicechat.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -116,13 +116,13 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\src\voicechat\ConfigReader.c">
+				RelativePath="..\..\src\ascent-voicechat\ConfigReader.c">
 			</File>
 			<File
-				RelativePath="..\..\src\voicechat\Main.c">
+				RelativePath="..\..\src\ascent-voicechat\Main.c">
 			</File>
 			<File
-				RelativePath="..\..\src\voicechat\VoiceChat.c">
+				RelativePath="..\..\src\ascent-voicechat\VoiceChat.c">
 			</File>
 		</Filter>
 		<Filter
@@ -130,10 +130,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\..\src\voicechat\VoiceChat.h">
+				RelativePath="..\..\src\ascent-voicechat\VoiceChat.h">
 			</File>
 			<File
-				RelativePath="..\..\src\voicechat\VoiceChatOpcodes.h">
+				RelativePath="..\..\src\ascent-voicechat\VoiceChatOpcodes.h">
 			</File>
 		</Filter>
 	</Files>
