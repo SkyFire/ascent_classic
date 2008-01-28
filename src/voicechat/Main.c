@@ -159,43 +159,11 @@ void OnUdpRead()
 		
 		if( chn_destmember != chn_member )
 		{
-			printf("sendto result to %s: %d\n", inet_ntoa(chn_destmember->address.sin_addr),
-				sendto( m_boundFdUDP, buffer, recv_len, 0, (const struct sockaddr*)&chn_destmember->address, sizeof(struct sockaddr) ) );
+			// We really want to change this to nonblocking sockets later. - Burlex
+			/*printf("sendto result to %s: %d\n", inet_ntoa(chn_destmember->address.sin_addr),*/
+				sendto( m_boundFdUDP, buffer, recv_len, 0, (const struct sockaddr*)&chn_destmember->address, sizeof(struct sockaddr) )/* )*/;
 		}
 	}
-
-    /*
-
-	header = *(uint32*)&buffer[0];
-	channel_id = *(uint16*)&buffer[4];
-	user_id = buffer[5];
-	chn = GetChannel(channel_id);
-	if(chn == NULL)
-	{
-		// invalid channel
-		return;
-	}
-
-	chn_member = GetChannelMember(user_id, chn);
-	if(chn_member == NULL)
-	{
-		// coming from an invalid user
-		return;
-	}
-
-	// depending on the opcode
-
-	// distribute the packet to the rest of the members
-    for(i = 0; i < chn->member_count; ++i)
-	{
-		chn_destmember = &chn->members[i];
-		
-		// TODO: Encrypt the header
-		if(chn_destmember != chn_member)
-		{
-			result = sendto(m_boundFdUDP, buffer, recv_len, 0, (const struct sockaddr*)&chn_destmember->address, recv_len);
-		}
-	}*/
 }
 
 void OnListenTcpRead()
@@ -280,6 +248,30 @@ void HandleTcpRead(int fd)
 				return;
 			}
 		}break;
+	case VOICECHAT_CMSG_DELETE_CHANNEL:
+		{
+			int channel_id = *(int*)&buffer[4];
+			struct VoiceChatChannel * chn;
+
+			chn = GetChannel( (uint16)channel_id );
+			if( chn != NULL )
+			{
+				if( chn->prev != NULL )
+					chn->prev->next = chn->next;
+
+				if( chn->next != NULL )
+					chn->next->prev = chn->prev;
+
+				if( m_channelEnd == chn )
+					m_channelEnd = chn->prev;
+
+				if( m_channelBegin == chn )
+					m_channelBegin = chn->next;
+
+				free( chn->members );
+				free( chn );
+			}break;
+		}
 	}
 }
 
