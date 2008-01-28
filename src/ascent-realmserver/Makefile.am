@@ -33,7 +33,7 @@ WorldSocket.cpp
 	
 ascent_realmserver_LDADD = -lshared -lzlib
 
-ascent_realmserver_LDFLAGS = -L$(srcdir)/../shared \
+ascent_realmserver_LDFLAGS = -L$(srcdir)/../ascent-shared \
                -L$(srcdir)/../../dep/src/zlib \
                -L$(srcdir)/../../dep/src 
                

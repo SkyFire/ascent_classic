@@ -59,3 +59,5 @@ public:
 };
 
 #define sClientMgr ClientMgr::getSingleton()
+
+

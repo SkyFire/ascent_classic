@@ -22,7 +22,6 @@
 
 Database * Database_Character;
 Database * Database_World;
-CircularQueue<uint32,30> last_spells;
 
 int main(int argc, char *argv[])
 {
@@ -110,3 +109,5 @@ void OnCrash(bool Terminate)
 {
 
 }
+
+

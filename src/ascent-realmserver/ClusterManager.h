@@ -83,3 +83,5 @@ public:
 
 
 #define sClusterMgr ClusterMgr::getSingleton()
+
+

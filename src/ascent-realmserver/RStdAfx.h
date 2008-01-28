@@ -46,7 +46,7 @@
 
 #include <Network/Network.h>
 
-#include "../ascent-shared/Auth/md5.h"
+#include "../ascent-shared/Auth/MD5.h"
 #include "../ascent-shared/Auth/BigNumber.h"
 #include "../ascent-shared/Auth/Sha1.h"
 #include "../ascent-shared/Auth/WowCrypt.h"
