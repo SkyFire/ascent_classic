@@ -119,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\..\dep\lib\release\*.dll ..\..\bin\release&#x0D;&#x0A;copy ..\..\dep\lib\*.dll ..\..\bin\release&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -319,6 +319,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -418,6 +419,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>

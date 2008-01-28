@@ -104,7 +104,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist ..\..\bin\debug\logonserver.conf copy ..\..\src\logonserver.conf ..\..\bin\debug"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -194,7 +194,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist ..\..\bin\debug_x64\logonserver.conf copy ..\..\src\logonserver.conf ..\..\bin\debug_x64"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -293,7 +293,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist ..\..\bin\release\logonserver.conf copy ..\..\src\logonserver.conf ..\..\bin\release"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -388,7 +388,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="if not exist ..\..\bin\release_x64\logonserver.conf copy ..\..\src\logonserver.conf ..\..\bin\release_x64"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
