@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "VoiceChat.h"
 
 int LoadConfigs(int * udp_port, char * udp_address, int * tcp_port, char * tcp_address)

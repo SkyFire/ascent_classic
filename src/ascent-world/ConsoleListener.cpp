@@ -17,12 +17,13 @@
  *
  */
 
+#include "StdAfx.h"
+
 #include <Common.h>
 #include <Network/Network.h>
 #include <Config/ConfigEnv.h>
 #include <svn_revision.h>
 
-#include "StdAfx.h"
 #include "BaseConsole.h"
 #include "ConsoleCommands.h"
 #define LOCAL_BUFFER_SIZE 2048
