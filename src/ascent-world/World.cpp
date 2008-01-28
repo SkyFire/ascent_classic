@@ -3507,21 +3507,33 @@ bool World::SetInitialWorldSettings()
 	// Hunter - Hawk Eye
 	sp = dbcSpell.LookupEntryForced( 19498 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1;
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 	sp = dbcSpell.LookupEntryForced( 19499 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1;
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 	sp = dbcSpell.LookupEntryForced( 19500 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 1;
+		sp->EffectSpellGroupRelation[0] = 1 | 4;
 
 	//Hunter : Pathfinding
 	sp = dbcSpell.LookupEntryForced( 19559 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 2097152;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+	}
 	sp = dbcSpell.LookupEntryForced( 19560 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 2097152;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+	}
+	sp = dbcSpell.LookupEntryForced( 5131 );
+	if( sp != NULL )
+		sp->SpellGroupType = 2097152;
+	sp = dbcSpell.LookupEntryForced( 13160 );
+	if( sp != NULL )
+		sp->SpellGroupType = 2097152;;
 
 	//Hunter : Rapid Killing - might need to add honor trigger too here. I'm guessing you receive Xp too so i'm avoiding double proc
 	sp = dbcSpell.LookupEntryForced( 34948 );
@@ -3589,19 +3601,19 @@ bool World::SetInitialWorldSettings()
 	//Hunter : Mortal Shots
 	sp = dbcSpell.LookupEntryForced( 19485 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
 	sp = dbcSpell.LookupEntryForced( 19487 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
 	sp = dbcSpell.LookupEntryForced( 19488 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
 	sp = dbcSpell.LookupEntryForced( 19489 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
 	sp = dbcSpell.LookupEntryForced( 19490 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 | 1 | 4096 | 2048 | 512 | 65536 | 131072 | 262144;
+		sp->EffectSpellGroupRelation[0] = 4 ; //simple shot
 
 	//Hunter : Improved Barrage
 	sp = dbcSpell.LookupEntryForced( 35104 );

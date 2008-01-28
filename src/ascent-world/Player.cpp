@@ -5498,6 +5498,20 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 	float dist = CalcDistance( this, target );
 	float maxr = GetMaxRange( range ) + 2.52f;
 
+	if( spellinfo->SpellGroupType )
+	{
+		SM_FFValue( this->SM_FRange, &maxr, spellinfo->SpellGroupType );
+		SM_PFValue( this->SM_PRange, &maxr, spellinfo->SpellGroupType );
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		float spell_flat_modifers=0;
+		float spell_pct_modifers=0;
+		SM_FFValue(this->SM_FRange,&spell_flat_modifers,spellinfo->SpellGroupType);
+		SM_FFValue(this->SM_PRange,&spell_pct_modifers,spellinfo->SpellGroupType);
+		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
+			printf("!!!!!spell range bonus mod flat %f , spell range bonus pct %f , spell range %f, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxr,spellinfo->SpellGroupType);
+#endif
+	}
+
 	//float bonusRange = 0;
 	// another hackfix: bonus range from hunter talent hawk eye: +2/4/6 yard range to ranged weapons
 	//if(autoshot)

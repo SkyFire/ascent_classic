@@ -2940,17 +2940,17 @@ uint8 Spell::CanCast(bool tolerate)
 	// set up our max Range
 	float maxRange = GetMaxRange( dbcSpellRange.LookupEntry( m_spellInfo->rangeIndex ) );
 
-	if( m_spellInfo->SpellGroupType && u_caster )
+	if( m_spellInfo->SpellGroupType && u_caster != NULL )
 	{
 		SM_FFValue( u_caster->SM_FRange, &maxRange, m_spellInfo->SpellGroupType );
 		SM_PFValue( u_caster->SM_PRange, &maxRange, m_spellInfo->SpellGroupType );
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		int spell_flat_modifers=0;
-		int spell_pct_modifers=0;
-		SM_FIValue(u_caster->SM_FRange,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PRange,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		float spell_flat_modifers=0;
+		float spell_pct_modifers=0;
+		SM_FFValue(u_caster->SM_FRange,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FFValue(u_caster->SM_PRange,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 		if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-			printf("!!!!!spell range bonus mod flat %d , spell range bonus pct %d , spell range %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxRange,m_spellInfo->SpellGroupType);
+			printf("!!!!!spell range bonus mod flat %f , spell range bonus pct %f , spell range %f, spell group %u\n",spell_flat_modifers,spell_pct_modifers,maxRange,m_spellInfo->SpellGroupType);
 #endif
 	}
 
