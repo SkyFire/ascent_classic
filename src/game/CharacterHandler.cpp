@@ -896,35 +896,6 @@ void WorldSession::FullLogin(Player * plr)
 
 	if(enter_world && !_player->GetMapMgr())
 	{
-/*		MapMgr * mapMgr = sWorldCreator.GetInstance(plr->GetMapId(), plr);
-		
-		if(mapMgr && mapMgr->m_battleground)
-		{
-			CBattleground * bg = mapMgr->m_battleground;
-			int32 team;
-			if(bg->GetType() <= BATTLEGROUND_ARENA_5V5 && bg->GetType() >= BATTLEGROUND_ARENA_2V2)
-			{
-				team = ((Arena*)bg)->GetFreeTeam();
-			}
-			else
-			{
-				team = plr->GetTeam();
-			}
-
-			if(team >= 0 && bg->CanPlayerJoin(plr))
-			{
-				plr->m_bgTeam = team;
-				bg->PortPlayer(plr, false);
-			}
-			else
-			{
-				LocationVector vec(plr->m_bgEntryPointX, plr->m_bgEntryPointY, plr->m_bgEntryPointZ, plr->m_bgEntryPointO);
-				plr->SetMapId(plr->m_bgEntryPointMap);
-				plr->SetInstanceID(plr->m_bgEntryPointInstance);
-			}
-		}*/
-
-		//plr->SendInitialLogonPackets();
 		plr->AddToWorld();
 	}
 

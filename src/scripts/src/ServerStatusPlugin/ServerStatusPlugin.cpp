@@ -225,7 +225,11 @@ void StatDumper::DumpStats()
     std::deque<Player*> gms;
     {
         // Dump server information.
-		fprintf(f, "    <platform>Ascent %s r%u/%s-%s-%s</platform>\n", BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
+#ifdef WIN32
+		fprintf(f, "    <platform>Ascent %s r%u/%s-Win-%s (www.ascentemu.com)", BUILD_TAG, g_getRevision(), CONFIG, ARCH);		
+#else
+		fprintf(f, "    <platform>Ascent %s r%u/%s-%s %s(www.ascentemu.com)", BUILD_TAG, g_getRevision(), PLATFORM_TEXT, ARCH);
+#endif
 
         char uptime[80];
         GenerateUptimeString(uptime);
