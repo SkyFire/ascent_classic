@@ -600,7 +600,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		if( _player->flying_aura )
 		{
 			speed = _player->m_flySpeed;
-			speed_limit_scale = 3.0f;
 		}
 
 		if( !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
