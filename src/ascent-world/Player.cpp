@@ -42,7 +42,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_lifetapbonus		  = 0;
 	info					= NULL;				 // Playercreate info
 	bSafeFall			   = false;
-	bFeatherFall			   = false;
+	bFeatherFall		   = false;
 	SoulStone			   = 0;
 	SoulStoneReceiver		= 0;
 	bReincarnation			= false;

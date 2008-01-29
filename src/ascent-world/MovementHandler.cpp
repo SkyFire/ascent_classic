@@ -578,8 +578,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/* Anti-Speed Hack Checks                                               */
 	/************************************************************************/
 
-	//sLog.outDebug( "1 Speedhacker HB(%u) UT(%u) FF(%u) B(%u) E(%u) C(%u) T(%u) O(%i) F(%x)",_player->_lastHeartbeatT, time(NULL), _player->bFeatherFall,_player->blinked, sWorld.antihack_speed, _player->m_uint32Values[UNIT_FIELD_CHARM],_player->m_TransporterGUID, recv_data.GetOpcode(), movement_info.flags );
-
 	if( sWorld.antihack_speed )
 	{
 		float speed;
@@ -612,15 +610,14 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 				if( _player->_lastHeartbeatV >= speed )
 				{
-					//time_t time_delta = time( NULL ) - _player->_lastHeartbeatT; //server time since last heartbeat
-					//time_delta = time_delta < 1 ? 1 : time_delta;
-
 					float delta_x = movement_info.x - _player->_lastHeartbeatX;
 					float delta_y = movement_info.y - _player->_lastHeartbeatY;
 
 					float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
 					float distance_delta = distance_xy_plane / speed;
-					float speed_delta = ( speed * 0.25f ) + 0.16f; // 0.16f is sensitivity 0.0f is very touchy
+					float speed_delta = ( speed * 0.25f ) + 0.16f;
+
+					// 0.16f is sensitivity 0.0f is very delicate i would recomend a minimum of 0.1f
 
 					if( distance_delta >= speed_delta )
 					{
