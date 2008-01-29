@@ -620,7 +620,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				float distance_delta = distance_xy_plane - ( speed * time_delta );
 
 				//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
-				sLog.outDebug( "Speedhacker D(%f) DD(%f) DX(%f) DY(%f) S(%f) TS(%i)", distance, distance_delta, delta_x, delta_y, delta_z, speed, time_delta );
+				sLog.outDebug( "Speedhacker D(%f) DD(%f) DX(%f) DY(%f) S(%f) TS(%i)", distance_xy_plane, distance_delta, delta_x, delta_y, speed, time_delta );
 
 				if( distance_delta >= speed )
 				{
