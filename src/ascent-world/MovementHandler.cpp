@@ -602,66 +602,74 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			speed = _player->m_flySpeed;
 		}
 
-		if( !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
+		if( !_player->bFeatherFall && !_player->blinked && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
 		{
-			if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
+			if( _player->_lastHeartbeatT == 0 )
 			{
-				//sLog.outDebug( "2 Speedhacker V(%g) S(%g)", _player->_lastHeartbeatV, speed );
 
-				if( _player->_lastHeartbeatV >= speed )
+				if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
 				{
-					float delta_x = movement_info.x - _player->_lastHeartbeatX;
-					float delta_y = movement_info.y - _player->_lastHeartbeatY;
+					//sLog.outDebug( "2 Speedhacker V(%g) S(%g)", _player->_lastHeartbeatV, speed );
 
-					float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
-					float distance_delta = distance_xy_plane / speed;
-					float speed_delta = ( speed * 0.25f ) + 0.16f;
-
-					// 0.16f is sensitivity 0.0f is very delicate i would recomend a minimum of 0.1f
-
-					if( distance_delta >= speed_delta )
+					if( _player->_lastHeartbeatV >= speed )
 					{
-						switch ( _player->m_speedhackChances )
+						float delta_x = movement_info.x - _player->_lastHeartbeatX;
+						float delta_y = movement_info.y - _player->_lastHeartbeatY;
+
+						float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
+						float distance_delta = distance_xy_plane / speed;
+						float speed_delta = ( speed * 0.25f ) + 0.16f;
+
+						// 0.16f is sensitivity 0.0f is very delicate i would recomend a minimum of 0.1f
+
+						if( distance_delta >= speed_delta )
 						{
-						case 2:
+							switch ( _player->m_speedhackChances )
 							{
-								sChatHandler.SystemMessage( this, "Speedhacker detected this is your first warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 10 seconds.");
-								sCheatLog.writefromsession( this, "Speedhacker first warning" );
-								sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f)", distance_xy_plane, distance_delta, speed, speed_delta );
-								_player->SetMovement( MOVE_ROOT, 1 );
-								sEventMgr.AddEvent( _player, &Player::SetMovement, uint8( MOVE_UNROOT ), uint32(1), EVENT_DELETE_TIMER, 10000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
-								_player->ResetHeartbeatCoords();
-								_player->m_speedhackChances--;
-								break;
-							}
-						case 1:
-							{
-								sChatHandler.SystemMessage( this, "Speedhacker detected this is your second warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 45 seconds.");
-								sCheatLog.writefromsession( this, "Speedhacker second warning, deterministic data" );
-								sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f)", distance_xy_plane, distance_delta, speed, speed_delta );
-								_player->SetMovement( MOVE_ROOT, 1 );
-								sEventMgr.AddEvent( _player, &Player::SetMovement, uint8( MOVE_UNROOT ), uint32(1), EVENT_DELETE_TIMER, 45000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
-								_player->ResetHeartbeatCoords();
-								_player->m_speedhackChances--;
-								break;
-							}
-						case 0:
-							{
-								sChatHandler.SystemMessage( this, "Speedhacker detected you where warned. Your account has been flagged for later processing by server administrators. You will now be removed from the server.");
-								sCheatLog.writefromsession( this, "Speedhacker kicked, deterministic data" );
-								sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f)", distance_xy_plane, distance_delta, speed, speed_delta );
-								_player->m_KickDelay = 0;
-								sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
-								_player->SetMovement( MOVE_ROOT, 1 );
-								break;
+							case 2:
+								{
+									sChatHandler.SystemMessage( this, "Speedhacker detected this is your first warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 10 seconds.");
+									sCheatLog.writefromsession( this, "Speedhacker first warning" );
+									sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f)", distance_xy_plane, distance_delta, speed, speed_delta );
+									_player->SetMovement( MOVE_ROOT, 1 );
+									sEventMgr.AddEvent( _player, &Player::SetMovement, uint8( MOVE_UNROOT ), uint32(1), EVENT_DELETE_TIMER, 10000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+									_player->ResetHeartbeatCoords();
+									_player->m_speedhackChances--;
+									break;
+								}
+							case 1:
+								{
+									sChatHandler.SystemMessage( this, "Speedhacker detected this is your second warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 45 seconds.");
+									sCheatLog.writefromsession( this, "Speedhacker second warning, deterministic data" );
+									sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f)", distance_xy_plane, distance_delta, speed, speed_delta );
+									_player->SetMovement( MOVE_ROOT, 1 );
+									sEventMgr.AddEvent( _player, &Player::SetMovement, uint8( MOVE_UNROOT ), uint32(1), EVENT_DELETE_TIMER, 45000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+									_player->ResetHeartbeatCoords();
+									_player->m_speedhackChances--;
+									break;
+								}
+							case 0:
+								{
+									sChatHandler.SystemMessage( this, "Speedhacker detected you where warned. Your account has been flagged for later processing by server administrators. You will now be removed from the server.");
+									sCheatLog.writefromsession( this, "Speedhacker kicked, deterministic data" );
+									sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f)", distance_xy_plane, distance_delta, speed, speed_delta );
+									_player->m_KickDelay = 0;
+									sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+									_player->SetMovement( MOVE_ROOT, 1 );
+									break;
+								}
 							}
 						}
 					}
 				}
 			}
+			_player->_lastHeartbeatT = 0;
+		}
+		else
+		{
+			_player->_lastHeartbeatT = time( NULL );
 		}
 
-		//_player->_lastHeartbeatT = time( NULL );
 		_player->_lastHeartbeatV = speed;
 		_player->_lastHeartbeatX = movement_info.x;
 		_player->_lastHeartbeatY = movement_info.y;
