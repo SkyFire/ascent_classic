@@ -583,28 +583,28 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	if( sWorld.antihack_speed )
 	{
 		float speed;
-		float speed_limit;
+		float speed_limit_scale;
 
 		switch( _player->m_lastMoveType )
 		{
 		case 1:
 			speed = _player->m_swimSpeed;
-			speed_limit = 14.0f;
+			speed_limit_scale = 2.1f;
 			break;
 		case 2:
 			speed = _player->m_flySpeed;
-			speed_limit = 36.0f;
+			speed_limit_scale = 2.6f;
 			break;
 		default:
 			speed = _player->m_runSpeed;
-			speed_limit = 64.0f;
+			speed_limit_scale = 2.9f;
 			break;
 		}
 
 		if( _player->flying_aura )
 		{
 			speed = _player->m_flySpeed;
-			speed_limit = 64.0f;
+			speed_limit = 2.9f;
 		}
 
 		if( !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
@@ -630,7 +630,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 					//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
 					sLog.outDebug( "Speedhacker D(%f) DD(%f) DX(%f) DY(%f) S(%f) TS(%f)", distance_xy_plane, distance_delta, delta_x, delta_y, speed, float( int32( time_delta ) ) );
 
-					if( distance_delta >= speed_limit )
+					if( distance_delta >= ( speed * speed_limit_scale ) )
 					{
 						switch ( _player->m_speedhackChances )
 						{
