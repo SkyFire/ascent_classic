@@ -6025,7 +6025,7 @@ void Player::UpdateNearbyGameObjects()
 						for(;itr2!=((GameObject*)(*itr))->m_quests->end();++itr2)
 						{
 							uint32 status = sQuestMgr.CalcQuestStatus(NULL, this, (*itr2)->qst, (*itr2)->type, false);
-							if(status == QMGR_QUEST_AVAILABLE || status == QMGR_QUEST_REPEATABLE || status == QMGR_QUEST_FINISHED)
+							if(status == QMGR_QUEST_CHAT || status == QMGR_QUEST_AVAILABLE || status == QMGR_QUEST_REPEATABLE || status == QMGR_QUEST_FINISHED)
 							{
 								// Activate gameobject
 								EventActivateGameObject((GameObject*)(*itr));

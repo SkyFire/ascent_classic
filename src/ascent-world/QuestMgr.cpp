@@ -77,6 +77,10 @@ uint32 QuestMgr::PlayerMeetsReqs(Player* plr, Quest* qst, bool skiplevelcheck)
 		}
 	}
 
+	// check quest level
+	if( plr->getLevel() >= ( qst->max_level + 5 ) )
+		return QMGR_QUEST_CHAT;
+
 	return status;
 }
 
@@ -219,7 +223,7 @@ uint32 QuestMgr::ActiveQuestsCount(Object* quest_giver, Player* plr)
 
 	for(itr = q_begin; itr != q_end; ++itr)
 	{
-		if (CalcQuestStatus(quest_giver, plr, *itr) >= QMGR_QUEST_NOT_FINISHED)
+		if (CalcQuestStatus(quest_giver, plr, *itr) >= QMGR_QUEST_CHAT)
 		{
 			if (tmp_map.find((*itr)->qst->id) == tmp_map.end())
 			{
@@ -511,7 +515,8 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr,
 
 	for (it = st; it != ed; ++it)
 	{
-		if (sQuestMgr.CalcQuestStatus(qst_giver, plr, *it) >= QMGR_QUEST_NOT_FINISHED)
+		status = sQuestMgr.CalcQuestStatus(qst_giver, plr, *it);
+		if (status >= QMGR_QUEST_CHAT)
 		{
 			if (tmp_map.find((*it)->qst->id) == tmp_map.end())
 			{
@@ -521,7 +526,7 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr,
 				*data << (*it)->qst->id;
 				/**data << sQuestMgr.CalcQuestStatus(qst_giver, plr, *it);
 				*data << uint32(0);*/
-				status = sQuestMgr.CalcQuestStatus(qst_giver, plr, *it);
+				
 				switch(status)
 				{
 				case QMGR_QUEST_NOT_FINISHED:
@@ -530,6 +535,10 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr,
 
 				case QMGR_QUEST_FINISHED:
 					*data << uint32(4) << uint32(1);
+					break;
+
+				case QMGR_QUEST_CHAT:
+					*data << uint32( QMGR_QUEST_AVAILABLE ) << uint32( 0 );
 					break;
 
 				default:
@@ -1441,7 +1450,7 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 
 		uint32 status = sQuestMgr.CalcStatus(qst_giver, plr);
 
-		if ((status == QMGR_QUEST_AVAILABLE) || (status == QMGR_QUEST_REPEATABLE))
+		if ((status == QMGR_QUEST_AVAILABLE) || (status == QMGR_QUEST_REPEATABLE) || (status == QMGR_QUEST_CHAT))
 		{
 			sQuestMgr.BuildQuestDetails(&data, (*itr)->qst, qst_giver, 1, plr->GetSession()->language);		// 1 because we have 1 quest, and we want goodbye to function
 			plr->GetSession()->SendPacket(&data);

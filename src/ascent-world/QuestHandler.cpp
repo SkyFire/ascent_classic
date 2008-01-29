@@ -182,7 +182,7 @@ void WorldSession::HandleQuestGiverQueryQuestOpcode( WorldPacket & recv_data )
 		return;
 	}*/	// bleh.. not needed.. maybe for antihack later on would be a good idea though
 	
-	if ((status == QMGR_QUEST_AVAILABLE) || (status == QMGR_QUEST_REPEATABLE))
+	if ((status == QMGR_QUEST_AVAILABLE) || (status == QMGR_QUEST_REPEATABLE) || (status == QMGR_QUEST_CHAT))
 	{
 		sQuestMgr.BuildQuestDetails(&data, qst,qst_giver,1, language);	 // 0 because we want goodbye to function
 		SendPacket(&data);
@@ -293,7 +293,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 	// it isn't available.
 	uint32 status = sQuestMgr.CalcQuestStatus(qst_giver, _player,qst,3, bSkipLevelCheck);
 
-	if((!sQuestMgr.IsQuestRepeatable(qst) && _player->HasFinishedQuest(qst->id)) || ( status != QMGR_QUEST_AVAILABLE && status != QMGR_QUEST_REPEATABLE )
+	if((!sQuestMgr.IsQuestRepeatable(qst) && _player->HasFinishedQuest(qst->id)) || ( status != QMGR_QUEST_AVAILABLE && status != QMGR_QUEST_REPEATABLE && status != QMGR_QUEST_CHAT )
 		|| !hasquest)
 	{
 		// We've got a hacker. Disconnect them.
@@ -731,7 +731,7 @@ void WorldSession::HandlePushQuestToPartyOpcode(WorldPacket &recv_data)
 {
     if(!_player) return;
 	if(!_player->IsInWorld()) return;
-	uint32 questid;
+	uint32 questid, status;
 	recv_data >> questid;
 
 	sLog.outDetail( "WORLD: Received CMSG_PUSHQUESTTOPARTY quest = %u", questid );
@@ -773,7 +773,8 @@ void WorldSession::HandlePushQuestToPartyOpcode(WorldPacket &recv_data)
 							response = QUEST_SHARE_MSG_HAVE_QUEST;
 							continue;
 						}
-						if(sQuestMgr.PlayerMeetsReqs(pPlayer, pQuest, false) != QMGR_QUEST_AVAILABLE)
+						status = sQuestMgr.PlayerMeetsReqs(pPlayer, pQuest, false);
+						if(status != QMGR_QUEST_AVAILABLE && status != QMGR_QUEST_CHAT)
 						{
 							response = QUEST_SHARE_MSG_CANT_TAKE_QUEST;
 							continue;
