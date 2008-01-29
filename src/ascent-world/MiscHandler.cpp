@@ -459,12 +459,12 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                                         pGO->SetUInt32Value( GAMEOBJECT_STATE, 1 );
 										// TODO : redo this temporary fix, because for some reason hasloot is true even when we loot everything
 										// my guess is we need to set up some even that rechecks the GO in 10 seconds or something
-										pGO->Despawn( 600000 + ( RandomUInt( 300000 ) ) );
+										//pGO->Despawn( 600000 + ( RandomUInt( 300000 ) ) );
                                         return;
                                     }
                                     else
                                     {
-										pGO->Despawn( 600000 + ( RandomUInt( 300000 ) ) );
+										pGO->Despawn( 60000 + ( RandomUInt( 180000 ) ) );
 										return;
                                     }
 

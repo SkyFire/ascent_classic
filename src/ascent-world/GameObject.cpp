@@ -683,7 +683,12 @@ bool GameObject::HasLoot()
 {
     int count=0;
     for(vector<__LootItem>::iterator itr = loot.items.begin(); itr != loot.items.end(); ++itr)
+	{
+		if( itr->item.itemproto->Bonding == ITEM_BIND_QUEST || itr->item.itemproto->Bonding == ITEM_BIND_QUEST2 )
+			continue;
+
 		count += (itr)->iItemsCount;
+	}
 
     return (count>0);
 
