@@ -477,7 +477,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                                     else
                                     {
     									pGO->CalcMineRemaining( true );
-										pGO->Despawn( 600000 + ( RandomUInt( 300000 ) ) );
+										pGO->Despawn( 60000 + ( RandomUInt( 180000 ) ) );
 										return;
                                     }
                                 }
