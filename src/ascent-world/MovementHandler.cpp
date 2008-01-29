@@ -608,7 +608,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			if( _player->_lastHeartbeatV >= speed )
 			{
 				float time_delta = float( time( NULL ) - _player->_lastHeartbeatT ); //server time since last heartbeat
-				time_delta = time_delta < 1.0f : 1.0f : time_delta;
+				time_delta = time_delta < 1.0f ? 1.0f : time_delta;
 
 				float delta_x = movement_info.x - _player->_lastHeartbeatX;
 				float delta_y = movement_info.y - _player->_lastHeartbeatY;
