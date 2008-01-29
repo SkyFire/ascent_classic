@@ -47,6 +47,7 @@ struct LevelInfo;
 //  Holds the display id and item type id for objects in
 //  a character's inventory
 //====================================================================
+
 enum Classes
 {
 	WARRIOR = 1,
@@ -59,6 +60,7 @@ enum Classes
 	WARLOCK = 9,
 	DRUID = 11,
 };
+
 enum Races
 {
 	RACE_HUMAN = 1,
@@ -72,6 +74,7 @@ enum Races
 	RACE_BLOODELF = 10,
 	RACE_DRAENEI = 11,
 };
+
 enum PlayerStatus
 {
 	NONE			 = 0,
@@ -126,6 +129,7 @@ enum PlayerMovementType
     MOVE_WATER_WALK = 3,
     MOVE_LAND_WALK  = 4,
 };
+
 enum PlayerSpeedType
 {
     RUN	            = 1,
@@ -135,6 +139,7 @@ enum PlayerSpeedType
     WALK	        = 5,
     FLY	            = 6,
 };
+
 enum Standing
 {
     STANDING_HATED,
@@ -146,6 +151,7 @@ enum Standing
     STANDING_REVERED,
     STANDING_EXALTED
 };
+
 enum PlayerFlags
 {
     PLAYER_FLAG_PARTY_LEADER		= 0x01,
@@ -186,6 +192,7 @@ struct spells
 	uint16  spellId;
 	uint16  slotId;
 };
+
 #pragma pack(push,1)
 struct ActionButton
 {
@@ -201,12 +208,14 @@ struct CreateInfo_ItemStruct
 	uint8   slot;
 	uint32  amount;
 };
+
 struct CreateInfo_SkillStruct
 {
 	uint32  skillid;
 	uint32  currentval;
 	uint32  maxval;
 };
+
 struct CreateInfo_ActionBarStruct
 {
 	uint32  button;
@@ -214,6 +223,7 @@ struct CreateInfo_ActionBarStruct
 	uint32  type;
 	uint32  misc;
 };
+
 struct PlayerCreateInfo{
 	uint8   index;
 	uint8   race;
@@ -246,6 +256,7 @@ struct PlayerCreateInfo{
 	//uint8 item_slot[10];
 	//uint16 spell[10];
 };
+
 struct DamageSplit
 {
 	Player* caster;

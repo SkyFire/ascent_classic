@@ -1,7 +1,6 @@
 #ifndef SKILL_H
 #define SKILL_H
 
-
 #define SKILL_FROST                     6
 #define SKILL_FIRE                      8
 #define SKILL_ARMS                      26
@@ -149,7 +148,6 @@
 #define SKILL_PET_SERPENT               768
 #define SKILL_INTERNAL                  769
 
-
 #define SKILL_TYPE_ATTRIBUTES           5
 #define SKILL_TYPE_WEAPON               6
 #define SKILL_TYPE_CLASS                7
@@ -159,11 +157,12 @@
 #define SKILL_TYPE_PROFESSION           11
 #define SKILL_TYPE_NA                   12
 
-typedef struct{
-    uint8   itemclass;
-    uint32  subclass;
-}ItemProf;
-const ItemProf * GetProficiencyBySkill(uint32 skill);
+typedef struct
+{
+    uint8 itemclass;
+    uint32 subclass;
+} ItemProf;
 
+const ItemProf* GetProficiencyBySkill(uint32 skill);
 
 #endif
