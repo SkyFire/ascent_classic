@@ -608,7 +608,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			if( _player->_lastHeartbeatV >= speed )
 			{
 				time_t time_delta = time( NULL ) - _player->_lastHeartbeatT; //server time since last heartbeat
-				time_delta = time_delta < 1 ? 1f : time_delta;
+				time_delta = time_delta < 1 ? 1 : time_delta;
 
 				float delta_x = movement_info.x - _player->_lastHeartbeatX;
 				float delta_y = movement_info.y - _player->_lastHeartbeatY;
@@ -620,7 +620,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				float distance_delta = distance_xy_plane - ( speed * float( int32( time_delta ) ) );
 
 				//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
-				sLog.outDebug( "Speedhacker D(%f) DD(%f) DX(%f) DY(%f) S(%f) TS(%i)", distance_xy_plane, distance_delta, delta_x, delta_y, speed, time_delta );
+				sLog.outDebug( "Speedhacker D(%f) DD(%f) DX(%f) DY(%f) S(%f) TS(%f)", distance_xy_plane, distance_delta, delta_x, delta_y, speed, float( int32( time_delta ) ) );
 
 				if( distance_delta >= speed )
 				{
