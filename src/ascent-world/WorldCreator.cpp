@@ -56,6 +56,12 @@ void InstanceMgr::Load(TaskList * l)
 			if(WorldMapInfoStorage.LookupEntry(result->Fetch()[0].GetUInt32()) == NULL)
 				continue;
 
+			if( result->Fetch()[0].GetUInt32() >= NUM_MAPS )
+			{
+				Log.Warning("InstanceMgr", "One or more of your creature_spawns rows specifies an invalid map: %u", result->Fetch()[0].GetUInt32() );
+				continue;
+			}
+
 			//_CreateMap(result->Fetch()[0].GetUInt32());
 			l->AddTask(new Task(new CallbackP1<InstanceMgr,uint32>(this, &InstanceMgr::_CreateMap, result->Fetch()[0].GetUInt32())));
 		} while(result->NextRow());
@@ -68,6 +74,12 @@ void InstanceMgr::Load(TaskList * l)
 	StorageContainerIterator<MapInfo> * itr = WorldMapInfoStorage.MakeIterator();
 	while(!itr->AtEnd())
 	{
+		if( itr->Get()->mapid >= NUM_MAPS )
+		{
+			Log.Warning("InstanceMgr", "One or more of your worldmap_info rows specifies an invalid map: %u", itr->Get()->mapid );
+			continue;
+		}
+
 		if(m_maps[itr->Get()->mapid] == NULL)
 		{
 			l->AddTask(new Task(new CallbackP1<InstanceMgr,uint32>(this, &InstanceMgr::_CreateMap, itr->Get()->mapid)));
@@ -382,10 +394,12 @@ MapMgr * InstanceMgr::_CreateInstance(Instance * in)
 
 void InstanceMgr::_CreateMap(uint32 mapid)
 {
+	if( mapid >= NUM_MAPS )
+		return;
+
 	MapInfo * inf;
 
 	inf = WorldMapInfoStorage.LookupEntry(mapid);
-	ASSERT(mapid<NUM_MAPS);
 	if(inf==NULL)
 		return;
 	if(m_maps[mapid]!=NULL)
@@ -842,6 +856,9 @@ void InstanceMgr::PlayerLeftGroup(Group * pGroup, Player * pPlayer)
 MapMgr * InstanceMgr::CreateBattlegroundInstance(uint32 mapid)
 {
 	// shouldn't happen
+	if( mapid >= NUM_MAPS )
+		return NULL;
+
 	if(!m_maps[mapid])
 	{
 		_CreateMap(mapid);
