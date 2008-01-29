@@ -935,8 +935,8 @@ public:
 	std::map<uint32,signed int> target_spell_effect_mod_pct; //used very rarely by some talents. Store value in % format
 
 	//Events
-	void Emote (EmoteType emote);
-	void EventAddEmote(EmoteType emote, uint32 time);
+	void Emote( EmoteType emote );
+	void EventAddEmote( EmoteType emote, uint32 time );
 	void EmoteExpire();
 	ASCENT_INLINE void setEmoteState(uint8 emote) { m_emoteState = emote; };
 	ASCENT_INLINE uint32 GetOldEmote() { return m_oldEmote; }
@@ -952,10 +952,10 @@ public:
 		return StandState (uint8 (bytes1));
 	}
 
-	void SendChatMessage(uint8 type, uint32 lang, const char *msg);
-	void SendChatMessageToPlayer(uint8 type, uint32 lang, const char *msg, Player *plr);
-	void SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg);
-	void RegisterPeriodicChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify);
+	void SendChatMessage( uint8 type, uint32 lang, const char* msg );
+	void SendChatMessageToPlayer( uint8 type, uint32 lang, const char* msg, Player* plr );
+	void SendChatMessageAlternateEntry( uint32 entry, uint8 type, uint32 lang, const char* msg);
+	void RegisterPeriodicChatMessage( uint32 delay, uint32 msgid, std::string message, bool sendnotify );
 
 	ASCENT_INLINE int GetHealthPct() { return (int)(GetUInt32Value(UNIT_FIELD_HEALTH) * 100 / GetUInt32Value(UNIT_FIELD_MAXHEALTH)); };
     ASCENT_INLINE void SetHealthPct(uint32 val) { if (val>0) SetUInt32Value(UNIT_FIELD_HEALTH,float2int32(val*0.01f*GetUInt32Value(UNIT_FIELD_MAXHEALTH))); };
