@@ -583,21 +583,17 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	if( sWorld.antihack_speed )
 	{
 		float speed;
-		float speed_limit_scale;
 
 		switch( _player->m_lastMoveType )
 		{
 		case 1:
 			speed = _player->m_swimSpeed;
-			speed_limit_scale = 2.0f;
 			break;
 		case 2:
 			speed = _player->m_flySpeed;
-			speed_limit_scale = 2.5f;
 			break;
 		default:
 			speed = _player->m_runSpeed;
-			speed_limit_scale = 3.0f;
 			break;
 		}
 
@@ -622,11 +618,12 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 					float delta_y = movement_info.y - _player->_lastHeartbeatY;
 
 					float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
-					float distance_delta = distance_xy_plane - ( speed * float( int32( time_delta ) ) );
+					float distance_delta = distance_xy_plane / speed;
+					float speed_delta = ( speed / 4.0f ) + 0.16f; // 0.16f is sensitivity 0.0f is very touchy
 
-					sLog.outDebug( "Speedhacker D(%f) DD(%f) DX(%f) DY(%f) S(%f) TS(%f)", distance_xy_plane, distance_delta, delta_x, delta_y, speed, float( int32( time_delta ) ) );
+					sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f) TS(%f)", distance_xy_plane, distance_delta, speed, speed_delta, float( int32( time_delta ) ) );
 
-					if( distance_delta >= ( speed * speed_limit_scale ) )
+					if( distance_delta >= speed_delta )
 					{
 						switch ( _player->m_speedhackChances )
 						{
