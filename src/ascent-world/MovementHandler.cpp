@@ -589,22 +589,22 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		{
 		case 1:
 			speed = _player->m_swimSpeed;
-			speed_limit_scale = 2.1f;
+			speed_limit_scale = 2.0f;
 			break;
 		case 2:
 			speed = _player->m_flySpeed;
-			speed_limit_scale = 2.6f;
+			speed_limit_scale = 2.5f;
 			break;
 		default:
 			speed = _player->m_runSpeed;
-			speed_limit_scale = 2.9f;
+			speed_limit_scale = 3.0f;
 			break;
 		}
 
 		if( _player->flying_aura )
 		{
 			speed = _player->m_flySpeed;
-			speed_limit_scale = 2.9f;
+			speed_limit_scale = 3.0f;
 		}
 
 		if( !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
