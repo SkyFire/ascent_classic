@@ -1147,6 +1147,22 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH,pet_dmg);
 			unitTarget->DealDamage(u_caster,pet_dmg,0,0,25228,true);
 		}break;
+
+	case 35729:	// rogue - cloak of shadows
+		{
+			if( !unitTarget || !unitTarget->isAlive())
+				return;
+
+			Aura * pAura;
+			for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
+			{
+				pAura = unitTarget->m_auras[i];
+				if( pAura != NULL && !pAura->IsPassive() && !pAura->IsPositive() && pAura->GetSpellProto()->can_be_dispelled )
+				{
+					pAura->Remove();
+				}
+			}
+		}break;
 	}										 
 }
 
@@ -2650,7 +2666,7 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 	{
 		aur = unitTarget->m_auras[x];
 		//Nothing can dispel resurrection sickness;
-		if(!aur->IsPassive() && aur->GetSpellId() != 15007)
+		if(!aur->IsPassive() && aur->GetSpellProto()->can_be_dispelled)
 		{
 			if(m_spellInfo->DispelType == DISPEL_ALL)
 			{
