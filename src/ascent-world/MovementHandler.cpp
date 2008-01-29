@@ -622,7 +622,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
 				sLog.outDebug( "Speedhacker D(%f) DD(%f) DX(%f) DY(%f) S(%f) TS(%f)", distance_xy_plane, distance_delta, delta_x, delta_y, speed, float( int32( time_delta ) ) );
 
-				if( distance_delta >= ( ( speed * speed ) * 0.5f ) )
+				if( distance_delta >= ( speed * 2.0f ) )
 				{
 					switch ( _player->m_speedhackChances )
 					{
