@@ -89,19 +89,22 @@ enum RandomFlags
 class AngelScriptEngine
 {
 private:
-//	lua_State * L;
+
 //	Mutex m_Lock;
-//
+
 public:
-//	LuaEngine();
-//	~LuaEngine();
-//
+	AngelScriptEngine();
+	~AngelScriptEngine();
+
 	void LoadScripts();
 	void LoadScript( string filename );
+
+	void Startup();
 	void Shutdown();
 	void Restart();
 
 //	void RegisterCoreFunctions();
+
 //	ASCENT_INLINE Mutex& GetLock() { return m_Lock; }
 //
 //	void OnUnitEvent(Unit * pUnit, const char * FunctionName, uint32 EventType, Unit * pMiscUnit, uint32 Misc);
@@ -110,41 +113,46 @@ public:
 //	void CallFunction(Unit * pUnit, const char * FuncName);
 };
 
-//struct LuaUnitBinding { const char * Functions[CREATURE_EVENT_COUNT]; };
-//struct LuaQuestBinding { const char * Functions[QUEST_EVENT_COUNT]; };
-//struct LuaGameObjectBinding { const char * Functions[GAMEOBJECT_EVENT_COUNT]; };
+struct AngelScriptUnitBinding { const char* Functions[CREATURE_EVENT_COUNT]; };
+struct AngelScriptQuestBinding { const char* Functions[QUEST_EVENT_COUNT]; };
+struct AngelScriptGameObjectBinding { const char* Functions[GAMEOBJECT_EVENT_COUNT]; };
 
 class AngelScriptEngineMgr
 {
 private:
-//	typedef HM_NAMESPACE::hash_map<uint32, LuaUnitBinding> UnitBindingMap;
-//	typedef HM_NAMESPACE::hash_map<uint32, LuaQuestBinding> QuestBindingMap;
-//	typedef HM_NAMESPACE::hash_map<uint32, LuaGameObjectBinding> GameObjectBindingMap;
-//	UnitBindingMap m_unitBinding;
-//	QuestBindingMap m_questBinding;
-//	GameObjectBindingMap m_gameobjectBinding;
+
+	typedef HM_NAMESPACE::hash_map< uint32, AngelScriptUnitBinding > UnitBindingMap;
+	typedef HM_NAMESPACE::hash_map< uint32, AngelScriptQuestBinding > QuestBindingMap;
+	typedef HM_NAMESPACE::hash_map< uint32, AngelScriptGameObjectBinding > GameObjectBindingMap;
+
+	UnitBindingMap m_unitBinding;
+	QuestBindingMap m_questBinding;
+	GameObjectBindingMap m_gameobjectBinding;
 
 public:
-	AngelScriptEngine* m_engine;
-	void Startup();
-	void Unload();
 
-//	void RegisterUnitEvent(uint32 Id, uint32 Event, const char * FunctionName);
-//	void RegisterQuestEvent(uint32 Id, uint32 Event, const char * FunctionName);
-//	void RegisterGameObjectEvent(uint32 Id, uint32 Event, const char * FunctionName);
-//
+	AngelScriptEngine* m_engine;
+
+	void Startup();
+	void Shutdown();
+	void Restart();
+
+	void RegisterUnitEvent( uint32 Id, uint32 Event, const char* FunctionName );
+	void RegisterQuestEvent( uint32 Id, uint32 Event, const char* FunctionName );
+	void RegisterGameObjectEvent( uint32 Id, uint32 Event, const char* FunctionName );
+
 //	LuaUnitBinding * GetUnitBinding(uint32 Id)
 //	{
 //		UnitBindingMap::iterator itr = m_unitBinding.find(Id);
 //		return (itr == m_unitBinding.end()) ? NULL : &itr->second;
 //	}
-//
+
 //	LuaQuestBinding * GetQuestBinding(uint32 Id)
 //	{
 //		QuestBindingMap::iterator itr = m_questBinding.find(Id);
 //		return (itr == m_questBinding.end()) ? NULL : &itr->second;
 //	}
-//
+
 //	LuaGameObjectBinding * GetGameObjectBinding(uint32 Id)
 //	{
 //		GameObjectBindingMap::iterator itr =m_gameobjectBinding.find(Id);

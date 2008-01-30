@@ -29,9 +29,10 @@
 
 bool as_is_starting_up = false;
 
-ScriptMgr* m_scriptMgr;
-//AngelScriptEngineMgr g_asMgr;
-//AngelScriptEngine* g_engine;
+AngelScriptEngineMgr g_asMgr;
+AngelScriptEngine* g_engine;
+ScriptMgr* g_scriptMgr;
+
 asIScriptEngine* g_asEngine;
 
 extern "C" SCRIPT_DECL uint32 _exp_get_version()
@@ -44,10 +45,20 @@ extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
 	return SCRIPT_TYPE_SCRIPT_ENGINE | SCRIPT_TYPE_SCRIPT_ENGINE_AS;
 }
 
-extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
+extern "C" SCRIPT_DECL void _exp_script_register( ScriptMgr* mgr )
 {
-	m_scriptMgr = mgr;
-	//g_asMgr.Startup();
+	g_scriptMgr = mgr;
+	g_asMgr.Startup();
+}
+
+void MessageCallback( const asSMessageInfo* msg, void* param )
+{
+	if( msg->type == asMSGTYPE_WARNING ) 
+		Log.Warning( "%s (%d, %d) : %s : %s", msg->section, msg->row, msg->col, msg->message );
+	else if( msg->type == asMSGTYPE_ERROR ) 
+		Log.Error( "%s (%d, %d) : %s : %s", msg->section, msg->row, msg->col, msg->message );
+	else if( msg->type == asMSGTYPE_INFORMATION ) 
+		Log.Notice( "%s (%d, %d) : %s : %s", msg->section, msg->row, msg->col, msg->message );
 }
 
 template<typename T>
@@ -96,221 +107,41 @@ const char* GetTClassName< GameObject >()
 //template<>
 //RegType<GameObject>* GetMethodTable<GameObject>() { return GOMethods; }
 
-//template <typename T> class Lunar {
-//	typedef struct { T *pT; } userdataType;
-//public:
-//	typedef int (*mfp)(lua_State *L, T* ptr);
-//	typedef struct { const char *name; mfp mfunc; } RegType;
-//
-//	static void Register(lua_State *L) {
-//		lua_newtable(L);
-//		int methods = lua_gettop(L);
-//
-//		luaL_newmetatable(L, GetTClassName<T>());
-//		int metatable = lua_gettop(L);
-//
-//		// store method table in globals so that
-//		// scripts can add functions written in Lua.
-//		lua_pushvalue(L, methods);
-//		set(L, LUA_GLOBALSINDEX, GetTClassName<T>());
-//
-//		// hide metatable from Lua getmetatable()
-//		lua_pushvalue(L, methods);
-//		set(L, metatable, "__metatable");
-//
-//		lua_pushvalue(L, methods);
-//		set(L, metatable, "__index");
-//
-//		lua_pushcfunction(L, tostring_T);
-//		set(L, metatable, "__tostring");
-//
-//		lua_pushcfunction(L, gc_T);
-//		set(L, metatable, "__gc");
-//
-//		lua_newtable(L);                // mt for method table
-//		lua_pushcfunction(L, new_T);
-//		lua_pushvalue(L, -1);           // dup new_T function
-//		set(L, methods, "new");         // add new_T to method table
-//		set(L, -3, "__call");           // mt.__call = new_T
-//		lua_setmetatable(L, methods);
-//
-//		// fill method table with methods from class T
-//		for (RegType *l = ((RegType*)GetMethodTable<T>()); l->name; l++) {
-//			lua_pushstring(L, l->name);
-//			lua_pushlightuserdata(L, (void*)l);
-//			lua_pushcclosure(L, thunk, 1);
-//			lua_settable(L, methods);
-//		}
-//
-//		lua_pop(L, 2);  // drop metatable and method table
-//	}
-//
-//	// call named lua method from userdata method table
-//	static int call(lua_State *L, const char *method,
-//		int nargs=0, int nresults=LUA_MULTRET, int errfunc=0)
-//	{
-//		int base = lua_gettop(L) - nargs;  // userdata index
-//		if (!luaL_checkudata(L, base, T::className)) {
-//			lua_settop(L, base-1);           // drop userdata and args
-//			lua_pushfstring(L, "not a valid %s userdata", T::className);
-//			return -1;
-//		}
-//
-//		lua_pushstring(L, method);         // method name
-//		lua_gettable(L, base);             // get method from userdata
-//		if (lua_isnil(L, -1)) {            // no method?
-//			lua_settop(L, base-1);           // drop userdata and args
-//			lua_pushfstring(L, "%s missing method '%s'", T::className, method);
-//			return -1;
-//		}
-//		lua_insert(L, base);               // put method under userdata, args
-//
-//		int status = lua_pcall(L, 1+nargs, nresults, errfunc);  // call method
-//		if (status) {
-//			const char *msg = lua_tostring(L, -1);
-//			if (msg == NULL) msg = "(error with no message)";
-//			lua_pushfstring(L, "%s:%s status = %d\n%s",
-//				T::className, method, status, msg);
-//			lua_remove(L, base);             // remove old message
-//			return -1;
-//		}
-//		return lua_gettop(L) - base + 1;   // number of results
-//	}
-//
-//	// push onto the Lua stack a userdata containing a pointer to T object
-//	static int push(lua_State *L, T *obj, bool gc=false) {
-//		if (!obj) { lua_pushnil(L); return 0; }
-//		luaL_getmetatable(L, GetTClassName<T>());  // lookup metatable in Lua registry
-//		if (lua_isnil(L, -1)) luaL_error(L, "%s missing metatable", GetTClassName<T>());
-//		int mt = lua_gettop(L);
-//		subtable(L, mt, "userdata", "v");
-//		userdataType *ud =
-//			static_cast<userdataType*>(pushuserdata(L, obj, sizeof(userdataType)));
-//		if (ud) {
-//			ud->pT = obj;  // store pointer to object in userdata
-//			lua_pushvalue(L, mt);
-//			lua_setmetatable(L, -2);
-//			if (gc == false) {
-//				lua_checkstack(L, 3);
-//				subtable(L, mt, "do not trash", "k");
-//				lua_pushvalue(L, -2);
-//				lua_pushboolean(L, 1);
-//				lua_settable(L, -3);
-//				lua_pop(L, 1);
-//			}
-//		}
-//		lua_replace(L, mt);
-//		lua_settop(L, mt);
-//		return mt;  // index of userdata containing pointer to T object
-//	}
-//
-//	// get userdata from Lua stack and return pointer to T object
-//	static T *check(lua_State *L, int narg) {
-//		userdataType *ud =
-//			static_cast<userdataType*>(luaL_checkudata(L, narg, GetTClassName<T>()));
-//		if(!ud) { luaL_typerror(L, narg, GetTClassName<T>()); return NULL; }
-//		return ud->pT;  // pointer to T object
-//	}
-//
-//private:
-//	Lunar();  // hide default constructor
-//
-//	// member function dispatcher
-//	static int thunk(lua_State *L) {
-//		// stack has userdata, followed by method args
-//		T *obj = check(L, 1);  // get 'self', or if you prefer, 'this'
-//		lua_remove(L, 1);  // remove self so member function args start at index 1
-//		// get member function from upvalue
-//		RegType *l = static_cast<RegType*>(lua_touserdata(L, lua_upvalueindex(1)));
-//		//return (obj->*(l->mfunc))(L);  // call member function
-//		return l->mfunc(L,obj);
-//	}
-//
-//	// create a new T object and
-//	// push onto the Lua stack a userdata containing a pointer to T object
-//	static int new_T(lua_State *L) {
-//		lua_remove(L, 1);   // use classname:new(), instead of classname.new()
-//		T *obj = NULL/*new T(L)*/;  // call constructor for T objects
-//		assert(false);
-//		push(L, obj, true); // gc_T will delete this object
-//		return 1;           // userdata containing pointer to T object
-//	}
-//
-//	// garbage collection metamethod
-//	static int gc_T(lua_State *L) {
-//		if (luaL_getmetafield(L, 1, "do not trash")) {
-//			lua_pushvalue(L, 1);  // dup userdata
-//			lua_gettable(L, -2);
-//			if (!lua_isnil(L, -1)) return 0;  // do not delete object
-//		}
-//		userdataType *ud = static_cast<userdataType*>(lua_touserdata(L, 1));
-//		T *obj = ud->pT;
-//		if (obj) delete obj;  // call destructor for T objects
-//		return 0;
-//	}
-//
-//	static int tostring_T (lua_State *L) {
-//		char buff[32];
-//		userdataType *ud = static_cast<userdataType*>(lua_touserdata(L, 1));
-//		T *obj = ud->pT;
-//		sprintf(buff, "%p", obj);
-//		lua_pushfstring(L, "%s (%s)", GetTClassName<T>(), buff);
-//		return 1;
-//	}
-//
-//	static void set(lua_State *L, int table_index, const char *key) {
-//		lua_pushstring(L, key);
-//		lua_insert(L, -2);  // swap value and key
-//		lua_settable(L, table_index);
-//	}
-//
-//	static void weaktable(lua_State *L, const char *mode) {
-//		lua_newtable(L);
-//		lua_pushvalue(L, -1);  // table is its own metatable
-//		lua_setmetatable(L, -2);
-//		lua_pushliteral(L, "__mode");
-//		lua_pushstring(L, mode);
-//		lua_settable(L, -3);   // metatable.__mode = mode
-//	}
-//
-//	static void subtable(lua_State *L, int tindex, const char *name, const char *mode) {
-//		lua_pushstring(L, name);
-//		lua_gettable(L, tindex);
-//		if (lua_isnil(L, -1)) {
-//			lua_pop(L, 1);
-//			lua_checkstack(L, 3);
-//			weaktable(L, mode);
-//			lua_pushstring(L, name);
-//			lua_pushvalue(L, -2);
-//			lua_settable(L, tindex);
-//		}
-//	}
-//
-//	static void *pushuserdata(lua_State *L, void *key, size_t sz) {
-//		void *ud = 0;
-//		lua_pushlightuserdata(L, key);
-//		lua_gettable(L, -2);     // lookup[key]
-//		if (lua_isnil(L, -1)) {
-//			lua_pop(L, 1);         // drop nil
-//			lua_checkstack(L, 3);
-//			ud = lua_newuserdata(L, sz);  // create new userdata
-//			lua_pushlightuserdata(L, key);
-//			lua_pushvalue(L, -2);  // dup userdata
-//			lua_settable(L, -4);   // lookup[key] = userdata
-//		}
-//		return ud;
-//	}
-//};
+AngelScriptEngine::AngelScriptEngine()
+{
+	g_asEngine = NULL;
+}
 
-//LuaEngine::LuaEngine()
-//{
-//	this->L = lua_open();
-//}
+AngelScriptEngine::~AngelScriptEngine()
+{
+	g_asEngine->Release();
+	g_asEngine = NULL;
+}
 
-//LuaEngine::~LuaEngine()
-//{
-//	lua_close(L);
-//}
+void AngelScriptEngine::Startup()
+{
+	g_asEngine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
+	if( g_asEngine == NULL )
+	{
+		Log.Notice( "AngelScriptEngineMgr", "Could not spawn AngelScript Engine!!!" );
+		return;
+	}
+
+	// Register message callback
+	g_asEngine->SetMessageCallback( asFUNCTION( MessageCallback ), NULL, asCALL_CDECL );
+}
+
+void AngelScriptEngine::Shutdown()
+{
+	g_asEngine->Release();
+	g_asEngine = NULL;
+}
+
+void AngelScriptEngine::Restart()
+{
+	Shutdown();
+	Startup();
+}
 
 void AngelScriptEngine::LoadScripts()
 {
@@ -318,6 +149,7 @@ void AngelScriptEngine::LoadScripts()
 	set< string > asByteCode;
 
 #ifdef WIN32
+
 	WIN32_FIND_DATA fd;
 	HANDLE h;
 
@@ -343,6 +175,7 @@ void AngelScriptEngine::LoadScripts()
 	FindClose( h );
 
 #else
+
 	struct dirent** list;
 	int filecount = scandir( "./scripts", &list, 0, 0 );
 	if( filecount <= 0 || !list )
@@ -365,6 +198,7 @@ void AngelScriptEngine::LoadScripts()
 		free( list[filecount] );
 	}
 	free( list );
+
 #endif
 
 	//for( set< string >::iterator itr = asByteCode.begin(); itr != asByteCode.end(); ++itr )
@@ -406,7 +240,7 @@ void AngelScriptEngine::LoadScript( string filename )
 
 	if( !stream )
 	{
-		//CGameLog::GetPtr()->Printf("CScript - Could not load ^%s!!", filename);
+		Log.Warning( "AngelScriptEngine", "Could not load %s!!!", filename.c_str() );
 		return;
 	}
 
@@ -422,20 +256,20 @@ void AngelScriptEngine::LoadScript( string filename )
 
 	if( g_asEngine->AddScriptSection( filename.c_str(), filename.c_str(), &txt[0], size, 0 ) < 0 )
 	{
-		//CGameLog::GetPtr()->Printf("CScript - There was a problem loading %s!!", filename );
+		Log.Warning( "AngelScriptEngine", "There was a problem while loading %s!!!", filename.c_str() );
 		return;
 	}
 
 	if( g_asEngine->Build( filename.c_str() ) < 0 )
 	{
-		//CGameLog::GetPtr()->Printf("CScript - Could not compile %s!!", filename);
+		Log.Warning( "AngelScriptEngine", "Could not compile %s!!!", filename.c_str() );
 		return;
 	}
 
 	asIScriptContext* m_pContext = g_asEngine->CreateContext();
 	if( m_pContext == NULL )
 	{
-		//CGameLog::GetPtr()->Printf("CScript - Could not create context!!", filename);
+		Log.Warning( "AngelScriptEngine", "Could not create context for %s!!!", filename.c_str() );
 		return;
 	}
 
@@ -613,172 +447,19 @@ void AngelScriptEngine::LoadScript( string filename )
 //	return 0;
 //}
 
-///************************************************************************/
-///* Manager Stuff                                                        */
-///************************************************************************/
-
-//class LuaCreature : public CreatureAIScript
-//{
-//public:
-//	LuaCreature(Creature* creature) : CreatureAIScript(creature) {};
-//	~LuaCreature() {};
-
-//	void OnCombatStart(Unit* mTarget)
-//	{
-//		if( m_binding->Functions[CREATURE_EVENT_ON_ENTER_COMBAT] != NULL )
-//			g_engine->OnUnitEvent( _unit, m_binding->Functions[CREATURE_EVENT_ON_ENTER_COMBAT], CREATURE_EVENT_ON_ENTER_COMBAT, mTarget, 0 );
-//	}
-
-//	void OnCombatStop(Unit* mTarget)
-//	{
-//		if( m_binding->Functions[CREATURE_EVENT_ON_LEAVE_COMBAT] != NULL )
-//			g_engine->OnUnitEvent( _unit, m_binding->Functions[CREATURE_EVENT_ON_LEAVE_COMBAT], CREATURE_EVENT_ON_LEAVE_COMBAT, mTarget, 0 );
-//	}
-
-//	void OnTargetDied(Unit* mTarget)
-//	{
-//		if( m_binding->Functions[CREATURE_EVENT_ON_KILLED_TARGET] != NULL )
-//			g_engine->OnUnitEvent( _unit, m_binding->Functions[CREATURE_EVENT_ON_KILLED_TARGET], CREATURE_EVENT_ON_KILLED_TARGET, mTarget, 0 );
-//	}
-
-//	void OnDied(Unit *mKiller)
-//	{
-//		if( m_binding->Functions[CREATURE_EVENT_ON_DIED] != NULL )
-//			g_engine->OnUnitEvent( _unit, m_binding->Functions[CREATURE_EVENT_ON_DIED], CREATURE_EVENT_ON_DIED, mKiller, 0 );
-//	}
-
-//	void OnLoad()
-//	{
-//		if( m_binding->Functions[CREATURE_EVENT_ON_SPAWN] != NULL )
-//			g_engine->OnUnitEvent( _unit, m_binding->Functions[CREATURE_EVENT_ON_SPAWN], CREATURE_EVENT_ON_SPAWN, NULL, 0 );
-//	}
-
-//	void OnReachWP(uint32 iWaypointId, bool bForwards)
-//	{
-//		if( m_binding->Functions[CREATURE_EVENT_ON_REACH_WP] != NULL )
-//			g_engine->OnUnitEvent( _unit, m_binding->Functions[CREATURE_EVENT_ON_REACH_WP], CREATURE_EVENT_ON_REACH_WP, NULL, iWaypointId );
-//	}
-
-//	void AIUpdate()
-//	{
-//		if( m_binding->Functions[CREATURE_EVENT_AI_TICK] != NULL )
-//			g_engine->OnUnitEvent( _unit, m_binding->Functions[CREATURE_EVENT_AI_TICK], CREATURE_EVENT_AI_TICK, NULL, 0 );
-//	}
-
-//	void StringFunctionCall(const char * pFunction)
-//	{
-//		g_engine->CallFunction( _unit, pFunction );
-//	}
-//
-//	void Destroy()
-//	{
-//		delete this;
-//	}
-//
-//	LuaUnitBinding * m_binding;
-//};
-//
-//class LuaGameObject : public GameObjectAIScript
-//{
-//public:
-//	LuaGameObject(GameObject * go) : GameObjectAIScript(go) {}
-//	~LuaGameObject() {}
-//
-//	void OnSpawn()
-//	{
-//		if( m_binding->Functions[GAMEOBJECT_EVENT_ON_SPAWN] != NULL )
-//			g_engine->OnGameObjectEvent( _gameobject, m_binding->Functions[GAMEOBJECT_EVENT_ON_SPAWN], GAMEOBJECT_EVENT_ON_SPAWN, NULL );
-//	}
-//
-//	void OnActivate(Player * pPlayer)
-//	{
-//		if( m_binding->Functions[GAMEOBJECT_EVENT_ON_USE] != NULL )
-//			g_engine->OnGameObjectEvent( _gameobject, m_binding->Functions[GAMEOBJECT_EVENT_ON_USE], GAMEOBJECT_EVENT_ON_USE, pPlayer );
-//	}
-//
-//	LuaGameObjectBinding * m_binding;
-//};
-//
-//class LuaQuest : public QuestScript
-//{
-//public:
-//	LuaQuest() : QuestScript() {}
-//	~LuaQuest() {}
-//
-//	void OnQuestStart(Player* mTarget, QuestLogEntry *qLogEntry)
-//	{
-//		if( m_binding->Functions[QUEST_EVENT_ON_ACCEPT] != NULL )
-//			g_engine->OnQuestEvent( mTarget, m_binding->Functions[QUEST_EVENT_ON_ACCEPT], qLogEntry->GetQuest()->id, QUEST_EVENT_ON_ACCEPT, mTarget );
-//	}
-//
-//	void OnQuestComplete(Player* mTarget, QuestLogEntry *qLogEntry)
-//	{
-//		if( m_binding->Functions[QUEST_EVENT_ON_COMPLETE] != NULL )
-//			g_engine->OnQuestEvent( mTarget, m_binding->Functions[QUEST_EVENT_ON_COMPLETE], qLogEntry->GetQuest()->id, QUEST_EVENT_ON_COMPLETE, mTarget );
-//	}
-//
-//	LuaQuestBinding * m_binding;
-//};
-//
-//CreatureAIScript * CreateLuaCreature(Creature * src)
-//{
-//	LuaUnitBinding * pBinding = g_luaMgr.GetUnitBinding( src->GetEntry() );
-//	if( pBinding == NULL )
-//		return NULL;
-//
-//	LuaCreature * pLua = new LuaCreature( src );
-//	pLua->m_binding = pBinding;
-//	return pLua;
-//}
-//
-//GameObjectAIScript * CreateLuaGameObject(GameObject * src)
-//{
-//	LuaGameObjectBinding * pBinding = g_luaMgr.GetGameObjectBinding( src->GetEntry() );
-//	if( pBinding == NULL )
-//		return NULL;
-//
-//	LuaGameObject * pLua = new LuaGameObject( src );
-//	pLua->m_binding = pBinding;
-//	return pLua;
-//}
-//
-//QuestScript * CreateLuaQuestScript(uint32 id)
-//{
-//	LuaQuestBinding * pBinding = g_luaMgr.GetQuestBinding( id );
-//	if( pBinding == NULL )
-//		return NULL;
-//
-//	LuaQuest * pLua = new LuaQuest();
-//	pLua->m_binding = pBinding;
-//	return pLua;
-//}
-
-void MessageCallback( const asSMessageInfo* msg, void* param )
-{
-	if( msg->type == asMSGTYPE_WARNING ) 
-		Log.Warning( "%s (%d, %d) : %s : %s", msg->section, msg->row, msg->col, msg->message );
-	else if( msg->type == asMSGTYPE_ERROR ) 
-		Log.Error( "%s (%d, %d) : %s : %s", msg->section, msg->row, msg->col, msg->message );
-	else if( msg->type == asMSGTYPE_INFORMATION ) 
-		Log.Notice( "%s (%d, %d) : %s : %s", msg->section, msg->row, msg->col, msg->message );
-}
-
 void AngelScriptEngineMgr::Startup()
 {
-
 	Log.Notice( "AngelScriptEngineMgr", "Spawning AngelScript Engine..." );
 
 	as_is_starting_up = true;
 
-	g_asEngine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
-	if( g_asEngine == NULL )
-	{
-		Log.Notice( "AngelScriptEngineMgr", "Could not spawn AngelScript Engine!!!" );
-		return;
-	}
+	m_engine = new AngelScriptEngine();
+	g_engine = m_engine;
 
-	// Register message callback
-	g_asEngine->SetMessageCallback( asFUNCTION(MessageCallback), NULL, asCALL_CDECL );
+	m_engine->Startup();
+	m_engine->LoadScripts();
+
+	as_is_starting_up = false;
 
 	// Register AngelScript Plugins
 	//RegisterScriptString( g_asEngine );
@@ -809,12 +490,24 @@ void AngelScriptEngineMgr::Startup()
 	//g_asEngine->RegisterObjectMethod( "Unit", "void SetDuelWield(bool enabled)", asMETHOD( Unit, SetDuelWield ), asCALL_THISCALL );
 
 	// Register events
-
-
 }
 
-//void LuaEngineMgr::RegisterUnitEvent(uint32 Id, uint32 Event, const char * FunctionName)
-//{
+void AngelScriptEngineMgr::Shutdown()
+{
+	m_engine->Shutdown();
+	delete m_engine;
+	m_engine = NULL;
+	g_engine = NULL;
+}
+
+void AngelScriptEngineMgr::Restart()
+{
+	Shutdown();
+	Startup();
+}
+
+void AngelScriptEngineMgr::RegisterUnitEvent( uint32 Id, uint32 Event, const char* FunctionName )
+{
 //	UnitBindingMap::iterator itr = m_unitBinding.find(Id);
 //	if(itr == m_unitBinding.end())
 //	{
@@ -830,10 +523,10 @@ void AngelScriptEngineMgr::Startup()
 //
 //		itr->second.Functions[Event]=strdup(FunctionName);
 //	}
-//}
+}
 
-//void LuaEngineMgr::RegisterQuestEvent(uint32 Id, uint32 Event, const char * FunctionName)
-//{
+void AngelScriptEngineMgr::RegisterQuestEvent( uint32 Id, uint32 Event, const char* FunctionName )
+{
 //	QuestBindingMap::iterator itr = m_questBinding.find(Id);
 //	if(itr == m_questBinding.end())
 //	{
@@ -849,10 +542,10 @@ void AngelScriptEngineMgr::Startup()
 //
 //		itr->second.Functions[Event]=strdup(FunctionName);
 //	}
-//}
+}
 
-//void LuaEngineMgr::RegisterGameObjectEvent(uint32 Id, uint32 Event, const char * FunctionName)
-//{
+void AngelScriptEngineMgr::RegisterGameObjectEvent( uint32 Id, uint32 Event, const char* FunctionName )
+{
 //	GameObjectBindingMap::iterator itr = m_gameobjectBinding.find(Id);
 //	if(itr == m_gameobjectBinding.end())
 //	{
@@ -868,71 +561,8 @@ void AngelScriptEngineMgr::Startup()
 //
 //		itr->second.Functions[Event]=strdup(FunctionName);
 //	}
-//}
-
-///*void LuaEngineMgr::ReloadScripts()
-//{
-//	m_lock.Acquire();
-//
-//	// acquire the locks on all the luaengines so they don't do anything.
-//	for(LuaEngineMap::iterator itr = m_engines.begin(); itr != m_engines.end(); ++itr)
-//		itr->first->GetLock().Acquire();
-//
-//	// remove all the function name bindings
-//	for(UnitBindingMap::iterator itr = m_unitBinding.begin(); itr != m_unitBinding.end(); ++itr)
-//	{
-//		for(uint32 i = 0; i < CREATURE_EVENT_COUNT; ++i)
-//			if(itr->second.Functions[i] != NULL)
-//				free((void*)itr->second.Functions[i]);
-//	}
-//	
-//	for(GameObjectBindingMap::iterator itr = m_gameobjectBinding.begin(); itr != m_gameobjectBinding.end(); ++itr)
-//	{
-//		for(uint32 i = 0; i < GAMEOBJECT_EVENT_COUNT; ++i)
-//			if(itr->second.Functions[i] != NULL)
-//				free((void*)itr->second.Functions[i]);
-//	}
-//
-//	// clear the maps
-//	m_gameobjectBinding.clear();
-//	m_unitBinding.clear();
-//
-//	// grab the first lua engine in the list, use it to re-create all the binding names.
-//	LuaEngine * l = m_engines.begin()->first;
-//	lua_is_starting_up = true;
-//	l->Restart();
-//	lua_is_starting_up = false;
-//
-//	// all our bindings have been re-created, go through the lua engines and restart them all, and then release their locks.
-//	for(LuaEngineMap::iterator itr = m_engines.begin(); itr != m_engines.end(); ++itr)
-//	{
-//		if(itr->first != l)		// this one is already done
-//		{
-//			itr->first->Restart();
-//			itr->first->GetLock().Release();
-//		}
-//	}
-//
-//	// release the big lock
-//	m_lock.Release();
-//}*/
-
-void AngelScriptEngineMgr::Unload()
-{
 }
 
-//void LuaEngine::Restart()
-//{
-//	m_Lock.Acquire();
-//	lua_close(L);
-//	L = lua_open();
-//	LoadScripts();
-//	m_Lock.Release();
-//}
-//
-//
-//
-//
 ///************************************************************************/
 ///* SCRIPT FUNCTION IMPLEMENTATION                                       */
 ///************************************************************************/
