@@ -30,10 +30,13 @@
 bool as_is_starting_up = false;
 
 AngelScriptEngineMgr g_asMgr;
+
 AngelScriptEngine* g_engine;
 ScriptMgr* g_scriptMgr;
 
 asIScriptEngine* g_asEngine;
+asIScriptContext* g_asEventCtx;
+asIScriptContext* g_asCurrentCtx;
 
 extern "C" SCRIPT_DECL uint32 _exp_get_version()
 {
@@ -110,12 +113,14 @@ const char* GetTClassName< GameObject >()
 AngelScriptEngine::AngelScriptEngine()
 {
 	g_asEngine = NULL;
+	g_asEventCtx = NULL;
 }
 
 AngelScriptEngine::~AngelScriptEngine()
 {
 	g_asEngine->Release();
 	g_asEngine = NULL;
+	g_asEventCtx = NULL;
 }
 
 void AngelScriptEngine::Startup()
@@ -123,12 +128,20 @@ void AngelScriptEngine::Startup()
 	g_asEngine = asCreateScriptEngine( ANGELSCRIPT_VERSION );
 	if( g_asEngine == NULL )
 	{
-		Log.Notice( "AngelScriptEngineMgr", "Could not spawn AngelScript Engine!!!" );
+		Log.Warning( "AngelScriptEngineMgr", "Could not spawn AngelScript Engine!!!" );
 		return;
 	}
 
 	// Register message callback
 	g_asEngine->SetMessageCallback( asFUNCTION( MessageCallback ), NULL, asCALL_CDECL );
+
+	// Create the events context
+	g_asEventCtx = g_asEngine->CreateContext();
+	if( g_asEventCtx == NULL )
+	{
+		Log.Warning( "AngelScriptEngineMgr", "Failed to create the context!!!" );
+		return;
+	}
 }
 
 void AngelScriptEngine::Shutdown()
@@ -225,8 +238,6 @@ void AngelScriptEngine::LoadScripts()
 
 		LoadScript( (*itr) );
 	}
-
-	//engine->Build( 0 );
 }
 
 void AngelScriptEngine::LoadScript( string filename )
@@ -466,16 +477,25 @@ void AngelScriptEngineMgr::Startup()
 
 	// Register class object types
 	g_asEngine->RegisterObjectType( "Unit", sizeof( Unit ), 0 );
+	g_asEngine->RegisterObjectType( "Object", sizeof( Object ), 0 );
+	g_asEngine->RegisterObjectType( "MapMgr", sizeof( MapMgr ), 0 );
 	g_asEngine->RegisterObjectType( "Player", sizeof( Player ), 0 );
-	g_asEngine->RegisterObjectType( "Creature", sizeof( Player ), 0 );
+	g_asEngine->RegisterObjectType( "Creature", sizeof( Creature ), 0 );
 	g_asEngine->RegisterObjectType( "GameObject", sizeof( GameObject ), 0 );
 	g_asEngine->RegisterObjectType( "AIInterface", sizeof( AIInterface ), 0 );
+	g_asEngine->RegisterObjectType( "WayPointMap", sizeof( WayPointMap ), 0 );
 
 	// Register Player class methods
 	g_asEngine->RegisterObjectMethod( "Player", "void GetName()", asMETHOD( Player, GetName ), asCALL_THISCALL );
 	
+	// Register Object class methods
+	g_asEngine->RegisterObjectMethod( "Object", "MapMgr* GetMapMgr() const", asMETHOD( Object, GetMapMgr ), asCALL_THISCALL );
+	
 	// Register Creature class methods
 	g_asEngine->RegisterObjectMethod( "Creature", "void GetCreatureName()", asMETHOD( Creature, GetCreatureName ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "Creature", "void DestroyCustomWaypointMap()", asMETHOD( Creature, DestroyCustomWaypointMap ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "Creature", "bool HasCustomWayPointMap()", asMETHOD( Creature, HasCustomWayPointMap ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "Creature", "void Despawn( uint32 delay, uint32 respawntime ", asMETHOD( Creature, Despawn ), asCALL_THISCALL );
 
 	// Register Unit class methods
 	g_asEngine->RegisterObjectMethod( "Unit", "const uint32& GetUInt32Value( uint32 index ) const", asMETHOD( Unit, GetUInt32Value ), asCALL_THISCALL );
@@ -486,8 +506,25 @@ void AngelScriptEngineMgr::Startup()
 	g_asEngine->RegisterObjectMethod( "Unit", "void SendChatMessage( uint8 type, uint32 lang, const char* msg )", asMETHOD( Unit, SendChatMessage ), asCALL_THISCALL );
 	g_asEngine->RegisterObjectMethod( "Unit", "AIInterface* GetAIInterface()", asMETHOD( Unit, GetAIInterface ), asCALL_THISCALL );
 
-	//g_asEngine->RegisterObjectMethod( "Unit", "void setAttackTimer( int32 time, bool offhand )", asMETHOD( Unit, setAttackTimer ), asCALL_THISCALL );
-	//g_asEngine->RegisterObjectMethod( "Unit", "void SetDuelWield(bool enabled)", asMETHOD( Unit, SetDuelWield ), asCALL_THISCALL );
+	// Register AIInterface class methods
+	g_asEngine->RegisterObjectMethod( "AIInterface", "void setMoveType( uint32 movetype )", asMETHOD( AIInterface, setMoveType ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "void SetWaypointMap( WayPointMap* m )", asMETHOD( AIInterface, SetWaypointMap ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "Unit* GetMostHated()", asMETHOD( AIInterface, GetMostHated ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "Unit* GetSecondHated()", asMETHOD( AIInterface, GetSecondHated ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "bool StopMovement( uint32 time )", asMETHOD( AIInterface, StopMovement ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "Unit* getTauntedBy()", asMETHOD( AIInterface, getTauntedBy ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "bool GetIsTaunted()", asMETHOD( AIInterface, GetIsTaunted ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "bool taunt( Unit* caster, bool apply = true )", asMETHOD( AIInterface, taunt ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "bool GetIsSoulLinked()", asMETHOD( AIInterface, GetIsSoulLinked ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "Unit* getSoullinkedWith()", asMETHOD( AIInterface, getSoullinkedWith ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "void SetNextTarget( Unit* nextTarget )", asMETHOD( AIInterface, SetNextTarget ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "void setMoveType( uint32 movetype )", asMETHOD( AIInterface, setMoveType ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "void MoveTo(float x, float y, float z, float o)", asMETHOD( AIInterface, MoveTo ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "SetDisableCombat( bool value )", asMETHOD( AIInterface, SetDisableCombat ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "SetDisableMelee( bool value )", asMETHOD( AIInterface, SetDisableMelee ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "SetDisableRanged( bool value )", asMETHOD( AIInterface, SetDisableRanged ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "SetDisableSpell( bool value )", asMETHOD( AIInterface, SetDisableSpell ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "AIInterface", "SetDisableTargeting( bool value )", asMETHOD( AIInterface, SetDisableTargeting ), asCALL_THISCALL );
 
 	// Register events
 }

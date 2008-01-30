@@ -250,7 +250,7 @@ public:
 	void ClearHateList();
 	void WipeHateList();
 	void WipeTargetList();
-	bool taunt(Unit* caster, bool apply = true);
+	bool taunt( Unit* caster, bool apply = true );
 	Unit* getTauntedBy();
 	bool GetIsTaunted();
 	Unit* getSoullinkedWith();
@@ -287,7 +287,7 @@ public:
 	uint32 getMoveFlags();
 	void UpdateMove();
 	void SendCurrentMove(Player* plyr/*uint64 guid*/);
-	bool StopMovement(uint32 time);
+	bool StopMovement( uint32 time );
 	uint32 getCurrentWaypoint() { return m_currentWaypoint; }
 	void changeWayPointID(uint32 oldwpid, uint32 newwpid);
 	bool addWayPoint(WayPoint* wp);
@@ -297,8 +297,8 @@ public:
 	WayPoint* getWayPoint(uint32 wpid);
 	void deleteWayPoint(uint32 wpid);
 	void deleteWaypoints();
-	ASCENT_INLINE bool hasWaypoints() { return m_waypoints!=NULL; }
-	ASCENT_INLINE void setMoveType(uint32 movetype) { m_moveType = movetype; }
+	ASCENT_INLINE bool hasWaypoints() { return m_waypoints != NULL; }
+	ASCENT_INLINE void setMoveType( uint32 movetype ) { m_moveType = movetype; }
 	ASCENT_INLINE uint32 getMoveType() { return m_moveType; }
 	ASCENT_INLINE void setMoveRunFlag(bool f) { m_moveRun = f; }
 	ASCENT_INLINE bool getMoveRunFlag() { return m_moveRun; }
@@ -351,7 +351,7 @@ public:
 	ASCENT_INLINE void AddStopTime(uint32 Time) { m_moveTimer += Time; }
 	ASCENT_INLINE void SetNextSpell(AI_Spell * sp) { m_nextSpell = sp; }
 	ASCENT_INLINE Unit* GetNextTarget() { return m_nextTarget; }
-	ASCENT_INLINE void SetNextTarget (Unit *nextTarget) 
+	ASCENT_INLINE void SetNextTarget( Unit* nextTarget ) 
 	{ 
 		m_nextTarget = nextTarget; 
 		if(nextTarget)
@@ -374,23 +374,32 @@ public:
 				}
 	}*/
 
-	Creature * m_formationLinkTarget;
+	Creature* m_formationLinkTarget;
 	float m_formationFollowDistance;
 	float m_formationFollowAngle;
 	uint32 m_formationLinkSqlId;
 
 	void WipeReferences();
-	WayPointMap *m_waypoints;
-	ASCENT_INLINE void SetPetOwner(Unit * owner) { m_PetOwner = owner; }
+
+	WayPointMap* m_waypoints;
+
+	ASCENT_INLINE void SetPetOwner( Unit* owner ) { m_PetOwner = owner; }
  
 	list<AI_Spell*> m_spells;
 
 	bool disable_combat;
 
+	void SetDisableCombat( bool value ) { disable_combat = value; }
+
 	bool disable_melee;
 	bool disable_ranged;
 	bool disable_spell;
 	bool disable_targeting;
+
+	ASCENT_INLINE void SetDisableMelee( bool value ) { disable_melee = value; }
+	ASCENT_INLINE void SetDisableRanged( bool value ) { disable_ranged = value; }
+	ASCENT_INLINE void SetDisableSpell( bool value ) { disable_spell = value; }
+	ASCENT_INLINE void SetDisableTargeting( bool value ) { disable_targeting = value; }
 
 	bool waiting_for_cooldown;
 
@@ -404,7 +413,7 @@ public:
 
 	void ResetProcCounts();
 
-	ASCENT_INLINE void SetWaypointMap(WayPointMap * m) { m_waypoints = m; }
+	ASCENT_INLINE void SetWaypointMap( WayPointMap* m ) { m_waypoints = m; }
 	bool m_isGuard;
 //	bool m_fastMove;
 	void setGuardTimer(uint32 timer) { m_guardTimer = timer; }
