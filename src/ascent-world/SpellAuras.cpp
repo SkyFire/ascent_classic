@@ -711,23 +711,23 @@ void Aura::RemoveAuraVisual()
 	sLog.outDebug("Removing Aura Visual - target: %d , slot: %d , flagslot: %d , flagsvalue: 0x%.4X",m_target->GetGUID(),slot,flagslot,value); */
 }
 
-void Aura::EventUpdateAA(float r)
+void Aura::EventUpdateAA( float r )
 {
 	uint32 i;
 	/* burlex: cheap hack to get this to execute in the correct context always */
-	if(event_GetCurrentInstanceId() == -1)
+	if( event_GetCurrentInstanceId() == -1 )
 	{
 		event_Relocate();
 		return;
 	}
 
-	Unit * u_caster = GetUnitCaster();
+	Unit* u_caster = GetUnitCaster();
 
 	// if the caster is no longer valid->remove the aura
-	if(u_caster == 0)
+	if( u_caster == NULL )
 		Remove();
 
-	Player * plr = 0;
+	Player* plr = 0;
 
 	if( u_caster->GetTypeId() == TYPEID_PLAYER )
 		plr = static_cast< Player* >( u_caster );
@@ -775,9 +775,9 @@ void Aura::EventUpdateAA(float r)
 		}
 	}
 
-	SubGroup* group = plr->GetGroup() ? plr->GetGroup()->GetSubGroup(plr->GetSubGroup()) : 0;
+	SubGroup* group = plr->GetGroup() ? plr->GetGroup()->GetSubGroup( plr->GetSubGroup() ) : NULL;
 
-	if(group)
+	if( group != NULL )
 	{
 		plr->GetGroup()->Lock();
 		GroupMembersSet::iterator itr = group->GetGroupMembersBegin();
@@ -824,20 +824,20 @@ void Aura::EventUpdateAA(float r)
 		++itr;
 
 		// Check if the target is 'valid'.
-		Player * iplr;
-		if(m_target->IsInWorld())
-			iplr = m_target->GetMapMgr()->GetPlayer(*it2);
+		Player* iplr;
+		if( m_target->IsInWorld() )
+			iplr = m_target->GetMapMgr()->GetPlayer( *it2 );
 		else
-			iplr = objmgr.GetPlayer(*it2);
+			iplr = objmgr.GetPlayer( *it2 );
 
-		if(!iplr || iplr->GetDistanceSq(u_caster) > r || iplr->GetInstanceID() != plr->GetInstanceID())
+		if( iplr == NULL || iplr->GetDistanceSq(u_caster) > r || iplr->GetInstanceID() != plr->GetInstanceID() )
 		{
 			targets.erase(it2);
-			if(iplr)
+			if( iplr != NULL )
 			{
 				// execute in the correct context
-                if(iplr->GetInstanceID() != plr->GetInstanceID())
-					sEventMgr.AddEvent(((Unit*)iplr), &Unit::EventRemoveAura, m_spellProto->Id, EVENT_DELETE_TIMER, 10, 1,0);
+                if( iplr->GetInstanceID() != plr->GetInstanceID() )
+					sEventMgr.AddEvent( static_cast< Unit* >( iplr ), &Unit::EventRemoveAura, m_spellProto->Id, EVENT_DELETE_TIMER, 10, 1, 0 );
 				else
 					iplr->RemoveAura(m_spellProto->Id);
 			}
@@ -847,22 +847,23 @@ void Aura::EventUpdateAA(float r)
 
 		// Is the player outside of the group now?
 		// (doesn't apply to the caster)
-		if(plr == iplr) continue;
+		if( plr == iplr )
+			continue;
 
-		if(!group || !group->HasMember(iplr->GetGUIDLow()))
+		if( group == NULL || !group->HasMember( iplr->GetGUIDLow() ) )
 		{
 			// execute in the correct context
-			if(iplr->GetInstanceID() != plr->GetInstanceID())
-				sEventMgr.AddEvent(((Unit*)iplr), &Unit::EventRemoveAura, m_spellProto->Id, EVENT_DELETE_TIMER, 10, 1,0);
+			if( iplr->GetInstanceID() != plr->GetInstanceID() )
+				sEventMgr.AddEvent( static_cast< Unit* >( iplr ), &Unit::EventRemoveAura, m_spellProto->Id, EVENT_DELETE_TIMER, 10, 1, 0 );
 			else
-				iplr->RemoveAura(m_spellProto->Id);
-			targets.erase(it2);
+				iplr->RemoveAura( m_spellProto->Id );
+			targets.erase( it2 );
 		}
 	}
 
 	// Push new targets into the set.
-	for(vector<uint32>::iterator vtr = NewTargets.begin(); vtr != NewTargets.end(); ++vtr)
-		targets.insert((*vtr));
+	for( vector<uint32>::iterator vtr = NewTargets.begin(); vtr != NewTargets.end(); ++vtr )
+		targets.insert( *vtr );
 
 	NewTargets.clear();
 }
@@ -895,30 +896,30 @@ void Aura::RemoveAA()
 		else
 			iplr = objmgr.GetPlayer((uint32)*itr);
 
-		if(!iplr || iplr == caster)
+		if( iplr == NULL || iplr == caster)
 			continue;
 
-		iplr->RemoveAura(m_spellProto->Id);
+		iplr->RemoveAura( m_spellProto->Id );
 	}
 	targets.clear();
 }
 
 //------------------------- Aura Effects -----------------------------
 
-void Aura::SpellAuraModBaseResistance(bool apply)
+void Aura::SpellAuraModBaseResistance( bool apply )
 {
-	SpellAuraModResistance(apply);
+	SpellAuraModResistance( apply );
 	//both add/decrease some resistance difference is unknown
 }
 
-void Aura::SpellAuraModBaseResistancePerc(bool apply)
+void Aura::SpellAuraModBaseResistancePerc( bool apply )
 {
 	uint32 Flag = mod->m_miscValue; 
 	int32 amt;
-	if(apply)
+	if( apply )
 	{
 		amt = mod->m_amount;
-		if(amt > 0)
+		if( amt > 0 )
 			SetPositive();
 		else 
 			SetNegative();
@@ -926,38 +927,38 @@ void Aura::SpellAuraModBaseResistancePerc(bool apply)
 	else
 		amt =- mod->m_amount;
 
-	for(uint32 x=0;x<7;x++)
+	for( uint32 x = 0; x < 7; x++ )
 	{
-		if(Flag & (((uint32)1)<< x))
+		if( Flag & ( ( (uint32) 1 ) << x ) )
 		{
-			if(m_target->GetTypeId() == TYPEID_PLAYER)
+			if( m_target->GetTypeId() == TYPEID_PLAYER )
 			{
-				if(mod->m_amount>0)
+				if( mod->m_amount > 0 )
 				{
-					static_cast< Player* >( m_target )->BaseResistanceModPctPos[x]+=amt;
+					static_cast< Player* >( m_target )->BaseResistanceModPctPos[x] += amt;
 				}
 				else
 				{
-					static_cast< Player* >( m_target )->BaseResistanceModPctNeg[x]-=amt;
+					static_cast< Player* >( m_target )->BaseResistanceModPctNeg[x] -= amt;
 				}
-				static_cast< Player* >( m_target )->CalcResistance(x);
+				static_cast< Player* >( m_target )->CalcResistance( x );
 
 			}
-			else if(m_target->GetTypeId() == TYPEID_UNIT)
+			else if( m_target->GetTypeId() == TYPEID_UNIT )
 			{
-				static_cast<Creature*>(m_target)->BaseResistanceModPct[x]+=amt;
-				static_cast<Creature*>(m_target)->CalcResistance(x);
+				static_cast< Creature* >( m_target )->BaseResistanceModPct[x] += amt;
+				static_cast< Creature* >( m_target )->CalcResistance( x );
 			}
 		}
 	}
 }
 
-void Aura::SpellAuraNULL(bool apply)
+void Aura::SpellAuraNULL( bool apply )
 {
-	 sLog.outDebug("Unknown Aura id %d", (uint32)mod->m_type);
+	 sLog.outDebug( "Unknown Aura id %d", (uint32)mod->m_type );
 }
 
-void Aura::SpellAuraBindSight(bool apply)
+void Aura::SpellAuraBindSight( bool apply )
 {
 	SetPositive();
 	// MindVision
