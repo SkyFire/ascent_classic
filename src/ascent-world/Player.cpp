@@ -8963,15 +8963,18 @@ void Player::EventStunOrImmobilize(Unit *proc_target, bool is_victim)
 		t_trigger_on_stun_chance = trigger_on_stun_chance_victim;
 	}
 
-	if(t_trigger_on_stun)
+	if( t_trigger_on_stun )
 	{
-		if(t_trigger_on_stun_chance<100 && !Rand(t_trigger_on_stun_chance))
+		if( t_trigger_on_stun_chance < 100 && !Rand( t_trigger_on_stun_chance ) )
 			return;
-		SpellEntry *spellInfo = dbcSpell.LookupEntry(t_trigger_on_stun);
-		if(!spellInfo)
+		SpellEntry* spellInfo = dbcSpell.LookupEntry( t_trigger_on_stun );
+
+		if( spellInfo == NULL)
 			return;
-		Spell *spell = new Spell(this, spellInfo ,true, NULL);
+
+		Spell* spell = new Spell( this, spellInfo ,true, NULL );
 		SpellCastTargets targets;
+
 		if ( spellInfo->procFlags & PROC_TARGET_SELF )
 			targets.m_unitTarget = GetGUID() ;
 		else if ( proc_target ) 
@@ -8983,7 +8986,7 @@ void Player::EventStunOrImmobilize(Unit *proc_target, bool is_victim)
 			targets.m_unitTarget = proc_target->GetGUID();
 		else targets.m_unitTarget = GetGUID();
 		*/
-		spell->prepare(&targets);
+		spell->prepare( &targets );
 	}
 }
 void Player::SummonRequest(uint32 Requestor, uint32 ZoneID, uint32 MapID, uint32 InstanceID, const LocationVector & Position)
