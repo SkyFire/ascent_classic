@@ -294,9 +294,19 @@ void WorldSession::LogoutPlayer(bool Save)
 		//Issue a message telling all guild members that this player signed off
 		if( _player->IsInGuild() )
 		{
+			// Hawk -- Fix - Send logout message to all clients
 			Guild* pGuild = _player->m_playerInfo->guild;
-			if( pGuild != NULL )
-				pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 1, _player->GetName() );
+			if( pGuild != NULL ) {
+				WorldPacket data(SMSG_GUILD_EVENT, 100);
+				data << uint8(GUILD_EVENT_HASGONEOFFLINE);
+				data << uint8(0x01);
+				data << _player->GetName();
+				data << _player->GetGUID();
+
+				pGuild->SendPacket(&data);
+			}
+			
+			//pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 1, _player->m_playerInfo->guid );
 		}
 
 		_player->GetItemInterface()->EmptyBuyBack();

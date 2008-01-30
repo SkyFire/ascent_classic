@@ -1451,33 +1451,34 @@ void Spell::cast(bool check)
 						HandleAddAura((*i));
 					}
 				}
-				// spells that proc on spell cast, some talents
-				if(p_caster && p_caster->IsInWorld())
-				{
-					for(i= UniqueTargets.begin();i != UniqueTargets.end();i++)
-					{
-						Unit * Target = p_caster->GetMapMgr()->GetUnit((*i));
 
-						if(!Target)
+				// we're much better to remove this here, because otherwise spells that change powers etc,
+				// don't get applied.
+				if( u_caster != NULL && !m_triggeredSpell && !m_triggeredByAura )
+					u_caster->RemoveAurasByInterruptFlagButSkip( AURA_INTERRUPT_ON_CAST_SPELL, m_spellInfo->Id );
+
+				// spells that proc on spell cast, some talents
+				if( p_caster != NULL && p_caster->IsInWorld() )
+				{
+					for( i = UniqueTargets.begin(); i != UniqueTargets.end(); i++ )
+					{
+						Unit* Target = p_caster->GetMapMgr()->GetUnit( (*i) );
+
+						if( Target == NULL )
 							continue; //we already made this check, so why make it again ?
 
-						if(!m_triggeredSpell)
+						if( !m_triggeredSpell )
 						{
-							p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,Target, m_spellInfo);
+							p_caster->HandleProc( PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL, Target, m_spellInfo );
 							p_caster->m_procCounter = 0; //this is required for to be able to count the depth of procs (though i have no idea where/why we use proc on proc)
 						}
 
-						Target->RemoveFlag(UNIT_FIELD_AURASTATE,m_spellInfo->TargetAuraState);
+						Target->RemoveFlag( UNIT_FIELD_AURASTATE, m_spellInfo->TargetAuraState );
 					}
 				}
 			}
-			// we're much better to remove this here, because otherwise spells that change powers etc,
-			// don't get applied.
 
-			if(u_caster && !m_triggeredSpell && !m_triggeredByAura)
-				u_caster->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_CAST_SPELL, m_spellInfo->Id);
-
-			if(m_spellState != SPELL_STATE_CASTING)
+			if( m_spellState != SPELL_STATE_CASTING )
 				finish();
 		} 
 		else //this shit has nothing to do with instant, this only means it will be on NEXT melee hit
@@ -3039,16 +3040,17 @@ uint8 Spell::CanCast(bool tolerate)
 				}
 			}
 
-			if( m_spellInfo->EffectApplyAuraName[0]==2)//mind control
-			if( m_spellInfo->EffectBasePoints[0])//got level req;
-				if((int32)target->getLevel() > m_spellInfo->EffectBasePoints[0]+1 + int32(p_caster->getLevel() - m_spellInfo->spellLevel))
+			if( m_spellInfo->NameHash == SPELL_HASH_MIND_CONTROL)//got level req;
+			{
+				if( (int32)target->getLevel() > m_spellInfo->EffectBasePoints[0] + 1 )
 					return SPELL_FAILED_HIGHLEVEL;
-				else if(target->GetTypeId() == TYPEID_UNIT) 
+				else if( target->GetTypeId() == TYPEID_UNIT ) 
 				{ 
-					Creature * c = (Creature*)(target);
-					if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank >ELITE_ELITE)
+					Creature* c = static_cast< Creature* >( target );
+					if ( c != NULL && c->GetCreatureName() && c->GetCreatureName()->Rank >= ELITE_ELITE )
 						return SPELL_FAILED_HIGHLEVEL;
 				} 
+			}
 
 			// scripted spell stuff
 			switch(m_spellInfo->Id)

@@ -50,16 +50,20 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 	g_luaMgr.Startup();
 }
 
-template<typename T> const char * GetTClassName() { return "UNKNOWN"; }
+template<typename T>
+const char* GetTClassName()
+{
+	return "UNKNOWN";
+}
 
 template<>
-const char * GetTClassName<Unit>()
+const char* GetTClassName<Unit>()
 {
 	return "Unit";
 }
 
 template<>
-const char * GetTClassName<GameObject>()
+const char* GetTClassName<GameObject>()
 {
 	return "GameObject";
 }
@@ -150,7 +154,9 @@ RegType<GameObject> GOMethods[] = {
 	{ NULL, NULL },
 };
 
-template<typename T> RegType<T>* GetMethodTable() { return NULL; }
+template<typename T>
+RegType<T>* GetMethodTable() { return NULL; }
+
 template<>
 RegType<Unit>* GetMethodTable<Unit>() { return UnitMethods; }
 

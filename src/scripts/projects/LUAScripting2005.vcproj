@@ -105,6 +105,7 @@
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -123,9 +124,11 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\ascent-shared;..\..\ascent-world;..\..\..\dep\include;..\..\..\dep\src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SCRIPTLIB;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="0"
+				StringPooling="true"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -151,6 +154,7 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
 				ImportLibrary="$(OutDir)/LUAScripting.lib"
 				TargetMachine="1"
 			/>

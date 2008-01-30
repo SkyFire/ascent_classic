@@ -729,26 +729,26 @@ void Aura::EventUpdateAA(float r)
 
 	Player * plr = 0;
 
-	if(u_caster->GetTypeId() == TYPEID_PLAYER)
-		plr = static_cast< Player* >(u_caster);
-	else if(u_caster->GetTypeId() == TYPEID_UNIT)
+	if( u_caster->GetTypeId() == TYPEID_PLAYER )
+		plr = static_cast< Player* >( u_caster );
+	else if( u_caster->GetTypeId() == TYPEID_UNIT )
 	{
-		if(u_caster->GetGUIDHigh() == HIGHGUID_PET)
-			plr = static_cast<Pet*>(u_caster)->GetPetOwner();
+		if( u_caster->GetGUIDHigh() == HIGHGUID_PET )
+			plr = static_cast< Pet* >( u_caster )->GetPetOwner();
 		else
-			plr = static_cast< Player* >(static_cast<Creature*>(u_caster)->GetTotemOwner());
+			plr = static_cast< Player* >( static_cast< Creature* >( u_caster )->GetTotemOwner() );
 	}
 
 
-	if(plr == 0 || plr->GetTypeId() != TYPEID_PLAYER)	// No player involved...
+	if( plr == NULL || plr->GetTypeId() != TYPEID_PLAYER )	// No player involved...
 		return;
 
-	vector<uint32> NewTargets;
+	vector< uint32 > NewTargets;
 
 	// Add the aura to the caster, if he's in range of course.
-	if(plr->GetDistanceSq(u_caster) < r)
+	if( plr->GetDistanceSq( u_caster ) <= r )
 	{
-		if(!plr->HasActiveAura(m_spellProto->Id))
+		if( !plr->HasActiveAura( m_spellProto->Id ) )
 		{
 			Aura * aura = new Aura(m_spellProto, -1, u_caster, plr);
 			aura->m_areaAura = true;
@@ -758,8 +758,24 @@ void Aura::EventUpdateAA(float r)
 		}
 	}
 
-	SubGroup * group = plr->GetGroup() ?
-		plr->GetGroup()->GetSubGroup(plr->GetSubGroup()) : 0;
+	//report say that aura should also affect pet 
+	if( plr != NULL && plr->GetSummon() && ( GetSpellProto()->NameHash == SPELL_HASH_TRUESHOT_AURA ||
+			GetSpellProto()->NameHash == SPELL_HASH_ASPECT_OF_THE_PACK ||
+			GetSpellProto()->NameHash == SPELL_HASH_ASPECT_OF_THE_WILD ) )
+	{
+		Unit* summon = plr->GetSummon();
+		if( summon != NULL && summon->isAlive() && summon->GetDistanceSq( u_caster ) <= r && !summon->HasActiveAura( m_spellProto->Id ) )
+		{
+			Aura * aura = new Aura(m_spellProto, -1, u_caster, summon );
+			aura->m_areaAura = true;
+			aura->AddMod( mod->m_type, mod->m_amount, mod->m_miscValue, mod->i );
+			summon->AddAura( aura );
+			//make sure we remove this
+			//sEventMgr.AddEvent(((Unit*)summon), &Unit::EventRemoveAura, m_spellProto->Id, EVENT_DELETE_TIMER, 10, 1,0);
+		}
+	}
+
+	SubGroup* group = plr->GetGroup() ? plr->GetGroup()->GetSubGroup(plr->GetSubGroup()) : 0;
 
 	if(group)
 	{
@@ -767,29 +783,28 @@ void Aura::EventUpdateAA(float r)
 		GroupMembersSet::iterator itr = group->GetGroupMembersBegin();
 		for(; itr != group->GetGroupMembersEnd(); ++itr)
 		{
-			if((*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer != plr && (*itr)->m_loggedInPlayer->GetDistanceSq(u_caster) <= r)
+			if( (*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer != plr && (*itr)->m_loggedInPlayer->GetDistanceSq(u_caster) <= r)
 			{
 				// Add the aura if they don't have it.
-				if(!(*itr)->m_loggedInPlayer->HasActiveAura(m_spellProto->Id) &&
+				if( !(*itr)->m_loggedInPlayer->HasActiveAura(m_spellProto->Id) &&
 					(*itr)->m_loggedInPlayer->GetInstanceID() == plr->GetInstanceID() && (*itr)->m_loggedInPlayer->isAlive())
 				{
-					Aura * aura = NULL;
+					Aura* aura = NULL;
 					//aura->AddMod(mod->m_type, mod->m_amount, mod->m_miscValue, mod->i);
-					for(i = 0; i < m_modcount; ++i)
+					for( i = 0; i < m_modcount; ++i )
 					{
 						/* is this an area aura modifier? */
-						if(m_spellProto->Effect[m_modList[i].i] == SPELL_EFFECT_APPLY_AREA_AURA)
+						if( m_spellProto->Effect[m_modList[i].i] == SPELL_EFFECT_APPLY_AREA_AURA )
 						{
-							if(!aura)
+							if( aura == NULL )
 							{
-								aura = new Aura(m_spellProto, -1, u_caster, (*itr)->m_loggedInPlayer);
+								aura = new Aura( m_spellProto, -1, u_caster, (*itr)->m_loggedInPlayer );
 								aura->m_areaAura = true;
 							}
-							aura->AddMod(m_modList[i].m_type, m_modList[i].m_amount,
-								m_modList[i].m_miscValue, m_modList[i].i);
+							aura->AddMod( m_modList[i].m_type, m_modList[i].m_amount, m_modList[i].m_miscValue, m_modList[i].i );
 						}
 					}
-					if(aura)
+					if( aura != NULL )
 					{
 						(*itr)->m_loggedInPlayer->AddAura(aura);
 						NewTargets.push_back((*itr)->m_loggedInPlayer->GetGUIDLow());
@@ -855,13 +870,27 @@ void Aura::EventUpdateAA(float r)
 void Aura::RemoveAA()
 {
 	AreaAuraList::iterator itr;
-	Unit * caster = GetUnitCaster();
+	Unit* caster = GetUnitCaster();
 
-	for(itr = targets.begin(); itr != targets.end(); ++itr)
+	//report say that aura should also affect pet 
+	Player* plr = NULL;
+	if( GetUnitCaster() && GetUnitCaster()->IsPlayer() )
+		plr = static_cast< Player* >( GetUnitCaster() );
+
+	if( plr != NULL && plr->GetSummon() && ( GetSpellProto()->NameHash == SPELL_HASH_TRUESHOT_AURA ||
+			GetSpellProto()->NameHash == SPELL_HASH_ASPECT_OF_THE_PACK ||
+			GetSpellProto()->NameHash == SPELL_HASH_ASPECT_OF_THE_WILD ) )
+	{
+		Unit* summon = plr->GetSummon();
+		if( summon != NULL && summon->isAlive() )
+			summon->RemoveAura( m_spellProto->Id );
+	}
+
+	for( itr = targets.begin(); itr != targets.end(); ++itr )
 	{
 		// Check if the target is 'valid'.
-		Player * iplr;
-		if(m_target->IsInWorld())
+		Player* iplr;
+		if( m_target->IsInWorld() )
 			iplr = m_target->GetMapMgr()->GetPlayer((uint32)*itr);
 		else
 			iplr = objmgr.GetPlayer((uint32)*itr);
@@ -1688,13 +1717,13 @@ void Aura::SpellAuraDummy(bool apply)
 		{
 			Unit *caster = GetUnitCaster();
 			if(caster && caster->IsPlayer())
-				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(29841,100);//fixed 100% chance
+				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize( 29841, 100, true );//fixed 100% chance
 		}break;
 	case 29838:
 		{
 			Unit *caster = GetUnitCaster();
 			if(caster && caster->IsPlayer())
-				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(29842,100);//fixed 100% chance
+				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize( 29842, 100, true );//fixed 100% chance
 		}break;
 	//mage Frostbite talent
 	case 11071:
@@ -2273,8 +2302,11 @@ void Aura::SpellAuraModStun(bool apply)
 		}
 
 		//warrior talent - second wind triggers on stun and immobilize. This is not used as proc to be triggered always !
-		if(p_target)
-			p_target->EventStunOrImmobilize(NULL);
+		Unit *caster = GetUnitCaster();
+		if( caster && caster->IsPlayer() && m_target )
+			static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
+		if( m_target && m_target->IsPlayer() && caster )
+			static_cast<Player*>(m_target)->EventStunOrImmobilize( caster );
 	}
 	else
 	{
@@ -2889,6 +2921,11 @@ void Aura::SpellAuraModRoot(bool apply)
 			m_target->Root();
 
 		/* -Supalosa- TODO: Mobs will attack nearest enemy in range on aggro list when rooted. */
+		Unit *caster = GetUnitCaster();
+		if( caster && caster->IsPlayer() && m_target )
+			static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
+		if( m_target && m_target->IsPlayer() && caster )
+			static_cast<Player*>(m_target)->EventStunOrImmobilize( caster );
 	}
 	else
 	{
@@ -3151,10 +3188,12 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 		//let's check Mage talents if we proc anythig 
 		if(m_spellProto->School==SCHOOL_FROST)
 		{
-			Unit *caster=GetUnitCaster();
 			//yes we are freezing the bastard, so can we proc anything on this ?
-			if(caster && caster->IsPlayer() && m_target)
-				static_cast< Player* >(caster)->EventStunOrImmobilize(m_target);
+			Unit* caster = GetUnitCaster();
+			if( caster && caster->IsPlayer() && m_target )
+				static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
+			if( m_target && m_target->IsPlayer() && caster )
+				static_cast<Player*>(m_target)->EventStunOrImmobilize( caster );
 		}
 		m_target->speedReductionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
 		//m_target->m_slowdown=this;
@@ -4770,73 +4809,15 @@ void Aura::SpellAuraMounted(bool apply)
 
 void Aura::SpellAuraModDamagePercDone(bool apply)
 {
-	float val = (apply) ? mod->m_amount/100.0f : -mod->m_amount/100.0f;
+	float val = apply ? mod->m_amount / 100.0f : -mod->m_amount / 100.0f;
 
-/* Shady: Don't know what this does, but it's not good. 
+/* 
+Shady: Don't know what this does, but it's not good. 
 Cause this aura effects only spells by school or combination of it.
 Don't know why there is any weapon modifiers.
-
-	if(m_target->IsPlayer())
-	{
-
-		//126 == melee,
-		//127 == evrything
-		//else - schools
-		*
-		//this is somehow wrong since fixed value will be owerwritten by other values
-		if(GetSpellProto()->EquippedItemClass==-1)//does not depend on weapon
-		{
-			for(uint32 x=0;x<7;x++)
-			{
-				if (mod->m_miscValue & (((uint32)1)<<x) )
-				{
-					m_target->ModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + x,val);
-				}
-			}
-		}else
-		*
-		//if(mod->m_miscValue&1 || mod->m_miscValue == 126)
-		{
-			if(apply)
-			{
-				WeaponModifier md;
-				md.value = mod->m_amount;
-				md.wclass = GetSpellProto()->EquippedItemClass;
-				//in case i'm wrong you will still not be able to attack with consumables i guess :P :D
-				if(md.wclass==0)
-					md.wclass=-1;//shoot me if i'm wrong but i found values that are 0 and should effect all weapons
-				md.subclass = GetSpellProto()->EquippedItemSubClass;
-				static_cast< Player* >( m_target )->damagedone.insert(make_pair(GetSpellId(), md));
-			}
-			else 
-			{
-				*std::list<WeaponModifier>::iterator i= static_cast< Player* >( m_target )->damagedone.begin();
-
-				for(;i!=static_cast< Player* >( m_target )->damagedone.end();i++)
-				{
-					if((*i).spellid==GetSpellId())
-					{
-						static_cast< Player* >( m_target )->damagedone.erase(i);
-						break;
-					}
-				}*
-				static_cast< Player* >( m_target )->damagedone.erase(GetSpellId());
-			}
-		}
-	}
-	else 
-	{
-		for(uint32 x=0;x<7;x++)
-		{
-			if (mod->m_miscValue & (((uint32)1)<<x) )
-			{
-				static_cast<Creature*>(m_target)->ModDamageDonePct[x] += val;
-			}
-		}
-	}
-	m_target->CalcDamage();
+Zack : shady, next time check all possible spells, yes there are spells that are modified based on weapon type
 */
-	switch (GetSpellId()) //dirty or mb not fix bug with wand specializations
+	switch( GetSpellId() ) //dirty or mb not fix bug with wand specializations
 	{
 	case 6057:
 	case 6085:
@@ -4847,14 +4828,53 @@ Don't know why there is any weapon modifiers.
 	case 14528:
 		return;
 	}
-	uint32 school_selector=1;
-	for (uint32 x=0;x<7;x++)
-	{
-		if(school_selector & mod->m_miscValue)
-			m_target->DamageDoneModPCT[x] += val;
-		school_selector = school_selector << 1;
-	}
 
+	if( m_target->IsPlayer() )
+	{
+		//1 == melee
+		//127 == evrything
+		if( GetSpellProto()->EquippedItemClass == -1 )//does not depend on weapon
+		{
+			for(uint32 x=0;x<7;x++)
+			{
+				if (mod->m_miscValue & (((uint32)1)<<x) )
+				{
+					m_target->ModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT + x,val);
+				}
+			}
+		}
+		if( mod->m_miscValue & 1 )
+		{
+			std::map< uint32, WeaponModifier >* dlist = &(static_cast<Player*>(m_target)->damagedone);
+			if( apply )
+			{
+				//!! this does not allow stacking ! Report spells that require this to stack
+				WeaponModifier md;
+				md.value = ( float )mod->m_amount;
+				md.wclass = GetSpellProto()->EquippedItemClass;
+				md.subclass = GetSpellProto()->EquippedItemSubClass;
+				dlist->insert(make_pair(GetSpellId(), md));
+			}
+			else 
+			{
+				std::map< uint32, WeaponModifier >::iterator i = dlist->find( GetSpellId() );
+				if( i != dlist->end() )
+					dlist->erase( i );
+			}
+		}
+	}
+	else 
+	{
+		uint32 school_selector = 1;
+		for( uint32 x = 0; x < 7; x++ )
+		{
+			if( school_selector & mod->m_miscValue )
+				m_target->DamageDoneModPCT[x] += val;
+			school_selector = school_selector << 1;
+
+		}
+	}
+	m_target->CalcDamage();
 }
 
 void Aura::SpellAuraModPercStat(bool apply)	

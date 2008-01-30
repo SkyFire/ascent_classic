@@ -1,4 +1,5 @@
-Rogues Hemo is not working correctly...
+mutilate 50% damage from poisened targets
+Rogues Hemo does not receive como point ?
 restealthing removes Shadow word:Paing and Devouring plague
 Gouge can be done from any position.Should be only facing the target,thus in front of it.
 

@@ -4122,8 +4122,24 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	}
 
 	uint32 displayID;
-	if (!p_caster->GetTeam() && (ci->Female_DisplayID != 0))
-		displayID = ci->Female_DisplayID;
+	if ( p_caster->GetTeam() == 0)
+	{
+		if ( ci->Female_DisplayID != 0 )
+			displayID = ci->Female_DisplayID; //this is the nice solution provided by emsy
+		else //this is the case when you are using a blizzlike db
+		{
+			if( ci->Male_DisplayID == 4587 )
+				displayID = 19075;
+			else if( ci->Male_DisplayID == 4588 )
+				displayID = 19073;
+			else if( ci->Male_DisplayID == 4589 )
+				displayID = 19074;
+			else if( ci->Male_DisplayID == 4590 )
+				displayID = 19071;
+			else if( ci->Male_DisplayID == 4683 )
+				displayID = 19074;
+		}
+	}
 	else
 		displayID = ci->Male_DisplayID;
 
