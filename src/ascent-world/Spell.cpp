@@ -2414,23 +2414,23 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 
 void Spell::HandleAddAura(uint64 guid)
 {
-	Unit * Target = 0;
-	if(guid == 0)
+	Unit* Target = 0;
+	if( guid == 0 )
 		return;
 
-	if(u_caster && u_caster->GetGUID() == guid)
+	if( u_caster != NULL && u_caster->GetGUID() == guid )
 		Target = u_caster;
 	else if(m_caster->IsInWorld())
 		Target = m_caster->GetMapMgr()->GetUnit(guid);
 
-	if(!Target)
+	if( Target == NULL )
 		return;
 
 	// Applying an aura to a flagged target will cause you to get flagged.
     // self casting doesnt flag himself.
-	if(Target->IsPlayer() && p_caster && p_caster != static_cast< Player* >(Target))
+	if( Target->IsPlayer() && p_caster != NULL && p_caster != static_cast< Player* >( Target ) )
 	{
-		if(static_cast< Player* >(Target)->IsPvPFlagged())
+		if( static_cast< Player* >(Target)->IsPvPFlagged() )
 			p_caster->SetPvPFlag();
 	}
 
@@ -2453,34 +2453,35 @@ void Spell::HandleAddAura(uint64 guid)
 	else if( m_spellInfo->Id == 20572 || m_spellInfo->Id == 33702 || m_spellInfo->Id == 33697) // Cast spell Blood Fury
 		spellid = 23230;
 
-	if(spellid && p_caster)
+	if( spellid && p_caster != NULL )
 	{
-		SpellEntry *spellInfo = dbcSpell.LookupEntry( spellid );
-		if(!spellInfo) return;
-		Spell *spell = new Spell(p_caster, spellInfo ,true, NULL);
-		SpellCastTargets targets(Target->GetGUID());
+		SpellEntry* spellInfo = dbcSpell.LookupEntry( spellid );
+		if( spellInfo == NULL )
+			return;
+		Spell *spell = new Spell( p_caster, spellInfo ,true, NULL );
+		SpellCastTargets targets( Target->GetGUID() );
 		spell->prepare(&targets);	
 	}
 
 	// avoid map corruption
-	if(Target->GetInstanceID()!=m_caster->GetInstanceID())
+	if( m_caster != NULL && Target->GetInstanceID() != m_caster->GetInstanceID() )
 		return;
 
 	std::map<uint32,Aura*>::iterator itr=Target->tmpAura.find(m_spellInfo->Id);
-	if(itr!=Target->tmpAura.end())
+	if( itr != Target->tmpAura.end() )
 	{
-		if(itr->second)
+		if( itr->second )
 		{
 			if(itr->second->GetSpellProto()->procCharges>0)
 			{
-				Aura *aur=NULL;
-				for(int i=0;i<itr->second->GetSpellProto()->procCharges-1;i++)
+				Aura* aur = NULL;
+				for(int i=0;i < itr->second->GetSpellProto()->procCharges-1; i++ )
 				{
-					aur = new Aura(itr->second->GetSpellProto(),itr->second->GetDuration(),itr->second->GetCaster(),itr->second->GetTarget());
-					Target->AddAura(aur);
-					aur=NULL;
+					aur = new Aura( itr->second->GetSpellProto(), itr->second->GetDuration(), itr->second->GetCaster(), itr->second->GetTarget() );
+					Target->AddAura( aur );
+					aur = NULL;
 				}
-				if(!(itr->second->GetSpellProto()->procFlags & PROC_REMOVEONUSE))
+				if( !( itr->second->GetSpellProto()->procFlags & PROC_REMOVEONUSE ) )
 				{
 					SpellCharge charge;
 					charge.count=itr->second->GetSpellProto()->procCharges;
@@ -2490,7 +2491,7 @@ void Spell::HandleAddAura(uint64 guid)
 					Target->m_chargeSpells.insert(make_pair(itr->second->GetSpellId(),charge));
 				}
 			}
-			Target->AddAura(itr->second); // the real spell is added last so the modifier is removed last
+			Target->AddAura( itr->second ); // the real spell is added last so the modifier is removed last
 			Target->tmpAura.erase(itr);
 		}
 	}
