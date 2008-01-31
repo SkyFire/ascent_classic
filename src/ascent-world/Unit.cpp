@@ -4574,31 +4574,32 @@ void Unit::EventSummonPetExpire()
 	sEventMgr.RemoveEvents(this, EVENT_SUMMON_PET_EXPIRE);
 }
 
-void Unit::CastSpell(Unit* Target, SpellEntry* Sp, bool triggered)
+void Unit::CastSpell( Unit* Target, SpellEntry* Sp, bool triggered )
 {
 	if( Sp == NULL )
 		return;
 
 	Spell *newSpell = new Spell(this, Sp, triggered, 0);
-	SpellCastTargets targets(0);
-	if(Target)
+	SpellCastTargets targets( 0 );
+	if( Target != NULL )
 	{
 		targets.m_unitTarget |= TARGET_FLAG_UNIT;
 		targets.m_unitTarget = Target->GetGUID();
 	}
 	else
 	{
-		newSpell->GenerateTargets(&targets);
+		newSpell->GenerateTargets( &targets );
 	}
 	newSpell->prepare(&targets);
 }
 
-void Unit::CastSpell(Unit* Target, uint32 SpellID, bool triggered)
+void Unit::CastSpell( Unit* Target, uint32 SpellID, bool triggered )
 {
-	SpellEntry * ent = dbcSpell.LookupEntry(SpellID);
-	if(ent == 0) return;
+	SpellEntry* sp = dbcSpell.LookupEntry(SpellID);
+	if( sp == NULL )
+		return;
 
-	CastSpell(Target, ent, triggered);
+	CastSpell( Target, sp, triggered );
 }
 
 void Unit::CastSpell(uint64 targetGuid, SpellEntry* Sp, bool triggered)

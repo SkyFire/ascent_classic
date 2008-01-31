@@ -2304,10 +2304,10 @@ void Aura::SpellAuraModStun(bool apply)
 
 		//warrior talent - second wind triggers on stun and immobilize. This is not used as proc to be triggered always !
 		Unit *caster = GetUnitCaster();
-		if( caster && caster->IsPlayer() && m_target )
-			static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
-		if( m_target && m_target->IsPlayer() && caster )
-			static_cast<Player*>(m_target)->EventStunOrImmobilize( caster );
+		if( caster != NULL && caster->IsPlayer() && m_target != NULL )
+			static_cast< Player* >( caster )->EventStunOrImmobilize( m_target );
+		if( m_target != NULL && m_target->IsPlayer() && caster != NULL )
+			static_cast< Player* >( m_target )->EventStunOrImmobilize( caster );
 	}
 	else
 	{
@@ -2923,10 +2923,10 @@ void Aura::SpellAuraModRoot(bool apply)
 
 		/* -Supalosa- TODO: Mobs will attack nearest enemy in range on aggro list when rooted. */
 		Unit *caster = GetUnitCaster();
-		if( caster && caster->IsPlayer() && m_target )
-			static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
-		if( m_target && m_target->IsPlayer() && caster )
-			static_cast<Player*>(m_target)->EventStunOrImmobilize( caster );
+		if( caster != NULL && caster->IsPlayer() && m_target != NULL )
+			static_cast< Player* >( caster )->EventStunOrImmobilize( m_target );
+		if( m_target != NULL && m_target->IsPlayer() && caster != NULL )
+			static_cast< Player* >( m_target )->EventStunOrImmobilize( caster );
 	}
 	else
 	{
@@ -3191,10 +3191,10 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 		{
 			//yes we are freezing the bastard, so can we proc anything on this ?
 			Unit* caster = GetUnitCaster();
-			if( caster && caster->IsPlayer() && m_target )
-				static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
-			if( m_target && m_target->IsPlayer() && caster )
-				static_cast<Player*>(m_target)->EventStunOrImmobilize( caster );
+			if( caster != NULL && caster->IsPlayer() && m_target != NULL )
+				static_cast< Player* >( caster )->EventStunOrImmobilize( m_target );
+			if( m_target != NULL && m_target->IsPlayer() && caster != NULL )
+				static_cast< Player* >( m_target )->EventStunOrImmobilize( caster );
 		}
 		m_target->speedReductionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
 		//m_target->m_slowdown=this;

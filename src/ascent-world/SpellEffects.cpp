@@ -4741,14 +4741,14 @@ void Spell::SpellEffectSummonDemon(uint32 i)
 
 void Spell::SpellEffectResurrect(uint32 i) // Resurrect (Flat)
 {
-	if(!playerTarget)
+	if( playerTarget == NULL )
 	{
-		if(!corpseTarget)
+		if( corpseTarget == NULL )
 		{
 			// unit resurrection handler
-			if(unitTarget)
+			if( unitTarget == NULL )
 			{
-				if(unitTarget->GetTypeId()==TYPEID_UNIT && unitTarget->IsPet() && unitTarget->isDead())
+				if( unitTarget->GetTypeId()==TYPEID_UNIT && unitTarget->IsPet() && unitTarget->isDead())
 				{
 					uint32 hlth = ((uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH) : (uint32)m_spellInfo->EffectBasePoints[i];
 					uint32 mana = ((uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1) : (uint32)m_spellInfo->EffectBasePoints[i];
@@ -4777,10 +4777,11 @@ void Spell::SpellEffectResurrect(uint32 i) // Resurrect (Flat)
 			return;
 		}
 		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt32Value(CORPSE_FIELD_OWNER));
-		if(!playerTarget) return;
+		if( playerTarget == NULL )
+			return;
 	}
 
-	if(playerTarget->isAlive() || !playerTarget->IsInWorld())
+	if( playerTarget->isAlive() || !playerTarget->IsInWorld() )
 		return;
 
 	uint32 health = m_spellInfo->EffectBasePoints[i];

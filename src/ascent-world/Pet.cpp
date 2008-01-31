@@ -1640,17 +1640,17 @@ AI_Spell * Pet::HandleAutoCastEvent()
 
 void Pet::HandleAutoCastEvent(uint32 Type)
 {
-	if(!m_Owner)
+	if( m_Owner == NULL )
 		return;
 
-	if(Type == AUTOCAST_EVENT_ATTACK)
+	if( Type == AUTOCAST_EVENT_ATTACK )
 	{
 		if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
 		{
 			// more than one autocast spell. pick a random one.
 			uint32 i;
 			uint32 ms = getMSTime();
-			for(i=0;i<m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size();++i)
+			for( i = 0;i < m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size(); ++i )
 			{
 				uint32 c = RandomUInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
 				uint32 j = 0;
@@ -1664,16 +1664,16 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 				}
 				else
 				{
-					if((*itr)->cooldowntime && (*itr)->cooldowntime > ms)
+					if( (*itr)->cooldowntime && (*itr)->cooldowntime > ms )
 						continue;
 
 					m_aiInterface->SetNextSpell(*itr);
 				}
 			}
 		}
-		else if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size())
+		else if( m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() )
 		{
-			AI_Spell * sp =*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+			AI_Spell* sp = *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 			if(sp->cooldown && getMSTime() < sp->cooldowntime)
 				return;
 
@@ -1684,7 +1684,7 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 
 	for( list<AI_Spell*>::iterator itr = m_autoCastSpells[Type].begin(); itr != m_autoCastSpells[Type].end(); )
 	{
-		AI_Spell * sp = *itr;
+		AI_Spell* sp = *itr;
 		++itr;
 
 		if( sp->spelltargetType == TTYPE_OWNER )
@@ -1692,7 +1692,7 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 		else
 		{
 			//modified by Zack: Spell targetting will be generated in the castspell function now.You cannot force to target self all the time
-			CastSpell( static_cast< Unit* >( NULL ), sp->spell, false);
+			CastSpell( static_cast< Unit* >( NULL ), sp->spell, false );
 		}
 	}
 }
