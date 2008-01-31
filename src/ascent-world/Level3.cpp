@@ -2456,6 +2456,27 @@ bool ChatHandler::HandleNpcPossessCommand(const char * args, WorldSession * m_se
 	return true;
 }
 
+//bool ChatHandler::HandleLoadScriptsCommand(const char * args, WorldSession * m_session)
+//{
+//	if( HookInterface::getSingletonPtr() == NULL )
+//		ScriptMgr::getSingleton().LoadScripts();
+//	return true;
+//}
+
+//bool ChatHandler::HandleReloadScriptsCommand(const char * args, WorldSession * m_session)
+//{
+//	ScriptMgr::getSingleton().UnloadScripts();
+//	ScriptMgr::getSingleton().LoadScripts();
+//	return true;
+//}
+
+//bool ChatHandler::HandleUnloadScriptsCommand(const char * args, WorldSession * m_session)
+//{
+//	if( HookInterface::getSingletonPtr() != NULL )
+//		ScriptMgr::getSingleton().UnloadScripts();
+//	return true;
+//}
+
 bool ChatHandler::HandleNpcUnPossessCommand(const char * args, WorldSession * m_session)
 {
 	Creature * creature = getSelectedCreature(m_session);
