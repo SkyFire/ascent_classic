@@ -4309,8 +4309,9 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	{
 	case SPELL_HASH_SAP:					// Sap
 	case SPELL_HASH_GOUGE:					// Gouge
-		grp = 0;
-		break;
+		{
+			grp = 0;
+		}break;
 
 	case SPELL_HASH_CHEAP_SHOT:				// Cheap Shot
 		{
@@ -4325,12 +4326,14 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		}break;
 
 	case SPELL_HASH_BASH:					// Bash
-		grp = 3;
-		break;
+		{
+			grp = 3;
+		}break;
 
 	case SPELL_HASH_ENTANGLING_ROOTS:		// Entangling Roots
-		grp = 4;
-		break;
+		{
+			grp = 4;
+		}break;
 
 	case SPELL_HASH_HAMMER_OF_JUSTICE:		// Hammer of Justice
 		{
@@ -4339,8 +4342,9 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		}break;
 
 	case SPELL_HASH_STUN:					// Stuns (all of them)
-		grp = 6;
-		break;
+		{
+			grp = 6;
+		}break;
 
 	case SPELL_HASH_CHARGE:					// Charge
 	case SPELL_HASH_INTERCEPT :				// Intercept
@@ -4353,12 +4357,14 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_FEAR:					// Fear
 	case SPELL_HASH_SEDUCTION:				// Seduction
 	case SPELL_HASH_HOWL_OF_TERROR:			// Howl of Terror
-		grp = 8;
-		break;
+		{
+			grp = 8;
+		}break;
 
 	case SPELL_HASH_FROST_NOVA:				// Frost Nova
-		grp = 9;
-		break;
+		{
+			grp = 9;
+		}break;
 
 	case SPELL_HASH_POLYMORPH:				// Polymorph
 	case SPELL_HASH_POLYMORPH__CHICKEN:		// Chicken
@@ -4371,20 +4377,24 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		}break;
 
 	case SPELL_HASH_PSYCHIC_SCREAM:			// Psychic Scream
-		grp = 11;
-		break;
+		{
+			grp = 11;
+		}break;
 
 	case SPELL_HASH_MIND_CONTROL:			// Mind Control
-		grp = 12;
-		break;
+		{
+			grp = 12;
+		}break;
 
-	case SPELL_HASH_FROST_SHOCK:			// Frost Shock
-		grp = 13;
-		break;
+	//With Patch 2.3, Frost Shock no longer suffers from diminishing returns. Prior to that it suffered from Diminishing Returns, which rendered each application of the snare weaker and weaker until the third use, at which point the target was immune for 15 seconds.
+	//case SPELL_HASH_FROST_SHOCK:			// Frost Shock
+	//	grp = 13;
+	//	break;
 
 	case SPELL_HASH_HIBERNATE:				// Hibernate
-		grp = 14;
-		break;
+		{
+			grp = 14;
+		}break;
 
 	case SPELL_HASH_CYCLONE:				// Cyclone
 		{
@@ -4411,20 +4421,24 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		}break;
 
 	case SPELL_HASH_BANISH:					// Banish
-		grp = 19;
-		break;
+		{
+			grp = 19;
+		}break;
 
 	case SPELL_HASH_FREEZING_TRAP_EFFECT:	// Freezing Trap Effect
-		grp = 20;
-		break;
+		{
+			grp = 20;
+		}break;
 
 	case SPELL_HASH_SCARE_BEAST:			// Scare Beast
-		grp = 21;
-		break;
+		{
+			grp = 21;
+		}break;
 
 	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
-		grp = 22;
-		break;
+		{
+			grp = 22;
+		}break;
 
 	}
 	uint32 ret;
