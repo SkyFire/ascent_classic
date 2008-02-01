@@ -45,6 +45,12 @@ _logoutTime(0), permissions(NULL), permissioncount(0), _loggingOut(false), insta
 	m_muted = 0;
 	_side = -1;
 
+	m_packet_counter = 0;
+	m_packet_counter_time = 0;
+
+	m_packets_per_second = 0.0f;
+	m_packets_per_second_peak = 0.0f;
+
 	for(uint32 x=0;x<8;x++)
 		sAccountData[x].data=NULL;	
 }
@@ -129,6 +135,16 @@ int WorldSession::Update(uint32 InstanceID)
 				// 1 - Delete session completely.
 				return 1;*/
 		
+	}
+
+	// track packets per second anti hack measure
+	if( (uint32)UNIXTIME > m_packet_counter_time )
+	{
+		m_packets_per_second = float( m_packet_counter ) / float( (uint32)UNIXTIME - m_packet_counter_time );
+		m_packet_counter_time = (uint32)UNIXTIME;
+		if( m_packets_per_second > m_packets_per_second_peak )
+			m_packets_per_second_peak = m_packets_per_second;
+		m_packet_counter = 0;
 	}
 
 	while ((packet = _recvQueue.Pop()))

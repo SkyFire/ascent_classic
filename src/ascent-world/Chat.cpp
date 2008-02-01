@@ -494,7 +494,6 @@ void CommandTableStorage::Init()
 		{ "increaseweaponskill", 'm', &ChatHandler::HandleIncreaseWeaponSkill, ".increaseweaponskill <count> - Increase eqipped weapon skill x times (defaults to 1).", NULL, 0, 0, 0},
 		{ "createaccount",'z',&ChatHandler::HandleCreateAccountCommand, ".createaccount - Creates account. Format should be .createaccount username password email", NULL, 0, 0, 0 },
 		{ "playerinfo",  'm', &ChatHandler::HandlePlayerInfo,		   ".playerinfo - Displays informations about the selected character (account...)", NULL, 0, 0, 0 },
-
 		{ "modify",		'm', NULL,									 "",				 modifyCommandTable, 0, 0, 0},
 		{ "waypoint",	  'w', NULL,									 "",			   waypointCommandTable, 0, 0, 0},
 		{ "debug",		 'd', NULL,									 "",				  debugCommandTable, 0, 0, 0},
