@@ -4582,18 +4582,18 @@ void Unit::UpdateSpeed(bool delay /* = false */)
 
 	m_flySpeed = PLAYER_NORMAL_FLIGHT_SPEED*(1.0f + ((float)m_flyspeedModifier)/100.0f);
 
-	if(IsPlayer())
+	if( IsPlayer() )
 	{
-		if(delay)
+		if( delay )
 			static_cast< Player* >( this )->resend_speed = delay;
 		else
 		{
 			static_cast< Player* >( this )->SetPlayerSpeed(RUN, m_runSpeed);
 			static_cast< Player* >( this )->SetPlayerSpeed(FLY, m_flySpeed);
 		}
+		static_cast< Player* >( this )->blinked = true;
 	}
 
-	static_cast< Player* >( this )->blinked = true;
 }
 
 bool Unit::HasActiveAura(uint32 spellid)
