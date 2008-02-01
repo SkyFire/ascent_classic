@@ -3488,7 +3488,7 @@ void Spell::RemoveItems()
 	}
 }
 
-int32 Spell::CalculateEffect(uint32 i,Unit *target)
+int32 Spell::CalculateEffect( uint32 i, Unit* target )
 {
 	// TODO: Add ARMOR CHECKS; Add npc that have ranged weapons use them;
 
@@ -3501,10 +3501,13 @@ int32 Spell::CalculateEffect(uint32 i,Unit *target)
 		return ::CalculateDamage( u_caster, unitTarget, RANGED, m_spellInfo->SpellGroupType );
 	}
 */
+	if( m_spellInfo == NULL )
+		return;
+
 	int32 value = 0;
 
-	float basePointsPerLevel    = m_spellInfo->EffectRealPointsPerLevel[i];
-	float randomPointsPerLevel  = m_spellInfo->EffectDicePerLevel[i];
+	float basePointsPerLevel = m_spellInfo->EffectRealPointsPerLevel[i];
+	float randomPointsPerLevel = m_spellInfo->EffectDicePerLevel[i];
 	int32 basePoints;
 
 	//added by Zack : some talents inherit their basepoints from the previously casted spell: see mage - Master of Elements
