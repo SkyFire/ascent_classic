@@ -8955,8 +8955,8 @@ void Player::EventStunOrImmobilize( Unit* proc_target, bool is_victim )
 	if( this == proc_target )
 		return; //how and why would we stun ourselfs
 
-	uint32 t_trigger_on_stun;
-	uint32 t_trigger_on_stun_chance;
+	int32 t_trigger_on_stun;
+	int32 t_trigger_on_stun_chance;
 
 	if( is_victim == false )
 	{
