@@ -615,7 +615,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 						float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
 						float distance_delta = distance_xy_plane / speed;
-						float speed_delta = ( speed * 0.25f ) + ( _player->GetSession()->GetLatency() / 100.0f );
+						float speed_delta = ( speed * 0.25f ) + std::max( float( _player->GetSession()->GetLatency() ) / 100.0f, 0.8f );
 
 						// 0.16f is sensitivity 0.0f is very delicate i would recomend a minimum of 0.1f
 
