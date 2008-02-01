@@ -8960,13 +8960,13 @@ void Player::EventStunOrImmobilize( Unit* proc_target, bool is_victim )
 
 	if( is_victim == false )
 	{
-		t_trigger_on_stun = trigger_on_stun;
-		t_trigger_on_stun_chance = trigger_on_stun_chance;
+		t_trigger_on_stun = (int32)trigger_on_stun;
+		t_trigger_on_stun_chance = (int32)trigger_on_stun_chance;
 	}
 	else
 	{
-		t_trigger_on_stun = trigger_on_stun_victim;
-		t_trigger_on_stun_chance = trigger_on_stun_chance_victim;
+		t_trigger_on_stun = (int32)trigger_on_stun_victim;
+		t_trigger_on_stun_chance = (int32)trigger_on_stun_chance_victim;
 	}
 
 	if( t_trigger_on_stun )
