@@ -4592,6 +4592,8 @@ void Unit::UpdateSpeed(bool delay /* = false */)
 			static_cast< Player* >( this )->SetPlayerSpeed(FLY, m_flySpeed);
 		}
 	}
+
+	static_cast< Player* >( m_target )->blinked = true;
 }
 
 bool Unit::HasActiveAura(uint32 spellid)
