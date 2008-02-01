@@ -3493,7 +3493,8 @@ int32 Spell::CalculateEffect( uint32 i, Unit* target )
 	// TODO: Add ARMOR CHECKS; Add npc that have ranged weapons use them;
 
 	// Range checks
- /*   if (m_spellInfo->Id == SPELL_RANGED_GUN) // this includes bow and gun
+ /*
+	if (m_spellInfo->Id == SPELL_RANGED_GUN) // this includes bow and gun
 	{
 		if(!u_caster || !unitTarget)
 			return 0;
@@ -3501,8 +3502,9 @@ int32 Spell::CalculateEffect( uint32 i, Unit* target )
 		return ::CalculateDamage( u_caster, unitTarget, RANGED, m_spellInfo->SpellGroupType );
 	}
 */
+
 	if( m_spellInfo == NULL )
-		return;
+		return 0;
 
 	int32 value = 0;
 
