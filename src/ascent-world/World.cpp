@@ -1409,8 +1409,9 @@ bool World::SetInitialWorldSettings()
 			sp->SpellGroupType |= 1; //some of them do have the flags but i's hard to write down those some from 130 spells
 
 		//mage Ice Floes affects these spells : Cone of Cold,Cold Snap,Ice Barrier,Ice Block
-		if( sp->NameHash == SPELL_HASH_CONE_OF_COLD || sp->NameHash == SPELL_HASH_COLD_SNAP || sp->NameHash == SPELL_HASH_ICE_BARRIER || sp->NameHash == SPELL_HASH_ICE_BLOCK )
-			sp->EffectSpellGroupRelation[0] = 0x00200000;
+		// Zack : WTF ? talents have group relations not target spells !
+//		if( sp->NameHash == SPELL_HASH_CONE_OF_COLD || sp->NameHash == SPELL_HASH_COLD_SNAP || sp->NameHash == SPELL_HASH_ICE_BARRIER || sp->NameHash == SPELL_HASH_ICE_BLOCK )
+//			sp->EffectSpellGroupRelation[0] = 0x00200000;
 
 /*		else if( strstr( nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
@@ -1506,14 +1507,13 @@ bool World::SetInitialWorldSettings()
 //	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);
 	}
 	//this is so lame : shamanistic rage triggers a new spell which borrows it's stats from parent spell :S
-	SpellEntry * parentsp = dbcSpell.LookupEntryForced( 30823 );
-	SpellEntry * triggersp = dbcSpell.LookupEntryForced( 30824 );
-	if( parentsp && triggersp ) 
+	SpellEntry*  parentsp = dbcSpell.LookupEntryForced( 30823 );
+	SpellEntry* triggersp = dbcSpell.LookupEntryForced( 30824 );
+
+	if( parentsp != NULL && triggersp != NULL )
 		triggersp->EffectBasePoints[0] = parentsp->EffectBasePoints[0];
 
-	SpellEntry* sp;
-
-	sp = dbcSpell.LookupEntryForced( 16164 );
+	SpellEntry* sp = dbcSpell.LookupEntryForced( 16164 );
 	if( sp != NULL && sp->Id == 16164 )
 		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
 
@@ -1762,19 +1762,48 @@ bool World::SetInitialWorldSettings()
 		sp->EffectApplyAuraName[1] = 4;
 	}
 
+	//paladin - Improved Righteous Fury
+	sp = dbcSpell.LookupEntryForced( 20468 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+	sp = dbcSpell.LookupEntryForced( 20469 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+	sp = dbcSpell.LookupEntryForced( 20470 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 1;
+		sp->EffectSpellGroupRelation[1] = 1;
+	}
+
 	//paladin ( grouping ) Healing Light
 	group_relation_paladin_healing_light = 0x40000000 | 0x80000000;
 
-	//paladin - 
+	//paladin - Healing Light
 	sp = dbcSpell.LookupEntryForced( 20237 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+	}
 	sp = dbcSpell.LookupEntryForced( 20238 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+	}
 	sp = dbcSpell.LookupEntryForced( 20239 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
+		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
+	}
 
 	//paladin - Aura Mastery
 	sp = dbcSpell.LookupEntryForced( 31821 );
@@ -1854,33 +1883,26 @@ bool World::SetInitialWorldSettings()
 	//paladin - Reckoning
 	sp = dbcSpell.LookupEntryForced( 20177 );
 	if( sp != NULL )
-	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
-        sp->EffectTriggerSpell[0] = 32746;
-	}
 	sp = dbcSpell.LookupEntryForced( 20179 );
 	if( sp != NULL )
-	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
-        sp->EffectTriggerSpell[0] = 32746;
-	}
 	sp = dbcSpell.LookupEntryForced( 20180 );
 	if( sp != NULL )
-	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
-        sp->EffectTriggerSpell[0] = 32746;
-	}
 	sp = dbcSpell.LookupEntryForced( 20181 );
 	if( sp != NULL )
-	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
-        sp->EffectTriggerSpell[0] = 32746;
-	}
 	sp = dbcSpell.LookupEntryForced( 20182 );
 	if( sp != NULL )
-	{
 		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
-        sp->EffectTriggerSpell[0] = 32746;
+
+	//paladin - Reckoning Effect = proc on proc
+	sp = dbcSpell.LookupEntryForced( 20178 );
+	if( sp != NULL )
+	{
+		sp->procChance = 100;
+		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 	}
 
 	//paladin - Judgement of Wisdom
@@ -2614,6 +2636,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 33215 ); 
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 8192 | 131072 | 8388608; // Mind Blast + Mind Control + Mind Flay
+
 	//Priest: Blessed Recovery
 	sp = dbcSpell.LookupEntryForced(27811);
 	if(sp != NULL)
@@ -3628,7 +3651,7 @@ bool World::SetInitialWorldSettings()
 		sp->SpellGroupType = 2097152;
 	sp = dbcSpell.LookupEntryForced( 13160 );
 	if( sp != NULL )
-		sp->SpellGroupType = 2097152;;
+		sp->SpellGroupType = 2097152;
 
 	//Hunter : Rapid Killing - might need to add honor trigger too here. I'm guessing you receive Xp too so i'm avoiding double proc
 	sp = dbcSpell.LookupEntryForced( 34948 );
@@ -3778,8 +3801,16 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	*/
+	
+	//Mage - Icy Veins
+	sp = dbcSpell.LookupEntryForced( 12472 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[1] = 512;
+		sp->EffectMiscValue[1] = SMT_TRIGGER;
+	}
 
-	//general wand shoot. Needs a group that is not used for mage and priest
+	//Wand Shoot - Needs a group that is not used for mage and priest
 	sp = dbcSpell.LookupEntryForced( 5019 );
 	if( sp != NULL )
 		sp->SpellGroupType = 134217728;
@@ -3934,15 +3965,6 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
 	}
 
-	//Mage:Arcane Blast
-	sp = dbcSpell.LookupEntryForced( 30451 );
-	if( sp != NULL )
-	{
-		sp->EffectApplyAuraName[1] = 42;
-		sp->EffectTriggerSpell[1] = 36032;
-		sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
-	}
-
 	//Mage - Magic Attunement
 	sp = dbcSpell.LookupEntryForced( 11247 );
 	if( sp != NULL )
@@ -4014,14 +4036,14 @@ bool World::SetInitialWorldSettings()
 	}
 
 	//druid Savage Fury
-	sp = dbcSpell.LookupEntryForced(16998);
+	sp = dbcSpell.LookupEntryForced( 16998 );
 	if( sp != NULL ) 
 	{
 		sp->EffectSpellGroupRelation_high[0] |= 1024;
 		//sp->EffectSpellGroupRelation_high[1] |= 1024;
 		//sp->EffectSpellGroupRelation_high[2] |= 1024;
 	}
-	sp = dbcSpell.LookupEntryForced(16999);
+	sp = dbcSpell.LookupEntryForced( 16999 );
 	if( sp != NULL ) 
 	{
 		sp->EffectSpellGroupRelation_high[0] |= 1024;
@@ -4260,7 +4282,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 2048;
 		sp->EffectMiscValue[0]=SMT_SPELL_VALUE_PCT;
 		sp->EffectBasePoints[0] = -(sp->EffectBasePoints[0]+2);
-//		sp->EffectSpellGroupRelation[1] = 2048; //we do not handle this misc type yet anyway. Removed it just as a reminder
+		//sp->EffectSpellGroupRelation[1] = 2048; //we do not handle this misc type yet anyway. Removed it just as a reminder
 		sp->EffectSpellGroupRelation[2] = 2048;
 	}
 	sp = dbcSpell.LookupEntryForced( 18822 );
@@ -4270,6 +4292,14 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 2048;
 		sp->EffectSpellGroupRelation[2] = 2048;
 	}
+
+	//warlock - Intensity
+	sp = dbcSpell.LookupEntryForced( 4224 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spells
+	sp = dbcSpell.LookupEntryForced( 18135 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spells
 
 	//warlock: Devastation
 	sp = dbcSpell.LookupEntryForced( 18130 );
@@ -4640,19 +4670,34 @@ bool World::SetInitialWorldSettings()
 	//warlock - Emberstorm
 	sp = dbcSpell.LookupEntryForced( 17954 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	}
 	sp = dbcSpell.LookupEntryForced( 17955 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	}
 	sp = dbcSpell.LookupEntryForced( 17956 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	}
 	sp = dbcSpell.LookupEntryForced( 17957 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	}
 	sp = dbcSpell.LookupEntryForced( 17958 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+	}
 
 	//warlock - Shadow and Flame
 	sp = dbcSpell.LookupEntryForced( 30288 );
@@ -4821,7 +4866,72 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 35701 );
 	if( sp != NULL )
 		sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_ON_PET;
-	
+
+	//warlock - Demonic Tactics
+	sp = dbcSpell.LookupEntryForced( 30242 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 0; //disble this. This is just blizz crap. Pure proove that they suck :P
+		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+		sp->EffectApplyAuraName[2] = SPELL_AURA_MOD_SPELL_CRIT_CHANCE; //lvl 1 has it fucked up :O
+		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
+	}
+	sp = dbcSpell.LookupEntryForced( 30245 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 0; //disble this. This is just blizz crap. Pure proove that they suck :P
+		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
+	}
+	sp = dbcSpell.LookupEntryForced( 30246 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 0; //disble this. This is just blizz crap. Pure proove that they suck :P
+		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
+	}
+	sp = dbcSpell.LookupEntryForced( 30247 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 0; //disble this. This is just blizz crap. Pure proove that they suck :P
+		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
+	}
+	sp = dbcSpell.LookupEntryForced( 30248 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 0; //disble this. This is just blizz crap. Pure proove that they suck :P
+		sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
+		sp->EffectImplicitTargetB[2] = EFF_TARGET_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
+	}
+
+	//warlock - Demonic Resilience
+	sp = dbcSpell.LookupEntryForced( 30319 );
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
+	}
+	sp = dbcSpell.LookupEntryForced( 30320 );
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
+	}
+	sp = dbcSpell.LookupEntryForced( 30321 );
+	if( sp != NULL )
+	{
+		sp->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_PET;
+		sp->c_is_flags |= SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER ;
+	}
 
 	//warlock - Improved Imp
 	sp = dbcSpell.LookupEntryForced( 18694 );
@@ -5353,7 +5463,7 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 26; //god, save us from fixed values !
 	}
 
-	//improved scorch
+	//Mage - Improved Scorch
 	sp = dbcSpell.LookupEntryForced( 11095 );
 	if( sp != NULL )
 	{
@@ -5785,12 +5895,6 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
 		sp->EffectTriggerSpell[0] = sp->EffectTriggerSpell[1];
 	}
-	sp = dbcSpell.LookupEntryForced( 30031 );
-	if( sp != NULL )
-		sp->NameHash = SPELL_HASH_RAMPAGE_PROC;
-	sp = dbcSpell.LookupEntryForced( 30032 );
-	if( sp != NULL )
-		sp->NameHash = SPELL_HASH_RAMPAGE_PROC;
 
 	//warrior - Unbridled Wrath
 	sp = dbcSpell.LookupEntryForced( 12322 );
@@ -6266,12 +6370,12 @@ bool World::SetInitialWorldSettings()
 	//---------ITEMS-----------------
 
 	//Solarian's Sapphire
-	sp = dbcSpell.LookupEntryForced(37536);
+	sp = dbcSpell.LookupEntryForced( 37536 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 65536;
 
 	//Totem of the Pulsing Earth
-	sp = dbcSpell.LookupEntryForced(37740);
+	sp = dbcSpell.LookupEntryForced( 37740 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 1;
 
@@ -7040,8 +7144,8 @@ bool World::SetInitialWorldSettings()
 	const static uint32 thrown_spells[] = {SPELL_RANGED_GENERAL,SPELL_RANGED_THROW,SPELL_RANGED_WAND, 26679, 27084, 29436, 37074, 41182, 41346, 0};
 	for(i = 0; thrown_spells[i] != 0; ++i)
 	{
-		sp = dbcSpell.LookupEntryForced(thrown_spells[i]);
-		if(sp->RecoveryTime==0 && sp->StartRecoveryTime == 0)
+		sp = dbcSpell.LookupEntryForced( thrown_spells[i] );
+		if( sp->RecoveryTime==0 && sp->StartRecoveryTime == 0 )
 			sp->RecoveryTime = 1600;
 	}
 

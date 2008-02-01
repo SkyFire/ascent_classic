@@ -1716,24 +1716,24 @@ void Aura::SpellAuraDummy(bool apply)
 	//Second Wind - triggers only on stun and Immobilize
 	case 29834:
 		{
-			Unit *caster = GetUnitCaster();
-			if(caster && caster->IsPlayer())
-				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize( 29841, 100, true );//fixed 100% chance
+			Unit* caster = GetUnitCaster();
+			if( caster != NULL && caster->IsPlayer())
+				static_cast< Player* >( caster )->SetTriggerStunOrImmobilize( 29841, 100, true );//fixed 100% chance
 		}break;
 	case 29838:
 		{
-			Unit *caster = GetUnitCaster();
-			if(caster && caster->IsPlayer())
-				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize( 29842, 100, true );//fixed 100% chance
+			Unit* caster = GetUnitCaster();
+			if( caster != NULL && caster->IsPlayer() )
+				static_cast< Player* >( caster )->SetTriggerStunOrImmobilize( 29842, 100, true );//fixed 100% chance
 		}break;
 	//mage Frostbite talent
 	case 11071:
 	case 12496:
 	case 12497:
 		{
-			Unit *caster = GetUnitCaster();
-			if(caster && caster->IsPlayer())
-				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(12494,mod->m_amount);
+			Unit* caster = GetUnitCaster();
+			if( caster != NULL && caster->IsPlayer() )
+				static_cast< Player* >( caster )->SetTriggerStunOrImmobilize( 12494, mod->m_amount );
 		}break;
 	//mage Magic Absorption
 	case 29441:
@@ -2302,12 +2302,12 @@ void Aura::SpellAuraModStun(bool apply)
 			m_target->m_currentSpell = 0;
 		}
 
-		//warrior talent - second wind triggers on stun and immobilize. This is not used as proc to be triggered always !
+		//warrior talent - second wind triggers on stun and immobilize. This is not used as proc to be triggered always!
 		Unit *caster = GetUnitCaster();
 		if( caster != NULL && caster->IsPlayer() && m_target != NULL )
 			static_cast< Player* >( caster )->EventStunOrImmobilize( m_target );
 		if( m_target != NULL && m_target->IsPlayer() && caster != NULL )
-			static_cast< Player* >( m_target )->EventStunOrImmobilize( caster );
+			static_cast< Player* >( m_target )->EventStunOrImmobilize( caster, true );
 	}
 	else
 	{
@@ -2926,7 +2926,7 @@ void Aura::SpellAuraModRoot(bool apply)
 		if( caster != NULL && caster->IsPlayer() && m_target != NULL )
 			static_cast< Player* >( caster )->EventStunOrImmobilize( m_target );
 		if( m_target != NULL && m_target->IsPlayer() && caster != NULL )
-			static_cast< Player* >( m_target )->EventStunOrImmobilize( caster );
+			static_cast< Player* >( m_target )->EventStunOrImmobilize( caster, true );
 	}
 	else
 	{
@@ -3194,7 +3194,7 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 			if( caster != NULL && caster->IsPlayer() && m_target != NULL )
 				static_cast< Player* >( caster )->EventStunOrImmobilize( m_target );
 			if( m_target != NULL && m_target->IsPlayer() && caster != NULL )
-				static_cast< Player* >( m_target )->EventStunOrImmobilize( caster );
+				static_cast< Player* >( m_target )->EventStunOrImmobilize( caster, true );
 		}
 		m_target->speedReductionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
 		//m_target->m_slowdown=this;

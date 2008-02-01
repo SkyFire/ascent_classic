@@ -5027,59 +5027,59 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 	}
 }
 
-void Player::AddInRangeObject(Object* pObj)
+void Player::AddInRangeObject( Object* pObj )
 {
 	//Send taxi move if we're on a taxi
-	if (m_CurrentTaxiPath && (pObj->GetTypeId() == TYPEID_PLAYER))
+	if( m_CurrentTaxiPath && ( pObj->GetTypeId() == TYPEID_PLAYER ) )
 	{
 		uint32 ntime = getMSTime();
 
 		if (ntime > m_taxi_ride_time)
-			m_CurrentTaxiPath->SendMoveForTime( this, static_cast< Player* >( pObj ), ntime - m_taxi_ride_time);
+			m_CurrentTaxiPath->SendMoveForTime( this, static_cast< Player* >( pObj ), ntime - m_taxi_ride_time );
 		else
-			m_CurrentTaxiPath->SendMoveForTime( this, static_cast< Player* >( pObj ), m_taxi_ride_time - ntime);
+			m_CurrentTaxiPath->SendMoveForTime( this, static_cast< Player* >( pObj ), m_taxi_ride_time - ntime );
 	}
 
-	Unit::AddInRangeObject(pObj);
+	Unit::AddInRangeObject( pObj );
 
 	//if the object is a unit send a move packet if they have a destination
-	if(pObj->GetTypeId() == TYPEID_UNIT)
+	if( pObj->GetTypeId() == TYPEID_UNIT )
 	{
 		//add an event to send move update have to send guid as pointer was causing a crash :(
 		//sEventMgr.AddEvent( static_cast< Creature* >( pObj )->GetAIInterface(), &AIInterface::SendCurrentMove, this->GetGUID(), EVENT_UNIT_SENDMOVE, 200, 1);
-		static_cast< Creature* >( pObj )->GetAIInterface()->SendCurrentMove(this);
+		static_cast< Creature* >( pObj )->GetAIInterface()->SendCurrentMove( this );
 	}
 }
 
-void Player::OnRemoveInRangeObject(Object* pObj)
+void Player::OnRemoveInRangeObject( Object* pObj )
 {
 	//if (/*!CanSee(pObj) && */IsVisible(pObj))
 	//{
 		//RemoveVisibleObject(pObj);
 	//}
-	if(m_tempSummon == pObj)
+	if( m_tempSummon == pObj )
 	{
-		m_tempSummon->RemoveFromWorld(false, true);
-		if(m_tempSummon)
+		m_tempSummon->RemoveFromWorld( false, true );
+		if( m_tempSummon )
 			m_tempSummon->SafeDelete();
 
 		m_tempSummon = 0;
-		SetUInt64Value(UNIT_FIELD_SUMMON, 0);
+		SetUInt64Value( UNIT_FIELD_SUMMON, 0 );
 	}
 
-	m_visibleObjects.erase(pObj);
-	Unit::OnRemoveInRangeObject(pObj);
+	m_visibleObjects.erase( pObj );
+	Unit::OnRemoveInRangeObject( pObj );
 
 	if( pObj == m_CurrentCharm )
 	{
-		Unit * p = m_CurrentCharm;
+		Unit* p = m_CurrentCharm;
 
 		this->UnPossess();
-		if(m_currentSpell)
+		if( m_currentSpell != NULL )
 			m_currentSpell->cancel();	   // cancel the spell
-		m_CurrentCharm=NULL;
+		m_CurrentCharm = NULL;
 
-		if( p->m_temp_summon&&p->GetTypeId() == TYPEID_UNIT )
+		if( p->m_temp_summon && p->GetTypeId() == TYPEID_UNIT )
 			static_cast< Creature* >( p )->SafeDelete();
 	}
  
@@ -6027,7 +6027,8 @@ void Player::UpdateNearbyGameObjects()
 						for(;itr2!=((GameObject*)(*itr))->m_quests->end();++itr2)
 						{
 							uint32 status = sQuestMgr.CalcQuestStatus(NULL, this, (*itr2)->qst, (*itr2)->type, false);
-							if(status == QMGR_QUEST_CHAT || status == QMGR_QUEST_AVAILABLE || status == QMGR_QUEST_REPEATABLE || status == QMGR_QUEST_FINISHED)
+							//if (status == QMGR_QUEST_CHAT || status == QMGR_QUEST_AVAILABLE || status == QMGR_QUEST_REPEATABLE || status == QMGR_QUEST_FINISHED )
+							if( status == QMGR_QUEST_AVAILABLE || status == QMGR_QUEST_REPEATABLE || status == QMGR_QUEST_FINISHED )
 							{
 								// Activate gameobject
 								EventActivateGameObject((GameObject*)(*itr));
@@ -8949,9 +8950,14 @@ void Player::UnPossess()
 }
 
 //what is an Immobilize spell ? Have to add it later to spell effect handler
-void Player::EventStunOrImmobilize(Unit *proc_target, bool is_victim)
+void Player::EventStunOrImmobilize( Unit* proc_target, bool is_victim )
 {
-	uint32 t_trigger_on_stun,t_trigger_on_stun_chance;
+	if( this == proc_target )
+		return; //how and why would we stun ourselfs
+
+	uint32 t_trigger_on_stun;
+	uint32 t_trigger_on_stun_chance;
+
 	if( is_victim == false )
 	{
 		t_trigger_on_stun = trigger_on_stun;
@@ -8970,10 +8976,15 @@ void Player::EventStunOrImmobilize(Unit *proc_target, bool is_victim)
 
 		SpellEntry* spellInfo = dbcSpell.LookupEntry( t_trigger_on_stun );
 
-		if( spellInfo == NULL)
+		if( spellInfo == NULL )
 			return;
 
-		Spell* spell = new Spell( this, spellInfo ,true, NULL );
+		SM_FIValue( SM_FChanceOfSuccess, &t_trigger_on_stun_chance, spellInfo->SpellGroupType );
+
+		if( t_trigger_on_stun_chance < 100 && !Rand( t_trigger_on_stun_chance ) )
+			return;
+
+		Spell* spell = new Spell( this, spellInfo, true, NULL );
 
 		if( spell == NULL)
 			return;
@@ -8985,12 +8996,8 @@ void Player::EventStunOrImmobilize(Unit *proc_target, bool is_victim)
 		else if( proc_target ) 
 			targets.m_unitTarget = proc_target->GetGUID();
 		else 
-			targets.m_unitTarget = GetGUID();
-		/*
-		if( proc_target )
-			targets.m_unitTarget = proc_target->GetGUID();
-		else targets.m_unitTarget = GetGUID();
-		*/
+			targets.m_unitTarget = 0;
+
 		spell->prepare( &targets );
 	}
 }

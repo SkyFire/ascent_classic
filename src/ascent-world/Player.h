@@ -951,7 +951,7 @@ public:
     /************************************************************************/
     /* Stun Immobilize                                                      */
     /************************************************************************/
-    void SetTriggerStunOrImmobilize(uint32 newtrigger,uint32 new_chance,bool is_victim=false)
+    void SetTriggerStunOrImmobilize( uint32 newtrigger, uint32 new_chance, bool is_victim = false )
     {
 		if( is_victim == false )
 		{
@@ -964,7 +964,7 @@ public:
 			trigger_on_stun_chance_victim = new_chance;
 		}
     }
-    void EventStunOrImmobilize(Unit *proc_target,bool is_victim=false);
+    void EventStunOrImmobilize( Unit *proc_target, bool is_victim = false );
     
     void EventPortToGM(Player *p);
 	ASCENT_INLINE uint32 GetTeam() { return m_team; }
