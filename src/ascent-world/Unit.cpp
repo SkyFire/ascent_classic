@@ -724,6 +724,8 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 14189: //Seal Fate
 						case 16953: //Blood Frenzy
 						{
+							if( CastingSpell == NULL )
+								continue;
 							if( CastingSpell->Effect[0] != 80 &&
 								CastingSpell->Effect[1] != 80 &&
 								CastingSpell->Effect[2] != 80 &&
@@ -732,6 +734,8 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						}break;
 						case 17106: //druid intencity
 						{
+							if( CastingSpell == NULL )
+								continue;
 							if( CastingSpell->Id != 5229 )//enrage
 								continue;
 						}break;
@@ -754,7 +758,8 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						}break;
                         case 34754: //holy concentration
                         {
-
+							if( CastingSpell == NULL )
+								continue;
 							if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL &&
 								CastingSpell->NameHash != SPELL_HASH_BINDING_HEAL &&
 								CastingSpell->NameHash != SPELL_HASH_GREATER_HEAL )
@@ -793,7 +798,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								Item* it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
 								if( it != NULL && it->GetProto() )
 								{
-									uint32 reqskill=GetSkillByProto( it->GetProto()->Class, it->GetProto()->SubClass );
+									uint32 reqskill = GetSkillByProto( it->GetProto()->Class, it->GetProto()->SubClass );
 									if( reqskill != SKILL_SWORDS && reqskill != SKILL_2H_SWORDS )
 										continue;
 								}
@@ -826,9 +831,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						{
 							if( CastingSpell == NULL )
 								continue;
-								if( CastingSpell->NameHash != SPELL_HASH_REND && 
-									CastingSpell->NameHash != SPELL_HASH_DEEP_WOUNDS )
-									continue;
+							if( CastingSpell->NameHash != SPELL_HASH_REND && 
+								CastingSpell->NameHash != SPELL_HASH_DEEP_WOUNDS )
+								continue;
 						}break;
 						//warrior - Unbridled Wrath
 						case 12964:
@@ -906,7 +911,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								//if we proced on spell tick
 								if( flag & PROC_ON_SPELL_HIT_VICTIM )
 								{
-									if( !CastingSpell )
+									if( CastingSpell == NULL )
 										continue;
 									//only trigger effect for specified spells
 									if( CastingSpell->NameHash != SPELL_HASH_SEED_OF_CORRUPTION )						
@@ -972,7 +977,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 17941:
 							{
 								if( CastingSpell == NULL )
-									continue;//this should not ocur unless we made a fuckup somewhere
+									continue;
 								//only trigger effect for specified spells
 								if( CastingSpell->NameHash != SPELL_HASH_CORRUPTION && //Corruption
 									CastingSpell->NameHash != SPELL_HASH_DRAIN_LIFE )//Drain Life								
@@ -1156,7 +1161,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 14893:
 						case 15357:
 							{
-								if( !CastingSpell || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) )
+								if( CastingSpell == NULL )
+									continue;
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) )
 									continue;
 							}
 							break;
@@ -1487,70 +1494,90 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}break;
 						case 37565: //setbonus
 							{
-								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL)
 									continue;
 							}break;
 						//SETBONUSES
 						case 37379:
 							{
-								if (!CastingSpell || CastingSpell->School != SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->School != SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						case 37378:
 							{
-								if (!CastingSpell || CastingSpell->School != SCHOOL_FIRE || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->School != SCHOOL_FIRE || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						case 39950:
 							{
-								if (!CastingSpell ||  !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
+								if( CastingSpell == NULL )
+									continue;
+								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
 									continue;
 							}break;
 						case 37234:
 						case 37214:
 						case 37601:
 							{
-								if (!CastingSpell ||  !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell == NULL )
+									continue;
+								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						case 37237:
 							{
-								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT)
 									continue;
 							}break;
 						case 37193:
 							{
-								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD)
 									continue;
 							}break;
 						case 37196:
 						case 43838:
 							{
-								if (!CastingSpell)
+								if( CastingSpell == NULL )
 									continue;
-								if (CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER &&
+								if( CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_JUSTICE &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_LIGHT &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_WISDOM &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_RIGHTEOUSNESS &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_BLOOD &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_VENGEANCE &&
-									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_COMMAND)
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_COMMAND )
 									continue;
 							}break;
 						case 43837:
 							{
-								if (!CastingSpell || (CastingSpell->NameHash != SPELL_HASH_FLASH_OF_LIGHT && CastingSpell->NameHash != SPELL_HASH_HOLY_LIGHT))
+								if( CastingSpell == NULL )
+									continue;
+								if( (CastingSpell->NameHash != SPELL_HASH_FLASH_OF_LIGHT && CastingSpell->NameHash != SPELL_HASH_HOLY_LIGHT))
 									continue;
 							}break;
 						case 37529:
 							{
-								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_OVERPOWER)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_OVERPOWER)
 									continue;
 							}break;
 						case 37517:
 							{
-								if (!CastingSpell || CastingSpell->Id == 37517 || CastingSpell->NameHash != SPELL_HASH_REVENGE)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->Id == 37517 || CastingSpell->NameHash != SPELL_HASH_REVENGE)
 									continue; 
 							}break;
 						//SETBONUSES END
@@ -1559,7 +1586,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING)) //requires healing spell.
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) ) //requires healing spell.
 									continue;
 							}break;
 /*						//paladin - illumination
@@ -1583,8 +1610,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 14189: //Seal Fate
 						case 16953: //Blood Frenzy
 						{
-							if( !CastingSpell || 
-								CastingSpell->Id == 14189 ||
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->Id == 14189 ||
 								CastingSpell->Id == 16953 )
 								continue;
 						}break;
