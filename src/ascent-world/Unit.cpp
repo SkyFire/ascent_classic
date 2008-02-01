@@ -4593,7 +4593,7 @@ void Unit::UpdateSpeed(bool delay /* = false */)
 		}
 	}
 
-	static_cast< Player* >( m_target )->blinked = true;
+	static_cast< Player* >( this )->blinked = true;
 }
 
 bool Unit::HasActiveAura(uint32 spellid)
