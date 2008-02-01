@@ -2550,6 +2550,7 @@ void Aura::SpellAuraModStealth(bool apply)
 	}
 
 	m_target->UpdateVisibility();
+	static_cast< Player* >( m_target )->blinked = true;
 }
 
 void Aura::SpellAuraModDetect(bool apply)
