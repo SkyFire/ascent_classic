@@ -660,12 +660,12 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			}
 			else
 			{
-				_player->_lastHeartbeatT = 0;
+				_player->_lastHeartbeatT--;
 			}
 		}
 		else
 		{
-			_player->_lastHeartbeatT = 1;
+			_player->_lastHeartbeatT = 2;
 		}
 
 		_player->_lastHeartbeatV = speed;
