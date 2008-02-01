@@ -724,11 +724,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 14189: //Seal Fate
 						case 16953: //Blood Frenzy
 						{
-							if( !this->IsPlayer() || 
-								!CastingSpell || 
-								CastingSpell->Id == 14189 ||
-								CastingSpell->Id == 16953 )
-								continue;
 							if( CastingSpell->Effect[0] != 80 &&
 								CastingSpell->Effect[1] != 80 &&
 								CastingSpell->Effect[2] != 80 &&
@@ -748,15 +743,13 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						}break;
 						case 37309:
 						{
-							if( !this->IsPlayer() )
-								continue;
 							if( static_cast< Player* >( this )->GetShapeShift() != FORM_BEAR ||
 								static_cast< Player* >( this )->GetShapeShift() != FORM_DIREBEAR )
 								continue;
 						}break;
 						case 37310:
 						{
-							if( !this->IsPlayer() || static_cast< Player* >( this )->GetShapeShift() != FORM_CAT )
+							if( static_cast< Player* >( this )->GetShapeShift() != FORM_CAT )
 								continue;
 						}break;
                         case 34754: //holy concentration
@@ -906,6 +899,41 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell->NameHash!=SPELL_HASH_SHADOW_BOLT)//shadow bolt								
 									continue;
 							}break;
+						// warlock - Seed of Corruption
+						case 27285:
+							{
+								bool can_proc_now = false;
+								//if we proced on spell tick
+								if( flag & PROC_ON_SPELL_HIT_VICTIM )
+								{
+									if( !CastingSpell )
+										continue;
+									//only trigger effect for specified spells
+									if( CastingSpell->NameHash != SPELL_HASH_SEED_OF_CORRUPTION )						
+										continue;
+									//this spell builds up in time
+									(*itr2).procCharges += dmg;
+									if( (int32)(*itr2).procCharges >= ospinfo->EffectBasePoints[ 1 ] && //if charge built up
+										dmg < (int32)this->GetUInt32Value( UNIT_FIELD_HEALTH ) ) //if this is not a killer blow
+										can_proc_now = true;
+								}
+								else can_proc_now = true; //target died
+								if( can_proc_now == false )
+									continue;
+								Unit *new_caster = victim;
+								if( new_caster && new_caster->isAlive() )
+								{
+									SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
+									Spell *spell = new Spell( new_caster, spellInfo ,true, NULL );
+									SpellCastTargets targets;
+									targets.m_destX = GetPositionX();
+									targets.m_destY = GetPositionY();
+									targets.m_destZ = GetPositionZ();
+									spell->prepare(&targets);
+								}
+								(*itr2).deleted = true;
+								continue;
+							}break;
 						// warlock - Improved Drain Soul
 						case 18371:
 							{
@@ -922,8 +950,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 25228:
 							{
 								//we need a pet for this, else we do not trigger it at all
-								if( IsPlayer() )
-									continue;
 								Unit* new_caster;
 								if( static_cast< Player* >( this )->GetSummon() )
 									new_caster = static_cast< Player* >( this )->GetSummon();
@@ -1139,7 +1165,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
                         case 27817:
                         case 27818:
                             {
-                                if(!IsPlayer() || !dmg)
+                                if( !dmg )
                                     continue;
                                 SpellEntry *parentproc= dbcSpell.LookupEntry(origId);
                                 SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId);
@@ -1180,8 +1206,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 16362:
 						case 25505:
 							{
-								if(!IsPlayer())
-									continue;
 								//!! The wierd thing is that we need the spell thet trigegred this enchant spell in order to output logs ..we are using oldspell info too 
 								//we have to recalc the value of this spell
 								SpellEntry *spellInfo = dbcSpell.LookupEntry(origId);
@@ -1209,7 +1233,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;//this should not ocur unless we made a fuckup somewhere
 								int32 proc_Chance;
 								//chance is based actually on combopoint count and not 100% always 
-								if( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE && IsPlayer())
+								if( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE )
 									proc_Chance = static_cast< Player* >( this )->m_comboPoints*ospinfo->EffectBasePoints[1];
 								else continue;
 								if(!Rand(proc_Chance))
@@ -1331,7 +1355,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 35547:
 						case 35548:
 							{
-								if( !IsPlayer() || !dmg )
+								if( !dmg )
 									continue;
 								//this needs offhand weapon
 								Item* it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
@@ -1552,6 +1576,21 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}break;*/
 					}
 				}
+				else
+				{
+					switch( spellId )
+					{
+						case 14189: //Seal Fate
+						case 16953: //Blood Frenzy
+						{
+							if( !CastingSpell || 
+								CastingSpell->Id == 14189 ||
+								CastingSpell->Id == 16953 )
+								continue;
+						}break;
+					}
+				}
+
 				if(spellId==22858 && isInBack(victim)) //retatliation needs target to be not in front. Can be casted by creatures too
 					continue;
 				SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
