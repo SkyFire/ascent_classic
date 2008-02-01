@@ -2341,7 +2341,10 @@ bool Spell::TakePower()
 
 void Spell::HandleEffects(uint64 guid, uint32 i)
 {   
-	if(guid == m_caster->GetGUID())
+	if( m_caster == NULL )
+		return;
+
+	if( guid == m_caster->GetGUID() )
 	{
 		unitTarget = u_caster;
 		gameObjTarget = g_caster;
@@ -2350,7 +2353,7 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 	}
 	else
 	{
-		if(!m_caster->IsInWorld())
+		if( !m_caster->IsInWorld() )
 		{
 			unitTarget = 0;
 			playerTarget = 0;
@@ -2358,12 +2361,12 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 			gameObjTarget = 0;
 			corpseTarget = 0;
 		}
-		else if(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
+		else if( m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM )
 		{
 			if( p_caster != NULL )
 			{
-				Player * plr = p_caster->GetTradeTarget();
-				if(plr)
+				Player* plr = p_caster->GetTradeTarget();
+				if( plr != NULL )
 					itemTarget = plr->getTradeItem((uint32)guid);
 			}
 		}
