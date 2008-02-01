@@ -1603,41 +1603,47 @@ bool World::SetInitialWorldSettings()
 	}
 
     //Priest - Holy Nova
-    sp = dbcSpell.LookupEntry( 15237 );
+    sp = dbcSpell.LookupEntryForced( 15237 );
     if( sp != NULL )
     {
         sp->Effect[1] = 64;
         sp->EffectTriggerSpell[1] = 23455;
     }
-    sp = dbcSpell.LookupEntry( 15430 );
+    sp = dbcSpell.LookupEntryForced( 15430 );
     if( sp != NULL )
     {
         sp->Effect[1] = 64;
         sp->EffectTriggerSpell[1] = 23458;
     }
-    sp = dbcSpell.LookupEntry( 15431 );
+    sp = dbcSpell.LookupEntryForced( 15431 );
     if( sp != NULL )
     {
         sp->Effect[1] = 64;
         sp->EffectTriggerSpell[1] = 23459;
     }
-    sp = dbcSpell.LookupEntry( 27799 );
+    sp = dbcSpell.LookupEntryForced( 27799 );
     if( sp != NULL )
     {
         sp->Effect[1] = 64;
         sp->EffectTriggerSpell[1] = 27803;
     }
-    sp = dbcSpell.LookupEntry( 27800 );
+    sp = dbcSpell.LookupEntryForced( 27800 );
     if( sp != NULL )
     {
         sp->Effect[1] = 64;
         sp->EffectTriggerSpell[1] = 27804;
     }
-    sp = dbcSpell.LookupEntry( 27801 );
+    sp = dbcSpell.LookupEntryForced( 27801 );
     if( sp != NULL )
     {
         sp->Effect[1] = 64;
         sp->EffectTriggerSpell[1] = 27805;
+    }
+    sp = dbcSpell.LookupEntryForced( 25331 );
+    if( sp != NULL )
+    {
+        sp->Effect[1] = 64;
+        sp->EffectTriggerSpell[1] = 25329;
     }
 
 	//Bloodlust targets sorounding creatures instead of us
