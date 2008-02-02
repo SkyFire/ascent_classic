@@ -3051,7 +3051,7 @@ uint8 Spell::CanCast(bool tolerate)
 				else if( target->GetTypeId() == TYPEID_UNIT ) 
 				{ 
 					Creature* c = static_cast< Creature* >( target );
-					if ( c != NULL && c->GetCreatureName() && c->GetCreatureName()->Rank >= ELITE_ELITE )
+					if ( c != NULL && c->GetCreatureName() && c->GetCreatureName()->Rank > ELITE_ELITE )
 						return SPELL_FAILED_HIGHLEVEL;
 				} 
 			}
@@ -4010,6 +4010,14 @@ void Spell::Heal(int32 amount)
 
 
 		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
+        SM_FFValue(u_caster->SM_CriticalChance, &spellCrit, m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+        float spell_flat_modifers=0;
+        SM_FFValue(u_caster->SM_CriticalChance,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+        if(spell_flat_modifers!=0)
+            printf("!!!!spell critchance mod flat %f ,and critchance is %f spell group %u\n",spell_flat_modifers,spellCrit,m_spellInfo->SpellGroupType);
+#endif
+
 		if(critical = Rand(spellCrit))
 		{
 			int32 critbonus = amount >> 1;

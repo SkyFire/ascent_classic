@@ -4612,8 +4612,10 @@ void Player::UpdateStats()
 
 	int32 hp = GetUInt32Value( UNIT_FIELD_BASE_HEALTH );
 
-	//int32 bonus = ( GetUInt32Value( UNIT_FIELD_POSSTAT2 ) - GetUInt32Value( UNIT_FIELD_NEGSTAT2 ) ) * 10 + m_healthfromspell + m_healthfromitems;
-	int32 bonus = GetUInt32Value( UNIT_FIELD_STAT2 ) * 10 + m_healthfromspell + m_healthfromitems;
+	int32 stat_bonus = GetUInt32Value( UNIT_FIELD_POSSTAT2 ) - GetUInt32Value( UNIT_FIELD_NEGSTAT2 );
+	if ( stat_bonus < 0 )
+		stat_bonus = 0; //avoid of having negative health
+	int32 bonus = stat_bonus * 10 + m_healthfromspell + m_healthfromitems;
 
 	int32 res = hp + bonus + hpdelta;
     int32 oldmaxhp = GetUInt32Value( UNIT_FIELD_MAXHEALTH );
@@ -4634,8 +4636,10 @@ void Player::UpdateStats()
 		// MP
 		int32 mana = GetUInt32Value( UNIT_FIELD_BASE_MANA );
 
-		//bonus = (GetUInt32Value( UNIT_FIELD_POSSTAT3)-GetUInt32Value(UNIT_FIELD_NEGSTAT3))*15+m_manafromspell +m_manafromitems ;
-		bonus = GetUInt32Value( UNIT_FIELD_STAT3 ) * 15 + m_manafromspell + m_manafromitems;
+		stat_bonus = GetUInt32Value( UNIT_FIELD_POSSTAT3 ) - GetUInt32Value( UNIT_FIELD_NEGSTAT3 );
+		if ( stat_bonus < 0 )
+			stat_bonus = 0; //avoid of having negative mana
+		bonus = stat_bonus * 15 + m_manafromspell + m_manafromitems ;
 
 		res = mana + bonus + manadelta;
 		if( res < mana )res = mana;	
@@ -8980,6 +8984,12 @@ void Player::EventStunOrImmobilize( Unit* proc_target, bool is_victim )
 			return;
 
 		SM_FIValue( SM_FChanceOfSuccess, &t_trigger_on_stun_chance, spellInfo->SpellGroupType );
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+		int spell_flat_modifers=0;
+		SM_FIValue(SM_FChanceOfSuccess,&spell_flat_modifers,spellInfo->SpellGroupType);
+		if(spell_flat_modifers!=0)
+			printf("!!!!! spell hitchance mod flat %d , spell hitchance bonus %d, spell group %u\n",spell_flat_modifers,bonus,spellInfo->SpellGroupType);
+#endif
 
 		if( t_trigger_on_stun_chance < 100 && !Rand( t_trigger_on_stun_chance ) )
 			return;
