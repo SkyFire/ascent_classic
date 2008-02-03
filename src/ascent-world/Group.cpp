@@ -1196,7 +1196,13 @@ void Group::SendVoiceUpdate()
 
 		for( it2 = m_voiceMembers.begin(); it2 != m_voiceMembers.end(); ++it2 )
 		{
+			if( (*itr) == NULL )
+				continue;
+
 			if( (*it2) == (*itr) )
+				continue;
+
+			if( (*itr)->GetSession() == NULL )
 				continue;
 
 			data << uint64( (*it2)->GetGUID() );
