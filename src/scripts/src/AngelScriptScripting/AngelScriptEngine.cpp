@@ -141,13 +141,15 @@ void AngelScriptEngineMgr::Startup()
 	g_asEngine->RegisterObjectType( "CreatureAIScript", sizeof( CreatureAIScript ), 0 );
 	g_asEngine->RegisterObjectType( "GameObjectAIScript", sizeof( GameObjectAIScript ), 0 );
 	g_asEngine->RegisterObjectType( "QuestScript", sizeof( QuestScript ), 0 );
+	g_asEngine->RegisterObjectType( "QuestLogEntry", sizeof( QuestLogEntry ), 0 );
 
 	// Register Player class methods
 	g_asEngine->RegisterObjectMethod( "Player", "void GetName()", asMETHOD( Player, GetName ), asCALL_THISCALL );
-	
+	g_asEngine->RegisterObjectMethod( "Player", "QuestLogEntry* GetQuestLogForEntry( uint32 quest )", asMETHOD( Player, GetQuestLogForEntry ), asCALL_THISCALL );
+
 	// Register Object class methods
 	g_asEngine->RegisterObjectMethod( "Object", "MapMgr* GetMapMgr() const", asMETHOD( Object, GetMapMgr ), asCALL_THISCALL );
-	
+
 	// Register Creature class methods
 	g_asEngine->RegisterObjectMethod( "Creature", "void GetCreatureName()", asMETHOD( Creature, GetCreatureName ), asCALL_THISCALL );
 	g_asEngine->RegisterObjectMethod( "Creature", "void DestroyCustomWaypointMap()", asMETHOD( Creature, DestroyCustomWaypointMap ), asCALL_THISCALL );
@@ -182,6 +184,12 @@ void AngelScriptEngineMgr::Startup()
 	g_asEngine->RegisterObjectMethod( "AIInterface", "SetDisableRanged( bool value )", asMETHOD( AIInterface, SetDisableRanged ), asCALL_THISCALL );
 	g_asEngine->RegisterObjectMethod( "AIInterface", "SetDisableSpell( bool value )", asMETHOD( AIInterface, SetDisableSpell ), asCALL_THISCALL );
 	g_asEngine->RegisterObjectMethod( "AIInterface", "SetDisableTargeting( bool value )", asMETHOD( AIInterface, SetDisableTargeting ), asCALL_THISCALL );
+
+	// Register QuestLogEntry class methods
+	g_asEngine->RegisterObjectMethod( "QuestLogEntry", "void SetMobCount( uint32 i, uint32 count )", asMETHOD( QuestLogEntry, SetMobCount ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "QuestLogEntry", "void SendUpdateAddKill( uint32 i )", asMETHOD( QuestLogEntry, SendUpdateAddKill ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "QuestLogEntry", "bool CanBeFinished()", asMETHOD( QuestLogEntry, CanBeFinished ), asCALL_THISCALL );
+	g_asEngine->RegisterObjectMethod( "QuestLogEntry", "void SendQuestComplete()", asMETHOD( QuestLogEntry, SendQuestComplete ), asCALL_THISCALL );
 
 	// Register Unit Hooks
 	for( UnitBindingMap::iterator itr = m_unitBinding.begin(); itr != m_unitBinding.end(); ++itr )

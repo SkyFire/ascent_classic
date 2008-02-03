@@ -917,7 +917,7 @@ public:
 	}
 
 	int32                GetOpenQuestSlot();
-	QuestLogEntry*       GetQuestLogForEntry(uint32 quest);
+	QuestLogEntry* GetQuestLogForEntry( uint32 quest );
 	ASCENT_INLINE QuestLogEntry*GetQuestLogInSlot(uint32 slot)  { return m_questlog[slot]; }
     ASCENT_INLINE uint32        GetQuestSharer()                { return m_questSharer; }
     
