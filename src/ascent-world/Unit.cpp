@@ -4834,8 +4834,8 @@ AuraCheckResponse Unit::AuraCheck(uint32 name_hash, uint32 rank, Object *caster)
 	// look for spells with same namehash
 	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
-//		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash && m_auras[x]->GetCaster()==caster)
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash)
+		//if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash && m_auras[x]->GetCaster()==caster)
+		if( m_auras[x] != NULL && m_auras[x]->GetSpellProto() != NULL && m_auras[x]->GetSpellProto()->NameHash == name_hash )
 		{
 			// we've got an aura with the same name as the one we're trying to apply
 			resp.Misc = m_auras[x]->GetSpellProto()->Id;
@@ -4863,15 +4863,18 @@ AuraCheckResponse Unit::AuraCheck(uint32 name_hash, uint32 rank, Aura* aur, Obje
 	resp.Error = AURA_CHECK_RESULT_NONE;
 	resp.Misc  = 0;
 
+	if( aur == NULL )
+		return resp;
+
 	// look for spells with same namehash
-//	if(aur->GetSpellProto()->NameHash == name_hash && aur->GetCaster()==caster)
-	if(aur->GetSpellProto()->NameHash == name_hash)
+	//if(aur->GetSpellProto()->NameHash == name_hash && aur->GetCaster()==caster)
+	if( aur->GetSpellProto() != NULL && aur->GetSpellProto()->NameHash == name_hash )
 	{
 		// we've got an aura with the same name as the one we're trying to apply
 		resp.Misc = aur->GetSpellProto()->Id;
 
 		// compare the rank to our applying spell
-		if(aur->GetSpellProto()->RankNumber > rank)
+		if( aur->GetSpellProto()->RankNumber > rank )
 			resp.Error = AURA_CHECK_RESULT_HIGHER_BUFF_PRESENT;
 		else
 			resp.Error = AURA_CHECK_RESULT_LOWER_BUFF_PRESENT;
@@ -4975,9 +4978,9 @@ int Unit::HasAurasWithNameHash(uint32 name_hash)
 
 bool Unit::HasNegativeAuraWithNameHash(uint32 name_hash)
 {
-	for(uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
+	for( uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x )
 	{
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash)
+		if( m_auras[x] && m_auras[x]->GetSpellProto() != NULL && m_auras[x]->GetSpellProto()->NameHash == name_hash )
 			return true;
 	}
 
