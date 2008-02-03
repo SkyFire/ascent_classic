@@ -3121,10 +3121,11 @@ bool AIInterface::modThreatByGUID(uint64 guid, int32 mod)
 
 bool AIInterface::modThreatByPtr(Unit* obj, int32 mod)
 {
-	if(!obj)
+	if( obj == NULL )
 		return false;
-	TargetMap::iterator it = m_aiTargets.find(obj);
-	if(it != m_aiTargets.end())
+
+	TargetMap::iterator it = m_aiTargets.find( obj );
+	if( it != m_aiTargets.end() )
 	{
 		it->second += mod;
 		if((it->second + obj->GetThreatModifyer()) > m_currentHighestThreat)
@@ -3137,7 +3138,7 @@ bool AIInterface::modThreatByPtr(Unit* obj, int32 mod)
 			}
 		}
 	}
-	else
+	else if( mod > 0 )
 	{
 		m_aiTargets.insert( make_pair( obj, mod ) );
 		if((mod + obj->GetThreatModifyer()) > m_currentHighestThreat)
@@ -3150,10 +3151,10 @@ bool AIInterface::modThreatByPtr(Unit* obj, int32 mod)
 		}
 	}
 
-	if(obj == m_nextTarget)
+	if( obj == m_nextTarget )
 	{
 		// check for a possible decrease in threat.
-		if(mod < 0)
+		if( mod < 0 )
 		{
 			m_nextTarget = GetMostHated();
 			//if there is no more new targets then we can walk back home ?

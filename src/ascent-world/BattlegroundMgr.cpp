@@ -1076,11 +1076,11 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 		plr->GetSession()->SendPacket(&data);
 	}
 
-	if(!m_ended && m_players[0].size() == 0 && m_players[1].size() == 0)
+	if( !m_ended && m_players[0].size() == 0 && m_players[1].size() == 0 )
 	{
 		/* create an inactive event */
-		sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_CLOSE);						// 10mins
-		sEventMgr.AddEvent(this, &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 600000, 1,0);
+		sEventMgr.RemoveEvents( this, EVENT_BATTLEGROUND_CLOSE );						
+		sEventMgr.AddEvent( this, &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1, 0 ); // 2 mins
 	}
 
 	plr->m_bgTeam=plr->GetTeam();

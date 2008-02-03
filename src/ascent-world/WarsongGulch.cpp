@@ -96,9 +96,9 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 		break;
 	}
 
-	if(buffslot > 0)
+	if( buffslot > -1 )
 	{
-		if(m_buffs[buffslot] != 0 && m_buffs[buffslot]->IsInWorld())
+		if( m_buffs[buffslot] != 0 && m_buffs[buffslot]->IsInWorld() )
 		{
 			/* apply the buff */
 			SpellEntry * sp = dbcSpell.LookupEntry(m_buffs[buffslot]->GetInfo()->sound3);
@@ -130,7 +130,7 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 		/* capture flag points */
 		plr->m_bgScore.Misc1++;
 
-		PlaySoundToAll( plr->GetTeam() ? SOUND_HORDE_SCORES : SOUND_ALLIANCE_SCORES );
+		PlaySoundToAll( plr->GetTeam() ? SOUND_ALLIANCE_SCORES : SOUND_HORDE_SCORES );
 
 		if( plr->GetTeam() == 1 )
 			SendChatMessage( CHAT_MSG_BG_EVENT_HORDE, plr->GetGUID(), "%s captured the Alliance flag!", plr->GetName() );
@@ -202,7 +202,9 @@ void WarsongGulch::DropFlag(Player * plr)
 	SetWorldState(plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 1);
 	plr->m_bgHasFlag = false;
 
+	sLog.outDebug( "WSG %u: Flag will return in 60 seconds." , GetId() );
 	sEventMgr.AddEvent(((WarsongGulch*)m_dropFlags[plr->GetTeam()]), &WarsongGulch::ReturnFlag, plr->GetTeam(), this, EVENT_BATTLEGROND_WSG_AUTO_RETURN_FLAG, 60000, 1, 0);
+	// for some reason, this event is not occurring
 
 	if( plr->GetTeam() == 1 )
 		SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, plr->GetGUID(), "The Alliance flag was dropped by %s!", plr->GetName() );

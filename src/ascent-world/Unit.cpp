@@ -2564,14 +2564,14 @@ else
 			if(ability && ability->MechanicsType == MECHANIC_BLEEDING)
 				disable_dR = true; 
 			
-			float summaryPCTmod = pVictim->DamageTakenPctMod[dmg.school_type]+this->DamageDoneModPCT[dmg.school_type];
+			float summaryPCTmod = pVictim->DamageTakenPctMod[dmg.school_type] + GetDamageDonePctMod( dmg.school_type ) + 1;
 
-			if(pct_dmg_mod > 0)
+			if( pct_dmg_mod > 0 )
 				dmg.full_damage = float2int32(dmg.full_damage*(float(pct_dmg_mod)/100.0f));
 
 			//a bit dirty fix
-			if(ability && ability->NameHash == SPELL_HASH_SHRED)
-				summaryPCTmod += pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
+			if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
+				summaryPCTmod *= 1 + pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
 
 			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
 

@@ -3553,15 +3553,15 @@ exit:
 	I think it's imbalanced so committed and replaced with dirty fix.
 	if (m_caster->IsUnit())
 		basePoints += static_cast<Unit*>(m_caster)->getLevel()*basePointsPerLevel; */
-	if (u_caster)
+	if( u_caster != NULL )
 	{
 		switch (m_spellInfo->NameHash)
 		{
-		case 0x7424D6B3: //Gift of the Naaru
-		case 0xDE1C36C8: //Blood Fury
-		case 0xEE91A232: //Mana Tap
-		case 0x6632EB62: //Arcane Torrent
-			basePoints += float2int32(u_caster->getLevel()*basePointsPerLevel);
+			case SPELL_HASH_GIFT_OF_THE_NAARU: //Gift of the Naaru
+			case SPELL_HASH_BLOOD_FURY: //Blood Fury
+			case SPELL_HASH_MANA_TAP: //Mana Tap
+			case SPELL_HASH_ARCANE_TORRENT: //Arcane Torrent
+				basePoints += float2int32( u_caster->getLevel() * basePointsPerLevel );
 			break;
 		}
 	}
@@ -3708,22 +3708,26 @@ exit:
 				value += RandomUInt((*itrSO)->damage);
 			}
 		}
-	 }
+	}
 
-	if( u_caster != NULL )
+	Unit* t_caster = u_caster;
+	if( i_caster != NULL && target != NULL )		
+		t_caster = target->GetMapMgr()->GetUnit( i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) ); //we should inherit the modifiers from the conjured food caster
+
+	if( t_caster != NULL )
 	{
-		int32 spell_flat_modifers=0;
-		int32 spell_pct_modifers=0;
-		int32 spell_pct_modifers2=0;//separated from the other for debugging purpuses
+		int32 spell_flat_modifers = 0;
+		int32 spell_pct_modifers = 0;
+		int32 spell_pct_modifers2 = 0;//separated from the other for debugging purpuses
 
-		SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue( t_caster->SM_FSPELL_VALUE, &spell_flat_modifers, m_spellInfo->SpellGroupType );
+		SM_FIValue( t_caster->SM_PSPELL_VALUE, &spell_pct_modifers, m_spellInfo->SpellGroupType );
 
-		SM_FIValue(u_caster->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(u_caster->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue( t_caster->SM_FEffectBonus, &spell_flat_modifers, m_spellInfo->SpellGroupType );
+		SM_FIValue( t_caster->SM_PEffectBonus, &spell_pct_modifers, m_spellInfo->SpellGroupType );
 
 		//now get mods from unit target. These are rare to find talents
-		if(target)
+		if( target != NULL )
 		{
 			std::map<uint32,signed int>::iterator itr;
 			itr=target->target_spell_effect_mod_flat.find(m_spellInfo->NameHash);
@@ -3741,10 +3745,10 @@ exit:
 		value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
 
 	}
-	else if( i_caster != NULL && target)
+	else if( i_caster != NULL && target != NULL )
 	{	
 		//we should inherit the modifiers from the conjured food caster
-		Unit *item_creator = target->GetMapMgr()->GetUnit( i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) );
+		Unit* item_creator = target->GetMapMgr()->GetUnit( i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) );
 		if( item_creator != NULL )
 		{
 			int32 spell_flat_modifers=0;

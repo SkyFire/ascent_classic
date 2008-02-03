@@ -1962,22 +1962,24 @@ int luaUnit_LearnSpell(lua_State * L, Unit* ptr)
 {
 	CHECK_TYPEID(TYPEID_PLAYER);
 	int spellid = luaL_checkint(L,1);
-	((Player*)ptr)->addSpell(spellid);
+	static_cast< Player* >( ptr )->addSpell(spellid);
 	return 0;
 }
 
 int luaUnit_MarkQuestObjectiveAsComplete(lua_State * L, Unit * ptr)
 {
-	CHECK_TYPEID(TYPEID_PLAYER);
-	int questid = luaL_checkint(L,1);
-	int objective = luaL_checkint(L,2);
-	Player * pl = ((Player*)ptr);
-	QuestLogEntry * qle = pl->GetQuestLogForEntry(questid);
-	qle->SetMobCount(objective, qle->GetQuest()->required_mobcount[objective]);
-	qle->SendUpdateAddKill(objective);
-	if(qle->CanBeFinished())
-		qle->SendQuestComplete();
-
+	CHECK_TYPEID( TYPEID_PLAYER );
+	int questid = luaL_checkint( L, 1 );
+	int objective = luaL_checkint( L, 2 );
+	Player* pl = static_cast< Player* >( ptr );
+	QuestLogEntry* qle = pl->GetQuestLogForEntry( questid );
+	if( qle != NULL )
+	{
+		qle->SetMobCount( objective, qle->GetQuest()->required_mobcount[objective] );
+		qle->SendUpdateAddKill( objective );
+		if( qle->CanBeFinished() )
+			qle->SendQuestComplete();
+	}
 	return 0;
 }
 
