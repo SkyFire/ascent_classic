@@ -127,10 +127,10 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	mTradeTarget = 0;
 
 	//Duel
-	DuelingWith			 = NULL;
+	DuelingWith				= NULL;
 	m_duelCountdownTimer	= 0;
 	m_duelStatus			= 0;
-	m_duelState			 = 2;		// finished
+	m_duelState				= DUEL_STATE_FINISHED;
 
 	//WayPoint
 	waypointunit			= NULL;
@@ -7129,25 +7129,29 @@ void Player::RequestDuel(Player *pTarget)
 
 void Player::DuelCountdown()
 {
-	m_duelCountdownTimer -= 1000;
-	if(DuelingWith == 0)
+	if( DuelingWith == NULL )
 		return;
 
-	if(m_duelCountdownTimer == 0)
+	m_duelCountdownTimer -= 1000;
+
+	if( m_duelCountdownTimer < 0 )
+		m_duelCountdownTimer = 0;
+
+	if( m_duelCountdownTimer == 0 )
 	{
 		// Start Duel.
-		SetUInt32Value(UNIT_FIELD_POWER2, 0);
-		DuelingWith->SetUInt32Value(UNIT_FIELD_POWER2, 0);
+		SetUInt32Value( UNIT_FIELD_POWER2, 0 );
+		DuelingWith->SetUInt32Value( UNIT_FIELD_POWER2, 0 );
 
 		//Give the players a Team
-		DuelingWith->SetUInt32Value(PLAYER_DUEL_TEAM, 1); // Duel Requester
-		SetUInt32Value(PLAYER_DUEL_TEAM, 2);
+		DuelingWith->SetUInt32Value( PLAYER_DUEL_TEAM, 1 ); // Duel Requester
+		SetUInt32Value( PLAYER_DUEL_TEAM, 2 );
 
-		SetDuelState(DUEL_STATE_STARTED);
-		DuelingWith->SetDuelState(DUEL_STATE_STARTED);
+		SetDuelState( DUEL_STATE_STARTED );
+		DuelingWith->SetDuelState( DUEL_STATE_STARTED );
 		
-		sEventMgr.AddEvent(this, &Player::DuelBoundaryTest, EVENT_PLAYER_DUEL_BOUNDARY_CHECK, 500, 0,0);
-		sEventMgr.AddEvent(DuelingWith, &Player::DuelBoundaryTest, EVENT_PLAYER_DUEL_BOUNDARY_CHECK, 500, 0,0);
+		sEventMgr.AddEvent( this, &Player::DuelBoundaryTest, EVENT_PLAYER_DUEL_BOUNDARY_CHECK, 500, 0, 0 );
+		sEventMgr.AddEvent( DuelingWith, &Player::DuelBoundaryTest, EVENT_PLAYER_DUEL_BOUNDARY_CHECK, 500, 0, 0 );
 	}
 }
 
@@ -7213,74 +7217,73 @@ void Player::EndDuel(uint8 WinCondition)
 		return;
 
 	// Remove the events
-	sEventMgr.RemoveEvents(this, EVENT_PLAYER_DUEL_COUNTDOWN);
-	sEventMgr.RemoveEvents(this, EVENT_PLAYER_DUEL_BOUNDARY_CHECK);
+	sEventMgr.RemoveEvents( this, EVENT_PLAYER_DUEL_COUNTDOWN );
+	sEventMgr.RemoveEvents( this, EVENT_PLAYER_DUEL_BOUNDARY_CHECK );
 
-	for(uint32 x = 0; x < MAX_AURAS; ++x)
+	for( uint32 x = 0; x < MAX_AURAS; ++x )
 	{
-		if(!m_auras[x]) continue;
-		if(m_auras[x]->WasCastInDuel())
+		if( m_auras[x] == NULL )
+			continue;
+		if( m_auras[x]->WasCastInDuel() )
 			m_auras[x]->Remove();
 	}
 
 	m_duelState = DUEL_STATE_FINISHED;
-	if(DuelingWith == 0) return;
 
-	sEventMgr.RemoveEvents(DuelingWith, EVENT_PLAYER_DUEL_BOUNDARY_CHECK);
-	sEventMgr.RemoveEvents(DuelingWith, EVENT_PLAYER_DUEL_COUNTDOWN);
+	if( DuelingWith == NULL )
+		return;
+
+	sEventMgr.RemoveEvents( DuelingWith, EVENT_PLAYER_DUEL_BOUNDARY_CHECK );
+	sEventMgr.RemoveEvents( DuelingWith, EVENT_PLAYER_DUEL_COUNTDOWN );
 
 	// spells waiting to hit
 	sEventMgr.RemoveEvents(this, EVENT_SPELL_DAMAGE_HIT);
 
-	for(uint32 x = 0; x < MAX_AURAS; ++x)
+	for( uint32 x = 0; x < MAX_AURAS; ++x )
 	{
-		if(!DuelingWith->m_auras[x]) continue;
-		if(DuelingWith->m_auras[x]->WasCastInDuel())
+		if( DuelingWith->m_auras[x] == NULL )
+			continue;
+		if( DuelingWith->m_auras[x]->WasCastInDuel() )
 			DuelingWith->m_auras[x]->Remove();
 	}
 
 	DuelingWith->m_duelState = DUEL_STATE_FINISHED;
 
 	//Announce Winner
-	WorldPacket data(SMSG_DUEL_WINNER, 500);
-	data << uint8(WinCondition);
+	WorldPacket data( SMSG_DUEL_WINNER, 500 );
+	data << uint8( WinCondition );
 	data << GetName() << DuelingWith->GetName();
-	SendMessageToSet(&data, true);
+	SendMessageToSet( &data, true );
 
-	data.Initialize(SMSG_DUEL_COMPLETE);
-	data << uint8(1);
-	SendMessageToSet(&data, true);
+	data.Initialize( SMSG_DUEL_COMPLETE );
+	data << uint8( 1 );
+	SendMessageToSet( &data, true );
 
-	//get Arbiter
-	GameObject *arbiter = m_mapMgr ? GetMapMgr()->GetGameObject(GetUInt32Value(PLAYER_DUEL_ARBITER)) : 0;
-	
 	//Clear Duel Related Stuff
-	SetUInt64Value(PLAYER_DUEL_ARBITER, 0);
-	DuelingWith->SetUInt64Value(PLAYER_DUEL_ARBITER, 0);
-	SetUInt32Value(PLAYER_DUEL_TEAM, 0);
-	DuelingWith->SetUInt32Value(PLAYER_DUEL_TEAM, 0);
-	
-	if(arbiter)
-	{
-		//Despawn Arbiter
-	   /* arbiter->Despawn(10000);
-		sObjHolder.Delete(arbiter);*/ 
-		//original code....for some reason we set timer to respawn arbiter
-		// this is wrong i guess...reenable if i'm wrong
 
-		arbiter->RemoveFromWorld(true);
+	GameObject* arbiter = m_mapMgr ? GetMapMgr()->GetGameObject(GetUInt32Value(PLAYER_DUEL_ARBITER)) : 0;
+
+	if( arbiter != NULL )
+	{
+		arbiter->RemoveFromWorld( true );
 		delete arbiter;
 	}
 
+	SetUInt64Value( PLAYER_DUEL_ARBITER, 0 );
+	DuelingWith->SetUInt64Value( PLAYER_DUEL_ARBITER, 0 );
+
+	SetUInt32Value( PLAYER_DUEL_TEAM, 0 );
+	DuelingWith->SetUInt32Value( PLAYER_DUEL_TEAM, 0 );
+	
 	EventAttackStop();
 	DuelingWith->EventAttackStop();
 	
 	// Call off pet
-	if(this->GetSummon())
+	if( this->GetSummon() != NULL )
 	{
 		this->GetSummon()->CombatStatus.Vanished();
-		this->GetSummon()->GetAIInterface()->SetUnitToFollow(this);
-		this->GetSummon()->GetAIInterface()->HandleEvent(EVENT_FOLLOWOWNER, this->GetSummon(), 0);
+		this->GetSummon()->GetAIInterface()->SetUnitToFollow( this );
+		this->GetSummon()->GetAIInterface()->HandleEvent( EVENT_FOLLOWOWNER, this->GetSummon(), 0 );
 		this->GetSummon()->GetAIInterface()->WipeTargetList();
 	}
 
@@ -7289,11 +7292,14 @@ void Player::EndDuel(uint8 WinCondition)
 	DuelingWith->RemoveNegativeAuras();*/
 
 	//Stop Players attacking so they don't kill the other player
-	m_session->OutPacket(SMSG_CANCEL_COMBAT);
-	DuelingWith->m_session->OutPacket(SMSG_CANCEL_COMBAT);
+	m_session->OutPacket( SMSG_CANCEL_COMBAT );
+	DuelingWith->m_session->OutPacket( SMSG_CANCEL_COMBAT );
 
-	smsg_AttackStop(DuelingWith);
-	DuelingWith->smsg_AttackStop(this);
+	smsg_AttackStop( DuelingWith );
+	DuelingWith->smsg_AttackStop( this );
+
+	DuelingWith->m_duelCountdownTimer = 0;
+	m_duelCountdownTimer = 0;
 
 	DuelingWith->DuelingWith = NULL;
 	DuelingWith = NULL;
