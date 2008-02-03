@@ -493,6 +493,7 @@ void Aura::Remove()
 		caster->SendMessageToSet( &data, true );
 	}
 
+	// this crashes a lot don't know why.....
 	delete this; // suicide xD	leaking this shit out
 }
 
