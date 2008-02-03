@@ -897,39 +897,40 @@ public:
 	//int32 RangedDamageTakenPct; 
 
 	//SM
-	int32 * SM_CriticalChance;//flat
-	int32 * SM_FDur;//flat
-	int32 * SM_PDur;//pct
-	int32 * SM_PRadius;//pct
-	int32 * SM_FRadius;//flat
-	int32 * SM_PRange;//pct
-	int32 * SM_FRange;//flat
-	int32 * SM_PCastTime;//pct
-	int32 * SM_FCastTime;//flat
-	int32 * SM_PCriticalDamage;
-	int32 * SM_PDOT;//pct
-	int32 * SM_FDOT;//flat
-	int32 * SM_FEffectBonus;//flat
-	int32 * SM_PEffectBonus;//pct
-	int32 * SM_FDamageBonus;//flat
-	int32 * SM_PDamageBonus;//pct
-	int32 * SM_PSPELL_VALUE;//pct
-	int32 * SM_FSPELL_VALUE;//flat
-	int32 * SM_FHitchance;//flat
-	int32 * SM_PAPBonus;//pct
-	int32 * SM_PCost;
-	int32 * SM_FCost;
-	int32 * SM_PNonInterrupt;
-	int32 * SM_PJumpReduce;
-	int32 * SM_FSpeedMod;
-	int32 * SM_FAdditionalTargets;
-	int32 * SM_FPenalty;//flat
-	int32 * SM_PPenalty;//Pct
-	int32 * SM_PCooldownTime;
-	int32 * SM_FCooldownTime;
-	int32 * SM_FChanceOfSuccess;
-	int32 * SM_FRezist_dispell;
-	int32 * SM_PRezist_dispell;
+	int32* SM_CriticalChance;//flat
+	int32* SM_FDur;//flat
+	int32* SM_PDur;//pct
+	int32* SM_PRadius;//pct
+	int32* SM_FRadius;//flat
+	int32* SM_PRange;//pct
+	int32* SM_FRange;//flat
+	int32* SM_PCastTime;//pct
+	int32* SM_FCastTime;//flat
+	int32* SM_PCriticalDamage;
+	int32* SM_PDOT;//pct
+	int32* SM_FDOT;//flat
+	int32* SM_FEffectBonus;//flat
+	int32* SM_PEffectBonus;//pct
+	int32* SM_FDamageBonus;//flat
+	int32* SM_PDamageBonus;//pct
+	int32* SM_PSPELL_VALUE;//pct
+	int32* SM_FSPELL_VALUE;//flat
+	int32* SM_FHitchance;//flat
+	int32* SM_PAPBonus;//pct
+	int32* SM_PCost;
+	int32* SM_FCost;
+	int32* SM_PNonInterrupt;
+	int32* SM_PJumpReduce;
+	int32* SM_FSpeedMod;
+	int32* SM_FAdditionalTargets;
+	int32* SM_FPenalty;//flat
+	int32* SM_PPenalty;//Pct
+	int32* SM_PCooldownTime;
+	int32* SM_FCooldownTime;
+	int32* SM_FChanceOfSuccess;
+	int32* SM_FRezist_dispell;
+	int32* SM_PRezist_dispell;
+
 	void InheritSMMods(Unit *inherit_from);
 	std::map<uint32,signed int> target_spell_effect_mod_flat; //used very rarely by some talents. Will mod the value of a casted spell on target
 	std::map<uint32,signed int> target_spell_effect_mod_pct; //used very rarely by some talents. Store value in % format

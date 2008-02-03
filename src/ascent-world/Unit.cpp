@@ -47,62 +47,65 @@ Unit::Unit()
 	
 	//DK:modifiers
 	PctRegenModifier = 0;
+
 	for( uint32 x = 0; x < 4; x++ )
 	{
 		PctPowerRegenModifier[x] = 1;
 	}
+
 	m_speedModifier = 0;
 	m_slowdown = 0;
-	m_mountedspeedModifier=0;
-	for(uint32 x=0;x<27;x++)
+	m_mountedspeedModifier = 0;
+
+	for( uint32 x = 0; x < 27; x++ )
 	{
-		MechanicsDispels[x]=0;
-		MechanicsResistancesPCT[x]=0;
-		ModDamageTakenByMechPCT[x]=0;
+		MechanicsDispels[x] = 0;
+		MechanicsResistancesPCT[x] = 0;
+		ModDamageTakenByMechPCT[x] = 0;
 	}
 
 	//SM
-	SM_CriticalChance=0;
-	SM_FDur=0;//flat
-	SM_PDur=0;//pct
-	SM_FRadius=0;
-	SM_FRange=0;
-	SM_PCastTime=0;
-	SM_FCastTime=0;
-	SM_PCriticalDamage=0;
-	SM_FDOT=0;
-	SM_PDOT=0;
-	SM_FEffectBonus=0;
-	SM_PEffectBonus=0;
-	SM_FDamageBonus=0;
-	SM_PDamageBonus=0;
-	SM_PSPELL_VALUE=0;
-	SM_FSPELL_VALUE=0;
-	SM_FHitchance=0;
-	SM_PRange=0;//pct
-	SM_PRadius=0;
-	SM_PAPBonus=0;
-	SM_PCost=0;
-	SM_FCost=0;
-	SM_FAdditionalTargets=0;
-	SM_PJumpReduce=0;
-	SM_FSpeedMod=0;
-	SM_PNonInterrupt=0;
-	SM_FPenalty=0;
-	SM_PPenalty=0;
-	SM_FCooldownTime = 0;
-	SM_PCooldownTime = 0;
-	SM_FChanceOfSuccess = 0;
-	SM_FRezist_dispell = 0;
-	SM_PRezist_dispell = 0;
+	SM_CriticalChance = NULL;
+	SM_FDur = NULL; // flat
+	SM_PDur = NULL; // pct
+	SM_FRadius = NULL;
+	SM_FRange = NULL;
+	SM_PCastTime = NULL;
+	SM_FCastTime = NULL;
+	SM_PCriticalDamage = NULL;
+	SM_FDOT = NULL;
+	SM_PDOT = NULL;
+	SM_FEffectBonus = NULL;
+	SM_PEffectBonus = NULL;
+	SM_FDamageBonus = NULL;
+	SM_PDamageBonus = NULL;
+	SM_PSPELL_VALUE = NULL;
+	SM_FSPELL_VALUE = NULL;
+	SM_FHitchance = NULL;
+	SM_PRange = NULL; // pct
+	SM_PRadius = NULL;
+	SM_PAPBonus = NULL;
+	SM_PCost = NULL;
+	SM_FCost = NULL;
+	SM_FAdditionalTargets = NULL;
+	SM_PJumpReduce = NULL;
+	SM_FSpeedMod = NULL;
+	SM_PNonInterrupt = NULL;
+	SM_FPenalty = NULL;
+	SM_PPenalty = NULL;
+	SM_FCooldownTime = NULL;
+	SM_PCooldownTime = NULL;
+	SM_FChanceOfSuccess = NULL;
+	SM_FRezist_dispell = NULL;
+	SM_PRezist_dispell = NULL;
 
 	m_pacified = 0;
 	m_interruptRegen = 0;
 	m_resistChance = 0;
 	m_powerRegenPCT = 0;
-	RAPvModifier=0;
-	APvModifier=0;
-	stalkedby=0;
+	RAPvModifier = 0;
+	APvModifier = 0;
+	stalkedby = 0;
 
 	m_extraattacks = 0;
 	m_stunned = 0;
@@ -118,12 +121,14 @@ Unit::Unit()
 	summonPet = NULL;
 
 	m_useAI = false;
-	for(uint32 x=0;x<10;x++)
+
+	for( uint32 x = 0; x < 10; x++ )
 	{
-		dispels[x]=0;
+		dispels[x] = 0;
 		CreatureAttackPowerMod[x] = 0;
 		CreatureRangedAttackPowerMod[x] = 0;
 	}
+
 	//REMIND:Update these if you make any changes
 	CreatureAttackPowerMod[UNIT_TYPE_MISC] = 0;
 	CreatureRangedAttackPowerMod[UNIT_TYPE_MISC] = 0;
@@ -133,7 +138,7 @@ Unit::Unit()
 	m_invisible = false;
 	m_invisFlag = INVIS_FLAG_NORMAL;
 
-	for(int i = 0; i < INVIS_FLAG_TOTAL; i++)
+	for( int32 i = 0; i < INVIS_FLAG_TOTAL; i++ )
 	{
 		m_invisDetect[i] = 0;
 	}
@@ -143,8 +148,10 @@ Unit::Unit()
 	m_stealth = 0;
 	m_can_stealth = true;
 
-	for(uint32 x=0;x<5;x++)
-		BaseStats[x]=0;
+	for( uint32 x = 0; x < 5; x++ )
+	{
+		BaseStats[x] = 0;
+	}
 
 	m_H_regenTimer = 2000;
 	m_P_regenTimer = 2000;
@@ -153,20 +160,21 @@ Unit::Unit()
 	//		CalculateActualArmor();
 
 	m_aiInterface = new AIInterface();
-	m_aiInterface->Init(this, AITYPE_AGRO, MOVEMENTTYPE_NONE);
+	m_aiInterface->Init( this, AITYPE_AGRO, MOVEMENTTYPE_NONE );
 
 	m_emoteState = 0;
 	m_oldEmote = 0;	
 	
-	BaseDamage[0]=0;
-	BaseOffhandDamage[0]=0;
-	BaseRangedDamage[0]=0;
-	BaseDamage[1]=0;
-	BaseOffhandDamage[1]=0;
-	BaseRangedDamage[1]=0;
+	BaseDamage[0] = 0;
+	BaseOffhandDamage[0] = 0;
+	BaseRangedDamage[0] = 0;
+	BaseDamage[1] = 0;
+	BaseOffhandDamage[1] = 0;
+	BaseRangedDamage[1] = 0;
 
 	m_CombatUpdateTimer = 0;
-	for(uint32 x=0;x<7;x++)
+
+	for( uint32 x = 0; x < 7; x++ )
 	{
 		SchoolImmunityList[x] = 0;
 		BaseResistance[x] = 0;
@@ -181,14 +189,15 @@ Unit::Unit()
 		SpellCritChanceSchool[x] = 0;
 		PowerCostMod[x] = 0;
 		PowerCostPctMod[x] = 0; // armor penetration & spell penetration
-		AttackerCritChanceMod[x]=0;
-		CritMeleeDamageTakenPctMod[x]=0;
-		CritRangedDamageTakenPctMod[x]=0;
+		AttackerCritChanceMod[x] = 0;
+		CritMeleeDamageTakenPctMod[x] = 0;
+		CritRangedDamageTakenPctMod[x] = 0;
 	}
+
 	DamageTakenPctModOnHP35 = 1;
 	RangedDamageTaken = 0;
 
-	for(int i = 0; i < 5; i++)
+	for( int32 i = 0; i < 5; i++ )
 	{
 		m_detectRangeGUID[i] = 0;
 		m_detectRangeMOD[i] = 0;
@@ -198,13 +207,14 @@ Unit::Unit()
 
 	m_threatModifyer = 0;
 	m_generatedThreatModifyer = 0;
-	memset(m_auras, 0, (MAX_AURAS+MAX_PASSIVE_AURAS)*sizeof(Aura*));
+	memset( m_auras, 0, ( MAX_AURAS + MAX_PASSIVE_AURAS ) * sizeof( Aura* ) );
 	
 	// diminishing return stuff
-	memset(m_diminishAuraCount, 0, 23);
-	memset(m_diminishCount, 0, 23*2);
-	memset(m_diminishTimer, 0, 23*2);
-	memset(m_auraStackCount, 0, MAX_AURAS);
+	memset( m_diminishAuraCount, 0, 23 );
+	memset( m_diminishCount, 0, 23 * 2 );
+	memset( m_diminishTimer, 0, 23 * 2 );
+	memset( m_auraStackCount, 0, MAX_AURAS );
+
 	m_diminishActive = false;
 	dynObj = 0;
 	pLastSpell = 0;
@@ -220,12 +230,12 @@ Unit::Unit()
 	m_procCounter = 0;
 	m_extrastriketargets = 0;
 	m_damgeShieldsInUse = false;
-//	fearSpell = 0;
+	//fearSpell = 0;
 	m_extraAttackCounter = false;
-	CombatStatus.SetUnit(this);
-	m_temp_summon=false;
-	m_chargeSpellsInUse=false;
-	m_spellsbusy=false;
+	CombatStatus.SetUnit( this );
+	m_temp_summon = false;
+	m_chargeSpellsInUse = false;
+	m_spellsbusy = false;
 	m_interruptedRegenTime = 0;
 }
 
@@ -233,39 +243,72 @@ Unit::~Unit()
 {  
 	RemoveAllAuras();
 
-	if(SM_CriticalChance != 0) delete [] SM_CriticalChance ;
-	if(SM_FDur != 0) delete [] SM_FDur ;//flat
-	if(SM_PDur != 0) delete [] SM_PDur ;//pct
-	if(SM_FRadius != 0) delete [] SM_FRadius ;
-	if(SM_FRange != 0) delete [] SM_FRange ;
-	if(SM_PCastTime != 0) delete [] SM_PCastTime ;
-	if(SM_FCastTime != 0) delete [] SM_FCastTime ;
-	if(SM_PCriticalDamage != 0) delete [] SM_PCriticalDamage ;
-	if(SM_FDOT != 0) delete [] SM_FDOT ;
-	if(SM_PDOT != 0) delete [] SM_PDOT ;
-	if(SM_PEffectBonus != 0) delete [] SM_PEffectBonus ;
-    if(SM_FEffectBonus != 0) delete [] SM_FEffectBonus ;
-	if(SM_FDamageBonus != 0) delete [] SM_FDamageBonus ;
-	if(SM_PDamageBonus != 0) delete [] SM_PDamageBonus ;
-	if(SM_PSPELL_VALUE != 0) delete [] SM_PSPELL_VALUE ;
-	if(SM_FSPELL_VALUE != 0) delete [] SM_FSPELL_VALUE ;
-	if(SM_FHitchance != 0) delete [] SM_FHitchance ;
-	if(SM_PRange != 0) delete [] SM_PRange ;//pct
-	if(SM_PRadius != 0) delete [] SM_PRadius ;
-	if(SM_PAPBonus != 0) delete [] SM_PAPBonus ;
-	if(SM_PCost != 0) delete [] SM_PCost ;
-	if(SM_FCost != 0) delete [] SM_FCost ;
-	if(SM_FAdditionalTargets != 0) delete [] SM_FAdditionalTargets ;
-	if(SM_PJumpReduce != 0) delete [] SM_PJumpReduce ;
-	if(SM_FSpeedMod != 0) delete [] SM_FSpeedMod ;
-	if(SM_PNonInterrupt != 0) delete [] SM_PNonInterrupt ;
-	if(SM_FPenalty != 0) delete [] SM_FPenalty ;
-	if(SM_PPenalty != 0) delete [] SM_PPenalty ;
-	if(SM_FCooldownTime != 0) delete [] SM_FCooldownTime ;
-	if(SM_PCooldownTime != 0) delete [] SM_PCooldownTime ;
-	if(SM_FChanceOfSuccess != 0) delete [] SM_FChanceOfSuccess ;
-	if(SM_FRezist_dispell != 0) delete [] SM_FRezist_dispell ;
-	if(SM_PRezist_dispell != 0) delete [] SM_PRezist_dispell ;
+	if( SM_CriticalChance != NULL )
+		delete[] SM_CriticalChance;
+	if( SM_FDur != NULL ) // flat
+		delete[] SM_FDur;
+	if( SM_PDur != NULL ) // pct
+		delete[] SM_PDur;
+	if( SM_FRadius != NULL )
+		delete[] SM_FRadius;
+	if( SM_FRange != NULL )
+		delete[] SM_FRange;
+	if( SM_PCastTime != NULL )
+		delete[] SM_PCastTime;
+	if( SM_FCastTime != NULL )
+		delete[] SM_FCastTime;
+	if( SM_PCriticalDamage != NULL )
+		delete[] SM_PCriticalDamage;
+	if( SM_FDOT != NULL )
+		delete[] SM_FDOT;
+	if( SM_PDOT != NULL )
+		delete[] SM_PDOT;
+	if( SM_PEffectBonus != NULL )
+		delete[] SM_PEffectBonus;
+    if( SM_FEffectBonus != NULL )
+		delete[] SM_FEffectBonus;
+	if( SM_FDamageBonus != NULL )
+		delete[] SM_FDamageBonus;
+	if( SM_PDamageBonus != NULL )
+		delete[] SM_PDamageBonus;
+	if( SM_PSPELL_VALUE != NULL )
+		delete[] SM_PSPELL_VALUE;
+	if( SM_FSPELL_VALUE != NULL )
+		delete[] SM_FSPELL_VALUE;
+	if( SM_FHitchance != NULL )
+		delete[] SM_FHitchance;
+	if( SM_PRange != NULL ) // pct
+		delete[] SM_PRange;
+	if( SM_PRadius != NULL )
+		delete[] SM_PRadius;
+	if( SM_PAPBonus != 0)
+		delete[] SM_PAPBonus;
+	if( SM_PCost != 0)
+		delete[] SM_PCost;
+	if( SM_FCost != 0)
+		delete[] SM_FCost;
+	if( SM_FAdditionalTargets != NULL )
+		delete[] SM_FAdditionalTargets;
+	if( SM_PJumpReduce != NULL )
+		delete[] SM_PJumpReduce;
+	if( SM_FSpeedMod != NULL )
+		delete[] SM_FSpeedMod;
+	if( SM_PNonInterrupt != NULL )
+		delete[] SM_PNonInterrupt;
+	if( SM_FPenalty != NULL )
+		delete[] SM_FPenalty;
+	if( SM_PPenalty != NULL )
+		delete[] SM_PPenalty;
+	if( SM_FCooldownTime != NULL )
+		delete[] SM_FCooldownTime;
+	if( SM_PCooldownTime != NULL )
+		delete[] SM_PCooldownTime;
+	if( SM_FChanceOfSuccess != NULL )
+		delete[] SM_FChanceOfSuccess;
+	if( SM_FRezist_dispell != NULL )
+		delete[] SM_FRezist_dispell;
+	if( SM_PRezist_dispell != NULL )
+		delete[] SM_PRezist_dispell;
 
 	delete m_aiInterface;
 
@@ -273,7 +316,7 @@ Unit::~Unit()
 		if(m_ObjectSlots[i])
 			delete m_ObjectSlots[i];*/
 
-	if(m_currentSpell)
+	if( m_currentSpell != NULL )
 		m_currentSpell->cancel();
 }
 
@@ -281,7 +324,7 @@ void Unit::Update( uint32 p_time )
 {
 	_UpdateSpells( p_time );
 
-	if(!isDead())
+	if( !isDead() )
 	{
 		//-----------------------POWER & HP REGENERATION-----------------
 /* Please dont do temp fixes. Better report to me. Thx. Shady */
@@ -298,9 +341,9 @@ void Unit::Update( uint32 p_time )
 		else
 		{
 			m_P_regenTimer -= p_time;
-			if (m_interruptedRegenTime)
+			if( m_interruptedRegenTime )
 			{
-				if(p_time>=m_interruptedRegenTime)
+				if( p_time >= m_interruptedRegenTime )
 					RegeneratePower( true );
 				else
 					m_interruptedRegenTime -= p_time;
@@ -308,18 +351,18 @@ void Unit::Update( uint32 p_time )
 		}
 
 
-		if(m_aiInterface != NULL && m_useAI)
+		if( m_aiInterface != NULL && m_useAI )
 			m_aiInterface->Update(p_time);
 
-		if(m_diminishActive)
+		if( m_diminishActive )
 		{
 			uint32 count = 0;
-			for(uint32 x = 0; x < 16; ++x)
+			for( uint32 x = 0; x < 16; ++x )
 			{
 				// diminishing return stuff
-				if(m_diminishTimer[x] && !m_diminishAuraCount[x])
+				if( m_diminishTimer[x] && !m_diminishAuraCount[x] )
 				{
-					if(p_time >= m_diminishTimer[x])
+					if( p_time >= m_diminishTimer[x] )
 					{
 						// resetting after 15 sec
 						m_diminishTimer[x] = 0;
@@ -333,7 +376,7 @@ void Unit::Update( uint32 p_time )
 					}
 				}
 			}
-			if(!count)
+			if( !count )
 				m_diminishActive = false;
 		}
 
@@ -355,8 +398,8 @@ bool Unit::canReachWithAttack(Unit *pVictim)
 	if( GetMapId() != pVictim->GetMapId() )
 		return false;
 
-	float distance = sqrt(GetDistanceSq(pVictim));
-	float attackreach = (((targetradius*targetscale) + selfreach) + (((selfradius*selfradius)*selfscale)+1.50f));
+	float distance = sqrt( GetDistanceSq( pVictim ) );
+	float attackreach = ( ( ( targetradius * targetscale ) + selfreach) + ( ( ( selfradius * selfradius ) * selfscale ) + 1.50f ) );
 
 	//formula adjustment for player side.
 	if( IsPlayer() )
@@ -403,23 +446,25 @@ bool Unit::canReachWithAttack(Unit *pVictim)
 
 void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 {
-	if(!PlayerInGroup) 
+	if( PlayerInGroup == NULL ) 
 		return;
-	if(!pVictim) 
+	if( pVictim == NULL ) 
 		return;
-	if(!PlayerInGroup->InGroup()) 
+	if( !PlayerInGroup->InGroup() ) 
 		return;
-	Group *pGroup = PlayerInGroup->GetGroup();
-	uint32 xp;
-	if(!pGroup) 
+	Group* pGroup = PlayerInGroup->GetGroup();
+	if( pGroup == NULL ) 
 		return;
 
+	uint32 xp;
+
 	//Get Highest Level Player, Calc Xp and give it to each group member
-	Player *pHighLvlPlayer = NULL;
-	Player *pGroupGuy = NULL;
-	  int active_player_count=0;
-	Player *active_player_list[MAX_GROUP_SIZE_RAID];//since group is small we can afford to do this ratehr then recheck again the whole active player set
-	int total_level=0;
+	Player* pHighLvlPlayer = NULL;
+	Player* pGroupGuy = NULL;
+	Player* active_player_list[MAX_GROUP_SIZE_RAID];//since group is small we can afford to do this ratehr then recheck again the whole active player set
+
+	int active_player_count = 0;
+	int total_level = 0;
 	float xp_mod = 1.0f;
 
 /*	if(pGroup->GetGroupType() == GROUP_TYPE_RAID)
@@ -443,23 +488,23 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 	//we only take into count players that are near us, on same map
 	GroupMembersSet::iterator itr;
 	pGroup->Lock();
-	for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) {
-		for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
+	for( uint32 i = 0; i < pGroup->GetSubGroupCount(); i++ )
+	{
+		for( itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
 		{
 			pGroupGuy = (*itr)->m_loggedInPlayer;
-			if( pGroupGuy && 
-				pGroupGuy->isAlive() && 
+			if( pGroupGuy != NULL && pGroupGuy->isAlive() && 
 //				PlayerInGroup->GetInstanceID()==pGroupGuy->GetInstanceID() &&
 				pVictim->GetMapMgr() == pGroupGuy->GetMapMgr() && 
-				pGroupGuy->GetDistanceSq(pVictim)<100*100
+				pGroupGuy->GetDistanceSq( pVictim ) < 100 * 100
 				)
 			{
-				active_player_list[active_player_count]=pGroupGuy;
+				active_player_list[active_player_count] = pGroupGuy;
 				active_player_count++;
 				total_level += pGroupGuy->getLevel();
-				if(pHighLvlPlayer)
+				if( pHighLvlPlayer != NULL )
 				{
-					if(pGroupGuy->getLevel() > pHighLvlPlayer->getLevel())
+					if( pGroupGuy->getLevel() > pHighLvlPlayer->getLevel() )
 						pHighLvlPlayer = pGroupGuy;
 				}
 				else 
@@ -468,48 +513,52 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 		}
 	}
 	pGroup->Unlock();
-	if(active_player_count<1) //killer is always close to the victim. This should never execute
+	if( active_player_count < 1 ) //killer is always close to the victim. This should never execute
 	{
-		if(PlayerInGroup == 0)
+		if( PlayerInGroup == 0 )
 		{
-			PlayerInfo * pleaderinfo = pGroup->GetLeader();
-			if(!pleaderinfo->m_loggedInPlayer)
+			PlayerInfo* pleaderinfo = pGroup->GetLeader();
+			if( pleaderinfo->m_loggedInPlayer == NULL )
 				return;
 
 			PlayerInGroup = pleaderinfo->m_loggedInPlayer;
 		}
 
-		xp = CalculateXpToGive(pVictim, PlayerInGroup);
-		PlayerInGroup->GiveXP(xp, pVictim->GetGUID(), true);
+		xp = CalculateXpToGive( pVictim, PlayerInGroup );
+		PlayerInGroup->GiveXP( xp, pVictim->GetGUID(), true );
 	}
 	else
 	{
 		if( pGroup->GetGroupType() == GROUP_TYPE_PARTY)
 		{
-			if(active_player_count==3)
-				xp_mod=1.1666f;
-			else if(active_player_count==4)
-				xp_mod=1.3f;
-			else if(active_player_count==5)
-				xp_mod=1.4f;
-			else xp_mod=1;//in case we have only 2 members ;)
+			if( active_player_count == 3 )
+				xp_mod = 1.1666f;
+			else if( active_player_count == 4 )
+				xp_mod = 1.3f;
+			else if( active_player_count == 5 )
+				xp_mod = 1.4f;
+			else
+				xp_mod = 1.0f;//in case we have only 2 members ;)
 		}
-		else if(pGroup->GetGroupType() == GROUP_TYPE_RAID)
-			xp_mod=0.5f;
+		else if( pGroup->GetGroupType() == GROUP_TYPE_RAID )
+			xp_mod = 0.5f;
 
-		if(pHighLvlPlayer == 0)
+		if( pHighLvlPlayer == NULL )
 		{
-			PlayerInfo * pleaderinfo = pGroup->GetLeader();
-			if(!pleaderinfo->m_loggedInPlayer)
+			PlayerInfo* pleaderinfo = pGroup->GetLeader();
+			if( pleaderinfo->m_loggedInPlayer == NULL )
 				return;
 
 			pHighLvlPlayer = pleaderinfo->m_loggedInPlayer;
 		}
 
-		xp = CalculateXpToGive(pVictim, pHighLvlPlayer);
+		xp = CalculateXpToGive( pVictim, pHighLvlPlayer );
+
 		//i'm not sure about this formula is correct or not. Maybe some brackets are wrong placed ?
-		for(int i=0;i<active_player_count;i++)
-			active_player_list[i]->GiveXP( float2int32(((xp*active_player_list[i]->getLevel()) / total_level)*xp_mod), pVictim->GetGUID(), true );
+		for( int i = 0; i < active_player_count; i++ )
+		{
+			active_player_list[i]->GiveXP( float2int32( ( ( xp * active_player_list[i]->getLevel()) / total_level ) * xp_mod ), pVictim->GetGUID(), true );
+		}
 	}
 		/* old code start before 2007 04 22
 		GroupMembersSet::iterator itr;
