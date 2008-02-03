@@ -29,25 +29,15 @@ class AngelScriptEngineMgr;
 extern AngelScriptEngineMgr g_asMgr;
 extern AngelScriptEngine* g_engine;
 
-///** Macros for calling lua-based events
-// */
-//#define LUA_ON_UNIT_EVENT(unit,eventtype,miscunit,misc) if(unit->GetTypeId()==TYPEID_UNIT && unit->IsInWorld()) { unit->GetMapMgr()->GetScriptEngine()->OnUnitEvent(unit,eventtype,miscunit,misc); }
-//#define LUA_ON_QUEST_EVENT(plr,quest,eventtype,miscobject) if(plr->IsPlayer() && plr->IsInWorld() && miscobject->IsInWorld() && !miscobject->IsPlayer()) { plr->GetMapMgr()->GetScriptEngine()->OnQuestEvent(plr,quest,eventtype,miscobject); } 
-//#define LUA_ON_GO_EVENT(unit,evtype,miscunit) if(unit->GetTypeId()==TYPEID_GAMEOBJECT && unit->IsInWorld()) { unit->GetMapMgr()->GetScriptEngine()->OnGameObjectEvent(unit,evtype,miscunit); }
-//#define LUA_CALL_FUNC(unit,funcname) if(unit->GetTypeId()==TYPEID_UNIT && unit->IsInWorld()) { unit->GetMapMgr()->GetScriptEngine()->CallFunction(unit,funcname); }
-
-/** Quest Events
- */
+// Quest Events
 enum QuestEvents
 {
 	QUEST_EVENT_ON_COMPLETE		= 1,
 	QUEST_EVENT_ON_ACCEPT		= 2,
-	//QUEST_EVENT_CAN_ACCEPT		= 3, 
 	QUEST_EVENT_COUNT,
 };
 
-/** Creature Events
- */
+// Creature Events
 enum CreatureEvents
 {
 	CREATURE_EVENT_ON_ENTER_COMBAT		= 1,
@@ -63,27 +53,26 @@ enum CreatureEvents
 	CREATURE_EVENT_COUNT,
 };
 
-/** GameObject Events
- */
+// GameObject Events
 enum GameObjectEvents
 {
-	GAMEOBJECT_EVENT_ON_SPAWN			= 1,
-	GAMEOBJECT_EVENT_ON_USE				= 2,
+	GAMEOBJECT_EVENT_ON_SPAWN	= 1,
+	GAMEOBJECT_EVENT_ON_USE		= 2,
 	GAMEOBJECT_EVENT_COUNT,
 };
 
-/** Random Flags
- */
+// Random Flags
 enum RandomFlags
 {
-	RANDOM_ANY           = 0,
-	RANDOM_IN_SHORTRANGE = 1,
-	RANDOM_IN_MIDRANGE   = 2,
-	RANDOM_IN_LONGRANGE  = 3,
-	RANDOM_WITH_MANA     = 4,
-	RANDOM_WITH_RAGE     = 5,
-	RANDOM_WITH_ENERGY   = 6,
-	RANDOM_NOT_MAINTANK  = 7
+	RANDOM_ANY				= 0,
+	RANDOM_IN_SHORTRANGE	= 1,
+	RANDOM_IN_MIDRANGE		= 2,
+	RANDOM_IN_LONGRANGE		= 3,
+	RANDOM_WITH_MANA		= 4,
+	RANDOM_WITH_RAGE		= 5,
+	RANDOM_WITH_ENERGY		= 6,
+	RANDOM_NOT_MAINTANK		= 7,
+	RANDOM_COUNT,
 };
 
 class AngelScriptEngine
@@ -103,19 +92,24 @@ public:
 	void Shutdown();
 	void Restart();
 
-//	void RegisterCoreFunctions();
-
 //	ASCENT_INLINE Mutex& GetLock() { return m_Lock; }
-//
-//	void OnUnitEvent(Unit * pUnit, const char * FunctionName, uint32 EventType, Unit * pMiscUnit, uint32 Misc);
-//	void OnQuestEvent(Player * QuestOwner, const char * FunctionName, uint32 QuestID, uint32 EventType, Object * QuestStarter);
-//	void OnGameObjectEvent(GameObject * pGameObject, const char * FunctionName, uint32 EventType, Unit * pMiscUnit);
-//	void CallFunction(Unit * pUnit, const char * FuncName);
+
 };
 
-struct AngelScriptUnitBinding { const char* Functions[CREATURE_EVENT_COUNT]; };
-struct AngelScriptQuestBinding { const char* Functions[QUEST_EVENT_COUNT]; };
-struct AngelScriptGameObjectBinding { const char* Functions[GAMEOBJECT_EVENT_COUNT]; };
+struct AngelScriptUnitBinding
+{
+	const char* Functions[CREATURE_EVENT_COUNT];
+};
+
+struct AngelScriptQuestBinding
+{
+	const char* Functions[QUEST_EVENT_COUNT];
+};
+
+struct AngelScriptGameObjectBinding
+{
+	const char* Functions[GAMEOBJECT_EVENT_COUNT];
+};
 
 class AngelScriptEngineMgr
 {
@@ -136,10 +130,6 @@ public:
 	void Startup();
 	void Shutdown();
 	void Restart();
-
-	void RegisterUnitEvent( uint32 Id, uint32 Event, const char* FunctionName );
-	void RegisterQuestEvent( uint32 Id, uint32 Event, const char* FunctionName );
-	void RegisterGameObjectEvent( uint32 Id, uint32 Event, const char* FunctionName );
 
 //	LuaUnitBinding * GetUnitBinding(uint32 Id)
 //	{
