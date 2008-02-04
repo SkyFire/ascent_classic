@@ -1643,43 +1643,64 @@ void Aura::SpellAuraDummy(bool apply)
 			// Take control of pets vision
 
 			// set charmed by and charm target
-			Unit * Caster = GetUnitCaster() ;
-			if(Caster == 0 || Caster->GetTypeId() != TYPEID_PLAYER) return;
-			Player * pCaster = static_cast< Player* >(Caster);
+			Unit* Caster = GetUnitCaster() ;
+			if( Caster == NULL || Caster->GetTypeId() != TYPEID_PLAYER )
+				return;
 
-			if(apply)
+			Player* pCaster = static_cast< Player* >( Caster );
+			Unit* target_pet;
+
+			if( pCaster->GetSummon() ) 
+				target_pet = pCaster->GetSummon();
+			else
+				return;
+
+			if( apply )
 			{
-				m_target->DisableAI();
-				pCaster->SetUInt64Value(UNIT_FIELD_SUMMON, 0);
-				m_target->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, 0);
-				pCaster->SetUInt64Value(UNIT_FIELD_CHARM, m_target->GetGUID());
-				m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, pCaster->GetGUID());
-				pCaster->SetUInt64Value(PLAYER_FARSIGHT, m_target->GetGUID());
-				pCaster->m_CurrentCharm = ((Creature*)m_target);
-				m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
-				pCaster->m_noInterrupt = 1;
-				pCaster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
+				pCaster->m_CurrentCharm = target_pet;
 
-				WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
-				data << m_target->GetNewGUID() << uint8(0);
-				pCaster->GetSession()->SendPacket(&data);
+				//target_pet->DisableAI();
+				target_pet->GetAIInterface()->SetUnitToFollow( NULL );
+				target_pet->m_redirectSpellPackets = pCaster;
+
+				pCaster->m_noInterrupt++;
+				pCaster->SetUInt64Value( UNIT_FIELD_CHARM, target_pet->GetGUID() );
+				pCaster->SetUInt64Value( PLAYER_FARSIGHT, target_pet->GetGUID() );
+				pCaster->ResetHeartbeatCoords();
+
+				target_pet->SetUInt64Value( UNIT_FIELD_CHARMEDBY, pCaster->GetGUID() );
+				target_pet->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE );
+
+				pCaster->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER );
+
+				WorldPacket data( SMSG_DEATH_NOTIFY_OBSOLETE, 10 );	
+				data << target_pet->GetNewGUID() << uint8( 1 );
+				pCaster->GetSession()->SendPacket( &data );
 			}
 			else
 			{
-				Caster->EnableAI();
-				pCaster->SetUInt64Value(UNIT_FIELD_SUMMON, m_target->GetGUID());
-				m_target->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, pCaster->GetGUID());
-				pCaster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
-				m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
-				pCaster->SetUInt64Value(PLAYER_FARSIGHT, 0);
+				Unit* pTarget = pCaster->m_CurrentCharm; 
 				pCaster->m_CurrentCharm = 0;
-				m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
-				pCaster->m_noInterrupt = 0;
-				pCaster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
-				WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
-				data << pCaster->GetNewGUID() << uint8(1);
-				pCaster->GetSession()->SendPacket(&data);
+				pTarget->EnableAI();
+				pTarget->m_redirectSpellPackets = 0;
+				pCaster->ResetHeartbeatCoords();
+
+				pCaster->m_noInterrupt--;
+				pCaster->SetUInt64Value( PLAYER_FARSIGHT, 0 );
+				pCaster->SetUInt64Value( UNIT_FIELD_CHARM, 0 );
+
+				pTarget->SetUInt64Value( UNIT_FIELD_CHARMEDBY, 0 );
+
+ 				pCaster->RemoveFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER );
+				pTarget->RemoveFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE );
+
+				WorldPacket data( SMSG_DEATH_NOTIFY_OBSOLETE, 10 );
+				data << pCaster->GetNewGUID() << uint8( 1 );
+				pCaster->GetSession()->SendPacket( &data );
+
+				Pet* pet = static_cast< Pet* >( pTarget );
+				pet->SendSpellsToOwner();
 			}
 		}break;
 	case 570:   // far sight

@@ -3440,7 +3440,6 @@ bool Unit::RemoveAura(uint32 spellId)
 			if( m_auras[x]->GetSpellId() == spellId )
 			{
 				m_auras[x]->Remove();
-				m_auras[x] = NULL;
 				return true;
 			}
 		}
