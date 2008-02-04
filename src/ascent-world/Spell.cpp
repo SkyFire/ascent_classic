@@ -2691,6 +2691,9 @@ uint8 Spell::CanCast(bool tolerate)
 			}
 		}
 
+		if( m_spellInfo->RequiredShapeShift && !( m_spellInfo->RequiredShapeShift & (1 << ( p_caster->GetShapeShift() - 1 ) ) ) )
+			return SPELL_FAILED_ONLY_STEALTHED;
+
 		// check if spell is allowed while we have a battleground flag
 		if(p_caster->m_bgHasFlag)
 		{

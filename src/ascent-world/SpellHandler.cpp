@@ -192,12 +192,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 	// this could fuck up things but meh it's needed ALOT of the newbs are using WPE now
 	// WPE allows them to mod the outgoing packet and basicly choose what ever spell they want :(
 
-	if( !GetPlayer()->HasSpell(spellId) )
+	if( !GetPlayer()->HasSpell(spellId) || spellInfo->Attributes & 64 )
 	{
-		sLog.outDetail("WORLD: Spell isn't casted because player \"%s\" is cheating", GetPlayer()->GetName());
+		_player->SendCastResult( spellId, SPELL_FAILED_NOT_KNOWN, 0 );
 		return;
 	}
-
+	
 	if (GetPlayer()->GetOnMeleeSpell() != spellId)
 	{
 		//autoshot 75
