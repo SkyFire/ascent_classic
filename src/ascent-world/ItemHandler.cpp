@@ -1374,6 +1374,12 @@ void WorldSession::SendInventoryList(Creature* unit)
 		{
 			if((curItem = ItemPrototypeStorage.LookupEntry(itr->itemid)))
 			{
+				if(curItem->AllowableClass && !(_player->getClassMask() & curItem->AllowableClass))
+					continue;
+
+				if(curItem->AllowableRace && !(_player->getRaceMask() & curItem->AllowableRace))
+					continue;
+
 				int32 av_am = (itr->max_amount>0)?itr->available_amount:-1;
 				data << (counter + 1);
 				data << curItem->ItemId;
