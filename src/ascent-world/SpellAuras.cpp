@@ -475,7 +475,7 @@ void Aura::Remove()
 		}
 
 		if( m_spellProto->buffIndexType != 0 && m_target->IsPlayer() )
-			( ( Player* )m_target )->RemoveSpellIndexReferences( m_spellProto->buffIndexType );
+			static_cast< Player* >( m_target )->RemoveSpellIndexReferences( m_spellProto->buffIndexType );
 	}
 	else
 		m_target->CombatStatus.RemoveAttacker( NULL, m_casterGuid );
@@ -495,8 +495,11 @@ void Aura::Remove()
 		caster->SendMessageToSet( &data, true );
 	}
 
+	// suicide xD leaking this shit out
 	// this crashes a lot don't know why.....
-	delete this; // suicide xD	leaking this shit out
+	// if you crash here ( you should have had debug logging on! )
+	// look at the last aura to be removed and report this to us
+	delete this;
 }
 
 void Aura::AddMod( uint32 t, int32 a, uint32 miscValue, uint32 i )

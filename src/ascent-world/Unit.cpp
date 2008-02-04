@@ -3433,13 +3433,14 @@ bool Unit::RemoveAura(Aura *aur)
 
 bool Unit::RemoveAura(uint32 spellId)
 {//this can be speed up, if we know passive \pos neg
-	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+	for( uint32 x = 0; x < MAX_AURAS + MAX_PASSIVE_AURAS; x++ )
 	{
-		if(m_auras[x])
+		if( m_auras[x] != NULL )
 		{
-			if(m_auras[x]->GetSpellId()==spellId)
+			if( m_auras[x]->GetSpellId() == spellId )
 			{
 				m_auras[x]->Remove();
+				m_auras[x] = NULL;
 				return true;
 			}
 		}

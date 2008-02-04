@@ -1646,7 +1646,7 @@ bool World::SetInitialWorldSettings()
         sp->EffectTriggerSpell[1] = 25329;
     }
 
-	//Bloodlust targets sorounding creatures instead of us
+	//Bloodlust targets sorounding party members instead of us
 	sp = dbcSpell.LookupEntryForced( 2825 );
 	if( sp != NULL )
 	{
@@ -1658,7 +1658,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2] = 0;
 	}
 
-	//Heroism targets sorounding creatures instead of us
+	//Heroism targets sorounding party members instead of us
 	sp = dbcSpell.LookupEntryForced( 32182 );
 	if( sp != NULL )
 	{
@@ -1669,7 +1669,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[1] = 0;
 		sp->EffectImplicitTargetB[2] = 0;
 	}
-	// Drums of war targets sorounding creatures instead of us
+	// Drums of war targets sorounding party members instead of us
 	sp = dbcSpell.LookupEntryForced( 35475 );
 	if( sp != NULL )
 	{
@@ -1681,7 +1681,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2] = 0;
 	}
 
-	// Symbol of Hope targets sorounding creatures instead of us
+	// Symbol of Hope targets sorounding party members instead of us
 	sp = dbcSpell.LookupEntryForced( 32548 );
 	if( sp != NULL )
 	{
@@ -1693,7 +1693,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2] = 0;
 	}
 
-	// Drums of Battle targets sorounding creatures instead of us
+	// Drums of Battle targets sorounding party members instead of us
 	sp = dbcSpell.LookupEntryForced( 35476 );
 	if( sp != NULL )
 	{
@@ -1717,7 +1717,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[2] = 0;
 	}
 
-	// Drums of Restoration targets sorounding creatures instead of us
+	// Drums of Restoration targets sorounding party members instead of us
 	sp = dbcSpell.LookupEntryForced( 35478 );
 	if( sp != NULL )
 	{
@@ -1728,7 +1728,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[1] = 0;
 		sp->EffectImplicitTargetB[2] = 0;
 	}
-	// Drums of Speed targets sorounding creatures instead of us
+	// Drums of Speed targets sorounding party members instead of us
 	sp = dbcSpell.LookupEntryForced( 35477 );
 	if( sp != NULL )
 	{
