@@ -2058,44 +2058,44 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	}
 }
 
-void Spell::SpellEffectEnergize(uint32 i) // Energize
+void Spell::SpellEffectEnergize( uint32 i ) // Energize
 {
-	if(!unitTarget || !unitTarget->isAlive())
+	if( unitTarget == NULL || unitTarget->isAlive() )
 		return;
 
-	uint32 POWER_TYPE=UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
+	uint32 POWER_TYPE = UNIT_FIELD_POWER1 + m_spellInfo->EffectMiscValue[i];
 
-	uint32 curEnergy = (uint32)unitTarget->GetUInt32Value(POWER_TYPE);
-	uint32 maxEnergy = (uint32)unitTarget->GetUInt32Value(POWER_TYPE+6);
+	uint32 curEnergy = (uint32)unitTarget->GetUInt32Value( POWER_TYPE );
+	uint32 maxEnergy = (uint32)unitTarget->GetUInt32Value( POWER_TYPE + 6 );
 	uint32 modEnergy;
-	//yess there is always someone special : shamanistic rage - talent
-	if(m_spellInfo->Id==30824)
-		modEnergy = damage*GetUnitTarget()->GetAP()/100;
-	//paladin illumination
-	else if(m_spellInfo->Id==20272 && ProcedOnSpell)
+
+	//yes there is always someone special : shamanistic rage - talent
+	if( m_spellInfo->Id == 30824 )
+		modEnergy = damage * GetUnitTarget()->GetAP() / 100;
+	else if( m_spellInfo->Id == 20272 && ProcedOnSpell ) //paladin illumination
 	{
-		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
-		if(motherspell)
-			modEnergy = (motherspell->EffectBasePoints[0]+1)*ProcedOnSpell->manaCost/100;
+		SpellEntry* motherspell = dbcSpell.LookupEntry( pSpellId );
+		if( motherspell != NULL )
+			modEnergy = ( motherspell->EffectBasePoints[0] + 1 ) * ProcedOnSpell->manaCost / 100;
 	}
-	//paladin - Spiritual Attunement 
-	else if(m_spellInfo->Id==31786 && ProcedOnSpell)
+	else if( m_spellInfo->Id == 31786 && ProcedOnSpell ) //paladin - Spiritual Attunement
 	{
-		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
-		if(motherspell)
+		SpellEntry* motherspell = dbcSpell.LookupEntry( pSpellId );
+		if( motherspell != NULL )
 		{
 			//heal amount from procspell (we only proced on a heal spell)
-			uint32 healamt=0;
-			if(ProcedOnSpell->Effect[0]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[0]==SPELL_EFFECT_SCRIPT_EFFECT)
-				healamt=ProcedOnSpell->EffectBasePoints[0]+1;
-			else if(ProcedOnSpell->Effect[1]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT)
-				healamt=ProcedOnSpell->EffectBasePoints[1]+1;
-			else if(ProcedOnSpell->Effect[2]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[2]==SPELL_EFFECT_SCRIPT_EFFECT)
-				healamt=ProcedOnSpell->EffectBasePoints[2]+1;
-			modEnergy = (motherspell->EffectBasePoints[0]+1)*(healamt)/100;
+			uint32 healamt = 0;
+			if( ProcedOnSpell->Effect[0] == SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[0] == SPELL_EFFECT_SCRIPT_EFFECT )
+				healamt = ProcedOnSpell->EffectBasePoints[0] + 1;
+			else if( ProcedOnSpell->Effect[1] == SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[1] == SPELL_EFFECT_SCRIPT_EFFECT )
+				healamt = ProcedOnSpell->EffectBasePoints[1] + 1;
+			else if( ProcedOnSpell->Effect[2] == SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[2] == SPELL_EFFECT_SCRIPT_EFFECT )
+				healamt = ProcedOnSpell->EffectBasePoints[2] + 1;
+			modEnergy = ( motherspell->EffectBasePoints[0] + 1 ) * ( healamt ) / 100;
 		}
 	}
-	else if (m_spellInfo->Id==2687){
+	else if( m_spellInfo->Id == 2687 )
+	{
 		modEnergy = damage;
 		if( p_caster != NULL )
 		{
@@ -2106,26 +2106,26 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 				else if(*itr == 12301)
 					modEnergy += 30;
 			}*/
-			if(p_caster->mSpells.find(12818) != p_caster->mSpells.end())
+			if( p_caster->mSpells.find( 12818 ) != p_caster->mSpells.end() )
 				modEnergy += 60;
-			if(p_caster->mSpells.find(12301) != p_caster->mSpells.end())
+			if( p_caster->mSpells.find( 12301 ) != p_caster->mSpells.end() )
 				modEnergy += 30;
 		}
 	}
 	else  
         modEnergy = damage;
 
-	SendHealManaSpellOnPlayer(u_caster, unitTarget, modEnergy, m_spellInfo->EffectMiscValue[i]);
+	SendHealManaSpellOnPlayer( u_caster, unitTarget, modEnergy, m_spellInfo->EffectMiscValue[i] );
 
-	if(modEnergy + curEnergy > maxEnergy)
-		unitTarget->SetUInt32Value(POWER_TYPE,maxEnergy);
+	if( modEnergy + curEnergy > maxEnergy )
+		unitTarget->SetUInt32Value( POWER_TYPE, maxEnergy );
 	else
-		unitTarget->SetUInt32Value(POWER_TYPE,modEnergy + curEnergy);
+		unitTarget->SetUInt32Value( POWER_TYPE, modEnergy + curEnergy);
 }
 
-void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage
+void Spell::SpellEffectWeaponDmgPerc( uint32 i ) // Weapon Percent damage
 {
-	if(!unitTarget  || !u_caster)
+	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
 	if( GetType() == SPELL_DMG_TYPE_MAGIC )
