@@ -57,6 +57,10 @@ uint32 QuestMgr::PlayerMeetsReqs(Player* plr, Quest* qst, bool skiplevelcheck)
 	if (plr->getLevel() < qst->min_level && !skiplevelcheck)
 		return QMGR_QUEST_AVAILABLELOW_LEVEL;
 
+	if(qst->required_races)
+		if(!(qst->required_races & plr->getRaceMask()))
+			return QMGR_QUEST_NOT_AVAILABLE;
+
 	if(qst->required_class)
 		if(!(qst->required_class & plr->getClassMask()))
 			return QMGR_QUEST_NOT_AVAILABLE;
