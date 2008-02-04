@@ -1650,90 +1650,94 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 2825 );
 	if( sp != NULL )
 	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
 
 	//Heroism targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 32182 );
 	if( sp != NULL )
 	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
 	// Drums of war targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 35475 );
 	if( sp != NULL )
 	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
+
 	// Symbol of Hope targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 32548 );
 	if( sp != NULL )
 	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
+
 	// Drums of Battle targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 35476 );
 	if( sp != NULL )
 	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
+
 	// Drums of Panic targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 35474 );
 	if( sp != NULL )
 	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_ENEMIES_AROUND_CASTER;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
+
 	// Drums of Restoration targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 35478 );
 	if( sp != NULL )
 	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
 	// Drums of Speed targets sorounding creatures instead of us
 	sp = dbcSpell.LookupEntryForced( 35477 );
 	if( sp != NULL )
 	{
-		sp->EffectImplicitTargetA[0]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[1]=EFF_TARGET_ALL_PARTY;
-		sp->EffectImplicitTargetA[2]=0;
-		sp->EffectImplicitTargetB[0]=0;
-		sp->EffectImplicitTargetB[1]=0;
-		sp->EffectImplicitTargetB[2]=0;
+		sp->EffectImplicitTargetA[0] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[1] = EFF_TARGET_ALL_PARTY;
+		sp->EffectImplicitTargetA[2] = 0;
+		sp->EffectImplicitTargetB[0] = 0;
+		sp->EffectImplicitTargetB[1] = 0;
+		sp->EffectImplicitTargetB[2] = 0;
 	}
 
 	//paladin - Blessing of Light. Changed to scripted because it needs to mod target and should not influence holy nova
