@@ -2945,6 +2945,23 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 	}
 
+	if( m_spellInfo->Flags3 & 0x100000 )
+	{
+		// currently these spells are the only ones that need this check.
+		Item * pItem = p_caster->GetItemInterface()->GetInventoryItem( INVENTORY_SLOT_NOT_SET, EQUIPMENT_SLOT_MAINHAND );
+		if( pItem == NULL )
+		{
+			// these need an item equipped
+			return SPELL_FAILED_EQUIPPED_ITEM;
+		}
+
+		if( m_spellInfo->EquippedItemClass && pItem->GetProto()->Class != m_spellInfo->EquippedItemClass )
+			return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+
+		if( m_spellInfo->EquippedItemSubClass && !(m_spellInfo->EquippedItemSubClass & (1 << pItem->GetProto()->SubClass)) )
+			return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+	}
+
 	// set up our max Range
 	float maxRange = GetMaxRange( dbcSpellRange.LookupEntry( m_spellInfo->rangeIndex ) );
 
