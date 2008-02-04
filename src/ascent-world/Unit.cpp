@@ -2604,23 +2604,27 @@ else
 					printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg.full_damage,ability->SpellGroupType);
 #endif
 			}
-			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type]+add_damage;
+			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type] + add_damage;
 			if( weapon_damage_type == RANGED )
 			{
-				dmg.full_damage+=pVictim->RangedDamageTaken;
+				dmg.full_damage += pVictim->RangedDamageTaken;
 			}
 			
-			if(ability && ability->MechanicsType == MECHANIC_BLEEDING)
+			if( ability && ability->MechanicsType == MECHANIC_BLEEDING )
 				disable_dR = true; 
 			
-			float summaryPCTmod = pVictim->DamageTakenPctMod[dmg.school_type] + GetDamageDonePctMod( dmg.school_type ) + 1;
+			//float summaryPCTmod = pVictim->DamageTakenPctMod[dmg.school_type] + GetDamageDonePctMod( dmg.school_type ) + 1;
+			float summaryPCTmod = pVictim->DamageTakenPctMod[dmg.school_type] + GetDamageDonePctMod( dmg.school_type );
 
 			if( pct_dmg_mod > 0 )
-				dmg.full_damage = float2int32(dmg.full_damage*(float(pct_dmg_mod)/100.0f));
+				dmg.full_damage = float2int32( dmg.full_damage *  ( float( pct_dmg_mod) / 100.0f ) );
 
 			//a bit dirty fix
 			if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
-				summaryPCTmod *= 1 + pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
+			{
+				//summaryPCTmod *= 1 + pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
+				summaryPCTmod += pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
+			}
 
 			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
 
