@@ -400,9 +400,11 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 
 void Aura::Remove()
 {
-	if( m_spellProto == NULL )
-		sLog.outDetail("Aura::Remove %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name != NULL ? m_spellProto->Name : "", m_target != NULL ? m_target->GetGUIDLow() : 0 );
- 	
+	if( m_spellProto != NULL )
+		sLog.outDebug("Aura::Remove %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name != NULL ? m_spellProto->Name : "", m_target != NULL ? m_target->GetGUIDLow() : 0 );
+	else
+		sLog.outDebug("Aura::Remove NULL from %u.", m_target != NULL ? m_target->GetGUIDLow() : 0 );
+
 	sEventMgr.RemoveEvents( this );
 
 	if( !IsPassive() || IsPassive() && m_spellProto->AttributesEx & 1024 )
@@ -421,7 +423,7 @@ void Aura::Remove()
 		if( m_spellProto->Effect[x] == SPELL_EFFECT_TRIGGER_SPELL )
 		{
 			//if(GetSpellProto()->EffectTriggerSpell[x]!=GetSpellId())
-			m_target->RemoveAura(GetSpellProto()->EffectTriggerSpell[x]);
+			m_target->RemoveAura( GetSpellProto()->EffectTriggerSpell[x] );
 		}
 		else if( m_spellProto->Effect[x] == SPELL_EFFECT_APPLY_AREA_AURA && m_casterGuid == m_target->GetGUID())
 		{
