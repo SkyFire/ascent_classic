@@ -615,7 +615,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 						float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
 						float distance_delta = distance_xy_plane / speed;
-						float speed_delta = ( speed * 0.25f ) + std::max( float( _player->GetSession()->GetLatency() ) / 100.0f, 0.64f );
+						float latency = float( _player->GetSession()->GetLatency() ) * 0.01f;
+						float speed_delta = ( speed * 0.25f ) + std::max( latency + ( latency * 0.04f ), 0.32f );
 
 						if( distance_delta >= speed_delta )
 						{
