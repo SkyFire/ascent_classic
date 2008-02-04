@@ -6239,31 +6239,35 @@ void Player::CalcStat(uint32 type)
 	   CalcResistance( 0 );
 }
 
-void Player::RegenerateMana(bool is_interrupted)
+void Player::RegenerateMana( bool is_interrupted )
 {
 	//if (m_interruptRegen)
 	//	return;
 
-	uint32 cur = GetUInt32Value(UNIT_FIELD_POWER1);
-	uint32 mm = GetUInt32Value(UNIT_FIELD_MAXPOWER1);
-	if(cur >= mm)return;
-	float amt = (is_interrupted) ? GetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT) : GetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN);
-	amt *= 2; //floats are Mana Regen Per Sec. Regen Applied every 2 secs so real value =X*2 . Shady
-	//Apply shit from conf file
-	amt *= sWorld.getRate(RATE_POWER1);
+	uint32 cur = GetUInt32Value( UNIT_FIELD_POWER1 );
+	uint32 mm = GetUInt32Value( UNIT_FIELD_MAXPOWER1 );
 
-	if((amt<=1.0)&&(amt>0))//this fixes regen like 0.98
+	if( cur >= mm )
+		return;
+
+	float amt = is_interrupted ? GetFloatValue( PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT ) : GetFloatValue( PLAYER_FIELD_MOD_MANA_REGEN );
+	amt *= 2.0f; //floats are Mana Regen Per Sec. Regen Applied every 2 secs so real value =X*2 . Shady
+
+	//Apply shit from conf file
+	amt *= sWorld.getRate( RATE_POWER1 );
+
+	if( ( amt <= 1.0f ) && ( amt > 0.0f ) )//this fixes regen like 0.98
 	{
-		if(is_interrupted)
+		if( is_interrupted )
 			return;
 		cur++;
 	}
 	else
-		cur += float2int32(amt);	
-	SetUInt32Value(UNIT_FIELD_POWER1,(cur >= mm) ? mm : cur);
+		cur += float2int32( amt );	
+	SetUInt32Value( UNIT_FIELD_POWER1, cur >= mm ? mm : cur );
 }
 
-void Player::RegenerateHealth(bool inCombat)
+void Player::RegenerateHealth( bool inCombat )
 {
 	const static float ClassMultiplier[12]={
 		0.0f,0.8f,0.25f,0.25f,0.5f,0.1f,0.0f,0.11f,0.1f,0.11f,0.0f,0.09f};

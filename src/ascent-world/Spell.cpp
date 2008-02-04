@@ -4048,32 +4048,32 @@ void Spell::Heal(int32 amount)
             printf("!!!!spell critchance mod flat %f ,and critchance is %f spell group %u\n",spell_flat_modifers,spellCrit,m_spellInfo->SpellGroupType);
 #endif
 
-		if(critical = Rand(spellCrit))
+		if( critical = Rand( spellCrit ) )
 		{
 			int32 critbonus = amount >> 1;
-			if( m_spellInfo->SpellGroupType)
-					SM_PIValue(static_cast<Unit*>(u_caster)->SM_PCriticalDamage, &critbonus, m_spellInfo->SpellGroupType);
+			if( m_spellInfo->SpellGroupType )
+				SM_PIValue( static_cast< Unit* >( u_caster )->SM_PCriticalDamage, &critbonus, m_spellInfo->SpellGroupType );
 			amount += critbonus;
 			//Shady: does it correct> caster casts heal and proc ..._VICTIM ? 
 			// Or mb i'm completely wrong? So if true  - just replace with old string. 
 			//u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, unitTarget, m_spellInfo, amount);
 			//Replaced with following one:
 			
-			unitTarget->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, u_caster, m_spellInfo, amount);
-			u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT, unitTarget, m_spellInfo, amount);
+			unitTarget->HandleProc( PROC_ON_SPELL_CRIT_HIT_VICTIM, u_caster, m_spellInfo, amount );
+			u_caster->HandleProc( PROC_ON_SPELL_CRIT_HIT, unitTarget, m_spellInfo, amount );
 		}
 		
 	}
 
 	if( p_caster != NULL )  
 	{
-		bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
-		bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+		bonus += float2int32( p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value( UNIT_FIELD_STAT3 ) );
+		bonus += float2int32( p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value( UNIT_FIELD_STAT4 ) );
 	}
 
 	amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
 
-	if(amount < 0) 
+	if( amount < 0 ) 
 		amount = 0;
 
 	if( p_caster != NULL )  

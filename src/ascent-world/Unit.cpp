@@ -327,7 +327,8 @@ void Unit::Update( uint32 p_time )
 	if( !isDead() )
 	{
 		//-----------------------POWER & HP REGENERATION-----------------
-/* Please dont do temp fixes. Better report to me. Thx. Shady */
+		/* Please dont do temp fixes. Better report to me. Thx. Shady */
+
         if( p_time >= m_H_regenTimer )
 		    RegenerateHealth();
 	    else
@@ -4596,11 +4597,11 @@ bool Unit::HasAura(uint32 spellid)
 
 void Unit::DropAurasOnDeath()
 {
-	for(uint32 x=0;x<MAX_AURAS;x++)
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
     {
-        if(m_auras[x])
+        if( m_auras[x] != NULL )
         {
-            if(m_auras[x] && m_auras[x]->GetSpellProto()->Flags4 & CAN_PERSIST_AND_CASTED_WHILE_DEAD)
+            if( m_auras[x]->GetSpellProto() != NULL && m_auras[x]->GetSpellProto()->Flags4 & CAN_PERSIST_AND_CASTED_WHILE_DEAD )
                 continue;
             else
 	        {
