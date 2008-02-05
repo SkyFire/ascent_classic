@@ -2616,18 +2616,30 @@ else
 			if( ability && ability->MechanicsType == MECHANIC_BLEEDING )
 				disable_dR = true; 
 			
-			float summaryPCTmod = pVictim->DamageTakenPctMod[dmg.school_type] + GetDamageDonePctMod( dmg.school_type ) + 1;
+			//float summaryPCTmod = (pVictim->DamageTakenPctMod[dmg.school_type] / 100.0f) + (GetDamageDonePctMod( dmg.school_type ) / 100.0f) + 1;
 
 			if( pct_dmg_mod > 0 )
 				dmg.full_damage = float2int32( dmg.full_damage *  ( float( pct_dmg_mod) / 100.0f ) );
 
 			//a bit dirty fix
-			if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
+			/*if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
 			{
 				summaryPCTmod *= 1 + pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
-			}
+			}*/
 
-			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
+			//dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
+
+			// burlex: fixed this crap properly
+			float inital_dmg = float(inital_dmg);
+			float dd_mod = GetDamageDonePctMod( dmg.school_type );
+			if( pVictim->DamageTakenPctMod[dmg.school_type] > 1.0f )
+				dmg.full_damage += float2int32( ( inital_dmg * pVictim->DamageTakenPctMod[ dmg.school_type ] ) - inital_dmg );
+
+			if( dd_mod > 1.0f )
+				dmg.full_damage += float2int32( ( inital_dmg * dd_mod) - inital_dmg );
+
+			if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
+				dmg.full_damage += float2int32( ( inital_dmg * (1 + pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING]) ) - inital_dmg );
 
 			//pet happiness state dmg modifier
 			if( IsPet() && !static_cast<Pet*>(this)->IsSummon() )
@@ -4316,7 +4328,7 @@ int32 Unit::GetDamageDoneMod(uint32 school)
 float Unit::GetDamageDonePctMod(uint32 school)
 {
    if(this->IsPlayer())
-	   return GetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT+school);
+	   return m_floatValues[PLAYER_FIELD_MOD_DAMAGE_DONE_PCT+school];
 	else
 	   return ((Creature*)this)->ModDamageDonePct[school];
 }
