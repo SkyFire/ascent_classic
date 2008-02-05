@@ -339,13 +339,7 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 			{
 				Guid = _player->mTradeItems[Index] ? _player->mTradeItems[Index]->GetGUID() : 0;
 				if(Guid != 0)
-				{
-					if(GetPermissionCount()>0)
-					{
-						sGMLog.writefromsession(this, "traded item %s to %s", _player->mTradeItems[Index]->GetProto()->Name1, pTarget->GetName());
-					}
-					pItem = _player->m_ItemInterface->SafeRemoveAndRetreiveItemByGuid(Guid, true);
-				}
+					_player->m_ItemInterface->SafeRemoveAndRetreiveItemByGuid(Guid, true);
 
 				Guid = pTarget->mTradeItems[Index] ? pTarget->mTradeItems[Index]->GetGUID() : 0;
 				if(Guid != 0)
@@ -358,6 +352,8 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 				pItem = _player->mTradeItems[Index];
 				if(pItem != 0)
 				{
+					if(_player->GetSession()->GetPermissionCount()>0) //items goes from GM (GM started trade)
+						sGMLog.writefromsession(this, "traded item id %u [%s] to %s", pItem->GetEntry(),pItem->GetProto()->Name1, pTarget->GetName());
 					pItem->SetOwner(pTarget);
 					pTarget->m_ItemInterface->AddItemToFreeSlot(pItem);
 				}
@@ -365,7 +361,9 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 				pItem = pTarget->mTradeItems[Index];
 				if(pItem != 0)
 				{
-					pItem->SetOwner(pTarget);
+					if(pTarget->GetSession()->GetPermissionCount()>0) //items goes from GM (player started trade)
+						sGMLog.writefromsession(pTarget->GetSession(), "traded item id %u [%s] to %s", pItem->GetEntry(),pItem->GetProto()->Name1, _player->GetName());
+					pItem->SetOwner(_player);
 					_player->m_ItemInterface->AddItemToFreeSlot(pItem);
 				}
 			}
@@ -373,12 +371,16 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 			// Trade Gold
 			if(pTarget->mTradeGold)
 			{
+				if(pTarget->GetSession()->GetPermissionCount()>0)
+					sGMLog.writefromsession(pTarget->GetSession(), "traded %u cooper to %s", pTarget->mTradeGold, _player->GetName());
 				_player->ModUInt32Value(PLAYER_FIELD_COINAGE, pTarget->mTradeGold);
 				pTarget->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)pTarget->mTradeGold);
 			}
 
 			if(_player->mTradeGold)
 			{
+				if(_player->GetSession()->GetPermissionCount()>0)
+					sGMLog.writefromsession(this, "traded %u cooper to %s", _player->mTradeGold, pTarget->GetName());
 				pTarget->ModUInt32Value(PLAYER_FIELD_COINAGE, _player->mTradeGold);
 				_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)_player->mTradeGold);
 			}
