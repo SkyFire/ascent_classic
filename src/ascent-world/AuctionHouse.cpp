@@ -490,8 +490,9 @@ void WorldSession::HandleAuctionSellItem( WorldPacket &recv_data )
 		return;
 	}
 
-	pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid( item, false );
-	if ( pItem == NULL ){
+	pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid( item, true );
+	if ( pItem == NULL )
+	{
 		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 8);
 		data << (uint32) 0 << (uint32) AUCTION_CREATE << (uint32) AUCTION_ERROR_ITEM;
 		SendPacket(&data);
