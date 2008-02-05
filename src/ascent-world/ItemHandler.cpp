@@ -1536,10 +1536,13 @@ void WorldSession::HandleReadItemOpcode(WorldPacket &recvPacket)
 
 void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 {
-	if(!_player->IsInWorld()) return;
-	CHECK_PACKET_SIZE(recvPacket, 12);
-	if(!GetPlayer())
+	if( _player == NULL )
 		return;
+
+	if( !_player->IsInWorld() )
+		return;
+
+	CHECK_PACKET_SIZE(recvPacket, 12);
 
 	uint64 npcguid;
 	uint64 itemguid;
@@ -1554,10 +1557,10 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 				// maxdurability - currentdurability
 				// it its 0 no durabiliti needs to be set
 				uint32 dDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurabilityMax() - _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
-				if (dDurability)
+				if( dDurability > 0 )
 				{
 					// the amount of durability that is needed to be added is the amount of money to be payed
-					if (dDurability <= _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
+					if( dDurability <= _player->GetUInt32Value( PLAYER_FIELD_COINAGE ) )
 					{
 						int32 cDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
 					   _player->ModUInt32Value( PLAYER_FIELD_COINAGE , -(int32)dDurability );
