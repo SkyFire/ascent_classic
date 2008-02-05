@@ -2946,7 +2946,7 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 	}
 
-	if( m_spellInfo->Flags3 & 0x100000 && pcaster != NULL )
+	if( m_spellInfo->Flags3 & 0x100000 && p_caster != NULL )
 	{
 		// currently these spells are the only ones that need this check.
 		Item* pItem = p_caster->GetItemInterface()->GetInventoryItem( INVENTORY_SLOT_NOT_SET, EQUIPMENT_SLOT_MAINHAND );

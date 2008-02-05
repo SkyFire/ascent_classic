@@ -67,6 +67,7 @@ AIInterface::AIInterface()
 
 	m_nextSpell = NULL;
 	m_nextTarget = NULL;
+	m_oldTarget = NULL;
 	totemspell = NULL;
 	m_Unit = NULL;
 	m_PetOwner = NULL;
@@ -902,7 +903,11 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				float distance = m_Unit->CalcDistance(m_nextTarget);
 
 				combatReach[0] = PLAYER_SIZE;
-				combatReach[1] = _CalcCombatRange(m_nextTarget, false);
+				combatReach[1] = _CalcCombatRange( m_nextTarget, false );
+
+				// target is player and is moving? give some extra range
+				if( m_nextTarget->IsPlayer() && static_cast< Player* >( m_nextTarget )->m_isMoving )
+					combatReach[1] += CREATURE_MELEE_RANGE_TOLERANCE;
 
 				if(	
 					distance >= combatReach[0] && 
@@ -963,7 +968,42 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						}
 					}
 				}
-				else // Target out of Range -> Run to it
+				else if( m_Unit->m_rooted && !m_Unit->IsStunned() && !m_oldTarget ) // Target out of Range and we can't move -> Choose a new target if applicable
+				{
+					Unit * newTarget = NULL;
+					Unit * tmpTarget = NULL;
+					Object * obj;
+					float shortestdist = m_nextTarget->CalcDistance( m_Unit ) , dist;
+					// scan through nearby players. Essentially, a second aggro check
+					std::set<Object*>::iterator itr , it2;
+					for( itr = m_Unit->GetInRangeOppFactsSetBegin(); itr != m_Unit->GetInRangeOppFactsSetEnd(); )
+					{
+						it2 = itr;
+						++itr;
+						obj = (*it2);
+						if( !obj->IsUnit() )
+						continue;
+						
+						tmpTarget = static_cast<Unit*>(obj);
+
+						if( ( dist = m_Unit->CalcDistance( obj ) ) > _CalcCombatRange( tmpTarget , false ) ) // don't bother with out-of-range
+						continue;
+				
+						if( dist > shortestdist )
+						continue;
+
+						shortestdist = dist;
+
+						newTarget = tmpTarget;
+					}
+					if( newTarget )
+					{
+						m_oldTarget = m_nextTarget;
+						SetNextTarget( newTarget );
+						// We return to our old target on unroot (AIInterface::EventRegainMovement)
+					}
+				}
+				else // Target out of Range and we can move to them -> Move to them
 				{
 					//calculate next move
 					float dist = combatReach[1]-PLAYER_SIZE;
@@ -3516,6 +3556,18 @@ void AIInterface::WipeCurrentTarget()
 
 	if( m_nextTarget == UnitToFollow_backup )
 		UnitToFollow_backup = NULL;
+}
+
+void AIInterface::EventRegainMovement()
+{
+	// uh, if we have an old target...
+	if( m_oldTarget )
+	{
+		// we return to our old target
+		SetNextTarget( m_oldTarget );
+		// and forget our temporary target :)
+		m_oldTarget = NULL;
+	}
 }
 
 #ifdef HACKY_CRASH_FIXES

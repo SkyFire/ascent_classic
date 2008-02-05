@@ -57,6 +57,8 @@ Unit::Unit()
 	m_slowdown = 0;
 	m_mountedspeedModifier = 0;
 
+	m_maxspeed = 0.0f;
+
 	for( uint32 x = 0; x < 27; x++ )
 	{
 		MechanicsDispels[x] = 0;
@@ -4554,18 +4556,18 @@ void Unit::SetStandState(uint8 standstate)
 
 void Unit::RemoveAurasByInterruptFlag(uint32 flag)
 {
-	Aura * a;
-	for(uint32 x=0;x<MAX_AURAS;x++)
+	//Aura* a;
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		a = m_auras[x];
-		if(a == NULL)
+		//a = m_auras[x];
+		if( m_auras[x] == NULL )
 			continue;
 		
 		//some spells do not get removed all the time only at specific intervals
-		if((a->m_spellProto->AuraInterruptFlags & flag) && !(a->m_spellProto->procFlags & PROC_REMOVEONUSE))
+		if( m_auras[x]->m_spellProto->AuraInterruptFlags & flag && !( m_auras[x]->m_spellProto->procFlags & PROC_REMOVEONUSE ) )
 		{
-			a->Remove();
-			m_auras[x] = NULL;
+			m_auras[x]->Remove();
+			//m_auras[x] = NULL; this is done inside REMOVE()
 		}
 	}
 }
@@ -4632,7 +4634,20 @@ void Unit::UpdateSpeed(bool delay /* = false */)
 		}
 	}
 
-	m_flySpeed = PLAYER_NORMAL_FLIGHT_SPEED*(1.0f + ((float)m_flyspeedModifier)/100.0f);
+	m_flySpeed = PLAYER_NORMAL_FLIGHT_SPEED * ( 1.0f + ( (float) m_flyspeedModifier ) / 100.0f );
+
+	// Apply Aura: Limit Speed (Judgement of Justice #31896)
+	if( m_maxspeed != 0 && m_runSpeed > m_maxspeed ) 
+	{
+		//sLog.outString( "LOL STUCK %f,%f" , m_runSpeed , m_maxspeed );
+		m_runSpeed = m_maxspeed;
+	}
+
+	if( m_maxspeed != 0 && m_flySpeed > m_maxspeed )
+	{
+		//sLog.outString( "LOL STUCK %f,%f" , m_runSpeed , m_maxspeed );
+		m_flySpeed = m_maxspeed;
+	}
 
 	if( IsPlayer() )
 	{
@@ -6154,4 +6169,10 @@ void Unit::ReplaceAIInterface(AIInterface *new_interface)
 	m_aiInterface = new_interface; 
 }
 
-
+void Unit::EventRegainMovement()
+{
+	if( IsCreature() && m_aiInterface )
+	{
+		m_aiInterface->EventRegainMovement();
+	}
+}

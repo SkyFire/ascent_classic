@@ -1225,7 +1225,7 @@ Creature * CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, u
 	pCreature->SetUInt32Value(UNIT_FIELD_POWER3, 200);
 	pCreature->SetUInt32Value(UNIT_FIELD_POWER5, 2000000);
 
-	pCreature->SetUInt32Value(UNIT_FIELD_MAXHEALTH, 10000);
+	pCreature->SetUInt32Value(UNIT_FIELD_MAXHEALTH, 100000);
 	pCreature->SetUInt32Value(UNIT_FIELD_MAXPOWER1, 4868);
 	pCreature->SetUInt32Value(UNIT_FIELD_MAXPOWER3, 200);
 	pCreature->SetUInt32Value(UNIT_FIELD_MAXPOWER5, 2000000);

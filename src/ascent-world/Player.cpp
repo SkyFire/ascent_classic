@@ -4953,31 +4953,33 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 							&& DuelingWith != pObj)
 						return true;
 
-					if(pObj->stalkedby == GetGUID()) // Hunter's Mark / MindVision is visible to the caster
+					if( pObj->stalkedby == GetGUID() ) // Hunter's Mark / MindVision is visible to the caster
 						return true;
 
-					if(isInFront(pObj)) // stealthed player is in front of us
+					if( isInFront( pObj ) ) // stealthed player is in front of us
 					{
 						// Detection Range = 5yds + (Detection Skill - Stealth Skill)/5
-						if(getLevel() < 60)
-							detectRange = 5.0f + getLevel() + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
+						if( getLevel() < 60 )
+							detectRange = 5.0f + float( getLevel() ) + 0.2f * (float)( getLevel() + GetStealthDetectBonus() - pObj->GetStealthLevel() );
 						else
-							detectRange = 65.0f + 0.2f * (float)(GetStealthDetectBonus() - pObj->GetStealthLevel());
-						// Hehe... stealth skill is increased by 5 each level and detection skill is increased by 5 each level too.
+							detectRange = 65.0f + 0.2f * (float)( getLevel() + GetStealthDetectBonus() - pObj->GetStealthLevel() );						// Hehe... stealth skill is increased by 5 each level and detection skill is increased by 5 each level too.
 						// This way, a level 70 should easily be able to detect a level 4 rogue (level 4 because that's when you get stealth)
 						//	detectRange += 0.2f * ( getLevel() - pObj->getLevel() );
-						if(detectRange < 1.0f) detectRange = 1.0f; // Minimum Detection Range = 1yd
+						if( detectRange < 1.0f )
+							detectRange = 1.0f; // Minimum Detection Range = 1yd
 					}
 					else // stealthed player is behind us
 					{
-						if(GetStealthDetectBonus() > 1000) return true; // immune to stealth
-						else detectRange = 0.0f;
+						if( GetStealthDetectBonus() > 1000 )
+							return true; // immune to stealth
+						else
+							detectRange = 0.0f;
 					}
 
-					detectRange += GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of player
-					detectRange += pObj->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS); // adjust range for size of stealthed player
+					detectRange += GetFloatValue( UNIT_FIELD_BOUNDINGRADIUS ); // adjust range for size of player
+					detectRange += pObj->GetFloatValue( UNIT_FIELD_BOUNDINGRADIUS ); // adjust range for size of stealthed player
 					//sLog.outString( "Player::CanSee(%s): detect range = %f yards (%f ingame units), cansee = %s , distance = %f" , pObj->GetName() , detectRange , detectRange * detectRange , ( GetDistance2dSq(pObj) > detectRange * detectRange ) ? "yes" : "no" , GetDistanceSq(pObj) );
-					if(GetDistanceSq(pObj) > detectRange * detectRange)
+					if( GetDistanceSq( pObj ) > detectRange * detectRange )
 						return bGMTagOn; // GM can see stealthed players
 				}
 
@@ -5383,36 +5385,45 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 			if(iter->roll == NULL && !iter->passed)
 			{
 				int32 ipid = 0;
-				uint32 factor=0;
-				if(iter->iRandomProperty)
-					ipid=iter->iRandomProperty->ID;
-				else if(iter->iRandomSuffix)
-				{
-					ipid = -int32(iter->iRandomSuffix->id);
-					factor=Item::GenerateRandomSuffixFactor(iter->item.itemproto);
-				}
+				uint32 factor = 0;
 
-				if(iter->item.itemproto)
+				if( iter->iRandomProperty )
 				{
-					iter->roll = new LootRoll(60000, (m_Group != NULL ? m_Group->MemberCount() : 1),  guid, x, iter->item.itemproto->ItemId, factor, uint32(ipid), GetMapMgr());
+					ipid = iter->iRandomProperty->ID;
+				}
+				else if( iter->iRandomSuffix )
+				{
+					//ipid = -int32(iter->iRandomSuffix->id);
+					// here we have (had?) a problem, the item random suffix was not sent correctly.
+					ipid = -int32( iter->iRandomSuffix->id );
+
+					// this is.. quite odd... we set it to a negative int, and then when the packet
+					// is sent, it's converted to a Uint? making the value like 2147234174?
+					factor = Item::GenerateRandomSuffixFactor( iter->item.itemproto );
+				}
+				//sLog.outString( "Item info %s: ipid %d (%u), Is RandomSuffix? %s" , iter->item.itemproto->Name1 , ipid , (uint32)ipid , iter->iRandomSuffix ? "Yes" : "No" ); 
+
+				if( iter->item.itemproto != NULL )
+				{
+					iter->roll = new LootRoll( 60000, ( m_Group != NULL ? m_Group->MemberCount() : 1 ),  guid, x, iter->item.itemproto->ItemId, factor, uint32(ipid), GetMapMgr() );
 					
 					data2.Initialize(SMSG_LOOT_START_ROLL);
 					data2 << guid;
 					data2 << x;
-					data2 << uint32(iter->item.itemproto->ItemId);
-					data2 << uint32(factor);
-					if(iter->iRandomProperty)
-						data2 << uint32(iter->iRandomProperty->ID);
-					else if(iter->iRandomSuffix)
-						data2 << uint32(ipid);
+					data2 << uint32( iter->item.itemproto->ItemId );
+					data2 << uint32( factor );
+					if( iter->iRandomProperty )
+						data2 << uint32( iter->iRandomProperty->ID );
+					else if( iter->iRandomSuffix )
+						data2 << uint32( ipid );
 					else
-						data2 << uint32(0);
+						data2 << uint32( 0 );
 
-					data2 << uint32(60000); // countdown
+					data2 << uint32( 60000 ); // countdown
 				}
 
-				Group * pGroup = m_playerInfo->m_Group;
-				if(pGroup)
+				Group* pGroup = m_playerInfo->m_Group;
+				if( pGroup != NULL )
 				{
 					pGroup->Lock();
 					for(uint32 i = 0; i < pGroup->GetSubGroupCount(); ++i)

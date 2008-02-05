@@ -211,7 +211,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraReduceEnemyRCritChance,//missing = 188 //used //Apply Aura: Reduces Attacker Chance to Crit with Ranged (Melee?) //http://www.thottbot.com/?sp=30893
 		&Aura::SpellAuraIncreaseRating,//missing = 189 //Apply Aura: Increases Rating
 		&Aura::SpellAuraIncreaseRepGainPct,//SPELL_AURA_MOD_FACTION_REPUTATION_GAIN //used // Apply Aura: Increases Reputation Gained by % //http://www.thottbot.com/?sp=30754
-		&Aura::SpellAuraNULL,//missing = 191 //used // noname //http://www.thottbot.com/?sp=29894
+		&Aura::SpellAuraLimitSpeed,//missing = 191 //used // noname //http://www.thottbot.com/?sp=29894
 		&Aura::SpellAuraNULL,//192 Apply Aura: Melee Slow %
 		&Aura::SpellAuraIncreaseTimeBetweenAttacksPCT,//193 Apply Aura: Increase Time Between Attacks (Melee, Ranged and Spell) by %
 		&Aura::SpellAuraIncreaseSpellDamageByInt,//194 Apply Aura: Increase Spell Damage by % of Intellect (All)
@@ -2952,7 +2952,7 @@ void Aura::SpellAuraModRoot(bool apply)
 			m_target->Root();
 
 		/* -Supalosa- TODO: Mobs will attack nearest enemy in range on aggro list when rooted. */
-		Unit *caster = GetUnitCaster();
+		Unit* caster = GetUnitCaster();
 		if( caster != NULL && caster->IsPlayer() && m_target != NULL )
 			static_cast< Player* >( caster )->EventStunOrImmobilize( m_target );
 		if( m_target != NULL && m_target->IsPlayer() && caster != NULL )
@@ -2962,11 +2962,14 @@ void Aura::SpellAuraModRoot(bool apply)
 	{
 		m_target->m_rooted--;
 
-		if(m_target->m_rooted == 0)
+		if( m_target->m_rooted == 0 )
+		{
 			m_target->Unroot();
+			m_target->EventRegainMovement();
+		}		
 
-		if(m_target->GetTypeId() == TYPEID_UNIT)
-			m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, 0);
+		if( m_target->GetTypeId() == TYPEID_UNIT )
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 1, 0 );
 	}
 }
 
@@ -5172,22 +5175,25 @@ void Aura::SpellAuraModResistChance(bool apply)
 
 void Aura::SpellAuraModDetectRange(bool apply)
 {
-	Unit*m_caster=GetUnitCaster();
-	if(!m_caster)return;
-	if(apply)
+	Unit* m_caster = GetUnitCaster();
+	if( m_caster == NULL )
+		return;
+
+	if( apply )
 	{
 		SetNegative();
-		m_caster->setDetectRangeMod(m_target->GetGUID(), mod->m_amount);
+		m_caster->setDetectRangeMod( m_target->GetGUID(), mod->m_amount );
 	}
 	else
 	{
-		m_caster->unsetDetectRangeMod(m_target->GetGUID());
+		m_caster->unsetDetectRangeMod( m_target->GetGUID() );
 	}
 }
 
 void Aura::SpellAuraPreventsFleeing(bool apply)
 {
-	// Curse of Recklessness 
+	// Curse of Recklessness
+	// Judgement of Justice
 }
 
 void Aura::SpellAuraModUnattackable(bool apply)
@@ -5201,30 +5207,30 @@ void Aura::SpellAuraModUnattackable(bool apply)
 
 void Aura::SpellAuraInterruptRegen(bool apply)
 {
-	if(apply)
+	if( apply )
 		m_target->m_interruptRegen++;
 	else
 	{
 		m_target->m_interruptRegen--;
-		  if(m_target->m_interruptRegen < 0)
+		  if( m_target->m_interruptRegen < 0 )
 			m_target->m_interruptRegen = 0;
 	}
 }
 
 void Aura::SpellAuraGhost(bool apply)
 {
-	if(m_target->GetTypeId() == TYPEID_PLAYER)
+	if( m_target->GetTypeId() == TYPEID_PLAYER )
 	{
 		m_target->m_invisible = apply;
 
-		if(apply)
+		if( apply )
 		{
 			SetNegative();
-			static_cast< Player* >( m_target )->SetMovement(MOVE_WATER_WALK, 4);
+			static_cast< Player* >( m_target )->SetMovement( MOVE_WATER_WALK, 4 );
 		}
 		else
 		{
-			static_cast< Player* >( m_target )->SetMovement(MOVE_LAND_WALK, 7);
+			static_cast< Player* >( m_target )->SetMovement( MOVE_LAND_WALK, 7 );
 		} 
 	}
 }
@@ -7328,6 +7334,21 @@ void Aura::SpellAuraIncreaseRepGainPct(bool apply)
 			p_target->pctReputationMod += mod->m_amount;//re use
 		else
 			p_target->pctReputationMod -= mod->m_amount;//re use
+	}
+}
+
+void Aura::SpellAuraLimitSpeed(bool apply)
+{
+	// prevents them from going over EffectMiscVal speed.
+	SetNegative(); // only negative
+	if( m_target != NULL )
+	{
+		if( apply )
+			m_target->m_maxspeed = mod->m_amount > 0 ? (float)mod->m_amount : 0.0f; // seems that it goes negative, rooting us
+		else
+			m_target->m_maxspeed = 0;
+
+		m_target->UpdateSpeed();
 	}
 }
 

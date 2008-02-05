@@ -838,6 +838,9 @@ public:
 	// Spell Crit
 	float spellcritperc;
 
+	// on regain movement
+	void EventRegainMovement();
+
 	// AIInterface
 	AIInterface *GetAIInterface() { return m_aiInterface; }
 	void ReplaceAIInterface(AIInterface *new_interface) ;
@@ -1021,6 +1024,7 @@ public:
 	// Affect Speed
 	int32 m_speedModifier;
 	int32 m_slowdown;
+	float m_maxspeed;
 	map< uint32, int32 > speedReductionMap;
 	bool GetSpeedDecrease();
 	int32 m_mountedspeedModifier;
