@@ -1942,20 +1942,6 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 
 	// all checks passed ok
 	source_entry = src->GetEntry();
-	dst->SetProto( src->GetProto() );
-
-	if( src->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) <= 1 )
-	{
-		// destroy the source item
-		_player->GetItemInterface()->SafeFullRemoveItemByGuid( src->GetGUID() );
-	}
-	else
-	{
-		// reduce stack count by one
-		src->ModUInt32Value( ITEM_FIELD_STACK_COUNT, -1 );
-		src->m_isDirty = true;
-	}
-
 	itemid = source_entry;
 	switch( source_entry )
 	{
@@ -1982,6 +1968,25 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 	case 21830:
 		itemid = 21831;
 		break;
+
+	default:
+		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_WRAPPED_CANT_BE_WRAPPED );
+		return;
+		break;
+	}
+
+	dst->SetProto( src->GetProto() );
+
+	if( src->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) <= 1 )
+	{
+		// destroy the source item
+		_player->GetItemInterface()->SafeFullRemoveItemByGuid( src->GetGUID() );
+	}
+	else
+	{
+		// reduce stack count by one
+		src->ModUInt32Value( ITEM_FIELD_STACK_COUNT, -1 );
+		src->m_isDirty = true;
 	}
 
 	// change the dest item's entry
