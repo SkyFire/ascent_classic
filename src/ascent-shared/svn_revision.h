@@ -18,4 +18,4 @@ ASCENT_INLINE int g_getRevision()
 
 //\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\//\\
 
-#endif  
+#endif   
