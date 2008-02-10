@@ -141,8 +141,11 @@ void WorldSession::HandleSetLookingForGroup(WorldPacket& recvPacket)
 				break;
 		}
 
+#ifndef GLOBAL_LFG
 		if( i == 3 )
 			_player->PartLFGChannel();
+#endif
+
 	}
 }
 
@@ -174,8 +177,11 @@ void WorldSession::HandleLfgClear(WorldPacket & recvPacket)
 void WorldSession::HandleLfgInviteAccept(WorldPacket & recvPacket)
 {
 	CHECK_INWORLD_RETURN
-	
+
+#ifndef GLOBAL_LFG	
 	_player->PartLFGChannel();
+#endif
+
 	if(_player->m_lfgMatch == NULL && _player->m_lfgInviterGuid == 0)
 	{
 		if(_player->m_lfgMatch == NULL)

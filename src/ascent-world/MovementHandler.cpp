@@ -373,8 +373,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Anti-Teleport                                                        */
 		/************************************************************************/
-		if(sWorld.antihack_teleport && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 2500.0f
-			&& _player->m_runSpeed < 50.0f && !(movement_info.flags & MOVEFLAG_TAXI))
+		if( sWorld.antihack_teleport && _player->m_position.Distance2DSq( movement_info.x, movement_info.y ) > 2500.0f && _player->m_runSpeed < 50.0f && !( movement_info.flags & MOVEFLAG_TAXI ) )
 		{
 			sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
 			Disconnect();
@@ -397,6 +396,27 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		/* Anti-Fall Damage                                                     */
 		/************************************************************************/
+
+		if( sWorld.antihack_falldmg )
+		{
+			if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 6 ) && !_player->flying_aura && !_player->m_TransporterGUID && _player->_lastHeartbeatZ - movement_info.z > 2.5f && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
+			{
+				_player->m_heightDecreaseCount++;
+				if( _player->m_heightDecreaseCount > 16.0f )
+				{
+					sChatHandler.SystemMessage( this, "Fall Damage hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+					sCheatLog.writefromsession( this, "Fall Damage hacker kicked" );
+					_player->m_KickDelay = 0;
+					sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+					_player->SetMovement( MOVE_ROOT, 1 );
+				}
+			}
+			else
+			{
+				_player->m_heightDecreaseCount = 0;
+			}
+		}
+
 		/*if(movement_info.flags & MOVEFLAG_FALLING_FAR && (!movement_info.FallTime) && sWorld.antihack_falldmg &&
 			!_player->bSafeFall && !_player->GodModeCheat)
 		{
@@ -431,6 +451,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Calculate the timestamp of the packet we have to send out            */
 	/************************************************************************/
+
 	size_t pos = (size_t)m_MoverWoWGuid.GetNewGuidLen() + 1;
 	uint32 mstime = mTimeStamp();
 	int32 move_time;
@@ -440,7 +461,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Copy into the output buffer.                                         */
 	/************************************************************************/
-	if(_player->m_inRangePlayers.size())
+
+	if( _player->m_inRangePlayers.size() )
 	{
 		move_time = (movement_info.time - (mstime - m_clientTimeDelay)) + MOVEMENT_PACKET_TIME_DELAY + mstime;
 		memcpy(&movement_packet[pos], recv_data.contents(), recv_data.size());
@@ -464,33 +486,36 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/* Falling damage checks                                                */
 	/************************************************************************/
 
-	if( movement_info.flags & MOVEFLAG_REDIRECTED && !( movement_info.flags & MOVEFLAG_FALLING ) )
+	if( movement_info.flags & MOVEFLAG_REDIRECTED && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
 	{
 		_player->blinked = true;
+		_player->m_redirectCount++;
 	}
 	else
 	{
+		if( _player->m_redirectCount > 0 )
+			_player->m_redirectCount--;
 		if( _player->blinked )
 		{
 			_player->blinked = false;
-			_player->m_fallDisabledUntil = UNIXTIME + 5;
 			_player->ResetHeartbeatCoords();
+			_player->m_fallTime = 0;
 		}
 		else
 		{
-			if( movement_info.flags & MOVEFLAG_FALLING ) // Falling
+			if( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) // Falling
 			{
 				if( _player->m_fallTime < movement_info.FallTime )
 					_player->m_fallTime = movement_info.FallTime;
 			}
 			else //once we done falling lets do some damage
 			{
-				if( _player->m_fallTime > 800 && _player->isAlive() && !_player->GodModeCheat )
+				if( _player->m_fallTime > 750 && _player->isAlive() && !_player->GodModeCheat )
 				{
 					//Check if we aren't falling in water
 					if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
 					{
-						if( !_player->bFeatherFall && UNIXTIME > _player->m_fallDisabledUntil )
+						if( !_player->bFeatherFall ) //&& UNIXTIME > _player->m_fallDisabledUntil )
 						{
 							//10% dmg per sec after first 3 seconds
 							//it rL a*t*t
@@ -525,6 +550,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Transporter Setup                                                    */
 	/************************************************************************/
+
 	if(!_player->m_lockTransportVariables)
 	{
 		if(_player->m_TransporterGUID && !movement_info.transGuid)
@@ -575,18 +601,37 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	}
 
 	/************************************************************************/
+	/* Anti-Packet Hack Checks                                              */
+	/************************************************************************/
+
+	if( movement_info.flags & MOVEFLAG_REDIRECTED && movement_info.flags & MOVEFLAG_TAXI )
+	{
+		sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+		sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED | MOVEFLAG_TAXI Packet hacker kicked" );
+		_player->m_KickDelay = 0;
+		sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+		_player->SetMovement( MOVE_ROOT, 1 );
+	}
+
+	if( _player->m_redirectCount > 32 )
+	{
+		sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+		sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED Packet hacker kicked" );
+		_player->m_KickDelay = 0;
+		sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+		_player->SetMovement( MOVE_ROOT, 1 );
+	}
+
+	/************************************************************************/
 	/* Anti-Speed Hack Checks                                               */
 	/************************************************************************/
 
-	//sLog.outDebug( "1 Speedhacker HB(%u) UT(%u) FF(%u) B(%u) E(%u) C(%u) T(%u) O(%i) F(%x)",_player->_lastHeartbeatT, time(NULL), _player->bFeatherFall,_player->blinked, sWorld.antihack_speed, _player->m_uint32Values[UNIT_FIELD_CHARM],_player->m_TransporterGUID, recv_data.GetOpcode(), movement_info.flags );
-
-	if( !_player->bFeatherFall && !_player->blinked && sWorld.antihack_speed && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & ( MOVEFLAG_FALLING | MOVEFLAG_FALLING_FAR | MOVEFLAG_FREE_FALLING ) ) )
+	if( sWorld.antihack_speed )
 	{
-		if( !HasGMPermissions() )
-		//if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
-		{
-			float speed;
+		float speed;
 
+		if( !_player->flying_aura )
+		{
 			switch( _player->m_lastMoveType )
 			{
 			case 1:
@@ -599,80 +644,96 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				speed = _player->m_runSpeed;
 				break;
 			}
+		}
+		else
+		{
+			speed = _player->m_flySpeed;
+		}
 
-			if( _player->flying_aura )
-				speed = _player->m_flySpeed;
-
-			//sLog.outDebug( "2 Speedhacker V(%g) S(%g)", _player->_lastHeartbeatV, speed );
-
-			if( _player->_lastHeartbeatV >= speed )
+		if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 6 ) && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
+		{
+			if( _player->_lastHeartbeatT == 0 )
 			{
-				time_t time_diff = time(NULL) - _player->_lastHeartbeatT; //server time since last heartbeat
-
-				float delta_x = movement_info.x - _player->_lastHeartbeatX;
-				float delta_y = movement_info.y - _player->_lastHeartbeatY;
-				
-				float distance_travelled = sqrtf( delta_x * delta_x + delta_y * delta_y ); //distance traveled between last heartbeat
-
-				float max_dist = ( speed * 0.5f ) + 0.1f;
-				float distance_delta = distance_travelled - ( max_dist * time_diff );
-
-				//sLog.outDebug( "3 Speedhacker DD(%g) DX(%g) DY(%g) S(%g) TS(%u)", distance_delta, delta_x, delta_y, speed, time_diff );
-
-				if( distance_delta > 16.0f )
+				if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
 				{
-					switch ( _player->m_speedhackChances )
+					if( _player->_lastHeartbeatV >= speed )
 					{
-					case 2:
+						float delta_x = movement_info.x - _player->_lastHeartbeatX;
+						float delta_y = movement_info.y - _player->_lastHeartbeatY;
+
+						float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
+						float distance_delta = distance_xy_plane / speed;
+						float latency = float( _player->GetSession()->GetLatency() ) * 0.01f;
+						float speed_delta = ( speed * 0.25f ) + std::max( latency + ( latency * 0.04f ), 0.32f );
+
+						if( distance_delta >= speed_delta )
 						{
-							sChatHandler.SystemMessage( this, "Speedhacker detected this is your first warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 5 seconds.");
-							sCheatLog.writefromsession( this, "Speedhacker first warning, deterministic data ( %g, %x, %g, %g, %g, %i, %i )", distance_delta, movement_info.flags, delta_x, delta_y, speed, _player->_lastHeartbeatT, time_diff );
-							_player->SetMovement( MOVE_ROOT, 1 );
-							sEventMgr.AddEvent( _player, &Player::SetMovement, uint8(MOVE_UNROOT), uint32(1), EVENT_DELETE_TIMER, 5000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
-							_player->ResetHeartbeatCoords();
-							_player->m_speedhackChances--;
-							break;
-						}
-					case 1:
-						{
-							sChatHandler.SystemMessage( this, "Speedhacker detected this is your second warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 30 seconds.");
-							sCheatLog.writefromsession( this, "Speedhacker second warning, deterministic data ( %g, %x, %g, %g, %g, %i, %i )", distance_delta, movement_info.flags, delta_x, delta_y, speed, _player->_lastHeartbeatT, time_diff );
-							_player->SetMovement( MOVE_ROOT, 1 );
-							sEventMgr.AddEvent( _player, &Player::SetMovement, uint8(MOVE_UNROOT), uint32(1), EVENT_DELETE_TIMER, 30000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
-							_player->ResetHeartbeatCoords();
-							_player->m_speedhackChances--;
-							break;
-						}
-					case 0:
-						{
-							sChatHandler.SystemMessage( this, "Speedhacker detected you where warned. Your account has been flagged for later processing by server administrators. You will now be removed from the server.");
-							sCheatLog.writefromsession( this, "Speedhacker kicked, deterministic data ( %g, %x, %g, %g, %g, %i, %i )", distance_delta, movement_info.flags, delta_x, delta_y, speed, _player->_lastHeartbeatT, time_diff );
-							_player->m_KickDelay = 0;
-							sEventMgr.AddEvent(_player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1,0);
-							_player->SetMovement(MOVE_ROOT, 1);
-							break;
+							switch ( _player->m_speedhackChances )
+							{
+							case 2:
+								{
+									sChatHandler.SystemMessage( this, "Speedhacker detected this is your first warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 10 seconds." );
+									sCheatLog.writefromsession( this, "Speedhacker first warning, deterministic data : D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
+									sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
+									_player->SetMovement( MOVE_ROOT, 1 );
+									sEventMgr.AddEvent( _player, &Player::SetMovement, uint8( MOVE_UNROOT ), uint32(1), EVENT_DELETE_TIMER, 10000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+									_player->ResetHeartbeatCoords();
+									_player->m_speedhackChances--;
+									break;
+								}
+							case 1:
+								{
+									sChatHandler.SystemMessage( this, "Speedhacker detected this is your second warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 45 seconds." );
+									sCheatLog.writefromsession( this, "Speedhacker second warning, deterministic data : D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
+									sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
+									_player->SetMovement( MOVE_ROOT, 1 );
+									sEventMgr.AddEvent( _player, &Player::SetMovement, uint8( MOVE_UNROOT ), uint32(1), EVENT_DELETE_TIMER, 45000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+									_player->ResetHeartbeatCoords();
+									_player->m_speedhackChances--;
+									break;
+								}
+							case 0:
+								{
+									sChatHandler.SystemMessage( this, "Speedhacker detected you were warned. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+									sCheatLog.writefromsession( this, "Speedhacker kicked, deterministic data : D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
+									sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
+									_player->m_KickDelay = 0;
+									sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+									_player->SetMovement( MOVE_ROOT, 1 );
+									break;
+								}
+							}
 						}
 					}
 				}
 			}
-			_player->_lastHeartbeatT = time(NULL);
-			_player->_lastHeartbeatX = movement_info.x;
-			_player->_lastHeartbeatY = movement_info.y;
-			_player->_lastHeartbeatZ = movement_info.z;
-			_player->_lastHeartbeatO = movement_info.orientation;
-			_player->_lastHeartbeatV = speed;
+			else
+			{
+				_player->_lastHeartbeatT--;
+			}
 		}
+		else
+		{
+			_player->_lastHeartbeatT = 2;
+		}
+
+		_player->_lastHeartbeatV = speed;
+		_player->_lastHeartbeatX = movement_info.x;
+		_player->_lastHeartbeatY = movement_info.y;
+		_player->_lastHeartbeatZ = movement_info.z;
+		_player->_lastHeartbeatO = movement_info.orientation;
+
 	}
 
 	/************************************************************************/
 	/* Breathing System                                                     */
 	/************************************************************************/
-	_HandleBreathing(movement_info, _player, this);
+	_HandleBreathing( movement_info, _player, this );
 
 	/************************************************************************/
 	/* Remove Spells                                                        */
 	/************************************************************************/
-	_player->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_MOVEMENT);
+	_player->RemoveAurasByInterruptFlag( AURA_INTERRUPT_ON_MOVEMENT );
 
 	/************************************************************************/
 	/* Update our position in the server.                                   */
@@ -803,19 +864,19 @@ void MovementInfo::init(WorldPacket & data)
 	data >> flags >> unk_230 >> time;
 	data >> x >> y >> z >> orientation;
 
-	if (flags & MOVEFLAG_TAXI)
+	if( flags & MOVEFLAG_TAXI )
 	{
 		data >> transGuid >> transX >> transY >> transZ >> transO >> transUnk;
 	}
-	if (flags & MOVEFLAG_SWIMMING)
+	if( flags & MOVEFLAG_SWIMMING )
 	{
 		data >> unk6;
 	}
-	if (flags & MOVEFLAG_FALLING || flags & MOVEFLAG_REDIRECTED)
+	if( flags & MOVEFLAG_FALLING || flags & MOVEFLAG_REDIRECTED )
 	{
 		data >> FallTime >> unk8 >> unk9 >> unk10;
 	}
-	if (flags & MOVEFLAG_SPLINE_MOVER)
+	if( flags & MOVEFLAG_SPLINE_MOVER )
 	{
 		data >> unk12;
 	}

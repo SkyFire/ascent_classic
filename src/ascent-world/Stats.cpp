@@ -70,20 +70,20 @@ uint32 getConColor(uint16 AttackerLvl, uint16 VictimLvl)
 
 uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 {
-	if(pVictim->IsPlayer())
+	if( pVictim->IsPlayer() )
 		return 0;
 
-	if(((Creature*)pVictim)->IsTotem())
+	if( static_cast< Creature* >( pVictim )->IsTotem() )
 		return 0;
 
-	CreatureInfo *victimI;
-	victimI = ((Creature*)pVictim)->GetCreatureName();
+	CreatureInfo* victimI  = static_cast< Creature* >( pVictim )->GetCreatureName();
 
-	if(victimI)
-		if(victimI->Type == CRITTER)
+	if( victimI != NULL )
+		if( victimI->Type == CRITTER )
 			return 0;
+
 	//not wowwikilike but more balanced
-	if ((int32)pVictim->getLevel()-(int32)pAttacker->getLevel()>10)
+	if( (int32)pVictim->getLevel() - (int32)pAttacker->getLevel() > 10 )
 		return 0;
 
 	// Partha: this screws things up for pets and groups
@@ -479,12 +479,12 @@ uint32 CalculateDamage( Unit* pAttacker, Unit* pVictim, uint32 weapon_damage_typ
 		//ap += pAttacker->GetRAP();
 		ap += pVictim->RAPvModifier;
 
-		if(!pVictim->IsPlayer() && ((Creature*)pVictim)->GetCreatureName())
+		if( !pVictim->IsPlayer() && static_cast< Creature* >( pVictim )->GetCreatureName() )
 		{
-			uint32 creatType = ((Creature*)pVictim)->GetCreatureName()->Type;
+			uint32 creatType = static_cast< Creature* >( pVictim )->GetCreatureName()->Type;
 			ap += (float)pAttacker->CreatureRangedAttackPowerMod[creatType];
 
-			if(pAttacker->IsPlayer())
+			if( pAttacker->IsPlayer() )
 			{
 				min_damage = (min_damage + static_cast< Player* >(pAttacker)->IncreaseDamageByType[creatType]) * (1 + static_cast< Player* >(pAttacker)->IncreaseDamageByTypePCT[creatType]);
 				max_damage = (max_damage + static_cast< Player* >(pAttacker)->IncreaseDamageByType[creatType]) * (1 + static_cast< Player* >(pAttacker)->IncreaseDamageByTypePCT[creatType]);
@@ -543,15 +543,15 @@ uint32 CalculateDamage( Unit* pAttacker, Unit* pVictim, uint32 weapon_damage_typ
 		//ap += pAttacker->GetAP();
 		ap += pVictim->APvModifier;
 
-		if(!pVictim->IsPlayer() && ((Creature*)pVictim)->GetCreatureName())
+		if( !pVictim->IsPlayer() && static_cast< Creature* >( pVictim )->GetCreatureName())
 		{
-			uint32 creatType = ((Creature*)pVictim)->GetCreatureName()->Type;
+			uint32 creatType = static_cast< Creature* >( pVictim )->GetCreatureName()->Type;
 			ap += (float)pAttacker->CreatureAttackPowerMod[creatType];
 
-			if(pAttacker->IsPlayer())
+			if( pAttacker->IsPlayer() )
 			{
-				min_damage = (min_damage + static_cast< Player* >(pAttacker)->IncreaseDamageByType[creatType]) * (1 + static_cast< Player* >(pAttacker)->IncreaseDamageByTypePCT[creatType]);
-				max_damage = (max_damage + static_cast< Player* >(pAttacker)->IncreaseDamageByType[creatType]) * (1 + static_cast< Player* >(pAttacker)->IncreaseDamageByTypePCT[creatType]);
+				min_damage = (min_damage + static_cast< Player* >( pAttacker )->IncreaseDamageByType[creatType]) * (1 + static_cast< Player* >(pAttacker)->IncreaseDamageByTypePCT[creatType]);
+				max_damage = (max_damage + static_cast< Player* >( pAttacker )->IncreaseDamageByType[creatType]) * (1 + static_cast< Player* >(pAttacker)->IncreaseDamageByTypePCT[creatType]);
 			}
 		}
 

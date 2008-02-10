@@ -1150,6 +1150,17 @@ void Group::RemoveVoiceMember(Player * pPlayer)
 
 }
 
+void Group::VoiceDied()
+{
+	m_groupLock.Acquire();
+	Log.Debug("Group", "voice died %u", m_Id);
+	m_voiceChannelId = -1;
+	m_voiceChannelRequested = false;
+	m_voiceMemberHigh = 1;
+	m_voiceMembers.clear();
+	m_groupLock.Release();
+}
+
 void Group::SendVoiceUpdate()
 {
 	m_groupLock.Acquire();
@@ -1185,6 +1196,9 @@ void Group::SendVoiceUpdate()
 
 	for( itr = m_voiceMembers.begin(); itr != m_voiceMembers.end(); ++itr )
 	{
+		if( (*itr) == NULL )
+			continue;
+
 		// Append ourself first, always.
 		data << uint64 ( (*itr)->GetGUID() );
 		data << uint8( (*itr)->m_inPartyVoiceId );
@@ -1196,7 +1210,13 @@ void Group::SendVoiceUpdate()
 
 		for( it2 = m_voiceMembers.begin(); it2 != m_voiceMembers.end(); ++it2 )
 		{
+			if( (*it2) == NULL )
+				continue;
+
 			if( (*it2) == (*itr) )
+				continue;
+
+			if( (*it2)->GetSession() == NULL )
 				continue;
 
 			data << uint64( (*it2)->GetGUID() );

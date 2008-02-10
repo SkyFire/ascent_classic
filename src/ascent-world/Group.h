@@ -199,8 +199,8 @@ public:
 	void SendVoiceUpdate();
 	void CreateVoiceSession();
 	void VoiceChannelCreated(uint16 id);
+	void VoiceDied();
 
-protected:
 	bool m_voiceChannelRequested;
 	int16 m_voiceChannelId;
 	uint8 m_voiceMemberHigh;

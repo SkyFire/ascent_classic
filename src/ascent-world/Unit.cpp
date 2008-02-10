@@ -47,62 +47,67 @@ Unit::Unit()
 	
 	//DK:modifiers
 	PctRegenModifier = 0;
+
 	for( uint32 x = 0; x < 4; x++ )
 	{
 		PctPowerRegenModifier[x] = 1;
 	}
+
 	m_speedModifier = 0;
 	m_slowdown = 0;
-	m_mountedspeedModifier=0;
-	for(uint32 x=0;x<27;x++)
+	m_mountedspeedModifier = 0;
+
+	m_maxspeed = 0.0f;
+
+	for( uint32 x = 0; x < 27; x++ )
 	{
-		MechanicsDispels[x]=0;
-		MechanicsResistancesPCT[x]=0;
-		ModDamageTakenByMechPCT[x]=0;
+		MechanicsDispels[x] = 0;
+		MechanicsResistancesPCT[x] = 0;
+		ModDamageTakenByMechPCT[x] = 0;
 	}
 
 	//SM
-	SM_CriticalChance=0;
-	SM_FDur=0;//flat
-	SM_PDur=0;//pct
-	SM_FRadius=0;
-	SM_FRange=0;
-	SM_PCastTime=0;
-	SM_FCastTime=0;
-	SM_PCriticalDamage=0;
-	SM_FDOT=0;
-	SM_PDOT=0;
-	SM_FEffectBonus=0;
-	SM_PEffectBonus=0;
-	SM_FDamageBonus=0;
-	SM_PDamageBonus=0;
-	SM_PSPELL_VALUE=0;
-	SM_FSPELL_VALUE=0;
-	SM_FHitchance=0;
-	SM_PRange=0;//pct
-	SM_PRadius=0;
-	SM_PAPBonus=0;
-	SM_PCost=0;
-	SM_FCost=0;
-	SM_FAdditionalTargets=0;
-	SM_PJumpReduce=0;
-	SM_FSpeedMod=0;
-	SM_PNonInterrupt=0;
-	SM_FPenalty=0;
-	SM_PPenalty=0;
-	SM_FCooldownTime = 0;
-	SM_PCooldownTime = 0;
-	SM_FChanceOfSuccess = 0;
-	SM_FRezist_dispell = 0;
-	SM_PRezist_dispell = 0;
+	SM_CriticalChance = NULL;
+	SM_FDur = NULL; // flat
+	SM_PDur = NULL; // pct
+	SM_FRadius = NULL;
+	SM_FRange = NULL;
+	SM_PCastTime = NULL;
+	SM_FCastTime = NULL;
+	SM_PCriticalDamage = NULL;
+	SM_FDOT = NULL;
+	SM_PDOT = NULL;
+	SM_FEffectBonus = NULL;
+	SM_PEffectBonus = NULL;
+	SM_FDamageBonus = NULL;
+	SM_PDamageBonus = NULL;
+	SM_PSPELL_VALUE = NULL;
+	SM_FSPELL_VALUE = NULL;
+	SM_FHitchance = NULL;
+	SM_PRange = NULL; // pct
+	SM_PRadius = NULL;
+	SM_PAPBonus = NULL;
+	SM_PCost = NULL;
+	SM_FCost = NULL;
+	SM_FAdditionalTargets = NULL;
+	SM_PJumpReduce = NULL;
+	SM_FSpeedMod = NULL;
+	SM_PNonInterrupt = NULL;
+	SM_FPenalty = NULL;
+	SM_PPenalty = NULL;
+	SM_FCooldownTime = NULL;
+	SM_PCooldownTime = NULL;
+	SM_FChanceOfSuccess = NULL;
+	SM_FRezist_dispell = NULL;
+	SM_PRezist_dispell = NULL;
 
 	m_pacified = 0;
 	m_interruptRegen = 0;
 	m_resistChance = 0;
 	m_powerRegenPCT = 0;
-	RAPvModifier=0;
-	APvModifier=0;
-	stalkedby=0;
+	RAPvModifier = 0;
+	APvModifier = 0;
+	stalkedby = 0;
 
 	m_extraattacks = 0;
 	m_stunned = 0;
@@ -118,12 +123,14 @@ Unit::Unit()
 	summonPet = NULL;
 
 	m_useAI = false;
-	for(uint32 x=0;x<10;x++)
+
+	for( uint32 x = 0; x < 10; x++ )
 	{
-		dispels[x]=0;
+		dispels[x] = 0;
 		CreatureAttackPowerMod[x] = 0;
 		CreatureRangedAttackPowerMod[x] = 0;
 	}
+
 	//REMIND:Update these if you make any changes
 	CreatureAttackPowerMod[UNIT_TYPE_MISC] = 0;
 	CreatureRangedAttackPowerMod[UNIT_TYPE_MISC] = 0;
@@ -133,7 +140,7 @@ Unit::Unit()
 	m_invisible = false;
 	m_invisFlag = INVIS_FLAG_NORMAL;
 
-	for(int i = 0; i < INVIS_FLAG_TOTAL; i++)
+	for( int32 i = 0; i < INVIS_FLAG_TOTAL; i++ )
 	{
 		m_invisDetect[i] = 0;
 	}
@@ -143,8 +150,10 @@ Unit::Unit()
 	m_stealth = 0;
 	m_can_stealth = true;
 
-	for(uint32 x=0;x<5;x++)
-		BaseStats[x]=0;
+	for( uint32 x = 0; x < 5; x++ )
+	{
+		BaseStats[x] = 0;
+	}
 
 	m_H_regenTimer = 2000;
 	m_P_regenTimer = 2000;
@@ -153,20 +162,21 @@ Unit::Unit()
 	//		CalculateActualArmor();
 
 	m_aiInterface = new AIInterface();
-	m_aiInterface->Init(this, AITYPE_AGRO, MOVEMENTTYPE_NONE);
+	m_aiInterface->Init( this, AITYPE_AGRO, MOVEMENTTYPE_NONE );
 
 	m_emoteState = 0;
 	m_oldEmote = 0;	
 	
-	BaseDamage[0]=0;
-	BaseOffhandDamage[0]=0;
-	BaseRangedDamage[0]=0;
-	BaseDamage[1]=0;
-	BaseOffhandDamage[1]=0;
-	BaseRangedDamage[1]=0;
+	BaseDamage[0] = 0;
+	BaseOffhandDamage[0] = 0;
+	BaseRangedDamage[0] = 0;
+	BaseDamage[1] = 0;
+	BaseOffhandDamage[1] = 0;
+	BaseRangedDamage[1] = 0;
 
 	m_CombatUpdateTimer = 0;
-	for(uint32 x=0;x<7;x++)
+
+	for( uint32 x = 0; x < 7; x++ )
 	{
 		SchoolImmunityList[x] = 0;
 		BaseResistance[x] = 0;
@@ -181,14 +191,15 @@ Unit::Unit()
 		SpellCritChanceSchool[x] = 0;
 		PowerCostMod[x] = 0;
 		PowerCostPctMod[x] = 0; // armor penetration & spell penetration
-		AttackerCritChanceMod[x]=0;
-		CritMeleeDamageTakenPctMod[x]=0;
-		CritRangedDamageTakenPctMod[x]=0;
+		AttackerCritChanceMod[x] = 0;
+		CritMeleeDamageTakenPctMod[x] = 0;
+		CritRangedDamageTakenPctMod[x] = 0;
 	}
+
 	DamageTakenPctModOnHP35 = 1;
 	RangedDamageTaken = 0;
 
-	for(int i = 0; i < 5; i++)
+	for( int32 i = 0; i < 5; i++ )
 	{
 		m_detectRangeGUID[i] = 0;
 		m_detectRangeMOD[i] = 0;
@@ -198,13 +209,14 @@ Unit::Unit()
 
 	m_threatModifyer = 0;
 	m_generatedThreatModifyer = 0;
-	memset(m_auras, 0, (MAX_AURAS+MAX_PASSIVE_AURAS)*sizeof(Aura*));
+	memset( m_auras, 0, ( MAX_AURAS + MAX_PASSIVE_AURAS ) * sizeof( Aura* ) );
 	
 	// diminishing return stuff
-	memset(m_diminishAuraCount, 0, 23);
-	memset(m_diminishCount, 0, 23*2);
-	memset(m_diminishTimer, 0, 23*2);
-	memset(m_auraStackCount, 0, MAX_AURAS);
+	memset( m_diminishAuraCount, 0, 23 );
+	memset( m_diminishCount, 0, 23 * 2 );
+	memset( m_diminishTimer, 0, 23 * 2 );
+	memset( m_auraStackCount, 0, MAX_AURAS );
+
 	m_diminishActive = false;
 	dynObj = 0;
 	pLastSpell = 0;
@@ -220,12 +232,12 @@ Unit::Unit()
 	m_procCounter = 0;
 	m_extrastriketargets = 0;
 	m_damgeShieldsInUse = false;
-//	fearSpell = 0;
+	//fearSpell = 0;
 	m_extraAttackCounter = false;
-	CombatStatus.SetUnit(this);
-	m_temp_summon=false;
-	m_chargeSpellsInUse=false;
-	m_spellsbusy=false;
+	CombatStatus.SetUnit( this );
+	m_temp_summon = false;
+	m_chargeSpellsInUse = false;
+	m_spellsbusy = false;
 	m_interruptedRegenTime = 0;
 }
 
@@ -233,39 +245,72 @@ Unit::~Unit()
 {  
 	RemoveAllAuras();
 
-	if(SM_CriticalChance != 0) delete [] SM_CriticalChance ;
-	if(SM_FDur != 0) delete [] SM_FDur ;//flat
-	if(SM_PDur != 0) delete [] SM_PDur ;//pct
-	if(SM_FRadius != 0) delete [] SM_FRadius ;
-	if(SM_FRange != 0) delete [] SM_FRange ;
-	if(SM_PCastTime != 0) delete [] SM_PCastTime ;
-	if(SM_FCastTime != 0) delete [] SM_FCastTime ;
-	if(SM_PCriticalDamage != 0) delete [] SM_PCriticalDamage ;
-	if(SM_FDOT != 0) delete [] SM_FDOT ;
-	if(SM_PDOT != 0) delete [] SM_PDOT ;
-	if(SM_PEffectBonus != 0) delete [] SM_PEffectBonus ;
-    if(SM_FEffectBonus != 0) delete [] SM_FEffectBonus ;
-	if(SM_FDamageBonus != 0) delete [] SM_FDamageBonus ;
-	if(SM_PDamageBonus != 0) delete [] SM_PDamageBonus ;
-	if(SM_PSPELL_VALUE != 0) delete [] SM_PSPELL_VALUE ;
-	if(SM_FSPELL_VALUE != 0) delete [] SM_FSPELL_VALUE ;
-	if(SM_FHitchance != 0) delete [] SM_FHitchance ;
-	if(SM_PRange != 0) delete [] SM_PRange ;//pct
-	if(SM_PRadius != 0) delete [] SM_PRadius ;
-	if(SM_PAPBonus != 0) delete [] SM_PAPBonus ;
-	if(SM_PCost != 0) delete [] SM_PCost ;
-	if(SM_FCost != 0) delete [] SM_FCost ;
-	if(SM_FAdditionalTargets != 0) delete [] SM_FAdditionalTargets ;
-	if(SM_PJumpReduce != 0) delete [] SM_PJumpReduce ;
-	if(SM_FSpeedMod != 0) delete [] SM_FSpeedMod ;
-	if(SM_PNonInterrupt != 0) delete [] SM_PNonInterrupt ;
-	if(SM_FPenalty != 0) delete [] SM_FPenalty ;
-	if(SM_PPenalty != 0) delete [] SM_PPenalty ;
-	if(SM_FCooldownTime != 0) delete [] SM_FCooldownTime ;
-	if(SM_PCooldownTime != 0) delete [] SM_PCooldownTime ;
-	if(SM_FChanceOfSuccess != 0) delete [] SM_FChanceOfSuccess ;
-	if(SM_FRezist_dispell != 0) delete [] SM_FRezist_dispell ;
-	if(SM_PRezist_dispell != 0) delete [] SM_PRezist_dispell ;
+	if( SM_CriticalChance != NULL )
+		delete[] SM_CriticalChance;
+	if( SM_FDur != NULL ) // flat
+		delete[] SM_FDur;
+	if( SM_PDur != NULL ) // pct
+		delete[] SM_PDur;
+	if( SM_FRadius != NULL )
+		delete[] SM_FRadius;
+	if( SM_FRange != NULL )
+		delete[] SM_FRange;
+	if( SM_PCastTime != NULL )
+		delete[] SM_PCastTime;
+	if( SM_FCastTime != NULL )
+		delete[] SM_FCastTime;
+	if( SM_PCriticalDamage != NULL )
+		delete[] SM_PCriticalDamage;
+	if( SM_FDOT != NULL )
+		delete[] SM_FDOT;
+	if( SM_PDOT != NULL )
+		delete[] SM_PDOT;
+	if( SM_PEffectBonus != NULL )
+		delete[] SM_PEffectBonus;
+    if( SM_FEffectBonus != NULL )
+		delete[] SM_FEffectBonus;
+	if( SM_FDamageBonus != NULL )
+		delete[] SM_FDamageBonus;
+	if( SM_PDamageBonus != NULL )
+		delete[] SM_PDamageBonus;
+	if( SM_PSPELL_VALUE != NULL )
+		delete[] SM_PSPELL_VALUE;
+	if( SM_FSPELL_VALUE != NULL )
+		delete[] SM_FSPELL_VALUE;
+	if( SM_FHitchance != NULL )
+		delete[] SM_FHitchance;
+	if( SM_PRange != NULL ) // pct
+		delete[] SM_PRange;
+	if( SM_PRadius != NULL )
+		delete[] SM_PRadius;
+	if( SM_PAPBonus != 0)
+		delete[] SM_PAPBonus;
+	if( SM_PCost != 0)
+		delete[] SM_PCost;
+	if( SM_FCost != 0)
+		delete[] SM_FCost;
+	if( SM_FAdditionalTargets != NULL )
+		delete[] SM_FAdditionalTargets;
+	if( SM_PJumpReduce != NULL )
+		delete[] SM_PJumpReduce;
+	if( SM_FSpeedMod != NULL )
+		delete[] SM_FSpeedMod;
+	if( SM_PNonInterrupt != NULL )
+		delete[] SM_PNonInterrupt;
+	if( SM_FPenalty != NULL )
+		delete[] SM_FPenalty;
+	if( SM_PPenalty != NULL )
+		delete[] SM_PPenalty;
+	if( SM_FCooldownTime != NULL )
+		delete[] SM_FCooldownTime;
+	if( SM_PCooldownTime != NULL )
+		delete[] SM_PCooldownTime;
+	if( SM_FChanceOfSuccess != NULL )
+		delete[] SM_FChanceOfSuccess;
+	if( SM_FRezist_dispell != NULL )
+		delete[] SM_FRezist_dispell;
+	if( SM_PRezist_dispell != NULL )
+		delete[] SM_PRezist_dispell;
 
 	delete m_aiInterface;
 
@@ -273,7 +318,7 @@ Unit::~Unit()
 		if(m_ObjectSlots[i])
 			delete m_ObjectSlots[i];*/
 
-	if(m_currentSpell)
+	if( m_currentSpell != NULL )
 		m_currentSpell->cancel();
 }
 
@@ -281,10 +326,11 @@ void Unit::Update( uint32 p_time )
 {
 	_UpdateSpells( p_time );
 
-	if(!isDead())
+	if( !isDead() )
 	{
 		//-----------------------POWER & HP REGENERATION-----------------
-/* Please dont do temp fixes. Better report to me. Thx. Shady */
+		/* Please dont do temp fixes. Better report to me. Thx. Shady */
+
         if( p_time >= m_H_regenTimer )
 		    RegenerateHealth();
 	    else
@@ -298,9 +344,9 @@ void Unit::Update( uint32 p_time )
 		else
 		{
 			m_P_regenTimer -= p_time;
-			if (m_interruptedRegenTime)
+			if( m_interruptedRegenTime )
 			{
-				if(p_time>=m_interruptedRegenTime)
+				if( p_time >= m_interruptedRegenTime )
 					RegeneratePower( true );
 				else
 					m_interruptedRegenTime -= p_time;
@@ -308,18 +354,18 @@ void Unit::Update( uint32 p_time )
 		}
 
 
-		if(m_aiInterface != NULL && m_useAI)
+		if( m_aiInterface != NULL && m_useAI )
 			m_aiInterface->Update(p_time);
 
-		if(m_diminishActive)
+		if( m_diminishActive )
 		{
 			uint32 count = 0;
-			for(uint32 x = 0; x < 16; ++x)
+			for( uint32 x = 0; x < 16; ++x )
 			{
 				// diminishing return stuff
-				if(m_diminishTimer[x] && !m_diminishAuraCount[x])
+				if( m_diminishTimer[x] && !m_diminishAuraCount[x] )
 				{
-					if(p_time >= m_diminishTimer[x])
+					if( p_time >= m_diminishTimer[x] )
 					{
 						// resetting after 15 sec
 						m_diminishTimer[x] = 0;
@@ -333,7 +379,7 @@ void Unit::Update( uint32 p_time )
 					}
 				}
 			}
-			if(!count)
+			if( !count )
 				m_diminishActive = false;
 		}
 
@@ -355,8 +401,8 @@ bool Unit::canReachWithAttack(Unit *pVictim)
 	if( GetMapId() != pVictim->GetMapId() )
 		return false;
 
-	float distance = sqrt(GetDistanceSq(pVictim));
-	float attackreach = (((targetradius*targetscale) + selfreach) + (((selfradius*selfradius)*selfscale)+1.50f));
+	float distance = sqrt( GetDistanceSq( pVictim ) );
+	float attackreach = ( ( ( targetradius * targetscale ) + selfreach) + ( ( ( selfradius * selfradius ) * selfscale ) + 1.50f ) );
 
 	//formula adjustment for player side.
 	if( IsPlayer() )
@@ -403,23 +449,25 @@ bool Unit::canReachWithAttack(Unit *pVictim)
 
 void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 {
-	if(!PlayerInGroup) 
+	if( PlayerInGroup == NULL ) 
 		return;
-	if(!pVictim) 
+	if( pVictim == NULL ) 
 		return;
-	if(!PlayerInGroup->InGroup()) 
+	if( !PlayerInGroup->InGroup() ) 
 		return;
-	Group *pGroup = PlayerInGroup->GetGroup();
-	uint32 xp;
-	if(!pGroup) 
+	Group* pGroup = PlayerInGroup->GetGroup();
+	if( pGroup == NULL ) 
 		return;
 
+	uint32 xp;
+
 	//Get Highest Level Player, Calc Xp and give it to each group member
-	Player *pHighLvlPlayer = NULL;
-	Player *pGroupGuy = NULL;
-	  int active_player_count=0;
-	Player *active_player_list[MAX_GROUP_SIZE_RAID];//since group is small we can afford to do this ratehr then recheck again the whole active player set
-	int total_level=0;
+	Player* pHighLvlPlayer = NULL;
+	Player* pGroupGuy = NULL;
+	Player* active_player_list[MAX_GROUP_SIZE_RAID];//since group is small we can afford to do this ratehr then recheck again the whole active player set
+
+	int active_player_count = 0;
+	int total_level = 0;
 	float xp_mod = 1.0f;
 
 /*	if(pGroup->GetGroupType() == GROUP_TYPE_RAID)
@@ -443,23 +491,23 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 	//we only take into count players that are near us, on same map
 	GroupMembersSet::iterator itr;
 	pGroup->Lock();
-	for(uint32 i = 0; i < pGroup->GetSubGroupCount(); i++) {
-		for(itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
+	for( uint32 i = 0; i < pGroup->GetSubGroupCount(); i++ )
+	{
+		for( itr = pGroup->GetSubGroup(i)->GetGroupMembersBegin(); itr != pGroup->GetSubGroup(i)->GetGroupMembersEnd(); ++itr)
 		{
 			pGroupGuy = (*itr)->m_loggedInPlayer;
-			if( pGroupGuy && 
-				pGroupGuy->isAlive() && 
+			if( pGroupGuy != NULL && pGroupGuy->isAlive() && 
 //				PlayerInGroup->GetInstanceID()==pGroupGuy->GetInstanceID() &&
 				pVictim->GetMapMgr() == pGroupGuy->GetMapMgr() && 
-				pGroupGuy->GetDistanceSq(pVictim)<100*100
+				pGroupGuy->GetDistanceSq( pVictim ) < 100 * 100
 				)
 			{
-				active_player_list[active_player_count]=pGroupGuy;
+				active_player_list[active_player_count] = pGroupGuy;
 				active_player_count++;
 				total_level += pGroupGuy->getLevel();
-				if(pHighLvlPlayer)
+				if( pHighLvlPlayer != NULL )
 				{
-					if(pGroupGuy->getLevel() > pHighLvlPlayer->getLevel())
+					if( pGroupGuy->getLevel() > pHighLvlPlayer->getLevel() )
 						pHighLvlPlayer = pGroupGuy;
 				}
 				else 
@@ -468,48 +516,52 @@ void Unit::GiveGroupXP(Unit *pVictim, Player *PlayerInGroup)
 		}
 	}
 	pGroup->Unlock();
-	if(active_player_count<1) //killer is always close to the victim. This should never execute
+	if( active_player_count < 1 ) //killer is always close to the victim. This should never execute
 	{
-		if(PlayerInGroup == 0)
+		if( PlayerInGroup == 0 )
 		{
-			PlayerInfo * pleaderinfo = pGroup->GetLeader();
-			if(!pleaderinfo->m_loggedInPlayer)
+			PlayerInfo* pleaderinfo = pGroup->GetLeader();
+			if( pleaderinfo->m_loggedInPlayer == NULL )
 				return;
 
 			PlayerInGroup = pleaderinfo->m_loggedInPlayer;
 		}
 
-		xp = CalculateXpToGive(pVictim, PlayerInGroup);
-		PlayerInGroup->GiveXP(xp, pVictim->GetGUID(), true);
+		xp = CalculateXpToGive( pVictim, PlayerInGroup );
+		PlayerInGroup->GiveXP( xp, pVictim->GetGUID(), true );
 	}
 	else
 	{
 		if( pGroup->GetGroupType() == GROUP_TYPE_PARTY)
 		{
-			if(active_player_count==3)
-				xp_mod=1.1666f;
-			else if(active_player_count==4)
-				xp_mod=1.3f;
-			else if(active_player_count==5)
-				xp_mod=1.4f;
-			else xp_mod=1;//in case we have only 2 members ;)
+			if( active_player_count == 3 )
+				xp_mod = 1.1666f;
+			else if( active_player_count == 4 )
+				xp_mod = 1.3f;
+			else if( active_player_count == 5 )
+				xp_mod = 1.4f;
+			else
+				xp_mod = 1.0f;//in case we have only 2 members ;)
 		}
-		else if(pGroup->GetGroupType() == GROUP_TYPE_RAID)
-			xp_mod=0.5f;
+		else if( pGroup->GetGroupType() == GROUP_TYPE_RAID )
+			xp_mod = 0.5f;
 
-		if(pHighLvlPlayer == 0)
+		if( pHighLvlPlayer == NULL )
 		{
-			PlayerInfo * pleaderinfo = pGroup->GetLeader();
-			if(!pleaderinfo->m_loggedInPlayer)
+			PlayerInfo* pleaderinfo = pGroup->GetLeader();
+			if( pleaderinfo->m_loggedInPlayer == NULL )
 				return;
 
 			pHighLvlPlayer = pleaderinfo->m_loggedInPlayer;
 		}
 
-		xp = CalculateXpToGive(pVictim, pHighLvlPlayer);
+		xp = CalculateXpToGive( pVictim, pHighLvlPlayer );
+
 		//i'm not sure about this formula is correct or not. Maybe some brackets are wrong placed ?
-		for(int i=0;i<active_player_count;i++)
-			active_player_list[i]->GiveXP( float2int32(((xp*active_player_list[i]->getLevel()) / total_level)*xp_mod), pVictim->GetGUID(), true );
+		for( int i = 0; i < active_player_count; i++ )
+		{
+			active_player_list[i]->GiveXP( float2int32( ( ( xp * active_player_list[i]->getLevel()) / total_level ) * xp_mod ), pVictim->GetGUID(), true );
+		}
 	}
 		/* old code start before 2007 04 22
 		GroupMembersSet::iterator itr;
@@ -724,10 +776,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 14189: //Seal Fate
 						case 16953: //Blood Frenzy
 						{
-							if( !this->IsPlayer() || 
-								!CastingSpell || 
-								CastingSpell->Id == 14189 ||
-								CastingSpell->Id == 16953 )
+							if( CastingSpell == NULL )
 								continue;
 							if( CastingSpell->Effect[0] != 80 &&
 								CastingSpell->Effect[1] != 80 &&
@@ -737,6 +786,8 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						}break;
 						case 17106: //druid intencity
 						{
+							if( CastingSpell == NULL )
+								continue;
 							if( CastingSpell->Id != 5229 )//enrage
 								continue;
 						}break;
@@ -748,20 +799,19 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						}break;
 						case 37309:
 						{
-							if( !this->IsPlayer() )
-								continue;
 							if( static_cast< Player* >( this )->GetShapeShift() != FORM_BEAR ||
 								static_cast< Player* >( this )->GetShapeShift() != FORM_DIREBEAR )
 								continue;
 						}break;
 						case 37310:
 						{
-							if( !this->IsPlayer() || static_cast< Player* >( this )->GetShapeShift() != FORM_CAT )
+							if( static_cast< Player* >( this )->GetShapeShift() != FORM_CAT )
 								continue;
 						}break;
                         case 34754: //holy concentration
                         {
-
+							if( CastingSpell == NULL )
+								continue;
 							if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL &&
 								CastingSpell->NameHash != SPELL_HASH_BINDING_HEAL &&
 								CastingSpell->NameHash != SPELL_HASH_GREATER_HEAL )
@@ -800,7 +850,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								Item* it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
 								if( it != NULL && it->GetProto() )
 								{
-									uint32 reqskill=GetSkillByProto( it->GetProto()->Class, it->GetProto()->SubClass );
+									uint32 reqskill = GetSkillByProto( it->GetProto()->Class, it->GetProto()->SubClass );
 									if( reqskill != SKILL_SWORDS && reqskill != SKILL_2H_SWORDS )
 										continue;
 								}
@@ -833,9 +883,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						{
 							if( CastingSpell == NULL )
 								continue;
-								if( CastingSpell->NameHash != SPELL_HASH_REND && 
-									CastingSpell->NameHash != SPELL_HASH_DEEP_WOUNDS )
-									continue;
+							if( CastingSpell->NameHash != SPELL_HASH_REND && 
+								CastingSpell->NameHash != SPELL_HASH_DEEP_WOUNDS )
+								continue;
 						}break;
 						//warrior - Unbridled Wrath
 						case 12964:
@@ -876,6 +926,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								continue;
 							if( CastingSpell->School != SCHOOL_FIRE )
 								continue;
+							SpellEntry* spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
+							SpellDuration* sd = dbcSpellDuration.LookupEntryForced( spellInfo->DurationIndex );
+							uint32 tickcount = GetDuration( sd ) / spellInfo->EffectAmplitude[0] ;
+							dmg_overwrite = ospinfo->EffectBasePoints[0] * dmg / (100  * tickcount );
 						}break;
 						//rogue - blade twisting
 						case 31125:
@@ -902,6 +956,41 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell->NameHash!=SPELL_HASH_SHADOW_BOLT)//shadow bolt								
 									continue;
 							}break;
+						// warlock - Seed of Corruption
+						case 27285:
+							{
+								bool can_proc_now = false;
+								//if we proced on spell tick
+								if( flag & PROC_ON_SPELL_HIT_VICTIM )
+								{
+									if( CastingSpell == NULL )
+										continue;
+									//only trigger effect for specified spells
+									if( CastingSpell->NameHash != SPELL_HASH_SEED_OF_CORRUPTION )						
+										continue;
+									//this spell builds up in time
+									(*itr2).procCharges += dmg;
+									if( (int32)(*itr2).procCharges >= ospinfo->EffectBasePoints[ 1 ] && //if charge built up
+										dmg < (int32)this->GetUInt32Value( UNIT_FIELD_HEALTH ) ) //if this is not a killer blow
+										can_proc_now = true;
+								}
+								else can_proc_now = true; //target died
+								if( can_proc_now == false )
+									continue;
+								Unit *new_caster = victim;
+								if( new_caster && new_caster->isAlive() )
+								{
+									SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
+									Spell *spell = new Spell( new_caster, spellInfo ,true, NULL );
+									SpellCastTargets targets;
+									targets.m_destX = GetPositionX();
+									targets.m_destY = GetPositionY();
+									targets.m_destZ = GetPositionZ();
+									spell->prepare(&targets);
+								}
+								(*itr2).deleted = true;
+								continue;
+							}break;
 						// warlock - Improved Drain Soul
 						case 18371:
 							{
@@ -918,8 +1007,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 25228:
 							{
 								//we need a pet for this, else we do not trigger it at all
-								if( IsPlayer() )
-									continue;
 								Unit* new_caster;
 								if( static_cast< Player* >( this )->GetSummon() )
 									new_caster = static_cast< Player* >( this )->GetSummon();
@@ -942,7 +1029,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 17941:
 							{
 								if( CastingSpell == NULL )
-									continue;//this should not ocur unless we made a fuckup somewhere
+									continue;
 								//only trigger effect for specified spells
 								if( CastingSpell->NameHash != SPELL_HASH_CORRUPTION && //Corruption
 									CastingSpell->NameHash != SPELL_HASH_DRAIN_LIFE )//Drain Life								
@@ -1126,7 +1213,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 15357:
 						case 15359:
 							{
-								if( !CastingSpell || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) )
+								if( CastingSpell == NULL )
+									continue;
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) )
 									continue;
 							}
 							break;
@@ -1135,7 +1224,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
                         case 27817:
                         case 27818:
                             {
-                                if(!IsPlayer() || !dmg)
+                                if( !dmg )
                                     continue;
                                 SpellEntry *parentproc= dbcSpell.LookupEntry(origId);
                                 SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId);
@@ -1169,16 +1258,16 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //healing wave
 									continue;
 							}break;
-							//shaman - Ancestral Fortitude
-						case 16177:
-						case 16236:
-						case 16237:
-							{
-								if( CastingSpell == NULL )
-									continue;
-								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) ) //healing spell
-									continue;
-							}break;
+                        //shaman - Ancestral Fortitude
+                        case 16177:
+                        case 16236:
+                        case 16237:
+                            {
+                                if( CastingSpell == NULL )
+                                    continue;
+                                if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) ) //healing spell
+                                    continue;
+                            }break;
 						//shaman - windfurry weapon
 						case 8232:
 						case 8235:
@@ -1186,8 +1275,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 16362:
 						case 25505:
 							{
-								if(!IsPlayer())
-									continue;
 								//!! The wierd thing is that we need the spell thet trigegred this enchant spell in order to output logs ..we are using oldspell info too 
 								//we have to recalc the value of this spell
 								SpellEntry *spellInfo = dbcSpell.LookupEntry(origId);
@@ -1215,7 +1302,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;//this should not ocur unless we made a fuckup somewhere
 								int32 proc_Chance;
 								//chance is based actually on combopoint count and not 100% always 
-								if( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE && IsPlayer())
+								if( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE )
 									proc_Chance = static_cast< Player* >( this )->m_comboPoints*ospinfo->EffectBasePoints[1];
 								else continue;
 								if(!Rand(proc_Chance))
@@ -1337,7 +1424,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 35547:
 						case 35548:
 							{
-								if( !IsPlayer() || !dmg )
+								if( !dmg )
 									continue;
 								//this needs offhand weapon
 								Item* it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
@@ -1410,14 +1497,12 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;//this should not ocur unless we made a fuckup somewhere
 								if(	CastingSpell->NameHash != SPELL_HASH_JUDGEMENT )
 									continue;
-								if( !IsPlayer() )
-									continue; //great, we can only make this for players 
 								Player* c = static_cast< Player* >( this );
 								//printf("is there a seal on the player ? %u \n",c->Seal);
 								if( !c->Seal )
 									continue; //how the hack did we manage to cast judgement without a seal ?
-								SpellEntry *spellInfo = dbcSpell.LookupEntry( c->Seal ); //null pointer check was already made
-								if( !spellInfo )
+								SpellEntry* spellInfo = dbcSpell.LookupEntry( c->Seal ); //null pointer check was already made
+								if( spellInfo == NULL )
 									continue;	//now this is getting freeky, how the hell did we manage to create this bug ?
 								dmg_overwrite = spellInfo->manaCost / 2 ; //only half dmg
 								//printf("is there a seal on the player ? %u \n",dmg_overwrite);
@@ -1469,70 +1554,90 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}break;
 						case 37565: //setbonus
 							{
-								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL)
 									continue;
 							}break;
 						//SETBONUSES
 						case 37379:
 							{
-								if (!CastingSpell || CastingSpell->School != SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->School != SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						case 37378:
 							{
-								if (!CastingSpell || CastingSpell->School != SCHOOL_FIRE || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->School != SCHOOL_FIRE || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						case 39950:
 							{
-								if (!CastingSpell ||  !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
+								if( CastingSpell == NULL )
+									continue;
+								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
 									continue;
 							}break;
 						case 37234:
 						case 37214:
 						case 37601:
 							{
-								if (!CastingSpell ||  !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell == NULL )
+									continue;
+								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
 							}break;
 						case 37237:
 							{
-								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT)
 									continue;
 							}break;
 						case 37193:
 							{
-								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD)
 									continue;
 							}break;
 						case 37196:
 						case 43838:
 							{
-								if (!CastingSpell)
+								if( CastingSpell == NULL )
 									continue;
-								if (CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER &&
+								if( CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_THE_CRUSADER &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_JUSTICE &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_LIGHT &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_WISDOM &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_RIGHTEOUSNESS &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_BLOOD &&
 									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_VENGEANCE &&
-									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_COMMAND)
+									CastingSpell->NameHash != SPELL_HASH_JUDGEMENT_OF_COMMAND )
 									continue;
 							}break;
 						case 43837:
 							{
-								if (!CastingSpell || (CastingSpell->NameHash != SPELL_HASH_FLASH_OF_LIGHT && CastingSpell->NameHash != SPELL_HASH_HOLY_LIGHT))
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_FLASH_OF_LIGHT && CastingSpell->NameHash != SPELL_HASH_HOLY_LIGHT )
 									continue;
 							}break;
 						case 37529:
 							{
-								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_OVERPOWER)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->NameHash != SPELL_HASH_OVERPOWER)
 									continue;
 							}break;
 						case 37517:
 							{
-								if (!CastingSpell || CastingSpell->Id == 37517 || CastingSpell->NameHash != SPELL_HASH_REVENGE)
+								if( CastingSpell == NULL )
+									continue;
+								if( CastingSpell->Id == 37517 || CastingSpell->NameHash != SPELL_HASH_REVENGE)
 									continue; 
 							}break;
 						//SETBONUSES END
@@ -1541,7 +1646,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING)) //requires healing spell.
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) ) //requires healing spell.
 									continue;
 							}break;
 /*						//paladin - illumination
@@ -1558,6 +1663,22 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}break;*/
 					}
 				}
+				else
+				{
+					switch( spellId )
+					{
+						case 14189: //Seal Fate
+						case 16953: //Blood Frenzy
+						{
+							if( CastingSpell == NULL )
+								continue;
+							if( CastingSpell->Id == 14189 ||
+								CastingSpell->Id == 16953 )
+								continue;
+						}break;
+					}
+				}
+
 				if(spellId==22858 && isInBack(victim)) //retatliation needs target to be not in front. Can be casted by creatures too
 					continue;
 				SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
@@ -2494,25 +2615,39 @@ else
 					printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg.full_damage,ability->SpellGroupType);
 #endif
 			}
-			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type]+add_damage;
+			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type] + add_damage;
 			if( weapon_damage_type == RANGED )
 			{
-				dmg.full_damage+=pVictim->RangedDamageTaken;
+				dmg.full_damage += pVictim->RangedDamageTaken;
 			}
 			
-			if(ability && ability->MechanicsType == MECHANIC_BLEEDING)
+			if( ability && ability->MechanicsType == MECHANIC_BLEEDING )
 				disable_dR = true; 
 			
-			float summaryPCTmod = pVictim->DamageTakenPctMod[dmg.school_type]+this->DamageDoneModPCT[dmg.school_type];
+			//float summaryPCTmod = (pVictim->DamageTakenPctMod[dmg.school_type] / 100.0f) + (GetDamageDonePctMod( dmg.school_type ) / 100.0f) + 1;
 
-			if(pct_dmg_mod > 0)
-				dmg.full_damage = float2int32(dmg.full_damage*(float(pct_dmg_mod)/100.0f));
+			if( pct_dmg_mod > 0 )
+				dmg.full_damage = float2int32( dmg.full_damage *  ( float( pct_dmg_mod) / 100.0f ) );
 
 			//a bit dirty fix
-			if(ability && ability->NameHash == SPELL_HASH_SHRED)
-				summaryPCTmod += pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
+			/*if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
+			{
+				summaryPCTmod *= 1 + pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING];
+			}*/
 
-			dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
+			//dmg.full_damage = (dmg.full_damage < 0) ? 0 : float2int32(dmg.full_damage*summaryPCTmod);
+
+			// burlex: fixed this crap properly
+			float inital_dmg = float(dmg.full_damage);
+			float dd_mod = GetDamageDonePctMod( dmg.school_type );
+			if( pVictim->DamageTakenPctMod[dmg.school_type] > 1.0f )
+				dmg.full_damage += float2int32( ( inital_dmg * pVictim->DamageTakenPctMod[ dmg.school_type ] ) - inital_dmg );
+
+			if( dd_mod > 1.0f )
+				dmg.full_damage += float2int32( ( inital_dmg * dd_mod) - inital_dmg );
+
+			if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
+				dmg.full_damage += float2int32( ( inital_dmg * (1 + pVictim->ModDamageTakenByMechPCT[MECHANIC_BLEEDING]) ) - inital_dmg );
 
 			//pet happiness state dmg modifier
 			if( IsPet() && !static_cast<Pet*>(this)->IsSummon() )
@@ -2803,6 +2938,32 @@ else
 				SpellNonMeleeDamageLog(pVictim, itr->second.spellid, dmg, true);
 			}
 		}
+
+		// refresh judgements
+		// TODO: find the opcode to refresh the aura or just remove it and re add it
+		// rather than fuck with duration
+		for( uint32 x = MAX_POSITIVE_AURAS; x <= MAX_AURAS; x++ )
+		{
+			if( pVictim->m_auras[x] && pVictim->m_auras[x]->GetUnitCaster() && pVictim->m_auras[x]->GetUnitCaster()->GetGUID() == GetGUID() && pVictim->m_auras[x]->GetSpellProto()->buffIndexType == SPELL_TYPE_INDEX_JUDGEMENT )
+			{
+				pVictim->m_auras[x]->SetDuration( 20000 ); // 20 seconds?
+				sEventMgr.ModifyEventTimeLeft( pVictim->m_auras[x], EVENT_AURA_REMOVE, 20000 );
+			
+				// We have to tell the target that the aura has been refreshed.
+				if( pVictim->IsPlayer() )
+				{
+					WorldPacket data( 5 );
+					data.SetOpcode( SMSG_UPDATE_AURA_DURATION );
+					data << (uint8)pVictim->m_auras[x]->GetAuraSlot() << 20000;
+					static_cast< Player* >( pVictim )->GetSession()->SendPacket( &data );
+				}
+				// However, there is also an opcode that tells the caster that the aura has been refreshed.
+				// This isn't implemented anywhere else in the source, so I can't work on that part :P
+				// (The 'cooldown' meter on the target frame that shows how long the aura has until expired does not get reset)=
+				// I would say break; here, but apparently in Ascent, one paladin can have multiple judgements on the target. No idea if this is blizzlike or not.
+			}
+		}
+
 	}
 	
 //==========================================================================================
@@ -3288,7 +3449,10 @@ void Unit::AddAura(Aura *aur)
 	// We add 500ms here to allow for the last tick in DoT spells. This is a dirty hack, but at least it doesn't crash like my other method.
 	// - Burlex
 	if(aur->GetDuration() > 0)
-		sEventMgr.AddEvent(aur, &Aura::Remove, EVENT_AURA_REMOVE, aur->GetDuration() + 500, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	{
+		sEventMgr.AddEvent(aur, &Aura::Remove, EVENT_AURA_REMOVE, aur->GetDuration() + 500, 1,
+			EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT | EVENT_FLAG_DELETES_OBJECT);
+	}
 
 	aur->RelocateEvents();
 
@@ -3323,11 +3487,11 @@ bool Unit::RemoveAura(Aura *aur)
 
 bool Unit::RemoveAura(uint32 spellId)
 {//this can be speed up, if we know passive \pos neg
-	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+	for( uint32 x = 0; x < MAX_AURAS + MAX_PASSIVE_AURAS; x++ )
 	{
-		if(m_auras[x])
+		if( m_auras[x] != NULL )
 		{
-			if(m_auras[x]->GetSpellId()==spellId)
+			if( m_auras[x]->GetSpellId() == spellId )
 			{
 				m_auras[x]->Remove();
 				return true;
@@ -3857,11 +4021,11 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 					data << uint32(0);			// new in 2.1.0
 					data << uint32(UnitNameLength);
 					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
+					data << static_cast< Player* >( *i )->GetGUID();
 					data << uint32(strlen(szMessage.str().c_str())+1);
 					data << szMessage.str().c_str();
 					data << uint8(0x00);
-					WorldSession *session = ((Player*)(*i))->GetSession();
+					WorldSession* session = static_cast< Player* >( *i )->GetSession();
 					session->SendPacket(&data);
 				}
 			}
@@ -3882,12 +4046,12 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 					data << uint32(0);			// new in 2.1.0
 					data << uint32(UnitNameLength);
 					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
+					data << static_cast< Player* >( *i )->GetGUID();
 					data << uint32(strlen(szMessage.str().c_str())+1);
 					data << szMessage.str().c_str();
 					data << uint8(0x00);
 
-					WorldSession *session = ((Player*)(*i))->GetSession();
+					WorldSession* session = static_cast< Player* >( *i )->GetSession();
 					session->SendPacket(&data);
 				}
 			}
@@ -3905,12 +4069,12 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 					data << uint32(0);			// new in 2.1.0
 					data << uint32(UnitNameLength);
 					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
+					data << static_cast< Player* >( *i )->GetGUID();
 					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
-					WorldSession *session = ((Player*)(*i))->GetSession();
+					WorldSession* session = static_cast< Player* >( *i )->GetSession();
 					session->SendPacket(&data);
 				}
 			}
@@ -3928,12 +4092,12 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 					data << uint32(0);			// new in 2.1.0
 					data << uint32(UnitNameLength);
 					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
+					data << static_cast< Player* >( *i )->GetGUID();
 					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
-					WorldSession *session = ((Player*)(*i))->GetSession();
+					WorldSession* session = static_cast< Player* >( *i )->GetSession();
 					session->SendPacket(&data);
 				}
 			}
@@ -3951,12 +4115,12 @@ void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, 
 					data << uint32(0);			// new in 2.1.0
 					data << uint32(UnitNameLength);
 					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
+					data << static_cast< Player* >( *i )->GetGUID();
 					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
-					WorldSession *session = ((Player*)(*i))->GetSession();
+					WorldSession* session = static_cast< Player* >( *i )->GetSession();
 					session->SendPacket(&data);
 				}
 			}
@@ -3993,12 +4157,12 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 					data << uint32(0);			// new in 2.1.0
 					data << uint32(UnitNameLength);
 					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
+					data << static_cast< Player* >( *i )->GetGUID();
 					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
-					WorldSession *session = ((Player*)(*i))->GetSession();
+					WorldSession* session = static_cast< Player* >( *i )->GetSession();
 					session->SendPacket(&data);
 				}
 			}
@@ -4031,12 +4195,12 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 								data << uint32(0);			// new in 2.1.0
 								data << uint32(UnitNameLength);
 								data << UnitName;
-								data << ((Player*)(*i))->GetGUID();
+								data << static_cast< Player* >( *i )->GetGUID();
 								data << uint32(MessageLength);
 								data << msg;
 								data << uint8(0x00);
 
-								WorldSession *session = ((Player*)(*i))->GetSession();
+								WorldSession* session = static_cast< Player* >( *i )->GetSession();
 								session->SendPacket(&data);
 							}
 						}
@@ -4059,12 +4223,12 @@ void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 					data << uint32(0);			// new in 2.1.0
 					data << uint32(UnitNameLength);
 					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
+					data << static_cast< Player* >( *i )->GetGUID();
 					data << uint32(MessageLength);
 					data << msg;
 					data << uint8(0x00);
 
-					WorldSession *session = ((Player*)(*i))->GetSession();
+					WorldSession* session = static_cast< Player* >( *i )->GetSession();
 					session->SendPacket(&data);
 				}
 			}
@@ -4201,7 +4365,7 @@ int32 Unit::GetDamageDoneMod(uint32 school)
 float Unit::GetDamageDonePctMod(uint32 school)
 {
    if(this->IsPlayer())
-	   return GetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT+school);
+	   return m_floatValues[PLAYER_FIELD_MOD_DAMAGE_DONE_PCT+school];
 	else
 	   return ((Creature*)this)->ModDamageDonePct[school];
 }
@@ -4441,18 +4605,18 @@ void Unit::SetStandState(uint8 standstate)
 
 void Unit::RemoveAurasByInterruptFlag(uint32 flag)
 {
-	Aura * a;
-	for(uint32 x=0;x<MAX_AURAS;x++)
+	//Aura* a;
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		a = m_auras[x];
-		if(a == NULL)
+		//a = m_auras[x];
+		if( m_auras[x] == NULL )
 			continue;
 		
 		//some spells do not get removed all the time only at specific intervals
-		if((a->m_spellProto->AuraInterruptFlags & flag) && !(a->m_spellProto->procFlags & PROC_REMOVEONUSE))
+		if( m_auras[x]->m_spellProto->AuraInterruptFlags & flag && !( m_auras[x]->m_spellProto->procFlags & PROC_REMOVEONUSE ) )
 		{
-			a->Remove();
-			m_auras[x] = NULL;
+			m_auras[x]->Remove();
+			//m_auras[x] = NULL; this is done inside REMOVE()
 		}
 	}
 }
@@ -4482,11 +4646,11 @@ bool Unit::HasAura(uint32 spellid)
 
 void Unit::DropAurasOnDeath()
 {
-	for(uint32 x=0;x<MAX_AURAS;x++)
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
     {
-        if(m_auras[x])
+        if( m_auras[x] != NULL )
         {
-            if(m_auras[x] && m_auras[x]->GetSpellProto()->Flags4 & CAN_PERSIST_AND_CASTED_WHILE_DEAD)
+            if( m_auras[x]->GetSpellProto() != NULL && m_auras[x]->GetSpellProto()->Flags4 & CAN_PERSIST_AND_CASTED_WHILE_DEAD )
                 continue;
             else
 	        {
@@ -4498,58 +4662,82 @@ void Unit::DropAurasOnDeath()
 
 void Unit::UpdateSpeed(bool delay /* = false */)
 {
-	if(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID) == 0)
+	if( GetUInt32Value( UNIT_FIELD_MOUNTDISPLAYID ) == 0 )
 	{
-		if(IsPlayer())
-			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_speedModifier)/100.0f);
+		if( IsPlayer() )
+			m_runSpeed = m_base_runSpeed * ( 1.0f + float( m_speedModifier ) / 100.0f);
 		else
-			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_speedModifier)/100.0f);
+			m_runSpeed = m_base_runSpeed * ( 1.0f + float( m_speedModifier ) / 100.0f);
 	}
 	else
 	{
-		if(IsPlayer())
+		if( IsPlayer() )
 		{
-			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_mountedspeedModifier)/100.0f);
-			m_runSpeed += (m_speedModifier<0) ? (m_base_runSpeed*((float)m_speedModifier)/100.0f) : 0;
+			m_runSpeed = m_base_runSpeed * ( 1.0f + float( m_mountedspeedModifier ) / 100.0f );
+			m_runSpeed += ( m_speedModifier < 0 ) ? ( m_base_runSpeed * float( m_speedModifier ) / 100.0f ) : 0;
 		}
 		else
 		{
-			m_runSpeed = m_base_runSpeed*(1.0f + ((float)m_mountedspeedModifier)/100.0f);
-			m_runSpeed += (m_speedModifier<0) ? (m_base_runSpeed*((float)m_speedModifier)/100.0f) : 0;
+			m_runSpeed = m_base_runSpeed * ( 1.0f + float( m_mountedspeedModifier ) / 100.0f);
+			m_runSpeed += ( m_speedModifier < 0 ) ? ( m_base_runSpeed * float( m_speedModifier ) / 100.0f ) : 0;
 		}
 	}
 
-	m_flySpeed = PLAYER_NORMAL_FLIGHT_SPEED*(1.0f + ((float)m_flyspeedModifier)/100.0f);
+	m_flySpeed = PLAYER_NORMAL_FLIGHT_SPEED * ( 1.0f + ( (float) m_flyspeedModifier ) / 100.0f );
 
-	if(IsPlayer())
+	// Apply Aura: Limit Speed (Judgement of Justice #31896)
+	if( m_maxspeed != 0.0f && m_runSpeed > m_maxspeed ) 
 	{
-		if(delay)
+		m_runSpeed = m_maxspeed;
+	}
+	if( m_maxspeed != 0.0f && m_flySpeed > m_maxspeed )
+	{
+		m_flySpeed = m_maxspeed;
+	}
+
+	if( m_runSpeed < 0.0f )
+		m_runSpeed = 0.0f;
+
+	if( m_flySpeed < 0.0f )
+		m_flySpeed = 0.0f;
+
+
+	if( IsPlayer() )
+	{
+		if( delay )
+		{
 			static_cast< Player* >( this )->resend_speed = delay;
+		}
 		else
 		{
-			static_cast< Player* >( this )->SetPlayerSpeed(RUN, m_runSpeed);
-			static_cast< Player* >( this )->SetPlayerSpeed(FLY, m_flySpeed);
+			static_cast< Player* >( this )->SetPlayerSpeed( RUN, m_runSpeed );
+			static_cast< Player* >( this )->SetPlayerSpeed( FLY, m_flySpeed );
 		}
+		static_cast< Player* >( this )->blinked = true;
 	}
 }
 
 bool Unit::HasActiveAura(uint32 spellid)
 {
-	for(uint32 x=0;x<MAX_AURAS;x++)
-	if(m_auras[x] && m_auras[x]->GetSpellId()==spellid)
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		return true;
+		if( m_auras[x] != NULL && m_auras[x]->GetSpellId() == spellid )
+		{
+			return true;
+		}
 	}
 
 	return false;
 }
 
-bool Unit::HasActiveAura(uint32 spellid,uint64 guid)
+bool Unit::HasActiveAura(uint32 spellid, uint64 guid)
 {
-	for(uint32 x=0;x<MAX_AURAS;x++)
-	if(m_auras[x] && m_auras[x]->GetSpellId()==spellid && m_auras[x]->m_casterGuid==guid)
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		return true;
+		if( m_auras[x] != NULL && m_auras[x]->GetSpellId() == spellid && m_auras[x]->m_casterGuid == guid )
+		{
+			return true;
+		}
 	}
 
 	return false;
@@ -4557,54 +4745,55 @@ bool Unit::HasActiveAura(uint32 spellid,uint64 guid)
 
 void Unit::EventSummonPetExpire()
 {
-	if(summonPet)
+	if( summonPet != NULL )
 	{
-		if(summonPet->GetEntry() == 7915)//Goblin Bomb
+		if( summonPet->GetEntry() == 7915 )//Goblin Bomb
 		{
-			SpellEntry *spInfo = dbcSpell.LookupEntry(13259);
-			if(!spInfo)
+			SpellEntry* spInfo = dbcSpell.LookupEntryForced( 13259 );
+			if( spInfo == NULL )
 				return;
 
-			Spell*sp=new Spell(summonPet,spInfo,true,NULL);
+			Spell* sp = new Spell( summonPet, spInfo, true, NULL );
 			SpellCastTargets tgt;
-			tgt.m_unitTarget=summonPet->GetGUID();
-			sp->prepare(&tgt);
+			tgt.m_unitTarget = summonPet->GetGUID();
+			sp->prepare( &tgt );
 		}
 		else
 		{
-			summonPet->RemoveFromWorld(false, true);
+			summonPet->RemoveFromWorld( false, true );
 			delete summonPet;
 			summonPet = NULL;
 		}
 	}
-	sEventMgr.RemoveEvents(this, EVENT_SUMMON_PET_EXPIRE);
+	sEventMgr.RemoveEvents( this, EVENT_SUMMON_PET_EXPIRE );
 }
 
-void Unit::CastSpell(Unit* Target, SpellEntry* Sp, bool triggered)
+void Unit::CastSpell( Unit* Target, SpellEntry* Sp, bool triggered )
 {
 	if( Sp == NULL )
 		return;
 
 	Spell *newSpell = new Spell(this, Sp, triggered, 0);
-	SpellCastTargets targets(0);
-	if(Target)
+	SpellCastTargets targets( 0 );
+	if( Target != NULL )
 	{
 		targets.m_unitTarget |= TARGET_FLAG_UNIT;
 		targets.m_unitTarget = Target->GetGUID();
 	}
 	else
 	{
-		newSpell->GenerateTargets(&targets);
+		newSpell->GenerateTargets( &targets );
 	}
 	newSpell->prepare(&targets);
 }
 
-void Unit::CastSpell(Unit* Target, uint32 SpellID, bool triggered)
+void Unit::CastSpell( Unit* Target, uint32 SpellID, bool triggered )
 {
-	SpellEntry * ent = dbcSpell.LookupEntry(SpellID);
-	if(ent == 0) return;
+	SpellEntry* sp = dbcSpell.LookupEntry(SpellID);
+	if( sp == NULL )
+		return;
 
-	CastSpell(Target, ent, triggered);
+	CastSpell( Target, sp, triggered );
 }
 
 void Unit::CastSpell(uint64 targetGuid, SpellEntry* Sp, bool triggered)
@@ -4688,10 +4877,10 @@ void Unit::RemoveAurasByBuffType(uint32 buff_type, const uint64 &guid, uint32 sk
 
 void Unit::RemoveAurasByBuffIndexType(uint32 buff_index_type, const uint64 &guid)
 {
-	for(uint32 x=0;x<MAX_AURAS;x++)
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->buffIndexType == buff_index_type)
-			if(!guid || (guid && m_auras[x]->m_casterGuid == guid))
+		if( m_auras[x] != NULL && m_auras[x]->GetSpellProto()->buffIndexType == buff_index_type )
+			if( !guid || ( guid && m_auras[x]->m_casterGuid == guid ) )
 				m_auras[x]->Remove();
 	}
 }
@@ -4721,8 +4910,8 @@ AuraCheckResponse Unit::AuraCheck(uint32 name_hash, uint32 rank, Object *caster)
 	// look for spells with same namehash
 	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
-//		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash && m_auras[x]->GetCaster()==caster)
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash)
+		//if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash && m_auras[x]->GetCaster()==caster)
+		if( m_auras[x] != NULL && m_auras[x]->GetSpellProto() != NULL && m_auras[x]->GetSpellProto()->NameHash == name_hash )
 		{
 			// we've got an aura with the same name as the one we're trying to apply
 			resp.Misc = m_auras[x]->GetSpellProto()->Id;
@@ -4750,15 +4939,18 @@ AuraCheckResponse Unit::AuraCheck(uint32 name_hash, uint32 rank, Aura* aur, Obje
 	resp.Error = AURA_CHECK_RESULT_NONE;
 	resp.Misc  = 0;
 
+	if( aur == NULL )
+		return resp;
+
 	// look for spells with same namehash
-//	if(aur->GetSpellProto()->NameHash == name_hash && aur->GetCaster()==caster)
-	if(aur->GetSpellProto()->NameHash == name_hash)
+	//if(aur->GetSpellProto()->NameHash == name_hash && aur->GetCaster()==caster)
+	if( aur->GetSpellProto() != NULL && aur->GetSpellProto()->NameHash == name_hash )
 	{
 		// we've got an aura with the same name as the one we're trying to apply
 		resp.Misc = aur->GetSpellProto()->Id;
 
 		// compare the rank to our applying spell
-		if(aur->GetSpellProto()->RankNumber > rank)
+		if( aur->GetSpellProto()->RankNumber > rank )
 			resp.Error = AURA_CHECK_RESULT_HIGHER_BUFF_PRESENT;
 		else
 			resp.Error = AURA_CHECK_RESULT_LOWER_BUFF_PRESENT;
@@ -4780,55 +4972,63 @@ void Unit::OnPushToWorld()
 void Unit::RemoveFromWorld(bool free_guid)
 {
 	CombatStatus.OnRemoveFromWorld();
-	if(critterPet != 0)
+	if( critterPet != NULL )
 	{
-		critterPet->RemoveFromWorld(false, true);
+		critterPet->RemoveFromWorld( false, true );
 		delete critterPet;
-		critterPet = 0;
+		critterPet = NULL;
 	}
 
-	if(dynObj != 0)
+	if( dynObj != NULL )
 		dynObj->Remove();
 
-	for(uint32 i = 0; i < 4; ++i)
+	for( uint32 i = 0; i < 4; ++i )
 	{
-		if(m_ObjectSlots[i] != 0)
+		if( m_ObjectSlots[i] != 0 )
 		{
-			GameObject * obj = m_mapMgr->GetGameObject(m_ObjectSlots[i]);
-			if(obj)
+			GameObject* obj = m_mapMgr->GetGameObject( m_ObjectSlots[i] );
+			if( obj != NULL )
 				obj->ExpireAndDelete();
 
 			m_ObjectSlots[i] = 0;
 		}
 	}
 
-	Object::RemoveFromWorld(free_guid);
+	Object::RemoveFromWorld( free_guid );
 
-
-	for(uint32 x = 0; x < MAX_AURAS+MAX_PASSIVE_AURAS; ++x)
+	for( uint32 x = 0; x < MAX_AURAS + MAX_PASSIVE_AURAS; ++x )
 	{
-		if(m_auras[x] != 0)
+		if( m_auras[x] != NULL )
+		{
+			/* f*cking shit crash fixes */
+			if( m_auras[x]->m_deleted )
+			{
+				m_auras[x] = NULL;
+				continue;
+			}
 			m_auras[x]->RelocateEvents();
+		}
 	}
+
 	m_aiInterface->WipeReferences();
 }
 
 void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 {
-	Aura * a;
-	for(uint32 x=0;x<MAX_AURAS;x++)
+	Aura* a;
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
 		a = m_auras[x];
-		if(a == 0)
+		if( a == NULL )
 			continue;
 
 		//some spells do not get removed all the time only at specific intervals
-		if((a->m_spellProto->AuraInterruptFlags & flag) && (a->m_spellProto->Id != skip) && a->m_spellProto->proc_interval==0)
+		if( ( a->m_spellProto->AuraInterruptFlags & flag ) && ( a->m_spellProto->Id != skip ) && a->m_spellProto->proc_interval == 0 )
 		{
 			//the black sheeps of sociaty
-			if(a->m_spellProto->AuraInterruptFlags & AURA_INTERRUPT_ON_CAST_SPELL)
+			if( a->m_spellProto->AuraInterruptFlags & AURA_INTERRUPT_ON_CAST_SPELL )
 			{
-				switch(a->GetSpellProto()->Id)
+				switch( a->GetSpellProto()->Id )
 				{
 					//priest - surge of light
 					case 33151:
@@ -4838,7 +5038,7 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 								continue;
 
 							//this spell gets removed only when casting smite
-						    SpellEntry *spi = dbcSpell.LookupEntry( skip );
+						    SpellEntry* spi = dbcSpell.LookupEntry( skip );
 							if( spi && spi->NameHash != SPELL_HASH_SMITE )
 								continue;
 						}
@@ -4862,9 +5062,9 @@ int Unit::HasAurasWithNameHash(uint32 name_hash)
 
 bool Unit::HasNegativeAuraWithNameHash(uint32 name_hash)
 {
-	for(uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
+	for( uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x )
 	{
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->NameHash == name_hash)
+		if( m_auras[x] && m_auras[x]->GetSpellProto() != NULL && m_auras[x]->GetSpellProto()->NameHash == name_hash )
 			return true;
 	}
 
@@ -5237,23 +5437,17 @@ int32 Unit::GetRAP()
 	return	0;
 }
 
-bool Unit::GetSpeedDecrease()
+void Unit::GetSpeedDecrease()
 {
-	int32 before=m_speedModifier;
+	int32 before = m_speedModifier;
+
 	m_speedModifier -= m_slowdown;
 	m_slowdown = 0;
-	map< uint32, int32 >::iterator itr = speedReductionMap.begin();
-	for(; itr != speedReductionMap.end(); ++itr)
+
+	for( map< uint32, int32 >::iterator itr = speedReductionMap.begin(); itr != speedReductionMap.end(); ++itr )
 		m_slowdown = (int32)min( m_slowdown, itr->second );
 
-	if(m_slowdown<-100)
-		m_slowdown = 100; //do not walk backwards !
-
 	m_speedModifier += m_slowdown;
-	//save bandwidth :P
-	if(m_speedModifier!=before)
-		return true;
-	return false;
 }
 
 void Unit::EventCastSpell(Unit * Target, SpellEntry * Sp)
@@ -6035,4 +6229,10 @@ void Unit::ReplaceAIInterface(AIInterface *new_interface)
 	m_aiInterface = new_interface; 
 }
 
-
+void Unit::EventRegainMovement()
+{
+	if( IsCreature() && m_aiInterface )
+	{
+		m_aiInterface->EventRegainMovement();
+	}
+}

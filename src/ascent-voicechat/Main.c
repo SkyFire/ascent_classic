@@ -103,6 +103,14 @@ void dumphex(char * buf, int len)
 	printf("\n");
 }
 
+int CompareSockAddr( struct sockaddr_in * p1, struct sockaddr_in * p2 )
+{
+	if( memcmp( p1, p2, sizeof(struct sockaddr_in) ) != 0 )
+		return 0;
+	else
+		return 1;
+}
+
 int first = 0;
 void OnUdpRead()
 {
@@ -166,8 +174,17 @@ void OnUdpRead()
 			chn_member = SetChannelMember( user_id, chn, (struct sockaddr*)&from );
 			printf("initializing member %u: %s\n", x, chn_member ? "success" : "failure");			
 		}
+		else
+		{
+			if( CompareSockAddr( &chn_member->address, (struct sockaddr_in*)&from ) != 1 )
+			{
+				// address obvously changed or something
+				chn_member = SetChannelMember( user_id, chn, (struct sockaddr*)&from );
+				printf("re-initializing member %u: %s\n", x, chn_member ? "success" : "failure");		
+			}
+		}
 
-		return;		// some sort of init packet?
+		return;		// some sort of init packet? (ping)
 	}
 	else
 		chn_member = GetChannelMember( user_id, chn );
@@ -257,48 +274,60 @@ void HandleTcpRead(int fd)
 	printf("tcpfrom: got cmd %u\n", cmd);
 	switch(cmd)
 	{
-	case VOICECHAT_CMSG_CREATE_CHANNEL:
-		{
-			int t = *(int*)&buffer[4];
-			int request_id = *(int*)&buffer[8];
-			struct VoiceChatChannel * chn;
-			uint8 out_buffer[12];
-            
-			chn = CreateChannel(GenerateChannelId(), t);
-			printf("tcp: creating channel request id %u type %u new id %u\n",  request_id, t, chn->channel_id);
-			*(int*)&out_buffer[0] = VOICECHAT_SMSG_CHANNEL_CREATED;
-			*(int*)&out_buffer[4] = request_id;
-			*(int*)&out_buffer[8] = chn->channel_id;
-			if(send(fd, out_buffer, 12, 0) != 12)
+		case VOICECHAT_CMSG_CREATE_CHANNEL:
 			{
-				printf("send() error (create channel)\n");
-				return;
-			}
-		}break;
-	case VOICECHAT_CMSG_DELETE_CHANNEL:
-		{
-			int channel_id = *(int*)&buffer[4];
-			struct VoiceChatChannel * chn;
-
-			chn = GetChannel( (uint16)channel_id );
-			if( chn != NULL )
-			{
-				if( chn->prev != NULL )
-					chn->prev->next = chn->next;
-
-				if( chn->next != NULL )
-					chn->next->prev = chn->prev;
-
-				if( m_channelEnd == chn )
-					m_channelEnd = chn->prev;
-
-				if( m_channelBegin == chn )
-					m_channelBegin = chn->next;
-
-				free( chn->members );
-				free( chn );
+				int t = *(int*)&buffer[4];
+				int request_id = *(int*)&buffer[8];
+				struct VoiceChatChannel * chn;
+				uint8 out_buffer[12];
+	            
+				chn = CreateChannel(GenerateChannelId(), t);
+				printf("tcp: creating channel request id %u type %u new id %u\n",  request_id, t, chn->channel_id);
+				*(int*)&out_buffer[0] = VOICECHAT_SMSG_CHANNEL_CREATED;
+				*(int*)&out_buffer[4] = request_id;
+				*(int*)&out_buffer[8] = chn->channel_id;
+				if(send(fd, out_buffer, 12, 0) != 12)
+				{
+					printf("send() error (create channel)\n");
+					return;
+				}
 			}break;
-		}
+		case VOICECHAT_CMSG_DELETE_CHANNEL:
+			{
+				int channel_id = *(int*)&buffer[4];
+				struct VoiceChatChannel * chn;
+
+				chn = GetChannel( (uint16)channel_id );
+				if( chn != NULL )
+				{
+					if( chn->prev != NULL )
+						chn->prev->next = chn->next;
+
+					if( chn->next != NULL )
+						chn->next->prev = chn->prev;
+
+					if( m_channelEnd == chn )
+						m_channelEnd = chn->prev;
+
+					if( m_channelBegin == chn )
+						m_channelBegin = chn->next;
+
+					free( chn->members );
+					free( chn );
+				}
+			}break;
+
+		case VOICECHAT_CMSG_REMOVE_MEMBER:
+			{
+				int channel_id = *(int*)&buffer[4];
+				int user_id = *(int*)&buffer[8];
+
+				struct VoiceChatChannel * chn;
+				chn = GetChannel( channel_id );
+				if( chn != NULL )
+					RemoveChannelMember( chn, (uint8)user_id );
+
+			}break;
 	}
 }
 

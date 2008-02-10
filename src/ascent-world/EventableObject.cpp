@@ -301,7 +301,16 @@ void EventableObjectHolder::Update(uint32 time_difference)
 		if((uint32)ev->currTime <= time_difference)
 		{
 			// execute the callback
-			ev->cb->execute();
+			if(ev->eventFlag & EVENT_FLAG_DELETES_OBJECT)
+			{
+				ev->deleted = true;
+				ev->cb->execute();
+				m_events.erase(it2);
+				ev->DecRef();
+				continue;
+			}
+			else
+				ev->cb->execute();
 
 			// check if the event is expired now.
             if(ev->repeats && --ev->repeats == 0)
@@ -345,17 +354,17 @@ void EventableObject::event_Relocate()
 	/* prevent any new stuff from getting added */
 	m_lock.Acquire();
 
-	EventableObjectHolder * nh = sEventMgr.GetEventHolder(event_GetInstanceID());
-	if(nh != m_holder)
+	EventableObjectHolder* nh = sEventMgr.GetEventHolder( event_GetInstanceID() );
+	if( nh != m_holder )
 	{
 		// whee, we changed event holder :>
 		// doing this will change the instanceid on all the events, as well as add to the new holder.
 		
 		// no need to do this if we don't have any events, though.
-		if(!nh)
-			nh = sEventMgr.GetEventHolder(-1);
+		if( nh == NULL )
+			nh = sEventMgr.GetEventHolder( -1 );
 
-		nh->AddObject(this);
+		nh->AddObject( this );
 
 		// reset our m_holder pointer and instance id
 		m_event_Instanceid = nh->GetInstanceID();

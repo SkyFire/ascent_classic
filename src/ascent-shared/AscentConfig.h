@@ -50,6 +50,9 @@
  * Only recommended under X64 builds, X86 builds will most likely run out of address space.
  * Default: Disabled
  */
+#ifdef ENABLE_MEMORY_MAPPING_FOR_MAPS
+# define USE_MEMORY_MAPPING_FOR_MAPS 1
+#endif
 //#define USE_MEMORY_MAPPING_FOR_MAPS
 
 /** Enable/disable Ascent's Voice Chat support.
@@ -59,8 +62,19 @@
  * Also, it only works for parties. Custom chat channels are not fully supported yet.
  * However, if you want to play around with it, feel free to enable this define.
  */
+#ifdef ENABLE_VOICE_CHAT
+# define VOICE_CHAT 1
+#endif
 //#define VOICE_CHAT 1
 
+/** Enable/disable global LFG channel 
+ * Used for test servers mainly
+ * Default: Disabled
+ */
+#ifdef ENABLE_GLOBAL_LFG
+# define GLOBAL_LFG 1
+#endif
+//#define GLOBAL_LFG 1
 
 #endif		// __ASCENTCONFIG_H
 

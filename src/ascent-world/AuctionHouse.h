@@ -36,7 +36,7 @@ enum AUCTIONRESULT
 enum AUCTIONRESULTERROR
 {
 	AUCTION_ERROR_NONE,
-	AUCTION_ERROR_UNK1,
+	AUCTION_ERROR_UNK1, // "internal bag error"
 	AUCTION_ERROR_INTERNAL,
 	AUCTION_ERROR_MONEY,
 	AUCTION_ERROR_ITEM,
@@ -112,4 +112,6 @@ public:
 	float deposit_percent;
 };
 #endif
+
+
 

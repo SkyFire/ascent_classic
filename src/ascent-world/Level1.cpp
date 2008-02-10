@@ -426,10 +426,11 @@ bool ChatHandler::HandleModifySpeedCommand(const char* args, WorldSession *m_ses
 	snprintf((char*)buf,256, "%s set your speed to %2.2f.", m_session->GetPlayer()->GetName(), Speed);
 	SystemMessage(chr->GetSession(), buf);
 
-	chr->SetPlayerSpeed(RUN, Speed);
-	chr->SetPlayerSpeed(SWIM, Speed);
-	chr->SetPlayerSpeed(RUNBACK, Speed);
-	chr->SetPlayerSpeed(FLY, Speed);
+	chr->SetPlayerSpeed( RUN, Speed );
+	chr->SetPlayerSpeed( SWIM, Speed );
+	chr->SetPlayerSpeed( RUNBACK, Speed );
+	chr->SetPlayerSpeed( FLY, Speed );
+	chr->blinked = true;
 
 	return true;
 }

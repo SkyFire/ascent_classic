@@ -110,7 +110,7 @@ namespace VMAP
 
             bool loadMap(const std::string& pDirFileName, unsigned int pMapTileIdent);
             void addModelConatiner(const std::string& pName, ManagedModelContainer *pMc);
-            void unloadMap(const std::string& dirFileName, unsigned int pMapTileIdent, bool pForce=false);
+            void unloadMap(const std::string& dirFileName, unsigned int pMapTileIdent);
 
             void getModelContainer(Array<ModelContainer *>& pArray ) { iTree->getMembers(pArray); }
             const void addDirFile(const std::string& pDirName, const FilesInDir& pFilesInDir) { iLoadedDirFiles.set(pDirName, pFilesInDir); }

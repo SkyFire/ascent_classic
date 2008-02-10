@@ -550,6 +550,7 @@ public:
 	void SpellAuraSpiritOfRedemption(bool apply);
 	void SpellAuraIncreaseAttackerSpellCrit(bool apply);
 	void SpellAuraIncreaseRepGainPct(bool apply);
+	void SpellAuraLimitSpeed(bool apply);
 	void SpellAuraIncreaseRangedAPStatPCT(bool apply);
 	//void SpellAuraModRangedDamageTakenPCT(bool apply);
 	void SpellAuraModBlockValue(bool apply);
@@ -690,6 +691,8 @@ protected:
 
 	void SendInterrupted(uint8 result, Object * m_caster);
 	void SendChannelUpdate(uint32 time, Object * m_caster);
+public:
+	bool m_deleted;
 };
 
 typedef void(Aura::*pSpellAura)(bool apply);

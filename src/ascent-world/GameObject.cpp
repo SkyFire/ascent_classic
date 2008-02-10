@@ -671,12 +671,12 @@ void GameObject::OnRemoveInRangeObject(Object* pObj)
 
 void GameObject::RemoveFromWorld(bool free_guid)
 {
-	WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
+	WorldPacket data( SMSG_GAMEOBJECT_DESPAWN_ANIM, 8 );
 	data << GetGUID();
-	SendMessageToSet(&data,true);
+	SendMessageToSet( &data, true );
 
-	sEventMgr.RemoveEvents(this, EVENT_GAMEOBJECT_TRAP_SEARCH_TARGET);
-	Object::RemoveFromWorld(free_guid);
+	sEventMgr.RemoveEvents( this, EVENT_GAMEOBJECT_TRAP_SEARCH_TARGET );
+	Object::RemoveFromWorld( free_guid );
 }
 
 bool GameObject::HasLoot()

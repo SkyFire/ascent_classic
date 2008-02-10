@@ -62,6 +62,14 @@ struct VoiceChatChannelMember * SetChannelMember(uint8 user_id, struct VoiceChat
 	return &channel->members[user_id];
 }
 
+void RemoveChannelMember(struct VoiceChatChannel * chn, uint8 user_id)
+{
+	if( user_id > chn->member_slots )
+		return;
+
+	chn->members[user_id].initialized = 0;
+}
+
 struct VoiceChatChannel * CreateChannel(uint16 channel_id, uint8 channel_type)
 {
 	struct VoiceChatChannel * chn;

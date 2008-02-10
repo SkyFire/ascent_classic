@@ -222,6 +222,20 @@ void VoiceChatHandler::CreateGroupChannel(Group * pGroup)
 	m_lock.Release();
 }
 
+void VoiceChatHandler::DestroyGroupChannel(Group * pGroup)
+{
+	Log.Debug("VoiceChatHandler", "DestroyGroupChannel %u", pGroup->GetID());
+	if( pGroup->m_voiceChannelId != -1 )
+	{
+		ByteBuffer buf(15);
+		buf << uint32(VOICECHAT_CMSG_DELETE_CHANNEL);
+		buf << uint32(pGroup->m_voiceChannelId);
+		m_client->Send(buf.contents(), 8);
+	}
+
+	pGroup->VoiceDied();
+}
+
 void VoiceChatHandler::DestroyVoiceChannel(Channel * chn)
 {
 	Log.Debug("VoiceChatHandler", "DestroyVoiceChannel %s", chn->m_name.c_str());

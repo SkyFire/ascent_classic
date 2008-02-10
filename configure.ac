@@ -29,6 +29,7 @@ AH_TEMPLATE([HAVE_DARWIN], Define if you have MacOSX Darwin, to include the corr
 AH_TEMPLATE([ENABLE_CLUSTERING], Define if you want to enable clustering, this is experimental.)
 AH_TEMPLATE([ENABLE_COLLISION], Define if you want to enable collision calculation, warning. this can cause. a heavy load)
 AH_TEMPLATE([ENABLE_VOICECHAT], Define this if you want to enable voice chat system)
+AH_TEMPLATE([ENABLE_GLOBAL_LFG], Define this if you want to enable global lfg channel)
 AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
 AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
 AH_TEMPLATE([X64], Define this if you are under an X64-based operating system.)
@@ -173,6 +174,13 @@ AC_ARG_ENABLE(voicechat,
      ],
 )
 
+AC_ARG_ENABLE(globallfg,
+     AC_HELP_STRING([--enable-globallfg],enable global lfg),
+     [ if test "x$enable_globallfg" = "xyes" ; then
+   	AC_DEFINE(ENABLE_GLOBAL_LFG)
+       fi
+     ],
+)
 
 # Check for networking stuff
 AC_MSG_CHECKING([detecting network socket engine])

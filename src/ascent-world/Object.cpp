@@ -324,11 +324,11 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 		}
 	}
 
-	if (flags & 0x20)
+	if( flags & 0x20 )
 	{
-		if(pThis && pThis->m_TransporterGUID != 0)
+		if( pThis != NULL && pThis->m_TransporterGUID != 0 )
 			flags2 |= 0x200;
-		else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportGuid != 0 && ((Creature*)this)->m_transportPosition != NULL)
+		else if( m_objectTypeId == TYPEID_UNIT && static_cast< Creature* >( this )->m_transportGuid != 0 && static_cast< Creature* >( this )->m_transportPosition != NULL)
 			flags2 |= 0x200;
 
 		if(splinebuf)
@@ -407,21 +407,23 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			*data << m_position.o;
 		}
 
-		if(flags & 0x20 && flags2 & 0x0200)
+		if( flags & 0x20 && flags2 & 0x0200 )
 		{
-			if(pThis)
+			if( pThis != NULL )
 			{
 				*data << pThis->m_TransporterGUID;
 				*data << pThis->m_TransporterX << pThis->m_TransporterY << pThis->m_TransporterZ << pThis->m_TransporterO;
 				*data << pThis->m_TransporterUnk;
 			}
-			else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportPosition != NULL)
+			else if( m_objectTypeId == TYPEID_UNIT && static_cast< Creature* >( this )->m_transportPosition != NULL)
 			{
-				*data << ((Creature*)this)->m_transportGuid;
-				*data << uint32(HIGHGUID_TRANSPORTER);
-				*data << ((Creature*)this)->m_transportPosition->x << ((Creature*)this)->m_transportPosition->y << 
-					((Creature*)this)->m_transportPosition->z << ((Creature*)this)->m_transportPosition->o;
-				*data << float(0.0f);
+				*data << static_cast< Creature* >( this )->m_transportGuid;
+				*data << uint32( HIGHGUID_TRANSPORTER );
+				*data << static_cast< Creature* >( this )->m_transportPosition->x;
+				*data << static_cast< Creature* >( this )->m_transportPosition->y;
+				*data << static_cast< Creature* >( this )->m_transportPosition->z;
+				*data << static_cast< Creature* >( this )->m_transportPosition->o;
+				*data << float( 0.0f );
 			}
 		}
 	}
@@ -1001,13 +1003,13 @@ void Object::PushToWorld(MapMgr*mgr)
 
 void Object::RemoveFromWorld(bool free_guid)
 {
-	ASSERT(m_mapMgr);
-	MapMgr * m = m_mapMgr;
-	m_mapMgr = 0;
+	ASSERT( m_mapMgr );
+	MapMgr* m = m_mapMgr;
+	m_mapMgr = NULL;
 
 	mSemaphoreTeleport = true;
 
-	m->RemoveObject(this, free_guid);
+	m->RemoveObject( this, free_guid );
 	
 	// update our event holder
 	event_Relocate();
@@ -1714,9 +1716,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	/*------------------------------------ DUEL HANDLERS END--------------------------*/
 
 	bool isCritter = false;
-	if(pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->GetCreatureName())
+	if( pVictim->GetTypeId() == TYPEID_UNIT && static_cast< Creature* >( pVictim )->GetCreatureName() )
 	{
-			if(((Creature*)pVictim)->GetCreatureName()->Type == CRITTER)
+			if( static_cast< Creature* >( pVictim )->GetCreatureName()->Type == CRITTER )
 				isCritter = true;
 	}
 	/* -------------------------- HIT THAT CAUSES VICTIM TO DIE ---------------------------*/
@@ -1754,7 +1756,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
         if( pMapInfo && pMapInfo->type == INSTANCE_NULL && !pVictim->IsPlayer() && !pVictim->IsPet() && ( IsPlayer() || IsPet() ) )
 		{
 			// Only NPCs that bear the PvP flag can be truly representing their faction.
-			if( ((Creature*)pVictim)->HasFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PVP ) )
+			if( static_cast< Creature* >( pVictim )->HasFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PVP ) )
 			{
 				Player * pAttacker = NULL;
 				if( IsPet() && GetGUIDHigh() == HIGHGUID_PET )
@@ -2426,7 +2428,7 @@ void Object::SendSpellNonMeleeDamageLog( Object* Caster, Object* Target, uint32 
 int32 Object::event_GetInstanceID()
 {
 	// return -1 for non-inworld.. so we get our shit moved to the right thread
-	if(!IsInWorld())
+	if( !IsInWorld() )
 		return -1;
 	else
 		return m_instanceId;
@@ -2465,14 +2467,14 @@ bool Object::CanActivate()
 
 void Object::Activate(MapMgr * mgr)
 {
-	switch(m_objectTypeId)
+	switch( m_objectTypeId )
 	{
 	case TYPEID_UNIT:
-		mgr->activeCreatures.insert((Creature*)this);
+		mgr->activeCreatures.insert( static_cast< Creature* >( this ) );
 		break;
 
 	case TYPEID_GAMEOBJECT:
-		mgr->activeGameObjects.insert((GameObject*)this);
+		mgr->activeGameObjects.insert( static_cast< GameObject* >( this ) );
 		break;
 	}
 
@@ -2481,14 +2483,14 @@ void Object::Activate(MapMgr * mgr)
 
 void Object::Deactivate(MapMgr * mgr)
 {
-	switch(m_objectTypeId)
+	switch( m_objectTypeId )
 	{
 	case TYPEID_UNIT:
-		mgr->activeCreatures.erase((Creature*)this);
+		mgr->activeCreatures.erase( static_cast< Creature* >( this ) );
 		break;
 
 	case TYPEID_GAMEOBJECT:
-		mgr->activeGameObjects.erase((GameObject*)this);
+		mgr->activeGameObjects.erase( static_cast< GameObject* >( this ) );
 		break;
 	}
 	Active = false;

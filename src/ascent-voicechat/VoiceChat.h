@@ -54,7 +54,6 @@ typedef unsigned int uint32;
 struct VoiceChatChannelMember
 {
 	struct sockaddr_in address;
-	uint8 encryption_key[16];
 	uint8 initialized;
 };
 
@@ -71,6 +70,8 @@ struct VoiceChatChannel
 struct VoiceChatChannel * GetChannel(uint16 channel_id);
 struct VoiceChatChannelMember * GetChannelMember(uint8 user_id, struct VoiceChatChannel * channel);
 struct VoiceChatChannelMember * SetChannelMember(uint8 user_id, struct VoiceChatChannel * channel, struct sockaddr * addr);
+void RemoveChannelMember(struct VoiceChatChannel * chn, uint8 user_id);
+
 struct WoWServer * CreateServer(int fd, struct sockaddr_in* address);
 struct WoWServer * GetServer(int fd);
 void CloseChannelsOnServer(struct WoWServer * srv);

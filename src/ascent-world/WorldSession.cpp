@@ -45,6 +45,12 @@ _logoutTime(0), permissions(NULL), permissioncount(0), _loggingOut(false), insta
 	m_muted = 0;
 	_side = -1;
 
+	m_packet_counter = 0;
+	m_packet_counter_time = 0;
+
+	m_packets_per_second = 0.0f;
+	m_packets_per_second_peak = 0.0f;
+
 	for(uint32 x=0;x<8;x++)
 		sAccountData[x].data=NULL;	
 }
@@ -92,14 +98,15 @@ int WorldSession::Update(uint32 InstanceID)
 	m_currMsTime = getMSTime();
 
 #ifndef CLUSTERING
-	if(!((++_updatecount) % 2) && _socket)
-		_socket->UpdateQueuedPackets();
+	if( _socket != NULL )
+		if( !( ( ++_updatecount ) % 2 ) )
+			_socket->UpdateQueuedPackets();
 #endif
 
-	WorldPacket *packet;
-	OpcodeHandler * Handler;
+	WorldPacket* packet;
+	OpcodeHandler* Handler;
 
-	if(InstanceID != instanceId)
+	if( InstanceID != instanceId )
 	{
 		// We're being updated by the wrong thread.
 		// "Remove us!" - 2
@@ -107,17 +114,17 @@ int WorldSession::Update(uint32 InstanceID)
 	}
 
 	// Socket disconnection.
-	if(!_socket)
+	if( _socket == NULL )
 	{
 		// Check if the player is in the process of being moved. We can't delete him
 		// if we are.
-		if(_player && _player->m_beingPushed)
+		if( _player != NULL && _player->m_beingPushed )
 		{
 			// Abort..
 			return 0;
 		}
 
-		if(!_logoutTime)
+		if( !_logoutTime )
 			_logoutTime = m_currMsTime + PLAYER_LOGOUT_DELAY;
 
 /*
@@ -131,27 +138,35 @@ int WorldSession::Update(uint32 InstanceID)
 		
 	}
 
-	while ((packet = _recvQueue.Pop()))
+	// track packets per second anti hack measure
+	if( (uint32)UNIXTIME > m_packet_counter_time )
 	{
-		ASSERT(packet);
+		m_packets_per_second = float( m_packet_counter ) / float( (uint32)UNIXTIME - m_packet_counter_time );
+		m_packet_counter_time = (uint32)UNIXTIME;
+		if( m_packets_per_second > m_packets_per_second_peak )
+			m_packets_per_second_peak = m_packets_per_second;
+		m_packet_counter = 0;
+	}
 
-		if(packet->GetOpcode() >= NUM_MSG_TYPES)
+	while( packet = _recvQueue.Pop() )
+	{
+		ASSERT( packet );
+
+		if( packet->GetOpcode() >= NUM_MSG_TYPES )
 			sLog.outError("[Session] Received out of range packet with opcode 0x%.4X", packet->GetOpcode());
 		else
 		{
 			Handler = &WorldPacketHandlers[packet->GetOpcode()];
-			if(Handler->status == STATUS_LOGGEDIN && !_player && Handler->handler != 0)
+			if( Handler->status == STATUS_LOGGEDIN && _player == NULL && Handler->handler != 0 )
 			{
-				sLog.outError("[Session] Received unexpected/wrong state packet with opcode %s (0x%.4X)",
-					LookupName(packet->GetOpcode(), g_worldOpcodeNames), packet->GetOpcode());
+				sLog.outError("[Session] Received unexpected/wrong state packet with opcode %s (0x%.4X)", LookupName(packet->GetOpcode(), g_worldOpcodeNames), packet->GetOpcode());
 			}
 			else
 			{
 				// Valid Packet :>
-				if(Handler->handler == 0)
+				if( Handler->handler == 0 )
 				{
-					sLog.outError("[Session] Received unhandled packet with opcode %s (0x%.4X)",
-						LookupName(packet->GetOpcode(), g_worldOpcodeNames), packet->GetOpcode());
+					sLog.outError("[Session] Received unhandled packet with opcode %s (0x%.4X)", LookupName(packet->GetOpcode(), g_worldOpcodeNames), packet->GetOpcode());
 				}
 				else
 				{
@@ -162,7 +177,7 @@ int WorldSession::Update(uint32 InstanceID)
 
 		delete packet;
 
-		if(InstanceID != instanceId)
+		if( InstanceID != instanceId )
 		{
 			// If we hit this -> means a packet has changed our map.
 			return 2;
@@ -174,17 +189,17 @@ int WorldSession::Update(uint32 InstanceID)
 		}
 	}
 
-	if(InstanceID != instanceId)
+	if( InstanceID != instanceId )
 	{
 		// If we hit this -> means a packet has changed our map.
 		return 2;
 	}
 
-	if( _logoutTime && (m_currMsTime >= _logoutTime) && instanceId == InstanceID)
+	if( _logoutTime && ( m_currMsTime >= _logoutTime ) && instanceId == InstanceID )
 	{
 		// Check if the player is in the process of being moved. We can't delete him
 		// if we are.
-		if(_player && _player->m_beingPushed)
+		if( _player != NULL && _player->m_beingPushed )
 		{
 			// Abort..
 			return 0;
@@ -193,18 +208,18 @@ int WorldSession::Update(uint32 InstanceID)
 		if( _socket == NULL )
 		{
 			bDeleted = true;
-			LogoutPlayer(true);
+			LogoutPlayer( true );
 			return 1;
 		}
 		else
-			LogoutPlayer(true);
+			LogoutPlayer( true );
 	}
 
-	if(m_lastPing + WORLDSOCKET_TIMEOUT < (uint32)UNIXTIME)
+	if( m_lastPing + WORLDSOCKET_TIMEOUT < (uint32)UNIXTIME )
 	{
 		// Check if the player is in the process of being moved. We can't delete him
 		// if we are.
-		if(_player && _player->m_beingPushed)
+		if( _player != NULL && _player->m_beingPushed )
 		{
 			// Abort..
 			return 0;
@@ -218,7 +233,7 @@ int WorldSession::Update(uint32 InstanceID)
 		}
 
 		m_lastPing = (uint32)UNIXTIME;		// Prevent calling this code over and over.
-		if(!_logoutTime)
+		if( !_logoutTime)
 			_logoutTime = m_currMsTime + PLAYER_LOGOUT_DELAY;
 	}
 
@@ -294,9 +309,19 @@ void WorldSession::LogoutPlayer(bool Save)
 		//Issue a message telling all guild members that this player signed off
 		if( _player->IsInGuild() )
 		{
+			// Hawk -- Fix - Send logout message to all clients
 			Guild* pGuild = _player->m_playerInfo->guild;
-			if( pGuild != NULL )
-				pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 1, _player->GetName() );
+			if( pGuild != NULL ) {
+				WorldPacket data(SMSG_GUILD_EVENT, 100);
+				data << uint8(GUILD_EVENT_HASGONEOFFLINE);
+				data << uint8(0x01);
+				data << _player->GetName();
+				data << _player->GetGUID();
+
+				pGuild->SendPacket(&data);
+			}
+			
+			//pGuild->LogGuildEvent( GUILD_EVENT_HASGONEOFFLINE, 1, _player->m_playerInfo->guid );
 		}
 
 		_player->GetItemInterface()->EmptyBuyBack();

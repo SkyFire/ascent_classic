@@ -503,8 +503,8 @@ public:
 	CreatureProto * proto;
 	CreatureSpawn * m_spawn;
 	void OnPushToWorld();
-	void Despawn(uint32 delay, uint32 respawntime);
-	void TriggerScriptEvent(string func);
+	void Despawn( uint32 delay, uint32 respawntime );
+	void TriggerScriptEvent( string func );
 
 	AuctionHouse * auctionHouse;
 	bool has_waypoint_text;
@@ -513,8 +513,11 @@ public:
 	void DeleteMe();
 	bool CanAddToWorld();
 
-	WayPointMap * m_custom_waypoint_map;
-	Player * m_escorter;
+	WayPointMap* m_custom_waypoint_map;
+
+	ASCENT_INLINE bool HasCustomWayPointMap() { return( m_custom_waypoint_map != NULL ); }
+
+	Player* m_escorter;
 	void DestroyCustomWaypointMap();
 	bool IsInLimboState() { return m_limbostate; }
 	uint32 GetLineByFamily(CreatureFamilyEntry * family){return family->skilline ? family->skilline : 0;};

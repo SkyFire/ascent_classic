@@ -324,7 +324,7 @@ namespace VMAP
         {
             MapTree* instanceTree = m_maps[ pMapId ];
             std::string dirFileName = getDirFileName(pMapId);
-            instanceTree->unloadMap(dirFileName, 0, true);
+            instanceTree->unloadMap(dirFileName, 0);
             if(instanceTree->size() == 0)
             {
 				m_maps[pMapId]=NULL;
@@ -879,17 +879,16 @@ namespace VMAP
 
     //=========================================================
 
-    void MapTree::unloadMap(const std::string& dirFileName, unsigned int pMapTileIdent, bool pForce)
+    void MapTree::unloadMap(const std::string& dirFileName, unsigned int pMapTileIdent)
     {
-        if(hasDirFile(dirFileName) && (pForce || containsLoadedMapTile(pMapTileIdent)))
+        if(hasDirFile(dirFileName) && containsLoadedMapTile(pMapTileIdent))
         {
-            if(containsLoadedMapTile(pMapTileIdent))
-                removeLoadedMapTile(pMapTileIdent);
+            removeLoadedMapTile(pMapTileIdent);
             FilesInDir& filesInDir = getDirFiles(dirFileName);
             filesInDir.decRefCount();
             if(filesInDir.getRefCount() <= 0)
             {
-                Array<std::string> fileNames = filesInDir.getFiles();
+                const Array<std::string> & fileNames = filesInDir.getFiles();
                 bool treeChanged = false;
                 for(int i=0; i<fileNames.size(); ++i)
                 {
@@ -899,6 +898,13 @@ namespace VMAP
                     if(mc->getRefCount() <= 0)
                     {
                         iLoadedModelContainer.remove(name);
+						if(!iTree->contains(mc))
+						{
+							printf("[vmap debug] trying to double delete model container %s\n", name.c_str());
+							delete mc;
+							continue;
+						}
+
                         iTree->remove(mc);
                         delete mc;
                         treeChanged = true;

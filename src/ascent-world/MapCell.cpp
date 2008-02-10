@@ -99,65 +99,74 @@ void MapCell::RemoveObjects()
 	//uint32 ltime = getMSTime();
 
 	/* delete objects in pending respawn state */
-	for(itr = _respawnObjects.begin(); itr != _respawnObjects.end(); ++itr)
+	if( _respawnObjects.size() > 0 )
 	{
-		switch((*itr)->GetGUIDHigh())
+		for( itr = _respawnObjects.begin(); itr != _respawnObjects.end(); ++itr )
 		{
-		case HIGHGUID_UNIT: {
-			_mapmgr->_reusable_guids_creature.push_back( (*itr)->GetGUIDLow() );
-			static_cast< Creature* >( *itr )->m_respawnCell=NULL;
-			delete static_cast< Creature* >( *itr );
-			}break;
+			switch( (*itr)->GetGUIDHigh() )
+			{
+			case HIGHGUID_UNIT:
+				{
+					_mapmgr->_reusable_guids_creature.push_back( (*itr)->GetGUIDLow() );
+					static_cast< Creature* >( *itr )->m_respawnCell=NULL;
+					delete static_cast< Creature* >( *itr );
+				}break;
 
-		case HIGHGUID_GAMEOBJECT: {
-			_mapmgr->_reusable_guids_gameobject.push_back( (*itr)->GetGUIDLow() );
-			static_cast< GameObject* >( *itr )->m_respawnCell=NULL;
-			delete static_cast< GameObject* >( *itr );
-			}break;
+			case HIGHGUID_GAMEOBJECT:
+				{
+					_mapmgr->_reusable_guids_gameobject.push_back( (*itr)->GetGUIDLow() );
+					static_cast< GameObject* >( *itr )->m_respawnCell=NULL;
+					delete static_cast< GameObject* >( *itr );
+				}break;
+			}
 		}
+		_respawnObjects.clear();
 	}
-	_respawnObjects.clear();
 
 	//This time it's simpler! We just remove everything :)
-	for(itr = _objects.begin(); itr != _objects.end(); )
+	if( _objects.size() > 0 )
 	{
-		count++;
-
-		Object *obj = (*itr);
-
-		itr++;
-
-		if(!obj || (_unloadpending && obj->GetGUIDHigh()==HIGHGUID_TRANSPORTER))
-			continue;
-
-		if(_unloadpending && obj->GetTypeId()==TYPEID_CORPSE && obj->GetUInt32Value(CORPSE_FIELD_OWNER) != 0)
-			continue;
-
-		if( obj->Active )
-			obj->Deactivate( _mapmgr );
-
-		if( obj->IsInWorld() )
-			obj->RemoveFromWorld( true );
-
-		if( obj->GetTypeId() == TYPEID_UNIT )
+		for( itr = _objects.begin(); itr != _objects.end(); )
 		{
-			if(obj->IsPet())
-				delete static_cast< Pet* >( obj );
-			else
-				delete static_cast< Creature* >( obj );
-		}
-		else if(obj->GetTypeId() == TYPEID_GAMEOBJECT)
-		{
-			if( obj->GetGUIDHigh() == HIGHGUID_TRANSPORTER )
-				delete static_cast< Transporter* >( obj );
-			else
-				delete static_cast< GameObject* >( obj );
-		}
-		else if( obj->GetTypeId() == TYPEID_DYNAMICOBJECT )
-			delete static_cast< DynamicObject* >( obj );
-		else if( obj->GetTypeId() == TYPEID_CORPSE )
-		{
-			delete static_cast< Corpse* >( obj );
+			if( itr == _objects.end() )
+				break;
+
+			Object* obj = (*itr);
+			count++;
+			itr++;
+
+			if( obj == NULL || ( _unloadpending && obj->GetGUIDHigh() == HIGHGUID_TRANSPORTER ) )
+				continue;
+
+			if( _unloadpending && obj->GetTypeId()==TYPEID_CORPSE && obj->GetUInt32Value(CORPSE_FIELD_OWNER) != 0)
+				continue;
+
+			if( obj->Active )
+				obj->Deactivate( _mapmgr );
+
+			if( obj->IsInWorld() )
+				obj->RemoveFromWorld( true );
+
+			if( obj->GetTypeId() == TYPEID_UNIT )
+			{
+				if(obj->IsPet())
+					delete static_cast< Pet* >( obj );
+				else
+					delete static_cast< Creature* >( obj );
+			}
+			else if(obj->GetTypeId() == TYPEID_GAMEOBJECT)
+			{
+				if( obj->GetGUIDHigh() == HIGHGUID_TRANSPORTER )
+					delete static_cast< Transporter* >( obj );
+				else
+					delete static_cast< GameObject* >( obj );
+			}
+			else if( obj->GetTypeId() == TYPEID_DYNAMICOBJECT )
+				delete static_cast< DynamicObject* >( obj );
+			else if( obj->GetTypeId() == TYPEID_CORPSE )
+			{
+				delete static_cast< Corpse* >( obj );
+			}
 		}
 	}
 

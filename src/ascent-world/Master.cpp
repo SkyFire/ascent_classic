@@ -106,8 +106,8 @@ ThreadBase * GetConsoleListener();
 
 bool Master::Run(int argc, char ** argv)
 {
-	char * config_file = (char*)default_config_file;
-	char * realm_config_file = (char*)default_realm_config_file;
+	char* config_file = const_cast< char* >( default_config_file );
+	char* realm_config_file = const_cast< char* >( default_realm_config_file );
 
 	int file_log_level = DEF_VALUE_NOT_SET;
 	int screen_log_level = DEF_VALUE_NOT_SET;
@@ -193,7 +193,7 @@ bool Master::Run(int argc, char ** argv)
 	if( do_check_conf )
 	{
 		Log.Notice( "Config", "Checking config file: %s", config_file );
-		if( Config.MainConfig.SetSource(config_file, true ) )
+		if( Config.MainConfig.SetSource( config_file, true ) )
 			Log.Success( "Config", "Passed without errors." );
 		else
 			Log.Warning( "Config", "Encountered one or more errors." );

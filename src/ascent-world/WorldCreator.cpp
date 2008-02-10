@@ -866,11 +866,38 @@ MapMgr * InstanceMgr::CreateBattlegroundInstance(uint32 mapid)
 			return NULL;
 	}
 
-	// burlex: there is actually no need to create an instance here. mapmgr deletion is performed by battlegroundmgr,
-	// and player addition also, so instancemgr doesn't need to keep track of it.
 	MapMgr * ret = new MapMgr(m_maps[mapid],mapid,GenerateInstanceID());
+	Instance * pInstance = new Instance();
+	pInstance->m_creation = UNIXTIME;
+	pInstance->m_creatorGroup = 0;
+	pInstance->m_creatorGuid = 0;
+	pInstance->m_difficulty = 0;
+	pInstance->m_expiration = 0;
+	pInstance->m_instanceId = ret->GetInstanceID();
+	pInstance->m_isBattleground = true;
+	pInstance->m_mapId = mapid;
+	pInstance->m_mapInfo = WorldMapInfoStorage.LookupEntry( mapid );
+	pInstance->m_mapMgr = ret;
+	m_mapLock.Acquire();
+	m_instances[mapid]->insert( make_pair( pInstance->m_instanceId, pInstance ) );
+	m_mapLock.Release();
 	ThreadPool.ExecuteTask(ret);
 	return ret;
+}
+
+void InstanceMgr::DeleteBattlegroundInstance(uint32 mapid, uint32 instanceid)
+{
+	m_mapLock.Acquire();
+	InstanceMap::iterator itr = m_instances[mapid]->find( instanceid );
+	if( itr == m_instances[mapid]->end() )
+	{
+		printf("Could not delete battleground instance!\n");
+		m_mapLock.Release();
+		return;
+	}
+
+	m_instances[mapid]->erase( itr );
+	m_mapLock.Release();
 }
 
 FormationMgr::FormationMgr()

@@ -189,12 +189,12 @@ public:
 ////////////////////////////////
     
     // double typedef lolz// a compile breaker..
-	typedef HM_NAMESPACE::hash_map<uint32, Player*>                     PlayerStorageMap;
+	typedef HM_NAMESPACE::hash_map< uint32, Player* > PlayerStorageMap;
 	PlayerStorageMap m_PlayerStorage;
-	__inline Player * GetPlayer(uint32 guid)
+	__inline Player* GetPlayer(uint32 guid)
 	{
-		PlayerStorageMap::iterator itr = m_PlayerStorage.find(guid);
-		return (itr != m_PlayerStorage.end()) ? itr->second : 0;
+		PlayerStorageMap::iterator itr = m_PlayerStorage.find( guid );
+		return( itr != m_PlayerStorage.end() ? itr->second : NULL );
 	}
 
 //////////////////////////////////////////////////////////
@@ -213,8 +213,8 @@ public:
 //////////////////////////////////////////////////////////
 // Lookup Wrappers
 ///////////////////////////////////
-	Unit * GetUnit(const uint64 & guid);
-	Object * _GetObject(const uint64 & guid);
+	Unit* GetUnit(const uint64 & guid);
+	Object* _GetObject(const uint64 & guid);
 
 	bool run();
 	bool Do();
