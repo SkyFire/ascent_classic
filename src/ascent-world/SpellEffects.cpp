@@ -1638,27 +1638,20 @@ void Spell::SpellEffectCreateItem(uint32 i) // Create item
 			newItem->SetUInt64Value(ITEM_FIELD_CREATOR,m_caster->GetGUID());
 			newItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, item_count);
 
-			if( m_itemProto->RandomPropId )
+			if (m_itemProto->RandomPropId)
 			{
-				RandomProps* iRandomProperty = lootmgr.GetRandomProperties( m_itemProto );
-				if( iRandomProperty != NULL )
-				{
-					newItem->SetRandomProperty( iRandomProperty->ID );
-					newItem->ApplyRandomProperties( false );
-				}
-
+				RandomProps * iRandomProperty = lootmgr.GetRandomProperties(m_itemProto);
+				newItem->SetRandomProperty(iRandomProperty->ID);
+				newItem->ApplyRandomProperties(false);
 			}
-			if( m_itemProto->RandomSuffixId )
+			if (m_itemProto->RandomSuffixId)
 			{
-				ItemRandomSuffixEntry* iRandomSuffix = lootmgr.GetRandomSuffix( m_itemProto );
-				if( iRandomSuffix != NULL )
-				{
-					newItem->SetRandomSuffix( iRandomSuffix->id );
-					newItem->ApplyRandomProperties( false );
-				}
+				ItemRandomSuffixEntry * iRandomSuffix = lootmgr.GetRandomSuffix(m_itemProto);
+				newItem->SetRandomSuffix(iRandomSuffix->id);
+				newItem->ApplyRandomProperties(false);
 			}
 
-			if( p_caster->GetItemInterface()->SafeAddItem( newItem, slotresult.ContainerSlot, slotresult.Slot ) )
+			if(p_caster->GetItemInterface()->SafeAddItem(newItem,slotresult.ContainerSlot, slotresult.Slot))
 			{
 				/*WorldPacket data(45);
 				p_caster->GetSession()->BuildItemPushResult(&data, p_caster->GetGUID(), 1, item_count, m_spellInfo->EffectSpellGroupRelation[i] ,0,0xFF,1,0xFFFFFFFF);
@@ -2058,44 +2051,44 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	}
 }
 
-void Spell::SpellEffectEnergize( uint32 i ) // Energize
+void Spell::SpellEffectEnergize(uint32 i) // Energize
 {
-	if( unitTarget == NULL || unitTarget->isAlive() )
+	if(!unitTarget || !unitTarget->isAlive())
 		return;
 
-	uint32 POWER_TYPE = UNIT_FIELD_POWER1 + m_spellInfo->EffectMiscValue[i];
+	uint32 POWER_TYPE=UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
 
-	uint32 curEnergy = (uint32)unitTarget->GetUInt32Value( POWER_TYPE );
-	uint32 maxEnergy = (uint32)unitTarget->GetUInt32Value( POWER_TYPE + 6 );
+	uint32 curEnergy = (uint32)unitTarget->GetUInt32Value(POWER_TYPE);
+	uint32 maxEnergy = (uint32)unitTarget->GetUInt32Value(POWER_TYPE+6);
 	uint32 modEnergy;
-
-	//yes there is always someone special : shamanistic rage - talent
-	if( m_spellInfo->Id == 30824 )
-		modEnergy = damage * GetUnitTarget()->GetAP() / 100;
-	else if( m_spellInfo->Id == 20272 && ProcedOnSpell ) //paladin illumination
+	//yess there is always someone special : shamanistic rage - talent
+	if(m_spellInfo->Id==30824)
+		modEnergy = damage*GetUnitTarget()->GetAP()/100;
+	//paladin illumination
+	else if(m_spellInfo->Id==20272 && ProcedOnSpell)
 	{
-		SpellEntry* motherspell = dbcSpell.LookupEntry( pSpellId );
-		if( motherspell != NULL )
-			modEnergy = ( motherspell->EffectBasePoints[0] + 1 ) * ProcedOnSpell->manaCost / 100;
+		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
+		if(motherspell)
+			modEnergy = (motherspell->EffectBasePoints[0]+1)*ProcedOnSpell->manaCost/100;
 	}
-	else if( m_spellInfo->Id == 31786 && ProcedOnSpell ) //paladin - Spiritual Attunement
+	//paladin - Spiritual Attunement 
+	else if(m_spellInfo->Id==31786 && ProcedOnSpell)
 	{
-		SpellEntry* motherspell = dbcSpell.LookupEntry( pSpellId );
-		if( motherspell != NULL )
+		SpellEntry *motherspell=dbcSpell.LookupEntry(pSpellId);
+		if(motherspell)
 		{
 			//heal amount from procspell (we only proced on a heal spell)
-			uint32 healamt = 0;
-			if( ProcedOnSpell->Effect[0] == SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[0] == SPELL_EFFECT_SCRIPT_EFFECT )
-				healamt = ProcedOnSpell->EffectBasePoints[0] + 1;
-			else if( ProcedOnSpell->Effect[1] == SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[1] == SPELL_EFFECT_SCRIPT_EFFECT )
-				healamt = ProcedOnSpell->EffectBasePoints[1] + 1;
-			else if( ProcedOnSpell->Effect[2] == SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[2] == SPELL_EFFECT_SCRIPT_EFFECT )
-				healamt = ProcedOnSpell->EffectBasePoints[2] + 1;
-			modEnergy = ( motherspell->EffectBasePoints[0] + 1 ) * ( healamt ) / 100;
+			uint32 healamt=0;
+			if(ProcedOnSpell->Effect[0]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[0]==SPELL_EFFECT_SCRIPT_EFFECT)
+				healamt=ProcedOnSpell->EffectBasePoints[0]+1;
+			else if(ProcedOnSpell->Effect[1]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[1]==SPELL_EFFECT_SCRIPT_EFFECT)
+				healamt=ProcedOnSpell->EffectBasePoints[1]+1;
+			else if(ProcedOnSpell->Effect[2]==SPELL_EFFECT_HEAL || ProcedOnSpell->Effect[2]==SPELL_EFFECT_SCRIPT_EFFECT)
+				healamt=ProcedOnSpell->EffectBasePoints[2]+1;
+			modEnergy = (motherspell->EffectBasePoints[0]+1)*(healamt)/100;
 		}
 	}
-	else if( m_spellInfo->Id == 2687 )
-	{
+	else if (m_spellInfo->Id==2687){
 		modEnergy = damage;
 		if( p_caster != NULL )
 		{
@@ -2106,26 +2099,26 @@ void Spell::SpellEffectEnergize( uint32 i ) // Energize
 				else if(*itr == 12301)
 					modEnergy += 30;
 			}*/
-			if( p_caster->mSpells.find( 12818 ) != p_caster->mSpells.end() )
+			if(p_caster->mSpells.find(12818) != p_caster->mSpells.end())
 				modEnergy += 60;
-			if( p_caster->mSpells.find( 12301 ) != p_caster->mSpells.end() )
+			if(p_caster->mSpells.find(12301) != p_caster->mSpells.end())
 				modEnergy += 30;
 		}
 	}
 	else  
         modEnergy = damage;
 
-	SendHealManaSpellOnPlayer( u_caster, unitTarget, modEnergy, m_spellInfo->EffectMiscValue[i] );
+	SendHealManaSpellOnPlayer(u_caster, unitTarget, modEnergy, m_spellInfo->EffectMiscValue[i]);
 
-	if( modEnergy + curEnergy > maxEnergy )
-		unitTarget->SetUInt32Value( POWER_TYPE, maxEnergy );
+	if(modEnergy + curEnergy > maxEnergy)
+		unitTarget->SetUInt32Value(POWER_TYPE,maxEnergy);
 	else
-		unitTarget->SetUInt32Value( POWER_TYPE, modEnergy + curEnergy);
+		unitTarget->SetUInt32Value(POWER_TYPE,modEnergy + curEnergy);
 }
 
-void Spell::SpellEffectWeaponDmgPerc( uint32 i ) // Weapon Percent damage
+void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage
 {
-	if( unitTarget == NULL || u_caster == NULL )
+	if(!unitTarget  || !u_caster)
 		return;
 
 	if( GetType() == SPELL_DMG_TYPE_MAGIC )
@@ -4129,24 +4122,8 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	}
 
 	uint32 displayID;
-	if ( p_caster->GetTeam() == 0)
-	{
-		if ( ci->Female_DisplayID != 0 )
-			displayID = ci->Female_DisplayID; //this is the nice solution provided by emsy
-		else //this is the case when you are using a blizzlike db
-		{
-			if( ci->Male_DisplayID == 4587 )
-				displayID = 19075;
-			else if( ci->Male_DisplayID == 4588 )
-				displayID = 19073;
-			else if( ci->Male_DisplayID == 4589 )
-				displayID = 19074;
-			else if( ci->Male_DisplayID == 4590 )
-				displayID = 19071;
-			else if( ci->Male_DisplayID == 4683 )
-				displayID = 19074;
-		}
-	}
+	if (!p_caster->GetTeam() && (ci->Female_DisplayID != 0))
+		displayID = ci->Female_DisplayID;
 	else
 		displayID = ci->Male_DisplayID;
 
@@ -4748,14 +4725,14 @@ void Spell::SpellEffectSummonDemon(uint32 i)
 
 void Spell::SpellEffectResurrect(uint32 i) // Resurrect (Flat)
 {
-	if( playerTarget == NULL )
+	if(!playerTarget)
 	{
-		if( corpseTarget == NULL )
+		if(!corpseTarget)
 		{
 			// unit resurrection handler
-			if( unitTarget == NULL )
+			if(unitTarget)
 			{
-				if( unitTarget->GetTypeId()==TYPEID_UNIT && unitTarget->IsPet() && unitTarget->isDead())
+				if(unitTarget->GetTypeId()==TYPEID_UNIT && unitTarget->IsPet() && unitTarget->isDead())
 				{
 					uint32 hlth = ((uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH) : (uint32)m_spellInfo->EffectBasePoints[i];
 					uint32 mana = ((uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1) : (uint32)m_spellInfo->EffectBasePoints[i];
@@ -4784,11 +4761,10 @@ void Spell::SpellEffectResurrect(uint32 i) // Resurrect (Flat)
 			return;
 		}
 		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt32Value(CORPSE_FIELD_OWNER));
-		if( playerTarget == NULL )
-			return;
+		if(!playerTarget) return;
 	}
 
-	if( playerTarget->isAlive() || !playerTarget->IsInWorld() )
+	if(playerTarget->isAlive() || !playerTarget->IsInWorld())
 		return;
 
 	uint32 health = m_spellInfo->EffectBasePoints[i];

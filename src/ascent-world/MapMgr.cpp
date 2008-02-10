@@ -1469,51 +1469,51 @@ void MapMgr::AddObject(Object *obj)
 	m_objectinsertlock.Release();//>>>>>>>>>>>>
 }
 
-Unit* MapMgr::GetUnit( const uint64 & guid )
-{
 
+Unit* MapMgr::GetUnit(const uint64 & guid)
+{
 #ifdef USING_BIG_ENDIAN
-	switch( ((uint32*)&guid)[0] )
+	switch (((uint32*)&guid)[0])
 #else
-	switch( ((uint32*)&guid)[1] )
+	switch (((uint32*)&guid)[1])
 #endif
 	{
-	case HIGHGUID_PLAYER:
-			return GetPlayer( (uint32)guid );
+	case	HIGHGUID_PLAYER:
+		return GetPlayer((uint32)guid);
 		break;
-	case HIGHGUID_UNIT:
-			return GetCreature( (uint32)guid );
+	case	HIGHGUID_UNIT:
+		return GetCreature((uint32)guid);
 		break;
-	case HIGHGUID_PET:
-			return GetPet( (uint32)guid );
+	case	HIGHGUID_PET:
+		return GetPet((uint32)guid);
 		break;
 	default:
 		return NULL;
 	}
 }
 
-Object* MapMgr::_GetObject( const uint64 & guid )
+Object* MapMgr::_GetObject(const uint64 & guid)
 {
 #ifdef USING_BIG_ENDIAN
-	switch( ((uint32*)&guid)[0] )
+	switch (((uint32*)&guid)[0])
 #else
-	switch( ((uint32*)&guid)[1] )
+	switch (((uint32*)&guid)[1])
 #endif
 	{
-	case HIGHGUID_GAMEOBJECT:
-		return GetGameObject( (uint32)guid );
+	case	HIGHGUID_GAMEOBJECT:
+		return GetGameObject((uint32)guid);
 		break;
-	case HIGHGUID_CORPSE:
-		return objmgr.GetCorpse( (uint32)guid );
+	case	HIGHGUID_CORPSE:
+		return objmgr.GetCorpse((uint32)guid);
 		break;
-	case HIGHGUID_DYNAMICOBJECT:
-		return GetDynamicObject( (uint32)guid );
+	case	HIGHGUID_DYNAMICOBJECT:
+		return GetDynamicObject((uint32)guid);
 		break;
-	case HIGHGUID_TRANSPORTER:
-		return objmgr.GetTransporter( GUID_LOPART(guid) );
+	case	HIGHGUID_TRANSPORTER:
+		return objmgr.GetTransporter(GUID_LOPART(guid));
 		break;
 	default:
-		return GetUnit( guid );
+		return GetUnit(guid);
 		break;
 	}
 }
@@ -1523,40 +1523,40 @@ void MapMgr::_PerformObjectDuties()
 	++mLoopCounter;
 	uint32 mstime = getMSTime();
 	uint32 difftime = mstime - lastUnitUpdate;
-	if( difftime > 500 )
+	if(difftime > 500)
 		difftime = 500;
 
 	// Update creatures.
 	{
-		Creature* ptr = NULL;
-		for( CreatureSet::iterator itr = activeCreatures.begin(); itr != activeCreatures.end(); )
+		CreatureSet::iterator itr = activeCreatures.begin();
+		PetStorageMap::iterator it2 = m_PetStorage.begin();
+		Creature * ptr;
+		Pet * ptr2;
+
+		for(; itr != activeCreatures.end();)
 		{
 			ptr = *itr;
 			++itr;
-			if( ptr != NULL )
-				ptr->Update( difftime );
+			ptr->Update(difftime);
 		}
-	}
 
-	// Update pets.
-	{
-		Pet* ptr = NULL;
-		for( PetStorageMap::iterator itr = m_PetStorage.begin(); itr != m_PetStorage.end(); )
+		for(; it2 != m_PetStorage.end();)
 		{
-			ptr = itr->second;
-			++itr;
-			if( ptr != NULL )
-				ptr->Update( difftime );
+			ptr2 = it2->second;
+			++it2;
+
+			ptr2->Update(difftime);
 		}		
 	}
 
 	// Update any events.
-	eventHolder.Update( difftime );
+	eventHolder.Update(difftime);
 
 	// Update players.
 	{
+		PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
 		Player* ptr;
-		for( PlayerStorageMap::iterator itr = m_PlayerStorage.begin(); itr != m_PlayerStorage.end(); )
+		for(; itr != m_PlayerStorage.end(); )
 		{
 			ptr = static_cast< Player* >( (itr->second) );
 			++itr;

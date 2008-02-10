@@ -23,7 +23,7 @@
 
 #ifdef VOICE_CHAT
 
-#include "../ascent-voicechat/VoiceChatOpcodes.h"
+#include "../voicechat/VoiceChatOpcodes.h"
 #include "VoiceChatClientSocket.h"
 
 class VoiceChatClientSocket;

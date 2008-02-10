@@ -5,6 +5,7 @@ Inspiration: only working on self (just like ancestral healing)
 Blessed Recovery http://www.wowhead.com/?spell=27811
 Blessed Resilience http://www.wowhead.com/?spell=33142
 Spell Warding http://www.wowhead.com/?spell=27900
+Holy Nova : Half Works (it does damage, but it doesn't heal)
 
 Prayer of Mending is not working.
 

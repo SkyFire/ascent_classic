@@ -89,7 +89,7 @@ void WorldSession::HandleInviteToGuild(WorldPacket & recv_data)
 		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_PERMISSIONS);
 		return;
 	}
-	else if(plyr->GetTeam()!=_player->GetTeam()) /** Hawk -- Removed GM check since now there's a GM command to do this */ // && _player->GetSession()->GetPermissionCount() == 0)
+	else if(plyr->GetTeam()!=_player->GetTeam() && _player->GetSession()->GetPermissionCount() == 0)
 	{
 		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_NOT_ALLIED);
 		return;
@@ -1087,7 +1087,7 @@ void WorldSession::HandleGuildBankModifyTab(WorldPacket & recv_data)
 		if( !(pTab->szTabIcon && strcmp(pTab->szTabIcon, tabicon.c_str()) == 0) )
 		{
 			ptmp = pTab->szTabIcon;
-			pTab->szTabIcon = strdup(tabicon.c_str());		// Hawk -- Fixed tab name setting instead of tab icon
+			pTab->szTabIcon = strdup(tabname.c_str());
 			if(ptmp)
 				free(ptmp);
 

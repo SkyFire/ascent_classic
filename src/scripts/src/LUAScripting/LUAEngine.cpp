@@ -1,23 +1,3 @@
-/*
- * Ascent MMORPG Server
- * LUA Interface
- * Copyright (C) 2007 Burlex <burlex@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
-
 #include "StdAfx.h"
 #include "LUAEngine.h"
 #include "LUAFunctions.h"
@@ -28,11 +8,9 @@
 #endif
 
 bool lua_is_starting_up = false;
-
-ScriptMgr* m_scriptMgr;
-LuaEngine* g_engine;
-
+ScriptMgr * m_scriptMgr;
 LuaEngineMgr g_luaMgr;
+LuaEngine * g_engine;
 
 extern "C" SCRIPT_DECL uint32 _exp_get_version()
 {
@@ -50,20 +28,16 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 	g_luaMgr.Startup();
 }
 
-template<typename T>
-const char* GetTClassName()
-{
-	return "UNKNOWN";
-}
+template<typename T> const char * GetTClassName() { return "UNKNOWN"; }
 
 template<>
-const char* GetTClassName<Unit>()
+const char * GetTClassName<Unit>()
 {
 	return "Unit";
 }
 
 template<>
-const char* GetTClassName<GameObject>()
+const char * GetTClassName<GameObject>()
 {
 	return "GameObject";
 }
@@ -154,9 +128,7 @@ RegType<GameObject> GOMethods[] = {
 	{ NULL, NULL },
 };
 
-template<typename T>
-RegType<T>* GetMethodTable() { return NULL; }
-
+template<typename T> RegType<T>* GetMethodTable() { return NULL; }
 template<>
 RegType<Unit>* GetMethodTable<Unit>() { return UnitMethods; }
 
@@ -1962,24 +1934,22 @@ int luaUnit_LearnSpell(lua_State * L, Unit* ptr)
 {
 	CHECK_TYPEID(TYPEID_PLAYER);
 	int spellid = luaL_checkint(L,1);
-	static_cast< Player* >( ptr )->addSpell(spellid);
+	((Player*)ptr)->addSpell(spellid);
 	return 0;
 }
 
 int luaUnit_MarkQuestObjectiveAsComplete(lua_State * L, Unit * ptr)
 {
-	CHECK_TYPEID( TYPEID_PLAYER );
-	int questid = luaL_checkint( L, 1 );
-	int objective = luaL_checkint( L, 2 );
-	Player* pl = static_cast< Player* >( ptr );
-	QuestLogEntry* qle = pl->GetQuestLogForEntry( questid );
-	if( qle != NULL )
-	{
-		qle->SetMobCount( objective, qle->GetQuest()->required_mobcount[objective] );
-		qle->SendUpdateAddKill( objective );
-		if( qle->CanBeFinished() )
-			qle->SendQuestComplete();
-	}
+	CHECK_TYPEID(TYPEID_PLAYER);
+	int questid = luaL_checkint(L,1);
+	int objective = luaL_checkint(L,2);
+	Player * pl = ((Player*)ptr);
+	QuestLogEntry * qle = pl->GetQuestLogForEntry(questid);
+	qle->SetMobCount(objective, qle->GetQuest()->required_mobcount[objective]);
+	qle->SendUpdateAddKill(objective);
+	if(qle->CanBeFinished())
+		qle->SendQuestComplete();
+
 	return 0;
 }
 

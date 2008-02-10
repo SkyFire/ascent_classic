@@ -8,9 +8,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GossipScripts", "projects\G
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerStatusPlugin", "projects\ServerStatusPlugin2005.vcproj", "{141DFBCF-91AE-4052-B916-60639C722EFA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LUAScripting", "projects\LUAScripting2005.vcproj", "{AEFCEECF-6839-4F1B-9317-70BF3EE09247}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AngelScriptScripting", "projects\AngelScriptScripting2008.vcproj", "{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LUAScripting2005", "projects\LUAScripting2005.vcproj", "{AEFCEECF-6839-4F1B-9317-70BF3EE09247}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,12 +56,6 @@ Global
 		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Release|Win32.ActiveCfg = Release|Win32
 		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Release|Win32.Build.0 = Release|Win32
 		{AEFCEECF-6839-4F1B-9317-70BF3EE09247}.Release|x64.ActiveCfg = Release|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|Win32.Build.0 = Debug|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Debug|x64.ActiveCfg = Debug|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|Win32.ActiveCfg = Release|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|Win32.Build.0 = Release|Win32
-		{39E6AF97-6BA3-4A72-8C61-BCEBF214EBFD}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

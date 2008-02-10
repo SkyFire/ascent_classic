@@ -838,9 +838,6 @@ public:
 	// Spell Crit
 	float spellcritperc;
 
-	// on regain movement
-	void EventRegainMovement();
-
 	// AIInterface
 	AIInterface *GetAIInterface() { return m_aiInterface; }
 	void ReplaceAIInterface(AIInterface *new_interface) ;
@@ -900,47 +897,46 @@ public:
 	//int32 RangedDamageTakenPct; 
 
 	//SM
-	int32* SM_CriticalChance;//flat
-	int32* SM_FDur;//flat
-	int32* SM_PDur;//pct
-	int32* SM_PRadius;//pct
-	int32* SM_FRadius;//flat
-	int32* SM_PRange;//pct
-	int32* SM_FRange;//flat
-	int32* SM_PCastTime;//pct
-	int32* SM_FCastTime;//flat
-	int32* SM_PCriticalDamage;
-	int32* SM_PDOT;//pct
-	int32* SM_FDOT;//flat
-	int32* SM_FEffectBonus;//flat
-	int32* SM_PEffectBonus;//pct
-	int32* SM_FDamageBonus;//flat
-	int32* SM_PDamageBonus;//pct
-	int32* SM_PSPELL_VALUE;//pct
-	int32* SM_FSPELL_VALUE;//flat
-	int32* SM_FHitchance;//flat
-	int32* SM_PAPBonus;//pct
-	int32* SM_PCost;
-	int32* SM_FCost;
-	int32* SM_PNonInterrupt;
-	int32* SM_PJumpReduce;
-	int32* SM_FSpeedMod;
-	int32* SM_FAdditionalTargets;
-	int32* SM_FPenalty;//flat
-	int32* SM_PPenalty;//Pct
-	int32* SM_PCooldownTime;
-	int32* SM_FCooldownTime;
-	int32* SM_FChanceOfSuccess;
-	int32* SM_FRezist_dispell;
-	int32* SM_PRezist_dispell;
-
+	int32 * SM_CriticalChance;//flat
+	int32 * SM_FDur;//flat
+	int32 * SM_PDur;//pct
+	int32 * SM_PRadius;//pct
+	int32 * SM_FRadius;//flat
+	int32 * SM_PRange;//pct
+	int32 * SM_FRange;//flat
+	int32 * SM_PCastTime;//pct
+	int32 * SM_FCastTime;//flat
+	int32 * SM_PCriticalDamage;
+	int32 * SM_PDOT;//pct
+	int32 * SM_FDOT;//flat
+	int32 * SM_FEffectBonus;//flat
+	int32 * SM_PEffectBonus;//pct
+	int32 * SM_FDamageBonus;//flat
+	int32 * SM_PDamageBonus;//pct
+	int32 * SM_PSPELL_VALUE;//pct
+	int32 * SM_FSPELL_VALUE;//flat
+	int32 * SM_FHitchance;//flat
+	int32 * SM_PAPBonus;//pct
+	int32 * SM_PCost;
+	int32 * SM_FCost;
+	int32 * SM_PNonInterrupt;
+	int32 * SM_PJumpReduce;
+	int32 * SM_FSpeedMod;
+	int32 * SM_FAdditionalTargets;
+	int32 * SM_FPenalty;//flat
+	int32 * SM_PPenalty;//Pct
+	int32 * SM_PCooldownTime;
+	int32 * SM_FCooldownTime;
+	int32 * SM_FChanceOfSuccess;
+	int32 * SM_FRezist_dispell;
+	int32 * SM_PRezist_dispell;
 	void InheritSMMods(Unit *inherit_from);
 	std::map<uint32,signed int> target_spell_effect_mod_flat; //used very rarely by some talents. Will mod the value of a casted spell on target
 	std::map<uint32,signed int> target_spell_effect_mod_pct; //used very rarely by some talents. Store value in % format
 
 	//Events
-	void Emote( EmoteType emote );
-	void EventAddEmote( EmoteType emote, uint32 time );
+	void Emote (EmoteType emote);
+	void EventAddEmote(EmoteType emote, uint32 time);
 	void EmoteExpire();
 	ASCENT_INLINE void setEmoteState(uint8 emote) { m_emoteState = emote; };
 	ASCENT_INLINE uint32 GetOldEmote() { return m_oldEmote; }
@@ -956,10 +952,10 @@ public:
 		return StandState (uint8 (bytes1));
 	}
 
-	void SendChatMessage( uint8 type, uint32 lang, const char* msg );
-	void SendChatMessageToPlayer( uint8 type, uint32 lang, const char* msg, Player* plr );
-	void SendChatMessageAlternateEntry( uint32 entry, uint8 type, uint32 lang, const char* msg);
-	void RegisterPeriodicChatMessage( uint32 delay, uint32 msgid, std::string message, bool sendnotify );
+	void SendChatMessage(uint8 type, uint32 lang, const char *msg);
+	void SendChatMessageToPlayer(uint8 type, uint32 lang, const char *msg, Player *plr);
+	void SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg);
+	void RegisterPeriodicChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify);
 
 	ASCENT_INLINE int GetHealthPct() { return (int)(GetUInt32Value(UNIT_FIELD_HEALTH) * 100 / GetUInt32Value(UNIT_FIELD_MAXHEALTH)); };
     ASCENT_INLINE void SetHealthPct(uint32 val) { if (val>0) SetUInt32Value(UNIT_FIELD_HEALTH,float2int32(val*0.01f*GetUInt32Value(UNIT_FIELD_MAXHEALTH))); };
@@ -1024,7 +1020,6 @@ public:
 	// Affect Speed
 	int32 m_speedModifier;
 	int32 m_slowdown;
-	float m_maxspeed;
 	map< uint32, int32 > speedReductionMap;
 	bool GetSpeedDecrease();
 	int32 m_mountedspeedModifier;

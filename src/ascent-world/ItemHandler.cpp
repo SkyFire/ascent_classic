@@ -63,8 +63,7 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 				{
 					i1->ModUInt32Value(ITEM_FIELD_STACK_COUNT, -c);
 					i2->ModUInt32Value(ITEM_FIELD_STACK_COUNT, +c);
-					i1->m_isDirty = true;
-					i2->m_isDirty = true;
+					i1->m_isDirty = i2->m_isDirty = true;
 				}
 				else
 				{
@@ -91,7 +90,6 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 			i2=objmgr.CreateItem(i1->GetEntry(),_player);
 			i2->SetUInt32Value(ITEM_FIELD_STACK_COUNT,c);
 			i1->m_isDirty = true;
-			i2->m_isDirty = true;
 
 			if(DstSlot == -1)
 			{
@@ -881,11 +879,8 @@ void WorldSession::HandleBuyBackOpcode( WorldPacket & recv_data )
 			return;
 		}
 		_player->ModUInt32Value( PLAYER_FIELD_COINAGE , -cost);
-		_player->GetItemInterface()->RemoveBuyBackItem(stuff);
-
 		if (!add)
 		{
-			it->m_isDirty = true;			// save the item again on logout
 			result = _player->GetItemInterface()->AddItemToFreeSlot(it);
 			if(!result)
 			{
@@ -896,13 +891,6 @@ void WorldSession::HandleBuyBackOpcode( WorldPacket & recv_data )
 		{
 			add->SetCount(add->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + amount);
 			add->m_isDirty = true;
-
-			// delete the item
-			it->DeleteFromDB();
-
-			// free the pointer
-			it->DestroyForPlayer( _player );
-			it->Delete();
 		}
 
 		data.Initialize( SMSG_BUY_ITEM );
@@ -910,6 +898,7 @@ void WorldSession::HandleBuyBackOpcode( WorldPacket & recv_data )
 		data << uint32(itemid) << uint32(amount);
 		SendPacket( &data );
 	}
+	_player->GetItemInterface()->RemoveBuyBackItem(stuff);
 }
 
 void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
@@ -1005,7 +994,6 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
 		if(item)
 		{
 			_player->GetItemInterface()->AddBuyBackItem(item,(it->SellPrice) * quantity);
-			item->DeleteFromDB();
 		}
 	}
 
@@ -1386,12 +1374,6 @@ void WorldSession::SendInventoryList(Creature* unit)
 		{
 			if((curItem = ItemPrototypeStorage.LookupEntry(itr->itemid)))
 			{
-				if(curItem->AllowableClass && !(_player->getClassMask() & curItem->AllowableClass))
-					continue;
-
-				if(curItem->AllowableRace && !(_player->getRaceMask() & curItem->AllowableRace))
-					continue;
-
 				int32 av_am = (itr->max_amount>0)?itr->available_amount:-1;
 				data << (counter + 1);
 				data << curItem->ItemId;
@@ -1548,13 +1530,10 @@ void WorldSession::HandleReadItemOpcode(WorldPacket &recvPacket)
 
 void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 {
-	if( _player == NULL )
-		return;
-
-	if( !_player->IsInWorld() )
-		return;
-
+	if(!_player->IsInWorld()) return;
 	CHECK_PACKET_SIZE(recvPacket, 12);
+	if(!GetPlayer())
+		return;
 
 	uint64 npcguid;
 	uint64 itemguid;
@@ -1569,10 +1548,10 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 				// maxdurability - currentdurability
 				// it its 0 no durabiliti needs to be set
 				uint32 dDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurabilityMax() - _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
-				if( dDurability > 0 )
+				if (dDurability)
 				{
 					// the amount of durability that is needed to be added is the amount of money to be payed
-					if( dDurability <= _player->GetUInt32Value( PLAYER_FIELD_COINAGE ) )
+					if (dDurability <= _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
 					{
 						int32 cDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
 					   _player->ModUInt32Value( PLAYER_FIELD_COINAGE , -(int32)dDurability );
@@ -1942,6 +1921,20 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 
 	// all checks passed ok
 	source_entry = src->GetEntry();
+	dst->SetProto( src->GetProto() );
+
+	if( src->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) <= 1 )
+	{
+		// destroy the source item
+		_player->GetItemInterface()->SafeFullRemoveItemByGuid( src->GetGUID() );
+	}
+	else
+	{
+		// reduce stack count by one
+		src->ModUInt32Value( ITEM_FIELD_STACK_COUNT, -1 );
+		src->m_isDirty = true;
+	}
+
 	itemid = source_entry;
 	switch( source_entry )
 	{
@@ -1968,25 +1961,6 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 	case 21830:
 		itemid = 21831;
 		break;
-
-	default:
-		_player->GetItemInterface()->BuildInventoryChangeError( src, dst, INV_ERR_WRAPPED_CANT_BE_WRAPPED );
-		return;
-		break;
-	}
-
-	dst->SetProto( src->GetProto() );
-
-	if( src->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) <= 1 )
-	{
-		// destroy the source item
-		_player->GetItemInterface()->SafeFullRemoveItemByGuid( src->GetGUID() );
-	}
-	else
-	{
-		// reduce stack count by one
-		src->ModUInt32Value( ITEM_FIELD_STACK_COUNT, -1 );
-		src->m_isDirty = true;
 	}
 
 	// change the dest item's entry

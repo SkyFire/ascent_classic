@@ -289,15 +289,12 @@ void Guild::CreateFromCharter(Charter * pCharter, WorldSession * pTurnIn)
 
 void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 {
-	
-
 	if(pClient->GetPlayer()->m_playerInfo->guild != this || pMember->guild != this)
 		return;
 
 	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_PROMOTE))
 	{
-		
-		SendGuildCommandResult(pClient, GUILD_MEMBER_S, "", GUILD_PERMISSIONS); 
+		SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
 		return;
 	}
 
@@ -305,12 +302,6 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	if(pMember->guildRank->iId == 1)
 	{
 		pClient->SystemMessage("You cannot promote this member any further.");
-		return;
-	}
-
-	// Hawk -- Can't promote if current rank is equivalent to our rank
-	if (pMember->guildRank->iId == pClient->GetPlayer()->m_playerInfo->guildRank->iId) {
-		pClient->SystemMessage("You cannot promote this player any further.");
 		return;
 	}
 
@@ -345,7 +336,7 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 
 	// log it
 	LogGuildEvent(GUILD_EVENT_PROMOTION, 3, pClient->GetPlayer()->GetName(), pMember->name, newRank->szRankName);
-	AddGuildLogEntry(GUILD_LOG_EVENT_PROMOTION, 3, pClient->GetPlayer()->GetGUIDLow(), pMember->guid, newRank->iId);
+	AddGuildLogEntry(GUILD_LOG_EVENT_PROMOTION, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid, newRank->iId);
 
 	// update in the database
 	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, pMember->guid, m_guildId);
@@ -366,14 +357,7 @@ void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	if(!pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_DEMOTE) ||
 		pMember->guid == GetGuildLeader())
 	{
-
-		SendGuildCommandResult(pClient, GUILD_MEMBER_S, "", GUILD_PERMISSIONS); 
-		return;
-	}
-
-	// Hawk - Can't demote people that are a higher rank than you
-	if (pMember->guildRank->iId < pClient->GetPlayer()->m_playerInfo->guildRank->iId) {
-		SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", C_R_NAME_RANK_TOO_HIGH);
+		SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
 		return;
 	}
 
@@ -391,9 +375,7 @@ void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	if(newRank==NULL)
 	{
 		m_lock.Release();
-		
-		//pClient->SystemMessage("Could not find a rank to demote this member to.");
-		SendGuildCommandResult(pClient, GUILD_PROMOTE_S, pMember->name, C_R_NAME_RANK_AT_LOWEST_RANK);
+		pClient->SystemMessage("Could not find a rank to demote this member to.");
 		return;
 	}
 
@@ -410,7 +392,7 @@ void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 
 	// log it
 	LogGuildEvent(GUILD_EVENT_DEMOTION, 3, pClient->GetPlayer()->GetName(), pMember->name, newRank->szRankName);
-	AddGuildLogEntry(GUILD_LOG_EVENT_DEMOTION, 3, pClient->GetPlayer()->GetGUIDLow(), pMember->guid, newRank->iId);
+	AddGuildLogEntry(GUILD_LOG_EVENT_DEMOTION, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid, newRank->iId);
 
 	// update in the database
 	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, pMember->guid, m_guildId);
@@ -715,13 +697,11 @@ void Guild::AddGuildMember(PlayerInfo * pMember, WorldSession * pClient, int32 F
 	if(pMember->guild != NULL)
 		return;
 
-	if (pClient && pClient->HasGMPermissions() == false) {
-		if(pClient && pClient->GetPlayer()->m_playerInfo->guild != this)
-			return;
+	if(pClient && pClient->GetPlayer()->m_playerInfo->guild != this)
+		return;
 
-		if(pClient && !pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_INVITE))
-			return;
-	}
+	if(pClient && !pClient->GetPlayer()->m_playerInfo->guildRank->CanPerformCommand(GR_RIGHT_INVITE))
+		return;
 
 	m_lock.Acquire();
 	GuildRank * r;
@@ -849,15 +829,6 @@ void Guild::SetPublicNote(PlayerInfo * pMember, const char * szNewNote, WorldSes
 			itr->second->szPublicNote = strdup(szNewNote);
 		else
 			itr->second->szPublicNote = NULL;
-
-		// Update the database
-		if (itr->second->szPublicNote == NULL) 
-			CharacterDatabase.Execute("UPDATE guild_data SET publicNote=\"\" WHERE playerid=%u", pMember->guid);
-		else
-			CharacterDatabase.Execute("UPDATE guild_data SET publicNote=\"%s\" WHERE playerid=%u", 
-				CharacterDatabase.EscapeString(string(itr->second->szPublicNote)).c_str(),
-				pMember->guid
-			);
 	}
 	m_lock.Release();
 
@@ -889,15 +860,6 @@ void Guild::SetOfficerNote(PlayerInfo * pMember, const char * szNewNote, WorldSe
 			itr->second->szOfficerNote = strdup(szNewNote);
 		else
 			itr->second->szOfficerNote = NULL;
-
-		// Update the database
-		if (itr->second->szOfficerNote == NULL) 
-			CharacterDatabase.Execute("UPDATE guild_data SET officerNote=\"\" WHERE playerid=%u", pMember->guid);
-		else
-			CharacterDatabase.Execute("UPDATE guild_data SET officerNote=\"%s\" WHERE playerid=%u", 
-				CharacterDatabase.EscapeString(string(itr->second->szOfficerNote)).c_str(),
-				pMember->guid
-			);
 	}
 	m_lock.Release();
 
@@ -966,8 +928,7 @@ void Guild::ChangeGuildMaster(PlayerInfo * pNewMaster, WorldSession * pClient)
 {
 	if(pClient->GetPlayer()->GetGUIDLow() != m_guildLeader)
 	{
-		//Guild::SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
-		pClient->SystemMessage("Permission denied.");
+		Guild::SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
 		return;
 	}
 

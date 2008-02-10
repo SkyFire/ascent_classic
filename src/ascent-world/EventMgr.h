@@ -143,8 +143,7 @@ enum EventTypes
 	EVENT_MUTE_PLAYER,			//Zack 2007 06 05: player gains his voice back
 	EVENT_PLAYER_FORECED_RESURECT,		//Zack 2007 06 08: After player not pushing release spirit for 6 minutes while dead
 	EVENT_PLAYER_SOFT_DISCONNECT,		//Zack 2007 06 12: Kick AFK players to not eat resources
-	EVENT_BATTLEGROUND_WSG_AUTO_RETURN_FLAG,
-	EVENT_BATTLEGROUND_WSG_AUTO_RETURN_FLAG_1,
+	EVENT_BATTLEGROND_WSG_AUTO_RETURN_FLAG,
 	EVENT_CORPSE_SPAWN_BONES,
 	EVENT_DODGE_BLOCK_FLAG_EXPIRE,	//yeah, there are more then 1 flags
 	EVENT_REJUVENATION_FLAG_EXPIRE,
@@ -177,10 +176,11 @@ enum EventFlags
 
 struct SERVER_DECL TimedEvent
 {
-	TimedEvent( void* object, CallbackBase* callback, uint32 type, time_t time, uint32 repeat, uint32 flags) : obj(object), cb(callback), eventType(type), eventFlag(flags), msTime(time), currTime(time), repeats(repeat), deleted(false), ref(0) {}
+	TimedEvent(void* object, CallbackBase* callback, uint32 type, time_t time, uint32 repeat, uint32 flags) : 
+		obj(object), cb(callback), eventType(type), eventFlag(flags), msTime(time), currTime(time), repeats(repeat), deleted(false),ref(0) {}
 		
-	void* obj;
-	CallbackBase* cb;
+	void *obj;
+	CallbackBase *cb;
 	uint32 eventType;
 	uint16 eventFlag;
 	time_t msTime;
@@ -190,12 +190,12 @@ struct SERVER_DECL TimedEvent
 	int instanceId;
 	volatile long ref;
 
-	static TimedEvent* Allocate( void* object, CallbackBase* callback, uint32 flags, time_t time, uint32 repeat );
+	static TimedEvent * Allocate(void* object, CallbackBase* callback, uint32 flags, time_t time, uint32 repeat);
 
 #ifdef WIN32
 	void DecRef()
 	{
-		InterlockedDecrement( &ref );
+		InterlockedDecrement(&ref);
 		if(ref <= 0)
 		{
 			delete cb;
@@ -226,157 +226,110 @@ struct SERVER_DECL TimedEvent
 
 class EventMgr;
 class EventableObjectHolder;
-typedef map< int32, EventableObjectHolder* > HolderMap;
+typedef map<int32, EventableObjectHolder*> HolderMap;
 
-class SERVER_DECL EventMgr : public Singleton< EventMgr >
+class SERVER_DECL EventMgr : public Singleton < EventMgr >
 {
-
 	friend class MiniEventMgr;
-
 public:
-
-	template< class Class >
-	void AddEvent( Class *obj, void (Class::*method)(), uint32 type, uint32 time, uint32 repeats, uint32 flags )
+	template <class Class>
+		void AddEvent(Class *obj, void (Class::*method)(), uint32 type, uint32 time, uint32 repeats, uint32 flags)
 	{
-		if( obj == NULL )
-			return;
-
 		// create a timed event
-		TimedEvent* event = new TimedEvent(obj, new CallbackP0<Class>(obj, method), type, time, repeats, flags );
+		TimedEvent * event = new TimedEvent(obj, new CallbackP0<Class>(obj, method), type, time, repeats, flags);
 
 		// add this to the object's list, updating will all be done later on...
-		obj->event_AddEvent( event );
+		obj->event_AddEvent(event);
 	}
 
-	template< class Class, typename P1 >
-	void AddEvent( Class *obj, void (Class::*method)(P1), P1 p1, uint32 type, uint32 time, uint32 repeats, uint32 flags )
+	template <class Class, typename P1>
+		void AddEvent(Class *obj, void (Class::*method)(P1), P1 p1, uint32 type, uint32 time, uint32 repeats, uint32 flags)
 	{
-		if( obj == NULL )
-			return;
-
 		// create a timed event
-		TimedEvent* event = new TimedEvent(obj, new CallbackP1<Class, P1>(obj, method, p1), type, time, repeats, flags );
+		TimedEvent * event = new TimedEvent(obj, new CallbackP1<Class, P1>(obj, method, p1), type, time, repeats, flags);
 
 		// add this to the object's list, updating will all be done later on...
-		obj->event_AddEvent( event );
+		obj->event_AddEvent(event);
 	}
 
-	template< class Class, typename P1, typename P2 >
-	void AddEvent( Class *obj, void (Class::*method)(P1,P2), P1 p1, P2 p2, uint32 type, uint32 time, uint32 repeats, uint32 flags )
+	template <class Class, typename P1, typename P2>
+		void AddEvent(Class *obj, void (Class::*method)(P1,P2), P1 p1, P2 p2, uint32 type, uint32 time, uint32 repeats, uint32 flags)
 	{
-		if( obj == NULL )
-			return;
-
 		// create a timed event
-		TimedEvent* event = new TimedEvent(obj, new CallbackP2<Class, P1, P2>(obj, method, p1, p2), type, time, repeats, flags );
+		TimedEvent * event = new TimedEvent(obj, new CallbackP2<Class, P1, P2>(obj, method, p1, p2), type, time, repeats, flags);
 
 		// add this to the object's list, updating will all be done later on...
-		obj->event_AddEvent( event );
+		obj->event_AddEvent(event);
 	}
 
-	template< class Class, typename P1, typename P2, typename P3 >
-	void AddEvent( Class *obj,void (Class::*method)(P1,P2,P3), P1 p1, P2 p2, P3 p3, uint32 type, uint32 time, uint32 repeats, uint32 flags )
+	template <class Class, typename P1, typename P2, typename P3>
+		void AddEvent(Class *obj,void (Class::*method)(P1,P2,P3), P1 p1, P2 p2, P3 p3, uint32 type, uint32 time, uint32 repeats, uint32 flags)
 	{
-		if( obj == NULL )
-			return;
-
 		// create a timed event
-		TimedEvent* event = new TimedEvent(obj, new CallbackP3<Class, P1, P2, P3>(obj, method, p1, p2, p3), type, time, repeats, flags );
+		TimedEvent * event = new TimedEvent(obj, new CallbackP3<Class, P1, P2, P3>(obj, method, p1, p2, p3), type, time, repeats, flags);
 
 		// add this to the object's list, updating will all be done later on...
-		obj->event_AddEvent( event );
+		obj->event_AddEvent(event);
 	}
 
-	template< class Class, typename P1, typename P2, typename P3, typename P4 >
-	void AddEvent( Class *obj, void (Class::*method)(P1,P2,P3,P4), P1 p1, P2 p2, P3 p3, P4 p4, uint32 type, uint32 time, uint32 repeats, uint32 flags )
+	template <class Class, typename P1, typename P2, typename P3, typename P4>
+		void AddEvent(Class *obj, void (Class::*method)(P1,P2,P3,P4), P1 p1, P2 p2, P3 p3, P4 p4, uint32 type, uint32 time, uint32 repeats, uint32 flags)
 	{
-		if( obj == NULL )
-			return;
-
 		// create a timed event
-		TimedEvent* event = new TimedEvent(obj, new CallbackP4<Class, P1, P2, P3, P4>(obj, method, p1, p2, p3, p4), type, time, repeats, flags );
+		TimedEvent * event = new TimedEvent(obj, new CallbackP4<Class, P1, P2, P3, P4>(obj, method, p1, p2, p3, p4), type, time, repeats, flags);
 
 		// add this to the object's list, updating will all be done later on...
-		obj->event_AddEvent( event );
+		obj->event_AddEvent(event);
 	}
 
-	template< class Class >
-	void RemoveEvents( Class* obj )
+	template <class Class> void RemoveEvents(Class *obj) { obj->event_RemoveEvents(-1); }
+	template <class Class> void RemoveEvents(Class *obj, int32 type)
 	{
-		if( obj == NULL )
-			return;
-
-		obj->event_RemoveEvents( -1 );
+		obj->event_RemoveEvents(type);
 	}
 
-	template< class Class >
-	void RemoveEvents( Class* obj, int32 type )
+	template <class Class> void ModifyEventTimeLeft(Class *obj, uint32 type, uint32 time,bool unconditioned=true)
 	{
-		if( obj == NULL )
-			return;
-
-		obj->event_RemoveEvents( type );
+		obj->event_ModifyTimeLeft(type, time,unconditioned);
 	}
 
-	template< class Class >
-	void ModifyEventTimeLeft( Class* obj, uint32 type, uint32 time, bool unconditioned = true )
+	template <class Class> void ModifyEventTimeAndTimeLeft(Class *obj, uint32 type, uint32 time)
 	{
-		if( obj == NULL )
-			return;
-
-		obj->event_ModifyTimeLeft( type, time, unconditioned );
+		obj->event_ModifyTimeAndTimeLeft(type, time);
 	}
 
-	template< class Class >
-	void ModifyEventTimeAndTimeLeft( Class* obj, uint32 type, uint32 time )
+	template <class Class> void ModifyEventTime(Class *obj, uint32 type, uint32 time)
 	{
-		if( obj == NULL )
-			return;
-
-		obj->event_ModifyTimeAndTimeLeft( type, time );
+		obj->event_ModifyTime(type, time);
 	}
 
-	template< class Class >
-	void ModifyEventTime( Class* obj, uint32 type, uint32 time )
+	template <class Class> bool HasEvent(Class *obj, uint32 type)
 	{
-		if( obj == NULL )
-			return;
-
-		obj->event_ModifyTime( type, time );
-	}
-
-	template< class Class >
-	bool HasEvent(Class *obj, uint32 type)
-	{
-		if( obj == NULL )
-			return false;
-
-		return obj->event_HasEvent( type );
+		return obj->event_HasEvent(type);
 	}
 
 	EventableObjectHolder * GetEventHolder(int32 InstanceId)
 	{
 		HolderMap::iterator itr = mHolders.find(InstanceId);
-		if( itr == mHolders.end() )
-			return 0;
+		if(itr == mHolders.end()) return 0;
 		return itr->second;
 	}
 
-	void AddEventHolder( EventableObjectHolder* holder, int32 InstanceId )
+	void AddEventHolder(EventableObjectHolder * holder, int32 InstanceId)
 	{
 		holderLock.Acquire();
 		mHolders.insert( HolderMap::value_type( InstanceId, holder) );
 		holderLock.Release();
 	}
 
-	void RemoveEventHolder( int32 InstanceId )
+	void RemoveEventHolder(int32 InstanceId)
 	{
 		holderLock.Acquire();
-		mHolders.erase( InstanceId );
+		mHolders.erase(InstanceId);
 		holderLock.Release();
 	}
 
-	void RemoveEventHolder( EventableObjectHolder* holder )
+	void RemoveEventHolder(EventableObjectHolder * holder)
 	{
 		holderLock.Acquire();
 		HolderMap::iterator itr = mHolders.begin();

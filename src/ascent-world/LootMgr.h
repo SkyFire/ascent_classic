@@ -27,7 +27,7 @@ class LootRoll : public EventableObject
 public:
 	LootRoll(uint32 timer, uint32 groupcount, uint64 guid, uint32 slotid, uint32 itemid, uint32 itemunk1, uint32 itemunk2, MapMgr * mgr);
 	~LootRoll();
-	void PlayerRolled(Player* player, uint8 choice);
+	void PlayerRolled(Player *player, uint8 choice);
 	void Finalize();
 
 	int32 event_GetInstanceID();
@@ -43,15 +43,15 @@ private:
 	uint32 _itemunk2;
 	uint32 _remaining;
 	uint64 _guid;
-	MapMgr* _mgr;
+	MapMgr * _mgr;
 };
 
-typedef vector< pair< RandomProps*, float > > RandomPropertyVector;
-typedef vector< pair< ItemRandomSuffixEntry*, float > > RandomSuffixVector;
+typedef vector<pair<RandomProps*, float> > RandomPropertyVector;
+typedef vector<pair<ItemRandomSuffixEntry*, float> > RandomSuffixVector;
 
 typedef struct
 {
-	ItemPrototype* itemproto;
+	ItemPrototype * itemproto;
 	uint32 displayid;
 }_LootItem;
 

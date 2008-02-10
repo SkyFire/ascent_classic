@@ -821,6 +821,26 @@ void WorldSession::FullLogin(Player * plr)
 	// Login time, will be used for played time calc
 	plr->m_playedtime[2] = (uint32)UNIXTIME;
 
+	//Issue a message telling all guild members that this player has signed on
+	if(plr->IsInGuild())
+	{
+		Guild *pGuild = plr->m_playerInfo->guild;
+		if(pGuild)
+		{
+			WorldPacket data(50);
+			data.Initialize(SMSG_GUILD_EVENT);
+			data << uint8(GUILD_EVENT_MOTD);
+			data << uint8(0x01);
+			if(pGuild->GetMOTD())
+				data << pGuild->GetMOTD();
+			else
+				data << uint8(0);
+			SendPacket(&data);
+
+			pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 1, plr->GetName());
+		}
+	}
+
 	// Send online status to people having this char in friendlist
 	sSocialMgr.LoggedIn( GetPlayer() );
 
@@ -844,36 +864,6 @@ void WorldSession::FullLogin(Player * plr)
 	{
 		_player->BroadcastMessage("Online Players: %s%u |rPeak: %s%u|r Accepted Connections: %s%u",
 			MSG_COLOR_WHITE, sWorld.GetSessionCount(), MSG_COLOR_WHITE, sWorld.PeakSessionCount, MSG_COLOR_WHITE, sWorld.mAcceptedConnections);
-	}
-
-	/** Hawk -- Moved this codeblock to be after the server MOTD, like bliz */
-	//Issue a message telling all guild members that this player has signed on
-	if(plr->IsInGuild())
-	{
-		Guild *pGuild = plr->m_playerInfo->guild;
-		if(pGuild)
-		{
-			WorldPacket data(50);
-			data.Initialize(SMSG_GUILD_EVENT);
-			data << uint8(GUILD_EVENT_MOTD);
-			data << uint8(0x01);
-			if(pGuild->GetMOTD())
-				data << pGuild->GetMOTD();
-			else
-				data << uint8(0);
-			SendPacket(&data);
-			
-			// Hawk -- Fix - Send out online packet to entire guild
-			data.Initialize(SMSG_GUILD_EVENT);
-			data << uint8(GUILD_EVENT_HASCOMEONLINE);
-			data << uint8(0x01);
-			data << plr->GetName();
-			data << plr->GetGUID();
-
-			pGuild->SendPacket(&data);
-			//pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 1, plr->GetName());
-
-		}
 	}
 
 	// Calculate rested experience if there is time between lastlogoff and now

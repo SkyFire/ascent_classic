@@ -180,12 +180,6 @@ public:
 	uint32 m_currMsTime;
 	uint32 m_lastPing;
 
-	uint32 m_packet_counter;
-	uint32 m_packet_counter_time;
-
-	float m_packets_per_second;
-	float m_packets_per_second_peak;
-
 	ASCENT_INLINE uint32 GetAccountId() const { return _accountId; }
 	ASCENT_INLINE Player* GetPlayer() { return _player; }
 	
@@ -245,7 +239,6 @@ public:
 
 	ASCENT_INLINE void QueuePacket(WorldPacket* packet)
 	{
-		m_packet_counter++;
 		m_lastPing = (uint32)UNIXTIME;
 		_recvQueue.Push(packet);
 	}
@@ -275,8 +268,6 @@ public:
 	ASCENT_INLINE uint32 GetLatency() { return _latency; }
 	ASCENT_INLINE string GetAccountName() { return _accountName; }
 	ASCENT_INLINE const char * GetAccountNameS() { return _accountName.c_str(); }
-	ASCENT_INLINE float GetPacketsPerSecond() { return m_packets_per_second; }
-	ASCENT_INLINE float GetPacketsPerSecondPeak() { return m_packets_per_second_peak; }
 
 	ASCENT_INLINE uint32 GetClientBuild() { return client_build; }
 	ASCENT_INLINE void SetClientBuild(uint32 build) { client_build = build; }
@@ -704,7 +695,6 @@ private:
 	FastQueue<WorldPacket*, Mutex> _recvQueue;
 	char *permissions;
 	int permissioncount;
-
 
 	bool _loggingOut;
 	uint32 _latency;

@@ -917,7 +917,7 @@ public:
 	}
 
 	int32                GetOpenQuestSlot();
-	QuestLogEntry* GetQuestLogForEntry( uint32 quest );
+	QuestLogEntry*       GetQuestLogForEntry(uint32 quest);
 	ASCENT_INLINE QuestLogEntry*GetQuestLogInSlot(uint32 slot)  { return m_questlog[slot]; }
     ASCENT_INLINE uint32        GetQuestSharer()                { return m_questSharer; }
     
@@ -951,20 +951,13 @@ public:
     /************************************************************************/
     /* Stun Immobilize                                                      */
     /************************************************************************/
-    void SetTriggerStunOrImmobilize( uint32 newtrigger, uint32 new_chance, bool is_victim = false )
+    void SetTriggerStunOrImmobilize(uint32 newtrigger,uint32 new_chance)
     {
-		if( is_victim == false )
-		{
-			trigger_on_stun = newtrigger;
-			trigger_on_stun_chance = new_chance;
-		}
-		else
-		{
-			trigger_on_stun_victim = newtrigger;
-			trigger_on_stun_chance_victim = new_chance;
-		}
+        trigger_on_stun = newtrigger;
+        trigger_on_stun_chance = new_chance;
     }
-    void EventStunOrImmobilize( Unit *proc_target, bool is_victim = false );
+    void EventStunOrImmobilize(Unit *proc_target);
+
     
     void EventPortToGM(Player *p);
 	ASCENT_INLINE uint32 GetTeam() { return m_team; }
@@ -1999,8 +1992,6 @@ protected:
 	uint32      _fields[PLAYER_END];
 	uint32	    trigger_on_stun;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
 	uint32	    trigger_on_stun_chance; //also using this for mage "Frostbite" talent
-	uint32	    trigger_on_stun_victim;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
-	uint32	    trigger_on_stun_chance_victim; //also using this for mage "Frostbite" talent
 	int			hearth_of_wild_pct;		//druid hearth of wild talent used on shapeshifting. We eighter know what is last talent level or memo on learn
 
 	uint32 m_team;
