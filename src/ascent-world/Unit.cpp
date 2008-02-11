@@ -339,7 +339,7 @@ void Unit::Update( uint32 p_time )
 		if( p_time >= m_P_regenTimer )
 		{
 			RegeneratePower( false );
-			m_interruptedRegenTime=0;
+			m_interruptedRegenTime = 0;
 		}
 		else
 		{
@@ -355,7 +355,7 @@ void Unit::Update( uint32 p_time )
 
 
 		if( m_aiInterface != NULL && m_useAI )
-			m_aiInterface->Update(p_time);
+			m_aiInterface->Update( p_time );
 
 		if( m_diminishActive )
 		{
@@ -654,7 +654,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						continue;
 					if( CastingSpell->EffectImplicitTargetA[0] == 1 || 
 						CastingSpell->EffectImplicitTargetA[1] == 1 || 
-						CastingSpell->EffectImplicitTargetA[2] == 1) //Prevents school based procs affecting caster when self buffing
+						CastingSpell->EffectImplicitTargetA[2] == 1 ) //Prevents school based procs affecting caster when self buffing
 						continue;
 				}
 				else
@@ -929,7 +929,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							SpellEntry* spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
 							SpellDuration* sd = dbcSpellDuration.LookupEntryForced( spellInfo->DurationIndex );
 							uint32 tickcount = GetDuration( sd ) / spellInfo->EffectAmplitude[0] ;
-							dmg_overwrite = ospinfo->EffectBasePoints[0] * dmg / (100  * tickcount );
+							dmg_overwrite = ospinfo->EffectBasePoints[0] * dmg / ( 100  * tickcount );
 						}break;
 						//rogue - blade twisting
 						case 31125:
@@ -953,7 +953,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=SPELL_HASH_SHADOW_BOLT)//shadow bolt								
+								if( CastingSpell->NameHash != SPELL_HASH_SHADOW_BOLT )//shadow bolt								
 									continue;
 							}break;
 						// warlock - Seed of Corruption
@@ -974,19 +974,20 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 										dmg < (int32)this->GetUInt32Value( UNIT_FIELD_HEALTH ) ) //if this is not a killer blow
 										can_proc_now = true;
 								}
-								else can_proc_now = true; //target died
+								else
+									can_proc_now = true; //target died
 								if( can_proc_now == false )
 									continue;
-								Unit *new_caster = victim;
-								if( new_caster && new_caster->isAlive() )
+								Unit* new_caster = victim;
+								if( new_caster != NULL && new_caster->isAlive() )
 								{
-									SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
-									Spell *spell = new Spell( new_caster, spellInfo ,true, NULL );
+									SpellEntry* spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
+									Spell* spell = new Spell( new_caster, spellInfo, true, NULL );
 									SpellCastTargets targets;
 									targets.m_destX = GetPositionX();
 									targets.m_destY = GetPositionY();
 									targets.m_destZ = GetPositionZ();
-									spell->prepare(&targets);
+									spell->prepare( &targets );
 								}
 								(*itr2).deleted = true;
 								continue;
@@ -1089,8 +1090,8 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								skilllinespell* skillability = objmgr.GetSpellSkill(CastingSpell->Id);
-								if( !skillability )
+								skilllinespell* skillability = objmgr.GetSpellSkill( CastingSpell->Id );
+								if( skillability == NULL )
 									continue;
 								if( skillability->skilline != SKILL_DESTRUCTION )
 									continue;
@@ -1101,10 +1102,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) )
 									continue;
-								if( CastingSpell->School!=SCHOOL_FIRE &&
-									CastingSpell->School!=SCHOOL_SHADOW)
+								if( CastingSpell->School != SCHOOL_FIRE &&
+									CastingSpell->School != SCHOOL_SHADOW )
 									continue;
 							}break;
 						//warlock - Soul Leech
@@ -1123,23 +1124,23 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									case SPELL_HASH_SEARING_PAIN: //Searing Pain
 									case SPELL_HASH_CONFLAGRATE: //Conflagrate
 									{
-										amount = CastingSpell->EffectBasePoints[0]+1;
+										amount = CastingSpell->EffectBasePoints[0] + 1;
 									}break;
 									case SPELL_HASH_SHADOWBURN: //Shadowburn
 									{
-										amount = CastingSpell->EffectBasePoints[1]+1;
+										amount = CastingSpell->EffectBasePoints[1] + 1;
 									}break;
 									default:
-										amount=0;
+										amount = 0;
 								}
-								if(!amount)
+								if( !amount )
 									continue;
-								SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
-								if(!spellInfo)
+								SpellEntry* spellInfo = dbcSpell.LookupEntryForced( spellId );
+								if( spellInfo == NULL )
 									continue;
-								Spell *spell = new Spell(this, spellInfo ,true, NULL);
+								Spell* spell = new Spell( this, spellInfo, true, NULL );
 								spell->SetUnitTarget(this);
-								spell->Heal(amount*(ospinfo->EffectBasePoints[0]+1)/100);
+								spell->Heal( amount * ( ospinfo->EffectBasePoints[0] + 1 ) / 100 );
 								delete spell;
 								continue;
 							}break;
@@ -1169,7 +1170,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING )
 									|| CastingSpell->School != SCHOOL_FIRE )
 									continue;
 								if( flag & PROC_ON_SPELL_CRIT_HIT )
@@ -1226,16 +1227,16 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
                             {
                                 if( !dmg )
                                     continue;
-                                SpellEntry *parentproc= dbcSpell.LookupEntry(origId);
-                                SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId);
-								if (!parentproc || !spellInfo)
+                                SpellEntry* parentproc = dbcSpell.LookupEntryForced( origId );
+                                SpellEntry* spellInfo = dbcSpell.LookupEntryForced( spellId );
+								if( parentproc == NULL || spellInfo == NULL )
 									continue;
 								int32 val = parentproc->EffectBasePoints[0] + 1;
-                                Spell *spell = new Spell(this, spellInfo ,true, NULL);
-                                spell->forced_basepoints[0] = (val*dmg)/300; //per tick
+                                Spell* spell = new Spell( this, spellInfo, true, NULL );
+                                spell->forced_basepoints[0] = ( val * dmg )/300; //per tick
                                 SpellCastTargets targets;
                                 targets.m_unitTarget = GetGUID();
-                                spell->prepare(&targets);
+                                spell->prepare( &targets );
                                 continue;
                             }break;
 						//shaman - Healing Way
@@ -1255,7 +1256,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
-								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //healing wave
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) ) //healing wave
 									continue;
 							}break;
                         //shaman - Ancestral Fortitude
@@ -1265,7 +1266,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
                             {
                                 if( CastingSpell == NULL )
                                     continue;
-                                if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) ) //healing spell
+                                if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) ) //healing spell
                                     continue;
                             }break;
 						//shaman - windfurry weapon
@@ -1277,10 +1278,10 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								//!! The wierd thing is that we need the spell thet trigegred this enchant spell in order to output logs ..we are using oldspell info too 
 								//we have to recalc the value of this spell
-								SpellEntry *spellInfo = dbcSpell.LookupEntry(origId);
-								uint32 AP_owerride=GetAP() + spellInfo->EffectBasePoints[0]+1;
-								uint32 dmg = static_cast< Player* >( this )->GetMainMeleeDamage(AP_owerride);
-								SpellEntry *sp_for_the_logs = dbcSpell.LookupEntry(spellId);
+								SpellEntry* spellInfo = dbcSpell.LookupEntry( origId );
+								uint32 AP_owerride = GetAP() + spellInfo->EffectBasePoints[0] + 1;
+								uint32 dmg = static_cast< Player* >( this )->GetMainMeleeDamage( AP_owerride );
+								SpellEntry* sp_for_the_logs = dbcSpell.LookupEntry( spellId );
 								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
 								Strike( victim, MELEE, sp_for_the_logs, dmg, 0, 0, true, false );
 								//nothing else to be done for this trigger
@@ -1292,7 +1293,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL )
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//we need a finishing move for this 
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE) || victim==this)
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE) || victim == this )
 									continue;
 							}break;
 						//rogue - Relentless Strikes
@@ -1303,9 +1304,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								int32 proc_Chance;
 								//chance is based actually on combopoint count and not 100% always 
 								if( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE )
-									proc_Chance = static_cast< Player* >( this )->m_comboPoints*ospinfo->EffectBasePoints[1];
+									proc_Chance = static_cast< Player* >( this )->m_comboPoints * ospinfo->EffectBasePoints[1];
 								else continue;
-								if(!Rand(proc_Chance))
+								if( !Rand( proc_Chance ) )
 									continue;
 							}break;
 						//rogue - Find Weakness
@@ -1317,7 +1318,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( CastingSpell == NULL )
 									continue;//this should not ocur unless we made a fuckup somewhere
-								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE))
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE ) )
 									continue;
 							}break;
 						//rogue - Initiative
@@ -1385,7 +1386,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( CastingSpell->School!=SCHOOL_FIRE && CastingSpell->School!=SCHOOL_FROST) //fire and frost criticals
+								if( CastingSpell->School != SCHOOL_FIRE && CastingSpell->School != SCHOOL_FROST ) //fire and frost criticals
 									continue;
 								dmg_overwrite = CastingSpell->manaCost * ( ospinfo->EffectBasePoints[0] + 1 ) / 100;
 							}break;
@@ -1477,16 +1478,16 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;//this should not ocur unless we made a fuckup somewhere
 								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
 									continue;
-								dmg_overwrite = ( dmg *  (ospinfo->EffectBasePoints[0] + 1 )) / 100 ; //only half dmg
-								int32 half_health = this->GetUInt32Value(UNIT_FIELD_HEALTH) >> 1;
+								dmg_overwrite = ( dmg * ( ospinfo->EffectBasePoints[0] + 1 ) ) / 100; //only half dmg
+								int32 half_health = this->GetUInt32Value( UNIT_FIELD_HEALTH ) >> 1;
 								if( dmg_overwrite > half_health )
-									dmg_overwrite = half_health ;
+									dmg_overwrite = half_health;
 							}break;
 						//paladin - Blessed Life
 						case 31828:
 							{
 								//we should test is damage is from enviroment or not :S
-								ModUInt32Value(UNIT_FIELD_HEALTH,dmg/2);
+								ModUInt32Value( UNIT_FIELD_HEALTH, dmg / 2 );
 								continue; //there is no visual for this ?
 							}break;
 							//paladin - sanctified judgement
@@ -1532,7 +1533,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if(	CastingSpell->NameHash == SPELL_HASH_LIGHTNING_BOLT || CastingSpell->NameHash == SPELL_HASH_CHAIN_LIGHTNING )
 								{
 									spellId = CastingSpell->Id;
-									dmg_overwrite = (CastingSpell->EffectBasePoints[0] + 1) / 2; //only half dmg
+									dmg_overwrite = ( CastingSpell->EffectBasePoints[0] + 1 ) / 2; //only half dmg
 								}
 								else continue;
 							}break;
@@ -1556,7 +1557,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL)
+								if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL )
 									continue;
 							}break;
 						//SETBONUSES
@@ -1564,21 +1565,21 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( CastingSpell->School != SCHOOL_SHADOW || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell->School != SCHOOL_SHADOW || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) )
 									continue;
 							}break;
 						case 37378:
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( CastingSpell->School != SCHOOL_FIRE || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( CastingSpell->School != SCHOOL_FIRE || !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) )
 									continue;
 							}break;
 						case 39950:
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING))
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) )
 									continue;
 							}break;
 						case 37234:
@@ -1587,21 +1588,21 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING))
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) )
 									continue;
 							}break;
 						case 37237:
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT)
+								if( CastingSpell->NameHash != SPELL_HASH_LIGHTNING_BOLT )
 									continue;
 							}break;
 						case 37193:
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD)
+								if( CastingSpell->NameHash != SPELL_HASH_HOLY_SHIELD )
 									continue;
 							}break;
 						case 37196:
@@ -1630,7 +1631,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								if( CastingSpell == NULL )
 									continue;
-								if( CastingSpell->NameHash != SPELL_HASH_OVERPOWER)
+								if( CastingSpell->NameHash != SPELL_HASH_OVERPOWER )
 									continue;
 							}break;
 						case 37517:
@@ -5889,267 +5890,269 @@ void Unit::Energize(Unit* target,uint32 SpellId, uint32 amount,uint32 type)
 
 void Unit::InheritSMMods(Unit *inherit_from)
 {
-	if(inherit_from->SM_CriticalChance)
+	if( inherit_from->SM_CriticalChance != NULL )
 	{
-		if(SM_CriticalChance==0)
+		if( SM_CriticalChance == NULL )
 			SM_CriticalChance = new int32[SPELL_GROUPS];
-		memcpy(SM_CriticalChance,inherit_from->SM_CriticalChance,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_CriticalChance, inherit_from->SM_CriticalChance, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FDur)
+	if( inherit_from->SM_FDur != NULL )
 	{
-		if(SM_FDur==0)
+		if( SM_FDur == NULL )
 			SM_FDur = new int32[SPELL_GROUPS];
-		memcpy(SM_FDur,inherit_from->SM_FDur,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FDur, inherit_from->SM_FDur, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PDur)
+	if( inherit_from->SM_PDur != NULL )
 	{
-		if(SM_PDur==0)
+		if( SM_PDur == NULL )
 			SM_PDur = new int32[SPELL_GROUPS];
-		memcpy(SM_PDur,inherit_from->SM_PDur,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PDur, inherit_from->SM_PDur, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PRadius)
+	if( inherit_from->SM_PRadius != NULL )
 	{
-		if(SM_PRadius==0)
+		if( SM_PRadius == NULL )
 			SM_PRadius = new int32[SPELL_GROUPS];
-		memcpy(SM_PRadius,inherit_from->SM_PRadius,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PRadius, inherit_from->SM_PRadius, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FRadius)
+	if( inherit_from->SM_FRadius != NULL )
 	{
 		if(SM_FRadius==0)
 			SM_FRadius = new int32[SPELL_GROUPS];
-		memcpy(SM_FRadius,inherit_from->SM_FRadius,sizeof(int)*SPELL_GROUPS);
+		memcpy (SM_FRadius, inherit_from->SM_FRadius, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FRange)
+	if( inherit_from->SM_FRange != NULL )
 	{
-		if(SM_FRange==0)
+		if( SM_FRange == NULL )
 			SM_FRange = new int32[SPELL_GROUPS];
-		memcpy(SM_FRange,inherit_from->SM_FRange,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FRange, inherit_from->SM_FRange, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PCastTime)
+	if( inherit_from->SM_PCastTime != NULL )
 	{
-		if(SM_PCastTime==0)
+		if( SM_PCastTime == NULL )
 			SM_PCastTime = new int32[SPELL_GROUPS];
-		memcpy(SM_PCastTime,inherit_from->SM_PCastTime,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PCastTime, inherit_from->SM_PCastTime, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FCastTime)
+	if( inherit_from->SM_FCastTime != NULL )
 	{
-		if(SM_FCastTime==0)
+		if( SM_FCastTime == NULL )
 			SM_FCastTime = new int32[SPELL_GROUPS];
-		memcpy(SM_FCastTime,inherit_from->SM_FCastTime,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FCastTime, inherit_from->SM_FCastTime, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PCriticalDamage)
+	if( inherit_from->SM_PCriticalDamage != NULL )
 	{
-		if(SM_PCriticalDamage==0)
+		if( SM_PCriticalDamage == NULL )
 			SM_PCriticalDamage = new int32[SPELL_GROUPS];
-		memcpy(SM_PCriticalDamage,inherit_from->SM_PCriticalDamage,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PCriticalDamage, inherit_from->SM_PCriticalDamage, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FDOT)
+	if( inherit_from->SM_FDOT != NULL )
 	{
-		if(SM_FDOT==0)
+		if( SM_FDOT == NULL )
 			SM_FDOT = new int32[SPELL_GROUPS];
-		memcpy(SM_FDOT,inherit_from->SM_FDOT,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FDOT, inherit_from->SM_FDOT, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PDOT)
+	if( inherit_from->SM_PDOT != NULL )
 	{
-		if(SM_PDOT==0)
+		if( SM_PDOT == NULL )
 			SM_PDOT = new int32[SPELL_GROUPS];
-		memcpy(SM_PDOT,inherit_from->SM_PDOT,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PDOT, inherit_from->SM_PDOT, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FEffectBonus)
+	if( inherit_from->SM_FEffectBonus != NULL )
 	{
-		if(SM_FEffectBonus==0)
+		if( SM_FEffectBonus == NULL )
 			SM_FEffectBonus = new int32[SPELL_GROUPS];
-		memcpy(SM_FEffectBonus,inherit_from->SM_FEffectBonus,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FEffectBonus, inherit_from->SM_FEffectBonus, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PEffectBonus)
+	if( inherit_from->SM_PEffectBonus != NULL )
 	{
-		if(SM_PEffectBonus==0)
+		if( SM_PEffectBonus == NULL )
 			SM_PEffectBonus = new int32[SPELL_GROUPS];
-		memcpy(SM_PEffectBonus,inherit_from->SM_PEffectBonus,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PEffectBonus, inherit_from->SM_PEffectBonus, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FDamageBonus)
+	if( inherit_from->SM_FDamageBonus != NULL )
 	{
-		if(SM_FDamageBonus==0)
+		if( SM_FDamageBonus == NULL )
 			SM_FDamageBonus = new int32[SPELL_GROUPS];
-		memcpy(SM_FDamageBonus,inherit_from->SM_FDamageBonus,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FDamageBonus, inherit_from->SM_FDamageBonus, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PDamageBonus)
+	if( inherit_from->SM_PDamageBonus != NULL )
 	{
-		if(SM_PDamageBonus==0)
+		if( SM_PDamageBonus == NULL )
 			SM_PDamageBonus = new int32[SPELL_GROUPS];
-		memcpy(SM_PDamageBonus,inherit_from->SM_PDamageBonus,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PDamageBonus, inherit_from->SM_PDamageBonus, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PSPELL_VALUE)
+	if( inherit_from->SM_PSPELL_VALUE != NULL )
 	{
-		if(SM_PSPELL_VALUE==0)
+		if( SM_PSPELL_VALUE == NULL )
 			SM_PSPELL_VALUE = new int32[SPELL_GROUPS];
-		memcpy(SM_PSPELL_VALUE,inherit_from->SM_PSPELL_VALUE,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PSPELL_VALUE, inherit_from->SM_PSPELL_VALUE, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FSPELL_VALUE)
+	if( inherit_from->SM_FSPELL_VALUE != NULL )
 	{
-		if(SM_FSPELL_VALUE==0)
+		if( SM_FSPELL_VALUE == NULL )
 			SM_FSPELL_VALUE = new int32[SPELL_GROUPS];
-		memcpy(SM_FSPELL_VALUE,inherit_from->SM_FSPELL_VALUE,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FSPELL_VALUE, inherit_from->SM_FSPELL_VALUE, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FHitchance)
+	if( inherit_from->SM_FHitchance != NULL )
 	{
-		if(SM_FHitchance==0)
+		if( SM_FHitchance == NULL )
 			SM_FHitchance = new int32[SPELL_GROUPS];
-		memcpy(SM_FHitchance,inherit_from->SM_FHitchance,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FHitchance, inherit_from->SM_FHitchance, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PRange)
+	if( inherit_from->SM_PRange != NULL )
 	{
-		if(SM_PRange==0)
+		if( SM_PRange == NULL )
 			SM_PRange = new int32[SPELL_GROUPS];
-		memcpy(SM_PRange,inherit_from->SM_PRange,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PRange, inherit_from->SM_PRange, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PRadius)
+	if( inherit_from->SM_PRadius != NULL )
 	{
-		if(SM_PRadius==0)
+		if( SM_PRadius == NULL )
 			SM_PRadius = new int32[SPELL_GROUPS];
-		memcpy(SM_PRadius,inherit_from->SM_PRadius,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PRadius, inherit_from->SM_PRadius, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PAPBonus)
+	if( inherit_from->SM_PAPBonus != NULL )
 	{
-		if(SM_PAPBonus==0)
+		if( SM_PAPBonus == NULL )
 			SM_PAPBonus = new int32[SPELL_GROUPS];
-		memcpy(SM_PAPBonus,inherit_from->SM_PAPBonus,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PAPBonus, inherit_from->SM_PAPBonus, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PCost)
+	if( inherit_from->SM_PCost != NULL )
 	{
-		if(SM_PCost==0)
+		if( SM_PCost == NULL )
 			SM_PCost = new int32[SPELL_GROUPS];
-		memcpy(SM_PCost,inherit_from->SM_PCost,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PCost, inherit_from->SM_PCost, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FCost)
+	if( inherit_from->SM_FCost != NULL )
 	{
-		if(SM_FCost==0)
+		if( SM_FCost == NULL )
 			SM_FCost = new int32[SPELL_GROUPS];
-		memcpy(SM_FCost,inherit_from->SM_FCost,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FCost, inherit_from->SM_FCost, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FAdditionalTargets)
+	if( inherit_from->SM_FAdditionalTargets != NULL )
 	{
-		if(SM_FAdditionalTargets==0)
+		if( SM_FAdditionalTargets == NULL )
 			SM_FAdditionalTargets = new int32[SPELL_GROUPS];
-		memcpy(SM_FAdditionalTargets,inherit_from->SM_FAdditionalTargets,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FAdditionalTargets, inherit_from->SM_FAdditionalTargets, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PJumpReduce)
+	if( inherit_from->SM_PJumpReduce != NULL )
 	{
-		if(SM_PJumpReduce==0)
+		if( SM_PJumpReduce == NULL )
 			SM_PJumpReduce = new int32[SPELL_GROUPS];
-		memcpy(SM_PJumpReduce,inherit_from->SM_PJumpReduce,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PJumpReduce, inherit_from->SM_PJumpReduce, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FSpeedMod)
+	if( inherit_from->SM_FSpeedMod != NULL )
 	{
-		if(SM_FSpeedMod==0)
+		if( SM_FSpeedMod == NULL )
 			SM_FSpeedMod = new int32[SPELL_GROUPS];
-		memcpy(SM_FSpeedMod,inherit_from->SM_FSpeedMod,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FSpeedMod,inherit_from->SM_FSpeedMod, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PNonInterrupt)
+	if( inherit_from->SM_PNonInterrupt != NULL )
 	{
-		if(SM_PNonInterrupt==0)
+		if( SM_PNonInterrupt == NULL )
 			SM_PNonInterrupt = new int32[SPELL_GROUPS];
-		memcpy(SM_PNonInterrupt,inherit_from->SM_PNonInterrupt,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PNonInterrupt, inherit_from->SM_PNonInterrupt, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FPenalty)
+	if( inherit_from->SM_FPenalty != NULL )
 	{
-		if(SM_FPenalty==0)
+		if( SM_FPenalty == NULL )
 			SM_FPenalty = new int32[SPELL_GROUPS];
-		memcpy(SM_FPenalty,inherit_from->SM_FPenalty,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FPenalty, inherit_from->SM_FPenalty, sizeof(int) * SPELL_GROUPS );
 	}
 	if(inherit_from->SM_FCooldownTime)
 	{
 		if(SM_FCooldownTime==0)
 			SM_FCooldownTime = new int32[SPELL_GROUPS];
-		memcpy(SM_FCooldownTime,inherit_from->SM_FCooldownTime,sizeof(int)*SPELL_GROUPS);
+		memcpy(SM_FCooldownTime,inherit_from->SM_FCooldownTime,sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PCooldownTime)
+	if( inherit_from->SM_PCooldownTime != NULL )
 	{
-		if(SM_PCooldownTime==0)
+		if( SM_PCooldownTime == NULL )
 			SM_PCooldownTime = new int32[SPELL_GROUPS];
-		memcpy(SM_PCooldownTime,inherit_from->SM_PCooldownTime,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PCooldownTime, inherit_from->SM_PCooldownTime, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FChanceOfSuccess)
+	if( inherit_from->SM_FChanceOfSuccess != NULL )
 	{
-		if(SM_FChanceOfSuccess==0)
+		if( SM_FChanceOfSuccess == NULL )
 			SM_FChanceOfSuccess = new int32[SPELL_GROUPS];
-		memcpy(SM_FChanceOfSuccess,inherit_from->SM_FChanceOfSuccess,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FChanceOfSuccess, inherit_from->SM_FChanceOfSuccess, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_FRezist_dispell)
+	if( inherit_from->SM_FRezist_dispell != NULL )
 	{
-		if(SM_FRezist_dispell==0)
+		if( SM_FRezist_dispell == NULL )
 			SM_FRezist_dispell = new int32[SPELL_GROUPS];
-		memcpy(SM_FRezist_dispell,inherit_from->SM_FRezist_dispell,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_FRezist_dispell, inherit_from->SM_FRezist_dispell, sizeof(int) * SPELL_GROUPS );
 	}
-	if(inherit_from->SM_PRezist_dispell)
+	if( inherit_from->SM_PRezist_dispell != NULL )
 	{
-		if(SM_PRezist_dispell==0)
+		if( SM_PRezist_dispell == NULL )
 			SM_PRezist_dispell = new int32[SPELL_GROUPS];
-		memcpy(SM_PRezist_dispell,inherit_from->SM_PRezist_dispell,sizeof(int)*SPELL_GROUPS);
+		memcpy( SM_PRezist_dispell, inherit_from->SM_PRezist_dispell, sizeof(int) * SPELL_GROUPS );
 	}
 }
 
 void CombatStatusHandler::TryToClearAttackTargets()
 {
 	AttackerMap::iterator i, i2;
-	Unit * pt;
+	Unit* pt;
 
 	for(i = m_attackTargets.begin(); i != m_attackTargets.end();)
 	{
 		i2 = i++;
-		pt = m_Unit->GetMapMgr()->GetUnit(*i2);
-		if(pt == NULL)
+		pt = m_Unit->GetMapMgr()->GetUnit( *i2 );
+
+		if( pt == NULL )
 		{
-			m_attackTargets.erase(i2);
+			m_attackTargets.erase( i2 );
 			continue;
 		}
 
-		RemoveAttackTarget(pt);
-		pt->CombatStatus.RemoveAttacker(m_Unit,m_Unit->GetGUID());
+		RemoveAttackTarget( pt );
+		pt->CombatStatus.RemoveAttacker( m_Unit, m_Unit->GetGUID() );
 	}
 }
 
 void CombatStatusHandler::AttackersForgetHate()
 {
 	AttackerMap::iterator i, i2;
-	Unit * pt;
+	Unit* pt;
 
-	for(i = m_attackTargets.begin(); i != m_attackTargets.end();)
+	for( i = m_attackTargets.begin(); i != m_attackTargets.end(); )
 	{
 		i2 = i++;
-		pt = m_Unit->GetMapMgr()->GetUnit(*i2);
-		if(pt == NULL)
+		pt = m_Unit->GetMapMgr()->GetUnit( *i2 );
+
+		if( pt == NULL )
 		{
-			m_attackTargets.erase(i2);
+			m_attackTargets.erase( i2 );
 			continue;
 		}
 
-		if(pt->GetAIInterface())
-			pt->GetAIInterface()->RemoveThreatByPtr(m_Unit);
+		if( pt->GetAIInterface() )
+			pt->GetAIInterface()->RemoveThreatByPtr( m_Unit );
 	}
 }
 
-void Unit::CancelSpell(Spell * ptr)
+void Unit::CancelSpell( Spell * ptr )
 {
-	if(ptr)
+	if( ptr != NULL )
 		ptr->cancel();
-	else if(m_currentSpell)
+	else if( m_currentSpell != NULL )
 		m_currentSpell->cancel();
 }
 
-void Unit::EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage)
+void Unit::EventStrikeWithAbility( uint64 guid, SpellEntry* sp, uint32 damage )
 {
-	Unit * victim = m_mapMgr ? m_mapMgr->GetUnit(guid) : NULL;
-	if(victim)
+	Unit* victim = m_mapMgr ? m_mapMgr->GetUnit( guid ) : NULL;
+	if( victim != NULL )
 		Strike( victim, RANGED, sp, 0, 0, 0, false, true );
 }
 
-void Unit::DispelAll(bool positive)
+void Unit::DispelAll( bool positive )
 {
-	for(uint32 i = 0; i < MAX_AURAS; ++i)
+	for( uint32 i = 0; i < MAX_AURAS; ++i )
 	{
-		if(m_auras[i]!=NULL)
-			if((m_auras[i]->IsPositive()&&positive)||!m_auras[i]->IsPositive())
+		if( m_auras[i] != NULL )
+			if( ( m_auras[i]->IsPositive() && positive ) || !m_auras[i]->IsPositive() )
 				m_auras[i]->Remove();
 	}
 }
@@ -6169,47 +6172,48 @@ bool Unit::RemoveAllAurasByMechanic( uint32 MechanicType , uint32 MaxDispel = -1
 {
 	//sLog.outString( "Unit::MechanicImmunityMassDispel called, mechanic: %u" , MechanicType );
 	uint32 DispelCount = 0;
-	for(uint32 x = ( HostileOnly ? MAX_POSITIVE_AURAS : 0 ) ; x < MAX_AURAS ; x++ ) // If HostileOnly = 1, then we use aura slots 40-56 (hostile). Otherwise, we use 0-56 (all)
-		{
-			if( DispelCount >= MaxDispel && MaxDispel > 0 )
+	for( uint32 x = ( HostileOnly ? MAX_POSITIVE_AURAS : 0 ) ; x < MAX_AURAS ; x++ ) // If HostileOnly = 1, then we use aura slots 40-56 (hostile). Otherwise, we use 0-56 (all)
+	{
+		if( DispelCount >= MaxDispel && MaxDispel > 0 )
 			return true;
 
-			if( m_auras[x] )
+		if( m_auras[x] != NULL )
+		{
+			if( m_auras[x]->GetSpellProto()->MechanicsType == MechanicType ) // Remove all mechanics of type MechanicType (my english goen boom)
 			{
-					if( m_auras[x]->GetSpellProto()->MechanicsType == MechanicType ) // Remove all mechanics of type MechanicType (my english goen boom)
+				//sLog.outString( "Removed aura. [AuraSlot %u, SpellId %u]" , x , m_auras[x]->GetSpellId() );
+				// TODO: Stop moving if fear was removed.
+				m_auras[x]->Remove(); // EZ-Remove
+				DispelCount++;
+			}
+			else if( MechanicType == MECHANIC_ENSNARED ) // if got immunity for slow, remove some that are not in the mechanics
+			{
+				for( int i = 0 ; i < 3 ; i++ )
+				{
+					// SNARE + ROOT
+					if( m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED || m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
 					{
-						//sLog.outString( "Removed aura. [AuraSlot %u, SpellId %u]" , x , m_auras[x]->GetSpellId() );
-						// TODO: Stop moving if fear was removed.
-						m_auras[x]->Remove(); // EZ-Remove
-						DispelCount ++;
+						m_auras[x]->Remove();
+						break;
 					}
-					else if( MechanicType == MECHANIC_ENSNARED ) // if got immunity for slow, remove some that are not in the mechanics
-					{
-						for( int i=0 ; i<3 ; i++ )
-						{
-							// SNARE + ROOT
-							if( m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED || m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
-							{
-								m_auras[x]->Remove();
-								break;
-							}
-						}
-					}
+				}
 			}
 		}
-	return ( DispelCount == 0 );
+	}
+	return( DispelCount == 0 );
 }
 
-void Unit::setAttackTimer(int32 time, bool offhand)
+void Unit::setAttackTimer( int32 time, bool offhand )
 {
-	if(!time)
+	if( time <= 0 )
 		time = offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
 
-	time = std::max(1000,float2int32(float(time)*GetFloatValue(UNIT_MOD_CAST_SPEED)));
-	if(time>300000)		// just in case.. shouldn't happen though
-		time=offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
+	time = max( 1000, float2int32( float( time ) * GetFloatValue( UNIT_MOD_CAST_SPEED ) ) );
 
-	if(offhand)
+	if( time > 300000 ) // just in case.. shouldn't happen though
+		time = offhand ? m_uint32Values[UNIT_FIELD_BASEATTACKTIME_01] : m_uint32Values[UNIT_FIELD_BASEATTACKTIME];
+
+	if( offhand )
 		m_attackTimer_1 = getMSTime() + time;
 	else
 		m_attackTimer = getMSTime() + time;
@@ -6217,16 +6221,17 @@ void Unit::setAttackTimer(int32 time, bool offhand)
 
 bool Unit::isAttackReady(bool offhand)
 {
-	if(offhand)
-		return (getMSTime() >= m_attackTimer_1) ? true : false;
+	if( offhand )
+		return getMSTime() >= m_attackTimer_1 ? true : false;
 	else
-		return (getMSTime() >= m_attackTimer) ? true : false;
+		return getMSTime() >= m_attackTimer ? true : false;
 }
 
-void Unit::ReplaceAIInterface(AIInterface *new_interface) 
+void Unit::ReplaceAIInterface( AIInterface* new_interface ) 
 { 
-	delete m_aiInterface;	//be carefull when you do this. Might screw unit states !
-	m_aiInterface = new_interface; 
+	//be carefull when you do this. Might screw unit states!
+	delete m_aiInterface;
+	m_aiInterface = new_interface;
 }
 
 void Unit::EventRegainMovement()
