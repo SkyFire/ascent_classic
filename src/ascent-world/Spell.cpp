@@ -2374,23 +2374,22 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 		else
 		{
 			unitTarget = NULL;
-			switch(UINT32_LOPART(GUID_HIPART(guid)))
+			switch( UINT32_LOPART( GUID_HIPART( guid ) ) )
 			{
 			case HIGHGUID_UNIT:
-				unitTarget = m_caster->GetMapMgr()->GetCreature((uint32)guid);
+				unitTarget = m_caster->GetMapMgr()->GetCreature( (uint32)guid );
 				break;
 			case HIGHGUID_PET:
-				unitTarget = m_caster->GetMapMgr()->GetPet((uint32)guid);
+				unitTarget = m_caster->GetMapMgr()->GetPet( (uint32)guid );
 				break;
 			case HIGHGUID_PLAYER:
 				{
-					unitTarget =  m_caster->GetMapMgr()->GetPlayer((uint32)guid);
-					playerTarget = static_cast< Player* >(unitTarget);
+					unitTarget = m_caster->GetMapMgr()->GetPlayer( (uint32)guid );
+					playerTarget = static_cast< Player* >( unitTarget );
 				}break;
 			case HIGHGUID_ITEM:
 				if( p_caster != NULL )
-					itemTarget = p_caster->GetItemInterface()->GetItemByGUID(guid);
-
+					itemTarget = p_caster->GetItemInterface()->GetItemByGUID( guid );
 				break;
 			case HIGHGUID_GAMEOBJECT:
 				gameObjTarget = m_caster->GetMapMgr()->GetGameObject((uint32)guid);
@@ -2402,10 +2401,10 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 		}
 	}	
 
-	damage = CalculateEffect(i,unitTarget);  
+	damage = CalculateEffect( i, unitTarget );  
 	sLog.outDebug( "WORLD: Spell effect id = %u, damage = %d", m_spellInfo->Effect[i], damage); 
 	
-	if( m_spellInfo->Effect[i]<TOTAL_SPELL_EFFECTS)
+	if( m_spellInfo->Effect[i] < TOTAL_SPELL_EFFECTS )
 	{
 		/*if(unitTarget && p_caster && isAttackable(p_caster,unitTarget))
 			sEventMgr.ModifyEventTimeLeft(p_caster,EVENT_ATTACK_TIMEOUT,PLAYER_ATTACK_TIMEOUT_INTERVAL);*/
