@@ -117,17 +117,23 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 			return;
 		}
 
-		if(itemProto->RequiredSkillRank)
+		if( itemProto->RequiredSkillRank )
 		{
-			if(_player->_GetSkillLineCurrent(itemProto->RequiredSkill, false) < itemProto->RequiredSkillRank)
+			if(_player->_GetSkillLineCurrent( itemProto->RequiredSkill, false) < itemProto->RequiredSkillRank )
 			{
-				_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+				_player->GetItemInterface()->BuildInventoryChangeError( tmpItem, NULL, INV_ERR_ITEM_RANK_NOT_ENOUGH );
 				return;
 			}
 		}
 	}
-	
-	if(itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown)
+
+	if( itemProto->AllowableClass && !(_player->getClassMask() & itemProto->AllowableClass) || itemProto->AllowableRace && !( _player->getRaceMask() & itemProto->AllowableRace ) )
+	{
+		_player->GetItemInterface()->BuildInventoryChangeError( tmpItem, NULL, INV_ERR_YOU_CAN_NEVER_USE_THAT_ITEM );
+		return;
+	}	
+
+	if( itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown )
 	{
 		if(!_player->CanCastItemDueToCooldown(itemProto, x))	// damn cheaters
 			return;

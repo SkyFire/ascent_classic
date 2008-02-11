@@ -3377,11 +3377,11 @@ void Unit::AddAura(Aura *aur)
 	}
 			
 	////////////////////////////////////////////////////////
-	if(aur->GetSpellProto()->SpellGroupType && m_objectTypeId == TYPEID_PLAYER)
+	if( aur->GetSpellProto()->SpellGroupType && m_objectTypeId == TYPEID_PLAYER )
 	{
-		int32 speedmod=0;
-		SM_FIValue(SM_FSpeedMod,&speedmod,aur->GetSpellProto()->SpellGroupType);
-		if(speedmod)
+		int32 speedmod = 0;
+		SM_FIValue( SM_FSpeedMod,&speedmod,aur->GetSpellProto()->SpellGroupType );
+		if( speedmod )
 		{
 			m_speedModifier += speedmod;
 			UpdateSpeed();
@@ -3389,10 +3389,13 @@ void Unit::AddAura(Aura *aur)
 	}
 	////////////////////////////////////////////////////////
 
-	aur->m_auraSlot=255;
-	aur->ApplyModifiers(true);
+	if( aur->m_auraSlot != 0xffffffff )
+		m_auras[aur->m_auraSlot] = NULL;
+
+	aur->m_auraSlot = 255;
+	aur->ApplyModifiers( true );
 	
-	if(!aur->IsPassive())
+	if( !aur->IsPassive() )
 	{	
 		aur->AddAuraVisual();
 		if(aur->m_auraSlot==255)

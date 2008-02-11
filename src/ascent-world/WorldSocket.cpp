@@ -93,11 +93,19 @@ void WorldSocket::OnDisconnect()
 
 void WorldSocket::OutPacket(uint16 opcode, size_t len, const void* data)
 {
-	OUTPACKET_RESULT res = _OutPacket(opcode, len, data);
-	if(res == OUTPACKET_RESULT_SUCCESS)
+	OUTPACKET_RESULT res;
+	if( ( len + 10 ) > WORLDSOCKET_SENDBUF_SIZE )
+	{
+		printf( "WARNING: Tried to send a packet of %u bytes (which is too large) to a socket. Opcode was: %u\n", (unsigned int)len, (unsigned int)opcode );
+		return;
+	}
+
+	res = _OutPacket( opcode, len, data );
+
+	if( res == OUTPACKET_RESULT_SUCCESS )
 		return;
 
-	if(res == OUTPACKET_RESULT_NO_ROOM_IN_BUFFER)
+	if( res == OUTPACKET_RESULT_NO_ROOM_IN_BUFFER )
 	{
 		/* queue the packet */
 		queueLock.Acquire();

@@ -1565,6 +1565,20 @@ void WorldSession::HandleReadItemOpcode(WorldPacket &recvPacket)
 	}
 }
 
+ASCENT_INLINE void RepairItem(Player * pPlayer, Item * pItem)
+{
+	int32 cost = (int32)pItem->GetUInt32Value( ITEM_FIELD_MAXDURABILITY ) - (int32)pItem->GetUInt32Value( ITEM_FIELD_DURABILITY );
+	if( cost <= 0 )
+		return;
+
+	if( cost > (int32)pPlayer->GetUInt32Value( PLAYER_FIELD_COINAGE ) )
+		return;
+
+	pPlayer->ModUInt32Value( PLAYER_FIELD_COINAGE, -cost );
+	pItem->SetDurabilityToMax();
+	pItem->m_isDirty = true;
+}
+
 void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 {
 	if( _player == NULL )
@@ -1577,49 +1591,57 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 
 	uint64 npcguid;
 	uint64 itemguid;
+	Item* pItem;
+	Container* pContainer;
+	uint32 i;
+	uint32 j;
 
 	recvPacket >> npcguid >> itemguid;
 
 	if( !itemguid ) 
 	{
-		for( int8 i = 0; i < MAX_INVENTORY_SLOT; i++ )
-			if( _player->GetItemInterface()->GetInventoryItem( i ) )
+		for( i = 0; i < MAX_INVENTORY_SLOT; i++ )
+		{
+			pItem = _player->GetItemInterface()->GetInventoryItem( i );
+			if( pItem != NULL )
 			{
-				// maxdurability - currentdurability
-				// it its 0 no durabiliti needs to be set
-				uint32 dDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurabilityMax() - _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
-				if( dDurability > 0 )
+				if( pItem->IsContainer() )
 				{
-					// the amount of durability that is needed to be added is the amount of money to be payed
-					if( dDurability <= _player->GetUInt32Value( PLAYER_FIELD_COINAGE ) )
+					pContainer = static_cast<Container*>( pItem );
+					for( j = 0; j < pContainer->GetProto()->ContainerSlots; ++j )
 					{
-						int32 cDurability = _player->GetItemInterface()->GetInventoryItem(i)->GetDurability();
-					   _player->ModUInt32Value( PLAYER_FIELD_COINAGE , -(int32)dDurability );
-					   _player->GetItemInterface()->GetInventoryItem(i)->SetDurabilityToMax();
-					   _player->GetItemInterface()->GetInventoryItem(i)->m_isDirty = true;
-			
-						if (cDurability <= 0)
-						   _player->ApplyItemMods(_player->GetItemInterface()->GetInventoryItem(i), i, true);
+						pItem = pContainer->GetItem( j );
+						if( pItem != NULL )
+							RepairItem( _player, pItem );
+					}
+				}
+				else
+				{
+					if( pItem->GetProto()->MaxDurability > 0 && i < INVENTORY_SLOT_BAG_END && pItem->GetDurability() <= 0 )
+					{
+						RepairItem( _player, pItem );
+						_player->ApplyItemMods( pItem, i, true );
 					}
 					else
 					{
-						// not enough money
-					}
+						RepairItem( _player, pItem );
+					}					
 				}
 			}
+		}
 	}
-	else 
+	else
 	{
-		Item *item = _player->GetItemInterface()->GetItemByGUID(itemguid);
-		if(item)
+		Item* item = _player->GetItemInterface()->GetItemByGUID( itemguid );
+		if( item != NULL )
 		{
-			SlotResult *searchres=_player->GetItemInterface()->LastSearchResult();//this never gets null since we get a pointer to the inteface internal var
+			SlotResult* searchres = _player->GetItemInterface()->LastSearchResult();//this never gets null since we get a pointer to the inteface internal var
 			uint32 dDurability = item->GetDurabilityMax() - item->GetDurability();
 
-			if (dDurability)
+			if( dDurability )
 			{
 				// the amount of durability that is needed to be added is the amount of money to be payed
-				if (dDurability <= _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
+				if( dDurability <= _player->GetUInt32Value( PLAYER_FIELD_COINAGE ) )
 				{
 					int32 cDurability = item->GetDurability();
 					_player->ModUInt32Value( PLAYER_FIELD_COINAGE , -(int32)dDurability );
@@ -1627,9 +1649,9 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 					item->m_isDirty = true;
 					
 					//only apply item mods if they are on char equiped
-	//printf("we are fixing a single item in inventory at bagslot %u and slot %u\n",searchres->ContainerSlot,searchres->Slot);
-					if(cDurability <= 0 && searchres->ContainerSlot==INVALID_BACKPACK_SLOT && searchres->Slot<INVENTORY_SLOT_BAG_END)
-						_player->ApplyItemMods(item, searchres->Slot, true);
+					//printf("we are fixing a single item in inventory at bagslot %u and slot %u\n",searchres->ContainerSlot,searchres->Slot);
+					if( cDurability <= 0 && searchres->ContainerSlot == INVALID_BACKPACK_SLOT && searchres->Slot < INVENTORY_SLOT_BAG_END )
+						_player->ApplyItemMods( item, searchres->Slot, true );
 				}
 				else
 				{

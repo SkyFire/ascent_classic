@@ -355,7 +355,6 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 
 	//SetCasterFaction(caster->_getFaction());
 
-	//m_auraSlot = 0;
 	m_modcount = 0;
 	m_dynamicValue = 0;
 	m_areaAura = false;
@@ -398,7 +397,9 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 	m_visualSlot = 0xFF;
 	pSpellId = 0;
 	periodic_target = 0;
-	sLog.outDetail("Aura::Constructor %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name, m_target->GetGUIDLow());
+	m_auraSlot = 0xffffffff;
+
+	sLog.outDetail( "Aura::Constructor %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name, m_target->GetGUIDLow() );
 	//fixed_amount = 0;//used only por percent values to be able to recover value correctly.No need to init this if we are not using it
 }
 
@@ -1740,17 +1741,6 @@ void Aura::SpellAuraDummy(bool apply)
 				}
 			}*/
 		}break;
-	case 33763: // LifeBloom
-		 {
-			 if( !apply )
-			 {
-				 if( GetUnitCaster() != NULL && m_target != NULL && m_target->isAlive() )
-				 {
-						GetUnitCaster()->Heal( m_target, pSpellId,mod->m_amount );
-						m_target->RemoveAllAuras( pSpellId, GetUnitCaster()->GetGUID() );
-				 }
-			 }
-		 }break;
 
 	case 23701://Darkmoon Card: Twisting Nether give 10% chance to self resurrect ->cast 23700
 		{
@@ -1859,6 +1849,33 @@ void Aura::SpellAuraDummy(bool apply)
 			else
 				sEventMgr.RemoveEvents(this, EVENT_AURA_PERIODIC_HEAL);
             		
+		}break;
+
+	case 16914:
+	case 17401:
+	case 17402:
+	case 27012:		// hurricane
+		{
+			if(apply)
+				sEventMgr.AddEvent(this, &Aura::EventPeriodicDamage, (uint32)mod->m_amount, EVENT_AURA_PERIODIC_DAMAGE, 1000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+			else
+				sEventMgr.RemoveEvents(this, EVENT_AURA_PERIODIC_DAMAGE);
+		}break;
+
+	case 33763:		// lifebloom
+		{
+			if(apply)
+				return;
+
+			Unit * pCaster = GetUnitCaster();
+			if( pCaster == NULL )
+				pCaster = m_target;
+
+			// this is an ugly hack because i don't want to copy/paste code ;P
+			Spell spell(pCaster, m_spellProto, true, NULL);
+			spell.SetUnitTarget( m_target );
+			spell.Heal( mod->m_amount );
+			//pCaster->Heal( m_target, m_spellProto->Id, mod->m_amount );
 		}break;
 
 	case 2584:			// Area spirit healer aura for BG's
