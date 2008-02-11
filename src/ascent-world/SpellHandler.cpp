@@ -75,34 +75,36 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 			}
 		}
 	}
-	if(!spellId)
-		return;
-	// check for spell id
-	SpellEntry *spellInfo = dbcSpell.LookupEntryForced( spellId );
 
-	if(!spellInfo)
+	if( !spellId )
+		return;
+
+	// check for spell id
+	SpellEntry* spellInfo = dbcSpell.LookupEntryForced( spellId );
+
+	if( spellInfo == NULL )
 	{
 		sLog.outError("WORLD: unknown spell id %i\n", spellId);
 		return;
 	}
 
-	if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP)
+	if( spellInfo->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP )
 	{
-		if (p_User->CombatStatus.IsInCombat())
+		if( p_User->CombatStatus.IsInCombat() || p_User->IsMounted() )
 		{
-			_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_CANT_DO_IN_COMBAT);
+			_player->GetItemInterface()->BuildInventoryChangeError( tmpItem, NULL, INV_ERR_CANT_DO_IN_COMBAT );
 			return;
 		}
-		if(p_User->GetStandState()!=1)
-		p_User->SetStandState(STANDSTATE_SIT);
+		if( p_User->GetStandState() != 1 )
+			p_User->SetStandState( STANDSTATE_SIT );
 		// loop through the auras and removing existing eating spells
 	}
 
-	if(itemProto->RequiredLevel)
+	if( itemProto->RequiredLevel )
 	{
-		if(_player->getLevel() < itemProto->RequiredLevel)
+		if( _player->getLevel() < itemProto->RequiredLevel )
 		{
-			_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+			_player->GetItemInterface()->BuildInventoryChangeError( tmpItem, NULL, INV_ERR_ITEM_RANK_NOT_ENOUGH );
 			return;
 		}
 	}
