@@ -5300,49 +5300,48 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 			continue;
         //quest items check. type 4/5
         //quest items that dont start quests.
-        if((itemProto->Bonding == ITEM_BIND_QUEST) && !(itemProto->QuestId) && !HasQuestForItem(iter->item.itemproto->ItemId))
+        if( ( itemProto->Bonding == ITEM_BIND_QUEST ) && !( itemProto->QuestId ) && !HasQuestForItem( iter->item.itemproto->ItemId ) )
             continue;
-        if((itemProto->Bonding == ITEM_BIND_QUEST2) && !(itemProto->QuestId) && !HasQuestForItem(iter->item.itemproto->ItemId))
+        if( ( itemProto->Bonding == ITEM_BIND_QUEST2 ) && !( itemProto->QuestId ) && !HasQuestForItem( iter->item.itemproto->ItemId ) )
             continue;
 
         //quest items that start quests need special check to avoid drops all the time.
-        if((itemProto->Bonding == ITEM_BIND_QUEST) && (itemProto->QuestId) && GetQuestLogForEntry(itemProto->QuestId))
+        if( ( itemProto->Bonding == ITEM_BIND_QUEST ) && ( itemProto->QuestId ) && GetQuestLogForEntry( itemProto->QuestId ) )
             continue;
-        if((itemProto->Bonding == ITEM_BIND_QUEST2) && (itemProto->QuestId) && GetQuestLogForEntry(itemProto->QuestId))
+        if((itemProto->Bonding == ITEM_BIND_QUEST2 ) && ( itemProto->QuestId ) && GetQuestLogForEntry( itemProto->QuestId ) )
             continue;
 
-        if((itemProto->Bonding == ITEM_BIND_QUEST) && (itemProto->QuestId) && HasFinishedQuest(itemProto->QuestId))
+        if( ( itemProto->Bonding == ITEM_BIND_QUEST ) && ( itemProto->QuestId ) && HasFinishedQuest( itemProto->QuestId ) )
             continue;
-        if((itemProto->Bonding == ITEM_BIND_QUEST2) && (itemProto->QuestId) && HasFinishedQuest(itemProto->QuestId))
+        if( ( itemProto->Bonding == ITEM_BIND_QUEST2 ) && ( itemProto->QuestId ) && HasFinishedQuest( itemProto->QuestI d) )
             continue;
 
         //check for starting item quests that need questlines.
-        if((itemProto->QuestId && itemProto->Bonding != ITEM_BIND_QUEST && itemProto->Bonding != ITEM_BIND_QUEST2))
+        if( ( itemProto->QuestId && itemProto->Bonding != ITEM_BIND_QUEST && itemProto->Bonding != ITEM_BIND_QUEST2 ) )
         {
             bool HasRequiredQuests = true;
-            Quest * pQuest = QuestStorage.LookupEntry(itemProto->QuestId);
-            if(pQuest)
+            Quest* pQuest = QuestStorage.LookupEntry( itemProto->QuestId );
+            if( pQuest != NULL )
             {
                 //check if its a questline.
-                for(uint32 i = 0; i < pQuest->required_quests[4]; i++)
+                for( uint32 i = 0; i < 4; i++)
                 {
-                    if(pQuest->required_quests[i])
+                    if( pQuest->required_quests[i] )
                     {
-                        if(!HasFinishedQuest(pQuest->required_quests[i]) || GetQuestLogForEntry(pQuest->required_quests[i]))
+                        if( !HasFinishedQuest( pQuest->required_quests[i] ) || GetQuestLogForEntry(pQuest->required_quests[i] ) )
                         {
                             HasRequiredQuests = false;
                             break;
                         }
                     }
                 }
-                if(!HasRequiredQuests)
+                if( !HasRequiredQuests )
                     continue;
             }
         } 
 
-
 		slottype = 0;
-		if(m_Group != NULL)
+		if( m_Group != NULL )
 		{
 			switch(m_Group->GetMethod())
 			{
