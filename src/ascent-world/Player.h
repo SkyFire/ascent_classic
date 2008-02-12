@@ -1985,7 +1985,7 @@ protected:
 	// Pointer to this char's game client
 	WorldSession *m_session;
 	// Channels
-	std::list<Channel*> m_channels;
+	std::set< Channel* > m_channels;
 	// Visible objects
 	std::set<Object*> m_visibleObjects;
 	// Groups/Raids

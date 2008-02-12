@@ -96,7 +96,7 @@ void WorldSocket::OutPacket(uint16 opcode, size_t len, const void* data)
 	OUTPACKET_RESULT res;
 	if( ( len + 10 ) > WORLDSOCKET_SENDBUF_SIZE )
 	{
-		printf( "WARNING: Tried to send a packet of %u bytes (which is too large) to a socket. Opcode was: %u\n", (unsigned int)len, (unsigned int)opcode );
+		printf( "WARNING: Tried to send a packet of %u bytes (which is too large) to a socket. Opcode was: %u (0x%03X)\n", (unsigned int)len, (unsigned int)opcode, (unsigned int)opcode );
 		return;
 	}
 

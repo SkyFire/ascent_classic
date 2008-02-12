@@ -24,7 +24,7 @@
 // TODO: handle errors better
 
 // An assert isn't necessarily fatal, although if compiled with asserts enabled it will be.
-#ifdef WIN32
+#if defined( WIN32 ) && defined( _DEBUG )
 #define WPAssert( assertion ) { if( !(assertion) ) { fprintf( stderr, "\n%s:%i ASSERTION FAILED:\n  %s\n", __FILE__, __LINE__, #assertion ); CStackWalker sw; sw.ShowCallstack(); assert(assertion); } }
 #else
 #define WPAssert( assertion ) { if( !(assertion) ) { fprintf( stderr, "\n%s:%i ASSERTION FAILED:\n  %s\n", __FILE__, __LINE__, #assertion ); assert(assertion); } }
