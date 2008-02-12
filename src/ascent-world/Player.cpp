@@ -5328,7 +5328,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
                 {
                     if( pQuest->required_quests[i] )
                     {
-                        if( !HasFinishedQuest( pQuest->required_quests[i] ) || GetQuestLogForEntry(pQuest->required_quests[i] ) )
+                        if( !HasFinishedQuest( pQuest->required_quests[i] ) || GetQuestLogForEntry( pQuest->required_quests[i] ) )
                         {
                             HasRequiredQuests = false;
                             break;
@@ -5343,7 +5343,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		slottype = 0;
 		if( m_Group != NULL )
 		{
-			switch(m_Group->GetMethod())
+			switch( m_Group->GetMethod() )
 			{
 			case PARTY_LOOT_MASTER:
 				slottype = 2;
@@ -5357,18 +5357,19 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 				slottype = 0;
 				break;
 			}
+
 			// only quality items are distributed
-			if(itemProto->Quality < m_Group->GetThreshold())
+			if( itemProto->Quality < m_Group->GetThreshold() )
 			{
 				slottype = 0;
 			}
 
-			/* if all people passed anyone can loot it? :P */
-			if(iter->passed)
+			// if all people passed anyone can loot it? :P
+			if( iter->passed )
 				slottype = 0;					// All players passed on the loot
 
 			//if it is ffa loot and not an masterlooter
-			if(iter->ffa_loot && slottype != 2)
+			if( iter->ffa_loot && slottype != 2 )
 				slottype = 0;
 		}
 
@@ -5378,12 +5379,12 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		data << uint32(iter->item.displayid); 
 		//data << uint32(iter->iRandomSuffix ? iter->iRandomSuffix->id : 0);
 		//data << uint32(iter->iRandomProperty ? iter->iRandomProperty->ID : 0);
-		if(iter->iRandomSuffix)
+		if( iter->iRandomSuffix )
 		{
 			data << Item::GenerateRandomSuffixFactor(itemProto);
 			data << uint32(-int32(iter->iRandomSuffix->id));
 		}
-		else if(iter->iRandomProperty)
+		else if( iter->iRandomProperty )
 		{
 			data << uint32(0);
 			data << uint32(iter->iRandomProperty->ID);
@@ -5396,9 +5397,9 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 
 		data << slottype;   // "still being rolled for" flag
 		
-		if(slottype == 1)
+		if( slottype == 1 )
 		{
-			if(iter->roll == NULL && !iter->passed)
+			if( iter->roll == NULL && !iter->passed )
 			{
 				int32 ipid = 0;
 				uint32 factor = 0;
