@@ -2392,10 +2392,10 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 					itemTarget = p_caster->GetItemInterface()->GetItemByGUID( guid );
 				break;
 			case HIGHGUID_GAMEOBJECT:
-				gameObjTarget = m_caster->GetMapMgr()->GetGameObject((uint32)guid);
+				gameObjTarget = m_caster->GetMapMgr()->GetGameObject( (uint32)guid );
 				break;
 			case HIGHGUID_CORPSE:
-				corpseTarget = objmgr.GetCorpse((uint32)guid);
+				corpseTarget = objmgr.GetCorpse( (uint32)guid );
 				break;
 			}
 		}

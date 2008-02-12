@@ -310,71 +310,76 @@ uint32 TimeStamp();
 
 void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2, Player* target )
 {
-	ByteBuffer *splinebuf = (m_objectTypeId == TYPEID_UNIT) ? target->GetAndRemoveSplinePacket(GetGUID()) : 0;
+	ByteBuffer* splinebuf = (m_objectTypeId == TYPEID_UNIT) ? target->GetAndRemoveSplinePacket( GetGUID() ) : NULL;
 	*data << (uint8)flags;
 
-	Player * pThis = 0;
-	if(m_objectTypeId == TYPEID_PLAYER)
+	Player* pThis = NULL;
+	if( m_objectTypeId == TYPEID_PLAYER )
 	{
 		pThis = static_cast< Player* >( this );
-		if(target == this)
+		if( target == this )
 		{
 			// Updating our last speeds.
 			pThis->UpdateLastSpeeds();
 		}
 	}
 
-	if( flags & 0x20 )
+	if( flags & UPDATEFLAG_LIVING )
 	{
 		if( pThis != NULL && pThis->m_TransporterGUID != 0 )
-			flags2 |= 0x200;
-		else if( m_objectTypeId == TYPEID_UNIT && static_cast< Creature* >( this )->m_transportGuid != 0 && static_cast< Creature* >( this )->m_transportPosition != NULL)
-			flags2 |= 0x200;
+			flags2 |= MOVEFLAG_TAXI;
+		else if( m_objectTypeId == TYPEID_UNIT && static_cast< Creature* >( this )->m_transportGuid != 0 && static_cast< Creature* >( this )->m_transportPosition != NULL )
+			flags2 |= MOVEFLAG_TAXI;
+		else
+			flags2 &= ~MOVEFLAG_TAXI;
 
-		if(splinebuf)
+		if( splinebuf != NULL )
 		{
-			flags2 |= 0x08000001;	   //1=move forward
-			if(GetTypeId() == TYPEID_UNIT)
+			flags2 |= MOVEFLAG_IMMOBILIZED;
+			flags2 |= MOVEFLAG_MOVE_FORWARD;
+			if( GetTypeId() == TYPEID_UNIT )
 			{
-				if(static_cast<Unit*>(this)->GetAIInterface()->m_moveRun == false)
-					flags2 |= 0x100;	//100=walk
+				if(static_cast< Unit* >( this )->GetAIInterface()->m_moveRun == false )
+					flags2 |= MOVEFLAG_WALK;
 			}			
 		}
 
-		if(GetTypeId() == TYPEID_UNIT)
+		if( GetTypeId() == TYPEID_UNIT )
 		{
 			//		 Don't know what this is, but I've only seen it applied to spirit healers.
 			//		 maybe some sort of invisibility flag? :/
 
-			switch(GetEntry())
+			switch( GetEntry() )
 			{
-			case 6491:  // Spirit Healer
-			case 13116: // Alliance Spirit Guide
-			case 13117: // Horde Spirit Guide
-				{
-					flags2 |= 0x10000000;
-				}break;
+				case 6491:  // Spirit Healer
+				case 13116: // Alliance Spirit Guide
+				case 13117: // Horde Spirit Guide
+					{
+						flags2 |= MOVEFLAG_WATER_WALK;
+					}break;
 			}
 		
-			if(static_cast<Unit*>(this)->GetAIInterface()->IsFlying())
-//				flags2 |= 0x800; //in 2.3 this is some state that i was not able to decode yet
-				flags2 |= 0x400; //Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
-			if(static_cast<Creature*>(this)->proto && static_cast<Creature*>(this)->proto->extra_a9_flags)
+			if( static_cast< Unit* >(this)->GetAIInterface()->IsFlying() )
 			{
-				if(!(flags2 & 0x0200))
-					flags2 |= static_cast<Creature*>(this)->proto->extra_a9_flags;
+				//flags2 |= 0x800; //in 2.3 this is some state that i was not able to decode yet
+				//Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
+				flags2 |= MOVEFLAG_NO_COLLISION;
 			}
-			if(GetGUIDHigh() == HIGHGUID_WAYPOINT)
+
+			if( static_cast< Creature* >(this)->proto && static_cast<C reature* >( this )->proto->extra_a9_flags )
 			{
-				if(GetUInt32Value(UNIT_FIELD_STAT0) == 768)		// flying waypoint
-					flags2 |= 0x800;
+				if( !( flags2 & MOVEFLAG_TAXI ) )
+					flags2 |= static_cast< Creature* >( this )->proto->extra_a9_flags;
+			}
+			if( GetGUIDHigh() == HIGHGUID_WAYPOINT )
+			{
+				if( GetUInt32Value( UNIT_FIELD_STAT0 ) == 768 )		// flying waypoint
+					flags2 |= MOVEFLAG_FLYING;
 			}
 		}
 
 		*data << (uint32)flags2;
-
 		*data << (uint8)0;
-
 		*data << getMSTime(); // this appears to be time in ms but can be any thing
 
 		// this stuff:
@@ -392,30 +397,35 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 		//*data << uint8(0x1);
 	}
 
-	if (flags & 0x40)
+	if( flags & UPDATEFLAG_HASPOSITION )
 	{
-		if(flags & 0x2)
+		if( flags & UPDATEFLAG_TRANSPORT )
 		{
-			*data << (float)m_position.x;
-			*data << (float)m_position.y;
-			*data << (float)m_position.z;
-			*data << (float)m_position.o;
+			*data << m_position.x;
+			*data << m_position.y;
+			*data << m_position.z;
+			*data << m_position.o;
 		}
 		else
 		{
-			*data << m_position;
+			*data << m_position.x;
+			*data << m_position.y;
+			*data << m_position.z;
 			*data << m_position.o;
 		}
 
-		if( flags & 0x20 && flags2 & 0x0200 )
+		if( flags & UPDATEFLAG_LIVING && flags2 & MOVEFLAG_TAXI )
 		{
 			if( pThis != NULL )
 			{
 				*data << pThis->m_TransporterGUID;
-				*data << pThis->m_TransporterX << pThis->m_TransporterY << pThis->m_TransporterZ << pThis->m_TransporterO;
+				*data << pThis->m_TransporterX;
+				*data << pThis->m_TransporterY;
+				*data << pThis->m_TransporterZ;
+				*data << pThis->m_TransporterO;
 				*data << pThis->m_TransporterUnk;
 			}
-			else if( m_objectTypeId == TYPEID_UNIT && static_cast< Creature* >( this )->m_transportPosition != NULL)
+			else if( m_objectTypeId == TYPEID_UNIT && static_cast< Creature* >( this )->m_transportPosition != NULL )
 			{
 				*data << static_cast< Creature* >( this )->m_transportGuid;
 				*data << uint32( HIGHGUID_TRANSPORTER );
@@ -428,57 +438,59 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 		}
 	}
 
-	if (flags & 0x20)
+	if( flags & UPDATEFLAG_LIVING )
 	{
 		*data << (uint32)0;
 	}
 
-	if (flags & 0x20 && flags2 & 0x2000)
+	if( flags & UPDATEFLAG_LIVING && flags2 & MOVEFLAG_FALLING )
 	{
-		*data << (float)0;
-		*data << (float)1.0;
-		*data << (float)0;
-		*data << (float)0;
+		*data << 0.0f;
+		*data << 1.0f;
+		*data << 0.0f;
+		*data << 0.0f;
 	}
 
-	if (flags & 0x20)
+	if( flags & UPDATEFLAG_LIVING )
 	{
-		*data << m_walkSpeed;	 // walk speed
-		*data << m_runSpeed;	  // run speed
-		*data << m_backWalkSpeed; // backwards walk speed
-		*data << m_swimSpeed;	 // swim speed
-		*data << m_backSwimSpeed; // backwards swim speed
+		*data << m_walkSpeed;		// walk speed
+		*data << m_runSpeed;		// run speed
+		*data << m_backWalkSpeed;	// backwards walk speed
+		*data << m_swimSpeed;		// swim speed
+		*data << m_backSwimSpeed;	// backwards swim speed
 		*data << m_flySpeed;		// fly speed
 		*data << m_backFlySpeed;	// back fly speed
-		*data << m_turnRate;	  // turn rate
+		*data << m_turnRate;		// turn rate
 	}
 
-	if(splinebuf)
+	if( splinebuf != NULL )
 	{
-		data->append(*splinebuf);
+		data->append( *splinebuf );
 		delete splinebuf;
 	}
 
-	if(flags & 0x8)
+	// why are we sending lowguid as highguid if no low guid is requested?
+
+	if( flags & UPDATEFLAG_LOWGUID )
 	{
 		*data << GetGUIDLow();
-		if(flags & 0x10)
+		if( flags & UPDATEFLAG_HIGHGUID )
 			*data << GetGUIDHigh();
 	}
-	else if(flags & 0x10)
+	else if( flags & UPDATEFLAG_HIGHGUID )
 		*data << GetGUIDLow();
 
-	if(flags & 0x2)
+	if( flags & UPDATEFLAG_TAXI )
 	{
-		if(target)
-		{
-			/*int32 m_time = TimeStamp() - target->GetSession()->m_clientTimeDelay;
-			m_time += target->GetSession()->m_moveDelayTime;
-			*data << m_time;*/
-			*data << getMSTime();
-		}
-		else
-            *data << getMSTime();
+		//if( target != NULL )
+		//{
+		//	/*int32 m_time = TimeStamp() - target->GetSession()->m_clientTimeDelay;
+		//	m_time += target->GetSession()->m_moveDelayTime;
+		//	*data << m_time;*/
+		//	*data << getMSTime();
+		//}
+		//else
+		*data << getMSTime();
 	}
 }
 

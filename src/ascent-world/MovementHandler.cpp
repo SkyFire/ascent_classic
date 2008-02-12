@@ -399,7 +399,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 		if( sWorld.antihack_falldmg )
 		{
-			if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 6 ) && !_player->flying_aura && !_player->m_TransporterGUID && _player->_lastHeartbeatZ - movement_info.z > 2.5f && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
+			if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 8 ) && !_player->flying_aura && !_player->m_TransporterGUID && _player->_lastHeartbeatZ - movement_info.z > 2.5f && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
 			{
 				_player->m_heightDecreaseCount++;
 				if( _player->m_heightDecreaseCount > 16.0f )
@@ -493,8 +493,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	}
 	else
 	{
+
 		if( _player->m_redirectCount > 0 )
 			_player->m_redirectCount--;
+
 		if( _player->blinked )
 		{
 			_player->blinked = false;
@@ -510,30 +512,27 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			}
 			else //once we done falling lets do some damage
 			{
-				if( _player->m_fallTime > 750 && _player->isAlive() && !_player->GodModeCheat )
+				if( _player->m_fallTime > 1000 && _player->isAlive() && !_player->GodModeCheat )
 				{
 					//Check if we aren't falling in water
-					if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
+					if( !( movement_info.flags & MOVEFLAG_SWIMMING ) && !_player->bFeatherFall )
 					{
-						if( !_player->bFeatherFall ) //&& UNIXTIME > _player->m_fallDisabledUntil )
+						//10% dmg per sec after first 3 seconds
+						//it rL a*t*t
+						double coeff = 0.000000075 * ( _player->m_fallTime * _player->m_fallTime - _player->m_fallTime );
+						
+						if( coeff > 0.0 )
 						{
-							//10% dmg per sec after first 3 seconds
-							//it rL a*t*t
-							double coeff = 0.000000075 * ( _player->m_fallTime * _player->m_fallTime - _player->m_fallTime );
-							
-							if( coeff > 0.0 )
-							{
-								uint32 damage = (uint32)( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) * coeff );
+							uint32 damage = (uint32)( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) * coeff );
 
-								if( _player->bSafeFall )
-									damage = float2int32( float( damage ) * 0.83f );
+							if( _player->bSafeFall )
+								damage = float2int32( float( damage ) * 0.83f );
 
-								if( damage > _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) ) // Can only deal 100% damage.
-									damage = _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH );
+							if( damage > _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) ) // Can only deal 100% damage.
+								damage = _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH );
 
-								_player->SendEnvironmentalDamageLog( _player->GetGUID(), DAMAGE_FALL, damage );
-								_player->DealDamage( _player, damage, 0, 0, 0 );
-							}
+							_player->SendEnvironmentalDamageLog( _player->GetGUID(), DAMAGE_FALL, damage );
+							_player->DealDamage( _player, damage, 0, 0, 0 );
 						}
 					}
 					_player->m_fallTime = 0;
@@ -613,7 +612,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		_player->SetMovement( MOVE_ROOT, 1 );
 	}
 
-	if( _player->m_redirectCount > 32 )
+	if( _player->m_redirectCount > _player->GetSession()->GetLatency() * 2 )
 	{
 		sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
 		sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED Packet hacker kicked" );
@@ -650,7 +649,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			speed = _player->m_flySpeed;
 		}
 
-		if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 6 ) && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
+		if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 8 ) && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
 		{
 			if( _player->_lastHeartbeatT == 0 )
 			{
@@ -897,23 +896,23 @@ void MovementInfo::write(WorldPacket & data)
 
 	data << x << y << z << orientation;
 
-	if (flags & MOVEFLAG_TAXI)
+	if( flags & MOVEFLAG_TAXI )
 	{
 		data << transGuid << transX << transY << transZ << transO << transUnk;
 	}
-	if (flags & MOVEFLAG_SWIMMING)
+	if( flags & MOVEFLAG_SWIMMING )
 	{
 		data << unk6;
 	}
-	if (flags & MOVEFLAG_FALLING)
+	if( flags & MOVEFLAG_FALLING )
 	{
 		data << FallTime << unk8 << unk9 << unk10;
 	}
-	if (flags & MOVEFLAG_SPLINE_MOVER)
+	if( flags & MOVEFLAG_SPLINE_MOVER )
 	{
 		data << unk12;
 	}
 	data << unklast;
-	if(unk13)
+	if( unk13 )
 		data << unk13;
 }

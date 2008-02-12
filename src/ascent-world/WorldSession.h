@@ -90,6 +90,18 @@ enum MovementFlags
 	MOVEFLAG_FULL_FALLING_MASK			= 0xE000,
 };
 
+enum UpdateFlags
+{
+    UPDATEFLAG_NONE			= 0x00,
+    UPDATEFLAG_SELF			= 0x01,
+    UPDATEFLAG_TAXI			= 0x02,
+    UPDATEFLAG_FULLGUID     = 0x04,
+    UPDATEFLAG_LOWGUID		= 0x08,
+    UPDATEFLAG_HIGHGUID		= 0x10,
+    UPDATEFLAG_LIVING		= 0x20,
+    UPDATEFLAG_HASPOSITION	= 0x40,
+};
+
 struct OpcodeHandler
 {
 	uint16 status;
