@@ -1860,19 +1860,19 @@ void Aura::SpellAuraDummy(bool apply)
 
 	case 33763:		// lifebloom
 		{
-			if(apply || !m_target)
+			if( apply || m_target == NULL )
 				return;
 
-			Unit * pCaster = GetUnitCaster();
+			Unit* pCaster = GetUnitCaster();
 			if( pCaster == NULL )
 				pCaster = m_target;
 
 			// this is an ugly hack because i don't want to copy/paste code ;P
-			Spell spell(pCaster, m_spellProto, true, NULL);
+			Spell spell( pCaster, m_spellProto, true, NULL );
 			spell.SetUnitTarget( m_target );
 			spell.Heal( mod->m_amount );
 
-			m_target->RemoveAllAuras(pSpellId,pCaster->GetGUID());
+			m_target->RemoveAllAuras( pSpellId, pCaster->GetGUID() );
 		}break;
 
 	case 2584:			// Area spirit healer aura for BG's
