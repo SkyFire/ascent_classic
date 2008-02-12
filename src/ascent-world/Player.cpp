@@ -5313,7 +5313,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 
         if( ( itemProto->Bonding == ITEM_BIND_QUEST ) && ( itemProto->QuestId ) && HasFinishedQuest( itemProto->QuestId ) )
             continue;
-        if( ( itemProto->Bonding == ITEM_BIND_QUEST2 ) && ( itemProto->QuestId ) && HasFinishedQuest( itemProto->QuestI d) )
+        if( ( itemProto->Bonding == ITEM_BIND_QUEST2 ) && ( itemProto->QuestId ) && HasFinishedQuest( itemProto->QuestId ) )
             continue;
 
         //check for starting item quests that need questlines.
