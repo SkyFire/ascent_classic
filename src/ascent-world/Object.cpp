@@ -366,7 +366,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 				flags2 |= MOVEFLAG_NO_COLLISION;
 			}
 
-			if( static_cast< Creature* >(this)->proto && static_cast<C reature* >( this )->proto->extra_a9_flags )
+			if( static_cast< Creature* >(this)->proto && static_cast< Creature* >( this )->proto->extra_a9_flags )
 			{
 				if( !( flags2 & MOVEFLAG_TAXI ) )
 					flags2 |= static_cast< Creature* >( this )->proto->extra_a9_flags;
@@ -399,7 +399,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 
 	if( flags & UPDATEFLAG_HASPOSITION )
 	{
-		if( flags & UPDATEFLAG_TRANSPORT )
+		if( flags & UPDATEFLAG_TAXI )
 		{
 			*data << m_position.x;
 			*data << m_position.y;
