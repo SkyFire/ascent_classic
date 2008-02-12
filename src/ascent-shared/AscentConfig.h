@@ -76,5 +76,17 @@
 #endif
 //#define GLOBAL_LFG 1
 
+/** Enable/disable movement compression.
+ * This allows the server to compress long-range creatures movement into a buffer and then flush
+ * it periodically, compressed with deflate. This can make a large difference to server bandwidth.
+ * Currently this sort of compression is only used for player and creature movement, although
+ * it may be expanded in the future.
+ * Default: disabled
+ */
+
+//#define ENABLE_COMPRESSED_MOVEMENT 1
+//#define ENABLE_COMPRESSED_MOVEMENT_FOR_PLAYERS 1
+//#define ENABLE_COMPRESSED_MOVEMENT_FOR_CREATURES 1
+
 #endif		// __ASCENTCONFIG_H
 

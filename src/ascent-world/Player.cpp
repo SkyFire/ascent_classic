@@ -391,9 +391,14 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_lfgInviterGuid = 0;
 	m_mountCheckTimer = 0;
 	this->OnLogin();
+
 #ifdef VOICE_CHAT
 	m_inPartyVoice = false;
 	m_inPartyVoiceId = 0;
+#endif
+
+#ifdef ENABLE_COMPRESSED_MOVEMENT
+	m_movementBuffer.reserve(5000);
 #endif
 }
 
@@ -3248,6 +3253,9 @@ void Player::OnPushToWorld()
 	if( !GetSession()->HasGMPermissions() )
 		GetItemInterface()->CheckAreaItems(); 
 
+#ifdef ENABLE_COMPRESSED_MOVEMENT
+	sEventMgr.AddEvent(this, &Player::EventDumpCompressedMovement, EVENT_PLAYER_FLUSH_MOVEMENT, World::m_movementCompressInterval, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+#endif
 }
 
 void Player::ResetHeartbeatCoords()
@@ -3341,6 +3349,11 @@ void Player::RemoveFromWorld()
 	}
 
 	sWorld.mInWorldPlayerCount--;
+
+#ifdef ENABLE_COMPRESSED_MOVEMENT
+	m_movementBuffer.clear();
+	sEventMgr.RemoveEvents(this, EVENT_PLAYER_FLUSH_MOVEMENT);
+#endif
 }
 
 // TODO: perhaps item should just have a list of mods, that will simplify code
@@ -4211,19 +4224,19 @@ void Player::RepopAtGraveyard(float ox, float oy, float oz, uint32 mapid)
 void Player::JoinedChannel(Channel *c)
 {
 	if( c != NULL )
-		m_channels.push_back(c);
+		m_channels.insert( c );
 }
 
 void Player::LeftChannel(Channel *c)
 {
 	if( c != NULL )
-		m_channels.remove(c);
+		m_channels.erase( c );
 }
 
 void Player::CleanupChannels()
 {
-	list<Channel *>::iterator i;
-	Channel * c;
+	set< Channel* >::iterator i;
+	Channel* c;
 	for(i = m_channels.begin(); i != m_channels.end();)
 	{
 		c = *i;
@@ -9703,49 +9716,49 @@ void Player::EventGroupFullUpdate()
 
 void Player::EjectFromInstance()
 {
-	if(m_bgEntryPointX && m_bgEntryPointY && m_bgEntryPointZ && !IS_INSTANCE(m_bgEntryPointMap))
+	if( m_bgEntryPointX && m_bgEntryPointY && m_bgEntryPointZ && !IS_INSTANCE( m_bgEntryPointMap ) )
 	{
-		if(SafeTeleport(m_bgEntryPointMap, m_bgEntryPointInstance, m_bgEntryPointX, m_bgEntryPointY, m_bgEntryPointZ, m_bgEntryPointO))
+		if( SafeTeleport( m_bgEntryPointMap, m_bgEntryPointInstance, m_bgEntryPointX, m_bgEntryPointY, m_bgEntryPointZ, m_bgEntryPointO ) )
 			return;
 	}
 
-	SafeTeleport(m_bind_mapid, 0, m_bind_pos_x, m_bind_pos_y, m_bind_pos_z, 0);
+	SafeTeleport( m_bind_mapid, 0, m_bind_pos_x, m_bind_pos_y, m_bind_pos_z, 0 );
 }
 
 bool Player::HasQuestSpell(uint32 spellid) //Only for Cast Quests
 {
-	if (quest_spells.size()>0 && quest_spells.find(spellid) != quest_spells.end())
+	if( quest_spells.size() > 0 && quest_spells.find( spellid ) != quest_spells.end() )
 		return true;
 	return false;
 }
 void Player::RemoveQuestSpell(uint32 spellid) //Only for Cast Quests
 {
-	if (quest_spells.size()>0)
-		quest_spells.erase(spellid);
+	if( quest_spells.size() > 0 )
+		quest_spells.erase( spellid );
 }
 
 bool Player::HasQuestMob(uint32 entry) //Only for Kill Quests
 {
-	if (quest_mobs.size()>0 && quest_mobs.find(entry) != quest_mobs.end())
+	if( quest_mobs.size() > 0 && quest_mobs.find( entry ) != quest_mobs.end() )
 		return true;
 	return false;
 }
 void Player::RemoveQuestMob(uint32 entry) //Only for Kill Quests
 {
-	if (quest_mobs.size()>0)
+	if( quest_mobs.size() > 0 )
 		quest_mobs.erase(entry);
 }
 
 PlayerInfo::~PlayerInfo()
 {
-	if(m_Group)
-		m_Group->RemovePlayer(this);
+	if( m_Group != NULL )
+		m_Group->RemovePlayer( this );
 }
 
 void Player::CopyAndSendDelayedPacket(WorldPacket * data)
 {
-	WorldPacket * data2 = new WorldPacket(*data);
-	delayedPackets.add(data2);
+	WorldPacket* data2 = new WorldPacket( *data );
+	delayedPackets.add( data2 );
 }
 
 void Player::SendMeetingStoneQueue(uint32 DungeonId, uint8 Status)
@@ -9757,11 +9770,11 @@ void Player::SendMeetingStoneQueue(uint32 DungeonId, uint8 Status)
 
 void Player::PartLFGChannel()
 {
-	Channel * pChannel = channelmgr.GetChannel("LookingForGroup", this);
+	Channel* pChannel = channelmgr.GetChannel("LookingForGroup", this);
 	if( pChannel == NULL )
 		return;
 
-	for(list<Channel*>::iterator itr = m_channels.begin(); itr != m_channels.end(); ++itr)
+	for( set< Channel* >::iterator itr = m_channels.begin(); itr != m_channels.end(); ++itr)
 	{
 		if( (*itr) == pChannel )
 		{
@@ -9814,3 +9827,88 @@ void Player::EventDismissPet()
 		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET)
 			m_auras[x]->Remove();
 }
+
+#ifdef ENABLE_COMPRESSED_MOVEMENT
+
+void Player::AppendMovementData(uint32 op, uint32 sz, const uint8* data)
+{
+	//printf("AppendMovementData(%u, %u, 0x%.8X)\n", op, sz, data);
+	m_movementBuffer << uint8(sz + 2);
+	m_movementBuffer << uint16(op);
+	m_movementBuffer.append( data, sz );
+}
+
+void Player::EventDumpCompressedMovement()
+{
+	if( m_movementBuffer.size() == 0 )
+		return;
+
+	uint32 size = m_movementBuffer.size();
+	uint32 destsize = size + size/10 + 16;
+	int rate = World::m_movementCompressRate;
+	if(size >= 40000 && rate < 6)
+		rate = 6;
+	if(size <= 100)
+		rate = 0;			// don't bother compressing packet smaller than this, zlib doesnt really handle them well
+
+	// set up stream
+	z_stream stream;
+	stream.zalloc = 0;
+	stream.zfree  = 0;
+	stream.opaque = 0;
+
+	if(deflateInit(&stream, rate) != Z_OK)
+	{
+		sLog.outError("deflateInit failed.");
+		return;
+	}
+
+	uint8 *buffer = new uint8[destsize];
+
+	// set up stream pointers
+	stream.next_out  = (Bytef*)buffer+4;
+	stream.avail_out = destsize;
+	stream.next_in   = (Bytef*)m_movementBuffer.contents();
+	stream.avail_in  = size;
+
+	// call the actual process
+	if(deflate(&stream, Z_NO_FLUSH) != Z_OK ||
+		stream.avail_in != 0)
+	{
+		sLog.outError("deflate failed.");
+		delete [] buffer;
+		return;
+	}
+
+	// finish the deflate
+	if(deflate(&stream, Z_FINISH) != Z_STREAM_END)
+	{
+		sLog.outError("deflate failed: did not end stream");
+		delete [] buffer;
+		return;
+	}
+
+	// finish up
+	if(deflateEnd(&stream) != Z_OK)
+	{
+		sLog.outError("deflateEnd failed.");
+		delete [] buffer;
+		return;
+	}
+
+	// fill in the full size of the compressed stream
+#ifdef USING_BIG_ENDIAN
+	*(uint32*)&buffer[0] = swap32(size);
+#else
+	*(uint32*)&buffer[0] = size;
+#endif
+
+	// send it
+	m_session->OutPacket(763, (uint16)stream.total_out + 4, buffer);
+	//printf("Compressed move compressed from %u bytes to %u bytes.\n", m_movementBuffer.size(), stream.total_out + 4);
+
+	// cleanup memory
+	delete [] buffer;
+	m_movementBuffer.clear();
+}
+#endif

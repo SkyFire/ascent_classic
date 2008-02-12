@@ -269,6 +269,69 @@ public:
 		UNLOCK_LOG;
 	}
 
+#define LARGERRORMESSAGE_ERROR 1
+#define LARGERRORMESSAGE_WARNING 2
+
+	void LargeErrorMessage(uint32 Colour, ...)
+	{
+		std::vector<char*> lines;
+		char * pointer;
+		va_list ap;
+		va_start(ap, Colour);
+		
+		size_t i,j,k;
+		pointer = va_arg(ap, char*);
+		while( pointer != NULL )
+		{
+			lines.push_back( pointer );
+			pointer = va_arg(ap, char*);
+		}
+
+		LOCK_LOG;
+
+		if( Colour == LARGERRORMESSAGE_ERROR )
+			Color(TRED);
+		else
+			Color(TYELLOW);
+
+		printf("*********************************************************************\n");
+		printf("*                        MAJOR ERROR/WARNING                        *\n");
+		printf("*                        ===================                        *\n");
+
+		for(std::vector<char*>::iterator itr = lines.begin(); itr != lines.end(); ++itr)
+		{
+			i = strlen(*itr);
+			j = (i<=65) ? 65 - i : 0;
+
+			printf("* %s", *itr);
+			for( k = 0; k < j; ++k )
+			{
+				printf(" ");
+			}
+
+			printf(" *\n");
+		}
+
+		printf("*********************************************************************\n");
+
+#ifdef WIN32
+		std::string str = "MAJOR ERROR/WARNING:\n";
+		for(std::vector<char*>::iterator itr = lines.begin(); itr != lines.end(); ++itr)
+		{
+			str += *itr;
+			str += "\n";
+		}
+
+		MessageBox(0, str.c_str(), "Error", MB_OK);
+#else
+		printf("Sleeping for 5 seconds.\n");
+		Sleep(5000);
+#endif
+
+		Color(TNORMAL);
+		UNLOCK_LOG;
+	}
+
 };
 
 #define Log CLog::getSingleton()

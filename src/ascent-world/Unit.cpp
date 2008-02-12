@@ -5010,7 +5010,6 @@ void Unit::RemoveFromWorld(bool free_guid)
 	{
 		if( m_auras[x] != NULL )
 		{
-			/* f*cking shit crash fixes */
 			if( m_auras[x]->m_deleted )
 			{
 				m_auras[x] = NULL;

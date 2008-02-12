@@ -509,10 +509,6 @@ void Aura::Remove()
 		caster->SendMessageToSet( &data, true );
 	}
 
-	// suicide xD leaking this shit out
-	// this crashes a lot don't know why.....
-	// if you crash here ( you should have had debug logging on! )
-	// look at the last aura to be removed and report this to us
 	delete this;
 }
 

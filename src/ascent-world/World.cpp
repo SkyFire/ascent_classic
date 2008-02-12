@@ -22,6 +22,11 @@
 initialiseSingleton( World );
 DayWatcherThread * dw = NULL;
 
+float World::m_movementCompressThreshold;
+float World::m_movementCompressThresholdCreatures;
+uint32 World::m_movementCompressRate;
+uint32 World::m_movementCompressInterval;
+
 World::World()
 {
 	m_playerLimit = 0;
@@ -350,7 +355,10 @@ bool World::SetInitialWorldSettings()
 
 	Log.Notice( "World", "Loading DBC files..." );
 	if( !LoadDBCs() )
+	{
+		Log.LargeErrorMessage( LARGERRORMESSAGE_ERROR, "One or more of the DBC files are missing.", "These are absolutely necessary for the server to function.", "The server will not start without them.", NULL );
 		return false;
+	}
 
 	/*{
 		DBCFile moo;
@@ -8044,6 +8052,17 @@ void World::Rehash(bool load)
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
 	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);
 	m_useAccountData = Config.MainConfig.GetBoolDefault("Server", "UseAccountData", false);
+
+	// ======================================
+	m_movementCompressInterval = Config.MainConfig.GetIntDefault("Movement", "FlushInterval", 1000);
+	m_movementCompressRate = Config.MainConfig.GetIntDefault("Movement", "CompressRate", 1);
+	
+	m_movementCompressThresholdCreatures = Config.MainConfig.GetFloatDefault("Movement", "CompressThresholdCreatures", 15.0f);
+	m_movementCompressThresholdCreatures *= m_movementCompressThresholdCreatures;
+
+	m_movementCompressThreshold = Config.MainConfig.GetFloatDefault("Movement", "CompressThreshold", 25.0f);
+	m_movementCompressThreshold *= m_movementCompressThreshold;		// square it to avoid sqrt() on checks
+	// ======================================
 
 	if( m_banTable != NULL )
 		free( m_banTable );

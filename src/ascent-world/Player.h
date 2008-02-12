@@ -2016,6 +2016,13 @@ protected:
 
 	uint32 m_mountCheckTimer;
 	void RemovePendingPlayer();
+
+#ifdef ENABLE_COMPRESSED_MOVEMENT
+public:
+	void EventDumpCompressedMovement();
+	void AppendMovementData(uint32 op, uint32 sz, const uint8* data);
+	ByteBuffer m_movementBuffer;
+#endif
 };
 
 class SkillIterator

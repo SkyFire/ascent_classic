@@ -601,6 +601,11 @@ public:
 	bool m_useAccountData;
 
 	char * m_banTable;
+
+	static float m_movementCompressThreshold;
+	static float m_movementCompressThresholdCreatures;
+	static uint32 m_movementCompressRate;
+	static uint32 m_movementCompressInterval;
 };
 
 #define sWorld World::getSingleton()
