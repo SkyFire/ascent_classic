@@ -360,7 +360,7 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 		for (it = qst_giver->QuestsBegin(); it != qst_giver->QuestsEnd(); ++it)
 		{
 			uint32 status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), *it);
-			if (status >= QMGR_QUEST_NOT_FINISHED)
+			if (status >= QMGR_QUEST_CHAT)
 			{
 				if (!ql.count((*it)->qst->id) )
 				{	

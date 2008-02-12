@@ -1860,7 +1860,7 @@ void Aura::SpellAuraDummy(bool apply)
 
 	case 33763:		// lifebloom
 		{
-			if(apply)
+			if(apply || !m_target)
 				return;
 
 			Unit * pCaster = GetUnitCaster();
@@ -1871,7 +1871,8 @@ void Aura::SpellAuraDummy(bool apply)
 			Spell spell(pCaster, m_spellProto, true, NULL);
 			spell.SetUnitTarget( m_target );
 			spell.Heal( mod->m_amount );
-			//pCaster->Heal( m_target, m_spellProto->Id, mod->m_amount );
+
+			m_target->RemoveAllAuras(pSpellId,pCaster->GetGUID());
 		}break;
 
 	case 2584:			// Area spirit healer aura for BG's

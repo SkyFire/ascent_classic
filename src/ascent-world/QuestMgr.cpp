@@ -1447,7 +1447,7 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 			if( sQuestMgr.CalcQuestStatus( qst_giver, plr, *itr ) >= QMGR_QUEST_CHAT )
 				break;
 
-		if( sQuestMgr.CalcStatus(qst_giver, plr) < QMGR_QUEST_NOT_FINISHED )
+		if( sQuestMgr.CalcStatus(qst_giver, plr) < QMGR_QUEST_CHAT )
 			return false; 
 
 		ASSERT(itr != q_end);
