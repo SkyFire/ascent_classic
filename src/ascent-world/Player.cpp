@@ -3924,9 +3924,11 @@ void Player::RepopRequestedPlayer()
 
 void Player::ResurrectPlayer()
 {
-	sEventMgr.RemoveEvents(this,EVENT_PLAYER_FORECED_RESURECT); //in case somebody resurected us before this event happened
+	sEventMgr.RemoveEvents( this, EVENT_PLAYER_FORECED_RESURECT ); //in case somebody resurected us before this event happened
+	
 	if( m_resurrectHealth )
 		SetUInt32Value( UNIT_FIELD_HEALTH, (uint32)min( m_resurrectHealth, m_uint32Values[UNIT_FIELD_MAXHEALTH] ) );
+	
 	if( m_resurrectMana )
 		SetUInt32Value( UNIT_FIELD_POWER1, (uint32)min( m_resurrectMana, m_uint32Values[UNIT_FIELD_MAXPOWER1] ) );
 
@@ -3934,26 +3936,29 @@ void Player::ResurrectPlayer()
 
 	SpawnCorpseBones();
 	
-	if(getRace()==RACE_NIGHTELF)
+	if( getRace() == RACE_NIGHTELF )
 	{
-		RemoveAura(20584);
-		RemoveAura(9036);
-	}else
-		RemoveAura(8326);
-
-	RemoveFlag(PLAYER_FLAGS, 0x10);
-	setDeathState(ALIVE);
-	UpdateVisibility();
-	if(resurrector && IsInWorld())
-	{
-		Player * p= objmgr.GetPlayer(resurrector);
-		resurrector=0;
-
-		if(p == 0) return;
-		//_Relocate(p->GetMapMgr()->GetMapId(), p->GetPosition(),false,false);
-		SafeTeleport(p->GetMapId(),p->GetInstanceID(),p->GetPosition());
+		RemoveAura( 20584 );
+		RemoveAura( 9036 );
 	}
-	SetMovement(MOVE_LAND_WALK, 1);
+	else
+		RemoveAura( 8326 );
+
+	RemoveFlag( PLAYER_FLAGS, 0x10 );
+	setDeathState( ALIVE );
+	UpdateVisibility();
+
+	if( resurrector && IsInWorld() )
+	{
+		Player* p = objmgr.GetPlayer( resurrector );
+		resurrector = 0;
+
+		if( p == NULL )
+			return;
+		//_Relocate( p->GetMapMgr()->GetMapId(), p->GetPosition(), false, false );
+		SafeTeleport( p->GetMapId(), p->GetInstanceID(), p->GetPosition() );
+	}
+	SetMovement( MOVE_LAND_WALK, 1 );
 }
 
 void Player::KillPlayer()

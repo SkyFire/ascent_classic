@@ -5051,53 +5051,55 @@ void Spell::SpellEffectProspecting(uint32 i)
 void Spell::SpellEffectResurrectNew(uint32 i)
 {
 	//base p =hp,misc mana
-	if(!playerTarget)
+	if( playerTarget == NULL )
 	{
-		if(!corpseTarget)
+		if( corpseTarget == NULL )
 		{
 			// unit resurrection handler
-			if(unitTarget)
+			if( unitTarget != NULL )
 			{
-				if(unitTarget->GetTypeId()==TYPEID_UNIT && unitTarget->IsPet() && unitTarget->isDead())
+				if( unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->IsPet() && unitTarget->isDead() )
 				{
-					uint32 hlth = ((uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXHEALTH) : (uint32)m_spellInfo->EffectBasePoints[i];
-					uint32 mana = ((uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)) ? unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1) : (uint32)m_spellInfo->EffectBasePoints[i];
+					uint32 hlth = ( (uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) ) ? unitTarget->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) : (uint32)m_spellInfo->EffectBasePoints[i];
+					uint32 mana = ( (uint32)m_spellInfo->EffectBasePoints[i] > unitTarget->GetUInt32Value( UNIT_FIELD_MAXPOWER1 ) ) ? unitTarget->GetUInt32Value( UNIT_FIELD_MAXPOWER1 ) : (uint32)m_spellInfo->EffectBasePoints[i];
 
-					if(!unitTarget->IsPet())
+					if( !unitTarget->IsPet() )
 					{
-						sEventMgr.RemoveEvents(unitTarget, EVENT_CREATURE_REMOVE_CORPSE);
+						sEventMgr.RemoveEvents( unitTarget, EVENT_CREATURE_REMOVE_CORPSE );
 					}
 					else
 					{
-						sEventMgr.RemoveEvents(unitTarget, EVENT_PET_DELAYED_REMOVE);
-						sEventMgr.RemoveEvents(unitTarget, EVENT_CREATURE_REMOVE_CORPSE);
+						sEventMgr.RemoveEvents( unitTarget, EVENT_PET_DELAYED_REMOVE );
+						sEventMgr.RemoveEvents( unitTarget, EVENT_CREATURE_REMOVE_CORPSE );
 					}
-					unitTarget->SetUInt32Value(UNIT_FIELD_HEALTH, hlth);
-					unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, mana);
-					unitTarget->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
-					unitTarget->setDeathState(ALIVE);
-					((Creature*)unitTarget)->Tagged=false;
-					((Creature*)unitTarget)->TaggerGuid=false;
-					((Creature*)unitTarget)->loot.gold=0;
-					((Creature*)unitTarget)->loot.looters.clear();
-					((Creature*)unitTarget)->loot.items.clear();
+					unitTarget->SetUInt32Value( UNIT_FIELD_HEALTH, hlth );
+					unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, mana );
+					unitTarget->SetUInt32Value( UNIT_DYNAMIC_FLAGS, 0 );
+					unitTarget->setDeathState( ALIVE );
+					static_cast< Creature* >( unitTarget )->Tagged = false;
+					static_cast< Creature* >( unitTarget )->TaggerGuid = false;
+					static_cast< Creature* >( unitTarget )->loot.gold = 0;
+					static_cast< Creature* >( unitTarget )->loot.looters.clear();
+					static_cast< Creature* >( unitTarget )->loot.items.clear();
 				}
 			}
 
 			return;
 		}
 		playerTarget = objmgr.GetPlayer(corpseTarget->GetUInt32Value(CORPSE_FIELD_OWNER));
-		if(!playerTarget) return;
+		
+		if( playerTarget == NULL )
+			return;
 	}
 
-	if(playerTarget->isAlive() || !playerTarget->IsInWorld())
+	if( playerTarget->isAlive() || !playerTarget->IsInWorld() )
 		return;
-   //resurr
+
 	playerTarget->resurrector = p_caster->GetGUIDLow();
 	playerTarget->m_resurrectHealth = damage;
 	playerTarget->m_resurrectMana = m_spellInfo->EffectMiscValue[i];
 
-	SendResurrectRequest(playerTarget);
+	SendResurrectRequest( playerTarget );
 }
 
 void Spell::SpellEffectTranformItem(uint32 i)
