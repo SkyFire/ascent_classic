@@ -42,7 +42,6 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 	case SPELL_HASH_INTERCEPT:
 	case SPELL_HASH_DEVOUR_MAGIC:
 	case SPELL_HASH_SPELL_LOCK:
-
 		return AUTOCAST_EVENT_ATTACK;
 		break;
 
@@ -720,7 +719,8 @@ void Pet::GiveXP( uint32 xp )
 
 	SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, xp);
 	SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, nxp);
-	if(changed) ApplyStatsForLevel();
+	if( changed )
+		ApplyStatsForLevel();
 }
 
 uint32 Pet::GetNextLevelXP( uint32 currentlevel )
@@ -1034,12 +1034,13 @@ void Pet::ApplySummonLevelAbilities()
 		m_aiInterface->disable_melee = true;
 		break;
 	}
-	if(m_uint32Values[OBJECT_FIELD_ENTRY] == 89)
+
+	if( m_uint32Values[OBJECT_FIELD_ENTRY] == 89 )
 		has_mana = false;
 
-	if(stat_index < 0)
+	if( stat_index < 0 )
 	{
-		sLog.outError("PETSTAT: No stat index found for entry %u, `%s`!", GetEntry(), creature_info->Name);
+		sLog.outError( "PETSTAT: No stat index found for entry %u, `%s`!", GetEntry(), creature_info->Name );
 		return;
 	}
 
@@ -1278,45 +1279,72 @@ void Pet::ApplySummonLevelAbilities()
 	double mod_max_dmg = R_mod_max_dmg[stat_index];
 	double pet_sta_to_hp = R_pet_sta_to_hp[stat_index];
 
-	// Calculate bonuses
-	double pet_sta_bonus = 0.3 * (double)m_Owner->BaseStats[STAT_STAMINA];	  // + sta_buffs
-	double pet_int_bonus = 0.3 * (double)m_Owner->BaseStats[STAT_INTELLECT];	// + int_buffs
-	double pet_arm_bonus = 0.35 * (double)m_Owner->BaseResistance[0];		   // + arm_buffs
+	// calculate bonuses
+	double pet_arm_bonus = 0.35 * (double)m_Owner->GetUInt32Value( UNIT_FIELD_RESISTANCES ); // + arm_buffs
+	double pet_sta_bonus = 0.30 * (double)m_Owner->GetUInt32Value( UNIT_FIELD_STAT2 ); // + sta_buffs
+	double pet_int_bonus = 0.30 * (double)m_Owner->GetUInt32Value( UNIT_FIELD_STAT3 ); // + int_buffs
+	double pet_pwr_bonus = 0.0;
+
+	// spell power bonus
+	for( uint32 i = 0; i < 7; i++ )
+	{
+		double spw_bonus = 0.15 * (double)m_Owner->GetDamageDoneMod( i );
+		SetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i ) + FL2UINT( spw_bonus ) );
+	}
+
+	// resistance bonus
+	for( uint32 i = 1; i < 7; i++ )
+	{
+		double res_bonus = 0.4 * (double)m_Owner->GetUInt32Value( UNIT_FIELD_RESISTANCES + i );
+		SetUInt32Value( UNIT_FIELD_RESISTANCES + i, GetUInt32Value( UNIT_FIELD_RESISTANCES + i ) + FL2UINT( res_bonus ) );
+	}
+
+	// attack power bonus
+	for( uint32 i = 0; i < 7; i++ )
+	{
+		double pwr_bonus = 0.57 * (double)m_Owner->GetDamageDoneMod( i ); // + res_buffs
+		if( pwr_bonus > pet_pwr_bonus )
+		{
+			pet_pwr_bonus = pwr_bonus;
+		}
+	}
 
 	double pet_str = base_str + pet_level * mod_str;
 	double pet_agi = base_agi + pet_level * mod_agi;
-	double pet_sta = base_sta + pet_level * mod_sta + pet_sta_bonus;
-	double pet_int = base_int + pet_level * mod_int + pet_int_bonus;
+	double pet_sta = ( base_sta + pet_level * mod_sta ) + pet_sta_bonus;
+	double pet_int = ( base_int + pet_level * mod_int ) + pet_int_bonus;
 	double pet_spr = base_spr + pet_level * mod_spr;
-	double pet_pwr = base_pwr + pet_level * mod_pwr;
-	double pet_arm = base_armor + pet_level * mod_armor + pet_arm_bonus;
+	double pet_pwr = ( base_pwr + pet_level * mod_pwr ) + pet_pwr_bonus;
+	double pet_arm = ( base_armor + pet_level * mod_armor ) + pet_arm_bonus;
 
 	// Calculate values
-	BaseStats[STAT_STRENGTH] = FL2UINT(pet_str);
-	BaseStats[STAT_AGILITY] = FL2UINT(pet_agi);
-	BaseStats[STAT_STAMINA] = FL2UINT(pet_sta);
-	BaseStats[STAT_INTELLECT] = FL2UINT(pet_int);
-	BaseStats[STAT_SPIRIT] = FL2UINT(pet_spr);
+	BaseStats[STAT_STRENGTH] = FL2UINT( pet_str );
+	BaseStats[STAT_AGILITY] = FL2UINT( pet_agi );
+	BaseStats[STAT_STAMINA] = FL2UINT( pet_sta );
+	BaseStats[STAT_INTELLECT] = FL2UINT( pet_int );
+	BaseStats[STAT_SPIRIT] = FL2UINT( pet_spr );
 
 	double pet_min_dmg = base_min_dmg + pet_level * mod_min_dmg;
 	double pet_max_dmg = base_max_dmg + pet_level * mod_max_dmg;
-	BaseDamage[0] = float(pet_min_dmg);
-	BaseDamage[1] = float(pet_max_dmg);
+	BaseDamage[0] = float( pet_min_dmg );
+	BaseDamage[1] = float( pet_max_dmg );
 
-	for(uint32 x = 0; x < 5; ++x)
-		CalcStat(x);
+	for( uint32 x = 0; x < 5; ++x )
+		CalcStat( x );
 
 	// Apply armor and attack power.
-	SetUInt32Value(UNIT_FIELD_ATTACK_POWER, FL2UINT(pet_pwr));
-	BaseResistance[0] = FL2UINT(pet_arm);
-	CalcResistance(0);
+	SetUInt32Value( UNIT_FIELD_ATTACK_POWER, FL2UINT( pet_pwr ) );
+	BaseResistance[0] = FL2UINT( pet_arm );
+
+	CalcResistance( 0 );
 	CalcDamage();
 
 	// Calculate health / mana
-	double health = pet_sta * pet_sta_to_hp;
-	double mana = has_mana ? (pet_int * 15) : 0.0;
-	SetUInt32Value(UNIT_FIELD_BASE_HEALTH, FL2UINT(health));
-	SetUInt32Value(UNIT_FIELD_BASE_MANA, FL2UINT(mana));
+	double health = GetUInt32Value( UNIT_FIELD_STAT2 ) * pet_sta_to_hp;
+	double mana = has_mana ? ( GetUInt32Value( UNIT_FIELD_STAT3 ) * 15 ) : 0.0;
+
+	SetUInt32Value( UNIT_FIELD_BASE_HEALTH, FL2UINT( health ) );
+	SetUInt32Value( UNIT_FIELD_BASE_MANA, FL2UINT( mana ) );
 }
 
 void Pet::ApplyPetLevelAbilities()
@@ -1439,7 +1467,7 @@ void Pet::ApplyPetLevelAbilities()
 
 void Pet::ApplyStatsForLevel()
 {
-	if(m_uint32Values[UNIT_CREATED_BY_SPELL])	   // Summon
+	if( m_uint32Values[UNIT_CREATED_BY_SPELL] )	   // Summon
 		ApplySummonLevelAbilities();
 	else
 		ApplyPetLevelAbilities();

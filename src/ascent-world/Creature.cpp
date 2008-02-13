@@ -53,20 +53,20 @@ Creature::Creature(uint32 high, uint32 low)
 	m_enslaveCount = 0;
 	m_enslaveSpell = 0;
 	
-	for(uint32 x=0;x<7;x++)
+	for( uint32 x = 0; x < 7; x++ )
 	{
-		FlatResistanceMod[x]=0;
-		BaseResistanceModPct[x]=0;
-		ResistanceModPct[x]=0;
-		ModDamageDone[x]=0;
-		ModDamageDonePct[x]=1.0;
+		FlatResistanceMod[x] = 0;
+		BaseResistanceModPct[x] = 0;
+		ResistanceModPct[x] = 0;
+		ModDamageDone[x] = 0;
+		ModDamageDonePct[x] = 1.0;
 	}
 
-	for(uint32 x=0;x<5;x++)
+	for( uint32 x = 0; x < 5; x++ )
 	{
-		TotalStatModPct[x]=0;
-		StatModPct[x]=0;
-		FlatStatMod[x]=0;
+		TotalStatModPct[x] = 0;
+		StatModPct[x] = 0;
+		FlatStatMod[x] = 0;
 	}
 
 	totemOwner = NULL;
@@ -584,15 +584,15 @@ void Creature::CalcResistance(uint32 type)
 
 void Creature::CalcStat(uint32 type)
 {
-	int32 res=(BaseStats[type]*(100+StatModPct[type]))/100;
+	int32 res = ( BaseStats[type] * ( 100 + StatModPct[type] ) ) / 100;
 		
-	res+=FlatStatMod[type];
-	if(res<0)res=0;
+	res += FlatStatMod[type];
+	if( res < 0 )
+		res = 0;
 		
-	res+=(res*(TotalStatModPct[type]))/100;
-	SetUInt32Value(UNIT_FIELD_STAT0+type,res>0?res:0);
+	res += ( res * ( TotalStatModPct[type] ) ) / 100;
+	SetUInt32Value( UNIT_FIELD_STAT0 + type, res > 0 ? res : 0 );
 }
-
 
 void Creature::RegenerateHealth()
 {

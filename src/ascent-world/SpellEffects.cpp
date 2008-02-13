@@ -268,9 +268,9 @@ void Spell::SpellEffectInstantKill(uint32 i)
 			}break;
 		}
 		//now caster gains this buff
-		if (spellid1 && spellid1 != 0)
+		if( spellid1 > 0 )
 		{
-			u_caster->CastSpell(u_caster, dbcSpell.LookupEntry(spellid1), true);
+			u_caster->CastSpell( u_caster, dbcSpell.LookupEntry( spellid1 ), true );
 		}
 	}
 
@@ -3716,13 +3716,13 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 			uint32 casted_spell_id = 0 ;
 			uint32 inc_resist_by_level = 0 ;
 			uint32 inc_resist_by_level_spell = 0 ;
-			if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 416 ) //in case it is imp
+			if( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 416 ) //in case it is imp
 				casted_spell_id = 23759 ;
-			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1860 ) //VoidWalker
+			else if( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1860 ) //VoidWalker
 				casted_spell_id = 23760 ;
-			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1863 ) //Succubus
+			else if( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 1863 ) //Succubus
 				casted_spell_id = 23761 ;
-			else if ( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 417 ) //Felhunter
+			else if( unitTarget->GetUInt32Value( OBJECT_FIELD_ENTRY ) == 417 ) //Felhunter
 			{
 				casted_spell_id = 0 ;
 				inc_resist_by_level_spell = 23762 ;

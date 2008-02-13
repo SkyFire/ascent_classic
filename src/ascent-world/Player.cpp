@@ -1638,19 +1638,20 @@ void Player::_SaveSpellCoolDownSecurity(QueryBuffer * buf)
 void Player::_SavePet(QueryBuffer * buf)
 {
 	// Remove any existing info
-	if(buf == NULL)
+	if( buf == NULL )
 		CharacterDatabase.Execute("DELETE FROM playerpets WHERE ownerguid=%u", GetGUIDLow());
 	else
 		buf->AddQuery("DELETE FROM playerpets WHERE ownerguid=%u", GetGUIDLow());
 
-	if(m_Summon&&m_Summon->IsInWorld()&&m_Summon->GetPetOwner()==this)	// update PlayerPets array with current pet's info
+	if( m_Summon != NULL && m_Summon->IsInWorld() && m_Summon->GetPetOwner() == this )	// update PlayerPets array with current pet's info
 	{
 		PlayerPet*pPet = GetPlayerPet(m_Summon->m_PetNumber);
-		if(!pPet || pPet->active == false)
-			m_Summon->UpdatePetInfo(true);
-		else m_Summon->UpdatePetInfo(false);
+		if( pPet == NULL || pPet->active == false )
+			m_Summon->UpdatePetInfo( true );
+		else
+			m_Summon->UpdatePetInfo( false );
 
-		if(!m_Summon->Summon)	   // is a pet
+		if( !m_Summon->Summon )	   // is a pet
 		{
 			// save pet spellz
 			PetSpellMap::iterator itr = m_Summon->mSpells.begin();
@@ -1691,10 +1692,10 @@ void Player::_SavePet(QueryBuffer * buf)
 			<< itr->second->loyaltypts << "','"
 			<< itr->second->loyaltyupdate << "')";
 			
-		if(buf == NULL)
-			CharacterDatabase.ExecuteNA(ss.str().c_str());
+		if( buf == NULL )
+			CharacterDatabase.ExecuteNA( ss.str().c_str() );
 		else
-			buf->AddQueryStr(ss.str());
+			buf->AddQueryStr( ss.str() );
 	}
 }
 
@@ -4705,6 +4706,11 @@ void Player::UpdateStats()
 
 	UpdateChances();
 	CalcDamage();
+
+	if( m_Summon == NULL)
+		return;
+
+	m_Summon->ApplyStatsForLevel();
 }
 
 void Player::AddRestXP(uint32 amount)
