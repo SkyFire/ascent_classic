@@ -4485,41 +4485,45 @@ void Aura::SpellAuraFeignDeath(bool apply)
 			pTarget->EventAttackStop();
 			pTarget->SetFlag( UNIT_FIELD_FLAGS_2, 1 );
 			pTarget->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH );
-			//pTarget->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_DEAD );
 			pTarget->SetFlag( UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_DEAD );
+
+			//pTarget->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_DEAD );
 			//pTarget->SetUInt32Value( UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD );
-			
+
 			data.SetOpcode( SMSG_START_MIRROR_TIMER );
-			data << uint32( 2 );		// type
+			data << uint32( 2 ); // type
 			data << uint32( GetDuration() );
 			data << uint32( GetDuration() );
 			data << uint32( 0xFFFFFFFF );
 			data << uint8( 0 );
-			data << uint32( m_spellProto->Id );		// ???
+			data << uint32( m_spellProto->Id ); // ???
 			pTarget->GetSession()->SendPacket( &data );
 
 			//Zack : removed this packet. As far as i know it is not required
-//			data.Initialize(0x03BE);
-//			data << pTarget->GetGUID();
-//			pTarget->setDeathState(DEAD);
+			//data.Initialize( 0x03BE );
+			//data << pTarget->GetGUID();
+			//pTarget->setDeathState( DEAD );
 
 			//now get rid of mobs agro. pTarget->CombatStatus.AttackersForgetHate() - this works only for already attacking mobs
 		    for(std::set<Object*>::iterator itr = pTarget->GetInRangeSetBegin(); itr != pTarget->GetInRangeSetEnd(); itr++ )
 			{
-				if((*itr)->IsUnit() && ((Unit*)(*itr))->isAlive())
+				if( (*itr)->IsUnit() && static_cast< Unit* >( *itr )->isAlive() )
 				{
-					if((*itr)->GetTypeId()==TYPEID_UNIT)
-						((Unit*)(*itr))->GetAIInterface()->RemoveThreatByPtr(pTarget);
+					if( (*itr)->GetTypeId() == TYPEID_UNIT )
+					{
+						static_cast< Unit* >( *itr )->GetAIInterface()->RemoveThreatByPtr( pTarget );
+					}
 					//if this is player and targeting us then we interrupt cast
 					if( ( (*itr) )->IsPlayer() )
 					{
 						//if player has selection on us
-						if( static_cast< Player* >( *itr )->GetSelection()==pTarget->GetGUID())							
+						if( static_cast< Player* >( *itr )->GetSelection() == pTarget->GetGUID() )							
 						{
 							//it seems that all these do not work in 2.3
 							//static_cast< Player* >( (*itr) )->SetSelection(0);//loose selection
 							//static_cast< Player* >( (*itr) )->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 						}
+
 						//if player is enemy then he will exit combat
 						if( static_cast< Player* >( *itr )->GetTarget() == pTarget->GetGUID() && static_cast< Player* >( *itr )->IsAttacking() )
 						{
@@ -4530,22 +4534,23 @@ void Aura::SpellAuraFeignDeath(bool apply)
 						if( static_cast< Player* >( *itr )->isCasting())
 							static_cast< Player* >( *itr )->CancelSpell( NULL ); //cancel current casting spell
 
-						static_cast< Player* >( *itr )->GetSession()->SendPacket( &data );
+						// Debug : Zack removed the packet but didn't removed the SEND
+						//static_cast< Player* >( *itr )->GetSession()->SendPacket( &data );
 					}
 				}
 			}
-			pTarget->setDeathState(ALIVE);
+			pTarget->setDeathState( ALIVE );
 		}
 		else
 		{
-			pTarget->RemoveFlag(UNIT_FIELD_FLAGS_2, 1);
-			pTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH);
-			pTarget->RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_DEAD);
 			//pTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DEAD);
 			//pTarget->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-			data.SetOpcode(SMSG_STOP_MIRROR_TIMER);
-			data << uint32(2);
-			pTarget->GetSession()->SendPacket(&data);
+			pTarget->RemoveFlag( UNIT_FIELD_FLAGS_2, 1 );
+			pTarget->RemoveFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_FEIGN_DEATH );
+			pTarget->RemoveFlag( UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_DEAD );
+			data.SetOpcode( SMSG_STOP_MIRROR_TIMER );
+			data << uint32( 2 );
+			pTarget->GetSession()->SendPacket( &data );
 		}
 	}
 }
