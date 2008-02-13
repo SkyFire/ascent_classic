@@ -4706,11 +4706,6 @@ void Player::UpdateStats()
 
 	UpdateChances();
 	CalcDamage();
-
-	if( m_Summon == NULL)
-		return;
-
-	m_Summon->ApplyStatsForLevel();
 }
 
 void Player::AddRestXP(uint32 amount)
