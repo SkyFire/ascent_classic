@@ -410,7 +410,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 		if( sWorld.antihack_falldmg )
 		{
-			if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 4 ) && !_player->flying_aura && !_player->m_TransporterGUID && _player->_lastHeartbeatZ - movement_info.z > 2.0f && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
+			if( !_player->bFeatherFall && _player->flying_aura == 0 && _player->m_TransporterGUID == 0 && _player->_lastHeartbeatZ - movement_info.z > 2.0f && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
 			{
 				_player->m_heightDecreaseCount++;
 				if( _player->m_heightDecreaseCount > 16.0f )
@@ -565,7 +565,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 	if(!_player->m_lockTransportVariables)
 	{
-		if(_player->m_TransporterGUID && !movement_info.transGuid)
+		if( _player->m_TransporterGUID && !movement_info.transGuid)
 		{
 			/* we left the transporter we were on */
 			if(_player->m_CurrentTransporter)
@@ -668,7 +668,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			speed = _player->m_flySpeed;
 		}
 
-		if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 8 ) && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_TransporterGUID && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
+		if( !_player->bFeatherFall && ( !_player->blinked || _player->m_redirectCount > 5 ) && !_player->m_uint32Values[UNIT_FIELD_CHARM] && _player->m_TransporterGUID == 0 && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
 		{
 			if( _player->_lastHeartbeatT == 0 )
 			{
