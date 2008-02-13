@@ -2897,7 +2897,7 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 			break;
 		case SKILL_ENCHANTING:
 			target->addSpell( 7418 );//Enchant Bracer - Minor Health
-			target->addSpell( 7420 );//Enchant Chest - Minor Health
+			target->addSpell( 7428 );//Enchant Bracer - Minor Deflection
 			target->addSpell( 7421 );//Runed Copper Rod
 			target->addSpell( 13262 );//Disenchant
 			break;
@@ -2914,7 +2914,6 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 			break;
 		case SKILL_TAILORING:
 			target->addSpell( 2963 );//Bolt of Linen Cloth
-			target->addSpell( 2964 );//bolt of woolen cloth
 			target->addSpell( 2387 );//Linen Cloak
 			target->addSpell( 2393 );//White Linen Shirt
 			target->addSpell( 3915 );//Brown Linen Shirt
@@ -2937,18 +2936,20 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 			target->addSpell( 2538 );//Charred Wolf Meat
 			target->addSpell( 2540 );//Roasted Boar Meat
 			target->addSpell( 818 );//Basic Campfire
+			target->addSpell( 8604 );//Herb Baked Egg
 			break;
 		case SKILL_BLACKSMITHING:
 			target->addSpell( 2660 );//Rough Sharpening Stone
 			target->addSpell( 2663 );//Copper Bracers
 			target->addSpell( 12260 );//Rough Copper Vest
 			target->addSpell( 2662 );//Copper Chain Pants
+			target->addSpell( 3115 );//Rough Weightstone
 			break;
 		case SKILL_JEWELCRAFTING:
 			target->addSpell( 25255 );// Delicate Copper Wire
-			target->addSpell( 25493 );	
-			target->addSpell( 26925 );	
-			target->addSpell( 32259 );
+            target->addSpell( 25493 );// Braided Copper Ring
+            target->addSpell( 26925 );// Woven Copper Ring
+            target->addSpell( 32259 );// Rough Stone Statue
 			break;
 	};
 }
