@@ -82,7 +82,7 @@ bool SocketWorkerThread::run()
     int i;
     struct epoll_event ev;
     SocketMgr* mgr = SocketMgr::getSingletonPtr();
-    running = false;
+    running = true;
 
     while( running )
     {
