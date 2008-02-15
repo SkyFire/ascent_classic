@@ -104,7 +104,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 		if(_player->_heartBeatDisabledUntil < UNIXTIME && sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->GetPlayerStatus() != TRANSFER_PENDING)
 		{
 			/* we're obviously cheating */
-			sCheatLog.writefromsession(this, "Used teleport hack, disconnecting.");
+			sCheatLog.writefromsession( this, "Used teleport hack, disconnecting." );
 			Disconnect();
 			return;
 		}
@@ -112,7 +112,7 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 		if(_player->_heartBeatDisabledUntil < UNIXTIME && sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->m_position.Distance2DSq(_player->m_sentTeleportPosition) > 625.0f)	/* 25.0f*25.0f */
 		{
 			/* cheating.... :( */
-			sCheatLog.writefromsession(this, "Used teleport hack {2}, disconnecting.");
+			sCheatLog.writefromsession( this, "Used teleport hack {2}, disconnecting." );
 			Disconnect();
 			return;
 		}
@@ -139,6 +139,11 @@ void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSessio
 	// no water breathing is required
 	if( !sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat )
 	{
+		// Test to see if we can stop water breathing hack
+		if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
+			if( movement_info.z + _player->m_noseLevel < _player->GetMapMgr()->GetWaterHeight( movement_info.x, movement_info.y ) - 0.1f )
+				sLog.outError( "NOT AN ERROR :: WATER BREATHING HACK TEST - AM I WORKING CORRECTLY?" );
+
 		// player is flagged as in water
 		if( _player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING  )
 		{

@@ -94,27 +94,29 @@ public:
 	ASCENT_INLINE string GetNameString() { return name; }
 	ASCENT_INLINE const char* GetName() { return name.c_str(); }
 	ASCENT_INLINE MapEntry* GetDBCEntry() { return me; }
-	void BuildXMLStats(char * m_file);
+	void BuildXMLStats( char* m_file );
 
-	ASCENT_INLINE CellSpawns *GetSpawnsList(uint32 cellx,uint32 celly)
+	ASCENT_INLINE CellSpawns* GetSpawnsList( uint32 cellx, uint32 celly )
 	{
-		ASSERT(cellx < _sizeX);
-		ASSERT(celly < _sizeY);
-		if(spawns[cellx]==NULL) return NULL;
+		ASSERT( cellx < _sizeX );
+		ASSERT( celly < _sizeY );
+		if( spawns[cellx] == NULL )
+			return NULL;
 
 		return spawns[cellx][celly];
 	}
-	ASCENT_INLINE CellSpawns * GetSpawnsListAndCreate(uint32 cellx, uint32 celly)
+
+	ASCENT_INLINE CellSpawns* GetSpawnsListAndCreate( uint32 cellx, uint32 celly )
 	{
-		ASSERT(cellx < _sizeX);
-		ASSERT(celly < _sizeY);
-		if(spawns[cellx]==NULL)
+		ASSERT( cellx < _sizeX );
+		ASSERT( celly < _sizeY );
+		if( spawns[cellx] == NULL )
 		{
 			spawns[cellx] = new CellSpawns*[_sizeY];
-			memset(spawns[cellx],0,sizeof(CellSpawns*)*_sizeY);
+			memset( spawns[cellx], 0, sizeof(CellSpawns*) *_sizeY );
 		}
 
-		if(spawns[cellx][celly] == 0)
+		if( spawns[cellx][celly] == NULL )
 			spawns[cellx][celly] = new CellSpawns;
 		return spawns[cellx][celly];
 	}
@@ -123,11 +125,11 @@ public:
 	uint32 CreatureSpawnCount;
 	uint32 GameObjectSpawnCount;
 
-	ASCENT_INLINE float  GetLandHeight(float x, float y)
+	ASCENT_INLINE float GetLandHeight( float x, float y )
 	{ 
-		if(_terrain)
+		if( _terrain != NULL )
 		{
-			return _terrain->GetLandHeight(x, y);
+			return _terrain->GetLandHeight( x, y );
 		}
 		else
 		{
@@ -135,9 +137,9 @@ public:
 		}
 	}
 
-	ASCENT_INLINE float  GetWaterHeight(float x, float y) 
+	ASCENT_INLINE float GetWaterHeight( float x, float y ) 
 	{ 
-		if(_terrain)
+		if( _terrain != NULL )
 		{ 
 			return _terrain->GetWaterHeight(x, y); 
 		}

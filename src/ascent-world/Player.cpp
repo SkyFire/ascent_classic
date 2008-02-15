@@ -2442,18 +2442,17 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		return;
 	}
 
-	Field *fields = result->Fetch();
+	Field* fields = result->Fetch();
 
-	if(fields[1].GetUInt32() != m_session->GetAccountId())
+	if( fields[1].GetUInt32() != m_session->GetAccountId() )
 	{
-		sCheatLog.writefromsession(m_session, "player tried to load character not belonging to them (guid %u, on account %u)",
-			fields[0].GetUInt32(), fields[1].GetUInt32());
+		sCheatLog.writefromsession(m_session, "player tried to load character not belonging to them (guid %u, on account %u)", fields[0].GetUInt32(), fields[1].GetUInt32());
 		RemovePendingPlayer();
 		return;
 	}
 
 	uint32 banned = fields[32].GetUInt32();
-	if(banned && (banned < 100 || banned > (uint32)UNIXTIME))
+	if( banned && ( banned < 100 || banned > (uint32)UNIXTIME ) )
 	{
 		RemovePendingPlayer();
 		return;
@@ -2463,23 +2462,23 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	m_name = get_next_field.GetString();
    
 	// Load race/class from fields
-	setRace(get_next_field.GetUInt8());
-	setClass(get_next_field.GetUInt8());
-	setGender(get_next_field.GetUInt8());
+	setRace( get_next_field.GetUInt8() );
+	setClass( get_next_field.GetUInt8() );
+	setGender( get_next_field.GetUInt8() );
 	uint32 cfaction = get_next_field.GetUInt32();
 	
 	// set race dbc
-	myRace = dbcCharRace.LookupEntryForced(getRace());
-	myClass = dbcCharClass.LookupEntryForced(getClass());
-	if(!myClass || !myRace)
+	myRace = dbcCharRace.LookupEntryForced( getRace() );
+	myClass = dbcCharClass.LookupEntryForced( getClass() );
+	if( myClass == NULL || myRace == NULL )
 	{
 		// bad character
-		printf("guid %u failed to login, no race or class dbc found. (race %u class %u)\n", (unsigned int)GetGUIDLow(), (unsigned int)getRace(), (unsigned int)getClass());
+		printf( "guid %u failed to login, no race or class dbc found. (race %u class %u)\n", (unsigned int)GetGUIDLow(), (unsigned int)getRace(), (unsigned int)getClass() );
 		RemovePendingPlayer();
 		return;
 	}
 
-	if(myRace->team_id == 7)
+	if( myRace->team_id == 7 )
 	{
 		m_bgTeam = m_team = 0;
 	}
@@ -2491,11 +2490,11 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	SetNoseLevel();
 
 	// set power type
-	SetPowerType(myClass->power_type);
+	SetPowerType( myClass->power_type );
 
 	// obtain player create info
-	info = objmgr.GetPlayerCreateInfo(getRace(), getClass());
-	assert(info);
+	info = objmgr.GetPlayerCreateInfo( getRace(), getClass() );
+	assert( info );
 
 	// set level
 	m_uint32Values[UNIT_FIELD_LEVEL] = get_next_field.GetUInt32();
@@ -2503,7 +2502,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		m_uint32Values[UNIT_FIELD_LEVEL] = 70;*/
 
 	// obtain level/stats information
-	lvlinfo = objmgr.GetLevelInfo(getRace(), getClass(), getLevel());
+	lvlinfo = objmgr.GetLevelInfo( getRace(), getClass(), getLevel() );
 	
 	if(!lvlinfo)
 	{
@@ -8824,49 +8823,67 @@ void Player::SoftDisconnect()
 void Player::SetNoseLevel()
 {
 	// Set the height of the player
-	switch (getRace())
+	switch( getRace() )
 	{
 		case RACE_HUMAN:
-		// female
-			if (getGender()) m_noseLevel = 1.72f;
-			// male
-			else m_noseLevel = 1.78f;
+			if( getGender() ) 
+				m_noseLevel = 1.72f; // male
+			else
+				m_noseLevel = 1.78f;// female
 		break;
 		case RACE_ORC:
-			if (getGender()) m_noseLevel = 1.82f;
-			else m_noseLevel = 1.98f;
+			if( getGender() ) 
+				m_noseLevel = 1.82f;
+			else
+				m_noseLevel = 1.98f;
 		break;
 		case RACE_DWARF:
-		if (getGender()) m_noseLevel = 1.27f;
-			else m_noseLevel = 1.4f;
+			if( getGender() ) 
+				m_noseLevel = 1.27f;
+			else
+				m_noseLevel = 1.4f;
 		break;
 		case RACE_NIGHTELF:
-			if (getGender()) m_noseLevel = 1.84f;
-			else m_noseLevel = 2.13f;
+			if( getGender() ) 
+				m_noseLevel = 1.84f;
+			else
+				m_noseLevel = 2.13f;
 		break;
 		case RACE_UNDEAD:
-			if (getGender()) m_noseLevel = 1.61f;
-			else m_noseLevel = 1.8f;
+			if( getGender() ) 
+				m_noseLevel = 1.61f;
+			else
+				m_noseLevel = 1.8f;
 		break;
 		case RACE_TAUREN:
-			if (getGender()) m_noseLevel = 2.48f;
-			else m_noseLevel = 2.01f;
+			if( getGender() ) 
+				m_noseLevel = 2.48f;
+			else
+				m_noseLevel = 2.01f;
 		break;
 		case RACE_GNOME:
-			if (getGender()) m_noseLevel = 1.06f;
-			else m_noseLevel = 1.04f;
+			if( getGender() ) 
+				m_noseLevel = 1.06f;
+			else
+				m_noseLevel = 1.04f;
 		break;
 		case RACE_TROLL:
-			if (getGender()) m_noseLevel = 2.02f;
-			else m_noseLevel = 1.93f;
+			if( getGender() ) 
+				m_noseLevel = 2.02f;
+			else
+				m_noseLevel = 1.93f;
 		break;
 		case RACE_BLOODELF:
-			if (getGender()) m_noseLevel = 1.83f;
-			else m_noseLevel = 1.93f;
+			if( getGender() )
+				m_noseLevel = 1.83f;
+			else
+				m_noseLevel = 1.93f;
 		break;
 		case RACE_DRAENEI:
-			if (getGender()) m_noseLevel = 2.09f;
-			else m_noseLevel = 2.36f;
+			if( getGender() )
+				m_noseLevel = 2.09f;
+			else
+				m_noseLevel = 2.36f;
 		break;
 	}
 }
