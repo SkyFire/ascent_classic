@@ -8134,10 +8134,11 @@ void World::Rehash(bool load)
 
 	antihack_teleport = Config.MainConfig.GetBoolDefault("AntiHack", "Teleport", true);
 	antihack_speed = Config.MainConfig.GetBoolDefault("AntiHack", "Speed", true);
-	antihack_falldmg = Config.MainConfig.GetBoolDefault("AntiHack", "FallDamage", true);
+	antihack_fall_damage = Config.MainConfig.GetBoolDefault("AntiHack", "FallDamage", true);
 	antihack_flight = Config.MainConfig.GetBoolDefault("AntiHack", "Flight", true);
+	antihack_water_breathing = Config.MainConfig.GetBoolDefault("AntiHack", "WaterBreathing", true);
 	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", false);
-	SpeedhackProtection = antihack_speed;
+
 	m_levelCap = Config.MainConfig.GetIntDefault("Server", "LevelCap", 70);
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
 	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);

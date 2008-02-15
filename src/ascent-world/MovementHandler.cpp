@@ -133,16 +133,26 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 
 }
 
-void _HandleBreathing(MovementInfo &movement_info, Player * _player, WorldSession * pSession)
+void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSession* pSession )
 {
 
 	// no water breathing is required
 	if( !sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat )
 	{
 		// Test to see if we can stop water breathing hack
-		if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
-			if( movement_info.z + _player->m_noseLevel < _player->GetMapMgr()->GetWaterHeight( movement_info.x, movement_info.y ) - 0.1f )
-				sLog.outError( "NOT AN ERROR :: WATER BREATHING HACK TEST - AM I WORKING CORRECTLY?" );
+		if( sWorld.antihack_water_breathing )
+		{
+			if( ( sWorld.no_antihack_on_gm && !pSession->HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
+			{
+				if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
+					if( movement_info.z + _player->m_noseLevel < _player->GetMapMgr()->GetWaterHeight( movement_info.x, movement_info.y ) - 0.1f )
+						sChatHandler.SystemMessage( this, "Water Breathing hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+						sCheatLog.writefromsession( this, "Water Breathing hacker kicked" );
+						_player->m_KickDelay = 0;
+						sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+						_player->SetMovement( MOVE_ROOT, 1 );
+			}
+		}
 
 		// player is flagged as in water
 		if( _player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING  )
@@ -381,56 +391,17 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Anti-Hack Checks                                                     */
 	/************************************************************************/
-	if( !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->m_uint32Values[UNIT_FIELD_CHARM])
+
+	if( !( HasGMPermissions() && sWorld.no_antihack_on_gm ) && !_player->m_uint32Values[UNIT_FIELD_CHARM])
 	{
 		/************************************************************************/
 		/* Anti-Teleport                                                        */
 		/************************************************************************/
 		if( sWorld.antihack_teleport && _player->m_position.Distance2DSq( movement_info.x, movement_info.y ) > 2500.0f && _player->m_runSpeed < 50.0f && !( movement_info.flags & MOVEFLAG_TAXI ) )
 		{
-			sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
+			sCheatLog.writefromsession( this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed );
 			Disconnect();
 			return;
-		}
-
-		/************************************************************************/
-		/* Anti-Fly                                                             */
-		/************************************************************************/
-
-		if( sWorld.antihack_flight )
-		{
-			if( _player->m_UnderwaterState == 0 && _player->flying_aura == 0 && !_player->FlyCheat && ( !( movement_info.flags & MOVEFLAG_FLYING ) || ( movement_info.flags & MOVEFLAG_AIR_SWIMMING ) ) && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) && !_player->m_TransporterGUID && ( recv_data.GetOpcode() == CMSG_FLY_PITCH_UP_Z || recv_data.GetOpcode() == CMSG_FLY_PITCH_DOWN_AFTER_UP || recv_data.GetOpcode() == MSG_MOVE_FLY_DOWN_UNK ) )
-			{
-				sChatHandler.SystemMessage( this, "Flying hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
-				sCheatLog.writefromsession( this, "Flying Damage hacker kicked" );
-				_player->m_KickDelay = 0;
-				sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
-				_player->SetMovement( MOVE_ROOT, 1 );
-			}
-		}
-
-		/************************************************************************/
-		/* Anti-Fall Damage                                                     */
-		/************************************************************************/
-
-		if( sWorld.antihack_falldmg )
-		{
-			if( !_player->bFeatherFall && _player->flying_aura == 0 && _player->m_TransporterGUID == 0 && _player->_lastHeartbeatZ - movement_info.z > 2.0f && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
-			{
-				_player->m_heightDecreaseCount++;
-				if( _player->m_heightDecreaseCount > 16.0f )
-				{
-					sChatHandler.SystemMessage( this, "Fall Damage hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
-					sCheatLog.writefromsession( this, "Fall Damage hacker kicked" );
-					_player->m_KickDelay = 0;
-					sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
-					_player->SetMovement( MOVE_ROOT, 1 );
-				}
-			}
-			else
-			{
-				_player->m_heightDecreaseCount = 0;
-			}
 		}
 
 		/************************************************************************/
@@ -568,31 +539,32 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/* Transporter Setup                                                    */
 	/************************************************************************/
 
-	if(!_player->m_lockTransportVariables)
+	if( !_player->m_lockTransportVariables )
 	{
-		if( _player->m_TransporterGUID && !movement_info.transGuid)
+		if( _player->m_TransporterGUID && !movement_info.transGuid )
 		{
 			/* we left the transporter we were on */
-			if(_player->m_CurrentTransporter)
+			if( _player->m_CurrentTransporter )
 			{
-				_player->m_CurrentTransporter->RemovePlayer(_player);
+				_player->m_CurrentTransporter->RemovePlayer( _player );
 				_player->m_CurrentTransporter = NULL;
 			}
 
 			_player->m_TransporterGUID = 0;
 			_player->ResetHeartbeatCoords();
 		}
-		else if(movement_info.transGuid)
+		else if( movement_info.transGuid )
 		{
-			if(!_player->m_TransporterGUID)
+			if( !_player->m_TransporterGUID )
 			{
 				/* just walked into a transport */
-				if(_player->IsMounted())
-					_player->RemoveAura(_player->m_MountSpellId);
+				if( _player->IsMounted() )
+					_player->RemoveAura( _player->m_MountSpellId );
 
-				_player->m_CurrentTransporter = objmgr.GetTransporter(GUID_LOPART(movement_info.transGuid));
-				if(_player->m_CurrentTransporter)
-					_player->m_CurrentTransporter->AddPlayer(_player);
+				_player->m_CurrentTransporter = objmgr.GetTransporter( GUID_LOPART( movement_info.transGuid ) );
+
+				if( _player->m_CurrentTransporter )
+					_player->m_CurrentTransporter->AddPlayer( _player );
 
 				/* set variables */
 				_player->m_TransporterGUID = movement_info.transGuid;
@@ -618,32 +590,10 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	}
 
 	/************************************************************************/
-	/* Anti-Packet Hack Checks                                              */
+	/* Breathing System                                                     */
 	/************************************************************************/
-	
-	// Disabled until fixed
-	if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
-	{
 
-		//if( movement_info.flags & MOVEFLAG_REDIRECTED && movement_info.flags & MOVEFLAG_TAXI )
-		//{
-		//	sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
-		//	sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED | MOVEFLAG_TAXI Packet hacker kicked" );
-		//	_player->m_KickDelay = 0;
-		//	sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
-		//	_player->SetMovement( MOVE_ROOT, 1 );
-		//}
-
-		//if( _player->m_redirectCount > _player->GetSession()->GetLatency() * 2 )
-		//{
-		//	sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
-		//	sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED Packet hacker kicked" );
-		//	_player->m_KickDelay = 0;
-		//	sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
-		//	_player->SetMovement( MOVE_ROOT, 1 );
-		//}
-
-	}
+	_HandleBreathing( movement_info, _player, this );
 
 	/************************************************************************/
 	/* Anti-Speed Hack Checks                                               */
@@ -749,18 +699,86 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	}
 
 	/************************************************************************/
-	/* Breathing System                                                     */
+	/* Anti-Flying Hack                                                     */
 	/************************************************************************/
-	_HandleBreathing( movement_info, _player, this );
+
+	if( sWorld.antihack_flight )
+	{
+		if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
+		{
+			if( _player->m_UnderwaterState == 0 && _player->flying_aura == 0 && !_player->FlyCheat && ( !( movement_info.flags & MOVEFLAG_FLYING ) || ( movement_info.flags & MOVEFLAG_AIR_SWIMMING ) ) && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) && !_player->m_TransporterGUID && ( recv_data.GetOpcode() == CMSG_FLY_PITCH_UP_Z || recv_data.GetOpcode() == CMSG_FLY_PITCH_DOWN_AFTER_UP || recv_data.GetOpcode() == MSG_MOVE_FLY_DOWN_UNK ) )
+			{
+				sChatHandler.SystemMessage( this, "Flying hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+				sCheatLog.writefromsession( this, "Flying Damage hacker kicked" );
+				_player->m_KickDelay = 0;
+				sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+				_player->SetMovement( MOVE_ROOT, 1 );
+			}
+		}
+	}
+
+	/************************************************************************/
+	/* Anti-Fall Damage hack                                                */
+	/************************************************************************/
+
+	if( sWorld.antihack_fall_damage )
+	{
+		if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
+		{
+			if( !_player->bFeatherFall && _player->flying_aura == 0 && _player->m_TransporterGUID == 0 && _player->_lastHeartbeatZ - movement_info.z > 2.0f && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
+			{
+				_player->m_heightDecreaseCount++;
+				if( _player->m_heightDecreaseCount > 16.0f )
+				{
+					sChatHandler.SystemMessage( this, "Fall Damage hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+					sCheatLog.writefromsession( this, "Fall Damage hacker kicked" );
+					_player->m_KickDelay = 0;
+					sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+					_player->SetMovement( MOVE_ROOT, 1 );
+				}
+			}
+			else
+			{
+				_player->m_heightDecreaseCount = 0;
+			}
+		}
+	}
+
+	/************************************************************************/
+	/* Anti-Packet Hack Checks                                              */
+	/************************************************************************/
+	
+	// Disabled until fixed
+	//if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
+	//{
+		//if( movement_info.flags & MOVEFLAG_REDIRECTED && movement_info.flags & MOVEFLAG_TAXI )
+		//{
+		//	sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+		//	sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED | MOVEFLAG_TAXI Packet hacker kicked" );
+		//	_player->m_KickDelay = 0;
+		//	sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+		//	_player->SetMovement( MOVE_ROOT, 1 );
+		//}
+		//if( _player->m_redirectCount > _player->GetSession()->GetLatency() * 2 )
+		//{
+		//	sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+		//	sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED Packet hacker kicked" );
+		//	_player->m_KickDelay = 0;
+		//	sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+		//	_player->SetMovement( MOVE_ROOT, 1 );
+		//}
+	//}
 
 	/************************************************************************/
 	/* Remove Spells                                                        */
 	/************************************************************************/
+
 	_player->RemoveAurasByInterruptFlag( AURA_INTERRUPT_ON_MOVEMENT );
 
 	/************************************************************************/
 	/* Update our position in the server.                                   */
 	/************************************************************************/
+
 	if( _player->m_CurrentCharm )
 		_player->m_CurrentCharm->SetPosition(movement_info.x, movement_info.y, movement_info.z, movement_info.orientation);
 	else

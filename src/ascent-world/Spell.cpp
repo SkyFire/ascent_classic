@@ -2949,7 +2949,7 @@ uint8 Spell::CanCast(bool tolerate)
 	}
 
 	// backstab/ambush
-	if(p_caster && (m_spellInfo->NameHash == SPELL_HASH_BACKSTAB || m_spellInfo->NameHash == SPELL_HASH_AMBUSH ))
+	if( p_caster != NULL && ( m_spellInfo->NameHash == SPELL_HASH_BACKSTAB || m_spellInfo->NameHash == SPELL_HASH_AMBUSH ) )
 	{
 		if( m_spellInfo->NameHash == SPELL_HASH_AMBUSH && !p_caster->IsStealth() )
 			return SPELL_FAILED_ONLY_STEALTHED;

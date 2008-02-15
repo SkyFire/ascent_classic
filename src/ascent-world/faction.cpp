@@ -87,7 +87,7 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 			hostile = static_cast< Player* >( objB )->IsHostileBasedOnReputation( objA->m_factionDBC );
 	}
 
-	if( objB->IsPlayer() && objA->IsPlayer() && static_cast< Player* >( objA )->m_bg != NULL )
+	if( objA->IsPlayer() && objB->IsPlayer() && static_cast< Player* >( objA )->m_bg != NULL )
 	{
 		if( static_cast< Player* >( objA )->m_bgTeam != static_cast< Player* >( objB )->m_bgTeam )
 			return true;
