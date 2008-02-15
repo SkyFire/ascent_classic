@@ -3925,13 +3925,13 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
-		sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF;
+		//sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF;
 	}
 	sp = dbcSpell.LookupEntryForced( 35581 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
-		sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF;
+		//sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF;
 	}
 
 	//Mage - Frost Channeling

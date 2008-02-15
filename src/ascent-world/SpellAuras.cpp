@@ -6015,10 +6015,10 @@ void Aura::SpellAuraModIncreaseSpeedAlways(bool apply)
 	if( apply )
 	{  
 		SetPositive();
-		m_target->m_speedModifier -= mod->m_amount;//?????
+		m_target->m_speedModifier += mod->m_amount;
 	}
 	else
-		m_target->m_speedModifier += mod->m_amount;
+		m_target->m_speedModifier -= mod->m_amount;
 
 	m_target->UpdateSpeed();
 }

@@ -378,6 +378,8 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 					case QMGR_QUEST_FINISHED:
 						data << uint32(4) << uint32(1);
 						break;
+					case QMGR_QUEST_CHAT:
+						data << QMGR_QUEST_AVAILABLE << uint32(0);
 
 					default:
 						data << status << uint32(0);

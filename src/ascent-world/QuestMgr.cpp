@@ -82,7 +82,7 @@ uint32 QuestMgr::PlayerMeetsReqs(Player* plr, Quest* qst, bool skiplevelcheck)
 	}
 
 	// check quest level
-	if( plr->getLevel() >= ( qst->max_level + 5 ) )
+	if( plr->getLevel() > ( qst->max_level + 5 ) )
 		return QMGR_QUEST_CHAT;
 
 	return status;
