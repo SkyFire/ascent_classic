@@ -146,8 +146,8 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 			{
 				if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
 					if( movement_info.z + _player->m_noseLevel < _player->GetMapMgr()->GetWaterHeight( movement_info.x, movement_info.y ) - 0.1f )
-						sChatHandler.SystemMessage( this, "Water Breathing hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
-						sCheatLog.writefromsession( this, "Water Breathing hacker kicked" );
+						sChatHandler.SystemMessage( pSession, "Water Breathing hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+						sCheatLog.writefromsession( pSession, "Water Breathing hacker kicked" );
 						_player->m_KickDelay = 0;
 						sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
 						_player->SetMovement( MOVE_ROOT, 1 );
