@@ -6502,6 +6502,96 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags = PROC_ON_CAST_SPELL;
 
+	// Ashtongue Talisman of Shadows 
+	sp = dbcSpell.LookupEntryForced( 40478 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CAST_SPELL;
+
+	// Ashtongue Talisman of Swiftness
+	sp = dbcSpell.LookupEntryForced( 40485 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CAST_SPELL;
+
+	// Ashtongue Talisman of Valor
+	sp = dbcSpell.LookupEntryForced( 40458 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CAST_SPELL;
+
+	// Memento of Tyrande
+	sp = dbcSpell.LookupEntryForced( 37655 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_CAST_SPELL;
+
+	// Ashtongue Talisman of Insight
+	sp = dbcSpell.LookupEntryForced( 40482 );
+	if( sp != NULL )
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
+
+	//Ashtongue Talisman of Equilibrium
+	sp = dbcSpell.LookupEntryForced( 40442 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 40;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectTriggerSpell[0] = 40452;
+		sp->maxstack = 1;
+		sp->Effect[1] = 6;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 25;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectTriggerSpell[1] = 40445;
+		sp->maxstack = 1;
+		sp->Effect[2] = 6;
+		sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 25;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectTriggerSpell[2] = 40446;
+		sp->maxstack = 1;
+	}
+
+	//Ashtongue Talisman of Acumen
+	sp = dbcSpell.LookupEntryForced( 40438 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 10;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectTriggerSpell[0] = 40441;
+		sp->maxstack = 1;
+		sp->Effect[1] = 6;
+		sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 10;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectTriggerSpell[1] = 40440;
+		sp->maxstack = 1;
+	}
+
+	//Ashtongue Talisman of Lethality
+	sp = dbcSpell.LookupEntryForced( 40460 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 20;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectTriggerSpell[0] = 40461;
+		sp->maxstack = 1;
+	}
+
+	//Serpent-Coil Braid
+	sp = dbcSpell.LookupEntryForced( 37447 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = 6;
+		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+		sp->procChance = 100;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+		sp->EffectTriggerSpell[0] = 37445;
+		sp->maxstack = 1;
+	}
 
 	//Item Set: Thunderheart Harness
 	sp = dbcSpell.LookupEntryForced( 38447 );

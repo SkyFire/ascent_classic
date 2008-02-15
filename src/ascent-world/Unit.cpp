@@ -1641,7 +1641,44 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell->Id == 37517 || CastingSpell->NameHash != SPELL_HASH_REVENGE)
 									continue; 
 							}break;
-						//SETBONUSES END
+
+						//http://www.wowhead.com/?item=32493 Ashtongue Talisman of Shadows
+						case 40480:
+							{
+								if( CastingSpell == NULL || CastingSpell->NameHash != SPELL_HASH_CORRUPTION )
+									continue; 
+							}break;
+
+						//http://www.wowhead.com/?item=32496  Memento of Tyrande
+						case 37656: //dont say damaging spell but EACH time spell is casted there is a chance (so can be healing spell)
+							{
+								if( CastingSpell == NULL )
+									continue;
+							}break;
+
+						//http://www.wowhead.com/?item=32488 Ashtongue Talisman of Insight
+						case 40483:
+							{
+								if( CastingSpell == NULL )
+									continue;
+								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING ) )
+									continue;
+							}break;
+
+						//http://www.wowhead.com/?item=32487 Ashtongue Talisman of Swiftness
+						case 40487:
+							{
+								if( CastingSpell == NULL || CastingSpell->NameHash != SPELL_HASH_STEADY_SHOT)
+									continue; 
+							}break;
+
+						//http://www.wowhead.com/?item=32485 Ashtongue Talisman of Valor
+						case 40459:
+							{
+								if( CastingSpell == NULL || (CastingSpell->NameHash != SPELL_HASH_MORTAL_STRIKE || CastingSpell->NameHash != SPELL_HASH_BLOODTHIRST || CastingSpell->NameHash != SPELL_HASH_SHIELD_SLAM))
+									continue; 
+							}break;
+
 						//item - Band of the Eternal Restorer 
 						case 35087:
 							{
@@ -1650,6 +1687,53 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) ) //requires healing spell.
 									continue;
 							}break;
+
+						//http://www.wowhead.com/?item=32486 Ashtongue Talisman of Equilibrium
+						case 40452: //Mangle has a 40% chance to grant 140 Strength for 8 sec
+							{
+								if( CastingSpell == NULL || CastingSpell->NameHash != SPELL_HASH_MANGLE__BEAR_ || CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_)
+									continue; 
+							}break;
+						case 40445: //Starfire has a 25% chance to grant up to 150 spell damage for 8 sec
+							{
+								if( CastingSpell == NULL || CastingSpell->NameHash != SPELL_HASH_STARFIRE)
+									continue; 
+							}break;
+						case 40446: //Rejuvenation has a 25% chance to grant up to 210 healing for 8 sec
+							{
+								if( CastingSpell == NULL || CastingSpell->NameHash != SPELL_HASH_REJUVENATION)
+									continue; 
+							}break;
+
+						//http://www.wowhead.com/?item=32490 Ashtongue Talisman of Acumen
+						case 40441: //Each time your Shadow Word: Pain deals damage, it has a 10% chance to grant you 220 spell damage for 10 sec
+							{
+								if( CastingSpell == NULL || CastingSpell->NameHash != SPELL_HASH_SHADOW_WORD__PAIN)
+									continue; 
+							}break;
+
+						//http://www.wowhead.com/?item=32490 Ashtongue Talisman of Acumen
+						case 40440: //Each time your Renew heals, it has a 10% chance to grant you 220 healing for 5 sec
+							{
+								if( CastingSpell == NULL || CastingSpell->NameHash != SPELL_HASH_RENEW)
+									continue; 
+							}break;
+
+						//http://www.wowhead.com/?item=32492 Ashtongue Talisman of Lethality
+						case 40461:
+							{
+								if( CastingSpell == NULL )
+									continue;
+								//we need a finishing move for this 
+								if(!(CastingSpell->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE) || victim==this)
+									continue;
+							}break;
+						case 37445: //using a mana gem grants you 225 spell damage for 15 sec
+							{
+								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_REPLENISH_MANA)
+									continue; 
+							}break;
+
 /*						//paladin - illumination
 						case 18350:
 							{
