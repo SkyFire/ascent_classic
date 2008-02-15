@@ -1147,7 +1147,7 @@ public:
 	void DispelAll(bool positive);
 	
 protected:
-	Unit ();
+	Unit();
 
 	uint32 m_meleespell;
 	void _UpdateSpells(uint32 time);

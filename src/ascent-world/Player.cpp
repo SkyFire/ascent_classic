@@ -764,7 +764,6 @@ bool Player::Create(WorldPacket& data )
 	return true;
 }
 
-
 void Player::Update( uint32 p_time )
 {
 	if(!IsInWorld())
@@ -8337,19 +8336,18 @@ bool Player::CanSignCharter(Charter * charter, Player * requester)
 
 void Player::SaveAuras(stringstream &ss)
 {
-   
 	// Add player auras
-//	for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
-	for(uint32 x=0;x<MAX_AURAS;x++)
+	//for(uint32 x=0;x<MAX_AURAS+MAX_PASSIVE_AURAS;x++)
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		if(m_auras[x])
+		if( m_auras[x] != NULL )
 		{
-			Aura *aur=m_auras[x];
+			Aura* aur = m_auras[x];
 			bool skip = false;
-			for(uint32 i = 0; i < 3; ++i)
+			for( uint32 i = 0; i < 3; ++i )
 			{
-				if(aur->m_spellProto->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA ||
-					aur->m_spellProto->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT)
+				if( aur->m_spellProto->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA ||
+					aur->m_spellProto->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT )
 				{
 					skip = true;
 					break;
@@ -8363,7 +8361,7 @@ void Player::SaveAuras(stringstream &ss)
 				skip = true;
 
 			// skipped spells due to bugs
-			switch(aur->m_spellProto->Id)
+			switch( aur->m_spellProto->Id )
 			{
 			case 12043: // Presence of mind
 			case 11129: // Combustion
@@ -8379,32 +8377,32 @@ void Player::SaveAuras(stringstream &ss)
 			}
 
 			//disabled proc spells until proper loading is fixed. Some spells tend to block or not remove when restored
-			if(aur->GetSpellProto()->procFlags)
+			if( aur->GetSpellProto()->procFlags )
 			{
 //				sLog.outDebug("skipping aura %d because has flags %d",aur->GetSpellId(),aur->GetSpellProto()->procFlags);
 				skip = true;
 			}
 			//disabled proc spells until proper loading is fixed. We cannot recover the charges that were used up. Will implement later
-			if(aur->GetSpellProto()->procCharges)
+			if( aur->GetSpellProto()->procCharges )
 			{
 //				sLog.outDebug("skipping aura %d because has proccharges %d",aur->GetSpellId(),aur->GetSpellProto()->procCharges);
 				skip = true;
 			}
 			//we are going to cast passive spells anyway on login so no need to save auras for them
-            if(aur->IsPassive() && !(aur->GetSpellProto()->AttributesEx & 1024))
+            if( aur->IsPassive() && !( aur->GetSpellProto()->AttributesEx & 1024 ) )
 				skip = true;
 			//shapeshift
 //			if(m_ShapeShifted==aur->m_spellProto->Id)
 //				skip=true;
 
-			if(skip)continue;
-			uint32 d=aur->GetTimeLeft();
-			if(d>3000)
+			if( skip )
+				continue;
+
+			uint32 d = aur->GetTimeLeft();
+			if( d > 3000)
 				ss  << aur->GetSpellId() << "," << d << ",";
 		}
 	}
-
-  
 }
 
 void Player::SetShapeShift(uint8 ss)
@@ -8422,7 +8420,7 @@ void Player::SetShapeShift(uint8 ss)
 			{
 				if( old_ss > 0 )
 				{
-					if(  ( ((uint32)1 << (old_ss-1)) & reqss ) &&		// we were in the form that required it
+					if( ( ((uint32)1 << (old_ss-1)) & reqss ) &&		// we were in the form that required it
 						!( ((uint32)1 << (ss-1) & reqss) ) )			// new form doesnt have the right form
 					{
 						m_auras[x]->Remove();
@@ -8433,7 +8431,7 @@ void Player::SetShapeShift(uint8 ss)
 
 			if( this->getClass() == DRUID )
 			{
-				for (uint32 y = 0; y < 3; ++y )
+				for( uint32 y = 0; y < 3; ++y )
 				{
 					switch( m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
 					{

@@ -616,19 +616,19 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/* Anti-Packet Hack Checks                                              */
 	/************************************************************************/
 	
+	// Disabled until fixed
 	if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
 	{
 
-		if( movement_info.flags & MOVEFLAG_REDIRECTED && movement_info.flags & MOVEFLAG_TAXI )
-		{
-			sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
-			sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED | MOVEFLAG_TAXI Packet hacker kicked" );
-			_player->m_KickDelay = 0;
-			sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
-			_player->SetMovement( MOVE_ROOT, 1 );
-		}
+		//if( movement_info.flags & MOVEFLAG_REDIRECTED && movement_info.flags & MOVEFLAG_TAXI )
+		//{
+		//	sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+		//	sCheatLog.writefromsession( this, "MOVEFLAG_REDIRECTED | MOVEFLAG_TAXI Packet hacker kicked" );
+		//	_player->m_KickDelay = 0;
+		//	sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+		//	_player->SetMovement( MOVE_ROOT, 1 );
+		//}
 
-		// Disabled until fixed
 		//if( _player->m_redirectCount > _player->GetSession()->GetLatency() * 2 )
 		//{
 		//	sChatHandler.SystemMessage( this, "Packet hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );

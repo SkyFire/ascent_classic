@@ -807,33 +807,33 @@ void WorldSession::HandleCharterSign( WorldPacket & recv_data )
 	uint64 item_guid;
 	recv_data >> item_guid;
 
-	Charter * c = objmgr.GetCharterByItemGuid(item_guid);
-	if(c == 0)
+	Charter* c = objmgr.GetCharterByItemGuid( item_guid );
+	if( c == NULL )
 		return;
 
 	for(uint32 i = 0; i < 9; ++i)
 	{
-		if(c->Signatures[i] == _player->GetGUID())
+		if( c->Signatures[i] == _player->GetGUID() )
 		{
-			SendNotification("You have already signed that charter.");
+			SendNotification( "You have already signed that charter." );
 			return;
 		}
 	}
 
-	if(c->IsFull())
+	if( c->IsFull() )
 		return;
 
-	c->AddSignature(_player->GetGUIDLow());
+	c->AddSignature( _player->GetGUIDLow() );
 	c->SaveToDB();
 	_player->m_charters[c->CharterType] = c;
-	_player->SaveToDB(false);
+	_player->SaveToDB( false );
 
-	Player * l = _player->GetMapMgr()->GetPlayer(c->GetLeader());
-	if(l == 0)
+	Player* l = _player->GetMapMgr()->GetPlayer(c->GetLeader() );
+	if( l == NULL )
 		return;
 
-	WorldPacket data(SMSG_PETITION_SIGN_RESULTS, 100);
-	data << item_guid << _player->GetGUID() << uint32(0);
+	WorldPacket data( SMSG_PETITION_SIGN_RESULTS, 100 );
+	data << item_guid << _player->GetGUID() << uint32( 0 );
 	l->GetSession()->SendPacket(&data);
 	data.clear();
 	data << item_guid << (uint64)c->GetLeader() << uint32(0);

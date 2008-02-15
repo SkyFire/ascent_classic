@@ -800,12 +800,12 @@ class SERVER_DECL Player : public Unit
 
 public:
 
-	Player ( uint32 high, uint32 low );
-	~Player ( );
+	Player( uint32 high, uint32 low );
+	~Player();
 
-	ASCENT_INLINE Guild * GetGuild() { return m_playerInfo->guild; }
-	ASCENT_INLINE GuildMember * GetGuildMember() { return m_playerInfo->guildMember; }
-	ASCENT_INLINE GuildRank * GetGuildRankS() { return m_playerInfo->guildRank; }
+	ASCENT_INLINE Guild* GetGuild() { return m_playerInfo->guild; }
+	ASCENT_INLINE GuildMember* GetGuildMember() { return m_playerInfo->guildMember; }
+	ASCENT_INLINE GuildRank* GetGuildRankS() { return m_playerInfo->guildRank; }
 
 	void EventGroupFullUpdate();
 
@@ -1703,7 +1703,7 @@ public:
 	set<Unit*> visiblityChangableSet;
 	bool m_beingPushed;
 	bool CanSignCharter(Charter * charter, Player * requester);
-	Charter * m_charters[NUM_CHARTER_TYPES];
+	Charter* m_charters[NUM_CHARTER_TYPES];
 	uint32 flying_aura;
 	stringstream LoadAuras;
 	bool resend_speed;
