@@ -759,7 +759,16 @@ void WorldSession::HandleCharterQuery(WorldPacket & recv_data)
     data << uint32(0);                                      // 7
     data << uint32(0);                                      // 8
     data << uint16(0);                                      // 9 2 bytes field
-    data << uint32(0x46);                                      // 10
+    
+	if( c->CharterType == CHARTER_TYPE_GUILD )
+	{
+		data << uint32(70);									// 10
+	}
+	else
+	{
+		data << uint32(1);									// 10
+	}
+
     data << uint32(0);                                      // 11
     data << uint32(0);                                      // 13 count of next strings?
     data << uint32(0);                                      // 14

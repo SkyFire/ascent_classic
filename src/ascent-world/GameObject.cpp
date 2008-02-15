@@ -477,43 +477,46 @@ void GameObject::EventCloseDoor()
 
 void GameObject::UseFishingNode(Player *player)
 {
-	sEventMgr.RemoveEvents(this);
-	if(GetUInt32Value(GAMEOBJECT_FLAGS) != 32)//click on bobber before somth is hooked
+	sEventMgr.RemoveEvents( this );
+	if( GetUInt32Value( GAMEOBJECT_FLAGS ) != 32 ) // Clicking on the bobber before something is hooked
 	{
-		player->GetSession()->OutPacket(SMSG_FISH_NOT_HOOKED);
-		EndFishing(player,true);
+		player->GetSession()->OutPacket( SMSG_FISH_NOT_HOOKED );
+		EndFishing( player, true );
 		return;
 	}
 	
-	uint32 zone=/*sAreaStore.LookupEntry(GetMapMgr()->GetAreaID(GetPositionX(),GetPositionY()))->ZoneId*/player->GetZoneId();
+	/* Unused code: sAreaStore.LookupEntry(GetMapMgr()->GetAreaID(GetPositionX(),GetPositionY()))->ZoneId*/
+	uint32 zone = player->GetAreaID();
+	if( zone == 0 ) // If the player's area ID is 0, use the zone ID instead
+		zone = player->GetZoneId();
 
-	FishingZoneEntry *entry = FishingZoneStorage.LookupEntry(zone);
-	if(entry == NULL)
+	FishingZoneEntry *entry = FishingZoneStorage.LookupEntry( zone );
+	if( entry == NULL ) // No fishing information found for area or zone, log an error, and end fishing
 	{
-		sLog.outError("ERROR: Fishing zone information for zone %d not found!", zone);
-		EndFishing(player, true);
+		sLog.outError( "ERROR: Fishing zone information for zone %d not found!", zone );
+		EndFishing( player, true );
 		return;
 	}
-	uint32 maxskill=entry->MaxSkill;
-//	uint32 minskill=entry->MaxSkill;
-	uint32 minskill=entry->MinSkill;
 
-	if(player->_GetSkillLineCurrent(SKILL_FISHING,false)<maxskill)	
-		player->_AdvanceSkillLine(SKILL_FISHING,float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
+	uint32 maxskill = entry->MaxSkill;
+	//uint32 minskill = entry->MaxSkill;
+	uint32 minskill = entry->MinSkill;
 
-	//Open loot on success, otherwise FISH_ESCAPED.
-	if(Rand(((player->_GetSkillLineCurrent(SKILL_FISHING,true)-minskill)*100)/maxskill))
-	{			  
-		lootmgr.FillFishingLoot(&loot,zone);
-		player->SendLoot(GetGUID(),3);
-		EndFishing(player, false);
-	}
-	else //failed
+	if( player->_GetSkillLineCurrent( SKILL_FISHING, false ) < maxskill )	
+		player->_AdvanceSkillLine( SKILL_FISHING, float2int32( 1.0f * sWorld.getRate( RATE_SKILLRATE ) ) );
+
+	// Open loot on success, otherwise FISH_ESCAPED.
+	if( Rand(((player->_GetSkillLineCurrent( SKILL_FISHING, true ) - minskill) * 100) / maxskill) )
 	{
-		player->GetSession()->OutPacket(SMSG_FISH_ESCAPED);
-		EndFishing(player,true);
+		lootmgr.FillFishingLoot( &loot, zone );
+		player->SendLoot( GetGUID(), 3 );
+		EndFishing( player, false );
 	}
-
+	else // Failed
+	{
+		player->GetSession()->OutPacket( SMSG_FISH_ESCAPED );
+		EndFishing( player, true );
+	}
 }
 
 void GameObject::EndFishing(Player* player, bool abort )

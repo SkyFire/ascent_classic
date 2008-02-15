@@ -75,16 +75,22 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 	}
 
 	// Reputation System Checks
-	if(objA->IsPlayer() && !objB->IsPlayer())	   // PvE
+	if( objA->IsPlayer() && !objB->IsPlayer() )	   // PvE
 	{
-		if(objB->m_factionDBC->RepListId >= 0)
+		if( objB->m_factionDBC->RepListId >= 0 )
 			hostile = static_cast< Player* >( objA )->IsHostileBasedOnReputation( objB->m_factionDBC );
 	}
 	
-	if(objB->IsPlayer() && !objA->IsPlayer())	   // PvE
+	if( objB->IsPlayer() && !objA->IsPlayer() )	   // PvE
 	{
-		if(objA->m_factionDBC->RepListId >= 0)
+		if( objA->m_factionDBC->RepListId >= 0 )
 			hostile = static_cast< Player* >( objB )->IsHostileBasedOnReputation( objA->m_factionDBC );
+	}
+
+	if( objA->IsPlayer() && static_cast< Player* >( objA )->m_bg != NULL )
+	{
+		if( static_cast< Player* >( objA )->m_bgTeam != static_cast< Player* >( objB )->m_bgTeam )
+			return true;
 	}
 
 	return hostile;

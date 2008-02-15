@@ -2956,73 +2956,70 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 
 void Spell::SpellEffectSummonObject(uint32 i)
 {
-	if(!p_caster)
+	if( p_caster == NULL )
 		return;
 
 	uint32 entry = m_spellInfo->EffectMiscValue[i];
 
 	uint32 mapid = u_caster->GetMapId();
-	float px=u_caster->GetPositionX();
-	float py=u_caster->GetPositionY();
-	float pz=u_caster->GetPositionZ();
+	float px = u_caster->GetPositionX();
+	float py = u_caster->GetPositionY();
+	float pz = u_caster->GetPositionZ();
 	float orient = m_caster->GetOrientation();
 	float posx = 0,posy = 0,posz = 0;
 	
-	if(entry == GO_FISHING_BOBBER)
+	if( entry == GO_FISHING_BOBBER )
 	{
-		float co=cos(orient);
-		float si=sin(orient);
+		float co = cos( orient );
+		float si = sin( orient );
 		MapMgr * map = m_caster->GetMapMgr();
 		Spell * spell = u_caster->GetCurrentSpell();
 
 		float r;
-		for( r=20;r>10;r--)
+		for( r = 20; r > 10; r-- )
 		{
-			posx=px+r*co;
-			posy=py+r*si;
-			if(!(map->GetWaterType(posx,posy) & 1))//water 
+			posx = px+r*co;
+			posy = py+r*si;
+			if( !(map->GetWaterType( posx, posy ) & 1) )//water 
 				continue;
-			posz=map->GetWaterHeight(posx,posy);
-			if(posz > map->GetLandHeight(posx,posy))//water 
+			posz = map->GetWaterHeight( posx, posy );
+			if( posz > map->GetLandHeight( posx, posy ) )//water 
 				break;
 		}
 
-		posx=px+r*co;
-		posy=py+r*si;
+		posx = px + r * co;
+		posy = py + r * si;
 		   
-		//check db if there is some fish/loot
-		//FIX me: this should be loaded/cached
-		uint32 zone;
-			if(!p_caster)
-				zone=dbcArea.LookupEntry(map->GetAreaID(posx,posy))->ZoneId;
-			else
-				zone=p_caster->GetZoneId();
+		// Todo / Fix me: This should be loaded / cached
+		uint32 zone = p_caster->GetAreaID();
+		if( zone == 0 ) // If the player's area ID is 0, use the zone ID instead
+			zone = p_caster->GetZoneId();
 
 		uint32 minskill;
-		FishingZoneEntry *fishentry = FishingZoneStorage.LookupEntry(zone);
-		if (!fishentry)
+		FishingZoneEntry* fishentry = FishingZoneStorage.LookupEntry( zone );
+		if( fishentry == NULL) // Check database if there is fishing area / zone information, if not, return
 			return;
 		
-		//TODO: add fishskill to the calculations
+		// Todo / Fix me: Add fishskill to the calculations
 		minskill = fishentry->MinSkill;
-		spell->SendChannelStart(20000);//30 seconds
+		spell->SendChannelStart( 20000 ); // 30 seconds
 		/*spell->SendSpellStart();
 		spell->SendCastResult(SPELL_CANCAST_OK);
 		spell->SendSpellGo ();*/
 
-		
-		GameObject *go=u_caster->GetMapMgr()->CreateGameObject();
+		GameObject *go = u_caster->GetMapMgr()->CreateGameObject();
 
-		go->CreateFromProto(GO_FISHING_BOBBER,mapid,posx,posy,posz,orient);
-		go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
-		go->SetUInt32Value(GAMEOBJECT_STATE,0);
-		go->SetUInt64Value(OBJECT_FIELD_CREATED_BY,m_caster->GetGUID());
-		u_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT,go->GetGUID());
+
+		go->CreateFromProto( GO_FISHING_BOBBER, mapid, posx, posy, posz, orient );
+		go->SetUInt32Value( GAMEOBJECT_FLAGS, 0 );
+		go->SetUInt32Value( GAMEOBJECT_STATE, 0 );
+		go->SetUInt64Value( OBJECT_FIELD_CREATED_BY, m_caster->GetGUID() );
+		u_caster->SetUInt64Value( UNIT_FIELD_CHANNEL_OBJECT, go->GetGUID() );
 			 
-		go->SetInstanceID(m_caster->GetInstanceID());
-		go->PushToWorld(m_caster->GetMapMgr());
+		go->SetInstanceID( m_caster->GetInstanceID() );
+		go->PushToWorld( m_caster->GetMapMgr() );
 	   
-		if (lootmgr.IsFishable(zone)) // only add this if there is fish in that zone.
+		if( lootmgr.IsFishable( zone ) ) // Only set a 'splash' if there is any loot in this area / zone
 		{
 			uint32 seconds = RandomUInt(17) + 2;
 			sEventMgr.AddEvent( go, &GameObject::FishHooked, static_cast< Player* >( m_caster ), EVENT_GAMEOBJECT_FISH_HOOKED, seconds * 1000, 1, 0 );
@@ -3031,11 +3028,12 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		p_caster->SetSummonedObject( go );
 	}
 	else
-	{//portal, lightwell
-		posx=px;
-		posy=py;		
-		GameObjectInfo * goI = GameObjectNameStorage.LookupEntry(entry);
-		if(!goI)
+	{
+		//portal, lightwell
+		posx = px;
+		posy = py;		
+		GameObjectInfo* goI = GameObjectNameStorage.LookupEntry(entry);
+		if( goI == NULL )
 		{
 			if( p_caster != NULL )
 			{

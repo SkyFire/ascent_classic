@@ -569,7 +569,7 @@ AsyncQuery::~AsyncQuery()
 		if(itr->result)
 			delete itr->result;
 
-		delete itr->query;
+		delete[] itr->query;
 	}
 }
 

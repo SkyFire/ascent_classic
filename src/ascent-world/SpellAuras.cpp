@@ -4499,9 +4499,8 @@ void Aura::SpellAuraFeignDeath(bool apply)
 			data << uint32( m_spellProto->Id ); // ???
 			pTarget->GetSession()->SendPacket( &data );
 
-			//Zack : removed this packet. As far as i know it is not required
-			//data.Initialize( 0x03BE );
-			//data << pTarget->GetGUID();
+			data.Initialize( 0x03BE );
+			data << pTarget->GetGUID();
 			//pTarget->setDeathState( DEAD );
 
 			//now get rid of mobs agro. pTarget->CombatStatus.AttackersForgetHate() - this works only for already attacking mobs
@@ -4534,8 +4533,7 @@ void Aura::SpellAuraFeignDeath(bool apply)
 						if( static_cast< Player* >( *itr )->isCasting())
 							static_cast< Player* >( *itr )->CancelSpell( NULL ); //cancel current casting spell
 
-						// Debug : Zack removed the packet but didn't removed the SEND
-						//static_cast< Player* >( *itr )->GetSession()->SendPacket( &data );
+						static_cast< Player* >( *itr )->GetSession()->SendPacket( &data );
 					}
 				}
 			}

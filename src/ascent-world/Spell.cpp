@@ -3079,18 +3079,21 @@ uint8 Spell::CanCast(bool tolerate)
 						if( !pPet->CanLearnSpellTP( m_spellInfo->EffectTriggerSpell[0] ) )
 							return SPELL_FAILED_TRAINING_POINTS;
 				}
-			}
 
-			if( m_spellInfo->NameHash == SPELL_HASH_MIND_CONTROL)//got level req;
-			{
-				if( (int32)target->getLevel() > m_spellInfo->EffectBasePoints[0] + 1 )
-					return SPELL_FAILED_HIGHLEVEL;
-				else if( target->GetTypeId() == TYPEID_UNIT ) 
-				{ 
-					Creature* c = static_cast< Creature* >( target );
-					if ( c != NULL && c->GetCreatureName() && c->GetCreatureName()->Rank > ELITE_ELITE )
-						return SPELL_FAILED_HIGHLEVEL;
-				} 
+				if( m_spellInfo->EffectApplyAuraName[0]==2)//mind control
+				{
+					if( m_spellInfo->EffectBasePoints[0])//got level req;
+					{
+						if((int32)target->getLevel() > m_spellInfo->EffectBasePoints[0]+1 + int32(p_caster->getLevel() - m_spellInfo->spellLevel))
+							return SPELL_FAILED_HIGHLEVEL;
+						else if(target->GetTypeId() == TYPEID_UNIT) 
+						{ 
+							Creature * c = (Creature*)(target);
+							if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank >ELITE_ELITE)
+								return SPELL_FAILED_HIGHLEVEL;
+						} 
+					}
+				}
 			}
 
 			// scripted spell stuff

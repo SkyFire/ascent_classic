@@ -210,6 +210,7 @@ void ArenaTeam::Roster(WorldPacket & data)
 			data << m_members[i].Won_ThisWeek;
 			data << m_members[i].Played_ThisSeason;
 			data << m_members[i].Won_ThisSeason;
+			data << uint32(0);
 		}
 	}
 }
