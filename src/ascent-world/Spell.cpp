@@ -2948,36 +2948,15 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 	}
 
-	// TO BURLEX :> :)
-	// This should work as it was intended to
-	// as it was when i found it, it had fucked up lots of stuff
-	// Many spells returned as failed because item not equipped
-	// even though you have something equipped
-	// i changed it to use in front status like all other ( behind ) things
-	// i see no where that flags3 is used to detect require behind so i
-	// can only assume it is untested. since it was getting in here for judgements etc
-	// i bet its fucked in dbc.
-	// i added crashy fixes too for p_caster being null and no interface 
-
-	// currently these spells are the only ones that need this check.
-	if( m_spellInfo->in_front_status == 2 && p_caster != NULL )
+	// backstab/ambush
+	if( m_spellInfo->NameHash == SPELL_HASH_BACKSTAB || m_spellInfo->NameHash == SPELL_HASH_AMBUSH )
 	{
-		if( p_caster->GetItemInterface() != NULL )
-		{
-			Item* pItem = p_caster->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+		if( m_spellInfo->NameHash == SPELL_HASH_AMBUSH && !p_caster->IsStealth() )
+			return SPELL_FAILED_ONLY_STEALTHED;
 
-			// these need an item equipped
-			if( pItem == NULL )
-			{
-				return SPELL_FAILED_EQUIPPED_ITEM;
-			}
-
-			if( m_spellInfo->EquippedItemClass && pItem->GetProto()->Class != m_spellInfo->EquippedItemClass )
-				return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
-
-			if( m_spellInfo->EquippedItemSubClass && !(m_spellInfo->EquippedItemSubClass & (1 << pItem->GetProto()->SubClass)) )
-				return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
-		}
+		Item* pMainHand = p_caster->GetItemInterface()->GetInventoryItem( INVENTORY_SLOT_NOT_SET, EQUIPMENT_SLOT_MAINHAND );
+		if( !pMainHand || pMainHand->GetProto()->Class != 2 || pMainHand->GetProto()->SubClass != 15 )
+			return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
 	}
 
 	// set up our max Range
