@@ -2440,46 +2440,46 @@ void Spell::HandleAddAura(uint64 guid)
 
 	// remove any auras with same type
 	if( m_spellInfo->buffType > 0)
-		Target->RemoveAurasByBuffType(m_spellInfo->buffType, m_caster->GetGUID(),m_spellInfo->Id);
+		Target->RemoveAurasByBuffType( m_spellInfo->buffType, m_caster->GetGUID(), m_spellInfo->Id );
 
 	uint32 spellid = 0;
 
-	if( m_spellInfo->MechanicsType == 25 && m_spellInfo->Id != 25771) // Cast spell Forbearance
+	if( m_spellInfo->MechanicsType == 25 && m_spellInfo->Id != 25771 ) // Cast spell Forbearance
 		spellid = 25771;
-	else if( m_spellInfo->MechanicsType == 16 && m_spellInfo->Id != 11196) // Cast spell Recently Bandaged
+	else if( m_spellInfo->MechanicsType == 16 && m_spellInfo->Id != 11196 ) // Cast spell Recently Bandaged
 		spellid = 11196;
-	else if( m_spellInfo->MechanicsType == 19 && m_spellInfo->Id != 6788) // Cast spell Weakened Soul
+	else if( m_spellInfo->MechanicsType == 19 && m_spellInfo->Id != 6788 ) // Cast spell Weakened Soul
 		spellid = 6788;
-	else if( m_spellInfo->Id == 45438) // Cast spell Hypothermia
+	else if( m_spellInfo->Id == 45438 ) // Cast spell Hypothermia
 		spellid = 41425;
-	else if( m_spellInfo->Id == 30451) // Cast spell Arcane Blast
+	else if( m_spellInfo->Id == 30451 ) // Cast spell Arcane Blast
 		spellid = 36032;
-	else if( m_spellInfo->Id == 20572 || m_spellInfo->Id == 33702 || m_spellInfo->Id == 33697) // Cast spell Blood Fury
+	else if( m_spellInfo->Id == 20572 || m_spellInfo->Id == 33702 || m_spellInfo->Id == 33697 ) // Cast spell Blood Fury
 		spellid = 23230;
 
 	if( spellid && p_caster != NULL )
 	{
-		SpellEntry* spellInfo = dbcSpell.LookupEntry( spellid );
+		SpellEntry* spellInfo = dbcSpell.LookupEntryForced( spellid );
 		if( spellInfo == NULL )
 			return;
-		Spell *spell = new Spell( p_caster, spellInfo ,true, NULL );
+		Spell* spell = new Spell( p_caster, spellInfo ,true, NULL );
 		SpellCastTargets targets( Target->GetGUID() );
-		spell->prepare(&targets);	
+		spell->prepare( &targets );	
 	}
 
 	// avoid map corruption
 	if( m_caster != NULL && Target->GetInstanceID() != m_caster->GetInstanceID() )
 		return;
 
-	std::map<uint32,Aura*>::iterator itr=Target->tmpAura.find(m_spellInfo->Id);
+	std::map< uint32, Aura* >::iterator itr = Target->tmpAura.find( m_spellInfo->Id );
 	if( itr != Target->tmpAura.end() )
 	{
 		if( itr->second )
 		{
-			if(itr->second->GetSpellProto()->procCharges>0)
+			if( itr->second->GetSpellProto()->procCharges > 0 )
 			{
 				Aura* aur = NULL;
-				for(int i=0;i < itr->second->GetSpellProto()->procCharges-1; i++ )
+				for( int i = 0;i < itr->second->GetSpellProto()->procCharges-1; i++ )
 				{
 					aur = new Aura( itr->second->GetSpellProto(), itr->second->GetDuration(), itr->second->GetCaster(), itr->second->GetTarget() );
 					Target->AddAura( aur );
@@ -2488,15 +2488,15 @@ void Spell::HandleAddAura(uint64 guid)
 				if( !( itr->second->GetSpellProto()->procFlags & PROC_REMOVEONUSE ) )
 				{
 					SpellCharge charge;
-					charge.count=itr->second->GetSpellProto()->procCharges;
-					charge.spellId=itr->second->GetSpellId();
-					charge.ProcFlag=itr->second->GetSpellProto()->procFlags;
+					charge.count = itr->second->GetSpellProto()->procCharges;
+					charge.spellId = itr->second->GetSpellId();
+					charge.ProcFlag = itr->second->GetSpellProto()->procFlags;
 					charge.lastproc = 0;
-					Target->m_chargeSpells.insert(make_pair(itr->second->GetSpellId(),charge));
+					Target->m_chargeSpells.insert( make_pair( itr->second->GetSpellId(), charge ) );
 				}
 			}
 			Target->AddAura( itr->second ); // the real spell is added last so the modifier is removed last
-			Target->tmpAura.erase(itr);
+			Target->tmpAura.erase( itr );
 		}
 	}
 }

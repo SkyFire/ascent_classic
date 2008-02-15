@@ -87,7 +87,7 @@ bool ConsoleThread::run()
 		FD_SET(STDIN_FILENO, &fds);
 		if( select( 1, &fds, NULL, NULL, &tv ) <= 0 )
 		{
-			if( !kill )	// timeout
+			if( !m_killSwitch )	// timeout
 				continue;
 			else
 				break;
