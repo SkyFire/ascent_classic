@@ -1425,6 +1425,19 @@ Unit* AIInterface::FindTarget()
 			}
 		}
 
+		/* neutral guard that attacks pvpers */
+		/*
+		if( m_Unit->IsNeutralGuard() )
+		{
+			if( pUnit->IsPlayer() && pUnit->CombatStatus.GetPrimaryAttackTarget() )
+			{
+				// get the target of the potential target :P
+				Unit * pPTarget = GetUnit()->GetMapMgr()->GetUnit( pUnit->CombatStatus.GetPrimaryAttackTarget() );
+				if( !pPTarget->IsPlayer() )
+					continue;
+			}
+		}
+		*/
 		/* is it a player? we have to check for our pvp flag. */
 //		if(m_U)
 		crange = _CalcCombatRange(pUnit,false);
