@@ -3035,7 +3035,7 @@ else
 		// rather than fuck with duration
 		for( uint32 x = MAX_POSITIVE_AURAS; x <= MAX_AURAS; x++ )
 		{
-			if( pVictim->m_auras[x] && pVictim->m_auras[x]->GetUnitCaster() && pVictim->m_auras[x]->GetUnitCaster()->GetGUID() == GetGUID() && pVictim->m_auras[x]->GetSpellProto()->buffIndexType == SPELL_TYPE_INDEX_JUDGEMENT )
+			if( pVictim->m_auras[x] != NULL && pVictim->m_auras[x]->GetUnitCaster() != NULL && pVictim->m_auras[x]->GetUnitCaster()->GetGUID() == GetGUID() && pVictim->m_auras[x]->GetSpellProto()->buffIndexType == SPELL_TYPE_INDEX_JUDGEMENT )
 			{
 				pVictim->m_auras[x]->SetDuration( 20000 ); // 20 seconds?
 				sEventMgr.ModifyEventTimeLeft( pVictim->m_auras[x], EVENT_AURA_REMOVE, 20000 );
@@ -4964,16 +4964,19 @@ void Unit::RemoveAurasByBuffType(uint32 buff_type, const uint64 &guid, uint32 sk
 {
 	uint64 sguid = buff_type >= SPELL_TYPE_BLESSING ? guid : 0;
 
-	for(uint32 x=0;x<MAX_AURAS;x++)
+	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
-		if(m_auras[x] && m_auras[x]->GetSpellProto()->buffType & buff_type && m_auras[x]->GetSpellId()!=skip)
-			if(!sguid || (sguid && m_auras[x]->m_casterGuid == sguid))
+		if( m_auras[x] != NULL && m_auras[x]->GetSpellProto()->buffType & buff_type && m_auras[x]->GetSpellId() != skip )
+			if( !sguid || ( sguid && m_auras[x]->m_casterGuid == sguid ) )
 				m_auras[x]->Remove();
 	}
 }
 
 void Unit::RemoveAurasByBuffIndexType(uint32 buff_index_type, const uint64 &guid)
 {
+	if( buff_index_type == SPELL_TYPE_INDEX_JUDGEMENT )
+		return;
+
 	for( uint32 x = 0; x < MAX_AURAS; x++ )
 	{
 		if( m_auras[x] != NULL && m_auras[x]->GetSpellProto()->buffIndexType == buff_index_type )

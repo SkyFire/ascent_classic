@@ -9398,11 +9398,11 @@ void Player::_ModifySkillMaximum(uint32 SkillLine, uint32 NewMax)
 
 void Player::RemoveSpellTargets(uint32 Type)
 {
-	if(m_spellIndexTypeTargets[Type] != 0)
+	if( m_spellIndexTypeTargets[Type] != 0 )
 	{
-		Unit * pUnit = m_mapMgr ? m_mapMgr->GetUnit(m_spellIndexTypeTargets[Type]) : NULL;
-		if(pUnit)
-            pUnit->RemoveAurasByBuffIndexType(Type, GetGUID());
+		Unit* pUnit = m_mapMgr ? m_mapMgr->GetUnit(m_spellIndexTypeTargets[Type]) : NULL;
+		if( pUnit != NULL )
+            pUnit->RemoveAurasByBuffIndexType( Type, GetGUID() );
 
 		m_spellIndexTypeTargets[Type] = 0;
 	}
