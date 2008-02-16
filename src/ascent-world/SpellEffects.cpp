@@ -5238,6 +5238,6 @@ void Spell::SpellEffectSpawn(uint32 i)
 
 void Spell::SpellEffectApplyAura128(uint32 i)
 {
-	if(m_spellInfo->EffectApplyAuraName[i] != 0)
-		SpellEffectApplyAura(i);
+	if( m_spellInfo->EffectApplyAuraName[i] != SPELL_AURA_NONE )
+		SpellEffectApplyAura( i );
 }

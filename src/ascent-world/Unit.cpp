@@ -3368,7 +3368,7 @@ void Unit::AddAura(Aura *aur)
 		for( uint32 i = 0; i < 3; ++i )
 		{
 			// Can't use flying auras in non-outlands.
-			if( aur->GetSpellProto()->EffectApplyAuraName[i] == 208 || aur->GetSpellProto()->EffectApplyAuraName[i] == 207 )
+			if( aur->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_SPEED_MOUNTED_FLIGHT || aur->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_SPEED_FLIGHT )
 			{
 				delete aur;
 				return;
@@ -3784,13 +3784,13 @@ void Unit::RemoveAllAuras()
 //ex:to remove morph spells
 void Unit::RemoveAllAuraType(uint32 auratype)
 {
-    for(uint32 x=0;x<MAX_AURAS;x++)
+    for( uint32 x = 0; x < MAX_AURAS; x++ )
     {
-		if(m_auras[x])
+		if( m_auras[x] != NULL )
 		{
-			SpellEntry *proto=m_auras[x]->GetSpellProto();
-			if(proto->EffectApplyAuraName[0]==auratype || proto->EffectApplyAuraName[1]==auratype || proto->EffectApplyAuraName[2]==auratype)
-				RemoveAura(m_auras[x]->GetSpellId());//remove all morph auras containig to this spell (like wolf motph also gives speed)
+			SpellEntry* proto=m_auras[x]->GetSpellProto();
+			if( proto->EffectApplyAuraName[0] == auratype || proto->EffectApplyAuraName[1] == auratype || proto->EffectApplyAuraName[2] == auratype )
+				RemoveAura( m_auras[x]->GetSpellId() );//remove all morph auras containig to this spell (like wolf motph also gives speed)
 		}
     }
 }

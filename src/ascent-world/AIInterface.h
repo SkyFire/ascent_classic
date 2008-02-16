@@ -158,7 +158,6 @@ enum AiEvents
 };
 
 struct SpellEntry;
-//enum MOD_TYPES;
 
 struct AI_Spell
 {

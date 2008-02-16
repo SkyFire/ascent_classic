@@ -1023,10 +1023,9 @@ ASCENT_INLINE bool IsDamagingSpell(SpellEntry *sp)
         case SPELL_EFFECT_ATTACK:
             return true;
     }
-    if( sp->Effect[0]==SPELL_EFFECT_APPLY_AURA ||
-       sp->Effect[0]==SPELL_EFFECT_APPLY_AREA_AURA)
+    if( sp->Effect[0]==SPELL_EFFECT_APPLY_AURA || sp->Effect[0]==SPELL_EFFECT_APPLY_AREA_AURA )
     {
-        switch (sp->EffectApplyAuraName[0])
+        switch( sp->EffectApplyAuraName[0] )
         {
             case 3://SPELL_AURA_PERIODIC_DAMAGE:
             case 43://SPELL_AURA_PROC_TRIGGER_DAMAGE:
@@ -1035,10 +1034,9 @@ ASCENT_INLINE bool IsDamagingSpell(SpellEntry *sp)
                 return true;
         }
     }
-    if( sp->Effect[1]==SPELL_EFFECT_APPLY_AURA ||
-        sp->Effect[1]==SPELL_EFFECT_APPLY_AREA_AURA)
+    if( sp->Effect[1]==SPELL_EFFECT_APPLY_AURA || sp->Effect[1]==SPELL_EFFECT_APPLY_AREA_AURA )
     {
-        switch (sp->EffectApplyAuraName[1])
+        switch( sp->EffectApplyAuraName[1] )
         {
             case 3://SPELL_AURA_PERIODIC_DAMAGE:
             case 43://SPELL_AURA_PROC_TRIGGER_DAMAGE:
@@ -1047,10 +1045,9 @@ ASCENT_INLINE bool IsDamagingSpell(SpellEntry *sp)
                 return true;
         }
     }
-    if( sp->Effect[2]==SPELL_EFFECT_APPLY_AURA ||
-        sp->Effect[2]==SPELL_EFFECT_APPLY_AREA_AURA)
+    if( sp->Effect[2]==SPELL_EFFECT_APPLY_AURA || sp->Effect[2]==SPELL_EFFECT_APPLY_AREA_AURA )
     {
-        switch (sp->EffectApplyAuraName[2])
+        switch( sp->EffectApplyAuraName[2] )
         {
             case 3://SPELL_AURA_PERIODIC_DAMAGE:
             case 43://SPELL_AURA_PROC_TRIGGER_DAMAGE:
@@ -1091,8 +1088,7 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
             return true;
 		default: break;
     }
-    if( sp->Effect[0] == SPELL_EFFECT_APPLY_AURA ||
-		sp->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[0] == SPELL_EFFECT_APPLY_AURA || sp->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
         switch( sp->EffectApplyAuraName[0] )
         {
@@ -1102,10 +1098,9 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
 			default: break;
         }
     }
-    if( sp->Effect[1] == SPELL_EFFECT_APPLY_AURA ||
-        sp->Effect[1] == SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[1] == SPELL_EFFECT_APPLY_AURA || sp->Effect[1] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
-        switch (sp->EffectApplyAuraName[1])
+        switch( sp->EffectApplyAuraName[1] )
         {
             case 8://SPELL_AURA_PERIODIC_HEAL:
             case 62://SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
@@ -1113,8 +1108,7 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
 			default: break;
         }
     }
-    if( sp->Effect[2] == SPELL_EFFECT_APPLY_AURA ||
-        sp->Effect[2] == SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[2] == SPELL_EFFECT_APPLY_AURA || sp->Effect[2] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
         switch( sp->EffectApplyAuraName[2] )
         {

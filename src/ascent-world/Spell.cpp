@@ -217,9 +217,9 @@ Spell::~Spell()
 bool Spell::IsStealthSpell()
 {
 	//check if aura name is some stealth aura
-	if( m_spellInfo->EffectApplyAuraName[0] == 16 ||
-		m_spellInfo->EffectApplyAuraName[1] == 16 ||
-		m_spellInfo->EffectApplyAuraName[2] == 16 )
+	if( m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_STEALTH ||
+		m_spellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOD_STEALTH ||
+		m_spellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOD_STEALTH )
 		return true;
 	return false;
 }
@@ -228,9 +228,9 @@ bool Spell::IsStealthSpell()
 bool Spell::IsInvisibilitySpell()
 {
 	//check if aura name is some invisibility aura
-	if( m_spellInfo->EffectApplyAuraName[0] == 18 ||
-		m_spellInfo->EffectApplyAuraName[1] == 18 ||
-		m_spellInfo->EffectApplyAuraName[2] == 18 )
+	if( m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_INVISIBILITY ||
+		m_spellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOD_INVISIBILITY ||
+		m_spellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOD_INVISIBILITY )
 		return true;
 	return false;
 }
@@ -1445,7 +1445,7 @@ void Spell::cast(bool check)
 				}
 	
 				/* don't call HandleAddAura unless we actually have auras... - Burlex*/
-				if( m_spellInfo->EffectApplyAuraName[0] != 0 || m_spellInfo->EffectApplyAuraName[1] != 0 || m_spellInfo->EffectApplyAuraName[2] != 0 )
+				if( m_spellInfo->EffectApplyAuraName[0] != SPELL_AURA_NONE || m_spellInfo->EffectApplyAuraName[1] != SPELL_AURA_NONE || m_spellInfo->EffectApplyAuraName[2] != SPELL_AURA_NONE )
 				{
 					hadEffect = true; // spell has had an effect (for item removal & possibly other things)
 
@@ -3049,34 +3049,28 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_BAD_TARGETS;
 				}
 				
-				// pet learning
+				// check training points when teaching pet
 				if( m_spellInfo->EffectImplicitTargetA[0] == EFF_TARGET_PET && m_spellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL )
 				{
 					Pet* pPet = p_caster->GetSummon();
 					// check if we have a pet
 					if( pPet == NULL )
 						return SPELL_FAILED_NO_PET;
-
-					// other checks
-					SpellEntry* trig = dbcSpell.LookupEntry( m_spellInfo->EffectTriggerSpell[0] );
-					if( trig == NULL )
-						return SPELL_FAILED_SPELL_UNAVAILABLE;
-
-					uint32 status = pPet->CanLearnSpell( trig );
-					if( status != NULL )
-						return status;
+					if( !pPet->IsSummon() )
+						if( !pPet->CanLearnSpellTP( m_spellInfo->EffectTriggerSpell[0] ) )
+							return SPELL_FAILED_TRAINING_POINTS;
 				}
 
-				if( m_spellInfo->EffectApplyAuraName[0]==2)//mind control
+				if( m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_POSSESS )//mind control
 				{
-					if( m_spellInfo->EffectBasePoints[0])//got level req;
+					if( m_spellInfo->EffectBasePoints[0] )//got level req;
 					{
-						if((int32)target->getLevel() > m_spellInfo->EffectBasePoints[0]+1 + int32(p_caster->getLevel() - m_spellInfo->spellLevel))
+						if( (int32)target->getLevel() > m_spellInfo->EffectBasePoints[0]+1 + int32( p_caster->getLevel() - m_spellInfo->spellLevel ) )
 							return SPELL_FAILED_HIGHLEVEL;
 						else if(target->GetTypeId() == TYPEID_UNIT) 
 						{ 
-							Creature * c = (Creature*)(target);
-							if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank >ELITE_ELITE)
+							Creature* c = (Creature*)(target);
+							if( c != NULL && c->GetCreatureName()&&c->GetCreatureName()->Rank >ELITE_ELITE )
 								return SPELL_FAILED_HIGHLEVEL;
 						} 
 					}
@@ -4238,14 +4232,14 @@ bool Spell::Reflect(Unit *refunit)
 		return false;
 
 	// if the spell to reflect is a reflect spell, do nothing.
-	for(int i=0; i<3; i++)
+	for( int i = 0; i < 3; i++ )
     {
-		if( m_spellInfo->Effect[i] == 6 && (m_spellInfo->EffectApplyAuraName[i] == 74 || m_spellInfo->EffectApplyAuraName[i] == 28))
+		if( m_spellInfo->Effect[i] == 6 && ( m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_REFLECT_SPELLS_SCHOOL || m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_REFLECT_SPELLS ) )
 			return false;
     }
-	for(std::list<struct ReflectSpellSchool*>::iterator i = refunit->m_reflectSpellSchool.begin();i != refunit->m_reflectSpellSchool.end();i++)
+	for( std::list< struct ReflectSpellSchool* >::iterator i = refunit->m_reflectSpellSchool.begin(); i != refunit->m_reflectSpellSchool.end(); i++ )
 	{
-		if((*i)->school == -1 || (*i)->school == (int32)m_spellInfo->School)
+		if( (*i)->school == -1 || (*i)->school == (int32)m_spellInfo->School )
 		{
 			if(Rand((float)(*i)->chance))
 			{

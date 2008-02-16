@@ -164,18 +164,17 @@ void DynamicObject::UpdateTargets()
 			if(GetDistanceSq(target) <= radius)
 			{
 				pAura = new Aura(m_spellProto, m_aliveDuration, u_caster, target);
-				for(uint32 i = 0; i < 3; ++i)
+				for( uint32 i = 0; i < 3; ++i )
 				{
-					if(m_spellProto->Effect[i] == 27)
+					if( m_spellProto->Effect[i] == 27 )
 					{
-						pAura->AddMod(m_spellProto->EffectApplyAuraName[i],
-							m_spellProto->EffectBasePoints[i]+1, m_spellProto->EffectMiscValue[i], i);
+						pAura->AddMod( m_spellProto->EffectApplyAuraName[i], m_spellProto->EffectBasePoints[i] + 1, m_spellProto->EffectMiscValue[i], i );
 					}
 				}
-				target->AddAura(pAura);
-				if(p_caster)
+				target->AddAura( pAura );
+				if( p_caster != NULL )
 				{
-					p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,target, m_spellProto);
+					p_caster->HandleProc( PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL, target, m_spellProto );
 					p_caster->m_procCounter = 0;
 				}
 

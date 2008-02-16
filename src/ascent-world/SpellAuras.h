@@ -211,6 +211,7 @@ enum MOD_TYPES
     SPELL_AURA_INCREASE_DAMAGE = 168,                   // Increase Damage Type
     SPELL_AURA_INCREASE_CRITICAL = 169,                 // Increase Critical Type
     SPELL_AURA_DETECT_AMORE = 170,                      // Detect Amore
+	SPELL_AURA_MOD_PARTY_SPEED = 171,					// Party Speed Increase
     SPELL_AURA_INCREASE_MOVEMENT_AND_MOUNTED_SPEED = 172,// Increase Movement and Mounted Speed (Non-Stacking)
     SPELL_AURA_INCREASE_SPELL_DAMAGE_PCT = 174,         // Increase Spell Damage by % Spirit (Spells
     SPELL_AURA_INCREASE_SPELL_HEALING_PCT = 175,        // Increase Spell Healing by % Spirit
@@ -225,6 +226,7 @@ enum MOD_TYPES
     SPELL_AURA_DECREASE_ATTACKER_CHANGE_TO_HIT_SPELLS = 186,// Reduces Attacker Chance to Hit with Spells
     SPELL_AURA_DECREASE_ATTACKER_CHANGE_TO_CRIT_MELEE = 187,// Reduces Attacker Chance to Crit with Melee (Ranged?)
     SPELL_AURA_DECREASE_ATTACKER_CHANGE_TO_CRIT_RANGED = 188,// Reduces Attacker Chance to Crit with Ranged (Melee?)
+    SPELL_AURA_MOD_RATING = 189,
     SPELL_AURA_INCREASE_REPUTATION = 190,               // Increases reputation from killed creatures
     SPELL_AURA_SPEED_LIMIT = 191,                       // speed limit
     SPELL_AURA_MELEE_SLOW_PCT = 192,
@@ -233,20 +235,29 @@ enum MOD_TYPES
     SPELL_AURA_INCREASE_HEALING_PCT_OF_INTELLECT = 195,
     SPELL_AURA_MOD_ALL_WEAPON_SKILLS = 196,
     SPELL_AURA_REDUCE_ATTACKER_CRICTICAL_HIT_CHANCE_PCT = 197,
-    SPELL_AURA_INCREASE_SPELL_HIT_PCT = 199,
+    SPELL_AURA_MOD_ALL_WEAPON_SKILLS_2 = 198,
+	SPELL_AURA_INCREASE_SPELL_HIT_PCT = 199,
+    SPELL_AURA_MOD_XP_PCT = 200,
     SPELL_AURA_CANNOT_BE_DODGED = 201,
 	SPELL_AURA_FINISHING_MOVES_CANNOT_BE_DODGED = 202,
     SPELL_AURA_REDUCE_ATTACKER_CRICTICAL_HIT_DAMAGE_MELEE_PCT = 203,
     SPELL_AURA_REDUCE_ATTACKER_CRICTICAL_HIT_DAMAGE_RANGED_PCT = 204,
+    SPELL_AURA_MOD_SPEED_MOUNTED = 206,
+    SPELL_AURA_MOD_SPEED_MOUNTED_FLIGHT = 207,
+    SPELL_AURA_MOD_SPEED_FLIGHT = 208,
     SPELL_AURA_INCREASE_RANGED_ATTACK_POWER_PCT_OF_INTELLECT = 212,
     SPELL_AURA_INCREASE_RAGE_FROM_DAMAGE_DEALT_PCT = 213,
     SPELL_AURA_INCREASE_CASTING_TIME_PCT = 216,
-    SPELL_AURA_REGEN_MANA_STAT_PCT=219,
-    SPELL_AURA_HEALING_STAT_PCT=220,
-    SPELL_AURA_INCREASE_MAX_HEALTH=230,//Used by Commanding Shout
-	SPELL_AURA_MODIFY_AXE_SKILL=240,
+    SPELL_AURA_REGEN_MANA_STAT_PCT = 219,
+    SPELL_AURA_HEALING_STAT_PCT = 220,
+    SPELL_AURA_DUMMY_2 = 226,
+    SPELL_AURA_INCREASE_AREA_MAX_HEALTH = 230,//Used by Commanding Shout
+	SPELL_AURA_MECHANIC_DURATION_MOD = 234,
+    SPELL_AURA_MOD_SCALE_2 = 239,
+	SPELL_AURA_MODIFY_AXE_SKILL = 240,
     TOTAL_SPELL_AURAS = 241,
 };
+
 enum AuraTickFlags
 {
     FLAG_PERIODIC_DAMAGE            = 2,
@@ -639,17 +650,17 @@ public:
 	// this stuff can be cached in spellproto.
 	ASCENT_INLINE bool IsCombatStateAffecting()
 	{
-		for(uint32 x = 0; x < 3; ++x) {
-			if(m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_DAMAGE || 
+		for( uint32 x = 0; x < 3; ++x )
+		{
+			if( m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_DAMAGE || 
 				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
 				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_TRIGGER_SPELL ||
 				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_LEECH ||
-				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_MANA_LEECH)
+				m_spellProto->EffectApplyAuraName[x] == SPELL_AURA_PERIODIC_MANA_LEECH )
 			{
 				return true;
 			}
 		}
-
 		return false;
 	}
 

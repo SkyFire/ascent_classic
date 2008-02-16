@@ -572,8 +572,8 @@ void Aura::ApplyModifiers( bool apply )
 	
 	if(GetSpellProto()->procFlags)
 	{
-		for(uint32 x=0; x<3; x++)
-			if(GetSpellProto()->EffectApplyAuraName[x] == SPELL_AURA_PROC_TRIGGER_SPELL||GetSpellId()==974||GetSpellId()==32593||GetSpellId()==32594)
+		for( uint32 x = 0; x < 3; x++ )
+			if( GetSpellProto()->EffectApplyAuraName[x] == SPELL_AURA_PROC_TRIGGER_SPELL || GetSpellId() == 974 || GetSpellId() == 32593 || GetSpellId() == 32594 )
 				return;//already have proc for this aura
 
 		if( apply )
@@ -4782,8 +4782,8 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 					else if(mod->m_miscValue == 11) // if got immunity for slow, remove some that are not in the mechanics
 					{
 						sLog.outString( "Removing roots" );
-						for(int i=0;i<3;i++)
-							if(m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED)
+						for( int i = 0; i <3 ; i++ )
+							if( m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED )
 							{
 								sLog.outString( "Removed snare aura in slot %u, spellid %u" , x , m_target->m_auras[x]->GetSpellId() );
 								m_target->m_auras[x]->Remove();
@@ -4798,16 +4798,16 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 				m_target->RemoveAllAurasByMechanic( (uint32)mod->m_miscValue , -1 , true );
 			}
 
-			if(m_spellProto->Id==42292)
+			if( m_spellProto->Id == 42292 )
 			{
 				// insignia of the A/H
-				for(uint32 x= MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
+				for( uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x )
 				{
-					if(m_target->m_auras[x])
+					if( m_target->m_auras[x] != NULL )
 					{
-						for(uint32 y = 0; y < 3; ++y)
+						for( uint32 y = 0; y < 3; ++y )
 						{
-							switch(m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
+							switch( m_target->m_auras[x]->GetSpellProto()->EffectApplyAuraName[y] )
 							{
 							case SPELL_AURA_MOD_STUN:
 							case SPELL_AURA_MOD_CONFUSE:
@@ -6201,10 +6201,10 @@ void Aura::SpellAuraModHaste( bool apply )
 void Aura::SpellAuraForceReaction( bool apply )
 {
 	// hackfix for spectacles
-	if(m_spellProto->EffectApplyAuraName[0] == SPELL_AURA_MOD_INVISIBILITY_DETECTION && m_target->IsPlayer())
+	if( m_spellProto->EffectApplyAuraName[0] == SPELL_AURA_MOD_INVISIBILITY_DETECTION && m_target->IsPlayer() )
 		return;
 
-	if (apply)
+	if( apply )
 	{
 		//SetCasterFaction(m_target->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 		SetCasterFaction(m_target->_getFaction());

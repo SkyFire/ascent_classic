@@ -209,8 +209,8 @@ public:
 	uint16 SpellTP(uint32 spellId);
 	uint16 GetUsedTP();
 	void UpdateTP();
-	uint32 CanLearnSpell( SpellEntry* sp );
-	
+	bool CanLearnSpellTP(uint32 spellId);
+
 	void HandleAutoCastEvent(uint32 Type);
 	AI_Spell * HandleAutoCastEvent();
 	void SetPetSpellState(uint32 spell, uint16 state);

@@ -8044,11 +8044,11 @@ void Player::CompleteLoading()
 		}
 		
 
-		for(uint32 x =0;x<3;x++)
+		for( uint32 x = 0; x < 3; x++ )
         {
-		    if(sp->Effect[x]==SPELL_EFFECT_APPLY_AURA)
+		    if( sp->Effect[x] == SPELL_EFFECT_APPLY_AURA )
 		    {
-			    a->AddMod(sp->EffectApplyAuraName[x],sp->EffectBasePoints[x]+1,sp->EffectMiscValue[x],x);
+			    a->AddMod( sp->EffectApplyAuraName[x], sp->EffectBasePoints[x] + 1, sp->EffectMiscValue[x], x );
 		    }
         }
 
@@ -8432,7 +8432,7 @@ void Player::SetShapeShift(uint8 ss)
 			{
 				for( uint32 y = 0; y < 3; ++y )
 				{
-					switch( m_auras[x]->GetSpellProto()->EffectApplyAuraName[y])
+					switch( m_auras[x]->GetSpellProto()->EffectApplyAuraName[y] )
 					{
 					case SPELL_AURA_MOD_ROOT: //Root
 					case SPELL_AURA_MOD_DECREASE_SPEED: //Movement speed
