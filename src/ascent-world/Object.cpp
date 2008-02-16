@@ -1734,7 +1734,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				isCritter = true;
 	}
 	/* -------------------------- HIT THAT CAUSES VICTIM TO DIE ---------------------------*/
-	if ((isCritter || health <= damage) )
+	if ( isCritter || health <= damage )
 	{
 		//warlock - seed of corruption
 		if( IsUnit() )
@@ -1748,7 +1748,14 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			static_cast< Unit* >( this )->HandleProc( PROC_ON_TARGET_DIE, pVictim, killerspell );
 			static_cast< Unit* >( this )->m_procCounter = 0;
 		}
-
+		// check if pets owner is combat participant
+		bool owner_participe = false;
+		if( IsPet() )
+		{
+			Player* owner = static_cast<Pet*>( this )->GetPetOwner();
+			if( owner != NULL && pVictim->GetAIInterface()->getThreatByPtr( owner ) > 0 )
+				owner_participe = true;
+		}
 		/* victim died! */
 		if( pVictim->IsPlayer() )
 			static_cast< Player* >( pVictim )->KillPlayer();
@@ -1950,15 +1957,15 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			//bool isCritter = (pVictim->GetCreatureName() != NULL)? pVictim->GetCreatureName()->Type : 0;
 
 			//-----------------------------------LOOOT--------------------------------------------
-			if ((!pVictim->IsPet())&& ( !isCritter ))
+			if( !pVictim->IsPet() && !isCritter )
 			{
-				Creature * victim = static_cast<Creature*>(pVictim);
+				Creature * victim = static_cast<Creature*>( pVictim );
 				// fill loot vector.
 				victim->generateLoot();
 
 				Player *owner = 0;
 				if(victim->TaggerGuid)
-					owner = GetMapMgr()->GetPlayer((uint32)victim->TaggerGuid);
+					owner = GetMapMgr()->GetPlayer( (uint32)victim->TaggerGuid );
 
 				if(owner == 0)  // no owner
 				{
@@ -1969,21 +1976,21 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				else
 				{
 					// Build the actual update.
-					ByteBuffer buf(500);
+					ByteBuffer buf( 500 );
 
-					uint32 Flags = victim->m_uint32Values[UNIT_DYNAMIC_FLAGS];
+					uint32 Flags = victim->m_uint32Values[ UNIT_DYNAMIC_FLAGS ];
 					Flags |= U_DYN_FLAG_LOOTABLE;
 					Flags |= U_DYN_FLAG_TAPPED_BY_PLAYER;
 
-					victim->BuildFieldUpdatePacket(&buf, UNIT_DYNAMIC_FLAGS, Flags);
+					victim->BuildFieldUpdatePacket( &buf, UNIT_DYNAMIC_FLAGS, Flags );
 
 					// Check for owner's group.
 					Group * pGroup = owner->GetGroup();
-					if(pGroup != 0)
+					if( pGroup != NULL )
 					{
 						// Owner was in a party.
 						// Check loot method.
-						switch(pGroup->GetMethod())
+						switch( pGroup->GetMethod() )
 						{
 						case PARTY_LOOT_RR:
 /*						//this commented code is not used because it was never tested and finished !
@@ -2007,14 +2014,14 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 								GroupMembersSet::iterator itr;
 								SubGroup * sGrp;
 								pGroup->Lock();
-								for(uint32 Index = 0; Index < pGroup->GetSubGroupCount(); ++Index)
+								for( uint32 Index = 0; Index < pGroup->GetSubGroupCount(); ++Index )
 								{
-									sGrp = pGroup->GetSubGroup(Index);
+									sGrp = pGroup->GetSubGroup( Index );
 									itr = sGrp->GetGroupMembersBegin();
-									for(; itr != sGrp->GetGroupMembersEnd(); ++itr)
+									for( ; itr != sGrp->GetGroupMembersEnd(); ++itr )
 									{
-										if((*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer->IsVisible(victim) )	   // Save updates for non-existant creatures
-											(*itr)->m_loggedInPlayer->PushUpdateData(&buf, 1);
+										if( (*itr)->m_loggedInPlayer && (*itr)->m_loggedInPlayer->IsVisible( victim ) )	   // Save updates for non-existant creatures
+											(*itr)->m_loggedInPlayer->PushUpdateData( &buf, 1 );
 									}
 								}
 								pGroup->Unlock();
@@ -2023,11 +2030,11 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 							{
 								// Master loot: only the loot master gets the update.
 								Player * pLooter = pGroup->GetLooter() ? pGroup->GetLooter()->m_loggedInPlayer : NULL;
-								if(pLooter == 0)
+								if( pLooter == NULL )
 									pLooter = pGroup->GetLeader()->m_loggedInPlayer;
 
-								if(pLooter->IsVisible(victim))  // Save updates for non-existant creatures
-									pLooter->PushUpdateData(&buf, 1);
+								if( pLooter->IsVisible( victim ) )  // Save updates for non-existant creatures
+									pLooter->PushUpdateData( &buf, 1 );
 
 							}break;
 						}
@@ -2035,17 +2042,17 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 					else
 					{
 						// Owner killed the mob solo.
-						if(owner->IsVisible(victim))
-							owner->PushUpdateData(&buf, 1);
+						if( owner->IsVisible( victim ) )
+							owner->PushUpdateData( &buf, 1 );
 					}
 				}
 			}
 			//---------------------------------looot-----------------------------------------  
 			
-			if (GetTypeId() == TYPEID_PLAYER && 
-				pVictim->GetUInt64Value(UNIT_FIELD_CREATEDBY) == 0 && 
-				pVictim->GetUInt64Value(OBJECT_FIELD_CREATED_BY) == 0 &&
-				!pVictim->IsPet())
+			if( GetTypeId() == TYPEID_PLAYER && 
+				pVictim->GetUInt64Value( UNIT_FIELD_CREATEDBY ) == 0 && 
+				pVictim->GetUInt64Value( OBJECT_FIELD_CREATED_BY ) == 0 &&
+				!pVictim->IsPet() )
 			{
 				// TODO: lots of casts are bad make a temp member pointer to use for batches like this
 				// that way no local loadhitstore and its just one assignment 
@@ -2055,18 +2062,17 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				{
 					//Calc Group XP
 					static_cast< Player* >( this )->GiveGroupXP( pVictim, static_cast< Player* >( this ) );
+					//TODO: pet xp if player in group
 				}
 				else
 				{
 					uint32 xp = CalculateXpToGive( pVictim, static_cast< Unit* >( this ) );
-					if( xp )
+					if( xp > 0 )
 						static_cast< Player* >( this )->GiveXP( xp, victimGuid, true );
-
 					if( static_cast< Player* >( this )->GetSummon() && static_cast< Player* >( this )->GetSummon()->GetUInt32Value( UNIT_CREATED_BY_SPELL ) == 0 )
 					{
 						xp = CalculateXpToGive( pVictim, static_cast< Player* >( this )->GetSummon() );
-						if( xp )
-							static_cast< Player* >( this )->GetSummon()->GiveXP( xp );
+						static_cast< Player* >( this )->GetSummon()->GiveXP( xp );
 					}
 				}
 
@@ -2076,31 +2082,48 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			else /* is Creature or GameObject*/
 			{
 				/* ----------------------------- PET XP HANDLING -------------- */
-				if( IsPet() && !pVictim->IsPet() )
+				if( owner_participe && IsPet() && !pVictim->IsPet() )
 				{
 					Player* petOwner = static_cast< Pet* >( this )->GetPetOwner();
-					if( petOwner && petOwner->GetTypeId() == TYPEID_PLAYER )
+					if( petOwner != NULL && petOwner->GetTypeId() == TYPEID_PLAYER )
 					{
 						if( petOwner->InGroup() )
 						{
 							//Calc Group XP
 							static_cast< Unit* >( this )->GiveGroupXP( pVictim, petOwner );
+							//TODO: pet xp if player in group
 						}
 						else
 						{
 							uint32 xp = CalculateXpToGive( pVictim, petOwner );
-							petOwner->GiveXP( xp, victimGuid, true );
+							if( xp > 0 )
+								petOwner->GiveXP( xp, victimGuid, true );
+							if( !static_cast< Pet* >( this )->IsSummon() )
+							{
+								xp = CalculateXpToGive( pVictim, static_cast< Pet* >( this ) );
+								static_cast< Pet* >( this )->GiveXP( xp );
+							}
 						}
 					}
-					if( pVictim->GetTypeId() != TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_UNIT )
+					if( petOwner != NULL && pVictim->GetTypeId() != TYPEID_PLAYER && 
+						pVictim->GetTypeId() == TYPEID_UNIT )
 						sQuestMgr.OnPlayerKill( petOwner, static_cast< Creature* >( pVictim ) );
 				}
 				/* ----------------------------- PET XP HANDLING END-------------- */
 
 				/* ----------------------------- PET DEATH HANDLING -------------- */
-				if(pVictim->IsPet())
+				if( pVictim->IsPet() )
 				{
+					// dying pet looses 1 happiness level
+					if( !static_cast< Pet* >( pVictim )->IsSummon() )
+					{
+						uint32 hap = static_cast< Pet* >( pVictim )->GetUInt32Value( UNIT_FIELD_POWER5 );
+						hap = hap - PET_HAPPINESS_UPDATE_VALUE > 0 ? hap - PET_HAPPINESS_UPDATE_VALUE : 0;
+						static_cast< Pet* >( pVictim )->SetUInt32Value( UNIT_FIELD_POWER5, hap );
+					}
+					
 					static_cast< Pet* >( pVictim )->DelayedRemove( false, true );
+					
 					//remove owner warlock soul link from caster
 					Player* owner = static_cast<Pet*>( pVictim )->GetPetOwner();
 					if( owner != NULL )
@@ -2148,10 +2171,12 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			}
 			
 			// Send AI Victim Reaction
-			if( this->IsPlayer() || this->GetTypeId()==TYPEID_UNIT )
-			if( pVictim->GetTypeId() != TYPEID_PLAYER )
+			if( this->IsPlayer() || this->GetTypeId() == TYPEID_UNIT )
 			{
-				static_cast< Creature* >( pVictim )->GetAIInterface()->AttackReaction( static_cast< Unit* >( this ), damage, spellId );
+				if( pVictim->GetTypeId() != TYPEID_PLAYER )
+				{
+					static_cast< Creature* >( pVictim )->GetAIInterface()->AttackReaction( static_cast< Unit* >( this ), damage, spellId );
+				}
 			}
 		}
 		
@@ -2160,7 +2185,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		{
 			
 		}*/	
-		pVictim->SetUInt32Value(UNIT_FIELD_HEALTH,health - damage);
+		pVictim->SetUInt32Value( UNIT_FIELD_HEALTH, health - damage );
 	}
 }
 
