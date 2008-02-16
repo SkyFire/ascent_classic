@@ -704,6 +704,21 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 	if( sWorld.antihack_flight )
 	{
+		//if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
+		//{
+		//	if( !_player->FlyCheat && _player->m_UnderwaterState == 0 && _player->flying_aura == 0 && !_player->m_TransporterGUID )
+		//	{
+		//		if( recv_data.GetOpcode() == MSG_MOVE_HEARTBEAT )
+		//		{
+		//			WorldPacket fly( SMSG_MOVE_SET_UNFLY, 13 );
+		//			fly << _player->GetNewGUID();
+		//			fly << uint32( 5 );
+		//			_player->SendMessageToSet( &fly, true );
+		//			_player->ResetHeartbeatCoords();
+		//		}
+		//	}
+		//}
+
 		if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
 		{
 			if( _player->m_UnderwaterState == 0 && _player->flying_aura == 0 && !_player->FlyCheat && ( !( movement_info.flags & MOVEFLAG_FLYING ) || ( movement_info.flags & MOVEFLAG_AIR_SWIMMING ) ) && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) && !_player->m_TransporterGUID && ( recv_data.GetOpcode() == CMSG_FLY_PITCH_UP_Z || recv_data.GetOpcode() == CMSG_FLY_PITCH_DOWN_AFTER_UP || recv_data.GetOpcode() == MSG_MOVE_FLY_DOWN_UNK ) )
