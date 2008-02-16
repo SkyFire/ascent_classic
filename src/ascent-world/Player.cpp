@@ -9030,7 +9030,7 @@ void Player::EventStunOrImmobilize( Unit* proc_target, bool is_victim )
 		if( t_trigger_on_stun_chance < 100 && !Rand( t_trigger_on_stun_chance ) )
 			return;
 
-		SpellEntry* spellInfo = dbcSpell.LookupEntry( t_trigger_on_stun );
+		SpellEntry* spellInfo = dbcSpell.LookupEntryForced( t_trigger_on_stun );
 
 		if( spellInfo == NULL )
 			return;
