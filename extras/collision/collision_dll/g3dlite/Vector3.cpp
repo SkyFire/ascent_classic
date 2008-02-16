@@ -435,9 +435,4 @@ Vector4 Vector3::xzzz() const  { return Vector4       (x, z, z, z); }
 Vector4 Vector3::yzzz() const  { return Vector4       (y, z, z, z); }
 Vector4 Vector3::zzzz() const  { return Vector4       (z, z, z, z); }
 
-
-
-
-
-
 } // namespace

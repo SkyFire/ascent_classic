@@ -45,6 +45,12 @@ Additionally a table to match map ids and map names is used.
 #define MAP_TILE_IDENT(x,y) ((x<<8) + y)
 //===========================================================
 
+// tile defined sizes
+#define VMAP_REP_FULL 34133.33333312 //64.0*533.33333333
+#define VMAP_REP_HALF 17066.66666656 //64.0*533.33333333 * 0.5
+
+//===========================================================
+
 namespace VMAP
 {
     //===========================================================
@@ -135,6 +141,8 @@ namespace VMAP
         public:
             // public for debug
             Vector3 convertPositionToInternalRep(float x, float y, float z) const;
+			void convertPositionToInternalRep(Vector3* target, float x, float y, float z) const;
+
             Vector3 convertPositionToMangosRep(float x, float y, float z) const;
 			Vector3 convertPositionToInternalRep(LocationVector & vec) const;
 			Vector3 convertPositionToInternalRepMod(LocationVector & vec) const;
