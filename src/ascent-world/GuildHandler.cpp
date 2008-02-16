@@ -737,9 +737,10 @@ void WorldSession::HandleCharterQuery(WorldPacket & recv_data)
 	data << charter_id;
 	data << (uint64)c->LeaderGuid;
 	data << c->GuildName << uint8(0);
-	if(c->CharterType == CHARTER_TYPE_GUILD)
+	if( c->CharterType == CHARTER_TYPE_GUILD )
 	{
-		data << uint32(9) << uint32(9);
+		data << uint32( 9 );
+		data << uint32( 9 );
 	}
 	else
 	{
@@ -750,7 +751,8 @@ void WorldSession::HandleCharterQuery(WorldPacket & recv_data)
 			v=4;
 
 		data << v << v;*/
-		data << uint32(c->Slots) << uint32(c->Slots);
+		data << uint32( c->Slots );
+		data << uint32( c->Slots );
 	}
 
 	data << uint32(0);                                      // 4
@@ -762,24 +764,24 @@ void WorldSession::HandleCharterQuery(WorldPacket & recv_data)
     
 	if( c->CharterType == CHARTER_TYPE_GUILD )
 	{
-		data << uint32(70);									// 10
+		data << uint32( 70 );								// 10
 	}
 	else
 	{
-		data << uint32(1);									// 10
+		data << uint32( 1 );								// 10
 	}
 
     data << uint32(0);                                      // 11
     data << uint32(0);                                      // 13 count of next strings?
     data << uint32(0);                                      // 14
 
-	if (c->CharterType == CHARTER_TYPE_GUILD)
+	if( c->CharterType == CHARTER_TYPE_GUILD )
 	{
-		data << uint32(0);
+		data << uint32( 0 );
 	}
 	else
 	{
-		data << uint32(1);
+		data << uint32( 1 );
 	}
 
 	SendPacket(&data);
