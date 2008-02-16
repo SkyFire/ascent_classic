@@ -9400,7 +9400,7 @@ void Player::RemoveSpellTargets(uint32 Type)
 {
 	if( m_spellIndexTypeTargets[Type] != 0 )
 	{
-		Unit* pUnit = m_mapMgr ? m_mapMgr->GetUnit(m_spellIndexTypeTargets[Type]) : NULL;
+		Unit* pUnit = m_mapMgr ? m_mapMgr->GetUnit( m_spellIndexTypeTargets[Type] ) : NULL;
 		if( pUnit != NULL )
             pUnit->RemoveAurasByBuffIndexType( Type, GetGUID() );
 

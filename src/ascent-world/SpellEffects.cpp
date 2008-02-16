@@ -1288,7 +1288,8 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 
 		pAura->pSpellId = pSpellId; //this is required for triggered spells
 		
-		unitTarget->tmpAura[m_spellInfo->Id] = pAura;		
+		//unitTarget->tmpAura[m_spellInfo->Id] = pAura;
+		unitTarget->tmpAura.insert( make_pair( m_spellInfo->Id, pAura ) );
 	}
 	else
 	{
@@ -2522,8 +2523,9 @@ void Spell::SpellEffectApplyAA(uint32 i) // Apply Area Aura
 	if( itr == unitTarget->tmpAura.end() )
 	{
 		pAura = new Aura( m_spellInfo, GetDuration(), m_caster, unitTarget );
-		
-		unitTarget->tmpAura[m_spellInfo->Id] = pAura;
+
+		//unitTarget->tmpAura[m_spellInfo->Id] = pAura;
+		unitTarget->tmpAura.insert( make_pair( m_spellInfo->Id, pAura ) );
 	
 		float r = GetRadius( i );
 
