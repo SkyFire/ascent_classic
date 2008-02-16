@@ -3182,63 +3182,73 @@ void Spell::SpellEffectTameCreature(uint32 i)
 
 void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 {
-	if(m_spellInfo->Id == 883)
-	{
-		// "Call Pet" spell
-		if(!p_caster)
-			return;
-
-		if(p_caster->GetSummon() != 0)
-		{
-			p_caster->GetSession()->SendNotification("You already have a pet summoned.");
-			return;
-		}
-
-		uint32 petno = p_caster->GetUnstabledPetNumber();
-
-		if(petno)
-		{
-			p_caster->SpawnPet(petno);
-		}
-		else
-		{
-			WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 50);
-			data << uint32(0) << "You do not have any pets to call." << uint8(0);
-			p_caster->GetSession()->SendPacket(&data);
-		}
+	uint32 entry = m_spellInfo->EffectMiscValue[i];
+	CreatureInfo *ci = CreatureNameStorage.LookupEntry(entry);
+	CreatureProto *cp = CreatureProtoStorage.LookupEntry(entry);
+	if (ci == NULL || cp == NULL)
 		return;
-	}
-	
-	//uint32 entryId = m_spellInfo->EffectMiscValue[i];
 
-	//VoidWalker:torment, sacrifice, suffering, consume shadows
-	//Succubus:lash of pain, soothing kiss, seduce , lesser invisibility
-	//felhunter:	 Devour Magic,Paranoia,Spell Lock,	Tainted Blood
+	switch(m_spellInfo->Id)
+ 	{
+		case 883:// "Call Pet"
+		{		
+			if(!p_caster)
+				return; 
+			if(p_caster->GetSummon() != 0)
+			{
+				p_caster->GetSession()->SendNotification("You already have a pet summoned.");
+				return;
+			}
+			uint32 petno = p_caster->GetUnstabledPetNumber();
+			if(petno)
+				p_caster->SpawnPet(petno);
+			else
+			{
+				WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 50);
+				data << uint32(0) << "You do not have any pets to call." << uint8(0);
+				p_caster->GetSession()->SendPacket(&data);
+			}
+		}break;
+		case 688:// "Summon Imp"
+		case 697:// "Summon Voidwalker"
+		case 712:// "Summon Succubus"
+		case 691:// "Summon Felhunter"
+		case 30146:// "Summon Felguard"
+ 		{
+			//VoidWalker:torment, sacrifice, suffering, consume shadows
+			//Succubus:lash of pain, soothing kiss, seduce , lesser invisibility
+			//felhunter:	 Devour Magic,Paranoia,Spell Lock,	Tainted Blood
+			if(!p_caster || !u_caster)
+				return;
+			// remove old pet
+			Pet *old = static_cast<Player*>(m_caster)->GetSummon();
+			if(old)
+				old->Dismiss(false);
  
-	if(!p_caster || p_caster->getClass() != WARLOCK)
-		return;
-	
-	// remove old pet
-	Pet *old = static_cast< Player* >(m_caster)->GetSummon();
-	if(old)
-		old->Dismiss(false);		
-	
-	CreatureInfo *ci = CreatureNameStorage.LookupEntry(m_spellInfo->EffectMiscValue[i]);
-	if(ci)
-	{
-		//if demonic sacrifice auras are still active, remove them
-		//uint32 spids[] = { 18789, 18790, 18791, 18792, 35701, 0 };
-		//p_caster->RemoveAuras(spids);
-		p_caster->RemoveAura(18789);
-		p_caster->RemoveAura(18790);
-		p_caster->RemoveAura(18791);
-		p_caster->RemoveAura(18792);
-		p_caster->RemoveAura(35701);
+			p_caster->RemoveAura(18789);
+			p_caster->RemoveAura(18790);
+			p_caster->RemoveAura(18791);
+			p_caster->RemoveAura(18792);
+			p_caster->RemoveAura(35701);
+			
+			Pet *summon = objmgr.CreatePet();
+			summon->SetInstanceID(m_caster->GetInstanceID());
+			summon->CreateAsSummon(m_spellInfo->EffectMiscValue[i], ci, NULL, u_caster, m_spellInfo, 1, 0);
+		}break;
+		default:
+ 		{
+			if (!u_caster)
+				return;
 
-		Pet *summon = objmgr.CreatePet();
-		summon->SetInstanceID(m_caster->GetInstanceID());
-		summon->CreateAsSummon(m_spellInfo->EffectMiscValue[i], ci, NULL, u_caster, m_spellInfo, 1, 0);
-	}
+			if(u_caster->summonPet)
+			{
+				u_caster->summonPet->RemoveFromWorld(false,true);
+				delete u_caster->summonPet;
+				u_caster->summonPet = NULL;
+			}			
+			u_caster->create_guardian(entry, -1, (float(-(M_PI/2))));
+		}break;
+ 	}
 }
 
 void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
@@ -4105,9 +4115,39 @@ void Spell::SpellEffectActivateObject(uint32 i) // Activate Object
 
 void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 {
-	if(!p_caster) return;
+	if(!p_caster) 
+		return;
 
-	uint32 slot = m_spellInfo->Effect[i] - SPELL_EFFECT_SUMMON_TOTEM_SLOT1;
+	float x = p_caster->GetPositionX();
+	float y = p_caster->GetPositionY();
+	uint32 slot = 0;
+
+    switch(m_spellInfo->Effect[i])
+    {
+        case SPELL_EFFECT_SUMMON_TOTEM_SLOT1: 
+		case SPELL_EFFECT_SUMMON_GUARDIAN:// jewelery statue case, like totem without slot 
+            x -= 1.5f;
+            y -= 1.5f;
+        break;
+        case SPELL_EFFECT_SUMMON_TOTEM_SLOT2: 
+            slot = 1; 
+            x -= 1.5f;
+            y += 1.5f;
+        break;
+        case SPELL_EFFECT_SUMMON_TOTEM_SLOT3: 
+            slot = 2; 
+            x += 1.5f;
+            y -= 1.5f;
+        break;
+        case SPELL_EFFECT_SUMMON_TOTEM_SLOT4: 
+            slot = 3; 
+            x += 1.5f;
+            y += 1.5f;
+        break;
+        default:
+        break;
+    }
+
 	if(p_caster->m_TotemSlots[slot] != 0)
 		p_caster->m_TotemSlots[slot]->TotemExpire();
 
@@ -4134,21 +4174,20 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	pTotem->SetTotemOwner(p_caster);
 	pTotem->SetTotemSlot(slot);
 
-	switch (slot)
+
+    switch(p_caster->GetMapId())
 	{
-	case 0:
-		pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX()+1.5f, p_caster->GetPositionY()+1.5f, p_caster->GetPositionZ(), p_caster->GetOrientation());
-		break;
-	case 1:
-		pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX()+1.5f, p_caster->GetPositionY()-1.5f, p_caster->GetPositionZ(), p_caster->GetOrientation());
-		break;
-	case 2:
-		pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX()-1.5f, p_caster->GetPositionY()-1.5f, p_caster->GetPositionZ(), p_caster->GetOrientation());
-		break;
-	case 3:
-		pTotem->Create(ci->Name, p_caster->GetMapId(), p_caster->GetPositionX()-1.5f, p_caster->GetPositionY()+1.5f, p_caster->GetPositionZ(), p_caster->GetOrientation());
-		break;
-	}
+		case 0:
+		case 1:
+		case 530:
+		{
+    		pTotem->Create(ci->Name, p_caster->GetMapId(), x, y, p_caster->GetMapMgr()->GetLandHeight(x, y), p_caster->GetOrientation());
+		}break;
+		default:
+		{
+    		pTotem->Create(ci->Name, p_caster->GetMapId(), x, y, p_caster->GetPositionZ(), p_caster->GetOrientation());
+		}break;
+    }
 
 	uint32 displayID = 0;
 
