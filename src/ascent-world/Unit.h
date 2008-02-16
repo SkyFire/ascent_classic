@@ -982,7 +982,7 @@ public:
 
 	ASCENT_INLINE void setcanperry(bool newstatus){can_parry=newstatus;}
 		
-	std::map<uint32,Aura*> tmpAura;
+	std::map< uint32, Aura* > tmpAura;
 
 	uint32 BaseResistance[7]; //there are resistances for silence, fear, mechanics ....
 	uint32 BaseStats[5];

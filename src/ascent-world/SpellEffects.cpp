@@ -1232,13 +1232,14 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 
 void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 {
-	if(!unitTarget)
+	if( unitTarget == NULL )
 		return;
+
 	// can't apply stuns/fear/polymorph/root etc on boss
-	if (!unitTarget->IsPlayer())
+	if( !unitTarget->IsPlayer() )
 	{
 		Creature* c = static_cast< Creature* >( unitTarget );
-		if( c != NULL && c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS )
+		if( c != NULL && c->GetCreatureName() && c->GetCreatureName()->Rank == ELITE_WORLDBOSS )
 		{
 			switch( m_spellInfo->EffectApplyAuraName[i] )
 			{
@@ -1251,38 +1252,39 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 			case 27: // silence
 			case 31: // increase speed
 			case 33: // decrease speed
-				SendCastResult(SPELL_FAILED_IMMUNE);
+				SendCastResult( SPELL_FAILED_IMMUNE );
 				return;
 			}
 		}
 	}
-	
+
 	// avoid map corruption.
-	if(unitTarget->GetInstanceID()!=m_caster->GetInstanceID())
+	if( unitTarget->GetInstanceID() != m_caster->GetInstanceID() )
 		return;
 
 	//check if we already have stronger aura
-	Aura *pAura;
+	Aura* pAura;
 
-	std::map<uint32,Aura*>::iterator itr=unitTarget->tmpAura.find(m_spellInfo->Id);
+	std::map< uint32, Aura* >::iterator itr=unitTarget->tmpAura.find( m_spellInfo->Id );
 	//if we do not make a check to see if the aura owner is the same as the caster then we will stack the 2 auras and they will not be visible client sided
-	if(itr==unitTarget->tmpAura.end())
+	if( itr == unitTarget->tmpAura.end() )
 	{
-		uint32 Duration=this->GetDuration();
+		uint32 Duration = this->GetDuration();
 		
 		// Handle diminishing returns, if it should be resisted, it'll make duration 0 here.
-		if(!(m_spellInfo->Attributes & 64)) // Passive
-			::ApplyDiminishingReturnTimer(&Duration, unitTarget, m_spellInfo);
+		if( !( m_spellInfo->Attributes & 64 ) ) // Passive
+			::ApplyDiminishingReturnTimer( &Duration, unitTarget, m_spellInfo );
 
-		if(!Duration)
+		if( !Duration )
 		{
 			//maybe add some resist messege to client here ?
 			return;
 		}
-		if(g_caster && g_caster->GetUInt32Value(OBJECT_FIELD_CREATED_BY) && g_caster->m_summoner)
-			pAura=new Aura(m_spellInfo, Duration, g_caster->m_summoner, unitTarget);
+
+		if( g_caster != NULL && g_caster->GetUInt32Value( OBJECT_FIELD_CREATED_BY ) && g_caster->m_summoner != NULL )
+			pAura = new Aura( m_spellInfo, Duration, g_caster->m_summoner, unitTarget);
 		else
-			pAura=new Aura(m_spellInfo, Duration, m_caster, unitTarget);
+			pAura = new Aura( m_spellInfo, Duration, m_caster, unitTarget );
 
 		pAura->pSpellId = pSpellId; //this is required for triggered spells
 		
@@ -1290,9 +1292,9 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	}
 	else
 	{
-		 pAura=itr->second;
+		 pAura = itr->second;
 	} 
-	pAura->AddMod(m_spellInfo->EffectApplyAuraName[i],damage,m_spellInfo->EffectMiscValue[i],i);
+	pAura->AddMod( m_spellInfo->EffectApplyAuraName[i], damage, m_spellInfo->EffectMiscValue[i], i );
 }
 
 void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
@@ -2507,27 +2509,36 @@ void Spell::SpellEffectApplyAA(uint32 i) // Apply Area Aura
 {
 	if( unitTarget == NULL || !unitTarget->isAlive() )
 		return;
+
 	if( u_caster != unitTarget )
 		return;
 
-	Aura*pAura;
-	std::map<uint32,Aura*>::iterator itr=unitTarget->tmpAura.find(m_spellInfo->Id);
-	if(itr==unitTarget->tmpAura.end())
-	{
-		pAura=new Aura(m_spellInfo,GetDuration(),m_caster,unitTarget);
-		
-		unitTarget->tmpAura [m_spellInfo->Id]= pAura;
-	
-		float r=GetRadius(i);
-		if(!sEventMgr.HasEvent(pAura, EVENT_AREAAURA_UPDATE))		/* only add it once */
-			sEventMgr.AddEvent(pAura, &Aura::EventUpdateAA,r*r, EVENT_AREAAURA_UPDATE, 1000, 0,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);	
+	// avoid map corruption
+	if( m_caster != NULL && unitTarget->GetInstanceID() != m_caster->GetInstanceID() )
+		return;
 
-	}else 
+	Aura* pAura;
+	std::map< uint32, Aura* >::iterator itr = unitTarget->tmpAura.find( m_spellInfo->Id );
+	if( itr == unitTarget->tmpAura.end() )
 	{
-		pAura=itr->second;	
+		pAura = new Aura( m_spellInfo, GetDuration(), m_caster, unitTarget );
+		
+		unitTarget->tmpAura[m_spellInfo->Id] = pAura;
+	
+		float r = GetRadius( i );
+
+		/* only add it once */
+		if( !sEventMgr.HasEvent( pAura, EVENT_AREAAURA_UPDATE ) )
+		{
+			sEventMgr.AddEvent( pAura, &Aura::EventUpdateAA, r * r, EVENT_AREAAURA_UPDATE, 1000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );	
+		}
+	}
+	else 
+	{
+		pAura = itr->second;	
 	}
  
-	pAura->AddMod(m_spellInfo->EffectApplyAuraName[i],damage,m_spellInfo->EffectMiscValue[i],i);
+	pAura->AddMod( m_spellInfo->EffectApplyAuraName[i], damage, m_spellInfo->EffectMiscValue[i], i );
 }
 
 void Spell::SpellEffectLearnSpell(uint32 i) // Learn Spell

@@ -2474,12 +2474,12 @@ void Spell::HandleAddAura(uint64 guid)
 	std::map< uint32, Aura* >::iterator itr = Target->tmpAura.find( m_spellInfo->Id );
 	if( itr != Target->tmpAura.end() )
 	{
-		if( itr->second )
+		if( itr->second != NULL )
 		{
 			if( itr->second->GetSpellProto()->procCharges > 0 )
 			{
 				Aura* aur = NULL;
-				for( int i = 0;i < itr->second->GetSpellProto()->procCharges-1; i++ )
+				for( int i = 0;i < itr->second->GetSpellProto()->procCharges - 1; i++ )
 				{
 					aur = new Aura( itr->second->GetSpellProto(), itr->second->GetDuration(), itr->second->GetCaster(), itr->second->GetTarget() );
 					Target->AddAura( aur );

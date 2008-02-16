@@ -3360,6 +3360,9 @@ void Unit::smsg_AttackStart(Unit* pVictim)
 
 void Unit::AddAura(Aura *aur)
 {
+	if( aur == NULL )
+		return;
+
 	if( m_mapId != 530 )
 	{
 		for( uint32 i = 0; i < 3; ++i )
