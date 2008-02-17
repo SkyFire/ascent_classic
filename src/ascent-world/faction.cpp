@@ -53,10 +53,9 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 	// We check this after the normal isHostile test, that way if we're
 	// on the opposite team we'll already know :p
 
-	if(hostile && 
-		( objA->IsPlayer() || objA->IsPet() || ( objA->IsUnit() && !objA->IsPlayer() && static_cast<Creature *>(objA)->IsTotem() && static_cast<Creature *>(objA)->GetTotemOwner()->IsPvPFlagged() ) ) )
+	if( hostile && ( objA->IsPlayer() || objA->IsPet() || ( objA->IsUnit() && !objA->IsPlayer() && static_cast< Creature* >( objA )->IsTotem() && static_cast< Creature* >( objA )->GetTotemOwner()->IsPvPFlagged() ) ) )
 	{
-		if(objB->IsPlayer())
+		if( objB->IsPlayer() )
 		{
 			// Check PvP Flags.
 			if( static_cast< Player* >( objB )->IsPvPFlagged() )
@@ -64,10 +63,10 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 			else
 				return false;
 		}
-		if(objB->IsPet())
+		if( objB->IsPet() )
 		{
 			// Check PvP Flags.
-			if(static_cast<Pet*>(objB)->GetPetOwner() && static_cast<Pet*>(objB)->GetPetOwner()->IsPvPFlagged() && static_cast<Pet*>(objB)->GetPetOwner()->GetMapMgr() == objB->GetMapMgr())
+			if( static_cast< Pet* >( objB )->GetPetOwner() != NULL && static_cast< Pet* >( objB )->GetPetOwner()->GetMapMgr() == objB->GetMapMgr() && static_cast< Pet* >( objB )->GetPetOwner()->IsPvPFlagged() )
 				return true;
 			else
 				return false;
