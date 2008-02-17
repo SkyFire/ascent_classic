@@ -4177,7 +4177,7 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 		case 1:
 		case 530:
 		{
-    		pTotem->Create(ci->Name, p_caster->GetMapId(), x, y, p_caster->GetMapMgr()->GetLandHeight(x, y), p_caster->GetOrientation());
+    		pTotem->Create(ci->Name, p_caster->GetMapId(), x, y, p_caster->GetPositionZ(), p_caster->GetOrientation());
 		}break;
 		default:
 		{
