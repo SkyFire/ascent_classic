@@ -4543,55 +4543,53 @@ void Player::UpdateStats()
 	uint32 lev = getLevel();
 
 	// Attack power
+	// Attack power
 	uint32 cl = getClass();   
 	switch (cl)
 	{
-		case DRUID:
-			AP = str * 2 - 20;
-		
-			if( GetShapeShift() == FORM_CAT )
-				AP += agi + lev * 2;
+	case DRUID:
+		AP = str * 2 - 20;
+		if( GetShapeShift() == FORM_CAT )
+			AP += agi + lev * 2;
+		if( GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR )
+			AP += lev * 3;
+		break;
 
-			if( GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR )
-				AP += lev * 3;
+	case ROGUE:
+		//AP = lev * 2 + str + agi - 20;
+		//RAP = lev + agi * 2 - 20;
+		//AP = str + agi - 20;
+		AP = lev * 2 + str + agi - 20;
+		RAP = lev + agi - 10;
+		break;
 
-			break;
-		
-		case ROGUE:
-			//AP = lev * 2 + str + agi - 20;
-			//RAP = lev + agi * 2 - 20;
-			//AP = str + agi - 20;
-			AP = lev * 2 + str + agi - 20;
-			RAP = lev + agi - 10;
-			break;
-		
-		case HUNTER:
-			//AP = lev* 2 + str + agi - 20;
-			//RAP = (lev + agi)*2 - 20;
-			AP = str + agi - 20;
-			RAP = lev * 2 + agi - 10;
-			break;
+	case HUNTER:
+		//AP = lev* 2 + str + agi - 20;
+		//RAP = (lev + agi)*2 - 20;
+		AP = str + agi - 20;
+		RAP = lev * 2 + agi - 10;
+		break;
 
-		case SHAMAN:
-			AP = (lev+str)*2 - 20;
-			break;
-	
-		case PALADIN:
-			//AP = lev * 3 + str * 2 - 20;
-			//AP = str * 2 - 20;
-			AP = lev * 3 + str * 2 - 20;
-			break;
+	case SHAMAN:
+		AP = (lev+str)*2 - 20;
+		break;
 
-		case WARRIOR:
-			//AP = lev * 3 + str * 2 - 20;
-			//RAP = (lev+agi)*2 - 20;
-			//AP = str * 2 - 20;
-			AP = lev * 3 + str * 2 - 20;
-			RAP = lev + agi - 20;
-			break;
+	case PALADIN:
+		//AP = lev * 3 + str * 2 - 20;
+		//AP = str * 2 - 20;
+		AP = lev * 3 + str * 2 - 20;
+		break;
 
-		default://mage,priest,warlock
-			AP = str - 10;
+	case WARRIOR:
+		//AP = lev * 3 + str * 2 - 20;
+		//RAP = (lev+agi)*2 - 20;
+		//AP = str * 2 - 20;
+		AP = lev * 3 + str * 2 - 20;
+		RAP = lev + agi - 20;
+		break;
+
+	default://mage,priest,warlock
+		AP = str - 10;
 	}
 
 	/* modifiers */
