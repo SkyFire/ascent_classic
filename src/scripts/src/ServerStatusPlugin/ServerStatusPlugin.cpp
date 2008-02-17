@@ -3,22 +3,6 @@
 
 #include "CoreMemoryAllocator.cpp"
 
-#ifdef WIN32
-#pragma pack(push,8)
-#include "PerfCounters.h"
-#pragma pack(pop)
-#include <Psapi.h>
-
-#define SYSTEM_OBJECT_INDEX					2		// 'System' object
-#define PROCESS_OBJECT_INDEX				230		// 'Process' object
-#define PROCESSOR_OBJECT_INDEX				238		// 'Processor' object
-#define TOTAL_PROCESSOR_TIME_COUNTER_INDEX	240		// '% Total processor time' counter (valid in WinNT under 'System' object)
-#define PROCESSOR_TIME_COUNTER_INDEX		6		// '% processor time' counter (for Win2K/XP)
-
-#pragma comment(lib, "advapi32")
-#pragma comment(lib, "Psapi")
-#endif
-
 extern "C" SCRIPT_DECL uint32 _exp_get_version()
 {
     return MAKE_SCRIPT_VERSION(SCRIPTLIB_VERSION_MAJOR, SCRIPTLIB_VERSION_MINOR);
@@ -30,69 +14,165 @@ extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
 }
 
 #ifdef WIN32
-bool m_bFirstTime = true;
-LONGLONG		m_lnOldValue = 0;
-LARGE_INTEGER	m_OldPerfTime100nSec;
-uint32 number_of_cpus;
-//time_t UNIXTIME; // some crappy fix for crappy error.
+	#pragma pack(push,8)
+	#include "PerfCounters.h"
+	#pragma pack(pop)
+	#include <Psapi.h>
+
+	#define SYSTEM_OBJECT_INDEX					2		// 'System' object
+	#define PROCESS_OBJECT_INDEX				230		// 'Process' object
+	#define PROCESSOR_OBJECT_INDEX				238		// 'Processor' object
+	#define TOTAL_PROCESSOR_TIME_COUNTER_INDEX	240		// '% Total processor time' counter (valid in WinNT under 'System' object)
+	#define PROCESSOR_TIME_COUNTER_INDEX		6		// '% processor time' counter (for Win2K/XP)
+
+	#pragma comment(lib, "advapi32")
+	#pragma comment(lib, "Psapi")
 #endif
 
+#define LOAD_THREAD_SLEEP					180
+
 #ifdef WIN32
-/* This is needed because windows is a piece of shit. ;) */
-BOOL APIENTRY DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
-{
-    return TRUE;
-}
+	bool m_bFirstTime = true;
+	LONGLONG m_lnOldValue = 0;
+	LARGE_INTEGER m_OldPerfTime100nSec;
+	uint32 number_of_cpus;
+#endif
+
+// This is needed because windows is a piece of shit
+#ifdef WIN32
+	BOOL APIENTRY DllMain( HANDLE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved )
+	{
+		return TRUE;
+	}
 #endif
 
 char Filename[MAX_PATH];
+
+// Actual StatDumper Class
 class StatDumper
 {
 public:
     void DumpStats();
 };
 
+// Instance of StatDumper
 StatDumper dumper;
+
+// Thread Wrapper for StatDumper
+struct StatDumperThread : public ThreadBase
+{
+#ifdef WIN32
+	HANDLE hEvent;
+#else
+	pthread_cond_t cond;
+	pthread_mutex_t mutex;
+#endif
+	bool running;
+public:
+	StatDumperThread();
+	~StatDumperThread();
+	void OnShutdown();
+	bool run();
+};
+
+void StatDumperThread::OnShutdown()
+{
+	running = false;
+#ifdef WIN32
+	SetEvent( hEvent );
+#else
+	pthread_cond_signal( &cond );
+#endif
+}
+
+StatDumperThread::StatDumperThread()
+{
+}
+
+StatDumperThread::~StatDumperThread()
+{
+#ifdef WIN32
+	CloseHandle(hEvent);
+#else
+	pthread_cond_destroy(&cond);
+	pthread_mutex_destroy(&mutex);
+#endif
+}
+
+bool StatDumperThread::run()
+{
+	int delay_ms = Config.MainConfig.GetIntDefault( "StatDumper", "Interval", 120000 );
+
+	if( delay_ms < 1000 )
+		delay_ms = 1000;
+
+	int delay_s = delay_ms / 1000;
+
+	if( !Config.MainConfig.GetString( "StatDumper", Filename, "Filename", "stats.xml", MAX_PATH ) )
+		strcpy( Filename, "stats.xml" );
+
+#ifdef WIN32
+	memset( &m_OldPerfTime100nSec, 0, sizeof( m_OldPerfTime100nSec ) );
+	SYSTEM_INFO si;
+	GetSystemInfo( &si );
+	number_of_cpus = si.dwNumberOfProcessors;
+#endif
+
+#ifdef WIN32
+	hEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
+#else
+	struct timeval now;
+	struct timespec tv;
+	pthread_mutex_init( &mutex, NULL );
+	pthread_cond_init( &cond, NULL );
+#endif
+
+	running = true;
+	for(;;)
+	{
+
+		dumper.DumpStats();
+
+#ifdef WIN32
+		WaitForSingleObject( hEvent, delay_ms );
+#else
+		gettimeofday( &now, NULL );
+		tv.tv_sec = now.tv_sec + delay_s;
+		tv.tv_nsec = now.tv_usec * 1000;
+		pthread_mutex_lock( &mutex );
+		pthread_cond_timedwait( &cond, &mutex, &tv );
+		pthread_mutex_unlock( &mutex );
+#endif
+		if( !running )
+			break;
+	}
+
+	return true;
+}
 
 extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
 {
-    //strcpy(Filename, Config.MainConfig.GetStringDefault("StatDumper.Filename", "stats.xml").c_str());
-    //strcpy(Filename, "stats.xml");
-	if(!Config.MainConfig.GetString("StatDumper", Filename, "Filename", "stats.xml", MAX_PATH))
-		strcpy(Filename, "stats.xml");
-
-#ifdef WIN32
-memset(&m_OldPerfTime100nSec, 0, sizeof(m_OldPerfTime100nSec));
-SYSTEM_INFO si;
-GetSystemInfo(&si);
-number_of_cpus = si.dwNumberOfProcessors;
-#endif
-    dumper.DumpStats();
-
-	int t = Config.MainConfig.GetIntDefault("StatDumper", "Interval", 120000);
-	TimedEvent * te = TimedEvent::Allocate(&dumper, new CallbackP0<StatDumper>(&dumper, &StatDumper::DumpStats), 1, t, 0);
-    sWorld.event_AddEvent(te);
+	ThreadPool.ExecuteTask( new StatDumperThread() );
 }
 
 #ifdef WIN32
-/*** GRR ***/
-int __cdecl HandleCrash(PEXCEPTION_POINTERS pExceptPtrs)
-{
-    return 0;
-}
+	/*** GRR ***/
+	int __cdecl HandleCrash(PEXCEPTION_POINTERS pExceptPtrs)
+	{
+		return 0;
+	}
 #endif
 
 void SetThreadName(const char* format, ...)
 {
-
 }
 
 void GenerateUptimeString(char * Dest)
 {
     uint32 seconds = sWorld.GetUptime();
-    uint32 mins=0;
-    uint32 hours=0;
-    uint32 days=0;
+    uint32 mins = 0;
+    uint32 hours = 0;
+    uint32 days = 0;
     if(seconds >= 60)
     {
         mins = seconds / 60;
@@ -216,11 +296,13 @@ void FillOnlineTime(uint32 Time, char * Dest)
 
 void StatDumper::DumpStats()
 {
-    if (!Filename)
+    if( !Filename )
         return;
-    FILE * f = fopen(Filename, "w");
-    if (!f)
+    FILE* f = fopen( Filename, "w" );
+    if( !f )
         return;
+
+	Log.Debug( "StatDumper", "Writing %s", Filename );
 
     // Dump Header
     fprintf(f, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -231,9 +313,9 @@ void StatDumper::DumpStats()
     {
         // Dump server information.
 #ifdef WIN32
-		fprintf( f, "    <platform>Ascent %s r%u/%s-Win-%s (www.ascentemu.com)</platform>\n", BUILD_TAG, g_getRevision(), CONFIG, ARCH );		
+		fprintf(f, "    <platform>Ascent %s r%u/%s-Win-%s (www.ascentemu.com)</platform>\n", BUILD_TAG, g_getRevision(), CONFIG, ARCH);		
 #else
-		fprintf( f, "    <platform>Ascent %s r%u/%s-%s (www.ascentemu.com)</platform>\n", BUILD_TAG, g_getRevision(), PLATFORM_TEXT, ARCH );
+		fprintf(f, "    <platform>Ascent %s r%u/%s-%s %s(www.ascentemu.com)</platform>\n", BUILD_TAG, g_getRevision(), PLATFORM_TEXT, ARCH);
 #endif
 
         char uptime[80];
