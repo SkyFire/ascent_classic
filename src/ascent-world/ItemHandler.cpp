@@ -816,7 +816,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
 	data << itemProto->ZoneNameID;
 	data << itemProto->MapID;
 	data << itemProto->BagFamily;
-	data << itemProto->ToolCategory;
+	data << itemProto->TotemCategory;
 	data << itemProto->Sockets[0].SocketColor ;
 	data << itemProto->Sockets[0].Unk;
 	data << itemProto->Sockets[1].SocketColor ;

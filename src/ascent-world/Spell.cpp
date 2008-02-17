@@ -1746,6 +1746,16 @@ void Spell::SendCastResult(uint8 result)
 	case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
 		plr->SendCastResult(m_spellInfo->Id, result, m_spellInfo->RequiresSpellFocus);
 		break;
+	case SPELL_FAILED_REQUIRES_AREA:
+		plr->SendCastResult(m_spellInfo->Id, result, m_spellInfo->RequiresAreaId);
+		break;
+	case SPELL_FAILED_TOTEMS:
+		if(m_spellInfo->Totem[1])
+			plr->SendCastResult(m_spellInfo->Id, result, m_spellInfo->Totem[1]);
+		else if(m_spellInfo->Totem[0])
+			plr->SendCastResult(m_spellInfo->Id, result, m_spellInfo->Totem[0]);
+		break;
+	//case SPELL_FAILED_TOTEM_CATEGORY: seems to be fully client sided.
 	default:
 		plr->SendCastResult(m_spellInfo->Id, result, 0);
 		break;
@@ -2764,12 +2774,12 @@ uint8 Spell::CanCast(bool tolerate)
 		if( m_spellInfo->Totem[0] != 0)
 		{
 			if(!p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Totem[0]))
-				return SPELL_FAILED_ITEM_GONE;
+				return SPELL_FAILED_TOTEMS;
 		}
 		if( m_spellInfo->Totem[1] != 0)
 		{
 			if(!p_caster->GetItemInterface()->GetItemCount(m_spellInfo->Totem[1]))
-				return SPELL_FAILED_ITEM_GONE;
+				return SPELL_FAILED_TOTEMS;
 		}
 
 		// stealth check
@@ -2821,6 +2831,9 @@ uint8 Spell::CanCast(bool tolerate)
 			if( !found )
 				return SPELL_FAILED_REQUIRES_SPELL_FOCUS;
 		}
+
+		if (m_spellInfo->RequiresAreaId && m_spellInfo->RequiresAreaId != p_caster->GetMapMgr()->GetAreaID(p_caster->GetPositionX(),p_caster->GetPositionY()))
+			return SPELL_FAILED_REQUIRES_AREA;
 	}
 
 	// Targetted Item Checks

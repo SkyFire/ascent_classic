@@ -338,9 +338,8 @@ struct SpellEntry
     uint32 FL;                              //206   only one spellid:6994 has this value = 369
     uint32 FM;                              //207   only one spellid:6994 has this value = 4
     uint32 FN;                              //208   only one spellid:26869  has this flag = 1   
-    uint32 unk201_4;						//209-210 
-    uint32 unk201_5;						//210 
-    uint32 unk201_6;						//211 
+    uint32 TotemCategory[2];				//209-210 
+    uint32 RequiresAreaId;				     		//211 
 
     /// CUSTOM: these fields are used for the modifications made in the world.cpp
     uint32 DiminishStatus;                  //
@@ -1188,6 +1187,7 @@ extern SERVER_DECL DBCStorage<gtFloat> dbcMeleeCrit;
 extern SERVER_DECL DBCStorage<gtFloat> dbcMeleeCritBase;
 extern SERVER_DECL DBCStorage<gtFloat> dbcSpellCrit;
 extern SERVER_DECL DBCStorage<gtFloat> dbcSpellCritBase;
+
 
 bool LoadDBCs();
 

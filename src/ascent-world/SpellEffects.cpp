@@ -3184,9 +3184,6 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 {
 	uint32 entry = m_spellInfo->EffectMiscValue[i];
 	CreatureInfo *ci = CreatureNameStorage.LookupEntry(entry);
-	CreatureProto *cp = CreatureProtoStorage.LookupEntry(entry);
-	if (ci == NULL || cp == NULL)
-		return;
 
 	switch(m_spellInfo->Id)
  	{
@@ -3230,6 +3227,9 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 			p_caster->RemoveAura(18791);
 			p_caster->RemoveAura(18792);
 			p_caster->RemoveAura(35701);
+
+			if (ci == NULL)
+				return;
 			
 			Pet *summon = objmgr.CreatePet();
 			summon->SetInstanceID(m_caster->GetInstanceID());
