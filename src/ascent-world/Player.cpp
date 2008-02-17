@@ -1002,7 +1002,7 @@ void Player::_EventAttack( bool offhand )
 		setAttackTimer(0, offhand);
 
 		//pvp timeout reset
-		if(pVictim->IsPlayer())
+		if( pVictim->IsPlayer() )
 		{
 			if (static_cast< Player* >(pVictim)->cannibalize)
 			{
@@ -1012,23 +1012,24 @@ void Player::_EventAttack( bool offhand )
 			}
 		}
 
-		if(this->IsStealth())
+		if( this->IsStealth() )
 		{
-			SetStealth(0);
+			RemoveAura( m_stealth );
+			SetStealth( 0 );
 		}
 
-		if (!GetOnMeleeSpell())
+		if( !GetOnMeleeSpell() || offhand )
 		{
 			Strike( pVictim, ( offhand ? OFFHAND : MELEE ), NULL, 0, 0, 0, false, false );
 		} 
 		else 
 		{ 
-			SpellEntry *spellInfo = dbcSpell.LookupEntry(GetOnMeleeSpell());
-			SetOnMeleeSpell(0);
-			Spell *spell = new Spell(this,spellInfo,true,NULL);
+			SpellEntry* spellInfo = dbcSpell.LookupEntry( GetOnMeleeSpell() );
+			SetOnMeleeSpell( 0 );
+			Spell* spell = new Spell( this, spellInfo, true, NULL );
 			SpellCastTargets targets;
 			targets.m_unitTarget = GetSelection();
-			spell->prepare(&targets);
+			spell->prepare( &targets );
 		}
 	}
 }
