@@ -51,6 +51,12 @@ struct Lock
     //uint32 unk3[11];
 };
 
+struct BankSlotPrice
+{
+	uint32 Id;
+	uint32 Price;
+};
+
 struct emoteentry
 {
     uint32 Id;
@@ -332,7 +338,7 @@ struct SpellEntry
     uint32 FL;                              //206   only one spellid:6994 has this value = 369
     uint32 FM;                              //207   only one spellid:6994 has this value = 4
     uint32 FN;                              //208   only one spellid:26869  has this flag = 1   
-    uint32 unk201_4;						//209 
+    uint32 unk201_4;						//209-210 
     uint32 unk201_5;						//210 
     uint32 unk201_6;						//211 
 
@@ -856,6 +862,11 @@ struct ItemRandomSuffixEntry
 	uint32 prefixes[3];
 };
 
+struct gtFloat
+{
+	float val;
+};
+
 struct CombatRatingDBC
 {
 	float val;
@@ -1171,6 +1182,12 @@ extern SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 extern SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 extern SERVER_DECL DBCStorage<CombatRatingDBC> dbcCombatRating;
 extern SERVER_DECL DBCStorage<ChatChannelDBC> dbcChatChannels;
+extern SERVER_DECL DBCStorage<BankSlotPrice> dbcBankSlotPrices;
+extern SERVER_DECL DBCStorage<BankSlotPrice> dbcStableSlotPrices; //uses same structure as Bank
+extern SERVER_DECL DBCStorage<gtFloat> dbcMeleeCrit;
+extern SERVER_DECL DBCStorage<gtFloat> dbcMeleeCritBase;
+extern SERVER_DECL DBCStorage<gtFloat> dbcSpellCrit;
+extern SERVER_DECL DBCStorage<gtFloat> dbcSpellCritBase;
 
 bool LoadDBCs();
 

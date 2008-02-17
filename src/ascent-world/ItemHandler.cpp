@@ -1675,34 +1675,8 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPacket& recvPacket)
 	slots =(uint8) (bytes >> 16);
 
 	sLog.outDetail("PLAYER: Buy bytes bag slot, slot number = %d", slots);
-
-	// Prices Hardcoded
-	switch (slots) 
-	{
-		case 0:
-			price = 1000;
-			break;
-		case 1:
-			price = 10000;
-			break;
-		case 2:
-			price = 100000;
-			break;
-		case 3:
-			price = 250000;
-			break;
-		case 4:
-			price = 250000;
-			break;
-		case 5:
-			price = 250000;
-			break;
-		case 6:
-			price = 250000;
-			break;
-		default:
-			return;
-	}
+	BankSlotPrice* bsp = dbcBankSlotPrices.LookupEntry(slots+1);
+	price = (bsp != NULL ) ? bsp->Price : 99999999;
 
 	if ((int32)_player->GetUInt32Value(PLAYER_FIELD_COINAGE) >= price) 
 	{

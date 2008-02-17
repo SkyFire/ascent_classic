@@ -69,7 +69,8 @@ struct CastResultPacketWExtra
 {
     uint32	SpellId;
     uint8	ErrorMessage;
-    uint32	Extra;
+    uint8	MultiCast;
+	uint32	Extra;
 };
 
 struct CastResultPacket
@@ -172,7 +173,8 @@ void Player::SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra)
         CastResultPacketWExtra packet;
         packet.SpellId = SpellId;
         packet.ErrorMessage = ErrorMessage;
-        packet.Extra = Extra;
+        packet.MultiCast = 0;
+		packet.Extra = Extra;
         GetSession()->OutPacket(SMSG_CAST_RESULT, sizeof(CastResultPacketWExtra),(const char*)&packet);
     }
 }

@@ -4437,24 +4437,10 @@ void Player::UpdateChances()
 
 	//critical
 
-	/* The formula is generated as follows:
+	gtFloat* baseCrit = dbcMeleeCritBase.LookupEntry(pClass-1);
+	gtFloat* CritPerAgi = dbcMeleeCrit.LookupEntry(pLevel - 1 + (pClass-1)*100);
 
-	[agility] / [crit constant*] + [skill modifier] + [bonuses]
-
-	The crit constant is class and level dependent and for a level 70 character as follows:
-
-		* Rogue [40]
-		* Druid [25.00]
-		* Hunter [40]
-		* Mage [25.00]
-		* Paladin [25.00]
-		* Priest [25.00]
-		* Shaman [25.00]
-		* Warlock [24.69]
-		* Warrior [33] 
-	*/
-
-	tmp = baseCritChance[pClass] + GetUInt32Value( UNIT_FIELD_STAT1 ) * float( CritFromAgi[pLevel][pClass] );
+	tmp = 100*(baseCrit->val + GetUInt32Value( UNIT_FIELD_STAT1 ) * CritPerAgi->val);
 
 	//std::list<WeaponModifier>::iterator i = tocritchance.begin();
 	map< uint32, WeaponModifier >::iterator itr = tocritchance.begin();
@@ -4485,8 +4471,10 @@ void Player::UpdateChances()
 	float rcr = tmp + CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT ) + ranged_bonus;
 	SetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE, min( rcr, 95.0f ) );
 
-	spellcritperc = baseSpellCrit[pClass] +
-					GetUInt32Value( UNIT_FIELD_STAT3 ) * float( SpellCritFromInt[pLevel][pClass] ) +
+	gtFloat* SpellCritBase  = dbcSpellCritBase.LookupEntry(pClass-1);
+	gtFloat* SpellCritPerInt = dbcSpellCrit.LookupEntry(pLevel - 1 + (pClass-1)*100);
+
+	spellcritperc = 100*(SpellCritBase->val + GetUInt32Value( UNIT_FIELD_STAT3 ) * SpellCritPerInt->val) +
 					this->GetSpellCritFromSpell() +
 					this->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT );
 	UpdateChanceFields();

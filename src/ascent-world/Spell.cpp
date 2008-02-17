@@ -1741,7 +1741,15 @@ void Spell::SendCastResult(uint8 result)
 	if(!plr) return;
 
 	// for some reason, the result extra is not working for anything, including SPELL_FAILED_REQUIRES_SPELL_FOCUS
-	plr->SendCastResult(m_spellInfo->Id, result, 0);
+	switch (result)
+	{
+	case SPELL_FAILED_REQUIRES_SPELL_FOCUS:
+		plr->SendCastResult(m_spellInfo->Id, result, m_spellInfo->RequiresSpellFocus);
+		break;
+	default:
+		plr->SendCastResult(m_spellInfo->Id, result, 0);
+		break;
+	}
 }
 
 // uint16 0xFFFF

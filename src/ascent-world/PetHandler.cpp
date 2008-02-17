@@ -362,11 +362,12 @@ void WorldSession::HandleBuyStableSlot(WorldPacket &recv_data)
 {
 	if(!_player->IsInWorld() || _player->GetStableSlotCount() == 2) return;
 	uint8 scount = _player->GetStableSlotCount();
-	int32 cost = (scount == 0) ? -500 : -50000;
-	if(abs(cost) > (int32)_player->GetUInt32Value(PLAYER_FIELD_COINAGE))
+	BankSlotPrice* bsp = dbcStableSlotPrices.LookupEntry(scount+1);
+	uint32 cost = (bsp != NULL) ? bsp->Price : 99999999;
+	if(cost > (int32)_player->GetUInt32Value(PLAYER_FIELD_COINAGE))
 		return;
 
-	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, cost);
+	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -cost);
 	
 	WorldPacket data(1);
 	data.SetOpcode(SMSG_STABLE_RESULT);

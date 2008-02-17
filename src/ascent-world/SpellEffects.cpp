@@ -4120,27 +4120,23 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 
 	float x = p_caster->GetPositionX();
 	float y = p_caster->GetPositionY();
-	uint32 slot = 0;
+	uint32 slot = m_spellInfo->Effect[i] - SPELL_EFFECT_SUMMON_TOTEM_SLOT1;
 
     switch(m_spellInfo->Effect[i])
     {
         case SPELL_EFFECT_SUMMON_TOTEM_SLOT1: 
-		case SPELL_EFFECT_SUMMON_GUARDIAN:// jewelery statue case, like totem without slot 
             x -= 1.5f;
             y -= 1.5f;
         break;
         case SPELL_EFFECT_SUMMON_TOTEM_SLOT2: 
-            slot = 1; 
             x -= 1.5f;
             y += 1.5f;
         break;
-        case SPELL_EFFECT_SUMMON_TOTEM_SLOT3: 
-            slot = 2; 
+        case SPELL_EFFECT_SUMMON_TOTEM_SLOT3:  
             x += 1.5f;
             y -= 1.5f;
         break;
         case SPELL_EFFECT_SUMMON_TOTEM_SLOT4: 
-            slot = 3; 
             x += 1.5f;
             y += 1.5f;
         break;
