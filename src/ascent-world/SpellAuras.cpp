@@ -4103,7 +4103,7 @@ void Aura::SpellAuraTransform(bool apply)
 		case 30167: // Red Ogre Costume
 		{
 			if( apply )
-				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, 10139 );
+				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, 11549 );
 			else
 				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value( UNIT_FIELD_NATIVEDISPLAYID ) );
 		}
@@ -4111,7 +4111,7 @@ void Aura::SpellAuraTransform(bool apply)
 		case 41301: // Time-Lost Figurine
 		{
 			if( apply )
-				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, 23423 );
+				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, 18628 );
 			else
 				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value( UNIT_FIELD_NATIVEDISPLAYID ) );
 		}
@@ -4768,7 +4768,7 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 		assert(mod->m_miscValue < 27);
 		m_target->MechanicsDispels[mod->m_miscValue]++;
 
-		if(mod->m_miscValue != 16 && mod->m_miscValue != 25 && mod->m_miscValue != 19) // dont remove bandages, Power Word and protection effect
+		if( mod->m_miscValue != 16 && mod->m_miscValue != 25 && mod->m_miscValue != 19 ) // dont remove bandages, Power Word and protection effect
 		{
 			/*
 			sLog.outString( "Removing values because we're not a bandage, PW:S or forbearance" );
@@ -4795,9 +4795,9 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 				}
 			*/
 			/* Supa's test run of Unit::RemoveAllAurasByMechanic */
-			if( m_target ) // just to be sure?
+			if( m_target != NULL ) // just to be sure?
 			{
-				m_target->RemoveAllAurasByMechanic( (uint32)mod->m_miscValue , -1 , true );
+				m_target->RemoveAllAurasByMechanic( (uint32)mod->m_miscValue , -1 , false );
 			}
 
 			if( m_spellProto->Id == 42292 )
