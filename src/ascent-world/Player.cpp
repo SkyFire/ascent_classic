@@ -3958,7 +3958,10 @@ void Player::ResurrectPlayer()
 		//_Relocate( p->GetMapMgr()->GetMapId(), p->GetPosition(), false, false );
 		SafeTeleport( p->GetMapId(), p->GetInstanceID(), p->GetPosition() );
 	}
+
 	SetMovement( MOVE_LAND_WALK, 1 );
+
+	blinked = true;
 }
 
 void Player::KillPlayer()
@@ -6204,9 +6207,9 @@ void Player::JumpToEndTaxiNode(TaxiPath * path)
 	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
 
 	SetPlayerSpeed( RUN, m_runSpeed );
-	blinked = true;
 
 	SafeTeleport(pathnode->mapid, 0, LocationVector(pathnode->x, pathnode->y, pathnode->z));
+	blinked = true;
 }
 
 void Player::RemoveSpellsFromLine(uint32 skill_line)

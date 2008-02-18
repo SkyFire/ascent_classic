@@ -1609,9 +1609,9 @@ public:
 		SetMovement(MOVE_UNROOT, 5);
 		SetPlayerSpeed( RUN, (float)7 );
 		SetPlayerSpeed( SWIM, (float)4.9 );
-		blinked = true;
 		SetMovement(MOVE_LAND_WALK, 8);
 		SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH) );
+		blinked = true;
 	}
 
 	LocationVector m_last_group_position;

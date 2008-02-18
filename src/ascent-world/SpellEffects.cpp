@@ -2015,7 +2015,8 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	data << ori;
 	m_caster->SendMessageToSet(&data, true); */
 
-	if(!p_caster) return;
+	if( p_caster == NULL )
+		return;
 
 	// remove movement impeding auras
 	p_caster->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_ANY_DAMAGE_TAKEN);
