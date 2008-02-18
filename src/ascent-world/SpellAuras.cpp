@@ -4524,7 +4524,7 @@ void Aura::SpellAuraFeignDeath(bool apply)
 							//static_cast< Player* >( (*itr) )->SetSelection(0);//loose selection
 							//static_cast< Player* >( (*itr) )->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 						}
-						if( static_cast< Player* >( *itr )->isCasting())
+						if( static_cast< Player* >( *itr )->isCasting() )
 							static_cast< Player* >( *itr )->CancelSpell( NULL ); //cancel current casting spell
 
 						static_cast< Player* >( *itr )->GetSession()->SendPacket( &data );

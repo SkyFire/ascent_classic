@@ -41,10 +41,11 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	Item *add;
 	Loot *pLoot = NULL;
 
-	if(_player->isCasting())
+	if( _player->isCasting() )
 		_player->InterruptSpell();
-	GameObject * pGO = NULL;
-	Creature * pCreature = NULL;
+
+	GameObject* pGO = NULL;
+	Creature* pCreature = NULL;
 
 	if(UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_UNIT)
 	{
@@ -208,7 +209,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 	if(!lootguid)
 		return;   // duno why this happens
 
-	if(_player->isCasting())
+	if( _player->isCasting() )
 		_player->InterruptSpell();
 
 	WorldPacket pkt;	
@@ -325,10 +326,10 @@ void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	if(_player->isCasting())
+	if( _player->isCasting() )
 		_player->InterruptSpell();
 
-	if(_player->InGroup() && !_player->m_bg)
+	if( _player->InGroup() && _player->m_bg == NULL )
 	{
 		Group * party = _player->GetGroup();
 		if(party)
