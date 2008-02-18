@@ -724,7 +724,11 @@ public:
 	void CastSpellAoF(float x,float y,float z,SpellEntry* Sp, bool triggered);
 	void EventCastSpell(Unit * Target, SpellEntry * Sp);
 
-	bool isCasting();
+	ASCENT_INLINE bool isCasting()
+	{
+		return( m_currentSpell != NULL );
+	}
+
 	bool IsInInstance();
     void CalculateResistanceReduction(Unit *pVictim,dealdamage *dmg) ;
 	void RegenerateHealth();
@@ -763,11 +767,9 @@ public:
 
 	/// Combat / Death Status
 	ASCENT_INLINE bool isAlive() { return m_deathState == ALIVE; };
-	ASCENT_INLINE bool isDead() { return  m_deathState != ALIVE; };
-	virtual void setDeathState(DeathState s) {
-		m_deathState = s;
-	};
-	DeathState getDeathState() { return m_deathState; }
+	ASCENT_INLINE bool isDead() { return m_deathState != ALIVE; };
+	virtual void setDeathState( DeathState s ) { m_deathState = s; };
+	ASCENT_INLINE DeathState getDeathState() { return m_deathState; }
 	void OnDamageTaken();
 
 	//! Add Aura to unit
@@ -781,7 +783,7 @@ public:
 	bool RemoveAuraNegByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAuras(uint32 * SpellIds);
 
-	void EventRemoveAura(uint32 SpellId)
+	ASCENT_INLINE void EventRemoveAura(uint32 SpellId)
 	{
 		RemoveAura(SpellId);
 	}
@@ -804,7 +806,7 @@ public:
 	Aura* FindAura(uint32 spellId, uint64 guid);
 	bool SetAurDuration(uint32 spellId,Unit* caster,uint32 duration);
 	bool SetAurDuration(uint32 spellId,uint32 duration);
-	   void DropAurasOnDeath();
+	void DropAurasOnDeath();
 	   
 	void castSpell(Spell * pSpell);
 	void InterruptSpell();
@@ -850,10 +852,10 @@ public:
 	ASCENT_INLINE void setAItoUse(bool value){m_useAI = value;}
 
 
-	int32 GetThreatModifyer() { return m_threatModifyer; }
-	void ModThreatModifyer(int32 mod) { m_threatModifyer += mod; }
-	int32 GetGeneratedThreatModifyer() { return m_generatedThreatModifyer; }
-	void ModGeneratedThreatModifyer(int32 mod) { m_generatedThreatModifyer += mod; }
+	ASCENT_INLINE int32 GetThreatModifyer() { return m_threatModifyer; }
+	ASCENT_INLINE void ModThreatModifyer(int32 mod) { m_threatModifyer += mod; }
+	ASCENT_INLINE int32 GetGeneratedThreatModifyer() { return m_generatedThreatModifyer; }
+	ASCENT_INLINE void ModGeneratedThreatModifyer(int32 mod) { m_generatedThreatModifyer += mod; }
 
 	// DK:Affect
 	ASCENT_INLINE uint32 IsPacified() { return m_pacified; }
@@ -945,10 +947,10 @@ public:
 	ASCENT_INLINE void setEmoteState(uint8 emote) { m_emoteState = emote; };
 	ASCENT_INLINE uint32 GetOldEmote() { return m_oldEmote; }
 	void EventSummonPetExpire();
-	void EventAurastateExpire(uint32 aurastateflag){RemoveFlag(UNIT_FIELD_AURASTATE,aurastateflag);} //hmm this looks like so not necesary :S
+	ASCENT_INLINE void EventAurastateExpire(uint32 aurastateflag){RemoveFlag(UNIT_FIELD_AURASTATE,aurastateflag);} //hmm this looks like so not necesary :S
 	void EventHealthChangeSinceLastUpdate();
 
-	void SetStandState (uint8 standstate);
+	void SetStandState(uint8 standstate);
 
 	ASCENT_INLINE StandState GetStandState()
 	{
@@ -1069,10 +1071,7 @@ public:
 	ASCENT_INLINE void DisableAI() { m_useAI = false; }
 	ASCENT_INLINE void EnableAI() { m_useAI = true; }
 
-	ASCENT_INLINE void SetPowerType(uint8 type)
-	{
-		SetByte(UNIT_FIELD_BYTES_0,3,type);
-	}
+	ASCENT_INLINE void SetPowerType(uint8 type){ SetByte( UNIT_FIELD_BYTES_0, 3, type ); }
 
 	ASCENT_INLINE bool IsSpiritHealer()
 	{
@@ -1109,10 +1108,7 @@ public:
 	uint16 m_diminishTimer[23];
 	bool   m_diminishActive;
 
-	void SetDiminishTimer(uint32 index)
-	{
-		m_diminishTimer[index] = 15000;
-	}
+	ASCENT_INLINE void SetDiminishTimer(uint32 index) { m_diminishTimer[index] = 15000; }
 
 	DynamicObject * dynObj;
 
@@ -1137,7 +1133,7 @@ public:
 	uint32 polySpell;
 	uint32 m_special_state; //flags for special states (stunned,rooted etc)
 	
-//	uint32 fearSpell;
+	//uint32 fearSpell;
 	CombatStatusHandler CombatStatus;
 	bool m_temp_summon;
 

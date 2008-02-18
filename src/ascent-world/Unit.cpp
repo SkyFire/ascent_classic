@@ -1909,16 +1909,6 @@ void Unit::HandleProcDmgShield(uint32 flag, Unit* attacker)
 	m_damgeShieldsInUse = false;
 }
 
-/*
-void Unit::HandleProcSpellOnSpell(Unit* Victim,uint32 damage,bool critical)
-{
-}
-*/
-bool Unit::isCasting()
-{
-	return (m_currentSpell != NULL);
-}
-
 bool Unit::IsInInstance()
 {
 	MapInfo *pMapinfo = WorldMapInfoStorage.LookupEntry(this->GetMapId());
@@ -5387,7 +5377,6 @@ bool Unit::IsDazed()
 	}
 
 	return false;
-
 }
 
 void Unit::UpdateVisibility()
