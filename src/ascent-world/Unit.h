@@ -763,7 +763,7 @@ public:
 
 	/// Combat / Death Status
 	ASCENT_INLINE bool isAlive() { return m_deathState == ALIVE; };
-	ASCENT_INLINE bool isDead() { return  m_deathState !=ALIVE; };
+	ASCENT_INLINE bool isDead() { return  m_deathState != ALIVE; };
 	virtual void setDeathState(DeathState s) {
 		m_deathState = s;
 	};

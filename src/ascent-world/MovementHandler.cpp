@@ -144,7 +144,7 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 		{
 			if( ( sWorld.no_antihack_on_gm && !pSession->HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
 			{
-				if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
+				if( !( movement_info.flags & MOVEFLAG_SWIMMING ) && !_player->isDead() )
 					if( movement_info.z + _player->m_noseLevel < _player->GetMapMgr()->GetWaterHeight( movement_info.x, movement_info.y ) - 0.1f )
 						sChatHandler.SystemMessage( pSession, "Water Breathing hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
 						sCheatLog.writefromsession( pSession, "Water Breathing hacker kicked" );
