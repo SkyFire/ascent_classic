@@ -64,6 +64,7 @@ Object::Object() : m_position(0,0,0,0), m_spawnLocation(0,0,0,0)
 	Active = false;
 	m_inQueue = false;
 	m_extensions = NULL;
+	m_loadedFromDB = false;
 }
 
 Object::~Object( )

@@ -3184,10 +3184,13 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 {
 	uint32 entry = m_spellInfo->EffectMiscValue[i];
 	CreatureInfo *ci = CreatureNameStorage.LookupEntry(entry);
+	CreatureProto *cp = CreatureProtoStorage.LookupEntry(entry);
+	if (ci == NULL || cp == NULL)
+		return;
 
 	switch(m_spellInfo->Id)
- 	{
-		case 883:// "Call Pet"
+	{
+	case 883:// "Call Pet"
 		{		
 			if(!p_caster)
 				return; 
@@ -3206,12 +3209,12 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 				p_caster->GetSession()->SendPacket(&data);
 			}
 		}break;
-		case 688:// "Summon Imp"
-		case 697:// "Summon Voidwalker"
-		case 712:// "Summon Succubus"
-		case 691:// "Summon Felhunter"
-		case 30146:// "Summon Felguard"
- 		{
+	case 688:// "Summon Imp"
+	case 697:// "Summon Voidwalker"
+	case 712:// "Summon Succubus"
+	case 691:// "Summon Felhunter"
+	case 30146:// "Summon Felguard"
+		{
 			//VoidWalker:torment, sacrifice, suffering, consume shadows
 			//Succubus:lash of pain, soothing kiss, seduce , lesser invisibility
 			//felhunter:	 Devour Magic,Paranoia,Spell Lock,	Tainted Blood
@@ -3221,26 +3224,22 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 			Pet *old = static_cast<Player*>(m_caster)->GetSummon();
 			if(old)
 				old->Dismiss(false);
- 
+
 			p_caster->RemoveAura(18789);
 			p_caster->RemoveAura(18790);
 			p_caster->RemoveAura(18791);
 			p_caster->RemoveAura(18792);
 			p_caster->RemoveAura(35701);
 
-			if (ci == NULL)
-				return;
-			
 			Pet *summon = objmgr.CreatePet();
 			summon->SetInstanceID(m_caster->GetInstanceID());
 			summon->CreateAsSummon(m_spellInfo->EffectMiscValue[i], ci, NULL, u_caster, m_spellInfo, 1, 0);
 		}break;
-		default:
- 		{
-			if (!u_caster)
+	default:
+		{
+			if( u_caster == NULL )
 				return;
-
-			if(u_caster->summonPet)
+			if( u_caster->summonPet )
 			{
 				u_caster->summonPet->RemoveFromWorld(false,true);
 				delete u_caster->summonPet;
@@ -3248,7 +3247,7 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 			}			
 			u_caster->create_guardian(entry, -1, (float(-(M_PI/2))));
 		}break;
- 	}
+	}
 }
 
 void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
@@ -4120,7 +4119,33 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 
 	float x = p_caster->GetPositionX();
 	float y = p_caster->GetPositionY();
-	uint32 slot = m_spellInfo->Effect[i] - SPELL_EFFECT_SUMMON_TOTEM_SLOT1;
+	uint32 slot = 0;
+
+	switch(m_spellInfo->Effect[i])
+	{
+	case SPELL_EFFECT_SUMMON_TOTEM_SLOT1: 
+	case SPELL_EFFECT_SUMMON_GUARDIAN:// jewelery statue case, like totem without slot 
+		x -= 1.5f;
+		y -= 1.5f;
+		break;
+	case SPELL_EFFECT_SUMMON_TOTEM_SLOT2: 
+		slot = 1; 
+		x -= 1.5f;
+		y += 1.5f;
+		break;
+	case SPELL_EFFECT_SUMMON_TOTEM_SLOT3: 
+		slot = 2; 
+		x += 1.5f;
+		y -= 1.5f;
+		break;
+	case SPELL_EFFECT_SUMMON_TOTEM_SLOT4: 
+		slot = 3; 
+		x += 1.5f;
+		y += 1.5f;
+		break;
+	default:
+		break;
+	}
 
     switch(m_spellInfo->Effect[i])
     {
@@ -4169,7 +4194,6 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	p_caster->m_TotemSlots[slot] = pTotem;
 	pTotem->SetTotemOwner(p_caster);
 	pTotem->SetTotemSlot(slot);
-
 
     switch(p_caster->GetMapId())
 	{

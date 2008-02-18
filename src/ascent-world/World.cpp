@@ -7481,11 +7481,8 @@ void World::Update(time_t diff)
 	eventholder->Update((uint32)diff);
 	sAuctionMgr.Update();
 	_UpdateGameTime();
-
-	/* since time() is an expensive system call, we only update it once per server loop */
-	UNIXTIME = time(NULL);
+	UpdateQueuedSessions((uint32)diff);
 }
-
 
 void World::SendGlobalMessage(WorldPacket *packet, WorldSession *self)
 {

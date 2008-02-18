@@ -538,7 +538,6 @@ protected:
 	std::set<Player*> m_inRangePlayers;
 	std::set<Object*> m_oppFactsInRange;
    
-  
 	//! Remove object from map
 	void _RemoveFromMap();
 
@@ -550,13 +549,13 @@ protected:
 public:
 
 	template<typename T>
-		void SetExtension(const string& name, T ptr)
+	void SetExtension(const string& name, T ptr)
 	{
 		_SetExtension(name, ((void*)ptr));
 	}
 
 	template<typename T>
-		T GetExtension(const string& name)
+	T GetExtension(const string& name)
 	{
 		if( m_extensions == NULL )
 			return ((T)NULL);
@@ -569,6 +568,9 @@ public:
 				return ((T)itr->second);
 		}
 	}
+
+	bool m_loadedFromDB;
+
 };
 
 #endif

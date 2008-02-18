@@ -401,6 +401,9 @@ bool Master::Run(int argc, char ** argv)
 			ThreadPool.IntegrityCheck();
 		}
 
+		/* since time() is an expensive system call, we only update it once per server loop */
+		UNIXTIME = time(NULL);
+
 #ifndef CLUSTERING
 		sLogonCommHandler.UpdateSockets();
 #ifdef VOICE_CHAT
@@ -463,7 +466,6 @@ bool Master::Run(int argc, char ** argv)
 		
 		Database_Character->CheckConnections();
 		Database_World->CheckConnections();
-		sWorld.UpdateQueuedSessions( diff );
 
 		if( 50 > etime )
 		{
