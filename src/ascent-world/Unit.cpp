@@ -2561,6 +2561,10 @@ else
 		hitchance=100.0f;
 		dodge=parry=block=0.0f;
 	}
+	if (ability->Attributes & ATTRIBUTES_CANT_BE_DPB)
+	{
+		dodge=parry=block=0.0f;
+	}
 
 //--------------------------------by victim state-------------------------------------------
 	if(pVictim->IsPlayer()&&pVictim->GetStandState()) //every not standing state is >0

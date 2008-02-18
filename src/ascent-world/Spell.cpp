@@ -1678,6 +1678,12 @@ void Spell::finish()
 	//enable pvp when attacking another player with spells
 	if( p_caster != NULL )
 	{
+		if (m_spellInfo->Attributes & ATTRIBUTES_STOP_ATTACK)
+		{
+			p_caster->EventAttackStop();
+			p_caster->smsg_AttackStop( unitTarget );
+		}
+
 		if(m_requiresCP && !GetSpellFailed())
 		{
 			if(p_caster->m_spellcomboPoints)
@@ -2663,6 +2669,11 @@ uint8 Spell::CanCast(bool tolerate)
 		{
 			if( m_spellInfo->Id == 25860 ) // Reindeer Transformation
 				return SPELL_FAILED_ONLY_MOUNTED;
+		}
+		else
+		{
+			if (!(m_spellInfo->Attributes & ATTRIBUTES_MOUNT_CASTABLE))
+				return SPELL_FAILED_NOT_MOUNTED;
 		}
 
 		// check if spell is allowed while shapeshifted

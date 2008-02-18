@@ -4524,14 +4524,6 @@ void Aura::SpellAuraFeignDeath(bool apply)
 							//static_cast< Player* >( (*itr) )->SetSelection(0);//loose selection
 							//static_cast< Player* >( (*itr) )->SetUInt64Value(UNIT_FIELD_TARGET, 0);
 						}
-
-						//if player is enemy then he will exit combat
-						if( static_cast< Player* >( *itr )->GetTarget() == pTarget->GetGUID() && static_cast< Player* >( *itr )->IsAttacking() )
-						{
-							static_cast< Player* >( *itr )->smsg_AttackStop( pTarget );
-							static_cast< Player* >( *itr )->EventAttackStop();
-						}
-
 						if( static_cast< Player* >( *itr )->isCasting())
 							static_cast< Player* >( *itr )->CancelSpell( NULL ); //cancel current casting spell
 

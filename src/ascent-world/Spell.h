@@ -330,14 +330,14 @@ enum Attributes
     ATTRIBUTES_UNK2								= 0x1,
     ATTRIBUTES_UNK3								= 0x2, // related to ranged??
     ATTRIBUTE_ON_NEXT_ATTACK					= 0x4,
-    ATTRIBUTES_UNK5								= 0x8, // not used.
+    ATTRIBUTES_UNUSED0							= 0x8,
     ATTRIBUTES_UNK6								= 0x10,
-    ATTRIBUTES_UNK7								= 0x20, // Reagents
+    ATTRIBUTES_UNK7								= 0x20, // Tradeskill recipies
     ATTRIBUTES_PASSIVE							= 0x40,
     ATTRIBUTES_NO_VISUAL_AURA					= 0x80,
     ATTRIBUTES_UNK10							= 0x100,	//seems to be afflicts pet
-    ATTRIBUTES_UNK11							= 0x200, // only appears in shaman imbue weapon spells
-    ATTRIBUTES_UNK12							= 0x400,
+    ATTRIBUTES_UNK11							= 0x200, // looks like temp enchants.
+    ATTRIBUTES_UNK12							= 0x400, //completely the same as ATTRIBUTE_ON_NEXT_ATTACK for class spells. So difference somewhere in mob abilities.
     ATTRIBUTES_UNK13							= 0x800,
     ATTRIBUTES_UNUSED1							= 0x1000,
     ATTRIBUTES_UNUSED2							= 0x2000,
@@ -347,17 +347,17 @@ enum Attributes
     ATTRIBUTES_REQ_STEALTH						= 0x20000,
     ATTRIBUTES_UNK20							= 0x40000,//it's not : must be behind
     ATTRIBUTES_UNK21							= 0x80000,
-    ATTRIBUTES_MUSTFACECASTER					= 0x100000,//may be wrong
+	ATTRIBUTES_STOP_ATTACK						= 0x100000,//switch off auto attack on use. Maim,Gouge,Disengage,Polymorph etc
     ATTRIBUTES_CANT_BE_DPB				    	= 0x200000,//can't be dodged, blocked, parried
-    ATTRIBUTES_UNK24							= 0x400000,
+    ATTRIBUTES_UNK24							= 0x400000, // related to ranged
     ATTRIBUTES_UNK25							= 0x800000,
-    ATTRIBUTES_UNK26							= 0x1000000,
+    ATTRIBUTES_MOUNT_CASTABLE					= 0x1000000, //castable on mounts
     ATTRIBUTES_TRIGGER_COOLDOWN			        = 0x2000000, //also requires atributes ex = 32 ?
     ATTRIBUTES_UNK28							= 0x4000000,
     ATTRIBUTES_UNK29							= 0x8000000,
     ATTRIBUTES_REQ_OOC							= 0x10000000, //     ATTRIBUTES_REQ_OUT_OF_COMBAT
     ATTRIBUTES_UNK31							= 0x20000000,
-    ATTRIBUTES_UNK32							= 0x40000000,
+    ATTRIBUTES_UNK32							= 0x40000000, // seems like IS_DIMINISHING but some spells not there (f.e. Gouge)
     ATTRIBUTES_UNUSED9							= 0x80000000,
 };
 

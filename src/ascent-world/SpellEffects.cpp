@@ -329,30 +329,6 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					dmg += extra_dmg;
 				}
 			}break;
-		case SPELL_HASH_GOUGE:	// Gouge: turns off your combat
-			{
-				if( p_caster != NULL )
-				{
-					p_caster->EventAttackStop();
-					p_caster->smsg_AttackStop( unitTarget );
-				}break;
-			}break;
-		case SPELL_HASH_BLIND:	// Blind: turns off your attack
-			{
-				if( p_caster != NULL )
-				{
-					p_caster->EventAttackStop();
-					p_caster->smsg_AttackStop( unitTarget );
-				}break;
-			}break;
-		case SPELL_HASH_MAIM:	// Maim: turns off your attack
-			{
-				if( p_caster != NULL )
-				{
-					p_caster->EventAttackStop();
-					p_caster->smsg_AttackStop( unitTarget );
-				}break;
-			}break;
 		case SPELL_HASH_ARCANE_SHOT: //hunter - arcane shot
 			{
 				if(u_caster)
@@ -1272,7 +1248,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 		uint32 Duration = this->GetDuration();
 		
 		// Handle diminishing returns, if it should be resisted, it'll make duration 0 here.
-		if( !( m_spellInfo->Attributes & 64 ) ) // Passive
+		if( !( m_spellInfo->Attributes & ATTRIBUTES_PASSIVE ) ) // Passive
 			::ApplyDiminishingReturnTimer( &Duration, unitTarget, m_spellInfo );
 
 		if( !Duration )
