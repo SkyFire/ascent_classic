@@ -1187,6 +1187,10 @@ extern SERVER_DECL DBCStorage<gtFloat> dbcMeleeCrit;
 extern SERVER_DECL DBCStorage<gtFloat> dbcMeleeCritBase;
 extern SERVER_DECL DBCStorage<gtFloat> dbcSpellCrit;
 extern SERVER_DECL DBCStorage<gtFloat> dbcSpellCritBase;
+extern SERVER_DECL DBCStorage<gtFloat> dbcManaRegen;
+extern SERVER_DECL DBCStorage<gtFloat> dbcManaRegenBase;
+extern SERVER_DECL DBCStorage<gtFloat> dbcHPRegen;
+extern SERVER_DECL DBCStorage<gtFloat> dbcHPRegenBase;
 
 
 bool LoadDBCs();

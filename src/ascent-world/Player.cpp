@@ -4536,16 +4536,15 @@ void Player::UpdateStats()
 
 	int32 AP = 0;
 	int32 RAP = 0;
-	int32 hpdelta = 128;
-	int32 manadelta = 128;
+	int32 hpdelta = 0;
+	int32 manadelta = 0;
 
 	uint32 str = GetUInt32Value(UNIT_FIELD_STAT0);
 	uint32 agi = GetUInt32Value(UNIT_FIELD_STAT1);
 	uint32 lev = getLevel();
+	uint32 cl = getClass();
 
 	// Attack power
-	// Attack power
-	uint32 cl = getClass();   
 	switch (cl)
 	{
 	case DRUID:
@@ -4555,40 +4554,24 @@ void Player::UpdateStats()
 		if( GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR )
 			AP += lev * 3;
 		break;
-
 	case ROGUE:
-		//AP = lev * 2 + str + agi - 20;
-		//RAP = lev + agi * 2 - 20;
-		//AP = str + agi - 20;
 		AP = lev * 2 + str + agi - 20;
 		RAP = lev + agi - 10;
 		break;
-
 	case HUNTER:
-		//AP = lev* 2 + str + agi - 20;
-		//RAP = (lev + agi)*2 - 20;
 		AP = str + agi - 20;
 		RAP = lev * 2 + agi - 10;
 		break;
-
 	case SHAMAN:
 		AP = (lev+str)*2 - 20;
 		break;
-
 	case PALADIN:
-		//AP = lev * 3 + str * 2 - 20;
-		//AP = str * 2 - 20;
 		AP = lev * 3 + str * 2 - 20;
 		break;
-
 	case WARRIOR:
-		//AP = lev * 3 + str * 2 - 20;
-		//RAP = (lev+agi)*2 - 20;
-		//AP = str * 2 - 20;
 		AP = lev * 3 + str * 2 - 20;
 		RAP = lev + agi - 20;
 		break;
-
 	default://mage,priest,warlock
 		AP = str - 10;
 	}
@@ -4602,16 +4585,15 @@ void Player::UpdateStats()
 	SetUInt32Value( UNIT_FIELD_ATTACK_POWER, AP );
 	SetUInt32Value( UNIT_FIELD_RANGED_ATTACK_POWER, RAP ); 
 
-	LevelInfo* lvlinfo = objmgr.GetLevelInfo( this->getRace(), this->getClass(), lev );
 
+// HP/Mana
+	LevelInfo* lvlinfo = objmgr.GetLevelInfo( this->getRace(), this->getClass(), lev );
 	if( lvlinfo != NULL )
 	{
 		hpdelta = lvlinfo->Stat[2] * 10;
 		manadelta = lvlinfo->Stat[3] * 15;
 	}
-
 	lvlinfo = objmgr.GetLevelInfo( this->getRace(), this->getClass(), 1 );
-
 	if( lvlinfo != NULL )
 	{
 		hpdelta -= lvlinfo->Stat[2] * 10;
@@ -4623,9 +4605,9 @@ void Player::UpdateStats()
 	int32 stat_bonus = GetUInt32Value( UNIT_FIELD_POSSTAT2 ) - GetUInt32Value( UNIT_FIELD_NEGSTAT2 );
 	if ( stat_bonus < 0 )
 		stat_bonus = 0; //avoid of having negative health
-	int32 bonus = stat_bonus * 10 + m_healthfromspell + m_healthfromitems;
+	hpdelta += stat_bonus * 10 + m_healthfromspell + m_healthfromitems;
 
-	int32 res = hp + bonus + hpdelta;
+	int32 res = hp + hpdelta;
     int32 oldmaxhp = GetUInt32Value( UNIT_FIELD_MAXHEALTH );
 
 	if( res < hp ) res = hp;
@@ -4633,12 +4615,13 @@ void Player::UpdateStats()
 	
 	if( ( int32 )GetUInt32Value( UNIT_FIELD_HEALTH ) > res )
 		SetUInt32Value( UNIT_FIELD_HEALTH, res );
-    else if( ( cl == DRUID) && ( GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR ) )
+    else /*if( ( cl == DRUID) && ( GetShapeShift() == FORM_BEAR || GetShapeShift() == FORM_DIREBEAR ) )*/  // why only in forms? it should apply to any1
     {
         res = float2int32( ( float )GetUInt32Value( UNIT_FIELD_MAXHEALTH ) * ( float )GetUInt32Value( UNIT_FIELD_HEALTH ) / float( oldmaxhp ) );
         SetUInt32Value( UNIT_FIELD_HEALTH, res );
     }
-		
+	
+//ManaRegen
 	if( cl != WARRIOR && cl != ROGUE )
 	{
 		// MP
@@ -4647,9 +4630,9 @@ void Player::UpdateStats()
 		stat_bonus = GetUInt32Value( UNIT_FIELD_POSSTAT3 ) - GetUInt32Value( UNIT_FIELD_NEGSTAT3 );
 		if ( stat_bonus < 0 )
 			stat_bonus = 0; //avoid of having negative mana
-		bonus = stat_bonus * 15 + m_manafromspell + m_manafromitems ;
+		manadelta += stat_bonus * 15 + m_manafromspell + m_manafromitems ;
 
-		res = mana + bonus + manadelta;
+		res = mana + manadelta;
 		if( res < mana )res = mana;	
 		SetUInt32Value(UNIT_FIELD_MAXPOWER1, res);
 
@@ -4657,10 +4640,11 @@ void Player::UpdateStats()
 			SetUInt32Value(UNIT_FIELD_POWER1,res);
 
 		//Manaregen
-		const static float ClassMultiplier[12] = {0.0f,0.0f,0.2f,0.2f,0.0f,0.25f,0.0f,0.2f,0.25f,0.2f,0.0f,0.225f};
-		const static float ClassFlatMod[12] = {0.0f,0.0f,15.0f,15.0f,0.0f,12.5f,0.0f,15.0f,12.5f,15.0f,0.0f,15.0f};
+
+		gtFloat* MPRegenBase = dbcManaRegenBase.LookupEntry(lev-1 + (cl-1)*100);
+		gtFloat* MPRegen =  dbcManaRegen.LookupEntry(lev-1 + (cl-1)*100);
 		uint32 Spirit = GetUInt32Value( UNIT_FIELD_STAT4 );
-		float amt = (Spirit*ClassMultiplier[cl]+ClassFlatMod[cl])*PctPowerRegenModifier[POWER_TYPE_MANA]*0.5f;
+		float amt = (Spirit*MPRegen->val+MPRegenBase->val*100)*PctPowerRegenModifier[POWER_TYPE_MANA]*0.5f;
 		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN,amt+m_ModInterrMRegen/5.0f);
 		SetFloatValue(PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT,amt*m_ModInterrMRegenPCT/100.0f+m_ModInterrMRegen/5.0f);
 	}
@@ -6261,9 +6245,6 @@ void Player::CalcStat(uint32 type)
 
 void Player::RegenerateMana( bool is_interrupted )
 {
-	//if (m_interruptRegen)
-	//	return;
-
 	uint32 cur = GetUInt32Value( UNIT_FIELD_POWER1 );
 	uint32 mm = GetUInt32Value( UNIT_FIELD_MAXPOWER1 );
 
@@ -6272,7 +6253,6 @@ void Player::RegenerateMana( bool is_interrupted )
 
 	float amt = is_interrupted ? GetFloatValue( PLAYER_FIELD_MOD_MANA_REGEN_INTERRUPT ) : GetFloatValue( PLAYER_FIELD_MOD_MANA_REGEN );
 	amt *= 2.0f; //floats are Mana Regen Per Sec. Regen Applied every 2 secs so real value =X*2 . Shady
-
 	//Apply shit from conf file
 	amt *= sWorld.getRate( RATE_POWER1 );
 
@@ -6289,35 +6269,19 @@ void Player::RegenerateMana( bool is_interrupted )
 
 void Player::RegenerateHealth( bool inCombat )
 {
-	const static float ClassMultiplier[12]={
-		0.0f,0.8f,0.25f,0.25f,0.5f,0.1f,0.0f,0.11f,0.1f,0.11f,0.0f,0.09f};
-
-	const static float ClassFlatMod[12]={
-			0.0f,6.0f,6.0f,6.0f,2.0f,4.0f,0.0f,6.0f,4.0f,6.0f,0.0f,6.5f};
-
-	float amt;
+	gtFloat* HPRegenBase = dbcHPRegenBase.LookupEntry(getLevel()-1 + (getClass()-1)*100);
+	gtFloat* HPRegen =  dbcHPRegen.LookupEntry(getLevel()-1 + (getClass()-1)*100);
+	
 	uint32 cur = GetUInt32Value(UNIT_FIELD_HEALTH);
 	uint32 mh = GetUInt32Value(UNIT_FIELD_MAXHEALTH);
 	if(cur >= mh)
 		return;
-	uint32 cl = getClass();
+	
 	uint32 Spirit = GetUInt32Value(UNIT_FIELD_STAT4);
-	if(PctRegenModifier == 0.0f)
-		amt = (Spirit*ClassMultiplier[cl]+ClassFlatMod[cl]);
-	else
-		amt = (Spirit*ClassMultiplier[cl]+ClassFlatMod[cl])*(1+PctRegenModifier);
-
-	//Apply shit from conf file
-	amt *= sWorld.getRate(RATE_HEALTH);
-	//Near values from official
-	// wowwiki: Health Regeneration is increased by 33% while sitting.
-	if(m_isResting)
-		amt = amt * 1.33f;
+	float amt = (Spirit*HPRegen->val+HPRegenBase->val*100)*(1+PctRegenModifier);
+	amt *= sWorld.getRate(RATE_HEALTH);//Apply shit from conf file
 
 	if(m_interruptRegen)
-		inCombat = true;
-
-	if(inCombat)
 		amt *= PctIgnoreRegenModifier;
 
 	if(amt != 0)

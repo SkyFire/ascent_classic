@@ -2393,14 +2393,12 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 		{
 		case MELEE:   // melee main hand weapon
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
-			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_MAIN_HAND_SKILL ) );
 			if (it && it->GetProto())
 				dmg.school_type = it->GetProto()->Damage[0].Type;
 			break;
 		case OFFHAND: // melee offhand weapon (dualwield)
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
-			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_OFF_HAND_SKILL ) );
 			hit_status |= HITSTATUS_DUALWIELD;//animation
 			if (it && it->GetProto())
@@ -2408,7 +2406,6 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 			break;
 		case RANGED:  // ranged weapon
 			it = disarmed ? NULL : pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
-			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_HIT );
 			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_RANGED_SKILL ) );
 			if (it && it->GetProto())
 				dmg.school_type = it->GetProto()->Damage[0].Type;
@@ -2416,21 +2413,21 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 		}
 
 		if(it && it->GetProto())
+		{
 			SubClassSkill = GetSkillByProto(it->GetProto()->Class,it->GetProto()->SubClass);
+			if(SubClassSkill==SKILL_FIST_WEAPONS) 
+				SubClassSkill = SKILL_UNARMED;
+		}
 		else
 			SubClassSkill = SKILL_UNARMED;
 
-		if(SubClassSkill==SKILL_FIST_WEAPONS) 
-			SubClassSkill = SKILL_UNARMED;
-
 		//chances in feral form don't depend on weapon skill
-		if(static_cast< Player* >( this )->IsInFeralForm()) 
+		if(pr->IsInFeralForm()) 
 		{
-			uint8 form = static_cast< Player* >( this )->GetShapeShift();
+			uint8 form = pr->GetShapeShift();
 			if(form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR)
 			{
 				SubClassSkill = SKILL_FERAL_COMBAT;
-				// Adjust skill for Level * 5 for Feral Combat
 				self_skill += pr->getLevel() * 5;
 			}
 		}
@@ -2499,28 +2496,7 @@ else
 		}
 	}
 	crit += (float)(pVictim->AttackerCritChanceMod[0]);
-//--------------------------------by damage type and by weapon type-------------------------
-	if( weapon_damage_type == RANGED ) 
-	{
-		dodge=0.0f;
-		parry=0.0f;
-		glanc=0.0f;
-	}
-	else
-		if(this->IsPlayer())
-		{
-			it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
-			if( it != NULL && it->GetProto()->InventoryType == INVTYPE_WEAPON && !ability )//dualwield to-hit penalty
-				hitmodifier -= 19.0f;
-			else
-			{
-				it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
-				if( it != NULL && it->GetProto()->InventoryType == INVTYPE_2HWEAPON )//2 handed weapon to-hit penalty
-  					hitmodifier -= 4.0f;
-			}
-		}
-
-	//--------------------------------by skill difference---------------------------------------
+//--------------------------------by skill difference---------------------------------------
 
 	float vsk = (float)self_skill - (float)victim_skill;
 	dodge = std::max( 0.0f, dodge - vsk * 0.04f );
@@ -2530,8 +2506,6 @@ else
 		block = std::max( 0.0f, block - vsk * 0.04f );
 
 	crit += pVictim->IsPlayer() ? vsk * 0.04f : min( vsk * 0.2f, 0.0f ); 
-	crit -= pVictim->IsPlayer() ? static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) : 0.0f;
-	if(crit<0) crit=0.0f;
 
 	if(vsk>0)
 			hitchance = std::max(hitchance,95.0f+vsk*0.02f+hitmodifier);
@@ -2554,8 +2528,51 @@ else
 			printf("!!!!spell critchance mod flat %f ,spell group %u\n",spell_flat_modifers,ability->SpellGroupType);
 #endif
 	}
+//--------------------------------by ratings------------------------------------------------
+	crit -= pVictim->IsPlayer() ? static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) : 0.0f;
+	if(crit<0) crit=0.0f;
+	if (this->IsPlayer())
+	{
+		hitmodifier += (weapon_damage_type == RANGED) ? static_cast< Player* >(this)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_HIT ) : static_cast< Player* >(this)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
+		dodge -=static_cast< Player* >(this)->CalcRating( PLAYER_RATING_MODIFIER_EXPERTISE );
+		if(dodge<0) dodge=0.0f;
+		parry -=static_cast< Player* >(this)->CalcRating( PLAYER_RATING_MODIFIER_EXPERTISE );
+		if(parry<0) parry=0.0f;
+	}
+	
 
-	//--------------------------------by victim state-------------------------------------------
+//--------------------------------by damage type and by weapon type-------------------------
+	if( weapon_damage_type == RANGED ) 
+	{
+		dodge=0.0f;
+		parry=0.0f;
+		glanc=0.0f;
+	}
+	else
+		if(this->IsPlayer())
+		{
+			it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_OFFHAND );
+			if( it != NULL && it->GetProto()->InventoryType == INVTYPE_WEAPON && !ability )//dualwield to-hit penalty
+				hitmodifier -= 19.0f;
+			else
+			{
+				it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+				if( it != NULL && it->GetProto()->InventoryType == INVTYPE_2HWEAPON )//2 handed weapon to-hit penalty
+					hitmodifier -= 4.0f;
+			}
+		}
+
+	//Hackfix for Surprise Attacks
+	if(  this->IsPlayer() && ability && static_cast< Player* >( this )->m_finishingmovesdodge && ability->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE)
+			dodge = 0.0f;
+
+	if(skip_hit_check)
+	{
+		hitchance=100.0f;
+		dodge=parry=block=0.0f;
+	}
+
+//--------------------------------by victim state-------------------------------------------
 	if(pVictim->IsPlayer()&&pVictim->GetStandState()) //every not standing state is >0
 	{
 		hitchance = 100.0f;
@@ -2565,16 +2582,6 @@ else
 		crush = 0.0f;
 		crit = 100.0f;
 	}
-
-	if(skip_hit_check)
-	{
-		hitchance=100.0f;
-		dodge=parry=block=0.0f;
-	}
-
-	if( IsPlayer() && static_cast< Player* >( this )->m_finishingmovesdodge && ability && ( ability->EffectPointsPerComboPoint[0] > 0 || ability->EffectPointsPerComboPoint[1] > 0 || ability->EffectPointsPerComboPoint[2] > 0 ) )  // SPELL: Surprise Attacks
-		dodge = 0.0f;
-
 //==========================================================================================
 //==============================One Roll Processing=========================================
 //==========================================================================================
@@ -2598,21 +2605,21 @@ else
 //--------------------------------postroll processing---------------------------------------
 	uint32 abs = 0;
 
-
 	switch(r)
 	{ 
 //--------------------------------miss------------------------------------------------------
 	case 0:
 		hit_status |= HITSTATUS_MISS;
-
 		// dirty ai agro fix
-		// make mob aggro when u miss it
-		// grep: dirty fix for this
-		if(pVictim->GetTypeId() == TYPEID_UNIT)
+		if(pVictim->GetTypeId() == TYPEID_UNIT && pVictim->GetAIInterface()->GetNextTarget() == NULL)
 			pVictim->GetAIInterface()->AttackReaction(this, 1, 0);
 		break;
 //--------------------------------dodge-----------------------------------------------------
 	case 1:
+		// dirty ai agro fix
+		if(pVictim->GetTypeId() == TYPEID_UNIT && pVictim->GetAIInterface()->GetNextTarget() == NULL)
+			pVictim->GetAIInterface()->AttackReaction(this, 1, 0);
+
 		CALL_SCRIPT_EVENT(pVictim, OnTargetDodged)(this);
 		CALL_SCRIPT_EVENT(this, OnDodged)(this);
 		targetEvent = 1;
@@ -2639,6 +2646,10 @@ else
 		break;
 //--------------------------------parry-----------------------------------------------------
 	case 2:
+		// dirty ai agro fix
+		if(pVictim->GetTypeId() == TYPEID_UNIT && pVictim->GetAIInterface()->GetNextTarget() == NULL)
+			pVictim->GetAIInterface()->AttackReaction(this, 1, 0);
+
 		CALL_SCRIPT_EVENT(pVictim, OnTargetParried)(this);
 		CALL_SCRIPT_EVENT(this, OnParried)(this);
 		targetEvent = 3;
