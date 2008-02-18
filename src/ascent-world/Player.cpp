@@ -3969,26 +3969,28 @@ void Player::KillPlayer()
 	setDeathState(JUST_DIED);
 
 	// Battleground stuff
-	if(m_bg)
-		m_bg->HookOnPlayerDeath(this);
+	if( m_bg != NULL )
+		m_bg->HookOnPlayerDeath( this );
 
 	EventDeath();
 	
-	m_session->OutPacket(SMSG_CANCEL_COMBAT);
-	m_session->OutPacket(SMSG_CANCEL_AUTO_REPEAT);
+	m_session->OutPacket( SMSG_CANCEL_COMBAT );
+	m_session->OutPacket( SMSG_CANCEL_AUTO_REPEAT );
 
-	SetMovement(MOVE_ROOT, 0);
+	SetMovement( MOVE_ROOT, 0 );
 
-	StopMirrorTimer(0);
-	StopMirrorTimer(1);
-	StopMirrorTimer(2);
+	StopMirrorTimer( 0 );
+	StopMirrorTimer(  1);
+	StopMirrorTimer( 2 );
 
-	SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED); //player death animation, also can be used with DYNAMIC_FLAGS <- huh???
+	SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED ); //player death animation, also can be used with DYNAMIC_FLAGS <- huh???
 	SetUInt32Value( UNIT_DYNAMIC_FLAGS, 0x00 );
-	if(this->getClass() == WARRIOR) //rage resets on death
-		SetUInt32Value(UNIT_FIELD_POWER2, 0);
+	if( this->getClass() == WARRIOR ) //rage resets on death
+		SetUInt32Value( UNIT_FIELD_POWER2, 0 );
 
 	sHookInterface.OnDeath(this);
+
+	blinked = true;
 }
 
 void Player::CreateCorpse()
