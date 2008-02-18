@@ -137,23 +137,8 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 {
 
 	// no water breathing is required
-	if( !sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat )
+	if( !sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || _player->isDead() || _player->GodModeCheat )
 	{
-		// Test to see if we can stop water breathing hack
-		if( sWorld.antihack_water_breathing )
-		{
-			if( ( sWorld.no_antihack_on_gm && !pSession->HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
-			{
-				if( !( movement_info.flags & MOVEFLAG_SWIMMING ) && !_player->isDead() )
-					if( movement_info.z + _player->m_noseLevel < _player->GetMapMgr()->GetWaterHeight( movement_info.x, movement_info.y ) - 0.1f )
-						sChatHandler.SystemMessage( pSession, "Water Breathing hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
-						sCheatLog.writefromsession( pSession, "Water Breathing hacker kicked" );
-						_player->m_KickDelay = 0;
-						sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
-						_player->SetMovement( MOVE_ROOT, 1 );
-			}
-		}
-
 		// player is flagged as in water
 		if( _player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING  )
 		{
@@ -200,6 +185,23 @@ void _HandleBreathing( MovementInfo &movement_info, Player* _player, WorldSessio
 		}
 
 		return;
+	}
+	else
+	{
+		// Test to see if we can stop water breathing hack
+		if( sWorld.antihack_water_breathing )
+		{
+			if( ( sWorld.no_antihack_on_gm && !pSession->HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
+			{
+				if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
+					if( movement_info.z + _player->m_noseLevel < _player->GetMapMgr()->GetWaterHeight( movement_info.x, movement_info.y ) - 0.1f )
+						sChatHandler.SystemMessage( pSession, "Water Breathing hacker detected. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
+						sCheatLog.writefromsession( pSession, "Water Breathing hacker kicked" );
+						_player->m_KickDelay = 0;
+						sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
+						_player->SetMovement( MOVE_ROOT, 1 );
+			}
+		}
 	}
 
 	//player is swiming and not flagged as in the water
