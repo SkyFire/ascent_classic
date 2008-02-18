@@ -3598,7 +3598,7 @@ exit:
 	
 	if( u_caster != NULL )
 	{
-		int32 diff = -m_spellInfo->baseLevel;
+		int32 diff = -(int32)m_spellInfo->baseLevel;
 
 		if( m_spellInfo->maxLevel && u_caster->getLevel() > m_spellInfo->maxLevel )
 			diff += m_spellInfo->maxLevel;
