@@ -348,7 +348,7 @@ enum Attributes
     ATTRIBUTES_UNK20							= 0x40000,//it's not : must be behind
     ATTRIBUTES_UNK21							= 0x80000,
     ATTRIBUTES_MUSTFACECASTER					= 0x100000,//may be wrong
-    ATTRIBUTES_UNK23							= 0x200000,
+    ATTRIBUTES_CANT_BE_DPB				    	= 0x200000,//can't be dodged, blocked, parried
     ATTRIBUTES_UNK24							= 0x400000,
     ATTRIBUTES_UNK25							= 0x800000,
     ATTRIBUTES_UNK26							= 0x1000000,
@@ -365,7 +365,7 @@ enum AttributesEx
 {
     ATTRIBUTESEX_NULL                         = 0x0,
     ATTRIBUTESEX_UNK2                         = 0x1,
-    ATTRIBUTEEX_DRAIN_WHOLE_MANA              = 0x2,
+    ATTRIBUTESEX_DRAIN_WHOLE_MANA             = 0x2,
     ATTRIBUTESEX_UNK4                         = 0x4,
     ATTRIBUTESEX_UNK5                         = 0x8,
     ATTRIBUTESEX_UNK6                         = 0x10,

@@ -3255,7 +3255,8 @@ void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
 	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
-	if( m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ && u_caster->IsPlayer() ) //Hacky fix for druid - Mangle.
+	//Hackfix for Mangle and Hemorrhage
+	if( (m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ || m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE) && u_caster->IsPlayer() )
 			static_cast< Player* >( u_caster )->AddComboPoints( unitTarget->GetGUID(), 1 );
 
 	// Hacky fix for druid spells where it would "double attack".
@@ -4119,33 +4120,7 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 
 	float x = p_caster->GetPositionX();
 	float y = p_caster->GetPositionY();
-	uint32 slot = 0;
-
-	switch(m_spellInfo->Effect[i])
-	{
-	case SPELL_EFFECT_SUMMON_TOTEM_SLOT1: 
-	case SPELL_EFFECT_SUMMON_GUARDIAN:// jewelery statue case, like totem without slot 
-		x -= 1.5f;
-		y -= 1.5f;
-		break;
-	case SPELL_EFFECT_SUMMON_TOTEM_SLOT2: 
-		slot = 1; 
-		x -= 1.5f;
-		y += 1.5f;
-		break;
-	case SPELL_EFFECT_SUMMON_TOTEM_SLOT3: 
-		slot = 2; 
-		x += 1.5f;
-		y -= 1.5f;
-		break;
-	case SPELL_EFFECT_SUMMON_TOTEM_SLOT4: 
-		slot = 3; 
-		x += 1.5f;
-		y += 1.5f;
-		break;
-	default:
-		break;
-	}
+	uint32 slot = m_spellInfo->Effect[i] - SPELL_EFFECT_SUMMON_TOTEM_SLOT1;
 
     switch(m_spellInfo->Effect[i])
     {

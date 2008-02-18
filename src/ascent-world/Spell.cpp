@@ -2290,7 +2290,7 @@ bool Spell::TakePower()
 	//UNIT_FIELD_POWER_COST_MULTIPLIER
 	if( u_caster != NULL )
 	{
-		if( m_spellInfo->AttributesEx & ATTRIBUTEEX_DRAIN_WHOLE_MANA ) // Uses %100 mana
+		if( m_spellInfo->AttributesEx & ATTRIBUTESEX_DRAIN_WHOLE_MANA ) // Uses %100 mana
 		{
 			m_caster->SetUInt32Value(powerField, 0);
 			return true;
