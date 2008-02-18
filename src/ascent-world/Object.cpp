@@ -1668,14 +1668,20 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	}
 
 	//* BATTLEGROUND DAMAGE COUNTER *//
-	if(pVictim != this)
+	if( pVictim != this )
 	{
-		if(IsPlayer())
+		if( IsPlayer() )
+		{
 			plr = static_cast< Player* >( this );
-		else if(IsPet())
+		}
+		else if( IsPet() )
+		{
 			plr = static_cast< Pet* >( this )->GetPetOwner();
+			if( plr != NULL && plr->GetMapMgr() == GetMapMgr() )
+				plr = NULL;
+		}
 
-		if(plr && plr->m_bg)
+		if( plr != NULL && plr->m_bg != NULL )
 		{
 			plr->m_bgScore.DamageDone += damage;
 			plr->m_bg->UpdatePvPData();
