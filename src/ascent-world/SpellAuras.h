@@ -344,7 +344,7 @@ public:
 
     ASCENT_INLINE SpellEntry* GetSpellProto() const { return m_spellProto; }
     ASCENT_INLINE uint32 GetSpellId() const {return m_spellProto->Id; }
-    ASCENT_INLINE bool IsPassive(){ if(!m_spellProto) return false; return (m_spellProto->Attributes & 64 && !m_areaAura);}
+    ASCENT_INLINE bool IsPassive(){ if(!m_spellProto) return false; return (m_spellProto->Attributes & ATTRIBUTES_PASSIVE && !m_areaAura);}
 
     ASCENT_INLINE int32 GetDuration() const { return m_duration; }
     void SetDuration(int32 duration) { m_duration = duration; }

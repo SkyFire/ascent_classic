@@ -316,11 +316,11 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 		dmg = damage;
 		switch(m_spellInfo->NameHash)
 		{
-		case 0xddaf1ac7: // Ice Lance
+		case SPELL_HASH_ICE_LANCE: // Ice Lance
 			if (dmg>300)   //dirty bugfix.
 				dmg = (int32)(damage >> 1);
 			break;
-		case 0x2bc0ae00:	// Incinerate -> Deals x-x extra damage if the target is affected by immolate
+		case SPELL_HASH_INCINERATE:	// Incinerate -> Deals x-x extra damage if the target is affected by immolate
 			{
 				if( unitTarget->HasAurasWithNameHash( SPELL_HASH_IMMOLATE ) )
 				{
@@ -358,11 +358,11 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 				if(u_caster)
 					dmg += float2int32(float(u_caster->GetRAP())*0.15f);
 			}break;
-		case 0xCBC738B8:	// Bloodthirst
+			case SPELL_HASH_BLOODTHIRST:	// Bloodthirst
 			{
                 dmg = u_caster->GetAP()*(m_spellInfo->EffectBasePoints[0]+1) / 100;
 			}break;
-		case 2189817683UL:	// Shield Slam - damage is increased by block value
+		case SPELL_HASH_SHIELD_SLAM:	// Shield Slam - damage is increased by block value
 			{
 				if( p_caster != NULL )
 				{
@@ -377,7 +377,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 				}
 			}break;
 
-		case 0xf79e1873:		// fire armor, is static damage
+		case SPELL_HASH_MOLTEN_ARMOR:		// molten armor, is static damage
 			static_damage=true;
 			break;
 		}

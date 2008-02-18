@@ -3550,12 +3550,12 @@ int32 Spell::CalculateEffect( uint32 i, Unit* target )
 
 	float basePointsPerLevel = m_spellInfo->EffectRealPointsPerLevel[i];
 	float randomPointsPerLevel = m_spellInfo->EffectDicePerLevel[i];
-	int32 basePoints;
+	int32 basePoints = m_spellInfo->EffectBasePoints[i] + 1;
+	int32 randomPoints = m_spellInfo->EffectDieSides[i];
 
 	//added by Zack : some talents inherit their basepoints from the previously casted spell: see mage - Master of Elements
 	if(forced_basepoints[i])
 		basePoints = forced_basepoints[i];
-	else basePoints = m_spellInfo->EffectBasePoints[i] + 1;
 
 	/* Random suffix value calculation */
 	if( i_caster != NULL && ( int32( i_caster->GetUInt32Value( ITEM_FIELD_RANDOM_PROPERTIES_ID ) ) < 0))
@@ -3589,40 +3589,25 @@ int32 Spell::CalculateEffect( uint32 i, Unit* target )
 	}
 exit:
 
-	/* Shady: it's so strange cause almost all spells has BPPL!=0 so at lvl70 Fireball takes +280 damage.
-	I think it's imbalanced so committed and replaced with dirty fix.
-	if (m_caster->IsUnit())
-		basePoints += static_cast<Unit*>(m_caster)->getLevel()*basePointsPerLevel; */
+	int32 diff = -m_spellInfo->baseLevel;
+	if (m_spellInfo->maxLevel && u_caster->getLevel()>m_spellInfo->maxLevel)
+		diff +=m_spellInfo->maxLevel;
+	else
+		diff +=u_caster->getLevel();	
+	
 	if( u_caster != NULL )
 	{
-		switch (m_spellInfo->NameHash)
-		{
-			case SPELL_HASH_GIFT_OF_THE_NAARU: //Gift of the Naaru
-			case SPELL_HASH_BLOOD_FURY: //Blood Fury
-			case SPELL_HASH_MANA_TAP: //Mana Tap
-			case SPELL_HASH_ARCANE_TORRENT: //Arcane Torrent
-				basePoints += float2int32( u_caster->getLevel() * basePointsPerLevel );
-			break;
-		}
+		randomPoints += float2int32(diff * randomPointsPerLevel);
+		basePoints += float2int32(diff * basePointsPerLevel );
 	}
-
-	int32 randomPoints = m_spellInfo->EffectDieSides[i];
-	if( u_caster != NULL )
-		randomPoints += u_caster->getLevel() * (int32)randomPointsPerLevel;
 	
 	if(randomPoints <= 1)
 		value = basePoints;
 	else
 		value = basePoints + rand() % randomPoints;
 
-    // druid passive forms
-	if( m_spellInfo->Id == 3025 || m_spellInfo->Id == 9635 || m_spellInfo->Id == 1178 || m_spellInfo->Id == 24905 )
-	{
-		if( u_caster != NULL )
-			value += float2int32( m_spellInfo->EffectRealPointsPerLevel[i] * ( u_caster->getLevel() - m_spellInfo->baseLevel ) );
-	}
 	//scripted shit
-	else if( m_spellInfo->Id == 34120)
+	if( m_spellInfo->Id == 34120)
 	{	//A steady shot that causes ${$RAP*0.3+$m1} damage. 
 		//	Actual Equation (http://www.wowwiki.com/Steady_Shot)
 		//		* The tooltip is proven to be wrong and the following is the best player worked out formula so far with data taken from [1]
