@@ -350,6 +350,10 @@
 			Name="Database"
 			>
 			<File
+				RelativePath="..\..\src\ascent-shared\Database\CreateInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ascent-shared\Database\Database.cpp"
 				>
 			</File>
@@ -371,6 +375,22 @@
 			</File>
 			<File
 				RelativePath="..\..\src\ascent-shared\Database\Field.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.h"
 				>
 			</File>
 			<Filter

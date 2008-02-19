@@ -114,7 +114,7 @@ bool startdb()
 	}
 
 	sLog.SetScreenLoggingLevel(Config.MainConfig.GetIntDefault("LogLevel", "Screen", 0));
-	sLogonSQL = new Database();
+	sLogonSQL = Database::CreateDatabaseInterface( ltype );
 
 	// Initialize it
 	if(!sLogonSQL->Initialize(lhostname.c_str(), (unsigned int)lport, lusername.c_str(),
