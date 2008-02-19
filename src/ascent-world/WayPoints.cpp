@@ -595,15 +595,16 @@ bool ChatHandler::HandleWPSkinCommand(const char* args, WorldSession *m_session)
 bool ChatHandler::HandleWPInfoCommand(const char* args, WorldSession *m_session)
 {
 	uint64 guid = m_session->GetPlayer()->GetSelection();
+
 	if( guid == 0 )
 	{
-		SystemMessage(m_session, "No selection.");
+		SystemMessage( m_session, "No selection." );
 		return true;
 	}
 
 	if( GUID_HIPART( guid ) != HIGHGUID_WAYPOINT )
 	{
-		SystemMessage(m_session, "You should select a Waypoint.");
+		SystemMessage( m_session, "You should select a Waypoint." );
 		return true;
 	}
 
@@ -612,7 +613,7 @@ bool ChatHandler::HandleWPInfoCommand(const char* args, WorldSession *m_session)
 
 	if( ai == NULL || ai->GetUnit() == NULL )
 	{
-		SystemMessage(m_session, "Invalid Creature, please select another one.");
+		SystemMessage( m_session, "Invalid Creature, please select another one." );
 		return true;
 	}
 
