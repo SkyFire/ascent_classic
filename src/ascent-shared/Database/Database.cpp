@@ -55,7 +55,7 @@ DatabaseConnection * Database::GetFreeConnection()
 	uint32 i = 0;
 	for(;;)
 	{
-		DatabaseConnection * con = &Connections[ ((i++) % mConnectionCount) ];
+		DatabaseConnection * con = Connections[ ((i++) % mConnectionCount) ];
 		if(con->Busy.AttemptAcquire())
 			return con;
 	}
@@ -229,6 +229,7 @@ bool Database::run()
 {
 	SetThreadName("Database Execute Thread");
 	SetThreadState(THREADSTATE_BUSY);
+	ThreadRunning = true;
 	char * query = queries_queue.pop();
 	DatabaseConnection * con = GetFreeConnection();
 	while(query)

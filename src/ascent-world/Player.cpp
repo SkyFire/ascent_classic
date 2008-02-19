@@ -2090,9 +2090,21 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	m_playedtime[2] += playedt;
 	
 	std::stringstream ss;
-	ss << "REPLACE INTO characters VALUES ("
+	if( CharacterDatabase.SupportsReplaceInto() )
+	{
+		ss << "REPLACE INTO characters VALUES (";
+	}
+	else
+	{
+		if( !bNewCharacter )
+		{
+			buf->AddQuery( "DELETE FROM characters WHERE guid = %u", GetGUIDLow() );
+		}
+
+		ss << "INSERT INTO characters VALUES (";
+	}
 		
-	<< GetGUIDLow() << ", "
+	ss << GetGUIDLow() << ", "
 	<< GetSession()->GetAccountId() << ","
 
 	// stat saving
@@ -4331,11 +4343,26 @@ void Player::_SaveTutorials(QueryBuffer * buf)
 {
 	if(tutorialsDirty)
 	{
-		if(buf == NULL)
-			CharacterDatabase.Execute("REPLACE INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+		if( CharacterDatabase.SupportsReplaceInto() )
+		{
+			if(buf == NULL)
+				CharacterDatabase.Execute("REPLACE INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+			else
+				buf->AddQuery("REPLACE INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+		}
 		else
-			buf->AddQuery("REPLACE INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
-
+		{
+			if( buf != NULL )
+			{
+				buf->AddQuery("DELETE FROM tutorials WHERE playerId = %u", GetGUIDLow() );
+				buf->AddQuery("INSERT INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+			}
+			else
+			{
+				CharacterDatabase.Execute("DELETE FROM tutorials WHERE playerId = %u", GetGUIDLow() );
+				CharacterDatabase.Execute("INSERT INTO tutorials VALUES('%u','%u','%u','%u','%u','%u','%u','%u','%u')", GetGUIDLow(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+			}
+		}
 		tutorialsDirty = false;
 	}
 }

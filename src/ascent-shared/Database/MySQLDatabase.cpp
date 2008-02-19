@@ -47,14 +47,17 @@ bool MySQLDatabase::Initialize(const char* Hostname, unsigned int port, const ch
 {
 	uint32 i;
 	MYSQL * temp, * temp2;
+	MySQLDatabaseConnection ** conns;
 
 	mHostname = string(Hostname);
 	mConnectionCount = ConnectionCount;
 	mUsername = string(Username);
 	mPassword = string(Password);
 
-	Log.Notice("MySQLDatabase", "Connecting to `%s`...", Hostname);
-	Connections = new MySQLDatabaseConnection[ConnectionCount];
+	Log.Notice("MySQLDatabase", "Connecting to `%s`, database `%s`...", Hostname, DatabaseName);
+	
+	conns = new MySQLDatabaseConnection*[ConnectionCount];
+	Connections = ((DatabaseConnection**)conns);
 	for( i = 0; i < ConnectionCount; ++i )
 	{
 		temp = mysql_init( NULL );
@@ -65,9 +68,11 @@ bool MySQLDatabase::Initialize(const char* Hostname, unsigned int port, const ch
 			return false;
 		}
 
-		static_cast<MySQLDatabaseConnection*>(&Connections[i])->MySql = temp2;
+		conns[i] = new MySQLDatabaseConnection;
+		conns[i]->MySql = temp2;
 	}
 
+	Database::_Initialize();
 	return true;
 }
 

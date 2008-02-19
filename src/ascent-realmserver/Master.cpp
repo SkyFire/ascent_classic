@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
 	Log.Notice("Server", "==============================================================");
 	Log.Line();
 
-	Database_Character = new Database();
-	Database_World = new Database();
+	Database_Character = Database::CreateDatabaseInterface(1);
+	Database_World = Database::CreateDatabaseInterface(1);
 	Log.Success("Database", "Interface Created.");
 
 	new ClusterMgr;

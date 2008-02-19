@@ -276,8 +276,17 @@ void Creature::SaveToDB()
 		spawnid = objmgr.GenerateCreatureSpawnID();
 	 
 	std::stringstream ss;
-	ss << "REPLACE INTO creature_spawns VALUES("
-		<< spawnid << ","
+	if( WorldDatabase.SupportsReplaceInto() )
+	{
+		ss << "REPLACE INTO creature_spawns VALUES(";
+	}
+	else
+	{
+		WorldDatabase.Execute("DELETE FROM creature_spawns WHERE id = %u", spawnid);
+		ss << "INSERT INTO creature_spawns VALUES(";
+	}
+	
+	ss << spawnid << ","
 		<< GetEntry() << ","
 		<< GetMapId() << ","
 		<< m_position.x << ","

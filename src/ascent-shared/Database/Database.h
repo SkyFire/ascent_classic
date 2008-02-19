@@ -118,6 +118,9 @@ public:
 
 	static Database * CreateDatabaseInterface(uint32 uType);
 
+	virtual bool SupportsReplaceInto() = 0;
+	virtual bool SupportsTableLocking() = 0;
+
 protected:
 
 	// spawn threads and shizzle
@@ -135,7 +138,7 @@ protected:
 
 	////////////////////////////////
 	FQueue<char*> queries_queue;
-	DatabaseConnection * Connections;
+	DatabaseConnection ** Connections;
 	
 	uint32 _counter;
 	///////////////////////////////

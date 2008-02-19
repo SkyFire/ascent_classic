@@ -219,8 +219,15 @@ void ArenaTeam::SaveToDB()
 {
 	std::stringstream ss;
 	uint32 i;
-	ss << "REPLACE INTO arenateams VALUES("
-		<< m_id << ","
+	if( CharacterDatabase.SupportsReplaceInto() )
+		ss << "REPLACE INTO arenateams VALUES(";
+	else
+	{
+		CharacterDatabase.Execute("DELETE FROM arenateams WHERE id = %u", m_id);
+		ss << "INSERT INTO arenateams VALUES(";
+	}
+
+	ss << m_id << ","
 		<< m_type << ","
 		<< m_leader << ",'"
 		<< m_name << "',"

@@ -536,8 +536,8 @@ public:
 	void CharacterEnumProc(QueryResultVector& results, uint32 AccountId);
 	void LoadAccountDataProc(QueryResultVector& results, uint32 AccountId);
 
-	void PollCharacterInsertQueue(MysqlCon * con);
-	void PollMailboxInsertQueue(MysqlCon * con);
+	void PollCharacterInsertQueue(DatabaseConnection * con);
+	void PollMailboxInsertQueue(DatabaseConnection * con);
 	void DisconnectUsersWithAccount(const char * account, WorldSession * session);
 	void DisconnectUsersWithIP(const char * ip, WorldSession * session);
 	void DisconnectUsersWithPlayerName(const char * plr, WorldSession * session);

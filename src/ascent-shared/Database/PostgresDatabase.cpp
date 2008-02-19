@@ -36,12 +36,12 @@ PostgresDatabase::PostgresDatabase() : Database()
 
 void PostgresDatabase::_BeginTransaction(DatabaseConnection * conn)
 {
-	//_SendQuery( conn, "START TRANSACTION", false );
+	_SendQuery( conn, "BEGIN TRANSACTION", false );
 }
 
 void PostgresDatabase::_EndTransaction(DatabaseConnection * conn)
 {
-	//_SendQuery( conn, "COMMIT", false );
+	_SendQuery( conn, "COMMIT TRANSACTION", false );
 }
 
 bool PostgresDatabase::Initialize(const char* Hostname, unsigned int port, const char* Username, const char* Password, const char* DatabaseName, uint32 ConnectionCount, uint32 BufferSize)
@@ -61,13 +61,15 @@ bool PostgresDatabase::Initialize(const char* Hostname, unsigned int port, const
 	if(strlen(Password) > 0)
 		ss << "password = '" << Password << "' ";
 
+	ss << "dbname = '" << DatabaseName << "'";
 	mConnectString = ss.str();
 
-	Log.Notice("PostgresDatabase", "Connecting to `%s`...", Hostname);
-	Connections = new PostgresDatabaseConnection[ConnectionCount];
+	Log.Notice("PostgresDatabase", "Connecting to `%s`, database: `%s`...", Hostname, DatabaseName);
+	Connections = new DatabaseConnection*[ConnectionCount];
 	for( i = 0; i < ConnectionCount; ++i )
 	{
-		con = static_cast<PostgresDatabaseConnection*>(&Connections[i]);
+		Connections[i] = new PostgresDatabaseConnection;
+		con = static_cast<PostgresDatabaseConnection*>(Connections[i]);
 		con->PgSql = PQconnectdb( mConnectString.c_str() );
 		con->Result = NULL;
 		if( con->PgSql == NULL )
@@ -77,6 +79,7 @@ bool PostgresDatabase::Initialize(const char* Hostname, unsigned int port, const
 		}
 	}
 
+	Database::_Initialize();
 	return true;
 }
 
@@ -134,20 +137,17 @@ bool PostgresDatabase::_SendQuery(DatabaseConnection *con, const char* Sql, bool
 {
 	PGresult * res = PQexec( static_cast<PostgresDatabaseConnection*>(con)->PgSql, Sql );
 	if( res == NULL )
-		return false;
-
-	ExecStatusType result = PQresultStatus(res);
-	if(result != PGRES_TUPLES_OK)
 	{
-		Log.Error("PostgreDatabase", "Query failed: %s", PQresultErrorMessage(res));
-		PQclear( res );
+		printf("Error: %s\n", PQerrorMessage( static_cast<PostgresDatabaseConnection*>(con)->PgSql ) );
 		return false;
 	}
 
-	if( PQntuples( res ) )
+	ExecStatusType result = PQresultStatus(res);
+	if( result != PGRES_TUPLES_OK && result != PGRES_COMMAND_OK )
 	{
-		Log.Error("PostgreDatabase", "Query failed (2): %s", PQresultErrorMessage(res));
+		Log.Error("PostgreDatabase", "Query failed: %s", PQresultErrorMessage(res));
 		PQclear( res );
+		static_cast<PostgresDatabaseConnection*>(con)->Result = NULL;
 		return false;
 	}
 

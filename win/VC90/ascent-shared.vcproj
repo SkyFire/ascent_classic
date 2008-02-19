@@ -393,6 +393,18 @@
 				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\dep\include\sqlite\sqlite3.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.h"
+				>
+			</File>
 			<Filter
 				Name="DataStores"
 				>

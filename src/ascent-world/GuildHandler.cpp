@@ -350,15 +350,31 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 		recv_data >> pRank->iTabPermissions[i].iStacksPerDay;
 	}
 
-	CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
-		_player->m_playerInfo->guild->GetGuildId(), pRank->iId, CharacterDatabase.EscapeString(newName).c_str(),
-		pRank->iRights, pRank->iGoldLimitPerDay,
-		pRank->iTabPermissions[0].iFlags, pRank->iTabPermissions[0].iStacksPerDay,
-		pRank->iTabPermissions[1].iFlags, pRank->iTabPermissions[1].iStacksPerDay,
-		pRank->iTabPermissions[2].iFlags, pRank->iTabPermissions[2].iStacksPerDay,
-		pRank->iTabPermissions[3].iFlags, pRank->iTabPermissions[3].iStacksPerDay,
-		pRank->iTabPermissions[4].iFlags, pRank->iTabPermissions[4].iStacksPerDay,
-		pRank->iTabPermissions[5].iFlags, pRank->iTabPermissions[5].iStacksPerDay);
+	if( CharacterDatabase.SupportsReplaceInto() )
+	{
+		CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
+			_player->m_playerInfo->guild->GetGuildId(), pRank->iId, CharacterDatabase.EscapeString(newName).c_str(),
+			pRank->iRights, pRank->iGoldLimitPerDay,
+			pRank->iTabPermissions[0].iFlags, pRank->iTabPermissions[0].iStacksPerDay,
+			pRank->iTabPermissions[1].iFlags, pRank->iTabPermissions[1].iStacksPerDay,
+			pRank->iTabPermissions[2].iFlags, pRank->iTabPermissions[2].iStacksPerDay,
+			pRank->iTabPermissions[3].iFlags, pRank->iTabPermissions[3].iStacksPerDay,
+			pRank->iTabPermissions[4].iFlags, pRank->iTabPermissions[4].iStacksPerDay,
+			pRank->iTabPermissions[5].iFlags, pRank->iTabPermissions[5].iStacksPerDay);
+	}
+	else
+	{
+		CharacterDatabase.Execute("DELETE FROM guild_ranks WHERE guildId = %u AND rankId = %u", _player->m_playerInfo->guild->GetGuildId(), pRank->iId );
+		CharacterDatabase.Execute("INSERT INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
+			_player->m_playerInfo->guild->GetGuildId(), pRank->iId, CharacterDatabase.EscapeString(newName).c_str(),
+			pRank->iRights, pRank->iGoldLimitPerDay,
+			pRank->iTabPermissions[0].iFlags, pRank->iTabPermissions[0].iStacksPerDay,
+			pRank->iTabPermissions[1].iFlags, pRank->iTabPermissions[1].iStacksPerDay,
+			pRank->iTabPermissions[2].iFlags, pRank->iTabPermissions[2].iStacksPerDay,
+			pRank->iTabPermissions[3].iFlags, pRank->iTabPermissions[3].iStacksPerDay,
+			pRank->iTabPermissions[4].iFlags, pRank->iTabPermissions[4].iStacksPerDay,
+			pRank->iTabPermissions[5].iFlags, pRank->iTabPermissions[5].iStacksPerDay);
+	}
 }
 
 void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)

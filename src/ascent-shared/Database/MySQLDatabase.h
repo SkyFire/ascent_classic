@@ -23,6 +23,9 @@ public:
 	string EscapeString(string Escape);
 	void EscapeLongString(const char * str, uint32 len, stringstream& out);
 	string EscapeString(const char * esc, DatabaseConnection * con);
+
+	bool SupportsReplaceInto() { return true; }
+	bool SupportsTableLocking() { return true; }
 	
 protected:
 
