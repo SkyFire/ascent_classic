@@ -2222,15 +2222,17 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				if( IsPlayer() )
 				{
 					CritChance = GetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE );
-					CritChance += static_cast< Player* >( pVictim )->res_R_crit_get();
-					CritChance += float( pVictim->AttackerCritChanceMod[spellInfo->School] );
 				}
 				else
 				{
 					CritChance = 5.0f; // static value for mobs.. not blizzlike, but an unfinished formula is not fatal :)
 				}
 				if( pVictim->IsPlayer() )
-				CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE );
+				{
+					CritChance += static_cast< Player* >( pVictim )->res_R_crit_get();
+					CritChance += float( pVictim->AttackerCritChanceMod[spellInfo->School] );
+					CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE );
+				}
 			}
 			else
 			{
