@@ -2556,14 +2556,19 @@ else
 	if(  this->IsPlayer() && ability && static_cast< Player* >( this )->m_finishingmovesdodge && ability->c_is_flags & SPELL_FLAG_IS_FINISHING_MOVE)
 			dodge = 0.0f;
 
-	if(skip_hit_check)
+	if( skip_hit_check )
 	{
-		hitchance=100.0f;
-		dodge=parry=block=0.0f;
+		hitchance = 100.0f;
+		dodge = 0.0f;
+		parry = 0.0f;
+		block = 0.0f;
 	}
-	if (ability->Attributes & ATTRIBUTES_CANT_BE_DPB)
+
+	if( ability != NULL && ability->Attributes & ATTRIBUTES_CANT_BE_DPB )
 	{
-		dodge=parry=block=0.0f;
+		dodge = 0.0f;
+		parry = 0.0f;
+		block = 0.0f;
 	}
 
 //--------------------------------by victim state-------------------------------------------
