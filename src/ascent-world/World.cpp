@@ -1513,7 +1513,7 @@ bool World::SetInitialWorldSettings()
 		}
 
 		if(
-			((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (sp->AttributesEx & ATTRIBUTESEX_DELAY_SOME_TRIGGERS)) //rogue cold blood
+			((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (sp->AttributesEx & ATTRIBUTESEX_NOT_BREAK_STEALTH)) //rogue cold blood
 			|| ((sp->Attributes & ATTRIBUTES_TRIGGER_COOLDOWN) && (!sp->AttributesEx || sp->AttributesEx & ATTRIBUTESEX_REMAIN_OOC))
 			)
 		{
@@ -1537,9 +1537,10 @@ bool World::SetInitialWorldSettings()
 	if( parentsp != NULL && triggersp != NULL )
 		triggersp->EffectBasePoints[0] = parentsp->EffectBasePoints[0];
 
+	/// Elemental Focus
 	SpellEntry* sp = dbcSpell.LookupEntryForced( 16164 );
 	if( sp != NULL && sp->Id == 16164 )
-		sp->procFlags = PROC_ON_SPELL_CRIT_HIT_VICTIM;
+		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
 
 	//remove stormstrike effect 0
 	sp = dbcSpell.LookupEntryForced( 17364 );
