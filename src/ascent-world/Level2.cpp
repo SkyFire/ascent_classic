@@ -715,7 +715,7 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 	go->SetFloatValue(GAMEOBJECT_ROTATION_03, cosf(o / 2));
 	go->PushToWorld(m_session->GetPlayer()->GetMapMgr());
 
-	// Create sapwn instance
+	// Create spawn instance
 	GOSpawn * gs = new GOSpawn;
 	gs->entry = go->GetEntry();
 	gs->facing = go->GetOrientation();

@@ -2395,51 +2395,6 @@ void Aura::SpellAuraModStun(bool apply)
 			m_target->GetAIInterface()->AttackReaction(target, 1, 0);
 		}
 	}
-
-/*
-	if( apply )
-	{
-		switch(this->m_spellProto->Id)
-		{
-		case 652:
-		case 2070:
-		case 6770:
-		case 6771:
-		case 11297:
-		case 11298:
-			{
-				// sap
-				Unit *c = GetUnitCaster();
-				if(c)
-					c->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);  // remove stealth
-			}break;
-		case 1776:
-		case 1777:
-		case 1780:
-		case 1781:
-		case 8629:
-		case 8630:
-		case 11285:
-		case 11286:
-		case 11287:
-		case 11288:
-		case 12540:
-		case 13579:
-		case 24698:
-		case 28456:
-			{
-				// gouge
-				Unit *c = GetUnitCaster();
-				if(c && c->IsPlayer() )
-				{
-					//static_cast< Player* >( c )->CombatModeDelay = 10;
-					static_cast< Player* >( c )->EventAttackStop();
-					c->smsg_AttackStop(m_target);
-					c->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_START_ATTACK);  // remove stealth
-				}
-			}
-		}
-	}*/
 }
 
 void Aura::SpellAuraModDamageDone(bool apply)
