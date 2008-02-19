@@ -3953,9 +3953,11 @@ void Player::ResurrectPlayer()
 		Player* p = objmgr.GetPlayer( resurrector );
 		resurrector = 0;
 
+		blinked = true;
+
 		if( p == NULL )
 			return;
-		//_Relocate( p->GetMapMgr()->GetMapId(), p->GetPosition(), false, false );
+
 		SafeTeleport( p->GetMapId(), p->GetInstanceID(), p->GetPosition() );
 	}
 
@@ -4200,7 +4202,6 @@ void Player::RepopAtGraveyard(float ox, float oy, float oz, uint32 mapid)
 		SafeTeleport(mapid, 0, dest);
 	}
 
-
 //	//correct method as it works on official server, and does not require any damn sql
 //	//no factions! no zones! no sqls! 1word: blizz-like
 //	float closestX , closestY , closestZ ;
@@ -4228,7 +4229,7 @@ void Player::RepopAtGraveyard(float ox, float oy, float oz, uint32 mapid)
 //	if(last_distance<1e10)
 //#endif
 
-	
+	blinked = true;	
 }
 
 void Player::JoinedChannel(Channel *c)
