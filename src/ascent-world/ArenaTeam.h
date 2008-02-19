@@ -74,7 +74,7 @@ public:
 	ArenaTeam(Field * f);
 	~ArenaTeam()
 	{
-		delete [] m_members;
+		delete[] m_members;
 	}
 
 	void SendPacket(WorldPacket * data);

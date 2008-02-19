@@ -101,7 +101,7 @@ public:
         T ** a = new T*[Max];
 		memset(a,0,sizeof(T*)*Max);
 		memcpy(a, _array, sizeof(T*) * _max);
-		delete [] _array;
+		delete[] _array;
 		_array = a;
 		_max = Max;
 	}
@@ -114,7 +114,7 @@ public:
 			if(_array[i] != 0)
 				delete _array[i];
 
-		delete [] _array;
+		delete[] _array;
 	}
 
 	/** Allocates entry Entry in the array and sets the pointer, and returns

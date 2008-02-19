@@ -264,7 +264,7 @@ void MapMgr::PushObject(Object *obj)
 	   UpdateCellActivity(x, y, 2);
 	}
 	else
-	switch(UINT32_LOPART(obj->GetGUIDHigh()))
+	switch( obj->GetGUIDHigh() )
 	{
 		case HIGHGUID_UNIT:
 			ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
@@ -330,7 +330,7 @@ void MapMgr::PushStaticObject(Object *obj)
 {
 	_mapWideStaticObjects.insert(obj);
 
-	switch(UINT32_LOPART(obj->GetGUIDHigh()))
+	switch( obj->GetGUIDHigh() )
 	{
 		case HIGHGUID_UNIT:
 			m_CreatureStorage[obj->GetGUIDLow()] = static_cast< Creature* >( obj );
@@ -375,7 +375,7 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	// Remove object from all needed places
 	///////////////////////////////////////
  
-	switch( UINT32_LOPART( obj->GetGUIDHigh() ) )
+	switch( obj->GetGUIDHigh() )
 	{
 		case HIGHGUID_UNIT:
 			ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
@@ -552,9 +552,9 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 		++iter; \
 		if(curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID ) \
 			fRange = 0.0f;		\
-		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER)) \
+		else if((curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER || obj->GetGUIDHigh() == HIGHGUID_TRANSPORTER)) \
 			fRange = 0.0f;		\
-		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT)) \
+		else if((curObj->GetGUIDHigh() == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || obj->GetGUIDHigh() == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT)) \
 			fRange = 0.0f;		\
 		else \
 			fRange = m_UpdateDistance;	\
@@ -874,9 +874,9 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 		++iter; \
 		if(curObj->IsPlayer() && obj->IsPlayer() && plObj && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID) \
 			fRange = 0.0f; \
-		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_TRANSPORTER)) \
+		else if((curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER ||obj->GetGUIDHigh() == HIGHGUID_TRANSPORTER)) \
 			fRange = 0.0f; \
-		else if((UINT32_LOPART(curObj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || UINT32_LOPART(obj->GetGUIDHigh()) == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT)) \
+		else if((curObj->GetGUIDHigh() == HIGHGUID_GAMEOBJECT && curObj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT || obj->GetGUIDHigh() == HIGHGUID_GAMEOBJECT && obj->GetUInt32Value(GAMEOBJECT_TYPE_ID) == GAMEOBJECT_TYPE_TRANSPORT)) \
 			fRange = 0.0f; \
 		else \
 			fRange = m_UpdateDistance; \

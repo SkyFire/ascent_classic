@@ -119,9 +119,9 @@ CellHandler<Class>::~CellHandler()
 				if(_cells[i][j])
 					delete _cells[i][j];
 			}
-			delete [] _cells[i];	
+			delete[] _cells[i];	
 		}
-		delete [] _cells;
+		delete[] _cells;
 	}
 }
 

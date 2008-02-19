@@ -47,18 +47,19 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	GameObject* pGO = NULL;
 	Creature* pCreature = NULL;
 
-	if(UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_UNIT)
+	if( GUID_HIPART( GetPlayer()->GetLootGUID() ) == HIGHGUID_UNIT )
 	{
 		pCreature = _player->GetMapMgr()->GetCreature((uint32)GetPlayer()->GetLootGUID());
 		if (!pCreature)return;
 		pLoot=&pCreature->loot;	
 	}
-	else if(UINT32_LOPART(GUID_HIPART(_player->GetLootGUID())) == HIGHGUID_GAMEOBJECT)
+	else if( GUID_HIPART( _player->GetLootGUID() ) == HIGHGUID_GAMEOBJECT )
 	{
 		pGO = _player->GetMapMgr()->GetGameObject((uint32)GetPlayer()->GetLootGUID());
 		if(!pGO)return;
 		pLoot=&pGO->loot;
-	}else if( (UINT32_LOPART(GUID_HIPART(_player->GetLootGUID())) == HIGHGUID_ITEM) )
+	}
+	else if( GUID_HIPART( _player->GetLootGUID() ) == HIGHGUID_ITEM )
 	{
 		Item *pItem = _player->GetItemInterface()->GetItemByGUID(_player->GetLootGUID());
 		if(!pItem)
@@ -215,26 +216,26 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 	WorldPacket pkt;	
 	Unit * pt = 0;
 
-	if(UINT32_LOPART(GUID_HIPART(lootguid)) == HIGHGUID_UNIT)
+	if( GUID_HIPART(lootguid) == HIGHGUID_UNIT )
 	{
 		Creature* pCreature = _player->GetMapMgr()->GetCreature((uint32)lootguid);
 		if(!pCreature)return;
 		pLoot=&pCreature->loot;
 		pt = pCreature;
 	}
-	else if(UINT32_LOPART(GUID_HIPART(lootguid)) == HIGHGUID_GAMEOBJECT)
+	else if( GUID_HIPART(lootguid) == HIGHGUID_GAMEOBJECT )
 	{
 		GameObject* pGO = _player->GetMapMgr()->GetGameObject((uint32)lootguid);
 		if(!pGO)return;
 		pLoot=&pGO->loot;
 	}
-	else if(UINT32_LOPART(GUID_HIPART(lootguid)) == HIGHGUID_CORPSE)
+	else if( GUID_HIPART(lootguid) == HIGHGUID_CORPSE )
 	{
 		Corpse *pCorpse = objmgr.GetCorpse((uint32)lootguid);
 		if(!pCorpse)return;
 		pLoot=&pCorpse->loot;
 	}
-	else if(UINT32_LOPART(GUID_HIPART(lootguid)) == HIGHGUID_PLAYER)
+	else if( GUID_HIPART(lootguid) == HIGHGUID_PLAYER )
 	{
 		Player * pPlayer = _player->GetMapMgr()->GetPlayer((uint32)lootguid);
 		if(!pPlayer) return;
@@ -242,7 +243,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 		pPlayer->bShouldHaveLootableOnCorpse = false;
 		pt = pPlayer;
 	}
-	else if( (UINT32_LOPART(GUID_HIPART(lootguid)) == HIGHGUID_ITEM) )
+	else if( GUID_HIPART(lootguid) == HIGHGUID_ITEM )
 	{
 		Item *pItem = _player->GetItemInterface()->GetItemByGUID(lootguid);
 		if(!pItem)
@@ -391,7 +392,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 	_player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
 	_player->m_currentLoot = 0;
 
-	if( UINT32_LOPART( GUID_HIPART( guid ) ) == HIGHGUID_UNIT )
+	if( GUID_HIPART( guid ) == HIGHGUID_UNIT )
 	{
 		Creature* pCreature = _player->GetMapMgr()->GetCreature( (uint32)guid );
 		if( pCreature == NULL )
@@ -420,7 +421,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 			}
 		}
 	}
-	else if( UINT32_LOPART( GUID_HIPART( guid ) ) == HIGHGUID_GAMEOBJECT )
+	else if( GUID_HIPART( guid ) == HIGHGUID_GAMEOBJECT )
 	{	   
 		GameObject* pGO = _player->GetMapMgr()->GetGameObject( (uint32)guid );
 		if( pGO == NULL )
@@ -528,13 +529,13 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
         default: break;
         }
 	}
-	else if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_CORPSE)
+	else if( GUID_HIPART( guid ) == HIGHGUID_CORPSE )
 	{
 		Corpse *pCorpse = objmgr.GetCorpse((uint32)guid);
 		if(pCorpse) 
 			pCorpse->SetUInt32Value(CORPSE_FIELD_DYNAMIC_FLAGS, 0);
 	}
-	else if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_PLAYER)
+	else if( GUID_HIPART(guid) == HIGHGUID_PLAYER )
 	{
 		Player *plr = objmgr.GetPlayer((uint32)guid);
 		if(plr)
@@ -543,7 +544,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 			plr->RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
 		}
 	}
-	else if(UINT32_LOPART(GUID_HIPART(guid)))
+	else if( GUID_HIPART( guid ) )
 	{
 		// suicide!
 		_player->GetItemInterface()->SafeFullRemoveItemByGuid(guid);
@@ -716,9 +717,9 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 
 	// free up used memory
 	if(zones)
-		delete [] zones;
+		delete[] zones;
 	if(names)
-		delete [] names;
+		delete[] names;
 }
 
 void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
@@ -1071,13 +1072,13 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 		case Z_BUF_ERROR:		   //-5
 		case Z_VERSION_ERROR:	   //-6
 		{
-			delete [] data;	 
+			delete[] data;	 
 			sLog.outString("WORLD WARNING: Decompression of account data %d for %s FAILED.", uiID, GetPlayer()->GetName());
 			break;
 		}
 
 		default:
-			delete [] data;	 
+			delete[] data;	 
 			sLog.outString("WORLD WARNING: Decompression gave a unknown error: %x, of account data %d for %s FAILED.", ZlibResult, uiID, GetPlayer()->GetName());
 			break;
 		}
@@ -1774,7 +1775,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 		return;
 
 	//now its time to give the loot to the target player
-	if(UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_UNIT)
+	if( GUID_HIPART( GetPlayer()->GetLootGUID() ) == HIGHGUID_UNIT )
 	{
 		pCreature = _player->GetMapMgr()->GetCreature((uint32)creatureguid);
 		if (!pCreature)return;

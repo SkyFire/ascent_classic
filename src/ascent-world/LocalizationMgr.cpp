@@ -90,12 +90,12 @@ void LocalizationMgr::Shutdown()
 	}
 
 	deletedPointers.clear();
-	delete [] m_ItemPages;
-	delete [] m_CreatureNames;
-	delete [] m_GameObjectNames;
-	delete [] m_Items;
-	delete [] m_NpcTexts;
-	delete [] m_Quests;
+	delete[] m_ItemPages;
+	delete[] m_CreatureNames;
+	delete[] m_GameObjectNames;
+	delete[] m_Items;
+	delete[] m_NpcTexts;
+	delete[] m_Quests;
 	m_languages.clear();
 	Log.Notice("LocalizationMgr", "Pointer cleanup completed in %.4f seconds.", float(float(getMSTime()-t) / 1000.0f));
 #undef SAFE_FREE_PTR

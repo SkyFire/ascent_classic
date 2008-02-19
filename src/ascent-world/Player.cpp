@@ -5204,13 +5204,14 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 	if(!IsInWorld()) return;
 	Loot * pLoot = NULL;
 	
-	if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_UNIT)
+	if( GUID_HIPART( guid ) == HIGHGUID_UNIT )
 	{
 		Creature* pCreature = GetMapMgr()->GetCreature((uint32)guid);
 		if(!pCreature)return;
 		pLoot=&pCreature->loot;
 		m_currentLoot = pCreature->GetGUID();
-	}else if(UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_GAMEOBJECT)
+	}
+	else if( GUID_HIPART( guid ) == HIGHGUID_GAMEOBJECT )
 	{
 		GameObject* pGO = GetMapMgr()->GetGameObject((uint32)guid);
 		if(!pGO)return;
@@ -5218,21 +5219,21 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		pLoot=&pGO->loot;
 		m_currentLoot = pGO->GetGUID();
 	}
-	else if((UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_PLAYER) )
+	else if( GUID_HIPART( guid ) == HIGHGUID_PLAYER )
 	{
 		Player *p=GetMapMgr()->GetPlayer((uint32)guid);
 		if(!p)return;
 		pLoot=&p->loot;
 		m_currentLoot = p->GetGUID();
 	}
-	else if( (UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_CORPSE))
+	else if( GUID_HIPART( guid ) == HIGHGUID_CORPSE )
 	{
 		Corpse *pCorpse = objmgr.GetCorpse((uint32)guid);
 		if(!pCorpse)return;
 		pLoot=&pCorpse->loot;
 		m_currentLoot = pCorpse->GetGUID();
 	}
-	else if( (UINT32_LOPART(GUID_HIPART(guid)) == HIGHGUID_ITEM) )
+	else if( GUID_HIPART( guid ) == HIGHGUID_ITEM )
 	{
 		Item *pItem = GetItemInterface()->GetItemByGUID(guid);
 		if(!pItem)
@@ -6794,7 +6795,7 @@ void Player::ProcessPendingUpdates()
 	
 	bProcessPending = false;
 	_bufferS.Release();
-	delete [] update_buffer;
+	delete[] update_buffer;
 
 	// send any delayed packets
 	WorldPacket * pck;
@@ -6847,7 +6848,7 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 		stream.avail_in != 0)
 	{
 		sLog.outError("deflate failed.");
-		delete [] buffer;
+		delete[] buffer;
 		return false;
 	}
 
@@ -6855,7 +6856,7 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 	if(deflate(&stream, Z_FINISH) != Z_STREAM_END)
 	{
 		sLog.outError("deflate failed: did not end stream");
-		delete [] buffer;
+		delete[] buffer;
 		return false;
 	}
 
@@ -6863,7 +6864,7 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 	if(deflateEnd(&stream) != Z_OK)
 	{
 		sLog.outError("deflateEnd failed.");
-		delete [] buffer;
+		delete[] buffer;
 		return false;
 	}
 
@@ -6878,7 +6879,7 @@ bool Player::CompressAndSendUpdateBuffer(uint32 size, const uint8* update_buffer
 	m_session->OutPacket(SMSG_COMPRESSED_UPDATE_OBJECT, (uint16)stream.total_out + 4, buffer);
 
 	// cleanup memory
-	delete [] buffer;
+	delete[] buffer;
 	
 	return true;
 }
@@ -9854,7 +9855,7 @@ void Player::EventDumpCompressedMovement()
 		stream.avail_in != 0)
 	{
 		sLog.outError("deflate failed.");
-		delete [] buffer;
+		delete[] buffer;
 		return;
 	}
 
@@ -9862,7 +9863,7 @@ void Player::EventDumpCompressedMovement()
 	if(deflate(&stream, Z_FINISH) != Z_STREAM_END)
 	{
 		sLog.outError("deflate failed: did not end stream");
-		delete [] buffer;
+		delete[] buffer;
 		return;
 	}
 
@@ -9870,7 +9871,7 @@ void Player::EventDumpCompressedMovement()
 	if(deflateEnd(&stream) != Z_OK)
 	{
 		sLog.outError("deflateEnd failed.");
-		delete [] buffer;
+		delete[] buffer;
 		return;
 	}
 
@@ -9886,7 +9887,7 @@ void Player::EventDumpCompressedMovement()
 	//printf("Compressed move compressed from %u bytes to %u bytes.\n", m_movementBuffer.size(), stream.total_out + 4);
 
 	// cleanup memory
-	delete [] buffer;
+	delete[] buffer;
 	m_movementBuffer.clear();
 }
 #endif

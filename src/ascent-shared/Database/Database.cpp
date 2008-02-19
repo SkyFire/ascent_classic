@@ -37,7 +37,7 @@ Database::Database() : CThread()
 
 Database::~Database()
 {
-	delete [] Connections;
+	delete[] Connections;
 }
 
 void Database::_Initialize()
@@ -160,7 +160,7 @@ void Database::PerformQueryBuffer(QueryBuffer * b, DatabaseConnection * ccon)
 	for(vector<char*>::iterator itr = b->queries.begin(); itr != b->queries.end(); ++itr)
 	{
 		_SendQuery(con, *itr, false);
-		delete [] (*itr);
+		delete[] (*itr);
 	}
 
 	_EndTransaction(con);
@@ -234,7 +234,7 @@ bool Database::run()
 	while(query)
 	{
 		_SendQuery( con, query, false );
-		delete [] query;
+		delete[] query;
 		if(ThreadState == THREADSTATE_TERMINATE)
 			break;
 
@@ -252,7 +252,7 @@ bool Database::run()
 			DatabaseConnection * con = GetFreeConnection();
 			_SendQuery( con, query, false );
 			con->Busy.Release();
-			delete [] query;
+			delete[] query;
 			query=queries_queue.pop_nowait();
 		}
 	}

@@ -213,25 +213,25 @@ LootMgr::~LootMgr()
 {
   sLog.outString("  Deleting Loot Tables...");
   for(LootStore::iterator iter=CreatureLoot.begin(); iter != CreatureLoot.end(); ++iter)
-  delete [] iter->second.items;
+  delete[] iter->second.items;
 
   for(LootStore::iterator iter=FishingLoot.begin(); iter != FishingLoot.end(); ++iter)
-  delete [] iter->second.items;
+  delete[] iter->second.items;
 
   for(LootStore::iterator iter=SkinningLoot.begin(); iter != SkinningLoot.end(); ++iter)
-  delete [] iter->second.items;
+  delete[] iter->second.items;
 
   for(LootStore::iterator iter=GOLoot.begin(); iter != GOLoot.end(); ++iter)
-  delete [] iter->second.items;
+  delete[] iter->second.items;
 
   for(LootStore::iterator iter=ItemLoot.begin(); iter != ItemLoot.end(); ++iter)
-	  delete [] iter->second.items;
+	  delete[] iter->second.items;
 
   for(LootStore::iterator iter=ProspectingLoot.begin(); iter != ProspectingLoot.end(); ++iter)
-  delete [] iter->second.items;
+  delete[] iter->second.items;
 
  for(LootStore::iterator iter=PickpocketingLoot.begin(); iter != PickpocketingLoot.end(); ++iter)
- delete [] iter->second.items;
+ delete[] iter->second.items;
 }
 
 void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)

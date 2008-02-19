@@ -33,7 +33,7 @@ public:
 	~UpdateMask( )
 	{
 		if(mUpdateMask)
-			delete [] mUpdateMask;
+			delete[] mUpdateMask;
 	}
 
 	void SetBit( const uint32 index )
@@ -73,7 +73,7 @@ public:
 	void SetCount(uint32 valuesCount)
 	{
 		if(mUpdateMask)
-			delete [] mUpdateMask;
+			delete[] mUpdateMask;
 
 		mCount = valuesCount;
 		//mBlocks = valuesCount/32 + 1;

@@ -72,7 +72,7 @@ Map::~Map()
 					spawns[x][y]=NULL;
 				}
 			}
-			delete [] spawns[x];
+			delete[] spawns[x];
 		}
 	}
 

@@ -251,7 +251,7 @@ public:
 
 	~Charter()
 	{
-		delete [] Signatures;
+		delete[] Signatures;
 	}
 	
 	void SaveToDB();

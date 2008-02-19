@@ -47,9 +47,9 @@ TerrainMgr::~TerrainMgr()
 				if(CellInformation[x][y] != 0)
 					delete CellInformation[x][y];
 			}
-			delete [] CellInformation[x];
+			delete[] CellInformation[x];
 		}
-		delete CellInformation;
+		delete[] CellInformation;
 	}
 #else
 
@@ -58,9 +58,9 @@ TerrainMgr::~TerrainMgr()
 	// Big memory cleanup, whee.
 	for(uint32 x = 0; x < _sizeX; ++x)
 	{
-		delete [] CellInformation[x];
+		delete[] CellInformation[x];
 	}
-	delete CellInformation;
+	delete[] CellInformation;
 
 #ifdef WIN32
 	UnmapViewOfFile(m_Memory);

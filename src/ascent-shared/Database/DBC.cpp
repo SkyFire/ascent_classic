@@ -109,7 +109,7 @@ void DBC::CSV(char* filename, bool info)
 			char* str = new char[65535];
 			Lookup(str,i,j);
 			fprintf(f,"%s,",str);
-			delete [] str;
+			delete[] str;
 		}
 		fprintf(f,"\x0d\x0a");
 	}
@@ -143,7 +143,7 @@ void DBC::FormatCSV(const char* filename, bool info)
 			/*char* str = new char[512];
 			LookupFormat(str,i,j);
 			fprintf(f,"%s,",str);
-			delete [] str;*/ // Old code -> too slow. keeping it for reference
+			delete[] str;*/ // Old code -> too slow. keeping it for reference
 			fst = tbl[i*cols+j];
 			if(format[j] == F_STRING)
 				fprintf(f,"\"%s\"",(char*)(db+fst));
@@ -211,9 +211,9 @@ void DBC::GuessFormat()
 			percent = npercent;
 		}
 	}
-	delete [] ints;
-	delete [] floats;
-	delete [] strings;
+	delete[] ints;
+	delete[] floats;
+	delete[] strings;
 	printf("\rGuessing format (%s): 100%% - Done!\n",name);
 }
 
@@ -238,7 +238,7 @@ void DBC::LookupFormat(char *out, int row, int col)
 }
 
 DBC::~DBC() {
-	if(tbl) delete [] tbl;
-	if(db) delete [] db;
-	if(format) delete [] format;
+	if(tbl) delete[] tbl;
+	if(db) delete[] db;
+	if(format) delete[] format;
 }

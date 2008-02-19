@@ -62,7 +62,7 @@ WordFilter::~WordFilter()
 		delete p;
 	}
 
-	delete [] m_filters;
+	delete[] m_filters;
 }
 
 bool WordFilter::CompileExpression(const char * szExpression, void** pOutput, void** pExtraOutput)

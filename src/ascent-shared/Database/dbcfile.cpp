@@ -61,7 +61,7 @@ bool DBCFile::open(const char*fn)
 
 DBCFile::~DBCFile()
 {
-	delete [] data;
+	delete[] data;
 }
 
 DBCFile::Record DBCFile::getRecord(size_t id)

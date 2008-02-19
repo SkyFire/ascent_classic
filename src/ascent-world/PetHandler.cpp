@@ -34,7 +34,7 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 
 	//printf("Pet_Action: 0x%.4X 0x%.4X\n", misc, action);
 
-	if(UINT32_LOPART(GUID_HIPART(petGuid)) == HIGHGUID_UNIT)
+	if( GUID_HIPART( petGuid ) == HIGHGUID_UNIT )
 	{
 		Creature *pCharm = GetPlayer()->GetMapMgr()->GetCreature((uint32)petGuid);
 		if(!pCharm) 

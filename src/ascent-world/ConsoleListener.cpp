@@ -171,7 +171,7 @@ ConsoleSocket::ConsoleSocket( SOCKET iFd ) : Socket(iFd, 10000, 1000)
 ConsoleSocket::~ConsoleSocket( )
 {
 	if( m_pBuffer != NULL )
-		delete [] m_pBuffer;
+		delete[] m_pBuffer;
 
 	if( m_pConsole != NULL )
 		delete m_pConsole;

@@ -69,7 +69,7 @@ WorldSession::~WorldSession()
 	}
 
 	if(permissions)
-		delete [] permissions;
+		delete[] permissions;
 
 	WorldPacket *packet;
 
@@ -79,7 +79,7 @@ WorldSession::~WorldSession()
 	for(uint32 x=0;x<8;x++)
 	{
 		if(sAccountData[x].data)
-			delete [] sAccountData[x].data;
+			delete[] sAccountData[x].data;
 	}
 
 #ifndef CLUSTERING
@@ -455,7 +455,7 @@ void WorldSession::LoadSecurity(std::string securitystring)
 
 void WorldSession::SetSecurity(std::string securitystring)
 {
-	delete [] permissions;
+	delete[] permissions;
 	LoadSecurity(securitystring);
 
 	// update db

@@ -2474,13 +2474,13 @@ bool Object::CanActivate()
 	{
 	case TYPEID_UNIT:
 		{
-			if(UINT32_LOPART(GetGUIDHigh()) != HIGHGUID_PET)
+			if( GetGUIDHigh() != HIGHGUID_PET )
 				return true;
 		}break;
 
 	case TYPEID_GAMEOBJECT:
 		{
-			if(static_cast<GameObject*>(this)->HasAI() && GetUInt32Value(GAMEOBJECT_TYPE_ID) != GAMEOBJECT_TYPE_TRAP)
+			if( static_cast< GameObject* >( this )->HasAI() && GetUInt32Value( GAMEOBJECT_TYPE_ID ) != GAMEOBJECT_TYPE_TRAP )
 				return true;
 		}break;
 	}

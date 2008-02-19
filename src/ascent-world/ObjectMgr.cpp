@@ -76,7 +76,7 @@ ObjectMgr::~ObjectMgr()
 	for( TrainerMap::iterator i = mTrainers.begin( ); i != mTrainers.end( ); ++ i) {
 		Trainer * t = i->second;
 		if(t->UIMessage && t->UIMessage != (char*)NormalTalkMessage)
-			delete [] t->UIMessage;
+			delete[] t->UIMessage;
 		delete t;
 	}
 
@@ -111,7 +111,7 @@ ObjectMgr::~ObjectMgr()
 			p = itr->second;
 			for(uint32 j = 0; j < p->TextCount; ++j)
 				free((char*)p->Texts[j]);
-			delete [] p->Texts;
+			delete[] p->Texts;
 			free((char*)p->MonsterName);
 			delete p;
 		}
@@ -1385,7 +1385,7 @@ void ObjectMgr::LoadTrainers()
 		if(!result2)
 		{
 			Log.Error("LoadTrainers", "Trainer with no spells, entry %u.", entry);
-			delete [] tr->UIMessage;
+			delete[] tr->UIMessage;
 			delete tr;
 			continue;
 		}
@@ -1440,7 +1440,7 @@ void ObjectMgr::LoadTrainers()
 			//and now we insert it to our lookup table
 			if(!tr->SpellCount)
 			{
-				delete [] tr->UIMessage;
+				delete[] tr->UIMessage;
 				delete tr;
 				continue;
 			}

@@ -2404,7 +2404,7 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 		else
 		{
 			unitTarget = NULL;
-			switch( UINT32_LOPART( GUID_HIPART( guid ) ) )
+			switch( GUID_HIPART( guid ) )
 			{
 			case HIGHGUID_UNIT:
 				unitTarget = m_caster->GetMapMgr()->GetCreature( (uint32)guid );
