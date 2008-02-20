@@ -349,6 +349,10 @@
 			Name="Database"
 			>
 			<File
+				RelativePath="..\..\src\ascent-shared\Database\CreateInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ascent-shared\Database\Database.cpp"
 				>
 			</File>
@@ -370,6 +374,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\ascent-shared\Database\Field.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\include\sqlite\sqlite3.c"
 				>
 			</File>
 			<Filter
@@ -401,6 +409,34 @@
 				</File>
 				<File
 					RelativePath="..\..\src\ascent-shared\Database\DBCStores.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Interfaces"
+				>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.h"
 					>
 				</File>
 			</Filter>
