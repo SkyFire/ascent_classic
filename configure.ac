@@ -10,9 +10,9 @@ AC_PREREQ(2.5)
 if test -d obj; then rm -rf obj; fi
 
 AM_CONFIG_HEADER( config.h )
-INCLUDES="-I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include"
+INCLUDES="-I/usr/include/mysql -I/usr/include/postgresql -I/usr/include/openssl -I/usr/local/include -I/usr/local/include/mysql -I/usr/local/include/openssl -I/usr/local/include/postgresql"
 AC_SUBST(INCLUDES)
-LDFLAGS="-L/usr/lib/mysql -L/usr/local/lib -L/usr/local/lib/mysql"
+LDFLAGS="-L/usr/lib/mysql -L/usr/lib/postgresql -L/usr/local/lib -L/usr/local/lib/mysql -L/usr/local/lib/postgresql"
 AC_SUBST(LDFLAGS)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
@@ -204,8 +204,8 @@ if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_HEADER(sys/event.h, , AC_MSG_ERROR([Cannot find sys/event.h for socket engine]))
 	AC_DEFINE(USE_KQUEUE)
 
-	INCLUDES+="-I/sw/include -I/sw/include/mysql -I/usr/include/openssl"
-	LDFLAGS+="-L/sw/lib -L/sw/lib/mysql -L/usr/lib"
+	INCLUDES+="-I/sw/include -I/sw/include/mysql -I/sw/include/postgresql -I/usr/include/openssl"
+	LDFLAGS+="-L/sw/lib -L/sw/lib/mysql -L/sw/lib/postgresql -L/usr/lib"
 fi
 
 AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
