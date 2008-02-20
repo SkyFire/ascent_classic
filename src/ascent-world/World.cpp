@@ -1846,6 +1846,59 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 	}
+	//paladin - Improved Devotion Aura
+	sp = dbcSpell.LookupEntryForced( 20142 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64;
+	sp = dbcSpell.LookupEntryForced( 20141 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64;
+	sp = dbcSpell.LookupEntryForced( 20140 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64;
+	sp = dbcSpell.LookupEntryForced( 20139 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64;
+	sp = dbcSpell.LookupEntryForced( 20138 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0] = 64;
+	
+	//paladin - Guardian's Favor
+	sp = dbcSpell.LookupEntryForced( 20175 );
+	if (sp != NULL)
+	{
+		sp->EffectSpellGroupRelation[0]=128;
+		sp->EffectSpellGroupRelation[1]=268435472;
+	}
+	sp = dbcSpell.LookupEntryForced( 20174 );
+	if (sp != NULL)
+	{
+		sp->EffectSpellGroupRelation[0]=128;
+		sp->EffectSpellGroupRelation[1]=268435472;
+	}
+	//paladin - Improved Concentration Aura
+	sp = dbcSpell.LookupEntryForced( 20256 );
+	if (sp != NULL)
+		sp->EffectSpellGroupRelation[0]=131072;
+	sp = dbcSpell.LookupEntryForced( 20255 );
+	if (sp != NULL)
+		sp->EffectSpellGroupRelation[0]=131072;
+	sp = dbcSpell.LookupEntryForced( 20254 );
+	if (sp != NULL)
+		sp->EffectSpellGroupRelation[0]=131072;
+	//paladin - Sacred Duty
+	sp = dbcSpell.LookupEntryForced( 31849 );
+	if (sp != NULL)
+	{
+		sp->EffectSpellGroupRelation[0]=4194304;
+		sp->EffectSpellGroupRelation[1]=4194304;
+	}
+	sp = dbcSpell.LookupEntryForced( 31848 );
+	if (sp != NULL)
+	{
+		sp->EffectSpellGroupRelation[0]=4194304;
+		sp->EffectSpellGroupRelation[1]=4194304;
+	}
 
 	//paladin - Aura Mastery
 	sp = dbcSpell.LookupEntryForced( 31821 );
