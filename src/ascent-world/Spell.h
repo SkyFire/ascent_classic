@@ -289,7 +289,7 @@ enum procFlags
 	PROC_ON_DOT_DAMAGE                 = 0x40000, //on harmfull non direct damage (DoTs)
 	PROC_ON_DOT_DAMAGE_VICTIM          = 0x80000,  //on harmfull non direct damage (DoTs) victim
 	PROC_REMOVEONUSE                   = 0x100000, //something supercustom. 99% wrong :P used by bombs and grenades in general.
-	PROC_ON_TRAP_TRIGGER               = 0x200000,
+	PROC_ON_TRAP_TRIGGER               = 0x200000, //triggers on trap activation)
 	PROC_UNUSED1                       = 0x400000,
 	PROC_ON_OFFHAND_HIT                = 0x800000, //only 1 spellname "Combat Potency"
 	PROC_ON_UNK1                       = 0x1000000,//only 1 spellname "Captured Totem"
