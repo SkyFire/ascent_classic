@@ -10,6 +10,7 @@ EXTRA_DIST += win/ascentVC71.sln win/VC71/ascent.vcproj \
 EXTRA_DIST += dep/lib/libmysqlclient.a dep/lib/libmySQLmingw.a
 EXTRA_DIST += dep/lib/debug/libmySQL.dll dep/lib/debug/libmySQL.lib
 EXTRA_DIST += dep/lib/release/libmySQL.dll dep/lib/release/libmySQL.lib
+EXTRA_DIST += dep/lib/release/libpq.dll dep/lib/release/libpq.lib
 
 # MYSQL heaers
 EXTRA_DIST += dep/include/mysql/config-win.h dep/include/mysql/dbug.h \
@@ -55,3 +56,13 @@ EXTRA_DIST += dep/include/openssl/aes.h dep/include/openssl/blowfish.h  \
               dep/include/openssl/rc2.h dep/include/openssl/safestack.h \
               dep/include/openssl/ssl3.h dep/include/openssl/txt_db.h \
               dep/include/openssl/x509v3.h
+
+EXTRA_DIST += dep/include/postgre/sqlca.h dep/include/postgre/pgtypes_numeric.h \
+              dep/include/postgre/pg_config_manual.h dep/include/postgre/ecpg_config.h \
+              dep/include/postgre/sql3types.h dep/include/postgre/pgtypes_interval.h \
+              dep/include/postgre/pg_config.h dep/include/postgre/ecpgtype.h \
+              dep/include/postgre/pgtypes_error.h dep/include/postgre/libpq-fe.h \
+              dep/include/postgre/ecpglib.h dep/include/postgre/postgres_ext.h \
+              dep/include/postgre/pgtypes_date.h dep/include/postgre/ecpgerrno.h \
+              dep/include/postgre/pgtypes_timestamp.h dep/include/postgre/pg_config_os.h \
+              dep/include/postgre/ecpg_informix.h
