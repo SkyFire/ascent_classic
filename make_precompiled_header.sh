@@ -3,8 +3,8 @@
 echo Building Precompiled Header...
 
 cd src/ascent-world
-#g++ -DHAVE_CONFIG_H -I. -I. -I../.. -I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include -I. -I./../../dep/include  -I./../ascent-shared -I./../../dep/src -g -O2 -o StdAfx.h.gch StdAfx.h
-g++ -DHAVE_CONFIG_H -I. -I../.. -I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include -I. -I./../../dep/include -I./../ascent-shared -I./../../dep/src -g -O2 -o StdAfx.h.gch StdAfx.h
+#g++ -DHAVE_CONFIG_H -I. -I. -I../.. -I/usr/include/mysql -I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include -I. -I./../../dep/include  -I./../ascent-shared -I./../../dep/src -g -O2 -o StdAfx.h.gch StdAfx.h
+g++ -DHAVE_CONFIG_H -I. -I../.. -I/usr/include/mysql -I/usr/local/include/mysql -I/usr/include/postgressql -I/usr/local/include/postgressql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include -I. -I./../../dep/include -I./../ascent-shared -I./../../dep/src -g -O2 -o StdAfx.h.gch StdAfx.h
 
 echo Symlinking script gch files.
 cd ../scripts/src/GossipScripts
