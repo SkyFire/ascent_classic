@@ -55,6 +55,14 @@ libshared_a_SOURCES = \
     Database/DataStore.h \
     Database/dbcfile.cpp \
     Database/dbcfile.h \
+    Database/MySQLDatabase.cpp \
+    Database/MySQLDatabase.h \
+    Database/PostgresDatabase.cpp \
+    Database/PostgresDatabase.h \
+    Database/SQLiteDatabase.cpp \
+    Database/SQLiteDatabase.h \
+    Database/CreateInterface.cpp \
+    ../../dep/include/sqlite/sqlite3.c \
     Network/ListenSocketPoll.h \
     Network/ListenSocketSelect.h \
     Network/ListenSocketLinux.h \
