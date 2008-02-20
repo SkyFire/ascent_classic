@@ -209,7 +209,7 @@ if test "x$OSNAME" = "xDarwin" ; then
 fi
 
 AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
-
+AC_CHECK_LIB( pq, PQconnectdb, [],[AC_MSG_ERROR([Missing postgre])])
 
 AC_DEFINE_UNQUOTED([PREFIX], "${prefix}", "Prefix")
 AC_DEFINE_UNQUOTED([SCRIPTDIR], "${scriptdir}", "librarydir")
