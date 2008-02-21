@@ -404,7 +404,6 @@ enum Attributes
     ATTRIBUTES_REQ_OOC							= 0x10000000, //     ATTRIBUTES_REQ_OUT_OF_COMBAT
     ATTRIBUTES_UNK31							= 0x20000000,
     ATTRIBUTES_UNK32							= 0x40000000, // seems like IS_DIMINISHING but some spells not there (f.e. Gouge)
-    ATTRIBUTES_UNUSED9							= 0x80000000,
 };
 
 enum AttributesEx
@@ -484,6 +483,11 @@ enum Flags4
     FLAGS4_PLAYER_RANGED_SPELLS         = 0x8000,
     CAN_PERSIST_AND_CASTED_WHILE_DEAD   = 0x100000,
     FLAGS4_PLAYER_RANGED_WAND           = 0x400000,
+};
+enum Flags5
+{
+	FLAGS5_PROCCHANCE_COMBOBASED        = 0x2,
+	FLAGS5_ONLY_IN_OUTLANDS             = 0x4000000,
 };
 
 enum SpellCastFlags
@@ -749,8 +753,8 @@ enum SPELL_ENTRY
     SPELL_ENTRY_Attributes,
     SPELL_ENTRY_AttributesEx,
     SPELL_ENTRY_Flags3,
-    SPELL_ENTRY_field10,
-    SPELL_ENTRY_field11,
+    SPELL_ENTRY_Flags4,
+    SPELL_ENTRY_Flags5,
     SPELL_ENTRY_unk201_1,
     SPELL_ENTRY_RequiredShapeShift,
     SPELL_ENTRY_UNK14,
@@ -948,9 +952,9 @@ enum SPELL_ENTRY
     SPELL_ENTRY_FL,
     SPELL_ENTRY_FM,
     SPELL_ENTRY_FN,
-    SPELL_ENTRY_unk201_4,
-    SPELL_ENTRY_unk201_5,
-    SPELL_ENTRY_unk201_6
+    SPELL_ENTRY_TotemCategory1,
+    SPELL_ENTRY_TotemCategory2,
+    SPELL_ENTRY_RequiredAreaID
 };
 
 // target type flags
