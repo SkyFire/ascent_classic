@@ -306,6 +306,7 @@ enum customProcFlags
 	CUSTOMPROC_ON_DIE                     = 0x40;//proc on our death
 	CUSTOMPROC_ON_FINISHMOVE              = 0x80; //procs when we use finish move ability
 	CUSTOMPROC_ON_ADDCOMBO                = 0x100; //procs when we use ability with +combo point
+	CUSTOMPROC_PROC_ON_SELF               = 0x200; //proc on self
 };
 #endif
 
