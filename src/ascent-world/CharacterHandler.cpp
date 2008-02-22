@@ -900,9 +900,6 @@ void WorldSession::FullLogin(Player * plr)
 		plr->AddToWorld();
 	}
 
-	/* delay antiflight hack checks and speedhack checks for 10 seconds. */
-	_player->_heartBeatDisabledUntil = UNIXTIME + 10;
-
 	objmgr.AddPlayer(_player);
 }
 

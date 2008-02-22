@@ -1625,6 +1625,15 @@ void WorldSession::HandleAcknowledgementOpcodes( WorldPacket & recv_data )
 	case CMSG_MOVE_SET_FLY_ACK:
 		_player->FlyCheat = _player->m_setflycheat;
 		break;
+
+	case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
+	case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
+	case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
+	case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
+	case CMSG_FORCE_FLY_BACK_SPEED_CHANGE_ACK:
+	case CMSG_FORCE_MOVE_SET_FLY_SPEED_ACK:
+		_player->_heartbeatEnable = true;
+		break;
 	}
 
    /* uint16 opcode = recv_data.GetOpcode();

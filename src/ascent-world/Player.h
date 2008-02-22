@@ -1404,7 +1404,7 @@ public:
 	float _lastHeartbeatO; // orientation
 	float _lastHeartbeatV; // velocity
 	time_t _lastHeartbeatT; // time
-	time_t _heartBeatDisabledUntil;
+	bool _heartbeatEnable;
 
 	void AddSplinePacket(uint64 guid, ByteBuffer* packet);
 	ByteBuffer* GetAndRemoveSplinePacket(uint64 guid);

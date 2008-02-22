@@ -34,29 +34,30 @@ class Creature;
 class MovementInfo;
 struct TrainerSpell;
 
+
 // MovementFlags Contribution by Tenshi
 enum MovementFlags
 {
 	// Byte 1 (Resets on Movement Key Press)
-    MOVEFLAG_MOVE_STOP                  = 0x00, //verified
-	MOVEFLAG_MOVE_FORWARD				= 0x01, //verified
-	MOVEFLAG_MOVE_BACKWARD				= 0x02, //verified
-	MOVEFLAG_STRAFE_LEFT				= 0x04, //verified
-	MOVEFLAG_STRAFE_RIGHT				= 0x08, //verified
-	MOVEFLAG_TURN_LEFT					= 0x10, //verified
-	MOVEFLAG_TURN_RIGHT					= 0x20, //verified
-	MOVEFLAG_PITCH_DOWN					= 0x40,			// Unconfirmed
-	MOVEFLAG_PITCH_UP					= 0x80,			// Unconfirmed
+    MOVEFLAG_MOVE_STOP                  = 0x00,			//verified
+	MOVEFLAG_MOVE_FORWARD				= 0x01,			//verified
+	MOVEFLAG_MOVE_BACKWARD				= 0x02,			//verified
+	MOVEFLAG_STRAFE_LEFT				= 0x04,			//verified
+	MOVEFLAG_STRAFE_RIGHT				= 0x08,			//verified
+	MOVEFLAG_TURN_LEFT					= 0x10,			//verified
+	MOVEFLAG_TURN_RIGHT					= 0x20,			//verified
+	MOVEFLAG_PITCH_DOWN					= 0x40,			//Unconfirmed
+	MOVEFLAG_PITCH_UP					= 0x80,			//Unconfirmed
 
 	// Byte 2 (Resets on Situation Change)
-	MOVEFLAG_WALK						= 0x100, //verified
+	MOVEFLAG_WALK						= 0x100,		//verified
 	MOVEFLAG_TAXI						= 0x200,		
 	MOVEFLAG_NO_COLLISION				= 0x400,
-	MOVEFLAG_FLYING	    				= 0x800, //verified
-	MOVEFLAG_REDIRECTED					= 0x1000,		// Unconfirmed
+	MOVEFLAG_FLYING	    				= 0x800,		//verified
+	MOVEFLAG_REDIRECTED					= 0x1000,		//Unconfirmed
 	MOVEFLAG_FALLING					= 0x2000,       //verified
-	MOVEFLAG_FALLING_FAR				= 0x4000,		// verified Going to take damage(might not take damage).
-	MOVEFLAG_FREE_FALLING				= 0x8000,		// half verified ;P
+	MOVEFLAG_FALLING_FAR				= 0x4000,		//verified
+	MOVEFLAG_FREE_FALLING				= 0x8000,		//half verified
 
 	// Byte 3 (Set by server. TB = Third Byte. Completely unconfirmed.)
 	MOVEFLAG_TB_PENDING_STOP			= 0x10000,		// (MOVEFLAG_PENDING_STOP)
@@ -87,6 +88,7 @@ enum MovementFlags
 	MOVEFLAG_PENDING_MASK				= 0x7F0000,
 	MOVEFLAG_PENDING_STRAFE_MASK		= 0x600000,
 	MOVEFLAG_PENDING_MOVE_MASK			= 0x180000,
+	MOVEFLAG_FULL_FALLING_MASK			= 0xE000,
 };
 
 struct OpcodeHandler
