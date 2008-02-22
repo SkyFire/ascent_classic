@@ -1,23 +1,3 @@
-/*
- * Ascent MMORPG Server
- * LUA Interface
- * Copyright (C) 2007 Burlex <burlex@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
-
 #ifndef __LUAFUNCTIONS_H
 #define __LUAFUNCTIONS_H
 
@@ -48,29 +28,21 @@ int luaUnit_KnockBack(lua_State * L, Unit * ptr);
 int luaUnit_MarkQuestObjectiveAsComplete(lua_State * L, Unit * ptr);
 int luaUnit_LearnSpell(lua_State * L, Unit* ptr);
 int luaUnit_UnlearnSpell(lua_State * L, Unit * ptr);
-int luaUnit_GetPlayerClass(lua_State * L, Unit * ptr);
 int luaUnit_HasFinishedQuest(lua_State * L, Unit * ptr);
 int luaUnit_GetItemCount(lua_State * L, Unit * ptr);
 int luaUnit_IsInCombat(lua_State * L, Unit * ptr);
 int luaUnit_GetMainTank(lua_State * L, Unit * ptr);
 int luaUnit_GetAddTank(lua_State * L, Unit * ptr);
-int luaUnit_ClearHateList(lua_State * L, Unit * ptr);
-int luaUnit_WipeHateList(lua_State * L, Unit * ptr);
-int luaUnit_WipeTargetList(lua_State * L, Unit * ptr);
-int luaUnit_WipeCurrentTarget(lua_State * L, Unit * ptr);
+int luaUnit_ClearThreatList(lua_State * L, Unit * ptr);
 int luaUnit_GetTauntedBy(lua_State * L, Unit * ptr);
 int luaUnit_SetTauntedBy(lua_State * L, Unit * ptr);
 int luaUnit_GetSoulLinkedWith(lua_State * L, Unit * ptr);
 int luaUnit_SetSoulLinkedWith(lua_State * L, Unit * ptr);
 int luaUnit_ChangeTarget(lua_State * L, Unit * ptr);
 int luaUnit_GetHealthPct(lua_State * L, Unit * ptr);
-int luaUnit_GetHealth(lua_State * L, Unit * ptr);
-int luaUnit_GetMaxHealth(lua_State * L, Unit * ptr);
 int luaUnit_GetManaPct(lua_State * L, Unit * ptr);
 int luaUnit_Emote(lua_State * L, Unit * ptr);
 int luaUnit_SetHealthPct(lua_State * L, Unit * ptr);
-int luaUnit_SetHealth(lua_State * L, Unit * ptr);
-int luaUnit_SetMaxHealth(lua_State * L, Unit * ptr);
 int luaUnit_Despawn(lua_State * L, Unit * ptr);
 int luaUnit_GetUnitBySqlId(lua_State * L, Unit * ptr);
 int luaUnit_PlaySoundToSet(lua_State * L, Unit * ptr);

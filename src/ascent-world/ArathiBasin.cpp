@@ -742,12 +742,12 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 		// this control point just got taken over by someone! oh noes!
 		if( m_spiritGuides[Id] != NULL )
 		{
-			map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find( m_spiritGuides[Id] );
+			map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find(m_spiritGuides[Id]);
 			if( itr != m_resurrectMap.end() )
 			{
 				for( set<uint32>::iterator it2 = itr->second.begin(); it2 != itr->second.end(); ++it2 )
 				{
-					Player * r_plr = m_mapMgr->GetPlayer( *it2 );
+					Player* r_plr = m_mapMgr->GetPlayer( *it2 );
 					if( r_plr != NULL && r_plr->isDead() )
 						HookHandleRepop( r_plr );
 				}

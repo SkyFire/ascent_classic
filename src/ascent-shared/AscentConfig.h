@@ -50,9 +50,6 @@
  * Only recommended under X64 builds, X86 builds will most likely run out of address space.
  * Default: Disabled
  */
-#ifdef ENABLE_MEMORY_MAPPING_FOR_MAPS
-# define USE_MEMORY_MAPPING_FOR_MAPS 1
-#endif
 //#define USE_MEMORY_MAPPING_FOR_MAPS
 
 /** Enable/disable Ascent's Voice Chat support.
@@ -62,19 +59,7 @@
  * Also, it only works for parties. Custom chat channels are not fully supported yet.
  * However, if you want to play around with it, feel free to enable this define.
  */
-#ifdef ENABLE_VOICE_CHAT
-# define VOICE_CHAT 1
-#endif
 //#define VOICE_CHAT 1
-
-/** Enable/disable global LFG channel 
- * Used for test servers mainly
- * Default: Disabled
- */
-#ifdef ENABLE_GLOBAL_LFG
-# define GLOBAL_LFG 1
-#endif
-//#define GLOBAL_LFG 1
 
 /** Enable/disable movement compression.
  * This allows the server to compress long-range creatures movement into a buffer and then flush
@@ -87,6 +72,28 @@
 //#define ENABLE_COMPRESSED_MOVEMENT 1
 //#define ENABLE_COMPRESSED_MOVEMENT_FOR_PLAYERS 1
 //#define ENABLE_COMPRESSED_MOVEMENT_FOR_CREATURES 1
+
+/**
+ * DATABASE LAYER SET UP
+ */
+
+/**
+ * Enable/disable database backends.
+ * Currently supported, MySQL, (under development): PostgreSQL, SQLite
+ */
+
+#if !defined(NO_DBLAYER_MYSQL)
+#define ENABLE_DATABASE_MYSQL 1
+#endif
+// #define ENABLE_DATABASE_POSTGRES 1
+// #define ENABLE_DATABASE_SQLITE 1
+
+/**
+ * Optimize the server for MySQL usage.
+ * This may give a small boost to performance.
+ * Enable it if you do not plan on using Ascent with PostgreSQL or SQLite.
+ */
+#define OPTIMIZE_SERVER_FOR_MYSQL 1
 
 #endif		// __ASCENTCONFIG_H
 

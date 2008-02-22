@@ -30,6 +30,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Extracting SVN revision..."
+				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -115,6 +117,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Extracting SVN revision..."
+				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -198,6 +202,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Extracting SVN revision..."
+				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -275,6 +281,8 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				Description="Extracting SVN revision..."
+				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -377,34 +385,6 @@
 				RelativePath="..\..\src\ascent-shared\Database\Field.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\include\sqlite\sqlite3.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.h"
-				>
-			</File>
 			<Filter
 				Name="DataStores"
 				>
@@ -434,6 +414,34 @@
 				</File>
 				<File
 					RelativePath="..\..\src\ascent-shared\Database\DBCStores.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Database Wrappers"
+				>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.h"
 					>
 				</File>
 			</Filter>

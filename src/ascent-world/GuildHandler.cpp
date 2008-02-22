@@ -89,7 +89,7 @@ void WorldSession::HandleInviteToGuild(WorldPacket & recv_data)
 		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_PERMISSIONS);
 		return;
 	}
-	else if(plyr->GetTeam()!=_player->GetTeam()) /** Hawk -- Removed GM check since now there's a GM command to do this */ // && _player->GetSession()->GetPermissionCount() == 0)
+	else if(plyr->GetTeam()!=_player->GetTeam() && _player->GetSession()->GetPermissionCount() == 0)
 	{
 		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_NOT_ALLIED);
 		return;
@@ -350,31 +350,15 @@ void WorldSession::HandleGuildRank(WorldPacket & recv_data)
 		recv_data >> pRank->iTabPermissions[i].iStacksPerDay;
 	}
 
-	if( CharacterDatabase.SupportsReplaceInto() )
-	{
-		CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
-			_player->m_playerInfo->guild->GetGuildId(), pRank->iId, CharacterDatabase.EscapeString(newName).c_str(),
-			pRank->iRights, pRank->iGoldLimitPerDay,
-			pRank->iTabPermissions[0].iFlags, pRank->iTabPermissions[0].iStacksPerDay,
-			pRank->iTabPermissions[1].iFlags, pRank->iTabPermissions[1].iStacksPerDay,
-			pRank->iTabPermissions[2].iFlags, pRank->iTabPermissions[2].iStacksPerDay,
-			pRank->iTabPermissions[3].iFlags, pRank->iTabPermissions[3].iStacksPerDay,
-			pRank->iTabPermissions[4].iFlags, pRank->iTabPermissions[4].iStacksPerDay,
-			pRank->iTabPermissions[5].iFlags, pRank->iTabPermissions[5].iStacksPerDay);
-	}
-	else
-	{
-		CharacterDatabase.Execute("DELETE FROM guild_ranks WHERE guildId = %u AND rankId = %u", _player->m_playerInfo->guild->GetGuildId(), pRank->iId );
-		CharacterDatabase.Execute("INSERT INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
-			_player->m_playerInfo->guild->GetGuildId(), pRank->iId, CharacterDatabase.EscapeString(newName).c_str(),
-			pRank->iRights, pRank->iGoldLimitPerDay,
-			pRank->iTabPermissions[0].iFlags, pRank->iTabPermissions[0].iStacksPerDay,
-			pRank->iTabPermissions[1].iFlags, pRank->iTabPermissions[1].iStacksPerDay,
-			pRank->iTabPermissions[2].iFlags, pRank->iTabPermissions[2].iStacksPerDay,
-			pRank->iTabPermissions[3].iFlags, pRank->iTabPermissions[3].iStacksPerDay,
-			pRank->iTabPermissions[4].iFlags, pRank->iTabPermissions[4].iStacksPerDay,
-			pRank->iTabPermissions[5].iFlags, pRank->iTabPermissions[5].iStacksPerDay);
-	}
+	CharacterDatabase.Execute("REPLACE INTO guild_ranks VALUES(%u, %u, \"%s\", %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
+		_player->m_playerInfo->guild->GetGuildId(), pRank->iId, CharacterDatabase.EscapeString(newName).c_str(),
+		pRank->iRights, pRank->iGoldLimitPerDay,
+		pRank->iTabPermissions[0].iFlags, pRank->iTabPermissions[0].iStacksPerDay,
+		pRank->iTabPermissions[1].iFlags, pRank->iTabPermissions[1].iStacksPerDay,
+		pRank->iTabPermissions[2].iFlags, pRank->iTabPermissions[2].iStacksPerDay,
+		pRank->iTabPermissions[3].iFlags, pRank->iTabPermissions[3].iStacksPerDay,
+		pRank->iTabPermissions[4].iFlags, pRank->iTabPermissions[4].iStacksPerDay,
+		pRank->iTabPermissions[5].iFlags, pRank->iTabPermissions[5].iStacksPerDay);
 }
 
 void WorldSession::HandleGuildAddRank(WorldPacket & recv_data)
@@ -753,10 +737,9 @@ void WorldSession::HandleCharterQuery(WorldPacket & recv_data)
 	data << charter_id;
 	data << (uint64)c->LeaderGuid;
 	data << c->GuildName << uint8(0);
-	if( c->CharterType == CHARTER_TYPE_GUILD )
+	if(c->CharterType == CHARTER_TYPE_GUILD)
 	{
-		data << uint32( 9 );
-		data << uint32( 9 );
+		data << uint32(9) << uint32(9);
 	}
 	else
 	{
@@ -767,8 +750,7 @@ void WorldSession::HandleCharterQuery(WorldPacket & recv_data)
 			v=4;
 
 		data << v << v;*/
-		data << uint32( c->Slots );
-		data << uint32( c->Slots );
+		data << uint32(c->Slots) << uint32(c->Slots);
 	}
 
 	data << uint32(0);                                      // 4
@@ -780,24 +762,24 @@ void WorldSession::HandleCharterQuery(WorldPacket & recv_data)
     
 	if( c->CharterType == CHARTER_TYPE_GUILD )
 	{
-		data << uint32( 70 );								// 10
+		data << uint32(1);                                      // 10
 	}
 	else
 	{
-		data << uint32( 1 );								// 10
+		data << uint32(70);                                      // 10
 	}
 
     data << uint32(0);                                      // 11
     data << uint32(0);                                      // 13 count of next strings?
     data << uint32(0);                                      // 14
 
-	if( c->CharterType == CHARTER_TYPE_GUILD )
+	if (c->CharterType == CHARTER_TYPE_GUILD)
 	{
-		data << uint32( 0 );
+		data << uint32(0);
 	}
 	else
 	{
-		data << uint32( 1 );
+		data << uint32(1);
 	}
 
 	SendPacket(&data);
@@ -834,33 +816,33 @@ void WorldSession::HandleCharterSign( WorldPacket & recv_data )
 	uint64 item_guid;
 	recv_data >> item_guid;
 
-	Charter* c = objmgr.GetCharterByItemGuid( item_guid );
-	if( c == NULL )
+	Charter * c = objmgr.GetCharterByItemGuid(item_guid);
+	if(c == 0)
 		return;
 
 	for(uint32 i = 0; i < 9; ++i)
 	{
-		if( c->Signatures[i] == _player->GetGUID() )
+		if(c->Signatures[i] == _player->GetGUID())
 		{
-			SendNotification( "You have already signed that charter." );
+			SendNotification("You have already signed that charter.");
 			return;
 		}
 	}
 
-	if( c->IsFull() )
+	if(c->IsFull())
 		return;
 
-	c->AddSignature( _player->GetGUIDLow() );
+	c->AddSignature(_player->GetGUIDLow());
 	c->SaveToDB();
 	_player->m_charters[c->CharterType] = c;
-	_player->SaveToDB( false );
+	_player->SaveToDB(false);
 
-	Player* l = _player->GetMapMgr()->GetPlayer(c->GetLeader() );
-	if( l == NULL )
+	Player * l = _player->GetMapMgr()->GetPlayer(c->GetLeader());
+	if(l == 0)
 		return;
 
-	WorldPacket data( SMSG_PETITION_SIGN_RESULTS, 100 );
-	data << item_guid << _player->GetGUID() << uint32( 0 );
+	WorldPacket data(SMSG_PETITION_SIGN_RESULTS, 100);
+	data << item_guid << _player->GetGUID() << uint32(0);
 	l->GetSession()->SendPacket(&data);
 	data.clear();
 	data << item_guid << (uint64)c->GetLeader() << uint32(0);
@@ -1114,7 +1096,7 @@ void WorldSession::HandleGuildBankModifyTab(WorldPacket & recv_data)
 		if( !(pTab->szTabIcon && strcmp(pTab->szTabIcon, tabicon.c_str()) == 0) )
 		{
 			ptmp = pTab->szTabIcon;
-			pTab->szTabIcon = strdup(tabicon.c_str());		// Hawk -- Fixed tab name setting instead of tab icon
+			pTab->szTabIcon = strdup(tabname.c_str());
 			if(ptmp)
 				free(ptmp);
 

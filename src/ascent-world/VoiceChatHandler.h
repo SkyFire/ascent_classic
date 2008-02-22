@@ -23,7 +23,7 @@
 
 #ifdef VOICE_CHAT
 
-#include "../ascent-voicechat/VoiceChatOpcodes.h"
+#include "../voicechat/VoiceChatOpcodes.h"
 #include "VoiceChatClientSocket.h"
 
 class VoiceChatClientSocket;
@@ -35,26 +35,13 @@ struct VoiceChatChannelRequest
 	uint32 groupid;
 };
 
-struct voicechat_ip
-{
-	union
-	{
-		uint8 oct1;
-		uint8 oct2;
-		uint8 oct3;
-		uint8 oct4;
-
-		uint32 full;
-	};
-};
-
 class VoiceChatHandler : public Singleton<VoiceChatHandler>
 {
 	VoiceChatClientSocket * m_client;
 	Mutex m_lock;
 	vector<VoiceChatChannelRequest> m_requests;
 	uint32 request_high;
-	voicechat_ip ip;
+	uint32 ip;
 	uint16 port;
 	time_t next_connect;
 	bool enabled;
@@ -66,7 +53,7 @@ public:
 	void SocketDisconnected();
 	void OnRead(const uint8 * bytes, uint32 len);
 
-	ASCENT_INLINE uint32 GetVoiceServerIP() { return ip.full; }
+	ASCENT_INLINE uint32 GetVoiceServerIP() { return ip; }
 	ASCENT_INLINE uint16 GetVoiceServerPort() { return port; }
 	void CreateVoiceChannel(Channel * chn);
 	void DestroyVoiceChannel(Channel * chn);
@@ -74,9 +61,6 @@ public:
 	bool CanUseVoiceChat();
 
 	void CreateGroupChannel(Group * pGroup);
-	void DestroyGroupChannel(Group * pGroup);
-	void RemoveGroupChannelMember(Group * pGroup);
-	bool CanCreateVoiceChannel(Channel * chn);
 };
 
 #define sVoiceChatHandler VoiceChatHandler::getSingleton()

@@ -42,8 +42,8 @@ namespace VMAP
     {
         iNNodes = pNNodes;
         iNTriangles = pNTriangles;
-        iTriangles = 0;
-        iTreeNodes = 0;
+        iTriangles = NULL;
+        iTreeNodes = NULL;
         if(iNNodes >0) iTreeNodes = new TreeNode[iNNodes];
         if(iNTriangles >0) iTriangles = new TriangleBox[iNTriangles];
     }

@@ -10,9 +10,9 @@ AC_PREREQ(2.5)
 if test -d obj; then rm -rf obj; fi
 
 AM_CONFIG_HEADER( config.h )
-INCLUDES="-I/usr/include/mysql -I/usr/include/postgresql -I/usr/include/openssl -I/usr/local/include -I/usr/local/include/mysql -I/usr/local/include/openssl -I/usr/local/include/postgresql"
+INCLUDES="-I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include"
 AC_SUBST(INCLUDES)
-LDFLAGS="-L/usr/lib/mysql -L/usr/lib/postgresql -L/usr/local/lib -L/usr/local/lib/mysql -L/usr/local/lib/postgresql"
+LDFLAGS="-L/usr/lib/mysql -L/usr/local/lib -L/usr/local/lib/mysql"
 AC_SUBST(LDFLAGS)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
@@ -29,11 +29,13 @@ AH_TEMPLATE([HAVE_DARWIN], Define if you have MacOSX Darwin, to include the corr
 AH_TEMPLATE([ENABLE_CLUSTERING], Define if you want to enable clustering, this is experimental.)
 AH_TEMPLATE([ENABLE_COLLISION], Define if you want to enable collision calculation, warning. this can cause. a heavy load)
 AH_TEMPLATE([ENABLE_VOICECHAT], Define this if you want to enable voice chat system)
-AH_TEMPLATE([ENABLE_GLOBAL_LFG], Define this if you want to enable global lfg channel)
 AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
 AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
 AH_TEMPLATE([X64], Define this if you are under an X64-based operating system.)
 AH_TEMPLATE([X86], Define this if you are under an X86-based 32bit operating system.)
+AH_TEMPLATE([NO_DBLAYER_MYSQL], Define this if you want to disable mysql support.)
+AH_TEMPLATE([ENABLE_DATABASE_POSTGRES], Define this if you want postgres support.)
+AH_TEMPLATE([ENABLE_DATABASE_SQLITE], Define this if you want sqlite support.)
 
 # Default prefix
 AC_PREFIX_DEFAULT(`pwd`)
@@ -86,14 +88,8 @@ esac
 
 AC_C_BIGENDIAN([AC_DEFINE(USING_BIG_ENDIAN)],[AC_DEFINE(USING_LITTLE_ENDIAN)],[])
 
-# Required for SVN revision magic
-AC_PROG_AWK
-
 AC_CHECK_PROG([SVN], [svn], yes)
 if test -z "$SVN"; then AC_MSG_ERROR(Subversion not found); fi
-
-AC_CHECK_PROG([SED], [sed], yes)
-if test -z "$SED"; then AC_MSG_ERROR(Sed not found); fi
 
 # Checks for libraries.
 AC_CHECK_LIB( pthread, pthread_create, [],
@@ -174,12 +170,28 @@ AC_ARG_ENABLE(voicechat,
      ],
 )
 
-AC_ARG_ENABLE(globallfg,
-     AC_HELP_STRING([--enable-globallfg],enable global lfg),
-     [ if test "x$enable_globallfg" = "xyes" ; then
-   	AC_DEFINE(ENABLE_GLOBAL_LFG)
-       fi
-     ],
+AC_ARG_ENABLE(mysql,
+	AC_HELP_STRING([--without-mysql],disables mysql backend),
+	[ if test "x$without_mysql" = "xyes" ; then
+		AC_DEFINE(NO_DBLAYER_MYSQL)
+		fi
+	],
+)
+
+AC_ARG_ENABLE(postgres,
+	AC_HELP_STRING([--enable-postgres],enables postgres backend),
+	[ if test "x$enable_postgres" = "xyes" ; then
+		AC_DEFINE(ENABLE_DATABASE_POSTGRES)
+		fi
+	],
+)
+
+AC_ARG_ENABLE(sqlite,
+	AC_HELP_STRING([--enable-sqlite],enables sqlite backend),
+	[ if test "x$enable_sqlite" = "xyes" ; then
+		AC_DEFINE(ENABLE_DATABASE_SQLITE)
+		fi
+	],
 )
 
 # Check for networking stuff
@@ -204,16 +216,18 @@ if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_HEADER(sys/event.h, , AC_MSG_ERROR([Cannot find sys/event.h for socket engine]))
 	AC_DEFINE(USE_KQUEUE)
 
-	INCLUDES+="-I/sw/include -I/sw/include/mysql -I/sw/include/postgresql -I/usr/include/openssl"
-	LDFLAGS+="-L/sw/lib -L/sw/lib/mysql -L/sw/lib/postgresql -L/usr/lib"
+	INCLUDES+="-I/sw/include -I/sw/include/mysql -I/usr/include/openssl"
+	LDFLAGS+="-L/sw/lib -L/sw/lib/mysql -L/usr/lib"
 fi
 
 AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
-AC_CHECK_LIB( pq, PQconnectdb, [],[AC_MSG_ERROR([Missing postgre])])
+
 
 AC_DEFINE_UNQUOTED([PREFIX], "${prefix}", "Prefix")
 AC_DEFINE_UNQUOTED([SCRIPTDIR], "${scriptdir}", "librarydir")
 AC_DEFINE_UNQUOTED([CONFDIR], "${sysconfdir}", "configdir")
+
+AC_DEFINE_UNQUOTED([SVN_REVISION_DONE], `sh ./extract_svn_revision.h`, [SVN revision generated])
 
 AC_CONFIG_FILES([
    ./Makefile

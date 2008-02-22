@@ -54,7 +54,15 @@ namespace VMAP
             AABox iBox;
 
         public:
-            ModelContainer() : BaseModel() { iNSubModel =0; iSubModel = 0; };
+            ModelContainer() : BaseModel()
+			{
+				iNSubModel = 0;
+				iSubModel = NULL;
+				iTreeNodes = NULL;
+				iTriangles = NULL;
+				iNTriangles = 0;
+				iNNodes = 0;
+			}
 
             // for the mainnode
             ModelContainer(unsigned int pNTriangles, unsigned int pNNodes, unsigned int pNSubModel);

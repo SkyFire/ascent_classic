@@ -38,25 +38,25 @@ struct TrainerSpell;
 enum MovementFlags
 {
 	// Byte 1 (Resets on Movement Key Press)
-    MOVEFLAG_MOVE_STOP                  = 0x00,			//verified
-	MOVEFLAG_MOVE_FORWARD				= 0x01,			//verified
-	MOVEFLAG_MOVE_BACKWARD				= 0x02,			//verified
-	MOVEFLAG_STRAFE_LEFT				= 0x04,			//verified
-	MOVEFLAG_STRAFE_RIGHT				= 0x08,			//verified
-	MOVEFLAG_TURN_LEFT					= 0x10,			//verified
-	MOVEFLAG_TURN_RIGHT					= 0x20,			//verified
-	MOVEFLAG_PITCH_DOWN					= 0x40,			//Unconfirmed
-	MOVEFLAG_PITCH_UP					= 0x80,			//Unconfirmed
+    MOVEFLAG_MOVE_STOP                  = 0x00, //verified
+	MOVEFLAG_MOVE_FORWARD				= 0x01, //verified
+	MOVEFLAG_MOVE_BACKWARD				= 0x02, //verified
+	MOVEFLAG_STRAFE_LEFT				= 0x04, //verified
+	MOVEFLAG_STRAFE_RIGHT				= 0x08, //verified
+	MOVEFLAG_TURN_LEFT					= 0x10, //verified
+	MOVEFLAG_TURN_RIGHT					= 0x20, //verified
+	MOVEFLAG_PITCH_DOWN					= 0x40,			// Unconfirmed
+	MOVEFLAG_PITCH_UP					= 0x80,			// Unconfirmed
 
 	// Byte 2 (Resets on Situation Change)
-	MOVEFLAG_WALK						= 0x100,		//verified
+	MOVEFLAG_WALK						= 0x100, //verified
 	MOVEFLAG_TAXI						= 0x200,		
 	MOVEFLAG_NO_COLLISION				= 0x400,
-	MOVEFLAG_FLYING	    				= 0x800,		//verified
-	MOVEFLAG_REDIRECTED					= 0x1000,		//Unconfirmed
+	MOVEFLAG_FLYING	    				= 0x800, //verified
+	MOVEFLAG_REDIRECTED					= 0x1000,		// Unconfirmed
 	MOVEFLAG_FALLING					= 0x2000,       //verified
-	MOVEFLAG_FALLING_FAR				= 0x4000,		//verified
-	MOVEFLAG_FREE_FALLING				= 0x8000,		//half verified
+	MOVEFLAG_FALLING_FAR				= 0x4000,		// verified Going to take damage(might not take damage).
+	MOVEFLAG_FREE_FALLING				= 0x8000,		// half verified ;P
 
 	// Byte 3 (Set by server. TB = Third Byte. Completely unconfirmed.)
 	MOVEFLAG_TB_PENDING_STOP			= 0x10000,		// (MOVEFLAG_PENDING_STOP)
@@ -87,19 +87,6 @@ enum MovementFlags
 	MOVEFLAG_PENDING_MASK				= 0x7F0000,
 	MOVEFLAG_PENDING_STRAFE_MASK		= 0x600000,
 	MOVEFLAG_PENDING_MOVE_MASK			= 0x180000,
-	MOVEFLAG_FULL_FALLING_MASK			= 0xE000,
-};
-
-enum UpdateFlags
-{
-    UPDATEFLAG_NONE			= 0x00,
-    UPDATEFLAG_SELF			= 0x01,
-    UPDATEFLAG_TAXI			= 0x02,
-    UPDATEFLAG_FULLGUID     = 0x04,
-    UPDATEFLAG_LOWGUID		= 0x08,
-    UPDATEFLAG_HIGHGUID		= 0x10,
-    UPDATEFLAG_LIVING		= 0x20,
-    UPDATEFLAG_HASPOSITION	= 0x40,
 };
 
 struct OpcodeHandler
@@ -193,12 +180,6 @@ public:
 	uint32 m_currMsTime;
 	uint32 m_lastPing;
 
-	uint32 m_packet_counter;
-	uint32 m_packet_counter_time;
-
-	float m_packets_per_second;
-	float m_packets_per_second_peak;
-
 	ASCENT_INLINE uint32 GetAccountId() const { return _accountId; }
 	ASCENT_INLINE Player* GetPlayer() { return _player; }
 	
@@ -233,7 +214,7 @@ public:
 	{
 		ASSERT(index < 8);
 		if(sAccountData[index].data)
-			delete[] sAccountData[index].data;
+			delete [] sAccountData[index].data;
 		sAccountData[index].data = data;
 		sAccountData[index].sz = sz;
 		if(!initial && !sAccountData[index].bIsDirty)		// Mark as "changed" or "dirty"
@@ -258,7 +239,6 @@ public:
 
 	ASCENT_INLINE void QueuePacket(WorldPacket* packet)
 	{
-		m_packet_counter++;
 		m_lastPing = (uint32)UNIXTIME;
 		_recvQueue.Push(packet);
 	}
@@ -288,8 +268,6 @@ public:
 	ASCENT_INLINE uint32 GetLatency() { return _latency; }
 	ASCENT_INLINE string GetAccountName() { return _accountName; }
 	ASCENT_INLINE const char * GetAccountNameS() { return _accountName.c_str(); }
-	ASCENT_INLINE float GetPacketsPerSecond() { return m_packets_per_second; }
-	ASCENT_INLINE float GetPacketsPerSecondPeak() { return m_packets_per_second_peak; }
 
 	ASCENT_INLINE uint32 GetClientBuild() { return client_build; }
 	ASCENT_INLINE void SetClientBuild(uint32 build) { client_build = build; }
@@ -717,7 +695,6 @@ private:
 	FastQueue<WorldPacket*, Mutex> _recvQueue;
 	char *permissions;
 	int permissioncount;
-
 
 	bool _loggingOut;
 	uint32 _latency;

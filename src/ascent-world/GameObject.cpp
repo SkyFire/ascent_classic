@@ -497,9 +497,8 @@ void GameObject::UseFishingNode(Player *player)
 		EndFishing( player, true );
 		return;
 	}
-
 	uint32 maxskill = entry->MaxSkill;
-	//uint32 minskill = entry->MaxSkill;
+//	uint32 minskill = entry->MaxSkill;
 	uint32 minskill = entry->MinSkill;
 
 	if( player->_GetSkillLineCurrent( SKILL_FISHING, false ) < maxskill )	
@@ -517,6 +516,7 @@ void GameObject::UseFishingNode(Player *player)
 		player->GetSession()->OutPacket( SMSG_FISH_ESCAPED );
 		EndFishing( player, true );
 	}
+
 }
 
 void GameObject::EndFishing(Player* player, bool abort )
@@ -674,12 +674,12 @@ void GameObject::OnRemoveInRangeObject(Object* pObj)
 
 void GameObject::RemoveFromWorld(bool free_guid)
 {
-	WorldPacket data( SMSG_GAMEOBJECT_DESPAWN_ANIM, 8 );
+	WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
 	data << GetGUID();
-	SendMessageToSet( &data, true );
+	SendMessageToSet(&data,true);
 
-	sEventMgr.RemoveEvents( this, EVENT_GAMEOBJECT_TRAP_SEARCH_TARGET );
-	Object::RemoveFromWorld( free_guid );
+	sEventMgr.RemoveEvents(this, EVENT_GAMEOBJECT_TRAP_SEARCH_TARGET);
+	Object::RemoveFromWorld(free_guid);
 }
 
 bool GameObject::HasLoot()

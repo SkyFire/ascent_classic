@@ -20,7 +20,8 @@
 #include "StdAfx.h"
 
 initialiseSingleton( World );
-DayWatcherThread * dw = NULL;
+
+DayWatcherThread* dw = NULL;
 
 float World::m_movementCompressThreshold;
 float World::m_movementCompressThresholdCreatures;
@@ -356,7 +357,7 @@ bool World::SetInitialWorldSettings()
 	Log.Notice( "World", "Loading DBC files..." );
 	if( !LoadDBCs() )
 	{
-		Log.LargeErrorMessage( LARGERRORMESSAGE_ERROR, "One or more of the DBC files are missing.", "These are absolutely necessary for the server to function.", "The server will not start without them.", NULL );
+		Log.LargeErrorMessage(LARGERRORMESSAGE_ERROR, "One or more of the DBC files are missing.", "These are absolutely necessary for the server to function.", "The server will not start without them.", NULL);
 		return false;
 	}
 
@@ -561,6 +562,7 @@ bool World::SetInitialWorldSettings()
 			p.second = result->Fetch()[2].GetInt32();
 			procMap.insert(make_pair(result->Fetch()[0].GetUInt32(), p));
 		} while(result->NextRow());
+		delete result;
 	}
 	uint32 cnt = (uint32)dbc.getRecordCount();
 	uint32 effect;
@@ -599,7 +601,6 @@ bool World::SetInitialWorldSettings()
 		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
         namehash = crc32((const unsigned char*)nametext, (unsigned int)strlen(nametext));
 		sp->NameHash   = namehash; //need these set before we start processing spells
-		sp->can_be_dispelled = true;
 
 		float radius=std::max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[0])),::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[1])));
 		radius=std::max(::GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[2])),radius);
@@ -657,6 +658,12 @@ bool World::SetInitialWorldSettings()
 
 		sp->proc_interval = 0;//trigger at each event
 		sp->c_is_flags = 0;
+		sp->spell_coef_flags = 0;
+		sp->Dspell_coef_override = -1;
+		sp->OTspell_coef_override = -1;
+		sp->casttime_coef = 0;
+		sp->fixed_dddhcoef = -1;
+		sp->fixed_hotdotcoef = -1;
 
 		talentSpellIterator = talentSpells.find(sp->Id);
 		if(talentSpellIterator == talentSpells.end())
@@ -808,48 +815,47 @@ bool World::SetInitialWorldSettings()
 
 		// find diminishing status
 		sp->DiminishStatus = GetDiminishingGroup(namehash);
-		sp->buffIndexType = 0;
-
-		switch( namehash )
+		sp->buffIndexType=0;
+		switch(namehash)
 		{
-		case SPELL_HASH_HUNTER_S_MARK:
+		case SPELL_HASH_HUNTER_S_MARK:		// Hunter's mark
 			sp->buffIndexType = SPELL_TYPE_INDEX_MARK;
 			break;
 
-		case SPELL_HASH_POLYMORPH:
-		case SPELL_HASH_POLYMORPH__CHICKEN:
-		case SPELL_HASH_POLYMORPH__PIG:
-		case SPELL_HASH_POLYMORPH__SHEEP:
-		case SPELL_HASH_POLYMORPH__TURTLE:
+		case SPELL_HASH_POLYMORPH:			// Polymorph
+		case SPELL_HASH_POLYMORPH__CHICKEN:	// Polymorph: Chicken
+		case SPELL_HASH_POLYMORPH__PIG:		// Polymorph: Pig
+		case SPELL_HASH_POLYMORPH__SHEEP:	// Polymorph: Sheep
+		case SPELL_HASH_POLYMORPH__TURTLE:	// Polymorph: Turtle
 			sp->buffIndexType = SPELL_TYPE_INDEX_POLYMORPH;
 			break;
 
-		case SPELL_HASH_FEAR:
+		case SPELL_HASH_FEAR:				// Fear
 			sp->buffIndexType = SPELL_TYPE_INDEX_FEAR;
 			break;
 
-		case SPELL_HASH_SAP:
+		case SPELL_HASH_SAP:				// Sap
 			sp->buffIndexType = SPELL_TYPE_INDEX_SAP;
 			break;
 
-		case SPELL_HASH_SCARE_BEAST:
+		case SPELL_HASH_SCARE_BEAST:		// Scare Beast
 			sp->buffIndexType = SPELL_TYPE_INDEX_SCARE_BEAST;
 			break;
 
-		case SPELL_HASH_HIBERNATE:
+		case SPELL_HASH_HIBERNATE:			// Hibernate
 			sp->buffIndexType = SPELL_TYPE_INDEX_HIBERNATE;
 			break;
 
-		//removed by Zack Earth shield stacks 10 times. Current code does not support it
-		//case SPELL_HASH_EARTH_SHIELD:
-		//	sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
-		//	break;
+//		removed by Zack Earth shield stacks 10 times. Current code does not support it
+//		case SPELL_HASH_EARTH_SHIELD:		// Earth Shield
+//			sp->buffIndexType = SPELL_TYPE_INDEX_EARTH_SHIELD;
+//			break;
 
-		case SPELL_HASH_CYCLONE:
+		case SPELL_HASH_CYCLONE:			// Cyclone
 			sp->buffIndexType = SPELL_TYPE_INDEX_CYCLONE;
 			break;
 
-		case SPELL_HASH_BANISH:
+		case SPELL_HASH_BANISH:				// Banish
 			sp->buffIndexType = SPELL_TYPE_INDEX_BANISH;
 			break;
 
@@ -860,7 +866,6 @@ bool World::SetInitialWorldSettings()
 		case SPELL_HASH_JUDGEMENT_OF_JUSTICE:
 			sp->buffIndexType = SPELL_TYPE_INDEX_JUDGEMENT;
 			break;
-
 		}
 
 		// HACK FIX: Break roots/fear on damage.. this needs to be fixed properly!
@@ -1295,7 +1300,7 @@ bool World::SetInitialWorldSettings()
 				sp->EffectBasePoints[0]=atoi(startofid); //get new value. This is actually level*8 ;)
 			}
 			sp->Effect[0] = 6; //aura
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL; //force him to use procspell effect
+			sp->EffectApplyAuraName[0] = 42; //force him to use procspell effect
 			sp->EffectTriggerSpell[0] = 12654; //evil , but this is good for us :D
 			sp->procFlags = PROC_ON_SPELL_CRIT_HIT; //add procflag here since this was not processed with the others !
 		}
@@ -1314,7 +1319,7 @@ bool World::SetInitialWorldSettings()
 		else if( strstr( nametext, "Shadow Weaving"))
 		{
 			sp->School = 5;
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+			sp->EffectApplyAuraName[0] = 42;
 			sp->procChance = sp->EffectBasePoints[0] + 1;
 			sp->procFlags = PROC_ON_CAST_SPECIFIC_SPELL;
 		}
@@ -1382,7 +1387,7 @@ bool World::SetInitialWorldSettings()
 			{
 				startofid += strlen("to deal $");
 				sp->EffectTriggerSpell[0] = atoi(startofid);
-				sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+				sp->EffectApplyAuraName[0] = 42;
 				sp->procFlags = PROC_ON_MELEE_ATTACK;
 				sp->procChance = 50;
 			}
@@ -1435,9 +1440,8 @@ bool World::SetInitialWorldSettings()
 			sp->SpellGroupType |= 1; //some of them do have the flags but i's hard to write down those some from 130 spells
 
 		//mage Ice Floes affects these spells : Cone of Cold,Cold Snap,Ice Barrier,Ice Block
-		// Zack : WTF ? talents have group relations not target spells !
-//		if( sp->NameHash == SPELL_HASH_CONE_OF_COLD || sp->NameHash == SPELL_HASH_COLD_SNAP || sp->NameHash == SPELL_HASH_ICE_BARRIER || sp->NameHash == SPELL_HASH_ICE_BLOCK )
-//			sp->EffectSpellGroupRelation[0] = 0x00200000;
+		if( sp->NameHash == SPELL_HASH_CONE_OF_COLD || sp->NameHash == SPELL_HASH_COLD_SNAP || sp->NameHash == SPELL_HASH_ICE_BARRIER || sp->NameHash == SPELL_HASH_ICE_BLOCK )
+			sp->EffectSpellGroupRelation[0] = 0x00200000;
 
 /*		else if( strstr( nametext, "Anesthetic Poison"))
 			sp->SpellGroupType |= 0; //not yet known ? 
@@ -1451,21 +1455,21 @@ bool World::SetInitialWorldSettings()
 			sp->procCharges=-1;*/
 
 		//Set Silencing spells mech.
-		if( sp->EffectApplyAuraName[0] == SPELL_AURA_MOD_SILENCE || 
-			sp->EffectApplyAuraName[1] == SPELL_AURA_MOD_SILENCE ||
-			sp->EffectApplyAuraName[2] == SPELL_AURA_MOD_SILENCE )
+		if( sp->EffectApplyAuraName[0] == 27 || 
+			sp->EffectApplyAuraName[1] == 27 ||
+			sp->EffectApplyAuraName[2] == 27 )
 			sp->MechanicsType = MECHANIC_SILENCED;
 
 		//Set Stunning spells mech.
-		if( sp->EffectApplyAuraName[0] == SPELL_AURA_MOD_STUN || 
-			sp->EffectApplyAuraName[1] == SPELL_AURA_MOD_STUN ||
-			sp->EffectApplyAuraName[2] == SPELL_AURA_MOD_STUN )
+		if( sp->EffectApplyAuraName[0] == 12 || 
+			sp->EffectApplyAuraName[1] == 12 ||
+			sp->EffectApplyAuraName[2] == 12 )
 			sp->MechanicsType = MECHANIC_STUNNED;
 
 		//Set Fearing spells mech
-		if( sp->EffectApplyAuraName[0] == SPELL_AURA_MOD_FEAR || 
-			sp->EffectApplyAuraName[1] == SPELL_AURA_MOD_FEAR ||
-			sp->EffectApplyAuraName[2] == SPELL_AURA_MOD_FEAR )
+		if( sp->EffectApplyAuraName[0] == 7 || 
+			sp->EffectApplyAuraName[1] == 7 ||
+			sp->EffectApplyAuraName[2] == 7 )
 			sp->MechanicsType = MECHANIC_FLEEING;
 
 		if( sp->proc_interval != 0 )
@@ -1498,9 +1502,6 @@ bool World::SetInitialWorldSettings()
 		if( sp->NameHash == SPELL_HASH_DIVINE_SHIELD || sp->NameHash == SPELL_HASH_DIVINE_PROTECTION || sp->NameHash == SPELL_HASH_BLESSING_OF_PROTECTION )
 			sp->MechanicsType = 25;
 
-		if( sp->Id == 25771 || sp->Id == 11196 || sp->Id == 6788 )
-			sp->removable_by_immunity = false;
-
 		/* hackfix for this - FIX ME LATER - Burlex */
 		if( namehash == SPELL_HASH_SEAL_FATE )
 			sp->procFlags = 0;
@@ -1532,6 +1533,297 @@ bool World::SetInitialWorldSettings()
 //if(sp->Id==11267 || sp->Id==11289 || sp->Id==6409)
 //	printf("!!!!!!! name %s , id %u , hash %u \n",nametext,sp->Id, namehash);
 	}
+
+
+	/////////////////////////////////////////////////////////////////
+	//SPELL COEFFICIENT SETTINGS START
+	//////////////////////////////////////////////////////////////////
+
+	for(uint32 x=0; x < cnt; x++)
+	{
+		// SpellID
+		uint32 spellid = dbc.getRecord(x).getUInt(0);
+		// get spellentry
+		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
+
+		//Setting Cast Time Coefficient
+		SpellCastTime *sd = dbcSpellCastTime.LookupEntry(sp->CastingTimeIndex);
+		float castaff = float(GetCastTime(sd));
+		if(castaff < 1500) castaff = 1500;
+		else
+			if(castaff > 7000) castaff = 7000;
+
+		sp->casttime_coef = castaff / 3500;		 
+
+		SpellEntry * spz;
+		bool spcheck = false;
+
+		//Flag for DoT and HoT
+		for( uint8 i = 0 ; i < 3 ; i++ )
+		{
+			if (sp->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_DAMAGE ||
+				sp->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL ||
+				sp->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_LEECH )
+			{
+				sp->spell_coef_flags |= SPELL_FLAG_IS_DOT_OR_HOT_SPELL;
+				break;
+			}
+		}
+
+		//Flag for DD or DH
+		for( uint8 i = 0 ; i < 3 ; i++ )
+		{
+			if ( sp->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_TRIGGER_SPELL && sp->EffectTriggerSpell[i] )
+			{
+				spz = dbcSpell.LookupEntry( sp->EffectTriggerSpell[i] );
+				if( spz &&
+					spz->Effect[i] == SPELL_EFFECT_SCHOOL_DAMAGE ||
+					spz->Effect[i] == SPELL_EFFECT_HEAL
+					) 
+					spcheck = true;
+			}
+			if (sp->Effect[i] == SPELL_EFFECT_SCHOOL_DAMAGE ||
+				sp->Effect[i] == SPELL_EFFECT_HEAL ||
+				spcheck
+				)
+			{
+				sp->spell_coef_flags |= SPELL_FLAG_IS_DD_OR_DH_SPELL;
+				break;
+			}
+		}
+
+		for(uint8 i = 0 ; i < 3; i++)
+		{
+			switch (sp->EffectImplicitTargetA[i])
+			{
+				//AoE
+			case EFF_TARGET_ALL_TARGETABLE_AROUND_LOCATION_IN_RADIUS:
+			case EFF_TARGET_ALL_ENEMY_IN_AREA:
+			case EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT:
+			case EFF_TARGET_ALL_PARTY_AROUND_CASTER:
+			case EFF_TARGET_ALL_ENEMIES_AROUND_CASTER:
+			case EFF_TARGET_IN_FRONT_OF_CASTER:
+			case EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED:
+			case EFF_TARGET_ALL_PARTY_IN_AREA_CHANNELED:
+			case EFF_TARGET_ALL_FRIENDLY_IN_AREA:
+			case EFF_TARGET_ALL_TARGETABLE_AROUND_LOCATION_IN_RADIUS_OVER_TIME:
+			case EFF_TARGET_ALL_PARTY:
+			case EFF_TARGET_LOCATION_INFRONT_CASTER:
+			case EFF_TARGET_BEHIND_TARGET_LOCATION:
+			case EFF_TARGET_LOCATION_INFRONT_CASTER_AT_RANGE:
+				{
+					sp->spell_coef_flags |= SPELL_FLAG_AOE_SPELL;
+					break;
+				}
+			}	
+		}
+
+		for(uint8 i = 0 ; i < 3 ; i++)
+		{
+			switch (sp->EffectImplicitTargetB[i])
+			{
+				//AoE
+			case EFF_TARGET_ALL_TARGETABLE_AROUND_LOCATION_IN_RADIUS:
+			case EFF_TARGET_ALL_ENEMY_IN_AREA:
+			case EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT:
+			case EFF_TARGET_ALL_PARTY_AROUND_CASTER:
+			case EFF_TARGET_ALL_ENEMIES_AROUND_CASTER:
+			case EFF_TARGET_IN_FRONT_OF_CASTER:
+			case EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED:
+			case EFF_TARGET_ALL_PARTY_IN_AREA_CHANNELED:
+			case EFF_TARGET_ALL_FRIENDLY_IN_AREA:
+			case EFF_TARGET_ALL_TARGETABLE_AROUND_LOCATION_IN_RADIUS_OVER_TIME:
+			case EFF_TARGET_ALL_PARTY:
+			case EFF_TARGET_LOCATION_INFRONT_CASTER:
+			case EFF_TARGET_BEHIND_TARGET_LOCATION:
+			case EFF_TARGET_LOCATION_INFRONT_CASTER_AT_RANGE:
+				{
+					sp->spell_coef_flags |= SPELL_FLAG_AOE_SPELL;
+					break;
+				}
+			}	
+		}
+
+		//Special Cases
+		//Holy Light & Flash of Light
+		if(sp->NameHash == SPELL_HASH_HOLY_LIGHT ||
+			sp->NameHash == SPELL_HASH_FLASH_OF_LIGHT)
+			sp->spell_coef_flags |= SPELL_FLAG_IS_DD_OR_DH_SPELL;
+
+		//Additional Effect (not healing or damaging)
+		for( uint8 i = 0 ; i < 3 ; i++ )
+		{
+			if(sp->Effect[i] == 0)
+				continue;
+
+			switch (sp->Effect[i])
+			{
+			case SPELL_EFFECT_SCHOOL_DAMAGE:
+			case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+			case SPELL_EFFECT_HEALTH_LEECH:
+			case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+			case SPELL_EFFECT_ADD_EXTRA_ATTACKS:
+			case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+			case SPELL_EFFECT_POWER_BURN:
+			case SPELL_EFFECT_ATTACK:
+			case SPELL_EFFECT_HEAL:
+			case SPELL_EFFECT_HEALTH_FUNNEL:
+			case SPELL_EFFECT_HEAL_MAX_HEALTH:
+			case SPELL_EFFECT_DUMMY:
+				continue;
+			}
+
+			switch (sp->EffectApplyAuraName[i])
+			{
+			case SPELL_AURA_PERIODIC_DAMAGE:
+			case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+			case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+			case SPELL_AURA_POWER_BURN:
+			case SPELL_AURA_PERIODIC_HEAL:
+			case SPELL_AURA_MOD_INCREASE_HEALTH:
+			case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+			case SPELL_AURA_DUMMY:
+				continue;
+			}
+
+			sp->spell_coef_flags |= SPELL_FLAG_ADITIONAL_EFFECT;
+			break;
+
+		}
+
+		//Calculating fixed coeficients
+		//Channeled spells
+		if( sp->ChannelInterruptFlags != 0 )
+		{
+			float Duration = float( GetDuration( dbcSpellDuration.LookupEntry( sp->DurationIndex ) ));
+			if(Duration < 1500) Duration = 1500;
+			else if(Duration > 7000) Duration = 7000;
+			sp->fixed_hotdotcoef = (Duration / 3500.0f);
+
+			if( sp->spell_coef_flags & SPELL_FLAG_ADITIONAL_EFFECT )
+				sp->fixed_hotdotcoef *= 0.95f;
+			if( sp->spell_coef_flags & SPELL_FLAG_AOE_SPELL )
+				sp->fixed_hotdotcoef *= 0.5f;
+		}
+
+		//Standard spells
+		else if( (sp->spell_coef_flags & SPELL_FLAG_IS_DD_OR_DH_SPELL) && !(sp->spell_coef_flags & SPELL_FLAG_IS_DOT_OR_HOT_SPELL) )
+		{
+			sp->fixed_dddhcoef = sp->casttime_coef;
+			if( sp->spell_coef_flags & SPELL_FLAG_ADITIONAL_EFFECT )
+				sp->fixed_dddhcoef *= 0.95f;
+			if( sp->spell_coef_flags & SPELL_FLAG_AOE_SPELL )
+				sp->fixed_dddhcoef *= 0.5f;
+		}
+
+		//Over-time spells
+		else if( !(sp->spell_coef_flags & SPELL_FLAG_IS_DD_OR_DH_SPELL) && (sp->spell_coef_flags & SPELL_FLAG_IS_DOT_OR_HOT_SPELL) )
+		{
+			float Duration = float( GetDuration( dbcSpellDuration.LookupEntry( sp->DurationIndex ) ));
+			sp->fixed_hotdotcoef = (Duration / 15000.0f);
+
+			if( sp->spell_coef_flags & SPELL_FLAG_ADITIONAL_EFFECT )
+				sp->fixed_hotdotcoef *= 0.95f;
+			if( sp->spell_coef_flags & SPELL_FLAG_AOE_SPELL )
+				sp->fixed_hotdotcoef *= 0.5f;
+
+		}
+
+		//Combined standard and over-time spells
+		else if( sp->spell_coef_flags & SPELL_FLAG_IS_DD_DH_DOT_SPELL )
+		{
+			float Duration = float( GetDuration( dbcSpellDuration.LookupEntry( sp->DurationIndex ) ));
+			float Portion_to_Over_Time = (Duration / 15000.0f) / ((Duration / 15000.0f) + sp->casttime_coef );
+			float Portion_to_Standard = 1.0f - Portion_to_Over_Time;
+
+			sp->fixed_dddhcoef = sp->casttime_coef * Portion_to_Standard;
+			sp->fixed_hotdotcoef = (Duration / 15000.0f) * Portion_to_Over_Time;
+
+			if( sp->spell_coef_flags & SPELL_FLAG_ADITIONAL_EFFECT )
+			{
+				sp->fixed_dddhcoef *= 0.95f;
+				sp->fixed_hotdotcoef *= 0.95f;
+			}
+			if( sp->spell_coef_flags & SPELL_FLAG_AOE_SPELL )
+			{
+				sp->fixed_dddhcoef *= 0.5f;
+				sp->fixed_hotdotcoef *= 0.5f;
+			}		
+		}
+	}
+
+	//Settings for special cases
+	QueryResult * resultx = WorldDatabase.Query("SELECT * FROM spell_coef_override");
+	if( resultx != NULL )
+	{
+		do 
+		{
+			Field * f;
+			f = resultx->Fetch();
+			SpellEntry * sp = dbcSpell.LookupEntryForced( f[0].GetUInt32() );
+			if( sp != NULL )
+			{
+				sp->Dspell_coef_override = f[2].GetFloat();
+				sp->OTspell_coef_override = f[3].GetFloat();
+			}
+		} while( resultx->NextRow() );
+		delete resultx;
+	}
+
+	//Fully loaded coefficients, we must share channeled coefficient to its triggered spells
+	for(uint32 x=0; x < cnt; x++)
+	{
+		// SpellID
+		uint32 spellid = dbc.getRecord(x).getUInt(0);
+		// get spellentry
+		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
+		SpellEntry * spz;
+
+		//Case SPELL_AURA_PERIODIC_TRIGGER_SPELL
+		for( uint8 i = 0 ; i < 3 ; i++ )
+		{
+			if ( sp->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_TRIGGER_SPELL )
+			{
+				spz = dbcSpell.LookupEntry( sp->EffectTriggerSpell[i] );
+				if( spz != NULL ) 
+				{
+					if( sp->Dspell_coef_override >= 0 )
+						spz->Dspell_coef_override = sp->Dspell_coef_override;
+					else
+					{
+						//we must set bonus per tick on triggered spells now (i.e. Arcane Missiles)
+						if( sp->ChannelInterruptFlags != 0 )
+						{
+							float Duration = float( GetDuration( dbcSpellDuration.LookupEntry( sp->DurationIndex ) ));
+							float amp = float(sp->EffectAmplitude[i]);
+							sp->fixed_dddhcoef = sp->fixed_hotdotcoef * amp / Duration;
+						}			
+						spz->fixed_dddhcoef = sp->fixed_dddhcoef;
+					}
+
+					if( sp->OTspell_coef_override >= 0 )
+						spz->OTspell_coef_override = sp->OTspell_coef_override;
+					else
+					{
+						//we must set bonus per tick on triggered spells now (i.e. Arcane Missiles)
+						if( sp->ChannelInterruptFlags != 0 )
+						{
+							float Duration = float( GetDuration( dbcSpellDuration.LookupEntry( sp->DurationIndex ) ));
+							float amp = float(sp->EffectAmplitude[i]);
+							sp->fixed_hotdotcoef *= amp / Duration;
+						}
+						spz->fixed_hotdotcoef = sp->fixed_hotdotcoef;
+					}
+					break;
+				}
+			}
+		}
+	}	
+
+	/////////////////////////////////////////////////////////////////
+	//SPELL COEFFICIENT SETTINGS END
+	/////////////////////////////////////////////////////////////////
+
 	//this is so lame : shamanistic rage triggers a new spell which borrows it's stats from parent spell :S
 	SpellEntry*  parentsp = dbcSpell.LookupEntryForced( 30823 );
 	SpellEntry* triggersp = dbcSpell.LookupEntryForced( 30824 );
@@ -1848,6 +2140,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
 		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
 	}
+
 	//paladin - Improved Devotion Aura
 	sp = dbcSpell.LookupEntryForced( 20142 );
 	if( sp != NULL )
@@ -1864,7 +2157,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 20138 );
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = 64;
-	
+
 	//paladin - Guardian's Favor
 	sp = dbcSpell.LookupEntryForced( 20175 );
 	if (sp != NULL)
@@ -2150,13 +2443,30 @@ bool World::SetInitialWorldSettings()
 	//paladin - Light's Grace
 	sp = dbcSpell.LookupEntryForced( 31833 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL;;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntryForced( 31835 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL;;
+		sp->procFlags = PROC_ON_CAST_SPELL;
 	sp = dbcSpell.LookupEntryForced( 31836 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_CAST_SPELL;;
+		sp->procFlags = PROC_ON_CAST_SPELL;
+
+	//shaman - Lightning Mastery
+	sp = dbcSpell.LookupEntryForced( 16578 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0]=1|2;
+	sp = dbcSpell.LookupEntryForced( 16579 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0]=1|2;
+	sp = dbcSpell.LookupEntryForced( 16580 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0]=1|2;
+	sp = dbcSpell.LookupEntryForced( 16581 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0]=1|2;
+	sp = dbcSpell.LookupEntryForced( 16582 );
+	if( sp != NULL )
+		sp->EffectSpellGroupRelation[0]=1|2;
 
 	//shaman - Lightning Overload 
 	sp = dbcSpell.LookupEntryForced( 30675 ); 
@@ -2323,6 +2633,7 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 16208 ); 
 	if( sp != NULL )
 		sp->EffectSpellGroupRelation[0] = group_relation_shaman_restorative_totems;
+	
 #ifndef NEW_PROCFLAGS
 	//shaman - Healing Way
 	sp = dbcSpell.LookupEntryForced( 29202 ); 
@@ -4220,7 +4531,7 @@ bool World::SetInitialWorldSettings()
 	}
 
 #ifndef NEW_PROCFLAGS
-    //Improved Sprint
+	//Improved Sprint
 	sp = dbcSpell.LookupEntryForced( 13743 );
 	if( sp != NULL )
 	{
@@ -5915,6 +6226,7 @@ bool World::SetInitialWorldSettings()
     sp = dbcSpell.LookupEntryForced( 15359 );
     if( sp != NULL )
         sp->rangeIndex = 4;
+
 #ifndef NEW_PROCFLAGS
 	//Relentless Strikes
 	sp = dbcSpell.LookupEntryForced( 14179 );
@@ -6015,6 +6327,7 @@ bool World::SetInitialWorldSettings()
 		sp->procChance = 30;//some say it is triggered every now and then
 		sp->procFlags = PROC_ON_RANGED_ATTACK;
 	}
+
 #ifdef NEW_PROCFLAGS
 	//warrior - deep wounds
 	sp = dbcSpell.LookupEntry( 12162);
@@ -6589,7 +6902,7 @@ bool World::SetInitialWorldSettings()
 	if (sp != NULL)
 		sp->EffectSpellGroupRelation[0]=8388608;
 	//Vengeful Gladiator's Libram of Fortitude
-		sp = dbcSpell.LookupEntryForced( 43852 );
+	sp = dbcSpell.LookupEntryForced( 43852 );
 	if (sp != NULL)
 		sp->EffectSpellGroupRelation[0]=8388608;
 	//Merciless Gladiator's Libram of Fortitude
@@ -6700,6 +7013,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation_high[0]=128;
 	}
 #endif
+
 	//Thunderfury
 	sp = dbcSpell.LookupEntryForced( 21992 );
 	if( sp != NULL )
@@ -6845,6 +7159,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectTriggerSpell[1] = 40440;
 		sp->maxstack = 1;
 	}
+
 #ifndef NEW_PROCFLAGS
 	//Ashtongue Talisman of Lethality
 	sp = dbcSpell.LookupEntryForced( 40460 );
@@ -7629,25 +7944,6 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
 
-	// Res sicknesss
-	sp = dbcSpell.LookupEntryForced( 15007 );
-	if( sp != NULL )
-		sp->can_be_dispelled = false;
-
-	// Forbearance
-	sp = dbcSpell.LookupEntryForced( 25771 );
-	if( sp != NULL )
-		sp->can_be_dispelled = false;
-
-	// Recently bandaged
-	sp = dbcSpell.LookupEntryForced( 11196 );
-	if( sp != NULL )
-		sp->can_be_dispelled = false;
-
-	// Weakened soul
-	sp = dbcSpell.LookupEntryForced( 6788 );
-	if( sp != NULL )
-		sp->can_be_dispelled = false;
 // ------------------------------------------------------------------------------------------------
 
 	Log.Notice("World","Starting Transport System...");
@@ -7680,8 +7976,9 @@ bool World::SetInitialWorldSettings()
 	new CBattlegroundManager;
 
 	dw = new DayWatcherThread();
-	ThreadPool.ExecuteTask(dw);
-	ThreadPool.ExecuteTask(new CharacterLoaderThread());
+	ThreadPool.ExecuteTask( dw );
+
+	ThreadPool.ExecuteTask( new CharacterLoaderThread() );
 
 	// Preload and compile talent and talent tab data to speed up talent inspect
 
@@ -7756,6 +8053,7 @@ void World::Update(time_t diff)
 	_UpdateGameTime();
 	UpdateQueuedSessions((uint32)diff);
 }
+
 
 void World::SendGlobalMessage(WorldPacket *packet, WorldSession *self)
 {
@@ -8278,7 +8576,6 @@ void World::Rehash(bool load)
 		new MailSystem;
 
 	channelmgr.seperatechannels = Config.MainConfig.GetBoolDefault("Server", "SeperateChatChannels", false);
-	sendRevisionOnJoin = Config.MainConfig.GetBoolDefault("Server", "SendBuildOnJoin", false);
 	MapPath = Config.MainConfig.GetStringDefault("Terrain", "MapPath", "maps");
 	UnloadMapFiles = Config.MainConfig.GetBoolDefault("Terrain", "UnloadMapFiles", true);
 	BreathingEnabled = Config.MainConfig.GetBoolDefault("Server", "EnableBreathing", true);
@@ -8413,11 +8710,10 @@ void World::Rehash(bool load)
 
 	antihack_teleport = Config.MainConfig.GetBoolDefault("AntiHack", "Teleport", true);
 	antihack_speed = Config.MainConfig.GetBoolDefault("AntiHack", "Speed", true);
-	antihack_fall_damage = Config.MainConfig.GetBoolDefault("AntiHack", "FallDamage", true);
+	antihack_falldmg = Config.MainConfig.GetBoolDefault("AntiHack", "FallDamage", true);
 	antihack_flight = Config.MainConfig.GetBoolDefault("AntiHack", "Flight", true);
-	antihack_water_breathing = Config.MainConfig.GetBoolDefault("AntiHack", "WaterBreathing", true);
 	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", false);
-
+	SpeedhackProtection = antihack_speed;
 	m_levelCap = Config.MainConfig.GetIntDefault("Server", "LevelCap", 70);
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
 	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);

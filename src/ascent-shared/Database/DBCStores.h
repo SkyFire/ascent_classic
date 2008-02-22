@@ -26,6 +26,12 @@
 
 #pragma pack(push,1)
 
+struct BankSlotPrice
+{
+	uint32 Id;
+	uint32 Price;
+};
+
 struct ItemSetEntry
 {
     uint32 id;                  //1
@@ -49,12 +55,6 @@ struct Lock
     //uint32 unk2[3];
     uint32 minlockskill[5]; // min skill in lockpiking to unlock.
     //uint32 unk3[11];
-};
-
-struct BankSlotPrice
-{
-	uint32 Id;
-	uint32 Price;
 };
 
 struct emoteentry
@@ -194,7 +194,7 @@ struct SpellEntry
     uint32 AttributesEx;                    //8
     uint32 Flags3;                          //9
     uint32 Flags4;                          //10 // Flags to
-    uint32 Flags5;                         //11 // Flags....
+    uint32 Flags5;                          //11 // Flags....
     uint32 unk201_1;                        //12 // Flags 2.0.1 unknown one
     uint32 RequiredShapeShift;              //13 // Flags BitMask for shapeshift spells
     uint32 UNK14;                           //14-> this is wrong // Flags BitMask for which shapeshift forms this spell can NOT be used in.
@@ -335,11 +335,11 @@ struct SpellEntry
     uint32 FG;                              //201   0,1,2 related to Spell_Dmg_Type I think
     int32 FH;                               //202   related to paladin aura's 
     float dmg_multiplier[3];                //203 - 205   if the name is correct I dono
-    uint32 FL;                              //206   only one spellid:6994 has this value = 369
-    uint32 FM;                              //207   only one spellid:6994 has this value = 4
-    uint32 FN;                              //208   only one spellid:26869  has this flag = 1   
-    uint32 TotemCategory[2];				//209-210 
-    uint32 RequiresAreaId;				     		//211 
+	//uint32 FL;                              //206   only one spellid:6994 has this value = 369 UNUSED
+	//uint32 FM;                              //207   only one spellid:6994 has this value = 4 UNUSED
+	uint32 FN;                              //208  3 spells 1 or 2   
+	uint32 TotemCategory[2];				//209-210 
+	uint32 RequiresAreaId;				     		//211 
 
     /// CUSTOM: these fields are used for the modifications made in the world.cpp
     uint32 DiminishStatus;                  //
@@ -351,13 +351,19 @@ struct SpellEntry
     uint32 NameHash;                        //!!! CUSTOM, related to custom spells, summon spell quest related spells
     float base_range_or_radius_sqr;         //!!! CUSTOM, needed for aoe spells most of the time
 	uint32 talent_tree;						//!!! CUSTOM,
-	bool removable_by_immunity;				//!!! CUSTOM,
 	uint32 in_front_status;					//!!! CUSTOM,
 	bool is_melee_spell;					//!!! CUSTOM,
 	bool is_ranged_spell;					//!!! CUSTOM,
     uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
 	uint32 ThreatForSpell;
-	bool can_be_dispelled;					//!!! CUSTOM
+
+	//Spell Coefficient
+	float casttime_coef;                                    //!!! CUSTOM, faster spell bonus calculation
+	uint32 spell_coef_flags;                                //!!! CUSTOM, store flags for spell coefficient calculations
+	float fixed_dddhcoef;                                   //!!! CUSTOM, fixed DD-DH coefficient for some spells
+	float fixed_hotdotcoef;                                 //!!! CUSTOM, fixed HOT-DOT coefficient for some spells
+	float Dspell_coef_override;                             //!!! CUSTOM, overrides any spell coefficient calculation and use this value in DD&DH
+	float OTspell_coef_override;							//!!! CUSTOM, overrides any spell coefficient calculation and use this value in HOT&DOT
 };
 
 struct ItemExtendedCostEntry
@@ -877,6 +883,18 @@ struct ChatChannelDBC
 	uint32 flags;
 };
 
+struct DurabilityQualityEntry
+{
+    uint32 id;
+    float quality_modifier;
+};
+
+struct DurabilityCostsEntry
+{
+    uint32 itemlevel;
+    uint32 modifier[29];
+};
+
 #pragma pack(pop)
 
 ASCENT_INLINE float GetRadius(SpellRadius *radius)
@@ -1181,6 +1199,8 @@ extern SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 extern SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 extern SERVER_DECL DBCStorage<CombatRatingDBC> dbcCombatRating;
 extern SERVER_DECL DBCStorage<ChatChannelDBC> dbcChatChannels;
+extern SERVER_DECL DBCStorage<DurabilityCostsEntry> dbcDurabilityCosts;
+extern SERVER_DECL DBCStorage<DurabilityQualityEntry> dbcDurabilityQuality;
 extern SERVER_DECL DBCStorage<BankSlotPrice> dbcBankSlotPrices;
 extern SERVER_DECL DBCStorage<BankSlotPrice> dbcStableSlotPrices; //uses same structure as Bank
 extern SERVER_DECL DBCStorage<gtFloat> dbcMeleeCrit;
@@ -1191,7 +1211,6 @@ extern SERVER_DECL DBCStorage<gtFloat> dbcManaRegen;
 extern SERVER_DECL DBCStorage<gtFloat> dbcManaRegenBase;
 extern SERVER_DECL DBCStorage<gtFloat> dbcHPRegen;
 extern SERVER_DECL DBCStorage<gtFloat> dbcHPRegenBase;
-
 
 bool LoadDBCs();
 

@@ -194,6 +194,6 @@ void WSSocket::SendWoWPacket(Session * from, WorldPacket * pck)
 void WSSocket::OnConnect()
 {
 	WorldPacket data(ISMSG_AUTH_REQUEST, 4);
-	data << uint32(g_getRevision());
+	data << uint32(BUILD_REVISION);
 	SendPacket(&data);
 }

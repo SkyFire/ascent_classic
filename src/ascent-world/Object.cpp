@@ -311,76 +311,71 @@ uint32 TimeStamp();
 
 void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2, Player* target )
 {
-	ByteBuffer* splinebuf = (m_objectTypeId == TYPEID_UNIT) ? target->GetAndRemoveSplinePacket( GetGUID() ) : NULL;
+	ByteBuffer *splinebuf = (m_objectTypeId == TYPEID_UNIT) ? target->GetAndRemoveSplinePacket(GetGUID()) : 0;
 	*data << (uint8)flags;
 
-	Player* pThis = NULL;
-	if( m_objectTypeId == TYPEID_PLAYER )
+	Player * pThis = 0;
+	if(m_objectTypeId == TYPEID_PLAYER)
 	{
 		pThis = static_cast< Player* >( this );
-		if( target == this )
+		if(target == this)
 		{
 			// Updating our last speeds.
 			pThis->UpdateLastSpeeds();
 		}
 	}
 
-	if( flags & UPDATEFLAG_LIVING )
+	if (flags & 0x20)
 	{
-		if( pThis != NULL && pThis->m_TransporterGUID != 0 )
-			flags2 |= MOVEFLAG_TAXI;
-		else if( m_objectTypeId == TYPEID_UNIT && static_cast< Creature* >( this )->m_transportGuid != 0 && static_cast< Creature* >( this )->m_transportPosition != NULL )
-			flags2 |= MOVEFLAG_TAXI;
-		else
-			flags2 &= ~MOVEFLAG_TAXI;
+		if(pThis && pThis->m_TransporterGUID != 0)
+			flags2 |= 0x200;
+		else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportGuid != 0 && ((Creature*)this)->m_transportPosition != NULL)
+			flags2 |= 0x200;
 
-		if( splinebuf != NULL )
+		if(splinebuf)
 		{
-			flags2 |= MOVEFLAG_IMMOBILIZED;
-			flags2 |= MOVEFLAG_MOVE_FORWARD;
-			if( GetTypeId() == TYPEID_UNIT )
+			flags2 |= 0x08000001;	   //1=move forward
+			if(GetTypeId() == TYPEID_UNIT)
 			{
-				if(static_cast< Unit* >( this )->GetAIInterface()->m_moveRun == false )
-					flags2 |= MOVEFLAG_WALK;
+				if(static_cast<Unit*>(this)->GetAIInterface()->m_moveRun == false)
+					flags2 |= 0x100;	//100=walk
 			}			
 		}
 
-		if( GetTypeId() == TYPEID_UNIT )
+		if(GetTypeId() == TYPEID_UNIT)
 		{
 			//		 Don't know what this is, but I've only seen it applied to spirit healers.
 			//		 maybe some sort of invisibility flag? :/
 
-			switch( GetEntry() )
+			switch(GetEntry())
 			{
-				case 6491:  // Spirit Healer
-				case 13116: // Alliance Spirit Guide
-				case 13117: // Horde Spirit Guide
-					{
-						flags2 |= MOVEFLAG_WATER_WALK;
-					}break;
+			case 6491:  // Spirit Healer
+			case 13116: // Alliance Spirit Guide
+			case 13117: // Horde Spirit Guide
+				{
+					flags2 |= 0x10000000;
+				}break;
 			}
 		
-			if( static_cast< Unit* >(this)->GetAIInterface()->IsFlying() )
+			if(static_cast<Unit*>(this)->GetAIInterface()->IsFlying())
+//				flags2 |= 0x800; //in 2.3 this is some state that i was not able to decode yet
+				flags2 |= 0x400; //Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
+			if(static_cast<Creature*>(this)->proto && static_cast<Creature*>(this)->proto->extra_a9_flags)
 			{
-				//flags2 |= 0x800; //in 2.3 this is some state that i was not able to decode yet
-				//Zack : Teribus the Cursed had flag 400 instead of 800 and he is flying all the time 
-				flags2 |= MOVEFLAG_NO_COLLISION;
+				if(!(flags2 & 0x0200))
+					flags2 |= static_cast<Creature*>(this)->proto->extra_a9_flags;
 			}
-
-			if( static_cast< Creature* >(this)->proto && static_cast< Creature* >( this )->proto->extra_a9_flags )
+			if(GetGUIDHigh() == HIGHGUID_WAYPOINT)
 			{
-				if( !( flags2 & MOVEFLAG_TAXI ) )
-					flags2 |= static_cast< Creature* >( this )->proto->extra_a9_flags;
-			}
-			if( GetGUIDHigh() == HIGHGUID_WAYPOINT )
-			{
-				if( GetUInt32Value( UNIT_FIELD_STAT0 ) == 768 )		// flying waypoint
-					flags2 |= MOVEFLAG_FLYING;
+				if(GetUInt32Value(UNIT_FIELD_STAT0) == 768)		// flying waypoint
+					flags2 |= 0x800;
 			}
 		}
 
 		*data << (uint32)flags2;
+
 		*data << (uint8)0;
+
 		*data << getMSTime(); // this appears to be time in ms but can be any thing
 
 		// this stuff:
@@ -398,100 +393,91 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 		//*data << uint8(0x1);
 	}
 
-	if( flags & UPDATEFLAG_HASPOSITION )
+	if (flags & 0x40)
 	{
-		if( flags & UPDATEFLAG_TAXI )
+		if(flags & 0x2)
 		{
-			*data << m_position.x;
-			*data << m_position.y;
-			*data << m_position.z;
-			*data << m_position.o;
+			*data << (float)m_position.x;
+			*data << (float)m_position.y;
+			*data << (float)m_position.z;
+			*data << (float)m_position.o;
 		}
 		else
 		{
-			*data << m_position.x;
-			*data << m_position.y;
-			*data << m_position.z;
+			*data << m_position;
 			*data << m_position.o;
 		}
 
-		if( flags & UPDATEFLAG_LIVING && flags2 & MOVEFLAG_TAXI )
+		if(flags & 0x20 && flags2 & 0x0200)
 		{
-			if( pThis != NULL )
+			if(pThis)
 			{
 				*data << pThis->m_TransporterGUID;
-				*data << pThis->m_TransporterX;
-				*data << pThis->m_TransporterY;
-				*data << pThis->m_TransporterZ;
-				*data << pThis->m_TransporterO;
+				*data << pThis->m_TransporterX << pThis->m_TransporterY << pThis->m_TransporterZ << pThis->m_TransporterO;
 				*data << pThis->m_TransporterUnk;
 			}
-			else if( m_objectTypeId == TYPEID_UNIT && static_cast< Creature* >( this )->m_transportPosition != NULL )
+			else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportPosition != NULL)
 			{
-				*data << static_cast< Creature* >( this )->m_transportGuid;
-				*data << uint32( HIGHGUID_TRANSPORTER );
-				*data << static_cast< Creature* >( this )->m_transportPosition->x;
-				*data << static_cast< Creature* >( this )->m_transportPosition->y;
-				*data << static_cast< Creature* >( this )->m_transportPosition->z;
-				*data << static_cast< Creature* >( this )->m_transportPosition->o;
-				*data << float( 0.0f );
+				*data << ((Creature*)this)->m_transportGuid;
+				*data << uint32(HIGHGUID_TRANSPORTER);
+				*data << ((Creature*)this)->m_transportPosition->x << ((Creature*)this)->m_transportPosition->y << 
+					((Creature*)this)->m_transportPosition->z << ((Creature*)this)->m_transportPosition->o;
+				*data << float(0.0f);
 			}
 		}
 	}
 
-	if( flags & UPDATEFLAG_LIVING )
+	if (flags & 0x20)
 	{
 		*data << (uint32)0;
 	}
 
-	if( flags & UPDATEFLAG_LIVING && flags2 & MOVEFLAG_FALLING )
+	if (flags & 0x20 && flags2 & 0x2000)
 	{
-		*data << 0.0f;
-		*data << 1.0f;
-		*data << 0.0f;
-		*data << 0.0f;
+		*data << (float)0;
+		*data << (float)1.0;
+		*data << (float)0;
+		*data << (float)0;
 	}
 
-	if( flags & UPDATEFLAG_LIVING )
+	if (flags & 0x20)
 	{
-		*data << m_walkSpeed;		// walk speed
-		*data << m_runSpeed;		// run speed
-		*data << m_backWalkSpeed;	// backwards walk speed
-		*data << m_swimSpeed;		// swim speed
-		*data << m_backSwimSpeed;	// backwards swim speed
+		*data << m_walkSpeed;	 // walk speed
+		*data << m_runSpeed;	  // run speed
+		*data << m_backWalkSpeed; // backwards walk speed
+		*data << m_swimSpeed;	 // swim speed
+		*data << m_backSwimSpeed; // backwards swim speed
 		*data << m_flySpeed;		// fly speed
 		*data << m_backFlySpeed;	// back fly speed
-		*data << m_turnRate;		// turn rate
+		*data << m_turnRate;	  // turn rate
 	}
 
-	if( splinebuf != NULL )
+	if(splinebuf)
 	{
-		data->append( *splinebuf );
+		data->append(*splinebuf);
 		delete splinebuf;
 	}
 
-	// why are we sending lowguid as highguid if no low guid is requested?
-
-	if( flags & UPDATEFLAG_LOWGUID )
+	if(flags & 0x8)
 	{
 		*data << GetGUIDLow();
-		if( flags & UPDATEFLAG_HIGHGUID )
+		if(flags & 0x10)
 			*data << GetGUIDHigh();
 	}
-	else if( flags & UPDATEFLAG_HIGHGUID )
+	else if(flags & 0x10)
 		*data << GetGUIDLow();
 
-	if( flags & UPDATEFLAG_TAXI )
+	if(flags & 0x2)
 	{
-		//if( target != NULL )
-		//{
-		//	/*int32 m_time = TimeStamp() - target->GetSession()->m_clientTimeDelay;
-		//	m_time += target->GetSession()->m_moveDelayTime;
-		//	*data << m_time;*/
-		//	*data << getMSTime();
-		//}
-		//else
-		*data << getMSTime();
+		if(target)
+		{
+			/*int32 m_time = TimeStamp() - target->GetSession()->m_clientTimeDelay;
+			m_time += target->GetSession()->m_moveDelayTime;
+			*data << m_time;*/
+			*data << getMSTime();
+		}
+		else
+            *data << getMSTime();
 	}
 }
 
@@ -1016,13 +1002,13 @@ void Object::PushToWorld(MapMgr*mgr)
 
 void Object::RemoveFromWorld(bool free_guid)
 {
-	ASSERT( m_mapMgr );
-	MapMgr* m = m_mapMgr;
-	m_mapMgr = NULL;
+	ASSERT(m_mapMgr);
+	MapMgr * m = m_mapMgr;
+	m_mapMgr = 0;
 
 	mSemaphoreTeleport = true;
 
-	m->RemoveObject( this, free_guid );
+	m->RemoveObject(this, free_guid);
 	
 	// update our event holder
 	event_Relocate();
@@ -1735,9 +1721,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	/*------------------------------------ DUEL HANDLERS END--------------------------*/
 
 	bool isCritter = false;
-	if( pVictim->GetTypeId() == TYPEID_UNIT && static_cast< Creature* >( pVictim )->GetCreatureName() )
+	if(pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->GetCreatureName())
 	{
-			if( static_cast< Creature* >( pVictim )->GetCreatureName()->Type == CRITTER )
+			if(((Creature*)pVictim)->GetCreatureName()->Type == CRITTER)
 				isCritter = true;
 	}
 	/* -------------------------- HIT THAT CAUSES VICTIM TO DIE ---------------------------*/
@@ -1775,7 +1761,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
         if( pMapInfo && pMapInfo->type == INSTANCE_NULL && !pVictim->IsPlayer() && !pVictim->IsPet() && ( IsPlayer() || IsPet() ) )
 		{
 			// Only NPCs that bear the PvP flag can be truly representing their faction.
-			if( static_cast< Creature* >( pVictim )->HasFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PVP ) )
+			if( ((Creature*)pVictim)->HasFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PVP ) )
 			{
 				Player * pAttacker = NULL;
 				if( IsPet() && GetGUIDHigh() == HIGHGUID_PET )
@@ -2176,44 +2162,40 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 //==============================Unacceptable Cases Processing===============================
 //==========================================================================================
-	if( pVictim == NULL || !pVictim->isAlive() || !pVictim->IsInWorld() )
+	if(!pVictim || !pVictim->isAlive())
 		return;
 
-	SpellEntry* spellInfo = dbcSpell.LookupEntryForced( spellID );
-
-	if( spellInfo == NULL )
+	SpellEntry *spellInfo = dbcSpell.LookupEntry( spellID );
+	if(!spellInfo)
         return;
 
-	if( this->IsPlayer() && !static_cast< Player* >( this )->canCast( spellInfo ) )
+	if (this->IsPlayer() && !static_cast< Player* >( this )->canCast(spellInfo))
 		return;
-
-	//==========================================================================================
-	//==============================Variables Initialization====================================
-	//========================================================================================== 
+//==========================================================================================
+//==============================Variables Initialization====================================
+//========================================================================================== 
 	uint32 school = spellInfo->School;
-	float res = float( damage );
+	float res = float(damage);
 	uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION;
 	uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_SPELL_HIT_VICTIM;
 	bool critical = false;
-
-	//==========================================================================================
-	//==============================+Spell Damage Bonus Calculations============================
-	//==========================================================================================
-	//------------------------------by stats----------------------------------------------------
+//==========================================================================================
+//==============================+Spell Damage Bonus Calculations============================
+//==========================================================================================
+//------------------------------by stats----------------------------------------------------
 	if( this->IsUnit() && !static_damage )
 	{
 		Unit* caster = static_cast< Unit* >( this );
 		caster->RemoveAurasByInterruptFlag( AURA_INTERRUPT_ON_START_ATTACK );
-		res += caster->GetSpellDmgBonus( pVictim, spellInfo, ( int )res );
-
-		//==========================================================================================
-		//==============================Post +SpellDamage Bonus Modifications=======================
-		//==========================================================================================
+		res += caster->GetSpellDmgBonus( pVictim, spellInfo, ( int )res, false );
+//==========================================================================================
+//==============================Post +SpellDamage Bonus Modifications=======================
+//==========================================================================================
 		if( res < 0 )
 			res = 0;
 		else
 		{
-			//------------------------------critical strike chance--------------------------------------	
+//------------------------------critical strike chance--------------------------------------	
 			// lol ranged spells were using spell crit chance
 			float CritChance;
 			if( spellInfo->is_ranged_spell )
@@ -2222,17 +2204,15 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				if( IsPlayer() )
 				{
 					CritChance = GetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE );
+					CritChance += static_cast< Player* >(pVictim)->res_R_crit_get();
+					CritChance += (float)(pVictim->AttackerCritChanceMod[spellInfo->School]);
 				}
 				else
 				{
 					CritChance = 5.0f; // static value for mobs.. not blizzlike, but an unfinished formula is not fatal :)
 				}
 				if( pVictim->IsPlayer() )
-				{
-					CritChance += static_cast< Player* >( pVictim )->res_R_crit_get();
-					CritChance += float( pVictim->AttackerCritChanceMod[spellInfo->School] );
-					CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE );
-				}
+				CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE );
 			}
 			else
 			{
@@ -2322,7 +2302,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	//------------------------------resistance reducing-----------------------------------------	
 	if(res > 0 && this->IsUnit())
 	{
-		static_cast<Unit*>(this)->CalculateResistanceReduction(pVictim,&dmg);
+		static_cast<Unit*>(this)->CalculateResistanceReduction(pVictim,&dmg,spellInfo);
 		if((int32)dmg.resisted_damage > dmg.full_damage)
 			res = 0;
 		else
@@ -2453,7 +2433,7 @@ void Object::SendSpellNonMeleeDamageLog( Object* Caster, Object* Target, uint32 
 int32 Object::event_GetInstanceID()
 {
 	// return -1 for non-inworld.. so we get our shit moved to the right thread
-	if( !IsInWorld() )
+	if(!IsInWorld())
 		return -1;
 	else
 		return m_instanceId;
@@ -2476,13 +2456,13 @@ bool Object::CanActivate()
 	{
 	case TYPEID_UNIT:
 		{
-			if( GetGUIDHigh() != HIGHGUID_PET )
+			if(GetGUIDHigh() != HIGHGUID_PET)
 				return true;
 		}break;
 
 	case TYPEID_GAMEOBJECT:
 		{
-			if( static_cast< GameObject* >( this )->HasAI() && GetUInt32Value( GAMEOBJECT_TYPE_ID ) != GAMEOBJECT_TYPE_TRAP )
+			if(static_cast<GameObject*>(this)->HasAI() && GetUInt32Value(GAMEOBJECT_TYPE_ID) != GAMEOBJECT_TYPE_TRAP)
 				return true;
 		}break;
 	}
@@ -2492,14 +2472,14 @@ bool Object::CanActivate()
 
 void Object::Activate(MapMgr * mgr)
 {
-	switch( m_objectTypeId )
+	switch(m_objectTypeId)
 	{
 	case TYPEID_UNIT:
-		mgr->activeCreatures.insert( static_cast< Creature* >( this ) );
+		mgr->activeCreatures.insert((Creature*)this);
 		break;
 
 	case TYPEID_GAMEOBJECT:
-		mgr->activeGameObjects.insert( static_cast< GameObject* >( this ) );
+		mgr->activeGameObjects.insert((GameObject*)this);
 		break;
 	}
 
@@ -2508,14 +2488,14 @@ void Object::Activate(MapMgr * mgr)
 
 void Object::Deactivate(MapMgr * mgr)
 {
-	switch( m_objectTypeId )
+	switch(m_objectTypeId)
 	{
 	case TYPEID_UNIT:
-		mgr->activeCreatures.erase( static_cast< Creature* >( this ) );
+		mgr->activeCreatures.erase((Creature*)this);
 		break;
 
 	case TYPEID_GAMEOBJECT:
-		mgr->activeGameObjects.erase( static_cast< GameObject* >( this ) );
+		mgr->activeGameObjects.erase((GameObject*)this);
 		break;
 	}
 	Active = false;

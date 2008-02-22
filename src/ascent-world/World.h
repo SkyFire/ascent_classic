@@ -489,14 +489,13 @@ public:
 
 	uint32 mQueueUpdateInterval;
 	bool m_useIrc;
-	bool sendRevisionOnJoin;
 
 	void SaveAllPlayers();
 
 	string MapPath;
 	bool UnloadMapFiles;
 	bool BreathingEnabled;
-
+	bool SpeedhackProtection;
 	uint32 mInWorldPlayerCount;
 	uint32 mAcceptedConnections;
 	uint32 SocketSendBufSize;
@@ -528,9 +527,8 @@ public:
 
 	bool antihack_teleport;
 	bool antihack_speed;
-	bool antihack_fall_damage;
+	bool antihack_falldmg;
 	bool antihack_flight;
-	bool antihack_water_breathing;
 	bool no_antihack_on_gm;
 
 	void CharacterEnumProc(QueryResultVector& results, uint32 AccountId);

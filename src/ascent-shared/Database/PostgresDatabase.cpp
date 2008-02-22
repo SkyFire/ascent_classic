@@ -21,6 +21,9 @@
 #include "DatabaseEnv.h"
 #include "../CrashHandler.h"
 #include "../NGLog.h"
+
+#if defined(ENABLE_DATABASE_POSTGRES)
+
 #include "PostgresDatabase.h"
 #pragma comment(lib, "libpq.lib")
 
@@ -238,3 +241,5 @@ bool PostgresDatabase::_Reconnect(PostgresDatabaseConnection * conn)
 {
 	return false;
 }
+
+#endif

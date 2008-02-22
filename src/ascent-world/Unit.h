@@ -724,13 +724,9 @@ public:
 	void CastSpellAoF(float x,float y,float z,SpellEntry* Sp, bool triggered);
 	void EventCastSpell(Unit * Target, SpellEntry * Sp);
 
-	ASCENT_INLINE bool isCasting()
-	{
-		return( m_currentSpell != NULL );
-	}
-
+	bool isCasting();
 	bool IsInInstance();
-    void CalculateResistanceReduction(Unit *pVictim,dealdamage *dmg) ;
+    void CalculateResistanceReduction(Unit *pVictim,dealdamage *dmg,SpellEntry* ability) ;
 	void RegenerateHealth();
 	void RegeneratePower(bool isinterrupted);
 	ASCENT_INLINE void setHRegenTimer(uint32 time) {m_H_regenTimer = time; }
@@ -767,9 +763,11 @@ public:
 
 	/// Combat / Death Status
 	ASCENT_INLINE bool isAlive() { return m_deathState == ALIVE; };
-	ASCENT_INLINE bool isDead() { return m_deathState != ALIVE; };
-	virtual void setDeathState( DeathState s ) { m_deathState = s; };
-	ASCENT_INLINE DeathState getDeathState() { return m_deathState; }
+	ASCENT_INLINE bool isDead() { return  m_deathState !=ALIVE; };
+	virtual void setDeathState(DeathState s) {
+		m_deathState = s;
+	};
+	DeathState getDeathState() { return m_deathState; }
 	void OnDamageTaken();
 
 	//! Add Aura to unit
@@ -783,7 +781,7 @@ public:
 	bool RemoveAuraNegByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAuras(uint32 * SpellIds);
 
-	ASCENT_INLINE void EventRemoveAura(uint32 SpellId)
+	void EventRemoveAura(uint32 SpellId)
 	{
 		RemoveAura(SpellId);
 	}
@@ -806,13 +804,13 @@ public:
 	Aura* FindAura(uint32 spellId, uint64 guid);
 	bool SetAurDuration(uint32 spellId,Unit* caster,uint32 duration);
 	bool SetAurDuration(uint32 spellId,uint32 duration);
-	void DropAurasOnDeath();
+	   void DropAurasOnDeath();
 	   
 	void castSpell(Spell * pSpell);
 	void InterruptSpell();
 
 	//caller is the caster
-	int32 GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg);
+	int32 GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg, bool isdot);
    
 	Unit* create_guardian(uint32 guardian_entry,uint32 duration,float angle);//guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
 
@@ -840,9 +838,6 @@ public:
 	// Spell Crit
 	float spellcritperc;
 
-	// on regain movement
-	void EventRegainMovement();
-
 	// AIInterface
 	AIInterface *GetAIInterface() { return m_aiInterface; }
 	void ReplaceAIInterface(AIInterface *new_interface) ;
@@ -852,10 +847,10 @@ public:
 	ASCENT_INLINE void setAItoUse(bool value){m_useAI = value;}
 
 
-	ASCENT_INLINE int32 GetThreatModifyer() { return m_threatModifyer; }
-	ASCENT_INLINE void ModThreatModifyer(int32 mod) { m_threatModifyer += mod; }
-	ASCENT_INLINE int32 GetGeneratedThreatModifyer() { return m_generatedThreatModifyer; }
-	ASCENT_INLINE void ModGeneratedThreatModifyer(int32 mod) { m_generatedThreatModifyer += mod; }
+	int32 GetThreatModifyer() { return m_threatModifyer; }
+	void ModThreatModifyer(int32 mod) { m_threatModifyer += mod; }
+	int32 GetGeneratedThreatModifyer() { return m_generatedThreatModifyer; }
+	void ModGeneratedThreatModifyer(int32 mod) { m_generatedThreatModifyer += mod; }
 
 	// DK:Affect
 	ASCENT_INLINE uint32 IsPacified() { return m_pacified; }
@@ -902,55 +897,54 @@ public:
 	//int32 RangedDamageTakenPct; 
 
 	//SM
-	int32* SM_CriticalChance;//flat
-	int32* SM_FDur;//flat
-	int32* SM_PDur;//pct
-	int32* SM_PRadius;//pct
-	int32* SM_FRadius;//flat
-	int32* SM_PRange;//pct
-	int32* SM_FRange;//flat
-	int32* SM_PCastTime;//pct
-	int32* SM_FCastTime;//flat
-	int32* SM_PCriticalDamage;
-	int32* SM_PDOT;//pct
-	int32* SM_FDOT;//flat
-	int32* SM_FEffectBonus;//flat
-	int32* SM_PEffectBonus;//pct
-	int32* SM_FDamageBonus;//flat
-	int32* SM_PDamageBonus;//pct
-	int32* SM_PSPELL_VALUE;//pct
-	int32* SM_FSPELL_VALUE;//flat
-	int32* SM_FHitchance;//flat
-	int32* SM_PAPBonus;//pct
-	int32* SM_PCost;
-	int32* SM_FCost;
-	int32* SM_PNonInterrupt;
-	int32* SM_PJumpReduce;
-	int32* SM_FSpeedMod;
-	int32* SM_FAdditionalTargets;
-	int32* SM_FPenalty;//flat
-	int32* SM_PPenalty;//Pct
-	int32* SM_PCooldownTime;
-	int32* SM_FCooldownTime;
-	int32* SM_FChanceOfSuccess;
-	int32* SM_FRezist_dispell;
-	int32* SM_PRezist_dispell;
-
+	int32 * SM_CriticalChance;//flat
+	int32 * SM_FDur;//flat
+	int32 * SM_PDur;//pct
+	int32 * SM_PRadius;//pct
+	int32 * SM_FRadius;//flat
+	int32 * SM_PRange;//pct
+	int32 * SM_FRange;//flat
+	int32 * SM_PCastTime;//pct
+	int32 * SM_FCastTime;//flat
+	int32 * SM_PCriticalDamage;
+	int32 * SM_PDOT;//pct
+	int32 * SM_FDOT;//flat
+	int32 * SM_FEffectBonus;//flat
+	int32 * SM_PEffectBonus;//pct
+	int32 * SM_FDamageBonus;//flat
+	int32 * SM_PDamageBonus;//pct
+	int32 * SM_PSPELL_VALUE;//pct
+	int32 * SM_FSPELL_VALUE;//flat
+	int32 * SM_FHitchance;//flat
+	int32 * SM_PAPBonus;//pct
+	int32 * SM_PCost;
+	int32 * SM_FCost;
+	int32 * SM_PNonInterrupt;
+	int32 * SM_PJumpReduce;
+	int32 * SM_FSpeedMod;
+	int32 * SM_FAdditionalTargets;
+	int32 * SM_FPenalty;//flat
+	int32 * SM_PPenalty;//Pct
+	int32 * SM_PCooldownTime;
+	int32 * SM_FCooldownTime;
+	int32 * SM_FChanceOfSuccess;
+	int32 * SM_FRezist_dispell;
+	int32 * SM_PRezist_dispell;
 	void InheritSMMods(Unit *inherit_from);
 	std::map<uint32,signed int> target_spell_effect_mod_flat; //used very rarely by some talents. Will mod the value of a casted spell on target
 	std::map<uint32,signed int> target_spell_effect_mod_pct; //used very rarely by some talents. Store value in % format
 
 	//Events
-	void Emote( EmoteType emote );
-	void EventAddEmote( EmoteType emote, uint32 time );
+	void Emote (EmoteType emote);
+	void EventAddEmote(EmoteType emote, uint32 time);
 	void EmoteExpire();
 	ASCENT_INLINE void setEmoteState(uint8 emote) { m_emoteState = emote; };
 	ASCENT_INLINE uint32 GetOldEmote() { return m_oldEmote; }
 	void EventSummonPetExpire();
-	ASCENT_INLINE void EventAurastateExpire(uint32 aurastateflag){RemoveFlag(UNIT_FIELD_AURASTATE,aurastateflag);} //hmm this looks like so not necesary :S
+	void EventAurastateExpire(uint32 aurastateflag){RemoveFlag(UNIT_FIELD_AURASTATE,aurastateflag);} //hmm this looks like so not necesary :S
 	void EventHealthChangeSinceLastUpdate();
 
-	void SetStandState(uint8 standstate);
+	void SetStandState (uint8 standstate);
 
 	ASCENT_INLINE StandState GetStandState()
 	{
@@ -958,10 +952,10 @@ public:
 		return StandState (uint8 (bytes1));
 	}
 
-	void SendChatMessage( uint8 type, uint32 lang, const char* msg );
-	void SendChatMessageToPlayer( uint8 type, uint32 lang, const char* msg, Player* plr );
-	void SendChatMessageAlternateEntry( uint32 entry, uint8 type, uint32 lang, const char* msg);
-	void RegisterPeriodicChatMessage( uint32 delay, uint32 msgid, std::string message, bool sendnotify );
+	void SendChatMessage(uint8 type, uint32 lang, const char *msg);
+	void SendChatMessageToPlayer(uint8 type, uint32 lang, const char *msg, Player *plr);
+	void SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg);
+	void RegisterPeriodicChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify);
 
 	ASCENT_INLINE int GetHealthPct() { return (int)(GetUInt32Value(UNIT_FIELD_HEALTH) * 100 / GetUInt32Value(UNIT_FIELD_MAXHEALTH)); };
     ASCENT_INLINE void SetHealthPct(uint32 val) { if (val>0) SetUInt32Value(UNIT_FIELD_HEALTH,float2int32(val*0.01f*GetUInt32Value(UNIT_FIELD_MAXHEALTH))); };
@@ -984,7 +978,7 @@ public:
 
 	ASCENT_INLINE void setcanperry(bool newstatus){can_parry=newstatus;}
 		
-	std::map< uint32, Aura* > tmpAura;
+	std::map<uint32,Aura*> tmpAura;
 
 	uint32 BaseResistance[7]; //there are resistances for silence, fear, mechanics ....
 	uint32 BaseStats[5];
@@ -1026,9 +1020,8 @@ public:
 	// Affect Speed
 	int32 m_speedModifier;
 	int32 m_slowdown;
-	float m_maxspeed;
 	map< uint32, int32 > speedReductionMap;
-	void GetSpeedDecrease();
+	bool GetSpeedDecrease();
 	int32 m_mountedspeedModifier;
 	int32 m_flyspeedModifier;
 	void UpdateSpeed(bool delay = false);
@@ -1061,8 +1054,8 @@ public:
 
 	int32 m_modlanguage;
 	
-	Creature* critterPet;
-	Creature* summonPet;
+	Creature *critterPet;
+	Creature *summonPet;
 
 	ASCENT_INLINE uint32 GetCharmTempVal() { return m_charmtemp; }
 	ASCENT_INLINE void SetCharmTempVal(uint32 val) { m_charmtemp = val; }
@@ -1071,7 +1064,10 @@ public:
 	ASCENT_INLINE void DisableAI() { m_useAI = false; }
 	ASCENT_INLINE void EnableAI() { m_useAI = true; }
 
-	ASCENT_INLINE void SetPowerType(uint8 type){ SetByte( UNIT_FIELD_BYTES_0, 3, type ); }
+	ASCENT_INLINE void SetPowerType(uint8 type)
+	{
+		SetByte(UNIT_FIELD_BYTES_0,3,type);
+	}
 
 	ASCENT_INLINE bool IsSpiritHealer()
 	{
@@ -1108,7 +1104,10 @@ public:
 	uint16 m_diminishTimer[23];
 	bool   m_diminishActive;
 
-	ASCENT_INLINE void SetDiminishTimer(uint32 index) { m_diminishTimer[index] = 15000; }
+	void SetDiminishTimer(uint32 index)
+	{
+		m_diminishTimer[index] = 15000;
+	}
 
 	DynamicObject * dynObj;
 
@@ -1133,7 +1132,7 @@ public:
 	uint32 polySpell;
 	uint32 m_special_state; //flags for special states (stunned,rooted etc)
 	
-	//uint32 fearSpell;
+//	uint32 fearSpell;
 	CombatStatusHandler CombatStatus;
 	bool m_temp_summon;
 
@@ -1143,7 +1142,7 @@ public:
 	void DispelAll(bool positive);
 	
 protected:
-	Unit();
+	Unit ();
 
 	uint32 m_meleespell;
 	void _UpdateSpells(uint32 time);

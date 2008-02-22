@@ -78,13 +78,13 @@ void SocketMgr::SpawnWorkerThreads()
 bool SocketWorkerThread::run()
 {
     int fd_count;
-    Socket* ptr;
+    Socket * ptr;
     int i;
-    struct epoll_event ev;
-    SocketMgr* mgr = SocketMgr::getSingletonPtr();
     running = true;
+    struct epoll_event ev;
+    SocketMgr * mgr = SocketMgr::getSingletonPtr();
 
-    while( running )
+    while(running)
     {
         fd_count = epoll_wait(mgr->epoll_fd, events, THREAD_EVENT_SIZE, 5000);
         for(i = 0; i < fd_count; ++i)

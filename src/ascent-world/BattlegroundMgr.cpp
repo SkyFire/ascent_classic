@@ -521,31 +521,29 @@ CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 
 	sEventMgr.AddEvent(this, &CBattleground::EventResurrectPlayers, EVENT_BATTLEGROUND_QUEUE_UPDATE, 30000, 0,0);
 
 	/* create raid groups */
-	/*for(uint32 i = 0; i < 2; ++i)
+	for(uint32 i = 0; i < 2; ++i)
 	{
-		m_groups[i] = new Group();
+		m_groups[i] = new Group(true);
 		m_groups[i]->m_disbandOnNoMembers = false;
 		m_groups[i]->ExpandToRaid();
-	}*/
+	}
 }
 
 CBattleground::~CBattleground()
 {
 	sEventMgr.RemoveEvents(this);
-	/*for(uint32 i = 0; i < 2; ++i)
+	for(uint32 i = 0; i < 2; ++i)
 	{
-		Player * plr;
 		PlayerInfo *inf;
 		for(uint32 j = 0; j < m_groups[i]->GetSubGroupCount(); ++j) {
 			for(GroupMembersSet::iterator itr = m_groups[i]->GetSubGroup(j)->GetGroupMembersBegin(); itr != m_groups[i]->GetSubGroup(j)->GetGroupMembersEnd();) {
-				plr = itr->player;
-				inf = itr->player_info;
+				inf = (*itr);
 				++itr;
-				m_groups[i]->RemovePlayer(inf, plr, true);
+				m_groups[i]->RemovePlayer(inf);
 			}
 		}
 		delete m_groups[i];
-	}*/
+	}
 }
 
 void CBattleground::UpdatePvPData()
@@ -761,13 +759,14 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	UpdatePvPData();
 
 	/* add the player to the group */
-	/*if(plr->GetGroup())
+	if(plr->GetGroup())
 	{
 		// remove them from their group
-		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);
+		plr->GetGroup()->RemovePlayer( plr->m_playerInfo );
 	}
 
-	m_groups[plr->m_bgTeam]->AddMember(plr->m_playerInfo, plr);*/
+	plr->ProcessPendingUpdates();
+	m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
 
 	if(!m_countdownStage)
 	{
@@ -1044,8 +1043,8 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 	plr->m_bg = 0;
 
 	/* are we in the group? */
-	/*if(plr->GetGroup() == m_groups[plr->m_bgTeam])
-		plr->GetGroup()->RemovePlayer(plr->m_playerInfo, plr, true);*/
+	if(plr->GetGroup() == m_groups[plr->m_bgTeam])
+		plr->GetGroup()->RemovePlayer( plr->m_playerInfo );
 
 	// reset team
 	plr->ResetTeam();
@@ -1079,11 +1078,11 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 		plr->GetSession()->SendPacket(&data);
 	}
 
-	if( !m_ended && m_players[0].size() == 0 && m_players[1].size() == 0 )
+	if(!m_ended && m_players[0].size() == 0 && m_players[1].size() == 0)
 	{
 		/* create an inactive event */
-		sEventMgr.RemoveEvents( this, EVENT_BATTLEGROUND_CLOSE );						
-		sEventMgr.AddEvent( this, &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1, 0 ); // 2 mins
+		sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_CLOSE);						// 10mins
+		sEventMgr.AddEvent(this, &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 600000, 1,0);
 	}
 
 	plr->m_bgTeam=plr->GetTeam();
@@ -1228,7 +1227,7 @@ Creature * CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, u
 	pCreature->SetUInt32Value(UNIT_FIELD_POWER3, 200);
 	pCreature->SetUInt32Value(UNIT_FIELD_POWER5, 2000000);
 
-	pCreature->SetUInt32Value(UNIT_FIELD_MAXHEALTH, 100000);
+	pCreature->SetUInt32Value(UNIT_FIELD_MAXHEALTH, 10000);
 	pCreature->SetUInt32Value(UNIT_FIELD_MAXPOWER1, 4868);
 	pCreature->SetUInt32Value(UNIT_FIELD_MAXPOWER3, 200);
 	pCreature->SetUInt32Value(UNIT_FIELD_MAXPOWER5, 2000000);

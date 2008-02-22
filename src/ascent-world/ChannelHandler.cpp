@@ -34,7 +34,6 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 	recvPacket >> channelname;
 	recvPacket >> pass;
 
-#ifndef GLOBAL_LFG
 	if(!stricmp(channelname.c_str(), "LookingForGroup")/* && HasFlag(ACCOUNT_FLAG_NO_AUTOJOIN)*/)
 	{
 		// make sure we have lfg dungeons
@@ -47,7 +46,6 @@ void WorldSession::HandleChannelJoin(WorldPacket& recvPacket)
 		if(i == 3)
 			return;		// don't join lfg
 	}
-#endif
 
 	chn = channelmgr.GetCreateChannel(channelname.c_str(), _player, dbc_id);
 	if(chn == NULL)

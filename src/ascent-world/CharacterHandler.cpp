@@ -800,7 +800,7 @@ void WorldSession::FullLogin(Player * plr)
 	}
 #endif
 
-	Log.Information("Login", "Player %s logged in.", plr->GetName());
+	Log.Debug("Login", "Player %s logged in.", plr->GetName());
 
 	if(plr->GetTeam() == 1)
 		sWorld.HordePlayers++;
@@ -821,32 +821,6 @@ void WorldSession::FullLogin(Player * plr)
 	// Login time, will be used for played time calc
 	plr->m_playedtime[2] = (uint32)UNIXTIME;
 
-	// Send online status to people having this char in friendlist
-	sSocialMgr.LoggedIn( GetPlayer() );
-
-	// Send MOTD
-	_player->BroadcastMessage(sWorld.GetMotd());
-
-	// Send revision (if enabled)
-	if(sWorld.sendRevisionOnJoin)
-	{
-		uint32 rev = g_getRevision();
-#ifdef WIN32
-		_player->BroadcastMessage("Server: %sAscent %s r%u/%s-Win-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
-			rev, CONFIG, ARCH, MSG_COLOR_LIGHTBLUE);		
-#else
-		_player->BroadcastMessage("Server: %sAscent %s r%u/%s-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
-			rev, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
-#endif
-	}
-
-	if(sWorld.SendStatsOnJoin)
-	{
-		_player->BroadcastMessage("Online Players: %s%u |rPeak: %s%u|r Accepted Connections: %s%u",
-			MSG_COLOR_WHITE, sWorld.GetSessionCount(), MSG_COLOR_WHITE, sWorld.PeakSessionCount, MSG_COLOR_WHITE, sWorld.mAcceptedConnections);
-	}
-
-	/** Hawk -- Moved this codeblock to be after the server MOTD, like bliz */
 	//Issue a message telling all guild members that this player has signed on
 	if(plr->IsInGuild())
 	{
@@ -862,18 +836,30 @@ void WorldSession::FullLogin(Player * plr)
 			else
 				data << uint8(0);
 			SendPacket(&data);
-			
-			// Hawk -- Fix - Send out online packet to entire guild
-			data.Initialize(SMSG_GUILD_EVENT);
-			data << uint8(GUILD_EVENT_HASCOMEONLINE);
-			data << uint8(0x01);
-			data << plr->GetName();
-			data << plr->GetGUID();
 
-			pGuild->SendPacket(&data);
-			//pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 1, plr->GetName());
-
+			pGuild->LogGuildEvent(GUILD_EVENT_HASCOMEONLINE, 1, plr->GetName());
 		}
+	}
+
+	// Send online status to people having this char in friendlist
+	sSocialMgr.LoggedIn( GetPlayer() );
+
+	// Send MOTD
+	_player->BroadcastMessage(sWorld.GetMotd());
+
+	// Send revision (if enabled)
+#ifdef WIN32
+	_player->BroadcastMessage("Server: %sAscent %s r%u/%s-Win-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
+		BUILD_REVISION, CONFIG, ARCH, MSG_COLOR_LIGHTBLUE);		
+#else
+	_player->BroadcastMessage("Server: %sAscent %s r%u/%s-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
+		BUILD_REVISION, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
+#endif
+
+	if(sWorld.SendStatsOnJoin)
+	{
+		_player->BroadcastMessage("Online Players: %s%u |rPeak: %s%u|r Accepted Connections: %s%u",
+			MSG_COLOR_WHITE, sWorld.GetSessionCount(), MSG_COLOR_WHITE, sWorld.PeakSessionCount, MSG_COLOR_WHITE, sWorld.mAcceptedConnections);
 	}
 
 	// Calculate rested experience if there is time between lastlogoff and now

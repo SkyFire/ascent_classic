@@ -286,22 +286,7 @@ void Item::SaveToDB( int8 containerslot, int8 slot, bool firstsave, QueryBuffer*
 
 	std::stringstream ss;
 
-	if( CharacterDatabase.SupportsReplaceInto() )
-	{
-		ss << "REPLACE INTO playeritems VALUES(";
-	}
-	else
-	{
-		if( !firstsave )
-		{
-			if( buf != NULL )
-				buf->AddQuery( "DELETE FROM playeritems WHERE guid = %u", GetGUIDLow() );
-			else
-				CharacterDatabase.Execute( "DELETE FROM playeritems WHERE guid = %u", GetGUIDLow() );
-		}
-
-		ss << "INSERT INTO playeritems VALUES(";
-	}
+	ss << "REPLACE INTO playeritems VALUES(";
 
 	ss << m_uint32Values[ITEM_FIELD_OWNER] << ",";
     ss << GetGUIDLow() << ",";

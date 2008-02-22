@@ -28,6 +28,12 @@
     #include <cstring>
 #endif
 
+#include <svn_revision.h>
+#define SCRIPTLIB_HIPART(x) ((x >> 16))
+#define SCRIPTLIB_LOPART(x) ((x & 0x0000ffff))
+#define SCRIPTLIB_VERSION_MINOR (BUILD_REVISION % 1000)
+#define SCRIPTLIB_VERSION_MAJOR (BUILD_REVISION / 1000)
+
 initialiseSingleton(ScriptMgr);
 initialiseSingleton(HookInterface);
 
@@ -54,11 +60,11 @@ struct ScriptingEngine
 
 void ScriptMgr::LoadScripts()
 {
-	if( HookInterface::getSingletonPtr() == NULL )
+	if(!HookInterface::getSingletonPtr())
 		new HookInterface;
 
 	sLog.outString( "Loading External Script Libraries..." );
-	sLog.outString( "" );
+	sLog.outString( "");
 
 	string start_path = Config.MainConfig.GetStringDefault( "Script", "BinaryLocation", "script_bin" ) + "\\";
 	string search_path = start_path + "*.";
@@ -72,40 +78,38 @@ void ScriptMgr::LoadScripts()
 	WIN32_FIND_DATA data;
 	uint32 count = 0;
 	HANDLE find_handle = FindFirstFile( search_path.c_str(), &data );
-	if( find_handle == INVALID_HANDLE_VALUE )
-		sLog.outError("  No external scripts found! Server will continue to function with limited functionality.");
+	if(find_handle == INVALID_HANDLE_VALUE)
+		sLog.outError( "  No external scripts found! Server will continue to function with limited functionality." );
 	else
 	{
 		do
 		{
 			string full_path = start_path + data.cFileName;
 			HMODULE mod = LoadLibrary( full_path.c_str() );
-			printf( "  %s : 0x%p : ", data.cFileName, reinterpret_cast< uint32* >( mod ) );
-			if( mod == 0 )
-			{
-				printf( "error!\n" );
-			}
+			printf( "  %s : 0x%p : ", data.cFileName, reinterpret_cast< uint32* >( mod ));
+			if(mod == 0)
+				printf("error!\n");
 			else
 			{
 				// find version import
-				exp_get_version vcall = (exp_get_version)GetProcAddress( mod, "_exp_get_version");
-				exp_script_register rcall = (exp_script_register)GetProcAddress( mod, "_exp_script_register" );
-				exp_get_script_type scall = (exp_get_script_type)GetProcAddress( mod, "_exp_get_script_type" );
-				if( vcall == 0 || rcall == 0 || scall == 0 )
+				exp_get_version vcall = (exp_get_version)GetProcAddress(mod, "_exp_get_version");
+				exp_script_register rcall = (exp_script_register)GetProcAddress(mod, "_exp_script_register");
+				exp_get_script_type scall = (exp_get_script_type)GetProcAddress(mod, "_exp_get_script_type");
+				if(vcall == 0 || rcall == 0 || scall == 0)
 				{
-					printf( "version functions not found!\n" );
-					FreeLibrary( mod );
+					printf("version functions not found!\n");
+					FreeLibrary(mod);
 				}
 				else
 				{
 					uint32 version = vcall();
 					uint32 stype = scall();
-					if(/*UINT32_LOPART(version) == SCRIPTLIB_VERSION_MINOR && UINT32_HIPART(version) == SCRIPTLIB_VERSION_MAJOR*/true)
+					if(SCRIPTLIB_LOPART(version) == SCRIPTLIB_VERSION_MINOR && SCRIPTLIB_HIPART(version) == SCRIPTLIB_VERSION_MAJOR)
 					{
 						if( stype & SCRIPT_TYPE_SCRIPT_ENGINE )
 						{
-							//printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
-							printf( "delayed load.\n" );
+							printf("v%u.%u : ", SCRIPTLIB_HIPART(version), SCRIPTLIB_LOPART(version));
+							printf("delayed load.\n");
 
 							ScriptingEngine se;
 							se.Handle = mod;
@@ -116,18 +120,18 @@ void ScriptMgr::LoadScripts()
 						}
 						else
 						{
-							_handles.push_back( static_cast< SCRIPT_MODULE >( mod ) );
-							//printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
-							rcall( this );
-							printf( "loaded.\n" );						
+							_handles.push_back(((SCRIPT_MODULE)mod));
+							printf("v%u.%u : ", SCRIPTLIB_HIPART(version), SCRIPTLIB_LOPART(version));
+							rcall(this);
+							printf("loaded.\n");						
 						}
 
 						++count;
 					}
 					else
 					{
-						printf( "version mismatch!\n" );						
-						FreeLibrary( mod );
+						FreeLibrary(mod);
+						printf("version mismatch!\n");						
 					}
 				}
 			}
@@ -215,11 +219,11 @@ char *ext;
 					{
 						uint32 version = vcall();
 						uint32 stype = scall();
-						if(/*UINT32_LOPART(version) == SCRIPTLIB_VERSION_MINOR && UINT32_HIPART(version) == SCRIPTLIB_VERSION_MAJOR*/1)
+						if(SCRIPTLIB_LOPART(version) == SCRIPTLIB_VERSION_MINOR && SCRIPTLIB_HIPART(version) == SCRIPTLIB_VERSION_MAJOR)
 						{
 							if( stype & SCRIPT_TYPE_SCRIPT_ENGINE )
 							{
-								//printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
+								printf("v%u.%u : ", SCRIPTLIB_HIPART(version), SCRIPTLIB_LOPART(version));
 								printf("delayed load.\n");
 
 								ScriptingEngine se;
@@ -232,7 +236,7 @@ char *ext;
 							else
 							{
 								_handles.push_back(((SCRIPT_MODULE)mod));
-								//printf("v%u.%u : ", UINT32_HIPART(version), UINT32_LOPART(version));
+								printf("v%u.%u : ", SCRIPTLIB_HIPART(version), SCRIPTLIB_LOPART(version));
 								rcall(this);
 								printf("loaded.\n");						
 							}
@@ -297,27 +301,24 @@ char *ext;
 
 void ScriptMgr::UnloadScripts()
 {
-	if( HookInterface::getSingletonPtr() != NULL )
+	if(HookInterface::getSingletonPtr())
 		delete HookInterface::getSingletonPtr();
 
-	for( CustomGossipScripts::iterator itr = _customgossipscripts.begin(); itr != _customgossipscripts.end(); ++itr )
+	for(CustomGossipScripts::iterator itr = _customgossipscripts.begin(); itr != _customgossipscripts.end(); ++itr)
 		(*itr)->Destroy();
-
 	_customgossipscripts.clear();
-
 	delete this->DefaultGossipScript;
-	this->DefaultGossipScript = NULL;
+	this->DefaultGossipScript=NULL;
 
 	LibraryHandleMap::iterator itr = _handles.begin();
 	for(; itr != _handles.end(); ++itr)
 	{
 #ifdef WIN32
-		FreeLibrary( static_cast< HMODULE >( *itr ) );
+		FreeLibrary(((HMODULE)*itr));
 #else
-		dlclose( *itr );
+		dlclose(*itr);
 #endif
 	}
-
 	_handles.clear();
 }
 

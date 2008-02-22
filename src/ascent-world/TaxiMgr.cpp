@@ -27,7 +27,9 @@ initialiseSingleton( TaxiMgr );
 
 void TaxiPath::ComputeLen()
 {
-	m_length = 0;
+	m_length1 = m_length1 = 0;
+	m_map1 = m_map2 = 0;
+	float * curptr = &m_length1;
 
 	if (!m_pathNodes.size())
 		return;
@@ -38,12 +40,21 @@ void TaxiPath::ComputeLen()
 	float x = itr->second->x;
 	float y = itr->second->y;
 	float z = itr->second->z;
+	uint32 curmap = itr->second->mapid;
+	m_map1 = curmap;
 
 	itr++;
 
 	while (itr != m_pathNodes.end())
 	{
-		m_length += sqrt((itr->second->x - x)*(itr->second->x - x) +
+		if( itr->second->mapid != curmap )
+		{
+			curptr = &m_length2;
+			m_map2 = itr->second->mapid;
+			curmap = itr->second->mapid;
+		}
+
+		*curptr += sqrt((itr->second->x - x)*(itr->second->x - x) +
 			(itr->second->y - y)*(itr->second->y - y) + 
 			(itr->second->z - z)*(itr->second->z - z));
 
@@ -54,12 +65,18 @@ void TaxiPath::ComputeLen()
 	}
 }
 
-void TaxiPath::SetPosForTime(float &x, float &y, float &z, uint32 time, uint32 *last_node)
+void TaxiPath::SetPosForTime(float &x, float &y, float &z, uint32 time, uint32 *last_node, uint32 mapid)
 {
 	if (!time)
 		return;
 
-	float traveled_len = (time/(getLength() * TAXI_TRAVEL_SPEED))*getLength();
+	float length;
+	if( mapid == m_map1 )
+		length = m_length1;
+	else
+		length = m_length2;
+
+	float traveled_len = (time/(length * TAXI_TRAVEL_SPEED))*length;
 	uint32 len = 0;
 
 	x = 0;
@@ -72,13 +89,30 @@ void TaxiPath::SetPosForTime(float &x, float &y, float &z, uint32 time, uint32 *
 	std::map<uint32, TaxiPathNode*>::iterator itr;
 	itr = m_pathNodes.begin();
 
-	float nx = itr->second->x;
-	float ny = itr->second->y;
-	float nz = itr->second->z; 
+	float nx;
+	float ny;
+	float nz;
+	bool set = false;
 	uint32 nodecounter = 0;
 
 	while (itr != m_pathNodes.end())
 	{
+		if( itr->second->mapid != mapid )
+		{
+			itr++;
+			nodecounter++;
+			continue;
+		}
+
+		if(!set)
+		{
+			nx = itr->second->x;
+			ny = itr->second->y;
+			nz = itr->second->z;
+			set = true;
+			continue;
+		}
+
 		len = (uint32)sqrt((itr->second->x - nx)*(itr->second->x - nx) +
 			(itr->second->y - ny)*(itr->second->y - ny) + 
 			(itr->second->z - nz)*(itr->second->z - nz));
@@ -89,6 +123,7 @@ void TaxiPath::SetPosForTime(float &x, float &y, float &z, uint32 time, uint32 *
 			y = (itr->second->y - ny)*(traveled_len/len) + ny;
 			z = (itr->second->z - nz)*(traveled_len/len) + nz;
 			*last_node = nodecounter;
+			printf("int position: %u %f %f %f (node %u)\n", mapid, x, y, z, nodecounter);
 			return;
 		}
 		else
@@ -118,7 +153,7 @@ TaxiPathNode* TaxiPath::GetPathNode(uint32 i)
 
 void TaxiPath::SendMoveForTime(Player *riding, Player *to, uint32 time)
 {
-	if (!time)
+/*	if (!time)
 		return;
 
 	float traveled_len = (time/(getLength() * TAXI_TRAVEL_SPEED))*getLength();;
@@ -181,7 +216,7 @@ void TaxiPath::SendMoveForTime(Player *riding, Player *to, uint32 time)
 		itr++;
 	}
 	//to->GetSession()->SendPacket(&data);
-	to->delayedPackets.add(data);
+	to->delayedPackets.add(data);*/
 }
 
 /***********************

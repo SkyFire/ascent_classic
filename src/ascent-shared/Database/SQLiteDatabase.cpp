@@ -1,4 +1,3 @@
-
 /*
 * Ascent MMORPG Server
 * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
@@ -21,6 +20,9 @@
 #include "DatabaseEnv.h"
 #include "../CrashHandler.h"
 #include "../NGLog.h"
+
+#if defined(ENABLE_DATABASE_SQLITE) 
+
 #include "SQLiteDatabase.h"
 
 SQLiteDatabase::~SQLiteDatabase()
@@ -110,3 +112,7 @@ QueryResult * SQLiteDatabase::_StoreQueryResult(DatabaseConnection * con)
 {
 	return NULL;
 }
+
+}
+
+#endif

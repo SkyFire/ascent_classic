@@ -42,6 +42,7 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 	case SPELL_HASH_INTERCEPT:
 	case SPELL_HASH_DEVOUR_MAGIC:
 	case SPELL_HASH_SPELL_LOCK:
+
 		return AUTOCAST_EVENT_ATTACK;
 		break;
 
@@ -722,26 +723,28 @@ void Pet::GiveXP( uint32 xp )
 	if(changed) ApplyStatsForLevel();
 }
 
-uint32 Pet::GetNextLevelXP( uint32 currentlevel )
+uint32 Pet::GetNextLevelXP(uint32 currentlevel)
 {
-	uint32 nextLvlXP;
-
-	if( ( currentlevel - 1 ) < MAX_PREDEFINED_NEXTLEVELXP )
+	uint32 level = currentlevel + 1;
+	uint32 nextLvlXP = 0;
+	if( level > 0 && level <= 30 )
 	{
-		nextLvlXP = NextLevelXp[( currentlevel - 1 )];
+		nextLvlXP = ((int)((((double)(8 * level * ((level * 5) + 45)))/100)+0.5))*100;
+	}
+	else if( level == 31 )
+	{
+		nextLvlXP = ((int)((((double)(((8 * level) + 3) * ((level * 5) + 45)))/100)+0.5))*100;
+	}
+	else if( level == 32 )
+	{
+		nextLvlXP = ((int)((((double)(((8 * level) + 6) * ((level * 5) + 45)))/100)+0.5))*100;
 	}
 	else
 	{
-		// 2.2
-		//double MXP = 45 + ( 5 * currentlevel );
-		// 2.3
-		double MXP = 235 + ( 5 * currentlevel );
-		double DIFF = currentlevel < 29 ? 0.0 : currentlevel < 30 ? 1.0 : currentlevel < 31 ? 3.0 : currentlevel < 32 ? 6.0 : 5.0 * ( double( currentlevel ) - 30.0 );
-		double XP = ( ( 8.0 * double( currentlevel ) ) + DIFF ) * MXP;
-		nextLvlXP = (int)( ( XP / 100.0 ) + 0.5 ) * 100;
+		nextLvlXP = ((int)((((double)(((8 * level) + ((level - 30) * 5)) * ((level * 5) + 45)))/100)+0.5))*100;
 	}
-
-	return (uint32)( nextLvlXP / 6 );
+	double xp = double(nextLvlXP) / 4.0;
+	return FL2UINT(xp);
 }
 
 void Pet::SetDefaultSpells()
@@ -1033,13 +1036,12 @@ void Pet::ApplySummonLevelAbilities()
 		m_aiInterface->disable_melee = true;
 		break;
 	}
-
-	if( m_uint32Values[OBJECT_FIELD_ENTRY] == 89 )
+	if(m_uint32Values[OBJECT_FIELD_ENTRY] == 89)
 		has_mana = false;
 
-	if( stat_index < 0 )
+	if(stat_index < 0)
 	{
-		sLog.outError( "PETSTAT: No stat index found for entry %u, `%s`!", GetEntry(), creature_info->Name );
+		sLog.outError("PETSTAT: No stat index found for entry %u, `%s`!", GetEntry(), creature_info->Name);
 		return;
 	}
 
@@ -1439,7 +1441,7 @@ void Pet::ApplyPetLevelAbilities()
 
 void Pet::ApplyStatsForLevel()
 {
-	if( m_uint32Values[UNIT_CREATED_BY_SPELL] )	   // Summon
+	if(m_uint32Values[UNIT_CREATED_BY_SPELL])	   // Summon
 		ApplySummonLevelAbilities();
 	else
 		ApplyPetLevelAbilities();
@@ -1553,7 +1555,7 @@ uint32 Pet::GetHighestRankSpell(uint32 spellId)
 void Pet::UpdateLoyalty( char pts )
 {	
 	//updates loyalty_pts and loyalty lvl if needed
-	if( m_Owner == NULL || Summon != NULL || m_Owner->GetMapMgr() != this->GetMapMgr() )
+	if( !m_Owner || Summon || m_Owner->GetMapMgr() != this->GetMapMgr() )
 		return;
 
 	char curLvl = GetLoyaltyLevel();
@@ -1638,21 +1640,23 @@ AI_Spell * Pet::HandleAutoCastEvent()
 
 void Pet::HandleAutoCastEvent(uint32 Type)
 {
-	if( m_Owner == NULL )
+	list<AI_Spell*>::iterator itr, it2;
+	AI_Spell * sp;
+	if(!m_Owner)
 		return;
 
-	if( Type == AUTOCAST_EVENT_ATTACK )
+	if(Type == AUTOCAST_EVENT_ATTACK)
 	{
 		if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
 		{
 			// more than one autocast spell. pick a random one.
 			uint32 i;
 			uint32 ms = getMSTime();
-			for( i = 0;i < m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size(); ++i )
+			for(i=0;i<m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size();++i)
 			{
 				uint32 c = RandomUInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
 				uint32 j = 0;
-				list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+				itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 
 				for(; itr != m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end(), j < c; ++j, ++itr);
 				if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
@@ -1662,16 +1666,16 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 				}
 				else
 				{
-					if( (*itr)->cooldowntime && (*itr)->cooldowntime > ms )
+					if((*itr)->cooldowntime && (*itr)->cooldowntime > ms)
 						continue;
 
 					m_aiInterface->SetNextSpell(*itr);
 				}
 			}
 		}
-		else if( m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() )
+		else if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size())
 		{
-			AI_Spell* sp = *m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
+			sp =*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 			if(sp->cooldown && getMSTime() < sp->cooldowntime)
 				return;
 
@@ -1680,17 +1684,17 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 		return;
 	}
 
-	for( list<AI_Spell*>::iterator itr = m_autoCastSpells[Type].begin(); itr != m_autoCastSpells[Type].end(); )
+	for(  itr = m_autoCastSpells[Type].begin(); itr != m_autoCastSpells[Type].end(); )
 	{
-		AI_Spell* sp = *itr;
-		++itr;
+		it2 = itr++;
+		sp = *it2;
 
 		if( sp->spelltargetType == TTYPE_OWNER )
 			CastSpell( m_Owner, sp->spell, false );
 		else
 		{
 			//modified by Zack: Spell targetting will be generated in the castspell function now.You cannot force to target self all the time
-			CastSpell( static_cast< Unit* >( NULL ), sp->spell, false );
+			CastSpell( static_cast< Unit* >( NULL ), sp->spell, false);
 		}
 	}
 }

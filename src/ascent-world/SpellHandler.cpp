@@ -75,36 +75,34 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 			}
 		}
 	}
-
-	if( !spellId )
+	if(!spellId)
 		return;
-
 	// check for spell id
-	SpellEntry* spellInfo = dbcSpell.LookupEntryForced( spellId );
+	SpellEntry *spellInfo = dbcSpell.LookupEntryForced( spellId );
 
-	if( spellInfo == NULL )
+	if(!spellInfo)
 	{
 		sLog.outError("WORLD: unknown spell id %i\n", spellId);
 		return;
 	}
 
-	if( spellInfo->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP )
+	if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_ON_STAND_UP)
 	{
-		if( p_User->CombatStatus.IsInCombat() || p_User->IsMounted() )
+		if (p_User->CombatStatus.IsInCombat() || p_User->IsMounted())
 		{
-			_player->GetItemInterface()->BuildInventoryChangeError( tmpItem, NULL, INV_ERR_CANT_DO_IN_COMBAT );
+			_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_CANT_DO_IN_COMBAT);
 			return;
 		}
-		if( p_User->GetStandState() != 1 )
-			p_User->SetStandState( STANDSTATE_SIT );
+		if(p_User->GetStandState()!=1)
+		p_User->SetStandState(STANDSTATE_SIT);
 		// loop through the auras and removing existing eating spells
 	}
 
-	if( itemProto->RequiredLevel )
+	if(itemProto->RequiredLevel)
 	{
-		if( _player->getLevel() < itemProto->RequiredLevel )
+		if(_player->getLevel() < itemProto->RequiredLevel)
 		{
-			_player->GetItemInterface()->BuildInventoryChangeError( tmpItem, NULL, INV_ERR_ITEM_RANK_NOT_ENOUGH );
+			_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
 			return;
 		}
 	}
@@ -117,23 +115,23 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 			return;
 		}
 
-		if( itemProto->RequiredSkillRank )
+		if(itemProto->RequiredSkillRank)
 		{
-			if(_player->_GetSkillLineCurrent( itemProto->RequiredSkill, false) < itemProto->RequiredSkillRank )
+			if(_player->_GetSkillLineCurrent(itemProto->RequiredSkill, false) < itemProto->RequiredSkillRank)
 			{
-				_player->GetItemInterface()->BuildInventoryChangeError( tmpItem, NULL, INV_ERR_ITEM_RANK_NOT_ENOUGH );
+				_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
 				return;
 			}
 		}
 	}
-
-	if( itemProto->AllowableClass && !(_player->getClassMask() & itemProto->AllowableClass) || itemProto->AllowableRace && !( _player->getRaceMask() & itemProto->AllowableRace ) )
+	
+	if( itemProto->AllowableClass && !(_player->getClassMask() & itemProto->AllowableClass) || itemProto->AllowableRace && !(_player->getRaceMask() & itemProto->AllowableRace) )
 	{
-		_player->GetItemInterface()->BuildInventoryChangeError( tmpItem, NULL, INV_ERR_YOU_CAN_NEVER_USE_THAT_ITEM );
+		_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_YOU_CAN_NEVER_USE_THAT_ITEM);
 		return;
-	}	
+	}		
 
-	if( itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown )
+	if(itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown)
 	{
 		if(!_player->CanCastItemDueToCooldown(itemProto, x))	// damn cheaters
 			return;
@@ -163,7 +161,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 	if(_player->m_currentSpell)
 	{
-		_player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, 0);
+		_player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, cn, 0);
 		return;
 	}
 
@@ -184,23 +182,17 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 	uint8 cn;
 
 	recvPacket >> spellId >> cn;
-
 	// check for spell id
-	SpellEntry* spellInfo = dbcSpell.LookupEntryForced( spellId );
+	SpellEntry *spellInfo = dbcSpell.LookupEntryForced(spellId );
 
-	if( spellInfo == NULL )
+	if(!spellInfo || !sHookInterface.OnCastSpell(_player, spellInfo))
 	{
-		sLog.outError( "WORLD: unknown spell id %i\n", spellId );
+		sLog.outError("WORLD: unknown spell id %i\n", spellId);
 		return;
 	}
 
-	if( !sHookInterface.OnCastSpell( _player, spellInfo ) )
-	{
-		sLog.outError( "SERVER_HOOK_EVENT_ON_CAST_SPELL: callback did not return true" );
-		return;
-	}
-
-	sLog.outDetail("WORLD: got cast spell packet, spellId - %i (%s), data length = %i", spellId, spellInfo->Name, recvPacket.size() );
+	sLog.outDetail("WORLD: got cast spell packet, spellId - %i (%s), data length = %i",
+		spellId, spellInfo->Name, recvPacket.size());
 	
 	// Cheat Detection only if player and not from an item
 	// this could fuck up things but meh it's needed ALOT of the newbs are using WPE now
@@ -208,10 +200,10 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
 	if( !GetPlayer()->HasSpell(spellId) || spellInfo->Attributes & ATTRIBUTES_PASSIVE )
 	{
-		_player->SendCastResult( spellId, SPELL_FAILED_NOT_KNOWN, 0 );
+		sLog.outDetail("WORLD: Spell isn't casted because player \"%s\" is cheating", GetPlayer()->GetName());
 		return;
 	}
-	
+
 	if (GetPlayer()->GetOnMeleeSpell() != spellId)
 	{
 		//autoshot 75
@@ -272,7 +264,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
         if(_player->m_currentSpell)
         {
-            _player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, 0);
+            _player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, cn, 0);
             return;
         }
 		Spell *spell = new Spell(GetPlayer(), spellInfo, false, NULL);

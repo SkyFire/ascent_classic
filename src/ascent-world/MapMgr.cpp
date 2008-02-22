@@ -264,14 +264,14 @@ void MapMgr::PushObject(Object *obj)
 	   UpdateCellActivity(x, y, 2);
 	}
 	else
-	switch( obj->GetGUIDHigh() )
+	switch(obj->GetGUIDHigh())
 	{
 		case HIGHGUID_UNIT:
 			ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
-			m_CreatureStorage[obj->GetGUIDLow()] = static_cast< Creature* >( obj );
-			if( static_cast< Creature* >( obj )->m_spawn != NULL )
+			m_CreatureStorage[obj->GetGUIDLow()] = (Creature*)obj;
+			if(((Creature*)obj)->m_spawn != NULL)
 			{
-				_sqlids_creatures.insert(make_pair( static_cast< Creature* >( obj )->m_spawn->id, static_cast< Creature* >( obj ) ) );
+				_sqlids_creatures.insert(make_pair( ((Creature*)obj)->m_spawn->id, ((Creature*)obj) ) );
 			}
 			break;
 
@@ -330,10 +330,10 @@ void MapMgr::PushStaticObject(Object *obj)
 {
 	_mapWideStaticObjects.insert(obj);
 
-	switch( obj->GetGUIDHigh() )
+	switch(obj->GetGUIDHigh())
 	{
 		case HIGHGUID_UNIT:
-			m_CreatureStorage[obj->GetGUIDLow()] = static_cast< Creature* >( obj );
+			m_CreatureStorage[obj->GetGUIDLow()] = (Creature*)obj;
 			break;
 
 		case HIGHGUID_PET:
@@ -341,11 +341,11 @@ void MapMgr::PushStaticObject(Object *obj)
 			break;
 
 		case HIGHGUID_DYNAMICOBJECT:
-			m_DynamicObjectStorage[obj->GetGUIDLow()] = static_cast< DynamicObject* >( obj );
+			m_DynamicObjectStorage[obj->GetGUIDLow()] = (DynamicObject*)obj;
 			break;
 
 		case HIGHGUID_GAMEOBJECT:
-			m_GOStorage[obj->GetGUIDLow()] = static_cast< GameObject* >( obj );
+			m_GOStorage[obj->GetGUIDLow()] = (GameObject*)obj;
 			break;
 	}
 }
@@ -364,107 +364,109 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	//ASSERT(obj->GetPositionY() > _minY && obj->GetPositionY() < _maxY);
 	ASSERT(_cells);
 
-	if( obj->Active )
-		obj->Deactivate( this );
+	if(obj->Active)
+		obj->Deactivate(this);
 
 	_updates.erase( obj );
 	obj->ClearUpdateMask();
-	Player* plObj = obj->GetTypeId() == TYPEID_PLAYER ? static_cast< Player* >( obj ) : NULL;
+	Player* plObj = (obj->GetTypeId() == TYPEID_PLAYER) ? static_cast< Player* >( obj ) : 0;
 
 	///////////////////////////////////////
 	// Remove object from all needed places
 	///////////////////////////////////////
  
-	switch( obj->GetGUIDHigh() )
+	switch(obj->GetGUIDHigh())
 	{
 		case HIGHGUID_UNIT:
 			ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
-			m_CreatureStorage[obj->GetGUIDLow()] = NULL;
-			if( static_cast< Creature* >( obj )->m_spawn != NULL )
+			m_CreatureStorage[obj->GetGUIDLow()] = 0;
+			if(((Creature*)obj)->m_spawn != NULL)
 			{
-				_sqlids_creatures.erase( static_cast< Creature* >( obj )->m_spawn->id );
+				_sqlids_creatures.erase(((Creature*)obj)->m_spawn->id);
 			}
 
-			if( free_guid )
-				_reusable_guids_creature.push_back( obj->GetGUIDLow() );
+			if(free_guid)
+				_reusable_guids_creature.push_back(obj->GetGUIDLow());
 
 			  break;
 
 		case HIGHGUID_PET:
-			m_PetStorage.erase( obj->GetGUIDLow() );
+			m_PetStorage.erase(obj->GetGUIDLow());
 			break;
 
 		case HIGHGUID_DYNAMICOBJECT:
-			m_DynamicObjectStorage.erase( obj->GetGUIDLow() );
+			m_DynamicObjectStorage.erase(obj->GetGUIDLow());
 			break;
 
 		case HIGHGUID_GAMEOBJECT:
 			ASSERT(obj->GetGUIDLow() <= m_GOHighGuid);
-			m_GOStorage[obj->GetGUIDLow()] = NULL;
-			if( static_cast< GameObject* >( obj )->m_spawn != NULL )
+			m_GOStorage[obj->GetGUIDLow()] = 0;
+			if(((GameObject*)obj)->m_spawn != NULL)
 			{
-				_sqlids_gameobjects.erase( static_cast< GameObject* >( obj )->m_spawn->id );
+				_sqlids_gameobjects.erase(((GameObject*)obj)->m_spawn->id);
 			}
 
-			if( free_guid )
-				_reusable_guids_gameobject.push_back( obj->GetGUIDLow() );
+			if(free_guid)
+				_reusable_guids_gameobject.push_back(obj->GetGUIDLow());
 
 			break;
 	}
 
 	// That object types are not map objects. TODO: add AI groups here?
-	if( obj->GetTypeId() == TYPEID_ITEM || obj->GetTypeId() == TYPEID_CONTAINER || obj->GetTypeId() == 10 )
+	if(obj->GetTypeId() == TYPEID_ITEM || obj->GetTypeId() == TYPEID_CONTAINER || obj->GetTypeId()==10)
 	{
 		return;
 	}
 
-	if( obj->GetTypeId() == TYPEID_CORPSE )
+	if(obj->GetTypeId() == TYPEID_CORPSE)
 	{
-		m_corpses.erase( static_cast< Corpse* >( obj ) );
+		m_corpses.erase(((Corpse*)obj));
 	}
 
-	if( !obj->GetMapCell() )
+	if(!obj->GetMapCell())
 	{
 		/* set the map cell correctly */
-		if( obj->GetPositionX() >= _maxX || obj->GetPositionX() <= _minY || obj->GetPositionY() >= _maxY || obj->GetPositionY() <= _minY )
+		if(obj->GetPositionX() >= _maxX || obj->GetPositionX() <= _minY ||
+			obj->GetPositionY() >= _maxY || obj->GetPositionY() <= _minY)
 		{
 			// do nothing
 		}
 		else
 		{
-			obj->SetMapCell( this->GetCellByCoords( obj->GetPositionX(), obj->GetPositionY() ) );
+			obj->SetMapCell(this->GetCellByCoords(obj->GetPositionX(), obj->GetPositionY()));
 		}		
 	}
 
-	if( obj->GetMapCell() )
+	if(obj->GetMapCell())
 	{
 		ASSERT(obj->GetMapCell());
 	
 		// Remove object from cell
-		obj->GetMapCell()->RemoveObject( obj );
+		obj->GetMapCell()->RemoveObject(obj);
 	
 		// Unset object's cell
-		obj->SetMapCell( NULL );
+		obj->SetMapCell(NULL);
 	}
 
 	// Clear any updates pending
-	if( obj->GetTypeId() == TYPEID_PLAYER )
+	if(obj->GetTypeId() == TYPEID_PLAYER)
 	{
 		_processQueue.erase( static_cast< Player* >( obj ) );
 		static_cast< Player* >( obj )->ClearAllPendingUpdates();
 	}
 	
 	// Remove object from all objects 'seeing' him
-	for( Object::InRangeSet::iterator iter = obj->GetInRangeSetBegin(); iter != obj->GetInRangeSetEnd(); ++iter )
+	for (Object::InRangeSet::iterator iter = obj->GetInRangeSetBegin();
+		iter != obj->GetInRangeSetEnd(); ++iter)
 	{
-		if( (*iter) != NULL )
+		if( (*iter) )
 		{
 			if( (*iter)->GetTypeId() == TYPEID_PLAYER )
 			{
 				if( static_cast< Player* >( *iter )->IsVisible( obj ) && static_cast< Player* >( *iter )->m_TransporterGUID != obj->GetGUID() )
-					static_cast< Player* >( *iter )->PushOutOfRange( obj->GetNewGUID() );
+					static_cast< Player* >( *iter )->PushOutOfRange(obj->GetNewGUID());
 			}
-			(*iter)->RemoveInRangeObject( obj );
+			(*iter)->RemoveInRangeObject(obj);
 		}
 	}
 	
@@ -522,7 +524,7 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 	}
 
 	Player* plObj;
-	ByteBuffer* buf = 0;
+	ByteBuffer * buf = 0;
 
 	if( obj->GetTypeId() == TYPEID_PLAYER )
 	{
@@ -610,9 +612,9 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 #undef IN_RANGE_LOOP
 #undef END_IN_RANGE_LOOP*/
 
-	if( obj->HasInRangeObjects() )
-	{
-		for( Object::InRangeSet::iterator iter = obj->GetInRangeSetBegin(), iter2; iter != obj->GetInRangeSetEnd(); )
+	if(obj->HasInRangeObjects()) {
+		for (Object::InRangeSet::iterator iter = obj->GetInRangeSetBegin(), iter2;
+			iter != obj->GetInRangeSetEnd();)
 		{
 			curObj = *iter;
 			iter2 = iter++;
@@ -623,22 +625,22 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 			else
 				fRange = m_UpdateDistance; // normal distance
 
-			if( fRange > 0.0f && curObj->GetDistance2dSq( obj ) > fRange )
+			if( fRange > 0.0f && curObj->GetDistance2dSq(obj) > fRange )
 			{
 				if( plObj )
-					plObj->RemoveIfVisible( curObj );
+					plObj->RemoveIfVisible(curObj);
 
 				if( curObj->IsPlayer() )
 					static_cast< Player* >( curObj )->RemoveIfVisible(obj);
 
-				curObj->RemoveInRangeObject( obj );
+				curObj->RemoveInRangeObject(obj);
 
 				if( obj->GetMapMgr() != this )
 				{
 					/* Something removed us. */
 					return;
 				}
-				obj->RemoveInRangeObject( iter2 );
+				obj->RemoveInRangeObject(iter2);
 			}
 		}
 	}
@@ -1470,51 +1472,51 @@ void MapMgr::AddObject(Object *obj)
 	m_objectinsertlock.Release();//>>>>>>>>>>>>
 }
 
-Unit* MapMgr::GetUnit( const uint64 & guid )
-{
 
+Unit* MapMgr::GetUnit(const uint64 & guid)
+{
 #ifdef USING_BIG_ENDIAN
-	switch( ((uint32*)&guid)[0] )
+	switch (((uint32*)&guid)[0])
 #else
-	switch( ((uint32*)&guid)[1] )
+	switch (((uint32*)&guid)[1])
 #endif
 	{
-	case HIGHGUID_PLAYER:
-			return GetPlayer( (uint32)guid );
+	case	HIGHGUID_PLAYER:
+		return GetPlayer((uint32)guid);
 		break;
-	case HIGHGUID_UNIT:
-			return GetCreature( (uint32)guid );
+	case	HIGHGUID_UNIT:
+		return GetCreature((uint32)guid);
 		break;
-	case HIGHGUID_PET:
-			return GetPet( (uint32)guid );
+	case	HIGHGUID_PET:
+		return GetPet((uint32)guid);
 		break;
 	default:
 		return NULL;
 	}
 }
 
-Object* MapMgr::_GetObject( const uint64 & guid )
+Object* MapMgr::_GetObject(const uint64 & guid)
 {
 #ifdef USING_BIG_ENDIAN
-	switch( ((uint32*)&guid)[0] )
+	switch (((uint32*)&guid)[0])
 #else
-	switch( ((uint32*)&guid)[1] )
+	switch (((uint32*)&guid)[1])
 #endif
 	{
-	case HIGHGUID_GAMEOBJECT:
-		return GetGameObject( (uint32)guid );
+	case	HIGHGUID_GAMEOBJECT:
+		return GetGameObject((uint32)guid);
 		break;
-	case HIGHGUID_CORPSE:
-		return objmgr.GetCorpse( (uint32)guid );
+	case	HIGHGUID_CORPSE:
+		return objmgr.GetCorpse((uint32)guid);
 		break;
-	case HIGHGUID_DYNAMICOBJECT:
-		return GetDynamicObject( (uint32)guid );
+	case	HIGHGUID_DYNAMICOBJECT:
+		return GetDynamicObject((uint32)guid);
 		break;
-	case HIGHGUID_TRANSPORTER:
-		return objmgr.GetTransporter( GUID_LOPART(guid) );
+	case	HIGHGUID_TRANSPORTER:
+		return objmgr.GetTransporter(GUID_LOPART(guid));
 		break;
 	default:
-		return GetUnit( guid );
+		return GetUnit(guid);
 		break;
 	}
 }
@@ -1524,40 +1526,40 @@ void MapMgr::_PerformObjectDuties()
 	++mLoopCounter;
 	uint32 mstime = getMSTime();
 	uint32 difftime = mstime - lastUnitUpdate;
-	if( difftime > 500 )
+	if(difftime > 500)
 		difftime = 500;
 
 	// Update creatures.
 	{
-		Creature* ptr = NULL;
-		for( CreatureSet::iterator itr = activeCreatures.begin(); itr != activeCreatures.end(); )
+		CreatureSet::iterator itr = activeCreatures.begin();
+		PetStorageMap::iterator it2 = m_PetStorage.begin();
+		Creature * ptr;
+		Pet * ptr2;
+
+		for(; itr != activeCreatures.end();)
 		{
 			ptr = *itr;
 			++itr;
-			if( ptr != NULL )
-				ptr->Update( difftime );
+			ptr->Update(difftime);
 		}
-	}
 
-	// Update pets.
-	{
-		Pet* ptr = NULL;
-		for( PetStorageMap::iterator itr = m_PetStorage.begin(); itr != m_PetStorage.end(); )
+		for(; it2 != m_PetStorage.end();)
 		{
-			ptr = itr->second;
-			++itr;
-			if( ptr != NULL )
-				ptr->Update( difftime );
+			ptr2 = it2->second;
+			++it2;
+
+			ptr2->Update(difftime);
 		}		
 	}
 
 	// Update any events.
-	eventHolder.Update( difftime );
+	eventHolder.Update(difftime);
 
 	// Update players.
 	{
+		PlayerStorageMap::iterator itr = m_PlayerStorage.begin();
 		Player* ptr;
-		for( PlayerStorageMap::iterator itr = m_PlayerStorage.begin(); itr != m_PlayerStorage.end(); )
+		for(; itr != m_PlayerStorage.end(); )
 		{
 			ptr = static_cast< Player* >( (itr->second) );
 			++itr;

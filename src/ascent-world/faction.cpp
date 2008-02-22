@@ -1,4 +1,27 @@
+/*
+ * Ascent MMORPG Server
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "StdAfx.h"
+
+#ifdef WIN32
+#define HACKY_CRASH_FIXES 1		// SEH stuff
+#endif
 
 bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 {
@@ -65,30 +88,44 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 		}
 		if( objB->IsPet() )
 		{
+#if defined(WIN32) && defined(HACKY_CRASH_FIXES)
+			__try {
+				// Check PvP Flags.
+				if( static_cast< Pet* >( objB )->GetPetOwner() != NULL && static_cast< Pet* >( objB )->GetPetOwner()->GetMapMgr() == objB->GetMapMgr() && static_cast< Pet* >( objB )->GetPetOwner()->IsPvPFlagged() )
+					return true;
+				else
+					return false;
+			} __except(EXCEPTION_EXECUTE_HANDLER)
+			{
+				static_cast<Pet*>(objB)->ClearPetOwner();
+				static_cast<Pet*>(objB)->SafeDelete();
+			}
+#else
 			// Check PvP Flags.
 			if( static_cast< Pet* >( objB )->GetPetOwner() != NULL && static_cast< Pet* >( objB )->GetPetOwner()->GetMapMgr() == objB->GetMapMgr() && static_cast< Pet* >( objB )->GetPetOwner()->IsPvPFlagged() )
 				return true;
 			else
 				return false;
+#endif
 		}
 	}
 
 	// Reputation System Checks
-	if( objA->IsPlayer() && !objB->IsPlayer() )	   // PvE
+	if(objA->IsPlayer() && !objB->IsPlayer())	   // PvE
 	{
-		if( objB->m_factionDBC->RepListId >= 0 )
+		if(objB->m_factionDBC->RepListId >= 0)
 			hostile = static_cast< Player* >( objA )->IsHostileBasedOnReputation( objB->m_factionDBC );
 	}
 	
-	if( objB->IsPlayer() && !objA->IsPlayer() )	   // PvE
+	if(objB->IsPlayer() && !objA->IsPlayer())	   // PvE
 	{
-		if( objA->m_factionDBC->RepListId >= 0 )
+		if(objA->m_factionDBC->RepListId >= 0)
 			hostile = static_cast< Player* >( objB )->IsHostileBasedOnReputation( objA->m_factionDBC );
 	}
 
-	if( objA->IsPlayer() && objB->IsPlayer() && static_cast< Player* >( objA )->m_bg != NULL )
+	if( objA->IsPlayer() && objB->IsPlayer() && static_cast<Player*>(objA)->m_bg != NULL )
 	{
-		if( static_cast< Player* >( objA )->m_bgTeam != static_cast< Player* >( objB )->m_bgTeam )
+		if( static_cast<Player*>(objA)->m_bgTeam != static_cast<Player*>(objB)->m_bgTeam )
 			return true;
 	}
 

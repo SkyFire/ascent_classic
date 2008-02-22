@@ -47,9 +47,9 @@ TerrainMgr::~TerrainMgr()
 				if(CellInformation[x][y] != 0)
 					delete CellInformation[x][y];
 			}
-			delete[] CellInformation[x];
+			delete [] CellInformation[x];
 		}
-		delete[] CellInformation;
+		delete [] CellInformation;
 	}
 #else
 
@@ -58,9 +58,9 @@ TerrainMgr::~TerrainMgr()
 	// Big memory cleanup, whee.
 	for(uint32 x = 0; x < _sizeX; ++x)
 	{
-		delete[] CellInformation[x];
+		delete [] CellInformation[x];
 	}
-	delete[] CellInformation;
+	delete [] CellInformation;
 
 #ifdef WIN32
 	UnmapViewOfFile(m_Memory);
@@ -300,25 +300,25 @@ uint8 TerrainMgr::GetWaterType(float x, float y)
 	return GetCellInformation(CellX, CellY)->LiquidType[ConvertTo2dArray(IntX)][ConvertTo2dArray(IntY)];
 }
 
-float TerrainMgr::GetWaterHeight( float x, float y )
+float TerrainMgr::GetWaterHeight(float x, float y)
 {
-	if( !AreCoordinatesValid( x, y ) )
+	if(!AreCoordinatesValid(x, y))
 		return 0.0f;
 
 	// Convert the co-ordinates to cells.
-	uint32 CellX = ConvertGlobalXCoordinate( x );
-	uint32 CellY = ConvertGlobalYCoordinate( y );
+	uint32 CellX = ConvertGlobalXCoordinate(x);
+	uint32 CellY = ConvertGlobalYCoordinate(y);
 
-	if( !CellInformationLoaded( CellX, CellY ) )
+	if(!CellInformationLoaded(CellX, CellY))
 		return 0.0f;
 
 	// Convert the co-ordinates to cell's internal
 	// system.
-	float IntX = ConvertInternalXCoordinate( x, CellX );
-	float IntY = ConvertInternalYCoordinate( y, CellY );
+	float IntX = ConvertInternalXCoordinate(x, CellX);
+	float IntY = ConvertInternalYCoordinate(y, CellY);
 
 	// Find the offset in the 2d array.
-	return GetCellInformation( CellX, CellY )->LiquidLevel[ConvertTo2dArray( IntX )][ConvertTo2dArray( IntY )];
+	return GetCellInformation(CellX, CellY)->LiquidLevel[ConvertTo2dArray(IntX)][ConvertTo2dArray(IntY)];
 }
 
 uint8 TerrainMgr::GetWalkableState(float x, float y)

@@ -62,7 +62,6 @@ libshared_a_SOURCES = \
     Database/SQLiteDatabase.cpp \
     Database/SQLiteDatabase.h \
     Database/CreateInterface.cpp \
-    ../../dep/include/sqlite/sqlite3.c \
     Network/ListenSocketPoll.h \
     Network/ListenSocketSelect.h \
     Network/ListenSocketLinux.h \

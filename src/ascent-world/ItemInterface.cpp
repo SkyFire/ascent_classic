@@ -56,13 +56,13 @@ uint32 ItemInterface::m_CreateForPlayer(ByteBuffer *data)
 	ASSERT(m_pOwner != NULL);
 	uint32 count = 0;
 
-	for( int i = 0; i < MAX_INVENTORY_SLOT; i++ )
+	for(int i = 0; i < MAX_INVENTORY_SLOT; i++)
 	{
-		if( m_pItems[i] != NULL )
+		if(m_pItems[i])
 		{
-			if( m_pItems[i]->IsContainer() )
+			if(m_pItems[i]->IsContainer())
 			{
-				count += static_cast< Container* >( m_pItems[i] )->BuildCreateUpdateBlockForPlayer( data, m_pOwner );
+				count += ((Container*)(m_pItems[i]))->BuildCreateUpdateBlockForPlayer(data, m_pOwner);
 
 				if(m_pItems[i]->GetProto())
 				{
@@ -362,12 +362,11 @@ Item *ItemInterface::SafeRemoveAndRetreiveItemFromSlot(int8 ContainerSlot, int8 
 	ASSERT(ContainerSlot < MAX_INVENTORY_SLOT);
 	Item *pItem = NULL;
 
-	if( ContainerSlot == INVENTORY_SLOT_NOT_SET )
+	if(ContainerSlot == INVENTORY_SLOT_NOT_SET)
 	{
-		pItem = GetInventoryItem( ContainerSlot, slot );
+		pItem = GetInventoryItem(ContainerSlot,slot);
 
-		if( pItem == NULL )
-			return NULL;
+		if (pItem == NULL) { return NULL; }
 
 		if(pItem->GetProto()->ContainerSlots > 0 && pItem->GetTypeId() == TYPEID_CONTAINER && ((Container*)pItem)->HasItems())
 		{
@@ -1372,9 +1371,6 @@ int8 ItemInterface::GetInternalBankSlotFromPlayer(int8 islot)
 //-------------------------------------------------------------------//
 int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype* proto, bool ignore_combat /* = false */, bool skip_2h_check /* = false */)
 {
-	if( proto == NULL )
-		return INV_ERR_ITEMS_CANT_BE_SWAPPED;
-
 	uint32 type=proto->InventoryType;
 	
 	if(slot >= INVENTORY_SLOT_BAG_START && slot < INVENTORY_SLOT_BAG_END && DstInvSlot == -1)

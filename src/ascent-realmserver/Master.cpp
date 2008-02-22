@@ -33,12 +33,12 @@ int main(int argc, char *argv[])
     /* Print Banner */
 	Log.Notice("Server", "==============================================================");
 	Log.Notice("Server", "| Codename Ascent Cluster - Realm Server                     |");
-	Log.Notice("Server", "| Version 0.1, Revision %04u                                 |", g_getRevision());
+	Log.Notice("Server", "| Version 0.1, Revision %04u                                 |", BUILD_REVISION);
 	Log.Notice("Server", "==============================================================");
 	Log.Line();
 
-	Database_Character = Database::CreateDatabaseInterface(1);
-	Database_World = Database::CreateDatabaseInterface(1);
+	Database_Character = Database::CreateDatabaseInterface( 1 );
+	Database_World = Database::CreateDatabaseInterface( 1 );
 	Log.Success("Database", "Interface Created.");
 
 	new ClusterMgr;

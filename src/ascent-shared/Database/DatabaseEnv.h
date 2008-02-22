@@ -20,13 +20,6 @@
 #if !defined(DATABASEENV_H)
 #define DATABASEENV_H
 
-/************************************************************************/
-/* Database Support Setup											   */
-/************************************************************************/
-// Define the databases that you would like the server to be compiled with here.
-
-#define DATABASE_SUPPORT_MYSQL
-
 //! Other libs we depend on.
 #include "Common.h"
 #include "Singleton.h"
@@ -34,7 +27,6 @@
 #include "CThreads.h"
 
 //! Our own includes.
-#include <mysql/mysql.h>
 #include "Database/DBCStores.h"
 #include "Database/Field.h"
 #include "Database/Database.h"

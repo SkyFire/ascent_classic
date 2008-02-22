@@ -576,7 +576,7 @@ enum SPELL_INDEX
 	SPELL_TYPE_INDEX_EARTH_SHIELD	= 7,
 	SPELL_TYPE_INDEX_CYCLONE		= 8,
 	SPELL_TYPE_INDEX_BANISH			= 9,
-	SPELL_TYPE_INDEX_JUDGEMENT		= 10,
+	SPELL_TYPE_INDEX_JUDGEMENT		= 10,	
 	NUM_SPELL_TYPE_INDEX			= 11,
 };
 
@@ -637,12 +637,12 @@ class SERVER_DECL Player : public Unit
 
 public:
 
-	Player( uint32 high, uint32 low );
-	~Player();
+	Player ( uint32 high, uint32 low );
+	~Player ( );
 
-	ASCENT_INLINE Guild* GetGuild() { return m_playerInfo->guild; }
-	ASCENT_INLINE GuildMember* GetGuildMember() { return m_playerInfo->guildMember; }
-	ASCENT_INLINE GuildRank* GetGuildRankS() { return m_playerInfo->guildRank; }
+	ASCENT_INLINE Guild * GetGuild() { return m_playerInfo->guild; }
+	ASCENT_INLINE GuildMember * GetGuildMember() { return m_playerInfo->guildMember; }
+	ASCENT_INLINE GuildRank * GetGuildRankS() { return m_playerInfo->guildRank; }
 
 	void EventGroupFullUpdate();
 
@@ -740,6 +740,7 @@ public:
     float               m_taxi_pos_y;
     float               m_taxi_pos_z;
     bool                m_onTaxi;
+	uint32				m_taxiMapChangeNode;
 
     /************************************************************************/
     /* Quests                                                               */
@@ -755,7 +756,7 @@ public:
 	}
 
 	int32                GetOpenQuestSlot();
-	QuestLogEntry* GetQuestLogForEntry( uint32 quest );
+	QuestLogEntry*       GetQuestLogForEntry(uint32 quest);
 	ASCENT_INLINE QuestLogEntry*GetQuestLogInSlot(uint32 slot)  { return m_questlog[slot]; }
     ASCENT_INLINE uint32        GetQuestSharer()                { return m_questSharer; }
     
@@ -789,20 +790,13 @@ public:
     /************************************************************************/
     /* Stun Immobilize                                                      */
     /************************************************************************/
-    void SetTriggerStunOrImmobilize( uint32 newtrigger, uint32 new_chance, bool is_victim = false )
+    void SetTriggerStunOrImmobilize(uint32 newtrigger,uint32 new_chance)
     {
-		if( is_victim == false )
-		{
-			trigger_on_stun = newtrigger;
-			trigger_on_stun_chance = new_chance;
-		}
-		else
-		{
-			trigger_on_stun_victim = newtrigger;
-			trigger_on_stun_chance_victim = new_chance;
-		}
+        trigger_on_stun = newtrigger;
+        trigger_on_stun_chance = new_chance;
     }
-    void EventStunOrImmobilize( Unit *proc_target, bool is_victim = false );
+    void EventStunOrImmobilize(Unit *proc_target);
+
     
     void EventPortToGM(Player *p);
 	ASCENT_INLINE uint32 GetTeam() { return m_team; }
@@ -1470,8 +1464,6 @@ public:
 	uint32 m_resurrectHealth, m_resurrectMana;
 	uint32 resurrector;
 	bool blinked;
-	uint32 m_redirectCount;
-	uint32 m_heightDecreaseCount;
 	uint16 m_speedhackChances;
 	uint32 m_explorationTimer;
 	// DBC stuff
@@ -1540,7 +1532,7 @@ public:
 	set<Unit*> visiblityChangableSet;
 	bool m_beingPushed;
 	bool CanSignCharter(Charter * charter, Player * requester);
-	Charter* m_charters[NUM_CHARTER_TYPES];
+	Charter * m_charters[NUM_CHARTER_TYPES];
 	uint32 flying_aura;
 	stringstream LoadAuras;
 	bool resend_speed;
@@ -1607,11 +1599,10 @@ public:
 	{
 		ResurrectPlayer();
 		SetMovement(MOVE_UNROOT, 5);
-		SetPlayerSpeed( RUN, (float)7 );
-		SetPlayerSpeed( SWIM, (float)4.9 );
+		SetPlayerSpeed(RUN, (float)7);
+		SetPlayerSpeed(SWIM, (float)4.9);
 		SetMovement(MOVE_LAND_WALK, 8);
 		SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH) );
-		blinked = true;
 	}
 
 	LocationVector m_last_group_position;
@@ -1657,7 +1648,7 @@ public:
     /************************************************************************/
     /* Spell Packet wrapper Please keep this separated                      */
     /************************************************************************/
-    void SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint32 Extra);
+    void SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint8 MultiCast, uint32 Extra);
     void SendSpellCoolDown(uint32 SpellID, uint16 Time);
     void SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4);
     void SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, bool type);
@@ -1822,7 +1813,7 @@ protected:
 	// Pointer to this char's game client
 	WorldSession *m_session;
 	// Channels
-	std::set< Channel* > m_channels;
+	std::set<Channel*> m_channels;
 	// Visible objects
 	std::set<Object*> m_visibleObjects;
 	// Groups/Raids
@@ -1840,8 +1831,6 @@ protected:
 	uint32      _fields[PLAYER_END];
 	uint32	    trigger_on_stun;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
 	uint32	    trigger_on_stun_chance; //also using this for mage "Frostbite" talent
-	uint32	    trigger_on_stun_victim;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
-	uint32	    trigger_on_stun_chance_victim; //also using this for mage "Frostbite" talent
 	int			hearth_of_wild_pct;		//druid hearth of wild talent used on shapeshifting. We eighter know what is last talent level or memo on learn
 
 	uint32 m_team;
@@ -1853,9 +1842,8 @@ protected:
 
 	uint32 m_mountCheckTimer;
 	void RemovePendingPlayer();
-
-#ifdef ENABLE_COMPRESSED_MOVEMENT
 public:
+#ifdef ENABLE_COMPRESSED_MOVEMENT
 	void EventDumpCompressedMovement();
 	void AppendMovementData(uint32 op, uint32 sz, const uint8* data);
 	ByteBuffer m_movementBuffer;

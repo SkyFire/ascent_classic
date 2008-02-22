@@ -106,8 +106,8 @@ ThreadBase * GetConsoleListener();
 
 bool Master::Run(int argc, char ** argv)
 {
-	char* config_file = const_cast< char* >( default_config_file );
-	char* realm_config_file = const_cast< char* >( default_realm_config_file );
+	char * config_file = (char*)default_config_file;
+	char * realm_config_file = (char*)default_realm_config_file;
 
 	int file_log_level = DEF_VALUE_NOT_SET;
 	int screen_log_level = DEF_VALUE_NOT_SET;
@@ -166,7 +166,7 @@ bool Master::Run(int argc, char ** argv)
 		sLog.m_screenLogLevel = 1;
 	}
 
-	printf(BANNER, BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
+	printf(BANNER, BUILD_TAG, BUILD_REVISION, CONFIG, PLATFORM_TEXT, ARCH);
 #ifdef REPACK
 	printf("\nRepack: %s | Author: %s | %s\n", REPACK, REPACK_AUTHOR, REPACK_WEBSITE);
 #endif
@@ -193,7 +193,7 @@ bool Master::Run(int argc, char ** argv)
 	if( do_check_conf )
 	{
 		Log.Notice( "Config", "Checking config file: %s", config_file );
-		if( Config.MainConfig.SetSource( config_file, true ) )
+		if( Config.MainConfig.SetSource(config_file, true ) )
 			Log.Success( "Config", "Passed without errors." );
 		else
 			Log.Warning( "Config", "Encountered one or more errors." );
@@ -215,6 +215,11 @@ bool Master::Run(int argc, char ** argv)
 	printf( "The key combination <Ctrl-C> will safely shut down the server at any time.\n" );
 	Log.Line();
     
+#ifndef WIN32
+	if(geteuid() == 0 || getegid() == 0)
+		Log.LargeErrorMessage( LARGERRORMESSAGE_WARNING, "You are running Ascent as root.", "This is not needed, and may be a possible security risk.", "It is advised to hit CTRL+C now and", "start as a non-privileged user.", NULL);
+#endif
+
 	InitRandomNumberGenerators();
 	Log.Success( "Rnd", "Initialized Random Number Generators." );
 
@@ -589,7 +594,7 @@ bool Master::_StartDB()
 	result = !result ? result : Config.MainConfig.GetString( "WorldDatabase", "Name", &database );
 	result = !result ? result : Config.MainConfig.GetInt( "WorldDatabase", "Port", &port );
 	result = !result ? result : Config.MainConfig.GetInt( "WorldDatabase", "Type", &type );
-	Database_World = Database::CreateDatabaseInterface( type );
+	Database_World = Database::CreateDatabaseInterface(type);
 
 	if(result == false)
 	{
@@ -611,7 +616,7 @@ bool Master::_StartDB()
 	result = !result ? result : Config.MainConfig.GetString( "CharacterDatabase", "Name", &database );
 	result = !result ? result : Config.MainConfig.GetInt( "CharacterDatabase", "Port", &port );
 	result = !result ? result : Config.MainConfig.GetInt( "CharacterDatabase", "Type", &type );
-	Database_Character = Database::CreateDatabaseInterface( type );
+	Database_Character = Database::CreateDatabaseInterface(type);
 
 	if(result == false)
 	{

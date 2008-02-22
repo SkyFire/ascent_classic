@@ -83,16 +83,18 @@ bool ConsoleThread::run()
 #else
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
-		FD_ZERO(&fds);
-		FD_SET(STDIN_FILENO, &fds);
+		FD_ZERO( &fds );
+		FD_SET( STDIN_FILENO, &fds );
 		if( select( 1, &fds, NULL, NULL, &tv ) <= 0 )
 		{
-			if( !m_killSwitch )	// timeout
+			if(!m_killSwitch)	// timeout
 				continue;
 			else
 				break;
 		}
 
+		// Read in single line from "stdin"
+		memset( cmd, 0, sizeof( cmd ) ); 
 		if( fgets( cmd, 300, stdin ) == NULL )
 			continue;
 #endif

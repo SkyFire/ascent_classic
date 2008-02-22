@@ -76,8 +76,7 @@ enum GameObjectEvents
 	GAMEOBJECT_EVENT_COUNT,
 };
 
-/** Random Flags
- */
+
 enum RandomFlags
 {
 	RANDOM_ANY           = 0,
@@ -89,7 +88,6 @@ enum RandomFlags
 	RANDOM_WITH_ENERGY   = 6,
 	RANDOM_NOT_MAINTANK  = 7
 };
-
 class LuaEngine
 {
 private:

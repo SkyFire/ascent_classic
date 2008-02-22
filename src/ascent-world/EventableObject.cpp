@@ -354,17 +354,17 @@ void EventableObject::event_Relocate()
 	/* prevent any new stuff from getting added */
 	m_lock.Acquire();
 
-	EventableObjectHolder* nh = sEventMgr.GetEventHolder( event_GetInstanceID() );
-	if( nh != m_holder )
+	EventableObjectHolder * nh = sEventMgr.GetEventHolder(event_GetInstanceID());
+	if(nh != m_holder)
 	{
 		// whee, we changed event holder :>
 		// doing this will change the instanceid on all the events, as well as add to the new holder.
 		
 		// no need to do this if we don't have any events, though.
-		if( nh == NULL )
-			nh = sEventMgr.GetEventHolder( -1 );
+		if(!nh)
+			nh = sEventMgr.GetEventHolder(-1);
 
-		nh->AddObject( this );
+		nh->AddObject(this);
 
 		// reset our m_holder pointer and instance id
 		m_event_Instanceid = nh->GetInstanceID();

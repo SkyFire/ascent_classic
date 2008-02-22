@@ -76,7 +76,7 @@ ObjectMgr::~ObjectMgr()
 	for( TrainerMap::iterator i = mTrainers.begin( ); i != mTrainers.end( ); ++ i) {
 		Trainer * t = i->second;
 		if(t->UIMessage && t->UIMessage != (char*)NormalTalkMessage)
-			delete[] t->UIMessage;
+			delete [] t->UIMessage;
 		delete t;
 	}
 
@@ -111,7 +111,7 @@ ObjectMgr::~ObjectMgr()
 			p = itr->second;
 			for(uint32 j = 0; j < p->TextCount; ++j)
 				free((char*)p->Texts[j]);
-			delete[] p->Texts;
+			delete [] p->Texts;
 			free((char*)p->MonsterName);
 			delete p;
 		}
@@ -1385,7 +1385,7 @@ void ObjectMgr::LoadTrainers()
 		if(!result2)
 		{
 			Log.Error("LoadTrainers", "Trainer with no spells, entry %u.", entry);
-			delete[] tr->UIMessage;
+			delete [] tr->UIMessage;
 			delete tr;
 			continue;
 		}
@@ -1440,7 +1440,7 @@ void ObjectMgr::LoadTrainers()
 			//and now we insert it to our lookup table
 			if(!tr->SpellCount)
 			{
-				delete[] tr->UIMessage;
+				delete [] tr->UIMessage;
 				delete tr;
 				continue;
 			}
@@ -1643,7 +1643,7 @@ void ObjectMgr::GenerateLevelUpInfo()
 				else
 				{
 					// 2.2
-					//double MXP = 45 + ( 5 * Level );
+					//double MXP = 45 + ( 5 * level );
 					// 2.3
 					double MXP = 235 + ( 5 * Level );
 					double DIFF = Level < 29 ? 0.0 : Level < 30 ? 1.0 : Level < 31 ? 3.0 : Level < 32 ? 6.0 : 5.0 * ( double( Level ) - 30.0 );
@@ -2434,7 +2434,7 @@ bool ObjectMgr::HandleInstanceReputationModifiers(Player * pPlayer, Unit * pVict
 	if(itr == m_reputation_instance.end())
 		return false;
 
-	is_boss = 0;//static_cast< Creature* >( pVictim )->GetCreatureName() ? static_cast< Creature* >( pVictim )->GetCreatureName()->Rank : 0;
+	is_boss = 0;//static_cast< Creature* >( pVictim )->GetCreatureName() ? ((Creature*)pVictim)->GetCreatureName()->Rank : 0;
 	if( !is_boss && static_cast< Creature* >( pVictim )->proto && static_cast< Creature* >( pVictim )->proto->boss )
 		is_boss = 1;
 

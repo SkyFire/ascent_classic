@@ -41,25 +41,23 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	Item *add;
 	Loot *pLoot = NULL;
 
-	if( _player->isCasting() )
+	if(_player->isCasting())
 		_player->InterruptSpell();
+	GameObject * pGO = NULL;
+	Creature * pCreature = NULL;
 
-	GameObject* pGO = NULL;
-	Creature* pCreature = NULL;
-
-	if( GUID_HIPART( GetPlayer()->GetLootGUID() ) == HIGHGUID_UNIT )
+	if(GUID_HIPART(GetPlayer()->GetLootGUID()) == HIGHGUID_UNIT)
 	{
 		pCreature = _player->GetMapMgr()->GetCreature((uint32)GetPlayer()->GetLootGUID());
 		if (!pCreature)return;
 		pLoot=&pCreature->loot;	
 	}
-	else if( GUID_HIPART( _player->GetLootGUID() ) == HIGHGUID_GAMEOBJECT )
+	else if(GUID_HIPART(_player->GetLootGUID()) == HIGHGUID_GAMEOBJECT)
 	{
 		pGO = _player->GetMapMgr()->GetGameObject((uint32)GetPlayer()->GetLootGUID());
 		if(!pGO)return;
 		pLoot=&pGO->loot;
-	}
-	else if( GUID_HIPART( _player->GetLootGUID() ) == HIGHGUID_ITEM )
+	}else if( (GUID_HIPART(_player->GetLootGUID()) == HIGHGUID_ITEM) )
 	{
 		Item *pItem = _player->GetItemInterface()->GetItemByGUID(_player->GetLootGUID());
 		if(!pItem)
@@ -210,32 +208,32 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 	if(!lootguid)
 		return;   // duno why this happens
 
-	if( _player->isCasting() )
+	if(_player->isCasting())
 		_player->InterruptSpell();
 
 	WorldPacket pkt;	
 	Unit * pt = 0;
 
-	if( GUID_HIPART(lootguid) == HIGHGUID_UNIT )
+	if(GUID_HIPART(lootguid) == HIGHGUID_UNIT)
 	{
 		Creature* pCreature = _player->GetMapMgr()->GetCreature((uint32)lootguid);
 		if(!pCreature)return;
 		pLoot=&pCreature->loot;
 		pt = pCreature;
 	}
-	else if( GUID_HIPART(lootguid) == HIGHGUID_GAMEOBJECT )
+	else if(GUID_HIPART(lootguid) == HIGHGUID_GAMEOBJECT)
 	{
 		GameObject* pGO = _player->GetMapMgr()->GetGameObject((uint32)lootguid);
 		if(!pGO)return;
 		pLoot=&pGO->loot;
 	}
-	else if( GUID_HIPART(lootguid) == HIGHGUID_CORPSE )
+	else if(GUID_HIPART(lootguid) == HIGHGUID_CORPSE)
 	{
 		Corpse *pCorpse = objmgr.GetCorpse((uint32)lootguid);
 		if(!pCorpse)return;
 		pLoot=&pCorpse->loot;
 	}
-	else if( GUID_HIPART(lootguid) == HIGHGUID_PLAYER )
+	else if(GUID_HIPART(lootguid) == HIGHGUID_PLAYER)
 	{
 		Player * pPlayer = _player->GetMapMgr()->GetPlayer((uint32)lootguid);
 		if(!pPlayer) return;
@@ -243,7 +241,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & recv_data )
 		pPlayer->bShouldHaveLootableOnCorpse = false;
 		pt = pPlayer;
 	}
-	else if( GUID_HIPART(lootguid) == HIGHGUID_ITEM )
+	else if( (GUID_HIPART(lootguid) == HIGHGUID_ITEM) )
 	{
 		Item *pItem = _player->GetItemInterface()->GetItemByGUID(lootguid);
 		if(!pItem)
@@ -327,10 +325,10 @@ void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	if( _player->isCasting() )
+	if(_player->isCasting())
 		_player->InterruptSpell();
 
-	if( _player->InGroup() && _player->m_bg == NULL )
+	if(_player->InGroup() && !_player->m_bg)
 	{
 		Group * party = _player->GetGroup();
 		if(party)
@@ -529,13 +527,13 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
         default: break;
         }
 	}
-	else if( GUID_HIPART( guid ) == HIGHGUID_CORPSE )
+	else if(GUID_HIPART(guid) == HIGHGUID_CORPSE)
 	{
 		Corpse *pCorpse = objmgr.GetCorpse((uint32)guid);
 		if(pCorpse) 
 			pCorpse->SetUInt32Value(CORPSE_FIELD_DYNAMIC_FLAGS, 0);
 	}
-	else if( GUID_HIPART(guid) == HIGHGUID_PLAYER )
+	else if(GUID_HIPART(guid) == HIGHGUID_PLAYER)
 	{
 		Player *plr = objmgr.GetPlayer((uint32)guid);
 		if(plr)
@@ -544,7 +542,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 			plr->RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
 		}
 	}
-	else if( GUID_HIPART( guid ) )
+	else if(GUID_HIPART(guid))
 	{
 		// suicide!
 		_player->GetItemInterface()->SafeFullRemoveItemByGuid(guid);
@@ -717,9 +715,9 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 
 	// free up used memory
 	if(zones)
-		delete[] zones;
+		delete [] zones;
 	if(names)
-		delete[] names;
+		delete [] names;
 }
 
 void WorldSession::HandleLogoutRequestOpcode( WorldPacket & recv_data )
@@ -973,19 +971,11 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
 
 void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 {
-	if( _player == NULL )
-		return;
-
-	if( !_player->IsInWorld() )
-		return;
-
-	if( _player->isAlive() )
-		return;
-
-	if( _player->resurrector == 0 )
-		return;
-
+	if(!_player->IsInWorld()) return;
 	sLog.outDetail("WORLD: Received CMSG_RESURRECT_RESPONSE");
+
+	if(GetPlayer()->isAlive())
+		return;
 
 	uint64 guid;
 	uint8 status;
@@ -993,11 +983,12 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 	recv_data >> status;
 
 	// need to check guid
-	Player* pl = _player->GetMapMgr()->GetPlayer( (uint32)guid );
-	if( pl == NULL )
-		pl = objmgr.GetPlayer( (uint32)guid );
-
-	if( pl == NULL || status != 1 )
+	Player * pl = _player->GetMapMgr()->GetPlayer((uint32)guid);
+	if(!pl)
+		pl = objmgr.GetPlayer((uint32)guid);
+		
+	
+	if(pl == 0 || status != 1)
 	{
 		_player->m_resurrectHealth = 0;
 		_player->m_resurrectMana = 0;
@@ -1072,13 +1063,13 @@ void WorldSession::HandleUpdateAccountData(WorldPacket &recv_data)
 		case Z_BUF_ERROR:		   //-5
 		case Z_VERSION_ERROR:	   //-6
 		{
-			delete[] data;	 
+			delete [] data;	 
 			sLog.outString("WORLD WARNING: Decompression of account data %d for %s FAILED.", uiID, GetPlayer()->GetName());
 			break;
 		}
 
 		default:
-			delete[] data;	 
+			delete [] data;	 
 			sLog.outString("WORLD WARNING: Decompression gave a unknown error: %x, of account data %d for %s FAILED.", ZlibResult, uiID, GetPlayer()->GetName());
 			break;
 		}
@@ -1775,7 +1766,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 		return;
 
 	//now its time to give the loot to the target player
-	if( GUID_HIPART( GetPlayer()->GetLootGUID() ) == HIGHGUID_UNIT )
+	if(GUID_HIPART(GetPlayer()->GetLootGUID()) == HIGHGUID_UNIT)
 	{
 		pCreature = _player->GetMapMgr()->GetCreature((uint32)creatureguid);
 		if (!pCreature)return;
@@ -1896,17 +1887,17 @@ void WorldSession::HandleLootRollOpcode(WorldPacket& recv_data)
 {
 	if(!_player->IsInWorld()) return;
 	/* struct:
-		
-		{CLIENT} Packet: (0x02A0) CMSG_LOOT_ROLL PacketSize = 13
-		|------------------------------------------------|----------------|
-		|00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F |0123456789ABCDEF|
-		|------------------------------------------------|----------------|
-		|11 4D 0B 00 BD 06 01 F0 00 00 00 00 02		  |.M...........   |
-		-------------------------------------------------------------------
 
-		uint64 creatureguid
-		uint21 slotid
-		uint8  choice
+	{CLIENT} Packet: (0x02A0) CMSG_LOOT_ROLL PacketSize = 13
+	|------------------------------------------------|----------------|
+	|00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F |0123456789ABCDEF|
+	|------------------------------------------------|----------------|
+	|11 4D 0B 00 BD 06 01 F0 00 00 00 00 02		  |.M...........   |
+	-------------------------------------------------------------------
+
+	uint64 creatureguid
+	uint21 slotid
+	uint8  choice
 
 	*/
 	uint64 creatureguid;
@@ -1914,19 +1905,32 @@ void WorldSession::HandleLootRollOpcode(WorldPacket& recv_data)
 	uint8 choice;
 	recv_data >> creatureguid >> slotid >> choice;
 
-	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)creatureguid);
-	if(!pCreature)
-	{
-		return;
-	}
-
 	LootRoll *li = NULL;
-	if(slotid >= pCreature->loot.items.size() || pCreature->loot.items.size()==0)
+
+	if (GUID_HIPART(creatureguid) == HIGHGUID_GAMEOBJECT) 
 	{
-		return;
-	} else {
+		GameObject* pGO = _player->GetMapMgr()->GetGameObject((uint32)creatureguid);
+		if (!pGO)
+			return;
+		if (slotid >= pGO->loot.items.size() || pGO->loot.items.size() == 0)
+			return;
+		if (pGO->GetInfo() && pGO->GetInfo()->Type == GAMEOBJECT_TYPE_CHEST)
+			li = pGO->loot.items[slotid].roll;
+	} 
+	else if (GUID_HIPART(creatureguid) == HIGHGUID_UNIT) 
+	{
+		// Creatures
+		Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)creatureguid);
+		if (!pCreature)
+			return;
+
+		if (slotid > pCreature->loot.items.size() || pCreature->loot.items.size() == 0)
+			return;
+
 		li = pCreature->loot.items[slotid].roll;
-	}
+	} 
+	else 
+		return;
 
 	if(!li)
 		return;
@@ -1972,9 +1976,9 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket &recv_data)
 	}
 
 	Lock *lock = dbcLock.LookupEntry( pItem->GetProto()->LockId );
-	
+
 	uint32 removeLockItems[5] = {0,0,0,0,0};
-	
+
 	if(lock) // locked item
 	{
 		for(int i=0;i<5;i++)
@@ -2012,7 +2016,6 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket &recv_data)
 	}
 	_player->SendLoot(pItem->GetGUID(), 5);
 }
-
 
 void WorldSession::HandleCompleteCinematic(WorldPacket &recv_data)
 {

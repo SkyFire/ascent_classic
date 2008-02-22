@@ -598,10 +598,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\ClassDiagram1.cd"
-			>
-		</File>
-		<File
 			RelativePath="..\..\src\ascent-world\ClusterInterface.cpp"
 			>
 		</File>
@@ -1007,6 +1003,10 @@
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\ScriptMgr.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\ascent-world\ScriptSetup.h"
 			>
 		</File>
 		<File

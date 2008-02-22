@@ -251,7 +251,7 @@ enum procFlags
 //    PROC_ON_UNK2_DAMAGE_VICTIM      = 0x80000,
     PROC_ON_TARGET_DIE		        = 0x80000,
     PROC_ON_ANY_DAMAGE_VICTIM       = 0x100000,
-    PROC_ON_TRAP_TRIGGERED          = 0x200000,
+	PROC_ON_TRAP_TRIGGER            = 0x200000, //triggers on trap activation)
     PROC_ON_AUTO_SHOT_HIT           = 0x400000,
     PROC_ON_ABSORB                  = 0x800000,
     PROC_ON_RESIST_VICTIM           = 0x1000000,//added it as custom, maybe already exists in another form ?
@@ -289,7 +289,7 @@ enum procFlags
 	PROC_ON_DOT_DAMAGE                 = 0x40000, //on harmfull non direct damage (DoTs)
 	PROC_ON_DOT_DAMAGE_VICTIM          = 0x80000,  //on harmfull non direct damage (DoTs) victim
 	PROC_REMOVEONUSE                   = 0x100000, //something supercustom. 99% wrong :P used by bombs and grenades in general.
-	PROC_ON_TRAP_TRIGGER               = 0x200000, //triggers on trap activation)
+	PROC_ON_TRAP_TRIGGER               = 0x200000,
 	PROC_UNUSED1                       = 0x400000,
 	PROC_ON_OFFHAND_HIT                = 0x800000, //only 1 spellname "Combat Potency"
 	PROC_ON_UNK1                       = 0x1000000,//only 1 spellname "Captured Totem"
@@ -373,118 +373,120 @@ enum ChannelInterruptFlags
 
 enum Attributes
 {
-    ATTRIBUTES_NULL								= 0x0,
-    ATTRIBUTES_UNK2								= 0x1,
-    ATTRIBUTES_UNK3								= 0x2, // related to ranged??
-    ATTRIBUTE_ON_NEXT_ATTACK					= 0x4,
-    ATTRIBUTES_UNUSED0							= 0x8,
-    ATTRIBUTES_UNK6								= 0x10,
-    ATTRIBUTES_UNK7								= 0x20, // Tradeskill recipies
-    ATTRIBUTES_PASSIVE							= 0x40,
-    ATTRIBUTES_NO_VISUAL_AURA					= 0x80,
-    ATTRIBUTES_UNK10							= 0x100,	//seems to be afflicts pet
-    ATTRIBUTES_UNK11							= 0x200, // looks like temp enchants.
-    ATTRIBUTES_UNK12							= 0x400, //completely the same as ATTRIBUTE_ON_NEXT_ATTACK for class spells. So difference somewhere in mob abilities.
-    ATTRIBUTES_UNK13							= 0x800,
-    ATTRIBUTES_UNUSED1							= 0x1000,
-    ATTRIBUTES_UNUSED2							= 0x2000,
-    ATTRIBUTES_UNUSED3							= 0x4000,
-    ATTRIBUTES_ONLY_OUTDOORS					= 0x8000,
-    ATTRIBUTES_UNK								= 0x10000,
-    ATTRIBUTES_REQ_STEALTH						= 0x20000,
-    ATTRIBUTES_UNK20							= 0x40000,//it's not : must be behind
-    ATTRIBUTES_UNK21							= 0x80000,
+	ATTRIBUTES_NULL								= 0x0,
+	ATTRIBUTES_UNK2								= 0x1,
+	ATTRIBUTES_UNK3								= 0x2, // related to ranged??
+	ATTRIBUTE_ON_NEXT_ATTACK					= 0x4,
+	ATTRIBUTES_UNUSED0							= 0x8,
+	ATTRIBUTES_UNK6								= 0x10,
+	ATTRIBUTES_UNK7								= 0x20, // Tradeskill recipies
+	ATTRIBUTES_PASSIVE							= 0x40,
+	ATTRIBUTES_NO_VISUAL_AURA					= 0x80,
+	ATTRIBUTES_UNK10							= 0x100,	//seems to be afflicts pet
+	ATTRIBUTES_UNK11							= 0x200, // looks like temp enchants.
+	ATTRIBUTES_UNK12							= 0x400, //completely the same as ATTRIBUTE_ON_NEXT_ATTACK for class spells. So difference somewhere in mob abilities.
+	ATTRIBUTES_UNK13							= 0x800,
+	ATTRIBUTES_UNUSED1							= 0x1000,
+	ATTRIBUTES_UNUSED2							= 0x2000,
+	ATTRIBUTES_UNUSED3							= 0x4000,
+	ATTRIBUTES_ONLY_OUTDOORS					= 0x8000,
+	ATTRIBUTES_UNK								= 0x10000,
+	ATTRIBUTES_REQ_STEALTH						= 0x20000,
+	ATTRIBUTES_UNK20							= 0x40000,//it's not : must be behind
+	ATTRIBUTES_UNK21							= 0x80000,
 	ATTRIBUTES_STOP_ATTACK						= 0x100000,//switch off auto attack on use. Maim,Gouge,Disengage,Polymorph etc
-    ATTRIBUTES_CANT_BE_DPB				    	= 0x200000,//can't be dodged, blocked, parried
-    ATTRIBUTES_UNK24							= 0x400000, // related to ranged
-    ATTRIBUTES_UNK25							= 0x800000,
-    ATTRIBUTES_MOUNT_CASTABLE					= 0x1000000, //castable on mounts
-    ATTRIBUTES_TRIGGER_COOLDOWN			        = 0x2000000, //also requires atributes ex = 32 ?
-    ATTRIBUTES_UNK28							= 0x4000000,
-    ATTRIBUTES_UNK29							= 0x8000000,
-    ATTRIBUTES_REQ_OOC							= 0x10000000, //     ATTRIBUTES_REQ_OUT_OF_COMBAT
-    ATTRIBUTES_UNK31							= 0x20000000,
-    ATTRIBUTES_UNK32							= 0x40000000, // seems like IS_DIMINISHING but some spells not there (f.e. Gouge)
+	ATTRIBUTES_CANT_BE_DPB				    	= 0x200000,//can't be dodged, blocked, parried
+	ATTRIBUTES_UNK24							= 0x400000, // related to ranged
+	ATTRIBUTES_UNK25							= 0x800000,
+	ATTRIBUTES_MOUNT_CASTABLE					= 0x1000000, //castable on mounts
+	ATTRIBUTES_TRIGGER_COOLDOWN			        = 0x2000000, //also requires atributes ex = 32 ?
+	ATTRIBUTES_UNK28							= 0x4000000,
+	ATTRIBUTES_UNK29							= 0x8000000,
+	ATTRIBUTES_REQ_OOC							= 0x10000000, //     ATTRIBUTES_REQ_OUT_OF_COMBAT
+    ATTRIBUTES_IGNORE_INVULNERABILITY           = 0x20000000, //debuffs that can't be removed by any spell and spells that can't be resisted in any case
+	ATTRIBUTES_UNK32							= 0x40000000, // seems like IS_DIMINISHING but some spells not there (f.e. Gouge)
 };
 
 enum AttributesEx
 {
-    ATTRIBUTESEX_NULL                         = 0x0,
-    ATTRIBUTESEX_UNK2                         = 0x1, // pet summonings
-    ATTRIBUTESEX_DRAIN_WHOLE_MANA             = 0x2,
-    ATTRIBUTESEX_UNK4                         = 0x4,
-    ATTRIBUTESEX_UNK5                         = 0x8,
-    ATTRIBUTESEX_UNK6                         = 0x10, // stealth effects but Rockbiter wtf 0_0
-    ATTRIBUTESEX_NOT_BREAK_STEALTH            = 0x20,
-    ATTRIBUTESEX_UNK8                         = 0x40,
-    ATTRIBUTESEX_UNK9                         = 0x80,
-    ATTRIBUTESEX_UNK10                        = 0x100,
-    ATTRIBUTESEX_UNK11                        = 0x200,
-    ATTRIBUTESEX_UNK12                        = 0x400,
-    ATTRIBUTESEX_UNK13                        = 0x800,
-    ATTRIBUTESEX_UNK14                        = 0x1000, // related to pickpocket
-    ATTRIBUTESEX_UNK15                        = 0x2000, // related to remote control
-    ATTRIBUTESEX_UNK16                        = 0x4000,
-    ATTRIBUTESEX_UNK17                        = 0x8000, // something like "grant immunity"
-    ATTRIBUTESEX_UNK18                        = 0x10000, // something like "grant immunity" too
-    ATTRIBUTESEX_REMAIN_OOC                   = 0x20000,
-    ATTRIBUTESEX_UNK20                        = 0x40000,
-    ATTRIBUTESEX_UNK21                        = 0x80000,
-    ATTRIBUTESEX_UNK22                        = 0x100000, // related to "Finishing move" and "Instantly overpowers"
-    ATTRIBUTESEX_UNK23                        = 0x200000,
-    ATTRIBUTESEX_UNK24                        = 0x400000, // only related to "Finishing move"
-    ATTRIBUTESEX_UNK25                        = 0x800000, // related to spells like "ClearAllBuffs"
-    ATTRIBUTESEX_UNK26                        = 0x1000000, // FISHING SPELLS
-    ATTRIBUTESEX_UNK27                        = 0x2000000, // related to "Detect" spell
-    ATTRIBUTESEX_UNK28                        = 0x4000000,
-    ATTRIBUTESEX_UNK29                        = 0x8000000,
-    ATTRIBUTESEX_UNK30                        = 0x10000000,
-    ATTRIBUTESEX_UNK31                        = 0x20000000,
-    ATTRIBUTESEX_UNK32                        = 0x40000000, // Overpower
+	ATTRIBUTESEX_NULL                         = 0x0,
+	ATTRIBUTESEX_UNK2                         = 0x1, // pet summonings
+	ATTRIBUTESEX_DRAIN_WHOLE_MANA             = 0x2,
+	ATTRIBUTESEX_UNK4                         = 0x4,
+	ATTRIBUTESEX_UNK5                         = 0x8,
+	ATTRIBUTESEX_UNK6                         = 0x10, // stealth effects but Rockbiter wtf 0_0
+	ATTRIBUTESEX_NOT_BREAK_STEALTH            = 0x20,
+	ATTRIBUTESEX_UNK8                         = 0x40,
+	ATTRIBUTESEX_UNK9                         = 0x80,
+	ATTRIBUTESEX_UNK10                        = 0x100,
+	ATTRIBUTESEX_UNK11                        = 0x200,
+	ATTRIBUTESEX_UNK12                        = 0x400,
+	ATTRIBUTESEX_UNK13                        = 0x800,
+	ATTRIBUTESEX_UNK14                        = 0x1000, // related to pickpocket
+	ATTRIBUTESEX_UNK15                        = 0x2000, // related to remote control
+	ATTRIBUTESEX_UNK16                        = 0x4000,
+	ATTRIBUTESEX_UNK17                        = 0x8000, // something like "grant immunity"
+	ATTRIBUTESEX_UNK18                        = 0x10000, // something like "grant immunity" too
+	ATTRIBUTESEX_REMAIN_OOC                   = 0x20000,
+	ATTRIBUTESEX_UNK20                        = 0x40000,
+	ATTRIBUTESEX_UNK21                        = 0x80000,
+	ATTRIBUTESEX_UNK22                        = 0x100000, // related to "Finishing move" and "Instantly overpowers"
+	ATTRIBUTESEX_UNK23                        = 0x200000,
+	ATTRIBUTESEX_UNK24                        = 0x400000, // only related to "Finishing move"
+	ATTRIBUTESEX_UNK25                        = 0x800000, // related to spells like "ClearAllBuffs"
+	ATTRIBUTESEX_UNK26                        = 0x1000000, // FISHING SPELLS
+	ATTRIBUTESEX_UNK27                        = 0x2000000, // related to "Detect" spell
+	ATTRIBUTESEX_UNK28                        = 0x4000000,
+	ATTRIBUTESEX_UNK29                        = 0x8000000,
+	ATTRIBUTESEX_UNK30                        = 0x10000000,
+	ATTRIBUTESEX_UNK31                        = 0x20000000,
+	ATTRIBUTESEX_UNK32                        = 0x40000000, // Overpower
 };
 
 enum Flags3
 {
-    FLAGS3_NULL               = 0x0,
-    FLAGS3_UNK2               = 0x1,
-    FLAGS3_UNK3               = 0x2,    // Can be used while stealthed
-    FLAGS3_UNK4               = 0x4,    // request pet maybe
-    FLAGS3_UNK5               = 0x8,    // something todo with temp enchanted items
-    FLAGS3_PARTY_EFFECTING_AURA = 0x10, // Party affecting aura's
-    FLAGS3_ACTIVATE_AUTO_SHOT = 0x20,   // spell that enable's auto shoot
-    FLAGS3_UNK8               = 0x40,   //Polymorph spells
-    FLAGS3_UNK9               = 0x80,
-    FLAGS3_UNUSED1            = 0x100,
-    FLAGS3_UNK11              = 0x200,  // used by 2 spells, 30421 | Nether Portal - Perseverence and  30466 | Nether Portal - Perseverence
-    FLAGS3_TAME_X             = 0x400,  // tame [creature]
-    FLAGS3_FUNNEL             = 0x800,  // only funnel spells
-    FLAGS3_UNK14              = 0x1000, // swipe / Cleave spells
-    FLAGS3_ENCHANT_OWN_ONLY   = 0x2000, // no trade window targets, BoE items get soulbound to you
-    FLAGS3_SPELL_PLAYER_EVENT = 0x4000, // Player event's like logging in, finishing quests, triggering cinematic, being adored, Heartbroken etc
-    FLAGS3_UNUSED3            = 0x8000,
-    FLAGS3_CONTROL_UNIT       = 0x10000, // PvP Controller, RC, Creature taming, Taming Lesson
-    FLAGS3_REQ_RANGED_WEAPON  = 0x20000, // this is shit and has nothing to do with auto shot
-    FLAGS3_REVIVE_PET         = 0x40000, // actually 1 spell, revive pet
-    FLAGS3_UNK21              = 0x80000, // this is a group of spells that are triggered by something. (I have no clue on how to name this one)
-    FLAGS3_REQ_BEHIND_TARGET  = 0x100000,
-    FLAGS3_UNK23              = 0x200000,
-    FLAGS3_UNK24              = 0x400000,
-    FLAGS3_UNK25              = 0x800000,
-    FLAGS3_UNK26              = 0x1000000,
-    FLAGS3_UNK27              = 0x2000000,
-    FLAGS3_UNK28              = 0x4000000,
-    FLAGS3_UNK29              = 0x8000000, // fishing spells and enchanting weapons
-    FLAGS3_UNK30              = 0x10000000, // some secondairy spell triggers, especialy for lightning shield alike spells
-    FLAGS3_UNK31              = 0x20000000,
-    FLAGS3_UNK32              = 0x40000000,
+	FLAGS3_NULL               = 0x0,
+	FLAGS3_UNK2               = 0x1,
+	FLAGS3_UNK3               = 0x2,    // Can be used while stealthed
+	FLAGS3_UNK4               = 0x4,    // request pet maybe
+	FLAGS3_UNK5               = 0x8,    // something todo with temp enchanted items
+	FLAGS3_PARTY_EFFECTING_AURA = 0x10, // Party affecting aura's
+	FLAGS3_ACTIVATE_AUTO_SHOT = 0x20,   // spell that enable's auto shoot
+	FLAGS3_UNK8               = 0x40,   //Polymorph spells
+	FLAGS3_UNK9               = 0x80,
+	FLAGS3_UNUSED1            = 0x100,
+	FLAGS3_UNK11              = 0x200,  // used by 2 spells, 30421 | Nether Portal - Perseverence and  30466 | Nether Portal - Perseverence
+	FLAGS3_TAME_X             = 0x400,  // tame [creature]
+	FLAGS3_FUNNEL             = 0x800,  // only funnel spells
+	FLAGS3_UNK14              = 0x1000, // swipe / Cleave spells
+	FLAGS3_ENCHANT_OWN_ONLY   = 0x2000, // no trade window targets, BoE items get soulbound to you
+	FLAGS3_SPELL_PLAYER_EVENT = 0x4000, // Player event's like logging in, finishing quests, triggering cinematic, being adored, Heartbroken etc
+	FLAGS3_UNUSED3            = 0x8000,
+	FLAGS3_CONTROL_UNIT       = 0x10000, // PvP Controller, RC, Creature taming, Taming Lesson
+	FLAGS3_REQ_RANGED_WEAPON  = 0x20000, // this is shit and has nothing to do with auto shot
+	FLAGS3_REVIVE_PET         = 0x40000, // actually 1 spell, revive pet
+	FLAGS3_UNK21              = 0x80000, // this is a group of spells that are triggered by something. (I have no clue on how to name this one)
+	FLAGS3_REQ_BEHIND_TARGET  = 0x100000, //wrong
+	FLAGS3_UNK23              = 0x200000,
+	FLAGS3_UNK24              = 0x400000,
+	FLAGS3_UNK25              = 0x800000,
+	FLAGS3_UNK26              = 0x1000000,
+	FLAGS3_UNK27              = 0x2000000,
+	FLAGS3_UNK28              = 0x4000000,
+	FLAGS3_UNK29              = 0x8000000, // fishing spells and enchanting weapons
+	FLAGS3_UNK30              = 0x10000000, // some secondairy spell triggers, especialy for lightning shield alike spells
+	FLAGS3_UNK31              = 0x20000000,
+	FLAGS3_UNK32              = 0x40000000,
 };
 
 enum Flags4
 {
-    FLAGS4_PLAYER_RANGED_SPELLS         = 0x8000,
-    CAN_PERSIST_AND_CASTED_WHILE_DEAD   = 0x100000,
-    FLAGS4_PLAYER_RANGED_WAND           = 0x400000,
+	FLAGS4_BG_ONLY                      = 0x800,
+	FLAGS4_PLAYER_RANGED_SPELLS         = 0x8000,
+	CAN_PERSIST_AND_CASTED_WHILE_DEAD   = 0x100000,
+	FLAGS4_PLAYER_RANGED_WAND           = 0x400000,
 };
+
 enum Flags5
 {
 	FLAGS5_PROCCHANCE_COMBOBASED        = 0x2,
@@ -953,9 +955,9 @@ enum SPELL_ENTRY
     SPELL_ENTRY_FL,
     SPELL_ENTRY_FM,
     SPELL_ENTRY_FN,
-    SPELL_ENTRY_TotemCategory1,
-    SPELL_ENTRY_TotemCategory2,
-    SPELL_ENTRY_RequiredAreaID
+	SPELL_ENTRY_TotemCategory1,
+	SPELL_ENTRY_TotemCategory2,
+	SPELL_ENTRY_RequiredAreaID
 };
 
 // target type flags
@@ -1025,6 +1027,15 @@ enum SpellIsFlags
     SPELL_FLAG_IS_EXPIREING_ON_PET		= 0x00000800, //when pet is summoned
 };
 
+enum SpellCoefficientsFlags
+{
+	SPELL_FLAG_IS_DOT_OR_HOT_SPELL		= 0x00000001, //Damage over Time or Healing over Time Spells
+	SPELL_FLAG_IS_DD_OR_DH_SPELL		= 0x00000002, //Direct Damage or Direct Healing Spells
+	SPELL_FLAG_IS_DD_DH_DOT_SPELL		= SPELL_FLAG_IS_DOT_OR_HOT_SPELL | SPELL_FLAG_IS_DD_OR_DH_SPELL, //DoT+(DD|DH) Spells
+	SPELL_FLAG_AOE_SPELL				= 0x00000004, //AoE Spells
+	SPELL_FLAG_ADITIONAL_EFFECT			= 0x00000008, //Spells with aditional effect not DD or DoT or HoT
+};
+
 ASCENT_INLINE bool CanAgroHash(uint32 spellhashname)
 {
     if (spellhashname == 4287212498UL) //hunter's mark
@@ -1074,9 +1085,10 @@ ASCENT_INLINE bool IsDamagingSpell(SpellEntry *sp)
         case SPELL_EFFECT_ATTACK:
             return true;
     }
-    if( sp->Effect[0]==SPELL_EFFECT_APPLY_AURA || sp->Effect[0]==SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[0]==SPELL_EFFECT_APPLY_AURA ||
+       sp->Effect[0]==SPELL_EFFECT_APPLY_AREA_AURA)
     {
-        switch( sp->EffectApplyAuraName[0] )
+        switch (sp->EffectApplyAuraName[0])
         {
             case 3://SPELL_AURA_PERIODIC_DAMAGE:
             case 43://SPELL_AURA_PROC_TRIGGER_DAMAGE:
@@ -1085,9 +1097,10 @@ ASCENT_INLINE bool IsDamagingSpell(SpellEntry *sp)
                 return true;
         }
     }
-    if( sp->Effect[1]==SPELL_EFFECT_APPLY_AURA || sp->Effect[1]==SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[1]==SPELL_EFFECT_APPLY_AURA ||
+        sp->Effect[1]==SPELL_EFFECT_APPLY_AREA_AURA)
     {
-        switch( sp->EffectApplyAuraName[1] )
+        switch (sp->EffectApplyAuraName[1])
         {
             case 3://SPELL_AURA_PERIODIC_DAMAGE:
             case 43://SPELL_AURA_PROC_TRIGGER_DAMAGE:
@@ -1096,9 +1109,10 @@ ASCENT_INLINE bool IsDamagingSpell(SpellEntry *sp)
                 return true;
         }
     }
-    if( sp->Effect[2]==SPELL_EFFECT_APPLY_AURA || sp->Effect[2]==SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[2]==SPELL_EFFECT_APPLY_AURA ||
+        sp->Effect[2]==SPELL_EFFECT_APPLY_AREA_AURA)
     {
-        switch( sp->EffectApplyAuraName[2] )
+        switch (sp->EffectApplyAuraName[2])
         {
             case 3://SPELL_AURA_PERIODIC_DAMAGE:
             case 43://SPELL_AURA_PROC_TRIGGER_DAMAGE:
@@ -1139,7 +1153,8 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
             return true;
 		default: break;
     }
-    if( sp->Effect[0] == SPELL_EFFECT_APPLY_AURA || sp->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[0] == SPELL_EFFECT_APPLY_AURA ||
+		sp->Effect[0] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
         switch( sp->EffectApplyAuraName[0] )
         {
@@ -1149,9 +1164,10 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
 			default: break;
         }
     }
-    if( sp->Effect[1] == SPELL_EFFECT_APPLY_AURA || sp->Effect[1] == SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[1] == SPELL_EFFECT_APPLY_AURA ||
+        sp->Effect[1] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
-        switch( sp->EffectApplyAuraName[1] )
+        switch (sp->EffectApplyAuraName[1])
         {
             case 8://SPELL_AURA_PERIODIC_HEAL:
             case 62://SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
@@ -1159,7 +1175,8 @@ ASCENT_INLINE bool IsHealingSpell(SpellEntry *sp)
 			default: break;
         }
     }
-    if( sp->Effect[2] == SPELL_EFFECT_APPLY_AURA || sp->Effect[2] == SPELL_EFFECT_APPLY_AREA_AURA )
+    if( sp->Effect[2] == SPELL_EFFECT_APPLY_AURA ||
+        sp->Effect[2] == SPELL_EFFECT_APPLY_AREA_AURA )
     {
         switch( sp->EffectApplyAuraName[2] )
         {
@@ -1453,13 +1470,7 @@ ASCENT_INLINE bool IsTargetingStealthed(SpellEntry *sp)
 		sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
 		sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
 		sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
-		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
-		sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
-		sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
-		sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
-		sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
-		sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
-		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT
+		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED
 		)
 		return 1;
 	return 0;

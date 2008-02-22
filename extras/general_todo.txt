@@ -42,10 +42,6 @@ SMT_RESIST_DISPEL - check if it is used
 - detect all proc spells that have same name as mother spell and can be stacked more then once
 - cast druid ranquility on target then target enters instance .. tranquility will remain on him
 - buged ? : avenger's shield, avenging wrath, judgement of seal of crusader (when they judge the seal of crusader the mob gets is like using the judgment of seal of light)
-- instance cooldown
-- more then limit can enter an instance if palyers go in at the same time
-- http://www.wowwiki.com/Instance_reset, worldmap_info instance reset timer is only for the show ?
-- http://www.wowwiki.com/Vanish - nu face wipe la aggro, nu intra in improved stealth si nush daca elimina movement impairing effects
 
 ==========================================================================
 ! BUGS !
@@ -99,8 +95,13 @@ Zack - test my shit :
 - paladin - Holy shield - 41026
 - http://thottbot.com/i29301
 - shaman - Shamanistic Focus - 43338. It triggers spell 43339 which might need the group flags. Have to update my db
+- Band of the Eternal Defender 35077
+- Band of the Eternal Champion 35080
+- Band of the Eternal Sage 35083
+- Band of the Eternal Restorer 35086
 - general spell targeting type 30 -> 21172
 - shaman - purge 8012
+- started playin with grounding totem effect, but it is defenetly not finished
 - paladin - Healing Light 20239
 - paladin - Sanctified Light 20361
 - paladin - sanctified judgement 31878
@@ -112,16 +113,30 @@ Zack - test my shit :
 - paladin - Divine Purpose 31873
 - paladin - Fanaticism 31883
 - paladin - Seal of Vengeance 31801
+- hunter - Expose Weakness 34503
+- hunter - arcane shot 14287
+- hunter - hawk eye 19500
+- Hunter : Pathfinding 19560
+- hunter : Steady Shot 34120
 - Hunter : Improved Stings 19468
+- Hunter : Mortal Shots 19490
+- Hunter : Improved Barrage 35111
 - Hunter : Clever Traps 19245
+- Hunter : Thrill of the Hunt 34499
+- remake combustion and that other spell that were removing mother aura on proc. Do not rename namehashes ever again !
+- mage spellsteal 30449 should steal only 1 spell 
+- check when dismissing pet if auras are removed too
 - warlock: Improved Enslave Demon 18822
+- warlock: Demonic Knowledge 35693
+- warlock: Pyroclasm 18096
 - warlock: Master Conjuror 18768 - should work
-- warrior - two-handed weapon specialization 12714
-- warrior - one-handed weapon specialization 16542
-- warrior - second wind 29838, also test mage frostbite 12497 for rooting effects
-- mage - wand specialization 6085
-- priest wand specialization 14528
-- Mage - Arcane Concentration 12577 - stupid clearcasting gets removed as it is casted .cast 12536
+- warlock - Seed of Corruption 27243 - might not be perfect in all cases
+- warlock - Improved Drain Soul 18372
+- warlock - Unstable Affliction 30405
+- warlock - Improved Healthstone 18693 ->check for conjured items when traded
+- warlock - Demonic Sacrifice 18788
+- warlock - Cataclysm 17782
+- warlock - Intensity 18136
 
 ==========================================================================
 Capt - test my shit :

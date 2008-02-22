@@ -79,29 +79,32 @@ namespace VMAP
 
     Vector3 VMapManager::convertPositionToInternalRep(float x, float y, float z) const
     {
-		Vector3 _vect(y,z,x);
-		_vect.x = VMAP_REP_FULL- ( y + VMAP_REP_HALF );
-		_vect.z = VMAP_REP_FULL- ( x + VMAP_REP_HALF );
-		return _vect;
+        float pos[3];
+        pos[0] = y;
+        pos[1] = z;
+        pos[2] = x;
+        double full = 64.0*533.33333333;
+        double mid = full/2.0;
+        pos[0] = full- (pos[0] + mid);
+        pos[2] = full- (pos[2] + mid);
+
+        return(Vector3(pos));
     }
-
-	//=========================================================
-
-	void VMapManager::convertPositionToInternalRep(Vector3* target, float x, float y, float z) const
-	{
-		target->x = VMAP_REP_FULL- ( y + VMAP_REP_HALF );
-		target->y = z;
-		target->z = VMAP_REP_FULL- ( x + VMAP_REP_HALF );
-	}
 
     //=========================================================
 
     Vector3 VMapManager::convertPositionToMangosRep(float x, float y, float z) const
     {
-        Vector3 _vect(z,x, y);
-		_vect.z = VMAP_REP_FULL- ( z + VMAP_REP_HALF );
-		_vect.x = VMAP_REP_FULL- ( x + VMAP_REP_HALF );
-		return _vect;
+        float pos[3];
+        pos[0] = z;
+        pos[1] = x;
+        pos[2] = y;
+        double full = 64.0*533.33333333;
+        double mid = full/2.0;
+        pos[0] = -((mid+pos[0])-full);
+        pos[1] = -((mid+pos[1])-full);
+
+        return(Vector3(pos));
     }
     //=========================================================
 	//=========================================================
@@ -112,8 +115,8 @@ namespace VMAP
 		pos[0] = vec.y;
 		pos[1] = vec.z;
 		pos[2] = vec.x;
-		double full = VMAP_REP_FULL;
-		double mid = VMAP_REP_HALF;
+		double full = 64.0*533.33333333;
+		double mid = full/2.0;
 		pos[0] = full- (pos[0] + mid);
 		pos[2] = full- (pos[2] + mid);
 
@@ -126,8 +129,8 @@ namespace VMAP
 		pos[0] = vec.y;
 		pos[1] = vec.z + 2.0f;
 		pos[2] = vec.x;
-		double full = VMAP_REP_FULL;
-		double mid = VMAP_REP_HALF;
+		double full = 64.0*533.33333333;
+		double mid = full/2.0;
 		pos[0] = full- (pos[0] + mid);
 		pos[2] = full- (pos[2] + mid);
 
@@ -143,8 +146,8 @@ namespace VMAP
 		pos[0] = vec.y;
 		pos[1] = vec.z;
 		pos[2] = vec.x;
-		double full = VMAP_REP_FULL;
-		double mid = VMAP_REP_HALF;
+		double full = 64.0*533.33333333;
+		double mid = full/2.0;
 		pos[0] = -((mid+pos[0])-full);
 		pos[1] = -((mid+pos[1])-full);
 
@@ -157,8 +160,8 @@ namespace VMAP
 		pos[0] = src.z;
 		pos[1] = src.x;
 		pos[2] = src.y;
-		double full = VMAP_REP_FULL;
-		double mid = VMAP_REP_HALF;
+		double full = 64.0*533.33333333;
+		double mid = full/2.0;
 		pos[0] = -((mid+pos[0])-full);
 		pos[1] = -((mid+pos[1])-full);
 
@@ -336,10 +339,8 @@ namespace VMAP
         bool result = true;
 		if( m_maps[pMapId] != NULL )
         {
-            Vector3 pos1;
-			Vector3 pos2;
-			convertPositionToInternalRep(&pos1,x1,y1,z1);
-            convertPositionToInternalRep(&pos2,x2,y2,z2);
+            Vector3 pos1 = convertPositionToInternalRep(x1,y1,z1);
+            Vector3 pos2 = convertPositionToInternalRep(x2,y2,z2);
             if(pos1 != pos2)
             {
                 MapTree* mapTree = m_maps[pMapId];
@@ -837,6 +838,8 @@ namespace VMAP
                                 addModelConatiner(name, mc);
                                 newModelLoaded = true;
                             }
+							else
+								delete mc;
                         }
                         else
                         {
@@ -887,7 +890,7 @@ namespace VMAP
             filesInDir.decRefCount();
             if(filesInDir.getRefCount() <= 0)
             {
-                const Array<std::string> & fileNames = filesInDir.getFiles();
+                Array<std::string> fileNames = filesInDir.getFiles();
                 bool treeChanged = false;
                 for(int i=0; i<fileNames.size(); ++i)
                 {
@@ -897,13 +900,6 @@ namespace VMAP
                     if(mc->getRefCount() <= 0)
                     {
                         iLoadedModelContainer.remove(name);
-						if(!iTree->contains(mc))
-						{
-							printf("[vmap debug] trying to double delete model container %s\n", name.c_str());
-							delete mc;
-							continue;
-						}
-
                         iTree->remove(mc);
                         delete mc;
                         treeChanged = true;

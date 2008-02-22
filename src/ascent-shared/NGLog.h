@@ -68,7 +68,7 @@ public:
 
 	CLog()
 	{
-		log_level = 4;
+		log_level = 3;
 #ifdef WIN32
 		stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
 		stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -100,25 +100,21 @@ public:
 		printf("%02u:%02u ", t->tm_hour, t->tm_min);
 	}
 
-
-	void Debug(const char * source, const char * format, ...)
+	void Notice(const char * source, const char * format, ...)
 	{
-		if(log_level < 4)
-			return;
-
+		/* notice is old loglevel 0/string */
 		LOCK_LOG;
 		va_list ap;
 		va_start(ap, format);
 		Time();
-		Color(TBLUE);
-		fputs("D ", stdout);
+		fputs("N ", stdout);
 		if(*source)
 		{
 			Color(TWHITE);
 			fputs(source, stdout);
 			putchar(':');
 			putchar(' ');
-			Color(TBLUE);
+			Color(TNORMAL);
 		}
 
 		vprintf(format, ap);
@@ -130,7 +126,7 @@ public:
 
 	void Warning(const char * source, const char * format, ...)
 	{
-		if(log_level < 3)
+		if(log_level < 2)
 			return;
 
 		/* warning is old loglevel 2/detail */
@@ -158,7 +154,7 @@ public:
 
 	void Success(const char * source, const char * format, ...)
 	{
-		if(log_level < 3)
+		if(log_level < 2)
 			return;
 
 		LOCK_LOG;
@@ -183,32 +179,6 @@ public:
 		UNLOCK_LOG;
 	}
 
-	void Information(const char * source, const char * format, ...)
-	{
-		if(log_level < 2)
-			return;
-
-		LOCK_LOG;
-		va_list ap;
-		va_start(ap, format);
-		Time();
-		fputs("I ", stdout);
-		if(*source)
-		{
-			Color(TWHITE);
-			fputs(source, stdout);
-			putchar(':');
-			putchar(' ');
-			Color(TRED);
-		}
-
-		vprintf(format, ap);
-		putchar('\n');
-		va_end(ap);
-		Color(TNORMAL);
-		UNLOCK_LOG;
-	}
-
 	void Error(const char * source, const char * format, ...)
 	{
 		if(log_level < 1)
@@ -218,7 +188,7 @@ public:
 		va_list ap;
 		va_start(ap, format);
 		Time();
-		Color(TGREEN);
+		Color(TRED);
 		fputs("E ", stdout);
 		if(*source)
 		{
@@ -236,36 +206,37 @@ public:
 		UNLOCK_LOG;
 	}
 
-	void Notice(const char * source, const char * format, ...)
+	void Line()
 	{
-		if(log_level < 0)
+		LOCK_LOG;
+		putchar('\n');
+		UNLOCK_LOG;
+	}
+
+	void Debug(const char * source, const char * format, ...)
+	{
+		if(log_level < 3)
 			return;
 
 		LOCK_LOG;
 		va_list ap;
 		va_start(ap, format);
 		Time();
-		fputs("N ", stdout);
+		Color(TBLUE);
+		fputs("D ", stdout);
 		if(*source)
 		{
 			Color(TWHITE);
 			fputs(source, stdout);
 			putchar(':');
 			putchar(' ');
-			Color(TNORMAL);
+			Color(TBLUE);
 		}
 
 		vprintf(format, ap);
 		putchar('\n');
 		va_end(ap);
 		Color(TNORMAL);
-		UNLOCK_LOG;
-	}
-
-	void Line()
-	{
-		LOCK_LOG;
-		putchar('\n');
 		UNLOCK_LOG;
 	}
 
@@ -331,7 +302,6 @@ public:
 		Color(TNORMAL);
 		UNLOCK_LOG;
 	}
-
 };
 
 #define Log CLog::getSingleton()

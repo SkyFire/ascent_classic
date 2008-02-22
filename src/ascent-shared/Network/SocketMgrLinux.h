@@ -88,12 +88,12 @@ class SocketWorkerThread : public ThreadBase
     /// epoll event struct
     struct epoll_event events[THREAD_EVENT_SIZE];
     bool running;
-
 public:
-
     bool run();
-    void OnShutdown() { running = false; }
-
+    void OnShutdown()
+    {
+        running = false;
+    }
 };
 
 #define sSocketMgr SocketMgr::getSingleton()

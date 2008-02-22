@@ -44,7 +44,6 @@ class TaxiPath {
 public:
 	TaxiPath() 
 	{ 
-		m_length = 0;
 	}
 
 	~TaxiPath() 
@@ -57,9 +56,8 @@ public:
 		}
 	}
 
-	ASCENT_INLINE const float & getLength( ) const { return m_length; };
 	void ComputeLen();
-	void SetPosForTime(float &x, float &y, float &z, uint32 time, uint32* lastnode);
+	void SetPosForTime(float &x, float &y, float &z, uint32 time, uint32* lastnode, uint32 mapid);
 	ASCENT_INLINE uint32 GetID() { return id; }
 	void SendMoveForTime(Player *riding, Player *to, uint32 time);
 	void AddPathNode(uint32 index, TaxiPathNode* pn) { m_pathNodes[index] = pn; }
@@ -71,7 +69,11 @@ protected:
 
 	std::map<uint32, TaxiPathNode*> m_pathNodes;
 
-	float m_length;
+	float m_length1;
+	uint32 m_map1;
+
+	float m_length2;
+	uint32 m_map2;
 	uint32 id, to, from, price;
 };
 

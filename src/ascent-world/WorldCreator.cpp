@@ -879,7 +879,6 @@ MapMgr * InstanceMgr::CreateBattlegroundInstance(uint32 mapid)
 	pInstance->m_mapInfo = WorldMapInfoStorage.LookupEntry( mapid );
 	pInstance->m_mapMgr = ret;
 	m_mapLock.Acquire();
-
 	if( m_instances[mapid] == NULL )
 		m_instances[mapid] = new InstanceMap;
 

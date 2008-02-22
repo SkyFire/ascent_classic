@@ -40,26 +40,28 @@ Container::Container(uint32 high,uint32 low) : Item()
 
 Container::~Container( )
 {
-   for( uint32 i = 0; i < m_itemProto->ContainerSlots; i++ )
+   for(uint32 i = 0; i < m_itemProto->ContainerSlots; i++)
 	{
-		if( m_Slot[i] && m_Slot[i]->GetOwner() == m_owner )
+		if(m_Slot[i] && m_Slot[i]->GetOwner() == m_owner)
 		{
-			if( m_Slot[i]->IsContainer() )
-				delete static_cast< Container* >( m_Slot[i] );
+			if(m_Slot[i]->IsContainer())
+				delete ((Container*)m_Slot[i]);
 			else
 				delete m_Slot[i];
 		}
 	}
-	delete[] m_Slot;
-}
 
+	delete [] m_Slot;
+}
 void Container::LoadFromDB( Field*fields )
 {
+
 	uint32 itemid=fields[2].GetUInt32();
 	m_itemProto = ItemPrototypeStorage.LookupEntry( itemid );
 
 	ASSERT(m_itemProto);
 	SetUInt32Value( OBJECT_FIELD_ENTRY, itemid );
+	
 
 	SetUInt32Value( ITEM_FIELD_CREATOR, fields[5].GetUInt32() );
 	SetUInt32Value( ITEM_FIELD_STACK_COUNT, 1);
@@ -70,14 +72,17 @@ void Container::LoadFromDB( Field*fields )
 	SetUInt32Value( ITEM_FIELD_MAXDURABILITY, m_itemProto->MaxDurability);
 	SetUInt32Value( ITEM_FIELD_DURABILITY, fields[12].GetUInt32());
   
+
 	SetUInt32Value( CONTAINER_FIELD_NUM_SLOTS, m_itemProto->ContainerSlots);
 
 	m_Slot = new Item*[m_itemProto->ContainerSlots];
 	memset(m_Slot, 0, sizeof(Item*)*(m_itemProto->ContainerSlots));
+
 }
 
 void Container::Create( uint32 itemid, Player *owner )
 {
+
 	m_itemProto = ItemPrototypeStorage.LookupEntry( itemid );
 	ASSERT(m_itemProto);
 

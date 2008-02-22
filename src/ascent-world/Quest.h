@@ -218,8 +218,8 @@ public:
 	bool LoadFromDB(Field *fields);
 	void UpdatePlayerFields();
 
-	void SetTrigger( uint32 i );
-	void SetMobCount( uint32 i, uint32 count );
+	void SetTrigger(uint32 i);
+	void SetMobCount(uint32 i, uint32 count);
 
 	bool IsUnitAffected(Unit* target);
 	ASCENT_INLINE bool IsCastQuest() { return iscastquest;}
@@ -230,9 +230,9 @@ public:
 	void Finish();
 
 	void SendQuestComplete();
-	void SendUpdateAddKill( uint32 i );
-	ASCENT_INLINE uint32 GetMobCount( uint32 i ) { return m_mobcount[i]; }
-	ASCENT_INLINE uint32 GetExploredAreas( uint32 i ) { return m_explored_areas[i]; }
+	void SendUpdateAddKill(uint32 i);
+	ASCENT_INLINE uint32 GetMobCount(uint32 i) { return m_mobcount[i]; }
+	ASCENT_INLINE uint32 GetExploredAreas(uint32 i) { return m_explored_areas[i]; }
 
 	ASCENT_INLINE uint32 GetBaseField(uint32 slot)
 	{

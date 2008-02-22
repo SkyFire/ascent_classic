@@ -1,12 +1,7 @@
 #include "StdAfx.h"
 #include "../../../ascent-shared/svn_revision.h"
 
-#include "CoreMemoryAllocator.cpp"
-
-extern "C" SCRIPT_DECL uint32 _exp_get_version()
-{
-    return MAKE_SCRIPT_VERSION(SCRIPTLIB_VERSION_MAJOR, SCRIPTLIB_VERSION_MINOR);
-}
+#include <ScriptSetup.h>
 
 extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
 {
@@ -313,9 +308,9 @@ void StatDumper::DumpStats()
     {
         // Dump server information.
 #ifdef WIN32
-		fprintf(f, "    <platform>Ascent %s r%u/%s-Win-%s (www.ascentemu.com)</platform>\n", BUILD_TAG, g_getRevision(), CONFIG, ARCH);		
+		fprintf(f, "    <platform>Ascent %s r%u/%s-Win-%s (www.ascentemu.com)</platform>\n", BUILD_TAG, BUILD_REVISION, CONFIG, ARCH);		
 #else
-		fprintf(f, "    <platform>Ascent %s r%u/%s-%s %s(www.ascentemu.com)</platform>\n", BUILD_TAG, g_getRevision(), PLATFORM_TEXT, ARCH);
+		fprintf(f, "    <platform>Ascent %s r%u/%s-%s %s(www.ascentemu.com)</platform>\n", BUILD_TAG, BUILD_REVISION, PLATFORM_TEXT, ARCH);
 #endif
 
         char uptime[80];

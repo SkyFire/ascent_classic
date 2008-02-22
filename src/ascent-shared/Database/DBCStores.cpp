@@ -52,6 +52,8 @@ SERVER_DECL DBCStorage<ItemExtendedCostEntry> dbcItemExtendedCost;
 SERVER_DECL DBCStorage<ItemRandomSuffixEntry> dbcItemRandomSuffix;
 SERVER_DECL DBCStorage<CombatRatingDBC> dbcCombatRating;
 SERVER_DECL DBCStorage<ChatChannelDBC> dbcChatChannels;
+SERVER_DECL DBCStorage<DurabilityQualityEntry> dbcDurabilityQuality;
+SERVER_DECL DBCStorage<DurabilityCostsEntry> dbcDurabilityCosts;
 SERVER_DECL DBCStorage<BankSlotPrice> dbcBankSlotPrices;
 SERVER_DECL DBCStorage<BankSlotPrice> dbcStableSlotPrices;
 SERVER_DECL DBCStorage<gtFloat> dbcMeleeCrit;
@@ -63,8 +65,6 @@ SERVER_DECL DBCStorage<gtFloat> dbcManaRegenBase;
 SERVER_DECL DBCStorage<gtFloat> dbcHPRegen;
 SERVER_DECL DBCStorage<gtFloat> dbcHPRegenBase;
 
-
-
 const char* ItemSetFormat = "usxxxxxxxxxxxxxxxuuuuuuuuuxxxxxxxxxuuuuuuuuuuuuuuuuuu";
 const char* LockFormat = "uuuuuuxxxuuuuuxxxuuuuuxxxxxxxxxxx";
 const char* EmoteEntryFormat = "uxuuuuxuxuxxxxxxxxx";
@@ -72,7 +72,7 @@ const char* skilllinespellFormat = "uuuxxxxxuuuuxxu";
 const char* EnchantEntrYFormat = "uuuuuuuuuuuuusxxxxxxxxxxxxxxxxuuuu";
 const char* GemPropertyEntryFormat = "uuuuu";
 const char* skilllineentrYFormat = "uuusxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-const char* spellentrYFormat = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuiuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffffffiiiiiiuuuuuuuuuuuuuuufffuuuuuuuuuuuufffuuuuusxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxuuuuuuuuuuifffuuuuuu";
+const char* spellentrYFormat = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuiuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffffffiiiiiiuuuuuuuuuuuuuuufffuuuuuuuuuuuufffuuuuusxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxsxxxxxxxxxxxxxxxxuuuuuuuuuuifffxxuuuu";
 const char* itemextendedcostFormat = "uuuuuuuuuuuuux";
 const char* talententryFormat = "uuuuuuuuuxxxxuxxuxxxx";
 const char* talenttabentryFormat = "uxxxxxxxxxxxxxxxxxxxuux";
@@ -95,6 +95,8 @@ const char* creaturefamilyFormat = "ufufuuuusxxxxxxxxxxxxxxxxx";
 const char* mapentryFormat = "usuxsxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char* itemrandomsuffixformat = "uxxxxxxxxxxxxxxxxxxuuuuuu";
 const char* chatchannelformat = "uuxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+const char * durabilityqualityFormat = "uf";
+const char * durabilitycostsFormat = "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuu";
 const char* bankslotpriceformat = "uu";
 const char* gtfloatformat = "f";
 
@@ -140,6 +142,8 @@ bool LoadDBCs()
 	LOAD_DBC("DBC/ItemRandomSuffix.dbc", itemrandomsuffixformat, true, dbcItemRandomSuffix, false);
 	LOAD_DBC("DBC/gtCombatRatings.dbc", gtfloatformat, false, dbcCombatRating, false);
 	LOAD_DBC("DBC/ChatChannels.dbc", chatchannelformat, true, dbcChatChannels, false);
+	LOAD_DBC("DBC/DurabilityQuality.dbc", durabilityqualityFormat, true, dbcDurabilityQuality, false);
+	LOAD_DBC("DBC/DurabilityCosts.dbc", durabilitycostsFormat, true, dbcDurabilityCosts, false);
 	LOAD_DBC("DBC/BankBagSlotPrices.dbc", bankslotpriceformat, true, dbcBankSlotPrices, false);
 	LOAD_DBC("DBC/StableSlotPrices.dbc", bankslotpriceformat, true, dbcStableSlotPrices, false);
 	LOAD_DBC("DBC/gtChanceToMeleeCrit.dbc", gtfloatformat, false, dbcMeleeCrit, false);

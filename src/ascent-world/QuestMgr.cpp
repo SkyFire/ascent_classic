@@ -57,10 +57,6 @@ uint32 QuestMgr::PlayerMeetsReqs(Player* plr, Quest* qst, bool skiplevelcheck)
 	if (plr->getLevel() < qst->min_level && !skiplevelcheck)
 		return QMGR_QUEST_AVAILABLELOW_LEVEL;
 
-	if(qst->required_races)
-		if(!(qst->required_races & plr->getRaceMask()))
-			return QMGR_QUEST_NOT_AVAILABLE;
-
 	if(qst->required_class)
 		if(!(qst->required_class & plr->getClassMask()))
 			return QMGR_QUEST_NOT_AVAILABLE;
@@ -82,7 +78,7 @@ uint32 QuestMgr::PlayerMeetsReqs(Player* plr, Quest* qst, bool skiplevelcheck)
 	}
 
 	// check quest level
-	if( plr->getLevel() > ( qst->max_level + 5 ) )
+	if( plr->getLevel() >= ( qst->max_level + 5 ) && ( status != QMGR_QUEST_REPEATABLE ) )
 		return QMGR_QUEST_CHAT;
 
 	return status;
@@ -145,8 +141,8 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 		bValid = static_cast< Creature* >( quest_giver )->HasQuests();
 		if(bValid)
 		{
-			q_begin = static_cast< Creature* >( quest_giver )->QuestsBegin();
-			q_end = static_cast< Creature* >( quest_giver )->QuestsEnd();
+			q_begin = ((Creature*)quest_giver)->QuestsBegin();
+			q_end = ((Creature*)quest_giver)->QuestsEnd();
 		}
 	}
     else if( quest_giver->GetTypeId() == TYPEID_ITEM )
@@ -201,21 +197,21 @@ uint32 QuestMgr::ActiveQuestsCount(Object* quest_giver, Player* plr)
 
 	if(quest_giver->GetTypeId() == TYPEID_GAMEOBJECT)
 	{
-        bValid = static_cast< GameObject* >( quest_giver )->HasQuests();
-		if( bValid )
+        bValid = ((GameObject*)quest_giver)->HasQuests();
+		if(bValid)
 		{
-			q_begin = static_cast< GameObject* >( quest_giver )->QuestsBegin();
-			q_end = static_cast< GameObject* >( quest_giver )->QuestsEnd();
+			q_begin = ((GameObject*)quest_giver)->QuestsBegin();
+			q_end   = ((GameObject*)quest_giver)->QuestsEnd();
 			
 		}
 	} 
 	else if(quest_giver->GetTypeId() == TYPEID_UNIT)
 	{
-		bValid = static_cast< Creature* >( quest_giver )->HasQuests();
-		if( bValid )
+		bValid = ((Creature*)quest_giver)->HasQuests();
+		if(bValid)
 		{
-			q_begin = static_cast< Creature* >( quest_giver )->QuestsBegin();
-			q_end = static_cast< Creature* >( quest_giver )->QuestsEnd();
+			q_begin = ((Creature*)quest_giver)->QuestsBegin();
+			q_end   = ((Creature*)quest_giver)->QuestsEnd();
 		}
 	}
 
@@ -490,22 +486,22 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr,
 	*data << uint32(1);//Emote
 
 	bool bValid = false;
-	if( qst_giver->GetTypeId() == TYPEID_GAMEOBJECT )
+	if(qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)
 	{
-		bValid = static_cast< GameObject* >( qst_giver )->HasQuests();
-		if( bValid )
+		bValid = ((GameObject*)qst_giver)->HasQuests();
+		if(bValid)
 		{
-			st = static_cast< GameObject* >( qst_giver )->QuestsBegin();
-			ed = static_cast< GameObject* >( qst_giver )->QuestsEnd();
+			st = ((GameObject*)qst_giver)->QuestsBegin();
+			ed = ((GameObject*)qst_giver)->QuestsEnd();
 		}
 	} 
-	else if( qst_giver->GetTypeId() == TYPEID_UNIT )
+	else if(qst_giver->GetTypeId() == TYPEID_UNIT)
 	{
-		bValid = static_cast< Creature* >( qst_giver )->HasQuests();
-		if( bValid )
+		bValid = ((Creature*)qst_giver)->HasQuests();
+		if(bValid)
 		{
-			st = static_cast< Creature* >( qst_giver )->QuestsBegin();
-			ed = static_cast< Creature* >( qst_giver )->QuestsEnd();
+			st = ((Creature*)qst_giver)->QuestsBegin();
+			ed = ((Creature*)qst_giver)->QuestsEnd();
 		}
 	}
 
@@ -846,15 +842,15 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 
 			// Let's do this properly. Determine the faction of the creature, and give reputation to his faction.
 			if( qst_giver->GetTypeId() == TYPEID_UNIT )
-				if( static_cast< Creature* >( qst_giver )->m_factionDBC != NULL )
-					fact = static_cast< Creature* >( qst_giver )->m_factionDBC->ID;
+				if(((Creature*)qst_giver)->m_factionDBC != NULL )
+					fact = ((Creature*)qst_giver)->m_factionDBC->ID;
 			if( qst_giver->GetTypeId() == TYPEID_GAMEOBJECT )
-				fact = qst_giver->GetUInt32Value( GAMEOBJECT_FACTION );
+				fact = qst_giver->GetUInt32Value(GAMEOBJECT_FACTION );
 		}
 		else
 		{
 			fact = qst->reward_repfaction[z];
-			if( qst->reward_repvalue[z] )
+			if(qst->reward_repvalue[z])
 				amt = qst->reward_repvalue[z];
 		}
 
@@ -903,7 +899,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 	
 	if(qst_giver->GetTypeId() == TYPEID_UNIT)
 	{
-		if( !static_cast< Creature* >( qst_giver )->HasQuest( qst->id, 2 ) )
+		if(!((Creature*)qst_giver)->HasQuest(qst->id, 2))
 		{
 			//sCheatLog.writefromsession(plr->GetSession(), "tried to finish quest from invalid npc.");
 			plr->GetSession()->Disconnect();
@@ -1418,22 +1414,22 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 
 		bool bValid = false;
 
-		if( qst_giver->GetTypeId() == TYPEID_GAMEOBJECT )
+		if(qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)
 		{
-            bValid = static_cast< GameObject* >( qst_giver )->HasQuests();
+            bValid = ((GameObject*)qst_giver)->HasQuests();
             if(bValid)
             {
-				q_begin = static_cast< GameObject* >( qst_giver )->QuestsBegin();
-				q_end = static_cast< GameObject* >( qst_giver )->QuestsEnd();
+				q_begin = ((GameObject*)qst_giver)->QuestsBegin();
+				q_end   = ((GameObject*)qst_giver)->QuestsEnd();
 			}
 		} 
 		else if(qst_giver->GetTypeId() == TYPEID_UNIT)
 		{
-			bValid = static_cast< Creature* >( qst_giver )->HasQuests();
+			bValid = ((Creature*)qst_giver)->HasQuests();
 			if(bValid)
 			{
-				q_begin = static_cast< Creature* >( qst_giver )->QuestsBegin();
-				q_end = static_cast< Creature* >( qst_giver )->QuestsEnd();
+				q_begin = ((Creature*)qst_giver)->QuestsBegin();
+				q_end   = ((Creature*)qst_giver)->QuestsEnd();
 			}
 		}
 
@@ -1443,11 +1439,11 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 			return false;
 		}
 		
-		for( itr = q_begin; itr != q_end; ++itr ) 
-			if( sQuestMgr.CalcQuestStatus( qst_giver, plr, *itr ) >= QMGR_QUEST_CHAT )
+		for(itr = q_begin; itr != q_end; ++itr) 
+			if (sQuestMgr.CalcQuestStatus(qst_giver, plr, *itr) >= QMGR_QUEST_CHAT)
 				break;
 
-		if( sQuestMgr.CalcStatus(qst_giver, plr) < QMGR_QUEST_CHAT )
+		if (sQuestMgr.CalcStatus(qst_giver, plr) < QMGR_QUEST_CHAT)
 			return false; 
 
 		ASSERT(itr != q_end);

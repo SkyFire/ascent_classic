@@ -184,7 +184,7 @@ void LogonServer::Run(int argc, char ** argv)
 		sLog.m_screenLogLevel = 3;
 	}
 	
-	sLog.outString(BANNER, BUILD_TAG, g_getRevision(), CONFIG, PLATFORM_TEXT, ARCH);
+	sLog.outString(BANNER, BUILD_TAG, BUILD_REVISION, CONFIG, PLATFORM_TEXT, ARCH);
 #ifdef REPACK
 	sLog.outString("Repack: %s | Author: %s | %s\n", REPACK, REPACK_AUTHOR, REPACK_WEBSITE);
 #endif

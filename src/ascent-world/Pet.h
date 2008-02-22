@@ -250,7 +250,7 @@ protected:
 	uint32 GetHighestRankSpell(uint32 spellId);
 	void UpdateLoyalty(char pts);
 
-	list<AI_Spell*> m_autoCastSpells[AUTOCAST_EVENT_COUNT+1];
+	list<AI_Spell*> m_autoCastSpells[AUTOCAST_EVENT_COUNT];
 };
 
 #define PET_LOYALTY_UPDATE_TIMER 120000

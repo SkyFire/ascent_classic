@@ -21,6 +21,9 @@
 #include "DatabaseEnv.h"
 #include "../CrashHandler.h"
 #include "../NGLog.h"
+
+#if defined(ENABLE_DATABASE_MYSQL)
+
 #include "MySQLDatabase.h"
 
 MySQLDatabase::~MySQLDatabase()
@@ -224,3 +227,5 @@ bool MySQLDatabase::_Reconnect(MySQLDatabaseConnection * conn)
 	conn->MySql = temp;
 	return true;
 }
+
+#endif

@@ -151,14 +151,17 @@ bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 		{
 			uint32 cellx=float2int32(((_maxX-unit->m_spawn->x)/_cellSize));
 			uint32 celly=float2int32(((_maxY-unit->m_spawn->y)/_cellSize));
-			CellSpawns * c = unit->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly);
-			for(CreatureSpawnList::iterator itr = c->CreatureSpawns.begin(); itr != c->CreatureSpawns.end(); ++itr)
-				if((*itr) == unit->m_spawn)
-				{
-					c->CreatureSpawns.erase(itr);
-					break;
-				}
-			delete unit->m_spawn;
+			if(cellx <= _sizeX && celly <= _sizeY)
+			{
+				CellSpawns * c = unit->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly);
+				for(CreatureSpawnList::iterator itr = c->CreatureSpawns.begin(); itr != c->CreatureSpawns.end(); ++itr)
+					if((*itr) == unit->m_spawn)
+					{
+						c->CreatureSpawns.erase(itr);
+						break;
+					}
+				delete unit->m_spawn;
+			}
 		}
 		unit->RemoveFromWorld(false,true);
 	}
@@ -715,7 +718,7 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 	go->SetFloatValue(GAMEOBJECT_ROTATION_03, cosf(o / 2));
 	go->PushToWorld(m_session->GetPlayer()->GetMapMgr());
 
-	// Create spawn instance
+	// Create sapwn instance
 	GOSpawn * gs = new GOSpawn;
 	gs->entry = go->GetEntry();
 	gs->facing = go->GetOrientation();
