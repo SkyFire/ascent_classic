@@ -37,7 +37,7 @@ Database::Database() : CThread()
 
 Database::~Database()
 {
-	delete[] Connections;
+	
 }
 
 void Database::_Initialize()

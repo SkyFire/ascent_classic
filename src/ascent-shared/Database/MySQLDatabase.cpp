@@ -28,6 +28,9 @@
 
 MySQLDatabase::~MySQLDatabase()
 {
+	for(int32 i = 0; i < mConnectionCount; ++i)
+		delete Connections[i];
+
 	delete [] Connections;
 }
 

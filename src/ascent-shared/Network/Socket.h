@@ -327,7 +327,7 @@ public:
 	void Update()
 	{
 		map<Socket*, time_t>::iterator i, i2;
-		time_t t = time(NULL);
+		time_t t = UNIXTIME;
 		lock.Acquire();
 		for(i = deletionQueue.begin(); i != deletionQueue.end();)
 		{
@@ -344,7 +344,7 @@ public:
 	void QueueSocket(Socket * s)
 	{
 		lock.Acquire();
-		deletionQueue.insert( map<Socket*, time_t>::value_type( s, time(NULL) + SOCKET_GC_TIMEOUT ) );
+		deletionQueue.insert( map<Socket*, time_t>::value_type( s, UNIXTIME + SOCKET_GC_TIMEOUT ) );
 		lock.Release();
 	}
 };

@@ -86,6 +86,7 @@ public:
 	void AdditionAck(uint32 ID, uint32 ServID);
 	void UpdateSockets();
 	void Connect(LogonServer * server);
+	void ConnectAll();
 	void LogonDatabaseSQLExecute(const char* str, ...);
 	void LogonDatabaseReloadAccounts();
 

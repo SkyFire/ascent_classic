@@ -69,6 +69,52 @@ void LogonCommHandler::RequestAddition(LogonCommClientSocket * Socket)
 	}
 }
 
+class LogonCommWatcherThread : public ThreadBase
+{
+	bool running;
+#ifdef WIN32
+	HANDLE hEvent;
+#endif
+public:
+
+	LogonCommWatcherThread()
+	{
+#ifdef WIN32
+		hEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+#endif
+		running = true;
+	}
+
+	~LogonCommWatcherThread()
+	{
+
+	}
+
+	void OnShutdown()
+	{
+		running = false;
+#ifdef WIN32
+		SetEvent( hEvent );
+#endif
+	}
+
+	bool run()
+	{
+		sLogonCommHandler.ConnectAll();
+		while( running )
+		{
+			sLogonCommHandler.UpdateSockets();
+#ifdef WIN32
+			WaitForSingleObject( hEvent, 3000 );
+#else
+			Sleep( 3000 );
+#endif
+		}
+
+		return true;
+	}
+};
+
 void LogonCommHandler::Startup()
 {
 	// Try to connect to all logons.
@@ -90,6 +136,11 @@ void LogonCommHandler::Startup()
 		delete result;
 	}
 
+	ThreadPool.ExecuteTask( new LogonCommWatcherThread() );
+}
+
+void LogonCommHandler::ConnectAll()
+{
 	Log.Notice("LogonCommClient", "Attempting to connect to logon server...");
 	for(set<LogonServer*>::iterator itr = servers.begin(); itr != servers.end(); ++itr)
 		Connect(*itr);

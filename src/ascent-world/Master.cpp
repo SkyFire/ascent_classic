@@ -410,7 +410,6 @@ bool Master::Run(int argc, char ** argv)
 		UNIXTIME = time(NULL);
 
 #ifndef CLUSTERING
-		sLogonCommHandler.UpdateSockets();
 #ifdef VOICE_CHAT
 		sVoiceChatHandler.Update();
 #endif
