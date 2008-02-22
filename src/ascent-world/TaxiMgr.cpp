@@ -123,7 +123,6 @@ void TaxiPath::SetPosForTime(float &x, float &y, float &z, uint32 time, uint32 *
 			y = (itr->second->y - ny)*(traveled_len/len) + ny;
 			z = (itr->second->z - nz)*(traveled_len/len) + nz;
 			*last_node = nodecounter;
-			printf("int position: %u %f %f %f (node %u)\n", mapid, x, y, z, nodecounter);
 			return;
 		}
 		else
@@ -153,6 +152,101 @@ TaxiPathNode* TaxiPath::GetPathNode(uint32 i)
 
 void TaxiPath::SendMoveForTime(Player *riding, Player *to, uint32 time)
 {
+	if (!time)
+		return;
+
+	float length;
+	uint32 mapid = riding->GetMapId();
+	if( mapid == m_map1 )
+		length = m_length1;
+	else
+		length = m_length2;
+
+	float traveled_len = (time/(length * TAXI_TRAVEL_SPEED))*length;
+	uint32 len = 0;
+	float x = 0,y = 0,z = 0;
+
+	if (!m_pathNodes.size())
+		return;
+
+	std::map<uint32, TaxiPathNode*>::iterator itr;
+	itr = m_pathNodes.begin();
+
+	float nx;
+	float ny;
+	float nz;
+	bool set = false;
+	uint32 nodecounter = 1;
+
+	while (itr != m_pathNodes.end())
+	{
+		if( itr->second->mapid != mapid )
+		{
+			itr++;
+			nodecounter++;
+			continue;
+		}
+
+		if(!set)
+		{
+			nx = itr->second->x;
+			ny = itr->second->y;
+			nz = itr->second->z;
+			set = true;
+			continue;
+		}
+
+		len = (uint32)sqrt((itr->second->x - nx)*(itr->second->x - nx) +
+			(itr->second->y - ny)*(itr->second->y - ny) + 
+			(itr->second->z - nz)*(itr->second->z - nz));
+
+		if (len >= traveled_len)
+		{
+			x = (itr->second->x - nx)*(traveled_len/len) + nx;
+			y = (itr->second->y - ny)*(traveled_len/len) + ny;
+			z = (itr->second->z - nz)*(traveled_len/len) + nz;
+			return;
+		}
+		else
+		{
+			traveled_len -= len;
+		}
+
+		nx = itr->second->x;
+		ny = itr->second->y;
+		nz = itr->second->z;
+		itr++;
+	}
+
+	if (itr == m_pathNodes.end())
+		return;
+
+	WorldPacket * data = new WorldPacket(SMSG_MONSTER_MOVE, 2000);
+	size_t pos;
+
+	*data << riding->GetNewGUID();
+	*data << riding->GetPositionX( ) << riding->GetPositionY( ) << riding->GetPositionZ( );
+	*data << getMSTime();
+	*data << uint8( 0 );
+	*data << uint32( 0x00000300 );
+	*data << uint32( uint32((length * TAXI_TRAVEL_SPEED) - time));
+	*data << uint32( nodecounter );
+	pos = data->wpos();
+	*data << nx << ny << nz;
+
+	while (itr != m_pathNodes.end())
+	{
+		TaxiPathNode *pn = itr->second;
+		if( pn->mapid != mapid )
+			break;
+
+		*data << pn->x << pn->y << pn->z;
+		++itr;
+		++nodecounter;
+	}
+	
+	*(uint32*)&(data->contents()[pos]) = nodecounter;
+	to->delayedPackets.add(data);
 /*	if (!time)
 		return;
 

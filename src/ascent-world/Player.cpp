@@ -3845,7 +3845,7 @@ void Player::SetPlayerSpeed(uint8 SpeedType, float value)
 			if(value == m_lastBackSwimSpeed)
 				break;
 
-			data.SetOpcode(MSG_MOVE_SET_SWIM_BACK_SPEED);
+			data.SetOpcode(SMSG_FORCE_SWIM_BACK_SPEED_CHANGE);
 			m_backSwimSpeed = value;
 			m_lastBackSwimSpeed = value;
 		}break;
@@ -3865,10 +3865,7 @@ void Player::SetPlayerSpeed(uint8 SpeedType, float value)
 
 	// dont mess up on these
 	ResetHeartbeatCoords();
-	if( SpeedType != SWIMBACK )
-	{
-		_heartbeatEnable = false;
-	}
+	_heartbeatEnable = false;
 }
 
 void Player::BuildPlayerRepop()
