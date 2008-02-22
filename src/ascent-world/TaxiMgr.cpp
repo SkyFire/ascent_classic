@@ -205,7 +205,7 @@ void TaxiPath::SendMoveForTime(Player *riding, Player *to, uint32 time)
 			x = (itr->second->x - nx)*(traveled_len/len) + nx;
 			y = (itr->second->y - ny)*(traveled_len/len) + ny;
 			z = (itr->second->z - nz)*(traveled_len/len) + nz;
-			return;
+			break;
 		}
 		else
 		{

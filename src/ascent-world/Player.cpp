@@ -948,6 +948,8 @@ void Player::EventDismount(uint32 money, float x, float y, float z)
 		m_taxiPaths.erase(m_taxiPaths.begin());
 		TaxiStart(p, taxi_model_id, 0);
 	}
+
+	ResetHeartbeatCoords();
 }
 
 void Player::_EventAttack( bool offhand )
@@ -6887,6 +6889,7 @@ void Player::ProcessPendingUpdates()
 	while(delayedPackets.size())
 	{
 		pck = delayedPackets.next();
+		printf("Delayed packet opcode %u size %u sent.\n", pck->GetOpcode());
 		m_session->SendPacket(pck);
 		delete pck;
 	}
