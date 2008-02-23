@@ -16,15 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-/* echo send/received packets to console */
-//#define ECHO_PACKET_LOG_TO_CONSOLE
-
 // Class WorldSocket - Main network code functions, handles
 // reading/writing of all packets.
 
 #include "StdAfx.h"
 #include "AuthCodes.h"
+
+/* echo send/received packets to console */
+#define ECHO_PACKET_LOG_TO_CONSOLE 1
 
 #ifndef CLUSTERING
 #pragma pack(push, 1)

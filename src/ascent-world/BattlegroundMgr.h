@@ -339,6 +339,7 @@ public:
 
 	void BuildPvPUpdateDataPacket(WorldPacket * data);
 	virtual uint8 Rated() { return 0; }
+	void OnPlayerPushed(Player* plr);
 };
 
 #define BattlegroundManager CBattlegroundManager::getSingleton( )

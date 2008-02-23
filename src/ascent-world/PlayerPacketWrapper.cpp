@@ -110,7 +110,22 @@ struct LoginVerifyWorldPacket
     float  O;
 };
 
+struct WorldStateUpdatePacket
+{
+	uint32 State;
+	uint32 Value;
+};
+
 #pragma pack(pop)
+
+void Player::SendWorldStateUpdate(uint32 WorldState, uint32 Value)
+{
+	WorldStateUpdatePacket pck;
+	pck.State = WorldState;
+	pck.Value = Value;
+
+	GetSession()->OutPacket(SMSG_UPDATE_WORLD_STATE, sizeof(WorldStateUpdatePacket), (const char*)&pck);
+}
 
 void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name)
 {

@@ -492,6 +492,7 @@ void CBattleground::SendWorldStates(Player * plr)
 	case  529: bflag = 0x0D1E; break;
 	case   30: bflag = 0x0A25; break;
 	case  559: bflag = 3698; break;
+	case 566: bflag = 0x0eec; bflag2 = 0; break;			// EOTS
 	
 	default:		/* arenas */
 		bflag  = 0x0E76;
@@ -708,6 +709,15 @@ void CBattleground::RemovePendingPlayer(Player * plr)
 	m_mainLock.Release();
 }
 
+void CBattleground::OnPlayerPushed(Player * plr)
+{
+	if(plr->GetGroup())
+		plr->GetGroup()->RemovePlayer(plr->m_playerInfo);
+
+	plr->ProcessPendingUpdates();
+	m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
+}
+
 void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 {
 	m_mainLock.Acquire();
@@ -764,9 +774,6 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		// remove them from their group
 		plr->GetGroup()->RemovePlayer( plr->m_playerInfo );
 	}
-
-	plr->ProcessPendingUpdates();
-	m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
 
 	if(!m_countdownStage)
 	{

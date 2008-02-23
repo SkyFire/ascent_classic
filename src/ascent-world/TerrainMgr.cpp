@@ -23,6 +23,7 @@
 
 TerrainMgr::TerrainMgr(string MapPath, uint32 MapId, bool Instanced) : mapPath(MapPath), mapId(MapId), Instance(Instanced)
 {
+	FileDescriptor = NULL;
 	CellInformation = NULL;
 }
 
@@ -35,6 +36,7 @@ TerrainMgr::~TerrainMgr()
 		mutex.Acquire();
 		fclose(FileDescriptor);
 		mutex.Release();
+		FileDescriptor = NULL;
 	}
 
 	// Big memory cleanup, whee.
@@ -50,6 +52,7 @@ TerrainMgr::~TerrainMgr()
 			delete [] CellInformation[x];
 		}
 		delete [] CellInformation;
+		CellInformation = NULL;
 	}
 #else
 
