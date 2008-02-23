@@ -3586,15 +3586,18 @@ void Aura::SpellAuraModEffectImmunity(bool apply)
 	if( m_spellProto->Id == 24937 )
 		SetPositive();
 
-	if( m_spellProto->Id == 23333 || m_spellProto->Id == 23335 )
+	if( m_spellProto->Id == 23333 || m_spellProto->Id == 23335 || m_spellProto->Id == 34976 )
 	{
 		if( !apply )
 		{
             Player* plr = static_cast< Player* >( GetUnitCaster() );
-			if( plr == NULL || plr->GetTypeId() != TYPEID_PLAYER || plr->m_bg == NULL|| plr->m_bg->GetType() != BATTLEGROUND_WARSUNG_GULCH )
+			if( plr == NULL || plr->GetTypeId() != TYPEID_PLAYER || plr->m_bg == NULL)
 				return;
 
-			((WarsongGulch*)plr->m_bg)->DropFlag(plr);
+			if( plr->m_bg->GetType() != BATTLEGROUND_WARSUNG_GULCH )
+				((WarsongGulch*)plr->m_bg)->DropFlag(plr);
+			else if( plr->m_bg->GetType() == BATTLEGROUND_EYE_OF_THE_STORM )
+				((EyeOfTheStorm*)plr->m_bg)->DropFlag(plr);
 		}
 	}
 }

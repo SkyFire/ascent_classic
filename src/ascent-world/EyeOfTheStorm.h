@@ -47,7 +47,6 @@ public:
 	const char * GetName() { return "Eye of the Storm"; }
 	void OnStart();
 
-	void RespawnFlag();
 	void UpdateCPs();
 	void GeneratePoints();
 
@@ -55,6 +54,10 @@ public:
 	bool GivePoints(uint32 team, uint32 points);
 
 	void RespawnCPFlag(uint32 i, uint32 id);		// 0 = Neutral, <0 = Leaning towards alliance, >0 Leaning towards horde
+
+	bool HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * pSpell);
+	void DropFlag(Player * plr);
+	void EventResetFlag();
 
 protected:
 	int32 m_CPStatus[EOTS_TOWER_COUNT];		
@@ -69,6 +72,9 @@ protected:
 
 	typedef set<Player*> EOTSCaptureDisplayList;
 	EOTSCaptureDisplayList m_CPDisplay[EOTS_TOWER_COUNT];
+
+	uint32 m_points[2];
+	Creature * m_spiritGuides[EOTS_TOWER_COUNT];
 };
 
 #endif		// _EOTS_H
