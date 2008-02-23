@@ -1857,7 +1857,10 @@ void Unit::RegeneratePower(bool isinterrupted)
 				else
 				{
 					if (static_cast< Player* >( this )->HasAura(12296))
+					{
+						m_P_regenTimer = 3000;
 						static_cast< Player* >( this )->LooseRage(-10);
+					}
 				}
 
 			}break;
