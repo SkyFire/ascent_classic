@@ -3590,14 +3590,13 @@ int32 Spell::CalculateEffect(uint32 i,Unit *target)
 	}
 exit:
 
-	int32 diff = -(int32)m_spellInfo->baseLevel;
-	if (m_spellInfo->maxLevel && u_caster->getLevel()>m_spellInfo->maxLevel)
-		diff +=m_spellInfo->maxLevel;
-	else
-		diff +=u_caster->getLevel();	
-
 	if( u_caster != NULL )
 	{
+		int32 diff = -(int32)m_spellInfo->baseLevel;
+		if (m_spellInfo->maxLevel && u_caster->getLevel()>m_spellInfo->maxLevel)
+			diff +=m_spellInfo->maxLevel;
+		else
+			diff +=u_caster->getLevel();
 		randomPoints += float2int32(diff * randomPointsPerLevel);
 		basePoints += float2int32(diff * basePointsPerLevel );
 	}
