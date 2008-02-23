@@ -310,7 +310,7 @@ void StatDumper::DumpStats()
 #ifdef WIN32
 		fprintf(f, "    <platform>Ascent %s r%u/%s-Win-%s (www.ascentemu.com)</platform>\n", BUILD_TAG, BUILD_REVISION, CONFIG, ARCH);		
 #else
-		fprintf(f, "    <platform>Ascent %s r%u/%s-%s %s(www.ascentemu.com)</platform>\n", BUILD_TAG, BUILD_REVISION, PLATFORM_TEXT, ARCH);
+		fprintf(f, "    <platform>Ascent %s r%u/%s-%s (www.ascentemu.com)</platform>\n", BUILD_TAG, BUILD_REVISION, PLATFORM_TEXT, ARCH);
 #endif
 
         char uptime[80];
