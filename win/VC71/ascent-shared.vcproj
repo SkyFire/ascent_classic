@@ -60,7 +60,8 @@
 				Name="VCPreBuildEventTool"
 				Description="Extracting SVN revision..."
 				CommandLine="cd $(SolutionDir)\..\src\ascent-shared
-RevisionExtractor.exe"/>
+RevisionExtractor.exe
+"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
@@ -117,7 +118,8 @@ RevisionExtractor.exe"/>
 				Name="VCPreBuildEventTool"
 				Description="Extracting SVN revision..."
 				CommandLine="cd $(SolutionDir)\..\src\ascent-shared
-RevisionExtractor.exe"/>
+RevisionExtractor.exe
+"/>
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
@@ -141,6 +143,9 @@ RevisionExtractor.exe"/>
 			Name="Database"
 			Filter="">
 			<File
+				RelativePath="..\..\src\ascent-shared\Database\CreateInterface.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\ascent-shared\Database\Database.cpp">
 			</File>
 			<File
@@ -160,6 +165,24 @@ RevisionExtractor.exe"/>
 			</File>
 			<File
 				RelativePath="..\..\src\ascent-shared\Database\Field.h">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.h">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.h">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.h">
 			</File>
 			<Filter
 				Name="DataStores">

@@ -30,7 +30,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Extracting SVN revision..."
-				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe"
+				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -117,7 +117,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Extracting SVN revision..."
-				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe"
+				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -202,7 +202,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Extracting SVN revision..."
-				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe"
+				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -281,7 +281,7 @@
 			<Tool
 				Name="VCPreBuildEventTool"
 				Description="Extracting SVN revision..."
-				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe"
+				CommandLine="cd $(SolutionDir)\..\src\ascent-shared&#x0D;&#x0A;RevisionExtractor.exe&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -357,6 +357,10 @@
 			Name="Database"
 			>
 			<File
+				RelativePath="..\..\src\ascent-shared\Database\CreateInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ascent-shared\Database\Database.cpp"
 				>
 			</File>
@@ -378,6 +382,30 @@
 			</File>
 			<File
 				RelativePath="..\..\src\ascent-shared\Database\Field.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\MySQLDatabase.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\PostgresDatabase.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Database\SQLiteDatabase.h"
 				>
 			</File>
 			<Filter
