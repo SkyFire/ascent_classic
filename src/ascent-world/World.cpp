@@ -2117,29 +2117,16 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1;
 		sp->EffectSpellGroupRelation[1] = 1;
 	}
-
-	//paladin ( grouping ) Healing Light
-	group_relation_paladin_healing_light = 0x40000000 | 0x80000000;
-
 	//paladin - Healing Light
 	sp = dbcSpell.LookupEntryForced( 20237 );
 	if( sp != NULL )
-	{
-		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-	}
-	sp = dbcSpell.LookupEntryForced( 20238 );
+		sp->EffectSpellGroupRelation[0] = 0x40000000 | 0x80000000;
 	if( sp != NULL )
-	{
-		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-	}
+		sp->EffectSpellGroupRelation[0] = 0x40000000 | 0x80000000;
 	sp = dbcSpell.LookupEntryForced( 20239 );
 	if( sp != NULL )
-	{
-		sp->EffectSpellGroupRelation[0] = group_relation_paladin_healing_light;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-	}
+		sp->EffectSpellGroupRelation[0] = 0x40000000 | 0x80000000;
+
 
 	//paladin - Improved Devotion Aura
 	sp = dbcSpell.LookupEntryForced( 20142 );
@@ -6349,23 +6336,49 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->procFlags |= PROC_TARGET_SELF;
 
+	//warrior - Improved Disciplines
+	sp = dbcSpell.LookupEntryForced( 29725 );
+	if (sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 16 | 8192;
+		sp->EffectSpellGroupRelation_high[0] = 8;
+		sp->EffectSpellGroupRelation[1] = 16 | 8192;
+		sp->EffectSpellGroupRelation_high[1] = 8;
+	}
+	sp = dbcSpell.LookupEntryForced( 29724 );
+	if (sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 16 | 8192;
+		sp->EffectSpellGroupRelation_high[0] = 8;
+		sp->EffectSpellGroupRelation[1] = 16 | 8192;
+		sp->EffectSpellGroupRelation_high[1] = 8;
+	}
+	sp = dbcSpell.LookupEntryForced( 29723 );
+	if (sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 16 | 8192;
+		sp->EffectSpellGroupRelation_high[0] = 8;
+		sp->EffectSpellGroupRelation[1] = 16 | 8192;
+		sp->EffectSpellGroupRelation_high[1] = 8;
+	}
+
 	//warrior - berserker rage is missing 1 effect = regenerate rage
 	sp = dbcSpell.LookupEntryForced( 18499 );
 	if( sp != NULL )
 	{
 		sp->Effect[2] = 6;
 		sp->EffectApplyAuraName[2] = SPELL_AURA_PROC_TRIGGER_SPELL;
-		sp->EffectTriggerSpell[2] = 9174; //not sure if this is the one. In my time this adds 30 rage
+		sp->EffectTriggerSpell[2] = 37521; //not sure if this is the one. In my time this adds 30 rage
 		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 	}
 
 	//warrior - improved berserker rage
 	sp = dbcSpell.LookupEntryForced( 20500 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
 	sp = dbcSpell.LookupEntryForced( 20501 );
 	if( sp != NULL )
-		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
+		sp->procFlags = PROC_ON_CAST_SPELL | PROC_TARGET_SELF;
 
 	//warrior - berserker rage is missing 1 effect = regenerate rage
 	sp = dbcSpell.LookupEntryForced( 18499 );
@@ -6515,21 +6528,56 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1073741824;
 
 	//warrior - Improved Mortal Strike
+
 	sp = dbcSpell.LookupEntryForced( 35446 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 33554432;
+	{
+		sp->EffectSpellGroupRelation[1] = 33554432;
+	sp->EffectSpellGroupRelation[0] = 33554432;
+	}
 	sp = dbcSpell.LookupEntryForced( 35448 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 33554432;
+	{
+		sp->EffectSpellGroupRelation[1] = 33554432;
+	sp->EffectSpellGroupRelation[0] = 33554432;
+	}
 	sp = dbcSpell.LookupEntryForced( 35449 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 33554432;
+	{
+		sp->EffectSpellGroupRelation[1] = 33554432;
+	sp->EffectSpellGroupRelation[0] = 33554432;
+	}
 	sp = dbcSpell.LookupEntryForced( 35450 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 33554432;
+	{
+		sp->EffectSpellGroupRelation[1] = 33554432;
+	sp->EffectSpellGroupRelation[0] = 33554432;
+	}
 	sp = dbcSpell.LookupEntryForced( 35451 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 33554432;
+	{
+		sp->EffectSpellGroupRelation[1] = 33554432;
+	sp->EffectSpellGroupRelation[0] = 33554432;
+	}
+	//warrior - Tactical Mastery
+	sp = dbcSpell.LookupEntryForced( 12677 );
+	if ( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[1] = 1024;
+		sp->EffectSpellGroupRelation[2] =33554432;
+	}
+	sp = dbcSpell.LookupEntryForced( 12676 );
+	if ( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[1] = 1024;
+		sp->EffectSpellGroupRelation[2] =33554432;
+	}
+	sp = dbcSpell.LookupEntryForced( 12295 );
+	if ( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[1] = 1024;
+		sp->EffectSpellGroupRelation[2] =33554432;
+	}
 
 	//warrior - Focused Rage
 	sp = dbcSpell.LookupEntryForced( 29787 );
@@ -6607,6 +6655,13 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_ABSORB;
 		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
 		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
+	}
+	//mage - Presence of Mind
+	sp = dbcSpell.LookupEntryForced(12043);
+	if (sp!= NULL)
+	{
+		sp->EffectSpellGroupRelation[0]= 0xFFFFFFFF;
+		sp->EffectSpellGroupRelation_high[0]= 0xFFFFFFFF;
 	}
 
 	// mage - Frost Warding
@@ -6755,41 +6810,41 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[1] = 0;
 		sp->EffectSpellGroupRelation_high[0] |= 16;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation_high[1] |= 16;
 	}
 	sp = dbcSpell.LookupEntryForced( 24943 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[1] = 0;
 		sp->EffectSpellGroupRelation_high[0] |= 16;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation_high[1] |= 16;
 	}
 	sp = dbcSpell.LookupEntryForced( 24944 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[1] = 0;
 		sp->EffectSpellGroupRelation_high[0] |= 16;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation_high[1] |= 16;
 	}
 	sp = dbcSpell.LookupEntryForced( 24945 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[1] = 0;
 		sp->EffectSpellGroupRelation_high[0] |= 16;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation_high[1] |= 16;
 	}
 	sp = dbcSpell.LookupEntryForced( 24946 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
-		sp->EffectMiscValue[0] = SMT_SPELL_VALUE;
-		sp->EffectSpellGroupRelation[1] = 0;
 		sp->EffectSpellGroupRelation_high[0] |= 16;
+		sp->EffectSpellGroupRelation[1] = 268435456 | 32 | 64 | 16 | 128 | 268435456;
+		sp->EffectSpellGroupRelation_high[1] |= 16;
 	}
 
 	// druid - Empowered Touch

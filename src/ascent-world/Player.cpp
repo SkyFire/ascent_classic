@@ -6393,12 +6393,11 @@ void Player::RegenerateHealth( bool inCombat )
 	}
 }
 
-void Player::LooseRage()
+void Player::LooseRage(int32 decayValue)
 {
 	//Rage is lost at a rate of 3 rage every 3 seconds. 
 	//The Anger Management talent changes this to 2 rage every 3 seconds.
 	uint32 cur = GetUInt32Value(UNIT_FIELD_POWER2);
-	uint32 decayValue = 30; // default not modified
 	
 	if(cur) {
 	  uint32 cl=getClass();
@@ -6412,8 +6411,11 @@ void Player::LooseRage()
 	    // rage per decay anywhere
 	    break;
 	  }
+	  uint32 newrage = ((int)cur <= decayValue) ? 0 : cur-decayValue;
+	  if (newrage > 1000 )
+		  newrage = 1000;
 
-	  SetUInt32Value(UNIT_FIELD_POWER2, (cur <= decayValue) ? 0 : (cur - decayValue));
+	  SetUInt32Value(UNIT_FIELD_POWER2,newrage);
 	}
 }
 
@@ -6889,7 +6891,7 @@ void Player::ProcessPendingUpdates()
 	while(delayedPackets.size())
 	{
 		pck = delayedPackets.next();
-		printf("Delayed packet opcode %u size %u sent.\n", pck->GetOpcode());
+		printf("Delayed packet opcode %u sent.\n", pck->GetOpcode());
 		m_session->SendPacket(pck);
 		delete pck;
 	}

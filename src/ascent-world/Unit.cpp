@@ -1261,7 +1261,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 23690:
 						case 23691:
 							{
-								if( !HasActiveAura( 18499 ) )
+								if( !CastingSpell || CastingSpell->NameHash != SPELL_HASH_BERSERKER_RAGE )
 									continue;
 							}break;
 						//mage - Arcane Concentration 
@@ -1852,8 +1852,14 @@ void Unit::RegeneratePower(bool isinterrupted)
 				if(!CombatStatus.IsInCombat())
 				{
 					m_P_regenTimer = 3000;
-					static_cast< Player* >( this )->LooseRage();
+					static_cast< Player* >( this )->LooseRage(30);
 				}
+				else
+				{
+					if (static_cast< Player* >( this )->HasAura(12296))
+						static_cast< Player* >( this )->LooseRage(-10);
+				}
+
 			}break;
 		}
 		
@@ -2622,7 +2628,7 @@ else
 			// burlex: fixed this crap properly
 			float inital_dmg = float(dmg.full_damage);
 			float dd_mod = GetDamageDonePctMod( dmg.school_type );
-			if( pVictim->DamageTakenPctMod[dmg.school_type] > 1.0f )
+			if( pVictim->DamageTakenPctMod[dmg.school_type] != 1.0f )
 				dmg.full_damage += float2int32( ( inital_dmg * pVictim->DamageTakenPctMod[ dmg.school_type ] ) - inital_dmg );
 
 			if( dd_mod > 1.0f )
@@ -3582,10 +3588,13 @@ bool Unit::RemoveAllAuras(uint32 spellId, uint64 guid)
 	{
 		if(m_auras[x])
 		{
-			if(m_auras[x]->GetSpellId()==spellId && m_auras[x]->m_casterGuid == guid)
+			if(m_auras[x]->GetSpellId()==spellId)
 			{
-				m_auras[x]->Remove();
-				res = true;
+				if (!guid || m_auras[x]->m_casterGuid == guid)
+				{
+					m_auras[x]->Remove();
+					res = true;
+				}
 			}
 		}
 	}

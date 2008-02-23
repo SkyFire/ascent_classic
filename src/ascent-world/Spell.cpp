@@ -3981,6 +3981,7 @@ void Spell::Heal(int32 amount)
 
 	//Make it critical
 	bool critical = false;
+	int32 critchance = 0; 
 	int32 bonus = 0;
 	float healdoneaffectperc = 1.0f;
 	if( u_caster != NULL )
@@ -4022,6 +4023,8 @@ void Spell::Heal(int32 amount)
 				bonus = float2int32( float( bonus ) * m_spellInfo->fixed_dddhcoef );
 		}
 
+		critchance = float2int32(u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School]);
+
 		if(m_spellInfo->SpellGroupType)
 		{
 			int penalty_pct = 0;
@@ -4030,6 +4033,7 @@ void Spell::Heal(int32 amount)
 			bonus += bonus * ( penalty_pct / 100 );
 			SM_FIValue( u_caster->SM_FPenalty, &penalty_flt, m_spellInfo->SpellGroupType );
 			bonus += penalty_flt;
+			SM_FIValue( u_caster->SM_CriticalChance,&critchance,m_spellInfo->SpellGroupType);
 #ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
 			int spell_flat_modifers=0;
 			int spell_pct_modifers=0;
@@ -4044,8 +4048,10 @@ void Spell::Heal(int32 amount)
 		amount += amount*u_caster->HealDonePctMod[m_spellInfo->School]/100;
 		amount += float2int32( float( amount ) * unitTarget->HealTakenPctMod[m_spellInfo->School] );
 
-		float spellCrit = u_caster->spellcritperc + u_caster->SpellCritChanceSchool[m_spellInfo->School];
-		if(critical = Rand(spellCrit))
+		if (m_spellInfo->SpellGroupType)
+			SM_FIValue(u_caster->SM_PDamageBonus,&amount,m_spellInfo->SpellGroupType);
+
+		if(critical = Rand(critchance))
 		{
 			int32 critbonus = amount >> 1;
 			if( m_spellInfo->SpellGroupType)

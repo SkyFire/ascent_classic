@@ -1325,7 +1325,7 @@ public:
 	void RegenerateMana(bool is_interrupted);
 	void RegenerateHealth(bool inCombat);
 	void RegenerateEnergy();
-	void LooseRage();
+	void LooseRage(int32 value);
 	
     uint32 SoulStone;
 	uint32 SoulStoneReceiver;

@@ -1804,6 +1804,7 @@ void Aura::SpellAuraDummy(bool apply)
 			Spell spell(pCaster, m_spellProto, true, NULL);
 			spell.SetUnitTarget( m_target );
 			spell.Heal( mod->m_amount );
+			pCaster->RemoveAllAuras(pSpellId,0);
 			//pCaster->Heal( m_target, m_spellProto->Id, mod->m_amount );
 		}break;
 
@@ -2124,7 +2125,12 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 	int add = ( bonus + amount > 0 ) ? bonus + amount : 0;
 	if( c != NULL )
+	{
 		add += float2int32( add * ( m_target->HealTakenPctMod[m_spellProto->School]+ c->HealDonePctMod[GetSpellProto()->School] / 100.0f));
+		if (m_spellProto->SpellGroupType)
+			c->SM_PIValue(c->SM_PDOT,&add,m_spellProto->SpellGroupType);
+	}
+
 	
 	uint32 newHealth = m_target->GetUInt32Value( UNIT_FIELD_HEALTH ) + (uint32)add;
 	
@@ -5029,7 +5035,7 @@ void Aura::SpellAuraModPowerRegen(bool apply)
 		else
 			SetNegative();
 	}	
-	if (m_target->IsPlayer())
+	if (m_target->IsPlayer() && mod->m_miscValue == POWER_TYPE_MANA)
 	{
 		int32 val = (apply) ? mod->m_amount: -mod->m_amount;
 		static_cast< Player* >( m_target )->m_ModInterrMRegen +=val;
