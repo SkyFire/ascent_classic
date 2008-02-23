@@ -318,27 +318,26 @@ void EyeOfTheStorm::UpdateCPs()
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_NEUTRAL )
 					RespawnCPFlag(i, EOTS_BANNER_NEUTRAL);
 			}
+		}
 
-			/* update the players with the new value */
-			eitr = disp->begin();
-			eitrend = disp->end();
+		/* update the players with the new value */
+		eitr = disp->begin();
+		eitrend = disp->end();
 
-			for( ; eitr != eitrend; )
+		for( ; eitr != eitrend; )
+		{
+			plr = *eitr;
+			eitr2 = eitr;
+			++eitr;
+
+			if( plr->GetDistance2dSq( go ) > EOTS_CAPTURE_DISTANCE )
 			{
-				plr = *eitr;
-				eitr2 = eitr;
-				++eitr;
-
-				if( plr->GetDistance2dSq( go ) > EOTS_CAPTURE_DISTANCE )
-				{
-					disp->erase( eitr2 );
-					plr->SendWorldStateUpdate(EOTS_WORLDSTATE_DISPLAYON, 0);			// hide the cp bar
-				}
-				else
-					plr->SendWorldStateUpdate(EOTS_WORLDSTATE_DISPLAYVALUE, m_CPStatus[i]);
+				disp->erase( eitr2 );
+				plr->SendWorldStateUpdate(EOTS_WORLDSTATE_DISPLAYON, 0);			// hide the cp bar
 			}
-
-
+			else
+				plr->SendWorldStateUpdate(EOTS_WORLDSTATE_DISPLAYVALUE, m_CPStatus[i]);
+		}
 	}
 }
 
