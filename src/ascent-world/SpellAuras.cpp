@@ -2128,7 +2128,7 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	{
 		add += float2int32( add * ( m_target->HealTakenPctMod[m_spellProto->School]+ c->HealDonePctMod[GetSpellProto()->School] / 100.0f));
 		if (m_spellProto->SpellGroupType)
-			c->SM_PIValue(c->SM_PDOT,&add,m_spellProto->SpellGroupType);
+			SM_PIValue(c->SM_PDOT,&add,m_spellProto->SpellGroupType);
 	}
 
 	
