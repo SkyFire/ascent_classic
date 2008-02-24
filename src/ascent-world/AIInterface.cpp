@@ -689,7 +689,7 @@ void AIInterface::_UpdateTargets()
 		for(i = m_assistTargets.begin(); i != m_assistTargets.end();)
 		{
 			i2 = i++;
-			if( (*i2)->event_GetCurrentInstanceId() != m_Unit->event_GetCurrentInstanceId() ||
+			if((*i2) == NULL || (*i2)->event_GetCurrentInstanceId() != m_Unit->event_GetCurrentInstanceId() ||
 				!(*i2)->isAlive() || m_Unit->GetDistanceSq((*i2)) >= 2500.0f || !(*i2)->CombatStatus.IsInCombat() )
 			{
 				m_assistTargets.erase( i2 );
