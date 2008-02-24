@@ -4935,7 +4935,7 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 	for (uint32 x =0;x<3;x++)
 		if(m_spellInfo->Effect[x] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
 		{
-			add_damage = damage * (m_spellInfo->EffectBasePoints[x]+1);
+			add_damage = damage * (m_spellInfo->EffectBasePoints[x]+1) /100;
 			return;
 		}
 

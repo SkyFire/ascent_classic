@@ -1,0 +1,1 @@
+alter table quests add column RequiredTradeskillValue int(5) unsigned default 0 not null after RequiredTradeskill
