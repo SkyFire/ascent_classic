@@ -5109,31 +5109,42 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[0] = 64;
 		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[1] = 64;
+		
 	}
 	sp = dbcSpell.LookupEntryForced( 17955 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[0] = 64;
 		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[1] = 64;
 	}
 	sp = dbcSpell.LookupEntryForced( 17956 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[0] = 64;
 		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[1] = 64;
 	}
 	sp = dbcSpell.LookupEntryForced( 17957 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[0] = 64;
 		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[1] = 64;
 	}
 	sp = dbcSpell.LookupEntryForced( 17958 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[0] = 64;
 		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
+		sp->EffectSpellGroupRelation_high[1] = 64;
 	}
 
 	//warlock - Shadow and Flame
