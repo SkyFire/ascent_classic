@@ -2320,6 +2320,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==============================Data Sending ProcHandling===================================
 //==========================================================================================
 	SendSpellNonMeleeDamageLog(this, pVictim, spellID, float2int32(res), school, abs_dmg, dmg.resisted_damage, false, 0, critical, IsPlayer());
+	DealDamage( pVictim, float2int32( res ), 2, 0, spellID );
 	
 	if( this->IsUnit() && allowProc && spellInfo->Id != 25501 )
 	{
@@ -2333,7 +2334,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			static_cast< Player* >( this )->m_casted_amount[school] = ( uint32 )res;
 	}
 
-	DealDamage( pVictim, float2int32( res ), 2, 0, spellID );
+	
 
 	if( pVictim->GetCurrentSpell() )
 		pVictim->GetCurrentSpell()->AddTime( school );

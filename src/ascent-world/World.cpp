@@ -4729,31 +4729,36 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 2048;
 		sp->EffectSpellGroupRelation[2] = 2048;
 	}
-
-	//warlock - Intensity
-	sp = dbcSpell.LookupEntryForced( 4224 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spells
-	sp = dbcSpell.LookupEntryForced( 18135 );
-	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spells
-
 	//warlock: Devastation
-	sp = dbcSpell.LookupEntryForced( 18130 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512; //destruction spells
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 |4096;
+	}
 	sp = dbcSpell.LookupEntryForced( 18131 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 |4096;
+	}
 	sp = dbcSpell.LookupEntryForced( 18132 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 |4096;
+	}
 	sp = dbcSpell.LookupEntryForced( 18133 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 |4096;
+	}
 	sp = dbcSpell.LookupEntryForced( 18134 );
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = 4 | 1 | 64 | 256 | 32 | 128 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 |4096;
+	}
 
 	//warlock - Shadow Mastery
 	sp = dbcSpell.LookupEntryForced( 18271 );
@@ -5194,7 +5199,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
 	sp = dbcSpell.LookupEntryForced( 17918 );
 	if( sp != NULL )
@@ -5202,7 +5207,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
 
 	//warlock - Cataclysm 
@@ -5210,9 +5215,9 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096 ;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
 	sp = dbcSpell.LookupEntryForced( 17779 );
 	if( sp != NULL )
@@ -5220,7 +5225,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
 	sp = dbcSpell.LookupEntryForced( 17780 );
 	if( sp != NULL )
@@ -5228,7 +5233,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
 	sp = dbcSpell.LookupEntryForced( 17781 );
 	if( sp != NULL )
@@ -5236,7 +5241,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
 	sp = dbcSpell.LookupEntryForced( 17782 );
 	if( sp != NULL )
@@ -5244,7 +5249,7 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
 
 	//warlock - Intensity 
@@ -5252,13 +5257,13 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096 ;
 	}
 	sp = dbcSpell.LookupEntryForced( 18136 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096 ;
 	}
 
 	//warlock - Suppression
