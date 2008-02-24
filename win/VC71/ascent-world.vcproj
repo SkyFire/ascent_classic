@@ -380,6 +380,12 @@
 			RelativePath="..\..\src\ascent-world\EventMgr.h">
 		</File>
 		<File
+			RelativePath="..\..\src\ascent-world\EyeOfTheStorm.cpp">
+		</File>
+		<File
+			RelativePath="..\..\src\ascent-world\EyeOfTheStorm.h">
+		</File>
+		<File
 			RelativePath="..\..\src\ascent-world\faction.cpp">
 		</File>
 		<File
