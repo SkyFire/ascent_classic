@@ -4468,7 +4468,9 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 	case SPELL_HASH_ENSLAVE_DEMON:			// Enslave Demon
 		grp = 22;
 		break;
-
+	case SPELL_HASH_SLEEP:					// Sleep
+		grp = 23;
+		break;
 	}
 	uint32 ret;
 	if( pve )
