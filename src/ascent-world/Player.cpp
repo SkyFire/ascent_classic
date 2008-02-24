@@ -8542,6 +8542,7 @@ void Player::CalcDamage()
 /////////////////MAIN HAND
 		float ap_bonus = GetAP()/14000.0f;
 		delta = (float)GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS ) - (float)GetUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_NEG );
+
 		if(IsInFeralForm())
 		{
 			uint32 lev = getLevel();
@@ -8700,13 +8701,16 @@ void Player::CalcDamage()
 		SetUInt32Value( PLAYER_RATING_MODIFIER_RANGED_SKILL, cr );
 
 /////////////////////////////////RANGED end
-		tmp = 1;
-		for(i = damagedone.begin();i != damagedone.end();i++)
-		if(i->second.wclass==(uint32)-1)  //any weapon
-			tmp += i->second.value/100.0f;
+		// REMOVED BY SUPALOSA - broke a LOT of spells :x who did this?
+		//tmp = 1;
+		//for(i = damagedone.begin();i != damagedone.end();i++)
+		//if(i->second.wclass==(uint32)-1)  //any weapon
+		//	tmp += i->second.value/100.0f;
 		
 		//display only modifiers for any weapon
-		SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT ,tmp);
+
+		// OMG?
+		//SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT ,tmp); // wtf?
  
 }
 

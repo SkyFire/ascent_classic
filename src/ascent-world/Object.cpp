@@ -1178,7 +1178,7 @@ void Object::SetFloatValue( const uint32 index, const float value )
 		return;
 
 	m_floatValues[ index ] = value;
-
+	
 	if(IsInWorld())
 	{
 		m_updateMask.SetBit( index );
