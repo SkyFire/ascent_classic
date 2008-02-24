@@ -5173,7 +5173,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096 ;
 	}
 
 	//warlock - destructive reach 
@@ -5242,16 +5242,12 @@ bool World::SetInitialWorldSettings()
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
-		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
 	}
 	sp = dbcSpell.LookupEntryForced( 18136 );
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
-		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[1] = 128 | 4096 ;
 	}
 
 	//warlock - Suppression

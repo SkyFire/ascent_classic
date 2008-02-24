@@ -1694,7 +1694,6 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket &recvPacket)
 
 	//WorldPacket data;
 
-	bool result;
 	SlotResult slotresult;
 	int8 SrcInvSlot, SrcSlot;//, error=0;
 
@@ -1725,7 +1724,7 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket &recvPacket)
         eitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInvSlot,SrcSlot, false);
 		if(!_player->GetItemInterface()->SafeAddItem(eitem, slotresult.ContainerSlot, slotresult.Slot))
 		{
-			sLog.outDebug("[ERROR]AutoBankItem: Error while adding item to bank bag!\n")
+			sLog.outDebug("[ERROR]AutoBankItem: Error while adding item to bank bag!\n");
             _player->GetItemInterface()->SafeAddItem(eitem, SrcInvSlot, SrcSlot);
 		}
 	}
@@ -1739,7 +1738,6 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket &recvPacket)
 
 	//WorldPacket data;
 
-	bool result;
 	int8 SrcInvSlot, SrcSlot;//, error=0, slot=-1, specialbagslot=-1;
 
 	if(!GetPlayer())
