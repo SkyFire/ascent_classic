@@ -1814,9 +1814,11 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 			else
 				gp = dbcGemProperty.LookupEntry(ip->GemProperties);
 	
-			if(gp)
+			if(!gp)
+				continue;
+
 			if(!(gp->SocketMask & TargetItem->GetProto()->Sockets[i].SocketColor))
-				ColorMatch=false;
+					ColorMatch=false;
 		}
 
 		if(gemguid)//add or replace gem
@@ -1836,14 +1838,17 @@ void WorldSession::HandleInsertGemOpcode(WorldPacket &recvPacket)
 			if(!gp->EnchantmentID)//this is ok in few cases
 				continue;
 				  
-			if(EI)//replace gem
-				TargetItem->RemoveEnchantment(2+i);//remove previous
-			else//add gem
-				FilledSlots++;
+			if (ColorMatch)
+			{
+				if(EI)//replace gem
+					TargetItem->RemoveEnchantment(2+i);//remove previous
+				else//add gem
+					FilledSlots++;
 
-			Enchantment = dbcEnchant.LookupEntry(gp->EnchantmentID);
-			if(Enchantment)
-				TargetItem->AddEnchantment(Enchantment, 0, true,apply,false,2+i);
+				Enchantment = dbcEnchant.LookupEntry(gp->EnchantmentID);
+				if(Enchantment)
+					TargetItem->AddEnchantment(Enchantment, 0, true,apply,false,2+i);
+			}
 		}
 	}
 
