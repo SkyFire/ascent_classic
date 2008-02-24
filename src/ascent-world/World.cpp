@@ -6568,6 +6568,16 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 33554432;
 	sp->EffectSpellGroupRelation[0] = 33554432;
 	}
+	//watrior - Improved Thudner Clap
+	sp = dbcSpell.LookupEntryForced( 12287 );
+	if ( sp != NULL )
+		sp->EffectSpellGroupRelation[1] = 128;
+	sp = dbcSpell.LookupEntryForced( 12665 );
+	if ( sp != NULL )
+		sp->EffectSpellGroupRelation[1] = 128;	
+	sp = dbcSpell.LookupEntryForced( 12666 );
+	if ( sp != NULL )
+		sp->EffectSpellGroupRelation[1] = 128;
 	//warrior - Tactical Mastery
 	sp = dbcSpell.LookupEntryForced( 12677 );
 	if ( sp != NULL )

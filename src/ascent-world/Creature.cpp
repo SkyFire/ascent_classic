@@ -574,9 +574,7 @@ void Creature::ClearInRangeSet()
 void Creature::CalcResistance(uint32 type)
 {
 	int32 res = (BaseResistance[type] * (100 + BaseResistanceModPct[type])) / 100;
-	if(res < 0) res = 0;
 	res += FlatResistanceMod[type];
-	if(res < 0) res = 0;
 	res += (res * ResistanceModPct[type]) / 100;
 	if(type==0)res+=GetUInt32Value(UNIT_FIELD_STAT1)*2;//fix armor from agi
 	SetUInt32Value(UNIT_FIELD_RESISTANCES + type, res > 0 ? res : 0);

@@ -1722,19 +1722,11 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket &recvPacket)
 	}
 	else
 	{
-		if(slotresult.ContainerSlot == INVENTORY_SLOT_NOT_SET)
+        eitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInvSlot,SrcSlot, false);
+		if(!_player->GetItemInterface()->SafeAddItem(eitem, slotresult.ContainerSlot, slotresult.Slot))
 		{
-			_player->GetItemInterface()->SwapItemSlots(SrcSlot, slotresult.Slot);
-		}
-		else
-		{
-			eitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInvSlot,SrcSlot, false);
-			result = _player->GetItemInterface()->SafeAddItem(eitem, slotresult.ContainerSlot, slotresult.Slot);
-			if(!result)
-			{
-				printf("Auto Bank Item: Error while adding item to one of the bank bags!\n");
-				_player->GetItemInterface()->SafeAddItem(eitem, SrcInvSlot, SrcSlot);
-			}
+			sLog.outDebug("[ERROR]AutoBankItem: Error while adding item to bank bag!\n")
+            _player->GetItemInterface()->SafeAddItem(eitem, SrcInvSlot, SrcSlot);
 		}
 	}
 }
@@ -1774,14 +1766,11 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket &recvPacket)
 	}
 	else
 	{
-		if( slotresult.ContainerSlot == INVENTORY_SLOT_NOT_SET )
+        eitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInvSlot, SrcSlot, false);
+		if (!_player->GetItemInterface()->AddItemToFreeSlot(eitem))
 		{
-			_player->GetItemInterface()->SwapItemSlots(SrcSlot, slotresult.Slot);
-		}
-		else
-		{
-			eitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInvSlot, SrcSlot, false);
-			result = _player->GetItemInterface()->AddItemToFreeSlot(eitem);
+			sLog.outDebug("[ERROR]AutoStoreBankItem: Error while adding item from one of the bank bags to the player bag!\n");
+            _player->GetItemInterface()->SafeAddItem(eitem, SrcInvSlot, SrcSlot);
 		}
 	}
 }
