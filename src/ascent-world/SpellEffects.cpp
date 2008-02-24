@@ -3184,8 +3184,8 @@ void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
 	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
-	//Hackfix for Mangle and Hemorrhage
-	if( (m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ || m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE) && u_caster->IsPlayer() )
+	//Hackfix for Mangle
+	if( m_spellInfo->NameHash == SPELL_HASH_MANGLE__CAT_ && u_caster->IsPlayer() )
 		static_cast< Player* >( u_caster )->AddComboPoints( unitTarget->GetGUID(), 1 );
 
 	// Hacky fix for druid spells where it would "double attack".
@@ -4896,24 +4896,6 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
-	// fix double attack on backstab etc.
-	/*if(m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
-	{
-		// rogue ambush etc
-		add_damage = damage * (m_spellInfo->EffectBasePoints[1]+1);
-		if(!add_damage)
-			add_damage = damage * 1.5;
-		return;
-	}
-	else if(m_spellInfo->Effect[2] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
-	{
-		add_damage = damage * (m_spellInfo->EffectBasePoints[2]+1);
-
-		if(!add_damage)
-			add_damage = damage * 1.5;
-
-		return;
-	}		*/
 	if( m_spellInfo->NameHash == SPELL_HASH_OVERPOWER && p_caster != NULL ) //warrior : overpower - let us clear the event and the combopoint count
 	{
 		p_caster->NullComboPoints(); //some say that we should only remove 1 point per dodge. Due to cooldown you can't cast it twice anyway..
@@ -4945,15 +4927,17 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		damage = damage*sunder_count;
 	}
 
-	if( m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE || m_spellInfo->Effect[1] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
-	{
-		add_damage = (uint32)(damage * 1.5);
-		return;
-	}
-
-	//hemorage
+	//Hemorrhage
 	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
 		p_caster->AddComboPoints(p_caster->GetSelection(), 1);
+
+	// rogue ambush etc
+	for (uint32 x =0;x<3;x++)
+		if(m_spellInfo->Effect[x] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE)
+		{
+			add_damage = damage * (m_spellInfo->EffectBasePoints[x]+1);
+			return;
+		}
 
 	//rogue - mutilate ads dmg if target is poisoned
 	if(	m_spellInfo->NameHash == SPELL_HASH_MUTILATE && unitTarget->IsPoisoned() )

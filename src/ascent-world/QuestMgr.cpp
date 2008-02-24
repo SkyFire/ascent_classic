@@ -61,6 +61,14 @@ uint32 QuestMgr::PlayerMeetsReqs(Player* plr, Quest* qst, bool skiplevelcheck)
 		if(!(qst->required_class & plr->getClassMask()))
 			return QMGR_QUEST_NOT_AVAILABLE;
 
+	if(qst->required_tradeskill)
+	{
+		if(!plr->_HasSkillLine(qst->required_tradeskill))
+			return QMGR_QUEST_NOT_AVAILABLE;
+		if (qst->required_tradeskill_value && plr->_GetSkillLineCurrent(qst->required_tradeskill) < qst->required_tradeskill_value)
+			return QMGR_QUEST_NOT_AVAILABLE;
+	}
+
 	// Check reputation
 	if(qst->required_rep_faction && qst->required_rep_value)
 		if(plr->GetStanding(qst->required_rep_faction) < (int32)qst->required_rep_value)

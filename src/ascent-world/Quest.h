@@ -122,6 +122,7 @@ struct Quest
 	uint32 required_races;
 	uint32 required_class;
 	uint32 required_tradeskill;
+	uint32 required_tradeskill_value;
 	uint32 required_rep_faction;
 	uint32 required_rep_value;
 
