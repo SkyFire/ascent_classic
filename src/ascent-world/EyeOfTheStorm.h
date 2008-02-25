@@ -58,6 +58,7 @@ public:
 	bool HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * pSpell);
 	void DropFlag(Player * plr);
 	void EventResetFlag();
+	void RepopPlayersOfTeam(int32 team, Creature * sh);
 
 protected:
 	int32 m_CPStatus[EOTS_TOWER_COUNT];		

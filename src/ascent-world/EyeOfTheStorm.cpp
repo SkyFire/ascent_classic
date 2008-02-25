@@ -105,9 +105,51 @@ EyeOfTheStorm::~EyeOfTheStorm()
 
 }
 
+void EyeOfTheStorm::RepopPlayersOfTeam(int32 team, Creature * sh)
+{
+	map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find(sh);
+	if( itr != m_resurrectMap.end() )
+	{
+		for( set<uint32>::iterator it2 = itr->second.begin(); it2 != itr->second.end(); ++it2 )
+		{
+			Player* r_plr = m_mapMgr->GetPlayer( *it2 );
+			if( r_plr != NULL && (team < 0 || r_plr->GetTeam() == team) && r_plr->isDead() )
+				HookHandleRepop( r_plr );
+		}
+	}
+}
+
 bool EyeOfTheStorm::HookHandleRepop(Player * plr)
 {
-	return false;
+	uint32 i;
+	uint32 sval;
+	uint32 t = plr->GetTeam();
+	float dist = 999999.0f;
+	float distcur;
+	LocationVector dest;
+
+	if(plr->GetTeam() == 0)
+		sval = 100;
+	else
+		sval = 0;
+
+	dest.ChangeCoords( EOTSStartLocations[t][0], EOTSStartLocations[t][1], EOTSStartLocations[t][2], 0 );
+
+	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
+	{
+		if( m_CPStatus[i] == sval )
+		{
+			distcur = plr->GetPositionNC().Distance2DSq( EOTSGraveyardLocations[i][0], EOTSGraveyardLocations[i][1] );
+			if( distcur < dist )
+			{
+				dist = distcur;
+				dest.ChangeCoords( EOTSGraveyardLocations[i][0], EOTSGraveyardLocations[i][1], EOTSGraveyardLocations[i][2], 0 );
+			}
+		}
+	}
+
+	plr->SafeTeleport(plr->GetMapId(), plr->GetInstanceID(), dest);
+	return true;
 }
 
 void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
@@ -128,7 +170,7 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 		break;
 
 	case 4516:			// Mage Tower
-		tid = EOTS_TOWER_DRAENEI;
+		tid = EOTS_TOWER_MAGE;
 		break;
 	}
 
@@ -146,6 +188,9 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 		val = 100;
 	else
 		val = 0;
+
+	if( m_CPStatus[tid] != val )
+		return;			// not captured by our team
 
 	for(i = 0; i < EOTS_TOWER_COUNT; ++i)
 	{
@@ -357,6 +402,9 @@ void EyeOfTheStorm::OnCreate()
 		m_bubbles[i] = m_mapMgr->CreateGameObject();
 		if( !m_bubbles[i]->CreateFromProto( 184719, m_mapMgr->GetMapId(), EOTSBubbleLocations[i][0], EOTSBubbleLocations[i][1], EOTSBubbleLocations[i][2], EOTSBubbleLocations[i][3] ) )
 		{
+			m_bubbles[i]->SetFloatValue(OBJECT_FIELD_SCALE_X,0.1f);
+			m_bubbles[i]->SetUInt32Value(GAMEOBJECT_STATE,1);
+			m_bubbles[i]->SetUInt32Value(GAMEOBJECT_FLAGS,32);
 			Log.LargeErrorMessage(LARGERRORMESSAGE_ERROR, "EOTS is being created and you are missing gameobjects. Terminating.");
 			abort();
 			return;
@@ -425,7 +473,7 @@ void EyeOfTheStorm::UpdateCPs()
 		}
 
 		/* score diff calculation */
-		printf("EOTS: Playercounts = %u %u\n", playercounts[0], playercounts[1]);
+		//printf("EOTS: Playercounts = %u %u\n", playercounts[0], playercounts[1]);
 		if(playercounts[0] != playercounts[1])
 		{
 			if(playercounts[0] > playercounts[1])
@@ -444,17 +492,50 @@ void EyeOfTheStorm::UpdateCPs()
 			if( m_CPStatus[i] == 0 )
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_HORDE )
+				{
 					RespawnCPFlag(i, EOTS_BANNER_HORDE);
+					if( m_spiritGuides[i] != NULL )
+					{
+						RepopPlayersOfTeam( 0, m_spiritGuides[i] );
+						m_spiritGuides[i]->Despawn( 0, 0 );
+						RemoveSpiritGuide( m_spiritGuides[i] );
+						m_spiritGuides[i] = NULL;
+					}
+
+					m_spiritGuides[i] = SpawnSpiritGuide( EOTSGraveyardLocations[i][0], EOTSGraveyardLocations[i][1], EOTSGraveyardLocations[i][2], 0, 1 );
+					AddSpiritGuide( m_spiritGuides[i] );
+				}
 			}
 			else if( m_CPStatus[i] == 100 )
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_ALLIANCE )
+				{
 					RespawnCPFlag(i, EOTS_BANNER_ALLIANCE);
+					if( m_spiritGuides[i] != NULL )
+					{
+						RepopPlayersOfTeam( 1, m_spiritGuides[i] );
+						m_spiritGuides[i]->Despawn( 0, 0 );
+						RemoveSpiritGuide( m_spiritGuides[i] );
+						m_spiritGuides[i] = NULL;
+					}
+
+					m_spiritGuides[i] = SpawnSpiritGuide( EOTSGraveyardLocations[i][0], EOTSGraveyardLocations[i][1], EOTSGraveyardLocations[i][2], 0, 0 );
+					AddSpiritGuide( m_spiritGuides[i] );
+				}
 			}
 			else
 			{
 				if( m_CPBanner[i]->GetEntry() != EOTS_BANNER_NEUTRAL )
+				{
 					RespawnCPFlag(i, EOTS_BANNER_NEUTRAL);
+					if( m_spiritGuides[i] != NULL )
+					{
+						RepopPlayersOfTeam( -1, m_spiritGuides[i] );
+						m_spiritGuides[i]->Despawn( 0, 0 );
+						RemoveSpiritGuide( m_spiritGuides[i] );
+						m_spiritGuides[i] = NULL;
+					}
+				}
 			}
 		}
 
@@ -530,13 +611,38 @@ void EyeOfTheStorm::GeneratePoints()
 
 bool EyeOfTheStorm::GivePoints(uint32 team, uint32 points)
 {
-	printf("EOTS: Give team %u %u points.\n", team, points);
+	//printf("EOTS: Give team %u %u points.\n", team, points);
 
 	m_points[team] += points;
 	if( m_points[team] >= 2000 )
 	{
 		m_points[team] = 2000;
 		SetWorldState( EOTS_WORLDSTATE_ALLIANCE_VICTORYPOINTS + team, m_points[team] );
+
+		m_ended = true;
+		m_winningteam = team;
+		m_nextPvPUpdateTime = 0;
+
+		sEventMgr.RemoveEvents(this);
+		sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
+
+		/* add the marks of honor to all players */
+		m_mainLock.Acquire();
+
+		SpellEntry * winner_spell = dbcSpell.LookupEntry(24953);
+		SpellEntry * loser_spell = dbcSpell.LookupEntry(24952);
+		for(uint32 i = 0; i < 2; ++i)
+		{
+			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+			{
+				(*itr)->Root();
+				if(i == m_winningteam)
+					(*itr)->CastSpell((*itr), winner_spell, true);
+				else
+					(*itr)->CastSpell((*itr), loser_spell, true);
+			}
+		}
+		m_mainLock.Release();
 		return true;
 	}
 
@@ -575,6 +681,10 @@ void EyeOfTheStorm::OnStart()
 	/* start the events */
 	sEventMgr.AddEvent(this, &EyeOfTheStorm::GeneratePoints, EVENT_EOTS_GIVE_POINTS, 2000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	sEventMgr.AddEvent(this, &EyeOfTheStorm::UpdateCPs, EVENT_EOTS_CHECK_CAPTURE_POINT_STATUS, 5000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+
+	/* spirit guides */
+	AddSpiritGuide(SpawnSpiritGuide( EOTSStartLocations[0][0], EOTSStartLocations[0][1], EOTSStartLocations[0][2], 0, 0 ));
+	AddSpiritGuide(SpawnSpiritGuide( EOTSStartLocations[1][0], EOTSStartLocations[1][1], EOTSStartLocations[1][2], 0, 1 ));
 
 	/* remove the bubbles */
 	for( i = 0; i < 2; ++i )
