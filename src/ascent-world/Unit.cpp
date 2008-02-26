@@ -3086,7 +3086,7 @@ else
 	//--------------------------rage processing-------------------------------------------------
 	//http://www.wowwiki.com/Formulas:Rage_generation
 
-	if( dmg.full_damage && IsPlayer() && GetPowerType() == POWER_TYPE_RAGE && !ability && CombatStatus.IsInCombat() )
+	if( dmg.full_damage && IsPlayer() && GetPowerType() == POWER_TYPE_RAGE && !ability)
 	{
 		float val;
 		float level = (float)getLevel();

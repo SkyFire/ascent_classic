@@ -276,19 +276,19 @@ void Spell::SpellTargetDefault(uint32 i, uint32 j)
 void Spell::SpellTargetSelf(uint32 i, uint32 j)
 {
 	TargetsList *tmpMap=&m_targetUnits[i];
-	if(p_caster)
-	{
-		if(m_spellInfo->RequiredShapeShift && (p_caster->getClass()==DRUID || p_caster->getClass()==WARRIOR))
-		{
-			if(m_spellInfo->Effect[i] != SPELL_EFFECT_LEARN_SPELL)//in talents
-			{	
-				if(!p_caster->GetShapeShift())
-					return;
-				if(!((((uint32)1)<< (p_caster->GetShapeShift()-1)) & m_spellInfo->RequiredShapeShift))
-					return;
-			}
-		}
-	}
+	//if(p_caster)
+	//{
+	//	if(m_spellInfo->RequiredShapeShift && (p_caster->getClass()==DRUID || p_caster->getClass()==WARRIOR))
+	//	{
+	//		if(m_spellInfo->Effect[i] != SPELL_EFFECT_LEARN_SPELL)//in talents
+	//		{	
+	//			if(!p_caster->GetShapeShift())
+	//				return;
+	//			if(!((((uint32)1)<< (p_caster->GetShapeShift()-1)) & m_spellInfo->RequiredShapeShift))
+	//				return;
+	//		}
+	//	}
+	//}
 	SafeAddTarget(tmpMap,m_caster->GetGUID());
 }
 void Spell::SpellTargetInvisibleAOE(uint32 i, uint32 j)

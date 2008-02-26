@@ -1020,6 +1020,7 @@ void Player::_EventAttack( bool offhand )
 		if (!GetOnMeleeSpell() || offhand)
 		{
 			Strike( pVictim, ( offhand ? OFFHAND : MELEE ), NULL, 0, 0, 0, false, false );
+				
 		} 
 		else 
 		{ 
@@ -7197,8 +7198,6 @@ void Player::RequestDuel(Player *pTarget)
 	data << pGameObj->GetGUID();
 	data << GetGUID();
 	pTarget->GetSession()->SendPacket(&data);
-
-	m_duelCountdownTimer = 3000;
 }
 
 void Player::DuelCountdown()
