@@ -59,6 +59,8 @@ ascent_world_SOURCES = \
     DynamicObject.cpp \
     DynamicObject.h \
     EventableObject.cpp \
+    EyeOfTheStorm.cpp \
+    EyeOfTheStorm.h \
     EventableObject.h \
     EventMgr.cpp \
     EventMgr.h \
@@ -200,4 +202,3 @@ ascent_world_LDFLAGS = -L$(srcdir)/../ascent-shared \
                -L$(srcdir)/../../dep/src \
                -L$(srcdir)/../../extras/collision/collision_dll \
                @LIB_EXPORT@
-               
