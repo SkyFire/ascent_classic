@@ -114,6 +114,16 @@ RegType<Unit> UnitMethods[] = {
 	{ "SetFaction", &luaUnit_SetFaction },
 	{ "SetStandState",&luaUnit_SetStandState },
 	{ "Teleport" , &luaUnit_TeleportUnit },
+	{ "GetPlayerClass", &luaUnit_GetPlayerClass },
+	{ "ClearThreatList", &luaUnit_ClearHateList },
+	{ "WipeThreatList", &luaUnit_WipeHateList },
+	{ "WipeTargetList", &luaUnit_WipeTargetList },
+	{ "WipeCurrentTarget", &luaUnit_WipeCurrentTarget },
+	{ "GetHealth", &luaUnit_GetHealth },
+	{ "GetMaxHealth", &luaUnit_GetMaxHealth },
+	{ "SetHealth", &luaUnit_SetHealth },
+	{ "SetMaxHealth", &luaUnit_SetMaxHealth },
+	{ "SetFieldFLags", &luaUnit_SetFIELDFLags },
 	{ NULL, NULL },
 };
 
@@ -2014,3 +2024,89 @@ int luaGameObject_Teleport(lua_State * L, GameObject * ptr)
 	return 0;
 }
 
+int luaUnit_GetHealth(lua_State * L, Unit * ptr)
+{
+	if( ptr == NULL )
+		lua_pushinteger( L, 0 );
+	else
+		lua_pushinteger( L, ptr->GetUInt32Value( UNIT_FIELD_HEALTH ) );
+
+	return 1;
+}
+
+int luaUnit_GetMaxHealth(lua_State * L, Unit * ptr)
+{
+	if( ptr == NULL )
+		lua_pushinteger( L, 0 );
+	else
+		lua_pushinteger( L, ptr->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) );
+
+	return 1;
+}
+
+int luaUnit_SetHealth(lua_State * L, Unit * ptr)
+{
+	int val = luaL_checkint( L, 1 );
+	if( ptr != NULL && val > 0 )
+		if( (uint32)val > ptr->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) )
+			ptr->SetUInt32Value( UNIT_FIELD_HEALTH, ptr->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) );
+		else
+			ptr->SetUInt32Value( UNIT_FIELD_HEALTH, val );
+	return 1;
+}
+
+int luaUnit_SetMaxHealth(lua_State * L, Unit * ptr)
+{
+	int val = luaL_checkint( L, 1 );
+	if( ptr != NULL && val > 0 )
+		if( (uint32)val < ptr->GetUInt32Value( UNIT_FIELD_HEALTH ) )
+			ptr->SetUInt32Value( UNIT_FIELD_HEALTH, val );
+		ptr->SetUInt32Value( UNIT_FIELD_MAXHEALTH, val );
+	return 1;
+}
+
+int luaUnit_WipeHateList(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID_RET_INT(TYPEID_UNIT);
+	ptr->WipeHateList();
+	return 1;
+}
+
+int luaUnit_WipeTargetList(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID_RET_INT(TYPEID_UNIT);
+	ptr->GetAIInterface()->WipeTargetList();
+	return 1;
+}
+
+int luaUnit_WipeCurrentTarget(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID_RET_INT(TYPEID_UNIT);
+	ptr->GetAIInterface()->WipeCurrentTarget();
+	return 1;
+}
+
+int luaUnit_GetPlayerClass(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID_RET( TYPEID_PLAYER );
+	lua_pushinteger( L, static_cast< Player* >( ptr )->getClass() );
+	return 1;
+}
+
+
+int luaUnit_ClearHateList(lua_State * L, Unit * ptr)
+{
+ 	CHECK_TYPEID_RET_INT(TYPEID_UNIT);
+ 	ptr->ClearHateList();
+ 	return 1;
+}
+
+int luaUnit_SetFieldFlags(lua_State * L, Unit * ptr)
+{
+	CHECK_TYPEID(TYPEID_UNIT);
+	int flags = luaL_checkint( L, 1 );
+	if(!flags)
+		return 0;
+	ptr->SetUInt32Value(UNIT_FIELD_FLAGS, flags);
+	return 0;
+}

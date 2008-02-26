@@ -70,6 +70,17 @@ int luaUnit_SetFaction(lua_State * L, Unit * ptr);
 int luaUnit_SetStandState(lua_State * L, Unit * ptr);
 int luaUnit_TeleportUnit(lua_State * L, Unit * ptr);
 
+int luaUnit_GetPlayerClass(lua_State * L, Unit * ptr);
+int luaUnit_ClearHateList(lua_State * L, Unit * ptr);
+int luaUnit_WipeHateList(lua_State * L, Unit * ptr);
+int luaUnit_WipeTargetList(lua_State * L, Unit * ptr);
+int luaUnit_WipeCurrentTarget(lua_State * L, Unit * ptr);
+int luaUnit_GetHealth(lua_State * L, Unit * ptr);
+int luaUnit_GetMaxHealth(lua_State * L, Unit * ptr);
+int luaUnit_SetHealth(lua_State * L, Unit * ptr);
+int luaUnit_SetMaxHealth(lua_State * L, Unit * ptr);
+int luaUnit_SetFieldFLags(lua_State * L, Unit * ptr);
+
 int luaGameObject_GetName(lua_State * L, GameObject * ptr);
 int luaGameObject_Teleport(lua_State * L, GameObject * ptr);
 int luaGameObject_SpawnCreature(lua_State * L, GameObject * ptr);
