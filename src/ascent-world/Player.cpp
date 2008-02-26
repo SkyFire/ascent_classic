@@ -8687,16 +8687,17 @@ void Player::CalcDamage()
 		SetUInt32Value( PLAYER_RATING_MODIFIER_RANGED_SKILL, cr );
 
 /////////////////////////////////RANGED end
-		// REMOVED BY SUPALOSA - broke a LOT of spells :x who did this?
+
 		//tmp = 1;
-		//for(i = damagedone.begin();i != damagedone.end();i++)
-		//if(i->second.wclass==(uint32)-1)  //any weapon
-		//	tmp += i->second.value/100.0f;
+		tmp = 0;
+		for(i = damagedone.begin();i != damagedone.end();i++)
+		if(i->second.wclass==(uint32)-1)  //any weapon
+			tmp += i->second.value/100.0f;
 		
 		//display only modifiers for any weapon
 
 		// OMG?
-		//SetFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT ,tmp); // wtf?
+		ModFloatValue(PLAYER_FIELD_MOD_DAMAGE_DONE_PCT ,tmp);
  
 }
 

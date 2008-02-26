@@ -613,6 +613,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 			uint32 proc_Chance = itr2->procChance;
 			SpellEntry* spe  = dbcSpell.LookupEntry( spellId );
 
+			// feral = no procs (need a better way to do this)
+			/*if( this->IsPlayer() && static_cast<Player*>(this)->GetShapeShift() )
+			{
+				if( spe->NameHash == SPELL_HASH_LIGHTNING_SPEED ) // mongoose
+					continue;
+				else if( spe->NameHash == SPELL_HASH_HOLY_STRENGTH ) //crusader
+					continue;
+			}*/
 			//Custom procchance modifications based on equipped weapon speed.
 			if( this->IsPlayer() && spe != NULL && (
 				spe->NameHash == SPELL_HASH_MAGTHERIDON_MELEE_TRINKET || 

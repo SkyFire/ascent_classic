@@ -280,7 +280,7 @@ public:
 	ASCENT_INLINE bool IsFull() { return !(HasFreeSlots(0) || HasFreeSlots(1)); }
 
 	/* Are we full? */
-	bool HasFreeSlots(uint32 Team) { m_mainLock.Acquire(); bool res = ((m_players[Team].size() + m_pendPlayers[Team].size()) < m_playerCountPerTeam); m_mainLock.Release(); return res; }
+	bool HasFreeSlots(uint32 Team) {m_mainLock.Acquire(); bool res = ((m_players[Team].size() + m_pendPlayers[Team].size()) < m_playerCountPerTeam); m_mainLock.Release(); return res; }
 
 	/* Add Player */
 	void AddPlayer(Player * plr, uint32 team);
