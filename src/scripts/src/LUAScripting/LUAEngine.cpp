@@ -123,7 +123,7 @@ RegType<Unit> UnitMethods[] = {
 	{ "GetMaxHealth", &luaUnit_GetMaxHealth },
 	{ "SetHealth", &luaUnit_SetHealth },
 	{ "SetMaxHealth", &luaUnit_SetMaxHealth },
-	{ "SetFieldFLags", &luaUnit_SetFIELDFLags },
+	{ "SetFieldFlags", &luaUnit_SetFieldFlags },
 	{ NULL, NULL },
 };
 

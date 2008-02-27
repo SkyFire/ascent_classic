@@ -79,7 +79,7 @@ int luaUnit_GetHealth(lua_State * L, Unit * ptr);
 int luaUnit_GetMaxHealth(lua_State * L, Unit * ptr);
 int luaUnit_SetHealth(lua_State * L, Unit * ptr);
 int luaUnit_SetMaxHealth(lua_State * L, Unit * ptr);
-int luaUnit_SetFieldFLags(lua_State * L, Unit * ptr);
+int luaUnit_SetFieldFlags(lua_State * L, Unit * ptr);
 
 int luaGameObject_GetName(lua_State * L, GameObject * ptr);
 int luaGameObject_Teleport(lua_State * L, GameObject * ptr);
