@@ -4421,9 +4421,9 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		grp = 12;
 		break;
 
-	case SPELL_HASH_FROST_SHOCK:			// Frost Shock
-		grp = 13;
-		break;
+	//case SPELL_HASH_FROST_SHOCK:			// Frost Shock
+		//grp = 13;
+		//break;
 
 	case SPELL_HASH_HIBERNATE:				// Hibernate
 		grp = 14;
@@ -4470,6 +4470,9 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		break;
 	case SPELL_HASH_SLEEP:					// Sleep
 		grp = 23;
+		break;
+	case SPELL_HASH_RIPOSTE:
+		grp = 24;
 		break;
 	}
 	uint32 ret;

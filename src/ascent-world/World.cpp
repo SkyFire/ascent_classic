@@ -5113,43 +5113,38 @@ bool World::SetInitialWorldSettings()
 	sp = dbcSpell.LookupEntryForced( 17954 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[0] = 64;
-		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[1] = 64;
+		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 256 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128;
+		sp->EffectSpellGroupRelation[1] = 4;
 		
 	}
 	sp = dbcSpell.LookupEntryForced( 17955 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[0] = 64;
-		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[1] = 64;
+		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 256 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128;
+		sp->EffectSpellGroupRelation[1] = 4;
 	}
 	sp = dbcSpell.LookupEntryForced( 17956 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[0] = 64;
-		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[1] = 64;
+		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 256 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128;
+		sp->EffectSpellGroupRelation[1] = 4;
 	}
 	sp = dbcSpell.LookupEntryForced( 17957 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[0] = 64;
-		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[1] = 64;
+		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 256 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128;
+		sp->EffectSpellGroupRelation[1] = 4;
 	}
 	sp = dbcSpell.LookupEntryForced( 17958 );
 	if( sp != NULL )
 	{
-		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[0] = 64;
-		sp->EffectSpellGroupRelation[1] = 32 | 64 | 4 | 1048576 | 256 | 512 | 1;
-		sp->EffectSpellGroupRelation_high[1] = 64;
+		sp->EffectSpellGroupRelation[0] = 32 | 64 | 4 | 256 | 512;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128;
+		sp->EffectSpellGroupRelation[1] = 4;
 	}
 
 	//warlock - Shadow and Flame
@@ -5197,7 +5192,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
@@ -5205,7 +5200,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
@@ -5223,7 +5218,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
@@ -5231,7 +5226,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
@@ -5239,7 +5234,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}
@@ -5247,7 +5242,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
-		sp->EffectSpellGroupRelation_high[0] = 128 | 4096 ;
+		sp->EffectSpellGroupRelation_high[0] = 64 | 128 | 4096;
 		sp->EffectSpellGroupRelation[1] = 1 | 4 | 32 | 64 | 128 | 256 | 512 ;
 		sp->EffectSpellGroupRelation_high[1] = 64 | 128 | 4096 ;
 	}

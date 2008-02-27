@@ -5043,6 +5043,12 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 							if( spi && spi->NameHash != SPELL_HASH_SMITE )
 								continue;
 						}
+					case 34936:
+						{
+							SpellEntry *spi = dbcSpell.LookupEntry( skip );
+							if( spi && spi->NameHash != SPELL_HASH_SHADOW_BOLT && spi->NameHash != SPELL_HASH_INCINERATE )
+								continue;
+						}
 				}
 			}
 			a->Remove();
@@ -6235,5 +6241,6 @@ void Unit::ReplaceAIInterface(AIInterface *new_interface)
 	delete m_aiInterface;	//be carefull when you do this. Might screw unit states !
 	m_aiInterface = new_interface; 
 }
+
 
 
