@@ -435,7 +435,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 	if( movement_info.flags & MOVEFLAG_REDIRECTED && !( movement_info.flags & MOVEFLAG_FALLING ) )
 	{
-		_player->blinked = true;
+		//_player->blinked = true; //disabled cause i dont see how moveflag redirected is related to blink since its triggered even without blink
 	}
 	else
 	{

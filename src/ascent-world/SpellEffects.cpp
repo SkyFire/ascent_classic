@@ -2007,6 +2007,7 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 		dest.z = z;
 
 	dest.o = p_caster->GetOrientation();
+	p_caster->blinked = true;
 	p_caster->SafeTeleport( p_caster->GetMapId(), p_caster->GetInstanceID(), dest );
 #endif
 	// just in case
