@@ -57,13 +57,13 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		pGO = _player->GetMapMgr()->GetGameObject((uint32)GetPlayer()->GetLootGUID());
 		if(!pGO)return;
 		pLoot=&pGO->loot;
-	}else if( (GUID_HIPART(_player->GetLootGUID()) == HIGHGUID_ITEM) )
+	}else if( GUID_HIPART(_player->GetLootGUID()) == HIGHGUID_ITEM )
 	{
 		Item *pItem = _player->GetItemInterface()->GetItemByGUID(_player->GetLootGUID());
 		if(!pItem)
 			return;
 		pLoot = pItem->loot;
-	}else if( UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_PLAYER )
+	}else if( GUID_HIPART(GetPlayer()->GetLootGUID()) == HIGHGUID_PLAYER )
 	{
 		Player * pl = _player->GetMapMgr()->GetPlayer((uint32)GetPlayer()->GetLootGUID());
 		if(!pl) return;

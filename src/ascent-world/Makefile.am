@@ -126,8 +126,6 @@ ascent_world_SOURCES = \
     Player.cpp \
     Player.h \
     PlayerPacketWrapper.cpp \
-    Professions.cpp \
-    Professions.h \
     QueryHandler.cpp \
     Quest.cpp \
     Quest.h \

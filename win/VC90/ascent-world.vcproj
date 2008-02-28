@@ -950,14 +950,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\ascent-world\Professions.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\ascent-world\Professions.h"
-			>
-		</File>
-		<File
 			RelativePath="..\..\src\ascent-world\QueryHandler.cpp"
 			>
 		</File>
