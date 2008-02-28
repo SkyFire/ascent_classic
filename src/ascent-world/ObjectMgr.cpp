@@ -2613,3 +2613,27 @@ void ObjectMgr::UpdateArenaTeamRankings()
 	m_arenaTeamLock.Release();
 }
 
+void ObjectMgr::UpdateArenaTeamWeekly()
+{	// reset weekly matches count for all teams and all members
+	m_arenaTeamLock.Acquire();
+	for(uint32 i = 0; i < NUM_ARENA_TEAM_TYPES; ++i)
+	{
+		for(HM_NAMESPACE::hash_map<uint32,ArenaTeam*>::iterator itr = m_arenaTeamMap[i].begin(); itr != m_arenaTeamMap[i].end(); ++itr)
+		{
+			ArenaTeam *team = itr->second;
+			if(team)
+			{
+				team->m_stat_gamesplayedweek = 0;
+				team->m_stat_gameswonweek = 0;
+				for(uint32 j = 0; j < team->m_memberCount; ++j)
+				{
+					team->m_members[j].Played_ThisWeek = 0;
+					team->m_members[j].Won_ThisWeek = 0;
+				}
+				team->SaveToDB();
+			}
+		}
+	}
+	m_arenaTeamLock.Release();
+}
+

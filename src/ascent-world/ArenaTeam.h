@@ -90,6 +90,7 @@ public:
 	bool HasMember(uint32 guid);
 	void SetLeader(PlayerInfo * info);
 	ArenaTeamMember * GetMember(PlayerInfo * info);
+	ArenaTeamMember * GetMemberByGuid(uint32 guid);
 
 	uint32 GetPlayersPerTeam()
 	{

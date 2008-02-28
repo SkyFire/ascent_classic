@@ -505,6 +505,7 @@ public:
 	ArenaTeam * GetArenaTeamById(uint32 id);
 	ArenaTeam * GetArenaTeamByGuid(uint32 guid, uint32 Type);
 	void UpdateArenaTeamRankings();
+	void UpdateArenaTeamWeekly();
 	void LoadArenaTeams();
 	HM_NAMESPACE::hash_map<uint32, ArenaTeam*> m_arenaTeamMap[3];
 	HM_NAMESPACE::hash_map<uint32, ArenaTeam*> m_arenaTeams;

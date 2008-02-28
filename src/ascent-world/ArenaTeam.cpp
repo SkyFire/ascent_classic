@@ -304,6 +304,16 @@ ArenaTeamMember * ArenaTeam::GetMember(PlayerInfo * info)
 	return NULL;
 }
 
+ArenaTeamMember * ArenaTeam::GetMemberByGuid(uint32 guid)
+{
+	for(uint32 i = 0; i < m_memberCount; ++i)
+	{
+		if(m_members[i].Info && m_members[i].Info->guid == guid)
+			return &m_members[i];
+	}
+	return NULL;
+}
+
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recv_data)
 {
 	uint8 slot;

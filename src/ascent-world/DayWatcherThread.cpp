@@ -217,9 +217,9 @@ void DayWatcherThread::update_arena()
 				team = objmgr.GetArenaTeamByGuid(guid, i);
 				if(team)
 				{
-					/* TODO: In the future we might want to do a check that says is the player active in this arena team.
-					 * Private servers are kinda smaller so this probably isn't such a good idea.
-					 * - Burlex */
+					ArenaTeamMember *member = team->GetMemberByGuid(guid);
+					if(member == NULL || team->m_stat_gamesplayedweek < 10 || ((member->Played_ThisWeek * 100) / team->m_stat_gamesplayedweek < 30))
+ 						continue;
 
 					/* we're in an arena team of this type! */
 					/* Source: http://www.wowwiki.com/Arena_point */
@@ -296,6 +296,8 @@ void DayWatcherThread::update_arena()
 		}while(result->NextRow());
 		delete result;
 	}
+
+	objmgr.UpdateArenaTeamWeekly();
 
 	//===========================================================================
 	last_arena_time = UNIXTIME;
