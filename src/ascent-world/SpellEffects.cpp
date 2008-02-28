@@ -565,6 +565,15 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 				unitTarget->SetUInt32Value( UNIT_FIELD_POWER1, unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ) + gain );
 			SendHealManaSpellOnPlayer( p_caster, static_cast< Player* >( unitTarget ), gain, 0 );
 		}break;
+	case 39610://Mana Tide
+		{
+			uint32 gain = (uint32) (unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1)*0.06);
+			uint32 max = unitTarget->GetUInt32Value(UNIT_FIELD_MAXPOWER1);
+			if(unitTarget->GetUInt32Value(UNIT_FIELD_POWER1)+gain>max)
+				unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, max);
+			else
+				unitTarget->SetUInt32Value(UNIT_FIELD_POWER1, unitTarget->GetUInt32Value(UNIT_FIELD_POWER1)+gain);
+		}break;
 	case 4141:// Summon Myzrael
 		{
 			//2755
@@ -4207,15 +4216,15 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 		pTotem->EnableAI();
 		pTotem->GetAIInterface()->Init(pTotem, AITYPE_TOTEM, MOVEMENTTYPE_NONE, p_caster);
 		pTotem->GetAIInterface()->totemspell = TotemSpell;
-		uint32 timer = 2000;	// need a proper resource for this.
+		uint32 timer = 3000;	// need a proper resource for this.
 
 		switch(TotemSpell->Id)
 		{
-		case 8146: //Tremor Totem
 		case 8167: //Poison Cleansing Totem
 		case 8172: //Disease Cleansing Totem
 			timer =  5000;
 			break;
+		case 8146: //Tremor Totem
 		case 8349: //Fire Nova Totem 1
 		case 8502: //Fire Nova Totem 2
 		case 8503: //Fire Nova Totem 3
