@@ -231,14 +231,17 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 		BaseResistanceModPctNeg[x] = 0; 
 		ResistanceModPctPos[x] = 0;
 		ResistanceModPctNeg[x] = 0;
-		SpellDmgDoneByInt[x] = 0;
-		SpellHealDoneByInt[x] = 0;
-		SpellDmgDoneBySpr[x] = 0;
-		SpellHealDoneBySpr[x] = 0;
 		SpellDelayResist[x] = 0;
 		m_casted_amount[x] = 0;
 	} 
 		
+	for(uint32 a = 0; a < 6; a++)
+		for(uint32 x = 0; x < 7; x++)
+		{	
+			SpellDmgDoneByAttribute[a][x] = 0;
+			SpellHealDoneByAttribute[a][x] = 0;
+		}
+
 	for(uint32 x = 0; x < 5; x++)
 	{
 		FlatStatModPos[x] = 0;

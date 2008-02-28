@@ -3842,8 +3842,8 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 
 	if( caster->IsPlayer() )
 	{
-		plus_damage += float2int32(static_cast< Player* >(caster)->SpellDmgDoneByInt[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT3)));
-		plus_damage += float2int32(static_cast< Player* >(caster)->SpellDmgDoneBySpr[school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT4)));
+		for(uint32 a = 0; a < 6; a++)
+			plus_damage += float2int32(static_cast< Player* >(caster)->SpellDmgDoneByAttribute[a][school] * float(caster->GetUInt32Value(UNIT_FIELD_STAT0 + a)));
 	}
 //------------------------------by school---------------------------------------------------
 	plus_damage += caster->GetDamageDoneMod(school);

@@ -194,8 +194,8 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraIncreasePartySpeed,//missing = 171
 		&Aura::SpellAuraIncreaseMovementAndMountedSpeed,//missing = 172 //used //Apply Aura: Increase Movement and Mounted Speed (Non-Stacking) //http://www.thottbot.com/?sp=26022 2e effect
 		&Aura::SpellAuraNULL,//missing = 173 // Apply Aura: Allow Champion Spells
-		&Aura::SpellAuraIncreaseSpellDamageBySpr,//missing = 174 //used //Apply Aura: Increase Spell Damage by % Spirit (Spells) //http://www.thottbot.com/?sp=15031
-		&Aura::SpellAuraIncreaseHealingBySpr,//missing = 175 //used //Apply Aura: Increase Spell Healing by % Spirit //http://www.thottbot.com/?sp=15031
+		&Aura::SpellAuraIncreaseSpellDamageByAttribute,//missing = 174 //used //Apply Aura: Increase Spell Damage by % Spirit (Spells) //http://www.thottbot.com/?sp=15031
+		&Aura::SpellAuraIncreaseHealingByAttribute,//missing = 175 //used //Apply Aura: Increase Spell Healing by % Spirit //http://www.thottbot.com/?sp=15031
 		&Aura::SpellAuraSpiritOfRedemption,//missing = 176 //used // Apply Aura: Spirit of Redemption
 		&Aura::SpellAuraNULL,//missing = 177 //used //Apply Aura: Area Charm // http://www.thottbot.com/?sp=26740
 		&Aura::SpellAuraNULL,//missing = 178 //Apply Aura: Increase Debuff Resistance 
@@ -214,8 +214,8 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//missing = 191 //used // noname //http://www.thottbot.com/?sp=29894
 		&Aura::SpellAuraNULL,//192 Apply Aura: Melee Slow %
 		&Aura::SpellAuraIncreaseTimeBetweenAttacksPCT,//193 Apply Aura: Increase Time Between Attacks (Melee, Ranged and Spell) by %
-		&Aura::SpellAuraIncreaseSpellDamageByInt,//194 Apply Aura: Increase Spell Damage by % of Intellect (All)
-		&Aura::SpellAuraIncreaseHealingByInt,//195 Apply Aura: Increase Healing by % of Intellect
+		&Aura::SpellAuraNULL,//194 //&Aura::SpellAuraIncreaseSpellDamageByInt,//194 Apply Aura: Increase Spell Damage by % of Intellect (All)
+		&Aura::SpellAuraNULL,//195 //&Aura::SpellAuraIncreaseHealingByInt,//195 Apply Aura: Increase Healing by % of Intellect
 		&Aura::SpellAuraNULL,//196 Apply Aura: Mod All Weapon Skills (6)
 		&Aura::SpellAuraModAttackerCritChance,//197 Apply Aura: Reduce Attacker Critical Hit Chance by %
 		&Aura::SpellAuraIncreaseAllWeaponSkill,//198
@@ -2048,8 +2048,9 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 	if( c != NULL && c->IsPlayer() )
 	{
-		bonus += float2int32( static_cast< Player* >( c )->SpellHealDoneByInt[m_spellProto->School] * static_cast< Player* >( c )->GetUInt32Value( UNIT_FIELD_STAT3 ) );
-		bonus += float2int32( static_cast< Player* >( c )->SpellHealDoneBySpr[m_spellProto->School] * static_cast< Player* >( c )->GetUInt32Value( UNIT_FIELD_STAT4 ) );
+		for(uint32 a = 0; a < 6; a++)
+			bonus += float2int32( static_cast< Player* >( c )->SpellHealDoneByAttribute[a][m_spellProto->School] * static_cast< Player* >( c )->GetUInt32Value( UNIT_FIELD_STAT0 + a) );
+
 		bonus += c->HealDoneMod[GetSpellProto()->School] + m_target->HealTakenMod[m_spellProto->School];
 		//Druid Tree of Life form. it should work not like this, but it's better then nothing. 
 		if( static_cast< Player* >( c )->IsInFeralForm() && static_cast< Player* >( c )->GetShapeShift() == FORM_TREE)
@@ -6587,7 +6588,7 @@ void Aura::SpellAuraIncreasePartySpeed(bool apply)
 	}
 }
 
-void Aura::SpellAuraIncreaseSpellDamageBySpr(bool apply)
+void Aura::SpellAuraIncreaseSpellDamageByAttribute(bool apply)
 {
 	Unit * pCaster = GetUnitCaster();
 	if(!pCaster)
@@ -6606,6 +6607,18 @@ void Aura::SpellAuraIncreaseSpellDamageBySpr(bool apply)
 	}
 	else
 		val =- val;
+
+	uint32 stat = 3;
+	for(uint32 i=0; i < 3; i++)
+	{ //bit hacky but it will work with all currently available spells
+		if (m_spellProto->EffectApplyAuraName[i] == SPELL_AURA_INCREASE_SPELL_HEALING_PCT)
+		{
+			if (m_spellProto->EffectMiscValue[i] < 5)
+				stat = m_spellProto->EffectMiscValue[i];
+			else
+				return;
+		}
+	}
 
 	if(m_target->IsPlayer())
 	{	
@@ -6613,8 +6626,8 @@ void Aura::SpellAuraIncreaseSpellDamageBySpr(bool apply)
 		{
 			if (mod->m_miscValue & (((uint32)1)<<x) )
 			{
-				m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) + val);
-				static_cast< Player* >( m_target )->SpellDmgDoneBySpr[x]+=((float)(val))/100;
+				m_target->SetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, m_target->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x) + float2int32(((float)val/100)*m_target->GetUInt32Value(UNIT_FIELD_STAT0 + stat)));
+				static_cast< Player* >( m_target )->SpellDmgDoneByAttribute[stat][x] += ((float)(val))/100;
 			}
 		}
 		if(m_target->IsPlayer())
@@ -6622,7 +6635,7 @@ void Aura::SpellAuraIncreaseSpellDamageBySpr(bool apply)
 	}
 }
 
-void Aura::SpellAuraIncreaseHealingBySpr(bool apply)
+void Aura::SpellAuraIncreaseHealingByAttribute(bool apply)
 {
 	Unit * pCaster = GetUnitCaster();
 	if(!pCaster)
@@ -6642,19 +6655,27 @@ void Aura::SpellAuraIncreaseHealingBySpr(bool apply)
 	else
 		val =- val;
 
+	uint32 stat;
+	if (mod->m_miscValue < 5)
+		stat = mod->m_miscValue;
+	else
+	{
+		sLog.outError(
+			"Aura::SpellAuraIncreaseHealingByAttribute::Unknown spell attribute type %u in spell %u.\n",
+			mod->m_miscValue,GetSpellId());
+		return;
+	}
+
 	if(m_target->IsPlayer())
 	{	
 		for(uint32 x=1;x<7;x++)
 		{
-		   // if (mod->m_miscValue & (((uint32)1)<<x) )
-			{
-				static_cast< Player* >( m_target )->SpellHealDoneBySpr[x]+=((float)(val))/100;
-			}
+			static_cast< Player* >( m_target )->SpellHealDoneByAttribute[stat][x] += ((float)(val))/100;
 		}
 		if(m_target->IsPlayer())
 		{
 			static_cast< Player* >( m_target )->UpdateChanceFields();
-			m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) + val);
+			m_target->SetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, m_target->GetUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS) + float2int32(((float)val/100)*m_target->GetUInt32Value(UNIT_FIELD_STAT0 + stat)));
 		}
 	}
 }
@@ -6963,6 +6984,7 @@ void Aura::SpellAuraIncreaseTimeBetweenAttacksPCT(bool apply)
 	m_target->ModFloatValue(UNIT_MOD_CAST_SPEED,pct_value);
 }
 
+/*
 void Aura::SpellAuraIncreaseSpellDamageByInt(bool apply)
 {
 	 float val;
@@ -7014,6 +7036,7 @@ void Aura::SpellAuraIncreaseHealingByInt(bool apply)
 		}
 	}
 }
+*/
 void Aura::SpellAuraModAttackerCritChance(bool apply)
 {
 	int32 val  = (apply) ? mod->m_amount : -mod->m_amount;

@@ -4008,8 +4008,8 @@ void Spell::Heal(int32 amount)
 		//Bonus from Intellect & Spirit
 		if( p_caster != NULL )  
 		{
-			bonus += float2int32(p_caster->SpellHealDoneByInt[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT3));
-			bonus += float2int32(p_caster->SpellHealDoneBySpr[m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT4));
+			for(uint32 a = 0; a < 6; a++)
+				bonus += float2int32(p_caster->SpellHealDoneByAttribute[a][m_spellInfo->School] * p_caster->GetUInt32Value(UNIT_FIELD_STAT0 + a));
 		}
 
 		//Spell Coefficient

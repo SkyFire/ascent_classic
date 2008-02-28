@@ -212,8 +212,8 @@ enum MOD_TYPES
     SPELL_AURA_INCREASE_CRITICAL = 169,                 // Increase Critical Type
     SPELL_AURA_DETECT_AMORE = 170,                      // Detect Amore
     SPELL_AURA_INCREASE_MOVEMENT_AND_MOUNTED_SPEED = 172,// Increase Movement and Mounted Speed (Non-Stacking)
-    SPELL_AURA_INCREASE_SPELL_DAMAGE_PCT = 174,         // Increase Spell Damage by % Spirit (Spells
-    SPELL_AURA_INCREASE_SPELL_HEALING_PCT = 175,        // Increase Spell Healing by % Spirit
+    SPELL_AURA_INCREASE_SPELL_DAMAGE_PCT = 174,         // Increase Spell Damage by % status
+    SPELL_AURA_INCREASE_SPELL_HEALING_PCT = 175,        // Increase Spell Healing by % status
     SPELL_AURA_SPIRIT_OF_REDEMPTION = 176,              // Spirit of Redemption Auras
     SPELL_AURA_AREA_CHARM = 177,                        // Area Charm 
     SPELL_AURA_INCREASE_ATTACKER_SPELL_CRIT = 179,      // Increase Attacker Spell Crit Type
@@ -229,8 +229,8 @@ enum MOD_TYPES
     SPELL_AURA_SPEED_LIMIT = 191,                       // speed limit
     SPELL_AURA_MELEE_SLOW_PCT = 192,
     SPELL_AURA_INCREASE_TIME_BETWEEN_ATTACKS = 193,
-    SPELL_AURA_INREASE_SPELL_DAMAGE_PCT_OF_INTELLECT = 194,
-    SPELL_AURA_INCREASE_HEALING_PCT_OF_INTELLECT = 195,
+    SPELL_AURA_INREASE_SPELL_DAMAGE_PCT_OF_INTELLECT = 194,  // NOT USED ANYMORE - 174 used instead
+    SPELL_AURA_INCREASE_HEALING_PCT_OF_INTELLECT = 195,		// NOT USED ANYMORE - 175 used instead
     SPELL_AURA_MOD_ALL_WEAPON_SKILLS = 196,
     SPELL_AURA_REDUCE_ATTACKER_CRICTICAL_HIT_CHANCE_PCT = 197,
     SPELL_AURA_INCREASE_SPELL_HIT_PCT = 199,
@@ -533,8 +533,8 @@ public:
 	void SpellAuraIncreaseDamageTypePCT(bool apply);
 	void SpellAuraIncreaseCricticalTypePCT(bool apply);
 	void SpellAuraIncreasePartySpeed(bool apply);
-	void SpellAuraIncreaseSpellDamageBySpr(bool apply);
-	void SpellAuraIncreaseHealingBySpr(bool apply);
+	void SpellAuraIncreaseSpellDamageByAttribute(bool apply);
+	void SpellAuraIncreaseHealingByAttribute(bool apply);
 	void SpellAuraIncreaseArmorByPctInt(bool apply);
 	void SpellAuraReduceAttackerMHitChance(bool apply);
 	void SpellAuraReduceAttackerRHitChance(bool apply);
@@ -542,8 +542,8 @@ public:
 	void SpellAuraReduceEnemyMCritChance(bool apply);
 	void SpellAuraReduceEnemyRCritChance(bool apply);
 	void SpellAuraIncreaseTimeBetweenAttacksPCT(bool apply);
-	void SpellAuraIncreaseSpellDamageByInt(bool apply);
-	void SpellAuraIncreaseHealingByInt(bool apply);
+//	void SpellAuraIncreaseSpellDamageByInt(bool apply);
+//	void SpellAuraIncreaseHealingByInt(bool apply);
 	void SpellAuraIncreaseAllWeaponSkill(bool apply);
 	void SpellAuraModAttackerCritChance(bool apply);
 	void SpellAuraIncreaseHitRate(bool apply);

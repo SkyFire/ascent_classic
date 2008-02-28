@@ -1289,10 +1289,8 @@ public:
 	uint32 ResistanceModPctNeg[7];
 	float m_resist_critical[2];//when we are a victim we can have talents to decrease chance for critical hit. This is a negative value and it's added to critchances
 	float m_resist_hit[3]; // 0 = melee; 1= ranged; 2=spells
-	float SpellDmgDoneByInt[7];
-	float SpellHealDoneByInt[7];
-	float SpellDmgDoneBySpr[7];
-	float SpellHealDoneBySpr[7];
+	float SpellDmgDoneByAttribute[5][7];
+	float SpellHealDoneByAttribute[5][7];
 	uint32 m_modphyscritdmgPCT;
 	uint32 m_RootedCritChanceBonus;
 	uint32 m_ModInterrMRegenPCT;
