@@ -188,8 +188,15 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
                         if(pPlayer->GetZoneId() == 3518)
                         {
                             // Add Halaa Battle Token
-                            SpellEntry * halaa_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 33004 : 33005);
-                            gPlayer->CastSpell(gPlayer, halaa_spell, true);
+                            SpellEntry * pvp_token_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 33004 : 33005);
+                            gPlayer->CastSpell(gPlayer, pvp_token_spell, true);
+                        }
+                        // If we are in Hellfire Peninsula
+                        if(pPlayer->GetZoneId() == 3483)
+                        {
+                            // Add Mark of Thrallmar/Honor Hold
+                            SpellEntry * pvp_token_spell = dbcSpell.LookupEntry(gPlayer->GetTeam()? 32158 : 32155);
+                            gPlayer->CastSpell(gPlayer, pvp_token_spell, true);
                         }
                     }
 
