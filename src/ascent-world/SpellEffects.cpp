@@ -2206,9 +2206,9 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		}
 		case LOCKTYPE_HERBALISM:
 		{
-			if(!gameObjTarget ) return;	  
+			if(!gameObjTarget) return;	  
 			
-			uint32 v=GetGOReqSkill(gameObjTarget);
+			uint32 v = gameObjTarget->GetGOReqSkill();
 			bool bAlreadyUsed = false;
 		 
 			if(Rand(100.0f)) // 3% chance to fail//why?
@@ -2250,9 +2250,9 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		break;
 		case LOCKTYPE_MINING:
 		{
-			if(!gameObjTarget ) return;
+			if(!gameObjTarget) return;
 
-			uint32 v = GetGOReqSkill(gameObjTarget);
+			uint32 v = gameObjTarget->GetGOReqSkill();
 			bool bAlreadyUsed = false;
 
 			if( Rand( 100.0f ) ) // 3% chance to fail//why?
@@ -4503,20 +4503,27 @@ void Spell::SpellEffectKnockBack(uint32 i)
 void Spell::SpellEffectDisenchant(uint32 i)
 {
 	Player* caster = static_cast< Player* >( m_caster );
-	Item* it = caster->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid( m_targets.m_itemTarget, true );
+	Item* it = caster->GetItemInterface()->GetItemByGUID(m_targets.m_itemTarget);
 	if( it == NULL )
 		return;
    
 	//Check for skill first, we can increase it upto 75 
 	uint32 skill=caster->_GetSkillLineCurrent( SKILL_ENCHANTING );
 	if(skill < 75)//can up skill
-	if(Rand(float(100-skill*100.0/75.0)))
-		caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
-	AddItemFromDisenchant(it->GetProto(),caster);
+		if(Rand(float(100-skill*100.0/75.0)))
+			caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
+ 
+	caster->SetLootGUID(it->GetGUID());
+	if(!it->loot)
+	{
+		it->loot = new Loot;
+		lootmgr.FillDisenchantingLoot(it->loot, it->GetEntry());
+	}
+	caster->SendLoot(it->GetGUID(), 2);
+
 
 	if(it==i_caster)
 		i_caster=NULL;
-	delete it;
 }
 
 void Spell::SpellEffectInebriate(uint32 i) // lets get drunk!
@@ -5008,7 +5015,9 @@ void Spell::SpellEffectProspecting(uint32 i)
 
 	if(p_caster->GetItemInterface()->RemoveItemAmt(entry, 5))
 	{
-		AddItemFromProspecting(entry, p_caster);
+		p_caster->SetLootGUID(p_caster->GetGUID());
+		lootmgr.FillProspectingLoot(&p_caster->loot, entry);
+		p_caster->SendLoot(p_caster->GetGUID(), 2);
 	}
 	else // this should never happen either
 	{

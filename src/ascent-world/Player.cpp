@@ -5403,7 +5403,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 
 
 		slottype = 0;
-		if(m_Group != NULL)
+		if(m_Group != NULL && loot_type < 2)
 		{
 			switch(m_Group->GetMethod())
 			{
@@ -5513,9 +5513,9 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 				}
 			}			
 		}
-		count++;	  
+		count++;
 	}
-	data.wpos (13) ;
+	data.wpos (13);
 	data << (uint8)count;
 
 	GetSession ()->SendPacket(&data);

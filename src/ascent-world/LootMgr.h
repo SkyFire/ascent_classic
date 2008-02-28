@@ -130,6 +130,8 @@ public:
 	void FillFishingLoot(Loot * loot,uint32 loot_id);
 	void FillSkinningLoot(Loot * loot,uint32 loot_id);
 	void FillPickpocketingLoot(Loot *loot, uint32 loot_id);
+	void FillDisenchantingLoot(Loot *loot, uint32 loot_id);
+	void FillProspectingLoot(Loot *loot, uint32 loot_id);
 
 	bool CanGODrop(uint32 LootId,uint32 itemid);
 	bool IsPickpocketable(uint32 creatureId);

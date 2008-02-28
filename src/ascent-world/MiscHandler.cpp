@@ -50,7 +50,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	{
 		pCreature = _player->GetMapMgr()->GetCreature((uint32)GetPlayer()->GetLootGUID());
 		if (!pCreature)return;
-		pLoot=&pCreature->loot;	
+		pLoot=&pCreature->loot;
 	}
 	else if(GUID_HIPART(_player->GetLootGUID()) == HIGHGUID_GAMEOBJECT)
 	{
@@ -63,6 +63,11 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		if(!pItem)
 			return;
 		pLoot = pItem->loot;
+	}else if( UINT32_LOPART(GUID_HIPART(GetPlayer()->GetLootGUID())) == HIGHGUID_PLAYER )
+	{
+		Player * pl = _player->GetMapMgr()->GetPlayer((uint32)GetPlayer()->GetLootGUID());
+		if(!pl) return;
+		pLoot = &pl->loot;
 	}
 
 	if(!pLoot) return;
@@ -534,6 +539,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 		if(plr)
 		{
 			plr->bShouldHaveLootableOnCorpse = false;
+			plr->loot.items.clear();
 			plr->RemoveFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
 		}
 	}
