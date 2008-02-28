@@ -1844,13 +1844,22 @@ bool World::SetInitialWorldSettings()
 	//Warlock: Nether Protection
 	sp = dbcSpell.LookupEntryForced( 30299 );
 	if (sp != NULL)
+	{
 		sp->procChance = 10;
+		sp->proc_interval = 13000;
+	}
 	sp = dbcSpell.LookupEntryForced( 30301 );
 	if (sp != NULL)
+	{
 		sp->procChance = 20;
+		sp->proc_interval = 13000;
+	}
 	sp = dbcSpell.LookupEntryForced( 30302 );
 	if (sp != NULL)
+	{
 		sp->procChance = 30;
+		sp->proc_interval = 13000;
+	}
 
 	//Warlock: Backlash
 	sp = dbcSpell.LookupEntryForced( 34935 );
@@ -2073,6 +2082,12 @@ bool World::SetInitialWorldSettings()
 		sp->EffectImplicitTargetB[0] = 0;
 		sp->EffectImplicitTargetB[1] = 0;
 		sp->EffectImplicitTargetB[2] = 0;
+	}
+
+	sp = dbcSpell.LookupEntryForced( 34774 );
+	if( sp != NULL ) //dragonspine trophy proc
+	{
+		sp->procChance = 6;
 	}
 
 	//paladin - Blessing of Light. Changed to scripted because it needs to mod target and should not influence holy nova
