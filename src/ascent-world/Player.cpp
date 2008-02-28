@@ -8322,7 +8322,7 @@ void Player::ModifyBonuses(uint32 type,int32 val)
 		case EXPERTISE_RATING_2:
 			{
 				ModUInt32Value( PLAYER_RATING_MODIFIER_EXPERTISE, val );
-				ModUInt32Value( PLAYER_EXPERTISE, float2int32( CalcRating( PLAYER_RATING_MODIFIER_EXPERTISE ) ) );
+				ModUInt32Value( PLAYER_EXPERTISE, val );
 			}break;
 		case RESILIENCE_RATING:
 			{
