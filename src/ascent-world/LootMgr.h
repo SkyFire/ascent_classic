@@ -142,13 +142,13 @@ public:
 	void LoadLootProp();
 	
 	LootStore	CreatureLoot;
-	
 	LootStore	FishingLoot;
 	LootStore	SkinningLoot;
 	LootStore	GOLoot;
 	LootStore	ItemLoot;
 	LootStore	ProspectingLoot;
-	LootStore PickpocketingLoot;
+	LootStore	DisenchantingLoot;
+	LootStore	PickpocketingLoot;
 	std::map<uint32, std::set<uint32> > quest_loot_go;
 
 	RandomProps * GetRandomProperties(ItemPrototype * proto);
