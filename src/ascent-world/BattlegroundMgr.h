@@ -68,6 +68,8 @@ struct BGScore
 #define AB_ALLIANCE_CAPTUREBASE			 0x6F3
 #define AB_MAX_SCORE						0x6F4
 
+#define BG_PREPARATION 44521
+
 // WSG define's
 #define WSG_ALLIANCE_FLAG_CAPTURED		  0x922
 #define WSG_HORDE_FLAG_CAPTURED			 0x923
@@ -216,6 +218,7 @@ protected:
 
 	/* winner stuff */
 	bool m_ended;
+	bool m_started;
 	uint8 m_winningteam;
 
 	/* resurrect queue */

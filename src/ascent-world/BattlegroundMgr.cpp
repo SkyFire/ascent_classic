@@ -516,6 +516,7 @@ CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 
 	m_nextPvPUpdateTime = 0;
 	m_countdownStage = 0;
 	m_ended = false;
+	m_started = false;
 	m_winningteam = 0;
 	m_startTime = (uint32)UNIXTIME;
 	m_lastResurrect = (uint32)UNIXTIME;

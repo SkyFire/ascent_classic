@@ -320,7 +320,8 @@ void WarsongGulch::HookOnHK(Player * plr)
 
 void WarsongGulch::OnAddPlayer(Player * plr)
 {
-	/* do we actually need to do anything special to the player? */
+	if(!m_started)
+		plr->CastSpell(plr, BG_PREPARATION, true);
 }
 
 void WarsongGulch::OnRemovePlayer(Player * plr)
@@ -328,6 +329,8 @@ void WarsongGulch::OnRemovePlayer(Player * plr)
 	/* drop the flag if we have it */
 	if(plr->m_bgHasFlag)
 		HookOnMount(plr);
+
+	plr->RemoveAura(BG_PREPARATION);
 }
 
 LocationVector WarsongGulch::GetStartingCoords(uint32 Team)
@@ -481,6 +484,12 @@ void WarsongGulch::OnCreate()
 
 void WarsongGulch::OnStart()
 {
+	for(uint32 i = 0; i < 2; ++i) {
+		for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr) {
+			(*itr)->RemoveAura(BG_PREPARATION);
+		}
+	}
+
 	/* open the gates */
 	for(list<GameObject*>::iterator itr = m_gates.begin(); itr != m_gates.end(); ++itr)
 	{
@@ -497,6 +506,8 @@ void WarsongGulch::OnStart()
 
 	/* correct? - burlex */
 	PlaySoundToAll(SOUND_BATTLEGROUND_BEGIN);
+
+	m_started = true;
 }
 
 
