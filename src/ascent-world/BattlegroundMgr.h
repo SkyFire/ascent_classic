@@ -69,6 +69,8 @@ struct BGScore
 #define AB_MAX_SCORE						0x6F4
 
 #define BG_PREPARATION 44521
+#define BG_REVIVE_PREPARATION	44535
+#define RESURRECT_SPELL			21074   // Spirit Healer Res
 
 // WSG define's
 #define WSG_ALLIANCE_FLAG_CAPTURED		  0x922
@@ -212,13 +214,13 @@ protected:
 
 	/* starting time */
 	uint32 m_startTime;
+	bool m_started;
 
 	/* countdown stuff */
 	uint32 m_countdownStage;
 
 	/* winner stuff */
 	bool m_ended;
-	bool m_started;
 	uint8 m_winningteam;
 
 	/* resurrect queue */
