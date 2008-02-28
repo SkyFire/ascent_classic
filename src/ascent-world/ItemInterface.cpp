@@ -1379,7 +1379,7 @@ int8 ItemInterface::CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype
 
 	if((slot < INVENTORY_SLOT_BAG_END && DstInvSlot == INVENTORY_SLOT_NOT_SET) || (slot >= BANK_SLOT_BAG_START && slot < BANK_SLOT_BAG_END && DstInvSlot == INVENTORY_SLOT_NOT_SET))
 	{
-		if (!ignore_combat && m_pOwner->CombatStatus.IsInCombat())
+		if (!ignore_combat && m_pOwner->CombatStatus.IsInCombat() && (slot < EQUIPMENT_SLOT_MAINHAND || slot > EQUIPMENT_SLOT_RANGED))
 			return INV_ERR_CANT_DO_IN_COMBAT;
 
 		if(proto->Flags & ITEM_FLAG_UNIQUE_EQUIP && IsEquipped(proto->ItemId))
