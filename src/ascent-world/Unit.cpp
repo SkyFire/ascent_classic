@@ -631,19 +631,19 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 				switch( spe->NameHash )
 				{
 					case SPELL_HASH_MAGTHERIDON_MELEE_TRINKET:
-						ppm = 1.5;
+						ppm = 1.5f;
 						break; // dragonspine trophy
 					case SPELL_HASH_ROMULO_S_POISON:
-						ppm = 1.5;
+						ppm = 1.5f;
 						break; // romulo's
 					case SPELL_HASH_BLACK_TEMPLE_MELEE_TRINKET:
-						ppm = 1.0;
+						ppm = 1.0f;
 						break; // madness of the betrayer
 				}
 				switch( spellId )
 				{
 					case 16870:
-						ppm = 2.0;
+						ppm = 2.0f;
 						break; //druid: clearcasting
 				}
 

@@ -7286,6 +7286,14 @@ bool World::SetInitialWorldSettings()
 		sp->maxstack = 1;
 	}
 
+	//Item: Assassination Armor
+	sp = dbcSpell.LookupEntryForced(37166);
+	if (sp != NULL)
+	{
+		sp->EffectSpellGroupRelation[0]=8519680;
+		sp->EffectSpellGroupRelation_high[0]=8;
+	}
+
 	//Item Set: Thunderheart Harness
 	sp = dbcSpell.LookupEntryForced( 38447 );
 	if( sp != NULL )
