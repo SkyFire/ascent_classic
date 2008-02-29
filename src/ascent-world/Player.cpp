@@ -3302,7 +3302,7 @@ void Player::OnPushToWorld()
 	sEventMgr.AddEvent(this, &Player::EventDumpCompressedMovement, EVENT_PLAYER_FLUSH_MOVEMENT, World::m_movementCompressInterval, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 #endif
 
-	if( m_mapMgr->m_battleground != NULL && m_bg != m_mapMgr->m_battleground )
+	if( m_mapMgr && m_mapMgr->m_battleground != NULL && m_bg != m_mapMgr->m_battleground )
 	{
 		m_bg = m_mapMgr->m_battleground;
 		m_bg->PortPlayer( this, true );
@@ -3327,7 +3327,10 @@ void Player::RemoveFromWorld()
 	load_mana = m_uint32Values[UNIT_FIELD_POWER1];
 
 	if(m_bg)
+	{
 		m_bg->RemovePlayer(this, true);
+		m_bg = NULL;
+	}
 
 	if(m_tempSummon)
 	{

@@ -2204,7 +2204,9 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				if( IsPlayer() )
 				{
 					CritChance = GetFloatValue( PLAYER_RANGED_CRIT_PERCENTAGE );
-					CritChance += static_cast< Player* >(pVictim)->res_R_crit_get();
+					if( pVictim->IsPlayer() )
+						CritChance += static_cast< Player* >(pVictim)->res_R_crit_get();
+
 					CritChance += (float)(pVictim->AttackerCritChanceMod[spellInfo->School]);
 				}
 				else
