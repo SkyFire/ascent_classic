@@ -156,8 +156,9 @@ AC_ARG_ENABLE(optimize,
            CXXFLAGS="$CXXFLAGS -O2"
        fi
      ],
+)
 
-AC_ARG_ENABLE(allwarnings,
+AC_ARG_ENABLE(warnings,
      AC_HELP_STRING([--enable-warnings],[enable Wall compiling]),
      [ if test "x$enable_warnings" = "xyes" ; then
            CFLAGS="$CFLAGS -Wall"
