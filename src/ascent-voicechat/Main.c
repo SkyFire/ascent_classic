@@ -107,7 +107,7 @@ int first = 0;
 void OnUdpRead()
 {
 	char buffer[4096];
-	int recv_len;
+	unsigned int recv_len;
 	int result;
 	uint32 i;
 	struct sockaddr_in from;
@@ -198,7 +198,7 @@ void OnListenTcpRead()
 	int new_fd;
 	struct WoWServer * ws;
 	struct sockaddr_in addr;
-	int outlen = sizeof(struct sockaddr_in);
+	unsigned int outlen = sizeof(struct sockaddr_in);
 
 	new_fd = (int)accept(m_listenFdTCP, (struct sockaddr*)&addr, &outlen);
 	if(new_fd < 0)
@@ -311,6 +311,7 @@ int MessageLoop()
 	struct timeval tv;
 	tv.tv_sec = 5;
 	tv.tv_usec = 0;
+	i = 0;
 
 	for(;;)
 	{

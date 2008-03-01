@@ -247,7 +247,7 @@ void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
 		}
 		pMatch->lock.Release();*/
 		Group * pGroup = new Group(true);
-		for(i = 0; i < 5, possibleMembers.size() > 0; ++i)
+		for(i = 0; i < 5 && possibleMembers.size() > 0; ++i)
 		{
 			pGroup->AddMember( possibleMembers.front()->m_playerInfo );
 			possibleMembers.front()->SendMeetingStoneQueue( LfgDungeonId, 0 );

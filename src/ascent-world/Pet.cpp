@@ -1558,8 +1558,8 @@ void Pet::UpdateLoyalty( char pts )
 	if( !m_Owner || Summon || m_Owner->GetMapMgr() != this->GetMapMgr() )
 		return;
 
-	char curLvl = GetLoyaltyLevel();
-	char newLvl = curLvl;
+	uint8 curLvl = GetLoyaltyLevel();
+	uint8 newLvl = curLvl;
 
 	LoyaltyPts += pts;
 

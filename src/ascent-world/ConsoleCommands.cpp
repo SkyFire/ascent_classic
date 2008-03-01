@@ -61,7 +61,7 @@ bool HandleInfoCommand(BaseConsole * pConsole, int argc, const char * argv[])
 bool HandleGMsCommand(BaseConsole * pConsole, int argc, const char * argv[])
 {
 	WorldPacket data;
-	bool first = true;
+	//bool first = true;
 
 	pConsole->Write("There are the following GM's online on this server: \r\n");
 	pConsole->Write("=======================================================\r\n");

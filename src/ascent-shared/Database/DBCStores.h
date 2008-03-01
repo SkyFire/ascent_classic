@@ -230,7 +230,7 @@ struct SpellEntry
     uint32 Totem[2];                        //44 - 45
     uint32 Reagent[8];                      //46 - 53
     uint32 ReagentCount[8];                 //54 - 61
-    uint32 EquippedItemClass;               //62
+    int32 EquippedItemClass;               //62
     uint32 EquippedItemSubClass;            //63
     uint32 RequiredItemFlags;               //64
     uint32 Effect[3];                       //65 - 67

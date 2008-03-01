@@ -1796,7 +1796,7 @@ int luaUnit_PlaySoundToSet(lua_State * L, Unit * ptr)
 int luaUnit_GetUnitBySqlId(lua_State * L, Unit * ptr)
 {
 	if(!ptr) return 0;
-	int sqlid = luaL_checkint(L,1);
+	//int sqlid = luaL_checkint(L,1);
 	return 0;
 }
 
@@ -2110,3 +2110,4 @@ int luaUnit_SetFieldFlags(lua_State * L, Unit * ptr)
 	ptr->SetUInt32Value(UNIT_FIELD_FLAGS, flags);
 	return 0;
 }
+

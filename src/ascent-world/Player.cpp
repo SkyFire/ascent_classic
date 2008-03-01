@@ -2385,7 +2385,7 @@ bool Player::canCast(SpellEntry *m_spellInfo)
 	{
 		if(this->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND))
 		{
-			if(this->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND)->GetProto()->Class == m_spellInfo->EquippedItemClass)
+			if((int32)this->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND)->GetProto()->Class == m_spellInfo->EquippedItemClass)
 			{
 				if (m_spellInfo->EquippedItemSubClass != 0)
 				{
@@ -2402,7 +2402,7 @@ bool Player::canCast(SpellEntry *m_spellInfo)
 
 		if (this->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED))
 		{
-			if(this->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED)->GetProto()->Class == m_spellInfo->EquippedItemClass)
+			if((int32)this->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED)->GetProto()->Class == m_spellInfo->EquippedItemClass)
 			{
 				if (m_spellInfo->EquippedItemSubClass != 0)
 				{

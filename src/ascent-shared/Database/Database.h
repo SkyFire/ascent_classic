@@ -169,9 +169,9 @@ public:
 	ASCENT_INLINE uint32 GetRowCount() const { return mRowCount; }
 
 protected:
-	Field *mCurrentRow;
 	uint32 mFieldCount;
 	uint32 mRowCount;
+        Field *mCurrentRow;
 };
 
 class SERVER_DECL QueryThread : public CThread

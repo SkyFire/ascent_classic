@@ -17,6 +17,7 @@ IFS=$NEWLINE
 
 for i in `find . \
   -name "*.h" -o \
+  -name "*.c" -o \
   -name "*.cpp" -o \
   -name "Makefile.am" -o \
   -name "configure.ac" -o \

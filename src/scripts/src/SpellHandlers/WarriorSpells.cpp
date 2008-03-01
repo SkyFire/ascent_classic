@@ -88,7 +88,7 @@ bool Charge(uint32 i, Spell* pSpell)
 
 bool Execute(uint32 i, Spell* pSpell)
 {
-    uint32 uSpellId = pSpell->m_spellInfo->Id;
+    //uint32 uSpellId = pSpell->m_spellInfo->Id;
     uint32 base_dmg = pSpell->damage;
     /*
     Attempt to finish off a wounded foe, causing 125 damage and converting each extra point

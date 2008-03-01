@@ -336,7 +336,7 @@ bool World::SetInitialWorldSettings()
 
 	// Relation Groups
 
-	uint32 group_relation_paladin_healing_light = 0;
+	//uint32 group_relation_paladin_healing_light = 0;
 	uint32 group_relation_paladin_sanctified_light = 0;
 	uint32 group_relation_shaman_enhancing_totems = 0;
 	uint32 group_relation_shaman_restorative_totems = 0;
@@ -8223,7 +8223,7 @@ void World::SendInstanceMessage(WorldPacket *packet, uint32 instanceid, WorldSes
 			itr->second->GetPlayer()->IsInWorld()
 			&& itr->second != self)  // dont send to self!
 		{
-			if (itr->second->GetPlayer()->GetInstanceID() == instanceid)
+			if (itr->second->GetPlayer()->GetInstanceID() == (int32)instanceid)
 				itr->second->SendPacket(packet);
 		}
 	}

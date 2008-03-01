@@ -116,3 +116,4 @@ QueryResult * SQLiteDatabase::_StoreQueryResult(DatabaseConnection * con)
 }
 
 #endif
+

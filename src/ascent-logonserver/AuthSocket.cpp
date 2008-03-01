@@ -169,6 +169,9 @@ void AuthSocket::HandleChallenge()
 		case BAN_STATUS_TIME_LEFT_ON_BAN:
 			SendChallengeError(CE_ACCOUNT_FREEZED);
 			return;
+
+		default:
+			break;
 	}
 
 	// Null-terminate the account string
@@ -534,6 +537,9 @@ void AuthSocket::HandleReconnectChallenge()
 	case BAN_STATUS_TIME_LEFT_ON_BAN:
 		SendChallengeError(CE_ACCOUNT_FREEZED);
 		return;
+
+	default:
+		break;
 	}
 
 	// Null-terminate the account string

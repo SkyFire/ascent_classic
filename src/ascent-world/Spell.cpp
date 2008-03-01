@@ -2906,7 +2906,7 @@ uint8 Spell::CanCast(bool tolerate)
 					return SPELL_FAILED_BAD_TARGETS;
 
 				// check if we have the correct class, subclass, and inventory type of target item
-				if( m_spellInfo->EquippedItemClass != proto->Class)
+				if( m_spellInfo->EquippedItemClass != (int32)proto->Class)
 					return SPELL_FAILED_BAD_TARGETS;
 
 				if( m_spellInfo->EquippedItemSubClass && !(m_spellInfo->EquippedItemSubClass & (1 << proto->SubClass)))

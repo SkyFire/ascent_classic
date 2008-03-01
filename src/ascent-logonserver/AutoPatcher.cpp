@@ -113,11 +113,10 @@ PatchMgr::PatchMgr()
 
 	struct dirent ** list;
 	int filecount;
-	uint32 count = 0;
 	int read_fd;
 	MD5Hash md5;
 	Patch * pPatch;
-	DWORD size,sizehigh;
+	int size;
 	uint32 srcversion;
 	char locality[5];
 	uint32 i;

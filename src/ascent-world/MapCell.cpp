@@ -209,7 +209,7 @@ void MapCell::LoadObjects(CellSpawns * sp)
 			GameObject * go=_mapmgr->CreateGameObject();
 			if(go->Load(*i))
 			{
-				uint32 state = go->GetUInt32Value(GAMEOBJECT_STATE);
+				//uint32 state = go->GetUInt32Value(GAMEOBJECT_STATE);
 
 				// FIXME - burlex
 				/*

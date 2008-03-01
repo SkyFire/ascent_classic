@@ -511,7 +511,7 @@ void CBattleground::SendWorldStates(Player * plr)
 	plr->GetSession()->SendPacket(&data);
 }
 
-CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 type) : m_mapMgr(mgr), m_id(id), m_levelGroup(levelgroup), m_type(type)
+CBattleground::CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 type) : m_mapMgr(mgr), m_id(id), m_type(type), m_levelGroup(levelgroup)
 {
 	m_nextPvPUpdateTime = 0;
 	m_countdownStage = 0;
