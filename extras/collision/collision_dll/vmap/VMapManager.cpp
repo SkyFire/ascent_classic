@@ -82,7 +82,7 @@ namespace VMAP
 
     //=========================================================
 
-    Vector3 VMapManager::convertPositionToInternalRep(float x, float y, float z) const
+    inline Vector3 VMapManager::convertPositionToInternalRep(float x, float y, float z) const
     {
         float pos[3];
         pos[0] = y;
@@ -98,7 +98,7 @@ namespace VMAP
 
     //=========================================================
 
-    Vector3 VMapManager::convertPositionToMangosRep(float x, float y, float z) const
+    inline Vector3 VMapManager::convertPositionToMangosRep(float x, float y, float z) const
     {
         float pos[3];
         pos[0] = z;
@@ -114,7 +114,7 @@ namespace VMAP
     //=========================================================
 	//=========================================================
 
-	Vector3 VMapManager::convertPositionToInternalRep(LocationVector & vec) const
+	inline Vector3 VMapManager::convertPositionToInternalRep(LocationVector & vec) const
 	{
 		float pos[3];
 		pos[0] = vec.y;
@@ -128,7 +128,7 @@ namespace VMAP
 		return(Vector3(pos));
 	}
 
-	Vector3 VMapManager::convertPositionToInternalRepMod(LocationVector & vec) const
+	inline Vector3 VMapManager::convertPositionToInternalRepMod(LocationVector & vec) const
 	{
 		float pos[3];
 		pos[0] = vec.y;
@@ -145,7 +145,7 @@ namespace VMAP
 
 	//=========================================================
 
-	Vector3 VMapManager::convertPositionToMangosRep(LocationVector & vec) const
+	inline Vector3 VMapManager::convertPositionToMangosRep(LocationVector & vec) const
 	{
 		float pos[3];
 		pos[0] = vec.y;
@@ -159,7 +159,7 @@ namespace VMAP
 		return(Vector3(pos));
 	}
 
-	LocationVector VMapManager::convertPositionToMangosRep(Vector3 & src) const
+	inline LocationVector VMapManager::convertPositionToMangosRep(Vector3 & src) const
 	{
 		float pos[3];
 		pos[0] = src.z;
