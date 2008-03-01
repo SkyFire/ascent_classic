@@ -1,5 +1,6 @@
 /* 
  * Copyright (C) 2005,2006,2007 MaNGOS <http://www.mangosproject.org/>
+ * Copyright (C) 2007-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +18,10 @@
  */
 
 #include "VMapManager.h"
+
+#if defined(WIN32)
+#define snprintf _snprintf
+#endif
 
 #define MAX_MAPS 600
 
@@ -173,7 +178,7 @@ namespace VMAP
     {
         char name[FILENAMEBUFFER_SIZE];
 
-        sprintf(name, "%03u_%d_%d%s",pMapId, x, y, DIR_FILENAME_EXTENSION);
+        snprintf(name, FILENAMEBUFFER_SIZE, "%03u_%d_%d%s",pMapId, x, y, DIR_FILENAME_EXTENSION);
         return(std::string(name));
     }
 
@@ -182,7 +187,7 @@ namespace VMAP
     {
         char name[FILENAMEBUFFER_SIZE];
 
-        sprintf(name, "%03d%s",pMapId, DIR_FILENAME_EXTENSION);
+        snprintf(name, FILENAMEBUFFER_SIZE, "%03d%s",pMapId, DIR_FILENAME_EXTENSION);
         return(std::string(name));
     }
     //=========================================================
@@ -233,31 +238,6 @@ namespace VMAP
     }
 
     //=========================================================
-    // result false, if no more id are found
-
-    bool getNextMapId(const std::string& pString, unsigned int& pStartPos, unsigned int& pId)
-    {
-        bool result = false;
-        unsigned int i;
-        for(i=pStartPos;i<pString.size(); ++i)
-        {
-            if(pString[i] == ',')
-            {
-                break;
-            }
-        }
-        if(i>pStartPos)
-        {
-            std::string idString = pString.substr(pStartPos, i-pStartPos);
-            pStartPos = i+1;
-            chompAndTrim(idString);
-            pId = atoi(idString.c_str());
-            result = true;
-        }
-        return(result);
-    }
-
-    //=========================================================
 
     int VMapManager::loadMap(const char* pBasePath, unsigned int pMapId, int x, int y)
     {
@@ -278,7 +258,7 @@ namespace VMAP
 			m_maps[pMapId] = instanceTree;
 		}
 
-		unsigned int mapTileIdent = MAP_TILE_IDENT(x,y);
+		size_t mapTileIdent = MAP_TILE_IDENT(x,y);
 		result = instanceTree->loadMap(dirFileName, mapTileIdent);
 		if(!result)                                         // remove on fail
 		{
@@ -306,7 +286,7 @@ namespace VMAP
 			else
 				dirFileName = getDirFileName( pMapId );
 
-			unsigned int mapTileIdent = MAP_TILE_IDENT(x,y);
+			size_t mapTileIdent = MAP_TILE_IDENT(x,y);
 			instanceTree->unloadMap(dirFileName, mapTileIdent);
 			if(instanceTree->size() == 0)
 			{
@@ -803,7 +783,7 @@ namespace VMAP
 
     //=========================================================
 
-    bool MapTree::loadMap(const std::string& pDirFileName, unsigned int pMapTileIdent)
+    bool MapTree::loadMap(const std::string& pDirFileName, size_t pMapTileIdent)
     {
         bool result = true;
         size_t len = iBasePath.length() + pDirFileName.length();
@@ -881,7 +861,7 @@ namespace VMAP
 
     //=========================================================
 
-    void MapTree::unloadMap(const std::string& dirFileName, unsigned int pMapTileIdent)
+    void MapTree::unloadMap(const std::string& dirFileName, size_t pMapTileIdent)
     {
         if(hasDirFile(dirFileName) && containsLoadedMapTile(pMapTileIdent))
         {
