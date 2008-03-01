@@ -82,31 +82,6 @@ Map::~Map()
 		delete *i;
 }
 
-
-void Map::BuildXMLStats(char * m_file)
-{
-	/*char tmp[200];
-	strcpy(tmp, "");
-#define pushline strcat(m_file, tmp)
-
-	InstanceMap::iterator itr = _instances.begin();
-	MapMgr * mgr;
-	for(; itr != _instances.end(); ++itr)
-	{
-		mgr = itr->second;
-		snprintf(tmp, 200, "	<instance>\n");																	   pushline;
-		snprintf(tmp, 200, "	  <map>%u</map>\n", (unsigned int)_mapId);														  pushline;
-		snprintf(tmp, 200, "	  <maptype>%u</maptype>\n", (unsigned int)(_mapInfo ? _mapInfo->type : 0));						   pushline;
-		snprintf(tmp, 200, "	  <players>%u</players>\n", (unsigned int)mgr->GetPlayerCount());								   pushline;
-		snprintf(tmp, 200, "	  <maxplayers>%u</maxplayers>\n", (unsigned int)(_mapInfo ? _mapInfo->playerlimit : 0));			  pushline;
-		snprintf(tmp, 200, "	  <state>%s</state>\n", mgr->HasPlayers() ? "ACTIVE" : "IDLE");					   pushline;
-		snprintf(tmp, 200, "	  <creationtime>%s</creationtime>\n", asctime(localtime(&mgr->CreationTime)));		pushline;   
-		snprintf(tmp, 200, "	  <expirytime>%s</expirytime>\n", mgr->ExpiryTime ? asctime(localtime(&mgr->ExpiryTime)) : "Never");			  pushline;
-		snprintf(tmp, 200, "	</instance>\n");																	  pushline;
-	}
-#undef pushline*/
-}
-
 bool first_table_warning = true;
 bool CheckResultLengthCreatures(QueryResult * res)
 {

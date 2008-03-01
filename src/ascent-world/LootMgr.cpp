@@ -253,7 +253,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 	QueryResult *result =WorldDatabase.Query("SELECT * FROM %s ORDER BY entryid ASC",szTableName);
 	if(!result)
 	{
-		sLog.outError("\rWARNING: Loading loot from table %s failed.", szTableName);
+		Log.Error("LootMgr", "Loading loot from table %s failed.", szTableName);
 		return;
 	}
 	uint32 entry_id = 0;
@@ -263,14 +263,13 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 	int pos = 0;
 	vector< tempy > ttab;
 	tempy t;
-	bool d = false;
 	do 
 	{	 
 		Field *fields = result->Fetch();
 		entry_id = fields[1].GetUInt32();
 		if(entry_id < last_entry)
 		{
-			sLog.outError("WARNING: Out of order loot table being loaded.\n");
+			Log.Error("LootMgr", "WARNING: Out of order loot table being loaded.\n");
 			return;
 		}
 		if(entry_id != last_entry)
@@ -280,35 +279,14 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 			ttab.clear();
 		}
 
-		if(result->GetFieldCount() > 4)
-		{
-			t.itemid = fields[2].GetUInt32();
-			t.chance = fields[3].GetFloat();
-			t.chance_2 = fields[4].GetFloat();
-			t.mincount = fields[5].GetUInt32();
-			t.maxcount = fields[6].GetUInt32();
-			t.ffa_loot = fields[7].GetUInt32();
-		}
-		else
-		{
-			if(!d)
-			{
-				Log.Warning("LootMgr", "Loot table %s is using old loot structure (without heroic chances column)!", szTableName);
-				Log.Warning("LootMgr", "This will be deprecated soon!");
-				d=true;
-			}
-			t.itemid = fields[2].GetUInt32();
-			t.chance = fields[3].GetFloat();
-			t.chance_2 = t.chance;
-			t.mincount = t.maxcount = 1;
-		}
-		ttab.push_back( t );
-		
+		t.itemid = fields[2].GetUInt32();
+		t.chance = fields[3].GetFloat();
+		t.chance_2 = fields[4].GetFloat();
+		t.mincount = fields[5].GetUInt32();
+		t.maxcount = fields[6].GetUInt32();
+		t.ffa_loot = fields[7].GetUInt32();
 
-		/*loot_tb t;		   
-		t.itemid = fields[1].GetUInt32();
-		t.chance = fields[2].GetFloat();
-		loot_db[fields[0].GetUInt32()].push_back(t);*/
+		ttab.push_back( t );
 
 		last_entry = entry_id;
 	} while( result->NextRow() );
@@ -342,7 +320,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 				if(!proto)
 				{
 					list.items[ind].item.itemproto=NULL;
-					sLog.outDetail("WARNING: Loot %u contains item that does not exist in the DB.",entry_id);
+					Log.Warning("LootMgr", "Loot for %u contains non-existant item. (%s)",entry_id, szTableName);
 				}
 				else
 				{

@@ -94,7 +94,6 @@ public:
 	ASCENT_INLINE string GetNameString() { return name; }
 	ASCENT_INLINE const char* GetName() { return name.c_str(); }
 	ASCENT_INLINE MapEntry* GetDBCEntry() { return me; }
-	void BuildXMLStats(char * m_file);
 
 	ASCENT_INLINE CellSpawns *GetSpawnsList(uint32 cellx,uint32 celly)
 	{

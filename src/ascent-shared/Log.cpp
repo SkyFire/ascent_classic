@@ -214,7 +214,7 @@ WorldLog::WorldLog()
 
 	if (Config.MainConfig.GetBoolDefault("LogLevel", "World", false))
 	{
-		sLog.outString("  Enabling packetlog output to \"world.log\"");
+		Log.Notice("WorldLog", "Enabling packetlog output to \"world.log\"");
 		Enable();
 	} else {
 		Disable();
