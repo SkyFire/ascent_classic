@@ -102,6 +102,9 @@ AC_CHECK_LIB( pthread, pthread_create, [],
 AC_CHECK_LIB( z, compress, [],[AC_MSG_ERROR([Missing zlib])] )
 AC_CHECK_LIB( compat, ftime )
 
+CFLAGS=""
+CXXFLAGS=""
+
 if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_LIB( crypto, SHA1_Init, [], [AC_CHECK_LIB(ssl, SHA1_Init,[],[AC_MSG_ERROR([Missing openssl])])])
 	AC_DEFINE(HAVE_DARWIN)
@@ -140,14 +143,24 @@ AC_ARG_ENABLE(gcov,
 AC_ARG_ENABLE(debug,
      AC_HELP_STRING([--enable-debug],[enable debug]),
      [ if test "x$enable_debug" = "xyes" ; then
+           CFLAGS="$CFLAGS -g"
            CXXFLAGS="$CXXFLAGS -g"
        fi
      ],
 )
 
+AC_ARG_ENABLE(optimize,
+     AC_HELP_STRING([--enable-optimize],[enable code optimization]),
+     [ if test "x$enable_optimize" = "xyes" ; then
+           CFLAGS="$CFLAGS -O2"
+           CXXFLAGS="$CXXFLAGS -O2"
+       fi
+     ],
+
 AC_ARG_ENABLE(allwarnings,
-     AC_HELP_STRING([--enable-allwarnings],[enable Wall compiling]),
-     [ if test "x$enable_allwarnings" = "xyes" ; then
+     AC_HELP_STRING([--enable-warnings],[enable Wall compiling]),
+     [ if test "x$enable_warnings" = "xyes" ; then
+           CFLAGS="$CFLAGS -Wall"
 	   CXXFLAGS="$CXXFLAGS -Wall"
        fi
      ],

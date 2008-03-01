@@ -2,7 +2,7 @@
 
 echo Building Precompiled Header...
 cd src/ascent-world
-g++ -DHAVE_CONFIG_H -I. -I../.. -I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include -I. -I./../../dep/include -I./../ascent-shared -I./../../dep/src -o StdAfx.h.gch StdAfx.h
+g++ -g -DHAVE_CONFIG_H -I. -I../.. -I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include -I. -I./../../dep/include -I./../ascent-shared -I./../../dep/src -o StdAfx.h.gch StdAfx.h
 
 echo Symlinking script gch files.
 cd ../scripts/src/GossipScripts
