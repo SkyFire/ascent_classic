@@ -4129,12 +4129,13 @@ void Player::CreateCorpse()
 	uint32 iDisplayID = 0;
 	uint16 iIventoryType = 0;
 	uint32 _cfi = 0;
+	Item * pItem;
 	for (int8 i = 0; i < EQUIPMENT_SLOT_END; i++)
 	{
-		if(GetItemInterface()->GetInventoryItem(i))
+		if(( pItem = GetItemInterface()->GetInventoryItem(i)))
 		{
-			iDisplayID = GetItemInterface()->GetInventoryItem(i)->GetProto()->DisplayInfoID;
-			iIventoryType = (uint16)GetItemInterface()->GetInventoryItem(i)->GetProto()->InventoryType;
+			iDisplayID = pItem->GetProto()->DisplayInfoID;
+			iIventoryType = (uint16)pItem->GetProto()->InventoryType;
 
 			_cfi =  (uint16(iDisplayID)) | (iIventoryType)<< 24;
 			pCorpse->SetUInt32Value(CORPSE_FIELD_ITEM + i,_cfi);
@@ -4191,13 +4192,14 @@ void Player::DeathDurabilityLoss(double percent)
 	uint32 pDurability;
 	uint32 pMaxDurability;
 	int32 pNewDurability;
+	Item * pItem;
 
 	for (int8 i = 0; i < EQUIPMENT_SLOT_END; i++)
 	{
-		if(GetItemInterface()->GetInventoryItem(i))
+		if((pItem = GetItemInterface()->GetInventoryItem(i)))
 		{
-			pMaxDurability =  GetItemInterface()->GetInventoryItem(i)->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
-			pDurability =  GetItemInterface()->GetInventoryItem(i)->GetUInt32Value(ITEM_FIELD_DURABILITY);
+			pMaxDurability = pItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
+			pDurability =  pItem->GetUInt32Value(ITEM_FIELD_DURABILITY);
 			if(pDurability)
 			{
 				pNewDurability = (uint32)(pMaxDurability*percent);
@@ -4207,11 +4209,11 @@ void Player::DeathDurabilityLoss(double percent)
 
 				if(pNewDurability <= 0) 
 				{ 
-					ApplyItemMods(GetItemInterface()->GetInventoryItem(i), i, false, true);
+					ApplyItemMods(pItem, i, false, true);
 				}
 
-				GetItemInterface()->GetInventoryItem(i)->SetUInt32Value(ITEM_FIELD_DURABILITY,(uint32)pNewDurability);
-				GetItemInterface()->GetInventoryItem(i)->m_isDirty = true;
+				pItem->SetUInt32Value(ITEM_FIELD_DURABILITY,(uint32)pNewDurability);
+				pItem->m_isDirty = true;
 			}
 		}
 	}

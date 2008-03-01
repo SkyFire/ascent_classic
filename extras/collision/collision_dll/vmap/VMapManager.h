@@ -43,7 +43,7 @@ Additionally a table to match map ids and map names is used.
 */
 
 // Create a value describing the map tile
-#define MAP_TILE_IDENT(x,y) ((x<<8) + y)
+#define MAP_TILE_IDENT(x,y) ((x<<16) + y)
 //===========================================================
 
 namespace VMAP
@@ -83,7 +83,7 @@ namespace VMAP
 
             // Store all the map tile idents that are loaded for that map
             // some maps are not splitted into tiles and we have to make sure, not removing the map before all tiles are removed
-            Table<size_t, bool> iLoadedMapTiles;
+            Table<unsigned int, bool> iLoadedMapTiles;
             std::string iBasePath;
 
         private:
@@ -91,10 +91,10 @@ namespace VMAP
             bool isAlreadyLoaded(const std::string& pName) { return(iLoadedModelContainer.containsKey(pName)); }
             RayIntersectionIterator<AABSPTree<ModelContainer*>::Node, ModelContainer*> beginRayIntersection(const Ray& ray, bool skipAABoxTests = false) const;
             RayIntersectionIterator<AABSPTree<ModelContainer*>::Node, ModelContainer*> endRayIntersection() const;
-            void setLoadedMapTile(size_t pTileIdent) { iLoadedMapTiles.set(pTileIdent, true); }
-            void removeLoadedMapTile(size_t pTileIdent) { iLoadedMapTiles.remove(pTileIdent); }
+            void setLoadedMapTile(unsigned int pTileIdent) { iLoadedMapTiles.set(pTileIdent, true); }
+            void removeLoadedMapTile(unsigned int pTileIdent) { iLoadedMapTiles.remove(pTileIdent); }
             bool hasLoadedMapTiles() { return(iLoadedMapTiles.size() > 0); }
-            bool containsLoadedMapTile(size_t pTileIdent) { return(iLoadedMapTiles.containsKey(pTileIdent)); }
+            bool containsLoadedMapTile(unsigned int pTileIdent) { return(iLoadedMapTiles.containsKey(pTileIdent)); }
         public:
             ManagedModelContainer *getModelContainer(const std::string& pName) { return(iLoadedModelContainer.get(pName)); }
             const bool hasDirFile(const std::string& pDirName) const { return(iLoadedDirFiles.containsKey(pDirName)); }
@@ -109,9 +109,9 @@ namespace VMAP
 			bool isOutDoors(const Vector3& pos);
             float getHeight(const Vector3& pPos);
 
-            bool loadMap(const std::string& pDirFileName, size_t pMapTileIdent);
+            bool loadMap(const std::string& pDirFileName, unsigned int pMapTileIdent);
             void addModelConatiner(const std::string& pName, ManagedModelContainer *pMc);
-            void unloadMap(const std::string& dirFileName, size_t pMapTileIdent);
+            void unloadMap(const std::string& dirFileName, unsigned int pMapTileIdent);
 
             void getModelContainer(Array<ModelContainer *>& pArray ) { iTree->getMembers(pArray); }
             inline const void addDirFile(const std::string& pDirName, const FilesInDir& pFilesInDir) { iLoadedDirFiles.set(pDirName, pFilesInDir); }

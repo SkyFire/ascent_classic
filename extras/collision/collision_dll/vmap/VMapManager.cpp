@@ -258,7 +258,7 @@ namespace VMAP
 			m_maps[pMapId] = instanceTree;
 		}
 
-		size_t mapTileIdent = MAP_TILE_IDENT(x,y);
+		unsigned int mapTileIdent = MAP_TILE_IDENT(x,y);
 		result = instanceTree->loadMap(dirFileName, mapTileIdent);
 		if(!result)                                         // remove on fail
 		{
@@ -286,7 +286,7 @@ namespace VMAP
 			else
 				dirFileName = getDirFileName( pMapId );
 
-			size_t mapTileIdent = MAP_TILE_IDENT(x,y);
+			unsigned int mapTileIdent = MAP_TILE_IDENT(x,y);
 			instanceTree->unloadMap(dirFileName, mapTileIdent);
 			if(instanceTree->size() == 0)
 			{
@@ -783,7 +783,7 @@ namespace VMAP
 
     //=========================================================
 
-    bool MapTree::loadMap(const std::string& pDirFileName, size_t pMapTileIdent)
+    bool MapTree::loadMap(const std::string& pDirFileName, unsigned int pMapTileIdent)
     {
         bool result = true;
         size_t len = iBasePath.length() + pDirFileName.length();
@@ -861,7 +861,7 @@ namespace VMAP
 
     //=========================================================
 
-    void MapTree::unloadMap(const std::string& dirFileName, size_t pMapTileIdent)
+    void MapTree::unloadMap(const std::string& dirFileName, unsigned int pMapTileIdent)
     {
         if(hasDirFile(dirFileName) && containsLoadedMapTile(pMapTileIdent))
         {
