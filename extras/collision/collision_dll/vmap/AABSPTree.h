@@ -82,7 +82,7 @@ namespace G3D {
 
     <P><CODE>void ::getBounds(const T&, G3D::AABox&);</CODE>
     <DT><CODE>bool operator==(const T&, const T&);</CODE>
-    <DT><CODE>unsigned int ::hashCode(const T&);</CODE>
+    <DT><CODE>size_t ::hashCode(const T&);</CODE>
     <DT><CODE>T::T();</CODE> <I>(public constructor of no arguments)</I>
 
     <B>Moving %Set Members</B>
@@ -636,7 +636,7 @@ namespace G3D {
                     root = NULL;
                 }
 
-                int size() const {
+                size_t size() const {
                     return memberTable.size();
                 }
 

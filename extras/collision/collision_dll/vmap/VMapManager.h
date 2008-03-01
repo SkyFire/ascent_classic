@@ -113,8 +113,8 @@ namespace VMAP
             void unloadMap(const std::string& dirFileName, unsigned int pMapTileIdent);
 
             void getModelContainer(Array<ModelContainer *>& pArray ) { iTree->getMembers(pArray); }
-            const void addDirFile(const std::string& pDirName, const FilesInDir& pFilesInDir) { iLoadedDirFiles.set(pDirName, pFilesInDir); }
-            int size() { return(iTree->size()); }
+            inline const void addDirFile(const std::string& pDirName, const FilesInDir& pFilesInDir) { iLoadedDirFiles.set(pDirName, pFilesInDir); }
+            inline size_t size() { return(iTree->size()); }
     };
 
     //===========================================================

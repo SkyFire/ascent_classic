@@ -104,7 +104,7 @@ namespace VMAP
 
     //=====================================================
 
-    unsigned int hashCode(const ModelContainer& pMc);
+    size_t hashCode(const ModelContainer& pMc);
     bool operator==(const ModelContainer& pMc1, const ModelContainer& pMc2);
     void getBounds(const ModelContainer& pMc, G3D::AABox& pAABox);
     void getBounds(const ModelContainer* pMc, G3D::AABox& pAABox);

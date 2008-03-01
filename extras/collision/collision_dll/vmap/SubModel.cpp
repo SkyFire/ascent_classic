@@ -29,7 +29,7 @@ namespace VMAP
     /**
     Functions to use ModelContainer with a AABSPTree
     */
-    unsigned int hashCode(const SubModel& pSm)
+    size_t hashCode(const SubModel& pSm)
     {
         return pSm.getNTriangles();
     }

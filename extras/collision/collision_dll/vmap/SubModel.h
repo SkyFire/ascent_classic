@@ -95,7 +95,7 @@ namespace VMAP
 			inline const unsigned int getIndoorFlag() const { return iIsIndoor; }
     };
 
-    unsigned int hashCode(const SubModel& pSm);
+    size_t hashCode(const SubModel& pSm);
     bool operator==(const SubModel& pSm1, const SubModel& pSm2);
     void getBounds(const SubModel& pSm, G3D::AABox& pAABox);
     void getBounds(const SubModel* pSm, G3D::AABox& pAABox);

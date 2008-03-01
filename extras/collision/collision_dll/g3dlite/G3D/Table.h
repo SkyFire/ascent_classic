@@ -34,7 +34,7 @@
 namespace G3D {
 class Hashable {
 public:
-    virtual unsigned int hashCode() const = 0;
+    virtual size_t hashCode() const = 0;
     
     /**
      An empty virtual destructor for virtual methods.
@@ -46,46 +46,54 @@ public:
 /**
  Int hashing function for use with Table.
  */
-inline unsigned int hashCode(const int a) {
-	return a;
+inline size_t hashCode(const int a) {
+	return static_cast<size_t>(a);
 }
 
-inline unsigned int hashCode(const G3D::uint32 a) {
-	return a;
+inline size_t hashCode(const G3D::uint32 a) {
+	return static_cast<size_t>(a);
 }
 
-inline unsigned int hashCode(const G3D::uint64 a) {
-	return (unsigned int)a;
+inline size_t hashCode(const G3D::uint64 a) {
+	return static_cast<size_t>(a);
 }
 
-inline unsigned int hashCode(const void* a) {
+inline size_t hashCode(const void* a) {
 	// Avoid 64-bit pointer cast problems by turning
 	// the pointer itself into an array of integers.
-	int* intPtr = (int*)(((unsigned char*)&a) + (sizeof(void*) - sizeof(int)));
-	return *intPtr;
+	//int* intPtr = (int*)(((unsigned char*)&a) + (sizeof(void*) - sizeof(int)));
+	//return *intPtr;
+
+	// sucks - burlex :P
+	// use a 64bit hash code instead !
+	// void* and size_t should be equal types (4byte on x86, 8byte on x64)
+	return reinterpret_cast<size_t>(a);
 }
 
 /**
  Default class pointer hash.
  */
-inline unsigned int hashCode(const G3D::Hashable* a) {
+inline size_t hashCode(const G3D::Hashable* a) {
     return a->hashCode();
 }
 
 /**
  Default class hash.
  */
-inline unsigned int hashCode(const G3D::Hashable& a) {
+inline size_t hashCode(const G3D::Hashable& a) {
     return a.hashCode();
 }
 
 /**
  String hashing function for use with Table.
  */
-inline unsigned int hashCode(const std::string& a) {
+inline size_t hashCode(const std::string& a) {
     //static const std::collate<char>& col = std::use_facet< std::collate<char> > (std::locale::empty( ));
     //return col.hash(a.c_str(), a.c_str() + a.size());
-    return G3D::Crypto::crc32(a.c_str(), a.size());
+
+	// burlex - this shouldn't be done with only 4 bytes, collisions are possible
+	// although i don't think we use std::strings much in this class
+    return static_cast<size_t>(G3D::Crypto::crc32(a.c_str(), a.size()));
 }
 
 namespace G3D {
@@ -98,7 +106,7 @@ namespace G3D {
  or provide overloads for the following <B>two</B> functions: 
 
   <PRE>
-   unsigned int hashCode(const Key&);
+   size_t hashCode(const Key&);
    bool operator==(const Key&, const Key&);
   </PRE>
 
@@ -107,7 +115,7 @@ namespace G3D {
  an enum would use:
 
   <PRE>
-  unsigned int hashCode(const MyEnum& x) { return (unsigned int)x; };
+  size_t hashCode(const MyEnum& x) { return (unsigned int)x; };
   </PRE>
 
   And rely on the default enum operator==.
@@ -136,7 +144,7 @@ private:
      */
     class Node {
     public:
-        unsigned int      hashCode;
+        size_t            hashCode;
         Entry             entry;
         Node*             next;
 
@@ -151,7 +159,7 @@ private:
         }
 
 
-        Node(Key key, Value value, unsigned int hashCode, Node* next) {
+        Node(Key key, Value value, size_t hashCode, Node* next) {
             this->entry.key   = key;
             this->entry.value = value;
             this->hashCode    = hashCode;
@@ -170,7 +178,7 @@ private:
     /**
      Number of elements in the table.
      */
-    int     _size;
+    size_t  _size;
 
     /**
      Array of Node*. 
@@ -182,25 +190,25 @@ private:
     /**
      Length of the bucket array.
      */
-    int     numBuckets;
+    size_t  numBuckets;
 
     /**
      Re-hashes for a larger bucket size.
      */
-    void resize(int numBuckets) {
+    void resize(size_t numBuckets) {
 
         Node** oldBucket = bucket;
         bucket = (Node**)System::alignedMalloc(sizeof(Node*) * numBuckets, 16);
         System::memset(bucket, 0, sizeof(Node*) * numBuckets);
 
-        for (int b = 0; b < this->numBuckets; b++) {
+        for (size_t b = 0; b < this->numBuckets; b++) {
             Node* node = oldBucket[b];
          
             while (node != NULL) {
                 Node* nextNode = node->next;
         
                 // insert at the head of the list for bucket[i]
-                int i = node->hashCode % numBuckets;
+                size_t i = node->hashCode % numBuckets;
                 node->next = bucket[i];
                 bucket[i] = node;
         
@@ -217,7 +225,7 @@ private:
         this->numBuckets = h.numBuckets;
         this->bucket = (Node**)System::alignedMalloc(sizeof(Node*) * numBuckets, 16);
         System::memset(this->bucket, 0, sizeof(Node*) * numBuckets);
-        for (int b = 0; b < this->numBuckets; b++) {
+        for (size_t b = 0; b < this->numBuckets; b++) {
             if (h.bucket[b] != NULL) {
                 bucket[b] = h.bucket[b]->clone();
             }
@@ -228,7 +236,7 @@ private:
      Frees the heap structures for the nodes.
      */
     void freeMemory() {
-        for (int b = 0; b < numBuckets; b++) {
+        for (size_t b = 0; b < numBuckets; b++) {
            Node* node = bucket[b];
            while (node != NULL) {
                 Node* next = node->next;
@@ -281,11 +289,11 @@ public:
     /**
      Returns the length of the deepest bucket.
      */
-    int debugGetDeepestBucketSize() const {
-        int deepest = 0;
+    size_t debugGetDeepestBucketSize() const {
+        size_t deepest = 0;
 
-        for (int b = 0; b < numBuckets; b++) {
-            int     count = 0;
+        for (size_t b = 0; b < numBuckets; b++) {
+            size_t  count = 0;
             Node*   node = bucket[b];
             while (node != NULL) {
                 node = node->next;
@@ -314,7 +322,7 @@ public:
     /**
      Returns the number of buckets.
      */
-    int debugGetNumBuckets() const {
+    size_t debugGetNumBuckets() const {
         return numBuckets;
     }
 
@@ -328,14 +336,14 @@ public:
         /**
          Bucket index.
          */
-        int                index;
+        size_t             index;
 
         /**
          Linked list node.
          */
         Node*              node;
         Table<Key, Value>* table;
-        int                numBuckets;
+        size_t             numBuckets;
         Node**             bucket;
         bool               isDone;
 
@@ -346,7 +354,7 @@ public:
             isDone = true;
         }
 
-        Iterator(const Table<Key, Value>* table, int numBuckets, Node** bucket) :
+        Iterator(const Table<Key, Value>* table, size_t numBuckets, Node** bucket) :
             table(const_cast<Table<Key, Value>*>(table)),
             numBuckets(numBuckets),
             bucket(bucket) {
@@ -460,7 +468,7 @@ public:
     /**
      Returns the number of keys.
      */
-    int size() const {
+    inline size_t size() const {
         return _size;
     }
 
@@ -471,8 +479,8 @@ public:
      key into a table is O(1), but may cause a potentially slow rehashing.
      */
     void set(const Key& key, const Value& value) {
-        unsigned int code = ::hashCode(key);
-        unsigned int b = code % numBuckets;
+        size_t code = ::hashCode(key);
+        size_t b = code % numBuckets;
         
         // Go to the bucket
         Node* n = bucket[b];
@@ -484,7 +492,7 @@ public:
             return;
         }
 
-        int bucketLength = 1;
+        size_t bucketLength = 1;
 
         // Sometimes a bad hash code will cause all elements
         // to collide.  Detect this case and don't rehash when 
@@ -505,7 +513,7 @@ public:
             ++bucketLength;
         } while (n != NULL);
 
-        const int maxBucketLength = 5;
+        const size_t maxBucketLength = 5;
         if ((bucketLength > maxBucketLength) & ! allSameCode && (numBuckets < _size * 20)) {
             // This bucket was really large; rehash if all elements
             // don't have the same hashcode the number of buckets is reasonable.
@@ -524,8 +532,8 @@ public:
     */
    void remove(const Key& key) {
       
-      unsigned int code = ::hashCode(key);
-      unsigned int b = code % numBuckets;
+      size_t code = ::hashCode(key);
+      size_t b = code % numBuckets;
 
       // Go to the bucket
       Node* n = bucket[b];
@@ -564,8 +572,8 @@ public:
     */
    Value& get(const Key& key) const {
 
-       unsigned int code = ::hashCode(key);
-      unsigned int b = code % numBuckets;
+      size_t code = ::hashCode(key);
+      size_t b = code % numBuckets;
 
       Node* node = bucket[b];
 
@@ -587,8 +595,8 @@ public:
     If the key is not present, returns false.
     */
    bool get(const Key& key, Value& val) const {
-	  unsigned int code = ::hashCode(key);
-      unsigned int b = code % numBuckets;
+	  size_t code = ::hashCode(key);
+      size_t b = code % numBuckets;
 
       Node* node = bucket[b];
 
@@ -609,8 +617,8 @@ public:
     Returns true if key is in the table.
     */
    bool containsKey(const Key& key) const {
-       unsigned int code = ::hashCode(key);
-       unsigned int b = code % numBuckets;
+       size_t code = ::hashCode(key);
+       size_t b = code % numBuckets;
 
        Node* node = bucket[b];
 
@@ -645,7 +653,7 @@ public:
 
    void getKeys(Array<Key>& keyArray) const {
        keyArray.resize(0, DONT_SHRINK_UNDERLYING_ARRAY);
-       for (int i = 0; i < numBuckets; i++) {
+       for (size_t i = 0; i < numBuckets; i++) {
            Node* node = bucket[i];
            while (node != NULL) {
                keyArray.append(node->entry.key);
@@ -664,7 +672,7 @@ public:
     <PRE>
         Array<Key> keys = table.getKeys();
         Set<Value> value;
-        for (int k = 0; k < keys.length(); k++) {
+        for (size_t k = 0; k < keys.length(); k++) {
            value.insert(keys[k]);
         }
         value.getMembers().deleteAll();
@@ -684,7 +692,7 @@ public:
     of dangling pointers.
     */
    void deleteValues() {
-       for (int i = 0; i < numBuckets; i++) {
+       for (size_t i = 0; i < numBuckets; i++) {
            Node* node = bucket[i];
            while (node != NULL) {
                delete node->entry.value;

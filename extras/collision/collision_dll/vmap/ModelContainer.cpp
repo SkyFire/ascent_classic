@@ -29,7 +29,7 @@ namespace VMAP
     /**
     Functions to use ModelContainer with a AABSPTree
     */
-    unsigned int hashCode(const ModelContainer& pMc)
+    size_t hashCode(const ModelContainer& pMc)
     {
         return (pMc.getBasePosition() * pMc.getNTriangles()).hashCode();
     }
