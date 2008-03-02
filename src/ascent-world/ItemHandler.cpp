@@ -1360,6 +1360,7 @@ void WorldSession::HandleListInventoryOpcode( WorldPacket & recv_data )
 	if(unit->GetAIInterface())
 		unit->GetAIInterface()->StopMovement(180000);
 
+	_player->Reputation_OnTalk(unit->m_factionDBC);
 	SendInventoryList(unit);
 }
 

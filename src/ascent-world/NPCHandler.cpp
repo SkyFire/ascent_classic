@@ -113,6 +113,7 @@ void WorldSession::HandleTrainerListOpcode( WorldPacket & recv_data )
 	Creature *train = GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
 	if(!train) return;
 
+	_player->Reputation_OnTalk(train->m_factionDBC);
 	SendTrainerList(train);
 }
 
