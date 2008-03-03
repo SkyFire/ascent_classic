@@ -3200,6 +3200,7 @@ void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
 		add_damage += damage;
 		return;
 	}
+
 	u_caster->Strike( unitTarget, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo, damage, 0, 0, false, true );
 }
 
@@ -4906,6 +4907,7 @@ void Spell::SpellEffectApplyPetAura(uint32 i)
 
 void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 {
+
 	if( unitTarget == NULL || u_caster == NULL )
 		return;
 
@@ -4939,7 +4941,25 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 			return; //no damage = no joy
 		damage = damage*sunder_count;
 	}
-
+	else if( m_spellInfo->NameHash == SPELL_HASH_CRUSADER_STRIKE ) // Crusader Strike - refreshes *all* judgements, not just your own
+	{
+		for( int x = MAX_POSITIVE_AURAS ; x <= MAX_AURAS ; x ++ ) // there are only debuff judgements anyway :P
+		{
+			if( unitTarget->m_auras[x] && unitTarget->m_auras[x]->GetSpellProto()->buffIndexType == SPELL_TYPE_INDEX_JUDGEMENT )
+			{
+				// Refresh it!
+				// oh noes, they don't stack...
+				Aura * aur = unitTarget->m_auras[x];
+				SpellEntry * spinfo = aur->GetSpellProto();
+				aur->Remove();
+				Spell * sp = new Spell( this->u_caster , spinfo , true , NULL );
+				
+				SpellCastTargets tgt;
+				tgt.m_unitTarget = unitTarget->GetGUID();
+				sp->prepare( &tgt );
+			}
+		}
+	}
 	//Hemorrhage
 	if( p_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_HEMORRHAGE )
 		p_caster->AddComboPoints(p_caster->GetSelection(), 1);

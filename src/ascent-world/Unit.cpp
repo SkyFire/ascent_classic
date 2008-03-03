@@ -2941,11 +2941,19 @@ else
 		// refresh judgements
 		// TODO: find the opcode to refresh the aura or just remove it and re add it
 		// rather than fuck with duration
+		// DONE: Remove + readded it :P
 		for( uint32 x = MAX_POSITIVE_AURAS; x <= MAX_AURAS; x++ )
 		{
 			if( pVictim->m_auras[x] != NULL && pVictim->m_auras[x]->GetUnitCaster() != NULL && pVictim->m_auras[x]->GetUnitCaster()->GetGUID() == GetGUID() && pVictim->m_auras[x]->GetSpellProto()->buffIndexType == SPELL_TYPE_INDEX_JUDGEMENT )
 			{
-				pVictim->m_auras[x]->SetDuration( 20000 ); // 20 seconds?
+				Aura * aur = pVictim->m_auras[x];
+				SpellEntry * spinfo = aur->GetSpellProto();
+				aur->Remove();
+				Spell * sp = new Spell( this , spinfo , true , NULL );
+				SpellCastTargets tgt;
+				tgt.m_unitTarget = pVictim->GetGUID();
+				sp->prepare( &tgt );
+				/*pVictim->m_auras[x]->SetDuration( 20000 ); // 20 seconds?
 				sEventMgr.ModifyEventTimeLeft( pVictim->m_auras[x], EVENT_AURA_REMOVE, 20000 );
 			
 				// We have to tell the target that the aura has been refreshed.
@@ -2956,6 +2964,7 @@ else
 					data << (uint8)pVictim->m_auras[x]->GetAuraSlot() << 20000;
 					static_cast< Player* >( pVictim )->GetSession()->SendPacket( &data );
 				}
+				*/
 				// However, there is also an opcode that tells the caster that the aura has been refreshed.
 				// This isn't implemented anywhere else in the source, so I can't work on that part :P
 				// (The 'cooldown' meter on the target frame that shows how long the aura has until expired does not get reset)=

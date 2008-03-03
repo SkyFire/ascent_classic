@@ -144,6 +144,8 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 		    u_caster = NULL;
 		    p_caster = NULL;
 		    i_caster = static_cast< Item* >( Caster );
+			if( i_caster->GetOwner() && i_caster->GetOwner()->GetDuelState() == DUEL_STATE_STARTED )
+				duelSpell = true;
         }break;
 		
 		case TYPEID_GAMEOBJECT:

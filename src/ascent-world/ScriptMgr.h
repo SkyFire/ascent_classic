@@ -63,6 +63,7 @@ enum ScriptTypes
 	SCRIPT_TYPE_SCRIPT_ENGINE_AS			= 0x22,
 };
 
+
 /* Hook typedefs */
 typedef bool(*tOnNewCharacter)(uint32 Race, uint32 Class, WorldSession * Session, const char * Name);
 typedef void(*tOnKillPlayer)(Player * pPlayer, Player * pVictim);
