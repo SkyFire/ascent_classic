@@ -584,7 +584,7 @@ public:
 				if(Max > STORAGE_ARRAY_MAX)
 				{
 					Log.Error("Storage", "The table, '%s', has a maximum entry of %u, which is less %u. Any items higher than %u will not be loaded.",
-						IndexName, STORAGE_ARRAY_MAX, STORAGE_ARRAY_MAX);
+						IndexName, Max, STORAGE_ARRAY_MAX, STORAGE_ARRAY_MAX);
 
 					Max = STORAGE_ARRAY_MAX;
 				}
@@ -645,7 +645,7 @@ public:
 				if(Max > STORAGE_ARRAY_MAX)
 				{
 					Log.Error("Storage", "The table, '%s', has a maximum entry of %u, which is less %u. Any items higher than %u will not be loaded.",
-						IndexName, STORAGE_ARRAY_MAX, STORAGE_ARRAY_MAX);
+						IndexName, Max, STORAGE_ARRAY_MAX, STORAGE_ARRAY_MAX);
 
 					Max = STORAGE_ARRAY_MAX;
 				}
