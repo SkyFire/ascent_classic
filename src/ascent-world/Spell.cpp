@@ -582,7 +582,18 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	uint32 melee_test_result;
 	if( m_spellInfo->is_melee_spell)
 	{
-		melee_test_result = u_caster->GetSpellDidHitResult( u_victim, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo );
+		uint32 _type;
+		if( GetType() == SPELL_DMG_TYPE_RANGED )
+			_type = RANGED;
+		else
+		{
+			if (m_spellInfo->Flags4 & 0x1000000)
+				_type =  OFFHAND;
+			else
+				_type = MELEE;
+		}
+
+		melee_test_result = u_caster->GetSpellDidHitResult( u_victim, _type, m_spellInfo );
 		if(melee_test_result != SPELL_DID_HIT_SUCCESS)
 			return (uint8)melee_test_result;
 	}
