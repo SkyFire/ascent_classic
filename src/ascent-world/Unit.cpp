@@ -3361,15 +3361,19 @@ void Unit::AddAura(Aura *aur)
 						//update duration,the same aura (update the whole stack whenever we cast a new one)
 						m_auras[x]->SetDuration(aur->GetDuration());
 						sEventMgr.ModifyEventTimeLeft(m_auras[x], EVENT_AURA_REMOVE, aur->GetDuration());
-						if(this->IsPlayer())
+						if(maxStack <= 1)
 						{
-							data.Initialize(SMSG_UPDATE_AURA_DURATION);
-							data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
-							static_cast< Player* >( this )->GetSession()->SendPacket( &data );
+							if(this->IsPlayer())
+							{
+								data.Initialize(SMSG_UPDATE_AURA_DURATION);
+								data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
+								((Player*)this)->GetSession()->SendPacket(&data);
+							}
+							
+							data.Initialize(SMSG_SET_AURA_SINGLE);
+							data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
+							SendMessageToSet(&data,false);
 						}
-						data.Initialize(SMSG_PET_LEARNT_SPELL);
-						data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
-						SendMessageToSet(&data,false);
 					}
 					if(maxStack <= f)
 					{
@@ -3732,7 +3736,7 @@ bool Unit::SetAurDuration(uint32 spellId,Unit* caster,uint32 duration)
 		static_cast< Player* >( this )->GetSession()->SendPacket( &data );
 	}
 
-	WorldPacket data(SMSG_PET_LEARNT_SPELL,21);
+	WorldPacket data(SMSG_SET_AURA_SINGLE,21);
 	data << GetNewGUID() << aur->m_visualSlot << uint32(spellId) << uint32(duration) << uint32(duration);
 	SendMessageToSet(&data,false);
 			
@@ -3757,7 +3761,7 @@ bool Unit::SetAurDuration(uint32 spellId,uint32 duration)
 		data << (uint8)(aur)->GetAuraSlot() << duration;
 		static_cast< Player* >( this )->GetSession()->SendPacket( &data );
 	}
-	WorldPacket data(SMSG_PET_LEARNT_SPELL,21);
+	WorldPacket data(SMSG_SET_AURA_SINGLE,21);
 	data << GetNewGUID() << aur->m_visualSlot << uint32(spellId) << uint32(duration) << uint32(duration);
 	SendMessageToSet(&data,false);
 

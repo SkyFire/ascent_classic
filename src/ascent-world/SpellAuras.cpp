@@ -681,7 +681,7 @@ void Aura::AddAuraVisual()
 		static_cast< Player* >( m_target )->GetSession()->SendPacket(&data);
 	}
 		
-	WorldPacket data(SMSG_PET_LEARNT_SPELL, 21);
+	WorldPacket data(SMSG_SET_AURA_SINGLE, 22);
 	data << m_target->GetNewGUID() << m_visualSlot << uint32(m_spellProto->Id) << uint32(m_duration) << uint32(m_duration);
 	m_target->SendMessageToSet(&data,false);
 

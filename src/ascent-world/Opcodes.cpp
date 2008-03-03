@@ -869,7 +869,7 @@ NameTableEntry g_worldOpcodeNames[] = {
 	{CMSG_MOVE_UNLOCK_MOVEMENT_ACK,                "CMSG_MOVE_UNLOCK_MOVEMENT_ACK"},
 	{SMSG_SET_COMBO_POINTS,                        "SMSG_SET_COMBO_POINTS"},
 	{SMSG_SET_AURA_MULTIPLE,                       "SMSG_SET_AURA_MULTIPLE"},
-	{SMSG_PET_LEARNT_SPELL,                        "SMSG_PET_LEARNT_SPELL"},
+	{SMSG_SET_AURA_SINGLE,                         "SMSG_SET_AURA_SINGLE"},
 	{SMSG_TARGET_CAST_RESULT,                      "SMSG_TARGET_CAST_RESULT"},
 	{CMSG_REPORT_SPAM,                             "CMSG_REPORT_SPAM"},
 	{SMSG_REPORT_SPAM_RESPONSE,                    "SMSG_REPORT_SPAM_RESPONSE"},
