@@ -1549,7 +1549,7 @@ public:
     // See if we hit the target or can it resist (evade/immune/resist on spellgo) (0=success)
     uint8 DidHit(uint32 effindex,Unit* target);
     // Prepares the spell thats going to cast to targets
-    void prepare(SpellCastTargets * targets);
+    uint8 prepare(SpellCastTargets * targets);
     // Cancels the current spell
     void cancel();
     // Update spell state based on time difference

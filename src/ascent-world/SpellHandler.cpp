@@ -144,12 +144,13 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	}
 
 	Spell *spell = new Spell(_player, spellInfo, false, NULL);
+	uint8 result;
 	spell->extra_cast_number=cn;
 	spell->i_caster = tmpItem;
 	//GetPlayer()->setCurrentSpell(spell);
-	spell->prepare(&targets);
+	result = spell->prepare(&targets);
 
-	if( ( itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown ) && spell->CanCast( false ) == SPELL_CANCAST_OK )
+	if( ( itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown ) && result == SPELL_CANCAST_OK )
 	{
 		ItemCooldown * item = new ItemCooldown;
 	   	if(itemProto->Spells[x].Id)

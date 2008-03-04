@@ -949,8 +949,10 @@ void Spell::GenerateTargets(SpellCastTargets *store_buff)
 		store_buff->m_targetMask |= TARGET_FLAG_DEST_LOCATION;
 }//end function
 
-void Spell::prepare( SpellCastTargets * targets )
+uint8 Spell::prepare( SpellCastTargets * targets )
 {
+	uint8 ccr;
+
 	chaindamage = 0;
 	m_targets = *targets;
 
@@ -1017,6 +1019,7 @@ void Spell::prepare( SpellCastTargets * targets )
 
 	//sLog.outString( "CanCast result: %u. Refer to SpellFailure.h to work out why." , cancastresult );
 
+	ccr = cancastresult;
 	if( cancastresult != SPELL_CANCAST_OK )
 	{
 		SendCastResult( cancastresult );
@@ -1038,11 +1041,11 @@ void Spell::prepare( SpellCastTargets * targets )
 				u_caster->GetCurrentSpell()->cancel();
 				SendChannelUpdate( 0 );
 				cancel();
-				return;
+				return ccr;
 			}
 		}
 		finish();
-		return;
+		return ccr;
 	}
 	else
 	{
@@ -1078,6 +1081,8 @@ void Spell::prepare( SpellCastTargets * targets )
 	}
 	else
 		cast( false );
+
+	return ccr;
 }
 
 void Spell::cancel()
