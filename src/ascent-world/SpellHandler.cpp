@@ -135,7 +135,22 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	{
 		if(!_player->CanCastItemDueToCooldown(itemProto, x))	// damn cheaters
 			return;
+	}
 
+	if(_player->m_currentSpell)
+	{
+		_player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, cn, 0);
+		return;
+	}
+
+	Spell *spell = new Spell(_player, spellInfo, false, NULL);
+	spell->extra_cast_number=cn;
+	spell->i_caster = tmpItem;
+	//GetPlayer()->setCurrentSpell(spell);
+	spell->prepare(&targets);
+
+	if( ( itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown ) && spell->CanCast( false ) == SPELL_CANCAST_OK )
+	{
 		ItemCooldown * item = new ItemCooldown;
 	   	if(itemProto->Spells[x].Id)
 		{
@@ -156,20 +171,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 				}
 			}
 		}
-		_player->m_itemcooldown.insert(item);
 	}
-
-	if(_player->m_currentSpell)
-	{
-		_player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, cn, 0);
-		return;
-	}
-
-	Spell *spell = new Spell(_player, spellInfo, false, NULL);
-	spell->extra_cast_number=cn;
-	spell->i_caster = tmpItem;
-	//GetPlayer()->setCurrentSpell(spell);
-	spell->prepare(&targets);
 }
 
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
