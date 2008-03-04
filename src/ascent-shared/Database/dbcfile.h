@@ -161,6 +161,11 @@ public:
 	/// Trivial
 	size_t getRecordCount() const { return recordCount;}
 	size_t getFieldCount() const { return fieldCount; }
+////////////////////////////////////////////////////////////////////////////////////////////
+	int AddRecord(); //simply add an empty record to the end of the data section
+	int AddString(const char *new_string); //simply add an empty record to the end of the string section
+	int GetRecordSize() { return recordSize; }
+////////////////////////////////////////////////////////////////////////////////////////////
 private:
 	std::string filename;
 	unsigned int recordSize;

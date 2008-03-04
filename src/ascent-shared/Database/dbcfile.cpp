@@ -22,7 +22,16 @@
 //#include "../Common.h"
 DBCFile::DBCFile()
 {
-	
+	data = NULL;
+	stringTable = NULL;
+}
+
+DBCFile::~DBCFile()
+{
+	if(	data )
+		free ( data );
+	if ( stringTable )
+		free ( stringTable );
 }
 
 bool DBCFile::open(const char*fn)
@@ -44,9 +53,10 @@ bool DBCFile::open(const char*fn)
 	stringSize = swap32(stringSize);
 #endif
 	
-	data = new unsigned char[recordSize*recordCount+stringSize];
-	stringTable = data + recordSize*recordCount;
-	fread(data,recordSize*recordCount+stringSize,1,pf);
+	data = (unsigned char *)malloc (recordSize*recordCount); 
+	stringTable = (unsigned char *)malloc ( stringSize ) ;
+	fread( data ,recordSize*recordCount,1,pf);
+	fread( stringTable , stringSize,1,pf);
 
 	/* swap all the rows */
 #ifdef USING_BIG_ENDIAN
@@ -57,11 +67,6 @@ bool DBCFile::open(const char*fn)
 #endif
 	fclose(pf);
 	return true;
-}
-
-DBCFile::~DBCFile()
-{
-	delete [] data;
 }
 
 DBCFile::Record DBCFile::getRecord(size_t id)
@@ -96,9 +101,73 @@ bool DBCFile::DumpBufferToFile(const char*fn)
   fwrite ((const void *)&stringSize , 4 , 1 , pFile );
 
   //now the main part is the data
-  fwrite (data , recordSize*recordCount+stringSize , 1 , pFile );
+  fwrite (data , recordSize*recordCount , 1 , pFile );
+  fwrite (stringTable , stringSize , 1 , pFile );
 
   //and pull out
   fclose (pFile);
   return true;
 }
+
+int DBCFile::AddRecord() //simply add an empty record to the end of the data section
+{
+	recordCount++;
+	if( data )
+	{
+		data = (unsigned char *)realloc( data, recordCount*recordSize );
+		memset( data + (recordCount - 1) * recordSize, 0, recordSize);//make sure no random values get here
+	}
+	else 
+	{
+		//the dbc file is not yet opened
+		printf(" Error : adding record to an unopened DBC file\n");
+		recordCount = 0;
+		return NULL;
+	}
+
+	//seems like an error ocured
+	if ( !data )
+	{
+		printf(" Error : Could not resize DBC data partition\n");
+		recordCount = 0;
+		return NULL;
+	}
+
+	return (recordCount - 1);
+}
+
+int DBCFile::AddString(const char *new_string) //simply add an empty record to the end of the string section
+{
+
+	size_t new_str_len = strlen( new_string ) + 1;
+
+	if( new_str_len == 0 )
+		return 0; //we do not add 0 len strings
+
+	if( stringTable )
+		stringTable = (unsigned char *)realloc( stringTable, stringSize + new_str_len );
+	else 
+	{
+		//the dbc file is not yet opened
+		printf(" Error : adding string to an unopened DBC file\n");
+		stringSize = 0;
+		return NULL;
+	}
+
+	//seems like an error ocured
+	if ( !stringTable )
+	{
+		printf(" Error : Could not resize DBC string partition\n");
+		stringSize = 0;
+		return NULL;
+	}
+
+	memcpy( stringTable + stringSize, new_string, new_str_len );
+
+	int ret = stringSize;
+
+	stringSize += (int)new_str_len;
+
+	return ret;
+}
+
