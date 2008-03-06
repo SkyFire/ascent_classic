@@ -1,8 +1,8 @@
 Index: trunk/src/ascent-shared/AscentConfig.h
 ===================================================================
---- trunk/src/ascent-shared/AscentConfig.h	(revision 4104)
+--- trunk/src/ascent-shared/AscentConfig.h	(revision 4106)
 +++ trunk/src/ascent-shared/AscentConfig.h	(working copy)
-@@ -95,5 +95,14 @@
+@@ -95,5 +95,15 @@
   */
  #define OPTIMIZE_SERVER_FOR_MYSQL 1
  
@@ -17,9 +17,10 @@ Index: trunk/src/ascent-shared/AscentConfig.h
  
 +
 +
++
 Index: trunk/src/ascent-shared/Database/DBCStores.h
 ===================================================================
---- trunk/src/ascent-shared/Database/DBCStores.h	(revision 4104)
+--- trunk/src/ascent-shared/Database/DBCStores.h	(revision 4106)
 +++ trunk/src/ascent-shared/Database/DBCStores.h	(working copy)
 @@ -344,6 +344,11 @@
      /// CUSTOM: these fields are used for the modifications made in the world.cpp
@@ -35,7 +36,7 @@ Index: trunk/src/ascent-shared/Database/DBCStores.h
      uint32 buffType;                        //!!! CUSTOM, these are related to creating a item through a spell
 Index: trunk/src/ascent-world/DynamicObject.cpp
 ===================================================================
---- trunk/src/ascent-world/DynamicObject.cpp	(revision 4104)
+--- trunk/src/ascent-world/DynamicObject.cpp	(revision 4106)
 +++ trunk/src/ascent-world/DynamicObject.cpp	(working copy)
 @@ -175,8 +175,10 @@
  				target->AddAura(pAura);
@@ -48,15 +49,16 @@ Index: trunk/src/ascent-world/DynamicObject.cpp
  				}
  
  				// add to target list
-@@ -233,3 +235,5 @@
+@@ -233,3 +235,6 @@
  	delete this;
  }
  
 +
 +
++
 Index: trunk/src/ascent-world/HonorHandler.cpp
 ===================================================================
---- trunk/src/ascent-world/HonorHandler.cpp	(revision 4104)
+--- trunk/src/ascent-world/HonorHandler.cpp	(revision 4106)
 +++ trunk/src/ascent-world/HonorHandler.cpp	(working copy)
 @@ -34,9 +34,10 @@
  {
@@ -72,7 +74,7 @@ Index: trunk/src/ascent-world/HonorHandler.cpp
  }
 Index: trunk/src/ascent-world/Item.cpp
 ===================================================================
---- trunk/src/ascent-world/Item.cpp	(revision 4104)
+--- trunk/src/ascent-world/Item.cpp	(revision 4106)
 +++ trunk/src/ascent-world/Item.cpp	(working copy)
 @@ -679,7 +679,9 @@
  						ProcTriggerSpell TS;
@@ -86,7 +88,7 @@ Index: trunk/src/ascent-world/Item.cpp
  						 * Secondly, need to assign some static chance for instant attacks (ss,
 Index: trunk/src/ascent-world/ItemInterface.cpp
 ===================================================================
---- trunk/src/ascent-world/ItemInterface.cpp	(revision 4104)
+--- trunk/src/ascent-world/ItemInterface.cpp	(revision 4106)
 +++ trunk/src/ascent-world/ItemInterface.cpp	(working copy)
 @@ -1156,7 +1156,7 @@
  	//detect special bag item
@@ -126,7 +128,7 @@ Index: trunk/src/ascent-world/ItemInterface.cpp
  				{
 Index: trunk/src/ascent-world/ItemPrototype.h
 ===================================================================
---- trunk/src/ascent-world/ItemPrototype.h	(revision 4104)
+--- trunk/src/ascent-world/ItemPrototype.h	(revision 4106)
 +++ trunk/src/ascent-world/ItemPrototype.h	(working copy)
 @@ -448,12 +448,18 @@
  
@@ -155,7 +157,7 @@ Index: trunk/src/ascent-world/ItemPrototype.h
  enum SOCKET_GEM_COLOR
 Index: trunk/src/ascent-world/Object.cpp
 ===================================================================
---- trunk/src/ascent-world/Object.cpp	(revision 4104)
+--- trunk/src/ascent-world/Object.cpp	(revision 4106)
 +++ trunk/src/ascent-world/Object.cpp	(working copy)
 @@ -1741,10 +1741,15 @@
  			if( spellId )
@@ -315,7 +317,7 @@ Index: trunk/src/ascent-world/Object.cpp
  
 Index: trunk/src/ascent-world/Player.cpp
 ===================================================================
---- trunk/src/ascent-world/Player.cpp	(revision 4104)
+--- trunk/src/ascent-world/Player.cpp	(revision 4106)
 +++ trunk/src/ascent-world/Player.cpp	(working copy)
 @@ -1462,9 +1462,10 @@
  	}
@@ -341,7 +343,7 @@ Index: trunk/src/ascent-world/Player.cpp
  			}
 Index: trunk/src/ascent-world/Spell.cpp
 ===================================================================
---- trunk/src/ascent-world/Spell.cpp	(revision 4104)
+--- trunk/src/ascent-world/Spell.cpp	(revision 4106)
 +++ trunk/src/ascent-world/Spell.cpp	(working copy)
 @@ -687,8 +687,10 @@
  		else
@@ -581,7 +583,7 @@ Index: trunk/src/ascent-world/Spell.cpp
  {
 Index: trunk/src/ascent-world/Spell.h
 ===================================================================
---- trunk/src/ascent-world/Spell.h	(revision 4104)
+--- trunk/src/ascent-world/Spell.h	(revision 4106)
 +++ trunk/src/ascent-world/Spell.h	(working copy)
 @@ -220,7 +220,7 @@
      TARGET_FLAG_UNK9                = 0x4000,
@@ -730,7 +732,7 @@ Index: trunk/src/ascent-world/Spell.h
 +#endif
 Index: trunk/src/ascent-world/SpellAuras.cpp
 ===================================================================
---- trunk/src/ascent-world/SpellAuras.cpp	(revision 4104)
+--- trunk/src/ascent-world/SpellAuras.cpp	(revision 4106)
 +++ trunk/src/ascent-world/SpellAuras.cpp	(working copy)
 @@ -1120,6 +1120,14 @@
  	uint32 school = GetSpellProto()->School;
@@ -929,7 +931,7 @@ Index: trunk/src/ascent-world/SpellAuras.cpp
  				break; //only 1 instance of a proc spell per caster ?
 Index: trunk/src/ascent-world/SpellAuras.h
 ===================================================================
---- trunk/src/ascent-world/SpellAuras.h	(revision 4104)
+--- trunk/src/ascent-world/SpellAuras.h	(revision 4106)
 +++ trunk/src/ascent-world/SpellAuras.h	(working copy)
 @@ -24,19 +24,19 @@
  	AFLAG_SET = 0x9
@@ -999,7 +1001,7 @@ Index: trunk/src/ascent-world/SpellAuras.h
  
 Index: trunk/src/ascent-world/SpellEffects.cpp
 ===================================================================
---- trunk/src/ascent-world/SpellEffects.cpp	(revision 4104)
+--- trunk/src/ascent-world/SpellEffects.cpp	(revision 4106)
 +++ trunk/src/ascent-world/SpellEffects.cpp	(working copy)
 @@ -1124,7 +1124,12 @@
  			ILotP.origId = 34299;
@@ -1026,7 +1028,7 @@ Index: trunk/src/ascent-world/SpellEffects.cpp
  				data << unitTarget->GetNewGUID();
 Index: trunk/src/ascent-world/Unit.cpp
 ===================================================================
---- trunk/src/ascent-world/Unit.cpp	(revision 4104)
+--- trunk/src/ascent-world/Unit.cpp	(revision 4106)
 +++ trunk/src/ascent-world/Unit.cpp	(working copy)
 @@ -217,7 +217,14 @@
  
@@ -1081,7 +1083,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  						case 14893:
  						case 15357:
  							{
-@@ -1747,9 +1756,605 @@
+@@ -1747,9 +1756,609 @@
  		bProcInUse = false;
  }
  
@@ -1353,6 +1355,10 @@ Index: trunk/src/ascent-world/Unit.cpp
 +						continue;
 +				}
 +				//SPELL_AURA_ADD_TARGET_TRIGGER = 109 handling. SpellGroupType based.
++				//temp  fix to avoid crash
++				if (itr2->i > 2)
++					itr2->i = 0;
++
 +				if (CastingSpell != NULL && ospinfo != NULL && (ospinfo->EffectSpellGroupRelation[itr2->i] || ospinfo->EffectSpellGroupRelation_high[itr2->i]))
 +				{
 +					if (!(CastingSpell->SpellGroupType & ((uint64)ospinfo->EffectSpellGroupRelation[itr2->i] + ((uint64)ospinfo->EffectSpellGroupRelation_high[itr2->i] << 32))))
@@ -1687,7 +1693,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  	//make sure we do not loop dmg procs
  	if(this==attacker || !attacker)
  		return;
-@@ -1783,6 +2388,7 @@
+@@ -1783,6 +2392,7 @@
  		}
  	}
  	m_damgeShieldsInUse = false;
@@ -1695,7 +1701,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  }
  
  /*
-@@ -2179,7 +2785,7 @@
+@@ -2179,7 +2789,7 @@
  //==========================================================================================
  //==============================Unacceptable Cases Processing===============================
  //==========================================================================================
@@ -1704,7 +1710,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  		return;
  	if(!isInFront(pVictim))
  		if(IsPlayer())
-@@ -2211,6 +2817,10 @@
+@@ -2211,6 +2821,10 @@
  	uint32 vstate			 = 1;
  	uint32 aproc			 = 0;
  	uint32 vproc			 = 0;
@@ -1715,7 +1721,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  	   
  	float hitmodifier		 = 0;
  	int32 self_skill;
-@@ -2521,7 +3131,11 @@
+@@ -2521,7 +3135,11 @@
  		CALL_SCRIPT_EVENT(this, OnDodged)(this);
  		targetEvent = 1;
  		vstate = DODGE;
@@ -1727,7 +1733,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  		pVictim->Emote(EMOTE_ONESHOT_PARRYUNARMED);			// Animation
  		if( pVictim->IsPlayer() )
  		{
-@@ -2551,6 +3165,10 @@
+@@ -2551,6 +3169,10 @@
  		CALL_SCRIPT_EVENT(this, OnParried)(this);
  		targetEvent = 3;
  		vstate = PARRY;
@@ -1738,7 +1744,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  		pVictim->Emote(EMOTE_ONESHOT_PARRYUNARMED);			// Animation
  		if(pVictim->IsPlayer())
  		{
-@@ -2577,6 +3195,7 @@
+@@ -2577,6 +3199,7 @@
  		else
  		{
  //--------------------------------state proc initialization---------------------------------
@@ -1746,7 +1752,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  			vproc |= PROC_ON_ANY_DAMAGE_VICTIM;			
  			if( weapon_damage_type != RANGED )
  			{
-@@ -2590,6 +3209,23 @@
+@@ -2590,6 +3213,23 @@
  				if(ability && ability->Id==3018 && IsPlayer() && getClass()==HUNTER)
  					aproc |= PROC_ON_AUTO_SHOT_HIT;
  			}
@@ -1770,7 +1776,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  //--------------------------------base damage calculation-----------------------------------
  			if(exclusive_damage)
  				dmg.full_damage = exclusive_damage;
-@@ -2707,13 +3343,22 @@
+@@ -2707,13 +3347,22 @@
  						{
  							blocked_damage = 0;
  						}
@@ -1793,7 +1799,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  						}
  						if( pVictim->IsPlayer() )//not necessary now but we'll have blocking mobs in future
  						{            
-@@ -2774,6 +3419,7 @@
+@@ -2774,6 +3423,7 @@
  					}
  					
  					pVictim->Emote(EMOTE_ONESHOT_WOUNDCRITICAL);
@@ -1801,7 +1807,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  					vproc |= PROC_ON_CRIT_HIT_VICTIM;
  					aproc |= PROC_ON_CRIT_ATTACK;
  					if( weapon_damage_type == RANGED )
-@@ -2781,7 +3427,9 @@
+@@ -2781,7 +3431,9 @@
  						vproc |= PROC_ON_RANGED_CRIT_ATTACK_VICTIM;
  						aproc |= PROC_ON_RANGED_CRIT_ATTACK;
  					}
@@ -1812,7 +1818,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  					if(this->IsPlayer())
  					{
  						this->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_CRITICAL);	//SB@L: Enables spells requiring critical strike
-@@ -2827,7 +3475,11 @@
+@@ -2827,7 +3479,11 @@
  			}
  
  			if(abs)
@@ -1824,7 +1830,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  
  			if (dmg.school_type == SCHOOL_NORMAL)
  			{
-@@ -2865,23 +3517,7 @@
+@@ -2865,23 +3521,7 @@
  	{
  		dmg.resisted_damage = dmg.full_damage; //godmode
  	}
@@ -1848,7 +1854,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  //--------------------------spells triggering-----------------------------------------------
  	if(realdamage > 0 && ability == 0)
  	{
-@@ -3046,8 +3682,6 @@
+@@ -3046,8 +3686,6 @@
  	if(realdamage)
  	{
  		DealDamage(pVictim, realdamage, 0, targetEvent, 0);
@@ -1857,7 +1863,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  
  		if(pVictim->GetCurrentSpell())
  			pVictim->GetCurrentSpell()->AddTime(0);
-@@ -3061,6 +3695,55 @@
+@@ -3061,6 +3699,55 @@
  //==========================================================================================
  //==============================Post Damage Dealing Processing==============================
  //==========================================================================================
@@ -1913,7 +1919,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  //--------------------------durability processing-------------------------------------------
  	if(pVictim->IsPlayer())
  	{
-@@ -5027,6 +5710,7 @@
+@@ -5027,6 +5714,7 @@
  	m_aiInterface->WipeReferences();
  }
  
@@ -1921,7 +1927,7 @@ Index: trunk/src/ascent-world/Unit.cpp
  void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
  {
  	Aura * a;
-@@ -5056,6 +5740,20 @@
+@@ -5056,6 +5744,20 @@
  							if( spi && spi->NameHash != SPELL_HASH_SMITE )
  								continue;
  						}
@@ -1942,15 +1948,16 @@ Index: trunk/src/ascent-world/Unit.cpp
  					case 34936:
  						{
  							SpellEntry *spi = dbcSpell.LookupEntry( skip );
-@@ -6257,3 +6955,5 @@
+@@ -6257,3 +6959,6 @@
  
  
  
++
 +
 +
 Index: trunk/src/ascent-world/Unit.h
 ===================================================================
---- trunk/src/ascent-world/Unit.h	(revision 4104)
+--- trunk/src/ascent-world/Unit.h	(revision 4106)
 +++ trunk/src/ascent-world/Unit.h	(working copy)
 @@ -709,8 +709,18 @@
  	void Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability, int32 add_damage, int32 pct_dmg_mod, uint32 exclusive_damage, bool disable_proc, bool skip_hit_check );
@@ -1973,7 +1980,7 @@ Index: trunk/src/ascent-world/Unit.h
  
 Index: trunk/src/ascent-world/World.cpp
 ===================================================================
---- trunk/src/ascent-world/World.cpp	(revision 4104)
+--- trunk/src/ascent-world/World.cpp	(revision 4106)
 +++ trunk/src/ascent-world/World.cpp	(working copy)
 @@ -117,6 +117,12 @@
  	Log.Notice("BattlegroundMgr", "~BattlegroundMgr()");
@@ -2618,24 +2625,18 @@ Index: trunk/src/ascent-world/World.cpp
  	//mage: Fire Power
  	sp = dbcSpell.LookupEntryForced( 11124 );
  	if( sp != NULL )
-@@ -4988,7 +5032,7 @@
- 	sp = dbcSpell.LookupEntryForced( 12351 );
- 	if( sp != NULL )
- 		sp->EffectSpellGroupRelation[0] = 8388608 | 16 | 2 | 4 | 8 | 262144 | 4194304 | 1;
--
-+#ifndef NEW_PROCFLAGS
- 	//mage - Combustion
+@@ -4993,8 +5037,10 @@
  	sp = dbcSpell.LookupEntryForced( 11129 );
  	if( sp != NULL )
-@@ -4997,6 +5041,7 @@
+ 	{
++#ifndef NEW_PROCFLAGS
+ 		sp->procFlags = PROC_ON_CAST_SPELL | PROC_ON_SPELL_CRIT_HIT | PROC_TARGET_SELF;
  		sp->procCharges = 0;
++#endif
  		sp->c_is_flags |= SPELL_FLAG_IS_REQUIRECOOLDOWNUPDATE;
  	}
-+#endif
  	sp = dbcSpell.LookupEntryForced( 28682 );
- 	if( sp != NULL )
- 		sp->EffectSpellGroupRelation[0] = 8388608 | 16 | 2 | 4 | 4194304 | 1;
-@@ -5049,14 +5094,14 @@
+@@ -5049,14 +5095,14 @@
  		sp->EffectSpellGroupRelation[0] = 32;
  		sp->EffectSpellGroupRelation[1] = 32;
  	}
@@ -2652,7 +2653,7 @@ Index: trunk/src/ascent-world/World.cpp
  		sp->procChance = 100;
  	}
  	sp = dbcSpell.LookupEntryForced( 29075 );
-@@ -5064,7 +5109,7 @@
+@@ -5064,7 +5110,7 @@
  	{
  		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
  		sp->EffectTriggerSpell[0] = 29077;
@@ -2661,7 +2662,7 @@ Index: trunk/src/ascent-world/World.cpp
  		sp->procChance = 100;
  	}
  	sp = dbcSpell.LookupEntryForced( 29076 );
-@@ -5072,9 +5117,10 @@
+@@ -5072,9 +5118,10 @@
  	{
  		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
  		sp->EffectTriggerSpell[0] = 29077;
@@ -2673,7 +2674,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	//mage: Blazing Speed
  	sp = dbcSpell.LookupEntryForced( 31641 ); 
-@@ -5755,7 +5801,7 @@
+@@ -5755,7 +5802,7 @@
  		sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
  		sp->EffectSpellGroupRelation[0] = 65536;
  	}
@@ -2682,7 +2683,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warlock - Unstable Affliction
  	sp = dbcSpell.LookupEntryForced( 30108 );
  	if( sp != NULL )
-@@ -5845,7 +5891,7 @@
+@@ -5845,7 +5892,7 @@
  		sp->procFlags = PROC_ON_CAST_SPELL;
  		sp->Effect[1] = 0 ; //remove this effect ? Maybe remove the other one :P xD
  	}
@@ -2691,7 +2692,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warlock - Bane
  	sp = dbcSpell.LookupEntryForced( 17788 );
  	if( sp != NULL )
-@@ -5877,7 +5923,7 @@
+@@ -5877,7 +5924,7 @@
  		sp->EffectSpellGroupRelation[0] = 1 | 4;
  		sp->EffectSpellGroupRelation_high[1] = 128;
  	}
@@ -2700,7 +2701,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warlock - soul leech
  	sp = dbcSpell.LookupEntryForced( 30293 );
  	if( sp != NULL )
-@@ -5885,7 +5931,7 @@
+@@ -5885,7 +5932,7 @@
  		sp->Effect[0] = 6; //aura
  		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
  		sp->EffectTriggerSpell[0] = 30294;
@@ -2709,7 +2710,7 @@ Index: trunk/src/ascent-world/World.cpp
  	}
  	sp = dbcSpell.LookupEntryForced( 30295 );
  	if( sp != NULL )
-@@ -5893,7 +5939,7 @@
+@@ -5893,7 +5940,7 @@
  		sp->Effect[0] = 6; //aura
  		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
  		sp->EffectTriggerSpell[0] = 30294;
@@ -2718,7 +2719,7 @@ Index: trunk/src/ascent-world/World.cpp
  	}
  	sp = dbcSpell.LookupEntryForced( 30296 );
  	if( sp != NULL )
-@@ -5901,7 +5947,7 @@
+@@ -5901,7 +5948,7 @@
  		sp->Effect[0] = 6; //aura
  		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
  		sp->EffectTriggerSpell[0] = 30294;
@@ -2727,7 +2728,7 @@ Index: trunk/src/ascent-world/World.cpp
  	}
  
  	//warlock - Pyroclasm
-@@ -6016,7 +6062,7 @@
+@@ -6016,7 +6063,7 @@
  		sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_REMOVEONUSE;
  		sp->AuraInterruptFlags = 0; //we remove it on proc or timeout
  	}
@@ -2736,7 +2737,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//wrath of air totem targets sorounding creatures instead of us
  	sp = dbcSpell.LookupEntryForced( 2895 );
  	if( sp != NULL )
-@@ -6190,49 +6236,36 @@
+@@ -6190,49 +6237,36 @@
  		sp->DurationIndex = 0;
  
  	//Priest: Shadow Power
@@ -2811,7 +2812,7 @@ Index: trunk/src/ascent-world/World.cpp
  
      //Priest - Inspiration proc spell
      sp = dbcSpell.LookupEntryForced( 14893 );
-@@ -6261,13 +6294,15 @@
+@@ -6261,13 +6295,15 @@
  		sp->EffectSpellGroupRelation[0]= 262144 | 2097152 | 8388608 | 8519680 | 524288 | 1048576 | 8388608;
  #endif
  
@@ -2829,7 +2830,7 @@ Index: trunk/src/ascent-world/World.cpp
  	sp = dbcSpell.LookupEntryForced( 33151 );
  	if( sp != NULL )
  	{
-@@ -6276,6 +6311,7 @@
+@@ -6276,6 +6312,7 @@
  		sp->EffectSpellGroupRelation[2] = 128;
  		sp->AuraInterruptFlags = AURA_INTERRUPT_ON_CAST_SPELL;
  	}
@@ -2837,7 +2838,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	//Seal of Justice -lowered proc chance (experimental values !)
  	sp = dbcSpell.LookupEntryForced( 20164 );
-@@ -6338,6 +6374,7 @@
+@@ -6338,6 +6375,7 @@
  		sp->EffectSpellGroupRelation[0] = 8389120 | 256 | 1024;
  #endif
  
@@ -2845,7 +2846,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//this an on equip item spell(2824) :  ice arrow(29501)
  	sp = dbcSpell.LookupEntryForced( 29501 );
  	if( sp != NULL )
-@@ -6345,8 +6382,10 @@
+@@ -6345,8 +6383,10 @@
  		sp->procChance = 30;//some say it is triggered every now and then
  		sp->procFlags = PROC_ON_RANGED_ATTACK;
  	}
@@ -2857,7 +2858,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warrior - deep wounds
  	sp = dbcSpell.LookupEntry( 12162);
  	if ( sp!=NULL )
-@@ -6359,6 +6398,7 @@
+@@ -6359,6 +6399,7 @@
  		sp->SpellGroupType = 32;
  #endif
  
@@ -2865,7 +2866,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warrior - second wind should trigger on self
  	sp = dbcSpell.LookupEntryForced( 29841 );
  	if( sp != NULL )
-@@ -6366,7 +6406,7 @@
+@@ -6366,7 +6407,7 @@
  	sp = dbcSpell.LookupEntryForced( 29842 );
  	if( sp != NULL )
  		sp->procFlags |= PROC_TARGET_SELF;
@@ -2874,7 +2875,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warrior - Improved Disciplines
  	sp = dbcSpell.LookupEntryForced( 29725 );
  	if (sp != NULL )
-@@ -6392,7 +6432,7 @@
+@@ -6392,7 +6433,7 @@
  		sp->EffectSpellGroupRelation[1] = 16 | 8192;
  		sp->EffectSpellGroupRelation_high[1] = 8;
  	}
@@ -2883,7 +2884,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warrior - berserker rage is missing 1 effect = regenerate rage
  	sp = dbcSpell.LookupEntryForced( 18499 );
  	if( sp != NULL )
-@@ -6421,7 +6461,6 @@
+@@ -6421,7 +6462,6 @@
  		sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
  	}
  
@@ -2891,7 +2892,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warrior - Blood Frenzy
  	sp = dbcSpell.LookupEntryForced( 29836 );
  	if( sp != NULL )
-@@ -6445,6 +6484,7 @@
+@@ -6445,6 +6485,7 @@
  		sp->EffectSpellGroupRelation[0] = 32;
  #endif
  
@@ -2899,7 +2900,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//warrior - Rampage
  	sp = dbcSpell.LookupEntryForced( 30030 );
  	if( sp != NULL )
-@@ -6475,6 +6515,7 @@
+@@ -6475,6 +6516,7 @@
  	sp = dbcSpell.LookupEntryForced( 13002 );
  	if( sp != NULL )
  		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_TARGET_SELF;
@@ -2907,7 +2908,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	//warrior - Commanding Presence
  	sp = dbcSpell.LookupEntryForced( 12318 );
-@@ -6661,6 +6702,7 @@
+@@ -6661,6 +6703,7 @@
  	if( sp != NULL )
  		sp->EffectSpellGroupRelation_high[0] = 128;
  
@@ -2915,7 +2916,7 @@ Index: trunk/src/ascent-world/World.cpp
  	// priest - Reflective Shield
  	sp = dbcSpell.LookupEntryForced( 33201 );
  	if( sp != NULL )
-@@ -6697,6 +6739,7 @@
+@@ -6697,6 +6740,7 @@
  		sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
  		sp->EffectTriggerSpell[0] = 33619; //!! WRONG spell, we will make direct dmg here
  	}
@@ -2923,7 +2924,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//mage - Presence of Mind
  	sp = dbcSpell.LookupEntryForced(12043);
  	if (sp!= NULL)
-@@ -6944,11 +6987,12 @@
+@@ -6944,11 +6988,12 @@
  		sp->EffectSpellGroupRelation[0] = 4;
  		sp->EffectSpellGroupRelation[1] = 1;
  	}
@@ -2937,7 +2938,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	sp = dbcSpell.LookupEntryForced( 16886 );
  	if( sp != NULL )
-@@ -6973,7 +7017,7 @@
+@@ -6973,7 +7018,7 @@
  	sp = dbcSpell.LookupEntryForced( 16818 );
  	if( sp != NULL )
  		sp->EffectSpellGroupRelation[0] = 1 | 4;
@@ -2946,7 +2947,7 @@ Index: trunk/src/ascent-world/World.cpp
  	// Druid: Omen of Clarity
  	sp = dbcSpell.LookupEntryForced( 16864 );
  	if( sp != NULL )
-@@ -6981,9 +7025,10 @@
+@@ -6981,9 +7026,10 @@
  		sp->procChance=100; //procchance dynamic. 3ppm
  		sp->procFlags = PROC_ON_MELEE_ATTACK | PROC_ON_CRIT_ATTACK;
  	}
@@ -2959,7 +2960,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Bonescythe Armor
  	sp = dbcSpell.LookupEntryForced( 28814 );
  	if (sp != NULL)
-@@ -7110,6 +7155,7 @@
+@@ -7110,6 +7156,7 @@
  	}
  #endif
  
@@ -2967,7 +2968,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Thunderfury
  	sp = dbcSpell.LookupEntryForced( 21992 );
  	if( sp != NULL )
-@@ -7118,6 +7164,7 @@
+@@ -7118,6 +7165,7 @@
          sp->EffectTriggerSpell[2] = 27648;
  		sp->EffectImplicitTargetA[2] = EFF_TARGET_SELF;
  	}
@@ -2975,7 +2976,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	//Solarian's Sapphire
  	sp = dbcSpell.LookupEntryForced( 37536 );
-@@ -7169,6 +7216,7 @@
+@@ -7169,6 +7217,7 @@
  	if( sp != NULL )
  		sp->EffectSpellGroupRelation[0] = 1;
  
@@ -2983,7 +2984,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Energized 
  	sp = dbcSpell.LookupEntryForced( 43750 ); 
  	if( sp != NULL )
-@@ -7256,7 +7304,6 @@
+@@ -7256,7 +7305,6 @@
  		sp->maxstack = 1;
  	}
  
@@ -2991,7 +2992,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Ashtongue Talisman of Lethality
  	sp = dbcSpell.LookupEntryForced( 40460 );
  	if( sp != NULL )
-@@ -7274,6 +7321,7 @@
+@@ -7274,6 +7322,7 @@
  		sp->EffectSpellGroupRelation[0] = 262144 | 2097152 | 8388608 | 8519680 | 524288 | 1048576 | 8388608;
  #endif
  
@@ -2999,7 +3000,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Serpent-Coil Braid
  	sp = dbcSpell.LookupEntryForced( 37447 );
  	if( sp != NULL )
-@@ -7285,6 +7333,7 @@
+@@ -7285,6 +7334,7 @@
  		sp->EffectTriggerSpell[0] = 37445;
  		sp->maxstack = 1;
  	}
@@ -3007,7 +3008,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	//Item: Assassination Armor
  	sp = dbcSpell.LookupEntryForced(37166);
-@@ -7366,7 +7415,7 @@
+@@ -7366,7 +7416,7 @@
  	{
  		sp->EffectSpellGroupRelation_high[0] |=4096;
  	}
@@ -3016,7 +3017,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Malorne Harness
  	sp = dbcSpell.LookupEntryForced( 37306 );
  	if( sp != NULL )
-@@ -7380,7 +7429,7 @@
+@@ -7380,7 +7430,7 @@
  		sp->procChance = 4;
  		sp->procFlags = PROC_ON_MELEE_ATTACK;
  	}
@@ -3025,7 +3026,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Slayer's Armor
  	sp = dbcSpell.LookupEntryForced( 38388 );
  	if( sp != NULL )
-@@ -7393,7 +7442,7 @@
+@@ -7393,7 +7443,7 @@
  		sp->EffectSpellGroupRelation_high[0] |= 2 | 4;
  		sp->EffectSpellGroupRelation[0] |= 8388612 |8388610 |41943040;
  	}
@@ -3034,7 +3035,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Deathmantle
  	sp = dbcSpell.LookupEntryForced( 37170 );
  	if( sp != NULL )
-@@ -7401,7 +7450,7 @@
+@@ -7401,7 +7451,7 @@
  		sp->procChance = 4;
  		sp->procFlags = PROC_ON_MELEE_ATTACK;
  	}
@@ -3043,7 +3044,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Netherblade
  	sp = dbcSpell.LookupEntryForced( 37167 );
  	if( sp != NULL )
-@@ -7434,11 +7483,13 @@
+@@ -7434,11 +7484,13 @@
  		sp->EffectSpellGroupRelation[0] = 536870912;
  		sp->EffectSpellGroupRelation[1] = 536870912;
  	}
@@ -3057,7 +3058,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	//Item Set: Aldor Regalia
  	sp = dbcSpell.LookupEntryForced( 37438 );
-@@ -7484,7 +7535,7 @@
+@@ -7484,7 +7536,7 @@
  	{
  		sp->EffectSpellGroupRelation[0] = 64;
  	}
@@ -3066,7 +3067,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Avatar Regalia
  	sp = dbcSpell.LookupEntryForced( 37600 );
  	if( sp != NULL )
-@@ -7504,7 +7555,7 @@
+@@ -7504,7 +7556,7 @@
  	{
  		sp->EffectSpellGroupRelation[0] = 4096;
  	}
@@ -3075,7 +3076,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Incarnate Regalia
  	sp = dbcSpell.LookupEntryForced( 37570 );
  	if( sp != NULL )
-@@ -7525,7 +7576,7 @@
+@@ -7525,7 +7577,7 @@
  		sp->EffectSpellGroupRelation[0] = 1;
  		sp->EffectSpellGroupRelation_high[0] = 64;
  	}
@@ -3084,7 +3085,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Voidheart Raiment
  	sp = dbcSpell.LookupEntryForced( 37377 );
  	if( sp != NULL )
-@@ -7547,6 +7598,7 @@
+@@ -7547,6 +7599,7 @@
  		sp->proc_interval = 20;
  		sp->EffectTriggerSpell[0] = 37378;
  	}
@@ -3092,7 +3093,7 @@ Index: trunk/src/ascent-world/World.cpp
  	sp = dbcSpell.LookupEntryForced( 37380 );
  	if( sp != NULL )
  	{
-@@ -7611,6 +7663,7 @@
+@@ -7611,6 +7664,7 @@
  	{
  		sp->EffectSpellGroupRelation[0] = 128;
  	}
@@ -3100,7 +3101,7 @@ Index: trunk/src/ascent-world/World.cpp
  	sp = dbcSpell.LookupEntryForced( 37227 );
  	if( sp != NULL )
  	{
-@@ -7618,12 +7671,13 @@
+@@ -7618,12 +7672,13 @@
  		sp->procChance = 100;
  		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
  	}
@@ -3115,7 +3116,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Cataclysm Regalia
  	sp = dbcSpell.LookupEntryForced( 37228 );
  	if( sp != NULL )
-@@ -7631,11 +7685,13 @@
+@@ -7631,11 +7686,13 @@
  		sp->procChance = 7;
  		sp->procFlags = PROC_ON_CAST_SPELL;
  	}
@@ -3129,7 +3130,7 @@ Index: trunk/src/ascent-world/World.cpp
  	sp = dbcSpell.LookupEntryForced( 37237 );
  	if( sp != NULL )
  	{
-@@ -7650,6 +7706,7 @@
+@@ -7650,6 +7707,7 @@
  		sp->procChance = 2;
  		sp->procFlags = PROC_ON_MELEE_ATTACK;
  	}
@@ -3137,7 +3138,7 @@ Index: trunk/src/ascent-world/World.cpp
  	sp = dbcSpell.LookupEntryForced( 37240 );
  	if( sp != NULL )
  	{
-@@ -7691,13 +7748,14 @@
+@@ -7691,13 +7749,14 @@
  	{
  		sp->EffectSpellGroupRelation_high[0] = 256;
  	}
@@ -3153,7 +3154,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Lightbringer Armor
  	sp = dbcSpell.LookupEntryForced( 38421 );
  	if( sp != NULL )
-@@ -7709,7 +7767,7 @@
+@@ -7709,7 +7768,7 @@
  	{
  		sp->EffectSpellGroupRelation[0] = 32;
  	}
@@ -3162,7 +3163,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Lightbringer Battlegear
  	sp = dbcSpell.LookupEntryForced( 38427 );
  	if( sp != NULL )
-@@ -7717,6 +7775,7 @@
+@@ -7717,6 +7776,7 @@
  		sp->procFlags = PROC_ON_MELEE_ATTACK;
  		sp->procChance = 20;
  	}
@@ -3170,7 +3171,7 @@ Index: trunk/src/ascent-world/World.cpp
  	sp = dbcSpell.LookupEntryForced( 38424 );
  	if( sp != NULL )
  	{
-@@ -7742,10 +7801,12 @@
+@@ -7742,10 +7802,12 @@
  		sp->EffectSpellGroupRelation[0] = 8;
  	}
  	sp = dbcSpell.LookupEntryForced( 37191 );
@@ -3183,7 +3184,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	//Item Set: Crystalforge Battlegear
  	sp = dbcSpell.LookupEntryForced( 37190 );
-@@ -7754,6 +7815,7 @@
+@@ -7754,6 +7816,7 @@
  		sp->EffectSpellGroupRelation[0] = 1024 | 524288 | 1048576 | 536870912UL;
  		sp->EffectSpellGroupRelation_high[0] = 1|520;
  	}
@@ -3191,7 +3192,7 @@ Index: trunk/src/ascent-world/World.cpp
  	sp = dbcSpell.LookupEntryForced( 37195 );
  	if( sp != NULL )
  	{
-@@ -7768,16 +7830,19 @@
+@@ -7768,16 +7831,19 @@
  		sp->procFlags = PROC_ON_SPELL_CRIT_HIT;
  		sp->proc_interval = 60000;
  	}
@@ -3211,7 +3212,7 @@ Index: trunk/src/ascent-world/World.cpp
  
  	//Item Set: Justicar Raiment
  	sp = dbcSpell.LookupEntryForced( 37182 );
-@@ -7841,7 +7906,7 @@
+@@ -7841,7 +7907,7 @@
  	{
  		sp->EffectSpellGroupRelation_high[0] = 513;
  	}
@@ -3220,7 +3221,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Destroyer Armor
  	sp = dbcSpell.LookupEntryForced( 37525 );
  	if( sp != NULL )
-@@ -7857,13 +7922,14 @@
+@@ -7857,13 +7923,14 @@
  		sp->procFlags = PROC_ON_CAST_SPELL;
  		sp->procChance = 100;
  	}
@@ -3236,7 +3237,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Warbringer Armor
  	sp = dbcSpell.LookupEntryForced( 37516 );
  	if( sp != NULL )
-@@ -7871,7 +7937,7 @@
+@@ -7871,7 +7938,7 @@
  		sp->procFlags = PROC_ON_CAST_SPELL;
  		sp->procChance = 100;
  	}
@@ -3245,7 +3246,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Item Set: Warbringer Battlegear
  	sp = dbcSpell.LookupEntryForced( 37518 );
  	if( sp != NULL )
-@@ -7893,7 +7959,7 @@
+@@ -7893,7 +7960,7 @@
  	sp = dbcSpell.LookupEntryForced( 35478 );
  	if( sp != NULL )
  		sp->RequiredShapeShift = 0;
@@ -3254,7 +3255,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//Paladin - Improved Lay on Hands
  	sp = dbcSpell.LookupEntryForced( 20234 );
  	if( sp != NULL )
-@@ -7984,7 +8050,7 @@
+@@ -7984,7 +8051,7 @@
  			sp->maxstack = 1;
  		}
  	}
@@ -3263,7 +3264,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//for test only
  	//sp = dbcSpell.LookupEntryForced( 32796 );
  	//if( sp != NULL )
-@@ -8048,6 +8114,239 @@
+@@ -8048,6 +8115,429 @@
  	if( sp != NULL )
  		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
  
@@ -3455,14 +3456,15 @@ Index: trunk/src/ascent-world/World.cpp
 +		if (sp != NULL)
 +			sp->ProcReqFlags |= PROC_REQ_FINISHMOVE;
 +	}
-+	//Rogue - Mace Specialization
++	//Rogue - Mace Specialization (share with warrior. FIXME)
 +	sp = dbcSpell.LookupEntryForced(5530);
 +	if (sp != NULL)
 +	{
-+		sp->ProcReqFlags |= PROC_REQ_WEAPON_TYPE;
++		sp->ProcReqFlags |= PROC_REQ_WEAPON_TYPE | PROC_REQ_PPM;
 +		ProcReqEntry* entry = new ProcReqEntry();
 +		entry->SpellId = sp->Id;
 +		entry->WeaponType = SKILL_MACES;
++		entry->PPM = 1.8f;
 +		sSpellProcReqMgr.AddRequirement(entry);
 +	}
 +	//Rogue - Sword Specialization
@@ -3497,15 +3499,204 @@ Index: trunk/src/ascent-world/World.cpp
 +		entry->SpellId = sp->Id;
 +		entry->SpecState = PROC_ON_DODGE | PROC_ON_RESIST;
 +		sSpellProcReqMgr.AddRequirement(entry);
-+
 +	}
++	//Mage - Winter's Chill
++	sp = dbcSpell.LookupEntryForced(12579);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPELL_SCHOOL;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpellSchool = (1 << SCHOOL_FROST);
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Mage - Impact
++	sp = dbcSpell.LookupEntryForced(12355);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPELL_SCHOOL;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpellSchool = (1 << SCHOOL_FIRE);
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Mage - Improved Scorch
++	sp = dbcSpell.LookupEntryForced(11095);
++	if (sp != NULL)
++		sp->procFlags |= PROC_ON_SPELL_LAND | PROC_ON_HARMFULSPELL_LAND;
++	sp = dbcSpell.LookupEntryForced(12872);
++	if (sp != NULL)
++		sp->procFlags |= PROC_ON_SPELL_LAND | PROC_ON_HARMFULSPELL_LAND;
++	sp = dbcSpell.LookupEntryForced(12873);
++	if (sp != NULL)
++		sp->procFlags |= PROC_ON_SPELL_LAND | PROC_ON_HARMFULSPELL_LAND;
++	//Mage - Combustion
++	sp = dbcSpell.LookupEntryForced(11129);
++	if (sp != NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++
++	//Hunter - Improved Concussive Shot
++	sp = dbcSpell.LookupEntryForced( 19410 );
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_CONCUSSIVE_SHOT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Hunter - Improved Wing Clip
++	sp = dbcSpell.LookupEntryForced( 19229 );
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_WING_CLIP;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Hunter - Thrill of the Hunt
++	sp = dbcSpell.LookupEntryForced( 34720 );
++	if (sp != NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Paladin - Improved Lay on Hands
++	sp = dbcSpell.LookupEntryForced( 20236 );
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_LAY_ON_HANDS;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	sp = dbcSpell.LookupEntryForced( 20233 );
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_LAY_ON_HANDS;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Paladin - Illumination 
++	sp = dbcSpell.LookupEntryForced( 20272 );
++	if (sp != NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Paladin - Lights Grace (mb needs adding skip in aura removing
++	sp = dbcSpell.LookupEntryForced( 31834 );
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_HOLY_LIGHT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Paladin - Eye for an Eye
++	sp = dbcSpell.LookupEntryForced(25997);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Paladin - Sanctified Judgement
++	sp = dbcSpell.LookupEntryForced(31930);
++	if (sp!=NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_JUDGEMENT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Shaman - Elemental Focus
++	sp = dbcSpell.LookupEntryForced(29936);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Shaman - Elemental Devastation
++	sp = dbcSpell.LookupEntryForced(30165);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL | PROC_REQ_CRITICAL;
++	sp = dbcSpell.LookupEntryForced(29177);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL | PROC_REQ_CRITICAL;
++	sp = dbcSpell.LookupEntryForced(29178);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL | PROC_REQ_CRITICAL;
++	//Shaman - Lightning Overload
++	sp = dbcSpell.LookupEntryForced(39805);
++	if (sp!=NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_LIGHTNING_BOLT;
++		entry->NameHash[1] = SPELL_HASH_CHAIN_LIGHTNING;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Shaman - Shamanistic Focus
++	sp = dbcSpell.LookupEntryForced(43339);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Shaman - Flurry
++	sp = dbcSpell.LookupEntryForced(16257);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	sp = dbcSpell.LookupEntryForced(16277);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	sp = dbcSpell.LookupEntryForced(16278);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	sp = dbcSpell.LookupEntryForced(16279);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	sp = dbcSpell.LookupEntryForced(16280);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Shaman - Unleashed Rage
++	for (uint32 x=30803;x<30808;x++)
++	{
++		sp = dbcSpell.LookupEntryForced(x);
++		if (sp!=NULL)
++			sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	}
++	//Shaman - Ancestral Healing
++	sp = dbcSpell.LookupEntryForced(16177);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL | PROC_REQ_HEALING_SPELL;
++	sp = dbcSpell.LookupEntryForced(16236);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL | PROC_REQ_HEALING_SPELL;
++	sp = dbcSpell.LookupEntryForced(16237);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL | PROC_REQ_HEALING_SPELL;
++	//Shaman - Healing Way
++	sp = dbcSpell.LookupEntryForced(29203);
++	if (sp!=NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_HEALING_WAY;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Warrior - Deep Wounds
++	sp = dbcSpell.LookupEntryForced(12868);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	sp = dbcSpell.LookupEntryForced(12850);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	sp = dbcSpell.LookupEntryForced(12162);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++
++
 +#endif
  // ------------------------------------------------------------------------------------------------
  
  	Log.Notice("World","Starting Transport System...");
 Index: trunk/src/ascent-world/World.h
 ===================================================================
---- trunk/src/ascent-world/World.h	(revision 4104)
+--- trunk/src/ascent-world/World.h	(revision 4106)
 +++ trunk/src/ascent-world/World.h	(working copy)
 @@ -33,6 +33,7 @@
  class EventableObjectHolder;
