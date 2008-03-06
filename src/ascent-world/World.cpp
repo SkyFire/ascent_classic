@@ -8048,6 +8048,163 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
 
+
+/*
+	//Hunter - Improved Concussive Shot
+	 sp = dbcSpell.LookupEntryForced( 19410 );
+	 if (sp != NULL)
+	 {
+		 sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
+		 ProcReqEntry* entry = new ProcReqEntry();
+		 entry->SpellId = sp->Id;
+		 entry->Namehash[0] = SPELL_HASH_CONCUSSIVE_SHOT;
+		 sSpellProcReqMgr.AddRequirement(entry);
+	 }
+	 //Hunter - Improved Wing Clip
+	 sp = dbcSpell.LookupEntryForced( 19229 );
+	 if (sp != NULL)
+	 {
+		 sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
+		 ProcReqEntry* entry = new ProcReqEntry();
+		 entry->SpellId = sp->Id;
+		 entry->Namehash[0] = SPELL_HASH_WING_CLIP;
+		 sSpellProcReqMgr.AddRequirement(entry);
+	 }
+	 //Hunter - Thrill of the Hunt
+	 sp = dbcSpell.LookupEntryForced( 34720 );
+	 if (sp != NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	//Paladin - Improved Lay on Hands
+	 sp = dbcSpell.LookupEntryForced( 20236 );
+	 if (sp != NULL)
+	 {
+		 sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
+		 ProcReqEntry* entry = new ProcReqEntry();
+		 entry->SpellId = sp->Id;
+		 entry->Namehash[0] = SPELL_HASH_LAY_ON_HANDS;
+		 sSpellProcReqMgr.AddRequirement(entry);
+	 }
+	 sp = dbcSpell.LookupEntryForced( 20233 );
+	 if (sp != NULL)
+	 {
+		 sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
+		 ProcReqEntry* entry = new ProcReqEntry();
+		 entry->SpellId = sp->Id;
+		 entry->Namehash[0] = SPELL_HASH_LAY_ON_HANDS;
+		 sSpellProcReqMgr.AddRequirement(entry);
+	 }
+	 //Paladin - Illumination 
+	 sp = dbcSpell.LookupEntryForced( 20272 );
+	 if (sp != NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 //Paladin - Lights Grace (mb needs adding skip in aura removing
+	 sp = dbcSpell.LookupEntryForced( 31834 );
+	 if (sp != NULL)
+	 {
+		 sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
+		 ProcReqEntry* entry = new ProcReqEntry();
+		 entry->SpellId = sp->Id;
+		 entry->Namehash[0] = SPELL_HASH_HOLY_LIGHT;
+		 sSpellProcReqMgr.AddRequirement(entry);
+	 }
+	 //Paladin - Eye for an Eye
+	 sp = dbcSpell.LookupEntryForced(25997);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 //Paladin - Sanctified Judgement
+	 sp = dbcSpell.LookupEntryForced(31930);
+	 if (sp!=NULL)
+	 {
+		 sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
+		 ProcReqEntry* entry = new ProcReqEntry();
+		 entry->SpellId = sp->Id;
+		 entry->Namehash[0] = SPELL_HASH_JUDGEMENT;
+		 sSpellProcReqMgr.AddRequirement(entry);
+	 }
+	 //Shaman - Elemental Focus
+	 sp = dbcSpell.LookupEntryForced(29936);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 //Shaman - Elemental Devastation
+	 sp = dbcSpell.LookupEntryForced(30165);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_DAMAGING | PROC_REQ_CRITICAL;
+	 sp = dbcSpell.LookupEntryForced(29177);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_DAMAGING | PROC_REQ_CRITICAL;
+	 sp = dbcSpell.LookupEntryForced(29178);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_DAMAGING | PROC_REQ_CRITICAL;
+	 //Shaman - Lightning Overload
+	 sp = dbcSpell.LookupEntryForced(39805);
+	 if (sp!=NULL)
+	 {
+		 sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
+		 ProcReqEntry* entry = new ProcReqEntry();
+		 entry->SpellId = sp->Id;
+		 entry->Namehash[0] = SPELL_HASH_LIGHTNING_BOLT;
+		 entry->Namehash[1] = SPELL_HASH_CHAIN_LIGHTNING;
+		 sSpellProcReqMgr.AddRequirement(entry);
+	 }
+	 //Shaman - Shamanistic Focus
+	 sp = dbcSpell.LookupEntryForced(43339);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 //Shaman - Flurry
+	 sp = dbcSpell.LookupEntryForced(16257);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 sp = dbcSpell.LookupEntryForced(16277);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 sp = dbcSpell.LookupEntryForced(16278);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 sp = dbcSpell.LookupEntryForced(16279);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 sp = dbcSpell.LookupEntryForced(16280);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 //Shaman - Unleashed Rage
+	 for (uint32 x=30803;x<30808;x++)
+	 {
+		 sp = dbcSpell.LookupEntryForced(x);
+		 if (sp!=NULL)
+			 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 }
+	 //Shaman - Ancestral Healing
+	 sp = dbcSpell.LookupEntryForced(16177);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL | PROC_REQ_HEALING;
+	 sp = dbcSpell.LookupEntryForced(16236);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL | PROC_REQ_HEALING;
+	 sp = dbcSpell.LookupEntryForced(16237);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL | PROC_REQ_HEALING;
+	 //Shaman - Healing Way
+	 sp = dbcSpell.LookupEntryForced(29203);
+	 if (sp!=NULL)
+	 {
+		 sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
+		 ProcReqEntry* entry = new ProcReqEntry();
+		 entry->SpellId = sp->Id;
+		 entry->Namehash[0] = SPELL_HASH_HEALING_WAY;
+		 sSpellProcReqMgr.AddRequirement(entry);
+	 }
+	 //Warrior - Deep Wounds
+	 sp = dbcSpell.LookupEntryForced(12868);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 sp = dbcSpell.LookupEntryForced(12850);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 sp = dbcSpell.LookupEntryForced(12162);
+	 if (sp!=NULL)
+		 sp->ProcReqFlags |= PROC_REQ_CRITICAL;
+	 //Mace Specialization - oops :) BLIAT TVAU MAT SUUUUKA PEREDELIVAT VSE POD PARENT TEPER!
+	 */
 // ------------------------------------------------------------------------------------------------
 
 	Log.Notice("World","Starting Transport System...");
