@@ -1,8 +1,8 @@
 Index: trunk/src/ascent-shared/AscentConfig.h
 ===================================================================
---- trunk/src/ascent-shared/AscentConfig.h	(revision 4106)
+--- trunk/src/ascent-shared/AscentConfig.h	(revision 4109)
 +++ trunk/src/ascent-shared/AscentConfig.h	(working copy)
-@@ -95,5 +95,15 @@
+@@ -95,5 +95,16 @@
   */
  #define OPTIMIZE_SERVER_FOR_MYSQL 1
  
@@ -18,9 +18,10 @@ Index: trunk/src/ascent-shared/AscentConfig.h
 +
 +
 +
++
 Index: trunk/src/ascent-shared/Database/DBCStores.h
 ===================================================================
---- trunk/src/ascent-shared/Database/DBCStores.h	(revision 4106)
+--- trunk/src/ascent-shared/Database/DBCStores.h	(revision 4109)
 +++ trunk/src/ascent-shared/Database/DBCStores.h	(working copy)
 @@ -344,6 +344,11 @@
      /// CUSTOM: these fields are used for the modifications made in the world.cpp
@@ -36,7 +37,7 @@ Index: trunk/src/ascent-shared/Database/DBCStores.h
      uint32 buffType;                        //!!! CUSTOM, these are related to creating a item through a spell
 Index: trunk/src/ascent-world/DynamicObject.cpp
 ===================================================================
---- trunk/src/ascent-world/DynamicObject.cpp	(revision 4106)
+--- trunk/src/ascent-world/DynamicObject.cpp	(revision 4109)
 +++ trunk/src/ascent-world/DynamicObject.cpp	(working copy)
 @@ -175,8 +175,10 @@
  				target->AddAura(pAura);
@@ -49,16 +50,17 @@ Index: trunk/src/ascent-world/DynamicObject.cpp
  				}
  
  				// add to target list
-@@ -233,3 +235,6 @@
+@@ -233,3 +235,7 @@
  	delete this;
  }
  
 +
 +
 +
++
 Index: trunk/src/ascent-world/HonorHandler.cpp
 ===================================================================
---- trunk/src/ascent-world/HonorHandler.cpp	(revision 4106)
+--- trunk/src/ascent-world/HonorHandler.cpp	(revision 4109)
 +++ trunk/src/ascent-world/HonorHandler.cpp	(working copy)
 @@ -34,9 +34,10 @@
  {
@@ -74,7 +76,7 @@ Index: trunk/src/ascent-world/HonorHandler.cpp
  }
 Index: trunk/src/ascent-world/Item.cpp
 ===================================================================
---- trunk/src/ascent-world/Item.cpp	(revision 4106)
+--- trunk/src/ascent-world/Item.cpp	(revision 4109)
 +++ trunk/src/ascent-world/Item.cpp	(working copy)
 @@ -679,7 +679,9 @@
  						ProcTriggerSpell TS;
@@ -88,7 +90,7 @@ Index: trunk/src/ascent-world/Item.cpp
  						 * Secondly, need to assign some static chance for instant attacks (ss,
 Index: trunk/src/ascent-world/ItemInterface.cpp
 ===================================================================
---- trunk/src/ascent-world/ItemInterface.cpp	(revision 4106)
+--- trunk/src/ascent-world/ItemInterface.cpp	(revision 4109)
 +++ trunk/src/ascent-world/ItemInterface.cpp	(working copy)
 @@ -1156,7 +1156,7 @@
  	//detect special bag item
@@ -128,7 +130,7 @@ Index: trunk/src/ascent-world/ItemInterface.cpp
  				{
 Index: trunk/src/ascent-world/ItemPrototype.h
 ===================================================================
---- trunk/src/ascent-world/ItemPrototype.h	(revision 4106)
+--- trunk/src/ascent-world/ItemPrototype.h	(revision 4109)
 +++ trunk/src/ascent-world/ItemPrototype.h	(working copy)
 @@ -448,12 +448,18 @@
  
@@ -157,7 +159,7 @@ Index: trunk/src/ascent-world/ItemPrototype.h
  enum SOCKET_GEM_COLOR
 Index: trunk/src/ascent-world/Object.cpp
 ===================================================================
---- trunk/src/ascent-world/Object.cpp	(revision 4106)
+--- trunk/src/ascent-world/Object.cpp	(revision 4109)
 +++ trunk/src/ascent-world/Object.cpp	(working copy)
 @@ -1741,10 +1741,15 @@
  			if( spellId )
@@ -317,7 +319,7 @@ Index: trunk/src/ascent-world/Object.cpp
  
 Index: trunk/src/ascent-world/Player.cpp
 ===================================================================
---- trunk/src/ascent-world/Player.cpp	(revision 4106)
+--- trunk/src/ascent-world/Player.cpp	(revision 4109)
 +++ trunk/src/ascent-world/Player.cpp	(working copy)
 @@ -1462,9 +1462,10 @@
  	}
@@ -343,7 +345,7 @@ Index: trunk/src/ascent-world/Player.cpp
  			}
 Index: trunk/src/ascent-world/Spell.cpp
 ===================================================================
---- trunk/src/ascent-world/Spell.cpp	(revision 4106)
+--- trunk/src/ascent-world/Spell.cpp	(revision 4109)
 +++ trunk/src/ascent-world/Spell.cpp	(working copy)
 @@ -687,8 +687,10 @@
  		else
@@ -531,7 +533,7 @@ Index: trunk/src/ascent-world/Spell.cpp
  
  	int doneTarget = 0;
  
-@@ -4536,6 +4560,49 @@
+@@ -4536,6 +4560,48 @@
  
  	plr->GetSession()->OutPacket(SMSG_TARGET_CAST_RESULT, c, buffer);
  }
@@ -563,7 +565,6 @@ Index: trunk/src/ascent-world/Spell.cpp
 +		}
 +	}
 +	spelllist.push_back(entry);
-+	sLog.outDebug("PUSHED");
 +	return true;
 +}
 +
@@ -583,7 +584,7 @@ Index: trunk/src/ascent-world/Spell.cpp
  {
 Index: trunk/src/ascent-world/Spell.h
 ===================================================================
---- trunk/src/ascent-world/Spell.h	(revision 4106)
+--- trunk/src/ascent-world/Spell.h	(revision 4109)
 +++ trunk/src/ascent-world/Spell.h	(working copy)
 @@ -220,7 +220,7 @@
      TARGET_FLAG_UNK9                = 0x4000,
@@ -732,7 +733,7 @@ Index: trunk/src/ascent-world/Spell.h
 +#endif
 Index: trunk/src/ascent-world/SpellAuras.cpp
 ===================================================================
---- trunk/src/ascent-world/SpellAuras.cpp	(revision 4106)
+--- trunk/src/ascent-world/SpellAuras.cpp	(revision 4109)
 +++ trunk/src/ascent-world/SpellAuras.cpp	(working copy)
 @@ -1120,6 +1120,14 @@
  	uint32 school = GetSpellProto()->School;
@@ -931,7 +932,7 @@ Index: trunk/src/ascent-world/SpellAuras.cpp
  				break; //only 1 instance of a proc spell per caster ?
 Index: trunk/src/ascent-world/SpellAuras.h
 ===================================================================
---- trunk/src/ascent-world/SpellAuras.h	(revision 4106)
+--- trunk/src/ascent-world/SpellAuras.h	(revision 4109)
 +++ trunk/src/ascent-world/SpellAuras.h	(working copy)
 @@ -24,19 +24,19 @@
  	AFLAG_SET = 0x9
@@ -1001,7 +1002,7 @@ Index: trunk/src/ascent-world/SpellAuras.h
  
 Index: trunk/src/ascent-world/SpellEffects.cpp
 ===================================================================
---- trunk/src/ascent-world/SpellEffects.cpp	(revision 4106)
+--- trunk/src/ascent-world/SpellEffects.cpp	(revision 4109)
 +++ trunk/src/ascent-world/SpellEffects.cpp	(working copy)
 @@ -1124,7 +1124,12 @@
  			ILotP.origId = 34299;
@@ -1028,7 +1029,7 @@ Index: trunk/src/ascent-world/SpellEffects.cpp
  				data << unitTarget->GetNewGUID();
 Index: trunk/src/ascent-world/Unit.cpp
 ===================================================================
---- trunk/src/ascent-world/Unit.cpp	(revision 4106)
+--- trunk/src/ascent-world/Unit.cpp	(revision 4109)
 +++ trunk/src/ascent-world/Unit.cpp	(working copy)
 @@ -217,7 +217,14 @@
  
@@ -1948,16 +1949,17 @@ Index: trunk/src/ascent-world/Unit.cpp
  					case 34936:
  						{
  							SpellEntry *spi = dbcSpell.LookupEntry( skip );
-@@ -6257,3 +6959,6 @@
+@@ -6257,3 +6959,7 @@
  
  
  
++
 +
 +
 +
 Index: trunk/src/ascent-world/Unit.h
 ===================================================================
---- trunk/src/ascent-world/Unit.h	(revision 4106)
+--- trunk/src/ascent-world/Unit.h	(revision 4109)
 +++ trunk/src/ascent-world/Unit.h	(working copy)
 @@ -709,8 +709,18 @@
  	void Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability, int32 add_damage, int32 pct_dmg_mod, uint32 exclusive_damage, bool disable_proc, bool skip_hit_check );
@@ -1980,7 +1982,7 @@ Index: trunk/src/ascent-world/Unit.h
  
 Index: trunk/src/ascent-world/World.cpp
 ===================================================================
---- trunk/src/ascent-world/World.cpp	(revision 4106)
+--- trunk/src/ascent-world/World.cpp	(revision 4109)
 +++ trunk/src/ascent-world/World.cpp	(working copy)
 @@ -117,6 +117,12 @@
  	Log.Notice("BattlegroundMgr", "~BattlegroundMgr()");
@@ -3264,7 +3266,7 @@ Index: trunk/src/ascent-world/World.cpp
  	//for test only
  	//sp = dbcSpell.LookupEntryForced( 32796 );
  	//if( sp != NULL )
-@@ -8048,6 +8115,429 @@
+@@ -8048,7 +8115,820 @@
  	if( sp != NULL )
  		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
  
@@ -3534,7 +3536,7 @@ Index: trunk/src/ascent-world/World.cpp
 +	sp = dbcSpell.LookupEntryForced(11129);
 +	if (sp != NULL)
 +		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
-+
+ 
 +	//Hunter - Improved Concussive Shot
 +	sp = dbcSpell.LookupEntryForced( 19410 );
 +	if (sp != NULL)
@@ -3688,15 +3690,406 @@ Index: trunk/src/ascent-world/World.cpp
 +	sp = dbcSpell.LookupEntryForced(12162);
 +	if (sp!=NULL)
 +		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
-+
-+
++	//Warlock - Shadow Embrace
++	sp = dbcSpell.LookupEntryForced(32386);
++	if (sp!=NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_CORRUPTION;
++		entry->NameHash[1] = SPELL_HASH_CURSE_OF_AGONY;
++		entry->NameHash[2] = SPELL_HASH_SEED_OF_CORRUPTION;
++		entry->NameHash[3] = SPELL_HASH_SIPHON_LIFE;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	for (uint32 x=32388;x<32392;x++)
++	{
++		sp = dbcSpell.LookupEntryForced(x);
++		if (sp!=NULL)
++		{
++			sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++			ProcReqEntry* entry = new ProcReqEntry();
++			entry->SpellId = sp->Id;
++			entry->NameHash[0] = SPELL_HASH_CORRUPTION;
++			entry->NameHash[1] = SPELL_HASH_CURSE_OF_AGONY;
++			entry->NameHash[2] = SPELL_HASH_SEED_OF_CORRUPTION;
++			entry->NameHash[3] = SPELL_HASH_SIPHON_LIFE;
++			sSpellProcReqMgr.AddRequirement(entry);
++		}
++	}
++	//Warlock - Improved Shadow Bolt
++	sp = dbcSpell.LookupEntryForced(17794);
++	if (sp!=NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_SHADOW_BOLT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	for (uint32 x=17797;x<17801;x++)
++	{
++		sp = dbcSpell.LookupEntryForced(x);
++		if (sp!=NULL)
++		{
++			sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++			ProcReqEntry* entry = new ProcReqEntry();
++			entry->SpellId = sp->Id;
++			entry->NameHash[0] = SPELL_HASH_SHADOW_BOLT;
++			sSpellProcReqMgr.AddRequirement(entry);
++		}
++	}
++	//Warlock - Aftermath
++	sp = dbcSpell.LookupEntryForced(18118);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPELL_SKILLINE;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpellSkillLine = SKILL_DESTRUCTION;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Warlock - Pyroclasm
++	sp = dbcSpell.LookupEntryForced(18093);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_RAIN_OF_FIRE;
++		entry->NameHash[1] = SPELL_HASH_HELLFIRE;
++		entry->NameHash[2] = SPELL_HASH_SOUL_FIRE;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Warlock - Nether Protection
++	sp = dbcSpell.LookupEntryForced(30300);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPELL_SCHOOL;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpellSchool = (1 << SCHOOL_FIRE) + ( 1 << SCHOOL_SHADOW);
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item Set: Spirit of Eskhandar
++	sp = dbcSpell.LookupEntryForced(22649);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Item - Shiffar's Nexus-Horn
++	sp = dbcSpell.LookupEntryForced(34321);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Item - Band of the Eternal Sage
++	sp = dbcSpell.LookupEntryForced(35084);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL;
++	//Item Set: Battlegear of Eternal Justice
++	sp = dbcSpell.LookupEntryForced(26975);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_JUDGEMENT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item: Figurine of the Colossus
++	sp = dbcSpell.LookupEntryForced(33090);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPEC_STATE_VICTIM;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpecState = PROC_ON_BLOCK;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item Set: Warbringer Armor
++	sp = dbcSpell.LookupEntryForced(37515);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPEC_STATE_VICTIM;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpecState = PROC_ON_PARRY;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item Set: Tirisfal Regalia
++	sp = dbcSpell.LookupEntryForced(37444);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Unknown proc
++	sp = dbcSpell.LookupEntryForced(38349);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Item Sextant of Unstable Currents
++	sp = dbcSpell.LookupEntryForced(38348);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Item Prism of Inner Calm
++	sp = dbcSpell.LookupEntryForced(38329);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Item 	Libram of Divine Judgement
++	sp = dbcSpell.LookupEntryForced(37515);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_JUDGEMENT_OF_COMMAND;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Curse of Burning Shadows
++	sp = dbcSpell.LookupEntryForced(36543);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPELL_SCHOOL;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpellSchool = (1 << SCHOOL_FIRE);
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Wrath of the Titans
++	sp = dbcSpell.LookupEntryForced(30610);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL;
++	//Item - Redemption of the Fallen
++	sp = dbcSpell.LookupEntryForced(30553);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_HEALING_SPELL;
++	//Item - Petrified Lichen Guard
++	sp = dbcSpell.LookupEntryForced(32643);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPEC_STATE_VICTIM;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpecState = PROC_ON_BLOCK;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Hourglass of the Unraveller
++	sp = dbcSpell.LookupEntryForced(33649);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_HEALING_SPELL;
++	//Item - High Warlord's Leather Gloves
++	sp = dbcSpell.LookupEntryForced(32747);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_DEADLY_THROW;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Vengeful Gladiator's Totem of the Third Wind
++	sp = dbcSpell.LookupEntryForced(43729);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_LESSER_HEALING_WAVE;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Vengeful Gladiator's Libram of Justice
++	sp = dbcSpell.LookupEntryForced(43727);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_FLASH_OF_LIGHT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Tsunami Talisman
++	sp = dbcSpell.LookupEntryForced(42084);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Item - Stonebreaker's Totem
++	sp = dbcSpell.LookupEntryForced(43749);
++	if (sp!=NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_EARTH_SHOCK;
++		entry->NameHash[0] = SPELL_HASH_FLAME_SHOCK;
++		entry->NameHash[0] = SPELL_HASH_FROST_SHOCK;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Staff of the Qiraji Prophets
++	sp = dbcSpell.LookupEntryForced(25767);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL;
++	//Item - Skycall Totem
++	sp = dbcSpell.LookupEntryForced(43751);
++	if (sp!=NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_LIGHTNING_BOLT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Robe of the Elder Scribes
++	sp = dbcSpell.LookupEntryForced(34597);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL;
++	//Item - Ribbon of Sacrifice
++	sp = dbcSpell.LookupEntryForced(38333);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_HEALING_SPELL;
++	//Item - Merciless Gladiator's Totem of the Third Wind
++	sp = dbcSpell.LookupEntryForced(42371);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_LESSER_HEALING_WAVE;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Merciless Gladiator's Libram of Justice
++	sp = dbcSpell.LookupEntryForced(42369);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_FLASH_OF_LIGHT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Libram of Mending
++	sp = dbcSpell.LookupEntryForced(43742);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_HOLY_LIGHT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Jagged Obsidian Shield
++	sp = dbcSpell.LookupEntryForced(27559);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL;
++	//Item - Idol of the Unseen Moon
++	sp = dbcSpell.LookupEntryForced(43740);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_MOONFIRE;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Idol of Terror
++	sp = dbcSpell.LookupEntryForced(43738);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_MANGLE__CAT_;
++		entry->NameHash[1] = SPELL_HASH_MANGLE__BEAR_;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Gladiator's Totem of the Third Wind
++	sp = dbcSpell.LookupEntryForced(34132);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_LESSER_HEALING_WAVE;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Gladiator's Libram of Justice
++	sp = dbcSpell.LookupEntryForced(34135);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_FLASH_OF_LIGHT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Fel Reaver's Piston
++	sp = dbcSpell.LookupEntryForced(38324);
++	if (sp != NULL)
++		sp->ProcReqFlags |= PROC_REQ_HEALING_SPELL;
++	//Item - Fathom-Brooch of the Tidewalker
++	sp = dbcSpell.LookupEntryForced(37243);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPELL_SCHOOL;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpellSchool = (1 << SCHOOL_NATURE);
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Eye of Magtheridon
++	sp = dbcSpell.LookupEntryForced(34747);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_SPEC_STATE_VICTIM;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->SpecState = PROC_ON_RESIST;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item -  	Blade of Wizardry
++	sp = dbcSpell.LookupEntryForced(38317);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_DAMAGING_SPELL;
++	//Item - Ashtongue Talisman of Valor
++	sp = dbcSpell.LookupEntryForced(40459);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_MORTAL_STRIKE;
++		entry->NameHash[1] = SPELL_HASH_BLOODTHIRST;
++		entry->NameHash[2] = SPELL_HASH_SHIELD_SLAM;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Ashtongue Talisman of Swiftness
++	sp = dbcSpell.LookupEntryForced(40487);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_STEADY_SHOT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Ashtongue Talisman of Insight
++	sp = dbcSpell.LookupEntryForced(40483);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_CRITICAL;
++	//Item - Arcane Infused Gem
++	sp = dbcSpell.LookupEntryForced(23722);
++	if (sp != NULL)
++	{
++		sp->ProcReqFlags |= PROC_REQ_NAMEHASH;
++		ProcReqEntry* entry = new ProcReqEntry();
++		entry->SpellId = sp->Id;
++		entry->NameHash[0] = SPELL_HASH_ARCANE_SHOT;
++		sSpellProcReqMgr.AddRequirement(entry);
++	}
++	//Item - Cosmic Infuser
++	sp = dbcSpell.LookupEntryForced(36483);
++	if (sp!=NULL)
++		sp->ProcReqFlags |= PROC_REQ_HEALING_SPELL;
 +#endif
  // ------------------------------------------------------------------------------------------------
  
  	Log.Notice("World","Starting Transport System...");
 Index: trunk/src/ascent-world/World.h
 ===================================================================
---- trunk/src/ascent-world/World.h	(revision 4106)
+--- trunk/src/ascent-world/World.h	(revision 4109)
 +++ trunk/src/ascent-world/World.h	(working copy)
 @@ -33,6 +33,7 @@
  class EventableObjectHolder;
