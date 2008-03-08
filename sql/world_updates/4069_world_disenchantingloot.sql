@@ -9,5 +9,5 @@ CREATE TABLE `disenchantingloot` (
   `maxcount` int(30) DEFAULT '1',
   `ffa_loot` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
