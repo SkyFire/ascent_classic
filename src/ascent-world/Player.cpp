@@ -499,6 +499,12 @@ Player::~Player ( )
 		m_Summon->Delete();
 		m_Summon=NULL;
 	}
+
+	while( delayedPackets.size() )
+	{
+		WorldPacket * pck = delayedPackets.next();
+		delete pck;
+	}
 }
 
 ASCENT_INLINE uint32 GetSpellForLanguage(uint32 SkillID)
