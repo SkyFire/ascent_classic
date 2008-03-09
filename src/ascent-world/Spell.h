@@ -1871,7 +1871,7 @@ public:
         return Rad[i];
     }
 
-    ASCENT_INLINE uint32 GetBaseThreat(uint32 dmg)
+    ASCENT_INLINE static uint32 GetBaseThreat(uint32 dmg)
     {
         //there should be a formula to determine what spell cause threat and which don't
 /*        switch(m_spellInfo->NameHash)

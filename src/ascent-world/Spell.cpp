@@ -4118,7 +4118,7 @@ void Spell::Heal(int32 amount)
 	// add threat
 	if( u_caster != NULL )
 	{
-		uint32 base_threat=GetBaseThreat(amount);
+		uint32 base_threat=Spell::GetBaseThreat(amount);
 		int count = 0;
 		Unit *unit;
 		std::vector<Unit*> target_threat;

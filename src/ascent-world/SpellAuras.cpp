@@ -2178,9 +2178,8 @@ void Aura::EventPeriodicHeal( uint32 amount )
 	Unit* u_caster = this->GetUnitCaster();
 	if( u_caster != NULL )
 	{
-		Spell* spell = new Spell( u_caster, spe, false, NULL );
 
-		uint32 base_threat=spell->GetBaseThreat(add);
+		uint32 base_threat=Spell::GetBaseThreat(add);
 		int count = 0;
 		Unit* unit;
 		std::vector< Unit* > target_threat;
