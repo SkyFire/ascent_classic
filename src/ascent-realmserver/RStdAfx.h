@@ -37,7 +37,7 @@
 #include "../ascent-shared/crc32.h"
 #include "../ascent-shared/LocationVector.h"
 
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 #include "../ascent-shared/Database/DatabaseEnv.h"
 #include "../ascent-shared/Database/DBCStores.h"
