@@ -54,11 +54,13 @@ bool MySQLDatabase::Initialize(const char* Hostname, unsigned int port, const ch
 	uint32 i;
 	MYSQL * temp, * temp2;
 	MySQLDatabaseConnection ** conns;
+	my_bool my_true = true;
 
 	mHostname = string(Hostname);
 	mConnectionCount = ConnectionCount;
 	mUsername = string(Username);
 	mPassword = string(Password);
+	mDatabaseName = string(DatabaseName);
 
 	Log.Notice("MySQLDatabase", "Connecting to `%s`, database `%s`...", Hostname, DatabaseName);
 	
@@ -73,6 +75,11 @@ bool MySQLDatabase::Initialize(const char* Hostname, unsigned int port, const ch
 			Log.Error("MySQLDatabase", "Connection failed due to: `%s`", mysql_error( temp ) );
 			return false;
 		}
+
+		if (mysql_options(temp2, MYSQL_OPT_RECONNECT, &my_true))
+			Log.Error("MySQLDatabase", "MYSQL_OPT_RECONNECT could not be set, connection drops may occur but will be counteracted.");
+		if(mysql_options(temp2, MYSQL_SET_CHARSET_NAME, "utf8"))
+			Log.Error("MySQLDatabase", "Could not set utf8 character set.");
 
 		conns[i] = new MySQLDatabaseConnection;
 		conns[i]->MySql = temp2;
@@ -135,7 +142,6 @@ bool MySQLDatabase::_SendQuery(DatabaseConnection *con, const char* Sql, bool Se
 	int result = mysql_query(static_cast<MySQLDatabaseConnection*>(con)->MySql, Sql);
 	if(result > 0)
 	{
-		printf("Sql query failed due to [%s], Query: [%s]\n", mysql_error( static_cast<MySQLDatabaseConnection*>(con)->MySql ), Sql);
 		if( Self == false && _HandleError(static_cast<MySQLDatabaseConnection*>(con), mysql_errno( static_cast<MySQLDatabaseConnection*>(con)->MySql ) ) )
 		{
 			// Re-send the query, the connection was successful.
@@ -143,6 +149,8 @@ bool MySQLDatabase::_SendQuery(DatabaseConnection *con, const char* Sql, bool Se
 			// stop after sending the query twice.
 			result = _SendQuery(con, Sql, true);
 		}
+		else
+			printf("Sql query failed due to [%s], Query: [%s]\n", mysql_error( static_cast<MySQLDatabaseConnection*>(con)->MySql ), Sql);
 	}
 
 	return (result == 0 ? true : false);
