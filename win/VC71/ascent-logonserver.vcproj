@@ -21,7 +21,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\ascent-shared"
+				AdditionalIncludeDirectories="..\..\src\ascent-shared"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -40,10 +40,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib dbghelp.lib mswsock.lib"
+				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
 				OutputFile="$(OutDir)/ascent-logonserver.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\dep\lib32"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Debug"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/ascent-logonserver.pdb"
 				SubSystem="1"
@@ -83,7 +83,7 @@
 				InlineFunctionExpansion="2"
 				OptimizeForProcessor="0"
 				OptimizeForWindowsApplication="TRUE"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\ascent-shared"
+				AdditionalIncludeDirectories="..\..\src\ascent-shared"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				StringPooling="TRUE"
 				MinimalRebuild="FALSE"
@@ -104,10 +104,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libmySQL.lib libeay32.lib ws2_32.lib winmm.lib odbc32.lib odbccp32.lib dbghelp.lib mswsock.lib"
+				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
 				OutputFile="$(OutDir)/ascent-logonserver.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\dep\lib32"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Release"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/ascent-logonserver.pdb"
 				SubSystem="1"

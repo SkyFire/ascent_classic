@@ -25,7 +25,7 @@
 				AdditionalOptions="/Zm150"
 				Optimization="0"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\src\ascent-shared;..\..\src\ascent-logonserver"
+				AdditionalIncludeDirectories="..\..\src\ascent-shared"
 				PreprocessorDefinitions="WIN32,_DEBUG,_LIB;INTEL_COMPILER"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -47,11 +47,11 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib libeay32.lib libmysql.lib dbghelp.lib"
+				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
 				ShowProgress="1"
 				OutputFile="$(OutDir)\ascent-world.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\dep\lib32"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Debug"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/ascent-world.pdb"/>
 			<Tool
@@ -117,9 +117,9 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib libeay32.lib libmysql.lib dbghelp.lib"
+				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
 				OutputFile="$(OutDir)/ascent-world.exe"
-				AdditionalLibraryDirectories="..\..\dep\lib32"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Release"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/ascent-world.pdb"
 				OptimizeReferences="2"
