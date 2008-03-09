@@ -4136,7 +4136,7 @@ void Aura::SpellAuraTransform(bool apply)
 				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, 11549 );
 			else
 				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value( UNIT_FIELD_NATIVEDISPLAYID ) );
-		}
+		}break;
 
 		case 41301: // Time-Lost Figurine
 		{
@@ -4144,7 +4144,7 @@ void Aura::SpellAuraTransform(bool apply)
 				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, 18628 );
 			else
 				m_target->SetUInt32Value( UNIT_FIELD_DISPLAYID, m_target->GetUInt32Value( UNIT_FIELD_NATIVEDISPLAYID ) );
-		}
+		}break;
 
 		case 16739: // Orb of Deception
 		{
