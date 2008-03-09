@@ -262,3 +262,10 @@ void TestConsoleLogin(string& username, string& password, uint32 requestno)
 {
 	sLogonCommHandler.TestConsoleLogon(username, password, requestno);
 }
+
+bool HandleRehashCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	pConsole->Write("Config file re-parsed.");
+	sWorld.Rehash(true);
+	return true;
+}

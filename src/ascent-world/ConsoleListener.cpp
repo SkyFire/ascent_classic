@@ -348,6 +348,7 @@ void HandleConsoleInput(BaseConsole * pConsole, const char * szInput)
 		{ &HandleMOTDCommand, "motd", "<new motd>", "Sets MOTD" },
 		{ &HandlePlayerInfoCommand, "playerinfo", "<plrname>", "Shows information about a player." },
 		{ &HandleCreateAccountCommand, "createaccount", "<name> <pass> <email> <flags>", "Creates an account." },
+		{ &HandleRehashCommand, "rehash", "none", "Reloads the config file" },
 		{ NULL, NULL, NULL, NULL },
 	};
 
