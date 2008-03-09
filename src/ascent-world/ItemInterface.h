@@ -78,6 +78,7 @@ public:
 	Item* FindItemLessMax(uint32 itemid, uint32 cnt, bool IncBank);
 	uint32 GetItemCount(uint32 itemid, bool IncBank = false);
 	uint32 RemoveItemAmt(uint32 id, uint32 amt);
+	uint32 RemoveItemAmt_ProtectPointer(uint32 id, uint32 amt, Item** pointer);
 	void RemoveAllConjured();
 	void BuyItem(ItemPrototype *item, uint32 total_amount, Creature * pVendor);
 

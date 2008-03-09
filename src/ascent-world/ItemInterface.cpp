@@ -1013,6 +1013,151 @@ uint32 ItemInterface::RemoveItemAmt(uint32 id, uint32 amt)
 	return 0;
 }
 
+uint32 ItemInterface::RemoveItemAmt_ProtectPointer(uint32 id, uint32 amt, Item** pointer)
+{
+	//this code returns shit return value is fucked
+	if (GetItemCount(id) < amt)
+	{
+		return 0;
+	}
+	uint32 i;
+
+	for(i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; i++)
+	{
+		Item *item = GetInventoryItem(i);
+		if (item)
+		{
+			if(item->GetEntry() == id && item->wrapped_item_id==0)
+			{
+				if(item->GetProto()->ContainerSlots > 0 && item->IsContainer() && ((Container*)item)->HasItems())
+				{
+					/* sounds weird? no. this will trigger a callstack display due to my other debug code. */
+					item->DeleteFromDB();
+					continue;
+				}
+
+				if (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > amt)
+				{
+					item->SetCount(item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) - amt);
+					item->m_isDirty = true;
+					return amt;
+				}
+				else if (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT)== amt)
+				{
+					bool result = SafeFullRemoveItemFromSlot(INVENTORY_SLOT_NOT_SET, i);
+					if( pointer != NULL && *pointer != NULL && *pointer == item )
+						*pointer = NULL;
+
+					if(result)
+					{
+						return amt;
+					}
+					else
+					{
+						return 0;
+					}
+				}
+				else
+				{
+					amt -= item->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
+					SafeFullRemoveItemFromSlot(INVENTORY_SLOT_NOT_SET, i);
+
+					if( pointer != NULL && *pointer != NULL && *pointer == item )
+						*pointer = NULL;
+				}
+			}
+		}
+	}
+
+	for(i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+	{
+		Item *item = GetInventoryItem(i);
+		if(item && item->IsContainer())
+		{
+			for (uint32 j =0; j < item->GetProto()->ContainerSlots;j++)
+			{
+				Item *item2 = ((Container*)item)->GetItem(j);
+				if (item2)
+				{
+					if (item2->GetProto()->ItemId == id && item->wrapped_item_id==0)
+					{
+						if (item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > amt)
+						{
+							item2->SetCount(item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT) - amt);
+							item2->m_isDirty = true;
+							return amt;
+						}
+						else if (item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT)== amt)
+						{
+							bool result = SafeFullRemoveItemFromSlot(i, j);
+							if( pointer != NULL && *pointer != NULL && *pointer == item2 )
+								*pointer = NULL;
+
+							if(result)
+							{
+								return amt;
+							}
+							else
+							{
+								return 0;
+							}
+						}
+						else
+						{
+							amt -= item2->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
+							SafeFullRemoveItemFromSlot(i, j);
+
+							if( pointer != NULL && *pointer != NULL && *pointer == item2 )
+								*pointer = NULL;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for(i = INVENTORY_KEYRING_START; i < INVENTORY_KEYRING_END; i++)
+	{
+		Item *item = GetInventoryItem(i);
+		if (item)
+		{
+			if(item->GetProto()->ItemId == id && item->wrapped_item_id==0)
+			{
+				if (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > amt)
+				{
+					item->SetCount(item->GetUInt32Value(ITEM_FIELD_STACK_COUNT) - amt);
+					item->m_isDirty = true;
+					return amt;
+				}
+				else if (item->GetUInt32Value(ITEM_FIELD_STACK_COUNT)== amt)
+				{
+					bool result = SafeFullRemoveItemFromSlot(INVENTORY_SLOT_NOT_SET, i);
+					if( pointer != NULL && *pointer != NULL && *pointer == item )
+						*pointer = NULL;
+
+					if(result)
+					{
+						return amt;
+					}
+					else
+					{
+						return 0;
+					}
+				}
+				else
+				{
+					amt -= item->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
+					SafeFullRemoveItemFromSlot(INVENTORY_SLOT_NOT_SET, i);
+
+					if( pointer != NULL && *pointer != NULL && *pointer == item )
+						*pointer = NULL;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 void ItemInterface::RemoveAllConjured()
 {
 	for(uint32 x = INVENTORY_SLOT_BAG_START; x < INVENTORY_SLOT_ITEM_END; ++x)

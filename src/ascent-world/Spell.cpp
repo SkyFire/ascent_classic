@@ -3541,14 +3541,16 @@ void Spell::RemoveItems()
 	// Ammo Removal
 	if( m_spellInfo->Flags3 == FLAGS3_REQ_RANGED_WEAPON || m_spellInfo->Flags4 & FLAGS4_PLAYER_RANGED_SPELLS)
 	{
-		p_caster->GetItemInterface()->RemoveItemAmt(p_caster->GetUInt32Value(PLAYER_AMMO_ID), 1);
+		p_caster->GetItemInterface()->RemoveItemAmt_ProtectPointer(p_caster->GetUInt32Value(PLAYER_AMMO_ID), 1, &i_caster);
 	}
 
 	// Reagent Removal
 	for(uint32 i=0; i<8 ;i++)
 	{
 		if( m_spellInfo->Reagent[i])
-			p_caster->GetItemInterface()->RemoveItemAmt(m_spellInfo->Reagent[i], m_spellInfo->ReagentCount[i]);
+		{
+			p_caster->GetItemInterface()->RemoveItemAmt_ProtectPointer(m_spellInfo->Reagent[i], m_spellInfo->ReagentCount[i], &i_caster);
+		}
 	}
 }
 

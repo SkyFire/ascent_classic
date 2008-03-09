@@ -6899,7 +6899,7 @@ void Player::ProcessPendingUpdates()
 	while(delayedPackets.size())
 	{
 		pck = delayedPackets.next();
-		printf("Delayed packet opcode %u sent.\n", pck->GetOpcode());
+		//printf("Delayed packet opcode %u sent.\n", pck->GetOpcode());
 		m_session->SendPacket(pck);
 		delete pck;
 	}
