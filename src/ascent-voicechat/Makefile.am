@@ -1,4 +1,4 @@
-INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include
+INCLUDES += -I$(srcdir)
 
 bin_PROGRAMS = ascent-voicechat
 

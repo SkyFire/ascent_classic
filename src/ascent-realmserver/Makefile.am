@@ -1,5 +1,4 @@
-INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../ascent-shared
-INCLUDES += -I$(srcdir)/../../dep/src
+INCLUDES += -I$(srcdir) -I$(srcdir)/../ascent-shared
 
 bin_PROGRAMS = ascent-realmserver
 
@@ -34,6 +33,5 @@ WorldSocket.cpp
 ascent_realmserver_LDADD = -lshared -lz
 
 ascent_realmserver_LDFLAGS = -L$(srcdir)/../ascent-shared \
-               -L$(srcdir)/../../dep/src \
                -L/usr/lib
                

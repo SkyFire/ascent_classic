@@ -1,4 +1,4 @@
-INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../ascent-shared
+INCLUDES += -I$(srcdir) -I$(srcdir)/../ascent-shared
 
 bin_PROGRAMS = ascent-logonserver
 
@@ -23,4 +23,4 @@ ascent_logonserver_SOURCES = \
 	PeriodicFunctionCall_Thread.h
 
 ascent_logonserver_LDADD = -lshared -lz
-ascent_logonserver_LDFLAGS = -L$(srcdir)/../ascent-shared -L/usr/lib
+ascent_logonserver_LDFLAGS = -L$(srcdir)/../ascent-shared

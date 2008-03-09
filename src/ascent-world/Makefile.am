@@ -1,5 +1,4 @@
-INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../ascent-shared
-INCLUDES += -I$(srcdir)/../../dep/src
+INCLUDES += -I$(srcdir)/../ascent-shared
 
 bin_PROGRAMS = ascent-world
 
@@ -195,8 +194,6 @@ ascent_world_SOURCES = \
 ascent_world_LDADD = -lshared -lz -lpcre -lcollision
 
 ascent_world_LDFLAGS = -L$(srcdir)/../ascent-shared \
-               -L$(srcdir)/../../dep/src/pcre \
-               -L$(srcdir)/../../dep/src \
                -L$(srcdir)/../../extras/collision/collision_dll \
                -L/usr/lib \
                @LIB_EXPORT@
