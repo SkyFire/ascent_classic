@@ -77,6 +77,7 @@ struct CastResultPacket
 {
     uint32	SpellId;
     uint8	ErrorMessage;
+	uint8   MultiCast;
 };
 
 struct BindPointUpdatePacket
@@ -181,6 +182,7 @@ void Player::SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint8 MultiCast,
         CastResultPacket packet;
         packet.SpellId = SpellId;
         packet.ErrorMessage = ErrorMessage;
+		packet.MultiCast = MultiCast;
         GetSession()->OutPacket(SMSG_CAST_RESULT, sizeof(CastResultPacket),(const char*)&packet);
     }
     else

@@ -267,8 +267,17 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
         if(_player->m_currentSpell)
         {
-            _player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, cn, 0);
-            return;
+			if( _player->m_currentSpell->getState() == SPELL_STATE_CASTING )
+			{
+				// cancel the existing channel spell, cast this one
+				_player->m_currentSpell->cancel();
+			}
+			else
+			{
+				// send the error message
+				_player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, cn, 0);
+				return;
+			}
         }
 		Spell *spell = new Spell(GetPlayer(), spellInfo, false, NULL);
 		spell->extra_cast_number=cn;
