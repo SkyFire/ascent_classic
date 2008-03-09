@@ -320,7 +320,7 @@ bool ChatHandler::HandleAppearCommand(const char* args, WorldSession *m_session)
 	if (chr)
 	{
 		char buf[256];
-		if(chr->IsBeingTeleported()==true) {
+		if( chr->IsBeingTeleported() ) {
 			snprintf((char*)buf,256, "%s is already being teleported.", chr->GetName());
 			SystemMessage(m_session, buf);
 			return true;
@@ -335,7 +335,13 @@ bool ChatHandler::HandleAppearCommand(const char* args, WorldSession *m_session)
 			SystemMessageToPlr(chr, buf0);
 		}
 
-		m_session->GetPlayer()->SafeTeleport(chr->GetMapId(), chr->GetInstanceID(), chr->GetPosition());
+		//m_session->GetPlayer()->SafeTeleport(chr->GetMapId(), chr->GetInstanceID(), chr->GetPosition());
+		//If the GM is on the same map as the player, use the normal safeteleport method
+		if ( m_session->GetPlayer()->GetMapId() == chr->GetMapId() && m_session->GetPlayer()->GetInstanceID() == chr->GetInstanceID() )
+			m_session->GetPlayer()->SafeTeleport(chr->GetMapId(),chr->GetInstanceID(),chr->GetPosition());
+		else
+			m_session->GetPlayer()->SafeTeleport(chr->GetMapMgr(), chr->GetPosition());
+		//The player and GM are not on the same map. We use this method so we can port to BG's (Above method doesn't support them)
 	}
 	else
 	{
