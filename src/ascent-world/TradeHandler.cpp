@@ -365,7 +365,7 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 				pItem = pTarget->mTradeItems[Index];
 				if(pItem != 0)
 				{
-					pItem->SetOwner(pTarget);
+					pItem->SetOwner(_player);
 					_player->m_ItemInterface->AddItemToFreeSlot(pItem);
 				}
 			}
