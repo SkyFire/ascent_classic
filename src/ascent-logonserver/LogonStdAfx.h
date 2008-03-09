@@ -33,7 +33,7 @@
 #include "../ascent-shared/Util.h"
 #include "../ascent-shared/ByteBuffer.h"
 #include "../ascent-shared/Config/ConfigEnv.h"
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 #include "../ascent-shared/Database/DatabaseEnv.h"
 #include "../ascent-shared/Database/DBCStores.h"
