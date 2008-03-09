@@ -2611,14 +2611,14 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 	if( srcslot < INVENTORY_SLOT_BAG_END ) 
  	{
 		if( m_pItems[(int)srcslot] != NULL )		
-			m_pOwner->ApplyItemMods( m_pItems[(int)srcslot], dstslot, true );
+			m_pOwner->ApplyItemMods( m_pItems[(int)srcslot], srcslot, true );
  	}
 
 	//dst item is equiped now
 	if( dstslot < INVENTORY_SLOT_BAG_END ) 
 	{
 		if( m_pItems[(int)dstslot] != NULL )		
-			m_pOwner->ApplyItemMods( m_pItems[(int)dstslot], srcslot, true );
+			m_pOwner->ApplyItemMods( m_pItems[(int)dstslot], dstslot, true );
 	}
 
 }
