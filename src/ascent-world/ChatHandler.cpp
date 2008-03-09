@@ -128,10 +128,6 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 		{
 			recv_data >> msg;
 
-			if(sWorld.getReqGmClient() == false)
-				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-					break;
-
 			if(GetPlayer()->m_modlanguage >=0)
 				data = sChatHandler.FillMessageData( CHAT_MSG_EMOTE, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 			else	
@@ -148,9 +144,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 	case CHAT_MSG_SAY:
 		{
 			recv_data >> msg;
-			if(sWorld.getReqGmClient() == false)
-				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-					break;
+
+			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
+				break;
 
 			if(g_chatFilter->Parse(msg) == true)
 			{
@@ -192,9 +188,8 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 		{
 			recv_data >> msg;
 
-			if(sWorld.getReqGmClient() == false)
-				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-					break;
+			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
+				break;
 			
 			if(g_chatFilter->Parse(msg) == true)
 			{
@@ -249,20 +244,19 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 	case CHAT_MSG_GUILD:
 		{
 			recv_data >> msg;
-			if(sWorld.getReqGmClient() == false)
-				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-				{
-					break;
-				}
+			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
+			{
+				break;
+			}
 
-				if(g_chatFilter->Parse(msg) == true)
-				{
-					SystemMessage("Your chat message was blocked by a server-side filter.");
-					return;
-				}
+			if(g_chatFilter->Parse(msg) == true)
+			{
+				SystemMessage("Your chat message was blocked by a server-side filter.");
+				return;
+			}
 
-				if(_player->m_playerInfo->guild)
-					_player->m_playerInfo->guild->GuildChat(msg.c_str(), this, lang);
+			if(_player->m_playerInfo->guild)
+				_player->m_playerInfo->guild->GuildChat(msg.c_str(), this, lang);
 
 			pMsg=msg.c_str();
 			pMisc=0;
@@ -271,9 +265,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 		{
 			recv_data >> msg;
 
-			if(sWorld.getReqGmClient() == false)
-				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-					break;
+			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
+				break;
+
 			if(g_chatFilter->Parse(msg) == true)
 			{
 				SystemMessage("Your chat message was blocked by a server-side filter.");
@@ -290,9 +284,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 		{
 			recv_data >> msg;
 
-			if(sWorld.getReqGmClient() == false)
-				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-					break;
+			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
+				break;
+
 			if(g_chatFilter->Parse(msg) == true)
 			{
 				SystemMessage("Your chat message was blocked by a server-side filter.");
@@ -396,10 +390,6 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			recv_data >> channel;
 			recv_data >> msg;
 		 
-			if(strcmp(channel.c_str(), sWorld.getGmClientChannel().c_str()) == 0)
-				if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-					break;
-
 			if(g_chatFilter->Parse(msg) == true)
 			{
 				SystemMessage("Your chat message was blocked by a server-side filter.");

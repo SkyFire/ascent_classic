@@ -34,7 +34,6 @@ World::World()
 	m_allowMovement = true;
 	m_gmTicketSystem = true;
 
-	reqGmClient = false;
 	GmClientChannel = "";
 
 	m_StartTime = 0;
@@ -59,6 +58,7 @@ World::World()
 	m_genLevelCap=70;
 	m_limitedNames=false;
 	m_banTable = NULL;
+	m_lfgForNonLfg = false;
 }
 
 void CleanupRandomNumberGenerators();
@@ -8802,11 +8802,13 @@ void World::Rehash(bool load)
 	}
 #endif
 
-	reqGmClient = Config.MainConfig.GetBoolDefault("GMClient", "ReqGmClient", false);
 	if(!Config.MainConfig.GetString("GMClient", "GmClientChannel", &GmClientChannel))
 	{
 		GmClientChannel = "";
 	}
+
+	m_reqGmForCommands = !Config.MainConfig.GetBoolDefault("Server", "AllowPlayerCommands", true);
+	m_lfgForNonLfg = !Config.MainConfig.GetBoolDefault("Server", "EnableLFGJoin", false);
 
 	realmtype = Config.MainConfig.GetBoolDefault("Server", "RealmType", false);
 	TimeOut= uint32(1000* Config.MainConfig.GetIntDefault("Server", "ConnectionTimeout", 180) );

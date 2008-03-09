@@ -285,7 +285,7 @@ void CommandTableStorage::Init()
 		{ "get",		 'c', &ChatHandler::HandleGMTicketGetAllCommand,  "Gets GM Ticket",			   NULL, 0, 0, 0},
 		{ "getId",	   'c', &ChatHandler::HandleGMTicketGetByIdCommand, "Gets GM Ticket by ID",		 NULL, 0, 0, 0},
 		{ "delId",	   'c', &ChatHandler::HandleGMTicketDelByIdCommand, "Deletes GM Ticket by ID",	  NULL, 0, 0, 0},
-		{ NULL,			2, NULL,									   "",							 NULL, 0, 0  }
+		{ NULL,			0, NULL,									   "",							 NULL, 0, 0  }
 	};
 	dupe_command_table(GMTicketCommandTable, _GMTicketCommandTable);
 
@@ -296,7 +296,7 @@ void CommandTableStorage::Init()
 		{ "members",	   'm', &ChatHandler::HandleGuildMembersCommand, "Lists guildmembers and their ranks.",	  NULL, 0, 0, 0},
 		{ "removeplayer",	   'm', &ChatHandler::HandleGuildRemovePlayerCommand, "Removes a player from a guild.",		 NULL, 0, 0, 0},
 		{ "disband",	   'm', &ChatHandler::HandleGuildDisbandCommand, "Disbands the guild of your target.",		 NULL, 0, 0, 0},
-		{ NULL,			2, NULL,									   "",							 NULL, 0, 0  }
+		{ NULL,			0, NULL,									   "",							 NULL, 0, 0  }
 	};
 	dupe_command_table(GuildCommandTable, _GuildCommandTable);
 
@@ -313,7 +313,7 @@ void CommandTableStorage::Init()
 		{ "export",	  'o', &ChatHandler::HandleGOExport,   "Exports the current GO selected",		  NULL, 0, 0, 0 },
 		{ "move", 'g', &ChatHandler::HandleGOMove, "Moves gameobject to player xyz", NULL, 0, 0, 0 },
 		{ "rotate", 'g', &ChatHandler::HandleGORotate, "Rotates gameobject x degrees", NULL, 0, 0, 0 },
-		{ NULL,			2, NULL,						   "",										 NULL, 0, 0  }
+		{ NULL,			0, NULL,						   "",										 NULL, 0, 0  }
 	};
 	dupe_command_table(GameObjectCommandTable, _GameObjectCommandTable);
 
@@ -328,7 +328,7 @@ void CommandTableStorage::Init()
 		{ "playsound",   'e', &ChatHandler::HandlePlaySoundCommand,	 "<val>. Val can be in hex.",		   NULL, 0, 0, 0 },
 		{ "setbfstatus", 'e', &ChatHandler::HandleSetBattlefieldStatusCommand,".setbfstatus - NYI.",		   NULL, 0, 0, 0 },
 		{ "leave",	   'e', &ChatHandler::HandleBattlegroundExitCommand, "Leaves the current battleground.", NULL, 0, 0, 0 },
-		{ NULL,			2, NULL,									 "",									NULL, 0, 0  }
+		{ NULL,			0, NULL,									 "",									NULL, 0, 0  }
 	};
 	dupe_command_table(BattlegroundCommandTable, _BattlegroundCommandTable);
 
@@ -451,8 +451,8 @@ void CommandTableStorage::Init()
 	static ChatCommand commandTable[] = {
 		//{ "renameguild", 'a', &ChatHandler::HandleRenameGuildCommand, "Renames a guild.", NULL, 0, 0, 0 },
 		{ "masssummon", 'z', &ChatHandler::HandleMassSummonCommand, ".masssummon - Summons all players.", NULL, 0, 0, 0},
-		{ "commands",	'h', &ChatHandler::HandleCommandsCommand,		"Shows Commands",				 NULL, 0, 0, 0},
-		{ "help",		'h', &ChatHandler::HandleHelpCommand,			"Shows help for command",		 NULL, 0, 0, 0},
+		{ "commands",	'0', &ChatHandler::HandleCommandsCommand,		"Shows Commands",				 NULL, 0, 0, 0},
+		{ "help",		'0', &ChatHandler::HandleHelpCommand,			"Shows help for command",		 NULL, 0, 0, 0},
 		{ "announce",	'u', &ChatHandler::HandleAnnounceCommand,	  "Sends Msg To All",			   NULL, 0, 0, 0},
 		{ "wannounce",   'u', &ChatHandler::HandleWAnnounceCommand,	 "Sends Widescreen Msg To All",	NULL, 0, 0, 0},
 		{ "appear",	  'v', &ChatHandler::HandleAppearCommand,		"Teleports to x's position.",	 NULL, 0, 0, 0},
@@ -467,11 +467,11 @@ void CommandTableStorage::Init()
 		{ "demorph",	 'm', &ChatHandler::HandleDeMorphCommand,	   "Demorphs from morphed model.",   NULL, 0, 0, 0},
 		{ "mount",	   'm', &ChatHandler::HandleMountCommand,		 "Mounts into modelid x.",		 NULL, 0, 0, 0},
 		{ "dismount",	  'h', &ChatHandler::HandleDismountCommand,	  "Dismounts.",					 NULL, 0, 0, 0},
-		{ "gm",		  'p', &ChatHandler::HandleGMListCommand,		"Shows active GM's",			  NULL, 0, 0, 0},
+		{ "gm",		  '0', &ChatHandler::HandleGMListCommand,		"Shows active GM's",			  NULL, 0, 0, 0},
 		{ "gmoff",	   't', &ChatHandler::HandleGMOffCommand,		 "Sets GM tag off",				NULL, 0, 0, 0},
 		{ "gmon",		't', &ChatHandler::HandleGMOnCommand,		  "Sets GM tag on",				 NULL, 0, 0, 0},
-		{ "gps",		 'p', &ChatHandler::HandleGPSCommand,		   "Shows Position",				 NULL, 0, 0, 0},
-		{ "info",		'p', &ChatHandler::HandleInfoCommand,		  "Server info",					NULL, 0, 0, 0},
+		{ "gps",		 '0', &ChatHandler::HandleGPSCommand,		   "Shows Position",				 NULL, 0, 0, 0},
+		{ "info",		'0', &ChatHandler::HandleInfoCommand,		  "Server info",					NULL, 0, 0, 0},
 		{ "worldport",   'v', &ChatHandler::HandleWorldPortCommand,	 "",							   NULL, 0, 0, 0},
 		{ "save",		's', &ChatHandler::HandleSaveCommand,		  "Save's your character",		  NULL, 0, 0, 0},
 		{ "saveall",	 's', &ChatHandler::HandleSaveAllCommand,	   "Save's all playing characters",  NULL, 0, 0, 0},
@@ -643,7 +643,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand *table, const char* text, Wo
 		if(!hasStringAbbr(table[i].Name, cmd.c_str()))
 			continue;
 
-		if(!m_session->CanUseCommand(table[i].CommandGroup))
+		if(table[i].CommandGroup != '0' && !m_session->CanUseCommand(table[i].CommandGroup))
 			continue;
 
 		if(table[i].ChildCommands != NULL)
@@ -707,7 +707,7 @@ int ChatHandler::ParseCommands(const char* text, WorldSession *session)
 	if(!*text)
 		return 0;
 
-	if(session->GetPermissionCount() == 0)
+	if(session->GetPermissionCount() == 0 && sWorld.m_reqGmForCommands)
 		return 0;
 
 	if(text[0] != '!' && text[0] != '.') // let's not confuse users

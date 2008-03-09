@@ -367,7 +367,6 @@ public:
 		return m_gmTicketSystem;
 	};
 
-	ASCENT_INLINE bool getReqGmClient() { return reqGmClient; }
 	ASCENT_INLINE std::string getGmClientChannel() { return GmClientChannel; }
 
 	void SetMotd(const char *motd) { m_motd = motd; }
@@ -575,10 +574,7 @@ protected:
 	bool m_allowMovement;
 	bool m_gmTicketSystem;
 	std::string m_motd;
-
-	bool reqGmClient;
-	std::string GmClientChannel;
-    
+   
     uint32 realmtype;
 
 	time_t m_gameTime;
@@ -592,6 +588,9 @@ protected:
 
 	uint32	m_KickAFKPlayers;//don't lag the server if you are useless anyway :P
 public:
+	std::string GmClientChannel;
+	bool m_reqGmForCommands;
+	bool m_lfgForNonLfg;
 	list<SpellEntry*> dummyspells;
 	uint32 m_levelCap;
 	uint32 m_genLevelCap;
