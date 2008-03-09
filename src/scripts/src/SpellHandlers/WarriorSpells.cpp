@@ -112,8 +112,10 @@ bool Execute(uint32 i, Spell* pSpell)
     add_damage *= pSpell->u_caster->GetUInt32Value(UNIT_FIELD_POWER2) / 10;   // rage is *10 always
     
     // send spell damage log
-    pSpell->u_caster->SpellNonMeleeDamageLog(target, 20647, base_dmg + add_damage, false);
-    // zero rage
+	//pSpell->u_caster->SpellNonMeleeDamageLog(target, 20647, base_dmg + add_damage, false);
+	SpellEntry *sp_for_the_logs = dbcSpell.LookupEntry(20647);
+	pSpell->u_caster->Strike( target, MELEE, sp_for_the_logs, base_dmg + add_damage, 0, 0, true, true );
+	// zero rage
     pSpell->u_caster->SetUInt32Value(UNIT_FIELD_POWER2, 0);
     return true;
 }
