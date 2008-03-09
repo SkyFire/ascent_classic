@@ -2963,6 +2963,11 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = 4194304;
 	}
 
+	//rogue - Vanish : Second Trigger Spell
+	sp = dbcSpell.LookupEntryForced( 18461 );
+	if( sp != NULL )
+		sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+
 	//rogue - Mace Specialization.
 	sp = dbcSpell.LookupEntryForced( 13709 ); 
 	if( sp != NULL )
