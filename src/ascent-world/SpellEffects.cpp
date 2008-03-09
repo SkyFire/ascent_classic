@@ -406,8 +406,8 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 					else
 						_type = MELEE;
 				}
-				u_caster->Strike( unitTarget, _type, m_spellInfo, 0, 0, dmg, pSpellId == 0, true );
 
+				u_caster->Strike( unitTarget, _type, m_spellInfo, 0, 0, dmg, pSpellId == 0, true );
 			}
 		}
 	}   
@@ -1497,20 +1497,7 @@ void Spell::SpellEffectWeapondamageNoschool(uint32 i) // Weapon damage + (no Sch
 				m_spellInfo, (uint32)damage, EVENT_SPELL_DAMAGE_HIT, float2int32(time), 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
 	else
-	{
-
-		uint32 _type;
-		if( GetType() == SPELL_DMG_TYPE_RANGED )
-			_type = RANGED;
-		else
-		{
-			if (m_spellInfo->Flags4 & 0x1000000)
-				_type =  OFFHAND;
-			else
-				_type = MELEE;
-		}
-		u_caster->Strike( unitTarget, _type, m_spellInfo, damage, 0, 0, false, true );
-	}
+		u_caster->Strike( unitTarget, ( GetType() == SPELL_DMG_TYPE_RANGED ? RANGED : MELEE ), m_spellInfo, damage, 0, 0, false, true );
 }
 
 void Spell::SpellEffectAddExtraAttacks(uint32 i) // Add Extra Attacks
@@ -2147,6 +2134,7 @@ void Spell::SpellEffectWeaponDmgPerc(uint32 i) // Weapon Percent damage
 			else
 				_type = MELEE;
 		}
+
 		u_caster->Strike( unitTarget, _type, m_spellInfo, add_damage, damage, 0, false, true );
 	}
 }
@@ -3249,7 +3237,7 @@ void Spell::SpellEffectWeapondamage( uint32 i ) // Weapon damage +
 		else
 			_type = MELEE;
 	}
-	u_caster->Strike( unitTarget, _type, m_spellInfo, add_damage, damage, 0, false, true );
+	u_caster->Strike( unitTarget, _type, m_spellInfo, damage, 0, 0, false, true );
 }
 
 void Spell::SpellEffectPowerBurn(uint32 i) // power burn
@@ -5034,7 +5022,6 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		else
 			_type = MELEE;
 	}
-
 	u_caster->Strike( unitTarget, _type, m_spellInfo, damage, 0, 0, false, true );
 }
 
