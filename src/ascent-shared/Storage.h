@@ -24,7 +24,43 @@
 #pragma warning(disable:4312)
 #endif
 
+// pooled allocations
+//#define STORAGE_ALLOCATION_POOLS 1
+
 #define STORAGE_ARRAY_MAX 200000
+
+#ifdef STORAGE_ALLOCATION_POOLS
+template<class T>
+class SERVER_DECL StorageAllocationPool
+{
+	T* _pool;
+	uint32 _count;
+	uint32 _max;
+public:
+	void Init(uint32 count)
+	{
+		_pool = new T[count+100];
+		_count = 0;
+		_max = count+100;
+	}
+
+	T * Get()
+	{
+		if( _count >= _max )
+		{
+			printf("StorageAllocationPool Get() failed!\n");
+			return NULL;
+		}
+
+		return &_pool[_count++];
+	}
+
+	void Free()
+	{
+		delete [] _pool;
+	}
+};
+#endif
 
 /** Base iterator class, returned by MakeIterator() functions.
  */
@@ -63,6 +99,11 @@ template<class T>
 class SERVER_DECL ArrayStorageContainer
 {
 public:
+#ifdef STORAGE_ALLOCATION_POOLS
+	StorageAllocationPool<T> _pool;
+	void InitPool(uint32 cnt) { _pool.Init( cnt ); }
+#endif
+
 	/** This is where the magic happens :P
 	 */
 	T ** _array;
@@ -110,10 +151,13 @@ public:
 	 */
 	~ArrayStorageContainer()
 	{
+#ifndef STORAGE_ALLOCATION_POOLS
 		for(uint32 i = 0; i < _max; ++i)
 			if(_array[i] != 0)
 				delete _array[i];
-
+#else
+		_pool.Free();
+#endif
 		delete [] _array;
 	}
 
@@ -125,7 +169,11 @@ public:
 		if(Entry >= _max || _array[Entry] != 0)
 			return reinterpret_cast<T*>(0);
 
+#ifndef STORAGE_ALLOCATION_POOLS
 		_array[Entry] = new T;
+#else
+		_array[Entry] = _pool.Get();
+#endif
 		return _array[Entry];
 	}
 
@@ -136,7 +184,9 @@ public:
 		if(Entry >= _max || _array[Entry] == 0)
 			return false;
 
+#ifndef STORAGE_ALLOCATION_POOLS
 		delete _array[Entry];
+#endif
 		_array[Entry] = 0;
 		return true;
 	}
@@ -159,8 +209,10 @@ public:
 		if(Entry > _max)
 			return false;
 
+#ifndef STORAGE_ALLOCATION_POOLS
 		if(_array[Entry] != 0)
 			delete _array[Entry];
+#endif
 
 		_array[Entry] = Pointer;
 		return true;
@@ -182,10 +234,12 @@ public:
 	{
 		for(uint32 i = 0; i < _max; ++i)
 		{
+#ifndef STORAGE_ALLOCATION_POOLS
 			if(_array[i] != 0)
 			{
 				delete _array[i];
 			}
+#endif
 			_array[i] = 0;
 		}
 	}
@@ -195,6 +249,11 @@ template<class T>
 class SERVER_DECL HashMapStorageContainer
 {
 public:
+#ifdef STORAGE_ALLOCATION_POOLS
+	StorageAllocationPool<T> _pool;
+	void InitPool(uint32 cnt) { _pool.Init( cnt ); }
+#endif
+
 	typename HM_NAMESPACE::hash_map<uint32, T*> _map;
 
 	/** Returns an iterator currently referencing the start of the container
@@ -235,7 +294,11 @@ public:
 	{
 		if(_map.find(Entry) != _map.end())
 			return reinterpret_cast<T*>(0);
+#ifdef STORAGE_ALLOCATION_POOLS
+		T * n = _pool.Get();
+#else
 		T * n = new T;
+#endif
 		_map.insert( make_pair( Entry, n ) );
 		return n;
 	}
@@ -248,7 +311,9 @@ public:
 		if(itr == _map.end())
 			return false;
 
+#ifndef STORAGE_ALLOCATION_POOLS
 		delete itr->second;
+#endif
 		_map.erase(itr);
 		return true;
 	}
@@ -274,8 +339,10 @@ public:
 			return true;
 		}
 
+#ifndef STORAGE_ALLOCATION_POOLS
 		delete itr->second;
 		itr->second = Pointer;
+#endif
 		return true;
 	}
 
@@ -616,6 +683,9 @@ public:
 
 		uint32 Entry;
 		T * Allocated;
+#ifdef STORAGE_ALLOCATION_POOLS
+		Storage<T, StorageType>::_storage.InitPool( result->GetRowCount() );
+#endif
 		do 
 		{
 			Entry = fields[0].GetUInt32();
