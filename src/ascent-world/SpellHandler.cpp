@@ -279,10 +279,22 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 				return;
 			}
         }
+
+		SpellCastTargets targets(recvPacket,GetPlayer()->GetGUID());
+
+		// some anticheat stuff
+		if( spellInfo->self_cast_only )
+		{
+			if( targets.m_unitTarget && targets.m_unitTarget != _player->GetGUID() )
+			{
+				// send the error message
+				_player->SendCastResult(spellInfo->Id, SPELL_FAILED_BAD_TARGETS, cn, 0);
+				return;
+			}
+		}
+
 		Spell *spell = new Spell(GetPlayer(), spellInfo, false, NULL);
 		spell->extra_cast_number=cn;
-	
-		SpellCastTargets targets(recvPacket,GetPlayer()->GetGUID());
 		spell->prepare(&targets);
 	}
 }

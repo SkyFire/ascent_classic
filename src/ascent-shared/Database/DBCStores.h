@@ -364,6 +364,8 @@ struct SpellEntry
 	float fixed_hotdotcoef;                                 //!!! CUSTOM, fixed HOT-DOT coefficient for some spells
 	float Dspell_coef_override;                             //!!! CUSTOM, overrides any spell coefficient calculation and use this value in DD&DH
 	float OTspell_coef_override;							//!!! CUSTOM, overrides any spell coefficient calculation and use this value in HOT&DOT
+
+	bool self_cast_only;
 };
 
 struct ItemExtendedCostEntry

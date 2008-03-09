@@ -596,6 +596,7 @@ bool World::SetInitialWorldSettings()
 
 		// get spellentry
 		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
+		sp->self_cast_only = false;
 
 		// hash the name
 		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
@@ -654,7 +655,28 @@ bool World::SetInitialWorldSettings()
 			{
 				sp->Attributes &= ~ATTRIBUTES_ONLY_OUTDOORS;
 			}
+
+			// fill in more here
+			switch( sp->EffectImplicitTargetA[b] )
+			{
+			case 1:
+			case 9:
+				sp->self_cast_only = true;
+				break;
+			}
+
+			// fill in more here too
+			switch( sp->EffectImplicitTargetB[b] )
+			{
+			case 1:
+			case 9:
+				sp->self_cast_only = true;
+				break;
+			}
 		}
+
+		/*if(sp->self_cast_only && !(sp->Attributes&64))
+			printf("SPELL SELF CAST ONLY: %s %u\n", sp->Name, sp->Id);*/
 
 		sp->proc_interval = 0;//trigger at each event
 		sp->c_is_flags = 0;
