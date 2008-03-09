@@ -338,7 +338,12 @@ if test "x$enable_clustering" = "xyes" ; then
 else
   echo "disabled"
 fi
+
 echo
+echo "Compiler version: "
+$(CC -v)
+echo
+echo "LIBS=${LIBS}"
 echo "CXXFLAGS=${CXXFLAGS}"
 echo "LDFLAGS=${LDFLAGS}"
 echo "===================================="
