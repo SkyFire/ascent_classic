@@ -1,0 +1,1 @@
+alter table accounts add column encrypted_password VARCHAR(40) NOT NULL DEFAULT '' AFTER Password;

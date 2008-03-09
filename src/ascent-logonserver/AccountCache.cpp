@@ -28,7 +28,7 @@ void AccountMgr::ReloadAccounts(bool silent)
 	if(!silent) sLog.outString("[AccountMgr] Reloading Accounts...");
 
 	// Load *all* accounts.
-	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, gm, flags, banned, forceLanguage, muted FROM accounts");
+	QueryResult * result = sLogonSQL->Query("SELECT acct, login, password, encrypted_password, gm, flags, banned, forceLanguage, muted FROM accounts");
 	Field * field;
 	string AccountName;
 	set<string> account_list;
@@ -102,35 +102,55 @@ void AccountMgr::AddAccount(Field* field)
 	Sha1Hash hash;
 	string Username     = field[1].GetString();
 	string Password	    = field[2].GetString();
-	string GMFlags		= field[3].GetString();
+	string EncryptedPassword = field[3].GetString();
+	string GMFlags		= field[4].GetString();
 
 	acct->AccountId				= field[0].GetUInt32();
-	acct->AccountFlags			= field[4].GetUInt8();
-	acct->Banned				= field[5].GetUInt32();
+	acct->AccountFlags			= field[5].GetUInt8();
+	acct->Banned				= field[6].GetUInt32();
 	acct->SetGMFlags(GMFlags.c_str());
 	acct->Locale[0] = 'e';
 	acct->Locale[1] = 'n';
 	acct->Locale[2] = 'U';
 	acct->Locale[3] = 'S';
-	if(strcmp(field[6].GetString(), "enUS"))
+	if(strcmp(field[7].GetString(), "enUS"))
 	{
 		// non-standard language forced
-		memcpy(acct->Locale, field[6].GetString(), 4);
+		memcpy(acct->Locale, field[7].GetString(), 4);
 		acct->forcedLocale = true;
 	}
 	else
 		acct->forcedLocale = false;
 
-    acct->Muted = field[7].GetUInt32();
+    acct->Muted = field[8].GetUInt32();
 
 	// Convert username/password to uppercase. this is needed ;)
 	ASCENT_TOUPPER(Username);
 	ASCENT_TOUPPER(Password);
 	
-	// Prehash the I value.
-	hash.UpdateData((Username + ":" + Password));
-	hash.Finalize();
-	memcpy(acct->SrpHash, hash.GetDigest(), 20);
+	if( EncryptedPassword.size() > 0 )
+	{
+		// prefer encrypted passwords over nonencrypted
+		BigNumber bn;
+		bn.SetHexStr( EncryptedPassword.c_str() );
+		if( bn.GetNumBytes() != 20 )
+		{
+			printf("Account `%s` has incorrect number of bytes (%u) in encrypted password! Disabling.\n", Username.c_str(), bn.GetNumBytes());
+			memset(acct->SrpHash, 0, 20);
+		}
+		else
+		{
+			memcpy(acct->SrpHash, bn.AsByteArray(), 20);
+			reverse_array(acct->SrpHash, 20);
+		}
+	}
+	else
+	{
+		// Prehash the I value.
+		hash.UpdateData((Username + ":" + Password));
+		hash.Finalize();
+		memcpy(acct->SrpHash, hash.GetDigest(), 20);
+	}
 
 	AccountDatabase[Username] = acct;
 }
@@ -141,7 +161,8 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 	Sha1Hash hash;
 	string Username     = field[1].GetString();
 	string Password	    = field[2].GetString();
-	string GMFlags		= field[3].GetString();
+	string EncryptedPassword = field[3].GetString();
+	string GMFlags		= field[4].GetString();
 
 	if(id != acct->AccountId)
 	{
@@ -153,28 +174,47 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 	}
 
 	acct->AccountId				= field[0].GetUInt32();
-	acct->AccountFlags			= field[4].GetUInt8();
-	acct->Banned				= field[5].GetUInt32();
+	acct->AccountFlags			= field[5].GetUInt8();
+	acct->Banned				= field[6].GetUInt32();
 	acct->SetGMFlags(GMFlags.c_str());
-	if(strcmp(field[6].GetString(), "enUS"))
+	if(strcmp(field[7].GetString(), "enUS"))
 	{
 		// non-standard language forced
-		memcpy(acct->Locale, field[6].GetString(), 4);
+		memcpy(acct->Locale, field[7].GetString(), 4);
 		acct->forcedLocale = true;
 	}
 	else
 		acct->forcedLocale = false;
 
-	acct->Muted = field[7].GetUInt32();
+	acct->Muted = field[8].GetUInt32();
 
 	// Convert username/password to uppercase. this is needed ;)
 	ASCENT_TOUPPER(Username);
 	ASCENT_TOUPPER(Password);
 
-	// Prehash the I value.
-	hash.UpdateData((Username + ":" + Password));
-	hash.Finalize();
-	memcpy(acct->SrpHash, hash.GetDigest(), 20);
+	if( EncryptedPassword.size() > 0 )
+	{
+		// prefer encrypted passwords over nonencrypted
+		BigNumber bn;
+		bn.SetHexStr( EncryptedPassword.c_str() );
+		if( bn.GetNumBytes() != 20 )
+		{
+			printf("Account `%s` has incorrect number of bytes in encrypted password! Disabling.\n", Username.c_str());
+			memset(acct->SrpHash, 0, 20);
+		}
+		else
+		{
+			memcpy(acct->SrpHash, bn.AsByteArray(), 20);
+			reverse_array(acct->SrpHash, 20);
+		}
+	}
+	else
+	{
+		// Prehash the I value.
+		hash.UpdateData((Username + ":" + Password));
+		hash.Finalize();
+		memcpy(acct->SrpHash, hash.GetDigest(), 20);
+	}
 }
 
 void AccountMgr::ReloadAccountsCallback()
