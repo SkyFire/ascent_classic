@@ -173,7 +173,7 @@ void AuctionHouse::RemoveAuction(Auction * auct)
 				amount = 0;
 
 			// ItemEntry:0:2
-			snprintf(subject, 100, "%u:0:2", (int)auct->pItem->GetEntry());
+			snprintf(subject, 100, "%u:0:2", (unsigned int)auct->pItem->GetEntry());
 
 			// <hex player guid>:bid:0:deposit:cut
 			if(auct->HighestBid == auct->BuyoutPrice)	   // Buyout
@@ -400,7 +400,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 
 		// send response packet
 		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 12);
-		data << auct->Id << uint32(AUCTION_BID) << uint32(0) << uint32(0);
+		data << auct->Id << uint32(AUCTION_CANCEL) << uint32(0) << uint32(0);
 		SendPacket(&data);
 	}
 	else
@@ -412,7 +412,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 
 		// send response packet
 		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 12);
-		data << auct->Id << uint32(AUCTION_BID) << uint32(0);
+		data << auct->Id << uint32(AUCTION_CANCEL) << uint32(0);
 		SendPacket(&data);
 	}
 }
