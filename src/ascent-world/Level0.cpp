@@ -91,7 +91,7 @@ bool ChatHandler::HandleCommandsCommand(const char* args, WorldSession *m_sessio
 		if(*args && !hasStringAbbr(table[i].Name, (char*)args))
 			continue;
 
-		if(!m_session->CanUseCommand(table[i].CommandGroup))
+		if(table[i].CommandGroup != '0' && !m_session->CanUseCommand(table[i].CommandGroup))
 			continue;
 
 		switch(table[i].CommandGroup)

@@ -386,38 +386,7 @@ public:
 	ASCENT_INLINE void SetStartTime(uint32 val) { m_StartTime = val; }
 	ASCENT_INLINE uint32 GetUptime(void) { return (uint32)UNIXTIME - m_StartTime; }
 	ASCENT_INLINE uint32 GetStartTime(void) { return m_StartTime; }
-	ASCENT_INLINE std::string GetUptimeString()
-	{
-		int seconds = (uint32)UNIXTIME - m_StartTime;
-		int mins=0;
-		int hours=0;
-		int days=0;
-		if(seconds >= 60)
-		{
-			mins = seconds / 60;
-			if(mins)
-			{
-				seconds -= mins*60;
-				if(mins >= 60)
-				{
-					hours = mins / 60;
-					if(hours)
-					{
-						mins -= hours*60;
-						if(hours >= 24)
-						{
-							days = hours/24;
-							if(days)
-								hours -= days*24;
-						}
-					}
-				}
-			}
-		}
-		char str[200];
-		snprintf(str, 200, "%d days, %d hours, %d minutes, %d seconds.", days, hours, mins, seconds);
-		return str;
-	}
+	std::string GetUptimeString();
 
 	// update the world server every frame
 	void Update(time_t diff);

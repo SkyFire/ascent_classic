@@ -9362,3 +9362,13 @@ void World::DisconnectUsersWithPlayerName(const char * plr, WorldSession * m_ses
 	}
 	m_sessionlock.ReleaseReadLock();
 }
+
+string World::GetUptimeString()
+{
+	char str[300];
+	time_t pTime = (time_t)UNIXTIME - m_StartTime;
+	tm * tmv = gmtime(&pTime);
+
+	snprintf(str, 300, "%u days, %u hours, %u minutes, %u seconds.", tmv->tm_yday, tmv->tm_hour, tmv->tm_min, tmv->tm_sec);
+	return string(str);
+}
