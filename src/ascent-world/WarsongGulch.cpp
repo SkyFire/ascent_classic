@@ -241,9 +241,9 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 	}
 
 	if( plr->GetTeam() == 0 )
-		sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_WSG_AUTO_RETURN_FLAG + 1);
-	else
 		sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_WSG_AUTO_RETURN_FLAG);
+	else
+		sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_WSG_AUTO_RETURN_FLAG + 1);
 
 	m_dropFlags[plr->GetTeam()]->RemoveFromWorld(false);
 	m_flagHolders[plr->GetTeam()] = plr->GetGUIDLow();
