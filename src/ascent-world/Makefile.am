@@ -192,11 +192,11 @@ ascent_world_SOURCES = \
 	ConsoleCommands.h \
 	ConsoleListener.cpp
 	
-ascent_world_LDADD = -lshared -lzlib -lpcre -lcollision
+ascent_world_LDADD = -lshared -lz -lpcre -lcollision
 
 ascent_world_LDFLAGS = -L$(srcdir)/../ascent-shared \
-               -L$(srcdir)/../../dep/src/zlib \
                -L$(srcdir)/../../dep/src/pcre \
                -L$(srcdir)/../../dep/src \
                -L$(srcdir)/../../extras/collision/collision_dll \
+               -L/usr/lib \
                @LIB_EXPORT@

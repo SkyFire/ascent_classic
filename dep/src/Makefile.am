@@ -1,1 +1,1 @@
-SUBDIRS = pcre zlib
+SUBDIRS = pcre 

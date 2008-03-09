@@ -31,9 +31,9 @@ WorkerServer.cpp \
 WorkerServerSocket.cpp \
 WorldSocket.cpp 
 	
-ascent_realmserver_LDADD = -lshared -lzlib
+ascent_realmserver_LDADD = -lshared -lz
 
 ascent_realmserver_LDFLAGS = -L$(srcdir)/../ascent-shared \
-               -L$(srcdir)/../../dep/src/zlib \
-               -L$(srcdir)/../../dep/src 
+               -L$(srcdir)/../../dep/src \
+               -L/usr/lib
                

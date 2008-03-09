@@ -22,6 +22,5 @@ ascent_logonserver_SOURCES = \
 	Main.h \
 	PeriodicFunctionCall_Thread.h
 
-ascent_logonserver_LDADD = -lshared -lzlib
-ascent_logonserver_LDFLAGS = -L$(srcdir)/../ascent-shared \
-               -L$(srcdir)/../../dep/src/zlib
+ascent_logonserver_LDADD = -lshared -lz
+ascent_logonserver_LDFLAGS = -L$(srcdir)/../ascent-shared -L/usr/lib
