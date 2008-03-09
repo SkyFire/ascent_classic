@@ -657,7 +657,7 @@ bool World::SetInitialWorldSettings()
 			}
 
 			// fill in more here
-			switch( sp->EffectImplicitTargetA[b] )
+			/*switch( sp->EffectImplicitTargetA[b] )
 			{
 			case 1:
 			case 9:
@@ -672,11 +672,14 @@ bool World::SetInitialWorldSettings()
 			case 9:
 				sp->self_cast_only = true;
 				break;
-			}
+			}*/
 		}
 
 		/*if(sp->self_cast_only && !(sp->Attributes&64))
 			printf("SPELL SELF CAST ONLY: %s %u\n", sp->Name, sp->Id);*/
+
+		if(!strcmp(sp->Name, "Hearthstone") || !strcmp(sp->Name, "Stuck") || !strcmp(sp->Name, "Astral Recall"))
+			sp->self_cast_only = true;
 
 		sp->proc_interval = 0;//trigger at each event
 		sp->c_is_flags = 0;
