@@ -341,7 +341,7 @@ fi
 
 echo
 echo "Compiler version: "
-$(CC -v)
+$($CC -v)
 echo
 echo "LIBS=${LIBS}"
 echo "CXXFLAGS=${CXXFLAGS}"
