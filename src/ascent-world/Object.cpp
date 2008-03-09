@@ -984,7 +984,7 @@ void Object::AddToWorld(MapMgr * pMapMgr)
 //this can only be called from the thread of mapmgr!!!
 void Object::PushToWorld(MapMgr*mgr)
 {
-	if(!mgr || (m_mapMgr != NULL && m_mapCell != NULL) )
+	if(!mgr/* || (m_mapMgr != NULL && m_mapCell != NULL) */)
 		return; //instance add failed
 
 	m_mapId=mgr->GetMapId();
