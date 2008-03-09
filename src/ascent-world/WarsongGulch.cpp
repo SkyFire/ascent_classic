@@ -140,7 +140,8 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 		SetWorldState( plr->GetTeam() ? WSG_ALLIANCE_FLAG_CAPTURED : WSG_HORDE_FLAG_CAPTURED, 1 );
 
 		/* respawn the home flag */
-		m_homeFlags[plr->GetTeam()]->PushToWorld(m_mapMgr);
+		if( !m_homeFlags[plr->GetTeam()]->IsInWorld() )
+			m_homeFlags[plr->GetTeam()]->PushToWorld(m_mapMgr);
 
 		/* give each player on that team a bonus 82 honor - burlex: is this correct amount? */
 		for(set<Player*>::iterator itr = m_players[plr->GetTeam()].begin(); itr != m_players[plr->GetTeam()].end(); ++itr)
@@ -222,7 +223,9 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 			uint32 x = plr->GetTeam() ? 0 : 1;
 			sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_WSG_AUTO_RETURN_FLAG + plr->GetTeam());
 
-			m_dropFlags[x]->RemoveFromWorld(false);
+			if( m_dropFlags[x]->IsInWorld() )
+				m_dropFlags[x]->RemoveFromWorld(false);
+
 			if(m_homeFlags[x]->IsInWorld() == false)
 				m_homeFlags[x]->PushToWorld(m_mapMgr);
 
@@ -245,7 +248,9 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 	else
 		sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_WSG_AUTO_RETURN_FLAG + 1);
 
-	m_dropFlags[plr->GetTeam()]->RemoveFromWorld(false);
+	if( m_dropFlags[plr->GetTeam()]->IsInWorld() )
+		m_dropFlags[plr->GetTeam()]->RemoveFromWorld(false);
+
 	m_flagHolders[plr->GetTeam()] = plr->GetGUIDLow();
 	plr->m_bgHasFlag = true;
 
@@ -268,7 +273,8 @@ void WarsongGulch::ReturnFlag(uint32 team)
 	if (m_dropFlags[team]->IsInWorld())
 		m_dropFlags[team]->RemoveFromWorld(false);
 	
-	m_homeFlags[team]->PushToWorld(m_mapMgr);
+	if( !m_homeFlags[team]->IsInWorld() )
+		m_homeFlags[team]->PushToWorld(m_mapMgr);
 	
 	if( team )
 		SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE, 0, "The Alliance flag was returned to its base!" );
@@ -291,7 +297,9 @@ void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
 
 	/* set the flag holder */
 	m_flagHolders[plr->GetTeam()] = plr->GetGUIDLow();
-	m_homeFlags[plr->GetTeam()]->RemoveFromWorld(false);
+	if(m_homeFlags[plr->GetTeam()]->IsInWorld())
+		m_homeFlags[plr->GetTeam()]->RemoveFromWorld(false);
+
 	plr->m_bgHasFlag = true;
 
 	if( plr->GetTeam() == 1 )
@@ -429,7 +437,10 @@ void WarsongGulch::OnCreate()
 {
 	/* add the buffs to the world */
 	for(int i = 0; i < 6; ++i)
-		m_buffs[i]->PushToWorld(m_mapMgr);
+	{
+		if(!m_buffs[i]->IsInWorld())
+			m_buffs[i]->PushToWorld(m_mapMgr);
+	}
 
 	// Alliance Gates
 	GameObject *gate = SpawnGameObject(179921, 489, 1471.554688f, 1458.778076f, 362.633240f, 0, 33, 114, 2.33271f);
@@ -500,7 +511,10 @@ void WarsongGulch::OnStart()
 
 	/* add the flags to the world */
 	for(int i = 0; i < 2; ++i)
-		m_homeFlags[i]->PushToWorld(m_mapMgr);
+	{
+		if( !m_homeFlags[i]->IsInWorld() )
+			m_homeFlags[i]->PushToWorld(m_mapMgr);
+	}
 
 	SendChatMessage( CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The flags are now placed at their bases." );
 
