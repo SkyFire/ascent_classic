@@ -1,8 +1,8 @@
 Ascent Win32/64 Installation Instructions
 =========================================
 
-Download the ascent-windows-libraries.rar distribution from www.ascentemu.com.
-http://www.ascentemu.com/ascent-windows-libraries.rar
+Download the ascent-windows-libraries.zip distribution from www.ascentemu.com.
+http://www.ascentemu.com/ascent-windows-libraries.zip
 
 Mirrors:
 <insert here>
