@@ -78,7 +78,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib"
+				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Debug"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
@@ -169,7 +170,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib"
+				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\x64\Release"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
@@ -265,7 +267,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib"
+				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Release"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
@@ -359,7 +362,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib"
+				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
+				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\x64\Release"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
