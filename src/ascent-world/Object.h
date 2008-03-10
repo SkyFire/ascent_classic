@@ -477,8 +477,6 @@ public:
 	ASCENT_INLINE size_t GetInRangeOppFactCount() { return m_oppFactsInRange.size(); }
 	void PlaySoundToSet(uint32 sound_entry);
 
-	void *SOC; //Script Object Container
-
 protected:
 	Object (  );
 

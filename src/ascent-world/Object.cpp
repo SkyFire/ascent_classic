@@ -65,8 +65,6 @@ Object::Object() : m_position(0,0,0,0), m_spawnLocation(0,0,0,0)
 	m_inQueue = false;
 	m_extensions = NULL;
 	m_loadedFromDB = false;
-
-	SOC = NULL;
 }
 
 Object::~Object( )
@@ -85,9 +83,6 @@ Object::~Object( )
 	
 	if( m_extensions != NULL )
 		delete m_extensions;
-
-	if ( SOC )
-		delete SOC;
 }
 
 
