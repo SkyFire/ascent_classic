@@ -81,6 +81,8 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 	}
 
 	amt = pLoot->items.at(lootSlot).iItemsCount;
+	if( pLoot->items.at(lootSlot).roll != NULL )
+		return;
 
 	if (!pLoot->items.at(lootSlot).ffa_loot)
 	{
