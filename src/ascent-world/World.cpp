@@ -8810,8 +8810,8 @@ void World::Rehash(bool load)
 		GmClientChannel = "";
 	}
 
-	m_reqGmForCommands = !Config.MainConfig.GetBoolDefault("Server", "AllowPlayerCommands", true);
-	m_lfgForNonLfg = !Config.MainConfig.GetBoolDefault("Server", "EnableLFGJoin", false);
+	m_reqGmForCommands = !Config.MainConfig.GetBoolDefault("Server", "AllowPlayerCommands", false);
+	m_lfgForNonLfg = Config.MainConfig.GetBoolDefault("Server", "EnableLFGJoin", false);
 
 	realmtype = Config.MainConfig.GetBoolDefault("Server", "RealmType", false);
 	TimeOut= uint32(1000* Config.MainConfig.GetIntDefault("Server", "ConnectionTimeout", 180) );
