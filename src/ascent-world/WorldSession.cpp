@@ -980,15 +980,15 @@ void WorldSession::SendItemPushResult(Item * pItem, bool Created, bool Received,
 
 	if(SendToSet)
 	{
-		if(Created)
+		/*if(Created)
 			_player->SendMessageToSet(&data, true);
 		else
-		{
+		{*/
 			if(_player->GetGroup())
 				_player->GetGroup()->SendPacketToAll(&data);
 			else
 				SendPacket(&data);
-		}
+		/*}*/
 	}
 	else
 		SendPacket(&data);
