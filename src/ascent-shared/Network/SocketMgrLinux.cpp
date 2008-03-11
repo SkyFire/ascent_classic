@@ -12,7 +12,12 @@
 initialiseSingleton(SocketMgr);
 void SocketMgr::AddSocket(Socket * s)
 {
-    assert(fds[s->GetFd()] == 0);
+	if(fds[s->GetFd()] != NULL)
+	{
+		fds[s->GetFd()]->Delete();
+		fds[s->GetFd()] = NULL;
+	}
+
     fds[s->GetFd()] = s;
 
     // Add epoll event based on socket activity.

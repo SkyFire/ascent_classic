@@ -252,7 +252,9 @@ Standing Player::GetStandingRank(uint32 Faction)
 
 bool Player::IsHostileBasedOnReputation(FactionDBC * dbc)
 {
-	assert(dbc->RepListId < 128 && dbc->RepListId >= 0);
+	if(dbc->RepListId < 0 || dbc->RepListId >= 128)
+		return false;
+
 	FactionReputation * rep = reputationByListId[dbc->RepListId];
 	if(!rep) return false;
 
@@ -340,8 +342,11 @@ void Player::ModStanding(uint32 Faction, int32 Value)
 
 void Player::SetAtWar(uint32 Faction, bool Set)
 {
+	if( Faction >= 128 )
+		return;
+
 	FactionReputation * rep = reputationByListId[Faction];
-	if(Faction > 128 || !rep) return;
+	if(!rep) return;
 	
 	if(GetReputationRankFromStanding(rep->standing) <= STANDING_HOSTILE && !Set) // At this point we have to be at war.
 		return;
@@ -399,7 +404,7 @@ void Player::UpdateInrangeSetsBasedOnReputation()
 			continue;
 
 		pUnit = static_cast< Unit* >( *itr );
-		if(pUnit->m_factionDBC != NULL || pUnit->m_factionDBC->RepListId < 0)
+		if(pUnit->m_factionDBC == NULL || pUnit->m_factionDBC->RepListId < 0)
 			continue;
 
 		rep_value = IsHostileBasedOnReputation( pUnit->m_factionDBC );
