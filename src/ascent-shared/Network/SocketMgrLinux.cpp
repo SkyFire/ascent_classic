@@ -14,8 +14,10 @@ void SocketMgr::AddSocket(Socket * s)
 {
 	if(fds[s->GetFd()] != NULL)
 	{
-		fds[s->GetFd()]->Delete();
-		fds[s->GetFd()] = NULL;
+		//fds[s->GetFd()]->Delete();
+		//fds[s->GetFd()] = NULL;
+		s->Delete();
+		return;
 	}
 
     fds[s->GetFd()] = s;
