@@ -2549,19 +2549,6 @@ void Aura::SpellAuraModStealth(bool apply)
 		m_target->SetFlag(UNIT_FIELD_BYTES_1,0x02000000);//sneak anim
 		m_target->RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_STEALTH);
 		m_target->m_stealthLevel += mod->m_amount;
-	}
-	else 
-	{
-		m_target->SetStealth(0);
-		m_target->m_stealthLevel -= mod->m_amount;
-		m_target->RemoveFlag(UNIT_FIELD_BYTES_1,0x02000000);
-		if( m_target->GetTypeId() == TYPEID_PLAYER )
-		{
-			WorldPacket data(12);
-			data.SetOpcode(SMSG_COOLDOWN_EVENT);
-			data << (uint32)GetSpellProto()->Id << m_target->GetGUID();
-			static_cast< Player* >( m_target )->GetSession()->SendPacket (&data);
-		}
 
 		// hack fix for vanish stuff
 		if( m_spellProto->NameHash == SPELL_HASH_VANISH && m_target->GetTypeId() == TYPEID_PLAYER )	 // Vanish
@@ -2581,6 +2568,19 @@ void Aura::SpellAuraModStealth(bool apply)
 			}
 			if(stealth_id)
 				p_caster->CastSpell(p_caster, dbcSpell.LookupEntry(stealth_id), true);
+		}
+	}
+	else 
+	{
+		m_target->SetStealth(0);
+		m_target->m_stealthLevel -= mod->m_amount;
+		m_target->RemoveFlag(UNIT_FIELD_BYTES_1,0x02000000);
+		if( m_target->GetTypeId() == TYPEID_PLAYER )
+		{
+			WorldPacket data(12);
+			data.SetOpcode(SMSG_COOLDOWN_EVENT);
+			data << (uint32)GetSpellProto()->Id << m_target->GetGUID();
+			static_cast< Player* >( m_target )->GetSession()->SendPacket (&data);
 		}
 	}
 
