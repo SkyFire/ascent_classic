@@ -7004,7 +7004,7 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 	{
 		sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; //all spells, too bad not all spells have grouping flags :S
-		sp->procCharges = 0;
+		sp->procCharges = 1;
 	}
 
 	// druid - Starlight Wrath
