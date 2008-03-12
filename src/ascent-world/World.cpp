@@ -3606,6 +3606,23 @@ bool World::SetInitialWorldSettings()
 		sp->Effect[2] = 0; //removing strange effects.
 	}
 
+	// Druid: Control of Nature
+	sp = dbcSpell.LookupEntryForced( 16918 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 0x20;
+	}
+	sp = dbcSpell.LookupEntryForced( 16919 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 0x20;
+	}
+	sp = dbcSpell.LookupEntryForced( 16920 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation_high[0] = 0x20;
+	}
+
 	//Druid: Improved Leader of the Pack
 	sp = dbcSpell.LookupEntryForced( 34299 );
 	if( sp != NULL )
