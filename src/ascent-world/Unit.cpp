@@ -1071,7 +1071,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
 								if( CastingSpell->NameHash != SPELL_HASH_RAIN_OF_FIRE && //Rain of Fire
-									CastingSpell->NameHash != SPELL_HASH_HELLFIRE && //Hellfire
+									CastingSpell->NameHash != SPELL_HASH_HELLFIRE_EFFECT && //Hellfire
 									CastingSpell->NameHash != SPELL_HASH_SOUL_FIRE ) //Soul Fire
 									continue;
 							}break;
@@ -5055,13 +5055,30 @@ void Unit::RemoveAurasByInterruptFlagButSkip(uint32 flag, uint32 skip)
 						    SpellEntry *spi = dbcSpell.LookupEntry( skip );
 							if( spi && spi->NameHash != SPELL_HASH_SMITE )
 								continue;
-						}
-					case 34936:
+						}break;
+					case 34936:		// Backlash
 						{
 							SpellEntry *spi = dbcSpell.LookupEntry( skip );
 							if( spi && spi->NameHash != SPELL_HASH_SHADOW_BOLT && spi->NameHash != SPELL_HASH_INCINERATE )
 								continue;
-						}
+						}break;
+
+					case 17941: //Shadow Trance
+						{
+							SpellEntry *spi = dbcSpell.LookupEntry( skip );
+							if( spi && spi->NameHash != SPELL_HASH_SHADOW_BOLT )
+								continue;
+						}break;
+					case 18708: //Fel Domination
+						{
+							SpellEntry *spi = dbcSpell.LookupEntry( skip );
+							if( spi && spi->NameHash != SPELL_HASH_SUMMON_IMP &&
+								spi->NameHash != SPELL_HASH_SUMMON_VOIDWALKER &&
+								spi->NameHash != SPELL_HASH_SUMMON_SUCCUBUS &&
+								spi->NameHash != SPELL_HASH_SUMMON_FELHUNTER &&
+								spi->NameHash != SPELL_HASH_SUMMON_FELGUARD )
+								continue;
+						}break;
 				}
 			}
 			a->Remove();
