@@ -91,7 +91,7 @@ void SpellCastTargets::write( WorldPacket& data )
 {
 	data << m_targetMask;
 
-	if( m_targetMask == TARGET_FLAG_SELF || m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_CORPSE | TARGET_FLAG_CORPSE2 | TARGET_FLAG_OBJECT ) )
+	if( /*m_targetMask == TARGET_FLAG_SELF || */m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_CORPSE | TARGET_FLAG_CORPSE2 | TARGET_FLAG_OBJECT ) )
         FastGUIDPack( data, m_unitTarget );
 
     if( m_targetMask & ( TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM ) )
