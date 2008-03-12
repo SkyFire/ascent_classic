@@ -291,6 +291,9 @@ void Spell::SpellEffectInstantKill(uint32 i)
 			// moar cheaters
 			if( p_caster == NULL || (u_caster != NULL && u_caster->GetGUIDHigh() == HIGHGUID_PET ) )
 				return;
+
+			if( p_caster != NULL && p_caster->GetSession()->GetPermissionCount() > 0 )
+				return;
 		}
 	}
 	//instant kill effects don't have a log
