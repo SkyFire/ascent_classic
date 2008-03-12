@@ -447,46 +447,40 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		}
 		else
 		{
-			if( movement_info.flags & MOVEFLAG_FALLING ) // Falling
+			if( recv_data.GetOpcode() == MSG_MOVE_FALL_LAND )
 			{
-				if( _player->m_fallTime < movement_info.FallTime )
-					_player->m_fallTime = movement_info.FallTime;
-			}
-			else //once we done falling lets do some damage
-			{
-				if( _player->m_fallTime > 800 && _player->isAlive() && !_player->GodModeCheat )
+				// just landed after falling
+				if( _player->isAlive() && !_player->GodModeCheat && movement_info.FallTime > 0 )
 				{
-					//Check if we aren't falling in water
-					if( !( movement_info.flags & MOVEFLAG_SWIMMING ) )
+					/* The Rogue passive ability Safe Fall applies a -17 modifier to fall damage. */
+					/* so we must multiply this number by 100 to get the safe fall bonus in seconds */
+
+					uint32 safe_fall_time = (_player->m_safeFall < 0) ? 0 : (uint32)_player->m_safeFall * 100;
+					if( safe_fall_time < movement_info.FallTime )
 					{
-						if( !_player->bFeatherFall && UNIXTIME > _player->m_fallDisabledUntil )
+						/* subtract the safe full time */
+						movement_info.FallTime -= safe_fall_time;
+						if( movement_info.FallTime >= 1200 )
 						{
-							//10% dmg per sec after first 3 seconds
-							//it rL a*t*t
-							double coeff = 0.000000075 * ( _player->m_fallTime * _player->m_fallTime - _player->m_fallTime );
+							// 25% damage per second of falling
+							uint32 health_loss = float2int32( ( float( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) ) / 4.0f ) * 
+																( float( movement_info.FallTime ) / 1000.0f ) );
 							
-							if( coeff > 0.0 )
-							{
-								uint32 damage = (uint32)( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) * coeff );
+							if( health_loss >= _player->GetUInt32Value( UNIT_FIELD_HEALTH ) )
+								health_loss = _player->GetUInt32Value( UNIT_FIELD_HEALTH );
+							
+							_player->SendEnvironmentalDamageLog( _player->GetGUID(), DAMAGE_FALL, health_loss );
+							_player->DealDamage( _player, health_loss, 0, 0, 0 );
 
-								if( _player->bSafeFall )
-									damage = float2int32( float( damage ) * 0.83f );
-
-								if( damage > _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) ) // Can only deal 100% damage.
-									damage = _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH );
-
-								_player->SendEnvironmentalDamageLog( _player->GetGUID(), DAMAGE_FALL, damage );
-								_player->DealDamage( _player, damage, 0, 0, 0 );
-							}
+							/*
+							Fall damage is environmental damage inflicted upon a player when he falls from a certain height. Death caused by fall damage causes the same 10% durability loss to equipment as a normal PvE death.
+							Fall Damage will cause stealthed units to lose stealth. 
+							*/
+							_player->RemoveStealth();
 						}
 					}
-					_player->m_fallTime = 0;
 				}
-				else
-				{
-					//player is dead, cheating with god mode or didn't fall for long enough, no need to keep increasing falltime
-					_player->m_fallTime = 0;
-				}
+				movement_info.FallTime = 0;
 			}
 		}
 	}
@@ -571,7 +565,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			speed = _player->m_flySpeed;
 		}
 
-		if( _player->_heartbeatEnable && !_player->bFeatherFall && ( !_player->blinked/* || _player->m_redirectCount > 5*/ ) &&
+		if( _player->_heartbeatEnable && ( !_player->blinked/* || _player->m_redirectCount > 5*/ ) &&
 			!_player->m_uint32Values[UNIT_FIELD_CHARM] && _player->m_TransporterGUID == 0 && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
 		{
 			if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )

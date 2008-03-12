@@ -1046,6 +1046,16 @@ public:
 	void EndEscortQuest();*/
 	void MoveToWaypoint(uint32 wp_id);	
 	void PlaySpellVisual(uint64 target, uint32 spellVisual);
+
+	void RemoveStealth()
+	{
+		if( m_stealth != 0 )
+		{
+			RemoveAura( m_stealth );
+			m_stealth = 0;
+		}
+	}
+
 	bool m_isPet;
 	uint32 m_stealth;
 	bool m_can_stealth;

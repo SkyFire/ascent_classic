@@ -41,8 +41,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	SpellHasteRatingBonus   = 0;
 	m_lifetapbonus		  = 0;
 	info					= NULL;				 // Playercreate info
-	bSafeFall			   = false;
-	bFeatherFall			   = false;
 	SoulStone			   = 0;
 	SoulStoneReceiver		= 0;
 	bReincarnation			= false;
@@ -73,7 +71,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_taxi_pos_y			= 0;
 	m_taxi_pos_z			= 0;
 	m_taxi_ride_time		= 0;
-	m_fallTime			  = 0;
 
 	// Attack related variables
 	m_blockfromspellPCT	 = 0;
@@ -400,6 +397,8 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 #endif
 
 	_heartbeatEnable = true;
+	m_safeFall = 0;
+	m_noFallDamage = false;
 }
 
 void Player::OnLogin()

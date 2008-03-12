@@ -1183,10 +1183,8 @@ public:
 	void EventPlayerRest();
 	void ApplyPlayerRestState(bool apply);
 	void UpdateRestState();
-	//falling?
-	uint32 m_fallTime;
-	bool bSafeFall;
-	bool bFeatherFall;
+	bool m_noFallDamage;
+	int32 m_safeFall;
 	// Gossip
 	GossipMenu* CurrentGossipMenu;
 	void CleanupGossipMenu();
