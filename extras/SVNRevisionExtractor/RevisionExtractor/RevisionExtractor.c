@@ -5,13 +5,22 @@
 #include <string.h>
 #include <ctype.h>
 
-#define ASCENT_BRANCH "4.0-STABLE"
+char * ASCENT_BRANCH = "4.3-TRUNK";
 int g_revision = 0;
 int g_oldRevision = -1;
 
 int main(int argc, char* argv[])
 {
 	FILE * pFile = fopen("../.svn/entries", "r");
+	FILE * pTagFile = fopen("../ascent-tag", "r");
+	if( pTagFile != NULL )
+	{
+		char str[1024];
+		fgets(str, 1024, pTagFile);
+		ASCENT_BRANCH = (char*)malloc(strlen(str)+1);
+		memcpy(ASCENT_BRANCH, str, strlen(str)+1);
+		fclose( pTagFile );
+	}
 	printf("SVN Revision Extractor\n");
 	printf("Written by Burlex, 2008/02/20\n");
 	printf("Branch: %s\n", ASCENT_BRANCH);
