@@ -454,13 +454,14 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				{
 					/* The Rogue passive ability Safe Fall applies a -17 modifier to fall damage. */
 					/* so we must multiply this number by 100 to get the safe fall bonus in seconds */
+					/* edit: this bonus seems a little high. let's make it * 100 / 3 (* 33.33 for faster performance) */
 
-					uint32 safe_fall_time = (_player->m_safeFall < 0) ? 0 : (uint32)_player->m_safeFall * 100;
+					uint32 safe_fall_time = (_player->m_safeFall < 0) ? 0 : (uint32)_player->m_safeFall * 33;
 					if( safe_fall_time < movement_info.FallTime )
 					{
 						/* subtract the safe full time */
 						movement_info.FallTime -= safe_fall_time;
-						if( movement_info.FallTime >= 1200 )
+						if( movement_info.FallTime >= 1000 )
 						{
 							// 25% damage per second of falling
 							uint32 health_loss = float2int32( ( float( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) ) / 4.0f ) * 
