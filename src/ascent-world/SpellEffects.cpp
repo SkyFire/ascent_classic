@@ -274,6 +274,25 @@ void Spell::SpellEffectInstantKill(uint32 i)
 		}
 	}
 
+	switch( m_spellInfo->NameHash )
+	{
+	case SPELL_HASH_SACRIFICE:
+		{
+			if( p_caster == NULL || unitTarget == NULL )
+				return;
+
+			// cheaters!
+			if( p_caster->GetSummon() != unitTarget )
+				return;
+		}break;
+
+	default:
+		{
+			// moar cheaters
+			if( p_caster == NULL || (u_caster != NULL && u_caster->GetGUIDHigh() == HIGHGUID_PET ) )
+				return;
+		}
+	}
 	//instant kill effects don't have a log
 	//m_caster->SpellNonMeleeDamageLog(unitTarget, m_spellInfo->Id, unitTarget->GetUInt32Value(UNIT_FIELD_HEALTH), true);
 	m_caster->DealDamage(unitTarget, unitTarget->GetUInt32Value(UNIT_FIELD_HEALTH), 0, 0, 0);
