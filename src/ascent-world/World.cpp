@@ -3607,21 +3607,24 @@ bool World::SetInitialWorldSettings()
 	}
 
 	// Druid: Control of Nature
-	sp = dbcSpell.LookupEntryForced( 16918 );
-	if( sp != NULL )
-	{
-		sp->EffectSpellGroupRelation_high[0] = 0x20;
-	}
-	sp = dbcSpell.LookupEntryForced( 16919 );
-	if( sp != NULL )
-	{
-		sp->EffectSpellGroupRelation_high[0] = 0x20;
-	}
-	sp = dbcSpell.LookupEntryForced( 16920 );
-	if( sp != NULL )
-	{
-		sp->EffectSpellGroupRelation_high[0] = 0x20;
-	}
+	sp = dbcSpell.LookupEntryForced( 16918 );			// Rank 1
+	sp->EffectSpellGroupRelation_high[0] |= 0x20;
+
+	sp = dbcSpell.LookupEntryForced( 16919 );			// Rank 2
+	sp->EffectSpellGroupRelation_high[0] |= 0x20;
+
+	sp = dbcSpell.LookupEntryForced( 16920 );			// Rank 3
+	sp->EffectSpellGroupRelation_high[0] |= 0x20;
+
+	// Druid: Brambles
+	sp = dbcSpell.LookupEntryForced( 16836 );			// Rank 1
+	sp->EffectSpellGroupRelation[0] |= 0x200;
+
+	sp = dbcSpell.LookupEntryForced( 16839 );			// Rank 2
+	sp->EffectSpellGroupRelation[0] |= 0x200;
+
+	sp = dbcSpell.LookupEntryForced( 16840 );			// Rank 3
+	sp->EffectSpellGroupRelation[0] |= 0x200;
 
 	//Druid: Improved Leader of the Pack
 	sp = dbcSpell.LookupEntryForced( 34299 );
