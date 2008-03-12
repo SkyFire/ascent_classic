@@ -1138,6 +1138,7 @@ public:
 	void SetManaFromSpell(uint32 value) { m_manafromspell = value;}
 	uint32 CalcTalentResetCost(uint32 resetnum);
 	void SendTalentResetConfirm();
+	void SendPetUntrainConfirm();
 	uint32 GetTalentResetTimes() { return m_talentresettimes; }
 	ASCENT_INLINE void SetTalentResetTimes(uint32 value) { m_talentresettimes = value; }
 	void SetPlayerStatus(uint8 pStatus) { m_status = pStatus; }

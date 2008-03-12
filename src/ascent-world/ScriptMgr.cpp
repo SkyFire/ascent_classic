@@ -593,6 +593,14 @@ void GossipScript::GossipHello(Object* pObject, Player* Plr, bool AutoSend)
 	{
 		Menu->AddItem(0, "I would like to reset my talents.", 11);
 	}
+	
+	if( pTrainer &&
+		pTrainer->TrainerType == TRAINER_TYPE_PET &&	// pet trainer type
+		Plr->getClass() == HUNTER &&					// hunter class
+		Plr->GetSummon() != NULL )						// have pet
+	{
+		Menu->AddItem(0, "I would like to untrain my pet.", 13); //TODO: Find proper message
+	}
 
 	if(AutoSend)
 		Menu->SendTo(Plr);
@@ -659,6 +667,20 @@ void GossipScript::GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, u
 		{
 			Plr->Gossip_Complete();
 			Plr->SendTalentResetConfirm();
+		}break;
+	case 13:
+		// switch to untrain message
+		{
+			GossipMenu *Menu;
+			objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), 7722, Plr);
+			Menu->AddItem(0, "Yes, please do.", 14);
+			Menu->SendTo(Plr);
+		}break;
+	case 14:
+		// untrain pet
+		{
+			Plr->Gossip_Complete();
+			Plr->SendPetUntrainConfirm();
 		}break;
 
 	default:

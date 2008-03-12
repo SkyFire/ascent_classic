@@ -5567,6 +5567,16 @@ void Player::SendTalentResetConfirm()
 	data << CalcTalentResetCost(GetTalentResetTimes());
 	GetSession()->SendPacket(&data);
 }
+void Player::SendPetUntrainConfirm()
+{
+	Pet* pPet = GetSummon();
+	if( pPet == NULL )
+		return;
+	WorldPacket data( SMSG_PET_UNLEARN_CONFIRM, 12 );
+	data << pPet->GetGUID();
+	data << pPet->GetUntrainCost();
+	GetSession()->SendPacket( &data );
+}
 
 int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot )
 {

@@ -1063,7 +1063,7 @@ void WorldSession::HandlePartyMemberStatsOpcode(WorldPacket & recv_data)
 		return;
 
 	_player->GetGroup()->UpdateOutOfRangePlayer(plr, GROUP_UPDATE_TYPE_FULL_CREATE | GROUP_UPDATE_TYPE_FULL_REQUEST_REPLY, false, &data);
-	data.SetOpcode(CMSG_PET_UNLEARN);
+	data.SetOpcode(SMSG_PARTY_MEMBER_STATS_FULL);
 	SendPacket(&data);
 }
 

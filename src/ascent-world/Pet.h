@@ -175,6 +175,8 @@ public:
 	void LoadSpells();
 	void AddSpell(SpellEntry * sp, bool learning);
 	void RemoveSpell(SpellEntry * sp);
+	void WipeSpells();
+	uint32 GetUntrainCost();
 	void SetSpellState(SpellEntry * sp, uint16 State);
 	uint16 GetSpellState(SpellEntry * sp);
 	ASCENT_INLINE void RemoveSpell(uint32 SpellID)
@@ -209,8 +211,8 @@ public:
 	uint16 SpellTP(uint32 spellId);
 	uint16 GetUsedTP();
 	void UpdateTP();
-	bool CanLearnSpellTP(uint32 spellId);
-
+	uint32 CanLearnSpell( SpellEntry* sp );
+	
 	void HandleAutoCastEvent(uint32 Type);
 	AI_Spell * HandleAutoCastEvent();
 	void SetPetSpellState(uint32 spell, uint16 state);

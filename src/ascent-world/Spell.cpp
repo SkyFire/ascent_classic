@@ -3086,7 +3086,7 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_BAD_TARGETS;
 				}
 				
-				// check training points when teaching pet
+				// pet training
 				if( m_spellInfo->EffectImplicitTargetA[0] == EFF_TARGET_PET &&
 					m_spellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL )
 				{
@@ -3094,9 +3094,15 @@ uint8 Spell::CanCast(bool tolerate)
 					// check if we have a pet
 					if( pPet == NULL )
 						return SPELL_FAILED_NO_PET;
-					if( !pPet->IsSummon() )
-						if( !pPet->CanLearnSpellTP( m_spellInfo->EffectTriggerSpell[0] ) )
-							return SPELL_FAILED_TRAINING_POINTS;
+
+					// other checks
+					SpellEntry* trig = dbcSpell.LookupEntry( m_spellInfo->EffectTriggerSpell[0] );
+					if( trig == NULL )
+						return SPELL_FAILED_SPELL_UNAVAILABLE;
+
+					uint32 status = pPet->CanLearnSpell( trig );
+					if( status != NULL )
+						return status;
 				}
 
 				if( m_spellInfo->EffectApplyAuraName[0]==2)//mind control

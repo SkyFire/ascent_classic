@@ -82,8 +82,17 @@ uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 	if(victimI)
 		if(victimI->Type == CRITTER)
 			return 0;
-	//not wowwikilike but more balanced
-	if ((int32)pVictim->getLevel()-(int32)pAttacker->getLevel()>10)
+	uint32 VictimLvl = pVictim->getLevel();
+	uint32 AttackerLvl = pAttacker->getLevel();
+
+	if( pAttacker->IsPet() && static_cast< Pet* >( pAttacker )->GetPetOwner() )
+	{
+		// based on: http://www.wowwiki.com/Talk:Formulas:Mob_XP#Hunter.27s_pet_XP (2008/01/12)
+		uint32 ownerLvl = static_cast< Pet* >( pAttacker )->GetPetOwner()->getLevel();
+		VictimLvl += ownerLvl - AttackerLvl;
+		AttackerLvl = ownerLvl;
+	}
+	else if( (int32)VictimLvl - (int32)AttackerLvl > 10 ) //not wowwikilike but more balanced
 		return 0;
 
 	// Partha: this screws things up for pets and groups
@@ -99,8 +108,6 @@ uint32 CalculateXpToGive(Unit *pVictim, Unit *pAttacker)
 	return 0;
 	*/
 
-	uint32 VictimLvl = pVictim->GetUInt32Value(UNIT_FIELD_LEVEL);
-	uint32 AttackerLvl = pAttacker->GetUInt32Value(UNIT_FIELD_LEVEL);
 
 	/*if(VictimLvl+7>AttackerLvl)
 	VictimLvl = AttackerLvl + 7;*/
@@ -647,5 +654,6 @@ bool isEven (int num)
 
 	return false;
 }
+
 
 

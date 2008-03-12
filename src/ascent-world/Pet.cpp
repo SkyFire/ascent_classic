@@ -34,7 +34,7 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 
 	case SPELL_HASH_FIREBOLT:			// Firebolt
 	case SPELL_HASH_LASH_OF_PAIN:		// Lash of Pain
-	case SPELL_HASH_TORMENT:            // Torment
+	case SPELL_HASH_TORMENT:			// Torment
 	case SPELL_HASH_SUFFERING:
 	case SPELL_HASH_SOOTHING_KISS:
 	case SPELL_HASH_SEDUCTION:
@@ -46,7 +46,7 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 		return AUTOCAST_EVENT_ATTACK;
 		break;
 
-	case SPELL_HASH_BLOOD_PACT:       // Blood Pact
+	case SPELL_HASH_BLOOD_PACT:			// Blood Pact
 	case SPELL_HASH_AVOIDANCE:
 	case SPELL_HASH_PARANOIA:
 		return AUTOCAST_EVENT_ON_SPAWN;
@@ -57,7 +57,7 @@ uint32 GetAutoCastTypeForSpell(SpellEntry * ent)
 		break;
 		
 	case SPELL_HASH_PHASE_SHIFT:		// Phase Shift
-	case SPELL_HASH_CONSUME_SHADOWS:     
+	case SPELL_HASH_CONSUME_SHADOWS:
 	case SPELL_HASH_LESSER_INVISIBILITY:
 		return AUTOCAST_EVENT_LEAVE_COMBAT;
 		break;
@@ -119,7 +119,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	// Create ourself	
 	Create(m_name.c_str(), owner->GetMapId(), owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
 	SetUInt32Value(OBJECT_FIELD_ENTRY, entry);
-	SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);   // better set this one
+	SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);	// better set this one
 
 	// Fields common to both lock summons and pets
 	if(type & 0x2 && created_from_creature != NULL)
@@ -210,7 +210,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		static_cast< Player* >(owner)->AddPlayerPet(pp, pp->number);
 	}	
 
-	//maybe we should use speed from the tempalte we created the creature ?
+	//maybe we should use speed from the template we created the creature ?
 	m_base_runSpeed = m_runSpeed = owner->m_base_runSpeed; //should we be able to keep up with master ?
 	m_base_walkSpeed = m_walkSpeed = owner->m_base_walkSpeed; //should we be able to keep up with master ?
 
@@ -366,7 +366,7 @@ void Pet::InitializeSpells()
 		SpellEntry *info = itr->first;
 
 		// Check that the spell isn't passive
-		if(info->Attributes & 64)
+		if( info->Attributes & ATTRIBUTES_PASSIVE )
 		{
 			// Cast on self..
 			Spell * sp = new Spell(this, info, true, false);
@@ -442,8 +442,7 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 	LoyaltyPts = mPi->loyaltypts;
 	LoyaltyXP = mPi->loyaltyxp;
 
-	SetIsPet(true);
-	bExpires = false;   
+	bExpires = false;
 
 	// Setup actionbar
 	if(mPi->actionbar.size() > 2)
@@ -782,7 +781,7 @@ void Pet::SetDefaultSpells()
 void Pet::AddSpell(SpellEntry * sp, bool learning)
 {
 	// Cast on self if we're a passive spell
-	if(sp->Attributes & 64)
+	if( sp->Attributes & ATTRIBUTES_PASSIVE )
 	{
 		if(IsInWorld())
 		{
@@ -930,6 +929,15 @@ void Pet::SetDefaultActionbar()
 	ActionBar[9] = PET_SPELL_PASSIVE;
 }
 
+void Pet::WipeSpells()
+{
+	while( mSpells.size() > 0 )
+	{
+		RemoveSpell( mSpells.begin()->first );
+	}
+	SendSpellsToOwner();
+}
+
 void Pet::RemoveSpell(SpellEntry * sp)
 {
 	mSpells.erase(sp);
@@ -977,6 +985,12 @@ void Pet::RemoveSpell(SpellEntry * sp)
 				break;
 			}
 		}
+	}
+	//Remove spell from action bar as well
+	for( uint32 pos = 0; pos < 10; pos++ )
+	{
+		if( ActionBar[pos] == sp->Id )
+			ActionBar[pos] = 0;
 	}
 	UpdateTP();
 }
@@ -1487,11 +1501,40 @@ uint16 Pet::GetUsedTP()
 	}
 	return sumTP;
 }
-bool Pet::CanLearnSpellTP(uint32 spellId)
+uint32 Pet::CanLearnSpell( SpellEntry * sp )
 {
-	//checks if pet has enough TPs to learn new spell
-	//higher spell ranks take TPs incrementallly, so we need this calculation
-	return SpellTP(spellId) - SpellTP(GetHighestRankSpell(spellId)) >  TP ? false : true;
+	// level requirement
+	if( getLevel() < sp->spellLevel )
+		return SPELL_FAILED_LEVEL_REQUIREMENT;
+
+	if( Summon )
+		return NULL;
+	
+	/** Hunter pet specific checks:
+		- number of active spells, max 4 are allowed per pet */
+	if( mSpells.size() > 0 && !( sp->Attributes & ATTRIBUTES_PASSIVE ) )
+	{
+		uint8 cnt = 0;
+		PetSpellMap::iterator itr = mSpells.begin();
+		for( ; itr != mSpells.end(); ++itr )
+		{
+			if( itr->first->NameHash == sp->NameHash )
+			{
+				cnt = 0;			
+				break;
+			}
+			if( !( itr->first->Attributes & ATTRIBUTES_PASSIVE ) )
+				cnt++;
+		}
+		if( cnt > 3 )
+			return SPELL_FAILED_TOO_MANY_SKILLS;
+	}
+	/** - available training points
+			- higher spell ranks take TPs incrementally, so we need this calculation */
+	if( SpellTP( sp->Id ) - SpellTP( GetHighestRankSpell( sp->Id ) ) >  TP )
+		return SPELL_FAILED_TRAINING_POINTS;
+	
+	return NULL;
 }
 void Pet::UpdateTP()
 {
@@ -1728,3 +1771,10 @@ void Pet::SetAutoCast(AI_Spell * sp, bool on)
 		}
 	}
 }
+uint32 Pet::GetUntrainCost()
+{
+	// TODO: implement penalty
+	// costs are: 10s, 50s, 1g, 2g, ..(+1g).. 10g cap
+	return 1000;
+}
+

@@ -428,3 +428,30 @@ void WorldSession::HandlePetAbandon(WorldPacket & recv_data)
 
 	pet->Dismiss(false);
 }
+void WorldSession::HandlePetUnlearn(WorldPacket & recv_data)
+{
+	if( !_player->IsInWorld() )
+		return;
+
+	uint64 guid;
+	recv_data >> guid;
+
+	Pet* pPet = _player->GetSummon();
+	if( pPet == NULL || pPet->GetGUID() != guid )
+	{
+		sChatHandler.SystemMessage(this, "That pet is not your current pet, or you do not have a pet.");
+		return;
+	}
+
+	int32 cost = pPet->GetUntrainCost();
+	if( cost > ( int32 )_player->GetUInt32Value( PLAYER_FIELD_COINAGE ) )
+	{
+		WorldPacket data(SMSG_BUY_FAILED, 12);
+		data << uint64( _player->GetGUID() );
+		data << uint32( 0 );
+		data << uint8( 2 );		//not enough money
+		return;	
+	}
+	_player->ModUInt32Value( PLAYER_FIELD_COINAGE, -cost );
+	pPet->WipeSpells();
+}
