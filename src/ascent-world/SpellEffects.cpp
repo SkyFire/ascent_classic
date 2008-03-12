@@ -445,6 +445,68 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 	switch(spellId)
 	{
+
+	case 30427: // Extract Gas
+		{
+			bool check = false;
+			uint32 cloudtype;
+			Creature *creature;
+
+			if(!p_caster)
+				return;
+
+			for(Object::InRangeSet::iterator i = p_caster->GetInRangeSetBegin(); i != p_caster->GetInRangeSetEnd(); ++i)
+			{
+				if((*i)->GetTypeId() == TYPEID_UNIT)
+				{
+					creature=static_cast<Creature *>((*i));
+					cloudtype=creature->GetEntry();
+					if(cloudtype == 24222 || cloudtype == 17408 || cloudtype == 17407 || cloudtype == 17378)
+					{
+						if(p_caster->GetDistance2dSq((*i)) < 400)
+						{
+							p_caster->SetSelection(creature->GetGUID());
+							check = true;
+							break;
+						}
+					}
+				}
+			}
+			
+			if(check)
+			{
+				uint32 item,count = 3+(rand()%3);
+			
+				if (cloudtype==24222) item=22572;//-air
+				if (cloudtype==17408) item=22576;//-mana
+				if (cloudtype==17407) item=22577;//-shadow
+				if (cloudtype==17378) item=22578;//-water
+
+				Item *add = p_caster->GetItemInterface()->FindItemLessMax(item, count, false);
+				if (!add)
+				{
+					ItemPrototype* proto = ItemPrototypeStorage.LookupEntry(item);
+					SlotResult slotresult;
+
+					slotresult = p_caster->GetItemInterface()->FindFreeInventorySlot(proto);
+					if(!slotresult.Result)
+					{
+						p_caster->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_INVENTORY_FULL);
+						return;
+					}
+					Item * it=objmgr.CreateItem(item,p_caster);  
+					it->SetUInt32Value( ITEM_FIELD_STACK_COUNT, count);
+					p_caster->GetItemInterface()->SafeAddItem(it,slotresult.ContainerSlot, slotresult.Slot);
+					creature->Despawn(3500,creature->proto->RespawnTime);
+				}
+				else
+				{
+					add->SetCount(add->GetUInt32Value(ITEM_FIELD_STACK_COUNT) + count);
+					add->m_isDirty = true;
+					creature->Despawn(3500,creature->proto->RespawnTime);
+				}
+			}
+		}break;
 /*	case 35029: //hunter: Focused Fire
 	case 35030:
 		{
@@ -1173,7 +1235,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
 			{
 				pAura = unitTarget->m_auras[i];
-				if( pAura != NULL && !pAura->IsPassive() && !pAura->IsPositive() && !(pAura->GetSpellProto()->Attributes & ATTRIBUTES_IGNORE_INVULNERABILITY))
+				if( pAura != NULL && !pAura->IsPassive() && !pAura->IsPositive() && !(pAura->GetSpellProto()->Attributes & ATTRIBUTES_IGNORE_INVULNERABILITY) &&
+					pAura->GetSpellProto()->School != 0 )
 				{
 					pAura->Remove();
 				}

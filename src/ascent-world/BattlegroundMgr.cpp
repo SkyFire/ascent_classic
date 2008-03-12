@@ -89,7 +89,7 @@ void CBattlegroundManager::HandleBattlegroundListPacket(WorldSession * m_session
 	m_instanceLock.Acquire();
 	for(map<uint32, CBattleground*>::iterator itr = m_instances[BattlegroundType].begin(); itr != m_instances[BattlegroundType].end(); ++itr)
 	{
-        if(itr->second->GetLevelGroup() == LevelGroup && itr->second->CanPlayerJoin(m_session->GetPlayer()))
+        if( itr->second->GetLevelGroup() == LevelGroup && itr->second->CanPlayerJoin(m_session->GetPlayer()) && !itr->second->HasEnded() )
 		{
 			data << itr->first;
 			++Count;
@@ -239,6 +239,9 @@ void CBattlegroundManager::EventQueueUpdate()
 			// try to join existing instances
 			for(iitr = m_instances[i].begin(); iitr != m_instances[i].end(); ++iitr)
 			{
+				if( iitr->second->HasEnded() )
+					continue;
+
 				if(IS_ARENA(i))
 				{
                     arena = ((Arena*)iitr->second);

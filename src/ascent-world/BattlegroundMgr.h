@@ -260,6 +260,9 @@ public:
 	CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 type);
 	virtual ~CBattleground();
 
+	/* Has it ended? */
+	ASCENT_INLINE bool HasEnded() { return m_ended; }
+
 	/* Send our current world states to a player . */
 	void SendWorldStates(Player * plr);
 
