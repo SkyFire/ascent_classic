@@ -6037,8 +6037,8 @@ void Player::Reset_ToLevel1()
 void Player::CalcResistance(uint32 type)
 {
 	int32 res;
-	uint32 pos;
-	uint32 neg;
+	int32 pos;
+	int32 neg;
 	ASSERT(type < 7);
 	pos=(BaseResistance[type]*BaseResistanceModPctPos[type])/100;
 	neg=(BaseResistance[type]*BaseResistanceModPctNeg[type])/100;
@@ -6052,6 +6052,10 @@ void Player::CalcResistance(uint32 type)
 	neg+=(res*ResistanceModPctNeg[type])/100;
 	res=pos-neg+BaseResistance[type];
 	if(type==0)res+=m_uint32Values[UNIT_FIELD_STAT1]*2;//fix armor from agi
+
+	if( res < 0 )
+		res = 1;
+
 	SetUInt32Value(UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE+type,pos);
 	SetUInt32Value(UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE+type,neg);
 	SetUInt32Value(UNIT_FIELD_RESISTANCES+type,res>0?res:0);
@@ -6359,6 +6363,9 @@ void Player::CalcStat(uint32 type)
 	pos += ( res * static_cast< Player* >( this )->TotalStatModPctPos[type] ) / 100;
 	neg += ( res * static_cast< Player* >( this )->TotalStatModPctNeg[type] ) / 100;
 	res = pos + BaseStats[type] - neg;
+	if( res <= 0 )
+		res = 1;
+
 	SetUInt32Value( UNIT_FIELD_POSSTAT0 + type, pos );
 	SetUInt32Value( UNIT_FIELD_NEGSTAT0 + type, neg );
 	SetUInt32Value( UNIT_FIELD_STAT0 + type, res > 0 ?res : 0 );
