@@ -678,10 +678,8 @@ bool ItemInterface::SafeFullRemoveItemByGuid(uint64 guid)
 //-------------------------------------------------------------------//
 Item *ItemInterface::GetInventoryItem(int8 slot)
 {
-	if(slot == INVENTORY_SLOT_NOT_SET || slot > MAX_INVENTORY_SLOT)
-	{
+	if(slot < 0 || slot > MAX_INVENTORY_SLOT)
 		return NULL;
-	}
 
 	return m_pItems[(int)slot];
 }
@@ -691,13 +689,11 @@ Item *ItemInterface::GetInventoryItem(int8 slot)
 //-------------------------------------------------------------------//
 Item *ItemInterface::GetInventoryItem(int8 ContainerSlot, int8 slot)
 {
-
-	if(ContainerSlot == INVENTORY_SLOT_NOT_SET)
+	if(ContainerSlot <= INVENTORY_SLOT_NOT_SET)
 	{
-		if(slot == INVENTORY_SLOT_NOT_SET || slot > MAX_INVENTORY_SLOT)
-		{
+		if(slot < 0 || slot > MAX_INVENTORY_SLOT)
 			return NULL;
-		}
+
 		return m_pItems[(int)slot];
 	}
 	else

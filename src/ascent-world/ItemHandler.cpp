@@ -1529,7 +1529,7 @@ void WorldSession::HandleReadItemOpcode(WorldPacket &recvPacket)
 	if(!GetPlayer())
 		return;
 
-	Item *item = _player->GetItemInterface()->GetInventoryItem(slot);
+	Item *item = _player->GetItemInterface()->GetInventoryItem(uslot, slot);
 	sLog.outDebug("Received CMSG_READ_ITEM %d", slot);
 
 	if(item)
