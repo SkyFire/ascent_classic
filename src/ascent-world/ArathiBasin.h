@@ -51,10 +51,12 @@ enum ABSpawnTypes
 
 class ArathiBasin : public CBattleground
 {
+public:
 	GameObject * m_buffs[AB_NUM_BUFFS];
 	GameObject * m_controlPoints[AB_NUM_CONTROL_POINTS];
 	GameObject * m_controlPointAuras[AB_NUM_CONTROL_POINTS];
 
+protected:
 	list<GameObject*> m_gates;
 	
 	uint32 m_resources[2];

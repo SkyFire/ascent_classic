@@ -221,20 +221,21 @@ public:
    
 	uint32 *m_ritualmembers;
 	uint32 m_ritualcaster,m_ritualtarget;
-	uint32 m_ritualspell;
+	uint16 m_ritualspell;
 
 	void InitAI();
 	SpellEntry* spell;
 	
 	float range;
-	uint32 checkrate;
-	uint32 counter;
+	uint8 checkrate;
+	uint16 counter;
 	int32 charges;//used for type==22,to limit number of usages.
 	bool invisible;//invisible
 	uint8 invisibilityFlag;
 	Unit* m_summoner;
-	GameObject *pcbannerAura;
-	int32 bannerslot;
+	int8 bannerslot;
+	int8 bannerauraslot;
+	CBattleground * m_battleground;
 
 	void CallScriptUpdate();
    
@@ -242,7 +243,6 @@ public:
 	ASCENT_INLINE GameObjectAIScript* GetScript() { return myScript; }
 
 	void TrapSearchTarget();	// Traps need to find targets faster :P
-	uint32 spawnid;
 
 	ASCENT_INLINE bool HasAI() { return spell != 0; }
 	GOSpawn * m_spawn;

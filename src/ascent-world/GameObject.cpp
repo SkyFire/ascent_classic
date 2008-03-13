@@ -34,8 +34,7 @@ GameObject::GameObject(uint32 high, uint32 low)
 
 	counter=0;//not needed at all but to prevent errors that var was not inited, can be removed in release
 
-	pcbannerAura = NULL;
-	bannerslot = -1;
+	bannerslot = bannerauraslot = -1;
 
 	m_summonedGo = false;
 	invisible = false;
@@ -51,12 +50,12 @@ GameObject::GameObject(uint32 high, uint32 low)
 	m_quests = NULL;
 	pInfo = NULL;
 	myScript = NULL;
-	spawnid = 0;
 	m_spawn = 0;
 	loot.gold = 0;
 	m_deleted = false;
 	mines_remaining = 1;
 	m_respawnCell=NULL;
+	m_battleground = NULL;
 }
 
 GameObject::~GameObject()
@@ -83,6 +82,15 @@ GameObject::~GameObject()
 		for(int i = 0; i < 4; i++)
 			if (m_summoner->m_ObjectSlots[i] == GetGUIDLow())
 				m_summoner->m_ObjectSlots[i] = 0;
+
+	if( m_battleground != NULL && m_battleground->GetType() == BATTLEGROUND_ARATHI_BASIN )
+	{
+		if( bannerslot >= 0 && static_cast<ArathiBasin*>(m_battleground)->m_controlPoints[bannerslot] == this )
+			static_cast<ArathiBasin*>(m_battleground)->m_controlPoints[bannerslot] = NULL;
+
+		if( bannerauraslot >= 0 && static_cast<ArathiBasin*>(m_battleground)->m_controlPointAuras[bannerauraslot] == this )
+			static_cast<ArathiBasin*>(m_battleground)->m_controlPointAuras[bannerauraslot] = NULL;
+	}
 }
 
 bool GameObject::CreateFromProto(uint32 entry,uint32 mapid, float x, float y, float z, float ang)
@@ -251,7 +259,7 @@ void GameObject::SaveToDB()
 {
 	std::stringstream ss;
 	ss << "REPLACE INTO gameobject_spawns VALUES("
-		<< spawnid << ","
+		<< ((m_spawn != NULL) ? 0 : m_spawn->id) << ","
 		<< GetEntry() << ","
 		<< GetMapId() << ","
 		<< GetPositionX() << ","
@@ -438,7 +446,6 @@ bool GameObject::Load(GOSpawn *spawn)
 	if(!CreateFromProto(spawn->entry,0,spawn->x,spawn->y,spawn->z,spawn->facing))
 		return false;
 
-	spawnid = spawn->id;
 	m_spawn = spawn;
 	SetFloatValue(GAMEOBJECT_ROTATION,spawn->o);
 	SetFloatValue(GAMEOBJECT_ROTATION_01 ,spawn->o1);
@@ -467,7 +474,8 @@ bool GameObject::Load(GOSpawn *spawn)
 
 void GameObject::DeleteFromDB()
 {
-	WorldDatabase.Execute("DELETE FROM gameobject_spawns WHERE id=%u", spawnid);
+	if( m_spawn != NULL )
+		WorldDatabase.Execute("DELETE FROM gameobject_spawns WHERE id=%u", m_spawn->id);
 }
 
 void GameObject::EventCloseDoor()

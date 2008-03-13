@@ -292,7 +292,7 @@ void Spell::SpellEffectInstantKill(uint32 i)
 			if( p_caster == NULL || (u_caster != NULL && u_caster->GetGUIDHigh() == HIGHGUID_PET ) )
 				return;
 
-			if( p_caster != NULL && p_caster->GetSession()->GetPermissionCount() == 0 )
+			if( p_caster->GetSession()->GetPermissionCount() == 0 )
 				return;
 		}
 	}

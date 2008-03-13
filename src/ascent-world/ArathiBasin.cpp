@@ -293,6 +293,7 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 		m_controlPointAuras[Id]->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		m_controlPointAuras[Id]->SetUInt32Value(GAMEOBJECT_TYPE_ID, 6);
 		m_controlPointAuras[Id]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
+		m_controlPointAuras[Id]->bannerauraslot = Id;
 		m_controlPointAuras[Id]->PushToWorld(m_mapMgr);
 	}
 	else
@@ -454,14 +455,26 @@ ArathiBasin::~ArathiBasin()
 	for(uint32 i = 0; i < AB_NUM_CONTROL_POINTS; ++i)
 	{
 		// buffs may not be spawned, so delete them if they're not
-		if(m_buffs[i] && m_buffs[i]->IsInWorld()==false)
-			delete m_buffs[i];
+		if(m_buffs[i] != NULL)
+		{
+			m_buffs[i]->m_battleground = NULL;
+			if( !m_buffs[i]->IsInWorld() )
+				delete m_buffs[i];
+		}
 
-		if(m_controlPoints[i] && m_controlPoints[i]->IsInWorld()==false)
-			delete m_controlPoints[i];
+		if(m_controlPoints[i] != NULL)
+		{
+			m_controlPoints[i]->m_battleground = NULL;
+			if( !m_controlPoints[i]->IsInWorld() )
+				delete m_controlPoints[i];
+		}
 
-		if(m_controlPointAuras[i] && m_controlPointAuras[i]->IsInWorld()==false)
-			delete m_controlPointAuras[i];
+		if(m_controlPointAuras[i])
+		{
+			m_controlPointAuras[i]->m_battleground = NULL;
+			if( !m_controlPointAuras[i]->IsInWorld() )
+				delete m_controlPointAuras[i];
+		}
 	}
 }
 

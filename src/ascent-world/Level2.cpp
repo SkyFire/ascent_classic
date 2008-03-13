@@ -742,7 +742,6 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 
 	m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cx,cy)->GOSpawns.push_back(gs);
 	go->m_spawn = gs;
-	go->spawnid = gs->id;
 
 	//go->AddToWorld();
 

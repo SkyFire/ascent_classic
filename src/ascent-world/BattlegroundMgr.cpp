@@ -929,6 +929,7 @@ GameObject * CBattleground::SpawnGameObject(uint32 entry,uint32 MapId , float x,
 	go->SetFloatValue(GAMEOBJECT_POS_Z, z);
 	go->SetFloatValue(GAMEOBJECT_FACING, o);
 	go->SetInstanceID(m_mapMgr->GetInstanceID());
+	go->m_battleground = this;
 
 	return go;
 }
