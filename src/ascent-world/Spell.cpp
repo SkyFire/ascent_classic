@@ -3064,6 +3064,15 @@ uint8 Spell::CanCast(bool tolerate)
 					return SPELL_FAILED_LINE_OF_SIGHT;
 #endif
 
+				// check aurastate
+				if( m_spellInfo->TargetAuraState )
+				{
+					if( !target->HasFlag( UNIT_FIELD_AURASTATE, m_spellInfo->TargetAuraState ) )
+					{
+						return SPELL_FAILED_TARGET_AURASTATE;
+					}
+				}
+
 				if(target->IsPlayer())
 				{
 					// disallow spell casting in sanctuary zones
