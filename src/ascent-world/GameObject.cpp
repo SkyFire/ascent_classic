@@ -259,7 +259,7 @@ void GameObject::SaveToDB()
 {
 	std::stringstream ss;
 	ss << "REPLACE INTO gameobject_spawns VALUES("
-		<< ((m_spawn != NULL) ? 0 : m_spawn->id) << ","
+		<< ((m_spawn == NULL) ? 0 : m_spawn->id) << ","
 		<< GetEntry() << ","
 		<< GetMapId() << ","
 		<< GetPositionX() << ","

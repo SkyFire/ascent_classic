@@ -972,7 +972,7 @@ int luaUnit_Emote(lua_State * L, Unit * ptr)
 	if(ptr==NULL) return 0;
 	uint32 emote_id = luaL_checkint(L, 1);
 	uint32 time = luaL_checkint(L, 1);
-	if(emote_id==NULL) 
+	if(emote_id==0) 
 		return 0;
 	if (time)
 		ptr->EventAddEmote((EmoteType)emote_id,time);
@@ -1204,7 +1204,7 @@ int luaUnit_SpawnGameObject(lua_State * L, Unit * ptr)
 	}
 
 	GameObject * pC = ptr->GetMapMgr()->CreateGameObject();
-	pC->spawnid=0;
+	//pC->spawnid=0;
 	pC->m_spawn=0;
 	pC->CreateFromProto(entry_id, ptr->GetMapId(), (float)x, (float)y, (float)z, (float)o);
 	pC->SetMapId(ptr->GetMapId());
