@@ -286,7 +286,7 @@ bool Transporter::GenerateWaypoints()
 	//mCurrentWaypoint = GetNextWaypoint();
 	mNextWaypoint = GetNextWaypoint();
 	m_pathTime = timer;
-	m_timer = 0;
+	
 	return true;
 }
 
@@ -305,9 +305,9 @@ void Transporter::UpdatePosition()
 	if (m_WayPoints.size() <= 1)
 		return;
 
-	m_timer = (getMSTime() + m_period) % m_pathTime;
+	m_timer = getMSTime() % m_period;
 	
-	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) >= ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
+	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) > ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
 	{
 		/*printf("%s from %u %f %f %f to %u %f %f %f\n", this->GetInfo()->Name,
 			mCurrentWaypoint->second.mapid, mCurrentWaypoint->second.x,mCurrentWaypoint->second.y,mCurrentWaypoint->second.z,
@@ -315,9 +315,9 @@ void Transporter::UpdatePosition()
 
 		mCurrentWaypoint = mNextWaypoint;
 		mNextWaypoint = GetNextWaypoint();
-		if (mNextWaypoint->second.mapid != GetMapId()) {
-			mCurrentWaypoint = mNextWaypoint;
-			mNextWaypoint = GetNextWaypoint();
+		if (mNextWaypoint->second.mapid != GetMapId() || mCurrentWaypoint->second.teleport) {
+			//mCurrentWaypoint = mNextWaypoint;
+			//mNextWaypoint = GetNextWaypoint();
 			TransportPassengers(mNextWaypoint->second.mapid, GetMapId(),
 				mNextWaypoint->second.x, mNextWaypoint->second.y, mNextWaypoint->second.z);
 			break;
