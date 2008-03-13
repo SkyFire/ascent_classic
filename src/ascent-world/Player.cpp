@@ -3729,7 +3729,7 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 				// into the for
 				for( i = m_procSpells.begin(); i != m_procSpells.end(); i++ )
 				{
-					if( (*i).spellId == item->GetProto()->Spells[k].Id )
+					if( (*i).spellId == item->GetProto()->Spells[k].Id && !(*i).deleted )
 					{
 						//m_procSpells.erase(i);
 						i->deleted = true;

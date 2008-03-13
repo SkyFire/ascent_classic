@@ -1373,7 +1373,7 @@ void Aura::SpellAuraDummy(bool apply)
 			{
 			for(std::list<struct ProcTriggerSpell>::iterator itr = m_target->m_procSpells.begin();itr != m_target->m_procSpells.end();itr++)
 			{
-				if(itr->origId == GetSpellId() && itr->caster == m_casterGuid)
+				if(itr->origId == GetSpellId() && itr->caster == m_casterGuid && !itr->deleted)
 				{
 					//m_target->m_procSpells.erase(itr);
 					itr->deleted = true;
