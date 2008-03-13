@@ -608,6 +608,129 @@ bool World::SetInitialWorldSettings()
 		radius=std::max(GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex)),radius);
 		sp->base_range_or_radius_sqr = radius*radius;
 
+		/*
+		AURASTATE_FLAG_DODGE_BLOCK			= 1,        //1
+		AURASTATE_FLAG_HEALTH20             = 2,        //2
+		AURASTATE_FLAG_BERSERK              = 4,        //3
+		AURASTATE_FLAG_JUDGEMENT            = 16,       //5
+		AURASTATE_FLAG_PARRY                = 64,       //7
+		AURASTATE_FLAG_LASTKILLWITHHONOR    = 512,      //10
+		AURASTATE_FLAG_CRITICAL             = 1024,     //11
+		AURASTATE_FLAG_HEALTH35             = 4096,     //13
+		AURASTATE_FLAG_IMMOLATE             = 8192,     //14
+		AURASTATE_FLAG_REJUVENATE           = 16384,    //15 //where do i use this ?
+		AURASTATE_FLAG_POISON               = 32768,    //16
+		*/
+
+		// correct caster aura state
+		if( sp->CasterAuraState != 0 )
+		{
+			switch( sp->CasterAuraState )
+			{
+			case 1:
+				sp->CasterAuraState = AURASTATE_FLAG_DODGE_BLOCK;
+				break;
+
+			case 2:
+				sp->CasterAuraState = AURASTATE_FLAG_HEALTH20;
+				break;
+
+			case 3:
+				sp->CasterAuraState = AURASTATE_FLAG_BERSERK;
+				break;
+
+			case 5:
+				sp->CasterAuraState = AURASTATE_FLAG_JUDGEMENT;
+				break;
+
+			case 7:
+				sp->CasterAuraState = AURASTATE_FLAG_PARRY;
+				break;
+
+			case 10:
+				sp->CasterAuraState = AURASTATE_FLAG_LASTKILLWITHHONOR;
+				break;
+
+			case 11:
+				sp->CasterAuraState = AURASTATE_FLAG_CRITICAL;
+				break;
+
+			case 13:
+				sp->CasterAuraState = AURASTATE_FLAG_HEALTH35;
+				break;
+
+			case 14:
+				sp->CasterAuraState = AURASTATE_FLAG_IMMOLATE;
+				break;
+
+			case 15:
+				sp->CasterAuraState = AURASTATE_FLAG_REJUVENATE;
+				break;
+
+			case 16:
+				sp->CasterAuraState = AURASTATE_FLAG_POISON;
+				break;
+
+			default:
+				Log.Error("AuraState", "Spell %u (%s) has unknown caster aura state %u\n", sp->Id, sp->Name, sp->CasterAuraState);
+				break;
+			}
+		}
+
+		if( sp->TargetAuraState != 0 )
+		{
+			switch( sp->TargetAuraState )
+			{
+			case 1:
+				sp->TargetAuraState = AURASTATE_FLAG_DODGE_BLOCK;
+				break;
+
+			case 2:
+				sp->TargetAuraState = AURASTATE_FLAG_HEALTH20;
+				break;
+
+			case 3:
+				sp->TargetAuraState = AURASTATE_FLAG_BERSERK;
+				break;
+
+			case 5:
+				sp->TargetAuraState = AURASTATE_FLAG_JUDGEMENT;
+				break;
+
+			case 7:
+				sp->TargetAuraState = AURASTATE_FLAG_PARRY;
+				break;
+
+			case 10:
+				sp->TargetAuraState = AURASTATE_FLAG_LASTKILLWITHHONOR;
+				break;
+
+			case 11:
+				sp->TargetAuraState = AURASTATE_FLAG_CRITICAL;
+				break;
+
+			case 13:
+				sp->TargetAuraState = AURASTATE_FLAG_HEALTH35;
+				break;
+
+			case 14:
+				sp->TargetAuraState = AURASTATE_FLAG_IMMOLATE;
+				break;
+
+			case 15:
+				sp->TargetAuraState = AURASTATE_FLAG_REJUVENATE;
+				break;
+
+			case 16:
+				sp->TargetAuraState = AURASTATE_FLAG_POISON;
+				break;
+
+			default:
+				Log.Error("AuraState", "Spell %u (%s) has unknown target aura state %u\n", sp->Id, sp->Name, sp->TargetAuraState);
+				break;
+			}
+		}
+
 		//there are some spells that change the "damage" value of 1 effect to another : devastate = bonus first then damage
 		//this is a total bullshit so remove it when spell system supports effect overwriting
 		for( uint32 col1_swap = 0; col1_swap < 2 ; col1_swap++ )

@@ -350,6 +350,16 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 			return;
 		}
 
+		// check aurastate
+		if( m_spellInfo->TargetAuraState )
+		{
+			if( !pTarget->HasFlag( UNIT_FIELD_AURASTATE, m_spellInfo->TargetAuraState ) )
+			{
+				cancastresult = SPELL_FAILED_TARGET_AURASTATE;
+				return;
+			}
+		}
+
 #ifdef COLLISION
 		// this distance check may have to be removed in the future.
 		//Shady: wtf is that? it causes a bug when caster and target too close to each other.

@@ -1063,6 +1063,10 @@ uint8 Spell::prepare( SpellCastTargets * targets )
 				p_caster->delayAttackTimer( m_timer + 1000 );
 				//p_caster->setAttackTimer(m_timer + 1000, false);
 		}
+
+		// aura state removal
+		if( m_spellInfo->CasterAuraState )
+			u_caster->RemoveFlag( UNIT_FIELD_AURASTATE, m_spellInfo->CasterAuraState );
 	}
 
 	//instant cast(or triggered) and not channeling
@@ -1073,11 +1077,6 @@ uint8 Spell::prepare( SpellCastTargets * targets )
 		m_castPositionZ = m_caster->GetPositionZ();
 	
 		u_caster->castSpell( this );
-
-		//remove Aurastates required for this spell from caster and target
-		//not sure if this is the right spot for this
-		if( m_spellInfo->CasterAuraState )
-			u_caster->RemoveFlag( UNIT_FIELD_AURASTATE, m_spellInfo->CasterAuraState );
 	}
 	else
 		cast( false );
@@ -2862,6 +2861,13 @@ uint8 Spell::CanCast(bool tolerate)
 
 		if (m_spellInfo->RequiresAreaId && m_spellInfo->RequiresAreaId != p_caster->GetMapMgr()->GetAreaID(p_caster->GetPositionX(),p_caster->GetPositionY()))
 			return SPELL_FAILED_REQUIRES_AREA;
+
+		// aurastate check
+		if( m_spellInfo->CasterAuraState )
+		{
+			if( !p_caster->HasFlag( UNIT_FIELD_AURASTATE, m_spellInfo->CasterAuraState ) )
+				return SPELL_FAILED_CASTER_AURASTATE;
+		}
 	}
 
 	// Targetted Item Checks
