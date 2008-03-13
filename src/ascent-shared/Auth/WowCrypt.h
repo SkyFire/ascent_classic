@@ -20,6 +20,7 @@
 #ifndef _WOWCRYPT_H
 #define _WOWCRYPT_H
 
+#include <stdlib.h>
 #include "../Common.h"
 #include <vector>
 
