@@ -396,7 +396,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_movementBuffer.reserve(5000);
 #endif
 
-	_heartbeatEnable = true;
+	_heartbeatDisable = 0;
 	m_safeFall = 0;
 	m_noFallDamage = false;
 }
@@ -3292,6 +3292,7 @@ void Player::OnPushToWorld()
 	}
 
 	ResetHeartbeatCoords();
+	_heartbeatDisable = 0;
 	m_lastMoveType = 0;
 	
 	/* send weather */
@@ -3892,7 +3893,7 @@ void Player::SetPlayerSpeed(uint8 SpeedType, float value)
 
 	// dont mess up on these
 	ResetHeartbeatCoords();
-	_heartbeatEnable = false;
+	++_heartbeatDisable;
 }
 
 void Player::BuildPlayerRepop()

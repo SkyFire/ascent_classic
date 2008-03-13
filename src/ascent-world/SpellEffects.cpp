@@ -2131,7 +2131,7 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	}
 
 	// reset heartbeat for a little while, 2 seconds maybe?
-	p_caster->_heartbeatEnable = false;
+	++p_caster->_heartbeatDisable;
 	sEventMgr.AddEvent( p_caster, &Player::ResetSpeedHack, EVENT_PLAYER_RESET_HEARTBEAT, 2000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 }
 
@@ -4517,7 +4517,7 @@ void Spell::SpellEffectCharge(uint32 i)
 	p_caster->ResetHeartbeatCoords();
 
 	// trigger an event to reset speedhack detection
-	p_caster->_heartbeatEnable = false;
+	++p_caster->_heartbeatDisable;
 	sEventMgr.AddEvent( p_caster, &Player::ResetSpeedHack, EVENT_PLAYER_RESET_HEARTBEAT, time + 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 }
 

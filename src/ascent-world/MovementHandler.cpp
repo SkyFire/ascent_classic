@@ -566,7 +566,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			speed = _player->m_flySpeed;
 		}
 
-		if( _player->_heartbeatEnable && ( !_player->blinked/* || _player->m_redirectCount > 5*/ ) &&
+		if( !_player->_heartbeatDisable && ( !_player->blinked/* || _player->m_redirectCount > 5*/ ) &&
 			!_player->m_uint32Values[UNIT_FIELD_CHARM] && _player->m_TransporterGUID == 0 && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
 		{
 			if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
@@ -578,7 +578,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 					float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
 					float distance_delta = distance_xy_plane / speed;
-					float latency = float( _latency ) * 0.01f;
+					//float latency = float( _latency ) * 0.01f;
+					static float latency = 0.25f;
 					float speed_delta = ( speed * 0.25f ) + std::max( latency + ( latency * 0.04f ), 0.32f );
 
 					if( distance_delta >= speed_delta )

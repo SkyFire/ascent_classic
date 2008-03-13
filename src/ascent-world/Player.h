@@ -1401,7 +1401,7 @@ public:
 	float _lastHeartbeatO; // orientation
 	float _lastHeartbeatV; // velocity
 	time_t _lastHeartbeatT; // time
-	bool _heartbeatEnable;
+	int32 _heartbeatDisable;
 
 	void AddSplinePacket(uint64 guid, ByteBuffer* packet);
 	ByteBuffer* GetAndRemoveSplinePacket(uint64 guid);
@@ -1605,7 +1605,9 @@ public:
 	void ResetSpeedHack()
 	{
 		ResetHeartbeatCoords();
-		_heartbeatEnable = true;
+		--_heartbeatDisable;
+		if(_heartbeatDisable < 0)
+			_heartbeatDisable = 0;
 	}
 
 	LocationVector m_last_group_position;

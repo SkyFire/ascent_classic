@@ -1635,8 +1635,7 @@ void WorldSession::HandleAcknowledgementOpcodes( WorldPacket & recv_data )
 	case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
 	case CMSG_FORCE_FLY_BACK_SPEED_CHANGE_ACK:
 	case CMSG_FORCE_MOVE_SET_FLY_SPEED_ACK:
-		_player->_heartbeatEnable = true;
-		_player->ResetHeartbeatCoords();
+		_player->ResetSpeedHack();
 		break;
 	}
 

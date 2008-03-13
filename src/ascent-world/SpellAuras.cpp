@@ -1878,6 +1878,8 @@ void Aura::SpellAuraModConfuse(bool apply)
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
 			data1 << m_target->GetNewGUID() << uint8(0x00);
 			p_target->GetSession()->SendPacket(&data1);
+
+			++p_target->_heartbeatDisable;
 		}
 	}
 	else
@@ -1899,6 +1901,8 @@ void Aura::SpellAuraModConfuse(bool apply)
 
 			if( u_caster != NULL )
 				sHookInterface.OnEnterCombat( p_target, u_caster );
+
+			p_target->ResetSpeedHack();
 		}
 		else
 			m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
@@ -2014,6 +2018,8 @@ void Aura::SpellAuraModFear(bool apply)
 			data1.Initialize(SMSG_DEATH_NOTIFY_OBSOLETE);
 			data1 << m_target->GetNewGUID() << uint8(0x00);
 			p_target->GetSession()->SendPacket(&data1);
+
+			++p_target->_heartbeatDisable;
 		}
 	}
 	else
@@ -2035,6 +2041,8 @@ void Aura::SpellAuraModFear(bool apply)
 
 			if( u_caster != NULL )
 				sHookInterface.OnEnterCombat( p_target, u_caster );
+
+			p_target->ResetSpeedHack();
 		}
 		else
 			m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
