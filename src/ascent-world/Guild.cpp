@@ -175,7 +175,7 @@ void Guild::AddGuildLogEntry(uint8 iEvent, uint8 iParamCount, ...)
 		ev->iLogId, m_guildId, ev->iTimeStamp, ev->iEvent, ev->iEventData[0], ev->iEventData[1], ev->iEventData[2]);
 
 	m_lock.Acquire();
-	if(m_log.size() >= 50)
+	if(m_log.size() >= 25)
 	{
 		// limit it to 250 events.
 		// delete the first (oldest) event.
@@ -1023,8 +1023,9 @@ void Guild::SendGuildLog(WorldSession * pClient)
 {
 	WorldPacket data(MSG_GUILD_LOG, 18*m_log.size()+1);
 	GuildLogList::iterator itr;
+	uint32 count = 0;
 
-	data << uint8(m_log.size() >= 250 ? 250 : m_log.size());
+	data << uint8(m_log.size() >= 25 ? 25 : m_log.size());
 	m_lock.Acquire();
 	for(itr = m_log.begin(); itr != m_log.end(); ++itr) {
 		data << uint8((*itr)->iEvent);
@@ -1053,6 +1054,8 @@ void Guild::SendGuildLog(WorldSession * pClient)
 		}
 
 		data << uint32(UNIXTIME - (*itr)->iTimeStamp);
+		if( (++count) >= 25 )
+			break;
 	}
 	m_lock.Release();
 
@@ -1373,6 +1376,7 @@ void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
 
 void Guild::SendGuildBankLog(WorldSession * pClient, uint8 iSlot)
 {
+	uint32 count = 0;
 	if(iSlot > 6)
 		return;
 
@@ -1383,7 +1387,7 @@ void Guild::SendGuildBankLog(WorldSession * pClient, uint8 iSlot)
 		WorldPacket data(MSG_GUILD_BANK_LOG, (17*m_moneyLog.size()) + 2);
 		uint32 lt = (uint32)UNIXTIME;
 		data << uint8(0x06);
-		data << uint8((m_moneyLog.size() < 250) ? m_moneyLog.size() : 250);
+		data << uint8((m_moneyLog.size() < 25) ? m_moneyLog.size() : 25);
 		list<GuildBankEvent*>::iterator itr = m_moneyLog.begin();
 		for(; itr != m_moneyLog.end(); ++itr)
 		{
@@ -1392,6 +1396,9 @@ void Guild::SendGuildBankLog(WorldSession * pClient, uint8 iSlot)
 			data << uint32(0);		// highguid
 			data << (*itr)->uEntry;
 			data << uint32(lt - (*itr)->uTimeStamp);
+
+			if( (++count) >= 25 )
+				break;
 		}
 
 		m_lock.Release();
@@ -1415,7 +1422,7 @@ void Guild::SendGuildBankLog(WorldSession * pClient, uint8 iSlot)
 		WorldPacket data(MSG_GUILD_BANK_LOG, (17*m_moneyLog.size()) + 2);
 		uint32 lt = (uint32)UNIXTIME;
 		data << uint8(iSlot);
-		data << uint8((pTab->lLog.size() < 250) ? pTab->lLog.size() : 250);
+		data << uint8((pTab->lLog.size() < 25) ? pTab->lLog.size() : 25);
 
 		list<GuildBankEvent*>::iterator itr = pTab->lLog.begin();
 		for(; itr != pTab->lLog.end(); ++itr)
@@ -1426,6 +1433,9 @@ void Guild::SendGuildBankLog(WorldSession * pClient, uint8 iSlot)
 			data << (*itr)->uEntry;
 			data << (*itr)->iStack;
 			data << uint32(lt - (*itr)->uTimeStamp);
+
+			if( (++count) >= 25 )
+				break;
 		}
 		
 		m_lock.Release();
@@ -1445,7 +1455,7 @@ void Guild::LogGuildBankAction(uint8 iAction, uint32 uGuid, uint32 uEntry, uint8
 
 	m_lock.Acquire();
 
-	if(pTab->lLog.size() >= 50)
+	if(pTab->lLog.size() >= 25)
 	{
 		// pop one off the end
 		GuildBankEvent * ev2 = *(pTab->lLog.begin());
@@ -1476,7 +1486,7 @@ void Guild::LogGuildBankActionMoney(uint8 iAction, uint32 uGuid, uint32 uAmount)
 
 	m_lock.Acquire();
 
-	if(m_moneyLog.size() >= 50)
+	if(m_moneyLog.size() >= 25)
 	{
 		// pop one off the end
 		GuildBankEvent * ev2 = *(m_moneyLog.begin());
