@@ -498,6 +498,8 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 			Charter *gc = _player->m_charters[CHARTER_TYPE_GUILD];
 			if(gc)
 				gc->Destroy();
+
+			_player->m_charters[CHARTER_TYPE_GUILD] = NULL;
 		}
 
 		if(it->GetProto()->ItemId == ARENA_TEAM_CHARTER_2v2)
@@ -505,6 +507,8 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 			Charter *gc = _player->m_charters[CHARTER_TYPE_ARENA_2V2];
 			if(gc)
 				gc->Destroy();
+
+			_player->m_charters[CHARTER_TYPE_ARENA_2V2] = NULL;
 		}
 
 		if(it->GetProto()->ItemId == ARENA_TEAM_CHARTER_5v5)
@@ -512,6 +516,8 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 			Charter *gc = _player->m_charters[CHARTER_TYPE_ARENA_5V5];
 			if(gc)
 				gc->Destroy();
+
+			_player->m_charters[CHARTER_TYPE_ARENA_5V5] = NULL;
 		}
 
 		if(it->GetProto()->ItemId == ARENA_TEAM_CHARTER_3v3)
@@ -519,6 +525,8 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 			Charter *gc = _player->m_charters[CHARTER_TYPE_ARENA_3V3];
 			if(gc)
 				gc->Destroy();
+
+			_player->m_charters[ARENA_TEAM_CHARTER_3v3] = NULL;
 		}
 
 		uint32 mail_id = it->GetUInt32Value(ITEM_FIELD_ITEM_TEXT_ID);
