@@ -2018,11 +2018,11 @@ void Aura::SpellAuraModFear(bool apply)
 
 				if( u_caster != NULL )
 					sHookInterface.OnEnterCombat( p_target, u_caster );
+
+				p_target->ResetSpeedHack();
 			}
 			else
 				m_target->GetAIInterface()->AttackReaction(u_caster, 1, 0);
-
-			p_target->ResetSpeedHack();
 		}
 	}
 }
