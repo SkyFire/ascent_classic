@@ -225,10 +225,17 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 				&& ( (spellInfo->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET) == 0 || ( (spellInfo->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET) && _player->GetSummon() ) ) )
 				)
 			{
-				Spell*sp=new Spell(_player,spellInfo,true,NULL);
-				SpellCastTargets tgt;
-				tgt.m_unitTarget=_player->GetGUID();
-				sp->prepare(&tgt);
+				if( spellInfo->RequiredShapeShift && !( (uint32)1 << (_player->GetShapeShift()-1) & spellInfo->RequiredShapeShift ) )
+				{
+					// do nothing
+				}
+				else
+				{
+					Spell*sp=new Spell(_player,spellInfo,true,NULL);
+					SpellCastTargets tgt;
+					tgt.m_unitTarget=_player->GetGUID();
+					sp->prepare(&tgt);
+				}
 			}
 
 			_player->SetUInt32Value(PLAYER_CHARACTER_POINTS1, CurTalentPoints-1);
