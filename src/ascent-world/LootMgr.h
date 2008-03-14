@@ -85,7 +85,6 @@ typedef struct
 {
 	uint32 count;
 	StoreLootItem*items;
-	uint32 group;
 }StoreLootList;
 
 typedef struct
