@@ -4464,7 +4464,7 @@ void Spell::SpellEffectCharge(uint32 i)
 		return;
 	if(!unitTarget->isAlive())
 		return;
-    if (p_caster->IsStunned() || p_caster->m_rooted || p_caster->IsPacified())
+    if (p_caster->IsStunned() || p_caster->m_rooted || p_caster->IsPacified() || p_caster->IsFeared())
         return;
 
 	float x, y, z;

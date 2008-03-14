@@ -25,6 +25,7 @@ Unit::Unit()
 	m_attackTimer_1 = 0;
 	m_duelWield = false;
 
+	m_fearmodifiers = 0;
 	m_state = 0;
 	m_special_state = 0;
 	m_deathState = ALIVE;
@@ -2179,7 +2180,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 //==========================================================================================
 //==============================Unacceptable Cases Processing===============================
 //==========================================================================================
-	if(!pVictim->isAlive() || !isAlive()  || IsStunned() || IsPacified())
+	if(!pVictim->isAlive() || !isAlive()  || IsStunned() || IsPacified() || IsFeared())
 		return;
 	if(!isInFront(pVictim))
 		if(IsPlayer())

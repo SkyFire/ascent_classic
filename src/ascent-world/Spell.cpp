@@ -3473,7 +3473,7 @@ uint8 Spell::CanCast(bool tolerate)
 			}
 		}
 
-		if( u_caster->IsStunned() )
+		if( u_caster->IsStunned() || u_caster->IsFeared())
 		{
 			// HACK FIX
 			switch( m_spellInfo->NameHash )

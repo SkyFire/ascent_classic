@@ -855,6 +855,7 @@ public:
 	// DK:Affect
 	ASCENT_INLINE uint32 IsPacified() { return m_pacified; }
 	ASCENT_INLINE uint32 IsStunned() { return m_stunned; }
+	ASCENT_INLINE uint32 IsFeared() { return m_fearmodifiers; }
 	ASCENT_INLINE uint32 GetResistChanceMod() { return m_resistChance; }
 	ASCENT_INLINE void SetResistChanceMod(uint32 amount) { m_resistChance=amount; }
 	
@@ -1010,6 +1011,7 @@ public:
 	int32 m_stunned;
 	int32 m_extraattacks;   
 	int32 m_extrastriketargets;
+	int32 m_fearmodifiers;
 	//std::set<SpellEntry*> m_onStrikeSpells;
 
 	int32 m_noInterrupt;
