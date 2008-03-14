@@ -1052,7 +1052,7 @@ uint8 Spell::prepare( SpellCastTargets * targets )
 		SendSpellStart();
 
 		// start cooldown handler
-		if( p_caster != NULL && p_caster->CastTimeCheat && !m_triggeredSpell )
+		if( p_caster != NULL && !p_caster->CastTimeCheat && !m_triggeredSpell )
 		{
 			AddStartCooldown();
 		}
