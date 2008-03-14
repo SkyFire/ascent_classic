@@ -187,6 +187,13 @@ enum ArenaTeamTypes
 	NUM_ARENA_TEAM_TYPES		= 3,
 };
 
+enum CooldownTypes
+{
+	COOLDOWN_TYPE_SPELL			= 0,
+	COOLDOWN_TYPE_CATEGORY		= 1,
+	NUM_COOLDOWN_TYPES,
+};
+
 struct spells
 {
 	uint16  spellId;
@@ -468,14 +475,6 @@ struct PetActionBar
 {
 	uint32 spell[10];
 };
-struct ItemCooldown
-{
-	uint16 SpellID;
-	uint16 ItemEntry;
-	uint16 SpellCategory;	   //this maybe got from spell id, maybe saved for speed
-	uint32 CooldownTimeStamp;
-	uint32 Cooldown;
-};
 struct classScriptOverride
 {
 	uint32 id;
@@ -600,6 +599,13 @@ enum SPELL_INDEX
 #define PLAYER_RATING_MODIFIER_EXPERTISE						PLAYER_FIELD_COMBAT_RATING_23
 
 class ArenaTeam;
+struct PlayerCooldown
+{
+	uint32 ExpireTime;
+	uint32 ItemId;
+	uint32 SpellId;
+};
+
 //====================================================================
 //  Player
 //  Class that holds every created character on the server.
@@ -607,10 +613,8 @@ class ArenaTeam;
 //  TODO:  Attach characters to user accounts
 //====================================================================
 typedef std::set<uint32>	                        SpellSet;
-typedef std::set<ItemCooldown*>                     ItemCooldownSet;
 typedef std::list<classScriptOverride*>             ScriptOverrideList;
 typedef std::set<uint32>                            SaveSet;
-typedef std::map<uint32, uint32>                    SpellCooldownHolderMap;
 typedef std::map<uint64, ByteBuffer*>               SplineMap;
 typedef std::map<uint32, ScriptOverrideList* >      SpellOverrideMap;
 typedef std::map<uint32, uint32>                    SpellOverrideExtraAuraMap;
@@ -620,6 +624,7 @@ typedef std::map<SpellEntry*, pair<uint32, uint32> >StrikeSpellMap;
 typedef std::map<uint32, OnHitSpell >               StrikeSpellDmgMap;
 typedef std::map<uint32, PlayerSkill>				SkillMap;
 typedef std::set<Player**>							ReferenceSet;
+typedef std::map<uint32, PlayerCooldown>			PlayerCooldownMap;
 
 //#define OPTIMIZED_PLAYER_SAVING
 
@@ -673,6 +678,25 @@ protected:
 	void _UpdateSkillFields();
 
 	SkillMap m_skills;
+
+
+	// COOLDOWNS
+	PlayerCooldownMap m_cooldownMap[NUM_COOLDOWN_TYPES];
+	uint32 m_globalCooldown;
+	
+public:
+	void Cooldown_AddStart(SpellEntry * pSpell);
+	void Cooldown_Add(SpellEntry * pSpell, Item * pItemCaster);
+	void Cooldown_AddItem(ItemPrototype * pProto, uint32 x);
+	bool Cooldown_CanCast(SpellEntry * pSpell);
+	bool Cooldown_CanCast(ItemPrototype * pProto, uint32 x);
+
+protected:
+	void _Cooldown_Add(uint32 Type, uint32 Misc, uint32 Time, uint32 SpellId, uint32 ItemId);
+	void _LoadPlayerCooldowns(QueryResult * result);
+	void _SavePlayerCooldowns(QueryBuffer * buf);
+
+	// END COOLDOWNS
 
 public:
 
@@ -1368,15 +1392,11 @@ public:
 	Object * GetSummonedObject () {return m_SummonedObject;};
 	void SetSummonedObject (Object * t_SummonedObject) {m_SummonedObject = t_SummonedObject;};
 	uint32 roll;
-	void AddRecoverCooldown(SpellEntry * spellInfo);
-	void AddCooldown(uint32 spell,uint32 time);
-	void AddCategoryCooldown(uint32 cat, uint32 time);
-	void AddGlobalCooldown(uint32 time);
-	uint32 GetGlobalCooldown() { return GlobalCooldown; }
-	void SetGlobalCooldown(uint32 time) { GlobalCooldown = time; }
+
 	void ClearCooldownsOnLine(uint32 skill_line, uint32 called_from);
 	void ResetAllCooldowns();
 	void ClearCooldownForSpell(uint32 spell_id);
+
 	bool bProcessPending;
 	Mutex _bufferS;
 	void PushUpdateData(ByteBuffer *data, uint32 updatecount);
@@ -1506,8 +1526,7 @@ public:
 	void UpdatePvPArea();
 	//! PvP Toggle (called on /pvp)
 	void PvPToggle();
-	bool CanCastDueToCooldown(SpellEntry * spellid);
-	bool CanCastItemDueToCooldown(ItemPrototype * pProto, uint32 x);
+
 	ASCENT_INLINE uint32 LastHonorResetTime() const { return m_lastHonorResetTime; }
 	ASCENT_INLINE void LastHonorResetTime(uint32 val) { m_lastHonorResetTime = val; }
 	uint32 OnlineTime;
@@ -1678,9 +1697,6 @@ public:
 	void CopyAndSendDelayedPacket(WorldPacket * data);
 	void PartLFGChannel();
 
-	ASCENT_INLINE map<uint32,uint32>::iterator SpellCoolDownMapStart() { return SpellCooldownMap.begin(); }
-	ASCENT_INLINE map<uint32,uint32>::iterator SpellCoolDownMapEnd() { return SpellCooldownMap.end(); }
-
 #ifdef VOICE_CHAT
 	bool m_inPartyVoice;
 	uint8 m_inPartyVoiceId;
@@ -1712,29 +1728,18 @@ protected:
 	void _SaveQuestLogEntry(QueryBuffer * buf);
 	void _LoadQuestLogEntry(QueryResult * result);
 
-	// DK
 	void _LoadPet(QueryResult * result);
 	void _LoadPetNo();
 	void _LoadPetSpells(QueryResult * result);
 	void _SavePet(QueryBuffer * buf);
 	void _SavePetSpells(QueryBuffer * buf);
-	void _SaveItemCooldown(QueryBuffer * buf);
-	void _LoadItemCooldown(QueryResult * result);
-	void _SaveSpellCoolDownSecurity(QueryBuffer * buf);
-	void _LoadSpellCoolDownSecurity( QueryResult* result );
 	void _ApplyItemMods( Item* item, int8 slot, bool apply, bool justdrokedown = false, bool skip_stat_apply = false );
 	void _EventAttack( bool offhand );
 	void _EventExploration();
-	void UpdateCooldowns();
 
 	// Water level related stuff
 	void SetNoseLevel();
 
-	// Cooldown stuff
-	std::map<uint32,uint32>	 SpellCooldownMap;
-	std::map<uint32,uint32>	 SpellCooldownCategoryMap;
-	ItemCooldownSet			 m_itemcooldown;
-	uint32					 GlobalCooldown;
 	/************************************************************************/
 	/* Trade																*/
 	/************************************************************************/
@@ -1828,7 +1833,6 @@ protected:
     // other system
 	Corpse *    myCorpse;
 
-	uint32      m_cooldownTimer;
 	uint32      m_lastHonorResetTime;
 	uint32      _fields[PLAYER_END];
 	uint32	    trigger_on_stun;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable

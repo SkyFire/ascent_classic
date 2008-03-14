@@ -312,8 +312,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	stack_cheat			 = false;
 	triggerpass_cheat = false;
 	m_pvpTimer			  = 0;
-	m_cooldownTimer		 = getMSTime() + 10000;
-	GlobalCooldown		  = 0;
+	m_globalCooldown = 0;
 	m_lastHonorResetTime	= 0;
 	memset(&mActions, 0, PLAYER_ACTION_BUTTON_SIZE);
 	tutorialsDirty = true;
@@ -457,16 +456,6 @@ Player::~Player ( )
 		if(m_questlog[i] != NULL)
 		{
 			delete m_questlog[i];
-		}
-	}
-
-	// clean up ITEMCOOLDOWN stuff
-	if (m_itemcooldown.size())
-	{
-		ItemCooldownSet::iterator itr;
-		for (itr = m_itemcooldown.begin(); itr != m_itemcooldown.end();itr++)
-		{
-			delete (*itr);
 		}
 	}
 
@@ -878,13 +867,6 @@ void Player::Update( uint32 p_time )
 	{
 		_EventExploration();
 		m_explorationTimer = mstime + 3000;
-	}
-
-	// Cooldowns
-	if(mstime >= m_cooldownTimer)
-	{
-		UpdateCooldowns();
-		m_cooldownTimer = mstime + 10000;
 	}
 
 	if(m_pvpTimer)
@@ -1465,173 +1447,88 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 
 void Player::smsg_InitialSpells()
 {
+	PlayerCooldownMap::iterator itr, itr2;
+
 	uint16 spellCount = (uint16)mSpells.size();
-	uint16 itemCount = (uint16)m_itemcooldown.size();
+	uint32 itemCount = m_cooldownMap[0].size() + m_cooldownMap[1].size();
+	uint32 mstime = getMSTime();
+	size_t pos;
 
 	WorldPacket data(SMSG_INITIAL_SPELLS, 5 + (spellCount * 4) + (itemCount * 4) );
 	data << uint8(0);
 	data << uint16(spellCount); // spell count
 
-	SpellSet::iterator itr;
-	for (itr = mSpells.begin(); itr != mSpells.end(); ++itr)
+	SpellSet::iterator sitr;
+	for (sitr = mSpells.begin(); sitr != mSpells.end(); ++sitr)
 	{
 		// todo: check out when we should send 0x0 and when we should send 0xeeee
 		// this is not slot,values is always eeee or 0,seems to be cooldown
-		data << uint16(*itr);				   // spell id
+		data << uint16(*sitr);				   // spell id
 		data << uint16(0xeeee);	 
 	}
 
-	if (itemCount)
+	pos = data.wpos();
+	data << uint16( 0 );		// placeholder
+
+	itemCount = 0;
+	for( itr = m_cooldownMap[COOLDOWN_TYPE_SPELL].begin(); itr != m_cooldownMap[COOLDOWN_TYPE_SPELL].end(); )
 	{
-		size_t pos = data.wpos();
-		size_t count = 0;
-	   data << uint16(itemCount);			   // item / spell count
-	   ItemCooldownSet::iterator itr, itr2;
-	   uint32 n = now();
-	   for (itr = m_itemcooldown.begin(); itr != m_itemcooldown.end();)
-	   {
-		   if( n >= (*itr)->CooldownTimeStamp || ( ((*itr)->CooldownTimeStamp - n) < 5000 ) )
-		   {
-			   itr2 = itr++;
-			   m_itemcooldown.erase(itr2);
-			   continue;
-		   }
+		itr2 = itr++;
 
-			//ItemCooldown * testje = (*itr);				   // for debug
-			data << uint16((*itr)->SpellID);					// spell id
-			data << uint16((*itr)->ItemEntry);				  // item entry
-			data << uint16((*itr)->SpellCategory);			  // spell Category
-
-			// if no spell category do it manualy
-			if (!(*itr)->SpellCategory)
-			{
-				data << uint32((*itr)->CooldownTimeStamp - now());
-				data << uint32(0);
-			}
-			else
-			{
-				data << uint32(0);
-				data << uint32((*itr)->CooldownTimeStamp - now());  // Current time time remaining of the cooldown in ms
-			}
-
-			++itr;
-			++count;
+		// don't keep around expired cooldowns
+		if( itr2->second.ExpireTime < mstime || (itr2->second.ExpireTime - mstime) < 10000 )
+		{
+			m_cooldownMap[COOLDOWN_TYPE_SPELL].erase( itr2 );
+			continue;
 		}
-#ifdef USING_BIG_ENDIAN
-	   *(uint16*)&data.contents()[pos] = swap16((uint16)count);
-#else
-	   *(uint16*)&data.contents()[pos] = (uint16)count;
+
+		data << uint16( itr2->first );						// spell id
+		data << uint16( itr2->second.ItemId );				// item id
+		data << uint16( 0 );								// spell category
+		data << uint32( itr2->second.ExpireTime - mstime );	// cooldown remaining in ms (for spell)
+		data << uint32( 0 );								// cooldown remaining in ms (for category)
+
+		++itemCount;
+
+#ifdef _DEBUG
+		Log.Debug("InitialSpells", "sending spell cooldown for spell %u to %u ms", itr2->first, itr2->second.ExpireTime - mstime);
 #endif
 	}
-	else
+
+	for( itr = m_cooldownMap[COOLDOWN_TYPE_CATEGORY].begin(); itr != m_cooldownMap[COOLDOWN_TYPE_CATEGORY].end(); )
 	{
-		data << uint16(0);
+		itr2 = itr++;
+
+		// don't keep around expired cooldowns
+		if( itr2->second.ExpireTime < mstime || (itr2->second.ExpireTime - mstime) < 10000 )
+		{
+			m_cooldownMap[COOLDOWN_TYPE_CATEGORY].erase( itr2 );
+			continue;
+		}
+
+		data << uint16( itr2->second.SpellId );				// spell id
+		data << uint16( itr2->second.ItemId );				// item id
+		data << uint16( itr2->first );						// spell category
+		data << uint32( 0 );								// cooldown remaining in ms (for spell)
+		data << uint32( itr2->second.ExpireTime - mstime );	// cooldown remaining in ms (for category)
+
+		++itemCount;
+
+#ifdef _DEBUG
+		Log.Debug("InitialSpells", "sending category cooldown for cat %u to %u ms", itr2->first, itr2->second.ExpireTime - mstime);
+#endif
 	}
+
+	
+#ifdef USING_BIG_ENDIAN
+	*(uint16*)&data.contents()[pos] = swap16((uint16)itemCount);
+#else
+	*(uint16*)&data.contents()[pos] = (uint16)itemCount;
+#endif
 
 	GetSession()->SendPacket(&data);
 
 	//Log::getSingleton( ).outDetail( "CHARACTER: Sent Initial Spells" );
-}
-
-/* Saves ItemCooldowns
-   checks for invalid items and deletes them from the list and don't save them */
-void Player::_SaveItemCooldown(QueryBuffer * buf)
-{
-	if(CooldownCheat) return;
-	// if we have nothing to save why save?
-	if (m_itemcooldown.size() == 0)
-		return;
-
-	if(buf == NULL)
-		CharacterDatabase.Execute("DELETE FROM playercooldownitems WHERE OwnerGuid = %u", GetGUIDLow() );
-	else
-		buf->AddQuery("DELETE FROM playercooldownitems WHERE OwnerGuid = %u", GetGUIDLow() );
-
-	uint32 entrys_to_insert=0;
-	std::stringstream query;
-	query << "INSERT INTO playercooldownitems (OwnerGuid, ItemEntry, SpellID, SpellCategory, CooldownTimeStamp, Cooldown) VALUES ";
-
-	ItemCooldownSet::iterator itr, it2, itrend;
-	itrend = m_itemcooldown.end();
-	for (itr = m_itemcooldown.begin(); itr != m_itemcooldown.end(); )
-	{
-		if (now() > (*itr)->CooldownTimeStamp)	  // if item is invalid
-		{
-			ItemCooldown * temp = (*itr);		   // get a temp pointer
-			it2 = itr;
-			++itr;
-			if(temp)
-			{
-				m_itemcooldown.erase(it2);			  // remove the object of the list
-				delete temp;							// delete its mem, using the temp pointer
-			}
-			continue;
-		}
-		if(entrys_to_insert>0)
-			query << ",";
-		query << "("<< GetGUIDLow() << "," << (*itr)->ItemEntry << "," << (*itr)->SpellID << "," << (*itr)->SpellCategory
-			<< "," << (*itr)->CooldownTimeStamp << "," << (*itr)->Cooldown << ")";
-		++itr;
-		entrys_to_insert++;
-	}
-	//only execute if we have entrys to insert
-	if(entrys_to_insert)
-	{
-		if(buf == NULL)
-			CharacterDatabase.ExecuteNA( query.str().c_str() );
-		else
-			buf->AddQueryStr(query.str());
-	}
-}
-
-void Player::_SaveSpellCoolDownSecurity(QueryBuffer * buf)
-{
-	if(CooldownCheat) return;
-	// if we have nothing to save, then why save?
-	if (SpellCooldownMap.size() == 0)
-		return;
-
-	if(buf == NULL)
-		CharacterDatabase.Execute("DELETE FROM playercooldownsecurity WHERE OwnerGuid = %u", GetGUIDLow() );
-	else
-		buf->AddQuery("DELETE FROM playercooldownsecurity WHERE OwnerGuid = %u", GetGUIDLow() );
-
-	SpellCooldownHolderMap::iterator itr, it2, itrend;
-
-	std::stringstream query;
-	query << "INSERT INTO playercooldownsecurity (OwnerGuid, SpellID, TimeStamp) VALUES ";
-	
-	itrend = SpellCooldownMap.end();
-	uint32 SpellID;
-	uint32 TimeStamp;
-	uint32 ts = now();
-	uint8	hascooldowns=0;
-	for (itr = SpellCooldownMap.begin(); itr != SpellCooldownMap.end();)
-	{
-
-		SpellID	  = itr->first;
-		TimeStamp	= itr->second;
-
-		if (ts > TimeStamp) // if cooldown is valid
-		{
-			it2 = itr;
-			++itr;
-			SpellCooldownMap.erase(it2);
-			continue;
-		}
-		if(hascooldowns)
-			query << ",";
-		query << "(" << GetGUIDLow() << "," << SpellID << "," << TimeStamp << ")";
-		++itr;
-		hascooldowns++;
-	}
-	if(hascooldowns)
-	{
-		if(buf == NULL)
-			CharacterDatabase.ExecuteNA( query.str().c_str( ) );
-		else
-			buf->AddQueryStr(query.str());
-	}
 }
 
 void Player::_SavePet(QueryBuffer * buf)
@@ -1758,75 +1655,6 @@ set<uint32>* Player::GetSummonSpells(uint32 Entry)
 		return &(itr->second);
 	}
 	return 0;
-}
-
-/* Loads ItemCooldowns
-checks for invalid items and deletes them from the db */
-void Player::_LoadItemCooldown(QueryResult * result)
-{
-	if(result)
-	{
-		uint32 n = now();
-		// TODO is there a better way to do this?
-		do
-		{
-			// if the current item does not have cooldown delete it from db
-			Field *fields			   = result->Fetch();
-			uint32 TempSpellID		  = fields[2].GetUInt32();
-			uint32 TempSpellCategory	= fields[3].GetUInt32();
-			uint32 TempTimestamp		= fields[4].GetUInt32();
-			uint32 TempCooldown		 = fields[5].GetUInt32();
-			uint32 DiffTimestamp		= TempTimestamp - n;
-
-			if (n > TempTimestamp || (n < TempTimestamp && DiffTimestamp > TempCooldown)) //if timestamp overflow or dif time is larget than 7 days
-			{
-				CharacterDatabase.Execute( "DELETE FROM playercooldownitems WHERE OwnerGuid=%u AND ItemEntry=%u",
-					GetGUIDLow(),fields[1].GetUInt32());
-			}
-			else // only add items to list that still have cooldown
-			{
-				ItemCooldown *be = new ItemCooldown;
-				be->ItemEntry		   = fields[1].GetUInt32();
-				be->SpellID			 = TempSpellID;
-				be->SpellCategory	   = TempSpellCategory;
-				be->CooldownTimeStamp   = TempTimestamp;
-				be->Cooldown			= TempCooldown;
-
-				m_itemcooldown.insert(be);
-			}
-		}
-		while( result->NextRow() );
-	}
-}
-
-void Player::_LoadSpellCoolDownSecurity(QueryResult * result)
-{
-	if(result)
-	{
-		uint32 n = now();
-		do
-		{
-			// if the current item does not have cooldown delete it from db
-			Field *fields			   = result->Fetch();
-			uint32 SpellID			  = fields[1].GetUInt32();
-			uint32 Timestamp			= fields[2].GetUInt32();
-			uint32 DiffTimestamp		= Timestamp - n;
-			SpellEntry		*spellInfo = dbcSpell.LookupEntry( SpellID );
-			
-			if (n + spellInfo->RecoveryTime > Timestamp && // cooldown did not expired somehow (not taking into care cooldown modifiers!)
-				n < Timestamp + spellInfo->RecoveryTime )  // cooldown does not starts in future (not taking into care cooldown modifiers!)
-			{
-				AddCooldown(SpellID,DiffTimestamp);
-			}
-//			if (now() > Timestamp || (now() < Timestamp && DiffTimestamp > Timestamp)) 
-			else // only add spells to list that still have cooldown
-			{
-				//if timestamp overflow or diff time is larger than 7 days
-				CharacterDatabase.Execute( "DELETE FROM playercooldownsecurity WHERE OwnerGuid = %u AND SpellID = %u", GetGUIDLow(), SpellID );
-			}
-		}
-		while( result->NextRow() );
-	}
 }
 
 void Player::_LoadPet(QueryResult * result)
@@ -2339,10 +2167,7 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	objmgr.SaveGMTicket(GetGUID(), buf);
 
 	// Cooldown Items
-	_SaveItemCooldown(buf);
-
-	// Spell Cooldowns security
-	_SaveSpellCoolDownSecurity(buf);
+	_SavePlayerCooldowns( buf );
 	
 	// Pets
 	if(getClass() == HUNTER || getClass() == WARLOCK)
@@ -2434,9 +2259,8 @@ bool Player::LoadFromDB(uint32 guid)
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP0<Player>(this, &Player::LoadFromDBProc) );
 	q->AddQuery("SELECT * FROM characters WHERE guid=%u AND forced_rename_pending = 0",guid);
 	q->AddQuery("SELECT * FROM tutorials WHERE playerId=%u",guid);
-	q->AddQuery("SELECT * FROM playercooldownitems WHERE OwnerGuid=%u", guid);
+	q->AddQuery("SELECT cooldown_type, cooldown_misc, cooldown_expire_time, cooldown_spellid, cooldown_itemid FROM playercooldowns WHERE player_guid=%u", guid);
 	q->AddQuery("SELECT * FROM questlog WHERE player_guid=%u",guid);
-	q->AddQuery("SELECT * FROM playercooldownsecurity WHERE OwnerGuid=%u",guid);
 	q->AddQuery("SELECT * FROM playeritems WHERE ownerguid=%u ORDER BY containerslot ASC", guid);
 	q->AddQuery("SELECT * FROM playerpets WHERE ownerguid=%u ORDER BY petnumber", guid);
 	q->AddQuery("SELECT * FROM playersummonspells where ownerguid=%u ORDER BY entryid", guid);
@@ -3054,11 +2878,10 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 
 	// load properties
 	_LoadTutorials(results[1].result);
-	_LoadItemCooldown(results[2].result);
+	_LoadPlayerCooldowns(results[2].result);
 	_LoadQuestLogEntry(results[3].result);
-	_LoadSpellCoolDownSecurity(results[4].result);
-	m_ItemInterface->mLoadItemsFromDatabase(results[5].result);
-	m_mailBox.Load(results[8].result);
+	m_ItemInterface->mLoadItemsFromDatabase(results[4].result);
+	m_mailBox.Load(results[7].result);
 	m_session->FullLogin(this);
 	m_session->m_loggingInPlayer=NULL;
 
@@ -4865,100 +4688,6 @@ void Player::ApplyPlayerRestState(bool apply)
 	}
 }
 
-void Player::UpdateCooldowns()
-{
-	if(CooldownCheat) return;
-
-	uint32 mstime = getMSTime();
-	map<uint32,uint32>::iterator itr;
-	map<uint32,uint32>::iterator next;
-	for(itr = SpellCooldownMap.begin();itr!=SpellCooldownMap.end();)
-	{
-		next = itr++;
-		if(mstime >= next->second)
-			SpellCooldownMap.erase(next);
-	}
-	for(itr = SpellCooldownCategoryMap.begin();itr!=SpellCooldownCategoryMap.end();)
-	{
-		next = itr++;
-		if(mstime >= next->second)
-			SpellCooldownCategoryMap.erase(next);
-	}
-	if(mstime > GlobalCooldown)
-		GlobalCooldown = 0;
-}
-
-void Player::AddCategoryCooldown(uint32 cat, uint32 tm)
-{
-	if(CooldownCheat) return;
-
-	map<uint32, uint32>::iterator itr = SpellCooldownCategoryMap.find(cat);
-	uint32 mstime = getMSTime();
-	if(itr != SpellCooldownCategoryMap.end())
-	{
-		itr->second = mstime + tm;
-	}
-	else
-	{
-		SpellCooldownCategoryMap.insert( make_pair( cat, mstime + tm ) );
-	}
-}
-
-void Player::AddCooldown(uint32 cat, uint32 tm)
-{
-	if(CooldownCheat) return;
-	map<uint32, uint32>::iterator itr = SpellCooldownMap.find(cat);
-	uint32 mstime = now();
-	if(itr != SpellCooldownMap.end())
-	{
-		itr->second = mstime + tm;
-	}
-	else
-	{
-		SpellCooldownMap.insert( make_pair( cat, mstime + tm ) );
-	}
-}
-
-//  I gues I need to look over this again
-//  rename this function into AddRecoverSpellCooldown or something
-void Player::AddRecoverCooldown(SpellEntry * spellInfo)
-{
-	if(CooldownCheat) return;
-	// if we have a cooldown larger then 1 minute
-	if (spellInfo->RecoveryTime > 1 * 60 * 1000 || spellInfo->CategoryRecoveryTime > 1 * 60 * 1000)
-	{
-		ItemCooldown * item = new ItemCooldown;
-		int32 cooltime;
-
-		item->ItemEntry = 0;                        // SpellCoolDowns have no itemid
-		item->SpellID = spellInfo->Id;              // spellId
-		item->SpellCategory = spellInfo->Category;  // category
-
-		// if we have a standard cooldown time
-		//  double check this
-		if (spellInfo->RecoveryTime)
-		{
-			cooltime = spellInfo->RecoveryTime;
-		}
-		else
-		{
-			cooltime = spellInfo->CategoryRecoveryTime;
-		}
-		SM_FIValue(this->SM_FCooldownTime, &cooltime, spellInfo->SpellGroupType);
-		SM_PIValue(this->SM_PCooldownTime, &cooltime, spellInfo->SpellGroupType);
-		item->Cooldown = cooltime;
-		item->CooldownTimeStamp = now() + cooltime;
-
-		m_itemcooldown.insert(item);
-	}
-}
-
-void Player::AddGlobalCooldown(uint32 tm)
-{
-	if(CooldownCheat) return;
-	GlobalCooldown = getMSTime() + tm;
-}
-
 #define CORPSE_VIEW_DISTANCE 1600 // 40*40
 
 bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha *
@@ -6642,30 +6371,6 @@ void Player::ClearCooldownForSpell(uint32 spell_id)
 	// remove cooldown data from Server side lists
 	SpellEntry * spe = dbcSpell.LookupEntry(spell_id);
 	if(!spe) return;
-
-	map<uint32,uint32>::iterator itr;
-	itr = SpellCooldownMap.find(spell_id);
-	if(itr != SpellCooldownMap.end())
-		SpellCooldownMap.erase(itr);
-
-	itr = SpellCooldownCategoryMap.find(spe->Category);
-	if(itr != SpellCooldownCategoryMap.end())
-		SpellCooldownCategoryMap.erase(itr);
-
-	ItemCooldownSet::iterator itr2, it2;
-	for (itr2 = m_itemcooldown.begin(); itr2 != m_itemcooldown.end(); )
-	{
-		ItemCooldown * temp = (*itr2);
-		it2 = itr2++;
-		if(temp)
-		{
-			if(temp->SpellID == spell_id || temp->SpellCategory == spe->Category)
-			{
-				m_itemcooldown.erase(it2);
-				delete temp;
-			}
-		}
-	}
 }
 
 void Player::ClearCooldownsOnLine(uint32 skill_line, uint32 called_from)
@@ -7943,72 +7648,6 @@ void Player::PvPToggle()
             }
         }
     }
-}
-
-bool Player::CanCastItemDueToCooldown(ItemPrototype * pProto, uint32 x)
-{
-	ItemCooldownSet::iterator itr = m_itemcooldown.begin();
-	ItemCooldown * cool;
-	uint32 curtime = now();
-	if(pProto->Spells[x].Category)
-	{
-		for(; itr != m_itemcooldown.end(); ++itr)
-		{
-			cool = *itr;
-			if(cool->SpellCategory == pProto->Spells[x].Category ||
-				cool->ItemEntry == pProto->ItemId)
-			{
-				if(cool->CooldownTimeStamp > curtime)
-					return false;
-			}
-		}
-	}
-	else
-	{
-		for(; itr != m_itemcooldown.end(); ++itr)
-		{
-			cool = *itr;
-			if(cool->ItemEntry == pProto->ItemId)
-			{
-				if(cool->CooldownTimeStamp > curtime)
-					return false;
-			}
-		}
-	}
-	return true;
-}
-
-bool Player::CanCastDueToCooldown(SpellEntry * spellid)
-{
-	map<uint32, uint32>::iterator itr;
-	uint32 mstime = getMSTime();
-	
-	// no point checking single spells unless they have
-	// a cooldown
-	if(spellid->RecoveryTime || spellid->StartRecoveryTime)
-	{
-		itr = SpellCooldownMap.find(spellid->Id);
-		if(itr != SpellCooldownMap.end())
-		{
-			if(mstime < itr->second)
-				return false;
-		}
-	}
-
-	if(spellid->Category)
-	{
-		itr = SpellCooldownCategoryMap.find(spellid->Category);
-		if(itr != SpellCooldownCategoryMap.end())
-		{
-			if(mstime < itr->second)
-				return false;
-		}
-	}
-
-	if(mstime < GlobalCooldown)
-		return false;
-
-	return true;
 }
 
 void Player::ResetPvPTimer()
@@ -9955,4 +9594,232 @@ void Player::RemoveShapeShiftSpell(uint32 id)
 {
 	mShapeShiftSpells.erase( id );
 	RemoveAura( id );
+}
+
+// COOLDOWNS
+void Player::_Cooldown_Add(uint32 Type, uint32 Misc, uint32 Time, uint32 SpellId, uint32 ItemId)
+{
+	PlayerCooldownMap::iterator itr = m_cooldownMap[Type].find( Misc );
+	if( itr != m_cooldownMap[Type].end( ) )
+	{
+		if( itr->second.ExpireTime < Time )
+		{
+			itr->second.ExpireTime = Time;
+			itr->second.ItemId = ItemId;
+			itr->second.SpellId = SpellId;
+		}
+	}
+	else
+	{
+		PlayerCooldown cd;
+		cd.ExpireTime = Time;
+		cd.ItemId = ItemId;
+		cd.SpellId = SpellId;
+
+		m_cooldownMap[Type].insert( make_pair( Misc, cd ) );
+	}
+
+#ifdef _DEBUG
+	Log.Debug("Cooldown", "added cooldown for type %u misc %u time %u item %u spell %u", Type, Misc, Time - getMSTime(), ItemId, SpellId);
+#endif
+}
+
+void Player::Cooldown_Add(SpellEntry * pSpell, Item * pItemCaster)
+{
+	uint32 mstime = getMSTime();
+
+	if( pSpell->CategoryRecoveryTime > 0 && pSpell->Category )
+		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->Category, mstime + pSpell->CategoryRecoveryTime, pSpell->Id, pItemCaster ? pItemCaster->GetProto()->ItemId : 0 );
+	
+	if( pSpell->RecoveryTime > 0 )
+		_Cooldown_Add( COOLDOWN_TYPE_SPELL, pSpell->Id, mstime + pSpell->RecoveryTime, pSpell->Id, pItemCaster ? pItemCaster->GetProto()->ItemId : 0 );
+}
+
+void Player::Cooldown_AddStart(SpellEntry * pSpell)
+{
+	if( pSpell->StartRecoveryTime == 0 )
+		return;
+
+	uint32 mstime = getMSTime();
+	if( pSpell->StartRecoveryCategory )
+		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->StartRecoveryCategory, mstime + pSpell->StartRecoveryTime, pSpell->Id, 0 );
+	else
+	{
+#ifdef _DEBUG
+		Log.Debug("Cooldown", "Global cooldown adding: %u ms", pSpell->StartRecoveryTime );
+#endif
+		m_globalCooldown = mstime + pSpell->StartRecoveryTime;
+	}
+}
+
+bool Player::Cooldown_CanCast(SpellEntry * pSpell)
+{
+	PlayerCooldownMap::iterator itr;
+	uint32 mstime = getMSTime();
+
+	if( pSpell->Category )
+	{
+		itr = m_cooldownMap[COOLDOWN_TYPE_CATEGORY].find( pSpell->Category );
+		if( itr != m_cooldownMap[COOLDOWN_TYPE_CATEGORY].end( ) )
+		{
+			if( mstime < itr->second.ExpireTime )
+				return false;
+			else
+				m_cooldownMap[COOLDOWN_TYPE_CATEGORY].erase( itr );
+		}		
+	}
+
+	itr = m_cooldownMap[COOLDOWN_TYPE_SPELL].find( pSpell->Id );
+	if( itr != m_cooldownMap[COOLDOWN_TYPE_SPELL].end( ) )
+	{
+		if( mstime < itr->second.ExpireTime )
+			return false;
+		else
+			m_cooldownMap[COOLDOWN_TYPE_SPELL].erase( itr );
+	}
+
+	if( m_globalCooldown )
+	{
+		if( mstime < m_globalCooldown )
+			return false;
+		else
+			m_globalCooldown = 0;
+	}
+
+	return true;
+}
+
+void Player::Cooldown_AddItem(ItemPrototype * pProto, uint32 x)
+{
+	if( pProto->Spells[x].CategoryCooldown <= 0 && pProto->Spells[x].Cooldown <= 0 )
+		return;
+
+	ItemSpell * isp = &pProto->Spells[x];
+	uint32 mstime = getMSTime();
+
+	if( isp->CategoryCooldown > 0)
+		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, isp->Category, isp->CategoryCooldown + mstime, isp->Id, pProto->ItemId );
+
+	if( isp->Cooldown > 0 )
+		_Cooldown_Add( COOLDOWN_TYPE_SPELL, isp->Id, isp->Cooldown + mstime, isp->Id, pProto->ItemId );
+}
+
+bool Player::Cooldown_CanCast(ItemPrototype * pProto, uint32 x)
+{
+	PlayerCooldownMap::iterator itr;
+	ItemSpell * isp = &pProto->Spells[x];
+	uint32 mstime = getMSTime();
+
+	if( isp->Category )
+	{
+		itr = m_cooldownMap[COOLDOWN_TYPE_CATEGORY].find( isp->Category );
+		if( itr != m_cooldownMap[COOLDOWN_TYPE_CATEGORY].end( ) )
+		{
+			if( mstime < itr->second.ExpireTime )
+				return false;
+			else
+				m_cooldownMap[COOLDOWN_TYPE_CATEGORY].erase( itr );
+		}	
+	}
+
+	itr = m_cooldownMap[COOLDOWN_TYPE_SPELL].find( isp->Id );
+	if( itr != m_cooldownMap[COOLDOWN_TYPE_SPELL].end( ) )
+	{
+		if( mstime < itr->second.ExpireTime )
+			return false;
+		else
+			m_cooldownMap[COOLDOWN_TYPE_SPELL].erase( itr );
+	}
+
+	return true;
+}
+
+#define COOLDOWN_SKIP_SAVE_IF_MS_LESS_THAN 10000
+
+void Player::_SavePlayerCooldowns(QueryBuffer * buf)
+{
+	PlayerCooldownMap::iterator itr;
+	PlayerCooldownMap::iterator itr2;
+	uint32 i;
+	uint32 seconds;
+	uint32 mstime = getMSTime();
+
+	// clear them (this should be replaced with an update queue later)
+	buf->AddQuery("DELETE FROM playercooldowns WHERE player_guid = %u", m_uint32Values[OBJECT_FIELD_GUID] );		// 0 is guid always
+
+	for( i = 0; i < NUM_COOLDOWN_TYPES; ++i )
+	{
+		itr = m_cooldownMap[i].begin( );
+		for( ; itr != m_cooldownMap[i].end( ); )
+		{
+			itr2 = itr++;
+
+			// expired ones - no point saving, nor keeping them around, wipe em
+			if( mstime >= itr2->second.ExpireTime )
+			{
+				m_cooldownMap[i].erase( itr2 );
+				continue;
+			}
+			
+			// skip small cooldowns which will end up expiring by the time we log in anyway
+			if( ( itr2->second.ExpireTime - mstime ) < COOLDOWN_SKIP_SAVE_IF_MS_LESS_THAN )
+				continue;
+
+			// work out the cooldown expire time in unix timestamp format
+			// burlex's reason: 30 day overflow of 32bit integer, also
+			// under windows we use GetTickCount() which is the system uptime, if we reboot
+			// the server all these timestamps will appear to be messed up.
+			
+			seconds = (itr2->second.ExpireTime - mstime) / 1000;
+			// this shouldnt ever be nonzero because of our check before, so no check needed
+			
+			buf->AddQuery( "INSERT INTO playercooldowns VALUES(%u, %u, %u, %u, %u, %u)", m_uint32Values[OBJECT_FIELD_GUID],
+				i, itr2->first, seconds + (uint32)UNIXTIME, itr2->second.SpellId, itr2->second.ItemId );
+		}
+	}
+}
+
+void Player::_LoadPlayerCooldowns(QueryResult * result)
+{
+	if( result == NULL )
+		return;
+
+	// we should only really call getMSTime() once to avoid user->system transitions, plus
+	// the cost of calling a function for every cooldown the player has
+	uint32 mstime = getMSTime();
+	uint32 type;
+	uint32 misc;
+	uint32 rtime;
+	uint32 realtime;
+	uint32 itemid;
+	uint32 spellid;
+	PlayerCooldown cd;
+
+	do 
+	{
+		type = result->Fetch()[0].GetUInt32();
+		misc = result->Fetch()[1].GetUInt32();
+		rtime = result->Fetch()[2].GetUInt32();
+		spellid = result->Fetch()[3].GetUInt32();
+		itemid = result->Fetch()[4].GetUInt32();
+
+		if( type >= NUM_COOLDOWN_TYPES )
+			continue;
+
+		// remember the cooldowns were saved in unix timestamp format for the reasons outlined above,
+		// so restore them back to mstime upon loading
+		rtime -= (uint32)UNIXTIME;
+
+		if( rtime < 10 )
+			continue;
+
+		realtime = mstime + ( ( rtime ) * 1000 );
+
+		// apply it back into cooldown map
+		cd.ExpireTime = realtime;
+		cd.ItemId = itemid;
+		cd.SpellId = spellid;
+		m_cooldownMap[type].insert( make_pair( misc, cd ) );
+
+	} while ( result->NextRow( ) );
 }

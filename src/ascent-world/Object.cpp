@@ -1840,7 +1840,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			if( !self_res_spell && static_cast< Player* >( pVictim )->bReincarnation )
 			{
 				SpellEntry* m_reincarnSpellInfo = dbcSpell.LookupEntry( 20608 );
-				if( static_cast< Player* >( pVictim )->CanCastDueToCooldown( m_reincarnSpellInfo ) )
+				if( static_cast< Player* >( pVictim )->Cooldown_CanCast( m_reincarnSpellInfo ) )
 				{
 					uint32 ankh_count = static_cast< Player* >( pVictim )->GetItemInterface()->GetItemCount( 17030 );
 					if( ankh_count )

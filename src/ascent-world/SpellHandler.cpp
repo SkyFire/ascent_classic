@@ -131,10 +131,10 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		return;
 	}		
 
-	if(itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown)
+	if( !_player->Cooldown_CanCast( itemProto, x ) )
 	{
-		if(!_player->CanCastItemDueToCooldown(itemProto, x))	// damn cheaters
-			return;
+		_player->SendCastResult(spellInfo->Id, SPELL_FAILED_NOT_READY, cn, 0);
+		return;
 	}
 
 	if(_player->m_currentSpell)
@@ -150,29 +150,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	//GetPlayer()->setCurrentSpell(spell);
 	result = spell->prepare(&targets);
 
-	if( ( itemProto->Spells[x].Cooldown || itemProto->Spells[x].CategoryCooldown ) && result == SPELL_CANCAST_OK )
-	{
-		ItemCooldown * item = new ItemCooldown;
-	   	if(itemProto->Spells[x].Id)
-		{
-			if(itemProto->Spells[x].Trigger == USE)
-			{
-				item->ItemEntry = itemProto->ItemId;
-				item->SpellID = spellId;
-				item->SpellCategory = itemProto->Spells[x].Category;
-				if(itemProto->Spells[x].Category)
-				{
-					item->Cooldown = itemProto->Spells[x].CategoryCooldown;
-					item->CooldownTimeStamp = now() + itemProto->Spells[x].CategoryCooldown;
-				}
-				else
-				{
-					item->Cooldown = itemProto->Spells[x].Cooldown;
-					item->CooldownTimeStamp = now() + itemProto->Spells[x].Cooldown;
-				}
-			}
-		}
-	}
+	if( result == SPELL_CANCAST_OK )
+		_player->Cooldown_AddItem( itemProto, x );
 }
 
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)

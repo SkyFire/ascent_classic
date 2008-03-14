@@ -1141,74 +1141,13 @@ void Spell::cancel()
 void Spell::AddCooldown()
 {
 	if( p_caster != NULL )
-	{
-		int32 cooltime = m_spellInfo->RecoveryTime;
-		if(cooltime && m_spellInfo->SpellGroupType)
-		{
-			SM_FIValue(u_caster->SM_FCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-			SM_PIValue(u_caster->SM_PCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			int spell_flat_modifers=0;
-			int spell_pct_modifers=0;
-			SM_FIValue(u_caster->SM_FCooldownTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_FIValue(u_caster->SM_PCooldownTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-				printf("!!!!!spell cooldown mod flat %d , spell cooldown mod pct %d , spell cooldown %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cooltime,m_spellInfo->SpellGroupType);
-#endif
-		}
-
-		if(cooltime > 0)
-			p_caster->AddCooldown(m_spellInfo->Id,cooltime);
-
-		cooltime = m_spellInfo->CategoryRecoveryTime;
-		if(cooltime && m_spellInfo->SpellGroupType)
-		{
-			SM_FIValue(u_caster->SM_FCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-			SM_PIValue(u_caster->SM_PCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-		}
-
-		if(cooltime > 0)
-			p_caster->AddCategoryCooldown(m_spellInfo->Category,cooltime);
-	}
+		p_caster->Cooldown_Add( m_spellInfo, i_caster );
 }
 
-// grep please speak with me about this function
-// there are possible expliots
 void Spell::AddStartCooldown()
 {
 	if( p_caster != NULL )
-	{
-		int32 cooltime = m_spellInfo->StartRecoveryTime;
-		if(cooltime && m_spellInfo->SpellGroupType)
-		{
-			SM_FIValue(u_caster->SM_FCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-			SM_PIValue(u_caster->SM_PCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			int spell_flat_modifers=0;
-			int spell_pct_modifers=0;
-			SM_FIValue(u_caster->SM_FCooldownTime,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_FIValue(u_caster->SM_PCooldownTime,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-				printf("!!!!!spell cooldown mod flat %d , spell cooldown mod pct %d , spell cooldown %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,cooltime,m_spellInfo->SpellGroupType);
-#endif
-		}
-
-		if(cooltime > 0)
-			p_caster->AddCooldown(m_spellInfo->Id,cooltime);
-
-		cooltime = m_spellInfo->StartRecoveryCategory;
-		if(cooltime && m_spellInfo->SpellGroupType)
-		{
-			SM_FIValue(u_caster->SM_FCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-			SM_PIValue(u_caster->SM_PCooldownTime, &cooltime, m_spellInfo->SpellGroupType);
-		}
-
-		if(cooltime > 0)
-			p_caster->AddCategoryCooldown(m_spellInfo->Category,cooltime);
-
-		// add spell recover cooldown for visual stuff
-		p_caster->AddRecoverCooldown(m_spellInfo);
-	}
+		p_caster->Cooldown_AddStart( m_spellInfo );
 }
 
 void Spell::cast(bool check)
@@ -2646,7 +2585,7 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 
 		// check for cooldowns
-		if(!tolerate && !p_caster->CanCastDueToCooldown(m_spellInfo))
+		if(!tolerate && !p_caster->Cooldown_CanCast(m_spellInfo))
 				return SPELL_FAILED_NOT_READY;
 
 		if(p_caster->GetDuelState() == DUEL_STATE_REQUESTED)
