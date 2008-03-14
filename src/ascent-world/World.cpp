@@ -1354,6 +1354,8 @@ bool World::SetInitialWorldSettings()
 						pr|=PROC_ON_RESIST_VICTIM;
 					if( strstr( desc,"Your Shadow Word: Pain, Mind Flay and Vampiric Touch spells also cause the target"))
 						pr|=PROC_ON_CAST_SPELL;
+					if( strstr( desc,"chance on spell hit"))
+						pr|=PROC_ON_CAST_SPELL;
 					if( strstr( desc,"your melee and ranged attacks"))
 						pr|=PROC_ON_MELEE_ATTACK|PROC_ON_RANGED_ATTACK;
 //					if( strstr( desc,"chill effect to your Blizzard"))
