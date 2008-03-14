@@ -133,21 +133,24 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 					toadd.push_back(*itr);
 			}
 
-			uint32 pts = Points / (uint32)toadd.size();
-			for(vector<Player*>::iterator vtr = toadd.begin(); vtr != toadd.end(); ++vtr)
+			if( toadd.size() > 0 )
 			{
-				AddHonorPointsToPlayer(*vtr, pts);
-
-				(*vtr)->m_killsToday++;
-				(*vtr)->m_killsLifetime++;
-				pPlayer->m_bg->HookOnHK(*vtr);
-				if(pVictim)
+				uint32 pts = Points / (uint32)toadd.size();
+				for(vector<Player*>::iterator vtr = toadd.begin(); vtr != toadd.end(); ++vtr)
 				{
-					// Send PVP credit
-					WorldPacket data(SMSG_PVP_CREDIT, 12);
-					uint32 pvppoints = pts * 10;
-					data << pvppoints << pVictim->GetGUID() << uint32(static_cast< Player* >(pVictim)->GetPVPRank());
-					(*vtr)->GetSession()->SendPacket(&data);
+					AddHonorPointsToPlayer(*vtr, pts);
+
+					(*vtr)->m_killsToday++;
+					(*vtr)->m_killsLifetime++;
+					pPlayer->m_bg->HookOnHK(*vtr);
+					if(pVictim)
+					{
+						// Send PVP credit
+						WorldPacket data(SMSG_PVP_CREDIT, 12);
+						uint32 pvppoints = pts * 10;
+						data << pvppoints << pVictim->GetGUID() << uint32(static_cast< Player* >(pVictim)->GetPVPRank());
+						(*vtr)->GetSession()->SendPacket(&data);
+					}
 				}
 			}
 
