@@ -597,6 +597,7 @@ bool World::SetInitialWorldSettings()
 		// get spellentry
 		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
 		sp->self_cast_only = false;
+		sp->apply_on_shapeshift_change = false;
 
 		// hash the name
 		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
@@ -730,6 +731,10 @@ bool World::SetInitialWorldSettings()
 				break;
 			}
 		}
+
+		// apply on shapeshift change
+		if( sp->NameHash == SPELL_HASH_TRACK_HUMANOIDS )
+			sp->apply_on_shapeshift_change = true;
 
 		//there are some spells that change the "damage" value of 1 effect to another : devastate = bonus first then damage
 		//this is a total bullshit so remove it when spell system supports effect overwriting

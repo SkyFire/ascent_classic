@@ -216,12 +216,9 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 				{
 					_player->removeSpell(respellid, false, false, 0);
 					_player->RemoveAura(respellid);
-					if(_player->m_SSSPecificSpells.size())
-						_player->m_SSSPecificSpells.erase(respellid);
-
 				}
-
 			}
+
 			if( (spellInfo->Attributes & ATTRIBUTES_PASSIVE || (spellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL ||
 															   spellInfo->Effect[1] == SPELL_EFFECT_LEARN_SPELL ||
 															   spellInfo->Effect[2] == SPELL_EFFECT_LEARN_SPELL) 
@@ -232,14 +229,6 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 				SpellCastTargets tgt;
 				tgt.m_unitTarget=_player->GetGUID();
 				sp->prepare(&tgt);
-				
-				
-				if(spellInfo->RequiredShapeShift && (_player->getClass()==DRUID || _player->getClass()==WARRIOR))
-				{		
-					if(spellInfo->Attributes & 64)//add for further cast
-						_player->m_SSSPecificSpells.insert(spellInfo->Id);
-				}
-
 			}
 
 			_player->SetUInt32Value(PLAYER_CHARACTER_POINTS1, CurTalentPoints-1);

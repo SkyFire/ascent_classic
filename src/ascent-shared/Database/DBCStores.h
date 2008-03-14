@@ -366,6 +366,7 @@ struct SpellEntry
 	float OTspell_coef_override;							//!!! CUSTOM, overrides any spell coefficient calculation and use this value in HOT&DOT
 
 	bool self_cast_only;
+	bool apply_on_shapeshift_change;
 };
 
 struct ItemExtendedCostEntry

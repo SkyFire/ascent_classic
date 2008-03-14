@@ -1749,45 +1749,7 @@ void Aura::SpellAuraDummy(bool apply)
 				}
 			}
 		}break;*/
-	case 17007: //Druid:Leader of the Pack
-		{
-			if( !m_target->IsPlayer() )
-				return;
-			Player* pTarget = static_cast< Player* >( m_target );
-			if (apply)
-			{
-				SSAura* aura = NULL;
-				for( set<SSAura*>::iterator itr = pTarget->m_ssAuras.begin(); itr != pTarget->m_ssAuras.end(); ++itr )
-				{
-					if( (*itr)->spellid == 24932 )
-						aura = *itr;
-				}
 
-				if( aura == NULL )
-				{
-					aura = new SSAura();
-					static_cast< Player* >(pTarget)->m_ssAuras.insert(aura);
-				}
-
-				aura->spellid = 24932;
-				aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
-			}
-			else 
-			{
-				set<SSAura*>::iterator itr, itr2;
-				for( itr = pTarget->m_ssAuras.begin(); itr != pTarget->m_ssAuras.end(); )
-				{
-					itr2 = itr;
-					++itr;
-
-					if( (*itr2)->spellid == 24932 )
-					{
-						delete (*itr2);
-						pTarget->m_ssAuras.erase( itr2 );
-					}
-				}
-			}
-		}break;
 	case 740:
 	case 8918:
 	case 9862:
@@ -1849,6 +1811,17 @@ void Aura::SpellAuraDummy(bool apply)
 			pTarget->m_bg->RemovePlayerFromResurrect(pTarget,pCreature);
 		}break;
 
+	case 17007: //Druid:Leader of the Pack
+		{
+			if( !m_target->IsPlayer() )
+				return;
+
+			Player * pTarget = ((Player*)m_target);
+			if( apply )
+				pTarget->AddShapeShiftSpell( 24932 );
+			else
+				pTarget->RemoveShapeShiftSpell( 24932 );
+		}break;
 	}
 }
 
@@ -3132,91 +3105,6 @@ void Aura::SpellAuraModIncreaseSpeed(bool apply)
 		m_target->m_speedModifier -= mod->m_amount;
 
 	m_target->UpdateSpeed();
-
-	switch (this->GetSpellId())
-	{
-	case 24866: //Feral Swiftness
-		if (!m_target->IsPlayer())
-			break;
-		{
-			Player* pTarget = static_cast< Player* >( m_target );
-			if (apply)
-			{
-				SSAura* aura = NULL;
-				for( set<SSAura*>::iterator itr = pTarget->m_ssAuras.begin(); itr != pTarget->m_ssAuras.end(); ++itr )
-				{
-					if( (*itr)->spellid == 24864 )
-						aura = *itr;
-				}
-
-				if( aura == NULL )
-				{
-					aura = new SSAura();
-					static_cast< Player* >(pTarget)->m_ssAuras.insert(aura);
-				}
-
-				aura->spellid = 24864;
-				aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
-			}
-			else 
-			{
-				set<SSAura*>::iterator itr, itr2;
-				for( itr = pTarget->m_ssAuras.begin(); itr != pTarget->m_ssAuras.end(); )
-				{
-					itr2 = itr;
-					++itr;
-
-					if( (*itr2)->spellid == 24864 )
-					{
-						delete (*itr2);
-						pTarget->m_ssAuras.erase( itr2 );
-					}
-				}
-			}
-		}
-		break;
-	case 17002: //Feral Swiftness
-		if (!m_target->IsPlayer())
-			break;
-		{
-			Player* pTarget = static_cast< Player* >( m_target );
-			if (apply)
-			{
-				SSAura* aura = NULL;
-				for( set<SSAura*>::iterator itr = pTarget->m_ssAuras.begin(); itr != pTarget->m_ssAuras.end(); ++itr )
-				{
-					if( (*itr)->spellid == 24867 )
-						aura = *itr;
-				}
-
-				if( aura == NULL )
-				{
-					aura = new SSAura();
-					static_cast< Player* >(pTarget)->m_ssAuras.insert(aura);
-				}
-
-				aura->spellid = 24867;
-				aura->forms = FORM_BEAR | FORM_DIREBEAR | FORM_CAT;
-			}
-			else 
-			{
-				set<SSAura*>::iterator itr, itr2;
-				for( itr = pTarget->m_ssAuras.begin(); itr != pTarget->m_ssAuras.end(); )
-				{
-					itr2 = itr;
-					++itr;
-
-					if( (*itr2)->spellid == 24867 )
-					{
-						delete (*itr2);
-						pTarget->m_ssAuras.erase( itr2 );
-					}
-				}
-			}
-		}
-		break;
-
-	}
 }
 
 void Aura::SpellAuraModIncreaseMountedSpeed(bool apply)

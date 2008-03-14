@@ -403,13 +403,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 
 void Player::OnLogin()
 {
-	if (this->getClass() == DRUID)
-	{
-		SSAura* aura = new SSAura();
-		aura->spellid = 24907;
-		aura->forms = FORM_MOONKIN;
-		this->m_ssAuras.insert(aura);
-	}
+
 }
 
 
@@ -488,9 +482,6 @@ Player::~Player ( )
 
 	if(m_playerInfo)
 		m_playerInfo->m_loggedInPlayer=NULL;
-
-	for(set<SSAura*>::iterator itr = m_ssAuras.begin(); itr != m_ssAuras.end(); ++itr)
-		delete (*itr);
 
 	if(m_Summon)
 	{
@@ -3557,8 +3548,6 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 						SpellCastTargets targets;
 						targets.m_unitTarget = this->GetGUID();
 						spell->prepare( &targets );
-						if( info->RequiredShapeShift && (getClass() == DRUID || getClass() == WARRIOR ) )
-							m_SSSPecificSpells.insert(info->Id);
 					}
 				}
 			}
@@ -3576,8 +3565,6 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 				if( Set->itemscount == set->itemscount[x] )
 				{
 					this->RemoveAura( set->SpellID[x], GetGUID() );
-					if( m_SSSPecificSpells.size() )
-							m_SSSPecificSpells.erase( set->SpellID[x] );
 				}
 	   
 				if(!(--Set->itemscount))
@@ -3689,8 +3676,6 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 				targets.m_unitTarget = this->GetGUID();
 				spell->castedItemId = item->GetEntry();
 				spell->prepare( &targets );
-				if( spells->RequiredShapeShift && ( getClass() == DRUID || getClass() == WARRIOR ) )
-					m_SSSPecificSpells.insert( spells->Id );
 
 			}
 			else if( item->GetProto()->Spells[k].Trigger == 2 )
@@ -3715,10 +3700,6 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 			if( item->GetProto()->Spells[k].Trigger == 1 )
 			{
 				this->RemoveAura( item->GetProto()->Spells[k].Id ); 
-				if( m_SSSPecificSpells.size() )
-				{
-					m_SSSPecificSpells.erase( item->GetProto()->Spells[k].Id );
-				}
 			}
 			else if( item->GetProto()->Spells[k].Trigger == 2 )
 			{
@@ -5972,7 +5953,6 @@ void Player::Reset_Talents()
 		{
 			if (tmpTalent->RankID[j] != 0)
 			{
-				m_SSSPecificSpells.erase(tmpTalent->RankID[j]);
 				SpellEntry *spellInfo;
 				spellInfo = dbcSpell.LookupEntry( tmpTalent->RankID[j] );
 				if(spellInfo)
@@ -8073,10 +8053,14 @@ void Player::CompleteLoading()
 			&& !( info->c_is_flags & SPELL_FLAG_IS_EXPIREING_WITH_PET ) //on pet summon talents
 			 ) 
 		{
+			if( info->RequiredShapeShift )
+			{
+				if( !( ((uint32)1 << (GetShapeShift()-1)) & info->RequiredShapeShift ) )
+					continue;
+			}
+
 			Spell * spell=new Spell(this,info,true,NULL);
 			spell->prepare(&targets);
-			if(info->RequiredShapeShift && (getClass()==DRUID || getClass()==WARRIOR))
-				m_SSSPecificSpells.insert(info->Id);
 		}
 	}
 
@@ -8520,50 +8504,38 @@ void Player::SetShapeShift(uint8 ss)
 		} 
 	}
 
-	if(m_SSSPecificSpells.size())
-	{//recalc modifiers
-		std::set<uint32>::iterator i;
-		for(i=m_SSSPecificSpells.begin();i!=m_SSSPecificSpells.end();i++)
+	// apply any talents/spells we have that apply only in this form.
+	set<uint32>::iterator itr;
+	SpellEntry * sp;
+	Spell * spe;
+	SpellCastTargets t(GetGUID());
+
+	for( itr = mSpells.begin(); itr != mSpells.end(); ++itr )
+	{
+		sp = dbcSpell.LookupEntry( *itr );
+		if( sp->apply_on_shapeshift_change || sp->Attributes & 64 )		// passive/talent
 		{
-			uint32 SpellId = *i;
-			if(this->FindAura(SpellId))
-				continue;
-			SpellEntry* spells = dbcSpell.LookupEntry(SpellId);
-			Spell *spell = new Spell(this, spells ,true,NULL);
-			SpellCastTargets targets;
-			targets.m_unitTarget = this->GetGUID();
-			spell->prepare(&targets);		   
+			if( sp->RequiredShapeShift && ((uint32)1 << (ss-1)) & sp->RequiredShapeShift )
+			{
+				spe = new Spell( this, sp, true, NULL );
+				spe->prepare( &t );
+			}
 		}
 	}
 
-	//Add some specific forms auras
-	if (m_ssAuras.size() && ss)
+	// now dummy-handler stupid hacky fixed shapeshift spells (leader of the pack, etc)
+	for( itr = mShapeShiftSpells.begin(); itr != mShapeShiftSpells.end(); ++itr )
 	{
-		std::set<SSAura*>::iterator i;
-		for(i=m_ssAuras.begin();i!=m_ssAuras.end();i++)
+		sp = dbcSpell.LookupEntry( *itr );
+		if( sp->RequiredShapeShift && ((uint32)1 << (ss-1)) & sp->RequiredShapeShift )
 		{
-			SSAura* aura = *i;
-			if(aura)
-			{
-				if (!(ss &= aura->forms )) // Not in required form
-				{
-					this->RemoveAura(aura->spellid);
-				}
-				else //in required form
-				{
-					SpellEntry* spe = dbcSpell.LookupEntry(aura->spellid);
-					if (!spe)
-					return;
-					Spell *spell = new Spell(this, spe ,true,NULL);
-					SpellCastTargets targets;
-					targets.m_unitTarget = this->GetGUID();
-					spell->prepare(&targets);	
-				}
-			}
+			spe = new Spell( this, sp, true, NULL );
+			spe->prepare( &t );
 		}
-		UpdateStats();
-		UpdateChances();
 	}
+
+	UpdateStats();
+	UpdateChances();
 }
 
 void Player::CalcDamage()
@@ -9965,3 +9937,22 @@ void Player::EventDumpCompressedMovement()
 	m_movementBuffer.clear();
 }
 #endif
+
+void Player::AddShapeShiftSpell(uint32 id)
+{
+	SpellEntry * sp = dbcSpell.LookupEntry( id );
+	mShapeShiftSpells.insert( id );
+
+	if( sp->RequiredShapeShift && ((uint32)1 << (GetShapeShift()-1)) & sp->RequiredShapeShift )
+	{
+		Spell * spe = new Spell( this, sp, true, NULL );
+		SpellCastTargets t(this->GetGUID());
+		spe->prepare( &t );
+	}
+}
+
+void Player::RemoveShapeShiftSpell(uint32 id)
+{
+	mShapeShiftSpells.erase( id );
+	RemoveAura( id );
+}
