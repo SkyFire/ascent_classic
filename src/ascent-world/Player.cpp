@@ -6369,8 +6369,23 @@ void Player::ClearCooldownForSpell(uint32 spell_id)
 	GetSession()->SendPacket(&data);
 
 	// remove cooldown data from Server side lists
+	uint32 i;
+	PlayerCooldownMap::iterator itr, itr2;
 	SpellEntry * spe = dbcSpell.LookupEntry(spell_id);
 	if(!spe) return;
+
+	for(i = 0; i < NUM_COOLDOWN_TYPES; ++i)
+	{
+		for( itr = m_cooldownMap[i].begin(); itr != m_cooldownMap[i].end(); )
+		{
+			itr2 = itr++;
+			if( ( i == COOLDOWN_TYPE_CATEGORY && itr2->first == spe->Category ) ||
+				( i == COOLDOWN_TYPE_SPELL && itr2->first == spe->Id ) )
+			{
+				m_cooldownMap[i].erase( itr2 );
+			}
+		}
+	}
 }
 
 void Player::ClearCooldownsOnLine(uint32 skill_line, uint32 called_from)
