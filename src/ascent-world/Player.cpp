@@ -9745,7 +9745,10 @@ void Player::_SavePlayerCooldowns(QueryBuffer * buf)
 	uint32 mstime = getMSTime();
 
 	// clear them (this should be replaced with an update queue later)
-	buf->AddQuery("DELETE FROM playercooldowns WHERE player_guid = %u", m_uint32Values[OBJECT_FIELD_GUID] );		// 0 is guid always
+	if( buf != NULL )
+		buf->AddQuery("DELETE FROM playercooldowns WHERE player_guid = %u", m_uint32Values[OBJECT_FIELD_GUID] );		// 0 is guid always
+	else
+		CharacterDatabase.Execute("DELETE FROM playercooldowns WHERE player_guid = %u", m_uint32Values[OBJECT_FIELD_GUID] );		// 0 is guid always
 
 	for( i = 0; i < NUM_COOLDOWN_TYPES; ++i )
 	{
@@ -9773,8 +9776,16 @@ void Player::_SavePlayerCooldowns(QueryBuffer * buf)
 			seconds = (itr2->second.ExpireTime - mstime) / 1000;
 			// this shouldnt ever be nonzero because of our check before, so no check needed
 			
-			buf->AddQuery( "INSERT INTO playercooldowns VALUES(%u, %u, %u, %u, %u, %u)", m_uint32Values[OBJECT_FIELD_GUID],
-				i, itr2->first, seconds + (uint32)UNIXTIME, itr2->second.SpellId, itr2->second.ItemId );
+			if( buf != NULL )
+			{
+				buf->AddQuery( "INSERT INTO playercooldowns VALUES(%u, %u, %u, %u, %u, %u)", m_uint32Values[OBJECT_FIELD_GUID],
+					i, itr2->first, seconds + (uint32)UNIXTIME, itr2->second.SpellId, itr2->second.ItemId );
+			}
+			else
+			{
+				CharacterDatabase.Execute( "INSERT INTO playercooldowns VALUES(%u, %u, %u, %u, %u, %u)", m_uint32Values[OBJECT_FIELD_GUID],
+					i, itr2->first, seconds + (uint32)UNIXTIME, itr2->second.SpellId, itr2->second.ItemId );
+			}
 		}
 	}
 }
