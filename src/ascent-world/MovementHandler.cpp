@@ -476,6 +476,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 				_player->RemoveStealth(); // Fall Damage will cause stealthed units to lose stealth. 
 			}
+			_player->z_axisposition = 0.0f;
 		}
 		else
 			//whilst player is not falling, continuosly update Z axis position.

@@ -398,6 +398,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	_heartbeatDisable = 0;
 	m_safeFall = 0;
 	m_noFallDamage = false;
+	z_axisposition = 0.0f;
 }
 
 void Player::OnLogin()
@@ -3137,6 +3138,8 @@ void Player::OnPushToWorld()
 
 	if( m_bg != NULL )
 		m_bg->OnPlayerPushed( this );
+
+	z_axisposition = 0.0f;
 }
 
 void Player::ResetHeartbeatCoords()
