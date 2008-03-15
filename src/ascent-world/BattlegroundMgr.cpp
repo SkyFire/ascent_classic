@@ -56,6 +56,17 @@ const static CreateBattlegroundFunc BGCFuncs[BATTLEGROUND_NUM_TYPES] = {
 #endif
 };
 
+const static uint32 BGMinimumPlayers[BATTLEGROUND_NUM_TYPES] = {
+	0,							// 0
+	0,							// AV
+	5,							// WSG
+	5,							// AB
+	2,							// 2v2
+	3,							// 3v3
+	5,							// 5v5
+	5,							// Netherstorm
+};
+
 CBattlegroundManager::CBattlegroundManager() : EventableObject()
 {
 	m_maxBattlegroundId = 0;
@@ -278,7 +289,7 @@ void CBattlegroundManager::EventQueueUpdate()
 			if(IS_ARENA(i))
 			{
 				// enough players to start a round?
-				if(tempPlayerVec[0].size() < 2)
+				if(tempPlayerVec[0].size() < BGMinimumPlayers[i])
 					continue;
 
 				if(CanCreateInstance(i,j))
@@ -302,11 +313,11 @@ void CBattlegroundManager::EventQueueUpdate()
 			else
 			{
 #ifdef ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
-				if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG ||
-					tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
+				if(tempPlayerVec[0].size() >= 1 ||
+					tempPlayerVec[1].size() >= 1)
 #else
-				if(tempPlayerVec[0].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG &&
-					tempPlayerVec[1].size() >= MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG)
+				if(tempPlayerVec[0].size() >= BGMinimumPlayers[i] &&
+					tempPlayerVec[1].size() >= BGMinimumPlayers[i])
 #endif
 				{
 					if(CanCreateInstance(i,j))
