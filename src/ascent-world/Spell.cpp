@@ -2572,6 +2572,9 @@ uint8 Spell::CanCast(bool tolerate)
 				return SPELL_FAILED_ONLY_OUTDOORS;
 		}
 #endif
+		//are we in an arena and the spell cooldown is longer then 15mins?
+		if ( p_caster->m_bg && ( p_caster->m_bg->GetType() >= BATTLEGROUND_ARENA_2V2 && p_caster->m_bg->GetType() <= BATTLEGROUND_ARENA_5V5 ) && ( m_spellInfo->RecoveryTime >= 900000 || m_spellInfo->CategoryRecoveryTime >= 900000 ) )
+			return SPELL_FAILED_SPELL_UNAVAILABLE;
 
 		// backstab/ambush
 		if( m_spellInfo->NameHash == SPELL_HASH_BACKSTAB || m_spellInfo->NameHash == SPELL_HASH_AMBUSH )
