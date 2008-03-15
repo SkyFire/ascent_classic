@@ -433,57 +433,55 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/* Falling damage checks                                                */
 	/************************************************************************/
 
-	if( movement_info.flags & MOVEFLAG_REDIRECTED && !( movement_info.flags & MOVEFLAG_FALLING ) )
+	if( _player->blinked )
 	{
-		//_player->blinked = true; //disabled cause i dont see how moveflag redirected is related to blink since its triggered even without blink
+		_player->blinked = false;
+		_player->m_fallDisabledUntil = UNIXTIME + 5;
+		_player->ResetHeartbeatCoords();
 	}
 	else
 	{
-		if( _player->blinked )
+		if( recv_data.GetOpcode() == MSG_MOVE_FALL_LAND )
 		{
-			_player->blinked = false;
-			_player->m_fallDisabledUntil = UNIXTIME + 5;
-			_player->ResetHeartbeatCoords();
-		}
-		else
-		{
-			if( recv_data.GetOpcode() == MSG_MOVE_FALL_LAND )
+			// player has finished falling
+			//if _player->z_axisposition contains no data then set to current position
+			if( !_player->z_axisposition )
+				_player->z_axisposition = movement_info.z;
+
+			// calculate distance fallen
+			uint32 falldistance = float2int32( _player->z_axisposition - movement_info.z );
+
+			/*if player is a rogue or druid(in cat form), then apply -17 modifier to fall distance.
+			these checks need improving, low level rogue/druid should not receive this benefit*/
+			if( ( _player->getClass() == ROGUE ) || ( _player->GetShapeShift() == FORM_CAT ) )
 			{
-				// just landed after falling
-				if( _player->isAlive() && !_player->GodModeCheat && movement_info.FallTime > 0 )
-				{
-					/* The Rogue passive ability Safe Fall applies a -17 modifier to fall damage. */
-					/* so we must multiply this number by 100 to get the safe fall bonus in seconds */
-					/* edit: this bonus seems a little high. let's make it * 100 / 3 (* 33.33 for faster performance) */
+				if( falldistance > 17 ) 
+					falldistance -=17;
+				else
+					falldistance = 1;
+			}
 
-					uint32 safe_fall_time = (_player->m_safeFall < 0) ? 0 : (uint32)_player->m_safeFall * 25;
-					if( safe_fall_time < movement_info.FallTime )
-					{
-						/* subtract the safe full time */
-						movement_info.FallTime -= safe_fall_time;
-						if( movement_info.FallTime >= 1100 )
-						{
-							// 25% damage per second of falling
-							uint32 health_loss = float2int32( ( float( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) ) / 4.0f ) * 
-																( float( movement_info.FallTime ) / 1000.0f ) );
-							
-							if( health_loss >= _player->GetUInt32Value( UNIT_FIELD_HEALTH ) )
-								health_loss = _player->GetUInt32Value( UNIT_FIELD_HEALTH );
-							
-							_player->SendEnvironmentalDamageLog( _player->GetGUID(), DAMAGE_FALL, health_loss );
-							_player->DealDamage( _player, health_loss, 0, 0, 0 );
+			//checks that player has fallen more than 12 units, otherwise no damage will be dealt
+			//falltime check is also needed here, otherwise sudden changes in Z axis position, such as using !recall, may result in death			
+			if( _player->isAlive() && !_player->GodModeCheat && falldistance > 12 && ( UNIXTIME >= _player->m_fallDisabledUntil ) && movement_info.FallTime > 1000 )
+			{
+				// 1.7% damage for each unit fallen on Z axis over 13
+				uint32 health_loss = float2int32( float( _player->GetUInt32Value( UNIT_FIELD_MAXHEALTH ) * ( ( falldistance - 12 ) * 0.017 ) ) );
+													
+				if( health_loss >= _player->GetUInt32Value( UNIT_FIELD_HEALTH ) )
+					health_loss = _player->GetUInt32Value( UNIT_FIELD_HEALTH );
 
-							/*
-							Fall damage is environmental damage inflicted upon a player when he falls from a certain height. Death caused by fall damage causes the same 10% durability loss to equipment as a normal PvE death.
-							Fall Damage will cause stealthed units to lose stealth. 
-							*/
-							_player->RemoveStealth();
-						}
-					}
-				}
-				movement_info.FallTime = 0;
+				_player->SendEnvironmentalDamageLog( _player->GetGUID(), DAMAGE_FALL, health_loss );
+				_player->DealDamage( _player, health_loss, 0, 0, 0 );
+
+				_player->RemoveStealth(); // Fall Damage will cause stealthed units to lose stealth. 
 			}
 		}
+		else
+			//whilst player is not falling, continuosly update Z axis position.
+			//once player lands this will be used to determine how far he fell.
+			if( !( movement_info.flags & MOVEFLAG_FALLING ) )
+				_player->z_axisposition = movement_info.z;
 	}
 
 	/************************************************************************/
@@ -567,7 +565,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		}
 
 		if( !_player->_heartbeatDisable && ( !_player->blinked/* || _player->m_redirectCount > 5*/ ) &&
-			!_player->m_uint32Values[UNIT_FIELD_CHARM] && _player->m_TransporterGUID == 0 && !( movement_info.flags & MOVEFLAG_FULL_FALLING_MASK ) )
+			!_player->m_uint32Values[UNIT_FIELD_CHARM] && _player->m_TransporterGUID == 0 && !( movement_info.flags & 0x6000 ) )
 		{
 			if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
 			{

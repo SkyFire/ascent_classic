@@ -1205,6 +1205,7 @@ public:
 	void ApplyPlayerRestState(bool apply);
 	void UpdateRestState();
 	bool m_noFallDamage;
+	float z_axisposition;
 	int32 m_safeFall;
 	// Gossip
 	GossipMenu* CurrentGossipMenu;

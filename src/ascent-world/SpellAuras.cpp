@@ -2830,6 +2830,24 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 		if(m_casterGuid == pTarget->GetGUID())
 			return;
 
+	// set up our max Range
+	float maxRange = GetMaxRange( dbcSpellRange.LookupEntry( spellInfo->rangeIndex ) );
+
+	if( spellInfo->SpellGroupType )
+	{
+		SM_FFValue( m_caster->SM_FRange, &maxRange, spellInfo->SpellGroupType );
+		SM_PFValue( m_caster->SM_PRange, &maxRange, spellInfo->SpellGroupType );
+	}
+
+	if( m_caster->IsStunned() || m_caster->IsFeared() || m_caster->GetDistance2dSq( pTarget ) > ( maxRange*maxRange ) )
+	{
+		// no longer valid
+		SendInterrupted(SPELL_FAILED_INTERRUPTED, m_caster);
+		SendChannelUpdate(0, m_caster);
+		this->Remove();
+		return;
+	}
+
 	Spell *spell = new Spell(m_caster, spellInfo, true, this);
 	SpellCastTargets targets;
 	targets.m_unitTarget = pTarget->GetGUID();
