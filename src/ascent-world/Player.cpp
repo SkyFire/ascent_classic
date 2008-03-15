@@ -9627,12 +9627,31 @@ void Player::_Cooldown_Add(uint32 Type, uint32 Misc, uint32 Time, uint32 SpellId
 void Player::Cooldown_Add(SpellEntry * pSpell, Item * pItemCaster)
 {
 	uint32 mstime = getMSTime();
+	int32 cool_time;
 
 	if( pSpell->CategoryRecoveryTime > 0 && pSpell->Category )
-		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->Category, mstime + pSpell->CategoryRecoveryTime, pSpell->Id, pItemCaster ? pItemCaster->GetProto()->ItemId : 0 );
+	{
+		cool_time = pSpell->CategoryRecoveryTime;
+		if( pSpell->SpellGroupType )
+		{
+			SM_FIValue(SM_FCooldownTime, &cool_time, pSpell->SpellGroupType);
+			SM_PIValue(SM_PCooldownTime, &cool_time, pSpell->SpellGroupType);
+		}
+
+		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->Category, mstime + cool_time, pSpell->Id, pItemCaster ? pItemCaster->GetProto()->ItemId : 0 );
+	}
 	
 	if( pSpell->RecoveryTime > 0 )
-		_Cooldown_Add( COOLDOWN_TYPE_SPELL, pSpell->Id, mstime + pSpell->RecoveryTime, pSpell->Id, pItemCaster ? pItemCaster->GetProto()->ItemId : 0 );
+	{
+		cool_time = pSpell->RecoveryTime;
+		if( pSpell->SpellGroupType )
+		{
+			SM_FIValue(SM_FCooldownTime, &cool_time, pSpell->SpellGroupType);
+			SM_PIValue(SM_PCooldownTime, &cool_time, pSpell->SpellGroupType);
+		}
+
+		_Cooldown_Add( COOLDOWN_TYPE_SPELL, pSpell->Id, mstime + cool_time, pSpell->Id, pItemCaster ? pItemCaster->GetProto()->ItemId : 0 );
+	}
 }
 
 void Player::Cooldown_AddStart(SpellEntry * pSpell)
