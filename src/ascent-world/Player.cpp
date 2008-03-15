@@ -2860,8 +2860,8 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 		break;
 	case WARLOCK:
 	case HUNTER:
-		_LoadPet(results[6].result);
-        _LoadPetSpells(results[7].result);
+		_LoadPet(results[5].result);
+        _LoadPetSpells(results[6].result);
 	break;
 	}
 
