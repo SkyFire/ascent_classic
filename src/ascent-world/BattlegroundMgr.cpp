@@ -478,7 +478,7 @@ void CBattlegroundManager::RemoveGroupFromQueues(Group * grp)
 
 bool CBattlegroundManager::CanCreateInstance(uint32 Type, uint32 LevelGroup)
 {
-	uint32 lc = 0;
+	/*uint32 lc = 0;
 	for(map<uint32, CBattleground*>::iterator itr = m_instances[Type].begin(); itr != m_instances[Type].end(); ++itr)
 	{
 		if(itr->second->GetLevelGroup() == LevelGroup)
@@ -487,7 +487,7 @@ bool CBattlegroundManager::CanCreateInstance(uint32 Type, uint32 LevelGroup)
 			if(lc >= MAXIMUM_BATTLEGROUNDS_PER_LEVEL_GROUP)
 				return false;
 		}
-	}
+	}*/
 
 	return true;
 }
