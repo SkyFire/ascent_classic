@@ -101,12 +101,12 @@ CFLAGS=$INCLUDES
 CXXFLAGS=$INCLUDES
 
 # Check for pthread
-ACX_PTHREAD([
+ACX_PTHREAD( [
 	LDFLAGS="$PTHREAD_LIBS $LDFLAGS"
        	CXXFLAGS="$CFLAGS $PTHREAD_CFLAGS"
        	CFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
        	CC="$PTHREAD_CC"
-],AC_MSG_ERROR(pthread not found))
+],AC_MSG_ERROR(pthread not found) )
 
 AC_CHECK_LIB( z, compress, [],[AC_MSG_ERROR([Missing zlib])] )
 AC_CHECK_LIB( compat, ftime )
