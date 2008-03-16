@@ -541,6 +541,7 @@ public:
 	void SpellAuraReduceAttackerSHitChance(bool apply);
 	void SpellAuraReduceEnemyMCritChance(bool apply);
 	void SpellAuraReduceEnemyRCritChance(bool apply);
+	void SpellAuraLimitSpeed(bool apply);
 	void SpellAuraIncreaseTimeBetweenAttacksPCT(bool apply);
 //	void SpellAuraIncreaseSpellDamageByInt(bool apply);
 //	void SpellAuraIncreaseHealingByInt(bool apply);

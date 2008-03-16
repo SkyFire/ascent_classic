@@ -55,6 +55,7 @@ Unit::Unit()
 	m_speedModifier = 0;
 	m_slowdown = 0;
 	m_mountedspeedModifier=0;
+	m_maxSpeed = 0;
 	for(uint32 x=0;x<27;x++)
 	{
 		MechanicsDispels[x]=0;
@@ -4726,7 +4727,15 @@ void Unit::UpdateSpeed(bool delay /* = false */)
 		}
 	}
 
+	
+
 	m_flySpeed = PLAYER_NORMAL_FLIGHT_SPEED*(1.0f + ((float)m_flyspeedModifier)/100.0f);
+
+	// Limit speed due to effects such as http://www.wowhead.com/?spell=31896 [Judgement of Justice]
+	if( m_maxSpeed && m_runSpeed > m_maxSpeed )
+	{
+		m_runSpeed = m_maxSpeed;
+	}
 
 	if(IsPlayer())
 	{
