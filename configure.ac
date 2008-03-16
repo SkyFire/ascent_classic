@@ -10,9 +10,9 @@ AC_PREREQ(2.5)
 if test -d obj; then rm -rf obj; fi
 
 AM_CONFIG_HEADER( config.h )
-INCLUDES="-I/usr/include -I/usr/local/include"
+INCLUDES="-I/usr/include/mysql -I/usr/include/openssl -I/usr/local/include/openssl -I/usr/local/include"
 AC_SUBST(INCLUDES)
-LDFLAGS="-L/usr/lib -L/usr/local/lib"
+LDFLAGS="-L/usr/lib/mysql -L/usr/local/lib -L/usr/local/lib/mysql"
 AC_SUBST(LDFLAGS)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
@@ -74,18 +74,15 @@ case "$ARCH" in
 		dnl yay 21st century hardware
 		AC_MSG_RESULT(x64 feel teh power)
 		AC_DEFINE(X64)
-		AC_SUBST(ARCH,x64)
 	;;
 	x86_64*)
 		dnl yay 21st century hardware
                 AC_MSG_RESULT(x64 feel teh power)
                 AC_DEFINE(X64)
-		AC_SUBST(ARCH,x64)
 	;;
 	*)
 		AC_MSG_RESULT(x86 oh noes i ran out of address space)
 		AC_DEFINE(X86)
-		AC_SUBST(ARCH,x86)
 	;;
 esac
 
@@ -95,21 +92,18 @@ AC_CHECK_PROG([SVN], [svn], yes)
 if test -z "$SVN"; then AC_MSG_ERROR(Subversion not found); fi
 
 # Checks for libraries.
-
-# Reset 
-CFLAGS=$INCLUDES
-CXXFLAGS=$INCLUDES
-
-# Check for pthread
-ACX_PTHREAD([
-	LDFLAGS="$PTHREAD_LIBS $LDFLAGS"
-       	CXXFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-       	CFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
-       	CC="$PTHREAD_CC"
-],AC_MSG_ERROR(pthread not found))
-
+AC_CHECK_LIB( pthread, pthread_create, [],
+    [LDFLAGS="-pthread $LDFLAGS"
+     AC_TRY_LINK([char pthread_create();],
+        pthread_create();,
+        [], [AC_MSG_ERROR([Missing pthread])])
+    ])
+    
 AC_CHECK_LIB( z, compress, [],[AC_MSG_ERROR([Missing zlib])] )
 AC_CHECK_LIB( compat, ftime )
+
+CFLAGS=""
+CXXFLAGS=""
 
 if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_LIB( crypto, SHA1_Init, [], [AC_CHECK_LIB(ssl, SHA1_Init,[],[AC_MSG_ERROR([Missing openssl])])])
@@ -117,8 +111,7 @@ if test "x$OSNAME" = "xDarwin" ; then
 	LIB_EXPORT="-framework System -framework Foundation"
 	AC_SUBST(LIB_EXPORT)
 else
-	#AC_CHECK_LIB( ssl, SHA1_Init, [], [AC_CHECK_LIB(ssl, SHA1_Init,[],[AC_MSG_ERROR([Missing openssl])])])
-	CHECK_SSL(1)
+	AC_CHECK_LIB( ssl, SHA1_Init, [], [AC_CHECK_LIB(ssl, SHA1_Init,[],[AC_MSG_ERROR([Missing openssl])])])
 	LIB_EXPORT="-Wl,--export-dynamic"
 	AC_SUBST(LIB_EXPORT)
 fi
@@ -187,7 +180,6 @@ AC_ARG_ENABLE(voicechat,
      AC_HELP_STRING([--enable-voicechat],enable voice chat system),
      [ if test "x$enable_voicechat" = "xyes" ; then
    	AC_DEFINE(ENABLE_VOICECHAT)
-	AC_SUBST(ENABLE_VOICECHAT)
        fi
      ],
 )
@@ -204,7 +196,6 @@ AC_ARG_ENABLE(postgres,
 	AC_HELP_STRING([--enable-postgres],enables postgres backend),
 	[ if test "x$enable_postgres" = "xyes" ; then
 		AC_DEFINE(ENABLE_DATABASE_POSTGRES)
-		AX_LIB_POSTGRESQL
 		fi
 	],
 )
@@ -225,15 +216,12 @@ if test "x$OSNAME" = "xLinux" ; then
 	AC_CHECK_FUNC(epoll_ctl, ,
 		[AC_CHECK_LIB(epoll, epoll_ctl, , AC_MSG_ERROR([Cannot find epoll_ctl() function for socket engine]))])
 	AC_DEFINE(USE_EPOLL)
-	AC_SUBST(NETWORKING, "epoll (Linux)")
 fi
-
 if test "x$OSNAME" = "xFreeBSD" ; then
 	AC_MSG_RESULT(kqueue)
 	AC_CHECK_FUNC(kevent, , AC_MSG_ERROR([Cannot find kevent() function for socket engine]))
 	AC_CHECK_HEADER(sys/event.h, , AC_MSG_ERROR([Cannot find sys/event.h for socket engine]))
 	AC_DEFINE(USE_KQUEUE)
-	AC_SUBST(NETWORKING, "kqueue (FreeBSD)")
 fi
 
 if test "x$OSNAME" = "xDarwin" ; then
@@ -241,29 +229,12 @@ if test "x$OSNAME" = "xDarwin" ; then
 	AC_CHECK_FUNC(kevent, , AC_MSG_ERROR([Cannot find kevent() function for socket engine]))
 	AC_CHECK_HEADER(sys/event.h, , AC_MSG_ERROR([Cannot find sys/event.h for socket engine]))
 	AC_DEFINE(USE_KQUEUE)
-	AC_SUBST(NETWORKING, "kqueue (Darwin)")
 
 	INCLUDES+="-I/sw/include -I/sw/include/mysql -I/usr/include/openssl"
 	LDFLAGS+="-L/sw/lib -L/sw/lib/mysql -L/usr/lib"
 fi
 
-# Check for mysql
-MYSQL_FOUND=AX_LIB_MYSQL([5.0])
-if test "$MYSQL_VERSION" = ""; then
-	AC_MSG_ERROR([*** mysql client library not found. Please install it.])
-else 
-	LDFLAGS="$LDFLAGS $MYSQL_LDFLAGS"
-	CFLAGS="$CFLAGS $MYSQL_CFLAGS"
-	CXXFLAGS="$CXXFLAGS $MYSQL_CFLAGS"
-fi
-
-# pcre 
-AX_PATH_LIB_PCRE([
-	LDFLAGS="$LDFLAGS $PCRE_LIBS"
-	CFLAGS="$CFLAGS $PCRE_CFLAGS"
-	CXXFLAGS="$CXXFLAGS $PCRE_CFLAGS"
-],AC_MSG_ERROR(Couldn't find pcre library. Make sure your pcre path is correct.))
-
+AC_CHECK_LIB( mysqlclient, mysql_init, [],[AC_CHECK_LIB(mysql, mysql_init,[],[AC_MSG_ERROR([Missing mysql])])])
 
 
 AC_DEFINE_UNQUOTED([PREFIX], "${prefix}", "Prefix")
@@ -293,59 +264,3 @@ AC_CONFIG_FILES([
 ])
 
 AC_OUTPUT
-
-echo
-echo "===================================="
-echo "Ascent configure report:"
-echo
-echo " Core:" 
-echo "             os: ${OSNAME}"
-echo "         prefix: ${prefix}"
-echo "   architecture: ${ARCH}"
-echo 
-echo " Database modules:"
-echo "        mysql: ${MYSQL_VERSION}"
-if test "x$enable_postgres" = "xyes" ; then
-  echo "   postgresql: ${POSTGRESQL_VERSION}"
-fi		
-if test "x$enable_sqlite" = "xyes" ; then
-  echo "       sqlite: ${SQLITE_VERSION}"
-fi
-
-echo
-echo " Networking:" 
-echo "   ${NETWORKING}"
-echo
-echo " Features: " 
-
-echo -n "    voicechat: "
-if test "x$enable_voicechat" = "xyes" ; then
-  echo "enabled"
-else
-  echo "disabled"
-fi
-
-echo -n "    collision: "
-if test "x$enable_collision" = "xyes" ; then
-  echo "enabled"
-else
-  echo "disabled"
-fi
-
-echo -n "   clustering: "
-if test "x$enable_clustering" = "xyes" ; then
-  echo "enabled"
-else
-  echo "disabled"
-fi
-
-echo
-echo "Compiler version: "
-$($CC -v)
-echo
-echo "LIBS=${LIBS}"
-echo "CXXFLAGS=${CXXFLAGS}"
-echo "LDFLAGS=${LDFLAGS}"
-echo "===================================="
-echo
-
