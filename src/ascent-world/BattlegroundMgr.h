@@ -123,7 +123,7 @@ static inline uint32 GetLevelGrouping(uint32 level)
 }
 #define MAX_LEVEL_GROUP 8
 #define MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG 1
-#define MAXIMUM_BATTLEGROUNDS_PER_LEVEL_GROUP 3
+#define MAXIMUM_BATTLEGROUNDS_PER_LEVEL_GROUP 50
 #define LEVEL_GROUP_70 7
 
 class CBattlegroundManager : public Singleton<CBattlegroundManager>, public EventableObject
