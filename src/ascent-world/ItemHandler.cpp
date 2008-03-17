@@ -32,7 +32,7 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 	if(!GetPlayer())
 		return;
 
-	if(count >= 127)
+	if(count >= 127 || (SrcInvSlot <= 0 && SrcSlot < INVENTORY_SLOT_ITEM_START) || (DstInvSlot <= 0 && DstSlot < INVENTORY_SLOT_ITEM_START))
 	{
 		/* exploit fix */
 		return;

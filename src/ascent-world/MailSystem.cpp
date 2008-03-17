@@ -576,6 +576,9 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 		string subject = "COD Payment: ";
 		subject += message->subject;
 		sMailSystem.SendAutomatedMessage(NORMAL, message->player_guid, message->sender_guid, subject, "", message->cod, 0, 0, 1);
+
+		message->cod = 0;
+		CharacterDatabase.Execute("UPDATE mailbox SET cod = 0 WHERE message_id = %u", message->message_id);
 	}
 
 	// prolly need to send an item push here
