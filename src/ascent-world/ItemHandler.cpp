@@ -1272,6 +1272,12 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 		return;
 	}
 
+	if( amount > it->MaxCount )
+	{
+		_player->GetItemInterface()->BuildInventoryChangeError(0, 0, INV_ERR_ITEM_CANT_STACK);
+		return;
+	}
+
 	if((error = _player->GetItemInterface()->CanReceiveItem(it, amount*item.amount)))
 	{
 		_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, error);
