@@ -3205,7 +3205,7 @@ void Spell::SpellEffectTameCreature(uint32 i)
 
 	uint8 result = SPELL_CANCAST_OK;
 
-	if(!tame || !p_caster || !p_caster->isAlive() || !tame->isAlive())
+	if(!tame || !p_caster || !p_caster->isAlive() || !tame->isAlive() || p_caster->getClass() != HUNTER )
 		result = SPELL_FAILED_BAD_TARGETS;
 	else if(!tame->GetCreatureName())
 		result = SPELL_FAILED_BAD_TARGETS;
