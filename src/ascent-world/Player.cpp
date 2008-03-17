@@ -9856,6 +9856,10 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 
 		// remember the cooldowns were saved in unix timestamp format for the reasons outlined above,
 		// so restore them back to mstime upon loading
+
+		if( (uint32)UNIXTIME > rtime )
+			continue;
+
 		rtime -= (uint32)UNIXTIME;
 
 		if( rtime < 10 )
