@@ -2219,7 +2219,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 	int32 victim_skill;
 	uint32 SubClassSkill	 = SKILL_UNARMED;
 
-	bool backAttack			 = isInBack( pVictim );
+	bool backAttack			 = !pVictim->isInFront( this );
 	uint32 vskill            = 0;
 	bool disable_dR			 = false;
 	
