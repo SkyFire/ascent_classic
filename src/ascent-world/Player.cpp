@@ -3056,6 +3056,7 @@ void Player::OnPushToWorld()
 	if(m_TeleportState == 2)   // Worldport Ack
 		OnWorldPortAck();
 
+	ResetSpeedHack();
 	m_beingPushed = false;
 	AddItemsToWorld();
 	m_lockTransportVariables = false;
