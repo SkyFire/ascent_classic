@@ -396,6 +396,15 @@ void WorldSession::HandlePetSetActionOpcode(WorldPacket& recv_data)
 		return;
 
 	Pet * pet = _player->GetSummon();
+	SpellEntry * spe = dbcSpell.LookupEntryForced( spell );
+	if( spe == NULL )
+		return;
+
+	// do we have the spell? if not don't set it (exploit fix)
+	PetSpellMap::iterator itr = pet->GetSpells()->find( spe );
+	if( itr == pet->GetSpells()->end( ) )
+		return;
+
 	pet->ActionBar[slot] = spell;
 	pet->SetSpellState(spell, state);
 }
