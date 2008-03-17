@@ -57,15 +57,18 @@ Arena::~Arena()
 
 void Arena::OnAddPlayer(Player * plr)
 {
-	/* cast arena readyness buff */
-	if(plr->isDead())
-		plr->ResurrectPlayer();
+	if( !m_started )
+	{
+		/* cast arena readyness buff */
+		if(plr->isDead())
+			plr->ResurrectPlayer();
 
-	plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-	plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
-	plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
-	sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
-	sEventMgr.AddEvent(plr, &Player::ResetAllCooldowns, EVENT_PLAYER_UPDATE, 500, 1, 0);
+		plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+		plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
+		sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
+		sEventMgr.AddEvent(plr, &Player::ResetAllCooldowns, EVENT_PLAYER_UPDATE, 500, 1, 0);
+	}
 
 	plr->m_deathVision = true;
 
@@ -85,7 +88,9 @@ void Arena::OnAddPlayer(Player * plr)
 	plr->GetItemInterface()->RemoveAllConjured();
 	plr->ResetAllCooldowns();
 
-	plr->CastSpell(plr, ARENA_PREPARATION, true);
+	if( !m_started )
+		plr->CastSpell(plr, ARENA_PREPARATION, true);
+
 	UpdatePlayerCounts();
 
 	/* Add the green/gold team flag */
