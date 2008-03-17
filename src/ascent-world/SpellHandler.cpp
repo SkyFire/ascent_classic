@@ -143,6 +143,26 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		return;
 	}
 
+	if( itemProto->ForcedPetId >= 0 )
+	{
+		if( itemProto->ForcedPetId == 0 )
+		{
+			if( _player->GetGUID() != targets.m_unitTarget )
+			{
+				_player->SendCastResult(spellInfo->Id, SPELL_FAILED_BAD_TARGETS, cn, 0);
+				return;
+			}
+		}
+		else
+		{
+			if( !_player->GetSummon() || _player->GetSummon()->GetEntry() != itemProto->ForcedPetId )
+			{
+				_player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, cn, 0);
+				return;
+			}
+		}
+	}
+
 	Spell *spell = new Spell(_player, spellInfo, false, NULL);
 	uint8 result;
 	spell->extra_cast_number=cn;

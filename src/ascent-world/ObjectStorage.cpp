@@ -330,6 +330,116 @@ void ObjectMgr::LoadExtraItemStuff()
 		pItemPrototype->FoodType = ft ;
 	
 		pItemPrototype->gossip_script=NULL;
+
+		// forced pet entries
+		switch( pItemPrototype->ItemId )
+		{
+		case 28071:
+		case 28072:
+		case 28073:
+		case 25469:
+		case 23734:
+		case 23735:
+		case 23755:
+		case 16381:
+		case 16382:
+		case 16383:
+		case 22188:
+		case 22189:
+		case 25900:
+		case 23711:
+		case 23730:
+		case 23731:
+		case 16390:
+		case 16388:
+		case 16389:
+		case 16384:
+		case 16385:
+		case 16386:
+		case 16387:
+		case 22190:
+			// Felguard
+			pItemPrototype->ForcedPetId = 17252;
+			break;
+
+		case 16321:
+		case 16322:
+		case 16323:
+		case 16324:
+		case 16325:
+		case 16326:
+		case 16327:
+		case 16328:
+		case 16329:
+		case 16330:
+		case 22181:
+		case 16302:
+		case 16316:
+		case 16317:
+		case 16318:
+		case 16319:
+		case 16320:
+		case 22179:
+		case 16331:
+			// Imp
+			pItemPrototype->ForcedPetId = 416;
+			break;
+
+		case 16357:
+		case 16358:
+		case 16359:
+		case 16360:
+		case 16361:
+		case 16362:
+		case 22184:
+		case 16351:
+		case 16352:
+		case 16353:
+		case 16354:
+		case 16355:
+		case 16356:
+		case 22185:
+		case 16346:
+		case 16347:
+		case 16348:
+		case 16349:
+		case 16350:
+		case 22182:
+			// Voidwalker
+			pItemPrototype->ForcedPetId = 1860;
+			break;
+
+		case 16380:
+		case 16379:
+		case 16375:
+		case 16376:
+		case 16377:
+		case 16378:
+		case 22187:
+		case 16363:
+		case 16364:
+		case 16365:
+		case 16366:
+		case 22183:
+		case 28068:
+			// Succubus
+			pItemPrototype->ForcedPetId = 1863;
+			break;
+
+		case 21283:
+		case 3144:
+		case 21282:
+		case 9214:
+		case 21281:
+		case 22891:
+			// Player
+			pItemPrototype->ForcedPetId = 0;
+			break;
+
+		default:
+			pItemPrototype->ForcedPetId = -1;
+			break;
+		}
         if(!itr->Inc())
 			break;
 	}
