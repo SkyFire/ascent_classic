@@ -3733,8 +3733,16 @@ exit:
 	 }
 
 	Unit *tcaster = u_caster;
-	if( i_caster != NULL && target)		
-		tcaster = target->GetMapMgr()->GetUnit( i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) ); //we should inherit the modifiers from the conjured food caster
+	if( i_caster != NULL && target)
+	{
+		if( target->GetGUID() == i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) )
+			tcaster = target;
+		else if( u_caster && u_caster->GetGUID() == i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) )
+			tcaster = u_caster;
+		else if( target->IsInWorld() )
+			tcaster = target->GetMapMgr()->GetUnit( i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) ); //we should inherit the modifiers from the conjured food caster
+	}
+
 	if( tcaster != NULL )
 	{
 		int32 spell_flat_modifers=0;
