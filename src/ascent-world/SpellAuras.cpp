@@ -556,7 +556,8 @@ void Aura::ApplyModifiers( bool apply )
 		else
 			sLog.outError("Unknown Aura id %d", (uint32)mod->m_type);
 	}
-	
+/*	
+	Zack : wtf ? why and who put this here ? This is handled in spell aura handler. Why duplicate here ? This creates bug
 	if(GetSpellProto()->procFlags)
 	{
 		for(uint32 x=0; x<3; x++)
@@ -599,6 +600,7 @@ void Aura::ApplyModifiers( bool apply )
 			}
 		}
 	}
+*/
 }
 
 void Aura::AddAuraVisual()
@@ -761,6 +763,27 @@ void Aura::EventUpdateAA(float r)
 		}
 	}
 
+	//report say that aura should also affect pet 
+	if( plr && plr->GetSummon() && 
+		(
+			GetSpellProto()->NameHash == SPELL_HASH_TRUESHOT_AURA ||
+			GetSpellProto()->NameHash == SPELL_HASH_ASPECT_OF_THE_PACK ||
+			GetSpellProto()->NameHash == SPELL_HASH_ASPECT_OF_THE_WILD
+			)
+		 )
+	{
+		Unit *summon = plr->GetSummon();
+		if( summon->isAlive() && summon->GetDistanceSq(u_caster) <= r && !summon->HasActiveAura( m_spellProto->Id ))
+		{
+			Aura * aura = new Aura(m_spellProto, -1, u_caster, summon );
+			aura->m_areaAura = true;
+			aura->AddMod( mod->m_type, mod->m_amount, mod->m_miscValue, mod->i);
+			summon->AddAura( aura );
+			//make sure we remove this
+//			sEventMgr.AddEvent(((Unit*)summon), &Unit::EventRemoveAura, m_spellProto->Id, EVENT_DELETE_TIMER, 10, 1,0);
+		}
+	}
+
 	SubGroup * group = plr->GetGroup() ?
 		plr->GetGroup()->GetSubGroup(plr->GetSubGroup()) : 0;
 
@@ -859,6 +882,23 @@ void Aura::RemoveAA()
 {
 	AreaAuraList::iterator itr;
 	Unit * caster = GetUnitCaster();
+
+	//report say that aura should also affect pet 
+	Player *plr = NULL;
+	if( GetUnitCaster() && GetUnitCaster()->IsPlayer() )
+		plr = static_cast<Player*>(GetUnitCaster());
+	if( plr && plr->GetSummon() && 
+		(
+			GetSpellProto()->NameHash == SPELL_HASH_TRUESHOT_AURA ||
+			GetSpellProto()->NameHash == SPELL_HASH_ASPECT_OF_THE_PACK ||
+			GetSpellProto()->NameHash == SPELL_HASH_ASPECT_OF_THE_WILD
+			)
+		 )
+	{
+		Unit *summon = plr->GetSummon();
+		if( summon->isAlive() )
+			summon->RemoveAura( m_spellProto->Id );
+	}
 
 	for(itr = targets.begin(); itr != targets.end(); ++itr)
 	{
@@ -1682,13 +1722,13 @@ void Aura::SpellAuraDummy(bool apply)
 		{
 			Unit *caster = GetUnitCaster();
 			if(caster && caster->IsPlayer())
-				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(29841,100);//fixed 100% chance
+				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize( 29841, 100, true );//fixed 100% chance
 		}break;
 	case 29838:
 		{
 			Unit *caster = GetUnitCaster();
 			if(caster && caster->IsPlayer())
-				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(29842,100);//fixed 100% chance
+				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize( 29842, 100, true );//fixed 100% chance
 		}break;
 	//mage Frostbite talent
 	case 11071:
@@ -1697,7 +1737,7 @@ void Aura::SpellAuraDummy(bool apply)
 		{
 			Unit *caster = GetUnitCaster();
 			if(caster && caster->IsPlayer())
-				static_cast< Player* >(caster)->SetTriggerStunOrImmobilize(12494,mod->m_amount);
+				static_cast<Player*>(caster)->SetTriggerStunOrImmobilize( 12494, mod->m_amount, false);
 		}break;
 	//mage Magic Absorption
 	case 29441:
@@ -2327,8 +2367,11 @@ void Aura::SpellAuraModStun(bool apply)
 		}
 
 		//warrior talent - second wind triggers on stun and immobilize. This is not used as proc to be triggered always !
-		if(p_target)
-			p_target->EventStunOrImmobilize(NULL);
+		Unit *caster = GetUnitCaster();
+		if( caster && caster->IsPlayer() && m_target )
+			static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
+		if( m_target && m_target->IsPlayer() && caster )
+			static_cast<Player*>(m_target)->EventStunOrImmobilize( caster, true );
 	}
 	else
 	{
@@ -2733,6 +2776,9 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 	if(m_spellProto->EffectTriggerSpell[mod->i] == 0)
 		return;
 
+/*
+	// Zack : there are 157 spells grouped into this iff and i couldn;t find even one that would correctly use it :S
+	// !!!!!!!! use namehashes !!!!!!!!!
 	if(IsPassive() && m_spellProto->Icon != 2010  && m_spellProto->Icon != 2020 && m_spellProto->Icon != 2255) //this spells are passive and are not done on the attack...
 	{
 		Unit * target = (m_target != 0) ? m_target : GetUnitCaster();
@@ -2748,6 +2794,7 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 
 		return;
 	}
+*/
 	
 	if(apply)
 	{
@@ -2961,6 +3008,11 @@ void Aura::SpellAuraModRoot(bool apply)
 			m_target->Root();
 
 		/* -Supalosa- TODO: Mobs will attack nearest enemy in range on aggro list when rooted. */
+		Unit *caster = GetUnitCaster();
+		if( caster && caster->IsPlayer() && m_target )
+			static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
+		if( m_target && m_target->IsPlayer() && caster )
+			static_cast<Player*>(m_target)->EventStunOrImmobilize( caster, true );
 	}
 	else
 	{
@@ -3192,10 +3244,12 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 		//let's check Mage talents if we proc anythig 
 		if(m_spellProto->School==SCHOOL_FROST)
 		{
-			Unit *caster=GetUnitCaster();
 			//yes we are freezing the bastard, so can we proc anything on this ?
-			if(caster && caster->IsPlayer() && m_target)
-				static_cast< Player* >(caster)->EventStunOrImmobilize(m_target);
+			Unit *caster = GetUnitCaster();
+			if( caster && caster->IsPlayer() && m_target )
+				static_cast<Player*>(caster)->EventStunOrImmobilize( m_target );
+			if( m_target && m_target->IsPlayer() && caster )
+				static_cast<Player*>(m_target)->EventStunOrImmobilize( caster, true );
 		}
 		m_target->speedReductionMap.insert(make_pair(m_spellProto->Id, mod->m_amount));
 		//m_target->m_slowdown=this;

@@ -1406,6 +1406,13 @@ void Spell::cast(bool check)
 						HandleAddAura((*i));
 					}
 				}
+			}
+			// we're much better to remove this here, because otherwise spells that change powers etc,
+			// don't get applied.
+			if(u_caster && !m_triggeredSpell && !m_triggeredByAura)
+				u_caster->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_CAST_SPELL, m_spellInfo->Id);
+			if(!IsReflected())
+			{
 				// spells that proc on spell cast, some talents
 				if(p_caster && p_caster->IsInWorld())
 				{
@@ -1426,11 +1433,6 @@ void Spell::cast(bool check)
 					}
 				}
 			}
-			// we're much better to remove this here, because otherwise spells that change powers etc,
-			// don't get applied.
-
-			if(u_caster && !m_triggeredSpell && !m_triggeredByAura)
-				u_caster->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_CAST_SPELL, m_spellInfo->Id);
 
 			if(m_spellState != SPELL_STATE_CASTING)
 				finish();

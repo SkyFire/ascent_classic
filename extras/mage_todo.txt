@@ -1,5 +1,3 @@
-Improved Scorch (talent) - not stacking on target
-
 Problems not related with only one spell/talent:
 - Problem with multiple mages in one group: if a mage cast fireball for example on a mob, if i cast a lower rank of fireball it says that a another more powerfull spell effect is active...this should work on buffs like Arcane Intellect not casting damage spells
 
@@ -11,51 +9,22 @@ Master of Elements: still disabled, haven't tried it -> what is the problem with
 Imp fire ward: not working for me, tho similar frost talents works
 Molten Fury: doesn't work
 
-Combustion: http://www.wowwiki.com/Combustion
-The buff isn't removed by 3 fire critical strikes as it should, and this way it could be stacked to 10 charges, making every mage fire spell a critical hit until the mage dies or the effect is removed via right click (or some actually working dispell spell).
-
 Cone of Cold is never applying any damage, only debufs.
-When summoning your water elemental, Winter's Chill is applied to the player himself/herself.
-Ritual of Refreshment mage spell does not work, the spell casts but when players of the party right click the bubble they get no items out of it.
-
 //////////////////////////////////
-
 
 Arcane
 
 Spells:
 Invisibility -> isn't working
-Spellsteal -> isn't working
 Blink -> should be a little faster, try to fix it
 Conjured food and water -> creates everytime more and don't have timer
 
 Talents:
 Presence of Mind -> isn't working for me, dunno 4 others try to test it
-Improved Arcane Missiles -> Your channeling isn't intrerrupted even without putting talents here.
-Wand Specialization -> I think that isnt working try to test it
-Magic Attunement - It doesn't change your tooltip, it doesn't change your buff information either but it is actually working.
-Arcane Concetration -> Isn't working I guess, test it
-Arcane Meditation -> also isn't working
 Arcane Potency -> Isn't working, test it
-Spell Power -> Isn't working, test it
-
-Fire:
-Spells:
--ll-
 
 Talents:
-Combustion -> I really have to write what's problem with combustion?
-Ignite -> Last time I checked, putting one talent in it is the same as putting 5. Overpowered, test it anyway
-Improved Scorch -> Same like Ignite, putting 1 talent point is the same as putting 3 talent points. Overpowered.
-
-Frost:
-Spells:
-Frostnova is bugged, fading from pyroblast or fireball dots. Also frost nova spell coefficient is wrong, level 70 mage with 800~ spell damage hits frost nova for 400, and coeff is only 13%. so adding to ~150 base damage 800*0.13 =/= 300
-Frostbolt rank1 kite is bugged. Cant use it enemy, slowed with frostbolt with higher rank.
-
-Talents:
-Frostbite is bugged -> Procs only from the very first frostbolt or enemy hit, but in the same time works ok with cone of cold. Procs on self too. (When casting Ice Block, when getting stunned/incapacitated, when summoning WE ) , test it
-Elemental Precision -> Reduces mana cost, not sure about target's resist.
 Frost warding -> Same like Magic Attunement, increases the armor gained from Frost Armor and Ice Armor. Not sure about reflecting spells.
-Frost Channeling -> Reduces mana cost, not sure about threat.
-Artic Winds -> Increases Frost damage. Not sure if it reduces the chance you are hit by melee or ranged attacks. test it
+
+Molten Armor: mobdeath by its damage keeps you in combat
+Ritual of Refreshment: does not work

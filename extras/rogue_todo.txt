@@ -1,4 +1,28 @@
-Rogues Hemo is not working correctly...
+-Vanish doesn't break movement impairments nor does the improved stealth help at all.
+-Ambush: Tooltip says without any talents is damage 265% damage, should be 275% due to 2.3.2
+-Master of Subtelty should add % damage to attacks made while in stealth as well as the 6 seconds that follow it.
+-Camoflauge works fine, but buff still says movement slowed by 15%.
+-Serrated Blades doesn't ignore targets armor as well as Rupture not getting bonus damage.
+-Hemorrhage doesn't give combo points still.
+-Dirty Deeds doesn't give more damage when enemy has less then 35% life.
+-Sinister Calling: Doesn't give 10% bonus damage to Backstab. +Edited
+-Preparation: Cools down some skills that shouldn't. Cloak of Shadows and Blind.
+-Preminition: Combo points still remain after 10 seconds have past.
+-Lethality: Doesn't affect all skills and seems to only affect Gouge.
+-Shiv doesn't instantly apply poison to target.
+-Cold Blood: Still remains sometimes after used with a skill.
+-Envenom: Completely unusable.
+-Ruthlessness: Not giving any combo points back at any chance.
+-Mutilate: Poisoned targets don't get 50% more damage.
+-Backstab: Tooltip claims it has 168% damage, should be 150% without talents.
+-Improve Slice And Dice: Works fine but doesn't appear on Tooltip, not sure if it should.
+-Cheat Death completely doesn't work.
+-Shadowstep: Depending on where you use it, you could fall to your death.
+
+////////////////
+
+mutilate 50% damage from poisened targets
+Rogues Hemo does not receive como point ?
 restealthing removes Shadow word:Paing and Devouring plague
 Gouge can be done from any position.Should be only facing the target,thus in front of it.
 

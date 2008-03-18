@@ -1,41 +1,31 @@
-Piercing howl should detect stealth
 Berserker rage should give you temporary stun ress
 Iron will, stun ress is not working
 charge/intercept should brake slowing effects
 
 the first bug - Victory Rush
-The spell is supposed to be active for 20 seconds after u kill something that gives honor and it can only be used once in those 20 seconds. The bug is that the spell can be used forever after killing someone ( meaning u can contineusly spam it) and it has no cooldown and requires no rage, does approximately 45% of attack power in dmg.
+The spell is supposed to be active for 20 seconds after u kill something that gives honor and it can only be used once in those 20 seconds. 
+The bug is that the spell can be used forever after killing someone ( meaning u can contineusly spam it) and it has no cooldown and requires no rage,
+does approximately 45% of attack power in dmg.
 An appropirate fix would be a disable of the spell or try to make it only useable once.
 
 2. spell reflection is not working at all now (some spells are just consumed)
-11. Berserker rage (rage part and fear part is 'ok' but ^^) "The warrior enters a berserker rage, becoming immune to Fear and Incapacitate effects and generating extra rage when taking damage. Lasts 10 sec. So only left incapacitate effects and that means immune on every kind of stun. "Incapacitating" means it cancels the character's ability to fight so it shouldnt work for example on frost nova. I think that it was working for some time.
+11. Berserker rage (rage part and fear part is 'ok' but ^^) "The warrior enters a berserker rage, becoming immune to Fear and Incapacitate effects and 
+generating extra rage when taking damage. Lasts 10 sec. So only left incapacitate effects and that means immune on every kind of stun. 
+"Incapacitating" means it cancels the character's ability to fight so it shouldnt work for example on frost nova. I think that it was working for some time.
 Intimidating Shout
 Bug:
 If you damage target of Intimidating Shout - the one "cowering in fear" - you will fear yourself (and duration renews each time you damage "cowering in fear" target again - basic situation is having DoT on your target and fearing it - your target fear is sometimes removed after 1st DoT tick and you get 8sec fear on yourself, or DoT doesnt remove his fear and you keep getting 8sec fear each time your DoT damages your feared target).
 Enrage talent doesnt give a slightest bonus dmg. Good thing that Flurry seems to work fine.
 
-4. second wind doesn't activate when getting immobilized by frost nova.
-
-talent -
-arms
-3. two-handed weapon specialization doesn't increase damage
-
 fury
 5. rampage doesn't stacks(only gives the initial AP)
 
-protection
-8. one-handed weapon specialization doesn't increase damage
-
 //////////////////////////////////////////////
-
-
-2.3 talents trees: http://www.wowhead.com/?talent=L
-
-Arms - not working stuff
-- Second Wind - some say it doesn't work for all roots and stuns
 
 Fury
 - Imp Berserker Rage - should generate rage when used (no idea if it ever worked) - will need effect override for this one
 
 Abilities
 - Intimidating Shout - it's an instant AOE fear, that doesn't work right. It affects the warrior, too. Very important.
+
+http://www.wowhead.com/?spell=2565 - is not removed

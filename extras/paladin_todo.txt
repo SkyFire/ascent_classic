@@ -28,20 +28,7 @@ Avenging Wrath (Trainer spell): should NOT be castable if the paladin has Forbea
 
 [Paladin Spell] Greater blessing of Light (does not add healing bonus)
 
-Skills:
-
-Seal of Blood both dosnt work.
-
 /////////
-
- sancity aura
- this aura is adding holy dmg but, isnt stacking or adding dmg to seal of command 70% + 10% and crusader strike 40% + 10%
-
- ////////
-
- consecration - should reveal hidden targets
-
- blessing of salvation
 
 Avenger's Shield
 Hurls a holy shield at the enemy, dealing X to Y Holy damage, Dazing them and then jumping to additional nearby enemies. Affects 3 total targets. Lasts 6 sec.
