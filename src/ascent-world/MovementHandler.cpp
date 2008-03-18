@@ -327,6 +327,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	if( recv_data.GetOpcode() == MSG_MOVE_STOP 
 		|| recv_data.GetOpcode() == MSG_MOVE_STOP_STRAFE 
 		|| recv_data.GetOpcode() == MSG_MOVE_STOP_TURN 
+		|| recv_data.GetOpcode() == MSG_MOVE_FALL_LAND
 		)
 		_player->m_isMoving = false;
 	else

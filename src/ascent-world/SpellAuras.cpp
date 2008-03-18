@@ -1265,11 +1265,6 @@ void Aura::EventPeriodicDamage(uint32 amount)
 	Unit * mtarget = m_target;
 	uint64 cguid = m_casterGuid;
 
-	if(c)
-		c->DealDamage(m_target, float2int32(res),  2, 0, GetSpellId ());
-	else
-		m_target->DealDamage(m_target, float2int32(res),  2, 0,  GetSpellId ());
-
 	if(mtarget->GetGUID()!=cguid && c)//don't use resist when cast on self-- this is some internal stuff
 	{
 		uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION;
@@ -1280,6 +1275,11 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		mtarget->HandleProc(vproc,c,sp, float2int32(res));
 		mtarget->m_procCounter = 0;
 	}
+
+	if(c)
+		c->DealDamage(m_target, float2int32(res),  2, 0, GetSpellId ());
+	else
+		m_target->DealDamage(m_target, float2int32(res),  2, 0,  GetSpellId ());
 }
 
 void Aura::SpellAuraDummy(bool apply)

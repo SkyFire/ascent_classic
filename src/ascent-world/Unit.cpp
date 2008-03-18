@@ -576,8 +576,9 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 		if( CastingSpell != NULL )
 		{
 			//this is to avoid spell proc on spellcast loop. We use dummy that is same for both spells
-			//if( CastingSpell->Id == itr2->spellId )
-			if( CastingSpell->Id == itr2->origId || CastingSpell->Id == itr2->spellId )
+			//CastingSpell->Id == itr2->origId || //removed by Zack : ex warlock - seed of corruption (or pyroclasm )ticks trigger the child effec
+			//proc should not proc on self
+			if( CastingSpell->Id == itr2->spellId )
 			{
 				//printf("WOULD CRASH HERE ON PROC: CastingId: %u, OrigId: %u, SpellId: %u\n", CastingSpell->Id, itr2->origId, itr2->spellId);
 				continue;
@@ -915,9 +916,49 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							if( CastingSpell->NameHash!=SPELL_HASH_SHADOW_BOLT)//shadow bolt								
 								continue;
 						}break;
+					// warlock - Seed of Corruption
+					case 27285:
+						{
+							bool can_proc_now = false;
+							//if we proced on spell tick
+							if( flag & PROC_ON_SPELL_HIT_VICTIM )
+							{
+								if( !CastingSpell )
+									continue;
+								//only trigger effect for specified spells
+								if( CastingSpell->NameHash != SPELL_HASH_SEED_OF_CORRUPTION )						
+									continue;
+								//this spell builds up in time
+								(*itr2).procCharges += dmg;
+								if( (int32)(*itr2).procCharges >= ospinfo->EffectBasePoints[ 1 ] && //if charge built up
+									dmg < (int32)this->GetUInt32Value( UNIT_FIELD_HEALTH ) ) //if this is not a killer blow
+									can_proc_now = true;
+							}
+							else can_proc_now = true; //target died
+							if( can_proc_now == false )
+								continue;
+							Unit *new_caster = victim;
+							if( new_caster && new_caster->isAlive() )
+							{
+								SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
+								Spell *spell = new Spell( new_caster, spellInfo ,true, NULL );
+								SpellCastTargets targets;
+								targets.m_destX = GetPositionX();
+								targets.m_destY = GetPositionY();
+								targets.m_destZ = GetPositionZ();
+								spell->prepare(&targets);
+							}
+							(*itr2).deleted = true;
+							continue;
+						}break;							
 					// warlock - Improved Drain Soul
 					case 18371:
 						{
+							if( !CastingSpell )
+								continue;
+							//only trigger effect for specified spells
+							if( CastingSpell->NameHash != SPELL_HASH_DRAIN_SOUL )						
+								continue;
 							//null check was made before like 2 times already :P
 							dmg_overwrite = ( ospinfo->EffectBasePoints[2] + 1 ) * GetUInt32Value( UNIT_FIELD_MAXPOWER1 ) / 100;
 						}break;
@@ -961,28 +1002,6 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								CastingSpell->NameHash != SPELL_HASH_DRAIN_LIFE )//Drain Life								
 								continue;
 						}break;
-/*                        //warlock - Demonic Knowledge
-                    case 39576:
-                        {
-                            if( CastingSpell == NULL )
-                                continue;
-                            if( CastingSpell->Effect[0] != 56 )
-                                continue;
-                            Pet* ps = static_cast< Player* >( this )->GetSummon();
-                            if( ps == NULL)
-                                return;//no pet
-                            int32 val;
-                            SpellEntry *parentproc= dbcSpell.LookupEntry( origId );
-                            val = parentproc->EffectBasePoints[0] + 1;
-                            val = val * (ps->GetUInt32Value( UNIT_FIELD_STAT2 ) + ps->GetUInt32Value( UNIT_FIELD_STAT3 ) );
-                            SpellEntry *spellInfo = dbcSpell.LookupEntry( 39576 );
-                            Spell *spell = new Spell( this, spellInfo ,true, NULL );
-                            spell->forced_basepoints[0] = ( val / 100 );
-                            SpellCastTargets targets;
-                            targets.m_unitTarget = GetGUID();
-                            spell->prepare( &targets );
-                            continue;
-                        }break;*/
 					//mage - Arcane Blast proc
 					case 36032:
 						{
@@ -1102,10 +1121,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							{
 								itr2->procCharges++;
 								if( itr2->procCharges >= 3 ) //whatch that number cause it depends on original stack count !
-								{
 									RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION );
-									RemoveAllAuraByNameHash( SPELL_HASH_COMBUSTION_PROC );
-								}
 								continue;
 							}
 						}break;
