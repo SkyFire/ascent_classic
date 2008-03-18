@@ -11,7 +11,11 @@ int LoadConfigs(int * udp_port, char * udp_address, int * tcp_port, char * tcp_a
 	int done=0;
 	int line=0;
 
+#ifdef WIN32
 	f = fopen("ascent-voicechat.conf", "r");
+#else
+	f = fopen((char*)CONFDIR "ascent-voicechat.conf", "r");
+#endif
 	if(!f)
 		return -2;
 
