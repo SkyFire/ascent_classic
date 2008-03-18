@@ -44,7 +44,7 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 		return;
 	Item *i2=_player->GetItemInterface()->GetInventoryItem(DstInvSlot,DstSlot);
 
-	if( (i1 && i1->wrapped_item_id) || (i2 && i2->wrapped_item_id) )
+	if( (i1 && i1->wrapped_item_id) || (i2 && i2->wrapped_item_id) || ( i1 && i1->GetProto()->MaxCount < 2 ) || ( i2 && i2->GetProto()->MaxCount < 2 ) || count < 1 )
 	{
 		GetPlayer()->GetItemInterface()->BuildInventoryChangeError(i1, i2, INV_ERR_ITEM_CANT_STACK);
         return;
