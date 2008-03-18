@@ -367,6 +367,12 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	if( msg.money > 0 )
 		cost += msg.money;
 
+	if( cost < 0 )
+	{
+		SendMailError(MAIL_ERR_INTERNAL_ERROR);
+		return;
+	}
+
 	// check that we have enough in our backpack
 	if( (int32)_player->GetUInt32Value( PLAYER_FIELD_COINAGE ) < cost )
 	{
