@@ -2275,10 +2275,17 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 			if (critical)
 			{		
-				float b = res / 2.0f;
+				int32 critical_bonus = 100;
 				if( spellInfo->SpellGroupType )
-					SM_PFValue( caster->SM_PCriticalDamage, &b, spellInfo->SpellGroupType );
-				res += b;
+					SM_FIValue( caster->SM_PCriticalDamage, &critical_bonus, spellInfo->SpellGroupType );
+
+				if( critical_bonus > 0 )
+				{
+					// the bonuses are halved by 50% (funky blizzard math :S)
+					float b = ( ( float(critical_bonus) / 2.0f ) / 100.0f ) + 1.0f;
+					res *= b;
+				}
+
 				if( pVictim->IsPlayer() )
 				{
 					//res = res*(1.0f-2.0f*static_cast< Player* >(pVictim)->CalcRating(PLAYER_RATING_MODIFIER_MELEE_CRIT_RESISTANCE));

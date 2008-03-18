@@ -4035,10 +4035,22 @@ void Spell::Heal(int32 amount)
 
 		if(critical = Rand(critchance))
 		{
-			int32 critbonus = amount >> 1;
+			/*int32 critbonus = amount >> 1;
 			if( m_spellInfo->SpellGroupType)
 					SM_PIValue(static_cast<Unit*>(u_caster)->SM_PCriticalDamage, &critbonus, m_spellInfo->SpellGroupType);
-			amount += critbonus;
+			amount += critbonus;*/
+
+			int32 critical_bonus = 100;
+			if( m_spellInfo->SpellGroupType )
+				SM_FIValue( u_caster->SM_PCriticalDamage, &critical_bonus, m_spellInfo->SpellGroupType );
+
+			if( critical_bonus > 0 )
+			{
+				// the bonuses are halved by 50% (funky blizzard math :S)
+				float b = ( ( float(critical_bonus) / 2.0f ) / 100.0f );
+				amount += float2int32( float(amount) * b );
+			}
+
 			//Shady: does it correct> caster casts heal and proc ..._VICTIM ? 
 			// Or mb i'm completely wrong? So if true  - just replace with old string. 
 			//u_caster->HandleProc(PROC_ON_SPELL_CRIT_HIT_VICTIM, unitTarget, m_spellInfo, amount);
