@@ -2282,7 +2282,12 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				if( critical_bonus > 0 )
 				{
 					// the bonuses are halved by 50% (funky blizzard math :S)
-					float b = ( ( float(critical_bonus) / 2.0f ) / 100.0f ) + 1.0f;
+					float b;
+					if( spellInfo->School == 0 )		// physical
+						b = ( ( float(critical_bonus) ) / 100.0f ) + 1.0f;
+					else
+						b = ( ( float(critical_bonus) / 2.0f ) / 100.0f ) + 1.0f;
+
 					res *= b;
 				}
 
