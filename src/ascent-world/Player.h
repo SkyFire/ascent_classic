@@ -1142,7 +1142,6 @@ public:
 	bool canCast(SpellEntry *m_spellInfo);
 	ASCENT_INLINE float GetBlockFromSpell() { return m_blockfromspell; }
 	ASCENT_INLINE float GetSpellCritFromSpell() { return m_spellcritfromspell; }
-	ASCENT_INLINE float GetHitFromMeleeSpell() { return m_hitfrommeleespell; }
 	ASCENT_INLINE float GetHitFromSpell() { return m_hitfromspell; }
 	ASCENT_INLINE float GetParryFromSpell() { return m_parryfromspell; }
 	ASCENT_INLINE float GetDodgeFromSpell() { return m_dodgefromspell; }
@@ -1150,7 +1149,6 @@ public:
 	void SetSpellCritFromSpell(float value) { m_spellcritfromspell = value; }
 	void SetParryFromSpell(float value) { m_parryfromspell = value; }
 	void SetDodgeFromSpell(float value) { m_dodgefromspell = value; }
-	void SetHitFromMeleeSpell(float value) { m_hitfrommeleespell = value; }
 	void SetHitFromSpell(float value) { m_hitfromspell = value; }
 	ASCENT_INLINE uint32 GetHealthFromSpell() { return m_healthfromspell; }
 	ASCENT_INLINE uint32 GetManaFromSpell() { return m_manafromspell; }
@@ -1796,7 +1794,6 @@ protected:
 	float m_dodgefromspell;
 	float m_parryfromspell;
 	float m_hitfromspell;
-	float m_hitfrommeleespell;
 	//stats mods
 	uint32 m_healthfromspell;
 	uint32 m_manafromspell;

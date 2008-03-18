@@ -122,7 +122,7 @@ public:
 	uint32 CreatureSpawnCount;
 	uint32 GameObjectSpawnCount;
 
-	ASCENT_INLINE float  GetLandHeight(float x, float y)
+	float  GetLandHeight(float x, float y)
 	{ 
 		if(_terrain)
 		{

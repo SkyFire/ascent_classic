@@ -228,6 +228,8 @@ Unit::Unit()
 	m_chargeSpellsInUse=false;
 	m_spellsbusy=false;
 	m_interruptedRegenTime = 0;
+
+	m_hitfrommeleespell = 0;
 }
 
 Unit::~Unit()
@@ -595,7 +597,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 				
 				//this is wrong, dummy is too common to be based on this, we should use spellgroup or something
 				SpellEntry* sp = dbcSpell.LookupEntry( spellId );
-				if( sp->dummy != CastingSpell->dummy )
+				if( sp->Icon != CastingSpell->Icon )
 				{
 					if( !ospinfo->School )
 						continue;
@@ -607,7 +609,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						continue;
 				}
 				else
-					if( sp->dummy == 1 )
+					if( sp->Icon == 1 )
 						continue;
 			}
 
@@ -2027,11 +2029,11 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 	//==========================================================================================
 	//==============================Attacker Skill Base Calculation=============================
 	//==========================================================================================
+	hitmodifier = GetHitFromMeleeSpell();  
 	if(this->IsPlayer())
 	{	  
 		self_skill = 0;
 		Player* pr = static_cast< Player* >( this );
-		hitmodifier = pr->GetHitFromMeleeSpell();  
 
 		switch( weapon_damage_type )
 		{

@@ -253,7 +253,7 @@ struct SpellEntry
     float  EffectPointsPerComboPoint[3];    //116 - 118
     uint32 SpellVisual;                     //119
     uint32 field114;                        //120
-    uint32 dummy;                           //121
+    uint32 Icon;                           //121
     uint32 CoSpell;                         //122   activeIconID;
     uint32 spellPriority;                   //123
     char* Name;                             //124

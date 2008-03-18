@@ -2733,7 +2733,7 @@ void Aura::SpellAuraPeriodicTriggerSpell(bool apply)
 	if(m_spellProto->EffectTriggerSpell[mod->i] == 0)
 		return;
 
-	if(IsPassive() && m_spellProto->dummy != 2010  && m_spellProto->dummy != 2020 && m_spellProto->dummy != 2255) //this spells are passive and are not done on the attack...
+	if(IsPassive() && m_spellProto->Icon != 2010  && m_spellProto->Icon != 2020 && m_spellProto->Icon != 2255) //this spells are passive and are not done on the attack...
 	{
 		Unit * target = (m_target != 0) ? m_target : GetUnitCaster();
 		if(target == 0 || !target->IsPlayer())
@@ -2826,7 +2826,7 @@ void Aura::EventPeriodicTriggerSpell(SpellEntry* spellInfo)
 		return;
 	}
 
-	if(spellInfo->dummy == 225 ) // this is arcane missles to avoid casting on self
+	if(spellInfo->Icon == 225 ) // this is arcane missles to avoid casting on self
 		if(m_casterGuid == pTarget->GetGUID())
 			return;
 
@@ -3983,23 +3983,20 @@ void Aura::EventPeriodicLeech(uint32 amount)
 
 void Aura::SpellAuraModHitChance(bool apply)
 {
-	if (m_target->IsPlayer())
+	if (apply)
 	{
-		if (apply)
+		static_cast< Player* >( m_target )->SetHitFromMeleeSpell( static_cast< Player* >( m_target )->GetHitFromMeleeSpell() + mod->m_amount);
+		if(mod->m_amount<0)
+			SetNegative();
+		else 
+			SetPositive();
+	}
+	else
+	{
+		static_cast< Player* >( m_target )->SetHitFromMeleeSpell( static_cast< Player* >( m_target )->GetHitFromMeleeSpell() - mod->m_amount);
+		if( static_cast< Player* >( m_target )->GetHitFromMeleeSpell() < 0 )
 		{
-			static_cast< Player* >( m_target )->SetHitFromMeleeSpell( static_cast< Player* >( m_target )->GetHitFromMeleeSpell() + mod->m_amount);
-			if(mod->m_amount<0)
-				SetNegative();
-			else 
-				SetPositive();
-		}
-		else
-		{
-			static_cast< Player* >( m_target )->SetHitFromMeleeSpell( static_cast< Player* >( m_target )->GetHitFromMeleeSpell() - mod->m_amount);
-			if( static_cast< Player* >( m_target )->GetHitFromMeleeSpell() < 0 )
-			{
-				static_cast< Player* >( m_target )->SetHitFromMeleeSpell( 0 );
-			}
+			static_cast< Player* >( m_target )->SetHitFromMeleeSpell( 0 );
 		}
 	}
 }
@@ -6703,8 +6700,8 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 		break;
 
 	case SMT_SPELL_VALUE:
-		if(GetSpellProto()->dummy==457) AffectedGroups=1;
-		if(GetSpellProto()->dummy==86) AffectedGroups=256;
+		if(GetSpellProto()->Icon==457) AffectedGroups=1;
+		if(GetSpellProto()->Icon==86) AffectedGroups=256;
 		SendModifierLog(&m_target->SM_FSPELL_VALUE,val,AffectedGroups,mod->m_miscValue);
 		break;
 

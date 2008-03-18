@@ -80,7 +80,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_dodgefromspell		= 0;
 	m_parryfromspell		= 0;
 	m_hitfromspell		  = 0; 
-	m_hitfrommeleespell	 = 0;
 	m_meleeattackspeedmod   = 0;
 	m_rangedattackspeedmod  = 0;
 
@@ -1441,6 +1440,7 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 		SetUInt32Value(UNIT_FIELD_POWER1,GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 
 		sSocialMgr.SendUpdateToFriends( this );
+		sHookInterface.OnPostLevelUp( this );
 	
 	}
 	// Set the update bit
@@ -3861,6 +3861,7 @@ void Player::ResurrectPlayer()
 		SafeTeleport(p->GetMapId(),p->GetInstanceID(),p->GetPosition());
 	}
 	SetMovement(MOVE_LAND_WALK, 1);
+	sHookInterface.OnPostResurrect( this );
 }
 
 void Player::KillPlayer()

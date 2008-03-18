@@ -864,3 +864,17 @@ void HookInterface::OnQuestFinished(Player * pPlayer, Quest * pQuest)
 		(call)(pPlayer, pQuest);
 	OUTER_LOOP_END
 }
+
+void HookInterface::OnPostLevelUp(Player * pPlayer)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_POST_LEVELUP, tOnPostLevelup)
+		(call)(pPlayer);
+	OUTER_LOOP_END
+}
+
+void HookInterface::OnPostResurrect(Player * pPlayer)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_POST_RESURRECT, tOnPostResurrect)
+		(call)(pPlayer);
+	OUTER_LOOP_END
+}

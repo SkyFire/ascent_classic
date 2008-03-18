@@ -1152,10 +1152,13 @@ public:
 	void EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage);
 	bool m_spellsbusy;
 	void DispelAll(bool positive);
+	void SetHitFromMeleeSpell(float value) { m_hitfrommeleespell = value; }
+	ASCENT_INLINE float GetHitFromMeleeSpell() { return m_hitfrommeleespell; }
 	
 protected:
 	Unit ();
 
+	float m_hitfrommeleespell;
 	uint32 m_meleespell;
 	void _UpdateSpells(uint32 time);
 
