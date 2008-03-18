@@ -1855,6 +1855,8 @@ public:
 	void AppendMovementData(uint32 op, uint32 sz, const uint8* data);
 	ByteBuffer m_movementBuffer;
 #endif
+
+	void addDeletedSpell(uint32 id) { mDeletedSpells.insert( id ); }
 };
 
 class SkillIterator
