@@ -1314,7 +1314,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	if(!unitTarget)
 		return;
 	// can't apply stuns/fear/polymorph/root etc on boss
-	if (!unitTarget->IsPlayer())
+	if ( !playerTarget )
 	{
 		Creature * c = (Creature*)( unitTarget );
 		if (c&&c->GetCreatureName()&&c->GetCreatureName()->Rank == ELITE_WORLDBOSS)
@@ -1330,7 +1330,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 			case 27: // silence
 			case 31: // increase speed
 			case 33: // decrease speed
-				SendCastResult(SPELL_FAILED_IMMUNE);
+				//SendCastResult(SPELL_FAILED_IMMUNE);
 				return;
 			}
 		}
