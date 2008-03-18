@@ -2421,8 +2421,11 @@ void ItemInterface::RemoveBuyBackItem(uint32 index)
 void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 {
 	// srcslot and dstslot are int... NULL might not be an int depending on arch where it is compiled
-	ASSERT( srcslot < MAX_INVENTORY_SLOT && srcslot >= 0 );
-	ASSERT( dstslot < MAX_INVENTORY_SLOT && dstslot >= 0 );
+	if( srcslot >= MAX_INVENTORY_SLOT || srcslot < 0 )
+		return;
+
+	if( dstslot >= MAX_INVENTORY_SLOT && dstslot < 0 )
+		return;
 
 	Item* SrcItem = GetInventoryItem( srcslot );
 	Item* DstItem = GetInventoryItem( dstslot );

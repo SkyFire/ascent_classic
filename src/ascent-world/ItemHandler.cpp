@@ -149,6 +149,12 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 		return;
 	}
 
+	if( DstInvSlot <= 0 && DstSlot < 0 )
+		return;
+
+	if( SrcInvSlot <= 0 && SrcSlot < 0 )
+		return;
+
 	SrcItem=_player->GetItemInterface()->GetInventoryItem(SrcInvSlot,SrcSlot);
 	if(!SrcItem)
 		return;
