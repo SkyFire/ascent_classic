@@ -3143,6 +3143,15 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_BAD_TARGETS;
 				}
 
+				//mind control is limted in target level
+				if(		( m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_POSSESS && (m_spellInfo->EffectBasePoints[0] + 1) < (int32)target->getLevel() ) 
+					||	( m_spellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOD_POSSESS && (m_spellInfo->EffectBasePoints[1] + 1) < (int32)target->getLevel() )
+					||	( m_spellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOD_POSSESS && (m_spellInfo->EffectBasePoints[2] + 1) < (int32)target->getLevel() )
+					)
+				{
+					return SPELL_FAILED_HIGHLEVEL;
+				}
+
 				/***********************************************************
 				* Inface checks, these are checked in 2 ways
 				* 1e way is check for damage type, as 3 is always ranged

@@ -870,7 +870,6 @@ public:
 	uint32 SchoolCastPrevent[7];
 	int32 GetDamageDoneMod(uint32 school);
 	float GetDamageDonePctMod(uint32 school);
-	float DamageDoneModPCT[7];
 	int32 DamageTakenMod[7];
 	float DamageTakenPctMod[7];
 	float DamageTakenPctModOnHP35;
