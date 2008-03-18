@@ -347,6 +347,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	trigger_on_stun_chance = 100;
 	m_modphyscritdmgPCT = 0;
 	m_RootedCritChanceBonus = 0;
+
 	m_ModInterrMRegenPCT = 0;
 	m_ModInterrMRegen =0;
 	m_RegenManaOnSpellResist=0;

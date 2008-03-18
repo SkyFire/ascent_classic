@@ -5726,7 +5726,6 @@ void Aura::SpellAuraOverrideClassScripts(bool apply)
 		return;
 	if(!GetUnitCaster()->IsPlayer())
 		return;
-
 	//misc value is spell to add
 	//spell familyname && grouprelation
 
@@ -5736,6 +5735,7 @@ void Aura::SpellAuraOverrideClassScripts(bool apply)
 	switch(mod->m_miscValue)
 	{
 		//----Shatter---
+		// Increases crit chance against rooted targets by (Rank * 10)%.
 		case 849:
 		case 910:
 		case 911:
@@ -5749,7 +5749,7 @@ void Aura::SpellAuraOverrideClassScripts(bool apply)
 				static_cast< Player* >( m_target )->m_RootedCritChanceBonus += val;
 			}
 			break;
-			//--------------
+// ----?
 		case 3736:
 		case 4415:
 		case 4418:

@@ -2311,6 +2311,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 		else
 			SubClassSkill = SKILL_UNARMED;
 
+
 		//chances in feral form don't depend on weapon skill
 		if(pr->IsInFeralForm()) 
 		{
@@ -5916,7 +5917,6 @@ void Unit::Energize(Unit* target,uint32 SpellId, uint32 amount,uint32 type)
 {//Static energize
 	if(!target || !SpellId || !amount)
 		return;
-
 	uint32 cm=target->GetUInt32Value(UNIT_FIELD_POWER1+type);
 	uint32 mm=target->GetUInt32Value(UNIT_FIELD_MAXPOWER1+type);
 	if(mm!=cm)

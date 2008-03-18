@@ -1312,7 +1312,8 @@ public:
 	float SpellDmgDoneByAttribute[5][7];
 	float SpellHealDoneByAttribute[5][7];
 	uint32 m_modphyscritdmgPCT;
-	uint32 m_RootedCritChanceBonus;
+	uint32 m_RootedCritChanceBonus; // Class Script Override: Shatter
+
 	uint32 m_ModInterrMRegenPCT;
 	int32 m_ModInterrMRegen;
 	float m_RegenManaOnSpellResist;
