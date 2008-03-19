@@ -1457,7 +1457,7 @@ void Player::smsg_InitialSpells()
 	PlayerCooldownMap::iterator itr, itr2;
 
 	uint16 spellCount = (uint16)mSpells.size();
-	uint32 itemCount = m_cooldownMap[0].size() + m_cooldownMap[1].size();
+	size_t itemCount = m_cooldownMap[0].size() + m_cooldownMap[1].size();
 	uint32 mstime = getMSTime();
 	size_t pos;
 
