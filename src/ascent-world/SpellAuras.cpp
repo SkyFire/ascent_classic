@@ -3609,6 +3609,22 @@ void Aura::SpellAuraModStateImmunity(bool apply)
 
 void Aura::SpellAuraModSchoolImmunity(bool apply)
 {
+	if( apply && ( m_spellProto->NameHash == SPELL_HASH_DIVINE_SHIELD || m_spellProto->NameHash == SPELL_HASH_ICE_BLOCK) ) // Paladin - Divine Shield
+	{
+		if( !m_target || !m_target->isAlive())
+			return;
+
+		Aura * pAura;
+		for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
+		{
+			pAura = m_target->m_auras[i];
+			if( pAura != this && pAura != NULL && !pAura->IsPassive() && !pAura->IsPositive() && !(pAura->GetSpellProto()->Attributes & ATTRIBUTES_IGNORE_INVULNERABILITY) )
+			{
+				pAura->Remove();
+			}
+		}
+	}
+
 	if(apply)
 	{
 		//fixme me may be negative

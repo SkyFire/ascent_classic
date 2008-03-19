@@ -3970,6 +3970,13 @@ void Spell::Heal(int32 amount)
 		if(m_spellInfo->NameHash == SPELL_HASH_SEAL_OF_LIGHT) //Seal of Light
 			healdoneaffectperc = 0.0f;
 
+		if(m_spellInfo->NameHash == SPELL_HASH_LESSER_HEROISM) //Lesser Heroism
+			healdoneaffectperc = 0.0f;
+
+		//Spells affected by Bonus Healing
+		if(m_spellInfo->NameHash == SPELL_HASH_EARTH_SHIELD) //Earth Shield
+			healdoneaffectperc = 0.3f;
+
 		//Basic bonus
 		bonus += u_caster->HealDoneMod[m_spellInfo->School];
 		bonus += unitTarget->HealTakenMod[m_spellInfo->School];
