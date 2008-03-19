@@ -3755,22 +3755,6 @@ exit:
 		SM_FIValue(tcaster->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
 		SM_FIValue(tcaster->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 
-		//now get mods from unit target. These are rare to find talents
-		if(target)
-		{
-			std::map<uint32,signed int>::iterator itr;
-			itr=target->target_spell_effect_mod_flat.find(m_spellInfo->NameHash);
-			if(itr!=target->target_spell_effect_mod_flat.end())
-				spell_flat_modifers += itr->second;
-			itr=target->target_spell_effect_mod_pct.find(m_spellInfo->NameHash);
-			if(itr!=target->target_spell_effect_mod_pct.end())
-				spell_pct_modifers += itr->second;
-		}
-
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-		if(spell_flat_modifers!=0 || spell_pct_modifers!=0 || spell_pct_modifers2!=0)
-			printf("!!!!spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
-#endif
 		value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
 
 	}

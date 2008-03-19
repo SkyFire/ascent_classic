@@ -665,8 +665,6 @@ public:
 		return false;
 	}
 
-	void SMTMod_On_target(bool apply,bool is_pct,uint32 namehash, int value);
-
 	bool m_castInDuel;
 
 private:

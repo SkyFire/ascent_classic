@@ -1323,7 +1323,7 @@ void Aura::SpellAuraDummy(bool apply)
 	switch(GetSpellId())
 	{
 	//paladin - Blessing of Light.
-	case 19977:
+	/*case 19977:
 	case 19978:
 	case 19979:
 	case 27144:
@@ -1335,12 +1335,12 @@ void Aura::SpellAuraDummy(bool apply)
 				SMTMod_On_target( apply, false, 0x9B56A8F5, mod->m_amount ); //holy light
 			if( mod->i == 1 )
 				SMTMod_On_target( apply, false, 0x333C4740, mod->m_amount ); //flash of light
-		}break;
+		}break;*/
 	//shaman - Healing Way - effect
-	case 29203:
+	/*case 29203:
 		{
 			SMTMod_On_target( apply, true, 0x08F1A7EF, mod->m_amount ); // Healing Wave
-		}break;
+		}break;*/
 	//druid - mangle
 	case 33878:
 	case 33986:
@@ -7495,56 +7495,6 @@ void Aura::SendChannelUpdate(uint32 time, Object * m_caster)
 	data << time;
 
 	m_caster->SendMessageToSet(&data, true);	
-}
-
-void Aura::SMTMod_On_target(bool apply,bool is_pct,uint32 namehash, int value)
-{
-	if(m_target->IsUnit())
-	{
-		Unit *u_target=(Unit *)m_target;
-		if(apply)
-		{
-			if(is_pct)
-			{
-				std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_pct.find(namehash);
-				if(itr!=u_target->target_spell_effect_mod_pct.end())
-					itr->second += mod->m_amount;
-				else u_target->target_spell_effect_mod_pct.insert(make_pair(namehash, mod->m_amount));
-			}
-			else
-			{
-				std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_flat.find(namehash);
-				if(itr!=u_target->target_spell_effect_mod_flat.end())
-					itr->second += mod->m_amount;
-				else u_target->target_spell_effect_mod_flat.insert(make_pair(namehash, mod->m_amount));
-			}
-		}
-		else
-		{
-			if(is_pct)
-			{
-				std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_pct.find(namehash);
-				//it would be very wierd to not hit this "if"
-				if(itr!=u_target->target_spell_effect_mod_pct.end())
-				{
-					if(itr->second==mod->m_amount)
-						u_target->target_spell_effect_mod_pct.erase(namehash);
-					else itr->second -= mod->m_amount;
-				}
-			}
-			else
-			{
-				std::map<uint32,signed int>::iterator itr=u_target->target_spell_effect_mod_flat.find(namehash);
-				//it would be very wierd to not hit this "if"
-				if(itr!=u_target->target_spell_effect_mod_flat.end())
-				{
-					if(itr->second==mod->m_amount)
-						u_target->target_spell_effect_mod_flat.erase(namehash);
-					else itr->second -= mod->m_amount;
-				}
-			}
-		}
-	}
 }
 
 void Aura::SpellAuraAxeSkillModifier(bool apply)
