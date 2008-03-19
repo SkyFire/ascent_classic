@@ -149,7 +149,9 @@ static void SM_FIValue( int32* m, int32* v, uint64 group )
 
     for( uint32 x = 0; x < SPELL_GROUPS; x++ )
         if( ( (uint64)1 << x ) & group )
+		{
             (*v) += m[x];
+		}
 }
 
 static void SM_PIValue( int32* m, int32* v, uint64 group )

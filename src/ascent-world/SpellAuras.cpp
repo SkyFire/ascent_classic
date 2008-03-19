@@ -1261,7 +1261,6 @@ void Aura::SpellAuraDummy(bool apply)
 		if( apply )
 		{
 			c->SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_JUDGEMENT );
-
 			if( !c->judgespell )
 				c->judgespell = mod->m_amount;
 			if( !c->Seal )
@@ -6698,7 +6697,21 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 {
 	int32 val = apply?mod->m_amount:-mod->m_amount;
 	uint64 AffectedGroups = (uint64)GetSpellProto()->EffectSpellGroupRelation[mod->i] + ((uint64)GetSpellProto()->EffectSpellGroupRelation_high[mod->i] << 32);
-
+	if( GetSpellId() == 20335 )
+	{
+		Log.Notice( "Improved Seal of the Crusader" , "Affected Spell Groups" );
+		for( uint32 x = 0; x < SPELL_GROUPS; x++ )
+		{
+			char grouptxt[50];
+			sprintf( grouptxt , "Group %u" , x );
+			if( ( ((uint64)1) << x ) & AffectedGroups )
+			{
+				Log.Notice( grouptxt , "Yes" );
+			}
+			else
+				Log.Notice( grouptxt , "No" );
+		}
+	}
 //printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
 
 	switch (mod->m_miscValue)//let's generate warnings for unknown types of modifiers

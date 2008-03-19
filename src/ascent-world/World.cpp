@@ -2388,21 +2388,22 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[0] = group_relation_paladin_sanctified_light;
 
 	//paladin - Improved Seal of the Crusader
+	
 	sp = dbcSpell.LookupEntryForced( 20335 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 512;
+		sp->EffectSpellGroupRelation[0] = 536870912;
 	sp = dbcSpell.LookupEntryForced( 20336 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 512;
+		sp->EffectSpellGroupRelation[0] = 536870912;
 	sp = dbcSpell.LookupEntryForced( 20337 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 512;
+		sp->EffectSpellGroupRelation[0] = 536870912;
 	sp = dbcSpell.LookupEntryForced( 28852 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 512;
+		sp->EffectSpellGroupRelation[0] = 536870912;
 	sp = dbcSpell.LookupEntryForced( 33557 );
 	if( sp != NULL )
-		sp->EffectSpellGroupRelation[0] = 512;
+		sp->EffectSpellGroupRelation[0] = 536870912;
 
 	//paladin - Light's Grace
 	sp = dbcSpell.LookupEntryForced( 31834 );
