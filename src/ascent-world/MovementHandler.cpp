@@ -583,7 +583,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 					static float latency = 0.25f;
 					float speed_delta = ( speed * 0.25f ) + std::max( latency + ( latency * 0.04f ), 0.32f );
 
-					printf("distance from last heartbeat: %f\n", _player->GetPositionNC().Distance2D( movement_info.x, movement_info.y ) );
+					//printf("distance from last heartbeat: %f\n", _player->GetPositionNC().Distance2D( movement_info.x, movement_info.y ) );
 
 					if( distance_delta >= speed_delta )
 					{

@@ -3504,6 +3504,11 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 			if( item->GetProto()->Spells[k].Trigger == 1 )
 			{
 				SpellEntry* spells = dbcSpell.LookupEntry( item->GetProto()->Spells[k].Id );
+				if( spells->RequiredShapeShift )
+				{
+					AddShapeShiftSpell( spells->Id );
+					continue;
+				}
 				Spell *spell = new Spell( this, spells ,true, NULL );
 				SpellCastTargets targets;
 				targets.m_unitTarget = this->GetGUID();
@@ -3532,7 +3537,11 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 		{
 			if( item->GetProto()->Spells[k].Trigger == 1 )
 			{
-				this->RemoveAura( item->GetProto()->Spells[k].Id ); 
+				SpellEntry* spells = dbcSpell.LookupEntry( item->GetProto()->Spells[k].Id );
+				if( spells->RequiredShapeShift )
+					RemoveShapeShiftSpell( spells->Id );
+				else
+					RemoveAura( item->GetProto()->Spells[k].Id ); 
 			}
 			else if( item->GetProto()->Spells[k].Trigger == 2 )
 			{
@@ -8198,6 +8207,10 @@ void Player::SetShapeShift(uint8 ss)
 			spe->prepare( &t );
 		}
 	}
+
+	// kill speedhack detection for 5 seconds
+	++_heartbeatDisable;
+	sEventMgr.AddEvent( this, &Player::ResetSpeedHack, EVENT_PLAYER_UPDATE, 5000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 
 	UpdateStats();
 	UpdateChances();
