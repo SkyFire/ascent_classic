@@ -3977,7 +3977,7 @@ int32 Unit::GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg
 //------------------------------by school----------------------------------------------
 	float summaryPCTmod = caster->GetDamageDonePctMod(school)-1; //value is initialized with 1
 	summaryPCTmod += pVictim->DamageTakenPctMod[school]-1;//value is initialized with 1
-	summaryPCTmod += caster->GetDamageDonePctMod(school);
+	//summaryPCTmod += caster->GetDamageDonePctMod(school);			// CAUSES HIGH DAMAGE
 	summaryPCTmod += pVictim->ModDamageTakenByMechPCT[spellInfo->MechanicsType];
 	int32 res = (int32)((base_dmg+bonus_damage)*summaryPCTmod + bonus_damage); // 1.x*(base_dmg+bonus_damage) == 1.0*base_dmg + 1.0*bonus_damage + 0.x*(base_dmg+bonus_damage) -> we add the returned value to base damage so we do not add it here (function returns bonus only)
 return res;
