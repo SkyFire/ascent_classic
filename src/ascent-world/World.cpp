@@ -1605,7 +1605,7 @@ bool World::SetInitialWorldSettings()
 		else 
 		if( sp->NameHash == SPELL_HASH_ILLUMINATION )
 			sp->EffectTriggerSpell[0] = 20272;*/  // broken trigger spell, do not use
-		//sp->Icon=result;
+		//sp->dummy=result;
 /*		//if there is a proc spell and has 0 as charges then it's probably going to triger infinite times. Better not save these
 		if(sp->procCharges==0)
 			sp->procCharges=-1;*/

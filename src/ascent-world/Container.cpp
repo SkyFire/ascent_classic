@@ -175,10 +175,10 @@ void Container::SwapItems(int8 SrcSlot, int8 DstSlot)
 	Item *temp;
 	if( SrcSlot < 0 || SrcSlot >= (int8)m_itemProto->ContainerSlots )
 		return;
-
+	
 	if( DstSlot < 0 || DstSlot >= (int8)m_itemProto->ContainerSlots )
 		return;
-
+	
 	if(m_Slot[DstSlot] &&  m_Slot[SrcSlot]&&m_Slot[DstSlot]->GetEntry()==m_Slot[SrcSlot]->GetEntry() && m_Slot[SrcSlot]->wrapped_item_id == 0 && m_Slot[DstSlot]->wrapped_item_id == 0 && m_Slot[DstSlot]->GetProto()->MaxCount>1)
 	{
 		uint32 total=m_Slot[SrcSlot]->GetUInt32Value(ITEM_FIELD_STACK_COUNT)+m_Slot[DstSlot]->GetUInt32Value(ITEM_FIELD_STACK_COUNT);

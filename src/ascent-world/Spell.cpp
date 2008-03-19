@@ -688,10 +688,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 			res =  (Rand(resistchance) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 
 		if (res == SPELL_DID_HIT_SUCCESS) // proc handling. mb should be moved outside this function
-		{
 			target->HandleProc(PROC_ON_SPELL_LAND_VICTIM,this->u_caster,this->m_spellInfo);
-			u_caster->HandleProc(PROC_ON_SPELL_LAND,target,this->m_spellInfo); //ucaster is checked before
-		}
 
 		return res;
 	}
@@ -1409,13 +1406,6 @@ void Spell::cast(bool check)
 						HandleAddAura((*i));
 					}
 				}
-			}
-			// we're much better to remove this here, because otherwise spells that change powers etc,
-			// don't get applied.
-			if(u_caster && !m_triggeredSpell && !m_triggeredByAura)
-				u_caster->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_CAST_SPELL, m_spellInfo->Id);
-			if(!IsReflected())
-			{
 				// spells that proc on spell cast, some talents
 				if(p_caster && p_caster->IsInWorld())
 				{
@@ -1436,6 +1426,11 @@ void Spell::cast(bool check)
 					}
 				}
 			}
+			// we're much better to remove this here, because otherwise spells that change powers etc,
+			// don't get applied.
+
+			if(u_caster && !m_triggeredSpell && !m_triggeredByAura)
+				u_caster->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_CAST_SPELL, m_spellInfo->Id);
 
 			if(m_spellState != SPELL_STATE_CASTING)
 				finish();
@@ -3148,15 +3143,6 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_BAD_TARGETS;
 				}
 
-				//mind control is limted in target level
-				if(		( m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_POSSESS && (m_spellInfo->EffectBasePoints[0] + 1) < (int32)target->getLevel() ) 
-					||	( m_spellInfo->EffectApplyAuraName[1] == SPELL_AURA_MOD_POSSESS && (m_spellInfo->EffectBasePoints[1] + 1) < (int32)target->getLevel() )
-					||	( m_spellInfo->EffectApplyAuraName[2] == SPELL_AURA_MOD_POSSESS && (m_spellInfo->EffectBasePoints[2] + 1) < (int32)target->getLevel() )
-					)
-				{
-					return SPELL_FAILED_HIGHLEVEL;
-				}
-
 				/***********************************************************
 				* Inface checks, these are checked in 2 ways
 				* 1e way is check for damage type, as 3 is always ranged
@@ -3732,32 +3718,46 @@ exit:
 		}
 	 }
 
-	Unit *tcaster = u_caster;
-	if( i_caster != NULL && target)
-	{
-		if( target->GetGUID() == i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) )
-			tcaster = target;
-		else if( u_caster && u_caster->GetGUID() == i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) )
-			tcaster = u_caster;
-		else if( target->IsInWorld() )
-			tcaster = target->GetMapMgr()->GetPlayer( i_caster->GetUInt32Value( ITEM_FIELD_CREATOR ) ); //we should inherit the modifiers from the conjured food caster
-	}
+	// TODO: INHERIT ITEM MODS FROM REAL ITEM OWNER - BURLEX BUT DO IT PROPERLY
 
-	if( tcaster != NULL )
+	if( u_caster != NULL )
 	{
 		int32 spell_flat_modifers=0;
 		int32 spell_pct_modifers=0;
 		int32 spell_pct_modifers2=0;//separated from the other for debugging purpuses
 
-		SM_FIValue(tcaster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(tcaster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 
-		SM_FIValue(tcaster->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-		SM_FIValue(tcaster->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+		SM_FIValue(u_caster->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
 
 		value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
 
 	}
+	else if( i_caster != NULL && target)
+	{	
+		//we should inherit the modifiers from the conjured food caster
+		Unit *item_creator = target->GetMapMgr()->GetUnit( i_caster->GetUInt64Value( ITEM_FIELD_CREATOR ) );
+		if( item_creator != NULL )
+		{
+			int32 spell_flat_modifers=0;
+			int32 spell_pct_modifers=0;
+			int32 spell_pct_modifers2=0;//separated from the other for debugging purpuses
+
+			SM_FIValue(item_creator->SM_FSPELL_VALUE,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(item_creator->SM_PSPELL_VALUE,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+
+			SM_FIValue(item_creator->SM_FEffectBonus,&spell_flat_modifers,m_spellInfo->SpellGroupType);
+			SM_FIValue(item_creator->SM_PEffectBonus,&spell_pct_modifers,m_spellInfo->SpellGroupType);
+#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
+			if(spell_flat_modifers!=0 || spell_pct_modifers!=0 || spell_pct_modifers2!=0)
+				printf("!!!!ITEMCASTER ! : spell value mod flat %d , spell value mod pct %d, spell value mod pct2 %d , spell dmg %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,spell_pct_modifers2,value,m_spellInfo->SpellGroupType);
+#endif
+			value = value + value*(spell_pct_modifers+spell_pct_modifers2)/100 + spell_flat_modifers;
+		}
+	}
+
 
 	return value;
 }

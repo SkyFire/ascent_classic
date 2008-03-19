@@ -80,6 +80,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_dodgefromspell		= 0;
 	m_parryfromspell		= 0;
 	m_hitfromspell		  = 0; 
+	m_hitfrommeleespell	 = 0;
 	m_meleeattackspeedmod   = 0;
 	m_rangedattackspeedmod  = 0;
 
@@ -344,8 +345,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	ok_to_remove = false;
 	trigger_on_stun = 0;
 	trigger_on_stun_chance = 100;
-	trigger_on_stun_victim = 0;
-	trigger_on_stun_chance_victim = 100;
 	m_modphyscritdmgPCT = 0;
 	m_RootedCritChanceBonus = 0;
 
@@ -1442,7 +1441,6 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 		SetUInt32Value(UNIT_FIELD_POWER1,GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 
 		sSocialMgr.SendUpdateToFriends( this );
-		sHookInterface.OnPostLevelUp( this );
 	
 	}
 	// Set the update bit
@@ -1457,7 +1455,7 @@ void Player::smsg_InitialSpells()
 	PlayerCooldownMap::iterator itr, itr2;
 
 	uint16 spellCount = (uint16)mSpells.size();
-	size_t itemCount = m_cooldownMap[0].size() + m_cooldownMap[1].size();
+	uint32 itemCount = m_cooldownMap[0].size() + m_cooldownMap[1].size();
 	uint32 mstime = getMSTime();
 	size_t pos;
 
@@ -3509,6 +3507,7 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 					AddShapeShiftSpell( spells->Id );
 					continue;
 				}
+
 				Spell *spell = new Spell( this, spells ,true, NULL );
 				SpellCastTargets targets;
 				targets.m_unitTarget = this->GetGUID();
@@ -3872,7 +3871,6 @@ void Player::ResurrectPlayer()
 		SafeTeleport(p->GetMapId(),p->GetInstanceID(),p->GetPosition());
 	}
 	SetMovement(MOVE_LAND_WALK, 1);
-	sHookInterface.OnPostResurrect( this );
 }
 
 void Player::KillPlayer()
@@ -8711,49 +8709,28 @@ void Player::UnPossess()
 }
 
 //what is an Immobilize spell ? Have to add it later to spell effect handler
-void Player::EventStunOrImmobilize(Unit *proc_target, bool is_victim)
+void Player::EventStunOrImmobilize(Unit *proc_target)
 {
-	if ( this == proc_target )
-		return; //how and why would we stun ourselfs
-	int32 t_trigger_on_stun,t_trigger_on_stun_chance;
-	if( is_victim == false )
+	if(trigger_on_stun)
 	{
-		t_trigger_on_stun = trigger_on_stun;
-		t_trigger_on_stun_chance = trigger_on_stun_chance;
-	}
-	else
-	{
-		t_trigger_on_stun = trigger_on_stun_victim;
-		t_trigger_on_stun_chance = trigger_on_stun_chance_victim;
-	}
-
-	if( t_trigger_on_stun )
-	{
-		if( t_trigger_on_stun_chance < 100 && !Rand( t_trigger_on_stun_chance ) )
+		if(trigger_on_stun_chance<100 && !Rand(trigger_on_stun_chance))
 			return;
-
-		SpellEntry *spellInfo = dbcSpell.LookupEntry(t_trigger_on_stun);
-
+		SpellEntry *spellInfo = dbcSpell.LookupEntry(trigger_on_stun);
 		if(!spellInfo)
 			return;
-
-		SM_FIValue(SM_FChanceOfSuccess,&t_trigger_on_stun_chance,spellInfo->SpellGroupType);
-
-		if(t_trigger_on_stun_chance<100 && !Rand(t_trigger_on_stun_chance))
-			return;
-
 		Spell *spell = new Spell(this, spellInfo ,true, NULL);
 		SpellCastTargets targets;
-
-		if ( spellInfo->procFlags & PROC_TARGET_SELF )
-			targets.m_unitTarget = GetGUID() ;
-		else if ( proc_target ) 
-			targets.m_unitTarget = proc_target->GetGUID() ;
-		else 
-			targets.m_unitTarget = NULL ;
-/*		if(proc_target)
+/*		if(spellInfo->procFlags & PROC_TAGRGET_ATTACKER)
+		{
+			if(!attacker)
+				return;
+			targets.m_unitTarget = attacker->GetGUID();
+		}
+		else targets.m_unitTarget = GetGUID();
+		*/
+		if(proc_target)
 			targets.m_unitTarget = proc_target->GetGUID();
-		else targets.m_unitTarget = GetGUID();*/
+		else targets.m_unitTarget = GetGUID();
 		spell->prepare(&targets);
 	}
 }

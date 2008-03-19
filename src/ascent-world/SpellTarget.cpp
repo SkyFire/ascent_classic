@@ -435,12 +435,6 @@ void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 			p = static_cast< Player* >( static_cast< Creature* >( u_caster )->GetTotemOwner() );
 		else if( u_caster->IsPet() && static_cast< Pet* >( u_caster )->GetPetOwner() ) 
 			p = static_cast< Pet* >( u_caster )->GetPetOwner();
-		else if( u_caster->GetUInt64Value( UNIT_FIELD_CREATEDBY ) )
-		{
-			Unit *t = u_caster->GetMapMgr()->GetUnit( u_caster->GetUInt64Value( UNIT_FIELD_CREATEDBY ) );
-			if ( t && t->IsPlayer() )
-				p = static_cast< Player* >( t );
-		}
 	}
 
 	if( p == NULL )

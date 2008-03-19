@@ -870,6 +870,7 @@ public:
 	uint32 SchoolCastPrevent[7];
 	int32 GetDamageDoneMod(uint32 school);
 	float GetDamageDonePctMod(uint32 school);
+	float DamageDoneModPCT[7];
 	int32 DamageTakenMod[7];
 	float DamageTakenPctMod[7];
 	float DamageTakenPctModOnHP35;
@@ -1150,13 +1151,10 @@ public:
 	void EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage);
 	bool m_spellsbusy;
 	void DispelAll(bool positive);
-	void SetHitFromMeleeSpell(float value) { m_hitfrommeleespell = value; }
-	ASCENT_INLINE float GetHitFromMeleeSpell() { return m_hitfrommeleespell; }
 	
 protected:
 	Unit ();
 
-	float m_hitfrommeleespell;
 	uint32 m_meleespell;
 	void _UpdateSpells(uint32 time);
 

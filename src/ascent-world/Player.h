@@ -808,20 +808,12 @@ public:
     /************************************************************************/
     /* Stun Immobilize                                                      */
     /************************************************************************/
-    void SetTriggerStunOrImmobilize(uint32 newtrigger,uint32 new_chance,bool is_victim=false)
+    void SetTriggerStunOrImmobilize(uint32 newtrigger,uint32 new_chance)
     {
-		if( is_victim == false )
-		{
-			trigger_on_stun = newtrigger;
-			trigger_on_stun_chance = new_chance;
-		}
-		else
-		{
-			trigger_on_stun_victim = newtrigger;
-			trigger_on_stun_chance_victim = new_chance;
-		}
+        trigger_on_stun = newtrigger;
+        trigger_on_stun_chance = new_chance;
     }
-    void EventStunOrImmobilize(Unit *proc_target,bool is_victim=false);
+    void EventStunOrImmobilize(Unit *proc_target);
 
     
     void EventPortToGM(Player *p);
@@ -1150,6 +1142,7 @@ public:
 	bool canCast(SpellEntry *m_spellInfo);
 	ASCENT_INLINE float GetBlockFromSpell() { return m_blockfromspell; }
 	ASCENT_INLINE float GetSpellCritFromSpell() { return m_spellcritfromspell; }
+	ASCENT_INLINE float GetHitFromMeleeSpell() { return m_hitfrommeleespell; }
 	ASCENT_INLINE float GetHitFromSpell() { return m_hitfromspell; }
 	ASCENT_INLINE float GetParryFromSpell() { return m_parryfromspell; }
 	ASCENT_INLINE float GetDodgeFromSpell() { return m_dodgefromspell; }
@@ -1157,6 +1150,7 @@ public:
 	void SetSpellCritFromSpell(float value) { m_spellcritfromspell = value; }
 	void SetParryFromSpell(float value) { m_parryfromspell = value; }
 	void SetDodgeFromSpell(float value) { m_dodgefromspell = value; }
+	void SetHitFromMeleeSpell(float value) { m_hitfrommeleespell = value; }
 	void SetHitFromSpell(float value) { m_hitfromspell = value; }
 	ASCENT_INLINE uint32 GetHealthFromSpell() { return m_healthfromspell; }
 	ASCENT_INLINE uint32 GetManaFromSpell() { return m_manafromspell; }
@@ -1802,6 +1796,7 @@ protected:
 	float m_dodgefromspell;
 	float m_parryfromspell;
 	float m_hitfromspell;
+	float m_hitfrommeleespell;
 	//stats mods
 	uint32 m_healthfromspell;
 	uint32 m_manafromspell;
@@ -1844,8 +1839,6 @@ protected:
 	uint32      _fields[PLAYER_END];
 	uint32	    trigger_on_stun;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
 	uint32	    trigger_on_stun_chance; //also using this for mage "Frostbite" talent
-	uint32	    trigger_on_stun_victim;        //bah, warrior talent but this will not get triggered on triggered spells if used on proc so i'm forced to used a special variable
-	uint32	    trigger_on_stun_chance_victim; //also using this for mage "Frostbite" talent
 	int			hearth_of_wild_pct;		//druid hearth of wild talent used on shapeshifting. We eighter know what is last talent level or memo on learn
 
 	uint32 m_team;

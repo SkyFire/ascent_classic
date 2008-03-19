@@ -149,10 +149,10 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 		return;
 	}
 
-	if( DstInvSlot <= 0 && DstSlot < 0 )
+	if( ( DstInvSlot <= 0 && DstSlot < 0 ) || DstInvSlot < -1 )
 		return;
-
-	if( SrcInvSlot <= 0 && SrcSlot < 0 )
+	
+	if( ( SrcInvSlot <= 0 && SrcSlot < 0 ) || SrcInvSlot < -1 )
 		return;
 
 	SrcItem=_player->GetItemInterface()->GetInventoryItem(SrcInvSlot,SrcSlot);

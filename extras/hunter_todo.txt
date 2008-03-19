@@ -1,3 +1,8 @@
+Bug: Scatter shot failure
+Class: Hunter
+NPC/Area: N/A
+Explanation: Scatter shot will sometimes say "you cant do that while immune(sounds familiar...hmmm but from where?!?! *cough* alchemy >.>) but sometimes it will work,but most of the time the target can still act on their own will while SS'd(and yes,noone caused them damage)
+
 TALENTS
 --BM--
 The Beast Within: doesn't work (adds a buff for hunter onBestial Wrath) - has to trigger on cast spell and has to end when buff expires
@@ -12,15 +17,27 @@ part with "n additional X each time they are struck by a ranged attack" never wo
 
 + all what scatler said + what i posted 2 weeks ago, and this is: Arcane Shot and Steady Shot crit chance based on intellect instead of agility and 1.5x crit damage for both of those shots (instead of 2x or 2.3x with talent)
 
-- Counterattack
+-Counterattack
 
 
 //////////////////////////////////////////////////
 
 Adds to Beast Mastery:
 
+Unleashed Fury - Broken. Does not increase pet damage.
 Improved Aspect of the Hawk - It procs and shows the buff icon but there's no speed increase at all.
+Bestial Discipline
+
+Skills:
+
 Eyes of the Beast - You start to control yourself (!) and you can't do anything until the spell is cancelled. This skill is pretty funny! tongue.gif
+Mend Pet - Still working as a channeled spell. This has changed. Now it should be an instant cast heal over time as of patch 2.1
+Track Hidden - Broken. Does not increase your stealth detection and of course, no target on the mini-map.
+Snake Trap - Never seen it working.
+
+Regarding Scatter Shot: it's a little bit confused in the list. Basically, in pvp, the target affected by Scatter will still be able to control itself. It will be unable to attack, but that's not the only effect we want.
+
+AUTO-SHOT: Currently I'm playing on the revision 2801 and Auto-Shot is all messed up!!! Most times you stand still and don't shoot. The only commit after 2801 that deals with it is the 2805 but is not clear if it's a fix. For God's sake, Hunter without Auto-shot is a rogue without stuns!!! It's ridiculous! If it's not fixed yet, please do it.
 
 Pets:
 
@@ -29,88 +46,12 @@ Also, Spell Damage Bonus is not adding any damage to pet spells.
 
 Skills like Dash and Dive are not working properly. You should be able to cast them anytime you want but they only work when the pet is hitting the target (which makes the skill useless).
 
-//////////////////////////////////////////////
+Natural Armor and Great Stamina reset the respectives stats to zero and adds only the amount mentioned.
 
-Spell:
+Most times if someone try to buff your pet will reset all stats to zero.
 
-EventPeriodicManaPct - should receive bonus from items..what items ? give examples
+*cough* Cobra Reflexes is decreasing attack speed instead of increasing and damage done should be reduced but it remains the same.
 
-Scorpid Sting: pus the sting on the target, but has no effect, tested with recount.
-* reduces the target's chance to hit with melee and ranged attacks by 5%.
-m_hitfrommeleespell- this needs to be added to the formulas
+Excluding the skills/spells, all training will be reset after some time and you'll get all training points back.
 
-Frost trap: no longer works since 33xx:
-* The radius of the trap was too small, here's an example of how it should be: <a href="http://www.youtube.com/watch?v=gRGCI0FXv3Y" target="_blank">http://www.youtube.com/watch?v=gRGCI0FXv3Y</a>
-* Creates an ice slick around itself for 30 sec when the first enemy approaches it. All enemies within 10 yards will be slowed to 40% of their normal movement speed while in the area of effect. Trap will exist for 1 min. Traps may be placed in combat, but have a 2 second arming time (it will become active in 2 seconds after trapping).
-
-Track Hidden: Broken.
-* Does not increase your stealth detection and of course, no target on the mini-map.
-
-Snake Trap: Never seen it working.
-* A trap that will release several venomous snakes to attack the first enemy to approach. The snakes will die after 15 sec.
-* The snakes have 3 rogue-style poisons:
-- Crippling Poison: Enemy movement speed is reduced by 50%.
-- Mind-Numbing Poison: Enemy spell-casting speed is incresed by 50%.
-- Deadly Poison: Enemy gets 15 nature damage over 12 seconds. Stacks up to 5 times.
-
-Haste effects:
-Steady Shot cast time should be affected by Haste bonuses including Quiver/Ammo Pouch, Serpent's Swiftness, Rapid Fire and Bloodlust. Rapid Fire should affect Aimed Shot cast time as well.
-
-General:
-* Pets dont level since 60 anymore.
-* Pet damage is too low, probably not affected by hunter's attack power.
-* Scaling:
-1 Ranged AP gives the pet 0.22 AP and 0.1287 spell damage
-1 stamina gives 0.3 stamina
-1 resistance gives 0.4 resistance
-1 armor gives 0.35 armor
-* Traps should appear IN FRONT of hunter when trapped, not under, and should be inactive for 2 seconds right upon trapping.
-* Physical immobilize effects shouldn't break on damage:
-- http://www.ascentemu.com/forums/index.php?showtopic=12769
-
-Beast mastery talents:
-
-Bestial wrath: pet buff, should increase it's damage by 50% for 18sec. while the duration, pet cannot be feared/slowed/stunned/charmed a.k.a. immune to crowd controll effects. The underlined part needs to be tested with aoe crowd control.
-The beast within:
-* Hunter buff (ACTIVATES WHEN BESTIAL WRATH IS APPLIED)
-* Should increase all damage done by 10%
-* Should reduce all mana costs by 20%
-* Should render the hunter immune to all crowd control like the pet's version
-* Lasts 18sec - as long as bestial wrath is applied on pet.
-* If pet dies, the beast within fades from a hunter. Hunter isn't put to combat during the duration by the aura itself.
-
-Ferocious inspiration: When your pet scores a critical hit, all party members have all damage increased by X% for 10 sec.
-Rank Increased damage
-Rank 1/3 1%
-Rank 2/3 2%
-Rank 3/3 3%
-
-Marksmanship talents:
-Go for the throat: doesn't work.
-* Hunter's ranged crits make pet generate 25 focus.
-
-Ranged Weapon specialization: doesn't work.
-* Should increase ranged damage by 5%
-
-Mortal shots: is said to be working in svn but it doesnt. here's the talent:
-* increases ranged weapon critical strike damage bonus by 6% per rank, up to 30% at max rank 5.
-
-Survival talents:
-
-Hawk eye: should increase ALL SHOTS range by 2/4/6yd.
-* It adds the range for auto-shot in tooltip and allows the "white" displaying of the ability as it was possible to shoot in 41yd range but when you start auto-shooting it says out of range. Special ranged attacks, however, have their tooltips same.
-
-Clever traps: doesn't work:
-* should increase trap effects (duration for freeze and frost trap and damage for immolation and explosive) by 15/30%
-
-Entrapment: doesn't work.
-* Gives your Immolation Trap, Frost Trap, and Explosive Trap a 8-25% chance to entrap the target, preventing them from moving for 5 sec.
-
-Survival instincts:
-* should increase AP by 2/4% and decrease all damage taken by 2/4% - this part doesn't work.
-
-Wyvern sting: should do nature damage after getting dispelled/removed as said on tooltip, but doesn't:
-Rank 1 300
-Rank 2 420
-Rank 3 600
-Rank 4 942
+Frenzy

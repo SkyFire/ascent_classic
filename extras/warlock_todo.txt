@@ -1,10 +1,37 @@
 Vampiric Touch, doesn't give any mana.
+HealthStone rank 2
+Nether Protection procs of shadow and fire dmg DoT's ticks
+
+Demonology
+SoulWell - nothing appears - wtf ? i can;t find this spell :S
 
 Imp:
 *Phase Shift - nothing happens imp still get's attacked by enemy
+Succubus ( succy )
+*Seduction - nothing happens
+*Shooting Kiss - no aggro made
+Felhunter
+*Spell lock - no spell lock for 8 seconds
+*Devour Magic - no buffs dispelled
+*Tainted Blood - no dmg reduction
+*Paranoia - doesn't destealths rogues or druids
 
 General
 -Should receive soul shard when pet is dismissed due to out of range or getting on windrider
+
+Talents - Affliction
+-Shadow Mastery: for some reason only applies to rank 1 skills. Doesn't apply to drain spells. Only uses base spell damage, not total spell damage after +damage is taken into consideration.
+-Fel Concentration: somewhat works, proc rate for cast time reduction seems to be less than 75% at maximum lvl
+-Empowered corruption: does not add any damage to corruption as it should (+36% at maximum lvl)
+
+Talents - Destruction
+-Intensity: has no noticable effect (supposed to give 70% at max lvl to reduce the chance of spell interruption).
+-Shadow and Flame: is supposed to give +20% damage to shadowbolt and incinerate but doesn't.
+-Emberstorm: only applies to base damage, not damage after spell casts.
+
+Talents - Demonology
+-Soul link: does not transfer 20% of damage to pet or give the +5% damage
+-Demonic Sacrifice: Working, though fire damage gained from imp and shadow damage gained from succubus and felguard are applied to base spell damage, not total spell damage after all other effects. Also, ff you use Demonic Sacrifice and log out with no pet, your character will show a Voidwalker next to them. When you log onto another character than back on to your lock, you'll have both the Demonic Sacrifice you used, and a Voidwalker out. Sacrificing this one would make 2 Sacrifices stack.
 
 Pets
 -Pets on defense/passive immediately attacks the closest enemy if it kills the current mob. It also immediately attacks the closest enemy if it is just summoned or from log in.
@@ -13,6 +40,8 @@ Pets
 
 Demonology Tree:
 Mana Feed - doesn't work
+Demonic Resilience - doesn't work
+Demonic Tactics
 
 Destruction Tree:
 Shadow Burn - skill works but doesn't return soul shard if target died withing 5 secs
@@ -22,7 +51,14 @@ Soul Siphon - doesn't work
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
+General (might affect more then just warlocks)
+- Should receive soul shard when pet is dismissed due to out of range or getting on windrider
+- Temporary +spell damage buffs (trinkets, potions, etc) will only apply the +damage to DoT's while the effect is in place - Not when you start the spell cast. For example, say you used a trinket that gives +150 spell damage. You apply Corruption and Unstable Affliction. You gain the +150 spell damage bonus as normal - your Unstable Affliction and Corruption should gain around 25 damage a tick. Half way through the ticks, the trinket wears off. You will now LOSE that 25 damage a tick, even though the DoT was applied when you initiated the cast.
+
 Hellfire/Rain of fire - must have a target selected else it will stop channeling immediately; channeling isn't affected by talent to reduce spell pushback; starts damaging only after good 3-4 seconds of channel.
+
+Curse of Agony:
+- Causes the "beginning damage" throughout the whole spell cast, making it to do much less damage than it should. (Its damage should ramp up <a href="http://www.wowwiki.com/Curse_of_Agony" target="_blank">http://www.wowwiki.com/Curse_of_Agony</a>
 
 Curse of Doom:
 - Works, but only gets 100% bonus from spell damage instead of 200%.
@@ -86,5 +122,9 @@ IMPORTANT - Siphon life - works but doesn't benefit from shadow damage so is use
 Demonology:
 
 - Improved health funnel. doesn't increase the health given to minion when channeling.
+- improved enslave demon. the spell itself doesn't work.
+- master conjuror. doesn't work. should increase effect of firestone and spellstone by 15/30%
+
 - when infernal dies, server crashes
+
 - put talent points into health funnel and see if caster dies like that
