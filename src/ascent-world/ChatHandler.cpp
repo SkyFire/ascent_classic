@@ -396,6 +396,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				return;
 			}
 
+			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
+				break;
+
 			Channel *chn = channelmgr.GetChannel(channel.c_str(),GetPlayer()); 
 			if(chn) 
 				chn->Say(GetPlayer(),msg.c_str(), NULL, false);
