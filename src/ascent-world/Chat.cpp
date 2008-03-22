@@ -205,7 +205,6 @@ void CommandTableStorage::Init()
 		{ "scale",	  'm', NULL,	"Size/Scale",		  NULL, OBJECT_FIELD_SCALE_X, 0,					2 },
 		{ "gold",	   'm', &ChatHandler::HandleModifyGoldCommand,  "Gold/Money/Copper",	  NULL,   0,  0,  0 },
 		{ "speed",	  'm', &ChatHandler::HandleModifySpeedCommand, "Movement Speed",		 NULL,   0,  0,  0 },
-		{ "gender",	 'm', &ChatHandler::HandleGenderChanger,		 "Changes gender 0=male / 1=female.",		NULL, 0, 0, 0},
 		{ "nativedisplayid", 'm', NULL, "Native Display ID", NULL, UNIT_FIELD_NATIVEDISPLAYID, 0,			  1 },
 		{ "displayid" , 'm', NULL,	"Display ID",		  NULL, UNIT_FIELD_DISPLAYID,	   0,			  1 },
 		{ "flags" ,	 'm', NULL,	"Unit Flags",		  NULL, UNIT_FIELD_FLAGS,		   0,			  1 },
