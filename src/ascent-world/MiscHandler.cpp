@@ -1237,10 +1237,6 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	{
 		case GAMEOBJECT_TYPE_CHAIR:
 		{
-            /// if players are mounted they are not able to sit on a chair
-            if( plyr->IsMounted() )
-                return;
-
 			WorldPacket data(MSG_MOVE_HEARTBEAT, 66);
 			data << plyr->GetNewGUID();
 			data << uint8(0);
@@ -1248,6 +1244,8 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 			data << obj->GetPositionX() << obj->GetPositionY() << obj->GetPositionZ() << obj->GetOrientation();
 			plyr->SendMessageToSet(&data, true);
 			plyr->SetStandState(STANDSTATE_SIT_MEDIUM_CHAIR);
+			plyr->m_lastRunSpeed = 0; //counteract mount-bug; reset speed to zero to force update SetPlayerSpeed in next line.
+			plyr->SetPlayerSpeed(RUN,plyr->m_base_runSpeed);
 		}break;
 	case GAMEOBJECT_TYPE_CHEST://cast da spell
 		{
