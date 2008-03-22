@@ -912,7 +912,7 @@ bool ChatHandler::HandleReviveStringcommand(const char* args, WorldSession* m_se
 		if(plr->GetInstanceID() == m_session->GetPlayer()->GetInstanceID())
 			plr->RemoteRevive();
 		else
-			sEventMgr.AddEvent(plr, &Player::RemoteRevive, EVENT_PLAYER_REST, 1, 1,0);
+			sEventMgr.AddEvent(plr, &Player::RemoteRevive, EVENT_PLAYER_UPDATE, 1, 1,0);
 
 		GreenSystemMessage(m_session, "Revived player %s.", args);
 	} else {
