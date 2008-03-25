@@ -448,7 +448,7 @@ bool WorldSession::CanUseCommand(char cmdstr)
 		return true;
 
 	for(int i = 0; i < permissioncount; ++i)
-		if(permissions[i] == cmdstr)
+		if(permissions[i] == cmdstr || permissions[i] == 'y' && cmdstr == 'g') // Advanced GM -> Lower GM
 			return true;
 
 	return false;

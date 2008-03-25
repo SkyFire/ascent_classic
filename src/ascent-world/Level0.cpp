@@ -94,35 +94,17 @@ bool ChatHandler::HandleCommandsCommand(const char* args, WorldSession *m_sessio
 		if(table[i].CommandGroup != '0' && !m_session->CanUseCommand(table[i].CommandGroup))
 			continue;
 
-		switch(table[i].CommandGroup)
+		if(!table[i].ChildCommands)
 		{
-		case 'z':
-			{
-				output+="|cffff6060";
-				output+=table[i].Name;
-				output+="|r, ";
-			}
-			break;
-		case 'm':
-			{
-				output+="|cff00ffff";
-				output+=table[i].Name;
-				output+=", ";
-			}
-			break;
-		case 'c':
-			{
-				output += "|cff00ff00";
-				output += table[i].Name;
-				output += "|r, ";
-			}break;
-		default:
-			{
-				output+="|cff00ccff";
-				output+=table[i].Name;
-				output+="|r, ";
-			}
-			break;
+			output += "|cff00ccff";
+			output += table[i].Name;
+			output += "|r, ";
+		}
+		else
+		{
+			output += MSG_COLOR_CYAN;
+			output += table[i].Name;
+			output += "|r, ";
 		}
 
 		count++;

@@ -594,6 +594,12 @@ bool ChatHandler::HandleNpcInfoCommand(const char *args, WorldSession *m_session
 {
 	char msg[512];
 	uint32 guid = GUID_LOPART(m_session->GetPlayer()->GetSelection());
+	Player *plr = getSelectedChar(m_session, false);
+	if(plr)
+	{
+		return HandlePlayerInfo(args, m_session);
+	}
+	
 	Creature *crt = getSelectedCreature(m_session);
 	if(!crt) return false;
 	if(crt->GetCreatureName())

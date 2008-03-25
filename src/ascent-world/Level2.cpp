@@ -348,8 +348,15 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 	switch(target->GetTypeId())
 	{
 	case TYPEID_PLAYER:
-		sGMLog.writefromsession(m_session, "used kill command on PLAYER %s", static_cast< Player* >( target )->GetName() );
-		break;
+		{
+			if(strchr(m_session->GetPermissions(),'p')==NULL)
+			{
+				RedSystemMessage(m_session, "You do not have permission to kill a player.");
+				return true;
+			}
+			sGMLog.writefromsession(m_session, "used kill command on PLAYER %s", static_cast< Player* >( target )->GetName() );
+			break;
+		}
 
 	case TYPEID_UNIT:
 		sGMLog.writefromsession(m_session, "used kill command on CREATURE %s", static_cast< Creature* >( target )->GetCreatureName() ? static_cast< Creature* >( target )->GetCreatureName()->Name : "unknown");
