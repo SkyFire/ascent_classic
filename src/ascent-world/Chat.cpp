@@ -231,7 +231,7 @@ void CommandTableStorage::Init()
 		{ "renamepet",'p',&ChatHandler::HandleRenamePetCommand, "Renames a pet to <name>.", NULL, 0, 0, 0 },
 		{ "addpetspell",'p',&ChatHandler::HandleAddPetSpellCommand, "Teaches pet <spell>.", NULL, 0, 0, 0 },
 		{ "removepetspell",'p',&ChatHandler::HandleRemovePetSpellCommand, "Removes pet spell <spell>.", NULL, 0, 0, 0 },
-		{ "kill",		'p', &ChatHandler::HandleKillCommand,		  ".kill - Kills selected unit.",   NULL, 0, 0, 0},
+		{ "kill",		'u', &ChatHandler::HandleKillCommand,		  ".kill - Kills selected unit.",   NULL, 0, 0, 0},
 		{ "killplr" ,   'u', &ChatHandler::HandleKillByPlrCommand,         ".killplr <name> - Kills specified player" , NULL , 0 , 0 , 0 },
 		{ "revive",	  'p', &ChatHandler::HandleReviveCommand,		"Revives you.",				   NULL, 0, 0, 0},
 		{ "reviveplr",   'p', &ChatHandler::HandleReviveStringcommand,  "Revives player specified.",	  NULL, 0, 0, 0},
