@@ -1318,12 +1318,12 @@ void Aura::SpellAuraDummy(bool apply)
 			 m_target->m_extrastriketargets++;
 		}break;
 	//taming rod spells
-	case 19548:	{
+	case 19548:	{                 //dummy
 		if (apply)
 			break;
 		else
-			TamingSpellid=19597;
-		}break;
+			TamingSpellid=19597; //Spelleffect3 #19614
+	}break;
 	case 19674:	{
 		if (apply)
 			break;
@@ -1407,6 +1407,24 @@ void Aura::SpellAuraDummy(bool apply)
 			break;
 		else
 			TamingSpellid=30104;
+	}break;
+	case 30646:	{
+		if (apply)
+			break;
+		else
+			TamingSpellid=30647;
+	}break;
+	case 30653:	{
+		if (apply)
+			break;
+		else
+			TamingSpellid=30648;
+	}break;
+	case 30654:	{
+		if (apply)
+			break;
+		else
+			TamingSpellid=30648;
 	}break;
 	case 16972://Predatory Strikes
 	case 16974:
