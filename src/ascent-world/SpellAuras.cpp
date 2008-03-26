@@ -1909,7 +1909,7 @@ void Aura::SpellAuraDummy(bool apply)
 		}
 		else
 		{
-			p_caster->SendCastResult(triggerspell->Id,SPELL_FAILED_BAD_TARGETS,0);
+			p_caster->SendCastResult(triggerspell->Id,SPELL_FAILED_BAD_TARGETS,0,0);
 		}
 		TamingSpellid = 0;
 	}
