@@ -1896,16 +1896,22 @@ void Aura::SpellAuraDummy(bool apply)
 		Quest* tamequest = QuestStorage.LookupEntry(triggerspell->EffectMiscValue[1]);
 		if (p_caster->GetQuestLogForEntry(tamequest->id)&& m_target->GetEntry() == tamequest->required_mob[0])
 		{
-			Creature *tame = ((m_target->GetTypeId() == TYPEID_UNIT) ? ((Creature*)m_target) : 0);
-			sQuestMgr.OnPlayerKill(p_caster, tame);
+			if(Rand(75.0f))// 75% chance on success
+			{
+				Creature *tame = ((m_target->GetTypeId() == TYPEID_UNIT) ? ((Creature*)m_target) : 0);
+				sQuestMgr.OnPlayerKill(p_caster, tame);
 
-			tame->GetAIInterface()->HandleEvent(EVENT_LEAVECOMBAT, p_caster, 0);
-			Pet *pPet = objmgr.CreatePet();
-			pPet->SetInstanceID(p_caster->GetInstanceID());
-			pPet->CreateAsSummon(tame->GetEntry(), tame->GetCreatureName(), tame, static_cast<Unit*>(p_caster), NULL, 2, 600000);
-			pPet->CastSpell(tame, triggerspell, false);
-			tame->SafeDelete();
-
+				tame->GetAIInterface()->HandleEvent(EVENT_LEAVECOMBAT, p_caster, 0);
+				Pet *pPet = objmgr.CreatePet();
+				pPet->SetInstanceID(p_caster->GetInstanceID());
+				pPet->CreateAsSummon(tame->GetEntry(), tame->GetCreatureName(), tame, static_cast<Unit*>(p_caster), NULL, 2, 600000);
+				pPet->CastSpell(tame, triggerspell, false);
+				tame->SafeDelete();
+			}
+			else
+			{
+				p_caster->SendCastResult(triggerspell->Id,SPELL_FAILED_TRY_AGAIN,0,0);
+			}
 		}
 		else
 		{
