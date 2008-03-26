@@ -1396,6 +1396,12 @@ void Aura::SpellAuraDummy(bool apply)
 		else
 			TamingSpellid=30100;
 	}break;
+	case 30102:	{
+		if (apply)
+			break;
+		else
+			TamingSpellid=30103;
+	}break;
 	case 30105:	{
 		if (apply)
 			break;
