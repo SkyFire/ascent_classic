@@ -349,7 +349,7 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 	{
 	case TYPEID_PLAYER:
 		{
-			if(strchr(m_session->GetPermissions(),'p')==NULL)
+			if(strchr(m_session->GetPermissions(),'p')==NULL && !m_session->HasGMPermissions())
 			{
 				RedSystemMessage(m_session, "You do not have permission to kill a player.");
 				return true;
