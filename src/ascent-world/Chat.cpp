@@ -54,6 +54,8 @@ ChatCommand * CommandTableStorage::GetSubCommandTable(const char * name)
 		return _questCommandTable;
 	else if(!strcmp(name, "server"))
 		return _serverCommandTable;
+	else if(!strcmp(name, "lookup"))
+		return _lookupCommandTable;
 	return 0;
 }
 
@@ -176,6 +178,7 @@ void CommandTableStorage::Dealloc()
 	free( _guildCommandTable);
 	free( _questCommandTable );
 	free( _serverCommandTable );
+	free( _lookupCommandTable );
 	free( _commandTable );
 }
 
@@ -506,11 +509,20 @@ void CommandTableStorage::Init()
 	};
 	dupe_command_table(serverCommandTable, _serverCommandTable);
 
+	static ChatCommand lookupCommandTable[] =
+	{
+		{ "item",		'l', &ChatHandler::HandleLookupItemCommand, "looks up an item string", NULL, 0, 0, 0 },
+		{ "quest",		'l', &ChatHandler::HandleQuestLookupCommand, "looks up a quest string", NULL, 0, 0, 0 },
+		{ "creature",	'l', &ChatHandler::HandleLookupCreatureCommand, "looks up an item string", NULL, 0, 0, 0 },
+		{ NULL,		    0,  NULL,										"",														NULL, 0, 0, 0},
+	};
+	dupe_command_table(lookupCommandTable, _lookupCommandTable);
+
 	static ChatCommand commandTable[] = {
 		{ "commands",		'0', &ChatHandler::HandleCommandsCommand,		"shows commands",				 NULL, 0, 0, 0},
 		{ "help",			'0', &ChatHandler::HandleHelpCommand,			"shows help for commands",		 NULL, 0, 0, 0},
 		{ "gps",			'0', &ChatHandler::HandleGPSCommand,		   "shows your current position",				 NULL, 0, 0, 0},
-
+		{ "createarenateam",'g', &ChatHandler::HandleCreateArenaTeamCommands, "creates an arena team", NULL, 0, 0, 0 },
 		{ "unit",			'u', NULL,									 "",				 unitCommandTable, 0, 0, 0},
 		{ "waypoint",		'w', NULL,									 "",			   waypointCommandTable, 0, 0, 0},
 		{ "debug",			'd', NULL,									 "",				  debugCommandTable, 0, 0, 0},
@@ -523,11 +535,7 @@ void CommandTableStorage::Init()
 		{ "teleport",		't', NULL,									 "",				 teleCommandTable, 0, 0, 0},
 		{ "guild",			'f', NULL,									 "",				 GuildCommandTable, 0, 0, 0},
 		{ "server",			's', NULL,									 "",				 serverCommandTable, 0, 0, 0},
-		{ "lookupitem",		'l', &ChatHandler::HandleLookupItemCommand, "looks up an item string", NULL, 0, 0, 0 },
-		{ "lookupquest",	'l', &ChatHandler::HandleQuestLookupCommand, "looks up a quest string", NULL, 0, 0, 0 },
-		{ "lookupcreature", 'l', &ChatHandler::HandleLookupCreatureCommand, "looks up an item string", NULL, 0, 0, 0 },
-		{ "createarenateam",'g', &ChatHandler::HandleCreateArenaTeamCommands, "creates an arena team", NULL, 0, 0, 0 },
-	
+		{ "lookup",			'l', NULL,									 "",				 lookupCommandTable, 0, 0, 0},
 		{ NULL,		  0, NULL,										 "",							   NULL, 0, 0  }
 	};
 	dupe_command_table(commandTable, _commandTable);

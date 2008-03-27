@@ -197,6 +197,7 @@ class SERVER_DECL CommandTableStorage : public Singleton<CommandTableStorage>
 	ChatCommand * _questCommandTable;
 	ChatCommand * _guildCommandTable;
 	ChatCommand * _serverCommandTable;
+	ChatCommand * _lookupCommandTable;
 	ChatCommand * _commandTable;
 
 	ChatCommand * GetSubCommandTable(const char * name);
