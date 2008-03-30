@@ -2262,6 +2262,8 @@ void Player::RemovePendingPlayer()
 
 bool Player::LoadFromDB(uint32 guid)
 {
+	m_uint32Values[OBJECT_FIELD_GUID] = guid;
+
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP0<Player>(this, &Player::LoadFromDBProc) );
 	q->AddQuery("SELECT * FROM characters WHERE guid=%u AND forced_rename_pending = 0",guid);
 	q->AddQuery("SELECT * FROM tutorials WHERE playerId=%u",guid);
@@ -2273,9 +2275,15 @@ bool Player::LoadFromDB(uint32 guid)
 	q->AddQuery("SELECT * FROM mailbox WHERE player_guid = %u", guid);
 
 	// queue it!
-	m_uint32Values[OBJECT_FIELD_GUID] = guid;
-	CharacterDatabase.QueueAsyncQuery(q);
-	return true;
+	if( CharacterDatabase.QueueAsyncQuery(q))
+	{
+		return true;
+	}
+	else
+	{
+		delete q;
+		return false;
+	}
 }
 
 void Player::LoadFromDBProc(QueryResultVector & results)

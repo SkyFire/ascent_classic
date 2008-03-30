@@ -245,7 +245,7 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 {	
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::CharacterEnumProc, GetAccountId()) );
 	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags, guild_data.guildid FROM characters LEFT JOIN guild_data ON characters.guid = guild_data.playerid WHERE acct=%u ORDER BY guid", GetAccountId());
-	CharacterDatabase.QueueAsyncQuery(q);
+	bool dummy = CharacterDatabase.QueueAsyncQuery(q);
 }
 
 void WorldSession::LoadAccountDataProc(QueryResult * result)

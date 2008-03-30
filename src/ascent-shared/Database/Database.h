@@ -105,7 +105,7 @@ public:
 	virtual void EscapeLongString(const char * str, uint32 len, stringstream& out) = 0;
 	virtual string EscapeString(const char * esc, DatabaseConnection * con) = 0;
 	
-	void QueueAsyncQuery(AsyncQuery * query);
+	bool QueueAsyncQuery(AsyncQuery * query);
 	void EndThreads();
 	
 	void thread_proc_query();
