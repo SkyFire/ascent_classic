@@ -3122,8 +3122,12 @@ Unit *AIInterface::GetMostHated()
 			continue;
 		}
 #endif
-
-		if((itr->second + itr->first->GetThreatModifyer()) > currentTarget.second)
+		// you must exceed 10% of the tank's threat to gain aggro in melee range
+		float threat_threshold = 1.1f;
+		// or 30% if outside melee range
+		if( currentTarget.first->isInRange( itr->first , 5.0f ) )
+		threat_threshold = 1.3f;
+		if((itr->second + itr->first->GetThreatModifyer()) > currentTarget.second * (int32)threat_threshold )
 		{
 			/* new target */
 			currentTarget.first = itr->first;
