@@ -8587,7 +8587,6 @@ void Player::Possess(Unit * pTarget)
 {
 	if(m_Summon || m_CurrentCharm)
 		return;
-
 	m_CurrentCharm = pTarget;
 	if(pTarget->GetTypeId() == TYPEID_UNIT)
 	{

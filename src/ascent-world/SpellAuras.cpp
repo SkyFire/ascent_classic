@@ -958,28 +958,52 @@ void Aura::SpellAuraModPossess(bool apply)
 	if(apply)
 	{
 		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER ) 
+		{
 			static_cast< Player* >(caster)->Possess( m_target );
+			}
+
 	}
 	else
 	{
-		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER )
-			static_cast< Player* >(caster)->UnPossess();
 
+		if( caster != NULL && caster->IsInWorld() && caster->GetTypeId() == TYPEID_PLAYER )
+		{
+			static_cast< Player* >(caster)->UnPossess();
+		}
 		// make sure Player::UnPossess() didn't fail, if it did we will just free the target here
 		if( m_target->GetUInt64Value( UNIT_FIELD_CHARMEDBY ) != 0 )
 		{
-			if( m_target->GetTypeId() == TYPEID_UNIT )
-			{
-				m_target->setAItoUse( true );
-				m_target->m_redirectSpellPackets = 0;
-			}
 
 			m_target->SetUInt64Value( UNIT_FIELD_CHARMEDBY, 0 );
 			m_target->RemoveFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE );
 			m_target->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, m_target->GetCharmTempVal() );
 			m_target->_setFaction();
 			m_target->UpdateOppFactionSet();
+
+			if( m_target->GetTypeId() == TYPEID_UNIT )
+			{
+				m_target->setAItoUse( true );
+				m_target->m_redirectSpellPackets = 0;
+			}
 		}
+
+		// Handle our targets now.
+	
+
+		if( m_target->GetTypeId() == TYPEID_UNIT )
+		{
+			// === Clear our threatlist - not entirely blizzlike, but better than what we had before (allowed for many MC exploits in instances) ===
+			m_target->GetAIInterface()->WipeHateList();
+
+			// === Remove us from our attacker's hate lists ===
+			m_target->CombatStatus.AttackersForgetHate();
+
+			// === Add threat to the caster ===
+			// WoWWiki says there will be a massive amount of threat added to the caster.
+			// However, there is no formula known, so we'll just add a flat value.
+			m_target->GetAIInterface()->AttackReaction( caster , 10000 );
+		}
+
 	}
 }
 

@@ -178,7 +178,6 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_ENTERCOMBAT:
 			{
 				if( pUnit == NULL ) return;
-
 				/* send the message */
 				if( m_Unit->GetTypeId() == TYPEID_UNIT )
 				{
@@ -368,6 +367,8 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				FollowDistance = 0.0f;
 
 				m_aiTargets.clear(); // we'll get a new target after we are unfeared
+				// No we won't...
+
 				m_fleeTimer = 0;
 				m_hasFleed = false;
 				m_hasCalledForHelp = false;
@@ -662,11 +663,11 @@ void AIInterface::_UpdateTargets()
 	// Find new Assist Targets and remove old ones
 	if(m_AIState == STATE_FLEEING)
 	{
-		FindFriends(100.0f/*10.0*/);
+		FindFriends(225.0f/*15.0*/);
 	}
 	else if(m_AIState != STATE_IDLE && m_AIState != STATE_SCRIPTIDLE)
 	{
-		FindFriends(16.0f/*4.0f*/);
+		FindFriends(64.0f/*8.0f*/);
 	}
 
 	if( m_updateAssist )
