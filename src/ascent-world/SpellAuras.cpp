@@ -1342,111 +1342,165 @@ void Aura::SpellAuraDummy(bool apply)
 			 m_target->m_extrastriketargets++;
 		}break;
 	//taming rod spells
-	case 19548:	{                 //dummy
+	case 19548:	{                 //invoke damage to trigger attack
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
-			TamingSpellid=19597; //Spelleffect3 #19614
+			TamingSpellid=19597; //uses Spelleffect3 #19614
 	}break;
 	case 19674:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19677;
 	}break;
 	case 19687:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19676;
 	}break;
 	case 19688:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19678;
 	}break;
 	case 19689:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19679;
 	}break;
 	case 19692:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19680;
 	}break;
 	case 19693:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19684;
 	}break;
 	case 19694:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19681;
 	}break;
 	case 19696:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19682;
 	}break;
 	case 19697:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19683;
 	}break;
 	case 19699:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19685;
 	}break;
 	case 19700:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=19686;
 	}break;
 	case 30099:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=30100;
 	}break;
 	case 30102:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=30103;
 	}break;
 	case 30105:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=30104;
 	}break;
 	case 30646:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=30647;
 	}break;
 	case 30653:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=30648;
 	}break;
 	case 30654:	{
 		if (apply)
+		{
+			m_target->GetAIInterface()->AttackReaction( GetUnitCaster(), 10, 0);
 			break;
+		}
 		else
 			TamingSpellid=30648;
 	}break;
@@ -1936,34 +1990,39 @@ void Aura::SpellAuraDummy(bool apply)
 				pTarget->RemoveShapeShiftSpell( 24932 );
 		}break;
 	}
-	if (TamingSpellid)
-	{
-		// Creates a 10 minute pet, if player has the quest that goes with the spell and if target corresponds to quest
-		Player*p_caster =(Player*)GetUnitCaster();
-		SpellEntry *triggerspell = dbcSpell.LookupEntry(TamingSpellid );
-		Quest* tamequest = QuestStorage.LookupEntry(triggerspell->EffectMiscValue[1]);
-		if (p_caster->GetQuestLogForEntry(tamequest->id)&& m_target->GetEntry() == tamequest->required_mob[0])
-		{
-			if(Rand(75.0f))// 75% chance on success
-			{
-				Creature *tame = ((m_target->GetTypeId() == TYPEID_UNIT) ? ((Creature*)m_target) : 0);
-				sQuestMgr.OnPlayerKill(p_caster, tame);
 
-				tame->GetAIInterface()->HandleEvent(EVENT_LEAVECOMBAT, p_caster, 0);
+	if ( TamingSpellid && ! GetTimeLeft() )
+	{
+		// Creates a 15 minute pet, if player has the quest that goes with the spell and if target corresponds to quest
+		Player *p_caster =(Player*)GetUnitCaster();
+		SpellEntry *triggerspell = dbcSpell.LookupEntry( TamingSpellid );
+		Quest* tamequest = QuestStorage.LookupEntry( triggerspell->EffectMiscValue[1] );
+		if ( p_caster->GetQuestLogForEntry(tamequest->id )&& m_target->GetEntry() == tamequest->required_mob[0] )
+		{	
+			if( Rand( 75.0f ) )// 75% chance on success
+			{
+				Creature *tamed = ( ( m_target->GetTypeId() == TYPEID_UNIT ) ? ( ( Creature* ) m_target ) : 0 );
+				QuestLogEntry *qle = p_caster->GetQuestLogForEntry(tamequest->id );
+
+				tamed->GetAIInterface()->HandleEvent( EVENT_LEAVECOMBAT, p_caster, 0 );
 				Pet *pPet = objmgr.CreatePet();
-				pPet->SetInstanceID(p_caster->GetInstanceID());
-				pPet->CreateAsSummon(tame->GetEntry(), tame->GetCreatureName(), tame, static_cast<Unit*>(p_caster), NULL, 2, 600000);
-				pPet->CastSpell(tame, triggerspell, false);
-				tame->SafeDelete();
+				pPet->SetInstanceID( p_caster->GetInstanceID() );
+				pPet->CreateAsSummon( tamed->GetEntry(), tamed->GetCreatureName(), tamed, static_cast<Unit*>(p_caster), triggerspell, 2, 900000 );
+				pPet->CastSpell( tamed, triggerspell, false );
+				tamed->SafeDelete();
+				qle->SetMobCount( 0, 1 );
+				qle->SendUpdateAddKill( 1 );
+				qle->UpdatePlayerFields();
+				qle->SendQuestComplete();
 			}
 			else
 			{
-				p_caster->SendCastResult(triggerspell->Id,SPELL_FAILED_TRY_AGAIN,0,0);
+				p_caster->SendCastResult( triggerspell->Id,SPELL_FAILED_TRY_AGAIN,0,0 );
 			}
 		}
 		else
 		{
-			p_caster->SendCastResult(triggerspell->Id,SPELL_FAILED_BAD_TARGETS,0,0);
+			p_caster->SendCastResult( triggerspell->Id,SPELL_FAILED_BAD_TARGETS,0,0 );
 		}
 		TamingSpellid = 0;
 	}
