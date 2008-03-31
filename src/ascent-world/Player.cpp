@@ -9733,12 +9733,16 @@ bool Player::Cooldown_CanCast(SpellEntry * pSpell)
 			m_cooldownMap[COOLDOWN_TYPE_SPELL].erase( itr );
 	}
 
-	if( m_globalCooldown && !CooldownCheat && pSpell->StartRecoveryTime >= 0 )
+	if( m_globalCooldown && !CooldownCheat && pSpell->StartRecoveryTime > 0 )
 	{
 		if( mstime < m_globalCooldown )
+		{
 			return false;
+		}
 		else
+		{
 			m_globalCooldown = 0;
+		}
 	}
 
 	return true;

@@ -1088,12 +1088,11 @@ void Spell::cancel()
 {
 	SendInterrupted(0);
 	SendCastResult(SPELL_FAILED_INTERRUPTED);
-
 	if(m_spellState == SPELL_STATE_CASTING)
 	{
 		if( u_caster != NULL )
 			u_caster->RemoveAura(m_spellInfo->Id);
-	
+		
 		if(m_timer > 0 || m_Delayed)
 		{
 			if(p_caster && p_caster->IsInWorld())
@@ -1102,6 +1101,7 @@ void Spell::cancel()
 				if(!pTarget)
 					pTarget = p_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
 				  
+
 				if(pTarget)
 				{
 					pTarget->RemoveAura(m_spellInfo->Id, m_caster->GetGUID());
@@ -1128,12 +1128,18 @@ void Spell::cancel()
 				}
 				if (m_timer > 0)
 					p_caster->delayAttackTimer(-m_timer);
+
+
 //				p_caster->setAttackTimer(1000, false);
 			 }
 		}
 		SendChannelUpdate(0);
 	}
-
+	else
+	{
+		// global cooldown reset - spell was being cast but was cancelled
+		p_caster->ResetGlobalCooldown();
+	}
 	//m_spellState = SPELL_STATE_FINISHED;
 	finish();
 }

@@ -691,6 +691,7 @@ public:
 	bool Cooldown_CanCast(SpellEntry * pSpell);
 	bool Cooldown_CanCast(ItemPrototype * pProto, uint32 x);
 
+	ASCENT_INLINE void ResetGlobalCooldown() { m_globalCooldown = 0; };
 protected:
 	void _Cooldown_Add(uint32 Type, uint32 Misc, uint32 Time, uint32 SpellId, uint32 ItemId);
 	void _LoadPlayerCooldowns(QueryResult * result);
