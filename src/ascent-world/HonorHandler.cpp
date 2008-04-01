@@ -44,6 +44,8 @@ void HonorHandler::AddHonorPointsToPlayer(Player *pPlayer, uint32 uAmount)
 int32 HonorHandler::CalculateHonorPointsForKill( Player *pPlayer, Unit* pVictim )
 {
 	// this sucks.. ;p
+	//
+	// WELL FIX IT THEN, DAMNIT - Aim
 	if( pVictim == NULL )
 	{
 		int32 pts = rand() % 100 + 100;
