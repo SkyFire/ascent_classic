@@ -262,22 +262,23 @@ bool Database::run()
 	return false;
 }
 
-void AsyncQuery::AddQuery(const char * formatstring, ...)
+void AsyncQuery::AddQuery(const char * format, ...)
 {
 	AsyncQueryResult res;
-	size_t nSize = 0;
-	char buff[1000];
-	memset(buff, 0, sizeof(buff));
-	va_list args;
-	va_start(args, formatstring);
-	nSize = vsnprintf_s( buff, sizeof(buff), _TRUNCATE, formatstring, args);
+	va_list ap;
+	char buffer[10000];
+	size_t len;
+	va_start(ap, format);
+	vsnprintf(buffer, 10000, format, ap);
+	va_end(ap);
+	len = strlen(buffer);
+	ASSERT(len);
+	res.query = new char[len+1];
+	res.query[len] = 0;
+	memcpy(res.query, buffer, len);
 	res.result = NULL;
-	res.query = new char[nSize+1];
-	res.query[nSize] = 0;
-	memcpy_s(res.query, nSize, buff, nSize);
 	queries.push_back(res);
 }
-
 void AsyncQuery::Perform()
 {
 	DatabaseConnection * conn = db->GetFreeConnection();
