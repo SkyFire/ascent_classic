@@ -1285,6 +1285,7 @@ void Aura::SpellAuraDummy(bool apply)
 		return;
 
 	uint32 triggerSpId = 0;
+	uint32 TamingSpellid=0;
 
 	// for seal -> set judgement crap
 	if( GetSpellProto()->buffType & SPELL_TYPE_SEAL && mod->i == 2 )

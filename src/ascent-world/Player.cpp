@@ -139,8 +139,6 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	for ( int aX = 0 ; aX < 8 ; aX++ )
 		m_Tutorials[ aX ] = 0x00;
 
-	m_lastRestUpdate		= 0;
-
 	m_lootGuid			  = 0;
 	m_banned				= false;
 

@@ -279,6 +279,7 @@ void AsyncQuery::AddQuery(const char * format, ...)
 	res.result = NULL;
 	queries.push_back(res);
 }
+
 void AsyncQuery::Perform()
 {
 	DatabaseConnection * conn = db->GetFreeConnection();
@@ -363,19 +364,17 @@ void Database::thread_proc_query()
 	}
 }
 
-bool Database::QueueAsyncQuery(AsyncQuery * query)
+void Database::QueueAsyncQuery(AsyncQuery * query)
 {
-	for(vector<AsyncQueryResult>::iterator itr = query->queries.begin(); itr != query->queries.end(); ++itr)
-	{
-		if ( itr->query == NULL )
-		{
-			return false;
-		}
-	}
 	query->db = this;
+	/*if(qt == NULL)
+	{
+		query->Perform();
+		return;
+	}
 
+	qqueries_queue.push(query);*/
 	query->Perform();
-	return true;
 }
 
 void Database::AddQueryBuffer(QueryBuffer * b)

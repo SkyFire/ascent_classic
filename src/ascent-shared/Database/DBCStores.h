@@ -367,6 +367,7 @@ struct SpellEntry
 
 	bool self_cast_only;
 	bool apply_on_shapeshift_change;
+	bool always_apply;
 };
 
 struct ItemExtendedCostEntry
