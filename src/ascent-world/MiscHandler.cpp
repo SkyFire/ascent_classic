@@ -144,10 +144,13 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 			item->ApplyRandomProperties(false);
 		}
 
-		GetPlayer()->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
-		
-		sQuestMgr.OnPlayerItemPickup(GetPlayer(),item);
-		_player->GetSession()->SendItemPushResult(item,false,true,true,true,slotresult.ContainerSlot,slotresult.Slot,1);
+		if( GetPlayer()->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot) )
+		{
+			sQuestMgr.OnPlayerItemPickup(GetPlayer(),item);
+			_player->GetSession()->SendItemPushResult(item,false,true,true,true,slotresult.ContainerSlot,slotresult.Slot,1);
+		}
+		else
+			delete item;
 	}
 	else 
 	{	
@@ -1237,15 +1240,18 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 	{
 		case GAMEOBJECT_TYPE_CHAIR:
 		{
-			WorldPacket data(MSG_MOVE_HEARTBEAT, 66);
+            /// if players are mounted they are not able to sit on a chair
+            if( plyr->IsMounted() )
+				plyr->RemoveAura( plyr->m_MountSpellId );
+
+			/*WorldPacket data(MSG_MOVE_HEARTBEAT, 66);
 			data << plyr->GetNewGUID();
 			data << uint8(0);
 			data << uint64(0);
 			data << obj->GetPositionX() << obj->GetPositionY() << obj->GetPositionZ() << obj->GetOrientation();
-			plyr->SendMessageToSet(&data, true);
+			plyr->SendMessageToSet(&data, true);*/
+			plyr->SafeTeleport( plyr->GetMapId(), plyr->GetInstanceID(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj->GetOrientation() );
 			plyr->SetStandState(STANDSTATE_SIT_MEDIUM_CHAIR);
-			plyr->m_lastRunSpeed = 0; //counteract mount-bug; reset speed to zero to force update SetPlayerSpeed in next line.
-			plyr->SetPlayerSpeed(RUN,plyr->m_base_runSpeed);
 		}break;
 	case GAMEOBJECT_TYPE_CHEST://cast da spell
 		{
@@ -1633,7 +1639,8 @@ void WorldSession::HandleAcknowledgementOpcodes( WorldPacket & recv_data )
 	case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
 	case CMSG_FORCE_FLY_BACK_SPEED_CHANGE_ACK:
 	case CMSG_FORCE_MOVE_SET_FLY_SPEED_ACK:
-		_player->ResetSpeedHack();
+		_player->ResetHeartbeatCoords();
+		_player->_speedChangeInProgress = false;
 		break;
 	}
 
@@ -1848,10 +1855,13 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 		item->ApplyRandomProperties(false);
 	}
 
-	player->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot);
-	player->GetSession()->SendItemPushResult(item,false,true,true,true,slotresult.ContainerSlot,slotresult.Slot,1);
-	
-	sQuestMgr.OnPlayerItemPickup(player,item);
+	if( player->GetItemInterface()->SafeAddItem(item,slotresult.ContainerSlot, slotresult.Slot) )
+	{
+		player->GetSession()->SendItemPushResult(item,false,true,true,true,slotresult.ContainerSlot,slotresult.Slot,1);
+		sQuestMgr.OnPlayerItemPickup(player,item);
+	}
+	else
+		delete item;
 
 	pLoot->items.at(slotid).iItemsCount=0;
 

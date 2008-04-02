@@ -23,7 +23,9 @@
 #ifdef SCRIPTLIB
 
 #include <svn_revision.h>
+#ifndef SKIP_ALLOCATOR_SHARING
 #include "CoreMemoryAllocator.cpp"
+#endif
 
 #define MAKE_SCRIPT_VERSION(major, minor) (uint32)(((uint16)major << 16) | ((uint16)minor))
 

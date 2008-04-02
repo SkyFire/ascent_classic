@@ -49,6 +49,7 @@ protected:
 	bool event_HasEvent(uint32 EventType);
 	void event_RemoveByPointer(TimedEvent * ev);
 	ASCENT_INLINE int32 event_GetCurrentInstanceId() { return m_event_Instanceid; }
+	bool event_GetTimeLeft(uint32 EventType, uint32 * Time);
 
 public:
 	uint32 event_GetEventPeriod(uint32 EventType);

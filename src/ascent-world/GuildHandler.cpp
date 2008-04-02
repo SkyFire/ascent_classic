@@ -587,7 +587,13 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			i->SetUInt32Value(ITEM_FIELD_FLAGS, 1);
 			i->SetUInt32Value(ITEM_FIELD_ENCHANTMENT, c->GetID());
 			i->SetUInt32Value(ITEM_FIELD_PROPERTY_SEED, 57813883);
-			_player->GetItemInterface()->AddItemToFreeSlot(i);
+			if( !_player->GetItemInterface()->AddItemToFreeSlot(i) )
+			{
+				c->Destroy();
+				delete i;
+				return;
+			}
+
 			c->SaveToDB();
 
 			/*WorldPacket data(45);
@@ -648,7 +654,13 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			i->SetUInt32Value(ITEM_FIELD_FLAGS, 1);
 			i->SetUInt32Value(ITEM_FIELD_ENCHANTMENT, c->GetID());
 			i->SetUInt32Value(ITEM_FIELD_PROPERTY_SEED, 57813883);
-			_player->GetItemInterface()->AddItemToFreeSlot(i);
+			if( !_player->GetItemInterface()->AddItemToFreeSlot(i) )
+			{
+				c->Destroy();
+				delete i;
+				return;
+			}
+
 			c->SaveToDB();
 
 			/*data.clear();
@@ -1458,7 +1470,7 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 				/* this *really* shouldn't happen. */
 				if(!_player->GetItemInterface()->AddItemToFreeSlot(pDestItem))
 				{
-					pDestItem->DeleteFromDB();
+					//pDestItem->DeleteFromDB();
 					delete pDestItem;
 				}
 			}

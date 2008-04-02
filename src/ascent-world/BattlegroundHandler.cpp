@@ -57,8 +57,15 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket &recv_data)
 
 void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recv_data)
 {
-	// TODO implement this
-	sLog.outString("Received CMSG_BATTLEFIELD_LIST");
+	uint64 guid;
+	recv_data >> guid;
+
+	CHECK_INWORLD_RETURN;
+	Creature * pCreature = _player->GetMapMgr()->GetCreature( (uint32)guid );
+	if( pCreature == NULL )
+		return;
+
+	SendBattlegroundList( pCreature, 0 );
 }
 
 void WorldSession::SendBattlegroundList(Creature* pCreature, uint32 mapid)

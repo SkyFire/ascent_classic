@@ -691,7 +691,6 @@ public:
 	bool Cooldown_CanCast(SpellEntry * pSpell);
 	bool Cooldown_CanCast(ItemPrototype * pProto, uint32 x);
 
-	ASCENT_INLINE void ResetGlobalCooldown() { m_globalCooldown = 0; };
 protected:
 	void _Cooldown_Add(uint32 Type, uint32 Misc, uint32 Time, uint32 SpellId, uint32 ItemId);
 	void _LoadPlayerCooldowns(QueryResult * result);
@@ -942,7 +941,7 @@ public:
 		return false;
 	}
 	ASCENT_INLINE int          HasBeenInvited() { return m_GroupInviter != 0; }
-	ASCENT_INLINE Group*       GetGroup() { return m_playerInfo->m_Group; }
+	ASCENT_INLINE Group*       GetGroup() { return m_playerInfo ? m_playerInfo->m_Group : NULL; }
 	ASCENT_INLINE int8		   GetSubGroup() { return m_playerInfo->subGroup; }
     bool                IsGroupMember(Player *plyr);
 	ASCENT_INLINE bool         IsBanned()
@@ -1209,7 +1208,6 @@ public:
 	GossipMenu* CurrentGossipMenu;
 	void CleanupGossipMenu();
 	void Gossip_Complete();
-	void Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name);
 	int m_lifetapbonus;
 	uint32 m_lastShotTime;
 	
@@ -1411,13 +1409,11 @@ public:
 
 	void ResetHeartbeatCoords();
 
-	float _lastHeartbeatX;
-	float _lastHeartbeatY;
-	float _lastHeartbeatZ;
-	float _lastHeartbeatO; // orientation
+	LocationVector _lastHeartbeatPosition;
 	float _lastHeartbeatV; // velocity
-	time_t _lastHeartbeatT; // time
+	uint32 _lastHeartbeatT;	// time
 	int32 _heartbeatDisable;
+	bool _speedChangeInProgress;
 
 	void AddSplinePacket(uint64 guid, ByteBuffer* packet);
 	ByteBuffer* GetAndRemoveSplinePacket(uint64 guid);
@@ -1617,13 +1613,8 @@ public:
 		SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH) );
 	}
 
-	void ResetSpeedHack()
-	{
-		ResetHeartbeatCoords();
-		--_heartbeatDisable;
-		if(_heartbeatDisable < 0)
-			_heartbeatDisable = 0;
-	}
+	void ResetSpeedHack();
+	void DelaySpeedHack(uint32 ms);
 
 	LocationVector m_last_group_position;
 	int32 m_rap_mod_pct;
@@ -1668,16 +1659,12 @@ public:
     /************************************************************************/
     /* Spell Packet wrapper Please keep this separated                      */
     /************************************************************************/
-    void SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint8 MultiCast, uint32 Extra);
-    void SendSpellCoolDown(uint32 SpellID, uint16 Time);
     void SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4);
     void SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, bool type);
-    void SendBindPointUpdate(float x,float y,float z,uint32 mapid,uint32 zoneid);
-    void SendSetProficiency(uint8 ItemClass, uint32 Proficiency);
     void SendEnvironmentalDamageLog(const uint64 & guid, uint8 type, uint32 damage);
-    void SendLoginVerifyWorld(uint32 MapId, float x, float y, float z, float o);
-    void SendLoginVerifyWorld();
 	void SendWorldStateUpdate(uint32 WorldState, uint32 Value);
+	void SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint8 MultiCast, uint32 Extra);
+	void Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name);
     /************************************************************************/
     /* End of SpellPacket wrapper                                           */
     /************************************************************************/
@@ -1856,6 +1843,11 @@ public:
 #endif
 
 	void addDeletedSpell(uint32 id) { mDeletedSpells.insert( id ); }
+
+	map<uint32, uint32> m_forcedReactions;
+
+	uint32 m_speedhackCheckTimer;
+	void _SpeedhackCheck(uint32 mstime);		// save a call to getMSTime() yes i am a stingy bastard
 };
 
 class SkillIterator

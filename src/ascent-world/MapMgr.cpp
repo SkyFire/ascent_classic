@@ -72,7 +72,6 @@ MapMgr::~MapMgr()
 	delete ScriptInterface;
 	
 	// Remove objects
-	Log.Notice("MapMgr","Instance %u shutdown: emptying all cells of objects...", GetInstanceID());
 	if(_cells)
 	{
 		for (uint32 i = 0; i < _sizeX; i++)
@@ -114,7 +113,7 @@ MapMgr::~MapMgr()
 		delete pCorpse;
 	}
 
-	Log.Notice("MapMgr", "Instance %u shutdown: Instance Closed Successfully. (MapId: %u)" , m_instanceID, _mapId);
+	Log.Notice("MapMgr", "Instance %u shut down. (%s)" , m_instanceID, GetBaseMap()->GetName());
 }
 
 
@@ -1209,8 +1208,8 @@ void MapMgr::UpdateCellActivity(uint32 x, uint32 y, int radius)
 
 bool MapMgr::_CellActive(uint32 x, uint32 y)
 {
-	uint32 endX = (x <= _sizeX) ? x + 1 : (_sizeX-1);
-	uint32 endY = (y <= _sizeY) ? y + 1 : (_sizeY-1);
+	uint32 endX = ((x+1) <= _sizeX) ? x + 1 : (_sizeX-1);
+	uint32 endY = ((y+1) <= _sizeY) ? y + 1 : (_sizeY-1);
 	uint32 startX = x > 0 ? x - 1 : 0;
 	uint32 startY = y > 0 ? y - 1 : 0;
 	uint32 posX, posY;

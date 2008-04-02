@@ -327,10 +327,17 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	if( recv_data.GetOpcode() == MSG_MOVE_STOP 
 		|| recv_data.GetOpcode() == MSG_MOVE_STOP_STRAFE 
 		|| recv_data.GetOpcode() == MSG_MOVE_STOP_TURN 
-		)
+		|| recv_data.GetOpcode() == MSG_MOVE_FALL_LAND
+		|| !( recv_data.GetOpcode() == MSG_MOVE_SET_FACING && movement_info.flags & MOVEFLAG_MOVING_MASK ) )
+	{
+		//printf("MOVING: FALSE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
 		_player->m_isMoving = false;
+	}
 	else
+	{
+		//printf("MOVING: TRUE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
 		_player->m_isMoving = true;
+	}
 
 	/************************************************************************/
 	/* Remove Emote State                                                   */
@@ -437,7 +444,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	{
 		_player->blinked = false;
 		_player->m_fallDisabledUntil = UNIXTIME + 5;
-		_player->ResetHeartbeatCoords();
+		_player->DelaySpeedHack( 5000 );
 	}
 	else
 	{
@@ -500,7 +507,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 			}
 
 			_player->m_TransporterGUID = 0;
-			_player->ResetSpeedHack();
+			_player->ResetHeartbeatCoords();
 		}
 		else if(movement_info.transGuid)
 		{
@@ -520,7 +527,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				_player->m_TransporterX = movement_info.transX;
 				_player->m_TransporterY = movement_info.transY;
 				_player->m_TransporterZ = movement_info.transZ;
-				_player->_heartbeatDisable++;
 			}
 			else
 			{
@@ -542,95 +548,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/* Anti-Speed Hack Checks                                               */
 	/************************************************************************/
 
-	if( sWorld.antihack_speed )
-	{
-		float speed;
-
-		if( !_player->flying_aura )
-		{
-			switch( _player->m_lastMoveType )
-			{
-			case 1:
-				speed = _player->m_swimSpeed;
-				break;
-			case 2:
-				speed = _player->m_flySpeed;
-				break;
-			default:
-				speed = _player->m_runSpeed;
-				break;
-			}
-		}
-		else
-		{
-			speed = _player->m_flySpeed;
-		}
-
-		if( !_player->_heartbeatDisable && ( !_player->blinked/* || _player->m_redirectCount > 5*/ ) &&
-			!_player->m_uint32Values[UNIT_FIELD_CHARM] && _player->m_TransporterGUID == 0 && !( movement_info.flags & 0x6000 ) )
-		{
-			if( ( sWorld.no_antihack_on_gm && !HasGMPermissions() ) || !sWorld.no_antihack_on_gm )
-			{
-				if( _player->_lastHeartbeatV >= speed )
-				{
-					float delta_x = movement_info.x - _player->_lastHeartbeatX;
-					float delta_y = movement_info.y - _player->_lastHeartbeatY;
-
-					float distance_xy_plane = delta_x * delta_x + delta_y * delta_y;
-					float distance_delta = distance_xy_plane / speed;
-					//float latency = float( _latency ) * 0.01f;
-					static float latency = 0.25f;
-					float speed_delta = ( speed * 0.25f ) + std::max( latency + ( latency * 0.04f ), 0.32f );
-
-					if( distance_delta >= speed_delta )
-					{
-						switch ( _player->m_speedhackChances )
-						{
-						case 2:
-							{
-								sChatHandler.SystemMessage( this, "Speedhacker detected this is your first warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 10 seconds." );
-								sCheatLog.writefromsession( this, "Speedhacker first warning, deterministic data : D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
-								sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
-								_player->SetMovement( MOVE_ROOT, 1 );
-								sEventMgr.AddEvent( _player, &Player::SetMovement, uint8( MOVE_UNROOT ), uint32(1), EVENT_DELETE_TIMER, 10000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
-								_player->ResetHeartbeatCoords();
-								_player->m_speedhackChances--;
-								break;
-							}
-						case 1:
-							{
-								sChatHandler.SystemMessage( this, "Speedhacker detected this is your second warning. Your account has been flagged for later processing by server administrators. You will be unrooted in 45 seconds." );
-								sCheatLog.writefromsession( this, "Speedhacker second warning, deterministic data : D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
-								sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
-								_player->SetMovement( MOVE_ROOT, 1 );
-								sEventMgr.AddEvent( _player, &Player::SetMovement, uint8( MOVE_UNROOT ), uint32(1), EVENT_DELETE_TIMER, 45000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
-								_player->ResetHeartbeatCoords();
-								_player->m_speedhackChances--;
-								break;
-							}
-						case 0:
-							{
-								sChatHandler.SystemMessage( this, "Speedhacker detected you were warned. Your account has been flagged for later processing by server administrators. You will now be removed from the server." );
-								sCheatLog.writefromsession( this, "Speedhacker kicked, deterministic data : D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
-								sLog.outDebug( "Speedhacker D(%f) DD(%f) S(%f) SD(%f) L(%f)", distance_xy_plane, distance_delta, speed, speed_delta, ( (float)_player->GetSession()->GetLatency() / 100.0f ) );
-								_player->m_KickDelay = 0;
-								sEventMgr.AddEvent( _player, &Player::_Kick, EVENT_PLAYER_KICK, 15000, 1, 0 );
-								_player->SetMovement( MOVE_ROOT, 1 );
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		_player->_lastHeartbeatV = speed;
-		_player->_lastHeartbeatX = movement_info.x;
-		_player->_lastHeartbeatY = movement_info.y;
-		_player->_lastHeartbeatZ = movement_info.z;
-		_player->_lastHeartbeatO = movement_info.orientation;
-
-	}
+	
 
 	/************************************************************************/
 	/* Breathing System                                                     */

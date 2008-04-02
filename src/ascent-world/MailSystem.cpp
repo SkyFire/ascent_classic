@@ -569,17 +569,19 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 
 	// add the item to their backpack
 	item->m_isDirty = true;
-	_player->GetItemInterface()->AddItemToFreeSlot(item);
 
-	message->items.erase( itr );
-
-	// re-save (update the items field)
-	sMailSystem.SaveMessageToSQL( message);
 	// send complete packet
 	data << uint32(MAIL_OK);
 	data << item->GetGUIDLow();
 	data << item->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 
+	if( !_player->GetItemInterface()->AddItemToFreeSlot(item) )
+		delete item;
+
+	message->items.erase( itr );
+
+	// re-save (update the items field)
+	sMailSystem.SaveMessageToSQL( message);
 	SendPacket(&data);
 	
 	if( message->cod > 0 )
@@ -706,16 +708,21 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
 
 	Item * pItem = objmgr.CreateItem(8383, _player);
 	pItem->SetUInt32Value(ITEM_FIELD_ITEM_TEXT_ID, message_id);
-	_player->GetItemInterface()->AddItemToFreeSlot(pItem);
+	if( _player->GetItemInterface()->AddItemToFreeSlot(pItem) )
+	{
+		// mail now has an item after it
+		message->copy_made = true;
 
-	// mail now has an item after it
-	message->copy_made = true;
+		// update in sql
+		CharacterDatabase.WaitExecute("UPDATE mailbox SET copy_made = 1 WHERE message_id = %u", message_id);
 
-	// update in sql
-	CharacterDatabase.WaitExecute("UPDATE mailbox SET copy_made = 1 WHERE message_id = %u", message_id);
-
-	data << uint32(MAIL_OK);
-	SendPacket(&data);
+		data << uint32(MAIL_OK);
+		SendPacket(&data);
+	}
+	else
+	{
+		delete pItem;
+	}
 }
 
 void WorldSession::HandleItemTextQuery(WorldPacket & recv_data)

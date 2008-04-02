@@ -821,19 +821,21 @@ void Item::ApplyEnchantmentBonus( uint32 Slot, bool Apply )
 
 void Item::ApplyEnchantmentBonuses()
 {
-	EnchantmentMap::iterator itr;
-	for( itr = Enchantments.begin(); itr != Enchantments.end(); ++itr )
+	EnchantmentMap::iterator itr, itr2;
+	for( itr = Enchantments.begin(); itr != Enchantments.end();  )
 	{
-		ApplyEnchantmentBonus( itr->first, APPLY );
+		itr2 = itr++;
+		ApplyEnchantmentBonus( itr2->first, APPLY );
 	}
 }
 
 void Item::RemoveEnchantmentBonuses()
 {
-	EnchantmentMap::iterator itr;
-	for( itr = Enchantments.begin(); itr != Enchantments.end(); ++itr )
+	EnchantmentMap::iterator itr, itr2;
+	for( itr = Enchantments.begin(); itr != Enchantments.end(); )
 	{
-		ApplyEnchantmentBonus( itr->first, REMOVE );
+		itr2 = itr++;
+		ApplyEnchantmentBonus( itr2->first, REMOVE );
 	}
 }
 

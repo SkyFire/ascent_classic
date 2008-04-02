@@ -348,15 +348,8 @@ bool ChatHandler::HandleKillCommand(const char *args, WorldSession *m_session)
 	switch(target->GetTypeId())
 	{
 	case TYPEID_PLAYER:
-		{
-			if(strchr(m_session->GetPermissions(),'p')==NULL && !m_session->HasGMPermissions())
-			{
-				RedSystemMessage(m_session, "You do not have permission to kill a player.");
-				return true;
-			}
-			sGMLog.writefromsession(m_session, "used kill command on PLAYER %s", static_cast< Player* >( target )->GetName() );
-			break;
-		}
+		sGMLog.writefromsession(m_session, "used kill command on PLAYER %s", static_cast< Player* >( target )->GetName() );
+		break;
 
 	case TYPEID_UNIT:
 		sGMLog.writefromsession(m_session, "used kill command on CREATURE %s", static_cast< Creature* >( target )->GetCreatureName() ? static_cast< Creature* >( target )->GetCreatureName()->Name : "unknown");
@@ -919,7 +912,7 @@ bool ChatHandler::HandleReviveStringcommand(const char* args, WorldSession* m_se
 		if(plr->GetInstanceID() == m_session->GetPlayer()->GetInstanceID())
 			plr->RemoteRevive();
 		else
-			sEventMgr.AddEvent(plr, &Player::RemoteRevive, EVENT_PLAYER_UPDATE, 1, 1,0);
+			sEventMgr.AddEvent(plr, &Player::RemoteRevive, EVENT_PLAYER_REST, 1, 1,0);
 
 		GreenSystemMessage(m_session, "Revived player %s.", args);
 	} else {

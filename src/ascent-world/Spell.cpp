@@ -1088,11 +1088,12 @@ void Spell::cancel()
 {
 	SendInterrupted(0);
 	SendCastResult(SPELL_FAILED_INTERRUPTED);
+
 	if(m_spellState == SPELL_STATE_CASTING)
 	{
 		if( u_caster != NULL )
 			u_caster->RemoveAura(m_spellInfo->Id);
-		
+	
 		if(m_timer > 0 || m_Delayed)
 		{
 			if(p_caster && p_caster->IsInWorld())
@@ -1101,7 +1102,6 @@ void Spell::cancel()
 				if(!pTarget)
 					pTarget = p_caster->GetMapMgr()->GetUnit(p_caster->GetSelection());
 				  
-
 				if(pTarget)
 				{
 					pTarget->RemoveAura(m_spellInfo->Id, m_caster->GetGUID());
@@ -1128,18 +1128,12 @@ void Spell::cancel()
 				}
 				if (m_timer > 0)
 					p_caster->delayAttackTimer(-m_timer);
-
-
 //				p_caster->setAttackTimer(1000, false);
 			 }
 		}
 		SendChannelUpdate(0);
 	}
-	else
-	{
-		// global cooldown reset - spell was being cast but was cancelled
-		p_caster->ResetGlobalCooldown();
-	}
+
 	//m_spellState = SPELL_STATE_FINISHED;
 	finish();
 }
@@ -1274,7 +1268,12 @@ void Spell::cast(bool check)
 			{
                 /// Part of this function contains a hack fix
                 /// hack fix for shoot spells, should be some other resource for it
-                p_caster->SendSpellCoolDown(m_spellInfo->Id, m_spellInfo->RecoveryTime ? m_spellInfo->RecoveryTime : 2300);
+                //p_caster->SendSpellCoolDown(m_spellInfo->Id, m_spellInfo->RecoveryTime ? m_spellInfo->RecoveryTime : 2300);
+				WorldPacket data(SMSG_SPELL_COOLDOWN, 14);
+				data << m_spellInfo->Id;
+				data << p_caster->GetNewGUID();
+				data << uint32(m_spellInfo->RecoveryTime ? m_spellInfo->RecoveryTime : 2300);
+				p_caster->GetSession()->SendPacket(&data);
 			}
 			else
 			{			
@@ -1329,7 +1328,7 @@ void Spell::cast(bool check)
 				}
 			}
 
-			std::vector<uint64>::iterator i;
+			std::vector<uint64>::iterator i, i2;
 			
 			// this is here to avoid double search in the unique list
 			//bool canreflect = false, reflected = false;
@@ -1383,9 +1382,10 @@ void Spell::cast(bool check)
                         }
 						else if (m_targetUnits[x].size()>0)
 						{
-							for(i= m_targetUnits[x].begin();i != m_targetUnits[x].end();i++)
+							for(i= m_targetUnits[x].begin();i != m_targetUnits[x].end();)
                             {
-								HandleEffects((*i),x);
+								i2 = i++;
+								HandleEffects((*i2),x);
                             }
 						}
 
@@ -1722,7 +1722,24 @@ void Spell::SendCastResult(uint8 result)
 	//case SPELL_FAILED_TOTEM_CATEGORY: seems to be fully client sided.
 	}
 
-	plr->SendCastResult(m_spellInfo->Id, result, extra_cast_number, Extra);
+	//plr->SendCastResult(m_spellInfo->Id, result, extra_cast_number, Extra);
+	if( Extra )
+	{
+		packetSMSG_CASTRESULT_EXTRA pe;
+		pe.SpellId = m_spellInfo->Id;
+		pe.ErrorMessage = result;
+		pe.MultiCast = extra_cast_number;
+		pe.Extra = Extra;
+		plr->GetSession()->OutPacket( SMSG_CAST_RESULT, sizeof( packetSMSG_CASTRESULT_EXTRA ), &pe );
+	}
+	else
+	{
+		packetSMSG_CASTRESULT pe;
+		pe.SpellId = m_spellInfo->Id;
+		pe.ErrorMessage = result;
+		pe.MultiCast = extra_cast_number;
+		plr->GetSession()->OutPacket( SMSG_CAST_RESULT, sizeof( packetSMSG_CASTRESULT ), &pe );
+	}
 }
 
 // uint16 0xFFFF
@@ -2690,7 +2707,6 @@ uint8 Spell::CanCast(bool tolerate)
 				}
 			}
 		}
-		
 
 		// check if spell is allowed while we have a battleground flag
 		if(p_caster->m_bgHasFlag)
@@ -3851,7 +3867,7 @@ void Spell::CreateItem(uint32 itemId)
 		}
 		
 		newItem = objmgr.CreateItem(itemId, pUnit);
-		bool result = pUnit->GetItemInterface()->SafeAddItem(newItem, slotresult.ContainerSlot, slotresult.Slot);
+		AddItemResult result = pUnit->GetItemInterface()->SafeAddItem(newItem, slotresult.ContainerSlot, slotresult.Slot);
 		if(!result)
 		{
 			delete newItem;

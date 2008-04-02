@@ -2131,11 +2131,17 @@ void Charter::RemoveSignature(uint32 PlayerGuid)
 
 void Charter::Destroy()
 {
+	if( Slots == 0 )			// ugly hack because of f*cked memory
+		return;
+
 	//meh remove from objmgr
 	objmgr.RemoveCharter(this);
 	// Kill the players with this (in db/offline)
 	CharacterDatabase.Execute( "DELETE FROM charters WHERE charterId = %u", CharterId );
 	Player * p;
+#ifdef WIN32
+	__try {
+#endif
 	for( uint32 i = 0; i < Slots; ++i )
 	{
 		if(!Signatures[i])
@@ -2144,6 +2150,12 @@ void Charter::Destroy()
 		if( p != NULL)
 			p->m_charters[CharterType] = 0;
 	}
+#ifdef WIN32
+	} __except(EXCEPTION_EXECUTE_HANDLER)
+	{
+		return;
+	}
+#endif
 
 	// click, click, boom!
 	delete this;

@@ -36,6 +36,14 @@ class Player;
 class UpdateData;
 class ByteBuffer;
 
+// sanity checking
+enum AddItemResult
+{
+	ADD_ITEM_RESULT_ERROR			= 0,
+	ADD_ITEM_RESULT_OK				= 1,
+	ADD_ITEM_RESULT_DUPLICATED		= 2,
+};
+
 class SERVER_DECL ItemInterface
 {
 private:
@@ -44,7 +52,7 @@ private:
 	Item* m_pItems[MAX_INVENTORY_SLOT];
 	Item* m_pBuyBack[MAX_BUYBACK_SLOT];
 
-	bool m_AddItem(Item *item, int8 ContainerSlot, int8 slot);
+	AddItemResult m_AddItem(Item *item, int8 ContainerSlot, int8 slot);
 
 public:
 	friend class ItemIterator;
@@ -67,13 +75,13 @@ public:
 	int8 GetBagSlotByGuid(uint64 guid);
 
 	Item *SafeAddItem(uint32 ItemId, int8 ContainerSlot, int8 slot);
-	bool SafeAddItem(Item *pItem, int8 ContainerSlot, int8 slot);
+	AddItemResult SafeAddItem(Item *pItem, int8 ContainerSlot, int8 slot);
 	Item *SafeRemoveAndRetreiveItemFromSlot(int8 ContainerSlot, int8 slot, bool destroy); //doesnt destroy item from memory
 	Item *SafeRemoveAndRetreiveItemByGuid(uint64 guid, bool destroy);
 	bool SafeFullRemoveItemFromSlot(int8 ContainerSlot, int8 slot); //destroys item fully
 	bool SafeFullRemoveItemByGuid(uint64 guid); //destroys item fully
-	bool AddItemToFreeSlot(Item *item);
-	bool AddItemToFreeBankSlot(Item *item);
+	AddItemResult AddItemToFreeSlot(Item *item);
+	AddItemResult AddItemToFreeBankSlot(Item *item);
 	
 	Item* FindItemLessMax(uint32 itemid, uint32 cnt, bool IncBank);
 	uint32 GetItemCount(uint32 itemid, bool IncBank = false);

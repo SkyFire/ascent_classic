@@ -610,13 +610,14 @@ void WorldSession::SendInnkeeperBind(Creature* pCreature)
 		// We don't have a hearthstone. Add one.
 		if(_player->GetItemInterface()->CalculateFreeSlots(NULL) > 0)
 		{
-			//BuildItemPushResult(&data, _player->GetGUID(), ITEM_PUSH_TYPE_RECEIVE, 1, ITEM_ID_HEARTH_STONE, 0);
-			SendPacket(&data);
-
 			Item *item = objmgr.CreateItem( ITEM_ID_HEARTH_STONE, _player);
-			_player->GetItemInterface()->AddItemToFreeSlot(item);					
-			SlotResult * lr = _player->GetItemInterface()->LastSearchResult();
-			SendItemPushResult(item,false,true,false,true,lr->ContainerSlot,lr->Slot,1);
+			if( _player->GetItemInterface()->AddItemToFreeSlot(item) )
+			{
+				SlotResult * lr = _player->GetItemInterface()->LastSearchResult();
+				SendItemPushResult(item,false,true,false,true,lr->ContainerSlot,lr->Slot,1);
+			}
+			else
+				delete item;
 		}
 	}
 

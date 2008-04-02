@@ -124,7 +124,7 @@ void AuctionHouse::AddAuction(Auction * auct)
 	auctionedItems.insert( HM_NAMESPACE::hash_map<uint64, Item*>::value_type( auct->pItem->GetGUID(), auct->pItem ) );
 	itemLock.ReleaseWriteLock();
 
-	sLog.outString("Auction House %u: Adding auction %u, expiry time %u.", dbc->id, auct->Id, auct->ExpiryTime);
+	Log.Debug("AuctionHouse", "%u: Add auction %u, expire@ %u.", dbc->id, auct->Id, auct->ExpiryTime);
 }
 
 Auction * AuctionHouse::GetAuction(uint32 Id)
@@ -140,7 +140,7 @@ Auction * AuctionHouse::GetAuction(uint32 Id)
 
 void AuctionHouse::RemoveAuction(Auction * auct)
 {
-	sLog.outString("Auction House %u: Removing auction %u because of reason %u.", dbc->id, auct->Id, auct->DeletedReason);
+	Log.Debug("AuctionHouse", "%u: Removing auction %u, reason %u.", dbc->id, auct->Id, auct->DeletedReason);
 
 	char subject[100];
 	char body[200];
@@ -498,6 +498,9 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 		SendPacket(&data);
 		return;
 	};
+
+	if( pItem->IsInWorld() )
+		pItem->RemoveFromWorld();
 
 	pItem->SetOwner(NULL);
 	pItem->m_isDirty = true;

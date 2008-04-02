@@ -139,6 +139,8 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	for ( int aX = 0 ; aX < 8 ; aX++ )
 		m_Tutorials[ aX ] = 0x00;
 
+	m_lastRestUpdate		= 0;
+
 	m_lootGuid			  = 0;
 	m_banned				= false;
 
@@ -304,7 +306,7 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	myCorpse				= 0;
 	bCorpseCreateable	   = true;
 	blinked				 = false;
-	m_speedhackChances	  = 2;
+	m_speedhackChances	  = 3;
 	m_explorationTimer	  = getMSTime();
 	linkTarget			  = 0;
 	stack_cheat			 = false;
@@ -398,6 +400,9 @@ Player::Player ( uint32 high, uint32 low ) : m_mailBox(low)
 	m_safeFall = 0;
 	m_noFallDamage = false;
 	z_axisposition = 0.0f;
+	m_KickDelay = 0;
+	m_speedhackCheckTimer = 0;
+	_speedChangeInProgress = false;
 }
 
 void Player::OnLogin()
@@ -733,10 +738,16 @@ bool Player::Create(WorldPacket& data )
 			if(item)
 			{
 				item->SetUInt32Value(ITEM_FIELD_STACK_COUNT,(*is).amount);
-				if((*is).slot<EQUIPMENT_SLOT_END)
-					GetItemInterface()->SafeAddItem(item, INVENTORY_SLOT_NOT_SET, (*is).slot);
+				if((*is).slot<INVENTORY_SLOT_BAG_END)
+				{
+					if( !GetItemInterface()->SafeAddItem(item, INVENTORY_SLOT_NOT_SET, (*is).slot) )
+						delete item;
+				}
 				else
-					GetItemInterface()->AddItemToFreeSlot(item);
+				{
+					if( !GetItemInterface()->AddItemToFreeSlot(item) )
+						delete item;
+				}
 			}
 		}
 	}
@@ -897,6 +908,12 @@ void Player::Update( uint32 p_time )
 		}
 	}
 #endif
+
+	if( mstime >= m_speedhackCheckTimer )
+	{
+		_SpeedhackCheck( mstime );
+		m_speedhackCheckTimer = mstime + 1000;
+	}
 }
 
 void Player::EventDismount(uint32 money, float x, float y, float z)
@@ -1342,7 +1359,6 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 
 	uint32 restxp = 0;
 
-	//add reststate bonus (except for quests)
 	if(m_restState == RESTSTATE_RESTED && allowbonus)
 	{
 		restxp = SubtractRestXP(xp);
@@ -1694,7 +1710,9 @@ void Player::_LoadPet(QueryResult * result)
 		if(pet->active)
 		{
 			if(iActivePet)  // how the hell can this happen
-				printf("pet warning - >1 active pet.. weird..");
+			{
+				//printf("pet warning - >1 active pet.. weird..");
+			}
 			else
 				iActivePet = pet->number;
 		}	   
@@ -2262,8 +2280,6 @@ void Player::RemovePendingPlayer()
 
 bool Player::LoadFromDB(uint32 guid)
 {
-	m_uint32Values[OBJECT_FIELD_GUID] = guid;
-
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP0<Player>(this, &Player::LoadFromDBProc) );
 	q->AddQuery("SELECT * FROM characters WHERE guid=%u AND forced_rename_pending = 0",guid);
 	q->AddQuery("SELECT * FROM tutorials WHERE playerId=%u",guid);
@@ -2275,15 +2291,9 @@ bool Player::LoadFromDB(uint32 guid)
 	q->AddQuery("SELECT * FROM mailbox WHERE player_guid = %u", guid);
 
 	// queue it!
-	if( CharacterDatabase.QueueAsyncQuery(q))
-	{
-		return true;
-	}
-	else
-	{
-		delete q;
-		return false;
-	}
+	m_uint32Values[OBJECT_FIELD_GUID] = guid;
+	CharacterDatabase.QueueAsyncQuery(q);
+	return true;
 }
 
 void Player::LoadFromDBProc(QueryResultVector & results)
@@ -2447,6 +2457,10 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 					sk.Reset(v1 & 0xffff);
 					sk.CurrentValue = v2 & 0xffff;
 					sk.MaximumValue = (v2 >> 16) & 0xffff;
+
+					if( !sk.CurrentValue )
+						sk.CurrentValue = 1;
+
 					m_skills.insert( make_pair(sk.Skill->id, sk) );
 				}
 			}
@@ -2486,6 +2500,10 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 					sk.Reset(v1);
 					sk.CurrentValue = v2;
 					sk.MaximumValue = v3;
+
+					if( !sk.CurrentValue )
+						sk.CurrentValue = 1;
+
 					m_skills.insert(make_pair(v1, sk));
 				}
 			}
@@ -3122,6 +3140,7 @@ void Player::OnPushToWorld()
 
 	ResetHeartbeatCoords();
 	_heartbeatDisable = 0;
+	_speedChangeInProgress =false;
 	m_lastMoveType = 0;
 	
 	/* send weather */
@@ -3158,8 +3177,9 @@ void Player::OnPushToWorld()
 
 void Player::ResetHeartbeatCoords()
 {
-	_lastHeartbeatX = _lastHeartbeatY = _lastHeartbeatZ = _lastHeartbeatO = _lastHeartbeatV = 0.0f;
-	_lastHeartbeatT = 0;
+	_lastHeartbeatPosition = m_position;
+	_lastHeartbeatV = m_runSpeed;
+	_lastHeartbeatT = getMSTime();
 }
 
 void Player::RemoveFromWorld()
@@ -3508,6 +3528,10 @@ void Player::_ApplyItemMods(Item* item, int8 slot, bool apply, bool justdrokedow
 
 		for( int k = 0; k < 5; k++ )
 		{
+			// stupid fucked dbs
+			if( item->GetProto()->Spells[k].Id == 0 )
+				continue;
+
 			if( item->GetProto()->Spells[k].Trigger == 1 )
 			{
 				SpellEntry* spells = dbcSpell.LookupEntry( item->GetProto()->Spells[k].Id );
@@ -3723,8 +3747,7 @@ void Player::SetPlayerSpeed(uint8 SpeedType, float value)
 	SendMessageToSet(&data , true);
 
 	// dont mess up on these
-	ResetHeartbeatCoords();
-	++_heartbeatDisable;
+	_speedChangeInProgress = true;
 }
 
 void Player::BuildPlayerRepop()
@@ -5391,7 +5414,12 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 */
 	if( fail > 0 )// && fail != SPELL_FAILED_OUT_OF_RANGE)
 	{
-		SendCastResult( autoshot ? 75 : spellid, fail, 0, 0 );
+		//SendCastResult( autoshot ? 75 : spellid, fail, 0, 0 );
+		packetSMSG_CASTRESULT cr;
+		cr.SpellId = autoshot ? 75 : spellid;
+		cr.ErrorMessage = fail;
+		cr.MultiCast = 0;
+		m_session->OutPacket( SMSG_CAST_RESULT, sizeof(packetSMSG_CASTRESULT), &cr );
 		if( fail != SPELL_FAILED_OUT_OF_RANGE )
 		{
 			uint32 spellid2 = autoshot ? 75 : spellid;
@@ -5564,15 +5592,8 @@ void Player::EventTimedQuestExpire(Quest *qst, QuestLogEntry *qle, uint32 log_sl
 void Player::SendInitialLogonPackets()
 {
 	// Initial Packets... they seem to be re-sent on port.
-#ifdef USING_BIG_ENDIAN
-	swap32(&m_timeLogoff);
 	m_session->OutPacket(SMSG_SET_REST_START, 4, &m_timeLogoff);
-	swap32(&m_timeLogoff);
-#else
-	m_session->OutPacket(SMSG_SET_REST_START, 4, &m_timeLogoff);
-#endif
 
-#ifndef USING_BIG_ENDIAN
     StackWorldPacket<32> data(SMSG_BINDPOINTUPDATE);
     data << m_bind_pos_x;
     data << m_bind_pos_y;
@@ -5580,14 +5601,17 @@ void Player::SendInitialLogonPackets()
     data << m_bind_mapid;
     data << m_bind_zoneid;
     GetSession()->SendPacket( &data );
-#else
-	WorldPacket data(32);
-    SendBindPointUpdate(m_bind_pos_x,m_bind_pos_y,m_bind_pos_z,m_bind_mapid,m_bind_zoneid);
-#endif
 
 	//Proficiencies
-    SendSetProficiency(4,armor_proficiency);
-    SendSetProficiency(2,weapon_proficiency);
+    //SendSetProficiency(4,armor_proficiency);
+    //SendSetProficiency(2,weapon_proficiency);
+	packetSMSG_SET_PROFICICENCY pr;
+	pr.ItemClass = 4;
+	pr.Profinciency = armor_proficiency;
+	m_session->OutPacket( SMSG_SET_PROFICIENCY, sizeof(packetSMSG_SET_PROFICICENCY), &pr );
+	pr.ItemClass = 2;
+	pr.Profinciency = weapon_proficiency;
+	m_session->OutPacket( SMSG_SET_PROFICIENCY, sizeof(packetSMSG_SET_PROFICICENCY), &pr );
   
 	//Tutorial Flags
 	data.Initialize( SMSG_TUTORIAL_FLAGS );
@@ -6006,6 +6030,9 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 	}
 
 	uint32 traveltime = uint32(traveldist * TAXI_TRAVEL_SPEED);
+
+	if( start_node > endn || (endn - start_node) > 200 )
+		return;
 
 	WorldPacket data(SMSG_MONSTER_MOVE, 38 + ( (endn - start_node) * 12 ) );
 	data << GetNewGUID();
@@ -8206,9 +8233,8 @@ void Player::SetShapeShift(uint8 ss)
 		}
 	}
 
-	// kill speedhack detection for 5 seconds
-	++_heartbeatDisable;
-	sEventMgr.AddEvent( this, &Player::ResetSpeedHack, EVENT_PLAYER_UPDATE, 5000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	// kill speedhack detection for 2 seconds (not needed with new code but bleh)
+	DelaySpeedHack( 2000 );
 
 	UpdateStats();
 	UpdateChances();
@@ -8595,6 +8621,7 @@ void Player::Possess(Unit * pTarget)
 {
 	if(m_Summon || m_CurrentCharm)
 		return;
+
 	m_CurrentCharm = pTarget;
 	if(pTarget->GetTypeId() == TYPEID_UNIT)
 	{
@@ -8767,6 +8794,10 @@ void Player::_AddSkillLine(uint32 SkillLine, uint32 Current, uint32 Max)
 {
 	ItemProf * prof;
 	SkillMap::iterator itr = m_skills.find(SkillLine);
+
+	if( !Current )
+		Current = 1;
+
 	if(itr != m_skills.end())
 	{
 		if( (Current > itr->second.CurrentValue && Max >= itr->second.MaximumValue) ||
@@ -8793,15 +8824,20 @@ void Player::_AddSkillLine(uint32 SkillLine, uint32 Current, uint32 Max)
 		//Add to proficiency
 		if((prof=(ItemProf *)GetProficiencyBySkill(SkillLine)))
 		{
+			packetSMSG_SET_PROFICICENCY pr;
+			pr.ItemClass = prof->itemclass;
             if(prof->itemclass==4)
             {
                 armor_proficiency|=prof->subclass;
-                SendSetProficiency(prof->itemclass,armor_proficiency);
+                //SendSetProficiency(prof->itemclass,armor_proficiency);
+				pr.Profinciency = armor_proficiency;
             }else
             {
                 weapon_proficiency|=prof->subclass;
-                SendSetProficiency(prof->itemclass,weapon_proficiency);
+                //SendSetProficiency(prof->itemclass,weapon_proficiency);
+				pr.Profinciency = weapon_proficiency;
             }
+			m_session->OutPacket( SMSG_SET_PROFICIENCY, sizeof( packetSMSG_SET_PROFICICENCY ), &pr );
     	}
 
 		// hackfix for poisons
@@ -9696,9 +9732,11 @@ void Player::Cooldown_AddStart(SpellEntry * pSpell)
 		return;
 
 	uint32 mstime = getMSTime();
-	if( pSpell->StartRecoveryCategory )
+	if( pSpell->StartRecoveryCategory )		// if we have a different cool category to the actual spell category - only used by few spells
 		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->StartRecoveryCategory, mstime + pSpell->StartRecoveryTime, pSpell->Id, 0 );
-	else
+	/*else if( pSpell->Category )				// cooldowns are grouped
+		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->Category, mstime + pSpell->StartRecoveryTime, pSpell->Id, 0 );*/
+	else									// no category, so it's a gcd
 	{
 #ifdef _DEBUG
 		Log.Debug("Cooldown", "Global cooldown adding: %u ms", pSpell->StartRecoveryTime );
@@ -9733,16 +9771,12 @@ bool Player::Cooldown_CanCast(SpellEntry * pSpell)
 			m_cooldownMap[COOLDOWN_TYPE_SPELL].erase( itr );
 	}
 
-	if( m_globalCooldown && !CooldownCheat && pSpell->StartRecoveryTime > 0 )
+	if( pSpell->StartRecoveryTime && m_globalCooldown )			/* gcd doesn't affect spells without a cooldown it seems */
 	{
 		if( mstime < m_globalCooldown )
-		{
 			return false;
-		}
 		else
-		{
 			m_globalCooldown = 0;
-		}
 	}
 
 	return true;
@@ -9896,4 +9930,87 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 		m_cooldownMap[type].insert( make_pair( misc, cd ) );
 
 	} while ( result->NextRow( ) );
+}
+
+void Player::_SpeedhackCheck(uint32 mstime)
+{
+	if( sWorld.antihack_speed && !GetTaxiState() )
+	{
+		if( m_position == _lastHeartbeatPosition && m_isMoving )
+		{
+			// this means the client is probably lagging. don't update the timestamp, don't do anything until we start to receive
+			// packets again (give the poor laggers a chance to catch up)
+			return;
+		}
+
+		// simplified; just take the fastest speed. less chance of fuckups too
+		float speed = ( flying_aura ) ? m_flySpeed : ( m_swimSpeed > m_runSpeed ) ? m_swimSpeed : m_runSpeed;
+		if( speed != _lastHeartbeatV )
+		{
+			_lastHeartbeatT = mstime;
+			_lastHeartbeatPosition = m_position;
+			_lastHeartbeatV = speed;
+			return;
+		}
+
+		if( !_heartbeatDisable && !m_uint32Values[UNIT_FIELD_CHARM] && m_TransporterGUID == 0 && !_speedChangeInProgress )
+		{
+			if( _lastHeartbeatV == speed )
+			{
+				// latency compensation a little
+				speed += 0.25f;
+
+				float distance = m_position.Distance2D( _lastHeartbeatPosition );
+				uint32 time_diff = mstime - _lastHeartbeatT;
+				uint32 move_time = float2int32( ( distance / ( speed * 0.001f ) ) );
+				int32 difference = time_diff - move_time;
+#ifdef _DEBUG
+				sLog.outDebug("speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff );
+#endif
+				if( difference < -500.0f )
+				{
+					if( m_speedhackChances == 1 )
+					{
+						SetMovement( MOVE_ROOT, 1 );
+						BroadcastMessage( "You have used all your speedhacking chances. You will be logged out in 7 seconds. Debug data: " );
+						BroadcastMessage( "speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff );
+						sEventMgr.AddEvent( this, &Player::_Kick, EVENT_PLAYER_KICK, 7000, 1, 0 );
+						m_speedhackChances = 0;
+					}
+					else if( m_speedhackChances > 1 )
+					{
+						BroadcastMessage( "Speedhack warning, you have %u chances left.", --m_speedhackChances );
+					}
+				}
+			}
+		}
+
+		_lastHeartbeatPosition = m_position;
+		_lastHeartbeatT = mstime;
+	}
+}
+
+void Player::ResetSpeedHack()
+{
+	ResetHeartbeatCoords();
+	_heartbeatDisable = 0;
+}
+
+void Player::DelaySpeedHack(uint32 ms)
+{
+	uint32 t;
+	_heartbeatDisable = 1;
+
+	if( event_GetTimeLeft( EVENT_PLAYER_RESET_HEARTBEAT, &t ) )
+	{
+		if( t > ms )		// dont override a slower reset
+			return;
+
+		// override it
+		event_ModifyTimeAndTimeLeft( EVENT_PLAYER_RESET_HEARTBEAT, ms );
+		return;
+	}
+
+	// add a new event
+	sEventMgr.AddEvent( this, &Player::ResetSpeedHack, EVENT_PLAYER_RESET_HEARTBEAT, ms, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 }

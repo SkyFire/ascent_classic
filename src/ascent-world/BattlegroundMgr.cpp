@@ -61,9 +61,9 @@ const static uint32 BGMinimumPlayers[BATTLEGROUND_NUM_TYPES] = {
 	0,							// AV
 	5,							// WSG
 	5,							// AB
-	2,							// 2v2
-	3,							// 3v3
-	5,							// 5v5
+	4,							// 2v2
+	6,							// 3v3
+	10,							// 5v5
 	5,							// Netherstorm
 };
 
@@ -726,11 +726,13 @@ void CBattleground::RemovePendingPlayer(Player * plr)
 
 void CBattleground::OnPlayerPushed(Player * plr)
 {
-	if(plr->GetGroup())
+	if( plr->GetGroup() && !Rated() )
 		plr->GetGroup()->RemovePlayer(plr->m_playerInfo);
 
 	plr->ProcessPendingUpdates();
-	m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
+	
+	if( plr->GetGroup() == NULL )
+		m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
 }
 
 void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
@@ -784,7 +786,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	UpdatePvPData();
 
 	/* add the player to the group */
-	if(plr->GetGroup())
+	if(plr->GetGroup() && !Rated())
 	{
 		// remove them from their group
 		plr->GetGroup()->RemovePlayer( plr->m_playerInfo );

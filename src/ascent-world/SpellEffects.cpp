@@ -278,12 +278,12 @@ void Spell::SpellEffectInstantKill(uint32 i)
 	{
 	case SPELL_HASH_SACRIFICE:
 		{
-			if( p_caster == NULL || unitTarget == NULL )
+			if( !u_caster->IsPet() )
 				return;
 
-			// cheaters!
-			if( p_caster->GetSummon() != unitTarget )
-				return;
+			static_cast<Pet*>(u_caster)->Dismiss( true );
+			return;
+
 		}break;
 
 	default:
@@ -496,7 +496,9 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 					}
 					Item * it=objmgr.CreateItem(item,p_caster);  
 					it->SetUInt32Value( ITEM_FIELD_STACK_COUNT, count);
-					p_caster->GetItemInterface()->SafeAddItem(it,slotresult.ContainerSlot, slotresult.Slot);
+					if( !p_caster->GetItemInterface()->SafeAddItem(it,slotresult.ContainerSlot, slotresult.Slot) )
+						delete it;
+
 					creature->Despawn(3500,creature->proto->RespawnTime);
 				}
 				else
@@ -1307,6 +1309,7 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 		float new_y = unitTarget->GetPositionY() - (shadowstep_distance * sinf(ang));
 		
 		/* Send a movement packet to "charge" at this target. Similar to warrior charge. */
+		p_caster->z_axisposition = 0.0f;
 		p_caster->SafeTeleport(p_caster->GetMapId(), p_caster->GetInstanceID(), LocationVector(new_x, new_y, (unitTarget->GetPositionZ() + 0.1f), unitTarget->GetOrientation()));
 		
 		return;
@@ -2140,8 +2143,9 @@ void Spell::SpellEffectLeap(uint32 i) // Leap
 	}
 
 	// reset heartbeat for a little while, 2 seconds maybe?
+	p_caster->DelaySpeedHack( 5000 );
 	++p_caster->_heartbeatDisable;
-	sEventMgr.AddEvent( p_caster, &Player::ResetSpeedHack, EVENT_PLAYER_RESET_HEARTBEAT, 2000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+	p_caster->z_axisposition = 0.0f;
 }
 
 void Spell::SpellEffectEnergize(uint32 i) // Energize
@@ -4526,8 +4530,8 @@ void Spell::SpellEffectCharge(uint32 i)
 	p_caster->ResetHeartbeatCoords();
 
 	// trigger an event to reset speedhack detection
-	++p_caster->_heartbeatDisable;
-	sEventMgr.AddEvent( p_caster, &Player::ResetSpeedHack, EVENT_PLAYER_RESET_HEARTBEAT, time + 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+	p_caster->DelaySpeedHack( time + 1000 );
+	p_caster->z_axisposition = 0.0f;
 }
 
 void Spell::SpellEffectPlayerPull( uint32 i )
@@ -4636,7 +4640,10 @@ void Spell::SpellEffectKnockBack(uint32 i)
 	unitTarget->SendMessageToSet(&data, true);
 
 	if( playerTarget )
+	{
+		playerTarget->z_axisposition = 0;
 		playerTarget->blinked = true;
+	}
 }
 
 void Spell::SpellEffectDisenchant(uint32 i)
@@ -5249,6 +5256,7 @@ void Spell::SpellEffectResurrectNew(uint32 i)
 void Spell::SpellEffectTranformItem(uint32 i)
 {
 	bool result;
+	AddItemResult result2;
 
 	if(!i_caster)
 		return;
@@ -5276,8 +5284,8 @@ void Spell::SpellEffectTranformItem(uint32 i)
 	//additem
 	
 	   //additem
-	result = owner->GetItemInterface()->AddItemToFreeSlot(it);
-	if(!result) //should never get here
+	result2 = owner->GetItemInterface()->AddItemToFreeSlot(it);
+	if(!result2) //should never get here
 	{ 
 		owner->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,INV_ERR_BAG_FULL);
 		delete it;

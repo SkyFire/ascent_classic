@@ -64,7 +64,7 @@ class Player;
 
 typedef std::set<PlayerInfo*> GroupMembersSet;
 
-class SERVER_DECL SubGroup	  // Most stuff will be done through here, not through the "Group" class.
+class SubGroup	  // Most stuff will be done through here, not through the "Group" class.
 {
 public:
 	friend class Group;
@@ -126,6 +126,10 @@ public:
 
 	ASCENT_INLINE void SendPacketToAll(WorldPacket *packet) { SendPacketToAllButOne(packet, NULL); }
 	void SendPacketToAllButOne(WorldPacket *packet, Player *pSkipTarget);
+
+	ASCENT_INLINE void OutPacketToAll(uint16 op, uint16 len, const void* data) { OutPacketToAllButOne(op, len, data, NULL); }
+	void OutPacketToAllButOne(uint16 op, uint16 len, const void* data, Player *pSkipTarget);
+
 	void SendNullUpdate(Player *pPlayer);
 
 	// Group Combat

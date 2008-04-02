@@ -258,6 +258,14 @@ bool Player::IsHostileBasedOnReputation(FactionDBC * dbc)
 	FactionReputation * rep = reputationByListId[dbc->RepListId];
 	if(!rep) return false;
 
+	// forced reactions take precedence
+	if( m_forcedReactions.size() )
+	{
+		map<uint32,uint32>::iterator itr = m_forcedReactions.find( dbc->ID );
+		if( itr != m_forcedReactions.end() )
+			return ( itr->second <= STANDING_HOSTILE ) ? true : false;
+	}
+
 	if(rep->flag & FACTION_FLAG_AT_WAR || GetReputationRankFromStanding(rep->standing) <= STANDING_HOSTILE)
 		return true;
 	else

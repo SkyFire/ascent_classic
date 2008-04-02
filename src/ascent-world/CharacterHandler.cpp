@@ -245,7 +245,7 @@ void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 {	
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::CharacterEnumProc, GetAccountId()) );
 	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags, guild_data.guildid FROM characters LEFT JOIN guild_data ON characters.guid = guild_data.playerid WHERE acct=%u ORDER BY guid", GetAccountId());
-	bool dummy = CharacterDatabase.QueueAsyncQuery(q);
+	CharacterDatabase.QueueAsyncQuery(q);
 }
 
 void WorldSession::LoadAccountDataProc(QueryResult * result)
@@ -667,7 +667,13 @@ void WorldSession::FullLogin(Player * plr)
 	SendPacket(&datab);
 
 	/* world preload */
-	plr->SendLoginVerifyWorld();
+	packetSMSG_LOGIN_VERIFY_WORLD vwpck;
+	vwpck.MapId = plr->GetMapId();
+	vwpck.O = plr->GetOrientation();
+	vwpck.X = plr->GetPositionX();
+	vwpck.Y = plr->GetPositionY();
+	vwpck.Z = plr->GetPositionZ();
+	OutPacket( SMSG_LOGIN_VERIFY_WORLD, sizeof(packetSMSG_LOGIN_VERIFY_WORLD), &vwpck );
 
 	// send voicechat state - active/inactive
 	/*
@@ -860,19 +866,28 @@ void WorldSession::FullLogin(Player * plr)
 		_player->BroadcastMessage("Online Players: %s%u |rPeak: %s%u|r Accepted Connections: %s%u",
 			MSG_COLOR_WHITE, sWorld.GetSessionCount(), MSG_COLOR_WHITE, sWorld.PeakSessionCount, MSG_COLOR_WHITE, sWorld.mAcceptedConnections);
 	}
-	//Set current RestState
-	if( plr->m_isResting) 		// We are resting at an inn , turn on Zzz
-		plr->ApplyPlayerRestState(true);
 
-	//Calculate rest bonus if there is time between lastlogoff and now
-	if( plr->m_timeLogoff > 0 && plr->GetUInt32Value(UNIT_FIELD_LEVEL) < plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))	// if timelogoff = 0 then it's the first login
+	// Calculate rested experience if there is time between lastlogoff and now
+	uint32 currenttime = (uint32)UNIXTIME;
+	uint32 timediff = currenttime - plr->m_timeLogoff;
+
+	if(plr->m_timeLogoff > 0 && plr->GetUInt32Value(UNIT_FIELD_LEVEL) < plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))	// if timelogoff = 0 then it's the first login
 	{
-		uint32 currenttime = (uint32)UNIXTIME;
-		uint32 timediff = currenttime - plr->m_timeLogoff;
-
-		//Calculate rest bonus
-		if( timediff > 0 ) 
-			plr->AddCalculatedRestXP(timediff);
+		if(plr->m_isResting) 
+		{
+			// We are resting at an inn, calculate XP and add it.
+			uint32 RestXP = plr->CalculateRestXP((uint32)timediff);
+			plr->AddRestXP(RestXP);
+			sLog.outDebug("REST: Added %d of rest XP.", RestXP);
+			plr->ApplyPlayerRestState(true);
+		}
+		else if(timediff > 0)
+		{
+			// We are resting in the wilderness at a slower rate.
+			uint32 RestXP = plr->CalculateRestXP((uint32)timediff);
+			RestXP >>= 2;		// divide by 4 because its at 1/4 of the rate
+			plr->AddRestXP(RestXP);
+		}
 	}
 
 #ifdef CLUSTERING

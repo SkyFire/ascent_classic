@@ -76,6 +76,9 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 	recv_data >> type;
 	recv_data >> lang;
 
+	if( lang >= NUM_LANGUAGES )
+		return;
+
 	if(GetPlayer()->IsBanned())
 	{
 		GetPlayer()->BroadcastMessage("You cannot do that when banned.");

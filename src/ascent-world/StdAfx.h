@@ -76,6 +76,8 @@
 	#include "../ascent-realmserver/WorkerOpcodes.h"
 #endif
 
+#include "Packets.h"
+
 #include "../ascent-shared/CallBack.h"
 #include "WordFilter.h"
 #include "EventMgr.h"

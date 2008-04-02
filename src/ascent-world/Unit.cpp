@@ -3321,71 +3321,72 @@ void Unit::AddAura(Aura *aur)
 		bool deleteAur = false;
 
 		//check if we already have this aura by this caster -> update duration
-		uint32 f = 0;
-		for( uint32 x = 0; x < MAX_AURAS; x++ )
+		// Nasty check for Blood Fury debuff (spell system based on namehashes is bs anyways)
+		if( !info->always_apply )
 		{
-			if( m_auras[x] )
+			uint32 f = 0;
+			for( uint32 x = 0; x < MAX_AURAS; x++ )
 			{
-				// Nasty check for Blood Fury debuff (spell system based on namehashes is bs anyways)
-				if( info->NameHash == SPELL_HASH_BLOOD_FURY )
-					continue;
-
-				if(	m_auras[x]->GetSpellProto()->Id != aur->GetSpellId() && 
-					( aur->pSpellId != m_auras[x]->GetSpellProto()->Id ) //if this is a proc spell then it should not remove it's mother : test with combustion later
-					)
+				if( m_auras[x] )
 				{
-					// Check for auras by specific type.
-					// Check for auras with the same name and a different rank.
-					
-					if(info->buffType > 0 && m_auras[x]->GetSpellProto()->buffType & info->buffType && maxStack == 0)
-						deleteAur = HasAurasOfBuffType(info->buffType, aur->m_casterGuid,0);
-					else
+					if(	m_auras[x]->GetSpellProto()->Id != aur->GetSpellId() && 
+						( aur->pSpellId != m_auras[x]->GetSpellProto()->Id ) //if this is a proc spell then it should not remove it's mother : test with combustion later
+						)
 					{
-						acr = AuraCheck(info->NameHash, info->RankNumber, m_auras[x],aur->GetCaster());
-						if(acr.Error == AURA_CHECK_RESULT_HIGHER_BUFF_PRESENT)
-							deleteAur = true;
-						else if(acr.Error == AURA_CHECK_RESULT_LOWER_BUFF_PRESENT)
+						// Check for auras by specific type.
+						// Check for auras with the same name and a different rank.
+						
+						if(info->buffType > 0 && m_auras[x]->GetSpellProto()->buffType & info->buffType && maxStack == 0)
+							deleteAur = HasAurasOfBuffType(info->buffType, aur->m_casterGuid,0);
+						else
 						{
-							// remove the lower aura
-							m_auras[x]->Remove();
-
-							// no more checks on bad ptr
-							continue;
-						}
-					}					   
-				}
-				else if( m_auras[x]->GetSpellId() == aur->GetSpellId() ) // not the best formula to test this I know, but it works until we find a solution
-				{
-					if( !aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid )
-						continue;
-					f++;
-					//if(maxStack > 1)
-					{
-						//update duration,the same aura (update the whole stack whenever we cast a new one)
-						m_auras[x]->SetDuration(aur->GetDuration());
-						sEventMgr.ModifyEventTimeLeft(m_auras[x], EVENT_AURA_REMOVE, aur->GetDuration());
-						if(maxStack <= 1)
-						{
-							if(this->IsPlayer())
+							acr = AuraCheck(info->NameHash, info->RankNumber, m_auras[x],aur->GetCaster());
+							if(acr.Error == AURA_CHECK_RESULT_HIGHER_BUFF_PRESENT)
+								deleteAur = true;
+							else if(acr.Error == AURA_CHECK_RESULT_LOWER_BUFF_PRESENT)
 							{
-								data.Initialize(SMSG_UPDATE_AURA_DURATION);
-								data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
-								((Player*)this)->GetSession()->SendPacket(&data);
+								// remove the lower aura
+								m_auras[x]->Remove();
+
+								// no more checks on bad ptr
+								continue;
 							}
-							
-							data.Initialize(SMSG_SET_AURA_SINGLE);
-							data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
-							SendMessageToSet(&data,false);
-						}
+						}					   
 					}
-					if(maxStack <= f)
+					else if( m_auras[x]->GetSpellId() == aur->GetSpellId() ) // not the best formula to test this I know, but it works until we find a solution
 					{
-						deleteAur = true;
-						break;
+						if( !aur->IsPositive() && m_auras[x]->m_casterGuid != aur->m_casterGuid )
+							continue;
+						f++;
+						//if(maxStack > 1)
+						{
+							//update duration,the same aura (update the whole stack whenever we cast a new one)
+							m_auras[x]->SetDuration(aur->GetDuration());
+							sEventMgr.ModifyEventTimeLeft(m_auras[x], EVENT_AURA_REMOVE, aur->GetDuration());
+							if(maxStack <= 1)
+							{
+								if(this->IsPlayer())
+								{
+									data.Initialize(SMSG_UPDATE_AURA_DURATION);
+									data << (uint8)m_auras[x]->m_visualSlot <<(uint32) aur->GetDuration();
+									((Player*)this)->GetSession()->SendPacket(&data);
+								}
+								
+								data.Initialize(SMSG_SET_AURA_SINGLE);
+								data << GetNewGUID() << m_auras[x]->m_visualSlot << uint32(m_auras[x]->GetSpellProto()->Id) << uint32(aur->GetDuration()) << uint32(aur->GetDuration());
+								SendMessageToSet(&data,false);
+							}
+						}
+						if(maxStack <= f)
+						{
+							deleteAur = true;
+							break;
+						}
 					}
 				}
 			}
 		}
+
 		if(deleteAur)
 		{
 			sEventMgr.RemoveEvents(aur);
@@ -5282,6 +5283,7 @@ void Unit::EnableFlight(bool delay /* = false */)
 		*data << GetNewGUID();
 		*data << uint32(2);
 		SendMessageToSet(data, false);
+		static_cast< Player* >( this )->z_axisposition = 0.0f;
 		static_cast< Player* >( this )->delayedPackets.add( data );
 		static_cast< Player* >( this )->m_setflycheat = true;
 	}
@@ -5305,6 +5307,7 @@ void Unit::DisableFlight(bool delay /* = false */)
 		*data << GetNewGUID();
 		*data << uint32(5);
 		SendMessageToSet(data, false);
+		static_cast< Player* >( this )->z_axisposition = 0.0f;
 		static_cast< Player* >( this )->delayedPackets.add( data );
 		static_cast< Player* >( this )->m_setflycheat = false;
 	}

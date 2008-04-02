@@ -247,7 +247,7 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr, uint32 instanceid)
 	in->m_mapInfo = inf;
 	in->m_isBattleground=false;
 	plr->SetInstanceID(in->m_instanceId);
-	Log.Notice("InstanceMgr", "Creating instance for player %u and group %u on map %u. (%u)", in->m_creatorGuid, in->m_creatorGroup, in->m_mapId, in->m_instanceId);
+	Log.Debug("InstanceMgr", "Creating instance for player %u and group %u on map %u. (%u)", in->m_creatorGuid, in->m_creatorGroup, in->m_mapId, in->m_instanceId);
 	
 	// save our new instance to the database.
 	in->SaveToDB();
@@ -360,12 +360,13 @@ MapMgr * InstanceMgr::GetInstance(Object* obj)
 
 MapMgr * InstanceMgr::_CreateInstance(uint32 mapid, uint32 instanceid)
 {
-	Log.Notice("InstanceMgr", "Creating static instance %u on map %u.", instanceid, mapid);
 	MapInfo * inf = WorldMapInfoStorage.LookupEntry(mapid);
 	MapMgr * ret;
 
 	ASSERT(inf && inf->type == INSTANCE_NULL);
 	ASSERT(mapid < NUM_MAPS && m_maps[mapid] != NULL);
+
+	Log.Notice("InstanceMgr", "Creating continent %s.", m_maps[mapid]->GetName());
 
 	ret = new MapMgr(m_maps[mapid], mapid, instanceid);
 	ASSERT(ret);
@@ -380,7 +381,7 @@ MapMgr * InstanceMgr::_CreateInstance(uint32 mapid, uint32 instanceid)
 
 MapMgr * InstanceMgr::_CreateInstance(Instance * in)
 {
-	Log.Notice("InstanceMgr", "Creating Map Manager for saved instance %u", in->m_instanceId);
+	Log.Notice("InstanceMgr", "Creating saved instance %u (%s)", in->m_instanceId, m_maps[in->m_mapId]->GetName());
 	ASSERT(in->m_mapMgr==NULL);
 
 	// we don't have to check for world map info here, since the instance wouldn't have been saved if it didn't have any.

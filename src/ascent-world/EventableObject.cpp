@@ -166,6 +166,37 @@ void EventableObject::event_ModifyTimeLeft(uint32 EventType, uint32 TimeLeft,boo
 	m_lock.Release();
 }
 
+bool EventableObject::event_GetTimeLeft(uint32 EventType, uint32 * Time)
+{
+	m_lock.Acquire();
+	if(!m_events.size())
+	{
+		m_lock.Release();
+		return false;
+	}
+
+	EventMap::iterator itr = m_events.find(EventType);
+	if(itr != m_events.end())
+	{
+		do 
+		{
+			if( itr->second->deleted )
+			{
+				++itr;
+				continue;
+			}
+
+			*Time = (uint32)itr->second->currTime;
+			m_lock.Release();
+			return true;
+
+		} while(itr != m_events.upper_bound(EventType));
+	}
+
+	m_lock.Release();
+	return false;
+}
+
 void EventableObject::event_ModifyTime(uint32 EventType, uint32 Time)
 {
 	m_lock.Acquire();

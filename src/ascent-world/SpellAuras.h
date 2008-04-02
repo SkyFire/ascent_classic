@@ -703,6 +703,9 @@ protected:
 	void SendChannelUpdate(uint32 time, Object * m_caster);
 public:
 	bool m_deleted;
+	int16 m_interrupted;
+
+	ASCENT_INLINE bool IsInterrupted() { return ( m_interrupted >= 0 ); }
 };
 
 typedef void(Aura::*pSpellAura)(bool apply);

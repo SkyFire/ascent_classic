@@ -26,7 +26,7 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 	int8 DstInvSlot=0, DstSlot=0, SrcInvSlot=0, SrcSlot=0;
 	uint8 count=0;
 
-	bool result;
+	AddItemResult result;
 
 	recv_data >> SrcInvSlot >> SrcSlot >> DstInvSlot >> DstSlot >> count;
 	if(!GetPlayer())
@@ -112,6 +112,8 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 			if(!result)
 			{
 				printf("HandleBuyItemInSlot: Error while adding item to dstslot");
+				delete i2;
+				i2 = NULL;
 			}
 		}
 		else
@@ -333,19 +335,21 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 
 		if(SrcItem)
 		{
-			bool result =_player->GetItemInterface()->SafeAddItem(SrcItem,DstInvSlot,DstSlot);
+			AddItemResult result =_player->GetItemInterface()->SafeAddItem(SrcItem,DstInvSlot,DstSlot);
 			if(!result)
 			{
 				printf("HandleSwapItem: Error while adding item to dstslot\n");
+				delete SrcItem;
 			}
 		}
 
 		if(DstItem)
 		{
-			bool result = _player->GetItemInterface()->SafeAddItem(DstItem,SrcInvSlot,SrcSlot);
+			AddItemResult result = _player->GetItemInterface()->SafeAddItem(DstItem,SrcInvSlot,SrcSlot);
 			if(!result)
 			{
 				printf("HandleSwapItem: Error while adding item to srcslot\n");
+				delete DstItem;
 			}
 		}
 	}
@@ -567,7 +571,7 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 	CHECK_PACKET_SIZE(recv_data, 2);
 	WorldPacket data;
 
-	   bool result;
+	AddItemResult result;
 	int8 SrcInvSlot, SrcSlot, error=0;
 	
 	if(!GetPlayer())
@@ -630,7 +634,8 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 					return;		// should never happen
 
 				if( !_player->GetItemInterface()->SafeAddItem(offhandweapon, result.ContainerSlot, result.Slot) )
-					_player->GetItemInterface()->AddItemToFreeSlot(offhandweapon);		// shouldn't happen either.
+					if( !_player->GetItemInterface()->AddItemToFreeSlot(offhandweapon) )		// shouldn't happen either.
+						delete offhandweapon;
 			}
 		}
 		else
@@ -653,7 +658,8 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 					return;		// should never happen
 
 				if( !_player->GetItemInterface()->SafeAddItem(mainhandweapon, result.ContainerSlot, result.Slot) )
-					_player->GetItemInterface()->AddItemToFreeSlot(mainhandweapon);		// shouldn't happen either.
+					if( !_player->GetItemInterface()->AddItemToFreeSlot(mainhandweapon) )		// shouldn't happen either.
+						delete mainhandweapon;
 			}
 		}
 	}
@@ -691,17 +697,21 @@ void WorldSession::HandleAutoEquipItemOpcode( WorldPacket & recv_data )
 			if(!result)
 			{
 				printf("HandleAutoEquip: Error while adding item to SrcSlot");
+				delete oitem;
+				oitem = NULL;
 			}
 		}
 		result = _player->GetItemInterface()->SafeAddItem(eitem, INVENTORY_SLOT_NOT_SET, Slot);
 		if(!result)
 		{
 			printf("HandleAutoEquip: Error while adding item to Slot");
+			delete eitem;
+			eitem = NULL;
 		}
 		
 	}
 
-	if(eitem->GetProto()->Bonding==ITEM_BIND_ON_EQUIP)
+	if(eitem && eitem->GetProto()->Bonding==ITEM_BIND_ON_EQUIP)
 		eitem->SoulBind();	   
 }
 
@@ -848,7 +858,7 @@ void WorldSession::HandleBuyBackOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	int32 stuff;
 	Item* add ;
-	bool result;
+	AddItemResult result;
 	uint8 error;
 
 	sLog.outDetail( "WORLD: Received CMSG_BUYBACK_ITEM" );
@@ -904,6 +914,7 @@ void WorldSession::HandleBuyBackOpcode( WorldPacket & recv_data )
 			if(!result)
 			{
 				printf("HandleBuyBack: Error while adding item to free slot");
+				delete it;
 			}
 		}
 		else
@@ -1242,7 +1253,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	Item *add = NULL;
 	uint8 error = 0;
 	SlotResult slotresult;
-	bool result;
+	AddItemResult result;
 
 	recv_data >> srcguid >> itemid;
 	recv_data >> amount >> slot;
@@ -1335,8 +1346,10 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 		{
 			if(Item *bag = _player->GetItemInterface()->GetInventoryItem(slotresult.ContainerSlot))
 			{
-				((Container*)bag)->AddItem(slotresult.Slot, itm);
-				SendItemPushResult(itm, false, true, false, true, slotresult.ContainerSlot, slotresult.Result, 1);
+				if( !((Container*)bag)->AddItem(slotresult.Slot, itm) )
+					delete itm;
+				else
+					SendItemPushResult(itm, false, true, false, true, slotresult.ContainerSlot, slotresult.Result, 1);
 			}
 		}
 	}
@@ -1448,7 +1461,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode( WorldPacket & recv_data )
 	Item *dstitem= NULL;
 	int8 NewSlot = 0;
 	int8 error;
-	bool result;
+	AddItemResult result;
 
 	recv_data >> SrcInv >> Slot >> DstInv;
 
@@ -1478,10 +1491,15 @@ void WorldSession::HandleAutoStoreBagItemOpcode( WorldPacket & recv_data )
 			{
 				//free space found, remove item and add it to the destination
 				srcitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInv, Slot, false);
-				result = _player->GetItemInterface()->SafeAddItem(srcitem, INVENTORY_SLOT_NOT_SET, NewSlot);
-				if(!result)
+				if( srcitem )
 				{
-					printf("HandleAutoStoreBagItem: Error while adding item to newslot");
+					result = _player->GetItemInterface()->SafeAddItem(srcitem, INVENTORY_SLOT_NOT_SET, NewSlot);
+					if(!result)
+					{
+						printf("HandleAutoStoreBagItem: Error while adding item to newslot");
+						delete srcitem;
+						return;
+					}
 				}
 			}
 		}
@@ -1512,11 +1530,16 @@ void WorldSession::HandleAutoStoreBagItemOpcode( WorldPacket & recv_data )
 					else
 					{
 						srcitem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(SrcInv, Slot, false);
-						result = _player->GetItemInterface()->SafeAddItem(srcitem, DstInv, NewSlot);
-						if(!result)
+						if( srcitem != NULL )
 						{
-							printf("HandleBuyItemInSlot: Error while adding item to newslot");
-						}		
+							result = _player->GetItemInterface()->SafeAddItem(srcitem, DstInv, NewSlot);
+							if(!result)
+							{
+								printf("HandleBuyItemInSlot: Error while adding item to newslot");
+								delete srcitem;
+								return;
+							}		
+						}
 					}
 				}
 				else
@@ -1751,7 +1774,8 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket &recvPacket)
 		if(!_player->GetItemInterface()->SafeAddItem(eitem, slotresult.ContainerSlot, slotresult.Slot))
 		{
 			sLog.outDebug("[ERROR]AutoBankItem: Error while adding item to bank bag!\n");
-            _player->GetItemInterface()->SafeAddItem(eitem, SrcInvSlot, SrcSlot);
+            if( !_player->GetItemInterface()->SafeAddItem(eitem, SrcInvSlot, SrcSlot) )
+				delete eitem;
 		}
 	}
 }
@@ -1794,7 +1818,8 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket &recvPacket)
 		if (!_player->GetItemInterface()->AddItemToFreeSlot(eitem))
 		{
 			sLog.outDebug("[ERROR]AutoStoreBankItem: Error while adding item from one of the bank bags to the player bag!\n");
-            _player->GetItemInterface()->SafeAddItem(eitem, SrcInvSlot, SrcSlot);
+           if( !_player->GetItemInterface()->SafeAddItem(eitem, SrcInvSlot, SrcSlot) )
+			   delete eitem;
 		}
 	}
 }

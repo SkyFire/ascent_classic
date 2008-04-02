@@ -448,7 +448,7 @@ bool WorldSession::CanUseCommand(char cmdstr)
 		return true;
 
 	for(int i = 0; i < permissioncount; ++i)
-		if((permissions[i] == cmdstr) || (permissions[i] == 'y' && cmdstr == 'g') || (permissions[i] == 'p' && cmdstr == 'u')) // Advanced GM -> Lower GM
+		if(permissions[i] == cmdstr)
 			return true;
 
 	return false;
@@ -967,7 +967,7 @@ void WorldSession::SendChatPacket(WorldPacket * data, uint32 langpos, int32 lang
 
 void WorldSession::SendItemPushResult(Item * pItem, bool Created, bool Received, bool SendToSet, bool NewItem, uint8 DestBagSlot, uint32 DestSlot, uint32 AddCount)
 {
-	WorldPacket data(SMSG_ITEM_PUSH_RESULT, 60);
+	/*WorldPacket data(SMSG_ITEM_PUSH_RESULT, 60);
 	data << _player->GetGUID();
 	data << uint32(Received);
 	data << uint32(Created);
@@ -978,7 +978,20 @@ void WorldSession::SendItemPushResult(Item * pItem, bool Created, bool Received,
 	data << pItem->GetItemRandomSuffixFactor();
 	data << pItem->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID);
 	data << AddCount;
-	data << pItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
+	data << pItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);*/
+
+	packetSMSG_ITEM_PUSH_RESULT data;
+	data.guid = _player->GetGUID();
+	data.received = Received;
+	data.created = Created;
+	data.unk1 = 1;
+	data.destbagslot = DestBagSlot;
+	data.destslot = NewItem ? DestSlot : 0xFFFFFFFF;
+	data.entry = pItem->GetEntry();
+	data.suffix = pItem->GetItemRandomSuffixFactor();
+	data.randomprop = pItem->GetUInt32Value( ITEM_FIELD_RANDOM_PROPERTIES_ID );
+	data.count = AddCount;
+	data.stackcount = pItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 
 	if(SendToSet)
 	{
@@ -986,14 +999,22 @@ void WorldSession::SendItemPushResult(Item * pItem, bool Created, bool Received,
 			_player->SendMessageToSet(&data, true);
 		else
 		{*/
-			if(_player->GetGroup())
+			/*if(_player->GetGroup())
 				_player->GetGroup()->SendPacketToAll(&data);
 			else
-				SendPacket(&data);
+				SendPacket(&data);*/
 		/*}*/
+
+		if( _player->GetGroup() )
+			_player->GetGroup()->OutPacketToAll( SMSG_ITEM_PUSH_RESULT, sizeof( packetSMSG_ITEM_PUSH_RESULT ), &data );
+		else
+			OutPacket( SMSG_ITEM_PUSH_RESULT, sizeof( packetSMSG_ITEM_PUSH_RESULT ), &data );
 	}
 	else
-		SendPacket(&data);
+	{
+		//SendPacket(&data);
+		OutPacket( SMSG_ITEM_PUSH_RESULT, sizeof( packetSMSG_ITEM_PUSH_RESULT ), &data );
+	}
 }
 
 void WorldSession::Delete()

@@ -340,16 +340,32 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 				Guid = _player->mTradeItems[Index] ? _player->mTradeItems[Index]->GetGUID() : 0;
 				if(Guid != 0)
 				{
-					if(GetPermissionCount()>0)
+					if( _player->mTradeItems[Index]->IsSoulbound() )
 					{
-						sGMLog.writefromsession(this, "traded item %s to %s", _player->mTradeItems[Index]->GetProto()->Name1, pTarget->GetName());
+						_player->mTradeItems[Index] = NULL;
 					}
-					pItem = _player->m_ItemInterface->SafeRemoveAndRetreiveItemByGuid(Guid, true);
+					else
+					{
+						if(GetPermissionCount()>0)
+						{
+							sGMLog.writefromsession(this, "traded item %s to %s", _player->mTradeItems[Index]->GetProto()->Name1, pTarget->GetName());
+						}
+						pItem = _player->m_ItemInterface->SafeRemoveAndRetreiveItemByGuid(Guid, true);
+					}
 				}
 
 				Guid = pTarget->mTradeItems[Index] ? pTarget->mTradeItems[Index]->GetGUID() : 0;
 				if(Guid != 0)
-					pTarget->m_ItemInterface->SafeRemoveAndRetreiveItemByGuid(Guid, true);
+				{
+					if( pTarget->mTradeItems[Index]->IsSoulbound() )
+					{
+						pTarget->mTradeItems[Index] = NULL;
+					}
+					else
+					{
+						pTarget->m_ItemInterface->SafeRemoveAndRetreiveItemByGuid(Guid, true);
+					}
+				}
 			}
 
 			// Dump all items back into the opposite players inventory
@@ -359,14 +375,16 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 				if(pItem != 0)
 				{
 					pItem->SetOwner(pTarget);
-					pTarget->m_ItemInterface->AddItemToFreeSlot(pItem);
+					if( !pTarget->m_ItemInterface->AddItemToFreeSlot(pItem) )
+						delete pItem;
 				}
 
 				pItem = pTarget->mTradeItems[Index];
 				if(pItem != 0)
 				{
 					pItem->SetOwner(_player);
-					_player->m_ItemInterface->AddItemToFreeSlot(pItem);
+					if( !_player->m_ItemInterface->AddItemToFreeSlot(pItem) )
+						delete pItem;
 				}
 			}
 

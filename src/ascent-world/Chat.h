@@ -185,20 +185,21 @@ public:
 
 class SERVER_DECL CommandTableStorage : public Singleton<CommandTableStorage>
 {
-	ChatCommand * _unitCommandTable;
+	ChatCommand * _modifyCommandTable;
 	ChatCommand * _debugCommandTable;
 	ChatCommand * _waypointCommandTable;
-	ChatCommand * _gmCommandTable;
-	ChatCommand * _battlegroundCommandTable;
-	ChatCommand * _gameobjectCommandTable;
-	ChatCommand * _cheatCommandTable;
-	ChatCommand * _pvpCommandTable;
-	ChatCommand * _teleportCommandTable;
+	ChatCommand * _GMTicketCommandTable;
+	ChatCommand * _GameObjectCommandTable;
+	ChatCommand * _BattlegroundCommandTable;
+	ChatCommand * _NPCCommandTable;
+	ChatCommand * _accountCommandTable;
+	ChatCommand * _CheatCommandTable;
+	ChatCommand * _honorCommandTable;
 	ChatCommand * _questCommandTable;
-	ChatCommand * _guildCommandTable;
-	ChatCommand * _serverCommandTable;
-	ChatCommand * _lookupCommandTable;
+	ChatCommand * _petCommandTable;
+	ChatCommand * _recallCommandTable;
 	ChatCommand * _commandTable;
+	ChatCommand * _GuildCommandTable;
 
 	ChatCommand * GetSubCommandTable(const char * name);
 public:

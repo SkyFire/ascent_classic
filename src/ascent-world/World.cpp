@@ -598,6 +598,7 @@ bool World::SetInitialWorldSettings()
 		SpellEntry * sp = dbcSpell.LookupEntry(spellid);
 		sp->self_cast_only = false;
 		sp->apply_on_shapeshift_change = false;
+		sp->always_apply = false;
 
 		// hash the name
 		//!!!!!!! representing all strings on 32 bits is dangerous. There is a chance to get same hash for a lot of strings ;)
@@ -735,6 +736,9 @@ bool World::SetInitialWorldSettings()
 		// apply on shapeshift change
 		if( sp->NameHash == SPELL_HASH_TRACK_HUMANOIDS )
 			sp->apply_on_shapeshift_change = true;
+
+		if( sp->NameHash == SPELL_HASH_BLOOD_FURY || sp->NameHash == SPELL_HASH_SHADOWSTEP )
+			sp->always_apply = true;
 
 		//there are some spells that change the "damage" value of 1 effect to another : devastate = bonus first then damage
 		//this is a total bullshit so remove it when spell system supports effect overwriting
@@ -3205,7 +3209,12 @@ bool World::SetInitialWorldSettings()
 		sp->EffectSpellGroupRelation[1] = group_relation_rogue_shadow_step;
 		sp->EffectSpellGroupRelation_high[1] = 256 | 128 ;
 		sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
+		sp->procFlags = 0;
 	}
+
+	sp = dbcSpell.LookupEntryForced( 44373 );
+	if( sp != NULL )
+		sp->procFlags = 0;
 
 	//rogue ( grouping ) Lethality
 	group_relation_rogue_lethality |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)
@@ -4453,6 +4462,15 @@ bool World::SetInitialWorldSettings()
 		sp->procFlags = PROC_ON_CAST_SPELL;
 	*/
 	
+	// Mage - Invisibility 
+	sp = dbcSpell.LookupEntryForced( 66 );
+	if( sp != NULL )
+	{
+		// make a new dummy effect for it
+		sp->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+		sp->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+	}
+
 	//Mage - Icy Veins
 	sp = dbcSpell.LookupEntryForced( 12472 );
 	if( sp != NULL )
@@ -8257,6 +8275,10 @@ bool World::SetInitialWorldSettings()
 	if( sp != NULL )
 		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
 
+	sp = dbcSpell.LookupEntryForced( 40475 );		// Black temple melee trinket
+	if( sp != NULL )
+		sp->procChance = 50;
+
 
 // ------------------------------------------------------------------------------------------------
 
@@ -9212,7 +9234,11 @@ bool CharacterLoaderThread::run()
 		// Get a single connection to maintain for the whole process.
 		DatabaseConnection * con = CharacterDatabase.GetFreeConnection();
 
+		// this hasn't been updated in some time, enable it if you want to fix/use it
+#if 0
 		sWorld.PollCharacterInsertQueue(con);
+#endif
+
 		sWorld.PollMailboxInsertQueue(con);
 		/* While this looks weird, it ensures the system doesn't waste time switching to these contexts.
 		   WaitForSingleObject will suspend the thread,
