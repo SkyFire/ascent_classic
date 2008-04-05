@@ -2731,16 +2731,6 @@ uint8 Spell::CanCast(bool tolerate)
 			}
 		}
 		
-		// check if this is a mana drain ability - cannot be cast on creatures with no mana 
-		// however it can be cast on other players regardless of class
-		for( int i = 0 ; i <= 2 ; i ++ )
-		{
-			if( ( m_spellInfo->Effect[i] == SPELL_EFFECT_POWER_DRAIN ||	( m_spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA && m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_MANA_LEECH ) ) &&
-				( unitTarget->IsCreature() && !static_cast<Creature*>(unitTarget)->proto->Mana ) )
-
-			return SPELL_FAILED_BAD_TARGETS;
-		}
-
 		// item spell checks
 		if(i_caster)
 		{
