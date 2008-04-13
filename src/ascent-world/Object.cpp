@@ -1662,7 +1662,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		}
 		else if( IsPet() )
 		{
-			plr = static_cast< Player* >( this )->GetPetOwner();
+			plr = static_cast< Pet* >( this )->GetPetOwner();
 			if( plr != NULL && plr->GetMapMgr() == GetMapMgr() )
 				plr = NULL;
 		}
