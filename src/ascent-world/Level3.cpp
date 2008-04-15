@@ -2006,6 +2006,7 @@ bool ChatHandler::HandleIPBanCommand(const char * args, WorldSession * m_session
 	SystemMessage(m_session, "Adding [%s] to IP ban table, expires %s", pIp, (expire_time == 0)? "Never" : ctime( &expire_time ));
 	sLogonCommHandler.IPBan_Add( pIp, (uint32)expire_time );
 	sWorld.DisconnectUsersWithIP(pIp, m_session);
+	sGMLog.writefromsession(m_session, "banned ip address %s, expires %s", pIp, (expire_time == 0)? "Never" : ctime( &expire_time ));
 	return true;
 }
 
@@ -2026,6 +2027,7 @@ bool ChatHandler::HandleIPUnBanCommand(const char * args, WorldSession * m_sessi
 
 	SystemMessage(m_session, "Removing [%s] from IP ban table if it exists", ip);
 	sLogonCommHandler.IPBan_Remove( ip );
+	sGMLog.writefromsession(m_session, "unbanned ip address %s", ip);
 	return true;
 }
 
