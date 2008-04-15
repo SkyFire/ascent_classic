@@ -2224,9 +2224,6 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			
 		}*/	
 
-		if( pVictim->IsPlayer() && ((Player*)pVictim)->IsMounted() )
-			pVictim->RemoveAura( ((Player*)pVictim)->m_MountSpellId );
-
 		pVictim->SetUInt32Value( UNIT_FIELD_HEALTH, health - damage );
 	}
 }
