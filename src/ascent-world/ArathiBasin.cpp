@@ -641,7 +641,7 @@ void ArathiBasin::HookOnAreaTrigger(Player * plr, uint32 id)
 	if(plr->isDead())		// dont apply to dead players... :P
 		return;	
 
-	uint32 x= (uint32)buffslot;
+	uint32 x = (uint32)buffslot;
 	if(m_buffs[x] && m_buffs[x]->IsInWorld())
 	{
 		// apply the spell
