@@ -6304,7 +6304,7 @@ void Aura::SpellAuraForceReaction( bool apply )
 		p_target->m_forcedReactions.erase( mod->m_miscValue );
 
 	WorldPacket data( SMSG_SET_FORCED_REACTIONS, ( 8 * p_target->m_forcedReactions.size() ) + 4 );
-	data << p_target->m_forcedReactions.size();
+	data << uint32(p_target->m_forcedReactions.size());
 	for( itr = p_target->m_forcedReactions.begin(); itr != p_target->m_forcedReactions.end(); ++itr )
 	{
 		data << itr->first;
