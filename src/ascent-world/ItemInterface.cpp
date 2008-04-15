@@ -2468,8 +2468,60 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 
 	//sLog.outDebug( "Putting items into slots..." );
 
-	m_pItems[(int)srcslot] = DstItem;
-	m_pItems[(int)dstslot] = SrcItem;
+
+
+    m_pItems[(int)dstslot] = SrcItem;
+
+    // Moving a bag with items to a empty bagslot
+    if ( (DstItem == NULL) && (SrcItem->IsContainer()) )
+    {
+        Item *tSrcItem = NULL;
+
+        for ( uint32 Slot = 0; Slot < SrcItem->GetProto()->ContainerSlots; Slot++ )
+        {
+            tSrcItem = ((Container*)(m_pItems[(int)srcslot]))->GetItem(Slot);
+            
+            m_pOwner->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(srcslot, Slot, false);
+
+            if ( tSrcItem != NULL )
+            {
+                m_pOwner->GetItemInterface()->SafeAddItem(tSrcItem, dstslot, Slot);
+            }
+        }
+    }
+
+   m_pItems[(int)srcslot] = DstItem;
+
+    // swapping 2 bags filled with items
+    if ( DstItem && SrcItem->IsContainer() && DstItem->IsContainer() )
+    {
+        Item *tDstItem = NULL;
+        Item *tSrcItem = NULL;
+        uint32 TotalSlots = 0;
+
+        // Determine the max amount of slots to swap
+        if ( SrcItem->GetProto()->ContainerSlots > DstItem->GetProto()->ContainerSlots )
+            TotalSlots = SrcItem->GetProto()->ContainerSlots;
+        else
+            TotalSlots = DstItem->GetProto()->ContainerSlots;
+
+        // swap items in the bags
+        for( uint32 Slot = 0; Slot < TotalSlots; Slot++ )
+        {
+            tSrcItem = ((Container*)(m_pItems[(int)srcslot]))->GetItem(Slot);
+            tDstItem = ((Container*)(m_pItems[(int)dstslot]))->GetItem(Slot);
+
+            if ( tSrcItem != NULL )
+                m_pOwner->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(srcslot, Slot, false);
+            if ( tDstItem != NULL )
+                m_pOwner->GetItemInterface()->SafeRemoveAndRetreiveItemFromSlot(dstslot, Slot, false);
+
+            if ( tSrcItem != NULL )
+                ((Container*)(DstItem))->AddItem(Slot, tSrcItem);
+            if ( tDstItem != NULL )
+                ((Container*)(SrcItem))->AddItem(Slot, tDstItem);
+        }
+    }
 	
 	if( DstItem != NULL )
 		DstItem->m_isDirty = true;
