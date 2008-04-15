@@ -1,3 +1,22 @@
+/*
+ * Ascent MMORPG Server
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "common.h"
 #include "network.h"
 #include "log.h"
@@ -5,7 +24,6 @@
 
 #if defined(USE_EPOLL) && !defined(USE_KQUEUE) && !defined(WIN32)
 #include <sys/epoll.h>
-// fallback to select()
 
 #define MAXCLIENTS 100
 int g_maxFd = 0;
