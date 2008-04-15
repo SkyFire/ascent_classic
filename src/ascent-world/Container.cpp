@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -185,7 +185,7 @@ void Container::SwapItems(int8 SrcSlot, int8 DstSlot)
 		m_Slot[DstSlot]->m_isDirty = m_Slot[SrcSlot]->m_isDirty = true;
 		if(total<=m_Slot[DstSlot]->GetProto()->MaxCount)
 		{
-			m_Slot[DstSlot]->ModUInt32Value(ITEM_FIELD_STACK_COUNT,m_Slot[SrcSlot]->GetUInt32Value(ITEM_FIELD_STACK_COUNT));
+			m_Slot[DstSlot]->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT,m_Slot[SrcSlot]->GetUInt32Value(ITEM_FIELD_STACK_COUNT));
 			SafeFullRemoveItemFromSlot(SrcSlot);
 			return;
 		}
@@ -199,7 +199,7 @@ void Container::SwapItems(int8 SrcSlot, int8 DstSlot)
 			{
 				int32 delta=m_Slot[DstSlot]->GetProto()->MaxCount-m_Slot[DstSlot]->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 				m_Slot[DstSlot]->SetUInt32Value(ITEM_FIELD_STACK_COUNT,m_Slot[DstSlot]->GetProto()->MaxCount);
-				m_Slot[SrcSlot]->ModUInt32Value(ITEM_FIELD_STACK_COUNT,-delta);
+				m_Slot[SrcSlot]->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT,-delta);
 				return;
 			}
 		}

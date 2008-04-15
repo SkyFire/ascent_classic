@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -33,9 +33,9 @@ public:
 	int32 event_GetInstanceID();
 
 private:
-	std::map<uint64, uint32> NeedRolls;
-	std::map<uint64, uint32> GreedRolls;
-	uint64 _passedGuid;
+	std::map<uint32, uint32> m_NeedRolls;
+	std::map<uint32, uint32> m_GreedRolls;
+	set<uint32> m_passRolls;
 	uint32 _groupcount;
 	uint32 _slotid;
 	uint32 _itemid;

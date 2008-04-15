@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -101,16 +101,19 @@ void MapCell::RemoveObjects()
 	/* delete objects in pending respawn state */
 	for(itr = _respawnObjects.begin(); itr != _respawnObjects.end(); ++itr)
 	{
-		switch((*itr)->GetGUIDHigh())
+		switch((*itr)->GetTypeId())
 		{
-		case HIGHGUID_UNIT: {
-			_mapmgr->_reusable_guids_creature.push_back( (*itr)->GetGUIDLow() );
-			static_cast< Creature* >( *itr )->m_respawnCell=NULL;
-			delete static_cast< Creature* >( *itr );
+		case TYPEID_UNIT: {
+				if( !(*itr)->IsPet() )
+				{
+					_mapmgr->_reusable_guids_creature.push_back( (*itr)->GetUIdFromGUID() );
+					static_cast< Creature* >( *itr )->m_respawnCell=NULL;
+					delete static_cast< Creature* >( *itr );
+				}
 			}break;
 
-		case HIGHGUID_GAMEOBJECT: {
-			_mapmgr->_reusable_guids_gameobject.push_back( (*itr)->GetGUIDLow() );
+		case TYPEID_GAMEOBJECT: {
+			_mapmgr->_reusable_guids_gameobject.push_back( (*itr)->GetUIdFromGUID() );
 			static_cast< GameObject* >( *itr )->m_respawnCell=NULL;
 			delete static_cast< GameObject* >( *itr );
 			}break;
@@ -132,7 +135,7 @@ void MapCell::RemoveObjects()
 
 		if( _unloadpending )
 		{
-			if(obj->GetGUIDHigh() == HIGHGUID_TRANSPORTER)
+			if(obj->GetTypeFromGUID() == HIGHGUID_TYPE_TRANSPORTER)
 				continue;
 
 			if(obj->GetTypeId()==TYPEID_CORPSE && obj->GetUInt32Value(CORPSE_FIELD_OWNER) != 0)
@@ -150,26 +153,7 @@ void MapCell::RemoveObjects()
 		if( obj->IsInWorld() )
 			obj->RemoveFromWorld( true );
 
-		if( obj->GetTypeId() == TYPEID_UNIT )
-		{
-			if(obj->IsPet())
-				delete static_cast< Pet* >( obj );
-			else
-				delete static_cast< Creature* >( obj );
-		}
-		else if(obj->GetTypeId() == TYPEID_GAMEOBJECT)
-		{
-			if( obj->GetGUIDHigh() == HIGHGUID_TRANSPORTER )
-				delete static_cast< Transporter* >( obj );
-			else
-				delete static_cast< GameObject* >( obj );
-		}
-		else if( obj->GetTypeId() == TYPEID_DYNAMICOBJECT )
-			delete static_cast< DynamicObject* >( obj );
-		else if( obj->GetTypeId() == TYPEID_CORPSE )
-		{
-			delete static_cast< Corpse* >( obj );
-		}
+		delete obj;
 	}
 
 	_playerCount = 0;
@@ -195,7 +179,7 @@ void MapCell::LoadObjects(CellSpawns * sp)
 					continue;*/
 			}
 
-			Creature * c=_mapmgr->CreateCreature();
+			Creature * c=_mapmgr->CreateCreature((*i)->entry);
 
 			c->SetMapId(_mapmgr->GetMapId());
 			c->SetInstanceID(_mapmgr->GetInstanceID());
@@ -217,7 +201,7 @@ void MapCell::LoadObjects(CellSpawns * sp)
 	{
 		for(GOSpawnList::iterator i=sp->GOSpawns.begin();i!=sp->GOSpawns.end();i++)
 		{
-			GameObject * go=_mapmgr->CreateGameObject();
+			GameObject * go=_mapmgr->CreateGameObject((*i)->entry);
 			if(go->Load(*i))
 			{
 				//uint32 state = go->GetUInt32Value(GAMEOBJECT_STATE);

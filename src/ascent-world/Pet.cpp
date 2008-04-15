@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -145,7 +145,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 0.5f);
 		SetFloatValue(UNIT_FIELD_COMBATREACH, 0.75f);
 		SetUInt32Value(UNIT_FIELD_BYTES_2, (0x01 | (0x28 << 8) | (0x2 << 24)));
-		SetUInt32Value(UNIT_FIELD_PETNUMBER, GetGUIDLow());
+		SetUInt32Value(UNIT_FIELD_PETNUMBER, GetUIdFromGUID());
 		SetPowerType(POWER_TYPE_MANA);
 		if(entry == WATER_ELEMENTAL)
 			m_name = "Water Elemental";
@@ -196,7 +196,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 	m_PartySpellsUpdateTimer = 0;
 
 	m_PetNumber = static_cast< Player* >(owner)->GeneratePetNumber();
-	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetGUIDLow());
+	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetUIdFromGUID());
 
 	m_ExpireTime = expiretime;
 	bExpires = m_ExpireTime > 0 ? true : false;
@@ -218,7 +218,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 }
 
 
-Pet::Pet(uint32 high, uint32 low) : Creature(high, low)
+Pet::Pet(uint64 guid) : Creature(guid)
 {
 	m_PetXP = 0;
 	Summon = false;
@@ -287,8 +287,9 @@ void Pet::Update(uint32 time)
 		//Loyalty
 		if( m_LoyaltyTimer == 0 && GetHappinessState() != 0 )
 		{
-			UpdateLoyalty(LoyaltyTicks[GetHappinessState()-1]);//loyalty tick is happiness state dependent
 			m_LoyaltyTimer = PET_LOYALTY_UPDATE_TIMER;
+			if( !UpdateLoyalty(LoyaltyTicks[GetHappinessState()-1]) ) //loyalty tick is happiness state dependent
+				return;			
 		} 
 		else 
 		{
@@ -510,7 +511,7 @@ void Pet::InitializeMe(bool first)
 	proto=CreatureProtoStorage.LookupEntry(GetEntry());
 	m_Owner->SetSummon(this);
 	m_Owner->SetUInt64Value(UNIT_FIELD_SUMMON, this->GetGUID());
-	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetGUIDLow());
+	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetUIdFromGUID());
 	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, (uint32)UNIXTIME);
 	myFamily = dbcCreatureFamily.LookupEntry(creature_info->Family);
 	bHasLoyalty = m_Owner->getClass() == HUNTER ? true : false;
@@ -537,7 +538,7 @@ void Pet::InitializeMe(bool first)
 	{
 		// Pull from database... :/
 		QueryResult * query = CharacterDatabase.Query("SELECT * FROM playerpetspells WHERE ownerguid=%u and petnumber=%u",
-			m_Owner->GetGUIDLow(), m_PetNumber);
+			m_Owner->GetLowGUID(), m_PetNumber);
 		if(query)
 		{
 			do 
@@ -624,7 +625,7 @@ void Pet::Dismiss(bool bSafeDelete)//Abandon pet
 	if(!Summon && m_Owner)
 	{
 		CharacterDatabase.Execute("DELETE FROM playerpetspells WHERE ownerguid=%u AND petnumber=%u",
-			m_Owner->GetGUIDLow(), m_PetNumber);
+			m_Owner->GetLowGUID(), m_PetNumber);
 	}
 
 	if(m_Owner)
@@ -711,7 +712,7 @@ void Pet::GiveXP( uint32 xp )
 
 	while(xp >= nxp)
 	{
-		ModUInt32Value(UNIT_FIELD_LEVEL, 1);
+		ModUnsigned32Value(UNIT_FIELD_LEVEL, 1);
 		xp -= nxp;
 		nxp = GetNextLevelXP(m_uint32Values[UNIT_FIELD_LEVEL]);
 		changed = true;
@@ -1508,7 +1509,7 @@ uint32 Pet::CanLearnSpell( SpellEntry * sp )
 		return SPELL_FAILED_LEVEL_REQUIREMENT;
 
 	if( Summon )
-		return NULL;
+		return 0;
 	
 	/** Hunter pet specific checks:
 		- number of active spells, max 4 are allowed per pet */
@@ -1534,7 +1535,7 @@ uint32 Pet::CanLearnSpell( SpellEntry * sp )
 	if( SpellTP( sp->Id ) - SpellTP( GetHighestRankSpell( sp->Id ) ) >  TP )
 		return SPELL_FAILED_TRAINING_POINTS;
 	
-	return NULL;
+	return 0;
 }
 void Pet::UpdateTP()
 {
@@ -1595,11 +1596,28 @@ uint32 Pet::GetHighestRankSpell(uint32 spellId)
 	}
 	return tmp ? tmp->Id : 0;
 }
-void Pet::UpdateLoyalty( char pts )
+bool Pet::UpdateLoyalty( char pts )
 {	
 	//updates loyalty_pts and loyalty lvl if needed
+	uint32 lvl;
+#ifdef WIN32
+	__try {
+		if( !m_Owner || Summon || m_Owner->GetMapMgr() != this->GetMapMgr() )
+			return true;
+
+		lvl = m_Owner->GetUInt32Value( PLAYER_NEXT_LEVEL_XP );
+	}
+	__except(EXCEPTION_EXECUTE_HANDLER)
+	{
+		m_Owner = NULL;
+		return true;
+	}
+#else
 	if( !m_Owner || Summon || m_Owner->GetMapMgr() != this->GetMapMgr() )
-		return;
+		return true;
+
+	lvl = m_Owner->GetUInt32Value( PLAYER_NEXT_LEVEL_XP );
+#endif
 
 	uint8 curLvl = GetLoyaltyLevel();
 	uint8 newLvl = curLvl;
@@ -1612,20 +1630,21 @@ void Pet::UpdateLoyalty( char pts )
 	if( LoyaltyPts < 0 && pts != 0 )
 		newLvl--;
 	else if( curLvl < BEST_FRIEND && LoyaltyPts > LoyLvlRange[ curLvl ] && 	// requires some loyalty pts ...
-		LoyaltyXP >= m_Owner->GetUInt32Value( PLAYER_NEXT_LEVEL_XP ) / 20 )	// ... and 5% of hunters nextlevel xp
+		LoyaltyXP >= lvl / 20 )	// ... and 5% of hunters nextlevel xp
 		newLvl++;
-	else return;
+	else return true;
 
 	if( newLvl < REBELIOUS )
 	{	
 		Dismiss(); // pet runs away
-		return;
+		return false;
 	}
 	
 	SetUInt32Value( UNIT_FIELD_BYTES_1, 0 | ( newLvl << 8 ) );		//set new loy level
 	LoyaltyPts = newLvl > curLvl ? 0 : LoyLvlRange[ newLvl ];		//reset loy_pts
 	LoyaltyXP = 0;													//reset loy_xp
 	UpdateTP();
+	return true;
 }
 
 AI_Spell * Pet::HandleAutoCastEvent()

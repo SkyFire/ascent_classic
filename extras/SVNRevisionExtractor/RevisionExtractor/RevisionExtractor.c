@@ -12,7 +12,7 @@ int g_oldRevision = -1;
 int main(int argc, char* argv[])
 {
 	FILE * pFile = fopen("../.svn/entries", "r");
-	FILE * pTagFile = fopen("../ascent-tag", "r");
+	FILE * pTagFile = fopen("../../ascent-tag", "r");
 	if( pTagFile != NULL )
 	{
 		char str[1024];

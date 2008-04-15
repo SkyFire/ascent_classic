@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -115,7 +115,7 @@ void DatabaseCleaner::CleanCharacters()
 				pCorpse->GetUInt32Value(CORPSE_FIELD_OWNER) == 0 ||
 				chr_guids.find(pCorpse->GetUInt32Value(CORPSE_FIELD_OWNER)) == chr_guids.end())
 			{
-				tokill_corpses.push_back(pCorpse->GetGUIDLow());
+				tokill_corpses.push_back(pCorpse->GetLowGUID());
 			}
 			delete pCorpse;
 		} while(result->NextRow());

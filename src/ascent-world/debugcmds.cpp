@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -54,7 +54,7 @@ bool ChatHandler::HandleShowReactionCommand(const char* args, WorldSession *m_se
 	uint64 guid = m_session->GetPlayer()->GetSelection();
 	if (guid != 0)
 	{
-		obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+		obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	}
 
 	if(!obj)
@@ -75,7 +75,7 @@ bool ChatHandler::HandleShowReactionCommand(const char* args, WorldSession *m_se
 	m_session->SendPacket( &data );
 
 	std::stringstream sstext;
-	sstext << "Sent Reaction of " << Reaction << " to " << obj->GetGUIDLow() << '\0';
+	sstext << "Sent Reaction of " << Reaction << " to " << obj->GetUIdFromGUID() << '\0';
 
 	SystemMessage(m_session,  sstext.str().c_str());
 	return true;
@@ -110,7 +110,7 @@ bool ChatHandler::HandleMoveInfoCommand(const char* args, WorldSession *m_sessio
 	Object *obj;
 
 	uint64 guid = m_session->GetPlayer()->GetSelection();
-	if(!(obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid)))
+	if(!(obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid))))
 	{
 		SystemMessage(m_session, "You should select a character or a creature.");
 		return true;
@@ -130,7 +130,7 @@ bool ChatHandler::HandleMoveInfoCommand(const char* args, WorldSession *m_sessio
 	uint32 aiagent = ((Creature *)obj)->GetAIInterface()->getCurrentAgent();
 	uint32 lowfollow = 0;
 	uint32 highfollow = 0;
-	if(unitToFollow == NULL)
+	/*if(unitToFollow == NULL)
 	{
 		lowfollow = 0;
 		highfollow = 0;
@@ -139,7 +139,7 @@ bool ChatHandler::HandleMoveInfoCommand(const char* args, WorldSession *m_sessio
 	{
 		lowfollow = unitToFollow->GetGUIDLow();
 		highfollow = unitToFollow->GetGUIDHigh();;
-	}
+	}*/
 
 	std::stringstream sstext;
 	sstext << "Following Unit: Low: " << lowfollow << " High: " << highfollow << "\n";
@@ -164,7 +164,7 @@ bool ChatHandler::HandleAIMoveCommand(const char* args, WorldSession *m_session)
 	uint64 guid = m_session->GetPlayer()->GetSelection();
 	if (guid != 0)
 	{
-		obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+		obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	}
 
 	if(obj == NULL)
@@ -301,7 +301,7 @@ bool ChatHandler::HandleFaceCommand(const char* args, WorldSession *m_session)
 	uint64 guid = m_session->GetPlayer()->GetSelection();
 	if (guid != 0)
 	{
-		obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+		obj = (Object*)m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	}
 
 	if(obj == NULL)
@@ -692,7 +692,7 @@ bool ChatHandler::HandleKnockBackCommand(const char* args, WorldSession *m_sessi
 
 bool ChatHandler::HandleFadeCommand(const char* args, WorldSession *m_session)
 {
-	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
+	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetUnit(m_session->GetPlayer()->GetSelection());
 	if(!target)
 		target = m_session->GetPlayer();
 	char* v = strtok((char*)args, " ");
@@ -710,7 +710,7 @@ bool ChatHandler::HandleFadeCommand(const char* args, WorldSession *m_session)
 
 bool ChatHandler::HandleThreatModCommand(const char* args, WorldSession *m_session)
 {
-	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
+	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetUnit(m_session->GetPlayer()->GetSelection());
 	if(!target)
 		target = m_session->GetPlayer();
 	char* v = strtok((char*)args, " ");
@@ -728,7 +728,7 @@ bool ChatHandler::HandleThreatModCommand(const char* args, WorldSession *m_sessi
 
 bool ChatHandler::HandleCalcThreatCommand(const char* args, WorldSession *m_session)
 {
-	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
+	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetUnit(m_session->GetPlayer()->GetSelection());
 	if(!target)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -753,7 +753,7 @@ bool ChatHandler::HandleCalcThreatCommand(const char* args, WorldSession *m_sess
 bool ChatHandler::HandleThreatListCommand(const char* args, WorldSession *m_session)
 {
 	Unit* target = NULL;
-	target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
+	target = m_session->GetPlayer()->GetMapMgr()->GetUnit(m_session->GetPlayer()->GetSelection());
 	if(!target)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -770,7 +770,7 @@ bool ChatHandler::HandleThreatListCommand(const char* args, WorldSession *m_sess
 			++itr;
 			continue;
 		}
-		sstext << "guid: " << itr->first->GetGUIDLow() <<" " << itr->first->GetGUIDHigh() << " | threat: " << itr->second << "| threat after mod: " << (itr->second + itr->first->GetThreatModifyer()) << "\n";
+		sstext << "guid: " << itr->first->GetGUID() << " | threat: " << itr->second << "| threat after mod: " << (itr->second + itr->first->GetThreatModifyer()) << "\n";
 		++itr;
 	}
 

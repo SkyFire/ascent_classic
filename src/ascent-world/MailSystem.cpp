@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -143,7 +143,7 @@ bool MailMessage::AddMessageDataToPacket(WorldPacket& data)
 				continue;
 
 			data << uint8(i++);
-			data << pItem->GetGUIDLow();
+			data << pItem->GetUInt32Value(OBJECT_FIELD_GUID);
 			data << pItem->GetEntry();
 
 			for( j = 0; j < 6; ++j )
@@ -320,7 +320,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	// uint8
 	
 	// Search for the recipient
-	PlayerInfo* player = ObjectMgr::getSingleton().GetPlayerInfoByName(recepient);
+	PlayerInfo* player = ObjectMgr::getSingleton().GetPlayerInfoByName(recepient.c_str());
 	if( player == NULL )
 	{
 		SendMailError( MAIL_ERR_RECIPIENT_NOT_FOUND );
@@ -392,7 +392,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 			pItem->RemoveFromWorld();
 			pItem->SetOwner( NULL );
 			pItem->SaveToDB( INVENTORY_SLOT_NOT_SET, 0, true, NULL );
-			msg.items.push_back( pItem->GetGUIDLow() );
+			msg.items.push_back( pItem->GetUInt32Value(OBJECT_FIELD_GUID) );
 
 			if( GetPermissionCount() > 0 )
 			{
@@ -411,7 +411,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	}
 
 	// take the money
-	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -cost);
+	_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -cost);
 
 	// Fill in the rest of the info
 	msg.player_guid = player->guid;
@@ -572,7 +572,7 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 
 	// send complete packet
 	data << uint32(MAIL_OK);
-	data << item->GetGUIDLow();
+	data << item->GetUInt32Value(OBJECT_FIELD_GUID);
 	data << item->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 
 	if( !_player->GetItemInterface()->AddItemToFreeSlot(item) )
@@ -586,7 +586,7 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 	
 	if( message->cod > 0 )
 	{
-		_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -int32(message->cod));
+		_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -int32(message->cod));
 		string subject = "COD Payment: ";
 		subject += message->subject;
 		sMailSystem.SendAutomatedMessage(NORMAL, message->player_guid, message->sender_guid, subject, "", message->cod, 0, 0, 1);
@@ -617,7 +617,7 @@ void WorldSession::HandleTakeMoney(WorldPacket & recv_data )
 	}
 
 	// add the money to the player
-	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, message->money);
+	_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, message->money);
 
 	// message no longer has any money
 	message->money = 0;

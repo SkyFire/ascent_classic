@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -309,6 +309,8 @@ void LogonCommHandler::ConnectionDropped(uint32 ID)
 uint32 LogonCommHandler::ClientConnected(string AccountName, WorldSocket * Socket)
 {
 	uint32 request_id = next_request++;
+	size_t i = 0;
+	const char * acct = AccountName.c_str();
 	sLog.outDebug ( " >> sending request for account information: `%s` (request %u).", AccountName.c_str(), request_id);
   //  sLog.outColor(TNORMAL, "\n");
 	
@@ -323,7 +325,12 @@ uint32 LogonCommHandler::ClientConnected(string AccountName, WorldSocket * Socke
 
 	WorldPacket data(RCMSG_REQUEST_SESSION, 100);
 	data << request_id;
-	data << AccountName;
+
+	// strip the shitty hash from it
+	for(; acct[i] != '#' && acct[i] != '\0'; ++i )
+		data.append( &acct[i], 1 );
+	
+	data.append( "\0", 1 );
 	itr->second->SendPacket(&data,false);
 
 	pending_logons[request_id] = Socket;
@@ -342,40 +349,6 @@ void LogonCommHandler::UnauthedSocketClose(uint32 id)
 void LogonCommHandler::RemoveUnauthedSocket(uint32 id)
 {
 	pending_logons.erase(id);
-}
-
-void LogonCommHandler::LogonDatabaseSQLExecute(const char* str, ...)
-{
-	va_list ap;
-	va_start(ap, str);
-	char query[1024];
-	vsnprintf(query, 1024, str, ap);
-	va_end(ap);
-	string q = string(query);
-
-	WorldPacket data(RCMSG_SQL_EXECUTE, q.size()+1);
-	data << q;
-	
-	// Send request packet to server.
-	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
-	if(logons.size() == 0 || itr->second == 0)
-	{
-		// No valid logonserver is connected.
-		return;
-	}
-	itr->second->SendPacket(&data,false);
-}
-
-void LogonCommHandler::LogonDatabaseReloadAccounts()
-{
-	WorldPacket data(RCMSG_RELOAD_ACCOUNTS, 1);
-	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
-	if(logons.size() == 0 || itr->second == 0)
-	{
-		// No valid logonserver is connected.
-		return;
-	}
-	itr->second->SendPacket(&data,false);
 }
 
 void LogonCommHandler::LoadRealmConfiguration()
@@ -463,6 +436,86 @@ void LogonCommHandler::TestConsoleLogon(string& username, string& password, uint
 	data << newuser;
 	data.append(hash.GetDigest(), 20);
 
+	itr->second->SendPacket(&data, false);
+}
+
+// db funcs
+void LogonCommHandler::Account_SetBanned(const char * account, uint32 banned)
+{
+	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
+	if(logons.size() == 0 || itr->second == 0)
+	{
+		// No valid logonserver is connected.
+		return;
+	}
+
+	WorldPacket data(RCMSG_MODIFY_DATABASE, 50);
+	data << uint32(1);		// 1 = ban
+	data << account;
+	data << banned;
+	itr->second->SendPacket(&data, false);
+}
+
+void LogonCommHandler::Account_SetGM(const char * account, const char * flags)
+{
+	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
+	if(logons.size() == 0 || itr->second == 0)
+	{
+		// No valid logonserver is connected.
+		return;
+	}
+
+	WorldPacket data(RCMSG_MODIFY_DATABASE, 50);
+	data << uint32(2);		// 2 = set gm
+	data << account;
+	data << flags;
+	itr->second->SendPacket(&data, false);
+}
+
+void LogonCommHandler::Account_SetMute(const char * account, uint32 muted)
+{
+	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
+	if(logons.size() == 0 || itr->second == 0)
+	{
+		// No valid logonserver is connected.
+		return;
+	}
+
+	WorldPacket data(RCMSG_MODIFY_DATABASE, 50);
+	data << uint32(3);		// 3 = mute
+	data << account;
+	data << muted;
+	itr->second->SendPacket(&data, false);
+}
+
+void LogonCommHandler::IPBan_Add(const char * ip, uint32 duration)
+{
+	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
+	if(logons.size() == 0 || itr->second == 0)
+	{
+		// No valid logonserver is connected.
+		return;
+	}
+
+	WorldPacket data(RCMSG_MODIFY_DATABASE, 50);
+	data << uint32(4);		// 4 = ipban add
+	data << ip;
+	data << duration;
+	itr->second->SendPacket(&data, false);
+}
+
+void LogonCommHandler::IPBan_Remove(const char * ip)
+{
+	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
+	if(logons.size() == 0 || itr->second == 0)
+	{
+		// No valid logonserver is connected.
+		return;
+	}
+
+	WorldPacket data(RCMSG_MODIFY_DATABASE, 50);
+	data << uint32(5);		// 5 = ipban remove
+	data << ip;
 	itr->second->SendPacket(&data, false);
 }
 

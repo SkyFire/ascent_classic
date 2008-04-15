@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,28 +57,15 @@ void DayWatcherThread::dupe_tm_pointer(tm * returnvalue, tm * mypointer)
 
 void DayWatcherThread::update_settings()
 {
-	CharacterDatabase.Execute("REPLACE INTO server_settings VALUES(\"last_honor_update_time\", %u)", last_honor_time);
 	CharacterDatabase.Execute("REPLACE INTO server_settings VALUES(\"last_arena_update_time\", %u)", last_arena_time);
 }
 
 void DayWatcherThread::load_settings()
 {
-	string honor_timeout = Config.MainConfig.GetStringDefault("Periods", "HonorUpdate", "daily");
 	string arena_timeout = Config.MainConfig.GetStringDefault("Periods", "ArenaUpdate", "weekly");
-
-	honor_period = get_timeout_from_string(honor_timeout.c_str(), DAILY);
 	arena_period = get_timeout_from_string(arena_timeout.c_str(), WEEKLY);
 
-	QueryResult * result = CharacterDatabase.Query("SELECT setting_value FROM server_settings WHERE setting_id = \"last_honor_update_time\"");
-	if(result)
-	{
-		last_honor_time = result->Fetch()[0].GetUInt32();
-		delete result;
-	}
-	else
-		last_honor_time = 0;
-
-	result = CharacterDatabase.Query("SELECT setting_value FROM server_settings WHERE setting_id = \"last_arena_update_time\"");
+	QueryResult * result = CharacterDatabase.Query("SELECT setting_value FROM server_settings WHERE setting_id = \"last_arena_update_time\"");
 	if(result)
 	{
 		last_arena_time = result->Fetch()[0].GetUInt32();
@@ -91,7 +78,6 @@ void DayWatcherThread::load_settings()
 void DayWatcherThread::set_tm_pointers()
 {
 	dupe_tm_pointer(localtime(&last_arena_time), &local_last_arena_time);
-	dupe_tm_pointer(localtime(&last_honor_time), &local_last_honor_time);
 }
 
 uint32 DayWatcherThread::get_timeout_from_string(const char * string, uint32 def)
@@ -155,8 +141,6 @@ bool DayWatcherThread::run()
 		m_busy=true;
 		currenttime = UNIXTIME;
 		dupe_tm_pointer(localtime(&currenttime), &local_currenttime);
-		if(has_timeout_expired(&local_currenttime, &local_last_honor_time, honor_period))
-			update_honor();
 
 		if(has_timeout_expired(&local_currenttime, &local_last_arena_time, arena_period))
 			update_arena();
@@ -304,66 +288,4 @@ void DayWatcherThread::update_arena()
 	dupe_tm_pointer(localtime(&last_arena_time), &local_last_arena_time);
 	m_dirty = true;
 }
-
-void DayWatcherThread::update_honor()
-{
-	Log.Notice("DayWatcherThread", "Running Daily Honor Maintenance...");
-	uint32 guid, killstoday, killsyesterday, honortoday, honoryesterday, honorpoints, points_to_add;
-	Player * plr;
-	QueryResult * result = CharacterDatabase.Query("SELECT guid, killsToday, killsYesterday, honorToday, honorYesterday, honorPoints, honorPointsToAdd FROM characters");
-	
-	if(result)
-	{
-		do 
-		{
-			Field * f = result->Fetch();
-			guid = f[0].GetUInt32();
-			killstoday = f[1].GetUInt32();
-			killsyesterday = f[2].GetUInt32();
-			honortoday = f[3].GetUInt32();
-			honoryesterday = f[4].GetUInt32();
-			honorpoints = f[5].GetUInt32();
-			points_to_add = f[6].GetUInt32();
-
-			/* add his "honor points to be added" */
-			honorpoints += points_to_add;
-			points_to_add = 0;
-
-			/* update the yesterday fields */
-			killsyesterday = killstoday;
-			honoryesterday = honortoday;
-			honortoday = killstoday = 0;
-
-			/* are we online? */
-			plr = objmgr.GetPlayer(guid);
-			if(plr)
-			{
-				/* we're online, update our fields here too */
-				plr->m_honorPoints = honorpoints;
-				plr->m_honorPointsToAdd = points_to_add;
-				plr->m_honorToday = honortoday;
-				plr->m_honorYesterday = honoryesterday;
-				plr->m_killsToday = killstoday;
-				plr->m_killsYesterday = killsyesterday;
-
-				/* update visible fields (must be done through an event because of no uint lock */
-				sEventMgr.AddEvent(plr, &Player::RecalculateHonor, EVENT_PLAYER_UPDATE, 100, 1, 0);
-
-				/* send a little message :> */
-				sChatHandler.SystemMessage(plr->GetSession(), "Your honor points have been updated! Check your PvP tab!");
-			}
-
-			/* update in database */
-			CharacterDatabase.Execute("UPDATE characters SET killsToday = %u, killsYesterday = %u, honorToday = %u, honorYesterday = %u, honorPoints = %u, honorPointsToAdd = %u WHERE guid = %u",
-				killstoday, killsyesterday, honortoday, honoryesterday, honorpoints, points_to_add, guid);
-		} while(result->NextRow());
-		delete result;
-	}
-
-	//===========================================================================
-	last_honor_time = UNIXTIME;
-	dupe_tm_pointer(localtime(&last_honor_time), &local_last_honor_time);
-	m_dirty = true;
-}
-
 

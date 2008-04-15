@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -278,6 +278,8 @@ void CStackWalker::OnOutput(LPCSTR szText)
 	fclose(m_file);
 }
 
+bool died = false;
+
 
 int __cdecl HandleCrash(PEXCEPTION_POINTERS pExceptPtrs)
 {
@@ -300,6 +302,14 @@ int __cdecl HandleCrash(PEXCEPTION_POINTERS pExceptPtrs)
 		TerminateThread(GetCurrentThread(),-1);
 		// not reached
 	}
+
+	if(died)
+	{
+		TerminateProcess(GetCurrentProcess(),-1);
+		// not reached:P
+	}
+
+	died=true;
 
 	// Create the date/time string
 	time_t curtime = time(NULL);

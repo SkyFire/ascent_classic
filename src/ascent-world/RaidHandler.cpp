@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -45,7 +45,7 @@ void WorldSession::HandleGroupChangeSubGroup(WorldPacket & recv_data)
 	recv_data >> name;
 	recv_data >> subGroup;
 
-	PlayerInfo * inf = objmgr.GetPlayerInfoByName(name);
+	PlayerInfo * inf = objmgr.GetPlayerInfoByName(name.c_str());
 	if(inf == NULL || inf->m_Group == NULL || inf->m_Group != _player->m_playerInfo->m_Group)
 		return;
 

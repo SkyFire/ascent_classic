@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -115,6 +115,7 @@ bool Master::Run(int argc, char ** argv)
 	int do_version = 0;
 	int do_cheater_check = 0;
 	int do_database_clean = 0;
+	time_t curTime;
 
 	struct ascent_option longopts[] =
 	{
@@ -156,6 +157,8 @@ bool Master::Run(int argc, char ** argv)
 
 	// Startup banner
 	UNIXTIME = time(NULL);
+	g_localTime = *localtime(&UNIXTIME);
+
 	if(!do_version && !do_check_conf)
 	{
 		sLog.Init(-1, 3);
@@ -407,7 +410,12 @@ bool Master::Run(int argc, char ** argv)
 		}
 
 		/* since time() is an expensive system call, we only update it once per server loop */
-		UNIXTIME = time(NULL);
+		curTime = time(NULL);
+		if( UNIXTIME != curTime )
+		{
+			UNIXTIME = time(NULL);
+			g_localTime = *localtime(&curTime);
+		}
 
 #ifndef CLUSTERING
 #ifdef VOICE_CHAT
@@ -486,7 +494,6 @@ bool Master::Run(int argc, char ** argv)
 	delete console;
 
 	// begin server shutdown
-	time_t st = UNIXTIME;
 	Log.Notice( "Shutdown", "Initiated at %s", ConvertTimeStampToDataTime( (uint32)UNIXTIME).c_str() );
 
 	if( lootmgr.is_loading )

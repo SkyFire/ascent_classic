@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,6 +18,25 @@
  */
 
 #include "StdAfx.h"
+
+static const uint32 TeamCountToId[6] = {
+	0,						// 0
+	0,						// 1
+	0,						// 2
+	ARENA_TEAM_TYPE_2V2,	// 3
+	ARENA_TEAM_TYPE_3V3,	// 4
+	ARENA_TEAM_TYPE_5V5,	// 5
+};
+
+static const uint32 IdToTeamCount[6] = {
+	3,
+	4,
+	5,
+	0,
+	0,
+	0,
+};
+
 ArenaTeam::ArenaTeam(uint32 Type, uint32 Id)
 {
 	m_id = Id;
@@ -190,7 +209,7 @@ void ArenaTeam::Roster(WorldPacket & data)
 {
 	data.Initialize(SMSG_ARENA_TEAM_ROSTER);
 	data.reserve(m_memberCount * 81 + 9);
-	data << uint8(m_type);
+	data << uint32(IdToTeamCount[m_type]);
 	data << m_memberCount;
 	data << uint32(0);			// unk
 
@@ -317,10 +336,12 @@ ArenaTeamMember * ArenaTeam::GetMemberByGuid(uint32 guid)
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recv_data)
 {
 	uint8 slot;
+	uint32 tcount;
 	ArenaTeam * team;
-	recv_data >> slot;
-	if(slot < 3)
+	recv_data >> tcount;
+	if(tcount <= 5)
 	{
+		slot = TeamCountToId[tcount];
 		team = _player->m_arenaTeams[slot];
 		if(team != NULL)
 		{
@@ -353,8 +374,15 @@ void WorldSession::HandleArenaTeamAddMemberOpcode(WorldPacket & recv_data)
 {
 	WorldPacket data(SMSG_ARENA_TEAM_INVITE, 40);
 	string player_name;
+	uint32 tcount;
 	uint8 slot;
-	recv_data >> slot >> player_name;
+	recv_data >> tcount >> player_name;
+	if( tcount > 5 )
+		return;
+
+	slot = TeamCountToId[tcount];
+	if( slot >= NUM_ARENA_TEAM_TYPES )
+		return;
 
 	Player * plr = objmgr.GetPlayer(player_name.c_str(), false);
 	if(plr == NULL)
@@ -369,7 +397,7 @@ void WorldSession::HandleArenaTeamAddMemberOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if(_player->m_arenaTeams[slot]->m_leader != _player->GetGUIDLow())
+	if(_player->m_arenaTeams[slot]->m_leader != _player->GetLowGUID())
 	{
 		SystemMessage("You are not the captain of this arena team.");
 		return;
@@ -415,9 +443,17 @@ void WorldSession::HandleArenaTeamRemoveMemberOpcode(WorldPacket & recv_data)
 {
 	ArenaTeam * team;
 	uint8 slot;
+	uint32 tcount;
 	string name;
 	PlayerInfo * inf;
-	recv_data >> slot >> name;
+	recv_data >> tcount >> name;
+
+	if( tcount > 5 )
+		return;
+
+	slot = TeamCountToId[tcount];
+	if( slot >= NUM_ARENA_TEAM_TYPES )
+		return;
 
 	if( (team = _player->m_arenaTeams[slot]) == NULL )
 	{
@@ -425,13 +461,13 @@ void WorldSession::HandleArenaTeamRemoveMemberOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if(team->m_leader != _player->GetGUIDLow())
+	if(team->m_leader != _player->GetLowGUID())
 	{
 		SystemMessage("You are not the leader of this team.");
 		return;
 	}
 
-	if( (inf = objmgr.GetPlayerInfoByName(name)) == NULL )
+	if( (inf = objmgr.GetPlayerInfoByName(name.c_str())) == NULL )
 	{
 		SystemMessage("That player cannot be found.");
 		return;
@@ -522,8 +558,16 @@ void WorldSession::HandleArenaTeamInviteDenyOpcode(WorldPacket & recv_data)
 void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recv_data)
 {
 	ArenaTeam * team;
+	uint32 tcount;
 	uint8 slot;
-	recv_data >> slot;
+	recv_data >> tcount;
+	if( tcount > 5 )
+		return;
+
+	slot = TeamCountToId[tcount];
+	if( slot >= NUM_ARENA_TEAM_TYPES )
+		return;
+
 	if( (team = _player->m_arenaTeams[slot]) == NULL )
 	{
 		SystemMessage("You are not in an arena team of this type.");
@@ -537,7 +581,7 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if(team->m_leader == _player->GetGUIDLow())
+	if(team->m_leader == _player->GetLowGUID())
 	{
 		SystemMessage("You cannot leave the team yet, promote someone else to captain first.");
 		return;
@@ -559,14 +603,23 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recv_data)
 {
 	ArenaTeam * team;
 	uint8 slot;
-	recv_data >> slot;
+	uint32 tcount;
+	recv_data >> tcount;
+
+	if( tcount > 5 )
+		return;
+
+	slot = TeamCountToId[tcount];
+	if( slot >= NUM_ARENA_TEAM_TYPES )
+		return;
+
 	if( (team = _player->m_arenaTeams[slot]) == NULL )
 	{
 		SystemMessage("You are not in an arena team of this type.");
 		return;
 	}
 
-	if(team->m_leader != _player->GetGUIDLow())
+	if(team->m_leader != _player->GetLowGUID())
 	{
 		SystemMessage("You aren't the captain of this team.");
 		return;
@@ -577,11 +630,20 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleArenaTeamPromoteOpcode(WorldPacket & recv_data) 
 {
+	uint32 tcount;
 	uint8 slot;
 	string name;
 	ArenaTeam * team;
 	PlayerInfo * inf;
-	recv_data >> slot >> name;
+	recv_data >> tcount >> name;
+
+	if( tcount > 5 )
+		return;
+
+	slot = TeamCountToId[tcount];
+
+	if( slot >= NUM_ARENA_TEAM_TYPES )
+		return;
 
 	if( (team = _player->m_arenaTeams[slot]) == NULL )
 	{
@@ -589,13 +651,13 @@ void WorldSession::HandleArenaTeamPromoteOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if(team->m_leader != _player->GetGUIDLow())
+	if(team->m_leader != _player->GetLowGUID())
 	{
 		SystemMessage("You aren't the captain of this team.");
 		return;
 	}
 
-	if( (inf = objmgr.GetPlayerInfoByName(name)) == NULL )
+	if( (inf = objmgr.GetPlayerInfoByName(name.c_str())) == NULL )
 	{
 		SystemMessage("That player cannot be found.");
 		return;

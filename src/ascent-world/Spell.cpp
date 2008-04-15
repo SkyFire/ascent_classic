@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -39,6 +39,7 @@ void SpellCastTargets::read( WorldPacket & data,uint64 caster )
 	m_strTarget = "";
 
 	data >> m_targetMask;
+	data >> m_targetMaskExtended;
 	WoWGuid guid;
 
 	if( m_targetMask == TARGET_FLAG_SELF )
@@ -90,6 +91,7 @@ void SpellCastTargets::read( WorldPacket & data,uint64 caster )
 void SpellCastTargets::write( WorldPacket& data )
 {
 	data << m_targetMask;
+	data << m_targetMaskExtended;
 
 	if( /*m_targetMask == TARGET_FLAG_SELF || */m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_CORPSE | TARGET_FLAG_CORPSE2 | TARGET_FLAG_OBJECT ) )
         FastGUIDPack( data, m_unitTarget );
@@ -201,6 +203,7 @@ Spell::Spell(Object* Caster, SpellEntry *info, bool triggered, Aura* aur)
 	forced_basepoints[0] = forced_basepoints[1] = forced_basepoints[2] = 0;
 	extra_cast_number = 0;
 	m_reflectedParent = NULL;
+	m_isCasting = false;
 }
 
 Spell::~Spell()
@@ -1135,7 +1138,13 @@ void Spell::cancel()
 	}
 
 	//m_spellState = SPELL_STATE_FINISHED;
-	finish();
+
+	// prevent memory corruption. free it up later.
+	// if this is true it means we are currently in the cast() function somewhere else down the stack
+	// (recursive spells) and we don't wanna have this class delete'd when we return to it.
+	// at the end of cast() it will get freed anyway.
+	if( !m_isCasting )
+		finish();
 }
 
 void Spell::AddCooldown()
@@ -1162,7 +1171,7 @@ void Spell::cast(bool check)
 		return;
 	}
 
-	sLog.outDebug("Spell::cast %u, Unit: %u", m_spellInfo->Id, m_caster->GetGUIDLow());
+	sLog.outDebug("Spell::cast %u, Unit: %u", m_spellInfo->Id, m_caster->GetLowGUID());
 
 	if(check)
 		cancastresult = CanCast(true);
@@ -1171,7 +1180,7 @@ void Spell::cast(bool check)
 
 	if(cancastresult == SPELL_CANCAST_OK)
 	{
-		if (p_caster && !m_triggeredSpell && p_caster->IsInWorld() && GUID_HIPART(m_targets.m_unitTarget)==HIGHGUID_UNIT)
+		if (p_caster && !m_triggeredSpell && p_caster->IsInWorld() && GET_TYPE_FROM_GUID(m_targets.m_unitTarget)==HIGHGUID_TYPE_UNIT)
 		{
 			sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,m_targets.m_unitTarget);
 		}
@@ -1224,6 +1233,8 @@ void Spell::cast(bool check)
 			finish();
 			return;
 		}
+
+		m_isCasting = true;
 
 		//sLog.outString( "CanCastResult: %u" , cancastresult );
 		if(!m_triggeredSpell)
@@ -1313,6 +1324,7 @@ void Spell::cast(bool check)
 								u_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, m_targets.m_unitTarget);
 							else
 							{
+								m_isCasting = false;
 								cancel();
 								return;
 							}
@@ -1438,6 +1450,8 @@ void Spell::cast(bool check)
 			if(u_caster && !m_triggeredSpell && !m_triggeredByAura)
 				u_caster->RemoveAurasByInterruptFlagButSkip(AURA_INTERRUPT_ON_CAST_SPELL, m_spellInfo->Id);
 
+			m_isCasting = false;
+
 			if(m_spellState != SPELL_STATE_CASTING)
 				finish();
 		} 
@@ -1460,15 +1474,17 @@ void Spell::cast(bool check)
 				}
 			}*/
 			
+			m_isCasting = false;
 			SendCastResult(cancastresult);
 			if( u_caster != NULL )  
-				if (u_caster->GetOnMeleeSpell() != m_spellInfo->Id)
-					u_caster->SetOnMeleeSpell(m_spellInfo->Id);
+				u_caster->SetOnMeleeSpell(m_spellInfo->Id);
+
 			finish();
 		}
 	}
 	else
 	{
+		// cancast failed
 		SendCastResult(cancastresult);
 		finish();
 	}
@@ -1503,10 +1519,15 @@ void Spell::AddTime(uint32 type)
 		}
 		if(m_spellState==SPELL_STATE_PREPARING)
 		{
-			uint32 delay = m_castTime/4;
+			int32 delay = m_castTime/4;
 			m_timer+=delay;
 			if(m_timer>m_castTime)
+			{
+				delay -= (m_timer - m_castTime);
 				m_timer=m_castTime;
+				if(delay<0)
+					delay = 1;
+			}
 
 			WorldPacket data(SMSG_SPELL_DELAYED, 13);
 			data << u_caster->GetNewGUID();
@@ -1530,7 +1551,11 @@ void Spell::AddTime(uint32 type)
 		{
 			int32 delay = GetDuration()/3;
 			m_timer-=delay;
-			p_caster->delayAttackTimer(-delay);
+			if(m_timer<0)
+				m_timer=0;
+			else
+				p_caster->delayAttackTimer(-delay);
+
 			m_Delayed = true;
 			if(m_timer>0)
 				SendChannelUpdate(m_timer);
@@ -1927,6 +1952,7 @@ void Spell::SendSpellGo()
 
 	data << m_spellInfo->Id;
 	data << flags;
+	data << getMSTime();
 	data << (uint8)(UniqueTargets.size()); //number of hits
 	
 	if( flags & 0x400 )
@@ -2371,28 +2397,28 @@ void Spell::HandleEffects(uint64 guid, uint32 i)
 		else
 		{
 			unitTarget = NULL;
-			switch(GUID_HIPART(guid))
+			switch(GET_TYPE_FROM_GUID(guid))
 			{
-			case HIGHGUID_UNIT:
-				unitTarget = m_caster->GetMapMgr()->GetCreature((uint32)guid);
+			case HIGHGUID_TYPE_UNIT:
+				unitTarget = m_caster->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 				break;
-			case HIGHGUID_PET:
-				unitTarget = m_caster->GetMapMgr()->GetPet((uint32)guid);
+			case HIGHGUID_TYPE_PET:
+				unitTarget = m_caster->GetMapMgr()->GetPet(GET_LOWGUID_PART(guid));
 				break;
-			case HIGHGUID_PLAYER:
+			case HIGHGUID_TYPE_PLAYER:
 				{
 					unitTarget =  m_caster->GetMapMgr()->GetPlayer((uint32)guid);
 					playerTarget = static_cast< Player* >(unitTarget);
 				}break;
-			case HIGHGUID_ITEM:
+			case HIGHGUID_TYPE_ITEM:
 				if( p_caster != NULL )
 					itemTarget = p_caster->GetItemInterface()->GetItemByGUID(guid);
 
 				break;
-			case HIGHGUID_GAMEOBJECT:
-				gameObjTarget = m_caster->GetMapMgr()->GetGameObject((uint32)guid);
+			case HIGHGUID_TYPE_GAMEOBJECT:
+				gameObjTarget = m_caster->GetMapMgr()->GetGameObject(GET_LOWGUID_PART(guid));
 				break;
-			case HIGHGUID_CORPSE:
+			case HIGHGUID_TYPE_CORPSE:
 				corpseTarget = objmgr.GetCorpse((uint32)guid);
 				break;
 			}
@@ -2583,6 +2609,11 @@ uint8 Spell::CanCast(bool tolerate)
 
 	if( p_caster != NULL )
 	{
+		// if theres any spells that should be cast while dead let me know
+		if( !p_caster->isAlive() )
+		{
+			return SPELL_FAILED_CASTER_DEAD;
+		}
 #ifdef COLLISION
 		if (m_spellInfo->MechanicsType == MECHANIC_MOUNTED)
 		{
@@ -2730,7 +2761,7 @@ uint8 Spell::CanCast(bool tolerate)
 				}
 			}
 		}
-		
+
 		// item spell checks
 		if(i_caster)
 		{
@@ -3081,7 +3112,7 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_SPELL_UNAVAILABLE;
 
 					uint32 status = pPet->CanLearnSpell( trig );
-					if( status != NULL )
+					if( status != 0 )
 						return status;
 				}
 
@@ -3496,7 +3527,7 @@ void Spell::RemoveItems()
 		// Stackable Item -> remove 1 from stack
 		if(i_caster->GetUInt32Value(ITEM_FIELD_STACK_COUNT) > 1)
 		{
-			i_caster->ModUInt32Value(ITEM_FIELD_STACK_COUNT, -1);
+			i_caster->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT, -1);
 			i_caster->m_isDirty = true;
 		}
 		// Expendable Item
@@ -3506,7 +3537,7 @@ void Spell::RemoveItems()
 			// if item has charges remaining -> remove 1 charge
 			if(((int32)i_caster->GetUInt32Value(ITEM_FIELD_SPELL_CHARGES)) < -1)
 			{
-				i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES, 1);
+				i_caster->ModUnsigned32Value(ITEM_FIELD_SPELL_CHARGES, 1);
 				i_caster->m_isDirty = true;
 			}
 			// if item has no charges remaining -> delete item
@@ -3519,7 +3550,7 @@ void Spell::RemoveItems()
 		// Non-Expendable Item -> remove 1 charge
 		else if(i_caster->GetProto()->Spells[0].Charges > 0)
 		{
-			i_caster->ModUInt32Value(ITEM_FIELD_SPELL_CHARGES, -1);
+			i_caster->ModUnsigned32Value(ITEM_FIELD_SPELL_CHARGES, -1);
 			i_caster->m_isDirty = true;
 		}
 	} 
@@ -4097,7 +4128,7 @@ void Spell::Heal(int32 amount)
 	if((curHealth + amount) >= maxHealth)
 		unitTarget->SetUInt32Value(UNIT_FIELD_HEALTH, maxHealth);
 	else
-		unitTarget->ModUInt32Value(UNIT_FIELD_HEALTH, amount);
+		unitTarget->ModUnsigned32Value(UNIT_FIELD_HEALTH, amount);
 
 	if (p_caster)
 	{

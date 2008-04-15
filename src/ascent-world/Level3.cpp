@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -376,8 +376,7 @@ bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession *m_se
 	Player * pPlayer = objmgr.GetPlayer(pCharacter, false);
 	if(pPlayer == NULL)
 	{
-		string sCharacter = string(pCharacter);
-		pInfo = objmgr.GetPlayerInfoByName(sCharacter);
+		pInfo = objmgr.GetPlayerInfoByName(pCharacter);
 		if(pInfo == NULL)
 		{
 			SystemMessage(m_session, "Player not found.");
@@ -776,33 +775,10 @@ bool ChatHandler::HandleAccountLevelCommand(const char * args, WorldSession * m_
 	if(argc != 2)
 		return false;
 
-	std::stringstream my_sql;
-	my_sql << "UPDATE accounts SET gm = '" << gmlevel << "' WHERE login = '" << account << "'";
+	sLogonCommHandler.Account_SetGM( account, gmlevel );
 
-	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
-
-	GreenSystemMessage(m_session, "Account '%s' level has been updated to '%s'. The change will be effective with the next reload cycle.", account, gmlevel);
+	GreenSystemMessage(m_session, "Account '%s' level has been updated to '%s'. The change will be effective immediately.", account, gmlevel);
 	sGMLog.writefromsession(m_session, "set account %s flags to %s", account, gmlevel);
-
-	return true;
-}
-
-bool ChatHandler::HandleAccountPasswordCommand(const char * args, WorldSession * m_session)
-{
-   if(!*args) return false;
-
-	char account[100];
-	char password[100];
-	int argc = sscanf(args, "%s %s", account, password);
-	if(argc != 2)
-		return false;
-
-	std::stringstream my_sql;
-	my_sql << "UPDATE accounts SET password = '" << password << "' WHERE login = '" << account << "'";
-
-	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
-
-	GreenSystemMessage(m_session, "Account '%s' password has been changed to '%s'. The change will be effective with the next reload cycle.", account, password);
 
 	return true;
 }
@@ -811,9 +787,10 @@ bool ChatHandler::HandleAccountUnbanCommand(const char * args, WorldSession * m_
 {
 	if(!*args) return false;
 	char * pAccount = (char*)args;
-	string escaped_account = CharacterDatabase.EscapeString(string(pAccount));
-	GreenSystemMessage(m_session, "Account '%s' has been unbanned. This change will be effective with the next reload cycle.", pAccount);
-	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET banned = 0 WHERE login = '%s'", escaped_account.c_str());
+	
+	sLogonCommHandler.Account_SetBanned( pAccount, 0 );
+	GreenSystemMessage(m_session, "Account '%s' has been unbanned. This change will be effective immediately.", pAccount);
+	
 	sGMLog.writefromsession(m_session, "unbanned account %s", pAccount);
 	return true;
 }
@@ -841,13 +818,14 @@ bool ChatHandler::HandleAccountBannedCommand(const char * args, WorldSession * m
 
 	uint32 banned = (timeperiod ? (uint32)UNIXTIME+timeperiod : 1);
 
-	stringstream my_sql;
+	/*stringstream my_sql;
 	my_sql << "UPDATE accounts SET banned = " << banned << " WHERE login = '" << CharacterDatabase.EscapeString(string(pAccount)) << "'";
 
 	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
-	sLogonCommHandler.LogonDatabaseReloadAccounts();
+	sLogonCommHandler.LogonDatabaseReloadAccounts();*/
+	sLogonCommHandler.Account_SetBanned(pAccount, banned);
 
-	GreenSystemMessage(m_session, "Account '%s' has been banned %s%s. The change will be effective with the next reload cycle.", pAccount, 
+	GreenSystemMessage(m_session, "Account '%s' has been banned %s%s. The change will be effective immediately.", pAccount, 
 		timeperiod ? "until " : "forever", timeperiod ? ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str() : "");
 
 	sWorld.DisconnectUsersWithAccount(pAccount, m_session);
@@ -872,11 +850,10 @@ bool ChatHandler::HandleAccountMuteCommand(const char * args, WorldSession * m_s
 
 	uint32 banned = (uint32)UNIXTIME+timeperiod;
 
-	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET muted = %u WHERE login = '%s'", banned, CharacterDatabase.EscapeString(string(pAccount)).c_str());
-	sLogonCommHandler.LogonDatabaseReloadAccounts();
+	sLogonCommHandler.Account_SetMute( pAccount, banned );
 
 	string tsstr = ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME);
-	GreenSystemMessage(m_session, "Account '%s' has been muted until %s. The change will be effective with the next reload cycle.", pAccount, 
+	GreenSystemMessage(m_session, "Account '%s' has been muted until %s. The change will be effective immediately.", pAccount, 
 		tsstr.c_str());
 
 	sGMLog.writefromsession(m_session, "mutex account %s until %s", pAccount, ConvertTimeStampToDataTime(timeperiod+(uint32)UNIXTIME).c_str());
@@ -893,12 +870,7 @@ bool ChatHandler::HandleAccountMuteCommand(const char * args, WorldSession * m_s
 
 bool ChatHandler::HandleAccountUnmuteCommand(const char * args, WorldSession * m_session)
 {
-	string escaped_account = CharacterDatabase.EscapeString( string(args) );
-	if( escaped_account.empty() )
-		return false;
-
-	sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET muted = 0 WHERE login = '%s'", escaped_account.c_str());
-	sLogonCommHandler.LogonDatabaseReloadAccounts();
+	sLogonCommHandler.Account_SetMute( args, 0 );
 
 	GreenSystemMessage(m_session, "Account '%s' has been unmuted.", args);
 	WorldSession * pSession = sWorld.FindSessionByName(args);
@@ -911,79 +883,30 @@ bool ChatHandler::HandleAccountUnmuteCommand(const char * args, WorldSession * m
 	return true;
 }
 
-bool ChatHandler::HandleAccountFlagsCommand(const char * args, WorldSession * m_session)
-{
-    if(!*args) return false;
-
-	char account[100];
-	unsigned int flags;
-	int argc = sscanf(args, "%s %u", account, &flags);
-	if(argc != 2)
-		return false;
-
-	stringstream my_sql;
-	my_sql << "UPDATE accounts SET flags = " << flags << " WHERE login = '" << account << "'";
-
-	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
-	sLogonCommHandler.LogonDatabaseReloadAccounts();
-
-	GreenSystemMessage(m_session, "Account '%s' flags have been updated. The change will be effective with the next reload cycle.", account);
-	sGMLog.writefromsession(m_session, "set account %s flags to %u", account, flags);
-	return true;
-}
-
-bool ChatHandler::HandleAccountEmailCommand(const char * args, WorldSession * m_session)
-{
-    if(!*args) return false;
-
-	char account[100];
-	char email[100];
-	int argc = sscanf(args, "%s %s", account, email);
-	if(argc != 2)
-		return false;
-
-	stringstream my_sql;
-	my_sql << "UPDATE accounts SET email = '" << email << "' WHERE login = '" << account << "'";
-
-	sLogonCommHandler.LogonDatabaseSQLExecute(my_sql.str().c_str());
-
-	GreenSystemMessage(m_session, "Account '%s' email has been updated to '%s'. The change will be effective with the next reload cycle.", account, email);
-
-	return true;
-}
-
-bool ChatHandler::HandleCreateAccountCommand(const char* args, WorldSession *m_session)
-{
-	char *user = strtok((char *)args, " ");
-	if(!user) return false;
-	char *pass = strtok(NULL, " ");
-	if(!pass) return false;
-	char *email = strtok(NULL, "\n");
-	if(!email) return false;
-
-	std::stringstream ss;
-	sLog.outString("%s creating account: %s %s %s.", m_session->GetPlayer()->GetName(), user, pass, email);
-	BlueSystemMessage(m_session, "Attempting to create account: %s, %s (Email: %s)...", user, pass, email);
-
-	ss << "INSERT INTO accounts (login, password, email) VALUES(\""
-		<< WorldDatabase.EscapeString(user) << "\",\""
-		<< WorldDatabase.EscapeString(pass) << "\",\""
-		<< WorldDatabase.EscapeString(email) << "\");";
-
-	sLogonCommHandler.LogonDatabaseSQLExecute(ss.str().c_str());
-	/*if(sLogonDatabase.Execute(ss.str().c_str()))
-	{*/
-		GreenSystemMessage(m_session, "Account creation successful. The account will be active with the next reload cycle.");
-		return true;
-	/*} else {
-		RedSystemMessage(m_session, "Creation failed. The player may or may not be able to log in.");
-		return true;
-	}*/
-}
-
 bool ChatHandler::HandleGetTransporterTime(const char* args, WorldSession* m_session)
 {
 	//Player *plyr = m_session->GetPlayer();
+	Creature * crt = getSelectedCreature(m_session, false);
+	if( crt == NULL )
+		return false;
+
+	WorldPacket data(SMSG_ATTACKERSTATEUPDATE, 1000);
+	data << uint32(0x00000102);
+	data << crt->GetNewGUID();
+	data << m_session->GetPlayer()->GetNewGUID();
+	
+	data << uint32(6);
+	data << uint8(1);
+	data << uint32(1);
+	data << uint32(0x40c00000);
+	data << uint32(6);
+	data << uint32(0);
+	data << uint32(0);
+	data << uint32(1);
+	data << uint32(0x000003e8);
+	data << uint32(0);
+	data << uint32(0);
+	m_session->SendPacket(&data);
 	return true;
 }
 
@@ -1322,7 +1245,7 @@ bool ChatHandler::HandleModifyLevelCommand(const char* args, WorldSession* m_ses
 
 bool ChatHandler::HandleCreatePetCommand(const char* args, WorldSession* m_session)
 {
-	if(!args || strlen(args) < 2)
+/*	if(!args || strlen(args) < 2)
 		return false;
 
 	uint32 Entry = atol(args);
@@ -1375,7 +1298,7 @@ bool ChatHandler::HandleCreatePetCommand(const char* args, WorldSession* m_sessi
 	delete pCreature;
 
 	sGMLog.writefromsession(m_session, "used create pet entry %u", Entry);
-
+*/
 	return true;
 }
 
@@ -1686,7 +1609,7 @@ bool ChatHandler::HandleMassSummonCommand(const char* args, WorldSession* m_sess
 		{
 			//plr->SafeTeleport(summoner->GetMapId(), summoner->GetInstanceID(), summoner->GetPosition());
 			/* let's do this the blizz way */
-			plr->SummonRequest(summoner->GetGUIDLow(), summoner->GetZoneId(), summoner->GetMapId(), summoner->GetInstanceID(), summoner->GetPosition());
+			plr->SummonRequest(summoner->GetLowGUID(), summoner->GetZoneId(), summoner->GetMapId(), summoner->GetInstanceID(), summoner->GetPosition());
 			++c;
 		}
 	}
@@ -2081,8 +2004,7 @@ bool ChatHandler::HandleIPBanCommand(const char * args, WorldSession * m_session
 		expire_time = UNIXTIME + (time_t)timeperiod;
 	
 	SystemMessage(m_session, "Adding [%s] to IP ban table, expires %s", pIp, (expire_time == 0)? "Never" : ctime( &expire_time ));
-	sLogonCommHandler.LogonDatabaseSQLExecute("REPLACE INTO ipbans VALUES ('%s', %u);", WorldDatabase.EscapeString(pIp).c_str(), (uint32)expire_time);
-	sLogonCommHandler.LogonDatabaseReloadAccounts();
+	sLogonCommHandler.IPBan_Add( pIp, (uint32)expire_time );
 	sWorld.DisconnectUsersWithIP(pIp, m_session);
 	return true;
 }
@@ -2103,8 +2025,7 @@ bool ChatHandler::HandleIPUnBanCommand(const char * args, WorldSession * m_sessi
 	 */
 
 	SystemMessage(m_session, "Removing [%s] from IP ban table if it exists", ip);
-	sLogonCommHandler.LogonDatabaseSQLExecute("DELETE FROM ipbans WHERE ip = '%s';", WorldDatabase.EscapeString(ip).c_str());
-	sLogonCommHandler.LogonDatabaseReloadAccounts();
+	sLogonCommHandler.IPBan_Remove( ip );
 	return true;
 }
 
@@ -2143,7 +2064,7 @@ bool ChatHandler::HandleCreatureSpawnCommand(const char *args, WorldSession *m_s
 	sp->channel_spell=sp->channel_target_creature=sp->channel_target_go=0;
 
 
-	Creature * p = m_session->GetPlayer()->GetMapMgr()->CreateCreature();
+	Creature * p = m_session->GetPlayer()->GetMapMgr()->CreateCreature(entry);
 	ASSERT(p);
 	p->Load(sp, (uint32)NULL, NULL);
 	p->PushToWorld(m_session->GetPlayer()->GetMapMgr());
@@ -2210,7 +2131,7 @@ bool ChatHandler::HandleForceRenameCommand(const char * args, WorldSession * m_s
 		return false;
 
 	string tmp = string(args);
-	PlayerInfo * pi = objmgr.GetPlayerInfoByName(tmp);
+	PlayerInfo * pi = objmgr.GetPlayerInfoByName(tmp.c_str());
 	if(pi == 0)
 	{
 		RedSystemMessage(m_session, "Player with that name not found.");
@@ -2475,35 +2396,6 @@ bool ChatHandler::HandleNpcUnPossessCommand(const char * args, WorldSession * m_
 	return true;
 }
 
-bool ChatHandler::HandleChangePasswordCommand(const char * args, WorldSession * m_session)
-{
-	char password[100];
-	char username[100];
-	int argc = sscanf("%s %s", password, username);
-	if(argc == 2)
-	{
-		// username = password :P
-		BlueSystemMessage(m_session, "Changed password of %s to %s.", password, username);
-		sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET password = '%s' WHERE login = '%s'", WorldDatabase.EscapeString(password).c_str(), WorldDatabase.EscapeString(username).c_str());
-		sLogonCommHandler.LogonDatabaseReloadAccounts();
-		sGMLog.writefromsession(m_session, "used change password command, %s to %s.", password, username);
-	}
-	else if(argc == 1)
-	{
-		// changing our own username.
-		BlueSystemMessage(m_session, "Changed your password to %s.", password);
-		sLogonCommHandler.LogonDatabaseSQLExecute("UPDATE accounts SET password = '%s' WHERE login = '%s'", WorldDatabase.EscapeString(password).c_str(), WorldDatabase.EscapeString(m_session->GetAccountName()).c_str());
-		sLogonCommHandler.LogonDatabaseReloadAccounts();
-		sGMLog.writefromsession(m_session, "used change password command, self to %s.", password);
-	}
-	else
-	{
-		RedSystemMessage(m_session, "Use .changepassword <username> <password> or .changepassword <password>.");
-		return false;
-	}
-	return true;
-}
-
 bool ChatHandler::HandleRehashCommand(const char * args, WorldSession * m_session)
 {
 	/* rehashes */
@@ -2717,7 +2609,7 @@ bool ChatHandler::HandleCreateArenaTeamCommands(const char * args, WorldSession 
 	t->m_borderColour=4294931722UL;
 	t->m_borderStyle=1;
 	t->m_backgroundColour=4284906803UL;
-	t->m_leader=plr->GetGUIDLow();
+	t->m_leader=plr->GetLowGUID();
 	t->m_name = string(name);
 	t->AddMember(plr->m_playerInfo);
 	objmgr.AddArenaTeam(t);
@@ -2850,4 +2742,73 @@ bool ChatHandler::HandleCollisionGetHeight(const char * args, WorldSession * m_s
 	SystemMessage(m_session, "Ascent was not compiled with collision support.");
 	return true;
 #endif
+}
+
+bool ChatHandler::HandleFixScaleCommand(const char * args, WorldSession * m_session)
+{
+	Creature * pCreature = getSelectedCreature(m_session, true);
+	if( pCreature == NULL )
+		return true;
+
+	float sc = (float)atof(args);
+	if(sc < 0.1f)
+	{
+		return false;
+	}
+
+	pCreature->SetFloatValue(OBJECT_FIELD_SCALE_X, sc);
+	pCreature->proto->Scale = sc;
+	WorldDatabase.Execute("UPDATE creature_proto SET scale = '%f' WHERE entry = %u", sc, pCreature->GetEntry());
+	return true;
+}
+
+bool ChatHandler::HandleAddTrainerSpellCommand( const char * args, WorldSession * m_session )
+{
+	Creature * pCreature = getSelectedCreature(m_session, true);
+	if( pCreature == NULL )
+		return true;
+
+	uint32 spellid, cost, reqspell, reqlevel, delspell;
+	if( sscanf(args, "%u %u %u %u %u", &spellid, &cost, &reqspell, &reqlevel, &delspell) != 5 )
+		return false;
+
+	Trainer * pTrainer =  pCreature->GetTrainer();
+	if( pTrainer == NULL )
+	{
+		RedSystemMessage(m_session, "Target is not a trainer.");
+		return true;
+	}
+
+	SpellEntry* pSpell = dbcSpell.LookupEntryForced(spellid);
+	if(pSpell==NULL)
+	{
+		RedSystemMessage(m_session, "Invalid spell.");
+		return true;
+	}
+
+	if( pSpell->Effect[0] == SPELL_EFFECT_INSTANT_KILL || pSpell->Effect[1] == SPELL_EFFECT_INSTANT_KILL || pSpell->Effect[2] == SPELL_EFFECT_INSTANT_KILL )
+	{
+		RedSystemMessage(m_session, "No. You're not doing that.");
+		return true;
+	}
+
+	TrainerSpell sp;
+	sp.Cost = cost;
+	sp.IsProfession = false;
+	sp.pLearnSpell = pSpell;
+	sp.pCastRealSpell = NULL;
+	sp.pCastSpell = NULL;
+	sp.RequiredLevel = reqlevel;
+	sp.RequiredSpell = reqspell;
+	sp.DeleteSpell = delspell;
+
+	pTrainer->Spells.push_back(sp);
+	pTrainer->SpellCount++;
+	
+	SystemMessage(m_session, "Added spell %u (%s) to trainer.", pSpell->Id, pSpell->Name);
+	sGMLog.writefromsession(m_session, "added spell %u to trainer %u", spellid, pCreature->GetEntry());
+	WorldDatabase.Execute("INSERT INTO trainer_spells VALUES(%u, %u, %u, %u, %u, %u, %u, %u, %u, %u)", 
+		pCreature->GetEntry(), (int)0, pSpell->Id, cost, reqspell, (int)0, (int)0, reqlevel, delspell, (int)0);
+
+	return true;
 }

@@ -1162,7 +1162,7 @@ int luaUnit_SpawnCreature(lua_State * L, Unit * ptr)
 		return 1;
 	}
 
-	Creature * pC = ptr->GetMapMgr()->CreateCreature();
+	Creature * pC = ptr->GetMapMgr()->CreateCreature(entry_id);
 	pC->spawnid=0;
 	pC->m_spawn=0;
 	pC->Load(proto, (float)x, (float)y, (float)z);
@@ -1203,7 +1203,7 @@ int luaUnit_SpawnGameObject(lua_State * L, Unit * ptr)
 		return 1;
 	}
 
-	GameObject * pC = ptr->GetMapMgr()->CreateGameObject();
+	GameObject * pC = ptr->GetMapMgr()->CreateGameObject(entry_id);
 	//pC->spawnid=0;
 	pC->m_spawn=0;
 	pC->CreateFromProto(entry_id, ptr->GetMapId(), (float)x, (float)y, (float)z, (float)o);
@@ -1465,7 +1465,7 @@ int luaUnit_AddItem(lua_State * L, Unit * ptr)
 	}
 	else
 	{
-		add->ModUInt32Value(ITEM_FIELD_STACK_COUNT,count);
+		add->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT,count);
 		plr->GetSession()->SendItemPushResult(add,false,true,false,false,plr->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()),0xFFFFFFFF,count);
 	}
 

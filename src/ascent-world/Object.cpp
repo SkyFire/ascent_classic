@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -148,7 +148,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 		{
 			case GAMEOBJECT_TYPE_MO_TRANSPORT:  
 				{
-					if(GetGUIDHigh() != HIGHGUID_TRANSPORTER)
+					if(GetTypeFromGUID() != HIGHGUID_TYPE_TRANSPORTER)
 						return 0;   // bad transporter
 					else
 						flags = 0x5A;
@@ -365,11 +365,11 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 				if(!(flags2 & 0x0200))
 					flags2 |= static_cast<Creature*>(this)->proto->extra_a9_flags;
 			}
-			if(GetGUIDHigh() == HIGHGUID_WAYPOINT)
+/*			if(GetGUIDHigh() == HIGHGUID_WAYPOINT)
 			{
 				if(GetUInt32Value(UNIT_FIELD_STAT0) == 768)		// flying waypoint
 					flags2 |= 0x800;
-			}
+			}*/
 		}
 
 		*data << (uint32)flags2;
@@ -419,7 +419,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 			else if(m_objectTypeId==TYPEID_UNIT && ((Creature*)this)->m_transportPosition != NULL)
 			{
 				*data << ((Creature*)this)->m_transportGuid;
-				*data << uint32(HIGHGUID_TRANSPORTER);
+				*data << uint32(HIGHGUID_TYPE_TRANSPORTER);
 				*data << ((Creature*)this)->m_transportPosition->x << ((Creature*)this)->m_transportPosition->y << 
 					((Creature*)this)->m_transportPosition->z << ((Creature*)this)->m_transportPosition->o;
 				*data << float(0.0f);
@@ -460,12 +460,12 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint8 flags, uint32 flags2,
 
 	if(flags & 0x8)
 	{
-		*data << GetGUIDLow();
+		*data << GetUInt32Value(OBJECT_FIELD_GUID);
 		if(flags & 0x10)
-			*data << GetGUIDHigh();
+			*data << GetUInt32Value(OBJECT_FIELD_GUID_01);
 	}
 	else if(flags & 0x10)
-		*data << GetGUIDLow();
+		*data << GetUInt32Value(OBJECT_FIELD_GUID);
 
 	if(flags & 0x2)
 	{
@@ -1090,7 +1090,46 @@ uint32 Object::GetModPUInt32Value(const uint32 index, const int32 value)
 	return ((basevalue*value)/100);
 }
 
-void Object::ModUInt32Value(uint32 index, int32 value )
+void Object::ModUnsigned32Value(uint32 index, int32 mod)
+{
+	ASSERT( index < m_valuesCount );
+	if(mod == 0)
+		return;
+
+	m_uint32Values[ index ] += mod;
+	if( (int32)m_uint32Values[index] < 0 )
+		m_uint32Values[index] = 0;
+
+	if(IsInWorld())
+	{
+		m_updateMask.SetBit( index );
+
+		if(!m_objectUpdated)
+		{
+			m_mapMgr->ObjectUpdated(this);
+			m_objectUpdated = true;
+		}
+	}
+
+	if(m_objectTypeId == TYPEID_PLAYER)
+	{
+#ifdef OPTIMIZED_PLAYER_SAVING
+		switch(index)
+		{
+		case UNIT_FIELD_LEVEL:
+		case PLAYER_XP:
+			static_cast< Player* >( this )->save_LevelXP();
+			break;
+
+		case PLAYER_FIELD_COINAGE:
+			static_cast< Player* >( this )->save_Gold();
+			break;
+		}
+#endif
+	}
+}
+
+void Object::ModSignedInt32Value(uint32 index, int32 value )
 {
 	ASSERT( index < m_valuesCount );
 	if(value == 0)
@@ -1639,7 +1678,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			if( rage + float2int32( val ) > 1000 )
 			  val = 1000.0f - (float)pVictim->GetUInt32Value( UNIT_FIELD_POWER2 );
 
-			ModUInt32Value(UNIT_FIELD_POWER2, (int32)val);
+			ModUnsigned32Value(UNIT_FIELD_POWER2, (int32)val);
 		}
 
 	if( pVictim->IsPlayer() )
@@ -1663,7 +1702,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		else if( IsPet() )
 		{
 			plr = static_cast< Pet* >( this )->GetPetOwner();
-			if( ! plr->IsPlayer() || (plr != NULL && plr->GetMapMgr() == GetMapMgr() ) )
+			if( plr != NULL && plr->GetMapMgr() == GetMapMgr() )
 				plr = NULL;
 		}
 
@@ -1771,7 +1810,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			if( ((Creature*)pVictim)->HasFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_PVP ) )
 			{
 				Player * pAttacker = NULL;
-				if( IsPet() && GetGUIDHigh() == HIGHGUID_PET )
+				if( IsPet() )
 					pAttacker = static_cast< Pet* >( this )->GetPetOwner();
 				else if(IsPlayer())
 					pAttacker = static_cast< Player* >( this );
@@ -2184,6 +2223,10 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		{
 			
 		}*/	
+
+		if( pVictim->IsPlayer() && ((Player*)pVictim)->IsMounted() )
+			pVictim->RemoveAura( ((Player*)pVictim)->m_MountSpellId );
+
 		pVictim->SetUInt32Value( UNIT_FIELD_HEALTH, health - damage );
 	}
 }
@@ -2464,15 +2507,15 @@ void Object::SendSpellNonMeleeDamageLog( Object* Caster, Object* Target, uint32 
 	data << Caster->GetNewGUID();
 	data << SpellID;                    // SpellID / AbilityID
 	data << Damage;                     // All Damage
-	data << School;                     // School
+	data << uint8(g_spellSchoolConversionTable[School]);                     // School
 	data << AbsorbedDamage;             // Absorbed Damage
 	data << ResistedDamage;             // Resisted Damage
-	data << BlockedDamage;              // Blocked Damage
 	data << uint8(PhysicalDamage);      // Physical Damage (true/false)
 	data << uint8(0);                   // unknown or it binds with Physical Damage
-	data << uint8(CriticalHit ? 2 : 0); // If critical hit this field is == 2
-	data << uint8(5);                   // unknown const
+	data << BlockedDamage;		     // Physical Damage (true/false)
+	data << uint8(CriticalHit ? 7 : 5);                   // unknown const
 	data << uint32(0);
+
 	Caster->SendMessageToSet( &data, bToset );
 }
 
@@ -2502,7 +2545,7 @@ bool Object::CanActivate()
 	{
 	case TYPEID_UNIT:
 		{
-			if(GetGUIDHigh() != HIGHGUID_PET)
+			if(!IsPet())
 				return true;
 		}break;
 

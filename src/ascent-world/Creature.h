@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,8 +56,8 @@ struct CreatureInfo
 	uint32 SpellDataID;
 	uint32 Male_DisplayID;
 	uint32 Female_DisplayID;
-	uint32 Male_DisplayID2;
-	uint32 Female_DisplayID2;
+	uint32 unkint1;
+	uint32 unkint2;
 	float unkfloat1;
 	float unkfloat2;
 	uint8  Civilian;
@@ -68,83 +68,35 @@ struct CreatureInfo
 	uint32 GenerateModelId(uint32 * dest)
 	{
 		/* only M */
-		if(( Male_DisplayID || Male_DisplayID2 ) && !Female_DisplayID && !Female_DisplayID2 )
+        if(Male_DisplayID == Female_DisplayID)
 		{
-			if (Male_DisplayID2)
-			{
-				if(Rand(50.0f))
-				{
-					*dest = Male_DisplayID;
-				}
-				else
-				{
-					*dest = Male_DisplayID2;
-				}
-			}
-			else
-			{
-				*dest = Male_DisplayID;
-			}
+			*dest = Male_DisplayID;
 			return 0;
 		}
-		/* only F */
-		if(( Female_DisplayID || Female_DisplayID2 ) && !Male_DisplayID && !Male_DisplayID2 )
+
+		/* only M */
+		if(Male_DisplayID && !Female_DisplayID)
 		{
-			if (Female_DisplayID2)
-			{
-				if(Rand(50.0f))
-				{
-					*dest = Female_DisplayID;
-				}
-				else
-				{
-					*dest = Female_DisplayID2;
-				}
-			}
-			else
-			{
-				*dest = Female_DisplayID;
-			}
+            *dest = Male_DisplayID;
+			return 0;
+		}
+
+		/* only F */
+		if(!Male_DisplayID && Female_DisplayID)
+		{
+			*dest = Female_DisplayID;
 			return 1;
 		}
 
 		/* make a random one */
 		if(Rand(50.0f))
 		{
-			if (Female_DisplayID2)
-			{
-				if(Rand(50.0f))
-				{
-					*dest = Female_DisplayID;
-				}
-				else
-				{
-					*dest = Female_DisplayID2;
-				}
-			}
-			else
-			{
-				*dest = Female_DisplayID;
-			}
+			*dest = Female_DisplayID;
 			return 1;
 		}
 		else
 		{
-			if (Male_DisplayID2)
-			{
-				if(Rand(50.0f))
-				{
-					*dest = Male_DisplayID;
-				}
-				else
-				{
-					*dest = Male_DisplayID2;
-				}
-			}
-			else
-			{
-				*dest = Male_DisplayID;
-			}
+			*dest = Male_DisplayID;
 			return 0;
 		}
 	}
@@ -295,7 +247,7 @@ class SERVER_DECL Creature : public Unit
 {
 public:
 
-	Creature(uint32 high, uint32 low);
+	Creature(uint64 guid);
 	virtual ~Creature();
     bool Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info);
 	void Load(CreatureProto * proto_, float x, float y, float z);

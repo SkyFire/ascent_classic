@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -377,11 +377,7 @@ void CommandTableStorage::Init()
 	{
 		{ "ban",	  'a', &ChatHandler::HandleAccountBannedCommand,   "Ban account. .account ban name timeperiod", NULL, 0, 0, 0 },
 		{ "unban",	  'z', &ChatHandler::HandleAccountUnbanCommand,		"Unbans account x.", NULL, 0, 0, 0 },
-		{ "create",	  'z', &ChatHandler::HandleCreateAccountCommand,   "Create account. Pass it username password email.", NULL, 0, 0, 0 },
-		{ "email",	  'z', &ChatHandler::HandleAccountEmailCommand,	   "Sets email address on account. Pass it username email_address.", NULL, 0, 0, 0},
-		{ "flags",	  'z', &ChatHandler::HandleAccountFlagsCommand,	   "Sets flags on account. Pass it username and 0 for Non-TBC or 8 for TBC.", NULL, 0, 0, 0},
 		{ "level",	  'z', &ChatHandler::HandleAccountLevelCommand,    "Sets gm level on account. Pass it username and 0,1,2,3,az, etc.", NULL, 0, 0, 0 },
-		{ "password", 'z', &ChatHandler::HandleAccountPasswordCommand, "Sets password on account. Pass it username password.",	NULL, 0, 0, 0},
 		{ "mute",	  'a', &ChatHandler::HandleAccountMuteCommand,		"Mutes account for <timeperiod>.", NULL, 0, 0, 0 },
 		{ "unmute",	  'a', &ChatHandler::HandleAccountUnmuteCommand,	"Unmutes account <x>", NULL, 0, 0, 0 },
 
@@ -492,7 +488,6 @@ void CommandTableStorage::Init()
 		{ "advanceskill",'m', &ChatHandler::HandleModifySkillCommand,   "advanceskill <skillid> <amount, optional, default = 1> - Advances skill line x times..", NULL, 0, 0, 0},
 		{ "removeskill", 'm', &ChatHandler::HandleRemoveSkillCommand,   ".removeskill <skillid> - Removes skill",		 NULL, 0, 0, 0 },
 		{ "increaseweaponskill", 'm', &ChatHandler::HandleIncreaseWeaponSkill, ".increaseweaponskill <count> - Increase eqipped weapon skill x times (defaults to 1).", NULL, 0, 0, 0},
-		{ "createaccount",'z',&ChatHandler::HandleCreateAccountCommand, ".createaccount - Creates account. Format should be .createaccount username password email", NULL, 0, 0, 0 },
 		{ "playerinfo",  'm', &ChatHandler::HandlePlayerInfo,		   ".playerinfo - Displays informations about the selected character (account...)", NULL, 0, 0, 0 },
 
 		{ "modify",		'm', NULL,									 "",				 modifyCommandTable, 0, 0, 0},
@@ -546,7 +541,6 @@ void CommandTableStorage::Init()
 		{ "lookupquest", 'l', &ChatHandler::HandleQuestLookupCommand, "Looks up quest string x.", NULL, 0, 0, 0 },
 		{ "lookupcreature", 'l', &ChatHandler::HandleLookupCreatureCommand, "Looks up item string x.", NULL, 0, 0, 0 },
 		//{ "reloadscripts", 'w', &ChatHandler::HandleReloadScriptsCommand, "Reloads GM Scripts", NULL, 0, 0, 0 },
-		{ "changepassword", 'z', &ChatHandler::HandleChangePasswordCommand, "Changes your accounts password.", NULL, 0, 0, 0 },
 		{ "rehash", 'z', &ChatHandler::HandleRehashCommand, "Reloads config file.", NULL, 0, 0, 0 },
 		{ "createarenateam", 'g', &ChatHandler::HandleCreateArenaTeamCommands, "Creates arena team", NULL, 0, 0, 0 },
 		{ "whisperblock", 'g', &ChatHandler::HandleWhisperBlockCommand, "Blocks like .gmon except without the <GM> tag", NULL, 0, 0, 0 },
@@ -557,6 +551,8 @@ void CommandTableStorage::Init()
 		{ "getheight", 'm', &ChatHandler::HandleCollisionGetHeight, "Gets height", NULL, 0, 0, 0 },
 		{ "renameallinvalidchars", 'z', &ChatHandler::HandleRenameAllCharacter, "Renames all invalid character names", NULL, 0,0, 0 },
 		{ "removesickness",   'm', &ChatHandler::HandleRemoveRessurectionSickessAuraCommand,   "Removes ressurrection sickness from the target",  NULL, 0, 0, 0},
+		{ "fixscale", 'm', &ChatHandler::HandleFixScaleCommand, "", NULL, 0, 0, 0 },
+		{ "addtrainerspell", 'm', &ChatHandler::HandleAddTrainerSpellCommand, "", NULL, 0, 0, 0 },
 	
 		{ NULL,		  0, NULL,										 "",							   NULL, 0, 0  }
 	};
@@ -807,13 +803,13 @@ Player * ChatHandler::getSelectedChar(WorldSession *m_session, bool showerror)
 Creature * ChatHandler::getSelectedCreature(WorldSession *m_session, bool showerror)
 {
 	uint64 guid;
-	Creature *creature;
+	Creature *creature = NULL;
 
 	guid = m_session->GetPlayer()->GetSelection();
-	if(GUID_HIPART(guid)==HIGHGUID_PET)
-		creature = m_session->GetPlayer()->GetMapMgr()->GetPet((uint32)guid);
-	else
-		creature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	if(GET_TYPE_FROM_GUID(guid) == HIGHGUID_TYPE_PET)
+		creature = m_session->GetPlayer()->GetMapMgr()->GetPet( GET_LOWGUID_PART(guid) );
+	else if(GET_TYPE_FROM_GUID(guid) == HIGHGUID_TYPE_UNIT)
+		creature = m_session->GetPlayer()->GetMapMgr()->GetCreature( GET_LOWGUID_PART(guid) );
 	
 	if(creature != NULL)
 		return creature;

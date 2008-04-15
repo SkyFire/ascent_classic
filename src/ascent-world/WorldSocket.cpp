@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -51,6 +51,7 @@ WorldSocket::WorldSocket(SOCKET fd) : Socket(fd, sWorld.SocketSendBufSize, sWorl
 	mQueued = false;
 	mRequestID = 0;
 	m_nagleEanbled = false;
+	m_fullAccountName = NULL;
 }
 
 WorldSocket::~WorldSocket()
@@ -66,6 +67,12 @@ WorldSocket::~WorldSocket()
 	{
 		mSession->SetSocket(NULL);
 		mSession=NULL;
+	}
+
+	if( m_fullAccountName != NULL )
+	{
+		delete m_fullAccountName;
+		m_fullAccountName = NULL;
 	}
 }
 
@@ -238,6 +245,9 @@ void WorldSocket::_HandleAuthSession(WorldPacket* recvPacket)
 		return;
 	}
 
+	// shitty hash !
+	m_fullAccountName = new string( account );
+
 	// Set the authentication packet 
     pAuthenticationPacket = recvPacket;
 }
@@ -250,7 +260,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	uint32 error;
 	recvData >> error;
 
-	if(error != 0)
+	if(error != 0 || pAuthenticationPacket == NULL)
 	{
 		// something happened wrong @ the logon server
 		OutPacket(SMSG_AUTH_RESPONSE, 1, "\x0D");
@@ -297,6 +307,15 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	{
 		// AUTH_FAILED = 0x0D
 		session->Disconnect();
+		
+		// clear the logout timer so he times out straight away
+		session->SetLogoutTimer(1);
+
+		// we must send authentication failed here.
+		// the stupid newb can relog his client.
+		// otherwise accounts dupe up and disasters happen.
+		OutPacket(SMSG_AUTH_RESPONSE, 1, "\x15");
+		return;
 	}
 
 	Sha1Hash sha;
@@ -305,7 +324,17 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	pAuthenticationPacket->read(digest, 20);
 
 	uint32 t = 0;
-	sha.UpdateData(AccountName);
+	if( m_fullAccountName == NULL )				// should never happen !
+		sha.UpdateData(AccountName);
+	else
+	{
+		sha.UpdateData(*m_fullAccountName);
+		
+		// this is unused now. we may as well free up the memory.
+		delete m_fullAccountName;
+		m_fullAccountName = NULL;
+	}
+
 	sha.UpdateData((uint8 *)&t, 4);
 	sha.UpdateData((uint8 *)&mClientSeed, 4);
 	sha.UpdateData((uint8 *)&mSeed, 4);
@@ -369,6 +398,14 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	}
 
 	Log.Debug("Auth", "%s from %s:%u [%ums]", AccountName.c_str(), GetRemoteIP().c_str(), GetRemotePort(), _latency);
+#ifdef SESSION_CAP
+	if( sWorld.GetSessionCount() >= SESSION_CAP )
+	{
+		OutPacket(SMSG_AUTH_RESPONSE, 1, "\x0D");
+		Disconnect();
+		return;
+	}
+#endif
 
 	// Check for queue.
 	if( (sWorld.GetSessionCount() < sWorld.GetPlayerLimit()) || pSession->HasGMPermissions() ) {
@@ -400,7 +437,7 @@ void WorldSocket::Authenticate()
 	else
 		OutPacket(SMSG_AUTH_RESPONSE, 11, "\x0C\x30\x78\x00\x00\x00\x00\x00\x00\x00\x00");
 
-	sAddonMgr.SendAddonInfoPacket(pAuthenticationPacket, (uint32)pAuthenticationPacket->rpos(), mSession);
+	sAddonMgr.SendAddonInfoPacket(pAuthenticationPacket, (uint32)pAuthenticationPacket->rpos(), pSession);
 	pSession->_latency = _latency;
 
 	delete pAuthenticationPacket;

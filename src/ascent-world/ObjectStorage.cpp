@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,7 @@
 
 /** Table formats converted to strings
  */
-const char * gItemPrototypeFormat						= "uuuussssuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffuffuffuffuffuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuusuuuuuuuuuuuuuuuuuuuuuuuuuuuu";
+const char * gItemPrototypeFormat						= "uuuussssuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuffuffuffuffuffuuuuuuuuuufuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuusuuuuuuuuuuuuuuuuuuuuuuuuuu";
 const char * gCreatureNameFormat						= "usssuuuuuuuuuuffcc";
 const char * gGameObjectNameFormat						= "uuusuuuuuuuuuuuuuuuuuuuuuuuu";
 const char * gCreatureProtoFormat						= "uuuuuuufuuuffuffuuuuuuuuuuuuuuuuuuffsuuuufffu";
@@ -136,6 +136,7 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 	if( result != NULL )
 	{
 		AI_Spell *sp;
+		SpellEntry * spe;
 		uint32 entry;
 
 		if(Config.MainConfig.GetBoolDefault("Server", "LoadAIAgents", true))
@@ -145,6 +146,11 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 				Field *fields = result->Fetch();
 				entry = fields[0].GetUInt32();
 				cn = CreatureProtoStorage.LookupEntry(entry);
+				spe = dbcSpell.LookupEntryForced(fields[5].GetUInt32());
+				if( spe == NULL )
+				{
+					Log.Warning("AIAgent", "For %u has nonexistant spell %u.", fields[0].GetUInt32(), fields[5].GetUInt32());
+				}
 				if(!cn)
 					continue;
 
@@ -153,7 +159,7 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 				sp->agent = fields[1].GetUInt16();
 				sp->procChance = fields[3].GetUInt32();
 				sp->procCount = fields[4].GetUInt32();
-				sp->spell = dbcSpell.LookupEntryForced(fields[5].GetUInt32());
+				sp->spell = spe;
 				sp->spellType = fields[6].GetUInt32();
 				sp->spelltargetType = fields[7].GetUInt32();
 				sp->cooldown = fields[8].GetUInt32();
@@ -259,25 +265,6 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 			} while( result->NextRow() );
 		}
 
-		delete result;
-	}
-	result = WorldDatabase.Query("SELECT Id,ExtraFlags FROM spellextra");
-	if(result)
-	{
-		do 
-		{
-			Field * fields = result->Fetch();
-			uint32 id = fields[0].GetUInt32();
-			uint32 flags = fields[1].GetUInt32();
-			SpellEntry * sp = dbcSpell.LookupEntryForced(id);
-			if(!sp)
-				continue;
-
-			if(flags & SPELL_EXTRA_INFRONT)
-				sp->in_front_status = 1;
-			else if(flags & SPELL_EXTRA_BEHIND)
-				sp->in_front_status = 2;				
-		} while(result->NextRow());
 		delete result;
 	}
 }
@@ -440,12 +427,40 @@ void ObjectMgr::LoadExtraItemStuff()
 			pItemPrototype->ForcedPetId = -1;
 			break;
 		}
+
+		pItemPrototype->extended_cost = NULL;
         if(!itr->Inc())
 			break;
 	}
 
 	itr->Destruct();
 	foodItems.clear();
+
+	result = WorldDatabase.Query("SELECT * FROM items_extendedcost");
+	ItemExtendedCostEntry * ec;
+	if( result != NULL )
+	{
+		do 
+		{
+			ec = dbcItemExtendedCost.LookupEntryForced( result->Fetch()[1].GetUInt32() );
+			if( ec == NULL )
+			{
+				Log.Warning("LoadItems", "Extendedcost for item %u references nonexistant EC %u", result->Fetch()[0].GetUInt32(), result->Fetch()[1].GetUInt32() );
+				continue;
+			}
+
+			pItemPrototype = ItemPrototypeStorage.LookupEntry( result->Fetch()[0].GetUInt32() );
+			if( pItemPrototype == NULL )
+			{
+				Log.Warning("LoadItems", "Extendedcost for item %u references nonexistant item %u", result->Fetch()[0].GetUInt32(), result->Fetch()[1].GetUInt32() );
+				continue;
+			}
+
+			pItemPrototype->extended_cost = ec;
+
+		} while (result->NextRow());
+		delete result;
+	}
 }
 
 #define make_task(storage, itype, storagetype, tablename, format) tl.AddTask( new Task( \

@@ -116,7 +116,7 @@ public:
         char msg[200];
         if(mTarget->GetTypeId() == TYPEID_PLAYER)
             sprintf(msg, "And stay down, %s.", static_cast<Player*>(mTarget)->GetName());
-        else if (mTarget->GetGUIDHigh() == HIGHGUID_PET)
+        else if (mTarget->IsPet())
             sprintf(msg, "And stay down, %s.", static_cast<Pet*>(mTarget)->GetName().c_str());
 
         _unit->SendChatMessage(CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, msg);

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -82,7 +82,8 @@ Group::Group(bool Assign)
 #ifdef VOICE_CHAT
 	m_voiceChannelRequested = false;
 	m_voiceChannelId = 0;
-	m_voiceMemberHigh = 1;
+	m_voiceMemberCount = 0;
+	memset(m_voiceMembersList, 0, sizeof(Player*)*41);
 #endif
 }
 
@@ -250,13 +251,24 @@ void Group::Update()
 
 				/* skip offline players */
 				if( (*itr1)->m_loggedInPlayer == NULL )
-					continue;
-
-#ifdef VOICE_CHAT
-				if( !(*itr1)->m_loggedInPlayer->m_inPartyVoice && sVoiceChatHandler.CanUseVoiceChat() )
 				{
-					AddVoiceMember( (*itr1)->m_loggedInPlayer );
-					(*itr1)->m_loggedInPlayer->m_inPartyVoice = true;
+#ifdef VOICE_CHAT
+					if( (*itr1)->groupVoiceId >= 0 )
+					{
+						// remove from voice members since that player is now offline
+						RemoveVoiceMember( (*itr1) );
+					}
+
+					continue;
+				}
+
+				if( (*itr1)->groupVoiceId < 0 && sVoiceChatHandler.CanUseVoiceChat() )
+				{
+					(*itr1)->groupVoiceId = 0;
+					AddVoiceMember( (*itr1) );
+				}
+#else
+					continue;
 				}
 #endif
 
@@ -463,6 +475,10 @@ void Group::RemovePlayer(PlayerInfo * info)
 
 	info->m_Group=NULL;
 	info->subGroup=-1;
+#ifdef VOICE_CHAT
+	if( info->groupVoiceId <= 0 )
+		RemoveVoiceMember(info);
+#endif
 
 	if(sg==NULL)
 	{
@@ -850,7 +866,7 @@ void Group::UpdateOutOfRangePlayer(Player * pPlayer, uint32 Flags, bool Distribu
 		else if(pPlayer->isDead())
 			member_flags |= 0x10;
 
-		*data << member_flags;
+		*data << member_flags << uint8(0);
 	}
 
 	if(Flags & GROUP_UPDATE_FLAG_HEALTH)
@@ -960,7 +976,7 @@ void Group::UpdateAllOutOfRangePlayersFor(Player * pPlayer)
 					hisMask.Clear();
 					myMask.Clear();
 					u1 = u2 = false;
-					for(uint32 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_25_01; ++i)
+					for(uint32 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_25_1; ++i)
 					{
 						if(plr->GetUInt32Value(i))
 						{
@@ -1134,20 +1150,58 @@ void Group::VoiceChannelCreated(uint16 id)
 {
 	Log.Debug("Group", "voicechannelcreated: id %u", (uint32)id);
 	m_voiceChannelId = id;
-	SendVoiceUpdate();
+	if( id != 0 )
+	{
+		// so we just got a channel. we better activate the slots that are in use so people can talk
+		uint32 i;
+		for( i = 0; i <= 40; ++i )
+		{
+			if( m_voiceMembersList[i] != NULL )
+				sVoiceChatHandler.ActivateChannelSlot(id, (uint8)i );
+		}
+
+		SendVoiceUpdate();
+	}
 }
 
-void Group::AddVoiceMember(Player * pPlayer)
+void Group::AddVoiceMember(PlayerInfo * pPlayer)
 {
 	m_groupLock.Acquire();
-	Log.Debug("Group", "adding voice member %u to group %u", pPlayer->GetGUIDLow(), GetID());
+	Log.Debug("Group", "adding voice member %u to group %u", pPlayer->guid, GetID());
+	uint32 i;
 
-	m_voiceMembers.insert( pPlayer );
-	pPlayer->m_inPartyVoiceId = m_voiceMemberHigh++;
+	// find him an id
+	for( i = 1; i <= 40; ++i )
+	{
+		if( m_voiceMembersList[i] == NULL )
+			break;
+	}
+
+	if( i == 41 )
+	{
+		// no free slots
+		Log.Error("Group", "could not add voice member, no slots!");
+		return;
+	}
+
+	pPlayer->groupVoiceId = i;
+	m_voiceMembersList[i] = pPlayer;
+	++m_voiceMemberCount;
 
 	if( !m_voiceChannelRequested )
 	{
-		if( m_voiceMembers.size() >= 2 )		// Don't create channels with only one member
+		/*uint32 count = 0;
+		for( i = 0; i < 41; ++i )
+		{
+			if( m_voiceMembersList[i] != NULL )
+			{
+				++count;
+				if( count >= 2 )
+					break;
+			}
+		}*/
+
+		if( m_voiceMemberCount >= 2 )		// Don't create channels with only one member
 		{
 			CreateVoiceSession();
 			m_voiceChannelRequested = true;
@@ -1156,15 +1210,47 @@ void Group::AddVoiceMember(Player * pPlayer)
 	else
 	{
 		if( m_voiceChannelId != 0 )
+		{
+			// activate his slot
+			sVoiceChatHandler.ActivateChannelSlot(m_voiceChannelId, (uint8)i);
 			SendVoiceUpdate();
+		}
 	}
 
 	m_groupLock.Release();
 }
 
-void Group::RemoveVoiceMember(Player * pPlayer)
+void Group::RemoveVoiceMember(PlayerInfo * pPlayer)
 {
+	if( pPlayer->groupVoiceId <= 0 )
+		return;
 
+	Log.Debug("Group", "removing voice member %u from group %u", pPlayer->guid, GetID());
+
+	m_groupLock.Acquire();
+	if( m_voiceMembersList[pPlayer->groupVoiceId] == pPlayer )
+	{
+		--m_voiceMemberCount;
+		m_voiceMembersList[pPlayer->groupVoiceId] = NULL;
+
+		if( m_voiceChannelId != 0 )
+		{
+			// turn off the slot
+			sVoiceChatHandler.DeactivateChannelSlot(m_voiceChannelId, pPlayer->groupVoiceId);
+			SendVoiceUpdate();
+		}
+
+		if( m_voiceMemberCount < 2 )
+		{
+			// destroy the channel
+			sVoiceChatHandler.DestroyGroupChannel(this);
+			m_voiceChannelId = 0;
+			m_voiceChannelRequested = false;
+		}
+	}
+
+	pPlayer->groupVoiceId = -1;
+	m_groupLock.Release();
 }
 
 void Group::SendVoiceUpdate()
@@ -1177,58 +1263,150 @@ void Group::SendVoiceUpdate()
 
 	uint8 counter = 1;
 	size_t pos;
-	VoiceMemberSet::iterator itr, it2;
+	uint32 i,j;
+	Player * pl;
+
 	WorldPacket data(SMSG_VOICE_SESSION, 100);
-	data << uint32( 0x000016a2 );
-	data << uint32( 0xe0e10000 );		// this appears to be constant :S
+	data << uint32( 0x00000E9D );
+	data << uint32( 0xE2500000 );		// this appears to be constant :S
 
 	data << uint16( m_voiceChannelId );		// voice channel id, used in udp packet
-	//data << uint16( 0xb168 );
 	data << uint8( 2 );						// party voice channel
 	data << uint8( 0 );						// for channels this is name
 	data.append( EncryptionKey, 16 );		// encryption key
 
 	// IP
 	// these dont appear to be in network byte order.. gg
-	data << uint8( 27 );					// 27
-	data << uint8( 1 );						// 1
-	data << uint8( 168 );					// 168
-	data << uint8( 192 );					// 192
-	// :
-	data << uint16( 3727 );					// port
+	data << uint32(htonl(sVoiceChatHandler.GetVoiceServerIP()));
+	data << uint16(sVoiceChatHandler.GetVoiceServerPort());
 	
-	data << uint8( m_voiceMembers.size() );
+	data << uint8( m_voiceMemberCount );
 	pos = data.wpos();
 
-	for( itr = m_voiceMembers.begin(); itr != m_voiceMembers.end(); ++itr )
+	for( i = 0; i <= 40; ++i )
 	{
-		// Append ourself first, always.
-		data << uint64 ( (*itr)->GetGUID() );
-		data << uint8( (*itr)->m_inPartyVoiceId );
+		if( m_voiceMembersList[i] == NULL )
+			continue;
 
-		/*if( (*itr)->m_playerInfo == m_Leader )
-			data << uint8( 0x80 );
-		else*/
-			data << uint8( 0x06 );
-
-		for( it2 = m_voiceMembers.begin(); it2 != m_voiceMembers.end(); ++it2 )
+		if( m_voiceMembersList[i]->m_loggedInPlayer == NULL )
 		{
-			if( (*it2) == (*itr) )
-				continue;
-
-			data << uint64( (*it2)->GetGUID() );
-			data << uint8( (*it2)->m_inPartyVoiceId );
-
-			if( (*itr)->m_playerInfo == m_Leader )
-				data << uint8( 0x80 );
-			else
-				data << uint8( 0xC8 );
+			// shouldnt happen
+			RemoveVoiceMember(m_voiceMembersList[i]);
+			continue;
 		}
 
-		data << uint8( 6 );
+		pl = m_voiceMembersList[i]->m_loggedInPlayer;
 
-		(*itr)->GetSession()->SendPacket( &data );
+		// Append ourself first, always.
+		data << uint64 ( pl->GetGUID() );
+		data << uint8( i );
+
+		if( pl->m_playerInfo == m_Leader )
+		{
+			data << uint8(0x06);
+		}
+		else
+		{
+			data << uint8(0x46);
+		}
+
+		for( j = 0; j <= 40; ++j )
+		{
+			if( i == j || m_voiceMembersList[j] == NULL )
+				continue;
+
+			if( m_voiceMembersList[j]->m_loggedInPlayer == NULL )
+			{
+				// shouldnt happen
+				RemoveVoiceMember(m_voiceMembersList[j]);
+				continue;
+			}
+
+			data << uint64( m_voiceMembersList[j]->guid );
+			data << uint8( j );
+
+			if( m_voiceMembersList[j] == m_Leader )
+			{
+				data << uint8(0x80) << uint8(0x47);
+			}
+			else
+			{
+				data << uint8(0xC8) << uint8(0x47);
+			}
+		}
+
+		//data << uint8( 0x47 );
+
+		pl->GetSession()->SendPacket( &data );
 		data.wpos( pos );
+	}
+
+	m_groupLock.Release();
+}
+
+void Group::VoiceSessionDropped()
+{
+	Log.Debug("Group", "Voice session dropped");
+	m_groupLock.Acquire();
+	for(uint32 i = 0; i < 41; ++i)
+	{
+		if( m_voiceMembersList[i] != NULL )
+		{
+			m_voiceMembersList[i]->groupVoiceId = -1;
+			m_voiceMembersList[i] = NULL;
+		}
+	}
+	m_voiceChannelRequested = false;
+	m_voiceChannelId = 0;
+	m_voiceMemberCount = 0;
+	m_groupLock.Release();
+}
+
+void Group::VoiceSessionReconnected()
+{
+	if( !sVoiceChatHandler.CanUseVoiceChat() )
+		return;
+
+	// try to recreate a group if one is needed
+	GroupMembersSet::iterator itr1, itr2;
+	Log.Debug("Group", "Attempting to recreate voice session for group %u", GetID());
+
+	uint32 i = 0, j = 0;
+	SubGroup *sg1 = NULL;
+	SubGroup *sg2 = NULL;
+	m_groupLock.Acquire();
+
+	for( i = 0; i < m_SubGroupCount; i++ )
+	{
+		sg1 = m_SubGroups[i];
+
+		if( sg1 != NULL)
+		{
+			for( itr1 = sg1->GetGroupMembersBegin(); itr1 != sg1->GetGroupMembersEnd(); ++itr1 )
+			{
+				// should never happen but just in case
+				if( (*itr1) == NULL )
+					continue;
+
+				/* skip offline players */
+				if( (*itr1)->m_loggedInPlayer == NULL )
+				{
+					if( (*itr1)->groupVoiceId >= 0 )
+					{
+						// remove from voice members since that player is now offline
+						RemoveVoiceMember( (*itr1) );
+					}
+
+					continue;
+				}
+
+				if( (*itr1)->groupVoiceId < 0 )
+				{
+					(*itr1)->groupVoiceId = 0;
+					AddVoiceMember( (*itr1) );
+				}
+			}
+		}
 	}
 
 	m_groupLock.Release();

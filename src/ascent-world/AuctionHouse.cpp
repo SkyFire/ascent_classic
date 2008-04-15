@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -190,7 +190,7 @@ void AuctionHouse::RemoveAuction(Auction * auct)
 			uint32 cut = uint32(float(cut_percent * auct->HighestBid));
 			Player * plr = objmgr.GetPlayer(auct->Owner);
 			if(cut && plr && plr->GetUInt32Value(PLAYER_FIELD_COINAGE) >= cut)
-				plr->ModUInt32Value(PLAYER_FIELD_COINAGE, -((int32)cut));
+				plr->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -((int32)cut));
 			
 			sMailSystem.SendAutomatedMessage(AUCTION, GetID(), auct->Owner, subject, "", 0, 0, auct->pItem->GetGUID(), 62);
 			
@@ -230,7 +230,7 @@ void WorldSession::HandleAuctionListBidderItems( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -364,7 +364,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 	uint32 auction_id, price;
 	recv_data >> auction_id >> price;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -380,7 +380,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 	if(_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < price)
 		return;
 
-	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -((int32)price));
+	_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -((int32)price));
 	if(auct->HighestBidder != 0)
 	{
 		// Return the money to the last highest bidder.
@@ -392,7 +392,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 
 	if(auct->BuyoutPrice == price)
 	{
-		auct->HighestBidder = _player->GetGUIDLow();
+		auct->HighestBidder = _player->GetLowGUID();
 		auct->HighestBid = price;
 
 		// we used buyout on the item.
@@ -406,7 +406,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 	else
 	{
 		// update most recent bid
-		auct->HighestBidder = _player->GetGUIDLow();
+		auct->HighestBidder = _player->GetLowGUID();
 		auct->HighestBid = price;
 		auct->UpdateInDB();
 
@@ -428,7 +428,7 @@ void WorldSession::HandleCancelAuction( WorldPacket & recv_data)
 	uint32 auction_id;
 	recv_data >> auction_id;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -458,7 +458,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 	recv_data >> guid >> item;
 	recv_data >> bid >> buyout >> etime;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(  !pCreature || !pCreature->auctionHouse )
 		return;		// NPC doesnt exist or isnt an auctioneer
 
@@ -513,14 +513,14 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 	auct->HighestBid = bid;
 	auct->HighestBidder = 0;	// hm
 	auct->Id = sAuctionMgr.GenerateAuctionId();
-	auct->Owner = _player->GetGUIDLow();
+	auct->Owner = _player->GetLowGUID();
 	auct->pItem = pItem;
 	auct->Deleted = false;
 	auct->DeletedReason = 0;
 	auct->DepositAmount = item_deposit;
 
 	// remove deposit
-	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)item_deposit);
+	_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -(int32)item_deposit);
 
 	// Add and save auction to DB
 	ah->AddAuction(auct);
@@ -542,7 +542,7 @@ void WorldSession::HandleAuctionListOwnerItems( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 
@@ -659,7 +659,7 @@ void WorldSession::HandleAuctionListItems( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature || !pCreature->auctionHouse)
 		return;
 

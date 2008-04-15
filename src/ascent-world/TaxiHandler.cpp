@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -61,7 +61,7 @@ void WorldSession::HandleTaxiQueryAvaibleNodesOpcode( WorldPacket & recv_data )
 	sLog.outDebug( "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES" );
 	uint64 guid;
 	recv_data >> guid;
-	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature) return;
 
 	SendTaxiList(pCreature);
@@ -139,6 +139,9 @@ void WorldSession::HandleActivateTaxiOpcode( WorldPacket & recv_data )
 
 	TaxiPath* taxipath = sTaxiMgr.GetTaxiPath(sourcenode, destinationnode);
 	TaxiNode* taxinode = sTaxiMgr.GetTaxiNode(sourcenode);
+
+	if( !taxinode || !taxipath )
+		return;
 
 	curloc = taxinode->id;
 	field = (uint8)((curloc - 1) / 32);
@@ -253,6 +256,12 @@ void WorldSession::HandleMultipleActivateTaxiOpcode(WorldPacket & recvPacket)
 	recvPacket >> guid >> moocost >> nodecount;
 	if(nodecount < 2)
 		return;
+
+	if(nodecount>10)
+	{
+		Disconnect();
+		return;
+	}
 
 	for(uint32 i = 0; i < nodecount; ++i)
 		pathes.push_back( recvPacket.read<uint32>() );

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -346,22 +346,29 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				break;
 			}
 
-			if( sSocialMgr.HasIgnore(player, GetPlayer()) )
-				return;
-
 			if(lang > 0 && LanguageSkills[lang] && _player->_HasSkillLine(LanguageSkills[lang]) == false)
 				return;
 
 			if(lang==0 && !CanUseCommand('c'))
 				return;
 
-			if(GetPlayer()->m_modlanguage >=0)
-				data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
+			if( player->Social_IsIgnoring( _player->GetLowGUID() ) )
+			{
+				data = sChatHandler.FillMessageData( CHAT_MSG_IGNORED, LANG_UNIVERSAL,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
+				SendPacket(data);
+				delete data;
+			}
 			else
-				data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, ((CanUseCommand('c') || player->GetSession()->CanUseCommand('c')) && lang != -1) ? LANG_UNIVERSAL : lang,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
+			{
+				if(GetPlayer()->m_modlanguage >=0)
+					data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
+				else
+					data = sChatHandler.FillMessageData( CHAT_MSG_WHISPER, ((CanUseCommand('c') || player->GetSession()->CanUseCommand('c')) && lang != -1) ? LANG_UNIVERSAL : lang,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 
-			player->GetSession()->SendPacket(data);
-			delete data;
+				player->GetSession()->SendPacket(data);
+				delete data;
+			}
+
 			//Sent the to Users id as the channel, this should be fine as it's not used for wisper
 		  
 			data = sChatHandler.FillMessageData(CHAT_MSG_WHISPER_INFORM, LANG_UNIVERSAL,msg.c_str(), player->GetGUID(), player->bGMTagOn ? 4 : 0  );
@@ -562,5 +569,4 @@ void WorldSession::HandleReportSpamOpcode(WorldPacket & recvPacket)
 	if(!rPlayer)
 		return;
 
-	sSocialMgr.AddIgnore(GetPlayer(), rPlayer->GetName());
 }

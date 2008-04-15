@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -59,7 +59,7 @@ void WorldSession::HandleTabardVendorActivateOpcode( WorldPacket & recv_data )
 	if(!_player->IsInWorld()) return;
 	uint64 guid;
 	recv_data >> guid;
-	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature) return;
 
 	SendTabardHelp(pCreature);
@@ -84,7 +84,7 @@ void WorldSession::HandleBankerActivateOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature) return;
 
 	SendBankerList(pCreature);
@@ -110,7 +110,7 @@ void WorldSession::HandleTrainerListOpcode( WorldPacket & recv_data )
 	// Inits, grab creature, check.
 	uint64 guid;
 	recv_data >> guid;
-	Creature *train = GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *train = GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!train) return;
 
 	_player->Reputation_OnTalk(train->m_factionDBC);
@@ -147,7 +147,13 @@ void WorldSession::SendTrainerList(Creature* pCreature)
 	{
 		pSpell = &(*itr);
 		Status = TrainerGetSpellStatus(pSpell);
-		data << pSpell->pCastSpell->Id;
+		if( pSpell->pCastRealSpell != NULL )
+			data << pSpell->pCastRealSpell->Id;
+		else if( pSpell->pLearnSpell )
+			data << pSpell->pLearnSpell->Id;
+		else
+			continue;
+
 		data << Status;
 		data << pSpell->Cost;
 		data << Spacer;
@@ -178,7 +184,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvPacket)
 	uint32 TeachingSpellID;
 
 	recvPacket >> Guid >> TeachingSpellID;
-	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)Guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(Guid));
 	if(pCreature == 0) return;
 
 	Trainer *pTrainer = pCreature->GetTrainer();
@@ -186,37 +192,98 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvPacket)
 
 	TrainerSpell * pSpell=NULL;
 	for(vector<TrainerSpell>::iterator itr = pTrainer->Spells.begin(); itr != pTrainer->Spells.end(); ++itr)
-		if(itr->pCastSpell->Id == TeachingSpellID)
+	{
+		if( ( itr->pCastRealSpell && itr->pCastRealSpell->Id == TeachingSpellID ) ||
+			( itr->pLearnSpell && itr->pLearnSpell->Id == TeachingSpellID ) )
+		{
 			pSpell = &(*itr);
-
+		}
+	}
 	
 	if(pSpell == NULL)
 		return;
 
 	if(TrainerGetSpellStatus(pSpell) > 0) return;
 	
-	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)pSpell->Cost);
+	_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -(int32)pSpell->Cost);
 
-	// Cast teaching spell on player
-	pCreature->CastSpell(_player, pSpell->pCastSpell, true);
+	if( pSpell->pCastSpell)
+	{
+		// Cast teaching spell on player
+		pCreature->CastSpell(_player, pSpell->pCastSpell, true);
+	}
+
+	if( pSpell->pLearnSpell )
+	{
+		packetSMSG_PLAY_SPELL_VISUAL pck;
+		pck.guid = pCreature->GetGUID();
+		pck.visualid = 0x5b3;
+		_player->OutPacketToSet( SMSG_PLAY_SPELL_VISUAL, sizeof(packetSMSG_PLAY_SPELL_VISUAL), &pck, true );
+
+		pck.guid = _player->GetGUID();
+		pck.visualid = 0x16a;
+		_player->OutPacketToSet( 0x1F7, sizeof(packetSMSG_PLAY_SPELL_VISUAL), &pck, true );
+
+		// add the spell
+		_player->addSpell( pSpell->pLearnSpell->Id );
+
+		uint32 i;
+		for( i = 0; i < 3; ++i)
+		{
+			if(pSpell->pLearnSpell->Effect[i] == SPELL_EFFECT_PROFICIENCY || pSpell->pLearnSpell->Effect[i] == SPELL_EFFECT_LEARN_SPELL ||
+				pSpell->pLearnSpell->Effect[i] == SPELL_EFFECT_WEAPON)
+			{
+				_player->CastSpell(_player, pSpell->pLearnSpell, true);
+				break;
+			}
+		}
+
+		for( i = 0; i < 3; ++i)
+		{
+			if( pSpell->pLearnSpell->Effect[i] == SPELL_EFFECT_SKILL )
+			{
+				uint32 skill = pSpell->pLearnSpell->EffectMiscValue[i];
+				uint32 val = (pSpell->pLearnSpell->EffectBasePoints[i]+1) * 75;
+				if( val > 350 )
+					val = 350;
+
+				if( _player->_GetSkillLineMax(skill) >= val )
+					return;
+
+				if( skill == SKILL_RIDING )
+					_player->_AddSkillLine( skill, val, val );
+				else
+				{
+					if( _player->_HasSkillLine(skill) )
+						_player->_ModifySkillMaximum(skill, val);
+					else
+						_player->_AddSkillLine( skill, 1, val);
+				}
+			}
+		}
+	}
 
 	if(pSpell->DeleteSpell)
 	{
 		// Remove old spell.
-		_player->removeSpell(pSpell->DeleteSpell, true, true, pSpell->pRealSpell->Id);
+		if( pSpell->pLearnSpell )
+			_player->removeSpell(pSpell->DeleteSpell, true, true, pSpell->pLearnSpell->Id);
+		else if(pSpell->pCastSpell)
+			_player->removeSpell(pSpell->DeleteSpell, true, true, pSpell->pCastRealSpell->Id);
+		else
+			_player->removeSpell(pSpell->DeleteSpell,true,false,0);
 	}
-
 }
 
 uint8 WorldSession::TrainerGetSpellStatus(TrainerSpell* pSpell)
 {
-	if(!pSpell->pRealSpell)
+	if(!pSpell->pCastSpell && !pSpell->pLearnSpell)
 		return TRAINER_STATUS_NOT_LEARNABLE;
 
-	if(_player->HasSpell(pSpell->pRealSpell->Id))
+	if( pSpell->pCastRealSpell && (_player->HasSpell(pSpell->pCastRealSpell->Id) || _player->HasDeletedSpell(pSpell->pCastRealSpell->Id)) )
 		return TRAINER_STATUS_ALREADY_HAVE;
 
-	if(_player->HasDeletedSpell(pSpell->pRealSpell->Id))
+	if( pSpell->pLearnSpell && (_player->HasSpell(pSpell->pLearnSpell->Id) || _player->HasDeletedSpell(pSpell->pLearnSpell->Id)) )
 		return TRAINER_STATUS_ALREADY_HAVE;
 
 	if(pSpell->DeleteSpell && _player->HasDeletedSpell(pSpell->DeleteSpell))
@@ -241,7 +308,7 @@ void WorldSession::HandleCharterShowListOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature *pCreature = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature) return;
 
 	SendCharterRequest(pCreature);
@@ -295,7 +362,7 @@ void WorldSession::HandleAuctionHelloOpcode( WorldPacket & recv_data )
 	if(!_player->IsInWorld()) return;
 	uint64 guid;
 	recv_data >> guid;
-	Creature* auctioneer = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature* auctioneer = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!auctioneer)
 		return;
 
@@ -329,7 +396,7 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 	std::set<uint32> ql;
 
 	recv_data >> guid;
-	Creature *qst_giver = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *qst_giver = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!qst_giver) 
 		return;
 
@@ -420,25 +487,27 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
 	if(!_player->IsInWorld()) return;
 	//WorldPacket data;
 	uint32 option;
+	uint32 unk24;
 	uint64 guid;
 	int8 extra=0;
 
-	recv_data >> guid >> option;
+	recv_data >> guid >> unk24 >> option;
 
 	sLog.outDetail("WORLD: CMSG_GOSSIP_SELECT_OPTION Option %i Guid %.8X", option, guid );
 	GossipScript * Script=NULL;
 	Object * qst_giver=NULL;
+	uint32 guidtype = GET_TYPE_FROM_GUID(guid);
 
-	if(GUID_HIPART(guid)==HIGHGUID_UNIT)
+	if(guidtype==HIGHGUID_TYPE_UNIT)
 	{
-		Creature *crt = _player->GetMapMgr()->GetCreature((uint32)guid);
+		Creature *crt = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 		if(!crt)
 			return;
 
 		qst_giver=crt;
 		Script=crt->GetCreatureName()?crt->GetCreatureName()->gossip_script:NULL;
 	}
-	else if(GUID_HIPART(guid)==HIGHGUID_ITEM)
+	else if(guidtype==HIGHGUID_TYPE_ITEM)
 	{
 		Item * pitem = _player->GetItemInterface()->GetItemByGUID(guid);
 		if(pitem==NULL)
@@ -578,7 +647,7 @@ void WorldSession::HandleBinderActivateOpcode( WorldPacket & recv_data )
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature *pC = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *pC = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pC) return;
 
 	SendInnkeeperBind(pC);

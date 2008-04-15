@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,6 +34,7 @@ class Creature;
 class MovementInfo;
 struct TrainerSpell;
 
+//#define SESSION_CAP 5
 
 // MovementFlags Contribution by Tenshi
 enum MovementFlags
@@ -657,6 +658,11 @@ protected:
 	void HandleEnableMicrophoneOpcode(WorldPacket & recv_data);
 	void HandleVoiceChatQueryOpcode(WorldPacket & recv_data);
 	void HandleChannelVoiceQueryOpcode(WorldPacket & recv_data);
+	void HandleSetAutoLootPassOpcode(WorldPacket & recv_data);
+
+	void HandleSetFriendNote(WorldPacket & recv_data);
+	void Handle38C(WorldPacket & recv_data);
+	void HandleInrangeQuestgiverQuery(WorldPacket & recv_data);
 
 public:
 

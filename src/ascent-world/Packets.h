@@ -95,6 +95,7 @@ struct packetSMSG_LOG_XP_GAIN
 	uint64	guid;                                    // Always 0
 	uint32	xp;                                      // Normal XP
 	uint8	type;                                    // Unknown.. seems to always be 0		
+	uint8   unk;									 // 2.4.0 unknown
 };
 
 struct packetSMSG_CASTRESULT_EXTRA
@@ -149,6 +150,11 @@ struct packetSMSG_WORLD_STATE_UPDATE
 	uint32 Value;
 };
 
+struct packetSMSG_PLAY_SPELL_VISUAL
+{
+	uint64 guid;
+	uint32 visualid;
+};
 
 #pragma pack(pop)
 

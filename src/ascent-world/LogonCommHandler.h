@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -87,8 +87,14 @@ public:
 	void UpdateSockets();
 	void Connect(LogonServer * server);
 	void ConnectAll();
-	void LogonDatabaseSQLExecute(const char* str, ...);
-	void LogonDatabaseReloadAccounts();
+	//void LogonDatabaseSQLExecute(const char* str, ...);
+	//void LogonDatabaseReloadAccounts();
+
+	void Account_SetBanned(const char * account, uint32 banned);
+	void Account_SetGM(const char * account, const char * flags);
+	void Account_SetMute(const char * account, uint32 muted);
+	void IPBan_Add(const char * ip, uint32 duration);
+	void IPBan_Remove(const char * ip);
 
 	void LoadRealmConfiguration();
 	void AddServer(string Name, string Address, uint32 Port);

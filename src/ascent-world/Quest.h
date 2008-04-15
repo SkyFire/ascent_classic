@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -237,7 +237,7 @@ public:
 
 	ASCENT_INLINE uint32 GetBaseField(uint32 slot)
 	{
-		return PLAYER_QUEST_LOG_1_1 + (slot * 3);
+		return PLAYER_QUEST_LOG_1_1 + (slot * 4);
 	}
 
 private:

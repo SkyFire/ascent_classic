@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "../../../ascent-shared/svn_revision.h"
 
+#define SKIP_ALLOCATOR_SHARING 1
 #include <ScriptSetup.h>
 
 extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
@@ -304,6 +305,11 @@ void StatDumper::DumpStats()
     fprintf(f, "<?xml-stylesheet type=\"text/xsl\" href=\"server_stats.xsl\"?>\n");
     fprintf(f, "<serverpage>\n");
     fprintf(f, "  <status>\n");
+
+	uint32 races[RACE_DRAENEI+1];
+	uint32 classes[DRUID+1];
+	memset(&races[0], 0, sizeof(uint32)*(RACE_DRAENEI+1));
+	memset(&classes[0], 0, sizeof(uint32)*(RACE_DRAENEI+1));
     std::deque<Player*> gms;
     {
         // Dump server information.
@@ -335,6 +341,8 @@ void StatDumper::DumpStats()
                     gm++;
                     gms.push_back(itr->second);
                 }
+				classes[itr->second->getClass()]++;
+				races[itr->second->getRace()]++;
             }            
         }
         objmgr._playerslock.ReleaseReadLock();
@@ -361,6 +369,51 @@ void StatDumper::DumpStats()
 		fprintf(f, "    <cdbquerysize>%u</cdbquerysize>\n", CharacterDatabase.GetQueueSize());
     }
     fprintf(f, "  </status>\n");
+	static const char * race_names[RACE_DRAENEI+1] = {
+		NULL,
+		"human",
+		"orc",
+		"dwarf",
+		"nightelf",
+		"undead",
+		"tauren",
+		"gnome",
+		"troll",
+		NULL,
+		"bloodelf",
+		"draenei",
+	};
+
+	static const char * class_names[DRUID+1] = {
+		NULL,
+		"warrior",
+		"paladin",
+		"hunter",
+		"rogue",
+		"priest",
+		NULL,
+		"shaman",
+		"mage",
+		"warlock",
+		NULL,
+		"druid",
+	};
+	
+	fprintf(f, "  <statsummary>\n");
+	uint32 i;
+	for(i = 0; i <= RACE_DRAENEI; ++i)
+	{
+		if( race_names[i] != NULL )
+			fprintf(f, "    <%s>%u</%s>\n", race_names[i], races[i], race_names[i]);
+	}
+
+	for(i = 0; i <= DRUID; ++i)
+	{
+		if( class_names[i] != NULL )
+			fprintf(f, "    <%s>%u</%s>\n", class_names[i], classes[i], class_names[i]);
+	}
+	fprintf(f, "  </statsummary>\n");
+
     Player * plr;
     uint32 t = (uint32)time(NULL);
     char otime[100];

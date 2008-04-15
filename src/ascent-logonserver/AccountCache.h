@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -101,6 +101,8 @@ public:
 	void Load();
 	void Reload();
 	void Remove(set<IPBan*>::iterator ban);
+	bool Add(const char * ip, uint32 dur);
+	bool Remove(const char * ip);
 
 	BAN_STATUS CalculateBanStatus(in_addr ip_address);
 

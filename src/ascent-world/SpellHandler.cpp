@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,10 +27,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	Player* p_User = GetPlayer();
 	sLog.outDetail("WORLD: got use Item packet, data length = %i",recvPacket.size());
 	int8 tmp1,slot,tmp3;
+	uint64 item_guid;
 	uint8 cn;
 	uint32 spellId = 0;
 
-	recvPacket >> tmp1 >> slot >> tmp3 >> cn;
+	recvPacket >> tmp1 >> slot >> tmp3 >> cn >> item_guid;
 	Item* tmpItem = NULL;
 	tmpItem = p_User->GetItemInterface()->GetInventoryItem(tmp1,slot);
 	if (!tmpItem)
@@ -155,7 +156,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		}
 		else
 		{
-			if( !_player->GetSummon() || _player->GetSummon()->GetEntry() != itemProto->ForcedPetId )
+			if( !_player->GetSummon() || _player->GetSummon()->GetEntry() != (uint32)itemProto->ForcedPetId )
 			{
 				_player->SendCastResult(spellInfo->Id, SPELL_FAILED_SPELL_IN_PROGRESS, cn, 0);
 				return;

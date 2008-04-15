@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -40,6 +40,7 @@ void WorldSession::HandleNameQueryOpcode( WorldPacket & recv_data )
 	data << pn->name;
 	data << uint8(0);	   // this probably is "different realm" or something flag.
 	data << pn->race << pn->gender << pn->cl;
+	data << uint8(0);			// 2.4.0, why do i get the feeling blizz is adding custom classes or custom titles? (same thing in who list)
 	SendPacket( &data );
 }
 
@@ -114,8 +115,8 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 		data << ci->SpellDataID;
 		data << ci->Male_DisplayID;
 		data << ci->Female_DisplayID;
-		data << ci->Male_DisplayID2;
-		data << ci->Female_DisplayID2;
+		data << ci->unkint1;
+		data << ci->unkint2;
 		data << ci->unkfloat1;
 		data << ci->unkfloat2;
 		data << ci->Leader;
@@ -196,7 +197,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket &recv_data)
 	WorldPacket data(MSG_CORPSE_QUERY, 21);
 	MapInfo *pMapinfo;
 
-	pCorpse = objmgr.GetCorpseByOwner(GetPlayer()->GetGUIDLow());
+	pCorpse = objmgr.GetCorpseByOwner(GetPlayer()->GetLowGUID());
 	if(pCorpse)
 	{
 		pMapinfo = WorldMapInfoStorage.LookupEntry(pCorpse->GetMapId());
@@ -282,4 +283,37 @@ void WorldSession::HandleItemNameQueryOpcode( WorldPacket & recv_data )
 			reply << proto->Name1;
 	}
 	SendPacket(&reply);	
+}
+
+void WorldSession::HandleInrangeQuestgiverQuery(WorldPacket & recv_data)
+{
+	CHECK_INWORLD_RETURN;
+
+	WorldPacket data(SMSG_INRANGE_QUESTGIVER_STATUS_QUERY_RESPONSE, 1000);
+	Object::InRangeSet::iterator itr;
+	Creature * pCreature;
+	uint32 count = 0;
+	data << count;
+
+	// 32 count
+	// <foreach count>
+	//    64 guid
+	//    8 status
+
+	for( itr = _player->m_objectsInRange.begin(); itr != _player->m_objectsInRange.end(); ++itr )
+	{
+		pCreature = static_cast<Creature*>(*itr);
+		if( pCreature->GetTypeId() != TYPEID_UNIT )
+			continue;
+
+		if( pCreature->isQuestGiver() )
+		{
+			data << pCreature->GetGUID();
+			data << uint8(sQuestMgr.CalcStatus( pCreature, _player ));
+			++count;
+		}
+	}
+
+	*(uint32*)(data.contents()) = count;
+	SendPacket(&data);
 }

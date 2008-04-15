@@ -320,7 +320,7 @@ bool ChatHandler::HandleQuestFinishCommand(const char * args, WorldSession * m_s
 
 					for(uint32 guid=1; guid < plr->GetMapMgr()->m_CreatureArraySize; guid++)
 					{
-						Creature *pCreature = plr->GetMapMgr()->GetCreature(guid);
+						Creature *pCreature = plr->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 						if(pCreature)
 						{
 							if(pCreature->GetEntry() == giver_id) //found creature
@@ -560,7 +560,7 @@ bool ChatHandler::HandleQuestListCommand(const char * args, WorldSession * m_ses
 			return true;
 		}
 
-		Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+		Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 		if(unit)
 		{
 			if (!unit->isQuestGiver())
@@ -600,7 +600,7 @@ bool ChatHandler::HandleQuestListCommand(const char * args, WorldSession * m_ses
 		{
 			if(plr->HasQuests())
 			{
-				QueryResult *playerResult = CharacterDatabase.Query("SELECT quest_id FROM questlog WHERE player_guid=%u", plr->GetGUIDLow());
+				QueryResult *playerResult = CharacterDatabase.Query("SELECT quest_id FROM questlog WHERE player_guid=%u", plr->GetLowGUID());
 				if(playerResult)
 				{
 					do 
@@ -699,7 +699,7 @@ bool ChatHandler::HandleQuestAddStartCommand(const char * args, WorldSession * m
 		return false;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!unit)
 	{
 		SystemMessage(m_session, "You must target an npc.");
@@ -783,7 +783,7 @@ bool ChatHandler::HandleQuestAddFinishCommand(const char * args, WorldSession * 
 		return false;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!unit)
 	{
 		SystemMessage(m_session, "You must target an npc.");
@@ -880,7 +880,7 @@ bool ChatHandler::HandleQuestDelStartCommand(const char * args, WorldSession * m
 		return false;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!unit)
 	{
 		SystemMessage(m_session, "You must target an npc.");
@@ -964,7 +964,7 @@ bool ChatHandler::HandleQuestDelFinishCommand(const char * args, WorldSession * 
 		return false;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!unit)
 	{
 		SystemMessage(m_session, "You must target an npc.");
@@ -1249,7 +1249,7 @@ bool ChatHandler::HandleQuestLoadCommand(const char * args, WorldSession * m_ses
 	if (guid == 0)
 		return true;
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!unit)
 		return true;
 

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -142,7 +142,7 @@ Item *ItemInterface::SafeAddItem(uint32 ItemId, int8 ContainerSlot, int8 slot)
 
 	if(pProto->InventoryType == INVTYPE_BAG)
 	{
-		pItem = (Item*)new Container(HIGHGUID_CONTAINER,objmgr.GenerateLowGuid(HIGHGUID_CONTAINER));
+		pItem = (Item*)new Container(HIGHGUID_TYPE_CONTAINER,objmgr.GenerateLowGuid(HIGHGUID_TYPE_CONTAINER));
 		static_cast<Container*>(pItem)->Create( ItemId, m_pOwner);
 		if(m_AddItem(pItem, ContainerSlot, slot))
 		{
@@ -156,7 +156,7 @@ Item *ItemInterface::SafeAddItem(uint32 ItemId, int8 ContainerSlot, int8 slot)
 	}
 	else
 	{
-		pItem = new Item(HIGHGUID_ITEM,objmgr.GenerateLowGuid(HIGHGUID_ITEM));
+		pItem = new Item(HIGHGUID_TYPE_ITEM,objmgr.GenerateLowGuid(HIGHGUID_TYPE_ITEM));
 		pItem->Create( ItemId, m_pOwner);
 		if(m_AddItem(pItem, ContainerSlot, slot))
 		{
@@ -1960,35 +1960,20 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount, Creature *
 		if(itemprice>m_pOwner->GetUInt32Value(PLAYER_FIELD_COINAGE))
 			m_pOwner->SetUInt32Value(PLAYER_FIELD_COINAGE,0);
 		else
-			m_pOwner->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)itemprice);
+			m_pOwner->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -(int32)itemprice);
 	}
-	if(item->ItemExtendedCost)
+	if( item->extended_cost != NULL )
 	{
-		ItemExtendedCostEntry *ex = dbcItemExtendedCost.LookupEntry(item->ItemExtendedCost);
-		if(ex)
+		ItemExtendedCostEntry * ex = item->extended_cost;
+		for(int i = 0;i<5;i++)
 		{
-			for(int i = 0;i<5;i++)
-			{
-				if(ex->item[i])
-				{
-					m_pOwner->GetItemInterface()->RemoveItemAmt(ex->item[i],(ex->count[i]*total_amount));
-				}
-			}
-			//just make sure we do not loop the value, Though we should have checked it before
-			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) >= (ex->honor*total_amount))
-			{
-				m_pOwner->ModUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, -int32((ex->honor*total_amount)));
-				m_pOwner->m_honorPoints -=int32(ex->honor*total_amount);
-			}
-			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) >= (ex->arena*total_amount))
-			{
-				m_pOwner->ModUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, -int32(ex->arena*total_amount));
-				m_pOwner->m_arenaPoints -=int32(ex->arena*total_amount);
-			}
+			if(ex->item[i])
+				m_pOwner->GetItemInterface()->RemoveItemAmt( ex->item[i], total_amount * ex->count[i] );
 		}
-		else sLog.outDebug("Warning: item %u has extended cost but could not find the value in ItemExtendedCostStore",item->ItemId);
-	}
 
+		m_pOwner->ModUnsigned32Value(PLAYER_FIELD_HONOR_CURRENCY, -(int32)(ex->honor * total_amount) );
+		m_pOwner->ModUnsigned32Value(PLAYER_FIELD_ARENA_CURRENCY, -(int32)(ex->arena * total_amount) );
+	}
 }
 
 enum CanAffordItem
@@ -2005,26 +1990,24 @@ enum CanAffordItem
 
 int8 ItemInterface::CanAffordItem(ItemPrototype * item,uint32 amount, Creature * pVendor)
 {
-	if(item->ItemExtendedCost)
+	if( item->extended_cost != NULL )
 	{
-		ItemExtendedCostEntry *ex = dbcItemExtendedCost.LookupEntry(item->ItemExtendedCost);
-		if(ex)
+		ItemExtendedCostEntry * ex = item->extended_cost;
+		for(int i = 0;i<5;i++)
 		{
-			for(int i = 0;i<5;i++)
+			if(ex->item[i])
 			{
-				if(ex->item[i])
-				{
-					if(m_pOwner->GetItemInterface()->GetItemCount(ex->item[i], false) < (ex->count[i]*amount))
-						return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
-				}
+				if(m_pOwner->GetItemInterface()->GetItemCount(ex->item[i], false) < (ex->count[i]*amount))
+					return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
 			}
-			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) < (ex->honor*amount))
-				return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
-			if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) < (ex->arena*amount))
-				return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
 		}
-		else sLog.outDebug("Warning: item %u has extended cost but could not find the value in ItemExtendedCostStore",item->ItemId);
+
+		if(m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) < (ex->honor*amount))
+			return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
+		if(m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) < (ex->arena*amount))
+			return CAN_AFFORD_ITEM_ERROR_NOT_ENOUGH_MONEY;
 	}
+
 	if(item->BuyPrice)
 	{
 		int32 price = GetBuyPriceForItem(item, amount, m_pOwner, pVendor) * amount;
@@ -2425,7 +2408,7 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 	if( srcslot >= MAX_INVENTORY_SLOT || srcslot < 0 )
 		return;
 
-	if( dstslot >= MAX_INVENTORY_SLOT && dstslot < 0 )
+	if( dstslot >= MAX_INVENTORY_SLOT || dstslot < 0 )
 		return;
 
 	Item* SrcItem = GetInventoryItem( srcslot );
@@ -2446,8 +2429,9 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 		uint32 total = SrcItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) + DstItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT );
 		if( total <= DstItem->GetProto()->MaxCount )
 		{
-			DstItem->ModUInt32Value( ITEM_FIELD_STACK_COUNT, SrcItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) );
+			DstItem->ModUnsigned32Value( ITEM_FIELD_STACK_COUNT, SrcItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT ) );
 			SafeFullRemoveItemFromSlot( INVENTORY_SLOT_NOT_SET, srcslot );
+			DstItem->m_isDirty = true;
 			return;
 		}
 		else
@@ -2460,7 +2444,9 @@ void ItemInterface::SwapItemSlots(int8 srcslot, int8 dstslot)
 			{
 				int32 delta=DstItem->GetProto()->MaxCount-DstItem->GetUInt32Value( ITEM_FIELD_STACK_COUNT );
 				DstItem->SetUInt32Value( ITEM_FIELD_STACK_COUNT, DstItem->GetProto()->MaxCount );
-				SrcItem->ModUInt32Value( ITEM_FIELD_STACK_COUNT, -delta );
+				SrcItem->ModUnsigned32Value( ITEM_FIELD_STACK_COUNT, -delta );
+				SrcItem->m_isDirty = true;
+				DstItem->m_isDirty = true;
 				return;
 			}
 		}
@@ -2646,13 +2632,13 @@ void ItemInterface::mLoadItemsFromDatabase(QueryResult * result)
 			{
 				if( proto->InventoryType == INVTYPE_BAG )
 				{
-					item = new Container( HIGHGUID_CONTAINER, fields[1].GetUInt32() );
+					item = new Container( HIGHGUID_TYPE_CONTAINER, fields[1].GetUInt32() );
 					static_cast< Container* >( item )->LoadFromDB( fields );
 
 				}
 				else
 				{
-					item = new Item( HIGHGUID_ITEM, fields[1].GetUInt32() );
+					item = new Item( HIGHGUID_TYPE_ITEM, fields[1].GetUInt32() );
 					item->LoadFromDB( fields, m_pOwner, false);
 
 				}

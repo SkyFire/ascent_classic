@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -331,6 +331,56 @@ void IPBanner::Load()
 
 		delete result;
 	}
+}
+
+bool IPBanner::Add(const char * ip, uint32 dur)
+{
+	unsigned int b1, b2, b3, b4;
+	if(sscanf(ip, "%u.%u.%u.%u", &b1, &b2, &b3, &b4) != 4)
+	{
+		return false;
+	}
+
+	IPBan * ban = new IPBan;
+	ban->ip.full.b1 = b1;
+	ban->ip.full.b2 = b2;
+	ban->ip.full.b3 = b3;
+	ban->ip.full.b4 = b4;
+	ban->ban_expire_time = dur;
+
+	setBusy.Acquire();
+	banList.insert(ban);
+	setBusy.Release();
+	return true;
+}
+
+bool IPBanner::Remove(const char * ip)
+{
+	unsigned int b1, b2, b3, b4;
+	union {
+		unsigned char b1, b2, b3, b4;
+		uint32 asbytes;
+	} b;
+	if(sscanf(ip, "%u.%u.%u.%u", &b1, &b2, &b3, &b4) != 4)
+	{
+		return false;
+	}
+
+	b.b1 = b1;
+	b.b2 = b2;
+	b.b3 = b3;
+	b.b4 = b4;
+
+	setBusy.Acquire();
+	set<IPBan*>::iterator itr, itr2;
+	for(itr = banList.begin(); itr != banList.end(); )
+	{
+		itr2 = itr++;
+		if( (*itr2)->ip.asbytes == b.asbytes )
+			banList.erase(itr2);
+	}
+	setBusy.Release();
+	return true;
 }
 
 void IPBanner::Reload()

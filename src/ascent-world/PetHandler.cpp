@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -34,9 +34,9 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 
 	//printf("Pet_Action: 0x%.4X 0x%.4X\n", misc, action);
 
-	if(GUID_HIPART(petGuid) == HIGHGUID_UNIT)
+	if(GET_TYPE_FROM_GUID(petGuid) == HIGHGUID_TYPE_UNIT)
 	{
-		Creature *pCharm = GetPlayer()->GetMapMgr()->GetCreature((uint32)petGuid);
+		Creature *pCharm = GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(petGuid));
 		if(!pCharm) 
 			return;
 
@@ -243,7 +243,7 @@ void WorldSession::HandlePetNameQuery(WorldPacket & recv_data)
 
 	WorldPacket data(8 + pPet->GetName().size());
 	data.SetOpcode(SMSG_PET_NAME_QUERY_RESPONSE);
-	data << (uint32)pPet->GetGUIDLow();
+	data << (uint32)pPet->GetUIdFromGUID();
 	data << pPet->GetName();
 	data << pPet->GetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP);		// stops packet flood
 	SendPacket(&data);
@@ -367,7 +367,7 @@ void WorldSession::HandleBuyStableSlot(WorldPacket &recv_data)
 	if(cost > (int32)_player->GetUInt32Value(PLAYER_FIELD_COINAGE))
 		return;
 
-	_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -cost);
+	_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -cost);
 	
 	WorldPacket data(1);
 	data.SetOpcode(SMSG_STABLE_RESULT);
@@ -461,6 +461,6 @@ void WorldSession::HandlePetUnlearn(WorldPacket & recv_data)
 		data << uint8( 2 );		//not enough money
 		return;	
 	}
-	_player->ModUInt32Value( PLAYER_FIELD_COINAGE, -cost );
+	_player->ModUnsigned32Value( PLAYER_FIELD_COINAGE, -cost );
 	pPet->WipeSpells();
 }

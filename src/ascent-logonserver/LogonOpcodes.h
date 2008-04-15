@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -54,8 +54,11 @@ enum RealmListOpcodes
 	RCMSG_TEST_CONSOLE_LOGIN					= 15,
 	RSMSG_CONSOLE_LOGIN_RESULT					= 16,
 
+	// DB modifying
+	RCMSG_MODIFY_DATABASE						= 17,
+
 	// count
-	RMSG_COUNT									= 17,
+	RMSG_COUNT									= 18,
 };
 
 #endif

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -235,7 +235,7 @@ void Player::SetStanding(uint32 Faction, int32 Value)
 		if(IsInWorld())
 		{
 			WorldPacket data(SMSG_SET_FACTION_STANDING, 12);
-			data << uint32(itr->second->flag) << dbc->RepListId << itr->second->CalcStanding();
+			data << uint32(0) << uint32(itr->second->flag) << dbc->RepListId << itr->second->CalcStanding();
 			m_session->SendPacket(&data);
 		}
 	}
@@ -338,7 +338,7 @@ void Player::ModStanding(uint32 Faction, int32 Value)
 		if(IsInWorld() && Visible(itr->second->flag))
 		{
 			WorldPacket data(SMSG_SET_FACTION_STANDING, 12);
-			data << uint32(1) << dbc->RepListId << itr->second->CalcStanding();
+			data << uint32(0) << uint32(1) << dbc->RepListId << itr->second->CalcStanding();
 			m_session->SendPacket(&data);
 		}
    }

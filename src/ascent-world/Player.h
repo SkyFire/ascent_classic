@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -426,6 +426,9 @@ struct PlayerInfo
 	uint32 lastLevel;
 	Group * m_Group;
 	int8 subGroup;
+#ifdef VOICE_CHAT
+	int8 groupVoiceId;
+#endif
 
 	Player * m_loggedInPlayer;
 	Guild * guild;
@@ -636,7 +639,7 @@ class SERVER_DECL Player : public Unit
 
 public:
 
-	Player ( uint32 high, uint32 low );
+	Player ( uint32 guid );
 	~Player ( );
 
 	ASCENT_INLINE Guild * GetGuild() { return m_playerInfo->guild; }
@@ -995,6 +998,7 @@ public:
 		memset(&mTradeItems, 0, sizeof(Item*) * 8);
 		mTradeStatus = 0;
 		mTradeTarget = 0;
+		m_tradeSequence = 2;
 	}
 	
     /************************************************************************/
@@ -1170,7 +1174,7 @@ public:
 	const uint32& GetBindZoneId( ) const { return m_bind_zoneid; }
 	ASCENT_INLINE uint8 GetShapeShift()
 	{
-		return GetByte(UNIT_FIELD_BYTES_1,2);
+		return GetByte(UNIT_FIELD_BYTES_2,3);
 	}
 
 	
@@ -1197,8 +1201,11 @@ public:
 	//Base stats calculations
 	//void CalcBaseStats();
 	// Rest
+	void AddRestXP(uint32 amount);
 	uint32 SubtractRestXP(uint32 amount);
-	void AddCalculatedRestXP(uint32 seconds);
+	uint32 CalculateRestXP(uint32 seconds);
+	uint32 m_lastRestUpdate;
+	void EventPlayerRest();
 	void ApplyPlayerRestState(bool apply);
 	void UpdateRestState();
 	bool m_noFallDamage;
@@ -1446,8 +1453,9 @@ public:
 	uint32 m_honorToday;
 	uint32 m_honorYesterday;
 	
+	void RolloverHonor();
 	uint32 m_honorPoints;
-	uint32 m_honorPointsToAdd;
+	uint32 m_honorRolloverTime;
 	uint32 m_killsToday;
 	uint32 m_killsYesterday;
 	uint32 m_killsLifetime;
@@ -1673,7 +1681,7 @@ public:
 	bool m_waterwalk;
 	bool m_setwaterwalk;
 	bool m_setflycheat;
-	uint32 m_areaspirithealer_guid;
+	uint64 m_areaSpiritHealer_guid;
 	bool m_finishingmovesdodge;
 
 	ASCENT_INLINE bool IsAttacking() {return m_attacking; }
@@ -1683,11 +1691,6 @@ public:
 
 	void CopyAndSendDelayedPacket(WorldPacket * data);
 	void PartLFGChannel();
-
-#ifdef VOICE_CHAT
-	bool m_inPartyVoice;
-	uint8 m_inPartyVoiceId;
-#endif
 
 protected:
 	LocationVector m_summonPos;
@@ -1848,6 +1851,41 @@ public:
 
 	uint32 m_speedhackCheckTimer;
 	void _SpeedhackCheck(uint32 mstime);		// save a call to getMSTime() yes i am a stingy bastard
+
+	bool m_passOnLoot;
+	uint32 m_tradeSequence;
+	bool m_changingMaps;
+
+	/************************************************************************/
+	/* SOCIAL                                                               */
+	/************************************************************************/
+private:
+	/* we may have multiple threads on this(chat) - burlex */
+	Mutex m_socialLock;
+	map<uint32, char*> m_friends;
+	set<uint32> m_ignores;
+	set<uint32> m_hasFriendList;
+
+	void Social_SendFriendList(uint32 flag);
+	
+	void Social_AddFriend(const char * name, const char * note);
+	void Social_RemoveFriend(uint32 guid);
+	
+	void Social_AddIgnore(const char * name);
+	void Social_RemoveIgnore(uint32 guid);
+
+	void Social_SetNote(uint32 guid, const char * note);
+
+public:
+	bool Social_IsIgnoring(PlayerInfo * m_info);
+	bool Social_IsIgnoring(uint32 guid);
+
+	void Social_TellFriendsOnline();
+	void Social_TellFriendsOffline();
+
+	/************************************************************************/
+	/* end social                                                           */
+	/************************************************************************/
 };
 
 class SkillIterator

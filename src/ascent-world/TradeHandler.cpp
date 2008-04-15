@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,8 +57,8 @@ void WorldSession::HandleInitiateTrade(WorldPacket & recv_data)
 		_player->ResetTradeVariables();
 		pTarget->ResetTradeVariables();
 
-		pTarget->mTradeTarget = _player->GetGUIDLow();
-		_player->mTradeTarget = pTarget->GetGUIDLow();
+		pTarget->mTradeTarget = _player->GetLowGUID();
+		_player->mTradeTarget = pTarget->GetLowGUID();
 
 		pTarget->mTradeStatus = TradeStatus;
 		_player->mTradeStatus = TradeStatus;
@@ -95,8 +95,12 @@ void WorldSession::HandleBeginTrade(WorldPacket & recv_data)
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	swap32(&TradeStatus);
 #else
-	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+/*	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
+	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);*/
+	WorldPacket data(SMSG_TRADE_STATUS, 8);
+	data << TradeStatus << uint32(0x19);
+	plr->m_session->SendPacket(&data);
+	SendPacket(&data);
 #endif
 
 	plr->mTradeStatus = TradeStatus;
@@ -391,14 +395,14 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 			// Trade Gold
 			if(pTarget->mTradeGold)
 			{
-				_player->ModUInt32Value(PLAYER_FIELD_COINAGE, pTarget->mTradeGold);
-				pTarget->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)pTarget->mTradeGold);
+				_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, pTarget->mTradeGold);
+				pTarget->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -(int32)pTarget->mTradeGold);
 			}
 
 			if(_player->mTradeGold)
 			{
-				pTarget->ModUInt32Value(PLAYER_FIELD_COINAGE, _player->mTradeGold);
-				_player->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)_player->mTradeGold);
+				pTarget->ModUnsigned32Value(PLAYER_FIELD_COINAGE, _player->mTradeGold);
+				_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -(int32)_player->mTradeGold);
 			}
 
 			// Close Window

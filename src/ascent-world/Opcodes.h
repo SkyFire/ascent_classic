@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -132,7 +132,7 @@ enum Opcodes {
 	SMSG_FRIEND_STATUS								= 104,	//(0x0068)
 	CMSG_ADD_FRIEND									= 105,	//(0x0069)
 	CMSG_DEL_FRIEND									= 106,	//(0x006A)
-	SMSG_IGNORE_LIST								= 107,	//(0x006B)
+	CMSG_SET_FRIEND_NOTE							= 107,	//(0x006B)
 	CMSG_ADD_IGNORE									= 108,	//(0x006C)
 	CMSG_DEL_IGNORE									= 109,	//(0x006D)
 	CMSG_GROUP_INVITE								= 110,	//(0x006E)
@@ -930,7 +930,10 @@ enum Opcodes {
 	MSG_GUILD_GET_FULL_PERMISSIONS					= 1020,	//(0x03FC)
 	MSG_GUILD_BANK_GET_AVAILABLE_AMOUNT				= 1021,	//(0x03FD)
 	MSG_GUILD_LOG									= 1022,	//(0x03FE)
-	NUM_MSG_TYPES									= 1023, //(0x03FF)
+	CMSG_SET_AUTO_LOOT_PASS							= 1032,	//(0x0408)
+	CMSG_INRANGE_QUESTGIVER_STATUS_QUERY			= 1046,	//(0x0416)
+	SMSG_INRANGE_QUESTGIVER_STATUS_QUERY_RESPONSE	= 1047,	//(0x0417)
+	NUM_MSG_TYPES									= 1048, //(0x0409)
 };
 
 enum FriendsResult {

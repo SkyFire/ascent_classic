@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -289,7 +289,7 @@ void Item::SaveToDB( int8 containerslot, int8 slot, bool firstsave, QueryBuffer*
 	ss << "REPLACE INTO playeritems VALUES(";
 
 	ss << m_uint32Values[ITEM_FIELD_OWNER] << ",";
-    ss << GetGUIDLow() << ",";
+    ss << m_uint32Values[OBJECT_FIELD_GUID] << ",";
 	ss << m_uint32Values[OBJECT_FIELD_ENTRY] << ",";
 	ss << wrapped_item_id << ",";
 	ss << m_uint32Values[ITEM_FIELD_GIFTCREATOR] << ",";
@@ -365,7 +365,7 @@ void Item::DeleteFromDB()
 		}
 	}
 
-	CharacterDatabase.Execute( "DELETE FROM playeritems WHERE guid = %u", GetGUIDLow() );
+	CharacterDatabase.Execute( "DELETE FROM playeritems WHERE guid = %u", m_uint32Values[OBJECT_FIELD_GUID] );
 }
 
 uint32 GetSkillByProto( uint32 Class, uint32 SubClass )
@@ -723,9 +723,9 @@ void Item::ApplyEnchantmentBonus( uint32 Slot, bool Apply )
 						val = RANDOM_SUFFIX_MAGIC_CALCULATION( RandomSuffixAmount, GetItemRandomSuffixFactor() );
 
 					if( Apply )
-						m_owner->ModUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS, val );
+						m_owner->ModUnsigned32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS, val );
 					else
-						m_owner->ModUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS, -val );
+						m_owner->ModUnsigned32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS, -val );
 					m_owner->CalcDamage();
 				}break;
 
@@ -796,7 +796,7 @@ void Item::ApplyEnchantmentBonus( uint32 Slot, bool Apply )
 							val = RANDOM_SUFFIX_MAGIC_CALCULATION( RandomSuffixAmount, GetItemRandomSuffixFactor() );
 
 						int32 value = GetProto()->Delay * val / 1000;
-						m_owner->ModUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS, value );
+						m_owner->ModUnsigned32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS, value );
 					}
 					else
 					{
@@ -805,7 +805,7 @@ void Item::ApplyEnchantmentBonus( uint32 Slot, bool Apply )
 							val = RANDOM_SUFFIX_MAGIC_CALCULATION( RandomSuffixAmount, GetItemRandomSuffixFactor() );
 
 						int32 value =- (int32)(GetProto()->Delay * val / 1000 );
-						m_owner->ModUInt32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS, value );
+						m_owner->ModUnsigned32Value( PLAYER_FIELD_MOD_DAMAGE_DONE_POS, value );
 					}
 					m_owner->CalcDamage();
 				}break;

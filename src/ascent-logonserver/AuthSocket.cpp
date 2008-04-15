@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -177,8 +177,17 @@ void AuthSocket::HandleChallenge()
 	// Null-terminate the account string
 	m_challenge.I[m_challenge.I_len] = 0;
 
-	// Look up the account information
+	// Clear the shitty hash (for server)
 	string AccountName = (char*)&m_challenge.I;
+	string::size_type i = AccountName.rfind("#");
+	if( i != string::npos )
+	{
+		printf("# ACCOUNTNAME!\n");
+		return;
+		//AccountName.erase( i );
+	}
+
+	// Look up the account information
 	sLog.outDebug("[AuthChallenge] Account Name: \"%s\"", AccountName.c_str());
 
 	m_account = AccountMgr::getSingleton().GetAccount(AccountName);
@@ -384,8 +393,8 @@ void AuthSocket::SendChallengeError(uint8 Error)
 
 void AuthSocket::SendProofError(uint8 Error, uint8 * M2)
 {
-	uint8 buffer[28];
-	memset(buffer, 0, 28);
+	uint8 buffer[32];
+	memset(buffer, 0, 32);
 
 	buffer[0] = 1;
 	buffer[1] = Error;
@@ -401,7 +410,7 @@ void AuthSocket::SendProofError(uint8 Error, uint8 * M2)
 	}
 	
 	memcpy(&buffer[2], M2, 20);
-	Send(buffer, 28);
+	Send(buffer, 32);
 }
 
 #define AUTH_CHALLENGE 0
@@ -544,6 +553,17 @@ void AuthSocket::HandleReconnectChallenge()
 
 	// Null-terminate the account string
 	m_challenge.I[m_challenge.I_len] = 0;
+
+	// Clear the shitty hash (for server)
+/*	size_t i = 0;
+	for( i = m_challenge.I_len; i >= 0; --i )
+	{
+		if( m_challenge.I[i] == '#' )
+		{
+			m_challenge.I[i] = '\0';
+			break;
+		}
+	}*/
 
 	// Look up the account information
 	string AccountName = (char*)&m_challenge.I;

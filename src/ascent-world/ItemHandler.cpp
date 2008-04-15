@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -61,8 +61,8 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 				//check if there is room on the other item.
 				if(((c + i2->GetUInt32Value(ITEM_FIELD_STACK_COUNT)) <= i2->GetProto()->MaxCount))
 				{
-					i1->ModUInt32Value(ITEM_FIELD_STACK_COUNT, -c);
-					i2->ModUInt32Value(ITEM_FIELD_STACK_COUNT, +c);
+					i1->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT, -c);
+					i2->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT, +c);
 					i1->m_isDirty = true;
 					i2->m_isDirty = true;
 				}
@@ -86,7 +86,7 @@ void WorldSession::HandleSplitOpcode(WorldPacket& recv_data)
 	{
 		if(c < (int32)i1->GetUInt32Value(ITEM_FIELD_STACK_COUNT))
 		{
-			i1->ModUInt32Value(ITEM_FIELD_STACK_COUNT,-c);
+			i1->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT,-c);
 
 			i2=objmgr.CreateItem(i1->GetEntry(),_player);
 			i2->SetUInt32Value(ITEM_FIELD_STACK_COUNT,c);
@@ -300,7 +300,7 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 			uint32 total=SrcItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT)+DstItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 			if(total<=DstItem->GetProto()->MaxCount)
 			{
-				DstItem->ModUInt32Value(ITEM_FIELD_STACK_COUNT,SrcItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT));
+				DstItem->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT,SrcItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT));
 				DstItem->m_isDirty = true;
 				bool result = _player->GetItemInterface()->SafeFullRemoveItemFromSlot(SrcInvSlot,SrcSlot);
 				if(!result)
@@ -319,7 +319,7 @@ void WorldSession::HandleSwapItemOpcode(WorldPacket& recv_data)
 				{
 					int32 delta=DstItem->GetProto()->MaxCount-DstItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
 					DstItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT,DstItem->GetProto()->MaxCount);
-					SrcItem->ModUInt32Value(ITEM_FIELD_STACK_COUNT,-delta);
+					SrcItem->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT,-delta);
 					SrcItem->m_isDirty = true;
 					DstItem->m_isDirty = true;
 					return;
@@ -839,8 +839,6 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
 	data << itemProto->Unk201_7;*/
 	data << itemProto->SocketBonus;
 	data << itemProto->GemProperties;
-	data << itemProto->ItemExtendedCost;
-	data << itemProto->ArenaRankRequirement;
 	data << itemProto->DisenchantReqSkill;
 	data << itemProto->ArmorDamageModifier;
 	//WPAssert(data.size() == 453 + itemProto->Name1.length() + itemProto->Description.length());
@@ -904,7 +902,7 @@ void WorldSession::HandleBuyBackOpcode( WorldPacket & recv_data )
 			_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, error);
 			return;
 		}
-		_player->ModUInt32Value( PLAYER_FIELD_COINAGE , -cost);
+		_player->ModUnsigned32Value( PLAYER_FIELD_COINAGE , -cost);
 		_player->GetItemInterface()->RemoveBuyBackItem(stuff);
 
 		if (!add)
@@ -965,7 +963,7 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	Creature *unit = _player->GetMapMgr()->GetCreature((uint32)vendorguid);
+	Creature *unit = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(vendorguid));
 	// Check if Vendor exists
 	if (unit == NULL)
 	{
@@ -1016,7 +1014,7 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
 	
 	uint32 price = GetSellPriceForItem(it, quantity);
 
-	_player->ModUInt32Value(PLAYER_FIELD_COINAGE,price);
+	_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE,price);
  
 	if(quantity < stackcount)
 	{
@@ -1068,7 +1066,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 	if( _player->isCasting() )
 		_player->InterruptSpell();
 
-	Creature* unit = _player->GetMapMgr()->GetCreature( ( uint32 )srcguid );
+	Creature* unit = _player->GetMapMgr()->GetCreature( GET_LOWGUID_PART(srcguid) );
 	if( unit == NULL || !unit->HasItems() )
 		return;
 
@@ -1183,7 +1181,7 @@ void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data ) // drag 
 			return;
 		}
 
-		oldItem->ModUInt32Value(ITEM_FIELD_STACK_COUNT, count_per_stack);
+		oldItem->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT, count_per_stack);
 		oldItem->m_isDirty = true;
 		pItem=oldItem;
 	}
@@ -1259,7 +1257,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	recv_data >> amount >> slot;
 
 
-	Creature *unit = _player->GetMapMgr()->GetCreature((uint32)srcguid);
+	Creature *unit = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(srcguid));
 	if (unit == NULL || !unit->HasItems())
 		return;
 
@@ -1355,7 +1353,7 @@ void WorldSession::HandleBuyItemOpcode( WorldPacket & recv_data ) // right-click
 	}
 	else
 	{
-		add->ModUInt32Value(ITEM_FIELD_STACK_COUNT, amount*item.amount);
+		add->ModUnsigned32Value(ITEM_FIELD_STACK_COUNT, amount*item.amount);
 		add->m_isDirty = true;
 		SendItemPushResult(add, false, true, false, false, _player->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()), 1, amount*item.amount);
 	}
@@ -1386,7 +1384,7 @@ void WorldSession::HandleListInventoryOpcode( WorldPacket & recv_data )
 
 	recv_data >> guid;
 
-	Creature *unit = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *unit = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if (unit == NULL)
 		return;
 
@@ -1431,9 +1429,13 @@ void WorldSession::SendInventoryList(Creature* unit)
 				data << curItem->DisplayInfoID;
 				data << av_am;
 				data << GetBuyPriceForItem(curItem, 1, _player, unit);
-				data << uint32(0x00);
-				data << (int16)itr->amount;
-				data << uint16(0x00);
+				data << int32(-1);			// wtf is dis?
+				data << itr->amount;
+
+				if( curItem->extended_cost != NULL )
+					data << curItem->extended_cost->costid;
+				else
+					data << uint32(0);
 
 				++counter;
 			}
@@ -1620,7 +1622,7 @@ ASCENT_INLINE void RepairItem(Player * pPlayer, Item * pItem)
 	if( cost > (int32)pPlayer->GetUInt32Value( PLAYER_FIELD_COINAGE ) )
 		return;
 
-	pPlayer->ModUInt32Value( PLAYER_FIELD_COINAGE, -cost );
+	pPlayer->ModUnsigned32Value( PLAYER_FIELD_COINAGE, -cost );
 	pItem->SetDurabilityToMax();
 	pItem->m_isDirty = true;
 }
@@ -1641,7 +1643,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 
 	recvPacket >> npcguid >> itemguid;
 
-	Creature * pCreature = _player->GetMapMgr()->GetCreature( (uint32)npcguid );
+	Creature * pCreature = _player->GetMapMgr()->GetCreature( GET_LOWGUID_PART(npcguid) );
 	if( pCreature == NULL )
 		return;
 
@@ -1694,7 +1696,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket &recvPacket)
 				if (dDurability <= _player->GetUInt32Value(PLAYER_FIELD_COINAGE))
 				{
 					int32 cDurability = item->GetDurability();
-					_player->ModUInt32Value( PLAYER_FIELD_COINAGE , -(int32)dDurability );
+					_player->ModUnsigned32Value( PLAYER_FIELD_COINAGE , -(int32)dDurability );
 					item->SetDurabilityToMax();
 					item->m_isDirty = true;
 					
@@ -1731,7 +1733,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPacket& recvPacket)
 	if ((int32)_player->GetUInt32Value(PLAYER_FIELD_COINAGE) >= price) 
 	{
 	   _player->SetUInt32Value(PLAYER_BYTES_2, (bytes&0xff00ffff) | ((slots+1) << 16) );
-	   _player->ModUInt32Value(PLAYER_FIELD_COINAGE, -price);
+	   _player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -price);
 	}
 }
 
@@ -2038,7 +2040,7 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 	else
 	{
 		// reduce stack count by one
-		src->ModUInt32Value( ITEM_FIELD_STACK_COUNT, -1 );
+		src->ModUnsigned32Value( ITEM_FIELD_STACK_COUNT, -1 );
 		src->m_isDirty = true;
 	}
 
@@ -2047,7 +2049,7 @@ void WorldSession::HandleWrapItemOpcode( WorldPacket& recv_data )
 	dst->SetUInt32Value( OBJECT_FIELD_ENTRY, itemid );
 
 	// set the giftwrapper fields
-	dst->SetUInt32Value( ITEM_FIELD_GIFTCREATOR, _player->GetGUIDLow() );
+	dst->SetUInt32Value( ITEM_FIELD_GIFTCREATOR, _player->GetLowGUID() );
 	dst->SetUInt32Value( ITEM_FIELD_DURABILITY, 0 );
 	dst->SetUInt32Value( ITEM_FIELD_MAXDURABILITY, 0 );
 	dst->SetUInt32Value( ITEM_FIELD_FLAGS, 0x8008 );

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -47,6 +47,7 @@ class WorldSession;
 #endif
 
 extern SERVER_DECL time_t UNIXTIME;		/* update this every loop to avoid the time() syscall! */
+extern SERVER_DECL tm g_localTime;
 #define LOG_USE_MUTEX
 
 class SERVER_DECL CLog : public Singleton< CLog >
@@ -96,8 +97,9 @@ public:
 
 	ASCENT_INLINE void Time()
 	{
-        tm * t = localtime(&UNIXTIME);
-		printf("%02u:%02u ", t->tm_hour, t->tm_min);
+        /*tm * t = localtime(&UNIXTIME);
+		printf("%02u:%02u ", t->tm_hour, t->tm_min);*/
+		printf("%02u:%02u ", g_localTime.tm_hour, g_localTime.tm_min);
 	}
 
 	void Notice(const char * source, const char * format, ...)

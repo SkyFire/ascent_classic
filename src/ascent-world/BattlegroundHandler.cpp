@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -61,7 +61,7 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recv_data)
 	recv_data >> guid;
 
 	CHECK_INWORLD_RETURN;
-	Creature * pCreature = _player->GetMapMgr()->GetCreature( (uint32)guid );
+	Creature * pCreature = _player->GetMapMgr()->GetCreature( GET_LOWGUID_PART(guid) );
 	if( pCreature == NULL )
 		return;
 
@@ -105,7 +105,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket &recv_data)
 	uint64 guid;
 	recv_data >> guid;
 
-	Creature * psg = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * psg = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(psg == NULL)
 		return;
 	
@@ -125,7 +125,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket &recv_data)
 	if(!_player->IsInWorld() || !_player->m_bg) return;
 	uint64 guid;
 	recv_data >> guid;
-	Creature * psg = _player->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * psg = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(psg == NULL)
 		return;
 

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -27,7 +27,7 @@ enum LFGTypes
 	LFG_HEROIC_DUNGEON = 5, // from client
 };
 
-#define MAX_DUNGEONS 197+1 // check max entrys +1 on lfgdungeons.dbc
+#define MAX_DUNGEONS 201+1 // check max entrys +1 on lfgdungeons.dbc
 #define MAX_LFG_QUEUE_ID 3
 #define LFG_MATCH_TIMEOUT 30		// in seconds
 

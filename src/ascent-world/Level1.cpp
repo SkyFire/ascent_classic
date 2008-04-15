@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,24 +25,16 @@
 
 bool ChatHandler::HandleAnnounceCommand(const char* args, WorldSession *m_session)
 {
-	if(!*args)
-		return false;
+	if( !*args || strlen(args) < 4 || strchr(args, '%'))
+	{
+		m_session->SystemMessage("Announces cannot contain the %% character and must be at least 4 characters.");
+		return true;
+	}
 
-	char pAnnounce[1024];
-	string input2;
-
-	input2 = "|cffff6060<";
-	//if (m_session->GetPermissionCount())   input2+="GM";
-	if(m_session->CanUseCommand('z')) input2+="Admin";
-	else if(m_session->GetPermissionCount()) input2+="GM";
-	input2+=">|r|c1f40af20";
-	input2+=m_session->GetPlayer()->GetName();
-	input2+="|r|cffffffff broadcasts: |r";
-	snprintf((char*)pAnnounce, 1024, "%s%s", input2.c_str(), args);   // Adds BROADCAST:
-	sWorld.SendWorldText(pAnnounce); // send message
+	char msg[1024];
+	snprintf(msg, 1024, "[Server Notice]"MSG_COLOR_GREEN" %s:"MSG_COLOR_WHITE" %s", m_session->GetPlayer()->GetName(), args);
+	sWorld.SendWorldText(msg); // send message
 	sGMLog.writefromsession(m_session, "used announce command, [%s]", args);
-
-	//sWorld.SendForcedIRCMessage(pAnnounce);
 	return true;
 }
 
@@ -288,8 +280,7 @@ bool ChatHandler::HandleSummonCommand(const char* args, WorldSession *m_session)
 	}
 	else
 	{
-		std::string name = args;
-		PlayerInfo * pinfo = objmgr.GetPlayerInfoByName(name);
+		PlayerInfo * pinfo = objmgr.GetPlayerInfoByName(args);
 		if(!pinfo)
 		{
 			char buf[256];
@@ -618,7 +609,7 @@ bool ChatHandler::HandleModifyGoldCommand(const char* args, WorldSession *m_sess
 {
 //	WorldPacket data;
 
-	if ( *args == NULL )
+	if ( *args == 0 )
 		return false;
 
 	Player *chr = getSelectedChar( m_session, true );
@@ -730,7 +721,7 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 {
 	uint32 id;
 	char sql[512];
-	Creature* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
+	Creature* target = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(m_session->GetPlayer()->GetSelection()));
 	if (!target)
 		return false;
 

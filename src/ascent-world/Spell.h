@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -511,6 +511,17 @@ enum School
     SCHOOL_FROST  = 4,
     SCHOOL_SHADOW = 5,
     SCHOOL_ARCANE = 6
+};
+
+// converting schools for 2.4.0 client
+static const uint32 g_spellSchoolConversionTable[SCHOOL_ARCANE+1] = {
+	1,				// SCHOOL_NORMAL
+	2,				// SCHOOL_HOLY
+	4,				// SCHOOL_FIRE
+	8,				// SCHOOL_NATURE
+	16,				// SCHOOL_FROST
+	32,				// SCHOOL_SHADOW
+	64,				// SCHOOL_ARCANE
 };
 
 enum ReplenishType
@@ -1249,17 +1260,17 @@ public:
     void read ( WorldPacket & data,uint64 caster );
     void write ( WorldPacket & data);
 
-    SpellCastTargets() : m_targetMask(0), m_unitTarget(0), m_itemTarget(0), m_srcX(0), m_srcY(0), m_srcZ(0),
+    SpellCastTargets() : m_targetMask(0), m_targetMaskExtended(0), m_unitTarget(0), m_itemTarget(0), m_srcX(0), m_srcY(0), m_srcZ(0),
         m_destX(0), m_destY(0), m_destZ(0) {}
 
     SpellCastTargets(uint16 TargetMask, uint64 unitTarget, uint64 itemTarget, float srcX, float srcY,
-        float srcZ, float destX, float destY, float destZ) : m_targetMask(TargetMask), m_unitTarget(unitTarget),
+        float srcZ, float destX, float destY, float destZ) : m_targetMask(TargetMask), m_targetMaskExtended(0), m_unitTarget(unitTarget),
         m_itemTarget(itemTarget), m_srcX(srcX), m_srcY(srcY), m_srcZ(srcZ), m_destX(destX), m_destY(destY), m_destZ(destZ) {}
 
-    SpellCastTargets(uint64 unitTarget) : m_targetMask(0x2), m_unitTarget(unitTarget), m_itemTarget(0),
+    SpellCastTargets(uint64 unitTarget) : m_targetMask(0x2), m_targetMaskExtended(0), m_unitTarget(unitTarget), m_itemTarget(0),
         m_srcX(0), m_srcY(0), m_srcZ(0), m_destX(0), m_destY(0), m_destZ(0) {}
 
-    SpellCastTargets(WorldPacket & data, uint64 caster) : m_targetMask(0), m_unitTarget(0), m_itemTarget(0), m_srcX(0), m_srcY(0), m_srcZ(0),
+    SpellCastTargets(WorldPacket & data, uint64 caster) : m_targetMask(0), m_targetMaskExtended(0), m_unitTarget(0), m_itemTarget(0), m_srcX(0), m_srcY(0), m_srcZ(0),
         m_destX(0), m_destY(0), m_destZ(0)
     {
         read(data, caster);
@@ -1281,11 +1292,13 @@ public:
         m_strTarget = target.m_strTarget;
 
         m_targetMask = target.m_targetMask;
+	m_targetMaskExtended = target.m_targetMaskExtended;
 
         return *this;
     }
 
     uint16 m_targetMask;
+    uint16 m_targetMaskExtended;			// this could be a 32 also
     uint64 m_unitTarget;
     uint64 m_itemTarget;
     float m_srcX, m_srcY, m_srcZ;
@@ -1968,6 +1981,7 @@ protected:
     float       Rad[3];
     bool        bRadSet[3];
 	bool        m_cancelled;
+	bool m_isCasting;
     //void _DamageRangeUpdate();
 
 	ASCENT_INLINE bool HasTarget(const uint64& guid, TargetsList* tmpMap)

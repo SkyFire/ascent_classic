@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -81,7 +81,8 @@ struct SpellEntry;
 struct TrainerSpell
 {
 	SpellEntry * pCastSpell;
-	SpellEntry * pRealSpell;
+	SpellEntry * pLearnSpell;
+	SpellEntry * pCastRealSpell;
 	uint32	DeleteSpell;
 	uint32	RequiredSpell;
 	uint32	RequiredSkillLine;
@@ -270,6 +271,38 @@ typedef std::map<uint32, std::list<SpellEntry*>* >                  OverrideIdMa
 typedef HM_NAMESPACE::hash_map<uint32, Player*>                     PlayerStorageMap;
 typedef std::list<GM_Ticket*>                                       GmTicketList;
 
+#ifndef WIN32
+#define ASCENT_USE_MAP_PLAYER_INDEX
+#ifdef ASCENT_USE_MAP_PLAYER_INDEX
+
+// you can use the string map (slower)
+typedef map<string, PlayerInfo*> PlayerNameStringIndexMap;
+
+
+#else			// or
+
+// gcc has no default hash for string type,
+// so we have to make an explicit hash template here
+template<>
+struct __gnu_cxx::hash<string>
+{
+	size_t operator()(string& tbh) const
+	{
+		// simple crc32 hash for now, we may need to change this later however
+		return size_t( crc32( (const unsigned char*)tbh.c_str(), tbh.length() ) );
+	}
+}
+
+typedef HM_NAMESPACE::hash_map<string, PlayerInfo*> PlayerNameStringIndexMap;
+
+#endif
+#else
+
+// vc++ has the type for a string hash already, so we don't need to do anything special
+typedef HM_NAMESPACE::hash_map<string, PlayerInfo*> PlayerNameStringIndexMap;
+
+#endif
+
 class SERVER_DECL ObjectMgr : public Singleton < ObjectMgr >, public EventableObject
 {
 public:
@@ -359,12 +392,15 @@ public:
 		m_groupLock.ReleaseWriteLock();
 	}
 
+	void GroupVoiceReconnected();
+
 	void LoadGroups();
 
 	// player names
 	void AddPlayerInfo(PlayerInfo *pn);
 	PlayerInfo *GetPlayerInfo(uint32 guid );
-	PlayerInfo *GetPlayerInfoByName(std::string & name);
+	PlayerInfo *GetPlayerInfoByName(const char * name);
+	void RenamePlayerInfo(PlayerInfo * pn, const char * oldname, const char * newname);
 	void DeletePlayerInfo(uint32 guid);
 	PlayerCreateInfo* GetPlayerCreateInfo(uint8 race, uint8 class_) const;
 
@@ -470,7 +506,6 @@ public:
 	set<SpellEntry*>* GetDefaultPetSpells(uint32 Entry);
 	uint32 GetPetSpellCooldown(uint32 SpellId);
 	void LoadPetSpellCooldowns();
-	void LoadSpellFixes();
 	WayPointMap * GetWayPointMap(uint32 spawnid);
 	void LoadSpellOverride();
 
@@ -558,6 +593,7 @@ protected:
 
 	uint64 TransportersCount;
 	HM_NAMESPACE::hash_map<uint32,PlayerInfo*> m_playersinfo;
+	PlayerNameStringIndexMap m_playersInfoByName;
 	
 	HM_NAMESPACE::hash_map<uint32,WayPointMap*> m_waypoints;//stored by spawnid
 	uint32 m_hiCreatureSpawnId;

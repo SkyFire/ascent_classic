@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -389,7 +389,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/* Anti-Teleport                                                        */
 		/************************************************************************/
 		if(sWorld.antihack_teleport && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 5625.0f
-			&& _player->m_runSpeed < 50.0f)
+			&& _player->m_runSpeed < 50.0f && !_player->m_TransporterGUID)
 		{
 			sCheatLog.writefromsession(this, "Used teleport hack {3}, speed was %f", _player->m_runSpeed);
 			Disconnect();
@@ -602,6 +602,14 @@ void WorldSession::HandleSetActiveMoverOpcode( WorldPacket & recv_data )
 
 	if(guid != m_MoverWoWGuid.GetOldGuid())
 	{
+		// make sure the guid is valid and we aren't cheating
+		if( !(_player->m_CurrentCharm && _player->m_CurrentCharm->GetGUID() == guid) &&
+			!(_player->GetGUID() == guid) )
+		{
+			// cheater!
+			return;
+		}
+
 		// generate wowguid
 		if(guid != 0)
 			m_MoverWoWGuid.Init(guid);

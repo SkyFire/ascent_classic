@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -178,6 +178,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_ENTERCOMBAT:
 			{
 				if( pUnit == NULL ) return;
+
 				/* send the message */
 				if( m_Unit->GetTypeId() == TYPEID_UNIT )
 				{
@@ -263,7 +264,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 					UnitToFollow = m_PetOwner;
 					FollowDistance = 3.0f;
 					m_lastFollowX = m_lastFollowY = 0;
-					if(m_Unit->GetGUIDHigh() == HIGHGUID_PET)
+					if(m_Unit->IsPet())
 					{
 						((Pet*)m_Unit)->SetPetAction(PET_ACTION_FOLLOW);
 						if( m_Unit->GetEntry() == 416 && m_Unit->isAlive() && m_Unit->IsInWorld() )
@@ -334,7 +335,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_FOLLOWOWNER:
 			{
 				m_AIState = STATE_FOLLOWING;
-				if(m_Unit->GetGUIDHigh() == HIGHGUID_PET)
+				if(m_Unit->IsPet())
 					((Pet*)m_Unit)->SetPetAction(PET_ACTION_FOLLOW);
 				UnitToFollow = m_PetOwner;
 				m_lastFollowX = m_lastFollowY = 0;
@@ -367,8 +368,6 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				FollowDistance = 0.0f;
 
 				m_aiTargets.clear(); // we'll get a new target after we are unfeared
-				// No we won't...
-
 				m_fleeTimer = 0;
 				m_hasFleed = false;
 				m_hasCalledForHelp = false;
@@ -547,7 +546,7 @@ void AIInterface::Update(uint32 p_time)
 	{
 		if(m_AIType == AITYPE_PET )
 		{
-			if(!m_Unit->bInvincible && m_Unit->GetGUIDHigh() == HIGHGUID_PET) 
+			if(!m_Unit->bInvincible && m_Unit->IsPet()) 
 			{
 				Pet * pPet = static_cast<Pet*>(m_Unit);
 	
@@ -557,7 +556,7 @@ void AIInterface::Update(uint32 p_time)
 				}
 			}
 			//we just use any creature as a pet guardian
-			else if(m_Unit->GetGUIDHigh() != HIGHGUID_PET)
+			else if(!m_Unit->IsPet())
 			{
 				_UpdateCombat(p_time);
 			}
@@ -597,6 +596,21 @@ void AIInterface::Update(uint32 p_time)
 			// Set health to full if they at there last location before attacking
 			if(m_AIType != AITYPE_PET&&!skip_reset_hp)
 				m_Unit->SetUInt32Value(UNIT_FIELD_HEALTH,m_Unit->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
+		}
+		else
+		{
+			if( m_creatureState == STOPPED )
+			{
+				// return to the home
+				if( m_returnX == 0.0f && m_returnY == 0.0f )
+				{
+					m_returnX = m_Unit->GetSpawnX();
+					m_returnY = m_Unit->GetSpawnY();
+					m_returnZ = m_Unit->GetSpawnZ();
+				}
+
+				MoveTo(m_returnX, m_returnY, m_returnZ, m_Unit->GetSpawnO());
+			}
 		}
 	}
 
@@ -663,11 +677,11 @@ void AIInterface::_UpdateTargets()
 	// Find new Assist Targets and remove old ones
 	if(m_AIState == STATE_FLEEING)
 	{
-		FindFriends(225.0f/*15.0*/);
+		FindFriends(100.0f/*10.0*/);
 	}
 	else if(m_AIState != STATE_IDLE && m_AIState != STATE_SCRIPTIDLE)
 	{
-		FindFriends(64.0f/*8.0f*/);
+		FindFriends(16.0f/*4.0f*/);
 	}
 
 	if( m_updateAssist )
@@ -751,7 +765,7 @@ void AIInterface::_UpdateTargets()
 				HandleEvent(EVENT_LEAVECOMBAT, m_Unit, 0);
 			}*/
 		}
-		else if( m_aiTargets.size() == 0 && (m_AIType == AITYPE_PET && (m_Unit->GetGUIDHigh() == HIGHGUID_PET && static_cast<Pet*>(m_Unit)->GetPetState() == PET_STATE_AGGRESSIVE) || (m_Unit->GetGUIDHigh() != HIGHGUID_PET && disable_melee == false ) ) )
+		else if( m_aiTargets.size() == 0 && (m_AIType == AITYPE_PET && (m_Unit->IsPet() && static_cast<Pet*>(m_Unit)->GetPetState() == PET_STATE_AGGRESSIVE) || (!m_Unit->IsPet() && disable_melee == false ) ) )
 		{
 			 Unit* target = FindTarget();
 			 if( target )
@@ -1096,7 +1110,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 						m_nextSpell->cooldowntime = getMSTime() + m_nextSpell->cooldown;
 
 					//add pet spell after use to pet owner with some chance
-					if(m_Unit->GetGUIDHigh() == HIGHGUID_PET && m_PetOwner->IsPlayer())
+					if(m_Unit->IsPet() && m_PetOwner->IsPlayer())
 					{	
 						Pet * pPet = static_cast<Pet*>(m_Unit);
 						if(pPet && Rand(10))
@@ -1328,9 +1342,9 @@ Unit* AIInterface::FindTarget()
 	float crange;
 	float z_diff;
 #ifdef LOS_CHECKS
+#ifdef LOS_ONLY_IN_INSTANCE
 	bool los = true;
 	bool check_los = true;
-#ifdef LOS_ONLY_IN_INSTANCE
 	if( m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_NULL )
 		check_los = false;
 #endif
@@ -1638,7 +1652,7 @@ bool AIInterface::FindFriends(float dist)
 			if(!isHostile(*hostileItr, m_Unit))
 				continue;
 
-			Creature * guard = m_Unit->GetMapMgr()->CreateCreature();
+			Creature * guard = m_Unit->GetMapMgr()->CreateCreature(guardid);
 			guard->Load(cp, x, y, z);
 			guard->SetInstanceID(m_Unit->GetInstanceID());
 			guard->SetZoneId(m_Unit->GetZoneId());
@@ -2240,7 +2254,7 @@ bool AIInterface::showWayPoints(Player* pPlayer, bool Backwards)
 			wp = *itr;
 
 			//Create
-			Creature* pWayPoint = new Creature(HIGHGUID_WAYPOINT ,wp->id);
+			Creature* pWayPoint = new Creature((uint64)HIGHGUID_TYPE_WAYPOINT << 32 | wp->id);
 			pWayPoint->CreateWayPoint(wp->id,pPlayer->GetMapId(),wp->x,wp->y,wp->z,0);
 			pWayPoint->SetUInt32Value(OBJECT_FIELD_ENTRY, 300000);
 			pWayPoint->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.5f);
@@ -2300,7 +2314,7 @@ bool AIInterface::hideWayPoints(Player* pPlayer)
 		if( (*itr) != NULL )
 		{
 			// avoid C4293
-			guid = ((uint64)HIGHGUID_WAYPOINT << 32) | (*itr)->id;
+			guid = ((uint64)HIGHGUID_TYPE_WAYPOINT << 32) | (*itr)->id;
 			WoWGuid wowguid(guid);
 			pPlayer->PushOutOfRange(wowguid);
 		}
@@ -2932,7 +2946,7 @@ AI_Spell *AIInterface::getSpell()
 	uint32 cool_time2;
 	uint32 nowtime = getMSTime();
 
-	if(m_Unit->GetGUIDHigh() == HIGHGUID_PET)
+	if(m_Unit->IsPet())
 	{
 		sp = def_spell = ((Pet*)m_Unit)->HandleAutoCastEvent();
 	}
@@ -3122,12 +3136,8 @@ Unit *AIInterface::GetMostHated()
 			continue;
 		}
 #endif
-		// you must exceed 10% of the tank's threat to gain aggro in melee range
-		float threat_threshold = 1.1f;
-		// or 30% if outside melee range
-		if( currentTarget.first != NULL && currentTarget.first->isInRange( itr->first , 5.0f ) )
-		threat_threshold = 1.3f;
-		if((itr->second + itr->first->GetThreatModifyer()) > currentTarget.second * (int32)threat_threshold )
+
+		if((itr->second + itr->first->GetThreatModifyer()) > currentTarget.second)
 		{
 			/* new target */
 			currentTarget.first = itr->first;

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -219,7 +219,7 @@ void LfgMgr::UpdateLfgQueue(uint32 LfgDungeonId)
 				// found a group for him, lets insert him.
 				if((*itr)->GetGroup()->AddMember((*it2)->m_playerInfo))
 				{
-					(*it2)->m_lfgInviterGuid = (*itr)->GetGUIDLow();
+					(*it2)->m_lfgInviterGuid = (*itr)->GetLowGUID();
 
 					it3 = it2;
 					++it2;

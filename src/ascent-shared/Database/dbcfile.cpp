@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -122,7 +122,7 @@ int DBCFile::AddRecord() //simply add an empty record to the end of the data sec
 		//the dbc file is not yet opened
 		printf(" Error : adding record to an unopened DBC file\n");
 		recordCount = 0;
-		return NULL;
+		return 0;
 	}
 
 	//seems like an error ocured
@@ -130,7 +130,7 @@ int DBCFile::AddRecord() //simply add an empty record to the end of the data sec
 	{
 		printf(" Error : Could not resize DBC data partition\n");
 		recordCount = 0;
-		return NULL;
+		return 0;
 	}
 
 	return (recordCount - 1);
@@ -151,7 +151,7 @@ int DBCFile::AddString(const char *new_string) //simply add an empty record to t
 		//the dbc file is not yet opened
 		printf(" Error : adding string to an unopened DBC file\n");
 		stringSize = 0;
-		return NULL;
+		return 0;
 	}
 
 	//seems like an error ocured
@@ -159,7 +159,7 @@ int DBCFile::AddString(const char *new_string) //simply add an empty record to t
 	{
 		printf(" Error : Could not resize DBC string partition\n");
 		stringSize = 0;
-		return NULL;
+		return 0;
 	}
 
 	memcpy( stringTable + stringSize, new_string, new_str_len );

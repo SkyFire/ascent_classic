@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -82,7 +82,7 @@ uint32 MapScriptInterface::GetPlayerCountInRadius(float x, float y, float z /* =
 GameObject* MapScriptInterface::SpawnGameObject(uint32 Entry, float cX, float cY, float cZ, float cO, bool AddToWorld, uint32 Misc1, uint32 Misc2)
 {
    
-	GameObject *pGameObject = mapMgr.CreateGameObject();
+	GameObject *pGameObject = mapMgr.CreateGameObject(Entry);
 	if(!pGameObject->CreateFromProto(Entry, mapMgr.GetMapId(), cX, cY, cZ, cO))
 	{
 		delete pGameObject;
@@ -123,7 +123,7 @@ Creature* MapScriptInterface::SpawnCreature(uint32 Entry, float cX, float cY, fl
 	sp->stand_state = 0;
 	sp->channel_spell=sp->channel_target_creature=sp->channel_target_go=0;
 
-	Creature * p = this->mapMgr.CreateCreature();
+	Creature * p = this->mapMgr.CreateCreature(Entry);
 	ASSERT(p);
 	p->Load(sp, (uint32)NULL, NULL);
 	p->spawnid = 0;

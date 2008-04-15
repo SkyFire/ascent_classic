@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -96,6 +96,7 @@ public:
 	uint16 i_voice_channel_id;
 	MemberMap m_VoiceMembers;
 #endif
+	uint32 m_minimumLevel;
 public:
 	Channel(const char * name, uint32 team, uint32 type_id);
 	~Channel();

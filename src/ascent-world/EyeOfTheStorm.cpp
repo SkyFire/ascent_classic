@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -178,7 +178,7 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 		return;
 
 	uint32 team = plr->GetTeam();
-	if( plr->GetGUIDLow() != m_flagHolder )
+	if( plr->GetLowGUID() != m_flagHolder )
 		return;
 
 	int32 val;
@@ -238,7 +238,7 @@ void EyeOfTheStorm::HookFlagDrop(Player * plr, GameObject * obj)
 	SetWorldState( 2757, 0 );
 	PlaySoundToAll( 8212 );
 	SendChatMessage( 0x53, plr->GetGUID(), "$n has taken the flag!" );
-	m_flagHolder = plr->GetGUIDLow();
+	m_flagHolder = plr->GetLowGUID();
 
 	event_RemoveEvents( EVENT_EOTS_RESET_FLAG );
 }
@@ -259,13 +259,13 @@ bool EyeOfTheStorm::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell *
 	SetWorldState( 2757, 0 );
 	PlaySoundToAll( 8212 );
 	SendChatMessage( 0x53, pPlayer->GetGUID(), "$n has taken the flag!" );
-	m_flagHolder = pPlayer->GetGUIDLow();
+	m_flagHolder = pPlayer->GetLowGUID();
 	return true;
 }
 
 void EyeOfTheStorm::HookOnMount(Player * plr)
 {
-	if( m_flagHolder == plr->GetGUIDLow() )
+	if( m_flagHolder == plr->GetLowGUID() )
 	{
 		plr->RemoveAura( EOTS_NETHERWING_FLAG_SPELL );
 		//DropFlag( plr );
@@ -286,7 +286,7 @@ void EyeOfTheStorm::OnRemovePlayer(Player * plr)
 		m_CPDisplay[i].erase( plr );
 	}
 
-	if( m_flagHolder == plr->GetGUIDLow() )
+	if( m_flagHolder == plr->GetLowGUID() )
 	{
 		plr->RemoveAura( EOTS_NETHERWING_FLAG_SPELL );
 		//DropFlag( plr );
@@ -295,7 +295,7 @@ void EyeOfTheStorm::OnRemovePlayer(Player * plr)
 
 void EyeOfTheStorm::DropFlag(Player * plr)
 {
-	if( m_flagHolder != plr->GetGUIDLow() )
+	if( m_flagHolder != plr->GetLowGUID() )
 		return;
 
 	m_dropFlag->SetPosition( plr->GetPosition() );
@@ -379,7 +379,7 @@ void EyeOfTheStorm::OnCreate()
 			return;
 		}
 
-		m_CPStatusGO[i] = m_mapMgr->CreateGameObject();
+		m_CPStatusGO[i] = m_mapMgr->CreateGameObject(goi->ID);
 		m_CPStatusGO[i]->CreateFromProto( goi->ID, m_mapMgr->GetMapId(), EOTSCPLocations[i][0], EOTSCPLocations[i][1], EOTSCPLocations[i][2], 0);
 		m_CPStatusGO[i]->PushToWorld( m_mapMgr );
 
@@ -391,7 +391,7 @@ void EyeOfTheStorm::OnCreate()
 			return;
 		}
 
-		m_CPBanner[i] = m_mapMgr->CreateGameObject();
+		m_CPBanner[i] = m_mapMgr->CreateGameObject(goi->ID);
 		m_CPBanner[i]->CreateFromProto( goi->ID, m_mapMgr->GetMapId(), EOTSCPLocations[i][0], EOTSCPLocations[i][1], EOTSCPLocations[i][2], 0);
 		m_CPBanner[i]->PushToWorld( m_mapMgr );
 	}
@@ -399,7 +399,7 @@ void EyeOfTheStorm::OnCreate()
 	/* BUBBLES! */
 	for( i = 0; i < 2; ++i )
 	{
-		m_bubbles[i] = m_mapMgr->CreateGameObject();
+		m_bubbles[i] = m_mapMgr->CreateGameObject(184719);
 		if( !m_bubbles[i]->CreateFromProto( 184719, m_mapMgr->GetMapId(), EOTSBubbleLocations[i][0], EOTSBubbleLocations[i][1], EOTSBubbleLocations[i][2], EOTSBubbleLocations[i][3] ) )
 		{
 			m_bubbles[i]->SetFloatValue(OBJECT_FIELD_SCALE_X,0.1f);
@@ -414,14 +414,14 @@ void EyeOfTheStorm::OnCreate()
 	}
 
 	/* Flag */
-	m_standFlag = m_mapMgr->CreateGameObject();
+	m_standFlag = m_mapMgr->CreateGameObject(184141);
 	m_standFlag->CreateFromProto( 184141, m_mapMgr->GetMapId(), 2174.782227f, 1569.054688f, 1160.361938f, -1.448624f );
 	m_standFlag->SetFloatValue( GAMEOBJECT_ROTATION_02, 0.662620f );
 	m_standFlag->SetFloatValue( GAMEOBJECT_ROTATION_03, -0.748956f );
 	m_standFlag->SetFloatValue( OBJECT_FIELD_SCALE_X, 2.5f );
 	m_standFlag->PushToWorld( m_mapMgr );
 
-	m_dropFlag = m_mapMgr->CreateGameObject();
+	m_dropFlag = m_mapMgr->CreateGameObject(184142);
 	m_dropFlag->CreateFromProto( 184142, m_mapMgr->GetMapId(), 2174.782227f, 1569.054688f, 1160.361938f, -1.448624f );
 	m_dropFlag->SetFloatValue( GAMEOBJECT_ROTATION_02, 0.885448f );
 	m_dropFlag->SetFloatValue( GAMEOBJECT_ROTATION_03, -0.464739f );

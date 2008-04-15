@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,7 @@ createFileSingleton(CLog);
 initialiseSingleton( WorldLog );
 
 SERVER_DECL time_t UNIXTIME;
+SERVER_DECL tm g_localTime;
 #ifndef WIN32
 static const char* colorstrings[TBLUE+1] = {
 "",

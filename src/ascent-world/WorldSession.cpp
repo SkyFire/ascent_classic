@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -250,10 +250,10 @@ void WorldSession::LogoutPlayer(bool Save)
 				switch( obj->GetTypeId() )
 				{
 				case TYPEID_UNIT:
-					static_cast< Creature* >( obj )->loot.looters.erase( _player->GetGUIDLow() );
+					static_cast< Creature* >( obj )->loot.looters.erase( _player->GetLowGUID() );
 					break;
 				case TYPEID_GAMEOBJECT:
-					static_cast< GameObject* >( obj )->loot.looters.erase( _player->GetGUIDLow() );
+					static_cast< GameObject* >( obj )->loot.looters.erase( _player->GetLowGUID() );
 					break;
 				}
 			}
@@ -269,7 +269,7 @@ void WorldSession::LogoutPlayer(bool Save)
 		if( _player->m_currentSpell != NULL )
 			_player->m_currentSpell->cancel();
 
-		sSocialMgr.LoggedOut( _player );
+		_player->Social_TellFriendsOffline();
 
 		if( _player->GetTeam() == 1 )
 		{
@@ -577,6 +577,7 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_ADD_IGNORE].handler								= &WorldSession::HandleAddIgnoreOpcode;
 	WorldPacketHandlers[CMSG_DEL_IGNORE].handler								= &WorldSession::HandleDelIgnoreOpcode;
 	WorldPacketHandlers[CMSG_BUG].handler									   = &WorldSession::HandleBugOpcode;
+	WorldPacketHandlers[CMSG_SET_FRIEND_NOTE].handler							= &WorldSession::HandleSetFriendNote;
 	
 	// Areatrigger
 	WorldPacketHandlers[CMSG_AREATRIGGER].handler							   = &WorldSession::HandleAreaTriggerOpcode;
@@ -884,6 +885,12 @@ void WorldSession::InitPacketHandlerTable()
 	WorldPacketHandlers[CMSG_ENABLE_MICROPHONE].handler = &WorldSession::HandleEnableMicrophoneOpcode;
 	WorldPacketHandlers[CMSG_VOICE_CHAT_QUERY].handler = &WorldSession::HandleVoiceChatQueryOpcode;
 	WorldPacketHandlers[CMSG_CHANNEL_VOICE_QUERY].handler = &WorldSession::HandleChannelVoiceQueryOpcode;
+	WorldPacketHandlers[CMSG_SET_AUTO_LOOT_PASS].handler = &WorldSession::HandleSetAutoLootPassOpcode;
+
+	WorldPacketHandlers[0x038C].handler = &WorldSession::Handle38C;
+	WorldPacketHandlers[0x038C].status = STATUS_AUTHED;
+
+	WorldPacketHandlers[CMSG_INRANGE_QUESTGIVER_STATUS_QUERY].handler = &WorldSession::HandleInrangeQuestgiverQuery;
 }
 
 void SessionLogWriter::writefromsession(WorldSession* session, const char* format, ...)
@@ -1021,4 +1028,15 @@ void WorldSession::Delete()
 {
 	deleteMutex.Acquire();
 	delete this;
+}
+
+void WorldSession::Handle38C(WorldPacket & recv_data)
+{
+	uint32 v;
+	recv_data >> v;
+
+	WorldPacket data(0x038B, 17);
+	data << v << uint32(0);
+	data << "01/01/01";
+	SendPacket(&data);
 }

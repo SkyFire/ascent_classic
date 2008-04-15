@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -259,36 +259,40 @@ void MapMgr::PushObject(Object *obj)
 	 //Add to the mapmanager's object list
 	if(plObj)
 	{
-	   m_PlayerStorage[plObj->GetGUIDLow()] = plObj;
+	   m_PlayerStorage[plObj->GetLowGUID()] = plObj;
 	   UpdateCellActivity(x, y, 2);
 	}
 	else
-	switch(obj->GetGUIDHigh())
 	{
-		case HIGHGUID_UNIT:
-			ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
-			m_CreatureStorage[obj->GetGUIDLow()] = (Creature*)obj;
-			if(((Creature*)obj)->m_spawn != NULL)
+		switch(obj->GetTypeFromGUID())
+		{
+		case HIGHGUID_TYPE_PET:
+			m_PetStorage[obj->GetUIdFromGUID()] = static_cast< Pet* >( obj );
+			break;
+
+		case HIGHGUID_TYPE_UNIT:
 			{
-				_sqlids_creatures.insert(make_pair( ((Creature*)obj)->m_spawn->id, ((Creature*)obj) ) );
-			}
-			break;
+				ASSERT((obj->GetUIdFromGUID()) <= m_CreatureHighGuid);
+				m_CreatureStorage[obj->GetUIdFromGUID()] = (Creature*)obj;
+				if(((Creature*)obj)->m_spawn != NULL)
+				{
+					_sqlids_creatures.insert(make_pair( ((Creature*)obj)->m_spawn->id, ((Creature*)obj) ) );
+				}
+			}break;
 
-		case HIGHGUID_PET:
-			m_PetStorage[obj->GetGUIDLow()] = static_cast< Pet* >( obj );
-			break;
-
-		case HIGHGUID_DYNAMICOBJECT:
-			m_DynamicObjectStorage[obj->GetGUIDLow()] = (DynamicObject*)obj;
-			break;
-
-		case HIGHGUID_GAMEOBJECT:
-			m_GOStorage[obj->GetGUIDLow()] = (GameObject*)obj;
-			if(((GameObject*)obj)->m_spawn != NULL)
+		case HIGHGUID_TYPE_GAMEOBJECT:
 			{
-				_sqlids_gameobjects.insert(make_pair( ((GameObject*)obj)->m_spawn->id, ((GameObject*)obj) ) );
-			}
+				m_GOStorage[obj->GetUIdFromGUID()] = (GameObject*)obj;
+				if(((GameObject*)obj)->m_spawn != NULL)
+				{
+					_sqlids_gameobjects.insert(make_pair( ((GameObject*)obj)->m_spawn->id, ((GameObject*)obj) ) );
+				}
+			}break;
+
+		case HIGHGUID_TYPE_DYNAMICOBJECT:
+			m_DynamicObjectStorage[obj->GetLowGUID()] = (DynamicObject*)obj;
 			break;
+		}
 	}
 
 	// Handle activation of that object.
@@ -329,22 +333,18 @@ void MapMgr::PushStaticObject(Object *obj)
 {
 	_mapWideStaticObjects.insert(obj);
 
-	switch(obj->GetGUIDHigh())
+	switch(obj->GetTypeFromGUID())
 	{
-		case HIGHGUID_UNIT:
-			m_CreatureStorage[obj->GetGUIDLow()] = (Creature*)obj;
+		case HIGHGUID_TYPE_UNIT:
+			m_CreatureStorage[obj->GetUIdFromGUID()] = (Creature*)obj;
 			break;
 
-		case HIGHGUID_PET:
-			m_PetStorage[obj->GetGUIDLow()] = static_cast< Pet* >( obj );
+		case HIGHGUID_TYPE_GAMEOBJECT:
+			m_GOStorage[obj->GetUIdFromGUID()] = (GameObject*)obj;
 			break;
 
-		case HIGHGUID_DYNAMICOBJECT:
-			m_DynamicObjectStorage[obj->GetGUIDLow()] = (DynamicObject*)obj;
-			break;
-
-		case HIGHGUID_GAMEOBJECT:
-			m_GOStorage[obj->GetGUIDLow()] = (GameObject*)obj;
+		default:
+			// maybe add a warning, shouldnt be needed
 			break;
 	}
 }
@@ -374,39 +374,39 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 	// Remove object from all needed places
 	///////////////////////////////////////
  
-	switch(obj->GetGUIDHigh())
+	switch(obj->GetTypeFromGUID())
 	{
-		case HIGHGUID_UNIT:
-			ASSERT(obj->GetGUIDLow() <= m_CreatureHighGuid);
-			m_CreatureStorage[obj->GetGUIDLow()] = 0;
+		case HIGHGUID_TYPE_UNIT:
+			ASSERT(obj->GetUIdFromGUID() <= m_CreatureHighGuid);
+			m_CreatureStorage[obj->GetUIdFromGUID()] = 0;
 			if(((Creature*)obj)->m_spawn != NULL)
 			{
 				_sqlids_creatures.erase(((Creature*)obj)->m_spawn->id);
 			}
 
 			if(free_guid)
-				_reusable_guids_creature.push_back(obj->GetGUIDLow());
+				_reusable_guids_creature.push_back(obj->GetUIdFromGUID());
 
 			  break;
 
-		case HIGHGUID_PET:
-			m_PetStorage.erase(obj->GetGUIDLow());
+		case HIGHGUID_TYPE_PET:
+			m_PetStorage.erase(obj->GetUIdFromGUID());
 			break;
 
-		case HIGHGUID_DYNAMICOBJECT:
-			m_DynamicObjectStorage.erase(obj->GetGUIDLow());
+		case HIGHGUID_TYPE_DYNAMICOBJECT:
+			m_DynamicObjectStorage.erase(obj->GetLowGUID());
 			break;
 
-		case HIGHGUID_GAMEOBJECT:
-			ASSERT(obj->GetGUIDLow() <= m_GOHighGuid);
-			m_GOStorage[obj->GetGUIDLow()] = 0;
+		case HIGHGUID_TYPE_GAMEOBJECT:
+			ASSERT(obj->GetUIdFromGUID() <= m_GOHighGuid);
+			m_GOStorage[obj->GetUIdFromGUID()] = 0;
 			if(((GameObject*)obj)->m_spawn != NULL)
 			{
 				_sqlids_gameobjects.erase(((GameObject*)obj)->m_spawn->id);
 			}
 
 			if(free_guid)
-				_reusable_guids_gameobject.push_back(obj->GetGUIDLow());
+				_reusable_guids_gameobject.push_back(obj->GetUIdFromGUID());
 
 			break;
 	}
@@ -487,7 +487,7 @@ void MapMgr::RemoveObject(Object *obj, bool free_guid)
 			uint32 y = GetPosY(obj->GetPositionY());
 			UpdateCellActivity(x, y, 2);
 		}
-		m_PlayerStorage.erase( static_cast< Player* >( obj )->GetGUIDLow() );
+		m_PlayerStorage.erase( static_cast< Player* >( obj )->GetLowGUID() );
 	}
 
 	// Remove the session from our set if it is a player.
@@ -619,7 +619,7 @@ void MapMgr::ChangeObjectLocation( Object *obj )
 			iter2 = iter++;
 			if( curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID )
 				fRange = 0.0f; // unlimited distance for people on same boat
-			else if( curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER )
+			else if( curObj->GetTypeFromGUID() == HIGHGUID_TYPE_TRANSPORTER )
 				fRange = 0.0f; // unlimited distance for transporters (only up to 2 cells +/- anyway.)
 			else
 				fRange = m_UpdateDistance; // normal distance
@@ -784,7 +784,7 @@ void MapMgr::UpdateInRangeSet( Object *obj, Player *plObj, MapCell* cell, ByteBu
 
 		if( curObj->IsPlayer() && obj->IsPlayer() && plObj->m_TransporterGUID && plObj->m_TransporterGUID == static_cast< Player* >( curObj )->m_TransporterGUID )
 			fRange = 0.0f; // unlimited distance for people on same boat
-		else if( curObj->GetGUIDHigh() == HIGHGUID_TRANSPORTER )
+		else if( curObj->GetTypeFromGUID() == HIGHGUID_TYPE_TRANSPORTER )
 			fRange = 0.0f; // unlimited distance for transporters (only up to 2 cells +/- anyway.)
 		else
 			fRange = m_UpdateDistance; // normal distance
@@ -1333,14 +1333,14 @@ bool MapMgr::Do()
 	/* create static objects */
 	for(GOSpawnList::iterator itr = _map->staticSpawns.GOSpawns.begin(); itr != _map->staticSpawns.GOSpawns.end(); ++itr)
 	{
-		GameObject * obj = CreateGameObject();
+		GameObject * obj = CreateGameObject((*itr)->entry);
 		obj->Load((*itr));
 		_mapWideStaticObjects.insert(obj);
 	}
 
 	for(CreatureSpawnList::iterator itr = _map->staticSpawns.CreatureSpawns.begin(); itr != _map->staticSpawns.CreatureSpawns.end(); ++itr)
 	{
-		Creature * obj = CreateCreature();
+		Creature * obj = CreateCreature((*itr)->entry);
 		obj->Load(*itr, 0, pMapInfo);
 		_mapWideStaticObjects.insert(obj);
 	}
@@ -1474,7 +1474,7 @@ void MapMgr::AddObject(Object *obj)
 
 Unit* MapMgr::GetUnit(const uint64 & guid)
 {
-#ifdef USING_BIG_ENDIAN
+/*#ifdef USING_BIG_ENDIAN
 	switch (((uint32*)&guid)[0])
 #else
 	switch (((uint32*)&guid)[1])
@@ -1491,27 +1491,50 @@ Unit* MapMgr::GetUnit(const uint64 & guid)
 		break;
 	default:
 		return NULL;
+	}*/
+
+	/*uint32 highguid = GUID_HIPART(guid);
+	if( highguid & HIGHGUID_UNIT )
+		return GetCreature( ((uint32)guid&LOWGUID_UNIT_MASK) );
+	else if( highguid == HIGHGUID_PLAYER )			// players are always zero
+		return GetPlayer( (uint32)guid );
+	else if( highguid & HIGHGUID_PET )
+		return GetPet( (uint32)guid );
+	else
+		return NULL;*/
+
+	switch(GET_TYPE_FROM_GUID(guid))
+	{
+	case HIGHGUID_TYPE_UNIT:
+		return GetCreature( GET_LOWGUID_PART(guid) );
+		break;
+
+	case HIGHGUID_TYPE_PLAYER:
+		return GetPlayer( (uint32)guid );
+		break;
+
+	case HIGHGUID_TYPE_PET:
+		return GetPet( (uint32)guid );
+		break;
 	}
+
+	return NULL;
 }
 
 Object* MapMgr::_GetObject(const uint64 & guid)
 {
-#ifdef USING_BIG_ENDIAN
-	switch (((uint32*)&guid)[0])
-#else
-	switch (((uint32*)&guid)[1])
-#endif
+	switch(GET_TYPE_FROM_GUID(guid))
 	{
-	case	HIGHGUID_GAMEOBJECT:
-		return GetGameObject((uint32)guid);
+	case	HIGHGUID_TYPE_GAMEOBJECT:
+		return GetGameObject(GET_LOWGUID_PART(guid));
 		break;
-	case	HIGHGUID_CORPSE:
-		return objmgr.GetCorpse((uint32)guid);
+	case	HIGHGUID_TYPE_UNIT:
+		return GetCreature(GET_LOWGUID_PART(guid));
 		break;
-	case	HIGHGUID_DYNAMICOBJECT:
+	case	HIGHGUID_TYPE_DYNAMICOBJECT:
 		return GetDynamicObject((uint32)guid);
 		break;
-	case	HIGHGUID_TRANSPORTER:
+	case	HIGHGUID_TYPE_TRANSPORTER:
 		return objmgr.GetTransporter(GUID_LOPART(guid));
 		break;
 	default:
@@ -1800,3 +1823,59 @@ void MapMgr::HookOnAreaTrigger(Player * plr, uint32 id)
 		break;
 	}
 }
+
+Creature * MapMgr::CreateCreature(uint32 entry)
+{
+	uint64 newguid = (uint64)HIGHGUID_TYPE_UNIT << 32;
+	char * pHighGuid = (char*)&newguid;
+	char * pEntry = (char*)&entry;
+	pHighGuid[3] |= pEntry[0];
+	pHighGuid[4] |= pEntry[1];
+	pHighGuid[5] |= pEntry[2];
+	pHighGuid[6] |= pEntry[3];
+
+	if(_reusable_guids_creature.size())
+	{
+		uint32 guid = _reusable_guids_creature.front();
+		_reusable_guids_creature.pop_front();
+
+		newguid |= guid;
+		return new Creature(newguid);
+	}
+
+	if(++m_CreatureHighGuid  >= m_CreatureArraySize)
+	{
+		// Reallocate array with larger size.
+		m_CreatureArraySize += RESERVE_EXPAND_SIZE;
+		m_CreatureStorage = (Creature**)realloc(m_CreatureStorage, sizeof(Creature*) * m_CreatureArraySize);
+		memset(&m_CreatureStorage[m_CreatureHighGuid],0,(m_CreatureArraySize-m_CreatureHighGuid)*sizeof(Creature*));
+	}
+
+	newguid |= m_CreatureHighGuid;
+	return new Creature(newguid);
+}
+
+GameObject * MapMgr::CreateGameObject(uint32 entry)
+{
+	if(_reusable_guids_gameobject.size())
+	{
+		uint32 guid = _reusable_guids_gameobject.front();
+		_reusable_guids_gameobject.pop_front();
+		return new GameObject((uint64)HIGHGUID_TYPE_GAMEOBJECT<<32 | guid);
+	}
+
+	if(++m_GOHighGuid  >= m_GOArraySize)
+	{
+		// Reallocate array with larger size.
+		m_GOArraySize += RESERVE_EXPAND_SIZE;
+		m_GOStorage = (GameObject**)realloc(m_GOStorage, sizeof(GameObject*) * m_GOArraySize);
+		memset(&m_GOStorage[m_GOHighGuid],0,(m_GOArraySize-m_GOHighGuid)*sizeof(GameObject*));
+	}
+	return new GameObject((uint64)HIGHGUID_TYPE_GAMEOBJECT<<32 | m_GOHighGuid);
+}
+
+DynamicObject * MapMgr::CreateDynamicObject()
+{
+	return new DynamicObject(HIGHGUID_TYPE_DYNAMICOBJECT,(++m_DynamicObjectHighGuid));
+}
+

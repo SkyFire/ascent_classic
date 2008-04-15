@@ -117,36 +117,63 @@ VoiceChatHandler::VoiceChatHandler()
 	enabled=false;
 }
 
-void VoiceChatHandler::OnRead(const uint8 * bytes, uint32 len)
+void VoiceChatHandler::OnRead(WorldPacket* pck)
 {
-	if(len<4) return;
+	uint32 request_id;
+	uint8 error;
+	uint16 channel_id = 0;
 
-	int cmd = *(int*)bytes;
-	Log.Debug("VoiceChatHandler", "Got Packet %u", cmd);
-	switch(cmd)
+	switch(pck->GetOpcode())
 	{
+	case VOICECHAT_SMSG_PONG:
+		{
+			printf("!! VOICECHAT PONGZ!\n");
+			m_client->last_pong = UNIXTIME;
+		}break;
 	case VOICECHAT_SMSG_CHANNEL_CREATED:
 		{
-			uint32 request_id = *(uint32*)&bytes[4];
-			uint32 channel_id = *(uint32*)&bytes[8];
-			Log.Debug("VoiceChatHandler", "Request ID %u, channel id %u", request_id, channel_id);
+			*pck >> request_id;
+			*pck >> error;
 
+			Log.Debug("VoiceChatHandler", "Request ID %u, error %u", request_id, (int)error);
 			for(vector<VoiceChatChannelRequest>::iterator itr = m_requests.begin(); itr != m_requests.end(); ++itr)
 			{
 				if(itr->id == request_id)
 				{
+					// zero = error, wehn we pass it to OnChannelCreated
+					if( error == 0 )
+						*pck >> channel_id;
+
+					VoiceChannel * chn = new VoiceChannel;
+					chn->channelId = channel_id;
+					chn->type = itr->groupid ? 3 : 0;
+					chn->team = itr->team;
+
 					if( itr->groupid == 0 )
 					{
-						Channel * chn = channelmgr.GetChannel(itr->channel_name.c_str(), itr->team);
-						if(chn != NULL)
-							chn->VoiceChannelCreated((uint16)channel_id);
+						Channel * chan = channelmgr.GetChannel(itr->channel_name.c_str(), itr->team);
+						if(chan != NULL)
+						{
+							chn->miscPointer = chan;
+							m_voiceChannels.insert(make_pair((uint32)channel_id, chn));
+							chan->VoiceChannelCreated(channel_id);
+						}
+						else
+							delete chn;
 					}
 					else
 					{
 						Group * grp = objmgr.GetGroupById( itr->groupid );
 						if( grp != NULL )
-							grp->VoiceChannelCreated( (uint16) channel_id );
+						{
+							chn->miscPointer = grp;
+							m_voiceChannels.insert(make_pair((uint32)channel_id, chn));
+							grp->VoiceChannelCreated(channel_id);
+						}
+						else
+							delete chn;
 					}
+
 					m_requests.erase(itr);
 					break;
 				}
@@ -157,16 +184,31 @@ void VoiceChatHandler::OnRead(const uint8 * bytes, uint32 len)
 
 void VoiceChatHandler::SocketDisconnected()
 {
+	m_lock.Acquire();
+
 	Log.Debug("VoiceChatHandler", "SocketDisconnected");
 	m_client = NULL;
 	m_requests.clear();
-	channelmgr.VoiceDied();
 
 	WorldPacket data(SMSG_VOICE_SYSTEM_STATUS, 2);
 	data << uint8(2);
 	data << uint8(0);
 	sWorld.SendGlobalMessage(&data, NULL);
 	next_connect = UNIXTIME + 5;
+
+	sWorld.SendWorldText("Channel/Party voice services are now offline.");
+
+	// notify channels
+	for(HM_NAMESPACE::hash_map<uint32, VoiceChannel*>::iterator itr = m_voiceChannels.begin(); itr != m_voiceChannels.end(); ++itr)
+	{
+		if( itr->second->type == 3 )		// party
+			((Group*)itr->second->miscPointer)->VoiceSessionDropped();
+
+		delete itr->second;
+	}
+	m_voiceChannels.clear();
+
+	m_lock.Release();
 }
 
 bool VoiceChatHandler::CanUseVoiceChat()
@@ -180,7 +222,6 @@ void VoiceChatHandler::CreateVoiceChannel(Channel * chn)
 		return;
 
 	Log.Debug("VoiceChatHandler", "CreateVoiceChannel %s", chn->m_name.c_str());
-	ByteBuffer buf(50);
 	VoiceChatChannelRequest req;
 
 	m_lock.Acquire();
@@ -191,10 +232,10 @@ void VoiceChatHandler::CreateVoiceChannel(Channel * chn)
 	req.groupid = 0;
 	m_requests.push_back(req);
 
-	buf << uint32(VOICECHAT_CMSG_CREATE_CHANNEL);
-	buf << uint32(0);
-	buf << req.id;
-	m_client->Send(buf.contents(), 12);
+	WorldPacket data(VOICECHAT_CMSG_CREATE_CHANNEL, 5);
+	data << (uint8)0;
+	data << req.id;
+	m_client->SendPacket(&data);
 	m_lock.Release();
 }
 
@@ -214,13 +255,76 @@ void VoiceChatHandler::CreateGroupChannel(Group * pGroup)
 	req.team = 0;
 
 	m_requests.push_back( req );
-	buf << uint32(VOICECHAT_CMSG_CREATE_CHANNEL);
-	buf << uint32(3);
-	buf << req.id;
-	m_client->Send(buf.contents(), 12);
-	
+
+	WorldPacket data(VOICECHAT_CMSG_CREATE_CHANNEL, 5);
+	data << (uint8)3;
+	data << req.id;
+	m_client->SendPacket(&data);
+
 	m_lock.Release();
 }
+
+void VoiceChatHandler::DestroyGroupChannel(Group * pGroup)
+{
+	if( pGroup->m_voiceChannelId <= 0 )
+		return;
+
+	m_lock.Acquire();
+	HM_NAMESPACE::hash_map<uint32, VoiceChannel*>::iterator itr = m_voiceChannels.find(pGroup->m_voiceChannelId);
+	if( itr != m_voiceChannels.end() )
+	{
+		// cleanup channel structure
+		m_voiceChannels.erase( itr );
+	}
+
+	if( m_client == NULL )
+	{
+		m_lock.Release();
+		return;
+	}
+
+	WorldPacket data(VOICECHAT_CMSG_DELETE_CHANNEL, 5);
+	data << (uint8)3;
+	data << (uint16)pGroup->m_voiceChannelId;
+	m_client->SendPacket(&data);
+
+	m_lock.Release();
+}
+
+void VoiceChatHandler::ActivateChannelSlot(uint16 channel_id, uint8 slot_id)
+{
+	if( m_client == NULL )
+		return;
+
+	Log.Debug("VoiceChatHandler", "Channel %u activate slot %u", (int)channel_id, (int)slot_id);
+
+	m_lock.Acquire();
+
+	WorldPacket data(VOICECHAT_CMSG_ADD_MEMBER, 5);
+	data << channel_id;
+	data << slot_id;
+	m_client->SendPacket(&data);
+
+	m_lock.Release();
+}
+
+void VoiceChatHandler::DeactivateChannelSlot(uint16 channel_id, uint8 slot_id)
+{
+	if( m_client == NULL )
+		return;
+
+	Log.Debug("VoiceChatHandler", "Channel %u deactivate slot %u", (int)channel_id, (int)slot_id);
+
+	m_lock.Acquire();
+
+	WorldPacket data(VOICECHAT_CMSG_REMOVE_MEMBER, 5);
+	data << channel_id;
+	data << slot_id;
+	m_client->SendPacket(&data);
+
+	m_lock.Release();
+}
+
 
 void VoiceChatHandler::DestroyVoiceChannel(Channel * chn)
 {
@@ -252,27 +356,50 @@ void VoiceChatHandler::Startup()
 
 void VoiceChatHandler::Update()
 {
-	if(!enabled || m_client)
+	if(!enabled)
 		return;
 
-	if(UNIXTIME > next_connect)
+	if( m_client == NULL )
 	{
-		Log.Notice("VoiceChatHandler", "Attempting to connect to voicechat server %s:%u", ip_s.c_str(), port);
-		VoiceChatClientSocket * s = ConnectTCPSocket<VoiceChatClientSocket>(ip_s.c_str(), port);
-		if(s != NULL)
+		if(UNIXTIME > next_connect)
 		{
-			// connected!
-			m_client = s;
-			Log.Notice("VoiceChatHandler", "Connected to %s:%u.", ip_s.c_str(), port);
-			WorldPacket data(SMSG_VOICE_SYSTEM_STATUS, 2);
-			data << uint8(2) << uint8(1);
-			sWorld.SendGlobalMessage(&data, NULL);
+			Log.Notice("VoiceChatHandler", "Attempting to connect to voicechat server %s:%u", ip_s.c_str(), port);
+			VoiceChatClientSocket * s = ConnectTCPSocket<VoiceChatClientSocket>(ip_s.c_str(), port);
+			if(s != NULL)
+			{
+				// connected!
+				m_client = s;
+				Log.Notice("VoiceChatHandler", "Connected to %s:%u.", ip_s.c_str(), port);
+				WorldPacket data(SMSG_VOICE_SYSTEM_STATUS, 2);
+				data << uint8(2) << uint8(1);
+				sWorld.SendGlobalMessage(&data, NULL);
+
+				objmgr.GroupVoiceReconnected();
+				sWorld.SendWorldText("Voice services are back online.");
+			}
+			else
+			{
+				Log.Notice("VoiceChatHandler", "Could not connect. Will try again later.");
+				m_client = NULL;
+				next_connect = UNIXTIME + 10;
+			}
 		}
-		else
+	}
+	else
+	{
+		if( UNIXTIME >= m_client->next_ping )
 		{
-			Log.Notice("VoiceChatHandler", "Could not connect. Will try again later.");
-			m_client = NULL;
-			next_connect = UNIXTIME + 10;
+			m_client->next_ping = UNIXTIME + 15;
+			WorldPacket data(VOICECHAT_CMSG_PING, 4);
+			data << uint32(0);
+			m_client->SendPacket(&data);
+		}
+		// because the above might kill m_client
+		if( m_client != NULL && (UNIXTIME - m_client->last_pong) > (15 * 3) )
+		{
+			// ping timeout
+			printf("ping timeout on voice socket\n");
+			m_client->Disconnect();
 		}
 	}
 }

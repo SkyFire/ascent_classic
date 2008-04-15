@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -43,7 +43,6 @@ Corpse::Corpse(uint32 high, uint32 low)
 
 Corpse::~Corpse()
 {
-	if(GetGUIDHigh() != 0)
 	objmgr.RemoveCorpse(this);
 	//just in case
 }
@@ -65,12 +64,12 @@ void Corpse::SaveToDB()
 {
 	//save corpse to DB
 	std::stringstream ss;
-	ss << "DELETE FROM corpses WHERE guid = " << GetGUIDLow();
+	ss << "DELETE FROM corpses WHERE guid = " << GetLowGUID();
 	CharacterDatabase.Execute( ss.str( ).c_str( ) );
 
 	ss.rdbuf()->str("");
 	ss << "INSERT INTO corpses (guid, positionX, positionY, positionZ, orientation, zoneId, mapId, data, instanceId) VALUES ("
-		<< GetGUIDLow() << ", '" << GetPositionX() << "', '" << GetPositionY() << "', '" << GetPositionZ() << "', '" << GetOrientation() << "', '" << GetZoneId() << "', '" << GetMapId() << "', '";
+		<< GetLowGUID() << ", '" << GetPositionX() << "', '" << GetPositionY() << "', '" << GetPositionZ() << "', '" << GetOrientation() << "', '" << GetZoneId() << "', '" << GetMapId() << "', '";
 
 	for(uint16 i = 0; i < m_valuesCount; i++ )
 		ss << GetUInt32Value(i) << " ";
@@ -85,7 +84,7 @@ void Corpse::DeleteFromDB()
 	//delete corpse from db when its not needed anymore
 	char sql[256];
 
-	snprintf(sql, 256, "DELETE FROM corpses WHERE guid=%u", (unsigned int)GetGUIDLow());
+	snprintf(sql, 256, "DELETE FROM corpses WHERE guid=%u", (unsigned int)GetLowGUID());
 	CharacterDatabase.Execute(sql);
 }
 

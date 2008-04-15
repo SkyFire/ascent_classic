@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -50,6 +50,7 @@ public:
 	void HandleMappingReply(WorldPacket & recvData);
 	void HandleUpdateMapping(WorldPacket & recvData);
 	void HandleTestConsoleLogin(WorldPacket & recvData);
+	void HandleDatabaseModify(WorldPacket& recvData);
 
 	uint32 last_ping;
 	bool removed;

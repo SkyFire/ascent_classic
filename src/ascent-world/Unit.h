@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -1025,9 +1025,9 @@ public:
 	bool GetSpeedDecrease();
 	int32 m_mountedspeedModifier;
 	int32 m_flyspeedModifier;
-	void UpdateSpeed(bool delay = false);
-	void EnableFlight(bool delay = false);
-	void DisableFlight(bool delay = false);
+	void UpdateSpeed();
+	void EnableFlight();
+	void DisableFlight();
 
 	// Escort Quests
 	//uint32 m_escortquestid;

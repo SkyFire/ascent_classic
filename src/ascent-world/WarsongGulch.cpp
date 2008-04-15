@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,11 +41,11 @@ WarsongGulch::WarsongGulch(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : C
 	m_homeFlags[1]->SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 
 	// dropped flags
-	m_dropFlags[1] = m_mapMgr->CreateGameObject();
+	m_dropFlags[1] = m_mapMgr->CreateGameObject(179786);
 	if(!m_dropFlags[1]->CreateFromProto(179785, 489, 0, 0, 0, 0))
 		Log.Warning("WarsongGulch", "Could not create dropped flag 1");
 
-	m_dropFlags[0] = m_mapMgr->CreateGameObject();
+	m_dropFlags[0] = m_mapMgr->CreateGameObject(179786);
 	if(!m_dropFlags[0]->CreateFromProto(179786, 489, 0, 0, 0, 0))
 		Log.Warning("WarsongGulch", "Could not create dropped flag 0");
 
@@ -112,7 +112,7 @@ void WarsongGulch::HookOnAreaTrigger(Player * plr, uint32 id)
 		return;
 	}
 
-	if(((id == 3646 && plr->GetTeam() == 0) || (id == 3647 && plr->GetTeam() == 1)) && (plr->m_bgHasFlag && m_flagHolders[plr->GetTeam()] == plr->GetGUIDLow()))
+	if(((id == 3646 && plr->GetTeam() == 0) || (id == 3647 && plr->GetTeam() == 1)) && (plr->m_bgHasFlag && m_flagHolders[plr->GetTeam()] == plr->GetLowGUID()))
 	{
 		if(m_flagHolders[plr->GetTeam() ? 0 : 1] != 0 || m_dropFlags[plr->GetTeam() ? 0 : 1]->IsInWorld())
 		{
@@ -251,7 +251,7 @@ void WarsongGulch::HookFlagDrop(Player * plr, GameObject * obj)
 	if( m_dropFlags[plr->GetTeam()]->IsInWorld() )
 		m_dropFlags[plr->GetTeam()]->RemoveFromWorld(false);
 
-	m_flagHolders[plr->GetTeam()] = plr->GetGUIDLow();
+	m_flagHolders[plr->GetTeam()] = plr->GetLowGUID();
 	plr->m_bgHasFlag = true;
 
 	/* This is *really* strange. Even though the A9 create sent to the client is exactly the same as the first one, if
@@ -296,7 +296,7 @@ void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
 	sp->prepare(&targets);
 
 	/* set the flag holder */
-	m_flagHolders[plr->GetTeam()] = plr->GetGUIDLow();
+	m_flagHolders[plr->GetTeam()] = plr->GetLowGUID();
 	if(m_homeFlags[plr->GetTeam()]->IsInWorld())
 		m_homeFlags[plr->GetTeam()]->RemoveFromWorld(false);
 

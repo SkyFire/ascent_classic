@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -397,7 +397,7 @@ void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, floa
 	AddToWorld();
 }
 
-Transporter::Transporter(uint32 guidlow, uint32 guidhigh) : GameObject(guidlow, guidhigh)
+Transporter::Transporter(uint64 guid) : GameObject(guid)
 {
 
 }
@@ -430,7 +430,7 @@ void ObjectMgr::LoadTransporters()
 		uint32 entry = QR->Fetch()[0].GetUInt32();
 		int32 period = QR->Fetch()[2].GetInt32();
 
-		Transporter * pTransporter = new Transporter(HIGHGUID_TRANSPORTER,entry);
+		Transporter * pTransporter = new Transporter((uint64)HIGHGUID_TYPE_TRANSPORTER<<32 |entry);
 		if(!pTransporter->CreateAsTransporter(entry, "", period))
 		{
 			sLog.outError("Transporter %s failed creation for some reason.", QR->Fetch()[1].GetString());
@@ -475,10 +475,10 @@ void Transporter::AddNPC(uint32 Entry, float offsetX, float offsetY, float offse
 	if(inf==NULL||proto==NULL)
 		return;
 
-	Creature * pCreature = new Creature(HIGHGUID_TRANSPORTER, guid);
+	Creature * pCreature = new Creature((uint64)HIGHGUID_TYPE_TRANSPORTER<<32 | guid);
 	pCreature->Load(proto, m_position.x, m_position.y, m_position.z);
 	pCreature->m_transportPosition = new LocationVector(offsetX, offsetY, offsetZ, offsetO);
-	pCreature->m_transportGuid = GetGUIDLow();
+	pCreature->m_transportGuid = GetUIdFromGUID();
 	m_npcs.insert(make_pair(guid,pCreature));
 }
 

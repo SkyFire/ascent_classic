@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -374,6 +374,7 @@ void QuestMgr::BuildQuestDetails(WorldPacket *data, Quest* qst, Object* qst_give
 
 	*data << uint32(0);
 	*data << uint32(0);
+	*data << uint32(0);
 	*data << uint32(4);
 	*data << uint32(1);
 	*data << uint32(0);
@@ -446,7 +447,7 @@ void QuestMgr::BuildQuestComplete(Player*plr, Quest* qst)
 	uint32 xp ;
 	if(plr->getLevel() >= plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))
 	{
-		plr->ModUInt32Value(PLAYER_FIELD_COINAGE, qst->reward_xp_as_money);
+		plr->ModUnsigned32Value(PLAYER_FIELD_COINAGE, qst->reward_xp_as_money);
 		xp = 0;
 	}else
 	{
@@ -1021,7 +1022,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
     }
     else
     {
-	    plr->ModUInt32Value(PLAYER_FIELD_COINAGE, qst->reward_money);
+	    plr->ModUnsigned32Value(PLAYER_FIELD_COINAGE, qst->reward_money);
   	
 	    // Reputation reward
 		GiveQuestRewardReputation(plr, qst, qst_giver);

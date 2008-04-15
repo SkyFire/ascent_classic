@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -118,7 +118,7 @@ void CBattlegroundManager::HandleBattlegroundListPacket(WorldSession * m_session
 void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, WorldPacket & pck)
 {
 	uint64 guid;
-	uint32 pguid = m_session->GetPlayer()->GetGUIDLow();
+	uint32 pguid = m_session->GetPlayer()->GetLowGUID();
 	uint32 lgroup = GetLevelGrouping(m_session->GetPlayer()->getLevel());
 	uint32 bgtype;
 	uint32 instance;
@@ -147,7 +147,7 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, Worl
 	/* Queue him! */
 	m_queueLock.Acquire();
 	m_queuedPlayers[bgtype][lgroup].push_back(pguid);
-	Log.Success("BattlegroundManager", "Player %u is now in battleground queue for instance %u", m_session->GetPlayer()->GetGUIDLow(), instance );
+	Log.Success("BattlegroundManager", "Player %u is now in battleground queue for instance %u", m_session->GetPlayer()->GetLowGUID(), instance );
 
 	/* send the battleground status packet */
 	SendBattlefieldStatus(m_session->GetPlayer(), 1, bgtype, instance, 0, BGMapIds[bgtype],0);
@@ -266,7 +266,7 @@ void CBattlegroundManager::EventQueueUpdate()
 						tempPlayerVec[0].pop_front();
 						plr->m_bgTeam=team;
 						arena->AddPlayer(plr, team);
-						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
+						ErasePlayerFromList(plr->GetLowGUID(), &m_queuedPlayers[i][j]);
 						team = arena->GetFreeTeam();
 					}
 				}
@@ -280,7 +280,7 @@ void CBattlegroundManager::EventQueueUpdate()
 							plr = *tempPlayerVec[k].begin();
 							tempPlayerVec[k].pop_front();
 							bg->AddPlayer(plr, plr->GetTeam());
-							ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
+							ErasePlayerFromList(plr->GetLowGUID(), &m_queuedPlayers[i][j]);
 						}
 					}
 				}
@@ -306,7 +306,7 @@ void CBattlegroundManager::EventQueueUpdate()
 						team = arena->GetFreeTeam();
 
 						// remove from the main queue (painful!)
-						ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
+						ErasePlayerFromList(plr->GetLowGUID(), &m_queuedPlayers[i][j]);
 					}
 				}
 			}
@@ -334,7 +334,7 @@ void CBattlegroundManager::EventQueueUpdate()
 								tempPlayerVec[k].pop_front();
 								plr->m_bgTeam=k;
 								bg->AddPlayer(plr, k);
-								ErasePlayerFromList(plr->GetGUIDLow(), &m_queuedPlayers[i][j]);
+								ErasePlayerFromList(plr->GetLowGUID(), &m_queuedPlayers[i][j]);
 							}
 						}
 					}
@@ -437,9 +437,9 @@ void CBattlegroundManager::RemovePlayerFromQueues(Player * plr)
 	
 	while(itr != m_queuedPlayers[plr->m_bgQueueType][lgroup].end())
 	{
-		if((*itr) == plr->GetGUIDLow())
+		if((*itr) == plr->GetLowGUID())
 		{
-			Log.Debug("BattlegroundManager", "Removing player %u from queue instance %u type %u", plr->GetGUIDLow(), plr->m_bgQueueInstanceId, plr->m_bgQueueType);
+			Log.Debug("BattlegroundManager", "Removing player %u from queue instance %u type %u", plr->GetLowGUID(), plr->m_bgQueueInstanceId, plr->m_bgQueueType);
 			m_queuedPlayers[plr->m_bgQueueType][lgroup].erase(itr);
 			break;
 		}
@@ -699,7 +699,7 @@ void CBattleground::AddPlayer(Player * plr, uint32 team)
 	m_mainLock.Acquire();
 
 	/* This is called when the player is added, not when they port. So, they're essentially still queued, but not inside the bg yet */
-	m_pendPlayers[team].insert(plr->GetGUIDLow());
+	m_pendPlayers[team].insert(plr->GetLowGUID());
 
 	/* Send a packet telling them that they can enter */
 	BattlegroundManager.SendBattlefieldStatus(plr, 2, m_type, m_id, 120000, m_mapMgr->GetMapId(),Rated());		// You will be removed from the queue in 2 minutes.
@@ -714,7 +714,7 @@ void CBattleground::AddPlayer(Player * plr, uint32 team)
 void CBattleground::RemovePendingPlayer(Player * plr)
 {
 	m_mainLock.Acquire();
-	m_pendPlayers[plr->m_bgTeam].erase(plr->GetGUIDLow());
+	m_pendPlayers[plr->m_bgTeam].erase(plr->GetLowGUID());
 
 	/* send a null bg update (so they don't join) */
 	BattlegroundManager.SendBattlefieldStatus(plr, 0, 0, 0, 0, 0,0);
@@ -747,7 +747,7 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 		return;
 	}
 
-	m_pendPlayers[plr->m_bgTeam].erase(plr->GetGUIDLow());
+	m_pendPlayers[plr->m_bgTeam].erase(plr->GetLowGUID());
 	if(m_players[plr->m_bgTeam].find(plr) != m_players[plr->m_bgTeam].end())
 	{
 		m_mainLock.Release();
@@ -930,7 +930,7 @@ void CBattlegroundManager::DeleteBattleground(CBattleground * bg)
 
 GameObject * CBattleground::SpawnGameObject(uint32 entry,uint32 MapId , float x, float y, float z, float o, uint32 flags, uint32 faction, float scale)
 {
-	GameObject *go = m_mapMgr->CreateGameObject();
+	GameObject *go = m_mapMgr->CreateGameObject(entry);
 
 	go->CreateFromProto(entry, MapId, x, y, z, o);
 
@@ -1239,7 +1239,7 @@ Creature * CBattleground::SpawnSpiritGuide(float x, float y, float z, float o, u
 		return NULL;
 	}
 
-	Creature * pCreature = m_mapMgr->CreateCreature();
+	Creature * pCreature = m_mapMgr->CreateCreature(pInfo->Id);
 
 	pCreature->Create(pInfo->Name, m_mapMgr->GetMapId(), x, y, z, o);
 
@@ -1296,8 +1296,8 @@ void CBattleground::QueuePlayerForResurrect(Player * plr, Creature * spirit_heal
 	m_mainLock.Acquire();
 	map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find(spirit_healer);
 	if(itr != m_resurrectMap.end())
-		itr->second.insert(plr->GetGUIDLow());
-	plr->m_areaspirithealer_guid=spirit_healer->GetGUIDLow();
+		itr->second.insert(plr->GetLowGUID());
+	plr->m_areaSpiritHealer_guid=spirit_healer->GetGUID();
 	m_mainLock.Release();
 }
 
@@ -1306,8 +1306,8 @@ void CBattleground::RemovePlayerFromResurrect(Player * plr, Creature * spirit_he
 	m_mainLock.Acquire();
 	map<Creature*,set<uint32> >::iterator itr = m_resurrectMap.find(spirit_healer);
 	if(itr != m_resurrectMap.end())
-		itr->second.erase(plr->GetGUIDLow());
-	plr->m_areaspirithealer_guid=0;
+		itr->second.erase(plr->GetLowGUID());
+	plr->m_areaSpiritHealer_guid=0;
 	m_mainLock.Release();
 }
 
@@ -1368,7 +1368,7 @@ void CBattleground::EventResurrectPlayers()
 
 void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 BattlegroundType, uint8 as_group, uint8 rated_match)
 {
-	uint32 pguid = m_session->GetPlayer()->GetGUIDLow();
+	uint32 pguid = m_session->GetPlayer()->GetLowGUID();
 	uint32 lgroup = GetLevelGrouping(m_session->GetPlayer()->getLevel());
 	if(as_group && m_session->GetPlayer()->GetGroup() == NULL)
 		return;
@@ -1488,7 +1488,7 @@ void CBattlegroundManager::HandleArenaJoin(WorldSession * m_session, uint32 Batt
 	/* Queue him! */
 	m_queueLock.Acquire();
 	m_queuedPlayers[BattlegroundType][lgroup].push_back(pguid);
-	Log.Success("BattlegroundMgr", "Player %u is now in battleground queue for {Arena %u}", m_session->GetPlayer()->GetGUIDLow(), BattlegroundType );
+	Log.Success("BattlegroundMgr", "Player %u is now in battleground queue for {Arena %u}", m_session->GetPlayer()->GetLowGUID(), BattlegroundType );
 
 	/* send the battleground status packet */
 	SendBattlefieldStatus(m_session->GetPlayer(), 1, BattlegroundType, 0 , 0, 0,0);

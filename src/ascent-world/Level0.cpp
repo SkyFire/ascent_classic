@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -417,7 +417,7 @@ bool ChatHandler::HandleRatingsCommand( const char *args , WorldSession *m_sessi
 	Player* m_plyr = getSelectedChar(m_session, false);
 	for( uint32 i = 0; i < 24; i++ )
 	{
-		m_plyr->ModUInt32Value( PLAYER_FIELD_COMBAT_RATING_1 + i, i );
+		m_plyr->ModUnsigned32Value( PLAYER_FIELD_COMBAT_RATING_1 + i, i );
 	}
 	m_plyr->UpdateStats();
 	return true;

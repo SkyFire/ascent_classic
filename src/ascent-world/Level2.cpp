@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -66,13 +66,13 @@ bool ChatHandler::HandleInvisibleCommand(const char *args, WorldSession *m_sessi
 		pChar->m_isGmInvisible = false;
 		pChar->m_invisible = false;
 		pChar->bInvincible = false;
-		sSocialMgr.LoggedOut(pChar);
+		pChar->Social_TellFriendsOnline();
 		snprintf(msg, 256, "%s OFF.", msg);
 	} else {
 		pChar->m_isGmInvisible = true;
 		pChar->m_invisible = true;
 		pChar->bInvincible = true;
-		sSocialMgr.LoggedIn(pChar);
+		pChar->Social_TellFriendsOffline();		
 		snprintf(msg, 256, "%s ON.", msg);
 	}
 
@@ -106,7 +106,7 @@ bool ChatHandler::CreateGuildCommand(const char* args, WorldSession *m_session)
 		}
 	}
 
-	Charter tempCharter(0, ptarget->GetGUIDLow(), CHARTER_TYPE_GUILD);
+	Charter tempCharter(0, ptarget->GetLowGUID(), CHARTER_TYPE_GUILD);
 	tempCharter.SignatureCount=0;
 	tempCharter.GuildName = string(args);
 
@@ -132,7 +132,7 @@ bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 		return true;
 	}
 
-	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature *unit = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!unit)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -192,7 +192,7 @@ bool ChatHandler::HandleItemCommand(const char* args, WorldSession *m_session)
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -243,7 +243,7 @@ bool ChatHandler::HandleItemRemoveCommand(const char* args, WorldSession *m_sess
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -298,7 +298,7 @@ bool ChatHandler::HandleNPCFlagCommand(const char* args, WorldSession *m_session
 		return true;
 	}
 
-	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)guid);
+	Creature * pCreature = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
 	if(!pCreature)
 	{
 		SystemMessage(m_session, "You should select a creature.");
@@ -702,7 +702,7 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 	sstext << "Spawning GameObject By Entry '" << EntryID << "'" << '\0';
 	SystemMessage(m_session, sstext.str().c_str());
 
-	GameObject *go = m_session->GetPlayer()->GetMapMgr()->CreateGameObject();
+	GameObject *go = m_session->GetPlayer()->GetMapMgr()->CreateGameObject(EntryID);
 	
 	Player *chr = m_session->GetPlayer();
 	uint32 mapid = chr->GetMapId();
@@ -998,7 +998,7 @@ bool ChatHandler::HandleAddAIAgentCommand(const char* args, WorldSession *m_sess
 	if(!Misc2)
 		return false;
 
-	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
+	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(m_session->GetPlayer()->GetSelection()));
 	if(!target)
 	{
 		RedSystemMessage(m_session, "You have to select a Creature!");
@@ -1039,7 +1039,7 @@ bool ChatHandler::HandleAddAIAgentCommand(const char* args, WorldSession *m_sess
 
 bool ChatHandler::HandleListAIAgentCommand(const char* args, WorldSession *m_session)
 {
-	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature((uint32)m_session->GetPlayer()->GetSelection());
+	Unit* target = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(m_session->GetPlayer()->GetSelection()));
 	if(!target)
 	{
 		RedSystemMessage(m_session, "You have to select a Creature!");
@@ -1047,7 +1047,7 @@ bool ChatHandler::HandleListAIAgentCommand(const char* args, WorldSession *m_ses
 	}
 
 	std::stringstream sstext;
-	sstext << "agentlist of creature: " << target->GetGUIDLow() << " " << target->GetGUIDHigh() << '\n';
+	sstext << "agentlist of creature: " << target->GetGUID() << '\n';
 
 	std::stringstream ss;
 	ss << "SELECT * FROM ai_agents where entry=" << target->GetUInt32Value(OBJECT_FIELD_ENTRY);

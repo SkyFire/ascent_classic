@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -92,31 +92,10 @@ public:
 	uint32 m_GOArraySize;
 	uint32 m_GOHighGuid;
 	GameObject ** m_GOStorage;
-	__inline GameObject * CreateGameObject()
-	{
-		if(_reusable_guids_gameobject.size())
-		{
-			uint32 guid = _reusable_guids_gameobject.front();
-			_reusable_guids_gameobject.pop_front();
-			return new GameObject(HIGHGUID_GAMEOBJECT, guid);
-		}
+	GameObject * CreateGameObject(uint32 entry);
 
-		if(++m_GOHighGuid  >= m_GOArraySize)
-		{
-			// Reallocate array with larger size.
-			m_GOArraySize += RESERVE_EXPAND_SIZE;
-			m_GOStorage = (GameObject**)realloc(m_GOStorage, sizeof(GameObject*) * m_GOArraySize);
-			memset(&m_GOStorage[m_GOHighGuid],0,(m_GOArraySize-m_GOHighGuid)*sizeof(GameObject*));
-		}
-		return new GameObject(HIGHGUID_GAMEOBJECT, m_GOHighGuid);
-	}
-
-	__inline uint32 GenerateGameobjectGuid()
-	{
-		return ++m_GOHighGuid;
-	}
-
-	__inline GameObject * GetGameObject(uint32 guid)
+	ASCENT_INLINE uint32 GenerateGameobjectGuid() { return ++m_GOHighGuid; }
+	ASCENT_INLINE GameObject * GetGameObject(uint32 guid)
 	{
 		if(guid > m_GOHighGuid)
 			return 0;
@@ -129,25 +108,7 @@ public:
 	uint32 m_CreatureArraySize;
 	uint32 m_CreatureHighGuid;
 	Creature ** m_CreatureStorage;
-	__inline Creature * CreateCreature()
-	{
-		if(_reusable_guids_creature.size())
-		{
-			uint32 guid = _reusable_guids_creature.front();
-			_reusable_guids_creature.pop_front();
-			return new Creature(HIGHGUID_UNIT, guid);
-		}
-
-		if(++m_CreatureHighGuid  >= m_CreatureArraySize)
-		{
-			// Reallocate array with larger size.
-			m_CreatureArraySize += RESERVE_EXPAND_SIZE;
-			m_CreatureStorage = (Creature**)realloc(m_CreatureStorage, sizeof(Creature*) * m_CreatureArraySize);
-			memset(&m_CreatureStorage[m_CreatureHighGuid],0,(m_CreatureArraySize-m_CreatureHighGuid)*sizeof(Creature*));
-		}
-		
-		return new Creature(HIGHGUID_UNIT, m_CreatureHighGuid);
-	}
+	Creature * CreateCreature(uint32 entry);
 
 	__inline Creature * GetCreature(uint32 guid)
 	{
@@ -162,12 +123,9 @@ public:
 	uint32 m_DynamicObjectHighGuid;
 	typedef HM_NAMESPACE::hash_map<uint32, DynamicObject*> DynamicObjectStorageMap;
 	DynamicObjectStorageMap m_DynamicObjectStorage;
-	__inline DynamicObject * CreateDynamicObject()
-	{
-		return new DynamicObject(HIGHGUID_DYNAMICOBJECT, ++m_DynamicObjectHighGuid);
-	}
-
-	__inline DynamicObject * GetDynamicObject(uint32 guid)
+	DynamicObject * CreateDynamicObject();
+	
+	ASCENT_INLINE DynamicObject * GetDynamicObject(uint32 guid)
 	{
 		DynamicObjectStorageMap::iterator itr = m_DynamicObjectStorage.find(guid);
 		return (itr != m_DynamicObjectStorage.end()) ? itr->second : 0;

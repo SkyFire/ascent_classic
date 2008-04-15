@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -29,7 +29,6 @@
 #endif
 
 #define _GAME
-//#define USE_SPECIFIC_AIAGENTS
 
 #include <list>
 #include <vector>
@@ -88,9 +87,6 @@
 
 #include "AddonMgr.h"
 #include "AIInterface.h"
-#ifdef USE_SPECIFIC_AIAGENTS
-	#include "AIAHealSupport.h"
-#endif
 #include "AreaTrigger.h"
 #include "BattlegroundMgr.h"
 #include "AlteracValley.h"
@@ -130,7 +126,6 @@
 #include "faction.h"
 #include "Skill.h"
 #include "SkillNameMgr.h"
-#include "SocialMgr.h"
 #include "SpellNameHashes.h"
 #include "Spell.h"
 #include "SpellAuras.h"

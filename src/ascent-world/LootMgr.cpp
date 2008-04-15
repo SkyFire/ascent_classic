@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -568,7 +568,6 @@ LootRoll::LootRoll(uint32 timer, uint32 groupcount, uint64 guid, uint32 slotid, 
 	_itemunk1 = itemunk1;
 	_itemunk2 = itemunk2;
 	_remaining = groupcount;
-	_passedGuid = 0;
 }
 
 LootRoll::~LootRoll()
@@ -607,7 +606,7 @@ void LootRoll::Finalize()
 		}
 	}
 */
-	for(std::map<uint64, uint32>::iterator itr = NeedRolls.begin(); itr != NeedRolls.end(); ++itr)
+	for(std::map<uint32, uint32>::iterator itr = m_NeedRolls.begin(); itr != m_NeedRolls.end(); ++itr)
 	{
 		if(itr->second > highest)
 		{
@@ -627,7 +626,7 @@ void LootRoll::Finalize()
 
 	if(!highest)
 	{
-		for(std::map<uint64, uint32>::iterator itr = GreedRolls.begin(); itr != GreedRolls.end(); ++itr)
+		for(std::map<uint32, uint32>::iterator itr = m_GreedRolls.begin(); itr != m_GreedRolls.end(); ++itr)
 		{
 			if(itr->second > highest)
 			{
@@ -647,14 +646,15 @@ void LootRoll::Finalize()
 	}
 
 	Loot * pLoot = 0;
-	if(GUID_HIPART(_guid) == HIGHGUID_UNIT)
+	uint32 guidtype = GET_TYPE_FROM_GUID(_guid);
+	if( guidtype == HIGHGUID_TYPE_UNIT )
 	{
-		Creature * pc = _mgr->GetCreature((uint32)_guid);
+		Creature * pc = _mgr->GetCreature(GET_LOWGUID_PART(_guid));
 		if(pc) pLoot = &pc->loot;
 	}
-	else if(GUID_HIPART(_guid) == HIGHGUID_GAMEOBJECT)
+	else if( guidtype == HIGHGUID_TYPE_GAMEOBJECT )
 	{
-		GameObject * go = _mgr->GetGameObject((uint32)_guid);
+		GameObject * go = _mgr->GetGameObject(GET_LOWGUID_PART(_guid));
 		if(go) pLoot = &go->loot;
 	}
 
@@ -683,12 +683,15 @@ void LootRoll::Finalize()
 	Player * _player = (player) ? _mgr->GetPlayer((uint32)player) : 0;
 	if(!player || !_player)
 	{
-		_player = _mgr->GetPlayer((uint32)_passedGuid);
-		if(_player)
+		/* all passed */
+		data.Initialize(SMSG_LOOT_ALL_PASSED);
+		data << _guid << _groupcount << _itemid << _itemunk1 << _itemunk2;
+		set<uint32>::iterator pitr = m_passRolls.begin();
+		while(_player == NULL && pitr != m_passRolls.end())
+			_player = _mgr->GetPlayer( (*(pitr++)) );
+
+		if( _player != NULL )
 		{
-			/* all passed */
-			data.Initialize(SMSG_LOOT_ALL_PASSED);
-			data << _guid << _groupcount << _itemid << _itemunk1 << _itemunk2;
 			if(_player->InGroup())
 				_player->GetGroup()->SendPacketToAll(&data);
 			else
@@ -786,7 +789,7 @@ void LootRoll::Finalize()
 
 void LootRoll::PlayerRolled(Player *player, uint8 choice)
 {
-	if(NeedRolls.find(player->GetGUID()) != NeedRolls.end() || GreedRolls.find(player->GetGUID()) != GreedRolls.end())
+	if(m_NeedRolls.find(player->GetLowGUID()) != m_NeedRolls.end() || m_GreedRolls.find(player->GetLowGUID()) != m_GreedRolls.end())
 		return; // dont allow cheaters
 
 	int roll = RandomUInt(99)+1;
@@ -797,20 +800,18 @@ void LootRoll::PlayerRolled(Player *player, uint8 choice)
 	data << _itemid << _itemunk1 << _itemunk2;
 
 	if(choice == NEED) {
-		NeedRolls.insert( std::make_pair(player->GetGUID(), roll) );
+		m_NeedRolls.insert( std::make_pair(player->GetLowGUID(), roll) );
 		data << uint8(roll) << uint8(NEED);
 	} 
 	else if(choice == GREED)
 	{
-		GreedRolls.insert( std::make_pair(player->GetGUID(), roll) );
+		m_GreedRolls.insert( std::make_pair(player->GetLowGUID(), roll) );
 		data << uint8(roll) << uint8(GREED);
 
 	}
 	else
 	{
-		if(!_passedGuid)
-			_passedGuid = player->GetGUID();
-
+		m_passRolls.insert( player->GetLowGUID() );
 		data << uint8(128) << uint8(128);
 	}
 	

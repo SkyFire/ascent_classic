@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -153,7 +153,7 @@ public:
 	// a lua script cannot create a unit.
 	GameObject(lua_State * L) { ASSERT(false); }*/
 
-	GameObject(uint32 high, uint32 low);
+	GameObject(uint64 guid);
 	~GameObject( );
 
 	ASCENT_INLINE GameObjectInfo* GetInfo() { return pInfo; }

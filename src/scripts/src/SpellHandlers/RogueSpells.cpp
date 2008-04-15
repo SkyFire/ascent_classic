@@ -23,12 +23,9 @@ bool Preparation(uint32 i, Spell * pSpell)
     Player * playerTarget = pSpell->p_caster;
     if(playerTarget == 0) return true;
 
-    playerTarget->ClearCooldownForSpell(SPELL_HASH_VANISH);
-	playerTarget->ClearCooldownForSpell(SPELL_HASH_EVASION);
-	playerTarget->ClearCooldownForSpell(SPELL_HASH_SPRINT);
-	playerTarget->ClearCooldownForSpell(SPELL_HASH_PREMEDITATION);
-	playerTarget->ClearCooldownForSpell(SPELL_HASH_COLD_BLOOD);
-	playerTarget->ClearCooldownForSpell(SPELL_HASH_SHADOWSTEP);
+    playerTarget->ClearCooldownsOnLine(39, pSpell->m_spellInfo->Id); // line - subtlety
+    playerTarget->ClearCooldownsOnLine(38, pSpell->m_spellInfo->Id); // line - combat
+    playerTarget->ClearCooldownsOnLine(253, pSpell->m_spellInfo->Id);// line - assassination
     return true;
 }
 

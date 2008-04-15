@@ -80,6 +80,7 @@ void Player::SendLogXPGain(uint64 guid, uint32 NormalXP, uint32 RestedXP, bool t
         packet.guid = 0; // does not need to be set for quest xp
         packet.xp = NormalXP;
         packet.type = (uint8)type;
+		packet.unk = 0;
         GetSession()->OutPacket(SMSG_LOG_XPGAIN, sizeof(packetSMSG_LOG_XP_GAIN),(const char*)&packet);
     }
 }
@@ -115,3 +116,5 @@ void Player::SendCastResult(uint32 SpellId, uint8 ErrorMessage, uint8 MultiCast,
 		m_session->OutPacket( SMSG_CAST_RESULT, sizeof( packetSMSG_CASTRESULT ), &pe );
 	}
 }
+
+

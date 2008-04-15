@@ -97,8 +97,8 @@ if test -z "$SVN"; then AC_MSG_ERROR(Subversion not found); fi
 # Checks for libraries.
 
 # Reset 
-CFLAGS=$INCLUDES
-CXXFLAGS=$INCLUDES
+CFLAGS="$INCLUDES -Wall"
+CXXFLAGS="$INCLUDES -Wall"
 
 # Check for pthread
 ACX_PTHREAD( [
@@ -270,7 +270,7 @@ AC_DEFINE_UNQUOTED([PREFIX], "${prefix}", "Prefix")
 AC_DEFINE_UNQUOTED([SCRIPTDIR], "${scriptdir}", "librarydir")
 AC_DEFINE_UNQUOTED([CONFDIR], "${sysconfdir}", "configdir")
 
-AC_DEFINE_UNQUOTED([SVN_REVISION_DONE], `sh ./extract_svn_revision.h`, [SVN revision generated])
+AC_DEFINE_UNQUOTED([SVN_REVISION_DONE], `sh ./extract_svn_revision.sh`, [SVN revision generated])
 
 AC_CONFIG_FILES([
    ./Makefile

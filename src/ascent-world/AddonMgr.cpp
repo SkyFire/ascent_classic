@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -125,7 +125,7 @@ void AddonMgr::SendAddonInfoPacket(WorldPacket *source, uint32 pos, WorldSession
 	ByteBuffer unpacked;
 	unpacked.resize(realsize);
 
-	if((position + 5) > source->size())
+	if((source->size() - position) < 4 || realsize == 0)
 	{
 		// we shouldnt get here.. but just in case this will stop any crash here.
 		sLog.outDebug("Warning: Incomplete auth session sent.");

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -101,7 +101,6 @@ protected:
 
 };
 
-typedef set<Player*> VoiceMemberSet;
 class Arena;
 class SERVER_DECL Group
 {
@@ -198,17 +197,20 @@ public:
 	/* Voicechat                                                            */
 	/************************************************************************/
 #ifdef VOICE_CHAT
-	void AddVoiceMember(Player * pPlayer);
-	void RemoveVoiceMember(Player * pPlayer);
+	void AddVoiceMember(PlayerInfo * pPlayer);
+	void RemoveVoiceMember(PlayerInfo * pPlayer);
 	void SendVoiceUpdate();
 	void CreateVoiceSession();
 	void VoiceChannelCreated(uint16 id);
+	void VoiceSessionDropped();
+	void VoiceSessionReconnected();
 
-protected:
+public:
 	bool m_voiceChannelRequested;
 	int16 m_voiceChannelId;
-	uint8 m_voiceMemberHigh;
-	VoiceMemberSet m_voiceMembers;
+	uint32 m_voiceMemberCount;
+protected:
+	PlayerInfo* m_voiceMembersList[41];
 #endif	// VOICE_CHAT
 
 protected:

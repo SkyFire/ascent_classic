@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -568,6 +568,8 @@ public:
 	void SpellAuraModBlockValue(bool apply);
 	void SpellAuraFinishingMovesCannotBeDodged(bool apply);
 	void SpellAuraAxeSkillModifier(bool apply);
+	void SpellAuraDrinkNew(bool apply);
+	void EventPeriodicDrink(uint32 amount);
 
 	void SendModifierLog(int32 ** m,int32 v,uint64 mask,uint8 type,bool pct = false);
 	void SendDummyModifierLog(std::map<SpellEntry*,uint32> * m,SpellEntry * spellInfo,uint32 i,bool apply,bool pct = false);
@@ -611,7 +613,7 @@ public:
 		data << (uint32)1;					  // unknown? need research?
 		data << uint32(Flags | 0x1);			// aura school
 		data << Amount;						 // amount of done to target / heal / damage
-		data << School;
+		data << g_spellSchoolConversionTable[School];
 		data << uint32(abs_dmg);
 		data << uint32(resisted_damage);
 
@@ -627,7 +629,7 @@ public:
 		data << (uint32)1;					  // unknown?? need resource?
 		data << uint32(Flags | 0x1);			// aura school
 		data << Amount;						 // amount of done to target / heal / damage
-		data << School;
+		data << g_spellSchoolConversionTable[School];
 		data << uint32(abs_dmg);
 		data << uint32(resisted_damage);
 

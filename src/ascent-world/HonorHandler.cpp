@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,7 +32,7 @@ void WorldSession::HandleSetVisibleRankOpcode(WorldPacket& recv_data)
 
 void HonorHandler::AddHonorPointsToPlayer(Player *pPlayer, uint32 uAmount)
 {
-	pPlayer->m_honorPointsToAdd += uAmount;
+	pPlayer->m_honorPoints += uAmount;
 	pPlayer->m_honorToday += uAmount;
 	
 	pPlayer->HandleProc(PROC_ON_GAIN_EXPIERIENCE, pPlayer, NULL);
@@ -107,11 +107,23 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 	if( !pVictim->IsPlayer() || static_cast< Player* >( pVictim )->m_honorless )
 		return;
 
-    if( pVictim->IsPlayer() && static_cast< Player* >( pVictim )->m_bgTeam == pPlayer->m_bgTeam )
-        return;
+    if( pVictim->IsPlayer() )
+	{
+		if( pPlayer->m_bg )
+		{
+			if( static_cast< Player* >( pVictim )->m_bgTeam == pPlayer->m_bgTeam )
+				return;
 
-    if( pPlayer->GetTeam() == static_cast< Player* >( pVictim )->GetTeam() )
-        return;
+			// patch 2.4, players killed >50 times in battlegrounds won't be worth honor for the rest of that bg
+			if( static_cast<Player*>(pVictim)->m_bgScore.Deaths >= 50 )
+				return;
+		}
+		else
+		{
+			if( pPlayer->GetTeam() == static_cast< Player* >( pVictim )->GetTeam() )
+				return;
+		}
+	}
 
 	// Calculate points
 	int32 Points = CalculateHonorPointsForKill(pPlayer, pVictim);

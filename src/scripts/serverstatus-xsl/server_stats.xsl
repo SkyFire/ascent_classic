@@ -105,6 +105,101 @@
 <xsl:template match="cdbquerysize">
 </xsl:template>
 
+<xsl:template match="statsummary">
+	<table cellspacing="0" cellpadding="0" border="0" style="border: 0;">
+	<tr>
+	<td valign="top">
+		<table border="0" cellspacing="1" cellpadding="3">
+		<tr class="head"><th colspan="4">Race Summary</th></tr>
+		<tr>
+			<th width="120px">Human: </th><td width="50px"><xsl:value-of select="human"/></td>
+			<th width="120px">Orc: </th><td width="50px"><xsl:value-of select="orc"/></td>
+		</tr>
+		<tr>
+			<th>Dwarf: </th><td><xsl:value-of select="dwarf"/></td>
+			<th>Undead: </th><td><xsl:value-of select="undead"/></td>
+		</tr>
+		<tr>
+			<th>Night Elf: </th><td><xsl:value-of select="nightelf"/></td>
+			<th>Tauren: </th><td><xsl:value-of select="tauren"/></td>
+		</tr>
+		<tr>
+			<th>Gnome: </th><td><xsl:value-of select="gnome"/></td>
+			<th>Troll: </th><td><xsl:value-of select="troll"/></td>
+		</tr>
+		<tr>
+			<th>Draenei: </th><td><xsl:value-of select="draenei"/></td>
+			<th>Blood Elf: </th><td><xsl:value-of select="bloodelf"/></td>
+		</tr>
+		</table>
+	</td>
+	<td width="20px"></td>
+	<td valign="top">
+		<table border="0" cellspacing="1" cellpadding="3">
+		<tr class="head"><th colspan="4">Class Summary</th></tr>
+		<tr>
+			<th width="120px">Warrior: </th><td width="50px"><xsl:value-of select="warrior"/></td>
+			<th width="120px">Paladin: </th><td width="50px"><xsl:value-of select="paladin"/></td>
+		</tr>
+		<tr>
+			<th>Hunter: </th><td><xsl:value-of select="hunter"/></td>
+			<th>Rogue: </th><td><xsl:value-of select="rogue"/></td>
+		</tr>
+		<tr>
+			<th>Priest: </th><td><xsl:value-of select="priest"/></td>
+			<th>Shaman: </th><td><xsl:value-of select="shaman"/></td>
+		</tr>
+		<tr>
+			<th>Mage: </th><td><xsl:value-of select="mage"/></td>
+			<th>Druid: </th><td><xsl:value-of select="druid"/></td>
+		</tr>
+		</table>
+	</td>
+	</tr>
+
+	<xsl:apply-templates/>
+
+	</table>
+
+</xsl:template>
+<xsl:template match="human">
+</xsl:template>
+<xsl:template match="orc">
+</xsl:template>
+<xsl:template match="dwarf">
+</xsl:template>
+<xsl:template match="nightelf">
+</xsl:template>
+<xsl:template match="undead">
+</xsl:template>
+<xsl:template match="tauren">
+</xsl:template>
+<xsl:template match="gnome">
+</xsl:template>
+<xsl:template match="troll">
+</xsl:template>
+<xsl:template match="bloodelf">
+</xsl:template>
+<xsl:template match="draenei">
+</xsl:template>
+
+<xsl:template match="warrior">
+</xsl:template>
+<xsl:template match="paladin">
+</xsl:template>
+<xsl:template match="hunter">
+</xsl:template>
+<xsl:template match="rogue">
+</xsl:template>
+<xsl:template match="priest">
+</xsl:template>
+<xsl:template match="shaman">
+</xsl:template>
+<xsl:template match="mage">
+</xsl:template>
+<xsl:template match="druid">
+</xsl:template>
+
 <xsl:template match="instances">
 	<table width="100%" border="0" cellspacing="1" cellpadding="2">
 		<tr class="head">

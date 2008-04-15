@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -81,7 +81,7 @@ void WorldSession::HandleDuelCancelled(WorldPacket & recv_data)
 	_player->SetUInt32Value( PLAYER_DUEL_TEAM, 0);
 
 	_player->DuelingWith->m_duelState = DUEL_STATE_FINISHED;
-	_player->m_duelStatus = DUEL_STATE_FINISHED;
+	_player->m_duelState = DUEL_STATE_FINISHED;
 
 	_player->DuelingWith->m_duelCountdownTimer = 0;
 	_player->m_duelCountdownTimer = 0;

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -127,7 +127,7 @@ NameTableEntry g_worldOpcodeNames[] = {
 	{SMSG_FRIEND_STATUS,                           "SMSG_FRIEND_STATUS"},
 	{CMSG_ADD_FRIEND,                              "CMSG_ADD_FRIEND"},
 	{CMSG_DEL_FRIEND,                              "CMSG_DEL_FRIEND"},
-	{SMSG_IGNORE_LIST,                             "SMSG_IGNORE_LIST"},
+	{CMSG_SET_FRIEND_NOTE,                             "CMSG_SET_FRIEND_NOTE"},
 	{CMSG_ADD_IGNORE,                              "CMSG_ADD_IGNORE"},
 	{CMSG_DEL_IGNORE,                              "CMSG_DEL_IGNORE"},
 	{CMSG_GROUP_INVITE,                            "CMSG_GROUP_INVITE"},
@@ -876,6 +876,9 @@ NameTableEntry g_worldOpcodeNames[] = {
 	{SMSG_ACTIVATE_SPAM_REPORTING,                 "SMSG_ACTIVATE_SPAM_REPORTING"},
 	{NUM_MSG_TYPES,                                "NUM_MSG_TYPES"},
 	{SMSG_INSPECT_TALENTS,						   "SMSG_INSPECT_TALENTS"},
+	{CMSG_SET_AUTO_LOOT_PASS,					   "CMSG_SET_AUTO_LOOT_PASS"},
+	{CMSG_INRANGE_QUESTGIVER_STATUS_QUERY,		   "CMSG_INRANGE_QUESTGIVER_STATUS_QUERY"},
+	{SMSG_INRANGE_QUESTGIVER_STATUS_QUERY_RESPONSE,"SMSG_INRANGE_QUESTGIVER_STATUS_QUERY_RESPONSE"},
 	{0,			0}
 };
 

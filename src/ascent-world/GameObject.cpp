@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,7 +18,7 @@
  */
 
 #include "StdAfx.h"
-GameObject::GameObject(uint32 high, uint32 low)
+GameObject::GameObject(uint64 guid)
 {
 	m_objectTypeId = TYPEID_GAMEOBJECT;
 	m_valuesCount = GAMEOBJECT_END;
@@ -26,8 +26,7 @@ GameObject::GameObject(uint32 high, uint32 low)
 	memset(m_uint32Values, 0,(GAMEOBJECT_END)*sizeof(uint32));
 	m_updateMask.SetCount(GAMEOBJECT_END);
 	SetUInt32Value( OBJECT_FIELD_TYPE,TYPE_GAMEOBJECT|TYPE_OBJECT);
-	SetUInt32Value( OBJECT_FIELD_GUID,low);
-	SetUInt32Value( OBJECT_FIELD_GUID+1,high);                           
+	SetUInt64Value( OBJECT_FIELD_GUID,guid);
 	m_wowGuid.Init(GetGUID());
  
 	SetFloatValue( OBJECT_FIELD_SCALE_X, 1);//info->Size  );
@@ -80,7 +79,7 @@ GameObject::~GameObject()
 
 	if (m_summonedGo && m_summoner)
 		for(int i = 0; i < 4; i++)
-			if (m_summoner->m_ObjectSlots[i] == GetGUIDLow())
+			if (m_summoner->m_ObjectSlots[i] == GetLowGUID())
 				m_summoner->m_ObjectSlots[i] = 0;
 
 	if( m_battleground != NULL && m_battleground->GetType() == BATTLEGROUND_ARATHI_BASIN )
@@ -672,7 +671,7 @@ void GameObject::OnRemoveInRangeObject(Object* pObj)
 	if(m_summonedGo && m_summoner == pObj)
 	{
 		for(int i = 0; i < 4; i++)
-			if (m_summoner->m_ObjectSlots[i] == GetGUIDLow())
+			if (m_summoner->m_ObjectSlots[i] == GetLowGUID())
 				m_summoner->m_ObjectSlots[i] = 0;
 
 		m_summoner = 0;

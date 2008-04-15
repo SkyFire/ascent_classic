@@ -17,6 +17,7 @@
 class ListenSocketBase
 {
 public:
+	virtual ~ListenSocketBase() {}
 	virtual void OnAccept() = 0;
 	virtual int GetFd() = 0;
 };

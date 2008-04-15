@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -336,7 +336,7 @@ void Guild::PromoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 
 	// log it
 	LogGuildEvent(GUILD_EVENT_PROMOTION, 3, pClient->GetPlayer()->GetName(), pMember->name, newRank->szRankName);
-	AddGuildLogEntry(GUILD_LOG_EVENT_PROMOTION, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid, newRank->iId);
+	AddGuildLogEntry(GUILD_LOG_EVENT_PROMOTION, 2, pClient->GetPlayer()->GetLowGUID(), pMember->guid, newRank->iId);
 
 	// update in the database
 	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, pMember->guid, m_guildId);
@@ -392,7 +392,7 @@ void Guild::DemoteGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 
 	// log it
 	LogGuildEvent(GUILD_EVENT_DEMOTION, 3, pClient->GetPlayer()->GetName(), pMember->name, newRank->szRankName);
-	AddGuildLogEntry(GUILD_LOG_EVENT_DEMOTION, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid, newRank->iId);
+	AddGuildLogEntry(GUILD_LOG_EVENT_DEMOTION, 2, pClient->GetPlayer()->GetLowGUID(), pMember->guid, newRank->iId);
 
 	// update in the database
 	CharacterDatabase.Execute("UPDATE guild_data SET guildRank = %u WHERE playerid = %u AND guildid = %u", newRank->iId, pMember->guid, m_guildId);
@@ -784,7 +784,7 @@ void Guild::RemoveGuildMember(PlayerInfo * pMember, WorldSession * pClient)
 	LogGuildEvent(GUILD_EVENT_LEFT, 1, pMember->name);
 	if(pClient && pClient->GetPlayer()->m_playerInfo != pMember)
 	{
-		AddGuildLogEntry(GUILD_LOG_EVENT_REMOVAL, 2, pClient->GetPlayer()->GetGUIDLow(), pMember->guid);
+		AddGuildLogEntry(GUILD_LOG_EVENT_REMOVAL, 2, pClient->GetPlayer()->GetLowGUID(), pMember->guid);
 	}
 	else
 	{
@@ -926,7 +926,7 @@ void Guild::Disband()
 
 void Guild::ChangeGuildMaster(PlayerInfo * pNewMaster, WorldSession * pClient)
 {
-	if(pClient->GetPlayer()->GetGUIDLow() != m_guildLeader)
+	if(pClient->GetPlayer()->GetLowGUID() != m_guildLeader)
 	{
 		Guild::SendGuildCommandResult(pClient, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
 		return;
@@ -1137,6 +1137,7 @@ void Guild::SendGuildRoster(WorldSession * pClient)
 		data << itr->second->pRank->iId;
 		data << uint8(itr->first->lastLevel);
 		data << uint8(itr->first->cl);
+		data << uint8(0);
 		data << itr->first->lastZone;
 
 		if(!pPlayer)
@@ -1212,7 +1213,7 @@ Guild* Guild::Create()
 
 void Guild::BuyBankTab(WorldSession * pClient)
 {
-	if(pClient && pClient->GetPlayer()->GetGUIDLow() != m_guildLeader)
+	if(pClient && pClient->GetPlayer()->GetLowGUID() != m_guildLeader)
 		return;
 
 	if(m_bankTabCount>=MAX_GUILD_BANK_TABS)
@@ -1317,7 +1318,7 @@ void Guild::DepositMoney(WorldSession * pClient, uint32 uAmount)
 	CharacterDatabase.Execute("UPDATE guilds SET bankBalance = %u WHERE guildId = %u", m_bankBalance, m_guildId);
 
 	// take the money, oh noes gm pls gief gold mi hero poor
-	pClient->GetPlayer()->ModUInt32Value(PLAYER_FIELD_COINAGE, -(int32)uAmount);
+	pClient->GetPlayer()->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -(int32)uAmount);
 
 	// broadcast guild event telling everyone the new balance
 	char buf[20];
@@ -1325,7 +1326,7 @@ void Guild::DepositMoney(WorldSession * pClient, uint32 uAmount)
 	LogGuildEvent(GUILD_EVENT_SETNEWBALANCE, 1, buf);
 
 	// log it!
-	LogGuildBankActionMoney(GUILD_BANK_LOG_EVENT_DEPOSIT_MONEY, pClient->GetPlayer()->GetGUIDLow(), uAmount);
+	LogGuildBankActionMoney(GUILD_BANK_LOG_EVENT_DEPOSIT_MONEY, pClient->GetPlayer()->GetLowGUID(), uAmount);
 }
 
 void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
@@ -1357,7 +1358,7 @@ void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
 	pMember->OnMoneyWithdraw(uAmount);
 
 	// give the gold! GM PLS GOLD PLS 1 COIN
-	pClient->GetPlayer()->ModUInt32Value(PLAYER_FIELD_COINAGE, (uint32)uAmount);
+	pClient->GetPlayer()->ModUnsigned32Value(PLAYER_FIELD_COINAGE, (uint32)uAmount);
 
 	// subtract the balance
 	m_bankBalance -= uAmount;
@@ -1371,7 +1372,7 @@ void Guild::WithdrawMoney(WorldSession * pClient, uint32 uAmount)
 	LogGuildEvent(GUILD_EVENT_SETNEWBALANCE, 1, buf);
 
 	// log it!
-	LogGuildBankActionMoney(GUILD_BANK_LOG_EVENT_WITHDRAW_MONEY, pClient->GetPlayer()->GetGUIDLow(), uAmount);
+	LogGuildBankActionMoney(GUILD_BANK_LOG_EVENT_WITHDRAW_MONEY, pClient->GetPlayer()->GetLowGUID(), uAmount);
 }
 
 void Guild::SendGuildBankLog(WorldSession * pClient, uint8 iSlot)

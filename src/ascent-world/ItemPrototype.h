@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -282,6 +282,7 @@ enum ITEM_SPELLTRIGGER_TYPE
 	ON_EQUIP	  = 1,
 	CHANCE_ON_HIT = 2,
 	SOULSTONE	 = 4,
+	LEARNING	= 6,
 };
 
 enum ITEM_BONDING_TYPE
@@ -557,8 +558,6 @@ struct ItemPrototype
 	SocketInfo Sockets[3];
 	uint32 SocketBonus;
 	uint32 GemProperties;
-	uint32 ItemExtendedCost;
-	uint32 ArenaRankRequirement;
 	int32 DisenchantReqSkill;
 	uint32 ArmorDamageModifier;
 
@@ -566,6 +565,8 @@ struct ItemPrototype
 	uint32 FoodType;		//pet food type
 	GossipScript * gossip_script;
 	int32 ForcedPetId;
+
+	ItemExtendedCostEntry * extended_cost;
 };
 
 typedef struct {

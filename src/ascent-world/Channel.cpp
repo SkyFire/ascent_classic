@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -56,6 +56,7 @@ Channel::Channel(const char * name, uint32 team, uint32 type_id)
 	m_name = string(name);
 	m_team = team;
 	m_id = type_id;
+	m_minimumLevel = 1;
 #ifdef VOICE_CHAT
 	voice_enabled = sVoiceChatHandler.CanUseVoiceChat();
 	i_voice_channel_id = -1;
@@ -85,6 +86,14 @@ Channel::Channel(const char * name, uint32 team, uint32 type_id)
 	}
 	else
 		m_flags = 0x01;
+
+	// scape stuff
+	if( !stricmp(name, "global") || !stricmp(name, "mall") || !stricmp(name, "lfg") )
+	{
+		m_minimumLevel = 10;
+		m_general = true;
+		m_announce = false;
+	}
 }
 
 void Channel::AttemptJoin(Player * plr, const char * password)
@@ -103,7 +112,7 @@ void Channel::AttemptJoin(Player * plr, const char * password)
 		return;
 	}
 
-	if(m_bannedMembers.find(plr->GetGUIDLow()) != m_bannedMembers.end())
+	if(m_bannedMembers.find(plr->GetLowGUID()) != m_bannedMembers.end())
 	{
 		data << uint8(CHANNEL_NOTIFY_FLAG_YOURBANNED) << m_name;
 		plr->GetSession()->SendPacket(&data);
@@ -386,6 +395,13 @@ void Channel::Say(Player * plr, const char * message, Player * for_gm_client, bo
 		}
 	}
 
+	// not blizzlike but meh
+	if( plr->getLevel() < m_minimumLevel )
+	{
+		plr->BroadcastMessage("You must be level %u to speak in the channel, '%s'.", m_minimumLevel, m_name.c_str());
+		return;
+	}
+
 	data.SetOpcode(SMSG_MESSAGECHAT);
 	data << uint8(CHAT_MSG_CHANNEL);
 	data << uint32(0);		// language
@@ -471,7 +487,7 @@ void Channel::Kick(Player * plr, Player * die_player, bool ban)
 		SetOwner(NULL, NULL);
 
 	if(ban)
-		m_bannedMembers.insert(die_player->GetGUIDLow());
+		m_bannedMembers.insert(die_player->GetLowGUID());
 
 	data.clear();
 	data << uint8(CHANNEL_NOTIFY_FLAG_YOULEFT) << m_name << m_id << uint32(0) << uint8(0);

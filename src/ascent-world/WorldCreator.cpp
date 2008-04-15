@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -238,7 +238,7 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr, uint32 instanceid)
 	in = new Instance;
 	in->m_creation = UNIXTIME;
 	in->m_expiration = (inf->type == INSTANCE_NONRAID) ? 0 : UNIXTIME + inf->cooldown;		// expire time 0 is 10 minutes after last player leaves
-	in->m_creatorGuid = pGroup ? 0 : plr->GetGUIDLow();		// creator guid is 0 if its owned by a group.
+	in->m_creatorGuid = pGroup ? 0 : plr->GetLowGUID();		// creator guid is 0 if its owned by a group.
 	in->m_creatorGroup = pGroup ? pGroup->GetID() : 0;
 	in->m_difficulty = plr->iInstanceType;
 	in->m_instanceId = GenerateInstanceID();
@@ -570,7 +570,7 @@ void InstanceMgr::ResetSavedInstances(Player * plr)
 				in = itr->second;
 				++itr;
 
-				if( ( in->m_mapInfo->type == INSTANCE_NONRAID && (plr->GetGroup() && plr->GetGroup()->GetID() == in->m_creatorGroup) ) || ( in->m_mapInfo->type == INSTANCE_NONRAID && plr->GetGUIDLow() == in->m_creatorGuid ) )
+				if( ( in->m_mapInfo->type == INSTANCE_NONRAID && (plr->GetGroup() && plr->GetGroup()->GetID() == in->m_creatorGroup) ) || ( in->m_mapInfo->type == INSTANCE_NONRAID && plr->GetLowGUID() == in->m_creatorGuid ) )
 				{
 					if(in->m_mapMgr && in->m_mapMgr->HasPlayers())
 					{

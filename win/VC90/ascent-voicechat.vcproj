@@ -68,11 +68,12 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(OutDir)/ascent-voicechat.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ascent-voicechat.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
+				FixedBaseAddress="1"
 				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
@@ -347,15 +348,39 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\ascent-voicechat\ConfigReader.c"
+				RelativePath="..\..\src\ascent-voicechat\ascent_socket.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ascent-voicechat\Main.c"
+				RelativePath="..\..\src\ascent-voicechat\configfile.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ascent-voicechat\VoiceChat.c"
+				RelativePath="..\..\src\ascent-voicechat\launcher.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\log.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\network_handlers.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\network_unixselect.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\network_win32.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\voice_channel.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\voice_socket.c"
 				>
 			</File>
 		</Filter>
@@ -365,11 +390,47 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\ascent-voicechat\VoiceChat.h"
+				RelativePath="..\..\src\ascent-voicechat\ascent_opcodes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ascent-voicechat\VoiceChatOpcodes.h"
+				RelativePath="..\..\src\ascent-voicechat\ascent_packet.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\common.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\configfile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\linkedlist.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\log.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\mutex.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\network.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\network_handlers.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\voice_channel.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\ascent-voicechat\voice_channelmgr.h"
 				>
 			</File>
 		</Filter>

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -1352,7 +1352,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( healthtoloose > (int32)GetUInt32Value( UNIT_FIELD_HEALTH ) )
 									SetUInt32Value( UNIT_FIELD_HEALTH, 1 );
 								else
-									ModUInt32Value( UNIT_FIELD_HEALTH, -healthtoloose );
+									ModUnsigned32Value( UNIT_FIELD_HEALTH, -healthtoloose );
 							}break;
 						//paladin - Improved Lay on Hands
 						case 20233:
@@ -1399,7 +1399,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 31828:
 							{
 								//we should test is damage is from enviroment or not :S
-								ModUInt32Value(UNIT_FIELD_HEALTH,dmg/2);
+								ModUnsigned32Value(UNIT_FIELD_HEALTH,dmg/2);
 								continue; //there is no visual for this ?
 							}break;
 							//paladin - sanctified judgement
@@ -2617,7 +2617,7 @@ else
 					printf("!!!!!spell dmg bonus mod flat %d , spell dmg bonus pct %d , spell dmg bonus %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,dmg.full_damage,ability->SpellGroupType);
 #endif
 			}
-			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type] + add_damage;
+			dmg.full_damage += pVictim->DamageTakenMod[dmg.school_type];
 			if( weapon_damage_type == RANGED )
 			{
 				dmg.full_damage += pVictim->RangedDamageTaken;
@@ -2630,6 +2630,8 @@ else
 
 			if( pct_dmg_mod > 0 )
 				dmg.full_damage = float2int32( dmg.full_damage *  ( float( pct_dmg_mod) / 100.0f ) );
+
+			dmg.full_damage += add_damage;
 
 			//a bit dirty fix
 			/*if( ability != NULL && ability->NameHash == SPELL_HASH_SHRED )
@@ -3010,17 +3012,17 @@ else
 		data << (uint32)realdamage;		 // Realdamage;
 		data << (uint8)1;				   // Damage type counter / swing type
 
-		data << (uint32)dmg.school_type;				  // Damage school
+		data << (uint32)g_spellSchoolConversionTable[dmg.school_type];				  // Damage school
 		data << (float)dmg.full_damage;	 // Damage float
 		data << (uint32)dmg.full_damage;	// Damage amount
 		data << (uint32)abs;// Damage absorbed
 		data << (uint32)dmg.resisted_damage;				  // Damage resisted
 
 		data << (uint32)vstate;			 // new victim state
-		data << (int32)0;					// can be 0,1000 or -1
+		data << (uint32)0x03e8;					// can be 0,1000 or -1
 		data << (uint32)0;				  // unknown
 		data << (uint32)blocked_damage;	 // Damage amount blocked
-		data << (uint32) 0;
+		//data << (uint32) 0;
 
 		SendMessageToSet(&data, this->IsPlayer());
 	}
@@ -3141,9 +3143,9 @@ else
 		//float p = ( 1 + ( static_cast< Player* >( this )->rageFromDamageDealt / 100.0f ) );
 		//sLog.outDebug( "Rd(%i) d(%i) c(%f) f(%f) s(%f) p(%f) r(%f) rage = %f", realdamage, dmg.full_damage, c, f, s, p, r, val );
 
-		ModUInt32Value( UNIT_FIELD_POWER2, (int32)val );
+		ModUnsigned32Value( UNIT_FIELD_POWER2, (int32)val );
 		if( GetUInt32Value( UNIT_FIELD_POWER2 ) > 1000 )
-			ModUInt32Value( UNIT_FIELD_POWER2, 1000 - GetUInt32Value( UNIT_FIELD_POWER2 ) );
+			ModUnsigned32Value( UNIT_FIELD_POWER2, 1000 - GetUInt32Value( UNIT_FIELD_POWER2 ) );
 
 	}
 
@@ -3161,9 +3163,9 @@ else
 
 		//sLog.outDebug( "Rd(%i) d(%i) c(%f) rage = %f", realdamage, dmg.full_damage, c, val );
 
-		pVictim->ModUInt32Value( UNIT_FIELD_POWER2, (int32)val );
+		pVictim->ModUnsigned32Value( UNIT_FIELD_POWER2, (int32)val );
 		if( pVictim->GetUInt32Value( UNIT_FIELD_POWER2) > 1000 )
-			pVictim->ModUInt32Value( UNIT_FIELD_POWER2, 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 ) );
+			pVictim->ModUnsigned32Value( UNIT_FIELD_POWER2, 1000 - pVictim->GetUInt32Value( UNIT_FIELD_POWER2 ) );
 
 	}
 		
@@ -3996,290 +3998,78 @@ void Unit::Emote(EmoteType emote)
 
 void Unit::SendChatMessageToPlayer(uint8 type, uint32 lang, const char *msg, Player *plr)
 {
-  if(plr == NULL)
-    return;
+	size_t UnitNameLength = 0, MessageLength = 0;
+	CreatureInfo *ci = (m_objectTypeId == TYPEID_UNIT) ? ((Creature*)this)->creature_info : NULL;
 
-  size_t UnitNameLength = 0, MessageLength = 0;
-  const char *UnitName = "";
-  CreatureInfo *ci;
+	if(ci == NULL || plr == NULL)
+		return;
 
-  ci = CreatureNameStorage.LookupEntry(GetEntry());
-  if(!ci)
-    return;
+	UnitNameLength = strlen((char*)ci->Name) + 1;
+	MessageLength = strlen((char*)msg) + 1;
 
-  UnitName = ci->Name;
-  UnitNameLength = strlen((char*)UnitName) + 1;
-  MessageLength = strlen((char*)msg) + 1;
-
-  switch(type)
-  {
-  case CHAT_MSG_MONSTER_WHISPER:
-    {
-      WorldPacket data(SMSG_MESSAGECHAT, 200);
-
-      data << uint8(type);
-      data << uint32(lang);
-      data << uint64(GetGUID());
-      data << uint32(0);
-      data << uint32(UnitNameLength);
-      data << UnitName;
-      data << uint64(plr->GetGUID());
-      data << uint32(MessageLength);
-      data << msg;
-      data << uint8(0);      
-
-      WorldSession *session = plr->GetSession();
-      session->SendPacket(&data);
-
-    }break;
-  }
+	WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
+	data << type;
+	data << lang;
+	data << GetGUID();
+	data << uint32(0);			// new in 2.1.0
+	data << uint32(UnitNameLength);
+	data << ci->Name;
+	data << uint64(0);
+	data << uint32(MessageLength);
+	data << msg;
+	data << uint8(0x00);
+	plr->GetSession()->SendPacket(&data);
 }
 
 void Unit::SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg)
 {
 	size_t UnitNameLength = 0, MessageLength = 0;
-	const char *UnitName = "";
 	CreatureInfo *ci;
 
 	ci = CreatureNameStorage.LookupEntry(entry);
 	if(!ci)
 		return;
 
-	UnitName = ci->Name;
-	UnitNameLength = strlen((char*)UnitName) + 1;
+	UnitNameLength = strlen((char*)ci->Name) + 1;
 	MessageLength = strlen((char*)msg) + 1;
 
-	switch(type)
-	{
-	case CHAT_MSG_MONSTER_EMOTE:
-		{
-			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
-			{
-				if((*i)->GetTypeId() == TYPEID_PLAYER)
-				{
-					std::stringstream szMessage;
-					szMessage << UnitName << msg;
-
-					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-					data << type;
-					data << lang;
-					data << GetGUID();
-					data << uint32(0);			// new in 2.1.0
-					data << uint32(UnitNameLength);
-					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
-					data << uint32(strlen(szMessage.str().c_str())+1);
-					data << szMessage.str().c_str();
-					data << uint8(0x00);
-					WorldSession *session = ((Player*)(*i))->GetSession();
-					session->SendPacket(&data);
-				}
-			}
-		}break;
-		case CHAT_MSG_RAID_BOSS_EMOTE:
-		{
-			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
-			{
-				if((*i)->GetTypeId() == TYPEID_PLAYER)
-				{
-					std::stringstream szMessage;
-					szMessage << UnitName << msg;
-
-					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-					data << type;
-					data << lang;
-					data << GetGUID();
-					data << uint32(0);			// new in 2.1.0
-					data << uint32(UnitNameLength);
-					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
-					data << uint32(strlen(szMessage.str().c_str())+1);
-					data << szMessage.str().c_str();
-					data << uint8(0x00);
-
-					WorldSession *session = ((Player*)(*i))->GetSession();
-					session->SendPacket(&data);
-				}
-			}
-		}break;
-	case CHAT_MSG_MONSTER_SAY:
-		{
-			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
-			{
-				if((*i)->GetTypeId() == TYPEID_PLAYER)
-				{
-					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-					data << type;
-					data << lang;
-					data << GetGUID();
-					data << uint32(0);			// new in 2.1.0
-					data << uint32(UnitNameLength);
-					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
-					data << uint32(MessageLength);
-					data << msg;
-					data << uint8(0x00);
-
-					WorldSession *session = ((Player*)(*i))->GetSession();
-					session->SendPacket(&data);
-				}
-			}
-		}break;
-	case CHAT_MSG_MONSTER_YELL:
-		{
-			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
-			{
-				if((*i)->GetTypeId() == TYPEID_PLAYER)
-				{
-					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-					data << type;
-					data << lang;
-					data << GetGUID();
-					data << uint32(0);			// new in 2.1.0
-					data << uint32(UnitNameLength);
-					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
-					data << uint32(MessageLength);
-					data << msg;
-					data << uint8(0x00);
-
-					WorldSession *session = ((Player*)(*i))->GetSession();
-					session->SendPacket(&data);
-				}
-			}
-		}break;
-	case CHAT_MSG_CHANNEL:
-		{
-			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
-			{
-				if((*i)->GetTypeId() == TYPEID_PLAYER)
-				{
-					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-					data << type;
-					data << lang;
-					data << GetGUID();
-					data << uint32(0);			// new in 2.1.0
-					data << uint32(UnitNameLength);
-					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
-					data << uint32(MessageLength);
-					data << msg;
-					data << uint8(0x00);
-
-					WorldSession *session = ((Player*)(*i))->GetSession();
-					session->SendPacket(&data);
-				}
-			}
-		}break;
-	}
+	WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
+	data << type;
+	data << lang;
+	data << GetGUID();
+	data << uint32(0);			// new in 2.1.0
+	data << uint32(UnitNameLength);
+	data << ci->Name;
+	data << uint64(0);
+	data << uint32(MessageLength);
+	data << msg;
+	data << uint8(0x00);
+	SendMessageToSet(&data, true);
 }
 
 void Unit::SendChatMessage(uint8 type, uint32 lang, const char *msg)
 {
 	size_t UnitNameLength = 0, MessageLength = 0;
-	const char *UnitName = "";
-	CreatureInfo *ci;
+	CreatureInfo *ci = (m_objectTypeId == TYPEID_UNIT) ? ((Creature*)this)->creature_info : NULL;
 
-	ci = CreatureNameStorage.LookupEntry(GetEntry());
-	if(!ci)
+	if(ci == NULL)
 		return;
 
-	UnitName = ci->Name;
-	UnitNameLength = strlen((char*)UnitName) + 1;
+	UnitNameLength = strlen((char*)ci->Name) + 1;
 	MessageLength = strlen((char*)msg) + 1;
 
-	switch(type)
-	{
-	case CHAT_MSG_MONSTER_SAY:
-		{
-			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
-			{
-				if((*i)->GetTypeId() == TYPEID_PLAYER)
-				{
-					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-					data << type;
-					data << lang;
-					data << GetGUID();
-					data << uint32(0);			// new in 2.1.0
-					data << uint32(UnitNameLength);
-					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
-					data << uint32(MessageLength);
-					data << msg;
-					data << uint8(0x00);
-
-					WorldSession *session = ((Player*)(*i))->GetSession();
-					session->SendPacket(&data);
-				}
-			}
-		}break;
-	case CHAT_MSG_MONSTER_YELL:
-		{
-			uint32 cell_radius = 2;
-			uint32 cellX = m_mapMgr->GetPosX(GetPositionX());
-			uint32 cellY = m_mapMgr->GetPosY(GetPositionY());
-			uint32 endX = ((cellX+cell_radius) <= _sizeX) ? cellX + cell_radius : (_sizeX-1);
-			uint32 endY = ((cellY+cell_radius) <= _sizeY) ? cellY + cell_radius : (_sizeY-1);
-			uint32 startX = (cellX-cell_radius) > 0 ? cellX - cell_radius : 0;
-			uint32 startY = (cellY-cell_radius) > 0 ? cellY - cell_radius : 0;
-
-			for(uint32 x = startX; x < endX; ++x)
-			{
-				for(uint32 y = startY; y < endY; ++y)
-				{
-					MapCell * pCell = m_mapMgr->GetCell(x,y);
-					if(pCell)
-					{
-						for(Object::InRangeSet::iterator i = pCell->Begin(); i != pCell->End(); i++)
-						{
-							if((*i)->GetTypeId() == TYPEID_PLAYER)
-							{
-								WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-								data << type;
-								data << lang;
-								data << GetGUID();
-								data << uint32(0);			// new in 2.1.0
-								data << uint32(UnitNameLength);
-								data << UnitName;
-								data << ((Player*)(*i))->GetGUID();
-								data << uint32(MessageLength);
-								data << msg;
-								data << uint8(0x00);
-
-								WorldSession *session = ((Player*)(*i))->GetSession();
-								session->SendPacket(&data);
-							}
-						}
-					}
-				}
-			}
-
-
-		}break;
-	case CHAT_MSG_CHANNEL:
-		{
-			for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); i++)
-			{
-				if((*i)->GetTypeId() == TYPEID_PLAYER)
-				{
-					WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
-					data << type;
-					data << lang;
-					data << GetGUID();
-					data << uint32(0);			// new in 2.1.0
-					data << uint32(UnitNameLength);
-					data << UnitName;
-					data << ((Player*)(*i))->GetGUID();
-					data << uint32(MessageLength);
-					data << msg;
-					data << uint8(0x00);
-
-					WorldSession *session = ((Player*)(*i))->GetSession();
-					session->SendPacket(&data);
-				}
-			}
-		}break;
-	}
+	WorldPacket data(SMSG_MESSAGECHAT, 35 + UnitNameLength + MessageLength);
+	data << type;
+	data << lang;
+	data << GetGUID();
+	data << uint32(0);			// new in 2.1.0
+	data << uint32(UnitNameLength);
+	data << ci->Name;
+	data << uint64(0);
+	data << uint32(MessageLength);
+	data << msg;
+	data << uint8(0x00);
+	SendMessageToSet(&data, true);
 }
 
 void Unit::WipeHateList()
@@ -4302,7 +4092,9 @@ void Unit::AddInRangeObject(Object* pObj)
 	{
 		if( isHostile( this, (Unit*)pObj ) )
 			m_oppFactsInRange.insert(pObj);
-		if( GetTypeId() == TYPEID_PLAYER )
+
+		// commented - this code won't work anyway due to objects getting added in range before they are created - burlex
+		/*if( GetTypeId() == TYPEID_PLAYER )
 		{
 			if( static_cast< Player* >( this )->InGroup() )
 			{
@@ -4322,7 +4114,7 @@ void Unit::AddInRangeObject(Object* pObj)
 					}
 				}
 			}
-		}		
+		}		*/
 	}
 
 	Object::AddInRangeObject(pObj);
@@ -4706,7 +4498,7 @@ void Unit::DropAurasOnDeath()
     }
 }
 
-void Unit::UpdateSpeed(bool delay /* = false */)
+void Unit::UpdateSpeed()
 {
 	if(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID) == 0)
 	{
@@ -4741,8 +4533,8 @@ void Unit::UpdateSpeed(bool delay /* = false */)
 
 	if(IsPlayer())
 	{
-		if(delay)
-			static_cast< Player* >( this )->resend_speed = delay;
+		if(((Player*)this)->m_changingMaps)
+			static_cast< Player* >( this )->resend_speed = true;
 		else
 		{
 			static_cast< Player* >( this )->SetPlayerSpeed(RUN, m_runSpeed);
@@ -5263,9 +5055,9 @@ void Unit::RemoveAurasOfSchool(uint32 School, bool Positive, bool Immune)
 	}
 }
 
-void Unit::EnableFlight(bool delay /* = false */)
+void Unit::EnableFlight()
 {
-	if(!delay || m_objectTypeId != TYPEID_PLAYER)
+	if(m_objectTypeId != TYPEID_PLAYER || ((Player*)this)->m_changingMaps)
 	{
 		WorldPacket data(SMSG_MOVE_SET_FLY, 13);
 		data << GetNewGUID();
@@ -5289,9 +5081,9 @@ void Unit::EnableFlight(bool delay /* = false */)
 	}
 }
 
-void Unit::DisableFlight(bool delay /* = false */)
+void Unit::DisableFlight()
 {
-	if(!delay || m_objectTypeId != TYPEID_PLAYER)
+	if(m_objectTypeId != TYPEID_PLAYER || ((Player*)this)->m_changingMaps)
 	{
 		WorldPacket data(SMSG_MOVE_SET_UNFLY, 13);
 		data << GetNewGUID();
@@ -5551,7 +5343,7 @@ Unit* Unit::create_guardian(uint32 guardian_entry,uint32 duration,float angle)
 	float x = GetPositionX()+(3*(cosf(m_fallowAngle+GetOrientation())));
 	float y = GetPositionY()+(3*(sinf(m_fallowAngle+GetOrientation())));
 	float z = GetPositionZ();
-	Creature * p = GetMapMgr()->CreateCreature();
+	Creature * p = GetMapMgr()->CreateCreature(guardian_entry);
 	p->SetInstanceID(GetMapMgr()->GetInstanceID());
 	p->Load(proto, x, y, z);
 	p->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, GetGUID());
@@ -5614,8 +5406,8 @@ void CombatStatusHandler::WeHealed(Unit * pHealTarget)
 
 	if(pHealTarget->CombatStatus.IsInCombat())
 	{
-		m_healed.insert(pHealTarget->GetGUIDLow());
-		pHealTarget->CombatStatus.m_healers.insert(m_Unit->GetGUIDLow());
+		m_healed.insert(pHealTarget->GetLowGUID());
+		pHealTarget->CombatStatus.m_healers.insert(m_Unit->GetLowGUID());
 	}
 
 	UpdateFlag();
@@ -5623,7 +5415,7 @@ void CombatStatusHandler::WeHealed(Unit * pHealTarget)
 
 void CombatStatusHandler::RemoveHealed(Unit * pHealTarget)
 {
-	m_healed.erase(pHealTarget->GetGUIDLow());
+	m_healed.erase(pHealTarget->GetLowGUID());
 	UpdateFlag();
 }
 
@@ -5833,7 +5625,7 @@ void CombatStatusHandler::ClearHealers()
 		pt = m_Unit->GetMapMgr()->GetPlayer(*itr);
 		if(pt)
 		{
-			pt->CombatStatus.m_healers.erase(m_Unit->GetGUIDLow());
+			pt->CombatStatus.m_healers.erase(m_Unit->GetLowGUID());
 			pt->CombatStatus.UpdateFlag();
 		}
 	}
@@ -5843,7 +5635,7 @@ void CombatStatusHandler::ClearHealers()
 		pt = m_Unit->GetMapMgr()->GetPlayer(*itr);
 		if(pt)
 		{
-			pt->CombatStatus.m_healed.erase(m_Unit->GetGUIDLow());
+			pt->CombatStatus.m_healed.erase(m_Unit->GetLowGUID());
 			pt->CombatStatus.UpdateFlag();
 		}
 	}

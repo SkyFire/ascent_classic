@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,7 +21,7 @@
 
 #define M_PI	   3.14159265358979323846
 
-Creature::Creature(uint32 high, uint32 low)
+Creature::Creature(uint64 guid)
 {
 	proto=0;
 	m_valuesCount = UNIT_END;
@@ -30,8 +30,7 @@ Creature::Creature(uint32 high, uint32 low)
 	memset(m_uint32Values, 0,(UNIT_END)*sizeof(uint32));
 	m_updateMask.SetCount(UNIT_END);
 	SetUInt32Value( OBJECT_FIELD_TYPE,TYPE_UNIT|TYPE_OBJECT);
-	SetUInt32Value( OBJECT_FIELD_GUID,low);
-	SetUInt32Value( OBJECT_FIELD_GUID+1,high);
+	SetUInt64Value( OBJECT_FIELD_GUID,guid);
 	m_wowGuid.Init(GetGUID());
 
 
@@ -481,7 +480,7 @@ void Creature::RemoveFromWorld(bool addrespawnevent, bool free_guid)
 {
 	RemoveAllAuras();
 	
-	if(GetGUIDHigh() != HIGHGUID_UNIT) /* Is a pet: IsPet() actually returns false on a pet? o_X */
+	if(IsPet()) /* Is a pet: IsPet() actually returns false on a pet? o_X */
 	{
 		if(IsInWorld())
 			Unit::RemoveFromWorld(true);
@@ -901,7 +900,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
     //SetUInt32Value(UNIT_FIELD_LEVEL, (mode ? proto->Level + (info ? info->lvl_mod_a : 0) : proto->Level));
 	SetUInt32Value(UNIT_FIELD_LEVEL, proto->MinLevel + (RandomUInt(proto->MaxLevel - proto->MinLevel)));
 	if(mode && info)
-		ModUInt32Value(UNIT_FIELD_LEVEL, info->lvl_mod_a);
+		ModUnsigned32Value(UNIT_FIELD_LEVEL, info->lvl_mod_a);
 
 	for(uint32 i = 0; i < 7; ++i)
 		SetUInt32Value(UNIT_FIELD_RESISTANCES+i,proto->Resistances[i]);

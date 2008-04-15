@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -222,7 +222,7 @@ public:
 
 	// Misc
 	void Init(Unit *un, AIType at, MovementType mt);
-	virtual void Init(Unit *un, AIType at, MovementType mt, Unit *owner); // used for pets
+	void Init(Unit *un, AIType at, MovementType mt, Unit *owner); // used for pets
 	Unit *GetUnit() { return m_Unit; }
 	Unit *GetPetOwner() { return m_PetOwner; }
 	void DismissPet();
@@ -408,7 +408,7 @@ public:
 	bool m_isGuard;
 //	bool m_fastMove;
 	void setGuardTimer(uint32 timer) { m_guardTimer = timer; }
-	virtual void _UpdateCombat(uint32 p_time);
+	void _UpdateCombat(uint32 p_time);
 
 protected:
 	bool m_AllowedToEnterCombat;

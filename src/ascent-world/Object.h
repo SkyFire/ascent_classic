@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -22,18 +22,25 @@
 
 class Unit;
 
-enum HIGHGUID {
-	HIGHGUID_PLAYER		= 0x00000000,
-	HIGHGUID_UNIT		= 0x00000001,
-	HIGHGUID_GAMEOBJECT	= 0x00000002, //0x1FAA0000, //0x1FA70000, elevators 0x1FAA0000 for trams(only this one works for elevators but not for trams lol)
-	HIGHGUID_CORPSE		= 0x00000003,
-	HIGHGUID_DYNAMICOBJECT = 0x00000004,
-	HIGHGUID_ITEM		  = 0x00000005,
-	HIGHGUID_CONTAINER	 = 0x00000006,
-	HIGHGUID_WAYPOINT	  = 0x00000007,
-	HIGHGUID_TRANSPORTER   = 0x1fc00000,
-	HIGHGUID_PET		   = 0x00000009,
+enum HIGHGUID_TYPE
+{
+	HIGHGUID_TYPE_UNIT				= 0xF1300000,
+	HIGHGUID_TYPE_PET				= 0xF1400000,
+	HIGHGUID_TYPE_GAMEOBJECT		= 0xF1100000,
+	HIGHGUID_TYPE_ITEM				= 0x40000000,
+	HIGHGUID_TYPE_CONTAINER			= 0x50000000,			// confirm this pl0x
+	HIGHGUID_TYPE_PLAYER			= 0x00000000,
+	HIGHGUID_TYPE_DYNAMICOBJECT		= 0x60000000,
+	HIGHGUID_TYPE_TRANSPORTER		= 0x1FC00000,
+	HIGHGUID_TYPE_WAYPOINT			= 0x10000000,
+	HIGHGUID_TYPE_CORPSE			= 0x30000000,
+//===============================================
+	HIGHGUID_TYPE_MASK				= 0xFFF00000,
+	LOWGUID_ENTRY_MASK				= 0x00FFFFFF,
 };
+
+#define GET_TYPE_FROM_GUID(x) (GUID_HIPART((x)) & HIGHGUID_TYPE_MASK)
+#define GET_LOWGUID_PART(x) (GUID_LOPART((x)) & LOWGUID_ENTRY_MASK)
 
 // TODO: fix that type mess
 
@@ -128,8 +135,18 @@ public:
 	ASCENT_INLINE const WoWGuid& GetNewGUID() const { return m_wowGuid; }
 	ASCENT_INLINE uint32 GetEntry(){return m_uint32Values[3];}
 	
-	ASCENT_INLINE const uint32& GetGUIDLow() const { return m_uint32Values[0]; }
-	ASCENT_INLINE const uint32& GetGUIDHigh() const { return m_uint32Values[1]; }
+	ASCENT_INLINE const uint32 GetEntryFromGUID() const
+	{
+/*		uint64 entry = *(uint64*)m_uint32Values;
+		entry >>= 24;
+		return (uint32)(entry & 0xFFFFFFFF);*/
+
+		return uint32( (*(uint64*)m_uint32Values >> 24) & 0xFFFFFFFF );
+	}
+
+	ASCENT_INLINE const uint32 GetTypeFromGUID() const { return (m_uint32Values[1] & HIGHGUID_TYPE_MASK); }
+	ASCENT_INLINE const uint32 GetUIdFromGUID() const { return (m_uint32Values[0] & LOWGUID_ENTRY_MASK); }
+	ASCENT_INLINE const uint32 GetLowGUID() const { return (m_uint32Values[0]); }
 
 	// type
 	ASCENT_INLINE const uint8& GetTypeId() const { return m_objectTypeId; }
@@ -228,7 +245,8 @@ public:
 	}
 
 	void __fastcall ModFloatValue(const uint32 index, const float value );
-	void ModUInt32Value(uint32 index, int32 value);
+	void ModSignedInt32Value(uint32 index, int32 value);
+	void ModUnsigned32Value(uint32 index, int32 mod);
 	uint32 GetModPUInt32Value(const uint32 index, const int32 value);
 
 	//! Set uint32 property

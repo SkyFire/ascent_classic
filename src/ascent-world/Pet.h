@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -115,7 +115,7 @@ class SERVER_DECL Pet : public Creature
 	friend class WorldSession;
 
 public:
-	Pet(uint32 high, uint32 low);
+	Pet(uint64 guid);
 	~Pet();
 
 	void LoadFromDB(Player* owner, PlayerPet * pi);
@@ -250,7 +250,7 @@ protected:
 	uint8 GetLoyaltyLevel(){return ((GetUInt32Value(UNIT_FIELD_BYTES_1) >> 8) & 0xff);};
 	HappinessState GetHappinessState();
 	uint32 GetHighestRankSpell(uint32 spellId);
-	void UpdateLoyalty(char pts);
+	bool UpdateLoyalty(char pts);
 
 	list<AI_Spell*> m_autoCastSpells[AUTOCAST_EVENT_COUNT];
 };

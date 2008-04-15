@@ -139,8 +139,7 @@ ascent_world_SOURCES = \
     ScriptMgr.h \
     Skill.h \
     SkillHandler.cpp \
-    SocialMgr.cpp \
-    SocialMgr.h \
+    SocialHandler.cpp \
     SpellAuras.cpp \
     SpellAuras.h \
     SpellTarget.cpp \
@@ -148,6 +147,7 @@ ascent_world_SOURCES = \
     Spell.h \
     SpellEffects.cpp \
     SpellHandler.cpp \
+    SpellFixes.cpp \
     Stats.h \
     Stats.cpp \
     StdAfx.cpp \

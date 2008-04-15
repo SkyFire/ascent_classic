@@ -614,10 +614,7 @@
 			RelativePath="..\..\src\ascent-world\SkillHandler.cpp">
 		</File>
 		<File
-			RelativePath="..\..\src\ascent-world\SocialMgr.cpp">
-		</File>
-		<File
-			RelativePath="..\..\src\ascent-world\SocialMgr.h">
+			RelativePath="..\..\src\ascent-world\SocialHandler.cpp">
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\Spell.cpp">
@@ -642,6 +639,9 @@
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\SpellNameHashes.h">
+		</File>
+		<File
+			RelativePath="..\..\src\ascent-world\SpellFixes.cpp">
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\SpellTarget.cpp">

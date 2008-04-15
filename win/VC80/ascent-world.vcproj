@@ -1009,11 +1009,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\src\ascent-world\SocialMgr.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\src\ascent-world\SocialMgr.h"
+			RelativePath="..\..\src\ascent-world\SocialHandler.cpp"
 			>
 		</File>
 		<File
@@ -1046,6 +1042,10 @@
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\SpellTarget.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\..\src\ascent-world\SpellFixes.cpp"
 			>
 		</File>
 		<File

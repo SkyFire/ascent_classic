@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -81,14 +81,14 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	if(sSocialMgr.HasIgnore(player, _player))
+	if( player->Social_IsIgnoring( _player->GetLowGUID() ) )
 	{
 		SendPartyCommandResult(_player, 0, membername, ERR_PARTY_IS_IGNORING_YOU);
 		return;
 	}
 
 	// 16/08/06 - change to guid to prevent very unlikely event of a crash in deny, etc
-	_player->SetInviter(_player->GetGUIDLow());//bugfix if player invtied 2 people-> he can be in 2 parties
+	_player->SetInviter(_player->GetLowGUID());//bugfix if player invtied 2 people-> he can be in 2 parties
 
 	data.SetOpcode(SMSG_GROUP_INVITE);
 	data << GetPlayer()->GetName();
@@ -102,7 +102,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 	SendPartyCommandResult(_player, gtype, membername, ERR_PARTY_NO_ERROR);
 
 	// 16/08/06 - change to guid to prevent very unlikely event of a crash in deny, etc
-	player->SetInviter(_player->GetGUIDLow());
+	player->SetInviter(_player->GetLowGUID());
 }
 
 ///////////////////////////////////////////////////////////////
@@ -195,7 +195,7 @@ void WorldSession::HandleGroupUninviteOpcode( WorldPacket & recv_data )
 	recv_data >> membername;
 
 	player = objmgr.GetPlayer(membername.c_str(), false);
-	info = objmgr.GetPlayerInfoByName(membername);
+	info = objmgr.GetPlayerInfoByName(membername.c_str());
 	if ( player == NULL && info == NULL )
 	{
 		SendPartyCommandResult(_player, 0, membername, ERR_PARTY_CANNOT_FIND);

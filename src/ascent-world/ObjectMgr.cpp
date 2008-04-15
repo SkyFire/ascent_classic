@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -224,29 +224,40 @@ void ObjectMgr::DeletePlayerInfo( uint32 guid )
 {
 	PlayerInfo * pl;
 	HM_NAMESPACE::hash_map<uint32,PlayerInfo*>::iterator i;
+	PlayerNameStringIndexMap::iterator i2;
 	playernamelock.AcquireWriteLock();
 	i=m_playersinfo.find(guid);
-	if(i!=m_playersinfo.end())
+	if(i==m_playersinfo.end())
 	{
-		pl=i->second;
-		if(pl->m_Group)
-		{
-			pl->m_Group->RemovePlayer(pl);
-			pl->m_Group = NULL;
-		}
-
-		if(pl->guild)
-		{
-			if(pl->guild->GetGuildLeader()==pl->guid)
-				pl->guild->Disband();
-			else
-				pl->guild->RemoveGuildMember(pl,NULL);
-		}
-
-		free(pl->name);
-		delete i->second;
-		m_playersinfo.erase(i);
+		playernamelock.ReleaseWriteLock();
+		return;
 	}
+	
+	pl=i->second;
+	if(pl->m_Group)
+	{
+		pl->m_Group->RemovePlayer(pl);
+		pl->m_Group = NULL;
+	}
+
+	if(pl->guild)
+	{
+		if(pl->guild->GetGuildLeader()==pl->guid)
+			pl->guild->Disband();
+		else
+			pl->guild->RemoveGuildMember(pl,NULL);
+	}
+
+	string pnam = string(pl->name);
+	ASCENT_TOLOWER(pnam);
+	i2 = m_playersInfoByName.find(pnam);
+	if( i2 != m_playersInfoByName.end() && i2->second == pl )
+		m_playersInfoByName.erase( i2 );
+
+	free(pl->name);
+	delete i->second;
+	m_playersinfo.erase(i);
+
 	playernamelock.ReleaseWriteLock();
 }
 
@@ -268,6 +279,27 @@ void ObjectMgr::AddPlayerInfo(PlayerInfo *pn)
 {
 	playernamelock.AcquireWriteLock();
 	m_playersinfo[pn->guid] =  pn ;
+	string pnam = string(pn->name);
+	ASCENT_TOLOWER(pnam);
+	m_playersInfoByName[pnam] = pn;
+	playernamelock.ReleaseWriteLock();
+}
+
+void ObjectMgr::RenamePlayerInfo(PlayerInfo * pn, const char * oldname, const char * newname)
+{
+	playernamelock.AcquireWriteLock();
+	string oldn = string(oldname);
+	ASCENT_TOLOWER(oldn);
+
+	PlayerNameStringIndexMap::iterator itr = m_playersInfoByName.find( oldn );
+	if( itr != m_playersInfoByName.end() && itr->second == pn )
+	{
+		string newn = string(newname);
+		ASCENT_TOLOWER(newn);
+		m_playersInfoByName.erase( itr );
+		m_playersInfoByName[newn] = pn;
+	}
+
 	playernamelock.ReleaseWriteLock();
 }
 
@@ -296,8 +328,11 @@ void ObjectMgr::LoadPlayersInfo()
 {
 	PlayerInfo * pn;
 	QueryResult *result = CharacterDatabase.Query("SELECT guid,name,race,class,level,gender,zoneId,timestamp,acct FROM characters");
+	uint32 period, c;
 	if(result)
 	{
+		period = (result->GetRowCount() / 20) + 1;
+		c = 0;
 		do
 		{
 			Field *fields = result->Fetch();
@@ -317,14 +352,37 @@ void ObjectMgr::LoadPlayersInfo()
 			pn->guild=NULL;
 			pn->guildRank=NULL;
 			pn->guildMember=NULL;
+#ifdef VOICE_CHAT
+			pn->groupVoiceId = -1;
+#endif
 
 			if(pn->race==RACE_HUMAN||pn->race==RACE_DWARF||pn->race==RACE_GNOME||pn->race==RACE_NIGHTELF||pn->race==RACE_DRAENEI)
 				pn->team = 0;
 			else 
 				pn->team = 1;
 		  
+			if( GetPlayerInfoByName(pn->name) != NULL )
+			{
+				// gotta rename him
+				char temp[300];
+				snprintf(temp, 300, "%s__%X__", pn->name, pn->guid);
+				Log.Notice("ObjectMgr", "Renaming duplicate player %s to %s. (%u)", pn->name,temp,pn->guid);
+				CharacterDatabase.WaitExecute("UPDATE characters SET name = \"%s\", forced_rename_pending = 1 WHERE guid = %u",
+					CharacterDatabase.EscapeString(string(temp)).c_str(), pn->guid);
+
+				free(pn->name);
+				pn->name = strdup(temp);
+			}
+
+			string lpn=string(pn->name);
+			ASCENT_TOLOWER(lpn);
+			m_playersInfoByName[lpn] = pn;
+
 			//this is startup -> no need in lock -> don't use addplayerinfo
 			 m_playersinfo[(uint32)pn->guid]=pn;
+
+			 if( !((++c) % period) )
+				 Log.Notice("PlayerInfo", "Done %u/%u, %u%% complete.", c, result->GetRowCount(), float2int32( (float(c) / float(result->GetRowCount()))*100.0f ));
 		} while( result->NextRow() );
 
 		delete result;
@@ -333,18 +391,18 @@ void ObjectMgr::LoadPlayersInfo()
 	LoadGuilds();
 }
 
-PlayerInfo* ObjectMgr::GetPlayerInfoByName(std::string &name)
+PlayerInfo* ObjectMgr::GetPlayerInfoByName(const char * name)
 {
-	HM_NAMESPACE::hash_map<uint32,PlayerInfo*>::const_iterator i;
-
-	PlayerInfo * rv = 0;
+	string lpn=string(name);
+	ASCENT_TOLOWER(lpn);
+	PlayerNameStringIndexMap::iterator i;
+	PlayerInfo *rv = NULL;
 	playernamelock.AcquireReadLock();
-	for(i=m_playersinfo.begin();i!=m_playersinfo.end();i++)
-		if(!stricmp(i->second->name,name.c_str()))
-		{
-			rv = i->second;
-			break;
-		}
+
+	i=m_playersInfoByName.find(lpn);
+	if( i != m_playersInfoByName.end() )
+		rv = i->second;
+
 	playernamelock.ReleaseReadLock();
 	return rv;
 }
@@ -469,6 +527,8 @@ void ObjectMgr::LoadGuilds()
 	QueryResult *result = CharacterDatabase.Query( "SELECT * FROM guilds" );
 	if(result)
 	{
+		uint32 period = (result->GetRowCount() / 20) + 1;
+		uint32 c = 0;
 		do 
 		{
 			Guild * pGuild = Guild::Create();
@@ -478,6 +538,10 @@ void ObjectMgr::LoadGuilds()
 			}
 			else
 				mGuild.insert(make_pair(pGuild->GetGuildId(), pGuild));
+
+			if( !((++c) % period) )
+				Log.Notice("Guilds", "Done %u/%u, %u%% complete.", c, result->GetRowCount(), float2int32( (float(c) / float(result->GetRowCount()))*100.0f ));
+
 		} while(result->NextRow());
 		delete result;
 	}
@@ -495,7 +559,7 @@ Corpse* ObjectMgr::LoadCorpse(uint32 guid)
 	do
 	{
 		Field *fields = result->Fetch();
-		pCorpse = new Corpse(HIGHGUID_CORPSE,fields[0].GetUInt32());
+		pCorpse = new Corpse(HIGHGUID_TYPE_CORPSE,fields[0].GetUInt32());
 		pCorpse->SetPosition(fields[1].GetFloat(), fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetFloat());
 		pCorpse->SetZoneId(fields[5].GetUInt32());
 		pCorpse->SetMapId(fields[6].GetUInt32());
@@ -544,7 +608,7 @@ void ObjectMgr::DelinkPlayerCorpses(Player *pOwner)
 {
 	//dupe protection agaisnt crashs
 	Corpse * c;
-	c=this->GetCorpseByOwner(pOwner->GetGUIDLow());
+	c=this->GetCorpseByOwner(pOwner->GetLowGUID());
 	if(!c)return;
 	sEventMgr.AddEvent(c, &Corpse::Delink, EVENT_CORPSE_SPAWN_BONES, 1, 1, 0);
 	CorpseAddEventDespawn(c);
@@ -692,15 +756,15 @@ uint32 ObjectMgr::GenerateMailID()
 }
 uint32 ObjectMgr::GenerateLowGuid(uint32 guidhigh)
 {
-	ASSERT(guidhigh == HIGHGUID_ITEM || guidhigh == HIGHGUID_CONTAINER || guidhigh == HIGHGUID_PLAYER);
+	ASSERT(guidhigh == HIGHGUID_TYPE_ITEM || guidhigh == HIGHGUID_TYPE_CONTAINER || guidhigh == HIGHGUID_TYPE_PLAYER);
 
 	uint32 ret;
-	if(guidhigh == HIGHGUID_ITEM)
+	if(guidhigh == HIGHGUID_TYPE_ITEM)
 	{
 		m_guidGenMutex.Acquire();
 		ret = ++m_hiItemGuid;
 		m_guidGenMutex.Release();
-	}else if(guidhigh==HIGHGUID_PLAYER)
+	}else if(guidhigh==HIGHGUID_TYPE_PLAYER)
 	{
 		m_playerguidlock.Acquire();
 		ret = ++m_hiPlayerGuid;
@@ -1107,6 +1171,8 @@ void ObjectMgr::LoadAIThreatToSpellId()
 		sp = dbcSpell.LookupEntryForced( fields[0].GetUInt32() );
 		if( sp != NULL )
 			sp->ThreatForSpell = fields[1].GetUInt32();
+		else
+			Log.Warning("AIThreatSpell", "Cannot apply to spell %u; spell is nonexistant.", fields[0].GetUInt32());
 
 	} while( result->NextRow() );
 
@@ -1120,14 +1186,14 @@ Item * ObjectMgr::CreateItem(uint32 entry,Player * owner)
 
 	if(proto->InventoryType == INVTYPE_BAG)
 	{
-		Container * pContainer = new Container(HIGHGUID_CONTAINER,GenerateLowGuid(HIGHGUID_CONTAINER));
+		Container * pContainer = new Container(HIGHGUID_TYPE_CONTAINER,GenerateLowGuid(HIGHGUID_TYPE_CONTAINER));
 		pContainer->Create( entry, owner);
 		pContainer->SetUInt32Value(ITEM_FIELD_STACK_COUNT, 1);
 		return pContainer;
 	}
 	else
 	{
-		Item * pItem = new Item(HIGHGUID_ITEM,GenerateLowGuid(HIGHGUID_ITEM));
+		Item * pItem = new Item(HIGHGUID_TYPE_ITEM,GenerateLowGuid(HIGHGUID_TYPE_ITEM));
 		pItem->Create(entry, owner);
 		pItem->SetUInt32Value(ITEM_FIELD_STACK_COUNT, 1);
 		return pItem;
@@ -1147,13 +1213,13 @@ Item * ObjectMgr::LoadItem(uint64 guid)
 
 		if(pProto->InventoryType == INVTYPE_BAG)
 		{
-			Container * pContainer = new Container(HIGHGUID_CONTAINER,(uint32)guid);
+			Container * pContainer = new Container(HIGHGUID_TYPE_CONTAINER,(uint32)guid);
 			pContainer->LoadFromDB(result->Fetch());
 			pReturn = pContainer;
 		}
 		else
 		{
-			Item * pItem = new Item(HIGHGUID_ITEM,(uint32)guid);
+			Item * pItem = new Item(HIGHGUID_TYPE_ITEM,(uint32)guid);
 			pItem->LoadFromDB(result->Fetch(), 0, false);
 			pReturn = pItem;
 		}
@@ -1176,13 +1242,13 @@ Item * ObjectMgr::LoadExternalItem(uint64 guid)
 
 		if(pProto->InventoryType == INVTYPE_BAG)
 		{
-			Container * pContainer = new Container(HIGHGUID_CONTAINER,(uint32)guid);
+			Container * pContainer = new Container(HIGHGUID_TYPE_CONTAINER,(uint32)guid);
 			pContainer->LoadFromDB(result->Fetch());
 			pReturn = pContainer;
 		}
 		else
 		{
-			Item * pItem = new Item(HIGHGUID_ITEM,(uint32)guid);
+			Item * pItem = new Item(HIGHGUID_TYPE_ITEM,(uint32)guid);
 			pItem->LoadFromDB(result->Fetch(), 0, false);
 			pReturn = pItem;
 		}
@@ -1203,7 +1269,7 @@ void ObjectMgr::LoadCorpses(MapMgr * mgr)
 		do
 		{
 			Field *fields = result->Fetch();
-			pCorpse = new Corpse(HIGHGUID_CORPSE,fields[0].GetUInt32());
+			pCorpse = new Corpse(HIGHGUID_TYPE_CORPSE,fields[0].GetUInt32());
 			pCorpse->SetPosition(fields[1].GetFloat(), fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetFloat());
 			pCorpse->SetZoneId(fields[5].GetUInt32());
 			pCorpse->SetMapId(fields[6].GetUInt32());
@@ -1289,6 +1355,7 @@ void GossipMenu::AddItem(GossipMenuItem* GossipItem)
 void GossipMenu::BuildPacket(WorldPacket& Packet)
 {
 	Packet << CreatureGuid;
+	Packet << uint32(0);			// some new menu type in 2.4?
 	Packet << TextId;
 	Packet << uint32(Menu.size());
 
@@ -1394,43 +1461,61 @@ void ObjectMgr::LoadTrainers()
 			do
 			{
 				fields2 = result2->Fetch();
+				TrainerSpell ts;
+				bool abrt=false;
 				uint32 CastSpellID=fields2[1].GetUInt32();
+				uint32 LearnSpellID=fields2[2].GetUInt32();
 
-				SpellEntry *spellInfo = dbcSpell.LookupEntryForced(CastSpellID );
-				if(!spellInfo)
+				ts.pCastSpell = NULL;
+				ts.pLearnSpell = NULL;
+				ts.pCastRealSpell = NULL;
+
+				if( CastSpellID != 0 )
 				{
-					Log.Error("LoadTrainers", "Trainer %u with non-existant spell %u.", entry, CastSpellID);
+					ts.pCastSpell = dbcSpell.LookupEntryForced( CastSpellID );
+					if( ts.pCastSpell )
+					{
+						for(int k=0;k<3;k++)
+						{
+							if(ts.pCastSpell->Effect[k]==SPELL_EFFECT_LEARN_SPELL)
+							{
+								ts.pCastRealSpell = dbcSpell.LookupEntryForced(ts.pCastSpell->EffectTriggerSpell[k]);
+								if( ts.pCastRealSpell == NULL )
+								{
+									Log.Warning("Trainers", "Trainer %u contains cast spell %u that is non-teaching\n", entry, CastSpellID);
+									abrt=true;
+								}
+								break;
+							}
+						}
+					}
+
+					if(abrt)
+						continue;
+				}
+
+				if( LearnSpellID != 0 )
+				{
+					ts.pLearnSpell = dbcSpell.LookupEntryForced( LearnSpellID );
+				}
+
+				if( ts.pCastSpell == NULL && ts.pLearnSpell == NULL )
+				{
+					Log.Warning("LoadTrainers", "Trainer %u with no invalid spells (%u/%u).", entry, CastSpellID, LearnSpellID);
 					continue; //omg a bad spell !
 				}
 
-				TrainerSpell ts;
-				ts.pCastSpell = spellInfo;
-				ts.Cost = fields2[2].GetUInt32();
-				ts.RequiredSpell = fields2[3].GetUInt32();
-				ts.RequiredSkillLine = fields2[4].GetUInt32();
-				ts.RequiredSkillLineValue = fields2[5].GetUInt32();
-				ts.RequiredLevel = fields2[6].GetUInt32();
-				ts.DeleteSpell = fields2[7].GetUInt32();
-				ts.IsProfession = (fields2[8].GetUInt32() != 0) ? true : false;
-				ts.pRealSpell=NULL;
+				if( ts.pCastSpell && !ts.pCastRealSpell)
+					continue;
 
-				for(int k=0;k<3;k++)
-				{
-					if(spellInfo->Effect[k]==SPELL_EFFECT_LEARN_SPELL)
-					{
-						ts.pRealSpell = dbcSpell.LookupEntry(spellInfo->EffectTriggerSpell[k]);
-						break;
-					}
-				}
-
-				if(ts.pRealSpell == NULL)
-				{
-					Log.Error("LoadTrainers", "Trainer %u contains spell %u which doesn't teach.", entry, CastSpellID);
-				}
-				else
-				{
-					tr->Spells.push_back(ts);
-				}
+				ts.Cost = fields2[3].GetUInt32();
+				ts.RequiredSpell = fields2[4].GetUInt32();
+				ts.RequiredSkillLine = fields2[5].GetUInt32();
+				ts.RequiredSkillLineValue = fields2[6].GetUInt32();
+				ts.RequiredLevel = fields2[7].GetUInt32();
+				ts.DeleteSpell = fields2[8].GetUInt32();
+				ts.IsProfession = (fields2[9].GetUInt32() != 0) ? true : false;
+				tr->Spells.push_back(ts);
 			}
 			while(result2->NextRow());
 			delete result2;
@@ -1758,7 +1843,8 @@ void ObjectMgr::LoadPetSpellCooldowns()
 				PetSpellCooldownMap::iterator itr = mPetSpellCooldowns.find(SpellId);
 				if(itr == mPetSpellCooldowns.end())
 				{
-					mPetSpellCooldowns.insert( make_pair(SpellId, Cooldown) );
+					if( Cooldown )
+						mPetSpellCooldowns.insert( make_pair(SpellId, Cooldown) );
 				}
 				else
 				{
@@ -1778,52 +1864,6 @@ uint32 ObjectMgr::GetPetSpellCooldown(uint32 SpellId)
 
 	SpellEntry* sp = dbcSpell.LookupEntry( SpellId );
 	return sp->CategoryRecoveryTime + sp->StartRecoveryTime;
-}
-
-void ObjectMgr::LoadSpellFixes()
-{
-	// Loads data from stored 1.12 dbc to fix spells that have had spell data removed in 2.0.
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spells112");
-	if(result == 0) return;
-
-//	uint32 count = result->GetRowCount();
-//	uint32 counter = 0;
-	uint32 fixed_count = 0;
-	uint32 proc_chance;
-	do 
-	{
-		Field * fields = result->Fetch();
-		uint32 entry = fields[0].GetUInt32();
-		SpellEntry * sp = dbcSpell.LookupEntry(entry);
-		if(sp == 0) continue;
-
-		// FIX SPELL GROUP RELATIONS
-		{
-			uint32 sgr[3];
-			sgr[0] = fields[103].GetUInt32();
-			sgr[1] = fields[104].GetUInt32();
-			sgr[2] = fields[105].GetUInt32();
-			proc_chance = fields[25].GetUInt32();
-
-			for(uint32 i = 0; i < 3; ++i)
-			{
-				if(sgr[i] && sp->EffectSpellGroupRelation[i] == 0)
-				{
-					//string name = fields[120].GetString();
-					//printf("%s[%u] %u->%u\n", name.c_str(),i, sp->EffectSpellGroupRelation[i], sgr[i]);
-					sp->EffectSpellGroupRelation[i] = sgr[i];
-					++fixed_count;
-				}
-			}
-
-			sp->procChance = (uint32)min( proc_chance, sp->procChance );			
-		}
-
-		// FIX OTHER STUFF.. we'll find out..
-
-	} while(result->NextRow());
-	delete result;
-	Log.Notice("ObjectMgr", "%u spell fixes loaded.", fixed_count);
 }
 
 void ObjectMgr::LoadSpellOverride()
@@ -1945,7 +1985,7 @@ Pet * ObjectMgr::CreatePet()
 	m_petlock.Acquire();
 	guid =++m_hiPetGuid;
 	m_petlock.Release();
-	return new Pet(HIGHGUID_PET,guid);
+	return new Pet((uint64)HIGHGUID_TYPE_PET<<32 | guid);
 }
 
 Player * ObjectMgr::CreatePlayer()
@@ -1954,20 +1994,20 @@ Player * ObjectMgr::CreatePlayer()
 	m_playerguidlock.Acquire();
 	guid =++m_hiPlayerGuid;
 	m_playerguidlock.Release();
-	return new Player(HIGHGUID_PLAYER,guid);
+	return new Player(guid);
 }
 
 void ObjectMgr::AddPlayer(Player * p)//add it to global storage
 {
 	_playerslock.AcquireWriteLock();
-	_players[p->GetGUIDLow()] = p;
+	_players[p->GetLowGUID()] = p;
 	_playerslock.ReleaseWriteLock();
 }
 
 void ObjectMgr::RemovePlayer(Player * p)
 {
 	_playerslock.AcquireWriteLock();
-	_players.erase(p->GetGUIDLow());
+	_players.erase(p->GetLowGUID());
 	_playerslock.ReleaseWriteLock();
 
 }
@@ -1978,20 +2018,20 @@ Corpse * ObjectMgr::CreateCorpse()
 	m_corpseguidlock.Acquire();
 	guid =++m_hiCorpseGuid;
 	m_corpseguidlock.Release();
-	return new Corpse(HIGHGUID_CORPSE,guid);
+	return new Corpse(HIGHGUID_TYPE_CORPSE,guid);
 }
 
 void ObjectMgr::AddCorpse(Corpse * p)//add it to global storage
 {
 	_corpseslock.Acquire();
-	m_corpses[p->GetGUIDLow()]=p;
+	m_corpses[p->GetLowGUID()]=p;
 	_corpseslock.Release();
 }
 
 void ObjectMgr::RemoveCorpse(Corpse * p)
 {
 	_corpseslock.Acquire();
-	m_corpses.erase(p->GetGUIDLow());
+	m_corpses.erase(p->GetLowGUID());
 	_corpseslock.Release();
 }
 
@@ -2018,7 +2058,7 @@ Transporter * ObjectMgr::GetTransporter(uint32 guid)
 void ObjectMgr::AddTransport(Transporter *pTransporter)
 {
 	_TransportLock.Acquire();
-	mTransports[pTransporter->GetGUIDLow()]=pTransporter;
+	mTransports[pTransporter->GetUIdFromGUID()]=pTransporter;
  	_TransportLock.Release();
 }
 
@@ -2649,3 +2689,12 @@ void ObjectMgr::UpdateArenaTeamWeekly()
 	m_arenaTeamLock.Release();
 }
 
+#ifdef VOICE_CHAT
+void ObjectMgr::GroupVoiceReconnected()
+{
+	m_groupLock.AcquireReadLock();
+	for(GroupMap::iterator itr = m_groups.begin(); itr != m_groups.end(); ++itr)
+		itr->second->VoiceSessionReconnected();
+	m_groupLock.ReleaseReadLock();
+}
+#endif

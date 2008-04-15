@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -136,6 +136,7 @@ void LogonCommServerSocket::HandlePacket(WorldPacket & recvData)
 		NULL,												// RSMSG_DISCONNECT_ACCOUNT
 		&LogonCommServerSocket::HandleTestConsoleLogin,		// RCMSG_TEST_CONSOLE_LOGIN
 		NULL,												// RSMSG_CONSOLE_LOGIN_RESULT
+		&LogonCommServerSocket::HandleDatabaseModify,		// RCMSG_MODIFY_DATABASE
 	};
 
 	if(recvData.GetOpcode() >= RMSG_COUNT || Handlers[recvData.GetOpcode()] == 0)
@@ -252,14 +253,16 @@ void LogonCommServerSocket::SendPacket(WorldPacket * data)
 
 void LogonCommServerSocket::HandleSQLExecute(WorldPacket & recvData)
 {
-	string Query;
+	/*string Query;
 	recvData >> Query;
-	sLogonSQL->Execute(Query.c_str());
+	sLogonSQL->Execute(Query.c_str());*/
+	printf("!! WORLD SERVER IS REQUESTING US TO EXECUTE SQL. THIS IS DEPRECATED AND IS BEING IGNORED. THE SERVER WAS: %s, PLEASE UPDATE IT.\n", GetRemoteIP().c_str());
 }
 
 void LogonCommServerSocket::HandleReloadAccounts(WorldPacket & recvData)
 {
-	sAccountMgr.ReloadAccounts(true);
+	printf("!! WORLD SERVER IS REQUESTING US TO RELOAD ACCOUNTS. THIS IS DEPRECATED AND IS BEING IGNORED. THE SERVER WAS: %s, PLEASE UPDATE IT.\n", GetRemoteIP().c_str());
+	//sAccountMgr.ReloadAccounts(true);
 }
 
 void LogonCommServerSocket::HandleAuthChallenge(WorldPacket & recvData)
@@ -398,4 +401,95 @@ void LogonCommServerSocket::HandleTestConsoleLogin(WorldPacket & recvData)
 
 	data << uint32(1);
 	SendPacket(&data);
+}
+
+void LogonCommServerSocket::HandleDatabaseModify(WorldPacket& recvData)
+{
+	uint32 method;
+	recvData >> method;
+
+	switch(method)
+	{
+	case 1:			// set account ban
+		{
+			string account;
+			uint32 duration;
+			recvData >> account >> duration;
+
+			// remember we expect this in uppercase
+			ASCENT_TOUPPER(account);
+
+			Account * pAccount = sAccountMgr.GetAccount(account);
+			if( pAccount == NULL )
+				return;
+
+			pAccount->Banned = duration;
+
+			// update it in the sql (duh)
+			sLogonSQL->Execute("UPDATE accounts SET banned = %u WHERE login = \"%s\"", duration, sLogonSQL->EscapeString(account).c_str());
+
+		}break;
+
+	case 2:		// set gm
+		{
+			string account;
+			string gm;
+			recvData >> account >> gm;
+
+			// remember we expect this in uppercase
+			ASCENT_TOUPPER(account);
+
+			Account * pAccount = sAccountMgr.GetAccount(account);
+			if( pAccount == NULL )
+				return;
+
+			pAccount->SetGMFlags( account.c_str() );
+
+			// update it in the sql (duh)
+			sLogonSQL->Execute("UPDATE accounts SET gm = \"%s\" WHERE login = \"%s\"", sLogonSQL->EscapeString(gm).c_str(), sLogonSQL->EscapeString(account).c_str());
+
+		}break;
+
+	case 3:		// set mute
+		{
+			string account;
+			uint32 duration;
+			recvData >> account >> duration;
+
+			// remember we expect this in uppercase
+			ASCENT_TOUPPER(account);
+
+			Account * pAccount = sAccountMgr.GetAccount(account);
+			if( pAccount == NULL )
+				return;
+
+			pAccount->Muted = duration;
+
+			// update it in the sql (duh)
+			sLogonSQL->Execute("UPDATE accounts SET muted = %u WHERE login = \"%s\"", duration, sLogonSQL->EscapeString(account).c_str());
+		}break;
+
+	case 4:		// ip ban add
+		{
+			string ip;
+			uint32 duration;
+
+			recvData >> ip >> duration;
+
+			if( sIPBanner.Add( ip.c_str(), duration ) )
+				sLogonSQL->Execute("INSERT INTO ipbans VALUES(\"%s\", %u)", sLogonSQL->EscapeString(ip).c_str(), duration);
+			
+		}break;
+
+	case 5:		// ip ban reomve
+		{
+			string ip;
+			recvData >> ip;
+
+			if( sIPBanner.Remove( ip.c_str() ) )
+				sLogonSQL->Execute("DELETE FROM ipbans WHERE ip = \"%s\")", sLogonSQL->EscapeString(ip).c_str());
+
+		}break;
+
+	}
 }

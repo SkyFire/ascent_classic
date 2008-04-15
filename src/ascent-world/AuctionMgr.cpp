@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -37,12 +37,17 @@ void AuctionMgr::LoadAuctionHouses()
 	map<uint32, AuctionHouse*> tempmap;
 	if(res)
 	{
+		uint32 period = (res->GetRowCount() / 20) + 1;
+		uint32 c = 0;
 		do
 		{
 			ah = new AuctionHouse(res->Fetch()[0].GetUInt32());
 			ah->LoadAuctions();
 			auctionHouses.push_back(ah);
 			tempmap.insert( make_pair( res->Fetch()[0].GetUInt32(), ah ) );
+			if( !((++c) % period) )
+				Log.Notice("AuctionHouse", "Done %u/%u, %u%% complete.", c, res->GetRowCount(), float2int32( (float(c) / float(res->GetRowCount()))*100.0f ));
+
 		}while(res->NextRow());
 		delete res;
 	}

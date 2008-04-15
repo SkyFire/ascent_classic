@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -104,7 +104,7 @@ extern uint32 m_transportGuidMax;
 class Transporter : public GameObject
 {
 public:
-	Transporter(uint32 guidlow, uint32 guidhigh);
+	Transporter(uint64 guid);
 	~Transporter();
 
 	bool CreateAsTransporter(uint32 EntryID, const char* Name, int32 Time);
@@ -113,9 +113,9 @@ public:
 
 	bool GenerateWaypoints();
 
-	ASCENT_INLINE void AddPlayer(Player *pPlayer) { mPassengers[pPlayer->GetGUIDLow()] = pPlayer; }
-	ASCENT_INLINE void RemovePlayer(Player *pPlayer) {mPassengers.erase(pPlayer->GetGUIDLow()); }
-	ASCENT_INLINE bool HasPlayer(Player* pPlayer) { return mPassengers.find(pPlayer->GetGUIDLow()) != mPassengers.end(); }
+	ASCENT_INLINE void AddPlayer(Player *pPlayer) { mPassengers[pPlayer->GetLowGUID()] = pPlayer; }
+	ASCENT_INLINE void RemovePlayer(Player *pPlayer) {mPassengers.erase(pPlayer->GetLowGUID()); }
+	ASCENT_INLINE bool HasPlayer(Player* pPlayer) { return mPassengers.find(pPlayer->GetLowGUID()) != mPassengers.end(); }
 	ASCENT_INLINE void SetPeriod(uint32 val) { m_period = val; }
 
 	uint32 m_pathTime;

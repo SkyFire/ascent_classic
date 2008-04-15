@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -67,6 +67,7 @@ WorldPacket* WorldSession::BuildQuestQueryResponse(Quest *qst)
 	*data << uint32(0);								// 2.3.0 - bonus honor
 	*data << uint32(qst->srcitem);				  // Item given at the start of a quest (srcitem)
 	*data << uint32(qst->quest_flags);			  // Quest Flags
+	*data << uint32(0);								// 2.4.0 unk
 
 	// (loop 4 times)
 	for(uint32 i = 0; i < 4; ++i)
@@ -221,7 +222,7 @@ void QuestLogEntry::SaveToDB(QueryBuffer * buf)
 	//CharacterDatabase.Execute("DELETE FROM questlog WHERE player_guid=%u AND quest_id=%u", m_plr->GetGUIDLow(), m_quest->id);
 	std::stringstream ss;
 	ss << "REPLACE INTO questlog VALUES(";
-	ss << m_plr->GetGUIDLow() << "," << m_quest->id << "," << m_slot << "," << m_time_left;
+	ss << m_plr->GetLowGUID() << "," << m_quest->id << "," << m_slot << "," << m_time_left;
 	for(int i = 0; i < 4; ++i)
 		ss << "," << m_explored_areas[i];
 	
@@ -376,20 +377,29 @@ void QuestLogEntry::UpdatePlayerFields()
 	// mob hunting
 	if(m_quest->count_required_mob)
 	{
-		uint8 cnt;
+		/*uint8 cnt;
 		for(int i = 0; i < 4; ++i)
 		{
 			if(m_quest->required_mob[i] && m_mobcount[i] > 0)
 			{
 				// 1 << (offset * 6)
 				cnt = m_mobcount[i];
-				field1 |= (cnt << (i*6));
+				field1 |= (cnt << (i*8));
 			}
+		}*/
+
+		// optimized this - burlex
+		uint8 * p = (uint8*)&field1;
+		for(int i = 0; i < 4; ++i)
+		{
+			if( m_quest->required_mob[i] && m_mobcount[i] > 0 )
+				p[i] |= (uint8)m_mobcount[i];
 		}
 	}
 
-	m_plr->SetUInt32Value(base + 1, field1);
-	m_plr->SetUInt32Value(base + 2, m_time_left);
+	m_plr->SetUInt32Value(base + 1, 0);
+	m_plr->SetUInt32Value(base + 2, field1);
+	m_plr->SetUInt32Value(base + 3, m_time_left);
 }
 
 void QuestLogEntry::SendQuestComplete()
