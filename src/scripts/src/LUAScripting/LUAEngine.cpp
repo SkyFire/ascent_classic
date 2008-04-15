@@ -1954,6 +1954,7 @@ int luaUnit_MarkQuestObjectiveAsComplete(lua_State * L, Unit * ptr)
 	qle->SendUpdateAddKill(objective);
 	if(qle->CanBeFinished())
 		qle->SendQuestComplete();
+	qle->UpdatePlayerFields();
 
 	return 0;
 }
