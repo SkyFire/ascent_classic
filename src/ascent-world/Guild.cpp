@@ -687,7 +687,7 @@ void Guild::SetGuildInformation(const char * szGuildInformation, WorldSession * 
 	else
 	{
 		m_guildInfo= NULL;
-		CharacterDatabase.Execute("UPDATE guilds SET guildInfo = "" WHERE guildId = %u", m_guildId);
+		CharacterDatabase.Execute("UPDATE guilds SET guildInfo = \"\" WHERE guildId = %u", m_guildId);
 	}
 }
 
