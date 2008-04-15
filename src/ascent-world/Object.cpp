@@ -2287,6 +2287,23 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				if( pVictim->IsPlayer() )
 				CritChance -= static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_RANGED_CRIT_RESILIENCE );
 			}
+			else if( spellInfo->is_melee_spell )
+			{
+				// Same shit with the melee spells, such as Judgement/Seal of Command
+				if( IsPlayer() )
+				{
+					CritChance = GetFloatValue(PLAYER_CRIT_PERCENTAGE);
+				}
+				if( pVictim->IsPlayer() )
+				{
+					CritChance += static_cast< Player* >(pVictim)->res_R_crit_get(); //this could be ability but in that case we overwrite the value
+				}
+				// Resilience
+				CritChance -= pVictim->IsPlayer() ? static_cast< Player* >(pVictim)->CalcRating( PLAYER_RATING_MODIFIER_MELEE_CRIT_RESILIENCE ) : 0.0f;
+				// Victim's (!) crit chance mod for physical attacks?
+				CritChance += (float)(pVictim->AttackerCritChanceMod[0]);
+
+			}
 			else
 			{
 				CritChance = caster->spellcritperc + caster->SpellCritChanceSchool[school] + pVictim->AttackerCritChanceMod[school];
@@ -2323,7 +2340,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				{
 					// the bonuses are halved by 50% (funky blizzard math :S)
 					float b;
-					if( spellInfo->School == 0 )		// physical
+					if( spellInfo->School == 0 || spellInfo->Id == 20424 || spellInfo->NameHash == SPELL_HASH_JUDGEMENT_OF_COMMAND )		// physical || hackfix SoCommand/JoCommand
 						b = ( ( float(critical_bonus) ) / 100.0f ) + 1.0f;
 					else
 						b = ( ( float(critical_bonus) / 2.0f ) / 100.0f ) + 1.0f;
