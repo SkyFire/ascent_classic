@@ -1421,6 +1421,12 @@ void ObjectMgr::LoadTrainers()
 	if(!result)
 		return;
 
+	if(result->GetFieldCount() != 10)
+	{
+		Log.LargeErrorMessage(LARGERRORMESSAGE_WARNING, "Trainers table format is invalid. Please update your database.");
+		return;
+	}
+
 	do 
 	{
 		Field * fields = result->Fetch();
