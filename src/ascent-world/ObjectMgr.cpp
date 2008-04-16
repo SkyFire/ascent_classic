@@ -1421,11 +1421,6 @@ void ObjectMgr::LoadTrainers()
 	if(!result)
 		return;
 
-	if(result->GetFieldCount() != 10)
-	{
-		Log.LargeErrorMessage(LARGERRORMESSAGE_WARNING, "Trainers table format is invalid. Please update your database.");
-		return;
-	}
 
 	do 
 	{
@@ -1455,6 +1450,11 @@ void ObjectMgr::LoadTrainers()
 
 		//now load the spells
 		result2 = WorldDatabase.Query("SELECT * FROM trainer_spells where entry='%u'",entry);
+		if(result2->GetFieldCount() != 10)
+		{
+			Log.LargeErrorMessage(LARGERRORMESSAGE_WARNING, "Trainers table format is invalid. Please update your database.");
+			return;
+		}
 		if(!result2)
 		{
 			Log.Error("LoadTrainers", "Trainer with no spells, entry %u.", entry);
