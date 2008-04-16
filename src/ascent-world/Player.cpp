@@ -10018,6 +10018,8 @@ void Player::_SpeedhackCheck(uint32 mstime)
 {
 	if( sWorld.antihack_speed && !GetTaxiState() )
 	{
+		if( ( sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions() ) )
+			return; // do not check GMs speed been the config tells us not to.
 		if( m_position == _lastHeartbeatPosition && m_isMoving )
 		{
 			// this means the client is probably lagging. don't update the timestamp, don't do anything until we start to receive
