@@ -2054,7 +2054,7 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	<< (uint32)UNIXTIME << ",";
 	
 	//online state
-	if(GetSession()->_loggingOut)
+	if(GetSession()->_loggingOut || bNewCharacter)
 	{
 		ss << "0,";
 	}else
