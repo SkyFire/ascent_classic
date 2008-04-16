@@ -1021,6 +1021,7 @@ enum SpellTypes // SPELL_ENTRY_buffType
     SPELL_TYPE_ELIXIR_GUARDIAN      = 0x00100000, 
     SPELL_TYPE_ELIXIR_FLASK         = SPELL_TYPE_ELIXIR_BATTLE | SPELL_TYPE_ELIXIR_GUARDIAN, //weee, this contains both battle and guardian elixirs ;)
     SPELL_TYPE_HUNTER_MARK			= 0x00200000,
+    SPELL_TYPE_WARRIOR_SHOUT        = 0x00400000,
 };
 
 //custom stuff generated for spells that will not change in time

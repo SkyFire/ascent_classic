@@ -13246,6 +13246,8 @@ void ApplyNormalFixes()
             type |= SPELL_TYPE_ELIXIR_FLASK;
 		else if( namehash == SPELL_HASH_HUNTER_S_MARK )		// hunter's mark
 			type |= SPELL_TYPE_HUNTER_MARK;
+        else if( namehash == SPELL_HASH_COMMANDING_SHOUT || namehash == SPELL_HASH_BATTLE_SHOUT )
+            type |= SPELL_TYPE_WARRIOR_SHOUT;
 		else if( strstr( desc, "Finishing move")==desc)
 			sp->c_is_flags |= SPELL_FLAG_IS_FINISHING_MOVE;
 		if( IsDamagingSpell( sp ) )
