@@ -829,6 +829,15 @@ void Guild::SetPublicNote(PlayerInfo * pMember, const char * szNewNote, WorldSes
 			itr->second->szPublicNote = strdup(szNewNote);
 		else
 			itr->second->szPublicNote = NULL;
+
+			// Update the database
+		if (itr->second->szPublicNote == NULL) 
+			CharacterDatabase.Execute("UPDATE guild_data SET publicNote=\"\" WHERE playerid=%u", pMember->guid);
+		else
+			CharacterDatabase.Execute("UPDATE guild_data SET publicNote=\"%s\" WHERE playerid=%u", 
+				CharacterDatabase.EscapeString(string(itr->second->szPublicNote)).c_str(),
+				pMember->guid
+			);
 	}
 	m_lock.Release();
 
@@ -860,6 +869,15 @@ void Guild::SetOfficerNote(PlayerInfo * pMember, const char * szNewNote, WorldSe
 			itr->second->szOfficerNote = strdup(szNewNote);
 		else
 			itr->second->szOfficerNote = NULL;
+
+		// Update the database
+		if (itr->second->szOfficerNote == NULL) 
+			CharacterDatabase.Execute("UPDATE guild_data SET officerNote=\"\" WHERE playerid=%u", pMember->guid);
+		else
+			CharacterDatabase.Execute("UPDATE guild_data SET officerNote=\"%s\" WHERE playerid=%u", 
+				CharacterDatabase.EscapeString(string(itr->second->szOfficerNote)).c_str(),
+				pMember->guid
+			);
 	}
 	m_lock.Release();
 
