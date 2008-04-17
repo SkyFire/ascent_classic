@@ -15634,6 +15634,7 @@ void ApplyNormalFixes()
 	group_relation_rogue_lethality |= 33554432UL;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
 	group_relation_rogue_lethality |= 536870912UL;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
 	group_relation_rogue_lethality |= 1073741824UL;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
+	group_relation_rogue_lethality |= 0x200000000;	// rogue - mutilate
 
 	//rogue Lethality
 	sp = dbcSpell.LookupEntryForced( 14128 ); 

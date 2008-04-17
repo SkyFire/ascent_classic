@@ -1848,6 +1848,28 @@ void Aura::SpellAuraDummy(bool apply)
 			else
 				pTarget->RemoveShapeShiftSpell( 24932 );
 		}break;
+
+	case 31223:
+	case 32222:
+	case 31221:		// Rogue : Master of Subtlety
+		{
+			if( !m_target->IsPlayer() )
+				return;
+
+			Player * pTarget = ((Player*)m_target);
+			if( apply )
+			{
+				pTarget->m_outStealthDamageBonusPct += mod->m_amount;
+				pTarget->m_outStealthDamageBonusPeriod = 6;			// 6 seconds
+				pTarget->m_outStealthDamageBonusTimer = 0;			// reset it
+			}
+			else
+			{
+				pTarget->m_outStealthDamageBonusPct -= mod->m_amount;
+				pTarget->m_outStealthDamageBonusPeriod = 6;			// 6 seconds
+				pTarget->m_outStealthDamageBonusTimer = 0;			// reset it
+			}
+		}break;	
 	}
 }
 
@@ -2604,6 +2626,8 @@ void Aura::SpellAuraModStealth(bool apply)
 			cd.guid = m_target->GetGUID();
 			cd.spellid = m_spellProto->Id;
 			static_cast<Player*>(m_target)->GetSession()->OutPacket( SMSG_COOLDOWN_EVENT, sizeof(packetSMSG_COOLDOWN_EVENT), &cd);
+			if( ((Player*)m_target)->m_outStealthDamageBonusPeriod && ((Player*)m_target)->m_outStealthDamageBonusPct )
+				((Player*)m_target)->m_outStealthDamageBonusTimer = UNIXTIME + ((Player*)m_target)->m_outStealthDamageBonusPeriod;
 		}
 	}
 

@@ -1887,6 +1887,9 @@ public:
 	/************************************************************************/
 
 	PlayerInfo * m_playerInfo;
+	uint32 m_outStealthDamageBonusPct;
+	uint32 m_outStealthDamageBonusPeriod;
+	uint32 m_outStealthDamageBonusTimer;
 };
 
 class SkillIterator

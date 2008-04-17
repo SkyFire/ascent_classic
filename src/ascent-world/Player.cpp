@@ -400,6 +400,7 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	_speedChangeInProgress = false;
 	m_passOnLoot = false;
 	m_changingMaps = true;
+	m_outStealthDamageBonusPct = m_outStealthDamageBonusPeriod = m_outStealthDamageBonusTimer = 0;
 }
 
 void Player::OnLogin()
