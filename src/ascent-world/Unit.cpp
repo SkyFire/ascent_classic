@@ -4224,9 +4224,10 @@ void Unit::CalcDamage()
 		delta = float(((Creature*)this)->ModDamageDone[0]);
 		mult = float(((Creature*)this)->ModDamageDonePct[0]);
 		r = BaseDamage[0]*mult+delta+bonus;
-		SetFloatValue(UNIT_FIELD_MINDAMAGE,r>0?r:0);
+		// give some diversity to pet damage instead of having a 77-78 damage range (as an example)
+		SetFloatValue(UNIT_FIELD_MINDAMAGE,r > 0 ? ( IsPet() ? r * 0.9f : r ) : 0 );
 		r = BaseDamage[1]*mult+delta+bonus;
-		SetFloatValue(UNIT_FIELD_MAXDAMAGE,r>0?r:0);
+		SetFloatValue(UNIT_FIELD_MAXDAMAGE, r > 0 ? ( IsPet() ? r * 1.1f : r ) : 0 );
 	
 	//	SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE,BaseRangedDamage[0]*mult+delta);
 	//	SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE,BaseRangedDamage[1]*mult+delta);
