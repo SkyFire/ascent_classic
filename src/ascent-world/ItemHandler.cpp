@@ -536,7 +536,7 @@ void WorldSession::HandleDestroyItemOpcode( WorldPacket & recv_data )
 			if(gc)
 				gc->Destroy();
 
-			_player->m_charters[ARENA_TEAM_CHARTER_3v3] = NULL;
+			_player->m_charters[CHARTER_TYPE_ARENA_3V3] = NULL;
 		}
 
 		uint32 mail_id = it->GetUInt32Value(ITEM_FIELD_ITEM_TEXT_ID);
