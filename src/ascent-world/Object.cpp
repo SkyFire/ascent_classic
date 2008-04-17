@@ -2264,7 +2264,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //==========================================================================================
 		if( res < 0 )
 			res = 0;
-		else
+		else if( spellInfo->spell_can_crit == true )
 		{
 //------------------------------critical strike chance--------------------------------------	
 			// lol ranged spells were using spell crit chance
@@ -2340,7 +2340,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				{
 					// the bonuses are halved by 50% (funky blizzard math :S)
 					float b;
-					if( spellInfo->School == 0 || spellInfo->Id == 20424 || spellInfo->NameHash == SPELL_HASH_JUDGEMENT_OF_COMMAND )		// physical || hackfix SoCommand/JoCommand
+					if( spellInfo->School == 0 || spellInfo->is_melee_spell || spellInfo->is_ranged_spell )		// physical || hackfix SoCommand/JoCommand
 						b = ( ( float(critical_bonus) ) / 100.0f ) + 1.0f;
 					else
 						b = ( ( float(critical_bonus) / 2.0f ) / 100.0f ) + 1.0f;

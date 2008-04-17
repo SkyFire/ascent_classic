@@ -14227,7 +14227,11 @@ void ApplyNormalFixes()
 			}		
 		}
 
-			//////////////////////////////////////////////////////
+		///	SPELLS CAN CRIT ///
+		sp->spell_can_crit = true; // - except in special cases noted in this section
+
+
+		//////////////////////////////////////////////////////
 		// CLASS-SPECIFIC SPELL FIXES						//
 		//////////////////////////////////////////////////////
 
@@ -14244,7 +14248,10 @@ void ApplyNormalFixes()
 		//////////////////////////////////////////
 
 		// Insert paladin spell fixes here
-
+			
+			// Seal of Righteousness - cannot crit
+			if( sp->NameHash == SPELL_HASH_SEAL_OF_RIGHTEOUSNESS )
+				sp->spell_can_crit = false;
 
 		//////////////////////////////////////////
 		// HUNTER								//
@@ -14288,6 +14295,10 @@ void ApplyNormalFixes()
 		//////////////////////////////////////////
 
 		// Insert shaman spell fixes here
+
+			// Lightning Shield - cannot crit
+			if( sp->NameHash == SPELL_HASH_LIGHTNING_SHIELD ) // not a mistake, the correct proc spell for lightning shield is also called lightning shield
+				sp->spell_can_crit = false;
 
 		//////////////////////////////////////////
 		// MAGE								//
