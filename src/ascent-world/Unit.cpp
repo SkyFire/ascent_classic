@@ -2738,13 +2738,9 @@ else
 					//sLog.outString( "DEBUG: Critical Strike! Full_damage: %u" , dmg.full_damage );
 					if(ability && ability->SpellGroupType)
 					{
-						SM_FIValue(SM_PCriticalDamage,&dmgbonus,ability->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-						int spell_flat_modifers=0;
-						SM_FIValue(SM_PCriticalDamage,&spell_flat_modifers,ability->SpellGroupType);
-						if(spell_flat_modifers!=0)
-							printf("!!!!!spell crit dmg bonus mod flat %d , spell crit dmg bonus %d, spell group %u\n",spell_flat_modifers,dmgbonus,ability->SpellGroupType);
-#endif
+						int32 dmg_bonus_pct = 100;
+						SM_FIValue(SM_PCriticalDamage,&dmg_bonus_pct,ability->SpellGroupType);
+						dmgbonus = float2int32( float(dmgbonus) * (float(dmg_bonus_pct)/100.0f) );
 					}
 					
 					//sLog.outString( "DEBUG: After CritMeleeDamageTakenPctMod: %u" , dmg.full_damage );
@@ -4925,7 +4921,7 @@ bool Unit::HasNegativeAura(uint32 spell_id)
 
 bool Unit::IsPoisoned()
 {
-	for(uint32 x = MAX_POSITIVE_AURAS; x < MAX_AURAS; ++x)
+	for(uint32 x = 0; x < MAX_AURAS+MAX_PASSIVE_AURAS; ++x)
 	{
 		if(m_auras[x] && m_auras[x]->GetSpellProto()->c_is_flags & SPELL_FLAG_IS_POISON)
 			return true;

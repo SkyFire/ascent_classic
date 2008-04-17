@@ -13918,6 +13918,11 @@ void ApplyNormalFixes()
 			sp->SpellGroupType |= 268435456; //some of them do have the flags but i's hard to write down those some from 130 spells
 			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
 		}
+		else if( strstr( nametext, "Scorpid Poison") )
+		{
+			// groups?
+			sp->c_is_flags |= SPELL_FLAG_IS_POISON;
+		}
 
 		//warlock - shadow bolt
 		if( sp->NameHash == SPELL_HASH_SHADOW_BOLT )

@@ -493,7 +493,7 @@ public:
 	void SpellAuraModHealingPCT(bool apply);   
 	void SpellAuraEmphaty(bool apply);
 	void SpellAuraModOffhandDamagePCT(bool apply);
-	void SpellAuraModPowerCostPCT(bool apply);
+	void SpellAuraModPenetration(bool apply);
 	void SpellAuraModRangedAttackPower(bool apply);
 	void SpellAuraModMeleeDamageTaken(bool apply);
 	void SpellAuraModMeleeDamageTakenPct(bool apply);

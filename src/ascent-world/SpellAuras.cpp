@@ -143,7 +143,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraNULL,//SPELL_AURA_UNTRACKABLE = 120,
 		&Aura::SpellAuraEmphaty,//SPELL_AURA_EMPATHY = 121,
 		&Aura::SpellAuraModOffhandDamagePCT,//SPELL_AURA_MOD_OFFHAND_DAMAGE_PCT = 122,
-		&Aura::SpellAuraModPowerCostPCT,//SPELL_AURA_MOD_POWER_COST_PCT = 123, --> armor penetration & spell penetration, NOT POWER COST!
+		&Aura::SpellAuraModPenetration,//SPELL_AURA_MOD_POWER_COST_PCT = 123, --> armor penetration & spell penetration, NOT POWER COST!
 		&Aura::SpellAuraModRangedAttackPower,//SPELL_AURA_MOD_RANGED_ATTACK_POWER = 124,
 		&Aura::SpellAuraModMeleeDamageTaken,//SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN = 125,
 		&Aura::SpellAuraModMeleeDamageTakenPct,//SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT = 126,
@@ -7013,7 +7013,7 @@ void Aura::SpellAuraModOffhandDamagePCT(bool apply)
 	}
 }
 
-void Aura::SpellAuraModPowerCostPCT(bool apply) // armor penetration & spell penetration
+void Aura::SpellAuraModPenetration(bool apply) // armor penetration & spell penetration
 {
 	//DK:This is basicly resistance reduce but i really dont
 	//know why blizz named this function like this
