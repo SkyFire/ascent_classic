@@ -14251,6 +14251,25 @@ void ApplyNormalFixes()
 		//////////////////////////////////////////
 
 		// Insert hunter spell fixes here
+		
+			// THESE FIXES ARE GROUPED FOR CODE CLEANLINESS.
+			/*
+			// Concussive Shot, Distracting Shot, Silencing Shot - ranged spells
+			if( sp->NameHash == SPELL_HASH_CONCUSSIVE_SHOT || sp->NameHash == SPELL_HASH_DISTRACTING_SHOT || sp->NameHash == SPELL_HASH_SILENCING_SHOT || sp->NameHash == SPELL_HASH_SCATTER_SHOT || sp->NameHash == SPELL_HASH_TRANQUILIZING_SHOT )
+				sp->is_ranged_spell = true;
+
+			// All stings - ranged spells
+			if( sp->NameHash == SPELL_HASH_SERPENT_STING || sp->NameHash == SPELL_HASH_SCORPID_STING || sp->NameHash == SPELL_HASH_VIPER_STING || sp->NameHash == SPELL_HASH_WYVERN STING )
+				sp->is_ranged_spell = true;
+			*/
+			// come to think of it... anything *castable* requiring a ranged weapon is a ranged spell -.-
+			// Note that talents etc also come under this, however it does not matter
+			// if they get flagged as ranged spells because is_ranged_spell is only used for
+			// differentiating between resistable and physically avoidable spells.
+			if( sp->EquippedItemClass == 2 && sp->EquippedItemSubClass & 262156 ) // 4 + 8 + 262144 ( becomes item classes 2, 3 and 18 which correspond to bow, gun and crossbow respectively)
+			{
+				sp->is_ranged_spell = true;
+			}
 
 		//////////////////////////////////////////
 		// ROGUE								//

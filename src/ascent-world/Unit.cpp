@@ -2172,7 +2172,7 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 		r++;
 	}
 
-	uint32 roll_results[5] = { SPELL_DID_HIT_SUCCESS,SPELL_DID_HIT_DODGE,SPELL_DID_HIT_DEFLECT,SPELL_DID_HIT_BLOCK,SPELL_DID_HIT_SUCCESS };
+	uint32 roll_results[5] = { SPELL_DID_HIT_MISS,SPELL_DID_HIT_DODGE,SPELL_DID_HIT_DEFLECT,SPELL_DID_HIT_BLOCK,SPELL_DID_HIT_SUCCESS };
 	return roll_results[r];
 }
 
@@ -2494,7 +2494,6 @@ else
 	chances[4]=chances[3]+block;
 	chances[5]=chances[4]+crit;
 	chances[6]=chances[5]+crush;
-
 //--------------------------------roll------------------------------------------------------
 	float Roll = RandomFloat(100.0f);
 	uint32 r = 0;
