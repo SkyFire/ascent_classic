@@ -6915,6 +6915,17 @@ void Player::Gossip_Complete()
 void Player::ZoneUpdate(uint32 ZoneId)
 {
 	m_zoneId = ZoneId;
+	/* how the f*ck is this happening */
+	if( m_playerInfo == NULL )
+	{
+		m_playerInfo = objmgr.GetPlayerInfo(GetLowGUID());
+		if( m_playerInfo == NULL )
+		{
+			m_session->Disconnect();
+			return;
+		}
+	}
+
 	m_playerInfo->lastZone = ZoneId;
 	sHookInterface.OnZone(this, ZoneId);
 

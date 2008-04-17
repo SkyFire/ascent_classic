@@ -704,7 +704,6 @@ protected:
 public:
 
 	bool ok_to_remove;
-	PlayerInfo * m_playerInfo;
 	uint64 m_spellIndexTypeTargets[NUM_SPELL_TYPE_INDEX];
 	void OnLogin();//custom stuff on player login.
 	void RemoveSpellTargets(uint32 Type);
@@ -1886,6 +1885,8 @@ public:
 	/************************************************************************/
 	/* end social                                                           */
 	/************************************************************************/
+
+	PlayerInfo * m_playerInfo;
 };
 
 class SkillIterator
