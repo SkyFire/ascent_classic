@@ -32,7 +32,7 @@ bool ChatHandler::HandleAnnounceCommand(const char* args, WorldSession *m_sessio
 	}
 
 	char msg[1024];
-	snprintf(msg, 1024, "[Server Notice]"MSG_COLOR_GREEN" %s:"MSG_COLOR_WHITE" %s", m_session->GetPlayer()->GetName(), args);
+	snprintf(msg, 1024, "[Server Notice]"MSG_COLOR_GREEN" %s: %s", m_session->GetPlayer()->GetName(), args);
 	sWorld.SendWorldText(msg); // send message
 	sGMLog.writefromsession(m_session, "used announce command, [%s]", args);
 	return true;

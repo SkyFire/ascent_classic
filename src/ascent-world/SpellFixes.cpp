@@ -15409,6 +15409,34 @@ void ApplyNormalFixes()
 	//rogue ( grouping ) Elusiveness = blind + vanish
 	group_relation_rogue_elusiveness = 0x00000800 | 0x01000000;
 
+	// rogue - puncturing wounds
+	/*
+	  SpellGroupType	0x0000000000800004	unsigned __int64 - backstab
+	  SpellGroupType	0x0000000200000000	unsigned __int64 - mutilate
+	  effect 0 is backstab, 1 is mutilate
+	*/
+
+	sp = dbcSpell.LookupEntryForced( 13733 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x00000004;
+		sp->EffectSpellGroupRelation_high[1] = 0x2;
+	}
+
+	sp = dbcSpell.LookupEntryForced( 13865 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x00000004;
+		sp->EffectSpellGroupRelation_high[1] = 0x2;
+	}
+
+	sp = dbcSpell.LookupEntryForced( 13866 );
+	if( sp != NULL )
+	{
+		sp->EffectSpellGroupRelation[0] = 0x00000004;
+		sp->EffectSpellGroupRelation_high[1] = 0x2;
+	}
+
 	//rogue - Elusiveness
 	sp = dbcSpell.LookupEntryForced( 13981 ); 
 	if( sp != NULL )

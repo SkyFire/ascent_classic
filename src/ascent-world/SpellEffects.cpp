@@ -4189,7 +4189,7 @@ void Spell::SpellEffectDuel(uint32 i) // Duel
 
 void Spell::SpellEffectStuck(uint32 i)
 {
-    if(!playerTarget)
+    if(!playerTarget || playerTarget != p_caster)
         return;
 
 	sEventMgr.AddEvent(playerTarget,&Player::EventTeleport,playerTarget->GetBindMapId(),playerTarget->GetBindPositionX(),playerTarget->GetBindPositionY(),
@@ -5189,8 +5189,9 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		}
 
 	//rogue - mutilate ads dmg if target is poisoned
+	uint32 pct_dmg_mod = 100;
 	if(	m_spellInfo->NameHash == SPELL_HASH_MUTILATE && unitTarget->IsPoisoned() )
-		damage = damage + float2int32( (float)damage * 0.5f );
+		pct_dmg_mod = 150;
 
 	uint32 _type;
 	if( GetType() == SPELL_DMG_TYPE_RANGED )
@@ -5202,7 +5203,7 @@ void Spell::SpellEffectDummyMelee( uint32 i ) // Normalized Weapon damage +
 		else
 			_type = MELEE;
 	}
-	u_caster->Strike( unitTarget, _type, m_spellInfo, damage, 0, 0, false, true );
+	u_caster->Strike( unitTarget, _type, m_spellInfo, damage, pct_dmg_mod, 0, false, true );
 }
 
 void Spell::SpellEffectSpellSteal( uint32 i )
