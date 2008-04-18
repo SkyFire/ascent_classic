@@ -15667,24 +15667,38 @@ void ApplyNormalFixes()
 	group_relation_rogue_lethality |= 33554432UL;//rogue - Hemorrhage (only a part of the whole group since it would affect other spells too)
 	group_relation_rogue_lethality |= 536870912UL;//rogue - Shiv (only a part of the whole group since it would affect other spells too)
 	group_relation_rogue_lethality |= 1073741824UL;//rogue - Ghostly Strike (only a part of the whole group since it would affect other spells too)
-	group_relation_rogue_lethality |= 0x200000000;	// rogue - mutilate
 
 	//rogue Lethality
 	sp = dbcSpell.LookupEntryForced( 14128 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation_high[0] = 2;
+	}
 	sp = dbcSpell.LookupEntryForced( 14132 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation_high[0] = 2;
+	}
 	sp = dbcSpell.LookupEntryForced( 14135 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation_high[0] = 2;
+	}
 	sp = dbcSpell.LookupEntryForced( 14136 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation_high[0] = 2;
+	}
 	sp = dbcSpell.LookupEntryForced( 14137 ); 
 	if( sp != NULL )
+	{
 		sp->EffectSpellGroupRelation[0] = group_relation_rogue_lethality;
+		sp->EffectSpellGroupRelation_high[0] = 2;
+	}
 
 	//rogue - Endurance 
 	sp = dbcSpell.LookupEntryForced( 13742 ); 
