@@ -388,27 +388,6 @@ struct FactionReputation
 	int32 baseStanding;
 	ASCENT_INLINE int32 CalcStanding() { return standing - baseStanding; }
 	ASCENT_INLINE bool Positive() { return standing >= 0; }
-	FactionRating CalcRating()
-	{		
-		//changed by zack : nocturno patch : items bougth from Quartermasters relly on full standing value
-//		register long st=CalcStanding();
-		register long st=standing;
-		if(st>=42000)
-			return EXALTED;
-		if(st>=21000)
-			return REVERED;
-		if(st>=9000)
-			return HONORED;
-		if(st>=3000)
-			return FRIENDLY;
-		if(st>=0)
-			return NEUTRAL;
-		if(st>-3000)
-			return UNFRIENDLY;
-		if(st>-6000)
-			return HOSTILE;
-		return HATED;
-	}
 };
 struct PlayerInfo
 {

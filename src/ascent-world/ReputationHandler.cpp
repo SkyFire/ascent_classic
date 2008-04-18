@@ -19,26 +19,27 @@
 
 #include "StdAfx.h"
 
-static int32 STANDING_TO_RANK[8] = {-36000, -6000, -3000, 3000, 6000, 12000, 21000, 1000};
 //static uint32 INITIALIZE_FACTIONS[128] = { 21, 92, 93, 59, 349, 70, 369, 471, 470, 169, 469, 67, 529, 76, 530, 81, 68, 54, 72, 47, 69, 86, 83, 549, 551, 550, 589, 577, 46, 289, 570, 571, 569, 574, 576, 609, 947, 946, 935, 730, 729, 749, 980, 809, 890, 889, 891, 892, 930, 909, 270, 510, 509, 910, 911, 922, 990, 932, 936, 933, 941, 934, 967, 942, 970, 978, 989, 1005, 1011, 1012, 1015, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 #define FACTION_FLAG_AT_WAR  2
 #define FACTION_FLAG_VISIBLE 1
 
 Standing Player::GetReputationRankFromStanding(int32 Standing_)
 {
-	uint32 i = 0;
-	for(; i < 8; )
-	{
-		if(Standing_ > STANDING_TO_RANK[i])
-		{
-			++i;
-		}
-		else
-		{
-			return Standing(i);
-		}
-	}
-	return STANDING_EXALTED;
+	if( Standing_ >= 42000 )  
+		return STANDING_EXALTED;  
+	else if( Standing_ >= 21000 )  
+		return STANDING_REVERED;  
+	else if( Standing_ >= 9000 )  
+		return STANDING_HONORED;  
+	else if( Standing_ >= 3000 )  
+		 return STANDING_FRIENDLY;  
+	else if( Standing_ >= 0 )  
+		return STANDING_NEUTRAL;  
+	else if( Standing_ > -3000 )  
+		return STANDING_UNFRIENDLY;  
+	else if( Standing_ > -6000 )  
+		return STANDING_HOSTILE;  
+	return STANDING_HATED;  
 }
 
 ASCENT_INLINE void SetFlagAtWar(uint8 & flag)

@@ -2022,9 +2022,7 @@ int8 ItemInterface::CanAffordItem(ItemPrototype * item,uint32 amount, Creature *
 		if(!factdbc || factdbc->RepListId < 0)
 			return (int8)NULL;
 		
-		//if(this->m_pOwner->reputationByListId[factdbc->RepListId]->CalcRating() < item->RequiredFactionStanding)
-		if(m_pOwner->reputationByListId[factdbc->RepListId] == 0 || m_pOwner->reputationByListId[factdbc->RepListId]->CalcRating()
-			< (int32)item->RequiredFactionStanding)
+		if( m_pOwner->GetReputationRankFromStanding( m_pOwner->GetStanding( item->RequiredFaction )) < (int32)item->RequiredFactionStanding )
 		{
 			return CAN_AFFORD_ITEM_ERROR_REPUTATION;
 		}
