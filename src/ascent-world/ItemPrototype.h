@@ -449,12 +449,18 @@ enum ITEM_FLAG
 
 enum SPECIAL_ITEM_TYPE
 {
-	ITEM_TYPE_KEYRING	 = 9,
-	ITEM_TYPE_ENCHANTMENT = 7,
-	ITEM_TYPE_HERBALISM   = 6,
-	ITEM_TYPE_SOULSHARD   = 3,
-	ITEM_TYPE_GUNAMMO	 = 2,
-	ITEM_TYPE_BOWAMMO	 = 1
+	ITEM_TYPE_BOWAMMO	    = 1,	// Arrows
+	ITEM_TYPE_GUNAMMO	    = 2,	// Bullets
+	ITEM_TYPE_SOULSHARD     = 3,	// Soul Shards
+	ITEM_TYPE_LEATHERWORK   = 4,	// Leatherworking Supplies
+	ITEM_TYPE_HERBALISM     = 6,	// Herbs
+	ITEM_TYPE_ENCHANTMENT   = 7,	// Enchanting Supplies
+	ITEM_TYPE_ENGINEERING   = 8,	// Engineering Supplies
+	ITEM_TYPE_KEYRING	    = 9,	// Keys
+	ITEM_TYPE_GEMS   	    = 10,	// Gems
+	ITEM_TYPE_MINING	    = 11,	// Mining Supplies
+	ITEM_TYPE_SBEQUIPMENT   = 12,	// Soulbound Equipment
+	ITEM_TYPE_VANITYPETS    = 13	// Vanity Pets
 };
 
 enum SOCKET_GEM_COLOR
