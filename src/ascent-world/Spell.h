@@ -1489,6 +1489,12 @@ ASCENT_INLINE bool IsTargetingStealthed(SpellEntry *sp)
 		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED
 		)
 		return 1;
+
+	if(
+		sp->NameHash == SPELL_HASH_MAGMA_TOTEM
+		)
+		return 1;
+
 	return 0;
 }
 

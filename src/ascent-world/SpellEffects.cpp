@@ -4350,7 +4350,7 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 	uint32 j;
 	for( j = 0; j < 3; ++j )
 	{
-		if( TotemSpell->Effect[j] == SPELL_EFFECT_APPLY_AREA_AURA || TotemSpell->Effect[j] == SPELL_EFFECT_PERSISTENT_AREA_AURA )
+		if( TotemSpell->Effect[j] == SPELL_EFFECT_APPLY_AREA_AURA || TotemSpell->Effect[j] == SPELL_EFFECT_PERSISTENT_AREA_AURA || TotemSpell->EffectApplyAuraName[j] == SPELL_AURA_PERIODIC_TRIGGER_SPELL )
 		{
 			break;
 		}
@@ -4384,11 +4384,6 @@ void Spell::SpellEffectSummonTotem(uint32 i) // Summon Totem
 
 		switch(TotemSpell->Id)
 		{
-		case 8167: //Poison Cleansing Totem
-		case 8172: //Disease Cleansing Totem
-			timer =  5000;
-			break;
-		case 8146: //Tremor Totem
 		case 8349: //Fire Nova Totem 1
 		case 8502: //Fire Nova Totem 2
 		case 8503: //Fire Nova Totem 3
@@ -4816,20 +4811,20 @@ void Spell::SpellEffectSummonObjectSlot(uint32 i)
 
 void Spell::SpellEffectDispelMechanic(uint32 i)
 {
-	if(!unitTarget)
+	if( !unitTarget && !unitTarget->isAlive() )
 		return;
-	if(!unitTarget->isAlive())
-		return;
-	/*
-	for(uint32 x=MAX_POSITIVE_AURAS;x<MAX_AURAS;x++)
-		if(unitTarget->m_auras[x])
-			if(unitTarget->m_auras[x]->GetSpellProto()->MechanicsType)
-				unitTarget->m_auras[x]->Remove();	
-	*/
+	
+	uint32 sMisc = m_spellInfo->EffectMiscValue[i];
 
-	// Hehe, I love this function.
-	unitTarget->RemoveAllAurasByMechanic( m_spellInfo->EffectMiscValue[i] , -1 , true );
-
+	for( uint32 x = 0 ; x<MAX_AURAS ; x++ )
+	{
+		if( unitTarget->m_auras[x] && !unitTarget->m_auras[x]->IsPositive())
+		{
+			if( unitTarget->m_auras[x]->GetSpellProto()->DispelType == sMisc || unitTarget->m_auras[x]->GetSpellProto()->EffectMechanic[x] == sMisc )
+				unitTarget->m_auras[x]->Remove();
+		}
+	}
+	
 	if( playerTarget && m_spellInfo->NameHash == SPELL_HASH_DAZED && playerTarget->IsMounted() )
 		playerTarget->RemoveAura(playerTarget->m_MountSpellId);
 }

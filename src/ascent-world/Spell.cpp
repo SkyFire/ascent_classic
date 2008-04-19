@@ -1180,6 +1180,33 @@ void Spell::cast(bool check)
 
 	if(cancastresult == SPELL_CANCAST_OK)
 	{
+			/* HACK FIX */
+			/* Please replace if found correct way */
+			/* SPELL_AURA_SPELL_MAGNET */
+		if( p_caster && p_caster->IsInWorld() )
+		{
+			Unit *Target = m_caster->GetMapMgr()->GetUnit( m_targets.m_unitTarget );
+			if( Target && Target->IsPlayer() && isAttackable(u_caster,Target) )
+			{	
+				Unit *MagnetCaster;
+				bool HasMagnetSpell = false;
+				for(uint32 x=0;x<MAX_POSITIVE_AURAS;x++)
+				if(	Target->m_auras[x] ) 
+				{
+					for(uint32 y = 0; y < 3; ++y)
+						if ( Target->m_auras[x]->m_spellProto->EffectApplyAuraName[y] == SPELL_AURA_SPELL_MAGNET )
+						{
+							MagnetCaster = Target->m_auras[x]->GetUnitCaster();
+							HasMagnetSpell = true;
+							break;
+						}
+				}
+				if ( HasMagnetSpell && MagnetCaster )
+				{
+					m_targets.m_unitTarget = MagnetCaster->GetGUID();
+				}
+			}
+		}
 		if (p_caster && !m_triggeredSpell && p_caster->IsInWorld() && GET_TYPE_FROM_GUID(m_targets.m_unitTarget)==HIGHGUID_TYPE_UNIT)
 		{
 			sQuestMgr.OnPlayerCast(p_caster,m_spellInfo->Id,m_targets.m_unitTarget);
