@@ -1,0 +1,1 @@
+update gameobject_names set sound1=5 where sound1<5 AND Type=8;

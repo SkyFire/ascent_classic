@@ -2206,6 +2206,10 @@ void Spell::SpellEffectEnergize(uint32 i) // Energize
 	else  
         modEnergy = damage;
 
+	if(unitTarget->HasAura(17619)) 
+	{ 
+		modEnergy = uint32(modEnergy*1.4f);      
+	} 
 	SendHealManaSpellOnPlayer(u_caster, unitTarget, modEnergy, m_spellInfo->EffectMiscValue[i]);
 
 	if(modEnergy + curEnergy > maxEnergy)
@@ -2320,17 +2324,23 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			else if(gameObjTarget)
 			{
 				GameObjectInfo *info = GameObjectNameStorage.LookupEntry(gameObjTarget->GetEntry());
-				if(!info || gameObjTarget->GetUInt32Value(GAMEOBJECT_STATE) == 1) return;
+				if(!info || gameObjTarget->GetUInt32Value(GAMEOBJECT_STATE) == 0) return;
 				Lock *lock = dbcLock.LookupEntry( info->SpellFocus );
-				if(!lock) return;
+				if(lock == 0)
+					return;
+
 				for(int i=0;i<5;i++)
 					if(lock->locktype[i] == 2 && lock->minlockskill[i] && lockskill >= lock->minlockskill[i])
 					{
 						v = lock->minlockskill[i];
+						gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
 						gameObjTarget->SetUInt32Value(GAMEOBJECT_STATE, 1);
-						DetermineSkillUp(SKILL_LOCKPICKING,v/5);
 						break;
 					}
+				lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
+				loottype = 2;
+				DetermineSkillUp(SKILL_LOCKPICKING,v/5);
+				break;
 			}
 		}
 		case LOCKTYPE_HERBALISM:
@@ -2434,6 +2444,10 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		default://not profession
 		{
 			if(!gameObjTarget ) return;
+
+			if( gameObjTarget->GetUInt32Value( GAMEOBJECT_TYPE_ID ) == GAMEOBJECT_TYPE_GOOBER)
+					CALL_GO_SCRIPT_EVENT(gameObjTarget, OnActivate)(static_cast<Player*>(p_caster));
+			
 			if(sQuestMgr.OnActivateQuestGiver(gameObjTarget, p_caster))
 				return;
 
@@ -2451,7 +2465,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		}
 		break;
 	};
-	if( gameObjTarget != NULL )
+	if( gameObjTarget != NULL && gameObjTarget->GetUInt32Value( GAMEOBJECT_TYPE_ID ) == GAMEOBJECT_TYPE_CHEST)
 		static_cast< Player* >( m_caster )->SendLoot( gameObjTarget->GetGUID(), loottype );
 }
 
@@ -2464,9 +2478,29 @@ void Spell::SpellEffectOpenLockItem(uint32 i)
 	if(!gameObjTarget || !gameObjTarget->IsInWorld()) 
 		return;
 	
-	gameObjTarget->SetUInt32Value(GAMEOBJECT_STATE,0);
+	CALL_GO_SCRIPT_EVENT(gameObjTarget, OnActivate)(static_cast<Player*>(caster));
+	gameObjTarget->SetUInt32Value(GAMEOBJECT_STATE, 0);	
+
+	if( gameObjTarget->GetEntry() == 183146)
+	{
+		gameObjTarget->Despawn(1);
+		return;
+	}
+
+	if( gameObjTarget->GetUInt32Value( GAMEOBJECT_TYPE_ID ) == GAMEOBJECT_TYPE_CHEST)
+	{
+		lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
+		static_cast< Player* >( m_caster )->SendLoot( gameObjTarget->GetGUID(), 1 );
+		gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, 1);
+	}
+
+	if( gameObjTarget->GetUInt32Value( GAMEOBJECT_TYPE_ID ) == GAMEOBJECT_TYPE_DOOR)
+		gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, 33);
+
 	if(gameObjTarget->GetMapMgr()->GetMapInfo()->type==INSTANCE_NULL)//dont close doors for instances
-		sEventMgr.AddEvent(gameObjTarget,&GameObject::EventCloseDoor,EVENT_GAMEOBJECT_DOOR_CLOSE,10000,1,0);
+		sEventMgr.AddEvent(gameObjTarget,&GameObject::EventCloseDoor, EVENT_GAMEOBJECT_DOOR_CLOSE,10000,1,0);
+	
+	sEventMgr.AddEvent(gameObjTarget, &GameObject::Despawn, (uint32)1, EVENT_GAMEOBJECT_ITEM_SPAWN, 6*60*1000, 1, 0);
 }
 
 void Spell::SpellEffectProficiency(uint32 i)
@@ -2873,10 +2907,10 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 		Creature * p = u_caster->GetMapMgr()->CreateCreature(cr_entry);
 		//ASSERT(p);
 		p->Load(proto, x, y, z);
-		p->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID());
-        p->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
+		//p->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID());
+        //p->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
         p->SetZoneId(m_caster->GetZoneId());
-		p->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,u_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
+		//p->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,u_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
 		p->m_faction = dbcFactionTemplate.LookupEntry(proto->Faction);
 		if(p->m_faction)
 			p->m_factionDBC = dbcFaction.LookupEntry(p->m_faction->Faction);
@@ -2888,46 +2922,29 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 
 void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 {
-	//these are not pets. Just some creatures that will fight on your side. 
-	//They follow you and attack your target but you cannot command them
-	//number of creatures is actualy dmg (the usual formula), sometimes =3 sometimes =1
+	if ( !u_caster )
+		return;
+
 	uint32 cr_entry = m_spellInfo->EffectMiscValue[i];
 
-	CreatureProto* proto = CreatureProtoStorage.LookupEntry( cr_entry );
-	CreatureInfo* info = CreatureNameStorage.LookupEntry( cr_entry );
-
-	if( proto == NULL || info == NULL )
+	uint32 level = u_caster->getLevel();
+	/*if ( u_caster->GetTypeId()==TYPEID_PLAYER && itemTarget )
 	{
-		sLog.outDetail( "Warning : Missing summon creature template %u used by spell %u!", cr_entry, m_spellInfo->Id );
-		return;
-	}
+		if (itemTarget->GetProto() && itemTarget->GetProto()->RequiredSkill == SKILL_ENGINERING)
+		{
+			uint32 skill202 = static_cast< Player* >( m_caster )->_GetSkillLineCurrent(SKILL_ENGINERING);
+			if (skill202>0)
+			{
+				level = skill202/5;
+			}
+		}
+	}*/
 
 	float angle_for_each_spawn = -float(M_PI) * 2 / damage;
-
 	for( int i = 0; i < damage; i++ )
 	{
 		float m_fallowAngle = angle_for_each_spawn * i;
-		float x = u_caster->GetPositionX() + ( 3 * ( cosf( m_fallowAngle + u_caster->GetOrientation() ) ) );
-		float y = u_caster->GetPositionY() + ( 3 * ( sinf( m_fallowAngle + u_caster->GetOrientation() ) ) );
-		float z = u_caster->GetPositionZ();
-
-		Creature* p = u_caster->GetMapMgr()->CreateCreature(proto->Id);
-
-		p->SetInstanceID( u_caster->GetMapMgr()->GetInstanceID() );
-		p->Load( proto, x, y, z );
-		p->SetUInt64Value( UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID() );
-        p->SetUInt64Value( UNIT_FIELD_CREATEDBY, m_caster->GetGUID() );
-        p->SetZoneId( m_caster->GetZoneId() );
-		p->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, u_caster->GetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE ) );
-		p->_setFaction();
-		p->GetAIInterface()->Init( p,AITYPE_PET,MOVEMENTTYPE_NONE, u_caster );
-		p->GetAIInterface()->SetUnitToFollow( u_caster );
-		p->GetAIInterface()->SetUnitToFollowAngle( m_fallowAngle );
-		p->GetAIInterface()->SetFollowDistance( 3.0f );
-		p->PushToWorld( u_caster->GetMapMgr() );
-
-		//make sure they will be desumonized (roxor)
-		sEventMgr.AddEvent( p, &Creature::SummonExpire, EVENT_SUMMON_EXPIRE, GetDuration(), 1, 0 );
+		u_caster->create_guardian(cr_entry,GetDuration(),m_fallowAngle,level);
 	}
 }
 
@@ -3160,6 +3177,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		
 		go->SetInstanceID(m_caster->GetInstanceID());
 		go->CreateFromProto(entry,mapid,posx,posy,pz,orient);
+		go->SetUInt32Value(GAMEOBJECT_STATE, 1);		
 		go->SetUInt64Value(OBJECT_FIELD_CREATED_BY,m_caster->GetGUID());
 		go->PushToWorld(m_caster->GetMapMgr());	  
 		sEventMgr.AddEvent(go, &GameObject::ExpireAndDelete, EVENT_GAMEOBJECT_EXPIRE, GetDuration(), 1,0);
@@ -4644,14 +4662,26 @@ void Spell::SpellEffectSummonCritter(uint32 i)
 
 void Spell::SpellEffectKnockBack(uint32 i)
 {
-	if(!playerTarget || !playerTarget->isAlive() || !m_caster)
+	if(!unitTarget || !unitTarget->isAlive() || !m_caster)
 		return;
 
-	//float x, y, z;
-	float dx,dy;//,dz;
-	float affect = float(damage)/10;
+	float dx, dy;
+	float value1 = float(m_spellInfo->EffectBasePoints[i]+1);
+	float value2 = float(m_spellInfo->EffectMiscValue[i]);
+	float proportion;
+	value2 ? proportion = value1/value2 : proportion = 0;
 
-	//Not sure about /100
+    if(proportion)
+	{
+		value1 = value1 / (10 * proportion);
+		value2 = value2 / 10 * proportion;
+	}
+	else
+	{
+		value2 = value1 / 10;
+		value1 = 0.1f;
+	}
+
 	dx = sinf(m_caster->GetOrientation());
 	dy = cosf(m_caster->GetOrientation());
 
@@ -4659,13 +4689,13 @@ void Spell::SpellEffectKnockBack(uint32 i)
 	data << unitTarget->GetNewGUID();
 	data << getMSTime();
 	data << dy << dx;
-	data << affect;
-	data << -affect;
-	//unitTarget->SendMessageToSet(&data, true);
-	playerTarget->GetSession()->SendPacket(&data);
+	data << value1;
+	data << -value2;
+	unitTarget->SendMessageToSet(&data, true);
 
-	playerTarget->z_axisposition = 0;
-	playerTarget->blinked = true;
+
+	if( playerTarget )
+		playerTarget->blinked = true;
 }
 
 void Spell::SpellEffectDisenchant(uint32 i)

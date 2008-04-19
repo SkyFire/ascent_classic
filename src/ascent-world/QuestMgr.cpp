@@ -61,6 +61,12 @@ uint32 QuestMgr::PlayerMeetsReqs(Player* plr, Quest* qst, bool skiplevelcheck)
 		if(!(qst->required_class & plr->getClassMask()))
 			return QMGR_QUEST_NOT_AVAILABLE;
 
+    if(qst->required_races)
+    {
+        if(!(qst->required_races & plr->getRaceMask()))
+            return QMGR_QUEST_NOT_AVAILABLE;
+    }
+	
 	if(qst->required_tradeskill)
 	{
 		if(!plr->_HasSkillLine(qst->required_tradeskill))

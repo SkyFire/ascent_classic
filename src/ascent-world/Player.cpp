@@ -624,16 +624,16 @@ bool Player::Create(WorldPacket& data )
 	memset(m_taximask,0,sizeof(m_taximask));
 	switch(race)
 	{
-	case RACE_TAUREN:       m_taximask[0]= 1 << (22-1); break;
-	case RACE_HUMAN:        m_taximask[0]= 1 << ( 2-1); break;
-	case RACE_DWARF:        m_taximask[0]= 1 << ( 6-1); break;
-	case RACE_GNOME:        m_taximask[0]= 1 << ( 6-1); break;
-	case RACE_ORC:          m_taximask[0]= 1 << (23-1); break;
-	case RACE_TROLL:        m_taximask[0]= 1 << (23-1); break;
-	case RACE_UNDEAD:       m_taximask[0]= 1 << (11-1); break;
-	case RACE_NIGHTELF:     m_taximask[0]= 1 << (27-1); break;
-	case RACE_BLOODELF:     m_taximask[2]= 1 << (18-1); break;
-	case RACE_DRAENEI:      m_taximask[2]= 1 << (30-1); break;
+	case RACE_TAUREN:	m_taximask[0]= 2097152;		break;
+	case RACE_HUMAN:	m_taximask[0]= 2;			break;
+	case RACE_DWARF:	m_taximask[0]= 32;			break;
+	case RACE_GNOME:	m_taximask[0]= 32;			break;
+	case RACE_ORC:		m_taximask[0]= 4194304;		break;
+	case RACE_TROLL:	m_taximask[0]= 4194304;		break;
+	case RACE_UNDEAD:	m_taximask[0]= 1024;		break;
+	case RACE_NIGHTELF:	m_taximask[0]= 100663296;	break;
+	case RACE_BLOODELF:	m_taximask[2]= 131072;		break;
+	case RACE_DRAENEI:	m_taximask[2]= 536870912;	break;
 	}
 
 	// Set Starting stats for char
@@ -7875,7 +7875,7 @@ void Player::CompleteLoading()
 			continue; //do not load auras that only exist while pet exist. We should recast these when pet is created anyway
 
 		Aura * a;
-		if(sp->Id == 8326 || sp->Id == 9036 || sp->Id == 20584 || sp->Id == 150007)		// death auras
+		if(sp->Id == 8326 || sp->Id == 9036 || sp->Id == 20584 || sp->Id == 15007)	// death auras
 		{
 			if(!isDead())
 				continue;

@@ -432,7 +432,8 @@ void Aura::Remove()
 
 		if( m_spellProto->Effect[x] == SPELL_EFFECT_TRIGGER_SPELL && !m_spellProto->always_apply )
 		{
-			//if(GetSpellProto()->EffectTriggerSpell[x]!=GetSpellId())
+			// Im not sure about this! FIXME!!
+			if ( dbcSpell.LookupEntryForced( GetSpellProto()->EffectTriggerSpell[x] )->DurationIndex < m_spellProto->DurationIndex )
 			m_target->RemoveAura(GetSpellProto()->EffectTriggerSpell[x]);
 		}
 		else if( m_spellProto->Effect[x] == SPELL_EFFECT_APPLY_AREA_AURA && m_casterGuid == m_target->GetGUID())
@@ -1111,7 +1112,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 			m_target->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_IMMOLATE);
 		}
 		//maybe poison aurastate should get triggered on other spells too ?
-		else if( m_spellProto->NameHash == SPELL_HASH_DEADLY_POISON )//deadly poison
+		else if( m_spellProto->NameHash == (SPELL_HASH_DEADLY_POISON,SPELL_HASH_DEADLY_POISON_II,SPELL_HASH_DEADLY_POISON_III,SPELL_HASH_DEADLY_POISON_IV,SPELL_HASH_DEADLY_POISON_V,SPELL_HASH_DEADLY_POISON_VI,SPELL_HASH_DEADLY_POISON_VII) )//deadly poison 
 		{
 			m_target->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_POISON);
 		}
@@ -1121,7 +1122,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 		if( m_spellProto->buffType & SPELL_TYPE_WARLOCK_IMMOLATE )
 			m_target->RemoveFlag( UNIT_FIELD_AURASTATE,AURASTATE_FLAG_IMMOLATE );
 		//maybe poison aurastate should get triggered on other spells too ?
-		else if( m_spellProto->NameHash == SPELL_HASH_DEADLY_POISON )//deadly poison
+		else if( m_spellProto->NameHash == (SPELL_HASH_DEADLY_POISON,SPELL_HASH_DEADLY_POISON_II,SPELL_HASH_DEADLY_POISON_III,SPELL_HASH_DEADLY_POISON_IV,SPELL_HASH_DEADLY_POISON_V,SPELL_HASH_DEADLY_POISON_VI,SPELL_HASH_DEADLY_POISON_VII) )//deadly poison 
 		{
 			m_target->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_POISON);
 		}
@@ -5380,37 +5381,7 @@ void Aura::SpellAuraGhost(bool apply)
 
 void Aura::SpellAuraMagnet(bool apply)
 {
-	/*shaman got a totem called grounding totem
-	if you cast it
-	1 negative spell casted on you will be casted on that totem instead of you
-	for example a damage spell
-	so you wont get damage of that 1 spell
-	next spell will deal damage on you of course*/
-	/*
-	//started by zack. If this text is not removed it means it never got to testing fase so feel free to delete or rewrite it
-	//check if there is something to be removed from target
-	if(m_target)
-	{
-		Aura *target_aura=NULL;
-		for(uint32 x=0;x<MAX_POSITIVE_AURAS;x++)
-			if(	m_target->m_auras[x] 
-//				&& !m_target->m_auras[x]->IsPositive() //this check was already made when we added to negative auras ;)
-				)
-			{
-				target_aura = m_target->m_auras[x];
-				break;
-			}
-		if(target_aura)
-		{
-			//add to self
-			Spell*sp=new Spell(GetCaster(),target_aura->GetSpellProto(),true,NULL); //make or do not make triggers on this action ?
-			SpellCastTargets tgt(GetCaster()->GetGUID());
-			sp->prepare(&tgt);
-			//remove it from target
-			m_target->RemoveAllAuras(target_aura->GetSpellProto()->Id,target_aura->GetCasterGUID());
-		}
-	}
-	*/
+// fixed in cast function
 }
 
 void Aura::SpellAuraManaShield(bool apply)

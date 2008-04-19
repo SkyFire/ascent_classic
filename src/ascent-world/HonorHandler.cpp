@@ -32,6 +32,8 @@ void WorldSession::HandleSetVisibleRankOpcode(WorldPacket& recv_data)
 
 void HonorHandler::AddHonorPointsToPlayer(Player *pPlayer, uint32 uAmount)
 {
+	if( pPlayer->GetMapId() == 559 || pPlayer->GetMapId() == 562 || pPlayer->GetMapId() == 572)
+		return;
 	pPlayer->m_honorPoints += uAmount;
 	pPlayer->m_honorToday += uAmount;
 	

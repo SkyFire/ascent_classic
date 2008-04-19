@@ -5326,7 +5326,7 @@ void Unit::SetFacing(float newo)
 }
 
 //guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
-Unit* Unit::create_guardian(uint32 guardian_entry,uint32 duration,float angle)
+Unit* Unit::create_guardian(uint32 guardian_entry,uint32 duration,float angle, uint32 lvl)
 {
 	CreatureProto * proto = CreatureProtoStorage.LookupEntry(guardian_entry);
 	CreatureInfo * info = CreatureNameStorage.LookupEntry(guardian_entry);
@@ -5342,6 +5342,20 @@ Unit* Unit::create_guardian(uint32 guardian_entry,uint32 duration,float angle)
 	Creature * p = GetMapMgr()->CreateCreature(guardian_entry);
 	p->SetInstanceID(GetMapMgr()->GetInstanceID());
 	p->Load(proto, x, y, z);
+
+	if (lvl != 0)
+	{
+		/* MANA */
+		p->SetPowerType(POWER_TYPE_MANA);
+		p->SetUInt32Value(UNIT_FIELD_MAXPOWER1,p->GetUInt32Value(UNIT_FIELD_MAXPOWER1)+28+10*lvl);
+		p->SetUInt32Value(UNIT_FIELD_POWER1,p->GetUInt32Value(UNIT_FIELD_POWER1)+28+10*lvl);
+		/* HEALTH */
+		p->SetUInt32Value(UNIT_FIELD_MAXHEALTH,p->GetUInt32Value(UNIT_FIELD_MAXHEALTH)+28+30*lvl);
+		p->SetUInt32Value(UNIT_FIELD_HEALTH,p->GetUInt32Value(UNIT_FIELD_HEALTH)+28+30*lvl);
+		/* LEVEL */
+		p->ModUnsigned32Value(UNIT_FIELD_LEVEL, lvl);
+	}
+
 	p->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, GetGUID());
     p->SetUInt64Value(UNIT_FIELD_CREATEDBY, GetGUID());
     p->SetZoneId(GetZoneId());
