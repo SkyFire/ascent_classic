@@ -133,6 +133,7 @@ bool startdb()
 void LogonServer::Run(int argc, char ** argv)
 {
 	UNIXTIME = time(NULL);
+	g_localTime = *localtime(&UNIXTIME);
 #ifdef WIN32
 	char * config_file = "ascent-logonserver.conf";
 #else
@@ -326,6 +327,7 @@ void LogonServer::Run(int argc, char ** argv)
 			sSocketGarbageCollector.Update();
 			CheckForDeadSockets();			  // Flood Protection
 			UNIXTIME = time(NULL);
+			g_localTime = *localtime(&UNIXTIME);
 		}
 
 		PatchMgr::getSingleton().UpdateJobs();
