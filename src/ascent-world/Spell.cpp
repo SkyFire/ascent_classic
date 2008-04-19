@@ -2912,18 +2912,13 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 
 		// check if we have the required gameobject focus
+		float focusRange;
+
 		if( m_spellInfo->RequiresSpellFocus)
 		{
-			float focusRange;
-			// professions use rangeIndex 1, which is 0yds, so we will use 5yds, which is standard interaction range.
-			if( m_spellInfo->rangeIndex == 1)
-				focusRange = 5.0f;
-			else
-				focusRange = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
-
 			bool found = false;
 
-			for(std::set<Object*>::iterator itr = p_caster->GetInRangeSetBegin(); itr != p_caster->GetInRangeSetEnd(); itr++ )
+            for(std::set<Object*>::iterator itr = p_caster->GetInRangeSetBegin(); itr != p_caster->GetInRangeSetEnd(); itr++ )
 			{
 				if((*itr)->GetTypeId() != TYPEID_GAMEOBJECT)
 					continue;
@@ -2931,17 +2926,22 @@ uint8 Spell::CanCast(bool tolerate)
 				if((*itr)->GetUInt32Value(GAMEOBJECT_TYPE_ID) != GAMEOBJECT_TYPE_SPELL_FOCUS)
 					continue;
 
-				// check if focus object is close enough
-				if(!IsInrange(p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ(), (*itr), (focusRange * focusRange)))
-					continue;
-
 				GameObjectInfo *info = ((GameObject*)(*itr))->GetInfo();
-
 				if(!info)
 				{
 					sLog.outDebug("Warning: could not find info about game object %u",(*itr)->GetEntry());
 					continue;
 				}
+
+				// professions use rangeIndex 1, which is 0yds, so we will use 5yds, which is standard interaction range.
+				if(info->sound1)
+					focusRange = float(info->sound1);
+				else
+					focusRange = GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
+
+				// check if focus object is close enough
+				if(!IsInrange(p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ(), (*itr), (focusRange * focusRange)))
+					continue;
 
 				if(info->SpellFocus == m_spellInfo->RequiresSpellFocus)
 				{
@@ -2983,6 +2983,7 @@ uint8 Spell::CanCast(bool tolerate)
 					// check for enchants that can only be done on your own items
 					if( m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY )
 						return SPELL_FAILED_BAD_TARGETS;
+
 					// get the player we are trading with
 					Player* t_player = p_caster->GetTradeTarget();
 					// get the targeted trade item
@@ -3020,10 +3021,6 @@ uint8 Spell::CanCast(bool tolerate)
 			case SPELL_EFFECT_ENCHANT_ITEM:
 			case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
 			{
-				// check for enchants that can only be done on your own items, make sure they are soulbound
-				if( m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY && i_target->GetOwner() != p_caster)
-					return SPELL_FAILED_BAD_TARGETS;
-
 				// check if we have the correct class, subclass, and inventory type of target item
 				if( m_spellInfo->EquippedItemClass != (int32)proto->Class)
 					return SPELL_FAILED_BAD_TARGETS;
@@ -3037,6 +3034,12 @@ uint8 Spell::CanCast(bool tolerate)
 				if (m_spellInfo->Effect[0] == SPELL_EFFECT_ENCHANT_ITEM && 
 					m_spellInfo->baseLevel && (m_spellInfo->baseLevel > proto->ItemLevel))
 					return int8(SPELL_FAILED_BAD_TARGETS); // maybe there is different err code
+				
+				if( i_caster && i_caster->GetProto()->Flags == 2097216)
+					break;
+
+				if( m_spellInfo->Flags3 & FLAGS3_ENCHANT_OWN_ONLY && !(i_target->IsSoulbound()))
+					return SPELL_FAILED_BAD_TARGETS;
 
 				break;
 			}
