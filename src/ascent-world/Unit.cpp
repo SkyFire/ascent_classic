@@ -4704,7 +4704,7 @@ void Unit::RemoveAurasByBuffIndexType(uint32 buff_index_type, const uint64 &guid
 
 bool Unit::HasAurasOfBuffType(uint32 buff_type, const uint64 &guid,uint32 skip)
 {
-	uint64 sguid = (buff_type == SPELL_TYPE_BLESSING) ? guid : 0;
+	uint64 sguid = (buff_type == SPELL_TYPE_BLESSING || buff_type == SPELL_TYPE_WARRIOR_SHOUT) ? guid : 0;
 
 	for(uint32 x=0;x<MAX_AURAS;x++)
 	{
@@ -6072,6 +6072,7 @@ void Unit::ReplaceAIInterface(AIInterface *new_interface)
 	delete m_aiInterface;	//be carefull when you do this. Might screw unit states !
 	m_aiInterface = new_interface; 
 }
+
 
 
 
