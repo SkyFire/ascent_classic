@@ -2612,35 +2612,38 @@ uint8 Spell::CanCast(bool tolerate)
 		if(m_caster->IsInWorld())
 		{
 			Unit *target = m_caster->GetMapMgr()->GetUnit( m_targets.m_unitTarget );
-			if(m_spellInfo->Id == 12699)
-			{
-				if(target->GetEntry() != 5307 || target->isAlive())
-					return SPELL_FAILED_BAD_TARGETS;
-			}
-
-			if(m_spellInfo->Id == 30877)
-			{
-				if(target->GetEntry() != 17326 && target != m_caster)
-					return SPELL_FAILED_BAD_TARGETS;
-			}
 			
-			if(m_spellInfo->Id == 34665)
+			if( target )
 			{
-				if(target->GetEntry() != 16880)
-					return SPELL_FAILED_BAD_TARGETS;
-			}
-
-			if(m_spellInfo->Id == 43723)
-			{
-				Creature *abysal = p_caster->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ(), 19973);
-				if(abysal != NULL)
+				if(m_spellInfo->Id == 12699)
 				{
-					if(!abysal->isAlive())
-						if(!(p_caster->GetItemInterface()->GetItemCount(31672, 0) > 1 && p_caster->GetItemInterface()->GetItemCount(31673, 0) > 0 && p_caster->CalcDistance(p_caster, abysal) < 10))
-							return SPELL_FAILED_NOT_HERE;
+					if(target->GetEntry() != 5307 || target->isAlive())
+						return SPELL_FAILED_BAD_TARGETS;
 				}
-				else
-					return SPELL_FAILED_NOT_HERE;
+
+				if(m_spellInfo->Id == 30877)
+				{
+					if(target->GetEntry() != 17326 && target != m_caster)
+						return SPELL_FAILED_BAD_TARGETS;
+				}
+				
+				if(m_spellInfo->Id == 34665)
+				{
+					if(target->GetEntry() != 16880)
+						return SPELL_FAILED_BAD_TARGETS;
+				}
+
+				if(m_spellInfo->Id == 3607)
+				{
+					if(target->GetEntry() != 2530)
+						return SPELL_FAILED_BAD_TARGETS;
+				}
+
+				if(m_spellInfo->Id == 36310)
+				{
+					if(target->GetEntry() != 20058)
+						return SPELL_FAILED_BAD_TARGETS;
+				}
 			}
 
 			if(m_spellInfo->Id == 32146)
@@ -2666,16 +2669,17 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_NOT_HERE;
 			}
 
-			if(m_spellInfo->Id == 3607)
+			if(m_spellInfo->Id == 43723)
 			{
-				if(target->GetEntry() != 2530)
-					return SPELL_FAILED_BAD_TARGETS;
-			}
-
-			if(m_spellInfo->Id == 36310)
-			{
-				if(target->GetEntry() != 20058)
-					return SPELL_FAILED_BAD_TARGETS;
+				Creature *abysal = p_caster->GetMapMgr()->GetInterface()->GetCreatureNearestCoords(p_caster->GetPositionX(), p_caster->GetPositionY(), p_caster->GetPositionZ(), 19973);
+				if(abysal != NULL)
+				{
+					if(!abysal->isAlive())
+						if(!(p_caster->GetItemInterface()->GetItemCount(31672, 0) > 1 && p_caster->GetItemInterface()->GetItemCount(31673, 0) > 0 && p_caster->CalcDistance(p_caster, abysal) < 10))
+							return SPELL_FAILED_NOT_HERE;
+				}
+				else
+					return SPELL_FAILED_NOT_HERE;
 			}
 		}
 

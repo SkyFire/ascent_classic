@@ -14580,6 +14580,49 @@ void ApplyNormalFixes()
 	if( sp != NULL )
 		sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
 
+	/**********************************************************
+	 * Misc stuff (questfixes etc)
+	 **********************************************************/
+	sp = dbcSpell.LookupEntryForced( 28734 );
+	if( sp != NULL )
+		sp->Effect[2] = SPELL_EFFECT_DUMMY;
+
+	sp = dbcSpell.LookupEntryForced( 35460 );
+	if( sp != NULL )
+		sp->Effect[2] = SPELL_EFFECT_DUMMY;
+
+	sp = dbcSpell.LookupEntryForced( 30877 );
+	if( sp != NULL )
+	{
+		sp->Effect[0] = SPELL_EFFECT_DUMMY;
+		sp->EffectImplicitTargetB[0]=0;
+	}
+
+	sp = dbcSpell.LookupEntryForced(38177);
+	if( sp != NULL )
+		sp->Effect[1] = SPELL_EFFECT_DUMMY;
+
+	sp = dbcSpell.LookupEntryForced(23179);
+	if( sp != NULL )
+		sp->EffectMiscValue[0] = 1434;
+
+	sp = dbcSpell.LookupEntryForced(3607);
+	if( sp != NULL )
+		sp->Effect[0] = SPELL_EFFECT_DUMMY;
+
+	sp = dbcSpell.LookupEntryForced(31373);
+	if( sp != NULL )
+		sp->Effect[2] = SPELL_EFFECT_DUMMY;
+
+	sp = dbcSpell.LookupEntryForced(31736);
+	if( sp != NULL )
+		sp->Effect[1] = SPELL_EFFECT_DUMMY;
+
+	sp = dbcSpell.LookupEntryForced(17016);
+	if( sp != NULL )
+		sp->Effect[2] = SPELL_EFFECT_DUMMY;
+
+
 	//////////////////////////////////////////////////////
 	// CLASS-SPECIFIC SPELL FIXES						//
 	//////////////////////////////////////////////////////
