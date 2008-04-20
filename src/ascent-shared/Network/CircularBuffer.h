@@ -1,25 +1,28 @@
-/****************************************************************************
+/*
+ * Ascent MMORPG Server
+ * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
  *
- * Multiplatform High-Performance Async Network Library
  * Circular Buffer Class
- * Copyright (c) 2007 Burlex
+ * Based on the Bip Buffer concept, from http://www.codeproject.com/KB/IP/bipbuffer.aspx
+ * Implementation Copyright (c) 2008 Burlex
  *
- * This file may be distributed under the terms of the Q Public License
- * as defined by Trolltech ASA of Norway and appearing in the file
- * COPYING included in the packaging of this file.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
- * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
 #ifndef _NETLIB_CIRCULARBUFFER_H
 #define _NETLIB_CIRCUALRBUFFER_H
-
-/**
- * Based on The Bip Buffer concept, 
- * http://www.codeproject.com/KB/IP/bipbuffer.aspx
- */
 
 class CircularBuffer
 {

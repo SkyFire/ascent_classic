@@ -62,8 +62,7 @@ libshared_a_SOURCES = \
     Database/SQLiteDatabase.cpp \
     Database/SQLiteDatabase.h \
     Database/CreateInterface.cpp \
-    Network/ListenSocketPoll.h \
-    Network/ListenSocketSelect.h \
+    Network/CircularBuffer.h \
     Network/ListenSocketLinux.h \
     Network/ListenSocketFreeBSD.h \
     Network/Network.h \
@@ -78,13 +77,5 @@ libshared_a_SOURCES = \
     Network/SocketMgrFreeBSD.h \
     Network/SocketOps.h \
     Network/SocketOpsLinux.cpp \
-    Network/SocketOpsFreeBSD.cpp \
-    Network/SocketMgrSelect.h \
-    Network/SocketMgrSelect.cpp \
-    Network/SocketOpsSelect.cpp \
-    Network/SocketSelect.cpp \
-    Network/SocketMgrPoll.h \
-    Network/SocketMgrPoll.cpp \
-    Network/SocketOpsPoll.cpp \
-    Network/SocketPoll.cpp 
+    Network/SocketOpsFreeBSD.cpp
     
