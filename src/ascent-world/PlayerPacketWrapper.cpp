@@ -28,6 +28,22 @@ void Player::SendWorldStateUpdate(uint32 WorldState, uint32 Value)
 	GetSession()->OutPacket(SMSG_UPDATE_WORLD_STATE, sizeof(packetSMSG_WORLD_STATE_UPDATE), (const char*)&pck);
 }
 
+//#define GOSSIP_FIX
+
+#ifdef GOSSIP_FIX
+void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name)
+{
+	Gossip_POI_Packet packet;
+	packet.data = Data;
+	packet.flags = Flags;
+	packet.icon = Icon;
+	packet.name = Name;
+	packet.pos_x = X;
+	packet.pos_y = Y;
+
+	GetSession()->OutPacket(SMSG_GOSSIP_POI, sizeof(Gossip_POI_Packet), (const char*)&packet);
+}
+#else
 void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name)
 {
 	WorldPacket data(SMSG_GOSSIP_POI, 50);
@@ -39,6 +55,7 @@ void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 
 	data << Y;
 	GetSession()->SendPacket(&data);
 }
+#endif
   
 void Player::SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4)
 {

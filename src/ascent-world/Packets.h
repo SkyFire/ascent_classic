@@ -156,6 +156,17 @@ struct packetSMSG_PLAY_SPELL_VISUAL
 	uint32 visualid;
 };
 
+
+struct Gossip_POI_Packet
+{
+	uint32	flags;
+	float	pos_x;
+	float	pos_y;
+	uint32	icon;
+	uint32	data;
+	const char* name;
+};
+
 #pragma pack(pop)
 
 #endif		// __PACKETS_H
