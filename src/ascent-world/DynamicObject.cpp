@@ -149,7 +149,7 @@ void DynamicObject::UpdateTargets()
 			itr2 = itr;
 			++itr;
 
-			if( !( (*itr2)->IsUnit() ) || ! static_cast< Unit* >( *itr2 )->isAlive() )
+			if( !( (*itr2)->IsUnit() ) || ! static_cast< Unit* >( *itr2 )->isAlive() || ( static_cast< Creature* >( *itr2 )->IsTotem() && !static_cast< Unit* >( *itr2 )->IsPlayer() ) )
 				continue;
 
 			target = static_cast< Unit* >( *itr2 );
