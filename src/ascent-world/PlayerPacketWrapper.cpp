@@ -28,34 +28,19 @@ void Player::SendWorldStateUpdate(uint32 WorldState, uint32 Value)
 	GetSession()->OutPacket(SMSG_UPDATE_WORLD_STATE, sizeof(packetSMSG_WORLD_STATE_UPDATE), (const char*)&pck);
 }
 
-//#define GOSSIP_FIX
 
-#ifdef GOSSIP_FIX
 void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name)
 {
-	Gossip_POI_Packet packet;
-	packet.data = Data;
-	packet.flags = Flags;
-	packet.icon = Icon;
-	packet.name = Name;
-	packet.pos_x = X;
-	packet.pos_y = Y;
+	size_t namelen = strlen(Name);
+	WorldPacket data(SMSG_GOSSIP_POI, 11 + namelen);
+	data << Flags << X << Y << Icon << Data;
+	if( Name == NULL || namelen == 0 )
+		data << uint8(0);
+	else
+		data.append((const uint8*)Name, namelen + 1);		// already null-terminated in memory so this is fine, saves the extra strlen()
 
-	GetSession()->OutPacket(SMSG_GOSSIP_POI, sizeof(Gossip_POI_Packet), (const char*)&packet);
-}
-#else
-void Player::Gossip_SendPOI(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char* Name)
-{
-	WorldPacket data(SMSG_GOSSIP_POI, 50);
-	data << Data;
-	data << Flags;
-	data << Icon;
-	data << Name;
-	data << X;
-	data << Y;
 	GetSession()->SendPacket(&data);
 }
-#endif
   
 void Player::SendLevelupInfo(uint32 level, uint32 Hp, uint32 Mana, uint32 Stat0, uint32 Stat1, uint32 Stat2, uint32 Stat3, uint32 Stat4)
 {
