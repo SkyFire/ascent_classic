@@ -25,7 +25,7 @@ void SocketMgr::AddSocket(Socket * s)
     // Add epoll event based on socket activity.
     struct epoll_event ev;
     memset(&ev, 0, sizeof(epoll_event));
-    ev.events = (s->GetWriteBufferSize()) ? EPOLLOUT : EPOLLIN;
+    ev.events = (s->GetWriteBuffer().GetSize()) ? EPOLLOUT : EPOLLIN;
     ev.events |= EPOLLET;			/* use edge-triggered instead of level-triggered because we're using nonblocking sockets */
     ev.data.fd = s->GetFd();
     
@@ -123,14 +123,14 @@ bool SocketWorkerThread::run()
                 ptr->ReadCallback(0);               // Len is unknown at this point.
 
 				/* changing to written state? */
-				if(ptr->GetWriteBufferSize() && !ptr->HasSendLock() && ptr->IsConnected())
+				if(ptr->GetWriteBuffer().GetSize() && !ptr->HasSendLock() && ptr->IsConnected())
 					ptr->PostEvent(EPOLLOUT);
             }
 			else if(events[i].events & EPOLLOUT)
             {
                 ptr->BurstBegin();          // Lock receive mutex
                 ptr->WriteCallback();       // Perform actual send()
-                if(ptr->GetWriteBufferSize() > 0)
+                if(ptr->GetWriteBuffer().GetSize() > 0)
                 {
                     /* we don't have to do anything here. no more oneshots :) */
                 }

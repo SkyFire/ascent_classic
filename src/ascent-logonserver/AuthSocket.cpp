@@ -518,7 +518,7 @@ void AuthSocket::HandleReconnectChallenge()
 		return;
 
 	// Copy the data into our cached challenge structure
-	if((full_size+4) > sizeof(sAuthLogonChallenge_C))
+	if((size_t)(full_size+4) > sizeof(sAuthLogonChallenge_C))
 	{
 		Disconnect();
 		return;
