@@ -645,10 +645,10 @@ bool ChatHandler::HandleGODelete(const char *args, WorldSession *m_session)
 					c->GOSpawns.erase(itr);
 					break;
 				}
+			GObj->DeleteFromDB();
 			delete GObj->m_spawn;
 		}
 	}
-	GObj->DeleteFromDB();
 	GObj->Despawn(0);
 	
 	delete GObj;

@@ -2589,6 +2589,9 @@ void Spell::SpellEffectOpenLockItem(uint32 i)
 	if(!gameObjTarget || !gameObjTarget->IsInWorld()) 
 		return;
 	
+	if( caster && caster->IsPlayer() && sQuestMgr.OnGameObjectActivate( (static_cast<Player*>(caster)), gameObjTarget ) )
+		static_cast<Player*>(caster)->UpdateNearbyGameObjects();
+
 	CALL_GO_SCRIPT_EVENT(gameObjTarget, OnActivate)(static_cast<Player*>(caster));
 	gameObjTarget->SetUInt32Value(GAMEOBJECT_STATE, 0);	
 
@@ -3018,10 +3021,19 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 		Creature * p = u_caster->GetMapMgr()->CreateCreature(cr_entry);
 		//ASSERT(p);
 		p->Load(proto, x, y, z);
-		//p->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID());
-        //p->SetUInt64Value(UNIT_FIELD_CREATEDBY, m_caster->GetGUID());
-        p->SetZoneId(m_caster->GetZoneId());
-		//p->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE,u_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
+		p->SetZoneId( m_caster->GetZoneId() );
+
+		if ( p->proto && p->proto->Faction == 35 )
+		{
+			p->SetUInt64Value( UNIT_FIELD_SUMMONEDBY, m_caster->GetGUID() );
+			p->SetUInt64Value( UNIT_FIELD_CREATEDBY, m_caster->GetGUID() );
+			p->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, u_caster->GetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE ) );
+		}
+		else
+		{
+			p->SetUInt32Value( UNIT_FIELD_FACTIONTEMPLATE, proto->Faction );
+		}
+
 		p->m_faction = dbcFactionTemplate.LookupEntry(proto->Faction);
 		if(p->m_faction)
 			p->m_factionDBC = dbcFaction.LookupEntry(p->m_faction->Faction);
