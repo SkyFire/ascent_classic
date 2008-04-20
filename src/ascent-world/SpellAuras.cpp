@@ -1302,6 +1302,33 @@ void Aura::SpellAuraDummy(bool apply)
 
 	switch(GetSpellId())
 	{
+	//Warlock - Demonic Knowledge
+	case 35696:
+		{
+			if ( m_target->IsPet() )
+			{
+				Unit* PetOwner;
+				if ( static_cast< Pet* >( m_target )->GetPetOwner() )
+				{
+					PetOwner = static_cast< Pet* >( m_target )->GetPetOwner();
+					uint32 val1 = m_target->GetUInt32Value( UNIT_FIELD_STAT2 ); // stamina
+					uint32 val2 = m_target->GetUInt32Value( UNIT_FIELD_STAT3 ); // intelect
+					uint32 val0 = val1+val2;
+					float dmginc = (float)(val0*mod->m_amount)/100;
+					int32 val;
+
+					if( apply )
+						val = (int32)dmginc;
+					else
+						val = (int32)-dmginc;
+
+					for (uint32 x=0;x<7;x++)
+						PetOwner->ModUnsigned32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + x, val);
+					
+					PetOwner->CalcDamage();
+				}
+			}
+		}break;
 	case 66:
 		{
 			// mage - invisibility

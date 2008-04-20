@@ -31,5 +31,5 @@ bool Preparation(uint32 i, Spell * pSpell)
 
 void SetupRogueSpells(ScriptMgr * mgr)
 {
-    mgr->register_dummy_spell(14185, &Preparation);
+    //mgr->register_dummy_spell(14185, &Preparation);
 }
