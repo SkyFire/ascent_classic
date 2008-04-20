@@ -57,35 +57,62 @@ void WSSocket::OnRead()
 	{
 		if(!_cmd)
 		{
-			if(GetReadBufferSize() < 6)
+			if(GetReadBuffer().GetContiguiousBytes() < 6)
 				break;
 
-			Read(2, (uint8*)&_cmd);
-			Read(4, (uint8*)&_remaining);
+			GetReadBuffer().Read((uint8*)&_cmd, 2);
+			GetReadBuffer().Read((uint8*)&_remaining, 4);
 			//_remaining = ntohl(_remaining);
 		}
 
-        if(_remaining && GetReadBufferSize() < _remaining)
+        if(_remaining && GetReadBuffer().GetSize() < _remaining)
 			break;
 
 		if(_cmd == ICMSG_WOW_PACKET)
 		{
 			/* optimized version for packet passing, to reduce latency! ;) */
-			uint32 sid = *(uint32*)&m_readBuffer[0];
+/*			uint32 sid = *(uint32*)&m_readBuffer[0];
+			uint16 op  = *(uint16*)&m_readBuffer[4];
+			uint32 sz  = *(uint32*)&m_readBuffer[6];*/
+			
+			/*uint32 sid = *(uint32*)&m_readBuffer[0];
 			uint16 op  = *(uint16*)&m_readBuffer[4];
 			uint32 sz  = *(uint32*)&m_readBuffer[6];
+
 			Session * session = sClientMgr.GetSession(sid);
 			if(session != NULL && session->GetSocket() != NULL)
 				session->GetSocket()->OutPacket(op, sz, m_readBuffer + 10);
 
-			RemoveReadBufferBytes(sz + 10/*header*/, false);
+			RemoveReadBufferBytes(sz + 10, false);*/
+
+			uint32 sid;
+			uint16 op;
+			uint32 sz;
+			
+
+			GetReadBuffer().Read(&sid, 4);
+			GetReadBuffer().Read(&op, 2);
+			GetReadBuffer().Read(&sz, 4);
+		
+			Session * session = sClientMgr.GetSession(sid);
+			if(session != NULL && session->GetSocket() != NULL)
+			{
+				uint8* buf = new uint8[sz];
+				GetReadBuffer().Read(buf, sz);
+				session->GetSocket()->OutPacket(op, sz, buf);
+				delete [] buf;
+			}
+			else
+				GetReadBuffer().Remove(sz);
+			
 			_cmd = 0;
 			continue;
 		}
 		WorldPacket * pck = new WorldPacket(_cmd, _remaining);
 		_cmd = 0;
 		pck->resize(_remaining);
-		Read(_remaining, (uint8*)pck->contents());
+		//Read(_remaining, (uint8*)pck->contents());
+		GetReadBuffer().Read((uint8*)pck->contents(), _remaining);
 
 		if(_authenticated)
 		{
