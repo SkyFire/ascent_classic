@@ -16,7 +16,7 @@ void SocketMgr::AddSocket(Socket * s)
     fds[s->GetFd()] = s;
 
     struct kevent ev;
-    if(s->GetWriteBufferSize())
+    if(s->GetWriteBuffer().GetSize())
 		EV_SET(&ev, s->GetFd(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, NULL);
 	else
 		EV_SET(&ev, s->GetFd(), EVFILT_READ, EV_ADD, 0, 0, NULL);
@@ -132,7 +132,7 @@ bool SocketWorkerThread::run()
             {
                 ptr->BurstBegin();          // Lock receive mutex
                 ptr->WriteCallback();       // Perform actual send()
-                if(ptr->GetWriteBufferSize() > 0)
+                if(ptr->GetWriteBuffer().GetSize() > 0)
                     ptr->PostEvent(EVFILT_WRITE, true);   // Still remaining data.
                 else
 				{
@@ -144,7 +144,7 @@ bool SocketWorkerThread::run()
 			else if(events[i].filter == EVFILT_READ)
             {
                 ptr->ReadCallback(0);               // Len is unknown at this point.
-				if(ptr->GetWriteBufferSize() > 0 && ptr->IsConnected() && !ptr->HasSendLock())
+				if(ptr->GetWriteBuffer().GetSize() > 0 && ptr->IsConnected() && !ptr->HasSendLock())
 				{
 					ptr->PostEvent(EVFILT_WRITE, true);
 					ptr->IncSendLock();

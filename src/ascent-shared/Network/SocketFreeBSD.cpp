@@ -29,7 +29,8 @@ void Socket::ReadCallback(uint32 len)
     // We have to lock here.
     m_readMutex.Acquire();
 
-    int bytes = recv(m_fd, ((char*)m_readBuffer + m_readByteCount), m_readBufferSize - m_readByteCount, 0);
+    size_t space = readBuffer.GetSpace();
+    int bytes = recv(m_fd, readBuffer.GetBuffer(), space, 0);
     if(bytes <= 0)
     {
         m_readMutex.Release();
@@ -38,7 +39,8 @@ void Socket::ReadCallback(uint32 len)
     }    
     else if(bytes > 0)
     {
-        m_readByteCount += bytes;
+        //m_readByteCount += bytes;
+        readBuffer.IncrementWritten(bytes);
         // call virtual onread()
         OnRead();
     }
@@ -49,7 +51,7 @@ void Socket::ReadCallback(uint32 len)
 void Socket::WriteCallback()
 {
     // We should already be locked at this point, so try to push everything out.
-    int bytes_written = send(m_fd, (void*)m_writeBuffer, m_writeByteCount, 0);
+    int bytes_written = send(m_fd, writeBuffer.GetBufferStart(), writeBuffer.GetContiguiousBytes(), 0);
     if(bytes_written < 0)
     {
         // error.
@@ -57,7 +59,8 @@ void Socket::WriteCallback()
         return;
     }
 
-    RemoveWriteBufferBytes(bytes_written, false);
+    //RemoveWriteBufferBytes(bytes_written, false);
+    writeBuffer.Remove(bytes_written);
 }
 
 void Socket::BurstPush()

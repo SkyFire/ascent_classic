@@ -377,7 +377,7 @@ public:
 	void hexlike()
 		{
 			uint32 j = 1, k = 1;
-			printf("STORAGE_SIZE: %u\n", size() );
+			printf("STORAGE_SIZE: %u\n", (unsigned int)size() );
 			for(uint32 i = 0; i < size(); i++)
 			{
 				if ((i == (j*8)) && ((i != (k*16))))
