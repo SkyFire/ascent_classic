@@ -311,7 +311,7 @@ ASCENT_INLINE void ApplyFloatPSM(float ** m,int32 v,uint32 mask, float def)
 
 Unit* Aura::GetUnitCaster()
 {
-	if( m_target == NULL )
+	if( !m_target )
 		return NULL;
 
 	if( m_casterGuid == m_target->GetGUID() )

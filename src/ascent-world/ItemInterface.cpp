@@ -1970,9 +1970,20 @@ void ItemInterface::BuyItem(ItemPrototype *item, uint32 total_amount, Creature *
 			if(ex->item[i])
 				m_pOwner->GetItemInterface()->RemoveItemAmt( ex->item[i], total_amount * ex->count[i] );
 		}
+		
+		int32 val = (int32)(ex->honor * total_amount);
 
-		m_pOwner->ModUnsigned32Value(PLAYER_FIELD_HONOR_CURRENCY, -(int32)(ex->honor * total_amount) );
-		m_pOwner->ModUnsigned32Value(PLAYER_FIELD_ARENA_CURRENCY, -(int32)(ex->arena * total_amount) );
+		if( m_pOwner->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY) >= (uint32)val )
+		{
+			m_pOwner->ModUnsigned32Value( PLAYER_FIELD_HONOR_CURRENCY, -val );
+			m_pOwner->m_honorPoints -= val;
+		}
+
+		if( m_pOwner->GetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY ) >= (uint32)val )
+		{
+			m_pOwner->ModUnsigned32Value( PLAYER_FIELD_ARENA_CURRENCY, -val );
+			m_pOwner->m_arenaPoints -= val;
+		}
 	}
 }
 
