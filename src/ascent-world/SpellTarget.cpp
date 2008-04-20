@@ -350,6 +350,30 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 			return;
 		}
 
+		/* HACK FIX */
+		/* Please replace if found correct way */
+		/* SPELL_AURA_SPELL_MAGNET */
+		if( pTarget && pTarget->IsPlayer() )
+		{	
+			Unit *MagnetCaster;
+			bool HasMagnetSpell = false;
+			for(uint32 x=0;x<MAX_POSITIVE_AURAS;x++)
+			if(	pTarget->m_auras[x] ) 
+			{
+				for(uint32 y = 0; y < 3; ++y)
+					if ( pTarget->m_auras[x]->m_spellProto->EffectApplyAuraName[y] == SPELL_AURA_SPELL_MAGNET )
+					{
+						MagnetCaster = pTarget->m_auras[x]->GetUnitCaster();
+						HasMagnetSpell = true;
+						break;
+					}
+			}
+			if ( HasMagnetSpell && MagnetCaster )
+			{
+				pTarget = MagnetCaster;
+			}
+		}
+
 #ifdef COLLISION
 		// this distance check may have to be removed in the future.
 		//Shady: wtf is that? it causes a bug when caster and target too close to each other.
