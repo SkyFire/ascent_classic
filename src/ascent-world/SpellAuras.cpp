@@ -2628,7 +2628,7 @@ void Aura::SpellAuraModStealth(bool apply)
 			cd.spellid = m_spellProto->Id;
 			static_cast<Player*>(m_target)->GetSession()->OutPacket( SMSG_COOLDOWN_EVENT, sizeof(packetSMSG_COOLDOWN_EVENT), &cd);
 			if( ((Player*)m_target)->m_outStealthDamageBonusPeriod && ((Player*)m_target)->m_outStealthDamageBonusPct )
-				((Player*)m_target)->m_outStealthDamageBonusTimer = UNIXTIME + ((Player*)m_target)->m_outStealthDamageBonusPeriod;
+				((Player*)m_target)->m_outStealthDamageBonusTimer = (uint32)UNIXTIME + ((Player*)m_target)->m_outStealthDamageBonusPeriod;
 		}
 	}
 

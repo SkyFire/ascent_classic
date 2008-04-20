@@ -18,15 +18,15 @@ void Socket::WriteCallback()
 	//printf("\nSocket::Writecallback(): sendsize : %u\n", this->m_writeByteCount);
 	// We don't want any writes going on while this is happening.
 	m_writeMutex.Acquire();
-	if(m_writeByteCount)
+	if(writeBuffer.GetContiguiousBytes())
 	{
 		DWORD w_length = 0;
 		DWORD flags = 0;
 
 		// attempt to push all the data out in a non-blocking fashion.
 		WSABUF buf;
-		buf.len = m_writeByteCount;
-		buf.buf = (char*)m_writeBuffer;
+		buf.len = writeBuffer.GetContiguiousBytes();
+		buf.buf = (char*)writeBuffer.GetBufferStart();
 
 		/*OverlappedStruct * ov = new OverlappedStruct(SOCKET_IO_EVENT_WRITE_END);
 		int r = WSASend(m_fd, &buf, 1, &w_length, flags, &ov->m_overlap, 0);
@@ -69,8 +69,8 @@ void Socket::SetupReadEvent()
 	DWORD r_length = 0;
 	DWORD flags = 0;
 	WSABUF buf;
-	buf.buf = (char*)m_readBuffer + m_readByteCount;
-	buf.len = m_readBufferSize - m_readByteCount;
+	buf.len = readBuffer.GetSpace();
+	buf.buf = (char*)readBuffer.GetBuffer();	
 
 	// event that will trigger after data is receieved
 	/*OverlappedStruct * ov = new OverlappedStruct(SOCKET_IO_EVENT_READ_COMPLETE);
@@ -97,7 +97,7 @@ void Socket::SetupReadEvent()
 
 void Socket::ReadCallback(uint32 len)
 {
-	AddRecvData(len);
+	readBuffer.IncrementWritten(len);
 	OnRead();
 	SetupReadEvent();
 }

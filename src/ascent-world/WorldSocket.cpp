@@ -169,7 +169,8 @@ OUTPACKET_RESULT WorldSocket::_OutPacket(uint16 opcode, size_t len, const void* 
 		return OUTPACKET_RESULT_NOT_CONNECTED;
 
 	BurstBegin();
-	if((m_writeByteCount + len + 4) >= m_writeBufferSize)
+	//if((m_writeByteCount + len + 4) >= m_writeBufferSize)
+	if( GetWriteBuffer().GetSpace() < (len+4) )
 	{
 		BurstEnd();
 		return OUTPACKET_RESULT_NO_ROOM_IN_BUFFER;
@@ -525,7 +526,7 @@ void WorldSocket::OnRead()
 		// Check for the header if we don't have any bytes to wait for.
 		if(mRemaining == 0)
 		{
-			if(GetReadBufferSize() < 6)
+			if(GetReadBuffer().GetSize() < 6)
 			{
 				// No header in the packet, let's wait.
 				return;
@@ -533,7 +534,7 @@ void WorldSocket::OnRead()
 
 			// Copy from packet buffer into header local var
 			ClientPktHeader Header;
-			Read(6, (uint8*)&Header);
+			GetReadBuffer().Read((uint8*)&Header, 6);
 
 			// Decrypt the header
             _crypt.DecryptSixRecv((uint8*)&Header);
@@ -550,7 +551,7 @@ void WorldSocket::OnRead()
 
 		if(mRemaining > 0)
 		{
-			if( GetReadBufferSize() < mRemaining )
+			if( GetReadBuffer().GetSize() < mRemaining )
 			{
 				// We have a fragmented packet. Wait for the complete one before proceeding.
 				return;
@@ -563,7 +564,8 @@ void WorldSocket::OnRead()
 		if(mRemaining > 0)
 		{
 			// Copy from packet buffer into our actual buffer.
-			Read(mRemaining, (uint8*)Packet->contents());
+			///Read(mRemaining, (uint8*)Packet->contents());
+			GetReadBuffer().Read((uint8*)Packet->contents(), mRemaining);
 		}
 
 		sWorldLog.LogPacket(mSize, mOpcode, mSize ? Packet->contents() : NULL, 0);

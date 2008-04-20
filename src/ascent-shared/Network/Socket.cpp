@@ -10,13 +10,11 @@
 
 initialiseSingleton(SocketGarbageCollector);
 
-Socket::Socket(SOCKET fd, uint32 sendbuffersize, uint32 recvbuffersize) : m_readBufferSize(recvbuffersize), 
-	m_writeBufferSize(sendbuffersize), m_fd(fd), m_readByteCount(0), m_writeByteCount(0), m_connected(false),
-	m_deleted(false)
+Socket::Socket(SOCKET fd, uint32 sendbuffersize, uint32 recvbuffersize) : m_fd(fd), m_connected(false),	m_deleted(false)
 {
 	// Allocate Buffers
-	m_readBuffer = (uint8*)malloc(recvbuffersize);
-	m_writeBuffer = (uint8*)malloc(sendbuffersize);
+	readBuffer.Allocate(recvbuffersize);
+	writeBuffer.Allocate(sendbuffersize);
 
 	// IOCP Member Variables
 #ifdef CONFIG_USE_IOCP
@@ -33,14 +31,7 @@ Socket::Socket(SOCKET fd, uint32 sendbuffersize, uint32 recvbuffersize) : m_read
 
 Socket::~Socket()
 {
-	// Deallocate buffers
-	free(m_readBuffer);
-	free(m_writeBuffer);
 
-#ifdef CONFIG_USE_IOCP
-	/*if(m_readEvent != NULL)
-		delete m_readEvent;*/
-#endif
 }
 
 bool Socket::Connect(const char * Address, uint32 Port)
@@ -76,8 +67,8 @@ void Socket::_OnConnect()
 	// set common parameters on the file descriptor
 	SocketOps::Nonblocking(m_fd);
 	SocketOps::DisableBuffering(m_fd);
-	SocketOps::SetRecvBufferSize(m_fd, m_writeBufferSize);
-	SocketOps::SetSendBufferSize(m_fd, m_writeBufferSize);
+/*	SocketOps::SetRecvBufferSize(m_fd, m_writeBufferSize);
+	SocketOps::SetSendBufferSize(m_fd, m_writeBufferSize);*/
 	m_connected = true;
 
 	// IOCP stuff
@@ -107,68 +98,7 @@ bool Socket::Send(const uint8 * Bytes, uint32 Size)
 
 bool Socket::BurstSend(const uint8 * Bytes, uint32 Size)
 {
-	// Check for buffer space.
-	if((Size + m_writeByteCount) >= m_writeBufferSize)
-		return false;
-
-	// Copy into the buffer.
-	memcpy(&m_writeBuffer[m_writeByteCount], Bytes, Size);
-	m_writeByteCount += Size;
-
-	return true;
-}
-
-void Socket::RemoveReadBufferBytes(uint32 size, bool lock)
-{
-	if(lock)
-		m_readMutex.Acquire();
-
-	if(m_readByteCount < size)
-	{
-		Disconnect();
-		if(lock)
-			m_readMutex.Release();
-
-		return;
-	}
-
-	if(size == m_readByteCount)	 // complete erasure
-		m_readByteCount = 0;
-	else
-	{
-		memcpy(m_readBuffer, &m_readBuffer[size], m_readByteCount - size);
-		m_readByteCount -= size;
-	}
-
-	if(lock)
-		m_readMutex.Release();
-}
-
-void Socket::RemoveWriteBufferBytes(uint32 size, bool lock)
-{
-	if(lock)
-		m_writeMutex.Acquire();
-
-	if(m_writeByteCount < size)
-	{
-		Disconnect();
-		if(lock)
-			m_writeMutex.Release();
-
-		return;
-	}
-
-	if(size == m_writeByteCount)	 // complete erasure
-		m_writeByteCount = 0;
-	else
-	{
-		//memcpy(m_writeBuffer, &m_writeBuffer[size], m_writeByteCount - size);
-		memmove(m_writeBuffer, &m_writeBuffer[size], m_writeByteCount - size);
-		m_writeByteCount -= size;
-	}
-
-	if(lock)
-		m_writeMutex.Release();
+	return writeBuffer.Write(Bytes, Size);
 }
 
 string Socket::GetRemoteIP()
@@ -202,12 +132,5 @@ void Socket::Delete()
 
 	if(m_connected) Disconnect();
 	sSocketGarbageCollector.QueueSocket(this);
-}
-
-void Socket::Read(uint32 size, uint8 * buffer)
-{
-	assert(size <= m_readByteCount);
-	memcpy(buffer, m_readBuffer, size);
-	RemoveReadBufferBytes(size, false);
 }
 

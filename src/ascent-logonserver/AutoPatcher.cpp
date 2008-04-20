@@ -299,7 +299,7 @@ bool PatchJob::Update()
 {
 	// don't update unless the write buffer is empty
 	m_client->BurstBegin();
-	if(m_client->GetWriteBufferSize()!=0)
+	if(m_client->GetWriteBuffer().GetSize()!=0)
 	{
 		m_client->BurstEnd();
 		return true;

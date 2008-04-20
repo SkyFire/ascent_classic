@@ -40,23 +40,6 @@ public:
 	// Called when the socket is disconnected from the client (either forcibly or by the connection dropping)
 	virtual void OnDisconnect() {}
 
-/* Buffer Operations */
-
-	// Remove x bytes from the front of the read buffer.
-	void __fastcall RemoveReadBufferBytes(uint32 size, bool lock);
-
-	// Remove x bytes from the front of the send buffer.
-	void __fastcall RemoveWriteBufferBytes(uint32 size, bool lock);
-
-	// Returns receive buffer offset.
-	ASCENT_INLINE uint8 * GetReadBuffer(uint32 offset) { return m_readBuffer + offset; }
-
-	// Increments the read size x bytes.
-	ASCENT_INLINE void AddRecvData(uint32 size) { m_readByteCount += size; }
-
-	// Reads x bytes from the buffer into the destination array.
-	void __fastcall Read(uint32 size, uint8 * buffer);
-
 /* Sending Operations */
 
 	// Locks sending mutex, adds bytes, unlocks mutex.
@@ -89,10 +72,9 @@ public:
 
 	ASCENT_INLINE bool IsDeleted() { return m_deleted; }
 	ASCENT_INLINE bool IsConnected() { return m_connected; }
-
-	ASCENT_INLINE uint32 GetReadBufferSize() { return m_readByteCount; }
-	ASCENT_INLINE uint32 GetWriteBufferSize() { return m_writeByteCount; }
 	ASCENT_INLINE sockaddr_in & GetRemoteStruct() { return m_client; }
+	ASCENT_INLINE CircularBuffer& GetReadBuffer() { return readBuffer; }
+	ASCENT_INLINE CircularBuffer& GetWriteBuffer() { return writeBuffer; }
 
 /* Deletion */
 	void Delete();
@@ -104,17 +86,10 @@ protected:
 	// Called when connection is opened.
 	void _OnConnect();
   
-/* Buffers */
-	uint32 m_readBufferSize;
-	uint32 m_writeBufferSize;
-
 	SOCKET m_fd;
 
-	uint32 m_readByteCount;
-        uint32 m_writeByteCount;
-
-	uint8 * m_readBuffer;
-	uint8 * m_writeBuffer;
+	CircularBuffer readBuffer;
+	CircularBuffer writeBuffer;
 
 	Mutex m_writeMutex;
 	Mutex m_readMutex;
@@ -198,61 +173,6 @@ private:
 public:
 	// Posts a epoll event with the specifed arguments.
 	void PostEvent(int events, bool oneshot);
-	// Atomic wrapper functions for increasing read/write locks
-	ASCENT_INLINE void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
-	ASCENT_INLINE void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
-	ASCENT_INLINE bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
-	bool AcquireSendLock()
-	{
-		bool rv;
-		m_writeLockMutex.Acquire();
-		if(m_writeLock != 0)
-			rv = false;
-		else
-		{
-			rv = true;
-			m_writeLock++;
-		}
-		m_writeLockMutex.Release();
-		return rv;
-	}
-
-private:
-	unsigned int m_writeLock;
-	Mutex m_writeLockMutex;
-#endif
-
-/* Select() Specific Calls */
-#ifdef CONFIG_USE_SELECT
-public:
-	// Atomic wrapper functions for increasing read/write locks
-	ASCENT_INLINE void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
-	ASCENT_INLINE void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
-	ASCENT_INLINE bool HasSendLock() { bool res; m_writeLockMutex.Acquire(); res = (m_writeLock != 0); m_writeLockMutex.Release(); return res; }
-	bool AcquireSendLock()
-	{
-		bool rv;
-		m_writeLockMutex.Acquire();
-		if(m_writeLock != 0)
-			rv = false;
-		else
-		{
-			rv = true;
-			m_writeLock++;
-		}
-		m_writeLockMutex.Release();
-		return rv;
-	}
-
-private:
-	unsigned int m_writeLock;
-	Mutex m_writeLockMutex;
-#endif
-
-	/* Poll() Specific Calls */
-#ifdef CONFIG_USE_POLL
-public:
-
 	// Atomic wrapper functions for increasing read/write locks
 	ASCENT_INLINE void IncSendLock() { m_writeLockMutex.Acquire(); m_writeLock++; m_writeLockMutex.Release(); }
 	ASCENT_INLINE void DecSendLock() { m_writeLockMutex.Acquire(); m_writeLock--; m_writeLockMutex.Release(); }
