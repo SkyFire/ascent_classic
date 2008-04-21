@@ -6846,7 +6846,7 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 	int32 val = apply?mod->m_amount:-mod->m_amount;
 	uint64 AffectedGroups = (uint64)GetSpellProto()->EffectSpellGroupRelation[mod->i] + ((uint64)GetSpellProto()->EffectSpellGroupRelation_high[mod->i] << 32);
 //printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
-	printf("LALAL, AddFlatModifier, spellID: %u,the smt type %u",GetSpellId(),mod->m_miscValue);
+
 	switch (mod->m_miscValue)//let's generate warnings for unknown types of modifiers
 	{
 	case SMT_CRITICAL:
