@@ -450,8 +450,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	 *****************************************/	
 
 	/*************************
-	/* MAGE SPELLS
-	/*************************
+	 * MAGE SPELLS
+	 *************************
 	 * IDs:
 	 *	11189 Frost Warding   -	RANK 1,		STATUS: DONE
 	 *  28332 Frost Warding   -	RANK 2,		STATUS: DONE
@@ -491,16 +491,16 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		}break;
 
 	/*************************
-	/* WARRIOR SPELLS
-	/*************************
+	 * WARRIOR SPELLS
+	 *************************
 	 * IDs:
 	 * NO SPELLS
 	 *  --------------------------------------------
 	 *************************/
 
 	/*************************
-	/* ROGUE SPELLS
-	/*************************
+	 * ROGUE SPELLS
+	 *************************
 	 * IDs:
 	 * 14185 Preparation		STATUS: DONE
 	 *  --------------------------------------------
@@ -566,8 +566,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			}
 		}break;
 	/*************************
-	/* DRUID SPELLS
-	/*************************
+	 * DRUID SPELLS
+	 *************************
 	 * IDs:
 	 * 34297 Improved Leader of the Pack RANK 1		STATUS: DONE
 	 * 34300 Improved Leader of the Pack RANK 2		STATUS: DONE
@@ -599,8 +599,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			u_caster->m_procSpells.push_back(ILotP);
 		}break;
 	/*************************
-	/* HUNTER SPELLS
-	/*************************
+	 * HUNTER SPELLS
+	 *************************
 	 * IDs:
 	 * 35029 Focused Fire RANK 1		STATUS: ToDo
 	 * 35030 Focused Fire RANK 2		STATUS: ToDo
@@ -624,8 +624,8 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 //		}break;
 
 	/*************************
-	/* PALADIN SPELLS
-	/*************************
+	 * PALADIN SPELLS
+	 *************************
 	 * IDs:
 	 * 31789 Righteous Defense		STATUS: DONE
 	 *  --------------------------------------------
@@ -707,24 +707,24 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			u_caster->SendMessageToSet(&datamr,true);
 		}break;
 	/*************************
-	/* PRIEST SPELLS
-	/*************************
+	 * PRIEST SPELLS
+	 *************************
 	 * IDs:
 	 * NO SPELLS
 	 *  --------------------------------------------
 	 *************************/
 
 	/*************************
-	/* SHAMAN SPELLS
-	/*************************
+	 * SHAMAN SPELLS
+	 *************************
 	 * IDs:
 	 * NO SPELLS
 	 *  --------------------------------------------
 	 *************************/
 
 	/*************************
-	/* WARLOCK SPELLS
-	/*************************
+	 * WARLOCK SPELLS
+	 *************************
 	 * IDs:
 	 * 19028 Soul Link				STATUS: ToDo
 	 *  --------------------------------------------
