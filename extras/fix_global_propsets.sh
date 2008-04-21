@@ -16,6 +16,7 @@ NEWLINE='
 IFS=$NEWLINE
 
 for i in `find . \
+  -name "*.sh" -o \
   -name "*.h" -o \
   -name "*.c" -o \
   -name "*.cpp" -o \
