@@ -101,6 +101,7 @@ Creature::Creature(uint64 guid)
 	m_transportGuid = 0;
 	m_transportPosition = NULL;
 	BaseAttackType = SCHOOL_NORMAL;
+	m_lootMethod = -1;
 }
 
 
@@ -211,6 +212,7 @@ void Creature::OnRespawn(MapMgr * m)
 	Skinned = false;
 	Tagged = false;
 	TaggerGuid = 0;
+	m_lootMethod = -1;
 
 	/* creature death state */
 	if(proto && proto->death_state == 1)

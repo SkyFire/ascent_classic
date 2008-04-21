@@ -5112,6 +5112,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 	if(!IsInWorld()) return;
 	Loot * pLoot = NULL;
 	uint32 guidtype = GET_TYPE_FROM_GUID(guid);
+	int8 loot_method = -1;
 
 	if(guidtype == HIGHGUID_TYPE_UNIT)
 	{
@@ -5119,6 +5120,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		if(!pCreature)return;
 		pLoot=&pCreature->loot;
 		m_currentLoot = pCreature->GetGUID();
+		loot_method = pCreature->m_lootMethod;
 	}else if(guidtype == HIGHGUID_TYPE_GAMEOBJECT)
 	{
 		GameObject* pGO = GetMapMgr()->GetGameObject(GET_LOWGUID_PART(guid));
@@ -5154,6 +5156,15 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 	{
 		// something whack happened.. damn cheaters..
 		return;
+	}
+
+	if( loot_method < 0 )
+	{
+		// not set
+		if( m_Group != NULL )
+			loot_method = m_Group->GetMethod();
+		else
+			loot_method = PARTY_LOOT_FFA;
 	}
 
 	// add to looter set
@@ -5234,7 +5245,7 @@ void Player::SendLoot(uint64 guid,uint8 loot_type)
 		slottype = 0;
 		if(m_Group != NULL && loot_type < 2)
 		{
-			switch(m_Group->GetMethod())
+			switch(loot_method)
 			{
 			case PARTY_LOOT_MASTER:
 				slottype = 2;

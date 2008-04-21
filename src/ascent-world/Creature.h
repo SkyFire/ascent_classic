@@ -552,6 +552,9 @@ protected:
 
 	bool m_PickPocketed;
 	uint32 _fields[UNIT_END];
+
+public:
+	int8 m_lootMethod;
 };
 
 #endif

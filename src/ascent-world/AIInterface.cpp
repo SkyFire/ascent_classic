@@ -300,6 +300,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 						aiowner->Tagged = false;
 						aiowner->TaggerGuid = 0;
 						aiowner->SetUInt32Value(UNIT_DYNAMIC_FLAGS,aiowner->GetUInt32Value(UNIT_DYNAMIC_FLAGS) & ~(U_DYN_FLAG_TAGGED_BY_OTHER |U_DYN_FLAG_LOOTABLE));
+						aiowner->m_lootMethod = -1;
 					}
 				}
 

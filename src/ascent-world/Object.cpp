@@ -1616,6 +1616,10 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				victim->Tagged = true;
 				victim->TaggerGuid = plr->GetGUID();
 
+				/* set loot method */
+				if( plr->GetGroup() != NULL )
+					victim->m_lootMethod = plr->GetGroup()->GetMethod();
+
 				// For new players who get a create object
 				uint32 Flags = pVictim->m_uint32Values[UNIT_DYNAMIC_FLAGS];
 				Flags |= U_DYN_FLAG_TAPPED_BY_PLAYER;
