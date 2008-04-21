@@ -14583,45 +14583,16 @@ void ApplyNormalFixes()
 	/**********************************************************
 	 * Misc stuff (questfixes etc)
 	 **********************************************************/
-	sp = dbcSpell.LookupEntryForced( 28734 );
-	if( sp != NULL )
-		sp->Effect[2] = SPELL_EFFECT_DUMMY;
-
-	sp = dbcSpell.LookupEntryForced( 35460 );
-	if( sp != NULL )
-		sp->Effect[2] = SPELL_EFFECT_DUMMY;
 
 	sp = dbcSpell.LookupEntryForced( 30877 );
 	if( sp != NULL )
 	{
-		sp->Effect[0] = SPELL_EFFECT_DUMMY;
 		sp->EffectImplicitTargetB[0]=0;
 	}
-
-	sp = dbcSpell.LookupEntryForced(38177);
-	if( sp != NULL )
-		sp->Effect[1] = SPELL_EFFECT_DUMMY;
 
 	sp = dbcSpell.LookupEntryForced(23179);
 	if( sp != NULL )
 		sp->EffectMiscValue[0] = 1434;
-
-	sp = dbcSpell.LookupEntryForced(3607);
-	if( sp != NULL )
-		sp->Effect[0] = SPELL_EFFECT_DUMMY;
-
-	sp = dbcSpell.LookupEntryForced(31373);
-	if( sp != NULL )
-		sp->Effect[2] = SPELL_EFFECT_DUMMY;
-
-	sp = dbcSpell.LookupEntryForced(31736);
-	if( sp != NULL )
-		sp->Effect[1] = SPELL_EFFECT_DUMMY;
-
-	sp = dbcSpell.LookupEntryForced(17016);
-	if( sp != NULL )
-		sp->Effect[2] = SPELL_EFFECT_DUMMY;
-
 
 	//////////////////////////////////////////////////////
 	// CLASS-SPECIFIC SPELL FIXES						//
@@ -20870,14 +20841,14 @@ void ApplyNormalFixes()
 			sp->EffectApplyAuraName[0] = SPELL_AURA_TRANSFORM;
 		}
 
-		//Shrink Ray
-		sp = dbcSpell.LookupEntryForced( 13006 );
+		//Purify helboar meat
+		sp = dbcSpell.LookupEntryForced( 29200 );
 		if( sp != NULL )
 		{
-			sp->procChance = 100;
-			sp->procFlags = PROC_ON_CAST_SPELL;
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			sp->EffectTriggerSpell[0] = 13003;
+			sp->Reagent[1] = 0;
+			sp->ReagentCount[1] = 0;
+			sp->EffectSpellGroupRelation[0] = 23248;
+			sp->Effect[0] = 24;
 		}
 
 		// - Warrior - Warbringer Armor
