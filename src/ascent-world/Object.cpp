@@ -1706,7 +1706,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				plr = NULL;
 		}
 
-		if( plr != NULL && plr->m_bg != NULL )
+		if( plr != NULL && plr->m_bg != NULL && plr->GetMapMgr() == GetMapMgr() )
 		{
 			plr->m_bgScore.DamageDone += damage;
 			plr->m_bg->UpdatePvPData();

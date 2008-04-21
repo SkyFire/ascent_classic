@@ -642,6 +642,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvPacket)
 	recvPacket >> quest_id;
 	recvPacket >> reward_slot;
 
+	if( reward_slot >= 6 )
+		return;
+
 	bool bValid = false;
 	Quest *qst = NULL;
 	Object *qst_giver = NULL;

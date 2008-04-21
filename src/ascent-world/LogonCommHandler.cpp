@@ -312,15 +312,20 @@ uint32 LogonCommHandler::ClientConnected(string AccountName, WorldSocket * Socke
 	size_t i = 0;
 	const char * acct = AccountName.c_str();
 	sLog.outDebug ( " >> sending request for account information: `%s` (request %u).", AccountName.c_str(), request_id);
-  //  sLog.outColor(TNORMAL, "\n");
-	
+	//  sLog.outColor(TNORMAL, "\n");
+
 	// Send request packet to server.
 	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
-	if(logons.size() == 0 || itr->second == 0)
+	if(logons.size() == 0)
 	{
 		// No valid logonserver is connected.
 		return (uint32)-1;
 	}
+
+	LogonCommClientSocket * s = itr->second;
+	if( s == NULL )
+		return (uint32)-1;
+
 	pendingLock.Acquire();
 
 	WorldPacket data(RCMSG_REQUEST_SESSION, 100);
@@ -329,9 +334,9 @@ uint32 LogonCommHandler::ClientConnected(string AccountName, WorldSocket * Socke
 	// strip the shitty hash from it
 	for(; acct[i] != '#' && acct[i] != '\0'; ++i )
 		data.append( &acct[i], 1 );
-	
+
 	data.append( "\0", 1 );
-	itr->second->SendPacket(&data,false);
+	s->SendPacket(&data,false);
 
 	pending_logons[request_id] = Socket;
 	pendingLock.Release();

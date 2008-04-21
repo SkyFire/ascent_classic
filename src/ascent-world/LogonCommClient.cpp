@@ -181,6 +181,8 @@ void LogonCommClientSocket::SendPacket(WorldPacket * data, bool no_crypto)
 {
 	logonpacket header;
 	bool rv;
+	if(!m_connected || m_deleted)
+		return;
 
 	BurstBegin();
 
