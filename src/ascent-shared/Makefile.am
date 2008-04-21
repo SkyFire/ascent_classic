@@ -63,6 +63,7 @@ libshared_a_SOURCES = \
     Database/SQLiteDatabase.h \
     Database/CreateInterface.cpp \
     Network/CircularBuffer.h \
+    Network/CircularBuffer.cpp \
     Network/ListenSocketLinux.h \
     Network/ListenSocketFreeBSD.h \
     Network/Network.h \
