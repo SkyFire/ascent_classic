@@ -4064,7 +4064,7 @@ void Spell::SendHealManaSpellOnPlayer(Object * caster, Object * target, uint32 d
 	caster->SendMessageToSet(&data, true);
 }
 
-void Spell::Heal(int32 amount)
+void Spell::Heal(int32 amount, bool ForceCrit)
 {
 	if(!unitTarget || !unitTarget->isAlive())
 		return;
@@ -4158,8 +4158,8 @@ void Spell::Heal(int32 amount)
 
 		if (m_spellInfo->SpellGroupType)
 			SM_FIValue(u_caster->SM_PDamageBonus,&amount,m_spellInfo->SpellGroupType);
-
-		if(critical = Rand(critchance))
+		
+		if( critical = Rand(critchance) || ForceCrit )
 		{
 			/*int32 critbonus = amount >> 1;
 			if( m_spellInfo->SpellGroupType)

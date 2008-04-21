@@ -514,6 +514,19 @@ void Aura::Remove()
 		caster->OutPacketToSet( SMSG_COOLDOWN_EVENT, sizeof( packetSMSG_COOLDOWN_EVENT ), &data, true );
 	}
 
+	if( caster != NULL && caster->IsPlayer() && caster->IsInWorld() )
+	{
+		int j;
+		for( j = 0; j < 3; ++j )
+			if( m_spellProto->Effect[j] == SPELL_EFFECT_ADD_FARSIGHT )
+				break;
+
+		if(j != 3)
+		{
+			caster->SetUInt64Value(PLAYER_FARSIGHT, 0);
+		}
+	}
+
 	delete this; // suicide xD	leaking this shit out
 }
 
@@ -6833,7 +6846,7 @@ void Aura::SpellAuraAddFlatModifier(bool apply)
 	int32 val = apply?mod->m_amount:-mod->m_amount;
 	uint64 AffectedGroups = (uint64)GetSpellProto()->EffectSpellGroupRelation[mod->i] + ((uint64)GetSpellProto()->EffectSpellGroupRelation_high[mod->i] << 32);
 //printf("!!! the AffectedGroups %u ,the smt type %u,\n",AffectedGroups,mod->m_miscValue);
-
+	printf("LALAL, AddFlatModifier, spellID: %u,the smt type %u",GetSpellId(),mod->m_miscValue);
 	switch (mod->m_miscValue)//let's generate warnings for unknown types of modifiers
 	{
 	case SMT_CRITICAL:

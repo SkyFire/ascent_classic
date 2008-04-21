@@ -3666,66 +3666,32 @@ void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
 
 void Spell::SpellEffectAddFarsight(uint32 i) // Add Farsight
 {
-#if 0
-	//farsight
-	//14501 and 11686
 	if(!p_caster)
 		return;
-	
-	CreatureInfo *ci = CreatureNameStorage.LookupEntry(14495);   // 14501
-	if( ci)
+
+	float x = m_targets.m_destX;
+	float y = m_targets.m_destY;
+	float z = m_targets.m_destZ;
+	if(x == 0)
+		x = m_targets.m_srcX;
+	if(y == 0)
+		y = m_targets.m_srcY;
+	if(z == 0)
+		z = m_targets.m_srcZ;
+
+	DynamicObject * dynObj = p_caster->GetMapMgr()->CreateDynamicObject();
+	dynObj->Create(u_caster, this, x, y, z, GetDuration(), GetRadius(i));
+	if( dynObj == NULL ) //i <3 burlex :P
 	{
-		Creature* InvisibleSummon = p_caster->GetMapMgr()->CreateCreature();
-		InvisibleSummon->SetInstanceID(m_caster->GetInstanceID());
-		
-		// Create
-		float x = m_targets.m_destX;
-		float y = m_targets.m_destY;
-		float z = m_targets.m_destZ;
-		if(x == 0)
-			x = m_targets.m_srcX;
-		if(y == 0)
-			y = m_targets.m_srcY;
-		if(z == 0)
-			z = m_targets.m_srcZ;
-
-		InvisibleSummon->Create(ci->Name, m_caster->GetMapId(), 
-			x, y, z, m_caster->GetOrientation());
-
-		// Fields
-		InvisibleSummon->SetUInt32Value(OBJECT_FIELD_ENTRY, ci->Id);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_LEVEL, 1);
-//		InvisibleSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  14495);
-//		InvisibleSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, 14495);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_DISPLAYID,  ci->Male_DisplayID);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, ci->Male_DisplayID);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_HEALTH , 100);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_MAXHEALTH , 100);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, m_caster->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE));
-		InvisibleSummon->SetFloatValue(OBJECT_FIELD_SCALE_X,0.2f);					
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_BYTES_0,2048); 
-		//InvisibleSummon->SetUInt32Value(UNIT_FIELD_FLAGS,0);
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 2000);//ci->baseattacktime); 
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_BASEATTACKTIME+1, 2000);//ci->rangeattacktime); 
-		InvisibleSummon->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 100);  
-		InvisibleSummon->SetFloatValue(UNIT_FIELD_COMBATREACH,m_caster->GetFloatValue(UNIT_FIELD_COMBATREACH));
-		InvisibleSummon->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-		InvisibleSummon->SetZoneId(m_caster->GetZoneId());
-		// Disable AI
-		InvisibleSummon->DisableAI();
-
-		//Setting faction
-		InvisibleSummon->_setFaction();
-		InvisibleSummon->PushToWorld(p_caster->GetMapMgr());
-		InvisibleSummon->bInvincible=true;
-
-		// bind farsight
-		p_caster->SetUInt64Value(PLAYER_FARSIGHT, InvisibleSummon->GetGUID());
-
-		// call changefarsightlocation
-		p_caster->GetMapMgr()->ChangeFarsightLocation(p_caster, InvisibleSummon);
+		delete dynObj;
+		return;
 	}
-#endif
+    dynObj->SetUInt32Value(OBJECT_FIELD_TYPE, 65);
+    dynObj->SetUInt32Value(DYNAMICOBJECT_BYTES, 0x80000002);
+	dynObj->SetInstanceID(p_caster->GetInstanceID());	
+	p_caster->SetUInt64Value(PLAYER_FARSIGHT, dynObj->GetGUID());
+
+	p_caster->GetMapMgr()->ChangeFarsightLocation(p_caster, dynObj);
 }
 
 void Spell::SpellEffectSummonPossessed(uint32 i) // eye of kilrog
@@ -3963,7 +3929,10 @@ void Spell::SpellEffectScriptEffect(uint32 i) // Script Effect
 	case 19942:
 	case 19943:
 	case 27137:
-		Heal((int32)damage);
+		if( u_caster->HasAura( 20216 ) )
+			Heal((int32)damage, true);
+		else
+			Heal((int32)damage);
 	break;
 
 	// Judgement

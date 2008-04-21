@@ -1772,7 +1772,7 @@ public:
     void SpellTargetTargetPartyMember(uint32 i, uint32 j);
     void SpellTargetSameGroupSameClass(uint32 i, uint32 j);
 
-    void Heal(int32 amount);
+    void Heal(int32 amount, bool ForceCrit = false);
 
     GameObject*		g_caster;
     Unit*			u_caster;

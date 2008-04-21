@@ -1251,7 +1251,7 @@ void MapMgr::PushToProcessed(Player* plr)
 }
 
 
-void MapMgr::ChangeFarsightLocation(Player *plr, Creature *farsight)
+void MapMgr::ChangeFarsightLocation(Player *plr, DynamicObject *farsight)
 {
 	if(farsight == 0)
 	{
