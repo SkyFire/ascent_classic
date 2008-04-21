@@ -3906,7 +3906,7 @@ void Spell::HandleTeleport(uint32 id, Unit* Target)
 	uint32 mapid;
 	
     // predefined behavior 
-	if (m_spellInfo->Id == 8690 ||m_spellInfo->Id == 556)//556- Astral Recall
+	if (m_spellInfo->Id == 8690 || m_spellInfo->Id == 556 || m_spellInfo->Id == 39937)// 556 - Astral Recall ; 39937 - Ruby Slippers
 	{
 		x = pTarget->GetBindPositionX();
 		y = pTarget->GetBindPositionY();
