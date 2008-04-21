@@ -1115,7 +1115,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 			m_target->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_IMMOLATE);
 		}
 		//maybe poison aurastate should get triggered on other spells too ?
-		else if( m_spellProto->NameHash == (SPELL_HASH_DEADLY_POISON,SPELL_HASH_DEADLY_POISON_II,SPELL_HASH_DEADLY_POISON_III,SPELL_HASH_DEADLY_POISON_IV,SPELL_HASH_DEADLY_POISON_V,SPELL_HASH_DEADLY_POISON_VI,SPELL_HASH_DEADLY_POISON_VII) )//deadly poison 
+		else if( m_spellProto->c_is_flags & SPELL_FLAG_IS_POISON )//deadly poison 
 		{
 			m_target->SetFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_POISON);
 		}
@@ -1125,7 +1125,7 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 		if( m_spellProto->buffType & SPELL_TYPE_WARLOCK_IMMOLATE )
 			m_target->RemoveFlag( UNIT_FIELD_AURASTATE,AURASTATE_FLAG_IMMOLATE );
 		//maybe poison aurastate should get triggered on other spells too ?
-		else if( m_spellProto->NameHash == (SPELL_HASH_DEADLY_POISON,SPELL_HASH_DEADLY_POISON_II,SPELL_HASH_DEADLY_POISON_III,SPELL_HASH_DEADLY_POISON_IV,SPELL_HASH_DEADLY_POISON_V,SPELL_HASH_DEADLY_POISON_VI,SPELL_HASH_DEADLY_POISON_VII) )//deadly poison 
+		else if( m_spellProto->c_is_flags & SPELL_FLAG_IS_POISON )//deadly poison 
 		{
 			m_target->RemoveFlag(UNIT_FIELD_AURASTATE,AURASTATE_FLAG_POISON);
 		}
