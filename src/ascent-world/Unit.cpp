@@ -229,6 +229,7 @@ Unit::Unit()
 	m_chargeSpellsInUse=false;
 	m_spellsbusy=false;
 	m_interruptedRegenTime = 0;
+	m_hasVampiricEmbrace = m_hasVampiricTouch = 0;
 }
 
 Unit::~Unit()
@@ -4257,67 +4258,6 @@ uint32 Unit::ManaShieldAbsorb(uint32 dmg)
 	return potential;	
 }
 
-void Unit::VampiricEmbrace(uint32 dmg,Unit* tgt)
-{
-	if(!IsPlayer())
-		return;//just in case
-	int32 perc = 15;
-	SM_FIValue(SM_FSPELL_VALUE,&perc,4);
-	uint32 heal = (dmg*perc) / 100;
-	this->Heal(this,15286,heal);
-
-	SubGroup* pGroup = static_cast< Player* >( this )->GetGroup() ?
-		static_cast< Player* >( this )->GetGroup()->GetSubGroup( static_cast< Player* >( this )->GetSubGroup() ) : NULL;
-
-	if( pGroup != NULL )
-	{
-		GroupMembersSet::iterator itr;
-		static_cast< Player* >( this )->GetGroup()->Lock();
-		for(itr = pGroup->GetGroupMembersBegin(); itr != pGroup->GetGroupMembersEnd(); ++itr)
-		{
-			Player *p = (*itr)->m_loggedInPlayer;
-			if(!p || p==this || !p->isAlive())
-				continue;
-			this->Heal(p,15286,heal);
-		}
-		static_cast< Player* >( this )->GetGroup()->Unlock();
-	}
-
-}
-
-// based of vampiric embrace code
-void Unit::VampiricTouch(uint32 dmg,Unit* tgt)
-{
-        if(!IsPlayer() || this->getClass() == WARRIOR || this->getClass() == ROGUE)
-                return;//just in case
-        
-        int32 perc = 5;
-        //SM_FIValue(SM_FSPELL_VALUE,&perc,4);
-		if(perc*dmg<0)
-			return;
-        uint32 man = (dmg*perc) / 100;
-		this->Energize(this,34919,man,POWER_TYPE_MANA);
-    
-		SubGroup* pGroup = static_cast< Player* >( this )->GetGroup() ?
-			static_cast< Player* >( this )->GetGroup()->GetSubGroup( static_cast< Player* >( this )->GetSubGroup() ) : NULL;
-
-		if( pGroup != NULL )
-        {
-                GroupMembersSet::iterator itr;
-				static_cast< Player* >( this )->GetGroup()->Lock();
-                for(itr = pGroup->GetGroupMembersBegin(); itr != pGroup->GetGroupMembersEnd(); ++itr)
-                {
-                        if(!(*itr)->m_loggedInPlayer || (*itr)->m_loggedInPlayer == this)
-                                continue;
-                        Player *p = (*itr)->m_loggedInPlayer;
-                        if(!p->isAlive() || p->getClass()==WARRIOR || p->getClass() == ROGUE || p==this)
-                                continue;
-						this->Energize(p,34919,man,POWER_TYPE_MANA);
-                }
-				static_cast< Player* >( this )->GetGroup()->Unlock();
-        }
-}
-
 // grep: Remove any AA spells that aren't owned by this player.
 //		 Otherwise, if he logs out and in and joins another group,
 //		 he'll apply it to them.
@@ -6087,6 +6027,12 @@ void Unit::ReplaceAIInterface(AIInterface *new_interface)
 	m_aiInterface = new_interface; 
 }
 
+bool Unit::HasAurasOfNameHashWithCaster(uint32 namehash, Unit * caster)
+{
+	for(uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
+		if( m_auras[i] && m_auras[i]->GetSpellProto()->NameHash == namehash && m_auras[i]->GetCasterGUID() == caster->GetGUID() )
+			return true;
 
-
+	return false;
+}
 

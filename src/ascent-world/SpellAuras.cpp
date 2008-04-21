@@ -1225,24 +1225,8 @@ void Aura::EventPeriodicDamage(uint32 amount)
 		SendPeriodicAuraLog(m_casterGuid, m_target, GetSpellProto()->Id, school, float2int32(res), abs_dmg, dmg.resisted_damage, FLAG_PERIODIC_DAMAGE);
 
 		if(school == SHADOW_DAMAGE)
-		{
-			if(m_target->VampEmbCaster.find(m_casterGuid) != m_target->VampEmbCaster.end())
-			{
-				if(GetUnitCaster() && GetUnitCaster()->isAlive())
-				{
-					if(c)
-						c->VampiricEmbrace(float2int32(res), m_target);
-				}
-			}
-			if(m_target->VampTchCaster.find(m_casterGuid) != m_target->VampTchCaster.end())
-			{
-				if(GetUnitCaster() && GetUnitCaster()->isAlive())
-				{
-					if(c)
-						c->VampiricTouch(float2int32(res), m_target);
-				}
-			}
-		}
+			if( c != NULL && c->isAlive() && c->IsPlayer() && c->getClass() == PRIEST )
+				((Player*)c)->VampiricSpell(float2int32(res), m_target);
 	}
 	// grep: this is hack.. some auras seem to delete this shit.
 	SpellEntry * sp = m_spellProto;
@@ -1510,17 +1494,14 @@ void Aura::SpellAuraDummy(bool apply)
 			{
 				SetNegative();
 				Unit * caster =this->GetUnitCaster();
-				if(caster) m_target->VampEmbCaster.insert(caster->GetGUID());
+				if(caster && caster->IsPlayer())
+					((Player*)caster)->m_vampiricEmbrace++;
 			}
 			else
 			{
 				Unit * caster =this->GetUnitCaster();
-				if(caster)
-				{
-					std::set<uint64>::iterator itr = m_target->VampEmbCaster.find(caster->GetGUID());
-					if(itr != m_target->VampEmbCaster.end())
-						m_target->VampEmbCaster.erase(itr);
-				}
+				if(caster && caster->IsPlayer())
+					((Player*)caster)->m_vampiricEmbrace--;
 			}
 		}break;
 	case 34914://Vampiric Touch
@@ -1530,18 +1511,15 @@ void Aura::SpellAuraDummy(bool apply)
 			if(apply)
 			{
 				SetNegative();
-				Unit * caster = this->GetUnitCaster();
-				if(caster) m_target->VampTchCaster.insert(caster->GetGUID());
+				Unit * caster =this->GetUnitCaster();
+				if(caster && caster->IsPlayer())
+					++((Player*)caster)->m_vampiricEmbrace;
 			}
 			else
 			{
 				Unit * caster =this->GetUnitCaster();
-				if(caster)
-				{
-					std::set<uint64>::iterator itr = m_target->VampTchCaster.find(caster->GetGUID());
-					if(itr != m_target->VampTchCaster.end())
-						m_target->VampTchCaster.erase(itr);
-				}
+				if(caster && caster->IsPlayer())
+					--((Player*)caster)->m_vampiricEmbrace;
 			}
 		}break;
 	case 18182:

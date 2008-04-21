@@ -1869,6 +1869,10 @@ public:
 	uint32 m_outStealthDamageBonusPct;
 	uint32 m_outStealthDamageBonusPeriod;
 	uint32 m_outStealthDamageBonusTimer;
+
+	int16 m_vampiricEmbrace;
+	int16 m_vampiricTouch;
+	void VampiricSpell(uint32 dmg, Unit* pTarget);
 };
 
 class SkillIterator

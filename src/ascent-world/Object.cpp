@@ -2461,21 +2461,10 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			}
 		}
 	}
-	if( school == SHADOW_DAMAGE ) 
+	if( school == SHADOW_DAMAGE )
 	{
-		//VampiricEmbrace
-		if( pVictim->VampEmbCaster.find( this->GetGUID() ) != pVictim->VampEmbCaster.end() && IsUnit() )
-		{
-			if( static_cast< Unit* >( this )->isAlive() )
-				static_cast< Unit* >( this )->VampiricEmbrace( float2int32( res ), pVictim );
-		}
-        
-		//VampiricTouch
-		if(pVictim->VampTchCaster.find(this->GetGUID()) != pVictim->VampTchCaster.end() && IsUnit())
-		{
-			if( static_cast< Unit* >( this )->isAlive() )
-				static_cast< Unit* >( this )->VampiricTouch( float2int32( res ), pVictim );
-		}
+		if( IsPlayer() && ((Unit*)this)->isAlive() && ((Player*)this)->getClass() == PRIEST )
+			((Player*)this)->VampiricSpell(float2int32(res), pVictim);
 
 		if( pVictim->isAlive() && this->IsUnit() )
 		{

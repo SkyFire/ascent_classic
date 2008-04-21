@@ -401,6 +401,7 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	m_passOnLoot = false;
 	m_changingMaps = true;
 	m_outStealthDamageBonusPct = m_outStealthDamageBonusPeriod = m_outStealthDamageBonusTimer = 0;
+	m_vampiricEmbrace = m_vampiricTouch = 0;
 }
 
 void Player::OnLogin()
@@ -10463,3 +10464,59 @@ void Player::Social_SendFriendList(uint32 flag)
 	m_session->SendPacket(&data);
 }
 
+void Player::VampiricSpell(uint32 dmg, Unit* pTarget)
+{
+	float fdmg = float(dmg);
+	uint32 bonus;
+	int32 perc;
+	Group * pGroup = GetGroup();
+	SubGroup * pSubGroup = (pGroup != NULL) ? pGroup->GetSubGroup(GetSubGroup()) : NULL;
+	GroupMembersSet::iterator itr;
+
+	if( ( !m_vampiricEmbrace && !m_vampiricTouch ) || getClass() != PRIEST )
+		return;
+
+	if( m_vampiricEmbrace > 0 && pTarget->m_hasVampiricEmbrace > 0 && pTarget->HasAurasOfNameHashWithCaster(SPELL_HASH_VAMPIRIC_EMBRACE, this) )
+	{
+		perc = 15;
+		SM_FIValue(SM_FSPELL_VALUE, &perc, 4);
+
+		bonus = float2int32(fdmg * (float(perc)/100.0f));
+		if( bonus > 0 )
+		{
+			Heal(this, 15286, bonus);
+			
+			// loop party
+			if( pSubGroup != NULL )
+			{
+				for( itr = pSubGroup->GetGroupMembersBegin(); itr != pSubGroup->GetGroupMembersEnd(); ++itr )
+				{
+					if( (*itr)->m_loggedInPlayer != NULL && (*itr) != m_playerInfo )
+						Heal( (*itr)->m_loggedInPlayer, 15286, bonus );
+				}
+			}
+		}
+	}
+
+	if( m_vampiricTouch > 0 && pTarget->m_hasVampiricTouch > 0 && pTarget->HasAurasOfNameHashWithCaster(SPELL_HASH_VAMPIRIC_TOUCH, this) )
+	{
+		perc = 5;
+		//SM_FIValue(SM_FSPELL_VALUE, &perc, 4);
+
+		bonus = float2int32(fdmg * (float(perc)/100.0f));
+		if( bonus > 0 )
+		{
+			Energize(this, 34919, bonus, POWER_TYPE_MANA);
+
+			// loop party
+			if( pSubGroup != NULL )
+			{
+				for( itr = pSubGroup->GetGroupMembersBegin(); itr != pSubGroup->GetGroupMembersEnd(); ++itr )
+				{
+					if( (*itr)->m_loggedInPlayer != NULL && (*itr) != m_playerInfo && (*itr)->m_loggedInPlayer->GetPowerType() == POWER_TYPE_MANA )
+						Energize((*itr)->m_loggedInPlayer, 34919, bonus, POWER_TYPE_MANA);
+				}
+			}
+		}
+	}
+}

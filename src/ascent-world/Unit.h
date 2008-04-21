@@ -881,10 +881,6 @@ public:
 	float BaseDamage[2];
 	float BaseOffhandDamage[2];
 	float BaseRangedDamage[2];
-	std::set<uint64> VampEmbCaster;
-	std::set<uint64> VampTchCaster;
-	void VampiricEmbrace(uint32 dmg,Unit* tgt);
-	void VampiricTouch(uint32 dmg,Unit* tgt);
 	SchoolAbsorb Absorbs[7];
 	uint32 AbsorbDamage(uint32 School,uint32 * dmg);//returns amt of absorbed dmg, decreases dmg by absorbed value
 	int32 RAPvModifier;
@@ -1151,6 +1147,10 @@ public:
 	void EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage);
 	bool m_spellsbusy;
 	void DispelAll(bool positive);
+
+	bool HasAurasOfNameHashWithCaster(uint32 namehash, Unit * caster);
+	int8 m_hasVampiricTouch;
+	int8 m_hasVampiricEmbrace;
 	
 protected:
 	Unit ();
