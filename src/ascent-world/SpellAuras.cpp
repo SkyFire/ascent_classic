@@ -1496,12 +1496,14 @@ void Aura::SpellAuraDummy(bool apply)
 				Unit * caster =this->GetUnitCaster();
 				if(caster && caster->IsPlayer())
 					((Player*)caster)->m_vampiricEmbrace++;
+				++m_target->m_hasVampiricEmbrace;
 			}
 			else
 			{
 				Unit * caster =this->GetUnitCaster();
 				if(caster && caster->IsPlayer())
 					((Player*)caster)->m_vampiricEmbrace--;
+				--m_target->m_hasVampiricEmbrace;
 			}
 		}break;
 	case 34914://Vampiric Touch
@@ -1513,13 +1515,17 @@ void Aura::SpellAuraDummy(bool apply)
 				SetNegative();
 				Unit * caster =this->GetUnitCaster();
 				if(caster && caster->IsPlayer())
-					++((Player*)caster)->m_vampiricEmbrace;
+					++((Player*)caster)->m_vampiricTouch;
+
+				++m_target->m_hasVampiricTouch;
 			}
 			else
 			{
 				Unit * caster =this->GetUnitCaster();
 				if(caster && caster->IsPlayer())
-					--((Player*)caster)->m_vampiricEmbrace;
+					--((Player*)caster)->m_vampiricTouch;
+
+				--m_target->m_hasVampiricTouch;
 			}
 		}break;
 	case 18182:
