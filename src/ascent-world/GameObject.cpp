@@ -392,7 +392,7 @@ void GameObject::InitAI()
                         //herbalism and mining;
                         if(pLock->lockmisc[i] == LOCKTYPE_MINING || pLock->lockmisc[i] == LOCKTYPE_HERBALISM)
                         {
-				CalcMineRemaining(true);
+							CalcMineRemaining(true);
                         }
                     }
                 }
