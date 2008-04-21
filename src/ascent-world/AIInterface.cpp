@@ -1371,9 +1371,6 @@ Unit* AIInterface::FindTarget()
 
 		pObj = (*it2);
 
-		if( pObj == NULL )
-			continue;
-
 		if( pObj->GetTypeId() == TYPEID_PLAYER )
 		{
 			if(static_cast< Player* >( pObj )->GetTaxiState() )	  // skip players on taxi
