@@ -4785,7 +4785,7 @@ void Spell::SpellEffectSummonCritter(uint32 i)
 
 void Spell::SpellEffectKnockBack(uint32 i)
 {
-	if(!unitTarget || !unitTarget->isAlive() || !m_caster)
+	if(playerTarget == NULL || !playerTarget->isAlive() || !m_caster)
 		return;
 
 	float dx, dy;
@@ -4814,11 +4814,8 @@ void Spell::SpellEffectKnockBack(uint32 i)
 	data << dy << dx;
 	data << value1;
 	data << -value2;
-	unitTarget->SendMessageToSet(&data, true);
-
-
-	if( playerTarget )
-		playerTarget->blinked = true;
+	playerTarget->GetSession()->SendPacket(&data);
+	playerTarget->blinked = true;
 }
 
 void Spell::SpellEffectDisenchant(uint32 i)
