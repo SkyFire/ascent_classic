@@ -544,6 +544,10 @@
 				RelativePath="..\..\src\ascent-shared\Network\SocketWin32.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\ascent-shared\Network\CircularBuffer.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Threading"

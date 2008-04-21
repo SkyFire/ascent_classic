@@ -260,6 +260,9 @@ RevisionExtractor.exe
 			Name="Network"
 			Filter="">
 			<File
+				RelativePath="..\..\src\ascent-shared\Network\CircularBuffer.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\ascent-shared\Network\ListenSocketWin32.h">
 			</File>
 			<File
