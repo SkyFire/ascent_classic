@@ -1878,7 +1878,7 @@ void Aura::SpellAuraDummy(bool apply)
 		}break;
 
 	case 31223:
-	case 32222:
+	case 31222:
 	case 31221:		// Rogue : Master of Subtlety
 		{
 			if( !m_target->IsPlayer() )
