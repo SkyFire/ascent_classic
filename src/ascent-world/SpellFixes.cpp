@@ -17324,7 +17324,7 @@ void ApplyNormalFixes()
 			sp->procFlags = PROC_ON_CAST_SPELL;
 			sp->EffectApplyAuraName[1] = SPELL_AURA_PROC_TRIGGER_SPELL;
 			sp->EffectMiscValue[0] = SMT_COST;
-			sp->EffectSpellGroupRelation[0] = 1048576 | 268435456 | 2147483648;
+			sp->EffectSpellGroupRelation[0] = 1048576UL | 268435456UL | 2147483648UL;
 		}
 
 		/**********************************************************

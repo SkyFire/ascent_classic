@@ -1040,3 +1040,4 @@ void WorldSession::Handle38C(WorldPacket & recv_data)
 	data << "01/01/01";
 	SendPacket(&data);
 }
+
