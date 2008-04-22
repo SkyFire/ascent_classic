@@ -383,7 +383,7 @@ void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 			}*/
 		}	
 	}
-	GetPlayer()->SendLoot(guid,1);
+	GetPlayer()->SendLoot(guid,LOOT_CORPSE);
 }
 
 
@@ -2001,7 +2001,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket &recv_data)
 		pItem->loot = new Loot;
 		lootmgr.FillItemLoot(pItem->loot, pItem->GetEntry());
 	}
-	_player->SendLoot(pItem->GetGUID(), 5);
+	_player->SendLoot(pItem->GetGUID(), LOOT_DISENCHANTING);
 }
 
 void WorldSession::HandleCompleteCinematic(WorldPacket &recv_data)

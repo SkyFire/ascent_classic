@@ -2460,7 +2460,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 						break;
 					}
 				lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
-				loottype = 2;
+				loottype = LOOT_SKINNING;
 				DetermineSkillUp(SKILL_LOCKPICKING,v/5);
 				break;
 			}
@@ -2488,7 +2488,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 					else
 						bAlreadyUsed = true;
 				}
-				loottype = 2;
+				loottype = LOOT_SKINNING;
 			}
 			else
 			{
@@ -2530,7 +2530,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 				else
 					bAlreadyUsed = true;
 
-				loottype = 2;
+				loottype = LOOT_SKINNING;
 			}
 			else
 			{
@@ -2583,7 +2583,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			{
 				lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
 			}
-			loottype=1;
+			loottype= LOOT_CORPSE ;
 		}
 		break;
 	};
@@ -3696,7 +3696,7 @@ void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
 	uint32 _rank = ((Creature*)unitTarget)->GetCreatureName() ? ((Creature*)unitTarget)->GetCreatureName()->Rank : 0;
 	unitTarget->loot.gold = float2int32((_rank+1) * unitTarget->getLevel() * (RandomUInt(5) + 1) * sWorld.getRate(RATE_MONEY));
 
-	p_caster->SendLoot(unitTarget->GetGUID(), 2);
+	p_caster->SendLoot(unitTarget->GetGUID(), LOOT_PICKPOCKETING );
 	target->SetPickPocketed(true);
 }
 
@@ -4828,23 +4828,37 @@ void Spell::SpellEffectDisenchant(uint32 i)
 	Player* caster = static_cast< Player* >( m_caster );
 	Item* it = caster->GetItemInterface()->GetItemByGUID(m_targets.m_itemTarget);
 	if( it == NULL )
+	{
+		SendCastResult(SPELL_FAILED_CANT_BE_DISENCHANTED);
 		return;
-   
+	}
+
 	//Check for skill first, we can increase it upto 75 
 	uint32 skill=caster->_GetSkillLineCurrent( SKILL_ENCHANTING );
 	if(skill < 75)//can up skill
+	{
 		if(Rand(float(100-skill*100.0/75.0)))
+		{
 			caster->_AdvanceSkillLine(SKILL_ENCHANTING, float2int32( 1.0f * sWorld.getRate(RATE_SKILLRATE)));
- 
+		}
+	}
+	//Fill disenchanting loot
 	caster->SetLootGUID(it->GetGUID());
 	if(!it->loot)
 	{
 		it->loot = new Loot;
 		lootmgr.FillDisenchantingLoot(it->loot, it->GetEntry());
 	}
-	caster->SendLoot(it->GetGUID(), 2);
-
-
+	if ( it->loot->items.size() > 0 )
+	{
+		Log.Debug("SpellEffect","Succesfully disenchanted item %d", uint32(itemTarget->GetEntry()));
+		p_caster->SendLoot( itemTarget->GetGUID(), LOOT_DISENCHANTING );
+	} 
+	else
+	{
+		Log.Debug("SpellEffect","Disenchanting failed, item %d has no loot", uint32(itemTarget->GetEntry()));
+		SendCastResult(SPELL_FAILED_CANT_BE_DISENCHANTED);
+	}
 	if(it==i_caster)
 		i_caster=NULL;
 }
@@ -5170,7 +5184,7 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
 		playerTarget->SetFlag(UNIT_DYNAMIC_FLAGS, U_DYN_FLAG_LOOTABLE);
 
 		// Send the loot.
-		p_caster->SendLoot(playerTarget->GetGUID(), 2);
+		p_caster->SendLoot(playerTarget->GetGUID(), LOOT_SKINNING);
 
 		// Send a message to the died player, telling him he has to resurrect at the graveyard.
 		// Send an empty corpse location too, :P
@@ -5210,7 +5224,7 @@ void Spell::SpellEffectSkinPlayerCorpse(uint32 i)
 		objmgr.CorpseAddEventDespawn(corpse);
 
 		// send loot
-		p_caster->SendLoot(corpse->GetGUID(), 2);
+		p_caster->SendLoot(corpse->GetGUID(), LOOT_SKINNING);
 	}
 }
 
@@ -5404,22 +5418,27 @@ void Spell::SpellEffectProspecting(uint32 i)
 
 	if(!itemTarget) // this should never happen
 	{
-		SendCastResult(SPELL_FAILED_ITEM_GONE);
+		SendCastResult(SPELL_FAILED_CANT_BE_PROSPECTED);
 		return;
 	}
 
-	uint32 entry = itemTarget->GetEntry();
+	//Fill Prospecting loot
+	p_caster->SetLootGUID(itemTarget->GetGUID());
+	if( !itemTarget->loot )
+		{
+			itemTarget->loot = new Loot;
+			lootmgr.FillProspectingLoot( itemTarget->loot , itemTarget->GetEntry());
+		}
 
-	if(p_caster->GetItemInterface()->RemoveItemAmt(entry, 5))
+	if ( itemTarget->loot->items.size() > 0 )
 	{
-		p_caster->SetLootGUID(p_caster->GetGUID());
-		lootmgr.FillProspectingLoot(&p_caster->loot, entry);
-		p_caster->SendLoot(p_caster->GetGUID(), 2);
-	}
+		Log.Debug("SpellEffect","Succesfully prospected item %d", uint32(itemTarget->GetEntry()));
+		p_caster->SendLoot( itemTarget->GetGUID(), LOOT_PROSPECTING );
+	} 
 	else // this should never happen either
 	{
-		SendCastResult(SPELL_FAILED_ITEM_GONE);
-		return;
+		Log.Debug("SpellEffect","Prospecting failed, item %d has no loot", uint32(itemTarget->GetEntry()));
+		SendCastResult(SPELL_FAILED_CANT_BE_PROSPECTED);
 	}
 }
 

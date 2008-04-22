@@ -194,6 +194,17 @@ enum CooldownTypes
 	NUM_COOLDOWN_TYPES,
 };
 
+enum LootType
+{
+    LOOT_CORPSE                 = 1,
+    LOOT_SKINNING               = 2,
+    LOOT_FISHING                = 3,
+    LOOT_PICKPOCKETING          = 2,                        // 4 unsupported by client, sending LOOT_SKINNING instead
+    LOOT_DISENCHANTING          = 2,                        // 5 unsupported by client, sending LOOT_SKINNING instead
+    LOOT_PROSPECTING            = 2,                        // 6 unsupported by client, sending LOOT_SKINNING instead
+    LOOT_INSIGNIA               = 2                         // 7 unsupported by client, sending LOOT_SKINNING instead
+};
+
 struct spells
 {
 	uint16  spellId;
