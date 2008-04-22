@@ -148,7 +148,7 @@ pSpellAura SpellAuraHandler[TOTAL_SPELL_AURAS]={
 		&Aura::SpellAuraModMeleeDamageTaken,//SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN = 125,
 		&Aura::SpellAuraModMeleeDamageTakenPct,//SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT = 126,
 		&Aura::SpellAuraRAPAttackerBonus,//SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS = 127,
-		&Aura::SpellAuraNULL,//SPELL_AURA_MOD_POSSESS_PET = 128,
+		&Aura::SpellAuraModPossessPet,//SPELL_AURA_MOD_POSSESS_PET = 128,
 		&Aura::SpellAuraModIncreaseSpeedAlways,//SPELL_AURA_MOD_INCREASE_SPEED_ALWAYS = 129,
 		&Aura::SpellAuraModIncreaseMountedSpeed,//SPELL_AURA_MOD_MOUNTED_SPEED_ALWAYS = 130,
 		&Aura::SpellAuraModCreatureRangedAttackPower,//SPELL_AURA_MOD_CREATURE_RANGED_ATTACK_POWER = 131,
@@ -1801,50 +1801,6 @@ void Aura::SpellAuraDummy(bool apply)
 				}
 			}
 		}break;*/
-	case 1002:  // Eyes of the beast
-		{
-			// Take control of pets vision
-
-			// set charmed by and charm target
-			Unit * Caster = GetUnitCaster() ;
-			if(Caster == 0 || Caster->GetTypeId() != TYPEID_PLAYER) return;
-			Player * pCaster = static_cast< Player* >(Caster);
-
-			if(apply)
-			{
-				m_target->DisableAI();
-				pCaster->SetUInt64Value(UNIT_FIELD_SUMMON, 0);
-				m_target->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, 0);
-				pCaster->SetUInt64Value(UNIT_FIELD_CHARM, m_target->GetGUID());
-				m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, pCaster->GetGUID());
-				pCaster->SetUInt64Value(PLAYER_FARSIGHT, m_target->GetGUID());
-				pCaster->m_CurrentCharm = ((Creature*)m_target);
-				m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
-				pCaster->m_noInterrupt = 1;
-				pCaster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
-
-				WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
-				data << m_target->GetNewGUID() << uint8(0);
-				pCaster->GetSession()->SendPacket(&data);
-			}
-			else
-			{
-				Caster->EnableAI();
-				pCaster->SetUInt64Value(UNIT_FIELD_SUMMON, m_target->GetGUID());
-				m_target->SetUInt64Value(UNIT_FIELD_SUMMONEDBY, pCaster->GetGUID());
-				pCaster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
-				m_target->SetUInt64Value(UNIT_FIELD_CHARMEDBY, 0);
-				pCaster->SetUInt64Value(PLAYER_FARSIGHT, 0);
-				pCaster->m_CurrentCharm = 0;
-				m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
-				pCaster->m_noInterrupt = 0;
-				pCaster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
-
-				WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
-				data << pCaster->GetNewGUID() << uint8(1);
-				pCaster->GetSession()->SendPacket(&data);
-			}
-		}break;
 	case 570:   // far sight
 	case 1345:
 	case 6197:
@@ -7830,5 +7786,51 @@ void Aura::SpellAuraAxeSkillModifier(bool apply)
 			p_target->_ModifySkillBonus( SKILL_2H_AXES, -mod->m_amount );
 		}
 		p_target->UpdateStats();
+	}
+}
+
+void Aura::SpellAuraModPossessPet(bool apply)
+{
+	Unit *caster = GetUnitCaster();
+	Player* pCaster;
+	if( caster->IsPlayer() )
+		pCaster = static_cast< Player* >( caster );
+	else
+		return;
+	
+	if( !m_target->IsPet() ||
+		pCaster->GetSummon() != m_target )
+		return;
+	
+
+	if(apply)
+	{
+		if( caster != NULL && caster->IsInWorld() ) 
+			pCaster->Possess( m_target );
+	}
+	else
+	{
+		if( caster != NULL && caster->IsInWorld() )
+		{
+			// Thats UGLY
+			m_target->setAItoUse(true);
+			m_target->m_redirectSpellPackets = 0;
+			pCaster->ResetHeartbeatCoords();
+
+			pCaster->m_noInterrupt--;
+			pCaster->SetUInt64Value(PLAYER_FARSIGHT, 0);
+			pCaster->SetUInt64Value(UNIT_FIELD_CHARM, 0);
+
+			pCaster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOCK_PLAYER);
+			m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED_CREATURE);
+			m_target->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, m_target->GetCharmTempVal());
+			m_target->_setFaction();
+			m_target->UpdateOppFactionSet();
+
+			/* send "switch mover" packet */
+			WorldPacket data(SMSG_DEATH_NOTIFY_OBSOLETE, 10);
+			data << pCaster->GetNewGUID() << uint8(1);
+			pCaster->GetSession()->SendPacket(&data);
+		}
 	}
 }

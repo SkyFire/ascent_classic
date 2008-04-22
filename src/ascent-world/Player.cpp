@@ -8721,7 +8721,7 @@ void Player::SetNoseLevel()
 
 void Player::Possess(Unit * pTarget)
 {
-	if(m_Summon || m_CurrentCharm)
+	if( m_CurrentCharm)
 		return;
 
 	m_CurrentCharm = pTarget;
@@ -8765,7 +8765,7 @@ void Player::Possess(Unit * pTarget)
 	/* build + send pet_spells packet */
 	if(pTarget->m_temp_summon)
 		return;
-	
+
 	WorldPacket data(SMSG_PET_SPELLS, pTarget->GetAIInterface()->m_spells.size() * 4 + 20);
 	data << pTarget->GetGUID();
 	data << uint32(0x00000000);//unk1
@@ -8785,7 +8785,6 @@ void Player::Possess(Unit * pTarget)
 		else
 			data << uint16(0) << uint8(0) << uint8(i+5);
 	}
-
 	// Send the rest of the spells.
 	data << uint8(avail_spells.size());
 	for(itr = avail_spells.begin(); itr != avail_spells.end(); ++itr)
@@ -8797,7 +8796,7 @@ void Player::Possess(Unit * pTarget)
 
 void Player::UnPossess()
 {
-	if(m_Summon || !m_CurrentCharm)
+	if( m_Summon || !m_CurrentCharm )
 		return;
 
 	Unit * pTarget = m_CurrentCharm; 
