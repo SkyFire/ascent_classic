@@ -2955,9 +2955,14 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 		//Nothing can dispel resurrection sickness;
 		if(!aur->IsPassive() && !(aur->GetSpellProto()->Attributes & ATTRIBUTES_IGNORE_INVULNERABILITY))
 		{
+			uint32 UARank = 0;
 			if(m_spellInfo->DispelType == DISPEL_ALL)
 			{
 				unitTarget->HandleProc( PROC_ON_PRE_DISPELL_AURA_VICTIM , u_caster , m_spellInfo, aur->GetSpellId() );
+				
+				if( aur->m_spellProto->NameHash == SPELL_HASH_UNSTABLE_AFFLICTION )
+					UARank = aur->m_spellProto->RankNumber;
+
 				data.clear();
 				data << m_caster->GetNewGUID();
 				data << unitTarget->GetNewGUID();
@@ -2970,6 +2975,9 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 			}
 			else if(aur->GetSpellProto()->DispelType == m_spellInfo->EffectMiscValue[i])
 			{
+				if( aur->m_spellProto->NameHash == SPELL_HASH_UNSTABLE_AFFLICTION )
+					UARank = aur->m_spellProto->RankNumber;
+
 				data.clear();
 				data << m_caster->GetNewGUID();
 				data << unitTarget->GetNewGUID();
@@ -2979,7 +2987,24 @@ void Spell::SpellEffectDispel(uint32 i) // Dispel
 				unitTarget->RemoveAllAuras(aur->GetSpellProto()->Id,aur->GetCasterGUID());
 				if(!--damage)
 					return;
-			}			
+			}	
+			if( UARank != 0 )
+			{
+				uint32 dmg = 0;
+				switch ( UARank ) // BRRR, FUCKING BLIZZ
+				{
+					case 1:
+						dmg = 990;
+						break;
+					case 2:
+						dmg = 1260;
+						break;
+					case 3:
+						dmg = 1575;
+						break;
+				}
+				u_caster->SpellNonMeleeDamageLog(u_caster,31117,dmg,true,true);
+			}
 		}
 	}   
 }
