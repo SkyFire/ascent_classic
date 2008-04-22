@@ -687,7 +687,27 @@ void Item::ApplyEnchantmentBonus( uint32 Slot, bool Apply )
 						if( !Entry->min[c] && GetProto()->Class == 2 )
 						{
 							float speed = (float)GetProto()->Delay;
-							TS.procChance = (uint32)( speed / 600.0f );
+							/////// procChance calc ///////
+							float ppm = 0;
+							SpellEntry* sp = dbcSpell.LookupEntry( Entry->spell[c] );
+							if( sp )
+							{
+								switch( sp->NameHash )
+								{
+								case SPELL_HASH_FROSTBRAND_ATTACK:
+									ppm = 9;
+									break;
+								}
+							}
+							if( ppm != 0 )
+							{
+								float pcount = 60/ppm;
+								float chance = (speed/10) / pcount;
+								TS.procChance = (uint32)chance;
+							}
+							else
+								TS.procChance = (uint32)( speed / 600.0f );
+							///////////////////////////////
 						}
 						else
 							TS.procChance = Entry->min[c];
