@@ -15226,19 +15226,19 @@ void ApplyNormalFixes()
 		 **********************************************************/
 		sp = dbcSpell.LookupEntryForced( 20177 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 		sp = dbcSpell.LookupEntryForced( 20179 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 		sp = dbcSpell.LookupEntryForced( 20180 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 		sp = dbcSpell.LookupEntryForced( 20181 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 		sp = dbcSpell.LookupEntryForced( 20182 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM | PROC_TARGET_SELF;
 
 		/**********************************************************
 		 * Reckoning Effect
