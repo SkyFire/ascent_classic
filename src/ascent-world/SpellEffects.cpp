@@ -760,7 +760,17 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		Non-Class spells
 		- Done
 	 *************************/
+	/*
+		Poultryizer
+		Turns the target into a chicken for 15 sec.   Well, that is assuming the transmogrification polarity has not been reversed...
+	*/
+	case 30507:
+		{
+			if( !unitTarget || !unitTarget->isAlive())
+				return;
 
+			u_caster->CastSpell(unitTarget->GetGUID(),30501,true);
+		}break;
 	/*
 		Six Demon Bag
 		Blasts enemies in front of you with the power of wind, fire, all that kind of thing!
@@ -769,6 +779,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 		{
 			if( !unitTarget || !unitTarget->isAlive())
 				return;
+
 			uint32 ClearSpellId[6] = { 8401,8408,930,118,1680,10159 };
 			int min = 1;
 			uint32 effect = min + int( ((6-min)+1) * rand() / (RAND_MAX + 1.0) );

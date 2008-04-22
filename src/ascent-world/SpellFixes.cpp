@@ -20833,13 +20833,6 @@ void ApplyNormalFixes()
 			sp->procChance = 30;//some say it is triggered every now and then
 			sp->procFlags = PROC_ON_RANGED_ATTACK;
 		}
-		//Gnomish Poultryizer trinket - Poultryizer
-		sp = dbcSpell.LookupEntryForced( 30507 );
-		if( sp != NULL )
-		{
-			sp->Effect[0] = 6;
-			sp->EffectApplyAuraName[0] = SPELL_AURA_TRANSFORM;
-		}
 
 		//Purify helboar meat
 		sp = dbcSpell.LookupEntryForced( 29200 );
