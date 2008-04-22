@@ -2463,7 +2463,11 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 
 				pVictim->Energize( pVictim, 29442, amount, POWER_TYPE_MANA );
 			}
+			// we still stay in combat dude
+			static_cast< Player* >(pVictim)->CombatStatusHandler_ResetPvPTimeout();
 		}
+		if( IsPlayer() )
+			static_cast< Player* >(this)->CombatStatusHandler_ResetPvPTimeout();
 	}
 	if( school == SHADOW_DAMAGE )
 	{
