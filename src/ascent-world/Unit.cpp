@@ -3226,9 +3226,17 @@ void Unit::smsg_AttackStop(Unit* pVictim)
 	data << pVictim->GetNewGUID();
 	data << uint32(0);
 	SendMessageToSet(&data, true );
-
+	// stop swinging, reset pvp timeout
+	if( pVictim->IsPlayer() )
+	{
+		pVictim->CombatStatusHandler_ResetPvPTimeout();
+		CombatStatusHandler_ResetPvPTimeout();
+	}
+	else
+	{
 	pVictim->CombatStatus.RemoveAttacker(this, GetGUID());
 	CombatStatus.RemoveAttackTarget(pVictim);
+	}
 }
 
 void Unit::smsg_AttackStop(uint64 victimGuid)

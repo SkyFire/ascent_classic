@@ -1652,6 +1652,7 @@ AI_Spell * Pet::HandleAutoCastEvent()
 	if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
 	{
 		// more than one autocast spell. pick a random one.
+		// WRONG! it should choose the left-most autocast spell! 
 		uint32 c = RandomUInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
 		uint32 j = 0;
 		list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();

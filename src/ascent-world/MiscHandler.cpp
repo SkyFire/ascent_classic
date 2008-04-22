@@ -839,12 +839,17 @@ void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
 	uint64 guid ;
 	recv_data >> guid;
 
+		if(guid == 0) // deselected target
+		{
+			// wait dude, 5 seconds -.-
+			_player->CombatStatusHandler_ResetPvPTimeout();
+			//_player->CombatStatus.ClearPrimaryAttackTarget();
+		}
 	if( GetPlayer( ) != 0 ){
 		GetPlayer( )->SetTarget(guid);
 	}
 
-	if(guid == 0)
-		_player->CombatStatus.ClearPrimaryAttackTarget();
+
 }
 
 void WorldSession::HandleSetSelectionOpcode( WorldPacket & recv_data )
@@ -857,8 +862,11 @@ void WorldSession::HandleSetSelectionOpcode( WorldPacket & recv_data )
 		_player->UpdateComboPoints();
 
 	_player->SetUInt64Value(UNIT_FIELD_TARGET, guid);
-	if(guid == 0)
-		_player->CombatStatus.ClearPrimaryAttackTarget();
+		if(guid == 0) // deselected target
+		{
+			_player->CombatStatusHandler_ResetPvPTimeout();
+			//_player->CombatStatus.ClearPrimaryAttackTarget();
+		}
 }
 
 void WorldSession::HandleStandStateChangeOpcode( WorldPacket & recv_data )

@@ -4591,6 +4591,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		grp = 22;
 		break;
 	case SPELL_HASH_SLEEP:					// Sleep
+	case SPELL_HASH_RECKLESS_CHARGE:		// Reckless Charge
 		grp = 23;
 		break;
 	case SPELL_HASH_RIPOSTE:
