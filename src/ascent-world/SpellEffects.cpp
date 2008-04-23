@@ -2452,17 +2452,23 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 					return;
 
 				for(int i=0;i<5;i++)
+				{
 					if(lock->locktype[i] == 2 && lock->minlockskill[i] && lockskill >= lock->minlockskill[i])
 					{
 						v = lock->minlockskill[i];
 						gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
 						gameObjTarget->SetUInt32Value(GAMEOBJECT_STATE, 1);
+						//Add Fill GO loot here
+						if(gameObjTarget->loot.items.size() == 0)
+						{
+							lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
+							DetermineSkillUp(SKILL_LOCKPICKING,v/5); //to prevent free skill up
+						}
+						loottype = LOOT_CORPSE;
+						//End of it
 						break;
 					}
-				lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
-				loottype = LOOT_SKINNING;
-				DetermineSkillUp(SKILL_LOCKPICKING,v/5);
-				break;
+				}
 			}
 		}
 		case LOCKTYPE_HERBALISM:
@@ -2615,8 +2621,10 @@ void Spell::SpellEffectOpenLockItem(uint32 i)
 	if( gameObjTarget->GetUInt32Value( GAMEOBJECT_TYPE_ID ) == GAMEOBJECT_TYPE_CHEST)
 	{
 		lootmgr.FillGOLoot(&gameObjTarget->loot,gameObjTarget->GetEntry(), gameObjTarget->GetMapMgr() ? (gameObjTarget->GetMapMgr()->iInstanceMode ? true : false) : false);
-		static_cast< Player* >( m_caster )->SendLoot( gameObjTarget->GetGUID(), 1 );
-		gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, 1);
+		if(gameObjTarget->loot.items.size() > 0)
+		{
+			((Player*)caster)->SendLoot(gameObjTarget->GetGUID(),LOOT_CORPSE);
+		}
 	}
 
 	if( gameObjTarget->GetUInt32Value( GAMEOBJECT_TYPE_ID ) == GAMEOBJECT_TYPE_DOOR)
@@ -4619,7 +4627,7 @@ void Spell::SpellEffectSkinning(uint32 i)
 	{
 		//Fill loot for Skinning
 		lootmgr.FillSkinningLoot(&((Creature*)unitTarget)->loot,unitTarget->GetEntry());
-		static_cast< Player* >( m_caster )->SendLoot( unitTarget->GetGUID(), 2 );
+		static_cast< Player* >( m_caster )->SendLoot( unitTarget->GetGUID(), LOOT_SKINNING );
 		
 		//Not skinable again
 		((Creature*)unitTarget)->Skinned = true;

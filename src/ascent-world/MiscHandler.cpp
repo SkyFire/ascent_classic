@@ -377,7 +377,7 @@ void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 				if(target)
 				{
 					if(target->TaggerGuid==GetPlayer()->GetGUID())
-						GetPlayer()->SendLoot(guid,1);
+						GetPlayer()->SendLoot(guid,LOOT_CORPSE);
 					else return;
 				}
 			}*/
