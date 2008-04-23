@@ -223,188 +223,119 @@ void AccountMgr::ReloadAccountsCallback()
 }
 BAN_STATUS IPBanner::CalculateBanStatus(in_addr ip_address)
 {
-	setBusy.Acquire();
-
-	uint8 b1 = ((uint8*)&ip_address)[0];
-	uint8 b2 = ((uint8*)&ip_address)[1];
-	uint8 b3 = ((uint8*)&ip_address)[2];
-	uint8 b4 = ((uint8*)&ip_address)[3];
-
-	// loop storage array
-	set<IPBan*>::iterator itr = banList.begin();
-	uint32 expiretime;
-	bool banned = false;
-
-	for(; itr != banList.end(); ++itr)
+	Guard lguard(listBusy);
+	list<IPBan>::iterator itr;
+	list<IPBan>::iterator itr2 = banList.begin();
+	for(; itr2 != banList.end();)
 	{
-		// compare first byte
-		if((*itr)->ip.full.b1 == b1 || (*itr)->ip.full.b1 == 0xFF)
+		itr = itr2;
+		++itr2;
+
+		if( ParseCIDRBan(ip_address.s_addr, itr->Mask, itr->Bytes) )
 		{
-			// compare second byte if there was a first match
-			if((*itr)->ip.full.b2 == b2 || (*itr)->ip.full.b2 == 0xFF)
+			// ban hit
+			if( itr->Expire == 0 )
+				return BAN_STATUS_PERMANENT_BAN;
+			
+			if( UNIXTIME >= itr->Expire )
 			{
-				// compare third byte if there was a second match
-				if((*itr)->ip.full.b3 == b3 || (*itr)->ip.full.b3 == 0xFF)
-				{
-					// compare last byte if there was a third match
-					if((*itr)->ip.full.b4 == b4 || (*itr)->ip.full.b4 == 0xFF)
-					{
-						// full IP match
-						banned = true;
-						expiretime = (*itr)->ban_expire_time;
-						break;
-					}
-				}
+				sLogonSQL->Execute("DELETE FROM ipbans WHERE expire = %u AND ip = \"%s\"", itr->Expire, sLogonSQL->EscapeString(itr->db_ip).c_str());
+				banList.erase(itr);
+			}
+			else
+			{
+				return BAN_STATUS_TIME_LEFT_ON_BAN;
 			}
 		}
 	}
 
-	//Release here because we're not touching stored stuff anymore
-	//-except in Remove, which acquires the lock itself (avoiding deadlocks :p)
-	setBusy.Release();
-
-	// calculate status
-	if(!banned)
-	{
-		sLog.outDebug("[IPBanner] IP has no ban entry");
-		return BAN_STATUS_NOT_BANNED;
-	}
-	
-	if (expiretime == 0)
-	{
-		sLog.outDebug("[IPBanner] IP permanently banned");
-		return BAN_STATUS_PERMANENT_BAN;
-	}
-	
-	time_t rawtime;
-	time( &rawtime );
-	if(expiretime > (uint32)rawtime)
-	{
-		// temporary ban.
-		time_t expire_time = expiretime;
-		sLog.outDebug("[IPBanner] IP temporary banned, Expires: %s", ctime( &expire_time ));
-		return BAN_STATUS_TIME_LEFT_ON_BAN;
-	}
-	if(expiretime <= (uint32)rawtime)
-	{
-		// ban has expired. erase it from the banlist and database
-		sLog.outDebug("[IPBanner] Expired IP temporary ban has been removed");
-		Remove(itr);
-		return BAN_STATUS_NOT_BANNED;
-	}
-
-	// shouldnt get this far, but just in case...
-	sLog.outDebug("[IPBanner] Unknown IP ban state/duration, enforcing anyway");
-	return BAN_STATUS_PERMANENT_BAN;
-}
-
-void IPBanner::Load()
-{
-	QueryResult * result = sLogonSQL->Query("SELECT ip, expire FROM ipbans");
-	Field * fields;
-	IPBan * ban;
-	const char * ip_str;
-	if(result)
-	{
-		do 
-		{
-			ban = new IPBan;
-			fields = result->Fetch();
-
-			ip_str = fields[0].GetString();
-			unsigned int b1, b2, b3, b4;
-			if(sscanf(ip_str, "%u.%u.%u.%u", &b1, &b2, &b3, &b4) != 4)
-			{
-				delete ban;
-				continue;
-			}
-
-			ban->ip.full.b1 = b1;
-			ban->ip.full.b2 = b2;
-			ban->ip.full.b3 = b3;
-			ban->ip.full.b4 = b4;
-			ban->ban_expire_time = fields[1].GetUInt32();
-
-			banList.insert( ban );
-		}
-		while(result->NextRow());
-
-		delete result;
-	}
+	return BAN_STATUS_NOT_BANNED;
 }
 
 bool IPBanner::Add(const char * ip, uint32 dur)
 {
-	unsigned int b1, b2, b3, b4;
-	if(sscanf(ip, "%u.%u.%u.%u", &b1, &b2, &b3, &b4) != 4)
-	{
+	string sip = string(ip);
+
+	string::size_type i = sip.find("/");
+	if( i == string::npos )
 		return false;
-	}
 
-	IPBan * ban = new IPBan;
-	ban->ip.full.b1 = b1;
-	ban->ip.full.b2 = b2;
-	ban->ip.full.b3 = b3;
-	ban->ip.full.b4 = b4;
-	ban->ban_expire_time = dur;
+	string stmp = sip.substr(0, i);
+	string smask = sip.substr(i+1);
 
-	setBusy.Acquire();
-	banList.insert(ban);
-	setBusy.Release();
+	unsigned int ipraw = MakeIP(stmp.c_str());
+	unsigned int ipmask = atoi(smask.c_str());
+	if( ipraw == 0 || ipmask == 0 )
+		return false;
+
+	IPBan ipb;
+	ipb.db_ip = sip;
+	ipb.Bytes = ipmask;
+	ipb.Mask = ipraw;
+	
+	listBusy.Acquire();
+	banList.push_back(ipb);
+	listBusy.Release();
+
 	return true;
 }
 
 bool IPBanner::Remove(const char * ip)
 {
-	unsigned int b1, b2, b3, b4;
-	union {
-		unsigned char b1, b2, b3, b4;
-		uint32 asbytes;
-	} b;
-	if(sscanf(ip, "%u.%u.%u.%u", &b1, &b2, &b3, &b4) != 4)
+	listBusy.Acquire();
+	for(list<IPBan>::iterator itr = banList.begin(); itr != banList.end(); ++itr)
 	{
-		return false;
+		if( !strcmp(ip, itr->db_ip.c_str()) )
+		{
+			banList.erase(itr);
+			listBusy.Release();
+			return true;
+		}
 	}
-
-	b.b1 = b1;
-	b.b2 = b2;
-	b.b3 = b3;
-	b.b4 = b4;
-
-	setBusy.Acquire();
-	set<IPBan*>::iterator itr, itr2;
-	for(itr = banList.begin(); itr != banList.end(); )
-	{
-		itr2 = itr++;
-		if( (*itr2)->ip.asbytes == b.asbytes )
-			banList.erase(itr2);
-	}
-	setBusy.Release();
-	return true;
+	listBusy.Release();
+	return false;
 }
 
 void IPBanner::Reload()
 {
-	setBusy.Acquire();
+	listBusy.Acquire();
 	banList.clear();
-	Load();
-	setBusy.Release();
-}
+	QueryResult * result = sLogonSQL->Query("SELECT ip, expire FROM ipbans");
+	if( result != NULL )
+	{
+		do 
+		{
+			IPBan ipb;
 
-void IPBanner::Remove(set<IPBan*>::iterator ban)
-{
-	setBusy.Acquire();
+			string ip = result->Fetch()[0].GetString();
+			string::size_type i = ip.find("/");
+			if( i == string::npos )
+			{
+				printf("IP ban \"%s\" could not be parsed. Ignoring\n", ip.c_str());
+				continue;
+			}
 
-	char strIp[16] = {0};
-	snprintf(strIp, 16, "%u.%u.%u.%u", (*ban)->ip.full.b1, (*ban)->ip.full.b2, (*ban)->ip.full.b3,
-		(*ban)->ip.full.b4 );
+			string stmp = ip.substr(0, i);
+			string smask = ip.substr(i+1);
 
-	sLogonSQL->Execute("DELETE FROM ipbans WHERE ip='%s'", strIp);
-	banList.erase(ban);
+			unsigned int ipraw = MakeIP(stmp.c_str());
+			unsigned int ipmask = atoi(smask.c_str());
+			if( ipraw == 0 || ipmask == 0 )
+			{
+				printf("IP ban \"%s\" could not be parsed. Ignoring\n", ip.c_str());
+				continue;
+			}
 
-	setBusy.Release();
+			ipb.Bytes = ipmask;
+			ipb.Mask = ipraw;
+			ipb.Expire = result->Fetch()[1].GetUInt32();
 
-	sLog.outDebug("[IPBanner] Removed expired IPBan for ip '%s'", strIp);
+			banList.push_back(ipb);
+
+		} while (result->NextRow());
+		delete result;
+	}
+	listBusy.Release();
 }
 
 Realm * InformationCore::AddRealm(uint32 realm_id, Realm * rlm)

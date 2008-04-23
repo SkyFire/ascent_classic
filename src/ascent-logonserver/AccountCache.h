@@ -80,12 +80,10 @@ struct Account
 
 typedef struct 
 {
-	union
-	{
-		struct ipfull { uint8 b1, b2, b3, b4; } full;
-		uint32 asbytes;
-	} ip;
-	uint32 ban_expire_time;
+	unsigned int Mask;
+	unsigned char Bytes;
+	uint32 Expire;
+	string db_ip;
 } IPBan;
 
 enum BAN_STATUS
@@ -98,17 +96,16 @@ enum BAN_STATUS
 class IPBanner : public Singleton< IPBanner >
 {
 public:
-	void Load();
 	void Reload();
-	void Remove(set<IPBan*>::iterator ban);
+
 	bool Add(const char * ip, uint32 dur);
 	bool Remove(const char * ip);
 
 	BAN_STATUS CalculateBanStatus(in_addr ip_address);
 
 protected:
-	Mutex setBusy;
-	set<IPBan*> banList;
+	Mutex listBusy;
+	list<IPBan> banList;
 };
 
 class AccountMgr : public Singleton < AccountMgr >
