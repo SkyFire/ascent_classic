@@ -19199,6 +19199,20 @@ void ApplyNormalFixes()
 
 	// Insert druid spell fixes here
 
+		//Druid: Feral Swiftness
+		sp = dbcSpell.LookupEntryForced( 17002 );
+		if ( sp != NULL )
+		{
+			sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
+			sp->EffectTriggerSpell[1] = 24864;
+		}
+		sp = dbcSpell.LookupEntryForced( 24866 );
+		if ( sp != NULL )
+		{
+			sp->Effect[1] = SPELL_EFFECT_TRIGGER_SPELL;
+			sp->EffectTriggerSpell[1] = 24867;
+		}
+
 		//Druid: Natural Perfection
 		sp = dbcSpell.LookupEntryForced( 33881 );
 		if ( sp != NULL )
