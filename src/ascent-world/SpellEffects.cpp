@@ -162,7 +162,7 @@ pSpellEffect SpellEffectsHandler[TOTAL_SPELL_EFFECTS]={
 		&Spell::SpellEffectNULL,// unknown - 139 // no spells
 		&Spell::SpellEffectTeleportUnits,//SPELL_EFFECT_TELEPORT_UNITS - 140 IronForge teleport / portal only it seems
 		&Spell::SpellEffectNULL,// unknown - 141 // triggers spell, magic one,  (Mother spell) http://www.thottbot.com/s41065
-		&Spell::SpellEffectNULL,// unknown - 142 // triggers some kind of "Put spell on target" thing... (dono for sure) http://www.thottbot.com/s40872 and http://www.thottbot.com/s33076
+		&Spell::SpellEffectTriggerSpellWithValue,// SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE - 142 // triggers some kind of "Put spell on target" thing... (dono for sure) http://www.thottbot.com/s40872 and http://www.thottbot.com/s33076
 		&Spell::SpellEffectNULL,// unknown - 143 // Master -> deamon effecting spell, http://www.thottbot.com/s25228 and http://www.thottbot.com/s35696
 };
 
@@ -5621,4 +5621,24 @@ void Spell::SpellEffectApplyAura128(uint32 i)
 {
 	if(m_spellInfo->EffectApplyAuraName[i] != 0)
 		SpellEffectApplyAura(i);
+}
+
+void Spell::SpellEffectTriggerSpellWithValue(uint32 i)
+{
+	if( unitTarget == NULL )
+		return;
+
+	SpellEntry* TriggeredSpell = dbcSpell.LookupEntryForced(m_spellInfo->EffectTriggerSpell[i]);
+	if( TriggeredSpell == NULL )
+		return;
+
+	Spell*sp=new Spell(m_caster,dbcSpell.LookupEntry(TriggeredSpell->Id),true,NULL);
+
+	for(uint32 x=0;x<3;x++)
+	{
+		sp->forced_basepoints[x] = TriggeredSpell->EffectBasePoints[i];
+	}
+
+	SpellCastTargets tgt(unitTarget->GetGUID());
+	sp->prepare(&tgt);
 }

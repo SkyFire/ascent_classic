@@ -750,7 +750,7 @@ enum SpellEffects
     SPELL_EFFECT_UNKNOWN19,                 //    139
     SPELL_EFFECT_UNKNOWN20,                 //    140
     SPELL_EFFECT_UNKNOWN21,                 //    141
-    SPELL_EFFECT_UNKNOWN22,                 //    142
+    SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE,	//    142
     SPELL_EFFECT_UNKNOWN23,                 //    143
     TOTAL_SPELL_EFFECTS,                    //    144
 };
@@ -1731,6 +1731,7 @@ public:
     void SpellEffectAddHonor(uint32 i);
     void SpellEffectSpawn(uint32 i);
     void SpellEffectApplyAura128(uint32 i);
+	void SpellEffectTriggerSpellWithValue(uint32 i);
 
     // Spell Targets Handlers
     void SpellTargetNULL(uint32 i, uint32 j);
