@@ -130,6 +130,126 @@ bool startdb()
 
 #define DEF_VALUE_NOT_SET 0xDEADBEEF
 
+
+Mutex m_allowedIpLock;
+vector<AllowedIP> m_allowedIps;
+vector<AllowedIP> m_allowedModIps;
+
+bool IsServerAllowed(unsigned int IP)
+{
+	m_allowedIpLock.Acquire();
+	for(vector<AllowedIP>::iterator itr = m_allowedIps.begin(); itr != m_allowedIps.end(); ++itr)
+	{
+		if( ParseCIDRBan(IP, itr->IP, itr->Bytes) )
+		{
+			m_allowedIpLock.Release();
+			return true;
+		}
+	}
+	m_allowedIpLock.Release();
+	return false;
+}
+
+bool IsServerAllowedMod(unsigned int IP)
+{
+	m_allowedIpLock.Acquire();
+	for(vector<AllowedIP>::iterator itr = m_allowedModIps.begin(); itr != m_allowedModIps.end(); ++itr)
+	{
+		if( ParseCIDRBan(IP, itr->IP, itr->Bytes) )
+		{
+			m_allowedIpLock.Release();
+			return true;
+		}
+	}
+	m_allowedIpLock.Release();
+	return false;
+}
+
+bool Rehash()
+{
+#ifdef WIN32
+	char * config_file = "ascent-logonserver.conf";
+#else
+	char * config_file = (char*)CONFDIR "/ascent-logonserver.conf";
+#endif
+	if(!Config.MainConfig.SetSource(config_file))
+	{
+		printf("Config file could not be rehashed.\n");
+		return false;
+	}
+
+	// re-set the allowed server IP's
+	string ips = Config.MainConfig.GetStringDefault("LogonServer", "AllowedIPs", "");
+	string ipsmod = Config.MainConfig.GetStringDefault("LogonServer", "AllowedModIPs", "");
+
+	vector<string> vips = StrSplit(ips, " ");
+	vector<string> vipsmod = StrSplit(ips, " ");
+
+	m_allowedIpLock.Acquire();
+	m_allowedIps.clear();
+	m_allowedModIps.clear();
+	vector<string>::iterator itr;
+	for(itr = vips.begin(); itr != vips.end(); ++itr)
+	{
+		string::size_type i = itr->find("/");
+		if( i == string::npos )
+		{
+			printf("IP: %s could not be parsed. Ignoring\n", itr->c_str());
+			continue;
+		}
+
+		string stmp = itr->substr(0, i);
+		string smask = itr->substr(i+1);
+
+		unsigned int ipraw = MakeIP(stmp.c_str());
+		unsigned int ipmask = atoi(smask.c_str());
+		if( ipraw == 0 || ipmask == 0 )
+		{
+			printf("IP: %s could not be parsed. Ignoring\n", itr->c_str());
+			continue;
+		}
+
+		AllowedIP tmp;
+		tmp.Bytes = ipmask;
+		tmp.IP = ipraw;
+		m_allowedIps.push_back(tmp);
+	}
+
+	for(itr = vipsmod.begin(); itr != vipsmod.end(); ++itr)
+	{
+		string::size_type i = itr->find("/");
+		if( i == string::npos )
+		{
+			printf("IP: %s could not be parsed. Ignoring\n", itr->c_str());
+			continue;
+		}
+
+		string stmp = itr->substr(0, i);
+		string smask = itr->substr(i+1);
+
+		unsigned int ipraw = MakeIP(stmp.c_str());
+		unsigned int ipmask = atoi(smask.c_str());
+		if( ipraw == 0 || ipmask == 0 )
+		{
+			printf("IP: %s could not be parsed. Ignoring\n", itr->c_str());
+			continue;
+		}
+
+		AllowedIP tmp;
+		tmp.Bytes = ipmask;
+		tmp.IP = ipraw;
+		m_allowedModIps.push_back(tmp);
+	}
+
+	if( InformationCore::getSingletonPtr() != NULL )
+		sInfoCore.CheckServers();
+
+	m_allowedIpLock.Release();
+
+	return true;
+}
+
+
 void LogonServer::Run(int argc, char ** argv)
 {
 	UNIXTIME = time(NULL);
@@ -214,16 +334,9 @@ void LogonServer::Run(int argc, char ** argv)
 	Log.Notice("System","Initializing Random Number Generators...");
 
 	Log.Notice("Config", "Loading Config Files...");
-	
-	if(Config.MainConfig.SetSource(config_file))
-	{
-		Log.Success("Config", ">> ascent-logonserver.conf", config_file);
-	}
-	else
-	{
-		Log.Error("Config", ">> ascent-logonserver.conf", config_file);
+	if(!Rehash())
 		return;
-	}
+
 	Log.Notice("ThreadMgr", "Starting...");
 	ThreadPool.Startup();
    

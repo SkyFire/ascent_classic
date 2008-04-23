@@ -22,6 +22,13 @@
 #include "Log.h"
 
 initialiseSingleton(LogonConsole);
+bool Rehash();
+
+void LogonConsole::TranslateRehash(char* str)
+{
+	sLog.outString("rehashing config file...");
+	Rehash();
+}
 
 void LogonConsole::Kill()
 {
@@ -108,6 +115,7 @@ void LogonConsole::ProcessCmd(char *cmd)
 
 		{"?", &LogonConsole::TranslateHelp}, {"help", &LogonConsole::TranslateHelp},
 		{ "reload", &LogonConsole::ReloadAccts},
+		{ "rehash", &LogonConsole::TranslateRehash},
 		{"quit", &LogonConsole::TranslateQuit}, {"exit", &LogonConsole::TranslateQuit}, 
 	};
 

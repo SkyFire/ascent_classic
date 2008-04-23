@@ -55,6 +55,7 @@ protected:					// Protected methods:
 	void ProcessHelp(char *command);
 
 	void ReloadAccts(char *str);
+	void TranslateRehash(char* str);
 };
 
 #define sLogonConsole LogonConsole::getSingleton()

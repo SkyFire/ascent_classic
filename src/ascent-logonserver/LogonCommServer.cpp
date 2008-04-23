@@ -31,10 +31,9 @@ ASCENT_INLINE static void swap32(uint32* p) { *p = ((*p >> 24 & 0xff)) | ((*p >>
 LogonCommServerSocket::LogonCommServerSocket(SOCKET fd) : Socket(fd, 65536, 524288)
 {
 	// do nothing
-	last_ping = (uint32)time(NULL);
+	last_ping = (uint32)UNIXTIME;
 	remaining = opcode = 0;
-	sInfoCore.AddServerSocket(this);
-	removed = false;
+	removed = true;
 
 	use_crypto = false;
 	authenticated = 0;
@@ -56,6 +55,19 @@ void LogonCommServerSocket::OnDisconnect()
 
 		sInfoCore.RemoveServerSocket(this);
 	}
+}
+
+void LogonCommServerSocket::OnConnect()
+{
+	if( !IsServerAllowed(GetRemoteAddress().s_addr) )
+	{
+		printf("Server connection from %s:%u DENIED, not an allowed IP.\n", GetRemoteIP().c_str(), GetRemotePort());
+		Disconnect();
+		return;
+	}
+
+	sInfoCore.AddServerSocket(this);
+	removed = false;
 }
 
 void LogonCommServerSocket::OnRead()
@@ -374,7 +386,6 @@ void LogonCommServerSocket::HandleTestConsoleLogin(WorldPacket & recvData)
 	recvData >> request;
 	recvData >> accountname;
 	recvData.read(key, 20);
-	printf("testing console login: %s\n", accountname.c_str());
 
 	data << request;
 

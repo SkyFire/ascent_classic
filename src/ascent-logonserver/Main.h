@@ -24,6 +24,15 @@ class AuthSocket;
 extern set<AuthSocket*> _authSockets;
 extern Mutex _authSocketLock;
 
+struct AllowedIP
+{
+	unsigned int IP;
+	unsigned char Bytes;
+};
+
+bool IsServerAllowed(unsigned int IP);
+bool IsServerAllowedMod(unsigned int IP);
+
 class LogonServer;
 class LogonServer : public Singleton< LogonServer >
 {

@@ -237,18 +237,19 @@ void PatchMgr::BeginPatchJob(Patch * pPatch, AuthSocket * pClient, uint32 Skip)
 
 void PatchMgr::UpdateJobs()
 {
-	list<PatchJob*>::iterator itr;
+	list<PatchJob*>::iterator itr, itr2;
 	m_patchJobLock.Acquire();
 	for(itr = m_patchJobs.begin(); itr != m_patchJobs.end();)
 	{
-		if(!(*itr)->Update())
+		itr2 = itr;
+		++itr;
+
+		if(!(*itr2)->Update())
 		{
-			(*itr)->GetClient()->m_patchJob=NULL;
-			delete (*itr);
-			itr = m_patchJobs.erase(itr);
+			(*itr2)->GetClient()->m_patchJob=NULL;
+			delete (*itr2);
+			m_patchJobs.erase(itr2);
 		}
-		else
-			++itr;
 	}
 	m_patchJobLock.Release();
 }

@@ -529,3 +529,25 @@ void InformationCore::TimeoutSockets()
 
 	serverSocketLock.Release();
 }
+
+void InformationCore::CheckServers()
+{
+	serverSocketLock.Acquire();
+
+	set<LogonCommServerSocket*>::iterator itr, it2;
+	LogonCommServerSocket * s;
+	for(itr = m_serverSockets.begin(); itr != m_serverSockets.end();)
+	{
+		s = *itr;
+		it2 = itr;
+		++itr;
+
+		if(!IsServerAllowed(s->GetRemoteAddress().s_addr))
+		{
+			printf("Disconnecting socket: %s due to it no longer being on an allowed IP.\n", s->GetRemoteIP().c_str());
+			s->Disconnect();
+		}
+	}
+
+	serverSocketLock.Release();
+}

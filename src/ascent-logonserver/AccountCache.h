@@ -228,6 +228,7 @@ public:
 	ASCENT_INLINE void   RemoveServerSocket(LogonCommServerSocket * sock) { serverSocketLock.Acquire(); m_serverSockets.erase( sock ); serverSocketLock.Release(); }
 
 	void		  TimeoutSockets();
+	void CheckServers();
 };
 
 #define sIPBanner IPBanner::getSingleton()

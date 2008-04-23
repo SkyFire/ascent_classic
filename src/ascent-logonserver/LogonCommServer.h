@@ -38,6 +38,7 @@ public:
 
 	void OnRead();
 	void OnDisconnect();
+	void OnConnect();
 	void SendPacket(WorldPacket * data);
 	void HandlePacket(WorldPacket & recvData);
 
