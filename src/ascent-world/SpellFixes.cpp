@@ -18183,25 +18183,19 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 		{
 			//this is for the trigger effect
-			sp->Effect[0]=6;
-			sp->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			sp->EffectTriggerSpell[0] = 25228;
-			sp->EffectImplicitTargetA[0] = EFF_TARGET_SELF;
-			sp->procFlags = PROC_ON_ANY_DAMAGE_VICTIM ;
+			sp->Effect[0]=SPELL_EFFECT_APPLY_AURA;
+			sp->EffectApplyAuraName[0] = SPELL_AURA_SPLIT_DAMAGE;
+			sp->EffectMiscValue[0]=20;
+			//sp->EffectImplicitTargetA[0] = EFF_TARGET_PET;
 			//this is for the extra 5% dmg for caster and pet
 			sp->Effect[1] = 6;
 			sp->EffectApplyAuraName[1] = 79;
 			sp->EffectBasePoints[1] = 4; //4+1=5
-			sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF ;
-			sp->EffectImplicitTargetB[1] = EFF_TARGET_PET ;
+			sp->EffectImplicitTargetA[1] = EFF_TARGET_SELF;
+			sp->EffectImplicitTargetB[1] = EFF_TARGET_PET;
 			sp->c_is_flags |= SPELL_FLAG_IS_EXPIREING_WITH_PET;
 		}
-		sp = dbcSpell.LookupEntryForced( 25228 );
-		if( sp != NULL )
-		{
-			sp->Effect[0]=3;	
-			sp->Effect[1]=0;//disable this part to not have multiple effects
-		}
+
 		//warlock: Demonic Aegis
 		sp = dbcSpell.LookupEntryForced( 30143 );
 		if( sp != NULL )

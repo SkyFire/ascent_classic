@@ -5262,7 +5262,38 @@ void Aura::SpellAuraModPercStat(bool apply)
 
 void Aura::SpellAuraSplitDamage(bool apply)
 {
-	//DK:FIXME
+	if( !m_target->IsUnit() )
+		return;
+
+	//Unit* uCaster = GetUnitCaster();
+	//if( !uCaster )
+	//	return;
+
+	//if( m_target == uCaster )
+	//	return;
+
+	//brrr, temporarty fix, this is used only by soul link atm:P
+
+	if( !m_target->IsPet() )
+		return;
+
+	Player* petOwner = static_cast< Pet* >( m_target )->GetPetOwner();
+
+	float val;
+	if(apply)
+	{
+		val = mod->m_miscValue/100.0f;
+	}
+	else
+	{
+		val = -mod->m_miscValue/100.0f;
+	}
+
+	for(uint32 x=0;x<7;x++)
+	{
+		petOwner->DamageTakenPctMod[x] -= val;
+		m_target->DamageTakenPctMod[x] += val;
+	}
 }
 
 void Aura::SpellAuraModRegen(bool apply)
