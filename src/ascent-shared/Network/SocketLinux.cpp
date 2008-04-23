@@ -39,7 +39,7 @@ void Socket::ReadCallback(uint32 len)
     else if(bytes > 0)
     {
         //m_readByteCount += bytes;
-        readBuffer.IncrementWritten(space);
+        readBuffer.IncrementWritten(bytes);
         // call virtual onread()
         OnRead();
     }
