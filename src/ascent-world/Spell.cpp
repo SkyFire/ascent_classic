@@ -4084,7 +4084,6 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 	bool critical = false;
 	int32 critchance = 0; 
 	int32 bonus = 0;
-	int32 bonus_pct = 0;
 	float healdoneaffectperc = 1.0f;
 	if( u_caster != NULL )
 	{
@@ -4139,7 +4138,7 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 			int penalty_pct = 0;
 			int penalty_flt = 0;
 			SM_FIValue( u_caster->SM_PPenalty, &penalty_pct, m_spellInfo->SpellGroupType );
-			bonus_pct += penalty_pct;
+			bonus += amount*penalty_pct/100;
 			SM_FIValue( u_caster->SM_FPenalty, &penalty_flt, m_spellInfo->SpellGroupType );
 			bonus += penalty_flt;
 			SM_FIValue( u_caster->SM_CriticalChance,&critchance,m_spellInfo->SpellGroupType);
@@ -4156,7 +4155,6 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 		amount += float2int32( float( bonus ) * healdoneaffectperc ); //apply downranking on final value ?
 		amount += amount*u_caster->HealDonePctMod[m_spellInfo->School]/100;
 		amount += float2int32( float( amount ) * unitTarget->HealTakenPctMod[m_spellInfo->School] );
-		amount += (amount*bonus_pct)/100;
 
 		if (m_spellInfo->SpellGroupType)
 			SM_FIValue(u_caster->SM_PDamageBonus,&amount,m_spellInfo->SpellGroupType);
