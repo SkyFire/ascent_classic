@@ -245,21 +245,26 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 	CHECK_PACKET_SIZE(recv_data, 4);
 	uint32 pageid = 0;
 	recv_data >> pageid;
-	ItemPage * page = ItemPageStorage.LookupEntry(pageid);
-	if(!page)
-		return;
 
-	LocalizedItemPage * lpi = (language>0) ? sLocalizationMgr.GetLocalizedItemPage(pageid,language):NULL;
+	while(pageid)
+	{
+		ItemPage * page = ItemPageStorage.LookupEntry(pageid);
+		if(!page)
+			return;
 
-	WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 1000);
-	data << pageid;
-	if(lpi)
-		data << lpi->Text;
-	else
-		data << page->text;
+		LocalizedItemPage * lpi = (language>0) ? sLocalizationMgr.GetLocalizedItemPage(pageid,language):NULL;
+		WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 1000);
+		data << pageid;
+		if(lpi)
+			data << lpi->Text;
+		else
+			data << page->text;
 
-	data << page->next_page;
-	SendPacket(&data);
+		data << page->next_page;
+		pageid = page->next_page;
+		SendPacket(&data);
+	}
+
 }
 //////////////////////////////////////////////////////////////
 /// This function handles CMSG_ITEM_NAME_QUERY:
