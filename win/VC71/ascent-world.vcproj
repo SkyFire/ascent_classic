@@ -47,6 +47,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NODEFAULTLIB:msvcrt.lib"
 				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
 				ShowProgress="1"
 				OutputFile="$(OutDir)\ascent-world.exe"
@@ -117,6 +118,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/NODEFAULTLIB:msvcrt.lib"
 				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
 				OutputFile="$(OutDir)/ascent-world.exe"
 				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Release"
@@ -555,6 +557,9 @@
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\Opcodes.h">
+		</File>
+		<File
+			RelativePath="..\..\src\ascent-world\Packets.h">
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\Pet.cpp">
