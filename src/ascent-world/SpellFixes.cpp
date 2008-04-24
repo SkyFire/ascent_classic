@@ -14399,11 +14399,44 @@ void ApplyNormalFixes()
 	/////////////////////////////////////////////////////////////////
 	//SPELL COEFFICIENT SETTINGS END
 	/////////////////////////////////////////////////////////////////
+	SpellEntry* sp;
+	/////////////////////////////////////////////////////////////////
+	//Database spell fixes handler
+	//////////////////////////////////////////////////////////////////
+	QueryResult * result = WorldDatabase.Query("SELECT spellId, procFlags, SpellGroupType, procChance FROM spellfixes");
+	if(result)
+	{
+		sLog.outDetail("Loading %u spell fixes from database...",result->GetRowCount());
+		do
+		{
+			Field * f = result->Fetch();
+			uint32 sf_spellId = f[0].GetUInt32();
+			uint32 sf_procFlags = f[1].GetUInt32();
+			uint32 sf_SpellGroupType = f[2].GetUInt32();
+			uint32 sf_procChance = f[3].GetUInt32();
+			
+			if( sf_spellId )
+			{
+				sp = dbcSpell.LookupEntryForced( sf_spellId );
+				if( sp != NULL )
+				{
+					if( sf_procFlags )
+						sp->procFlags = sf_procFlags;
+					if( sf_SpellGroupType )
+						sp->SpellGroupType = sf_SpellGroupType;
+					if( sf_procChance )
+						sp->procChance = sf_procChance;
+				}
+				//sLog.outDebug("Loaded fix for spell: %u from database",sf_spellId);
+			}
+
+		}while(result->NextRow());
+		delete result;
+	}	
 
 	/********************************************************
 	 * Windfury Enchantment
 	 ********************************************************/
-	SpellEntry* sp;
 	EnchantEntry* Enchantment;
 		
 	Enchantment = dbcEnchant.LookupEntryForced( 283 );
