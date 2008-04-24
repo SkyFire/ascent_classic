@@ -4561,14 +4561,14 @@ void Player::UpdateStats()
 	case HUNTER:
 		//AP = lev* 2 + str + agi - 20;
 		//RAP = (lev + agi)*2 - 20;
-		AP = str + agi - 20;
+		AP = lev * 2 + str + agi - 20;
 		RAP = lev * 2 + agi - 10;
 		break;
 
 	case SHAMAN:
 		AP = (lev+str)*2 - 20;
 		break;
-
+		
 	case PALADIN:
 		//AP = lev * 3 + str * 2 - 20;
 		//AP = str * 2 - 20;
@@ -4580,7 +4580,7 @@ void Player::UpdateStats()
 		//RAP = (lev+agi)*2 - 20;
 		//AP = str * 2 - 20;
 		AP = lev * 3 + str * 2 - 20;
-		RAP = lev + agi - 20;
+		RAP = lev + agi - 10;
 		break;
 
 	default://mage,priest,warlock
