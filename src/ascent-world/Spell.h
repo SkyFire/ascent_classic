@@ -253,7 +253,7 @@ enum procFlags
 	PROC_ON_RESIST_VICTIM				= 0x1000000,
 	PROC_ON_DODGE_VICTIM				= 0x2000000,
 	PROC_ON_DIE							= 0x4000000,
-	PROC_REMOVEONUS						= 0x8000000,//remove prochcharge only when it is used
+	PROC_REMOVEONUSE					= 0x8000000,//remove prochcharge only when it is used
 	PROC_MISC							= 0x10000000,//our custom flag to decide if proc dmg or shield
 	PROC_ON_BLOCK_VICTIM				= 0x20000000,
 	PROC_ON_SPELL_CRIT_HIT				= 0x40000000,
