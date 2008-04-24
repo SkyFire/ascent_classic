@@ -17651,19 +17651,19 @@ void ApplyNormalFixes()
 		 **********************************************************/
 		sp = dbcSpell.LookupEntryForced( 11213 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_SPELL_LAND | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_SPELL_HIT | PROC_TARGET_SELF;
 		sp = dbcSpell.LookupEntryForced( 12574 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_SPELL_LAND | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_SPELL_HIT | PROC_TARGET_SELF;
 		sp = dbcSpell.LookupEntryForced( 12575 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_SPELL_LAND | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_SPELL_HIT | PROC_TARGET_SELF;
 		sp = dbcSpell.LookupEntryForced( 12576 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_SPELL_LAND | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_SPELL_HIT | PROC_TARGET_SELF;
 		sp = dbcSpell.LookupEntryForced( 12577 );
 		if( sp != NULL )
-			sp->procFlags = PROC_ON_SPELL_LAND | PROC_TARGET_SELF;
+			sp->procFlags = PROC_ON_SPELL_HIT | PROC_TARGET_SELF;
 
 		//Mage - Icy Veins
 		sp = dbcSpell.LookupEntryForced( 12472 );

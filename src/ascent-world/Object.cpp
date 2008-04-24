@@ -2251,7 +2251,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 //========================================================================================== 
 	uint32 school = spellInfo->School;
 	float res = float(damage);
-	uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION;
+	uint32 aproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_SPELL_HIT;
 	uint32 vproc = PROC_ON_ANY_HOSTILE_ACTION | PROC_ON_ANY_DAMAGE_VICTIM | PROC_ON_SPELL_HIT_VICTIM;
 	bool critical = false;
 //==========================================================================================

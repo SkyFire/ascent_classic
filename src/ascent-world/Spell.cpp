@@ -691,10 +691,8 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 			res =  (Rand(resistchance) ? SPELL_DID_HIT_RESIST : SPELL_DID_HIT_SUCCESS);
 
 		if (res == SPELL_DID_HIT_SUCCESS) // proc handling. mb should be moved outside this function
-		{
 			target->HandleProc(PROC_ON_SPELL_LAND_VICTIM,u_caster,m_spellInfo);	
-			u_caster->HandleProc(PROC_ON_SPELL_LAND, target ,m_spellInfo);						
-		}
+
 		return res;
 	}
  
