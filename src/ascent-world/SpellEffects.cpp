@@ -4997,7 +4997,7 @@ void Spell::SpellEffectDispelMechanic(uint32 i)
 	{
 		if( unitTarget->m_auras[x] && !unitTarget->m_auras[x]->IsPositive())
 		{
-			if( unitTarget->m_auras[x]->GetSpellProto()->DispelType == sMisc || unitTarget->m_auras[x]->GetSpellProto()->EffectMechanic[x] == (int32)sMisc )
+			if( unitTarget->m_auras[x]->GetSpellProto()->DispelType == sMisc )
 				unitTarget->m_auras[x]->Remove();
 		}
 	}
