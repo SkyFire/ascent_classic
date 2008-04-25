@@ -298,6 +298,7 @@ bool IPBanner::Remove(const char * ip)
 
 void IPBanner::Reload()
 {
+
 	listBusy.Acquire();
 	banList.clear();
 	QueryResult * result = sLogonSQL->Query("SELECT ip, expire FROM ipbans");
@@ -306,17 +307,17 @@ void IPBanner::Reload()
 		do 
 		{
 			IPBan ipb;
-
+			string smask;
 			string ip = result->Fetch()[0].GetString();
 			string::size_type i = ip.find("/");
+			string stmp = ip.substr(0, i);
 			if( i == string::npos )
 			{
-				printf("IP ban \"%s\" could not be parsed. Ignoring\n", ip.c_str());
-				continue;
+				printf("IP ban \"%s\" netmask not specified. assuming /32 \n", ip.c_str());
+				smask = "32";
 			}
-
-			string stmp = ip.substr(0, i);
-			string smask = ip.substr(i+1);
+			else
+				smask = ip.substr(i+1);
 
 			unsigned int ipraw = MakeIP(stmp.c_str());
 			unsigned int ipmask = atoi(smask.c_str());
