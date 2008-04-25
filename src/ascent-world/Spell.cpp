@@ -3209,7 +3209,7 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_TARGET_IS_PLAYER;
 				}break;
 				case 13907:
-				}
+				{
 					if (!target || target->IsPlayer() || target->getClass()!=TARGET_TYPE_DEMON )
 						return SPELL_FAILED_SPELL_UNAVAILABLE;
 				}break;
