@@ -3094,7 +3094,7 @@ void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 
 	uint32 cr_entry = m_spellInfo->EffectMiscValue[i];
 
-	uint32 level = u_caster->getLevel();
+	uint32 level = 0;//u_caster->getLevel();
 	/*if ( u_caster->GetTypeId()==TYPEID_PLAYER && itemTarget )
 	{
 		if (itemTarget->GetProto() && itemTarget->GetProto()->RequiredSkill == SKILL_ENGINERING)
