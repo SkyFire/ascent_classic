@@ -1464,6 +1464,10 @@ bool Object::isInBack(Object* target)
 
     return( ( angle <= left ) && ( angle >= right ) );
 }
+bool Object::isInArc(Object* target , float angle) // angle in degrees
+{
+    return inArc( GetPositionX() , GetPositionY() , angle , GetOrientation() , target->GetPositionX() , target->GetPositionY() );
+}
 
 bool Object::isInRange(Object* target, float range)
 {

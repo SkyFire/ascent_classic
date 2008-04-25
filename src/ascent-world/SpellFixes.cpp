@@ -13365,7 +13365,7 @@ void ApplyNormalFixes()
 					sp->is_melee_spell = true;
 				if( ( sp->Effect[z] == SPELL_EFFECT_SCHOOL_DAMAGE && sp->Spell_Dmg_Type == SPELL_DMG_TYPE_RANGED ) )
 				{
-					//sLog.outString( "Ranged Spell: %u [%s]" , sp->Id , sp->Name );
+					//Log.Notice( "SpellFixes" , "Ranged Spell: %u [%s]" , sp->Id , sp->Name );
 					sp->is_ranged_spell = true;
 				}
 			}
@@ -20900,4 +20900,14 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->procChance = 50;
 
+		//////////////////////////////////////////
+		// BOSSES								//
+		//////////////////////////////////////////
+
+		// Insert boss spell fixes here
+		
+			// Dark Glare
+			sp = dbcSpell.LookupEntryForced( 26029 );
+			if( sp != NULL )
+				sp->cone_width = 15.0f; // 15 degree cone
 }

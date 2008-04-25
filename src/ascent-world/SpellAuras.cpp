@@ -2814,9 +2814,13 @@ void Aura::SpellAuraModInvisibility(bool apply)
 		return;
 
 	if(apply)
+	{
 		m_target->m_invisFlag = mod->m_miscValue;
+	}
 	else
+	{
 		m_target->m_invisFlag = INVIS_FLAG_NORMAL;
+	}
 
 	m_target->m_invisible = apply;
 	m_target->UpdateVisibility();

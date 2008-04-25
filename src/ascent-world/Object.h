@@ -304,9 +304,12 @@ public:
 	//use it to check if a object is in range of another
 	bool isInRange(Object* target, float range);
 
+
 	// Use it to Check if a object is in front of another one
 	bool isInFront(Object* target);
 	bool isInBack(Object* target);
+	// Check to see if an object is in front of a target in a specified arc (in degrees)
+	bool isInArc(Object* target , float degrees); 
 	/* Calculates the angle between two Positions */
 	float calcAngle( float Position1X, float Position1Y, float Position2X, float Position2Y );
 	float calcRadAngle( float Position1X, float Position1Y, float Position2X, float Position2Y );
@@ -509,8 +512,6 @@ protected:
 	void _BuildMovementUpdate( ByteBuffer *data, uint8 flags, uint32 flags2, Player* target );
 	void _BuildValuesUpdate( ByteBuffer *data, UpdateMask *updateMask, Player* target );
 
-	/* Main Function called by isInFront(); */
-	bool inArc(float Position1X, float Position1Y, float FOV, float Orientation, float Position2X, float Position2Y );
 
 	//! WoWGuid class
 	WoWGuid m_wowGuid;
@@ -527,6 +528,9 @@ protected:
 	//! Current map cell
 	MapCell *m_mapCell;
 
+	/* Main Function called by isInFront(); */
+	bool inArc(float Position1X, float Position1Y, float FOV, float Orientation, float Position2X, float Position2Y );
+	
 	LocationVector m_position;
 	LocationVector m_lastMapUpdatePosition;
 	LocationVector m_spawnLocation;

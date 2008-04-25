@@ -2052,6 +2052,14 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 			break;
 		}
 
+		// erm. some spells don't use ranged weapon skill but are still a ranged spell and use melee stats instead
+		// i.e. hammer of wrath
+		if( ability && ability->NameHash == SPELL_HASH_HAMMER_OF_WRATH )
+		{
+			it = pr->GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_MAINHAND );
+			hitmodifier += pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_HIT );
+			self_skill = float2int32( pr->CalcRating( PLAYER_RATING_MODIFIER_MELEE_MAIN_HAND_SKILL ) );
+		}
 		if(it && it->GetProto())
 			SubClassSkill = GetSkillByProto(it->GetProto()->Class,it->GetProto()->SubClass);
 		else
@@ -2071,6 +2079,7 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 				self_skill += pr->getLevel() * 5;
 			}
 		}
+
 
 		self_skill += pr->_GetSkillLineCurrent(SubClassSkill);
 	}
@@ -5267,6 +5276,7 @@ void Unit::SetFacing(float newo)
 	data << uint32(0);				// time
 	data << m_position;				// position
 	SendMessageToSet(&data, true);*/
+	
 	m_aiInterface->SendMoveToPacket(m_position.x,m_position.y,m_position.z,m_position.o,1,0x100); // MoveFlags = 0x100 (run)
 }
 
@@ -5625,7 +5635,10 @@ void Unit::CombatStatusHandler_ResetPvPTimeout()
 			}
 		}
 	}
-
+	// TESTING GROUND TESTING
+	//this->SendChatMessage( CHAT_MSG_MONSTER_SAY , LANG_UNIVERSAL , "Eye of C'thun AI Initialised" );
+	//this->SendChatMessage(
+	//	this->Emote( EMOTE_ONESHOT_SPELLCAST ); 
 	// yay for recursive mutexes
 	sEventMgr.AddEvent(this, &Unit::CombatStatusHandler_UpdatePvPTimeout, EVENT_ATTACK_TIMEOUT, 5000, 1, 0);
 	m_lock.Release();
