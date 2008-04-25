@@ -353,7 +353,12 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 		/* HACK FIX */
 		/* Please replace if found correct way */
 		/* SPELL_AURA_SPELL_MAGNET */
-		if( pTarget && pTarget->IsPlayer() )
+		int x;
+		for( x = 0; x < 3; ++x )
+			if( m_spellInfo->EffectApplyAuraName[x] == SPELL_AURA_MOD_POSSESS )
+				break;		
+
+		if( pTarget && pTarget->IsPlayer() && x == 3)
 		{	
 			Unit *MagnetCaster;
 			bool HasMagnetSpell = false;
