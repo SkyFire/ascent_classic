@@ -3157,16 +3157,6 @@ uint8 Spell::CanCast(bool tolerate)
 						if( atCaster->AreaFlags & 0x800 || atTarget->AreaFlags & 0x800 )
 							return SPELL_FAILED_NOT_HERE;
 					}
-
-					// scripted spell stuff, target is player
-					switch(m_spellInfo->Id)
-					{
-						case 603: //curse of doom, can't be casted on players
-						case 30910:
-						{
-							return SPELL_FAILED_TARGET_IS_PLAYER;
-						}break;
-					}
 				}
 				else
 				{
@@ -3212,19 +3202,23 @@ uint8 Spell::CanCast(bool tolerate)
 			// scripted spell stuff
 			switch(m_spellInfo->Id)
 			{
+				case 603: //curse of doom, can't be casted on players
+				case 30910:
+				{
+					if(target->IsPlayer())
+						return SPELL_FAILED_TARGET_IS_PLAYER;
+				}break;
 				case 13907:
+				}
 					if (!target || target->IsPlayer() || target->getClass()!=TARGET_TYPE_DEMON )
 						return SPELL_FAILED_SPELL_UNAVAILABLE;
-					break;
-
+				}break;
 				// disable spell
-				case 25997: // Eye for an Eye
 				case 38554: //Absorb Eye of Grillok
 				{
 					// do not allow spell to be cast
 					return SPELL_FAILED_SPELL_UNAVAILABLE;
-				}
-
+				}break;
 				case 36314: //The Seer's Presence
 				{
 					// this spell can be cast only on socrethar. Otherwife cool exploit
@@ -3233,18 +3227,27 @@ uint8 Spell::CanCast(bool tolerate)
 					// this spell should be used only for a specific quest on specific monster = "Socrethar"
 					if(target->GetEntry()!=20132) //nasty fixed numbers :(
 						return SPELL_FAILED_BAD_TARGETS;
-				}
-
+				}break;
 				case 982: //Revive Pet
 				{
 					Pet *pPet = p_caster->GetSummon();
 					if(pPet && !pPet->isDead())
 						return SPELL_FAILED_TARGET_NOT_DEAD;
-				}
+				}break;
 				case 38177:
 				{
 					if(target->GetEntry() != 21387)
 						return SPELL_FAILED_BAD_TARGETS;
+				}break;
+				case 44041://Chastise 1
+				case 44043://Chastise 2
+				case 44044://Chastise 3
+				case 44045://Chastise 4
+				case 44046://Chastise 5
+				case 44047://Chastise 6
+				{
+					if (p_caster->getRace()!=RACE_DWARF || p_caster->getRace()!=RACE_DRAENEI )
+						return SPELL_FAILED_SPELL_UNAVAILABLE;
 				}break;
 			}
 

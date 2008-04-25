@@ -307,14 +307,13 @@ void IPBanner::Reload()
 		do 
 		{
 			IPBan ipb;
-			string smask;
+			string smask= "32";
 			string ip = result->Fetch()[0].GetString();
 			string::size_type i = ip.find("/");
 			string stmp = ip.substr(0, i);
 			if( i == string::npos )
 			{
 				printf("IP ban \"%s\" netmask not specified. assuming /32 \n", ip.c_str());
-				smask = "32";
 			}
 			else
 				smask = ip.substr(i+1);
