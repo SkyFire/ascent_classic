@@ -7189,8 +7189,32 @@ void Aura::SpellAuraModOffhandDamagePCT(bool apply)
 
 void Aura::SpellAuraModPenetration(bool apply) // armor penetration & spell penetration
 {
-	//DK:This is basicly resistance reduce but i really dont
-	//know why blizz named this function like this
+	if( m_spellProto->NameHash == SPELL_HASH_SERRATED_BLADES )
+	{
+		if(!m_target->IsPlayer())
+			return;
+
+		Player *plr = static_cast< Player* >(m_target);
+		if( apply )
+		{
+			if( m_spellProto->Id == 14171 )
+				plr->PowerCostPctMod[0] += float( m_target->getLevel() * 2.67 );
+			else if( m_spellProto->Id == 14172 )
+				plr->PowerCostPctMod[0] += float( m_target->getLevel() * 5.43 );
+			else if( m_spellProto->Id == 14173 )
+				plr->PowerCostPctMod[0] += float( m_target->getLevel() * 8 );
+		}
+		else
+		{
+			if( m_spellProto->Id == 14171 )
+				plr->PowerCostPctMod[0] -= float( m_target->getLevel() * 2.67 );
+			else if( m_spellProto->Id == 14172 )
+				plr->PowerCostPctMod[0] -= float( m_target->getLevel() * 5.43 );
+			else if( m_spellProto->Id == 14173 )
+				plr->PowerCostPctMod[0] -= float( m_target->getLevel() * 8 );
+		}
+		return;
+	}
 	if(apply)
 	{
 		if(mod->m_amount < 0)
