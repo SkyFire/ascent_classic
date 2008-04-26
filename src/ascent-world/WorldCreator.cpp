@@ -260,6 +260,11 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr, uint32 instanceid)
 	return INSTANCE_OK;
 }
 
+MapMgr* InstanceMgr::GetMapMgr(uint32 mapId)
+{
+	return m_singleMaps[mapId];
+}
+
 MapMgr * InstanceMgr::GetInstance(Object* obj)
 {
 	Player * plr;

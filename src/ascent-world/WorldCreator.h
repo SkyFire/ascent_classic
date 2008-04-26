@@ -174,6 +174,7 @@ public:
 
 	// this only frees the instance pointer, not the mapmgr itself
 	void DeleteBattlegroundInstance(uint32 mapid, uint32 instanceid);
+	MapMgr* GetMapMgr(uint32 mapId);
 
 private:
 	void _LoadInstances();
