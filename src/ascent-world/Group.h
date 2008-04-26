@@ -64,7 +64,7 @@ class Player;
 
 typedef std::set<PlayerInfo*> GroupMembersSet;
 
-class SubGroup	  // Most stuff will be done through here, not through the "Group" class.
+SERVER_DECL class SubGroup	  // Most stuff will be done through here, not through the "Group" class.
 {
 public:
 	friend class Group;
