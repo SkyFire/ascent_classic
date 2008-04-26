@@ -864,3 +864,10 @@ void HookInterface::OnQuestFinished(Player * pPlayer, Quest * pQuest)
 		(call)(pPlayer, pQuest);
 	OUTER_LOOP_END
 }
+
+void HookInterface::OnHonorableKill(Player * pPlayer, Player * pKilled)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_HONORABLE_KILL, tOnHonorableKill)
+		(call)(pPlayer, pKilled);
+	OUTER_LOOP_END
+}

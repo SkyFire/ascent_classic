@@ -50,6 +50,7 @@ enum ServerHookEvents
 	SERVER_HOOK_EVENT_ON_CHARACTER_CREATE	= 20,
 	SERVER_HOOK_EVENT_ON_QUEST_CANCELLED	= 21,
 	SERVER_HOOK_EVENT_ON_QUEST_FINISHED		= 22,
+	SERVER_HOOK_EVENT_ON_HONORABLE_KILL		= 23,
 
 	NUM_SERVER_HOOKS,
 };
@@ -87,6 +88,7 @@ typedef void(*tOnLoot)(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 It
 typedef bool(*ItemScript)(Item * pItem, Player * pPlayer);
 typedef void(*tOnQuestCancel)(Player * pPlayer, Quest * pQuest);
 typedef void(*tOnQuestFinished)(Player * pPlayer, Quest * pQuest);
+typedef void(*tOnHonorableKill)(Player * pPlayer, Player * pKilled);
 
 class Spell;
 class Aura;
@@ -277,6 +279,7 @@ public:
 	void OnCharacterCreate(Player * pPlayer);
 	void OnQuestCancelled(Player * pPlayer, Quest * pQuest);
 	void OnQuestFinished(Player * pPlayer, Quest * pQuest);
+	void OnHonorableKill(Player * pPlayer, Player * pKilled);
 };
 
 #define sScriptMgr ScriptMgr::getSingleton()
