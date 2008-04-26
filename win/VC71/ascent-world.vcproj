@@ -118,7 +118,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/NODEFAULTLIB:msvcrt.lib"
 				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
 				OutputFile="$(OutDir)/ascent-world.exe"
 				AdditionalLibraryDirectories="..\..\extras\collision\collision_dll\Release"
@@ -640,13 +639,13 @@
 			RelativePath="..\..\src\ascent-world\SpellFailure.h">
 		</File>
 		<File
+			RelativePath="..\..\src\ascent-world\SpellFixes.cpp">
+		</File>
+		<File
 			RelativePath="..\..\src\ascent-world\SpellHandler.cpp">
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\SpellNameHashes.h">
-		</File>
-		<File
-			RelativePath="..\..\src\ascent-world\SpellFixes.cpp">
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\SpellTarget.cpp">
