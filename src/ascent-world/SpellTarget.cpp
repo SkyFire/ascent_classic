@@ -355,7 +355,8 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 		/* SPELL_AURA_SPELL_MAGNET */
 		int x;
 		for( x = 0; x < 3; ++x )
-			if( m_spellInfo->EffectApplyAuraName[x] == SPELL_AURA_MOD_POSSESS )
+			if( m_spellInfo->EffectApplyAuraName[x] == SPELL_AURA_MOD_POSSESS ||
+				m_spellInfo->is_melee_spell )
 				break;		
 
 		if( pTarget && pTarget->IsPlayer() && x == 3)
