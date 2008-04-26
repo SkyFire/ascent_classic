@@ -1,0 +1,1 @@
+alter table spellfixes add column `procCharges` INTEGER(30) not null default 0;

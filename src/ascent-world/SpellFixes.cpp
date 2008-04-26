@@ -14403,7 +14403,7 @@ void ApplyNormalFixes()
 	/////////////////////////////////////////////////////////////////
 	//Database spell fixes handler
 	//////////////////////////////////////////////////////////////////
-	QueryResult * result = WorldDatabase.Query("SELECT spellId, procFlags, SpellGroupType, procChance FROM spellfixes");
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM spellfixes");
 	if(result)
 	{
 		sLog.outDetail("Loading %u spell fixes from database...",result->GetRowCount());
@@ -14414,7 +14414,8 @@ void ApplyNormalFixes()
 			uint32 sf_procFlags = f[1].GetUInt32();
 			uint32 sf_SpellGroupType = f[2].GetUInt32();
 			uint32 sf_procChance = f[3].GetUInt32();
-			
+			uint32 sf_procCharges = f[4].GetUInt32();
+
 			if( sf_spellId )
 			{
 				sp = dbcSpell.LookupEntryForced( sf_spellId );
@@ -14422,10 +14423,15 @@ void ApplyNormalFixes()
 				{
 					if( sf_procFlags )
 						sp->procFlags = sf_procFlags;
+
 					if( sf_SpellGroupType )
 						sp->SpellGroupType = sf_SpellGroupType;
+
 					if( sf_procChance )
 						sp->procChance = sf_procChance;
+
+					if ( sf_procCharges )
+						sp->procCharges = sf_procCharges;
 				}
 				//sLog.outDebug("Loaded fix for spell: %u from database",sf_spellId);
 			}
