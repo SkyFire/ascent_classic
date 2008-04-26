@@ -74,7 +74,7 @@ void CCollideInterface::ActivateTile(uint32 mapId, uint32 tileX, uint32 tileY)
 	if(m_tilesLoaded[mapId][tileX][tileY] == 0)
 	{
 		COLLISION_BEGINTIMER;
-		CollisionMgr->loadMap("vmaps", mapId, tileY, tileX);
+		CollisionMgr->loadMap(sWorld.vMapPath.c_str, mapId, tileY, tileX);
 		printf("[%u ns] collision_activate_cell %u %u %u\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, tileX, tileY);
 	}
 
@@ -203,7 +203,7 @@ void CCollideInterface::ActivateTile(uint32 mapId, uint32 tileX, uint32 tileY)
 {
 	m_loadLock.Acquire();
 	if(m_tilesLoaded[mapId][tileX][tileY] == 0)
-		CollisionMgr->loadMap("vmaps", mapId, tileY, tileX);
+		CollisionMgr->loadMap(sWorld.vMapPath.c_str(), mapId, tileY, tileX);
 
 	++m_tilesLoaded[mapId][tileX][tileY];
 	m_loadLock.Release();

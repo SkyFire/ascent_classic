@@ -461,6 +461,7 @@ public:
 	void SaveAllPlayers();
 
 	string MapPath;
+	string vMapPath;
 	bool UnloadMapFiles;
 	bool BreathingEnabled;
 	bool SpeedhackProtection;
