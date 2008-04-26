@@ -10927,11 +10927,6 @@ void Apply112SpellFixes()
 	if(sp != NULL)
 		sp->procChance = 10;
 
-	// Spell 16164 Proc Chance (Elemental Focus )
-	sp = dbcSpell.LookupEntryForced(16164);
-	if(sp != NULL)
-		sp->procChance = 10;
-
 	// Spell 16178 Group Relation (Purification Rank 1)
 	sp = dbcSpell.LookupEntryForced(16178);
 	if(sp != NULL) {
