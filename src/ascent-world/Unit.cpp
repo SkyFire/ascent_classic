@@ -1628,19 +1628,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_REPLENISH_MANA)
 									continue; 
 							}break;
-
-/*						//paladin - illumination
-						case 18350:
+						case 38395:
 							{
-								continue; //disabled until finished
 								if( CastingSpell == NULL )
-									continue;//this should not ocur unless we made a fuckup somewhere
-								//only trigger effect for specified spells
-								if( CastingSpell->NameHash!=666 && //Holy light
-									CastingSpell->NameHash!=666 && //Flash of light
-									CastingSpell->NameHash!=666 ) //Holy shock
 									continue;
-							}break;*/
+								if( CastingSpell->NameHash != SPELL_HASH_IMMOLATE &&
+									CastingSpell->NameHash != SPELL_HASH_CORRUPTION)
+									continue;
+							}break;
 					}
 				}
 				if(spellId==22858 && isInBack(victim)) //retatliation needs target to be not in front. Can be casted by creatures too
