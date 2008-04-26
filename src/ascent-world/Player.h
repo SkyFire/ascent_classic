@@ -1831,6 +1831,7 @@ public:
 #ifdef ENABLE_COMPRESSED_MOVEMENT
 	void EventDumpCompressedMovement();
 	void AppendMovementData(uint32 op, uint32 sz, const uint8* data);
+	Mutex m_movementBufferLock;
 	ByteBuffer m_movementBuffer;
 #endif
 
@@ -1936,5 +1937,26 @@ public:
 	ASCENT_INLINE PlayerSkill* Grab() { return &m_itr->second; }
 	ASCENT_INLINE bool End() { return (m_itr==m_endItr)?true:false; }
 };
+
+#ifdef ENABLE_COMPRESSED_MOVEMENT
+
+class CMovementCompressorThread : public ThreadBase
+{
+	bool running;
+	Mutex m_listLock;
+	set<Player*> m_players;
+public:
+	CMovementCompressorThread() { running = true; }
+
+	void AddPlayer(Player * pPlayer);
+	void RemovePlayer(Player * pPlayer);
+
+	void OnShutdown() { running = false; }
+	bool run();
+};
+
+extern CMovementCompressorThread * MovementCompressor;
+
+#endif
 
 #endif

@@ -3204,7 +3204,8 @@ void Player::OnPushToWorld()
 		GetItemInterface()->CheckAreaItems(); 
 
 #ifdef ENABLE_COMPRESSED_MOVEMENT
-	sEventMgr.AddEvent(this, &Player::EventDumpCompressedMovement, EVENT_PLAYER_FLUSH_MOVEMENT, World::m_movementCompressInterval, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	//sEventMgr.AddEvent(this, &Player::EventDumpCompressedMovement, EVENT_PLAYER_FLUSH_MOVEMENT, World::m_movementCompressInterval, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	MovementCompressor->AddPlayer(this);
 #endif
 
 	if( m_mapMgr && m_mapMgr->m_battleground != NULL && m_bg != m_mapMgr->m_battleground )
@@ -3315,8 +3316,12 @@ void Player::RemoveFromWorld()
 
 	sWorld.mInWorldPlayerCount--;
 #ifdef ENABLE_COMPRESSED_MOVEMENT
+	MovementCompressor->RemovePlayer(this);
+	m_movementBufferLock.Acquire();
 	m_movementBuffer.clear();
-	sEventMgr.RemoveEvents(this, EVENT_PLAYER_FLUSH_MOVEMENT);
+	m_movementBufferLock.Release();
+	//sEventMgr.RemoveEvents(this, EVENT_PLAYER_FLUSH_MOVEMENT);
+	
 #endif
 
 	if(GetTaxiState())
@@ -9667,12 +9672,47 @@ void Player::EventDismissPet()
 
 #ifdef ENABLE_COMPRESSED_MOVEMENT
 
+CMovementCompressorThread *MovementCompressor;
+
 void Player::AppendMovementData(uint32 op, uint32 sz, const uint8* data)
 {
-	//printf("AppendMovementData(%u, %u, 0x%.8X)\n", op, sz, data);
+	printf("AppendMovementData(%u, %u, 0x%.8X)\n", op, sz, data);
+	m_movementBufferLock.Acquire();
 	m_movementBuffer << uint8(sz + 2);
 	m_movementBuffer << uint16(op);
 	m_movementBuffer.append( data, sz );
+	m_movementBufferLock.Release();
+}
+
+bool CMovementCompressorThread::run()
+{
+	set<Player*>::iterator itr;
+	while(running)
+	{
+		m_listLock.Acquire();
+		for(itr = m_players.begin(); itr != m_players.end(); ++itr)
+		{
+			(*itr)->EventDumpCompressedMovement();
+		}
+		m_listLock.Release();
+		Sleep(World::m_movementCompressInterval);
+	}
+
+	return true;
+}
+
+void CMovementCompressorThread::AddPlayer(Player * pPlayer)
+{
+	m_listLock.Acquire();
+	m_players.insert(pPlayer);
+	m_listLock.Release();
+}
+
+void CMovementCompressorThread::RemovePlayer(Player * pPlayer)
+{
+	m_listLock.Acquire();
+	m_players.erase(pPlayer);
+	m_listLock.Release();
 }
 
 void Player::EventDumpCompressedMovement()
@@ -9680,6 +9720,7 @@ void Player::EventDumpCompressedMovement()
 	if( m_movementBuffer.size() == 0 )
 		return;
 
+	m_movementBufferLock.Acquire();
 	uint32 size = m_movementBuffer.size();
 	uint32 destsize = size + size/10 + 16;
 	int rate = World::m_movementCompressRate;
@@ -9697,6 +9738,7 @@ void Player::EventDumpCompressedMovement()
 	if(deflateInit(&stream, rate) != Z_OK)
 	{
 		sLog.outError("deflateInit failed.");
+		m_movementBufferLock.Release();
 		return;
 	}
 
@@ -9714,6 +9756,7 @@ void Player::EventDumpCompressedMovement()
 	{
 		sLog.outError("deflate failed.");
 		delete [] buffer;
+		m_movementBufferLock.Release();
 		return;
 	}
 
@@ -9722,6 +9765,7 @@ void Player::EventDumpCompressedMovement()
 	{
 		sLog.outError("deflate failed: did not end stream");
 		delete [] buffer;
+		m_movementBufferLock.Release();
 		return;
 	}
 
@@ -9730,6 +9774,7 @@ void Player::EventDumpCompressedMovement()
 	{
 		sLog.outError("deflateEnd failed.");
 		delete [] buffer;
+		m_movementBufferLock.Release();
 		return;
 	}
 
@@ -9747,6 +9792,7 @@ void Player::EventDumpCompressedMovement()
 	// cleanup memory
 	delete [] buffer;
 	m_movementBuffer.clear();
+	m_movementBufferLock.Release();
 }
 #endif
 

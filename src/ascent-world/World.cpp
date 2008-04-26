@@ -495,6 +495,11 @@ bool World::SetInitialWorldSettings()
 
 	ThreadPool.ExecuteTask( new CharacterLoaderThread() );
 
+#ifdef ENABLE_COMPRESSED_MOVEMENT
+	MovementCompressor = new CMovementCompressorThread();
+	ThreadPool.ExecuteTask( MovementCompressor );
+#endif
+
 	// Preload and compile talent and talent tab data to speed up talent inspect
 
 	uint32 talent_max_rank;
