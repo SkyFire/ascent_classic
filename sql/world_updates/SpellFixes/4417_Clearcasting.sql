@@ -1,1 +1,1 @@
-INSERT INTO `spellfixes` (`spellId`,`procCharges`) VALUES ('12536','2');;
+INSERT INTO `spellfixes` (`spellId`,`procCharges`) VALUES ('12536','2');

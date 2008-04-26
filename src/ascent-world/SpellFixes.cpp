@@ -14435,6 +14435,38 @@ void ApplyNormalFixes()
 		delete result;
 	}	
 
+	result = WorldDatabase.Query("SELECT * FROM spell_proc");
+	if(result)
+	{
+		do
+		{
+			Field * f = result->Fetch();
+			uint32 spe_spellId = f[0].GetUInt32();
+			uint32 spe_NameHash = f[1].GetUInt32();
+
+			if( spe_spellId )
+			{
+				int x;
+				for( x = 0; x < 3; ++x )
+					if( sp->ProcOnNameHash[x] == 0 )
+						break;
+
+				if( x != 3 )
+				{
+					sp = dbcSpell.LookupEntryForced( spe_spellId );
+					if( sp != NULL )
+					{
+						sp->ProcOnNameHash[x] = spe_NameHash;
+					}
+				}
+				else
+					sLog.outError("Wrong ProcOnNameHash for Spell: %u!",spe_spellId);
+			}
+
+		}while(result->NextRow());
+		delete result;
+	}	
+
 	/********************************************************
 	 * Windfury Enchantment
 	 ********************************************************/

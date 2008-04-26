@@ -360,6 +360,8 @@ struct SpellEntry
     uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
 	uint32 ThreatForSpell;
 
+	uint32 ProcOnNameHash[3];
+
 	// love me or hate me, all "In a cone in front of the caster" spells don't necessarily mean "in front"
 	float cone_width;
 	//Spell Coefficient

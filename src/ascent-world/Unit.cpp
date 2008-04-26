@@ -713,6 +713,17 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 				//these are player talents. Fuckem they pull the emu speed down 
 				if( IsPlayer() )
 				{
+					if( spe && spe->ProcOnNameHash[0] != 0 )
+					{
+						if( CastingSpell == NULL )
+							continue;
+
+						if( CastingSpell->NameHash != spe->ProcOnNameHash[0] &&
+							CastingSpell->NameHash != spe->ProcOnNameHash[1] &&
+							CastingSpell->NameHash != spe->ProcOnNameHash[2] )
+							continue;
+					}
+
 					uint32 talentlevel = 0;
 					switch( origId )
 					{
@@ -1628,14 +1639,14 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_REPLENISH_MANA)
 									continue; 
 							}break;
-						case 38395:
+						/*case 38395:
 							{
 								if( CastingSpell == NULL )
 									continue;
 								if( CastingSpell->NameHash != SPELL_HASH_IMMOLATE &&
 									CastingSpell->NameHash != SPELL_HASH_CORRUPTION)
 									continue;
-							}break;
+							}break;*/
 					}
 				}
 				if(spellId==22858 && isInBack(victim)) //retatliation needs target to be not in front. Can be casted by creatures too
