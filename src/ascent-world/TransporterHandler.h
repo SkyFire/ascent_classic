@@ -110,7 +110,7 @@ public:
 	bool CreateAsTransporter(uint32 EntryID, const char* Name, int32 Time);
 	void UpdatePosition();
 	void TransportPassengers(uint32 mapid, uint32 oldmap, float x, float y, float z);
-	void Transporter::TransportGossip(uint32 route);
+	void TransportGossip(uint32 route);
 	bool GenerateWaypoints();
 
 	ASCENT_INLINE void AddPlayer(Player *pPlayer) { mPassengers[pPlayer->GetLowGUID()] = pPlayer; }

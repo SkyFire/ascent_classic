@@ -129,7 +129,7 @@ private:
 	HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* > m_itm_quests;
 
 	HM_NAMESPACE::hash_map<uint32, list<QuestAssociation *>* > m_quest_associations;
-	ASCENT_INLINE HM_NAMESPACE::hash_map<uint32, list<QuestAssociation *>* >& QuestMgr::GetQuestAssociationList()
+	ASCENT_INLINE HM_NAMESPACE::hash_map<uint32, list<QuestAssociation *>* >& GetQuestAssociationList()
 		{return m_quest_associations;}
 
 	HM_NAMESPACE::hash_map<uint32, uint32>		  m_ObjectLootQuestList;
@@ -138,7 +138,7 @@ private:
 
 	template <class T> HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* >& _GetList();
 
-	void QuestMgr::AddItemQuestAssociation( uint32 itemId, Quest *qst, uint8 item_count);
+	void AddItemQuestAssociation( uint32 itemId, Quest *qst, uint8 item_count);
 
 	// Quest Loading
 	void _RemoveChar(char* c, std::string *str);
