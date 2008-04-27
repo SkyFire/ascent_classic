@@ -179,11 +179,15 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 				if(!(*itr)->IsPlayer())
 					continue;
 
+				bool added = false;
 				Player * plr = (Player*)(*itr);
 				if(pVictim->CombatStatus.m_attackers.find(plr->GetGUID()) != pVictim->CombatStatus.m_attackers.end())
+				{
+					added = true;
 					contributors.insert(plr);
+				}
 
-				if(plr->GetGroup())
+				if(added && plr->GetGroup())
 				{
 					Group * pGroup = plr->GetGroup();
 					uint32 groups = pGroup->GetSubGroupCount();
