@@ -58,7 +58,6 @@ World::World()
 	m_genLevelCap=70;
 	m_limitedNames=false;
 	m_banTable = NULL;
-	m_lfgForNonLfg = false;
 }
 
 void CleanupRandomNumberGenerators();
