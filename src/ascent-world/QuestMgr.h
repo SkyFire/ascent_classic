@@ -26,9 +26,16 @@ struct QuestRelation
 	uint8 type;
 };
 
+struct QuestAssociation
+{
+	Quest *qst;
+	uint8 item_count;
+};
+
 class Item;
 
 typedef std::list<QuestRelation *> QuestRelationList;
+typedef std::list<QuestAssociation *> QuestAssociationList;
 
 class SERVER_DECL QuestMgr :  public Singleton < QuestMgr >
 {
@@ -80,7 +87,8 @@ public:
 	void LoadGOQuests(GameObject *go);
 
 	QuestRelationList* GetCreatureQuestList(uint32 entryid);
-	   QuestRelationList* GetGOQuestList(uint32 entryid);
+	QuestRelationList* GetGOQuestList(uint32 entryid);
+	QuestAssociationList* GetQuestAssociationListForItemId (uint32 itemId);
 	uint32 GetGameObjectLootQuest(uint32 GO_Entry);
 	void SetGameObjectLootQuest(uint32 GO_Entry, uint32 Item_Entry);
 	ASCENT_INLINE bool IsQuestRepeatable(Quest *qst) { return (qst->is_repeatable!=0 ? true : false); }
@@ -120,11 +128,17 @@ private:
 	HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* > m_obj_quests;
 	HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* > m_itm_quests;
 
+	HM_NAMESPACE::hash_map<uint32, list<QuestAssociation *>* > m_quest_associations;
+	ASCENT_INLINE HM_NAMESPACE::hash_map<uint32, list<QuestAssociation *>* >& QuestMgr::GetQuestAssociationList()
+		{return m_quest_associations;}
+
 	HM_NAMESPACE::hash_map<uint32, uint32>		  m_ObjectLootQuestList;
 
 	template <class T> void _AddQuest(uint32 entryid, Quest *qst, uint8 type);
 
 	template <class T> HM_NAMESPACE::hash_map<uint32, list<QuestRelation *>* >& _GetList();
+
+	void QuestMgr::AddItemQuestAssociation( uint32 itemId, Quest *qst, uint8 item_count);
 
 	// Quest Loading
 	void _RemoveChar(char* c, std::string *str);

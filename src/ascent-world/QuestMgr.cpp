@@ -1763,4 +1763,95 @@ void QuestMgr::LoadExtraQuestStuff()
 		delete pResult;
 	}
 	objmgr.ProcessGameobjectQuests();
+
+	//load item quest associations
+	uint32 item;
+	uint8 item_count;
+
+	pResult = WorldDatabase.Query("SELECT * FROM item_quest_association");
+	pos = 0;
+	if( pResult != NULL)
+	{
+		total = pResult->GetRowCount();
+		do 
+		{
+			Field *data = pResult->Fetch();
+			item = data[0].GetUInt32();
+			quest = data[1].GetUInt32();
+			item_count = data[2].GetUInt8();
+
+			qst = QuestStorage.LookupEntry(quest);
+			if(!qst)
+			{
+				//printf("Tried to add association to item %d for non-existant quest %d.\n", item, quest);
+			} 
+			else 
+			{
+				AddItemQuestAssociation( item, qst, item_count );
+			}
+		} while( pResult->NextRow() );
+		delete pResult;
+	}
+}
+
+void QuestMgr::AddItemQuestAssociation( uint32 itemId, Quest *qst, uint8 item_count)
+{
+	HM_NAMESPACE::hash_map<uint32, list<QuestAssociation *>* > &associationList = GetQuestAssociationList();
+	std::list<QuestAssociation *>* tempList;
+	QuestAssociation *ptr = NULL;
+	
+	// look for the item in the associationList
+	if (associationList.find( itemId ) == associationList.end() )
+	{
+		// not found. Create a new entry and QuestAssociationList
+		tempList = new std::list<QuestAssociation *>;
+
+		associationList.insert(HM_NAMESPACE::hash_map<uint32, list<QuestAssociation *>* >::value_type(itemId, tempList));
+	}
+	else
+	{
+		// item found, now we'll search through its QuestAssociationList
+		tempList = associationList.find( itemId )->second;
+	}
+	
+	// look through this item's QuestAssociationList for a matching quest entry
+	list<QuestAssociation *>::iterator it;
+	for (it = tempList->begin(); it != tempList->end(); ++it)
+	{
+		if ((*it)->qst == qst)
+		{
+			// matching quest found
+			ptr = (*it);
+			break;
+		}
+	}
+
+	// did we find a matching quest?
+	if (ptr == NULL)
+	{
+		// nope, create a new QuestAssociation for this item and quest
+		ptr = new QuestAssociation;
+		ptr->qst = qst;
+		ptr->item_count = item_count;
+
+		tempList->push_back( ptr );
+	}
+	else
+	{
+		// yep, update the QuestAssociation with the new item_count information 
+		ptr->item_count = item_count;
+		sLog.outDebug( "WARNING: Duplicate entries found in item_quest_association, updating item #%d with new item_count: %d.", itemId, item_count );
+	}
+}
+
+QuestAssociationList* QuestMgr::GetQuestAssociationListForItemId (uint32 itemId)
+{
+	HM_NAMESPACE::hash_map<uint32, QuestAssociationList* > &associationList = GetQuestAssociationList();
+	HM_NAMESPACE::hash_map<uint32, QuestAssociationList* >::iterator itr = associationList.find( itemId );
+	if( itr == associationList.end() )
+	{
+		return 0;
+	} else {
+		return itr->second;
+	}
 }

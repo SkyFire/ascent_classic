@@ -5097,6 +5097,22 @@ bool Player::HasQuestForItem(uint32 itemid)
 		if( m_questlog[i] != NULL )
 		{
 			qst = m_questlog[i]->GetQuest();
+
+			// Check the item_quest_association table for an entry related to this item
+			QuestAssociationList *tempList = QuestMgr::getSingleton().GetQuestAssociationListForItemId( itemid );
+			if( tempList != NULL )
+			{
+				QuestAssociationList::iterator it;
+				for (it = tempList->begin(); it != tempList->end(); ++it)
+				{
+					if ( ((*it)->qst == qst) && (GetItemInterface()->GetItemCount( itemid ) < (*it)->item_count) )
+					{
+						return true;
+					} // end if
+				} // end for
+			} // end if
+			
+			// No item_quest association found, check the quest requirements
 			if( !qst->count_required_item )
 				continue;
 
