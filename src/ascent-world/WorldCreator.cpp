@@ -435,13 +435,50 @@ void BuildStats(MapMgr * mgr, char * m_file, Instance * inst, MapInfo * inf)
 #define pushline strcat(m_file, tmp)
 
 	snprintf(tmp, 200, "	<instance>\n");																												pushline;
-	snprintf(tmp, 200, "	  <map>%u</map>\n", mgr->GetMapId());																						pushline;
-	snprintf(tmp, 200, "	  <maptype>%u</maptype>\n", inf->type);																						pushline;
-	snprintf(tmp, 200, "	  <players>%u</players>\n", mgr->GetPlayerCount());																			pushline;
-	snprintf(tmp, 200, "	  <maxplayers>%u</maxplayers>\n", inf->playerlimit);																		pushline;
-	snprintf(tmp, 200, "      <idletime>%s</idletime>\n", mgr->InactiveMoveTime ? asctime(localtime(&mgr->InactiveMoveTime)) : "N/A");					pushline;
-	snprintf(tmp, 200, "	  <creationtime>%s</creationtime>\n", inst ? asctime(localtime(&inst->m_creation)) : "N/A");								pushline;   
-	snprintf(tmp, 200, "	  <expirytime>%s</expirytime>\n", inst ? (inst->m_expiration ? asctime(localtime(&inst->m_expiration)) : "N/A") : "N/A");	pushline;
+	snprintf(tmp, 200, "		<map>%u</map>\n", mgr->GetMapId());																						pushline;
+	snprintf(tmp, 200, "		<maptype>%u</maptype>\n", inf->type);																						pushline;
+	snprintf(tmp, 200, "		<players>%u</players>\n", mgr->GetPlayerCount());																			pushline;
+	snprintf(tmp, 200, "		<maxplayers>%u</maxplayers>\n", inf->playerlimit);																		pushline;
+
+	//<creationtime>
+	if (inst)
+	{
+		tm *ttime = localtime( &inst->m_creation );
+		snprintf(tmp, 200, "		<creationtime>%02u:%02u:%02u %02u/%02u/%u</creationtime>\n",ttime->tm_hour, ttime->tm_min, ttime->tm_sec, ttime->tm_mday, ttime->tm_mon, uint32( ttime->tm_year + 1900 ));
+		pushline;
+	}
+	else
+	{
+		snprintf(tmp, 200, "		<creationtime>N/A</creationtime>\n");
+		pushline;
+	}
+
+	//<expirytime>
+	if (inst && inst->m_expiration)
+	{
+		tm *ttime = localtime( &inst->m_expiration );
+		snprintf(tmp, 200, "		<expirytime>%02u:%02u:%02u %02u/%02u/%u</expirytime>\n",ttime->tm_hour, ttime->tm_min, ttime->tm_sec, ttime->tm_mday, ttime->tm_mon, uint32( ttime->tm_year + 1900 ));
+		pushline;
+	}
+	else
+	{
+		snprintf(tmp, 200, "		<expirytime>N/A</expirytime>\n");
+		pushline;
+
+	}
+	//<idletime>
+	if (mgr->InactiveMoveTime)
+	{
+		tm *ttime = localtime( &mgr->InactiveMoveTime );
+		snprintf(tmp, 200, "		<idletime>%02u:%02u:%02u %02u/%02u/%u</idletime>\n",ttime->tm_hour, ttime->tm_min, ttime->tm_sec, ttime->tm_mday, ttime->tm_mon, uint32( ttime->tm_year + 1900 ));
+		pushline;
+	}
+	else
+	{
+		snprintf(tmp, 200, "		<idletime>N/A</idletime>\n");
+		pushline;
+	}
+
 	snprintf(tmp, 200, "	</instance>\n");																											pushline;
 #undef pushline
 }
@@ -545,7 +582,9 @@ void Instance::LoadFromDB(Field * fields)
 	while(p)
 	{
 		*p = 0;
-		m_killedNpcs.insert(atol(q));
+		uint32 val = atol(q);
+		if (val)
+			m_killedNpcs.insert( val );
 		q = p+1;
 		p = strchr(q, ' ');
 	}
