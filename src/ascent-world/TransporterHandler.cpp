@@ -27,6 +27,7 @@ bool Transporter::CreateAsTransporter(uint32 EntryID, const char* Name, int32 Ti
 	if(!CreateFromProto(EntryID,0,0,0,0,0))
 		return false;
 	
+	// Override these flags to avoid mistakes in proto
 	SetUInt32Value(GAMEOBJECT_FLAGS,40);
 	SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 	
@@ -50,9 +51,10 @@ bool Transporter::CreateAsTransporter(uint32 EntryID, const char* Name, int32 Ti
 
 bool FillPathVector(uint32 PathID, TransportPath & Path)
 {
+	// Store dbc values into current Path array
 	Path.Resize(dbcTaxiPathNode.GetNumRows());
-	uint32 i = 0;
 
+	uint32 i = 0;
 	for(uint32 j = 0; j < dbcTaxiPathNode.GetNumRows(); j++)
 	{
 		DBCTaxiPathNode *pathnode = dbcTaxiPathNode.LookupRow(j);
@@ -328,11 +330,41 @@ void Transporter::UpdatePosition()
 
 		if(mCurrentWaypoint->second.delayed)
 		{
-			PlaySoundToSet(5495);		// BoatDockedWarning.wav
+			//Transprter Script = sScriptMgr.CreateAIScriptClassForGameObject(GetEntry(), this);
+			switch( GetInfo()->DisplayID )
+			{
+				case 3015:
+				case 7087:
+					{
+						PlaySoundToSet(5154);		// ShipDocked LightHouseFogHorn.wav
+					} break;
+				case 3031:
+					{
+						PlaySoundToSet(11804);		// ZeppelinDocked	ZeppelinHorn.wav
+					} break;
+				default :
+					{
+						PlaySoundToSet(5495);		// BoatDockingWarning	BoatDockedWarning.wav
+					} break;
+			}
+			TransportGossip(GetInfo()->DisplayID);
 		}
 	}
 }
-
+void Transporter::TransportGossip(uint32 route)
+{
+	if( route == 241)
+	{
+		if ( mCurrentWaypoint->second.mapid )
+		{
+			Log.Debug("Transporter","Arrived in Ratched at %u", m_timer);
+		}
+		else
+		{
+			Log.Debug("Transporter","Arrived in Booty at %u", m_timer);
+		}
+	}
+}
 void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, float y, float z)
 {
 	sEventMgr.RemoveEvents(this, EVENT_TRANSPORTER_NEXT_WAYPOINT);
@@ -356,7 +388,7 @@ void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, floa
 			Player *plr = objmgr.GetPlayer(it2->first);
 			if(!plr)
 			{
-				// remove from map
+				// remove all non players from map
 				mPassengers.erase(it2);
 				continue;
 			}
@@ -372,7 +404,7 @@ void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, floa
 
 			if(mapid == 530 && !plr->GetSession()->HasFlag(ACCOUNT_FLAG_XPACK_01))
 			{
-				// player is not flagged to access bc content, repop at graveyard
+				// player does not have BC content, repop at graveyard
 				plr->RepopAtGraveyard(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), plr->GetMapId());
 				continue;
 			}
