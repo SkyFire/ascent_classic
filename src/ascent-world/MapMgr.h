@@ -215,6 +215,7 @@ public:
 
 	void LoadAllCells();
 	ASCENT_INLINE size_t GetPlayerCount() { return m_PlayerStorage.size(); }
+	uint32 GetTeamPlayersCount(uint32 teamId);
 
 	void _PerformObjectDuties();
 	uint32 mLoopCounter;
