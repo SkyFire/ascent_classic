@@ -196,9 +196,9 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 						SubGroup * sg = pGroup->GetSubGroup(i);
 						if(!sg) continue;
 
-						for(GroupMembersSet::iterator itr = sg->GetGroupMembersBegin(); itr != sg->GetGroupMembersEnd(); itr++)
+						for(GroupMembersSet::iterator itr2 = sg->GetGroupMembersBegin(); itr2 != sg->GetGroupMembersEnd(); itr2++)
 						{
-							PlayerInfo * pi = (*itr);
+							PlayerInfo * pi = (*itr2);
 							Player * gm = objmgr.GetPlayer(pi->guid);
 							if(!gm) continue;
 
