@@ -1974,9 +1974,11 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			}
 			else
 			{
-				// REPUTATION
-				plr->Reputation_OnKilledUnit( pVictim, false );
-				RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+				if (!isCritter) // REPUTATION
+				{
+					plr->Reputation_OnKilledUnit( pVictim, false );
+					RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+				}
 			}
 		}
 		/* -------------------------------- HONOR + BATTLEGROUND CHECKS END------------------------ */
