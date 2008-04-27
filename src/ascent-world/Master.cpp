@@ -332,7 +332,7 @@ bool Master::Run(int argc, char ** argv)
 	uint32 next_printout = getMSTime(), next_send = getMSTime();
 
 	// Start Network Subsystem
-	sLog.outString( "Starting network subsystem..." );
+	Log.Notice( "Network","Starting subsystem..." );
 	new SocketMgr;
 	new SocketGarbageCollector;
 	sSocketMgr.SpawnWorkerThreads();
@@ -340,7 +340,7 @@ bool Master::Run(int argc, char ** argv)
 	sScriptMgr.LoadScripts();
 
 	LoadingTime = getMSTime() - LoadingTime;
-	sLog.outString ( "\nServer is ready for connections. Startup time: %ums\n", LoadingTime );
+	Log.Notice( "Server","Ready for connections. Startup time: %ums\n", LoadingTime );
 
 	Log.Notice("RemoteConsole", "Starting...");
 	if( StartConsoleListener() )
@@ -436,10 +436,10 @@ bool Master::Run(int argc, char ** argv)
 				if(m_ShutdownTimer > 60000.0f)
 				{
 					if( !( (int)(m_ShutdownTimer) % 60000 ) )
-						sLog.outString( "Server shutdown in %i minutes.", (int)(m_ShutdownTimer / 60000.0f ) );
+						Log.Notice( "Server", "Shutdown in %i minutes.", (int)(m_ShutdownTimer / 60000.0f ) );
 				}
 				else
-					sLog.outString( "Server shutdown in %i seconds.", (int)(m_ShutdownTimer / 1000.0f ) );
+					Log.Notice( "Server","Shutdown in %i seconds.", (int)(m_ShutdownTimer / 1000.0f ) );
 					
 				next_printout = getMSTime() + 500;
 			}
@@ -604,7 +604,7 @@ bool Master::_StartDB()
 
 	if(result == false)
 	{
-		sLog.outError( "sql: One or more parameters were missing from WorldDatabase directive." );
+		Log.Error( "sql","One or more parameters were missing from WorldDatabase directive." );
 		return false;
 	}
 
@@ -612,7 +612,7 @@ bool Master::_StartDB()
 	if( !WorldDatabase.Initialize(hostname.c_str(), (unsigned int)port, username.c_str(),
 		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault( "WorldDatabase", "ConnectionCount", 3 ), 16384 ) )
 	{
-		sLog.outError( "sql: Main database initialization failed. Exiting." );
+		Log.Error( "sql","Main database initialization failed. Exiting." );
 		return false;
 	}
 
@@ -626,7 +626,7 @@ bool Master::_StartDB()
 
 	if(result == false)
 	{
-		sLog.outError( "sql: One or more parameters were missing from Database directive." );
+		Log.Error( "sql","One or more parameters were missing from Database directive." );
 		return false;
 	}
 
@@ -634,7 +634,7 @@ bool Master::_StartDB()
 	if( !CharacterDatabase.Initialize( hostname.c_str(), (unsigned int)port, username.c_str(),
 		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault( "CharacterDatabase", "ConnectionCount", 5 ), 16384 ) )
 	{
-		sLog.outError( "sql: Main database initialization failed. Exiting." );
+		Log.Error( "sql","Main database initialization failed. Exiting." );
 		return false;
 	}
 
@@ -680,7 +680,7 @@ Mutex m_crashedMutex;
 // Crash Handler
 void OnCrash( bool Terminate )
 {
-	sLog.outString( "Advanced crash handler initialized." );
+		Log.Error( "Crash Handler","Advanced crash handler initialized." );
 
 	if( !m_crashedMutex.AttemptAcquire() )
 		TerminateThread( GetCurrentThread(), 0 );
@@ -689,20 +689,20 @@ void OnCrash( bool Terminate )
 	{
 		if( World::getSingletonPtr() != 0 )
 		{
-			sLog.outString( "Waiting for all database queries to finish..." );
+			Log.Notice( "sql","Waiting for all database queries to finish..." );
 			WorldDatabase.EndThreads();
 			CharacterDatabase.EndThreads();
-			sLog.outString( "All pending database operations cleared.\n" );
+			Log.Notice( "sql","All pending database operations cleared.\n" );
 			sWorld.SaveAllPlayers();
-			sLog.outString( "Data saved." );
+			Log.Notice( "sql","Data saved." );
 		}
 	}
 	catch(...)
 	{
-		sLog.outString( "Threw an exception while attempting to save all data." );
+		Log.Error( "sql","Threw an exception while attempting to save all data." );
 	}
 
-	sLog.outString( "Closing." );
+	Log.Notice( "Server","Closing." );
 	
 	// beep
 	//printf("\x7");
