@@ -3190,15 +3190,8 @@ void Player::OnPushToWorld()
 	/* send weather */
 	sWeatherMgr.SendWeather(this);
 
-	if( load_health > m_uint32Values[UNIT_FIELD_MAXHEALTH] )
-		SetUInt32Value( UNIT_FIELD_HEALTH, m_uint32Values[UNIT_FIELD_MAXHEALTH] );
-	else
-		SetUInt32Value(UNIT_FIELD_HEALTH, load_health);
-
-	if( load_mana > m_uint32Values[UNIT_FIELD_MAXPOWER1] )
-		SetUInt32Value( UNIT_FIELD_POWER1, m_uint32Values[UNIT_FIELD_MAXPOWER1] );
-	else
-		SetUInt32Value(UNIT_FIELD_POWER1, load_mana);
+	SetUInt32Value( UNIT_FIELD_HEALTH, ( load_health > m_uint32Values[UNIT_FIELD_MAXHEALTH] ? m_uint32Values[UNIT_FIELD_MAXHEALTH] : load_health ));
+	SetUInt32Value( UNIT_FIELD_POWER1, ( load_mana > m_uint32Values[UNIT_FIELD_MAXPOWER1] ? m_uint32Values[UNIT_FIELD_MAXPOWER1] : load_mana ));
 
 	if( !GetSession()->HasGMPermissions() )
 		GetItemInterface()->CheckAreaItems(); 
@@ -5420,6 +5413,10 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 	Item* itm = GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
 	if( itm == NULL )
 		fail = SPELL_FAILED_NO_AMMO;
+
+	ItemPrototype * iprot=ItemPrototypeStorage.LookupEntry(GetUInt32Value(PLAYER_AMMO_ID));
+	if( iprot && getLevel()< iprot->RequiredLevel)
+		fail = SPELL_FAILED_LOWLEVEL;
 
 	// Player has clicked off target. Fail spell.
 	if( m_curSelection != m_AutoShotTarget )
@@ -9581,6 +9578,17 @@ bool Player::HasQuestMob(uint32 entry) //Only for Kill Quests
 		return true;
 	return false;
 }
+
+bool Player::HasQuest(uint32 entry) 
+{
+	for(uint32 i=0;i<25;i++)
+	{
+		if ( m_questlog[i]->GetQuest()->id == entry)
+		return true;
+	}
+	return false;
+}
+
 void Player::RemoveQuestMob(uint32 entry) //Only for Kill Quests
 {
 	if (quest_mobs.size()>0)

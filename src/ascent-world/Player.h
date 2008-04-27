@@ -783,6 +783,7 @@ public:
 	bool                HasQuestSpell(uint32 spellid);
 	void                RemoveQuestSpell(uint32 spellid);
 	bool                HasQuestMob(uint32 entry);
+	bool                HasQuest(uint32 entry);
 	void                RemoveQuestMob(uint32 entry);
 
     //Quest related variables
