@@ -180,7 +180,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 					continue;
 
 				Player * plr = (Player*)(*itr);
-				if(pVictim->CombatStatus.m_attackers.find(plr->GetGUID()) == pVictim->CombatStatus.m_attackers.end())
+				if(pVictim->CombatStatus.m_attackers.find(plr->GetGUID()) != pVictim->CombatStatus.m_attackers.end())
 					contributors.insert(plr);
 
 				if(plr->GetGroup())
