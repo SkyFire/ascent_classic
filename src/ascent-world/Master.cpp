@@ -173,7 +173,7 @@ bool Master::Run(int argc, char ** argv)
 #ifdef REPACK
 	printf("\nRepack: %s | Author: %s | %s\n", REPACK, REPACK_AUTHOR, REPACK_WEBSITE);
 #endif
-	printf("\nCopyright (C) 2005-2007 Ascent Team. http://www.ascentemu.com/\n");
+	printf("\nCopyright (C) 2005-2008 Ascent Team. http://www.ascentemu.com/\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY, and is FREE SOFTWARE.\n");
 	printf("You are welcome to redistribute it under the terms of the GNU Affero\n");
 	printf("General Public License, either version 3 or any later version. For a\n");
