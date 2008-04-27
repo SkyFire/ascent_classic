@@ -9693,7 +9693,7 @@ CMovementCompressorThread *MovementCompressor;
 
 void Player::AppendMovementData(uint32 op, uint32 sz, const uint8* data)
 {
-	printf("AppendMovementData(%u, %u, 0x%.8X)\n", op, sz, data);
+	//printf("AppendMovementData(%u, %u, 0x%.8X)\n", op, sz, data);
 	m_movementBufferLock.Acquire();
 	m_movementBuffer << uint8(sz + 2);
 	m_movementBuffer << uint16(op);
