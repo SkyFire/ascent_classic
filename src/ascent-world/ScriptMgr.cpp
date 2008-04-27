@@ -63,8 +63,8 @@ void ScriptMgr::LoadScripts()
 	if(!HookInterface::getSingletonPtr())
 		new HookInterface;
 
-	sLog.outString( "Loading External Script Libraries..." );
-	sLog.outString( "");
+	Log.Notice("Server","Loading External Script Libraries...");
+	sLog.outString("");
 
 	string start_path = Config.MainConfig.GetStringDefault( "Script", "BinaryLocation", "script_bin" ) + "\\";
 	string search_path = start_path + "*.";
@@ -87,8 +87,10 @@ void ScriptMgr::LoadScripts()
 			string full_path = start_path + data.cFileName;
 			HMODULE mod = LoadLibrary( full_path.c_str() );
 			printf( "  %s : 0x%p : ", data.cFileName, reinterpret_cast< uint32* >( mod ));
-			if(mod == 0)
-				printf("error!\n");
+			if( mod == 0 )
+			{
+				printf( "error!\n" );
+			}
 			else
 			{
 				// find version import
@@ -139,10 +141,10 @@ void ScriptMgr::LoadScripts()
 		while(FindNextFile(find_handle, &data));
 		FindClose(find_handle);
 		sLog.outString("");
-		sLog.outString("Loaded %u external libraries.", count);
+		Log.Notice("Server","Loaded %u external libraries.", count);
 		sLog.outString("");
 
-		sLog.outString("Loading optional scripting engines...");
+		Log.Notice("Server","Loading optional scripting engines...");
 		for(vector<ScriptingEngine>::iterator itr = ScriptEngines.begin(); itr != ScriptEngines.end(); ++itr)
 		{
 			if( itr->Type & SCRIPT_TYPE_SCRIPT_ENGINE_LUA )
@@ -150,7 +152,7 @@ void ScriptMgr::LoadScripts()
 				// lua :O
 				if( Config.MainConfig.GetBoolDefault("ScriptBackends", "LUA", false) )
 				{
-					sLog.outString("   Initializing LUA script engine...");
+					Log.Notice("Server","Initializing LUA script engine...");
 					itr->InitializeCall(this);
 					_handles.push_back( (SCRIPT_MODULE)itr->Handle );
 				}
@@ -163,7 +165,7 @@ void ScriptMgr::LoadScripts()
 			{
 				if( Config.MainConfig.GetBoolDefault("ScriptBackends", "AS", false) )
 				{
-					sLog.outString("   Initializing AngelScript script engine...");
+					Log.Notice("Server","Initializing AngelScript script engine...");
 					itr->InitializeCall(this);
 					_handles.push_back( (SCRIPT_MODULE)itr->Handle );
 				}
@@ -174,11 +176,11 @@ void ScriptMgr::LoadScripts()
 			}
 			else
 			{
-				sLog.outString("  Unknown script engine type: 0x%.2X, please contact developers.", (*itr).Type );
+				Log.Notice("Server","Unknown script engine type: 0x%.2X, please contact developers.", (*itr).Type );
 				FreeLibrary( itr->Handle );
 			}
 		}
-		sLog.outString("Done loading script engines...");
+		Log.Notice("Server","Done loading script engines...");
 	}
 #else
 	/* Loading system for *nix */
@@ -840,6 +842,13 @@ bool HookInterface::OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const cha
 void HookInterface::OnLoot(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId)
 {
 	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_LOOT, tOnLoot)
+		(call)(pPlayer, pTarget, Money, ItemId);
+	OUTER_LOOP_END
+}
+
+void HookInterface::OnObjectLoot(Player * pPlayer, Object * pTarget, uint32 Money, uint32 ItemId)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_OBJECTLOOT, tOnObjectLoot)
 		(call)(pPlayer, pTarget, Money, ItemId);
 	OUTER_LOOP_END
 }
