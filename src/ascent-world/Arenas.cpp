@@ -390,6 +390,17 @@ void Arena::Finish()
 			}
 		}
 	}
+
+	for(int i = 0; i < 2; i++)
+	{
+		bool victorious = (i == m_winningteam);
+		set<Player*>::iterator itr = m_players[i].begin();
+		for(; itr != m_players[i].end(); itr++)
+		{
+			Player * plr = (Player *)(*itr);
+			sHookInterface.OnArenaFinish(plr, plr->m_arenaTeams[m_arenateamtype], victorious, rated_match);
+		}
+	}
 }
 
 LocationVector Arena::GetStartingCoords(uint32 Team)

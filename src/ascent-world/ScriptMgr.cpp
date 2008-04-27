@@ -871,3 +871,10 @@ void HookInterface::OnHonorableKill(Player * pPlayer, Player * pKilled)
 		(call)(pPlayer, pKilled);
 	OUTER_LOOP_END
 }
+
+void HookInterface::OnArenaFinish(Player * pPlayer, ArenaTeam* pTeam, bool victory, bool rated)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_ARENA_FINISH, tOnArenaFinish)
+		(call)(pPlayer, pTeam, victory, rated);
+	OUTER_LOOP_END
+}
