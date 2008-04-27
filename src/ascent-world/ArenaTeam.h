@@ -29,7 +29,7 @@ struct ArenaTeamMember
 	uint32 Won_ThisSeason;
 };
 
-class ArenaTeam
+class SERVER_DECL ArenaTeam
 {
 	void AllocateSlots(uint32 Type)
 	{
