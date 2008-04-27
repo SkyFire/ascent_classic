@@ -595,7 +595,6 @@ class CombatStatusHandler
 {
 	typedef set<uint64> AttackerMap;
 	typedef set<uint32> HealedSet;		// Must Be Players!
-	AttackerMap m_attackers;
 	HealedSet m_healers;
 	HealedSet m_healed;
 	Unit* m_Unit;
@@ -605,7 +604,7 @@ class CombatStatusHandler
 
 public:
 	CombatStatusHandler() : m_lastStatus(false), m_primaryAttackTarget(0) {}
-
+	AttackerMap m_attackers;
 	void AddAttackTarget(const uint64& guid);						// this means we clicked attack, not actually striked yet, so they shouldnt be in combat.
 	void ClearPrimaryAttackTarget();								// means we deselected the unit, stopped attacking it.
 

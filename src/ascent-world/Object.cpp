@@ -1899,6 +1899,49 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			//pVictim->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNTED_TAXI);
 		}
 
+		/* -------------------------------- HONOR + BATTLEGROUND CHECKS ------------------------ */
+		plr = NULL;
+		if( IsPlayer() )
+			plr = static_cast< Player* >( this );
+		else if(IsPet())
+			plr = static_cast< Pet* >( this )->GetPetOwner();
+
+		if( plr != NULL)
+		{
+			if( plr->m_bg != 0 )
+				plr->m_bg->HookOnPlayerKill( plr, pVictim );
+
+			if( pVictim->IsPlayer() )
+			{
+				sHookInterface.OnKillPlayer( plr, static_cast< Player* >( pVictim ) );
+				if(plr->getLevel() > pVictim->getLevel())
+				{
+					unsigned int diff = plr->getLevel() - pVictim->getLevel();
+					if( diff <= 8 )
+					{
+						HonorHandler::OnPlayerKilledUnit(plr, pVictim);
+						SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+					}
+					else
+						RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+				}
+				else
+				{
+					HonorHandler::OnPlayerKilledUnit( plr, pVictim );
+					SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+				}
+			}
+			else
+			{
+				if (!isCritter) // REPUTATION
+				{
+					plr->Reputation_OnKilledUnit( pVictim, false );
+					RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
+				}
+			}
+		}
+		/* -------------------------------- HONOR + BATTLEGROUND CHECKS END------------------------ */
+
 		// Wipe our attacker set on death
 		pVictim->CombatStatus.Vanished();
 
@@ -1940,49 +1983,6 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				}
 			}
 		}
-		/* -------------------------------- HONOR + BATTLEGROUND CHECKS ------------------------ */
-		plr = NULL;
-		if( IsPlayer() )
-			plr = static_cast< Player* >( this );
-		else if(IsPet())
-			plr = static_cast< Pet* >( this )->GetPetOwner();
-		
-		if( plr != NULL)
-		{
-			if( plr->m_bg != 0 )
-				plr->m_bg->HookOnPlayerKill( plr, pVictim );
-
-			if( pVictim->IsPlayer() )
-			{
-				sHookInterface.OnKillPlayer( plr, static_cast< Player* >( pVictim ) );
-				if(plr->getLevel() > pVictim->getLevel())
-				{
-					unsigned int diff = plr->getLevel() - pVictim->getLevel();
-					if( diff <= 8 )
-					{
-						HonorHandler::OnPlayerKilledUnit(plr, pVictim);
-						SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
-					}
-					else
-						RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
-				}
-				else
-				{
-					HonorHandler::OnPlayerKilledUnit( plr, pVictim );
-					SetFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
-				}
-			}
-			else
-			{
-				if (!isCritter) // REPUTATION
-				{
-					plr->Reputation_OnKilledUnit( pVictim, false );
-					RemoveFlag( UNIT_FIELD_AURASTATE, AURASTATE_FLAG_LASTKILLWITHHONOR );
-				}
-			}
-		}
-		/* -------------------------------- HONOR + BATTLEGROUND CHECKS END------------------------ */
-
 		uint64 victimGuid = pVictim->GetGUID();
 
 		if(pVictim->GetTypeId() == TYPEID_UNIT)
