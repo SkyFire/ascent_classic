@@ -6065,6 +6065,14 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 	float lastx = 0, lasty = 0, lastz = 0;
 	TaxiPathNode *firstNode = path->GetPathNode(start_node);
 	uint32 add_time = 0;
+
+	// temporary workaround for taximodes with changing map
+	if (path->GetID() == 766 || path->GetID() == 767 || path->GetID() == 771 || path->GetID() == 772)
+	{
+		JumpToEndTaxiNode(path);
+		return;
+	}
+
 	if(start_node)
 	{
 		TaxiPathNode *pn = path->GetPathNode(0);
@@ -6096,7 +6104,9 @@ void Player::TaxiStart(TaxiPath *path, uint32 modelid, uint32 start_node)
 	for(uint32 i = start_node; i < endn; ++i)
 	{
 		TaxiPathNode *pn = path->GetPathNode(i);
-		if(!pn)
+
+		// temporary workaround for taximodes with changing map
+		if (!pn || path->GetID() == 766 || path->GetID() == 767 || path->GetID() == 771 || path->GetID() == 772)
 		{
 			JumpToEndTaxiNode(path);
 			return;
@@ -6184,6 +6194,8 @@ void Player::JumpToEndTaxiNode(TaxiPath * path)
 	TaxiPathNode * pathnode = path->GetPathNode((uint32)path->GetNodeCount()-1);
 	if(!pathnode) return;
 
+	ModUnsigned32Value( PLAYER_FIELD_COINAGE , -(int32)path->GetPrice());
+
 	SetTaxiState(false);
 	SetTaxiPath(NULL);
 	UnSetTaxiPos();
@@ -6196,6 +6208,14 @@ void Player::JumpToEndTaxiNode(TaxiPath * path)
 	SetPlayerSpeed(RUN, m_runSpeed);
 
 	SafeTeleport(pathnode->mapid, 0, LocationVector(pathnode->x, pathnode->y, pathnode->z));
+
+	// Start next path if any remaining
+	if(m_taxiPaths.size())
+	{
+		TaxiPath * p = *m_taxiPaths.begin();
+		m_taxiPaths.erase(m_taxiPaths.begin());
+		TaxiStart(p, taxi_model_id, 0);
+	}
 }
 
 void Player::RemoveSpellsFromLine(uint32 skill_line)
