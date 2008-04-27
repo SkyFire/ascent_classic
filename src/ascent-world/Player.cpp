@@ -6271,6 +6271,10 @@ void Player::RegenerateHealth( bool inCombat )
 
 	float amt = (m_uint32Values[UNIT_FIELD_STAT4]*HPRegen->val+HPRegenBase->val*100)*(1+PctRegenModifier);
 	amt *= sWorld.getRate(RATE_HEALTH);//Apply shit from conf file
+	//Near values from official
+	// wowwiki: Health Regeneration is increased by 33% while sitting.
+	if(m_isResting)
+		amt = amt * 1.33f;
 
 	if(inCombat)
 		amt *= PctIgnoreRegenModifier;
@@ -8236,6 +8240,7 @@ void Player::SaveAuras(stringstream &ss)
 				skip = true;
 
 			// skipped spells due to bugs
+/*			why these should't be save??
 			switch(aur->m_spellProto->Id)
 			{
 			case 12043: // Presence of mind
@@ -8253,7 +8258,7 @@ void Player::SaveAuras(stringstream &ss)
 
 				skip = true;
 				break;
-			}
+			}*/
 
 			//disabled proc spells until proper loading is fixed. Some spells tend to block or not remove when restored
 			if(aur->GetSpellProto()->procFlags)
@@ -8918,37 +8923,42 @@ void Player::EventRemoveAndDelete()
 }
 #endif
 
-void Player::_AddSkillLine(uint32 SkillLine, uint32 Current, uint32 Max)
+void Player::_AddSkillLine(uint32 SkillLine, uint32 Curr_sk, uint32 Max_sk)
 {
+	skilllineentry * CheckedSkill = dbcSkillLine.LookupEntry(SkillLine);
+	if (!CheckedSkill) //Return is skill doesn't exist
+		return;
+
+	// force to be within limits
+	if (Curr_sk > 375)
+		Curr_sk = 375;
+	if (Curr_sk < 1)
+		Curr_sk = 1;
+
 	ItemProf * prof;
 	SkillMap::iterator itr = m_skills.find(SkillLine);
-
-	if( !Current )
-		Current = 1;
-
 	if(itr != m_skills.end())
 	{
-		if( (Current > itr->second.CurrentValue && Max >= itr->second.MaximumValue) ||
-			(Current == itr->second.CurrentValue && Max > itr->second.MaximumValue) )
+		if( (Curr_sk > itr->second.CurrentValue && Max_sk >= itr->second.MaximumValue) || (Curr_sk == itr->second.CurrentValue && Max_sk > itr->second.MaximumValue) )
 		{
-			itr->second.CurrentValue = Current;
-			itr->second.MaximumValue = Max;
-
-			if(itr->second.CurrentValue>itr->second.MaximumValue)
-				itr->second.CurrentValue=itr->second.MaximumValue;
-			_UpdateSkillFields();
+			itr->second.CurrentValue = Curr_sk;
+			itr->second.MaximumValue = Max_sk;
+			_UpdateMaxSkillCounts();
 		}
 	}
 	else
 	{
 		PlayerSkill inf;
-		inf.Skill = dbcSkillLine.LookupEntry(SkillLine);
-		inf.CurrentValue = Current;
-		inf.MaximumValue = Max;
+		inf.Skill = CheckedSkill;
+		inf.MaximumValue = Max_sk;
+		if(inf.Skill->id != SKILL_RIDING)
+			inf.CurrentValue = Curr_sk;
+		else
+			inf.CurrentValue = Max_sk;
 		inf.BonusValue = 0;
 		m_skills.insert( make_pair( SkillLine, inf ) );
 		_UpdateSkillFields();
-
+	}
 		//Add to proficiency
 		if((prof=(ItemProf *)GetProficiencyBySkill(SkillLine)))
 		{
@@ -8971,7 +8981,6 @@ void Player::_AddSkillLine(uint32 SkillLine, uint32 Current, uint32 Max)
 		// hackfix for poisons
 		if(SkillLine==SKILL_POISONS && !HasSpell(2842))
 			addSpell(2842);
-	}
 }
 
 void Player::_UpdateSkillFields()
@@ -9018,19 +9027,15 @@ void Player::_AdvanceSkillLine(uint32 SkillLine, uint32 Count /* = 1 */)
 	{
 		/* Add it */
 		_AddSkillLine(SkillLine, Count, getLevel() * 5);
+		_UpdateMaxSkillCounts();
 	}
 	else
-	{
-		/* Update it. */
-		if(itr->second.CurrentValue >= itr->second.MaximumValue)
-			return;
-
-		itr->second.CurrentValue += Count;
-		if(itr->second.CurrentValue >= itr->second.MaximumValue)
-			itr->second.CurrentValue = itr->second.MaximumValue;
+	{	
+		uint32 curr_sk = itr->second.CurrentValue;
+		itr->second.CurrentValue = min(curr_sk + Count,itr->second.MaximumValue);
+		if (itr->second.CurrentValue != curr_sk)
+			_UpdateSkillFields();
 	}
-
-	_UpdateSkillFields();
 }
 
 uint32 Player::_GetSkillLineMax(uint32 SkillLine)
@@ -9061,20 +9066,44 @@ void Player::_RemoveSkillLine(uint32 SkillLine)
 void Player::_UpdateMaxSkillCounts()
 {
 	bool dirty = false;
-	uint32 new_max = getLevel() * 5;
+	uint32 new_max;
 	for(SkillMap::iterator itr = m_skills.begin(); itr != m_skills.end(); ++itr)
 	{
-		if(itr->second.Skill->type != SKILL_TYPE_WEAPON &&
-			itr->second.Skill->id != SKILL_POISONS &&
-			itr->second.Skill->id != SKILL_LOCKPICKING)
+		if(itr->second.Skill->type == SKILL_TYPE_WEAPON || itr->second.Skill->id == SKILL_LOCKPICKING || itr->second.Skill->id == SKILL_POISONS)
 		{
-			continue;
+			new_max = 5 * getLevel();
+		}
+		else if (itr->second.Skill->type == SKILL_TYPE_LANGUAGE)
+		{
+			new_max = 300;
+		}
+		else if (itr->second.Skill->type == SKILL_TYPE_PROFESSION || itr->second.Skill->type == SKILL_TYPE_SECONDARY)
+		{
+			new_max = itr->second.MaximumValue;
+			if (new_max >= 350)
+				new_max = 375;
+		}
+		else
+		{
+			new_max = 1;
 		}
 
-        if(itr->second.MaximumValue != new_max)
+		// force to be within limits
+		if (new_max > 375)
+			new_max = 375;
+		if (new_max < 1)
+			new_max = 1;
+
+	
+		if(itr->second.MaximumValue != new_max)
 		{
 			dirty = true;
 			itr->second.MaximumValue = new_max;
+		}
+		if (itr->second.CurrentValue > new_max)
+		{
+			dirty = true;
+			itr->second.CurrentValue = new_max;
 		}
 	}
 
@@ -9516,7 +9545,7 @@ void Player::save_Auras()
 			}
 
 			// skipped spells due to bugs
-			switch(aur->m_spellProto->Id)
+/*			switch(aur->m_spellProto->Id)
 			{
 			case 12043: // Presence of mind
 			case 11129: // Combustion
@@ -9530,7 +9559,7 @@ void Player::save_Auras()
 				skip = true;
 				break;
 			}
-
+*/
 			//disabled proc spells until proper loading is fixed. Some spells tend to block or not remove when restored
 			if(aur->GetSpellProto()->procFlags)
 			{
