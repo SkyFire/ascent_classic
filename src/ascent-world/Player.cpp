@@ -718,6 +718,7 @@ bool Player::Create(WorldPacket& data )
 		if(se->type != SKILL_TYPE_LANGUAGE)
 			_AddSkillLine(se->id, ss->currentval, ss->maxval);
 	}
+	_UpdateMaxSkillCounts();
 	//Chances depend on stats must be in this order!
 //	UpdateStats();
 	//UpdateChances();
@@ -1783,21 +1784,29 @@ void Player::addSpell(uint32 spell_id)
 	if(sk && !_HasSkillLine(sk->skilline))
 	{
 		skilllineentry * skill = dbcSkillLine.LookupEntry(sk->skilline);
-		uint32 max = 5 * getLevel();
-
+		SpellEntry * spell = dbcSpell.LookupEntry(spell_id);
+		uint32 max = 1;
 		switch(skill->type)
 		{
-		case SKILL_TYPE_WEAPON:
-		case SKILL_TYPE_SECONDARY:
-		case SKILL_TYPE_LANGUAGE:
-		case SKILL_TYPE_PROFESSION:
-			return;
-		}
-
-		if(skill->type==SKILL_TYPE_PROFESSION)
-			ModUnsigned32Value(PLAYER_CHARACTER_POINTS2,-1);
+			case SKILL_TYPE_PROFESSION:
+				max=75*((spell->RankNumber)+1);
+				ModUnsigned32Value( PLAYER_CHARACTER_POINTS2, -1 ); // we are learning a proffesion, so substract a point.
+				break;
+			case SKILL_TYPE_SECONDARY:
+				max=75*((spell->RankNumber)+1);
+				break;
+			case SKILL_TYPE_WEAPON:
+				max=5*getLevel();
+				break;
+			case SKILL_TYPE_CLASS:
+			case SKILL_TYPE_ARMOR:
+				if(skill->id == SKILL_LOCKPICKING || skill->id == SKILL_POISONS)
+					max=5*getLevel();
+				break;
+		};
 
 		_AddSkillLine(sk->skilline, 1, max);
+		_UpdateMaxSkillCounts();
 	}
 }
 
