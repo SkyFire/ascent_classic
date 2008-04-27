@@ -97,8 +97,8 @@ void WorldSession::HandleQuestgiverHelloOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	if(qst_giver->GetAIInterface()) // NPC Stops moving for 3 minutes
-		qst_giver->GetAIInterface()->StopMovement(180000);
+	/*if(qst_giver->GetAIInterface()) // NPC Stops moving for 3 minutes
+		qst_giver->GetAIInterface()->StopMovement(180000);*/
 
 	//qst_giver->Emote(EMOTE_ONESHOT_TALK); // this doesnt work
 	sQuestMgr.OnActivateQuestGiver(qst_giver, GetPlayer());
