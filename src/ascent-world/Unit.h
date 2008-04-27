@@ -1140,6 +1140,8 @@ public:
 	uint32 m_special_state; //flags for special states (stunned,rooted etc)
 	
 //	uint32 fearSpell;
+	uint32 m_cTimer;
+	void EventUpdateFlag();
 	CombatStatusHandler CombatStatus;
 	bool m_temp_summon;
 

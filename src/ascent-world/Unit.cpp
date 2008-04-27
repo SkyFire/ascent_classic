@@ -745,11 +745,13 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 					{
 						case 14189: //Seal Fate
 						case 16953: //Blood Frenzy
+						case 16959: //Primal Fury
 						{
 							if( !this->IsPlayer() || 
 								!CastingSpell || 
 								CastingSpell->Id == 14189 ||
-								CastingSpell->Id == 16953 )
+								CastingSpell->Id == 16953 ||
+								CastingSpell->Id == 16959)
 								continue;
 							if( CastingSpell->Effect[0] != 80 &&
 								CastingSpell->Effect[1] != 80 &&
@@ -759,6 +761,8 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						}break;
 						case 17106: //druid intencity
 						{
+							if( CastingSpell == NULL )
+								continue;
 							if( CastingSpell->Id != 5229 )//enrage
 								continue;
 						}break;
@@ -784,6 +788,8 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
                         case 34754: //holy concentration
                         {
 
+							if( CastingSpell == NULL )
+								continue;
 							if( CastingSpell->NameHash != SPELL_HASH_FLASH_HEAL &&
 								CastingSpell->NameHash != SPELL_HASH_BINDING_HEAL &&
 								CastingSpell->NameHash != SPELL_HASH_GREATER_HEAL )
@@ -898,6 +904,23 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								continue;
 							if( CastingSpell->School != SCHOOL_FIRE )
 								continue;
+							SpellEntry* spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
+							SpellDuration* sd = dbcSpellDuration.LookupEntryForced( spellInfo->DurationIndex );
+							uint32 tickcount = GetDuration( sd ) / spellInfo->EffectAmplitude[0] ;
+							dmg_overwrite = ospinfo->EffectBasePoints[0] * dmg / (100  * tickcount );
+						}break;
+						//druid - Primal Fury
+						case 37116:
+						case 37117:
+						{
+							if (!this->IsPlayer())
+								continue;
+							Player* mPlayer = (Player*)this;
+							if (!mPlayer->IsInFeralForm() || 
+								(mPlayer->GetShapeShift() != FORM_CAT &&
+								mPlayer->GetShapeShift() != FORM_BEAR &&
+								mPlayer->GetShapeShift() != FORM_DIREBEAR))
+								continue;
 						}break;
 						//rogue - blade twisting
 						case 31125:
@@ -923,6 +946,41 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								//only trigger effect for specified spells
 								if( CastingSpell->NameHash!=SPELL_HASH_SHADOW_BOLT)//shadow bolt								
 									continue;
+							}break;
+						// warlock - Seed of Corruption
+						case 27285:
+							{
+								bool can_proc_now = false;
+								//if we proced on spell tick
+								if( flag & PROC_ON_SPELL_HIT_VICTIM )
+								{
+									if( CastingSpell == NULL )
+										continue;
+									//only trigger effect for specified spells
+									if( CastingSpell->NameHash != SPELL_HASH_SEED_OF_CORRUPTION )						
+										continue;
+									//this spell builds up in time
+									(*itr2).procCharges += dmg;
+									if( (int32)(*itr2).procCharges >= ospinfo->EffectBasePoints[ 1 ] && //if charge built up
+										dmg < (int32)this->GetUInt32Value( UNIT_FIELD_HEALTH ) ) //if this is not a killer blow
+										can_proc_now = true;
+								}
+								else can_proc_now = true; //target died
+								if( can_proc_now == false )
+									continue;
+								Unit *new_caster = victim;
+								if( new_caster && new_caster->isAlive() )
+								{
+									SpellEntry *spellInfo = dbcSpell.LookupEntry( spellId ); //we already modified this spell on server loading so it must exist
+									Spell *spell = new Spell( new_caster, spellInfo ,true, NULL );
+									SpellCastTargets targets;
+									targets.m_destX = GetPositionX();
+									targets.m_destY = GetPositionY();
+									targets.m_destZ = GetPositionZ();
+									spell->prepare(&targets);
+								}
+								(*itr2).deleted = true;
+								continue;
 							}break;
 						// warlock - Improved Drain Soul
 						case 18371:
@@ -1147,6 +1205,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 						case 15363:
 						case 14893:
 						case 15357:
+						case 15359:
 							{
 								if( !CastingSpell || !( CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING ) )
 									continue;
@@ -1189,6 +1248,16 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;//this should not ocur unless we made a fuckup somewhere
 								//only trigger effect for specified spells
 								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_DAMAGING)) //healing wave
+									continue;
+							}break;
+						//shaman - Ancestral Fortitude
+						case 16177:
+						case 16236:
+						case 16237:
+							{
+								if( CastingSpell == NULL )
+									continue;
+								if( !(CastingSpell->c_is_flags & SPELL_FLAG_IS_HEALING) ) //healing spell
 									continue;
 							}break;
 						//shaman - windfurry weapon
@@ -1443,6 +1512,7 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 									continue;
 							}break;
 						//Spell Haste Trinket
+						//http://www.wowhead.com/?item=28190 scarab of the infinite cicle
 						case 33370:
 							{
 								if( CastingSpell == NULL )
@@ -1561,8 +1631,13 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL )
 									continue;
 							}break;
-
-							//http://www.wowhead.com/?item=32488 Ashtongue Talisman of Insight
+						//http://www.wowhead.com/?item=33509  Idol of Terror
+						case 43738: //Your Mangle ability has a chance to grant 65 agility for 10 sec.
+							{
+								if (!CastingSpell || CastingSpell->NameHash != SPELL_HASH_MANGLE__BEAR_ || CastingSpell->NameHash != SPELL_HASH_MANGLE__CAT_)
+									continue;
+							}break;
+						//http://www.wowhead.com/?item=32488 Ashtongue Talisman of Insight
 						case 40483:
 							{
 								if( CastingSpell == NULL )
@@ -1584,7 +1659,12 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 								if( CastingSpell == NULL || (CastingSpell->NameHash != SPELL_HASH_MORTAL_STRIKE || CastingSpell->NameHash != SPELL_HASH_BLOODTHIRST || CastingSpell->NameHash != SPELL_HASH_SHIELD_SLAM))
 									continue; 
 							}break;
-
+						case 28804://Epiphany :Each spell you cast can trigger an Epiphany, increasing your mana regeneration by 24 for 30 sec.
+							{
+								if (!CastingSpell)
+									continue;
+							}break;
+						//SETBONUSES END
 						//item - Band of the Eternal Restorer 
 						case 35087:
 							{
@@ -1649,6 +1729,23 @@ void Unit::HandleProc( uint32 flag, Unit* victim, SpellEntry* CastingSpell, uint
 							}break;*/
 					}
 				}
+				else
+				{
+					switch( spellId )
+					{
+						case 14189: //Seal Fate
+						case 16953: //Blood Frenzy
+						case 16959: //Primal Fury
+						{
+							if( !CastingSpell || 
+								CastingSpell->Id == 14189 ||
+								CastingSpell->Id == 16953 ||
+								CastingSpell->Id == 16959 )
+								continue;
+						}break;
+					}
+				}
+
 				if(spellId==22858 && isInBack(victim)) //retatliation needs target to be not in front. Can be casted by creatures too
 					continue;
 				SpellEntry *spellInfo = dbcSpell.LookupEntry(spellId );
@@ -2579,6 +2676,7 @@ else
 				sEventMgr.ModifyEventTimeLeft( pVictim, EVENT_PARRY_FLAG_EXPIRE, 5000 );
 			if( static_cast< Player* >( pVictim )->getClass() == 1 || static_cast< Player* >( pVictim )->getClass() == 4 )//warriors for 'revenge' and rogues for 'riposte'
 			{
+				pVictim->SetFlag( UNIT_FIELD_AURASTATE,AURASTATE_FLAG_DODGE_BLOCK );	//SB@L: Enables spells requiring dodge
 				if(!sEventMgr.HasEvent( pVictim, EVENT_DODGE_BLOCK_FLAG_EXPIRE ) )
 					sEventMgr.AddEvent( pVictim, &Unit::EventAurastateExpire, (uint32)AURASTATE_FLAG_DODGE_BLOCK, EVENT_DODGE_BLOCK_FLAG_EXPIRE, 5000, 1, 0 );
 				else 
@@ -3241,6 +3339,7 @@ void Unit::smsg_AttackStop(Unit* pVictim)
 	data << uint32(0);
 	SendMessageToSet(&data, true );
 	// stop swinging, reset pvp timeout
+
 	if( pVictim->IsPlayer() )
 	{
 		pVictim->CombatStatusHandler_ResetPvPTimeout();
@@ -3248,8 +3347,18 @@ void Unit::smsg_AttackStop(Unit* pVictim)
 	}
 	else
 	{
-	pVictim->CombatStatus.RemoveAttacker(this, GetGUID());
-	CombatStatus.RemoveAttackTarget(pVictim);
+		if(!IsPlayer() || getClass() == ROGUE)
+		{
+			m_cTimer = getMSTime() + 5000;
+			sEventMgr.RemoveEvents(this, EVENT_COMBAT_TIMER); 
+			sEventMgr.AddEvent(this, &Unit::EventUpdateFlag, EVENT_COMBAT_TIMER, 5000, 1, 0);
+			sEventMgr.AddEvent(pVictim, &Unit::EventUpdateFlag, EVENT_COMBAT_TIMER, 5000, 1, 0);
+		}
+		else
+		{
+			pVictim->CombatStatus.RemoveAttacker(this, GetGUID());
+			CombatStatus.RemoveAttackTarget(pVictim);
+		}
 	}
 }
 
@@ -6049,6 +6158,11 @@ void Unit::ReplaceAIInterface(AIInterface *new_interface)
 { 
 	delete m_aiInterface;	//be carefull when you do this. Might screw unit states !
 	m_aiInterface = new_interface; 
+}
+
+void Unit::EventUpdateFlag()  
+{  
+static_cast< Player * >( this )->CombatStatus.UpdateFlag(); 
 }
 
 bool Unit::HasAurasOfNameHashWithCaster(uint32 namehash, Unit * caster)
