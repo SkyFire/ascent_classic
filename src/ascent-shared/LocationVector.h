@@ -25,7 +25,7 @@
 //////////////////////////////////////////////////////////
 
 
-SERVER_DECL class LocationVector
+class SERVER_DECL LocationVector
 {
 public:
 	// Constructors

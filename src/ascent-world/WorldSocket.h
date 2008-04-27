@@ -41,7 +41,7 @@ enum OUTPACKET_RESULT
 	OUTPACKET_RESULT_SOCKET_ERROR = 4,
 };
 
-SERVER_DECL class WorldSocket : public Socket
+class SERVER_DECL WorldSocket : public Socket
 {
 public:
 	WorldSocket(SOCKET fd);
