@@ -61,7 +61,7 @@ void BuildWeatherPacket(WorldPacket * data, uint32 Effect, float Density )
 uint32 GetSound(uint32 Effect, float Density)
 {
     uint32 sound;
-    if(Density<=0.20f)
+    if(Density<=0.30f)
 		return WEATHER_NOSOUND;
 
 	switch(Effect)
@@ -180,7 +180,7 @@ void WeatherInfo::_GenerateWeather()
 {
 	m_currentTime = 0;
 	m_currentEffect = 0;
-	m_currentDensity = 0.20f;//Starting Offset (don't go below, it's annoying fog)
+	m_currentDensity = 0.30f;//Starting Offset (don't go below, it's annoying fog)
 	float fd = RandomFloat();
 	m_maxDensity = fd+1; //1 - 2
 	m_totalTime = (RandomUInt(11) + 5)*1000*120;//update approx. every 1-2 minutes
@@ -230,7 +230,7 @@ void WeatherInfo::Update()
 	if (m_currentEffect == 0 || RandomUInt(100) < 66) 
 	{
 		m_currentDensity -= WEATHER_DENSITY_UPDATE;
-		if (m_currentDensity < 0.20f) //0.20 is considered fog, lower values are anoying
+		if (m_currentDensity < 0.30f) //0.20 is considered fog, lower values are anoying
 		{
 			m_currentDensity = 0.0f;
 			m_currentEffect = 0;
