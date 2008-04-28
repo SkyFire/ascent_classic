@@ -177,6 +177,15 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 	if( tid < 0 )
 		return;
 
+#ifdef ANTI_CHEAT
+	if(!m_started)
+	{
+		SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, plr->GetGUID(), "%s has removed from the battleground for cheating.",  plr->GetName());
+		plr->SoftDisconnect();
+		return;
+	}
+#endif
+
 	uint32 team = plr->GetTeam();
 	if( plr->GetLowGUID() != m_flagHolder )
 		return;
@@ -211,7 +220,7 @@ void EyeOfTheStorm::HookOnAreaTrigger(Player * plr, uint32 id)
 	const static uint32 points[5] = { 25, 75, 85, 100, 500 };
 	const char * msgs[2] = { "The Alliance have captured the flag.", "The Horde have captured the flag." };
 
-	SendChatMessage( 0x54, 0, msgs[team] );
+	SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE + team, 0, msgs[team] );
 	GivePoints( team, points[towers] );
 
 	m_standFlag->PushToWorld( m_mapMgr );
@@ -237,7 +246,7 @@ void EyeOfTheStorm::HookFlagDrop(Player * plr, GameObject * obj)
 
 	SetWorldState( 2757, 0 );
 	PlaySoundToAll( 8212 );
-	SendChatMessage( 0x53, plr->GetGUID(), "$n has taken the flag!" );
+	SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE + plr->GetTeam(), plr->GetGUID(), "$N has taken the flag!" );
 	m_flagHolder = plr->GetLowGUID();
 
 	event_RemoveEvents( EVENT_EOTS_RESET_FLAG );
@@ -258,7 +267,7 @@ bool EyeOfTheStorm::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell *
 
 	SetWorldState( 2757, 0 );
 	PlaySoundToAll( 8212 );
-	SendChatMessage( 0x53, pPlayer->GetGUID(), "$n has taken the flag!" );
+	SendChatMessage( CHAT_MSG_BG_EVENT_ALLIANCE + pPlayer->GetTeam(), pPlayer->GetGUID(), "$N has taken the flag!" );
 	m_flagHolder = pPlayer->GetLowGUID();
 	return true;
 }
@@ -315,7 +324,7 @@ void EyeOfTheStorm::EventResetFlag()
 
 	SetWorldState( 2757, 1 );
 	PlaySoundToAll( 8192 );
-	SendChatMessage( 0x52, 0, "The flag has been reset." );
+	SendChatMessage( CHAT_MSG_BG_EVENT_NEUTRAL, 0, "The flag has been reset." );
 	m_flagHolder = 0;
 }
 
