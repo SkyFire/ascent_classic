@@ -10178,7 +10178,7 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 #ifdef COLLISION
 void Player::_FlyhackCheck()
 {
-	if(!sWorld.antihack_flight || GetTaxiState())
+	if(!sWorld.antihack_flight || GetTaxiState() || (sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions()))
 		return;
 
 	MovementInfo * mi = GetSession()->GetMovementInfo();
@@ -10189,7 +10189,7 @@ void Player::_FlyhackCheck()
 		!(m_special_state & UNIT_STATE_CHARM || m_special_state & UNIT_STATE_FEAR || m_special_state & UNIT_STATE_ROOT || m_special_state & UNIT_STATE_STUN || m_special_state & UNIT_STATE_POLYMORPH || m_special_state & UNIT_STATE_CONFUSE || m_special_state & UNIT_STATE_FROZEN)
 		&& !flying_aura && !FlyCheat)
 	{
-		float t_height = CollideInterface.GetHeight(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ());
+		float t_height = CollideInterface.GetHeight(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ() + 2.0f);
 		if(t_height == 99999.0f || t_height == NO_WMO_HEIGHT )
 			t_height = GetMapMgr()->GetLandHeight(GetPositionX(), GetPositionY());
 			if(t_height == 99999.0f || t_height == 0.0f) // Can't rely on anyone these days...
@@ -10202,7 +10202,7 @@ void Player::_FlyhackCheck()
 		if(t_height != p_height && abs((int)(t_height - p_height)) > sWorld.flyhack_threshold)
 		{
 			// Fly hax!
-			EventTeleport(GetMapId(), GetPositionX(), GetPositionY(), t_height); // relog fix.
+			EventTeleport(GetMapId(), GetPositionX(), GetPositionY(), t_height + 2.0f); // relog fix.
 			sCheatLog.writefromsession(GetSession(), "Caught fly hacking on map %u.", GetMapId());
 			GetSession()->Disconnect();
 		}
