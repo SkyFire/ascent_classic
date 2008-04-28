@@ -10187,7 +10187,7 @@ void Player::_FlyhackCheck()
 	// Falling, CCs, etc. All stuff that could potentially trap a player in mid-air.
 	if(!(mi->flags & MOVEFLAG_FALLING) && !(mi->flags & MOVEFLAG_LEVITATE)&& !(m_special_state & UNIT_STATE_CHARM || m_special_state & UNIT_STATE_FEAR || m_special_state & UNIT_STATE_ROOT || m_special_state & UNIT_STATE_STUN || m_special_state & UNIT_STATE_POLYMORPH || m_special_state & UNIT_STATE_CONFUSE || m_special_state & UNIT_STATE_FROZEN))
 	{
-		float t_height = CollideInterface.GetHeight(GetMapId(), GetPosition());
+		float t_height = CollideInterface.GetHeight(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ());
 		if(t_height == 99999.0f || t_height == NO_WMO_HEIGHT )
 			t_height = GetMapMgr()->GetLandHeight(GetPositionX(), GetPositionY());
 			if(t_height == 99999.0f || t_height == 0.0f) // Can't rely on anyone these days...
@@ -10195,7 +10195,7 @@ void Player::_FlyhackCheck()
 
 		float p_height = GetPositionZ();
 
-		if(t_height != p_height && abs(t_height - p_height) > 10)
+		if(t_height != p_height && abs((int)(t_height - p_height)) > 10)
 		{
 			// Fly hax!
 			GetSession()->Disconnect();
