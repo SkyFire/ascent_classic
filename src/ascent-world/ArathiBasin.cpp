@@ -518,7 +518,7 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 	if(current_resources >= RESOURCES_WARNING_THRESHOLD && !m_nearingVictory[Team])
 	{
 		m_nearingVictory[Team] = true;
-		SendChatMessage(Team ? CHAT_MSG_BG_EVENT_HORDE : CHAT_MSG_BG_EVENT_ALLIANCE, (uint64)0, "The %s has gathered 1800 resources and is nearing victory!", Team ? "Horde" : "Alliance");
+		SendChatMessage(Team ? CHAT_MSG_BG_EVENT_HORDE : CHAT_MSG_BG_EVENT_ALLIANCE, (uint64)0, "The %s has gathered %u resources and is nearing victory!", Team ? "Horde" : "Alliance", current_resources);
 		uint32 sound = SOUND_ALLIANCE_BGALMOSTEND - Team;
 		PlaySoundToAll(sound);
 	}
