@@ -20,6 +20,7 @@
 #include "StdAfx.h"
 
 #define BASE_RESOURCES_GAIN 10
+#define RESOURCES_WARNING_THRESHOLD 1800
 #define RESOURCES_WINVAL 2000
 #define RESOURCES_TO_GAIN_BH 200
 #define BASE_BH_GAIN 14
@@ -446,6 +447,7 @@ ArathiBasin::ArathiBasin(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : CBa
 		m_resources[i] = 0;
 		m_capturedBases[i] = 0;
 		m_lastHonorGainResources[i] = 0;
+		m_nearingVictory[i] = false;
 	}
 }
 
@@ -512,6 +514,14 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 
 	// update the world states
 	SetWorldState(resource_fields[Team], current_resources);
+
+	if(current_resources >= RESOURCES_WARNING_THRESHOLD && !m_nearingVictory[Team])
+	{
+		m_nearingVictory[Team] = true;
+		SendChatMessage(Team ? CHAT_MSG_BG_EVENT_HORDE : CHAT_MSG_BG_EVENT_ALLIANCE, (uint64)0, "The %s has gathered 1800 resources and is nearing victory!", Team ? "Horde" : "Alliance");
+		uint32 sound = SOUND_ALLIANCE_BGALMOSTEND - Team;
+		PlaySoundToAll(sound);
+	}
 
 	// check for winning condition
 	if(current_resources == RESOURCES_WINVAL)

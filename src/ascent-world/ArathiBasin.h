@@ -65,6 +65,7 @@ protected:
 	int32 m_basesOwnedBy[AB_NUM_CONTROL_POINTS];
 	int32 m_basesAssaultedBy[AB_NUM_CONTROL_POINTS];
 	Creature * m_spiritGuides[AB_NUM_CONTROL_POINTS];
+	bool m_nearingVictory[2];
 
 public:
 	ArathiBasin(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t);
