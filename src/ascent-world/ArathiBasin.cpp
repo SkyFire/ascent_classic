@@ -750,6 +750,7 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 	{
 		SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, pPlayer->GetGUID(), "%s has been removed from the game for cheating.", pPlayer->GetName());
 		pPlayer->SoftDisconnect();
+		return;
 	}
 #endif
 
