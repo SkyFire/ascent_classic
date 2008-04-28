@@ -209,9 +209,9 @@ void ArenaTeam::Roster(WorldPacket & data)
 {
 	data.Initialize(SMSG_ARENA_TEAM_ROSTER);
 	data.reserve(m_memberCount * 81 + 9);
-	data << uint32(IdToTeamCount[m_type]);
+	data << m_id;
 	data << m_memberCount;
-	data << uint32(0);			// unk
+	data << GetPlayersPerTeam();
 
 	for(uint32 i = 0; i < m_memberCount; ++i)
 	{
@@ -222,14 +222,14 @@ void ArenaTeam::Roster(WorldPacket & data)
 			data << uint64(info->guid);
 			data << uint8( (info->m_loggedInPlayer != NULL) ? 1 : 0 );
 			data << info->name;
-			data << info->lastZone;
+			data << uint32( m_members[i].Info->guid == m_leader ? 0 : 1); // Unk
 			data << uint8( info->lastLevel );
 			data << uint8( info->cl );
 			data << m_members[i].Played_ThisWeek;
 			data << m_members[i].Won_ThisWeek;
 			data << m_members[i].Played_ThisSeason;
 			data << m_members[i].Won_ThisSeason;
-			data << uint32(0);
+			data << m_stat_rating; // (actually personal rating here /shrug)
 		}
 	}
 }
@@ -336,19 +336,16 @@ ArenaTeamMember * ArenaTeam::GetMemberByGuid(uint32 guid)
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recv_data)
 {
 	uint8 slot;
-	uint32 tcount;
+	uint32 teamId;
 	ArenaTeam * team;
-	recv_data >> tcount;
-	if(tcount <= 5)
+	recv_data >> teamId;
+	team = objmgr.GetArenaTeamById(teamId);
+	if(team)
 	{
-		slot = TeamCountToId[tcount];
-		team = _player->m_arenaTeams[slot];
-		if(team != NULL)
-		{
-			WorldPacket data(1000);
-			team->Roster(data);
-			SendPacket(&data);
-		}
+		slot = TeamCountToId[team->m_type];
+		WorldPacket data(1000);
+		team->Roster(data);
+		SendPacket(&data);
 	}
 }
 
