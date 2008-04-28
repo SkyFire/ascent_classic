@@ -5240,28 +5240,14 @@ void Spell::SpellEffectSkill(uint32 i)
 {
 	// Used by professions only
 	// Effect should be renamed in RequireSkill
-	if(!p_caster)
+
+	if ( !p_caster || p_caster->_GetSkillLineMax(m_spellInfo->EffectMiscValue[i]) >= uint32( damage * 75 ) )
 		return;
-
-	//uint32 skillid=m_spellInfo->EffectMiscValue[i];
-	//if(skillid==SKILL_FISHING)return;
-
-	uint32 val = damage * 75;
-	if( val > 350 )
-		val = 350;
-
-	if( p_caster->_GetSkillLineMax(m_spellInfo->EffectMiscValue[i]) >= val )
-		return;
-
-	if( m_spellInfo->EffectMiscValue[i] == SKILL_RIDING )
-		p_caster->_AddSkillLine( m_spellInfo->EffectMiscValue[i], val, val );
+	
+	if ( p_caster->_HasSkillLine( m_spellInfo->EffectMiscValue[i]) )
+		p_caster->_ModifySkillMaximum( m_spellInfo->EffectMiscValue[i], uint32( damage * 75 ) );
 	else
-	{
-		if( p_caster->_HasSkillLine(m_spellInfo->EffectMiscValue[i]) )
-			p_caster->_ModifySkillMaximum(m_spellInfo->EffectMiscValue[i], val);
-		else
-			p_caster->_AddSkillLine( m_spellInfo->EffectMiscValue[i], 1, val);
-	}
+		p_caster->_AddSkillLine( m_spellInfo->EffectMiscValue[i], 1, uint32( damage * 75 ) );
 }
 
 void Spell::SpellEffectApplyPetAura(uint32 i)

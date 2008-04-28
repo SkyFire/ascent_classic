@@ -8946,14 +8946,12 @@ void Player::EventRemoveAndDelete()
 void Player::_AddSkillLine(uint32 SkillLine, uint32 Curr_sk, uint32 Max_sk)
 {
 	skilllineentry * CheckedSkill = dbcSkillLine.LookupEntry(SkillLine);
-	if (!CheckedSkill) //Return is skill doesn't exist
+	if (!CheckedSkill) //skill doesn't exist, exit here
 		return;
 
 	// force to be within limits
-	if (Curr_sk > 375)
-		Curr_sk = 375;
-	if (Curr_sk < 1)
-		Curr_sk = 1;
+	Curr_sk = ( Curr_sk > 375 ? 375 : ( Curr_sk <1 ? 1 : Curr_sk ) );
+	Max_sk = ( Max_sk > 375 ? 375 : Max_sk );
 
 	ItemProf * prof;
 	SkillMap::iterator itr = m_skills.find(SkillLine);
@@ -8971,36 +8969,34 @@ void Player::_AddSkillLine(uint32 SkillLine, uint32 Curr_sk, uint32 Max_sk)
 		PlayerSkill inf;
 		inf.Skill = CheckedSkill;
 		inf.MaximumValue = Max_sk;
-		if(inf.Skill->id != SKILL_RIDING)
-			inf.CurrentValue = Curr_sk;
-		else
-			inf.CurrentValue = Max_sk;
+		inf.CurrentValue = ( inf.Skill->id != SKILL_RIDING ? Curr_sk : Max_sk );
 		inf.BonusValue = 0;
 		m_skills.insert( make_pair( SkillLine, inf ) );
 		_UpdateSkillFields();
 	}
-		//Add to proficiency
-		if((prof=(ItemProf *)GetProficiencyBySkill(SkillLine)))
+	//Add to proficiency
+	if((prof=(ItemProf *)GetProficiencyBySkill(SkillLine)))
+	{
+		packetSMSG_SET_PROFICICENCY pr;
+		pr.ItemClass = prof->itemclass;
+		if(prof->itemclass==4)
 		{
-			packetSMSG_SET_PROFICICENCY pr;
-			pr.ItemClass = prof->itemclass;
-            if(prof->itemclass==4)
-            {
-                armor_proficiency|=prof->subclass;
-                //SendSetProficiency(prof->itemclass,armor_proficiency);
+				armor_proficiency|=prof->subclass;
+				//SendSetProficiency(prof->itemclass,armor_proficiency);
 				pr.Profinciency = armor_proficiency;
-            }else
-            {
-                weapon_proficiency|=prof->subclass;
-                //SendSetProficiency(prof->itemclass,weapon_proficiency);
+		}
+		else
+		{
+				weapon_proficiency|=prof->subclass;
+				//SendSetProficiency(prof->itemclass,weapon_proficiency);
 				pr.Profinciency = weapon_proficiency;
-            }
-			m_session->OutPacket( SMSG_SET_PROFICIENCY, sizeof( packetSMSG_SET_PROFICICENCY ), &pr );
-    	}
+		}
+		m_session->OutPacket( SMSG_SET_PROFICIENCY, sizeof( packetSMSG_SET_PROFICICENCY ), &pr );
+	}
 
-		// hackfix for poisons
-		if(SkillLine==SKILL_POISONS && !HasSpell(2842))
-			addSpell(2842);
+	// hackfix for poisons
+	if(SkillLine==SKILL_POISONS && !HasSpell(2842))
+		addSpell(2842);
 }
 
 void Player::_UpdateSkillFields()
@@ -9270,6 +9266,9 @@ void Player::_AdvanceAllSkills(uint32 count)
 
 void Player::_ModifySkillMaximum(uint32 SkillLine, uint32 NewMax)
 {
+	// force to be within limits
+	NewMax = ( NewMax > 375 ? 375 : NewMax );
+
 	SkillMap::iterator itr = m_skills.find(SkillLine);
 	if(itr == m_skills.end())
 		return;
