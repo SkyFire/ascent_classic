@@ -711,6 +711,7 @@ private:
 	uint32 instanceId;
 	uint8 _updatecount;
 public:
+	ASCENT_INLINE MovementInfo* GetMovementInfo() { return &movement_info; }
 	static void InitPacketHandlerTable();
 	uint32 floodLines;
 	time_t floodTime;

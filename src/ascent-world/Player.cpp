@@ -402,6 +402,9 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	m_changingMaps = true;
 	m_outStealthDamageBonusPct = m_outStealthDamageBonusPeriod = m_outStealthDamageBonusTimer = 0;
 	m_vampiricEmbrace = m_vampiricTouch = 0;
+#ifdef COLLISION
+	m_flyhackCheckTimer = 0;
+#endif
 }
 
 void Player::OnLogin()
@@ -914,6 +917,14 @@ void Player::Update( uint32 p_time )
 		_SpeedhackCheck( mstime );
 		m_speedhackCheckTimer = mstime + 1000;
 	}
+
+#ifdef COLLISION
+	if( mstime >= m_flyhackCheckTimer )
+	{
+		_FlyhackCheck();
+		m_flyhackCheckTimer = mstime + 10000; 
+	}
+#endif
 }
 
 void Player::EventDismount(uint32 money, float x, float y, float z)
@@ -10163,6 +10174,35 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 
 	} while ( result->NextRow( ) );
 }
+
+#ifdef COLLISION
+void Player::_FlyhackCheck()
+{
+	if(!sWorld.antihack_flight || GetTaxiState())
+		return;
+
+	MovementInfo * mi = GetSession()->GetMovementInfo();
+	if(!mi) return; //wtf?
+
+	// Falling, CCs, etc. All stuff that could potentially trap a player in mid-air.
+	if(!(mi->flags & MOVEFLAG_FALLING) && !(mi->flags & MOVEFLAG_LEVITATE)&& !(m_special_state & UNIT_STATE_CHARM || m_special_state & UNIT_STATE_FEAR || m_special_state & UNIT_STATE_ROOT || m_special_state & UNIT_STATE_STUN || m_special_state & UNIT_STATE_POLYMORPH || m_special_state & UNIT_STATE_CONFUSE || m_special_state & UNIT_STATE_FROZEN))
+	{
+		float t_height = CollideInterface.GetHeight(GetMapId(), GetPosition());
+		if(t_height == 99999.0f || t_height == NO_WMO_HEIGHT )
+			t_height = GetMapMgr()->GetLandHeight(GetPositionX(), GetPositionY());
+			if(t_height == 99999.0f || t_height == 0.0f) // Can't rely on anyone these days...
+				return;
+
+		float p_height = GetPositionZ();
+
+		if(t_height != p_height && abs(t_height - p_height) > 10)
+		{
+			// Fly hax!
+			GetSession()->Disconnect();
+		}
+	}
+}
+#endif
 
 void Player::_SpeedhackCheck(uint32 mstime)
 {

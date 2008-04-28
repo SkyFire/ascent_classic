@@ -1841,6 +1841,10 @@ public:
 	map<uint32, uint32> m_forcedReactions;
 
 	uint32 m_speedhackCheckTimer;
+#ifdef COLLISION
+	uint32 m_flyhackCheckTimer;
+	void _FlyhackCheck();
+#endif
 	void _SpeedhackCheck(uint32 mstime);		// save a call to getMSTime() yes i am a stingy bastard
 
 	bool m_passOnLoot;
