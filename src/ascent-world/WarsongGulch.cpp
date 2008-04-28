@@ -284,6 +284,14 @@ void WarsongGulch::ReturnFlag(uint32 team)
 
 void WarsongGulch::HookFlagStand(Player * plr, GameObject * obj)
 {
+#ifdef ANTI_CHEAT
+	if(!m_started)
+	{
+		SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, plr->GetGUID(), "%s has been removed from the game for cheating!", plr->GetName());
+		plr->SoftDisconnect();
+		return;
+	}
+#endif
 	if(m_flagHolders[plr->GetTeam()] || m_homeFlags[plr->GetTeam()] != obj)
 	{
 		// cheater!

@@ -20,6 +20,8 @@
 #ifndef __BATTLEGROUNDMGR_H
 #define __BATTLEGROUNDMGR_H
 
+#define ANTI_CHEAT
+
 class CBattleground;
 class MapMgr;
 class Player;
