@@ -10197,13 +10197,15 @@ void Player::_FlyhackCheck()
 
 		float p_height = GetPositionZ();
 
+		int32 diff = p_height - t_height;
+		if(diff < 0)
+			diff = -diff;
 
-
-		if(t_height != p_height && abs((int)(t_height - p_height)) > sWorld.flyhack_threshold)
+		if(t_height != p_height && (uint32)diff > sWorld.flyhack_threshold)
 		{
 			// Fly hax!
 			EventTeleport(GetMapId(), GetPositionX(), GetPositionY(), t_height + 2.0f); // relog fix.
-			sCheatLog.writefromsession(GetSession(), "Caught fly hacking on map %u.", GetMapId());
+			sCheatLog.writefromsession(GetSession(), "Caught fly hacking on map %u hovering %u over the terrain.", GetMapId(), diff);
 			GetSession()->Disconnect();
 		}
 	}
