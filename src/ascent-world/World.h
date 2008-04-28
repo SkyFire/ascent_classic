@@ -497,6 +497,7 @@ public:
 	bool antihack_teleport;
 	bool antihack_speed;
 	bool antihack_flight;
+	uint32 flyhack_threshold;
 	bool no_antihack_on_gm;
 
 	void CharacterEnumProc(QueryResultVector& results, uint32 AccountId);
