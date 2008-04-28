@@ -10185,7 +10185,9 @@ void Player::_FlyhackCheck()
 	if(!mi) return; //wtf?
 
 	// Falling, CCs, etc. All stuff that could potentially trap a player in mid-air.
-	if(!(mi->flags & MOVEFLAG_FALLING) && !(mi->flags & MOVEFLAG_LEVITATE)&& !(m_special_state & UNIT_STATE_CHARM || m_special_state & UNIT_STATE_FEAR || m_special_state & UNIT_STATE_ROOT || m_special_state & UNIT_STATE_STUN || m_special_state & UNIT_STATE_POLYMORPH || m_special_state & UNIT_STATE_CONFUSE || m_special_state & UNIT_STATE_FROZEN))
+	if(!(mi->flags & MOVEFLAG_FALLING) && !(mi->flags & MOVEFLAG_LEVITATE)&& 
+		!(m_special_state & UNIT_STATE_CHARM || m_special_state & UNIT_STATE_FEAR || m_special_state & UNIT_STATE_ROOT || m_special_state & UNIT_STATE_STUN || m_special_state & UNIT_STATE_POLYMORPH || m_special_state & UNIT_STATE_CONFUSE || m_special_state & UNIT_STATE_FROZEN)
+		&& !flying_aura && !FlyCheat)
 	{
 		float t_height = CollideInterface.GetHeight(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ());
 		if(t_height == 99999.0f || t_height == NO_WMO_HEIGHT )
