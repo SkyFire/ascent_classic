@@ -1554,7 +1554,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 	if( pVictim->IsSpiritHealer() )
 		return;
 
-	if( pVictim->IsUnit() && pVictim != this )
+	if( this->IsUnit() && pVictim->IsUnit() && pVictim != this )
 	{
 		// Set our attack target to the victim.
 		static_cast< Unit* >( this )->CombatStatus.OnDamageDealt( pVictim );
