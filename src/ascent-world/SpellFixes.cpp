@@ -16416,6 +16416,11 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
 
+		// rogue - shadowstep
+		sp = dbcSpell.LookupEntryForced( 36554 );
+		if( sp != NULL )
+			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+
 		//rogue - Mace Specialization.
 		sp = dbcSpell.LookupEntryForced( 13709 ); 
 		if( sp != NULL )
