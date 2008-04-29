@@ -948,10 +948,6 @@ void Object::AddToWorld()
 	if(!mapMgr)
 		return; //instance add failed
 
-	// don't add players into afull battleground
-	if( m_objectTypeId == TYPEID_PLAYER && mapMgr->m_battleground && mapMgr->m_battleground->IsFull() )
-		return;
-
 	m_mapMgr = mapMgr;
 	m_inQueue = true;
 
