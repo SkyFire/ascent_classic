@@ -13,11 +13,11 @@
 #include "SocketDefines.h"
 #ifdef CONFIG_USE_KQUEUE
 
-#define SOCKET_HOLDER_SIZE 1024    // You don't want this number to be too big, otherwise you're gonna be eating
+#define SOCKET_HOLDER_SIZE 30000    // You don't want this number to be too big, otherwise you're gonna be eating
                                     // memory. 65536 = 256KB, so thats no big issue for now, and I really can't
                                     // see anyone wanting to have more than 65536 concurrent connections.
 
-#define THREAD_EVENT_SIZE 1024      // This is the number of socket events each thread can receieve at once.
+#define THREAD_EVENT_SIZE 4096      // This is the number of socket events each thread can receieve at once.
                                     // This default value should be more than enough.
 
 class Socket;
