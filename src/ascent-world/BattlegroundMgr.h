@@ -197,7 +197,6 @@ public:
 	set<Player*> m_players[2];
 	void Lock() { m_mainLock.Acquire(); }
 	void Unlock() { m_mainLock.Release(); }
-
 protected:
 	/* World States. This should be moved to mapmgr instead for world pvp :/ */
 	map<uint32, uint32> m_worldStates;
@@ -257,7 +256,7 @@ public:
 	ASCENT_INLINE uint32 GetId() { return m_id; }
 	ASCENT_INLINE uint32 GetLevelGroup() { return m_levelGroup; }
 	ASCENT_INLINE MapMgr* GetMapMgr() { return m_mapMgr; }
-
+	
 	/* Creating a battleground requires a pre-existing map manager */
 	CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 type);
 	virtual ~CBattleground();

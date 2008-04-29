@@ -732,7 +732,10 @@ void CBattleground::OnPlayerPushed(Player * plr)
 	plr->ProcessPendingUpdates();
 	
 	if( plr->GetGroup() == NULL )
-		m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
+	{
+		if ( plr->m_isGmInvisible == false ) //do not join invisible gm's into bg groups.
+			m_groups[plr->m_bgTeam]->AddMember( plr->m_playerInfo );
+	}
 }
 
 void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
@@ -755,10 +758,13 @@ void CBattleground::PortPlayer(Player * plr, bool skip_teleport /* = false*/)
 	}
 
 	plr->SetTeam(plr->m_bgTeam);
-	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
-	data << plr->GetGUID();
-	DistributePacketToAll(&data);
-
+	if ( plr->m_isGmInvisible == false )
+	{
+		//Do not let everyone know an invisible gm has joined.
+		WorldPacket data(SMSG_BATTLEGROUND_PLAYER_JOINED, 8);
+		data << plr->GetGUID();
+		DistributePacketToAll(&data);
+	}
 	m_players[plr->m_bgTeam].insert(plr);
 
 	/* remove from any auto queue remove events */
@@ -1058,10 +1064,13 @@ void CBattleground::RemovePlayer(Player * plr, bool logout)
 {
 	WorldPacket data(SMSG_BATTLEGROUND_PLAYER_LEFT, 30);
 	data << plr->GetGUID();
-
+	if ( plr->m_isGmInvisible == false )
+	{
+		//Dont show invisble gm's leaving the game.
+		DistributePacketToAll(&data);
+	}
 	m_mainLock.Acquire();
 	m_players[plr->m_bgTeam].erase(plr);
-	DistributePacketToAll(&data);
 
 	memset(&plr->m_bgScore, 0, sizeof(BGScore));
 	OnRemovePlayer(plr);
