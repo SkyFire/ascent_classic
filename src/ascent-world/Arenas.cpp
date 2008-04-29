@@ -504,6 +504,8 @@ void Arena::HookOnAreaTrigger(Player * plr, uint32 id)
 
 void Player::FullHPMP()
 {
+	if(isDead())
+		ResurrectPlayer();
     SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH));
     SetUInt32Value(UNIT_FIELD_POWER1, GetUInt32Value(UNIT_FIELD_MAXPOWER1));
     SetUInt32Value(UNIT_FIELD_POWER4, GetUInt32Value(UNIT_FIELD_MAXPOWER4));
