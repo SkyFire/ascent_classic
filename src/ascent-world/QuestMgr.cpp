@@ -1028,6 +1028,8 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 			    spe->prepare(&tgt);
 		    }
 	    }
+
+		plr->ModUnsigned32Value(PLAYER_FIELD_COINAGE, qst->reward_money);
     }
     else
     {
