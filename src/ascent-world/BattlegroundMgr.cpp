@@ -661,17 +661,17 @@ void CBattleground::BuildPvPUpdateDataPacket(WorldPacket * data)
 				// would this be correct?
 				if( Rated() )
 				{
-					data << uint8((*itr)->m_bgTeam);
+					*data << uint8((*itr)->m_bgTeam);
 				}
 				else
 				{
-					data << uint32(0);		// w
-					data << uint32(0);		// t
-					data << uint32(0);		// f
+					*data << uint32(0);		// w
+					*data << uint32(0);		// t
+					*data << uint32(0);		// f
 				}
 
-				data << uint32(1);			// count of values after this
-				data << uint32(bs->Misc1);	// rating change
+				*data << uint32(1);			// count of values after this
+				*data << uint32(bs->Misc1);	// rating change
 			}
 		}
 	}
