@@ -4067,6 +4067,8 @@ void Spell::SendHealManaSpellOnPlayer(Object * caster, Object * target, uint32 d
 
 void Spell::Heal(int32 amount, bool ForceCrit)
 {
+	int32 base_amount = amount; //store base_amount for later use
+
 	if(!unitTarget || !unitTarget->isAlive())
 		return;
 	
@@ -4221,12 +4223,27 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 	// add threat
 	if( u_caster != NULL )
 	{
-		uint32 base_threat=Spell::GetBaseThreat(amount);
+		//preventing overheal ;)
+		if( (curHealth + base_amount) >= maxHealth )
+			base_amount = maxHealth - curHealth;
+
+		uint32 base_threat=GetBaseThreat(base_amount);
 		int count = 0;
 		Unit *unit;
 		std::vector<Unit*> target_threat;
 		if(base_threat)
 		{
+			/* 
+			http://www.wowwiki.com/Threat
+			Healing threat is global, and is normally .5x of the amount healed.
+			Healing effects cause no threat if the target is already at full health.
+
+			Example: Player 1 is involved in combat with 5 mobs. Player 2 (priest) heals Player 1 for 1000 health,
+			and has no threat reduction talents. A 1000 heal generates 500 threat,
+			however that 500 threat is split amongst the 5 mobs.
+			Each of the 5 mobs now has 100 threat towards Player 2.
+			*/
+
 			target_threat.reserve(u_caster->GetInRangeCount()); // this helps speed
 
 			for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
@@ -4240,16 +4257,12 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 					++count;
 				}
 			}
-			if(count == 0)
-				count = 1;  // division against 0 protection
-			/* 
-			When a tank hold multiple mobs, the threat of a heal on the tank will be split between all the mobs.
-			The exact formula is not yet known, but it is more than the Threat/number of mobs.
-			So if a tank holds 5 mobs and receives a heal, the threat on each mob will be less than Threat(heal)/5.
-			Current speculation is Threat(heal)/(num of mobs *2)
-			*/
+			count = ( count == 0 ? 1 : count );  // division against 0 protection
+
+			// every unit on threatlist should get 1/2 the threat, divided by size of list
 			uint32 threat = base_threat / (count * 2);
-				
+
+			// update threatlist (HealReaction)
 			for(std::vector<Unit*>::iterator itr = target_threat.begin(); itr != target_threat.end(); ++itr)
 			{
 				// for now we'll just use heal amount as threat.. we'll prolly need a formula though
@@ -4259,10 +4272,10 @@ void Spell::Heal(int32 amount, bool ForceCrit)
 					doneTarget = 1;
 			}
 		}
-
+		// remember that we healed (for combat status)
 		if(unitTarget->IsInWorld() && u_caster->IsInWorld())
 			u_caster->CombatStatus.WeHealed(unitTarget);
-	}   
+	}
 }
 
 void Spell::DetermineSkillUp(uint32 skillid,uint32 targetlevel)
