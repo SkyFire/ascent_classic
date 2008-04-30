@@ -2012,7 +2012,7 @@ bool ChatHandler::HandleIPBanCommand(const char * args, WorldSession * m_session
 	}
 	SystemMessage(m_session, "Adding [%s] to IP ban table, expires %s", pIp, (expire_time == 0)? "Never" : ctime( &expire_time ));
 	sLogonCommHandler.IPBan_Add( pIp, (uint32)expire_time );
-	sWorld.DisconnectUsersWithIP(pIp, m_session);
+	sWorld.DisconnectUsersWithIP(IP.substr(0,IP.find("/")).c_str(), m_session);
 	sGMLog.writefromsession(m_session, "banned ip address %s, expires %s", pIp, (expire_time == 0)? "Never" : ctime( &expire_time ));
 	return true;
 }
