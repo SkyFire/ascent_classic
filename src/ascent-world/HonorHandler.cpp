@@ -191,7 +191,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 				{
 					Group * pGroup = plr->GetGroup();
 					uint32 groups = pGroup->GetSubGroupCount();
-					for(int i = 0; i < groups; i++)
+					for(uint32 i = 0; i < groups; i++)
 					{
 						SubGroup * sg = pGroup->GetSubGroup(i);
 						if(!sg) continue;
