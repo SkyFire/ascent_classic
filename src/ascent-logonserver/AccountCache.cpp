@@ -131,7 +131,13 @@ void AccountMgr::AddAccount(Field* field)
 		acct->forcedLocale = false;
 
     acct->Muted = field[8].GetUInt32();
-
+	if (UNIXTIME > acct->Muted && acct->Muted != 0 && acct->Muted != 1) //1 = perm ban?
+	{
+		//Accounts should be unbanned once the date is past their set expiry date.
+		acct->Muted= 0;
+		//sLog.outDebug("Account %s's mute has expired.",acct->UsernamePtr->c_str());
+		sLogonSQL->Execute("UPDATE accounts SET muted = 0 WHERE acct=%u",acct->AccountId);
+	}
 	// Convert username/password to uppercase. this is needed ;)
 	ASCENT_TOUPPER(Username);
 	ASCENT_TOUPPER(Password);
@@ -202,7 +208,13 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 		acct->forcedLocale = false;
 
 	acct->Muted = field[8].GetUInt32();
-
+	if (UNIXTIME > acct->Muted && acct->Muted != 0 && acct->Muted != 1) //1 = perm ban?
+	{
+		//Accounts should be unbanned once the date is past their set expiry date.
+		acct->Muted= 0;
+		sLog.outDebug("Account %s's mute has expired.",acct->UsernamePtr->c_str());
+		sLogonSQL->Execute("UPDATE accounts SET muted = 0 WHERE acct=%u",acct->AccountId);
+	}
 	// Convert username/password to uppercase. this is needed ;)
 	ASCENT_TOUPPER(Username);
 	ASCENT_TOUPPER(Password);
