@@ -2019,12 +2019,15 @@ bool ChatHandler::HandleIPBanCommand(const char * args, WorldSession * m_session
 
 bool ChatHandler::HandleIPUnBanCommand(const char * args, WorldSession * m_session)
 {
-	char ip[16] = {0};		// IPv4 address
-
-	// we require at least one argument, the network address to unban
-	if ( sscanf(args, "%15s", ip) < 1)
+	string pIp = args;
+	if (pIp.length() == 0)
 		return false;
 
+	if (pIp.find("/") == string::npos)
+	{
+		RedSystemMessage(m_session, "Lack of CIDR address assumes a 32bit match (if you don't understand, dont worry, it worked)");
+		pIp.append("/32");
+	}
 	/**
 	 * We can afford to be less fussy with the validty of the IP address given since
 	 * we are only attempting to remove it.
@@ -2032,12 +2035,11 @@ bool ChatHandler::HandleIPUnBanCommand(const char * args, WorldSession * m_sessi
 	 * no idea if the address existed and so the account/IPBanner cache requires reloading.
 	 */
 
-	SystemMessage(m_session, "Removing [%s] from IP ban table if it exists", ip);
-	sLogonCommHandler.IPBan_Remove( ip );
-	sGMLog.writefromsession(m_session, "unbanned ip address %s", ip);
+	SystemMessage(m_session,"Deleting [%s] from ip ban table if it exists",pIp.c_str());
+	sLogonCommHandler.IPBan_Remove( pIp.c_str() );
+	sGMLog.writefromsession(m_session, "unbanned ip address %s", pIp.c_str());
 	return true;
 }
-
 bool ChatHandler::HandleCreatureSpawnCommand(const char *args, WorldSession *m_session)
 {
 	uint32 entry = atol(args);
