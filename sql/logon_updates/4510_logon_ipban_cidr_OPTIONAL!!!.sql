@@ -1,0 +1,1 @@
+UPDATE ipbans SET ip = CONCAT( IP, "/32" ) ;
