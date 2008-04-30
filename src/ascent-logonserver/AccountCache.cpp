@@ -343,7 +343,7 @@ void IPBanner::Reload()
 			ipb.Bytes = ipmask;
 			ipb.Mask = ipraw;
 			ipb.Expire = result->Fetch()[1].GetUInt32();
-
+			ipb.db_ip = ip;
 			banList.push_back(ipb);
 
 		} while (result->NextRow());
