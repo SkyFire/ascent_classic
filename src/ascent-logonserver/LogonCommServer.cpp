@@ -499,7 +499,7 @@ void LogonCommServerSocket::HandleDatabaseModify(WorldPacket& recvData)
 			recvData >> ip;
 
 			if( sIPBanner.Remove( ip.c_str() ) )
-				sLogonSQL->Execute("DELETE FROM ipbans WHERE ip = \"%s\")", sLogonSQL->EscapeString(ip).c_str());
+				sLogonSQL->Execute("DELETE FROM ipbans WHERE ip = \"%s\"", sLogonSQL->EscapeString(ip).c_str());
 
 		}break;
 
