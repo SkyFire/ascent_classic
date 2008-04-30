@@ -10184,7 +10184,7 @@ void Player::_LoadPlayerCooldowns(QueryResult * result)
 #ifdef COLLISION
 void Player::_FlyhackCheck()
 {
-	if(!sWorld.antihack_flight || GetTaxiState() || (sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions()))
+	if(!sWorld.antihack_flight || m_TransporterGUID != 0 || GetTaxiState() || (sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions()))
 		return;
 
 	MovementInfo * mi = GetSession()->GetMovementInfo();
