@@ -333,7 +333,9 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	{
 		if( _player->m_isMoving )
 		{
+#ifdef _DEBUG
 			printf("MOVING: FALSE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
+#endif
 			mstime_s = getMSTime();
 			_player->_SpeedhackCheck(mstime_s);
 			_player->m_isMoving = false;
@@ -344,7 +346,9 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	{
 		if( !_player->m_isMoving )
 		{
+#ifdef _DEBUG
 			printf("MOVING: TRUE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
+#endif
 			mstime_s = getMSTime();
 			_player->m_isMoving = true;
 			_player->_startMoveTime = mstime_s;
