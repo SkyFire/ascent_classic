@@ -116,7 +116,7 @@ void LogonConsole::ProcessCmd(char *cmd)
 		{"?", &LogonConsole::TranslateHelp}, {"help", &LogonConsole::TranslateHelp},
 		{ "reload", &LogonConsole::ReloadAccts},
 		{ "rehash", &LogonConsole::TranslateRehash},
-		{"quit", &LogonConsole::TranslateQuit}, {"exit", &LogonConsole::TranslateQuit}, 
+		{"shutdown", &LogonConsole::TranslateQuit}, {"exit", &LogonConsole::TranslateQuit}, 
 	};
 
 	char cmd2[80];
@@ -168,7 +168,7 @@ void LogonConsole::ProcessHelp(char *command)
 		sLog.outString("Console:--------help--------");
 		sLog.outString("   help, ?: print this text");
 		sLog.outString("   reload: reloads accounts");
-		sLog.outString("   quit, exit: close program");
+		sLog.outString("   shutdown, exit: close program");
 	}
 }
 //------------------------------------------------------------------------------
