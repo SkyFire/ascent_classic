@@ -280,9 +280,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				}
 				else
 				{
-					CALL_SCRIPT_EVENT(m_Unit, OnCombatStop)(UnitToFollow);
 					m_AIState = STATE_EVADE;
 
+					Unit* SavedFollow = UnitToFollow;
 					UnitToFollow = NULL;
 					FollowDistance = 0.0f;
 					m_lastFollowX = m_lastFollowY = 0;
@@ -306,6 +306,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 						aiowner->SetUInt32Value(UNIT_DYNAMIC_FLAGS,aiowner->GetUInt32Value(UNIT_DYNAMIC_FLAGS) & ~(U_DYN_FLAG_TAGGED_BY_OTHER |U_DYN_FLAG_LOOTABLE));
 						aiowner->m_lootMethod = -1;
 					}
+					CALL_SCRIPT_EVENT(m_Unit, OnCombatStop)(SavedFollow);
 				}
 
 				if(m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
