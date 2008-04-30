@@ -108,6 +108,13 @@ void AccountMgr::AddAccount(Field* field)
 	acct->AccountId				= field[0].GetUInt32();
 	acct->AccountFlags			= field[5].GetUInt8();
 	acct->Banned				= field[6].GetUInt32();
+	if (UNIXTIME > acct->Banned && acct->Banned != 0)
+	{
+		//Accounts should be unbanned once the date is past their set expiry date.
+		acct->Banned = 0;
+		sLog.outDebug("Account %s's ban has expired.",acct->UsernamePtr->c_str());
+		sLogonSQL->Execute("UPDATE accounts SET banned = 0 WHERE acct=%u",acct->AccountId);
+	}
 	acct->SetGMFlags(GMFlags.c_str());
 	acct->Locale[0] = 'e';
 	acct->Locale[1] = 'n';
