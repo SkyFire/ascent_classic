@@ -305,6 +305,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 	// spell cancel on movement, for now only fishing is added
 	Object * t_go = _player->m_SummonedObject;
+	uint32 mstime_s;
 	if (t_go)
 	{
 		if (t_go->GetEntry() == GO_FISHING_BOBBER)
@@ -328,15 +329,27 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		|| recv_data.GetOpcode() == MSG_MOVE_STOP_STRAFE 
 		|| recv_data.GetOpcode() == MSG_MOVE_STOP_TURN 
 		|| recv_data.GetOpcode() == MSG_MOVE_FALL_LAND
-		|| !( recv_data.GetOpcode() == MSG_MOVE_SET_FACING && movement_info.flags & MOVEFLAG_MOVING_MASK ) )
+		|| ( recv_data.GetOpcode() == MSG_MOVE_SET_FACING && !(movement_info.flags & MOVEFLAG_MOVING_MASK) ) )
 	{
-		//printf("MOVING: FALSE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
-		_player->m_isMoving = false;
+		if( _player->m_isMoving )
+		{
+			printf("MOVING: FALSE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
+			mstime_s = getMSTime();
+			_player->_SpeedhackCheck(mstime_s);
+			_player->m_isMoving = false;
+			_player->_startMoveTime = 0;
+		}
 	}
 	else
 	{
-		//printf("MOVING: TRUE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
-		_player->m_isMoving = true;
+		if( !_player->m_isMoving )
+		{
+			printf("MOVING: TRUE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
+			mstime_s = getMSTime();
+			_player->m_isMoving = true;
+			_player->_startMoveTime = mstime_s;
+			_player->_lastHeartbeatPosition = _player->GetPosition();
+		}
 	}
 
 	/************************************************************************/

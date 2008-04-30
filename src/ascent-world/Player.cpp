@@ -385,6 +385,7 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	m_lfgInviterGuid = 0;
 	m_mountCheckTimer = 0;
 	m_taxiMapChangeNode = 0;
+	_startMoveTime = 0;
 	this->OnLogin();
 
 #ifdef ENABLE_COMPRESSED_MOVEMENT
@@ -3238,7 +3239,12 @@ void Player::ResetHeartbeatCoords()
 {
 	_lastHeartbeatPosition = m_position;
 	_lastHeartbeatV = m_runSpeed;
-	_lastHeartbeatT = getMSTime();
+	if( m_isMoving )
+		_startMoveTime = getMSTime();
+	else
+		_startMoveTime = 0;
+
+	//_lastHeartbeatT = getMSTime();
 }
 
 void Player::RemoveFromWorld()
@@ -10214,22 +10220,26 @@ void Player::_FlyhackCheck()
 
 void Player::_SpeedhackCheck(uint32 mstime)
 {
-	if( sWorld.antihack_speed && !GetTaxiState() )
+	if( sWorld.antihack_speed && !GetTaxiState() && m_isMoving )
 	{
 		if( ( sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions() ) )
 			return; // do not check GMs speed been the config tells us not to.
-		if( m_position == _lastHeartbeatPosition && m_isMoving )
+		/*if( m_position == _lastHeartbeatPosition && m_isMoving )
 		{
 			// this means the client is probably lagging. don't update the timestamp, don't do anything until we start to receive
 			// packets again (give the poor laggers a chance to catch up)
 			return;
-		}
+		}*/
 
 		// simplified; just take the fastest speed. less chance of fuckups too
 		float speed = ( flying_aura ) ? m_flySpeed : ( m_swimSpeed > m_runSpeed ) ? m_swimSpeed : m_runSpeed;
 		if( speed != _lastHeartbeatV )
 		{
-			_lastHeartbeatT = mstime;
+			if( m_isMoving )
+				_startMoveTime = mstime;
+			else
+				_startMoveTime = 0;
+
 			_lastHeartbeatPosition = m_position;
 			_lastHeartbeatV = speed;
 			return;
@@ -10237,38 +10247,32 @@ void Player::_SpeedhackCheck(uint32 mstime)
 
 		if( !_heartbeatDisable && !m_uint32Values[UNIT_FIELD_CHARM] && m_TransporterGUID == 0 && !_speedChangeInProgress )
 		{
-			if( _lastHeartbeatV == speed )
-			{
-				// latency compensation a little
-				speed += 0.25f;
+			// latency compensation a little
+			speed += 0.25f;
 
-				float distance = m_position.Distance2D( _lastHeartbeatPosition );
-				uint32 time_diff = mstime - _lastHeartbeatT;
-				uint32 move_time = float2int32( ( distance / ( speed * 0.001f ) ) );
-				int32 difference = time_diff - move_time;
+			float distance = m_position.Distance2D( _lastHeartbeatPosition );
+			uint32 time_diff = mstime - _startMoveTime;
+			uint32 move_time = float2int32( ( distance / ( speed * 0.001f ) ) );
+			int32 difference = time_diff - move_time;
 #ifdef _DEBUG
-				//sLog.outDebug("speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff );
+			sLog.outDebug("speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff );
 #endif
-				if( difference < -500.0f )
+			if( difference < World::m_speedHackThreshold )
+			{
+				if( m_speedhackChances == 1 )
 				{
-					if( m_speedhackChances == 1 )
-					{
-						SetMovement( MOVE_ROOT, 1 );
-						BroadcastMessage( "You have used all your speedhacking chances. You will be logged out in 7 seconds. Debug data: " );
-						BroadcastMessage( "speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff );
-						sEventMgr.AddEvent( this, &Player::_Kick, EVENT_PLAYER_KICK, 7000, 1, 0 );
-						m_speedhackChances = 0;
-					}
-					else if( m_speedhackChances > 1 )
-					{
-						BroadcastMessage( "Speedhack warning, you have %u chances left.", --m_speedhackChances );
-					}
+					SetMovement( MOVE_ROOT, 1 );
+					BroadcastMessage( "You have used all your speedhacking chances. You will be logged out in 7 seconds. Debug data: " );
+					BroadcastMessage( "speed: %f diff: %i dist: %f move: %u tdiff: %u\n", speed, difference, distance, move_time, time_diff );
+					sEventMgr.AddEvent( this, &Player::_Kick, EVENT_PLAYER_KICK, 7000, 1, 0 );
+					m_speedhackChances = 0;
+				}
+				else if( m_speedhackChances > 1 )
+				{
+					BroadcastMessage( "Speedhack warning, you have %u chances left.", --m_speedhackChances );
 				}
 			}
 		}
-
-		_lastHeartbeatPosition = m_position;
-		_lastHeartbeatT = mstime;
 	}
 }
 

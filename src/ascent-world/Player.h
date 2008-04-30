@@ -1408,7 +1408,7 @@ public:
 
 	LocationVector _lastHeartbeatPosition;
 	float _lastHeartbeatV; // velocity
-	uint32 _lastHeartbeatT;	// time
+	uint32 _startMoveTime;	// time
 	int32 _heartbeatDisable;
 	bool _speedChangeInProgress;
 
