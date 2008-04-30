@@ -425,7 +425,7 @@ void LogonServer::Run(int argc, char ** argv)
 	}
 	uint32 loop_counter = 0;
 	//ThreadPool.Gobble();
-
+	sLog.outString("Success! Ready for connections");
 	while(mrunning && authsockcreated && intersockcreated)
 	{
 		if(!(++loop_counter % 400))	 // 20 seconds
