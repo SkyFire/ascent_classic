@@ -2002,7 +2002,14 @@ bool ChatHandler::HandleIPBanCommand(const char * args, WorldSession * m_session
 		expire_time = 0;
 	else
 		expire_time = UNIXTIME + (time_t)timeperiod;
-	
+	string IP = pIp;
+	string::size_type i = IP.find("/");
+	if (i == string::npos)
+	{
+		RedSystemMessage(m_session, "Lack of CIDR address assumes a 32bit match (if you don't understand, dont worry, it worked)");
+		IP.append("/32");
+		pIp = (char*)IP.c_str(); //is this correct? - optical
+	}
 	SystemMessage(m_session, "Adding [%s] to IP ban table, expires %s", pIp, (expire_time == 0)? "Never" : ctime( &expire_time ));
 	sLogonCommHandler.IPBan_Add( pIp, (uint32)expire_time );
 	sWorld.DisconnectUsersWithIP(pIp, m_session);
