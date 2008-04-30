@@ -112,7 +112,8 @@ void AccountMgr::AddAccount(Field* field)
 	{
 		//Accounts should be unbanned once the date is past their set expiry date.
 		acct->Banned = 0;
-		sLog.outDebug("Account %s's ban has expired.",acct->UsernamePtr->c_str());
+		//me go boom :(
+		//printf("Account %s's ban has expired.\n",acct->UsernamePtr->c_str());
 		sLogonSQL->Execute("UPDATE accounts SET banned = 0 WHERE acct=%u",acct->AccountId);
 	}
 	acct->SetGMFlags(GMFlags.c_str());
