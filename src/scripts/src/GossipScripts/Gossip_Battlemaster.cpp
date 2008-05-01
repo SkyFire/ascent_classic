@@ -127,7 +127,7 @@ public:
 		if(pObject->GetTypeId()!=TYPEID_UNIT)
 			return;
 
-		plr->GetSession()->SendBattlegroundList(((Creature*)pObject), 1);  // WSG = 2
+		plr->GetSession()->SendBattlegroundList(((Creature*)pObject), 0);  // WSG = 2
     }
 
     void Destroy()
