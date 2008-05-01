@@ -2787,6 +2787,45 @@ bool ChatHandler::HandleCollisionGetHeight(const char * args, WorldSession * m_s
 	return true;
 #endif
 }
+bool ChatHandler::HandleLevelUpCommand(const char* args, WorldSession *m_session)
+{
+	int levels = 0;
+
+	if (!*args)
+		levels = 1;
+	else
+		levels = atoi(args);
+
+	if(levels <= 0)
+		return false;
+
+	Player *plr = getSelectedChar(m_session, true);
+
+	if(!plr) plr = m_session->GetPlayer();
+
+	if(!plr) return false;
+
+	sGMLog.writefromsession(m_session, "used level up command on %s, with %u levels", plr->GetName(), levels);
+
+	levels += plr->getLevel();
+
+	if(levels>70)
+		levels=70;
+
+	LevelInfo * inf = objmgr.GetLevelInfo(plr->getRace(),plr->getClass(),levels);
+	if(!inf)
+		return false;
+	plr->ApplyLevelInfo(inf,levels);
+
+	WorldPacket data;
+	std::stringstream sstext;
+	sstext << "You have been leveled up to Level " << levels << '\0';
+	SystemMessage(plr->GetSession(), sstext.str().c_str());
+
+	plr->Social_TellFriendsOnline();
+
+	return true;
+}
 
 bool ChatHandler::HandleFixScaleCommand(const char * args, WorldSession * m_session)
 {

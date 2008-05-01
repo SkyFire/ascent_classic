@@ -490,6 +490,7 @@ void CommandTableStorage::Init()
 		{ "removeskill", 'm', &ChatHandler::HandleRemoveSkillCommand,   ".removeskill <skillid> - Removes skill",		 NULL, 0, 0, 0 },
 		{ "increaseweaponskill", 'm', &ChatHandler::HandleIncreaseWeaponSkill, ".increaseweaponskill <count> - Increase eqipped weapon skill x times (defaults to 1).", NULL, 0, 0, 0},
 		{ "playerinfo",  'm', &ChatHandler::HandlePlayerInfo,		   ".playerinfo - Displays informations about the selected character (account...)", NULL, 0, 0, 0 },
+		{ "levelup",	'm', &ChatHandler::HandleLevelUpCommand,		"Levelup x lvls",				   NULL, 0, 0, 0},
 
 		{ "modify",		'm', NULL,									 "",				 modifyCommandTable, 0, 0, 0},
 		{ "waypoint",	  'w', NULL,									 "",			   waypointCommandTable, 0, 0, 0},
