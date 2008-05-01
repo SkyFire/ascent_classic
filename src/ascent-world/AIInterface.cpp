@@ -229,7 +229,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			{
 				if( pUnit == NULL ) return;
 				
-				if( pUnit->IsPlayer() || pUnit->IsCreature() )
+				if( pUnit->IsCreature() )
 					pUnit->RemoveNegativeAuras();
 				//cancel spells that we are casting. Should remove bug where creatures cast a spell after they died
 //				CancelSpellCast();
