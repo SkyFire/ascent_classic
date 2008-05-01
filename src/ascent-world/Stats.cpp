@@ -643,7 +643,7 @@ uint32 CalculateDamage( Unit* pAttacker, Unit* pVictim, uint32 weapon_damage_typ
 	{
 		if( pAttacker->IsPlayer() && ((Player*)pAttacker)->m_outStealthDamageBonusTimer )
 		{
-			if( UNIXTIME >= ((Player*)pAttacker)->m_outStealthDamageBonusTimer )
+			if( (uint32)UNIXTIME >= ((Player*)pAttacker)->m_outStealthDamageBonusTimer )
 				((Player*)pAttacker)->m_outStealthDamageBonusTimer = 0;
 			else
 				result *= ((float(((Player*)pAttacker)->m_outStealthDamageBonusPct) / 100.0f) + 1.0f);

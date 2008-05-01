@@ -1700,6 +1700,7 @@ void World::DisconnectUsersWithAccount(const char * account, WorldSession * m_se
 	SessionMap::iterator itr;
 	WorldSession * session;
 	m_sessionlock.AcquireReadLock();
+	bool FoundUser = false;
 	for(itr = m_sessions.begin(); itr != m_sessions.end();)
 	{
 		session = itr->second;
@@ -1707,6 +1708,7 @@ void World::DisconnectUsersWithAccount(const char * account, WorldSession * m_se
 
 		if(!stricmp(account, session->GetAccountNameS()))
 		{
+			FoundUser = true;
 			m_session->SystemMessage("Disconnecting user with account `%s` IP `%s` Player `%s`.", session->GetAccountNameS(), 
 				session->GetSocket() ? session->GetSocket()->GetRemoteIP().c_str() : "noip", session->GetPlayer() ? session->GetPlayer()->GetName() : "noplayer");
 
@@ -1714,6 +1716,8 @@ void World::DisconnectUsersWithAccount(const char * account, WorldSession * m_se
 		}
 	}
 	m_sessionlock.ReleaseReadLock();
+	if ( FoundUser == false )
+		m_session->SystemMessage("There is nobody online with account [%s]",account);
 }
 
 void World::DisconnectUsersWithIP(const char * ip, WorldSession * m_session)
@@ -1721,6 +1725,7 @@ void World::DisconnectUsersWithIP(const char * ip, WorldSession * m_session)
 	SessionMap::iterator itr;
 	WorldSession * session;
 	m_sessionlock.AcquireReadLock();
+	bool FoundUser = false;
 	for(itr = m_sessions.begin(); itr != m_sessions.end();)
 	{
 		session = itr->second;
@@ -1732,12 +1737,15 @@ void World::DisconnectUsersWithIP(const char * ip, WorldSession * m_session)
 		string ip2 = session->GetSocket()->GetRemoteIP().c_str();
 		if(!stricmp(ip, ip2.c_str()))
 		{
+			FoundUser = true;
 			m_session->SystemMessage("Disconnecting user with account `%s` IP `%s` Player `%s`.", session->GetAccountNameS(), 
 				ip2.c_str(), session->GetPlayer() ? session->GetPlayer()->GetName() : "noplayer");
 
 			session->Disconnect();
 		}
 	}
+	if ( FoundUser == false )
+		m_session->SystemMessage("There is nobody online with ip [%s]",ip);
 	m_sessionlock.ReleaseReadLock();
 }
 
@@ -1746,6 +1754,7 @@ void World::DisconnectUsersWithPlayerName(const char * plr, WorldSession * m_ses
 	SessionMap::iterator itr;
 	WorldSession * session;
 	m_sessionlock.AcquireReadLock();
+	bool FoundUser = false;
 	for(itr = m_sessions.begin(); itr != m_sessions.end();)
 	{
 		session = itr->second;
@@ -1762,6 +1771,8 @@ void World::DisconnectUsersWithPlayerName(const char * plr, WorldSession * m_ses
 			session->Disconnect();
 		}
 	}
+	if (FoundUser == false)
+		m_session->SystemMessage("There is no body online with the name [%s]",plr);
 	m_sessionlock.ReleaseReadLock();
 }
 
