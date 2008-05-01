@@ -56,8 +56,8 @@ struct CreatureInfo
 	uint32 SpellDataID;
 	uint32 Male_DisplayID;
 	uint32 Female_DisplayID;
-	uint32 unkint1;
-	uint32 unkint2;
+	uint32 Male_DisplayID2;
+	uint32 Female_DisplayID2;
 	float unkfloat1;
 	float unkfloat2;
 	uint8  Civilian;
@@ -68,35 +68,83 @@ struct CreatureInfo
 	uint32 GenerateModelId(uint32 * dest)
 	{
 		/* only M */
-        if(Male_DisplayID == Female_DisplayID)
+		if(( Male_DisplayID || Male_DisplayID2 ) && !Female_DisplayID && !Female_DisplayID2 )
 		{
-			*dest = Male_DisplayID;
+			if (Male_DisplayID2)
+			{
+				if(Rand(50.0f))
+				{
+					*dest = Male_DisplayID;
+				}
+				else
+				{
+					*dest = Male_DisplayID2;
+				}
+			}
+			else
+			{
+				*dest = Male_DisplayID;
+			}
 			return 0;
 		}
-
-		/* only M */
-		if(Male_DisplayID && !Female_DisplayID)
-		{
-            *dest = Male_DisplayID;
-			return 0;
-		}
-
 		/* only F */
-		if(!Male_DisplayID && Female_DisplayID)
+		if(( Female_DisplayID || Female_DisplayID2 ) && !Male_DisplayID && !Male_DisplayID2 )
 		{
-			*dest = Female_DisplayID;
+			if (Female_DisplayID2)
+			{
+				if(Rand(50.0f))
+				{
+					*dest = Female_DisplayID;
+				}
+				else
+				{
+					*dest = Female_DisplayID2;
+				}
+			}
+			else
+			{
+				*dest = Female_DisplayID;
+			}
 			return 1;
 		}
 
 		/* make a random one */
 		if(Rand(50.0f))
 		{
-			*dest = Female_DisplayID;
+			if (Female_DisplayID2)
+			{
+				if(Rand(50.0f))
+				{
+					*dest = Female_DisplayID;
+				}
+				else
+				{
+					*dest = Female_DisplayID2;
+				}
+			}
+			else
+			{
+				*dest = Female_DisplayID;
+			}
 			return 1;
 		}
 		else
 		{
-			*dest = Male_DisplayID;
+			if (Male_DisplayID2)
+			{
+				if(Rand(50.0f))
+				{
+					*dest = Male_DisplayID;
+				}
+				else
+				{
+					*dest = Male_DisplayID2;
+				}
+			}
+			else
+			{
+				*dest = Male_DisplayID;
+			}
 			return 0;
 		}
 	}
