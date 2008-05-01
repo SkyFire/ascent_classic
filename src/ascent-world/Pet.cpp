@@ -149,6 +149,8 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		SetPowerType(POWER_TYPE_MANA);
 		if(entry == WATER_ELEMENTAL)
 			m_name = "Water Elemental";
+		else if(entry == 19668)
+			m_name = "Shadowfiend";
 		else
 			m_name = sWorld.GenerateName();
 
@@ -1050,6 +1052,9 @@ void Pet::ApplySummonLevelAbilities()
 		stat_index = 5;
 		m_aiInterface->disable_melee = true;
 		break;
+	case 19668:    // Priest's Shadowfiend, until someone knows the stats that real have
+		stat_index = 5;
+		break;
 	}
 	if(m_uint32Values[OBJECT_FIELD_ENTRY] == 89)
 		has_mana = false;
@@ -1327,6 +1332,11 @@ void Pet::ApplySummonLevelAbilities()
 	SetUInt32Value(UNIT_FIELD_ATTACK_POWER, FL2UINT(pet_pwr));
 	BaseResistance[0] = FL2UINT(pet_arm);
 	CalcResistance(0);
+	// Priest's Shadowfiend
+	if (m_uint32Values[OBJECT_FIELD_ENTRY]==19668) {
+	    SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 1500);
+	    SetUInt32Value(UNIT_FIELD_ATTACK_POWER,((uint32)(350+0.57*m_Owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS_05)))/2);
+	}
 	CalcDamage();
 
 	// Calculate health / mana
