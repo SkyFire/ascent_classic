@@ -521,6 +521,7 @@ void CommandTableStorage::Init()
 		{ "advanceallskills", 'm', &ChatHandler::HandleAdvanceAllSkillsCommand, "Advances all skills <x> points.", NULL, 0, 0, 0 },
 		{ "killbyplayer", 'f', &ChatHandler::HandleKillByPlayerCommand, "Disconnects the player with name <s>.", NULL, 0, 0, 0 },
 		{ "killbyaccount", 'f', &ChatHandler::HandleKillBySessionCommand, "Disconnects the session with account name <s>.", NULL, 0, 0, 0 },
+		{ "killbyip", 'f', &ChatHandler::HandleKillByIPCommand, "Disconnects the session with the ip <s>.", NULL, 0, 0, 0 },
 		{ "castall", 'z', &ChatHandler::HandleCastAllCommand, "Makes all players online cast spell <x>.", NULL, 0, 0, 0},
 		{ "dispelall", 'z', &ChatHandler::HandleDispelAllCommand, "Dispels all negative (or positive w/ 1) auras on all players.",NULL,0,0,0},
 		{ "castspell",   'd', &ChatHandler::HandleCastSpellCommand,	 ".castspell <spellid> - Casts spell on target.",  NULL, 0, 0, 0 },

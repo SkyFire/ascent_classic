@@ -1594,6 +1594,17 @@ bool ChatHandler::HandleKillBySessionCommand(const char* args, WorldSession* m_s
 	sWorld.DisconnectUsersWithAccount(args,m_session);
 	return true;
 }
+bool ChatHandler::HandleKillByIPCommand(const char* args, WorldSession* m_session)
+{
+	if(!args || strlen(args) < 2)
+	{
+		RedSystemMessage(m_session, "An IP is required.");
+		return true;
+	}
+
+	sWorld.DisconnectUsersWithIP(args,m_session);
+	return true;
+}
 
 bool ChatHandler::HandleMassSummonCommand(const char* args, WorldSession* m_session)
 {

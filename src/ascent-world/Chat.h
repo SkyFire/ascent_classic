@@ -422,6 +422,7 @@ protected:
 	// kill
 	bool HandleKillBySessionCommand(const char* args, WorldSession* m_session);
 	bool HandleKillByPlayerCommand(const char* args, WorldSession* m_session);
+	bool HandleKillByIPCommand(const char* args, WorldSession* m_session);
 
 	// castall
 	bool HandleCastAllCommand(const char* args, WorldSession* m_session);
