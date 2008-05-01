@@ -108,7 +108,7 @@ void AccountMgr::AddAccount(Field* field)
 	acct->AccountId				= field[0].GetUInt32();
 	acct->AccountFlags			= field[5].GetUInt8();
 	acct->Banned				= field[6].GetUInt32();
-	if (UNIXTIME > acct->Banned && acct->Banned != 0 && acct->Banned != 1) //1 = perm ban?
+	if ( (uint32)UNIXTIME > acct->Banned && acct->Banned != 0 && acct->Banned != 1) //1 = perm ban?
 	{
 		//Accounts should be unbanned once the date is past their set expiry date.
 		acct->Banned = 0;
@@ -131,7 +131,7 @@ void AccountMgr::AddAccount(Field* field)
 		acct->forcedLocale = false;
 
     acct->Muted = field[8].GetUInt32();
-	if (UNIXTIME > acct->Muted && acct->Muted != 0 && acct->Muted != 1) //1 = perm ban?
+	if ( (uint32)UNIXTIME > acct->Muted && acct->Muted != 0 && acct->Muted != 1) //1 = perm ban?
 	{
 		//Accounts should be unbanned once the date is past their set expiry date.
 		acct->Muted= 0;
@@ -190,7 +190,7 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 	acct->AccountId				= field[0].GetUInt32();
 	acct->AccountFlags			= field[5].GetUInt8();
 	acct->Banned				= field[6].GetUInt32();
-	if (UNIXTIME > acct->Banned && acct->Banned != 0 && acct->Banned != 1) //1 = perm ban?
+	if ((uint32)UNIXTIME > acct->Banned && acct->Banned != 0 && acct->Banned != 1) //1 = perm ban?
 	{
 		//Accounts should be unbanned once the date is past their set expiry date.
 		acct->Banned = 0;
@@ -208,7 +208,7 @@ void AccountMgr::UpdateAccount(Account * acct, Field * field)
 		acct->forcedLocale = false;
 
 	acct->Muted = field[8].GetUInt32();
-	if (UNIXTIME > acct->Muted && acct->Muted != 0 && acct->Muted != 1) //1 = perm ban?
+	if ((uint32)UNIXTIME > acct->Muted && acct->Muted != 0 && acct->Muted != 1) //1 = perm ban?
 	{
 		//Accounts should be unbanned once the date is past their set expiry date.
 		acct->Muted= 0;
@@ -264,7 +264,7 @@ BAN_STATUS IPBanner::CalculateBanStatus(in_addr ip_address)
 			if( itr->Expire == 0 )
 				return BAN_STATUS_PERMANENT_BAN;
 			
-			if( UNIXTIME >= itr->Expire )
+			if( (uint32)UNIXTIME >= itr->Expire )
 			{
 				sLogonSQL->Execute("DELETE FROM ipbans WHERE expire = %u AND ip = \"%s\"", itr->Expire, sLogonSQL->EscapeString(itr->db_ip).c_str());
 				banList.erase(itr);
