@@ -1710,8 +1710,9 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		else if( IsPet() )
 		{
 			plr = static_cast< Pet* >( this )->GetPetOwner();
-			if( plr != NULL && plr->GetMapMgr() == GetMapMgr() )
-				plr = NULL;
+			if (plr)
+				if( plr != NULL && plr->GetMapMgr() == GetMapMgr() )
+					plr = NULL;
 		}
 
 		if( plr != NULL && plr->m_bg != NULL && plr->GetMapMgr() == GetMapMgr() )
