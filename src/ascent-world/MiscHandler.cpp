@@ -159,7 +159,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
 		add->m_isDirty = true;
 
 		sQuestMgr.OnPlayerItemPickup(GetPlayer(),add);
-		_player->GetSession()->SendItemPushResult(add, false, true, true, false, _player->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()), 0xFFFFFFFF, 1);
+		_player->GetSession()->SendItemPushResult(add, false, false, true, false, _player->GetItemInterface()->GetBagSlotByGuid(add->GetGUID()), 0xFFFFFFFF,amt);
 	}
 
 	//in case of ffa_loot update only the player who recives it.
@@ -460,7 +460,12 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                     {
                         if( pLock->locktype[i] )
                         {
-                            if( pLock->locktype[i] == 2 ) //locktype;
+                            if( pLock->locktype[i] == 1 ) //Item or Quest Required;
+							{
+								pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 60000 : 12000 + ( RandomUInt( 60000 ) ) ) );
+								return;
+							}
+							else if( pLock->locktype[i] == 2 ) //locktype;
                             {
                                 //herbalism and mining;
                                 if( pLock->lockmisc[i] == LOCKTYPE_MINING || pLock->lockmisc[i] == LOCKTYPE_HERBALISM )
@@ -488,29 +493,30 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 										return;
                                     }
                                 }
-                                else //other type of locks that i dont bother to split atm ;P
-                                {
-                                    if(pGO->HasLoot())
-                                    {
-                                        pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
-                                        return;
-                                    }
-									
-									pGO->CalcMineRemaining(true);
-
-                    			    uint32 DespawnTime = 0;
-			                        if(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()))
-				                        DespawnTime = 120000;	   // 5 min for quest GO,
-			                        else
-				                        DespawnTime = 900000;	   // 15 for else
-			                        pGO->Despawn(DespawnTime);
-
+								else
+								{
+									if(pGO->HasLoot())
+									{
+										pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
+										return;
+									}
+									pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 60000 : 12000 + ( RandomUInt( 60000 ) ) ) );
 									return;
-                                }
-                            }
+								}
+							}
+							else //other type of locks that i dont bother to split atm ;P
+							{
+								if(pGO->HasLoot())
+								{
+									pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
+									return;
+								}
+								pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 60000 : 12000 + ( RandomUInt( 60000 ) ) ) );
+								return;
+							}
                         }
                     }
-                }
+				}
                 else
                 {
                     if( pGO->HasLoot() )
@@ -518,17 +524,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
                         pGO->SetUInt32Value(GAMEOBJECT_STATE, 1);
                         return;
                     }
-                    uint32 DespawnTime = 0;
-			        if(sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()))
-				        DespawnTime = 120000;	   // 5 min for quest GO,
-			        else
-			        {
-				        DespawnTime = 900000;	   // 15 for else
-			        }
-
-
-			        pGO->Despawn(DespawnTime);
-
+                    pGO->Despawn((sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 60000 : 12000 + ( RandomUInt( 60000 ) ) ) );
                 }
             }
         default: break;
@@ -1162,6 +1158,9 @@ void WorldSession::HandleAmmoSetOpcode(WorldPacket & recv_data)
 	uint32 ammoId;
 	recv_data >> ammoId;
 
+	if(!ammoId)
+		return;
+
 	ItemPrototype * xproto=ItemPrototypeStorage.LookupEntry(ammoId);
 	if(!xproto)
 		return;
@@ -1173,6 +1172,37 @@ void WorldSession::HandleAmmoSetOpcode(WorldPacket & recv_data)
 		return;
 	}
 
+	if(xproto->RequiredLevel)
+	{
+		if(GetPlayer()->getLevel() < xproto->RequiredLevel)
+		{
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+			_player->SetUInt32Value(PLAYER_AMMO_ID, 0);
+			_player->CalcDamage();
+			return;
+		}
+	}
+	if(xproto->RequiredSkill)
+	{
+		if(!GetPlayer()->_HasSkillLine(xproto->RequiredSkill))
+		{
+			GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+			_player->SetUInt32Value(PLAYER_AMMO_ID, 0);
+			_player->CalcDamage();
+			return;
+		}
+
+		if(xproto->RequiredSkillRank)
+		{
+			if(_player->_GetSkillLineCurrent(xproto->RequiredSkill, false) < xproto->RequiredSkillRank)
+			{
+				GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,INV_ERR_ITEM_RANK_NOT_ENOUGH);
+				_player->SetUInt32Value(PLAYER_AMMO_ID, 0);
+				_player->CalcDamage();
+				return;
+			}
+		}
+	}
 	_player->SetUInt32Value(PLAYER_AMMO_ID, ammoId);
 	_player->CalcDamage();
 
