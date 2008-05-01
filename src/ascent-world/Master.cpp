@@ -273,8 +273,10 @@ bool Master::Run(int argc, char ** argv)
 	Log.Line();
 	sLog.outString( "" );
 
-	//ScriptSystem = new ScriptEngine;
-	//ScriptSystem->Reload();
+#ifdef GM_SCRIPT
+	ScriptSystem = new ScriptEngine;
+	ScriptSystem->Reload();
+#endif
 
 	new EventMgr;
 	new World;
@@ -556,11 +558,15 @@ bool Master::Run(int argc, char ** argv)
 	delete VoiceChatHandler::getSingletonPtr();
 #endif
 
+#ifdef GM_SCRIPT
+	Log.Notice("GM-scripting:", "Closing ScriptEngine...");
+	delete ScriptSystem;
+#endif
+
 #ifdef ENABLE_LUA_SCRIPTING
 	sLog.outString("Deleting Script Engine...");
 	LuaEngineMgr::getSingleton().Unload();
 #endif
-	//delete ScriptSystem;
 
 	delete GMCommand_Log;
 	delete Anticheat_Log;
