@@ -587,10 +587,16 @@ bool ChatHandler::HandleRemoveSkillCommand(const char *args, WorldSession *m_ses
 	BlueSystemMessage(m_session, "Removing skill line %d", skill);
 
 	Player *plr = getSelectedChar(m_session, true);
-	if(!plr) return true;
-	sGMLog.writefromsession(m_session, "used remove skill of %u on %s", skill, plr->GetName());
-	plr->_RemoveSkillLine(skill);
-	SystemMessageToPlr(plr, "%s removed skill line %d from you. ", m_session->GetPlayer()->GetName(), skill);
+	if(plr && plr->_HasSkillLine(skill) ) //fix bug; removing skill twice will mess up skills
+	{
+		plr->_RemoveSkillLine(skill);
+		sGMLog.writefromsession(m_session, "used remove skill of %u on %s", skill, plr->GetName());
+		SystemMessageToPlr(plr, "%s removed skill line %d from you. ", m_session->GetPlayer()->GetName(), skill);
+	}
+	else
+	{
+		BlueSystemMessage(m_session, "Player doesn't have skill line %d", skill);
+	}
 	return true;
 }
 
