@@ -228,8 +228,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_LEAVECOMBAT:
 			{
 				if( pUnit == NULL ) return;
-
-				pUnit->RemoveNegativeAuras();
+				
+				if( pUnit->IsPlayer() || pUnit->IsCreature() )
+					pUnit->RemoveNegativeAuras();
 				//cancel spells that we are casting. Should remove bug where creatures cast a spell after they died
 //				CancelSpellCast();
 				// restart emote

@@ -4412,6 +4412,9 @@ uint32 Unit::AbsorbDamage( uint32 School, uint32* dmg )
 	if( dmg == NULL )
 		return 0;
 
+	if( School > 6 )
+		return 0;
+
 	SchoolAbsorb::iterator i, j;
 	uint32 abs = 0;
 	for( i = Absorbs[School].begin(); i != Absorbs[School].end(); )
