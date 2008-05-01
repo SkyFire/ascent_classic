@@ -880,27 +880,19 @@ void WorldSession::FullLogin(Player * plr)
 			MSG_COLOR_WHITE, sWorld.GetSessionCount(), MSG_COLOR_WHITE, sWorld.PeakSessionCount, MSG_COLOR_WHITE, sWorld.mAcceptedConnections);
 	}
 
-	// Calculate rested experience if there is time between lastlogoff and now
-	uint32 currenttime = (uint32)UNIXTIME;
-	uint32 timediff = currenttime - plr->m_timeLogoff;
+	//Set current RestState
+	if( plr->m_isResting) 		// We are resting at an inn , turn on Zzz
+		plr->ApplyPlayerRestState(true);
 
-	if(plr->m_timeLogoff > 0 && plr->GetUInt32Value(UNIT_FIELD_LEVEL) < plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))	// if timelogoff = 0 then it's the first login
+	//Calculate rest bonus if there is time between lastlogoff and now
+	if( plr->m_timeLogoff > 0 && plr->GetUInt32Value(UNIT_FIELD_LEVEL) < plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))	// if timelogoff = 0 then it's the first login
 	{
-		if(plr->m_isResting) 
-		{
-			// We are resting at an inn, calculate XP and add it.
-			uint32 RestXP = plr->CalculateRestXP((uint32)timediff);
-			plr->AddRestXP(RestXP);
-			sLog.outDebug("REST: Added %d of rest XP.", RestXP);
-			plr->ApplyPlayerRestState(true);
-		}
-		else if(timediff > 0)
-		{
-			// We are resting in the wilderness at a slower rate.
-			uint32 RestXP = plr->CalculateRestXP((uint32)timediff);
-			RestXP >>= 2;		// divide by 4 because its at 1/4 of the rate
-			plr->AddRestXP(RestXP);
-		}
+		uint32 currenttime = (uint32)UNIXTIME;
+		uint32 timediff = currenttime - plr->m_timeLogoff;
+
+		//Calculate rest bonus
+		if( timediff > 0 ) 
+			plr->AddCalculatedRestXP(timediff);
 	}
 
 #ifdef CLUSTERING

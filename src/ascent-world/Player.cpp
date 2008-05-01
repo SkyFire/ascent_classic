@@ -138,8 +138,6 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	for ( int aX = 0 ; aX < 8 ; aX++ )
 		m_Tutorials[ aX ] = 0x00;
 
-	m_lastRestUpdate		= 0;
-
 	m_lootGuid			  = 0;
 	m_banned				= false;
 
@@ -1165,6 +1163,53 @@ void Player::_EventExploration()
 	
 	if(!AreaId || AreaId == 0xFFFF)
 		return;
+
+	// AreaId fix for undercity and ironforge.  This will now enable rest for these 2 cities.
+	// since they're both on the same map, only 1 map id check
+	if (GetMapId() == 0) 
+	{
+		// get position
+		float ss_x = m_position.x;
+		float ss_y = m_position.y;
+		float ss_z = m_position.z;
+
+		// Check for Undercity, Tirisfal Glades, and Ruins of Lordaeron, if neither, skip
+		if (AreaId == 153 || AreaId == 85 || m_AreaID == 1497) 
+		{
+			// ruins check     
+			if (ss_z < 74) 
+			{
+				// box with coord 1536,174 -> 1858,353; and z < 62.5 for reachable areas   
+				if (ss_y > 174 && ss_y < 353 && ss_x > 1536 && ss_x < 1858) 
+				{
+					AreaId = 1497;
+				}
+			}
+			// inner city check
+			if (ss_z < 38) 
+			{
+				// box with coord 1238, 11 -> 1823, 640; and z < 38 for undeground
+				if (ss_y > 11 && ss_y < 640 && ss_x > 1238 && ss_x < 1823) 
+				{
+					AreaId = 1497;
+				}
+			}
+			// todo bat tunnel, only goes part way, but should be fine for now
+		}
+		// Check for Ironforge, and Gates of IronForge.. if neither skip
+		if (AreaId == 809 || m_AreaID == 1537) {
+			// height check
+			if (ss_z > 480) 
+			{
+				// box with coord -5097.3, -828 -> -4570, -1349.3; and z > 480.
+				if (ss_y > -1349.3 && ss_y < -828 && ss_x > -5097.3 && ss_x < -4570) 
+				{
+					AreaId = 1537;
+				}
+			}
+		}
+	}
+
 	AreaTable * at = dbcArea.LookupEntry(AreaId);
 	if(at == 0)
 		return;
@@ -1194,25 +1239,35 @@ void Player::_EventExploration()
             GetGroup()->UpdateOutOfRangePlayer(this, 128, true, NULL);
 	}
 
+	// Zone update, this really should update to a parent zone if one exists.
+	//  Will show correct location on your character screen, as well zoneid in DB will have correct value
+	//  for any web sites that access that data.
+	if(at->ZoneId == 0 && m_zoneId != AreaId) 
+	{
+		ZoneUpdate(AreaId);
+	}
+	else if (at->ZoneId != 0 && m_zoneId != at->ZoneId) 
+	{
+		ZoneUpdate(at->ZoneId);
+	}
+
+
 	if(at->ZoneId != 0 && m_zoneId != at->ZoneId)
 		ZoneUpdate(at->ZoneId);
 
+	bool rest_on = false;
 	// Check for a restable area
     if(at->AreaFlags & AREA_CITY_AREA || at->AreaFlags & AREA_CITY)
 	{
 		// check faction
 		if((at->category == AREAC_ALLIANCE_TERRITORY && GetTeam() == 0) || (at->category == AREAC_HORDE_TERRITORY && GetTeam() == 1) )
 		{
-			if(!m_isResting) ApplyPlayerRestState(true);
+			rest_on = true;
 		}
-        else if(at->category != AREAC_ALLIANCE_TERRITORY && at->category != AREAC_HORDE_TERRITORY)
+		else if(at->category != AREAC_ALLIANCE_TERRITORY && at->category != AREAC_HORDE_TERRITORY)
 		{
-			if(!m_isResting) ApplyPlayerRestState(true);
+			rest_on = true;
 		}
-        else
-        {
-            if(m_isResting) ApplyPlayerRestState(false);
-        }
 	}
 	else
 	{
@@ -1223,28 +1278,33 @@ void Player::_EventExploration()
             if(at2 && at2->AreaFlags & AREA_CITY_AREA || at2 && at2->AreaFlags & AREA_CITY)
             {
                 if((at2->category == AREAC_ALLIANCE_TERRITORY && GetTeam() == 0) || (at2->category == AREAC_HORDE_TERRITORY && GetTeam() == 1) )
-		        {
-			        if(!m_isResting) ApplyPlayerRestState(true);
-		        }
-                else if(at2->category != AREAC_ALLIANCE_TERRITORY && at2->category != AREAC_HORDE_TERRITORY)
-		        {
-			        if(!m_isResting) ApplyPlayerRestState(true);
-		        }
-                else
-                {
-                    if(m_isResting) ApplyPlayerRestState(false);
-                }
+				{
+					rest_on = true;
+				}
+				else if(at2->category != AREAC_ALLIANCE_TERRITORY && at2->category != AREAC_HORDE_TERRITORY)
+				{
+					rest_on = true;
+				}
             }
-			else
-			{
-				if(m_isResting)
-					ApplyPlayerRestState(false);
-			}
-        }
-        else
-        {
-		    if(m_isResting) ApplyPlayerRestState(false);
-        }
+		}
+	}
+
+	if (rest_on)
+	{
+		if(!m_isResting) ApplyPlayerRestState(true);
+	}
+	else
+	{
+		if(m_isResting)
+		{
+#ifdef COLLISION
+			const LocationVector & loc = GetPosition();
+			if(!CollideInterface.IsIndoor(GetMapId(), loc.x, loc.y, loc.z + 2.0f))
+				ApplyPlayerRestState(false);
+#else
+			ApplyPlayerRestState(false);
+#endif
+		}
 	}
 
 	if( !(currFields & val) && !GetTaxiState() && !m_TransporterGUID)//Unexplored Area		// bur: we dont want to explore new areas when on taxi
@@ -1369,6 +1429,7 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 
 	uint32 restxp = xp;
 
+	//add reststate bonus (except for quests)
 	if(m_restState == RESTSTATE_RESTED && allowbonus)
 	{
 		restxp = SubtractRestXP(xp);
@@ -2037,8 +2098,11 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	<< m_uint32Values[PLAYER__FIELD_KNOWN_TITLES] << ","
 	<< m_uint32Values[PLAYER_FIELD_COINAGE] << ","
 	<< m_uint32Values[PLAYER_AMMO_ID] << ","
-	<< m_uint32Values[PLAYER_CHARACTER_POINTS2] << ","
-	<< m_uint32Values[PLAYER_CHARACTER_POINTS1] << ","
+	<< m_uint32Values[PLAYER_CHARACTER_POINTS2] << ",";
+
+	if (m_uint32Values[PLAYER_CHARACTER_POINTS1] > 61 &&  ! GetSession()->HasGMPermissions())
+            SetUInt32Value(PLAYER_CHARACTER_POINTS1, 61);
+	ss << m_uint32Values[PLAYER_CHARACTER_POINTS1] << ","
 	<< load_health << ","
 	<< load_mana << ","
 	<< uint32(GetPVPRank()) << ","
@@ -4711,66 +4775,61 @@ void Player::UpdateStats()
 	CalcDamage();
 }
 
-void Player::AddRestXP(uint32 amount)
-{
-	if(GetUInt32Value(UNIT_FIELD_LEVEL) >= GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))		// Save CPU, don't waste time on this if you're >= 60
-		return;
-	m_restAmount += amount;
-	SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, (uint32)(m_restAmount*0.5));
-	UpdateRestState();
-}
-
 uint32 Player::SubtractRestXP(uint32 amount)
 {
-	if(GetUInt32Value(UNIT_FIELD_LEVEL) >= GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))		// Save CPU, don't waste time on this if you're >= 70
-		return 0;
-	uint32 amt = amount;
-	int32 tmp = m_restAmount - amount;
-	int32 pos = m_restAmount - (amount*2);
-	if(pos < 0) pos = 0;
+	if(GetUInt32Value(UNIT_FIELD_LEVEL) >= GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))		// Save CPU, don't waste time on this if you've reached max_level
+		amount = 0;
 
-	if(tmp < 0)
-	{
-		amt = m_restAmount;
+	int32 restAmount = m_restAmount - (amount << 1);									// remember , we are dealing with xp without restbonus, so multiply by 2
+
+	if( restAmount < 0)
 		m_restAmount = 0;
-	}
 	else
-		m_restAmount -= amount;
+		m_restAmount = restAmount;
 
-	
-	SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, pos);
+	Log.Debug("REST","Subtracted %d rest XP to a total of %d", amount, m_restAmount);
+	UpdateRestState();																	// Update clients interface with new values.
+	return amount;
+}
+
+void Player::AddCalculatedRestXP(uint32 seconds)
+{
+	// At level one, players will all start in the normal tier. 
+	// When a player rests in a city or at an inn they will gain rest bonus at a very slow rate. 
+	// Eight hours of rest will be needed for a player to gain one "bubble" of rest bonus. 
+	// At any given time, players will be able to accumulate a maximum of 30 "bubbles" worth of rest bonus which 
+	// translates into approximately 1.5 levels worth of rested play (before your character returns to normal rest state).
+	// Thanks to the comforts of a warm bed and a hearty meal, players who rest or log out at an Inn will 
+	// accumulate rest credit four times faster than players logged off outside of an Inn or City. 
+	// Players who log out anywhere else in the world will earn rest credit four times slower.
+	// http://www.worldofwarcraft.com/info/basics/resting.html
+
+
+	// Define xp for a full bar ( = 20 bubbles)
+	uint32 xp_to_lvl = uint32(lvlinfo->XPToNextLevel);
+
+	// get RestXP multiplier from config.
+	float bubblerate = sWorld.getRate(RATE_RESTXP);
+
+	// One bubble (5% of xp_to_level) for every 8 hours logged out.
+	// if multiplier RestXP (from ascent.config) is f.e 2, you only need 4hrs/bubble.
+	uint32 rested_xp = uint32(0.05f * xp_to_lvl * ( seconds / (3600 * ( 8 / bubblerate))));
+
+	// if we are at a resting area rest_XP goes 4 times faster (making it 1 bubble every 2 hrs)
+	if (m_isResting)
+		rested_xp <<= 2;
+
+	// Add result to accumulated rested XP
+	m_restAmount += uint32(rested_xp);
+
+	// and set limit to be max 1.5 * 20 bubbles * multiplier (1.5 * xp_to_level * multiplier)
+	if (m_restAmount > xp_to_lvl + (uint32)((float)( xp_to_lvl >> 1 ) * bubblerate ))
+		m_restAmount = xp_to_lvl + (uint32)((float)( xp_to_lvl >> 1 ) * bubblerate );
+
+	Log.Debug("REST","Add %d rest XP to a total of %d, RestState %d", rested_xp, m_restAmount,m_isResting);
+
+	// Update clients interface with new values.
 	UpdateRestState();
-	return amt;
-}
-
-uint32 Player::CalculateRestXP(uint32 seconds)
-{
-	float rate = sWorld.getRate(RATE_RESTXP);
-	float xp = 0;
-	if(seconds < 60)
-	{
-		xp = 1 * rate;
-	}
-	else
-	{
-		xp = ((seconds / 60) * rate);
-	}
-	return uint32(xp);
-}
-
-void Player::EventPlayerRest()
-{
-	if(GetUInt32Value(UNIT_FIELD_LEVEL) >= GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))		// Save CPU, don't waste time on this if you're >= 70
-	{
-		EventMgr::getSingleton().RemoveEvents(this, EVENT_PLAYER_REST);
-		return;
-	}
-	// Rest timer
-	uint32 diff = (uint32)UNIXTIME - m_lastRestUpdate;
-	m_lastRestUpdate = (uint32)UNIXTIME;
-	uint32 RestXP = CalculateRestXP((uint32)diff);
-	sLog.outDebug("REST: Adding %d rest XP for %.0f seconds of rest time", RestXP, diff);
-	AddRestXP(RestXP);
 }
 
 void Player::UpdateRestState()
@@ -4780,8 +4839,11 @@ void Player::UpdateRestState()
 	else
 		m_restState = RESTSTATE_NORMAL;
 
-	// Update needle position
+	// Update RestState 100%/200%
 	SetUInt32Value(PLAYER_BYTES_2, ((GetUInt32Value(PLAYER_BYTES_2) & 0x00FFFFFF) | (m_restState << 24)));
+
+	//update needle (weird, works at 1/2 rate)
+	SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, m_restAmount >> 1);
 }
 
 void Player::ApplyPlayerRestState(bool apply)
@@ -4790,23 +4852,14 @@ void Player::ApplyPlayerRestState(bool apply)
 	{
 		m_restState = RESTSTATE_RESTED;
 		m_isResting = true;
-
 		SetFlag(PLAYER_FLAGS, PLAYER_FLAG_RESTING);	//put zzz icon
-
-		UpdateRestState();
-		m_lastRestUpdate = (uint32)UNIXTIME;
-
-		if(GetUInt32Value(UNIT_FIELD_LEVEL) >= GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))		// Save CPU, don't waste time on this if you're >= 70
-			return;
-		sEventMgr.AddEvent(this, &Player::EventPlayerRest, EVENT_PLAYER_REST, (uint32)60000, 0, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
 	else
 	{
 		m_isResting = false;
 		RemoveFlag(PLAYER_FLAGS,PLAYER_FLAG_RESTING);	//remove zzz icon
-		sEventMgr.RemoveEvents(this, EVENT_PLAYER_REST);
-		UpdateRestState();
 	}
+	UpdateRestState();
 }
 
 #define CORPSE_VIEW_DISTANCE 1600 // 40*40
