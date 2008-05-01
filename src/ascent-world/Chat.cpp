@@ -190,6 +190,7 @@ void CommandTableStorage::Init()
 	static ChatCommand modifyCommandTable[] =
 	{
 		{ "hp",		 'm', NULL,	"Health Points/HP",	NULL, UNIT_FIELD_HEALTH,	UNIT_FIELD_MAXHEALTH, 1 },
+		{ "gender",	 'm', &ChatHandler::HandleGenderChanger,		 "Changes gender 0=male / 1=female.",		NULL, 0, 0, 0},
 		{ "mana",	   'm', NULL,	"Mana Points/MP",	  NULL, UNIT_FIELD_POWER1,	UNIT_FIELD_MAXPOWER1, 1 },
 		{ "rage",	   'm', NULL,	"Rage Points",		 NULL, UNIT_FIELD_POWER2,	UNIT_FIELD_MAXPOWER2, 1 },
 		{ "energy",	 'm', NULL,	"Energy Points",	   NULL, UNIT_FIELD_POWER4,	UNIT_FIELD_MAXPOWER4, 1 },

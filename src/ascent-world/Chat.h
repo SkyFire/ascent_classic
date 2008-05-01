@@ -308,6 +308,7 @@ protected:
 	bool HandleMoveCommand(const char* args, WorldSession *m_session);
 	bool HandleLearnCommand(const char* args, WorldSession *m_session);
 	bool HandleReviveCommand(const char* args, WorldSession *m_session);
+	bool HandleGenderChanger(const char* args, WorldSession *m_session);
 	bool HandleAddGraveCommand(const char* args, WorldSession *m_session);
 	bool HandleAddSHCommand(const char* args, WorldSession *m_session);
 	bool HandleExploreCheatCommand(const char* args, WorldSession *m_session);

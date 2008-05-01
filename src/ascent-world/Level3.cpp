@@ -2648,6 +2648,28 @@ bool ChatHandler::HandleWhisperBlockCommand(const char * args, WorldSession * m_
 	return true;
 }
 
+bool ChatHandler::HandleGenderChanger(const char* args, WorldSession *m_session)
+{
+	int gender;
+	Player* target = objmgr.GetPlayer((uint32)m_session->GetPlayer()->GetSelection());
+	if(!target) {
+		SystemMessage(m_session, "Select A Player first.");
+		return true;
+	}
+	if (!*args)
+	{
+		if (target->getGender()== 1)
+			gender = 0;
+		else
+			gender = 1;
+	}
+	else
+		gender = min((int)atoi((char*)args),1);
+	target->setGender(gender);
+	SystemMessage(m_session, "Gender changed to %u",gender);
+	return true;
+}
+
 bool ChatHandler::HandleDispelAllCommand(const char * args, WorldSession * m_session)
 {
 	uint32 pos=0;
