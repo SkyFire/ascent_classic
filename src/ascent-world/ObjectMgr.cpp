@@ -1179,6 +1179,141 @@ void ObjectMgr::LoadAIThreatToSpellId()
 	delete result;
 }
 
+void ObjectMgr::LoadSpellFixes()
+{
+	SpellEntry* sp;
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM spellfixes");
+	if(result)
+	{
+		sLog.outDetail("Loading %u spell fixes from database...",result->GetRowCount());
+		do
+		{
+			Field * f = result->Fetch();
+			uint32 sf_spellId = f[0].GetUInt32();
+			uint32 sf_procFlags = f[1].GetUInt32();
+			uint32 sf_SpellGroupType = f[2].GetUInt32();
+			uint32 sf_procChance = f[3].GetUInt32();
+			uint32 sf_procCharges = f[4].GetUInt32();
+
+			if( sf_spellId )
+			{
+				sp = dbcSpell.LookupEntryForced( sf_spellId );
+				if( sp != NULL )
+				{
+					if( sf_procFlags )
+						sp->procFlags = sf_procFlags;
+
+					if( sf_SpellGroupType )
+						sp->SpellGroupType = sf_SpellGroupType;
+
+					if( sf_procChance )
+						sp->procChance = sf_procChance;
+
+					if ( sf_procCharges )
+						sp->procCharges = sf_procCharges;
+				}
+			}
+		}while(result->NextRow());
+		delete result;
+	}	
+}
+
+void ObjectMgr::LoadSpellProcs()
+{
+	SpellEntry* sp;
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_proc");
+	if(result)
+	{
+		do
+		{
+			Field * f = result->Fetch();
+			uint32 spe_spellId = f[0].GetUInt32();
+			uint32 spe_NameHash = f[1].GetUInt32();
+
+			if( spe_spellId )
+			{
+				sp = dbcSpell.LookupEntryForced( spe_spellId );
+				if( sp != NULL )
+				{
+					int x;
+					for( x = 0; x < 3; ++x )
+						if( sp->ProcOnNameHash[x] == 0 )
+							break;
+
+					if( x != 3 )
+					{
+						sp->ProcOnNameHash[x] = spe_NameHash;
+					}
+					else
+						sLog.outError("Wrong ProcOnNameHash for Spell: %u!",spe_spellId);
+				}
+			}
+
+		}while(result->NextRow());
+		delete result;
+	}	
+}
+
+void ObjectMgr::LoadSpellEffectsOverride()
+{
+	SpellEntry* sp;
+	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_effects_override");
+	if(result)
+	{
+		do
+		{
+			Field * f = result->Fetch();
+			uint32 seo_SpellId = f[0].GetUInt32();
+			uint32 seo_EffectId = f[1].GetUInt32();
+			uint32 seo_Disable = f[2].GetUInt32();
+			uint32 seo_Effect = f[3].GetUInt32();
+			uint32 seo_BasePoints = f[4].GetUInt32();
+			uint32 seo_ApplyAuraName = f[5].GetUInt32();
+			uint32 seo_SpellGroupRelation = f[6].GetUInt32();
+			uint32 seo_MiscValue = f[7].GetUInt32();
+			uint32 seo_TriggerSpell = f[8].GetUInt32();
+			uint32 seo_ImplicitTargetA = f[9].GetUInt32();
+			uint32 seo_ImplicitTargetB = f[10].GetUInt32();
+
+			if( seo_SpellId )
+			{
+				sp = dbcSpell.LookupEntryForced( seo_SpellId );
+				if( sp != NULL )
+				{
+					if( seo_Disable )
+						sp->Effect[seo_EffectId] = 0;
+
+					if( seo_Effect )
+						sp->Effect[seo_EffectId] = seo_Effect;
+
+					if( seo_BasePoints )
+						sp->EffectBasePoints[seo_EffectId] = seo_BasePoints;
+
+					if( seo_ApplyAuraName )
+						sp->EffectApplyAuraName[seo_EffectId] = seo_ApplyAuraName;
+
+					if( seo_SpellGroupRelation )
+						sp->EffectSpellGroupRelation[seo_EffectId] = seo_SpellGroupRelation;
+
+					if( seo_MiscValue )
+						sp->EffectMiscValue[seo_EffectId] = seo_MiscValue;
+
+					if( seo_TriggerSpell )
+						sp->EffectTriggerSpell[seo_EffectId] = seo_TriggerSpell;
+					
+					if( seo_ImplicitTargetA )
+						sp->EffectImplicitTargetA[seo_EffectId] = seo_ImplicitTargetA;
+
+					if( seo_ImplicitTargetB )
+						sp->EffectImplicitTargetB[seo_EffectId] = seo_ImplicitTargetB;
+				}
+			}
+
+		}while(result->NextRow());
+		delete result;
+	}	
+}
+
 Item * ObjectMgr::CreateItem(uint32 entry,Player * owner)
 {
 	ItemPrototype * proto = ItemPrototypeStorage.LookupEntry(entry);
