@@ -992,7 +992,7 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
 	}
 
 	// Check if item can be sold
-	if (it->SellPrice == 0 || item->wrapped_item_id != 0)
+	if (it->SellPrice == 0 || item->wrapped_item_id != 0 || it->BuyPrice == 0)
 	{
 		SendSellItem(vendorguid, itemguid, 2);
 		return;
