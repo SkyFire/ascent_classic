@@ -479,7 +479,7 @@ void GameObject::DeleteFromDB()
 
 void GameObject::EventCloseDoor()
 {
-	SetUInt32Value(GAMEOBJECT_STATE, 1);
+	SetUInt32Value(GAMEOBJECT_STATE, 0);
 }
 
 void GameObject::UseFishingNode(Player *player)
