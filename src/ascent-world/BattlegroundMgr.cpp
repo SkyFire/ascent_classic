@@ -124,6 +124,10 @@ void CBattlegroundManager::HandleBattlegroundJoin(WorldSession * m_session, Worl
 	uint32 instance;
 
 	pck >> guid >> bgtype >> instance;
+
+	if ( ! guid )
+		return; //crash fix. /script JoinBattlefield(0,1); ;s
+
 	if(bgtype >= BATTLEGROUND_NUM_TYPES)
 		return;		// cheater!
 
