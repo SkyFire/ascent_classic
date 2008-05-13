@@ -887,3 +887,10 @@ void HookInterface::OnArenaFinish(Player * pPlayer, ArenaTeam* pTeam, bool victo
 		(call)(pPlayer, pTeam, victory, rated);
 	OUTER_LOOP_END
 }
+
+void HookInterface::OnPostLevelUp(Player * pPlayer)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_POST_LEVELUP, tOnPostLevelup)
+		(call)(pPlayer);
+	OUTER_LOOP_END
+}

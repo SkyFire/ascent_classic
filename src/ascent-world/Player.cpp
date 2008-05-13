@@ -1518,6 +1518,9 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 		// Set next level conditions
 		SetUInt32Value(PLAYER_NEXT_LEVEL_XP, lvlinfo->XPToNextLevel);
 
+		// ScriptMgr hook for OnPostLevelUp
+		sHookInterface.OnPostLevelUp(this);
+
 		// Set stats
 		for(uint32 i = 0; i < 5; ++i)
 		{

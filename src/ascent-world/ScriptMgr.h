@@ -286,6 +286,7 @@ public:
 	void OnHonorableKill(Player * pPlayer, Player * pKilled);
 	void OnArenaFinish(Player * pPlayer, ArenaTeam* pTeam, bool victory, bool rated);
 	void OnObjectLoot(Player * pPlayer, Object * pTarget, uint32 Money, uint32 ItemId);
+	void OnPostLevelUp(Player * pPlayer);
 };
 
 #define sScriptMgr ScriptMgr::getSingleton()
