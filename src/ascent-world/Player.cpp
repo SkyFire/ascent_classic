@@ -197,25 +197,25 @@ Player::Player( uint32 guid ) : m_mailBox(guid)
 	m_BreathDamageTimer	 = 0;
 
 	//transport shit
-	m_TransporterGUID	   = 0;
-	m_TransporterX		  = 0.0f;
-	m_TransporterY		  = 0.0f;
-	m_TransporterZ		  = 0.0f;
-	m_TransporterO		  = 0.0f;
+	m_TransporterGUID		= 0;
+	m_TransporterX			= 0.0f;
+	m_TransporterY			= 0.0f;
+	m_TransporterZ			= 0.0f;
+	m_TransporterO			= 0.0f;
 	m_TransporterUnk		= 0.0f;
 	m_lockTransportVariables= false;
 
 	// Autoshot variables
 	m_AutoShotTarget		= 0;
 	m_onAutoShot			= false;
-	m_AutoShotDuration	  = 0;
-	m_AutoShotAttackTimer   = 0;
-	m_AutoShotSpell		 = NULL;
+	m_AutoShotDuration		= 0;
+	m_AutoShotAttackTimer	= 0;
+	m_AutoShotSpell			= NULL;
 
 	m_AttackMsgTimer		= 0;
 
 	timed_quest_slot		= 0;
-	m_GM_SelectedGO		 = NULL;
+	m_GM_SelectedGO			= NULL;
 
 	for(uint32 x = 0;x < 7; x++)
 	{
@@ -5496,38 +5496,47 @@ void Player::SendPetUntrainConfirm()
 
 int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot )
 {
-	uint8 fail = 0;
-
 	SpellEntry* spellinfo = dbcSpell.LookupEntry( spellid );
 
 	if( spellinfo == NULL )
 		return -1;
 	//sLog.outString( "Canshootwithrangedweapon!?!? spell: [%u] %s" , spellinfo->Id , spellinfo->Name );
 
+	// Check if Morphed
+	if( polySpell > 0 )
+		return SPELL_FAILED_NOT_SHAPESHIFT;
+
 	// Check ammo
 	Item* itm = GetItemInterface()->GetInventoryItem( EQUIPMENT_SLOT_RANGED );
 	if( itm == NULL )
-		fail = SPELL_FAILED_NO_AMMO;
+		return SPELL_FAILED_NO_AMMO;
 
+	// Check ammo level
 	ItemPrototype * iprot=ItemPrototypeStorage.LookupEntry(GetUInt32Value(PLAYER_AMMO_ID));
 	if( iprot && getLevel()< iprot->RequiredLevel)
-		fail = SPELL_FAILED_LOWLEVEL;
+		return SPELL_FAILED_LOWLEVEL;
 
 	// Player has clicked off target. Fail spell.
 	if( m_curSelection != m_AutoShotTarget )
-		fail = SPELL_FAILED_INTERRUPTED;
+		return SPELL_FAILED_INTERRUPTED;
 
+	// Check if target is allready dead
 	if( target->isDead() )
-		fail = SPELL_FAILED_TARGETS_DEAD;
+		return SPELL_FAILED_TARGETS_DEAD;
 
+	// Check if in line of sight (need collision detection).
+#ifdef COLLISION
+	if (GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(GetMapId(),GetPositionNC(),target->GetPositionNC()))
+		return SPELL_FAILED_LINE_OF_SIGHT;
+#endif
+
+	// Check if we aren't casting another spell allready
 	if( GetCurrentSpell() )
 		return -1;
    
-	if( fail > 0 )
-		return -1;	
-
 	// Supalosa - The hunter ability Auto Shot is using Shoot range, which is 5 yards shorter.
 	// So we'll use 114, which is the correct 35 yard range used by the other Hunter abilities (arcane shot, concussive shot...)
+	uint8 fail = 0;
 	uint32 rIndex = autoshot ? 114 : spellinfo->rangeIndex;
 	SpellRange* range = dbcSpellRange.LookupEntry( rIndex );
 	float minrange = GetMinRange( range );
@@ -5557,7 +5566,7 @@ int32 Player::CanShootRangedWeapon( uint32 spellid, Unit* target, bool autoshot 
 	//bonusRange = 2.52f;
 	//sLog.outString( "Bonus range = %f" , bonusRange );
 
-	// Check for close
+	// Check for too close
 	if( spellid != SPELL_RANGED_WAND )//no min limit for wands
 		if( minrange > dist )
 			fail = SPELL_FAILED_TOO_CLOSE;
