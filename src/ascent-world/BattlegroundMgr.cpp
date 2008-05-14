@@ -20,6 +20,8 @@
 #include "StdAfx.h"
 
 #define ENABLE_AB
+#define ENABLE_WSG
+//#define ENABLE_AV
 //#define ENABLE_EOTS
 //#define ONLY_ONE_PERSON_REQUIRED_TO_JOIN_DEBUG
 
@@ -39,8 +41,16 @@ const static uint32 BGMapIds[BATTLEGROUND_NUM_TYPES] = {
 
 const static CreateBattlegroundFunc BGCFuncs[BATTLEGROUND_NUM_TYPES] = {
 	NULL,						// 0
-	NULL,						// AV
+#ifdef ENABLE_AV
+	&AlteracValley::Create,		// AV
+#else
+	NULL,						//AV
+#endif
+#ifdef ENABLE_WSG
 	&WarsongGulch::Create,		// WSG
+#else
+	NULL,						// WSG
+#endif
 #ifdef ENABLE_AB
 	&ArathiBasin::Create,		// AB
 #else

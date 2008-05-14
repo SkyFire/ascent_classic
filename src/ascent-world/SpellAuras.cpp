@@ -3843,7 +3843,7 @@ void Aura::SpellAuraModEffectImmunity(bool apply)
 			if( plr == NULL || plr->GetTypeId() != TYPEID_PLAYER || plr->m_bg == NULL)
 				return;
 
-			if( plr->m_bg->GetType() == BATTLEGROUND_WARSUNG_GULCH )
+			if( plr->m_bg->GetType() == BATTLEGROUND_WARSONG_GULCH )
 				((WarsongGulch*)plr->m_bg)->DropFlag(plr);
 			else if( plr->m_bg->GetType() == BATTLEGROUND_EYE_OF_THE_STORM )
 				((EyeOfTheStorm*)plr->m_bg)->DropFlag(plr);
