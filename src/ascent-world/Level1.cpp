@@ -137,7 +137,11 @@ bool ChatHandler::HandleKickCommand(const char* args, WorldSession *m_session)
 
 	if(!*args)
 	return false;
+
+	bool SilentKick = false;
+
 	char *pname = strtok((char*)args, " ");
+
 	if(!pname)
 	{
 		RedSystemMessage(m_session, "No name specified.");
@@ -146,10 +150,16 @@ bool ChatHandler::HandleKickCommand(const char* args, WorldSession *m_session)
 	Player *chr = objmgr.GetPlayer((const char*)pname, false);
 	if (chr)
 	{
-		char *reason = strtok(NULL, "\n");
+		char *reason = strtok(NULL, " ");
+
 		std::string kickreason = "No reason";
 		if(reason)
 			kickreason = reason;
+
+		char* pSilentKick = strtok(NULL, "\n");
+
+		if (pSilentKick)
+			SilentKick = (atoi(pSilentKick)>0?true:false);
 
 		BlueSystemMessage(m_session, "Attempting to kick %s from the server for \"%s\".", chr->GetName(), kickreason.c_str());
 		sGMLog.writefromsession(m_session, "Kicked player %s from the server for %s", chr->GetName(), kickreason.c_str());
@@ -164,10 +174,14 @@ bool ChatHandler::HandleKickCommand(const char* args, WorldSession *m_session)
 			return true;
 		}*/ // we might have to re-work this
 
-		char msg[200];
-		snprintf(msg, 200, "%sGM: %s was kicked from the server by %s. Reason: %s", MSG_COLOR_RED, chr->GetName(), m_session->GetPlayer()->GetName(), kickreason.c_str());
-		sWorld.SendWorldText(msg, NULL);
-		//sWorld.SendIRCMessage(msg);
+		if(SilentKick == false)
+		{
+			char msg[200];
+			snprintf(msg, 200, "%sGM: %s was kicked from the server by %s. Reason: %s", MSG_COLOR_RED, chr->GetName(), m_session->GetPlayer()->GetName(), kickreason.c_str());
+			sWorld.SendWorldText(msg, NULL);
+			//sWorld.SendIRCMessage(msg);
+		}
+		
 		SystemMessageToPlr(chr, "You are being kicked from the server by %s. Reason: %s", m_session->GetPlayer()->GetName(), kickreason.c_str());
 
 		chr->Kick(6000);

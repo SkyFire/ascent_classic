@@ -53,6 +53,7 @@ enum ServerHookEvents
 	SERVER_HOOK_EVENT_ON_HONORABLE_KILL		= 23,
 	SERVER_HOOK_EVENT_ON_ARENA_FINISH		= 24,
 	SERVER_HOOK_EVENT_ON_OBJECTLOOT			= 25,
+	SERVER_HOOK_EVENT_ON_POST_LEVELUP		= 26,
 
 	NUM_SERVER_HOOKS,
 };
@@ -93,6 +94,7 @@ typedef void(*tOnQuestFinished)(Player * pPlayer, Quest * pQuest);
 typedef void(*tOnHonorableKill)(Player * pPlayer, Player * pKilled);
 typedef void(*tOnArenaFinish)(Player * pPlayer, ArenaTeam * pTeam, bool victory, bool rated);
 typedef void(*tOnObjectLoot)(Player * pPlayer, Object * pTarget, uint32 Money, uint32 ItemId);
+typedef void(*tOnPostLevelUp)(Player * pPlayer);
 
 class Spell;
 class Aura;
