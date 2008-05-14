@@ -492,6 +492,7 @@ public:
 	bool gm_skip_attunement;
 
 	bool show_gm_in_who_list;
+	bool allow_gm_friends;
 	uint32 map_unload_time;
 
 	bool antihack_teleport;
