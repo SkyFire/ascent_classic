@@ -363,6 +363,10 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 	m_dynamicValue = 0;
 	m_areaAura = false;
 
+	if( m_spellProto->c_is_flags & SPELL_FLAG_IS_FORCEDDEBUFF )
+		SetNegative( 100 );
+	else if( m_spellProto->c_is_flags & SPELL_FLAG_IS_FORCEDBUFF )
+		SetPositive( 100 );
 	if( caster->IsUnit() )
 	{
 		if( m_spellProto->buffIndexType > 0 && caster->IsPlayer() )
@@ -406,7 +410,7 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 	m_visualSlot = 0xFF;
 	pSpellId = 0;
 	periodic_target = 0;
-	sLog.outDetail("Aura::Constructor %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name, m_target->GetLowGUID());
+	//sLog.outDetail("Aura::Constructor %u (%s) from %u.", m_spellProto->Id, m_spellProto->Name, m_target->GetLowGUID());
 	m_auraSlot = 0xffffffff;
 	m_interrupted = -1;
 	//fixed_amount = 0;//used only por percent values to be able to recover value correctly.No need to init this if we are not using it
@@ -4688,7 +4692,13 @@ void Aura::SpellAuraModCastingSpeed(bool apply)
 		current -= float(mod->m_amount / 100.0f);
 	else
 		current += float(mod->m_amount / 100.0f);
-	m_target->SetFloatValue(UNIT_MOD_CAST_SPEED, current);
+	m_target->SetFloatValue(UNIT_MOD_CAST_SPEED, current );
+
+	// spell haste/slow is limited to 100% fast or 100% slow.
+	if( m_target->GetFloatValue( UNIT_MOD_CAST_SPEED ) >= 2.0f )
+		m_target->SetFloatValue( UNIT_MOD_CAST_SPEED , 2.0f );
+	else if( m_target->GetFloatValue( UNIT_MOD_CAST_SPEED ) <= 0.5f )
+		m_target->SetFloatValue( UNIT_MOD_CAST_SPEED , 0.5f );
 }
 
 void Aura::SpellAuraFeignDeath(bool apply)

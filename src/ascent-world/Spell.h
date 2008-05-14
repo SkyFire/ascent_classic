@@ -1033,6 +1033,8 @@ enum SpellIsFlags
     SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER	= 0x00000200, //we should cast these on owner too
     SPELL_FLAG_IS_EXPIREING_WITH_PET	= 0x00000400, //when pet dies, we remove this too
     SPELL_FLAG_IS_EXPIREING_ON_PET		= 0x00000800, //when pet is summoned
+	SPELL_FLAG_IS_FORCEDDEBUFF			= 0x00001000, // forced to be a debuff
+	SPELL_FLAG_IS_FORCEDBUFF			= 0x00002000, // forced to be a buff
 };
 
 enum SpellCoefficientsFlags

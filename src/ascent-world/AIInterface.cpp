@@ -1426,8 +1426,8 @@ Unit* AIInterface::FindTarget()
 			continue;
 		}
 
-		if(pUnit->m_invisible) // skip invisible units
-			continue;
+		/*if(pUnit->m_invisible) // skip invisible units
+			continue;*/
 		
 		if(!pUnit->isAlive()
 			|| m_Unit == pUnit /* wtf? */

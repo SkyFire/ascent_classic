@@ -2072,7 +2072,6 @@ void Unit::CalculateResistanceReduction(Unit *pVictim,dealdamage * dmg, SpellEnt
 uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability )
 {
 	Item * it = NULL;
-
 	float hitchance          = 0.0f;
 	float dodge				 = 0.0f;
 	float parry				 = 0.0f;
@@ -2083,7 +2082,7 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 	int32 victim_skill;
 	uint32 SubClassSkill	 = SKILL_UNARMED;
 
-	bool backAttack			 = isInBack( pVictim );
+	bool backAttack			 = !pVictim->isInFront( this ); // isInBack is bugged!
 	uint32 vskill            = 0;
 
 	//==========================================================================================
@@ -2277,11 +2276,13 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 	chances[2]=chances[1]+parry;
 	chances[3]=chances[2]+block;
 
+
 	//--------------------------------roll------------------------------------------------------
 	float Roll = RandomFloat(100.0f);
 	uint32 r = 0;
 	while (r<4&&Roll>chances[r])
 	{
+
 		r++;
 	}
 

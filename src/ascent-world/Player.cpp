@@ -4752,9 +4752,12 @@ void Player::UpdateStats()
 
 	/////////////////////RATINGS STUFF/////////////////
 	float cast_speed = CalcRating( PLAYER_RATING_MODIFIER_SPELL_HASTE );
+	if( cast_speed >= 50 ) 		// spell haste/slow is limited to 100% fast
+		cast_speed = 50;
 	if( cast_speed != SpellHasteRatingBonus )
 	{
-		ModFloatValue( UNIT_MOD_CAST_SPEED, ( SpellHasteRatingBonus - cast_speed ) / 100.0f);
+		ModFloatValue( UNIT_MOD_CAST_SPEED, ( SpellHasteRatingBonus - cast_speed ) / 100.0f );
+
 		SpellHasteRatingBonus = cast_speed;
 	}
 	////////////////////RATINGS STUFF//////////////////////
@@ -10045,6 +10048,8 @@ void Player::Cooldown_AddStart(SpellEntry * pSpell)
 	int32 atime = float2int32( float(pSpell->StartRecoveryTime) * m_floatValues[UNIT_MOD_CAST_SPEED] );
 	if( atime <= 0 )
 		return;
+	if( atime >= 1.5f )
+		atime = 1.5f; // global cooldown is decreased by spell haste, but it's not INCREASED by spell slow.
 
 	if( pSpell->StartRecoveryCategory )		// if we have a different cool category to the actual spell category - only used by few spells
 		_Cooldown_Add( COOLDOWN_TYPE_CATEGORY, pSpell->StartRecoveryCategory, mstime + atime, pSpell->Id, 0 );

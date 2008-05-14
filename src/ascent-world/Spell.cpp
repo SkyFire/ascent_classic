@@ -564,7 +564,7 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 		u_victim->MechanicsDispels[MECHANIC_ENSNARED]
 		)
 	{
-	for( int i = 1 ; i <= 3 ; i ++ )
+	for( int i = 0 ; i <= 2 ; i ++ )
 		{
 			if( u_victim->MechanicsDispels[MECHANIC_ROOTED] && m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
 				return SPELL_DID_HIT_IMMUNE;
@@ -2035,7 +2035,11 @@ void Spell::writeSpellMissedTargets( WorldPacket * data )
 			///handle proc on resist spell
 			Unit* target = u_caster->GetMapMgr()->GetUnit((*i).TargetGuid);
 			if(target && target->isAlive())
+			{
 				u_caster->HandleProc(PROC_ON_RESIST_VICTIM,target,m_spellInfo/*,damage*/);		/** Damage is uninitialized at this point - burlex */
+				target->CombatStatusHandler_ResetPvPTimeout(); // aaa
+				u_caster->CombatStatusHandler_ResetPvPTimeout(); // bbb
+			}
 		}
 	}
 	else
@@ -3455,7 +3459,7 @@ uint8 Spell::CanCast(bool tolerate)
 	// Special State Checks (for creatures & players)
 	if( u_caster )
 	{
-		if( u_caster->SchoolCastPrevent[m_spellInfo->School] )
+		if( u_caster->SchoolCastPrevent[m_spellInfo->School] ) 
 		{	
 			uint32 now_ = getMSTime();
 			if( now_ > u_caster->SchoolCastPrevent[m_spellInfo->School] )//this limit has expired,remove
@@ -3465,10 +3469,13 @@ uint8 Spell::CanCast(bool tolerate)
 				// HACK FIX
 				switch( m_spellInfo->NameHash )
 				{
-					case SPELL_HASH_ICE_BLOCK: //Ice Block
+					// This is actually incorrect. school lockouts take precedence over silence.
+					// So ice block/divine shield are not usable while their schools are locked out,
+					// but can be used while silenced.
+					/*case SPELL_HASH_ICE_BLOCK: //Ice Block
 					case 0x9840A1A6: //Divine Shield
 						break;
-
+					*/
 					case 0x3DFA70E5: //Will of the Forsaken
 						{
 							if( u_caster->m_special_state & ( UNIT_STATE_FEAR | UNIT_STATE_CHARM | UNIT_STATE_SLEEP ) )
@@ -3507,7 +3514,17 @@ uint8 Spell::CanCast(bool tolerate)
 		}
 
 		if( u_caster->m_silenced && m_spellInfo->School != NORMAL_DAMAGE )// can only silence non-physical
-			return SPELL_FAILED_SILENCED;
+		{
+			switch( m_spellInfo->NameHash )
+			{
+				case SPELL_HASH_ICE_BLOCK: //Ice Block
+				case SPELL_HASH_DIVINE_SHIELD: //Divine Shield
+				break;
+
+				default:
+				return SPELL_FAILED_SILENCED;
+			}
+		}
 
 		if(target) /* -Supalosa- Shouldn't this be handled on Spell Apply? */
 		{
@@ -4566,6 +4583,7 @@ uint32 GetDiminishingGroup(uint32 NameHash)
 		break;
 
 	case SPELL_HASH_CYCLONE:				// Cyclone
+	case SPELL_HASH_BLIND:					// Blind
 		{
 			grp = 15;
 			pve = true;

@@ -3654,6 +3654,7 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 	if(school)//prevent from casts in this school
 	{
 		unitTarget->SchoolCastPrevent[school]=GetDuration()+getMSTime();
+		// TODO: visual!
 	}
 }
 
@@ -4651,11 +4652,11 @@ void Spell::SpellEffectCharge(uint32 i)
 {
 	if(!unitTarget)
 		return;
-	if(!p_caster)
-		return;
+	//if(!p_caster) who said units can't charge? :P
+	//	return;
 	if(!unitTarget->isAlive())
 		return;
-    if (p_caster->IsStunned() || p_caster->m_rooted || p_caster->IsPacified() || p_caster->IsFeared())
+    if (u_caster->IsStunned() || u_caster->m_rooted || u_caster->IsPacified() || u_caster->IsFeared())
         return;
 
 	float x, y, z;
@@ -4697,19 +4698,26 @@ void Spell::SpellEffectCharge(uint32 i)
 	if(unitTarget->GetTypeId() == TYPEID_UNIT)
 		unitTarget->GetAIInterface()->StopMovement(2000);
 
-	p_caster->SendMessageToSet(&data, true);   
+	u_caster->SendMessageToSet(&data, true);   
 	
-	p_caster->SetPosition(x,y,z,alpha,true);
-	p_caster->addStateFlag(UF_ATTACKING);
-	p_caster ->smsg_AttackStart( unitTarget );
-	p_caster->EventAttackStart();
-	p_caster->setAttackTimer(time, false);
-	p_caster->setAttackTimer(time, true);
-	p_caster->ResetHeartbeatCoords();
+	u_caster->SetPosition(x,y,z,alpha,true);
+	u_caster->addStateFlag(UF_ATTACKING);
+	u_caster ->smsg_AttackStart( unitTarget );
+	if( p_caster )
+	{
+		p_caster->EventAttackStart();
+		p_caster->ResetHeartbeatCoords();
+	}
+	u_caster->setAttackTimer(time, false);
+	u_caster->setAttackTimer(time, true);
+
 
 	// trigger an event to reset speedhack detection
-	p_caster->DelaySpeedHack( time + 1000 );
-	p_caster->z_axisposition = 0.0f;
+	if( p_caster )
+	{
+		p_caster->DelaySpeedHack( time + 1000 );
+		p_caster->z_axisposition = 0.0f;
+	}
 }
 
 void Spell::SpellEffectPlayerPull( uint32 i )
@@ -4990,18 +4998,19 @@ void Spell::SpellEffectDispelMechanic(uint32 i)
 {
 	if( !unitTarget && !unitTarget->isAlive() )
 		return;
-	
+	/* this was already working before...
 	uint32 sMisc = m_spellInfo->EffectMiscValue[i];
 
 	for( uint32 x = 0 ; x<MAX_AURAS ; x++ )
 	{
 		if( unitTarget->m_auras[x] && !unitTarget->m_auras[x]->IsPositive())
 		{
-			if( unitTarget->m_auras[x]->GetSpellProto()->DispelType == sMisc )
+			if( unitTarget->m_auras[x]->GetSpellProto()->MechanicsType == sMisc )
 				unitTarget->m_auras[x]->Remove();
 		}
 	}
-	
+	*/
+	unitTarget->RemoveAllAurasByMechanic( m_spellInfo->EffectMiscValue[i] , m_spellInfo->EffectBasePoints[i] , true );
 	if( playerTarget && m_spellInfo->NameHash == SPELL_HASH_DAZED && playerTarget->IsMounted() )
 		playerTarget->RemoveAura(playerTarget->m_MountSpellId);
 }

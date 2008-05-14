@@ -16350,6 +16350,13 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
 
+		// rogue - Blind (Make it able to miss!)
+		sp = dbcSpell.LookupEntryForced( 2094 );
+		if( sp != NULL )
+		{
+			sp->Spell_Dmg_Type = SPELL_DMG_TYPE_RANGED;
+			sp->is_ranged_spell = true; 
+		}
 		//rogue - Mace Specialization.
 		sp = dbcSpell.LookupEntryForced( 13709 ); 
 		if( sp != NULL )
@@ -17660,7 +17667,8 @@ void ApplyNormalFixes()
 		{
 			sp->EffectMiscValue[0] = SMT_CRITICAL_DAMAGE;
 			sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-			sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+			sp->EffectSpellGroupRelation[0] = 524288 | 131072 | 0 | 1 | 2 | 4 | 22 | 12 | 29 | 11;
+			//sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF; // This shit made spells get 150-200% bonus!
 			//sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF;
 		}
 		sp = dbcSpell.LookupEntryForced( 35581 );
@@ -17668,7 +17676,8 @@ void ApplyNormalFixes()
 		{
 			sp->EffectMiscValue[0] = SMT_CRITICAL_DAMAGE;
 			sp->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
-			sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
+			sp->EffectSpellGroupRelation[0] = 524288 | 131072 | 0 | 1 | 2 | 4 | 22 | 12 | 29 | 11;
+			//sp->EffectSpellGroupRelation[0] = 0xFFFFFFFF;
 			//sp->EffectSpellGroupRelation_high[0] = 0xFFFFFFFF;
 		}
 
@@ -18011,6 +18020,11 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 31642 );
 		if( sp != NULL )
 			sp->EffectTriggerSpell[0] = 31643;
+
+		// Mage: Cold Snap ( set spell group relation for second effect, "gives you 100% chance to avoid interruption caused by damage while casting."
+		sp = dbcSpell.LookupEntryForced( 12472 ); 
+		if( sp != NULL )
+			sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF; // we can be sure this won't fuck up like Spell Power did, since it's 100%, not additive :P
 
 		//mage talent "frostbyte". we make it to be dummy
 		sp = dbcSpell.LookupEntryForced( 11071 );
