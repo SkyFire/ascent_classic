@@ -455,6 +455,9 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 	 * IDs:
 	 *	11189 Frost Warding   -	RANK 1,		STATUS: DONE
 	 *  28332 Frost Warding   -	RANK 2,		STATUS: DONE
+	 *  11094 Molten Shields  -	RANK 1,		STATUS: DONE
+	 *  13043 Molten Shields  -	RANK 2,		STATUS: DONE
+
 	 *  --------------------------------------------
 	 *************************/
 	
@@ -484,8 +487,36 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 			ReflectSpellSchool *rss = new ReflectSpellSchool;
 			rss->chance = m_spellInfo->procChance;
 			rss->spellId = m_spellInfo->Id;
-			rss->require_aura_hash = 2161224959UL; 
-			rss->school = m_spellInfo->School;		
+			rss->require_aura_hash = SPELL_HASH_FROST_WARD; 
+			rss->school = SCHOOL_FROST;		
+
+			unitTarget->m_reflectSpellSchool.push_back(rss);
+		}break;
+	/*
+		Molten Shields	Rank 2
+		Causes your Fire Ward to have a 20% chance to reflect Fire spells while active. In addition, your Molten Armor has a 100% chance to affect ranged and spell attacks.
+		Effect #1	Apply Aura: Dummy
+		11904,13043
+	*/
+	case 11904:
+	case 13043:
+		{
+			if(!unitTarget)
+				break;
+			for(std::list<struct ReflectSpellSchool*>::iterator i = unitTarget->m_reflectSpellSchool.begin(), i2;i != unitTarget->m_reflectSpellSchool.end();)
+				if(m_spellInfo->Id == (*i)->spellId)
+				{
+					i2 = i++;
+					unitTarget->m_reflectSpellSchool.erase(i2);
+				}
+				else
+					++i;
+
+			ReflectSpellSchool *rss = new ReflectSpellSchool;
+			rss->chance = m_spellInfo->EffectBasePoints[0];
+			rss->spellId = m_spellInfo->Id;
+			rss->require_aura_hash = SPELL_HASH_FIRE_WARD; 
+			rss->school = SCHOOL_FIRE;		
 
 			unitTarget->m_reflectSpellSchool.push_back(rss);
 		}break;
