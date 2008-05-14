@@ -10380,7 +10380,7 @@ void Player::Social_AddFriend(const char * name, const char * note)
 	WorldPacket data(SMSG_FRIEND_STATUS, 10);
 	map<uint32, char*>::iterator itr;
 	PlayerInfo * info;
-	Player * pTarget;
+	//Player * pTarget;
 
 	// lookup the player
 	info = objmgr.GetPlayerInfoByName(name);
@@ -10391,14 +10391,14 @@ void Player::Social_AddFriend(const char * name, const char * note)
 		return;
 	}
 
-	// gm check
-	pTarget = m_session->GetPlayer()->GetMapMgr()->GetPlayer(info->guid);
+	// gm check - commented until i come up with a cleaner way of doing this, -comp.
+	/*pTarget = m_session->GetPlayer()->GetMapMgr()->GetPlayer(info->guid);
 	if( pTarget->GetSession()->HasGMPermissions() && !m_session->HasGMPermissions() && !sWorld.allow_gm_friends)
 	{
 		data << uint8(FRIEND_NOT_FOUND);
 		m_session->SendPacket(&data);
 		return;
-	}
+	}*/
 
 	// team check
 	if( info->team != m_playerInfo->team )
