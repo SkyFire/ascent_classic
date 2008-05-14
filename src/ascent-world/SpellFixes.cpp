@@ -18024,7 +18024,7 @@ void ApplyNormalFixes()
 		// Mage: Cold Snap ( set spell group relation for second effect, "gives you 100% chance to avoid interruption caused by damage while casting."
 		sp = dbcSpell.LookupEntryForced( 12472 ); 
 		if( sp != NULL )
-			sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF; // we can be sure this won't fuck up like Spell Power did, since it's 100%, not additive :P
+			sp->EffectSpellGroupRelation[1] = 0xFFFFFFFF; // we can be sure this won't fuck up like Spell Power did, since it's 100%, not additive :P 1
 
 		//mage talent "frostbyte". we make it to be dummy
 		sp = dbcSpell.LookupEntryForced( 11071 );
