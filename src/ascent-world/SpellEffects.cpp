@@ -5027,7 +5027,7 @@ void Spell::SpellEffectSummonObjectSlot(uint32 i)
 
 void Spell::SpellEffectDispelMechanic(uint32 i)
 {
-	if( !unitTarget && !unitTarget->isAlive() )
+	if( !unitTarget || !unitTarget->isAlive() )
 		return;
 	/* this was already working before...
 	uint32 sMisc = m_spellInfo->EffectMiscValue[i];
