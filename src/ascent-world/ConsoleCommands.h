@@ -35,4 +35,5 @@ bool HandleShutDownCommand(BaseConsole * pConsole, int argc, const char * argv[]
 bool HandleUnbanAccountCommand(BaseConsole * pConsole, int argc, const char * argv[]);
 bool HandleWAnnounceCommand(BaseConsole * pConsole, int argc, const char * argv[]);
 bool HandleWhisperCommand(BaseConsole * pConsole, int argc, const char * argv[]);
+bool HandleNameHashCommand(BaseConsole * pConsole, int argc, const char * argv[]);
 #endif

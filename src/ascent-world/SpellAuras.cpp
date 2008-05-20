@@ -5047,6 +5047,7 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 							case SPELL_AURA_MOD_CONFUSE:
 							case SPELL_AURA_MOD_ROOT:
 							case SPELL_AURA_MOD_FEAR:
+							case SPELL_AURA_MOD_CHARM:
 								m_target->m_auras[x]->Remove();
 								goto out;
 								break;

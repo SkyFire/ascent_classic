@@ -356,6 +356,7 @@ void HandleConsoleInput(BaseConsole * pConsole, const char * szInput)
 		{ &HandleUnbanAccountCommand, "unbanaccount", "<account>", "Unbans account x." },
 		{ &HandleWAnnounceCommand, "wannounce", "<wannounce string>", "Shows the message in all client title areas." },
 		{ &HandleWhisperCommand, "whisper","<player> <message>", "Whispers a message to someone from the console." },
+		{ &HandleNameHashCommand, "getnamehash" , "<text>" , "Returns the crc32 hash of <text>" } ,
 		{ NULL, NULL, NULL, NULL },
 	};
 

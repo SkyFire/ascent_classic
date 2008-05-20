@@ -317,3 +317,15 @@ bool HandleRehashCommand(BaseConsole * pConsole, int argc, const char * argv[])
 	sWorld.Rehash(true);
 	return true;
 }
+
+bool HandleNameHashCommand(BaseConsole * pConsole, int argc, const char * argv[])
+{
+	if( !argc )
+		return false;
+	string spname;
+		ConcatArgs(spname, argc, 0, argv);
+	pConsole->Write( "Name Hash for %s is 0x%X" , spname.c_str() , crc32((const unsigned char*)spname.c_str(), (unsigned int)spname.length()) );
+	sWorld.Rehash(true);
+	return true;
+}
+
