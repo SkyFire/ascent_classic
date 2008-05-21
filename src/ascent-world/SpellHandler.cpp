@@ -316,7 +316,10 @@ void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
 	for(uint32 x = 0; x < MAX_AURAS+MAX_POSITIVE_AURAS; ++x)
 	{
 		if(_player->m_auras[x] && _player->m_auras[x]->IsPositive() && _player->m_auras[x]->GetSpellId() == spellId)
+		{
+			_player->m_auras[x]->m_ignoreunapply = true; // prevent abuse
 			_player->m_auras[x]->Remove();
+		}
 	}
 	sLog.outDebug("removing aura %u",spellId);
 }

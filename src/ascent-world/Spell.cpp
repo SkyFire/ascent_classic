@@ -553,27 +553,31 @@ uint8 Spell::DidHit(uint32 effindex,Unit* target)
 	/*************************************************************************/
 	/* Check if the target is immune to this mechanic                        */
 	/*************************************************************************/
+ 
 	if(u_victim->MechanicsDispels[m_spellInfo->MechanicsType])
 	{
+		// Immune - IF, and ONLY IF, there is no damage component!
+		bool no_damage_component = true;
+		for( int x = 0 ; x <= 2 ; x ++ )
+		{
+			if( m_spellInfo->Effect[0] == SPELL_EFFECT_SCHOOL_DAMAGE
+				|| m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_PERCENT_DAMAGE
+				|| m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_DAMAGE
+				|| m_spellInfo->Effect[0] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL
+				|| m_spellInfo->Effect[0] == SPELL_EFFECT_DUMMY
+				|| ( m_spellInfo->Effect[0] == SPELL_EFFECT_APPLY_AURA &&
+					( m_spellInfo->EffectApplyAuraName[0] == SPELL_AURA_PERIODIC_DAMAGE 
+					) )
+				)
+			{
+				no_damage_component = false;
+				break;
+			}
+		}
+		if( no_damage_component )
 		return SPELL_DID_HIT_IMMUNE; // Moved here from Spell::CanCast
 	}
 	
-	/**** HACK FIX: AoE Snare/Root spells (i.e. Frost Nova) ****/
-	/* If you find any other AoE effects that also apply something that SHOULD be a mechanic, add it here. */
-	if( u_victim->MechanicsDispels[MECHANIC_ROOTED] ||
-		u_victim->MechanicsDispels[MECHANIC_ENSNARED]
-		)
-	{
-	for( int i = 0 ; i <= 2 ; i ++ )
-		{
-			if( u_victim->MechanicsDispels[MECHANIC_ROOTED] && m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_ROOT )
-				return SPELL_DID_HIT_IMMUNE;
-			if( u_victim->MechanicsDispels[MECHANIC_ENSNARED] && m_spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED )
-				return SPELL_DID_HIT_IMMUNE;
-		}
-
-	}
-
 	/************************************************************************/
 	/* Check if the target has a % resistance to this mechanic              */
 	/************************************************************************/
@@ -2472,6 +2476,8 @@ void Spell::HandleAddAura(uint64 guid)
 	uint32 spellid = 0;
 
 	if( m_spellInfo->MechanicsType == 25 && m_spellInfo->Id != 25771) // Cast spell Forbearance
+		spellid = 25771;
+	else if( m_spellInfo->NameHash == SPELL_HASH_AVENGING_WRATH )
 		spellid = 25771;
 	else if( m_spellInfo->MechanicsType == 16 && m_spellInfo->Id != 11196) // Cast spell Recently Bandaged
 		spellid = 11196;

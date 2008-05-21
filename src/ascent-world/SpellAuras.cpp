@@ -339,7 +339,7 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target )
 	m_duration = duration;
 	m_positive = 0; //we suppose spell will have positive impact on target
 	m_deleted = false;
-
+	m_ignoreunapply = false;
 	m_casterGuid = caster->GetGUID();
 	m_target = target;
 
@@ -1028,6 +1028,11 @@ void Aura::SpellAuraPeriodicDamage(bool apply)
 {
 	if(apply)
 	{
+		if( m_target )
+		{
+			if( m_spellProto->MechanicsType == MECHANIC_BLEEDING && m_target->MechanicsDispels[MECHANIC_BLEEDING] )
+				return;
+		}
 		int32 dmg	= mod->m_amount;
 		Unit *c = GetUnitCaster();
 		switch(m_spellProto->Id)
@@ -1336,7 +1341,7 @@ void Aura::SpellAuraDummy(bool apply)
 	case 66:
 		{
 			// mage - invisibility
-			if( !apply && !this->IsInterrupted() )
+			if( !apply && !this->IsInterrupted() && !m_ignoreunapply )
 				m_target->CastSpell( m_target, 32612, true );
 		}break;
 	//paladin - Blessing of Light.
@@ -1940,7 +1945,9 @@ void Aura::SpellAuraDummy(bool apply)
 		{
 			if(apply)
 				return;
-
+			// apply ONCE only.
+			if( m_ignoreunapply )
+				return;
 			Unit * pCaster = GetUnitCaster();
 			if( pCaster == NULL )
 				pCaster = m_target;
@@ -1949,7 +1956,22 @@ void Aura::SpellAuraDummy(bool apply)
 			Spell spell(pCaster, m_spellProto, true, NULL);
 			spell.SetUnitTarget( m_target );
 			spell.Heal( mod->m_amount );
-			pCaster->RemoveAllAuras(pSpellId,0);
+
+			// Remove other Lifeblooms - but do NOT handle unapply again
+			for(uint32 x=0;x<MAX_AURAS;x++)
+			{
+				if(m_target->m_auras[x])
+				{
+					if( m_target->m_auras[x]->GetSpellId() == 33763 )
+					{
+						m_target->m_auras[x]->m_ignoreunapply = true;
+						m_target->m_auras[x]->Remove();
+					}
+				}
+			}
+	
+			//pCaster->RemoveAllAuras(pSpellId,0);
+
 			//pCaster->Heal( m_target, m_spellProto->Id, mod->m_amount );
 		}break;
 
@@ -2049,7 +2071,14 @@ void Aura::SpellAuraModConfuse(bool apply)
 	if(apply)
 	{
 		if( u_caster == NULL ) return;
-
+		// Check Mechanic Immunity
+		if( m_target )
+		{
+			if( m_target->MechanicsDispels[MECHANIC_DISORIENTED] 
+			|| ( m_spellProto->MechanicsType == MECHANIC_POLYMORPHED && m_target->MechanicsDispels[MECHANIC_POLYMORPHED] ) 
+			)
+				 return;
+		}
 		SetNegative();
 		
 		m_target->m_special_state |= UNIT_STATE_CONFUSE;
@@ -2186,7 +2215,12 @@ void Aura::SpellAuraModFear(bool apply)
 	if(apply)
 	{
 		if( u_caster == NULL ) return;
-
+		// Check Mechanic Immunity
+		if( m_target )
+		{
+			if( m_target->MechanicsDispels[MECHANIC_FLEEING] )
+				 return;
+		}
 		SetNegative();
 
 		m_target->m_special_state |= UNIT_STATE_FEAR;
@@ -2511,6 +2545,18 @@ void Aura::SpellAuraModStun(bool apply)
 
 	if(apply)
 	{ 
+		// Check Mechanic Immunity
+		// Stun is a tricky one... it's used for all different kinds of mechanics as a base Aura
+		if( m_target && !IsPositive() && !m_spellProto->NameHash == SPELL_HASH_ICE_BLOCK ) // ice block stuns you, don't want our own spells to ignore stun effects
+		{
+			if( ( m_spellProto->MechanicsType == MECHANIC_CHARMED &&  m_target->MechanicsDispels[MECHANIC_CHARMED] )
+			|| ( m_spellProto->MechanicsType == MECHANIC_INCAPACIPATED && m_target->MechanicsDispels[MECHANIC_INCAPACIPATED] )
+			
+			|| ( m_spellProto->MechanicsType == MECHANIC_SAPPED && m_target->MechanicsDispels[MECHANIC_SAPPED] )
+			|| ( m_target->MechanicsDispels[MECHANIC_STUNNED] )
+				)
+				 return;
+		}
 		SetNegative();
 
 		m_target->m_rooted++;
@@ -3203,6 +3249,12 @@ void Aura::SpellAuraModRoot(bool apply)
 {
 	if(apply)
 	{
+		// Check Mechanic Immunity
+		if( m_target )
+		{
+			if( m_target->MechanicsDispels[MECHANIC_ROOTED] )
+				 return;
+		}
 		SetNegative();
 
 		m_target->m_rooted++;
@@ -3422,6 +3474,12 @@ void Aura::SpellAuraModDecreaseSpeed(bool apply)
 	//there can not be 2 slow downs only most powerfull is applied
 	if(apply)
 	{
+		// Check Mechanic Immunity
+		if( m_target )
+		{
+			if( m_target->MechanicsDispels[MECHANIC_ENSNARED] )
+				 return;
+		}
 		switch(m_spellProto->NameHash)
 		{
 			case 0x1931b37a:			// Stealth
@@ -4997,7 +5055,7 @@ void Aura::SpellAuraMechanicImmunity(bool apply)
 	{
 		//sLog.outString( "mod->m_miscValue = %u" , (uint32) mod->m_miscValue );
 		//sLog.outString( "Incrementing MechanicsDispels (current value: %u, new val: %u)" , m_target->MechanicsDispels[mod->m_miscValue] , m_target->MechanicsDispels[mod->m_miscValue] + 1 );
-		assert(mod->m_miscValue < 27);
+		assert(mod->m_miscValue < 31);
 		m_target->MechanicsDispels[mod->m_miscValue]++;
 
 		if(mod->m_miscValue != 16 && mod->m_miscValue != 25 && mod->m_miscValue != 19) // dont remove bandages, Power Word and protection effect
@@ -5287,8 +5345,65 @@ void Aura::SpellAuraSplitDamage(bool apply)
 	//if( m_target == uCaster )
 	//	return;
 
-	//brrr, temporarty fix, this is used only by soul link atm:P
+	// Correct (?) implementation of SplitDamage.
+	
+	
 
+
+	if( apply )
+	{
+
+		for( std::list<DamageSplitTarget>::iterator itr = m_target->m_damageSplitTargets.begin() ; itr != m_target->m_damageSplitTargets.end() ; itr ++ )
+		{
+			if( itr->m_target == m_casterGuid ) // Prevent looping in damage swapping, this will lead to infinite loop crash.
+				return;
+			if( itr->m_spellId == GetSpellId() )
+				m_target->m_damageSplitTargets.erase( itr ); // overwrite older effects
+		}
+		DamageSplitTarget dst;// = new DamageShield();
+		dst.m_target = m_target->GetGUID();
+		dst.m_spellId = GetSpellId();
+		dst.m_flatDamageSplit = mod->m_amount;
+		dst.m_pctDamageSplit = 0.0f;
+		dst.damage_type = mod->m_miscValue;
+		dst.creator = (void*)this;
+		m_target->m_damageSplitTargets.push_back(dst);		
+		Log.Notice( "SSSS" , "Added SPLITDAMAGE OMG" );
+	}
+	else
+	{
+		for( std::list<DamageSplitTarget>::iterator itr = m_target->m_damageSplitTargets.begin() ; itr != m_target->m_damageSplitTargets.end() ; itr ++ )
+		{
+			if( itr->creator == this )
+				m_target->m_damageSplitTargets.erase( itr ); // erase
+		}		
+	}
+	/* COPY: DamageShield 
+		if(apply)
+	{
+		SetPositive();
+		DamageProc ds;// = new DamageShield();
+		ds.m_damage = mod->m_amount;
+		ds.m_spellId = GetSpellProto()->Id;
+		ds.m_school = GetSpellProto()->School;
+		ds.m_flags = PROC_ON_MELEE_ATTACK_VICTIM | PROC_MISC; //maybe later we might want to add other flags too here
+		ds.owner = (void*)this;
+		m_target->m_damageShields.push_back(ds);
+	}
+	else
+	{
+		for(std::list<struct DamageProc>::iterator i = m_target->m_damageShields.begin();i != m_target->m_damageShields.end();i++)
+		{
+			if(i->owner==this)
+			{
+				 m_target->m_damageShields.erase(i);
+				 return;
+			}
+		}
+	}
+*/
+	//brrr, temporarty fix, this is used only by soul link atm:P
+/*
 	if( !m_target->IsPet() )
 		return;
 
@@ -5309,6 +5424,7 @@ void Aura::SpellAuraSplitDamage(bool apply)
 		petOwner->DamageTakenPctMod[x] -= val;
 		m_target->DamageTakenPctMod[x] += val;
 	}
+	*/
 }
 
 void Aura::SpellAuraModRegen(bool apply)
@@ -6659,6 +6775,33 @@ void Aura::SpellAuraModDetectedRange(bool apply)
 void Aura::SpellAuraSplitDamageFlat(bool apply)
 {
 	//DK:FIXME
+	//SUPA:FIXU
+
+	// rewrite, copy-paste DamageProc struct.
+	if(apply)
+	{
+		DamageSplitTarget ds;
+		ds.m_flatDamageSplit = mod->m_amount;
+		ds.m_spellId = GetSpellProto()->Id;
+		ds.m_pctDamageSplit = 0;
+		ds.damage_type = mod->m_miscValue;
+		ds.creator = (void*)this;
+		ds.m_target = GetCaster()->GetGUID();
+		m_target->m_damageSplitTargets.push_back(ds);
+		//sLog.outDebug("registering dmg split %u, school %u, flags %u, charges %u \n",ds.m_spellId,ds.m_school,ds.m_flags,m_spellProto->procCharges);
+	}
+	else
+	{
+		for(std::list<struct DamageSplitTarget>::iterator i = m_target->m_damageSplitTargets.begin();i != m_target->m_damageSplitTargets.end();i++)
+		{
+			if(i->creator == this)
+			{
+				m_target->m_damageSplitTargets.erase(i);
+				break;
+			}
+		}
+	}
+
 }
 
 void Aura::SpellAuraModStealthLevel(bool apply)

@@ -13939,24 +13939,27 @@ void ApplyNormalFixes()
 		if(sp->procCharges==0)
 			sp->procCharges=-1;*/
 
-		//Set Silencing spells mech.
-		if( sp->EffectApplyAuraName[0] == 27 || 
-			sp->EffectApplyAuraName[1] == 27 ||
-			sp->EffectApplyAuraName[2] == 27 )
-			sp->MechanicsType = MECHANIC_SILENCED;
+		// Set default mechanics if we don't already have one
+		if( !sp->MechanicsType )
+		{
+			//Set Silencing spells mechanic.
+			if( sp->EffectApplyAuraName[0] == 27 || 
+				sp->EffectApplyAuraName[1] == 27 ||
+				sp->EffectApplyAuraName[2] == 27 )
+				sp->MechanicsType = MECHANIC_SILENCED;
 
-		//Set Stunning spells mech.
-		if( sp->EffectApplyAuraName[0] == 12 || 
-			sp->EffectApplyAuraName[1] == 12 ||
-			sp->EffectApplyAuraName[2] == 12 )
-			sp->MechanicsType = MECHANIC_STUNNED;
+			//Set Stunning spells mechanic.
+			if( sp->EffectApplyAuraName[0] == 12 || 
+				sp->EffectApplyAuraName[1] == 12 ||
+				sp->EffectApplyAuraName[2] == 12 )
+				sp->MechanicsType = MECHANIC_STUNNED;
 
-		//Set Fearing spells mech
-		if( sp->EffectApplyAuraName[0] == 7 || 
-			sp->EffectApplyAuraName[1] == 7 ||
-			sp->EffectApplyAuraName[2] == 7 )
-			sp->MechanicsType = MECHANIC_FLEEING;
-
+			//Set Fearing spells mechanic
+			if( sp->EffectApplyAuraName[0] == 7 || 
+				sp->EffectApplyAuraName[1] == 7 ||
+				sp->EffectApplyAuraName[2] == 7 )
+				sp->MechanicsType = MECHANIC_FLEEING;
+		}
 		if( sp->proc_interval != 0 )
 			sp->procFlags |= PROC_REMOVEONUSE;
 
@@ -14305,6 +14308,13 @@ void ApplyNormalFixes()
 		//////////////////////////////////////////
 
 		// Insert mage spell fixes here
+
+			// Invisibility: changed to "Dummy" effect for invisibility to trigger.
+			if( sp->NameHash == SPELL_HASH_INVISIBILITY )
+			{
+				sp->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+				sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+			}
 
 		//////////////////////////////////////////
 		// WARLOCK								//
@@ -18101,6 +18111,7 @@ void ApplyNormalFixes()
 			sp->procChance = 30;
 			sp->proc_interval = 13000;
 		}
+
 		/**********************************************************
 		 *	Backlash
 		 **********************************************************/

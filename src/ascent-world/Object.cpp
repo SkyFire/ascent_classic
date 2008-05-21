@@ -1605,7 +1605,7 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		//the black sheep , no actually it is paladin : Ardent Defender
 		if(static_cast<Unit*>(this)->DamageTakenPctModOnHP35 && HasFlag(UNIT_FIELD_AURASTATE , AURASTATE_FLAG_HEALTH35) )
 			damage = damage - float2int32(damage * static_cast<Unit*>(this)->DamageTakenPctModOnHP35) / 100 ;
-			
+
 		plr = 0;
 		if(IsPet())
 			plr = static_cast<Pet*>(this)->GetPetOwner();
@@ -2428,7 +2428,36 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		dmg.resisted_damage = dmg.full_damage;
 	}
 	//DK:FIXME->SplitDamage
-	
+	// Completed (Supa)
+	// Paladin: Blessing of Sacrifice, and Warlock: Soul Link
+		if( !pVictim->m_damageSplitTargets.empty() )
+		{
+			std::list< DamageSplitTarget >::iterator itr;
+			Unit * splittarget;
+			uint32 splitdamage, tmpsplit;
+			for( itr = pVictim->m_damageSplitTargets.begin() ; itr != pVictim->m_damageSplitTargets.end() ; itr ++ )
+			{
+				// TODO: Separate damage based on school.
+				splittarget = pVictim->GetMapMgr() ? pVictim->GetMapMgr()->GetUnit( itr->m_target ) : NULL;
+				if( splittarget && res > 0 )
+				{
+					// calculate damage
+					tmpsplit = itr->m_flatDamageSplit;
+					if( tmpsplit > float2int32( res ))
+						tmpsplit = float2int32( res ); // prevent < 0 damage
+					splitdamage = tmpsplit;
+					res -= (float)tmpsplit;
+					// TODO: pct damage
+
+					if( splitdamage )
+					{
+						pVictim->DealDamage( splittarget , splitdamage , 0 , 0 , 0 , false );
+						// Send damage log
+						pVictim->SendSpellNonMeleeDamageLog( pVictim , splittarget , 27148 , splitdamage , SCHOOL_HOLY , 0 , 0 , true , 0 , 0 , true );
+					}
+				}
+			}
+		}
 //==========================================================================================
 //==============================Data Sending ProcHandling===================================
 //==========================================================================================

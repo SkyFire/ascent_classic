@@ -825,6 +825,7 @@ public:
 	bool m_damgeShieldsInUse;
 	std::list<struct DamageProc> m_damageShields;
 	std::list<struct ReflectSpellSchool*> m_reflectSpellSchool;
+ 	std::list<struct DamageSplitTarget> m_damageSplitTargets;
  
 	std::list<struct ProcTriggerSpell> m_procSpells;
 //	std::map<uint32,ProcTriggerSpellOnSpellList> m_procSpellonSpell; //index is namehash

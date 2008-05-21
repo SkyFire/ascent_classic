@@ -292,7 +292,15 @@ struct DamageProc
     uint32 m_flags;
     void  *owner;//mark the owner of this proc to know which one to delete
 };
-
+struct DamageSplitTarget
+{
+	uint64 m_target; // we store them
+	uint32 m_spellId;
+    float m_pctDamageSplit; // % of taken damage to transfer (i.e. Soul Link)
+	uint32 m_flatDamageSplit; // flat damage to transfer (i.e. Blessing of Sacrifice)
+	uint8 damage_type; // bitwise 0-127 thingy
+	void * creator;
+};
 #ifndef NEW_PROCFLAGS
 struct ProcTriggerSpell
 {
@@ -369,6 +377,7 @@ public:
 	void EventUpdateAA(float r);
 	void RemoveAA();
 		
+
 	ASCENT_INLINE uint32 GetTimeLeft()//in sec
 	{
 		if(m_duration==-1)return (uint32)-1;
@@ -702,12 +711,13 @@ private:
 protected:
 	uint32 m_casterfaction;
 
+
 	void SendInterrupted(uint8 result, Object * m_caster);
 	void SendChannelUpdate(uint32 time, Object * m_caster);
 public:
 	bool m_deleted;
 	int16 m_interrupted;
-
+	bool m_ignoreunapply; // "special" case, for unapply
 	ASCENT_INLINE bool IsInterrupted() { return ( m_interrupted >= 0 ); }
 };
 

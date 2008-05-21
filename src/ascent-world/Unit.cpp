@@ -2963,6 +2963,36 @@ else
 //==========================================================================================
 //==============================Post Roll Special Cases Processing==========================
 //==========================================================================================
+//------------------------------- Special Effects Processing
+// Paladin: Blessing of Sacrifice, and Warlock: Soul Link
+		if( !pVictim->m_damageSplitTargets.empty() )
+		{
+			std::list< DamageSplitTarget >::iterator itr;
+			Unit * splittarget;
+			uint32 splitdamage, tmpsplit;
+			for( itr = pVictim->m_damageSplitTargets.begin() ; itr != pVictim->m_damageSplitTargets.end() ; itr ++ )
+			{
+				// TODO: Separate damage based on school.
+				splittarget = pVictim->GetMapMgr() ? pVictim->GetMapMgr()->GetUnit( itr->m_target ) : NULL;
+				if( splittarget && dmg.full_damage > 0 )
+				{
+					// calculate damage
+					tmpsplit = itr->m_flatDamageSplit;
+					if( tmpsplit > dmg.full_damage )
+						tmpsplit = dmg.full_damage; // prevent < 0 damage
+					splitdamage = tmpsplit;
+					dmg.full_damage -= tmpsplit;
+					// TODO: pct damage
+					if( splitdamage )
+					{
+						pVictim->DealDamage( splittarget , splitdamage , 0 , 0 , 0 , false );
+						// Send damage log
+						pVictim->SendSpellNonMeleeDamageLog( pVictim , splittarget , 27148 , splitdamage , SCHOOL_HOLY , 0 , 0 , true , 0 , 0 , true );
+					}
+				}
+			}
+			realdamage = dmg.full_damage;
+		}
 //--------------------------special states processing---------------------------------------
 	if(pVictim->GetTypeId() == TYPEID_UNIT)
 	{
@@ -3171,6 +3201,7 @@ else
 		// have to set attack target here otherwise it wont be set
 		// because dealdamage is not called.
 		//setAttackTarget(pVictim);
+		pVictim->CombatStatus.OnDamageDealt( this );
 	}
 //==========================================================================================
 //==============================Post Damage Dealing Processing==============================
@@ -6113,8 +6144,6 @@ bool Unit::RemoveAllAurasByMechanic( uint32 MechanicType , uint32 MaxDispel = -1
 			{
 					if( m_auras[x]->GetSpellProto()->MechanicsType == MechanicType ) // Remove all mechanics of type MechanicType (my english goen boom)
 					{
-						//sLog.outString( "Removed aura. [AuraSlot %u, SpellId %u]" , x , m_auras[x]->GetSpellId() );
-						// TODO: Stop moving if fear was removed.
 						m_auras[x]->Remove(); // EZ-Remove
 						DispelCount ++;
 					}
