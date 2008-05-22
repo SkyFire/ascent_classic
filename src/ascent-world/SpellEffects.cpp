@@ -1546,6 +1546,12 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 
 	uint32 powerField = UNIT_FIELD_POWER1+m_spellInfo->EffectMiscValue[i];
 	uint32 curPower = unitTarget->GetUInt32Value(powerField);
+	if( powerField == UNIT_FIELD_POWER1 && unitTarget->IsPlayer() )
+	{
+		// Resilience - reduces the effect of mana drains by (CalcRating*2)%.
+
+		damage *= 1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f );
+	}
 	uint32 amt=damage+((u_caster->GetDamageDoneMod(m_spellInfo->School)*80)/100);
 	if(amt>curPower)
 	{
@@ -1557,6 +1563,7 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 		u_caster->SetUInt32Value(powerField,m);
 	else
 		u_caster->SetUInt32Value(powerField,u_caster->GetUInt32Value(powerField)+amt);	
+
 	SendHealManaSpellOnPlayer(u_caster, u_caster, amt, m_spellInfo->EffectMiscValue[i]);
 }
 
@@ -3595,7 +3602,12 @@ void Spell::SpellEffectPowerBurn(uint32 i) // power burn
 		return;
 	if (unitTarget->GetPowerType() != POWER_TYPE_MANA)
 		return;
+	if( unitTarget->IsPlayer() )
+	{
+		// Resilience - reduces the effect of mana drains by (CalcRating*2)%.
 
+		damage *= 1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f );
+	}
 	int32 mana = (int32)min( (int32)unitTarget->GetUInt32Value( UNIT_FIELD_POWER1 ), damage );
 	unitTarget->ModUnsigned32Value(UNIT_FIELD_POWER1,-mana);
 	

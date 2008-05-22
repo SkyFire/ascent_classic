@@ -14566,6 +14566,12 @@ void ApplyNormalFixes()
 	if( sp != NULL )
 		sp->procChance = 50;
 
+	/**********************************************************
+	 * Mana Tap - BLOOD ELF RACIAL
+	 **********************************************************/
+	sp = dbcSpell.LookupEntryForced( 28734 );
+	if( sp != NULL )
+		sp->Effect[0] = SPELL_EFFECT_POWER_BURN; // should be Power Burn, not Power Drain. Power Drain leeches mana which is incorrect.
 
 	/**********************************************************
 	 * thrown - add a 1.6 second cooldown
@@ -20875,6 +20881,12 @@ void ApplyNormalFixes()
 			sp->ReagentCount[1] = 0;
 			sp->EffectSpellGroupRelation[0] = 23248;
 			sp->Effect[0] = 24;
+		}
+		// Clefthide Leg Armor - not ENCHANT_OWN_ONLY.
+		sp = dbcSpell.LookupEntryForced( 35489 );
+		if( sp != NULL )
+		{
+			sp->Flags3 = 0;
 		}
 
 		// - Warrior - Warbringer Armor
