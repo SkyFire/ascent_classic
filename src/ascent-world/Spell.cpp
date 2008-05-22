@@ -3457,6 +3457,8 @@ uint8 Spell::CanCast(bool tolerate)
 		return SPELL_FAILED_DAMAGE_IMMUNE;
 	if (m_spellInfo->MechanicsType == 25 && ((target) ? target->HasAura(25771) : u_caster->HasAura(25771))) //Forbearance
 		return SPELL_FAILED_DAMAGE_IMMUNE;
+	if( m_spellInfo->NameHash == SPELL_HASH_AVENGING_WRATH && ((target) ? target->HasAura(25771) : u_caster->HasAura(25771))) // forbearance, avenging wrath
+		return SPELL_FAILED_DAMAGE_IMMUNE;
 	if (m_spellInfo->NameHash == SPELL_HASH_ICE_BLOCK && u_caster->HasAura(41425))
 		return SPELL_FAILED_DAMAGE_IMMUNE;
 	if (m_spellInfo->MechanicsType == 16 && ((target) ? target->HasAura(11196) : u_caster->HasAura(11196)))
