@@ -355,10 +355,11 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 			{
 				if(u_caster)
 					dmg += float2int32(float(u_caster->GetRAP())*0.15f);
+				dmg *= float2int32( 0.9f + RandomFloat( 0.2f ) ); // randomised damage
 			}break;
 		case SPELL_HASH_GORE: // boar/ravager: Gore (50% chance of double damage)
 			{
-				dmg *= Rand( 50 ) ? 2 : 0;
+				dmg *= Rand( 50 ) ? 2 : 1;
 			}
 			break;
 		case 0xCBC738B8:	// Bloodthirst
@@ -887,7 +888,7 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 
 	//curse of agony(18230) = periodic damage increased in 
 	//flag 2031678
-	case 34120:
+	/*case 34120:
 		{//steady shot
 		if(unitTarget)
 		if(unitTarget->IsDazed())
@@ -895,8 +896,9 @@ void Spell::SpellEffectDummy(uint32 i) // Dummy(Scripted events)
 //			u_caster->SpellNonMeleeDamageLog(unitTarget,spellId,damage,false);
 			u_caster->SpellNonMeleeDamageLog(unitTarget,spellId,damage,pSpellId==0);
 		}
-		
+	
 		}break;
+	*/
 	case 1454://life tap
 	case 1455:
 	case 1456:

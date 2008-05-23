@@ -2012,6 +2012,7 @@ void Unit::RegeneratePower(bool isinterrupted)
 			break;
 		case POWER_TYPE_FOCUS:
 			static_cast<Creature*>(this)->RegenerateFocus();
+			m_P_regenTimer = 4000;
 			break;
 		}
 	}

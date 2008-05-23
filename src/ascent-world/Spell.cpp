@@ -3764,12 +3764,15 @@ exit:
 				Item *it;
 				if(p_caster->GetItemInterface())
 				{
-					it = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_MAINHAND);
+					it = p_caster->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_RANGED);
 					if(it)
-						value += float2int32(150 + float(it->GetProto()->Damage[0].Min)/float(it->GetProto()->Delay)*2.8f);
+					{
+						float weapondmg = it->GetProto()->Damage[0].Min + RandomFloat( it->GetProto()->Damage[0].Max );
+						value += float2int32(150 + weapondmg/float(it->GetProto()->Delay/1000.0f)*2.8f);
+					}
 				}
 			}
-			if(target && target->HasNegativeAura(CREATURE_SPELL_TO_DAZE))
+			if(target && target->IsDazed())
 				value += 175;
 			value += (uint32)(u_caster->GetRAP()*0.2);
 		}

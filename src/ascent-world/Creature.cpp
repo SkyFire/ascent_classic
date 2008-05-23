@@ -651,7 +651,7 @@ void Creature::RegenerateFocus()
 	uint32 cur=GetUInt32Value(UNIT_FIELD_POWER3);
 	uint32 mm=GetUInt32Value(UNIT_FIELD_MAXPOWER3);
 	if(cur>=mm)return;
-	float amt = 10.0f * PctPowerRegenModifier[POWER_TYPE_FOCUS];
+	float amt = 25.0f * PctPowerRegenModifier[POWER_TYPE_FOCUS];
 	cur+=(uint32)amt;
 	SetUInt32Value(UNIT_FIELD_POWER3,(cur>=mm)?mm:cur);
 }
