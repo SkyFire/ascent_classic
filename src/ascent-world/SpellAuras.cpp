@@ -5335,9 +5335,36 @@ void Aura::SpellAuraModPercStat(bool apply)
 
 void Aura::SpellAuraSplitDamage(bool apply)
 {
+	return; // disabled: see note later
 	if( !m_target->IsUnit() )
 		return;
+//SUPA:FIXU
 
+	// rewrite, copy-paste DamageProc struct.
+	// NOTE: not handled by Split Damage handlers yet, only Flat Damage so far.
+	if(apply)
+	{
+		DamageSplitTarget ds;
+		ds.m_flatDamageSplit = 0;
+		ds.m_spellId = GetSpellProto()->Id;
+		ds.m_pctDamageSplit = mod->m_amount;;
+		ds.damage_type = mod->m_miscValue;
+		ds.creator = (void*)this;
+		ds.m_target = GetCaster()->GetGUID();
+		m_target->m_damageSplitTargets.push_back(ds);
+		//sLog.outDebug("registering dmg split %u, school %u, flags %u, charges %u \n",ds.m_spellId,ds.m_school,ds.m_flags,m_spellProto->procCharges);
+	}
+	else
+	{
+		for(std::list<struct DamageSplitTarget>::iterator i = m_target->m_damageSplitTargets.begin();i != m_target->m_damageSplitTargets.end();i++)
+		{
+			if(i->creator == this)
+			{
+				m_target->m_damageSplitTargets.erase(i);
+				break;
+			}
+		}
+	}
 	//Unit* uCaster = GetUnitCaster();
 	//if( !uCaster )
 	//	return;
@@ -5350,34 +5377,6 @@ void Aura::SpellAuraSplitDamage(bool apply)
 	
 
 
-	if( apply )
-	{
-
-		for( std::list<DamageSplitTarget>::iterator itr = m_target->m_damageSplitTargets.begin() ; itr != m_target->m_damageSplitTargets.end() ; itr ++ )
-		{
-			if( itr->m_target == m_casterGuid ) // Prevent looping in damage swapping, this will lead to infinite loop crash.
-				return;
-			if( itr->m_spellId == GetSpellId() )
-				m_target->m_damageSplitTargets.erase( itr ); // overwrite older effects
-		}
-		DamageSplitTarget dst;// = new DamageShield();
-		dst.m_target = m_target->GetGUID();
-		dst.m_spellId = GetSpellId();
-		dst.m_flatDamageSplit = mod->m_amount;
-		dst.m_pctDamageSplit = 0.0f;
-		dst.damage_type = mod->m_miscValue;
-		dst.creator = (void*)this;
-		m_target->m_damageSplitTargets.push_back(dst);		
-		Log.Notice( "SSSS" , "Added SPLITDAMAGE OMG" );
-	}
-	else
-	{
-		for( std::list<DamageSplitTarget>::iterator itr = m_target->m_damageSplitTargets.begin() ; itr != m_target->m_damageSplitTargets.end() ; itr ++ )
-		{
-			if( itr->creator == this )
-				m_target->m_damageSplitTargets.erase( itr ); // erase
-		}		
-	}
 	/* COPY: DamageShield 
 		if(apply)
 	{
