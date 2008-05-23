@@ -356,6 +356,11 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 				if(u_caster)
 					dmg += float2int32(float(u_caster->GetRAP())*0.15f);
 			}break;
+		case SPELL_HASH_GORE: // boar/ravager: Gore (50% chance of double damage)
+			{
+				dmg *= Rand( 50 ) ? 2 : 0;
+			}
+			break;
 		case 0xCBC738B8:	// Bloodthirst
 			{
                 dmg = u_caster->GetAP()*(m_spellInfo->EffectBasePoints[0]+1) / 100;
