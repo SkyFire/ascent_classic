@@ -2547,7 +2547,7 @@ void Aura::SpellAuraModStun(bool apply)
 	{ 
 		// Check Mechanic Immunity
 		// Stun is a tricky one... it's used for all different kinds of mechanics as a base Aura
-		if( m_target && !IsPositive() && !m_spellProto->NameHash == SPELL_HASH_ICE_BLOCK ) // ice block stuns you, don't want our own spells to ignore stun effects
+		if( m_target && !IsPositive() && m_spellProto->NameHash != SPELL_HASH_ICE_BLOCK ) // ice block stuns you, don't want our own spells to ignore stun effects
 		{
 			if( ( m_spellProto->MechanicsType == MECHANIC_CHARMED &&  m_target->MechanicsDispels[MECHANIC_CHARMED] )
 			|| ( m_spellProto->MechanicsType == MECHANIC_INCAPACIPATED && m_target->MechanicsDispels[MECHANIC_INCAPACIPATED] )
