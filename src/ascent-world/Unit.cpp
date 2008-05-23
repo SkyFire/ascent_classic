@@ -2982,6 +2982,11 @@ else
 						tmpsplit = dmg.full_damage; // prevent < 0 damage
 					splitdamage = tmpsplit;
 					dmg.full_damage -= tmpsplit;
+					tmpsplit = itr->m_pctDamageSplit * dmg.full_damage;
+					if( tmpsplit > dmg.full_damage )
+						tmpsplit = dmg.full_damage;
+					splitdamage += tmpsplit;
+					dmg.full_damage -= tmpsplit;
 					// TODO: pct damage
 					if( splitdamage )
 					{

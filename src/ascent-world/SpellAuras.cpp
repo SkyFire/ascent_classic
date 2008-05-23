@@ -5335,19 +5335,19 @@ void Aura::SpellAuraModPercStat(bool apply)
 
 void Aura::SpellAuraSplitDamage(bool apply)
 {
-	return; // disabled: see note later
+	
 	if( !m_target->IsUnit() )
 		return;
 //SUPA:FIXU
 
 	// rewrite, copy-paste DamageProc struct.
-	// NOTE: not handled by Split Damage handlers yet, only Flat Damage so far.
+
 	if(apply)
 	{
 		DamageSplitTarget ds;
 		ds.m_flatDamageSplit = 0;
 		ds.m_spellId = GetSpellProto()->Id;
-		ds.m_pctDamageSplit = mod->m_amount;;
+		ds.m_pctDamageSplit = mod->m_amount / 100.0f;
 		ds.damage_type = mod->m_miscValue;
 		ds.creator = (void*)this;
 		ds.m_target = GetCaster()->GetGUID();

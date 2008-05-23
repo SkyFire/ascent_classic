@@ -2447,6 +2447,11 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 						tmpsplit = float2int32( res ); // prevent < 0 damage
 					splitdamage = tmpsplit;
 					res -= (float)tmpsplit;
+					tmpsplit = itr->m_pctDamageSplit * res;
+					if( tmpsplit > float2int32( res ) )
+						tmpsplit = float2int32( res );
+					splitdamage += tmpsplit;
+					res -= (float)tmpsplit;
 					// TODO: pct damage
 
 					if( splitdamage )
