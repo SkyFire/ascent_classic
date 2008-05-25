@@ -16361,10 +16361,7 @@ void ApplyNormalFixes()
 		if( sp != NULL )
 			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
 
-		// rogue - shadowstep
-		sp = dbcSpell.LookupEntryForced( 36554 );
-		if( sp != NULL )
-			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+
 
 		// rogue - Blind (Make it able to miss!)
 		sp = dbcSpell.LookupEntryForced( 2094 );
@@ -16423,13 +16420,21 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 36563 ); 
 		if( sp != NULL )
 		{
-			sp->EffectSpellGroupRelation[3] = group_relation_rogue_shadow_step;
-			sp->EffectSpellGroupRelation_high[3] = 256 | 128 ;
-			sp->EffectMiscValue[3] = SMT_SPELL_VALUE;
-			sp->EffectTriggerSpell[1] = 36554;
-			sp->EffectTriggerSpell[2] = 44373;
-			sp->procFlags = PROC_ON_CAST_SPELL;	
+			// Effect goes from 0-2, not 1-3... -.-
+			sp->EffectSpellGroupRelation[2] = group_relation_rogue_shadow_step;
+			sp->EffectSpellGroupRelation_high[2] = 256 | 128 ;
+			sp->EffectMiscValue[1] = SMT_SPELL_VALUE;
 		}
+		// Still related to shadowstep - prevent the trigger spells from breaking stealth.
+		sp = dbcSpell.LookupEntryForced( 44373 );
+		if( sp )
+			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+		sp = dbcSpell.LookupEntryForced( 36563 );
+		if( sp )
+			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
+		sp = dbcSpell.LookupEntryForced( 36554 );
+		if( sp != NULL )
+			sp->AttributesEx |= ATTRIBUTESEX_NOT_BREAK_STEALTH;
 
 		//rogue ( grouping ) Lethality
 		group_relation_rogue_lethality |= 2;//rogue - Sinister Strike (only a part of the whole group since it would affect other spells too)

@@ -119,7 +119,8 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 
 		sLog.outDebug( "WORLD: got MSG_MOVE_TELEPORT_ACK." );
 		GetPlayer()->SetPlayerStatus(NONE);
-		GetPlayer()->SetMovement(MOVE_UNROOT,5);
+		if( GetPlayer()->m_rooted <= 0 )
+			GetPlayer()->SetMovement(MOVE_UNROOT,5);
 		_player->ResetHeartbeatCoords();
 
 		if(GetPlayer()->GetSummon() != NULL)		// move pet too

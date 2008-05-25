@@ -1252,7 +1252,7 @@ void Spell::cast(bool check)
 				p_caster->setAttackTimer( 0, true );
 				p_caster->setAttackTimer( 0, false );
 			}
-			if( p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_NOT_BREAK_STEALTH) )
+			if( p_caster->IsStealth() && !(m_spellInfo->AttributesEx & ATTRIBUTESEX_NOT_BREAK_STEALTH) && m_spellInfo->Id != 1 ) // <-- baaaad, baaad hackfix - for some reason some spells were triggering Spell ID #1 and stuffing up the spell system.
 			{
 				/* talents procing - don't remove stealth either */
 				if (!(m_spellInfo->Attributes & ATTRIBUTES_PASSIVE) && 
@@ -4446,7 +4446,7 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 	switch(Target->m_diminishCount[Grp])
 	{
 	case 0: // Full effect
-		if (Target->IsPlayer() && Dur > 10000)
+		if ( ( Target->IsPlayer() || Target->IsPet() ) && Dur > 10000)
 		{
 			Dur = 10000;
 		}
@@ -4454,7 +4454,7 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 		
 	case 1: // Reduced by 50%
 		Dur *= 0.5f;
-		if (Target->IsPlayer() && Dur > 5000)
+		if ( ( Target->IsPlayer() || Target->IsPet() ) && Dur > 5000)
 		{
 			Dur = 5000;
 		}
@@ -4462,7 +4462,7 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 
 	case 2: // Reduced by 75%
 		Dur *= 0.25f;
-		if (Target->IsPlayer() && Dur > 2500)
+		if ( ( Target->IsPlayer() || Target->IsPet() ) && Dur > 2500)
 		{
 			Dur = 2500;
 		}
