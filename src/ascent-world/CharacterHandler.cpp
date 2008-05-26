@@ -109,6 +109,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 	{
 		uint32 displayid;
 		uint8 invtype;
+		uint32 enchantment; // added in 2.4
 	};
 
 	player_item items[20];
@@ -202,24 +203,42 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			else
 				data << uint32(0) << uint32(0) << uint32(0);
 
-			res = CharacterDatabase.Query("SELECT containerslot, slot, entry FROM playeritems WHERE ownerguid=%u", GUID_LOPART(guid));
+			res = CharacterDatabase.Query("SELECT containerslot, slot, entry, enchantments FROM playeritems WHERE ownerguid=%u", GUID_LOPART(guid));
 
 			memset(items, 0, sizeof(player_item) * 20);
+			uint32 enchantid;
+			EnchantEntry * enc;
 			if(res)
 			{
 				do 
 				{
 					containerslot = res->Fetch()[0].GetInt8();
 					slot = res->Fetch()[1].GetInt8();
+
 					if( containerslot == -1 && slot < 19 && slot >= 0 )
 					{
 						proto = ItemPrototypeStorage.LookupEntry(res->Fetch()[2].GetUInt32());
 						if(proto)
 						{
 							// slot0 = head, slot14 = cloak
+							
 							if(!(slot == 0 && (flags & (uint32)PLAYER_FLAG_NOHELM) != 0) && !(slot == 14 && (flags & (uint32)PLAYER_FLAG_NOCLOAK) != 0)) {
 								items[slot].displayid = proto->DisplayInfoID;
 								items[slot].invtype = proto->InventoryType;
+								// weapon glows
+								if( slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND )
+								{
+									// get enchant visual ID
+									const char * enchant_field = res->Fetch()[3].GetString();	
+									if( sscanf( enchant_field , "%u,0,0;" , (unsigned int *)&enchantid ) == 1 && enchantid > 0 )
+									{
+										enc = dbcEnchant.LookupEntry( enchantid );
+										if( enc != NULL )
+										items[slot].enchantment = enc->visual;
+										else
+										items[slot].enchantment = 0;;
+									}
+								}
 							}
 						}
 					}
@@ -229,9 +248,7 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 
 			for( i = 0; i < 20; ++i )
 			{
-				// 2.4.0 added a uint32 here, it's obviously one of the itemtemplate fields,
-				// we just gotta figure out which one :P
-				data << items[i].displayid << items[i].invtype << uint32(0);
+				data << items[i].displayid << items[i].invtype << uint32(items[i].enchantment);
 			}
 
 			num++;
