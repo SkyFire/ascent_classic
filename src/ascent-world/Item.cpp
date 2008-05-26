@@ -563,7 +563,7 @@ int32 Item::AddEnchantment( EnchantEntry* Enchantment, uint32 Duration, bool Per
 	Instance.RandomSuffix = RandomSuffix;
 
 	// Set the enchantment in the item fields.
-	uint32 EnchantBase = Slot * 3 + ITEM_FIELD_ENCHANTMENT;
+	uint32 EnchantBase = ITEM_FIELD_ENCHANTMENT + Slot * 3;
 	SetUInt32Value( EnchantBase, Enchantment->Id );
 	SetUInt32Value( EnchantBase + 1, (uint32)Instance.ApplyTime );
 	SetUInt32Value( EnchantBase + 2, 0 ); // charges
@@ -657,9 +657,17 @@ void Item::ApplyEnchantmentBonus( uint32 Slot, bool Apply )
 	}
 
 	// Apply the visual on the player.
+	// SUPALOSA_: Not here
 	uint32 ItemSlot = m_owner->GetItemInterface()->GetInventorySlotByGuid( GetGUID() ) * 16;
 	uint32 VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + ItemSlot;
 	m_owner->SetUInt32Value( VisibleBase + 1 + Slot, Apply ? Entry->Id : 0 );
+	
+	// 0 = ItemGUID
+	// 1 = PermEnchant
+	// 2 = TempEnchant
+	// 3 = Gem1
+	// 4 = Gem2
+	// 5 = Gem3
 
 	// Another one of those for loop that where not indented properly god knows what will break
 	// but i made it actually affect the code below it
