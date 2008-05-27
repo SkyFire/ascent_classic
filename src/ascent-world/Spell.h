@@ -405,14 +405,14 @@ enum Attributes
 
 enum AttributesEx
 {
-	ATTRIBUTESEX_NULL                         = 0x0,
-	ATTRIBUTESEX_UNK2                         = 0x1, // pet summonings
-	ATTRIBUTESEX_DRAIN_WHOLE_MANA             = 0x2,
-	ATTRIBUTESEX_UNK4                         = 0x4,
-	ATTRIBUTESEX_UNK5                         = 0x8,
-	ATTRIBUTESEX_UNK6                         = 0x10, // stealth effects but Rockbiter wtf 0_0
-	ATTRIBUTESEX_NOT_BREAK_STEALTH            = 0x20,
-	ATTRIBUTESEX_UNK8                         = 0x40,
+	ATTRIBUTESEX_NULL                         = 0x0, // 0
+	ATTRIBUTESEX_UNK2                         = 0x1, // 1, pet summonings
+	ATTRIBUTESEX_DRAIN_WHOLE_MANA             = 0x2, // 2
+	ATTRIBUTESEX_UNK4                         = 0x4, // 3
+	ATTRIBUTESEX_UNK5                         = 0x8, // 4
+	ATTRIBUTESEX_UNK6                         = 0x10, // 5, stealth effects but Rockbiter wtf 0_0
+	ATTRIBUTESEX_NOT_BREAK_STEALTH            = 0x20, // 6
+	ATTRIBUTESEX_UNK8							= 0x40, // 7 [POSSIBLY: dynamite, grenades from engineering etc..]
 	ATTRIBUTESEX_UNK9                         = 0x80,
 	ATTRIBUTESEX_UNK10                        = 0x100,
 	ATTRIBUTESEX_UNK11                        = 0x200,

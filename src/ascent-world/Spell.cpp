@@ -1571,7 +1571,10 @@ void Spell::AddTime(uint32 type)
 void Spell::update(uint32 difftime)
 {
 	// skip cast if we're more than 2/3 of the way through
-	if(
+	// TODO: determine which spells can be casted while moving.
+	// Client knows this, so it should be easy once we find the flag.
+	// XD, it's already there!
+	if( ( m_spellInfo->InterruptFlags & CAST_INTERRUPT_ON_MOVEMENT ) &&
 		(((float)m_castTime / 1.5f) > (float)m_timer ) && 
 //		float(m_castTime)/float(m_timer) >= 2.0f		&&
 		(
