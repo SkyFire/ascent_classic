@@ -3108,7 +3108,30 @@ uint8 Spell::CanCast(bool tolerate)
 
 	// set up our max Range
 	float maxRange = GetMaxRange( dbcSpellRange.LookupEntry( m_spellInfo->rangeIndex ) );
+		// latency compensation!!
+		// figure out how much extra distance we need to allow for based on our movespeed and latency.
+		if( u_caster && unitTarget->IsPlayer() && static_cast< Player* >( unitTarget )->m_isMoving )
+		{
+			// this only applies to PvP.
+			uint32 lat = static_cast< Player* >( unitTarget )->GetSession() ? static_cast< Player* >( unitTarget )->GetSession()->GetLatency() : 0;
 
+			// if we're over 500 get fucked anyway.. your gonna lag! and this stops cheaters too
+			lat = ( lat > 500 ) ? 500 : lat;
+
+			// calculate the added distance
+			maxRange += ( u_caster->m_runSpeed * 0.001f ) * float( lat );
+		}
+		if( p_caster && p_caster->m_isMoving )
+		{
+			// this only applies to PvP.
+			uint32 lat = p_caster->GetSession() ? p_caster->GetSession()->GetLatency() : 0;
+
+			// if we're over 500 get fucked anyway.. your gonna lag! and this stops cheaters too
+			lat = ( lat > 500) ? 500 : lat;
+
+			// calculate the added distance
+			maxRange += ( u_caster->m_runSpeed * 0.001f ) * float( lat );
+		}
 	if( m_spellInfo->SpellGroupType && u_caster != NULL )
 	{
 		SM_FFValue( u_caster->SM_FRange, &maxRange, m_spellInfo->SpellGroupType );
