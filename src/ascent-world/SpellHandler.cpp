@@ -170,9 +170,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 	spell->i_caster = tmpItem;
 	//GetPlayer()->setCurrentSpell(spell);
 	result = spell->prepare(&targets);
-
-	if( result == SPELL_CANCAST_OK )
-		_player->Cooldown_AddItem( itemProto, x );
+	
+	//if( result == SPELL_CANCAST_OK ) // incorrect - should be on Completed Cast
+	//	_player->Cooldown_AddItem( itemProto, x );
 }
 
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)

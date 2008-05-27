@@ -1704,6 +1704,22 @@ void Spell::finish()
 		m_spellInfo->Effect[2] == SPELL_EFFECT_SUMMON_OBJECT)
 		if( p_caster != NULL )
 			p_caster->SetSummonedObject(NULL);		
+	/* 
+	Set cooldown on item
+	*/
+	if( i_caster && i_caster->GetOwner() && cancastresult == SPELL_CANCAST_OK && !GetSpellFailed() )
+	{
+			uint32 x;
+		for(x = 0; x < 5; x++)
+		{
+			if(i_caster->GetProto()->Spells[x].Trigger == USE)
+			{
+				if(i_caster->GetProto()->Spells[x].Id)
+					break;
+			}
+		}
+		i_caster->GetOwner()->Cooldown_AddItem( i_caster->GetProto() , x );
+	}
 	/*
 	We set current spell only if this spell has cast time or is channeling spell
 	otherwise it's instant spell and we delete it right after completion
