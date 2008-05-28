@@ -1871,6 +1871,17 @@ void Object::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 		/* Remove all Auras */
 		pVictim->DropAurasOnDeath();
 
+		/* Stop players from casting */
+		std::set<Player*>::iterator itr;
+		for( itr = pVictim->GetInRangePlayerSetBegin() ; itr != pVictim->GetInRangePlayerSetEnd() ; itr ++ )
+		{
+			//if player has selection on us
+			if( (*itr)->GetSelection()==pVictim->GetGUID())							
+			{
+				if( (*itr)->isCasting() )
+					(*itr)->CancelSpell( NULL ); //cancel current casting spell
+			}
+		}
 		/* Stop victim from attacking */
 		if( this->IsUnit() )
 			pVictim->smsg_AttackStop( static_cast< Unit* >( this ) );
