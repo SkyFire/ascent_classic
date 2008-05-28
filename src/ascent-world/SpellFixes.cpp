@@ -14316,6 +14316,10 @@ void ApplyNormalFixes()
 				sp->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
 			}
 
+			// Hypothermia: undispellable
+			if( sp->NameHash == SPELL_HASH_HYPOTHERMIA )
+				sp->c_is_flags |= SPELL_FLAG_IS_FORCEDDEBUFF;
+
 		//////////////////////////////////////////
 		// WARLOCK								//
 		//////////////////////////////////////////
@@ -20908,6 +20912,29 @@ void ApplyNormalFixes()
 		sp = dbcSpell.LookupEntryForced( 40475 );		// Black temple melee trinket
 		if( sp != NULL )
 			sp->procChance = 50;
+
+		// Band of the Eternal Champion: reduced proc rate
+		sp = dbcSpell.LookupEntryForced( 35080 );
+		if( sp != NULL )
+			sp->procChance = 5;
+
+		// Band of the Eternal Sage: reduced proc rate
+		sp = dbcSpell.LookupEntryForced( 35083 );
+		if( sp != NULL )
+			sp->procChance = 5;
+
+		// Band of the Eternal Defender: reduced proc rate
+		sp = dbcSpell.LookupEntryForced( 35077 );
+		if( sp != NULL )
+			sp->procChance = 5;
+
+		// Band of the Eternal Restorer: reduced proc rate
+		sp = dbcSpell.LookupEntryForced( 35086 );
+		if( sp != NULL )
+			sp->procChance = 5;
+
+
+
 
 		//////////////////////////////////////////
 		// BOSSES								//
