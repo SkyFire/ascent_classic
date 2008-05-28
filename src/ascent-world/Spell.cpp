@@ -3110,16 +3110,21 @@ uint8 Spell::CanCast(bool tolerate)
 	float maxRange = GetMaxRange( dbcSpellRange.LookupEntry( m_spellInfo->rangeIndex ) );
 		// latency compensation!!
 		// figure out how much extra distance we need to allow for based on our movespeed and latency.
-		if( u_caster && unitTarget && unitTarget->IsPlayer() && static_cast< Player* >( unitTarget )->m_isMoving )
+		if( u_caster && m_targets.m_unitTarget )
 		{
-			// this only applies to PvP.
-			uint32 lat = static_cast< Player* >( unitTarget )->GetSession() ? static_cast< Player* >( unitTarget )->GetSession()->GetLatency() : 0;
+			Unit * utarget;
+			utarget = m_caster->GetMapMgr()->GetUnit( m_targets.m_unitTarget );
+			if( utarget->IsPlayer() && static_cast< Player* >( utarget )->m_isMoving )
+				{
+					// this only applies to PvP.
+					uint32 lat = static_cast< Player* >( utarget )->GetSession() ? static_cast< Player* >( utarget )->GetSession()->GetLatency() : 0;
 
-			// if we're over 500 get fucked anyway.. your gonna lag! and this stops cheaters too
-			lat = ( lat > 500 ) ? 500 : lat;
+					// if we're over 500 get fucked anyway.. your gonna lag! and this stops cheaters too
+					lat = ( lat > 500 ) ? 500 : lat;
 
-			// calculate the added distance
-			maxRange += ( u_caster->m_runSpeed * 0.001f ) * float( lat );
+					// calculate the added distance
+					maxRange += ( u_caster->m_runSpeed * 0.001f ) * float( lat );
+				}
 		}
 		if( p_caster && p_caster->m_isMoving )
 		{
