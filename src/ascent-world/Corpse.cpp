@@ -104,11 +104,6 @@ void Corpse::Despawn()
 	}
 }
 
-void Corpse::generateLoot()
-{
-	loot.gold = rand() % 150 + 50; // between 50c and 1.5s, need to fix this!
-}
-
 void Corpse::SpawnBones()
 {
 	SetUInt32Value(CORPSE_FIELD_FLAGS, 5);

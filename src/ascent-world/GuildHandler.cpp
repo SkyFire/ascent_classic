@@ -94,6 +94,12 @@ void WorldSession::HandleInviteToGuild(WorldPacket & recv_data)
 		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_NOT_ALLIED);
 		return;
 	}
+	else if(pGuild->GetNumMembers() >= MAX_GUILD_MEMBERS)
+	{
+		// We can't handle >= 500 members, or WoW will #132. I don't have the proper error code, so just throw the internal one.
+		Guild::SendGuildCommandResult(this, GUILD_INVITE_S,"",GUILD_INTERNAL);
+		return;
+	}
 	Guild::SendGuildCommandResult(this, GUILD_INVITE_S,inviteeName.c_str(),GUILD_U_HAVE_INVITED);
 	//41
   
@@ -122,6 +128,11 @@ void WorldSession::HandleGuildAccept(WorldPacket & recv_data)
 
 	Guild *pGuild = inviter->m_playerInfo->guild;
 	if(!pGuild)
+	{
+		return;
+	}
+
+	if(pGuild->GetNumMembers() >= MAX_GUILD_MEMBERS)
 	{
 		return;
 	}
@@ -283,6 +294,18 @@ void WorldSession::HandleGuildLeader(WorldPacket & recv_data)
 	PlayerInfo * dstplr = objmgr.GetPlayerInfoByName(name.c_str());
 	if(dstplr==NULL)
 		return;
+
+	if(dstplr->guild != _player->m_playerInfo->guild)
+	{
+		Guild::SendGuildCommandResult(this, GUILD_CREATE_S,"",GUILD_PLAYER_NOT_IN_GUILD);
+		return;
+	}
+
+	if(_player->GetLowGUID() != _player->m_playerInfo->guild->GetGuildLeader())
+	{
+		Guild::SendGuildCommandResult(this, GUILD_PROMOTE_S, "", GUILD_PERMISSIONS);
+		return;
+	}
 
 	_player->m_playerInfo->guild->ChangeGuildMaster(dstplr, this);
 }
@@ -524,15 +547,24 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 		return;
 	}
 
+	if( arena_index >= NUM_CHARTER_TYPES )
+		return;
+
 	if(crt->GetEntry()==19861 || crt->GetEntry()==18897 || crt->GetEntry()==19856)		/* i am lazy! */
 	{
 		uint32 arena_type = arena_index - 1;
 		if(arena_type > 2)
 			return;
 
-		if(_player->m_arenaTeams[arena_type] || _player->m_charters[arena_index])
+		if(_player->m_playerInfo->arenaTeam[arena_type])
 		{
 			SendNotification("You are already in an arena team.");
+			return;
+		}
+
+		if(_player->m_playerInfo->charterId[arena_index] != 0)
+		{
+			SendNotification("You already have an arena charter of this type.");
 			return;
 		}
 
@@ -549,16 +581,10 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			return;
 		}
 
-		if(_player->m_charters[arena_type])
-		{
-			SendNotification("You already have an arena charter.");
-			return;
-		}
-
 		static uint32 item_ids[] = {ARENA_TEAM_CHARTER_2v2, ARENA_TEAM_CHARTER_3v3, ARENA_TEAM_CHARTER_5v5};
 		static uint32 costs[] = {ARENA_TEAM_CHARTER_2v2_COST,ARENA_TEAM_CHARTER_3v3_COST,ARENA_TEAM_CHARTER_5v5_COST};
 
-		if(_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < costs[arena_type])
+		if(_player->GetUInt32Value(PLAYER_FIELD_COINAGE) < costs[arena_type] && !sWorld.free_arena_teams)
 			return;			// error message needed here
 
 		ItemPrototype * ip = ItemPrototypeStorage.LookupEntry(item_ids[arena_type]);
@@ -570,7 +596,7 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			return;
 		}
 
-		error = _player->GetItemInterface()->CanReceiveItem(ip,1);
+		error = _player->GetItemInterface()->CanReceiveItem(ip,1, NULL);
 		if(error)
 		{
 			_player->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,error);
@@ -600,24 +626,32 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			BuildItemPushResult(&data, _player->GetGUID(), ITEM_PUSH_TYPE_RECEIVE, 1, item_ids[arena_type], 0);
 			SendPacket(&data);*/
 			SendItemPushResult(i, false, true, false, true, _player->GetItemInterface()->LastSearchItemBagSlot(), _player->GetItemInterface()->LastSearchItemSlot(), 1);
-			_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -(int32)costs[arena_type]);
-			_player->m_charters[arena_index] = c;
+
+			if(!sWorld.free_arena_teams)
+				_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -(int32)costs[arena_type]);
+
+			_player->m_playerInfo->charterId[arena_index] = c->GetID();
 			_player->SaveToDB(false);
 		}
 	}
 	else
 	{
+		if( _player->GetUInt32Value(PLAYER_FIELD_COINAGE) < 1000 && !sWorld.free_guild_charters )
+		{
+			SendNotification("You don't have enough money.");
+			return;
+		}
+		if(_player->m_playerInfo->charterId[CHARTER_TYPE_GUILD] != 0)
+		{
+			SendNotification("You already have a guild charter.");
+			return;
+		}
+
 		Guild * g = objmgr.GetGuildByGuildName(name);
 		Charter * c = objmgr.GetCharterByName(name, CHARTER_TYPE_GUILD);
 		if(g != 0 || c != 0)
 		{
 			SendNotification("A guild with that name already exists.");
-			return;
-		}
-
-		if(_player->m_charters[CHARTER_TYPE_GUILD])
-		{
-			SendNotification("You already have a guild charter.");
 			return;
 		}
 
@@ -630,7 +664,7 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			return;
 		}
 
-		error = _player->GetItemInterface()->CanReceiveItem(ItemPrototypeStorage.LookupEntry(ITEM_ENTRY_GUILD_CHARTER),1);
+		error = _player->GetItemInterface()->CanReceiveItem(ItemPrototypeStorage.LookupEntry(ITEM_ENTRY_GUILD_CHARTER),1, NULL);
 		if(error)
 		{
 			_player->GetItemInterface()->BuildInventoryChangeError(NULL,NULL,error);
@@ -669,7 +703,11 @@ void WorldSession::HandleCharterBuy(WorldPacket & recv_data)
 			SendPacket(&data);*/
 			SendItemPushResult(i, false, true, false, true, _player->GetItemInterface()->LastSearchItemBagSlot(), _player->GetItemInterface()->LastSearchItemSlot(), 1);
 
-			_player->m_charters[CHARTER_TYPE_GUILD] = c;
+			_player->m_playerInfo->charterId[CHARTER_TYPE_GUILD] = c->GetID();
+
+			// 10 silver
+			if(!sWorld.free_guild_charters)
+				_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, -1000);
 			_player->SaveToDB(false);
 		}
 	}
@@ -808,6 +846,12 @@ void WorldSession::HandleCharterOffer( WorldPacket & recv_data )
 	Player * pTarget = _player->GetMapMgr()->GetPlayer((uint32)target_guid);
 	pCharter = objmgr.GetCharterByItemGuid(item_guid);
 
+	if( pCharter == NULL )
+	{
+		SendNotification("Charter cannot be found.");
+		return;
+	}
+
 	if(pTarget == 0 || pTarget->GetTeam() != _player->GetTeam() || pTarget == _player)
 	{
 		SendNotification("Target is of the wrong faction.");
@@ -828,9 +872,18 @@ void WorldSession::HandleCharterSign( WorldPacket & recv_data )
 	uint64 item_guid;
 	recv_data >> item_guid;
 
+	if( !_player->IsInWorld() )
+		return;
+
 	Charter * c = objmgr.GetCharterByItemGuid(item_guid);
 	if(c == 0)
 		return;
+
+	if( _player->m_playerInfo->charterId[c->CharterType] != 0 )
+	{
+		SendNotification("You cannot sign two charters of the same type.");
+		return;
+	}
 
 	for(uint32 i = 0; i < 9; ++i)
 	{
@@ -846,7 +899,7 @@ void WorldSession::HandleCharterSign( WorldPacket & recv_data )
 
 	c->AddSignature(_player->GetLowGUID());
 	c->SaveToDB();
-	_player->m_charters[c->CharterType] = c;
+	_player->m_playerInfo->charterId[c->CharterType] = c->GetID();
 	_player->SaveToDB(false);
 
 	Player * l = _player->GetMapMgr()->GetPlayer(c->GetLeader());
@@ -870,9 +923,13 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 
 	if(pCharter->CharterType == CHARTER_TYPE_GUILD)
 	{
-		Charter * gc = _player->m_charters[CHARTER_TYPE_GUILD];
-		if(gc == 0)
+		Charter * gc = pCharter;
+		if(gc == NULL)
 			return;
+
+		if( gc->GetLeader() != _player->GetLowGUID() )
+			return;
+
 		if(gc->SignatureCount < 9 && Config.MainConfig.GetBoolDefault("Server", "RequireAllSignatures", false))
 		{
 			SendNotification("You don't have the required amount of signatures to turn in this petition.");
@@ -886,7 +943,7 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 		pGuild->CreateFromCharter(gc, this);
 
 		// Destroy the charter
-		_player->m_charters[CHARTER_TYPE_GUILD] = 0;
+		_player->m_playerInfo->charterId[CHARTER_TYPE_GUILD] = 0;
 		gc->Destroy();
 
 		_player->GetItemInterface()->RemoveItemAmt(ITEM_ENTRY_GUILD_CHARTER, 1);
@@ -920,7 +977,10 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 			return;
 		}
 
-		if(_player->m_arenaTeams[pCharter->CharterType-1] != NULL)
+		if( pCharter->GetLeader() != _player->GetLowGUID() )
+			return;
+
+		if(_player->m_playerInfo->arenaTeam[pCharter->CharterType-1] != NULL)
 		{
 			sChatHandler.SystemMessage(this, "You are already in an arena team.");
 			return;
@@ -958,7 +1018,7 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 		}
 
 		_player->GetItemInterface()->SafeFullRemoveItemByGuid(mooguid);
-		_player->m_charters[pCharter->CharterType] = NULL;
+		_player->m_playerInfo->charterId[pCharter->CharterType] = 0;
 		pCharter->Destroy();
 	}
 
@@ -1044,7 +1104,7 @@ void WorldSession::HandleGuildBankGetAvailableAmount(WorldPacket & recv_data)
 	uint32 avail = _player->m_playerInfo->guildMember->CalculateAvailableAmount();
 
 	/* pls gm mi hero poor give 1 gold coin pl0x */
-	WorldPacket data(MSG_GUILD_BANK_GET_AVAILABLE_AMOUNT, 4);
+	WorldPacket data(MSG_GUILD_BANK_MONEY_WITHDRAWN, 4);
 	data << uint32(money>avail ? avail : money);
 	SendPacket(&data);
 }
@@ -1376,6 +1436,12 @@ void WorldSession::HandleGuildBankDepositItem(WorldPacket & recv_data)
 			}
 		}
 
+		if( source_bagslot == 0xff && source_slot < INVENTORY_SLOT_ITEM_START || source_slot == 0xff )
+		{
+			_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_CANT_DROP_SOULBOUND);
+			return;
+		}
+
 		pSourceItem = _player->GetItemInterface()->GetInventoryItem(source_bagslot, source_slot);
 
 		/* make sure that both arent null - wtf ? */
@@ -1499,7 +1565,7 @@ void WorldSession::HandleGuildBankOpenVault(WorldPacket & recv_data)
 	}
 
 	recv_data >> guid;
-	pObj = _player->GetMapMgr()->GetGameObject((uint32)guid);
+	pObj = _player->GetMapMgr()->GetGameObject(GET_LOWGUID_PART(guid));
 	if(pObj==NULL)
 		return;
 
@@ -1536,7 +1602,7 @@ void Guild::SendGuildBankInfo(WorldSession * pClient)
 	if(pMember==NULL)
 		return;
 
-	WorldPacket data(SMSG_GUILD_BANK_VIEW_RESPONSE, 500);
+	WorldPacket data(SMSG_GUILD_BANK_LIST, 500);
 	data << uint64(m_bankBalance);
 	data << uint8(0);
 	data << uint32(0);
@@ -1571,8 +1637,9 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 {
 	size_t pos;
 	uint32 count=0;
-	WorldPacket data(SMSG_GUILD_BANK_VIEW_RESPONSE, 1100);
+	WorldPacket data(SMSG_GUILD_BANK_LIST, 1100);
 	GuildMember * pMember = pClient->GetPlayer()->m_playerInfo->guildMember;
+	Item *pItem;
 
 	if(pMember==NULL || !pMember->pRank->CanPerformBankCommand(GR_RIGHT_GUILD_BANK_VIEW_TAB, pTab->iTabId))
 		return;
@@ -1593,6 +1660,7 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 	{
 		if(pTab->pSlots[j] != NULL)
 		{
+			pItem = pTab->pSlots[j];
 			if(updated_slot1 >= 0 && j == updated_slot1)
 				updated_slot1 = -1;
 
@@ -1601,12 +1669,32 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 
 			++count;
 
-			// what i don't understand here, where is the field for random properties? :P - Burlex
 			data << uint8(j);
-			data << pTab->pSlots[j]->GetEntry();
-			data << uint32(0);			// this is an enchant
-			data << pTab->pSlots[j]->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
-			data << uint16(0);
+			data << pItem->GetEntry();
+
+			// random props
+			if( pItem->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) )
+			{
+				data << pItem->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID);
+				if( (int32)pItem->GetUInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) < 0 )
+					data << pItem->GetItemRandomSuffixFactor();
+				else
+					data << uint32(0);
+			}
+			else
+				data << uint32(0);
+
+			// stack
+			data << uint8(pItem->GetUInt32Value(ITEM_FIELD_STACK_COUNT));
+			data << uint32(0);
+
+			// only sent in 2.4.2
+			if( pClient->GetClientBuild() >= 8278 )
+				data << uint8(0);
+
+			data << uint8(0);		// enchant count
+			//		slot
+			//		id
 		}
 	}
 
@@ -1639,7 +1727,7 @@ void Guild::SendGuildBank(WorldSession * pClient, GuildBankTab * pTab, int8 upda
 
 void WorldSession::HandleGuildGetFullPermissions(WorldPacket & recv_data)
 {
-	WorldPacket data(MSG_GUILD_GET_FULL_PERMISSIONS, 61);
+	WorldPacket data(MSG_GUILD_PERMISSIONS, 61);
 	GuildRank * pRank = _player->GetGuildRankS();
 	uint32 i;
 

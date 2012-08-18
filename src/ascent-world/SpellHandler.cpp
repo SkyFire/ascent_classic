@@ -22,10 +22,9 @@
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
 	if(!_player->IsInWorld()) return;
-	typedef std::list<Aura*> AuraList;
 	
 	Player* p_User = GetPlayer();
-	sLog.outDetail("WORLD: got use Item packet, data length = %i",recvPacket.size());
+	DEBUG_LOG("WORLD: got use Item packet, data length = %i",recvPacket.size());
 	int8 tmp1,slot,tmp3;
 	uint64 item_guid;
 	uint8 cn;
@@ -58,6 +57,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		if(!qst) 
 			return;
 
+		if( sQuestMgr.PlayerMeetsReqs(_player, qst, false) != QMGR_QUEST_AVAILABLE || qst->min_level > _player->getLevel() )
+			return;
+
         WorldPacket data;
         sQuestMgr.BuildQuestDetails(&data, qst, tmpItem, 0, language);
 		SendPacket(&data);
@@ -83,7 +85,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 	if(!spellInfo)
 	{
-		sLog.outError("WORLD: unknown spell id %i\n", spellId);
+		DEBUG_LOG("WORLD: unknown spell id %i\n", spellId);
 		return;
 	}
 
@@ -94,9 +96,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 			_player->GetItemInterface()->BuildInventoryChangeError(tmpItem,NULL,INV_ERR_CANT_DO_IN_COMBAT);
 			return;
 		}
+	
 		if(p_User->GetStandState()!=1)
-		p_User->SetStandState(STANDSTATE_SIT);
-		// loop through the auras and removing existing eating spells
+			p_User->SetStandState(STANDSTATE_SIT);
 	}
 
 	if(itemProto->RequiredLevel)
@@ -164,15 +166,17 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 		}
 	}
 
+	if(!sHookInterface.OnCastSpell(_player, spellInfo))
+	{
+		_player->SendCastResult(spellInfo->Id, SPELL_FAILED_UNKNOWN, cn, 0);
+		return;
+	}
+
 	Spell *spell = new Spell(_player, spellInfo, false, NULL);
-	uint8 result;
 	spell->extra_cast_number=cn;
 	spell->i_caster = tmpItem;
-	//GetPlayer()->setCurrentSpell(spell);
-	result = spell->prepare(&targets);
-	
-	//if( result == SPELL_CANCAST_OK ) // incorrect - should be on Completed Cast
-	//	_player->Cooldown_AddItem( itemProto, x );
+	if( spell->prepare(&targets) == SPELL_CANCAST_OK )
+		_player->Cooldown_AddItem( itemProto, x );
 }
 
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
@@ -190,11 +194,11 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
 	if(!spellInfo || !sHookInterface.OnCastSpell(_player, spellInfo))
 	{
-		sLog.outError("WORLD: unknown spell id %i\n", spellId);
+		DEBUG_LOG("WORLD: unknown spell id %i\n", spellId);
 		return;
 	}
 
-	sLog.outDetail("WORLD: got cast spell packet, spellId - %i (%s), data length = %i",
+	DEBUG_LOG("WORLD: got cast spell packet, spellId - %i (%s), data length = %i",
 		spellId, spellInfo->Name, recvPacket.size());
 	
 	// Cheat Detection only if player and not from an item
@@ -203,7 +207,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
 	if( !GetPlayer()->HasSpell(spellId) || spellInfo->Attributes & ATTRIBUTES_PASSIVE )
 	{
-		sLog.outDetail("WORLD: Spell isn't casted because player \"%s\" is cheating", GetPlayer()->GetName());
+		DEBUG_LOG("WORLD: Spell isn't casted because player \"%s\" is cheating", GetPlayer()->GetName());
 		return;
 	}
 
@@ -260,10 +264,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
 			return;
 		}
-		/*const char * name = sSpellStore.LookupString(spellInfo->Name);
-		if(name)
-			sChatHandler.SystemMessageToPlr(_player, "%sSpell Cast:%s %s %s[Group %u, family %u]", MSG_COLOR_LIGHTBLUE,
-			MSG_COLOR_SUBWHITE, name, MSG_COLOR_YELLOW, spellInfo->SpellGroupType, spellInfo->SpellFamilyName);*/
 
         if(_player->m_currentSpell)
         {
@@ -316,12 +316,9 @@ void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
 	for(uint32 x = 0; x < MAX_AURAS+MAX_POSITIVE_AURAS; ++x)
 	{
 		if(_player->m_auras[x] && _player->m_auras[x]->IsPositive() && _player->m_auras[x]->GetSpellId() == spellId)
-		{
-			_player->m_auras[x]->m_ignoreunapply = true; // prevent abuse
 			_player->m_auras[x]->Remove();
-		}
 	}
-	sLog.outDebug("removing aura %u",spellId);
+	DEBUG_LOG("removing aura %u",spellId);
 }
 
 void WorldSession::HandleCancelChannellingOpcode( WorldPacket& recvPacket)
@@ -340,67 +337,50 @@ void WorldSession::HandleCancelChannellingOpcode( WorldPacket& recvPacket)
 
 void WorldSession::HandleCancelAutoRepeatSpellOpcode(WorldPacket& recv_data)
 {
-	//sLog.outString("Received CMSG_CANCEL_AUTO_REPEAT_SPELL message.");
-	//on original we automatically enter combat when creature got close to us
-//	GetPlayer()->GetSession()->OutPacket(SMSG_CANCEL_COMBAT);
-	GetPlayer()->m_onAutoShot = false;
+	_player->m_onAutoShot = false;
 }
 
 void WorldSession::HandleAddDynamicTargetOpcode(WorldPacket & recvPacket)
 {
 	uint64 guid;
 	uint32 spellid;
-	uint8 flags;
-	recvPacket >> guid >> spellid >> flags;
-	
-	SpellEntry * sp = dbcSpell.LookupEntry(spellid);
+	Unit *caster;
+	SpellCastTargets targets;
+	SpellEntry *sp;
+	Spell * pSpell;
+	list<AI_Spell*>::iterator itr;
+
+	recvPacket >> guid >> spellid;
+	sp = dbcSpell.LookupEntry(spellid);
+
 	// Summoned Elemental's Freeze
     if (spellid == 33395)
-    {
-        if (!_player->m_Summon)
-            return;
-    }
-    else if (!_player->m_CurrentCharm || guid != _player->m_CurrentCharm->GetGUID())
-    {
-        return;
-    }
-	
-	/* burlex: this is.. strange */
-	SpellCastTargets targets;
-	targets.m_targetMask = flags;
+	{
+		caster = _player->m_Summon;
+		if( caster && ((Pet*)caster)->GetAISpellForSpellId(spellid) == NULL )
+			return;
+	}
+	else
+	{
+		caster = _player->m_CurrentCharm;
+		if( caster != NULL )
+		{
+			for(itr = caster->GetAIInterface()->m_spells.begin(); itr != caster->GetAIInterface()->m_spells.end(); ++itr)
+			{
+				if( (*itr)->spell->Id == spellid )
+					break;
+			}
 
-	if(flags == 0)
-		targets.m_unitTarget = guid;
-	else if(flags & 0x02)
-	{
-		WoWGuid guid;
-		recvPacket >> flags;		// skip one byte
-		recvPacket >> guid;
-		targets.m_unitTarget = guid.GetOldGuid();
+			if( itr == caster->GetAIInterface()->m_spells.end() )
+				return;
+		}
 	}
-	else if(flags & 0x20)
-	{
-		recvPacket >> flags;		// skip one byte
-		recvPacket >> targets.m_srcX >> targets.m_srcY >> targets.m_srcZ;
-	}
-	else if(flags & 0x40)
-	{
-		recvPacket >> flags;		// skip one byte
-		recvPacket >> targets.m_destX >> targets.m_destY >> targets.m_destZ;
-	}
-	else if (flags & 0x2000)
-	{
-		recvPacket >> flags;		// skip one byte
-		recvPacket >> targets.m_strTarget;
-	}
-	if(spellid == 33395)	// Summoned Water Elemental's freeze
-	{
-		Spell * pSpell = new Spell(_player->m_Summon, sp, false, 0);
-		pSpell->prepare(&targets);
-	}
-	else			// trinket?
-	{
-		Spell * pSpell = new Spell(_player->m_CurrentCharm, sp, false, 0);
-		pSpell->prepare(&targets);
-	}
+
+	if( caster == NULL || guid != caster->GetGUID() )
+		return;
+	
+	targets.read(recvPacket, _player->GetGUID());
+
+	pSpell = new Spell(caster, sp, false, 0);
+	pSpell->prepare(&targets);
 }

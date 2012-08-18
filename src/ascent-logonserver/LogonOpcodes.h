@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -57,8 +57,12 @@ enum RealmListOpcodes
 	// DB modifying
 	RCMSG_MODIFY_DATABASE						= 17,
 
+	// S->C ping
+	RSMSG_SERVER_PING							= 18,
+	RCMSG_SERVER_PONG							= 19,
+
 	// count
-	RMSG_COUNT									= 18,
+	RMSG_COUNT									= 20,
 };
 
 #endif

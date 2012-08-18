@@ -85,24 +85,23 @@ public:
 	string m_name;
 	string m_password;
 	uint8 m_flags;
-	uint32 m_id;
+	uint32 m_typeId;
 	bool m_general;
 	bool m_muted;
 	bool m_announce;
 	uint32 m_team;
 	ASCENT_INLINE size_t GetNumMembers() { return m_members.size(); }
-#ifdef VOICE_CHAT
-	bool voice_enabled;
-	uint16 i_voice_channel_id;
-	MemberMap m_VoiceMembers;
-#endif
 	uint32 m_minimumLevel;
+	ChatChannelDBC * pDBC;
+	uint32 m_channelId;
+	bool m_deleted;
 public:
-	Channel(const char * name, uint32 team, uint32 type_id);
+	friend class ChannelMgr;
+	Channel(const char * name, uint32 team, uint32 type_id, uint32 id);
 	~Channel();
 
 	void AttemptJoin(Player * plr, const char * password);
-	void Part(Player * plr);
+	void Part(Player * plr, bool silent);
 	void Kick(Player * plr, Player * die_player, bool ban);
 	void Invite(Player * plr, Player * new_player);
 	void Moderate(Player * plr);
@@ -131,15 +130,6 @@ public:
 
 	void SendToAll(WorldPacket * data);
 	void SendToAll(WorldPacket * data, Player * plr);
-
-#ifdef VOICE_CHAT
-	void VoiceChannelCreated(uint16 id);
-	void JoinVoiceChannel(Player * plr);
-	void PartVoiceChannel(Player * plr);
-	void SendVoiceUpdate();
-	void VoiceDied();
-
-#endif
 
 	bool HasMember(Player * pPlayer);
 };

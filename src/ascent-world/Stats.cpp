@@ -641,12 +641,26 @@ uint32 CalculateDamage( Unit* pAttacker, Unit* pVictim, uint32 weapon_damage_typ
 
 	if(result >= 0)
 	{
-		if( pAttacker->IsPlayer() && ((Player*)pAttacker)->m_outStealthDamageBonusTimer )
+		if( pAttacker->IsPlayer() )
 		{
-			if( (uint32)UNIXTIME >= ((Player*)pAttacker)->m_outStealthDamageBonusTimer )
-				((Player*)pAttacker)->m_outStealthDamageBonusTimer = 0;
-			else
-				result *= ((float(((Player*)pAttacker)->m_outStealthDamageBonusPct) / 100.0f) + 1.0f);
+			Player *pl = TO_PLAYER(pAttacker);
+			if( pl->m_outStealthDamageBonusPct )
+			{
+				if( pl->IsStealth() )
+				{
+					result *= ((float(((Player*)pAttacker)->m_outStealthDamageBonusPct) / 100.0f) + 1.0f);
+				}
+				else
+				{
+					if( pl->m_outStealthDamageBonusTimer )
+					{
+						if( (uint32)UNIXTIME >= pl->m_outStealthDamageBonusTimer )
+							pl->m_outStealthDamageBonusTimer = 0;
+						else
+							result *= ((float(((Player*)pAttacker)->m_outStealthDamageBonusPct) / 100.0f) + 1.0f);							
+					}
+				}
+			}				
 		}
 
 		return FL2UINT(result);

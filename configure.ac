@@ -25,12 +25,11 @@ AC_PROG_LIBTOOL
 # autoheader templates
 AH_TEMPLATE([USE_EPOLL], Define if you want to use the epoll socket engine module.)
 AH_TEMPLATE([USE_KQUEUE], Define if you want to use the kqueue socket engine module.)
+AH_TEMPLATE([USE_KQUEUE_DFLY], Define if you want to use the kqueue socket engine module for DFLY.)
 AH_TEMPLATE([HAVE_DARWIN], Define if you have MacOSX Darwin, to include the correct headers for kevent)
 AH_TEMPLATE([ENABLE_CLUSTERING], Define if you want to enable clustering, this is experimental.)
 AH_TEMPLATE([ENABLE_COLLISION], Define if you want to enable collision calculation, warning. this can cause. a heavy load)
 AH_TEMPLATE([ENABLE_VOICECHAT], Define this if you want to enable voice chat system)
-AH_TEMPLATE([USING_BIG_ENDIAN], Define this if you are on a big-endian system.)
-AH_TEMPLATE([USING_LITTLE_ENDIAN], Define this if you are on a non-big-endian system.)
 AH_TEMPLATE([X64], Define this if you are under an X64-based operating system.)
 AH_TEMPLATE([X86], Define this if you are under an X86-based 32bit operating system.)
 AH_TEMPLATE([NO_DBLAYER_MYSQL], Define this if you want to disable mysql support.)
@@ -51,6 +50,11 @@ case "$OSNAME" in
 		dnl FreeBSD Owns !
 		AC_MSG_RESULT(FreeBSD Owns your hd)
 		FREEBSD=yes
+	;;
+	DragonFly*)
+		dnl DragonFlyBSD OMG, it works? 
+		AC_MSG_RESULT(DragonFlyBSD Rocks)
+		DRAGONFLY=yes
 	;;
 	Linux*)
 		dnl Linux...
@@ -89,16 +93,14 @@ case "$ARCH" in
 	;;
 esac
 
-AC_C_BIGENDIAN([AC_DEFINE(USING_BIG_ENDIAN)],[AC_DEFINE(USING_LITTLE_ENDIAN)],[])
-
 AC_CHECK_PROG([SVN], [svn], yes)
 if test -z "$SVN"; then AC_MSG_ERROR(Subversion not found); fi
 
 # Checks for libraries.
 
 # Reset 
-CFLAGS="$INCLUDES -Wall"
-CXXFLAGS="$INCLUDES -Wall"
+CFLAGS="$INCLUDES"
+CXXFLAGS="$INCLUDES"
 
 # Check for pthread
 ACX_PTHREAD( [
@@ -234,6 +236,15 @@ if test "x$OSNAME" = "xFreeBSD" ; then
 	AC_CHECK_HEADER(sys/event.h, , AC_MSG_ERROR([Cannot find sys/event.h for socket engine]))
 	AC_DEFINE(USE_KQUEUE)
 	AC_SUBST(NETWORKING, "kqueue (FreeBSD)")
+
+fi
+
+if test "x$OSNAME" = "xDragonFly" ; then
+	AC_MSG_RESULT(kqueue)
+	AC_CHECK_FUNC(kevent, , AC_MSG_ERROR([Cannot find kevent() function for socket engine]))
+	AC_CHECK_HEADER(sys/event.h, , AC_MSG_ERROR([Cannot find sys/event.h for socket engine]))
+ 	AC_DEFINE(USE_KQUEUE_DFLY)
+	AC_SUBST(NETWORKING, "kqueue (DragonFly)")
 fi
 
 if test "x$OSNAME" = "xDarwin" ; then
@@ -283,7 +294,6 @@ AC_CONFIG_FILES([
    src/scripts/Makefile
    src/scripts/src/Makefile
    src/scripts/src/GossipScripts/Makefile
-   src/scripts/src/InstanceScripts/Makefile
    src/scripts/src/ServerStatusPlugin/Makefile
    src/scripts/src/SpellHandlers/Makefile
    src/scripts/src/LUAScripting/Makefile

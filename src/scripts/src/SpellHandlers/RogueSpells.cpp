@@ -18,18 +18,23 @@
 #include "StdAfx.h"
 #include "Setup.h"
 
-bool Preparation(uint32 i, Spell * pSpell)
+bool Envenom(uint32 i, Spell * pSpell)
 {
-    Player * playerTarget = pSpell->p_caster;
-    if(playerTarget == 0) return true;
+	if(!pSpell->p_caster) return true;
 
-    playerTarget->ClearCooldownsOnLine(39, pSpell->m_spellInfo->Id); // line - subtlety
-    playerTarget->ClearCooldownsOnLine(38, pSpell->m_spellInfo->Id); // line - combat
-    playerTarget->ClearCooldownsOnLine(253, pSpell->m_spellInfo->Id);// line - assassination
-    return true;
+	Player * pPlayer = pSpell->p_caster;
+
+	// This is approximate, meh.
+	uint32 points = pSpell->damage / 180;
+	for(uint32 x = 0; x < points; x++)
+	{
+		pPlayer->RemoveAuraNegByNameHash(SPELL_HASH_DEADLY_POISON_IV);
+	}
+
+	return true;
 }
 
 void SetupRogueSpells(ScriptMgr * mgr)
 {
-    //mgr->register_dummy_spell(14185, &Preparation);
+
 }

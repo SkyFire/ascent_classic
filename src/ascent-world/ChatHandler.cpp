@@ -71,8 +71,6 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 	uint32 type;
 	int32 lang;
 
-	const char * pMisc = 0;
-	const char * pMsg = 0;
 	recv_data >> type;
 	recv_data >> lang;
 
@@ -85,28 +83,16 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	if(lang != -1 && !GetPermissionCount() && sWorld.flood_lines)
+	string msg, misc;
+
+	// special misc
+	if( type == CHAT_MSG_CHANNEL || type == CHAT_MSG_WHISPER )
 	{
-		/* flood detection, wheeee! */
-		if(UNIXTIME >= floodTime)
-		{
-			floodLines = 0;
-			floodTime = UNIXTIME + sWorld.flood_seconds;
-		}
-
-		if((++floodLines) > sWorld.flood_lines)
-		{
-			if(sWorld.flood_message)
-				_player->BroadcastMessage("Your message has triggered serverside flood protection. You can speak again in %u seconds.", floodTime - UNIXTIME);
-
-			return;
-		}
+		recv_data >> misc;
+		recv_data >> msg;
 	}
-
-	std::stringstream irctext;
-	irctext.rdbuf()->str("");
-	std::string msg;
-	msg.reserve(256);
+	else
+		recv_data >> msg;
 
 	//arghhh STFU. I'm not giving you gold or items NOOB
 	switch(type)
@@ -119,43 +105,101 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 		{
 			if( m_muted && m_muted >= (uint32)UNIXTIME )
 			{
-				SystemMessage("Your voice is currently muted by a moderator.");
+				SystemMessage("Your voice is currently muted by a moderator. This will expire in %s.", ConvertTimeStampToString(m_muted - (uint32)UNIXTIME).c_str());
 				return;
 			}
 		}break;
+	}
+
+	if( lang != -1 && !GetPermissionCount() )
+	{
+		if(sWorld.flood_lines)
+		{
+			/* flood detection, wheeee! */
+			if(UNIXTIME >= floodTime)
+			{
+				floodLines = 0;
+				floodTime = UNIXTIME + sWorld.flood_seconds;
+			}
+
+			if((++floodLines) > sWorld.flood_lines)
+			{
+				if( sWorld.flood_mute_after_flood )
+				{
+					_player->BroadcastMessage("You have been muted for %u seconds for spamming.", sWorld.flood_mute_after_flood );
+					m_muted = (uint32)UNIXTIME + sWorld.flood_mute_after_flood;
+					return;
+				}
+
+				if(sWorld.flood_message)
+					_player->BroadcastMessage("Your message has triggered serverside flood protection. You can speak again in %u seconds.", floodTime - UNIXTIME);
+
+				return;
+			}
+		}
+
+		if( sWorld.flood_message_time )
+		{
+			if( !stricmp(m_repeatMessage.c_str(), msg.c_str()) )
+			{
+				if( ((uint32)UNIXTIME - m_repeatTime) < sWorld.flood_message_time )
+				{
+					_player->BroadcastMessage("Your message has triggered serverside flood protection. Please don't repeat yourself.");
+					return;
+				}
+			}
+
+			m_repeatMessage = msg;
+			m_repeatTime = (uint32)UNIXTIME;
+		}
+
+		if( sWorld.flood_caps_pct > 0.0f )
+		{
+			if( msg.length() >= sWorld.flood_caps_min_len )
+			{
+				uint32 fc = 0;
+				uint32 slen = msg.length();
+				uint32 clen = 0;
+				for(; fc < slen; ++fc)
+				{
+					if( msg[fc] >= 'A' && msg[fc] <= 'Z' )
+						++clen;
+				}
+
+				float pct = (float(clen) / float(slen)) * 100.0f;
+				if( pct >= sWorld.flood_caps_pct )
+				{
+					SystemMessage("Message blocked. Please don't speak in caps. You are are allowed %.2f%% caps in a message of %u characters.", sWorld.flood_caps_pct, sWorld.flood_caps_min_len);
+					return;
+				}
+			}
+		}
+
+		// filter
+		if(g_chatFilter->Parse(msg) == true)
+		{
+			SystemMessage("Your chat message was blocked by a server-side filter.");
+			return;
+		}
 	}
 
 	switch(type)
 	{
 	case CHAT_MSG_EMOTE:
 		{
-			recv_data >> msg;
-
 			if(GetPlayer()->m_modlanguage >=0)
 				data = sChatHandler.FillMessageData( CHAT_MSG_EMOTE, GetPlayer()->m_modlanguage,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 			else	
 				data = sChatHandler.FillMessageData( CHAT_MSG_EMOTE, CanUseCommand('c') ? LANG_UNIVERSAL : lang,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
-			GetPlayer()->SendMessageToSet( data, true ,true );
 
-			//sLog.outString("[emote] %s: %s", _player->GetName(), msg.c_str());
+			GetPlayer()->SendMessageToSet( data, true ,true );
 			delete data;
-			
-			pMsg=msg.c_str();
-			pMisc=0;
 
 		}break;
 	case CHAT_MSG_SAY:
 		{
-			recv_data >> msg;
-
 			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 				break;
-
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
 
 			if(GetPlayer()->m_modlanguage >=0)
 			{
@@ -177,28 +221,16 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 					(*itr)->GetSession()->SendChatPacket(data, 1, lang, this);
 				}
 			}
-
-			
-			//sLog.outString("[say] %s: %s", _player->GetName(), msg.c_str());
 			delete data;
-			pMsg=msg.c_str();
-			pMisc=0;
 		} break;
 	case CHAT_MSG_PARTY:
 	case CHAT_MSG_RAID:
 	case CHAT_MSG_RAID_LEADER:
 	case CHAT_MSG_RAID_WARNING:
+	case CHAT_MSG_BATTLEGROUND:
 		{
-			recv_data >> msg;
-
 			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 				break;
-			
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
 
 			Group *pGroup = _player->GetGroup();
 			if(pGroup == NULL) break;
@@ -239,62 +271,27 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 					_player->GetGroup()->Unlock();
 				}
 			}
-			//sLog.outString("[party] %s: %s", _player->GetName(), msg.c_str());
 			delete data;
-			pMsg=msg.c_str();
-			pMisc=0;
 		} break;
 	case CHAT_MSG_GUILD:
 		{
-			recv_data >> msg;
 			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-			{
 				break;
-			}
 
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
-
-			if(_player->m_playerInfo->guild)
+			if(_player->m_playerInfo->guild != NULL)
 				_player->m_playerInfo->guild->GuildChat(msg.c_str(), this, lang);
-
-			pMsg=msg.c_str();
-			pMisc=0;
 		} break;
 	case CHAT_MSG_OFFICER:
 		{
-			recv_data >> msg;
-
 			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 				break;
 
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
-
-			if(_player->m_playerInfo->guild)
+			if(_player->m_playerInfo->guild != NULL)
 				_player->m_playerInfo->guild->OfficerChat(msg.c_str(), this, lang);
-
-			pMsg=msg.c_str();
-			pMisc=0;
 		} break;
 	case CHAT_MSG_YELL:
 		{
-			recv_data >> msg;
 
-			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
-				break;
-
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
 			if(lang > 0 && LanguageSkills[lang] && _player->_HasSkillLine(LanguageSkills[lang]) == false)
 				return;
 
@@ -306,30 +303,16 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			else
 				data = sChatHandler.FillMessageData( CHAT_MSG_YELL, (CanUseCommand('c') && lang != -1) ? LANG_UNIVERSAL : lang,  msg.c_str(), _player->GetGUID(), _player->bGMTagOn ? 4 : 0 );
 
-			//SendPacket(data);
-			//sWorld.SendZoneMessage(data, GetPlayer()->GetZoneId(), this);
 			_player->GetMapMgr()->SendChatMessageToCellPlayers(_player, data, 2, 1, lang, this);
 			delete data;
-			//sLog.outString("[yell] %s: %s", _player->GetName(), msg.c_str());
-			pMsg=msg.c_str();
-			pMisc=0;
 		} break;
 	case CHAT_MSG_WHISPER:
 		{
-			std::string to = "",tmp;
-			recv_data >> to >> msg;
-
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
-		 
-			Player *player = objmgr.GetPlayer(to.c_str(), false);
+			Player *player = objmgr.GetPlayer(misc.c_str(), false);
 			if(!player)
 			{
-				data = new WorldPacket(SMSG_CHAT_PLAYER_NOT_FOUND, to.length() + 1);
-				*data << to;
+				data = new WorldPacket(SMSG_CHAT_PLAYER_NOT_FOUND, misc.length() + 1);
+				*data << misc;
 				SendPacket(data);
 				delete data;
 				break;
@@ -390,45 +373,19 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				delete data;
 			}
 
-			//sLog.outString("[whisper] %s to %s: %s", _player->GetName(), to.c_str(), msg.c_str());
-			pMsg=msg.c_str();
-			pMisc=to.c_str();
 		} break;
 	case CHAT_MSG_CHANNEL:
 		{
-			std::string channel = "";
-			recv_data >> channel;
-			recv_data >> msg;
-		 
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
-
 			if (sChatHandler.ParseCommands(msg.c_str(), this) > 0)
 				break;
 
-			Channel *chn = channelmgr.GetChannel(channel.c_str(),GetPlayer()); 
-			if(chn) 
+			Channel *chn = channelmgr.GetChannel(misc.c_str(),GetPlayer()); 
+			if(chn != NULL)
 				chn->Say(GetPlayer(),msg.c_str(), NULL, false);
-
-			//sLog.outString("[%s] %s: %s", channel.c_str(), _player->GetName(), msg.c_str());
-			pMsg=msg.c_str();
-			pMisc=channel.c_str();
-
 		} break;
 	case CHAT_MSG_AFK:
 		{
-			std::string reason;
-			recv_data >> reason;
-			GetPlayer()->SetAFKReason(reason);
-
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
+			GetPlayer()->SetAFKReason(msg);
 
 			/* WorldPacket *data, WorldSession* session, uint32 type, uint32 language, const char *channelName, const char *message*/
 			if(GetPlayer()->HasFlag(PLAYER_FLAGS, 0x02))
@@ -442,19 +399,17 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 				GetPlayer()->SetFlag(PLAYER_FLAGS, 0x02);
 				if(sWorld.GetKickAFKPlayerTime())
 					sEventMgr.AddEvent(GetPlayer(),&Player::SoftDisconnect,EVENT_PLAYER_SOFT_DISCONNECT,sWorld.GetKickAFKPlayerTime(),1,0);
+
+				if( GetPlayer()->m_bg )
+				{
+					GetPlayer()->m_bg->RemovePlayer( GetPlayer(), false );
+					//GetPlayer()->BroadcastMessage("You have been kicked from %s for inactivity.", GetPlayer()->m_bg->GetName());
+				}
 			}			
 		} break;
 	case CHAT_MSG_DND:
 		{
-			std::string reason;
-			recv_data >> reason;
-			GetPlayer()->SetAFKReason(reason);
-
-			if(g_chatFilter->Parse(msg) == true)
-			{
-				SystemMessage("Your chat message was blocked by a server-side filter.");
-				return;
-			}
+			GetPlayer()->SetAFKReason(msg);
 
 			if(GetPlayer()->HasFlag(PLAYER_FLAGS, 0x04))
 				GetPlayer()->RemoveFlag(PLAYER_FLAGS, 0x04);
@@ -464,11 +419,8 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 			}		  
 		} break;
 	default:
-		sLog.outError("CHAT: unknown msg type %u, lang: %u", type, lang);
+		DEBUG_LOG("CHAT: unknown msg type %u, lang: %u", type, lang);
 	}
-
-	if(pMsg)
-		sHookInterface.OnChat(_player, type, lang, pMsg, pMisc);
 }
 
 void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
@@ -487,6 +439,56 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
 	recv_data >> text_emote;
 	recv_data >> unk;
 	recv_data >> guid;
+
+	if( m_muted && m_muted >= (uint32)UNIXTIME )
+	{
+		SystemMessage("Your voice is currently muted by a moderator. This will expire in %s.", ConvertTimeStampToString(m_muted - (uint32)UNIXTIME).c_str());
+		return;
+	}
+
+	if( !GetPermissionCount() )
+	{
+		if( sWorld.flood_lines)
+		{
+			/* flood detection, wheeee! */
+			if(UNIXTIME >= floodTime)
+			{
+				floodLines = 0;
+				floodTime = UNIXTIME + sWorld.flood_seconds;
+			}
+
+			if((++floodLines) > sWorld.flood_lines)
+			{
+				if( sWorld.flood_mute_after_flood )
+				{
+					_player->BroadcastMessage("You have been muted for %u seconds for spamming.", sWorld.flood_mute_after_flood );
+					m_muted = (uint32)UNIXTIME + sWorld.flood_mute_after_flood;
+					return;
+				}
+
+				if(sWorld.flood_message)
+					_player->BroadcastMessage("Your message has triggered serverside flood protection. You can speak again in %u seconds.", floodTime - UNIXTIME);
+
+				return;
+			}
+		}
+
+		if( sWorld.flood_message_time )
+		{
+			// fuck you /crying newbs, go QQ somewhere else
+			if( m_repeatEmoteId == text_emote )
+			{
+				if( ((uint32)UNIXTIME - m_repeatEmoteTime) < sWorld.flood_message_time )
+				{
+					_player->BroadcastMessage("Your message has triggered serverside flood protection. Please don't repeat yourself.");
+					return;
+				}
+			}
+
+			m_repeatEmoteTime = (uint32)UNIXTIME;
+			m_repeatEmoteId = text_emote;
+		}
+	}
 
 	Unit * pUnit = _player->GetMapMgr()->GetUnit(guid);
 	if(pUnit)
@@ -553,10 +555,10 @@ void WorldSession::HandleReportSpamOpcode(WorldPacket & recvPacket)
 	CHECK_PACKET_SIZE(recvPacket, 29);
 
     // the 0 in the out packet is unknown
-    GetPlayer()->GetSession()->OutPacket(SMSG_REPORT_SPAM_RESPONSE, 1, 0 );
+    GetPlayer()->GetSession()->OutPacket(SMSG_COMPLAIN_RESULT, 1, 0 );
 
 	/* This whole thing is guess-work */
-	uint8 unk1;
+	/*uint8 unk1;
 	uint64 reportedGuid;
 	uint32 unk2;
 	uint32 messagetype;
@@ -567,6 +569,6 @@ void WorldSession::HandleReportSpamOpcode(WorldPacket & recvPacket)
 
 	Player * rPlayer = objmgr.GetPlayer((uint32)reportedGuid);
 	if(!rPlayer)
-		return;
+		return;*/
 
 }

@@ -45,7 +45,7 @@ int voicechat_init_clientsocket()
 	}
 
 	// create a socket
-	fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	fd = (int)socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if( fd < 0 )
 	{
 		log_write(ERROR, "FATAL: socket() for udp socket returned an error. %d.", fd);
@@ -99,7 +99,7 @@ int voicechat_init_serversocket()
 	}
 
 	// create a socket
-	fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	fd = (int)socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if( fd < 0 )
 	{
 		log_write(ERROR, "FATAL: socket() for tcp socket returned an error. %d.", fd);

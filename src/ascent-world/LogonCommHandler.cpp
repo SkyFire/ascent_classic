@@ -62,16 +62,15 @@ void LogonCommHandler::RequestAddition(LogonCommClientSocket * Socket)
 		data << realm->Name;
 		data << realm->Address;
 		data << realm->Colour;
-		data << realm->Icon;
+		data << realm->Type;
 		data << realm->TimeZone;
 		data << realm->Population;
 		Socket->SendPacket(&data,false);
 	}
 }
 
-class LogonCommWatcherThread : public ThreadBase
+class LogonCommWatcherThread : public ThreadContext
 {
-	bool running;
 #ifdef WIN32
 	HANDLE hEvent;
 #endif
@@ -82,7 +81,6 @@ public:
 #ifdef WIN32
 		hEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
 #endif
-		running = true;
 	}
 
 	~LogonCommWatcherThread()
@@ -92,7 +90,7 @@ public:
 
 	void OnShutdown()
 	{
-		running = false;
+		m_threadRunning = false;
 #ifdef WIN32
 		SetEvent( hEvent );
 #endif
@@ -101,7 +99,7 @@ public:
 	bool run()
 	{
 		sLogonCommHandler.ConnectAll();
-		while( running )
+		while( m_threadRunning )
 		{
 			sLogonCommHandler.UpdateSockets();
 #ifdef WIN32
@@ -311,9 +309,9 @@ uint32 LogonCommHandler::ClientConnected(string AccountName, WorldSocket * Socke
 	uint32 request_id = next_request++;
 	size_t i = 0;
 	const char * acct = AccountName.c_str();
-	sLog.outDebug ( " >> sending request for account information: `%s` (request %u).", AccountName.c_str(), request_id);
-	//  sLog.outColor(TNORMAL, "\n");
-
+	DEBUG_LOG ( " >> sending request for account information: `%s` (request %u).", AccountName.c_str(), request_id);
+  //  sLog.outColor(TNORMAL, "\n");
+	
 	// Send request packet to server.
 	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
 	if(logons.size() == 0)
@@ -334,7 +332,7 @@ uint32 LogonCommHandler::ClientConnected(string AccountName, WorldSocket * Socke
 	// strip the shitty hash from it
 	for(; acct[i] != '#' && acct[i] != '\0'; ++i )
 		data.append( &acct[i], 1 );
-
+	
 	data.append( "\0", 1 );
 	s->SendPacket(&data,false);
 
@@ -377,11 +375,12 @@ void LogonCommHandler::LoadRealmConfiguration()
 			Realm * realm = new Realm;
 			realm->Name = Config.RealmConfig.GetStringVA("Name", "SomeRealm", "Realm%u", i);
 			realm->Address = Config.RealmConfig.GetStringVA("Address", "127.0.0.1:8129", "Realm%u", i);
-			realm->Colour = Config.RealmConfig.GetIntVA("Colour", 1, "Realm%u", i);
 			realm->TimeZone = Config.RealmConfig.GetIntVA("TimeZone", 1, "Realm%u", i);
 			realm->Population = Config.RealmConfig.GetFloatVA("Population", 0, "Realm%u", i);
-			string rt = Config.RealmConfig.GetStringVA("Icon", "Normal", "Realm%u", i);
+			string rt = Config.RealmConfig.GetStringVA("Type", "Normal", "Realm%u", i);
+			string rc = Config.RealmConfig.GetStringVA("Colour", "Green", "Realm%u", i);
 			uint32 type;
+			uint32 colour = 0;
 
 			// process realm type
 			if(!stricmp(rt.c_str(), "pvp"))
@@ -393,9 +392,20 @@ void LogonCommHandler::LoadRealmConfiguration()
 			else
 				type = 0;
 
+			if( !stricmp(rc.c_str(), "green") )
+				colour = 0;//green
+			else if( !stricmp(rc.c_str(), "red"))
+				colour = 1;//red
+			else if( !stricmp(rc.c_str(), "blue"))
+				colour = 3;//blue
+			else
+				colour = 0;//green
+				
+
 			_realmType = type;
 
-			realm->Icon = type;
+			realm->Colour = colour;
+			realm->Type = type;
 			realms.insert(realm);
 		}
 	}
@@ -445,7 +455,7 @@ void LogonCommHandler::TestConsoleLogon(string& username, string& password, uint
 }
 
 // db funcs
-void LogonCommHandler::Account_SetBanned(const char * account, uint32 banned)
+void LogonCommHandler::Account_SetBanned(const char * account, uint32 banned, const char* reason)
 {
 	map<LogonServer*, LogonCommClientSocket*>::iterator itr = logons.begin();
 	if(logons.size() == 0 || itr->second == 0)
@@ -458,6 +468,7 @@ void LogonCommHandler::Account_SetBanned(const char * account, uint32 banned)
 	data << uint32(1);		// 1 = ban
 	data << account;
 	data << banned;
+	data << reason;
 	itr->second->SendPacket(&data, false);
 }
 

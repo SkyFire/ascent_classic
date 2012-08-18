@@ -59,6 +59,7 @@ enum Rates
 	RATE_ARENAPOINTMULTIPLIER2X,
 	RATE_ARENAPOINTMULTIPLIER3X,
 	RATE_ARENAPOINTMULTIPLIER5X,
+	RATE_EOTS_CAPTURERATE,
 	MAX_RATES
 };		
 
@@ -178,6 +179,12 @@ enum ServerMessageType
 	SERVER_MSG_RESTART_CANCELLED  = 5
 };
 
+enum ServerShutdownType
+{
+	SERVER_SHUTDOWN_TYPE_SHUTDOWN	= 1,
+	SERVER_SHUTDOWN_TYPE_RESTART	= 2,
+};
+
 enum WorldMapInfoFlag
 {
 	WMI_INSTANCE_ENABLED   = 0x1,
@@ -232,7 +239,7 @@ enum REALM_TYPE
 };
 struct AreaTable;
 
-class BasicTaskExecutor : public ThreadBase
+class BasicTaskExecutor : public ThreadContext
 {
 	CallbackBase * cb;
 	uint32 priority;
@@ -253,7 +260,7 @@ public:
 	void execute();
 };
 
-struct CharacterLoaderThread : public ThreadBase
+struct CharacterLoaderThread : public ThreadContext
 {
 #ifdef WIN32
 	HANDLE hEvent;
@@ -261,7 +268,6 @@ struct CharacterLoaderThread : public ThreadBase
 	pthread_cond_t cond;
 	pthread_mutex_t mutex;
 #endif
-	bool running;
 public:
 	CharacterLoaderThread();
 	~CharacterLoaderThread();
@@ -314,13 +320,34 @@ enum BasicTaskExecutorPriorities
 	BTW_PRIORITY_HIGH	   = 2,
 };
 
-class TaskExecutor : public ThreadBase
+class TaskExecutor : public ThreadContext
 {
 	TaskList * starter;
 public:
 	TaskExecutor(TaskList * l) : starter(l) { l->incrementThreadCount(); }
 	~TaskExecutor() { starter->decrementThreadCount(); }
 
+	bool run();
+};
+
+class NewsAnnouncer : public ThreadContext
+{
+	struct NewsAnnouncement
+	{
+		uint32 m_id;
+		uint32 m_lastTime;
+		uint32 m_timePeriod;
+		int32 m_factionMask;
+		string m_message;
+	};
+
+	map<uint32, NewsAnnouncement> m_announcements;
+
+	void _UpdateMessages();
+	void _ReloadMessages();
+	void _SendMessage(NewsAnnouncement *ann);
+	void _Init();
+public:
 	bool run();
 };
 
@@ -382,6 +409,7 @@ public:
 	void SendZoneMessage(WorldPacket *packet, uint32 zoneid, WorldSession *self = 0);
 	void SendInstanceMessage(WorldPacket *packet, uint32 instanceid, WorldSession *self = 0);
 	void SendFactionMessage(WorldPacket *packet, uint8 teamId);
+	void SendMessageToGMs(WorldSession *self, const char * text, ...);
 
 	ASCENT_INLINE void SetStartTime(uint32 val) { m_StartTime = val; }
 	ASCENT_INLINE uint32 GetUptime(void) { return (uint32)UNIXTIME - m_StartTime; }
@@ -456,12 +484,13 @@ public:
 	Mutex queueMutex;
 
 	uint32 mQueueUpdateInterval;
+
+	bool free_guild_charters;
 	bool m_useIrc;
 
 	void SaveAllPlayers();
 
 	string MapPath;
-	string vMapPath;
 	bool UnloadMapFiles;
 	bool BreathingEnabled;
 	bool SpeedhackProtection;
@@ -488,18 +517,23 @@ public:
 
 	uint32 flood_lines;
 	uint32 flood_seconds;
+	uint32 flood_message_time;
+	uint32 flood_mute_after_flood;
+	uint32 flood_caps_min_len;
+	float flood_caps_pct;
 	bool flood_message;
 	bool gm_skip_attunement;
 
 	bool show_gm_in_who_list;
-	//bool allow_gm_friends;
 	uint32 map_unload_time;
 
 	bool antihack_teleport;
 	bool antihack_speed;
 	bool antihack_flight;
-	uint32 flyhack_threshold;
+	bool antihack_cheatengine;
 	bool no_antihack_on_gm;
+
+	bool free_arena_teams;
 
 	void CharacterEnumProc(QueryResultVector& results, uint32 AccountId);
 	void LoadAccountDataProc(QueryResultVector& results, uint32 AccountId);
@@ -559,6 +593,7 @@ protected:
 	QueueSet mQueuedSessions;
 
 	uint32	m_KickAFKPlayers;//don't lag the server if you are useless anyway :P
+
 public:
 	std::string GmClientChannel;
 	bool m_reqGmForCommands;
@@ -576,6 +611,19 @@ public:
 	static uint32 m_movementCompressRate;
 	static uint32 m_movementCompressInterval;
 	static float m_speedHackThreshold;
+	static float m_speedHackLatencyMultiplier;
+	static uint32 m_speedHackResetInterval;
+	static uint32 m_CEThreshold;
+	static float m_wallhackthreshold;
+
+	// shutdown
+	uint32 m_shutdownTime;
+	uint32 m_shutdownType;
+	uint32 m_shutdownLastTime;
+
+	void QueueShutdown(uint32 delay, uint32 type);
+	void CancelShutdown();
+	void UpdateShutdownStatus();
 };
 
 #define sWorld World::getSingleton()

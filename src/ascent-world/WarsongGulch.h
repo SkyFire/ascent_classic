@@ -27,6 +27,10 @@ class WarsongGulch : public CBattleground
 	uint32 m_flagHolders[2];
 	list<GameObject*> m_gates;
 	uint32 m_scores[2];
+	bool m_flagAtBase[2];
+#ifdef BG_ANTI_CHEAT
+	uint32 m_flagPickUpTimestamp[2];
+#endif
 public:
 	WarsongGulch(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t);
 	~WarsongGulch();
@@ -51,4 +55,8 @@ public:
 
 	const char * GetName() { return "Warsong Gulch"; }
 	void OnStart();
+
+	/* looooooot */
+	bool SupportsPlayerLoot() { return true; }
+	void HookGenerateLoot(Player *plr, Corpse *pCorpse);
 };

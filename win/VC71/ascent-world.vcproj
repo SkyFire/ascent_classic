@@ -32,7 +32,7 @@
 				RuntimeLibrary="1"
 				EnableFunctionLevelLinking="FALSE"
 				RuntimeTypeInfo="FALSE"
-				UsePrecompiledHeader="3"
+				UsePrecompiledHeader="2"
 				PrecompiledHeaderFile="$(IntDir)/game.pch"
 				AssemblerListingLocation="$(IntDir)/"
 				ObjectFile="$(IntDir)/"
@@ -47,7 +47,6 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/NODEFAULTLIB:msvcrt.lib"
 				AdditionalDependencies="ws2_32.lib libmysql.lib libeay32.lib dbghelp.lib zlib.lib pcre.lib"
 				ShowProgress="1"
 				OutputFile="$(OutDir)\ascent-world.exe"
@@ -153,16 +152,6 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="AiAgents"
-			Filter="">
-			<File
-				RelativePath="..\..\src\ascent-world\AIAHealSupport.cpp">
-			</File>
-			<File
-				RelativePath="..\..\src\ascent-world\AIAHealSupport.h">
-			</File>
-		</Filter>
 		<Filter
 			Name="Launcher"
 			Filter="">
@@ -556,9 +545,6 @@
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\Opcodes.h">
-		</File>
-		<File
-			RelativePath="..\..\src\ascent-world\Packets.h">
 		</File>
 		<File
 			RelativePath="..\..\src\ascent-world\Pet.cpp">

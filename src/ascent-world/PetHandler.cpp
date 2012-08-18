@@ -61,7 +61,7 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 		}
 		return;
 	}
-	Pet *pPet = _player->GetMapMgr()->GetPet((uint32)petGuid);
+	Pet *pPet = _player->GetMapMgr()->GetPet(GET_LOWGUID_PART(petGuid));
 	if(!pPet || !pPet->isAlive())
 		return;
 
@@ -74,10 +74,6 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 		if(!pTarget) pTarget = pPet;	// target self
 	}
 
-	if(action==PET_ACTION_ACTION && misc==PET_ACTION_STAY)//sit if STAY commanded
-		pPet->SetStandState(STANDSTATE_SIT);
-	else 
-		pPet->SetStandState(STANDSTATE_STAND);
 	switch(action)
 	{
 	case PET_ACTION_ACTION:
@@ -232,7 +228,7 @@ void WorldSession::HandlePetAction(WorldPacket & recv_data)
 void WorldSession::HandlePetInfo(WorldPacket & recv_data)
 {
 	//nothing
-	sLog.outDebug("HandlePetInfo is called");
+	DEBUG_LOG("HandlePetInfo is called");
 }
 
 void WorldSession::HandlePetNameQuery(WorldPacket & recv_data)
@@ -242,7 +238,7 @@ void WorldSession::HandlePetNameQuery(WorldPacket & recv_data)
 	uint64 petGuid = 0;
 
 	recv_data >> petNumber >> petGuid;
-	Pet *pPet = _player->GetMapMgr()->GetPet((uint32)petGuid);
+	Pet *pPet = _player->GetMapMgr()->GetPet(GET_LOWGUID_PART(petGuid));
 	if(!pPet) return;
 
 	WorldPacket data(8 + pPet->GetName().size());
@@ -285,7 +281,7 @@ void WorldSession::HandleUnstablePet(WorldPacket & recv_data)
 	PlayerPet *pet = _player->GetPlayerPet(petnumber);
 	if(!pet)
 	{
-		sLog.outError("PET SYSTEM: Player "I64FMT" tried to unstable non-existant pet %d", _player->GetGUID(), petnumber);
+		DEBUG_LOG("PET SYSTEM: Player "I64FMT" tried to unstable non-existant pet %d", _player->GetGUID(), petnumber);
 		return;
 	}
 	_player->SpawnPet(petnumber);
@@ -307,7 +303,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket & recv_data)
 	PlayerPet *pet = _player->GetPlayerPet(petnumber);
 	if(!pet)
 	{
-		sLog.outError("PET SYSTEM: Player "I64FMT" tried to unstable non-existant pet %d", _player->GetGUID(), petnumber);
+		DEBUG_LOG("PET SYSTEM: Player "I64FMT" tried to unstable non-existant pet %d", _player->GetGUID(), petnumber);
 		return;
 	}
 	Pet *pPet = _player->GetSummon();

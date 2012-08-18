@@ -55,13 +55,13 @@ void BuildWeatherPacket(WorldPacket * data, uint32 Effect, float Density )
 		*data << Effect << float(0) << uint32(0) << uint8(0);		
 	else
 		*data << Effect << Density << GetSound(Effect,Density) << uint8(0) ;
-//	sLog.outDebug("Send Weather Update %d, Density %f, Sound %d, unint8(0)", Effect,Density,GetSound(Effect,Density));
+//	DEBUG_LOG("Send Weather Update %d, Density %f, Sound %d, unint8(0)", Effect,Density,GetSound(Effect,Density));
 }
 
 uint32 GetSound(uint32 Effect, float Density)
 {
     uint32 sound;
-    if(Density<=0.30f)
+    if(Density<=0.20f)
 		return WEATHER_NOSOUND;
 
 	switch(Effect)
@@ -180,7 +180,7 @@ void WeatherInfo::_GenerateWeather()
 {
 	m_currentTime = 0;
 	m_currentEffect = 0;
-	m_currentDensity = 0.30f;//Starting Offset (don't go below, it's annoying fog)
+	m_currentDensity = 0.20f;//Starting Offset (don't go below, it's annoying fog)
 	float fd = RandomFloat();
 	m_maxDensity = fd+1; //1 - 2
 	m_totalTime = (RandomUInt(11) + 5)*1000*120;//update approx. every 1-2 minutes
@@ -215,12 +215,12 @@ void WeatherInfo::BuildUp()
 	{
 		sEventMgr.RemoveEvents(this, EVENT_WEATHER_UPDATE);
 		sEventMgr.AddEvent(this, &WeatherInfo::Update, EVENT_WEATHER_UPDATE, (uint32)(m_totalTime/ceil(m_maxDensity/WEATHER_DENSITY_UPDATE)*4), 0,0);
-//		sLog.outDebug("Weather starting random for zone:%d type:%d new interval:%d ms",m_zoneId,m_currentEffect,(uint32)(m_totalTime/ceil(m_maxDensity/WEATHER_DENSITY_UPDATE)*4));
+//		DEBUG_LOG("Weather starting random for zone:%d type:%d new interval:%d ms",m_zoneId,m_currentEffect,(uint32)(m_totalTime/ceil(m_maxDensity/WEATHER_DENSITY_UPDATE)*4));
 	}
 	else
 	{
 		m_currentDensity += WEATHER_DENSITY_UPDATE;
-//		sLog.outDebug("Weather increased for zone:%d type:%d density:%f",m_zoneId,m_currentEffect,m_currentDensity);
+//		DEBUG_LOG("Weather increased for zone:%d type:%d density:%f",m_zoneId,m_currentEffect,m_currentDensity);
 		SendUpdate();
 	}
 }
@@ -230,7 +230,7 @@ void WeatherInfo::Update()
 	if (m_currentEffect == 0 || RandomUInt(100) < 66) 
 	{
 		m_currentDensity -= WEATHER_DENSITY_UPDATE;
-		if (m_currentDensity < 0.30f) //0.20 is considered fog, lower values are anoying
+		if (m_currentDensity < 0.20f) //0.20 is considered fog, lower values are anoying
 		{
 			m_currentDensity = 0.0f;
 			m_currentEffect = 0;
@@ -249,7 +249,7 @@ void WeatherInfo::Update()
 		}
 	}
 	SendUpdate();
-//	sLog.outDebug("Weather Updated,zoneId:%d type:%d density:%f", m_zoneId, m_currentEffect, m_currentDensity);
+//	DEBUG_LOG("Weather Updated,zoneId:%d type:%d density:%f", m_zoneId, m_currentEffect, m_currentDensity);
 }
 
 void WeatherInfo::SendUpdate()

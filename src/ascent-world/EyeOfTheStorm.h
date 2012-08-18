@@ -60,7 +60,12 @@ public:
 	void EventResetFlag();
 	void RepopPlayersOfTeam(int32 team, Creature * sh);
 
+	/* looooooot */
+	bool SupportsPlayerLoot() { return true; }
+	void HookGenerateLoot(Player *plr, Corpse *pCorpse);
+
 protected:
+	uint32 m_resourceRewards[2];
 	int32 m_CPStatus[EOTS_TOWER_COUNT];		
 	uint32 m_flagHolder;
 
@@ -71,8 +76,9 @@ protected:
 	GameObject * m_CPBanner[EOTS_TOWER_COUNT];
 	GameObject * m_bubbles[2];
 
-	typedef set<Player*> EOTSCaptureDisplayList;
-	EOTSCaptureDisplayList m_CPDisplay[EOTS_TOWER_COUNT];
+	typedef map<uint32, uint32> EOTSStoredPlayerMap;
+	EOTSStoredPlayerMap m_CPStored[EOTS_TOWER_COUNT];
+	int32 m_towerCount[2];
 
 	uint32 m_points[2];
 	Creature * m_spiritGuides[EOTS_TOWER_COUNT];

@@ -28,7 +28,7 @@ const char * gCreatureProtoFormat						= "uuuuuuufuuuffuffuuuuuuuuuuuuuuuuuuffsu
 const char * gAreaTriggerFormat							= "ucuusffffuu";
 const char * gItemPageFormat							= "usu";
 const char * gNpcTextFormat								= "ufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuufssuuuuuuu";
-const char * gQuestFormat								= "uuuuuuuuuuuuuuuuuuussssssssssuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu";
+const char * gQuestFormat								= "uuuuuuuuuuuuuuuuuuussssssssssuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu";
 const char * gSpellExtraFormat							= "uuuu";
 const char * gGraveyardFormat							= "uffffuuuux";
 const char * gTeleportCoordFormat						= "uxufffx";
@@ -284,6 +284,16 @@ void ObjectMgr::LoadExtraItemStuff()
 	}
 	delete result;
 
+	StorageContainerIterator<GameObjectInfo> *gtr = GameObjectNameStorage.MakeIterator();
+	while(!gtr->AtEnd())
+	{
+		gtr->Get()->InvolvedQuestCount =0;
+		gtr->Get()->InvolvedQuestIds = NULL;
+		gtr->Inc();
+	}
+	gtr->Destruct();
+	
+
 	StorageContainerIterator<ItemPrototype> * itr = ItemPrototypeStorage.MakeIterator();
 	ItemPrototype * pItemPrototype;
 	while(!itr->AtEnd())
@@ -428,39 +438,12 @@ void ObjectMgr::LoadExtraItemStuff()
 			break;
 		}
 
-		pItemPrototype->extended_cost = NULL;
         if(!itr->Inc())
 			break;
 	}
 
 	itr->Destruct();
 	foodItems.clear();
-
-	result = WorldDatabase.Query("SELECT * FROM items_extendedcost");
-	ItemExtendedCostEntry * ec;
-	if( result != NULL )
-	{
-		do 
-		{
-			ec = dbcItemExtendedCost.LookupEntryForced( result->Fetch()[1].GetUInt32() );
-			if( ec == NULL )
-			{
-				Log.Warning("LoadItems", "Extendedcost for item %u references nonexistant EC %u", result->Fetch()[0].GetUInt32(), result->Fetch()[1].GetUInt32() );
-				continue;
-			}
-
-			pItemPrototype = ItemPrototypeStorage.LookupEntry( result->Fetch()[0].GetUInt32() );
-			if( pItemPrototype == NULL )
-			{
-				Log.Warning("LoadItems", "Extendedcost for item %u references nonexistant item %u", result->Fetch()[0].GetUInt32(), result->Fetch()[1].GetUInt32() );
-				continue;
-			}
-
-			pItemPrototype->extended_cost = ec;
-
-		} while (result->NextRow());
-		delete result;
-	}
 }
 
 #define make_task(storage, itype, storagetype, tablename, format) tl.AddTask( new Task( \

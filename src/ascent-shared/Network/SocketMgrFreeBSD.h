@@ -83,16 +83,15 @@ public:
     void SpawnWorkerThreads();
 };
 
-class SocketWorkerThread : public ThreadBase
+class SocketWorkerThread : public ThreadContext
 {
     /// epoll event struct
     struct kevent events[THREAD_EVENT_SIZE];
-    bool running;
 public:
     bool run();
     void OnShutdown()
     {
-        running=false;
+        m_threadRunning = false;
     }
 };
 

@@ -61,11 +61,8 @@ public:
 	Master();
 	~Master();
 	bool Run(int argc, char ** argv);
-	bool m_ShutdownEvent;
-	uint32 m_ShutdownTimer;
 
 	static volatile bool m_stopEvent;
-	bool m_restartEvent;
 
 private:
 	bool _StartDB();

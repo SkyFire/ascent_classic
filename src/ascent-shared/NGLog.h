@@ -65,11 +65,9 @@ public:
 #ifdef WIN32
 	HANDLE stdout_handle, stderr_handle;
 #endif  
-	int32 log_level;
 
 	CLog()
 	{
-		log_level = 3;
 #ifdef WIN32
 		stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
 		stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -97,8 +95,6 @@ public:
 
 	ASCENT_INLINE void Time()
 	{
-        /*tm * t = localtime(&UNIXTIME);
-		printf("%02u:%02u ", t->tm_hour, t->tm_min);*/
 		printf("%02u:%02u ", g_localTime.tm_hour, g_localTime.tm_min);
 	}
 
@@ -126,11 +122,40 @@ public:
 		UNLOCK_LOG;
 	}
 
+	void Line()
+	{
+		LOCK_LOG;
+		putchar('\n');
+		UNLOCK_LOG;
+	}
+
+	void Error(const char * source, const char * format, ...)
+	{
+		LOCK_LOG;
+		va_list ap;
+		va_start(ap, format);
+		Time();
+		Color(TRED);
+		fputs("E ", stdout);
+		if(*source)
+		{
+			Color(TWHITE);
+			fputs(source, stdout);
+			putchar(':');
+			putchar(' ');
+			Color(TRED);
+		}
+
+		vprintf(format, ap);
+		putchar('\n');
+		va_end(ap);
+		Color(TNORMAL);
+		UNLOCK_LOG;
+	}
+
+#ifdef _DEBUG
 	void Warning(const char * source, const char * format, ...)
 	{
-		if(log_level < 2)
-			return;
-
 		/* warning is old loglevel 2/detail */
 		LOCK_LOG;
 		va_list ap;
@@ -156,9 +181,6 @@ public:
 
 	void Success(const char * source, const char * format, ...)
 	{
-		if(log_level < 2)
-			return;
-
 		LOCK_LOG;
 		va_list ap;
 		va_start(ap, format);
@@ -181,45 +203,8 @@ public:
 		UNLOCK_LOG;
 	}
 
-	void Error(const char * source, const char * format, ...)
-	{
-		if(log_level < 1)
-			return;
-
-		LOCK_LOG;
-		va_list ap;
-		va_start(ap, format);
-		Time();
-		Color(TRED);
-		fputs("E ", stdout);
-		if(*source)
-		{
-			Color(TWHITE);
-			fputs(source, stdout);
-			putchar(':');
-			putchar(' ');
-			Color(TRED);
-		}
-
-		vprintf(format, ap);
-		putchar('\n');
-		va_end(ap);
-		Color(TNORMAL);
-		UNLOCK_LOG;
-	}
-
-	void Line()
-	{
-		LOCK_LOG;
-		putchar('\n');
-		UNLOCK_LOG;
-	}
-
 	void Debug(const char * source, const char * format, ...)
 	{
-		if(log_level < 3)
-			return;
-
 		LOCK_LOG;
 		va_list ap;
 		va_start(ap, format);
@@ -241,6 +226,12 @@ public:
 		Color(TNORMAL);
 		UNLOCK_LOG;
 	}
+#else
+	void Debug(const char * source, const char * format, ...) {}
+	void Success(const char * source, const char * format, ...) {}
+	void Warning(const char * source, const char * format, ...) {}
+#endif
+
 
 #define LARGERRORMESSAGE_ERROR 1
 #define LARGERRORMESSAGE_WARNING 2

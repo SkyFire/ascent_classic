@@ -28,9 +28,7 @@ typedef struct
 
 #ifndef CLUSTERING
 
-#ifndef USING_BIG_ENDIAN
 ASCENT_INLINE static void swap32(uint32* p) { *p = ((*p >> 24 & 0xff)) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
-#endif
 
 LogonCommClientSocket::LogonCommClientSocket(SOCKET fd) : Socket(fd, 724288, 262444)
 {
@@ -49,12 +47,12 @@ void LogonCommClientSocket::OnRead()
 	{
 		if(!remaining)
 		{
-			if(GetReadBuffer().GetSize() < 6)
+			if(readBuffer.GetSize() < 6)
 				return;	 // no header
 
 			// read header
-			GetReadBuffer().Read((uint8*)&opcode, 2);
-			GetReadBuffer().Read((uint8*)&remaining, 4);
+			readBuffer.Read(&opcode, 2);
+			readBuffer.Read(&remaining, 4);
 
 			// decrypt the first two bytes
 			if(use_crypto)
@@ -63,16 +61,12 @@ void LogonCommClientSocket::OnRead()
 				_recvCrypto.Process((uint8*)&remaining, (uint8*)&remaining, 4);
 			}
 
-#ifdef USING_BIG_ENDIAN
-			opcode = swap16(opcode);
-#else
 			// convert network byte order
 			swap32(&remaining);
-#endif
 		}
 
 		// do we have a full packet?
-		if(GetReadBuffer().GetSize() < remaining)
+		if(readBuffer.GetSize() < remaining)
 			return;
 
 		// create the buffer
@@ -80,8 +74,7 @@ void LogonCommClientSocket::OnRead()
 		if(remaining)
 		{
 			buff.resize(remaining);
-			//Read(remaining, (uint8*)buff.contents());
-			GetReadBuffer().Read((uint8*)buff.contents(), remaining);
+			readBuffer.Read((void*)buff.contents(), remaining);
 		}
 
 		// decrypt the rest of the packet
@@ -116,6 +109,9 @@ void LogonCommClientSocket::HandlePacket(WorldPacket & recvData)
 		&LogonCommClientSocket::HandleDisconnectAccount,	// RSMSG_DISCONNECT_ACCOUNT
 		NULL,												// RCMSG_TEST_CONSOLE_LOGIN
 		&LogonCommClientSocket::HandleConsoleAuthResult,	// RSMSG_CONSOLE_LOGIN_RESULT
+		NULL,												// RCMSG_MODIFY_DATABASE
+		&LogonCommClientSocket::HandleServerPing,			// RCMSG_SERVER_PING
+		NULL,												// RSMSG_SERVER_PONG
 	};
 
 	if(recvData.GetOpcode() >= RMSG_COUNT || Handlers[recvData.GetOpcode()] == 0)
@@ -186,15 +182,9 @@ void LogonCommClientSocket::SendPacket(WorldPacket * data, bool no_crypto)
 
 	BurstBegin();
 
-#ifndef USING_BIG_ENDIAN
 	header.opcode = data->GetOpcode();
-	//header.size   = ntohl((u_long)data->size());
 	header.size = (uint32)data->size();
 	swap32(&header.size);
-#else
-	header.opcode = swap16(uint16(data->GetOpcode()));
-	header.size   = data->size();
-#endif
 
 	if(use_crypto && !no_crypto)
 		_sendCrypto.Process((unsigned char*)&header, (unsigned char*)&header, 6);
@@ -350,7 +340,7 @@ void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 
 	if(deflateInit(&stream, 1) != Z_OK)
 	{
-		sLog.outError("deflateInit failed.");
+		DEBUG_LOG("deflateInit failed.");
 		return;
 	}
 
@@ -364,29 +354,25 @@ void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 	if(deflate(&stream, Z_NO_FLUSH) != Z_OK ||
 		stream.avail_in != 0)
 	{
-		sLog.outError("deflate failed.");
+		DEBUG_LOG("deflate failed.");
 		return;
 	}
 
 	// finish the deflate
 	if(deflate(&stream, Z_FINISH) != Z_STREAM_END)
 	{
-		sLog.outError("deflate failed: did not end stream");
+		DEBUG_LOG("deflate failed: did not end stream");
 		return;
 	}
 
 	// finish up
 	if(deflateEnd(&stream) != Z_OK)
 	{
-		sLog.outError("deflateEnd failed.");
+		DEBUG_LOG("deflateEnd failed.");
 		return;
 	}
 
-#ifdef USING_BIG_ENDIAN
-	*(uint32*)data.contents() = swap32(uint32(uncompressed.size()));
-#else
 	*(uint32*)data.contents() = (uint32)uncompressed.size();
-#endif
 	data.resize(stream.total_out + 4);
 	SendPacket(&data,false);
 }
@@ -408,6 +394,16 @@ void LogonCommClientSocket::HandleConsoleAuthResult(WorldPacket & recvData)
 	recvData >> requestid >> result;
 
 	ConsoleAuthCallback(requestid, result);
+}
+
+void LogonCommClientSocket::HandleServerPing(WorldPacket &recvData)
+{
+	uint32 r;
+	recvData >> r;
+
+	WorldPacket data(RCMSG_SERVER_PONG, 4);
+	data << r;
+	SendPacket(&data, false);
 }
 
 #else

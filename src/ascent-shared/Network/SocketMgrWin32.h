@@ -49,7 +49,7 @@ private:
 
 typedef void(*OperationHandler)(Socket * s, uint32 len);
 
-class SocketWorkerThread : public ThreadBase
+class SocketWorkerThread : public ThreadContext
 {
 public:
 	bool run();

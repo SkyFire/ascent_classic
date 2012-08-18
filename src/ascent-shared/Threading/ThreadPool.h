@@ -150,7 +150,7 @@ public:
 
 struct SERVER_DECL Thread
 {
-	ThreadBase * ExecutionTarget;
+	ThreadContext * ExecutionTarget;
 	ThreadController ControlInterface;
 	Mutex SetupMutex;
 	bool DeleteAfterExit;
@@ -189,10 +189,10 @@ public:
 	bool ThreadExit(Thread * t);
 
 	// creates a thread, returns a handle to it.
-	Thread * StartThread(ThreadBase * ExecutionTarget);
+	Thread * StartThread(ThreadContext * ExecutionTarget);
 
 	// grabs/spawns a thread, and tells it to execute a task.
-	void ExecuteTask(ThreadBase * ExecutionTarget);
+	void ExecuteTask(ThreadContext * ExecutionTarget);
 
 	// prints some neat debug stats
 	void ShowStats();

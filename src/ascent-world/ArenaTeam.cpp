@@ -54,6 +54,7 @@ ArenaTeam::ArenaTeam(uint32 Type, uint32 Id)
 	m_stat_gameswonseason = 0;
 	m_stat_gameswonweek = 0;
 	m_stat_ranking = 0;
+	m_queueSearchRange = 100;
 }
 
 ArenaTeam::ArenaTeam(Field * f)
@@ -87,11 +88,15 @@ ArenaTeam::ArenaTeam(Field * f)
 		{
 			m_members[i].Info = objmgr.GetPlayerInfo(guid);
 			if(m_members[i].Info)
+			{
+				m_members[i].Info->arenaTeam[m_type] = this;
 				++m_memberCount;
+			}
 		}
 		else
 			m_members[i].Info = NULL;
 	}	
+	m_queueSearchRange = 100;
 }
 
 void ArenaTeam::SendPacket(WorldPacket * data)
@@ -148,10 +153,10 @@ bool ArenaTeam::AddMember(PlayerInfo * info)
 		base_field = (m_type*6) + PLAYER_FIELD_ARENA_TEAM_INFO_1_1;
 		plr->SetUInt32Value(base_field, m_id);
 		plr->SetUInt32Value(base_field+1,m_leader);
-        
-        plr->m_arenaTeams[m_type]=this;
 		plr->GetSession()->SystemMessage("You are now a member of the arena team, '%s'.", m_name.c_str());
 	}
+
+	info->arenaTeam[m_type] = this;
 	return true;
 }
 
@@ -169,10 +174,9 @@ bool ArenaTeam::RemoveMember(PlayerInfo * info)
 			SaveToDB();
 
 			if(info->m_loggedInPlayer)
-			{
 				info->m_loggedInPlayer->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (m_type*6), 0);
-				info->m_loggedInPlayer->m_arenaTeams[m_type]=0;
-			}
+
+			info->arenaTeam[m_type] = NULL;
 			return true;
 		}
 	}
@@ -311,6 +315,8 @@ void ArenaTeam::SetLeader(PlayerInfo * info)
 				m_members[i].Info->m_loggedInPlayer->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (m_type*6) + 1, 1);
 		}
 	}
+
+	SaveToDB();
 }
 
 ArenaTeamMember * ArenaTeam::GetMember(PlayerInfo * info)
@@ -400,7 +406,7 @@ void WorldSession::HandleArenaTeamAddMemberOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if(plr->m_arenaTeams[pTeam->m_type] != NULL)
+	if(plr->m_playerInfo->arenaTeam[pTeam->m_type] != NULL)
 	{
 		SystemMessage("That player is already in an arena team of this type.");
 		return;
@@ -418,9 +424,9 @@ void WorldSession::HandleArenaTeamAddMemberOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	plr->m_arenateaminviteguid = _player->m_arenaTeams[pTeam->m_type]->m_id;
+	plr->m_arenateaminviteguid = _player->m_playerInfo->arenaTeam[pTeam->m_type]->m_id;
 	data << _player->GetName();
-	data << _player->m_arenaTeams[pTeam->m_type]->m_name;
+	data << _player->m_playerInfo->arenaTeam[pTeam->m_type]->m_name;
 	plr->GetSession()->SendPacket(&data);
 }
 
@@ -442,7 +448,7 @@ void WorldSession::HandleArenaTeamRemoveMemberOpcode(WorldPacket & recv_data)
 
 	slot = team->m_type;
 
-	if( (team = _player->m_arenaTeams[slot]) == NULL )
+	if( (team = _player->m_playerInfo->arenaTeam[slot]) == NULL )
 	{
 		SystemMessage("You are not in an arena team of this type.");
 		return;
@@ -502,7 +508,7 @@ void WorldSession::HandleArenaTeamInviteAcceptOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if(_player->m_arenaTeams[team->m_type] != NULL)		/* shouldn't happen */
+	if(_player->m_playerInfo->arenaTeam[team->m_type] != NULL)		/* shouldn't happen */
 	{
 		SystemMessage("You have already been in an arena team of that size.");
 		return;
@@ -556,7 +562,7 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if( (team = _player->m_arenaTeams[team->m_type]) == NULL )
+	if( (team = _player->m_playerInfo->arenaTeam[team->m_type]) == NULL )
 	{
 		SystemMessage("You are not in an arena team of this type.");
 		return;
@@ -593,7 +599,7 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if( (team = _player->m_arenaTeams[team->m_type]) == NULL )
+	if( (team = _player->m_playerInfo->arenaTeam[team->m_type]) == NULL )
 	{
 		SystemMessage("You are not in an arena team of this type.");
 		return;
@@ -629,7 +635,7 @@ void WorldSession::HandleArenaTeamPromoteOpcode(WorldPacket & recv_data)
 	if( slot >= NUM_ARENA_TEAM_TYPES )
 		return;
 
-	if( (team = _player->m_arenaTeams[slot]) == NULL )
+	if( (team = _player->m_playerInfo->arenaTeam[slot]) == NULL )
 	{
 		SystemMessage("You are not in an arena team of this type.");
 		return;

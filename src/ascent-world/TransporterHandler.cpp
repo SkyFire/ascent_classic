@@ -27,7 +27,6 @@ bool Transporter::CreateAsTransporter(uint32 EntryID, const char* Name, int32 Ti
 	if(!CreateFromProto(EntryID,0,0,0,0,0))
 		return false;
 	
-	// Override these flags to avoid mistakes in proto
 	SetUInt32Value(GAMEOBJECT_FLAGS,40);
 	SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, 100);
 	
@@ -51,10 +50,9 @@ bool Transporter::CreateAsTransporter(uint32 EntryID, const char* Name, int32 Ti
 
 bool FillPathVector(uint32 PathID, TransportPath & Path)
 {
-	// Store dbc values into current Path array
 	Path.Resize(dbcTaxiPathNode.GetNumRows());
-
 	uint32 i = 0;
+
 	for(uint32 j = 0; j < dbcTaxiPathNode.GetNumRows(); j++)
 	{
 		DBCTaxiPathNode *pathnode = dbcTaxiPathNode.LookupRow(j);
@@ -288,6 +286,7 @@ bool Transporter::GenerateWaypoints()
 	//mCurrentWaypoint = GetNextWaypoint();
 	mNextWaypoint = GetNextWaypoint();
 	m_pathTime = timer;
+	m_timer = 0;
 	
 	return true;
 }
@@ -309,7 +308,7 @@ void Transporter::UpdatePosition()
 
 	m_timer = getMSTime() % m_period;
 	
-	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) > ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
+	while (((m_timer - mCurrentWaypoint->first) % m_pathTime) >= ((mNextWaypoint->first - mCurrentWaypoint->first) % m_pathTime))
 	{
 		/*printf("%s from %u %f %f %f to %u %f %f %f\n", this->GetInfo()->Name,
 			mCurrentWaypoint->second.mapid, mCurrentWaypoint->second.x,mCurrentWaypoint->second.y,mCurrentWaypoint->second.z,
@@ -330,41 +329,11 @@ void Transporter::UpdatePosition()
 
 		if(mCurrentWaypoint->second.delayed)
 		{
-			//Transprter Script = sScriptMgr.CreateAIScriptClassForGameObject(GetEntry(), this);
-			switch( GetInfo()->DisplayID )
-			{
-				case 3015:
-				case 7087:
-					{
-						PlaySoundToSet(5154);		// ShipDocked LightHouseFogHorn.wav
-					} break;
-				case 3031:
-					{
-						PlaySoundToSet(11804);		// ZeppelinDocked	ZeppelinHorn.wav
-					} break;
-				default :
-					{
-						PlaySoundToSet(5495);		// BoatDockingWarning	BoatDockedWarning.wav
-					} break;
-			}
-			TransportGossip(GetInfo()->DisplayID);
+			PlaySoundToSet(5495);		// BoatDockedWarning.wav
 		}
 	}
 }
-void Transporter::TransportGossip(uint32 route)
-{
-	if( route == 241)
-	{
-		if ( mCurrentWaypoint->second.mapid )
-		{
-			Log.Debug("Transporter","Arrived in Ratched at %u", m_timer);
-		}
-		else
-		{
-			Log.Debug("Transporter","Arrived in Booty at %u", m_timer);
-		}
-	}
-}
+
 void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, float y, float z)
 {
 	sEventMgr.RemoveEvents(this, EVENT_TRANSPORTER_NEXT_WAYPOINT);
@@ -388,14 +357,12 @@ void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, floa
 			Player *plr = objmgr.GetPlayer(it2->first);
 			if(!plr)
 			{
-				// remove all non players from map
+				// remove from map
 				mPassengers.erase(it2);
 				continue;
 			}
 			if(!plr->GetSession() || !plr->IsInWorld()) 
 				continue;
-
-			plr->m_lockTransportVariables = true;
 
 			v.x = x + plr->m_TransporterX;
 			v.y = y + plr->m_TransporterY;
@@ -404,21 +371,23 @@ void Transporter::TransportPassengers(uint32 mapid, uint32 oldmap, float x, floa
 
 			if(mapid == 530 && !plr->GetSession()->HasFlag(ACCOUNT_FLAG_XPACK_01))
 			{
-				// player does not have BC content, repop at graveyard
+				// player is not flagged to access bc content, repop at graveyard
 				plr->RepopAtGraveyard(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), plr->GetMapId());
 				continue;
 			}
 
-			plr->GetSession()->SendPacket(&Pending);
-			plr->_Relocate(mapid, v, false, true, 0);
-
 			// Lucky bitch. Do it like on official.
 			if(plr->isDead())
 			{
-				plr->ResurrectPlayer();
+				/*plr->ResurrectPlayer(NULL);
 				plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-				plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+				plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));*/
+				plr->RemoteRevive();
 			}
+
+			plr->m_lockTransportVariables = true;
+			plr->GetSession()->SendPacket(&Pending);
+			plr->_Relocate(mapid, v, false, true, 0);
 		}
 	}
 
@@ -465,7 +434,7 @@ void ObjectMgr::LoadTransporters()
 		Transporter * pTransporter = new Transporter((uint64)HIGHGUID_TYPE_TRANSPORTER<<32 |entry);
 		if(!pTransporter->CreateAsTransporter(entry, "", period))
 		{
-			sLog.outError("Transporter %s failed creation for some reason.", QR->Fetch()[1].GetString());
+			DEBUG_LOG("Transporter %s failed creation for some reason.", QR->Fetch()[1].GetString());
 			delete pTransporter;
 		}else
 		{
@@ -508,7 +477,7 @@ void Transporter::AddNPC(uint32 Entry, float offsetX, float offsetY, float offse
 		return;
 
 	Creature * pCreature = new Creature((uint64)HIGHGUID_TYPE_TRANSPORTER<<32 | guid);
-	pCreature->Load(proto, m_position.x, m_position.y, m_position.z);
+	pCreature->Load(proto, m_position.x, m_position.y, m_position.z, 0.0f);
 	pCreature->m_transportPosition = new LocationVector(offsetX, offsetY, offsetZ, offsetO);
 	pCreature->m_transportGuid = GetUIdFromGUID();
 	m_npcs.insert(make_pair(guid,pCreature));

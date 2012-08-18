@@ -4,7 +4,7 @@
 # WARNING:
 #  Running this script will wipe all previous svn:ignore propsets
 
-if [ ! -f configure ] ; then
+if [ ! -f configure.ac ] ; then
   echo "You must run this script in the root of the trunk."
   exit 1
 fi
@@ -16,7 +16,6 @@ NEWLINE='
 IFS=$NEWLINE
 
 for i in `find . \
-  -name "*.sh" -o \
   -name "*.h" -o \
   -name "*.c" -o \
   -name "*.cpp" -o \
@@ -27,6 +26,7 @@ for i in `find . \
   -name "*.conf" -o \
   -name "*.gm" -o \
   -name "*.patch" -o \
+  -name "*.sh" -o \
   -name "*.html"`; do
         EOLSTYLE=$(svn pg svn:eol-style $i)
         if [ $? -eq 0 ] && [ -z "$EOLSTYLE" ] ; then

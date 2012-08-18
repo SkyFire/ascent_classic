@@ -1,0 +1,346 @@
+# depslib dependency file v1.0
+1212807398 source:/home/burlex/devel/summit-stable/codeblocks/main.cpp
+	<iostream>
+
+1212806149 source:/home/burlex/devel/summit-stable/src/ascent-logonserver/AccountCache.cpp
+	"LogonStdAfx.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-logonserver/LogonStdAfx.h
+	<list>
+	<vector>
+	<map>
+	<sstream>
+	<string>
+	"Common.h"
+	<Network/Network.h>
+	"../ascent-shared/Log.h"
+	"../ascent-shared/Util.h"
+	"../ascent-shared/ByteBuffer.h"
+	"../ascent-shared/Config/ConfigEnv.h"
+	<zlib.h>
+	"../ascent-shared/Database/DatabaseEnv.h"
+	"../ascent-shared/Database/DBCStores.h"
+	"../ascent-shared/Database/dbcfile.h"
+	"../ascent-shared/Auth/BigNumber.h"
+	"../ascent-shared/Auth/Sha1.h"
+	"../ascent-shared/Auth/WowCrypt.h"
+	"../ascent-shared/CrashHandler.h"
+	"LogonOpcodes.h"
+	"../ascent-logonserver/Main.h"
+	"../ascent-world/NameTables.h"
+	"AccountCache.h"
+	"PeriodicFunctionCall_Thread.h"
+	"../ascent-logonserver/AutoPatcher.h"
+	"../ascent-logonserver/AuthSocket.h"
+	"../ascent-logonserver/AuthStructs.h"
+	"../ascent-logonserver/LogonOpcodes.h"
+	"../ascent-logonserver/LogonCommServer.h"
+	"../ascent-logonserver/LogonConsole.h"
+	"../ascent-shared/WorldPacket.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Common.h
+	<config.h>
+	"AscentConfig.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<time.h>
+	<math.h>
+	<errno.h>
+	<windows.h>
+	<string.h>
+	<winsock2.h>
+	<ws2tcpip.h>
+	<sys/time.h>
+	<sys/types.h>
+	<sys/ioctl.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+	<unistd.h>
+	<signal.h>
+	<netdb.h>
+	<set>
+	<list>
+	<string>
+	<map>
+	<queue>
+	<sstream>
+	<algorithm>
+	<ext/hash_map>
+	<ext/hash_set>
+	<hash_map>
+	<hash_set>
+	<assert.h>
+	"Threading/Threading.h"
+	"MersenneTwister.h"
+	<sys/timeb.h>
+	"Util.h"
+
+1212807569 /home/burlex/devel/summit-stable/codeblocks/config.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/AscentConfig.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Threading/Threading.h
+	"../Errors.h"
+	"Mutex.h"
+	"Guard.h"
+	"ThreadStarter.h"
+	"LockedQueue.h"
+	"ThreadPool.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Errors.h
+	"CrashHandler.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/CrashHandler.h
+	"Common.h"
+	<DbgHelp.h>
+	"StackWalker.h"
+	"CircularQueue.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/StackWalker.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/CircularQueue.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Threading/Mutex.h
+	<pthread.h>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Threading/Guard.h
+	"Mutex.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Threading/ThreadStarter.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Threading/LockedQueue.h
+	"Mutex.h"
+	<deque>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Threading/ThreadPool.h
+	"../Common.h"
+	"Mutex.h"
+	"ThreadStarter.h"
+	<semaphore.h>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/MersenneTwister.h
+	"Common.h"
+	"Singleton.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Singleton.h
+	"Errors.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Util.h
+	"Common.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/Network.h
+	"../Log.h"
+	"../NGLog.h"
+	"CircularBuffer.h"
+	"SocketDefines.h"
+	"SocketOps.h"
+	"Socket.h"
+	"SocketMgrWin32.h"
+	"ListenSocketWin32.h"
+	"SocketMgrLinux.h"
+	"ListenSocketLinux.h"
+	"SocketMgrFreeBSD.h"
+	"ListenSocketFreeBSD.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Log.h
+	"Common.h"
+	"Singleton.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/NGLog.h
+	"Common.h"
+	"Singleton.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/CircularBuffer.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/SocketDefines.h
+	"../Common.h"
+	<sys/epoll.h>
+	<sys/event.h>
+	<sys/event.h>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/SocketOps.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/Socket.h
+	"SocketDefines.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/SocketMgrWin32.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/ListenSocketWin32.h
+	"../Threading/ThreadPool.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/SocketMgrLinux.h
+	"SocketDefines.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/ListenSocketLinux.h
+	"SocketDefines.h"
+	<errno.h>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/SocketMgrFreeBSD.h
+	"SocketDefines.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Network/ListenSocketFreeBSD.h
+	"SocketDefines.h"
+	<errno.h>
+	"SocketDefines.h"
+	<errno.h>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/ByteBuffer.h
+	"Common.h"
+	"WoWGuid.h"
+	"LocationVector.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/WoWGuid.h
+	"Common.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/LocationVector.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Config/ConfigEnv.h
+	"Common.h"
+	"Config.h"
+	"Log.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Config/Config.h
+	"Common.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Database/DatabaseEnv.h
+	"Common.h"
+	"Singleton.h"
+	"Log.h"
+	"Database/DBCStores.h"
+	"Database/Field.h"
+	"Database/Database.h"
+
+1212806272 /home/burlex/devel/summit-stable/src/ascent-shared/Database/DBCStores.h
+	"Common.h"
+	"DataStore.h"
+	"Timer.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Database/DataStore.h
+	"Common.h"
+	"Singleton.h"
+	"DBC.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Database/DBC.h
+	"../Common.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Timer.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Database/Field.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Database/Database.h
+	<string>
+	"../Threading/Queue.h"
+	"../CallBack.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Threading/Queue.h
+	"Condition.h"
+	"Mutex.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Threading/Condition.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/CallBack.h
+	<vector>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Database/dbcfile.h
+	<cassert>
+	<string>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Auth/BigNumber.h
+	"Common.h"
+	"ByteBuffer.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Auth/Sha1.h
+	<stdlib.h>
+	"Common.h"
+	<openssl/sha.h>
+	"Auth/BigNumber.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Auth/WowCrypt.h
+	<stdlib.h>
+	"../Common.h"
+	<vector>
+
+1212806148 /home/burlex/devel/summit-stable/src/ascent-logonserver/LogonOpcodes.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-logonserver/Main.h
+	"../ascent-shared/Singleton.h"
+
+1212806151 /home/burlex/devel/summit-stable/src/ascent-world/NameTables.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-logonserver/AccountCache.h
+	"Common.h"
+	"../ascent-shared/Database/DatabaseEnv.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-logonserver/PeriodicFunctionCall_Thread.h
+	"../ascent-shared/CallBack.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-logonserver/AutoPatcher.h
+
+1212806148 /home/burlex/devel/summit-stable/src/ascent-logonserver/AuthSocket.h
+	"AccountCache.h"
+	"AuthStructs.h"
+
+1212806148 /home/burlex/devel/summit-stable/src/ascent-logonserver/AuthStructs.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-logonserver/LogonCommServer.h
+	<RC4Engine.h>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/RC4Engine.h
+
+1212806148 /home/burlex/devel/summit-stable/src/ascent-logonserver/LogonConsole.h
+	"Common.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/WorldPacket.h
+	"Common.h"
+	"ByteBuffer.h"
+	"StackBuffer.h"
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/StackBuffer.h
+	"Common.h"
+	"WoWGuid.h"
+	"LocationVector.h"
+
+1212807709 source:/home/burlex/devel/summit-stable/src/ascent-logonserver/AuthSocket.cpp
+	"LogonStdAfx.h"
+	<openssl/md5.h>
+
+1212806296 source:/home/burlex/devel/summit-stable/src/ascent-logonserver/AutoPatcher.cpp
+	"LogonStdAfx.h"
+	"../ascent-shared/Auth/MD5.h"
+	<fcntl.h>
+	<dirent.h>
+	<sys/stat.h>
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/Auth/MD5.h
+	<stdlib.h>
+	<openssl/md5.h>
+	"Common.h"
+
+1212806149 source:/home/burlex/devel/summit-stable/src/ascent-logonserver/LogonCommServer.cpp
+	"LogonStdAfx.h"
+
+1212806148 source:/home/burlex/devel/summit-stable/src/ascent-logonserver/LogonConsole.cpp
+	"LogonStdAfx.h"
+	"LogonConsole.h"
+	"Log.h"
+
+1212806149 source:/home/burlex/devel/summit-stable/src/ascent-logonserver/LogonOpcodes.cpp
+	"LogonStdAfx.h"
+
+1212806149 source:/home/burlex/devel/summit-stable/src/ascent-logonserver/LogonStdAfx.cpp
+	"LogonStdAfx.h"
+
+1212806149 source:/home/burlex/devel/summit-stable/src/ascent-logonserver/Main.cpp
+	"LogonStdAfx.h"
+	<signal.h>
+	"svn_revision.h"
+	<sys/resource.h>
+	"../ascent-shared/ascent_getopt.h"
+	<sched.h>
+
+1212806220 /home/burlex/devel/summit-stable/src/ascent-shared/svn_revision.h
+
+1212806149 /home/burlex/devel/summit-stable/src/ascent-shared/ascent_getopt.h
+

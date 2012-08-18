@@ -95,6 +95,8 @@ public:
 	void SendAuctionNotificationPacket(Player * plr, Auction * auct);
 	void SendAuctionList(Player * plr, WorldPacket * packet);
 
+	void UpdateItemOwnerships(uint32 oldGuid, uint32 newGuid);
+
 private:
 	RWLock itemLock;
 	HM_NAMESPACE::hash_map<uint64, Item*> auctionedItems;

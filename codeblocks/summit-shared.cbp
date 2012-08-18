@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="summit-shared" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="libsummit-shared" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="libsummit-shared" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Release/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-DHAVE_CONFIG_H" />
+			<Add directory="../src/ascent-shared" />
+			<Add directory="../codeblocks" />
+		</Compiler>
+		<Unit filename="../src/ascent-shared/AscentConfig.h" />
+		<Unit filename="../src/ascent-shared/Auth/BigNumber.cpp" />
+		<Unit filename="../src/ascent-shared/Auth/BigNumber.h" />
+		<Unit filename="../src/ascent-shared/Auth/MD5.cpp" />
+		<Unit filename="../src/ascent-shared/Auth/MD5.h" />
+		<Unit filename="../src/ascent-shared/Auth/Sha1.cpp" />
+		<Unit filename="../src/ascent-shared/Auth/Sha1.h" />
+		<Unit filename="../src/ascent-shared/Auth/WowCrypt.cpp" />
+		<Unit filename="../src/ascent-shared/Auth/WowCrypt.h" />
+		<Unit filename="../src/ascent-shared/AuthCodes.h" />
+		<Unit filename="../src/ascent-shared/ByteBuffer.h" />
+		<Unit filename="../src/ascent-shared/CallBack.cpp" />
+		<Unit filename="../src/ascent-shared/CallBack.h" />
+		<Unit filename="../src/ascent-shared/CircularQueue.h" />
+		<Unit filename="../src/ascent-shared/Common.h" />
+		<Unit filename="../src/ascent-shared/Config/Config.cpp" />
+		<Unit filename="../src/ascent-shared/Config/Config.h" />
+		<Unit filename="../src/ascent-shared/Config/ConfigEnv.h" />
+		<Unit filename="../src/ascent-shared/CoreMemoryAllocator.cpp" />
+		<Unit filename="../src/ascent-shared/CoreMemoryAllocator_Core.cpp" />
+		<Unit filename="../src/ascent-shared/CrashHandler.cpp" />
+		<Unit filename="../src/ascent-shared/CrashHandler.h" />
+		<Unit filename="../src/ascent-shared/Database/CreateInterface.cpp" />
+		<Unit filename="../src/ascent-shared/Database/DBC.cpp" />
+		<Unit filename="../src/ascent-shared/Database/DBC.h" />
+		<Unit filename="../src/ascent-shared/Database/DBCStores.cpp" />
+		<Unit filename="../src/ascent-shared/Database/DBCStores.h" />
+		<Unit filename="../src/ascent-shared/Database/DataStore.h" />
+		<Unit filename="../src/ascent-shared/Database/Database.cpp" />
+		<Unit filename="../src/ascent-shared/Database/Database.h" />
+		<Unit filename="../src/ascent-shared/Database/DatabaseEnv.h" />
+		<Unit filename="../src/ascent-shared/Database/Field.h" />
+		<Unit filename="../src/ascent-shared/Database/MySQLDatabase.cpp" />
+		<Unit filename="../src/ascent-shared/Database/MySQLDatabase.h" />
+		<Unit filename="../src/ascent-shared/Database/PostgresDatabase.cpp" />
+		<Unit filename="../src/ascent-shared/Database/PostgresDatabase.h" />
+		<Unit filename="../src/ascent-shared/Database/SQLiteDatabase.cpp" />
+		<Unit filename="../src/ascent-shared/Database/SQLiteDatabase.h" />
+		<Unit filename="../src/ascent-shared/Database/dbcfile.cpp" />
+		<Unit filename="../src/ascent-shared/Database/dbcfile.h" />
+		<Unit filename="../src/ascent-shared/Errors.h" />
+		<Unit filename="../src/ascent-shared/FastQueue.h" />
+		<Unit filename="../src/ascent-shared/LocationVector.h" />
+		<Unit filename="../src/ascent-shared/Log.cpp" />
+		<Unit filename="../src/ascent-shared/Log.h" />
+		<Unit filename="../src/ascent-shared/MemoryLeaks.cpp" />
+		<Unit filename="../src/ascent-shared/MemoryLeaks.h" />
+		<Unit filename="../src/ascent-shared/MersenneTwister.cpp" />
+		<Unit filename="../src/ascent-shared/MersenneTwister.h" />
+		<Unit filename="../src/ascent-shared/NGLog.h" />
+		<Unit filename="../src/ascent-shared/Network/CircularBuffer.cpp" />
+		<Unit filename="../src/ascent-shared/Network/CircularBuffer.h" />
+		<Unit filename="../src/ascent-shared/Network/ListenSocketFreeBSD.h" />
+		<Unit filename="../src/ascent-shared/Network/ListenSocketLinux.h" />
+		<Unit filename="../src/ascent-shared/Network/ListenSocketPoll.h" />
+		<Unit filename="../src/ascent-shared/Network/ListenSocketSelect.h" />
+		<Unit filename="../src/ascent-shared/Network/ListenSocketWin32.h" />
+		<Unit filename="../src/ascent-shared/Network/Network.h" />
+		<Unit filename="../src/ascent-shared/Network/Socket.cpp" />
+		<Unit filename="../src/ascent-shared/Network/Socket.h" />
+		<Unit filename="../src/ascent-shared/Network/SocketDefines.h" />
+		<Unit filename="../src/ascent-shared/Network/SocketFreeBSD.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketLinux.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrFreeBSD.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrFreeBSD.h" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrLinux.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrLinux.h" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrPoll.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrPoll.h" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrSelect.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrSelect.h" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrWin32.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketMgrWin32.h" />
+		<Unit filename="../src/ascent-shared/Network/SocketOps.h" />
+		<Unit filename="../src/ascent-shared/Network/SocketOpsFreeBSD.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketOpsLinux.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketOpsPoll.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketOpsSelect.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketOpsWin32.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketPoll.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketSelect.cpp" />
+		<Unit filename="../src/ascent-shared/Network/SocketWin32.cpp" />
+		<Unit filename="../src/ascent-shared/New-Bytebuffer.h" />
+		<Unit filename="../src/ascent-shared/PreallocatedQueue.h" />
+		<Unit filename="../src/ascent-shared/RC4Engine.h" />
+		<Unit filename="../src/ascent-shared/Singleton.h" />
+		<Unit filename="../src/ascent-shared/SmartPointer.h" />
+		<Unit filename="../src/ascent-shared/StackBuffer.h" />
+		<Unit filename="../src/ascent-shared/StackWalker.cpp" />
+		<Unit filename="../src/ascent-shared/StackWalker.h" />
+		<Unit filename="../src/ascent-shared/Storage.h" />
+		<Unit filename="../src/ascent-shared/Threading/Condition.h" />
+		<Unit filename="../src/ascent-shared/Threading/Guard.h" />
+		<Unit filename="../src/ascent-shared/Threading/LockedQueue.h" />
+		<Unit filename="../src/ascent-shared/Threading/Mutex.cpp" />
+		<Unit filename="../src/ascent-shared/Threading/Mutex.h" />
+		<Unit filename="../src/ascent-shared/Threading/Queue.h" />
+		<Unit filename="../src/ascent-shared/Threading/RWLock.h" />
+		<Unit filename="../src/ascent-shared/Threading/ThreadPool.cpp" />
+		<Unit filename="../src/ascent-shared/Threading/ThreadPool.h" />
+		<Unit filename="../src/ascent-shared/Threading/ThreadStarter.h" />
+		<Unit filename="../src/ascent-shared/Threading/Threading.h" />
+		<Unit filename="../src/ascent-shared/Timer.h" />
+		<Unit filename="../src/ascent-shared/Util.cpp" />
+		<Unit filename="../src/ascent-shared/Util.h" />
+		<Unit filename="../src/ascent-shared/WoWGuid.h" />
+		<Unit filename="../src/ascent-shared/WorldPacket.h" />
+		<Unit filename="../src/ascent-shared/ascent_getopt.cpp" />
+		<Unit filename="../src/ascent-shared/ascent_getopt.h" />
+		<Unit filename="../src/ascent-shared/crc32.cpp" />
+		<Unit filename="../src/ascent-shared/crc32.h" />
+		<Unit filename="../src/ascent-shared/svn_revision.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

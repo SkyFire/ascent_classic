@@ -1,4 +1,4 @@
-INCLUDES += -I$(srcdir) -I$(srcdir)/../ascent-shared
+INCLUDES += -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../ascent-shared
 
 bin_PROGRAMS = ascent-logonserver
 

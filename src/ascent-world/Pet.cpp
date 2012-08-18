@@ -149,7 +149,7 @@ void Pet::CreateAsSummon(uint32 entry, CreatureInfo *ci, Creature* created_from_
 		SetPowerType(POWER_TYPE_MANA);
 		if(entry == WATER_ELEMENTAL)
 			m_name = "Water Elemental";
-		else if(entry == 19668)
+		else if( entry == 19668)
 			m_name = "Shadowfiend";
 		else
 			m_name = sWorld.GenerateName();
@@ -244,6 +244,7 @@ Pet::Pet(uint64 guid) : Creature(guid)
 	TP = 0;
 	LoyaltyPts = LoyLvlRange[1];
 	LoyaltyXP = 0;
+	m_dismissed = false;
 }
 
 Pet::~Pet()
@@ -447,6 +448,17 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 
 	bExpires = false;
 
+	if(m_Owner && getLevel() > m_Owner->getLevel())
+	{
+		SetUInt32Value(UNIT_FIELD_LEVEL, m_Owner->getLevel());
+		SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+		SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, GetNextLevelXP(m_Owner->getLevel()));
+	}
+
+	// Nuke auras
+	for(uint32 x = UNIT_FIELD_AURA_01; x <= UNIT_FIELD_AURA_55; x++)
+		SetUInt32Value(x, 0);
+
 	// Setup actionbar
 	if(mPi->actionbar.size() > 2)
 	{
@@ -479,18 +491,6 @@ void Pet::LoadFromDB(Player* owner, PlayerPet * pi)
 	}
 
 	InitializeMe(false);
-
-	if(m_Owner && getLevel() > m_Owner->getLevel())
-	{
-		SetUInt32Value(UNIT_FIELD_LEVEL, m_Owner->getLevel());
-		SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-		SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, GetNextLevelXP(m_Owner->getLevel()));
-		ApplyStatsForLevel();
-	}
-	
-	// Nuke auras
-	for(uint32 x = UNIT_FIELD_AURA_01; x <= UNIT_FIELD_AURA_55; x++)
-		SetUInt32Value(x, 0);
 }
 
 void Pet::OnPushToWorld()
@@ -504,6 +504,15 @@ void Pet::OnPushToWorld()
 
 void Pet::InitializeMe(bool first)
 {
+	if( m_Owner->GetSummon() != NULL )
+	{
+		// 2 pets???!
+		m_Owner->GetSummon()->Remove(true, true, true);
+		m_Owner->SetSummon(this);
+	}
+	else
+		m_Owner->SetSummon(this);
+
 	// set up ai and shit
 	GetAIInterface()->Init(this,AITYPE_PET,MOVEMENTTYPE_NONE,m_Owner);
 	GetAIInterface()->SetUnitToFollow(m_Owner);
@@ -511,7 +520,6 @@ void Pet::InitializeMe(bool first)
 
 	SetCreatureName(CreatureNameStorage.LookupEntry(GetEntry()));
 	proto=CreatureProtoStorage.LookupEntry(GetEntry());
-	m_Owner->SetSummon(this);
 	m_Owner->SetUInt64Value(UNIT_FIELD_SUMMON, this->GetGUID());
 	SetUInt32Value(UNIT_FIELD_PETNUMBER, GetUIdFromGUID());
 	SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, (uint32)UNIXTIME);
@@ -523,6 +531,8 @@ void Pet::InitializeMe(bool first)
 
 	if(GetEntry() == 416)
 		m_aiInterface->disable_melee = true;
+
+	ApplyStatsForLevel();
 
 	// Load our spells
 	if(Summon)
@@ -623,16 +633,23 @@ void Pet::UpdatePetInfo(bool bSetToOffline)
 
 void Pet::Dismiss(bool bSafeDelete)//Abandon pet
 {
-	// Delete any petspells for us.
-	if(!Summon && m_Owner)
-	{
-		CharacterDatabase.Execute("DELETE FROM playerpetspells WHERE ownerguid=%u AND petnumber=%u",
-			m_Owner->GetLowGUID(), m_PetNumber);
-	}
+	// already deleted
+	if( m_dismissed )
+		return;
 
-	if(m_Owner)
+	// Delete any petspells for us.
+	if( !bExpires )
 	{
-		m_Owner->RemovePlayerPet( m_PetNumber );
+		if(!Summon && m_Owner)
+		{
+			CharacterDatabase.Execute("DELETE FROM playerpetspells WHERE ownerguid=%u AND petnumber=%u",
+				m_Owner->GetLowGUID(), m_PetNumber);
+		}
+
+		if(m_Owner)
+		{
+			m_Owner->RemovePlayerPet( m_PetNumber );
+		}
 	}
 
 	// find out playerpet entry, delete it
@@ -641,6 +658,9 @@ void Pet::Dismiss(bool bSafeDelete)//Abandon pet
 
 void Pet::Remove(bool bSafeDelete, bool bUpdate, bool bSetOffline)
 {
+	if( m_dismissed )
+		return;
+
 	RemoveAllAuras(); // Prevent pet overbuffing
 	if(m_Owner)
 	{
@@ -651,7 +671,7 @@ void Pet::Remove(bool bSafeDelete, bool bUpdate, bool bSetOffline)
 		{
 			if(!bExpires) 
 				UpdatePetInfo(bSetOffline);
-			if(!IsSummon())
+			if(!IsSummon() && !bExpires)
 				m_Owner->_SavePet(NULL);//not perfect but working
 		}
 		m_Owner->SetSummon(NULL);
@@ -664,8 +684,10 @@ void Pet::Remove(bool bSafeDelete, bool bUpdate, bool bSetOffline)
 /*		PetSafeDelete();*/
 
 	// has to be next loop - reason because of RemoveFromWorld, iterator gets broke.
-	if(IsInWorld() && Active) Deactivate(m_mapMgr);
+	/*if(IsInWorld() && Active) Deactivate(m_mapMgr);*/
+	sEventMgr.RemoveEvents(this);
 	sEventMgr.AddEvent(this, &Pet::PetSafeDelete, EVENT_CREATURE_SAFE_DELETE, 1, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	m_dismissed = true;
 }
 
 void Pet::PetSafeDelete()
@@ -1052,16 +1074,13 @@ void Pet::ApplySummonLevelAbilities()
 		stat_index = 5;
 		m_aiInterface->disable_melee = true;
 		break;
-	case 19668:    // Priest's Shadowfiend, until someone knows the stats that real have
-		stat_index = 5;
-		break;
 	}
 	if(m_uint32Values[OBJECT_FIELD_ENTRY] == 89)
 		has_mana = false;
 
 	if(stat_index < 0)
 	{
-		sLog.outError("PETSTAT: No stat index found for entry %u, `%s`!", GetEntry(), creature_info->Name);
+		DEBUG_LOG("PETSTAT: No stat index found for entry %u, `%s`!", GetEntry(), creature_info->Name);
 		return;
 	}
 
@@ -1332,11 +1351,6 @@ void Pet::ApplySummonLevelAbilities()
 	SetUInt32Value(UNIT_FIELD_ATTACK_POWER, FL2UINT(pet_pwr));
 	BaseResistance[0] = FL2UINT(pet_arm);
 	CalcResistance(0);
-	// Priest's Shadowfiend
-	if (m_uint32Values[OBJECT_FIELD_ENTRY]==19668) {
-	    SetUInt32Value(UNIT_FIELD_BASEATTACKTIME, 1500);
-	    SetUInt32Value(UNIT_FIELD_ATTACK_POWER,((uint32)(350+0.57*m_Owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS_05)))/2);
-	}
 	CalcDamage();
 
 	// Calculate health / mana
@@ -1399,9 +1413,9 @@ void Pet::ApplyPetLevelAbilities()
 	if(creature_info->Family > 35 || R_pet_mod_sta[creature_info->Family] == 0)
 	{
 		if( myFamily == NULL && myFamily->name != NULL )
-            sLog.outError("PETSTAT: Creature family %u has missing data. Assuming to be 1.", creature_info->Family);
+            DEBUG_LOG("PETSTAT: Creature family %u has missing data. Assuming to be 1.", creature_info->Family);
 		else
-			sLog.outError("PETSTAT: Creature family %u [%s] has missing data. Assuming to be 1.", creature_info->Family, myFamily->name);
+			DEBUG_LOG("PETSTAT: Creature family %u [%s] has missing data. Assuming to be 1.", creature_info->Family, myFamily->name);
 	}
 	else
 	{
@@ -1589,7 +1603,7 @@ void Pet::AddPetSpellToOwner(uint32 spellId)
 	
 	}
 	else
-		sLog.outDebug("WORLD: Could not find teaching spell for spell %u", spellId);
+		DEBUG_LOG("WORLD: Could not find teaching spell for spell %u", spellId);
 }
 uint32 Pet::GetHighestRankSpell(uint32 spellId)
 {	
@@ -1662,7 +1676,6 @@ AI_Spell * Pet::HandleAutoCastEvent()
 	if(m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size() > 1)
 	{
 		// more than one autocast spell. pick a random one.
-		// WRONG! it should choose the left-most autocast spell! 
 		uint32 c = RandomUInt((uint32)m_autoCastSpells[AUTOCAST_EVENT_ATTACK].size());
 		uint32 j = 0;
 		list<AI_Spell*>::iterator itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
@@ -1732,12 +1745,9 @@ void Pet::HandleAutoCastEvent(uint32 Type)
 				itr = m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin();
 
 				for(; itr != m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end(), j < c; ++j, ++itr);
-				if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end() )
+				if(itr == m_autoCastSpells[AUTOCAST_EVENT_ATTACK].end())
 				{
-					if(  (*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin())->cooldowntime > ms )
 					m_aiInterface->SetNextSpell(*m_autoCastSpells[AUTOCAST_EVENT_ATTACK].begin());
-					else
-					return;
 					break;
 				}
 				else

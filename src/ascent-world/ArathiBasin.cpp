@@ -25,37 +25,6 @@
 #define RESOURCES_TO_GAIN_BH 200
 #define BASE_BH_GAIN 14
 uint32 buffentrys[3] = {180380,180362,180146};
-// AB define's
-#define AB_CAPTURED_STABLES_ALLIANCE		0x6E7 //1767
-#define AB_CAPTURED_STABLES_HORDE		   0x6E8 //1768
-#define AB_CAPTURING_STABLES_ALLIANCE	   0x6E9 //1769
-#define AB_CAPTURING_STABLES_HORDE		  0x6EA //1770
-// 0x6EB is unknown
-#define AB_CAPTURED_FARM_ALLIANCE		   0x6EC //1772 // 1 is captured by the alliance
-#define AB_CAPTURED_FARM_HORDE			  0x6ED // 1773 / 1 is captured by the horde
-#define AB_CAPTURING_FARM_ALLIANCE		  0x6EE // 1774 1 is capturing by the alliance
-#define AB_CAPTURING_FARM_HORDE			 0x6EF // 1775 1 is capturing by the horde
-
-#define AB_CAPTURED_BLACKSMITH_ALLIANCE	 0x6F6 // 1782
-#define AB_CAPTURED_BLACKSMITH_HORDE		0x6F7 //1783
-#define AB_CAPTURING_BLACKSMITH_ALLIANCE	0x6F8 //1784
-#define AB_CAPTURING_BLACKSMITH_HORDE	   0x6F9 //1785
-// 0x6FA is unknown
-#define AB_CAPTURED_GOLDMINE_ALLIANCE	   0x6FB //1787
-#define AB_CAPTURED_GOLDMINE_HORDE		  0x6FC//1788
-#define AB_CAPTURING_GOLDMINE_ALLIANCE	  0x6FD//1789
-#define AB_CAPTURING_GOLDMINE_HORDE		 0x6FE//1790
-// 0x6FF is unknown
-#define AB_CAPTURED_LUMBERMILL_ALLIANCE	 0x700//1792
-#define AB_CAPTURED_LUMBERMILL_HORDE		0x701//1793
-#define AB_CAPTURING_LUMBERMILL_ALLIANCE	0x702//1794
-#define AB_CAPTURING_LUMBERMILL_HORDE	   0x703//1795
-
-#define AB_SHOW_STABLE_ICON				 0x732//1842
-#define AB_SHOW_GOLDMINE_ICON			   0x733//1843
-#define AB_SHOW_LUMBERMILL_ICON			 0x734//1844
-#define AB_SHOW_FARM_ICON				   0x735//1845
-#define AB_SHOW_BACKSMITH_ICON			  0x736//1846
 
 /* AB Battleground Data */
 
@@ -122,27 +91,27 @@ uint32 buffentrys[3] = {180380,180362,180146};
 	};
 
 	static uint32 AssaultFields[AB_NUM_CONTROL_POINTS][2] = {
-		{ AB_CAPTURING_STABLES_ALLIANCE, AB_CAPTURING_STABLES_HORDE },								// STABLE
-		{ AB_CAPTURING_FARM_ALLIANCE, AB_CAPTURING_FARM_HORDE },									// FARM
-		{ AB_CAPTURING_BLACKSMITH_ALLIANCE, AB_CAPTURING_BLACKSMITH_HORDE },						// BLACKSMITH
-		{ AB_CAPTURING_GOLDMINE_ALLIANCE, AB_CAPTURING_GOLDMINE_HORDE },							// MINE
-		{ AB_CAPTURING_LUMBERMILL_ALLIANCE, AB_CAPTURING_LUMBERMILL_HORDE },						// LUMBERMILL
+		{ WORLDSTATE_AB_CAPTURING_STABLES_ALLIANCE, WORLDSTATE_AB_CAPTURING_STABLES_HORDE },		// STABLE
+		{ WORLDSTATE_AB_CAPTURING_FARM_ALLIANCE, WORLDSTATE_AB_CAPTURING_FARM_HORDE },				// FARM
+		{ WORLDSTATE_AB_CAPTURING_BLACKSMITH_ALLIANCE, WORLDSTATE_AB_CAPTURING_BLACKSMITH_HORDE },	// BLACKSMITH
+		{ WORLDSTATE_AB_CAPTURING_GOLDMINE_ALLIANCE, WORLDSTATE_AB_CAPTURING_GOLDMINE_HORDE },		// MINE
+		{ WORLDSTATE_AB_CAPTURING_LUMBERMILL_ALLIANCE, WORLDSTATE_AB_CAPTURING_LUMBERMILL_HORDE },	// LUMBERMILL
 	};
 
 	static uint32 OwnedFields[AB_NUM_CONTROL_POINTS][2] = {
-		{ AB_CAPTURED_STABLES_ALLIANCE, AB_CAPTURED_STABLES_HORDE },								// STABLE
-		{ AB_CAPTURED_FARM_ALLIANCE, AB_CAPTURED_FARM_HORDE },										// FARM
-		{ AB_CAPTURED_BLACKSMITH_ALLIANCE, AB_CAPTURED_BLACKSMITH_HORDE },							// BLACKSMITH
-		{ AB_CAPTURED_GOLDMINE_ALLIANCE, AB_CAPTURED_GOLDMINE_HORDE },								// MINE
-		{ AB_CAPTURED_LUMBERMILL_ALLIANCE, AB_CAPTURED_LUMBERMILL_HORDE },							// LUMBERMILL
+		{ WORLDSTATE_AB_CAPTURED_STABLES_ALLIANCE, WORLDSTATE_AB_CAPTURED_STABLES_HORDE },			// STABLE
+		{ WORLDSTATE_AB_CAPTURED_FARM_ALLIANCE, WORLDSTATE_AB_CAPTURED_FARM_HORDE },				// FARM
+		{ WORLDSTATE_AB_CAPTURED_BLACKSMITH_ALLIANCE, WORLDSTATE_AB_CAPTURED_BLACKSMITH_HORDE },	// BLACKSMITH
+		{ WORLDSTATE_AB_CAPTURED_GOLDMINE_ALLIANCE, WORLDSTATE_AB_CAPTURED_GOLDMINE_HORDE },		// MINE
+		{ WORLDSTATE_AB_CAPTURED_LUMBERMILL_ALLIANCE, WORLDSTATE_AB_CAPTURED_LUMBERMILL_HORDE },	// LUMBERMILL
 	};
 
 	static uint32 NeutralFields[AB_NUM_CONTROL_POINTS] = {
-		AB_SHOW_STABLE_ICON,
-		AB_SHOW_FARM_ICON,
-		AB_SHOW_BACKSMITH_ICON,
-		AB_SHOW_GOLDMINE_ICON,
-		AB_SHOW_LUMBERMILL_ICON,
+		WORLDSTATE_AB_SHOW_STABLE_ICON,
+		WORLDSTATE_AB_SHOW_FARM_ICON,
+		WORLDSTATE_AB_SHOW_BACKSMITH_ICON,
+		WORLDSTATE_AB_SHOW_GOLDMINE_ICON,
+		WORLDSTATE_AB_SHOW_LUMBERMILL_ICON,
 	};
 
 	static uint32 ResourceUpdateIntervals[6] = {
@@ -174,7 +143,7 @@ void ArathiBasin::SpawnBuff(uint32 x)
 
 	if(m_buffs[x] == NULL)
 	{
-		m_buffs[x] = SpawnGameObject(chosen_buffid, m_mapMgr->GetMapId(), BuffCoordinates[x][0], BuffCoordinates[x][1], BuffCoordinates[x][2],
+		m_buffs[x] = SpawnGameObject(chosen_buffid, BuffCoordinates[x][0], BuffCoordinates[x][1], BuffCoordinates[x][2],
 			BuffCoordinates[x][3], 0, 114, 1);
 
 		m_buffs[x]->SetFloatValue(GAMEOBJECT_ROTATION_02, BuffRotations[x][0]);
@@ -212,7 +181,7 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 
 	if(m_controlPoints[Id] == NULL)
 	{
-		m_controlPoints[Id] = SpawnGameObject(gi->ID, m_mapMgr->GetMapId(), ControlPointCoordinates[Id][0], ControlPointCoordinates[Id][1],
+		m_controlPoints[Id] = SpawnGameObject(gi->ID, ControlPointCoordinates[Id][0], ControlPointCoordinates[Id][1],
 			ControlPointCoordinates[Id][2], ControlPointCoordinates[Id][3], 0, 35, 1.0f);
 
 		m_controlPoints[Id]->SetFloatValue(GAMEOBJECT_ROTATION_02, ControlPointRotations[Id][0]);
@@ -286,7 +255,7 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 
 	if(m_controlPointAuras[Id] == NULL)
 	{
-		m_controlPointAuras[Id] = SpawnGameObject(gi_aura->ID, m_mapMgr->GetMapId(), ControlPointCoordinates[Id][0], ControlPointCoordinates[Id][1],
+		m_controlPointAuras[Id] = SpawnGameObject(gi_aura->ID, ControlPointCoordinates[Id][0], ControlPointCoordinates[Id][1],
 			ControlPointCoordinates[Id][2], ControlPointCoordinates[Id][3], 0, 35, 1.0f);
 
 		m_controlPointAuras[Id]->SetFloatValue(GAMEOBJECT_ROTATION_02, ControlPointRotations[Id][0]);
@@ -314,7 +283,7 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 void ArathiBasin::OnCreate()
 {
 	// Alliance Gate
-	GameObject *gate = SpawnGameObject(180255, 529, 1284.597290f, 1281.166626f, -15.977916f, 0.706859f, 32, 114, 1.5799990f);
+	GameObject *gate = SpawnGameObject(180255, 1284.597290f, 1281.166626f, -15.977916f, 0.706859f, 32, 114, 1.5799990f);
 	gate->SetFloatValue(GAMEOBJECT_ROTATION,0.0129570f);
 	gate->SetFloatValue(GAMEOBJECT_ROTATION_01,-0.0602880f);
 	gate->SetFloatValue(GAMEOBJECT_ROTATION_02,0.3449600f);
@@ -323,7 +292,7 @@ void ArathiBasin::OnCreate()
 	m_gates.push_back(gate);
 
 	// horde gate
-	gate = SpawnGameObject(180256, 529, 708.0902710f, 708.4479370f, -17.3898964f, -2.3910990f, 32, 114, 1.5699990f);
+	gate = SpawnGameObject(180256, 708.0902710f, 708.4479370f, -17.3898964f, -2.3910990f, 32, 114, 1.5699990f);
 	gate->SetFloatValue(GAMEOBJECT_ROTATION,0.0502910f);
 	gate->SetFloatValue(GAMEOBJECT_ROTATION_01,0.0151270f);
 	gate->SetFloatValue(GAMEOBJECT_ROTATION_02,0.9292169f);
@@ -349,61 +318,64 @@ void ArathiBasin::OnCreate()
 	AddSpiritGuide(SpawnSpiritGuide(NoBaseGYLocations[0][0],NoBaseGYLocations[0][1],NoBaseGYLocations[0][2], 0.0f, 0));
 	AddSpiritGuide(SpawnSpiritGuide(NoBaseGYLocations[1][0],NoBaseGYLocations[1][1],NoBaseGYLocations[1][2], 0.0f, 1));
 
+	// w00t
+	WorldStateManager &sm = m_mapMgr->GetStateManager();
+
 	// urrrgh worldstates
-	SetWorldState(0x8D8, 0x00);
-	SetWorldState(0x8D7, 0x00);
-	SetWorldState(0x8D6, 0x00);
-	SetWorldState(0x8D5, 0x00);
-	SetWorldState(0x8D4, 0x00);
-	SetWorldState(0x8D3, 0x00);
+	sm.CreateWorldState(0x8D8, 0x00);
+	sm.CreateWorldState(0x8D7, 0x00);
+	sm.CreateWorldState(0x8D6, 0x00);
+	sm.CreateWorldState(0x8D5, 0x00);
+	sm.CreateWorldState(0x8D4, 0x00);
+	sm.CreateWorldState(0x8D3, 0x00);
 
 	// AB world state's
 	// unknowns, need more research
-	SetWorldState(0x7A3, 1800); // unknown
-	SetWorldState(0x745, 0x02); // unknown
+	sm.CreateWorldState(0x7A3, 1800); // unknown
+	sm.CreateWorldState(0x745, 0x02); // unknown
 
 	// Icon stuff for on the map
-	SetWorldState(AB_SHOW_BACKSMITH_ICON, 			 0x01);
-	SetWorldState(AB_SHOW_FARM_ICON, 				  0x01);
-	SetWorldState(AB_SHOW_LUMBERMILL_ICON, 			0x01);
-	SetWorldState(AB_SHOW_GOLDMINE_ICON, 			 0x01);
-	SetWorldState(AB_SHOW_STABLE_ICON, 			0x01);
+	sm.CreateWorldState(WORLDSTATE_AB_SHOW_BACKSMITH_ICON, 			 0x01);
+	sm.CreateWorldState(WORLDSTATE_AB_SHOW_FARM_ICON, 				  0x01);
+	sm.CreateWorldState(WORLDSTATE_AB_SHOW_LUMBERMILL_ICON, 			0x01);
+	sm.CreateWorldState(WORLDSTATE_AB_SHOW_GOLDMINE_ICON, 			 0x01);
+	sm.CreateWorldState(WORLDSTATE_AB_SHOW_STABLE_ICON, 			0x01);
 
 	// LumberMill
-	SetWorldState(AB_CAPTURING_LUMBERMILL_HORDE, 	   0x00);
-	SetWorldState(AB_CAPTURING_LUMBERMILL_ALLIANCE, 	0x00);
-	SetWorldState(AB_CAPTURED_LUMBERMILL_HORDE, 		0x00);
-	SetWorldState(AB_CAPTURED_LUMBERMILL_ALLIANCE, 	 0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_LUMBERMILL_HORDE, 	   0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_LUMBERMILL_ALLIANCE, 	0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_LUMBERMILL_HORDE, 		0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_LUMBERMILL_ALLIANCE, 	 0x00);
 
 	// GoldMine
-	SetWorldState(AB_CAPTURING_GOLDMINE_HORDE, 		 0x00);
-	SetWorldState(AB_CAPTURING_GOLDMINE_ALLIANCE, 	  0x00);
-	SetWorldState(AB_CAPTURED_GOLDMINE_HORDE, 		  0x00);
-	SetWorldState(AB_CAPTURED_GOLDMINE_ALLIANCE, 	   0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_GOLDMINE_HORDE, 		 0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_GOLDMINE_ALLIANCE, 	  0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_GOLDMINE_HORDE, 		  0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_GOLDMINE_ALLIANCE, 	   0x00);
 
 	// BlackSmith
-	SetWorldState(AB_CAPTURING_BLACKSMITH_HORDE, 	   0x00);
-	SetWorldState(AB_CAPTURING_BLACKSMITH_ALLIANCE, 	0x00);
-	SetWorldState(AB_CAPTURED_BLACKSMITH_HORDE, 		0x00);
-	SetWorldState(AB_CAPTURED_BLACKSMITH_ALLIANCE, 	 0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_BLACKSMITH_HORDE, 	   0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_BLACKSMITH_ALLIANCE, 	0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_BLACKSMITH_HORDE, 		0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_BLACKSMITH_ALLIANCE, 	 0x00);
 
-	SetWorldState(AB_MAX_SCORE, 						RESOURCES_WINVAL);
-	SetWorldState(AB_ALLIANCE_CAPTUREBASE, 			 0x00);
-	SetWorldState(AB_HORDE_CAPTUREBASE, 				0x00);
-	SetWorldState(AB_HORDE_RESOURCES, 				  0x00);
-	SetWorldState(AB_ALLIANCE_RESOURCES, 			   0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_MAX_SCORE, 						RESOURCES_WINVAL);
+	sm.CreateWorldState(WORLDSTATE_AB_ALLIANCE_CAPTUREBASE, 			 0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_HORDE_CAPTUREBASE, 				0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_HORDE_RESOURCES, 				  0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_ALLIANCE_RESOURCES, 			   0x00);
 
 	// Farm
-	SetWorldState(AB_CAPTURING_FARM_ALLIANCE, 		 0x00);
-	SetWorldState(AB_CAPTURING_FARM_HORDE, 			 0x00);
-	SetWorldState(AB_CAPTURED_FARM_HORDE, 			  0x00);
-	SetWorldState(AB_CAPTURED_FARM_ALLIANCE, 		   0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_FARM_ALLIANCE, 		 0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_FARM_HORDE, 			 0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_FARM_HORDE, 			  0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_FARM_ALLIANCE, 		   0x00);
 
 	// Stables
-	SetWorldState(AB_CAPTURING_STABLES_HORDE, 		  0x00);
-	SetWorldState(AB_CAPTURING_STABLES_ALLIANCE, 	   0x00);
-	SetWorldState(AB_CAPTURED_STABLES_HORDE, 		   0x00);
-	SetWorldState(AB_CAPTURED_STABLES_ALLIANCE, 		0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_STABLES_HORDE, 		  0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURING_STABLES_ALLIANCE, 	   0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_STABLES_HORDE, 		   0x00);
+	sm.CreateWorldState(WORLDSTATE_AB_CAPTURED_STABLES_ALLIANCE, 		0x00);
 }
 
 void ArathiBasin::OnStart()
@@ -440,6 +412,8 @@ ArathiBasin::ArathiBasin(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : CBa
 		m_spiritGuides[i] = NULL;
 		m_basesAssaultedBy[i] = -1;
 		m_basesOwnedBy[i] = -1;
+		m_basesLastOwnedBy[i] = -1;
+		m_flagIsVirgin[i] = true;
 	}
 
 	for(i = 0; i < 2; ++i)
@@ -447,7 +421,8 @@ ArathiBasin::ArathiBasin(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : CBa
 		m_resources[i] = 0;
 		m_capturedBases[i] = 0;
 		m_lastHonorGainResources[i] = 0;
-		m_nearingVictory[i] = false;
+		m_nearingVictory[i] = 0;
+		m_reprewards[i] = 330;
 	}
 }
 
@@ -482,7 +457,7 @@ ArathiBasin::~ArathiBasin()
 
 void ArathiBasin::EventUpdateResources(uint32 Team)
 {
-	uint32 resource_fields[2] = { AB_ALLIANCE_RESOURCES, AB_HORDE_RESOURCES };
+	static uint32 resource_fields[2] = { WORLDSTATE_AB_ALLIANCE_RESOURCES, WORLDSTATE_AB_HORDE_RESOURCES };
 
 	uint32 current_resources = m_resources[Team];
 	uint32 current_bases = m_capturedBases[Team];
@@ -497,6 +472,8 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 	if(current_resources == m_resources[Team])
 		return;
 
+	m_mainLock.Acquire();
+
 	// check for overflow
 	if(current_resources > RESOURCES_WINVAL)
 		current_resources = RESOURCES_WINVAL;
@@ -504,16 +481,25 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 	m_resources[Team] = current_resources;
 	if((current_resources - m_lastHonorGainResources[Team]) >= RESOURCES_TO_GAIN_BH)
 	{
-		m_mainLock.Acquire();
 		for(set<Player*>::iterator itr = m_players[Team].begin(); itr != m_players[Team].end(); ++itr)
 			(*itr)->m_bgScore.BonusHonor += BASE_BH_GAIN;
-
-		UpdatePvPData();
-		m_mainLock.Release();
 	}
 
 	// update the world states
-	SetWorldState(resource_fields[Team], current_resources);
+	m_mapMgr->GetStateManager().UpdateWorldState(resource_fields[Team], current_resources);
+
+	if( current_resources >= m_reprewards[Team] )
+	{
+		for(set<Player*>::iterator itx = m_players[Team].begin(); itx != m_players[Team].end(); itx++)
+		{
+			Player * plr = (*itx);
+			if(!plr) continue;
+
+			HonorHandler::AddHonorPointsToPlayer( plr, 20 );
+		}
+
+		m_reprewards[Team] += 330;
+	}
 
 	if(current_resources >= RESOURCES_WARNING_THRESHOLD && !m_nearingVictory[Team])
 	{
@@ -527,15 +513,13 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 	if(current_resources == RESOURCES_WINVAL)
 	{
 		m_ended = true;
-		m_winningteam = Team;
+		m_losingteam = (Team) ? 0 : 1;
 		m_nextPvPUpdateTime = 0;
 
 		sEventMgr.RemoveEvents(this);
 		sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
 
 		/* add the marks of honor to all players */
-		m_mainLock.Acquire();
-
 		SpellEntry * winner_spell = dbcSpell.LookupEntry(24953);
 		SpellEntry * loser_spell = dbcSpell.LookupEntry(24952);
 		for(uint32 i = 0; i < 2; ++i)
@@ -543,14 +527,23 @@ void ArathiBasin::EventUpdateResources(uint32 Team)
 			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
 			{
 				(*itr)->Root();
-				if(i == m_winningteam)
-					(*itr)->CastSpell((*itr), winner_spell, true);
-				else
+
+				if( (*itr)->HasFlag(PLAYER_FLAGS, 0x2) )
+					continue;
+
+				if(i == m_losingteam)
 					(*itr)->CastSpell((*itr), loser_spell, true);
+				else
+				{
+					(*itr)->CastSpell((*itr), winner_spell, true);
+					HonorHandler::AddHonorPointsToPlayer( (*itr), 20 );
+				}
 			}
 		}
-		m_mainLock.Release();
 	}
+
+	UpdatePvPData();
+	m_mainLock.Release();
 }
 
 void ArathiBasin::HookOnPlayerDeath(Player * plr)
@@ -710,6 +703,11 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 	if(m_basesAssaultedBy[Id] != (int32)Team)
 		return;
 
+	
+	m_basesLastOwnedBy[Id] = Team;
+
+	m_flagIsVirgin[Id] = false;
+
 	m_basesOwnedBy[Id] = Team;
 	m_basesAssaultedBy[Id]=-1;
 
@@ -725,19 +723,19 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 	AddSpiritGuide(m_spiritGuides[Id]);
 
 	// send the chat message/sounds out
-	PlaySoundToAll(Team ? SOUND_HORDE_CAPTURE : SOUND_ALLIANCE_CAPTURE);
+	PlaySoundToAll(Team ? SOUND_HORDE_SCORES : SOUND_ALLIANCE_SCORES);
 	SendChatMessage(Team ? CHAT_MSG_BG_EVENT_HORDE : CHAT_MSG_BG_EVENT_ALLIANCE, 0, "The %s has taken the %s!", Team ? "Horde" : "Alliance", ControlPointNames[Id]);
 	
 	// update the overhead display on the clients (world states)
 	m_capturedBases[Team]++;
-	SetWorldState(Team ? AB_HORDE_CAPTUREBASE : AB_ALLIANCE_CAPTUREBASE, m_capturedBases[Team]);
+	m_mapMgr->GetStateManager().UpdateWorldState(Team ? WORLDSTATE_AB_HORDE_CAPTUREBASE : WORLDSTATE_AB_ALLIANCE_CAPTUREBASE, m_capturedBases[Team]);
 
 	// respawn the control point with the correct aura
 	SpawnControlPoint(Id, Team ? AB_SPAWN_TYPE_HORDE_CONTROLLED : AB_SPAWN_TYPE_ALLIANCE_CONTROLLED);
 
 	// update the map
-	SetWorldState(AssaultFields[Id][Team], 0);
-	SetWorldState(OwnedFields[Id][Team], 1);
+	m_mapMgr->GetStateManager().UpdateWorldState(AssaultFields[Id][Team], 0);
+	m_mapMgr->GetStateManager().UpdateWorldState(OwnedFields[Id][Team], 1);
 
 	// resource update event. :)
 	if(m_capturedBases[Team]==1)
@@ -755,7 +753,7 @@ void ArathiBasin::CaptureControlPoint(uint32 Id, uint32 Team)
 
 void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 {
-#ifdef ANTI_CHEAT
+#if defined(BG_ANTI_CHEAT) && !defined(_DEBUG)
 	if(!m_started)
 	{
 		SendChatMessage(CHAT_MSG_BG_EVENT_NEUTRAL, pPlayer->GetGUID(), "%s has been removed from the game for cheating.", pPlayer->GetName());
@@ -764,13 +762,16 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 	}
 #endif
 
+	bool isVirgin = false;
+
 	uint32 Team = pPlayer->m_bgTeam;
 	uint32 Owner;
 
 	if(m_basesOwnedBy[Id]==-1 && m_basesAssaultedBy[Id]==-1)
 	{
+		isVirgin = true;
 		// omgwtfbbq our flag is a virgin?
-		SetWorldState(NeutralFields[Id], 0);
+		m_mapMgr->GetStateManager().UpdateWorldState(NeutralFields[Id], 0);
 	}
 
 	if(m_basesOwnedBy[Id] != -1)
@@ -790,7 +791,10 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 				{
 					Player* r_plr = m_mapMgr->GetPlayer( *it2 );
 					if( r_plr != NULL && r_plr->isDead() )
+					{
 						HookHandleRepop( r_plr );
+						QueueAtNearestSpiritGuide(r_plr, itr->first);
+					}
 				}
 			}
 			m_resurrectMap.erase( itr );
@@ -800,10 +804,10 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 
 		// detract one from the teams controlled points
 		m_capturedBases[Owner] -= 1;
-		SetWorldState(Owner ? AB_HORDE_CAPTUREBASE : AB_ALLIANCE_CAPTUREBASE, m_capturedBases[Owner]);
+		m_mapMgr->GetStateManager().UpdateWorldState(Owner ? WORLDSTATE_AB_HORDE_CAPTUREBASE : WORLDSTATE_AB_ALLIANCE_CAPTUREBASE, m_capturedBases[Owner]);
 
 		// reset the world states
-		SetWorldState(OwnedFields[Id][Owner], 0);
+		m_mapMgr->GetStateManager().UpdateWorldState(OwnedFields[Id][Owner], 0);
 
 		// modify the resource update time period
 		if(m_capturedBases[Owner]==0)
@@ -812,20 +816,32 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 			this->event_ModifyTime(EVENT_AB_RESOURCES_UPDATE_TEAM_0 + Owner, ResourceUpdateIntervals[m_capturedBases[Owner]]);
 	}
 
+	// Contested Flag, not ours, and is not virgin
+	uint32 otherTeam = Team ? 0 : 1;
+	if( !isVirgin && m_basesLastOwnedBy[Id] == Team && m_basesOwnedBy[Id] == -1 )
+	{
+		m_mapMgr->GetStateManager().UpdateWorldState(AssaultFields[Id][Team ? 0 : 1], 0);
+		this->event_RemoveEvents(EVENT_AB_CAPTURE_CP_1 + Id);
+		SendChatMessage(Team ? CHAT_MSG_BG_EVENT_HORDE : CHAT_MSG_BG_EVENT_ALLIANCE, pPlayer->GetGUID(), "$N has defended the %s!", ControlPointNames[Id]);
+		m_basesAssaultedBy[Id] = Team;
+		CaptureControlPoint( Id, Team );
+		return;
+	}
+
 	// nigga stole my flag!
 	if(m_basesAssaultedBy[Id] != -1)
 	{
 		Owner = m_basesAssaultedBy[Id];
 
 		// woah! vehicle hijack!
-		m_basesAssaultedBy[Id] = -1;
-		SetWorldState(AssaultFields[Id][Owner], 0);
+		m_basesAssaultedBy[Id] = Team;
+		m_mapMgr->GetStateManager().UpdateWorldState(AssaultFields[Id][Owner], 0);
 
 		// make sure the event does not trigger
 		sEventMgr.RemoveEvents(this, EVENT_AB_CAPTURE_CP_1 + Id);
 
 		// no need to remove the spawn, SpawnControlPoint will do this.
-	}
+	} 
 
 	m_basesAssaultedBy[Id] = Team;
 
@@ -836,18 +852,25 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 	SendChatMessage(Team ? CHAT_MSG_BG_EVENT_HORDE : CHAT_MSG_BG_EVENT_ALLIANCE, pPlayer->GetGUID(), "$N claims the %s! If left unchallenged, the %s will control it in 1 minute!", ControlPointNames[Id],
 		Team ? "Horde" : "Alliance");
 
-	//NEED THE SOUND ID
-	//PlaySoundToAll(Team ? SOUND:SOUND);
+	// guessed
+	PlaySoundToAll(Team ? SOUND_ALLIANCE_CAPTURE : SOUND_HORDE_CAPTURE);
 
 	// update the client's map with the new assaulting field
-	SetWorldState(AssaultFields[Id][Team], 1);
+	m_mapMgr->GetStateManager().UpdateWorldState(AssaultFields[Id][Team], 1);
 
 	// create the 60 second event.
 	sEventMgr.AddEvent(this, &ArathiBasin::CaptureControlPoint, Id, Team, EVENT_AB_CAPTURE_CP_1 + Id, 60000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+
+	// update players info
+	pPlayer->m_bgScore.MiscData[BG_SCORE_AB_BASE_ASSAULTED]++;
+	UpdatePvPData();
 }
 
 bool ArathiBasin::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * pSpell)
 {
+	if( pPlayer->m_bgFlagIneligible )
+		return false;
+
 	// burlex todo: find a cleaner way to do this that doesnt waste memory.
 	if(pGo->bannerslot >= 0 && pGo->bannerslot < AB_NUM_CONTROL_POINTS)
 	{
@@ -857,4 +880,14 @@ bool ArathiBasin::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * p
 	}
 
 	return false;
+}
+
+void ArathiBasin::HookGenerateLoot(Player *plr, Corpse *pCorpse)
+{
+	// add some money
+	float gold = ((float(plr->getLevel()) / 2.5f)+1) * 100.0f;			// fix this later
+	gold *= sWorld.getRate(RATE_MONEY);
+
+	// set it
+	pCorpse->m_loot.gold = float2int32(gold);
 }

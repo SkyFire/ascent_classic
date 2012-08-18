@@ -166,13 +166,17 @@ enum MONSTER_SAY_EVENTS
 
 enum AREATABLE_FLAGS
 {
-    AREA_CITY_AREA          = 0x20,
-    AREA_NEUTRAL_AREA       = 0x40,
-    AREA_PVP_ARENA          = 0x80,
-    AREA_CITY               = 0x200,
-    AREA_SANCTUARY          = 0x800,
-    AREA_ISLAND             = 0x1000,
-    AREA_PVP_OBJECTIVE_AREA = 0x8000,
+	AREA_UNK1				= 0x8,
+	AREA_UNK2				= 0x10,
+	AREA_CITY_AREA          = 0x20,
+	AREA_NEUTRAL_AREA       = 0x40,
+	AREA_PVP_ARENA          = 0x80,
+	AREA_CITY               = 0x200,
+	AREA_FLYING_PERMITTED	= 0x400,
+	AREA_SANCTUARY          = 0x800,
+	AREA_ISLAND             = 0x1000,
+	AREA_UNK4				= 0x4000,
+	AREA_PVP_OBJECTIVE_AREA = 0x8000,
 };
 
 enum AREATABLE_CATEGORY
@@ -358,7 +362,6 @@ public:
 	
 	Item * CreateItem(uint32 entry,Player * owner);
 	Item * LoadItem(uint64 guid);
-	Item * LoadExternalItem(uint64 guid);
   
 	// Groups
 	Group * GetGroupByLeader(Player *pPlayer);
@@ -484,9 +487,6 @@ public:
 	void LoadVendors();
 	void LoadTotemSpells();
 	void LoadAIThreatToSpellId();
-	void LoadSpellFixes();
-	void LoadSpellProcs();
-	void LoadSpellEffectsOverride();
 	void LoadReputationModifierTable(const char * tablename, ReputationModMap * dmap);
 	void LoadReputationModifiers();
 	ReputationModifier * GetReputationModifier(uint32 entry_id, uint32 faction_id);
@@ -544,11 +544,11 @@ public:
 
 	ArenaTeam * GetArenaTeamByName(string & name, uint32 Type);
 	ArenaTeam * GetArenaTeamById(uint32 id);
-	ArenaTeam * GetArenaTeamByGuid(uint32 guid, uint32 Type);
 	void UpdateArenaTeamRankings();
 	void UpdateArenaTeamWeekly();
 	void LoadArenaTeams();
 	HM_NAMESPACE::hash_map<uint32, ArenaTeam*> m_arenaTeamMap[3];
+	HM_NAMESPACE::hash_map<uint32, ArenaTeam*> m_arenaTeamPlayerMap[3];
 	HM_NAMESPACE::hash_map<uint32, ArenaTeam*> m_arenaTeams;
 	void RemoveArenaTeam(ArenaTeam * team);
 	void AddArenaTeam(ArenaTeam * team);

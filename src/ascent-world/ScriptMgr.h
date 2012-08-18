@@ -43,17 +43,15 @@ enum ServerHookEvents
 	SERVER_HOOK_EVENT_ON_LOGOUT				= 13,
 	SERVER_HOOK_EVENT_ON_QUEST_ACCEPT		= 14,
 	SERVER_HOOK_EVENT_ON_ZONE				= 15,
-	SERVER_HOOK_EVENT_ON_CHAT				= 16,
-	SERVER_HOOK_EVENT_ON_LOOT				= 17,
-	SERVER_HOOK_EVENT_ON_GUILD_CREATE		= 18,
-	SERVER_HOOK_EVENT_ON_ENTER_WORLD_2		= 19,
-	SERVER_HOOK_EVENT_ON_CHARACTER_CREATE	= 20,
-	SERVER_HOOK_EVENT_ON_QUEST_CANCELLED	= 21,
-	SERVER_HOOK_EVENT_ON_QUEST_FINISHED		= 22,
-	SERVER_HOOK_EVENT_ON_HONORABLE_KILL		= 23,
-	SERVER_HOOK_EVENT_ON_ARENA_FINISH		= 24,
-	SERVER_HOOK_EVENT_ON_OBJECTLOOT			= 25,
-	SERVER_HOOK_EVENT_ON_POST_LEVELUP		= 26,
+	SERVER_HOOK_EVENT_ON_GUILD_CREATE		= 17,
+	SERVER_HOOK_EVENT_ON_ENTER_WORLD_2		= 18,
+	SERVER_HOOK_EVENT_ON_CHARACTER_CREATE	= 19,
+	SERVER_HOOK_EVENT_ON_QUEST_CANCELLED	= 20,
+	SERVER_HOOK_EVENT_ON_QUEST_FINISHED		= 21,
+	SERVER_HOOK_EVENT_ON_HONORABLE_KILL		= 22,
+	SERVER_HOOK_EVENT_ON_ARENA_FINISH		= 23,
+	SERVER_HOOK_EVENT_ON_CONTIENT_CREATE	= 25,
+	SERVER_HOOK_EVENT_ON_POST_SPELL_CAST	= 26,
 
 	NUM_SERVER_HOOKS,
 };
@@ -85,16 +83,14 @@ typedef void(*tOnTick)();
 typedef bool(*tOnLogoutRequest)(Player * pPlayer);
 typedef void(*tOnLogout)(Player * pPlayer);
 typedef void(*tOnQuestAccept)(Player * pPlayer, Quest * pQuest);
-typedef void(*tOnZone)(Player * pPlayer, uint32 Zone);
-typedef bool(*tOnChat)(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
-typedef void(*tOnLoot)(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId);
+typedef void(*tOnZone)(Player * pPlayer, uint32 Zone, uint32 OldZone);
 typedef bool(*ItemScript)(Item * pItem, Player * pPlayer);
 typedef void(*tOnQuestCancel)(Player * pPlayer, Quest * pQuest);
 typedef void(*tOnQuestFinished)(Player * pPlayer, Quest * pQuest);
 typedef void(*tOnHonorableKill)(Player * pPlayer, Player * pKilled);
-typedef void(*tOnArenaFinish)(Player * pPlayer, ArenaTeam * pTeam, bool victory, bool rated);
-typedef void(*tOnObjectLoot)(Player * pPlayer, Object * pTarget, uint32 Money, uint32 ItemId);
-typedef void(*tOnPostLevelUp)(Player * pPlayer);
+typedef void(*tOnArenaFinish)(Player * pPlayer, uint32 type, ArenaTeam * pTeam, bool victory, bool rated);
+typedef void(*tOnContinentCreate)(MapMgr *mgr);
+typedef void(*tOnPostSpellCast)(Player * pPlayer, SpellEntry * pSpell, Unit * pTarget);
 
 class Spell;
 class Aura;
@@ -195,7 +191,6 @@ public:
 	virtual void OnCallForHelp() {}
 	virtual void OnLoad() {}
 	virtual void OnReachWP(uint32 iWaypointId, bool bForwards) {}
-	virtual void OnLootTaken(Player* pPlayer, ItemPrototype *pItemPrototype) {}
 	virtual void AIUpdate() {}
 	virtual void OnEmote(Player * pPlayer, EmoteType Emote) {}
 	virtual void StringFunctionCall(const char * pFunc) {}
@@ -220,12 +215,12 @@ public:
 	virtual void OnCreate() {}
 	virtual void OnSpawn() {}
 	virtual void OnDespawn() {}
-	virtual void OnLootTaken(Player * pLooter, ItemPrototype *pItemInfo) {}
 	virtual void OnActivate(Player * pPlayer) {}
 	virtual void AIUpdate() {}
 	virtual void Destroy() {}
 
 	void RegisterAIUpdateEvent(uint32 frequency);
+	void RemoveAIUpdateEvent();
 
 protected:
 
@@ -278,17 +273,15 @@ public:
 	bool OnLogoutRequest(Player * pPlayer);
 	void OnLogout(Player * pPlayer);
 	void OnQuestAccept(Player * pPlayer, Quest * pQuest);
-	void OnZone(Player * pPlayer, uint32 Zone);
-	bool OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc);
-	void OnLoot(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId);
+	void OnZone(Player * pPlayer, uint32 Zone, uint32 OldZone);
 	void OnEnterWorld2(Player * pPlayer);
 	void OnCharacterCreate(Player * pPlayer);
 	void OnQuestCancelled(Player * pPlayer, Quest * pQuest);
 	void OnQuestFinished(Player * pPlayer, Quest * pQuest);
 	void OnHonorableKill(Player * pPlayer, Player * pKilled);
-	void OnArenaFinish(Player * pPlayer, ArenaTeam* pTeam, bool victory, bool rated);
-	void OnObjectLoot(Player * pPlayer, Object * pTarget, uint32 Money, uint32 ItemId);
-	void OnPostLevelUp(Player * pPlayer);
+	void OnArenaFinish(Player * pPlayer, uint32 type, ArenaTeam* pTeam, bool victory, bool rated);
+	void OnContinentCreate(MapMgr *pMgr);
+	void OnPostSpellCast(Player * pPlayer, SpellEntry * pSpell, Unit * pTarget);
 };
 
 #define sScriptMgr ScriptMgr::getSingleton()

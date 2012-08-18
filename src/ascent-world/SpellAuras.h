@@ -266,8 +266,12 @@ struct Modifier
 
     ///needed for per level effect
     int32 realamount;
-    //need this to store % values or they cannot be reverted corectly (i think :D )
-    signed int fixed_amount[7];
+    
+	//need this to store % values or they cannot be reverted corectly (i think :D )
+    int32 fixed_amount[7];
+
+	// float fixed amounts
+	float fixed_float_amount[7];
 };
 
 
@@ -292,15 +296,7 @@ struct DamageProc
     uint32 m_flags;
     void  *owner;//mark the owner of this proc to know which one to delete
 };
-struct DamageSplitTarget
-{
-	uint64 m_target; // we store them
-	uint32 m_spellId;
-    float m_pctDamageSplit; // % of taken damage to transfer (i.e. Soul Link)
-	uint32 m_flatDamageSplit; // flat damage to transfer (i.e. Blessing of Sacrifice)
-	uint8 damage_type; // bitwise 0-127 thingy
-	void * creator;
-};
+
 #ifndef NEW_PROCFLAGS
 struct ProcTriggerSpell
 {
@@ -357,6 +353,10 @@ public:
 
     ASCENT_INLINE int32 GetDuration() const { return m_duration; }
     void SetDuration(int32 duration) { m_duration = duration; }
+	void UpdateAuraDuration(uint32 new_duration);
+
+	ASCENT_INLINE uint32 GetModCount() const { return m_modcount; }
+	ASCENT_INLINE Modifier *GetMod(uint32 x) { return &m_modList[x]; }
 
     ASCENT_INLINE uint8 GetAuraSlot() const { return m_auraSlot; }
 	void SetAuraSlot(uint8 slot) { m_auraSlot = slot; }
@@ -374,10 +374,10 @@ public:
 	void ApplyModifiers(bool apply);
 	void AddAuraVisual();
 	void RemoveAuraVisual();
-	void EventUpdateAA(float r);
+	void EventUpdateCreatureAA(float r);
+	void EventUpdatePlayerAA(float r);
 	void RemoveAA();
 		
-
 	ASCENT_INLINE uint32 GetTimeLeft()//in sec
 	{
 		if(m_duration==-1)return (uint32)-1;
@@ -578,7 +578,6 @@ public:
 	void SpellAuraFinishingMovesCannotBeDodged(bool apply);
 	void SpellAuraAxeSkillModifier(bool apply);
 	void SpellAuraDrinkNew(bool apply);
-	void SpellAuraModPossessPet(bool apply);
 	void EventPeriodicDrink(uint32 amount);
 
 	void SendModifierLog(int32 ** m,int32 v,uint64 mask,uint8 type,bool pct = false);
@@ -711,13 +710,13 @@ private:
 protected:
 	uint32 m_casterfaction;
 
-
 	void SendInterrupted(uint8 result, Object * m_caster);
 	void SendChannelUpdate(uint32 time, Object * m_caster);
 public:
 	bool m_deleted;
+	bool m_creatureAA;
 	int16 m_interrupted;
-	bool m_ignoreunapply; // "special" case, for unapply
+
 	ASCENT_INLINE bool IsInterrupted() { return ( m_interrupted >= 0 ); }
 };
 

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -116,7 +116,7 @@ void LogonConsole::ProcessCmd(char *cmd)
 		{"?", &LogonConsole::TranslateHelp}, {"help", &LogonConsole::TranslateHelp},
 		{ "reload", &LogonConsole::ReloadAccts},
 		{ "rehash", &LogonConsole::TranslateRehash},
-		{"shutdown", &LogonConsole::TranslateQuit}, {"exit", &LogonConsole::TranslateQuit}, 
+		{"quit", &LogonConsole::TranslateQuit}, {"exit", &LogonConsole::TranslateQuit}, 
 	};
 
 	char cmd2[80];
@@ -168,7 +168,8 @@ void LogonConsole::ProcessHelp(char *command)
 		sLog.outString("Console:--------help--------");
 		sLog.outString("   help, ?: print this text");
 		sLog.outString("   reload: reloads accounts");
-		sLog.outString("   shutdown, exit: close program");
+		sLog.outString("   rehash: rehashes config file");
+		sLog.outString("   quit, exit: close program");
 	}
 }
 //------------------------------------------------------------------------------

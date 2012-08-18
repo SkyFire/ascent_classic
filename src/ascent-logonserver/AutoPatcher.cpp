@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -113,10 +113,11 @@ PatchMgr::PatchMgr()
 
 	struct dirent ** list;
 	int filecount;
+	//uint32 count = 0;
 	int read_fd;
 	MD5Hash md5;
 	Patch * pPatch;
-	int size;
+	DWORD size;
 	uint32 srcversion;
 	char locality[5];
 	uint32 i;
@@ -250,6 +251,8 @@ void PatchMgr::UpdateJobs()
 			delete (*itr2);
 			m_patchJobs.erase(itr2);
 		}
+		else
+			++itr;
 	}
 	m_patchJobLock.Release();
 }
@@ -300,7 +303,7 @@ bool PatchJob::Update()
 {
 	// don't update unless the write buffer is empty
 	m_client->BurstBegin();
-	if(m_client->GetWriteBuffer().GetSize()!=0)
+	if( m_client->GetWriteBuffer().GetSize() != 0 )
 	{
 		m_client->BurstEnd();
 		return true;

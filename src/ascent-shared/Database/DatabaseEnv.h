@@ -24,7 +24,6 @@
 #include "Common.h"
 #include "Singleton.h"
 #include "Log.h"
-#include "CThreads.h"
 
 //! Our own includes.
 #include "Database/DBCStores.h"

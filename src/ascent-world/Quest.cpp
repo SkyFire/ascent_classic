@@ -286,7 +286,7 @@ bool QuestLogEntry::CanBeFinished()
 		}
 	}
 
-//Check for Gold & AreaTrigger Requirement s
+	//Check for Gold & AreaTrigger Requirement s
 	for(i = 0; i < 4; ++i)
 	{
 		if(m_quest->required_money && (m_plr->GetUInt32Value(PLAYER_FIELD_COINAGE) < m_quest->required_money)) 

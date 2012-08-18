@@ -47,29 +47,27 @@ class WorldSession;
 #endif
 std::string FormatOutputString(const char * Prefix, const char * Description, bool useTimeStamp);
 
+// log define
+#ifdef _DEBUG
+#define DEBUG_LOG sLog.outDebug
+#else
+#define DEBUG_LOG
+#endif
+
 class SERVER_DECL oLog : public Singleton< oLog > {
 public:
   void outString( const char * str, ... );
-  void outError( const char * err, ... );
-  void outBasic( const char * str, ... );
-  void outDetail( const char * str, ... );
   void outDebug( const char * str, ... );
-  void outMenu( const char * str, ... );
 
   void fLogText(const char *text);
   void SetLogging(bool enabled);
   
-  void Init(int32 fileLogLevel, int32 screenLogLevel);
-  void SetFileLoggingLevel(int32 level);
-  void SetScreenLoggingLevel(int32 level);
-
+  void Init();
   void outColor(uint32 colorcode, const char * str, ...);
   
 #ifdef WIN32
   HANDLE stdout_handle, stderr_handle;
 #endif
-  int32 m_fileLogLevel;
-  int32 m_screenLogLevel;
 };
 
 class SessionLogWriter

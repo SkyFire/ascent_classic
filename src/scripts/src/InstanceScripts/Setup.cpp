@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "Setup.h"
-#define SKIP_ALLOCATOR_SHARING 1
+//#define SKIP_ALLOCATOR_SHARING 1
 #include <ScriptSetup.h>
 
 extern "C" SCRIPT_DECL uint32 _exp_get_script_type()
@@ -16,6 +16,7 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)	// Comment any 
 	SetupBlackwingLair(mgr);
 	SetupNaxxramas(mgr);
 	SetupOnyxiasLair(mgr);
+	SetupAlteracValleyBattleground(mgr);
 }
 
 #ifdef WIN32

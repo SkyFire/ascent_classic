@@ -1,0 +1,21 @@
+(big towers)
+
+stadium - 
+artkit_neutral = 69
+artkit_horde = 68
+artkit_ally = 67
+
+overlook - 
+artkit_neutral = 63
+artkit_horde = 61
+artkit_ally = 62
+
+brokenhill - 
+artkit_neutral = 66
+artkit_horde = 64
+artkit_ally = 65
+
+(small flagpole)
+artkit_horde = 1
+artkit_ally = 2
+artkit_neutral = 3

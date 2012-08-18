@@ -243,53 +243,31 @@ void Spell::FillTargetMap(uint32 i)
 	}
 }
 
-//#define I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
 void Spell::SpellTargetNULL(uint32 i, uint32 j)
 {
-	sLog.outDebug("[SPELL][TARGET] Unhandled target typeA: %u typeB: %u", m_spellInfo->EffectImplicitTargetA[j], m_spellInfo->EffectImplicitTargetB[j]);
-
-	#ifdef I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
-		TargetsList *tmpMap=&m_targetUnits[i];
-		SafeAddTarget(tmpMap,m_targets.m_unitTarget);
-	#endif
+	DEBUG_LOG("[SPELL][TARGET] Unhandled target typeA: %u typeB: %u", m_spellInfo->EffectImplicitTargetA[j], m_spellInfo->EffectImplicitTargetB[j]);
 }
-//#undef I_AM_STUPID_BUT_I_JUST_WANT_TO_TRY_THIS
 
 /// Spell Target Handling for type 0: Default targeting
 void Spell::SpellTargetDefault(uint32 i, uint32 j)
 {
 	if(j==0 || (m_caster->IsPet() && j==1))
 	{
-		TargetsList *tmpMap=&m_targetUnits[i];
-
 		if(m_targets.m_unitTarget)
-			SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+			_AddTargetForced(m_targets.m_unitTarget, i);
 		else if(m_targets.m_itemTarget)
-			SafeAddTarget(tmpMap,m_targets.m_itemTarget);
-		else if( (m_spellInfo->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT
-			|| m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_DEMON) )
-			SafeAddTarget(tmpMap,m_caster->GetGUID());
+			_AddTargetForced(m_targets.m_itemTarget, i);
+		else if( m_spellInfo->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT || 
+				 m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_DEMON ||
+				 m_spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_WILD )
+			_AddTargetForced(m_caster->GetGUID(), i);
 	}
 }
 
 /// Spell Target Handling for type 1: Self Target + in moon skin form party member in radius
 void Spell::SpellTargetSelf(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	//if(p_caster)
-	//{
-	//	if(m_spellInfo->RequiredShapeShift && (p_caster->getClass()==DRUID || p_caster->getClass()==WARRIOR))
-	//	{
-	//		if(m_spellInfo->Effect[i] != SPELL_EFFECT_LEARN_SPELL)//in talents
-	//		{	
-	//			if(!p_caster->GetShapeShift())
-	//				return;
-	//			if(!((((uint32)1)<< (p_caster->GetShapeShift()-1)) & m_spellInfo->RequiredShapeShift))
-	//				return;
-	//		}
-	//	}
-	//}
-	SafeAddTarget(tmpMap,m_caster->GetGUID());
+	_AddTargetForced(m_caster->GetGUID(), i);
 }
 void Spell::SpellTargetInvisibleAOE(uint32 i, uint32 j)
 {
@@ -302,10 +280,7 @@ void Spell::SpellTargetFriendly(uint32 i, uint32 j)
 	// O fuck we are contagious...
 	// this off course is not tested yet. 
 	if (p_caster)
-	{
-		TargetsList *tmpMap=&m_targetUnits[i];
-		SafeAddTarget(tmpMap,p_caster->GetGUID());
-	}
+		_AddTargetForced(p_caster->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 5: Target: Pet
@@ -313,9 +288,8 @@ void Spell::SpellTargetPet(uint32 i, uint32 j)
 {
 	if(p_caster)
 	{
-		TargetsList *tmpMap=&m_targetUnits[i];
-		if(p_caster->GetSummon())
-			SafeAddTarget(tmpMap,p_caster->GetSummon()->GetGUID());
+		if( p_caster->GetSummon() != NULL )
+			_AddTargetForced( p_caster->GetSummon()->GetGUID(), i );
 	}
 }
 
@@ -328,7 +302,6 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 	if(!pTarget)
 		return;
 
-	TargetsList *tmpMap=&m_targetUnits[i];
 	if(m_spellInfo->TargetCreatureType && pTarget->GetTypeId()==TYPEID_UNIT)
 	{		
 		Creature* cr = static_cast< Creature* >( pTarget );
@@ -349,54 +322,41 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 			cancastresult = SPELL_FAILED_BAD_TARGETS;
 			return;
 		}
+	}
 
-		/* HACK FIX */
-		/* Please replace if found correct way */
-		/* SPELL_AURA_SPELL_MAGNET */
-		int x;
+	// magnet!!!!!
+	if( pTarget->IsPlayer() && TO_PLAYER(pTarget)->m_magnetAura != NULL && m_magnetTarget == NULL )
+	{
+		uint32 x;
 		for( x = 0; x < 3; ++x )
-			if( m_spellInfo->EffectApplyAuraName[x] == SPELL_AURA_MOD_POSSESS ||
-				m_spellInfo->is_melee_spell )
-				break;		
-
-		if( pTarget && pTarget->IsPlayer() && x == 3)
-		{	
-			Unit *MagnetCaster;
-			bool HasMagnetSpell = false;
-			for(uint32 x=0;x<MAX_POSITIVE_AURAS;x++)
-			if(	pTarget->m_auras[x] ) 
+		{
+			if( m_spellInfo->EffectApplyAuraName[x] == SPELL_AURA_MOD_POSSESS || 
+				m_spellInfo->EffectApplyAuraName[x] == SPELL_AURA_MOD_FEAR ||
+				m_spellInfo->EffectApplyAuraName[x] == SPELL_AURA_MOD_CONFUSE || 
+				m_spellInfo->EffectApplyAuraName[x] == SPELL_AURA_MOD_STUN )
 			{
-				for(uint32 y = 0; y < 3; ++y)
-					if ( pTarget->m_auras[x]->m_spellProto->EffectApplyAuraName[y] == SPELL_AURA_SPELL_MAGNET )
-					{
-						MagnetCaster = pTarget->m_auras[x]->GetUnitCaster();
-						HasMagnetSpell = true;
-						break;
-					}
-			}
-			if ( HasMagnetSpell && MagnetCaster )
-			{
-				pTarget = MagnetCaster;
+				break;
 			}
 		}
 
-#ifdef COLLISION
-		// this distance check may have to be removed in the future.
-		//Shady: wtf is that? it causes a bug when caster and target too close to each other.
-		/*if( p_caster->GetDistance2dSq( pTarget ) < 4.0f && CollideInterface.CheckLOS( p_caster->GetMapId(), p_caster->GetPositionNC(), pTarget->GetPositionNC() ) )
+		if( x == 3 && !m_spellInfo->is_melee_spell && GetType() == SPELL_DMG_TYPE_MAGIC )
 		{
-			cancastresult = SPELL_FAILED_LINE_OF_SIGHT;
-			return;
-		}*/
+			// redirect it to the magnet
+			m_magnetTarget = TO_PLAYER(pTarget)->m_magnetAura->GetUnitCaster();
 
-#endif
+			// clear the magnet aura
+			TO_PLAYER(pTarget)->m_magnetAura->Remove();
+		}
 	}
 
-	uint8 did_hit_result = DidHit(i,pTarget);
-	if(did_hit_result != SPELL_DID_HIT_SUCCESS)
-		SafeAddModeratedTarget(pTarget->GetGUID(), did_hit_result);
-	else
-		SafeAddTarget(tmpMap, pTarget->GetGUID());
+	if( m_magnetTarget != NULL )
+	{
+		// if the target exists, shoot it at him.
+		if( m_magnetTarget != NULL && m_magnetTarget->IsInWorld() && !m_magnetTarget->isDead() )
+			pTarget = m_magnetTarget;
+	}
+
+	_AddTarget(pTarget, i);
 
 	if(m_spellInfo->EffectChainTarget[i])
 	{
@@ -415,12 +375,7 @@ void Spell::SpellTargetSingleTargetEnemy(uint32 i, uint32 j)
 			{
 				if(isAttackable(u_caster,(Unit*)(*itr)))
 				{
-					did_hit_result = DidHit(i,((Unit*)*itr));
-					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
-						SafeAddTarget(tmpMap, (*itr)->GetGUID());
-					else
-						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result);
-
+					_AddTarget(((Unit*)*itr), i);
 					if(!--jumps)
 						return;
 				}
@@ -446,17 +401,15 @@ void Spell::SpellTargetAreaOfEffect(uint32 i, uint32 j)
 /// Spell Target Handling for type 18: Land under caster
 void Spell::SpellTargetLandUnderCaster(uint32 i, uint32 j) /// I don't think this is the correct name for this one
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
 	if(m_spellInfo->Effect[i] != SPELL_EFFECT_SUMMON_DEMON && m_spellInfo->Effect[i] != SPELL_EFFECT_SUMMON_OBJECT_WILD)
 		FillAllTargetsInArea(i,m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),GetRadius(i));
 	else
-		SafeAddTarget(tmpMap,m_caster->GetGUID());
+		_AddTargetForced(m_caster->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 18: All Party Members around the Caster in given range NOT RAID
 void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 {
-	TargetsList* tmpMap = &m_targetUnits[i];
 	Player* p = p_caster;
 
 	if( p == NULL )
@@ -474,7 +427,7 @@ void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 
 	r *= r;
 	if( IsInrange( m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), p, r ) )
-		SafeAddTarget( tmpMap, p->GetGUID() );	 
+		_AddTargetForced(p->GetGUID(), i);
 
 	SubGroup* subgroup = p->GetGroup() ? p->GetGroup()->GetSubGroup( p->GetSubGroup() ) : 0;
 
@@ -486,7 +439,7 @@ void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 			if(!(*itr)->m_loggedInPlayer || m_caster == (*itr)->m_loggedInPlayer) 
 				continue;
 			if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr)->m_loggedInPlayer,r))
-				SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
+				_AddTargetForced( (*itr)->m_loggedInPlayer->GetGUID(), i );
 		}
 		p->GetGroup()->Unlock();
 	}
@@ -495,7 +448,6 @@ void Spell::SpellTargetAllPartyMembersRangeNR(uint32 i, uint32 j)
 /// Spell Target Handling for type 21: Single Target Friend
 void Spell::SpellTargetSingleTargetFriend(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
 	Unit *Target;
 	if(m_targets.m_unitTarget == m_caster->GetGUID())
 		Target = u_caster;
@@ -506,7 +458,7 @@ void Spell::SpellTargetSingleTargetFriend(uint32 i, uint32 j)
 
 	float r= GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 	if(IsInrange (m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target, r*r))
-		SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+		_AddTargetForced(Target->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 22: Enemy Targets around the Caster//changed party members around you
@@ -521,33 +473,45 @@ void Spell::SpellTargetAoE(uint32 i, uint32 j) // something special
 /// Spell Target Handling for type 23: Gameobject Target
 void Spell::SpellTargetSingleGameobjectTarget(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+	_AddTargetForced(m_targets.m_unitTarget, i);
 }
 
 /// Spell Target Handling for type 24: Targets in Front of the Caster
 void Spell::SpellTargetInFrontOfCaster(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
 	std::set<Object*>::iterator itr;
-	uint8 did_hit_result;
-	for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+
+	if( m_spellInfo->cone_width == 0.0f )
 	{
-		if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
-			continue;
-		//is Creature in range
-		if(m_caster->isInRange((Unit*)(*itr),GetRadius(i)))
+		for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 		{
-			if( m_spellInfo->cone_width ? m_caster->isInArc( (Unit*)(*itr) , m_spellInfo->cone_width ) : m_caster->isInFront((Unit*)(*itr)) ) // !!! is the target within our cone ?
+			if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
+				continue;
+			//is Creature in range
+			if(m_caster->isInRange((Unit*)(*itr),GetRadius(i)))
 			{
-				if(isAttackable(u_caster, (Unit*)(*itr)))
+				if(m_caster->isInFront((Unit*)(*itr)))
 				{
-					did_hit_result = DidHit(i,((Unit*)*itr));
-					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
-						SafeAddTarget(tmpMap,(*itr)->GetGUID());
-					else
-						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result);
-				}	
+					if(isAttackable(u_caster, (Unit*)(*itr)))
+						_AddTarget(((Unit*)(*itr)), i);
+				}
+			}
+		}
+	}
+	else
+	{
+		for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
+		{
+			if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
+				continue;
+			//is Creature in range
+			if(m_caster->isInArc(*itr, m_spellInfo->cone_width))
+			{
+				if(m_caster->isInFront((Unit*)(*itr)))
+				{
+					if(isAttackable(u_caster, (Unit*)(*itr)))
+						_AddTarget(((Unit*)(*itr)), i);
+				}
 			}
 		}
 	}
@@ -556,28 +520,25 @@ void Spell::SpellTargetInFrontOfCaster(uint32 i, uint32 j)
 /// Spell Target Handling for type 25: Single Target Friend	 // Used o.a. in Duel
 void Spell::SpellTargetSingleFriend(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+	_AddTargetForced(m_targets.m_unitTarget, i);
 }
 
 /// Spell Target Handling for type 26: unit target/Item Target
 /// game object and item related... research pickpocket stuff
 void Spell::SpellTargetGameobject_itemTarget(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	if(m_targets.m_unitTarget)
-		SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+	if( m_targets.m_unitTarget )
+		_AddTargetForced(m_targets.m_unitTarget, i);
 
-	if(m_targets.m_itemTarget)
-		SafeAddTarget(tmpMap,m_targets.m_itemTarget);
+	if( m_targets.m_itemTarget )
+		_AddTargetForced(m_targets.m_itemTarget, i);
 }
 
 /// Spell Target Handling for type 27: target is owner of pet
 void Spell::SpellTargetPetOwner(uint32 i, uint32 j)
 { 
-	TargetsList* tmpMap = &m_targetUnits[i];
-	if( u_caster != NULL && u_caster->IsPet() && static_cast< Pet* >( u_caster )->GetPetOwner() )
-		SafeAddTarget( tmpMap, u_caster->GetUInt64Value( UNIT_FIELD_SUMMONEDBY ) );
+	if( u_caster->IsPet() && ((Pet*)u_caster)->GetPetOwner() )
+		_AddTargetForced( ((Pet*)u_caster)->GetPetOwner()->GetGUID(), i );
 }
 
 /// this is handled in DO
@@ -607,9 +568,11 @@ void Spell::SpellTargetTypeTAOE(uint32 i, uint32 j)
 
 	// tranquility
 	if( u_caster != NULL && m_spellInfo->NameHash == SPELL_HASH_TRANQUILITY )
-		m_targetUnits[i].push_back( u_caster->GetGUID() );
+		_AddTargetForced(u_caster->GetGUID(), i);
 	else
+	{
 		FillAllTargetsInArea( (LocationVector&)Target->GetPosition(), i );
+	}
 }
 
 /// Spell Target Handling for type 30: PBAE Party Based Area Effect
@@ -633,17 +596,15 @@ void Spell::SpellTargetScriptedEffects(uint32 i, uint32 j)
 /// Spell Target Handling for type 32 / 73: related to summoned pet or creature
 void Spell::SpellTargetSummon(uint32 i, uint32 j)
 {// Minion Target
-	TargetsList *tmpMap=&m_targetUnits[i];
 	if(m_caster->GetUInt64Value(UNIT_FIELD_SUMMON) == 0)
-		SafeAddTarget(tmpMap,m_caster->GetGUID());
+		_AddTargetForced(m_caster->GetGUID(), i);
 	else
-		SafeAddTarget(tmpMap,m_caster->GetUInt64Value(UNIT_FIELD_SUMMON));
+		_AddTargetForced(m_caster->GetUInt64Value(UNIT_FIELD_SUMMON), i);
 }
 
 /// Spell Target Handling for type 33: Party members of totem, inside given range
 void Spell::SpellTargetNearbyPartyMembers(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
 	// this implementation is wrong.... this one is for totems
 	if( u_caster != NULL )
 	{
@@ -660,7 +621,7 @@ void Spell::SpellTargetNearbyPartyMembers(uint32 i, uint32 j)
 					return;
 
 				if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),p,r))
-					SafeAddTarget(tmpMap,p->GetGUID());
+					_AddTargetForced(p->GetGUID(), i);
 
 				SubGroup * pGroup = p->GetGroup() ?
 					p->GetGroup()->GetSubGroup(p->GetSubGroup()) : 0;
@@ -674,7 +635,7 @@ void Spell::SpellTargetNearbyPartyMembers(uint32 i, uint32 j)
 						if(!(*itr)->m_loggedInPlayer || p == (*itr)->m_loggedInPlayer) 
 							continue;
 						if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),(*itr)->m_loggedInPlayer,r))
-							SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
+							_AddTargetForced((*itr)->m_loggedInPlayer->GetGUID(), i);
 					}
 					p->GetGroup()->Unlock();
 				}
@@ -687,7 +648,6 @@ void Spell::SpellTargetNearbyPartyMembers(uint32 i, uint32 j)
 /// this one requeres more research
 void Spell::SpellTargetSingleTargetPartyMember(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
 	if(!m_caster->IsInWorld())
 		return;
 
@@ -696,13 +656,12 @@ void Spell::SpellTargetSingleTargetPartyMember(uint32 i, uint32 j)
 		return;
 	float r=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 	if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target,r*r))
-		SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+		_AddTargetForced(m_targets.m_unitTarget, i);
 }
 
 /// Spell Target Handling for type 36: these targets are scripted :s or something.. there seems to be a system...
 void Spell::SpellTargetScriptedEffects2(uint32 i, uint32 j)
 {
-	//TargetsList *tmpMap=&m_targetUnits[i];
 
 }
 
@@ -712,7 +671,6 @@ void Spell::SpellTargetPartyMember(uint32 i, uint32 j)
 	if(!m_caster->IsInWorld())
 		return;
 
-	TargetsList *tmpMap=&m_targetUnits[i];
 	// if no group target self
 	Player * Target = m_caster->GetMapMgr()->GetPlayer((uint32)m_targets.m_unitTarget);
 	if(!Target)
@@ -727,20 +685,18 @@ void Spell::SpellTargetPartyMember(uint32 i, uint32 j)
 		for(GroupMembersSet::iterator itr = subgroup->GetGroupMembersBegin(); itr != subgroup->GetGroupMembersEnd(); ++itr)
 		{
 			if((*itr)->m_loggedInPlayer)
-				SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
+				_AddTargetForced( (*itr)->m_loggedInPlayer->GetGUID(), i );
 		}
 		Target->GetGroup()->Unlock();
 	}
 	else
-	{
-		SafeAddTarget(tmpMap,Target->GetGUID());
-	}
+		_AddTargetForced(Target->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 38: Dummy Target (Server-side script effect)
 void Spell::SpellTargetDummyTarget(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
+	//TargetsList *tmpMap=&m_targetUnits[i];
 	if(m_spellInfo->Id == 12938)
 	{
 		//FIXME:this ll be immortal targets
@@ -768,28 +724,26 @@ void Spell::SpellTargetDummyTarget(uint32 i, uint32 j)
 			}
 		}
 	}
-	SafeAddTarget(tmpMap,m_caster->GetGUID());
+	_AddTargetForced(m_caster->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 39: Fishing
 void Spell::SpellTargetFishing(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	SafeAddTarget(tmpMap,m_caster->GetGUID());
+	_AddTargetForced(m_caster->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 40: Activate Object target(probably based on focus)
 /// movement proc, like traps.
 void Spell::SpellTargetType40(uint32 i, uint32 j)
 {
-	//TargetsList *tmpMap=&m_targetUnits[i];
+
 }
 
 /// Spell Target Handling for type 41 / 42 / 43 / 44: Totems
 void Spell::SpellTargetTotem(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
-	SafeAddTarget(tmpMap,m_caster->GetGUID());
+	_AddTargetForced(m_caster->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 45: Chain,!!only for healing!! for chain lightning =6 
@@ -798,7 +752,6 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 	if( !m_caster->IsInWorld() )
 		return;
 
-	TargetsList *tmpMap=&m_targetUnits[i];
 	//if selected target is party member, then jumps on party
 	Unit* firstTarget;
 
@@ -826,7 +779,8 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 	{
 		SM_FIValue(u_caster->SM_FAdditionalTargets,(int32*)&jumps,m_spellInfo->SpellGroupType);
 	}
-	SafeAddTarget(tmpMap,firstTarget->GetGUID());
+
+	_AddTargetForced(firstTarget->GetGUID(), i);
 	if(!jumps)
 		return;
 	jumps--;
@@ -846,7 +800,7 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 					continue;
 				if(IsInrange(u_caster->GetPositionX(),u_caster->GetPositionY(),u_caster->GetPositionZ(),(*itr)->m_loggedInPlayer, range))
 				{
-					SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
+					_AddTargetForced((*itr)->m_loggedInPlayer->GetGUID(), i);
 					if(!--jumps)
 					{
 						p_caster->GetGroup()->Unlock();
@@ -869,7 +823,7 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 			{
 				if(!isAttackable(u_caster,(Unit*)(*itr)))
 				{
-					SafeAddTarget(tmpMap,(*itr)->GetGUID());
+					_AddTargetForced((*itr)->GetGUID(), i);
 					if(!--jumps)
 						return;
 				}
@@ -891,13 +845,12 @@ void Spell::SpellTargetChainTargeting(uint32 i, uint32 j)
 
 void Spell::SpellTargetSimpleTargetAdd(uint32 i, uint32 j)
 {
-	SafeAddTarget(&m_targetUnits[i],m_caster->GetGUID());
+	_AddTargetForced(m_caster->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 53: Target Area by Players CurrentSelection()
 void Spell::SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j)
 {
-	//TargetsList *tmpMap=&m_targetUnits[i];
 	Unit *Target = NULL;
 	if(m_caster->IsInWorld())
 	{
@@ -916,9 +869,8 @@ void Spell::SpellTargetTargetAreaSelectedUnit(uint32 i, uint32 j)
 /// Spell Target Handling for type 54: Targets in Front of the Caster
 void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
 	std::set<Object*>::iterator itr;
-	uint8 did_hit_result;
+
 	for( itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 	{
 		if(!((*itr)->IsUnit()) || !((Unit*)(*itr))->isAlive())
@@ -929,13 +881,7 @@ void Spell::SpellTargetInFrontOfCaster2(uint32 i, uint32 j)
 			if(m_caster->isInFront((Unit*)(*itr)))
 			{
 				if(isAttackable(u_caster, (Unit*)(*itr)))
-				{
-					did_hit_result = DidHit(i,((Unit*)*itr));
-					if(did_hit_result==SPELL_DID_HIT_SUCCESS)
-						SafeAddTarget(tmpMap,(*itr)->GetGUID());
-					else
-						SafeAddModeratedTarget((*itr)->GetGUID(), did_hit_result);
-				}	
+					_AddTarget(((Unit*)*itr), i);
 			}
 		}
 	}
@@ -947,8 +893,7 @@ void Spell::SpellTarget56(uint32 i, uint32 j)
 	if(!m_caster->IsInWorld())
 		return;
 
-	TargetsList *tmpMap=&m_targetUnits[i];
-	SafeAddTarget(tmpMap,m_caster->GetGUID());
+	_AddTargetForced(m_caster->GetGUID(), i);
 }
 
 /// Spell Target Handling for type 57: Targeted Party Member
@@ -957,20 +902,18 @@ void Spell::SpellTargetTargetPartyMember(uint32 i, uint32 j)
 	if(!m_caster->IsInWorld())
 		return;
 
-	TargetsList *tmpMap=&m_targetUnits[i];
 	Unit* Target = m_caster->GetMapMgr()->GetPlayer ((uint32)m_targets.m_unitTarget);
 	if(!Target)
 		return;
 
 	float r=GetMaxRange(dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex));
 	if(IsInrange(m_caster->GetPositionX(),m_caster->GetPositionY(),m_caster->GetPositionZ(),Target,r*r))
-		SafeAddTarget(tmpMap,m_targets.m_unitTarget);
+		_AddTargetForced(m_targets.m_unitTarget, i);
 }
 
 /// Spell Target Handling for type 61: targets with the same group/raid and the same class
 void Spell::SpellTargetSameGroupSameClass(uint32 i, uint32 j)
 {
-	TargetsList *tmpMap=&m_targetUnits[i];
 	if(!m_caster->IsInWorld())
 		return;
 
@@ -988,7 +931,8 @@ void Spell::SpellTargetSameGroupSameClass(uint32 i, uint32 j)
 		{
 			if(!(*itr)->m_loggedInPlayer || Target->getClass() != (*itr)->m_loggedInPlayer->getClass()) 
 				continue;
-			SafeAddTarget(tmpMap,(*itr)->m_loggedInPlayer->GetGUID());
+			
+			_AddTargetForced((*itr)->m_loggedInPlayer->GetGUID(), i);
 		}
 		Target->GetGroup()->Unlock();
 	}

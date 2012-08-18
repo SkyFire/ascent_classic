@@ -300,12 +300,6 @@ RevisionExtractor.exe
 				RelativePath="..\..\src\ascent-shared\Threading\Condition.h">
 			</File>
 			<File
-				RelativePath="..\..\src\ascent-shared\CThreads.cpp">
-			</File>
-			<File
-				RelativePath="..\..\src\ascent-shared\CThreads.h">
-			</File>
-			<File
 				RelativePath="..\..\src\ascent-shared\Threading\Guard.h">
 			</File>
 			<File

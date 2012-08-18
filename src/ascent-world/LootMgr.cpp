@@ -98,7 +98,8 @@ void LootMgr::LoadLoot()
 	//THIS MUST BE CALLED AFTER LOADING OF ITEMS
 	is_loading = true;
 	LoadLootProp();
-	LoadLootTables("creatureloot",&CreatureLoot);
+	printf("Loading loot...\n");
+	//LoadLootTables("creatureloot",&CreatureLoot);
 	LoadLootTables("objectloot",&GOLoot);
 	LoadLootTables("skinningloot",&SkinningLoot);
 	LoadLootTables("fishingloot",&FishingLoot);
@@ -106,6 +107,13 @@ void LootMgr::LoadLoot()
 	LoadLootTables("prospectingloot", &ProspectingLoot);
 	LoadLootTables("disenchantingloot", &DisenchantingLoot);
 	LoadLootTables("pickpocketingloot", &PickpocketingLoot);
+	is_loading = false;
+}
+
+void LootMgr::LoadCreatureLoot()
+{
+	is_loading = true;
+	LoadLootTables("creatureloot",&CreatureLoot);
 	is_loading = false;
 }
 
@@ -246,6 +254,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 	delete dbc;*/
 	//HM_NAMESPACE::hash_map<uint32, std::vector<loot_tb> > loot_db;
 	//HM_NAMESPACE::hash_map<uint32, std::vector<loot_tb> >::iterator itr;
+	printf("Attempting to load loot from table %s...\n", szTableName);
 	vector< pair< uint32, vector< tempy > > > db_cache;
 	vector< pair< uint32, vector< tempy > > >::iterator itr;
 	db_cache.reserve(10000);
@@ -349,7 +358,7 @@ void LootMgr::LoadLootTables(const char * szTableName,LootStore * LootTable)
 		}
 	}
 
-	//sLog.outString("  %d loot templates loaded from %s", db_cache.size(), szTableName);
+	printf("%d loot templates loaded from %s\n", db_cache.size(), szTableName);
  //   loot_db.clear();
 	delete result;
 }
@@ -650,12 +659,12 @@ void LootRoll::Finalize()
 	if( guidtype == HIGHGUID_TYPE_UNIT )
 	{
 		Creature * pc = _mgr->GetCreature(GET_LOWGUID_PART(_guid));
-		if(pc) pLoot = &pc->loot;
+		if(pc) pLoot = &pc->m_loot;
 	}
 	else if( guidtype == HIGHGUID_TYPE_GAMEOBJECT )
 	{
 		GameObject * go = _mgr->GetGameObject(GET_LOWGUID_PART(_guid));
-		if(go) pLoot = &go->loot;
+		if(go) pLoot = &go->m_loot;
 	}
 
 	if(!pLoot)
@@ -716,7 +725,7 @@ void LootRoll::Finalize()
 	ItemPrototype* it = ItemPrototypeStorage.LookupEntry(itemid);
 
 	int8 error;
-	if((error = _player->GetItemInterface()->CanReceiveItem(it, 1)))
+	if((error = _player->GetItemInterface()->CanReceiveItem(it, 1, NULL)))
 	{
 		_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, error);
 		return;
@@ -733,7 +742,7 @@ void LootRoll::Finalize()
 			return;
 		}
 
-		sLog.outDebug("AutoLootItem MISC");
+		DEBUG_LOG("AutoLootItem MISC");
 		Item *item = objmgr.CreateItem( itemid, _player);
 
 		item->SetUInt32Value(ITEM_FIELD_STACK_COUNT,amt);
@@ -843,3 +852,46 @@ int32 LootRoll::event_GetInstanceID()
 {
 	return _mgr->GetInstanceID();
 }
+
+void LootMgr::FillObjectLootMap(map<uint32, vector<uint32> > *dest)
+{
+	printf("Generating object loot map...\n");
+	QueryResult *result = WorldDatabase.Query("SELECT entryid, itemid FROM objectloot");
+	if( result != NULL )
+	{
+		do 
+		{
+			uint32 itemid = result->Fetch()[1].GetUInt32();
+			uint32 objid = result->Fetch()[0].GetUInt32();
+
+			map<uint32, vector<uint32> >::iterator vtr = dest->find(itemid);
+			if( vtr == dest->end() )
+			{
+				vector<uint32> tv;
+				tv.push_back(objid);
+				dest->insert(make_pair(itemid, tv));
+			}
+			else
+				vtr->second.push_back(objid);
+		} while (result->NextRow());
+		delete result;
+	}
+
+}
+
+bool Loot::HasItems()
+{
+	// check gold
+	if( gold > 0 )
+		return true;
+
+	// check items
+	for(vector<__LootItem>::iterator itr = items.begin(); itr != items.end(); ++itr)
+	{
+		if( itr->iItemsCount > 0 && itr->item.itemproto->Class != 12 )
+			return true;
+	}
+
+	return false;				
+}
+

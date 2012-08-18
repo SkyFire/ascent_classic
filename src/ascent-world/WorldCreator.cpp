@@ -36,6 +36,9 @@ InstanceMgr::InstanceMgr()
 void InstanceMgr::Load(TaskList * l)
 {
 	new FormationMgr;
+	new WorldStateTemplateManager;
+
+	sWorldStateTemplateManager.LoadFromDB();
 
 	// Create all non-instance type maps.
 	QueryResult *result = CharacterDatabase.Query( "SELECT MAX(id) FROM instances" );
@@ -97,7 +100,7 @@ void InstanceMgr::Load(TaskList * l)
 
 InstanceMgr::~InstanceMgr()
 {
-
+	delete WorldStateTemplateManager::getSingletonPtr();
 }
 
 void InstanceMgr::Shutdown()
@@ -237,7 +240,7 @@ uint32 InstanceMgr::PreTeleport(uint32 mapid, Player * plr, uint32 instanceid)
 	// if we're here, it means we need to create a new instance.
 	in = new Instance;
 	in->m_creation = UNIXTIME;
-	in->m_expiration = (inf->type == INSTANCE_NONRAID) ? 0 : UNIXTIME + inf->cooldown;		// expire time 0 is 10 minutes after last player leaves
+	in->m_expiration =UNIXTIME + inf->cooldown;		// expire time 0 is 10 minutes after last player leaves
 	in->m_creatorGuid = pGroup ? 0 : plr->GetLowGUID();		// creator guid is 0 if its owned by a group.
 	in->m_creatorGroup = pGroup ? pGroup->GetID() : 0;
 	in->m_difficulty = plr->iInstanceType;
@@ -437,7 +440,7 @@ void BuildStats(MapMgr * mgr, char * m_file, Instance * inst, MapInfo * inf)
 	snprintf(tmp, 200, "	<instance>\n");																												pushline;
 	snprintf(tmp, 200, "		<map>%u</map>\n", mgr->GetMapId());																						pushline;
 	snprintf(tmp, 200, "		<maptype>%u</maptype>\n", inf->type);																						pushline;
-	snprintf(tmp, 200, "		<players>%u</players>\n", mgr->GetPlayerCount());																			pushline;
+	snprintf(tmp, 200, "		<players>%u</players>\n", (unsigned int)mgr->GetPlayerCount());																			pushline;
 	snprintf(tmp, 200, "		<maxplayers>%u</maxplayers>\n", inf->playerlimit);																		pushline;
 
 	//<creationtime>
@@ -583,8 +586,9 @@ void Instance::LoadFromDB(Field * fields)
 	{
 		*p = 0;
 		uint32 val = atol(q);
-		if (val)
-			m_killedNpcs.insert( val );
+		if( val != 0 )
+			m_killedNpcs.insert(val);
+
 		q = p+1;
 		p = strchr(q, ' ');
 	}
@@ -594,7 +598,7 @@ void Instance::LoadFromDB(Field * fields)
 
 void InstanceMgr::ResetSavedInstances(Player * plr)
 {
-	WorldPacket data(SMSG_RESET_INSTANCE, 4);
+	WorldPacket data(SMSG_INSTANCE_RESET, 4);
 	Instance * in;
 	InstanceMap::iterator itr;
 	InstanceMap * instancemap;
@@ -769,11 +773,11 @@ void InstanceMgr::BuildSavedInstancesForPlayer(Player * plr)
 					{
 						m_mapLock.Release();
 
-						data.SetOpcode(SMSG_INSTANCE_SAVE);
+						data.SetOpcode(SMSG_UPDATE_LAST_INSTANCE);
 						data << uint32(in->m_mapId);
 						plr->GetSession()->SendPacket(&data);
 
-						data.Initialize(SMSG_INSTANCE_RESET_ACTIVATE);
+						data.Initialize(SMSG_UPDATE_INSTANCE_OWNERSHIP);
 						data << uint32(0x01);
 						plr->GetSession()->SendPacket(&data);
 					
@@ -785,7 +789,7 @@ void InstanceMgr::BuildSavedInstancesForPlayer(Player * plr)
 		m_mapLock.Release();
 	}
 
-	data.SetOpcode(SMSG_INSTANCE_RESET_ACTIVATE);
+	data.SetOpcode(SMSG_UPDATE_INSTANCE_OWNERSHIP);
 	data << uint32(0x00);
 	plr->GetSession()->SendPacket(&data);
 }
@@ -811,7 +815,7 @@ void InstanceMgr::BuildRaidSavedInstancesForPlayer(Player * plr)
 				in = itr->second;
 				++itr;
 
-				if( in->m_mapInfo->type != INSTANCE_NONRAID && PlayerOwnsInstance(in, plr) )
+				if( /*in->m_mapInfo->type != INSTANCE_NONRAID && */PlayerOwnsInstance(in, plr) )
 				{
 					data << in->m_mapId;
 					data << uint32(in->m_expiration - UNIXTIME);
@@ -823,18 +827,14 @@ void InstanceMgr::BuildRaidSavedInstancesForPlayer(Player * plr)
 	}
 	m_mapLock.Release();
 
-#ifdef USING_BIG_ENDIAN
-	*(uint32*)&data.contents()[0] = swap32(counter);
-#else
 	*(uint32*)&data.contents()[0] = counter;
-#endif
 	plr->GetSession()->SendPacket(&data);
 }
 
 void Instance::SaveToDB()
 {
 	// don't save non-raid instances.
-	if(m_mapInfo->type == INSTANCE_NONRAID || m_isBattleground)
+	if(m_isBattleground)
 		return;
 
 	std::stringstream ss;

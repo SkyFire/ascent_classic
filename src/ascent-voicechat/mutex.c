@@ -19,11 +19,13 @@
 
 #include "common.h"
 #include "mutex.h"
-
+#ifdef __DragonFly__                                                                                
+#include <pthread.h>                                                                                
+#endif           
 #ifndef WIN32
 
 /* this is done slightly differently on bsd-variants */
-#if defined(__FreeBSD__) ||  defined(__APPLE_CC__) || defined(__OpenBSD__)
+#if defined(__FreeBSD__) ||  defined(__APPLE_CC__) || defined(__OpenBSD__) || defined(__DragonFly__)
 #define recursive_mutex_flag PTHREAD_MUTEX_RECURSIVE
 #else
 #define recursive_mutex_flag PTHREAD_MUTEX_RECURSIVE_NP

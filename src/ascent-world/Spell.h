@@ -174,9 +174,6 @@ static void SM_PFValue( int32* m, float* v, uint64 group )
             (*v) += ( (*v) * m[x] ) / 100.0f;
 }
 
-//bool IsBeneficSpell(SpellEntry *sp);
-//AI_SpellTargetType RecommandAISpellTargetType(SpellEntry *sp);
-
 enum SPELL_DMG_TYPE // SPELL_ENTRY_Spell_Dmg_Type
 {
 	SPELL_DMG_TYPE_NONE   = 0,
@@ -222,89 +219,49 @@ enum SpellCastTargetFlags
     TARGET_FLAG_UNK9                = 0x4000,
     TARGET_FLAG_CORPSE2             = 0x8000
 };
-#ifndef NEW_PROCFLAGS 
+
 enum procFlags
 {
-	PROC_NULL							= 0x0,
-	PROC_ON_ANY_HOSTILE_ACTION			= 0x1,
-	PROC_ON_GAIN_EXPIERIENCE			= 0x2,
-	PROC_ON_MELEE_ATTACK				= 0x4,
-	PROC_ON_CRIT_HIT_VICTIM				= 0x8,
-	PROC_ON_CAST_SPELL					= 0x10,
-	PROC_ON_PHYSICAL_ATTACK_VICTIM		= 0x20,
-	PROC_ON_RANGED_ATTACK				= 0x40,
-	PROC_ON_RANGED_CRIT_ATTACK			= 0x80,
-	PROC_ON_PHYSICAL_ATTACK				= 0x100,
-	PROC_ON_MELEE_ATTACK_VICTIM			= 0x200,
-	PROC_ON_SPELL_HIT					= 0x400,
-	PROC_ON_RANGED_CRIT_ATTACK_VICTIM	= 0x800,
-	PROC_ON_CRIT_ATTACK					= 0x1000,
-	PROC_ON_RANGED_ATTACK_VICTIM		= 0x2000,
-	PROC_ON_PRE_DISPELL_AURA_VICTIM		= 0x4000,
-	PROC_ON_SPELL_LAND_VICTIM			= 0x8000,
-	PROC_ON_CAST_SPECIFIC_SPELL			= 0x10000,
-	PROC_ON_SPELL_HIT_VICTIM			= 0x20000,
-	PROC_ON_SPELL_CRIT_HIT_VICTIM		= 0x40000,
-	PROC_ON_TARGET_DIE					= 0x80000,
-	PROC_ON_ANY_DAMAGE_VICTIM			= 0x100000,
-	PROC_ON_TRAP_TRIGGER				= 0x200000, //triggers on trap activation)
-	PROC_ON_AUTO_SHOT_HIT				= 0x400000,
-	PROC_ON_ABSORB						= 0x800000,
-	PROC_ON_RESIST_VICTIM				= 0x1000000,
-	PROC_ON_DODGE_VICTIM				= 0x2000000,
-	PROC_ON_DIE							= 0x4000000,
-	PROC_REMOVEONUSE					= 0x8000000,//remove prochcharge only when it is used
-	PROC_MISC							= 0x10000000,//our custom flag to decide if proc dmg or shield
-	PROC_ON_BLOCK_VICTIM				= 0x20000000,
-	PROC_ON_SPELL_CRIT_HIT				= 0x40000000,
-	PROC_TARGET_SELF					= 0x80000000,//our custom flag to decide if proc target is self or victim
+    PROC_NULL                       = 0x0,
+    PROC_ON_ANY_HOSTILE_ACTION      = 0x1,
+    PROC_ON_GAIN_EXPIERIENCE        = 0x2,
+    PROC_ON_MELEE_ATTACK            = 0x4,
+    PROC_ON_CRIT_HIT_VICTIM         = 0x8,
+    PROC_ON_CAST_SPELL              = 0x10,
+    PROC_ON_PHYSICAL_ATTACK_VICTIM  = 0x20,
+    PROC_ON_RANGED_ATTACK           = 0x40,
+    PROC_ON_RANGED_CRIT_ATTACK      = 0x80,
+//    PROC_ON_UNK_DAMAGE_VICTIM       = 0x80,//seems to be on ranged dmg victim 99% sure('each melee or ranged attack' -> flag =680 (dec))
+    PROC_ON_PHYSICAL_ATTACK         = 0x100,
+    PROC_ON_MELEE_ATTACK_VICTIM     = 0x200,
+//    PROC_ON_ANY_ACTION              = 0x400,
+    PROC_ON_SPELL_LAND              = 0x400,
+//    PROC_UNK_DEFILLED               = 0x800,
+    PROC_ON_RANGED_CRIT_ATTACK_VICTIM = 0x800,
+    PROC_ON_CRIT_ATTACK             = 0x1000,
+    PROC_ON_RANGED_ATTACK_VICTIM    = 0x2000,
+//    PROC_ANYTIME                    = 0x4000,
+    PROC_ON_PRE_DISPELL_AURA_VICTIM = 0x4000,
+//    PROC_UNK2_DEFILLED              = 0x8000,
+	PROC_ON_SPELL_LAND_VICTIM       = 0x8000,//custom flag. PROC only when spell landed on victim
+    PROC_ON_CAST_SPECIFIC_SPELL     = 0x10000,
+    PROC_ON_SPELL_HIT_VICTIM        = 0x20000,
+    PROC_ON_SPELL_CRIT_HIT_VICTIM   = 0x40000,
+//    PROC_ON_UNK2_DAMAGE_VICTIM      = 0x80000,
+    PROC_ON_TARGET_DIE		        = 0x80000,
+    PROC_ON_ANY_DAMAGE_VICTIM       = 0x100000,
+	PROC_ON_TRAP_TRIGGER            = 0x200000, //triggers on trap activation)
+    PROC_ON_AUTO_SHOT_HIT           = 0x400000,
+    PROC_ON_ABSORB                  = 0x800000,
+    PROC_ON_RESIST_VICTIM           = 0x1000000,//added it as custom, maybe already exists in another form ?
+    PROC_ON_DODGE_VICTIM            = 0x2000000,//added it as custom, maybe already exists in another form ?
+    PROC_ON_DIE                     = 0x4000000,//added it as custom, maybe already exists in another form ?
+    PROC_REMOVEONUSE                = 0x8000000,//remove prochcharge only when it is used
+    PROC_MISC                       = 0x10000000,//our custom flag to decide if proc dmg or shield
+    PROC_ON_BLOCK_VICTIM            = 0x20000000,//added it as custom, maybe already exists in another form ?
+    PROC_ON_SPELL_CRIT_HIT          = 0x40000000,//added it as custom, maybe already exists in another form ?
+    PROC_TARGET_SELF               = 0x80000000,//our custom flag to decide if proc target is self or victim
 };
-#else
-//REMEMBER: Wands r not ranged based weapons. So it shouldn't be any ranged proc when u hit with wands!
-enum procFlags
-{
-	PROC_NULL                          = 0x0,
-	PROC_ON_NPC_ACTION                 = 0x1, //on GO action too btw. related to quests in general.
-	PROC_ON_XP_GAIN                    = 0x2, //on honor gain too btw.
-	PROC_ON_MELEE_HIT                  = 0x4, //on successful white melee attack
-	PROC_ON_MELEE_HIT_VICTIM           = 0x8, //on successful white melee attack victim
-	PROC_ON_MELEE_ABILITY_LAND         = 0x10, //on successful melee ability attack. Abilities that was resisted/dodged etc doesn't proc with this flag
-	PROC_ON_MELEE_ABILITY_LAND_VICTIM  = 0x20, //on successful melee ability victim but not white damage. Abilities that was resisted/dodged etc doesn't proc with this flag
-	PROC_ON_RANGED_HIT                 = 0x40,  //on successful ranged white attack
-	PROC_ON_RANGED_HIT_VICTIM          = 0x80,  //on successful ranged white attack victim
-	PROC_ON_RANGED_ABILITY_LAND        = 0x100, //on successful ranged ability attack. Abilities that was resisted/dodged etc doesn't proc with this flag
-	PROC_ON_RANGED_ABILITY_LAND_VICTIM = 0x200,  //on successful ranged ability victim but not white damage. Abilities that was resisted/dodged etc doesn't proc with this flag
-	PROC_ON_CAST_SPELL                 = 0x400, //on nonability (spell) cast. Spells that was resisted don't proc with this flag
-	PROC_ON_CAST_SPELL_VICTIM          = 0x800,  //on nonability (spell) cast victim. Spells that was resisted don't proc with this flag.
-	PROC_ON_ANY_DAMAGE                 = 0x1000, // mb wrong
-	PROC_ON_ANY_DAMAGE_VICTIM          = 0x2000, // mb wrong
-	PROC_ON_HEALSPELL_LAND             = 0x4000, //on heal (direct or HoT) spell land.
-	PROC_ON_HEALSPELL_LAND_VICTIM      = 0x8000,  //on heal (direct or HoT) spell land victim.
-	PROC_ON_HARMFULSPELL_LAND          = 0x10000, //on harmfull spell land (DoT damage not included in this flag!)
-	PROC_ON_HARMFULSPELL_LAND_VICTIM   = 0x20000, //on harmfull spell land victim (DoT damage not included in this flag!)
-	PROC_ON_DOT_DAMAGE                 = 0x40000, //on harmfull non direct damage (DoTs)
-	PROC_ON_DOT_DAMAGE_VICTIM          = 0x80000,  //on harmfull non direct damage (DoTs) victim
-	PROC_REMOVEONUSE                   = 0x100000, //something supercustom. 99% wrong :P used by bombs and grenades in general.
-	PROC_ON_TRAP_TRIGGER               = 0x200000,
-	PROC_UNUSED1                       = 0x400000,
-	PROC_ON_OFFHAND_HIT                = 0x800000, //only 1 spellname "Combat Potency"
-	PROC_ON_UNK1                       = 0x1000000,//only 1 spellname "Captured Totem"
-};
-enum customProcFlags
-{
-	CUSTOMPROC_NULL                       = 0x0;
-	CUSTOMPROC_ON_CRIT                    = 0x1; //doesn't matter victim or not. 
-	CUSTOMPROC_ON_MISS_VICTIM             = 0x2;
-	CUSTOMPROC_ON_DODGE_VICTIM            = 0x4;
-	CUSTOMPROC_ON_BLOCK_VICTIM            = 0x8;
-	CUSTOMPROC_ON_PARRY_VICTIM            = 0x10;
-	CUSTOMPROC_ON_RESIST_VICTIM           = 0x20;
-	CUSTOMPROC_ON_DIE                     = 0x40;//proc on our death
-	CUSTOMPROC_ON_FINISHMOVE              = 0x80; //procs when we use finish move ability
-	CUSTOMPROC_ON_ADDCOMBO                = 0x100; //procs when we use ability with +combo point
-	CUSTOMPROC_PROC_ON_SELF               = 0x200; //proc on self
-};
-#endif
 
 enum CastInterruptFlags
 {
@@ -405,14 +362,14 @@ enum Attributes
 
 enum AttributesEx
 {
-	ATTRIBUTESEX_NULL                         = 0x0, // 0
-	ATTRIBUTESEX_UNK2                         = 0x1, // 1, pet summonings
-	ATTRIBUTESEX_DRAIN_WHOLE_MANA             = 0x2, // 2
-	ATTRIBUTESEX_UNK4                         = 0x4, // 3
-	ATTRIBUTESEX_UNK5                         = 0x8, // 4
-	ATTRIBUTESEX_UNK6                         = 0x10, // 5, stealth effects but Rockbiter wtf 0_0
-	ATTRIBUTESEX_NOT_BREAK_STEALTH            = 0x20, // 6
-	ATTRIBUTESEX_UNK8							= 0x40, // 7 [POSSIBLY: dynamite, grenades from engineering etc..]
+	ATTRIBUTESEX_NULL                         = 0x0,
+	ATTRIBUTESEX_UNK2                         = 0x1, // pet summonings
+	ATTRIBUTESEX_DRAIN_WHOLE_MANA             = 0x2,
+	ATTRIBUTESEX_UNK4                         = 0x4,
+	ATTRIBUTESEX_UNK5                         = 0x8,
+	ATTRIBUTESEX_UNK6                         = 0x10, // stealth effects but Rockbiter wtf 0_0
+	ATTRIBUTESEX_NOT_BREAK_STEALTH            = 0x20,
+	ATTRIBUTESEX_UNK8                         = 0x40,
 	ATTRIBUTESEX_UNK9                         = 0x80,
 	ATTRIBUTESEX_UNK10                        = 0x100,
 	ATTRIBUTESEX_UNK11                        = 0x200,
@@ -1033,8 +990,12 @@ enum SpellIsFlags
     SPELL_FLAG_IS_CASTED_ON_PET_SUMMON_PET_OWNER	= 0x00000200, //we should cast these on owner too
     SPELL_FLAG_IS_EXPIREING_WITH_PET	= 0x00000400, //when pet dies, we remove this too
     SPELL_FLAG_IS_EXPIREING_ON_PET		= 0x00000800, //when pet is summoned
-	SPELL_FLAG_IS_FORCEDDEBUFF			= 0x00001000, // forced to be a debuff
-	SPELL_FLAG_IS_FORCEDBUFF			= 0x00002000, // forced to be a buff
+	SPELL_FLAG_IS_DISPEL_SPELL			= 0x00001000,
+	SPELL_FLAG_CAN_BE_REFLECTED			= 0x00002000,
+	SPELL_FLAG_IS_HEALING_SPELL			= 0x00004000,
+	SPELL_FLAG_IS_HEALING_MANA_SPELL	= 0x00008000,
+	SPELL_FLAG_CANNOT_PROC_ON_SELF		= 0x00010000,
+	SPELL_FLAG_IS_FLYING				= 0x00020000,
 };
 
 enum SpellCoefficientsFlags
@@ -1256,18 +1217,19 @@ class SpellCastTargets
 public:
     void read ( WorldPacket & data,uint64 caster );
     void write ( WorldPacket & data);
+	void write ( StackPacket & data);
 
-    SpellCastTargets() : m_targetMask(0), m_targetMaskExtended(0), m_unitTarget(0), m_itemTarget(0), m_srcX(0), m_srcY(0), m_srcZ(0),
+    SpellCastTargets() : m_targetMask(0), m_unitTarget(0), m_itemTarget(0), m_srcX(0), m_srcY(0), m_srcZ(0),
         m_destX(0), m_destY(0), m_destZ(0) {}
 
     SpellCastTargets(uint16 TargetMask, uint64 unitTarget, uint64 itemTarget, float srcX, float srcY,
-        float srcZ, float destX, float destY, float destZ) : m_targetMask(TargetMask), m_targetMaskExtended(0), m_unitTarget(unitTarget),
+        float srcZ, float destX, float destY, float destZ) : m_targetMask(TargetMask), m_unitTarget(unitTarget),
         m_itemTarget(itemTarget), m_srcX(srcX), m_srcY(srcY), m_srcZ(srcZ), m_destX(destX), m_destY(destY), m_destZ(destZ) {}
 
-    SpellCastTargets(uint64 unitTarget) : m_targetMask(0x2), m_targetMaskExtended(0), m_unitTarget(unitTarget), m_itemTarget(0),
+    SpellCastTargets(uint64 unitTarget) : m_targetMask(0x2), m_unitTarget(unitTarget), m_itemTarget(0),
         m_srcX(0), m_srcY(0), m_srcZ(0), m_destX(0), m_destY(0), m_destZ(0) {}
 
-    SpellCastTargets(WorldPacket & data, uint64 caster) : m_targetMask(0), m_targetMaskExtended(0), m_unitTarget(0), m_itemTarget(0), m_srcX(0), m_srcY(0), m_srcZ(0),
+    SpellCastTargets(WorldPacket & data, uint64 caster) : m_targetMask(0), m_unitTarget(0), m_itemTarget(0), m_srcX(0), m_srcY(0), m_srcZ(0),
         m_destX(0), m_destY(0), m_destZ(0)
     {
         read(data, caster);
@@ -1289,13 +1251,10 @@ public:
         m_strTarget = target.m_strTarget;
 
         m_targetMask = target.m_targetMask;
-	m_targetMaskExtended = target.m_targetMaskExtended;
-
         return *this;
     }
 
-    uint16 m_targetMask;
-    uint16 m_targetMaskExtended;			// this could be a 32 also
+    uint32 m_targetMask;
     uint64 m_unitTarget;
     uint64 m_itemTarget;
     float m_srcX, m_srcY, m_srcZ;
@@ -1379,25 +1338,22 @@ enum MECHANICS
     MECHANIC_SILENCED, // 9
     MECHANIC_ASLEEP, // 10
     MECHANIC_ENSNARED, // 11
-    MECHANIC_STUNNED, // 12
-    MECHANIC_FROZEN, // 13
-    MECHANIC_INCAPACIPATED, // 14
-    MECHANIC_BLEEDING, // 15
-    MECHANIC_HEALING, // 16
-    MECHANIC_POLYMORPHED, // 17
-    MECHANIC_BANISHED, // 18
-    MECHANIC_SHIELDED, // 19
-    MECHANIC_SHACKLED, // 20
-    MECHANIC_MOUNTED, // 21
-    MECHANIC_SEDUCED, // 22
-    MECHANIC_TURNED, // 23
-    MECHANIC_HORRIFIED, // 24
-    MECHANIC_INVULNARABLE, // 25
-    MECHANIC_INTERRUPTED, // 26
-    MECHANIC_DAZED, // 27
-	MECHANIC_UNK1, // 28, fill in please
-	MECHANIC_UNK2, // 29, fill in please
-	MECHANIC_SAPPED // 30
+    MECHANIC_STUNNED,
+    MECHANIC_FROZEN,
+    MECHANIC_INCAPACIPATED,
+    MECHANIC_BLEEDING,
+    MECHANIC_HEALING,
+    MECHANIC_POLYMORPHED,
+    MECHANIC_BANISHED,
+    MECHANIC_SHIELDED,
+    MECHANIC_SHACKLED,
+    MECHANIC_MOUNTED,
+    MECHANIC_SEDUCED,
+    MECHANIC_TURNED,
+    MECHANIC_HORRIFIED,
+    MECHANIC_INVULNARABLE,
+    MECHANIC_INTERRUPTED,
+    MECHANIC_DAZED
 };
 
 typedef enum {
@@ -1464,53 +1420,66 @@ typedef enum {
    EFF_TARGET_SELECTED_ENEMY_DEADLY_POISON				= 86,
 } SpellEffectTarget;
 
+ASCENT_INLINE bool IsFlyingSpell(SpellEntry *sp)
+{
+	if( sp->EffectApplyAuraName[0] == 206 || 
+		sp->EffectApplyAuraName[1] == 206 || 
+		sp->EffectApplyAuraName[1] == 206 || 
+
+		sp->EffectApplyAuraName[0] == 207 || 
+		sp->EffectApplyAuraName[1] == 207 || 
+		sp->EffectApplyAuraName[1] == 207 || 
+
+		sp->EffectApplyAuraName[0] == 208 || 
+		sp->EffectApplyAuraName[1] == 208 || 
+		sp->EffectApplyAuraName[1] == 208 || 
+
+		sp->NameHash == SPELL_HASH_SWIFT_FLIGHT_FORM ||
+		sp->NameHash == SPELL_HASH_FLIGHT_FORM )
+	{
+		return true;
+	}
+
+	return false;
+}
 
 ASCENT_INLINE bool IsTargetingStealthed(SpellEntry *sp)
 {
 	if(
-		sp->EffectImplicitTargetA[0]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
-		sp->EffectImplicitTargetA[1]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
-		sp->EffectImplicitTargetA[2]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
-		sp->EffectImplicitTargetB[0]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
-		sp->EffectImplicitTargetB[1]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
-		sp->EffectImplicitTargetB[2]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
-		sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
-		sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
-		sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
-		sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
-		sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
-		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
-		sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
-		sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
-		sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
-		sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
-		sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
-		sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED
-		)
-		return 1;
+			sp->EffectImplicitTargetA[0]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+			sp->EffectImplicitTargetA[1]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+			sp->EffectImplicitTargetA[2]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+			sp->EffectImplicitTargetB[0]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+			sp->EffectImplicitTargetB[1]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
+			sp->EffectImplicitTargetB[2]==EFF_TARGET_INVISIBLE_OR_HIDDEN_ENEMIES_AT_LOCATION_RADIUS ||
 
-	if(
-		sp->NameHash == SPELL_HASH_MAGMA_TOTEM
-		)
-		return 1;
+			sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+			sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+			sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+			sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+			sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
+			sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMIES_AROUND_CASTER ||
 
-	return 0;
+			sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+			sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+			sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+			sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+			sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+			sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_CHANNELED ||
+
+			sp->EffectImplicitTargetA[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
+			sp->EffectImplicitTargetA[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
+			sp->EffectImplicitTargetA[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
+			sp->EffectImplicitTargetB[0]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
+			sp->EffectImplicitTargetB[1]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
+			sp->EffectImplicitTargetB[2]==EFF_TARGET_ALL_ENEMY_IN_AREA_INSTANT
+		)
+	{
+		return true;
+	}
+
+	return false;
 }
-
-// slow
-struct SpellTargetMod
-{
-    SpellTargetMod(uint64 _TargetGuid, uint8 _TargetModType) : TargetGuid(_TargetGuid), TargetModType(_TargetModType)
-    {
-
-    }
-    uint64 TargetGuid;
-    uint8  TargetModType;
-};
-
-
-typedef std::vector<uint64> TargetsList;
-typedef std::vector<SpellTargetMod> SpellTargetsList;
 
 typedef void(Spell::*pSpellEffect)(uint32 i);
 typedef void(Spell::*pSpellTarget)(uint32 i, uint32 j);
@@ -1533,10 +1502,14 @@ enum SpellDidHitResult
 	SPELL_DID_HIT_MISS						= 1,
 	SPELL_DID_HIT_RESIST					= 2,
 	SPELL_DID_HIT_DODGE						= 3,
-	SPELL_DID_HIT_DEFLECT					= 4,
+	SPELL_DID_HIT_PARRY						= 4,
 	SPELL_DID_HIT_BLOCK						= 5,
 	SPELL_DID_HIT_EVADE						= 6,
 	SPELL_DID_HIT_IMMUNE					= 7,
+	SPELL_DID_HIT_IMMUNE_2					= 8,
+	SPELL_DID_HIT_DEFLECT					= 9,
+	SPELL_DID_HIT_ABSORB					= 10,
+	SPELL_DID_HIT_REFLECT					= 11,
 };
 
 // Spell instance
@@ -1567,8 +1540,6 @@ public:
     void GenerateTargets(SpellCastTargets *store_buff);
     // Fills the target map of the spell packet
     void FillTargetMap(uint32);
-    // See if we hit the target or can it resist (evade/immune/resist on spellgo) (0=success)
-    uint8 DidHit(uint32 effindex,Unit* target);
     // Prepares the spell thats going to cast to targets
     uint8 prepare(SpellCastTargets * targets);
     // Cancels the current spell
@@ -1580,7 +1551,7 @@ public:
     // Finishes the casted spell
     void finish();
     // Handle the Effects of the Spell
-    void HandleEffects(uint64 guid,uint32 i);
+    void HandleEffects(uint32 i);
     // Take Power from the caster based on spell power usage
     bool TakePower();
     // Has power?
@@ -1607,6 +1578,7 @@ public:
 
     ASCENT_INLINE uint32 getState() { return m_spellState; }
     ASCENT_INLINE void SetUnitTarget(Unit *punit){unitTarget=punit;}
+	ASCENT_INLINE SpellEntry *GetSpellProto() { return m_spellInfo; }
 
     // Send Packet functions
     void SendCastResult(uint8 result);
@@ -1617,13 +1589,12 @@ public:
     void SendChannelUpdate(uint32 time);
     void SendChannelStart(uint32 duration);
     void SendResurrectRequest(Player* target);
-    void SendHealSpellOnPlayer(Object* caster, Object* target, uint32 dmg,bool critical);
-    void SendHealManaSpellOnPlayer(Object * caster, Object * target, uint32 dmg, uint32 powertype);
+    static void SendHealSpellOnPlayer(Object* caster, Object* target, uint32 dmg,bool critical, uint32 spellid);
+    static void SendHealManaSpellOnPlayer(Object * caster, Object * target, uint32 dmg, uint32 powertype, uint32 spellid);
     
 
     void HandleAddAura(uint64 guid);
     void writeSpellGoTargets( WorldPacket * data );
-    void writeSpellMissedTargets( WorldPacket * data );
 
     SpellEntry* m_spellInfo;
     uint32 pSpellId;
@@ -1772,7 +1743,7 @@ public:
     void SpellTargetTargetPartyMember(uint32 i, uint32 j);
     void SpellTargetSameGroupSameClass(uint32 i, uint32 j);
 
-    void Heal(int32 amount, bool ForceCrit = false);
+    void Heal(int32 amount);
 
     GameObject*		g_caster;
     Unit*			u_caster;
@@ -1785,10 +1756,6 @@ public:
 	// This returns SPELL_ENTRY_Spell_Dmg_Type where 0 = SPELL_DMG_TYPE_NONE, 1 = SPELL_DMG_TYPE_MAGIC, 2 = SPELL_DMG_TYPE_MELEE, 3 = SPELL_DMG_TYPE_RANGED
 	// It should NOT be used for weapon_damage_type which needs: 0 = MELEE, 1 = OFFHAND, 2 = RANGED
 	ASCENT_INLINE uint32 GetType() { return ( m_spellInfo->Spell_Dmg_Type == SPELL_DMG_TYPE_NONE ? SPELL_DMG_TYPE_MAGIC : m_spellInfo->Spell_Dmg_Type ); }
-
-    std::vector<uint64> UniqueTargets;
-    SpellTargetsList    ModeratedTargets;
-
     ASCENT_INLINE Item* GetItemTarget() { return itemTarget; }
     ASCENT_INLINE Unit* GetUnitTarget() { return unitTarget; }
     ASCENT_INLINE Player* GetPlayerTarget() { return playerTarget; }
@@ -1848,14 +1815,6 @@ public:
                 {
                     SM_FIValue(u_caster->SM_FDur,(int32*)&this->Dur,m_spellInfo->SpellGroupType);
                     SM_PIValue(u_caster->SM_PDur,(int32*)&this->Dur,m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-					int spell_flat_modifers=0;
-					int spell_pct_modifers=0;
-					SM_FIValue(u_caster->SM_FDur,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-					SM_FIValue(u_caster->SM_PDur,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-					if(spell_flat_modifers!=0 || spell_pct_modifers!=0)
-						printf("!!!!!spell duration mod flat %d , spell duration mod pct %d , spell duration %d, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Dur,m_spellInfo->SpellGroupType);
-#endif
                 }
             }
             else
@@ -1880,14 +1839,6 @@ public:
         {
             SM_FFValue(u_caster->SM_FRadius,&Rad[i],m_spellInfo->SpellGroupType);
             SM_PFValue(u_caster->SM_PRadius,&Rad[i],m_spellInfo->SpellGroupType);
-#ifdef COLLECTION_OF_UNTESTED_STUFF_AND_TESTERS
-			float spell_flat_modifers=0;
-			float spell_pct_modifers=1;
-			SM_FFValue(u_caster->SM_FRadius,&spell_flat_modifers,m_spellInfo->SpellGroupType);
-			SM_PFValue(u_caster->SM_PRadius,&spell_pct_modifers,m_spellInfo->SpellGroupType);
-			if(spell_flat_modifers!=0 || spell_pct_modifers!=1)
-				printf("!!!!!spell radius mod flat %f , spell radius mod pct %f , spell radius %f, spell group %u\n",spell_flat_modifers,spell_pct_modifers,Rad[i],m_spellInfo->SpellGroupType);
-#endif
         }
 
         return Rad[i];
@@ -1927,9 +1878,6 @@ public:
     bool judgement;
 	uint8 extra_cast_number;
 
-    void SendCastSuccess(Object * target);
-    void SendCastSuccess(const uint64& guid);
-
     bool duelSpell;
 
 	ASCENT_INLINE void safe_cancel()
@@ -1942,14 +1890,6 @@ public:
     ASCENT_INLINE bool GetSpellFailed(){return m_Spell_Failed;}
     ASCENT_INLINE void SetSpellFailed(bool failed = true){m_Spell_Failed = failed;}
 
-    ASCENT_INLINE bool IsReflected() {return m_IsReflected;}
-    ASCENT_INLINE void SetReflected(bool reflected = true) {m_IsReflected = reflected;}
-    
-    /// Spell possibility's
-    ASCENT_INLINE bool GetCanReflect() {return m_CanRelect;}
-    ASCENT_INLINE void SetCanReflect(bool reflect = true) {m_CanRelect = reflect;}
-
-
 	Spell * m_reflectedParent;
 
 protected:
@@ -1957,24 +1897,12 @@ protected:
     /// Spell state's
     bool    m_usesMana;
     bool    m_Spell_Failed;        //for 5sr
-    bool    m_IsReflected;
     bool    m_Delayed;
-    
-    
-    // Spell possibility's
-    bool m_CanRelect;
-    
-    bool m_IsCastedOnSelf;
-
-    bool hadEffect;
-
     uint32  m_spellState;
     int32   m_castTime;
     int32   m_timer;
     
-    
-
-    // Current Targets to be used in effect handler
+	// Current Targets to be used in effect handler
     Unit*       unitTarget;
     Item*       itemTarget;
     GameObject* gameObjTarget;
@@ -1989,31 +1917,44 @@ protected:
     bool        bRadSet[3];
 	bool        m_cancelled;
 	bool m_isCasting;
+	bool m_projectileWait;
     //void _DamageRangeUpdate();
 
-	ASCENT_INLINE bool HasTarget(const uint64& guid, TargetsList* tmpMap)
-	{
-		for(TargetsList::iterator itr = tmpMap->begin(); itr != tmpMap->end(); ++itr)
-			if((*itr)==guid)
-				return true;
-
-		for(SpellTargetsList::iterator itr = ModeratedTargets.begin(); itr != ModeratedTargets.end(); ++itr)
-			if((*itr).TargetGuid==guid)
-				return true;
-
-		return false;
-	}
-
 private:
-    TargetsList m_targetUnits[3];
-    void SafeAddTarget(TargetsList* tgt,uint64 guid);
-    
-    void SafeAddMissedTarget(uint64 guid);
-    void SafeAddModeratedTarget(uint64 guid, uint16 type);
+	struct SpellTarget
+	{
+		uint64 Guid;
+		uint8 HitResult;
+		uint8 EffectMask;
+	};
+
+	typedef vector<SpellTarget> SpellTargetList;
+	SpellTargetList m_targetList;
+
+	// adds a target to the list, performing DidHit checks
+	void _AddTarget(const Unit *target, const uint32 effectid);
+
+	// adds a target to the list, negating DidHit checks
+	void _AddTargetForced(const uint64& guid, const uint32 effectid);
+
+	// didhit checker
+	uint8 _DidHit(const Unit *target);
+
+	// gets the pointer of an object (optimized for spell system)
+	Object* _LookupObject(const uint64& guid);
+
+	// sets the pointers (unitTarget, itemTarget, etc) for a given guid
+	void _SetTargets(const uint64& guid);
 
     friend class DynamicObject;
     void DetermineSkillUp(uint32 skillid,uint32 targetlevel);
     void DetermineSkillUp(uint32 skillid);
+
+	uint32 m_hitTargetCount;
+	uint32 m_missTargetCount;
+	
+	// magnet
+	Unit * m_magnetTarget;
 };
 
 void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * spell);

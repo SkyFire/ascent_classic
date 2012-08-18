@@ -21,208 +21,173 @@
 
 #ifdef COLLISION
 
+#pragma comment(lib, "collision.lib")
 #define MAX_MAP 600
 
-CCollideInterface CollideInterface;
+struct CollisionMap
+{
+	uint32 m_loadCount;
+	uint32 m_tileLoadCount[64][64];
+	RWLock m_lock;
+};
+
+SERVER_DECL CCollideInterface CollideInterface;
 IVMapManager * CollisionMgr;
-Mutex m_loadLock;
-uint32 m_tilesLoaded[MAX_MAP][64][64];
-
-#ifdef WIN32
-#ifdef COLLISION_DEBUG
-
-uint64 c_GetTimerValue()
-{
-	LARGE_INTEGER li;
-	QueryPerformanceCounter( &li );
-	return li.QuadPart;
-}
-
-uint32 c_GetNanoSeconds(uint64 t1, uint64 t2)
-{
-	LARGE_INTEGER li;
-	double val;
-	QueryPerformanceFrequency( &li );
-	val = double( t1 - t2 ) * 1000000;
-	val /= li.QuadPart;
-    return long2int32( val );	
-}
-
-#define COLLISION_BEGINTIMER uint64 v1 = c_GetTimerValue();
-
-#endif	// COLLISION_DEBUG
-#endif	// WIN32
-
-#ifdef WIN32
-#pragma comment(lib, "collision.lib")
-#endif
-
-// Debug functions
-#ifdef COLLISION_DEBUG
+CollisionMap *m_mapLocks[MAX_MAP];
+Mutex m_mapCreateLock;
 
 void CCollideInterface::Init()
 {
 	Log.Notice("CollideInterface", "Init");
-	COLLISION_BEGINTIMER;
 	CollisionMgr = ((IVMapManager*)collision_init());
-	printf("[%u ns] collision_init\n", c_GetNanoSeconds(c_GetTimerValue(), v1));
+	memset(m_mapLocks, 0, sizeof(CollisionMap*)*MAX_MAP);
+}
+
+void CCollideInterface::ActivateMap(uint32 mapId)
+{
+	m_mapCreateLock.Acquire();
+	if( m_mapLocks[mapId] == NULL )
+	{
+		m_mapLocks[mapId] = new CollisionMap;
+		m_mapLocks[mapId]->m_loadCount = 1;
+		memset(m_mapLocks[mapId]->m_tileLoadCount, 0, sizeof(uint32)*64*64);
+	}
+	else
+		m_mapLocks[mapId]->m_loadCount++;
+
+	m_mapCreateLock.Release();
+}
+
+void CCollideInterface::DeactivateMap(uint32 mapId)
+{
+	m_mapCreateLock.Acquire();
+	ASSERT(m_mapLocks[mapId] != NULL);
+	--m_mapLocks[mapId]->m_loadCount;
+	if( m_mapLocks[mapId]->m_loadCount == 0 )
+	{
+		// no instances using this anymore
+		delete m_mapLocks[mapId];
+		CollisionMgr->unloadMap(mapId);
+		m_mapLocks[mapId] = NULL;
+	}
+	m_mapCreateLock.Release();
 }
 
 void CCollideInterface::ActivateTile(uint32 mapId, uint32 tileX, uint32 tileY)
 {
-	m_loadLock.Acquire();
-	if(m_tilesLoaded[mapId][tileX][tileY] == 0)
-	{
-		COLLISION_BEGINTIMER;
-		CollisionMgr->loadMap(sWorld.vMapPath.c_str, mapId, tileY, tileX);
-		printf("[%u ns] collision_activate_cell %u %u %u\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, tileX, tileY);
-	}
+	ASSERT(m_mapLocks[mapId] != NULL);
+	// acquire write lock
+	m_mapLocks[mapId]->m_lock.AcquireWriteLock();
+	if( m_mapLocks[mapId]->m_tileLoadCount[tileX][tileY] == 0 )
+		CollisionMgr->loadMap("vmaps", mapId, tileY, tileX);
 
-	++m_tilesLoaded[mapId][tileX][tileY];
-	m_loadLock.Release();
+	// increment count
+	m_mapLocks[mapId]->m_tileLoadCount[tileX][tileY]++;
+
+	// release lock
+	m_mapLocks[mapId]->m_lock.ReleaseWriteLock();
 }
 
 void CCollideInterface::DeactivateTile(uint32 mapId, uint32 tileX, uint32 tileY)
 {
-	m_loadLock.Acquire();
-	if(!(--m_tilesLoaded[mapId][tileX][tileY]))
-	{
-		COLLISION_BEGINTIMER;
-		CollisionMgr->unloadMap(mapId, tileY, tileX);
-		printf("[%u ns] collision_deactivate_cell %u %u %u\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, tileX, tileY);
-	}
+	ASSERT(m_mapLocks[mapId] != NULL);
+	// get write lock
+	m_mapLocks[mapId]->m_lock.AcquireWriteLock();
+	if( (--m_mapLocks[mapId]->m_tileLoadCount[tileX][tileY]) == 0 )
+		CollisionMgr->unloadMap(mapId, tileX, tileY);
 
-	m_loadLock.Release();
-}
-
-void CCollideInterface::DeInit()
-{
-	Log.Notice("CollideInterface", "DeInit");
-	COLLISION_BEGINTIMER;
-	collision_shutdown();
-	printf("[%u ns] collision_shutdown\n", c_GetNanoSeconds(c_GetTimerValue(), v1));
-}
-
-float CCollideInterface::GetHeight(uint32 mapId, float x, float y, float z)
-{
-	COLLISION_BEGINTIMER;
-	float v = CollisionMgr->getHeight(mapId, x, y, z);
-	printf("[%u ns] GetHeight Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x, y, z);
-	return v;
-}
-
-float CCollideInterface::GetHeight(uint32 mapId, LocationVector & pos)
-{
-	COLLISION_BEGINTIMER;
-	float v = CollisionMgr->getHeight(mapId, pos);
-	printf("[%u ns] GetHeight Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos.x, pos.y, pos.z);
-	return v;
-}
-
-bool CCollideInterface::IsIndoor(uint32 mapId, LocationVector & pos)
-{
-	bool r;
-	COLLISION_BEGINTIMER;
-	r = CollisionMgr->isInDoors(mapId, pos);
-	printf("[%u ns] IsIndoor Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos.x, pos.y, pos.z);
-	return r;
-}
-
-bool CCollideInterface::IsOutdoor(uint32 mapId, LocationVector & pos)
-{
-	bool r;
-	COLLISION_BEGINTIMER;
-	r = CollisionMgr->isOutDoors(mapId, pos);
-	printf("[%u ns] IsOutdoor Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos.x, pos.y, pos.z);
-	return r;
-}
-
-bool CCollideInterface::IsIndoor(uint32 mapId, float x, float y, float z)
-{
-	bool r;
-	COLLISION_BEGINTIMER;
-	r = CollisionMgr->isInDoors(mapId, x, y, z);
-	printf("[%u ns] IsIndoor Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x, y, z);
-	return r;
-}
-
-bool CCollideInterface::IsOutdoor(uint32 mapId, float x, float y, float z)
-{
-	bool r;
-	COLLISION_BEGINTIMER;
-	r = CollisionMgr->isOutDoors(mapId, x, y, z);
-	printf("[%u ns] IsOutdoor Map:%u %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x, y, z);
-	return r;
-}
-
-bool CCollideInterface::CheckLOS(uint32 mapId, LocationVector & pos1, LocationVector & pos2)
-{
-	bool r;
-	COLLISION_BEGINTIMER;
-	r = CollisionMgr->isInLineOfSight(mapId, pos1, pos2);
-	printf("[%u ns] CheckLOS Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z);
-	return r;
+	// release write lock
+	m_mapLocks[mapId]->m_lock.ReleaseWriteLock();
 }
 
 bool CCollideInterface::CheckLOS(uint32 mapId, float x1, float y1, float z1, float x2, float y2, float z2)
 {
-	bool r;
-	COLLISION_BEGINTIMER;
-	r = CollisionMgr->isInLineOfSight(mapId, x1, y1, z1, x2, y2, z2);
-	printf("[%u ns] CheckLOS Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x1, y1, z1, x2, y2, z2);
-	return r;
-}
+	ASSERT(m_mapLocks[mapId] != NULL);
 
-bool CCollideInterface::GetFirstPoint(uint32 mapId, LocationVector & pos1, LocationVector & pos2, LocationVector & outvec, float distmod)
-{
-	bool r;
-	COLLISION_BEGINTIMER;
-	r = CollisionMgr->getObjectHitPos(mapId, pos1, pos2, outvec, distmod);
-	printf("[%u ns] GetFirstPoint Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z);
-	return r;
+	// get read lock
+	m_mapLocks[mapId]->m_lock.AcquireReadLock();
+
+	// get data
+	bool res = CollisionMgr->isInLineOfSight(mapId, x1, y1, z1, x2, y2, z2);
+
+	// release write lock
+	m_mapLocks[mapId]->m_lock.ReleaseReadLock();
+
+	// return
+	return res;
 }
 
 bool CCollideInterface::GetFirstPoint(uint32 mapId, float x1, float y1, float z1, float x2, float y2, float z2, float & outx, float & outy, float & outz, float distmod)
 {
-	bool r;
-	COLLISION_BEGINTIMER;
-	r = CollisionMgr->getObjectHitPos(mapId, x1, y1, z1, x2, y2, z2, outx, outy, outz, distmod);
-	printf("[%u ns] GetFirstPoint Map:%u %f %f %f -> %f %f %f\n", c_GetNanoSeconds(c_GetTimerValue(), v1), mapId, x1, y1, z1, x2, y2, z2);
-	return r;
+	ASSERT(m_mapLocks[mapId] != NULL);
+
+	// get read lock
+	m_mapLocks[mapId]->m_lock.AcquireReadLock();
+
+	// get data
+	bool res = CollisionMgr->getObjectHitPos(mapId, x1, y1, z1, x2, y2, z2, outx, outy, outz, distmod);
+
+	// release write lock
+	m_mapLocks[mapId]->m_lock.ReleaseReadLock();
+
+	// return
+	return res;
 }
 
-#else
-
-void CCollideInterface::Init()
+float CCollideInterface::GetHeight(uint32 mapId, float x, float y, float z)
 {
-	Log.Notice("CollideInterface", "Init");
-	CollisionMgr = ((IVMapManager*)collision_init());
+	ASSERT(m_mapLocks[mapId] != NULL);
+
+	// get read lock
+	m_mapLocks[mapId]->m_lock.AcquireReadLock();
+
+	// get data
+	float res = CollisionMgr->getHeight(mapId, x, y, z);
+
+	// release write lock
+	m_mapLocks[mapId]->m_lock.ReleaseReadLock();
+
+	// return
+	return res;
 }
 
-void CCollideInterface::ActivateTile(uint32 mapId, uint32 tileX, uint32 tileY)
+bool CCollideInterface::IsIndoor(uint32 mapId, float x, float y, float z)
 {
-	m_loadLock.Acquire();
-	if(m_tilesLoaded[mapId][tileX][tileY] == 0)
-		CollisionMgr->loadMap(sWorld.vMapPath.c_str(), mapId, tileY, tileX);
+	ASSERT(m_mapLocks[mapId] != NULL);
 
-	++m_tilesLoaded[mapId][tileX][tileY];
-	m_loadLock.Release();
+	// get read lock
+	m_mapLocks[mapId]->m_lock.AcquireReadLock();
+
+	// get data
+	bool res = CollisionMgr->isInDoors(mapId, x, y, z);
+
+	// release write lock
+	m_mapLocks[mapId]->m_lock.ReleaseReadLock();
+
+	// return
+	return res;
 }
 
-void CCollideInterface::DeactivateTile(uint32 mapId, uint32 tileX, uint32 tileY)
+bool CCollideInterface::IsOutdoor(uint32 mapId, float x, float y, float z)
 {
-	m_loadLock.Acquire();
-	if(!(--m_tilesLoaded[mapId][tileX][tileY]))
-		CollisionMgr->unloadMap(mapId, tileY, tileX);
+	ASSERT(m_mapLocks[mapId] != NULL);
 
-	m_loadLock.Release();
+	// get read lock
+	m_mapLocks[mapId]->m_lock.AcquireReadLock();
+
+	// get data
+	bool res = CollisionMgr->isOutDoors(mapId, x, y, z);
+
+	// release write lock
+	m_mapLocks[mapId]->m_lock.ReleaseReadLock();
+
+	// return
+	return res;
 }
 
 void CCollideInterface::DeInit()
 {
-	Log.Notice("CollideInterface", "DeInit");
-	collision_shutdown();
+	// bleh.
 }
 
-#endif		// COLLISION_DEBUG
 #endif		// COLLISION

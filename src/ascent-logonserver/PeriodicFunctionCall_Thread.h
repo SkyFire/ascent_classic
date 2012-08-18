@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,7 +20,7 @@
 #include "../ascent-shared/CallBack.h"
 
 template<class Type>
-class PeriodicFunctionCaller : public ThreadBase
+class PeriodicFunctionCaller : public ThreadContext
 {
 public:
 	template<class T>

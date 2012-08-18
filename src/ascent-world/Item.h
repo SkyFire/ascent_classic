@@ -215,7 +215,6 @@ public:
 
 	void RemoveFromWorld();
 
-	Loot* loot;
 	bool locked;
 	bool m_isDirty;
 

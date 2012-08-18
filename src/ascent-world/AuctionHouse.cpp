@@ -301,12 +301,33 @@ void AuctionHouse::SendBidListPacket(Player * plr, WorldPacket * packet)
 			++count;
 		}			
 	}
-#ifdef USING_BIG_ENDIAN
-	swap32((uint32*)&data.contents()[0]);
-#endif
 	data << count;
 	auctionLock.ReleaseReadLock();
 	plr->GetSession()->SendPacket(&data);
+}
+
+void AuctionHouse::UpdateItemOwnerships(uint32 oldGuid, uint32 newGuid)
+{
+
+	Auction * auct;
+	auctionLock.AcquireWriteLock();
+	HM_NAMESPACE::hash_map<uint32, Auction*>::iterator itr = auctions.begin();
+	for(; itr != auctions.end(); ++itr)
+	{
+		auct = itr->second;
+		if(auct->Owner == oldGuid)
+		{
+			auct->Owner = newGuid;
+			// Don't save, we take care of this in char rename all at once. Less queries.
+		}
+
+		if(auct->HighestBidder == oldGuid)
+		{
+			auct->HighestBidder = newGuid;
+			auct->UpdateInDB();
+		}
+	}
+	auctionLock.ReleaseWriteLock();
 }
 
 void AuctionHouse::SendOwnerListPacket(Player * plr, WorldPacket * packet)
@@ -332,9 +353,6 @@ void AuctionHouse::SendOwnerListPacket(Player * plr, WorldPacket * packet)
 		}			
 	}
 	data << count;
-#ifdef USING_BIG_ENDIAN
-	swap32((uint32*)&data.contents()[0]);
-#endif
 	auctionLock.ReleaseReadLock();
 	plr->GetSession()->SendPacket(&data);
 }
@@ -365,7 +383,7 @@ void WorldSession::HandleAuctionPlaceBid( WorldPacket & recv_data )
 	recv_data >> auction_id >> price;
 
 	Creature * pCreature = _player->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
-	if(!pCreature || !pCreature->auctionHouse)
+	if(!pCreature || !pCreature->auctionHouse || price == 0)
 		return;
 
 	// Find Item
@@ -489,7 +507,7 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 		return;
 	}
 
-	pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(item, true);
+	pItem = _player->GetItemInterface()->SafeRemoveAndRetreiveItemByGuid(item, false);
 	if (!pItem){
 		WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 8);
 		data << uint32(0);
@@ -498,6 +516,9 @@ void WorldSession::HandleAuctionSellItem( WorldPacket & recv_data )
 		SendPacket(&data);
 		return;
 	};
+
+	if( pItem->IsInWorld() )
+		pItem->RemoveFromWorld();
 
 	pItem->SetOwner(NULL);
 	pItem->m_isDirty = true;
@@ -642,10 +663,6 @@ void AuctionHouse::SendAuctionList(Player * plr, WorldPacket * packet)
 	
 	// total count
 	data << uint32(1 + counted_items);
-#ifdef USING_BIG_ENDIAN
-	swap32((uint32*)&data.contents()[0]);
-#endif
-
 	auctionLock.ReleaseReadLock();
 	plr->GetSession()->SendPacket(&data);
 }
@@ -679,9 +696,12 @@ void AuctionHouse::LoadAuctions()
 		auct = new Auction;
 		auct->Id = fields[0].GetUInt32();
 		
+		//Field *itemfields = objmgr.GetCachedItem(fields[2].GetUInt32());
+		//Item * pItem = (itemfields == NULL) ? NULL : objmgr.LoadItem(itemfields);
 		Item * pItem = objmgr.LoadItem(fields[2].GetUInt64());
 		if(!pItem)
 		{
+			printf("Deleting auction for invalid item %u (%u)\n", auct->Id, fields[2].GetUInt32());
 			CharacterDatabase.Execute("DELETE FROM auctions WHERE auctionId=%u",auct->Id);
 			delete auct;
 			continue;

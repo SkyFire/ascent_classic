@@ -231,21 +231,9 @@ double CRandomMersenne::Random() {
 
 	// This shortcut allows the compiler to optimize away the following switch
 	// statement for the most common architectures:
-#if defined(_M_IX86) || defined(_M_X64) || defined(__LITTLE_ENDIAN__)
-	Architecture = LITTLE_ENDIAN1;
-#elif defined(__BIG_ENDIAN__)
-	Architecture = BIG_ENDIAN1;
-#endif
-
-#ifdef USING_BIG_ENDIAN
-	convert.i[1] =  r << 20;
-	convert.i[0] = (r >> 12) | 0x3FF00000;
-	return convert.f - 1.0;
-#else
 	convert.i[0] =  r << 20;
 	convert.i[1] = (r >> 12) | 0x3FF00000;
 	return convert.f - 1.0;
-#endif
 	// This somewhat slower method works for all architectures, including 
 	// non-IEEE floating point representation:
 	//return (double)r * (1./((double)(uint32)(-1L)+1.));

@@ -42,7 +42,7 @@ bool ChatHandler::HandleBGInfoCommnad(const char *args, WorldSession *m_session)
 bool ChatHandler::HandleBattlegroundCommand(const char* args, WorldSession *m_session)
 {
 	uint32 type = atoi(args);
-	if(type != 2 && type != 3 && type != 4 && type != 5 && type != 7)
+	if(type != 1 && type != 2 && type != 3 && type != 4 && type != 5 && type != 7)
 		return false;
 
 	Player * plr = getSelectedChar(m_session, true);
@@ -57,8 +57,11 @@ bool ChatHandler::HandleSetWorldStateCommand(const char* args, WorldSession *m_s
 	if(sscanf(args,"%u %u", &id,&val)!=2)
 		return false;
 
-	if(m_session->GetPlayer()->m_bg)
-		m_session->GetPlayer()->m_bg->SetWorldState(id,val);
+	//if(m_session->GetPlayer()->m_bg)
+	//{
+		m_session->GetPlayer()->GetMapMgr()->GetStateManager().CreateWorldState(id, val);
+		m_session->GetPlayer()->GetMapMgr()->GetStateManager().UpdateWorldState(id, val);
+	//}
 
 	return true;
 }

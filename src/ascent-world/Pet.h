@@ -253,6 +253,7 @@ protected:
 	bool UpdateLoyalty(char pts);
 
 	list<AI_Spell*> m_autoCastSpells[AUTOCAST_EVENT_COUNT];
+	bool m_dismissed;
 };
 
 #define PET_LOYALTY_UPDATE_TIMER 120000

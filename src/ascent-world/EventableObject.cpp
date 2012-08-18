@@ -27,7 +27,14 @@ EventableObject::~EventableObject()
 	EventMap::iterator itr = m_events.begin();
 	for(; itr != m_events.end(); ++itr)
 	{
-		itr->second->deleted = true;
+		if( itr->second->eventFlag & EVENT_FLAG_FIRE_ON_DELETE && !itr->second->deleted )
+		{
+			itr->second->deleted = true;
+			itr->second->cb->execute();
+		}
+		else
+			itr->second->deleted = true;
+
 		itr->second->DecRef();
 	}
 
@@ -85,7 +92,14 @@ void EventableObject::event_RemoveByPointer(TimedEvent * ev)
 
 			if(it2->second == ev)
 			{
-				it2->second->deleted = true;
+				if( it2->second->eventFlag & EVENT_FLAG_FIRE_ON_DELETE && !it2->second->deleted )
+				{
+					it2->second->deleted = true;
+					it2->second->cb->execute();
+				}
+				else
+					it2->second->deleted = true;
+
 				it2->second->DecRef();
 				m_events.erase(it2);
 				m_lock.Release();
@@ -111,7 +125,14 @@ void EventableObject::event_RemoveEvents(uint32 EventType)
 		EventMap::iterator itr = m_events.begin();
 		for(; itr != m_events.end(); ++itr)
 		{
-			itr->second->deleted = true;
+			if( itr->second->eventFlag & EVENT_FLAG_FIRE_ON_DELETE && !itr->second->deleted )
+			{
+				itr->second->deleted = true;
+				itr->second->cb->execute();
+			}
+			else
+				itr->second->deleted = true;
+
 			itr->second->DecRef();
 		}
 		m_events.clear();
@@ -126,7 +147,14 @@ void EventableObject::event_RemoveEvents(uint32 EventType)
 			{
 				it2 = itr++;
 
-				it2->second->deleted = true;
+				if( it2->second->eventFlag & EVENT_FLAG_FIRE_ON_DELETE && !it2->second->deleted )
+				{
+					it2->second->deleted = true;
+					it2->second->cb->execute();
+				}
+				else
+					it2->second->deleted = true;
+
 				it2->second->DecRef();
 				m_events.erase(it2);
 

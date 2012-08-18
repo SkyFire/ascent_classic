@@ -28,6 +28,10 @@ float World::m_movementCompressThresholdCreatures;
 uint32 World::m_movementCompressRate;
 uint32 World::m_movementCompressInterval;
 float World::m_speedHackThreshold;
+float World::m_wallhackthreshold;
+float World::m_speedHackLatencyMultiplier;
+uint32 World::m_speedHackResetInterval;
+uint32 World::m_CEThreshold;
 
 World::World()
 {
@@ -50,7 +54,6 @@ World::World()
 	AlliancePlayers = 0;
 	gm_skip_attunement = false;
 	show_gm_in_who_list = true;
-	//allow_gm_friends = true;
 	map_unload_time=0;
 #ifndef CLUSTERING
 	SocketSendBufSize = WORLDSOCKET_SENDBUF_SIZE;
@@ -60,7 +63,11 @@ World::World()
 	m_genLevelCap=70;
 	m_limitedNames=false;
 	m_banTable = NULL;
-	m_speedHackThreshold = -600.0f;
+	m_lfgForNonLfg = false;
+	m_speedHackThreshold = -500.0f;
+	m_speedHackLatencyMultiplier = 0.0f;
+	m_speedHackResetInterval = 5000;
+	m_CEThreshold = 10000;
 }
 
 void CleanupRandomNumberGenerators();
@@ -262,10 +269,17 @@ bool World::SetInitialWorldSettings()
 	Log.Line();
 	Player::InitVisibleUpdateBits();
 
+	Log.Notice("World", "Clearing old bans, setting players offline...");
 	CharacterDatabase.WaitExecute("UPDATE characters SET online = 0 WHERE online = 1");
-	//CharacterDatabase.WaitExecute("UPDATE characters SET level = 70 WHERE level > 70");
 	CharacterDatabase.WaitExecute("UPDATE characters SET banned=0,banReason='' WHERE banned > 100 AND banned < %u", UNIXTIME);
-   
+
+	Log.Notice("World", "Clearing old guild logs...");
+	CharacterDatabase.WaitExecute("DELETE FROM guild_logs WHERE timestamp <= %u", uint32(UNIXTIME - 1209600));			// 2 weeks
+	CharacterDatabase.WaitExecute("DELETE FROM guild_banklogs WHERE timestamp <= %u", uint32(UNIXTIME - 1209600));			// 2 weeks
+
+	Log.Notice("World", "Starting up...");  
+	Log.Line();
+
 	m_lastTick = UNIXTIME;
 
 	// TODO: clean this
@@ -318,8 +332,6 @@ bool World::SetInitialWorldSettings()
 	// Start
 
 	uint32 start_time = getMSTime();
-
-	Log.Notice( "World", "Loading DBC files..." );
 	if( !LoadDBCs() )
 	{
 		Log.LargeErrorMessage(LARGERRORMESSAGE_ERROR, "One or more of the DBC files are missing.", "These are absolutely necessary for the server to function.", "The server will not start without them.", NULL);
@@ -399,9 +411,6 @@ bool World::SetInitialWorldSettings()
 	MAKE_TASK(ObjectMgr, LoadSpellOverride);
 	MAKE_TASK(ObjectMgr, LoadVendors);
 	MAKE_TASK(ObjectMgr, LoadAIThreatToSpellId);
-	MAKE_TASK(ObjectMgr, LoadSpellFixes);
-	MAKE_TASK(ObjectMgr, LoadSpellProcs);
-	MAKE_TASK(ObjectMgr, LoadSpellEffectsOverride);
 	MAKE_TASK(ObjectMgr, LoadDefaultPetSpells);
 	MAKE_TASK(ObjectMgr, LoadPetSpellCooldowns);
 	MAKE_TASK(ObjectMgr, LoadGuildCharters);
@@ -441,6 +450,7 @@ bool World::SetInitialWorldSettings()
 #ifdef COLLISION
 	CollideInterface.Init();
 #endif
+	sScriptMgr.LoadScripts();
 
 	// calling this puts all maps into our task list.
 	sInstanceMgr.Load(&tl);
@@ -482,13 +492,13 @@ bool World::SetInitialWorldSettings()
 		Log.Notice("World", "Backgrounding loot loading...");
 
 		// loot background loading in a lower priority thread.
-		ThreadPool.ExecuteTask(new BasicTaskExecutor(new CallbackP0<LootMgr>(LootMgr::getSingletonPtr(), &LootMgr::LoadLoot), 
+		ThreadPool.ExecuteTask(new BasicTaskExecutor(new CallbackP0<LootMgr>(LootMgr::getSingletonPtr(), &LootMgr::LoadCreatureLoot), 
 			BTE_PRIORITY_LOW));
 	}
 	else
 	{
 		Log.Notice("World", "Loading loot in foreground...");
-		lootmgr.LoadLoot();
+		lootmgr.LoadCreatureLoot();
 	}
 
 	Channel::LoadConfSettings();
@@ -499,6 +509,7 @@ bool World::SetInitialWorldSettings()
 	ThreadPool.ExecuteTask( dw );
 
 	ThreadPool.ExecuteTask( new CharacterLoaderThread() );
+	ThreadPool.ExecuteTask( new NewsAnnouncer() );
 
 #ifdef ENABLE_COMPRESSED_MOVEMENT
 	MovementCompressor = new CMovementCompressorThread();
@@ -582,6 +593,26 @@ void World::Update(time_t diff)
 #endif
 }
 
+void World::SendMessageToGMs(WorldSession *self, const char * text, ...)
+{
+	char buf[500];
+	va_list ap;
+	va_start(ap, text);
+	vsnprintf(buf, 2000, text, ap);
+	va_end(ap);
+
+	WorldPacket *data = sChatHandler.FillSystemMessageData(buf);
+	m_sessionlock.AcquireReadLock();
+	SessionMap::iterator itr;
+	for (itr = m_sessions.begin(); itr != m_sessions.end(); itr++)
+	{
+		if( itr->second != self && itr->second->HasGMPermissions() && itr->second->GetPlayer() != NULL )
+			itr->second->SendPacket(data);
+	}
+	m_sessionlock.ReleaseReadLock();
+
+	delete data;
+}
 
 void World::SendGlobalMessage(WorldPacket *packet, WorldSession *self)
 {
@@ -1023,6 +1054,7 @@ void TaskList::spawn()
 void TaskList::wait()
 {
 	bool has_tasks = true;
+	time_t t;
 	while(has_tasks)
 	{
 		queueLock.Acquire();
@@ -1036,6 +1068,15 @@ void TaskList::wait()
 			}
 		}
 		queueLock.Release();
+
+		// keep updating time lol
+		t = time(NULL);
+		if( UNIXTIME != t )
+		{
+			UNIXTIME = t;
+			g_localTime = *localtime(&t);
+		}
+
 		Sleep(20);
 	}
 }
@@ -1053,23 +1094,19 @@ void Task::execute()
 bool TaskExecutor::run()
 {
 	Task * t;
-	THREAD_TRY_EXECUTION
+	while(starter->running)
 	{
-		while(starter->running)
+		t = starter->GetTask();
+		if(t)
 		{
-			t = starter->GetTask();
-			if(t)
-			{
-				t->execute();
-				t->completed = true;
-				starter->RemoveTask(t);
-				delete t;
-			}
-			else
-				Sleep(20);
+			t->execute();
+			t->completed = true;
+			starter->RemoveTask(t);
+			delete t;
 		}
+		else
+			Sleep(20);
 	}
-	THREAD_HANDLE_CRASH
 	return true;
 }
 
@@ -1105,7 +1142,6 @@ void World::Rehash(bool load)
 
 	channelmgr.seperatechannels = Config.MainConfig.GetBoolDefault("Server", "SeperateChatChannels", false);
 	MapPath = Config.MainConfig.GetStringDefault("Terrain", "MapPath", "maps");
-	vMapPath = Config.MainConfig.GetStringDefault("Terrain", "vMapPath", "vmaps");
 	UnloadMapFiles = Config.MainConfig.GetBoolDefault("Terrain", "UnloadMapFiles", true);
 	BreathingEnabled = Config.MainConfig.GetBoolDefault("Server", "EnableBreathing", true);
 	SendStatsOnJoin = Config.MainConfig.GetBoolDefault("Server", "SendStatsOnJoin", true);
@@ -1138,13 +1174,14 @@ void World::Rehash(bool load)
 	setRate(RATE_ARENAPOINTMULTIPLIER2X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier2x", 1.0f));
 	setRate(RATE_ARENAPOINTMULTIPLIER3X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier3x", 1.0f));
 	setRate(RATE_ARENAPOINTMULTIPLIER5X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier5x", 1.0f));
+	free_arena_teams = Config.MainConfig.GetBoolDefault("Server", "FreeArenaTeams", false);
+	free_guild_charters = Config.MainConfig.GetBoolDefault("Server", "FreeGuildCharters", false);
+	setRate(RATE_EOTS_CAPTURERATE, Config.MainConfig.GetFloatDefault("Rates", "EOTSCaptureRate", 1.0f));
 	SetPlayerLimit(Config.MainConfig.GetIntDefault("Server", "PlayerLimit", 1000));
+
 	SetMotd(Config.MainConfig.GetStringDefault("Server", "Motd", "Ascent Default MOTD").c_str());
 	mQueueUpdateInterval = Config.MainConfig.GetIntDefault("Server", "QueueUpdateInterval", 5000);
 	SetKickAFKPlayerTime(Config.MainConfig.GetIntDefault("Server", "KickAFKPlayers", 0));
-	sLog.SetScreenLoggingLevel(Config.MainConfig.GetIntDefault("LogLevel", "Screen", 1));
-	sLog.SetFileLoggingLevel(Config.MainConfig.GetIntDefault("LogLevel", "File", -1));
-	Log.log_level = Config.MainConfig.GetIntDefault("LogLevel", "Screen", 1);
 	gm_skip_attunement = Config.MainConfig.GetBoolDefault("Server", "SkipAttunementsForGM", true);
 #ifndef CLUSTERING
 	SocketRecvBufSize = Config.MainConfig.GetIntDefault("WorldSocket", "RecvBufSize", WORLDSOCKET_RECVBUF_SIZE);
@@ -1233,8 +1270,12 @@ void World::Rehash(bool load)
 	flood_lines = Config.MainConfig.GetIntDefault("FloodProtection", "Lines", 0);
 	flood_seconds = Config.MainConfig.GetIntDefault("FloodProtection", "Seconds", 0);
 	flood_message = Config.MainConfig.GetBoolDefault("FloodProtection", "SendMessage", false);
+	flood_message_time = Config.MainConfig.GetIntDefault("FloodProtection", "FloodMessageTime", 0);
+	flood_mute_after_flood = Config.MainConfig.GetIntDefault("FloodProtection", "MuteAfterFlood", 0);
+	flood_caps_min_len = Config.MainConfig.GetIntDefault("FloodProtection", "CapsMinLen", 0);
+	flood_caps_pct = Config.MainConfig.GetFloatDefault("FloodProtection", "CapsPct", 0.0f);
 	show_gm_in_who_list = Config.MainConfig.GetBoolDefault("Server", "ShowGMInWhoList", true);
-	//allow_gm_friends = Config.MainConfig.GetBoolDefault("Server", "AllowGMFriends", false);
+
 	if(!flood_lines || !flood_seconds)
 		flood_lines = flood_seconds = 0;
 
@@ -1243,9 +1284,7 @@ void World::Rehash(bool load)
 	antihack_teleport = Config.MainConfig.GetBoolDefault("AntiHack", "Teleport", true);
 	antihack_speed = Config.MainConfig.GetBoolDefault("AntiHack", "Speed", true);
 	antihack_flight = Config.MainConfig.GetBoolDefault("AntiHack", "Flight", true);
-	flyhack_threshold = Config.MainConfig.GetIntDefault("AntiHack", "FlightThreshold", 8);
 	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", false);
-	m_speedHackThreshold = Config.MainConfig.GetFloatDefault("AntiHack", "SpeedThreshold", -600.0f);
 	SpeedhackProtection = antihack_speed;
 	m_levelCap = Config.MainConfig.GetIntDefault("Server", "LevelCap", 70);
 	m_genLevelCap = Config.MainConfig.GetIntDefault("Server", "GenLevelCap", 70);
@@ -1261,6 +1300,13 @@ void World::Rehash(bool load)
 
 	m_movementCompressThreshold = Config.MainConfig.GetFloatDefault("Movement", "CompressThreshold", 25.0f);
 	m_movementCompressThreshold *= m_movementCompressThreshold;		// square it to avoid sqrt() on checks
+
+	m_speedHackThreshold = Config.MainConfig.GetFloatDefault("AntiHack", "SpeedThreshold", -500.0f);
+	m_speedHackLatencyMultiplier = Config.MainConfig.GetFloatDefault("AntiHack", "SpeedLatencyCompensation", 0.25f);
+	m_speedHackResetInterval = Config.MainConfig.GetIntDefault("AntiHack", "SpeedResetPeriod", 5000);
+	antihack_cheatengine = Config.MainConfig.GetBoolDefault("AntiHack", "CheatEngine", false);
+	m_CEThreshold = Config.MainConfig.GetIntDefault("AntiHack", "CheatEngineTimeDiff", 10000);
+	m_wallhackthreshold = Config.MainConfig.GetFloatDefault("AntiHack", "WallHackThreshold", 5.0f);
 	// ======================================
 
 	if( m_banTable != NULL )
@@ -1390,12 +1436,12 @@ struct insert_playeritem
 
 void CharacterLoaderThread::OnShutdown()
 {
-	running=false;
 #ifdef WIN32
 	SetEvent(hEvent);
 #else
 	pthread_cond_signal(&cond);
 #endif
+	m_threadRunning = false;
 }
 
 CharacterLoaderThread::CharacterLoaderThread()
@@ -1424,7 +1470,6 @@ bool CharacterLoaderThread::run()
 	pthread_mutex_init(&mutex,NULL);
 	pthread_cond_init(&cond,NULL);
 #endif
-	running=true;
 	for(;;)
 	{
 		// Get a single connection to maintain for the whole process.
@@ -1451,7 +1496,7 @@ bool CharacterLoaderThread::run()
 		pthread_cond_timedwait(&cond, &mutex, &tv);
 		pthread_mutex_unlock(&mutex);
 #endif
-		if(!running)
+		if(!m_threadRunning)
 			break;
 	}
 
@@ -1466,10 +1511,13 @@ void World::PollMailboxInsertQueue(DatabaseConnection * con)
 	uint32 itemid;
 	uint32 stackcount;
 
+	CharacterDatabase.FWaitExecute("LOCK TABLES `mailbox_insert_queue` WRITE", con);
 	result = CharacterDatabase.FQuery("SELECT * FROM mailbox_insert_queue", con);
+	CharacterDatabase.FWaitExecute("DELETE FROM mailbox_insert_queue", con);
+	CharacterDatabase.FWaitExecute("UNLOCK TABLES", con);
 	if( result != NULL )
 	{
-		Log.Notice("MailboxQueue", "Sending queued messages....");
+		Log.Notice("MailboxQueue", "Sending %u queued messages....", result->GetRowCount());
 		do 
 		{
 			f = result->Fetch();
@@ -1583,6 +1631,7 @@ void World::PollCharacterInsertQueue(DatabaseConnection * con)
 
 			// create his playerinfo in the server
 			PlayerInfo * inf = new PlayerInfo();
+			memset(inf, 0, sizeof(PlayerInfo));
 			inf->acct = f[1].GetUInt32();
 #ifdef VOICE_CHAT
 			inf->groupVoiceId = -1;
@@ -1705,7 +1754,6 @@ void World::DisconnectUsersWithAccount(const char * account, WorldSession * m_se
 	SessionMap::iterator itr;
 	WorldSession * session;
 	m_sessionlock.AcquireReadLock();
-	bool FoundUser = false;
 	for(itr = m_sessions.begin(); itr != m_sessions.end();)
 	{
 		session = itr->second;
@@ -1713,7 +1761,6 @@ void World::DisconnectUsersWithAccount(const char * account, WorldSession * m_se
 
 		if(!stricmp(account, session->GetAccountNameS()))
 		{
-			FoundUser = true;
 			m_session->SystemMessage("Disconnecting user with account `%s` IP `%s` Player `%s`.", session->GetAccountNameS(), 
 				session->GetSocket() ? session->GetSocket()->GetRemoteIP().c_str() : "noip", session->GetPlayer() ? session->GetPlayer()->GetName() : "noplayer");
 
@@ -1721,8 +1768,6 @@ void World::DisconnectUsersWithAccount(const char * account, WorldSession * m_se
 		}
 	}
 	m_sessionlock.ReleaseReadLock();
-	if ( FoundUser == false )
-		m_session->SystemMessage("There is nobody online with account [%s]",account);
 }
 
 void World::DisconnectUsersWithIP(const char * ip, WorldSession * m_session)
@@ -1730,7 +1775,6 @@ void World::DisconnectUsersWithIP(const char * ip, WorldSession * m_session)
 	SessionMap::iterator itr;
 	WorldSession * session;
 	m_sessionlock.AcquireReadLock();
-	bool FoundUser = false;
 	for(itr = m_sessions.begin(); itr != m_sessions.end();)
 	{
 		session = itr->second;
@@ -1742,15 +1786,12 @@ void World::DisconnectUsersWithIP(const char * ip, WorldSession * m_session)
 		string ip2 = session->GetSocket()->GetRemoteIP().c_str();
 		if(!stricmp(ip, ip2.c_str()))
 		{
-			FoundUser = true;
 			m_session->SystemMessage("Disconnecting user with account `%s` IP `%s` Player `%s`.", session->GetAccountNameS(), 
 				ip2.c_str(), session->GetPlayer() ? session->GetPlayer()->GetName() : "noplayer");
 
 			session->Disconnect();
 		}
 	}
-	if ( FoundUser == false )
-		m_session->SystemMessage("There is nobody online with ip [%s]",ip);
 	m_sessionlock.ReleaseReadLock();
 }
 
@@ -1759,7 +1800,6 @@ void World::DisconnectUsersWithPlayerName(const char * plr, WorldSession * m_ses
 	SessionMap::iterator itr;
 	WorldSession * session;
 	m_sessionlock.AcquireReadLock();
-	bool FoundUser = false;
 	for(itr = m_sessions.begin(); itr != m_sessions.end();)
 	{
 		session = itr->second;
@@ -1776,8 +1816,6 @@ void World::DisconnectUsersWithPlayerName(const char * plr, WorldSession * m_ses
 			session->Disconnect();
 		}
 	}
-	if (FoundUser == false)
-		m_session->SystemMessage("There is no body online with the name [%s]",plr);
 	m_sessionlock.ReleaseReadLock();
 }
 
@@ -1789,4 +1827,242 @@ string World::GetUptimeString()
 
 	snprintf(str, 300, "%u days, %u hours, %u minutes, %u seconds.", tmv->tm_yday, tmv->tm_hour, tmv->tm_min, tmv->tm_sec);
 	return string(str);
+}
+
+void World::UpdateShutdownStatus()
+{
+	uint32 time_left = ((uint32)UNIXTIME > m_shutdownTime) ? 0 : m_shutdownTime - (uint32)UNIXTIME;
+	uint32 time_period = 1;
+
+	if( time_left && m_shutdownTime )
+	{
+		// determine period
+		if( time_left <= 30 )
+		{
+			// every 1 sec
+			time_period = 1;
+		}
+		else if( time_left <= (TIME_MINUTE * 2) )
+		{
+			// every 30 secs
+			time_period = 30;
+		}
+		else
+		{
+			// every minute
+			time_period = 60;
+		}
+
+		// time to send a new packet?
+		if( ( (uint32)UNIXTIME - m_shutdownLastTime ) >= time_period )
+		{
+			// send message
+			m_shutdownLastTime = (uint32)UNIXTIME;
+
+			WorldPacket data(SMSG_SERVER_MESSAGE, 200);
+			if( m_shutdownType == SERVER_SHUTDOWN_TYPE_RESTART )
+				data << uint32(SERVER_MSG_RESTART_TIME);
+			else
+				data << uint32(SERVER_MSG_SHUTDOWN_TIME);
+
+			char tbuf[100];
+			snprintf(tbuf, 100, "%02u:%02u", (time_left / 60), (time_left % 60));
+			data << tbuf;
+			SendGlobalMessage(&data, NULL);
+
+			printf("Server shutdown in %s.\n", tbuf);
+		}
+	}
+	else
+	{
+		// shutting down?
+		sEventMgr.RemoveEvents(this, EVENT_WORLD_SHUTDOWN);
+		if( m_shutdownTime )
+		{
+			SendWorldText("Server is saving and shutting down. You will be disconnected shortly.", NULL);
+			Master::m_stopEvent = true;
+		}
+		else
+		{
+			WorldPacket data(SMSG_SERVER_MESSAGE, 200);
+			if( m_shutdownTime == SERVER_SHUTDOWN_TYPE_RESTART )
+				data << uint32(SERVER_MSG_RESTART_CANCELLED);
+			else
+				data << uint32(SERVER_MSG_SHUTDOWN_CANCELLED);
+
+			data << uint8(0);
+			SendGlobalMessage(&data, NULL);
+		}
+	}
+}
+
+void World::CancelShutdown()
+{
+	m_shutdownTime = 0;
+	m_shutdownType = 0;
+	m_shutdownLastTime = 0;
+}
+
+void World::QueueShutdown(uint32 delay, uint32 type)
+{
+	// set parameters
+	m_shutdownLastTime = 0;
+	m_shutdownTime = (uint32)UNIXTIME + delay;
+	m_shutdownType = type;
+
+	// add event
+	sEventMgr.AddEvent(this, &World::UpdateShutdownStatus, EVENT_WORLD_SHUTDOWN, 50, 0, 0);
+
+	// send message
+	char buf[1000];
+	snprintf(buf, 1000, "Server %s initiated. Server will save and shut down in approx. %u seconds.", type == SERVER_SHUTDOWN_TYPE_RESTART ? "restart" : "shutdown", delay);
+	SendWorldText(buf, NULL);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// News Announcer
+//////////////////////////////////////////////////////////////////////////
+
+bool NewsAnnouncer::run()
+{
+	map<uint32, NewsAnnouncement>::iterator itr;
+	uint32 last_load_time = 0;
+
+	// init
+	_Init();
+	last_load_time = (uint32)UNIXTIME;
+
+	while(m_threadRunning)
+	{
+		// loop through messages
+		for( itr = m_announcements.begin(); itr != m_announcements.end(); ++itr )
+		{
+			// it can be send time pl0x?
+			if( ((uint32)UNIXTIME - itr->second.m_lastTime) >= itr->second.m_timePeriod )
+				_SendMessage(&itr->second);
+		}
+
+		if( ((uint32)UNIXTIME - last_load_time) > 120 )			// reload every 2 minutes
+			_ReloadMessages();
+
+		// sleep
+		Sleep(10000);
+	}
+
+	// delete us :P
+	return true;
+}
+
+void NewsAnnouncer::_SendMessage(NewsAnnouncement *ann)
+{
+	char buf[10000];
+
+	// fill out the message buffer
+	buf[0] = 0;
+	strcat(buf, MSG_COLOR_WHITE"Server News:|r ");
+	strcat(buf, ann->m_message.c_str());
+
+	// build the packet
+	WorldPacket *data_to_send = sChatHandler.FillSystemMessageData(buf);
+
+	// send to sessions
+	if( ann->m_factionMask < 0 )
+	{
+		// send to all
+		sWorld.SendGlobalMessage(data_to_send, NULL);
+	}
+	else
+	{
+		// send to team
+		sWorld.SendFactionMessage(data_to_send, ann->m_factionMask);
+	}
+
+	// update last time
+	ann->m_lastTime = (uint32)UNIXTIME;
+	CharacterDatabase.Execute("REPLACE INTO news_timers VALUES(%u, %u)", ann->m_id, ann->m_lastTime);
+
+	// send it to the console too
+	puts(buf);
+}
+
+void NewsAnnouncer::_ReloadMessages()
+{
+	QueryResult *res;
+	NewsAnnouncement ann;
+	map<uint32, NewsAnnouncement>::iterator itr, itr2;
+	set<uint32> db_msgs;
+	Field *f;
+	uint32 id;
+
+	// query db
+	res = WorldDatabase.Query("SELECT * FROM news_announcements");
+
+	if( res != NULL )
+	{
+		do 
+		{
+			f = res->Fetch();
+			id = f[0].GetUInt32();
+
+			// create structure/update structure
+			db_msgs.insert(id);
+			itr = m_announcements.find(id);
+			if( itr == m_announcements.end() )
+			{
+				ann.m_id = id;
+				ann.m_factionMask = f[1].GetInt32();
+				ann.m_timePeriod = f[2].GetUInt32();
+				ann.m_lastTime = (uint32)UNIXTIME;
+				ann.m_message = f[3].GetString();
+				m_announcements.insert(make_pair(ann.m_id, ann));
+			}
+			else
+			{
+				// update
+				itr->second.m_factionMask = f[1].GetInt32();
+				itr->second.m_timePeriod = f[2].GetUInt32();
+				itr->second.m_message = f[3].GetString();
+			}
+
+		} while (res->NextRow());
+		delete res;
+	}
+
+	for(itr = m_announcements.begin(); itr != m_announcements.end();)
+	{
+		itr2 = itr++;
+		if( db_msgs.find(itr2->second.m_id) == db_msgs.end() )
+		{
+			// message no longer exists
+			CharacterDatabase.Execute("DELETE FROM FROM news_timers WHERE id = %u", itr2->second.m_id);
+			m_announcements.erase(itr2);
+		}
+	}
+}
+
+void NewsAnnouncer::_Init()
+{
+	// load messages
+	_ReloadMessages();
+
+	// get initial last timestamps
+	QueryResult *res = CharacterDatabase.Query("SELECT * FROM news_timers");
+	if( res != NULL )
+	{
+		do 
+		{
+			uint32 id = res->Fetch()[0].GetUInt32();
+			uint32 t = res->Fetch()[1].GetUInt32();
+
+			// update "last" timestamp
+			map<uint32, NewsAnnouncement>::iterator itr = m_announcements.find(id);
+			if( itr == m_announcements.end() )
+				CharacterDatabase.Execute("DELETE FROM news_timers WHERE id = %u", id);
+			else
+				itr->second.m_lastTime = t;
+
+		} while (res->NextRow());
+		delete res;
+	}
 }

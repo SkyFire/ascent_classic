@@ -23,7 +23,6 @@ Item::Item()//this is called when constructing as container
 {
 	m_itemProto = NULL;
 	m_owner = NULL;
-	loot = NULL;
 	locked = false;
 	wrapped_item_id = 0;
 }
@@ -44,7 +43,6 @@ Item::Item( uint32 high, uint32 low )
 
 	m_itemProto = NULL;
 	m_owner = NULL;
-	loot = NULL;
 	locked = false;
 	m_isDirty = true;
 	random_prop = 0;
@@ -54,9 +52,6 @@ Item::Item( uint32 high, uint32 low )
 
 Item::~Item()
 {
-	if( loot != NULL )
-		delete loot;
-
 	sEventMgr.RemoveEvents( this );
 
 	EnchantmentMap::iterator itr;
@@ -197,8 +192,8 @@ void Item::LoadFromDB(Field* fields, Player* plr, bool light )
 		SetUInt32Value( ITEM_FIELD_FLAGS, 1 );
 		SetUInt32Value( ITEM_FIELD_STACK_COUNT, 1 );
 		SetUInt32Value( ITEM_FIELD_PROPERTY_SEED, 57813883 );
-		if( plr->m_charters[CHARTER_TYPE_GUILD] )
-			SetUInt32Value( ITEM_FIELD_ENCHANTMENT, plr->m_charters[CHARTER_TYPE_GUILD]->GetID() );
+		if( plr->m_playerInfo->charterId[CHARTER_TYPE_GUILD] )
+			SetUInt32Value( ITEM_FIELD_ENCHANTMENT, plr->m_playerInfo->charterId[CHARTER_TYPE_GUILD] );
 	}
 
 	if( m_uint32Values[OBJECT_FIELD_ENTRY] == ARENA_TEAM_CHARTER_2v2 )
@@ -206,8 +201,8 @@ void Item::LoadFromDB(Field* fields, Player* plr, bool light )
 		SetUInt32Value( ITEM_FIELD_FLAGS, 1 );
 		SetUInt32Value( ITEM_FIELD_STACK_COUNT, 1 );
 		SetUInt32Value( ITEM_FIELD_PROPERTY_SEED, 57813883 );
-		if( plr->m_charters[CHARTER_TYPE_ARENA_2V2] )
-			SetUInt32Value( ITEM_FIELD_ENCHANTMENT, plr->m_charters[CHARTER_TYPE_ARENA_2V2]->GetID() );
+		if( plr->m_playerInfo->charterId[CHARTER_TYPE_ARENA_2V2] )
+			SetUInt32Value( ITEM_FIELD_ENCHANTMENT, plr->m_playerInfo->charterId[CHARTER_TYPE_ARENA_2V2] );
 	}
 
 	if( m_uint32Values[OBJECT_FIELD_ENTRY] == ARENA_TEAM_CHARTER_3v3 )
@@ -215,8 +210,8 @@ void Item::LoadFromDB(Field* fields, Player* plr, bool light )
 		SetUInt32Value( ITEM_FIELD_FLAGS, 1 );
 		SetUInt32Value( ITEM_FIELD_STACK_COUNT, 1 );
 		SetUInt32Value( ITEM_FIELD_PROPERTY_SEED, 57813883 );
-		if( plr->m_charters[CHARTER_TYPE_ARENA_3V3] )
-			SetUInt32Value( ITEM_FIELD_ENCHANTMENT, plr->m_charters[CHARTER_TYPE_ARENA_3V3]->GetID() );
+		if( plr->m_playerInfo->charterId[CHARTER_TYPE_ARENA_3V3] )
+			SetUInt32Value( ITEM_FIELD_ENCHANTMENT, plr->m_playerInfo->charterId[CHARTER_TYPE_ARENA_3V3] );
 	}
 
 	if( m_uint32Values[OBJECT_FIELD_ENTRY] == ARENA_TEAM_CHARTER_5v5 )
@@ -224,8 +219,8 @@ void Item::LoadFromDB(Field* fields, Player* plr, bool light )
 		SetUInt32Value( ITEM_FIELD_FLAGS, 1 );
 		SetUInt32Value( ITEM_FIELD_STACK_COUNT, 1 );
 		SetUInt32Value( ITEM_FIELD_PROPERTY_SEED, 57813883 );
-		if( plr->m_charters[CHARTER_TYPE_ARENA_5V5] )
-			SetUInt32Value( ITEM_FIELD_ENCHANTMENT, plr->m_charters[CHARTER_TYPE_ARENA_5V5]->GetID() );
+		if( plr->m_playerInfo->charterId[CHARTER_TYPE_ARENA_5V5] )
+			SetUInt32Value( ITEM_FIELD_ENCHANTMENT, plr->m_playerInfo->charterId[CHARTER_TYPE_ARENA_5V5] );
 	}
 }
 
@@ -563,7 +558,7 @@ int32 Item::AddEnchantment( EnchantEntry* Enchantment, uint32 Duration, bool Per
 	Instance.RandomSuffix = RandomSuffix;
 
 	// Set the enchantment in the item fields.
-	uint32 EnchantBase = ITEM_FIELD_ENCHANTMENT + Slot * 3;
+	uint32 EnchantBase = Slot * 3 + ITEM_FIELD_ENCHANTMENT;
 	SetUInt32Value( EnchantBase, Enchantment->Id );
 	SetUInt32Value( EnchantBase + 1, (uint32)Instance.ApplyTime );
 	SetUInt32Value( EnchantBase + 2, 0 ); // charges
@@ -601,10 +596,11 @@ int32 Item::AddEnchantment( EnchantEntry* Enchantment, uint32 Duration, bool Per
 	
 		/* Only apply the enchantment bonus if we're equipped */
 		uint8 slot = m_owner->GetItemInterface()->GetInventorySlotByGuid( GetGUID() );
-		if( slot >= EQUIPMENT_SLOT_START && slot < EQUIPMENT_SLOT_END )
+		if( slot > EQUIPMENT_SLOT_START && slot < EQUIPMENT_SLOT_END )
             ApplyEnchantmentBonus( Slot, APPLY );
 	}
 
+	GetOwner()->SaveToDB(false);
 	return Slot;
 }
 
@@ -657,17 +653,9 @@ void Item::ApplyEnchantmentBonus( uint32 Slot, bool Apply )
 	}
 
 	// Apply the visual on the player.
-	// SUPALOSA_: Not here
 	uint32 ItemSlot = m_owner->GetItemInterface()->GetInventorySlotByGuid( GetGUID() ) * 16;
 	uint32 VisibleBase = PLAYER_VISIBLE_ITEM_1_0 + ItemSlot;
 	m_owner->SetUInt32Value( VisibleBase + 1 + Slot, Apply ? Entry->Id : 0 );
-	
-	// 0 = ItemGUID
-	// 1 = PermEnchant
-	// 2 = TempEnchant
-	// 3 = Gem1
-	// 4 = Gem2
-	// 5 = Gem3
 
 	// Another one of those for loop that where not indented properly god knows what will break
 	// but i made it actually affect the code below it
@@ -840,7 +828,7 @@ void Item::ApplyEnchantmentBonus( uint32 Slot, bool Apply )
 
 			default:
 				{
-					sLog.outError( "Unknown enchantment type: %u (%u)", Entry->type[c], Entry->Id );
+					DEBUG_LOG( "Unknown enchantment type: %u (%u)", Entry->type[c], Entry->Id );
 				}break;
 			}
 		}
@@ -1057,4 +1045,66 @@ uint32 Item::GenerateRandomSuffixFactor( ItemPrototype* m_itemProto )
 
 	value = ( value * double( m_itemProto->ItemLevel ) ) + 0.5;
 	return long2int32( value );
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// Item Links
+//////////////////////////////////////////////////////////////////////////
+static const char *g_itemQualityColours[7] = {
+	"|cff9d9d9d",		// Grey
+	"|cffffffff",		// White
+	"|cff1eff00",		// Green
+	"|cff0070dd",		// Blue
+	"|cffa335ee",		// Purple
+	"|cffff8000",		// Orange
+	"|cffe6cc80",		// Artifact
+};
+
+string ItemPrototype::ConstructItemLink(uint32 random_prop, uint32 random_suffix, uint32 stack)
+{
+	if( Quality > 6 )
+		return "INVALID_ITEM";
+
+	char buf[1000];
+	char sbuf[50];
+	char rptxt[100];
+	char rstxt[100];
+	
+	// stack text
+	if( stack > 1 )
+		snprintf(sbuf, 50, "x%u", stack);
+	else
+		sbuf[0] = 0;
+
+	// null 'em
+	rptxt[0] = 0;
+	rstxt[0] = 0;
+
+	// lookup properties
+	if( random_prop != 0 )
+	{
+		RandomProps *rp = dbcRandomProps.LookupEntryForced(random_prop);
+		if( rp != NULL )
+			snprintf(rptxt, 100, " %s", rp->rpname);
+	}
+	
+	// suffix
+	if( random_suffix != 0 )
+	{
+		ItemRandomSuffixEntry *rs = dbcItemRandomSuffix.LookupEntryForced(random_suffix);
+		if( rs != NULL )
+			snprintf(rstxt, 100, " %s", rs->name);
+	}
+
+	// construct full link
+	snprintf(buf, 1000, "%s|Hitem:%u:0:0:0:0:0:%d:0|h[%s%s%s]%s|h|r", g_itemQualityColours[Quality], ItemId, /* suffix/prop */ random_suffix ? (-(int32)random_suffix) : random_prop, 
+		Name1, rstxt, rptxt, sbuf);
+	
+	return string(buf);
+}
+
+bool ItemPrototype::ValidateItemLink(const char *szLink)
+{
+	return true;
 }

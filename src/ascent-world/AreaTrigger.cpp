@@ -101,7 +101,7 @@ uint32 CheckTriggerPrerequsites(AreaTrigger * pAreaTrigger, WorldSession * pSess
 
 void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 {		
-	sLog.outDebug("AreaTrigger: %u", id);
+	DEBUG_LOG("AreaTrigger: %u", id);
 
 	// Are we REALLY here?
 	if( !_player->IsInWorld() )
@@ -112,15 +112,6 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 
 	AreaTrigger* pAreaTrigger = AreaTriggerStorage.LookupEntry( id );
 
-	if( pAreaTrigger == NULL )
-	{
-		sLog.outDebug("Missing AreaTrigger: %u", id);
-		return;
-	}
-
-	if( _player->GetSession()->CanUseCommand('z') )
-		sChatHandler.BlueSystemMessage( this, "[%sSystem%s] |rEntered areatrigger: %s%u (%s).", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE, id, pAreaTrigger->Name );
-
 	// if in BG handle is triggers
 	if( _player->m_bg )
 	{
@@ -130,6 +121,20 @@ void WorldSession::_HandleAreaTriggerOpcode(uint32 id)
 
 	// Hook for Scripted Areatriggers
 	_player->GetMapMgr()->HookOnAreaTrigger(_player, id);
+
+	if( _player->GetSession()->CanUseCommand('z') )
+	{
+		if( pAreaTrigger != NULL )
+			sChatHandler.BlueSystemMessage( this, "[%sSystem%s] |rEntered areatrigger: %s%u (%s).", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE, id, pAreaTrigger->Name );
+		else
+			sChatHandler.BlueSystemMessage( this, "[%sSystem%s] |rEntered areatrigger: %s%u", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE, id);
+	}
+
+	if( pAreaTrigger == NULL )
+	{
+		DEBUG_LOG("Missing AreaTrigger: %u", id);
+		return;
+	}
 
 	switch(pAreaTrigger->Type)
 	{

@@ -72,7 +72,7 @@ typedef HM_NAMESPACE::hash_map<uint32, GameObject*> GameObjectSqlIdMap;
 class Transporter;
 #define RESERVE_EXPAND_SIZE 1024
 
-class SERVER_DECL MapMgr : public CellHandler <MapCell>, public EventableObject,public CThread
+class SERVER_DECL MapMgr : public CellHandler <MapCell>, public EventableObject,public ThreadContext
 {
 	friend class UpdateObjectThread;
 	friend class ObjectUpdaterThread;
@@ -89,17 +89,24 @@ public:
 ////////////////////////////////////////////////////////
 // Local (mapmgr) storage/generation of GameObjects
 /////////////////////////////////////////////
-	uint32 m_GOArraySize;
+	typedef HM_NAMESPACE::hash_map<uint32, GameObject*> GameObjectMap;
+	GameObjectMap m_gameObjectStorage;
 	uint32 m_GOHighGuid;
-	GameObject ** m_GOStorage;
 	GameObject * CreateGameObject(uint32 entry);
 
-	ASCENT_INLINE uint32 GenerateGameobjectGuid() { return ++m_GOHighGuid; }
+	ASCENT_INLINE uint32 GenerateGameobjectGuid()
+	{
+		m_GOHighGuid &= 0x00FFFFFF;
+		return ++m_GOHighGuid;
+	}
+
 	ASCENT_INLINE GameObject * GetGameObject(uint32 guid)
 	{
-		if(guid > m_GOHighGuid)
-			return 0;
-		return m_GOStorage[guid];
+		GameObjectMap::iterator itr = m_gameObjectStorage.find(guid);
+		if( itr == m_gameObjectStorage.end() )
+			return NULL;
+
+		return itr->second;
 	}
 
 /////////////////////////////////////////////////////////
@@ -184,7 +191,7 @@ public:
 	void PushStaticObject(Object * obj);
 	void RemoveObject(Object *obj, bool free_guid);
 	void ChangeObjectLocation(Object *obj); // update inrange lists
-	void ChangeFarsightLocation(Player *plr, DynamicObject *farsight);
+	void ChangeFarsightLocation(Player *plr, Creature *farsight);
 
 	//! Mark object as updated
 	void ObjectUpdated(Object *obj);
@@ -207,8 +214,6 @@ public:
 
 	ASCENT_INLINE uint32 GetInstanceID() { return m_instanceID; }
 	ASCENT_INLINE MapInfo *GetMapInfo() { return pMapInfo; }
-
-	bool _shutdown;
 
 	ASCENT_INLINE MapScriptInterface * GetInterface() { return ScriptInterface; }
 	virtual int32 event_GetInstanceID() { return m_instanceID; }
@@ -240,7 +245,7 @@ public:
 	void InstanceShutdown()
 	{
 		pInstance = NULL;
-		SetThreadState(THREADSTATE_TERMINATE);
+		Terminate();
 	}
 
 	// kill the worker thread only
@@ -248,7 +253,7 @@ public:
 	{
 		pInstance=NULL;
 		thread_kill_only = true;
-		SetThreadState(THREADSTATE_TERMINATE);
+		Terminate();
 		while(thread_running)
 		{
 			Sleep(100);
@@ -267,7 +272,7 @@ private:
 	set<Object*> _mapWideStaticObjects;
 
 	bool _CellActive(uint32 x, uint32 y);
-	void UpdateInRangeSet(Object *obj, Player *plObj, MapCell* cell, ByteBuffer ** buf);
+	void UpdateInRangeSet(Object *obj, Player *plObj, MapCell* cell);
 
 public:
 	// Distance a Player can "see" other objects and receive updates from them (!! ALREADY dist*dist !!)
@@ -304,12 +309,48 @@ public:
 
 	Creature * GetSqlIdCreature(uint32 sqlid);
 	GameObject * GetSqlIdGameObject(uint32 sqlid);
-	deque<uint32> _reusable_guids_gameobject;
 	deque<uint32> _reusable_guids_creature;
 
 	bool forced_expire;
 	bool thread_kill_only;
 	bool thread_running;
+
+	// world state manager stuff
+	WorldStateManager m_stateManager;
+
+	// bytebuffer caching
+	ByteBuffer m_updateBuffer;
+	ByteBuffer m_createBuffer;
+	ByteBuffer m_updateBuildBuffer;
+	ByteBuffer m_compressionBuffer;
+
+public:
+
+	// get!
+	ASCENT_INLINE WorldStateManager& GetStateManager() { return m_stateManager; }
+
+	// send packet functions for state manager
+	void SendPacketToPlayers(int32 iZoneMask, int32 iFactionMask, WorldPacket *pData);
+	void SendPacketToPlayers(int32 iZoneMask, int32 iFactionMask, StackPacket *pData);
+	void SendPvPCaptureMessage(int32 iZoneMask, uint32 ZoneId, const char * Format, ...);
+
+	// auras :< (world pvp)
+	void RemoveAuraFromPlayers(int32 iFactionMask, uint32 uAuraId);
+	void RemovePositiveAuraFromPlayers(int32 iFactionMask, uint32 uAuraId);
+	void CastSpellOnPlayers(int32 iFactionMask, uint32 uSpellId);
+
+
+public:
+
+	// stored iterators for safe checking
+	PetStorageMap::iterator __pet_iterator;
+	PlayerStorageMap::iterator __player_iterator;
+
+	CreatureSet::iterator __creature_iterator;
+	GameObjectSet::iterator __gameobject_iterator;
+	
+	SessionSet::iterator __session_iterator_1;
+	SessionSet::iterator __session_iterator_2;
 };
 
 #endif

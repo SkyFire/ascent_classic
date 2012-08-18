@@ -36,16 +36,12 @@ Creature::Creature(uint64 guid)
 
 	m_quests = NULL;
 	proto = NULL;
-	spawnid=0;
  
 	creature_info=NULL;
 	m_H_regenTimer=0;
 	m_P_regenTimer=0;
 	m_useAI = true;
 	mTaxiNode = 0;
-
-	Tagged = false;
-	TaggerGuid = 0;
 
 	Skinned = false;
 	
@@ -77,12 +73,10 @@ Creature::Creature(uint64 guid)
 	m_TaxiNode = 0;
 	myFamily = 0;
 
-	loot.gold = 0;
 	haslinkupevent = false;
 	original_emotestate = 0;
 	mTrainer = 0;
 	m_spawn = 0;
-	spawnid = 0;
 	auctionHouse = 0;
 	has_waypoint_text = has_combat_text = false;
 	SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER,1);
@@ -101,7 +95,10 @@ Creature::Creature(uint64 guid)
 	m_transportGuid = 0;
 	m_transportPosition = NULL;
 	BaseAttackType = SCHOOL_NORMAL;
+
+	m_taggingPlayer = m_taggingGroup = 0;
 	m_lootMethod = -1;
+	m_noDeleteAfterDespawn = false;
 }
 
 
@@ -172,7 +169,7 @@ void Creature::OnRemoveCorpse()
 	if (IsInWorld() && (int32)m_mapMgr->GetInstanceID() == m_instanceId)
 	{
 
-		sLog.outDetail("Removing corpse of "I64FMT"...", GetGUID());
+		DEBUG_LOG("Removing corpse of "I64FMT"...", GetGUID());
 	   
 			if((GetMapMgr()->GetMapInfo() && GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID && this->proto && this->proto->boss) || m_noRespawn)
 			{
@@ -199,7 +196,7 @@ void Creature::OnRemoveCorpse()
 
 void Creature::OnRespawn(MapMgr * m)
 {
-	sLog.outDetail("Respawning "I64FMT"...", GetGUID());
+	DEBUG_LOG("Respawning "I64FMT"...", GetGUID());
 	SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 	SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0); // not tagging shiat
 	if(proto && m_spawn)
@@ -210,8 +207,8 @@ void Creature::OnRespawn(MapMgr * m)
 
 	RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 	Skinned = false;
-	Tagged = false;
-	TaggerGuid = 0;
+	//ClearTag();
+	m_taggingGroup = m_taggingPlayer = 0;
 	m_lootMethod = -1;
 
 	/* creature death state */
@@ -225,9 +222,6 @@ void Creature::OnRespawn(MapMgr * m)
 		bInvincible = true;
 		SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DEAD);
 	}
-
-	//empty loot
-	loot.items.clear();
 
 	setDeathState(ALIVE);
 	GetAIInterface()->StopMovement(0); // after respawn monster can move
@@ -248,37 +242,40 @@ void Creature::CreateWayPoint (uint32 WayPointID, uint32 mapid, float x, float y
 ///////////
 /// Looting
 
-void Creature::generateLoot()
+void Creature::GenerateLoot()
 {
-	lootmgr.FillCreatureLoot(&loot,GetEntry(), m_mapMgr ? (m_mapMgr->iInstanceMode > 0 ? true : false) : false);
+	if( IsPet() )
+		return;
+
+	lootmgr.FillCreatureLoot(&m_loot,GetEntry(), m_mapMgr ? (m_mapMgr->iInstanceMode > 0 ? true : false) : false);
 	
-	loot.gold = proto ? proto->money : 0;
+	m_loot.gold = proto ? proto->money : 0;
 
 	//For now let fill according to entry
-	if(!loot.gold)
+	if(!m_loot.gold)
 	{
 		CreatureInfo *info=GetCreatureName();
 		if (info && info->Type != BEAST)
 		{
 			if(m_uint32Values[UNIT_FIELD_MAXHEALTH] <= 1667)
-				loot.gold = (uint32)((info->Rank+1)*getLevel()*(rand()%5 + 1)); //generate copper
+				m_loot.gold = (uint32)((info->Rank+1)*getLevel()*(rand()%5 + 1)); //generate copper
 			else
-				loot.gold = (uint32)((info->Rank+1)*getLevel()*(rand()%5 + 1)*(this->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*0.0006)); //generate copper
+				m_loot.gold = (uint32)((info->Rank+1)*getLevel()*(rand()%5 + 1)*(this->GetUInt32Value(UNIT_FIELD_MAXHEALTH)*0.0006)); //generate copper
 		}
 	}
 	
-	if(loot.gold)
-		loot.gold = int32(float(loot.gold) * sWorld.getRate(RATE_MONEY));
+	if(m_loot.gold)
+		m_loot.gold = int32(float(m_loot.gold) * sWorld.getRate(RATE_MONEY));
 }
 
 void Creature::SaveToDB()
 {
-	if(!spawnid)
-		spawnid = objmgr.GenerateCreatureSpawnID();
+	if( m_spawn == NULL )
+		return;
 	 
 	std::stringstream ss;
 	ss << "REPLACE INTO creature_spawns VALUES("
-		<< spawnid << ","
+		<< m_spawn->id << ","
 		<< GetEntry() << ","
 		<< GetMapId() << ","
 		<< m_position.x << ","
@@ -346,9 +343,11 @@ void Creature::LoadScript()
 
 void Creature::DeleteFromDB()
 {
-	if(!GetSQL_id())return;
-	WorldDatabase.Execute("DELETE FROM creature_spawns WHERE id=%u", GetSQL_id());
-	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE spawnid=%u",GetSQL_id());
+	if( m_spawn == NULL )
+		return;
+
+	WorldDatabase.Execute("DELETE FROM creature_spawns WHERE id=%u", m_spawn->id);
+	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE spawnid=%u", m_spawn->id);
 }
 
 
@@ -480,6 +479,9 @@ bool Creature::CanAddToWorld()
 
 void Creature::RemoveFromWorld(bool addrespawnevent, bool free_guid)
 {
+	m_taggingPlayer = m_taggingGroup = 0;
+	m_lootMethod = 1;
+
 	RemoveAllAuras();
 	
 	if(IsPet()) /* Is a pet: IsPet() actually returns false on a pet? o_X */
@@ -651,7 +653,7 @@ void Creature::RegenerateFocus()
 	uint32 cur=GetUInt32Value(UNIT_FIELD_POWER3);
 	uint32 mm=GetUInt32Value(UNIT_FIELD_MAXPOWER3);
 	if(cur>=mm)return;
-	float amt = 25.0f * PctPowerRegenModifier[POWER_TYPE_FOCUS];
+	float amt = 10.0f * PctPowerRegenModifier[POWER_TYPE_FOCUS];
 	cur+=(uint32)amt;
 	SetUInt32Value(UNIT_FIELD_POWER3,(cur>=mm)?mm:cur);
 }
@@ -862,8 +864,6 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 	if(!creature_info)
 		return false;
 	
-	spawnid = spawn->id;
-
 	m_walkSpeed = m_base_walkSpeed = proto->walk_speed; //set speeds
 	m_runSpeed = m_base_runSpeed = proto->run_speed; //set speeds
 	m_flySpeed = proto->fly_speed;
@@ -946,6 +946,10 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 		{
 			GetAIInterface()->m_canCallForHelp = true;
 		}
+	}
+	else
+	{
+		sLog.outString("Warning: Creature %u is missing a valid faction template.\n", spawn->entry);
 	}
 
 
@@ -1069,7 +1073,7 @@ bool Creature::Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info)
 }
 
 
-void Creature::Load(CreatureProto * proto_, float x, float y, float z)
+void Creature::Load(CreatureProto * proto_, float x, float y, float z, float o)
 {
 	proto = proto_;
 
@@ -1135,8 +1139,8 @@ void Creature::Load(CreatureProto * proto_, float x, float y, float z)
 	original_emotestate = 0;
 	// set position
 
-	m_position.ChangeCoords( x, y, z, 0 );
-	m_spawnLocation.ChangeCoords(x, y, z, 0);
+	m_position.ChangeCoords( x, y, z, o );
+	m_spawnLocation.ChangeCoords(x, y, z, o);
 	m_faction = dbcFactionTemplate.LookupEntry(proto->Faction);
 
 	if(m_faction)

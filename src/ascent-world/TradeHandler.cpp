@@ -31,11 +31,7 @@ void WorldSession::HandleInitiateTrade(WorldPacket & recv_data)
 
 	if(pTarget == 0)
 	{
-#ifdef USING_BIG_ENDIAN
-		TradeStatus = swap32(uint32(TRADE_STATUS_PLAYER_NOT_FOUND));
-#else
 		TradeStatus = TRADE_STATUS_PLAYER_NOT_FOUND;
-#endif
 		OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 		return;
 	}
@@ -77,11 +73,7 @@ void WorldSession::HandleBeginTrade(WorldPacket & recv_data)
 	Player * plr = _player->GetTradeTarget();
 	if(_player->mTradeTarget == 0 || plr == 0)
 	{
-#ifdef USING_BIG_ENDIAN
-		TradeStatus = swap32(uint32(TRADE_STATUS_PLAYER_NOT_FOUND));
-#else
 		TradeStatus = TRADE_STATUS_PLAYER_NOT_FOUND;
-#endif
 		OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 		return;
 	}
@@ -89,19 +81,10 @@ void WorldSession::HandleBeginTrade(WorldPacket & recv_data)
 	if( _player->CalcDistance( objmgr.GetPlayer(_player->mTradeTarget) ) > 10.0f )
 	TradeStatus = TRADE_STATUS_TOO_FAR_AWAY;
 
-#ifdef USING_BIG_ENDIAN
-	swap32(&TradeStatus);
-	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	swap32(&TradeStatus);
-#else
-/*	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);*/
 	WorldPacket data(SMSG_TRADE_STATUS, 8);
 	data << TradeStatus << uint32(0x19);
 	plr->m_session->SendPacket(&data);
 	SendPacket(&data);
-#endif
 
 	plr->mTradeStatus = TradeStatus;
 	_player->mTradeStatus = TradeStatus;
@@ -115,24 +98,13 @@ void WorldSession::HandleBusyTrade(WorldPacket & recv_data)
 	Player * plr = _player->GetTradeTarget();
 	if(_player->mTradeTarget == 0 || plr == 0)
 	{
-#ifdef USING_BIG_ENDIAN
-		TradeStatus = swap32(uint32(TRADE_STATUS_PLAYER_NOT_FOUND));
-#else
 		TradeStatus = TRADE_STATUS_PLAYER_NOT_FOUND;
-#endif
 		OutPacket(TRADE_STATUS_PLAYER_NOT_FOUND, 4, &TradeStatus);
 		return;
 	}
 
-#ifdef USING_BIG_ENDIAN
-	swap32(&TradeStatus);
 	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	swap32(&TradeStatus);
-#else
-	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-#endif
 
 	plr->mTradeStatus = TradeStatus;
 	_player->mTradeStatus = TradeStatus;
@@ -149,24 +121,13 @@ void WorldSession::HandleIgnoreTrade(WorldPacket & recv_data)
 	Player * plr = _player->GetTradeTarget();
 	if(_player->mTradeTarget == 0 || plr == 0)
 	{
-#ifdef USING_BIG_ENDIAN
-		TradeStatus = swap32(uint32(TRADE_STATUS_PLAYER_NOT_FOUND));
-#else
 		TradeStatus = TRADE_STATUS_PLAYER_NOT_FOUND;
-#endif
 		OutPacket(TRADE_STATUS_PLAYER_NOT_FOUND, 4, &TradeStatus);
 		return;
 	}
 
-#ifdef USING_BIG_ENDIAN
-	swap32(&TradeStatus);
 	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	swap32(&TradeStatus);
-#else
-	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-#endif
 
 	plr->mTradeStatus = TradeStatus;
 	_player->mTradeStatus = TradeStatus;
@@ -181,12 +142,7 @@ void WorldSession::HandleCancelTrade(WorldPacket & recv_data)
 	if(_player->mTradeTarget == 0 || _player->mTradeStatus == TRADE_STATUS_COMPLETE)
 		return;
 
-#ifdef USING_BIG_ENDIAN
-	uint32 TradeStatus = swap32(uint32(TRADE_STATUS_CANCELLED));
-#else
     uint32 TradeStatus = TRADE_STATUS_CANCELLED;
-#endif
-
     OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 
 	Player * plr = _player->GetTradeTarget();
@@ -212,12 +168,7 @@ void WorldSession::HandleUnacceptTrade(WorldPacket & recv_data)
 	if(_player->mTradeTarget == 0 || plr == 0)
 		return;
 
-#ifdef USING_BIG_ENDIAN
-	uint32 TradeStatus = swap32(uint32(TRADE_STATUS_UNACCEPTED));
-#else
 	uint32 TradeStatus = TRADE_STATUS_UNACCEPTED;
-#endif
-
 	OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 
@@ -234,7 +185,7 @@ void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)
 	CHECK_PACKET_SIZE(recv_data, 3);
 
 	uint8 TradeSlot = recv_data.contents()[0];
-	uint8 SourceBag = recv_data.contents()[1];
+	int8 SourceBag = recv_data.contents()[1];
 	uint8 SourceSlot = recv_data.contents()[2];
 	Player * pTarget = _player->GetMapMgr()->GetPlayer( _player->mTradeTarget );
 
@@ -242,9 +193,16 @@ void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)
 	if( pTarget == NULL || pItem == 0 || TradeSlot > 6 || ( TradeSlot < 6 && pItem->IsSoulbound() ) )
 		return;
 
+	// cheatproof
+	if( SourceBag == INVENTORY_SLOT_NOT_SET && SourceSlot < INVENTORY_SLOT_BAG_END && SourceSlot >= INVENTORY_SLOT_BAG_START )
+		return;
+
+	if( pItem->GetProto()->ContainerSlots > 0 && ((Container*)pItem)->HasItems() )
+		return;
+
 	if(TradeSlot < 6 && pItem->IsSoulbound())
 	{
-		sCheatLog.writefromsession(this, "tried to cheat trade a soulbound item");
+		// client is obviously cheating
 		Disconnect();
 		return;
 	}
@@ -254,7 +212,7 @@ void WorldSession::HandleSetTradeItem(WorldPacket & recv_data)
 		// duping little shits
 		if(_player->mTradeItems[i] == pItem || pTarget->mTradeItems[i] == pItem)
 		{
-			sCheatLog.writefromsession(this, "tried to dupe an item through trade");
+			// cheating client
 			Disconnect();
 			return;
 		}
@@ -302,15 +260,8 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 	uint32 TradeStatus = TRADE_STATUS_ACCEPTED;
 	
 	// Tell the other player we're green.
-#ifdef USING_BIG_ENDIAN
-	swap32(&TradeStatus);
 	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 	_player->mTradeStatus = TradeStatus;
-	swap32(&TradeStatus);
-#else
-	plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-	_player->mTradeStatus = TradeStatus;
-#endif
 
 	if(plr->mTradeStatus == TRADE_STATUS_ACCEPTED)
 	{
@@ -344,7 +295,7 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 				Guid = _player->mTradeItems[Index] ? _player->mTradeItems[Index]->GetGUID() : 0;
 				if(Guid != 0)
 				{
-					if( _player->mTradeItems[Index]->IsSoulbound() )
+					if( _player->mTradeItems[Index]->IsSoulbound() || ( _player->mTradeItems[Index]->GetProto()->ContainerSlots > 0 && ((Container*)_player->mTradeItems[Index])->HasItems() ) )
 					{
 						_player->mTradeItems[Index] = NULL;
 					}
@@ -354,20 +305,20 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 						{
 							sGMLog.writefromsession(this, "traded item %s to %s", _player->mTradeItems[Index]->GetProto()->Name1, pTarget->GetName());
 						}
-						pItem = _player->m_ItemInterface->SafeRemoveAndRetreiveItemByGuid(Guid, true);
+						pItem = _player->m_ItemInterface->SafeRemoveAndRetreiveItemByGuidRemoveStats(Guid, true);
 					}
 				}
 
 				Guid = pTarget->mTradeItems[Index] ? pTarget->mTradeItems[Index]->GetGUID() : 0;
 				if(Guid != 0)
 				{
-					if( pTarget->mTradeItems[Index]->IsSoulbound() )
+					if( pTarget->mTradeItems[Index]->IsSoulbound() || ( pTarget->mTradeItems[Index]->GetProto()->ContainerSlots > 0 && ((Container*)pTarget->mTradeItems[Index])->HasItems() ) )
 					{
 						pTarget->mTradeItems[Index] = NULL;
 					}
 					else
 					{
-						pTarget->m_ItemInterface->SafeRemoveAndRetreiveItemByGuid(Guid, true);
+						pTarget->m_ItemInterface->SafeRemoveAndRetreiveItemByGuidRemoveStats(Guid, true);
 					}
 				}
 			}
@@ -407,15 +358,8 @@ void WorldSession::HandleAcceptTrade(WorldPacket & recv_data)
 
 			// Close Window
 			TradeStatus = TRADE_STATUS_COMPLETE;
-#ifdef USING_BIG_ENDIAN
-            swap32(&TradeStatus);
 			OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
 			plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-			swap32(&TradeStatus);
-#else
-			OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-			plr->m_session->OutPacket(SMSG_TRADE_STATUS, 4, &TradeStatus);
-#endif
 
 			_player->mTradeStatus = TRADE_STATUS_COMPLETE;
 			plr->mTradeStatus = TRADE_STATUS_COMPLETE;

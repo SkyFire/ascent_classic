@@ -186,26 +186,26 @@ struct SpellEntry
 {
 	uint32 Id;                              //1
 	uint32 Category;                        //2
-	uint32 field4;                          //3 something like spelltype 0: general spells 1: Pet spells 2: Disguise / transormation spells 3: enchantment spells
+	uint32 castUI;                          //3 something like spelltype 0: general spells 1: Pet spells 2: Disguise / transormation spells 3: enchantment spells
 	uint32 DispelType;                      //4
 	uint32 MechanicsType;                   //5
 	uint32 Attributes;                      //6
 	uint32 AttributesEx;                    //7
-	uint32 Flags3;                          //8
-	uint32 Flags4;                          //9 // Flags to
-	uint32 Flags5;                          //10 // Flags....
-	uint32 unk201_1;                        //11 // Flags 2.0.1 unknown one
-	uint32 unk240_1;						//12
+	uint32 Flags3;                   //8
+	uint32 Flags4;				            //9 // Flags to
+	uint32 AttributesExD;                   //10 // Flags....
+	uint32 AttributesExE;                   //11 // Flags 2.0.1 unknown one
+	uint32 AttributesExF;					//12
 	uint32 RequiredShapeShift;              //13 // Flags BitMask for shapeshift spells
-	uint32 UNK14;                           //14-> this is wrong // Flags BitMask for which shapeshift forms this spell can NOT be used in.
+	uint32 ShapeshiftExclude;               //14-> this is wrong // Flags BitMask for which shapeshift forms this spell can NOT be used in.;                           //14-> this is wrong // Flags BitMask for which shapeshift forms this spell can NOT be used in.
 	uint32 Targets;                         //15 - N / M
 	uint32 TargetCreatureType;              //16
 	uint32 RequiresSpellFocus;              //17
-	uint32 unk240_2;						//18
+	uint32 FacingCasterFlags;				//18
 	uint32 CasterAuraState;                 //19
 	uint32 TargetAuraState;                 //20
-	uint32 unk201_2;                        //21 2.0.1 unknown two
-	uint32 unk201_3;                        //22 2.0.1 unknown three
+	uint32 ExcludeCasterAuraState;          //21 2.0.1 unknown two
+	uint32 ExcludeTargetAuraState;          //22 2.0.1 unknown three
 	uint32 CastingTimeIndex;                //23
 	uint32 RecoveryTime;                    //24
 	uint32 CategoryRecoveryTime;            //25 recoverytime
@@ -250,12 +250,13 @@ struct SpellEntry
 	uint32 EffectChainTarget[3];            //105 - 107
 	uint32 EffectSpellGroupRelation[3];     //108 - 110     Not sure maybe we should rename it. its the relation to field: SpellGroupType
 	uint32 EffectMiscValue[3];              //111 - 113
+	uint32 EffectMiscValueB[3];				// 2.4.3
 	uint32 EffectTriggerSpell[3];           //114 - 116
 	float  EffectPointsPerComboPoint[3];    //117 - 117
 	uint32 SpellVisual;                     //120
 	uint32 field114;                        //121
-	uint32 dummy;                           //122
-	uint32 CoSpell;                         //123   activeIconID;
+	uint32 dummy;                     //122
+	uint32 activeIconID;                    //123   activeIconID
 	uint32 spellPriority;                   //124
 	char* Name;                             //125
 	//uint32 NameAlt1;                        //126
@@ -333,15 +334,17 @@ struct SpellEntry
 	uint64 SpellGroupType;					//198+199
 	uint32 MaxTargets;                      //200 
 	uint32 Spell_Dmg_Type;                  //201   dmg_class Integer      0=None, 1=Magic, 2=Melee, 3=Ranged
-	uint32 FG;                              //202   0,1,2 related to Spell_Dmg_Type I think
-	int32 FH;                               //203   related to paladin aura's 
+	uint32 PreventionType;                  //202   0,1,2 related to Spell_Dmg_Type I think
+	int32 FH;                   //203   related to paladin aura's 
 	float dmg_multiplier[3];                //204 - 206   if the name is correct I dono
-	uint32 FL;                              //207   only one spellid:6994 has this value = 369 UNUSED
-	uint32 FM;                              //208   only one spellid:6994 has this value = 4 UNUSED
-	uint32 FN;                              //209  3 spells 1 or 2   
+	uint32 MinFactionID;                    //207   only one spellid:6994 has this value = 369 UNUSED
+	uint32 MinReputation;                   //208   only one spellid:6994 has this value = 4 UNUSED
+	uint32 RequiredAuraVision;              //209  3 spells 1 or 2   
 	uint32 TotemCategory[2];				//210-211
 	uint32 RequiresAreaId;				     		//212 
 	uint32 School;						// 213
+//	uint32 RuneCostID;						//214 from 3.0.1
+//	uint32 SpellMissileID;					//215 from 3.0.1
 
     /// CUSTOM: these fields are used for the modifications made in the world.cpp
     uint32 DiminishStatus;                  //
@@ -351,6 +354,7 @@ struct SpellEntry
     uint32 buffType;                        //!!! CUSTOM, these are related to creating a item through a spell
     uint32 RankNumber;                      //!!! CUSTOM, this protects players from having >1 rank of a spell
     uint32 NameHash;                        //!!! CUSTOM, related to custom spells, summon spell quest related spells
+	float base_range_or_radius;				//!!! CUSTOM, needed for aoe spells most of the time
     float base_range_or_radius_sqr;         //!!! CUSTOM, needed for aoe spells most of the time
 	uint32 talent_tree;						//!!! CUSTOM,
 	uint32 in_front_status;					//!!! CUSTOM,
@@ -360,10 +364,9 @@ struct SpellEntry
     uint32 EffectSpellGroupRelation_high[3];     //!!! this is not contained in client dbc but server must have it
 	uint32 ThreatForSpell;
 
-	uint32 ProcOnNameHash[3];
-
 	// love me or hate me, all "In a cone in front of the caster" spells don't necessarily mean "in front"
 	float cone_width;
+
 	//Spell Coefficient
 	float casttime_coef;                                    //!!! CUSTOM, faster spell bonus calculation
 	uint32 spell_coef_flags;                                //!!! CUSTOM, store flags for spell coefficient calculations
@@ -375,6 +378,11 @@ struct SpellEntry
 	bool self_cast_only;
 	bool apply_on_shapeshift_change;
 	bool always_apply;
+
+	bool Unique;											//!!! CUSTOM, Is this a unique effect? ex: Mortal Strike -50% healing.
+
+	uint32 area_aura_update_interval;
+	float procs_per_minute;
 };
 
 struct ItemExtendedCostEntry
@@ -472,11 +480,11 @@ struct SpellDuration
 struct RandomProps
 {
     uint32 ID;
-    //uint32 name1;
+    //char *name1;
     uint32 spells[3];
     //uint32 unk1;
     //uint32 unk2;
-    //uint32 name2;
+    char *rpname;
     //uint32 RankAlt1;
     //uint32 RankAlt2;
     //uint32 RankAlt3;
@@ -843,6 +851,7 @@ struct MapEntry
 struct ItemRandomSuffixEntry
 {
 	uint32 id;
+	char *name;
 	uint32 enchantments[3];
 	uint32 prefixes[3];
 };
@@ -861,6 +870,7 @@ struct ChatChannelDBC
 {
 	uint32 id;
 	uint32 flags;
+	const char* pattern;
 };
 
 struct DurabilityQualityEntry
@@ -957,10 +967,6 @@ public:
 		fread(&string_length, 4, 1, f);
 		pos = ftell(f);
 
-#ifdef USING_BIG_ENDIAN
-		swap32(&rows); swap32(&cols); swap32(&useless_shit); swap32(&string_length);
-#endif
-
 		if( load_strings )
 		{
 			fseek( f, 20 + ( rows * cols * 4 ), SEEK_SET );
@@ -1017,7 +1023,7 @@ public:
 		uint32 val;
 		size_t len = strlen(format);
 		if(len!= cols)
-			printf("!!! possible invalid format in file %s (us: %u, them: %u)\n", filename, len, cols);
+			printf("!!! possible invalid format in file %s (us: %u, them: %u)\n", filename, (unsigned int)len, cols);
 
 		while(*t != 0)
 		{
@@ -1034,9 +1040,6 @@ public:
 				++t;
 				continue;		// skip!
 			}
-#ifdef USING_BIG_ENDIAN
-			swap32(&val);
-#endif
 			if(*t == 's')
 			{
 				char ** new_ptr = (char**)dest_ptr;

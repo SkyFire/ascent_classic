@@ -24,52 +24,6 @@ class Player;
 class GameObjectAIScript;
 class GameObjectTemplate;
 
-struct GOQuestItem
-{
-	uint32 itemid;
-	uint32 requiredcount;
-};
-
-struct GOQuestGameObject
-{
-	uint32 goid;
-	uint32 requiredcount;
-};
-
-enum GAMEOBJECT_FLAG_BIT
-{
-	GAMEOBJECT_UNCLICKABLE = 0x01,
-	GAMEOBJECT_CLICKABLE = 0x20,
-};
-
-#if ENABLE_SHITTY_STL_HACKS == 1
-typedef HM_NAMESPACE::hash_map<Quest*, uint32 > GameObjectGOMap;
-#else
-namespace HM_NAMESPACE
-{
-	template <>
-	struct hash<Quest*>
-	{
-		union __vp
-		{
-			size_t s;
-			Quest* p;
-		};
-
-		size_t operator()(Quest* __x) const
-		{
-			__vp vp;
-			vp.p = __x;
-			return vp.s;
-		}
-	};
-};
-
-typedef HM_NAMESPACE::hash_map<Quest*, uint32, HM_NAMESPACE::hash<Quest*> > GameObjectGOMap;
-#endif
-
-typedef HM_NAMESPACE::hash_map<Quest*, std::map<uint32, uint32> > GameObjectItemMap;
-
 #pragma pack(push,1)
 struct GameObjectInfo
 {
@@ -101,9 +55,8 @@ struct GameObjectInfo
 	uint32 Unknown12;
 	uint32 Unknown13;
 	uint32 Unknown14;
-	// Quests
-	GameObjectGOMap goMap;
-	GameObjectItemMap itemMap;
+	uint32 *InvolvedQuestIds;
+	uint32 InvolvedQuestCount;
 };
 #pragma pack(pop)
 
@@ -138,6 +91,22 @@ enum GAMEOBJECT_TYPES
 	GAMEOBJECT_TYPE_FLAGDROP		   = 26,
 };
 
+enum GameObjectFlags
+{
+	GO_FLAG_IN_USE          = 0x01,                         //disables interaction while animated
+	GO_FLAG_LOCKED          = 0x02,                         //require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
+	GO_FLAG_INTERACT_COND   = 0x04,                         //cannot interact (condition to interact)
+	GO_FLAG_TRANSPORT       = 0x08,                         //any kind of transport? Object can transport (elevator, boat, car)
+	GO_FLAG_UNK1            = 0x10,                         //
+	GO_FLAG_NODESPAWN       = 0x20,                         //never despawn, typically for doors, they just change state
+	GO_FLAG_TRIGGERED       = 0x40,                         //typically, summoned objects. Triggered by spell or other events
+};
+
+enum GameObjectDynFlags
+{
+	GO_DYNFLAG_QUEST		= 0x09,
+};
+
 #define CALL_GO_SCRIPT_EVENT(obj, func) if(obj->GetTypeId() == TYPEID_GAMEOBJECT && static_cast<GameObject*>(obj)->GetScript() != NULL) static_cast<GameObject*>(obj)->GetScript()->func
 
 class SERVER_DECL GameObject : public Object
@@ -169,7 +138,7 @@ public:
 
 	void Spawn(MapMgr * m);
 	void Despawn(uint32 time);
-	Loot loot;
+
 	//void _EnvironmentalDamageUpdate();
 	void UpdateTrapState();
 	// Serialization
@@ -205,8 +174,6 @@ public:
 	void _Expire();
 	
 	void ExpireAndDelete();
-
-	void Deactivate();
 
 	ASCENT_INLINE bool isQuestGiver()
 	{
@@ -257,9 +224,14 @@ public:
 		if(force || !mines_remaining)
 			mines_remaining = GetInfo()->sound4 + RandomUInt(GetInfo()->sound5 - GetInfo()->sound4) - 1;
 	}
-	bool HasLoot();
+
 	uint32 GetGOReqSkill();
 	MapCell * m_respawnCell;
+
+	ASCENT_INLINE void SetScript(GameObjectAIScript *pScript) { myScript = pScript; }
+
+	// loooot
+	void GenerateLoot();
 
 protected:
 

@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -20,18 +20,33 @@
 #ifndef __ACCOUNTCACHE_H
 #define __ACCOUNTCACHE_H
 
+enum RealmColours
+{
+	REALMCOLOUR_GREEN			= 0,
+	REALMCOLOUR_RED				= 1,
+	REALMCOLOUR_OFFLINE			= 2,
+	REALMCOLOUR_BLUE			= 3,
+};
+
+enum RealmIcons
+{
+	REALMICON_UNK_0				= 0,
+	REALMICON_UNK_1				= 1,
+	REALMICON_UNK_2				= 2,
+};
+
 #include "Common.h"
 #include "../ascent-shared/Database/DatabaseEnv.h"
 
 struct Account
 {
 	uint32 AccountId;
+	char * Username;
 	char * GMFlags;
 	uint8 AccountFlags;
 	uint32 Banned;
 	uint8 SrpHash[20];
 	uint8 * SessionKey;
-	string * UsernamePtr;
 	uint32 Muted;
 
 	Account()
@@ -80,10 +95,12 @@ struct Account
 
 typedef struct 
 {
-	unsigned int Mask;
-	unsigned char Bytes;
-	uint32 Expire;
-	string db_ip;
+	union
+	{
+		struct ipfull { uint8 b1, b2, b3, b4; } full;
+		uint32 asbytes;
+	} ip;
+	uint32 ban_expire_time;
 } IPBan;
 
 enum BAN_STATUS
@@ -96,16 +113,17 @@ enum BAN_STATUS
 class IPBanner : public Singleton< IPBanner >
 {
 public:
+	void Load();
 	void Reload();
-
+	void Remove(set<IPBan*>::iterator ban);
 	bool Add(const char * ip, uint32 dur);
 	bool Remove(const char * ip);
 
 	BAN_STATUS CalculateBanStatus(in_addr ip_address);
 
 protected:
-	Mutex listBusy;
-	list<IPBan> banList;
+	Mutex setBusy;
+	set<IPBan*> banList;
 };
 
 class AccountMgr : public Singleton < AccountMgr >
@@ -174,15 +192,31 @@ protected:
 	Mutex setBusy;
 };
 
+class LogonCommServerSocket;
 typedef struct
 {
+	uint32 Id;
 	string Name;
 	string Address;
 	uint32 Colour;
 	uint32 Icon;
 	uint32 TimeZone;
 	float Population;
+
+	Mutex m_charMapLock;
 	HM_NAMESPACE::hash_map<uint32, uint8> CharacterMap;
+	LogonCommServerSocket *ServerSocket;
+
+	uint8 GetCharacterCount(uint32 acc)
+	{
+		uint8 r;
+		m_charMapLock.Acquire();
+		HM_NAMESPACE::hash_map<uint32, uint8>::iterator itr = CharacterMap.find( acc );
+		r = (itr == CharacterMap.end()) ? 0 : itr->second;
+		m_charMapLock.Release();
+		return r;
+	}
+
 }Realm;
 
 class AuthSocket;
@@ -214,12 +248,17 @@ public:
 	// Realm management
 	uint32 GenerateRealmID()
 	{
-		return ++realmhigh;
+		uint32 r;
+		realmLock.Acquire();
+		r = ++realmhigh;
+		realmLock.Release();
+		return r;
 	}
 
-	Realm*		  AddRealm(uint32 realm_id, Realm * rlm);
-	Realm*        GetRealm(uint32 realm_id);
-	void		  RemoveRealm(uint32 realm_id);
+	void		  AddRealm(Realm * rlm);
+	Realm*        GetRealmByName(const char * realmName);
+	Realm*        GetRealmById(uint32 id);
+	void		  SetRealmOffline(uint32 realm_id, LogonCommServerSocket *ss);
 
 	ASCENT_INLINE void   AddServerSocket(LogonCommServerSocket * sock) { serverSocketLock.Acquire(); m_serverSockets.insert( sock ); serverSocketLock.Release(); }
 	ASCENT_INLINE void   RemoveServerSocket(LogonCommServerSocket * sock) { serverSocketLock.Acquire(); m_serverSockets.erase( sock ); serverSocketLock.Release(); }

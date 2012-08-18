@@ -47,7 +47,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	if ( _player->InGroup() && !_player->IsGroupLeader() )
+	if ( _player->InGroup() && (!_player->IsGroupLeader() || _player->GetGroup()->HasFlag(GROUP_FLAG_BATTLEGROUND_GROUP) ) )
 	{
 		SendPartyCommandResult(_player, 0, "", ERR_PARTY_YOU_ARE_NOT_LEADER);
 		return;
@@ -87,6 +87,12 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 		return;
 	}
 
+	if( player->bGMTagOn && !_player->GetSession()->HasPermissions())
+	{
+		SendPartyCommandResult(_player, 0, membername, ERR_PARTY_CANNOT_FIND);
+		return;
+	}
+
 	// 16/08/06 - change to guid to prevent very unlikely event of a crash in deny, etc
 	_player->SetInviter(_player->GetLowGUID());//bugfix if player invtied 2 people-> he can be in 2 parties
 
@@ -111,7 +117,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
 void WorldSession::HandleGroupCancelOpcode( WorldPacket & recv_data )
 {
 	if(!_player->IsInWorld()) return;
-	sLog.outDebug( "WORLD: got CMSG_GROUP_CANCEL." );
+	DEBUG_LOG( "WORLD: got CMSG_GROUP_CANCEL." );
 }
 
 ////////////////////////////////////////////////////////////////
@@ -136,13 +142,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 		if(grp->GetLeader()->m_loggedInPlayer)
 			_player->iInstanceType = grp->GetLeader()->m_loggedInPlayer->iInstanceType;
 
-#ifdef USING_BIG_ENDIAN
-		uint32 swapped = swap32(_player->iInstanceType);
-		_player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &swapped);
-#else
-        _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &_player->iInstanceType);
-#endif
-        //sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
+        _player->GetSession()->OutPacket(MSG_SET_DUNGEON_DIFFICULTY, 4, &_player->iInstanceType);
 		return;
 	}
 	
@@ -151,15 +151,7 @@ void WorldSession::HandleGroupAcceptOpcode( WorldPacket & recv_data )
 	grp->AddMember(player->m_playerInfo);		// add the inviter first, therefore he is the leader
 	grp->AddMember(_player->m_playerInfo);	   // add us.
     _player->iInstanceType = player->iInstanceType;
-#ifdef USING_BIG_ENDIAN
-	uint32 swapped2 = swap32(player->iInstanceType);
-	_player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &swapped2);
-#else
-    _player->GetSession()->OutPacket(CMSG_DUNGEON_DIFFICULTY, 4, &player->iInstanceType);
-#endif
-    //sInstanceSavingManager.ResetSavedInstancesForPlayer(_player);
-
-	// Currentgroup and all that shit are set by addmember.
+    _player->GetSession()->OutPacket(MSG_SET_DUNGEON_DIFFICULTY, 4, &player->iInstanceType);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +200,7 @@ void WorldSession::HandleGroupUninviteOpcode( WorldPacket & recv_data )
 		return;
 	}
 
-	if ( !_player->IsGroupLeader() )
+	if ( !_player->IsGroupLeader() || info->m_Group->HasFlag(GROUP_FLAG_BATTLEGROUND_GROUP) )	// bg group
 	{
 		if(_player != player)
 		{
@@ -216,6 +208,9 @@ void WorldSession::HandleGroupUninviteOpcode( WorldPacket & recv_data )
 			return;
 		}
 	}
+
+	if(_player->m_bg)
+		return;
 
 	group = _player->GetGroup();
 
@@ -228,7 +223,7 @@ void WorldSession::HandleGroupUninviteOpcode( WorldPacket & recv_data )
 //////////////////////////////////////////////////////////////////////////////////////////
 void WorldSession::HandleGroupUninviteGuildOpcode( WorldPacket & recv_data )
 {
-	sLog.outDebug( "WORLD: got CMSG_GROUP_UNINVITE_GUID." );
+	DEBUG_LOG( "WORLD: got CMSG_GROUP_UNINVITE_GUID." );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +275,9 @@ void WorldSession::HandleGroupDisbandOpcode( WorldPacket & recv_data )
 	if(!_player->IsInWorld()) return;
 	Group* pGroup = _player->GetGroup();
 	if(!pGroup) return;
+
+	if(pGroup->HasFlag(GROUP_FLAG_BATTLEGROUND_GROUP))
+		return;
 
 	//pGroup->Disband();
 	pGroup->RemovePlayer(_player->m_playerInfo);
@@ -341,7 +339,7 @@ void WorldSession::HandleSetPlayerIconOpcode(WorldPacket& recv_data)
 	if(icon == 0xFF)
 	{
 		// client request
-		WorldPacket data(MSG_GROUP_SET_PLAYER_ICON, 73);
+		WorldPacket data(MSG_RAID_TARGET_UPDATE, 73);
 		data << uint8(1);
 		for(uint8 i = 0; i < 8; ++i)
 			data << i << pGroup->m_targetIcons[i];
@@ -355,7 +353,7 @@ void WorldSession::HandleSetPlayerIconOpcode(WorldPacket& recv_data)
 			return;			// whhopes,buffer overflow :p
 
 		// setting icon
-		WorldPacket data(MSG_GROUP_SET_PLAYER_ICON, 10);
+		WorldPacket data(MSG_RAID_TARGET_UPDATE, 10);
 		data << uint8(0) << icon << guid;
 		pGroup->SendPacketToAll(&data);
 

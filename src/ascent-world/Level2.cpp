@@ -94,7 +94,7 @@ bool ChatHandler::CreateGuildCommand(const char* args, WorldSession *m_session)
 	{
 		// send message to user
 		char buf[256];
-		snprintf((char*)buf,256,"The name was too long by %i", strlen((char*)args)-75);
+		snprintf((char*)buf,256,"The name was too long by %i", (unsigned int)strlen((char*)args)-75);
 		SystemMessage(m_session, buf);
 		return true;
 	}
@@ -124,7 +124,6 @@ bool ChatHandler::CreateGuildCommand(const char* args, WorldSession *m_session)
 
 bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 {
-
 	uint64 guid = m_session->GetPlayer()->GetSelection();
 	if (guid == 0)
 	{
@@ -138,34 +137,50 @@ bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 		SystemMessage(m_session, "You should select a creature.");
 		return true;
 	}
-	sGMLog.writefromsession(m_session, "used npc delete, sqlid %u, creature %s, pos %f %f %f",
-		unit->GetSQL_id(), unit->GetCreatureName() ? unit->GetCreatureName()->Name : "wtfbbqhax", unit->GetPositionX(), unit->GetPositionY(),
-		unit->GetPositionZ());
-	if(unit->m_spawn == 0)
-		return false;
-	BlueSystemMessage(m_session, "Deleted creature ID %u", unit->spawnid);
 
+	if( unit->m_spawn != NULL && !m_session->CanUseCommand('z') )
+	{
+		SystemMessage(m_session, "You do not have permission to do that. Please contact higher staff for removing of saved spawns.");
+		return true;
+	}
+
+	sGMLog.writefromsession(m_session, "used npc delete, sqlid %u, creature %s, pos %f %f %f",
+		unit->m_spawn ? unit->m_spawn : 0, unit->GetCreatureName() ? unit->GetCreatureName()->Name : "wtfbbqhax", unit->GetPositionX(), unit->GetPositionY(),
+		unit->GetPositionZ());
+
+	BlueSystemMessage(m_session, "Deleted creature ID %u", unit->m_spawn ? unit->m_spawn->id : 0);
+	
+	MapMgr *unitMgr = unit->GetMapMgr();
 	if(unit->IsInWorld())
 	{
-		if(unit->m_spawn)
+		unit->RemoveFromWorld(false,true);
+	}
+
+	if(unit->m_spawn == NULL)
+		return true;
+
+	unit->DeleteFromDB();
+	if(unit->m_spawn)
+	{
+		uint32 cellx=float2int32(((_maxX-unit->m_spawn->x)/_cellSize));
+		uint32 celly=float2int32(((_maxY-unit->m_spawn->y)/_cellSize));
+		if(cellx <= _sizeX && celly <= _sizeY && unitMgr != NULL)
 		{
-			uint32 cellx=float2int32(((_maxX-unit->m_spawn->x)/_cellSize));
-			uint32 celly=float2int32(((_maxY-unit->m_spawn->y)/_cellSize));
-			if(cellx <= _sizeX && celly <= _sizeY)
+			CellSpawns * c = unitMgr->GetBaseMap()->GetSpawnsList(cellx, celly);
+			if( c != NULL )
 			{
-				CellSpawns * c = unit->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly);
 				for(CreatureSpawnList::iterator itr = c->CreatureSpawns.begin(); itr != c->CreatureSpawns.end(); ++itr)
+				{
 					if((*itr) == unit->m_spawn)
 					{
 						c->CreatureSpawns.erase(itr);
+						delete unit->m_spawn;
 						break;
 					}
-				delete unit->m_spawn;
+				}
 			}
 		}
-		unit->RemoveFromWorld(false,true);
 	}
-	unit->DeleteFromDB();
 
 	delete unit;
 
@@ -174,7 +189,6 @@ bool ChatHandler::HandleDeleteCommand(const char* args, WorldSession *m_session)
 
 bool ChatHandler::HandleDeMorphCommand(const char* args, WorldSession *m_session)
 {
-	sLog.outError("Demorphed %s",m_session->GetPlayer()->GetName());
 	m_session->GetPlayer()->DeMorph();
 	return true;
 }
@@ -635,18 +649,21 @@ bool ChatHandler::HandleGODelete(const char *args, WorldSession *m_session)
 		uint32 cellx=float2int32(((_maxX-GObj->m_spawn->x)/_cellSize));
 		uint32 celly=float2int32(((_maxY-GObj->m_spawn->y)/_cellSize));
 
+		GObj->DeleteFromDB();
+
 		if(cellx < _sizeX && celly < _sizeY)
 		{
-			//m_session->GetPlayer()->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx,celly)->GOSpawns.erase(GObj->m_spawn);
 			CellSpawns * c = GObj->GetMapMgr()->GetBaseMap()->GetSpawnsListAndCreate(cellx, celly);
 			for(GOSpawnList::iterator itr = c->GOSpawns.begin(); itr != c->GOSpawns.end(); ++itr)
+			{
 				if((*itr) == GObj->m_spawn)
 				{
 					c->GOSpawns.erase(itr);
 					break;
 				}
-			GObj->DeleteFromDB();
+			}
 			delete GObj->m_spawn;
+			GObj->m_spawn = NULL;
 		}
 	}
 	GObj->Despawn(0);
@@ -690,6 +707,12 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 	if (pSave)
 		Save = (atoi(pSave)>0?true:false);
 
+	/*if( Save && !m_session->CanUseCommand('z') )
+	{
+		SystemMessage(m_session, "You are not allowed to save spawns.");
+		return true;
+	}*/
+
 	GameObjectInfo* goi = GameObjectNameStorage.LookupEntry(EntryID);
 	if(!goi)
 	{
@@ -698,7 +721,7 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 		return true;
 	}
 
-	sLog.outDebug("Spawning GameObject By Entry '%u'", EntryID);
+	DEBUG_LOG("Spawning GameObject By Entry '%u'", EntryID);
 	sstext << "Spawning GameObject By Entry '" << EntryID << "'" << '\0';
 	SystemMessage(m_session, sstext.str().c_str());
 

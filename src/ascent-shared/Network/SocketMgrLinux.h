@@ -83,7 +83,7 @@ public:
     void SpawnWorkerThreads();
 };
 
-class SocketWorkerThread : public ThreadBase
+class SocketWorkerThread : public ThreadContext
 {
     /// epoll event struct
     struct epoll_event events[THREAD_EVENT_SIZE];

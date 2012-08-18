@@ -29,7 +29,7 @@ class Unit;
 
 enum ChatMsg
 {
-	CHAT_MSG_ADDON									= 0,
+	CHAT_MSG_UNK_0									= 0,
 	CHAT_MSG_SAY									= 1,
 	CHAT_MSG_PARTY									= 2,
 	CHAT_MSG_RAID									= 3,
@@ -84,6 +84,7 @@ enum ChatMsg
 
 enum Languages
 {
+	LANG_ADDON									= -1,
     LANG_UNIVERSAL                              = 0x00,
     LANG_ORCISH                                 = 0x01,
     LANG_DARNASSIAN                             = 0x02,
@@ -171,7 +172,7 @@ public:
 	ChatHandler();
 	~ChatHandler();
 
-	WorldPacket * FillMessageData( uint32 type, uint32 language,  const char* message,uint64 guid, uint8 flag = 0) const;
+	WorldPacket * FillMessageData( uint32 type, int32 language,  const char* message,uint64 guid, uint8 flag = 0) const;
 	WorldPacket * FillSystemMessageData( const char* message ) const;
 
 	int ParseCommands(const char* text, WorldSession *session);
@@ -271,6 +272,7 @@ protected:
 	bool HandleRenameGuildCommand(const char* args, WorldSession *m_session);
 	bool HandleGuildRemovePlayerCommand(const char* args, WorldSession *m_session);
 	bool HandleGuildDisbandCommand(const char* args, WorldSession *m_session);
+	bool HandleGuildSetLeaderCommand(const char *args, WorldSession *m_session);
 
 	// Level 2 commands
 	bool HandleNameCommand(const char* args, WorldSession *m_session);
@@ -308,7 +310,6 @@ protected:
 	bool HandleMoveCommand(const char* args, WorldSession *m_session);
 	bool HandleLearnCommand(const char* args, WorldSession *m_session);
 	bool HandleReviveCommand(const char* args, WorldSession *m_session);
-	bool HandleGenderChanger(const char* args, WorldSession *m_session);
 	bool HandleAddGraveCommand(const char* args, WorldSession *m_session);
 	bool HandleAddSHCommand(const char* args, WorldSession *m_session);
 	bool HandleExploreCheatCommand(const char* args, WorldSession *m_session);
@@ -326,7 +327,6 @@ protected:
 	bool HandleIncreaseWeaponSkill(const char* args, WorldSession *m_session);
 	bool HandleCastSpellCommand(const char* args, WorldSession *m_session);
 	bool HandleCastSpellNECommand(const char* args, WorldSession *m_session);
-	bool HandleLevelUpCommand(const char* args, WorldSession *m_session);
 	bool HandleModifyGoldCommand(const char* args, WorldSession *m_session);
 	bool HandleMonsterSayCommand(const char* args, WorldSession *m_session);
 	bool HandleMonsterYellCommand(const char* args, WorldSession* m_session);
@@ -424,7 +424,6 @@ protected:
 	// kill
 	bool HandleKillBySessionCommand(const char* args, WorldSession* m_session);
 	bool HandleKillByPlayerCommand(const char* args, WorldSession* m_session);
-	bool HandleKillByIPCommand(const char* args, WorldSession* m_session);
 
 	// castall
 	bool HandleCastAllCommand(const char* args, WorldSession* m_session);
@@ -508,6 +507,18 @@ protected:
 
 	bool HandleFixScaleCommand(const char * args, WorldSession * m_session);
 	bool HandleAddTrainerSpellCommand( const char * args, WorldSession * m_session );
+	bool HandleClearCorpsesCommand(const char *args, WorldSession *m_session);
+	bool HandleClearBonesCommand(const char *args, WorldSession *m_session);
+
+	bool HandleMultiMuteCommand(const char *args, WorldSession *m_session);
+	bool HandleMultiBanCommand(const char *args, WorldSession *m_session);
+	bool HandleMultiAccountBanCommand(const char *args, WorldSession *m_session);
+	bool HandleMultiKickCommand(const char *args, WorldSession *m_session);
+
+	// Reputation system command
+	bool HandlePosRepCommand(const char *args, WorldSession *m_session);
+	bool HandleNegRepCommand(const char *args, WorldSession *m_session);
+	bool HandleGetRepCommand(const char *args, WorldSession *m_session);
 };
 
 

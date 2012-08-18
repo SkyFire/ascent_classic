@@ -52,6 +52,13 @@ enum QuickGroupUpdateFlags
 	PARTY_UPDATE_FLAG_ZONEID			= 2,
 };
 
+enum GroupFlags
+{
+	GROUP_FLAG_DONT_DISBAND_WITH_NO_MEMBERS			= 1,
+	GROUP_FLAG_REMOVE_OFFLINE_PLAYERS				= 2,
+	GROUP_FLAG_BATTLEGROUND_GROUP					= 4,
+};
+
 struct PlayerInfo;
 typedef struct
 {
@@ -126,6 +133,9 @@ public:
 	ASCENT_INLINE void SendPacketToAll(WorldPacket *packet) { SendPacketToAllButOne(packet, NULL); }
 	void SendPacketToAllButOne(WorldPacket *packet, Player *pSkipTarget);
 
+	ASCENT_INLINE void SendPacketToAll(StackPacket *packet) { SendPacketToAllButOne(packet, NULL); }
+	void SendPacketToAllButOne(StackPacket *packet, Player *pSkipTarget);
+
 	ASCENT_INLINE void OutPacketToAll(uint16 op, uint16 len, const void* data) { OutPacketToAllButOne(op, len, data, NULL); }
 	void OutPacketToAllButOne(uint16 op, uint16 len, const void* data, Player *pSkipTarget);
 
@@ -177,7 +187,6 @@ public:
 	void HandlePartialChange(uint32 Type, Player * pPlayer);
 
 	uint64 m_targetIcons[8];
-	bool m_disbandOnNoMembers;
 	ASCENT_INLINE Mutex& getLock() { return m_groupLock; }
 	ASCENT_INLINE void Lock() { m_groupLock.Acquire(); }
 	ASCENT_INLINE void Unlock() { return m_groupLock.Release(); }
@@ -213,6 +222,10 @@ protected:
 	PlayerInfo* m_voiceMembersList[41];
 #endif	// VOICE_CHAT
 
+	ASCENT_INLINE void SetFlag(uint8 groupflag) { m_groupFlags |= groupflag; }
+	ASCENT_INLINE void RemoveFlag(uint8 groupflag) { m_groupFlags &= ~groupflag; }
+	ASCENT_INLINE bool HasFlag(uint8 groupflag) { return (m_groupFlags & groupflag) > 0 ? true : false; }
+
 protected:
 	PlayerInfo * m_Leader;
 	PlayerInfo * m_Looter;
@@ -232,6 +245,12 @@ protected:
 	bool m_dirty;
 	bool m_updateblock;
 	uint8 m_difficulty;
+	uint8 m_groupFlags;
+
+	// Evil prayer of mending stuff
+public:
+	uint8 m_prayerOfMendingCount;
+	uint32 m_prayerOfMendingTarget;
 };
 
 #endif  // _GROUP_H_

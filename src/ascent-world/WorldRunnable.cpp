@@ -24,7 +24,7 @@
 #include "StdAfx.h"
 #define WORLD_UPDATE_DELAY 50
 
-WorldRunnable::WorldRunnable() : CThread()
+WorldRunnable::WorldRunnable() : ThreadContext()
 {
 
 }
@@ -35,23 +35,8 @@ bool WorldRunnable::run()
 	uint32 LastWorldUpdate=getMSTime();
 	uint32 LastSessionsUpdate=getMSTime();
 
-	THREAD_TRY_EXECUTION2
-
-	while(ThreadState != THREADSTATE_TERMINATE)
+	while(m_threadRunning)
 	{
-		// Provision for pausing this thread.
-		if(ThreadState == THREADSTATE_PAUSED)
-		{
-			while(ThreadState == THREADSTATE_PAUSED)
-			{
-				Sleep(200);
-			}
-		}
-		if(ThreadState == THREADSTATE_TERMINATE)
-			break;
-
-		ThreadState = THREADSTATE_BUSY;
-
 		uint32 diff;
 		//calce time passed
 		uint32 now,execution_start;
@@ -83,10 +68,6 @@ bool WorldRunnable::run()
 			diff=WORLD_UPDATE_DELAY-now;
 		else
 			diff=now-execution_start;//time used for updating 
-		if(ThreadState == THREADSTATE_TERMINATE)
-			break;
-
-		ThreadState = THREADSTATE_SLEEPING;
 
 		/*This is execution time compensating system
 			if execution took more than default delay 
@@ -95,6 +76,5 @@ bool WorldRunnable::run()
 		Sleep(WORLD_UPDATE_DELAY-diff);
 	}
 
-	THREAD_HANDLE_CRASH2
 	return true;
 }

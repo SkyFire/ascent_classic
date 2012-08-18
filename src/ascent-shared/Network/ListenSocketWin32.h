@@ -15,7 +15,7 @@
 #include "../Threading/ThreadPool.h"
 
 template<class T>
-class SERVER_DECL ListenSocket : public ThreadBase
+class SERVER_DECL ListenSocket : public ThreadContext
 {
 public:
 	ListenSocket(const char * ListenAddress, uint32 Port)

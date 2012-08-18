@@ -20,10 +20,8 @@
 #include "StdAfx.h"
 
 #define ARENA_PREPARATION 32727
-#define ARENA_WORLD_STATE_A_PLAYER_COUNT 2544
-#define ARENA_WORLD_STATE_H_PLAYER_COUNT 2545
-#define GREEN_TEAM 0
-#define GOLD_TEAM 1
+#define GOLD_TEAM 0
+#define GREEN_TEAM 1
 
 Arena::Arena(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t, uint32 players_per_side) : CBattleground(mgr, id, lgroup, t)
 {
@@ -48,6 +46,7 @@ Arena::Arena(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t, uint32 players_pe
 		break;
 	}
 	rated_match=false;
+	m_ratedTeams[0] = m_ratedTeams[1] = 0;
 }
 
 Arena::~Arena()
@@ -61,13 +60,12 @@ void Arena::OnAddPlayer(Player * plr)
 	{
 		/* cast arena readyness buff */
 		if(plr->isDead())
-			plr->ResurrectPlayer();
+			plr->ResurrectPlayer(NULL);
 
 		plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
 		plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
 		plr->SetUInt32Value(UNIT_FIELD_POWER4, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER4));
 		sEventMgr.AddEvent(plr, &Player::FullHPMP, EVENT_PLAYER_UPDATE, 500, 1, 0);
-		sEventMgr.AddEvent(plr, &Player::ResetAllCooldowns, EVENT_PLAYER_UPDATE, 500, 1, 0);
 	}
 
 	plr->m_deathVision = true;
@@ -94,33 +92,12 @@ void Arena::OnAddPlayer(Player * plr)
 	UpdatePlayerCounts();
 
 	/* Add the green/gold team flag */
-	Aura * aura = new Aura(dbcSpell.LookupEntry(32725-plr->m_bgTeam), -1, plr, plr);
-	plr->AddAura(aura);
+	Aura * aura = new Aura(dbcSpell.LookupEntry(32724+plr->m_bgTeam), -1, plr, plr);
+	plr->AddAura(aura, NULL);
 	
 	/* Set FFA PvP Flag */
 	if(!plr->HasFlag(PLAYER_FLAGS, PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		plr->SetFlag(PLAYER_FLAGS, PLAYER_FLAG_FREE_FOR_ALL_PVP);
-
-	/* update arena team stats */
-	if(rated_match && plr->m_arenaTeams[m_arenateamtype] != NULL)
-	{
-		ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
-		ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
-		if(doneteams.find(t) == doneteams.end())
-		{
-			t->m_stat_gamesplayedseason++;
-			t->m_stat_gamesplayedweek++;
-			doneteams.insert(t);
-		}
-
-		if(tp != NULL)
-		{
-			tp->Played_ThisWeek++;
-			tp->Played_ThisSeason++;
-		}
-
-		t->SaveToDB();
-	}
 }
 
 void Arena::OnRemovePlayer(Player * plr)
@@ -130,13 +107,16 @@ void Arena::OnRemovePlayer(Player * plr)
 	plr->RemoveAura(ARENA_PREPARATION);
 	UpdatePlayerCounts();
 	
-	plr->RemoveAura(32725-plr->m_bgTeam);
+	plr->RemoveAura(32724+plr->m_bgTeam);
 	if(plr->HasFlag(PLAYER_FLAGS, PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		plr->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAG_FREE_FOR_ALL_PVP);
 }
 
 void Arena::HookOnPlayerKill(Player * plr, Unit * pVictim)
 {
+	if( !pVictim->IsPlayer() )
+		return;
+
 	plr->m_bgScore.KillingBlows++;
 	UpdatePlayerCounts();
 }
@@ -154,76 +134,91 @@ void Arena::HookOnPlayerDeath(Player * plr)
 void Arena::OnCreate()
 {
 	GameObject * obj;
+	WorldStateManager &sm = m_mapMgr->GetStateManager();
+
 	switch(m_mapMgr->GetMapId())
 	{
 		/* loraedeon */
 	case 572: {
-		obj = SpawnGameObject(185917, 572, 1278.647705f, 1730.556641f, 31.605574f, 1.684245f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(185917, 1278.647705f, 1730.556641f, 31.605574f, 1.684245f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.746058f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, 0.665881f);
 		m_gates.insert(obj);
 
-		obj = SpawnGameObject(185918, 572, 1293.560791f, 1601.937988f, 31.605574f, -1.457349f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(185918, 1293.560791f, 1601.937988f, 31.605574f, -1.457349f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, -0.665881f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, 0.746058f);
 		m_gates.insert(obj);
 
-			  }break;
+		m_pcWorldStates[GREEN_TEAM] = WORLDSTATE_ARENA_LORDAERON_GREEN_PLAYER_COUNT;
+		m_pcWorldStates[GOLD_TEAM] = WORLDSTATE_ARENA_LORDAERON_GOLD_PLAYER_COUNT;
+		sm.CreateWorldState(WORLDSTATE_ARENA_LORDAERON_SCORE_SHOW, 1);
+		
+	  }break;
 
 		/* blades edge arena */
 	case 562: {
-		obj = SpawnGameObject(183972, 562, 6177.707520f, 227.348145f, 3.604374f, -2.260201f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(183972, 6177.707520f, 227.348145f, 3.604374f, -2.260201f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.90445f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, -0.426569f);
 		obj->PushToWorld(m_mapMgr);
 
-		obj = SpawnGameObject(183973, 562, 6189.546387f, 241.709854f, 3.101481f, 0.881392f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(183973, 6189.546387f, 241.709854f, 3.101481f, 0.881392f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.426569f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, 0.904455f);
 		m_gates.insert(obj);
 
-		obj = SpawnGameObject(183970, 562, 6299.115723f, 296.549438f, 3.308032f, 0.881392f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(183970, 6299.115723f, 296.549438f, 3.308032f, 0.881392f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.426569f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, 0.904455f);
 		obj->PushToWorld(m_mapMgr);
 
-		obj = SpawnGameObject(183971, 562, 6287.276855f, 282.187714f, 3.810925f, -2.260201f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(183971, 6287.276855f, 282.187714f, 3.810925f, -2.260201f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.904455f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, -0.426569f);
 		m_gates.insert(obj);
+
+		m_pcWorldStates[GREEN_TEAM] = WORLDSTATE_ARENA_BLADESEDGE_GREEN_PLAYER_COUNT;
+		m_pcWorldStates[GOLD_TEAM] = WORLDSTATE_ARENA_BLADESEDGE_GOLD_PLAYER_COUNT;
+		sm.CreateWorldState(WORLDSTATE_ARENA_BLADESEDGE_SCORE_SHOW, 1);
+
 			  }break;
 
 		/* nagrand arena */
 	case 559: {
-		obj = SpawnGameObject(183979, 559, 4090.064453f, 2858.437744f, 10.236313f, 0.492805f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(183979, 4090.064453f, 2858.437744f, 10.236313f, 0.492805f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.243916f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, 0.969796f);
 		obj->PushToWorld(m_mapMgr);
 
-		obj = SpawnGameObject(183980, 559, 4081.178955f, 2874.970459f, 12.391714f, 0.492805f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(183980, 4081.178955f, 2874.970459f, 12.391714f, 0.492805f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.243916f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, 0.969796f);
 		m_gates.insert(obj);
 
-		obj = SpawnGameObject(183977, 559, 4023.709473f, 2981.776611f, 10.701169f, -2.648788f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(183977, 4023.709473f, 2981.776611f, 10.701169f, -2.648788f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.969796f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, -0.243916f);
 		obj->PushToWorld(m_mapMgr);
 
-		obj = SpawnGameObject(183978, 559, 4031.854248f, 2966.833496f, 12.646200f, -2.648788f, 32, 1375, 1.0f);
+		obj = SpawnGameObject(183978, 4031.854248f, 2966.833496f, 12.646200f, -2.648788f, 32, 1375, 1.0f);
 		obj->SetUInt32Value(GAMEOBJECT_STATE, 1);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_02, 0.969796f);
 		obj->SetFloatValue(GAMEOBJECT_ROTATION_03, -0.243916f);
 		m_gates.insert(obj);
+
+		m_pcWorldStates[GREEN_TEAM] = WORLDSTATE_ARENA_NAGRAND_GREEN_PLAYER_COUNT;
+		m_pcWorldStates[GOLD_TEAM] = WORLDSTATE_ARENA_NAGRAND_GOLD_PLAYER_COUNT;
+		sm.CreateWorldState(WORLDSTATE_ARENA_NAGRAND_SCORE_SHOW, 1);
 
 			  }break;
 	}
@@ -232,16 +227,19 @@ void Arena::OnCreate()
 	for(set<GameObject*>::iterator itr = m_gates.begin(); itr != m_gates.end(); ++itr)
 		(*itr)->PushToWorld(m_mapMgr);
 
-	SetWorldState(0x08D4	,0x0000);
-	SetWorldState(0x08D8	,0x0000);
-	SetWorldState(0x08D7	,0x0000);
-	SetWorldState(0x08D6	,0x0000);
-	SetWorldState(0x08D5	,0x0000);
-	SetWorldState(0x08D3	,0x0000);
-	SetWorldState(0x09F1	,0x0000);
-	SetWorldState(0x09F0	,0x0000);
-	SetWorldState(0x0C0D	,0x017B);
-	SetWorldState(0x09F3	,0x0001);
+	
+	// known world states
+	sm.CreateWorldState(m_pcWorldStates[GREEN_TEAM], 0);
+	sm.CreateWorldState(m_pcWorldStates[GOLD_TEAM], 0);
+
+	// unknown world states
+	sm.CreateWorldState(0x08D4	,0x0000);
+	sm.CreateWorldState(0x08D8	,0x0000);
+	sm.CreateWorldState(0x08D7	,0x0000);
+	sm.CreateWorldState(0x08D6	,0x0000);
+	sm.CreateWorldState(0x08D5	,0x0000);
+	sm.CreateWorldState(0x08D3	,0x0000);
+	sm.CreateWorldState(0x0C0D	,0x017B);
 }
 
 void Arena::OnStart()
@@ -264,6 +262,9 @@ void Arena::OnStart()
 
 	/* Incase all players left */
 	UpdatePlayerCounts();
+
+	// soundz!
+	PlaySoundToAll(SOUND_BATTLEGROUND_BEGIN);
 }
 
 void Arena::UpdatePlayerCounts()
@@ -279,20 +280,49 @@ void Arena::UpdatePlayerCounts()
 		}
 	}
 
-	SetWorldState(ARENA_WORLD_STATE_A_PLAYER_COUNT, players[0]);
-	SetWorldState(ARENA_WORLD_STATE_H_PLAYER_COUNT, players[1]);
+	m_mapMgr->GetStateManager().UpdateWorldState(m_pcWorldStates[GOLD_TEAM], players[GOLD_TEAM]);
+	m_mapMgr->GetStateManager().UpdateWorldState(m_pcWorldStates[GREEN_TEAM], players[GREEN_TEAM]);
 
 	if(!m_started)
 		return;
 
-	if(players[1] == 0)
-		m_winningteam = 0;
-	else if(players[0] == 0)
-		m_winningteam = 1;
+	if(players[GOLD_TEAM] == 0)
+		m_losingteam = GOLD_TEAM;
+	else if(players[GREEN_TEAM] == 0)
+		m_losingteam = GREEN_TEAM;
 	else
 		return;
 
 	Finish();
+}
+
+void Arena::RecalculateArenaTeams(ArenaTeam * pWinner, ArenaTeam * pLoser)
+{
+	// Get the winner's chance to win
+	int32 ourRating = (int32)pWinner->m_stat_rating;
+	int32 otherRating = (int32)pLoser->m_stat_rating;
+
+	float expo = (ourRating - otherRating) / 400.0f;
+	float chanceToWin = 1.0f / ( 1.0f + pow(10.0f, expo));
+
+	int32 teamBonus = (int32)(32.0f*(chanceToWin));
+
+	if((int32)pLoser->m_stat_rating + teamBonus < 0)
+		pLoser->m_stat_rating = 0;
+	else
+		pLoser->m_stat_rating -= (uint32)teamBonus;
+
+	pWinner->m_stat_rating += (uint32)teamBonus;
+
+	if(pWinner->m_stat_rating > 3000)
+		pWinner->m_stat_rating = 3000;
+
+	pWinner->m_stat_gameswonseason++;
+	pWinner->m_stat_gameswonweek++;
+	pWinner->m_stat_gamesplayedweek++;
+	pLoser->m_stat_gamesplayedweek++;
+
+	objmgr.UpdateArenaTeamRankings();
 }
 
 void Arena::Finish()
@@ -300,105 +330,63 @@ void Arena::Finish()
 	m_ended = true;
 	m_nextPvPUpdateTime = 0;
 	UpdatePvPData();
-	PlaySoundToAll(m_winningteam ? SOUND_ALLIANCEWINS : SOUND_HORDEWINS);
+	PlaySoundToAll(m_losingteam ? SOUND_ALLIANCEWINS : SOUND_HORDEWINS);
 
 	sEventMgr.RemoveEvents(this, EVENT_BATTLEGROUND_CLOSE);
+	sEventMgr.RemoveEvents(this, EVENT_ARENA_ANTISTEALTH);
 	sEventMgr.AddEvent(((CBattleground*)this), &CBattleground::Close, EVENT_BATTLEGROUND_CLOSE, 120000, 1,0);
 
 	/* update arena team stats */
 	doneteams.clear();
 	if(rated_match)
 	{
-		uint32 averageRating[2] = {0,0};
-		for(uint32 i = 0; i < 2; ++i) {
-			uint32 teamCount = 0;
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+		ArenaTeam *pTeams[2];
+		pTeams[0] = m_ratedTeams[0] ? objmgr.GetArenaTeamById(m_ratedTeams[0]) : NULL;
+		pTeams[1] = m_ratedTeams[1] ? objmgr.GetArenaTeamById(m_ratedTeams[1]) : NULL;
+		if( pTeams[0] != NULL && pTeams[1]!= NULL )
+		{
+			ArenaTeam * pWinningTeam = m_losingteam == 0 ? pTeams[1] : pTeams[0];
+			ArenaTeam * pLosingTeam = m_losingteam == 0 ? pTeams[0] : pTeams[1];
+
+			RecalculateArenaTeams(pWinningTeam, pLosingTeam);	
+
+			for(uint32 i = 0; i < 2; i++)
 			{
-				Player * plr = *itr;
-				if(plr->m_arenaTeams[m_arenateamtype] != NULL)
+				for(std::set<PlayerInfo*>::iterator itr = m_RatedPlayers[i].begin(); itr != m_RatedPlayers[i].end(); itr++)
 				{
-					ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
-					if(doneteams.find(t) == doneteams.end())
+					PlayerInfo * pi = (*itr);
+					if(pTeams[i]->GetMember(pi))
 					{
-						averageRating[i] += t->m_stat_rating;
-						teamCount++;
-						doneteams.insert(t);
-					}
-				}
-			}
-			if(teamCount)
-				averageRating[i] /= teamCount;
-		}
-		doneteams.clear();
-		for (uint32 i = 0; i < 2; ++i) {
-			uint32 j = i ? 0 : 1; // opposing side
-			bool outcome;
-
-			outcome = (i == m_winningteam);
-
-			// ---- Elo Rating System ----
-			// Expected Chance to Win for Team A vs Team B
-			//                     1
-			// -------------------------------------------
-			//                   (PB - PA)/400
-			//              1 + 10
-
-			double power = (int)(averageRating[j] - averageRating[i]) / 400.0f;
-			double divisor = pow(((double)(10.0)), power);
-			divisor += 1.0;
-
-			double winChance = 1.0 / divisor;
-
-			for(set<Player*>::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-			{
-				Player * plr = *itr;
-				if(plr->m_arenaTeams[m_arenateamtype] != NULL)
-				{
-					ArenaTeam * t = plr->m_arenaTeams[m_arenateamtype];
-					ArenaTeamMember * tp = t->GetMember(plr->m_playerInfo);
-					if(doneteams.find(t) == doneteams.end())
-					{
-						if (outcome)
+						ArenaTeamMember * member = pTeams[i]->GetMember(pi);
+						if(member != NULL)
 						{
-							t->m_stat_gameswonseason++;
-							t->m_stat_gameswonweek++;
+							if(pTeams[i] == pWinningTeam)
+							{
+								member->Won_ThisSeason++;
+								member->Won_ThisWeek++;
+							}
 						}
-						// New Rating Calculation via Elo
-						// New Rating = Old Rating + K * (outcome - Expected Win Chance)
-						// outcome = 1 for a win and 0 for a loss (0.5 for a draw ... but we cant have that)
-						// K is the maximum possible change
-						// Through investigation, K was estimated to be 32 (same as chess)
-						double multiplier = (outcome ? 1.0 : 0.0) - winChance;
-						double deltaRating = 32.0 * multiplier;
-						if ( deltaRating < 0 && (-1.0 * deltaRating) > t->m_stat_rating )
-							t->m_stat_rating = 0;
-						else
-							t->m_stat_rating += long2int32(deltaRating);
-						objmgr.UpdateArenaTeamRankings();
-
-						doneteams.insert(t);
 					}
-
-					if(tp != NULL && outcome)
-					{
-						tp->Won_ThisWeek++;
-						tp->Won_ThisSeason++;
-					}
-
-					t->SaveToDB();
 				}
 			}
+
+			pTeams[0]->SaveToDB();
+			pTeams[1]->SaveToDB();
 		}
 	}
-
 	for(int i = 0; i < 2; i++)
 	{
-		bool victorious = (i == m_winningteam);
+		bool victorious = (i != m_losingteam);
 		set<Player*>::iterator itr = m_players[i].begin();
 		for(; itr != m_players[i].end(); itr++)
 		{
 			Player * plr = (Player *)(*itr);
-			sHookInterface.OnArenaFinish(plr, plr->m_arenaTeams[m_arenateamtype], victorious, rated_match);
+			plr->Root();
+
+			if( plr->m_bgScore.DamageDone == 0 && plr->m_bgScore.HealingDone == 0 )
+				continue;
+
+			sHookInterface.OnArenaFinish(plr, m_arenateamtype, plr->m_playerInfo->arenaTeam[m_arenateamtype], victorious, rated_match);
 		}
 	}
 }
@@ -504,8 +492,9 @@ void Arena::HookOnAreaTrigger(Player * plr, uint32 id)
 
 void Player::FullHPMP()
 {
-	if(isDead())
-		ResurrectPlayer();
+	if( isDead() )
+		ResurrectPlayer(NULL);
+
     SetUInt32Value(UNIT_FIELD_HEALTH, GetUInt32Value(UNIT_FIELD_MAXHEALTH));
     SetUInt32Value(UNIT_FIELD_POWER1, GetUInt32Value(UNIT_FIELD_MAXPOWER1));
     SetUInt32Value(UNIT_FIELD_POWER4, GetUInt32Value(UNIT_FIELD_MAXPOWER4));

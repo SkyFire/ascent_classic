@@ -355,6 +355,18 @@ bool WinterWondervolt(uint32 i, Spell * pSpell)
 }
 
 // -----------------------------------------------------------------------------
+bool DeadlyThrowDummyEffect(uint32 i, Spell * pSpell)
+{
+	Unit* target = pSpell->GetUnitTarget();
+	if(!target) return true;
+
+	if(pSpell->m_caster->IsPlayer() && static_cast<Player*>(pSpell->m_caster)->HasAura(32748))
+		pSpell->SpellEffectInterruptCast(i);
+
+	return true;
+}
+
+// -----------------------------------------------------------------------------
 
 bool WinterWondervoltAura(uint32 i, Aura* pAura, bool apply)
 {
@@ -410,7 +422,7 @@ void SetupItemSpells_1(ScriptMgr * mgr)
 	mgr->register_dummy_spell(26541, &SummonCritterDummy);      // Red Helper Box
 	mgr->register_dummy_spell(26275, &WinterWondervolt);        // PX-238 Winter Wondervolt Trap
 	mgr->register_dummy_aura( 26274, &WinterWondervoltAura);    // PX-238 Winter Wondervolt Transform Aura
-
+	mgr->register_dummy_spell( 26679, &DeadlyThrowDummyEffect);
 
 
 // REGISTER NEW DUMMY SPELLS ABOVE THIS LINE

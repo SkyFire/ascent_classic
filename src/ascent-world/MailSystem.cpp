@@ -284,13 +284,14 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 	vector< Item* >::iterator itr;
 	string recepient;
 	Item * pItem;
+	int8 real_item_slot;
 	//uint32 err = MAIL_OK;
 
 	recv_data >> gameobject >> recepient;
 	recv_data >> msg.subject >> msg.body >> msg.stationary;
 	recv_data >> unk2 >> itemcount;
 
-	if( itemcount > 12 )
+	if( itemcount > 12 || msg.body.find("%") != string::npos || msg.subject.find("%") != string::npos)
 	{
 		//SystemMessage("Sorry, Ascent does not support sending multiple items at this time. (don't want to lose your item do you) Remove some items, and try again.");
 		SendMailError(MAIL_ERR_INTERNAL_ERROR);
@@ -303,7 +304,9 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 		recv_data >> itemguid;
 
         pItem = _player->GetItemInterface()->GetItemByGUID( itemguid );
-		if( pItem == NULL || pItem->IsSoulbound() || pItem->HasFlag( ITEM_FIELD_FLAGS, ITEM_FLAG_CONJURED ) )
+		real_item_slot = _player->GetItemInterface()->GetInventorySlotByGuid( itemguid );
+		if( pItem == NULL || pItem->IsSoulbound() || pItem->HasFlag( ITEM_FIELD_FLAGS, ITEM_FLAG_CONJURED ) || 
+			( pItem->IsContainer() && ((Container*)pItem)->HasItems() ) || real_item_slot >= 0 && real_item_slot < INVENTORY_SLOT_ITEM_START )
 		{
 			SendMailError( MAIL_ERR_INTERNAL_ERROR );
 			return;
@@ -347,7 +350,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 		return;
 	}
 
-	if( msg.stationary == 0x3d || msg.stationary == 0x3d && !HasGMPermissions())
+	if( msg.stationary == 0x3d && !HasGMPermissions())
 	{
 		SendMailError(MAIL_ERR_INTERNAL_ERROR);
 		return;
@@ -563,20 +566,26 @@ void WorldSession::HandleTakeItem(WorldPacket & recv_data )
 		return;
 	}
 
-	// all is good
-	// delete the item (so when its resaved it'll have an association)
-	item->DeleteFromDB();
-
-	// add the item to their backpack
 	item->m_isDirty = true;
+
+	if( !_player->GetItemInterface()->SafeAddItem(item, result.ContainerSlot, result.Slot) )
+	{
+		if( !_player->GetItemInterface()->AddItemToFreeSlot(item) )
+		{
+			// no free slots left!
+			data << uint32(MAIL_ERR_BAG_FULL);
+			SendPacket(&data);
+			delete item;
+			return;
+		}
+	}
+	else												// true so it waitexecute's
+		item->SaveToDB(result.ContainerSlot, result.Slot, true, NULL);
 
 	// send complete packet
 	data << uint32(MAIL_OK);
 	data << item->GetUInt32Value(OBJECT_FIELD_GUID);
 	data << item->GetUInt32Value(ITEM_FIELD_STACK_COUNT);
-
-	if( !_player->GetItemInterface()->AddItemToFreeSlot(item) )
-		delete item;
 
 	message->items.erase( itr );
 
@@ -617,7 +626,17 @@ void WorldSession::HandleTakeMoney(WorldPacket & recv_data )
 	}
 
 	// add the money to the player
-	_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, message->money);
+	if((_player->GetUInt32Value(PLAYER_FIELD_COINAGE) + message->money) >= PLAYER_MAX_GOLD )
+	{
+		data << uint32(MAIL_ERR_INTERNAL_ERROR);
+		SendPacket(&data);
+		return;
+	}
+	else
+		_player->ModUnsigned32Value(PLAYER_FIELD_COINAGE, message->money);
+	
+	// force save
+	_player->SaveToDB(false);
 
 	// message no longer has any money
 	message->money = 0;
@@ -764,19 +783,11 @@ void Mailbox::FillTimePacket(WorldPacket& data)
 
 	if(c==0)
 	{
-#ifdef USING_BIG_ENDIAN
-		*(uint32*)(&data.contents()[0])=swap32(0xc7a8c000);
-#else
 		*(uint32*)(&data.contents()[0])=0xc7a8c000;
-#endif
 	}
 	else
 	{
-#ifdef USING_BIG_ENDIAN
-		*(uint32*)(&data.contents()[4])=swap32(c);
-#else
 		*(uint32*)(&data.contents()[4])=c;
-#endif
 	}
 }
 

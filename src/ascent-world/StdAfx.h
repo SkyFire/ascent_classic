@@ -60,16 +60,19 @@
 #include "../ascent-shared/Auth/BigNumber.h"
 #include "../ascent-shared/Auth/Sha1.h"
 #include "../ascent-shared/Auth/WowCrypt.h"
+#include "../ascent-shared/Auth/AuthPacketKey.h"
 #include "../ascent-shared/CrashHandler.h"
 #include "../ascent-shared/FastQueue.h"
 #include "../ascent-shared/CircularQueue.h"
 #include "../ascent-shared/Threading/RWLock.h"
 #include "../ascent-shared/Threading/Condition.h"
 #include "../ascent-shared/ascent_getopt.h"
+#include "../ascent-shared/BufferPool.h"
 
 #include "UpdateFields.h"
 #include "UpdateMask.h"
 #include "Opcodes.h"
+#include "WorldStates.h"
 
 #ifdef CLUSTERING
 	#include "../ascent-realmserver/WorkerOpcodes.h"
@@ -120,6 +123,7 @@
 #include "Pet.h"
 #include "WorldSocket.h"
 #include "WorldSession.h"
+#include "WorldStateManager.h"
 #include "MapMgr.h"
 #include "MapScriptInterface.h"
 #include "Player.h"
@@ -137,25 +141,17 @@
 #include "ItemInterface.h"
 #include "Stats.h"
 #include "WorldCreator.h"
-
-
 #include "ObjectMgr.h"
-
-#include "CThreads.h"
 #include "ScriptMgr.h"
-
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "ArenaTeam.h"
-
 #include "LogonCommClient.h"
 #include "LogonCommHandler.h"
 #include "MainServerDefines.h"
 #include "WorldRunnable.h"
-
 #include "../ascent-shared/Storage.h"
 #include "ObjectStorage.h"
-#include "DatabaseCleaner.h"
 #include "DayWatcherThread.h"
 #include "VoiceChatHandler.h"
 #include "LocalizationMgr.h"

@@ -134,6 +134,9 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath="..\src\GossipScripts\Gossip_Battlemaster.cpp">
+			</File>
+			<File
 				RelativePath="..\src\GossipScripts\Gossip_Innkeepers.cpp">
 			</File>
 			<File

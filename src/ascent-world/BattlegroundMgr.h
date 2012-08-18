@@ -20,24 +20,30 @@
 #ifndef __BATTLEGROUNDMGR_H
 #define __BATTLEGROUNDMGR_H
 
-#define ANTI_CHEAT
-
 class CBattleground;
 class MapMgr;
 class Player;
 class Map;
 class Group;
+class Corpse;
+
+/*
+ * Battleground enable/disable
+ */
+#define ENABLE_AB 1
+#define ENABLE_EOTS 1
+#define ENABLE_AV 1
 
 enum BattleGroundTypes
 {
 	BATTLEGROUND_ALTERAC_VALLEY = 1,
-	BATTLEGROUND_WARSONG_GULCH	= 2,
-	BATTLEGROUND_ARATHI_BASIN	= 3,
-	BATTLEGROUND_ARENA_2V2		= 4,
-	BATTLEGROUND_ARENA_3V3		= 5,
-	BATTLEGROUND_ARENA_5V5		= 6,
-	BATTLEGROUND_EYE_OF_THE_STORM=7,
-	BATTLEGROUND_NUM_TYPES		 =8,
+	BATTLEGROUND_WARSONG_GULCH,
+	BATTLEGROUND_ARATHI_BASIN,
+	BATTLEGROUND_ARENA_2V2,
+	BATTLEGROUND_ARENA_3V3,
+	BATTLEGROUND_ARENA_5V5,
+	BATTLEGROUND_EYE_OF_THE_STORM,
+	BATTLEGROUND_NUM_TYPES,
 };
 
 struct BGScore
@@ -48,9 +54,22 @@ struct BGScore
 	uint32 BonusHonor;
 	uint32 DamageDone;
 	uint32 HealingDone;
-	uint32 Misc1;
-	uint32 Misc2;
+
+	// the max one for this is , for AV
+	uint32 MiscData[5];
 };
+
+// bg score declarations
+#define BG_SCORE_WSG_FLAG_CAPTURES 0
+#define BG_SCORE_WSG_FLAG_RETURNS 1
+#define BG_SCORE_AB_BASE_ASSAULTED 0
+#define BG_SCORE_AB_BASE_DEFENDED 1
+#define BG_SCORE_AV_GRAVEYARDS_ASSAULTED 0
+#define BG_SCORE_AV_GRAVEYARDS_DEFENDED 1
+#define BG_SCORE_AV_TOWERS_ASSAULTED 2
+#define BG_SCORE_AV_TOWERS_DEFENDED 3
+#define BG_SCORE_AV_MINES_CAPTURES 4
+#define BG_SCORE_EOTS_FLAG_CAPTURES 0
 
 #define SOUND_BATTLEGROUND_BEGIN			0xD6F
 #define SOUND_HORDE_SCORES					8213
@@ -64,22 +83,9 @@ struct BGScore
 #define SOUND_HORDE_BGALMOSTEND			 0x2108
 #define SOUND_ALLIANCE_BGALMOSTEND		  0x2109
 
-#define AB_ALLIANCE_RESOURCES			   0x6F0
-#define AB_HORDE_RESOURCES				  0x6F1
-#define AB_HORDE_CAPTUREBASE				0x6F2
-#define AB_ALLIANCE_CAPTUREBASE			 0x6F3
-#define AB_MAX_SCORE						0x6F4
-
 #define BG_PREPARATION 44521
 #define BG_REVIVE_PREPARATION	44535
 #define RESURRECT_SPELL			21074   // Spirit Healer Res
-
-// WSG define's
-#define WSG_ALLIANCE_FLAG_CAPTURED		  0x922
-#define WSG_HORDE_FLAG_CAPTURED			 0x923
-#define WSG_CURRENT_HORDE_SCORE			 0x62E
-#define WSG_CURRENT_ALLIANCE_SCORE		  0x62D
-#define WSG_MAX_SCORE					   0x641
 
 // AV define's
 #define AV_UNCONTROLED_SNOWFALL_GRAVE	   0x7AE //1 -> show uncontrolled
@@ -127,6 +133,7 @@ static inline uint32 GetLevelGrouping(uint32 level)
 #define MINIMUM_PLAYERS_ON_EACH_SIDE_FOR_BG 1
 #define MAXIMUM_BATTLEGROUNDS_PER_LEVEL_GROUP 50
 #define LEVEL_GROUP_70 7
+#define BG_ANTI_CHEAT 1
 
 class CBattlegroundManager : public Singleton<CBattlegroundManager>, public EventableObject
 {
@@ -193,14 +200,16 @@ protected:
 	uint32 m_levelGroup;
 
 public:
+	// for av node usage
+	friend class AVNode;
+
 	/* Team->Player Map */
 	set<Player*> m_players[2];
 	void Lock() { m_mainLock.Acquire(); }
 	void Unlock() { m_mainLock.Release(); }
-protected:
-	/* World States. This should be moved to mapmgr instead for world pvp :/ */
-	map<uint32, uint32> m_worldStates;
+	ASCENT_INLINE bool IsArena() { return (m_type >= BATTLEGROUND_ARENA_2V2 && m_type <= BATTLEGROUND_ARENA_5V5); }
 
+protected:
 	/* PvP Log Data Map */
 	map<uint32, BGScore> m_pvpData;
 
@@ -222,7 +231,7 @@ protected:
 
 	/* winner stuff */
 	bool m_ended;
-	uint8 m_winningteam;
+	uint8 m_losingteam;
 
 	/* resurrect queue */
 	map<Creature*, set<uint32> > m_resurrectMap;
@@ -252,20 +261,22 @@ public:
 	/* On Area Trigger */
 	virtual void HookOnAreaTrigger(Player * plr, uint32 id) = 0;
 
+	/* Used to generate loot for players (AV) */
+	virtual void HookGenerateLoot(Player *plr, Corpse *pCorpse) = 0;
+	virtual bool SupportsPlayerLoot() = 0;
+
 	/* Retreival Functions */
 	ASCENT_INLINE uint32 GetId() { return m_id; }
 	ASCENT_INLINE uint32 GetLevelGroup() { return m_levelGroup; }
 	ASCENT_INLINE MapMgr* GetMapMgr() { return m_mapMgr; }
-	
+
 	/* Creating a battleground requires a pre-existing map manager */
 	CBattleground(MapMgr * mgr, uint32 id, uint32 levelgroup, uint32 type);
 	virtual ~CBattleground();
 
 	/* Has it ended? */
 	ASCENT_INLINE bool HasEnded() { return m_ended; }
-
-	/* Send our current world states to a player . */
-	void SendWorldStates(Player * plr);
+	ASCENT_INLINE bool HasStarted() { return m_started; }
 
 	/* Send the pvp log data of all players to this player. */
 	void SendPVPData(Player * plr);
@@ -315,7 +326,8 @@ public:
 		return (uint32)s;
 	}
 
-	GameObject * SpawnGameObject(uint32 entry,uint32 MapId , float x, float y, float z, float o, uint32 flags, uint32 faction, float scale);
+	GameObject * SpawnGameObject(uint32 entry,float x, float y, float z, float o, uint32 flags, uint32 faction, float scale);
+	Creature * SpawnCreature(uint32 entry,float x, float y, float z, float o);
 	void UpdatePvPData();
 
 	ASCENT_INLINE uint32 GetStartTime() { return m_startTime; }
@@ -333,7 +345,6 @@ public:
 	void Close();
 	virtual void OnClose() {}
 
-	void SetWorldState(uint32 Index, uint32 Value);
 	Creature * SpawnSpiritGuide(float x, float y, float z, float o, uint32 horde);
 
 	ASCENT_INLINE uint32 GetLastResurrect() { return m_lastResurrect; }
@@ -349,6 +360,7 @@ public:
 	void BuildPvPUpdateDataPacket(WorldPacket * data);
 	virtual uint8 Rated() { return 0; }
 	void OnPlayerPushed(Player* plr);
+	void QueueAtNearestSpiritGuide(Player *plr, Creature *old);
 };
 
 #define BattlegroundManager CBattlegroundManager::getSingleton( )

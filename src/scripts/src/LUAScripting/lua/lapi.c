@@ -454,7 +454,6 @@ LUA_API void lua_pushstring (lua_State *L, const char *s) {
     lua_pushlstring(L, s, strlen(s));
 }
 
-
 LUA_API const char *lua_pushvfstring (lua_State *L, const char *fmt,
                                       va_list argp) {
   const char *ret;

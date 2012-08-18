@@ -63,14 +63,6 @@ enum MsTimeVariables
 
 #include "AscentConfig.h"
 
-/* Define this if you're using a big-endian machine */
-#ifdef USING_BIG_ENDIAN
-#include <machine/byte_order.h>
-#define bswap_16(x) NXSwapShort(x)
-#define bswap_32(x) NXSwapInt(x)
-#define bswap_64(x) NXSwapLongLong(x)
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -157,8 +149,13 @@ enum MsTimeVariables
 #define PLATFORM_TEXT "FreeBSD"
 #define UNIX_FLAVOUR UNIX_FLAVOUR_BSD
 #else
+#ifdef USE_KQUEUE_DFLY
+#define PLATFORM_TEXT "DragonFlyBSD"
+#define UNIX_FLAVOUR UNIX_FLAVOUR_BSD
+#else
 #define PLATFORM_TEXT "Linux"
 #define UNIX_FLAVOUR UNIX_FLAVOUR_LINUX
+#endif
 #endif
 #endif
 #endif
@@ -173,14 +170,10 @@ enum MsTimeVariables
 #define CONFIG "Release"
 #endif
 
-#ifdef USING_BIG_ENDIAN
-#define ARCH "PPC"
-#else
 #ifdef X64
 #define ARCH "X64"
 #else
 #define ARCH "X86"
-#endif
 #endif
 
 /*#if COMPILER == COMPILER_MICROSOFT
@@ -206,6 +199,9 @@ enum MsTimeVariables
 #endif
 #ifdef USE_KQUEUE
 	#define CONFIG_USE_KQUEUE
+#endif
+#ifdef USE_KQUEUE_DFLY
+	#define CONFIG_USE_KQUEUE_DFLY
 #endif
 #ifdef USE_SELECT
 	#define CONFIG_USE_SELECT
@@ -334,104 +330,6 @@ typedef uint32_t DWORD;
 
 #endif
 
-/* these can be optimized into assembly */
-#ifdef USING_BIG_ENDIAN
-
-/*ASCENT_INLINE static void swap16(uint16* p) { *p = ((*p >> 8) & 0xff) | (*p << 8); }
-ASCENT_INLINE static void swap32(uint32* p) { *p = ((*p >> 24 & 0xff)) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
-ASCENT_INLINE static void swap64(uint64* p) { *p = ((*p >> 56)) | ((*p >> 40) & 0x000000000000ff00ULL) | ((*p >> 24) & 0x0000000000ff0000ULL) | ((*p >> 8 ) & 0x00000000ff000000ULL) |
-								((*p << 8 ) & 0x000000ff00000000ULL) | ((*p << 24) & 0x0000ff0000000000ULL) | ((*p << 40) & 0x00ff000000000000ULL) | ((*p << 56)); }*/
-
-ASCENT_INLINE static void swap16(uint16* p) { *p = bswap_16((uint16_t)*p); }
-ASCENT_INLINE static void swap32(uint32* p) { *p = bswap_32((uint32_t)*p); }
-ASCENT_INLINE static void swap64(uint64* p) { *p = bswap_64((uint64_t)*p);; }
-
-ASCENT_INLINE static float swapfloat(float p)
-{
-	union { float asfloat; uint8 asbytes[4]; } u1, u2;
-	u1.asfloat = p;
-	/* swap! */
-	u2.asbytes[0] = u1.asbytes[3];
-	u2.asbytes[1] = u1.asbytes[2];
-	u2.asbytes[2] = u1.asbytes[1];
-	u2.asbytes[3] = u1.asbytes[0];
-    
-	return u2.asfloat;
-}
-
-ASCENT_INLINE static double swapdouble(double p)
-{
-	union { double asfloat; uint8 asbytes[8]; } u1, u2;
-	u1.asfloat = p;
-	/* swap! */
-	u2.asbytes[0] = u1.asbytes[7];
-	u2.asbytes[1] = u1.asbytes[6];
-	u2.asbytes[2] = u1.asbytes[5];
-	u2.asbytes[3] = u1.asbytes[4];
-	u2.asbytes[4] = u1.asbytes[3];
-	u2.asbytes[5] = u1.asbytes[2];
-	u2.asbytes[6] = u1.asbytes[1];
-	u2.asbytes[7] = u1.asbytes[0];
-
-	return u2.asfloat;
-}
-
-ASCENT_INLINE static void swapfloat(float * p)
-{
-	union { float asfloat; uint8 asbytes[4]; } u1, u2;
-	u1.asfloat = *p;
-	/* swap! */
-	u2.asbytes[0] = u1.asbytes[3];
-	u2.asbytes[1] = u1.asbytes[2];
-	u2.asbytes[2] = u1.asbytes[1];
-	u2.asbytes[3] = u1.asbytes[0];
-	*p = u2.asfloat;
-}
-
-ASCENT_INLINE static void swapdouble(double * p)
-{
-	union { double asfloat; uint8 asbytes[8]; } u1, u2;
-	u1.asfloat = *p;
-	/* swap! */
-	u2.asbytes[0] = u1.asbytes[7];
-	u2.asbytes[1] = u1.asbytes[6];
-	u2.asbytes[2] = u1.asbytes[5];
-	u2.asbytes[3] = u1.asbytes[4];
-	u2.asbytes[4] = u1.asbytes[3];
-	u2.asbytes[5] = u1.asbytes[2];
-	u2.asbytes[6] = u1.asbytes[1];
-	u2.asbytes[7] = u1.asbytes[0];
-	*p = u2.asfloat;
-}
-
-/*ASCENT_INLINE static uint16 swap16(uint16 p) { return ((p >> 8) & 0xff) | (p << 8); }
-ASCENT_INLINE static uint32 swap32(uint32 p) { return ((p >> 24) & 0xff) | ((p >> 8) & 0xff00) | ((p << 8) & 0xff0000) | (p << 24); }
-ASCENT_INLINE static uint64 swap64(uint64 p)  { p = (((p >> 56) & 0xff)) | ((p >> 40) & 0x000000000000ff00ULL) | ((p >> 24) & 0x0000000000ff0000ULL) | ((p >> 8 ) & 0x00000000ff000000ULL) |
-								((p << 8 ) & 0x000000ff00000000ULL) | ((p << 24) & 0x0000ff0000000000ULL) | ((p << 40) & 0x00ff000000000000ULL) | ((p << 56)); }
-
-ASCENT_INLINE static void swap16(int16* p) { *p = ((*p >> 8) & 0xff) | (*p << 8); }
-ASCENT_INLINE static void swap32(int32* p) { *p = ((*p >> 24) & 0xff) | ((*p >> 8) & 0xff00) | ((*p << 8) & 0xff0000) | (*p << 24); }
-ASCENT_INLINE static void swap64(int64* p) { *p = ((*p >> 56) & 0xff) | ((*p >> 40) & 0x000000000000ff00ULL) | ((*p >> 24) & 0x0000000000ff0000ULL) | ((*p >> 8 ) & 0x00000000ff000000ULL) |
-								((*p << 8 ) & 0x000000ff00000000ULL) | ((*p << 24) & 0x0000ff0000000000ULL) | ((*p << 40) & 0x00ff000000000000ULL) | ((*p << 56)); }
-
-ASCENT_INLINE static int16 swap16(int16 p) { return ((p >> 8) & 0xff) | (p << 8); }
-ASCENT_INLINE static int32 swap32(int32 p) { return ((p >> 24) & 0xff) | ((p >> 8) & 0xff00) | ((p << 8) & 0xff0000) | (p << 24); }
-ASCENT_INLINE static int64 swap64(int64 p)  { return ((((p >> 56) & 0xff)) | ((p >> 40) & 0x000000000000ff00ULL) | ((p >> 24) & 0x0000000000ff0000ULL) | ((p >> 8 ) & 0x00000000ff000000ULL) |
-								((p << 8 ) & 0x000000ff00000000ULL) | ((p << 24) & 0x0000ff0000000000ULL) | ((p << 40) & 0x00ff000000000000ULL) | ((p << 56))); }*/
-
-ASCENT_INLINE static uint16 swap16(uint16 p) { return bswap_16((uint16_t)p); }
-ASCENT_INLINE static uint32 swap32(uint32 p) { return bswap_32((uint32_t)p); }
-ASCENT_INLINE static uint64 swap64(uint64 p)  { return bswap_64((uint64_t)p); }
-
-ASCENT_INLINE static void swap16(int16* p) { *p = bswap_16((uint16_t)*p); }
-ASCENT_INLINE static void swap32(int32* p) { *p = bswap_32((uint32_t)*p); }
-ASCENT_INLINE static void swap64(int64* p) { *p = bswap_64((uint64_t)*p); }
-
-ASCENT_INLINE static int16 swap16(int16 p) { return bswap_16((uint16_t)p); }
-ASCENT_INLINE static int32 swap32(int32 p) { return bswap_32((uint32_t)p); }
-ASCENT_INLINE static int64 swap64(int64 p)  { return bswap_64((uint64_t)p); }
-
-#endif
 /* 
 Scripting system exports/imports
 */
@@ -515,7 +413,7 @@ static inline uint32 int32abs2uint32( const int value )
 /// Fastest Method of float2int32
 static inline int float2int32(const float value)
 {
-#if !defined(X64) && COMPILER == COMPILER_MICROSOFT && !defined(USING_BIG_ENDIAN)
+#if !defined(X64) && COMPILER == COMPILER_MICROSOFT 
 	int i;
 	__asm {
 		fld value
@@ -527,18 +425,14 @@ static inline int float2int32(const float value)
 	union { int asInt[2]; double asDouble; } n;
 	n.asDouble = value + 6755399441055744.0;
 
-#if USING_BIG_ENDIAN
-	return n.asInt [1];
-#else
 	return n.asInt [0];
-#endif
 #endif
 }
 
 /// Fastest Method of long2int32
 static inline int long2int32(const double value)
 {
-#if !defined(X64) && COMPILER == COMPILER_MICROSOFT && !defined(USING_BIG_ENDIAN)
+#if !defined(X64) && COMPILER == COMPILER_MICROSOFT
 	int i;
 	__asm {
 		fld value
@@ -549,12 +443,7 @@ static inline int long2int32(const double value)
 #else
   union { int asInt[2]; double asDouble; } n;
   n.asDouble = value + 6755399441055744.0;
-
-#if USING_BIG_ENDIAN
-  return n.asInt [1];
-#else
   return n.asInt [0];
-#endif
 #endif
 }
 
@@ -657,65 +546,7 @@ ASCENT_INLINE void ASCENT_TOUPPER(std::string& str)
 };
 
 // returns true if the ip hits the mask, otherwise false
-static bool ParseCIDRBan(unsigned int IP, unsigned int Mask, unsigned int MaskBits)
-{
-	// CIDR bans are a compacted form of IP / Submask
-	// So 192.168.1.0/255.255.255.0 would be 192.168.1.0/24
-	// IP's in the 192.168l.1.x range would be hit, others not.
-	unsigned char * source_ip = (unsigned char*)&IP;
-	unsigned char * mask = (unsigned char*)&Mask;
-	int full_bytes = MaskBits / 8;
-	int leftover_bits = MaskBits % 8;
-	//int byte;
-
-	// sanity checks for the data first
-	if( MaskBits > 32 )
-		return false;
-
-	// this is the table for comparing leftover bits
-	static const unsigned char leftover_bits_compare[9] = {
-		0x00,			// 00000000
-		0x80,			// 10000000
-		0xC0,			// 11000000
-		0xE0,			// 11100000
-		0xF0,			// 11110000
-		0xF8,			// 11111000
-		0xFC,			// 11111100
-		0xFE,			// 11111110
-		0xFF,			// 11111111 - This one isn't used
-	};
-
-	// if we have any full bytes, compare them with memcpy
-	if( full_bytes > 0 )
-	{
-		if( memcmp( source_ip, mask, full_bytes ) != 0 )
-			return false;
-	}
-
-	// compare the left over bits
-	if( leftover_bits > 0 )
-	{
-		if( ( source_ip[full_bytes] & leftover_bits_compare[leftover_bits] ) !=
-			( mask[full_bytes] & leftover_bits_compare[leftover_bits] ) )
-		{
-			// one of the bits does not match
-			return false;
-		}
-	}
-
-	// all of the bits match that were testable
-	return true;
-}
-
-static unsigned int MakeIP(const char * str)
-{
-	unsigned int bytes[4];
-	unsigned int res;
-	if( sscanf(str, "%u.%u.%u.%u", &bytes[0], &bytes[1], &bytes[2], &bytes[3]) != 4 )
-		return 0;
-
-	res = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
-	return res;
-}
+bool ParseCIDRBan(unsigned int IP, unsigned int Mask, unsigned int MaskBits);
+unsigned int MakeIP(const char * str);
 
 #endif

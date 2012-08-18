@@ -74,32 +74,45 @@ void WorldSession::SendBattlegroundList(Creature* pCreature, uint32 mapid)
 		return;
 
 	/* we should have a bg id selection here. */
-	uint32 t = BATTLEGROUND_WARSONG_GULCH;
+	uint32 t = 0;
 	if (mapid == 0)
 	{
 		if(pCreature->GetCreatureName())
 		{
+#ifdef ENABLE_AV
+			if(strstr(pCreature->GetCreatureName()->SubName, "Alterac Valley") != NULL)
+				t = BATTLEGROUND_ALTERAC_VALLEY;
+#endif
 			if(strstr(pCreature->GetCreatureName()->SubName, "Arena") != NULL)
 				t = BATTLEGROUND_ARENA_2V2;
 			else if(strstr(pCreature->GetCreatureName()->SubName, "Arathi") != NULL)
 				t = BATTLEGROUND_ARATHI_BASIN;
 			else if(strstr(pCreature->GetCreatureName()->SubName, "Warsong") != NULL)
 				t = BATTLEGROUND_WARSONG_GULCH;
-			else if(strstr(pCreature->GetCreatureName()->SubName, "Alterac") != NULL)
-				t = BATTLEGROUND_ALTERAC_VALLEY;
-			else if(strstr(pCreature->GetCreatureName()->SubName, "Eye") != NULL)
+			else if(strstr(pCreature->GetCreatureName()->SubName, "Eye of") != NULL)
 				t = BATTLEGROUND_EYE_OF_THE_STORM;
 		}
 	}
 	else
 		t = mapid;
 
-    BattlegroundManager.HandleBattlegroundListPacket(this, t);
+	if( t == 0 )
+		SystemMessage("Sorry, invalid battlemaster.");
+	else
+		BattlegroundManager.HandleBattlegroundListPacket(this, t);
 }
 
 void WorldSession::HandleBattleMasterHelloOpcode(WorldPacket &recv_data)
 {
-	sLog.outString("Received CMSG_BATTLEMASTER_HELLO");
+	uint64 guid;
+	recv_data >> guid;
+
+	CHECK_INWORLD_RETURN;
+	Creature * pCreature = _player->GetMapMgr()->GetCreature( GET_LOWGUID_PART(guid) );
+	if( pCreature == NULL )
+		return;
+
+	SendBattlegroundList( pCreature, 0 );
 }
 
 void WorldSession::HandleLeaveBattlefieldOpcode(WorldPacket &recv_data)
@@ -139,7 +152,6 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket &recv_data)
 		return;
 
 	_player->m_bg->QueuePlayerForResurrect(_player, psg);
-	_player->CastSpell(_player,2584,true);
 }
 
 void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket &recv_data)
@@ -212,27 +224,12 @@ void WorldSession::HandleInspectHonorStatsOpcode( WorldPacket &recv_data )
     uint64 guid;
     recv_data >> guid;
 
-  	if( _player == NULL )
-	{
-		sLog.outError( "HandleInspectHonorStatsOpcode : _player was null" );
+	Player* player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
+	if( player == NULL )
 		return;
-	}
-
-	if( _player->GetMapMgr() == NULL )
-	{
-		sLog.outError( "HandleInspectHonorStatsOpcode : _player map mgr was null" );
-		return;
-	}
-
-	if( _player->GetMapMgr()->GetPlayer( (uint32)guid ) == NULL )
-	{
-		sLog.outError( "HandleInspectHonorStatsOpcode : guid was null" );
-		return;
-	}
-
-    Player* player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
-
-    WorldPacket data( MSG_INSPECT_HONOR_STATS, 13 );
+	
+	uint8 buf[100];
+	StackPacket data( MSG_INSPECT_HONOR_STATS, buf, 100 );
 
     data << player->GetGUID() << (uint8)player->GetUInt32Value( PLAYER_FIELD_HONOR_CURRENCY );
     data << player->GetUInt32Value( PLAYER_FIELD_KILLS );
@@ -253,33 +250,28 @@ void WorldSession::HandleInspectArenaStatsOpcode( WorldPacket & recv_data )
 
     Player* player =  _player->GetMapMgr()->GetPlayer( (uint32)guid );
 	if( player == NULL )
-	{
-		sLog.outError( "HandleInspectHonorStatsOpcode : guid was null" );
 		return;
-	}
 
-	uint32 id;
+	ArenaTeam *team;
+	uint32 i;
 
-    for( uint8 i = 0; i < 3; i++ )
+    for( i = 0; i < 3; i++ )
     {
-		id = player->GetUInt32Value( PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + ( i * 6 ) );
-        if( id > 0 )
-        {
-            ArenaTeam* team = objmgr.GetArenaTeamById( id );
-            if( team != NULL )
-			{
-				WorldPacket data( MSG_INSPECT_ARENA_STATS, 8 + 1 + 4 * 5 );
-				data << player->GetGUID();
-				data << team->m_type;
-				data << team->m_id;
-				data << team->m_stat_rating;
-				data << team->m_stat_gamesplayedweek;
-				data << team->m_stat_gameswonweek;
-				data << team->m_stat_gamesplayedseason;
-				SendPacket( &data );
-
-			}
-        }
+		team = player->m_playerInfo->arenaTeam[i];
+		if( team != NULL )
+		{
+			uint8 buf[100];
+			StackPacket data( MSG_INSPECT_ARENA_TEAMS, buf, 100 );
+			data << player->GetGUID();
+			data << uint8(team->m_type);
+			data << team->m_id;
+			data << team->m_stat_rating;
+			data << team->m_stat_gamesplayedweek;
+			data << team->m_stat_gameswonweek;
+			data << team->m_stat_gamesplayedseason;
+			data << uint32(0);
+			SendPacket( &data );
+		}
     }
 }
 

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="summit-logonserver" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/summit-logonserver" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/summit-logonserver" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-DHAVE_CONFIG_H" />
+			<Add directory="../src/ascent-shared" />
+			<Add directory="../codeblocks" />
+		</Compiler>
+		<Linker>
+			<Add library="libsummit-shared.a" />
+			<Add library="z" />
+			<Add library="ssl" />
+			<Add library="mysqlclient" />
+			<Add directory="../codeblocks" />
+		</Linker>
+		<Unit filename="../src/ascent-logonserver/AccountCache.cpp" />
+		<Unit filename="../src/ascent-logonserver/AccountCache.h" />
+		<Unit filename="../src/ascent-logonserver/AuthSocket.cpp" />
+		<Unit filename="../src/ascent-logonserver/AuthSocket.h" />
+		<Unit filename="../src/ascent-logonserver/AuthStructs.h" />
+		<Unit filename="../src/ascent-logonserver/AutoPatcher.cpp" />
+		<Unit filename="../src/ascent-logonserver/AutoPatcher.h" />
+		<Unit filename="../src/ascent-logonserver/LogonCommServer.cpp" />
+		<Unit filename="../src/ascent-logonserver/LogonCommServer.h" />
+		<Unit filename="../src/ascent-logonserver/LogonConsole.cpp" />
+		<Unit filename="../src/ascent-logonserver/LogonConsole.h" />
+		<Unit filename="../src/ascent-logonserver/LogonOpcodes.cpp" />
+		<Unit filename="../src/ascent-logonserver/LogonOpcodes.h" />
+		<Unit filename="../src/ascent-logonserver/LogonStdAfx.cpp" />
+		<Unit filename="../src/ascent-logonserver/LogonStdAfx.h" />
+		<Unit filename="../src/ascent-logonserver/Main.cpp" />
+		<Unit filename="../src/ascent-logonserver/Main.h" />
+		<Unit filename="../src/ascent-logonserver/PeriodicFunctionCall_Thread.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

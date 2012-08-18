@@ -39,6 +39,7 @@ class Aura;
 class Spell;
 class AIInterface;
 class GameObject;
+class Creature;
 
 struct CreatureInfo;
 struct FactionTemplateDBC;
@@ -591,53 +592,66 @@ typedef std::list<struct ProcTriggerSpellOnSpell> ProcTriggerSpellOnSpellList;
 /************************************************************************/
 
 class Unit;
-class CombatStatusHandler
+class SERVER_DECL CombatStatusHandler
 {
 	typedef set<uint64> AttackerMap;
+	typedef map<uint64, uint32> AttackTMap;
 	typedef set<uint32> HealedSet;		// Must Be Players!
+	AttackerMap m_attackers;
 	HealedSet m_healers;
 	HealedSet m_healed;
 	Unit* m_Unit;
 	bool m_lastStatus;
-	AttackerMap m_attackTargets;
-	uint64 m_primaryAttackTarget;
+	AttackTMap m_attackTargets;
+	map<uint64,uint32> DamageMap;
 
 public:
-	CombatStatusHandler() : m_lastStatus(false), m_primaryAttackTarget(0) {}
-	AttackerMap m_attackers;
-	void AddAttackTarget(const uint64& guid);						// this means we clicked attack, not actually striked yet, so they shouldnt be in combat.
-	void ClearPrimaryAttackTarget();								// means we deselected the unit, stopped attacking it.
+	CombatStatusHandler() : m_lastStatus(false) {}
 
-	void OnDamageDealt(Unit * pTarget);								// this is what puts the other person in combat.
-	void WeHealed(Unit * pHealTarget);								// called when a player heals another player, regardless of combat state.
+	Unit* GetKiller();													// Gets this unit's current killer.
 
-	void RemoveAttacker(Unit * pAttacker, const uint64& guid);		// this means we stopped attacking them totally. could be because of deagro, etc.
-	void RemoveAttackTarget(Unit * pTarget);						// means our DoT expired.
+	void OnDamageDealt(Unit * pTarget, uint32 damage);					// this is what puts the other person in combat.
+	void WeHealed(Unit * pHealTarget);									// called when a player heals another player, regardless of combat state.
+	void RemoveAttackTarget(Unit * pTarget);							// means our DoT expired.
+	void ForceRemoveAttacker(const uint64& guid);						// when target is invalid pointer
 
-	void UpdateFlag();												// detects if we have changed combat state (in/out), and applies the flag.
+	void UpdateFlag();													// detects if we have changed combat state (in/out), and applies the flag.
 
-	ASCENT_INLINE bool IsInCombat() { return m_lastStatus; }				// checks if we are in combat or not.
+	ASCENT_INLINE bool IsInCombat() { return m_lastStatus; }			// checks if we are in combat or not.
 
-	void OnRemoveFromWorld();										// called when we are removed from world, kills all references to us.
+	void OnRemoveFromWorld();											// called when we are removed from world, kills all references to us.
 	
 	ASCENT_INLINE void Vanished()
 	{
 		ClearAttackers();
 		ClearHealers();
+		DamageMap.clear();
 	}
 
-	ASCENT_INLINE const uint64& GetPrimaryAttackTarget() { return m_primaryAttackTarget; }
+	bool DidHeal(uint32 guidLow)
+	{
+		return (m_healed.find(guidLow) != m_healed.end());
+	}
+
+	bool HealedBy(uint32 guidLow)
+	{
+		return (m_healers.find(guidLow) != m_healers.end());
+	}
+
+	bool DidDamageTo(uint64 guid)
+	{
+		return (DamageMap.find(guid) != DamageMap.end());
+	}
+
 	ASCENT_INLINE void SetUnit(Unit * p) { m_Unit = p; }
-	void TryToClearAttackTargets();									// for pvp timeout
-	void AttackersForgetHate();										// used right now for Feign Death so attackers go home
+	void UpdateTargets();
 
 protected:
-	bool InternalIsInCombat();										// called by UpdateFlag, do not call from anything else!
-	bool IsAttacking(Unit * pTarget);								// internal function used to determine if we are still attacking target x.
-	void AddAttacker(const uint64& guid);							// internal function to add an attacker
-	void RemoveHealed(Unit * pHealTarget);							// usually called only by updateflag
-	void ClearHealers();											// this is called on instance change.
-	void ClearAttackers();											// means we vanished, or died.
+	bool InternalIsInCombat();											// called by UpdateFlag, do not call from anything else!
+	bool IsAttacking(Unit * pTarget);									// internal function used to determine if we are still attacking target x.
+	void RemoveHealed(Unit * pHealTarget);								// usually called only by updateflag
+	void ClearHealers();												// this is called on instance change.
+	void ClearAttackers();												// means we vanished, or died.
 	void ClearMyHealers();
 };
 
@@ -649,19 +663,7 @@ protected:
 class SERVER_DECL Unit : public Object
 {
 public:
-	/************************************************************************/
-	/* LUA Stuff                                                            */
-	/************************************************************************/
-/*	typedef struct { const char *name; int(*mfunc)(lua_State*,Unit*); } RegType;
-	static const char className[];
-	static RegType methods[];
-	
-	// a lua script cannot create a unit.
-	Unit(lua_State * L) { ASSERT(false); }*/
-
-
-	void CombatStatusHandler_UpdatePvPTimeout();
-	void CombatStatusHandler_ResetPvPTimeout();
+	void CombatStatusHandler_UpdateTargets();
 
 	virtual ~Unit ( );
 
@@ -770,10 +772,12 @@ public:
 	void OnDamageTaken();
 
 	//! Add Aura to unit
-	void AddAura(Aura *aur);
+	void AddAura(Aura *aur, Aura *pParentAura);
 	//! Remove aura from unit
 	bool RemoveAura(Aura *aur);
 	bool RemoveAura(uint32 spellId);
+	bool RemovePositiveAura(uint32 spellId);
+	bool RemoveNegativeAura(uint32 spellId);
 	bool RemoveAura(uint32 spellId,uint64 guid);
 	bool RemoveAuraByNameHash(uint32 namehash);//required to remove weaker instances of a spell
 	bool RemoveAuraPosByNameHash(uint32 namehash);//required to remove weaker instances of a spell
@@ -811,7 +815,8 @@ public:
 	//caller is the caster
 	int32 GetSpellDmgBonus(Unit *pVictim, SpellEntry *spellInfo,int32 base_dmg, bool isdot);
    
-	Unit* create_guardian(uint32 guardian_entry,uint32 duration,float angle, uint32 lvl = 0);//guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
+	//guardians are temporary spawn that will inherit master faction and will folow them. Apart from that they have their own mind
+	Unit* create_guardian(uint32 guardian_entry,uint32 duration,float angle, uint32 lvl);
 
 	uint32 m_addDmgOnce;
 	Creature *m_TotemSlots[4];
@@ -825,7 +830,6 @@ public:
 	bool m_damgeShieldsInUse;
 	std::list<struct DamageProc> m_damageShields;
 	std::list<struct ReflectSpellSchool*> m_reflectSpellSchool;
- 	std::list<struct DamageSplitTarget> m_damageSplitTargets;
  
 	std::list<struct ProcTriggerSpell> m_procSpells;
 //	std::map<uint32,ProcTriggerSpellOnSpellList> m_procSpellonSpell; //index is namehash
@@ -866,7 +870,6 @@ public:
 	void Heal(Unit* target,uint32 SpellId, uint32 amount);
 	void Energize(Unit* target,uint32 SpellId, uint32 amount, uint32 type);
 
-	Loot loot;
 	uint32 SchoolCastPrevent[7];
 	int32 GetDamageDoneMod(uint32 school);
 	float GetDamageDonePctMod(uint32 school);
@@ -952,9 +955,9 @@ public:
 	void SendChatMessageAlternateEntry(uint32 entry, uint8 type, uint32 lang, const char * msg);
 	void RegisterPeriodicChatMessage(uint32 delay, uint32 msgid, std::string message, bool sendnotify);
 
-	ASCENT_INLINE int GetHealthPct() { return (int)(GetUInt32Value(UNIT_FIELD_HEALTH) * 100 / GetUInt32Value(UNIT_FIELD_MAXHEALTH)); };
+	ASCENT_INLINE int GetHealthPct() { return (int)((GetUInt32Value(UNIT_FIELD_HEALTH)+1) * 100 / (GetUInt32Value(UNIT_FIELD_MAXHEALTH)+1)); };
     ASCENT_INLINE void SetHealthPct(uint32 val) { if (val>0) SetUInt32Value(UNIT_FIELD_HEALTH,float2int32(val*0.01f*GetUInt32Value(UNIT_FIELD_MAXHEALTH))); };
-	ASCENT_INLINE int GetManaPct() { return (int)(GetUInt32Value(UNIT_FIELD_POWER1) * 100 / GetUInt32Value(UNIT_FIELD_MAXPOWER1)); };
+	ASCENT_INLINE int GetManaPct() { return (int)((GetUInt32Value(UNIT_FIELD_POWER1)+1) * 100 / (GetUInt32Value(UNIT_FIELD_MAXPOWER1)+1)); };
 		
 	uint32 GetResistance(uint32 type);	
 	
@@ -978,7 +981,7 @@ public:
 	uint32 BaseResistance[7]; //there are resistances for silence, fear, mechanics ....
 	uint32 BaseStats[5];
 	int32 HealDoneMod[7];
-	int32 HealDonePctMod[7];
+	float HealDonePctMod[7];
 	int32 HealTakenMod[7];
 	float HealTakenPctMod[7];
 	uint32 SchoolImmunityList[7];
@@ -1140,20 +1143,19 @@ public:
 	uint32 m_special_state; //flags for special states (stunned,rooted etc)
 	
 //	uint32 fearSpell;
-	uint32 m_cTimer;
-	void EventUpdateFlag();
 	CombatStatusHandler CombatStatus;
 	bool m_temp_summon;
 
 	void CancelSpell(Spell * ptr);
 	void EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage);
-	bool m_spellsbusy;
 	void DispelAll(bool positive);
 
 	bool HasAurasOfNameHashWithCaster(uint32 namehash, Unit * caster);
 	int8 m_hasVampiricTouch;
 	int8 m_hasVampiricEmbrace;
-	
+	bool mAngerManagement;
+	bool mRecentlyBandaged;
+
 protected:
 	Unit ();
 
@@ -1201,7 +1203,6 @@ protected:
 	uint32 m_charmtemp;
 
 	bool m_extraAttackCounter;
-
 };
 
 

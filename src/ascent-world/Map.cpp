@@ -47,6 +47,11 @@ Map::Map(uint32 mapid, MapInfo * inf)
 		name = _mapInfo->name;
 	else
 		name = "Unknown";
+
+	// collision
+#ifdef COLLISION
+	CollideInterface.ActivateMap(_mapId);
+#endif
 }
 
 Map::~Map()
@@ -80,6 +85,11 @@ Map::~Map()
 		delete *i;
 	for(GOSpawnList::iterator i = staticSpawns.GOSpawns.begin(); i != staticSpawns.GOSpawns.end(); ++i)
 		delete *i;
+
+	// collision
+#ifdef COLLISION
+	CollideInterface.DeactivateMap(_mapId);
+#endif
 }
 
 bool first_table_warning = true;
@@ -308,3 +318,4 @@ void Map::LoadSpawns(bool reload)
 
 	Log.Notice("Map", "%u creatures / %u gameobjects on map %u cached.", CreatureSpawnCount, GameObjectSpawnCount, _mapId);
 }
+

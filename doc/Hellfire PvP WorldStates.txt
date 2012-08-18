@@ -1,0 +1,24 @@
+The Stadium Neutral - 2472
+The Stadium Alliance - 2471
+The Stadium Horde - 2470
+
+The Overlook Alliance - 2480
+The Overlook Horde - 2481
+The Overlook Neutral - 2482
+
+Broken Hill Alliance - 2483
+Broken Hill Horde - 2484
+Broken Hill Neutral - 2485
+
+
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_STADIUM_NEUTRAL", 2472, 530, 3483, -1, 0);
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_STADIUM_ALLIANCE", 2471, 530, 3483, -1, 0);
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_STADIUM_HORDE", 2470, 530, 3483, -1, 0);
+
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_OVERLOOK_NEUTRAL", 2482, 530, 3483, -1, 0);
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_OVERLOOK_ALLIANCE", 2480, 530, 3483, -1, 0);
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_OVERLOOK_HORDE", 2481, 530, 3483, -1, 0);
+
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_BROKENHILL_NEUTRAL", 2485, 530, 3483, -1, 0);
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_BROKENHILL_ALLIANCE", 2483, 530, 3483, -1, 0);
+INSERT INTO worldstate_template (comment, field_number, mapid, zone_mask, faction_mask, initial_value) VALUES("WORLDSTATE_HELLFIRE_BROKENHILL_HORDE", 2484, 530, 3483, -1, 0);

@@ -102,27 +102,14 @@ void DynamicObject::Create(Unit * caster, Spell * pSpell, float x, float y, floa
 
 void DynamicObject::AddInRangeObject( Object* pObj )
 {
-	if( pObj->IsUnit() )
-	{
-		bool attackable;
-		if( p_caster != NULL)
-			attackable = isAttackable( p_caster, pObj );
-		else
-			attackable = isAttackable( this, pObj );
-		
-		if( attackable )
-			m_inRangeOppFactions.insert( static_cast< Unit* >( pObj ) );
-	}
 	Object::AddInRangeObject( pObj );
 }
 
 void DynamicObject::OnRemoveInRangeObject( Object* pObj )
 {
 	if( pObj->IsUnit() )
-	{
-		m_inRangeOppFactions.erase( static_cast< Unit* >( pObj ) );
 		targets.erase( static_cast< Unit* >( pObj ) );
-	}
+
 	Object::OnRemoveInRangeObject( pObj );
 }
 
@@ -149,7 +136,7 @@ void DynamicObject::UpdateTargets()
 			itr2 = itr;
 			++itr;
 
-			if( !( (*itr2)->IsUnit() ) || ! static_cast< Unit* >( *itr2 )->isAlive() || ( static_cast< Creature* >( *itr2 )->IsTotem() && !static_cast< Unit* >( *itr2 )->IsPlayer() ) )
+			if( !( (*itr2)->IsUnit() ) || ! static_cast< Unit* >( *itr2 )->isAlive() || ((*itr2)->GetTypeId()==TYPEID_UNIT && ((Creature*)*itr2)->IsTotem() ) )
 				continue;
 
 			target = static_cast< Unit* >( *itr2 );
@@ -172,7 +159,7 @@ void DynamicObject::UpdateTargets()
 							m_spellProto->EffectBasePoints[i]+1, m_spellProto->EffectMiscValue[i], i);
 					}
 				}
-				target->AddAura(pAura);
+				target->AddAura(pAura, NULL);
 				if(p_caster)
 				{
 					p_caster->HandleProc(PROC_ON_CAST_SPECIFIC_SPELL | PROC_ON_CAST_SPELL,target, m_spellProto);

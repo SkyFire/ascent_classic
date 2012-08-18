@@ -19,7 +19,7 @@
 
 #include "StdAfx.h"
 
-#define BANNER "Ascent %s r%u/%s-%s-%s :: World Server"
+#define BANNER "Summit r%u/%s-%s-%s :: World Server\n"
 
 #ifndef WIN32
 #include <sched.h>
@@ -70,9 +70,7 @@ void Master::_OnSignal(int s)
 
 Master::Master()
 {
-	m_ShutdownTimer = 0;
-	m_ShutdownEvent = false;
-	m_restartEvent = false;
+
 }
 
 Master::~Master()
@@ -102,7 +100,7 @@ struct Addr
 bool bServerShutdown = false;
 bool StartConsoleListener();
 void CloseConsoleListener();
-ThreadBase * GetConsoleListener();
+ThreadContext * GetConsoleListener();
 
 bool Master::Run(int argc, char ** argv)
 {
@@ -120,13 +118,9 @@ bool Master::Run(int argc, char ** argv)
 	struct ascent_option longopts[] =
 	{
 		{ "checkconf",			ascent_no_argument,				&do_check_conf,			1		},
-		{ "screenloglevel",		ascent_required_argument,		&screen_log_level,		1		},
-		{ "fileloglevel",		ascent_required_argument,		&file_log_level,		1		},
 		{ "version",			ascent_no_argument,				&do_version,			1		},
 		{ "conf",				ascent_required_argument,		NULL,					'c'		},
 		{ "realmconf",			ascent_required_argument,		NULL,					'r'		},
-		{ "databasecleanup",	ascent_no_argument,				&do_database_clean,		1		},
-		{ "cheatercheck",		ascent_no_argument,				&do_cheater_check,		1		},
 		{ 0, 0, 0, 0 }
 	};
 
@@ -148,9 +142,7 @@ bool Master::Run(int argc, char ** argv)
 		case 0:
 			break;
 		default:
-			sLog.m_fileLogLevel = -1;
-			sLog.m_screenLogLevel = 3;
-			printf("Usage: %s [--checkconf] [--screenloglevel <level>] [--fileloglevel <level>] [--conf <filename>] [--realmconf <filename>] [--version] [--databasecleanup] [--cheatercheck]\n", argv[0]);
+			printf("Usage: %s [--checkconf] [--conf <filename>] [--realmconf <filename>] [--version]\n", argv[0]);
 			return true;
 		}
 	}
@@ -159,36 +151,9 @@ bool Master::Run(int argc, char ** argv)
 	UNIXTIME = time(NULL);
 	g_localTime = *localtime(&UNIXTIME);
 
-	if(!do_version && !do_check_conf)
-	{
-		sLog.Init(-1, 3);
-	}
-	else
-	{
-		sLog.m_fileLogLevel = -1;
-		sLog.m_screenLogLevel = 1;
-	}
-
-	printf(BANNER, BUILD_TAG, BUILD_REVISION, CONFIG, PLATFORM_TEXT, ARCH);
-#ifdef REPACK
-	printf("\nRepack: %s | Author: %s | %s\n", REPACK, REPACK_AUTHOR, REPACK_WEBSITE);
-#endif
-	printf("\nCopyright (C) 2005-2008 Ascent Team. http://www.ascentemu.com/\n");
-	printf("This program comes with ABSOLUTELY NO WARRANTY, and is FREE SOFTWARE.\n");
-	printf("You are welcome to redistribute it under the terms of the GNU Affero\n");
-	printf("General Public License, either version 3 or any later version. For a\n");
-	printf("copy of this license, see the COPYING file provided with this distribution.\n");
+	printf(BANNER, BUILD_REVISION, CONFIG, PLATFORM_TEXT, ARCH);
+	printf("Built at %s on %s by %s@%s\n", BUILD_TIME, BUILD_DATE, BUILD_USER, BUILD_HOST);
 	Log.Line();
-#ifdef REPACK
-	Log.Color(TRED);
-	printf("Warning: Using repacks is potentially dangerous. You should always compile\n");
-	printf("from the source yourself at www.ascentemu.com.\n");
-	printf("By using this repack, you agree to not visit the ascent website and ask\nfor support.\n");
-	printf("For all support, you should visit the repacker's website at %s\n", REPACK_WEBSITE);
-	Log.Color(TNORMAL);
-	Log.Line();
-#endif
-	Log.log_level = 3;
 
 	if(do_version)
 		return true;
@@ -258,25 +223,11 @@ bool Master::Run(int argc, char ** argv)
 		return false;
 	}
 
-	if(do_database_clean)
-	{
-		printf( "\nEntering database maintenance mode.\n\n" );
-		new DatabaseCleaner;
-		DatabaseCleaner::getSingleton().Run();
-		delete DatabaseCleaner::getSingletonPtr();
-		Log.Color(TYELLOW);
-		printf( "\nMaintenence finished. Take a moment to review the output, and hit space to continue startup." );
-		Log.Color(TNORMAL);
-		fflush(stdout);
-	}
-
 	Log.Line();
 	sLog.outString( "" );
 
-#ifdef GM_SCRIPT
-	ScriptSystem = new ScriptEngine;
-	ScriptSystem->Reload();
-#endif
+	//ScriptSystem = new ScriptEngine;
+	//ScriptSystem->Reload();
 
 	new EventMgr;
 	new World;
@@ -288,13 +239,6 @@ bool Master::Run(int argc, char ** argv)
 
 	/* load the config file */
 	sWorld.Rehash(false);
-
-	/* set new log levels */
-	if( screen_log_level != (int)DEF_VALUE_NOT_SET )
-		sLog.SetScreenLoggingLevel(screen_log_level);
-	
-	if( file_log_level != (int)DEF_VALUE_NOT_SET )
-		sLog.SetFileLoggingLevel(file_log_level);
 
 	// Initialize Opcode Table
 	WorldSession::InitPacketHandlerTable();
@@ -313,6 +257,7 @@ bool Master::Run(int argc, char ** argv)
 	if( do_cheater_check )
 		sWorld.CleanupCheaters();
 
+	g_bufferPool.Init();
 	sWorld.SetStartTime((uint32)UNIXTIME);
 	
 	WorldRunnable * wr = new WorldRunnable();
@@ -331,18 +276,15 @@ bool Master::Run(int argc, char ** argv)
 	uint32 diff;
 	uint32 last_time = now();
 	uint32 etime;
-	uint32 next_printout = getMSTime(), next_send = getMSTime();
 
 	// Start Network Subsystem
-	Log.Notice( "Network","Starting subsystem..." );
+	sLog.outString( "Starting network subsystem..." );
 	new SocketMgr;
 	new SocketGarbageCollector;
 	sSocketMgr.SpawnWorkerThreads();
 
-	sScriptMgr.LoadScripts();
-
 	LoadingTime = getMSTime() - LoadingTime;
-	Log.Notice( "Server","Ready for connections. Startup time: %ums\n", LoadingTime );
+	sLog.outString ( "\nServer is ready for connections. Startup time: %ums\n", LoadingTime );
 
 	Log.Notice("RemoteConsole", "Starting...");
 	if( StartConsoleListener() )
@@ -409,6 +351,7 @@ bool Master::Run(int argc, char ** argv)
 		{
 			ThreadPool.ShowStats();
 			ThreadPool.IntegrityCheck();
+			g_bufferPool.Optimize();
 		}
 
 		/* since time() is an expensive system call, we only update it once per server loop */
@@ -431,53 +374,6 @@ bool Master::Run(int argc, char ** argv)
 		/* UPDATE */
 		last_time = now();
 		etime = last_time - start;
-		if( m_ShutdownEvent )
-		{
-			if( getMSTime() >= next_printout )
-			{
-				if(m_ShutdownTimer > 60000.0f)
-				{
-					if( !( (int)(m_ShutdownTimer) % 60000 ) )
-						Log.Notice( "Server", "Shutdown in %i minutes.", (int)(m_ShutdownTimer / 60000.0f ) );
-				}
-				else
-					Log.Notice( "Server","Shutdown in %i seconds.", (int)(m_ShutdownTimer / 1000.0f ) );
-					
-				next_printout = getMSTime() + 500;
-			}
-
-			if( getMSTime() >= next_send )
-			{
-				int time = m_ShutdownTimer / 1000;
-				if( ( time % 30 == 0 ) || time < 10 )
-				{
-					// broadcast packet.
-					WorldPacket data( 20 );
-					data.SetOpcode( SMSG_SERVER_MESSAGE );
-					data << uint32( SERVER_MSG_SHUTDOWN_TIME );
-					
-					if( time > 0 )
-					{
-						int mins = 0, secs = 0;
-						if(time > 60)
-							mins = time / 60;
-						if(mins)
-							time -= (mins * 60);
-						secs = time;
-						char str[20];
-						snprintf( str, 20, "%02u:%02u", mins, secs );
-						data << str;
-						sWorld.SendGlobalMessage( &data, NULL );
-					}
-				}
-				next_send = getMSTime() + 1000;
-			}
-			if( diff >= m_ShutdownTimer )
-				break;
-			else
-				m_ShutdownTimer -= diff;
-		}
-
 		if( 50 > etime )
 		{
 #ifdef WIN32
@@ -489,7 +385,7 @@ bool Master::Run(int argc, char ** argv)
 	}
 	_UnhookSignals();
 
-    wr->SetThreadState( THREADSTATE_TERMINATE );
+    wr->Terminate();
 	ThreadPool.ShowStats();
 	/* Shut down console system */
 	console->terminate();
@@ -558,15 +454,11 @@ bool Master::Run(int argc, char ** argv)
 	delete VoiceChatHandler::getSingletonPtr();
 #endif
 
-#ifdef GM_SCRIPT
-	Log.Notice("GM-scripting:", "Closing ScriptEngine...");
-	delete ScriptSystem;
-#endif
-
 #ifdef ENABLE_LUA_SCRIPTING
 	sLog.outString("Deleting Script Engine...");
 	LuaEngineMgr::getSingleton().Unload();
 #endif
+	//delete ScriptSystem;
 
 	delete GMCommand_Log;
 	delete Anticheat_Log;
@@ -574,6 +466,7 @@ bool Master::Run(int argc, char ** argv)
 
 	// remove pid
 	remove( "ascent.pid" );
+	g_bufferPool.Destroy();
 
 	Log.Notice( "Shutdown", "Shutdown complete." );
 
@@ -594,10 +487,6 @@ bool Master::_StartDB()
 {
 	string hostname, username, password, database;
 	int port = 0;
-	int type = 1;
-	//string lhostname, lusername, lpassword, ldatabase;
-	//int lport = 0;
-	//int ltype = 1;
 	// Configure Main Database
 	
 	bool result = Config.MainConfig.GetString( "WorldDatabase", "Username", &username );
@@ -605,12 +494,11 @@ bool Master::_StartDB()
 	result = !result ? result : Config.MainConfig.GetString( "WorldDatabase", "Hostname", &hostname );
 	result = !result ? result : Config.MainConfig.GetString( "WorldDatabase", "Name", &database );
 	result = !result ? result : Config.MainConfig.GetInt( "WorldDatabase", "Port", &port );
-	result = !result ? result : Config.MainConfig.GetInt( "WorldDatabase", "Type", &type );
-	Database_World = Database::CreateDatabaseInterface(type);
+	Database_World = Database::Create();
 
 	if(result == false)
 	{
-		Log.Error( "sql","One or more parameters were missing from WorldDatabase directive." );
+		DEBUG_LOG( "sql: One or more parameters were missing from WorldDatabase directive." );
 		return false;
 	}
 
@@ -618,7 +506,7 @@ bool Master::_StartDB()
 	if( !WorldDatabase.Initialize(hostname.c_str(), (unsigned int)port, username.c_str(),
 		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault( "WorldDatabase", "ConnectionCount", 3 ), 16384 ) )
 	{
-		Log.Error( "sql","Main database initialization failed. Exiting." );
+		DEBUG_LOG( "sql: Main database initialization failed. Exiting." );
 		return false;
 	}
 
@@ -627,12 +515,11 @@ bool Master::_StartDB()
 	result = !result ? result : Config.MainConfig.GetString( "CharacterDatabase", "Hostname", &hostname );
 	result = !result ? result : Config.MainConfig.GetString( "CharacterDatabase", "Name", &database );
 	result = !result ? result : Config.MainConfig.GetInt( "CharacterDatabase", "Port", &port );
-	result = !result ? result : Config.MainConfig.GetInt( "CharacterDatabase", "Type", &type );
-	Database_Character = Database::CreateDatabaseInterface(type);
+	Database_Character = Database::Create();
 
 	if(result == false)
 	{
-		Log.Error( "sql","One or more parameters were missing from Database directive." );
+		DEBUG_LOG( "sql: One or more parameters were missing from Database directive." );
 		return false;
 	}
 
@@ -640,7 +527,7 @@ bool Master::_StartDB()
 	if( !CharacterDatabase.Initialize( hostname.c_str(), (unsigned int)port, username.c_str(),
 		password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault( "CharacterDatabase", "ConnectionCount", 5 ), 16384 ) )
 	{
-		Log.Error( "sql","Main database initialization failed. Exiting." );
+		DEBUG_LOG( "sql: Main database initialization failed. Exiting." );
 		return false;
 	}
 
@@ -653,6 +540,43 @@ void Master::_StopDB()
 	delete Database_Character;
 }
 
+#ifndef WIN32
+// Unix crash handler :oOoOoOoOoOo
+volatile bool m_crashed = false;
+void segfault_handler(int c)
+{
+	if( m_crashed )
+	{
+		abort();
+		return;		// not reached
+	}
+
+	m_crashed = true;
+
+	printf ("Segfault handler entered...\n");
+	try
+	{
+		if( World::getSingletonPtr() != 0 )
+		{
+			sLog.outString( "Waiting for all database queries to finish..." );
+			WorldDatabase.EndThreads();
+			CharacterDatabase.EndThreads();
+			sLog.outString( "All pending database operations cleared.\n" );
+			sWorld.SaveAllPlayers();
+			sLog.outString( "Data saved." );
+		}
+	}
+	catch(...)
+	{
+		sLog.outString( "Threw an exception while attempting to save all data." );
+	}
+
+	printf("Writing coredump...\n");
+	abort();
+}
+#endif
+
+
 void Master::_HookSignals()
 {
 	signal( SIGINT, _OnSignal );
@@ -663,6 +587,12 @@ void Master::_HookSignals()
 #else
 	signal( SIGHUP, _OnSignal );
 	signal(SIGUSR1, _OnSignal);
+	
+	// crash handler
+	signal(SIGSEGV, segfault_handler);
+	signal(SIGFPE, segfault_handler);
+	signal(SIGILL, segfault_handler);
+	signal(SIGBUS, segfault_handler);
 #endif
 }
 
@@ -686,7 +616,7 @@ Mutex m_crashedMutex;
 // Crash Handler
 void OnCrash( bool Terminate )
 {
-		Log.Error( "Crash Handler","Advanced crash handler initialized." );
+	sLog.outString( "Advanced crash handler initialized." );
 
 	if( !m_crashedMutex.AttemptAcquire() )
 		TerminateThread( GetCurrentThread(), 0 );
@@ -695,20 +625,20 @@ void OnCrash( bool Terminate )
 	{
 		if( World::getSingletonPtr() != 0 )
 		{
-			Log.Notice( "sql","Waiting for all database queries to finish..." );
+			sLog.outString( "Waiting for all database queries to finish..." );
 			WorldDatabase.EndThreads();
 			CharacterDatabase.EndThreads();
-			Log.Notice( "sql","All pending database operations cleared.\n" );
+			sLog.outString( "All pending database operations cleared.\n" );
 			sWorld.SaveAllPlayers();
-			Log.Notice( "sql","Data saved." );
+			sLog.outString( "Data saved." );
 		}
 	}
 	catch(...)
 	{
-		Log.Error( "sql","Threw an exception while attempting to save all data." );
+		sLog.outString( "Threw an exception while attempting to save all data." );
 	}
 
-	Log.Notice( "Server","Closing." );
+	sLog.outString( "Closing." );
 	
 	// beep
 	//printf("\x7");

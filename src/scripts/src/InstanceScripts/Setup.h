@@ -28,6 +28,7 @@ void SetupGuardAI(ScriptMgr * mgr);
 void SetupBlackTemple(ScriptMgr * mgr);
 void SetupArcatraz(ScriptMgr * mgr);
 void SetupTheMechanar(ScriptMgr * mgr);
+void SetupAlteracValleyBattleground(ScriptMgr * mgr);
 
 struct SP_AI_Spell{
 	SpellEntry *info; // spell info

@@ -33,6 +33,8 @@ class LuaEngineMgr;
 extern LuaEngineMgr g_luaMgr;
 extern LuaEngine * g_engine;
 
+GossipMenu * Menu;
+
 /** Macros for calling lua-based events
  */
 #define LUA_ON_UNIT_EVENT(unit,eventtype,miscunit,misc) if(unit->GetTypeId()==TYPEID_UNIT && unit->IsInWorld()) { unit->GetMapMgr()->GetScriptEngine()->OnUnitEvent(unit,eventtype,miscunit,misc); }

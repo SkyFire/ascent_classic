@@ -22,6 +22,7 @@
 
 struct ItemPrototype;
 class MapMgr;
+class Player;
 class LootRoll : public EventableObject
 {
 public:
@@ -87,12 +88,14 @@ typedef struct
 	StoreLootItem*items;
 }StoreLootList;
 
-typedef struct
+struct Loot
 {
 	std::vector<__LootItem> items;
 	uint32 gold;
 	LooterSet looters;
-}Loot;
+	bool HasItems();
+	bool HasLoot() { return (gold > 0) || HasItems(); }
+};
 
 struct tempy
 {
@@ -139,6 +142,7 @@ public:
 	bool IsFishable(uint32 zoneid);
 
 	void LoadLoot();
+	void LoadCreatureLoot();
 	void LoadLootProp();
 	
 	LootStore	CreatureLoot;
@@ -156,6 +160,8 @@ public:
 
 	bool is_loading;
  
+	void FillObjectLootMap(map<uint32, vector<uint32> > *dest);
+
 private:
 	void LoadLootTables(const char * szTableName,LootStore * LootTable);
 	void PushLoot(StoreLootList *list,Loot * loot, bool heroic);

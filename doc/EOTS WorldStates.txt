@@ -1,0 +1,21 @@
+Dreinei Ruins Neutral Display - 2731
+Dreinei Ruins Alliance Display - 2732
+Dreinei Ruins Horde Display - 2733
+
+Mage Tower Neutral Display - 2728
+Mage Tower Horde Display - 2729
+Mage Tower Alliance Display - 2730
+
+Fel Reaver Ruins Neutral Display - 2725
+Fel Reaver Ruins Alliance Display - 2726
+Fel Reaver Ruins Horde Display - 2727
+
+Blood Elf Tower Neutral Display - 2722
+Blood Elf Tower Alliance Display - 2723
+Blood Elf Tower Horde Display - 2724
+
+Flag Neutral Display - 2757
+
+Horde Victory Points Display - 2770
+Alliance Victory Points Display - 2769
+

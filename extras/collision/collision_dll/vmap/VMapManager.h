@@ -154,19 +154,15 @@ namespace VMAP
 
 			// LOS
 			virtual bool isInLineOfSight(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2);
-			virtual bool isInLineOfSight(unsigned int pMapId, LocationVector & v1, LocationVector & v2);
 
 			// Height
 			virtual float getHeight(unsigned int pMapId, float x, float y, float z);
-			virtual float getHeight(unsigned int mapid, LocationVector & vec);
 
 			// Indoors
 			virtual bool isInDoors(unsigned int mapid, float x, float y, float z);
-			virtual bool isInDoors(unsigned int mapid, LocationVector & vec);
 
 			// Outdoors
 			virtual bool isOutDoors(unsigned int mapid, float x, float y, float z);
-			virtual bool isOutDoors(unsigned int mapid, LocationVector & vec);
 
 			/**
 			test if we hit an object. return true if we hit one. rx,ry,rz will hold the hit position or the dest position, if no intersection was found
@@ -175,7 +171,8 @@ namespace VMAP
 
 			// Closest Point
 			virtual bool getObjectHitPos(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float &ry, float& rz, float pModifyDist);
-			virtual bool getObjectHitPos(unsigned int pMapId, LocationVector & v1, LocationVector & v2, LocationVector & vout, float pModifyDist);
+
+			void setDebugPoint(float x, float y, float z, float o);
     };
 }
 #endif

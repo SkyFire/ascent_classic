@@ -22,7 +22,7 @@ SocketMgr::SocketMgr()
 
 SocketMgr::~SocketMgr()
 {
-	
+
 }
 
 void SocketMgr::SpawnWorkerThreads()
@@ -30,7 +30,7 @@ void SocketMgr::SpawnWorkerThreads()
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 
-	threadcount = si.dwNumberOfProcessors;
+	threadcount = si.dwNumberOfProcessors*2;
 
 	printf("IOCP: Spawning %u worker threads.\n", threadcount);
 	for(long x = 0; x < threadcount; ++x)
@@ -39,7 +39,6 @@ void SocketMgr::SpawnWorkerThreads()
 
 bool SocketWorkerThread::run()
 {
-	THREAD_TRY_EXECUTION2
 	HANDLE cp = sSocketMgr.GetCompletionPort();
 	DWORD len;
 	Socket * s;
@@ -67,7 +66,6 @@ bool SocketWorkerThread::run()
 			ophandlers[ov->m_event](s, len);
 	}
 
-	THREAD_HANDLE_CRASH2
 	return true;
 }
 
@@ -105,7 +103,7 @@ void HandleWriteComplete(Socket * s, uint32 len)
 
 void HandleShutdown(Socket * s, uint32 len)
 {
-	
+
 }
 
 void SocketMgr::CloseAll()
@@ -116,7 +114,7 @@ void SocketMgr::CloseAll()
 	for(set<Socket*>::iterator itr = _sockets.begin(); itr != _sockets.end(); ++itr)
 		tokill.push_back(*itr);
 	socketLock.Release();
-	
+
 	for(list<Socket*>::iterator itr = tokill.begin(); itr != tokill.end(); ++itr)
 		(*itr)->Disconnect();
 
@@ -139,3 +137,4 @@ void SocketMgr::ShutdownThreads()
 }
 
 #endif
+

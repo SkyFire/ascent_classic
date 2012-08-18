@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
 echo Building Precompiled Header...
 cd src/ascent-world

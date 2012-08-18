@@ -31,7 +31,6 @@ static pthread_mutex_t abortmutex;
 
 DayWatcherThread::DayWatcherThread()
 {
-	m_running = true;
 	m_dirty = false;
 }
 
@@ -42,7 +41,7 @@ DayWatcherThread::~DayWatcherThread()
 
 void DayWatcherThread::terminate()
 {
-	m_running = false;
+	m_threadRunning = false;
 #ifdef WIN32
 	SetEvent(m_abortEvent);
 #else
@@ -136,7 +135,7 @@ bool DayWatcherThread::run()
 	pthread_cond_init(&abortcond,NULL);
 #endif
 	
-	while(ThreadState != THREADSTATE_TERMINATE)
+	while(m_threadRunning)
 	{
 		m_busy=true;
 		currenttime = UNIXTIME;
@@ -149,7 +148,7 @@ bool DayWatcherThread::run()
 			update_settings();
 
 		m_busy=false;
-		if(ThreadState == THREADSTATE_TERMINATE)
+		if(!m_threadRunning)
 			break;
 
 #ifdef WIN32
@@ -162,7 +161,7 @@ bool DayWatcherThread::run()
 		pthread_cond_timedwait(&abortcond, &abortmutex, &tv);
 		pthread_mutex_unlock(&abortmutex);
 #endif
-		if(!m_running)
+		if(!m_threadRunning)
 			break;
 	}
 #ifdef WIN32
@@ -181,6 +180,7 @@ void DayWatcherThread::update_arena()
 	Player * plr;
 	uint32 guid, arenapoints, orig_arenapoints;
 	ArenaTeam * team;
+	PlayerInfo * inf;
 	uint32 arenapointsPerTeam[3] = {0};
 	double X, Y;
 	if(result)
@@ -189,6 +189,11 @@ void DayWatcherThread::update_arena()
 		{
 			Field * f = result->Fetch();
 			guid = f[0].GetUInt32();
+
+			inf = objmgr.GetPlayerInfo(guid);
+			if( inf == NULL )
+				continue;
+
 			arenapoints = f[1].GetUInt32();
 			orig_arenapoints = arenapoints;
 
@@ -198,7 +203,7 @@ void DayWatcherThread::update_arena()
 			/* are we in any arena teams? */
 			for(uint32 i = 0; i < 3; ++i)			// 3 arena team types
 			{
-				team = objmgr.GetArenaTeamByGuid(guid, i);
+				team = inf->arenaTeam[i];
 				if(team)
 				{
 					ArenaTeamMember *member = team->GetMemberByGuid(guid);

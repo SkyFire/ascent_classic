@@ -85,7 +85,7 @@ int voicechat_ascent_listen_socket_read_handler(network_socket *s, int act)
 	int slen = sizeof(struct sockaddr_in);
 	char buffer[100] = {'N','/','A'};
 	network_socket * ns;
-	int new_fd = accept(s->fd, (struct sockaddr*)&new_address, &slen);
+	int new_fd = (int)accept(s->fd, (struct sockaddr*)&new_address, &slen);
 
 	if( new_fd < 0 )
 	{

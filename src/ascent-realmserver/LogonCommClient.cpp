@@ -43,12 +43,12 @@ void LogonCommClientSocket::OnRead()
 	{
 		if(!remaining)
 		{
-			if(GetReadBuffer().GetSize() < 4)
+			if(readBuffer.GetSize() < 4)
 				return;	 // no header
 
 			// read header
-			GetReadBuffer().Read(&opcode, 2);
-			GetReadBuffer().Read(&remaining, 4);
+			readBuffer.Read(&opcode, 2);
+			readBuffer.Read(&remaining, 4);
 
 			// decrypt the first two bytes
 			if(use_crypto)
@@ -62,7 +62,7 @@ void LogonCommClientSocket::OnRead()
 		}
 
 		// do we have a full packet?
-		if(GetReadBuffer().GetSize() < remaining)
+		if(readBuffer.GetSize() < remaining)
 			return;
 
 		// create the buffer
@@ -70,7 +70,7 @@ void LogonCommClientSocket::OnRead()
 		if(remaining)
 		{
 			buff.resize(remaining);
-			GetReadBuffer().Read((void*)buff.contents(), remaining);
+			readBuffer.Read((uint8*)buff.contents(), remaining);
 		}
 
 		// decrypt the rest of the packet
@@ -153,7 +153,7 @@ void LogonCommClientSocket::HandleSessionInfo(WorldPacket & recvData)
 void LogonCommClientSocket::HandlePong(WorldPacket & recvData)
 {
 	if(latency)
-		sLog.outDebug(">> logonserver latency: %ums", getMSTime() - pingtime);
+		DEBUG_LOG(">> logonserver latency: %ums", getMSTime() - pingtime);
 	latency = getMSTime() - pingtime;
 	last_pong = uint32(time(NULL));
 }
@@ -340,7 +340,7 @@ void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 
 	if(deflateInit(&stream, 1) != Z_OK)
 	{
-		sLog.outError("deflateInit failed.");
+		printf("deflateInit failed.");
 		return;
 	}
 
@@ -354,21 +354,21 @@ void LogonCommClientSocket::CompressAndSend(ByteBuffer & uncompressed)
 	if(deflate(&stream, Z_NO_FLUSH) != Z_OK ||
 		stream.avail_in != 0)
 	{
-		sLog.outError("deflate failed.");
+		printf("deflate failed.");
 		return;
 	}
 
 	// finish the deflate
 	if(deflate(&stream, Z_FINISH) != Z_STREAM_END)
 	{
-		sLog.outError("deflate failed: did not end stream");
+		printf("deflate failed: did not end stream");
 		return;
 	}
 
 	// finish up
 	if(deflateEnd(&stream) != Z_OK)
 	{
-		sLog.outError("deflateEnd failed.");
+		printf("deflateEnd failed.");
 		return;
 	}
 

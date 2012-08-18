@@ -19,7 +19,9 @@
 
 #include "StdAfx.h"
 
-//static uint32 INITIALIZE_FACTIONS[128] = { 21, 92, 93, 59, 349, 70, 369, 471, 470, 169, 469, 67, 529, 76, 530, 81, 68, 54, 72, 47, 69, 86, 83, 549, 551, 550, 589, 577, 46, 289, 570, 571, 569, 574, 576, 609, 947, 946, 935, 730, 729, 749, 980, 809, 890, 889, 891, 892, 930, 909, 270, 510, 509, 910, 911, 922, 990, 932, 936, 933, 941, 934, 967, 942, 970, 978, 989, 1005, 1011, 1012, 1015, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+#define FACTION_FLAG_HIDDEN 4                
+#define FACTION_FLAG_INVISIBLE_FORCED 8               
+#define FACTION_FLAG_PEACE_FORCED 16  
 #define FACTION_FLAG_AT_WAR  2
 #define FACTION_FLAG_VISIBLE 1
 
@@ -32,7 +34,7 @@ Standing Player::GetReputationRankFromStanding(int32 Standing_)
 	else if( Standing_ >= 9000 )  
 		return STANDING_HONORED;  
 	else if( Standing_ >= 3000 )  
-		 return STANDING_FRIENDLY;  
+		return STANDING_FRIENDLY;  
 	else if( Standing_ >= 0 )  
 		return STANDING_NEUTRAL;  
 	else if( Standing_ > -3000 )  
@@ -64,6 +66,22 @@ ASCENT_INLINE void SetFlagVisible(uint8 & flag)
 		return;
 
 	flag |= FACTION_FLAG_VISIBLE;
+}
+
+ASCENT_INLINE void SetFlagPeaceForced(uint8 & flag)
+{
+	if(flag & FACTION_FLAG_PEACE_FORCED)
+		return;
+
+	flag |= FACTION_FLAG_PEACE_FORCED;
+}
+
+ASCENT_INLINE void SetForcedInvisible(uint8 & flag)
+{
+	if(flag & FACTION_FLAG_INVISIBLE_FORCED)
+		return;
+
+	flag |= FACTION_FLAG_INVISIBLE_FORCED;
 }
 
 ASCENT_INLINE void UnsetFlagVisible(uint8 & flag)
@@ -153,7 +171,14 @@ void Player::_InitialReputation()
 				(f->parentFaction == 67 && GetTeam() == 1) )		 // Horde own faction.
 			{
 				SetFlagVisible(rep->flag);
-			}				 
+				SetFlagPeaceForced(rep->flag);
+			}
+
+			if((f->parentFaction == 469 && GetTeam() == 1) ||		// Alliance own faction.
+				(f->parentFaction == 67 && GetTeam() == 0) )		 // Horde own faction.
+			{
+				SetForcedInvisible(rep->flag);
+			}
 				
 			reputationByListId[f->RepListId] = rep;
 		}
@@ -216,14 +241,7 @@ void Player::SetStanding(uint32 Faction, int32 Value)
 		{
 			SetFlagVisible(itr->second->flag);
 			if(IsInWorld())
-			{
-#ifdef USING_BIG_ENDIAN
-				uint32 swapped = swap32(dbc->RepListId);
-				m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &swapped);
-#else
 				m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &dbc->RepListId);
-#endif
-			}
 		}
 
 		// Set at war if we're beyond hostile.
@@ -322,14 +340,7 @@ void Player::ModStanding(uint32 Faction, int32 Value)
 		{
 			SetFlagVisible(itr->second->flag);
 			if(IsInWorld())
-			{
-#ifdef USING_BIG_ENDIAN
-				uint32 swapped = swap32(dbc->RepListId);
-				m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &swapped);
-#else
 				m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &dbc->RepListId);
-#endif
-			}
 		}
 
 		// Set at war if we're beyond hostile.
@@ -358,6 +369,10 @@ void Player::SetAtWar(uint32 Faction, bool Set)
 	if(!rep) return;
 	
 	if(GetReputationRankFromStanding(rep->standing) <= STANDING_HOSTILE && !Set) // At this point we have to be at war.
+		return;
+
+	FactionDBC * f = dbcFaction.LookupEntry(Faction);
+	if(rep->flag & 0x4)
 		return;
 
 	if(Set)
@@ -504,14 +519,7 @@ void Player::Reputation_OnTalk(FactionDBC * dbc)
 	{
 		SetFlagVisible(rep->flag);
 		if(IsInWorld())
-		{
-#ifdef USING_BIG_ENDIAN
-			uint32 swapped = swap32(dbc->RepListId);
-			m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &swapped);
-#else
 			m_session->OutPacket(SMSG_SET_FACTION_VISIBLE, 4, &dbc->RepListId);
-#endif
-		}
 
 #ifdef OPTIMIZED_PLAYER_SAVING
 		save_Reputation();

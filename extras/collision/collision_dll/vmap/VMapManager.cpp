@@ -25,6 +25,90 @@
 
 #define MAX_MAPS 600
 
+//#define COLLISION_VISUAL_DEBUG 1
+#ifdef COLLISION_VISUAL_DEBUG
+
+#pragma pack(push, 1)
+struct __DEBUG_CMD
+{
+	int cmd;
+	float p1;
+	float p2;
+	float p3;
+	float p4;
+	float p5;
+	float p6;
+	float p7;
+	float p8;
+	float p9;
+	int ip1;
+	int ip2;
+	int ip3;
+};
+
+enum __DEBUG_OP
+{
+	__DEBUG_LOAD_TILE,
+	__DEBUG_UNLOAD_TILE,
+	__DEBUG_LOAD_MAP,
+	__DEBUG_SET_POS,
+	__DEBUG_TEST_LOS,
+	__DEBUG_GET_HEIGHT,
+	__DEBUG_GET_FIRSTPOINT,
+	__DEBUG_ISINDOOR,
+	__DEBUG_ISOUTDOOR,
+};
+
+#define MAKE_CMD(ptr, _cmd, _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _ip1, _ip2, _ip3) ptr.cmd = _cmd; \
+	ptr.p1 = _p1; ptr.p2 = _p2; ptr.p3 = _p3; ptr.p4 = _p4; ptr.p5 = _p5; ptr.p6 = _p6; ptr.p7 = _p7; \
+	ptr.p8 = _p8; ptr.p9 = _p9; ptr.ip1 = _ip1; ptr.ip2 = _ip2; ptr.ip3 = _ip3;
+
+static const char *pipename = "\\\\.\\mailslot\\vmapcomm";
+HANDLE hPipe;
+
+void __open_pipe()
+{
+	hPipe = CreateMailslot(pipename, 2000, MAILSLOT_WAIT_FOREVER, NULL);
+	assert(hPipe != INVALID_HANDLE_VALUE);
+	printf("mailslot create: %s\n", pipename);
+}
+
+void __post_msg(__DEBUG_CMD *cmd)
+{
+	DWORD bw;
+	printf("post ipc msg cmd %u\n", cmd->cmd);
+	assert(WriteFile(hPipe, cmd, sizeof(__DEBUG_CMD), &bw, NULL) != FALSE);
+	assert(bw == sizeof(__DEBUG_CMD));
+}
+
+void __open_read_pipe()
+{
+	hPipe = CreateFile(pipename, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	assert(hPipe != INVALID_HANDLE_VALUE);
+}
+
+__DEBUG_CMD *__read_msg()
+{
+	__DEBUG_CMD nc;
+	__DEBUG_CMD *ret;
+
+	DWORD br;
+	BOOL res = ReadFile(hPipe, &nc, (DWORD)sizeof(__DEBUG_CMD), &br, NULL);
+	if( res == TRUE )
+	{
+		ret = new __DEBUG_CMD;
+		memcpy(ret, &nc, sizeof(__DEBUG_CMD));
+		return ret;
+	}
+
+	assert(GetLastError() == ERROR_SEM_TIMEOUT);
+	return NULL;
+}
+
+#endif
+
+
+
 namespace VMAP
 {
 	inline bool IsTileMap(unsigned int mapid)
@@ -65,6 +149,9 @@ namespace VMAP
     VMapManager::VMapManager()
     {
 		memset( m_maps, 0, sizeof(MapTree*) * MAX_MAPS );
+#ifdef COLLISION_VISUAL_DEBUG
+		__open_read_pipe();
+#endif
     }
 
     //=========================================================
@@ -79,6 +166,15 @@ namespace VMAP
 			m_maps[i] = NULL;
 		}
     }
+
+	void VMapManager::setDebugPoint(float x, float y, float z, float o)
+	{
+#ifdef COLLISION_VISUAL_DEBUG
+		__DEBUG_CMD cmd;
+		MAKE_CMD(cmd, __DEBUG_SET_POS, x, y, z + 2.0f, o, 0, 0, 0, 0, 0, 0, 0, 0);
+		__post_msg(&cmd);
+#endif
+	}
 
     //=========================================================
 
@@ -119,20 +215,6 @@ namespace VMAP
 		float pos[3];
 		pos[0] = vec.y;
 		pos[1] = vec.z;
-		pos[2] = vec.x;
-		double full = 64.0*533.33333333;
-		double mid = full/2.0;
-		pos[0] = full- (pos[0] + mid);
-		pos[2] = full- (pos[2] + mid);
-
-		return(Vector3(pos));
-	}
-
-	inline Vector3 VMapManager::convertPositionToInternalRepMod(LocationVector & vec) const
-	{
-		float pos[3];
-		pos[0] = vec.y;
-		pos[1] = vec.z + 2.0f;
 		pos[2] = vec.x;
 		double full = 64.0*533.33333333;
 		double mid = full/2.0;
@@ -246,10 +328,29 @@ namespace VMAP
 		if( pMapId >= MAX_MAPS )
 			return false;
 
+#ifndef COLLISION_VISUAL_DEBUG
 		if( IsTileMap( pMapId ) )
+		{
 			dirFileName = getDirFileName( pMapId, x, y );
+		}
 		else
+		{
 			dirFileName = getDirFileName( pMapId );
+		}
+#else
+		__DEBUG_CMD cmd;
+		if( IsTileMap( pMapId ) )
+		{
+			MAKE_CMD(cmd, __DEBUG_LOAD_TILE, 0, 0, 0, 0, 0, 0, 0, 0, 0, pMapId, x, y);
+			dirFileName = getDirFileName( pMapId, x, y );
+		}
+		else
+		{
+			MAKE_CMD(cmd, __DEBUG_LOAD_MAP, 0, 0, 0, 0, 0, 0, 0, 0, 0, pMapId, 0, 0);
+			dirFileName = getDirFileName( pMapId );
+		}
+		__post_msg(&cmd);
+#endif
 
 		MapTree* instanceTree = m_maps[pMapId];
 		if( instanceTree == NULL )
@@ -319,51 +420,30 @@ namespace VMAP
         bool result = true;
 		if( m_maps[pMapId] != NULL )
         {
-            Vector3 pos1 = convertPositionToInternalRep(x1,y1,z1);
-            Vector3 pos2 = convertPositionToInternalRep(x2,y2,z2);
+            Vector3 pos1 = convertPositionToInternalRep(x1,y1,z1 + 1.0f);
+            Vector3 pos2 = convertPositionToInternalRep(x2,y2,z2 + 1.0f);
             if(pos1 != pos2)
             {
                 MapTree* mapTree = m_maps[pMapId];
                 result = mapTree->isInLineOfSight(pos1, pos2);
+				if( result )
+				{
+					// try being more aggressive
+					pos1 = convertPositionToInternalRep(x1,y1,z1 + 2.5f);
+					pos2 = convertPositionToInternalRep(x2,y2,z2 + 2.5f);
+					result = mapTree->isInLineOfSight(pos1, pos2);
+				}
             }
         }
         return(result);
     }
-
-	bool VMapManager::isInLineOfSight(unsigned int pMapId, LocationVector & v1, LocationVector & v2)
-	{
-		bool result = true;
-		if( m_maps[pMapId] != NULL )
-		{
-			Vector3 pos1 = convertPositionToInternalRepMod(v1);
-			Vector3 pos2 = convertPositionToInternalRepMod(v2);
-			if(pos1 != pos2)
-			{
-				MapTree* mapTree = m_maps[pMapId];
-				result = mapTree->isInLineOfSight(pos1, pos2);
-			}
-		}
-		return(result);
-	}
 
 	bool VMapManager::isInDoors(unsigned int mapid, float x, float y, float z)
 	{
 		bool result = false;
 		if( m_maps[mapid] != NULL )
 		{
-			Vector3 pos = convertPositionToInternalRep(x,y,z);
-			MapTree* mapTree = m_maps[mapid];
-			result = mapTree->isInDoors(pos);
-		}
-		return(result);
-	}
-
-	bool VMapManager::isInDoors(unsigned int mapid, LocationVector & vec)
-	{
-		bool result = false;
-		if( m_maps[mapid] != NULL )
-		{
-			Vector3 pos = convertPositionToInternalRepMod(vec);
+			Vector3 pos = convertPositionToInternalRep(x,y,z + 1.0f);
 			MapTree* mapTree = m_maps[mapid];
 			result = mapTree->isInDoors(pos);
 		}
@@ -375,25 +455,12 @@ namespace VMAP
 		bool result = false;
 		if( m_maps[mapid] != NULL )
 		{
-			Vector3 pos = convertPositionToInternalRep(x,y,z);
+			Vector3 pos = convertPositionToInternalRep(x,y,z + 1.0f);
 			MapTree* mapTree = m_maps[mapid];
 			result = mapTree->isOutDoors(pos);
 		}
 		return(result);
 	}
-
-	bool VMapManager::isOutDoors(unsigned int mapid, LocationVector & vec)
-	{
-		bool result = false;
-		if( m_maps[mapid] != NULL )
-		{
-			Vector3 pos = convertPositionToInternalRepMod(vec);
-			MapTree* mapTree = m_maps[mapid];
-			result = mapTree->isOutDoors(pos);
-		}
-		return(result);
-	}
-
 
     //=========================================================
     /**
@@ -408,34 +475,36 @@ namespace VMAP
         rz=z2;
 		if( m_maps[pMapId] != NULL )
 		{
-                Vector3 pos1 = convertPositionToInternalRep(x1,y1,z1);
-                Vector3 pos2 = convertPositionToInternalRep(x2,y2,z2);
+                Vector3 pos1 = convertPositionToInternalRep(x1,y1,z1 + 1.5f);
+                Vector3 pos2 = convertPositionToInternalRep(x2,y2,z2 + 1.5f);
                 Vector3 resultPos;
                 MapTree* mapTree = m_maps[pMapId];
                 result = mapTree->getObjectHitPos(pos1, pos2, resultPos, pModifyDist);
-                resultPos = convertPositionToMangosRep(resultPos.x,resultPos.y,resultPos.z);
-                rx = resultPos.x;
-                ry = resultPos.y;
-                rz = resultPos.z;
+
+				if( !result )
+				{
+					// be a bit more aggressive
+					pos1 = convertPositionToInternalRep(x1,y1,z1 + 5.0f);
+					pos2 = convertPositionToInternalRep(x2,y2,z2 + 5.0f);
+					result = mapTree->getObjectHitPos(pos1, pos2, resultPos, pModifyDist);
+				}
+
+				if( result )
+				{
+					resultPos = convertPositionToMangosRep(resultPos.x,resultPos.y,resultPos.z);
+					rx = resultPos.x;
+	                ry = resultPos.y;
+		            rz = resultPos.z + 0.05f;
+				}
+				else
+				{
+					rx = x2;
+					ry = y2;
+					rz = z2;
+				}
         }
         return result;
     }
-
-	bool VMapManager::getObjectHitPos(unsigned int pMapId, LocationVector & v1, LocationVector & v2, LocationVector & vout, float pModifyDist)
-	{
-		bool result = false;
-		vout = v2;
-		if( m_maps[pMapId] != NULL )
-		{
-			Vector3 pos1 = convertPositionToInternalRepMod(v1);
-			Vector3 pos2 = convertPositionToInternalRepMod(v2);
-			Vector3 resultPos;
-			MapTree* mapTree = m_maps[pMapId];
-			result = mapTree->getObjectHitPos(pos1, pos2, resultPos, pModifyDist);
-			vout = convertPositionToMangosRep(resultPos);
-		}
-		return result;
-	}
 
     //=========================================================
     /**
@@ -448,29 +517,23 @@ namespace VMAP
         float height = VMAP_INVALID_HEIGHT;                 //no height
 		if( m_maps[pMapId] != NULL )
 		{
-            Vector3 pos = convertPositionToInternalRep(x,y,z);
+            Vector3 pos = convertPositionToInternalRep(x,y,z + 1.5f);
             height = m_maps[pMapId]->getHeight(pos);
             if(!(height < inf()))
             {
-				return VMAP_INVALID_HEIGHT;
+				pos = convertPositionToInternalRep(x,y,z + 5.0f);
+				height = m_maps[pMapId]->getHeight(pos);
+				if(!(height < inf()))
+				{
+					return VMAP_INVALID_HEIGHT;
+				}
             }
         }
-        return(height);
+		if( height != VMAP_INVALID_HEIGHT )
+			return height + 0.05f;
+		else
+			return height;
     }
-	float VMapManager::getHeight(unsigned int mapid, LocationVector & vec)
-	{
-		float height = VMAP_INVALID_HEIGHT;                 //no height
-		if( m_maps[mapid] != NULL )
-		{
-			Vector3 pos = convertPositionToInternalRepMod(vec);
-			height = m_maps[mapid]->getHeight(pos);
-			if(!(height < inf()))
-			{
-				return VMAP_INVALID_HEIGHT;
-			}
-		}
-		return(height);
-	}
 
 
     //=========================================================

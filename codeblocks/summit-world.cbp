@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="summit-world" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/summit-world" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/summit-world" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-DHAVE_CONFIG_H" />
+			<Add directory="../codeblocks" />
+			<Add directory="../src/ascent-shared" />
+		</Compiler>
+		<Linker>
+			<Add library="libsummit-shared.a" />
+			<Add library="z" />
+			<Add library="ssl" />
+			<Add library="mysqlclient" />
+			<Add library="pcre" />
+			<Add directory="../codeblocks" />
+		</Linker>
+		<Unit filename="../src/ascent-world/AIInterface.cpp" />
+		<Unit filename="../src/ascent-world/AIInterface.h" />
+		<Unit filename="../src/ascent-world/AddonMgr.cpp" />
+		<Unit filename="../src/ascent-world/AddonMgr.h" />
+		<Unit filename="../src/ascent-world/AlteracValley.cpp" />
+		<Unit filename="../src/ascent-world/AlteracValley.h" />
+		<Unit filename="../src/ascent-world/ArathiBasin.cpp" />
+		<Unit filename="../src/ascent-world/ArathiBasin.h" />
+		<Unit filename="../src/ascent-world/AreaTrigger.cpp" />
+		<Unit filename="../src/ascent-world/AreaTrigger.h" />
+		<Unit filename="../src/ascent-world/ArenaTeam.cpp" />
+		<Unit filename="../src/ascent-world/ArenaTeam.h" />
+		<Unit filename="../src/ascent-world/Arenas.cpp" />
+		<Unit filename="../src/ascent-world/Arenas.h" />
+		<Unit filename="../src/ascent-world/AuctionHouse.cpp" />
+		<Unit filename="../src/ascent-world/AuctionHouse.h" />
+		<Unit filename="../src/ascent-world/AuctionMgr.cpp" />
+		<Unit filename="../src/ascent-world/AuctionMgr.h" />
+		<Unit filename="../src/ascent-world/BaseConsole.h" />
+		<Unit filename="../src/ascent-world/BattlegroundCommands.cpp" />
+		<Unit filename="../src/ascent-world/BattlegroundHandler.cpp" />
+		<Unit filename="../src/ascent-world/BattlegroundMgr.cpp" />
+		<Unit filename="../src/ascent-world/BattlegroundMgr.h" />
+		<Unit filename="../src/ascent-world/CConsole.cpp" />
+		<Unit filename="../src/ascent-world/CConsole.h" />
+		<Unit filename="../src/ascent-world/CellHandler.h" />
+		<Unit filename="../src/ascent-world/Channel.cpp" />
+		<Unit filename="../src/ascent-world/Channel.h" />
+		<Unit filename="../src/ascent-world/ChannelHandler.cpp" />
+		<Unit filename="../src/ascent-world/ChannelMgr.h" />
+		<Unit filename="../src/ascent-world/CharacterHandler.cpp" />
+		<Unit filename="../src/ascent-world/Chat.cpp" />
+		<Unit filename="../src/ascent-world/Chat.h" />
+		<Unit filename="../src/ascent-world/ChatHandler.cpp" />
+		<Unit filename="../src/ascent-world/ClusterInterface.cpp" />
+		<Unit filename="../src/ascent-world/ClusterInterface.h" />
+		<Unit filename="../src/ascent-world/CollideInterface.cpp" />
+		<Unit filename="../src/ascent-world/CollideInterface.h" />
+		<Unit filename="../src/ascent-world/CombatHandler.cpp" />
+		<Unit filename="../src/ascent-world/ConsoleCommands.cpp" />
+		<Unit filename="../src/ascent-world/ConsoleCommands.h" />
+		<Unit filename="../src/ascent-world/ConsoleListener.cpp" />
+		<Unit filename="../src/ascent-world/Container.cpp" />
+		<Unit filename="../src/ascent-world/Container.h" />
+		<Unit filename="../src/ascent-world/Corpse.cpp" />
+		<Unit filename="../src/ascent-world/Corpse.h" />
+		<Unit filename="../src/ascent-world/Creature.cpp" />
+		<Unit filename="../src/ascent-world/Creature.h" />
+		<Unit filename="../src/ascent-world/DatabaseCleaner.cpp" />
+		<Unit filename="../src/ascent-world/DatabaseCleaner.h" />
+		<Unit filename="../src/ascent-world/DayWatcherThread.cpp" />
+		<Unit filename="../src/ascent-world/DayWatcherThread.h" />
+		<Unit filename="../src/ascent-world/DuelHandler.cpp" />
+		<Unit filename="../src/ascent-world/DynamicObject.cpp" />
+		<Unit filename="../src/ascent-world/DynamicObject.h" />
+		<Unit filename="../src/ascent-world/EventMgr.cpp" />
+		<Unit filename="../src/ascent-world/EventMgr.h" />
+		<Unit filename="../src/ascent-world/EventableObject.cpp" />
+		<Unit filename="../src/ascent-world/EventableObject.h" />
+		<Unit filename="../src/ascent-world/EyeOfTheStorm.cpp" />
+		<Unit filename="../src/ascent-world/EyeOfTheStorm.h" />
+		<Unit filename="../src/ascent-world/GMTicket.cpp" />
+		<Unit filename="../src/ascent-world/GameObject.cpp" />
+		<Unit filename="../src/ascent-world/GameObject.h" />
+		<Unit filename="../src/ascent-world/Group.cpp" />
+		<Unit filename="../src/ascent-world/Group.h" />
+		<Unit filename="../src/ascent-world/GroupHandler.cpp" />
+		<Unit filename="../src/ascent-world/Guild.cpp" />
+		<Unit filename="../src/ascent-world/Guild.h" />
+		<Unit filename="../src/ascent-world/GuildHandler.cpp" />
+		<Unit filename="../src/ascent-world/HonorHandler.cpp" />
+		<Unit filename="../src/ascent-world/HonorHandler.h" />
+		<Unit filename="../src/ascent-world/Item.cpp" />
+		<Unit filename="../src/ascent-world/Item.h" />
+		<Unit filename="../src/ascent-world/ItemHandler.cpp" />
+		<Unit filename="../src/ascent-world/ItemInterface.cpp" />
+		<Unit filename="../src/ascent-world/ItemInterface.h" />
+		<Unit filename="../src/ascent-world/ItemPrototype.h" />
+		<Unit filename="../src/ascent-world/Level0.cpp" />
+		<Unit filename="../src/ascent-world/Level1.cpp" />
+		<Unit filename="../src/ascent-world/Level2.cpp" />
+		<Unit filename="../src/ascent-world/Level3.cpp" />
+		<Unit filename="../src/ascent-world/LfgHandler.cpp" />
+		<Unit filename="../src/ascent-world/LfgMgr.cpp" />
+		<Unit filename="../src/ascent-world/LfgMgr.h" />
+		<Unit filename="../src/ascent-world/LocalizationMgr.cpp" />
+		<Unit filename="../src/ascent-world/LocalizationMgr.h" />
+		<Unit filename="../src/ascent-world/LogonCommClient.cpp" />
+		<Unit filename="../src/ascent-world/LogonCommClient.h" />
+		<Unit filename="../src/ascent-world/LogonCommHandler.cpp" />
+		<Unit filename="../src/ascent-world/LogonCommHandler.h" />
+		<Unit filename="../src/ascent-world/LootMgr.cpp" />
+		<Unit filename="../src/ascent-world/LootMgr.h" />
+		<Unit filename="../src/ascent-world/MailSystem.cpp" />
+		<Unit filename="../src/ascent-world/MailSystem.h" />
+		<Unit filename="../src/ascent-world/Main.cpp" />
+		<Unit filename="../src/ascent-world/MainServerDefines.h" />
+		<Unit filename="../src/ascent-world/Map.cpp" />
+		<Unit filename="../src/ascent-world/Map.h" />
+		<Unit filename="../src/ascent-world/MapCell.cpp" />
+		<Unit filename="../src/ascent-world/MapCell.h" />
+		<Unit filename="../src/ascent-world/MapMgr.cpp" />
+		<Unit filename="../src/ascent-world/MapMgr.h" />
+		<Unit filename="../src/ascent-world/MapScriptInterface.cpp" />
+		<Unit filename="../src/ascent-world/MapScriptInterface.h" />
+		<Unit filename="../src/ascent-world/Master.cpp" />
+		<Unit filename="../src/ascent-world/Master.h" />
+		<Unit filename="../src/ascent-world/MiscHandler.cpp" />
+		<Unit filename="../src/ascent-world/MiscHandler.h" />
+		<Unit filename="../src/ascent-world/MovementHandler.cpp" />
+		<Unit filename="../src/ascent-world/NPCHandler.cpp" />
+		<Unit filename="../src/ascent-world/NPCHandler.h" />
+		<Unit filename="../src/ascent-world/NameTables.h" />
+		<Unit filename="../src/ascent-world/Object.cpp" />
+		<Unit filename="../src/ascent-world/Object.h" />
+		<Unit filename="../src/ascent-world/ObjectMgr.cpp" />
+		<Unit filename="../src/ascent-world/ObjectMgr.h" />
+		<Unit filename="../src/ascent-world/ObjectStorage.cpp" />
+		<Unit filename="../src/ascent-world/ObjectStorage.h" />
+		<Unit filename="../src/ascent-world/Opcodes.cpp" />
+		<Unit filename="../src/ascent-world/Opcodes.h" />
+		<Unit filename="../src/ascent-world/Packets.h" />
+		<Unit filename="../src/ascent-world/Pet.cpp" />
+		<Unit filename="../src/ascent-world/Pet.h" />
+		<Unit filename="../src/ascent-world/PetHandler.cpp" />
+		<Unit filename="../src/ascent-world/Player.cpp" />
+		<Unit filename="../src/ascent-world/Player.h" />
+		<Unit filename="../src/ascent-world/PlayerPacketWrapper.cpp" />
+		<Unit filename="../src/ascent-world/QueryHandler.cpp" />
+		<Unit filename="../src/ascent-world/Quest.cpp" />
+		<Unit filename="../src/ascent-world/Quest.h" />
+		<Unit filename="../src/ascent-world/QuestCommands.cpp" />
+		<Unit filename="../src/ascent-world/QuestHandler.cpp" />
+		<Unit filename="../src/ascent-world/QuestMgr.cpp" />
+		<Unit filename="../src/ascent-world/QuestMgr.h" />
+		<Unit filename="../src/ascent-world/RaidHandler.cpp" />
+		<Unit filename="../src/ascent-world/RecallCommands.cpp" />
+		<Unit filename="../src/ascent-world/ReputationHandler.cpp" />
+		<Unit filename="../src/ascent-world/ScriptMgr.cpp" />
+		<Unit filename="../src/ascent-world/ScriptMgr.h" />
+		<Unit filename="../src/ascent-world/ScriptSetup.h" />
+		<Unit filename="../src/ascent-world/Skill.h" />
+		<Unit filename="../src/ascent-world/SkillHandler.cpp" />
+		<Unit filename="../src/ascent-world/SkillNameMgr.h" />
+		<Unit filename="../src/ascent-world/SocialHandler.cpp" />
+		<Unit filename="../src/ascent-world/Spell.cpp" />
+		<Unit filename="../src/ascent-world/Spell.h" />
+		<Unit filename="../src/ascent-world/SpellAuras.cpp" />
+		<Unit filename="../src/ascent-world/SpellAuras.h" />
+		<Unit filename="../src/ascent-world/SpellEffects.cpp" />
+		<Unit filename="../src/ascent-world/SpellFailure.h" />
+		<Unit filename="../src/ascent-world/SpellFixes.cpp" />
+		<Unit filename="../src/ascent-world/SpellHandler.cpp" />
+		<Unit filename="../src/ascent-world/SpellNameHashes.h" />
+		<Unit filename="../src/ascent-world/SpellTarget.cpp" />
+		<Unit filename="../src/ascent-world/Stats.cpp" />
+		<Unit filename="../src/ascent-world/Stats.h" />
+		<Unit filename="../src/ascent-world/StdAfx.cpp" />
+		<Unit filename="../src/ascent-world/StdAfx.h" />
+		<Unit filename="../src/ascent-world/TaxiHandler.cpp" />
+		<Unit filename="../src/ascent-world/TaxiMgr.cpp" />
+		<Unit filename="../src/ascent-world/TaxiMgr.h" />
+		<Unit filename="../src/ascent-world/TerrainMgr.cpp" />
+		<Unit filename="../src/ascent-world/TerrainMgr.h" />
+		<Unit filename="../src/ascent-world/TradeHandler.cpp" />
+		<Unit filename="../src/ascent-world/TransporterHandler.cpp" />
+		<Unit filename="../src/ascent-world/TransporterHandler.h" />
+		<Unit filename="../src/ascent-world/Unit.cpp" />
+		<Unit filename="../src/ascent-world/Unit.h" />
+		<Unit filename="../src/ascent-world/UpdateFields.h" />
+		<Unit filename="../src/ascent-world/UpdateMask.h" />
+		<Unit filename="../src/ascent-world/VoiceChatClientSocket.cpp" />
+		<Unit filename="../src/ascent-world/VoiceChatClientSocket.h" />
+		<Unit filename="../src/ascent-world/VoiceChatHandler.cpp" />
+		<Unit filename="../src/ascent-world/VoiceChatHandler.h" />
+		<Unit filename="../src/ascent-world/WarsongGulch.cpp" />
+		<Unit filename="../src/ascent-world/WarsongGulch.h" />
+		<Unit filename="../src/ascent-world/WayPoints.cpp" />
+		<Unit filename="../src/ascent-world/WeatherMgr.cpp" />
+		<Unit filename="../src/ascent-world/WeatherMgr.h" />
+		<Unit filename="../src/ascent-world/WordFilter.cpp" />
+		<Unit filename="../src/ascent-world/WordFilter.h" />
+		<Unit filename="../src/ascent-world/WorkdSocketCluster.cpp" />
+		<Unit filename="../src/ascent-world/WorkerServerClient.cpp" />
+		<Unit filename="../src/ascent-world/WorkerServerClient.h" />
+		<Unit filename="../src/ascent-world/World.cpp" />
+		<Unit filename="../src/ascent-world/World.h" />
+		<Unit filename="../src/ascent-world/WorldCreator.cpp" />
+		<Unit filename="../src/ascent-world/WorldCreator.h" />
+		<Unit filename="../src/ascent-world/WorldRunnable.cpp" />
+		<Unit filename="../src/ascent-world/WorldRunnable.h" />
+		<Unit filename="../src/ascent-world/WorldSession.cpp" />
+		<Unit filename="../src/ascent-world/WorldSession.h" />
+		<Unit filename="../src/ascent-world/WorldSocket.cpp" />
+		<Unit filename="../src/ascent-world/WorldSocket.h" />
+		<Unit filename="../src/ascent-world/WorldStateManager.cpp" />
+		<Unit filename="../src/ascent-world/WorldStateManager.h" />
+		<Unit filename="../src/ascent-world/WorldStates.h" />
+		<Unit filename="../src/ascent-world/debugcmds.cpp" />
+		<Unit filename="../src/ascent-world/faction.cpp" />
+		<Unit filename="../src/ascent-world/faction.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -35,6 +35,8 @@
 #elif __MINGW32__
     #define G3D_WIN32 
     #define G3D_MINGW32 
+#elif __DragonFly__
+    #define G3D_LINUX
 #elif __linux__ 
     #define G3D_LINUX
 #elif __OpenBSD__

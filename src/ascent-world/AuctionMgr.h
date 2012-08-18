@@ -50,6 +50,9 @@ public:
 		return id;
 	}
 
+	vector<AuctionHouse*>::iterator GetAuctionHousesBegin() { return auctionHouses.begin(); }
+	vector<AuctionHouse*>::iterator GetAuctionHousesEnd() { return auctionHouses.end(); }
+
 private:
 	HM_NAMESPACE::hash_map<uint32, AuctionHouse*> auctionHouseEntryMap;
 	vector<AuctionHouse*> auctionHouses;

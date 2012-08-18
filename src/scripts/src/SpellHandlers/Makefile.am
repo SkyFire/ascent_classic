@@ -5,4 +5,4 @@ AM_CXXFLAGS = -DSCRIPTLIB
 
 lib_LTLIBRARIES = libSpellHandlers.la
 
-libSpellHandlers_la_SOURCES = HunterSpells.cpp ItemSpells_1.cpp MageSpells.cpp PaladinSpells.cpp RogueSpells.cpp Setup.cpp ShamanSpells.cpp WarlockSpells.cpp WarriorSpells.cpp
+libSpellHandlers_la_SOURCES = Event_MidsummerFireFestival.cpp HunterSpells.cpp ItemSpells_1.cpp MageSpells.cpp PaladinSpells.cpp RogueSpells.cpp Setup.cpp ShamanSpells.cpp WarlockSpells.cpp WarriorSpells.cpp

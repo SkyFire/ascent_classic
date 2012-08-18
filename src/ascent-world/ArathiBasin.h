@@ -55,17 +55,20 @@ public:
 	GameObject * m_buffs[AB_NUM_BUFFS];
 	GameObject * m_controlPoints[AB_NUM_CONTROL_POINTS];
 	GameObject * m_controlPointAuras[AB_NUM_CONTROL_POINTS];
+	bool m_nearingVictory[2];
 
 protected:
 	list<GameObject*> m_gates;
 	
+	uint32 m_reprewards[2];
 	uint32 m_resources[2];
 	uint32 m_capturedBases[2];
 	uint32 m_lastHonorGainResources[2];
+	int32 m_basesLastOwnedBy[AB_NUM_CONTROL_POINTS];
 	int32 m_basesOwnedBy[AB_NUM_CONTROL_POINTS];
 	int32 m_basesAssaultedBy[AB_NUM_CONTROL_POINTS];
+	bool m_flagIsVirgin[AB_NUM_CONTROL_POINTS];
 	Creature * m_spiritGuides[AB_NUM_CONTROL_POINTS];
-	bool m_nearingVictory[2];
 
 public:
 	ArathiBasin(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t);
@@ -98,4 +101,8 @@ public:
 	void SpawnControlPoint(uint32 Id, uint32 Type);
 	void CaptureControlPoint(uint32 Id, uint32 Team);
 	void AssaultControlPoint(Player * pPlayer, uint32 Id);
+
+	/* looooooot */
+	bool SupportsPlayerLoot() { return true; }
+	void HookGenerateLoot(Player *plr, Corpse *pCorpse);
 };

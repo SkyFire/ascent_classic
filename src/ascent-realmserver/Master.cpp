@@ -25,7 +25,6 @@ Database * Database_World;
 
 int main(int argc, char *argv[])
 {
-	sLog.Init(-1, -1);
 	sLog.outString("TexT");
 	/* Initialize global timestamp */
 	UNIXTIME = time(NULL);
@@ -37,8 +36,8 @@ int main(int argc, char *argv[])
 	Log.Notice("Server", "==============================================================");
 	Log.Line();
 
-	Database_Character = Database::CreateDatabaseInterface( 1 );
-	Database_World = Database::CreateDatabaseInterface( 1 );
+	Database_Character = Database::Create();
+	Database_World = Database::Create();
 	Log.Success("Database", "Interface Created.");
 
 	new ClusterMgr;

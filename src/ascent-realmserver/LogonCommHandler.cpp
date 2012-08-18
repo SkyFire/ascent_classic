@@ -233,7 +233,7 @@ void LogonCommHandler::ConnectionDropped(uint32 ID)
 uint32 LogonCommHandler::ClientConnected(string AccountName, WorldSocket * Socket)
 {
 	uint32 request_id = next_request++;
-	sLog.outDebug ( " >> sending request for account information: `%s` (request %u).", AccountName.c_str(), request_id);
+	DEBUG_LOG ( " >> sending request for account information: `%s` (request %u).", AccountName.c_str(), request_id);
   //  sLog.outColor(TNORMAL, "\n");
 	
 	// Send request packet to server.

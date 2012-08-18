@@ -41,6 +41,9 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 	if(objB->GetTypeId() == TYPEID_CORPSE)
 		return false;
 
+	if(objB->m_faction == objA->m_faction || objB->m_factionDBC == objA->m_factionDBC)
+		return false;
+
 	uint32 faction = objB->m_faction->Mask;
 	uint32 host = objA->m_faction->HostileMask;
 
@@ -150,19 +153,45 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 
 	if(objB->GetTypeId() == TYPEID_CORPSE)
 		return false;
+
+	Player *playerA = NULL;
+	Player *playerB = NULL;
 	
-	// Players in feign death flags can't be attacked (where did you get this information from?)
-	// Changed by Supa: Creatures cannot attack players with feign death flags.
-	/*if(!objA->IsPlayer())
+	// Players in feign death flags can't be attacked
+	if(objA->IsPlayer())
+	{
 		if(objA->HasFlag(UNIT_FIELD_FLAGS_2, 0x00000001))
 			return false;
-	if(!objB->IsPlayer())
+
+		playerA = TO_PLAYER(objA);
+	}
+	else
+	{
+		if( objA->IsPet() )
+			playerA = TO_PET(objA)->GetPetOwner();
+		else if( objA->GetTypeId() == TYPEID_UNIT && TO_CREATURE(objA)->IsTotem() )
+			playerA = TO_CREATURE(objA)->GetTotemOwner();
+	}
+
+	if(objB->IsPlayer())
+	{
 		if(objB->HasFlag(UNIT_FIELD_FLAGS_2, 0x00000001))
-			return false;*/
+			return false;
+
+		playerB = TO_PLAYER(objB);
+	}
+	else
+	{
+		if( objB->IsPet() )
+			playerB = TO_PET(objB)->GetPetOwner();
+		else if( objB->GetTypeId() == TYPEID_UNIT && TO_CREATURE(objB)->IsTotem() )
+			playerB = TO_CREATURE(objB)->GetTotemOwner();
+	}
 
 	// Checks for untouchable, unattackable
 	if(objA->IsUnit() && objA->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9 | UNIT_FLAG_MOUNTED_TAXI | UNIT_FLAG_NOT_SELECTABLE))
 		return false;
+
 	if(objB->IsUnit())
 	{
 		if(objB->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_9 | UNIT_FLAG_MOUNTED_TAXI | UNIT_FLAG_NOT_SELECTABLE))
@@ -184,114 +213,32 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 			)
 		return true;
 
+
+	}
+
+	// duel checks
+	if( playerA != NULL && playerB != NULL )
+	{
+		if( playerA->DuelingWith == playerB  &&
+			playerA->GetDuelState() == DUEL_STATE_STARTED )
+		{
+			return true;
+		}
+
 		if(objA->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP) && objB->HasFlag(PLAYER_FLAGS,PLAYER_FLAG_FREE_FOR_ALL_PVP))
 		{
-			if( static_cast< Player* >( objA )->m_bg != NULL )
-				if( static_cast< Player* >( objA )->GetGroup() == static_cast< Player* >( objB )->GetGroup() )
+			if( playerA->m_bg != NULL )
+				if( playerA->GetGroup() == playerB->GetGroup() )
 					return false;
 
 			return true;		// can hurt each other in FFA pvp
 		}
-	}
-	
-	// handle for pets in duel
-	if(objA->IsPet())
-	{
-		if(objB->IsPlayer())
-			if(
-				static_cast<Pet *>(objA)->GetPetOwner() &&
-				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast< Player* >(objB) && 
-				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
-				)
-				return true;
-		if(objB->IsPet())
-			if(static_cast<Pet *>(objA)->GetPetOwner() &&
-				static_cast<Pet *>(objB)->GetPetOwner() &&
-				static_cast<Pet *>(objA)->GetPetOwner()->DuelingWith == static_cast<Pet *>(objB)->GetPetOwner() && 
-				static_cast<Pet *>(objA)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
-				)
-				return true;
-	}
-	if(objB->IsPet())
-	{
-		if(objA->IsPlayer())
-			if(
-				static_cast<Pet*>(objB)->GetPetOwner() && static_cast<Pet *>(objB)->GetPetOwner() &&
-				static_cast<Pet *>(objB)->GetPetOwner()->DuelingWith == static_cast< Player* >(objA) && 
-				static_cast<Pet *>(objB)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
-				)
-				return true;
-		else if(objA->IsPet())
-			if(static_cast<Pet*>(objA)->GetPetOwner() && static_cast<Pet *>(objB)->GetPetOwner() &&
-				static_cast<Pet*>(objB)->GetPetOwner() &&
-				static_cast<Pet *>(objB)->GetPetOwner()->DuelingWith == static_cast<Pet *>(objA)->GetPetOwner() && 
-				static_cast<Pet *>(objB)->GetPetOwner()->GetDuelState() == DUEL_STATE_STARTED
-				)
-				return true;
-	}
 
-	// handle for totems
-	if(objA->IsUnit() && !objA->IsPlayer()) // must be creature
-	{
-		if(static_cast<Creature *>(objA)->IsTotem())
+		if( playerA->GetAreaDBC() != NULL )
 		{
-			if(objB->IsPlayer())
-				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
-					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast< Player* >(objB) && 
-					static_cast<Creature *>(objA)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
-					)
-					return true;
-			if(objB->IsPet())
-				if( static_cast<Creature *>(objA)->GetTotemOwner() &&
-					static_cast<Creature *>(objA)->GetTotemOwner()->DuelingWith == static_cast<Pet *>(objB)->GetPetOwner() && 
-					static_cast<Creature *>(objA)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
-					)
-					return true;
+			if( playerA->GetAreaDBC()->AreaFlags & 0x800 )
+				return false;
 		}
-	}
-	if(objB->IsUnit() && !objB->IsPlayer()) // must be creature
-	{
-		if(static_cast<Creature *>(objB)->IsTotem())
-		{
-			if(objA->IsPlayer())
-				if( static_cast<Creature *>(objB)->GetTotemOwner() &&
-					static_cast<Creature *>(objB)->GetTotemOwner()->DuelingWith == static_cast< Player* >(objA) && 
-					static_cast<Creature *>(objB)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
-					)
-					return true;
-			if(objA->IsPet())
-				if( static_cast<Creature *>(objB)->GetTotemOwner() &&
-					static_cast<Creature *>(objB)->GetTotemOwner()->DuelingWith == static_cast<Pet *>(objA)->GetPetOwner() && 
-					static_cast<Creature *>(objB)->GetTotemOwner()->GetDuelState() == DUEL_STATE_STARTED
-					)
-					return true;
-		}
-	}
-
-	// do not let people attack each other in sanctuary
-	// Dueling is already catered for
-	AreaTable *atA;
-	AreaTable *atB;
-	if( objA->IsPet() && static_cast< Pet* >( objA )->GetPetOwner() )
-		atA = dbcArea.LookupEntry( static_cast< Pet* >( objA )->GetPetOwner()->GetAreaID() );
-	else if( objA->IsPlayer() )
-		atA = dbcArea.LookupEntry( static_cast< Player* >( objA )->GetAreaID() );
-	else
-		atA = NULL;
-
-	if( objB->IsPet() && static_cast< Pet* >( objB )->GetPetOwner() )
-		atB = dbcArea.LookupEntry( static_cast< Pet* >( objB )->GetPetOwner()->GetAreaID() );
-	else if( objB->IsPlayer() )
-		atB = dbcArea.LookupEntry( static_cast< Player* >( objB )->GetAreaID() );
-	else
-		atB = NULL;
-
-	// We have the area codes
-	// We know they aren't dueling
-	if (atA && atB)
-	{
-		if(atA->AreaFlags & 0x800 || atB->AreaFlags & 0x800)
-			return false;
 	}
 
 	if(objA->m_faction == objB->m_faction)  // same faction can't kill each other unless in ffa pvp/duel
@@ -325,16 +272,13 @@ bool isCombatSupport(Object* objA, Object* objB)// B combat supports A?
 	if(!objA || !objB)
 		return false;
 
-	if(objA->GetTypeId() == TYPEID_CORPSE )
+	if(objA->GetTypeId() == TYPEID_CORPSE)
 		return false;
 
 	if(objB->GetTypeId() == TYPEID_CORPSE)
 		return false;
 
 	if(objB->m_faction == 0 || objA->m_faction == 0)
-		return false;
-
-	if( objA->IsPet() || objB->IsPet() ) // fixes an issue where horde pets would chain aggro horde guards and vice versa for alliance.
 		return false;
 
 	bool combatSupport = false;

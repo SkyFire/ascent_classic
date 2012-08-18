@@ -13,8 +13,6 @@ ascent_world_SOURCES = \
     DayWatcherThread.h \
     ArenaTeam.cpp \
     ArenaTeam.h \
-    DatabaseCleaner.cpp \
-    DatabaseCleaner.h \
     ObjectStorage.cpp \
     ObjectStorage.h \
     AddonMgr.cpp \
@@ -179,18 +177,21 @@ ascent_world_SOURCES = \
     WorldSocket.h \
     WorldRunnable.h \
     WorldRunnable.cpp \
+    WorldStates.h \
+    WorldStateManager.h \
+    WorldStateManager.cpp \
     WordFilter.h \
     WordFilter.cpp \
-	Main.cpp \
-	Master.cpp \
-	Master.h \
-	CConsole.cpp \
-	CConsole.h \
-	BaseConsole.h \
-	ConsoleCommands.cpp \
-	ConsoleCommands.h \
-	ConsoleListener.cpp
-	
+    Main.cpp \
+    Master.cpp \
+    Master.h \
+    CConsole.cpp \
+    CConsole.h \
+    BaseConsole.h \
+    ConsoleCommands.cpp \
+    ConsoleCommands.h \
+    ConsoleListener.cpp
+
 ascent_world_LDADD = -lshared -lz -lpcre -lcollision
 
 ascent_world_LDFLAGS = -L$(srcdir)/../ascent-shared \

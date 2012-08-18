@@ -63,8 +63,8 @@ void ScriptMgr::LoadScripts()
 	if(!HookInterface::getSingletonPtr())
 		new HookInterface;
 
-	Log.Notice("Server","Loading External Script Libraries...");
-	sLog.outString("");
+	sLog.outString( "Loading External Script Libraries..." );
+	sLog.outString( "");
 
 	string start_path = Config.MainConfig.GetStringDefault( "Script", "BinaryLocation", "script_bin" ) + "\\";
 	string search_path = start_path + "*.";
@@ -79,7 +79,7 @@ void ScriptMgr::LoadScripts()
 	uint32 count = 0;
 	HANDLE find_handle = FindFirstFile( search_path.c_str(), &data );
 	if(find_handle == INVALID_HANDLE_VALUE)
-		sLog.outError( "  No external scripts found! Server will continue to function with limited functionality." );
+		sLog.outString( "  No external scripts found! Server will continue to function with limited functionality." );
 	else
 	{
 		do
@@ -87,10 +87,8 @@ void ScriptMgr::LoadScripts()
 			string full_path = start_path + data.cFileName;
 			HMODULE mod = LoadLibrary( full_path.c_str() );
 			printf( "  %s : 0x%p : ", data.cFileName, reinterpret_cast< uint32* >( mod ));
-			if( mod == 0 )
-			{
-				printf( "error!\n" );
-			}
+			if(mod == 0)
+				printf("error!\n");
 			else
 			{
 				// find version import
@@ -141,10 +139,10 @@ void ScriptMgr::LoadScripts()
 		while(FindNextFile(find_handle, &data));
 		FindClose(find_handle);
 		sLog.outString("");
-		Log.Notice("Server","Loaded %u external libraries.", count);
+		sLog.outString("Loaded %u external libraries.", count);
 		sLog.outString("");
 
-		Log.Notice("Server","Loading optional scripting engines...");
+		sLog.outString("Loading optional scripting engines...");
 		for(vector<ScriptingEngine>::iterator itr = ScriptEngines.begin(); itr != ScriptEngines.end(); ++itr)
 		{
 			if( itr->Type & SCRIPT_TYPE_SCRIPT_ENGINE_LUA )
@@ -152,7 +150,7 @@ void ScriptMgr::LoadScripts()
 				// lua :O
 				if( Config.MainConfig.GetBoolDefault("ScriptBackends", "LUA", false) )
 				{
-					Log.Notice("Server","Initializing LUA script engine...");
+					sLog.outString("   Initializing LUA script engine...");
 					itr->InitializeCall(this);
 					_handles.push_back( (SCRIPT_MODULE)itr->Handle );
 				}
@@ -165,7 +163,7 @@ void ScriptMgr::LoadScripts()
 			{
 				if( Config.MainConfig.GetBoolDefault("ScriptBackends", "AS", false) )
 				{
-					Log.Notice("Server","Initializing AngelScript script engine...");
+					sLog.outString("   Initializing AngelScript script engine...");
 					itr->InitializeCall(this);
 					_handles.push_back( (SCRIPT_MODULE)itr->Handle );
 				}
@@ -176,11 +174,11 @@ void ScriptMgr::LoadScripts()
 			}
 			else
 			{
-				Log.Notice("Server","Unknown script engine type: 0x%.2X, please contact developers.", (*itr).Type );
+				sLog.outString("  Unknown script engine type: 0x%.2X, please contact developers.", (*itr).Type );
 				FreeLibrary( itr->Handle );
 			}
 		}
-		Log.Notice("Server","Done loading script engines...");
+		sLog.outString("Done loading script engines...");
 	}
 #else
 	/* Loading system for *nix */
@@ -189,7 +187,7 @@ void ScriptMgr::LoadScripts()
 	uint32 count = 0;
 
 	if(!filecount || !list || filecount < 0)
-		sLog.outError("  No external scripts found! Server will continue to function with limited functionality.");
+		printf("  No external scripts found! Server will continue to function with limited functionality.");
 	else
 	{
 char *ext;
@@ -438,6 +436,11 @@ void CreatureAIScript::ModifyAIUpdateEvent(uint32 newfrequency)
 	sEventMgr.ModifyEventTimeAndTimeLeft(_unit, EVENT_SCRIPT_UPDATE_EVENT, newfrequency);
 }
 
+void GameObjectAIScript::RemoveAIUpdateEvent()
+{
+	sEventMgr.RemoveEvents( _gameobject, EVENT_SCRIPT_UPDATE_EVENT );
+}
+
 void CreatureAIScript::RemoveAIUpdateEvent()
 {
 	sEventMgr.RemoveEvents(_unit, EVENT_SCRIPT_UPDATE_EVENT);
@@ -588,12 +591,19 @@ void GossipScript::GossipHello(Object* pObject, Player* Plr, bool AutoSend)
 		Menu->AddItem(0, "I would like to go to the battleground.", 10);
 
 	if( pTrainer &&
-		pTrainer->RequiredClass &&					  // class trainer
-		pTrainer->RequiredClass == Plr->getClass() &&   // correct class
 		pCreature->getLevel() > 10 &&				   // creature level
 		Plr->getLevel() > 10 )						  // player level
 	{
-		Menu->AddItem(0, "I would like to reset my talents.", 11);
+		if(pTrainer->RequiredClass)
+		{
+			if(pTrainer->RequiredClass == Plr->getClass())
+			{
+				Menu->AddItem(0, "I would like to reset my talents.", 11);
+			}
+		}
+		else
+			Menu->AddItem(0, "I would like to reset my talents.", 11);
+
 	}
 	
 	if( pTrainer &&
@@ -686,7 +696,7 @@ void GossipScript::GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, u
 		}break;
 
 	default:
-		sLog.outError("Unknown IntId %u on entry %u", IntId, pCreature->GetEntry());
+		DEBUG_LOG("Unknown IntId %u on entry %u", IntId, pCreature->GetEntry());
 		break;
 	}	
 }
@@ -825,31 +835,10 @@ void HookInterface::OnQuestAccept(Player * pPlayer, Quest * pQuest)
 	OUTER_LOOP_END
 }
 
-void HookInterface::OnZone(Player * pPlayer, uint32 Zone)
+void HookInterface::OnZone(Player * pPlayer, uint32 Zone, uint32 OldZone)
 {
 	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_ZONE, tOnZone)
-		(call)(pPlayer, Zone);
-	OUTER_LOOP_END
-}
-
-bool HookInterface::OnChat(Player * pPlayer, uint32 Type, uint32 Lang, const char * Message, const char * Misc)
-{
-	OUTER_LOOP_BEGIN_COND(SERVER_HOOK_EVENT_ON_CHAT, tOnChat)
-		ret_val = (call)(pPlayer, Type, Lang, Message, Misc);
-	OUTER_LOOP_END_COND
-}
-
-void HookInterface::OnLoot(Player * pPlayer, Unit * pTarget, uint32 Money, uint32 ItemId)
-{
-	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_LOOT, tOnLoot)
-		(call)(pPlayer, pTarget, Money, ItemId);
-	OUTER_LOOP_END
-}
-
-void HookInterface::OnObjectLoot(Player * pPlayer, Object * pTarget, uint32 Money, uint32 ItemId)
-{
-	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_OBJECTLOOT, tOnObjectLoot)
-		(call)(pPlayer, pTarget, Money, ItemId);
+		(call)(pPlayer, Zone, OldZone);
 	OUTER_LOOP_END
 }
 
@@ -881,16 +870,24 @@ void HookInterface::OnHonorableKill(Player * pPlayer, Player * pKilled)
 	OUTER_LOOP_END
 }
 
-void HookInterface::OnArenaFinish(Player * pPlayer, ArenaTeam* pTeam, bool victory, bool rated)
+void HookInterface::OnArenaFinish(Player * pPlayer, uint32 type, ArenaTeam* pTeam, bool victory, bool rated)
 {
 	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_ARENA_FINISH, tOnArenaFinish)
-		(call)(pPlayer, pTeam, victory, rated);
+		(call)(pPlayer, type, pTeam, victory, rated);
 	OUTER_LOOP_END
 }
 
-void HookInterface::OnPostLevelUp(Player * pPlayer)
+void HookInterface::OnContinentCreate(MapMgr *pMgr)
 {
-	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_POST_LEVELUP, tOnPostLevelUp)
-		(call)(pPlayer);
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_CONTIENT_CREATE, tOnContinentCreate)
+		(call)(pMgr);
 	OUTER_LOOP_END
 }
+
+void HookInterface::OnPostSpellCast(Player * pPlayer, SpellEntry * pSpell, Unit * pTarget)
+{
+	OUTER_LOOP_BEGIN(SERVER_HOOK_EVENT_ON_POST_SPELL_CAST, tOnPostSpellCast)
+		(call)(pPlayer, pSpell, pTarget);
+	OUTER_LOOP_END
+}
+

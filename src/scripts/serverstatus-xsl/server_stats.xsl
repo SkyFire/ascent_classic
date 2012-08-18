@@ -5,7 +5,7 @@
 <xsl:template match="/">
 	<html xmlns="http://www.w3.org/1999/xhtml" >
 	<head>
-		<title>Server Status</title>
+		<title>Summit Server Status</title>
 		<meta http-equiv="Pragma" content="no-cache"/>
 		<meta http-equiv="Cache-Control" content="no-cache"/>
 		<style type="text/css" media="screen">@import url(server_stats.css);</style>
@@ -25,9 +25,9 @@
 
 <xsl:template match="status">
 	<table width="100%" border="0" cellspacing="1" cellpadding="3">
-		<tr class="head"><th colspan="4">Ascent Server Status (<b>www.ascentemu.com</b>)</th></tr>
+		<tr class="head"><th colspan="4">Summit Server Status</th></tr>
 		<tr>
-			<th>Platform: </th><td><xsl:value-of select="platform"/></td>
+			<th>Platform: </th><td><xsl:value-of select="platform"/><br />Built at <xsl:value-of select="buildhost"/></td>
 			<th>Uptime: </th><td><xsl:value-of select="uptime"/></td>
 		</tr>
 		<tr>
@@ -70,6 +70,8 @@
 </xsl:template>
 
 <xsl:template match="platform">
+</xsl:template>
+<xsl:template match="buildhost>
 </xsl:template>
 <xsl:template match="uptime">
 </xsl:template>
@@ -153,6 +155,10 @@
 			<th>Mage: </th><td><xsl:value-of select="mage"/></td>
 			<th>Druid: </th><td><xsl:value-of select="druid"/></td>
 		</tr>
+		<tr>
+			<th>Warlock: </th><td><xsl:value-of select="warlock"/></td>
+			<th> </th><td> </td>
+		</tr>
 		</table>
 	</td>
 	</tr>
@@ -198,6 +204,8 @@
 <xsl:template match="mage">
 </xsl:template>
 <xsl:template match="druid">
+</xsl:template>
+<xsl:template match="warlock">
 </xsl:template>
 
 <xsl:template match="instances">

@@ -53,7 +53,7 @@ bool AddonMgr::IsAddonBanned(std::string name, uint64 crc)
 	{
 		if(i->second->banned)
 		{
-			sLog.outDebug("Addon %s is banned.", name.c_str());
+			DEBUG_LOG("Addon %s is banned.", name.c_str());
 			return true;
 		}
 	}
@@ -67,7 +67,7 @@ bool AddonMgr::IsAddonBanned(std::string name, uint64 crc)
 		ent->isNew = true;
 		ent->showinlist = true;
 
-		sLog.outDebug("Discovered new addon %s sent by client.", name.c_str());
+		DEBUG_LOG("Discovered new addon %s sent by client.", name.c_str());
 
 		KnownAddons[ent->name] = ent;
 	}
@@ -95,7 +95,7 @@ bool AddonMgr::ShouldShowInList(std::string name)
 		ent->isNew = true;
 		ent->showinlist = true;
 
-		sLog.outDebug("Discovered new addon %s sent by client.", name.c_str());
+		DEBUG_LOG("Discovered new addon %s sent by client.", name.c_str());
 
 		KnownAddons[ent->name] = ent;
 	}
@@ -116,7 +116,7 @@ void AddonMgr::SendAddonInfoPacket(WorldPacket *source, uint32 pos, WorldSession
 	}
 	catch (ByteBuffer::error &)
 	{
-		sLog.outDebug("Warning: Incomplete auth session sent.");
+		DEBUG_LOG("Warning: Incomplete auth session sent.");
 		return;
 	}	
 	rsize = realsize;
@@ -128,7 +128,7 @@ void AddonMgr::SendAddonInfoPacket(WorldPacket *source, uint32 pos, WorldSession
 	if((source->size() - position) < 4 || realsize == 0)
 	{
 		// we shouldnt get here.. but just in case this will stop any crash here.
-		sLog.outDebug("Warning: Incomplete auth session sent.");
+		DEBUG_LOG("Warning: Incomplete auth session sent.");
 		return;
 	}
 	int32 result;
@@ -136,11 +136,11 @@ void AddonMgr::SendAddonInfoPacket(WorldPacket *source, uint32 pos, WorldSession
 
 	if(result != Z_OK)
 	{
-		sLog.outError("Decompression of addon section of CMSG_AUTH_SESSION failed.");
+		DEBUG_LOG("Decompression of addon section of CMSG_AUTH_SESSION failed.");
 		return;
 	}
 
-	sLog.outDetail("Decompression of addon section of CMSG_AUTH_SESSION succeeded.");
+	DEBUG_LOG("Decompression of addon section of CMSG_AUTH_SESSION succeeded.");
 	
 	
 	uint8 Enable; // based on the parsed files from retool
@@ -244,7 +244,7 @@ void AddonMgr::SaveToDB()
 	{
 		if(itr->second->isNew)
 		{
-			sLog.outDetail("Saving new addon %s", itr->second->name.c_str());
+			DEBUG_LOG("Saving new addon %s", itr->second->name.c_str());
 			std::stringstream ss;
 			ss << "INSERT INTO clientaddons (name, crc, banned, showinlist) VALUES(\""
 				<< WorldDatabase.EscapeString(itr->second->name) << "\",\""

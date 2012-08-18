@@ -50,7 +50,6 @@ GameObject::GameObject(uint64 guid)
 	pInfo = NULL;
 	myScript = NULL;
 	m_spawn = 0;
-	loot.gold = 0;
 	m_deleted = false;
 	mines_remaining = 1;
 	m_respawnCell=NULL;
@@ -79,7 +78,7 @@ GameObject::~GameObject()
 
 	if (m_summonedGo && m_summoner)
 		for(int i = 0; i < 4; i++)
-			if (m_summoner->m_ObjectSlots[i] == GetLowGUID())
+			if (m_summoner->m_ObjectSlots[i] == GetUIdFromGUID())
 				m_summoner->m_ObjectSlots[i] = 0;
 
 	if( m_battleground != NULL && m_battleground->GetType() == BATTLEGROUND_ARATHI_BASIN )
@@ -225,10 +224,8 @@ void GameObject::Despawn(uint32 time)
 	if(!IsInWorld())
 		return;
 
-	loot.items.clear();
-
 	//This is for go get deleted while looting
-	if(m_spawn)
+	if( m_spawn != NULL )
 	{
 		SetUInt32Value(GAMEOBJECT_STATE, m_spawn->state);
 		SetUInt32Value(GAMEOBJECT_FLAGS, m_spawn->flags);
@@ -249,7 +246,7 @@ void GameObject::Despawn(uint32 time)
 	}
 	else
 	{
-		Object::RemoveFromWorld(true);
+		Object::RemoveFromWorld(false);
 		ExpireAndDelete();
 	}
 }
@@ -392,7 +389,7 @@ void GameObject::InitAI()
                         //herbalism and mining;
                         if(pLock->lockmisc[i] == LOCKTYPE_MINING || pLock->lockmisc[i] == LOCKTYPE_HERBALISM)
                         {
-							CalcMineRemaining(true);
+				CalcMineRemaining(true);
                         }
                     }
                 }
@@ -461,9 +458,8 @@ bool GameObject::Load(GOSpawn *spawn)
 			m_factionDBC = dbcFaction.LookupEntry(m_faction->Faction);
 	}
 	SetFloatValue(OBJECT_FIELD_SCALE_X,spawn->scale);
-	_LoadQuests();
+
 	CALL_GO_SCRIPT_EVENT(this, OnCreate)();
-	CALL_GO_SCRIPT_EVENT(this, OnSpawn)();
 
 	InitAI();
 
@@ -500,7 +496,7 @@ void GameObject::UseFishingNode(Player *player)
 	FishingZoneEntry *entry = FishingZoneStorage.LookupEntry( zone );
 	if( entry == NULL ) // No fishing information found for area or zone, log an error, and end fishing
 	{
-		sLog.outError( "ERROR: Fishing zone information for zone %d not found!", zone );
+		DEBUG_LOG( "ERROR: Fishing zone information for zone %d not found!", zone );
 		EndFishing( player, true );
 		return;
 	}
@@ -514,7 +510,7 @@ void GameObject::UseFishingNode(Player *player)
 	// Open loot on success, otherwise FISH_ESCAPED.
 	if( Rand(((player->_GetSkillLineCurrent( SKILL_FISHING, true ) - minskill) * 100) / maxskill) )
 	{
-		lootmgr.FillFishingLoot( &loot, zone );
+		lootmgr.FillFishingLoot( &m_loot, zone );
 		player->SendLoot( GetGUID(), LOOT_FISHING );
 		EndFishing( player, false );
 	}
@@ -622,6 +618,14 @@ uint32 GameObject::NumOfQuests()
 void GameObject::_LoadQuests()
 {
 	sQuestMgr.LoadGOQuests(this);
+
+	// set state for involved quest objects
+	if( pInfo && pInfo->InvolvedQuestIds )
+	{
+		SetUInt32Value(GAMEOBJECT_DYN_FLAGS, 0);
+		SetUInt32Value(GAMEOBJECT_STATE, 0);
+		SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+	}
 }
 
 /////////////////
@@ -649,11 +653,6 @@ void GameObject::ExpireAndDelete()
 	sEventMgr.AddEvent(this, &GameObject::_Expire, EVENT_GAMEOBJECT_EXPIRE, 1, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
 
-void GameObject::Deactivate()
-{
-	SetUInt32Value(GAMEOBJECT_DYN_FLAGS, 0);
-}
-
 void GameObject::CallScriptUpdate()
 {
 	ASSERT(myScript);
@@ -671,7 +670,7 @@ void GameObject::OnRemoveInRangeObject(Object* pObj)
 	if(m_summonedGo && m_summoner == pObj)
 	{
 		for(int i = 0; i < 4; i++)
-			if (m_summoner->m_ObjectSlots[i] == GetLowGUID())
+			if (m_summoner->m_ObjectSlots[i] == GetUIdFromGUID())
 				m_summoner->m_ObjectSlots[i] = 0;
 
 		m_summoner = 0;
@@ -689,21 +688,6 @@ void GameObject::RemoveFromWorld(bool free_guid)
 	Object::RemoveFromWorld(free_guid);
 }
 
-bool GameObject::HasLoot()
-{
-    int count=0;
-    for(vector<__LootItem>::iterator itr = loot.items.begin(); itr != loot.items.end(); ++itr)
-	{
-		if( itr->item.itemproto->Bonding == ITEM_BIND_QUEST || itr->item.itemproto->Bonding == ITEM_BIND_QUEST2 )
-			continue;
-
-		count += (itr)->iItemsCount;
-	}
-
-    return (count>0);
-
-}
-
 uint32 GameObject::GetGOReqSkill()  
 {
 	if(GetEntry() == 180215) return 300;
@@ -719,5 +703,10 @@ uint32 GameObject::GetGOReqSkill()
 			return lock->minlockskill[i];
 		}
 	return 0;
+}
+
+void GameObject::GenerateLoot()
+{
+
 }
 

@@ -572,7 +572,8 @@ struct ItemPrototype
 	GossipScript * gossip_script;
 	int32 ForcedPetId;
 
-	ItemExtendedCostEntry * extended_cost;
+	string ConstructItemLink(uint32 random_prop, uint32 random_suffix, uint32 stack);
+	bool ValidateItemLink(const char *szLink);
 };
 
 typedef struct {

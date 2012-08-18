@@ -107,7 +107,7 @@ void WorldSocket::_HandleAuthSession(WorldPacket* recvPacket)
 	}
 	catch(ByteBuffer::error &)
 	{
-		sLog.outDetail("Incomplete copy of AUTH_SESSION Received.");
+		DEBUG_LOG("Incomplete copy of AUTH_SESSION Received.");
 		return;
 	}
 
@@ -146,7 +146,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	uint32 AccountFlags;
 
 	recvData >> AccountID >> AccountName >> GMFlags >> AccountFlags;
-	sLog.outDebug( " >> got information packet from logon: `%s` ID %u (request %u)", AccountName.c_str(), AccountID, mRequestID);
+	DEBUG_LOG( " >> got information packet from logon: `%s` ID %u (request %u)", AccountName.c_str(), AccountID, mRequestID);
 	//	sLog.outColor(TNORMAL, "\n");
 
 	mRequestID = 0;
@@ -236,7 +236,7 @@ void WorldSocket::OnRead()
 		// Check for the header if we don't have any bytes to wait for.
 		if(mRemaining == 0)
 		{
-			if(GetReadBuffer().GetSize() < 6)
+			if(readBuffer.GetSize() < 6)
 			{
 				// No header in the packet, let's wait.
 				return;
@@ -244,7 +244,7 @@ void WorldSocket::OnRead()
 
 			// Copy from packet buffer into header local var
 			ClientPktHeader Header;
-			GetReadBuffer().Read(&Header, 6);
+			readBuffer.Read(&Header, 6);
 
 			// Decrypt the header
             _crypt.DecryptSixRecv((uint8*)&Header);
@@ -257,7 +257,7 @@ void WorldSocket::OnRead()
 
 		if(mRemaining > 0)
 		{
-			if( GetReadBuffer().GetSize() < mRemaining )
+			if( readBuffer.GetSize() < mRemaining )
 			{
 				// We have a fragmented packet. Wait for the complete one before proceeding.
 				return;
@@ -270,8 +270,7 @@ void WorldSocket::OnRead()
 		if(mRemaining > 0)
 		{
 			// Copy from packet buffer into our actual buffer.
-			//Read(mRemaining, (uint8*)Packet->contents());
-			GetReadBuffer().Read((uint8*)Packet->contents(), mRemaining);
+			readBuffer.Read((uint8*)Packet->contents(), mRemaining);
 		}
 
 		/*sWorldLog.LogPacket(mSize, mOpcode, mSize ? Packet->contents() : NULL, 0);*/

@@ -22,14 +22,13 @@
 
 #include "Common.h"
 
-class ConsoleThread : public ThreadBase
+class ConsoleThread : public ThreadContext
 {
 protected:
-	bool m_killSwitch;
 	bool m_isRunning;
 public:
-	bool run();
 	void terminate();
+	bool run();
 };
 
 #endif

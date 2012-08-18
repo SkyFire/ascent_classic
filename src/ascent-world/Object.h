@@ -20,7 +20,10 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
+#include "LootMgr.h"
+
 class Unit;
+class Spell;
 
 enum HIGHGUID_TYPE
 {
@@ -101,6 +104,21 @@ class Player;
 class MapCell;
 class MapMgr;
 
+/**
+ * casting defines
+ */
+
+#define TO_PLAYER(ptr) ((Player*)(ptr))
+#define TO_UNIT(ptr) ((Unit*)(ptr))
+#define TO_CREATURE(ptr) ((Creature*)(ptr))
+#define TO_PET(ptr) ((Pet*)(ptr))
+#define TO_CONTAINER(ptr) ((Container*)(ptr))
+#define TO_ITEM(ptr) ((Item*)(ptr))
+#define TO_OBJECT(ptr) ((Object*)(ptr))
+#define TO_GAMEOBJECT(ptr) ((GameObject*)(ptr))
+#define TO_DYNAMICOBJECT(ptr) ((DynamicObject*)(ptr))
+#define TO_CORPSE(ptr) ((Corpse*)(ptr))
+
 //====================================================================
 //  Object
 //  Base object for every item, unit, player, corpse, container, etc
@@ -126,24 +144,11 @@ public:
 	virtual void RemoveFromWorld(bool free_guid);
 
 	// guid always comes first
-#ifndef USING_BIG_ENDIAN
 	ASCENT_INLINE const uint64& GetGUID() const { return *((uint64*)m_uint32Values); }
-#else
-	ASCENT_INLINE const uint64 GetGUID() const { return GetUInt64Value(0); }
-#endif
-
 	ASCENT_INLINE const WoWGuid& GetNewGUID() const { return m_wowGuid; }
-	ASCENT_INLINE uint32 GetEntry(){return m_uint32Values[3];}
+	ASCENT_INLINE uint32 GetEntry(){return m_uint32Values[OBJECT_FIELD_ENTRY];}
 	
-	ASCENT_INLINE const uint32 GetEntryFromGUID() const
-	{
-/*		uint64 entry = *(uint64*)m_uint32Values;
-		entry >>= 24;
-		return (uint32)(entry & 0xFFFFFFFF);*/
-
-		return uint32( (*(uint64*)m_uint32Values >> 24) & 0xFFFFFFFF );
-	}
-
+	ASCENT_INLINE const uint32 GetEntryFromGUID() const	{ return uint32( (*(uint64*)m_uint32Values >> 24) & 0xFFFFFFFF ); }
 	ASCENT_INLINE const uint32 GetTypeFromGUID() const { return (m_uint32Values[1] & HIGHGUID_TYPE_MASK); }
 	ASCENT_INLINE const uint32 GetUIdFromGUID() const { return (m_uint32Values[0] & LOWGUID_ENTRY_MASK); }
 	ASCENT_INLINE const uint32 GetLowGUID() const { return (m_uint32Values[0]); }
@@ -189,6 +194,10 @@ public:
 	ASCENT_INLINE const float& GetSpawnY( ) const { return m_spawnLocation.y; }
 	ASCENT_INLINE const float& GetSpawnZ( ) const { return m_spawnLocation.z; }
 	ASCENT_INLINE const float& GetSpawnO( ) const { return m_spawnLocation.o; }
+	ASCENT_INLINE void SetSpawnX(float x) { m_spawnLocation.x = x; }
+	ASCENT_INLINE void SetSpawnY(float y) { m_spawnLocation.y = y; }
+	ASCENT_INLINE void SetSpawnZ(float z) { m_spawnLocation.z = z; }
+	ASCENT_INLINE void SetSpawnO(float o) { m_spawnLocation.o = o; }
 
 	ASCENT_INLINE const LocationVector & GetPosition() { return m_position; }
 	ASCENT_INLINE LocationVector & GetPositionNC() { return m_position; }
@@ -215,34 +224,13 @@ public:
 	ASCENT_INLINE const uint32& GetZoneId( ) const { return m_zoneId; }
 
 	//! Get uint32 property
-	ASCENT_INLINE const uint32& GetUInt32Value( uint32 index ) const
-	{
-		ASSERT( index < m_valuesCount );
-		return m_uint32Values[ index ];
-	}
+	ASCENT_INLINE const uint32& GetUInt32Value( uint32 index ) const { return m_uint32Values[ index ]; }
 
 	//! Get uint64 property
-#ifdef USING_BIG_ENDIAN
-        __inline const uint64 GetUInt64Value( uint32 index ) const
-#else
-	ASCENT_INLINE const uint64& GetUInt64Value( uint32 index ) const
-#endif
-	{
-		ASSERT( index + uint32(1) < m_valuesCount );
-#ifdef USING_BIG_ENDIAN
-		/* these have to be swapped here :< */
-		return uint64((uint64(m_uint32Values[index+1]) << 32) | m_uint32Values[index]);
-#else
-		return *((uint64*)&(m_uint32Values[ index ]));
-#endif
-	}
+	ASCENT_INLINE const uint64& GetUInt64Value( uint32 index ) const { return *((uint64*)&(m_uint32Values[ index ])); }
 
 	//! Get float property
-	ASCENT_INLINE const float& GetFloatValue( uint32 index ) const
-	{
-		ASSERT( index < m_valuesCount );
-		return m_floatValues[ index ];
-	}
+	ASCENT_INLINE const float& GetFloatValue( uint32 index ) const { return m_floatValues[ index ]; }
 
 	void __fastcall ModFloatValue(const uint32 index, const float value );
 	void ModSignedInt32Value(uint32 index, int32 value);
@@ -252,20 +240,18 @@ public:
 	//! Set uint32 property
 	void SetByte(uint32 index, uint32 index1,uint8 value);
 
-	ASCENT_INLINE uint8 GetByte(uint32 i,uint32 i1)
-	{
-		ASSERT( i < m_valuesCount);
-		ASSERT(i1 < 4);
-#ifdef USING_BIG_ENDIAN
-		return ((uint8*)m_uint32Values)[i*4+(3-i1)];
-#else
-		return ((uint8*)m_uint32Values)[i*4+i1];
-#endif
-	}
+	ASCENT_INLINE uint8 GetByte(uint32 i,uint32 i1) { return ((uint8*)m_uint32Values)[i*4+i1]; }
 	
 	ASCENT_INLINE void SetNewGuid(uint32 Guid)
 	{
-		SetUInt32Value(OBJECT_FIELD_GUID, Guid);
+		uint64 new_full_guid = Guid;
+		if( m_objectTypeId == TYPEID_GAMEOBJECT )
+			new_full_guid |= ((uint64)GetEntry() << 24) | ((uint64)HIGHGUID_TYPE_GAMEOBJECT << 32);
+
+		if( m_objectTypeId == TYPEID_UNIT )
+			new_full_guid |= ((uint64)GetEntry() << 24) | ((uint64)HIGHGUID_TYPE_UNIT << 32);
+
+		SetUInt64Value(OBJECT_FIELD_GUID, new_full_guid);
 		m_wowGuid.Init(GetGUID());
 	}
 
@@ -282,11 +268,7 @@ public:
 
 	void __fastcall RemoveFlag( const uint32 index, uint32 oldFlag );
 
-	ASCENT_INLINE bool HasFlag( const uint32 index, uint32 flag ) const
-	{
-		ASSERT( index < m_valuesCount );
-		return (m_uint32Values[ index ] & flag) != 0;
-	}
+	ASCENT_INLINE bool HasFlag( const uint32 index, uint32 flag ) const { return (m_uint32Values[ index ] & flag) != 0;	}
 	
 	////////////////////////////////////////
 	void ClearUpdateMask( )
@@ -295,21 +277,18 @@ public:
 		m_objectUpdated = false;
 	}
 
-	bool HasUpdateField(uint32 index)
-	{
-		ASSERT( index < m_valuesCount);
-		return m_updateMask.GetBit(index);
-	}
+	bool HasUpdateField(uint32 index) { return m_updateMask.GetBit(index); }
 
 	//use it to check if a object is in range of another
 	bool isInRange(Object* target, float range);
 
-
 	// Use it to Check if a object is in front of another one
 	bool isInFront(Object* target);
 	bool isInBack(Object* target);
+	
 	// Check to see if an object is in front of a target in a specified arc (in degrees)
 	bool isInArc(Object* target , float degrees); 
+
 	/* Calculates the angle between two Positions */
 	float calcAngle( float Position1X, float Position1Y, float Position2X, float Position2Y );
 	float calcRadAngle( float Position1X, float Position1Y, float Position2X, float Position2Y );
@@ -384,7 +363,7 @@ public:
 	virtual void OnRemoveInRangeObject( Object * pObj )
 	{
 		if( pObj->GetTypeId() == TYPEID_PLAYER )
-			ASSERT( m_inRangePlayers.erase( reinterpret_cast< Player* >( pObj ) ) == 1 );
+			m_inRangePlayers.erase( reinterpret_cast< Player* >( pObj ) );
 	}
 
 	virtual void ClearInRangeSet()
@@ -438,7 +417,7 @@ public:
 	ASCENT_INLINE std::set<Player*> * GetInRangePlayerSet() { return &m_inRangePlayers; };
 
 	void __fastcall SendMessageToSet(WorldPacket *data, bool self,bool myteam_only=false);
-	ASCENT_INLINE void SendMessageToSet(StackBufferBase * data, bool self) { OutPacketToSet(data->GetOpcode(), data->GetSize(), data->GetBufferPointer(), self); }
+	ASCENT_INLINE void SendMessageToSet(StackPacket * data, bool self) { OutPacketToSet(data->GetOpcode(), (uint16)data->GetSize(), data->GetBufferPointer(), self); }
 	void OutPacketToSet(uint16 Opcode, uint16 Len, const void * Data, bool self);
 
 	//! Fill values with data from a space seperated string of uint32s.
@@ -459,7 +438,6 @@ public:
 	float m_base_runSpeed;
 	float m_base_walkSpeed;
 
-	void EventSpellDamage(uint64 Victim, uint32 SpellID, uint32 Damage);
 	void SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage, bool allowProc, bool static_damage = false, bool no_remove_auras = false);
 	
 	//*****************************************************************************************
@@ -497,6 +475,7 @@ public:
 	void GMScriptEvent(void * function, uint32 argc, uint32 * argv, uint32 * argt);
 	ASCENT_INLINE size_t GetInRangeOppFactCount() { return m_oppFactsInRange.size(); }
 	void PlaySoundToSet(uint32 sound_entry);
+	void EventSpellHit(Spell *pSpell);
 
 protected:
 	Object (  );
@@ -512,6 +491,8 @@ protected:
 	void _BuildMovementUpdate( ByteBuffer *data, uint8 flags, uint32 flags2, Player* target );
 	void _BuildValuesUpdate( ByteBuffer *data, UpdateMask *updateMask, Player* target );
 
+	/* Main Function called by isInFront(); */
+	bool inArc(float Position1X, float Position1Y, float FOV, float Orientation, float Position2X, float Position2Y );
 
 	//! WoWGuid class
 	WoWGuid m_wowGuid;
@@ -528,9 +509,6 @@ protected:
 	//! Current map cell
 	MapCell *m_mapCell;
 
-	/* Main Function called by isInFront(); */
-	bool inArc(float Position1X, float Position1Y, float FOV, float Orientation, float Position2X, float Position2Y );
-	
 	LocationVector m_position;
 	LocationVector m_lastMapUpdatePosition;
 	LocationVector m_spawnLocation;
@@ -592,6 +570,32 @@ public:
 	}
 
 	bool m_loadedFromDB;
+
+	/************************************************************************/
+	/* ACCESSOR FUNCTIONS                                                   */
+	/************************************************************************/
+	// Stats
+	ASCENT_INLINE uint32 GetStrength() { return m_uint32Values[UNIT_FIELD_STRENGTH]; }
+	ASCENT_INLINE uint32 GetAgility() { return m_uint32Values[UNIT_FIELD_AGILITY]; }
+	ASCENT_INLINE uint32 GetStamina() { return m_uint32Values[UNIT_FIELD_STAMINA]; }
+	ASCENT_INLINE uint32 GetIntellect() { return m_uint32Values[UNIT_FIELD_INTELLECT]; }
+	ASCENT_INLINE uint32 GetSpirit() { return m_uint32Values[UNIT_FIELD_SPIRIT]; }
+
+	// Health
+	ASCENT_INLINE uint32 GetHealth() { return m_uint32Values[UNIT_FIELD_HEALTH]; }
+	ASCENT_INLINE uint32 GetMaxHealth() { return m_uint32Values[UNIT_FIELD_MAXHEALTH]; }
+
+	/************************************************************************/
+	/* END ACCESSOR FUNCTIONS                                               */
+	/************************************************************************/
+
+public:
+	// loooooot
+	Loot m_loot;
+	bool m_looted;
+
+	// empties loot vector
+	void ClearLoot();
 };
 
 #endif

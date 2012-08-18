@@ -39,11 +39,11 @@ public:
 		if(mValue)
 		{
 			uint64 value;
-			#ifndef WIN32	// Make GCC happy.
+#if !defined(WIN32) && defined(X64)
 			sscanf(mValue,I64FMTD,(long long unsigned int*)&value);
-			#else
-			sscanf(mValue, I64FMTD, &value);
-			#endif
+#else
+			sscanf(mValue,I64FMTD,&value);
+#endif
 			return value;
 		}
 		else

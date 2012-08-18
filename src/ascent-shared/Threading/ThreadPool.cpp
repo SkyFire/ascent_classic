@@ -27,9 +27,12 @@
 #else
 	
 	volatile int threadid_count = 0;
+	Mutex m_threadIdLock;
 	int GenerateThreadId()
 	{
+		m_threadIdLock.Acquire();
 		int i = ++threadid_count;
+		m_threadIdLock.Release();
 		return i;
 	}
 
@@ -83,7 +86,7 @@ bool CThreadPool::ThreadExit(Thread * t)
 	return true;
 }
 
-void CThreadPool::ExecuteTask(ThreadBase * ExecutionTarget)
+void CThreadPool::ExecuteTask(ThreadContext * ExecutionTarget)
 {
 	Thread * t;
 	_mutex.Acquire();
@@ -111,7 +114,11 @@ void CThreadPool::ExecuteTask(ThreadBase * ExecutionTarget)
 	}
 
 	// add the thread to the active set
+#ifdef WIN32
+	Log.Debug("ThreadPool", "Thread %u is now executing task at 0x%p.", t->ControlInterface.GetId(), ExecutionTarget);
+#else
 	Log.Debug("ThreadPool", "Thread %u is now executing task at %p.", t->ControlInterface.GetId(), ExecutionTarget);
+#endif
 	m_activeThreads.insert(t);
 	_mutex.Release();
 }
@@ -243,6 +250,17 @@ void CThreadPool::Shutdown()
 	}
 }
 
+bool RunThread(ThreadContext * target)
+{
+	bool res = false;
+	THREAD_TRY_EXECUTION
+	{
+		res = target->run();
+	}
+	THREAD_HANDLE_CRASH
+	return res;
+}
+
 /* this is the only platform-specific code. neat, huh! */
 #ifdef WIN32
 
@@ -259,7 +277,7 @@ static unsigned long WINAPI thread_proc(void* param)
 	{
 		if(t->ExecutionTarget != NULL)
 		{
-			if(t->ExecutionTarget->run())
+			if( RunThread( t->ExecutionTarget ) )
 				delete t->ExecutionTarget;
 
 			t->ExecutionTarget = NULL;
@@ -287,7 +305,7 @@ static unsigned long WINAPI thread_proc(void* param)
 	return 0;
 }
 
-Thread * CThreadPool::StartThread(ThreadBase * ExecutionTarget)
+Thread * CThreadPool::StartThread(ThreadContext * ExecutionTarget)
 {
 	HANDLE h;
 	Thread * t = new Thread;
@@ -335,7 +353,7 @@ static void * thread_proc(void * param)
 	pthread_exit(0);
 }
 
-Thread * CThreadPool::StartThread(ThreadBase * ExecutionTarget)
+Thread * CThreadPool::StartThread(ThreadContext * ExecutionTarget)
 {
 	pthread_t target;
 	Thread * t = new Thread;

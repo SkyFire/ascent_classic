@@ -49,6 +49,7 @@ class SERVER_DECL ArenaTeam
 
 public:
 
+	uint32 m_queueSearchRange;
 	uint32 m_id;
 	uint32 m_type;
 	uint32 m_leader;

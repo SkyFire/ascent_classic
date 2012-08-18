@@ -74,7 +74,7 @@ Group::Group(bool Assign)
 
 	m_dirty=false;
 	m_updateblock=false;
-	m_disbandOnNoMembers = true;
+	m_groupFlags = 0;
 	memset(m_targetIcons, 0, sizeof(uint64) * 8);
 	m_isqueued=false;
 	m_difficulty=0;
@@ -85,6 +85,8 @@ Group::Group(bool Assign)
 	m_voiceMemberCount = 0;
 	memset(m_voiceMembersList, 0, sizeof(Player*)*41);
 #endif
+	m_prayerOfMendingCount = 0;
+	m_prayerOfMendingTarget = 0;
 }
 
 Group::~Group()
@@ -211,7 +213,48 @@ void Group::Update()
 	if( m_updateblock )
 		return;
 
-	Player* pNewLeader = NULL;
+	Player *pNewLeader = NULL;
+	PlayerInfo *plrinf;
+
+	WorldPacket data( 50 + ( m_MemberCount * 20 ) );
+	GroupMembersSet::iterator itr1, itr2;
+
+	uint32 i = 0, j = 0;
+	uint8 flags;
+	SubGroup *sg1 = NULL;
+	SubGroup *sg2 = NULL;
+	m_groupLock.Acquire();
+
+	m_updateblock = true;
+
+	if( m_groupFlags & GROUP_FLAG_REMOVE_OFFLINE_PLAYERS )
+	{
+		for( i = 0; i < m_SubGroupCount; i++ )
+		{
+			sg1 = m_SubGroups[i];
+
+			if( sg1 != NULL)
+			{
+				for( itr1 = sg1->GetGroupMembersBegin(); itr1 != sg1->GetGroupMembersEnd(); )
+				{
+					// should never happen but just in case
+					plrinf = *itr1;
+					++itr1;
+
+					if( plrinf == NULL )
+						continue;
+
+					if( plrinf->m_loggedInPlayer == NULL )
+					{
+						// bai bai
+						RemovePlayer(plrinf);
+					}
+				}
+			}
+		}
+	}
+
+	m_updateblock = false;
 
 	if( m_Leader == NULL || ( m_Leader != NULL && m_Leader->m_loggedInPlayer == NULL ) )
 	{
@@ -227,15 +270,6 @@ void Group::Update()
 		if( pNewLeader != NULL )
 			m_Looter = pNewLeader->m_playerInfo;
 	}
-
-	WorldPacket data( 50 + ( m_MemberCount * 20 ) );
-	GroupMembersSet::iterator itr1, itr2;
-
-	uint32 i = 0, j = 0;
-	uint8 flags;
-	SubGroup *sg1 = NULL;
-	SubGroup *sg2 = NULL;
-	m_groupLock.Acquire();
 
 	for( i = 0; i < m_SubGroupCount; i++ )
 	{
@@ -520,7 +554,7 @@ void Group::RemovePlayer(PlayerInfo * info)
 
 	if(m_MemberCount < 2)
 	{
-		if(m_disbandOnNoMembers)
+		if(!(m_groupFlags & GROUP_FLAG_DONT_DISBAND_WITH_NO_MEMBERS))
 		{
 			m_groupLock.Release();
 			Disband();
@@ -606,6 +640,23 @@ void Group::SendPacketToAllButOne(WorldPacket *packet, Player *pSkipTarget)
 		}
 	}
 	
+	m_groupLock.Release();
+}
+
+void Group::SendPacketToAllButOne(StackPacket *packet, Player *pSkipTarget)
+{
+	GroupMembersSet::iterator itr;
+	uint32 i = 0;
+	m_groupLock.Acquire();
+	for(; i < m_SubGroupCount; i++)
+	{
+		for(itr = m_SubGroups[i]->GetGroupMembersBegin(); itr != m_SubGroups[i]->GetGroupMembersEnd(); ++itr)
+		{
+			if((*itr)->m_loggedInPlayer != NULL && (*itr)->m_loggedInPlayer != pSkipTarget)
+				(*itr)->m_loggedInPlayer->GetSession()->SendPacket(packet);
+		}
+	}
+
 	m_groupLock.Release();
 }
 
@@ -790,7 +841,7 @@ void Group::LoadFromDB(Field *fields)
 
 void Group::SaveToDB()
 {
-	if(!m_disbandOnNoMembers)	/* don't save bg groups */
+	if(m_groupFlags & GROUP_FLAG_DONT_DISBAND_WITH_NO_MEMBERS)	/* don't save bg groups */
 		return;
 
 	std::stringstream ss;
@@ -946,11 +997,6 @@ void Group::UpdateAllOutOfRangePlayersFor(Player * pPlayer)
 
 	/* tell us any other players we don't know about */
 	Player * plr;
-	bool u1, u2;
-	UpdateMask myMask;
-	myMask.SetCount(PLAYER_END);
-	UpdateMask hisMask;
-	hisMask.SetCount(PLAYER_END);
 
 	m_groupLock.Acquire();
 	for(uint32 i = 0; i < m_SubGroupCount; ++i)
@@ -967,44 +1013,6 @@ void Group::UpdateAllOutOfRangePlayersFor(Player * pPlayer)
 			{
 				UpdateOutOfRangePlayer(plr, GROUP_UPDATE_TYPE_FULL_CREATE, false, &data);
 				pPlayer->GetSession()->SendPacket(&data);
-			}
-			else
-			{
-				if(pPlayer->GetSubGroup() == plr->GetSubGroup())
-				{
-					/* distribute quest fields to other players */
-					hisMask.Clear();
-					myMask.Clear();
-					u1 = u2 = false;
-					for(uint32 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_25_1; ++i)
-					{
-						if(plr->GetUInt32Value(i))
-						{
-							hisMask.SetBit(i);
-							u1 = true;
-						}
-
-						if(pPlayer->GetUInt32Value(i))
-						{
-							u2 = true;
-							myMask.SetBit(i);
-						}
-					}
-
-					if(u1)
-					{
-						data.clear();
-                        plr->BuildValuesUpdateBlockForPlayer(&data, &hisMask);
-						pPlayer->PushUpdateData(&data, 1);
-					}
-
-					if(u2)
-					{
-						data.clear();
-						pPlayer->BuildValuesUpdateBlockForPlayer(&data, &myMask);
-						plr->PushUpdateData(&data, 1);
-					}
-				}
 			}
 		}
 	}

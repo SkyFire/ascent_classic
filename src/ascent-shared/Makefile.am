@@ -3,14 +3,14 @@ INCLUDES += -I$(srcdir)
 noinst_LIBRARIES = libshared.a
 
 libshared_a_SOURCES = \
-    CThreads.cpp \
-    CThreads.h \
     Log.cpp \
     MemoryLeaks.cpp \
     MersenneTwister.cpp \
     MersenneTwister.h \
     PreallocatedQueue.h \
     ByteBuffer.h \
+    BufferPool.h \
+    BufferPool.cpp \
     Common.h \
     Errors.h \
     Log.h \
@@ -55,15 +55,10 @@ libshared_a_SOURCES = \
     Database/DataStore.h \
     Database/dbcfile.cpp \
     Database/dbcfile.h \
-    Database/MySQLDatabase.cpp \
-    Database/MySQLDatabase.h \
-    Database/PostgresDatabase.cpp \
-    Database/PostgresDatabase.h \
-    Database/SQLiteDatabase.cpp \
-    Database/SQLiteDatabase.h \
-    Database/CreateInterface.cpp \
     Network/CircularBuffer.h \
     Network/CircularBuffer.cpp \
+    Network/ListenSocketPoll.h \
+    Network/ListenSocketSelect.h \
     Network/ListenSocketLinux.h \
     Network/ListenSocketFreeBSD.h \
     Network/Network.h \
@@ -78,5 +73,13 @@ libshared_a_SOURCES = \
     Network/SocketMgrFreeBSD.h \
     Network/SocketOps.h \
     Network/SocketOpsLinux.cpp \
-    Network/SocketOpsFreeBSD.cpp
+    Network/SocketOpsFreeBSD.cpp \
+    Network/SocketMgrSelect.h \
+    Network/SocketMgrSelect.cpp \
+    Network/SocketOpsSelect.cpp \
+    Network/SocketSelect.cpp \
+    Network/SocketMgrPoll.h \
+    Network/SocketMgrPoll.cpp \
+    Network/SocketOpsPoll.cpp \
+    Network/SocketPoll.cpp 
     

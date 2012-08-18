@@ -228,16 +228,17 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 		case EVENT_LEAVECOMBAT:
 			{
 				if( pUnit == NULL ) return;
-				
-				if( pUnit->IsCreature() )
+
+				if( pUnit->GetTypeId() == TYPEID_UNIT && !pUnit->IsPet() )
 					pUnit->RemoveNegativeAuras();
+
 				//cancel spells that we are casting. Should remove bug where creatures cast a spell after they died
 //				CancelSpellCast();
 				// restart emote
 				if(m_Unit->GetTypeId() == TYPEID_UNIT)
 				{
 					if( static_cast< Creature* >( m_Unit )->has_combat_text )
-					objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_COMBAT_STOP );
+						objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_COMBAT_STOP );
 
 					if(static_cast<Creature*>(m_Unit)->original_emotestate)
 						m_Unit->SetUInt32Value(UNIT_NPC_EMOTESTATE, static_cast< Creature* >( m_Unit )->original_emotestate);
@@ -281,9 +282,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				}
 				else
 				{
+					CALL_SCRIPT_EVENT(m_Unit, OnCombatStop)(UnitToFollow);
 					m_AIState = STATE_EVADE;
 
-					Unit* SavedFollow = UnitToFollow;
 					UnitToFollow = NULL;
 					FollowDistance = 0.0f;
 					m_lastFollowX = m_lastFollowY = 0;
@@ -300,14 +301,9 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 							m_returnZ=m_Unit->GetSpawnZ();
 						}
 
-						Creature *aiowner = static_cast<Creature*>(m_Unit);
-						//clear tagger.
-						aiowner->Tagged = false;
-						aiowner->TaggerGuid = 0;
-						aiowner->SetUInt32Value(UNIT_DYNAMIC_FLAGS,aiowner->GetUInt32Value(UNIT_DYNAMIC_FLAGS) & ~(U_DYN_FLAG_TAGGED_BY_OTHER |U_DYN_FLAG_LOOTABLE));
-						aiowner->m_lootMethod = -1;
+						// clear tagger
+						TO_CREATURE(m_Unit)->ClearTag();
 					}
-					CALL_SCRIPT_EVENT(m_Unit, OnCombatStop)(SavedFollow);
 				}
 
 				if(m_Unit->GetMapMgr()->GetMapInfo() && m_Unit->GetMapMgr()->GetMapInfo()->type == INSTANCE_RAID)
@@ -333,14 +329,14 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 				if( pUnit == NULL ) return;
 
 				if( static_cast< Creature* >( m_Unit )->has_combat_text )
-				objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DAMAGE_TAKEN );
+					objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DAMAGE_TAKEN );
 
 				CALL_SCRIPT_EVENT(m_Unit, OnDamageTaken)(pUnit, float(misc1));
 				if(!modThreatByPtr(pUnit, misc1))
 				{
 					m_aiTargets.insert(TargetMap::value_type(pUnit, misc1));
 				}
-				m_Unit->CombatStatus.OnDamageDealt(pUnit);
+				m_Unit->CombatStatus.OnDamageDealt(pUnit, 1);
 			}break;
 		case EVENT_FOLLOWOWNER:
 			{
@@ -452,7 +448,7 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			if( pUnit == NULL ) return;
 
 			if( static_cast< Creature* >( m_Unit )->has_combat_text )
-			objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DIED );
+				objmgr.HandleMonsterSayEvent( static_cast< Creature* >( m_Unit ), MONSTER_SAY_EVENT_ON_DIED );
 
 			CALL_SCRIPT_EVENT(m_Unit, OnDied)(pUnit);
 			m_AIState = STATE_IDLE;
@@ -490,10 +486,13 @@ void AIInterface::HandleEvent(uint32 event, Unit* pUnit, uint32 misc1)
 			{
 				if(m_Unit->GetTypeId() == TYPEID_UNIT && !m_Unit->IsPet())
 				{
-					if(m_Unit->GetMapMgr()->pInstance && m_Unit->GetMapMgr()->GetMapInfo()->type != INSTANCE_NONRAID)
+					if( m_Unit->GetMapMgr()->pInstance && m_Unit->GetMapMgr()->GetMapInfo()->type != INSTANCE_PVP )
 					{
-						m_Unit->GetMapMgr()->pInstance->m_killedNpcs.insert( static_cast< Creature* >( m_Unit )->GetSQL_id() );
-						m_Unit->GetMapMgr()->pInstance->SaveToDB();
+						if( TO_CREATURE(m_Unit)->m_spawn != NULL )
+						{
+							m_Unit->GetMapMgr()->pInstance->m_killedNpcs.insert( TO_CREATURE(m_Unit)->m_spawn->id );
+							m_Unit->GetMapMgr()->pInstance->SaveToDB();
+						}
 					}
 				}
 			}
@@ -516,6 +515,7 @@ void AIInterface::Update(uint32 p_time)
 				(m_nextTarget && 
 					(!m_Unit->GetMapMgr()->GetUnit(m_nextTarget->GetGUID()) || 
 					!m_nextTarget->isAlive() ||
+					(m_nextTarget->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_nextTarget)->IsTotem()) ||
 					!IsInrange(m_Unit,m_nextTarget,pSpell->m_spellInfo->base_range_or_radius_sqr) ||
 					!isAttackable(m_Unit, m_nextTarget,!(pSpell->m_spellInfo->c_is_flags & SPELL_FLAG_IS_TARGETINGSTEALTHED))
 					)
@@ -1089,7 +1089,8 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 				float distance = m_Unit->GetDistanceSq(m_nextTarget);
 				bool los = true;
 #ifdef COLLISION
-				los = CollideInterface.CheckLOS(m_Unit->GetMapId(), m_Unit->GetPositionNC(),m_nextTarget->GetPositionNC());
+				los = CollideInterface.CheckLOS( m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ(),
+					m_nextTarget->GetPositionX(), m_nextTarget->GetPositionY(), m_nextTarget->GetPositionZ() );
 #endif
 				if(los && ((distance <= (m_nextSpell->maxrange*m_nextSpell->maxrange)  && distance >= (m_nextSpell->minrange*m_nextSpell->minrange)) || m_nextSpell->maxrange == 0)) // Target is in Range -> Attack
 				{
@@ -1383,7 +1384,6 @@ Unit* AIInterface::FindTarget()
 		++itr;
 
 		pObj = (*it2);
-
 		if( pObj->GetTypeId() == TYPEID_PLAYER )
 		{
 			if(static_cast< Player* >( pObj )->GetTaxiState() )	  // skip players on taxi
@@ -1426,8 +1426,8 @@ Unit* AIInterface::FindTarget()
 			continue;
 		}
 
-		/*if(pUnit->m_invisible) // skip invisible units
-			continue;*/
+		if(pUnit->m_invisible) // skip invisible units
+			continue;
 		
 		if(!pUnit->isAlive()
 			|| m_Unit == pUnit /* wtf? */
@@ -1462,7 +1462,8 @@ Unit* AIInterface::FindTarget()
 
 	#endif		// LOS_ONLY_IN_INSTANCE
 
-            if( CollideInterface.CheckLOS( m_Unit->GetMapId( ), m_Unit->GetPositionNC( ), pUnit->GetPositionNC( ) ) )
+            if( CollideInterface.CheckLOS( m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ(), 
+				pUnit->GetPositionX(), pUnit->GetPositionZ(), pUnit->GetPositionZ() ) )
 			{
 				distance = dist;
 				target = pUnit;
@@ -1636,7 +1637,7 @@ bool AIInterface::FindFriends(float dist)
 		float x = m_Unit->GetPositionX() + (float)( (float)(rand() % 150 + 100) / 1000.0f );
 		float y = m_Unit->GetPositionY() + (float)( (float)(rand() % 150 + 100) / 1000.0f );
 #ifdef COLLISION
-		float z = CollideInterface.GetHeight(m_Unit->GetMapId(), x, y, m_Unit->GetPositionZ() + 2.0f);
+		float z = CollideInterface.GetHeight(m_Unit->GetMapId(), x, y, m_Unit->GetPositionZ());
 		if( z == NO_WMO_HEIGHT )
 			z = m_Unit->GetMapMgr()->GetLandHeight(x, y);
 
@@ -1667,7 +1668,7 @@ bool AIInterface::FindFriends(float dist)
 				continue;
 
 			Creature * guard = m_Unit->GetMapMgr()->CreateCreature(guardid);
-			guard->Load(cp, x, y, z);
+			guard->Load(cp, x, y, z, 0.0f);
 			guard->SetInstanceID(m_Unit->GetInstanceID());
 			guard->SetZoneId(m_Unit->GetZoneId());
 			guard->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); /* shitty DBs */
@@ -1876,11 +1877,9 @@ void AIInterface::SendMoveToPacket(float toX, float toY, float toZ, float toO, u
 	//this should NEVER be called directly !!!!!!
 	//use MoveTo()
 
-#ifndef USING_BIG_ENDIAN
-	StackWorldPacket<60> data(SMSG_MONSTER_MOVE);
-#else
-	WorldPacket data(SMSG_MONSTER_MOVE, 60);
-#endif
+	//WorldPacket data(SMSG_MONSTER_MOVE, 60);
+	uint8 buffer[100];
+	StackPacket data(SMSG_MONSTER_MOVE, buffer, 100);
 	data << m_Unit->GetNewGUID();
 	data << m_Unit->GetPositionX() << m_Unit->GetPositionY() << m_Unit->GetPositionZ();
 	data << getMSTime();
@@ -1952,23 +1951,33 @@ void AIInterface::SendMoveToSplinesPacket(std::list<Waypoint> wp, bool run)
 */
 bool AIInterface::StopMovement(uint32 time)
 {
-	m_moveTimer = time; //set pause after stopping
-	m_creatureState = STOPPED;
+	if( m_creatureState == STOPPED )
+	{
+		if( time > m_moveTimer )
+			m_moveTimer = time;
 
-	m_destinationX = m_destinationY = m_destinationZ = 0;
-	m_nextPosX = m_nextPosY = m_nextPosZ = 0;
-	m_timeMoved = 0;
-	m_timeToMove = 0;
+		return true;
+	}
+	else
+	{
+		m_moveTimer = time; //set pause after stopping
+		m_creatureState = STOPPED;
+	
+		m_destinationX = m_destinationY = m_destinationZ = 0;
+		m_nextPosX = m_nextPosY = m_nextPosZ = 0;
+		m_timeMoved = 0;
+		m_timeToMove = 0;
 
-	WorldPacket data(26);
-	data.SetOpcode(SMSG_MONSTER_MOVE);
-	data << m_Unit->GetNewGUID();
-	data << m_Unit->GetPositionX() << m_Unit->GetPositionY() << m_Unit->GetPositionZ();
-	data << getMSTime();
-	data << uint8(1);   // "DontMove = 1"
+		WorldPacket data(26);
+		data.SetOpcode(SMSG_MONSTER_MOVE);
+		data << m_Unit->GetNewGUID();
+		data << m_Unit->GetPositionX() << m_Unit->GetPositionY() << m_Unit->GetPositionZ();
+		data << getMSTime();
+		data << uint8(1);   // "DontMove = 1"
 
-	m_Unit->SendMessageToSet( &data, false );
-	return true;
+		m_Unit->SendMessageToSet( &data, false );
+		return true;
+	}
 }
 
 void AIInterface::MoveTo(float x, float y, float z, float o)
@@ -2341,9 +2350,10 @@ bool AIInterface::saveWayPoints()
 	if(!m_waypoints)return false;
 
 	if(!GetUnit()) return false;
-	if(GetUnit()->GetTypeId() != TYPEID_UNIT) return false;
+	if(GetUnit()->GetTypeId() != TYPEID_UNIT ||
+		TO_CREATURE(GetUnit())->m_spawn == NULL ) return false;
 
-	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE spawnid = %u", ((Creature*)GetUnit())->GetSQL_id());
+	WorldDatabase.Execute("DELETE FROM creature_waypoints WHERE spawnid = %u", ((Creature*)GetUnit())->m_spawn->id);
 	WayPointMap::const_iterator itr;
 	WayPoint* wp = NULL;
 	std::stringstream ss;
@@ -2359,7 +2369,7 @@ bool AIInterface::saveWayPoints()
 		ss.str("");
 		ss << "INSERT INTO creature_waypoints ";
 		ss << "(spawnid,waypointid,position_x,position_y,position_z,waittime,flags,forwardemoteoneshot,forwardemoteid,backwardemoteoneshot,backwardemoteid,forwardskinid,backwardskinid) VALUES (";
-		ss << ((Creature*)GetUnit())->GetSQL_id() << ", ";
+		ss << TO_CREATURE(GetUnit())->m_spawn->id << ", ";
 		ss << wp->id << ", ";
 		ss << wp->x << ", ";
 		ss << wp->y << ", ";
@@ -2704,20 +2714,25 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			float wl = m_Unit->GetMapMgr()->GetWaterHeight(Fx, Fy);
 //			uint8 wt = m_Unit->GetMapMgr()->GetWaterType(Fx, Fy);
 #ifdef COLLISION
-			Fz = CollideInterface.GetHeight(m_Unit->GetMapId(), Fx, Fy, m_Unit->GetPositionZ() + 2.0f);
-			if( Fz == NO_WMO_HEIGHT )
-                Fz = m_Unit->GetMapMgr()->GetLandHeight(Fx, Fy);
+
+			if( !CollideInterface.GetFirstPoint( m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ(), 
+				Fx, Fy, m_Unit->GetPositionZ() + 1.5f, Fx, Fy, Fz, -3.5f ) )
+			{
+				// clear path?
+				Fz = CollideInterface.GetHeight( m_Unit->GetMapId(), Fx, Fy, m_Unit->GetPositionZ() );
+				if( Fz == NO_WMO_HEIGHT )
+					Fz = m_Unit->GetMapMgr()->GetLandHeight(Fx, Fy);
+			}
 			else
 			{
-				if( CollideInterface.GetFirstPoint(m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ() + 2.0f,
-					Fx, Fy, Fz + 2.0f, Fx, Fy, Fz, -1.0f) )
-				{
-					//Fz = CollideInterface.GetHeight(m_Unit->GetMapId(), Fx, Fy, m_Unit->GetPositionZ() + 2.0f);
-				}
+				// obstruction in the way.
+				// the distmod will fuck up the Z, so get a new height.
+				float fz2 = CollideInterface.GetHeight(m_Unit->GetMapId(), Fx, Fy, Fz);
+				if( fz2 != NO_WMO_HEIGHT )
+					Fz = fz2;
 			}
 
-			if( fabs( m_Unit->GetPositionZ() - Fz ) > 10.0f || 
-				( wl != 0.0f && Fz < wl ) )		// in water
+			if( fabs( m_Unit->GetPositionZ() - Fz ) > 3.5f || ( wl != 0.0f && Fz < wl ) )		// in water
 			{
 				m_FearTimer=getMSTime() + 500;
 			}
@@ -2749,37 +2764,40 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 		// calculate a random distance and angle to move
 		float wanderD = RandomFloat(2.0f) + 2.0f;
 		float wanderO = RandomFloat(6.283f);
-		float wanderX = m_Unit->GetPositionX() + wanderD * cosf(wanderO);
-		float wanderY = m_Unit->GetPositionY() + wanderD * sinf(wanderO);
+		float Fx = m_Unit->GetPositionX() + wanderD * cosf(wanderO);
+		float Fy = m_Unit->GetPositionY() + wanderD * sinf(wanderO);
+		float Fz;
 
 #ifdef COLLISION
-		float wanderZ = CollideInterface.GetHeight(m_Unit->GetMapId(), wanderX, wanderY, m_Unit->GetPositionZ() + 2.0f);
-		float wanderZ2 = wanderZ;
-		if( wanderZ == NO_WMO_HEIGHT )
-			wanderZ = m_Unit->GetMapMgr()->GetLandHeight(wanderX, wanderY);
+		if( !CollideInterface.GetFirstPoint( m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ(), 
+			Fx, Fy, m_Unit->GetPositionZ() + 1.5f, Fx, Fy, Fz, -3.5f ) )
+		{
+			// clear path?
+			Fz = CollideInterface.GetHeight( m_Unit->GetMapId(), Fx, Fy, m_Unit->GetPositionZ() );
+			if( Fz == NO_WMO_HEIGHT )
+				Fz = m_Unit->GetMapMgr()->GetLandHeight(Fx, Fy);
+		}
 		else
 		{
-			if( CollideInterface.GetFirstPoint(m_Unit->GetMapId(), m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ() + 2.0f,
-				wanderX, wanderY, wanderZ + 2.0f, wanderX, wanderY, wanderZ, -1.0f) )
-			{
-				//wanderZ = CollideInterface.GetHeight(m_Unit->GetMapId(), wanderX, wanderY, m_Unit->GetPositionZ() + 2.0f);
-			}
-			else
-				wanderZ = wanderZ2;
+			// obstruction in the way.
+			// the distmod will fuck up the Z, so get a new height.
+			float fz2 = CollideInterface.GetHeight(m_Unit->GetMapId(), Fx, Fy, Fz);
+			if( fz2 != NO_WMO_HEIGHT )
+				Fz = fz2;
 		}
 
-		if( fabs( m_Unit->GetPositionZ() - wanderZ ) > 10.0f )
+		if( fabs( m_Unit->GetPositionZ() - Fz ) > 3.5f )
 		{
 			m_WanderTimer=getMSTime() + 1000;
 		}
 		else
 		{
 			m_Unit->SetOrientation(wanderO);
-			MoveTo(wanderX, wanderY, wanderZ, wanderO);
+			MoveTo(Fx, Fy, Fz, wanderO);
 			m_WanderTimer = getMSTime() + m_totalMoveTime + 300; // time till next move (+ pause)
 		}
 #else
-		float wanderZ = m_Unit->GetMapMgr()->GetLandHeight(wanderX, wanderY);
+		Fz = m_Unit->GetMapMgr()->GetLandHeight(Fx, Fy);
 
 		// without these next checks we could fall through the "ground" (WMO) and get stuck
 		// wander won't work correctly in cities until we get some way to fix this and remove these checks
@@ -2787,15 +2805,15 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 		float landZ = m_Unit->GetMapMgr()->GetLandHeight(m_Unit->GetPositionX(), m_Unit->GetPositionY());
 
 		if( currentZ > landZ + 1.0f // are we more than 1yd above ground? (possible WMO)
-		 || wanderZ < currentZ - 5.0f // is our destination land height too low? (possible WMO)
-		 || wanderZ > currentZ + wanderD) // is our destination too high to climb?
+		 || Fz < currentZ - 5.0f // is our destination land height too low? (possible WMO)
+		 || Fz > currentZ + wanderD) // is our destination too high to climb?
 		{
 			m_WanderTimer = getMSTime() + 1000; // wait 1 second before we try again
 			return;
 		}
 
 		m_Unit->SetOrientation(wanderO);
-		MoveTo(wanderX, wanderY, wanderZ, wanderO);
+		MoveTo(Fx, Fy, Fz, wanderO);
 		m_WanderTimer = getMSTime() + m_totalMoveTime + 300; // time till next move (+ pause)
 #endif
 	}
@@ -2899,7 +2917,7 @@ SpellEntry *AIInterface::getSpellEntry(uint32 spellId)
 
 	if(!spellInfo)
 	{
-		sLog.outError("WORLD: unknown spell id %i\n", spellId);
+		DEBUG_LOG("WORLD: unknown spell id %i\n", spellId);
 		return NULL;
 	}
 
@@ -3425,9 +3443,6 @@ void AIInterface::CheckTarget(Unit* target)
 	TargetMap::iterator it2 = m_aiTargets.find( target );
 	if( it2 != m_aiTargets.end() || target == m_nextTarget )
 	{
-		target->CombatStatus.RemoveAttacker( m_Unit, m_Unit->GetGUID() );
-		m_Unit->CombatStatus.RemoveAttackTarget( target );
-
 		if(it2 != m_aiTargets.end())
 		{
 			m_aiTargets.erase(it2);
@@ -3509,7 +3524,7 @@ void AIInterface::ResetProcCounts()
 //we only cast once a spell and we will set his health and resistances. Note that this can be made with db too !
 void AIInterface::Event_Summon_EE_totem(uint32 summon_duration)
 {
-	Unit *ourslave=m_Unit->create_guardian(329,summon_duration,float(-M_PI*2));
+	Unit *ourslave=m_Unit->create_guardian(329,summon_duration,float(-M_PI*2), 0);
 	if(ourslave)
 	{
 		static_cast<Creature*>(ourslave)->ResistanceModPct[NATURE_DAMAGE]=100;//we should be imune to nature dmg. This can be also set in db
@@ -3526,7 +3541,7 @@ void AIInterface::Event_Summon_FE_totem(uint32 summon_duration)
 	//timer should not reach this value thus not cast this spell again
 	m_totemspelltimer = 0xEFFFFFFF;
 	//creatures do not support PETs and the spell uses that effect so we force a summon guardian thing
-	Unit *ourslave=m_Unit->create_guardian(575,summon_duration,float(-M_PI*2));
+	Unit *ourslave=m_Unit->create_guardian(575,summon_duration,float(-M_PI*2), 0);
 	if(ourslave)
 	{
 		static_cast<Creature*>(ourslave)->ResistanceModPct[FIRE_DAMAGE]=100;//we should be imune to fire dmg. This can be also set in db

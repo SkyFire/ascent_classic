@@ -18,17 +18,22 @@
  */
 
 class ArenaTeam;
+struct PlayerInfo;
 
 class Arena : public CBattleground
 {
 	set<GameObject*> m_gates;
 	set<ArenaTeam*> doneteams;
-	bool m_started;
 	uint32 m_arenateamtype;
+
+	uint32 m_pcWorldStates[2];
+
 public:
 	bool rated_match;
 	Arena(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t, uint32 players_per_side);
 	virtual ~Arena();
+
+	void RecalculateArenaTeams(ArenaTeam * pWinner, ArenaTeam * pLoser);
 
 	bool HookHandleRepop(Player * plr);
 	void OnAddPlayer(Player * plr);
@@ -57,6 +62,8 @@ public:
 	void HookFlagStand(Player * plr, GameObject * obj) {}
 	void HookOnAreaTrigger(Player * plr, uint32 id);
 
+	void BuffRespawn(uint32 buffId);
+
 	int32 GetFreeTeam()
 	{
 		size_t c0 = m_players[0].size() + m_pendPlayers[0].size();
@@ -69,7 +76,17 @@ public:
 		/* We shouldn't reach here. */
 	}
 
+	//ArenaTeam * m_RatedTeams[2];
+	uint32 m_ratedTeams[2];
+	std::set<PlayerInfo*> m_RatedPlayers[2];
+
+	GameObject * mBuffs[2];
+
 	void Finish();
 	uint8 Rated() { return rated_match; }
 	ASCENT_INLINE uint32 GetArenaTeamType() { return m_arenateamtype; }
+
+	/* looooooot */
+	bool SupportsPlayerLoot() { return false; }
+	void HookGenerateLoot(Player *plr, Corpse *pCorpse) {}
 };

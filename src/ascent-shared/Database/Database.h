@@ -23,6 +23,7 @@
 #include <string>
 #include "../Threading/Queue.h"
 #include "../CallBack.h"
+#include <mysql/mysql.h>
 
 using namespace std;
 class QueryResult;
@@ -32,6 +33,7 @@ class Database;
 struct DatabaseConnection
 {
 	FastMutex Busy;
+	MYSQL *conn;
 };
 
 struct SERVER_DECL AsyncQueryResult
@@ -64,10 +66,11 @@ public:
 	void AddQueryStr(const string& str);
 };
 
-class SERVER_DECL Database : public CThread
+class SERVER_DECL Database : public ThreadContext
 {
 	friend class QueryThread;
 	friend class AsyncQuery;
+
 public:
 	Database();
 	virtual ~Database();
@@ -76,34 +79,33 @@ public:
 	/* Thread Stuff                                                         */
 	/************************************************************************/
 	bool run();
+	bool ThreadRunning;
 
 	/************************************************************************/
 	/* Virtual Functions                                                    */
 	/************************************************************************/
-	virtual bool Initialize(const char* Hostname, unsigned int port,
+	bool Initialize(const char* Hostname, unsigned int port,
 		const char* Username, const char* Password, const char* DatabaseName,
-		uint32 ConnectionCount, uint32 BufferSize) = 0;
+		uint32 ConnectionCount, uint32 BufferSize);
 	
-	virtual void Shutdown() = 0;
+	void Shutdown();
 
-	virtual QueryResult* Query(const char* QueryString, ...);
-	virtual QueryResult* QueryNA(const char* QueryString);
-	virtual QueryResult * FQuery(const char * QueryString, DatabaseConnection * con);
-	virtual void FWaitExecute(const char * QueryString, DatabaseConnection * con);
-	virtual bool WaitExecute(const char* QueryString, ...);//Wait For Request Completion
-	virtual bool WaitExecuteNA(const char* QueryString);//Wait For Request Completion
-	virtual bool Execute(const char* QueryString, ...);
-	virtual bool ExecuteNA(const char* QueryString);
-
-	bool ThreadRunning;
+	QueryResult* Query(const char* QueryString, ...);
+	QueryResult* QueryNA(const char* QueryString);
+	QueryResult * FQuery(const char * QueryString, DatabaseConnection *con);
+	void FWaitExecute(const char * QueryString, DatabaseConnection *con);
+	bool WaitExecute(const char* QueryString, ...);//Wait For Request Completion
+	bool WaitExecuteNA(const char* QueryString);//Wait For Request Completion
+	bool Execute(const char* QueryString, ...);
+	bool ExecuteNA(const char* QueryString);
 
 	ASCENT_INLINE const string& GetHostName() { return mHostname; }
 	ASCENT_INLINE const string& GetDatabaseName() { return mDatabaseName; }
 	ASCENT_INLINE const uint32 GetQueueSize() { return queries_queue.get_size(); }
 
-	virtual string EscapeString(string Escape) = 0;
-	virtual void EscapeLongString(const char * str, uint32 len, stringstream& out) = 0;
-	virtual string EscapeString(const char * esc, DatabaseConnection * con) = 0;
+	string EscapeString(string Escape);
+	void EscapeLongString(const char * str, uint32 len, stringstream& out);
+	string EscapeString(const char * esc, DatabaseConnection *con);
 	
 	void QueueAsyncQuery(AsyncQuery * query);
 	void EndThreads();
@@ -111,34 +113,30 @@ public:
 	void thread_proc_query();
 	void FreeQueryResult(QueryResult * p);
 
-	DatabaseConnection * GetFreeConnection();
+	DatabaseConnection *GetFreeConnection();
 
-	void PerformQueryBuffer(QueryBuffer * b, DatabaseConnection * ccon);
+	void PerformQueryBuffer(QueryBuffer * b, DatabaseConnection *ccon);
 	void AddQueryBuffer(QueryBuffer * b);
 
-	static Database * CreateDatabaseInterface(uint32 uType);
+	static Database *Create();
 
-	virtual bool SupportsReplaceInto() = 0;
-	virtual bool SupportsTableLocking() = 0;
+	/* database is killed off manually. */
+	void OnShutdown() {}
 
 protected:
 
-	// spawn threads and shizzle
-	void _Initialize();
-
-	virtual void _BeginTransaction(DatabaseConnection * conn) = 0;
-	virtual void _EndTransaction(DatabaseConnection * conn) = 0;
-
 	// actual query function
-	virtual bool _SendQuery(DatabaseConnection *con, const char* Sql, bool Self) = 0;
-	virtual QueryResult * _StoreQueryResult(DatabaseConnection * con) = 0;
+	bool _SendQuery(DatabaseConnection *con, const char* Sql, bool Self);
+	QueryResult * _StoreQueryResult(DatabaseConnection * con);
+	bool _HandleError(DatabaseConnection *conn, uint32 ErrorNumber);
+	bool _Reconnect(DatabaseConnection *conn);
 
 	////////////////////////////////
 	FQueue<QueryBuffer*> query_buffer;
 
 	////////////////////////////////
 	FQueue<char*> queries_queue;
-	DatabaseConnection ** Connections;
+	DatabaseConnection *m_connections;
 	
 	uint32 _counter;
 	///////////////////////////////
@@ -158,10 +156,10 @@ protected:
 class SERVER_DECL QueryResult
 {
 public:
-	QueryResult(uint32 fields, uint32 rows) : mFieldCount(fields), mRowCount(rows), mCurrentRow(NULL) {}
-	virtual ~QueryResult() {}
+	QueryResult(MYSQL_RES *res, uint32 fields, uint32 rows);
+	~QueryResult();
 
-	virtual bool NextRow() = 0;
+	bool NextRow();
 	void Delete() { delete this; }
 
 	ASCENT_INLINE Field* Fetch() { return mCurrentRow; }
@@ -171,15 +169,16 @@ public:
 protected:
 	uint32 mFieldCount;
 	uint32 mRowCount;
-        Field *mCurrentRow;
+    Field *mCurrentRow;
+	MYSQL_RES *mResult;
 };
 
-class SERVER_DECL QueryThread : public CThread
+class SERVER_DECL QueryThread : public ThreadContext
 {
 	friend class Database;
 	Database * db;
 public:
-	QueryThread(Database * d) : CThread(), db(d) {}
+	QueryThread(Database * d) : ThreadContext(), db(d) {}
 	~QueryThread();
 	bool run();
 };

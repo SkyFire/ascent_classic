@@ -42,6 +42,7 @@ public:
 
 	void HandleRegister(WorldPacket & recvData);
 	void HandlePong(WorldPacket & recvData);
+	void HandleServerPing(WorldPacket &recvData);
 	void HandleSessionInfo(WorldPacket & recvData);
 	void HandleRequestAccountMapping(WorldPacket & recvData);
 	void UpdateAccountCount(uint32 account_id, uint8 add);

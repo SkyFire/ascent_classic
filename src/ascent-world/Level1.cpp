@@ -137,11 +137,7 @@ bool ChatHandler::HandleKickCommand(const char* args, WorldSession *m_session)
 
 	if(!*args)
 	return false;
-
-	bool SilentKick = false;
-
 	char *pname = strtok((char*)args, " ");
-
 	if(!pname)
 	{
 		RedSystemMessage(m_session, "No name specified.");
@@ -150,16 +146,10 @@ bool ChatHandler::HandleKickCommand(const char* args, WorldSession *m_session)
 	Player *chr = objmgr.GetPlayer((const char*)pname, false);
 	if (chr)
 	{
-		char *reason = strtok(NULL, " ");
-
+		char *reason = strtok(NULL, "\n");
 		std::string kickreason = "No reason";
 		if(reason)
 			kickreason = reason;
-
-		char* pSilentKick = strtok(NULL, "\n");
-
-		if (pSilentKick)
-			SilentKick = (atoi(pSilentKick)>0?true:false);
 
 		BlueSystemMessage(m_session, "Attempting to kick %s from the server for \"%s\".", chr->GetName(), kickreason.c_str());
 		sGMLog.writefromsession(m_session, "Kicked player %s from the server for %s", chr->GetName(), kickreason.c_str());
@@ -174,14 +164,10 @@ bool ChatHandler::HandleKickCommand(const char* args, WorldSession *m_session)
 			return true;
 		}*/ // we might have to re-work this
 
-		if(SilentKick == false)
-		{
-			char msg[200];
-			snprintf(msg, 200, "%sGM: %s was kicked from the server by %s. Reason: %s", MSG_COLOR_RED, chr->GetName(), m_session->GetPlayer()->GetName(), kickreason.c_str());
-			sWorld.SendWorldText(msg, NULL);
-			//sWorld.SendIRCMessage(msg);
-		}
-		
+		char msg[200];
+		snprintf(msg, 200, "%s%s was kicked by %s (%s)", MSG_COLOR_WHITE, chr->GetName(), m_session->GetPlayer()->GetName(), kickreason.c_str());
+		sWorld.SendWorldText(msg, NULL);
+		//sWorld.SendIRCMessage(msg);
 		SystemMessageToPlr(chr, "You are being kicked from the server by %s. Reason: %s", m_session->GetPlayer()->GetName(), kickreason.c_str());
 
 		chr->Kick(6000);
@@ -221,12 +207,20 @@ bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_sess
 		item->SetUInt32Value(ITEM_FIELD_STACK_COUNT, ((count > it->MaxCount) ? it->MaxCount : count));
 		if(it->Bonding==ITEM_BIND_ON_PICKUP)
 			item->SoulBind();
+		uint32 pr = 0;
+		uint32 sf = 0;
 		if(randomprop!=0)
 		{
 			if(randomprop<0)
+			{
+				sf = abs(int(randomprop));
 				item->SetRandomSuffix(abs(int(randomprop)));
+			}
 			else
+			{
+				pr = randomprop;
 				item->SetRandomProperty(randomprop);
+			}
 
 			item->ApplyRandomProperties(false);
 		}
@@ -238,14 +232,15 @@ bool ChatHandler::HandleAddInvItemCommand(const char *args, WorldSession *m_sess
 			return true;
 		}
 
-		char messagetext[128];
-		snprintf(messagetext, 128, "Adding item %d (%s) to %s's inventory.",(unsigned int)it->ItemId,it->Name1, chr->GetName());
+		char messagetext[500];
+		string itemlink = it->ConstructItemLink(pr, sf, item->GetUInt32Value(ITEM_FIELD_STACK_COUNT));
+		snprintf(messagetext, 500, "Adding item %d %s to %s's inventory.",(unsigned int)it->ItemId,itemlink.c_str(), chr->GetName());
 		SystemMessage(m_session, messagetext);
-		snprintf(messagetext, 128, "%s added item %d (%s) to your inventory.", m_session->GetPlayer()->GetName(), (unsigned int)itemid, it->Name1);
+		snprintf(messagetext, 500, "%s added item %d %s to your inventory.", m_session->GetPlayer()->GetName(), (unsigned int)itemid, itemlink.c_str());
 		SystemMessageToPlr(chr,  messagetext);
 
 		SlotResult *lr = chr->GetItemInterface()->LastSearchResult();
-		chr->GetSession()->SendItemPushResult(item,false,true,false,true,lr->ContainerSlot,lr->Slot,count);
+		chr->GetSession()->SendItemPushResult(item,false,true,false,true,lr->ContainerSlot,lr->Slot,item->GetUInt32Value(ITEM_FIELD_STACK_COUNT));
 
 		return true;
 	} else {
@@ -289,7 +284,7 @@ bool ChatHandler::HandleSummonCommand(const char* args, WorldSession *m_session)
 			chr->_Relocate(plr->GetMapId(),plr->GetPosition(),false,false,plr->GetInstanceID());
 		else
 		{
-			sEventMgr.AddEvent(chr,&Player::EventPortToGM,plr,0,1,1,0);
+			sEventMgr.AddEvent(chr,&Player::EventPortToGM,plr->GetLowGUID(),0,1,1,0);
 		}
 	}
 	else
@@ -601,16 +596,10 @@ bool ChatHandler::HandleRemoveSkillCommand(const char *args, WorldSession *m_ses
 	BlueSystemMessage(m_session, "Removing skill line %d", skill);
 
 	Player *plr = getSelectedChar(m_session, true);
-	if(plr && plr->_HasSkillLine(skill) ) //fix bug; removing skill twice will mess up skills
-	{
-		plr->_RemoveSkillLine(skill);
-		sGMLog.writefromsession(m_session, "used remove skill of %u on %s", skill, plr->GetName());
-		SystemMessageToPlr(plr, "%s removed skill line %d from you. ", m_session->GetPlayer()->GetName(), skill);
-	}
-	else
-	{
-		BlueSystemMessage(m_session, "Player doesn't have skill line %d", skill);
-	}
+	if(!plr) return true;
+	sGMLog.writefromsession(m_session, "used remove skill of %u on %s", skill, plr->GetName());
+	plr->_RemoveSkillLine(skill);
+	SystemMessageToPlr(plr, "%s removed skill line %d from you. ", m_session->GetPlayer()->GetName(), skill);
 	return true;
 }
 
@@ -746,9 +735,9 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 		return false;
 
 	int valcount = sscanf(args, "%u", (unsigned int*)&id);
-	if(valcount)
+	if(valcount && target->m_spawn != NULL)
 	{
-		snprintf(sql, 512, "UPDATE creature_spawns SET respawnlink = '%u' WHERE id = '%u'", (unsigned int)id, (unsigned int)target->GetSQL_id());
+		snprintf(sql, 512, "UPDATE creature_spawns SET respawnlink = '%u' WHERE id = '%u'", (unsigned int)id, (unsigned int)target->m_spawn->id);
 		WorldDatabase.Execute( sql );
 		BlueSystemMessage(m_session, "Spawn linking for this NPC has been updated: %u", id);
 	}
@@ -760,6 +749,27 @@ bool ChatHandler::HandleNpcSpawnLinkCommand(const char* args, WorldSession *m_se
 	return true;
 }
 
+bool ChatHandler::HandleGuildSetLeaderCommand(const char *args, WorldSession *m_session)
+{
+	Player *plr = getSelectedChar(m_session);
+	if( plr == NULL )
+		return true;
 
+	if( plr->m_playerInfo->guild == NULL )
+	{
+		SystemMessage(m_session, "Target not in a guild.");
+		return true;
+	}
 
+	PlayerInfo *new_leader = objmgr.GetPlayerInfoByName(args);
+	if( new_leader == NULL )
+	{
+		SystemMessage(m_session, "New leader not found.");
+		return true;
+	}
 
+	Guild *pGuild = plr->m_playerInfo->guild;
+	pGuild->ChangeGuildMaster(new_leader, NULL);
+	SystemMessage(m_session, "Guild leader changed.");
+	return true;
+}

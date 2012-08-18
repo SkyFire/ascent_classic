@@ -14,6 +14,12 @@
 #include "SocketDefines.h"
 #include <errno.h>
 
+#ifdef CONFIG_USE_KQUEUE_DFLY
+
+#include "SocketDefines.h"
+#include <errno.h>
+#endif
+
 class ListenSocketBase
 {
 public:

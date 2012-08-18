@@ -36,6 +36,7 @@ struct CreatureItem
 	uint32 available_amount;
 	uint32 max_amount;
 	uint32 incrtime;
+	ItemExtendedCostEntry *extended_cost;
 };
 
 SERVER_DECL bool Rand(float chance);
@@ -56,8 +57,8 @@ struct CreatureInfo
 	uint32 SpellDataID;
 	uint32 Male_DisplayID;
 	uint32 Female_DisplayID;
-	uint32 Male_DisplayID2;
-	uint32 Female_DisplayID2;
+	uint32 unkint1;
+	uint32 unkint2;
 	float unkfloat1;
 	float unkfloat2;
 	uint8  Civilian;
@@ -68,83 +69,35 @@ struct CreatureInfo
 	uint32 GenerateModelId(uint32 * dest)
 	{
 		/* only M */
-		if(( Male_DisplayID || Male_DisplayID2 ) && !Female_DisplayID && !Female_DisplayID2 )
+        if(Male_DisplayID == Female_DisplayID)
 		{
-			if (Male_DisplayID2)
-			{
-				if(Rand(50.0f))
-				{
-					*dest = Male_DisplayID;
-				}
-				else
-				{
-					*dest = Male_DisplayID2;
-				}
-			}
-			else
-			{
-				*dest = Male_DisplayID;
-			}
+			*dest = Male_DisplayID;
 			return 0;
 		}
-		/* only F */
-		if(( Female_DisplayID || Female_DisplayID2 ) && !Male_DisplayID && !Male_DisplayID2 )
+
+		/* only M */
+		if(Male_DisplayID && !Female_DisplayID)
 		{
-			if (Female_DisplayID2)
-			{
-				if(Rand(50.0f))
-				{
-					*dest = Female_DisplayID;
-				}
-				else
-				{
-					*dest = Female_DisplayID2;
-				}
-			}
-			else
-			{
-				*dest = Female_DisplayID;
-			}
+            *dest = Male_DisplayID;
+			return 0;
+		}
+
+		/* only F */
+		if(!Male_DisplayID && Female_DisplayID)
+		{
+			*dest = Female_DisplayID;
 			return 1;
 		}
 
 		/* make a random one */
 		if(Rand(50.0f))
 		{
-			if (Female_DisplayID2)
-			{
-				if(Rand(50.0f))
-				{
-					*dest = Female_DisplayID;
-				}
-				else
-				{
-					*dest = Female_DisplayID2;
-				}
-			}
-			else
-			{
-				*dest = Female_DisplayID;
-			}
+			*dest = Female_DisplayID;
 			return 1;
 		}
 		else
 		{
-			if (Male_DisplayID2)
-			{
-				if(Rand(50.0f))
-				{
-					*dest = Male_DisplayID;
-				}
-				else
-				{
-					*dest = Male_DisplayID2;
-				}
-			}
-			else
-			{
-				*dest = Male_DisplayID;
-			}
+			*dest = Male_DisplayID;
 			return 0;
 		}
 	}
@@ -298,7 +251,7 @@ public:
 	Creature(uint64 guid);
 	virtual ~Creature();
     bool Load(CreatureSpawn *spawn, uint32 mode, MapInfo *info);
-	void Load(CreatureProto * proto_, float x, float y, float z);
+	void Load(CreatureProto * proto_, float x, float y, float z, float o);
 
 	void AddToWorld();
 	void AddToWorld(MapMgr * pMapMgr);
@@ -311,6 +264,8 @@ public:
 
 	/// Updates
 	virtual void Update( uint32 time );
+
+	ASCENT_INLINE CreatureInfo* GetCreatureInfo() { return creature_info; }
 
 	/// Creature inventory
 	ASCENT_INLINE uint32 GetItemIdBySlot(uint32 slot) { return m_SellItems->at(slot).itemid; }
@@ -466,17 +421,10 @@ public:
 	//Make this unit face another unit
 	bool setInFront(Unit* target);
 
-	/// Looting
-	void generateLoot();
-	
 	bool Skinned;
-
-	bool Tagged;
-	uint64 TaggerGuid;
 
 	/// Misc
 	ASCENT_INLINE void setEmoteState(uint8 emote) { m_emoteState = emote; };
-	ASCENT_INLINE uint32 GetSQL_id() { return spawnid; };
 
 	virtual void setDeathState(DeathState s);
 
@@ -546,9 +494,9 @@ public:
 	void ChannelLinkUpCreature(uint32 SqlId);
 	bool haslinkupevent;
 	WayPoint * CreateWaypointStruct();
-	uint32 spawnid;
 	uint32 original_emotestate;
 	CreatureProto * proto;
+	ASCENT_INLINE CreatureProto *GetProto() { return proto; }
 	CreatureSpawn * m_spawn;
 	void OnPushToWorld();
 	void Despawn(uint32 delay, uint32 respawntime);
@@ -602,7 +550,25 @@ protected:
 	uint32 _fields[UNIT_END];
 
 public:
+	// loooooot
+	void GenerateLoot();
+
+	// tagging
+	uint32 m_taggingGroup;
+	uint32 m_taggingPlayer;
 	int8 m_lootMethod;
+
+	// updates the loot state, whether it is tagged or lootable, or no longer has items
+	void UpdateLootAnimation();
+
+	// clears tag, clears "tagged" visual grey
+	void ClearTag();
+
+	// tags the object by a certain player.
+	void Tag(Player *plr);
+
+	// used by bgs
+	bool m_noDeleteAfterDespawn;
 };
 
 #endif

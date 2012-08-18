@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -25,7 +25,7 @@
 #endif
 #include "../ascent-shared/ascent_getopt.h"
 
-#define BANNER "Ascent %s r%u/%s-%s (%s) :: Logon Server"
+#define BANNER "Summit r%u/%s-%s (%s) :: Logon Server\n"
 
 #ifndef WIN32
 #include <sched.h>
@@ -69,6 +69,13 @@ void _OnSignal(int s)
 	signal(s, _OnSignal);
 }
 
+void RunLS(int argc, char** argv)
+{
+	new LogonServer;
+	LogonServer::getSingleton( ).Run(argc, argv);
+	delete LogonServer::getSingletonPtr();
+}
+
 int main(int argc, char** argv)
 {
 #ifndef WIN32
@@ -83,18 +90,18 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	new LogonServer;
-
 	// Run!
-	LogonServer::getSingleton( ).Run(argc, argv);
-	delete LogonServer::getSingletonPtr();
+	THREAD_TRY_EXECUTION
+	{
+		RunLS(argc, argv);
+	}
+	THREAD_HANDLE_CRASH
 }
 
 bool startdb()
 {
 	string lhostname, lusername, lpassword, ldatabase;
 	int lport = 0;
-	int ltype = 1;
 	// Configure Main Database
 
 	bool result;
@@ -105,7 +112,6 @@ bool startdb()
 	result = !result ? result : Config.MainConfig.GetString("LogonDatabase", "Hostname", &lhostname);
 	result = !result ? result : Config.MainConfig.GetString("LogonDatabase", "Name", &ldatabase);
 	result = !result ? result : Config.MainConfig.GetInt("LogonDatabase", "Port", &lport);
-	result = !result ? result : Config.MainConfig.GetInt("LogonDatabase", "Type", &ltype);
 
 	if(result == false)
 	{
@@ -113,15 +119,14 @@ bool startdb()
 		return false;
 	}
 
-	sLog.SetScreenLoggingLevel(Config.MainConfig.GetIntDefault("LogLevel", "Screen", 0));
-	sLogonSQL = Database::CreateDatabaseInterface( ltype );
+	sLogonSQL = Database::Create();
 
 	// Initialize it
 	if(!sLogonSQL->Initialize(lhostname.c_str(), (unsigned int)lport, lusername.c_str(),
 		lpassword.c_str(), ldatabase.c_str(), Config.MainConfig.GetIntDefault("LogonDatabase", "ConnectionCount", 5),
 		16384))
 	{
-		sLog.outError("sql: Logon database initialization failed. Exiting.");
+		printf("sql: Logon database initialization failed. Exiting.");
 		return false;
 	}   
 
@@ -129,7 +134,6 @@ bool startdb()
 }
 
 #define DEF_VALUE_NOT_SET 0xDEADBEEF
-
 
 Mutex m_allowedIpLock;
 vector<AllowedIP> m_allowedIps;
@@ -208,7 +212,7 @@ bool Rehash()
 			printf("IP: %s could not be parsed. Ignoring\n", itr->c_str());
 			continue;
 		}
-
+		
 		AllowedIP tmp;
 		tmp.Bytes = ipmask;
 		tmp.IP = ipraw;
@@ -287,28 +291,13 @@ void LogonServer::Run(int argc, char ** argv)
 		case 0:
 			break;
 		default:
-			sLog.m_fileLogLevel = -1;
-			sLog.m_screenLogLevel = 3;
 			printf("Usage: %s [--checkconf] [--screenloglevel <level>] [--fileloglevel <level>] [--conf <filename>] [--version]\n", argv[0]);
 			return;
 		}
 	}
 
-	// Startup banner
-	if(!do_version && !do_check_conf)
-	{
-		sLog.Init(-1, 3);
-	}
-	else
-	{
-		sLog.m_fileLogLevel = -1;
-		sLog.m_screenLogLevel = 3;
-	}
-	
-	sLog.outString(BANNER, BUILD_TAG, BUILD_REVISION, CONFIG, PLATFORM_TEXT, ARCH);
-#ifdef REPACK
-	sLog.outString("Repack: %s | Author: %s | %s\n", REPACK, REPACK_AUTHOR, REPACK_WEBSITE);
-#endif
+	sLog.outString(BANNER, BUILD_REVISION, CONFIG, PLATFORM_TEXT, ARCH);
+	printf("Built at %s on %s by %s@%s\n", BUILD_TIME, BUILD_DATE, BUILD_USER, BUILD_HOST);
 	sLog.outString("==============================================================================");
 	sLog.outString("");
 	if(do_version)
@@ -334,6 +323,16 @@ void LogonServer::Run(int argc, char ** argv)
 	Log.Notice("System","Initializing Random Number Generators...");
 
 	Log.Notice("Config", "Loading Config Files...");
+	
+	/*if(Config.MainConfig.SetSource(config_file))
+	{
+		Log.Success("Config", ">> ascent-logonserver.conf", config_file);
+	}
+	else
+	{
+		Log.Error("Config", ">> ascent-logonserver.conf", config_file);
+		return;
+	}*/
 	if(!Rehash())
 		return;
 
@@ -376,6 +375,7 @@ void LogonServer::Run(int argc, char ** argv)
 	max_build = Config.MainConfig.GetIntDefault("Client", "MaxBuild", 6999);
 	string logon_pass = Config.MainConfig.GetStringDefault("LogonServer", "RemotePassword", "r3m0t3b4d");
 	Sha1Hash hash;
+	time_t oldtime = UNIXTIME;
 	hash.UpdateData(logon_pass);
 	hash.Finalize();
 	memcpy(sql_hash, hash.GetDigest(), 20);
@@ -425,7 +425,7 @@ void LogonServer::Run(int argc, char ** argv)
 	}
 	uint32 loop_counter = 0;
 	//ThreadPool.Gobble();
-	sLog.outString("Success! Ready for connections");
+
 	while(mrunning && authsockcreated && intersockcreated)
 	{
 		if(!(++loop_counter % 400))	 // 20 seconds
@@ -436,11 +436,17 @@ void LogonServer::Run(int argc, char ** argv)
 
 		if(!(loop_counter%10))
 		{
-			sInfoCore.TimeoutSockets();
-			sSocketGarbageCollector.Update();
-			CheckForDeadSockets();			  // Flood Protection
+			oldtime = UNIXTIME;
 			UNIXTIME = time(NULL);
-			g_localTime = *localtime(&UNIXTIME);
+			if( UNIXTIME != oldtime )
+			{
+				g_localTime = *localtime(&UNIXTIME);
+
+				// these are all time-based, so not point running them if the clock didn't change
+				sInfoCore.TimeoutSockets();
+				sSocketGarbageCollector.Update();
+				CheckForDeadSockets();			  // Flood Protection
+			}
 		}
 
 		PatchMgr::getSingleton().UpdateJobs();
@@ -496,7 +502,7 @@ void OnCrash(bool Terminate)
 void LogonServer::CheckForDeadSockets()
 {
 	_authSocketLock.Acquire();
-	time_t t = time(NULL);
+	time_t t = UNIXTIME;
 	time_t diff;
 	set<AuthSocket*>::iterator itr = _authSockets.begin();
 	set<AuthSocket*>::iterator it2;

@@ -5,13 +5,16 @@
 
 struct MySQLDatabaseConnection : public DatabaseConnection
 {
-	MYSQL * MySql;
+	
 };
 
 class SERVER_DECL MySQLDatabase : public Database
 {
 	friend class QueryThread;
 	friend class AsyncQuery;
+
+	
+
 public:
 	MySQLDatabase();
 	~MySQLDatabase();
@@ -31,14 +34,12 @@ public:
 	
 protected:
 
-	bool _HandleError(MySQLDatabaseConnection*, uint32 ErrorNumber);
-	bool _SendQuery(DatabaseConnection *con, const char* Sql, bool Self = false);
+
+
 
 	void _BeginTransaction(DatabaseConnection * conn);
 	void _EndTransaction(DatabaseConnection * conn);
-	bool _Reconnect(MySQLDatabaseConnection * conn);
-
-	QueryResult * _StoreQueryResult(DatabaseConnection * con);
+	
 };
 
 class SERVER_DECL MySQLQueryResult : public QueryResult
@@ -50,7 +51,7 @@ public:
 	bool NextRow();
 
 protected:
-	MYSQL_RES* mResult;
+	
 };
 
 #endif		// __MYSQLDATABASE_H

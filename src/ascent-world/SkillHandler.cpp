@@ -185,7 +185,7 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 	uint32 spellid = talentInfo->RankID[requested_rank];
 	if( spellid == 0 )
 	{
-		sLog.outDetail("Talent: %u Rank: %u = 0", talent_id, requested_rank);
+		DEBUG_LOG("Talent: %u Rank: %u = 0", talent_id, requested_rank);
 	}
 	else
 	{
@@ -205,7 +205,14 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 
 		if(!(GetPlayer( )->HasSpell(spellid)))
 		{
-			GetPlayer( )->addSpell(spellid);			
+			GetPlayer( )->addSpell(spellid);
+			// More cheat death hackage! :)
+			if(spellid == 31330)
+				GetPlayer()->m_cheatDeathRank = 3;
+			else if(spellid == 31329)
+				GetPlayer()->m_cheatDeathRank = 2;
+			else if(spellid == 31328)
+				GetPlayer()->m_cheatDeathRank = 1;
 	
 			SpellEntry *spellInfo = dbcSpell.LookupEntry( spellid );	 
 			
@@ -241,6 +248,8 @@ void WorldSession::HandleLearnTalentOpcode( WorldPacket & recv_data )
 			_player->SetUInt32Value(PLAYER_CHARACTER_POINTS1, CurTalentPoints-1);
 		}
 	}
+
+	_player->UpdateTalentInspectBuffer();
 }
 
 void WorldSession::HandleUnlearnTalents( WorldPacket & recv_data )

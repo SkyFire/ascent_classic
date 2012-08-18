@@ -479,6 +479,12 @@ public:
 
     /** A value that can be passed to ignore a parameter.  Never look at the result of dummy. */
     static Vector3 dummy;
+
+	void MultiplyXZ(float s)
+	{
+		this->x *= s;
+		this->z *= s;
+	}
 };
 
 inline G3D::Vector3 operator*(float s, const G3D::Vector3& v) {

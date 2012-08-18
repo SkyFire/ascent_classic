@@ -35,6 +35,11 @@ extern "C" SCRIPT_DECL void _exp_script_register(ScriptMgr* mgr)
     SetupMageSpells(mgr);
     SetupPaladinSpells(mgr);
     SetupRogueSpells(mgr);
+	
+	// ======
+	// events
+	// ======
+	SetupMidsummer(mgr);
 }
 
 #ifdef WIN32

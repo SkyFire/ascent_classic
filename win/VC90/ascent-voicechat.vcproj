@@ -44,7 +44,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/Zm250 /MP"
+				AdditionalOptions="/Zm150 /MP5"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\src\ascent-shared"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"

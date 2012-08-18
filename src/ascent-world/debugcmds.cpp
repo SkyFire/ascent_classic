@@ -124,7 +124,7 @@ bool ChatHandler::HandleMoveInfoCommand(const char* args, WorldSession *m_sessio
 	uint32 attackerscount = (uint32)((Creature *)obj)->GetAIInterface()->getAITargetsCount();
 	uint32 creatureState = ((Creature *)obj)->GetAIInterface()->m_creatureState;
 	uint32 curwp = ((Creature *)obj)->GetAIInterface()->getCurrentWaypoint();
-	Unit* unitToFollow = ((Creature *)obj)->GetAIInterface()->getUnitToFollow();
+	//Unit* unitToFollow = ((Creature *)obj)->GetAIInterface()->getUnitToFollow();
 	uint32 aistate = ((Creature *)obj)->GetAIInterface()->getAIState();
 	uint32 aitype = ((Creature *)obj)->GetAIInterface()->getAIType();
 	uint32 aiagent = ((Creature *)obj)->GetAIInterface()->getCurrentAgent();
@@ -339,7 +339,7 @@ bool ChatHandler::HandleFaceCommand(const char* args, WorldSession *m_session)
 	//GetSession()->SendPacket( &packet );
 	//obj->BuildMovementUpdateBlock(data,0)
 	//obj->SendMessageToSet(&data,false);
-	sLog.outDebug("facing sent");
+	DEBUG_LOG("facing sent");
 	return true;
 	//((Creature *)obj)->AI_MoveTo(obj->GetPositionX()+0.1,obj->GetPositionY()+0.1,obj->GetPositionZ()+0.1,theOrientation);
 }
@@ -928,7 +928,7 @@ bool ChatHandler::HandleDebugDumpCoordsCommmand(const char * args, WorldSession 
 	FILE * f = fopen("C:\\script_dump.txt", "a");
 	if(!f) return true;
 
-	fprintf(f, "mob.CreateWaypoint(%f, %f, %f, %f, 0, 0, 0);\n", p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(),
+	fprintf(f, "{ %f, %f, %f, %f },\n", p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(),
 		p->GetOrientation());
 	fclose(f);
 	return true;
@@ -980,7 +980,7 @@ bool ChatHandler::HandleSendpacket(const char * args, WorldSession * m_session)
 
     if (!xstring)
     {
-        sLog.outDebug("[Debug][Sendpacket] Packet is invalid");
+        DEBUG_LOG("[Debug][Sendpacket] Packet is invalid");
         return false;
     }
 
@@ -1011,7 +1011,7 @@ bool ChatHandler::HandleSendpacket(const char * args, WorldSession * m_session)
             sscanf(&xstring[j+1], "%x", &HexValue);
             if (HexValue > 0xFF)
             {
-                sLog.outDebug("[Debug][Sendpacket] Packet is invalid");
+                DEBUG_LOG("[Debug][Sendpacket] Packet is invalid");
                 return false;
             }
             data << uint8(HexValue);
@@ -1024,7 +1024,7 @@ bool ChatHandler::HandleSendpacket(const char * args, WorldSession * m_session)
 
     m_session->SendPacket(&data);
 
-    sLog.outDebug("[Debug][Sendpacket] Packet was send");
+    DEBUG_LOG("[Debug][Sendpacket] Packet was send");
 #endif
     return true;
 }

@@ -167,13 +167,9 @@ void WorldSession::SendTrainerList(Creature* pCreature)
 		++Count;
 	}
 
-#ifdef USING_BIG_ENDIAN
-	*(uint32*)&data.contents()[12] = swap32(Count);
-#else
 	*(uint32*)&data.contents()[12] = Count;
-#endif
-	
 	data << pTrainer->UIMessage;
+
 	SendPacket(&data);
 }
 
@@ -321,7 +317,17 @@ void WorldSession::SendCharterRequest(Creature* pCreature)
 		pCreature->GetEntry()==18897 || pCreature->GetEntry()==19856)
 	{
 		WorldPacket data(SMSG_PETITION_SHOWLIST, 81);
-		static const uint8 tdata[73] = { 0x03, 0x01, 0x00, 0x00, 0x00, 0x08, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x00, 0x35, 0x0C, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x09, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x80, 0x4F, 0x12, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x0A, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x80, 0x84, 0x1E, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00 };
+		uint8 tdata[73];
+		if(sWorld.free_arena_teams)
+		{
+			static const uint8 temp[73] = { 0x03, 0x01, 0x00, 0x00, 0x00, 0x08, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x09, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x0A, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00 };
+			memcpy(tdata, temp, sizeof(temp));
+		}
+		else
+		{
+			static const uint8 temp[73] = { 0x03, 0x01, 0x00, 0x00, 0x00, 0x08, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x00, 0x35, 0x0C, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x09, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x80, 0x4F, 0x12, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x0A, 0x5C, 0x00, 0x00, 0x21, 0x3F, 0x00, 0x00, 0x80, 0x84, 0x1E, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00 };
+			memcpy(tdata, temp, sizeof(temp));
+		}
 		data << pCreature->GetGUID();
 		data.append(tdata,73);
 		SendPacket(&data);
@@ -347,7 +353,10 @@ void WorldSession::SendCharterRequest(Creature* pCreature)
 		data << uint16(0);		  // unknown
 	//	data << uint32(0x3F21);	 // unknown
 
-		data << uint32(1000);	   // charter prise
+		if(sWorld.free_guild_charters)
+			data << uint32(0);
+		else
+			data << uint32(1000);	   // charter prise
 		data << uint32(0);		  // unknown, maybe charter type
 		data << uint32(9);		  // amount of unique players needed to sign the charter
 		SendPacket( &data );
@@ -401,8 +410,8 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 		return;
 
 	//stop when talked to for 3 min
-	/*if(qst_giver->GetAIInterface())
-		qst_giver->GetAIInterface()->StopMovement(180000);*/
+	if(qst_giver->GetAIInterface())
+		qst_giver->GetAIInterface()->StopMovement(180000);
  
 	// unstealth meh
 	if( _player->IsStealth() )
@@ -411,7 +420,7 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 	// reputation
 	_player->Reputation_OnTalk(qst_giver->m_factionDBC);
 
-	sLog.outDebug( "WORLD: Received CMSG_GOSSIP_HELLO from %u",GUID_LOPART(guid) );
+	DEBUG_LOG( "WORLD: Received CMSG_GOSSIP_HELLO from %u",GUID_LOPART(guid) );
 
 	GossipScript * Script = qst_giver->GetCreatureName() ? qst_giver->GetCreatureName()->gossip_script : NULL;
 	if(!Script)
@@ -471,7 +480,7 @@ void WorldSession::HandleGossipHelloOpcode( WorldPacket & recv_data )
 		data.wpos(pos);
 		data << count;
 		SendPacket(&data);
-		sLog.outDebug( "WORLD: Sent SMSG_GOSSIP_MESSAGE" );
+		DEBUG_LOG( "WORLD: Sent SMSG_GOSSIP_MESSAGE" );
 	}
 	else
 	{
@@ -493,7 +502,7 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
 
 	recv_data >> guid >> unk24 >> option;
 
-	sLog.outDetail("WORLD: CMSG_GOSSIP_SELECT_OPTION Option %i Guid %.8X", option, guid );
+	DEBUG_LOG("WORLD: CMSG_GOSSIP_SELECT_OPTION Option %i Guid %.8X", option, guid );
 	GossipScript * Script=NULL;
 	Object * qst_giver=NULL;
 	uint32 guidtype = GET_TYPE_FROM_GUID(guid);
@@ -547,7 +556,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode( WorldPacket & recv_data )
 {
 	if(!_player->IsInWorld() ||!_player->isDead()) return;
 	GetPlayer( )->DeathDurabilityLoss(0.25);
-	GetPlayer( )->ResurrectPlayer();
+	GetPlayer( )->ResurrectPlayer(NULL);
 
 	if(_player->getLevel() > 10)
 	{
@@ -575,13 +584,14 @@ void WorldSession::HandleSpiritHealerActivateOpcode( WorldPacket & recv_data )
 //////////////////////////////////////////////////////////////
 void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 {
-	WorldPacket data;
+	uint8 bdata[50000];
+	StackPacket data(SMSG_NPC_TEXT_UPDATE, bdata, 50000);
 	uint32 textID;
 	uint64 targetGuid;
 	GossipText *pGossip;
 
 	recv_data >> textID;
-	sLog.outDetail("WORLD: CMSG_NPC_TEXT_QUERY ID '%u'", textID );
+	DEBUG_LOG("WORLD: CMSG_NPC_TEXT_QUERY ID '%u'", textID );
 
 	recv_data >> targetGuid;
 	GetPlayer()->SetUInt64Value(UNIT_FIELD_TARGET, targetGuid);
@@ -589,14 +599,13 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 	pGossip = NpcTextStorage.LookupEntry(textID);
 	LocalizedNpcText * lnc = (language>0) ? sLocalizationMgr.GetLocalizedNpcText(textID,language) : NULL;
 
-	data.Initialize( SMSG_NPC_TEXT_UPDATE );
 	data << textID;
 	
 	if(pGossip)
 	{
-		data << float(1.0f);		// Unknown
 		for(uint32 i=0;i<8;i++)
 		{
+			data << pGossip->Texts[i].Prob;		// prob
 			if(lnc)
 			{
 				data << lnc->Texts[i][0];
@@ -609,31 +618,26 @@ void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 			}
 
 			data << pGossip->Texts[i].Lang;
-			data << uint32(0x00);		// Was prob.. but if you set it to 0 emotes work ;)
 			for(uint32 e=0;e<6;e++)
 				data << uint32(pGossip->Texts[i].Emote[e]);
-
-			if(i!=7) data << uint32(0x00);	// don't append to last
 		}
 	} 
 	else 
 	{
-		data << float(1.0f);		// unknown
-		data << "Hey there, $N. How can I help you?";
-		data << "Hey there, $N. How can I help you?";
-		data << uint32(0x00);	// ?
-		data << uint32(0x00);	// ?
-		for(uint32 e=0;e<6;e++)
+		data << float(1.0f);		// prob
+		data << "Hello, $N. What can I do for you?";
+		data << "Hello, $N. What can I do for you?";
+		data << uint32(0);	// lang
+		for(uint32 e=0;e<6;e++)		// emotes
 			data << uint32(0x00);
 
 		for(int i=0;i<7;i++)
 		{
-			data << uint32(0x00);
+			data << float(0.0f);
 			data << uint8(0x00) << uint8(0x00);
-			data << uint32(0x00);	// ?
-			data << uint32(0x00);	// ?
-			for(uint32 e=0;e<6;e++)
-				data << uint32(0x00);	// emote 1
+			data << uint32(0x00);	// lang
+			for(uint32 e=0;e<6;e++) // emotes
+				data << uint32(0x00);
 		}
 	}
 

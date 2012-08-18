@@ -19,6 +19,11 @@
 
 #ifndef _THREADING_MUTEX_H
 #define _THREADING_MUTEX_H
+#ifdef __DragonFly__                                                        
+#include <pthread.h>                                                
+#endif                                                                          
+               
+//#include <pthread.h> // For DFLY
 
 class SERVER_DECL Mutex
 {

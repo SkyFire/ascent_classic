@@ -28,9 +28,8 @@ enum DAYWATCHERSETTINGS
 	HOURLY		= 4,
 };
 
-class DayWatcherThread : public CThread
+class DayWatcherThread : public ThreadContext
 {
-	bool m_running;
 	bool m_busy;
 	bool m_dirty;
 

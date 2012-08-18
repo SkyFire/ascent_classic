@@ -65,128 +65,33 @@ static const char* colorstrings[TBLUE+1] = {
 
 void oLog::outString( const char * str, ... )
 {
-	if(m_fileLogLevel < 0 && m_screenLogLevel < 0)
-		return;
-
 	va_list ap;
 	va_start(ap, str);
 	
-	if(m_screenLogLevel >= 0)
-	{
-		vprintf(str, ap);
-		putc('\n', stdout);
-	}
-
-	va_end(ap);
-}
-
-void oLog::outError( const char * err, ... )
-{
-	if(m_fileLogLevel < 1 && m_screenLogLevel < 1)
-		return;
-
-	va_list ap;
-	va_start(ap, err);
-
-	if(m_screenLogLevel >= 1)
-	{
-#ifdef WIN32
-		SetConsoleTextAttribute(stderr_handle, FOREGROUND_RED | FOREGROUND_INTENSITY);
-#else
-		puts(colorstrings[TRED]);
-#endif
-		vfprintf(stderr, err, ap);
-		putc('\n', stderr);
-#ifdef WIN32
-		SetConsoleTextAttribute(stderr_handle, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
-#else
-		puts(colorstrings[TNORMAL]);
-#endif
-	}
-
-	va_end(ap);
-}
-
-void oLog::outBasic( const char * str, ... )
-{
-	if(m_fileLogLevel < 1 && m_screenLogLevel < 1)
-		return;
-
-	va_list ap;
-	va_start(ap, str);
-
-	if(m_screenLogLevel >= 1)
-	{
-		vprintf(str, ap);
-		putc('\n', stdout);
-	}
-
-	va_end(ap);
-}
-
-void oLog::outDetail( const char * str, ... )
-{
-	if(m_fileLogLevel < 2 && m_screenLogLevel < 2)
-		return;
-
-	va_list ap;
-	va_start(ap, str);
-
-	if(m_screenLogLevel >= 2)
-	{
-		vprintf(str, ap);
-		putc('\n', stdout);
-	}
-
+	vprintf(str, ap);
+	putc('\n', stdout);
 	va_end(ap);
 }
 
 void oLog::outDebug( const char * str, ... )
 {
-	if(m_fileLogLevel < 3 && m_screenLogLevel < 3)
-		return;
-
 	va_list ap;
 	va_start(ap, str);
 
-	if(m_screenLogLevel >= 3)
-	{
-		vprintf(str, ap);
-		putc('\n', stdout);
-	}
+	vprintf(str, ap);
+	putc('\n', stdout);
 
 	va_end(ap);
 }
 
-void oLog::outMenu( const char * str, ... )
-{
-	va_list ap;
-	va_start(ap, str);
-	vprintf( str, ap );
-	va_end(ap);
-	fflush(stdout);
-}
 
-void oLog::Init(int32 fileLogLevel, int32 screenLogLevel)
+void oLog::Init()
 {
-	m_screenLogLevel = screenLogLevel;
-	m_fileLogLevel = fileLogLevel;
-
 	// get error handle
 #ifdef WIN32
 	stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
 	stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 #endif
-}
-
-void oLog::SetScreenLoggingLevel(int32 level)
-{
-	m_screenLogLevel = level;
-}
-
-void oLog::SetFileLoggingLevel(int32 level)
-{
-	m_fileLogLevel = level;
 }
 
 void SessionLogWriter::write(const char* format, ...)

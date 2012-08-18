@@ -109,7 +109,6 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 	{
 		uint32 displayid;
 		uint8 invtype;
-		uint32 enchantment; // added in 2.4
 	};
 
 	player_item items[20];
@@ -203,42 +202,24 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 			else
 				data << uint32(0) << uint32(0) << uint32(0);
 
-			res = CharacterDatabase.Query("SELECT containerslot, slot, entry, enchantments FROM playeritems WHERE ownerguid=%u", GUID_LOPART(guid));
+			res = CharacterDatabase.Query("SELECT containerslot, slot, entry FROM playeritems WHERE ownerguid=%u", GUID_LOPART(guid));
 
 			memset(items, 0, sizeof(player_item) * 20);
-			uint32 enchantid;
-			EnchantEntry * enc;
 			if(res)
 			{
 				do 
 				{
 					containerslot = res->Fetch()[0].GetInt8();
 					slot = res->Fetch()[1].GetInt8();
-
 					if( containerslot == -1 && slot < 19 && slot >= 0 )
 					{
 						proto = ItemPrototypeStorage.LookupEntry(res->Fetch()[2].GetUInt32());
 						if(proto)
 						{
 							// slot0 = head, slot14 = cloak
-							
 							if(!(slot == 0 && (flags & (uint32)PLAYER_FLAG_NOHELM) != 0) && !(slot == 14 && (flags & (uint32)PLAYER_FLAG_NOCLOAK) != 0)) {
 								items[slot].displayid = proto->DisplayInfoID;
 								items[slot].invtype = proto->InventoryType;
-								// weapon glows
-								if( slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND )
-								{
-									// get enchant visual ID
-									const char * enchant_field = res->Fetch()[3].GetString();	
-									if( sscanf( enchant_field , "%u,0,0;" , (unsigned int *)&enchantid ) == 1 && enchantid > 0 )
-									{
-										enc = dbcEnchant.LookupEntry( enchantid );
-										if( enc != NULL )
-										items[slot].enchantment = enc->visual;
-										else
-										items[slot].enchantment = 0;;
-									}
-								}
 							}
 						}
 					}
@@ -248,7 +229,9 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 
 			for( i = 0; i < 20; ++i )
 			{
-				data << items[i].displayid << items[i].invtype << uint32(items[i].enchantment);
+				// 2.4.0 added a uint32 here, it's obviously one of the itemtemplate fields,
+				// we just gotta figure out which one :P
+				data << items[i].displayid << items[i].invtype << uint32(0);
 			}
 
 			num++;
@@ -264,9 +247,16 @@ void WorldSession::CharacterEnumProc(QueryResult * result)
 
 void WorldSession::HandleCharEnumOpcode( WorldPacket & recv_data )
 {	
+	if( m_lastEnumTime > 0 && (UNIXTIME - m_lastEnumTime) < 5 )		// should be enough
+	{
+		Disconnect();
+		return;
+	}
+
 	AsyncQuery * q = new AsyncQuery( new SQLClassCallbackP1<World, uint32>(World::getSingletonPtr(), &World::CharacterEnumProc, GetAccountId()) );
-	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags, guild_data.guildid FROM characters LEFT JOIN guild_data ON characters.guid = guild_data.playerid WHERE acct=%u ORDER BY guid LIMIT 10", GetAccountId());
+	q->AddQuery("SELECT guid, level, race, class, gender, bytes, bytes2, name, positionX, positionY, positionZ, mapId, zoneId, banned, restState, deathstate, forced_rename_pending, player_flags, guild_data.guildid FROM characters LEFT JOIN guild_data ON characters.guid = guild_data.playerid WHERE acct=%u ORDER BY guid", GetAccountId());
 	CharacterDatabase.QueueAsyncQuery(q);
+	m_lastEnumTime = (uint32)UNIXTIME;
 }
 
 void WorldSession::LoadAccountDataProc(QueryResult * result)
@@ -383,18 +373,14 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	pNewChar->SaveToDB(true);	
 
 	PlayerInfo *pn=new PlayerInfo ;
+	memset(pn, 0, sizeof(PlayerInfo));
 	pn->guid = pNewChar->GetLowGUID();
 	pn->name = strdup(pNewChar->GetName());
 	pn->cl = pNewChar->getClass();
 	pn->race = pNewChar->getRace();
 	pn->gender = pNewChar->getGender();
-	pn->m_Group=0;
-	pn->subGroup=0;
-	pn->m_loggedInPlayer=NULL;
 	pn->team = pNewChar->GetTeam ();
-	pn->guild=NULL;
-	pn->guildRank=NULL;
-	pn->guildMember=NULL;
+	pn->acct = GetAccountId();
 #ifdef VOICE_CHAT
 	pn->groupVoiceId = -1;
 #endif
@@ -407,6 +393,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
 	OutPacket(SMSG_CHAR_CREATE, 1, "\x2F");
 
 	sLogonCommHandler.UpdateAccountCount(GetAccountId(), 1);
+	m_lastEnumTime = 0;
 }
 
 /* FOR 1.10.1
@@ -531,17 +518,25 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 
 			for(int i = 0; i < NUM_CHARTER_TYPES; ++i)
 			{
-				Charter * c = objmgr.GetCharterByGuid(guid, (CharterTypes)i);
-				if(c != NULL)
-					c->RemoveSignature((uint32)guid);
+				if( inf->charterId[i] != 0 )
+				{
+					Charter *pCharter = objmgr.GetCharter(inf->charterId[i], (CharterTypes)i);
+					if( pCharter->LeaderGuid == inf->guid )
+						pCharter->Destroy();
+					else
+						pCharter->RemoveSignature(inf->guid);
+				}
 			}
-
 
 			for(int i = 0; i < NUM_ARENA_TEAM_TYPES; ++i)
 			{
-				ArenaTeam * t = objmgr.GetArenaTeamByGuid((uint32)guid, i);
-				if(t != NULL)
-					t->RemoveMember(inf);
+				if( inf->arenaTeam[i] != NULL )
+				{
+					if( inf->arenaTeam[i]->m_leader == guid )
+						inf->arenaTeam[i]->Destroy();
+					else
+						inf->arenaTeam[i]->RemoveMember(inf);
+				}
 			}
 			
 			/*if( _socket != NULL )
@@ -574,6 +569,7 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 	}
 
 	OutPacket(SMSG_CHAR_DELETE, 1, &fail);
+	m_lastEnumTime = 0;
 }
 
 void WorldSession::HandleCharRenameOpcode(WorldPacket & recv_data)
@@ -640,11 +636,10 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket & recv_data)
 	// If we're here, the name is okay.
 	free(pi->name);
 	pi->name = strdup(name.c_str());
-	CharacterDatabase.WaitExecute("UPDATE characters SET name = '%s' WHERE guid = %u", name.c_str(), (uint32)guid);
-	CharacterDatabase.WaitExecute("UPDATE characters SET forced_rename_pending = 0 WHERE guid = %u", (uint32)guid);
-	
+
 	data << uint8(0) << guid << name;
 	SendPacket(&data);
+	m_lastEnumTime = 0;
 }
 
 
@@ -653,7 +648,7 @@ void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 	CHECK_PACKET_SIZE(recv_data, 8);
 	uint64 playerGuid = 0;
 
-	sLog.outDebug( "WORLD: Recvd Player Logon Message" );
+	DEBUG_LOG( "WORLD: Recvd Player Logon Message" );
 
 	recv_data >> playerGuid; // this is the GUID selected by the player
 	if(objmgr.GetPlayer((uint32)playerGuid) != NULL || m_loggingInPlayer || _player)
@@ -684,11 +679,7 @@ void WorldSession::FullLogin(Player * plr)
 	movement_packet[0] = m_MoverWoWGuid.GetNewGuidMask();
 	memcpy(&movement_packet[1], m_MoverWoWGuid.GetNewGuid(), m_MoverWoWGuid.GetNewGuidLen());
 
-#ifndef USING_BIG_ENDIAN
-	StackWorldPacket<20> datab(CMSG_DUNGEON_DIFFICULTY);
-#else
-	WorldPacket datab(CMSG_DUNGEON_DIFFICULTY, 20);
-#endif
+	WorldPacket datab(MSG_SET_DUNGEON_DIFFICULTY, 20);
 	datab << plr->iInstanceType;
 	datab << uint32(0x01);
 	datab << uint32(0x00);
@@ -714,11 +705,11 @@ void WorldSession::FullLogin(Player * plr)
 	*/
 
 #ifdef VOICE_CHAT
-	datab.Initialize(SMSG_VOICE_SYSTEM_STATUS);
+	datab.Initialize(SMSG_FEATURE_SYSTEM_STATUS);
 	datab << uint8(2) << uint8(sVoiceChatHandler.CanUseVoiceChat() ? 1 : 0);
 	SendPacket(&datab);
 #else
-	datab.Initialize(SMSG_VOICE_SYSTEM_STATUS);
+	datab.Initialize(SMSG_FEATURE_SYSTEM_STATUS);
 	datab << uint8(2) << uint8(0);
 #endif
 
@@ -734,6 +725,7 @@ void WorldSession::FullLogin(Player * plr)
 	if(info == 0)
 	{
 		info = new PlayerInfo;
+		memset(info, 0, sizeof(PlayerInfo));
 		info->cl = plr->getClass();
 		info->gender = plr->getGender();
 		info->guid = plr->GetLowGUID();
@@ -743,11 +735,6 @@ void WorldSession::FullLogin(Player * plr)
 		info->lastZone = plr->GetZoneId();
 		info->race = plr->getRace();
 		info->team = plr->GetTeam();
-		info->guild=NULL;
-		info->guildRank=NULL;
-		info->guildMember=NULL;
-		info->m_Group=0;
-		info->subGroup=0;
 		objmgr.AddPlayerInfo(info);
 	}
 	plr->m_playerInfo = info;
@@ -757,15 +744,22 @@ void WorldSession::FullLogin(Player * plr)
 		plr->m_uint32Values[PLAYER_GUILDRANK] = plr->m_playerInfo->guildRank->iId;
 	}
 
+	for(uint32 z = 0; z < NUM_ARENA_TEAM_TYPES; ++z)
+	{
+		if(_player->m_playerInfo->arenaTeam[z] != NULL)
+		{
+			_player->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*6), _player->m_playerInfo->arenaTeam[z]->m_id);
+			if(_player->m_playerInfo->arenaTeam[z]->m_leader == _player->GetLowGUID())
+				_player->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*6) + 1, 0);
+			else
+				_player->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (z*6) + 1, 1);
+		}
+	}
+
 	info->m_loggedInPlayer = plr;
 
 	// account data == UI config
-#ifndef USING_BIG_ENDIAN
-	StackWorldPacket<128> data(SMSG_ACCOUNT_DATA_MD5);
-#else
-	WorldPacket data(SMSG_ACCOUNT_DATA_MD5, 128);
-#endif
-
+	WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 128);
 	MD5Hash md5hash;
 
 	for (int i = 0; i < 8; i++)
@@ -781,11 +775,7 @@ void WorldSession::FullLogin(Player * plr)
 		md5hash.UpdateData((const uint8*)acct_data->data, acct_data->sz);
 		md5hash.Finalize();
 
-#ifndef USING_BIG_ENDIAN
-		data.Write(md5hash.GetDigest(), MD5_DIGEST_LENGTH);
-#else
 		data.append(md5hash.GetDigest(), MD5_DIGEST_LENGTH);
-#endif
 	}
 	SendPacket(&data);
 
@@ -803,9 +793,7 @@ void WorldSession::FullLogin(Player * plr)
 		{
 			if(plr->isDead())
 			{
-				plr->ResurrectPlayer();
-				plr->SetUInt32Value(UNIT_FIELD_HEALTH, plr->GetUInt32Value(UNIT_FIELD_MAXHEALTH));
-				plr->SetUInt32Value(UNIT_FIELD_POWER1, plr->GetUInt32Value(UNIT_FIELD_MAXPOWER1));
+				plr->RemoteRevive();
 			}
 
 			float c_tposx = pTrans->GetPositionX() + plr->m_TransporterX;
@@ -814,11 +802,8 @@ void WorldSession::FullLogin(Player * plr)
 			if(plr->GetMapId() != pTrans->GetMapId())	   // loaded wrong map
 			{
 				plr->SetMapId(pTrans->GetMapId());
-#ifndef USING_BIG_ENDIAN
-				StackWorldPacket<20> dataw(SMSG_NEW_WORLD);
-#else
+
 				WorldPacket dataw(SMSG_NEW_WORLD, 20);
-#endif
 				dataw << pTrans->GetMapId() << c_tposx << c_tposy << c_tposz << plr->GetOrientation();
 				SendPacket(&dataw);
 
@@ -841,15 +826,9 @@ void WorldSession::FullLogin(Player * plr)
 		sWorld.AlliancePlayers++;
 
 	if(plr->m_FirstLogin && !HasGMPermissions())
-	{
-		uint32 racecinematic = plr->myRace->cinematic_id;
-#ifdef USING_BIG_ENDIAN
-		swap32(&racecinematic);
-#endif
-		OutPacket(SMSG_TRIGGER_CINEMATIC, 4, &racecinematic);
-	}
+		OutPacket(SMSG_TRIGGER_CINEMATIC, 4, &plr->myRace->cinematic_id);
 
-	sLog.outDetail( "WORLD: Created new player for existing players (%s)", plr->GetName() );
+	DEBUG_LOG( "WORLD: Created new player for existing players (%s)", plr->GetName() );
 
 	// Login time, will be used for played time calc
 	plr->m_playedtime[2] = (uint32)UNIXTIME;
@@ -884,11 +863,11 @@ void WorldSession::FullLogin(Player * plr)
 
 	// Send revision (if enabled)
 #ifdef WIN32
-	_player->BroadcastMessage("Server: %sAscent %s r%u/%s-Win-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
-		BUILD_REVISION, CONFIG, ARCH, MSG_COLOR_LIGHTBLUE);		
+	_player->BroadcastMessage("Server: %sSummIt r%u-TRUNK/%s-Win-%s", MSG_COLOR_WHITE, BUILD_REVISION, CONFIG, ARCH, MSG_COLOR_LIGHTBLUE);
+	//_player->BroadcastMessage("Built at %s on %s by %s@%s", BUILD_TIME, BUILD_DATE, BUILD_USER, BUILD_HOST);
 #else
-	_player->BroadcastMessage("Server: %sAscent %s r%u/%s-%s %s(www.ascentemu.com)", MSG_COLOR_WHITE, BUILD_TAG,
-		BUILD_REVISION, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
+	_player->BroadcastMessage("Server: %sSummIt r%u-TRUNK/%s-%s", MSG_COLOR_WHITE, BUILD_REVISION, PLATFORM_TEXT, ARCH, MSG_COLOR_LIGHTBLUE);
+	//_player->BroadcastMessage("Built at %s on %s by %s@%s", BUILD_TIME, BUILD_DATE, BUILD_USER, BUILD_HOST);
 #endif
 
 	if(sWorld.SendStatsOnJoin)
@@ -897,19 +876,31 @@ void WorldSession::FullLogin(Player * plr)
 			MSG_COLOR_WHITE, sWorld.GetSessionCount(), MSG_COLOR_WHITE, sWorld.PeakSessionCount, MSG_COLOR_WHITE, sWorld.mAcceptedConnections);
 	}
 
-	//Set current RestState
-	if( plr->m_isResting) 		// We are resting at an inn , turn on Zzz
-		plr->ApplyPlayerRestState(true);
+	// send to gms
+	if( HasGMPermissions() )
+		sWorld.SendMessageToGMs(this, "GM %s (%s) is now online. (Permissions: [%s])", _player->GetName(), GetAccountNameS(), GetPermissions());
 
-	//Calculate rest bonus if there is time between lastlogoff and now
-	if( plr->m_timeLogoff > 0 && plr->GetUInt32Value(UNIT_FIELD_LEVEL) < plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))	// if timelogoff = 0 then it's the first login
+	// Calculate rested experience if there is time between lastlogoff and now
+	uint32 currenttime = (uint32)UNIXTIME;
+	uint32 timediff = currenttime - plr->m_timeLogoff;
+
+	if(plr->m_timeLogoff > 0 && plr->GetUInt32Value(UNIT_FIELD_LEVEL) < plr->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))	// if timelogoff = 0 then it's the first login
 	{
-		uint32 currenttime = (uint32)UNIXTIME;
-		uint32 timediff = currenttime - plr->m_timeLogoff;
-
-		//Calculate rest bonus
-		if( timediff > 0 ) 
-			plr->AddCalculatedRestXP(timediff);
+		if(plr->m_isResting) 
+		{
+			// We are resting at an inn, calculate XP and add it.
+			uint32 RestXP = plr->CalculateRestXP((uint32)timediff);
+			plr->AddRestXP(RestXP);
+			DEBUG_LOG("REST: Added %d of rest XP.", RestXP);
+			plr->ApplyPlayerRestState(true);
+		}
+		else if(timediff > 0)
+		{
+			// We are resting in the wilderness at a slower rate.
+			uint32 RestXP = plr->CalculateRestXP((uint32)timediff);
+			RestXP >>= 2;		// divide by 4 because its at 1/4 of the rate
+			plr->AddRestXP(RestXP);
+		}
 	}
 
 #ifdef CLUSTERING
@@ -921,6 +912,47 @@ void WorldSession::FullLogin(Player * plr)
 
 	if(info->m_Group)
 		info->m_Group->Update();
+
+	//death system checkout
+	if(_player->GetUInt32Value(UNIT_FIELD_HEALTH) == 0 || _player->isDead() || _player->HasFlag(PLAYER_FLAGS, PLAYER_FLAG_DEATH_WORLD_ENABLE))
+	{
+		Corpse * corpse = objmgr.GetCorpseByOwner(_player->GetLowGUID());
+		if( corpse != NULL )
+		{
+			MapMgr *myMgr = sInstanceMgr.GetInstance(_player);
+			if( myMgr == NULL || (myMgr->GetMapInfo()->type != INSTANCE_NULL && myMgr->GetMapInfo()->type != INSTANCE_PVP)
+				|| (myMgr->GetMapId() == corpse->GetMapId()) )	
+			{
+				// instance death, screw it, revive them
+				_player->ResurrectPlayer(NULL);
+				_player->SpawnCorpseBones();
+				//_player->KillPlayer();
+				//_player->RepopRequestedPlayer();
+			}
+			else
+			{
+				// got a corpse
+				_player->setDeathState(CORPSE);
+				_player->SetFlag(PLAYER_FLAGS, PLAYER_FLAG_DEATH_WORLD_ENABLE);
+				_player->SetUInt32Value(UNIT_FIELD_HEALTH, 1);
+			}
+		}
+		else
+		{
+			// logged out after death, attempt repop
+			// otherwise people can cheat death by relogging
+			if( _player->m_uint32Values[UNIT_FIELD_HEALTH] == 0 )
+			{
+				_player->KillPlayer();
+				_player->RepopRequestedPlayer();
+			}
+			else
+			{
+				// just revive them
+				_player->ResurrectPlayer(NULL);
+			}
+		}
+	}
 
 	if(enter_world && !_player->GetMapMgr())
 	{

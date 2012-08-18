@@ -18,6 +18,7 @@
  */
 
 #include "ConfigEnv.h"
+#include "NGLog.h"
 ConfigMgr Config;
 
 //#define _CONFIG_DEBUG
@@ -131,7 +132,7 @@ bool ConfigFile::SetSource(const char *file, bool ignorecase)
 		int length;
 		if(!f)
 		{
-			sLog.outError("Could not open %s.", file);
+			Log.Error("ConfigFile", "Could not open %s.", file);
 			return false;
 		}
 
@@ -229,7 +230,7 @@ parse:
 					/* append the setting to the config block. */
 					if(current_block == "" || current_variable == "")
 					{
-						sLog.outError("Quote without variable.");
+						Log.Error("ConfigFile", "Quote without variable.");
 						return false;
 					}
 
@@ -353,7 +354,7 @@ parse:
 					}
 					else
 					{
-						sLog.outError("Block without name.");
+						Log.Error("ConfigFile", "Block without name.");
 						return false;
 					}
 
@@ -365,26 +366,26 @@ parse:
 
 		}catch(...)
 			{
-				sLog.outError("Exception in config parsing.");
+				Log.Error("ConfigFile", "Exception in config parsing.");
 				return false;
 			}
 
 		/* handle any errors */
 		if(in_block)
 		{
-			sLog.outError("Unterminated block.");
+			Log.Error("ConfigFile", "Unterminated block.");
 			return false;
 		}
 
 		if(in_multiline_comment)
 		{
-			sLog.outError("Unterminated comment.");
+			Log.Error("ConfigFile", "Unterminated comment.");
 			return false;
 		}
 
 		if(in_multiline_quote)
 		{
-			sLog.outError("Unterminated quote.");
+			Log.Error("ConfigFile", "Unterminated quote.");
 			return false;
 		}
 

@@ -78,6 +78,7 @@ public:
 	AddItemResult SafeAddItem(Item *pItem, int8 ContainerSlot, int8 slot);
 	Item *SafeRemoveAndRetreiveItemFromSlot(int8 ContainerSlot, int8 slot, bool destroy); //doesnt destroy item from memory
 	Item *SafeRemoveAndRetreiveItemByGuid(uint64 guid, bool destroy);
+	Item *SafeRemoveAndRetreiveItemByGuidRemoveStats(uint64 guid, bool destroy);
 	bool SafeFullRemoveItemFromSlot(int8 ContainerSlot, int8 slot); //destroys item fully
 	bool SafeFullRemoveItemByGuid(uint64 guid); //destroys item fully
 	AddItemResult AddItemToFreeSlot(Item *item);
@@ -88,7 +89,7 @@ public:
 	uint32 RemoveItemAmt(uint32 id, uint32 amt);
 	uint32 RemoveItemAmt_ProtectPointer(uint32 id, uint32 amt, Item** pointer);
 	void RemoveAllConjured();
-	void BuyItem(ItemPrototype *item, uint32 total_amount, Creature * pVendor);
+	void BuyItem(ItemPrototype *item, uint32 total_amount, Creature * pVendor, ItemExtendedCostEntry *ec);
 
 	uint32 CalculateFreeSlots(ItemPrototype *proto);
 	void ReduceItemDurability();
@@ -107,8 +108,8 @@ public:
 
 
 	int8 CanEquipItemInSlot(int8 DstInvSlot, int8 slot, ItemPrototype* item, bool ignore_combat = false, bool skip_2h_check = false);
-	int8 CanReceiveItem(ItemPrototype * item, uint32 amount);
-	int8 CanAffordItem(ItemPrototype * item,uint32 amount, Creature * pVendor);
+	int8 CanReceiveItem(ItemPrototype * item, uint32 amount, ItemExtendedCostEntry *ec);
+	int8 CanAffordItem(ItemPrototype * item,uint32 amount, Creature * pVendor, ItemExtendedCostEntry *ec);
 	int8 GetItemSlotByType(uint32 type);
 	Item* GetItemByGUID(uint64 itemGuid);
 
@@ -132,6 +133,49 @@ public:
 	bool IsEquipped(uint32 itemid);
 
 	void CheckAreaItems();
+
+public:
+	ASCENT_INLINE bool VerifyBagSlots(int8 ContainerSlot, int8 Slot)
+	{
+		if( ContainerSlot < -1 || Slot < 0 )
+			return false;
+
+		if( ContainerSlot > 0 && (ContainerSlot < INVENTORY_SLOT_BAG_START || ContainerSlot >= INVENTORY_SLOT_BAG_END) )
+			return false;
+
+		if( ContainerSlot == -1 && (Slot >= INVENTORY_SLOT_ITEM_END  || Slot <= EQUIPMENT_SLOT_END) )
+			return false;
+			
+		return true;
+	}
+
+	ASCENT_INLINE bool VerifyBagSlotsWithBank(int8 ContainerSlot, int8 Slot)
+	{
+		if( ContainerSlot < -1 || Slot < 0 )
+			return false;
+
+		if( ContainerSlot > 0 && (ContainerSlot < INVENTORY_SLOT_BAG_START || ContainerSlot >= INVENTORY_SLOT_BAG_END) )
+			return false;
+
+		if( ContainerSlot == -1 && (Slot >= MAX_INVENTORY_SLOT || Slot <= EQUIPMENT_SLOT_END) )
+			return false;
+
+		return true;
+	}
+
+	ASCENT_INLINE bool VerifyBagSlotsWithInv(int8 ContainerSlot, int8 Slot)
+	{
+		if( ContainerSlot < -1 || Slot < 0 )
+			return false;
+
+		if( ContainerSlot > 0 && (ContainerSlot < INVENTORY_SLOT_BAG_START || ContainerSlot >= INVENTORY_SLOT_BAG_END) )
+			return false;
+
+		if( ContainerSlot == -1 && Slot >= MAX_INVENTORY_SLOT )
+			return false;
+
+		return true;
+	}
 };
 
 class ItemIterator

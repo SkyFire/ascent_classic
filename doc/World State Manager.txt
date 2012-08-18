@@ -1,0 +1,21 @@
+- 1 world state manager per instance
+ - per-instance world state structure:
+    
+    uint32 StateId - world state id
+    int32 ZoneMask - if set to -1, sends for all zones, otherwise sends only for this zone. (world pvp!)
+    int32 FactionMask - if set to -1, sends for both factions, otherwise sends for one faction
+    uint32 Value - value of world state
+
+
+ - per-player world state manager
+    
+    - there are also world states that are per-player, not per-zone/faction
+    - e.g. display of the capture bar
+      - a player will have a world state manager for this, structure:
+           uint32 StateId
+           uint32 Value
+
+      - OR! for now we are just going to use the SendWorldStateUpdate handler 
+           - they use no bandwidth
+           - no point keeping them persistant/stored unless we need to use them?
+           - things like control points will have a list of inrange players they will disable the state from when they go out of range anyway

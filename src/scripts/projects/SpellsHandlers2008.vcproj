@@ -414,6 +414,14 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Events"
+			>
+			<File
+				RelativePath="..\src\SpellHandlers\Event_MidsummerFireFestival.cpp"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

@@ -38,6 +38,11 @@ struct CorpseData
 	void DeleteFromDB();
 };
 
+enum CORPSE_DYNAMIC_FLAGS
+{
+	CORPSE_DYN_FLAG_LOOTABLE			= 1,
+};
+
 #define CORPSE_RECLAIM_TIME 30
 #define CORPSE_RECLAIM_TIME_MS CORPSE_RECLAIM_TIME * 1000
 #define CORPSE_MINIMUM_RECLAIM_RADIUS 39 
@@ -60,8 +65,6 @@ public:
 	
 	ASCENT_INLINE void SetLoadedFromDB(bool value) { _loadedfromdb = value; }
 	ASCENT_INLINE bool GetLoadedFromDB(void) { return _loadedfromdb; }
-	Loot loot;
-	void generateLoot();
 
 	void SpawnBones();
 	void Delink();

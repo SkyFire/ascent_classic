@@ -49,7 +49,7 @@ public:
 
 	// vs8 fix - send null on empty buffer
 	ASCENT_INLINE void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
-	ASCENT_INLINE void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
+	ASCENT_INLINE void SendPacket(StackPacket * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
 
 	void __fastcall OutPacket(uint16 opcode, size_t len, const void* data);
 	OUTPACKET_RESULT __fastcall _OutPacket(uint16 opcode, size_t len, const void* data);
@@ -100,134 +100,13 @@ private:
 
 #endif
 
-static inline void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid)
-{
-	// hehe speed freaks
-	uint8 guidmask = 0;
-	uint8 guidfields[9] = {0,0,0,0,0,0,0,0};
-	
-	int j = 1;
-	uint8 * test = (uint8*)&oldguid;
-
-	if (*test) //7*8
-	{
-		guidfields[j] = *test;
-		guidmask |= 1;
-		j++;
-	}
-	if (*(test+1)) //6*8
-	{
-		guidfields[j] = *(test+1);
-		guidmask |= 2;
-		j++;
-	}
-	if (*(test+2)) //5*8
-	{
-		guidfields[j] = *(test+2);
-		guidmask |= 4;
-		j++;
-	}
-	if (*(test+3)) //4*8
-	{
-		guidfields[j] = *(test+3);
-		guidmask |= 8;
-		j++;
-	}
-	if (*(test+4)) //3*8
-	{
-		guidfields[j] = *(test+4);
-		guidmask |= 16;
-		j++;
-	}
-	if (*(test+5))//2*8
-	{
-		guidfields[j] = *(test+5);
-		guidmask |= 32;
-		j++;
-	}
-	if (*(test+6))//1*8
-	{
-		guidfields[j] = *(test+6);
-		guidmask |= 64;
-		j++;
-	}
-	if (*(test+7)) //0*8
-	{
-		guidfields[j] = *(test+7);
-		guidmask |= 128;
-		j++;
-	}
-	guidfields[0] = guidmask;
-
-	buf.append(guidfields,j);
-}
+void FastGUIDPack(ByteBuffer & buf, const uint64 & oldguid);
+void FastGUIDPack(StackBuffer & buf, const uint64 & oldguid);
 
 //!!! warning. This presumes that all guids can be compressed at least 1 byte
 //make sure you choose highguids acordingly
-static inline unsigned int FastGUIDPack(const uint64 & oldguid, unsigned char * buffer, uint32 pos)
-{
-	// hehe speed freaks
-	uint8 guidmask = 0;
+unsigned int FastGUIDPack(const uint64 & oldguid, unsigned char * buffer, uint32 pos);
 
-	int j = 1 + pos;
-#ifdef USING_BIG_ENDIAN
-	uint64 t = swap64(oldguid);
-	uint8 * test = (uint8*)&t;
-#else
-	uint8 * test = (uint8*)&oldguid;
-#endif
-
-	if (*test) //7*8
-	{
-		buffer[j] = *test;
-		guidmask |= 1;
-		j++;
-	}
-	if (*(test+1)) //6*8
-	{
-		buffer[j] = *(test+1);
-		guidmask |= 2;
-		j++;
-	}
-	if (*(test+2)) //5*8
-	{
-		buffer[j] = *(test+2);
-		guidmask |= 4;
-		j++;
-	}
-	if (*(test+3)) //4*8
-	{
-		buffer[j] = *(test+3);
-		guidmask |= 8;
-		j++;
-	}
-	if (*(test+4)) //3*8
-	{
-		buffer[j] = *(test+4);
-		guidmask |= 16;
-		j++;
-	}
-	if (*(test+5))//2*8
-	{
-		buffer[j] = *(test+5);
-		guidmask |= 32;
-		j++;
-	}
-	if (*(test+6))//1*8
-	{
-		buffer[j] = *(test+6);
-		guidmask |= 64;
-		j++;
-	}
-	if (*(test+7)) //0*8
-	{
-		buffer[j] = *(test+7);
-		guidmask |= 128;
-		j++;
-	}
-	buffer[pos] = guidmask;
-	return (j - pos);
-}
 
 /* Modified/Simplified WorldSocket for use with clustering */
 #ifdef CLUSTERING
@@ -243,7 +122,7 @@ public:
 	ASCENT_INLINE uint32 GetRemotePort() { return ntohs(m_address.sin_port); }
 
 	ASCENT_INLINE void SendPacket(WorldPacket* packet) { if(!packet) return; OutPacket(packet->GetOpcode(), (uint16)packet->size(), (packet->size() ? (const void*)packet->contents() : NULL)); }
-	ASCENT_INLINE void SendPacket(StackBufferBase * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
+	ASCENT_INLINE void SendPacket(StackPacket * packet) { if(!packet) return; OutPacket(packet->GetOpcode(), packet->GetSize(), (packet->GetSize() ? (const void*)packet->GetBufferPointer() : NULL)); }
 	void __fastcall OutPacket(uint16 opcode, uint16 len, const void* data);
 	ASCENT_INLINE uint32 GetSessionId() { return m_sessionId; }
 

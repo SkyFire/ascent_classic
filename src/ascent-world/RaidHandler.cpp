@@ -137,7 +137,7 @@ void WorldSession::HandleRequestRaidInfoOpcode(WorldPacket & recv_data)
 void WorldSession::HandleReadyCheckOpcode(WorldPacket& recv_data)
 {
 	Group * pGroup  = _player->GetGroup();
-	WorldPacket data(CMSG_RAID_READYCHECK, 20);
+	WorldPacket data(MSG_RAID_READY_CHECK, 20);
 	uint8 ready;
 
 	if(!pGroup || ! _player->IsInWorld())

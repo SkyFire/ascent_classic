@@ -74,7 +74,7 @@ void WorldSession::HandleMoveWorldportAckOpcode( WorldPacket & recv_data )
 		// get outta here
 		return;
 	}
-	sLog.outDebug( "WORLD: got MSG_MOVE_WORLDPORT_ACK." );
+	DEBUG_LOG( "WORLD: got MSG_MOVE_WORLDPORT_ACK." );
 	
 	if(_player->m_CurrentTransporter && _player->GetMapId() != _player->m_CurrentTransporter->GetMapId())
 	{
@@ -87,10 +87,17 @@ void WorldSession::HandleMoveWorldportAckOpcode( WorldPacket & recv_data )
 		WorldPacket dataw(SMSG_NEW_WORLD, 20);
 		dataw << pTrans->GetMapId() << c_tposx << c_tposy << c_tposz << _player->GetOrientation();
 		SendPacket(&dataw);
+
+		_player->SetMapId(_player->m_CurrentTransporter->GetMapId());
+		_player->SetPosition(c_tposx, c_tposy, c_tposz, 0, false);
 	}
 	else
 	{
-		_player->m_TeleportState = 2;
+		// don't overwrite the loading flag here.
+		// reason: talents/passive spells don't get cast on an invalid instance login
+		if( _player->m_TeleportState != 1 )
+			_player->m_TeleportState = 2;
+
 		_player->AddToWorld();
 	}
 }
@@ -117,10 +124,9 @@ void WorldSession::HandleMoveTeleportAckOpcode( WorldPacket & recv_data )
 			return;
 		}
 
-		sLog.outDebug( "WORLD: got MSG_MOVE_TELEPORT_ACK." );
+		DEBUG_LOG( "WORLD: got MSG_MOVE_TELEPORT_ACK." );
 		GetPlayer()->SetPlayerStatus(NONE);
-		if( GetPlayer()->m_rooted <= 0 )
-			GetPlayer()->SetMovement(MOVE_UNROOT,5);
+		GetPlayer()->SetMovement(MOVE_UNROOT,5);
 		_player->ResetHeartbeatCoords();
 
 		if(GetPlayer()->GetSummon() != NULL)		// move pet too
@@ -306,7 +312,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 
 	// spell cancel on movement, for now only fishing is added
 	Object * t_go = _player->m_SummonedObject;
-	uint32 mstime_s;
+	uint32 mstime = mTimeStamp();
 	if (t_go)
 	{
 		if (t_go->GetEntry() == GO_FISHING_BOBBER)
@@ -326,36 +332,33 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Update player movement state                                         */
 	/************************************************************************/
-	if( recv_data.GetOpcode() == MSG_MOVE_STOP 
-		|| recv_data.GetOpcode() == MSG_MOVE_STOP_STRAFE 
-		|| recv_data.GetOpcode() == MSG_MOVE_STOP_TURN 
-		|| recv_data.GetOpcode() == MSG_MOVE_FALL_LAND
-		|| ( recv_data.GetOpcode() == MSG_MOVE_SET_FACING && !(movement_info.flags & MOVEFLAG_MOVING_MASK) ) )
+	if( sWorld.antihack_cheatengine && _player->m_lastMovementPacketTimestamp != 0 )
 	{
-		if( _player->m_isMoving )
+		int32 server_delta = (int32)mstime - (int32)_player->m_lastMovementPacketTimestamp;
+		int32 client_delta = (int32)movement_info.time - (int32)_player->m_lastMoveTime;
+		int32 diff = client_delta - server_delta;
+		DEBUG_LOG("server delta: %u, client delta: %u\n", server_delta, client_delta);
+		if( diff >= (int32)World::m_CEThreshold )		// replace with threshold var
 		{
-#ifdef _DEBUG
-//			printf("MOVING: FALSE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
-#endif
-			mstime_s = getMSTime();
-			_player->_SpeedhackCheck(mstime_s);
-			_player->m_isMoving = false;
-			_player->_startMoveTime = 0;
+			// client cheating with process speedup
+			if( _player->m_cheatEngineChances == 1 )
+			{
+				_player->SetMovement( MOVE_ROOT, 1 );
+				_player->BroadcastMessage( "Cheat engine detected. Please contact an admin with the below information if you believe this is a false detection." );
+				_player->BroadcastMessage( "You will be disconnected in 10 seconds." );
+				_player->BroadcastMessage( MSG_COLOR_WHITE"diff: %d server delta: %u client delta: %u\n", diff, server_delta, client_delta );
+				sEventMgr.AddEvent( _player, &Player::_Disconnect, EVENT_PLAYER_KICK, 10000, 1, 0 );
+				_player->m_cheatEngineChances = 0;
+				sCheatLog.writefromsession(this, "Cheat Engine detected. Diff: %d, Server Delta: %u, Client Delta: %u", diff, server_delta, client_delta );
+			}
+			else if (_player->m_cheatEngineChances > 0 )
+				_player->m_cheatEngineChances--;
 		}
 	}
-	else
-	{
-		if( !_player->m_isMoving )
-		{
-#ifdef _DEBUG
-//			printf("MOVING: TRUE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
-#endif
-			mstime_s = getMSTime();
-			_player->m_isMoving = true;
-			_player->_startMoveTime = mstime_s;
-			_player->_lastHeartbeatPosition = _player->GetPosition();
-		}
-	}
+
+	_player->m_lastMovementPacketTimestamp = mstime;
+	_player->m_lastMoveTime = movement_info.time;
+
 
 	/************************************************************************/
 	/* Remove Emote State                                                   */
@@ -401,7 +404,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/************************************************************************/
 	/* Anti-Hack Checks                                                     */
 	/************************************************************************/
-	if( !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->_heartbeatDisable)
+	if( !(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->m_uint32Values[UNIT_FIELD_CHARM] && !_player->m_heartbeatDisable)
 	{
 		/************************************************************************/
 		/* Anti-Teleport                                                        */
@@ -419,7 +422,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 	/* Calculate the timestamp of the packet we have to send out            */
 	/************************************************************************/
 	size_t pos = (size_t)m_MoverWoWGuid.GetNewGuidLen() + 1;
-	uint32 mstime = mTimeStamp();
 	int32 move_time;
 	if(m_clientTimeDelay == 0)
 		m_clientTimeDelay = mstime - movement_info.time;
@@ -438,11 +440,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		/************************************************************************/
 		for(set<Player*>::iterator itr = _player->m_inRangePlayers.begin(); itr != _player->m_inRangePlayers.end(); ++itr)
 		{
-#ifdef USING_BIG_ENDIAN
-			*(uint32*)&movement_packet[pos+5] = swap32(move_time + (*itr)->GetSession()->m_moveDelayTime);
-#else
 			*(uint32*)&movement_packet[pos+5] = uint32(move_time + (*itr)->GetSession()->m_moveDelayTime);
-#endif
 #if defined(ENABLE_COMPRESSED_MOVEMENT) && defined(ENABLE_COMPRESSED_MOVEMENT_FOR_PLAYERS)
 			if( _player->GetPositionNC().Distance2DSq((*itr)->GetPosition()) >= World::m_movementCompressThreshold )
 				(*itr)->AppendMovementData( recv_data.GetOpcode(), uint16(recv_data.size() + pos), movement_packet );
@@ -506,6 +504,9 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 		else
 			//whilst player is not falling, continuosly update Z axis position.
 			//once player lands this will be used to determine how far he fell.
+			if( _player->z_axisposition == 0.0f )
+				_player->DelaySpeedHack(20000);
+
 			if( !( movement_info.flags & MOVEFLAG_FALLING ) )
 				_player->z_axisposition = movement_info.z;
 	}
@@ -599,11 +600,59 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
 				movement_info.orientation + movement_info.transO, false);
 		}
 	}	
+
+	if(  !(movement_info.flags & MOVEFLAG_MOVING_MASK) )
+	{
+		if( _player->m_isMoving )
+		{
+			//printf("MOVING: FALSE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
+			_player->_SpeedhackCheck();
+			_player->m_isMoving = false;
+			_player->m_startMoveTime = 0;
+		}
+	}
+	else
+	{
+		if( !_player->m_isMoving )
+		{
+			//printf("MOVING: TRUE (Packet %s)\n", LookupName( recv_data.GetOpcode(), g_worldOpcodeNames ) );
+			_player->m_isMoving = true;
+			_player->m_startMoveTime = movement_info.time;
+			_player->m_lastHeartbeatPosition.ChangeCoords(movement_info.x, movement_info.y, movement_info.z);
+		}
+	}
+
+	// reset the period every 5 seconds, for a little more accuracy
+	if( _player->m_isMoving && (_player->m_lastMoveTime - _player->m_startMoveTime) >= 5000 )
+	{
+		_player->m_lastHeartbeatPosition.ChangeCoords(movement_info.x, movement_info.y, movement_info.z);
+		_player->m_startMoveTime = _player->m_lastMoveTime;
+		_player->m_cheatEngineChances = 2;
+	}
+
+#if defined(_DEBUG) && defined(COLLISION)
+	//CollideInterface.setDebugPoint(movement_info.x, movement_info.y, movement_info.z, movement_info.orientation);
+#endif
 }
 
 void WorldSession::HandleMoveTimeSkippedOpcode( WorldPacket & recv_data )
 {
-	
+	uint64 guid;
+	uint32 time_dif;
+	uint8 buf[16];
+	StackPacket data(0x319, buf, 16);
+
+	recv_data >> guid;
+	recv_data >> time_dif;
+
+	// ignore updates for not us
+	if( guid != _player->GetGUID() )
+		return;
+
+	// send to other players
+	data << _player->GetNewGUID();
+	data << time_dif;
+	_player->SendMessageToSet(&data, false);
 }
 
 void WorldSession::HandleMoveNotActiveMoverOpcode( WorldPacket & recv_data )
@@ -708,6 +757,11 @@ void WorldSession::HandleTeleportCheatOpcode(WorldPacket & recv_data)
 	_player->SafeTeleport(_player->GetMapId(),_player->GetInstanceID(),vec);
 }
 
+void WorldSession::HandleMoveFallResetOpcode(WorldPacket & recvPacket)
+{
+	_player->z_axisposition = 0.0f;
+}
+
 void MovementInfo::init(WorldPacket & data)
 {
 	transGuid = 0;
@@ -738,7 +792,7 @@ void MovementInfo::init(WorldPacket & data)
 		if(data.rpos() + 4 == data.wpos())
 			data >> unk13;
 		else
-			sLog.outDebug("Extra bits of movement packet left");
+			DEBUG_LOG("Extra bits of movement packet left");
 	}
 }
 

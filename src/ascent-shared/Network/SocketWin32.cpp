@@ -25,7 +25,7 @@ void Socket::WriteCallback()
 
 		// attempt to push all the data out in a non-blocking fashion.
 		WSABUF buf;
-		buf.len = writeBuffer.GetContiguiousBytes();
+		buf.len = (ULONG)writeBuffer.GetContiguiousBytes();
 		buf.buf = (char*)writeBuffer.GetBufferStart();
 
 		/*OverlappedStruct * ov = new OverlappedStruct(SOCKET_IO_EVENT_WRITE_END);
@@ -69,7 +69,7 @@ void Socket::SetupReadEvent()
 	DWORD r_length = 0;
 	DWORD flags = 0;
 	WSABUF buf;
-	buf.len = readBuffer.GetSpace();
+	buf.len = (ULONG)readBuffer.GetSpace();
 	buf.buf = (char*)readBuffer.GetBuffer();	
 
 	// event that will trigger after data is receieved

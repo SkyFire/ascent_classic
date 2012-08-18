@@ -137,7 +137,7 @@ public:
 	void write(WorldPacket & data);
 };
 
-#define CHECK_INWORLD_RETURN if(!_player->IsInWorld()) { return; }
+#define CHECK_INWORLD_RETURN if(_player == NULL || !_player->IsInWorld()) { return; }
 #define CHECK_GUID_EXISTS(guidx) if(_player->GetMapMgr()->GetUnit((guidx)) == NULL) { return; }
 #define CHECK_PACKET_SIZE(pckp, ssize) if(ssize && pckp.size() < ssize) { Disconnect(); return; }
 
@@ -164,7 +164,7 @@ public:
 			_socket->SendPacket(packet);
 	}
 
-	ASCENT_INLINE void SendPacket(StackBufferBase * packet)
+	ASCENT_INLINE void SendPacket(StackPacket * packet)
 	{
 		if(_socket && _socket->IsConnected())
 			_socket->SendPacket(packet);
@@ -353,6 +353,7 @@ protected:
 	/// Opcodes implemented in MovementHandler.cpp
 	void HandleMoveWorldportAckOpcode( WorldPacket& recvPacket );
 	void HandleMovementOpcodes( WorldPacket& recvPacket );
+	void HandleMoveFallResetOpcode( WorldPacket & recvPacket);
 	void HandleMoveTimeSkippedOpcode( WorldPacket & recv_data );
 	void HandleMoveNotActiveMoverOpcode( WorldPacket & recv_data );
 	void HandleSetActiveMoverOpcode( WorldPacket & recv_data );
@@ -681,6 +682,8 @@ public:
 	float m_wLevel; // Level of water the player is currently in
 	bool m_bIsWLevelSet; // Does the m_wLevel variable contain up-to-date information about water level?
 
+	MovementInfo* GetMovementInfo() { return &movement_info; }
+
 private:
 	friend class Player;
 	Player *_player;
@@ -711,7 +714,6 @@ private:
 	uint32 instanceId;
 	uint8 _updatecount;
 public:
-	ASCENT_INLINE MovementInfo* GetMovementInfo() { return &movement_info; }
 	static void InitPacketHandlerTable();
 	uint32 floodLines;
 	time_t floodTime;
@@ -719,6 +721,14 @@ public:
 	uint32 language;
 	WorldPacket* BuildQuestQueryResponse(Quest *qst);
 	uint32 m_muted;
+	uint32 m_lastEnumTime;
+	uint32 m_lastWhoTime;
+
+protected:
+	uint32 m_repeatTime;
+	string m_repeatMessage;
+	uint32 m_repeatEmoteTime;
+	uint32 m_repeatEmoteId;
 };
 
 typedef std::set<WorldSession*> SessionSet;

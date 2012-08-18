@@ -24,7 +24,7 @@
 #ifndef __WORLDRUNNABLE_H
 #define __WORLDRUNNABLE_H
 
-class WorldRunnable : public CThread
+class WorldRunnable : public ThreadContext
 {
 public:
 	WorldRunnable();

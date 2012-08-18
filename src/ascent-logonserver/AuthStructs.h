@@ -1,6 +1,6 @@
 /*
  * Ascent MMORPG Server
- * Copyright (C) 2005-2008 Ascent Team <http://www.ascentemu.com/>
+ * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -79,6 +79,7 @@ typedef struct {
 	uint8   cmd;			// 0x01 CMD_AUTH_LOGON_PROOF
 	uint8   error;
 	uint8   M2[20];
+	uint32	unk1;
 	uint32  unk2;
 	uint16  unk203;
 } sAuthLogonProof_S;

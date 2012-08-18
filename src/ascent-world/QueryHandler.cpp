@@ -33,9 +33,10 @@ void WorldSession::HandleNameQueryOpcode( WorldPacket & recv_data )
 	if(!pn)
 		return;
 
-	sLog.outDebug( "Received CMSG_NAME_QUERY for: %s", pn->name );
+	DEBUG_LOG( "Received CMSG_NAME_QUERY for: %s", pn->name );
 
-	WorldPacket data(SMSG_NAME_QUERY_RESPONSE, strlen(pn->name) + 35);
+	uint8 databuffer[5000];
+	StackPacket data(SMSG_NAME_QUERY_RESPONSE, databuffer, 5000);
 	data << pn->guid << uint32(0);	//highguid
 	data << pn->name;
 	data << uint8(0);	   // this probably is "different realm" or something flag.
@@ -50,9 +51,6 @@ void WorldSession::HandleNameQueryOpcode( WorldPacket & recv_data )
 void WorldSession::HandleQueryTimeOpcode( WorldPacket & recv_data )
 {
 	uint32 t = (uint32)UNIXTIME;
-#ifdef USING_BIG_ENDIAN
-	swap32(&t);
-#endif
 	OutPacket(SMSG_QUERY_TIME_RESPONSE, 4, &t);
 }
 
@@ -62,7 +60,9 @@ void WorldSession::HandleQueryTimeOpcode( WorldPacket & recv_data )
 void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 {
 	CHECK_PACKET_SIZE(recv_data, 12);
-	WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 150);
+	//WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 150);
+	uint8 databuffer[10000];
+	StackPacket data(SMSG_CREATURE_QUERY_RESPONSE, databuffer, 10000);
 	uint32 entry;
 	uint64 guid;
 	CreatureInfo *ci;
@@ -92,7 +92,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 
 		if(lcn == NULL)
 		{
-			sLog.outDetail("WORLD: CMSG_CREATURE_QUERY '%s'", ci->Name);
+			DEBUG_LOG("WORLD: CMSG_CREATURE_QUERY '%s'", ci->Name);
 			data << (uint32)entry;
 			data << ci->Name;
 			data << uint8(0) << uint8(0) << uint8(0);
@@ -100,7 +100,7 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 		}
 		else
 		{
-			sLog.outDetail("WORLD: CMSG_CREATURE_QUERY '%s' (localized to %s)", ci->Name, lcn->Name);
+			DEBUG_LOG("WORLD: CMSG_CREATURE_QUERY '%s' (localized to %s)", ci->Name, lcn->Name);
 			data << (uint32)entry;
 			data << lcn->Name;
 			data << uint8(0) << uint8(0) << uint8(0);
@@ -115,8 +115,8 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 		data << ci->SpellDataID;
 		data << ci->Male_DisplayID;
 		data << ci->Female_DisplayID;
-		data << ci->Male_DisplayID2;
-		data << ci->Female_DisplayID2;
+		data << ci->unkint1;
+		data << ci->unkint2;
 		data << ci->unkfloat1;
 		data << ci->unkfloat2;
 		data << ci->Leader;
@@ -131,7 +131,9 @@ void WorldSession::HandleCreatureQueryOpcode( WorldPacket & recv_data )
 void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 {
 	CHECK_PACKET_SIZE(recv_data, 12);
-	WorldPacket data(SMSG_GAMEOBJECT_QUERY_RESPONSE, 300);
+	//WorldPacket data(SMSG_GAMEOBJECT_QUERY_RESPONSE, 300);
+	uint8 databuffer[10000];
+	StackPacket data(SMSG_GAMEOBJECT_QUERY_RESPONSE, databuffer, 10000);
 
 	uint32 entryID;
 	uint64 guid;
@@ -141,7 +143,7 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 	recv_data >> entryID;
 	recv_data >> guid;
 
-	sLog.outDetail("WORLD: CMSG_GAMEOBJECT_QUERY '%u'", entryID);
+	DEBUG_LOG("WORLD: CMSG_GAMEOBJECT_QUERY '%u'", entryID);
 
 	goinfo = GameObjectNameStorage.LookupEntry(entryID);
 	if(goinfo == NULL)
@@ -191,10 +193,12 @@ void WorldSession::HandleGameObjectQueryOpcode( WorldPacket & recv_data )
 //////////////////////////////////////////////////////////////
 void WorldSession::HandleCorpseQueryOpcode(WorldPacket &recv_data)
 {
-	sLog.outDetail("WORLD: Received MSG_CORPSE_QUERY");
+	DEBUG_LOG("WORLD: Received MSG_CORPSE_QUERY");
 
 	Corpse *pCorpse;
-	WorldPacket data(MSG_CORPSE_QUERY, 21);
+	//WorldPacket data(MSG_CORPSE_QUERY, 21);
+	uint8 databuffer[100];
+	StackPacket data(MSG_CORPSE_QUERY, databuffer, 100);
 	MapInfo *pMapinfo;
 
 	pCorpse = objmgr.GetCorpseByOwner(GetPlayer()->GetLowGUID());
@@ -244,35 +248,39 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
 {
 	CHECK_PACKET_SIZE(recv_data, 4);
 	uint32 pageid = 0;
+	uint8 buffer[10000];
+	StackPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE,buffer, 10000);
 	recv_data >> pageid;
 
 	while(pageid)
 	{
 		ItemPage * page = ItemPageStorage.LookupEntry(pageid);
-		if(!page)
+		if(page == NULL)
 			return;
 
 		LocalizedItemPage * lpi = (language>0) ? sLocalizationMgr.GetLocalizedItemPage(pageid,language):NULL;
-		WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 1000);
+		data.Clear();
 		data << pageid;
 		if(lpi)
-			data << lpi->Text;
+			data.Write((uint8*)lpi->Text, strlen(lpi->Text) + 1);
 		else
-			data << page->text;
+			data.Write((uint8*)page->text, strlen(page->text) + 1);
 
 		data << page->next_page;
 		pageid = page->next_page;
 		SendPacket(&data);
 	}
-
 }
+
 //////////////////////////////////////////////////////////////
 /// This function handles CMSG_ITEM_NAME_QUERY:
 //////////////////////////////////////////////////////////////
 void WorldSession::HandleItemNameQueryOpcode( WorldPacket & recv_data )
 {
 	CHECK_PACKET_SIZE(recv_data, 4);
-	WorldPacket reply(SMSG_ITEM_NAME_QUERY_RESPONSE, 100);
+	uint8 databuffer[1000];
+	StackPacket reply(SMSG_ITEM_NAME_QUERY_RESPONSE, databuffer, 1000);
+
 	uint32 itemid;
 	recv_data >> itemid;
 	reply << itemid;
@@ -294,7 +302,9 @@ void WorldSession::HandleInrangeQuestgiverQuery(WorldPacket & recv_data)
 {
 	CHECK_INWORLD_RETURN;
 
-	WorldPacket data(SMSG_INRANGE_QUESTGIVER_STATUS_QUERY_RESPONSE, 1000);
+	//WorldPacket data(SMSG_QUESTGIVER_STATUS_MULTIPLE, 1000);
+	uint8 databuffer[10000];
+	StackPacket data(SMSG_QUESTGIVER_STATUS_MULTIPLE, databuffer, 10000);
 	Object::InRangeSet::iterator itr;
 	Creature * pCreature;
 	uint32 count = 0;
@@ -319,6 +329,6 @@ void WorldSession::HandleInrangeQuestgiverQuery(WorldPacket & recv_data)
 		}
 	}
 
-	*(uint32*)(data.contents()) = count;
+	*(uint32*)(data.GetBufferPointer()) = count;
 	SendPacket(&data);
 }

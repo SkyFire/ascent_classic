@@ -23,6 +23,7 @@
 struct PlayerInfo;
 
 #define MAX_GUILD_RANKS 10
+#define MAX_GUILD_MEMBERS 500
 enum PETITION_TURNIN_ERRORS
 {
 	ERR_PETITION_OK,
@@ -411,11 +412,11 @@ public:
 
 	/** Sends a guild chat message.
 	 */
-	void GuildChat(const char * szMessage, WorldSession * pClient, uint32 iType);
+	void GuildChat(const char * szMessage, WorldSession * pClient, int32 iType);
 
 	/** Sends an officer chat message.
 	 */
-	void OfficerChat(const char * szMessage, WorldSession * pClient, uint32 iType);
+	void OfficerChat(const char * szMessage, WorldSession * pClient, int32 iType);
 
 	/** Sends the guild log to a player.
 	 */
@@ -448,6 +449,11 @@ public:
 	ASCENT_INLINE const uint32 GetBankTabCount() const { return m_bankTabCount; }
 	ASCENT_INLINE const uint32 GetBankBalance() const { return m_bankBalance; }
 	ASCENT_INLINE const size_t GetNumMembers() const { return m_members.size(); }
+
+	Mutex* getLock() { return &m_lock; }
+	map<PlayerInfo*, GuildMember*>::iterator GetGuildMembersBegin() { return m_members.begin(); }
+	map<PlayerInfo*, GuildMember*>::iterator GetGuildMembersEnd() { return m_members.end(); }
+	
 	/** Creates a guild rank with the specified permissions.
 	 */
 	GuildRank * CreateGuildRank(const char * szRankName, uint32 iPermissions, bool bFullGuildBankPermissions);
@@ -514,6 +520,11 @@ public:
 	/** Sends the guild information packet to the specified client.
 	 */
 	void SendGuildInfo(WorldSession * pClient);
+
+	/** Force a guild leader change internally
+	 * used for char renames, etc.
+	 */
+	void ForceLeaderChange(uint32 newGuid) { m_guildLeader = newGuid; }
 
 protected:
 	

@@ -113,7 +113,6 @@ void MapCell::RemoveObjects()
 			}break;
 
 		case TYPEID_GAMEOBJECT: {
-			_mapmgr->_reusable_guids_gameobject.push_back( (*itr)->GetUIdFromGUID() );
 			static_cast< GameObject* >( *itr )->m_respawnCell=NULL;
 			delete static_cast< GameObject* >( *itr );
 			}break;
@@ -188,7 +187,10 @@ void MapCell::LoadObjects(CellSpawns * sp)
             if(c->Load(*i, _mapmgr->iInstanceMode, _mapmgr->GetMapInfo()))
 			{
 				if(!c->CanAddToWorld())
+				{
 					delete c;
+					continue;
+				}
 
 				c->PushToWorld(_mapmgr);
 			}
@@ -215,6 +217,7 @@ void MapCell::LoadObjects(CellSpawns * sp)
 
 				go->m_loadedFromDB = true;
 				go->PushToWorld(_mapmgr);
+				CALL_GO_SCRIPT_EVENT(go, OnSpawn)();
 			}
 			else
 				delete go;//missing proto or smth of that kind

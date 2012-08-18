@@ -26,7 +26,7 @@ LocalConsole g_localConsole;
 
 void ConsoleThread::terminate()
 {
-	m_killSwitch = true;
+	m_threadRunning = false;
 #ifdef WIN32
 	/* write the return keydown/keyup event */
 	DWORD dwTmp;
@@ -66,9 +66,8 @@ bool ConsoleThread::run()
 	struct timeval tv;
 #endif
 
-	m_killSwitch = false;
 	m_isRunning = true;
-	while( m_killSwitch != true )
+	while( m_threadRunning )
 	{
 #ifdef WIN32
 
@@ -77,7 +76,7 @@ bool ConsoleThread::run()
 		if( fgets( cmd, 300, stdin ) == NULL )
 			continue;
 
-		if( m_killSwitch )
+		if( !m_threadRunning )
 			break;
 
 #else
@@ -87,7 +86,7 @@ bool ConsoleThread::run()
 		FD_SET( STDIN_FILENO, &fds );
 		if( select( 1, &fds, NULL, NULL, &tv ) <= 0 )
 		{
-			if(!m_killSwitch)	// timeout
+			if(m_threadRunning)	// timeout
 				continue;
 			else
 				break;

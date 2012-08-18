@@ -45,7 +45,6 @@ protected:
 	Player * p_caster;
 	Spell* m_parentSpell;
 	DynamicObjectList targets;
-	FactionRangeList  m_inRangeOppFactions;
 	
 	uint32 m_aliveDuration;
 	uint32 _fields[DYNAMICOBJECT_END];

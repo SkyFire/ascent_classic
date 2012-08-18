@@ -18,7 +18,6 @@
  */
 
 #include "StdAfx.h"
-
 initialiseSingleton( ObjectMgr );
 
 const char * NormalTalkMessage = "What can I teach you, $N?";
@@ -333,10 +332,12 @@ void ObjectMgr::LoadPlayersInfo()
 	{
 		period = (result->GetRowCount() / 20) + 1;
 		c = 0;
+		
 		do
 		{
 			Field *fields = result->Fetch();
 			pn=new PlayerInfo;
+			memset(pn, 0, sizeof(PlayerInfo));
 			pn->guid = fields[0].GetUInt32();
 			pn->name = strdup(fields[1].GetString());
 			pn->race = fields[2].GetUInt8();
@@ -346,12 +347,6 @@ void ObjectMgr::LoadPlayersInfo()
 			pn->lastZone=fields[6].GetUInt32();
 			pn->lastOnline=fields[7].GetUInt32();
 			pn->acct = fields[8].GetUInt32();
-			pn->m_Group=0;
-			pn->subGroup=0;
-			pn->m_loggedInPlayer=NULL;
-			pn->guild=NULL;
-			pn->guildRank=NULL;
-			pn->guildMember=NULL;
 #ifdef VOICE_CHAT
 			pn->groupVoiceId = -1;
 #endif
@@ -779,123 +774,7 @@ uint32 ObjectMgr::GenerateLowGuid(uint32 guidhigh)
 
 void ObjectMgr::ProcessGameobjectQuests()
 {
-	/*if(!mGameObjectNames.size())
-		return;
-
-	int total = mGameObjectNames.size();
-	std::set<Quest*> tmp;
-	for(HM_NAMESPACE::hash_map<uint32, Quest*>::iterator itr = sQuestMgr.Begin(); itr != sQuestMgr.End(); ++itr)
-	{
-		Quest *qst = itr->second;
-		if(qst->count_required_item > 0 || 
-			qst->required_mobtype[0] == QUEST_MOB_TYPE_GAMEOBJECT ||
-			qst->required_mobtype[1] == QUEST_MOB_TYPE_GAMEOBJECT ||
-			qst->required_mobtype[2] == QUEST_MOB_TYPE_GAMEOBJECT ||
-			qst->required_mobtype[3] == QUEST_MOB_TYPE_GAMEOBJECT )
-		{
-			tmp.insert(qst);
-		}
-	}
-	std::vector<GameObjectInfo*> gos;
-	gos.reserve(5000);
-	for(GameObjectNameMap::iterator it0 = mGameObjectNames.begin(); it0 != mGameObjectNames.end(); ++it0)
-	{
-		GameObjectInfo *gon = it0->second;
-		gos.push_back(it0->second);
-	}
-
-	int c = 0;
-	total = gos.size();
-	for(std::vector<GameObjectInfo*>::iterator it0 = gos.begin(); it0 != gos.end(); ++it0)
-	{
-		GameObjectInfo *gon = (*it0);
-
-		map<uint32, std::set<uint32> >* golootlist = &(LootMgr::getSingleton().quest_loot_go);
-		map<uint32, std::set<uint32> >::iterator it2 = golootlist->find(gon->ID);
-		//// QUEST PARSING
-		for(std::set<Quest*>::iterator itr = tmp.begin(); itr != tmp.end(); ++itr)
-		{
-			Quest *qst = *itr;
-			int max = qst->count_required_mob;
-			if(qst->count_required_item > max)
-				max = qst->count_required_item;
-
-			if(max > 0)
-			{
-				for(int i = 0; i < max; ++i)
-				{
-					if(qst->required_mob[i] > 0)
-					{
-						if(qst->required_mob[i] == gon->ID &&
-						qst->required_mobtype[i] == QUEST_MOB_TYPE_GAMEOBJECT)
-						{
-							gon->goMap.insert( GameObjectGOMap::value_type( qst, qst->required_mobcount[i] ) );
-							sDatabase.WaitExecute("INSERT INTO gameobject_quest_pickup_binding VALUES(%u, %u, %u)",
-								gon->ID, qst->id, qst->required_mobcount[i]);
-						}
-					}
-					if(qst->required_itemcount[i] > 0 && it2 != golootlist->end())
-					{
-						// check our loot template for this item
-						for(std::set<uint32>::iterator it4 = it2->second.begin(); it4 != it2->second.end(); ++it4)
-						{
-							if((*it4) == qst->required_item[i])
-							{
-								//GOQuestItem it;
-								//it.itemid = qst->required_item[i];
-								//it.requiredcount = qst->required_itemcount[i];
-								//gon->itemMap.insert( GameObjectItemMap::value_type( qst, it ) );
-								//gon->itemMap[qst].insert(it);
-								gon->itemMap[qst].insert( std::map<uint32, uint32>::value_type( qst->required_item[i], qst->required_itemcount[i]) );
-								sDatabase.WaitExecute("INSERT INTO gameobject_quest_item_binding VALUES(%u, %u, %u, %u)",
-									gon->ID, qst->id, qst->required_item[i], qst->required_itemcount[i]);
-							}
-						}
-					}
-				}
-			}
-		}
-		c++;
-		if(!(c % 150))
-			SetProgressBar(c, total, "Binding");
-	}
-	ClearProgressBar();*/
-	QueryResult * result  = WorldDatabase.Query("SELECT * FROM gameobject_quest_item_binding");
-	QueryResult * result2 = WorldDatabase.Query("SELECT * FROM gameobject_quest_pickup_binding");
-
-	GameObjectInfo * gon;
-	Quest * qst;
-
-	if(result)
-	{
-		do 
-		{
-			Field * fields = result->Fetch();
-			gon = GameObjectNameStorage.LookupEntry(fields[0].GetUInt32());
-			qst = QuestStorage.LookupEntry(fields[1].GetUInt32());
-			if(gon && qst)
-				gon->itemMap[qst].insert( make_pair( fields[2].GetUInt32(), fields[3].GetUInt32() ) );			
-
-		} while(result->NextRow());
-		delete result;
-	}
-
-
-	if(result2)
-	{
-		do 
-		{
-			Field * fields = result2->Fetch();
-			gon = GameObjectNameStorage.LookupEntry(fields[0].GetUInt32());
-			qst = QuestStorage.LookupEntry(fields[1].GetUInt32());
-			if(gon && qst)
-				gon->goMap.insert( make_pair( qst, fields[2].GetUInt32() ) );
-
-		} while(result2->NextRow());
-		delete result2;
-	}
-
-	result = WorldDatabase.Query("SELECT * FROM npc_gossip_textid");
+	QueryResult *result = WorldDatabase.Query("SELECT * FROM npc_gossip_textid");
 	if(result)
 	{
 		uint32 entry, text;
@@ -1076,12 +955,12 @@ void ObjectMgr::LoadVendors()
 	QueryResult *result = WorldDatabase.Query("SELECT * FROM vendors");
 	if( result != NULL )
 	{
-		if( result->GetFieldCount() < 5 )
+		if( result->GetFieldCount() < 6 )
 		{
 			Log.Notice("ObjectMgr", "Invalid format in vendors (%u/5) columns, not enough data to proceed.\n", result->GetFieldCount() );
 			return;
 		}
-		else if( result->GetFieldCount() > 5 )
+		else if( result->GetFieldCount() > 6 )
 		{
 			Log.Notice("ObjectMgr", "Invalid format in vendors (%u/5) columns, loading anyway because we have enough data\n", result->GetFieldCount() );
 		}
@@ -1107,6 +986,19 @@ void ObjectMgr::LoadVendors()
 			itm.available_amount = fields[3].GetUInt32();
 			itm.max_amount       = fields[3].GetUInt32();
 			itm.incrtime         = fields[4].GetUInt32();
+			itm.extended_cost    = NULL;
+
+			uint32 ec = fields[5].GetUInt32();
+			if( ec != 0 )
+			{
+				itm.extended_cost = dbcItemExtendedCost.LookupEntryForced(ec);
+				if( itm.extended_cost == NULL )
+				{
+					printf("Item %u at vendor %u has extended cost %u which is invalid. Skipping.\n", itm.itemid, fields[0].GetUInt32(), ec);
+					continue;
+				}
+			}
+
 			items->push_back( itm );
 		}
 		while( result->NextRow() );
@@ -1179,141 +1071,6 @@ void ObjectMgr::LoadAIThreatToSpellId()
 	delete result;
 }
 
-void ObjectMgr::LoadSpellFixes()
-{
-	SpellEntry* sp;
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spellfixes");
-	if(result)
-	{
-		sLog.outDetail("Loading %u spell fixes from database...",result->GetRowCount());
-		do
-		{
-			Field * f = result->Fetch();
-			uint32 sf_spellId = f[0].GetUInt32();
-			uint32 sf_procFlags = f[1].GetUInt32();
-			uint32 sf_SpellGroupType = f[2].GetUInt32();
-			uint32 sf_procChance = f[3].GetUInt32();
-			uint32 sf_procCharges = f[4].GetUInt32();
-
-			if( sf_spellId )
-			{
-				sp = dbcSpell.LookupEntryForced( sf_spellId );
-				if( sp != NULL )
-				{
-					if( sf_procFlags )
-						sp->procFlags = sf_procFlags;
-
-					if( sf_SpellGroupType )
-						sp->SpellGroupType = sf_SpellGroupType;
-
-					if( sf_procChance )
-						sp->procChance = sf_procChance;
-
-					if ( sf_procCharges )
-						sp->procCharges = sf_procCharges;
-				}
-			}
-		}while(result->NextRow());
-		delete result;
-	}	
-}
-
-void ObjectMgr::LoadSpellProcs()
-{
-	SpellEntry* sp;
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_proc");
-	if(result)
-	{
-		do
-		{
-			Field * f = result->Fetch();
-			uint32 spe_spellId = f[0].GetUInt32();
-			uint32 spe_NameHash = f[1].GetUInt32();
-
-			if( spe_spellId )
-			{
-				sp = dbcSpell.LookupEntryForced( spe_spellId );
-				if( sp != NULL )
-				{
-					int x;
-					for( x = 0; x < 3; ++x )
-						if( sp->ProcOnNameHash[x] == 0 )
-							break;
-
-					if( x != 3 )
-					{
-						sp->ProcOnNameHash[x] = spe_NameHash;
-					}
-					else
-						sLog.outError("Wrong ProcOnNameHash for Spell: %u!",spe_spellId);
-				}
-			}
-
-		}while(result->NextRow());
-		delete result;
-	}	
-}
-
-void ObjectMgr::LoadSpellEffectsOverride()
-{
-	SpellEntry* sp;
-	QueryResult * result = WorldDatabase.Query("SELECT * FROM spell_effects_override");
-	if(result)
-	{
-		do
-		{
-			Field * f = result->Fetch();
-			uint32 seo_SpellId = f[0].GetUInt32();
-			uint32 seo_EffectId = f[1].GetUInt32();
-			uint32 seo_Disable = f[2].GetUInt32();
-			uint32 seo_Effect = f[3].GetUInt32();
-			uint32 seo_BasePoints = f[4].GetUInt32();
-			uint32 seo_ApplyAuraName = f[5].GetUInt32();
-			uint32 seo_SpellGroupRelation = f[6].GetUInt32();
-			uint32 seo_MiscValue = f[7].GetUInt32();
-			uint32 seo_TriggerSpell = f[8].GetUInt32();
-			uint32 seo_ImplicitTargetA = f[9].GetUInt32();
-			uint32 seo_ImplicitTargetB = f[10].GetUInt32();
-
-			if( seo_SpellId )
-			{
-				sp = dbcSpell.LookupEntryForced( seo_SpellId );
-				if( sp != NULL )
-				{
-					if( seo_Disable )
-						sp->Effect[seo_EffectId] = 0;
-
-					if( seo_Effect )
-						sp->Effect[seo_EffectId] = seo_Effect;
-
-					if( seo_BasePoints )
-						sp->EffectBasePoints[seo_EffectId] = seo_BasePoints;
-
-					if( seo_ApplyAuraName )
-						sp->EffectApplyAuraName[seo_EffectId] = seo_ApplyAuraName;
-
-					if( seo_SpellGroupRelation )
-						sp->EffectSpellGroupRelation[seo_EffectId] = seo_SpellGroupRelation;
-
-					if( seo_MiscValue )
-						sp->EffectMiscValue[seo_EffectId] = seo_MiscValue;
-
-					if( seo_TriggerSpell )
-						sp->EffectTriggerSpell[seo_EffectId] = seo_TriggerSpell;
-					
-					if( seo_ImplicitTargetA )
-						sp->EffectImplicitTargetA[seo_EffectId] = seo_ImplicitTargetA;
-
-					if( seo_ImplicitTargetB )
-						sp->EffectImplicitTargetB[seo_EffectId] = seo_ImplicitTargetB;
-				}
-			}
-
-		}while(result->NextRow());
-		delete result;
-	}	
-}
-
 Item * ObjectMgr::CreateItem(uint32 entry,Player * owner)
 {
 	ItemPrototype * proto = ItemPrototypeStorage.LookupEntry(entry);
@@ -1361,35 +1118,6 @@ Item * ObjectMgr::LoadItem(uint64 guid)
 		delete result;
 	}
 	
-	return pReturn;
-}
-
-Item * ObjectMgr::LoadExternalItem(uint64 guid)
-{
-	QueryResult * result = CharacterDatabase.Query("SELECT * FROM playeritems_external WHERE guid = %u", GUID_LOPART(guid));
-	Item * pReturn = 0;
-
-	if(result)
-	{
-		ItemPrototype * pProto = ItemPrototypeStorage.LookupEntry(result->Fetch()[2].GetUInt32());
-		if(!pProto)
-			return NULL;
-
-		if(pProto->InventoryType == INVTYPE_BAG)
-		{
-			Container * pContainer = new Container(HIGHGUID_TYPE_CONTAINER,(uint32)guid);
-			pContainer->LoadFromDB(result->Fetch());
-			pReturn = pContainer;
-		}
-		else
-		{
-			Item * pItem = new Item(HIGHGUID_TYPE_ITEM,(uint32)guid);
-			pItem->LoadFromDB(result->Fetch(), 0, false);
-			pReturn = pItem;
-		}
-		delete result;
-	}
-
 	return pReturn;
 }
 
@@ -1623,7 +1351,7 @@ void ObjectMgr::LoadTrainers()
 								ts.pCastRealSpell = dbcSpell.LookupEntryForced(ts.pCastSpell->EffectTriggerSpell[k]);
 								if( ts.pCastRealSpell == NULL )
 								{
-									Log.Warning("Trainers", "Trainer %u contains cast spell %u that is non-teaching\n", entry, CastSpellID);
+									Log.Warning("Trainers", "Trainer %u contains cast spell %u that is non-teaching", entry, CastSpellID);
 									abrt=true;
 								}
 								break;
@@ -2126,7 +1854,9 @@ Pet * ObjectMgr::CreatePet()
 	m_petlock.Acquire();
 	guid =++m_hiPetGuid;
 	m_petlock.Release();
-	return new Pet((uint64)HIGHGUID_TYPE_PET<<32 | guid);
+
+	uint64 fullguid = ((uint64)HIGHGUID_TYPE_PET << 32) | ((uint64)guid << 24) | guid;
+	return new Pet(fullguid);
 }
 
 Player * ObjectMgr::CreatePlayer()
@@ -2272,7 +2002,17 @@ Charter::Charter(Field * fields)
 	{
 		Signatures[i] = fields[f++].GetUInt32();
 		if(Signatures[i])
+		{
+			PlayerInfo * inf = objmgr.GetPlayerInfo(Signatures[i]);
+			if( inf == NULL )
+			{
+				Signatures[i] = 0;
+				continue;
+			}
+
+			inf->charterId[CharterType] = CharterId;
 			++SignatureCount;
+		}
 	}
 }
 
@@ -2319,24 +2059,16 @@ void Charter::Destroy()
 	objmgr.RemoveCharter(this);
 	// Kill the players with this (in db/offline)
 	CharacterDatabase.Execute( "DELETE FROM charters WHERE charterId = %u", CharterId );
-	Player * p;
-#ifdef WIN32
-	__try {
-#endif
+	PlayerInfo * p;
 	for( uint32 i = 0; i < Slots; ++i )
 	{
 		if(!Signatures[i])
 			continue;
-		p =  objmgr.GetPlayer( Signatures[i] );
-		if( p != NULL)
-			p->m_charters[CharterType] = 0;
+
+		p = objmgr.GetPlayerInfo(Signatures[i]);
+		if( p != NULL )
+			p->charterId[CharterType] = NULL;
 	}
-#ifdef WIN32
-	} __except(EXCEPTION_EXECUTE_HANDLER)
-	{
-		return;
-	}
-#endif
 
 	// click, click, boom!
 	delete this;
@@ -2344,11 +2076,6 @@ void Charter::Destroy()
 
 void Charter::SaveToDB()
 {
-	/*CharacterDatabase.Execute(
-		"REPLACE INTO charters VALUES(%u,%u,'%s',"I64FMTD",%u,%u,%u,%u,%u,%u,%u,%u,%u)",
-		CharterId,LeaderGuid,GuildName.c_str(),ItemGuid,Signatures[0],Signatures[1],
-		Signatures[2],Signatures[3],Signatures[4],Signatures[5],
-		Signatures[6],Signatures[7],Signatures[8]);*/
 	std::stringstream ss;
 	uint32 i;
 	ss << "REPLACE INTO charters VALUES(" << CharterId << "," << CharterType << "," << LeaderGuid << ",'" << GuildName << "'," << ItemGuid;
@@ -2711,21 +2438,6 @@ void ObjectMgr::LoadArenaTeams()
 
 	/* update the ranking */
 	UpdateArenaTeamRankings();
-}
-
-ArenaTeam * ObjectMgr::GetArenaTeamByGuid(uint32 guid, uint32 Type)
-{
-	m_arenaTeamLock.Acquire();
-	for(HM_NAMESPACE::hash_map<uint32,ArenaTeam*>::iterator itr = m_arenaTeamMap[Type].begin(); itr != m_arenaTeamMap[Type].end(); ++itr)
-	{
-		if(itr->second->HasMember(guid))
-		{
-			m_arenaTeamLock.Release();
-			return itr->second;
-		}
-	}
-	m_arenaTeamLock.Release();
-	return NULL;
 }
 
 ArenaTeam * ObjectMgr::GetArenaTeamById(uint32 id)
